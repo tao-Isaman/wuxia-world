@@ -1,4 +1,5 @@
 import type { Scene } from "../types";
+import { WORLD_MAP_SCENES } from "./world-map";
 
 // Scene table — three kinds (dialog / location / route) discriminated by `kind`.
 //
@@ -14,7 +15,9 @@ import type { Scene } from "../types";
 // Authoring rule: every `next`, `routeSceneId`, `dialogSceneId`, `locationId`,
 // and route `back` must reference a scene id in this table. validateAndRepair
 // resets unknown ids to "start" on save load.
-export const SCENES: readonly Scene[] = [
+// Core (tutorial) scenes. The full SCENES array below appends WORLD_MAP_SCENES
+// (84 locations from location.md plus their hub + category routes).
+const CORE_SCENES: readonly Scene[] = [
   // ─── Opening ─────────────────────────────────────────────────────────
   {
     kind: "dialog",
@@ -24,7 +27,8 @@ export const SCENES: readonly Scene[] = [
       { t: "narration", text: "เจ้าเดินทางมาจากแดนไกลเพื่อพิสูจน์ฝีมือในยุทธภพ" },
     ],
     choices: [
-      { text: "เข้าสู่หมู่บ้าน →", next: "village" },
+      { text: "เข้าสู่หมู่บ้าน → (ทำตามเรื่องราว)", next: "village" },
+      { text: "🗺 ข้ามไปสำรวจยุทธภพเลย", next: "world_journey" },
     ],
   },
 
@@ -60,6 +64,13 @@ export const SCENES: readonly Scene[] = [
         routeSceneId: "mountain_road",
         label: "ทางเหนือสู่ภูผา",
         hint: "เส้นทางขึ้นเขาสำหรับชมทิวทัศน์",
+      },
+      {
+        // Connector to the larger world (84 locations from location.md).
+        // See lib/world/data/world-map.ts.
+        routeSceneId: "village_to_world",
+        label: "🗺 ออกเดินทางสู่ยุทธภพ",
+        hint: "เริ่มผจญภัยในโลกกว้าง",
       },
     ],
   },
@@ -265,13 +276,16 @@ export const SCENES: readonly Scene[] = [
     lines: [
       { t: "narration", text: "เจ้าเดินทางกลับยังหมู่บ้านพร้อมเรื่องราวแห่งชัยชนะ" },
       { t: "dialogue", speaker: "ผู้อาวุโส", text: "ทำได้ดีมาก เจ้าช่างเป็นยอดยุทธอย่างแท้จริง" },
-      { t: "narration", text: "(จบเดโม่ — เพิ่มฉากต่อใน lib/world/data/scenes.ts)" },
+      { t: "narration", text: "ถึงเวลาออกเดินทางสู่ยุทธภพอันกว้างใหญ่แล้ว..." },
     ],
     choices: [
-      { text: "ก้าวต่อไป...", next: "village" },
+      { text: "ออกเดินทางสู่ยุทธภพ →", next: "world_journey" },
     ],
   },
 ];
+
+// Final scene table: core tutorial + the full world map (84 locations).
+export const SCENES: readonly Scene[] = [...CORE_SCENES, ...WORLD_MAP_SCENES];
 
 export const SCENES_BY_ID = new Map<string, Scene>(SCENES.map((s) => [s.id, s]));
 

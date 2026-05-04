@@ -75,6 +75,13 @@ export function applyEffect(state: WorldStateData, eff: SceneEffect): void {
     case "goto":
       state.currentSceneId = eff.sceneId;
       return;
+
+    case "gotoRandom": {
+      if (eff.sceneIds.length === 0) return;
+      const i = Math.floor(Math.random() * eff.sceneIds.length);
+      state.currentSceneId = eff.sceneIds[i]!;
+      return;
+    }
   }
 }
 
