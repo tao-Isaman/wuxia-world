@@ -13,6 +13,7 @@ import { LocationView } from "./location-view";
 import { RouteView } from "./route-view";
 import { QuestLog } from "./quest-log";
 import { PlayerStatus } from "./player-status";
+import { StatusBar } from "./status-bar";
 import { DebugOverlay } from "./debug-overlay";
 import { BattleArena } from "@/components/game/battle-arena";
 
@@ -97,6 +98,7 @@ export function WorldScreen() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-[1fr_280px] gap-3">
       <div className="space-y-3">
+        <StatusBar />
         {mainView}
         <div className="flex justify-end">
           <Button

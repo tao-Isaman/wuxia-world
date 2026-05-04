@@ -101,7 +101,8 @@ export type SceneEffect =
   | { t: "finishQuest"; questId: string; success: boolean }
   | { t: "triggerBattle"; opponentId: string; onWin: string; onLose: string }
   | { t: "goto"; sceneId: string }
-  | { t: "gotoRandom"; sceneIds: string[] };
+  | { t: "gotoRandom"; sceneIds: string[] }
+  | { t: "rollRandomEvent" };
 
 // ─── Conditions ────────────────────────────────────────────────────────
 

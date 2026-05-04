@@ -1,5 +1,13 @@
 import type { SceneEffect, WorldStateData } from "./types";
 import { getQuest } from "./data/quests";
+import { getScene } from "./data/scenes";
+import {
+  EVENT_PROBABILITY,
+  FIGHT_EVENTS,
+  MEET_EVENTS,
+  TREASURE_EVENTS,
+  pickWeighted,
+} from "./data/random-events";
 
 // Pure mutation: applies a single effect to the world state in place.
 // `triggerBattle` only sets `pendingBattle` — the battle-bridge module
@@ -80,6 +88,67 @@ export function applyEffect(state: WorldStateData, eff: SceneEffect): void {
       if (eff.sceneIds.length === 0) return;
       const i = Math.floor(Math.random() * eff.sceneIds.length);
       state.currentSceneId = eff.sceneIds[i]!;
+      return;
+    }
+
+    case "rollRandomEvent": {
+      // Suppress the immediate re-roll that fires when a meet/treasure dialog
+      // auto-returns to the leaf, or when a fight's onWin/onLose routes back.
+      // The flag is single-use and is also wiped by validateAndRepair on
+      // rehydrate so it can never leak across sessions.
+      if (state.flags._skipEventRoll) {
+        delete state.flags._skipEventRoll;
+        return;
+      }
+      if (!state.playerBuild) return;
+
+      // Pin the leaf as lastLocationId so the upcoming event dialog's "ปิด"
+      // returns here even though we are about to redirect away from it.
+      state.lastLocationId = state.currentSceneId;
+
+      const luk = state.playerBuild.stats.LUK;
+      const fightP = EVENT_PROBABILITY.fight;
+      const treasureP = Math.min(
+        EVENT_PROBABILITY.treasureCap,
+        EVENT_PROBABILITY.treasureBase + luk / EVENT_PROBABILITY.treasureLukDivisor,
+      );
+      const meetP = Math.min(
+        EVENT_PROBABILITY.meetCap,
+        EVENT_PROBABILITY.meetBase + luk / EVENT_PROBABILITY.meetLukDivisor,
+      );
+
+      const r = Math.random();
+
+      if (r < fightP) {
+        const ev = pickWeighted(FIGHT_EVENTS, Math.random());
+        if (!ev) return;
+        state.flags._skipEventRoll = true;
+        state.pendingBattle = {
+          opponentId: ev.opponentId,
+          onWin: state.lastLocationId,
+          onLose: state.lastLocationId,
+        };
+        return;
+      }
+      if (r < fightP + treasureP) {
+        const ev = pickWeighted(TREASURE_EVENTS, Math.random());
+        if (!ev) return;
+        state.flags._skipEventRoll = true;
+        state.currentSceneId = ev.dialogSceneId;
+        const dest = getScene(ev.dialogSceneId);
+        if (dest?.onEnter) applyEffects(state, dest.onEnter);
+        return;
+      }
+      if (r < fightP + treasureP + meetP) {
+        const ev = pickWeighted(MEET_EVENTS, Math.random());
+        if (!ev) return;
+        state.flags._skipEventRoll = true;
+        state.currentSceneId = ev.dialogSceneId;
+        const dest = getScene(ev.dialogSceneId);
+        if (dest?.onEnter) applyEffects(state, dest.onEnter);
+        return;
+      }
+      // r ≥ all bands → nothing happens; player just sees the location.
       return;
     }
   }

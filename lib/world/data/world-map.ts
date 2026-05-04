@@ -33,9 +33,18 @@ import type {
 
 function leaf(id: string, name: string, description: string): LocationScene {
   // routes are populated below in the connectivity pass — every leaf gets
-  // 1–4 directed-edge routes to other leaves plus a final "back to world map"
-  // fallback. Authors can append more routes after this file mutates them.
-  return { kind: "location", id, name, description, npcs: [], routes: [] };
+  // 1–4 directed-edge routes to other leaves. Each leaf also rolls a random
+  // event on every entry (fight / treasure / meet / nothing), implemented
+  // in lib/world/effects.ts.
+  return {
+    kind: "location",
+    id,
+    name,
+    description,
+    npcs: [],
+    routes: [],
+    onEnter: [{ t: "rollRandomEvent" }],
+  };
 }
 
 function destOf(loc: LocationScene, hint?: string): RouteDestination {

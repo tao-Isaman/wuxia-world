@@ -12,6 +12,21 @@ export const ITEMS: readonly ItemDef[] = [
     name: "กุญแจเก่า",
     description: "กุญแจเก่าแก่ ไม่รู้ว่าใช้กับประตูไหน",
   },
+  {
+    id: "jade",
+    name: "หยกล้ำค่า",
+    description: "หยกเขียวขัดเงาวาว มูลค่าสูงในตลาดบู๊ลิ้ม",
+  },
+  {
+    id: "herb",
+    name: "สมุนไพรหายาก",
+    description: "ใบไม้สมุนไพรกลิ่นหอม ใช้ทำยาฟื้นพลัง",
+  },
+  {
+    id: "ancient_coin",
+    name: "เหรียญโบราณ",
+    description: "เหรียญทองคำโบราณ มีอักษรจีนแกะสลัก",
+  },
 ];
 
 export const ITEMS_BY_ID = new Map<string, ItemDef>(ITEMS.map((i) => [i.id, i]));

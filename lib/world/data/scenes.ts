@@ -282,6 +282,84 @@ const CORE_SCENES: readonly Scene[] = [
       { text: "ออกเดินทางสู่ยุทธภพ →", next: "world_journey" },
     ],
   },
+
+  // ─── Random-event scenes ─────────────────────────────────────────────
+  // Fired by `rollRandomEvent` in lib/world/effects.ts. Each is a terminal
+  // dialog whose onEnter applies the loot; pressing "ปิด" auto-returns to
+  // lastLocationId (the leaf the player just stepped onto).
+
+  {
+    kind: "dialog",
+    id: "evt_meet_wanderer",
+    lines: [
+      { t: "narration", text: "เจ้าพบนักเดินทางคนหนึ่งบนเส้นทาง" },
+      { t: "dialogue", speaker: "นักเดินทาง", text: "ท่านดูเหนื่อยล้าเหลือเกิน รับสมุนไพรนี้ไปเถิด" },
+      { t: "narration", text: "เขาส่งสมุนไพรหายากให้แล้วจากไป" },
+    ],
+    onEnter: [{ t: "giveItem", itemId: "herb", count: 1 }],
+  },
+
+  {
+    kind: "dialog",
+    id: "evt_meet_monk",
+    lines: [
+      { t: "narration", text: "พระผู้แสวงบุญรูปหนึ่งเดินผ่านมา" },
+      { t: "dialogue", speaker: "พระ", text: "เจริญพร โยม จงเดินทางอย่างปลอดภัย" },
+      { t: "narration", text: "ท่านส่งยาเลือดเล็กให้ก่อนเดินจากไป" },
+    ],
+    onEnter: [{ t: "giveItem", itemId: "potion", count: 1 }],
+  },
+
+  {
+    kind: "dialog",
+    id: "evt_meet_merchant",
+    lines: [
+      { t: "narration", text: "พ่อค้าเร่ผูกม้าอยู่ริมทาง" },
+      { t: "dialogue", speaker: "พ่อค้า", text: "วันนี้ขายดี ขอแบ่งโชคให้ผู้พบเห็น!" },
+      { t: "narration", text: "เขายื่นถุงเหรียญทองให้ก่อนจากไป" },
+    ],
+    onEnter: [{ t: "addGold", amount: 80 }],
+  },
+
+  {
+    kind: "dialog",
+    id: "evt_treasure_gold",
+    lines: [
+      { t: "narration", text: "เจ้าสะดุดถุงผ้าเก่าใต้พุ่มไม้" },
+      { t: "narration", text: "ภายในมีเหรียญทองอยู่จำนวนหนึ่ง!" },
+    ],
+    onEnter: [{ t: "addGold", amount: 50 }],
+  },
+
+  {
+    kind: "dialog",
+    id: "evt_treasure_potion",
+    lines: [
+      { t: "narration", text: "เจ้าพบขวดยาเล็ก ๆ ซ่อนอยู่ในซอกหิน" },
+      { t: "narration", text: "ดูเหมือนใครจะลืมไว้... เก็บไปด้วยก็แล้วกัน" },
+    ],
+    onEnter: [{ t: "giveItem", itemId: "potion", count: 1 }],
+  },
+
+  {
+    kind: "dialog",
+    id: "evt_treasure_herb",
+    lines: [
+      { t: "narration", text: "พุ่มสมุนไพรหายากซ่อนอยู่ใต้ใบไม้แห้ง" },
+      { t: "narration", text: "เจ้าเด็ดยอดอ่อนใส่ย่ามอย่างระมัดระวัง" },
+    ],
+    onEnter: [{ t: "giveItem", itemId: "herb", count: 1 }],
+  },
+
+  {
+    kind: "dialog",
+    id: "evt_treasure_jade",
+    lines: [
+      { t: "narration", text: "แสงเขียวจาง ๆ ลอดผ่านโพรงหิน..." },
+      { t: "narration", text: "เป็นหยกล้ำค่าอย่างไม่น่าเชื่อ!" },
+    ],
+    onEnter: [{ t: "giveItem", itemId: "jade", count: 1 }],
+  },
 ];
 
 // Final scene table: core tutorial + the full world map (84 locations).

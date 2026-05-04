@@ -34,6 +34,11 @@ export function validateAndRepair(state: WorldStateData): void {
     }
   }
 
+  // Transient engine flags must never survive a reload — `_skipEventRoll`
+  // is set by rollRandomEvent to suppress the immediate return-roll, and
+  // would silently swallow the next on-enter event if it leaked.
+  delete state.flags._skipEventRoll;
+
   // Inventory: drop unknown items.
   for (const itemId of Object.keys(state.inventory)) {
     if (!ITEMS_BY_ID.has(itemId)) {
