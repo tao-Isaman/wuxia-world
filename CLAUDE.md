@@ -23,14 +23,16 @@ There are no tests yet. If you add some, prefer Vitest (zero-config with the Bun
 
 ## Architecture
 
-Three layers, strict directionality — UI depends on stores, stores depend on the engine, engine depends on nothing else:
+Layered, strict downward dependency — UI depends on stores, stores depend on the engines, engines depend on nothing else (and not on each other except via the explicit bridge):
 
 ```
 app/, components/        ← React components, Tailwind
    ↓
-store/                   ← Zustand wrappers
+store/                   ← Zustand wrappers (character, battle, world)
    ↓
-lib/game/                ← pure TypeScript engine (no React, no I/O)
+lib/game/   lib/world/   ← pure TypeScript engines (no React, no I/O)
+              ↓
+              battle-bridge.ts  ← only place the two stores talk to each other
 ```
 
 ### `lib/game/` — pure engine
@@ -80,31 +82,78 @@ The animation pipeline:
 
 The ATB Progress bar uses `animate={false}` (no CSS transition) because rAF already updates it every frame; with the default transition the bar would lag behind the actual gauge state.
 
+### `lib/world/` — pure world/story engine
+
+A second engine layered on top of the battle sim. The world is the text-based RPG outer game; the battle sim is its combat layer. Same conventions as `lib/game/`: discriminated unions on `t`, data tables, dispatchers, no React.
+
+- **`types.ts`** — `Scene`, `Choice`, `SceneEffect`, `Condition`, `QuestDef`, `QuestState`, `ItemDef`, `OpponentDef`, `WorldStateData`. `SceneEffect` and `Condition` are the unions you'll extend.
+- **`data/`** — `scenes.ts`, `quests.ts`, `items.ts`, `opponents.ts`. Authoring rule: every `next` and every `onWin`/`onLose` must reference an existing scene id, otherwise `validateAndRepair` (run on save load) will reset the player to `START_SCENE_ID`.
+- **`conditions.ts`** — `evaluateCondition(state, c)`: read-only check used by the choice-panel to filter visible choices.
+- **`effects.ts`** — `applyEffect(state, eff)`: mutating dispatcher. The `triggerBattle` effect just *sets* `pendingBattle` — it does **not** start the battle directly.
+- **`battle-bridge.ts`** — module-level subscriptions that wire `useWorldStore` ↔ `useBattleStore`. **This is the only place the two stores reference each other.** Do not call `battleStore.start()` from inside `applyEffect` or anywhere else — keep effects pure mutation.
+- **`validate.ts`** — `validateAndRepair(state)`: drops dangling refs to removed scenes/items/quests; clears stale `pendingBattle`.
+
+### Routes
+
+- **`/`** (`app/page.tsx`) — the world game. Renders `<WorldScreen />`, calls `initBattleBridge()` once on mount.
+- **`/debug`** (`app/debug/page.tsx`) — dev sandbox with three tabs: setup (CharacterCard A & B), library (SkillLibrary), and the free-form battle sim (`<BattleArena mode="free" />`). The world player is fully decoupled from the character-store builds here; changes in /debug don't affect the world save.
+
 ### `store/` — Zustand wrappers
 
-Two stores, both `"use client"`:
+All `"use client"`. Three stores, all independent:
 
-- **`character-store.ts`** — setup state (stats, skills, arts, equipment per side). All mutations clamp/dedupe at the boundary (e.g. `setStat` enforces the 200-point budget; `setSkillSlot` clears duplicates from other slots).
-- **`battle-store.ts`** — runtime battle state. Mutate-then-publish: pure logic mutates the `BattleState` in place, then the store calls `set({ state: { ...state } })` so subscribers re-render via reference change. The internal `advanceUntilPlayer` loop runs the ATB + AI turns until it's the player's turn (or the battle ends), capped by `MAX_AI_CHAIN` to prevent infinite loops if the AI is locked out (no usable skills + no MP for IA).
+- **`character-store.ts`** — `/debug` setup-tab state (character A & B). Wrapped with `persist` (`wusia-character-v1`, version 1). The world game does **not** read from this store.
+- **`battle-store.ts`** — runtime battle state. **Not persisted** — combat is ephemeral; reload mid-fight via the bridge's `reconcile()` restarts the encounter from full HP.
+- **`world-store.ts`** — story state (scene, flags, quests, inventory, gold, `pendingBattle`, `playerBuild`). Wrapped with `persist` (`wusia-world-v1`, version 1) + `validateAndRepair` on rehydrate. The world's `playerBuild` is initialized by `startNewGame()` from the local `STARTER_BUILD` (all stats 1, single `basic_punch` skill). Future world progression mutates this build directly — there's no link back to the setup tab.
 
-UI components subscribe to these stores via the standard Zustand selector pattern: `useCharacterStore((s) => s.builds[side])`. Don't read `getState()` from inside components — only from event handlers / store internals.
+UI components subscribe via the standard selector pattern: `useWorldStore((s) => s.flags)`. Don't read `getState()` from inside components — only from event handlers / store internals / bridge subscriptions.
+
+### Battle ↔ World seam (`lib/world/battle-bridge.ts`)
+
+`initBattleBridge()` is called once from `app/page.tsx` (idempotent, SSR-safe). It's **one-way automatic** — only the world-to-battle transition is auto-driven; the battle-to-world transition is user-initiated so players see the result before the world resumes.
+
+1. **World → Battle (auto)**: `useWorldStore.subscribe` watches `pendingBattle`. When it appears, the bridge looks up the opponent and calls `battleStore.start(playerBuild, opp.build())`. The world UI then renders `<BattleArena mode="world" onContinue={acknowledge} />` inline (no tab navigation).
+2. **Battle → World (manual)**: when `state.winner` is set, `BattleArena` in world mode shows the winner banner with a "ดำเนินเรื่อง →" button. Clicking it calls `worldStore.acknowledgeBattleResult()`, which routes to the right `onWin`/`onLose` scene, clears `pendingBattle`, and resets the battle store.
+
+`reconcile()` runs once on bridge init: if the world has a `pendingBattle` but the battle store is null (refresh wiped it), it restarts the battle so the player can finish.
+
+The bridge only writes to the battle store — never reads. The UI handles the reverse path. This keeps `applyEffect` purely state-mutating; it never starts a battle directly.
 
 ### UI layer
 
-- **`components/ui/`** — shadcn primitives (Button, Card, Combobox, etc.). The custom **`Combobox`** wraps Popover + cmdk and replaces the searchable-dropdown helper from the original demo.
-- **`components/game/`** — feature components. Each subscribes to whatever slice of the store it needs. The `BattleLog` uses `dangerouslySetInnerHTML` because log lines are pre-formatted with `<b>`, `<span class="lp">`, etc. — those strings are produced inside `lib/game/effects.ts` and `battle.ts` from controlled inputs (no user content), so the XSS surface is the engine itself. Inline classes referenced by those strings (`.lp`, `.lC`) live in `app/globals.css`.
+- **`components/ui/`** — shadcn primitives (Button, Card, Combobox, etc.). The custom **`Combobox`** wraps Popover + cmdk.
+- **`components/game/`** — battle/setup feature components. **`BattleArena`** has a `mode?: "free" | "world"` prop:
+  - `"free"` (default): full Reset / Auto / Restart buttons; reads display names from setup-tab character A & B as fallback.
+  - `"world"`: only the post-battle "ดำเนินเรื่อง →" button (calls `onContinue`); display reads from `battleStore.builds` (set by `start()`), so player/opponent names match the world's encounter.
+  
+  The `BattleLog` uses `dangerouslySetInnerHTML` because log lines are pre-formatted with `<b>`, `<span class="lp">`, etc. — those strings are produced inside `lib/game/effects.ts` and `battle.ts` from controlled inputs (no user content). Inline classes (`.lp`, `.lC`) live in `app/globals.css`.
+- **`components/world/`** — world feature components. `WorldScreen` is the page root; it renders one of three views based on state: `<StartScreen />` (no save), `<BattleArena mode="world" />` (pendingBattle), or the dialog/choice/sidebar layout. `DialogDisplay` renders narration + dialogue lines, `ChoicePanel` filters choices by `visibleIf`, `PlayerStatus` / `QuestLog` show side info, `DebugOverlay` is dev-only (`process.env.NODE_ENV === "development"`).
 
 ### Adding new game content
 
 Most additions don't require touching dispatchers:
 
-- **New skill** → append to `SKILLS` in `lib/game/data/skills.ts`. Use existing `se`/`ee` types if possible.
-- **New equipment** → append to `EQUIPMENT`. Use existing `eff` types if possible.
-- **New art** → append to `ARTS`. The active's `t` field must match an existing case in `resolveArtActive`'s switch (or you'll need to add a new one).
-- **New effect type** → add a variant to the relevant union in `types.ts`, then add a case to the relevant dispatcher in `effects.ts` (or `battle.ts` for art active types). TypeScript will tell you which dispatchers need updating.
+- **New skill / equipment / art** → append to the relevant table in `lib/game/data/`. Use existing `se`/`ee`/`eff` types if possible.
+- **New scene / quest / item / opponent** → append to the relevant table in `lib/world/data/`. The cheapest authoring loop is the dev-only Debug Overlay — jump straight to the new scene without playing through everything.
+- **New effect type** (combat) → variant in `lib/game/types.ts` + case in `lib/game/effects.ts` (or `battle.ts` for art-active types). TS exhaustiveness flags missed dispatchers.
+- **New scene effect / condition** (world) → variant in `lib/world/types.ts` + case in `effects.ts` / `conditions.ts`. Same TS exhaustiveness story.
+- **New world opponent** → append to `OPPONENTS` with a `build()` factory. The factory pattern lets future encounters scale off flags / quest progression without sharing mutable build state. **Calibrate against the player's current stats**: at game start the player has STARTER_BUILD (all 1s + `basic_punch`); demo opponents mirror that for a 50/50 fight.
+
+### Save format & migrations
+
+Two persisted Zustand slices, separate localStorage keys, separate version fields:
+
+- `wusia-character-v1` — `{ builds: { A, B } }` (only used by /debug)
+- `wusia-world-v1` — world state minus action functions (see `partialize`)
+
+`battle-store` is intentionally not persisted.
+
+When a schema changes, bump `version` and add a `migrate(persisted, fromVersion)` that reshapes old payloads. Identity migrations are fine for additive changes. `validateAndRepair` (world-store only) is a separate safety net for content drift (renamed scene ids, removed items, etc.) — it runs on every rehydrate.
+
+`worldStore.resetGame()` wipes the world slice and resets the battle store. Character builds persist independently and are unaffected.
 
 ### Conventions kept from the original
 
-The data tables use compact field names (`bp`, `p`, `f`, `dm`, `dr`, `se`, `ee`, `mg`, `ti`, `w`, etc.) so they cross-reference cleanly with `demo.html` for tuning checks. **Keep this style in the data files** — verbose names there hurt readability when scanning 80 entries. Engine functions and React components, by contrast, use full names (`resolveSkill`, `applySelfEffect`, `BattleContext`) since those are touched far less often than the data.
+The combat data tables use compact field names (`bp`, `p`, `f`, `dm`, `dr`, `se`, `ee`, `mg`, `ti`, `w`, etc.) so they cross-reference cleanly with `demo.html`. **Keep this style in `lib/game/data/`** — verbose names there hurt readability when scanning 80 entries. World data (scenes / quests / items) is touched even more often during authoring, so it uses readable field names (`text`, `speaker`, `description`, etc.) rather than shorthand. Engine functions and React components use full names everywhere.
 
-Thai is the canonical UI language; skill/art/equipment names stay in Thai. If we ever want i18n later, the natural seam is to give each item an i18n key alongside `n` rather than translating the existing strings.
+Thai is the canonical UI language; skill / art / equipment / scene / quest / item names stay in Thai. If we ever want i18n later, the natural seam is to give each item an i18n key alongside `n`/`name` rather than translating the existing strings.

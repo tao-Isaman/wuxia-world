@@ -1,6 +1,7 @@
 "use client";
 
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 import type { CharacterBuild, EquipLoadout, Side, StatKey } from "@/lib/game";
 import { DEFAULT_STATS, STAT_BUDGET, totalStatPoints } from "@/lib/game";
 import { clamp } from "@/lib/utils";
@@ -35,70 +36,82 @@ interface CharacterStore {
   reset: () => void;
 }
 
-export const useCharacterStore = create<CharacterStore>((set) => ({
-  builds: {
-    A: defaultBuild("ยุนม่อ"),
-    B: defaultBuild("ผู้พิทักษ์"),
-  },
-
-  setName: (side, name) =>
-    set((s) => ({ builds: { ...s.builds, [side]: { ...s.builds[side], name } } })),
-
-  setStat: (side, key, v) =>
-    set((s) => {
-      const cur = s.builds[side];
-      const others = totalStatPoints(cur.stats) - cur.stats[key];
-      const cv = clamp(v, 1, Math.min(STAT_BUDGET - others, 100));
-      return {
-        builds: {
-          ...s.builds,
-          [side]: { ...cur, stats: { ...cur.stats, [key]: cv } },
-        },
-      };
-    }),
-
-  setArt: (side, artId) =>
-    set((s) => ({ builds: { ...s.builds, [side]: { ...s.builds[side], artId } } })),
-
-  setArtLevel: (side, lv) =>
-    set((s) => ({
-      builds: {
-        ...s.builds,
-        [side]: { ...s.builds[side], artLevel: clamp(lv, 1, 10) },
-      },
-    })),
-
-  setSkillSlot: (side, slot, skillId) =>
-    set((s) => {
-      const cur = s.builds[side];
-      const next = [...cur.skillIds];
-      // Prevent duplicates: if id is already in another slot, clear that slot.
-      if (skillId) {
-        for (let i = 0; i < next.length; i++) if (i !== slot && next[i] === skillId) next[i] = null;
-      }
-      next[slot] = skillId;
-      return { builds: { ...s.builds, [side]: { ...cur, skillIds: next } } };
-    }),
-
-  setEquipSlot: (side, slot, idx, itemId) =>
-    set((s) => {
-      const cur = s.builds[side];
-      const eq = { ...cur.equipment };
-      if (slot === "W" || slot === "A" || slot === "H" || slot === "B") {
-        eq[slot] = itemId;
-      } else {
-        const arr: [string | null, string | null] = [...eq[slot]];
-        if (idx === 0 || idx === 1) arr[idx] = itemId;
-        eq[slot] = arr;
-      }
-      return { builds: { ...s.builds, [side]: { ...cur, equipment: eq } } };
-    }),
-
-  reset: () =>
-    set({
+export const useCharacterStore = create<CharacterStore>()(
+  persist(
+    (set) => ({
       builds: {
         A: defaultBuild("ยุนม่อ"),
         B: defaultBuild("ผู้พิทักษ์"),
       },
+
+      setName: (side, name) =>
+        set((s) => ({ builds: { ...s.builds, [side]: { ...s.builds[side], name } } })),
+
+      setStat: (side, key, v) =>
+        set((s) => {
+          const cur = s.builds[side];
+          const others = totalStatPoints(cur.stats) - cur.stats[key];
+          const cv = clamp(v, 1, Math.min(STAT_BUDGET - others, 100));
+          return {
+            builds: {
+              ...s.builds,
+              [side]: { ...cur, stats: { ...cur.stats, [key]: cv } },
+            },
+          };
+        }),
+
+      setArt: (side, artId) =>
+        set((s) => ({ builds: { ...s.builds, [side]: { ...s.builds[side], artId } } })),
+
+      setArtLevel: (side, lv) =>
+        set((s) => ({
+          builds: {
+            ...s.builds,
+            [side]: { ...s.builds[side], artLevel: clamp(lv, 1, 10) },
+          },
+        })),
+
+      setSkillSlot: (side, slot, skillId) =>
+        set((s) => {
+          const cur = s.builds[side];
+          const next = [...cur.skillIds];
+          // Prevent duplicates: if id is already in another slot, clear that slot.
+          if (skillId) {
+            for (let i = 0; i < next.length; i++) {
+              if (i !== slot && next[i] === skillId) next[i] = null;
+            }
+          }
+          next[slot] = skillId;
+          return { builds: { ...s.builds, [side]: { ...cur, skillIds: next } } };
+        }),
+
+      setEquipSlot: (side, slot, idx, itemId) =>
+        set((s) => {
+          const cur = s.builds[side];
+          const eq = { ...cur.equipment };
+          if (slot === "W" || slot === "A" || slot === "H" || slot === "B") {
+            eq[slot] = itemId;
+          } else {
+            const arr: [string | null, string | null] = [...eq[slot]];
+            if (idx === 0 || idx === 1) arr[idx] = itemId;
+            eq[slot] = arr;
+          }
+          return { builds: { ...s.builds, [side]: { ...cur, equipment: eq } } };
+        }),
+
+      reset: () =>
+        set({
+          builds: {
+            A: defaultBuild("ยุนม่อ"),
+            B: defaultBuild("ผู้พิทักษ์"),
+          },
+        }),
     }),
-}));
+    {
+      name: "wusia-character-v1",
+      version: 1,
+      partialize: (s) => ({ builds: s.builds }),
+      migrate: (persisted) => persisted as { builds: Record<Side, CharacterBuild> },
+    },
+  ),
+);

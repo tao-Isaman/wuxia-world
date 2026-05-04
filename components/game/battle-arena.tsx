@@ -13,6 +13,7 @@ import {
   critPct,
   hpColor,
   type BattleState,
+  type CharacterBuild,
   type Side,
 } from "@/lib/game";
 import { useBattleStore } from "@/store/battle-store";
@@ -121,8 +122,17 @@ function SidePanel({
   );
 }
 
-export function BattleArena() {
+interface BattleArenaProps {
+  // "free"  — /debug battle tab. User can configure builds and reset freely.
+  // "world" — embedded in WorldScreen. No reset; "ดำเนินเรื่อง" closes the
+  //           seam via onContinue, which resolves to the world's onWin/onLose.
+  mode?: "free" | "world";
+  onContinue?: () => void;
+}
+
+export function BattleArena({ mode = "free", onContinue }: BattleArenaProps) {
   const state = useBattleStore((s) => s.state);
+  const battleBuilds = useBattleStore((s) => s.builds);
   const start = useBattleStore((s) => s.start);
   const reset = useBattleStore((s) => s.reset);
   const useSkill = useBattleStore((s) => s.useSkill);
@@ -130,8 +140,14 @@ export function BattleArena() {
   const autoAdvance = useBattleStore((s) => s.autoAdvance);
   const tick = useBattleStore((s) => s.tick);
 
-  const buildA = useCharacterStore((s) => s.builds.A);
-  const buildB = useCharacterStore((s) => s.builds.B);
+  // Setup-tab builds — used in free mode for the "start fresh" button only.
+  const setupA = useCharacterStore((s) => s.builds.A);
+  const setupB = useCharacterStore((s) => s.builds.B);
+
+  // What's actually fighting (set by `start()`). Falls back to setup builds
+  // for the brief render when the battle hasn't been started yet in free mode.
+  const displayA: CharacterBuild = battleBuilds?.A ?? setupA;
+  const displayB: CharacterBuild = battleBuilds?.B ?? setupB;
 
   // rAF-driven gauge animation. Runs only while a side hasn't filled yet —
   // when phase changes to "player"/"enemy"/"over", the effect cleans up and
@@ -153,11 +169,20 @@ export function BattleArena() {
   }, [phase, tick]);
 
   if (!state) {
+    if (mode === "world") {
+      return (
+        <Card>
+          <CardContent className="p-8 text-center text-sm text-muted-foreground">
+            กำลังเริ่มการต่อสู้...
+          </CardContent>
+        </Card>
+      );
+    }
     return (
       <Card>
         <CardContent className="p-8 text-center space-y-4">
           <p className="text-sm text-muted-foreground">ตั้งค่าตัวละครและเลือกวิชาก่อน</p>
-          <Button size="lg" onClick={() => start(buildA, buildB)}>
+          <Button size="lg" onClick={() => start(setupA, setupB)}>
             ⚔ เริ่มการต่อสู้
           </Button>
         </CardContent>
@@ -167,7 +192,7 @@ export function BattleArena() {
 
   const isAActive = state.phase === "player";
   const isBActive = state.phase === "enemy" || state.phase === "resolving";
-  const aA = getArt(buildA.artId);
+  const aA = getArt(displayA.artId);
   const canIA = !!aA.act && state.mpA >= aA.act.c && state.iaCD.A === 0;
 
   return (
@@ -177,18 +202,18 @@ export function BattleArena() {
           side="A"
           state={state}
           isActive={isAActive}
-          artId={buildA.artId}
-          artLevel={buildA.artLevel}
-          name={buildA.name}
+          artId={displayA.artId}
+          artLevel={displayA.artLevel}
+          name={displayA.name}
         />
         <div className="flex items-start justify-center pt-4 text-2xl font-bold text-muted-foreground">VS</div>
         <SidePanel
           side="B"
           state={state}
           isActive={isBActive}
-          artId={buildB.artId}
-          artLevel={buildB.artLevel}
-          name={buildB.name}
+          artId={displayB.artId}
+          artLevel={displayB.artLevel}
+          name={displayB.name}
         />
       </div>
 
@@ -204,7 +229,7 @@ export function BattleArena() {
               "text-xl font-bold",
               state.winner === "A" ? "text-indigo-900 dark:text-indigo-200" : "text-orange-900 dark:text-orange-200",
             )}>
-              🏆 {state.winner === "A" ? buildA.name : buildB.name} ชนะ!
+              🏆 {state.winner === "A" ? displayA.name : displayB.name} ชนะ!
             </div>
             <div className="text-xs text-muted-foreground mt-1">{state.turn} ตา</div>
           </CardContent>
@@ -214,19 +239,27 @@ export function BattleArena() {
       <BattleLog log={state.log} />
 
       {state.winner ? (
-        <div className="flex justify-center gap-2">
-          <Button onClick={() => start(buildA, buildB)}>เริ่มใหม่</Button>
-          <Button variant="outline" onClick={reset}>
-            Reset
-          </Button>
-        </div>
+        mode === "world" ? (
+          <div className="flex justify-center">
+            <Button size="lg" onClick={() => onContinue?.()}>
+              ดำเนินเรื่อง →
+            </Button>
+          </div>
+        ) : (
+          <div className="flex justify-center gap-2">
+            <Button onClick={() => start(setupA, setupB)}>เริ่มใหม่</Button>
+            <Button variant="outline" onClick={reset}>
+              Reset
+            </Button>
+          </div>
+        )
       ) : state.phase === "player" ? (
         <div className="space-y-2">
           <p className="text-xs text-center text-muted-foreground">
-            เลือกวิชา: <strong>{buildA.name}</strong>
+            เลือกวิชา: <strong>{displayA.name}</strong>
           </p>
           <div className="flex gap-2 justify-center flex-wrap">
-            {buildA.skillIds.map((sid, i) => {
+            {displayA.skillIds.map((sid, i) => {
               if (!sid) return null;
               const sk = getSkill(sid);
               if (!sk) return null;
@@ -276,35 +309,41 @@ export function BattleArena() {
               </Button>
             )}
           </div>
-          <div className="flex justify-center gap-2">
-            <Button variant="outline" size="sm" onClick={autoAdvance}>
-              Auto ▶▶
-            </Button>
-            <Button variant="outline" size="sm" onClick={reset}>
-              Reset
-            </Button>
-          </div>
+          {mode === "free" && (
+            <div className="flex justify-center gap-2">
+              <Button variant="outline" size="sm" onClick={autoAdvance}>
+                Auto ▶▶
+              </Button>
+              <Button variant="outline" size="sm" onClick={reset}>
+                Reset
+              </Button>
+            </div>
+          )}
         </div>
       ) : state.phase === "filling" ? (
         <div className="text-center space-y-2">
           <p className="text-sm italic text-muted-foreground py-2">
             กำลังสะสมพลัง... (A {Math.floor(state.gA)}% · B {Math.floor(state.gB)}%)
           </p>
-          <div className="flex justify-center gap-2">
-            <Button variant="outline" size="sm" onClick={autoAdvance}>
-              Auto ▶▶
-            </Button>
-            <Button variant="outline" size="sm" onClick={reset}>
-              Reset
-            </Button>
-          </div>
+          {mode === "free" && (
+            <div className="flex justify-center gap-2">
+              <Button variant="outline" size="sm" onClick={autoAdvance}>
+                Auto ▶▶
+              </Button>
+              <Button variant="outline" size="sm" onClick={reset}>
+                Reset
+              </Button>
+            </div>
+          )}
         </div>
       ) : (
         <div className="text-center space-y-2">
-          <p className="text-sm italic text-muted-foreground py-2">{buildB.name} กำลังโจมตี...</p>
-          <Button variant="outline" size="sm" onClick={reset}>
-            Reset
-          </Button>
+          <p className="text-sm italic text-muted-foreground py-2">{displayB.name} กำลังโจมตี...</p>
+          {mode === "free" && (
+            <Button variant="outline" size="sm" onClick={reset}>
+              Reset
+            </Button>
+          )}
         </div>
       )}
     </div>

@@ -9,6 +9,9 @@ import type { Skill } from "../types";
 //   dr  = drain % of damage dealt → caster HP
 //   se  = effect on self,  ee = effect on enemy
 export const SKILLS: readonly Skill[] = [
+  // Starter skill — given to fresh world-mode characters. Intentionally weak
+  // so progression has somewhere to go.
+  { id: "basic_punch", n: "หมัดตรง", ti: 0, w: "กำปั้น", mg: 10, st: { STR: 2 }, at: "phy", bp: 25, p: 0, f: 0, dm: 1, se: null, ee: null, d: "หมัดเริ่มต้นสำหรับมือใหม่" },
   { id: "tj", n: "ไทจี้เจี้ยน", ti: 0, w: "กระบี่", mg: 20, st: { POW: 5, DEX: 5 }, at: "int", bp: 45, p: 0, f: 0, dm: 1, se: null, ee: null, d: "Int พื้นฐาน" },
   { id: "qf", n: "ชิงเฟิงเจี้ยน", ti: 0, w: "กระบี่", mg: 20, st: { STR: 5, AGI: 5 }, at: "phy", bp: 40, p: 20, f: 0, dm: 1, se: null, ee: null, d: "Phy+20%" },
   { id: "dg", n: "ดามอกุน", ti: 0, w: "พลอง", mg: 20, st: { STR: 6, VIT: 4 }, at: "phy", bp: 55, p: 0, f: 0, dm: 1, se: null, ee: null, d: "Phy พลองหนัก" },

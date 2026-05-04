@@ -1,35 +1,34 @@
 "use client";
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CharacterCard } from "@/components/game/character-card";
-import { SkillLibrary } from "@/components/game/skill-library";
-import { BattleArena } from "@/components/game/battle-arena";
+import { useEffect } from "react";
+import Link from "next/link";
+import { WorldScreen } from "@/components/world/world-screen";
+import { initBattleBridge } from "@/lib/world/battle-bridge";
 
+// World page (`/`) — the main game. Setup / skill library / free battle sim
+// live in /debug as dev tools. The world owns its own player build (see
+// store/world-store.ts STARTER_BUILD) and is fully decoupled from the dev
+// sandbox; battles inside the world play out inline via BattleArena in
+// "world" mode.
 export default function HomePage() {
+  // Module-level subscriptions live outside React, but we initialize them
+  // once in a useEffect so SSR / hot-reload don't double-subscribe.
+  useEffect(() => {
+    initBattleBridge();
+  }, []);
+
   return (
-    <main className="container max-w-5xl mx-auto p-3">
-      <Tabs defaultValue="setup" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="setup">1 ตั้งค่า + วิชา</TabsTrigger>
-          <TabsTrigger value="library">2 คลังวิชา</TabsTrigger>
-          <TabsTrigger value="battle">3 สมรภูมิ</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="setup" className="mt-3">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <CharacterCard side="A" />
-            <CharacterCard side="B" />
-          </div>
-        </TabsContent>
-
-        <TabsContent value="library" className="mt-3">
-          <SkillLibrary />
-        </TabsContent>
-
-        <TabsContent value="battle" className="mt-3">
-          <BattleArena />
-        </TabsContent>
-      </Tabs>
+    <main className="container max-w-3xl mx-auto p-3 space-y-3">
+      <div className="flex items-center justify-between">
+        <h1 className="text-base font-bold">กำลังภายใน — โลกยุทธภพ</h1>
+        <Link
+          href="/debug"
+          className="text-[11px] text-muted-foreground hover:text-foreground"
+        >
+          🛠 dev tools
+        </Link>
+      </div>
+      <WorldScreen />
     </main>
   );
 }
