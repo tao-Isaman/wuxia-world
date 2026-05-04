@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 60 9% 96%;
+    --foreground: 0 0% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 10%;
+    --primary: 244 50% 56%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 60 5% 92%;
+    --secondary-foreground: 0 0% 10%;
+    --muted: 60 5% 92%;
+    --muted-foreground: 0 0% 45%;
+    --accent: 60 5% 92%;
+    --accent-foreground: 0 0% 10%;
+    --destructive: 0 70% 55%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 60 5% 86%;
+    --input: 60 5% 86%;
+    --ring: 244 50% 56%;
+    --radius: 0.5rem;
+
+    /* Game-specific accents */
+    --side-a: 244 50% 56%;
+    --side-b: 17 67% 52%;
+  }
+
+  .dark {
+    --background: 0 0% 10%;
+    --foreground: 60 5% 95%;
+    --card: 0 0% 13%;
+    --card-foreground: 60 5% 95%;
+    --popover: 0 0% 13%;
+    --popover-foreground: 60 5% 95%;
+    --primary: 244 60% 70%;
+    --primary-foreground: 0 0% 10%;
+    --secondary: 0 0% 20%;
+    --secondary-foreground: 60 5% 95%;
+    --muted: 0 0% 18%;
+    --muted-foreground: 0 0% 65%;
+    --accent: 0 0% 20%;
+    --accent-foreground: 60 5% 95%;
+    --destructive: 0 60% 50%;
+    --destructive-foreground: 60 5% 95%;
+    --border: 0 0% 22%;
+    --input: 0 0% 22%;
+    --ring: 244 60% 70%;
+  }
+
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  }
+}
+
+/* Battle-log inline classes — referenced from dynamically-built log strings */
+@layer components {
+  .lp { font-size: 10px; color: hsl(var(--muted-foreground)); }
+  .lC { color: #BA7517; font-weight: 700; }
+}

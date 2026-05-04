@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>กำลังภายใน — Battle Sim</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',sans-serif;background:#F7F6F3;color:#1A1A1A;padding:12px}
+.tabs{display:flex;gap:4px;margin-bottom:12px}
+.tb{flex:1;padding:8px;font-size:13px;border:1px solid #D0CFC8;border-radius:8px;background:#fff;color:#666;cursor:pointer}
+.tb.on{background:#EEEDFE;color:#3C3489;border-color:#B8B5F0;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.card{background:#fff;border:1px solid #E0DFD8;border-radius:12px;padding:14px}
+.sh{font-size:13px;font-weight:600;padding:4px 12px;border-radius:20px;margin-bottom:8px;display:inline-block}
+.shA{background:#EEEDFE;color:#3C3489}.shB{background:#FAECE7;color:#993C1D}
+.ni{width:100%;font-size:14px;padding:5px 8px;border:1px solid #D0CFC8;border-radius:8px;background:#fff;color:#111;margin-bottom:6px;font-weight:600}
+.prow{display:flex;justify-content:space-between;font-size:11px;color:#888;margin-bottom:2px}
+.pbw{background:#F0EFE8;border-radius:4px;height:8px;overflow:hidden;margin:2px 0 8px}
+.pbf{height:100%;border-radius:4px;transition:width .15s}
+.sr{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.sr label{font-size:11px;color:#666;width:58px;flex-shrink:0}
+.sr input[type=range]{flex:1;accent-color:#7F77DD}
+.sr .sv{font-size:12px;font-weight:600;color:#111;width:22px;text-align:right}
+.dg{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin:6px 0}
+.dv{background:#F5F4F0;border-radius:5px;padding:4px 7px}
+.dvl{font-size:9px;color:#888}.dvv{font-size:12px;font-weight:600;color:#111}
+.iad{font-size:9px;color:#1D9E75;margin-left:2px}
+.sec{margin-top:10px;border-top:1px solid #E8E7E0;padding-top:10px}
+.stt{font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px}
+.ia-r{display:flex;align-items:center;gap:7px;margin-bottom:5px;flex-wrap:wrap}
+.ia-r select{flex:1;min-width:140px;font-size:12px;padding:4px 7px;border:1px solid #D0CFC8;border-radius:6px}
+.ia-r label{font-size:11px;color:#888}
+.ia-r input[type=range]{width:65px;accent-color:#7F77DD}
+.ia-r span{font-size:12px;font-weight:600;min-width:16px}
+.ia-inf{background:#F5F4F0;border-radius:8px;padding:9px 12px;font-size:11px;color:#666;line-height:1.9;margin-top:4px}
+.ia-inf b{color:#111}
+.ia-tot{margin-top:5px;background:#F5F4F0;border-radius:5px;padding:4px 10px;font-size:11px;color:#666;border-left:3px solid #7F77DD}
+.sk-slot{display:flex;align-items:center;gap:5px;margin-bottom:4px}
+.sk-slot .num{font-size:10px;color:#999;width:14px;flex-shrink:0;text-align:center}
+.sk-slot select{flex:1;font-size:11px;padding:3px 7px;border:1px solid #D0CFC8;border-radius:5px}
+.sk-info{font-size:9px;background:#F0EFE8;padding:2px 6px;border-radius:3px;color:#666;white-space:nowrap}
+.tb0{background:#F2F0E8;color:#5A584F}.tb1{background:#E0F5EE;color:#0A5040}
+.tb2{background:#EEEDFE;color:#3C3489}.tb3{background:#FAEAE0;color:#903020}.tb4{background:#E4EFF9;color:#1A5A9A}
+.tier-badge{font-size:9px;padding:1px 5px;border-radius:3px;font-weight:600}
+.mas-r{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}
+.mb{font-size:10px;padding:2px 7px;border-radius:4px;background:#F0EFE8;color:#666}
+.mb b{color:#7F77DD}
+.skbon{font-size:10px;color:#666;margin-top:3px}
+.btop{display:grid;grid-template-columns:1fr 36px 1fr;gap:10px;margin-bottom:10px}
+.cp{padding:10px;background:#fff;border:1px solid #E0DFD8;border-radius:10px}
+.cp.aA{border:2px solid #7F77DD}.cp.aB{border:2px solid #D85A30}
+.cn{font-size:13px;font-weight:600;color:#111}
+.cht{font-size:10px;color:#888;margin-top:2px}
+.hpb{background:#F0EFE8;border-radius:4px;height:12px;overflow:hidden;margin:3px 0}
+.hpf{height:100%;border-radius:4px;transition:width .3s}
+.mpb{background:#F0EFE8;border-radius:3px;height:6px;overflow:hidden;margin:1px 0}
+.mpf{height:100%;border-radius:3px;background:#7F77DD;transition:width .3s}
+.atbb{background:#F0EFE8;border-radius:3px;height:5px;overflow:hidden;margin:3px 0}
+.atbf{height:100%;border-radius:3px;transition:width .2s}
+.sr2{display:flex;gap:4px;flex-wrap:wrap;margin-top:3px}
+.sm{font-size:9px;background:#F0EFE8;padding:2px 5px;border-radius:4px;color:#888}
+.sm b{color:#111}
+.brow{display:flex;gap:3px;flex-wrap:wrap;margin-top:3px;min-height:16px}
+.bf{font-size:9px;padding:1px 5px;border-radius:3px;background:#E5F3D8;color:#3A6D0F}
+.db{font-size:9px;padding:1px 5px;border-radius:3px;background:#FBEBEB;color:#A32D2D}
+.stk{font-size:9px;padding:1px 5px;border-radius:3px;background:#FAF0D8;color:#8A5000}
+.vsb{font-size:16px;font-weight:700;color:#BBB;text-align:center;padding-top:18px}
+.blog{height:175px;overflow-y:auto;background:#F5F4F0;border-radius:8px;padding:10px;margin-bottom:10px;font-size:12px;line-height:1.9}
+.lA{color:#534AB7}.lB{color:#993C1D}.lS{color:#999;font-style:italic}
+.lC{color:#BA7517;font-weight:700}.lp{font-size:10px;color:#AAA}
+.skbs{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:8px}
+.skb{padding:7px 12px;border-radius:8px;border:1px solid #D0CFC8;cursor:pointer;font-size:12px;background:#fff;min-width:82px;text-align:center}
+.skb:hover:not(:disabled){background:#F5F4F0}
+.skb:disabled{opacity:.35;cursor:not-allowed}
+.skb.ia{border-color:#1D9E75;background:#E0F5EE;color:#085041}
+.skb.ia:hover:not(:disabled){background:#C0EBDA}
+.skbn{font-weight:600;display:block;font-size:12px}.skbi{font-size:9px;color:#888;margin-top:1px}
+.cdb{font-size:9px;padding:0 4px;border-radius:3px;background:#FBEBEB;color:#A32D2D;font-weight:600}
+.ctrl{display:flex;gap:8px;justify-content:center;margin-top:4px}
+.btn-s{font-size:14px;padding:11px 30px;border-radius:10px;border:1px solid #7F77DD;background:#EEEDFE;color:#3C3489;cursor:pointer;font-weight:600}
+.btn-a,.btn-r{font-size:12px;padding:8px 16px;border-radius:8px;border:1px solid #D0CFC8;background:#fff;color:#666;cursor:pointer}
+.think{color:#888;font-style:italic;font-size:13px;text-align:center;padding:8px}
+.winbanner{text-align:center;padding:14px;border-radius:10px;margin-bottom:10px}
+.lib{width:100%;border-collapse:collapse;font-size:11px}
+.lib th{background:#F0EFE8;padding:6px 8px;text-align:left;font-weight:600;color:#666;border-bottom:1px solid #E0DFD8}
+.lib td{padding:6px 8px;border-bottom:1px solid #F0EFE8;color:#111;vertical-align:top}
+.lib tr:hover td{background:#FAF9F5}
+/* Searchable dropdown */
+.ss-wrap{position:relative;flex:1;min-width:0}
+.ia-r .ss-wrap{min-width:140px}
+.ss-inp{width:100%;font-size:11px;padding:3px 26px 3px 7px;border:1px solid #D0CFC8;border-radius:5px;background:#fff;cursor:pointer}
+.ss-inp:focus{outline:none;border-color:#7F77DD;cursor:text}
+.ss-wrap::after{content:'▾';position:absolute;right:7px;top:50%;transform:translateY(-50%);color:#999;pointer-events:none;font-size:12px;line-height:1}
+.ss-dd{position:absolute;top:calc(100% + 2px);left:0;min-width:100%;max-height:180px;overflow-y:auto;background:#fff;border:1px solid #B8B5F0;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,.12);z-index:9999;display:none}
+.ss-opt{padding:5px 10px;font-size:11px;cursor:pointer;white-space:nowrap;color:#111}
+.ss-opt:hover,.ss-opt.ss-cur{background:#EEEDFE;color:#3C3489}
+.ss-grp{padding:3px 10px;font-size:10px;color:#999;font-weight:600;background:#F5F4F0;text-transform:uppercase;letter-spacing:.04em}
+.eq-row{display:flex;align-items:center;gap:5px;margin-bottom:4px}
+.eq-lbl{font-size:11px;color:#666;width:76px;flex-shrink:0;font-weight:500}
+.eq-sel{flex:1;font-size:11px;padding:3px 7px;border:1px solid #D0CFC8;border-radius:5px;background:#fff}
+.eq-tag{font-size:9px;background:#EEEDFE;color:#3C3489;padding:1px 6px;border-radius:3px;white-space:nowrap}
+.eq-sum{margin-top:5px;font-size:10px;color:#666;background:#F5F4F0;border-radius:5px;padding:5px 10px;border-left:3px solid #D85A30;line-height:1.8}
+</style>
+</head>
+<body>
+
+<div class="tabs">
+  <button class="tb on" onclick="ST(0)">1  ตั้งค่า + วิชา</button>
+  <button class="tb" onclick="ST(1)">2  คลังวิชา</button>
+  <button class="tb" onclick="ST(2)">3  สมรภูมิ</button>
+</div>
+
+<div id="t0">
+  <div class="two">
+    <div class="card">
+      <div class="sh shA">ฝ่าย A</div>
+      <input class="ni" id="niA" value="ยุนม่อ" oninput="CH.A.n=this.value">
+      <div id="pA"></div><div id="slA"></div>
+      <div id="dvA" class="dg"></div>
+      <div id="iaA"></div><div id="ssA"></div><div id="eqA"></div>
+    </div>
+    <div class="card">
+      <div class="sh shB">ฝ่าย B</div>
+      <input class="ni" id="niB" value="ผู้พิทักษ์" oninput="CH.B.n=this.value">
+      <div id="pB"></div><div id="slB"></div>
+      <div id="dvB" class="dg"></div>
+      <div id="iaB"></div><div id="ssB"></div><div id="eqB"></div>
+    </div>
+  </div>
+</div>
+
+<div id="t1" style="display:none">
+  <div class="card">
+    <div class="stt">คลังวิชา 80 วิชา — stat รวมต่อวิชา ≤ 20 pts | hpLv+mpLv=70 สำหรับกำลังภายใน</div>
+    <div style="overflow-x:auto"><table class="lib" id="libt"></table></div>
+  </div>
+</div>
+
+<div id="t2" style="display:none">
+  <div id="bv">
+    <div style="text-align:center;padding:3rem 0">
+      <div style="font-size:13px;color:#888;margin-bottom:16px">ตั้งค่าตัวละครและเลือกวิชาก่อน</div>
+      <button class="btn-s" onclick="SB()">⚔ เริ่มการต่อสู้</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const TIERS=[{n:'พื้นฐาน',cd:0,c:'tb0'},{n:'ขั้นกลาง',cd:2,c:'tb1'},{n:'ขั้นสูง',cd:3,c:'tb2'},{n:'ลับ',cd:4,c:'tb3'},{n:'เฉพาะ',cd:5,c:'tb4'}];
+
+const SP=[
+  {id:'tj', n:'ไทจี้เจี้ยน',      ti:0,w:'กระบี่',   mg:20,st:{POW:5,DEX:5},        at:'int',bp:45,p:0, f:0, dm:1,   se:null,                                  ee:null,                                     d:'Int พื้นฐาน'},
+  {id:'qf', n:'ชิงเฟิงเจี้ยน',    ti:0,w:'กระบี่',   mg:20,st:{STR:5,AGI:5},        at:'phy',bp:40,p:20,f:0, dm:1,   se:null,                                  ee:null,                                     d:'Phy+20%'},
+  {id:'dg', n:'ดามอกุน',           ti:0,w:'พลอง',     mg:20,st:{STR:6,VIT:4},        at:'phy',bp:55,p:0, f:0, dm:1,   se:null,                                  ee:null,                                     d:'Phy พลองหนัก'},
+  {id:'sf', n:'หมัดเส้าหลิน',      ti:0,w:'กำปั้น',   mg:20,st:{STR:5,VIT:5},        at:'phy',bp:42,p:0, f:20,dm:1,   se:null,                                  ee:null,                                     d:'Phy+flat20'},
+  {id:'gn', n:'เข็มทอง',           ti:0,w:'เข็ม',     mg:20,st:{DEX:7,LUK:3},        at:'phy',bp:30,p:0, f:0, dm:1,   se:null,                                  ee:null,                                     d:'Phy ระยะไกล'},
+  {id:'rf', n:'สะท้อนพลัง',        ti:1,w:'กำปั้น',   mg:40,st:{POW:7,AGI:5},        at:null, bp:0,      dm:1,        se:{t:'buff_reflect',v:50,u:1},            ee:null,                                     d:'สะท้อน 50% dmg (1 ตา)'},
+  {id:'cs', n:'ก้าวเมฆหมอก',       ti:1,w:'ตัวเบา',   mg:40,st:{AGI:8,DEX:5},        at:null, bp:0,      dm:1,        se:{t:'buff_eva',v:30,u:2},                ee:null,                                     d:'Eva+30 (2 ตา)'},
+  {id:'ig', n:'เกราะเพชร',          ti:1,w:'กำปั้น',   mg:40,st:{VIT:7,DEF:6},        at:null, bp:0,      dm:1,        se:{t:'buff_reduce',v:30,u:2},             ee:null,                                     d:'ลด dmg 30% (2 ตา)'},
+  {id:'dp', n:'ฝ่ามือมังกร',        ti:1,w:'กำปั้น',   mg:40,st:{STR:7,DEX:6},        at:'phy',bp:50,p:0, f:0, dm:1,   se:null,                                  ee:{t:'debuff_eva',v:-12,u:2},               d:'Phy + Eva-12 (2 ตา)'},
+  {id:'pn', n:'เข็มพิษ',            ti:1,w:'เข็ม',     mg:40,st:{DEX:7,LUK:6},        at:null, bp:0,      dm:1,        se:null,                                  ee:{t:'debuff_poison',pp:4,u:3,ev:-8},       d:'พิษ 4%HP/ตา + Eva-8 (3 ตา)'},
+  {id:'ws', n:'สองดาบล่องลม',       ti:2,w:'ดาบโค้ง',  mg:60,st:{STR:8,AGI:7},        at:'phy',bp:60,p:0, f:0, dm:1,   se:{t:'stack_atk',v:5,mx:4},              ee:null,                                     d:'Phy + สะสม ATK+5% (≤4 ซ้อน)'},
+  {id:'sa', n:'คีตาอาคม',           ti:2,w:'ขลุ่ย',    mg:60,st:{POW:8,INT:7},        at:'int',bp:30,p:0, f:0, dm:0.7, se:null,                                  ee:{t:'debuff_acc',v:-18,u:3},               d:'Int×0.7 + Acc-18 (3 ตา)'},
+  {id:'fs', n:'กระบองเพลิง',        ti:2,w:'พลอง',     mg:60,st:{STR:9,POW:6},        at:'phy',bp:65,p:20,f:0, dm:1,   se:null,                                  ee:{t:'debuff_def',v:-15,u:2},               d:'Phy+20% + PDef-15 (2 ตา)'},
+  {id:'yy', n:'หยิน-หยางฝ่า',       ti:2,w:'กำปั้น',   mg:60,st:{POW:8,VIT:7},        at:null, bp:0,      dm:1,        se:{t:'heal_buff',hp:20,bt:'buff_def',bv:15,bu:2}, ee:null,                            d:'ฟื้น 20%HP + DEF+15 (2 ตา)'},
+  {id:'ch', n:'โซ่เกี่ยวสังหาร',    ti:2,w:'ขอเกี่ยว', mg:60,st:{STR:8,DEX:7},        at:'phy',bp:55,p:0, f:0, dm:1,   se:null,                                  ee:{t:'debuff_eva',v:-20,u:2},               d:'Phy + Eva-20 (2 ตา)'},
+  {id:'ep', n:'18 ฝ่ามือมังกร',     ti:3,w:'กำปั้น',   mg:80,st:{STR:8,POW:6,VIT:4},  at:'phy',bp:90,p:30,f:0, dm:1,   se:null,                                  ee:null,                                     d:'Phy×130% หนักมาก'},
+  {id:'bs', n:'ดาบอสุรี',           ti:3,w:'ดาบโค้ง',  mg:80,st:{STR:10,AGI:8},       at:'phy',bp:80,p:0, f:0, dm:1, dr:30, se:null,                             ee:null,                                     d:'Phy + ดูด 30% dmg → HP'},
+  {id:'zs', n:'กู่ฉินสะท้านจิต',   ti:3,w:'ขลุ่ย',    mg:80,st:{POW:9,INT:9},        at:'int',bp:50,p:0, f:0, dm:1,   se:null,                                  ee:{t:'multi_debuff',av:-15,ev:-15,u:3},     d:'Int + Acc-15 Eva-15 (3 ตา)'},
+  {id:'ft', n:'ขลุ่ยสะท้านฟ้า',    ti:4,w:'ขลุ่ย',    mg:100,st:{POW:8,INT:7,AGI:5}, at:'int',bp:75,p:30,f:0, dm:1,   se:{t:'buff_reduce',v:20,u:2},            ee:null,                                     d:'Int×130% + ลด dmg 20% (2 ตา)'},
+  {id:'np', n:'เบญจพิษรวมกาย',      ti:4,w:'เข็ม',     mg:100,st:{DEX:8,LUK:7,POW:5}, at:null, bp:0,      dm:1,        se:null,                                  ee:{t:'heavy_poison',pp:8,u:4,av:-15,ev:-10},d:'พิษ 8%HP/ตา + Acc-15 Eva-10 (4 ตา)'},
+  // ─── พื้นฐาน เพิ่ม ───
+  {id:'ns1',n:'กระบี่เบื้องต้น',    ti:0,w:'ดาบโค้ง',  mg:20,st:{STR:5,AGI:5},         at:'phy',bp:38,p:0, f:10,dm:1,   se:null,                                  ee:null,                                     d:'Phy ดาบโค้งพื้นฐาน'},
+  {id:'ns2',n:'ขอเกี่ยวเบื้องต้น',  ti:0,w:'ขอเกี่ยว', mg:20,st:{STR:5,DEX:5},         at:'phy',bp:35,p:0, f:0, dm:1,   se:null,                                  ee:null,                                     d:'Phy ขอเกี่ยวพื้นฐาน'},
+  // ─── ขั้นกลาง เพิ่ม ───
+  {id:'nm1',n:'ดาบน้ำค้าง',         ti:1,w:'ดาบโค้ง',  mg:40,st:{POW:6,INT:6},         at:'int',bp:42,p:0, f:0, dm:1,   se:null,                                  ee:{t:'debuff_def',v:-12,u:2},               d:'Int + PDef-12 (2 ตา)'},
+  {id:'nm2',n:'ฝ่ามือเกราะ',        ti:1,w:'กำปั้น',   mg:40,st:{STR:6,DEF:6},         at:'phy',bp:46,p:0, f:0, dm:1,   se:{t:'buff_def',v:15,u:2},               ee:null,                                     d:'Phy + บัฟตัวเอง DEF+15 (2 ตา)'},
+  // ─── ขั้นสูง เพิ่ม ───
+  {id:'na1',n:'กระบี่ดาวเหนือ',     ti:2,w:'กระบี่',   mg:60,st:{POW:8,INT:7},         at:'int',bp:60,p:0, f:0, dm:1.1, se:null,                                  ee:{t:'debuff_eva',v:-15,u:2},               d:'Int×1.1 + Eva-15 (2 ตา)'},
+  {id:'na2',n:'หมัดมวยจีน',         ti:2,w:'กำปั้น',   mg:60,st:{STR:8,VIT:7},         at:'phy',bp:58,p:0, f:0, dm:1,   se:{t:'heal_pct',v:8},                   ee:null,                                     d:'Phy + ฟื้น 8% HP'},
+  // ─── ลับ เพิ่ม ───
+  {id:'nh1',n:'พลองเทวดา',          ti:3,w:'พลอง',     mg:80,st:{POW:9,INT:9},         at:'int',bp:65,p:20,f:0, dm:1,   se:null,                                  ee:{t:'multi_debuff',av:-12,ev:-12,u:3},     d:'Int+20% + Acc-12 Eva-12 (3 ตา)'},
+  {id:'nh2',n:'กระบี่วิเศษ',        ti:3,w:'กระบี่',   mg:80,st:{STR:9,AGI:9},         at:'phy',bp:80,p:0, f:0, dm:1, dr:25,se:null,                             ee:null,                                     d:'Phy + ดูด 25% dmg → HP'},
+  // ─── เฉพาะ เพิ่ม ───
+  {id:'nu1',n:'มังกรฟ้า',           ti:4,w:'ดาบโค้ง',  mg:100,st:{POW:10,INT:7,AGI:3}, at:'int',bp:90,p:30,f:0, dm:1,   se:{t:'stack_atk',v:8,mx:3},             ee:null,                                     d:'Int×130% + ATK+8% (≤3 ซ้อน)'},
+  {id:'nu2',n:'หมัดสะท้านจักรวาล',  ti:4,w:'กำปั้น',   mg:100,st:{STR:10,VIT:6,POW:4}, at:'phy',bp:95,p:30,f:0, dm:1,   se:null,                                  ee:{t:'multi_debuff',av:-20,ev:-20,u:3},     d:'Phy×130% + Acc-20 Eva-20 (3 ตา)'},
+  // ─── พื้นฐาน เพิ่ม (10) ───
+  {id:'nc1',n:'ประกาศิตพรรคยาจก',  ti:0,w:'กำปั้น',   mg:20,st:{STR:5,VIT:5},         at:'phy',bp:40,p:0, f:0, dm:1,   se:null,                                  ee:null,                                     d:'Phy ฝ่ามือพรรคยาจก'},
+  {id:'nc2',n:'ไม้เท้าตีสุนัข',    ti:0,w:'พลอง',     mg:20,st:{STR:5,AGI:5},         at:'phy',bp:50,p:0, f:5, dm:1,   se:null,                                  ee:null,                                     d:'Phy ไม้เท้าพรรคยาจก'},
+  {id:'nc3',n:'กระบี่น้ำ',          ti:0,w:'กระบี่',   mg:20,st:{POW:5,INT:5},         at:'int',bp:35,p:0, f:0, dm:1,   se:null,                                  ee:null,                                     d:'Int กระบี่สายน้ำ'},
+  {id:'nc4',n:'ฝ่ามือเมฆ',          ti:0,w:'กำปั้น',   mg:20,st:{STR:5,POW:5},         at:'phy',bp:40,p:0, f:10,dm:1,   se:null,                                  ee:null,                                     d:'Phy ฝ่ามือธรรมดา'},
+  {id:'nc5',n:'ทวนเบื้องต้น',       ti:0,w:'ทวน',      mg:20,st:{STR:6,VIT:4},         at:'phy',bp:52,p:0, f:0, dm:1,   se:null,                                  ee:null,                                     d:'Phy ทวนพื้นฐาน'},
+  {id:'nc6',n:'กระบองสั้น',          ti:0,w:'กระบอง',   mg:20,st:{STR:5,DEF:5},         at:'phy',bp:48,p:0, f:5, dm:1,   se:null,                                  ee:null,                                     d:'Phy กระบองสั้น'},
+  {id:'nc7',n:'ดาบยาวพื้นฐาน',      ti:0,w:'ดาบยาว',   mg:20,st:{STR:7,VIT:3},         at:'phy',bp:58,p:0, f:0, dm:1,   se:null,                                  ee:null,                                     d:'Phy ดาบยาวสองมือ'},
+  {id:'nc8',n:'แส้เบื้องต้น',        ti:0,w:'แส้',      mg:20,st:{AGI:5,DEX:5},         at:'phy',bp:32,p:0, f:8, dm:1,   se:null,                                  ee:null,                                     d:'Phy แส้พื้นฐาน'},
+  {id:'nc9',n:'พัดพื้นฐาน',          ti:0,w:'พัด',      mg:20,st:{POW:5,INT:5},         at:'int',bp:30,p:0, f:0, dm:1,   se:null,                                  ee:null,                                     d:'Int พัดสายใน'},
+  {id:'nc10',n:'ขอเกี่ยวพื้นฐาน',   ti:0,w:'ขอเกี่ยว', mg:20,st:{STR:5,DEX:5},         at:'phy',bp:35,p:0, f:5, dm:1,   se:null,                                  ee:null,                                     d:'Phy ขอเกี่ยวพื้นฐาน'},
+  // ─── ขั้นกลาง เพิ่ม (12) ───
+  {id:'nd1',n:'แส้แปดทิศ',          ti:1,w:'แส้',      mg:40,st:{AGI:7,DEX:6},         at:'phy',bp:48,p:0, f:0, dm:1,   se:null,                                  ee:{t:'debuff_eva',v:-12,u:2},               d:'Phy Eva-12 (2 ตา)'},
+  {id:'nd2',n:'พัดนกยูง',            ti:1,w:'พัด',      mg:40,st:{POW:7,INT:6},         at:'int',bp:40,p:0, f:0, dm:1,   se:null,                                  ee:{t:'debuff_acc',v:-12,u:2},               d:'Int Acc-12 (2 ตา)'},
+  {id:'nd3',n:'ดาบดาวเหนือ',        ti:1,w:'กระบี่',   mg:40,st:{STR:7,DEX:6},         at:'phy',bp:52,p:15,f:0, dm:1,   se:null,                                  ee:null,                                     d:'Phy+15%'},
+  {id:'nd4',n:'ทวนลม',               ti:1,w:'ทวน',      mg:40,st:{STR:8,AGI:5},         at:'phy',bp:58,p:0, f:0, dm:1,   se:null,                                  ee:{t:'debuff_eva',v:-10,u:2},               d:'Phy Eva-10 (2 ตา)'},
+  {id:'nd5',n:'อรหันต์พันมือ',       ti:1,w:'กำปั้น',   mg:40,st:{POW:6,INT:7},         at:'int',bp:42,p:0, f:0, dm:0.9, se:null,                                  ee:{t:'multi_debuff',av:-8,ev:-8,u:2},       d:'Int×0.9 + Acc-8 Eva-8'},
+  {id:'nd6',n:'กระบี่หยาง',          ti:1,w:'กระบี่',   mg:40,st:{POW:7,INT:6},         at:'int',bp:44,p:0, f:0, dm:1,   se:null,                                  ee:{t:'debuff_def',v:-12,u:2},               d:'Int PDef-12 (2 ตา)'},
+  {id:'nd7',n:'ฝ่ามือเสือ',          ti:1,w:'กำปั้น',   mg:40,st:{STR:8,VIT:5},         at:'phy',bp:52,p:0, f:0, dm:1,   se:{t:'buff_reduce',v:20,u:2},            ee:null,                                     d:'Phy + ลดdmg20% (2 ตา)'},
+  {id:'nd8',n:'แส้เหล็กดูดชีพ',     ti:1,w:'แส้',      mg:40,st:{DEX:7,AGI:6},         at:'phy',bp:44,p:0, f:0, dm:1, dr:20, se:null,                             ee:null,                                     d:'Phy + ดูด 20% HP'},
+  {id:'nd9',n:'เข็มตีจุด',           ti:1,w:'เข็ม',     mg:40,st:{DEX:8,LUK:5},         at:'phy',bp:35,p:0, f:0, dm:1,   se:null,                                  ee:{t:'debuff_acc',v:-15,u:2},               d:'Phy Acc-15 (2 ตา)'},
+  {id:'nd10',n:'กรงเล็บเพลิง',       ti:1,w:'กำปั้น',   mg:40,st:{STR:7,POW:6},         at:'phy',bp:50,p:0, f:0, dm:1,   se:null,                                  ee:{t:'debuff_def',v:-12,u:2},               d:'Phy PDef-12 (2 ตา)'},
+  {id:'nd11',n:'กระบี่ลม',           ti:1,w:'กระบี่',   mg:40,st:{AGI:8,STR:5},         at:'phy',bp:45,p:0, f:0, dm:1,   se:{t:'buff_eva',v:20,u:2},               ee:null,                                     d:'Phy + Eva+20 (2 ตา)'},
+  {id:'nd12',n:'ฝ่ามือเกราะ',        ti:1,w:'กำปั้น',   mg:40,st:{STR:6,DEF:6},         at:'phy',bp:46,p:0, f:0, dm:1,   se:{t:'buff_def',v:15,u:2},               ee:null,                                     d:'Phy + DEF+15 (2 ตา)'},
+  // ─── ขั้นสูง เพิ่ม (13) ───
+  {id:'ne1',n:'สิบแปดฝ่ามือมังกร',   ti:2,w:'กำปั้น',   mg:60,st:{STR:8,VIT:7},         at:'phy',bp:75,p:25,f:0, dm:1,   se:null,                                  ee:null,                                     d:'Phy×125% หนักมาก'},
+  {id:'ne2',n:'ดาบอรหันต์เส้าหลิน', ti:2,w:'กระบี่',   mg:60,st:{STR:8,DEF:7},         at:'phy',bp:68,p:0, f:0, dm:1,   se:{t:'buff_def',v:20,u:2},               ee:null,                                     d:'Phy + DEF+20 (2 ตา)'},
+  {id:'ne3',n:'ทวนหมุนฟ้า',          ti:2,w:'ทวน',      mg:60,st:{STR:9,AGI:6},         at:'phy',bp:70,p:0, f:0, dm:1,   se:null,                                  ee:{t:'debuff_eva',v:-18,u:2},               d:'Phy Eva-18 (2 ตา)'},
+  {id:'ne4',n:'ดอกบัวนพรัตน์',       ti:2,w:'พัด',      mg:60,st:{POW:8,INT:7},         at:'int',bp:55,p:0, f:0, dm:1.1, se:{t:'heal_pct',v:15},                   ee:null,                                     d:'Int×1.1 + ฟื้น 15% HP'},
+  {id:'ne5',n:'กระบี่วิ่งบนน้ำ',     ti:2,w:'กระบี่',   mg:60,st:{POW:9,AGI:6},         at:'int',bp:62,p:0, f:0, dm:1,   se:null,                                  ee:{t:'debuff_eva',v:-18,u:2},               d:'Int Eva-18 (2 ตา)'},
+  {id:'ne6',n:'แส้ทะลุปราการ',       ti:2,w:'แส้',      mg:60,st:{STR:8,DEX:7},         at:'phy',bp:65,p:0, f:0, dm:1,   se:null,                                  ee:{t:'debuff_def',v:-18,u:2},               d:'Phy PDef-18 (2 ตา)'},
+  {id:'ne7',n:'ฝ่ามือน้ำแข็ง',       ti:2,w:'กำปั้น',   mg:60,st:{POW:8,INT:7},         at:'int',bp:58,p:0, f:0, dm:1.1, se:null,                                  ee:{t:'debuff_acc',v:-15,u:2},               d:'Int×1.1 Acc-15 (2 ตา)'},
+  {id:'ne8',n:'หมัดเมา',              ti:2,w:'กำปั้น',   mg:60,st:{STR:7,AGI:8},         at:'phy',bp:62,p:0, f:0, dm:1, dr:20, se:null,                             ee:{t:'debuff_eva',v:-12,u:2},               d:'Phy ดูด20% + Eva-12'},
+  {id:'ne9',n:'ดาบยาวมังกร',         ti:2,w:'ดาบยาว',   mg:60,st:{STR:9,VIT:6},         at:'phy',bp:80,p:25,f:0, dm:1,   se:null,                                  ee:null,                                     d:'Phy×125% ดาบยาวหนัก'},
+  {id:'ne10',n:'พลองลม',              ti:2,w:'พลอง',     mg:60,st:{POW:9,INT:6},         at:'int',bp:60,p:0, f:0, dm:0.8, se:null,                                  ee:{t:'multi_debuff',av:-15,ev:-12,u:2},     d:'Int×0.8 + สองดีบัฟ'},
+  {id:'ne11',n:'กรงเล็บสิงห์',       ti:2,w:'กำปั้น',   mg:60,st:{STR:8,DEX:7},         at:'phy',bp:65,p:0, f:0, dm:1,   se:null,                                  ee:{t:'debuff_def',v:-15,u:2},               d:'Phy PDef-15 (2 ตา)'},
+  {id:'ne12',n:'กระบี่เก้าฟ้า',      ti:2,w:'กระบี่',   mg:60,st:{POW:8,INT:7},         at:'int',bp:65,p:15,f:0, dm:1,   se:{t:'stack_atk',v:6,mx:3},             ee:null,                                     d:'Int+15% + สะสม ATK+6%'},
+  {id:'ne13',n:'ทวนหยินหยาง',         ti:2,w:'ทวน',      mg:60,st:{STR:8,POW:7},         at:'phy',bp:68,p:0, f:0, dm:1,   se:null,                                  ee:{t:'debuff_acc',v:-15,u:2},               d:'Phy Acc-15 (2 ตา)'},
+  // ─── ลับ เพิ่ม (8) ───
+  {id:'nf1',n:'กู่ฉินสังหาร',         ti:3,w:'ขลุ่ย',    mg:80,st:{POW:9,INT:9},         at:'int',bp:72,p:0, f:0, dm:1.1, se:null,                                  ee:{t:'multi_debuff',av:-18,ev:-18,u:3},     d:'Int×1.1 + Acc-18 Eva-18 (3 ตา)'},
+  {id:'nf2',n:'ดาบโดดเดี่ยว',        ti:3,w:'กระบี่',   mg:80,st:{POW:10,INT:8},        at:'int',bp:75,p:0, f:0, dm:1.1, dr:25,se:null,                            ee:null,                                     d:'Int×1.1 + ดูด 25% HP'},
+  {id:'nf3',n:'ทวนประทับมังกร',       ti:3,w:'ทวน',      mg:80,st:{STR:10,VIT:8},        at:'phy',bp:88,p:25,f:0, dm:1,   se:null,                                  ee:null,                                     d:'Phy×125% ทวนสังหาร'},
+  {id:'nf4',n:'ฝ่ามือยมฑูต',         ti:3,w:'กำปั้น',   mg:80,st:{STR:9,POW:9},         at:'phy',bp:82,p:0, f:0, dm:1,   se:null,                                  ee:{t:'debuff_poison',pp:6,u:3,ev:-12},      d:'Phy + พิษ 6%HP/ตา Eva-12 (3 ตา)'},
+  {id:'nf5',n:'หมัดเพลิง',            ti:3,w:'กำปั้น',   mg:80,st:{STR:10,AGI:8},        at:'phy',bp:85,p:30,f:0, dm:1,   se:null,                                  ee:{t:'debuff_def',v:-20,u:2},               d:'Phy×130% + PDef-20 (2 ตา)'},
+  {id:'nf6',n:'ดาบยาวสีเลือด',       ti:3,w:'ดาบยาว',   mg:80,st:{STR:10,DEX:8},        at:'phy',bp:90,p:0, f:0, dm:1, dr:35,se:null,                              ee:null,                                     d:'Phy + ดูด 35% HP'},
+  {id:'nf7',n:'แส้เก้าหัว',           ti:3,w:'แส้',      mg:80,st:{DEX:10,AGI:8},        at:'phy',bp:75,p:0, f:0, dm:1,   se:null,                                  ee:{t:'multi_debuff',av:-18,ev:-18,u:3},     d:'Phy + Acc-18 Eva-18 (3 ตา)'},
+  {id:'nf8',n:'พัดเพลิงสวรรค์',      ti:3,w:'พัด',      mg:80,st:{POW:9,INT:9},         at:'int',bp:70,p:0, f:0, dm:1.1, se:null,                                  ee:{t:'debuff_acc',v:-20,u:2},               d:'Int×1.1 + Acc-20 (2 ตา)'},
+  // ─── เฉพาะ เพิ่ม (7) ───
+  {id:'ng1',n:'เก้าฟ้าหนึ่งกระบี่',  ti:4,w:'กระบี่',   mg:100,st:{POW:9,INT:8,AGI:3},  at:'int',bp:88,p:30,f:0, dm:1,   se:{t:'buff_reduce',v:25,u:2},            ee:null,                                     d:'Int×130% + ลดdmg 25% (2 ตา)'},
+  {id:'ng2',n:'ทวนประจักษ์พยาน',     ti:4,w:'ทวน',      mg:100,st:{STR:9,VIT:7,AGI:4},  at:'phy',bp:98,p:30,f:0, dm:1,   se:null,                                  ee:{t:'debuff_eva',v:-25,u:3},               d:'Phy×130% + Eva-25 (3 ตา)'},
+  {id:'ng3',n:'ฝ่ามือมังกรเทพ',      ti:4,w:'กำปั้น',   mg:100,st:{STR:10,VIT:6,POW:4}, at:'phy',bp:95,p:30,f:0, dm:1, dr:25,se:null,                              ee:null,                                     d:'Phy×130% + ดูด 25% HP'},
+  {id:'ng4',n:'หมัดพระอินทร์',        ti:4,w:'กำปั้น',   mg:100,st:{POW:10,INT:7,LUK:3}, at:'int',bp:85,p:0, f:0, dm:1.2, se:null,                                 ee:{t:'multi_debuff',av:-25,ev:-25,u:3},     d:'Int×120% + Acc-25 Eva-25 (3 ตา)'},
+  {id:'ng5',n:'ดาบยาวเทพสังหาร',     ti:4,w:'ดาบยาว',   mg:100,st:{STR:10,DEX:6,AGI:4}, at:'phy',bp:100,p:30,f:0,dm:1,   se:null,                                  ee:{t:'debuff_def',v:-25,u:3},               d:'Phy×130% + PDef-25 (3 ตา)'},
+  {id:'ng6',n:'ขลุ่ยพลิกโลก',        ti:4,w:'ขลุ่ย',    mg:100,st:{POW:9,INT:8,DEX:3},  at:'int',bp:82,p:25,f:0, dm:1,   se:null,                                  ee:{t:'heavy_poison',pp:10,u:4,av:-18,ev:-15},d:'Int×125% + พิษ 10%HP/ตา Acc-18 Eva-15'},
+  {id:'ng7',n:'นพเก้าฟ้าคืนดาว',     ti:4,w:'กำปั้น',   mg:100,st:{POW:8,INT:8,AGI:4},  at:'int',bp:90,p:0, f:0, dm:1.2, dr:40,se:{t:'stack_atk',v:10,mx:3},      ee:null,                                     d:'Int×120% + ดูด 40% + ATK+10% (≤3 ซ้อน)'},
+  // ─── วิชาจักรวาลกิมย้ง (7 วิชา) ───
+  {id:'yyz', n:'ดัชนีเอกสุริยัน',    ti:3,w:'นิ้วมือ',  mg:80,st:{POW:9,INT:9},         at:'int',bp:55,p:0, f:0, dm:1.1, se:null,                                  ee:{t:'debuff_acc',v:-22,u:3},               d:'Int×1.1 จี้สกัดจุด Acc-22 (3 ตา) — 一阳指'},
+  {id:'lmsj',n:'กระบี่ 6 ชีพจร',     ti:4,w:'นิ้วมือ',  mg:100,st:{POW:9,INT:8,DEX:3},  at:'int',bp:100,p:40,f:0,dm:1.2, se:{t:'stack_atk',v:10,mx:2},            ee:null,                                     d:'Int×120% bp×140% + ATK+10% (≤2 ซ้อน) — 六脉神剑 ต้องการพลังมหาศาล'},
+  {id:'bmsg',n:'มหาเวทดูดดาว',       ti:4,w:'กำปั้น',   mg:100,st:{POW:9,INT:9,AGI:2},  at:'int',bp:70,p:0, f:0, dm:1.3, dr:45, se:null,                           ee:{t:'drain_mp',v:30},                      d:'Int×1.3 + ดูด 45%HP + ดูด MP 30% — 北冥神功'},
+  {id:'bmzq',n:'ลมปราณภูติอุดร',     ti:3,w:'กำปั้น',   mg:80,st:{POW:10,INT:10},       at:null, bp:0,      dm:1,        se:{t:'buff_iatk_reduce',iv:20,rv:15,u:3}, ee:null,                                     d:'IAtk+20% + ลดรับ 15% (3 ตา) — 北冥真气'},
+  {id:'yxjf',n:'กระบี่ขลุ่ยหยก',    ti:3,w:'กระบี่',   mg:80,st:{POW:9,INT:9},         at:'int',bp:65,p:0, f:0, dm:1.1, se:{t:'heal_pct',v:10},                   ee:{t:'debuff_eva',v:-20,u:2},               d:'Int×1.1 + ฟื้น 10%HP + Eva-20 (2 ตา) — 玉箫剑法'},
+  {id:'hgdf',n:'วิชาสลายพลัง',       ti:3,w:'กำปั้น',   mg:80,st:{POW:10,INT:8,DEX:2},  at:'int',bp:45,p:0, f:0, dm:0.8, se:null,                                  ee:{t:'dispel',acc:-15,u:2},                 d:'Int×0.8 + สลาย buff 1 ชั้น + Acc-15 (2 ตา) — 化功大法'},
+  {id:'yxhd',n:'ดาวเคลื่อนดาราคล้อย',ti:4,w:'ตัวเบา',  mg:100,st:{AGI:10,DEX:7,LUK:3}, at:null, bp:0,      dm:1,        se:{t:'buff_reflect_eva',rv:60,ev:30,u:2},  ee:null,                                     d:'สะท้อน 60% + Eva+30 (2 ตา) เบี่ยงทิศโจมตี — 移星换斗'},
+  // ─── วิชาไอคอนิกกิมย้ง เพิ่มเติม (7 วิชา) ───
+  {id:'ansh',n:'ฝ่ามือกำสรดวิญญาณสลาย',ti:4,w:'กำปั้น',mg:100,st:{STR:8,POW:8,INT:4},  at:'int',bp:85,p:0, f:0, dm:1.2,  se:{t:'stack_atk',v:12,mx:2},            ee:{t:'debuff_acc',v:-18,u:2},               d:'Int×1.2 + ATK+12%(≤2ซ้อน) + Acc-18(2ตา) — 黯然销魂掌 ยิ่งเศร้ายิ่งแกร่ง'},
+  {id:'dgjj',n:'เก้ากระบี่เดียวดาย',   ti:4,w:'กระบี่', mg:100,st:{STR:6,AGI:8,DEX:6},  at:'phy',bp:90,p:30,f:0, dm:1.2,  se:{t:'buff_reflect',v:50,u:1},           ee:{t:'debuff_eva',v:-20,u:2},               d:'Phy×130% + สะท้อน 50%(1ตา) + Eva-20(2ตา) — 独孤九剑 ทะลุทุกวิชา'},
+  {id:'khbt',n:'คัมภีร์ทานตะวัน',      ti:4,w:'กระบี่', mg:100,st:{AGI:10,DEX:6,INT:4}, at:'int',bp:92,p:25,f:0, dm:1.2,  se:{t:'buff_eva',v:35,u:2},               ee:null,                                     d:'Int×120% bp×125% + Eva+35(2ตา) — 葵花宝典 เร็วเกินมนุษย์'},
+  {id:'ynxj',n:'คัมภีร์สาวหยก',        ti:3,w:'กระบี่', mg:80, st:{POW:9,INT:9},          at:'int',bp:58,p:0, f:0, dm:1.1,  se:{t:'heal_pct',v:15},                   ee:{t:'debuff_acc',v:-15,u:2},               d:'Int×1.1 + ฟื้น 15%HP + Acc-15(2ตา) — 玉女心经 ลี้ลับไร้รูปแบบ'},
+  {id:'ynss',n:'เพลงกระบี่สุรางคนางค์ใจพิสุทธิ์',ti:3,w:'กระบี่',mg:80,st:{POW:9,INT:9}, at:'int',bp:72,p:0, f:0, dm:1.1,  se:null,                                  ee:{t:'multi_debuff',av:-15,ev:-15,u:2},     d:'Int×1.1 + Acc-15 Eva-15(2ตา) — 玉女素心剑 กระบี่คู่สุรางคนาง'},
+  {id:'qzjf',n:'กระบี่ชวนจินก่า',      ti:2,w:'กระบี่', mg:60, st:{POW:8,INT:7,DEX:5},   at:'int',bp:60,p:0, f:0, dm:1.1,  se:{t:'buff_reflect',v:35,u:1},           ee:{t:'debuff_acc',v:-14,u:2},               d:'Int×1.1 + สะท้อน 35%(1ตา) + Acc-14(2ตา) — 全真剑法 หนึ่งกระบี่สามทิศ'},
+  {id:'qzzq',n:'ลมปราณชวนจินก่า',      ti:2,w:'กำปั้น', mg:60, st:{POW:8,INT:7,DEF:5},   at:null, bp:0,      dm:1,        se:{t:'buff_iatk_reduce',iv:15,rv:20,u:3},  ee:null,                                     d:'IAtk+15% + ลดรับ 20%(3ตา) — 全真真气 หยางบริสุทธิ์'}
+];
+
+const ARTS=[
+  {id:'none',    n:'— ไม่มี —',              sc:'',                   tp:'',              stats:{},                    hL:0,  mL:0,  act:null,pas:null},
+  {id:'tendon',  n:'พลังเปลี่ยนเส้นเอ็น',   sc:'เส้าหลิน',          tp:'หยาง·แข็ง',    stats:{STR:20,VIT:20,DEF:10}, hL:55, mL:15, act:{n:'อุ้มแผ่นดิน',     c:25,cd:3,t:'heal',         h:22,                d:'ฟื้น 22% HP (CD3)'},            pas:{tr:'hit_recv',ch:25, d:'ถูกโจมตี 25% → DEF+20 (2ตา)', e:{t:'buff_def', n:'เกราะ',v:20,u:2}}},
+  {id:'diamond', n:'จินกังชี่',              sc:'เส้าหลิน',          tp:'หยาง·แข็ง',    stats:{VIT:25,DEF:15,STR:10}, hL:55, mL:15, act:{n:'เกราะเพชร',        c:20,cd:3,t:'buff_reduce',  v:30,u:3,            d:'ลด dmg 30% (3ตา) CD3'},       pas:{tr:'hit_recv',ch:20, d:'ถูกโจมตี 20% → ฟื้น 8% HP',   e:{t:'heal_pct', v:8}}},
+  {id:'wanderer',n:'เจียงหูชี่',             sc:'ยาจก',               tp:'แข็ง·ภายนอก',  stats:{STR:15,VIT:20,AGI:15}, hL:45, mL:25, act:{n:'ฝ่ามือมังกร',     c:25,cd:4,t:'atk_phy_pen',  m:1.4,pen:30,        d:'ทางกาย×1.4 ทะลุ DEF 30% CD4'},pas:{tr:'hit_recv',ch:30, d:'ถูกโจมตี 30% → Eva+15 (1ตา)',  e:{t:'buff_eva', n:'ว่องไว',v:15,u:1}}},
+  {id:'military',n:'จวินเจิ้นชี่',           sc:'องครักษ์',           tp:'หยาง·ภายนอก',  stats:{STR:20,DEX:15,AGI:15}, hL:40, mL:30, act:{n:'สามก้าวสังหาร',   c:30,cd:4,t:'atk_phy_pen',  m:1.3,pen:50,        d:'ทางกาย×1.3 ทะลุ DEF 50% CD4'},pas:{tr:'on_crit',ch:100,d:'Crit → ศัตรู Eva-8 (2ตา)',     e:{t:'debuff_eva',n:'ตาพร่า',v:-8,u:2}}},
+  {id:'taiji',   n:'ไทจี้เจิ้นชี่',          sc:'อู่ตัง',             tp:'สมดุล·อ่อน',   stats:{POW:20,AGI:15,INT:15}, hL:35, mL:35, act:{n:'สะท้อนพลัง',      c:30,cd:3,t:'buff_reflect', v:50,u:1,            d:'สะท้อน 50% (1ตา) CD3'},       pas:{tr:'use_int',ch:100,d:'Int skill → IAtk+12%',             e:{t:'mult_iatk'}}},
+  {id:'lotus',   n:'เหลียนฮวาชี่',           sc:'บัวขาว',             tp:'สมดุล·อ่อน',   stats:{POW:15,INT:15,LUK:20}, hL:35, mL:35, act:{n:'นิพพานบัว',        c:30,cd:3,t:'heal_cleanse', h:18,                d:'ฟื้น 18%HP + ลบ debuff CD3'},  pas:{tr:'hit_recv',ch:20, d:'ถูกโจมตี 20% → ฟื้น 5% HP',   e:{t:'heal_pct', v:5}}},
+  {id:'scholar', n:'เหวินชี่',               sc:'หมู่ตึกบรรณฑิต',    tp:'สมดุล·ภายใน',  stats:{INT:20,POW:15,DEX:15}, hL:25, mL:45, act:{n:'คีตาอาคม',         c:30,cd:3,t:'debuff_acc_dmg',ad:-20,u:2,dm:0.6, d:'Acc-20 + Int×0.6 CD3'},        pas:{tr:'use_int',ch:100,d:'Int skill → ATK+10%',              e:{t:'mult_atk'}}},
+  {id:'poison',  n:'อินตู๋ชี่',              sc:'ถังเหมิน',           tp:'หยิน·อ่อน',    stats:{DEX:20,LUK:20,POW:10}, hL:15, mL:55, act:{n:'พิษสะสม',          c:35,cd:3,t:'debuff_poison', pp:5,u:3,ev:-10,    d:'พิษ 5%HP/ตา + Eva-10 CD3'},    pas:{tr:'on_crit',ch:100,d:'Crit → ศัตรู Acc-8 (2ตา)',         e:{t:'debuff_acc',n:'ตาพร่า',v:-8,u:2}}},
+  {id:'heaven',  n:'เฉียนคุนต้าฝ่า',         sc:'ลัทธิฟ้าดิน',        tp:'สมดุล·ภายใน',  stats:{POW:30,INT:20},         hL:15, mL:55, act:{n:'กลืนฟ้าดิน',       c:40,cd:4,t:'drain',         m:1.2,h:40,          d:'Int×1.2 + ดูด 40% dmg CD4'},   pas:{tr:'use_act',ch:100,d:'ใช้ IA → ATK+3% (≤+15%)',          e:{t:'stack_atk',v:3,mx:5}}},
+  {id:'blood',   n:'โลหิตอสุรา',             sc:'สำนักดาบโลหิต',      tp:'หยาง·แข็ง',    stats:{STR:25,AGI:15,LUK:10},  hL:45, mL:25, act:{n:'เลือดสาด',          c:30,cd:4,t:'drain_phy',     m:1.4,h:35,          d:'ทางกาย×1.4 + ดูด 35% CD4'},   pas:{tr:'on_crit',ch:100,d:'Crit → ฟื้น 6% HP',                e:{t:'heal_pct',v:6}}},
+  {id:'snow',    n:'กำแพงหิมะ',              sc:'สำนักน้ำแข็ง',       tp:'หยิน·แข็ง',    stats:{DEF:25,VIT:15,INT:10},  hL:50, mL:20, act:{n:'กำแพงน้ำแข็ง',      c:20,cd:3,t:'buff_reduce',   v:50,u:1,            d:'ลด dmg 50% (1ตา) CD3'},       pas:{tr:'hit_recv',ch:25, d:'ถูกโจมตี 25% → ศัตรู Acc-12 (2ตา)', e:{t:'debuff_acc',n:'สับสน',v:-12,u:2}}},
+  {id:'fire',    n:'เพลิงสวรรค์',            sc:'สำนักเพลิง',         tp:'หยาง·ภายใน',   stats:{POW:25,INT:15,STR:10},  hL:30, mL:40, act:{n:'เพลิงฟ้า',          c:35,cd:4,t:'atk_int_pen',   m:1.4,pen:30,        d:'Int×1.4 ทะลุ IDef 30% CD4'},  pas:{tr:'use_int',ch:50,  d:'Int skill 50% → ศัตรู PDef-12 (2ตา)',e:{t:'debuff_def',n:'ไฟไหม้',v:-12,u:2}}},
+  {id:'sand',    n:'พายุทราย',               sc:'สำนักพายุ',          tp:'สมดุล·ภายนอก', stats:{AGI:25,DEX:15,LUK:10},  hL:35, mL:35, act:{n:'พายุทราย',          c:25,cd:3,t:'buff_eva_debuff_eva',selfV:20,eneV:-15,u:2,d:'Eva+20 / ศัตรู Eva-15 (2ตา) CD3'},pas:{tr:'on_crit',ch:100,d:'Crit → ศัตรู Acc-12 (2ตา)',       e:{t:'debuff_acc',n:'ทราย',v:-12,u:2}}},
+  {id:'shadow',  n:'เงาสังหาร',              sc:'สำนักเงา',           tp:'หยิน·ภายนอก',  stats:{DEX:20,LUK:20,INT:10},  hL:20, mL:50, act:{n:'ตีจุดมรณะ',         c:35,cd:4,t:'drain_acc',     m:1.2,h:40,adv:-15,  d:'Int×1.2 + ดูด 40% + Acc-15 CD4'},pas:{tr:'on_crit',ch:100,d:'Crit → ศัตรู PDef-15 (2ตา)',      e:{t:'debuff_def',n:'บาดแผล',v:-15,u:2}}},
+  // ─── กำลังภายใน จากจักรวาลกิมย้ง / 9Yin ───
+  {id:'jiuyin',  n:'เก้าหยินจิงชี่',          sc:'คัมภีร์เก้าหยิน',    tp:'หยิน·ภายใน',   stats:{POW:20,INT:20,DEX:10},  hL:10, mL:60, act:{n:'เก้าหยินขาวกระดูก', c:40,cd:4,t:'atk_int_pen',   m:1.5,pen:40,        d:'Int×1.5 ทะลุ IDef 40% CD4'},  pas:{tr:'use_int',ch:100,d:'Int skill → ศัตรู PDef-10 (2ตา)',  e:{t:'debuff_def',n:'กระดูกร้าว',v:-10,u:2}}},
+  {id:'jiuyang', n:'เก้าหยางเซินกง',          sc:'คัมภีร์เก้าหยาง',   tp:'หยาง·แข็ง',    stats:{STR:15,VIT:20,DEF:15},  hL:60, mL:10, act:{n:'เพลิงบริสุทธิ์',     c:25,cd:3,t:'atk_phy_pen',   m:1.5,pen:25,        d:'ทางกาย×1.5 ทะลุ DEF 25% CD3'},pas:{tr:'hit_recv',ch:30, d:'ถูกโจมตี 30% → ฟื้น 10% HP',  e:{t:'heal_pct',v:10}}},
+  {id:'qiankun', n:'เฉียนคุนต้าหนัวอี',       sc:'ลัทธิหมิง',          tp:'สมดุล·ภายใน',  stats:{POW:20,AGI:15,INT:15},  hL:20, mL:50, act:{n:'โอนถ่ายพลัง',        c:35,cd:3,t:'buff_reflect', v:70,u:1,            d:'สะท้อน 70% ตาถัดไป CD3'},     pas:{tr:'use_int',ch:100,d:'Int skill → IAtk+15%',             e:{t:'mult_iatk'}}},
+  {id:'zixia',   n:'จื่อเสียเซินกง',           sc:'อู่ตัง',             tp:'สมดุล·อ่อน',   stats:{POW:20,INT:15,AGI:15},  hL:30, mL:40, act:{n:'หมอกม่วง',           c:30,cd:3,t:'heal_cleanse', h:25,                d:'ฟื้น 25%HP + ลบ debuff CD3'},  pas:{tr:'use_int',ch:50, d:'Int skill 50% → Eva+10 (2ตา)',    e:{t:'buff_eva',n:'หมอก',v:10,u:2}}},
+  {id:'emei',    n:'ง้อไบ๊เซินกง',            sc:'ง้อไบ๊',             tp:'สมดุล·ภายใน',  stats:{POW:15,INT:15,VIT:20},  hL:35, mL:35, act:{n:'วิสุทธิ์บัวหยก',      c:30,cd:3,t:'heal_cleanse', h:20,                d:'ฟื้น 20%HP + ลบ debuff CD3'},  pas:{tr:'hit_recv',ch:25, d:'ถูกโจมตี 25% → ฟื้น 6% HP',   e:{t:'heal_pct',v:6}}},
+  {id:'shenzhao',n:'เซินจ้าวจิง',             sc:'พรรคบู๊ลิ้ม',        tp:'สมดุล·ภายใน',  stats:{INT:25,POW:15,DEX:10},  hL:20, mL:50, act:{n:'ดวงตาจิต',           c:30,cd:3,t:'debuff_acc_dmg',ad:-25,u:3,dm:0.7, d:'Acc-25 + Int×0.7 CD3'},        pas:{tr:'use_int',ch:100,d:'Int skill → ATK+12%',              e:{t:'mult_atk'}}},
+  {id:'taiyin',  n:'ไต้อินเจิ้นชี่',          sc:'สำนักมาร',           tp:'หยิน·อ่อน',    stats:{DEX:20,LUK:20,POW:10},  hL:10, mL:60, act:{n:'มรณะเย็น',           c:40,cd:4,t:'debuff_poison', pp:6,u:4,ev:-15,    d:'พิษ 6%HP/ตา + Eva-15 CD4'},    pas:{tr:'on_crit',ch:100,d:'Crit → ศัตรู Acc-10 (3ตา)',        e:{t:'debuff_acc',n:'มรณะ',v:-10,u:3}}},
+  {id:'huoxue',  n:'ฮั่วเสวียสินฝ่า',         sc:'หมอยุทธ',            tp:'สมดุล·ภายใน',  stats:{VIT:25,POW:15,DEF:10},  hL:50, mL:20, act:{n:'โลหิตรักษา',          c:25,cd:3,t:'heal',          h:30,                d:'ฟื้น 30% HP CD3'},             pas:{tr:'hit_recv',ch:20, d:'ถูกโจมตี 20% → ฟื้น 8% HP',   e:{t:'heal_pct',v:8}}},
+  {id:'huashan', n:'หัวซานเซินกง',            sc:'หัวซาน',             tp:'สมดุล·แข็ง',   stats:{STR:20,DEX:15,POW:15},  hL:35, mL:35, act:{n:'กระบี่หนึ่งในฟ้า',   c:35,cd:4,t:'atk_phy_pen',   m:1.4,pen:35,        d:'ทางกาย×1.4 ทะลุ DEF 35% CD4'},pas:{tr:'on_crit',ch:100,d:'Crit → สะสม ATK+5%',               e:{t:'stack_atk',v:5,mx:5}}},
+  {id:'dongxuan',n:'ตงซวนเซินกง',             sc:'สำนักมืด',           tp:'หยิน·ภายใน',   stats:{INT:20,POW:20,LUK:10},  hL:15, mL:55, act:{n:'กลืนชีพ',            c:40,cd:4,t:'drain',         m:1.3,h:50,          d:'Int×1.3 + ดูด 50% dmg CD4'},   pas:{tr:'use_act',ch:100,d:'ใช้ IA → ATK+4% (≤+20%)',          e:{t:'stack_atk',v:4,mx:5}}}
+];
+
+const STATKEYS=['STR','AGI','POW','VIT','DEX','LUK','DEF','INT'];
+const STATLBL={STR:'กำลัง',AGI:'ความเร็ว',POW:'ภายใน',VIT:'ร่างกาย',DEX:'เฉียบคม',LUK:'โชค',DEF:'ป้องกัน',INT:'ฉลาด'};
+const BUDGET=200;
+
+// ─── EQUIPMENT (35 ชิ้น) ───
+// atkb=ATK flat, pdb=PD flat, idb=ID flat, hpb=HP flat, mpb=MP flat
+// eff: {t:'pct_atk'|'flat_cri'|'flat_eva'|'pct_reduce'|'hp_regen'|'on_hit', v, db}
+const EQUIP=[
+  // อาวุธ W — base: ATK
+  {id:'W1',n:'ดาบเหล็กสามัญ',  ty:'W',atkb:20, pdb:0,  idb:0,  hpb:0,  mpb:0, st:{},                   eff:null},
+  {id:'W2',n:'ดาบทองคำ',        ty:'W',atkb:40, pdb:0,  idb:0,  hpb:0,  mpb:0, st:{STR:8,DEX:7},        eff:null},
+  {id:'W3',n:'ดาบเพลิง',         ty:'W',atkb:35, pdb:0,  idb:0,  hpb:0,  mpb:0, st:{STR:10,POW:10},      eff:{t:'pct_atk',v:10}},
+  {id:'W4',n:'ดาบพิษ',           ty:'W',atkb:45, pdb:0,  idb:0,  hpb:0,  mpb:0, st:{DEX:10,LUK:8},       eff:{t:'on_hit',db:{t:'debuff_eva',v:-10,u:2}}},
+  {id:'W5',n:'ดาบมังกรเทพ',      ty:'W',atkb:70, pdb:0,  idb:0,  hpb:0,  mpb:0, st:{STR:10,AGI:6,DEX:4}, eff:{t:'flat_cri',v:20}},
+  // เสื้อ A — base: PD+ID (สูง)
+  {id:'A1',n:'เสื้อผ้าธรรมดา',  ty:'A',atkb:0, pdb:30,  idb:20, hpb:0,  mpb:0, st:{},                   eff:null},
+  {id:'A2',n:'เกราะหนัง',        ty:'A',atkb:0, pdb:55,  idb:38, hpb:0,  mpb:0, st:{VIT:10,DEF:10},      eff:null},
+  {id:'A3',n:'เกราะเหล็ก',       ty:'A',atkb:0, pdb:90,  idb:60, hpb:0,  mpb:0, st:{DEF:12,VIT:8},       eff:{t:'pct_reduce',v:8}},
+  {id:'A4',n:'เกราะมังกร',       ty:'A',atkb:0, pdb:120, idb:85, hpb:0,  mpb:0, st:{DEF:10,VIT:10},      eff:null},
+  {id:'A5',n:'เกราะเทพ',          ty:'A',atkb:0, pdb:150, idb:110,hpb:0,  mpb:0, st:{DEF:8,VIT:8,POW:4},  eff:{t:'pct_reduce',v:12}},
+  // หมวก H — base: PD+ID
+  {id:'H1',n:'หมวกผ้า',          ty:'H',atkb:0, pdb:15,  idb:10, hpb:0,  mpb:0, st:{},                   eff:null},
+  {id:'H2',n:'หมวกหนัง',         ty:'H',atkb:0, pdb:28,  idb:20, hpb:0,  mpb:0, st:{VIT:8,DEF:5},        eff:null},
+  {id:'H3',n:'หมวกเหล็ก',        ty:'H',atkb:0, pdb:48,  idb:35, hpb:0,  mpb:0, st:{DEF:10,VIT:10},      eff:null},
+  {id:'H4',n:'หมวกเทพ',          ty:'H',atkb:0, pdb:68,  idb:50, hpb:0,  mpb:0, st:{DEF:10,INT:10},      eff:{t:'pct_reduce',v:5}},
+  {id:'H5',n:'มงกุฎมังกร',        ty:'H',atkb:0, pdb:85,  idb:65, hpb:0,  mpb:0, st:{DEF:8,VIT:8,INT:4},  eff:{t:'flat_cri',v:12}},
+  // รองเท้า B — base: PD+ID
+  {id:'B1',n:'รองเท้าผ้า',       ty:'B',atkb:0, pdb:12,  idb:8,  hpb:0,  mpb:0, st:{},                   eff:null},
+  {id:'B2',n:'รองเท้าหนัง',      ty:'B',atkb:0, pdb:22,  idb:16, hpb:0,  mpb:0, st:{AGI:8,DEX:5},        eff:null},
+  {id:'B3',n:'รองเท้าเหล็ก',     ty:'B',atkb:0, pdb:38,  idb:28, hpb:0,  mpb:0, st:{DEF:8,VIT:6,AGI:6},  eff:null},
+  {id:'B4',n:'รองเท้าลม',        ty:'B',atkb:0, pdb:28,  idb:20, hpb:0,  mpb:0, st:{AGI:12,DEX:8},       eff:{t:'flat_eva',v:20}},
+  {id:'B5',n:'รองเท้าเทพ',       ty:'B',atkb:0, pdb:50,  idb:38, hpb:0,  mpb:0, st:{AGI:8,DEX:8,LUK:4},  eff:{t:'flat_eva',v:15}},
+  // ปลอกแขน BR — base: PD+ID
+  {id:'BR1',n:'ปลอกแขนผ้า',     ty:'BR',atkb:0, pdb:8,   idb:6,  hpb:0,  mpb:0, st:{},                   eff:null},
+  {id:'BR2',n:'ปลอกแขนหนัง',    ty:'BR',atkb:0, pdb:15,  idb:12, hpb:0,  mpb:0, st:{STR:6,DEF:4},        eff:null},
+  {id:'BR3',n:'ปลอกแขนเหล็ก',   ty:'BR',atkb:0, pdb:25,  idb:18, hpb:0,  mpb:0, st:{DEF:8,STR:6,VIT:6},  eff:null},
+  {id:'BR4',n:'ปลอกแขนมังกร',   ty:'BR',atkb:0, pdb:38,  idb:28, hpb:0,  mpb:0, st:{STR:10,DEX:10},      eff:{t:'pct_atk',v:8}},
+  {id:'BR5',n:'ปลอกแขนเทพ',     ty:'BR',atkb:0, pdb:50,  idb:38, hpb:0,  mpb:0, st:{STR:10,DEX:6,AGI:4}, eff:null},
+  // แหวน R — base: HP+MP
+  {id:'R1',n:'แหวนทองเปล่า',    ty:'R',atkb:0, pdb:0,  idb:0, hpb:100, mpb:60,  st:{},                   eff:null},
+  {id:'R2',n:'แหวนพลัง',         ty:'R',atkb:0, pdb:0,  idb:0, hpb:150, mpb:80,  st:{STR:5,POW:5},        eff:null},
+  {id:'R3',n:'แหวนชีวิต',        ty:'R',atkb:0, pdb:0,  idb:0, hpb:280, mpb:80,  st:{VIT:8,LUK:2},        eff:null},
+  {id:'R4',n:'แหวนปัญญา',        ty:'R',atkb:0, pdb:0,  idb:0, hpb:100, mpb:200, st:{INT:6,POW:4},        eff:{t:'hp_regen',v:3}},
+  {id:'R5',n:'แหวนมังกร',        ty:'R',atkb:0, pdb:0,  idb:0, hpb:200, mpb:150, st:{STR:5,POW:5},        eff:{t:'flat_cri',v:12}},
+  // ประดับ C — base: HP
+  {id:'C1',n:'เหรียญโชคลาภ',     ty:'C',atkb:0, pdb:0,  idb:0, hpb:180, mpb:0,  st:{},                   eff:null},
+  {id:'C2',n:'ประดับเลือดมังกร',  ty:'C',atkb:0, pdb:0,  idb:0, hpb:350, mpb:0,  st:{STR:5,VIT:5},        eff:null},
+  {id:'C3',n:'ประดับปัญญาสวรรค์', ty:'C',atkb:0, pdb:0,  idb:0, hpb:250, mpb:0,  st:{INT:5,POW:5},        eff:{t:'pct_atk',v:6}},
+  {id:'C4',n:'ประดับชีวิตนิรันดร์',ty:'C',atkb:0, pdb:0,  idb:0, hpb:500, mpb:0,  st:{VIT:10},             eff:{t:'hp_regen',v:5}},
+  {id:'C5',n:'ประดับมังกรเทพ',    ty:'C',atkb:0, pdb:0,  idb:0, hpb:450, mpb:0,  st:{STR:5,VIT:5},        eff:{t:'pct_reduce',v:8}},
+];
+
+let CH={A:{n:'ยุนม่อ',s:{STR:1,AGI:1,POW:1,VIT:1,DEX:1,LUK:1,DEF:1,INT:1}},B:{n:'ผู้พิทักษ์',s:{STR:1,AGI:1,POW:1,VIT:1,DEX:1,LUK:1,DEF:1,INT:1}}};
+let asel={A:'none',B:'none'},alv={A:5,B:5};
+let EQ={A:[null,null,null,null,null],B:[null,null,null,null,null]};
+let eqd={
+  A:{W:null,A:null,H:null,B:null,BR:[null,null],R:[null,null],C:[null,null]},
+  B:{W:null,A:null,H:null,B:null,BR:[null,null],R:[null,null],C:[null,null]}
+};
+let battle=null,ato=null;
+
+function ST(i){[0,1,2].forEach(j=>{document.getElementById('t'+j).style.display=j===i?'':'none';document.querySelectorAll('.tb')[j].classList.toggle('on',j===i);});if(i===1)renderLib();if(i===2)renderBV();}
+function gArt(s){return ARTS.find(a=>a.id===asel[s])||ARTS[0];}
+function opp(s){return s==='A'?'B':'A';}
+function gSk(id){return SP.find(x=>x.id===id)||null;}
+function gTot(s){return STATKEYS.reduce((t,k)=>t+CH[s].s[k],0);}
+
+// Equipment helpers
+function gEqItems(s){
+  const q=eqd[s];
+  return [q.W,q.A,q.H,q.B,...q.BR,...q.R,...q.C].filter(Boolean).map(id=>EQUIP.find(e=>e.id===id)).filter(Boolean);
+}
+function gEqBonus(s){
+  const b={atk:0,pd:0,id_:0,hp:0,mp:0,cri:0,eva:0,pct_atk:0,pct_red:0,hp_regen:0};
+  gEqItems(s).forEach(e=>{
+    b.atk+=e.atkb||0; b.pd+=e.pdb||0; b.id_+=e.idb||0; b.hp+=e.hpb||0; b.mp+=e.mpb||0;
+    if(e.eff){
+      if(e.eff.t==='flat_cri')   b.cri+=e.eff.v;
+      if(e.eff.t==='flat_eva')   b.eva+=e.eff.v;
+      if(e.eff.t==='pct_atk')    b.pct_atk+=e.eff.v;
+      if(e.eff.t==='pct_reduce') b.pct_red+=e.eff.v;
+      if(e.eff.t==='hp_regen')   b.hp_regen+=e.eff.v;
+    }
+  });
+  return b;
+}
+function gEqStBon(s){
+  const st={};
+  gEqItems(s).forEach(e=>Object.entries(e.st||{}).forEach(([k,v])=>{st[k]=(st[k]||0)+v;}));
+  return st;
+}
+function eqEffDesc(eff){
+  if(!eff)return'';
+  if(eff.t==='pct_atk')   return`+${eff.v}%ATK`;
+  if(eff.t==='flat_cri')  return`Cri+${eff.v}`;
+  if(eff.t==='flat_eva')  return`Eva+${eff.v}`;
+  if(eff.t==='pct_reduce')return`ลดDmg${eff.v}%`;
+  if(eff.t==='hp_regen')  return`ฟื้น${eff.v}%/ตา`;
+  if(eff.t==='on_hit')    return`OnHit:${eff.db?.t?.replace('debuff_','')||''}${eff.db?.v||''}`;
+  return'';
+}
+function eqItemDesc(id){
+  const e=EQUIP.find(x=>x.id===id);if(!e)return'';
+  const p=[];
+  if(e.atkb)p.push(`Atk+${e.atkb}`);if(e.pdb)p.push(`PD+${e.pdb}`);if(e.idb)p.push(`ID+${e.idb}`);
+  if(e.hpb) p.push(`HP+${e.hpb}`); if(e.mpb)p.push(`MP+${e.mpb}`);
+  const sb=Object.entries(e.st||{}).map(([k,v])=>`${k}+${v}`).join(' ');
+  if(sb)p.push(sb);
+  const ef=eqEffDesc(e.eff);if(ef)p.push(ef);
+  return p.join(' ');
+}
+
+function combStats(s){
+  const b={...CH[s].s},art=gArt(s);
+  if(art.id!=='none'){const f=alv[s]/10;Object.keys(art.stats).forEach(k=>{b[k]=(b[k]||0)+Math.floor(art.stats[k]*f);});}
+  EQ[s].forEach(id=>{const sk=gSk(id);if(sk)Object.entries(sk.st||{}).forEach(([k,v])=>{b[k]=(b[k]||0)+v;});});
+  Object.entries(gEqStBon(s)).forEach(([k,v])=>{b[k]=(b[k]||0)+v;});
+  return b;
+}
+function derive(o){return{HP:o.VIT*20+o.DEF*10+o.STR*3,MP:o.POW*12+o.INT*4,Atk:o.STR*3+o.AGI+o.POW+o.DEX+o.INT*2,PA:o.STR*2+o.DEX+o.LUK,IA:o.POW*2+o.DEX+o.LUK,PD:o.DEF*2+o.VIT+o.INT*2,ID:o.DEF*2+o.POW+o.VIT+o.INT*2,Eva:o.AGI*2,Acc:o.DEX*2,Cri:o.STR+o.LUK,Res:o.LUK+Math.floor(o.DEF*.5),Spd:Math.max(o.AGI*2,1)};}
+function deriveAll(s){
+  const d=derive(combStats(s)),art=gArt(s);
+  if(art.id!=='none'){d.HP+=art.hL*alv[s];d.MP+=art.mL*alv[s];}
+  const eb=gEqBonus(s);
+  d.Atk+=eb.atk; d.PD+=eb.pd; d.ID+=eb.id_; d.HP+=eb.hp; d.MP+=eb.mp; d.Cri+=eb.cri; d.Eva+=eb.eva;
+  return d;
+}
+function getMas(s){const m={};EQ[s].forEach(id=>{const sk=gSk(id);if(sk)m[sk.w]=Math.min(200,(m[sk.w]||0)+sk.mg);});return m;}
+function getWM(s,w){return getMas(s)[w]||0;}
+function hpPct(a,e){return Math.min(Math.max(80+(a-e)/4,5),95);}
+function crPct(c,r){return Math.min(Math.max(3+(c-r)/3,0),75);}
+function hpC(p){return p>50?'#1D9E75':p>20?'#BA7517':'#E24B4A';}
+
+function updStat(s,k,v){const ot=gTot(s)-CH[s].s[k],cv=Math.min(Math.max(v,1),Math.min(BUDGET-ot,100));CH[s].s[k]=cv;const sl=document.getElementById('sl-'+s+'-'+k),sv=document.getElementById('sv-'+s+'-'+k);if(sl)sl.value=cv;if(sv)sv.textContent=cv;rMax(s);rPts(s);rDv(s);}
+function rMax(s){const r=BUDGET-gTot(s);STATKEYS.forEach(k=>{const sl=document.getElementById('sl-'+s+'-'+k);if(sl)sl.max=Math.min(CH[s].s[k]+r,100);});}
+function rPts(s){const tot=gTot(s),rem=BUDGET-tot,p=tot/BUDGET*100,bc=rem===0?'#E24B4A':rem<20?'#BA7517':'#7F77DD';document.getElementById('p'+s).innerHTML=`<div class="prow"><span>คะแนน <b>${tot}</b>/${BUDGET}</span><span style="${rem===0?'color:#E24B4A':''}">เหลือ ${rem}</span></div><div class="pbw"><div class="pbf" style="width:${p}%;background:${bc}"></div></div>`;}
+
+function rDv(s){
+  const pure=derive(CH[s].s),all=deriveAll(s),el=document.getElementById('dv'+s);if(!el)return;
+  const df=(cv,bv)=>cv>bv?`<span class="iad">+${cv-bv}</span>`:'';
+  const it=[['HP',all.HP,pure.HP],['MP',all.MP,pure.MP],['ATK',all.Atk,pure.Atk],['PA',all.PA,pure.PA],['IA',all.IA,pure.IA],['PD',all.PD,pure.PD],['ID',all.ID,pure.ID],['SPD',all.Spd,pure.Spd],['Eva',all.Eva,pure.Eva],['Acc',all.Acc,pure.Acc],['Cri',all.Cri,pure.Cri],['Res',all.Res,pure.Res]];
+  el.innerHTML=it.map(([l,cv,bv])=>`<div class="dv"><div class="dvl">${l}</div><div class="dvv">${cv}${df(cv,bv)}</div></div>`).join('');
+}
+
+function rIA(s){
+  const el=document.getElementById('ia'+s);if(!el)return;
+  const art=gArt(s),lv=alv[s];
+  const opts=ARTS.map(a=>`<option value="${a.id}" ${a.id===asel[s]?'selected':''}>${a.n}</option>`).join('');
+  let info='';
+  if(art.id!=='none'){
+    const sb=Object.entries(art.stats).map(([k,v])=>`${k}+${Math.floor(v*lv/10)}`).join(' ');
+    const al=deriveAll(s);
+    info=`<div class="ia-inf"><b>${art.sc}</b> · ${art.tp}<br>${sb} | HP+${art.hL*lv} MP+${art.mL*lv}${art.act?`<br>⚡ <b>${art.act.n}</b> (MP ${art.act.c}): ${art.act.d}`:''}${art.pas?`<br>◆ ${art.pas.d}`:''}</div><div class="ia-tot">รวม HP <b>${al.HP}</b> · MP <b>${al.MP}</b></div>`;
+  }
+  el.innerHTML=`<div class="sec"><div class="stt">กำลังภายใน</div><div class="ia-r"><select onchange="asel['${s}']=this.value;rIA('${s}');rDv('${s}')">${opts}</select><label>ขั้น</label><input type="range" min="1" max="10" value="${lv}" oninput="alv['${s}']=+this.value;document.getElementById('ilv${s}').textContent=this.value;rIA('${s}');rDv('${s}')"><span id="ilv${s}">${lv}</span></div>${info}</div>`;
+  makeSearchable(el);
+}
+
+function rSS(s){
+  const el=document.getElementById('ss'+s);if(!el)return;
+  const used=EQ[s].filter(Boolean),mas=getMas(s);
+  const skBon={};EQ[s].forEach(id=>{const sk=gSk(id);if(sk)Object.entries(sk.st||{}).forEach(([k,v])=>{skBon[k]=(skBon[k]||0)+v;});});
+  const bonStr=Object.entries(skBon).map(([k,v])=>`${k}+${v}`).join(' ')||'—';
+  const masStr=Object.entries(mas).map(([w,v])=>`<span class="mb">×<b>${(1+v/200*.5).toFixed(2)}</b> ${w}</span>`).join('');
+  let slots='';
+  for(let i=0;i<5;i++){
+    const cur=EQ[s][i],csk=gSk(cur);
+    const og=TIERS.map((t,ti)=>{const opts=SP.filter(sk=>sk.ti===ti&&(!used.includes(sk.id)||sk.id===cur)).map(sk=>`<option value="${sk.id}" ${sk.id===cur?'selected':''}>${sk.n}</option>`).join('');return opts?`<optgroup label="${t.n} (CD${t.cd})">${opts}</optgroup>`:''}).join('');
+    const info=csk?`${csk.at==='phy'?'⚔':csk.at==='int'?'💜':csk.se?'⟳':'💥'} ${csk.w} CD${TIERS[csk.ti].cd}`:'—';
+    slots+=`<div class="sk-slot"><span class="num">${i+1}</span><select onchange="EQ['${s}'][${i}]=this.value||null;rSS('${s}');rDv('${s}')"><option value="">— ว่าง —</option>${og}</select><span class="sk-info">${info}</span></div>`;
+  }
+  el.innerHTML=`<div class="sec"><div class="stt">วิชาที่ฝึก (5 ช่อง)</div>${slots}<div class="mas-r">${masStr||'<span style="font-size:10px;color:#AAA">ยังไม่มีความเชี่ยวชาญ</span>'}</div><div class="skbon">โบนัสจากวิชา: ${bonStr}</div></div>`;
+  makeSearchable(el);
+}
+
+function rEQ(s){
+  const el=document.getElementById('eq'+s);if(!el)return;
+  const q=eqd[s];
+  const SLOTS=[
+    {key:'W', n:'🗡 อาวุธ',    ty:'W', cnt:1},
+    {key:'A', n:'👘 เสื้อ',    ty:'A', cnt:1},
+    {key:'H', n:'🪖 หมวก',    ty:'H', cnt:1},
+    {key:'B', n:'👟 รองเท้า',  ty:'B', cnt:1},
+    {key:'BR',n:'💪 ปลอกแขน', ty:'BR',cnt:2},
+    {key:'R', n:'💍 แหวน',     ty:'R', cnt:2},
+    {key:'C', n:'🎖 ประดับ',   ty:'C', cnt:2},
+  ];
+  const mkOpts=(ty,cur)=>`<option value="">— ว่าง —</option>`+
+    EQUIP.filter(e=>e.ty===ty).map(e=>`<option value="${e.id}" ${e.id===cur?'selected':''}>${e.n}</option>`).join('');
+
+  let html='';
+  SLOTS.forEach(sl=>{
+    if(sl.cnt===1){
+      const cur=q[sl.key],tag=cur?`<span class="eq-tag">${eqItemDesc(cur)}</span>`:'';
+      html+=`<div class="eq-row"><span class="eq-lbl">${sl.n}</span><select class="eq-sel" onchange="eqd['${s}']['${sl.key}']=this.value||null;rEQ('${s}');rDv('${s}')">${mkOpts(sl.ty,cur)}</select>${tag}</div>`;
+    }else{
+      [0,1].forEach(i=>{
+        const cur=q[sl.key][i],tag=cur?`<span class="eq-tag">${eqItemDesc(cur)}</span>`:'';
+        html+=`<div class="eq-row"><span class="eq-lbl">${i===0?sl.n:''}</span><select class="eq-sel" onchange="eqd['${s}']['${sl.key}'][${i}]=this.value||null;rEQ('${s}');rDv('${s}')">${mkOpts(sl.ty,cur)}</select>${tag}</div>`;
+      });
+    }
+  });
+
+  const eb=gEqBonus(s);
+  const sum=[];
+  if(eb.atk)    sum.push(`Atk+<b>${eb.atk}</b>`);
+  if(eb.pd)     sum.push(`PD+<b>${eb.pd}</b>`);
+  if(eb.id_)    sum.push(`ID+<b>${eb.id_}</b>`);
+  if(eb.hp)     sum.push(`HP+<b>${eb.hp}</b>`);
+  if(eb.mp)     sum.push(`MP+<b>${eb.mp}</b>`);
+  if(eb.cri)    sum.push(`Cri+<b>${eb.cri}</b>`);
+  if(eb.eva)    sum.push(`Eva+<b>${eb.eva}</b>`);
+  if(eb.pct_atk)sum.push(`ATK+<b>${eb.pct_atk}%</b>`);
+  if(eb.pct_red)sum.push(`ลดDmg<b>${eb.pct_red}%</b>`);
+  if(eb.hp_regen)sum.push(`ฟื้น<b>${eb.hp_regen}%</b>/ตา`);
+  const stb=Object.entries(gEqStBon(s)).map(([k,v])=>`${k}+<b>${v}</b>`);
+  const total=[...sum,...stb].join(' · ')||'ไม่มีโบนัส';
+
+  el.innerHTML=`<div class="sec"><div class="stt">อุปกรณ์ (9 ช่อง)</div>${html}<div class="eq-sum">รวม: ${total}</div></div>`;
+  makeSearchable(el);
+}
+
+function renderLib(){
+  const tbl=document.getElementById('libt');if(!tbl)return;
+  tbl.innerHTML=`<thead><tr><th>ชื่อวิชา</th><th>ระดับ</th><th>CD</th><th>อาวุธ</th><th>MG</th><th>พลังฐาน</th><th>สถิติ</th><th>ผลกระทบ</th></tr></thead><tbody>${SP.map(sk=>{
+    const t=TIERS[sk.ti];
+    const sb=Object.entries(sk.st||{}).map(([k,v])=>`${k}+${v}`).join(' ');
+    const type=sk.at==='phy'?'⚔Phy':sk.at==='int'?'💜Int':sk.se?'⟳Buff':'💥Debuff';
+    let bpStr='—';
+    if(sk.at){
+      const se=Math.round((sk.bp||0)*(1+(sk.p||0)/100)+(sk.f||0));
+      const parts=[];
+      if(sk.bp)parts.push(`bp${sk.bp}`);
+      if(sk.p) parts.push(`+${sk.p}%`);
+      if(sk.f) parts.push(`+${sk.f}`);
+      if(sk.dm&&sk.dm!==1)parts.push(`×${sk.dm}`);
+      bpStr=`<b>${se}</b><br><span style="color:#AAA;font-size:9px">${parts.join(' ')}</span>`;
+    }
+    return`<tr><td><b>${sk.n}</b></td><td><span class="tier-badge ${t.c}">${t.n}</span></td><td>${t.cd}</td><td>${sk.w}</td><td>+${sk.mg}</td><td style="font-size:10px;text-align:center">${bpStr}</td><td style="font-size:10px">${sb}</td><td style="font-size:10px">${type} · ${sk.d}</td></tr>`;
+  }).join('')}</tbody>`;
+}
+
+// === BATTLE ===
+function addBuf(s,b){battle.st[s].buffs=battle.st[s].buffs.filter(x=>x.t!==b.t);battle.st[s].buffs.push({...b});}
+function addDeb(s,d){battle.st[s].debuffs=battle.st[s].debuffs.filter(x=>x.t!==d.t);battle.st[s].debuffs.push({...d});}
+function lg(cls,txt){battle.log.push({cls,txt});if(battle.log.length>100)battle.log.shift();}
+function checkWin(){if(battle.winner)return;const w=battle.hA<=0?'B':battle.hB<=0?'A':null;if(w){battle.winner=w;battle.phase='over';lg('lS',`━━ ${CH[w].n} ชนะ! (${battle.turn} ตา) ━━`);}}
+
+function tickFX(){
+  if(battle.winner)return;
+  ['A','B'].forEach(s=>{
+    const st=battle.st[s],poi=st.debuffs.find(d=>d.t==='debuff_poison');
+    if(poi&&poi.u>0){const dmg=Math.round(battle['d'+s].HP*poi.pp/100);battle['h'+s]=Math.max(0,battle['h'+s]-dmg);if(dmg>0)lg('lS',`&nbsp;☠ ${CH[s].n} รับพิษ ${dmg}`);}
+    st.buffs.forEach(b=>{if(b.u>0)b.u--;});st.buffs=st.buffs.filter(b=>b.u>0);
+    st.debuffs.forEach(d=>{if(d.u>0)d.u--;});st.debuffs=st.debuffs.filter(d=>d.u>0);
+    if(battle['h'+s]<=0&&!battle.winner){battle.winner=opp(s);battle.phase='over';lg('lS',`━━ ${CH[battle.winner].n} ชนะ! (พิษ) ━━`);}
+    // HP regen from equipment
+    const regen=gEqBonus(s).hp_regen;
+    if(regen>0&&battle['h'+s]>0&&!battle.winner){const h=Math.round(battle['d'+s].HP*regen/100);battle['h'+s]=Math.min(battle['d'+s].HP,battle['h'+s]+h);if(h>0)lg('lS',`&nbsp;💊 ${CH[s].n} ฟื้น ${h} (อุปกรณ์)`);}
+  });
+}
+
+function chkPas(s,trigger){
+  const art=gArt(s);if(!art.pas||art.pas.tr!==trigger)return;
+  if(Math.random()*100>=art.pas.ch)return;
+  const e=art.pas.e,ds=opp(s);
+  if(e.t==='buff_def'){addBuf(s,{t:'buff_def',n:e.n||'DEF↑',v:e.v,u:e.u});lg('lS',`&nbsp;◆ ${CH[s].n}: DEF+${e.v}(${e.u}ตา)`);}
+  else if(e.t==='buff_eva'){addBuf(s,{t:'buff_eva',n:e.n||'Eva↑',v:e.v,u:e.u});lg('lS',`&nbsp;◆ ${CH[s].n}: Eva+${e.v}(${e.u}ตา)`);}
+  else if(e.t==='heal_pct'){const h=Math.round(battle['d'+s].HP*e.v/100);battle['h'+s]=Math.min(battle['d'+s].HP,battle['h'+s]+h);lg('lS',`&nbsp;◆ ${CH[s].n} ฟื้น ${h} HP`);}
+  else if(e.t==='debuff_acc'){addDeb(ds,{t:'debuff_acc',n:e.n||'Acc↓',v:e.v,u:e.u});lg('lS',`&nbsp;◆ ${CH[ds].n}: Acc${e.v}(${e.u}ตา)`);}
+  else if(e.t==='debuff_eva'){addDeb(ds,{t:'debuff_eva',n:e.n||'Eva↓',v:e.v,u:e.u});lg('lS',`&nbsp;◆ ${CH[ds].n}: Eva${e.v}(${e.u}ตา)`);}
+  else if(e.t==='debuff_def'){addDeb(ds,{t:'debuff_def',n:e.n||'DEF↓',v:e.v,u:e.u});lg('lS',`&nbsp;◆ ${CH[ds].n}: PDef${e.v}(${e.u}ตา)`);}
+  else if(e.t==='stack_atk'){const cur=battle.st[s].stk||0;if(cur<e.mx){battle.st[s].stk++;lg('lS',`&nbsp;◆ ${CH[s].n}: ATK+${battle.st[s].stk*e.v}%`);}}
+}
+
+function calcDmg(side,sk){
+  const ds=opp(side),ad=battle['d'+side],dd=battle['d'+ds],ast=battle.st[side],dst=battle.st[ds];
+  const aid=gArt(side).id;
+  let iatkBuff=0; ast.buffs.forEach(b=>{if(b.t==='buff_iatk')iatkBuff+=b.v;});
+  let im=1+iatkBuff/100,ab=1;
+  if(aid==='taiji'&&sk.at==='int')im=(1+iatkBuff/100)*1.12;
+  if(aid==='scholar'&&sk.at==='int'){im=1+iatkBuff/100;ab=1.10;}
+  const sm=1+(ast.stk||0)*0.03+gEqBonus(side).pct_atk/100;
+  let ea=ad.Acc;ast.debuffs.forEach(d=>{if(d.t==='debuff_acc')ea=Math.max(0,ea+d.v);});
+  let ee=dd.Eva;dst.debuffs.forEach(d=>{if(d.t==='debuff_eva')ee=Math.max(0,ee+d.v);});dst.buffs.forEach(b=>{if(b.t==='buff_eva')ee+=b.v;});
+  let fD=0,pR=0,ref=0,dR=0;
+  dst.buffs.forEach(b=>{if(b.t==='buff_def')fD+=b.v;if(b.t==='buff_reduce')pR+=b.v;if(b.t==='buff_reflect')ref=b.v;});
+  dst.debuffs.forEach(d=>{if(d.t==='debuff_def')dR+=Math.abs(d.v);});
+  pR+=gEqBonus(ds).pct_red;
+  const mas=getWM(side,sk.w),mm=1+(mas/200)*.5;
+  const ta=sk.at==='phy'?ad.PA:ad.IA*im;
+  const se=(sk.bp||0)*(1+(sk.p||0)/100)+(sk.f||0);
+  const ed=Math.max(0,(sk.at==='phy'?dd.PD:dd.ID)+fD-dR);
+  const raw=Math.max(1,(ad.Atk*sm*ab+ta+se)*(sk.dm||1)*mm-ed)*(1-pR/100);
+  const hp=hpPct(ea,ee);
+  if(Math.random()*100>=hp)return{hit:false,dmg:0,crit:false,hp:Math.round(hp),cp:0,refl:0};
+  const cp=crPct(ad.Cri,dd.Res),crit=Math.random()*100<cp,dmg=Math.round(raw*(crit?1.5:1));
+  let rd=0;if(ref>0){rd=Math.round(dmg*ref/100);dst.buffs=dst.buffs.filter(b=>b.t!=='buff_reflect');}
+  return{hit:true,dmg,crit,hp:Math.round(hp),cp:Math.round(cp),refl:rd};
+}
+
+function applySelf(caster,eff){
+  if(!eff)return;const s=caster;
+  if(eff.t==='buff_reflect'){addBuf(s,{t:'buff_reflect',n:'สะท้อน',v:eff.v,u:eff.u});lg('lS',`&nbsp;⟳ ${CH[s].n}: สะท้อน${eff.v}%(${eff.u}ตา)`);}
+  else if(eff.t==='buff_eva'){addBuf(s,{t:'buff_eva',n:'ว่องไว',v:eff.v,u:eff.u});lg('lS',`&nbsp;⟳ ${CH[s].n}: Eva+${eff.v}(${eff.u}ตา)`);}
+  else if(eff.t==='buff_reduce'){addBuf(s,{t:'buff_reduce',n:'เกราะ',v:eff.v,u:eff.u});lg('lS',`&nbsp;⟳ ${CH[s].n}: ลดdmg${eff.v}%(${eff.u}ตา)`);}
+  else if(eff.t==='buff_def'){addBuf(s,{t:'buff_def',n:'DEF↑',v:eff.v,u:eff.u});lg('lS',`&nbsp;⟳ ${CH[s].n}: DEF+${eff.v}(${eff.u}ตา)`);}
+  else if(eff.t==='heal_pct'){const h=Math.round(battle['d'+s].HP*eff.v/100);battle['h'+s]=Math.min(battle['d'+s].HP,battle['h'+s]+h);lg('lS',`&nbsp;⟳ ${CH[s].n}: ฟื้น${h}HP`);}
+  else if(eff.t==='heal_buff'){const h=Math.round(battle['d'+s].HP*eff.hp/100);battle['h'+s]=Math.min(battle['d'+s].HP,battle['h'+s]+h);addBuf(s,{t:eff.bt,n:'บัฟ',v:eff.bv,u:eff.bu});lg('lS',`&nbsp;⟳ ${CH[s].n}: ฟื้น${h}HP+${eff.bt}+${eff.bv}(${eff.bu}ตา)`);}
+  else if(eff.t==='stack_atk'){const cur=battle.st[s].stk||0;if(cur<eff.mx){battle.st[s].stk++;lg('lS',`&nbsp;⟳ ${CH[s].n}: ATK+${battle.st[s].stk*eff.v}%`);}}
+  else if(eff.t==='buff_iatk_reduce'){addBuf(s,{t:'buff_iatk',n:'ลมปราณอุดร',v:eff.iv,u:eff.u});addBuf(s,{t:'buff_reduce',n:'ลดรับ',v:eff.rv,u:eff.u});lg('lS',`&nbsp;⟳ ${CH[s].n}: IAtk+${eff.iv}% + ลดรับ${eff.rv}%(${eff.u}ตา)`);}
+  else if(eff.t==='buff_reflect_eva'){addBuf(s,{t:'buff_reflect',n:'ดาวคล้อย',v:eff.rv,u:eff.u});addBuf(s,{t:'buff_eva',n:'ดาวคล้อย',v:eff.ev,u:eff.u});lg('lS',`&nbsp;⟳ ${CH[s].n}: สะท้อน${eff.rv}% + Eva+${eff.ev}(${eff.u}ตา)`);}
+}
+
+function applyEnemy(caster,eff){
+  if(!eff)return;const ds=opp(caster);
+  if(eff.t==='debuff_eva'){addDeb(ds,{t:'debuff_eva',n:'Eva↓',v:eff.v,u:eff.u});lg('lS',`&nbsp;✗ ${CH[ds].n}: Eva${eff.v}(${eff.u}ตา)`);}
+  else if(eff.t==='debuff_acc'){addDeb(ds,{t:'debuff_acc',n:'Acc↓',v:eff.v,u:eff.u});lg('lS',`&nbsp;✗ ${CH[ds].n}: Acc${eff.v}(${eff.u}ตา)`);}
+  else if(eff.t==='debuff_def'){addDeb(ds,{t:'debuff_def',n:'DEF↓',v:eff.v,u:eff.u});lg('lS',`&nbsp;✗ ${CH[ds].n}: PDef${eff.v}(${eff.u}ตา)`);}
+  else if(eff.t==='debuff_poison'){addDeb(ds,{t:'debuff_poison',n:'พิษ',pp:eff.pp,u:eff.u});addDeb(ds,{t:'debuff_eva',n:'พิษEva',v:eff.ev,u:eff.u});lg('lS',`&nbsp;✗ ${CH[ds].n}: พิษ${eff.pp}%/ตา Eva${eff.ev}(${eff.u}ตา)`);}
+  else if(eff.t==='multi_debuff'){addDeb(ds,{t:'debuff_acc',n:'Acc↓',v:eff.av,u:eff.u});addDeb(ds,{t:'debuff_eva',n:'Eva↓',v:eff.ev,u:eff.u});lg('lS',`&nbsp;✗ ${CH[ds].n}: Acc${eff.av} Eva${eff.ev}(${eff.u}ตา)`);}
+  else if(eff.t==='heavy_poison'){addDeb(ds,{t:'debuff_poison',n:'พิษร้าย',pp:eff.pp,u:eff.u});addDeb(ds,{t:'debuff_acc',n:'พิษAcc',v:eff.av,u:eff.u});addDeb(ds,{t:'debuff_eva',n:'พิษEva',v:eff.ev,u:eff.u});lg('lS',`&nbsp;✗ ${CH[ds].n}: พิษ${eff.pp}%/ตา Acc${eff.av} Eva${eff.ev}(${eff.u}ตา)`);}
+  else if(eff.t==='drain_mp'){const mpDrain=Math.round(battle['d'+ds].MP*eff.v/100);const gained=Math.min(battle['mp'+ds],mpDrain);battle['mp'+ds]=Math.max(0,battle['mp'+ds]-gained);battle['mp'+opp(ds)]=Math.min(battle['d'+opp(ds)].MP,battle['mp'+opp(ds)]+gained);lg('lS',`&nbsp;✗ ${CH[ds].n}: ดูด MP ${gained}`);}
+  else if(eff.t==='dispel'){const rm=battle.st[ds].buffs.shift();addDeb(ds,{t:'debuff_acc',n:'สลายพลัง',v:eff.acc,u:eff.u});lg('lS',`&nbsp;✗ ${CH[ds].n}: ${rm?`สลาย[${rm.n||'บัฟ'}]`:''} Acc${eff.acc}(${eff.u}ตา)`);}
+}
+
+function decCD(s){battle.cd[s]=battle.cd[s].map(v=>Math.max(0,v-1));battle.iaCD[s]=Math.max(0,battle.iaCD[s]-1);}
+
+function resolveSk(side,idx){
+  battle.turn++;tickFX();if(battle.winner)return;
+  const skId=EQ[side][idx];if(!skId)return;
+  const sk=gSk(skId);if(!sk)return;
+  battle.cd[side][idx]=TIERS[sk.ti].cd;
+  const ds=opp(side),cls=side==='A'?'lA':'lB',nm=CH[side].n;
+  const ti=sk.at==='phy'?'⚔':sk.at==='int'?'💜':sk.se?'⟳':'💥';
+  if(sk.at){
+    const res=calcDmg(side,sk);
+    const pn=`<span class="lp">[hit${res.hp}% crit${res.cp}%]</span>`;
+    if(!res.hit){lg(cls,`[${battle.turn}] ${nm} → <b>${sk.n}</b>${ti} <span style="color:#AAA">พลาด!</span> ${pn}`);}
+    else{
+      battle['h'+ds]=Math.max(0,battle['h'+ds]-res.dmg);
+      const dt=res.crit?`<span class="lC">★CRIT! ${res.dmg}</span>`:`<b>${res.dmg}</b>`;
+      lg(cls,`[${battle.turn}] ${nm} → <b>${sk.n}</b>${ti} ${dt} ${pn}`);
+      if((sk.dr||0)>0){const h=Math.round(res.dmg*sk.dr/100);battle['h'+side]=Math.min(battle['d'+side].HP,battle['h'+side]+h);lg('lS',`&nbsp;→ ดูด ${h} HP`);}
+      if(res.refl>0){battle['h'+side]=Math.max(0,battle['h'+side]-res.refl);lg('lS',`&nbsp;↩ สะท้อน ${res.refl}`);}
+      // on_hit weapon effect
+      const wep=EQUIP.find(e=>e.id===eqd[side].W);
+      if(wep&&wep.eff&&wep.eff.t==='on_hit'&&wep.eff.db){addDeb(ds,{...wep.eff.db,n:wep.eff.db.t.replace('debuff_','')+'↓'});lg('lS',`&nbsp;🗡 ${wep.n}: ${wep.eff.db.t.replace('debuff_','')}${wep.eff.db.v}(${wep.eff.db.u}ตา)`);}
+      if(res.crit)chkPas(side,'on_crit');
+      chkPas(ds,'hit_recv');
+      if(sk.at==='int')chkPas(side,'use_int');
+      checkWin();
+    }
+  }else{lg(cls,`[${battle.turn}] ${nm} → <b>${sk.n}</b>${ti}`);}
+  if(!battle.winner){if(sk.se)applySelf(side,sk.se);if(sk.ee)applyEnemy(side,sk.ee);}
+  lg('lS',`&nbsp;A:${battle.hA}/${battle.dA.HP} · B:${battle.hB}/${battle.dB.HP}`);
+}
+
+function resolveIA(s){
+  const art=gArt(s);if(!art.act)return false;
+  const act=art.act;
+  if(battle.iaCD[s]>0){lg('lS',`[IA] ${CH[s].n}: กำลังภายใน CD ${battle.iaCD[s]}`);return false;}
+  if(battle['mp'+s]<act.c){lg('lS',`[IA] ${CH[s].n}: MP ไม่พอ`);return false;}
+  battle['mp'+s]-=act.c;
+  battle.iaCD[s]=act.cd||0;  // set CD
+  battle.turn++;tickFX();if(battle.winner)return true;
+  const cls=s==='A'?'lA':'lB',nm=CH[s].n,ds=opp(s),ad=battle['d'+s],dd=battle['d'+ds],dst=battle.st[ds];
+  let fD=0,pR=0,ref=0;dst.buffs.forEach(b=>{if(b.t==='buff_def')fD+=b.v;if(b.t==='buff_reduce')pR+=b.v;if(b.t==='buff_reflect')ref=b.v;});
+  const pn=(hp,cp)=>`<span class="lp">[hit${hp}% crit${cp}%]</span>`;
+  // hit/crit helper for IA attacks
+  function iaMiss(){
+    let ea=ad.Acc;battle.st[s].debuffs.forEach(d=>{if(d.t==='debuff_acc')ea=Math.max(0,ea+d.v);});
+    let ee=dd.Eva;dst.debuffs.forEach(d=>{if(d.t==='debuff_eva')ee=Math.max(0,ee+d.v);});dst.buffs.forEach(b=>{if(b.t==='buff_eva')ee+=b.v;});
+    return {ea,ee,hp:Math.round(hpPct(ea,ee)),cp:Math.round(crPct(ad.Cri,dd.Res))};
+  }
+  function doAtkHit(rawDmg,hc){
+    const crit=Math.random()*100<hc.cp,dmg=Math.round(rawDmg*(crit?1.5:1));
+    battle['h'+ds]=Math.max(0,battle['h'+ds]-dmg);
+    if(ref>0){const rd=Math.round(dmg*ref/100);battle['h'+s]=Math.max(0,battle['h'+s]-rd);dst.buffs=dst.buffs.filter(b=>b.t!=='buff_reflect');lg('lS',`&nbsp;↩ สะท้อน${rd}`);}
+    return{dmg,crit};
+  }
+  if(act.t==='heal'){
+    const h=Math.round(battle['d'+s].HP*act.h/100);battle['h'+s]=Math.min(battle['d'+s].HP,battle['h'+s]+h);
+    lg(cls,`[${battle.turn}] ${nm} ⚡<b>${act.n}</b> → ฟื้น <b>${h}</b> HP`);
+  }
+  else if(act.t==='heal_cleanse'){
+    const h=Math.round(battle['d'+s].HP*act.h/100);battle['h'+s]=Math.min(battle['d'+s].HP,battle['h'+s]+h);
+    const rm=battle.st[s].debuffs.pop();
+    lg(cls,`[${battle.turn}] ${nm} ⚡<b>${act.n}</b> → ฟื้น <b>${h}</b> HP${rm?` +ลบ[${rm.n}]`:''}`);
+  }
+  else if(act.t==='atk_phy_pen'){
+    const hc=iaMiss();
+    if(Math.random()*100>=hc.hp){lg(cls,`[${battle.turn}] ${nm} ⚡<b>${act.n}</b> → <span style="color:#AAA">พลาด!</span> ${pn(hc.hp,hc.cp)}`);}
+    else{const raw=Math.max(1,(ad.Atk+ad.PA)*act.m-(dd.PD*(1-act.pen/100)+fD))*(1-pR/100),r=doAtkHit(raw,hc);const dt=r.crit?`<span class="lC">★CRIT! ${r.dmg}</span>`:`<b>${r.dmg}</b>`;lg(cls,`[${battle.turn}] ${nm} ⚡<b>${act.n}</b>⚔ ${dt} ${pn(hc.hp,hc.cp)}`);checkWin();}
+  }
+  else if(act.t==='buff_reflect'){addBuf(s,{t:'buff_reflect',n:'สะท้อน',v:act.v,u:act.u});lg(cls,`[${battle.turn}] ${nm} ⚡<b>${act.n}</b> → สะท้อน${act.v}%(${act.u}ตา)`);}
+  else if(act.t==='buff_reduce'){addBuf(s,{t:'buff_reduce',n:'เกราะ',v:act.v,u:act.u});lg(cls,`[${battle.turn}] ${nm} ⚡<b>${act.n}</b> → ลดdmg${act.v}%(${act.u}ตา)`);}
+  else if(act.t==='drain'){
+    const hc=iaMiss();
+    if(Math.random()*100>=hc.hp){lg(cls,`[${battle.turn}] ${nm} ⚡<b>${act.n}</b> → <span style="color:#AAA">พลาด!</span> ${pn(hc.hp,hc.cp)}`);}
+    else{const raw=Math.max(1,(ad.Atk+ad.IA)*act.m-(dd.ID+fD))*(1-pR/100),r=doAtkHit(raw,hc);const heal=Math.round(r.dmg*act.h/100);battle['h'+s]=Math.min(battle['d'+s].HP,battle['h'+s]+heal);const dt=r.crit?`<span class="lC">★CRIT! ${r.dmg}</span>`:`<b>${r.dmg}</b>`;lg(cls,`[${battle.turn}] ${nm} ⚡<b>${act.n}</b>💜 ${dt} + ฟื้น <b>${heal}</b> ${pn(hc.hp,hc.cp)}`);checkWin();}
+  }
+  else if(act.t==='debuff_acc_dmg'){
+    addDeb(ds,{t:'debuff_acc',n:'สับสน',v:act.ad,u:act.u});  // debuff applies regardless
+    const hc=iaMiss();
+    if(Math.random()*100>=hc.hp){lg(cls,`[${battle.turn}] ${nm} ⚡<b>${act.n}</b> → Acc${act.ad} + <span style="color:#AAA">พลาด!</span> ${pn(hc.hp,hc.cp)}`);}
+    else{const raw=Math.max(1,(ad.Atk+ad.IA)*act.dm-(dd.ID+fD))*(1-pR/100),r=doAtkHit(raw,hc);const dt=r.crit?`<span class="lC">★CRIT! ${r.dmg}</span>`:`<b>${r.dmg}</b>`;lg(cls,`[${battle.turn}] ${nm} ⚡<b>${act.n}</b> → Acc${act.ad} + ${dt} ${pn(hc.hp,hc.cp)}`);checkWin();}
+  }
+  else if(act.t==='debuff_poison'){
+    addDeb(ds,{t:'debuff_poison',n:'พิษ',pp:act.pp,u:act.u});
+    addDeb(ds,{t:'debuff_eva',n:'พิษEva',v:act.ev,u:act.u});
+    lg(cls,`[${battle.turn}] ${nm} ⚡<b>${act.n}</b> → พิษ${act.pp}%/ตา Eva${act.ev}`);
+  }
+  else if(act.t==='drain_phy'){
+    const hc=iaMiss();
+    if(Math.random()*100>=hc.hp){lg(cls,`[${battle.turn}] ${nm} ⚡<b>${act.n}</b> → <span style="color:#AAA">พลาด!</span> ${pn(hc.hp,hc.cp)}`);}
+    else{const raw=Math.max(1,(ad.Atk+ad.PA)*act.m-(dd.PD+fD))*(1-pR/100),r=doAtkHit(raw,hc);const heal=Math.round(r.dmg*act.h/100);battle['h'+s]=Math.min(battle['d'+s].HP,battle['h'+s]+heal);const dt=r.crit?`<span class="lC">★CRIT! ${r.dmg}</span>`:`<b>${r.dmg}</b>`;lg(cls,`[${battle.turn}] ${nm} ⚡<b>${act.n}</b>⚔ ${dt} + ฟื้น <b>${heal}</b> ${pn(hc.hp,hc.cp)}`);checkWin();}
+  }
+  else if(act.t==='atk_int_pen'){
+    const hc=iaMiss();
+    if(Math.random()*100>=hc.hp){lg(cls,`[${battle.turn}] ${nm} ⚡<b>${act.n}</b> → <span style="color:#AAA">พลาด!</span> ${pn(hc.hp,hc.cp)}`);}
+    else{const raw=Math.max(1,(ad.Atk+ad.IA)*act.m-(dd.ID*(1-act.pen/100)+fD))*(1-pR/100),r=doAtkHit(raw,hc);const dt=r.crit?`<span class="lC">★CRIT! ${r.dmg}</span>`:`<b>${r.dmg}</b>`;lg(cls,`[${battle.turn}] ${nm} ⚡<b>${act.n}</b>💜 ${dt} ${pn(hc.hp,hc.cp)}`);checkWin();}
+  }
+  else if(act.t==='buff_eva_debuff_eva'){
+    addBuf(s,{t:'buff_eva',n:'ว่องไว',v:act.selfV,u:act.u});
+    addDeb(ds,{t:'debuff_eva',n:'ทราย',v:act.eneV,u:act.u});
+    lg(cls,`[${battle.turn}] ${nm} ⚡<b>${act.n}</b> → Eva+${act.selfV} / ศัตรู Eva${act.eneV}(${act.u}ตา)`);
+  }
+  else if(act.t==='drain_acc'){
+    addDeb(ds,{t:'debuff_acc',n:'จุดจำ',v:act.adv,u:2});
+    const hc=iaMiss();
+    if(Math.random()*100>=hc.hp){lg(cls,`[${battle.turn}] ${nm} ⚡<b>${act.n}</b> → Acc${act.adv} + <span style="color:#AAA">พลาด!</span> ${pn(hc.hp,hc.cp)}`);}
+    else{const raw=Math.max(1,(ad.Atk+ad.IA)*act.m-(dd.ID+fD))*(1-pR/100),r=doAtkHit(raw,hc);const heal=Math.round(r.dmg*act.h/100);battle['h'+s]=Math.min(battle['d'+s].HP,battle['h'+s]+heal);const dt=r.crit?`<span class="lC">★CRIT! ${r.dmg}</span>`:`<b>${r.dmg}</b>`;lg(cls,`[${battle.turn}] ${nm} ⚡<b>${act.n}</b>💜 ${dt} + ฟื้น <b>${heal}</b> ${pn(hc.hp,hc.cp)}`);checkWin();}
+  }
+  const p=art.pas;if(p&&p.tr==='use_act')chkPas(s,'use_act');
+  lg('lS',`&nbsp;A:${battle.hA}/${battle.dA.HP} · B:${battle.hB}/${battle.dB.HP}`);
+  return true;
+}
+
+function getNext(){
+  // BASE=60: ต้องเร็วกว่า 5× ถึงได้ 2 ตาต่อ 1 ตาของฝ่ายตรงข้าม
+  // สูตร: (Spd+60)/(SpeedB+60)=2 เมื่อ Spd=5×SpeedB
+  const BASE=60,lim=100000;let i=0;
+  while(battle.gA<100&&battle.gB<100&&i++<lim){battle.gA+=battle.dA.Spd+BASE;battle.gB+=battle.dB.Spd+BASE;}
+  if(battle.gA>=battle.gB){battle.gA=Math.max(0,battle.gA-100);return'A';}
+  battle.gB=Math.max(0,battle.gB-100);return'B';
+}
+
+function doAI(s){const art=gArt(s),mp=battle['mp'+s];const avail=EQ[s].map((id,i)=>({id,i,cd:battle.cd[s][i]})).filter(x=>x.id&&x.cd===0);const canIA=art.act&&mp>=art.act.c&&battle.iaCD[s]===0;if(canIA&&Math.random()<0.2)resolveIA(s);else if(avail.length>0)resolveSk(s,avail[Math.floor(Math.random()*avail.length)].i);}
+
+function proceed(){
+  if(battle.winner||battle.phase==='over'){renderBV();return;}
+  const nx=getNext();decCD(nx);
+  battle.phase=nx==='A'?'player':'enemy';renderBV();
+  if(battle.phase==='enemy'){ato=setTimeout(()=>{if(!battle||battle.phase!=='enemy')return;doAI('B');if(!battle.winner)proceed();else renderBV();},750);}
+}
+
+function useSkill(i){if(!battle||battle.phase!=='player')return;battle.phase='resolving';resolveSk('A',i);if(!battle.winner)proceed();else renderBV();}
+function useIA_act(){if(!battle||battle.phase!=='player')return;battle.phase='resolving';resolveIA('A');if(!battle.winner)proceed();else renderBV();}
+
+function SB(){
+  if(ato){clearTimeout(ato);ato=null;}
+  const dA=deriveAll('A'),dB=deriveAll('B');
+  battle={dA,dB,hA:dA.HP,hB:dB.HP,mpA:dA.MP,mpB:dB.MP,gA:0,gB:0,turn:0,log:[],winner:null,phase:'start',
+    st:{A:{buffs:[],debuffs:[],stk:0},B:{buffs:[],debuffs:[],stk:0}},cd:{A:[0,0,0,0,0],B:[0,0,0,0,0]},iaCD:{A:0,B:0}};
+  lg('lS','━━ เริ่มการต่อสู้ ━━');
+  const mas=getMas('A');Object.entries(mas).forEach(([w,v])=>lg('lS',`A: ${w} ×${(1+v/200*.5).toFixed(2)}`));
+  const aA=gArt('A'),aB=gArt('B');
+  if(aA.id!=='none')lg('lS',`A IA: ${aA.n} ขั้น${alv.A} HP+${aA.hL*alv.A} MP+${aA.mL*alv.A}`);
+  if(aB.id!=='none')lg('lS',`B IA: ${aB.n} ขั้น${alv.B} HP+${aB.hL*alv.B} MP+${aB.mL*alv.B}`);
+  proceed();
+}
+
+function autoFull(){
+  if(!battle||battle.phase==='over')return;let saf=250;
+  const step=()=>{
+    if(!battle||battle.phase==='over'||saf--<=0){renderBV();return;}
+    const s=battle.phase==='player'?'A':'B';decCD(s);doAI(s);
+    if(battle.winner){renderBV();return;}
+    const nx=getNext();battle.phase=nx==='A'?'player':'enemy';setTimeout(step,60);
+  };step();
+}
+function resetBattle(){if(ato){clearTimeout(ato);ato=null;}battle=null;renderBV();}
+
+function bfHtml(s){const st=battle.st[s];return st.buffs.map(b=>`<span class="bf">${b.n}(${b.u})</span>`).join('')+st.debuffs.map(d=>`<span class="db">${d.n}(${d.u})</span>`).join('')+(st.stk>0?`<span class="stk">ATK+${st.stk*3}%</span>`:'');}
+
+function renderBV(){
+  const bv=document.getElementById('bv');if(!bv)return;
+  if(!battle){bv.innerHTML=`<div style="text-align:center;padding:3rem 0"><div style="font-size:13px;color:#888;margin-bottom:16px">ตั้งค่าตัวละครและเลือกวิชาก่อน</div><button class="btn-s" onclick="SB()">⚔ เริ่มการต่อสู้</button></div>`;return;}
+  const pA=Math.max(0,battle.hA/battle.dA.HP*100),pB=Math.max(0,battle.hB/battle.dB.HP*100);
+  const mpAp=battle.dA.MP>0?Math.max(0,battle.mpA/battle.dA.MP*100):0,mpBp=battle.dB.MP>0?Math.max(0,battle.mpB/battle.dB.MP*100):0;
+  const gA=Math.min(100,battle.gA),gB=Math.min(100,battle.gB);
+  const iA=battle.phase==='player',iB=battle.phase==='enemy'||battle.phase==='resolving';
+  const hAB=Math.round(hpPct(battle.dA.Acc,battle.dB.Eva)),hBA=Math.round(hpPct(battle.dB.Acc,battle.dA.Eva));
+  const cAB=Math.round(crPct(battle.dA.Cri,battle.dB.Res)),cBA=Math.round(crPct(battle.dB.Cri,battle.dA.Res));
+  const artA=gArt('A'),artB=gArt('B');
+
+  const panel=(s,isAct,hp,mpp,g,gc,hab,cab,art)=>`
+    <div class="cp ${isAct?(s==='A'?'aA':'aB'):''}">
+      <div class="cn">${CH[s].n}${art.id!=='none'?` <span style="font-size:10px;color:${s==='A'?'#534AB7':'#993C1D'}">[${art.n.substring(0,7)}${alv[s]}]</span>`:''}</div>
+      <div class="cht">${battle['h'+s]} / ${battle['d'+s].HP} HP</div>
+      <div class="hpb"><div class="hpf" style="width:${hp}%;background:${hpC(hp)}"></div></div>
+      ${battle['d'+s].MP>0?`<div class="cht">${battle['mp'+s]} / ${battle['d'+s].MP} MP</div><div class="mpb"><div class="mpf" style="width:${mpp}%"></div></div>`:''}
+      <div class="cht" style="margin-top:3px">ATB</div>
+      <div class="atbb"><div class="atbf" style="width:${g}%;background:${gc}"></div></div>
+      <div class="sr2"><span class="sm">SPD <b>${battle['d'+s].Spd}</b></span><span class="sm">Acc <b>${battle['d'+s].Acc}</b></span><span class="sm">Eva <b>${battle['d'+s].Eva}</b></span><span class="sm">Cri <b>${battle['d'+s].Cri}</b></span></div>
+      <div style="font-size:11px;color:#888;margin-top:3px">Hit<b style="color:#1D9E75"> ${hab}%</b> · Crit<b style="color:#BA7517"> ${cab}%</b></div>
+      <div class="brow">${bfHtml(s)}</div>
+    </div>`;
+
+  let win='';
+  if(battle.winner){const wn=CH[battle.winner].n,wc=battle.winner==='A'?'#EEEDFE':'#FAECE7',tc=battle.winner==='A'?'#3C3489':'#993C1D';win=`<div class="winbanner" style="background:${wc}"><div style="font-size:20px;font-weight:700;color:${tc}">🏆 ${wn} ชนะ!</div><div style="font-size:12px;color:#888;margin-top:4px">${battle.turn} ตา</div></div>`;}
+
+  let ctrl='';
+  if(battle.winner){ctrl=`<div class="ctrl"><button class="btn-s" onclick="SB()">เริ่มใหม่</button><button class="btn-r" onclick="resetBattle()">Reset</button></div>`;}
+  else if(battle.phase==='player'){
+    const aA=gArt('A'),canIA=aA.act&&battle.mpA>=aA.act.c&&battle.iaCD.A===0;
+    const skBtns=EQ.A.map((id,i)=>{
+      if(!id)return'';
+      const sk=gSk(id);if(!sk)return'';
+      const cd=battle.cd.A[i],onCd=cd>0,t=TIERS[sk.ti];
+      return `<button class="skb" onclick="${onCd?'':'useSkill('+i+')'}" ${onCd?'disabled':''}><span class="skbn">${sk.n}</span><span class="skbi">${sk.at==='phy'?'⚔':sk.at==='int'?'💜':sk.se?'⟳':'💥'} ${sk.w} ${onCd?`<span class="cdb">CD ${cd}</span>`:`<span style="font-size:9px">${t.n}</span>`}</span></button>`;
+    }).join('');
+    const iaCDval=battle.iaCD.A,iaOnCD=iaCDval>0;
+    ctrl=`<div style="font-size:12px;color:#888;text-align:center;margin-bottom:7px">เลือกวิชา: <b>${CH.A.n}</b></div><div class="skbs">${skBtns}${aA.act?`<button class="skb ia" onclick="useIA_act()" ${canIA?'':'disabled'}><span class="skbn">⚡ ${aA.act.n}</span><span class="skbi">MP ${aA.act.c}/${battle.mpA} ${iaOnCD?`<span class="cdb">CD ${iaCDval}</span>`:`<span style="font-size:9px">CD${aA.act.cd}</span>`}</span></button>`:''}</div><div class="ctrl"><button class="btn-a" onclick="autoFull()">Auto ▶▶</button><button class="btn-r" onclick="resetBattle()">Reset</button></div>`;
+  }else{ctrl=`<div class="think">${CH.B.n} กำลังโจมตี...</div><div class="ctrl"><button class="btn-r" onclick="resetBattle()">Reset</button></div>`;}
+
+  bv.innerHTML=`<div class="btop">${panel('A',iA,pA,mpAp,gA,'#7F77DD',hAB,cAB,artA)}<div class="vsb">VS</div>${panel('B',iB,pB,mpBp,gB,'#D85A30',hBA,cBA,artB)}</div>${win}<div class="blog">${battle.log.slice().reverse().map(l=>`<div class="${l.cls}">${l.txt}</div>`).join('')}</div>${ctrl}`;
+}
+
+// === SEARCHABLE DROPDOWNS ===
+function makeSearchable(root){
+  root.querySelectorAll('select').forEach(sel=>{
+    if(sel.dataset.ms)return;
+    sel.dataset.ms='1';
+    const wrap=document.createElement('span');
+    wrap.className='ss-wrap';
+    sel.parentNode.insertBefore(wrap,sel);
+    // transfer classes (eq-sel, etc) to wrap
+    if(sel.classList.contains('eq-sel'))sel.classList.remove('eq-sel');
+    const dd=document.createElement('div');dd.className='ss-dd';
+    const si=document.createElement('input');si.type='text';si.className='ss-inp';
+    si.placeholder='🔍 ค้นหา...';
+    // set initial label — ถ้าเป็น option แรก (placeholder/none) ให้แสดง placeholder แทน
+    const curOpt=sel.options[sel.selectedIndex];
+    if(curOpt&&sel.selectedIndex>0)si.value=curOpt.text;
+    // build dropdown items from current select options
+    const buildDD=(q='')=>{
+      dd.innerHTML='';
+      let lastGrp='',dd_idx=0;
+      for(const opt of sel.options){
+        if(opt.tagName==='OPTGROUP'){lastGrp=opt.label;continue;}
+        const txt=opt.text,val=opt.value;
+        if(q&&!txt.toLowerCase().includes(q.toLowerCase()))continue;
+        if(opt.parentElement.tagName==='OPTGROUP'&&opt.parentElement.label!==lastGrp){
+          lastGrp=opt.parentElement.label;
+          const grpEl=document.createElement('div');grpEl.className='ss-grp';grpEl.textContent=lastGrp;dd.appendChild(grpEl);
+        }
+        const li=document.createElement('div');
+        li.className='ss-opt'+(val===sel.value?' ss-cur':'');
+        li.textContent=txt;
+        li.onmousedown=e=>{e.preventDefault();sel.value=val;si.value=(val&&dd_idx>0)?txt:'';dd.style.display='none';sel.dispatchEvent(new Event('change'));};
+        dd_idx++;
+        dd.appendChild(li);
+      }
+    };
+    si.addEventListener('focus',()=>{buildDD();dd.style.display='block';si.select();});
+    si.addEventListener('input',()=>{buildDD(si.value);dd.style.display='block';});
+    si.addEventListener('blur',()=>{setTimeout(()=>{dd.style.display='none';},180);});
+    sel.style.display='none';
+    wrap.appendChild(si);wrap.appendChild(dd);
+  });
+}
+
+// === INIT ===
+['A','B'].forEach(s=>{
+  const el=document.getElementById('sl'+s);
+  STATKEYS.forEach(k=>{
+    const row=document.createElement('div');row.className='sr';
+    row.innerHTML=`<label>${STATLBL[k]}</label><input type="range" min="1" max="100" step="1" value="${CH[s].s[k]}" id="sl-${s}-${k}"><span class="sv" id="sv-${s}-${k}">${CH[s].s[k]}</span>`;
+    el.appendChild(row);
+    row.querySelector('input').addEventListener('input',e=>updStat(s,k,+e.target.value));
+  });
+  rPts(s);rMax(s);rDv(s);rIA(s);rSS(s);rEQ(s);
+  makeSearchable(document.getElementById('ia'+s));
+  makeSearchable(document.getElementById('ss'+s));
+  makeSearchable(document.getElementById('eq'+s));
+});
+</script>
+</body>
+</html>
