@@ -10,11 +10,28 @@ import { OPPONENTS_BY_ID } from "./data/opponents";
 export function validateAndRepair(state: WorldStateData): void {
   if (!state.hasGame) return;
 
-  if (!SCENES_BY_ID.has(state.currentSceneId)) {
+  const cur = SCENES_BY_ID.get(state.currentSceneId);
+  if (!cur) {
     console.warn(
       `[world] currentSceneId "${state.currentSceneId}" not found — resetting to "${START_SCENE_ID}"`,
     );
     state.currentSceneId = START_SCENE_ID;
+  }
+
+  // lastLocationId must point to a known scene of kind "location".
+  if (state.lastLocationId) {
+    const ll = SCENES_BY_ID.get(state.lastLocationId);
+    if (!ll) {
+      console.warn(
+        `[world] lastLocationId "${state.lastLocationId}" not found — clearing`,
+      );
+      state.lastLocationId = null;
+    } else if (ll.kind !== "location") {
+      console.warn(
+        `[world] lastLocationId "${state.lastLocationId}" is not a location — clearing`,
+      );
+      state.lastLocationId = null;
+    }
   }
 
   // Inventory: drop unknown items.

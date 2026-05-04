@@ -9,6 +9,8 @@ import { getScene } from "@/lib/world";
 import { StartScreen } from "./start-screen";
 import { DialogDisplay } from "./dialog-display";
 import { ChoicePanel } from "./choice-panel";
+import { LocationView } from "./location-view";
+import { RouteView } from "./route-view";
 import { QuestLog } from "./quest-log";
 import { PlayerStatus } from "./player-status";
 import { DebugOverlay } from "./debug-overlay";
@@ -72,11 +74,30 @@ export function WorldScreen() {
     );
   }
 
+  // Pick the right view per scene kind. Sidebar (PlayerStatus / QuestLog /
+  // DebugOverlay) renders alongside all three.
+  let mainView: React.ReactNode;
+  switch (scene.kind) {
+    case "dialog":
+      mainView = (
+        <>
+          <DialogDisplay scene={scene} />
+          <ChoicePanel scene={scene} />
+        </>
+      );
+      break;
+    case "location":
+      mainView = <LocationView scene={scene} />;
+      break;
+    case "route":
+      mainView = <RouteView scene={scene} />;
+      break;
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-[1fr_280px] gap-3">
       <div className="space-y-3">
-        <DialogDisplay scene={scene} />
-        <ChoicePanel scene={scene} />
+        {mainView}
         <div className="flex justify-end">
           <Button
             variant="ghost"

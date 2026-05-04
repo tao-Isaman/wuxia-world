@@ -1,10 +1,10 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import type { Scene } from "@/lib/world";
+import type { DialogScene } from "@/lib/world";
 
 interface Props {
-  scene: Scene;
+  scene: DialogScene;
 }
 
 export function DialogDisplay({ scene }: Props) {

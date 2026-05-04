@@ -2,20 +2,22 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import type { Scene } from "@/lib/world";
+import type { DialogScene } from "@/lib/world";
 import { evaluateCondition } from "@/lib/world";
 import { useWorldStore } from "@/store/world-store";
 
 interface Props {
-  scene: Scene;
+  scene: DialogScene;
 }
 
 export function ChoicePanel({ scene }: Props) {
   const state = useWorldStore();
   const makeChoice = useWorldStore((s) => s.makeChoice);
   const gotoScene = useWorldStore((s) => s.gotoScene);
+  const exitToLocation = useWorldStore((s) => s.exitToLocation);
 
-  // Auto-advance scenes (no choices, has next) — render a single "ต่อไป" button.
+  // No choices → either a "ต่อไป" auto-advance button (has next) or a
+  // "ปิด" terminal-dialog button (returns to lastLocationId).
   if (!scene.choices || scene.choices.length === 0) {
     if (scene.next) {
       return (
@@ -23,6 +25,20 @@ export function ChoicePanel({ scene }: Props) {
           <CardContent className="p-3">
             <Button onClick={() => gotoScene(scene.next!)} className="w-full">
               ต่อไป →
+            </Button>
+          </CardContent>
+        </Card>
+      );
+    }
+    // Terminal dialog. Show close button only if we have a location to
+    // return to; otherwise the dialog is a true dead-end (rare; would only
+    // happen at the very start before the player visits any location).
+    if (state.lastLocationId) {
+      return (
+        <Card>
+          <CardContent className="p-3">
+            <Button onClick={exitToLocation} variant="outline" className="w-full">
+              ปิด
             </Button>
           </CardContent>
         </Card>

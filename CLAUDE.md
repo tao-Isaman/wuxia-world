@@ -86,12 +86,26 @@ The ATB Progress bar uses `animate={false}` (no CSS transition) because rAF alre
 
 A second engine layered on top of the battle sim. The world is the text-based RPG outer game; the battle sim is its combat layer. Same conventions as `lib/game/`: discriminated unions on `t`, data tables, dispatchers, no React.
 
-- **`types.ts`** — `Scene`, `Choice`, `SceneEffect`, `Condition`, `QuestDef`, `QuestState`, `ItemDef`, `OpponentDef`, `WorldStateData`. `SceneEffect` and `Condition` are the unions you'll extend.
-- **`data/`** — `scenes.ts`, `quests.ts`, `items.ts`, `opponents.ts`. Authoring rule: every `next` and every `onWin`/`onLose` must reference an existing scene id, otherwise `validateAndRepair` (run on save load) will reset the player to `START_SCENE_ID`.
-- **`conditions.ts`** — `evaluateCondition(state, c)`: read-only check used by the choice-panel to filter visible choices.
+**Three scene kinds** (`Scene = DialogScene | LocationScene | RouteScene`, discriminated on `kind`):
+
+- **`"dialog"`** — narration + dialogue lines + optional `choices` / `next`. Terminal dialogs (no choices, no next) get a "ปิด" button that returns the player to `lastLocationId`.
+- **`"location"`** — persistent place with a description, an `npcs[]` list (each opens a dialog scene), and a `routes[]` list (each opens a route scene). Visiting a location updates `lastLocationId`.
+- **`"route"`** — travel screen with a description, `destinations[]` (each navigates to a location with optional `effects`), and a back button (defaults to `lastLocationId`, override via `back`).
+
+`Choice`, `NpcRef`, `RouteRef`, and `RouteDestination` all support `visibleIf: Condition` for gating. Use the existing `goto` effect and `Condition` machinery to navigate between any scene type — they don't care about kind.
+
+**Auto-return**: when a dialog scene ends naturally (no choices, no `next`), the player clicks "ปิด" → `worldStore.exitToLocation()` → goes to `lastLocationId`. Authors don't add explicit `goto` at the end of every NPC dialog — return is automatic. If a dialog should land somewhere *other* than the previous location, give it a choice with explicit `next`.
+
+**Dialog auto-advance gotcha**: a dialog scene with `next` set and no choices auto-advances *without showing its lines* (the renderer follows `next` immediately). For narration-then-continue scenes, use a single confirmation choice (`choices: [{ text: "ก้าวต่อไป", next: "..." }]`) rather than `next`. `next` is only useful for true bridge scenes you want the engine to skip through (e.g., redirector ids preserved for save compatibility).
+
+Module map:
+
+- **`types.ts`** — scene union, `Choice`, `SceneEffect`, `Condition`, `NpcRef`, `RouteRef`, `RouteDestination`, `QuestDef`, `QuestState`, `ItemDef`, `OpponentDef`, `WorldStateData`.
+- **`data/`** — `scenes.ts`, `quests.ts`, `items.ts`, `opponents.ts`. Authoring rule: every scene id reference (`next`, `routeSceneId`, `dialogSceneId`, `locationId`, `back`, `onWin`, `onLose`) must exist, otherwise `validateAndRepair` (run on save load) resets the player to `START_SCENE_ID`.
+- **`conditions.ts`** — `evaluateCondition(state, c)`: read-only check used by views to filter visible NPCs / routes / destinations / choices.
 - **`effects.ts`** — `applyEffect(state, eff)`: mutating dispatcher. The `triggerBattle` effect just *sets* `pendingBattle` — it does **not** start the battle directly.
-- **`battle-bridge.ts`** — module-level subscriptions that wire `useWorldStore` ↔ `useBattleStore`. **This is the only place the two stores reference each other.** Do not call `battleStore.start()` from inside `applyEffect` or anywhere else — keep effects pure mutation.
-- **`validate.ts`** — `validateAndRepair(state)`: drops dangling refs to removed scenes/items/quests; clears stale `pendingBattle`.
+- **`battle-bridge.ts`** — module-level Zustand subscription. **One-way**: only world→battle is automatic; battle→world is user-driven via the "ดำเนินเรื่อง" button calling `worldStore.acknowledgeBattleResult()`.
+- **`validate.ts`** — drops dangling refs (unknown scene ids, removed items/quests, stale `pendingBattle`, `lastLocationId` pointing to non-location scenes).
 
 ### Routes
 
@@ -127,14 +141,25 @@ The bridge only writes to the battle store — never reads. The UI handles the r
   - `"world"`: only the post-battle "ดำเนินเรื่อง →" button (calls `onContinue`); display reads from `battleStore.builds` (set by `start()`), so player/opponent names match the world's encounter.
   
   The `BattleLog` uses `dangerouslySetInnerHTML` because log lines are pre-formatted with `<b>`, `<span class="lp">`, etc. — those strings are produced inside `lib/game/effects.ts` and `battle.ts` from controlled inputs (no user content). Inline classes (`.lp`, `.lC`) live in `app/globals.css`.
-- **`components/world/`** — world feature components. `WorldScreen` is the page root; it renders one of three views based on state: `<StartScreen />` (no save), `<BattleArena mode="world" />` (pendingBattle), or the dialog/choice/sidebar layout. `DialogDisplay` renders narration + dialogue lines, `ChoicePanel` filters choices by `visibleIf`, `PlayerStatus` / `QuestLog` show side info, `DebugOverlay` is dev-only (`process.env.NODE_ENV === "development"`).
+- **`components/world/`** — world feature components. `WorldScreen` is the page root; it renders one of these based on state:
+  - `<StartScreen />` (no save)
+  - `<BattleArena mode="world" />` (pendingBattle is set)
+  - Otherwise it dispatches on `scene.kind`:
+    - `"dialog"` → `<DialogDisplay />` + `<ChoicePanel />`
+    - `"location"` → `<LocationView />` (description, NPC list, route list)
+    - `"route"` → `<RouteView />` (description, destination list, back button)
+  
+  Sidebar (`PlayerStatus` / `QuestLog` / dev-only `DebugOverlay`) renders alongside all scene kinds. `DialogDisplay` and `ChoicePanel` are typed against `DialogScene` specifically — passing a location/route to them is a TS error.
 
 ### Adding new game content
 
 Most additions don't require touching dispatchers:
 
 - **New skill / equipment / art** → append to the relevant table in `lib/game/data/`. Use existing `se`/`ee`/`eff` types if possible.
-- **New scene / quest / item / opponent** → append to the relevant table in `lib/world/data/`. The cheapest authoring loop is the dev-only Debug Overlay — jump straight to the new scene without playing through everything.
+- **New location** → append a `{ kind: "location", ... }` entry to `SCENES`. Reference NPC dialogs by `dialogSceneId` and outbound routes by `routeSceneId`.
+- **New route** → append a `{ kind: "route", ... }` entry. List destinations with optional `effects` (e.g., gold cost, flag set on first arrival). The back button defaults to `lastLocationId` — override via `back` only for one-way travel.
+- **New dialog scene** → append a `{ kind: "dialog", ... }` entry. End on either a `choices` array or a terminal scene (no `next`, no `choices`) so the player can return via the auto "ปิด" button. Don't use `next` without `choices` unless you want the lines skipped.
+- **New quest / item / opponent** → append to the relevant table in `lib/world/data/`. The cheapest authoring loop is the dev-only Debug Overlay — jump straight to the new scene without playing through everything.
 - **New effect type** (combat) → variant in `lib/game/types.ts` + case in `lib/game/effects.ts` (or `battle.ts` for art-active types). TS exhaustiveness flags missed dispatchers.
 - **New scene effect / condition** (world) → variant in `lib/world/types.ts` + case in `effects.ts` / `conditions.ts`. Same TS exhaustiveness story.
 - **New world opponent** → append to `OPPONENTS` with a `build()` factory. The factory pattern lets future encounters scale off flags / quest progression without sharing mutable build state. **Calibrate against the player's current stats**: at game start the player has STARTER_BUILD (all 1s + `basic_punch`); demo opponents mirror that for a 50/50 fight.

@@ -37,6 +37,9 @@ interface WorldStore extends WorldStateData {
   startNewGame: () => void;
   makeChoice: (idx: number) => void;
   gotoScene: (sceneId: string) => void;
+  // Used by the "ปิด" button on terminal dialogs and by the route-screen
+  // back button. No-op if lastLocationId is null (very early in a fresh game).
+  exitToLocation: () => void;
   clearPendingBattle: () => void;
   // After a battle finishes (state.winner set), the world UI calls this when
   // the user clicks "ดำเนินเรื่อง". It routes to onWin/onLose, clears
@@ -53,6 +56,7 @@ const emptyData = (): WorldStateData => ({
   hasGame: false,
   playerBuild: null,
   currentSceneId: START_SCENE_ID,
+  lastLocationId: null,
   flags: {},
   quests: {},
   inventory: {},
@@ -60,16 +64,24 @@ const emptyData = (): WorldStateData => ({
   pendingBattle: null,
 });
 
-// Drains chained `next` pointers: scenes that auto-advance with no choices
-// jump immediately to their `next`. Caps at 32 hops to stop accidental loops.
+// Walk through `next` pointers on dialog scenes. Stops at the first scene
+// that requires user input (any choices, route, or location). Updates
+// `lastLocationId` whenever it lands on a location.
 function followAutoAdvance(state: WorldStateData): void {
   for (let i = 0; i < 32; i++) {
     const sc = getScene(state.currentSceneId);
     if (!sc) return;
+    if (sc.kind === "location") {
+      state.lastLocationId = state.currentSceneId;
+      return; // locations wait for the player
+    }
+    if (sc.kind === "route") return; // routes wait for the player
+    // dialog
     if (sc.choices && sc.choices.length > 0) return;
-    if (!sc.next) return;
+    if (!sc.next) return; // terminal dialog → wait for "ปิด" click
     state.currentSceneId = sc.next;
-    if (sc.onEnter) applyEffects(state, sc.onEnter);
+    const next = getScene(state.currentSceneId);
+    if (next?.onEnter) applyEffects(state, next.onEnter);
   }
 }
 
@@ -88,6 +100,21 @@ function takeChoice(state: WorldStateData, choice: Choice): void {
   followAutoAdvance(state);
 }
 
+// Shallow-clone the data fields so the persisted slice picks up the change.
+function draftFrom(s: WorldStateData): WorldStateData {
+  return {
+    hasGame: s.hasGame,
+    playerBuild: s.playerBuild,
+    currentSceneId: s.currentSceneId,
+    lastLocationId: s.lastLocationId,
+    flags: { ...s.flags },
+    quests: { ...s.quests },
+    inventory: { ...s.inventory },
+    gold: s.gold,
+    pendingBattle: s.pendingBattle,
+  };
+}
+
 export const useWorldStore = create<WorldStore>()(
   persist(
     (set, get) => ({
@@ -101,7 +128,7 @@ export const useWorldStore = create<WorldStore>()(
           currentSceneId: START_SCENE_ID,
         });
         // Run start scene's onEnter + auto-advance through any chained scenes.
-        const draft = { ...get() };
+        const draft = draftFrom(get());
         const start = getScene(START_SCENE_ID);
         if (start?.onEnter) applyEffects(draft, start.onEnter);
         followAutoAdvance(draft);
@@ -112,19 +139,10 @@ export const useWorldStore = create<WorldStore>()(
         const s = get();
         if (!s.hasGame || s.pendingBattle) return;
         const sc = getScene(s.currentSceneId);
-        if (!sc?.choices) return;
+        if (sc?.kind !== "dialog" || !sc.choices) return;
         const choice = sc.choices[idx];
         if (!choice) return;
-        const draft: WorldStateData = {
-          hasGame: s.hasGame,
-          playerBuild: s.playerBuild,
-          currentSceneId: s.currentSceneId,
-          flags: { ...s.flags },
-          quests: { ...s.quests },
-          inventory: { ...s.inventory },
-          gold: s.gold,
-          pendingBattle: s.pendingBattle,
-        };
+        const draft = draftFrom(s);
         takeChoice(draft, choice);
         set({ ...draft });
       },
@@ -134,18 +152,21 @@ export const useWorldStore = create<WorldStore>()(
           console.warn(`[world] gotoScene: unknown scene "${sceneId}"`);
           return;
         }
-        const s = get();
-        const draft: WorldStateData = {
-          hasGame: s.hasGame,
-          playerBuild: s.playerBuild,
-          currentSceneId: sceneId,
-          flags: { ...s.flags },
-          quests: { ...s.quests },
-          inventory: { ...s.inventory },
-          gold: s.gold,
-          pendingBattle: s.pendingBattle,
-        };
+        const draft = draftFrom(get());
+        draft.currentSceneId = sceneId;
         const sc = getScene(sceneId);
+        if (sc?.onEnter) applyEffects(draft, sc.onEnter);
+        followAutoAdvance(draft);
+        set({ ...draft });
+      },
+
+      exitToLocation: () => {
+        const s = get();
+        if (!s.lastLocationId) return;
+        if (s.lastLocationId === s.currentSceneId) return;
+        const draft = draftFrom(s);
+        draft.currentSceneId = draft.lastLocationId!;
+        const sc = getScene(draft.currentSceneId);
         if (sc?.onEnter) applyEffects(draft, sc.onEnter);
         followAutoAdvance(draft);
         set({ ...draft });
@@ -185,6 +206,7 @@ export const useWorldStore = create<WorldStore>()(
         hasGame: s.hasGame,
         playerBuild: s.playerBuild,
         currentSceneId: s.currentSceneId,
+        lastLocationId: s.lastLocationId,
         flags: s.flags,
         quests: s.quests,
         inventory: s.inventory,
