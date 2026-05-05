@@ -209,6 +209,9 @@ export interface Equipment {
   mpb: number;
   st: PartialStats;
   eff: EquipEffect | null;
+  // Marks the W-slot item as a musical instrument. The world's music
+  // life-skill requires an instrument equipped to grant practice xp.
+  instrument?: boolean;
 }
 
 // ─── Per-character build state ─────────────────────────────────────────

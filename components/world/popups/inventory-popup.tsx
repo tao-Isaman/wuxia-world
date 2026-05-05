@@ -1,10 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { Modal } from "@/components/ui/modal";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { SLOT_LABELS, getEquip } from "@/lib/game";
 import type { EquipSlotType } from "@/lib/game";
-import { getItem } from "@/lib/world";
+import { LIFE_SKILL_LABEL, getItem } from "@/lib/world";
 import { useWorldStore } from "@/store/world-store";
 
 interface Props {
@@ -42,6 +44,8 @@ export function InventoryPopup({ open, onClose }: Props) {
   const player = useWorldStore((s) => s.playerBuild);
   const inventory = useWorldStore((s) => s.inventory);
   const gold = useWorldStore((s) => s.gold);
+  const consumeItem = useWorldStore((s) => s.useItem);
+  const [lastUsed, setLastUsed] = useState<string | null>(null);
   if (!player) return null;
 
   const items = Object.entries(inventory).filter(([, n]) => n > 0);
@@ -101,24 +105,54 @@ export function InventoryPopup({ open, onClose }: Props) {
               <strong className="text-amber-600">{gold}</strong>
             </div>
           </div>
+          {lastUsed && (
+            <div className="rounded bg-muted/40 px-2 py-1 text-[11px] mb-1.5">{lastUsed}</div>
+          )}
           {items.length === 0 ? (
             <p className="text-xs text-muted-foreground italic py-2 text-center">ย่ามว่างเปล่า</p>
           ) : (
             <ul className="space-y-1.5">
               {items.map(([id, n]) => {
                 const def = getItem(id);
+                const consumable = def?.use?.t === "trainSkill";
                 return (
                   <li
                     key={id}
                     className="rounded bg-muted/30 px-2 py-1.5 text-xs flex items-start justify-between gap-2"
                   >
-                    <div className="flex-1">
-                      <strong>{def?.name ?? id}</strong>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <strong>{def?.name ?? id}</strong>
+                        {consumable && def?.use?.t === "trainSkill" && (
+                          <Badge variant="outline" className="text-[9px]">
+                            ฝึก {LIFE_SKILL_LABEL[def.use.skill]} +{def.use.xp}
+                          </Badge>
+                        )}
+                      </div>
                       {def?.description && (
                         <div className="text-[10px] text-muted-foreground">{def.description}</div>
                       )}
                     </div>
-                    <Badge variant="outline" className="text-[10px] shrink-0">×{n}</Badge>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <Badge variant="outline" className="text-[10px]">×{n}</Badge>
+                      {consumable && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-6 px-2 text-[10px]"
+                          onClick={() => {
+                            const r = consumeItem(id);
+                            if (!r.ok) {
+                              setLastUsed("ใช้ไม่ได้");
+                              return;
+                            }
+                            setLastUsed(`ฝึก ${LIFE_SKILL_LABEL[r.skill]} · +${r.xpGained} xp`);
+                          }}
+                        >
+                          ใช้
+                        </Button>
+                      )}
+                    </div>
                   </li>
                 );
               })}

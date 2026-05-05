@@ -67,6 +67,71 @@ export const ITEMS: readonly ItemDef[] = [
   { id: "iron_ingot",  name: "เหล็กแท่ง",        description: "เหล็กที่ถูกถลุงและตีเป็นแท่ง พร้อมขึ้นรูป" },
   { id: "leather",     name: "หนังฟอก",          description: "หนังสัตว์ที่ฟอกแล้ว เหมาะกับงานเย็บเสื้อหนัง" },
   { id: "cooked_meat", name: "เนื้อย่าง",        description: "เนื้อสดที่ปรุงแล้ว เพิ่มแรงระหว่างเดินทาง" },
+
+  // ─── Crafting bases (paper / ink / silk) ─────────────────────────────
+  { id: "paper",       name: "กระดาษสา",         description: "กระดาษพื้นเมือง ใช้สำหรับงานวาดและงานเขียน" },
+  { id: "ink",         name: "หมึกเข้ม",         description: "หมึกจีนเข้มข้น ใช้คู่กับพู่กัน" },
+  { id: "silk",        name: "ผ้าไหม",           description: "ผ้าไหมเนื้อดี ใช้ทำเสื้อชั้นสูง" },
+  { id: "thread",      name: "เส้นด้าย",         description: "ด้ายเย็บคุณภาพ วัตถุดิบงานตัดเย็บ" },
+
+  // ─── Books (reading mastery) ─────────────────────────────────────────
+  { id: "book_basic",   name: "ตำราเบื้องต้น",    description: "ตำราสำหรับผู้เริ่มต้น อ่านเพื่อฝึกฝน",
+    use: { t: "trainSkill", skill: "reading", xp: 30 } },
+  { id: "book_inter",   name: "ตำราขั้นกลาง",     description: "ตำราระดับกลาง เพิ่มความรู้และมาสเตอร์รี่",
+    use: { t: "trainSkill", skill: "reading", xp: 80 } },
+  { id: "book_advanced", name: "ตำราขั้นสูง",     description: "ตำราที่หาได้ยาก ฝึกฝนการอ่านได้มาก",
+    use: { t: "trainSkill", skill: "reading", xp: 180 } },
+  { id: "book_legendary", name: "ตำราตำนาน",     description: "ตำราในตำนาน เพิ่มมาสเตอร์รี่อย่างมหาศาล",
+    use: { t: "trainSkill", skill: "reading", xp: 400 } },
+
+  // ─── Song books (music mastery) ──────────────────────────────────────
+  { id: "song_basic",  name: "ตำราเพลงพื้นฐาน",  description: "ตำราเพลงสำหรับผู้เริ่มฝึกดนตรี",
+    use: { t: "trainSkill", skill: "music", xp: 30 } },
+  { id: "song_inter",  name: "ตำราเพลงขั้นกลาง", description: "ตำราเพลงระดับกลาง",
+    use: { t: "trainSkill", skill: "music", xp: 80 } },
+  { id: "song_advanced", name: "ตำราเพลงลึกลับ", description: "ตำราเพลงที่ซ่อนอยู่ในตำนาน",
+    use: { t: "trainSkill", skill: "music", xp: 180 } },
+
+  // ─── Image scrolls (drawing mastery) ─────────────────────────────────
+  { id: "image_basic",  name: "ภาพวาดเบื้องต้น", description: "ม้วนภาพฝึกหัด ดูเพื่อฝึกการสังเกต",
+    use: { t: "trainSkill", skill: "drawing", xp: 30 } },
+  { id: "image_inter",  name: "ภาพวาดงานช่าง",   description: "ภาพวาดของช่างฝีมือดี",
+    use: { t: "trainSkill", skill: "drawing", xp: 80 } },
+  { id: "image_master", name: "ภาพวาดศิลปิน",    description: "ผลงานศิลปินชั้นเอก ทรงคุณค่าและฝึกได้มาก",
+    use: { t: "trainSkill", skill: "drawing", xp: 180 } },
+
+  // ─── Calligraphy scrolls (writing mastery) ───────────────────────────
+  { id: "alpha_basic",  name: "ตัวอักษรพื้นฐาน",  description: "แผ่นอักษรฝึกเบื้องต้น",
+    use: { t: "trainSkill", skill: "writing", xp: 30 } },
+  { id: "alpha_inter",  name: "อักษรงดงาม",       description: "งานอักษรของบัณฑิต",
+    use: { t: "trainSkill", skill: "writing", xp: 80 } },
+  { id: "alpha_master", name: "อักษรเทพนิยม",     description: "งานอักษรของปรมาจารย์",
+    use: { t: "trainSkill", skill: "writing", xp: 180 } },
+
+  // ─── Forge outputs (sold or used as crafting base) ───────────────────
+  { id: "iron_blade",  name: "ใบมีดเหล็ก",        description: "ใบมีดเหล็กผ่านการตี ใช้ทำดาบ" },
+  { id: "iron_sword",  name: "ดาบเหล็กธรรมดา",    description: "ดาบเหล็กที่ช่างฝีมือทั่วไปทำได้" },
+  { id: "steel_sword", name: "ดาบเหล็กกล้า",      description: "ดาบที่ตีจากเหล็กกล้าคุณภาพสูง" },
+
+  // ─── Tailoring outputs ───────────────────────────────────────────────
+  { id: "cloth_robe",  name: "เสื้อผ้าทอ",        description: "เสื้อผ้าฝ้ายธรรมดา" },
+  { id: "leather_robe", name: "เสื้อหนังเบา",     description: "เสื้อหนังสัตว์ ป้องกันได้ดีพอประมาณ" },
+  { id: "silk_robe",   name: "เสื้อผ้าไหม",       description: "เสื้อผ้าไหมราคาแพง" },
+
+  // ─── Jewelry outputs ─────────────────────────────────────────────────
+  { id: "silver_ring", name: "แหวนเงิน",          description: "แหวนเงินขัดเงา" },
+  { id: "gold_ring",   name: "แหวนทอง",           description: "แหวนทองที่ช่างฝีมือทำ" },
+  { id: "jade_amulet", name: "เครื่องราง·หยก",    description: "เครื่องรางทำจากหยก" },
+
+  // ─── Alchemy outputs ─────────────────────────────────────────────────
+  { id: "potion_mid",  name: "ยาเลือดกลาง",       description: "ยาฟื้นพลังชีวิตขั้นกลาง" },
+  { id: "potion_big",  name: "ยาเลือดใหญ่",       description: "ยาฟื้นพลังชีวิตขั้นสูง" },
+  { id: "poison_vial", name: "ขวดพิษ",            description: "ขวดพิษเข้มข้น ใช้กับงานลอบ" },
+
+  // ─── Chef outputs ────────────────────────────────────────────────────
+  { id: "rice_dish",   name: "ข้าวหมูแดง",         description: "ข้าวจานเดียวเรียบง่าย กินแล้วฟื้นแรง" },
+  { id: "spicy_stew",  name: "ต้มยำเข้มข้น",       description: "ต้มยำเผ็ดร้อน เพิ่มแรงเดินทาง" },
+  { id: "moon_cake",   name: "ขนมไหว้พระจันทร์",   description: "ของหวานพื้นเมือง รสหวานหอม" },
 ];
 
 export const ITEMS_BY_ID = new Map<string, ItemDef>(ITEMS.map((i) => [i.id, i]));

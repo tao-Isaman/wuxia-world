@@ -11,6 +11,10 @@ export const EQUIPMENT: readonly Equipment[] = [
   { id: "W3", n: "ดาบเพลิง", ty: "W", atkb: 35, pdb: 0, idb: 0, hpb: 0, mpb: 0, st: { STR: 10, POW: 10 }, eff: { t: "pct_atk", v: 10 } },
   { id: "W4", n: "ดาบพิษ", ty: "W", atkb: 45, pdb: 0, idb: 0, hpb: 0, mpb: 0, st: { DEX: 10, LUK: 8 }, eff: { t: "on_hit", db: { t: "debuff_eva", v: -10, u: 2 } } },
   { id: "W5", n: "ดาบมังกรเทพ", ty: "W", atkb: 70, pdb: 0, idb: 0, hpb: 0, mpb: 0, st: { STR: 10, AGI: 6, DEX: 4 }, eff: { t: "flat_cri", v: 20 } },
+  // Music instruments — fight as weak weapons but tag the W slot for the
+  // music life-skill so practiceMusic() works.
+  { id: "W_flute", n: "ขลุ่ยไผ่", ty: "W", atkb: 10, pdb: 0, idb: 0, hpb: 0, mpb: 30, st: { POW: 4, INT: 4 }, eff: null, instrument: true },
+  { id: "W_pipa",  n: "พิณยี่ห้อง", ty: "W", atkb: 12, pdb: 0, idb: 0, hpb: 0, mpb: 40, st: { POW: 5, INT: 5 }, eff: null, instrument: true },
 
   // เสื้อ A — base: PD+ID (สูง)
   { id: "A1", n: "เสื้อผ้าธรรมดา", ty: "A", atkb: 0, pdb: 30, idb: 20, hpb: 0, mpb: 0, st: {}, eff: null },

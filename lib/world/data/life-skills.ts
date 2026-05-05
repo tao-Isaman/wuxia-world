@@ -8,6 +8,17 @@ export const LIFE_SKILL_LABEL: Record<LifeSkill, string> = {
   fishing:     "ประมง",
   herbalism:   "เก็บสมุนไพร",
   venom:       "เก็บพิษ",
+  reading:     "อ่านตำรา",
+  music:       "ดนตรี",
+  drawing:     "วาดภาพ",
+  writing:     "อักษรศิลป์",
+  chess:       "หมากรุก",
+  begging:     "ขอทาน",
+  forge:       "ตีอาวุธ",
+  tailoring:   "ตัดเย็บ",
+  jewelry:     "ช่างเครื่องประดับ",
+  alchemy:     "เภสัช",
+  chef:        "ทำอาหาร",
 };
 
 export const LIFE_SKILL_ICON: Record<LifeSkill, string> = {
@@ -17,6 +28,17 @@ export const LIFE_SKILL_ICON: Record<LifeSkill, string> = {
   fishing:     "🎣",
   herbalism:   "🌿",
   venom:       "☠",
+  reading:     "📖",
+  music:       "🎵",
+  drawing:     "🎨",
+  writing:     "✒",
+  chess:       "♟",
+  begging:     "🥣",
+  forge:       "🔨",
+  tailoring:   "🧵",
+  jewelry:     "💍",
+  alchemy:     "🧪",
+  chef:        "🍳",
 };
 
 // Mastery curve. Index N is the xp needed to reach level N + 1.

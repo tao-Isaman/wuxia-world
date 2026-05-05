@@ -360,6 +360,27 @@ const CORE_SCENES: readonly Scene[] = [
     ],
     onEnter: [{ t: "giveItem", itemId: "jade", count: 1 }],
   },
+
+  // ─── Beggar trainer (unlocks the begging life-skill) ─────────────────
+  // Reachable via the NPC list at sect_beggars (พรรคยาจก). Setting the
+  // `begging_learned` flag makes begging-resource nodes visible everywhere.
+  {
+    kind: "dialog",
+    id: "beggar_trainer_talk",
+    lines: [
+      { t: "narration", text: "ผู้เฒ่ายาจกหันมามองเจ้าด้วยสายตาเอ็นดู" },
+      { t: "dialogue", speaker: "ผู้เฒ่ายาจก", text: "อยากเรียนรู้ศาสตร์แห่งการขอทานหรือ? นี่ไม่ใช่เรื่องน่าอาย" },
+      { t: "dialogue", speaker: "ผู้เฒ่ายาจก", text: "จงจำไว้: มารยาท ความถ่อมตน และการอ่านใจคน คือเคล็ดลับ" },
+    ],
+    choices: [
+      {
+        text: "รับการสอนและกลับไปฝึก",
+        next: "sect_beggars",
+        effects: [{ t: "setFlag", flag: "begging_learned", value: true }],
+      },
+      { text: "ขอตัวก่อน", next: "sect_beggars" },
+    ],
+  },
 ];
 
 // Final scene table: core tutorial + the full world map (84 locations).

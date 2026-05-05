@@ -3,10 +3,12 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { CharacterBuild } from "@/lib/game";
+import { getEquip } from "@/lib/game";
 import { useBattleStore } from "@/store/battle-store";
 import {
   applyEffects,
   gatherSuccessChance,
+  getItem,
   getRecipe,
   getResource,
   getScene,
@@ -44,7 +46,10 @@ const STARTER_STAMINA = 100;
 const STAMINA_REGEN_PER_LEAF = 5;       // recovered each time the player walks into a location
 const HUNT_XP_MULT = 8;                 // hunting xp = 8 * resourceLevel (combat is risky)
 const GATHER_XP_MULT = 5;               // non-combat xp = 5 * resourceLevel
+const CRAFT_XP_MULT = 5;                // craft xp = 5 * recipe.requiredMastery
 const FAIL_XP_FRACTION = 0.5;           // failed drop checks still teach you — half xp
+// Sentinel mastery used for recipes with no skill — always passes the gate.
+const MAX_DUMMY_LEVEL = 99;
 
 // Result of a gather attempt — surfaced so the UI can show a small banner.
 // On a fresh successful non-combat gather: type "yield". On hunting: type
@@ -68,8 +73,29 @@ export type GatherResult =
   | { ok: true; type: "battle"; resourceId: string; opponentId: string };
 
 export type CraftResult =
-  | { ok: false; reason: "missing-input" | "unknown" }
-  | { ok: true; recipeId: string; outputItemId: string; outputCount: number };
+  | { ok: false; reason: "missing-input" | "missing-mastery" | "unknown" }
+  | {
+      ok: true;
+      recipeId: string;
+      outputItemId: string;
+      outputCount: number;
+      xpGained: number;
+      dropCheck: "passed" | "failed" | "none";
+    };
+
+// Result of using a consumable item (book, song book, image, etc.).
+export type UseItemResult =
+  | { ok: false; reason: "unknown" | "missing" | "no-effect" }
+  | { ok: true; itemId: string; skill: LifeSkill; xpGained: number };
+
+// Result of clicking the "เล่นเพลง" practice button.
+export type PracticeMusicResult =
+  | { ok: false; reason: "no-instrument" | "no-build" }
+  | { ok: true; xpGained: number };
+
+// Practice xp granted per "เล่นเพลง" click. Small so the loop isn't trivial
+// to grind — books and song books are the bigger xp source.
+const PRACTICE_MUSIC_XP = 10;
 
 interface WorldStore extends WorldStateData {
   // Actions
@@ -90,6 +116,8 @@ interface WorldStore extends WorldStateData {
   // Activity actions
   gatherResource: (resourceId: string) => GatherResult;
   craftRecipe: (recipeId: string) => CraftResult;
+  useItem: (itemId: string) => UseItemResult;
+  practiceMusic: () => PracticeMusicResult;
 
   // Debug helpers (dev-only consumers).
   _setFlag: (flag: string, value: boolean | number | string) => void;
@@ -343,7 +371,8 @@ export const useWorldStore = create<WorldStore>()(
 
         // Non-combat: spend stamina, roll drop check + yield, grant xp.
         // Failed checks still give half xp — low-tier grinding is the
-        // legitimate path to higher mastery.
+        // legitimate path to higher mastery. Begging-style activities pay
+        // an extra stamina hit only when the drop check fails.
         const draft = draftFrom(s);
         draft.stamina = Math.max(0, draft.stamina - res.staminaCost);
         const lvl = masteryLevel(draft.lifeSkillXp[res.skill] ?? 0);
@@ -351,6 +380,17 @@ export const useWorldStore = create<WorldStore>()(
         const yieldRoll = rollResourceYield(res, lvl);
         for (const it of yieldRoll.items) {
           draft.inventory[it.itemId] = (draft.inventory[it.itemId] ?? 0) + it.count;
+        }
+        // Drop-check pass also pays out gold for begging / chess activities.
+        if (yieldRoll.passed && res.goldYield) {
+          const [g0, g1] = res.goldYield;
+          const gold = g0 + Math.floor(Math.random() * Math.max(1, g1 - g0 + 1));
+          draft.gold = Math.max(0, draft.gold + gold);
+        }
+        // Extra failure stamina cost (used by begging — botched approach
+        // costs 2× the listed stamina total).
+        if (!yieldRoll.passed && res.failureExtraStamina) {
+          draft.stamina = Math.max(0, draft.stamina - res.failureExtraStamina);
         }
         const fullXp = GATHER_XP_MULT * res.level;
         const xpGained = yieldRoll.passed ? fullXp : Math.floor(fullXp * FAIL_XP_FRACTION);
@@ -372,27 +412,100 @@ export const useWorldStore = create<WorldStore>()(
         const s = get();
         const r = getRecipe(recipeId);
         if (!r) return { ok: false, reason: "unknown" };
+
+        // Mastery gate — recipes can require a minimum mastery level on
+        // their `skill`. Below the threshold we refuse the attempt before
+        // touching the inventory.
+        const required = r.requiredMastery ?? 1;
+        const skill = r.skill;
+        const masteryLv = skill ? masteryLevel(s.lifeSkillXp[skill] ?? 0) : MAX_DUMMY_LEVEL;
+        if (skill && masteryLv < required) {
+          return { ok: false, reason: "missing-mastery" };
+        }
+
         for (const inp of r.inputs) {
           if ((s.inventory[inp.itemId] ?? 0) < inp.count) {
             return { ok: false, reason: "missing-input" };
           }
         }
+
         const draft = draftFrom(s);
+        // Inputs are consumed regardless of drop-check outcome — failed
+        // craft = ingredients lost, success = ingredients lost + output.
         for (const inp of r.inputs) {
           const cur = draft.inventory[inp.itemId] ?? 0;
           const next = cur - inp.count;
           if (next <= 0) delete draft.inventory[inp.itemId];
           else draft.inventory[inp.itemId] = next;
         }
-        draft.inventory[r.output.itemId] =
-          (draft.inventory[r.output.itemId] ?? 0) + r.output.count;
+
+        let dropCheck: "passed" | "failed" | "none" = "none";
+        let outputProduced = false;
+        if (r.usesDropCheck) {
+          const passed = Math.random() < gatherSuccessChance(masteryLv, required);
+          dropCheck = passed ? "passed" : "failed";
+          outputProduced = passed;
+        } else {
+          outputProduced = true;
+        }
+
+        if (outputProduced) {
+          draft.inventory[r.output.itemId] =
+            (draft.inventory[r.output.itemId] ?? 0) + r.output.count;
+        }
+
+        // XP scales with recipe required mastery; failed drop-checks still
+        // teach you something (half xp).
+        const fullXp = CRAFT_XP_MULT * required;
+        const xpGained = dropCheck === "failed" ? Math.floor(fullXp * FAIL_XP_FRACTION) : fullXp;
+        if (skill) {
+          draft.lifeSkillXp[skill] = (draft.lifeSkillXp[skill] ?? 0) + xpGained;
+        }
         set({ ...draft });
         return {
           ok: true,
           recipeId: r.id,
           outputItemId: r.output.itemId,
-          outputCount: r.output.count,
+          outputCount: outputProduced ? r.output.count : 0,
+          xpGained,
+          dropCheck,
         };
+      },
+
+      useItem: (itemId) => {
+        const s = get();
+        const def = getItem(itemId);
+        if (!def) return { ok: false, reason: "unknown" };
+        if ((s.inventory[itemId] ?? 0) <= 0) return { ok: false, reason: "missing" };
+        if (!def.use) return { ok: false, reason: "no-effect" };
+
+        const draft = draftFrom(s);
+        // Consume one count.
+        const cur = draft.inventory[itemId] ?? 0;
+        if (cur <= 1) delete draft.inventory[itemId];
+        else draft.inventory[itemId] = cur - 1;
+
+        const eff = def.use;
+        if (eff.t === "trainSkill") {
+          draft.lifeSkillXp[eff.skill] = (draft.lifeSkillXp[eff.skill] ?? 0) + eff.xp;
+          set({ ...draft });
+          return { ok: true, itemId, skill: eff.skill, xpGained: eff.xp };
+        }
+        // Unknown effect t — fall through; no xp granted but item consumed.
+        set({ ...draft });
+        return { ok: false, reason: "no-effect" };
+      },
+
+      practiceMusic: () => {
+        const s = get();
+        if (!s.playerBuild) return { ok: false, reason: "no-build" };
+        const wId = s.playerBuild.equipment.W;
+        const w = getEquip(wId);
+        if (!w?.instrument) return { ok: false, reason: "no-instrument" };
+        const draft = draftFrom(s);
+        draft.lifeSkillXp.music = (draft.lifeSkillXp.music ?? 0) + PRACTICE_MUSIC_XP;
+        set({ ...draft });
+        return { ok: true, xpGained: PRACTICE_MUSIC_XP };
       },
 
       _setFlag: (flag, value) =>
@@ -402,7 +515,7 @@ export const useWorldStore = create<WorldStore>()(
     }),
     {
       name: "wusia-world-v1",
-      version: 2,
+      version: 3,
       // Only persist the data fields, not the action functions.
       partialize: (s) => ({
         hasGame: s.hasGame,
@@ -419,21 +532,25 @@ export const useWorldStore = create<WorldStore>()(
         pendingBattle: s.pendingBattle,
         pendingHuntYield: s.pendingHuntYield,
       }),
-      // v1 → v2 added stamina, staminaMax, lifeSkillXp, pendingHuntYield.
-      // Old saves get sensible defaults so existing players don't lose progress.
+      // Migrations:
+      //   v1 → v2 added stamina, staminaMax, lifeSkillXp (6 keys),
+      //            pendingHuntYield.
+      //   v2 → v3 grew lifeSkillXp from 6 → 17 keys (added cultural,
+      //            social, crafting families). Existing xp values are
+      //            preserved; missing keys default to 0.
       migrate: (persisted, fromVersion) => {
         const p = (persisted ?? {}) as Partial<WorldStateData>;
-        if (fromVersion < 2) {
-          return {
-            ...emptyData(),
-            ...p,
-            stamina: p.stamina ?? STARTER_STAMINA,
-            staminaMax: p.staminaMax ?? STARTER_STAMINA,
-            lifeSkillXp: p.lifeSkillXp ?? emptyLifeSkillXp(),
-            pendingHuntYield: p.pendingHuntYield ?? null,
-          } as WorldStateData;
-        }
-        return p as WorldStateData;
+        const out: WorldStateData = {
+          ...emptyData(),
+          ...p,
+          stamina: typeof p.stamina === "number" ? p.stamina : STARTER_STAMINA,
+          staminaMax: typeof p.staminaMax === "number" ? p.staminaMax : STARTER_STAMINA,
+          // Merge: empty defaults first, then any persisted values overlay.
+          lifeSkillXp: { ...emptyLifeSkillXp(), ...(p.lifeSkillXp ?? {}) } as Record<LifeSkill, number>,
+          pendingHuntYield: p.pendingHuntYield ?? null,
+        };
+        void fromVersion;
+        return out;
       },
       onRehydrateStorage: () => (state) => {
         if (state) validateAndRepair(state);

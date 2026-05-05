@@ -144,12 +144,28 @@ export interface ItemDef {
   id: string;
   name: string;
   description: string;
+  // Consumable: item shows a "ใช้" action; effect runs on use, one count is
+  // removed from inventory. Currently only `trainSkill` ships, but the
+  // discriminated union leaves room for heal / buff / unlock items later.
+  use?: ItemUseEffect;
 }
 
-// ─── Life skills / gathering ──────────────────────────────────────────
-// Six gathering professions. Each has its own xp pool and mastery level
-// (1-5). Mastery grows with use (5 × resourceLevel xp per gather) and gates
-// access to higher-tier resources downstream.
+export type ItemUseEffect =
+  | { t: "trainSkill"; skill: LifeSkill; xp: number };
+
+// ─── Life skills ──────────────────────────────────────────────────────
+// Seventeen skills across four families. Each has its own xp pool and
+// mastery level (1-5). Mastery grows with use and gates higher-tier
+// recipes / resources / activities.
+//
+//   Gathering (combat-or-find, resource pipeline):
+//     mining · woodcutting · hunting · fishing · herbalism · venom
+//   Cultural (consume training items):
+//     reading · music · drawing · writing
+//   Social (mastery-checked location activity):
+//     chess · begging
+//   Crafting professions (recipes):
+//     forge · tailoring · jewelry · alchemy · chef
 export const LIFE_SKILL_KEYS = [
   "mining",
   "woodcutting",
@@ -157,6 +173,17 @@ export const LIFE_SKILL_KEYS = [
   "fishing",
   "herbalism",
   "venom",
+  "reading",
+  "music",
+  "drawing",
+  "writing",
+  "chess",
+  "begging",
+  "forge",
+  "tailoring",
+  "jewelry",
+  "alchemy",
+  "chef",
 ] as const;
 export type LifeSkill = (typeof LIFE_SKILL_KEYS)[number];
 
@@ -181,6 +208,12 @@ export interface ResourceDef {
   // Hunting-only: the gather first triggers a battle from this pool. The
   // win-handler then rolls `yields` for the spoils. Lose → no spoils.
   opponentIds?: readonly string[];
+  // Begging-style activities: gold range awarded on drop-check pass instead
+  // of (or in addition to) item drops.
+  goldYield?: [number, number];
+  // Extra stamina deducted only on a failed drop check — used by begging so
+  // a botched approach actually costs the player. Default 0.
+  failureExtraStamina?: number;
   // Free-form description shown on the activity button.
   hint?: string;
 }
@@ -191,17 +224,26 @@ export interface ResourceNodeRef {
   // category-default resource sits at a flavour-named place.
   label?: string;
   hint?: string;
+  // Hide the activity until the condition is satisfied. Used to gate
+  // begging behind first meeting a beggar-trainer.
+  visibleIf?: Condition;
 }
 
 // Crafting recipe. Inputs are consumed, output is added to inventory.
-// `skill` is informational for now (no skill-gating); future iterations
-// can require a mastery threshold here.
+// Crafting always grants xp toward `skill` (5 × requiredMastery).
+//
+// `requiredMastery` blocks the attempt entirely if the player isn't there yet.
+// `usesDropCheck` makes the craft itself a mastery-vs-difficulty test —
+// failure consumes ingredients but produces no output (used for art/writing
+// recipes where execution is finicky).
 export interface RecipeDef {
   id: string;
   name: string;
   inputs: { itemId: string; count: number }[];
   output: { itemId: string; count: number };
   skill?: LifeSkill;
+  requiredMastery?: 1 | 2 | 3 | 4 | 5;
+  usesDropCheck?: boolean;
   description?: string;
 }
 

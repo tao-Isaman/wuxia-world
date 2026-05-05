@@ -508,6 +508,50 @@ for (const spot of RARE_SPOTS) {
   if (lf) lf.resources = [{ resourceId: spot.resourceId }];
 }
 
+// ─── Social activities (chess + begging) ─────────────────────────────
+// Chess fits best at inns / NPC homes — places where a stranger sitting
+// across a board feels natural. Begging is a city-and-large-sect activity
+// gated by the `begging_learned` flag so newcomers don't trip over it.
+function appendResources(loc: LocationScene | undefined, refs: ResourceNodeRef[]): void {
+  if (!loc) return;
+  loc.resources = [...(loc.resources ?? []), ...refs];
+}
+
+const BEGGING_GATE: ResourceNodeRef["visibleIf"] = {
+  t: "flag",
+  flag: "begging_learned",
+};
+
+for (const inn of INNS) appendResources(inn, [{ resourceId: "chess_basic" }]);
+for (const home of HOMES.slice(0, 4)) appendResources(home, [{ resourceId: "chess_basic" }]);
+appendResources(LEAVES_BY_ID.get("sect_quanzhen"), [{ resourceId: "chess_master" }]);
+appendResources(LEAVES_BY_ID.get("sect_xiaoyao"), [{ resourceId: "chess_master" }]);
+
+for (const city of CITIES) {
+  appendResources(city, [
+    { resourceId: "beg_street", visibleIf: BEGGING_GATE },
+    { resourceId: "beg_market", visibleIf: BEGGING_GATE },
+  ]);
+}
+appendResources(LEAVES_BY_ID.get("sect_beggars"), [
+  { resourceId: "beg_street", visibleIf: BEGGING_GATE },
+]);
+
+// Beggar-trainer NPC at sect_beggars — first visit unlocks the begging
+// resource nodes via the `begging_learned` flag. Once set, the dialog still
+// shows but its trainer-effect is idempotent.
+appendNpc(LEAVES_BY_ID.get("sect_beggars"), {
+  id: "beggar_trainer",
+  name: "ผู้เฒ่ายาจก",
+  hint: "สอนวิชาพรรคยาจกให้ผู้แสวงหา",
+  dialogSceneId: "beggar_trainer_talk",
+});
+
+function appendNpc(loc: LocationScene | undefined, npc: import("../types").NpcRef): void {
+  if (!loc) return;
+  loc.npcs = [...loc.npcs, npc];
+}
+
 // ─── World hub ────────────────────────────────────────────────────────
 const WORLD_HUB: LocationScene = {
   kind: "location",

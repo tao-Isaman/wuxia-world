@@ -246,6 +246,58 @@ export const RESOURCES: readonly ResourceDef[] = [
       { itemId: "scorpion_venom",  weight: 4 },
     ],
   },
+
+  // ─── Chess (social mastery activity) ────────────────────────────────
+  {
+    id: "chess_basic",
+    name: "เล่นหมากรุกกับชาวบ้าน",
+    skill: "chess",
+    level: 1,
+    staminaCost: 5,
+    yields: [
+      { itemId: "ancient_coin", weight: 2 },
+      { itemId: "potion",       weight: 3 },
+    ],
+    goldYield: [10, 25],
+    hint: "เล่นกับเซียนหมากรุกในร้านน้ำชา",
+  },
+  {
+    id: "chess_master",
+    name: "เล่นหมากรุกกับเซียนตัวจริง",
+    skill: "chess",
+    level: 3,
+    staminaCost: 10,
+    yields: [
+      { itemId: "ancient_coin", weight: 4 },
+      { itemId: "jade",         weight: 1 },
+    ],
+    goldYield: [40, 80],
+    hint: "เซียนหมากรุกที่ฝึกฝีมือมาทั้งชีวิต",
+  },
+
+  // ─── Begging (gold + 2× stamina on fail; gated by flag) ─────────────
+  {
+    id: "beg_street",
+    name: "ขอเงินคนผ่านไปมา",
+    skill: "begging",
+    level: 1,
+    staminaCost: 6,
+    failureExtraStamina: 6,
+    yields: [],
+    goldYield: [10, 25],
+    hint: "เข้าหาผู้ใจบุญด้วยมารยาทพรรคยาจก",
+  },
+  {
+    id: "beg_market",
+    name: "ขอเงินในตลาด",
+    skill: "begging",
+    level: 2,
+    staminaCost: 8,
+    failureExtraStamina: 8,
+    yields: [{ itemId: "rice_dish", weight: 2 }],
+    goldYield: [20, 50],
+    hint: "ตลาดคึกคักแต่คนหวงเงินมากกว่า",
+  },
 ];
 
 export const RESOURCES_BY_ID = new Map<string, ResourceDef>(
