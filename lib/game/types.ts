@@ -38,6 +38,28 @@ export type AttackType = "phy" | "int" | null;
 
 export type SkillTierIndex = 0 | 1 | 2 | 3 | 4;
 
+// ─── Weapon mastery families ──────────────────────────────────────────
+// Each skill belongs to exactly one family. Mastery is summed per family
+// (cap 200) and contributes ×(1 + mastery/200 * 0.5) damage at battle time.
+//
+//   fist   — กำปั้น, นิ้ว, ฝ่ามือ, ตัวเบา (qinggong / body arts)
+//   long   — ทวน, หอก, ไม้พลอง, กระบอง
+//   sword  — กระบี่ (jian — straight sword)
+//   blade  — ดาบ, ดาบโค้ง, ดาบยาว
+//   short  — มีด, พัด
+//   hidden — เข็ม, มีดบิน, โซ่, ตะขอ, แส้, อาวุธลับอื่น ๆ
+//   music  — ขลุ่ย, พิณ
+export const WEAPON_FAMILY_KEYS = [
+  "fist",
+  "long",
+  "sword",
+  "blade",
+  "short",
+  "hidden",
+  "music",
+] as const;
+export type WeaponFamily = (typeof WEAPON_FAMILY_KEYS)[number];
+
 export interface Tier {
   n: string;
   cd: number;
@@ -81,7 +103,7 @@ export interface Skill {
   id: string;
   n: string;
   ti: SkillTierIndex;
-  w: string; // weapon family (mastery key)
+  w: WeaponFamily; // weapon family (mastery key) — see WEAPON_FAMILY_KEYS
   mg: number; // mastery gained per equip
   st: PartialStats;
   at: AttackType;

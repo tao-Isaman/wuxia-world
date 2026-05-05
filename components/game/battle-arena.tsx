@@ -7,6 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import {
   TIERS,
+  WEAPON_FAMILY_LABEL,
   getArt,
   getSkill,
   hitPct,
@@ -276,7 +277,7 @@ export function BattleArena({ mode = "free", onContinue }: BattleArenaProps) {
                 >
                   <span className="font-semibold text-xs">{sk.n}</span>
                   <span className="text-[9px] text-muted-foreground">
-                    {sk.at === "phy" ? "⚔" : sk.at === "int" ? "💜" : sk.se ? "⟳" : "💥"} {sk.w}{" "}
+                    {sk.at === "phy" ? "⚔" : sk.at === "int" ? "💜" : sk.se ? "⟳" : "💥"} {WEAPON_FAMILY_LABEL[sk.w]}{" "}
                     {onCd ? (
                       <Badge variant="destructive" className="text-[8px] px-1 py-0">
                         CD {cd}

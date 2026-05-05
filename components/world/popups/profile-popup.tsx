@@ -1,0 +1,357 @@
+"use client";
+
+import { Modal } from "@/components/ui/modal";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import {
+  SLOT_LABELS,
+  STAT_BUDGET,
+  STAT_KEYS,
+  STAT_LABEL,
+  TIERS,
+  WEAPON_FAMILY_HINT,
+  WEAPON_FAMILY_LABEL,
+  combinedStats,
+  derive,
+  deriveAll,
+  getArt,
+  getEquip,
+  getEquipBonus,
+  getEquipStatBonus,
+  getMasteryMap,
+  getSkill,
+  totalStatPoints,
+} from "@/lib/game";
+import type { EquipSlotType, Skill, StatKey, WeaponFamily } from "@/lib/game";
+import { useWorldStore } from "@/store/world-store";
+
+interface Props {
+  open: boolean;
+  onClose: () => void;
+}
+
+const DERIVED_ROWS: { label: string; key: keyof ReturnType<typeof deriveAll> }[] = [
+  { label: "HP",  key: "HP" },
+  { label: "MP",  key: "MP" },
+  { label: "ATK", key: "Atk" },
+  { label: "PA",  key: "PA" },
+  { label: "IA",  key: "IA" },
+  { label: "PD",  key: "PD" },
+  { label: "ID",  key: "ID" },
+  { label: "SPD", key: "Spd" },
+  { label: "Eva", key: "Eva" },
+  { label: "Acc", key: "Acc" },
+  { label: "Cri", key: "Cri" },
+  { label: "Res", key: "Res" },
+];
+
+type EquipSlotRow = {
+  type: EquipSlotType;
+  label: string;
+  index?: 0 | 1;
+};
+
+const EQUIP_ROWS: readonly EquipSlotRow[] = [
+  { type: "W",  label: `🗡 ${SLOT_LABELS.W}` },
+  { type: "A",  label: `👘 ${SLOT_LABELS.A}` },
+  { type: "H",  label: `🪖 ${SLOT_LABELS.H}` },
+  { type: "B",  label: `👟 ${SLOT_LABELS.B}` },
+  { type: "BR", label: `💪 ${SLOT_LABELS.BR} 1`, index: 0 },
+  { type: "BR", label: `💪 ${SLOT_LABELS.BR} 2`, index: 1 },
+  { type: "R",  label: `💍 ${SLOT_LABELS.R} 1`,  index: 0 },
+  { type: "R",  label: `💍 ${SLOT_LABELS.R} 2`,  index: 1 },
+  { type: "C",  label: `🎖 ${SLOT_LABELS.C} 1`,  index: 0 },
+  { type: "C",  label: `🎖 ${SLOT_LABELS.C} 2`,  index: 1 },
+];
+
+function skillKindIcon(sk: Skill | null): string {
+  if (!sk) return "";
+  if (sk.at === "phy") return "⚔";
+  if (sk.at === "int") return "💜";
+  return sk.se ? "⟳" : "💥";
+}
+
+function describeEquip(id: string | null): string {
+  if (!id) return "";
+  const e = getEquip(id);
+  if (!e) return "";
+  const parts: string[] = [];
+  if (e.atkb) parts.push(`Atk+${e.atkb}`);
+  if (e.pdb)  parts.push(`PD+${e.pdb}`);
+  if (e.idb)  parts.push(`ID+${e.idb}`);
+  if (e.hpb)  parts.push(`HP+${e.hpb}`);
+  if (e.mpb)  parts.push(`MP+${e.mpb}`);
+  const sb = Object.entries(e.st).map(([k, v]) => `${k}+${v}`).join(" ");
+  if (sb) parts.push(sb);
+  if (e.eff) {
+    if (e.eff.t === "pct_atk")    parts.push(`+${e.eff.v}%ATK`);
+    else if (e.eff.t === "flat_cri")    parts.push(`Cri+${e.eff.v}`);
+    else if (e.eff.t === "flat_eva")    parts.push(`Eva+${e.eff.v}`);
+    else if (e.eff.t === "pct_reduce")  parts.push(`ลดDmg${e.eff.v}%`);
+    else if (e.eff.t === "hp_regen")    parts.push(`ฟื้น${e.eff.v}%/ตา`);
+    else if (e.eff.t === "on_hit")      parts.push(`OnHit:${e.eff.db.t.replace("debuff_", "")}${e.eff.db.v}`);
+  }
+  return parts.join(" ");
+}
+
+// Profile popup — read-only character sheet that mirrors the /debug
+// CharacterCard layout: stat budget, base stats, derived stats, inner art
+// summary, move-skill slots with mastery + bonus rollup, and full equipment
+// list with the same bonus summary the /debug page surfaces.
+//
+// Because the world player is currently locked to STARTER_BUILD with no
+// editor UI, every section here is display-only; once an in-world progression
+// editor exists, this popup is the natural "current state" snapshot.
+export function ProfilePopup({ open, onClose }: Props) {
+  const player = useWorldStore((s) => s.playerBuild);
+  const gold = useWorldStore((s) => s.gold);
+  if (!player) return null;
+
+  const base = player.stats;
+  const combined = combinedStats(player);
+  const derivedAll = deriveAll(player);
+  const derivedBase = derive(base);
+  const art = getArt(player.artId);
+  const lv = player.artLevel;
+
+  const totalSpent = totalStatPoints(base);
+  const remaining = STAT_BUDGET - totalSpent;
+  const budgetPct = (totalSpent / STAT_BUDGET) * 100;
+  const budgetColor =
+    remaining <= 0 ? "#E24B4A" : remaining < 20 ? "#BA7517" : "#7F77DD";
+
+  // Skills + mastery + per-skill stat bonus aggregation (mirrors SkillSlots).
+  const mastery = getMasteryMap(player.skillIds);
+  const skillStatBonus: Record<string, number> = {};
+  for (const sid of player.skillIds) {
+    const sk = getSkill(sid);
+    if (!sk) continue;
+    for (const [k, v] of Object.entries(sk.st)) {
+      skillStatBonus[k] = (skillStatBonus[k] ?? 0) + (v as number);
+    }
+  }
+
+  // Equipment bonus summary (mirrors EquipmentSlots).
+  const eb = getEquipBonus(player.equipment);
+  const sb = getEquipStatBonus(player.equipment);
+  const equipSummary: string[] = [];
+  if (eb.atk)      equipSummary.push(`Atk+${eb.atk}`);
+  if (eb.pd)       equipSummary.push(`PD+${eb.pd}`);
+  if (eb.id_)      equipSummary.push(`ID+${eb.id_}`);
+  if (eb.hp)       equipSummary.push(`HP+${eb.hp}`);
+  if (eb.mp)       equipSummary.push(`MP+${eb.mp}`);
+  if (eb.cri)      equipSummary.push(`Cri+${eb.cri}`);
+  if (eb.eva)      equipSummary.push(`Eva+${eb.eva}`);
+  if (eb.pct_atk)  equipSummary.push(`ATK+${eb.pct_atk}%`);
+  if (eb.pct_red)  equipSummary.push(`ลดDmg${eb.pct_red}%`);
+  if (eb.hp_regen) equipSummary.push(`ฟื้น${eb.hp_regen}%/ตา`);
+  for (const [k, v] of Object.entries(sb)) equipSummary.push(`${k}+${v}`);
+
+  return (
+    <Modal open={open} onClose={onClose} title={`👤 โปรไฟล์ — ${player.name}`} maxWidth="max-w-3xl">
+      <div className="space-y-4">
+        {/* ─── Header ──────────────────────────────────────────────── */}
+        <section>
+          <div className="flex items-center justify-between">
+            <strong className="text-base">{player.name}</strong>
+            <div className="text-xs">
+              <span className="text-muted-foreground">ทอง </span>
+              <strong className="text-amber-600">{gold}</strong>
+            </div>
+          </div>
+        </section>
+
+        {/* ─── Stat budget ─────────────────────────────────────────── */}
+        <section>
+          <div className="flex justify-between text-xs text-muted-foreground mb-1">
+            <span>คะแนนพลัง <strong className="text-foreground">{totalSpent}</strong>/{STAT_BUDGET}</span>
+            <span className={remaining <= 0 ? "text-destructive" : ""}>เหลือ {remaining}</span>
+          </div>
+          <Progress value={budgetPct} indicatorColor={budgetColor} className="h-2" />
+        </section>
+
+        {/* ─── Base stats ──────────────────────────────────────────── */}
+        <section>
+          <div className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground mb-1">
+            พลังพื้นฐาน
+          </div>
+          <div className="grid grid-cols-4 gap-1.5">
+            {STAT_KEYS.map((k) => {
+              const b = base[k];
+              const c = combined[k];
+              const d = c - b;
+              return (
+                <div key={k} className="rounded bg-muted/40 px-2 py-1.5">
+                  <div className="text-[9px] text-muted-foreground">
+                    {k} <span className="opacity-70">{STAT_LABEL[k]}</span>
+                  </div>
+                  <div className="text-xs font-semibold">
+                    {c}
+                    {d > 0 && <span className="text-[9px] text-emerald-600 ml-1">+{d}</span>}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* ─── Derived stats ───────────────────────────────────────── */}
+        <section>
+          <div className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground mb-1">
+            พลังที่คำนวณ
+          </div>
+          <div className="grid grid-cols-4 gap-1.5">
+            {DERIVED_ROWS.map(({ label, key }) => {
+              const cv = derivedAll[key];
+              const bv = derivedBase[key as keyof typeof derivedBase] ?? cv;
+              const diff = cv - bv;
+              return (
+                <div key={label} className="rounded bg-muted/40 px-2 py-1.5">
+                  <div className="text-[9px] text-muted-foreground">{label}</div>
+                  <div className="text-xs font-semibold">
+                    {cv}
+                    {diff > 0 && <span className="text-[9px] text-emerald-600 ml-1">+{diff}</span>}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* ─── Inner art ───────────────────────────────────────────── */}
+        <section className="border-t pt-3">
+          <div className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground mb-1">
+            กำลังภายใน
+          </div>
+          {art.id === "none" ? (
+            <div className="rounded border border-dashed border-muted-foreground/30 px-3 py-2 text-xs text-center text-muted-foreground italic">
+              ยังไม่ได้เรียนวิชาในกาย
+            </div>
+          ) : (
+            <div className="rounded-md bg-muted/40 p-3 text-[11px] leading-relaxed space-y-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                <strong className="text-sm">{art.n}</strong>
+                <Badge variant="outline" className="text-[9px]">{art.sc}</Badge>
+                <Badge variant="outline" className="text-[9px]">{art.tp}</Badge>
+                <Badge variant="outline" className="text-[9px]">ระดับ {lv}</Badge>
+              </div>
+              <div>
+                {(Object.entries(art.stats) as [StatKey, number][])
+                  .map(([k, v]) => `${k}+${Math.floor((v * lv) / 10)}`)
+                  .join(" ")}{" "}
+                | HP+{art.hL * lv} MP+{art.mL * lv}
+              </div>
+              {art.act && (
+                <div>
+                  ⚡ <strong>{art.act.n}</strong> (MP {art.act.c}, CD {art.act.cd}): {art.act.d}
+                </div>
+              )}
+              {art.pas && <div>◆ {art.pas.d}</div>}
+              <div className="mt-1 border-l-2 border-primary pl-2">
+                รวม HP <strong>{derivedAll.HP}</strong> · MP <strong>{derivedAll.MP}</strong>
+              </div>
+            </div>
+          )}
+        </section>
+
+        {/* ─── Move skills ─────────────────────────────────────────── */}
+        <section className="border-t pt-3">
+          <div className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground mb-2">
+            วิชาที่ฝึก (5 ช่อง)
+          </div>
+          <div className="space-y-1.5">
+            {player.skillIds.map((sid, i) => {
+              const sk = sid ? getSkill(sid) : null;
+              if (!sk) {
+                return (
+                  <div key={i} className="flex items-center gap-1.5">
+                    <span className="text-[10px] text-muted-foreground w-4 text-center shrink-0">{i + 1}</span>
+                    <span className="flex-1 text-[11px] text-muted-foreground italic px-2">— ว่าง —</span>
+                  </div>
+                );
+              }
+              const tier = TIERS[sk.ti];
+              return (
+                <div key={i} className="rounded bg-muted/30 px-2 py-1.5">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-1.5 flex-wrap min-w-0">
+                      <span className="text-[10px] text-muted-foreground shrink-0">{i + 1}</span>
+                      <strong className="text-xs">{sk.n}</strong>
+                      <Badge variant="outline" className="text-[9px]">{tier?.n}</Badge>
+                      <Badge
+                        variant="outline"
+                        className="text-[9px]"
+                        title={WEAPON_FAMILY_HINT[sk.w]}
+                      >
+                        {WEAPON_FAMILY_LABEL[sk.w]}
+                      </Badge>
+                    </div>
+                    <span className="text-[9px] bg-primary/10 text-primary px-1.5 py-0.5 rounded shrink-0 whitespace-nowrap">
+                      {skillKindIcon(sk)} CD{tier?.cd ?? 0}
+                    </span>
+                  </div>
+                  <div className="text-[10px] text-muted-foreground mt-0.5">{sk.d}</div>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="flex flex-wrap gap-1 mt-2">
+            {Object.entries(mastery).map(([w, v]) => (
+              <span
+                key={w}
+                className="text-[10px] bg-muted/40 px-2 py-0.5 rounded"
+                title={WEAPON_FAMILY_HINT[w as WeaponFamily]}
+              >
+                ×<strong className="text-primary">{(1 + ((v ?? 0) / 200) * 0.5).toFixed(2)}</strong>{" "}
+                {WEAPON_FAMILY_LABEL[w as WeaponFamily]}
+              </span>
+            ))}
+            {Object.keys(mastery).length === 0 && (
+              <span className="text-[10px] text-muted-foreground">ยังไม่มีความเชี่ยวชาญ</span>
+            )}
+          </div>
+
+          <div className="text-[10px] text-muted-foreground mt-1">
+            โบนัสจากวิชา:{" "}
+            {Object.entries(skillStatBonus).length > 0
+              ? Object.entries(skillStatBonus).map(([k, v]) => `${k}+${v}`).join(" ")
+              : "—"}
+          </div>
+        </section>
+
+        {/* ─── Equipment ───────────────────────────────────────────── */}
+        <section className="border-t pt-3">
+          <div className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground mb-2">
+            อุปกรณ์ ({EQUIP_ROWS.length} ช่อง)
+          </div>
+          <div className="space-y-1">
+            {EQUIP_ROWS.map((row) => {
+              const slot = player.equipment[row.type];
+              const id = Array.isArray(slot) ? slot[row.index ?? 0] : slot;
+              const e = getEquip(id);
+              const key = `${row.type}-${row.index ?? "x"}`;
+              return (
+                <div key={key} className="flex items-center gap-1.5 text-xs">
+                  <span className="text-[11px] text-muted-foreground w-24 shrink-0">{row.label}</span>
+                  <div className="flex-1 min-w-0">
+                    {e ? <strong>{e.n}</strong> : <span className="text-[10px] text-muted-foreground italic">— ว่าง —</span>}
+                  </div>
+                  {e && (
+                    <span className="text-[9px] bg-primary/10 text-primary px-1.5 py-0.5 rounded shrink-0 whitespace-nowrap">
+                      {describeEquip(id)}
+                    </span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="mt-2 rounded-md bg-muted/40 p-2 border-l-2 border-orange-500 text-[10px] leading-relaxed">
+            รวม: {equipSummary.length > 0 ? equipSummary.join(" · ") : "ไม่มีโบนัส"}
+          </div>
+        </section>
+      </div>
+    </Modal>
+  );
+}

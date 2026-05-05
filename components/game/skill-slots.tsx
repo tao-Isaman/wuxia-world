@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import {
   SKILLS,
   TIERS,
+  WEAPON_FAMILY_LABEL,
   getSkill,
   getMasteryMap,
   type Side,
@@ -29,7 +30,7 @@ export function SkillSlots({ side }: Props) {
         value: sk.id,
         label: sk.n,
         group: `${TIERS[sk.ti].n} (CD${TIERS[sk.ti].cd})`,
-        hint: `${sk.w}`,
+        hint: WEAPON_FAMILY_LABEL[sk.w],
       })),
     [],
   );
@@ -75,7 +76,7 @@ export function SkillSlots({ side }: Props) {
                 />
               </div>
               <span className="text-[9px] text-muted-foreground bg-muted/40 px-1.5 py-0.5 rounded shrink-0 whitespace-nowrap">
-                {sk ? `${SKILL_KIND_ICON(sk)} ${sk.w} CD${TIERS[sk.ti].cd}` : "—"}
+                {sk ? `${SKILL_KIND_ICON(sk)} ${WEAPON_FAMILY_LABEL[sk.w]} CD${TIERS[sk.ti].cd}` : "—"}
               </span>
             </div>
           );
@@ -85,7 +86,8 @@ export function SkillSlots({ side }: Props) {
       <div className="flex flex-wrap gap-1 mt-2">
         {Object.entries(mastery).map(([w, v]) => (
           <span key={w} className="text-[10px] bg-muted/40 px-2 py-0.5 rounded">
-            ×<strong className="text-primary">{(1 + (v / 200) * 0.5).toFixed(2)}</strong> {w}
+            ×<strong className="text-primary">{(1 + ((v ?? 0) / 200) * 0.5).toFixed(2)}</strong>{" "}
+            {WEAPON_FAMILY_LABEL[w as keyof typeof WEAPON_FAMILY_LABEL] ?? w}
           </span>
         ))}
         {Object.keys(mastery).length === 0 && (

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useWorldStore } from "@/store/world-store";
 import { useBattleStore } from "@/store/battle-store";
 import { getScene } from "@/lib/world";
+import { ensureBattleStarted } from "@/lib/world/battle-bridge";
 import { StartScreen } from "./start-screen";
 import { DialogDisplay } from "./dialog-display";
 import { ChoicePanel } from "./choice-panel";
@@ -14,6 +15,7 @@ import { RouteView } from "./route-view";
 import { QuestLog } from "./quest-log";
 import { PlayerStatus } from "./player-status";
 import { StatusBar } from "./status-bar";
+import { MenuBar } from "./menu-bar";
 import { DebugOverlay } from "./debug-overlay";
 import { BattleArena } from "@/components/game/battle-arena";
 
@@ -32,6 +34,14 @@ export function WorldScreen() {
   const resetGame = useWorldStore((s) => s.resetGame);
   // Subscribe to battle state so the layout updates when winner is set / cleared.
   const battleStateExists = useBattleStore((s) => s.state !== null);
+
+  // Defensive: if pendingBattle is set but the (unpersisted) battle store
+  // isn't running yet, kick it off from React's lifecycle. This catches the
+  // edge cases the module-level subscription might miss — hot reloads,
+  // rehydration timing, fresh tabs that resume mid-battle.
+  useEffect(() => {
+    if (pendingBattle && !battleStateExists) ensureBattleStarted();
+  }, [pendingBattle, battleStateExists]);
 
   if (!hydrated) {
     return (
@@ -99,6 +109,7 @@ export function WorldScreen() {
     <div className="grid grid-cols-1 md:grid-cols-[1fr_280px] gap-3">
       <div className="space-y-3">
         <StatusBar />
+        <MenuBar />
         {mainView}
         <div className="flex justify-end">
           <Button

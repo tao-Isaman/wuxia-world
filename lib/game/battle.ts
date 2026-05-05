@@ -9,6 +9,7 @@ import {
   getEquipBonus,
   getMasteryMap,
   type EquipBonus,
+  type MasteryMap,
 } from "./derive";
 import { hitPct, critPct, CRIT_MULTIPLIER } from "./damage";
 import { getArt, getEquip, getSkill, TIERS } from "./data";
@@ -29,7 +30,7 @@ export interface BattleContext {
   artIds: Record<Side, string>;
   weaponEquipIds: Record<Side, string | null>;
   equipBonus: Record<Side, EquipBonus>;
-  masteries: Record<Side, Record<string, number>>;
+  masteries: Record<Side, MasteryMap>;
 }
 
 export function makeContext(buildA: CharacterBuild, buildB: CharacterBuild): BattleContext {

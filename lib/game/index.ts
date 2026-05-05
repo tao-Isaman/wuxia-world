@@ -12,6 +12,8 @@ export {
   ARTS,
   EQUIPMENT,
   SLOT_LABELS,
+  WEAPON_FAMILY_LABEL,
+  WEAPON_FAMILY_HINT,
   getSkill,
   getArt,
   getEquip,
@@ -27,6 +29,7 @@ export {
   getWeaponMastery,
   totalStatPoints,
   type EquipBonus,
+  type MasteryMap,
 } from "./derive";
 export { hitPct, critPct, hpColor, CRIT_MULTIPLIER } from "./damage";
 export {

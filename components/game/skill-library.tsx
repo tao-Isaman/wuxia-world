@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { SKILLS, TIERS } from "@/lib/game";
+import { SKILLS, TIERS, WEAPON_FAMILY_LABEL } from "@/lib/game";
 import { cn } from "@/lib/utils";
 
 const TIER_COLORS = [
@@ -71,7 +71,7 @@ export function SkillLibrary() {
                       <Badge className={cn("font-semibold text-[9px]", TIER_COLORS[sk.ti])}>{t.n}</Badge>
                     </TableCell>
                     <TableCell>{t.cd}</TableCell>
-                    <TableCell>{sk.w}</TableCell>
+                    <TableCell>{WEAPON_FAMILY_LABEL[sk.w]}</TableCell>
                     <TableCell>+{sk.mg}</TableCell>
                     <TableCell className="text-[10px]">{bp}</TableCell>
                     <TableCell className="text-[10px]">{sb}</TableCell>

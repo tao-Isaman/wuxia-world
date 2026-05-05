@@ -19,6 +19,33 @@ import { useBattleStore } from "@/store/battle-store";
 import { useWorldStore } from "@/store/world-store";
 import { getOpponent } from "./data/opponents";
 
+// Single chokepoint for "world says fight, battle hasn't started" — used by
+// both the module-level subscription (fast path) and a React useEffect hook
+// in WorldScreen (defensive path). Calling it when the battle already exists
+// is a no-op so it's safe to invoke repeatedly.
+export function ensureBattleStarted(): void {
+  const ws = useWorldStore.getState();
+  if (!ws.pendingBattle) return;
+
+  const bs = useBattleStore.getState();
+  if (bs.state) return; // already running
+
+  if (!ws.playerBuild) {
+    console.warn("[bridge] pendingBattle without playerBuild — clearing");
+    ws.clearPendingBattle();
+    return;
+  }
+  const opp = getOpponent(ws.pendingBattle.opponentId);
+  if (!opp) {
+    console.warn(
+      `[bridge] unknown opponentId "${ws.pendingBattle.opponentId}" — clearing`,
+    );
+    ws.clearPendingBattle();
+    return;
+  }
+  bs.start(ws.playerBuild, opp.build());
+}
+
 let initialized = false;
 
 export function initBattleBridge(): void {
@@ -31,45 +58,14 @@ export function initBattleBridge(): void {
   useWorldStore.subscribe((next, prev) => {
     if (next.pendingBattle === prev.pendingBattle) return;
     if (!next.pendingBattle) return;
-    if (!next.playerBuild) {
-      console.warn("[bridge] pendingBattle without playerBuild — clearing");
-      useWorldStore.getState().clearPendingBattle();
-      return;
-    }
-    const opp = getOpponent(next.pendingBattle.opponentId);
-    if (!opp) {
-      console.warn(
-        `[bridge] unknown opponentId "${next.pendingBattle.opponentId}" — clearing`,
-      );
-      useWorldStore.getState().clearPendingBattle();
-      return;
-    }
-    useBattleStore.getState().start(next.playerBuild, opp.build());
+    ensureBattleStarted();
   });
 
   // No Battle → World subscription. The world UI shows the battle's winner
   // banner with a "ดำเนินเรื่อง" button that calls
   // `worldStore.acknowledgeBattleResult()` — that's where the seam closes.
 
-  reconcile();
-}
-
-// Hot-reload reconciliation: if we reload while a battle is mid-flight,
-// fix up store state so the player isn't stuck.
-function reconcile(): void {
-  const ws = useWorldStore.getState();
-  const bs = useBattleStore.getState();
-  if (!ws.pendingBattle) return;
-  // Battle store is unpersisted — if it's null on reload, restart so the
-  // player can finish. If a winner was already decided pre-reload, the
-  // restart drops that and the player has to fight again. Acceptable for now.
-  if (!bs.state && ws.playerBuild) {
-    const opp = getOpponent(ws.pendingBattle.opponentId);
-    if (opp) {
-      bs.start(ws.playerBuild, opp.build());
-    } else {
-      console.warn("[bridge] reconcile: opponent vanished, clearing pendingBattle");
-      ws.clearPendingBattle();
-    }
-  }
+  // Catch the case where the page rehydrates with pendingBattle already set
+  // but the (unpersisted) battle store is empty.
+  ensureBattleStarted();
 }

@@ -4,6 +4,7 @@ import type {
   CharacterBuild,
   EquipLoadout,
   PartialStats,
+  WeaponFamily,
 } from "./types";
 import { STAT_KEYS } from "./types";
 import { getSkill, getArt, getEquip } from "./data";
@@ -137,10 +138,12 @@ export function deriveAll(build: CharacterBuild): Derived {
   return d;
 }
 
+export type MasteryMap = Partial<Record<WeaponFamily, number>>;
+
 // Weapon mastery: each equipped skill grants `mg` toward its weapon family.
-// Cap is 200 per weapon. Mastery contributes ×(1 + mastery/200 * 0.5) damage.
-export function getMasteryMap(skillIds: (string | null)[]): Record<string, number> {
-  const out: Record<string, number> = {};
+// Cap is 200 per family. Mastery contributes ×(1 + mastery/200 * 0.5) damage.
+export function getMasteryMap(skillIds: (string | null)[]): MasteryMap {
+  const out: MasteryMap = {};
   for (const sid of skillIds) {
     const sk = getSkill(sid);
     if (!sk) continue;
@@ -149,7 +152,7 @@ export function getMasteryMap(skillIds: (string | null)[]): Record<string, numbe
   return out;
 }
 
-export function getWeaponMastery(skillIds: (string | null)[], weapon: string): number {
+export function getWeaponMastery(skillIds: (string | null)[], weapon: WeaponFamily): number {
   return getMasteryMap(skillIds)[weapon] ?? 0;
 }
 
