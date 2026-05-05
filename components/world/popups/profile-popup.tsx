@@ -121,7 +121,7 @@ export function ProfilePopup({ open, onClose }: Props) {
     remaining <= 0 ? "#E24B4A" : remaining < 20 ? "#BA7517" : "#7F77DD";
 
   // Skills + mastery + per-skill stat bonus aggregation (mirrors SkillSlots).
-  const mastery = getMasteryMap(player.skillIds);
+  const mastery = getMasteryMap(player.skillIds, player.skillLevels);
   const skillStatBonus: Record<string, number> = {};
   for (const sid of player.skillIds) {
     const sk = getSkill(sid);

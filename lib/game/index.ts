@@ -33,6 +33,18 @@ export {
 } from "./derive";
 export { hitPct, critPct, hpColor, CRIT_MULTIPLIER } from "./damage";
 export {
+  SKILL_LEVEL_MIN,
+  SKILL_LEVEL_MAX,
+  SKILL_XP_BASE,
+  getSkillLevel,
+  clampLevel,
+  bpMultiplier,
+  mgMultiplier,
+  effectiveBp,
+  effectiveMg,
+  xpToNextLevel,
+} from "./leveling";
+export {
   opposite,
   addBuff,
   addDebuff,

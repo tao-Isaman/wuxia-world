@@ -342,10 +342,11 @@ const DIR_INFO: Record<Dir, { label: string; hint: string }> = {
 // the opposite of d yet. Edges are sorted by sum of endpoint degrees (most
 // constrained first) so the tight edges get assigned before the surrounding
 // directions are used up. With max degree 4 = number of directions, plain
-// greedy can paint itself into a corner — backtracking always finds a valid
-// assignment when one exists. If backtracking ever fails (graph too dense to
-// 4-edge-colour with paired-opposite constraint), the still-unassigned edges
-// fall back to a numbered label downstream.
+// greedy can paint itself into a corner. The backtracker is capped by a step
+// budget — when the graph is too dense to 4-edge-colour with the paired-
+// opposite constraint, the search would otherwise be exponential, so once
+// the budget is exhausted we finish with a greedy pass and let any still-
+// unassigned edges pick up numbered fallback labels downstream.
 const dirOf = new Map<string, Map<string, Dir>>(); // src -> dst -> direction at src
 const usedAt = new Map<string, Set<Dir>>();
 for (const l of ALL_LEAVES) {
@@ -373,8 +374,35 @@ undirectedEdges.sort((x, y) => {
   return x[1].localeCompare(y[1]);
 });
 
+// Step budget for the backtracker — well beyond what a 85-edge graph needs
+// when a solution exists, but small enough that an unsolvable instance bails
+// in single-digit milliseconds instead of running for minutes.
+const ASSIGN_STEP_BUDGET = 50_000;
+let assignSteps = 0;
+
+function greedyAssignFrom(idx: number): void {
+  for (let i = idx; i < undirectedEdges.length; i++) {
+    const [a, b] = undirectedEdges[i]!;
+    const usedA = usedAt.get(a)!;
+    const usedB = usedAt.get(b)!;
+    for (const d of DIRS) {
+      if (usedA.has(d)) continue;
+      if (usedB.has(OPPOSITE[d])) continue;
+      dirOf.get(a)!.set(b, d);
+      dirOf.get(b)!.set(a, OPPOSITE[d]);
+      usedA.add(d);
+      usedB.add(OPPOSITE[d]);
+      break;
+    }
+  }
+}
+
 function assignDirections(idx: number): boolean {
   if (idx >= undirectedEdges.length) return true;
+  if (++assignSteps > ASSIGN_STEP_BUDGET) {
+    greedyAssignFrom(idx);
+    return true;
+  }
   const [a, b] = undirectedEdges[idx]!;
   const usedA = usedAt.get(a)!;
   const usedB = usedAt.get(b)!;
@@ -394,7 +422,10 @@ function assignDirections(idx: number): boolean {
   return false;
 }
 
-assignDirections(0);
+if (!assignDirections(0)) {
+  // Backtracking proved no full solution exists — finish what we can greedily.
+  greedyAssignFrom(0);
+}
 
 const EDGE_ROUTES: RouteScene[] = [];
 

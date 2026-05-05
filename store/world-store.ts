@@ -3,7 +3,12 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { CharacterBuild } from "@/lib/game";
-import { getEquip } from "@/lib/game";
+import {
+  getEquip,
+  getSkill,
+  SKILL_LEVEL_MAX,
+  xpToNextLevel,
+} from "@/lib/game";
 import { useBattleStore } from "@/store/battle-store";
 import {
   applyEffects,
@@ -52,8 +57,14 @@ const MAX_DUMMY_LEVEL = 99;
 
 // Game-time costs. `HOURS_PER_DAY` = 12 ชั่วยาม.
 const HOURS_PER_DAY = 12;
-const TRAVEL_HOURS = 0.5;
-const TRAVEL_STAMINA = 5;
+// Stepping out of a location onto a road is the cheap half of a journey;
+// arriving at a destination from the road is the expensive half.
+const LOC_TO_ROUTE_HOURS = 1;
+const ROUTE_TO_LOC_HOURS = 2;
+// Stamina spent on every overworld travel (location → route or route →
+// location). Exported so the UI can disable buttons when the player can't
+// afford the move.
+export const TRAVEL_STAMINA_COST = 10;
 const ACTION_HOURS = 0.2;
 const FIGHT_HOURS = 0.5;
 const FIGHT_STAMINA = 5;
@@ -102,6 +113,11 @@ export type PracticeMusicResult =
   | { ok: false; reason: "no-instrument" | "no-build" }
   | { ok: true; xpGained: number };
 
+// Result of attempting to level up a move skill via either xp source.
+export type LevelUpSkillResult =
+  | { ok: false; reason: "unknown" | "maxed" | "insufficient" }
+  | { ok: true; skillId: string; level: number; cost: number };
+
 // Three rest tiers — see plan above.
 export type RestKind = "inn" | "temple" | "route";
 
@@ -113,6 +129,17 @@ export type RestResult =
 // to grind — books and song books are the bigger xp source.
 const PRACTICE_MUSIC_XP = 10;
 
+// W-exp drop rates per action. W-exp is the "any-action" pool the player
+// can spend to level up move skills, alongside the per-skill xp bar that
+// only fills via combat use.
+const W_EXP_GATHER = 10;
+const W_EXP_CRAFT = 5;
+const W_EXP_USE_ITEM = 5;
+const W_EXP_PRACTICE_MUSIC = 5;
+const W_EXP_FIGHT_WIN = 50;
+// Per-skill xp gained for each use of a skill in a battle the player won.
+const SKILL_USE_XP = 20;
+
 interface WorldStore extends WorldStateData {
   // Actions
   startNewGame: () => void;
@@ -121,6 +148,10 @@ interface WorldStore extends WorldStateData {
   // Used by the "ปิด" button on terminal dialogs and by the route-screen
   // back button. No-op if lastLocationId is null (very early in a fresh game).
   exitToLocation: () => void;
+  // True when navigating to `targetSceneId` either won't cost stamina
+  // (story warps) or the player can pay the overworld travel cost. UI uses
+  // this to disable destination / route buttons preemptively.
+  canTravelTo: (targetSceneId: string) => boolean;
   clearPendingBattle: () => void;
   // After a battle finishes (state.winner set), the world UI calls this when
   // the user clicks "ดำเนินเรื่อง". It routes to onWin/onLose, clears
@@ -135,6 +166,12 @@ interface WorldStore extends WorldStateData {
   useItem: (itemId: string) => UseItemResult;
   practiceMusic: () => PracticeMusicResult;
   rest: (kind: RestKind) => RestResult;
+
+  // Move-skill progression. Either path advances a skill by one level —
+  // `levelUpSkillFromExp` consumes the skill's own xp pool, while
+  // `levelUpSkillFromWExp` spends from the global w-exp pool.
+  levelUpSkillFromExp: (skillId: string) => LevelUpSkillResult;
+  levelUpSkillFromWExp: (skillId: string) => LevelUpSkillResult;
 
   // Debug helpers (dev-only consumers).
   _setFlag: (flag: string, value: boolean | number | string) => void;
@@ -156,12 +193,25 @@ const emptyData = (): WorldStateData => ({
   stamina: STARTER_STAMINA,
   staminaMax: STARTER_STAMINA,
   lifeSkillXp: emptyLifeSkillXp(),
+  wExp: 0,
+  skillLevel: {},
+  skillExp: {},
   day: 1,
   time: 0,
   pendingBattle: null,
   pendingHuntYield: null,
   gameOver: false,
 });
+
+// Push the current skill levels into the player build so the engine reads
+// them at battle handoff time (BattleContext snapshots `build.skillLevels`).
+function syncPlayerSkillLevels(state: WorldStateData): void {
+  if (!state.playerBuild) return;
+  state.playerBuild = {
+    ...state.playerBuild,
+    skillLevels: { ...state.skillLevel },
+  };
+}
 
 // In-place time advance. Rolls `time` over each `HOURS_PER_DAY` and
 // increments `day`. Negative deltas are not supported (game time is one-way).
@@ -177,17 +227,47 @@ function advanceTime(state: WorldStateData, hours: number): void {
   state.day = day;
 }
 
-// Charge the per-navigation cost (5 stamina + 0.5 ชั่วยาม) iff the target
-// is a route or location AND the player isn't just looping back where they
-// already are (dialog → same-location returns shouldn't punish ordinary
-// conversation flow).
-function chargeTravelIfNeeded(state: WorldStateData, targetSceneId: string): void {
-  if (state.currentSceneId === targetSceneId) return;
-  const sc = getScene(targetSceneId);
-  if (!sc) return;
-  if (sc.kind !== "route" && sc.kind !== "location") return;
-  state.stamina = Math.max(0, state.stamina - TRAVEL_STAMINA);
-  advanceTime(state, TRAVEL_HOURS);
+// Returns true when the move is either free (story warp / same scene) or
+// the player has enough stamina for the overworld travel cost. UI buttons
+// can call this against the current state to grey themselves out.
+function travelTransitionHours(
+  source: ReturnType<typeof getScene>,
+  target: ReturnType<typeof getScene>,
+): number | null {
+  if (!source || !target) return null;
+  if (source.kind === "location" && target.kind === "route") return LOC_TO_ROUTE_HOURS;
+  if (source.kind === "route" && target.kind === "location") return ROUTE_TO_LOC_HOURS;
+  return null;
+}
+
+function canAffordTravelTo(state: WorldStateData, targetSceneId: string): boolean {
+  if (state.currentSceneId === targetSceneId) return true;
+  const target = getScene(targetSceneId);
+  const source = getScene(state.currentSceneId);
+  const hours = travelTransitionHours(source, target);
+  if (hours === null) return true; // story warp — free, always allowed
+  return state.stamina >= TRAVEL_STAMINA_COST;
+}
+
+// Charge the per-navigation travel cost only on the two real overworld
+// transitions:
+//   location → route  → 10 stamina + 1 ชั่วยาม (stepping onto a road)
+//   route → location  → 10 stamina + 2 ชั่วยาม (arriving at a destination)
+// Story warps (dialog → anywhere, location → location, etc.) are free —
+// only walking the map costs stamina and time.
+//
+// Returns false when the move is real travel and the player cannot afford
+// the stamina cost. Callers must abort the navigation in that case.
+function chargeTravelIfNeeded(state: WorldStateData, targetSceneId: string): boolean {
+  if (state.currentSceneId === targetSceneId) return true;
+  const target = getScene(targetSceneId);
+  const source = getScene(state.currentSceneId);
+  const hours = travelTransitionHours(source, target);
+  if (hours === null) return true; // story warp — free
+  if (state.stamina < TRAVEL_STAMINA_COST) return false;
+  state.stamina -= TRAVEL_STAMINA_COST;
+  advanceTime(state, hours);
+  return true;
 }
 
 // Walk through `next` pointers on dialog scenes. Stops at the first scene
@@ -213,20 +293,29 @@ function followAutoAdvance(state: WorldStateData): void {
 
 // Effects might end with `triggerBattle`, in which case we suspend navigation
 // (the battle-bridge will start the battle; acknowledgeBattleResult resumes).
-function takeChoice(state: WorldStateData, choice: Choice): void {
+//
+// Returns false when the choice required overworld travel and the player
+// couldn't afford the stamina cost — caller discards the draft.
+function takeChoice(state: WorldStateData, choice: Choice): boolean {
+  // Pre-flight: refuse the whole choice (effects + nav) when the move is
+  // real travel and the player can't pay. Otherwise zero-stamina players
+  // could still trigger flag/quest side effects by tapping a route.
+  if (!canAffordTravelTo(state, choice.next)) return false;
+
   const effects: readonly SceneEffect[] = choice.effects ?? [];
   applyEffects(state, effects);
   if (state.pendingBattle) {
     // Battle suspends scene navigation; the onWin/onLose path overrides `next`.
-    return;
+    return true;
   }
   // Same-target navigation (closing a dialog back to where you stood) is free;
   // a different route/location pays the travel cost.
-  chargeTravelIfNeeded(state, choice.next);
+  if (!chargeTravelIfNeeded(state, choice.next)) return false;
   state.currentSceneId = choice.next;
   const sc = getScene(state.currentSceneId);
   if (sc?.onEnter) applyEffects(state, sc.onEnter);
   followAutoAdvance(state);
+  return true;
 }
 
 // Shallow-clone the data fields so the persisted slice picks up the change.
@@ -243,6 +332,9 @@ function draftFrom(s: WorldStateData): WorldStateData {
     stamina: s.stamina,
     staminaMax: s.staminaMax,
     lifeSkillXp: { ...s.lifeSkillXp },
+    wExp: s.wExp,
+    skillLevel: { ...s.skillLevel },
+    skillExp: { ...s.skillExp },
     day: s.day,
     time: s.time,
     pendingBattle: s.pendingBattle,
@@ -290,12 +382,17 @@ export const useWorldStore = create<WorldStore>()(
       ...emptyData(),
 
       startNewGame: () => {
-        set({
-          ...emptyData(),
-          hasGame: true,
-          playerBuild: STARTER_BUILD(),
-          currentSceneId: START_SCENE_ID,
-        });
+        const fresh = emptyData();
+        fresh.hasGame = true;
+        fresh.playerBuild = STARTER_BUILD();
+        fresh.currentSceneId = START_SCENE_ID;
+        // Seed level 1 for the starter skill so the UI has an entry to
+        // display from turn one.
+        for (const sid of fresh.playerBuild.skillIds) {
+          if (sid) fresh.skillLevel[sid] = 1;
+        }
+        syncPlayerSkillLevels(fresh);
+        set({ ...fresh });
         // Run start scene's onEnter + auto-advance through any chained scenes.
         const draft = draftFrom(get());
         const start = getScene(START_SCENE_ID);
@@ -312,7 +409,9 @@ export const useWorldStore = create<WorldStore>()(
         const choice = sc.choices[idx];
         if (!choice) return;
         const draft = draftFrom(s);
-        takeChoice(draft, choice);
+        // Drop the draft entirely if takeChoice refuses (e.g., stamina too
+        // low for a travel-bearing choice). State stays exactly as it was.
+        if (!takeChoice(draft, choice)) return;
         set({ ...draft });
       },
 
@@ -322,7 +421,10 @@ export const useWorldStore = create<WorldStore>()(
           return;
         }
         const draft = draftFrom(get());
-        chargeTravelIfNeeded(draft, sceneId);
+        // Refuse the move entirely when stamina is too low for an overworld
+        // travel hop — UI buttons should also be disabled, but defend here
+        // in case something slips through.
+        if (!chargeTravelIfNeeded(draft, sceneId)) return;
         draft.currentSceneId = sceneId;
         const sc = getScene(sceneId);
         if (sc?.onEnter) applyEffects(draft, sc.onEnter);
@@ -343,6 +445,8 @@ export const useWorldStore = create<WorldStore>()(
         followAutoAdvance(draft);
         set({ ...draft });
       },
+
+      canTravelTo: (sceneId) => canAffordTravelTo(get(), sceneId),
 
       clearPendingBattle: () => set({ pendingBattle: null, pendingHuntYield: null }),
 
@@ -370,8 +474,17 @@ export const useWorldStore = create<WorldStore>()(
           return;
         }
 
-        // Win path: drop hunt spoils if a hunt was in flight, then route
-        // to the encounter's onWin destination.
+        // Win path: bank w-exp + per-skill xp from each move used in the fight,
+        // then drop hunt spoils if a hunt was in flight, then route to the
+        // encounter's onWin destination.
+        draft.wExp = Math.max(0, draft.wExp + W_EXP_FIGHT_WIN);
+        const uses = battleState?.skillUses?.A ?? {};
+        for (const [sid, count] of Object.entries(uses)) {
+          if (typeof count !== "number" || count <= 0) continue;
+          if (!getSkill(sid)) continue;
+          draft.skillExp[sid] = (draft.skillExp[sid] ?? 0) + count * SKILL_USE_XP;
+          if (!(sid in draft.skillLevel)) draft.skillLevel[sid] = 1;
+        }
         const hunt = draft.pendingHuntYield;
         draft.pendingHuntYield = null;
         if (hunt) {
@@ -457,6 +570,7 @@ export const useWorldStore = create<WorldStore>()(
         const fullXp = GATHER_XP_MULT * res.level;
         const xpGained = yieldRoll.passed ? fullXp : Math.floor(fullXp * FAIL_XP_FRACTION);
         draft.lifeSkillXp[res.skill] = (draft.lifeSkillXp[res.skill] ?? 0) + xpGained;
+        draft.wExp += W_EXP_GATHER;
         set({ ...draft });
         return {
           ok: true,
@@ -524,6 +638,7 @@ export const useWorldStore = create<WorldStore>()(
         if (skill) {
           draft.lifeSkillXp[skill] = (draft.lifeSkillXp[skill] ?? 0) + xpGained;
         }
+        draft.wExp += W_EXP_CRAFT;
         set({ ...draft });
         return {
           ok: true,
@@ -552,6 +667,7 @@ export const useWorldStore = create<WorldStore>()(
         const eff = def.use;
         if (eff.t === "trainSkill") {
           draft.lifeSkillXp[eff.skill] = (draft.lifeSkillXp[eff.skill] ?? 0) + eff.xp;
+          draft.wExp += W_EXP_USE_ITEM;
           set({ ...draft });
           return { ok: true, itemId, skill: eff.skill, xpGained: eff.xp };
         }
@@ -569,6 +685,7 @@ export const useWorldStore = create<WorldStore>()(
         const draft = draftFrom(s);
         advanceTime(draft, ACTION_HOURS);
         draft.lifeSkillXp.music = (draft.lifeSkillXp.music ?? 0) + PRACTICE_MUSIC_XP;
+        draft.wExp += W_EXP_PRACTICE_MUSIC;
         set({ ...draft });
         return { ok: true, xpGained: PRACTICE_MUSIC_XP };
       },
@@ -596,6 +713,41 @@ export const useWorldStore = create<WorldStore>()(
         return { ok: true, kind, cost, restored };
       },
 
+      levelUpSkillFromExp: (skillId) => {
+        const s = get();
+        const sk = getSkill(skillId);
+        if (!sk) return { ok: false, reason: "unknown" };
+        const lv = s.skillLevel[skillId] ?? 1;
+        if (lv >= SKILL_LEVEL_MAX) return { ok: false, reason: "maxed" };
+        const cost = xpToNextLevel(sk, lv);
+        const xp = s.skillExp[skillId] ?? 0;
+        if (xp < cost) return { ok: false, reason: "insufficient" };
+
+        const draft = draftFrom(s);
+        draft.skillLevel[skillId] = lv + 1;
+        draft.skillExp[skillId] = xp - cost;
+        syncPlayerSkillLevels(draft);
+        set({ ...draft });
+        return { ok: true, skillId, level: lv + 1, cost };
+      },
+
+      levelUpSkillFromWExp: (skillId) => {
+        const s = get();
+        const sk = getSkill(skillId);
+        if (!sk) return { ok: false, reason: "unknown" };
+        const lv = s.skillLevel[skillId] ?? 1;
+        if (lv >= SKILL_LEVEL_MAX) return { ok: false, reason: "maxed" };
+        const cost = xpToNextLevel(sk, lv);
+        if (s.wExp < cost) return { ok: false, reason: "insufficient" };
+
+        const draft = draftFrom(s);
+        draft.wExp -= cost;
+        draft.skillLevel[skillId] = lv + 1;
+        syncPlayerSkillLevels(draft);
+        set({ ...draft });
+        return { ok: true, skillId, level: lv + 1, cost };
+      },
+
       _setFlag: (flag, value) =>
         set((s) => ({ flags: { ...s.flags, [flag]: value } })),
 
@@ -603,7 +755,7 @@ export const useWorldStore = create<WorldStore>()(
     }),
     {
       name: "wusia-world-v1",
-      version: 4,
+      version: 5,
       // Only persist the data fields, not the action functions.
       partialize: (s) => ({
         hasGame: s.hasGame,
@@ -617,6 +769,9 @@ export const useWorldStore = create<WorldStore>()(
         stamina: s.stamina,
         staminaMax: s.staminaMax,
         lifeSkillXp: s.lifeSkillXp,
+        wExp: s.wExp,
+        skillLevel: s.skillLevel,
+        skillExp: s.skillExp,
         day: s.day,
         time: s.time,
         pendingBattle: s.pendingBattle,
@@ -628,6 +783,8 @@ export const useWorldStore = create<WorldStore>()(
       //   v2 → v3 grew lifeSkillXp from 6 → 17 keys.
       //   v3 → v4 added day/time. Both default to 1/0 — players returning
       //           after this update find themselves on day 1 morning.
+      //   v4 → v5 added wExp / skillLevel / skillExp. Existing skills default
+      //           to level 1 (the new nerfed baseline) with empty xp pools.
       migrate: (persisted, fromVersion) => {
         const p = (persisted ?? {}) as Partial<WorldStateData>;
         const out: WorldStateData = {
@@ -636,6 +793,9 @@ export const useWorldStore = create<WorldStore>()(
           stamina: typeof p.stamina === "number" ? p.stamina : STARTER_STAMINA,
           staminaMax: typeof p.staminaMax === "number" ? p.staminaMax : STARTER_STAMINA,
           lifeSkillXp: { ...emptyLifeSkillXp(), ...(p.lifeSkillXp ?? {}) } as Record<LifeSkill, number>,
+          wExp: typeof p.wExp === "number" && p.wExp >= 0 ? p.wExp : 0,
+          skillLevel: p.skillLevel && typeof p.skillLevel === "object" ? { ...p.skillLevel } : {},
+          skillExp: p.skillExp && typeof p.skillExp === "object" ? { ...p.skillExp } : {},
           day: typeof p.day === "number" && p.day >= 1 ? p.day : 1,
           time: typeof p.time === "number" && p.time >= 0 ? p.time : 0,
           pendingHuntYield: p.pendingHuntYield ?? null,

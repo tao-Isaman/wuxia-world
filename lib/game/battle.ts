@@ -13,6 +13,7 @@ import {
 } from "./derive";
 import { hitPct, critPct, CRIT_MULTIPLIER } from "./damage";
 import { getArt, getEquip, getSkill, TIERS } from "./data";
+import { effectiveBp } from "./leveling";
 import {
   applyEnemyEffect,
   applySelfEffect,
@@ -31,15 +32,25 @@ export interface BattleContext {
   weaponEquipIds: Record<Side, string | null>;
   equipBonus: Record<Side, EquipBonus>;
   masteries: Record<Side, MasteryMap>;
+  // Per-skill levels in effect for each side. Read at damage time so the
+  // skill's `bp` gets scaled by the level multiplier. Empty record → all
+  // skills at level 1 (the nerfed baseline).
+  skillLevels: Record<Side, Record<string, number>>;
 }
 
 export function makeContext(buildA: CharacterBuild, buildB: CharacterBuild): BattleContext {
+  const lvA = buildA.skillLevels ?? {};
+  const lvB = buildB.skillLevels ?? {};
   return {
     names: { A: buildA.name, B: buildB.name },
     artIds: { A: buildA.artId, B: buildB.artId },
     weaponEquipIds: { A: buildA.equipment.W, B: buildB.equipment.W },
     equipBonus: { A: getEquipBonus(buildA.equipment), B: getEquipBonus(buildB.equipment) },
-    masteries: { A: getMasteryMap(buildA.skillIds), B: getMasteryMap(buildB.skillIds) },
+    masteries: {
+      A: getMasteryMap(buildA.skillIds, lvA),
+      B: getMasteryMap(buildB.skillIds, lvB),
+    },
+    skillLevels: { A: lvA, B: lvB },
   };
 }
 
@@ -61,6 +72,7 @@ export function makeInitialState(buildA: CharacterBuild, buildB: CharacterBuild)
     },
     cd: { A: [0, 0, 0, 0, 0], B: [0, 0, 0, 0, 0] },
     iaCD: { A: 0, B: 0 },
+    skillUses: { A: {}, B: {} },
   };
 }
 
@@ -189,9 +201,11 @@ export function calcSkillDamage(
   const mas = ctx.masteries[side][sk.w] ?? 0;
   const mm = 1 + (mas / 200) * 0.5;
 
-  // Damage formula
+  // Damage formula. `bp` is scaled by the skill's level (lv1 → 50%, lv10 → 100%).
+  const lv = ctx.skillLevels[side][sk.id];
+  const eBp = effectiveBp(sk, typeof lv === "number" ? lv : 1);
   const ta = sk.at === "phy" ? ad.PA : ad.IA * im;
-  const se = sk.bp * (1 + sk.p / 100) + sk.f;
+  const se = eBp * (1 + sk.p / 100) + sk.f;
   const ed = Math.max(0, (sk.at === "phy" ? dd.PD : dd.ID) + fD - dR);
   const raw = Math.max(1, (ad.Atk * sm * ab + ta + se) * sk.dm * mm - ed) * (1 - pR / 100);
 
@@ -228,6 +242,7 @@ export function resolveSkill(
   const skill = getSkill(skillId);
   if (!skill) return;
   state.cd[side][slotIdx] = TIERS[skill.ti].cd;
+  state.skillUses[side][skillId] = (state.skillUses[side][skillId] ?? 0) + 1;
 
   const ds = opposite(side);
   const cls = side === "A" ? "lA" : "lB";

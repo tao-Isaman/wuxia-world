@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import type { RouteScene, SceneEffect } from "@/lib/world";
 import { applyEffect, evaluateCondition } from "@/lib/world";
-import { useWorldStore } from "@/store/world-store";
+import { TRAVEL_STAMINA_COST, useWorldStore } from "@/store/world-store";
 import { RestPanel } from "./rest-panel";
 
 interface Props {
@@ -19,6 +19,8 @@ interface Props {
 export function RouteView({ scene }: Props) {
   const state = useWorldStore();
   const gotoScene = useWorldStore((s) => s.gotoScene);
+  const stamina = useWorldStore((s) => s.stamina);
+  const tooTired = stamina < TRAVEL_STAMINA_COST;
 
   const visibleDests = scene.destinations.filter(
     (d) => !d.visibleIf || evaluateCondition(state, d.visibleIf),
@@ -86,16 +88,19 @@ export function RouteView({ scene }: Props) {
                 <Button
                   key={d.locationId}
                   variant="outline"
+                  disabled={tooTired}
                   onClick={() => travel(d.locationId, d.effects)}
                   className="w-full justify-start text-left h-auto py-2 whitespace-normal"
                 >
                   <span className="flex flex-col items-start gap-0.5">
                     <span className="font-semibold text-sm">→ {d.label}</span>
-                    {d.hint && (
-                      <span className="text-[10px] text-muted-foreground">
-                        {d.hint}
-                      </span>
-                    )}
+                    <span className="text-[10px] text-muted-foreground">
+                      ⚡ {TRAVEL_STAMINA_COST}
+                      {d.hint && <span className="ml-2">{d.hint}</span>}
+                      {tooTired && (
+                        <span className="text-rose-600 ml-2">พลังไม่พอ</span>
+                      )}
+                    </span>
                   </span>
                 </Button>
               ))}
@@ -105,10 +110,12 @@ export function RouteView({ scene }: Props) {
             <Button
               variant="ghost"
               size="sm"
+              disabled={tooTired}
               onClick={() => gotoScene(backTarget)}
               className="w-full text-xs text-muted-foreground"
             >
               ← ย้อนกลับ
+              {tooTired && <span className="text-rose-600 ml-2">พลังไม่พอ</span>}
             </Button>
           )}
         </CardContent>

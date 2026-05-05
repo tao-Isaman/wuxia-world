@@ -15,7 +15,11 @@ import {
   getScene,
   masteryLevel,
 } from "@/lib/world";
-import { useWorldStore, type GatherResult } from "@/store/world-store";
+import {
+  useWorldStore,
+  TRAVEL_STAMINA_COST,
+  type GatherResult,
+} from "@/store/world-store";
 import { RestPanel } from "./rest-panel";
 
 interface Props {
@@ -120,21 +124,24 @@ export function LocationView({ scene }: Props) {
               {visibleRoutes.map((route) => {
                 const target = getScene(route.routeSceneId);
                 const valid = target?.kind === "route";
+                const tooTired = stamina < TRAVEL_STAMINA_COST;
                 return (
                   <Button
                     key={route.routeSceneId}
                     variant="outline"
-                    disabled={!valid}
+                    disabled={!valid || tooTired}
                     onClick={() => gotoScene(route.routeSceneId)}
                     className="w-full justify-start text-left h-auto py-2 whitespace-normal"
                   >
                     <span className="flex flex-col items-start gap-0.5">
                       <span className="font-semibold text-sm">🚶 {route.label}</span>
-                      {route.hint && (
-                        <span className="text-[10px] text-muted-foreground">
-                          {route.hint}
-                        </span>
-                      )}
+                      <span className="text-[10px] text-muted-foreground">
+                        ⚡ {TRAVEL_STAMINA_COST}
+                        {route.hint && <span className="ml-2">{route.hint}</span>}
+                        {tooTired && (
+                          <span className="text-rose-600 ml-2">พลังไม่พอ</span>
+                        )}
+                      </span>
                     </span>
                   </Button>
                 );

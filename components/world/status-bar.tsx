@@ -20,6 +20,7 @@ export function StatusBar() {
   const staminaMax = useWorldStore((s) => s.staminaMax);
   const day = useWorldStore((s) => s.day);
   const time = useWorldStore((s) => s.time);
+  const wExp = useWorldStore((s) => s.wExp);
 
   if (!player) return null;
 
@@ -63,6 +64,11 @@ export function StatusBar() {
           <div className="shrink-0 text-xs">
             <span className="text-muted-foreground">ทอง </span>
             <strong className="text-amber-600">{gold}</strong>
+          </div>
+
+          <div className="shrink-0 text-xs">
+            <span className="text-muted-foreground">w-exp </span>
+            <strong className="text-violet-600">{wExp}</strong>
           </div>
 
           <div className="shrink-0 text-xs">

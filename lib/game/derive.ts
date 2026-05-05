@@ -8,6 +8,7 @@ import type {
 } from "./types";
 import { STAT_KEYS } from "./types";
 import { getSkill, getArt, getEquip } from "./data";
+import { effectiveMg } from "./leveling";
 import type { Equipment } from "./types";
 
 // Pure: base stats → derived combat stats.
@@ -140,20 +141,30 @@ export function deriveAll(build: CharacterBuild): Derived {
 
 export type MasteryMap = Partial<Record<WeaponFamily, number>>;
 
-// Weapon mastery: each equipped skill grants `mg` toward its weapon family.
-// Cap is 200 per family. Mastery contributes ×(1 + mastery/200 * 0.5) damage.
-export function getMasteryMap(skillIds: (string | null)[]): MasteryMap {
+// Weapon mastery: each equipped skill grants `mg` toward its weapon family,
+// scaled by the skill's current level (lv1 = 1×, lv10 = 2×). Cap is 200
+// per family. Mastery contributes ×(1 + mastery/200 * 0.5) damage.
+export function getMasteryMap(
+  skillIds: (string | null)[],
+  skillLevels?: Record<string, number>,
+): MasteryMap {
   const out: MasteryMap = {};
   for (const sid of skillIds) {
     const sk = getSkill(sid);
-    if (!sk) continue;
-    out[sk.w] = Math.min(200, (out[sk.w] ?? 0) + sk.mg);
+    if (!sk || !sid) continue;
+    const lv = skillLevels?.[sid];
+    const mg = effectiveMg(sk, typeof lv === "number" ? lv : 1);
+    out[sk.w] = Math.min(200, (out[sk.w] ?? 0) + mg);
   }
   return out;
 }
 
-export function getWeaponMastery(skillIds: (string | null)[], weapon: WeaponFamily): number {
-  return getMasteryMap(skillIds)[weapon] ?? 0;
+export function getWeaponMastery(
+  skillIds: (string | null)[],
+  weapon: WeaponFamily,
+  skillLevels?: Record<string, number>,
+): number {
+  return getMasteryMap(skillIds, skillLevels)[weapon] ?? 0;
 }
 
 export function totalStatPoints(stats: StatBlock): number {

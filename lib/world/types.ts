@@ -301,6 +301,17 @@ export interface WorldStateData {
   // xp per life skill — mastery level is derived in lib/world/data/life-skills.
   lifeSkillXp: Record<LifeSkill, number>;
 
+  // Move-skill progression. Every action (gather / craft / fight / etc.)
+  // grants a bit of `wExp`, a global pool the player can spend to level up
+  // any move skill. Each skill also has its own xp pool that fills only when
+  // that skill is used in battle. Either path levels the skill up; rarer
+  // skills (higher tier) need more xp per level.
+  wExp: number;
+  // skillId → current level (defaults to 1 when missing).
+  skillLevel: Record<string, number>;
+  // skillId → accumulated xp toward the next level.
+  skillExp: Record<string, number>;
+
   // Game time. Twelve ชั่วยาม per day; `time` is a fractional within-day
   // counter (0 ≤ time < 12) that advances per action and rolls `day` over
   // when it crosses 12.

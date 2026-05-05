@@ -233,6 +233,9 @@ export interface CharacterBuild {
   artLevel: number; // 1..10
   skillIds: (string | null)[]; // 5 slots
   equipment: EquipLoadout;
+  // Per-skill level (1..10). Missing entries default to 1. Level scales the
+  // skill's base power and the mastery it grants — see lib/game/leveling.ts.
+  skillLevels?: Record<string, number>;
 }
 
 // ─── Live battle state ─────────────────────────────────────────────────
@@ -289,4 +292,7 @@ export interface BattleState {
   st: { A: SideBattleState; B: SideBattleState };
   cd: { A: number[]; B: number[] }; // skill cooldowns
   iaCD: { A: number; B: number }; // internal-art active CD
+  // Per-side count of how many times each skill id was used this battle.
+  // Read by the world store on battle end to grant per-skill exp.
+  skillUses: { A: Record<string, number>; B: Record<string, number> };
 }

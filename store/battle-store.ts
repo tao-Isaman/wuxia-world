@@ -102,7 +102,7 @@ export const useBattleStore = create<BattleStore>((set, get) => {
       const ctx = makeContext(a, b);
       const state = makeInitialState(a, b);
       logLine(state, "lS", "━━ เริ่มการต่อสู้ ━━");
-      for (const [w, v] of Object.entries(getMasteryMap(a.skillIds))) {
+      for (const [w, v] of Object.entries(getMasteryMap(a.skillIds, a.skillLevels))) {
         logLine(state, "lS", `A: ${w} ×${(1 + (v / 200) * 0.5).toFixed(2)}`);
       }
       const aA = getArt(a.artId);

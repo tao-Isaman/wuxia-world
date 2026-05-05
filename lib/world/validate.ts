@@ -5,6 +5,8 @@ import { ITEMS_BY_ID } from "./data/items";
 import { QUESTS_BY_ID } from "./data/quests";
 import { OPPONENTS_BY_ID } from "./data/opponents";
 import { RESOURCES_BY_ID } from "./data/resources";
+import { SKILLS_BY_ID } from "@/lib/game/data/skills";
+import { SKILL_LEVEL_MAX, SKILL_LEVEL_MIN } from "@/lib/game";
 
 // Called from persist's onRehydrateStorage. Drops or repairs any references
 // to data ids that don't exist anymore (e.g., a scene was removed between
@@ -102,5 +104,38 @@ export function validateAndRepair(state: WorldStateData): void {
   while (state.time >= 12) {
     state.time -= 12;
     state.day += 1;
+  }
+
+  // Move-skill progression: clamp level into [1, MAX], drop entries for
+  // skills that no longer exist, and keep the player build's `skillLevels`
+  // mirror in sync so the engine reads the right multipliers.
+  if (typeof state.wExp !== "number" || state.wExp < 0) state.wExp = 0;
+  if (!state.skillLevel || typeof state.skillLevel !== "object") state.skillLevel = {};
+  if (!state.skillExp || typeof state.skillExp !== "object") state.skillExp = {};
+  for (const sid of Object.keys(state.skillLevel)) {
+    if (!SKILLS_BY_ID.has(sid)) {
+      delete state.skillLevel[sid];
+      continue;
+    }
+    const lv = state.skillLevel[sid];
+    if (typeof lv !== "number" || !Number.isFinite(lv)) {
+      state.skillLevel[sid] = SKILL_LEVEL_MIN;
+    } else {
+      state.skillLevel[sid] = Math.max(SKILL_LEVEL_MIN, Math.min(SKILL_LEVEL_MAX, Math.floor(lv)));
+    }
+  }
+  for (const sid of Object.keys(state.skillExp)) {
+    if (!SKILLS_BY_ID.has(sid)) {
+      delete state.skillExp[sid];
+      continue;
+    }
+    const xp = state.skillExp[sid];
+    state.skillExp[sid] = typeof xp === "number" && xp >= 0 ? xp : 0;
+  }
+  if (state.playerBuild) {
+    state.playerBuild = {
+      ...state.playerBuild,
+      skillLevels: { ...state.skillLevel },
+    };
   }
 }
