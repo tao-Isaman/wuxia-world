@@ -105,6 +105,63 @@ export function applyEffect(state: WorldStateData, eff: SceneEffect): void {
       return;
     }
 
+    case "learnSkill": {
+      if (!state.playerBuild) return;
+      const cur = state.playerBuild.learnedSkillIds ?? [];
+      const slots = [...state.playerBuild.skillIds];
+      let learnedNext = cur;
+      if (!cur.includes(eff.skillId)) {
+        learnedNext = [...cur, eff.skillId];
+      }
+      // Auto-equip into the first empty slot for convenience. Authors who
+      // want to teach without slotting can clear the slot via a follow-up.
+      if (!slots.includes(eff.skillId)) {
+        for (let i = 0; i < slots.length; i++) {
+          if (slots[i] === null) {
+            slots[i] = eff.skillId;
+            break;
+          }
+        }
+      }
+      state.playerBuild = {
+        ...state.playerBuild,
+        learnedSkillIds: learnedNext,
+        skillIds: slots,
+      };
+      return;
+    }
+
+    case "learnArt": {
+      if (!state.playerBuild) return;
+      const cur = state.playerBuild.learnedArtIds ?? [];
+      const lv = eff.level && eff.level >= 1 ? eff.level : 1;
+      const levels = { ...(state.playerBuild.artLevels ?? {}) };
+      const slots = [...state.playerBuild.skillIds];
+      const slotEntry = `art:${eff.artId}`;
+      let learnedArts = cur;
+      if (!cur.includes(eff.artId)) {
+        learnedArts = [...cur, eff.artId];
+      }
+      // Same auto-slot policy as learnSkill — drop into the first empty slot
+      // so the player can use the art straight away.
+      if (!slots.includes(slotEntry)) {
+        for (let i = 0; i < slots.length; i++) {
+          if (slots[i] === null) {
+            slots[i] = slotEntry;
+            break;
+          }
+        }
+      }
+      state.playerBuild = {
+        ...state.playerBuild,
+        learnedArtIds: learnedArts,
+        artLevels:
+          (levels[eff.artId] ?? 0) < lv ? { ...levels, [eff.artId]: lv } : levels,
+        skillIds: slots,
+      };
+      return;
+    }
+
     case "rollRandomEvent": {
       // Suppress the immediate re-roll that fires when a meet/treasure dialog
       // auto-returns to the leaf, or when a fight's onWin/onLose routes back.

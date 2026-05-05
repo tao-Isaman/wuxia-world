@@ -16,8 +16,11 @@ const defaultBuild = (name: string): CharacterBuild => ({
   stats: { ...DEFAULT_STATS },
   artId: "none",
   artLevel: 5,
-  skillIds: [null, null, null, null, null],
+  skillIds: [null, null, null, null, null, null, null, null, null, null],
   equipment: emptyLoadout(),
+  learnedSkillIds: [],
+  learnedArtIds: [],
+  artLevels: {},
 });
 
 interface CharacterStore {
@@ -109,9 +112,29 @@ export const useCharacterStore = create<CharacterStore>()(
     }),
     {
       name: "wusia-character-v1",
-      version: 1,
+      version: 2,
       partialize: (s) => ({ builds: s.builds }),
-      migrate: (persisted) => persisted as { builds: Record<Side, CharacterBuild> },
+      // v1 → v2: pad skillIds from 5 → 10 slots; seed learned arrays.
+      migrate: (persisted) => {
+        const p = (persisted ?? {}) as { builds?: Partial<Record<Side, CharacterBuild>> };
+        const builds: Record<Side, CharacterBuild> = {
+          A: p.builds?.A ?? defaultBuild("ยุนม่อ"),
+          B: p.builds?.B ?? defaultBuild("ผู้พิทักษ์"),
+        };
+        for (const side of ["A", "B"] as const) {
+          const b = builds[side];
+          const slots = Array.isArray(b.skillIds) ? [...b.skillIds] : [];
+          while (slots.length < 10) slots.push(null);
+          builds[side] = {
+            ...b,
+            skillIds: slots,
+            learnedSkillIds: b.learnedSkillIds ?? slots.filter((s): s is string => !!s),
+            learnedArtIds: b.learnedArtIds ?? (b.artId && b.artId !== "none" ? [b.artId] : []),
+            artLevels: b.artLevels ?? (b.artId && b.artId !== "none" ? { [b.artId]: b.artLevel } : {}),
+          };
+        }
+        return { builds };
+      },
     },
   ),
 );

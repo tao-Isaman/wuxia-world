@@ -9,6 +9,11 @@ import type {
 import { STAT_KEYS } from "./types";
 import { getSkill, getArt, getEquip } from "./data";
 import { effectiveMg } from "./leveling";
+import {
+  computeConflictFactors,
+  getStatusFactor,
+  type ConflictFactors,
+} from "./skill-conflict";
 import type { Equipment } from "./types";
 
 // Pure: base stats → derived combat stats.
@@ -101,33 +106,100 @@ export function getEquipBonus(loadout: EquipLoadout): EquipBonus {
   return b;
 }
 
-// Combine base stats + art-scaled stats + skill stat bonuses + equipment bonuses.
-export function combinedStats(build: CharacterBuild): StatBlock {
+function addScaledPartialStats(
+  target: StatBlock,
+  src: PartialStats,
+  factor: number,
+): void {
+  if (factor === 1) {
+    addPartialStats(target, src);
+    return;
+  }
+  if (factor <= 0) return;
+  for (const k of STAT_KEYS) {
+    const v = src[k];
+    if (v) target[k] += Math.floor(v * factor);
+  }
+}
+
+// Combine base stats + art-scaled stats + skill stat bonuses + equipment
+// bonuses. Reads from BOTH slotted skills and learned-but-unslotted skills
+// (everyone learned contributes their `st`). Same for arts. Conflict
+// factors halve / zero misaligned contributions per skill-conflict.ts.
+export function combinedStats(
+  build: CharacterBuild,
+  conflict?: ConflictFactors,
+): StatBlock {
   const out: StatBlock = { ...build.stats };
-  const art = getArt(build.artId);
-  if (art.id !== "none") {
-    const f = build.artLevel / 10;
+  const factors = conflict ?? computeConflictFactors(build, { getSkill, getArt });
+
+  // Active art — scaled by `artLevel`. Then learned arts (excluding the
+  // active one) — scaled by their per-art level (default 1).
+  const activeArt = getArt(build.artId);
+  if (activeArt.id !== "none") {
+    const f = (build.artLevel / 10) * getStatusFactor(activeArt, factors);
+    for (const k of STAT_KEYS) {
+      const v = activeArt.stats[k];
+      if (v) out[k] += Math.floor(v * f);
+    }
+  }
+  for (const aid of build.learnedArtIds ?? []) {
+    if (aid === build.artId) continue; // already counted
+    const art = getArt(aid);
+    if (!art || art.id === "none") continue;
+    const lv = build.artLevels?.[aid] ?? 1;
+    const f = (lv / 10) * getStatusFactor(art, factors);
     for (const k of STAT_KEYS) {
       const v = art.stats[k];
       if (v) out[k] += Math.floor(v * f);
     }
   }
+
+  // Slotted move skills — full contribution (modulated by conflict). Then
+  // learned-but-unslotted move skills — same shape, since the spec says
+  // "learn unlimited skills for gain base status".
+  const counted = new Set<string>();
   for (const sid of build.skillIds) {
+    if (!sid) continue;
+    counted.add(sid);
     const sk = getSkill(sid);
-    if (sk) addPartialStats(out, sk.st);
+    if (!sk) continue;
+    addScaledPartialStats(out, sk.st, getStatusFactor(sk, factors));
   }
+  for (const sid of build.learnedSkillIds ?? []) {
+    if (counted.has(sid)) continue;
+    const sk = getSkill(sid);
+    if (!sk) continue;
+    addScaledPartialStats(out, sk.st, getStatusFactor(sk, factors));
+  }
+
   addPartialStats(out, getEquipStatBonus(build.equipment));
   return out;
 }
 
 // Full derived stats including art HP/MP-per-level and equipment overlays.
 export function deriveAll(build: CharacterBuild): Derived {
-  const d = derive(combinedStats(build));
-  const art = getArt(build.artId);
-  if (art.id !== "none") {
-    d.HP += art.hL * build.artLevel;
-    d.MP += art.mL * build.artLevel;
+  const factors = computeConflictFactors(build, { getSkill, getArt });
+  const d = derive(combinedStats(build, factors));
+
+  // Active art HP/MP gain — scaled by conflict.
+  const activeArt = getArt(build.artId);
+  if (activeArt.id !== "none") {
+    const f = getStatusFactor(activeArt, factors);
+    d.HP += Math.floor(activeArt.hL * build.artLevel * f);
+    d.MP += Math.floor(activeArt.mL * build.artLevel * f);
   }
+  // Learned arts also chip in HP / MP — same scaling, with conflict.
+  for (const aid of build.learnedArtIds ?? []) {
+    if (aid === build.artId) continue;
+    const art = getArt(aid);
+    if (!art || art.id === "none") continue;
+    const lv = build.artLevels?.[aid] ?? 1;
+    const f = getStatusFactor(art, factors);
+    d.HP += Math.floor(art.hL * lv * f);
+    d.MP += Math.floor(art.mL * lv * f);
+  }
+
   const eb = getEquipBonus(build.equipment);
   d.Atk += eb.atk;
   d.PD += eb.pd;
@@ -142,18 +214,22 @@ export function deriveAll(build: CharacterBuild): Derived {
 export type MasteryMap = Partial<Record<WeaponFamily, number>>;
 
 // Weapon mastery: each equipped skill grants `mg` toward its weapon family,
-// scaled by the skill's current level (lv1 = 1×, lv10 = 2×). Cap is 200
-// per family. Mastery contributes ×(1 + mastery/200 * 0.5) damage.
+// scaled by the skill's current level (lv1 = 1×, lv10 = 2×) AND by any
+// conflict factor on the skill's type tags. Cap is 200 per family.
+// Mastery contributes ×(1 + mastery/200 * 0.5) damage.
 export function getMasteryMap(
   skillIds: (string | null)[],
   skillLevels?: Record<string, number>,
+  conflict?: ConflictFactors,
 ): MasteryMap {
   const out: MasteryMap = {};
   for (const sid of skillIds) {
     const sk = getSkill(sid);
     if (!sk || !sid) continue;
     const lv = skillLevels?.[sid];
-    const mg = effectiveMg(sk, typeof lv === "number" ? lv : 1);
+    const factor = conflict ? getStatusFactor(sk, conflict) : 1;
+    if (factor <= 0) continue;
+    const mg = effectiveMg(sk, typeof lv === "number" ? lv : 1) * factor;
     out[sk.w] = Math.min(200, (out[sk.w] ?? 0) + mg);
   }
   return out;
@@ -163,8 +239,9 @@ export function getWeaponMastery(
   skillIds: (string | null)[],
   weapon: WeaponFamily,
   skillLevels?: Record<string, number>,
+  conflict?: ConflictFactors,
 ): number {
-  return getMasteryMap(skillIds, skillLevels)[weapon] ?? 0;
+  return getMasteryMap(skillIds, skillLevels, conflict)[weapon] ?? 0;
 }
 
 export function totalStatPoints(stats: StatBlock): number {

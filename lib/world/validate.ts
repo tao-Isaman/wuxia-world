@@ -7,6 +7,7 @@ import { OPPONENTS_BY_ID } from "./data/opponents";
 import { RESOURCES_BY_ID } from "./data/resources";
 import { NPCS_BY_ID } from "./data/npcs";
 import { SKILLS_BY_ID } from "@/lib/game/data/skills";
+import { ARTS_BY_ID } from "@/lib/game/data/arts";
 import {
   deriveAll,
   SKILL_LEVEL_MAX,
@@ -202,5 +203,31 @@ export function validateAndRepair(state: WorldStateData): void {
   if (state.pendingSpar && !NPCS_BY_ID.has(state.pendingSpar.npcId)) {
     console.warn(`[world] clearing dangling pendingSpar for unknown npc "${state.pendingSpar.npcId}"`);
     state.pendingSpar = null;
+  }
+
+  // Build learn arrays — drop any unknown skill / art ids, dedupe, clamp
+  // levels into [1, 10]. Pad skillIds to 10 if a save came through with
+  // fewer (the migrate already does this for v8→v9 but a hand-edited save
+  // could still slip in shorter).
+  if (state.playerBuild) {
+    const b = state.playerBuild;
+    const slots = Array.isArray(b.skillIds) ? [...b.skillIds] : [];
+    while (slots.length < 10) slots.push(null);
+    const cleanSkills = (b.learnedSkillIds ?? []).filter((id) => SKILLS_BY_ID.has(id));
+    const dedupedSkills = Array.from(new Set(cleanSkills));
+    const cleanArts = (b.learnedArtIds ?? []).filter((id) => ARTS_BY_ID.has(id) && id !== "none");
+    const dedupedArts = Array.from(new Set(cleanArts));
+    const cleanLevels: Record<string, number> = {};
+    for (const [aid, lv] of Object.entries(b.artLevels ?? {})) {
+      if (!ARTS_BY_ID.has(aid)) continue;
+      cleanLevels[aid] = Math.max(1, Math.min(10, Math.floor(lv)));
+    }
+    state.playerBuild = {
+      ...b,
+      skillIds: slots,
+      learnedSkillIds: dedupedSkills,
+      learnedArtIds: dedupedArts,
+      artLevels: cleanLevels,
+    };
   }
 }

@@ -45,6 +45,25 @@ export {
   xpToNextLevel,
 } from "./leveling";
 export {
+  CONFLICT_MIN_LEARNED,
+  CONFLICT_THRESHOLD,
+  CONFLICT_HALF_FACTOR,
+  CONFLICT_ZERO_FACTOR,
+  computeConflictFactors,
+  effectiveTypes,
+  getStatusFactor,
+  type ConflictFactors,
+} from "./skill-conflict";
+export {
+  ART_SLOT_PREFIX,
+  parseSlotId,
+  encodeArtSlot,
+  isArtSlot,
+  firstArtSlotIndex,
+  placeInFirstEmpty,
+  type SlotInfo,
+} from "./slots";
+export {
   opposite,
   addBuff,
   addDebuff,

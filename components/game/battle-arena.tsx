@@ -13,6 +13,7 @@ import {
   hitPct,
   critPct,
   hpColor,
+  parseSlotId,
   type BattleState,
   type CharacterBuild,
   type Side,
@@ -260,12 +261,41 @@ export function BattleArena({ mode = "free", onContinue }: BattleArenaProps) {
             เลือกวิชา: <strong>{displayA.name}</strong>
           </p>
           <div className="flex gap-2 justify-center flex-wrap">
-            {displayA.skillIds.map((sid, i) => {
-              if (!sid) return null;
-              const sk = getSkill(sid);
-              if (!sk) return null;
+            {displayA.skillIds.map((raw, i) => {
+              if (!raw) return null;
+              const info = parseSlotId(raw);
+              if (!info) return null;
               const cd = state.cd.A[i];
               const onCd = cd > 0;
+
+              if (info.kind === "art") {
+                const art = info.art;
+                if (!art.act) return null;
+                const mpShort = state.mpA < art.act.c;
+                return (
+                  <Button
+                    key={i}
+                    size="sm"
+                    disabled={onCd || mpShort}
+                    onClick={() => useSkill(i)}
+                    className="flex-col h-auto py-2 min-w-[82px] bg-emerald-100 hover:bg-emerald-200 text-emerald-900 border border-emerald-700"
+                  >
+                    <span className="font-semibold text-xs">⚡ {art.act.n}</span>
+                    <span className="text-[9px]">
+                      MP {art.act.c}/{state.mpA}{" "}
+                      {onCd ? (
+                        <Badge variant="destructive" className="text-[8px] px-1 py-0">
+                          CD {cd}
+                        </Badge>
+                      ) : (
+                        <span>CD{art.act.cd}</span>
+                      )}
+                    </span>
+                  </Button>
+                );
+              }
+
+              const sk = info.skill;
               return (
                 <Button
                   key={i}

@@ -288,7 +288,7 @@ export function ProfilePopup({ open, onClose }: Props) {
         {/* ─── Move skills ─────────────────────────────────────────── */}
         <section className="border-t pt-3">
           <div className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground mb-2">
-            วิชาที่ฝึก (5 ช่อง)
+            วิชาที่ฝึก ({player.skillIds.length} ช่อง)
           </div>
           <div className="space-y-1.5">
             {player.skillIds.map((sid, i) => {

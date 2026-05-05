@@ -5,8 +5,12 @@ import { persist } from "zustand/middleware";
 import type { CharacterBuild, StatKey } from "@/lib/game";
 import {
   deriveAll,
+  encodeArtSlot,
   getEquip,
   getSkill,
+  isArtSlot,
+  parseSlotId,
+  placeInFirstEmpty,
   SKILL_LEVEL_MAX,
   STAT_KEYS,
   xpToNextLevel,
@@ -51,11 +55,14 @@ const STARTER_BUILD = (): CharacterBuild => ({
   stats: { STR: 1, AGI: 1, POW: 1, VIT: 1, DEX: 1, LUK: 1, DEF: 1, INT: 1 },
   artId: "none",
   artLevel: 1,
-  skillIds: ["basic_punch", null, null, null, null],
+  skillIds: ["basic_punch", null, null, null, null, null, null, null, null, null],
   equipment: {
     W: null, A: null, H: null, B: null,
     BR: [null, null], R: [null, null], C: [null, null],
   },
+  learnedSkillIds: ["basic_punch"],
+  learnedArtIds: [],
+  artLevels: {},
 });
 
 const STARTER_STAMINA = 100;
@@ -202,6 +209,13 @@ interface WorldStore extends WorldStateData {
   // one tier. The skill's own xp bar auto-levels on overflow without any
   // user action — no separate "level up via skill xp" button is needed.
   levelUpSkillFromWExp: (skillId: string) => LevelUpSkillResult;
+
+  // Equip a learned skill or art into a specific slot. `rawId` follows
+  // the slot encoding from `lib/game/slots.ts` — bare skill id or
+  // "art:<artId>". Pass null to clear the slot. Idempotent: assigning the
+  // same id to a slot it already occupies is a no-op; assigning to a new
+  // slot moves it (the old slot is cleared).
+  equipSlot: (slotIdx: number, rawId: string | null) => void;
 
   // NPC interactions. The popup calls these on click — they keep all the
   // state-mutation logic in the store so adding more interaction kinds
@@ -961,6 +975,25 @@ export const useWorldStore = create<WorldStore>()(
         return { ok: true, skillId, level: lv + 1, cost };
       },
 
+      equipSlot: (slotIdx, rawId) => {
+        const s = get();
+        if (!s.playerBuild) return;
+        const slots = [...s.playerBuild.skillIds];
+        if (slotIdx < 0 || slotIdx >= slots.length) return;
+        // Validate the id resolves before writing it in.
+        if (rawId !== null && !parseSlotId(rawId)) return;
+        // Move-not-duplicate: if the same id sits in another slot, clear it.
+        if (rawId) {
+          for (let i = 0; i < slots.length; i++) {
+            if (i !== slotIdx && slots[i] === rawId) slots[i] = null;
+          }
+        }
+        slots[slotIdx] = rawId;
+        set({
+          playerBuild: { ...s.playerBuild, skillIds: slots },
+        });
+      },
+
       meetNpc: (npcId) => {
         const s = get();
         if (!getNpc(npcId)) return;
@@ -1005,7 +1038,7 @@ export const useWorldStore = create<WorldStore>()(
     }),
     {
       name: "wusia-world-v1",
-      version: 8,
+      version: 9,
       // Only persist the data fields, not the action functions.
       partialize: (s) => ({
         hasGame: s.hasGame,
@@ -1047,8 +1080,50 @@ export const useWorldStore = create<WorldStore>()(
       //           start with all-zero traits and no NPC interactions.
       //   v7 → v8 added currentHp / currentMp. Existing players are seeded
       //           at full HP/MP from deriveAll(playerBuild).
+      //   v8 → v9 expanded skillIds 5 → 10 slots; added learnedSkillIds /
+      //           learnedArtIds / artLevels. Existing slotted skills + the
+      //           active art are seeded into the learned arrays.
       migrate: (persisted, fromVersion) => {
         const p = (persisted ?? {}) as Partial<WorldStateData>;
+        // Pad the build's skillIds to 10 and back-fill learned arrays.
+        if (p.playerBuild) {
+          const b = p.playerBuild as CharacterBuild;
+          const slots = Array.isArray(b.skillIds) ? [...b.skillIds] : [];
+          while (slots.length < 10) slots.push(null);
+          // learnedSkillIds: only count entries that are bare skill ids
+          // (skip "art:" prefixed entries, which would be art slots).
+          const learnedSkillIds =
+            b.learnedSkillIds ??
+            (slots.filter(
+              (s): s is string => typeof s === "string" && !s.startsWith("art:"),
+            ) as readonly string[]);
+          const learnedArtIds =
+            b.learnedArtIds ??
+            (b.artId && b.artId !== "none"
+              ? ([b.artId] as readonly string[])
+              : []);
+          const artLevels =
+            b.artLevels ??
+            (b.artId && b.artId !== "none"
+              ? { [b.artId]: b.artLevel }
+              : {});
+          // Auto-slot the legacy artId into a free slot so the player can
+          // actually use it under the new unified-slot system.
+          if (
+            b.artId &&
+            b.artId !== "none" &&
+            !slots.some((s) => s === encodeArtSlot(b.artId))
+          ) {
+            placeInFirstEmpty(slots, encodeArtSlot(b.artId));
+          }
+          p.playerBuild = {
+            ...b,
+            skillIds: slots,
+            learnedSkillIds,
+            learnedArtIds,
+            artLevels,
+          };
+        }
         const seedHpMp =
           p.playerBuild ? deriveAll(p.playerBuild as CharacterBuild) : null;
         const out: WorldStateData = {

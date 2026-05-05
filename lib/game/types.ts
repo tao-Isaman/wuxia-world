@@ -60,6 +60,39 @@ export const WEAPON_FAMILY_KEYS = [
 ] as const;
 export type WeaponFamily = (typeof WEAPON_FAMILY_KEYS)[number];
 
+// ─── Skill / art philosophical types ──────────────────────────────────
+// Three independent axes a skill or art can sit on. A skill may have one
+// tag per axis (or none). The `balance` tag is informational — it never
+// contributes to conflict counts, just like an absent tag wouldn't.
+//
+//   yin / yang        — passive vs aggressive philosophy
+//   hard / soft       — bone-shattering vs flowing redirection
+//   internal / external — qi-driven vs body-conditioned
+//   balance           — neutral on whichever axis it's listed on
+//
+// See lib/world/skill-conflict.ts for how counts and the > 60 % threshold
+// drive the half/zero base-status modifiers.
+export const SKILL_TYPE_KEYS = [
+  "yin",
+  "yang",
+  "balance",
+  "hard",
+  "soft",
+  "internal",
+  "external",
+] as const;
+export type SkillType = (typeof SKILL_TYPE_KEYS)[number];
+
+export const SKILL_TYPE_LABEL: Record<SkillType, string> = {
+  yin: "หยิน",
+  yang: "หยาง",
+  balance: "สมดุล",
+  hard: "แข็ง",
+  soft: "อ่อน",
+  internal: "ภายใน",
+  external: "ภายนอก",
+};
+
 export interface Tier {
   n: string;
   cd: number;
@@ -115,6 +148,9 @@ export interface Skill {
   se: SelfEffect | null;
   ee: EnemyEffect | null;
   d: string; // description
+  // Philosophical type tags. A skill may have zero, one, or several tags
+  // (one per axis). Used by the conflict system in lib/world/skill-conflict.ts.
+  types?: readonly SkillType[];
 }
 
 // ─── Internal energy art (ARTS table) ──────────────────────────────────
@@ -184,6 +220,9 @@ export interface Art {
   mL: number;
   act: ArtActive | null;
   pas: ArtPassive | null;
+  // Philosophical type tags. See SKILL_TYPE_KEYS above. When omitted, the
+  // engine derives them from the human-readable `tp` string at load time.
+  types?: readonly SkillType[];
 }
 
 // ─── Equipment (EQUIP table) ───────────────────────────────────────────
@@ -226,16 +265,33 @@ export interface EquipLoadout {
   C: [string | null, string | null];
 }
 
+export const SKILL_SLOT_COUNT = 10;
+
 export interface CharacterBuild {
   name: string;
   stats: StatBlock;
+  // Currently active inner art. Treated as the 11th "slot" for conflict-
+  // counting purposes. Future engine work may unify this into `skillIds`.
   artId: string; // 'none' = no internal energy
   artLevel: number; // 1..10
-  skillIds: (string | null)[]; // 5 slots
+  // Active move-skill slots. Currently 10 — empty slots are null.
+  skillIds: (string | null)[];
   equipment: EquipLoadout;
   // Per-skill level (1..10). Missing entries default to 1. Level scales the
   // skill's base power and the mastery it grants — see lib/game/leveling.ts.
+  skillIds_legacy?: never; // sentinel — reserved against accidental rename
   skillLevels?: Record<string, number>;
+  // All move skills the player has ever learned (slotted or not). Each
+  // contributes its `st` (stat bonus) to combinedStats, so learning more
+  // skills passively grows the character. Unlimited.
+  learnedSkillIds?: readonly string[];
+  // All inner arts the player has learned. Each contributes its scaled
+  // stats and HP/MP gains — same shape as the active art, but without the
+  // active/passive battle effects (only the stat side).
+  learnedArtIds?: readonly string[];
+  // Per-art level (1..10). Mirrors `skillLevels`. Missing entries default
+  // to the build's `artLevel` for the active art, or 1 for everything else.
+  artLevels?: Record<string, number>;
 }
 
 // ─── Live battle state ─────────────────────────────────────────────────

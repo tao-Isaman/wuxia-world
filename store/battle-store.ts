@@ -15,6 +15,7 @@ import {
   logLine,
   makeContext,
   makeInitialState,
+  parseSlotId,
   peekReadyActor,
   resolveArtActive,
   resolveSkill,
@@ -136,9 +137,15 @@ export const useBattleStore = create<BattleStore>((set, get) => {
       const { state, ctx, builds } = get();
       if (!state || !ctx || !builds || state.winner) return;
       if (state.phase !== "player") return;
-      const sid = builds.A.skillIds[slotIdx];
-      if (!sid || state.cd.A[slotIdx] > 0) return;
-      resolveSkill(state, "A", slotIdx, sid, ctx);
+      const raw = builds.A.skillIds[slotIdx];
+      if (!raw || state.cd.A[slotIdx] > 0) return;
+      const info = parseSlotId(raw);
+      if (!info) return;
+      if (info.kind === "skill") {
+        resolveSkill(state, "A", slotIdx, info.skill.id, ctx);
+      } else {
+        resolveArtActive(state, "A", ctx, { slotIdx, artId: info.art.id });
+      }
       if (!state.winner) drainToActor(state);
       set({ state: { ...state } });
       maybeScheduleEnemy();

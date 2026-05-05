@@ -111,7 +111,14 @@ export type SceneEffect =
   // Adjust a single NPC's relationship value. Used by quest scenes that
   // reward/penalise the player after talking, sparring, or completing a
   // delivery for a registered NPC.
-  | { t: "addNpcRelationship"; npcId: string; amount: number };
+  | { t: "addNpcRelationship"; npcId: string; amount: number }
+  // Add a move skill to the player's `learnedSkillIds`. Once learned, the
+  // skill contributes its `st` (stat bonus) and counts toward the type-
+  // conflict system. Slotting it for combat is a separate concern.
+  | { t: "learnSkill"; skillId: string }
+  // Add an inner art to the player's `learnedArtIds` and seed its level.
+  // Defaults to level 1 when omitted; same caveats as learnSkill.
+  | { t: "learnArt"; artId: string; level?: number };
 
 // ─── Conditions ────────────────────────────────────────────────────────
 

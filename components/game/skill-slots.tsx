@@ -54,7 +54,7 @@ export function SkillSlots({ side }: Props) {
   return (
     <section className="border-t pt-3 mt-3">
       <h3 className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground mb-2">
-        วิชาที่ฝึก (5 ช่อง)
+        วิชาที่ฝึก ({build.skillIds.length} ช่อง)
       </h3>
       <div className="space-y-1.5">
         {build.skillIds.map((cur, i) => {

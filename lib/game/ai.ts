@@ -2,6 +2,7 @@ import type { BattleState, Side } from "./types";
 import type { BattleContext } from "./battle";
 import { resolveArtActive, resolveSkill } from "./battle";
 import { getArt } from "./data";
+import { parseSlotId } from "./slots";
 
 // Simple AI: 20% prefer the IA active when available + affordable, otherwise
 // pick a random off-cooldown skill slot. Mirrors `doAI` in demo.html.
@@ -36,8 +37,18 @@ export function runAITurn(
     return false;
   }
   const slotIdx = available[Math.floor(Math.random() * available.length)];
-  const sid = slotSkillIds[slotIdx];
-  if (!sid) return false;
-  resolveSkill(state, side, slotIdx, sid, ctx);
+  const raw = slotSkillIds[slotIdx];
+  if (!raw) return false;
+  const info = parseSlotId(raw);
+  if (!info) return false;
+  if (info.kind === "skill") {
+    resolveSkill(state, side, slotIdx, info.skill.id, ctx);
+  } else {
+    // Art-slot: respect MP cost; bail if the AI can't afford it.
+    if (!info.art.act) return false;
+    const sideMp = side === "A" ? state.mpA : state.mpB;
+    if (sideMp < info.art.act.c) return false;
+    resolveArtActive(state, side, ctx, { slotIdx, artId: info.art.id });
+  }
   return true;
 }

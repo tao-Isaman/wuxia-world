@@ -15,6 +15,12 @@ import { hitPct, critPct, CRIT_MULTIPLIER } from "./damage";
 import { getArt, getEquip, getSkill, TIERS } from "./data";
 import { effectiveBp } from "./leveling";
 import {
+  computeConflictFactors,
+  getStatusFactor,
+  type ConflictFactors,
+} from "./skill-conflict";
+import { firstArtSlotIndex, parseSlotId } from "./slots";
+import {
   applyEnemyEffect,
   applySelfEffect,
   checkPassive,
@@ -36,21 +42,38 @@ export interface BattleContext {
   // skill's `bp` gets scaled by the level multiplier. Empty record → all
   // skills at level 1 (the nerfed baseline).
   skillLevels: Record<Side, Record<string, number>>;
+  // Conflict factors per side — drive the half/zero base-status modifiers
+  // when a side has too many opposing-type skills learned. See
+  // lib/game/skill-conflict.ts.
+  conflict: Record<Side, ConflictFactors>;
+}
+
+// Pick the "primary" art for a side: the first art slotted in slots wins,
+// otherwise fall back to the legacy `build.artId`. Powers ctx.artIds[side]
+// which the existing passive-trigger code reads to fire art passives.
+function primaryArtId(build: CharacterBuild): string {
+  const idx = firstArtSlotIndex(build.skillIds);
+  if (idx < 0) return build.artId;
+  const info = parseSlotId(build.skillIds[idx]);
+  return info && info.kind === "art" ? info.art.id : build.artId;
 }
 
 export function makeContext(buildA: CharacterBuild, buildB: CharacterBuild): BattleContext {
   const lvA = buildA.skillLevels ?? {};
   const lvB = buildB.skillLevels ?? {};
+  const conflictA = computeConflictFactors(buildA, { getSkill, getArt });
+  const conflictB = computeConflictFactors(buildB, { getSkill, getArt });
   return {
     names: { A: buildA.name, B: buildB.name },
-    artIds: { A: buildA.artId, B: buildB.artId },
+    artIds: { A: primaryArtId(buildA), B: primaryArtId(buildB) },
     weaponEquipIds: { A: buildA.equipment.W, B: buildB.equipment.W },
     equipBonus: { A: getEquipBonus(buildA.equipment), B: getEquipBonus(buildB.equipment) },
     masteries: {
-      A: getMasteryMap(buildA.skillIds, lvA),
-      B: getMasteryMap(buildB.skillIds, lvB),
+      A: getMasteryMap(buildA.skillIds, lvA, conflictA),
+      B: getMasteryMap(buildB.skillIds, lvB, conflictB),
     },
     skillLevels: { A: lvA, B: lvB },
+    conflict: { A: conflictA, B: conflictB },
   };
 }
 
@@ -85,7 +108,10 @@ export function makeInitialState(
       A: { buffs: [], debuffs: [], stk: 0 },
       B: { buffs: [], debuffs: [], stk: 0 },
     },
-    cd: { A: [0, 0, 0, 0, 0], B: [0, 0, 0, 0, 0] },
+    cd: {
+      A: new Array(buildA.skillIds.length).fill(0) as number[],
+      B: new Array(buildB.skillIds.length).fill(0) as number[],
+    },
     iaCD: { A: 0, B: 0 },
     skillUses: { A: {}, B: {} },
     hitsReceived: { A: 0, B: 0 },
@@ -217,9 +243,11 @@ export function calcSkillDamage(
   const mas = ctx.masteries[side][sk.w] ?? 0;
   const mm = 1 + (mas / 200) * 0.5;
 
-  // Damage formula. `bp` is scaled by the skill's level (lv1 → 50%, lv10 → 100%).
+  // Damage formula. `bp` is scaled by the skill's level (lv1 → 50%, lv10 → 100%)
+  // AND by any conflict factor on the skill's type tags (half / zero).
   const lv = ctx.skillLevels[side][sk.id];
-  const eBp = effectiveBp(sk, typeof lv === "number" ? lv : 1);
+  const conflictFactor = getStatusFactor(sk, ctx.conflict[side]);
+  const eBp = effectiveBp(sk, typeof lv === "number" ? lv : 1) * conflictFactor;
   const ta = sk.at === "phy" ? ad.PA : ad.IA * im;
   const se = eBp * (1 + sk.p / 100) + sk.f;
   const ed = Math.max(0, (sk.at === "phy" ? dd.PD : dd.ID) + fD - dR);
@@ -329,17 +357,27 @@ function skillTag(sk: Skill): string {
 }
 
 // ─── Internal-art active resolution ───
+//
+// `opts.slotIdx` makes the call slot-aware: cooldown lives in cd[slotIdx]
+// instead of the legacy iaCD[side]. `opts.artId` overrides ctx.artIds[side]
+// when a different art was slotted at that index. Both default to the
+// legacy single-art path so nothing changes for /debug or older callers.
 export function resolveArtActive(
   state: BattleState,
   side: Side,
   ctx: BattleContext,
+  opts?: { slotIdx?: number; artId?: string },
 ): boolean {
-  const art = getArt(ctx.artIds[side]);
+  const aid = opts?.artId ?? ctx.artIds[side];
+  const art = getArt(aid);
   if (!art.act) return false;
   const act = art.act;
 
-  if (state.iaCD[side] > 0) {
-    logLine(state, "lS", `[IA] ${ctx.names[side]}: กำลังภายใน CD ${state.iaCD[side]}`);
+  const slotIdx = opts?.slotIdx;
+  const onCd =
+    typeof slotIdx === "number" ? state.cd[side][slotIdx] : state.iaCD[side];
+  if (onCd > 0) {
+    logLine(state, "lS", `[IA] ${ctx.names[side]}: กำลังภายใน CD ${onCd}`);
     return false;
   }
   const mp = side === "A" ? state.mpA : state.mpB;
@@ -350,7 +388,8 @@ export function resolveArtActive(
 
   if (side === "A") state.mpA -= act.c;
   else state.mpB -= act.c;
-  state.iaCD[side] = act.cd;
+  if (typeof slotIdx === "number") state.cd[side][slotIdx] = act.cd;
+  else state.iaCD[side] = act.cd;
 
   state.turn++;
   tickEffects(state, ctx.equipBonus.A.hp_regen, ctx.equipBonus.B.hp_regen, ctx.names);
@@ -543,8 +582,9 @@ export function resolveArtActive(
     }
   }
 
-  const art2 = getArt(ctx.artIds[side]);
-  if (art2.pas?.tr === "use_act") checkPassive(state, side, ctx.artIds[side], "use_act", ctx.names);
+  // Fire the use_act passive for the art that was just activated (not the
+  // primary). If multiple arts are slotted, each uses its own passive set.
+  if (art.pas?.tr === "use_act") checkPassive(state, side, aid, "use_act", ctx.names);
 
   logLine(state, "lS", `&nbsp;A:${state.hA}/${state.dA.HP} · B:${state.hB}/${state.dB.HP}`);
   return true;
