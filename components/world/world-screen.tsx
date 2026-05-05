@@ -17,6 +17,7 @@ import { PlayerStatus } from "./player-status";
 import { StatusBar } from "./status-bar";
 import { MenuBar } from "./menu-bar";
 import { DebugOverlay } from "./debug-overlay";
+import { GameOverScreen } from "./game-over-screen";
 import { BattleArena } from "@/components/game/battle-arena";
 
 export function WorldScreen() {
@@ -30,6 +31,7 @@ export function WorldScreen() {
   const hasGame = useWorldStore((s) => s.hasGame);
   const currentSceneId = useWorldStore((s) => s.currentSceneId);
   const pendingBattle = useWorldStore((s) => s.pendingBattle);
+  const gameOver = useWorldStore((s) => s.gameOver);
   const acknowledge = useWorldStore((s) => s.acknowledgeBattleResult);
   const resetGame = useWorldStore((s) => s.resetGame);
   // Subscribe to battle state so the layout updates when winner is set / cleared.
@@ -55,6 +57,11 @@ export function WorldScreen() {
 
   if (!hasGame) {
     return <StartScreen />;
+  }
+
+  // Game over — player lost a fight. Only "เริ่มต้นใหม่" is available.
+  if (gameOver) {
+    return <GameOverScreen />;
   }
 
   // Active battle — render BattleArena inline. The bridge already started

@@ -95,4 +95,12 @@ export function validateAndRepair(state: WorldStateData): void {
       state.lifeSkillXp[k] = typeof v === "number" && v >= 0 ? v : 0;
     }
   }
+
+  // Game time invariants. Day must be ≥ 1; time normalised to [0, 12).
+  if (typeof state.day !== "number" || state.day < 1) state.day = 1;
+  if (typeof state.time !== "number" || state.time < 0) state.time = 0;
+  while (state.time >= 12) {
+    state.time -= 12;
+    state.day += 1;
+  }
 }

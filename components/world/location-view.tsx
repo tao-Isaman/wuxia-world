@@ -16,6 +16,7 @@ import {
   masteryLevel,
 } from "@/lib/world";
 import { useWorldStore, type GatherResult } from "@/store/world-store";
+import { RestPanel } from "./rest-panel";
 
 interface Props {
   scene: LocationScene;
@@ -42,7 +43,16 @@ export function LocationView({ scene }: Props) {
   const visibleRoutes = scene.routes.filter(
     (r) => !r.visibleIf || evaluateCondition(state, r.visibleIf),
   );
-  const resources = scene.resources ?? [];
+  const resources = (scene.resources ?? []).filter(
+    (r) => !r.visibleIf || evaluateCondition(state, r.visibleIf),
+  );
+
+  // Rest type by id prefix — inns / temples / palaces all give a rest panel.
+  const restKind: "inn" | "temple" | null = scene.id.startsWith("inn_")
+    ? "inn"
+    : scene.id.startsWith("temple_") || scene.id.startsWith("palace_")
+      ? "temple"
+      : null;
 
   return (
     <div className="space-y-3">
@@ -133,6 +143,8 @@ export function LocationView({ scene }: Props) {
           )}
         </CardContent>
       </Card>
+
+      {restKind && <RestPanel kind={restKind} />}
 
       {resources.length > 0 && (
         <Card>

@@ -301,6 +301,16 @@ export interface WorldStateData {
   // xp per life skill — mastery level is derived in lib/world/data/life-skills.
   lifeSkillXp: Record<LifeSkill, number>;
 
+  // Game time. Twelve ชั่วยาม per day; `time` is a fractional within-day
+  // counter (0 ≤ time < 12) that advances per action and rolls `day` over
+  // when it crosses 12.
+  day: number;
+  time: number;
+
+  // Set when the player loses a fight. The world UI swaps to a game-over
+  // screen and the only action available is "เริ่มใหม่" (resetGame).
+  gameOver: boolean;
+
   // Battle seam.
   pendingBattle: PendingBattle | null;
   // When a hunting gather kicks off a battle, the resource id is stashed

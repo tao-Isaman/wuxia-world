@@ -43,13 +43,22 @@ const STARTER_BUILD = (): CharacterBuild => ({
 });
 
 const STARTER_STAMINA = 100;
-const STAMINA_REGEN_PER_LEAF = 5;       // recovered each time the player walks into a location
 const HUNT_XP_MULT = 8;                 // hunting xp = 8 * resourceLevel (combat is risky)
 const GATHER_XP_MULT = 5;               // non-combat xp = 5 * resourceLevel
 const CRAFT_XP_MULT = 5;                // craft xp = 5 * recipe.requiredMastery
 const FAIL_XP_FRACTION = 0.5;           // failed drop checks still teach you — half xp
 // Sentinel mastery used for recipes with no skill — always passes the gate.
 const MAX_DUMMY_LEVEL = 99;
+
+// Game-time costs. `HOURS_PER_DAY` = 12 ชั่วยาม.
+const HOURS_PER_DAY = 12;
+const TRAVEL_HOURS = 0.5;
+const TRAVEL_STAMINA = 5;
+const ACTION_HOURS = 0.2;
+const FIGHT_HOURS = 0.5;
+const FIGHT_STAMINA = 5;
+const REST_HOURS = 12;
+const REST_INN_COST = 300;
 
 // Result of a gather attempt — surfaced so the UI can show a small banner.
 // On a fresh successful non-combat gather: type "yield". On hunting: type
@@ -93,6 +102,13 @@ export type PracticeMusicResult =
   | { ok: false; reason: "no-instrument" | "no-build" }
   | { ok: true; xpGained: number };
 
+// Three rest tiers — see plan above.
+export type RestKind = "inn" | "temple" | "route";
+
+export type RestResult =
+  | { ok: false; reason: "gold" }
+  | { ok: true; kind: RestKind; cost: number; restored: number };
+
 // Practice xp granted per "เล่นเพลง" click. Small so the loop isn't trivial
 // to grind — books and song books are the bigger xp source.
 const PRACTICE_MUSIC_XP = 10;
@@ -118,6 +134,7 @@ interface WorldStore extends WorldStateData {
   craftRecipe: (recipeId: string) => CraftResult;
   useItem: (itemId: string) => UseItemResult;
   practiceMusic: () => PracticeMusicResult;
+  rest: (kind: RestKind) => RestResult;
 
   // Debug helpers (dev-only consumers).
   _setFlag: (flag: string, value: boolean | number | string) => void;
@@ -139,22 +156,49 @@ const emptyData = (): WorldStateData => ({
   stamina: STARTER_STAMINA,
   staminaMax: STARTER_STAMINA,
   lifeSkillXp: emptyLifeSkillXp(),
+  day: 1,
+  time: 0,
   pendingBattle: null,
   pendingHuntYield: null,
+  gameOver: false,
 });
+
+// In-place time advance. Rolls `time` over each `HOURS_PER_DAY` and
+// increments `day`. Negative deltas are not supported (game time is one-way).
+function advanceTime(state: WorldStateData, hours: number): void {
+  if (hours <= 0) return;
+  let total = state.time + hours;
+  let day = state.day;
+  while (total >= HOURS_PER_DAY) {
+    total -= HOURS_PER_DAY;
+    day++;
+  }
+  state.time = total;
+  state.day = day;
+}
+
+// Charge the per-navigation cost (5 stamina + 0.5 ชั่วยาม) iff the target
+// is a route or location AND the player isn't just looping back where they
+// already are (dialog → same-location returns shouldn't punish ordinary
+// conversation flow).
+function chargeTravelIfNeeded(state: WorldStateData, targetSceneId: string): void {
+  if (state.currentSceneId === targetSceneId) return;
+  const sc = getScene(targetSceneId);
+  if (!sc) return;
+  if (sc.kind !== "route" && sc.kind !== "location") return;
+  state.stamina = Math.max(0, state.stamina - TRAVEL_STAMINA);
+  advanceTime(state, TRAVEL_HOURS);
+}
 
 // Walk through `next` pointers on dialog scenes. Stops at the first scene
 // that requires user input (any choices, route, or location). Updates
-// `lastLocationId` whenever it lands on a location, and ticks stamina regen
-// on each leaf entry (with a full reset at home_player).
+// `lastLocationId` whenever it lands on a location.
 function followAutoAdvance(state: WorldStateData): void {
   for (let i = 0; i < 32; i++) {
     const sc = getScene(state.currentSceneId);
     if (!sc) return;
     if (sc.kind === "location") {
-      const arrivedAtNewLeaf = state.lastLocationId !== state.currentSceneId;
       state.lastLocationId = state.currentSceneId;
-      if (arrivedAtNewLeaf) regenStaminaOnArrival(state);
       return; // locations wait for the player
     }
     if (sc.kind === "route") return; // routes wait for the player
@@ -167,14 +211,6 @@ function followAutoAdvance(state: WorldStateData): void {
   }
 }
 
-function regenStaminaOnArrival(state: WorldStateData): void {
-  if (state.currentSceneId === "home_player") {
-    state.stamina = state.staminaMax;
-    return;
-  }
-  state.stamina = Math.min(state.staminaMax, state.stamina + STAMINA_REGEN_PER_LEAF);
-}
-
 // Effects might end with `triggerBattle`, in which case we suspend navigation
 // (the battle-bridge will start the battle; acknowledgeBattleResult resumes).
 function takeChoice(state: WorldStateData, choice: Choice): void {
@@ -184,6 +220,9 @@ function takeChoice(state: WorldStateData, choice: Choice): void {
     // Battle suspends scene navigation; the onWin/onLose path overrides `next`.
     return;
   }
+  // Same-target navigation (closing a dialog back to where you stood) is free;
+  // a different route/location pays the travel cost.
+  chargeTravelIfNeeded(state, choice.next);
   state.currentSceneId = choice.next;
   const sc = getScene(state.currentSceneId);
   if (sc?.onEnter) applyEffects(state, sc.onEnter);
@@ -204,8 +243,11 @@ function draftFrom(s: WorldStateData): WorldStateData {
     stamina: s.stamina,
     staminaMax: s.staminaMax,
     lifeSkillXp: { ...s.lifeSkillXp },
+    day: s.day,
+    time: s.time,
     pendingBattle: s.pendingBattle,
     pendingHuntYield: s.pendingHuntYield,
+    gameOver: s.gameOver,
   };
 }
 
@@ -280,6 +322,7 @@ export const useWorldStore = create<WorldStore>()(
           return;
         }
         const draft = draftFrom(get());
+        chargeTravelIfNeeded(draft, sceneId);
         draft.currentSceneId = sceneId;
         const sc = getScene(sceneId);
         if (sc?.onEnter) applyEffects(draft, sc.onEnter);
@@ -292,6 +335,8 @@ export const useWorldStore = create<WorldStore>()(
         if (!s.lastLocationId) return;
         if (s.lastLocationId === s.currentSceneId) return;
         const draft = draftFrom(s);
+        // No travel cost — exiting a dialog back to where you already are
+        // isn't movement.
         draft.currentSceneId = draft.lastLocationId!;
         const sc = getScene(draft.currentSceneId);
         if (sc?.onEnter) applyEffects(draft, sc.onEnter);
@@ -307,14 +352,29 @@ export const useWorldStore = create<WorldStore>()(
         const battleState = useBattleStore.getState().state;
         const winner = battleState?.winner;
         if (!winner) return;
-        const dest = winner === "A" ? s.pendingBattle.onWin : s.pendingBattle.onLose;
 
-        // If a hunt was in flight, the win-side gets the spoils. Lose → nothing.
+        // Combat charges flat 5 stamina + 0.5 ชั่วยาม regardless of outcome.
         const draft = draftFrom(s);
+        draft.stamina = Math.max(0, draft.stamina - FIGHT_STAMINA);
+        advanceTime(draft, FIGHT_HOURS);
         draft.pendingBattle = null;
+
+        // Loss path → game over. The world UI freezes onto the game-over
+        // screen until the player picks เริ่มใหม่ (resetGame). All hunt
+        // yields are dropped on the floor — losing erases the haul.
+        if (winner !== "A") {
+          draft.pendingHuntYield = null;
+          draft.gameOver = true;
+          set({ ...draft });
+          useBattleStore.getState().reset();
+          return;
+        }
+
+        // Win path: drop hunt spoils if a hunt was in flight, then route
+        // to the encounter's onWin destination.
         const hunt = draft.pendingHuntYield;
         draft.pendingHuntYield = null;
-        if (winner === "A" && hunt) {
+        if (hunt) {
           const res = getResource(hunt.resourceId);
           if (res) {
             const lvl = masteryLevel(draft.lifeSkillXp[res.skill] ?? 0);
@@ -323,7 +383,7 @@ export const useWorldStore = create<WorldStore>()(
               draft.inventory[it.itemId] = (draft.inventory[it.itemId] ?? 0) + it.count;
             }
             // Win + drop-check pass = full xp; win + check-fail (carcass
-            // unusable) = half xp. Losing the battle gives no xp at all.
+            // unusable) = half xp.
             const xp = HUNT_XP_MULT * res.level;
             draft.lifeSkillXp[res.skill] =
               (draft.lifeSkillXp[res.skill] ?? 0) + (yieldRoll.passed ? xp : Math.floor(xp * FAIL_XP_FRACTION));
@@ -331,7 +391,7 @@ export const useWorldStore = create<WorldStore>()(
         }
         set({ ...draft });
         useBattleStore.getState().reset();
-        get().gotoScene(dest);
+        get().gotoScene(s.pendingBattle.onWin);
       },
 
       resetGame: () => {
@@ -354,6 +414,7 @@ export const useWorldStore = create<WorldStore>()(
             res.opponentIds[Math.floor(Math.random() * res.opponentIds.length)]!;
           const draft = draftFrom(s);
           draft.stamina = Math.max(0, draft.stamina - res.staminaCost);
+          advanceTime(draft, ACTION_HOURS);
           draft.pendingHuntYield = {
             resourceId: res.id,
             returnSceneId: s.currentSceneId,
@@ -375,6 +436,7 @@ export const useWorldStore = create<WorldStore>()(
         // an extra stamina hit only when the drop check fails.
         const draft = draftFrom(s);
         draft.stamina = Math.max(0, draft.stamina - res.staminaCost);
+        advanceTime(draft, ACTION_HOURS);
         const lvl = masteryLevel(draft.lifeSkillXp[res.skill] ?? 0);
         const successChance = gatherSuccessChance(lvl, res.level);
         const yieldRoll = rollResourceYield(res, lvl);
@@ -430,6 +492,7 @@ export const useWorldStore = create<WorldStore>()(
         }
 
         const draft = draftFrom(s);
+        advanceTime(draft, ACTION_HOURS);
         // Inputs are consumed regardless of drop-check outcome — failed
         // craft = ingredients lost, success = ingredients lost + output.
         for (const inp of r.inputs) {
@@ -480,6 +543,7 @@ export const useWorldStore = create<WorldStore>()(
         if (!def.use) return { ok: false, reason: "no-effect" };
 
         const draft = draftFrom(s);
+        advanceTime(draft, ACTION_HOURS);
         // Consume one count.
         const cur = draft.inventory[itemId] ?? 0;
         if (cur <= 1) delete draft.inventory[itemId];
@@ -503,9 +567,33 @@ export const useWorldStore = create<WorldStore>()(
         const w = getEquip(wId);
         if (!w?.instrument) return { ok: false, reason: "no-instrument" };
         const draft = draftFrom(s);
+        advanceTime(draft, ACTION_HOURS);
         draft.lifeSkillXp.music = (draft.lifeSkillXp.music ?? 0) + PRACTICE_MUSIC_XP;
         set({ ...draft });
         return { ok: true, xpGained: PRACTICE_MUSIC_XP };
+      },
+
+      rest: (kind) => {
+        const s = get();
+        const max = s.staminaMax;
+        let cost = 0;
+        let restored = 0;
+        if (kind === "inn") {
+          cost = REST_INN_COST;
+          restored = max;
+        } else if (kind === "temple") {
+          restored = Math.floor(max * 0.5);
+        } else {
+          // route
+          restored = Math.floor(max * 0.25);
+        }
+        if (s.gold < cost) return { ok: false, reason: "gold" };
+        const draft = draftFrom(s);
+        draft.gold -= cost;
+        draft.stamina = Math.min(max, draft.stamina + restored);
+        advanceTime(draft, REST_HOURS);
+        set({ ...draft });
+        return { ok: true, kind, cost, restored };
       },
 
       _setFlag: (flag, value) =>
@@ -515,7 +603,7 @@ export const useWorldStore = create<WorldStore>()(
     }),
     {
       name: "wusia-world-v1",
-      version: 3,
+      version: 4,
       // Only persist the data fields, not the action functions.
       partialize: (s) => ({
         hasGame: s.hasGame,
@@ -529,15 +617,17 @@ export const useWorldStore = create<WorldStore>()(
         stamina: s.stamina,
         staminaMax: s.staminaMax,
         lifeSkillXp: s.lifeSkillXp,
+        day: s.day,
+        time: s.time,
         pendingBattle: s.pendingBattle,
         pendingHuntYield: s.pendingHuntYield,
+        gameOver: s.gameOver,
       }),
       // Migrations:
-      //   v1 → v2 added stamina, staminaMax, lifeSkillXp (6 keys),
-      //            pendingHuntYield.
-      //   v2 → v3 grew lifeSkillXp from 6 → 17 keys (added cultural,
-      //            social, crafting families). Existing xp values are
-      //            preserved; missing keys default to 0.
+      //   v1 → v2 added stamina/staminaMax/lifeSkillXp(6)/pendingHuntYield.
+      //   v2 → v3 grew lifeSkillXp from 6 → 17 keys.
+      //   v3 → v4 added day/time. Both default to 1/0 — players returning
+      //           after this update find themselves on day 1 morning.
       migrate: (persisted, fromVersion) => {
         const p = (persisted ?? {}) as Partial<WorldStateData>;
         const out: WorldStateData = {
@@ -545,9 +635,11 @@ export const useWorldStore = create<WorldStore>()(
           ...p,
           stamina: typeof p.stamina === "number" ? p.stamina : STARTER_STAMINA,
           staminaMax: typeof p.staminaMax === "number" ? p.staminaMax : STARTER_STAMINA,
-          // Merge: empty defaults first, then any persisted values overlay.
           lifeSkillXp: { ...emptyLifeSkillXp(), ...(p.lifeSkillXp ?? {}) } as Record<LifeSkill, number>,
+          day: typeof p.day === "number" && p.day >= 1 ? p.day : 1,
+          time: typeof p.time === "number" && p.time >= 0 ? p.time : 0,
           pendingHuntYield: p.pendingHuntYield ?? null,
+          gameOver: p.gameOver === true,
         };
         void fromVersion;
         return out;

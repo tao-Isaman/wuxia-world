@@ -18,6 +18,8 @@ export function StatusBar() {
   const gold = useWorldStore((s) => s.gold);
   const stamina = useWorldStore((s) => s.stamina);
   const staminaMax = useWorldStore((s) => s.staminaMax);
+  const day = useWorldStore((s) => s.day);
+  const time = useWorldStore((s) => s.time);
 
   if (!player) return null;
 
@@ -61,6 +63,14 @@ export function StatusBar() {
           <div className="shrink-0 text-xs">
             <span className="text-muted-foreground">ทอง </span>
             <strong className="text-amber-600">{gold}</strong>
+          </div>
+
+          <div className="shrink-0 text-xs">
+            <span className="text-muted-foreground">วันที่ </span>
+            <strong>{day}</strong>
+            <span className="text-muted-foreground"> · ⌛ </span>
+            <strong className="font-mono">{time.toFixed(1)}</strong>
+            <span className="text-muted-foreground">/12</span>
           </div>
         </div>
       </CardContent>
