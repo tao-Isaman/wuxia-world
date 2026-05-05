@@ -19,6 +19,7 @@ import {
   useWorldStore,
   TRAVEL_STAMINA_COST,
   type GatherResult,
+  type RestKind,
 } from "@/store/world-store";
 import { RestPanel } from "./rest-panel";
 
@@ -51,12 +52,15 @@ export function LocationView({ scene }: Props) {
     (r) => !r.visibleIf || evaluateCondition(state, r.visibleIf),
   );
 
-  // Rest type by id prefix — inns / temples / palaces all give a rest panel.
-  const restKind: "inn" | "temple" | null = scene.id.startsWith("inn_")
+  // Rest tier by id prefix. Inns charge gold for a full restore, temples /
+  // palaces give a free half restore, and every other location falls back
+  // to the roadside tier so a player who runs out of stamina can never get
+  // permanently stuck.
+  const restKind: RestKind = scene.id.startsWith("inn_")
     ? "inn"
     : scene.id.startsWith("temple_") || scene.id.startsWith("palace_")
       ? "temple"
-      : null;
+      : "route";
 
   return (
     <div className="space-y-3">
@@ -151,7 +155,7 @@ export function LocationView({ scene }: Props) {
         </CardContent>
       </Card>
 
-      {restKind && <RestPanel kind={restKind} />}
+      <RestPanel kind={restKind} />
 
       {resources.length > 0 && (
         <Card>
