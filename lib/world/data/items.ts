@@ -6,6 +6,7 @@ export const ITEMS: readonly ItemDef[] = [
     id: "potion",
     name: "ยาเลือดเล็ก",
     description: "ยาฟื้นพลังชีวิต ใช้ในยามฉุกเฉิน",
+    use: { t: "heal", hp: 30 },
   },
   {
     id: "old_key",
@@ -54,9 +55,12 @@ export const ITEMS: readonly ItemDef[] = [
   { id: "fish_dragon", name: "ปลามังกร",         description: "ปลาในตำนาน มีเกล็ดสีรุ้ง พบได้น้อยมาก" },
 
   // ─── Herbalism ───────────────────────────────────────────────────────
-  { id: "ginseng",     name: "โสม",              description: "รากโสมสด ใช้ฟื้นพลังภายในและทำยาบำรุง" },
-  { id: "lotus_seed",  name: "เม็ดบัว",          description: "เม็ดบัวสด ใช้ทำยาฟื้นใจและล้างพิษ" },
-  { id: "snow_lotus",  name: "บัวหิมะ",          description: "บัวหิมะที่ขึ้นบนเขาสูง ของวิเศษหายาก" },
+  { id: "ginseng",     name: "โสม",              description: "รากโสมสด ใช้ฟื้นพลังภายในและทำยาบำรุง",
+    use: { t: "heal", mp: 50 } },
+  { id: "lotus_seed",  name: "เม็ดบัว",          description: "เม็ดบัวสด ใช้ทำยาฟื้นใจและล้างพิษ",
+    use: { t: "heal", mp: 30 } },
+  { id: "snow_lotus",  name: "บัวหิมะ",          description: "บัวหิมะที่ขึ้นบนเขาสูง ของวิเศษหายาก",
+    use: { t: "heal", hp: 80, mp: 80 } },
 
   // ─── Venom / poisonous fauna ─────────────────────────────────────────
   { id: "viper_venom",     name: "พิษงู",         description: "ของเหลวสีเขียวเข้ม สกัดจากเขี้ยวงูเห่า" },
@@ -66,7 +70,8 @@ export const ITEMS: readonly ItemDef[] = [
   // ─── Crafted intermediates ───────────────────────────────────────────
   { id: "iron_ingot",  name: "เหล็กแท่ง",        description: "เหล็กที่ถูกถลุงและตีเป็นแท่ง พร้อมขึ้นรูป" },
   { id: "leather",     name: "หนังฟอก",          description: "หนังสัตว์ที่ฟอกแล้ว เหมาะกับงานเย็บเสื้อหนัง" },
-  { id: "cooked_meat", name: "เนื้อย่าง",        description: "เนื้อสดที่ปรุงแล้ว เพิ่มแรงระหว่างเดินทาง" },
+  { id: "cooked_meat", name: "เนื้อย่าง",        description: "เนื้อสดที่ปรุงแล้ว เพิ่มแรงระหว่างเดินทาง",
+    use: { t: "heal", hp: 30 } },
 
   // ─── Crafting bases (paper / ink / silk) ─────────────────────────────
   { id: "paper",       name: "กระดาษสา",         description: "กระดาษพื้นเมือง ใช้สำหรับงานวาดและงานเขียน" },
@@ -124,14 +129,19 @@ export const ITEMS: readonly ItemDef[] = [
   { id: "jade_amulet", name: "เครื่องราง·หยก",    description: "เครื่องรางทำจากหยก" },
 
   // ─── Alchemy outputs ─────────────────────────────────────────────────
-  { id: "potion_mid",  name: "ยาเลือดกลาง",       description: "ยาฟื้นพลังชีวิตขั้นกลาง" },
-  { id: "potion_big",  name: "ยาเลือดใหญ่",       description: "ยาฟื้นพลังชีวิตขั้นสูง" },
+  { id: "potion_mid",  name: "ยาเลือดกลาง",       description: "ยาฟื้นพลังชีวิตขั้นกลาง",
+    use: { t: "heal", hp: 80 } },
+  { id: "potion_big",  name: "ยาเลือดใหญ่",       description: "ยาฟื้นพลังชีวิตขั้นสูง",
+    use: { t: "heal", hp: 200 } },
   { id: "poison_vial", name: "ขวดพิษ",            description: "ขวดพิษเข้มข้น ใช้กับงานลอบ" },
 
   // ─── Chef outputs ────────────────────────────────────────────────────
-  { id: "rice_dish",   name: "ข้าวหมูแดง",         description: "ข้าวจานเดียวเรียบง่าย กินแล้วฟื้นแรง" },
-  { id: "spicy_stew",  name: "ต้มยำเข้มข้น",       description: "ต้มยำเผ็ดร้อน เพิ่มแรงเดินทาง" },
-  { id: "moon_cake",   name: "ขนมไหว้พระจันทร์",   description: "ของหวานพื้นเมือง รสหวานหอม" },
+  { id: "rice_dish",   name: "ข้าวหมูแดง",         description: "ข้าวจานเดียวเรียบง่าย กินแล้วฟื้นแรง",
+    use: { t: "heal", hp: 40 } },
+  { id: "spicy_stew",  name: "ต้มยำเข้มข้น",       description: "ต้มยำเผ็ดร้อน เพิ่มแรงเดินทาง",
+    use: { t: "heal", hp: 60 } },
+  { id: "moon_cake",   name: "ขนมไหว้พระจันทร์",   description: "ของหวานพื้นเมือง รสหวานหอม",
+    use: { t: "heal", hp: 20 } },
 ];
 
 export const ITEMS_BY_ID = new Map<string, ItemDef>(ITEMS.map((i) => [i.id, i]));

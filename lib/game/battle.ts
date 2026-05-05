@@ -54,13 +54,28 @@ export function makeContext(buildA: CharacterBuild, buildB: CharacterBuild): Bat
   };
 }
 
-export function makeInitialState(buildA: CharacterBuild, buildB: CharacterBuild): BattleState {
+export interface InitialStateOpts {
+  // Override side-A starting HP/MP — used by the world to carry post-battle
+  // health into the next fight. Clamped into [0, max] from deriveAll(buildA).
+  hpA?: number;
+  mpA?: number;
+}
+
+export function makeInitialState(
+  buildA: CharacterBuild,
+  buildB: CharacterBuild,
+  opts: InitialStateOpts = {},
+): BattleState {
   const dA = deriveAll(buildA);
   const dB = deriveAll(buildB);
+  const startHpA =
+    typeof opts.hpA === "number" ? Math.max(0, Math.min(dA.HP, opts.hpA)) : dA.HP;
+  const startMpA =
+    typeof opts.mpA === "number" ? Math.max(0, Math.min(dA.MP, opts.mpA)) : dA.MP;
   return {
     dA, dB,
-    hA: dA.HP, hB: dB.HP,
-    mpA: dA.MP, mpB: dB.MP,
+    hA: startHpA, hB: dB.HP,
+    mpA: startMpA, mpB: dB.MP,
     gA: 0, gB: 0,
     turn: 0,
     log: [],

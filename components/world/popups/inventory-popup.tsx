@@ -114,7 +114,8 @@ export function InventoryPopup({ open, onClose }: Props) {
             <ul className="space-y-1.5">
               {items.map(([id, n]) => {
                 const def = getItem(id);
-                const consumable = def?.use?.t === "trainSkill";
+                const useEff = def?.use;
+                const consumable = !!useEff;
                 return (
                   <li
                     key={id}
@@ -123,9 +124,19 @@ export function InventoryPopup({ open, onClose }: Props) {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5 flex-wrap">
                         <strong>{def?.name ?? id}</strong>
-                        {consumable && def?.use?.t === "trainSkill" && (
+                        {useEff?.t === "trainSkill" && (
                           <Badge variant="outline" className="text-[9px]">
-                            ฝึก {LIFE_SKILL_LABEL[def.use.skill]} +{def.use.xp}
+                            ฝึก {LIFE_SKILL_LABEL[useEff.skill]} +{useEff.xp}
+                          </Badge>
+                        )}
+                        {useEff?.t === "heal" && (useEff.hp ?? 0) > 0 && (
+                          <Badge variant="outline" className="text-[9px] border-rose-400 text-rose-600">
+                            HP +{useEff.hp}
+                          </Badge>
+                        )}
+                        {useEff?.t === "heal" && (useEff.mp ?? 0) > 0 && (
+                          <Badge variant="outline" className="text-[9px] border-sky-400 text-sky-600">
+                            MP +{useEff.mp}
                           </Badge>
                         )}
                       </div>
@@ -143,10 +154,18 @@ export function InventoryPopup({ open, onClose }: Props) {
                           onClick={() => {
                             const r = consumeItem(id);
                             if (!r.ok) {
-                              setLastUsed("ใช้ไม่ได้");
+                              if (r.reason === "full") setLastUsed("HP / MP เต็มแล้ว ไม่ต้องใช้");
+                              else setLastUsed("ใช้ไม่ได้");
                               return;
                             }
-                            setLastUsed(`ฝึก ${LIFE_SKILL_LABEL[r.skill]} · +${r.xpGained} xp`);
+                            if (r.kind === "trainSkill") {
+                              setLastUsed(`ฝึก ${LIFE_SKILL_LABEL[r.skill]} · +${r.xpGained} xp`);
+                            } else if (r.kind === "heal") {
+                              const parts: string[] = [];
+                              if (r.hpHealed > 0) parts.push(`HP +${r.hpHealed}`);
+                              if (r.mpHealed > 0) parts.push(`MP +${r.mpHealed}`);
+                              setLastUsed(parts.length > 0 ? `ฟื้นพลัง: ${parts.join(" · ")}` : "ไม่มีพลังให้ฟื้น");
+                            }
                           }}
                         >
                           ใช้

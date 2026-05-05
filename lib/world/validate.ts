@@ -8,6 +8,7 @@ import { RESOURCES_BY_ID } from "./data/resources";
 import { NPCS_BY_ID } from "./data/npcs";
 import { SKILLS_BY_ID } from "@/lib/game/data/skills";
 import {
+  deriveAll,
   SKILL_LEVEL_MAX,
   SKILL_LEVEL_MIN,
   STAT_KEYS,
@@ -93,6 +94,20 @@ export function validateAndRepair(state: WorldStateData): void {
   if (typeof state.staminaMax !== "number" || state.staminaMax <= 0) state.staminaMax = 100;
   if (typeof state.stamina !== "number") state.stamina = state.staminaMax;
   state.stamina = Math.max(0, Math.min(state.staminaMax, state.stamina));
+
+  // HP / MP — clamp into [0, deriveAll max]. Reseed missing values to full
+  // when the player build is available so the bar reads right after a
+  // fresh hydrate.
+  if (state.playerBuild) {
+    const d = deriveAll(state.playerBuild);
+    if (typeof state.currentHp !== "number" || state.currentHp < 0) state.currentHp = d.HP;
+    if (typeof state.currentMp !== "number" || state.currentMp < 0) state.currentMp = d.MP;
+    state.currentHp = Math.min(d.HP, state.currentHp);
+    state.currentMp = Math.min(d.MP, state.currentMp);
+  } else {
+    state.currentHp = Math.max(0, state.currentHp ?? 0);
+    state.currentMp = Math.max(0, state.currentMp ?? 0);
+  }
 
   // Life-skill xp: ensure all six keys are present and non-negative.
   if (!state.lifeSkillXp || typeof state.lifeSkillXp !== "object") {

@@ -194,7 +194,9 @@ function PracticeTab() {
                           setLast("ใช้ไม่สำเร็จ");
                           return;
                         }
-                        setLast(`ฝึก ${LIFE_SKILL_LABEL[r.skill]} · +${r.xpGained} xp`);
+                        if (r.kind === "trainSkill") {
+                          setLast(`ฝึก ${LIFE_SKILL_LABEL[r.skill]} · +${r.xpGained} xp`);
+                        }
                       }}
                     >
                       ใช้

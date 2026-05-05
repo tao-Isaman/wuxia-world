@@ -4,6 +4,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { CharacterBuild, StatKey } from "@/lib/game";
 import {
+  deriveAll,
   getEquip,
   getSkill,
   SKILL_LEVEL_MAX,
@@ -113,10 +114,18 @@ export type CraftResult =
       dropCheck: "passed" | "failed" | "none";
     };
 
-// Result of using a consumable item (book, song book, image, etc.).
+// Result of using a consumable item (book, song book, image, potion, …).
+// Discriminated on `kind` so the UI can render different feedback per use.
 export type UseItemResult =
-  | { ok: false; reason: "unknown" | "missing" | "no-effect" }
-  | { ok: true; itemId: string; skill: LifeSkill; xpGained: number };
+  | { ok: false; reason: "unknown" | "missing" | "no-effect" | "no-build" | "full" }
+  | { ok: true; kind: "trainSkill"; itemId: string; skill: LifeSkill; xpGained: number }
+  | {
+      ok: true;
+      kind: "heal";
+      itemId: string;
+      hpHealed: number;
+      mpHealed: number;
+    };
 
 // Result of clicking the "เล่นเพลง" practice button.
 export type PracticeMusicResult =
@@ -226,6 +235,8 @@ const emptyData = (): WorldStateData => ({
   gold: 0,
   stamina: STARTER_STAMINA,
   staminaMax: STARTER_STAMINA,
+  currentHp: 0,
+  currentMp: 0,
   lifeSkillXp: emptyLifeSkillXp(),
   wExp: 0,
   skillLevel: {},
@@ -430,6 +441,8 @@ function draftFrom(s: WorldStateData): WorldStateData {
     gold: s.gold,
     stamina: s.stamina,
     staminaMax: s.staminaMax,
+    currentHp: s.currentHp,
+    currentMp: s.currentMp,
     lifeSkillXp: { ...s.lifeSkillXp },
     wExp: s.wExp,
     skillLevel: { ...s.skillLevel },
@@ -495,6 +508,12 @@ export const useWorldStore = create<WorldStore>()(
           if (sid) fresh.skillLevel[sid] = 1;
         }
         syncPlayerSkillLevels(fresh);
+        // Start at full HP / MP — both are derived from the player build's
+        // VIT / DEF / POW / INT and snapshotted here so the bar reads right
+        // before the player ever enters a fight.
+        const d = deriveAll(fresh.playerBuild);
+        fresh.currentHp = d.HP;
+        fresh.currentMp = d.MP;
         set({ ...fresh });
         // Run start scene's onEnter + auto-advance through any chained scenes.
         const draft = draftFrom(get());
@@ -567,6 +586,14 @@ export const useWorldStore = create<WorldStore>()(
         draft.stamina = Math.max(0, draft.stamina - FIGHT_STAMINA);
         advanceTime(draft, FIGHT_HOURS);
         draft.pendingBattle = null;
+        // Carry surviving HP / MP back into the world. Even on loss we copy
+        // — non-fatal sparring leaves the player with whatever HP they had
+        // at the final hit, fatal losses route to gameOver and the values
+        // get reset by `resetGame` anyway.
+        if (battleState) {
+          draft.currentHp = Math.max(0, battleState.hA);
+          draft.currentMp = Math.max(0, battleState.mpA);
+        }
 
         // Loss path. Fatal battles → game over (existing behaviour).
         // Non-fatal battles (sparring) → route to onLose, world resumes.
@@ -813,6 +840,20 @@ export const useWorldStore = create<WorldStore>()(
         if ((s.inventory[itemId] ?? 0) <= 0) return { ok: false, reason: "missing" };
         if (!def.use) return { ok: false, reason: "no-effect" };
 
+        // Pre-flight for heal items: refuse if both targets are already at
+        // max so the player doesn't waste a potion.
+        if (def.use.t === "heal") {
+          if (!s.playerBuild) return { ok: false, reason: "no-build" };
+          const d = deriveAll(s.playerBuild);
+          const hpRoom = Math.max(0, d.HP - s.currentHp);
+          const mpRoom = Math.max(0, d.MP - s.currentMp);
+          const wantsHp = (def.use.hp ?? 0) > 0;
+          const wantsMp = (def.use.mp ?? 0) > 0;
+          if ((!wantsHp || hpRoom === 0) && (!wantsMp || mpRoom === 0)) {
+            return { ok: false, reason: "full" };
+          }
+        }
+
         const draft = draftFrom(s);
         advanceTime(draft, ACTION_HOURS);
         // Consume one count.
@@ -830,7 +871,24 @@ export const useWorldStore = create<WorldStore>()(
           if (itemStat) grantStatXp(draft, itemStat, STAT_XP_PER_ACTION);
           rollLukXp(draft);
           set({ ...draft });
-          return { ok: true, itemId, skill: eff.skill, xpGained: eff.xp };
+          return { ok: true, kind: "trainSkill", itemId, skill: eff.skill, xpGained: eff.xp };
+        }
+        if (eff.t === "heal") {
+          // playerBuild was checked above for heal items.
+          const d = deriveAll(draft.playerBuild!);
+          const hpHealed =
+            eff.hp && eff.hp > 0
+              ? Math.min(d.HP - draft.currentHp, eff.hp)
+              : 0;
+          const mpHealed =
+            eff.mp && eff.mp > 0
+              ? Math.min(d.MP - draft.currentMp, eff.mp)
+              : 0;
+          draft.currentHp = Math.min(d.HP, draft.currentHp + hpHealed);
+          draft.currentMp = Math.min(d.MP, draft.currentMp + mpHealed);
+          rollLukXp(draft);
+          set({ ...draft });
+          return { ok: true, kind: "heal", itemId, hpHealed, mpHealed };
         }
         // Unknown effect t — fall through; no xp granted but item consumed.
         set({ ...draft });
@@ -858,20 +916,29 @@ export const useWorldStore = create<WorldStore>()(
         const s = get();
         const max = s.staminaMax;
         let cost = 0;
-        let restored = 0;
+        let pct = 0;
         if (kind === "inn") {
           cost = REST_INN_COST;
-          restored = max;
+          pct = 1;
         } else if (kind === "temple") {
-          restored = Math.floor(max * 0.5);
+          pct = 0.5;
         } else {
           // route
-          restored = Math.floor(max * 0.25);
+          pct = 0.25;
         }
         if (s.gold < cost) return { ok: false, reason: "gold" };
         const draft = draftFrom(s);
         draft.gold -= cost;
+        const restored = Math.floor(max * pct);
         draft.stamina = Math.min(max, draft.stamina + restored);
+        // Resting restores HP / MP at the same proportion as stamina —
+        // matches the existing "ฟื้นเต็ม / ½ / ¼" labels which were always
+        // meant to cover every pool, not stamina alone.
+        if (draft.playerBuild) {
+          const d = deriveAll(draft.playerBuild);
+          draft.currentHp = Math.min(d.HP, draft.currentHp + Math.floor(d.HP * pct));
+          draft.currentMp = Math.min(d.MP, draft.currentMp + Math.floor(d.MP * pct));
+        }
         advanceTime(draft, REST_HOURS);
         set({ ...draft });
         return { ok: true, kind, cost, restored };
@@ -938,7 +1005,7 @@ export const useWorldStore = create<WorldStore>()(
     }),
     {
       name: "wusia-world-v1",
-      version: 7,
+      version: 8,
       // Only persist the data fields, not the action functions.
       partialize: (s) => ({
         hasGame: s.hasGame,
@@ -951,6 +1018,8 @@ export const useWorldStore = create<WorldStore>()(
         gold: s.gold,
         stamina: s.stamina,
         staminaMax: s.staminaMax,
+        currentHp: s.currentHp,
+        currentMp: s.currentMp,
         lifeSkillXp: s.lifeSkillXp,
         wExp: s.wExp,
         skillLevel: s.skillLevel,
@@ -976,13 +1045,25 @@ export const useWorldStore = create<WorldStore>()(
       //           start with empty pools and grow stats from there.
       //   v6 → v7 added traits + npcStates + pendingSpar. Existing players
       //           start with all-zero traits and no NPC interactions.
+      //   v7 → v8 added currentHp / currentMp. Existing players are seeded
+      //           at full HP/MP from deriveAll(playerBuild).
       migrate: (persisted, fromVersion) => {
         const p = (persisted ?? {}) as Partial<WorldStateData>;
+        const seedHpMp =
+          p.playerBuild ? deriveAll(p.playerBuild as CharacterBuild) : null;
         const out: WorldStateData = {
           ...emptyData(),
           ...p,
           stamina: typeof p.stamina === "number" ? p.stamina : STARTER_STAMINA,
           staminaMax: typeof p.staminaMax === "number" ? p.staminaMax : STARTER_STAMINA,
+          currentHp:
+            typeof p.currentHp === "number" && p.currentHp >= 0
+              ? p.currentHp
+              : seedHpMp?.HP ?? 0,
+          currentMp:
+            typeof p.currentMp === "number" && p.currentMp >= 0
+              ? p.currentMp
+              : seedHpMp?.MP ?? 0,
           lifeSkillXp: { ...emptyLifeSkillXp(), ...(p.lifeSkillXp ?? {}) } as Record<LifeSkill, number>,
           wExp: typeof p.wExp === "number" && p.wExp >= 0 ? p.wExp : 0,
           skillLevel: p.skillLevel && typeof p.skillLevel === "object" ? { ...p.skillLevel } : {},

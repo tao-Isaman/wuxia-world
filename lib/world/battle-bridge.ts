@@ -43,7 +43,10 @@ export function ensureBattleStarted(): void {
     ws.clearPendingBattle();
     return;
   }
-  bs.start(ws.playerBuild, opp.build());
+  bs.start(ws.playerBuild, opp.build(), {
+    hpA: ws.currentHp,
+    mpA: ws.currentMp,
+  });
 }
 
 let initialized = false;

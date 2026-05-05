@@ -69,5 +69,6 @@ export {
   resolveArtActive,
   type BattleContext,
   type DamageResult,
+  type InitialStateOpts,
 } from "./battle";
 export { runAITurn } from "./ai";

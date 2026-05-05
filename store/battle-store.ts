@@ -21,6 +21,7 @@ import {
   runAITurn,
   tickGauges,
   type BattleContext,
+  type InitialStateOpts,
 } from "@/lib/game";
 
 interface BattleStore {
@@ -29,7 +30,7 @@ interface BattleStore {
   // Build references — kept so AI can read skill ids per slot.
   builds: Record<Side, CharacterBuild> | null;
 
-  start: (a: CharacterBuild, b: CharacterBuild) => void;
+  start: (a: CharacterBuild, b: CharacterBuild, opts?: InitialStateOpts) => void;
   reset: () => void;
 
   // UI animation tick — called from a requestAnimationFrame loop while
@@ -98,10 +99,16 @@ export const useBattleStore = create<BattleStore>((set, get) => {
     ctx: null,
     builds: null,
 
-    start: (a, b) => {
+    start: (a, b, opts) => {
       const ctx = makeContext(a, b);
-      const state = makeInitialState(a, b);
+      const state = makeInitialState(a, b, opts);
       logLine(state, "lS", "━━ เริ่มการต่อสู้ ━━");
+      if (typeof opts?.hpA === "number" && state.hA < state.dA.HP) {
+        logLine(state, "lS", `A เริ่มต้นด้วย HP ${state.hA}/${state.dA.HP}`);
+      }
+      if (typeof opts?.mpA === "number" && state.mpA < state.dA.MP) {
+        logLine(state, "lS", `A เริ่มต้นด้วย MP ${state.mpA}/${state.dA.MP}`);
+      }
       for (const [w, v] of Object.entries(getMasteryMap(a.skillIds, a.skillLevels))) {
         logLine(state, "lS", `A: ${w} ×${(1 + (v / 200) * 0.5).toFixed(2)}`);
       }

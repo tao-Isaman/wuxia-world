@@ -228,7 +228,10 @@ export interface ItemDef {
 }
 
 export type ItemUseEffect =
-  | { t: "trainSkill"; skill: LifeSkill; xp: number };
+  | { t: "trainSkill"; skill: LifeSkill; xp: number }
+  // Heal current HP and/or MP, capped at the player's deriveAll max. At
+  // least one of `hp` / `mp` must be > 0.
+  | { t: "heal"; hp?: number; mp?: number };
 
 // ─── Life skills ──────────────────────────────────────────────────────
 // Seventeen skills across four families. Each has its own xp pool and
@@ -378,6 +381,13 @@ export interface WorldStateData {
   // Activity / professions state.
   stamina: number;
   staminaMax: number;
+
+  // Combat persistence — HP / MP carry over between battles. Snapshotted
+  // from BattleState.hA / mpA on `acknowledgeBattleResult` and pushed back
+  // into the next battle's initial state via the bridge. Max values are
+  // computed live from `deriveAll(playerBuild)` and are not stored.
+  currentHp: number;
+  currentMp: number;
   // xp per life skill — mastery level is derived in lib/world/data/life-skills.
   lifeSkillXp: Record<LifeSkill, number>;
 

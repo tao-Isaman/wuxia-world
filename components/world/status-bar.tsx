@@ -18,6 +18,8 @@ export function StatusBar() {
   const gold = useWorldStore((s) => s.gold);
   const stamina = useWorldStore((s) => s.stamina);
   const staminaMax = useWorldStore((s) => s.staminaMax);
+  const currentHp = useWorldStore((s) => s.currentHp);
+  const currentMp = useWorldStore((s) => s.currentMp);
   const day = useWorldStore((s) => s.day);
   const time = useWorldStore((s) => s.time);
   const wExp = useWorldStore((s) => s.wExp);
@@ -25,8 +27,8 @@ export function StatusBar() {
   if (!player) return null;
 
   const d = deriveAll(player);
-  const hpCur = d.HP;
-  const mpCur = d.MP;
+  const hpCur = Math.min(d.HP, currentHp);
+  const mpCur = Math.min(d.MP, currentMp);
   const hpPct = d.HP > 0 ? (hpCur / d.HP) * 100 : 0;
   const mpPct = d.MP > 0 ? (mpCur / d.MP) * 100 : 0;
   const stPct = staminaMax > 0 ? (stamina / staminaMax) * 100 : 0;
