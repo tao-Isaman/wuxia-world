@@ -7,11 +7,12 @@ import type {
   Scene,
 } from "../types";
 
-// 84 locations from location.md (cities, sects, islands, terrain, caves,
-// temples/palaces, mansions, taverns, NPC homes, miscellaneous, plus one new
-// sect). Each leaf is a bare LocationScene with a description (Chinese name +
-// note from location.md) and a single "กลับสู่แผนที่" route back to the world
-// hub. Authors flesh these out by appending NPCs, additional routes, and
+// 85 locations: 83 from location.md (cities, sects, islands, terrain, caves,
+// temples/palaces, mansions, taverns, NPC homes, miscellaneous) plus one new
+// sect ("สำนักดาบโลหิต") and one new palace ("พระราชวังหลวง" beside the
+// capital). Each leaf is a bare LocationScene with a description (Chinese name
+// + note from location.md) and a single "กลับสู่แผนที่" route back to the
+// world hub. Authors flesh these out by appending NPCs, additional routes, and
 // onEnter effects directly to the leaf entries.
 //
 // Structure:
@@ -21,7 +22,7 @@ import type {
 //     ├─ cat_isles     → 10 islands
 //     ├─ cat_terrain   → 11 mountains/cliffs
 //     ├─ cat_caves     → 12 caves/valleys
-//     ├─ cat_temples   → 4 temples/palaces
+//     ├─ cat_temples   → 5 temples/palaces (incl. the new "พระราชวังหลวง")
 //     ├─ cat_mansions  → 4 mansions
 //     ├─ cat_inns      → 4 taverns
 //     ├─ cat_homes     → 11 NPC homes
@@ -141,12 +142,13 @@ const CAVES: LocationScene[] = [
   leaf("cave_zixiu", "ถ้ำฝึกวิทยายุทธ์", "自修山洞 · เฉพาะ JY Online"),
 ];
 
-// ─── Temples / palaces / fortresses (4) ──────────────────────────────
+// ─── Temples / palaces / fortresses (5) ──────────────────────────────
 const TEMPLES: LocationScene[] = [
   leaf("temple_dalun", "วิหารล้อลม", "大轮寺"),
   leaf("temple_tianning", "วิหารหลวงจีนสวรรค์", "天宁寺"),
   leaf("palace_zhongyang", "พระราชวังจงหยาง", "重阳宫 · ที่อยู่ฉวนเจินเจี้ยว"),
   leaf("city_lingxiao", "เมืองลิ้งเซียว", "凌霄城"),
+  leaf("palace_royal", "พระราชวังหลวง", "皇宫 · ที่ประทับขององค์จักรพรรดิ · ใจกลางอำนาจของแผ่นดิน · ติดกับนครหลวง"),
 ];
 
 // ─── Mansions / villas (4) ────────────────────────────────────────────
@@ -256,6 +258,7 @@ const HAND_EDGES: ReadonlyArray<readonly [string, string]> = [
   // Flagship cities link to nearby landmarks
   ["city_capital", "city_yangzhou"],
   ["city_capital", "inn_yuelai"],
+  ["city_capital", "palace_royal"], // พระราชวังหลวงตั้งอยู่ในนครหลวง
   ["city_yangzhou", "villa_meizhuang"], // ดงดอกท้อ (สี่อรหันต์) by 扬州
   ["city_xixia", "desert_ruins"], // ทะเลทราย near ซีเซี่ย
   ["tribe_huizu", "city_xixia"],
@@ -566,7 +569,7 @@ const WORLD_HUB: LocationScene = {
     { routeSceneId: "cat_isles", label: "🏝 เกาะ (10)", hint: "เกาะแก่งกลางมหาสมุทร" },
     { routeSceneId: "cat_terrain", label: "🏔 ภูเขาและหน้าผา (11)", hint: "เขาสูงและหน้าผาสำคัญ" },
     { routeSceneId: "cat_caves", label: "🕳 ถ้ำและหุบเขา (12)", hint: "ถ้ำลับและหุบเขาห่างไกล" },
-    { routeSceneId: "cat_temples", label: "🏛 วัด · วัง · ป้อม (4)", hint: "ศาสนสถานและที่หลวง" },
+    { routeSceneId: "cat_temples", label: "🏛 วัด · วัง · ป้อม (5)", hint: "ศาสนสถานและที่หลวง" },
     { routeSceneId: "cat_mansions", label: "🏠 คุ้มและคฤหาสน์ (4)", hint: "ตระกูลขุนนางในบู๊ลิ้ม" },
     { routeSceneId: "cat_inns", label: "🍵 โรงเตี๊ยม (4)", hint: "จุดพักการเดินทาง" },
     { routeSceneId: "cat_homes", label: "👤 บ้าน NPC (11)", hint: "บ้านของยอดยุทธในตำนาน" },
