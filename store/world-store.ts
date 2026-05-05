@@ -2,13 +2,20 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { CharacterBuild } from "@/lib/game";
+import type { CharacterBuild, StatKey } from "@/lib/game";
 import {
   getEquip,
   getSkill,
   SKILL_LEVEL_MAX,
+  STAT_KEYS,
   xpToNextLevel,
 } from "@/lib/game";
+import {
+  lukRollChance,
+  statFromLifeSkill,
+  STAT_XP_PER_ACTION,
+  xpToNextStatLevel,
+} from "@/lib/world/stat-progression";
 import { useBattleStore } from "@/store/battle-store";
 import {
   applyEffects,
@@ -167,10 +174,9 @@ interface WorldStore extends WorldStateData {
   practiceMusic: () => PracticeMusicResult;
   rest: (kind: RestKind) => RestResult;
 
-  // Move-skill progression. Either path advances a skill by one level —
-  // `levelUpSkillFromExp` consumes the skill's own xp pool, while
-  // `levelUpSkillFromWExp` spends from the global w-exp pool.
-  levelUpSkillFromExp: (skillId: string) => LevelUpSkillResult;
+  // Spend w-exp to skip the per-skill xp grind and level a move skill by
+  // one tier. The skill's own xp bar auto-levels on overflow without any
+  // user action — no separate "level up via skill xp" button is needed.
   levelUpSkillFromWExp: (skillId: string) => LevelUpSkillResult;
 
   // Debug helpers (dev-only consumers).
@@ -180,6 +186,9 @@ interface WorldStore extends WorldStateData {
 
 const emptyLifeSkillXp = (): Record<LifeSkill, number> =>
   Object.fromEntries(LIFE_SKILL_KEYS.map((k) => [k, 0])) as Record<LifeSkill, number>;
+
+const emptyStatExp = (): Record<StatKey, number> =>
+  Object.fromEntries(STAT_KEYS.map((k) => [k, 0])) as Record<StatKey, number>;
 
 const emptyData = (): WorldStateData => ({
   hasGame: false,
@@ -196,6 +205,7 @@ const emptyData = (): WorldStateData => ({
   wExp: 0,
   skillLevel: {},
   skillExp: {},
+  statExp: emptyStatExp(),
   day: 1,
   time: 0,
   pendingBattle: null,
@@ -211,6 +221,64 @@ function syncPlayerSkillLevels(state: WorldStateData): void {
     ...state.playerBuild,
     skillLevels: { ...state.skillLevel },
   };
+}
+
+// Auto-level a stat as many times as the accumulated xp allows. The cost
+// uses the player's *base* stat (build.stats[k]) — equipment / skill
+// bonuses are deliberately excluded so an item-stacked LUK can't make LUK
+// itself harder to grow. Mutates draft.playerBuild on each tier crossed.
+function applyStatLevelUps(state: WorldStateData, key: StatKey): void {
+  if (!state.playerBuild) return;
+  let build: CharacterBuild = state.playerBuild;
+  while (true) {
+    const base: number = build.stats[key];
+    const cost = xpToNextStatLevel(base);
+    const xp = state.statExp[key] ?? 0;
+    if (xp < cost) break;
+    build = {
+      ...build,
+      stats: { ...build.stats, [key]: base + 1 },
+    };
+    state.statExp[key] = xp - cost;
+  }
+  state.playerBuild = build;
+}
+
+// Bank stat xp + auto-level. Skips silently when there's no player build.
+function grantStatXp(state: WorldStateData, key: StatKey, amount: number): void {
+  if (amount <= 0) return;
+  if (!state.playerBuild) return;
+  state.statExp[key] = (state.statExp[key] ?? 0) + amount;
+  applyStatLevelUps(state, key);
+}
+
+// LUK roll on any qualifying action. The base chance is 10 %, +1 % per
+// current LUK, capped at 50 %. On pass, banks STAT_XP_PER_ACTION into the
+// LUK pool (which can itself level LUK and tighten the next roll).
+function rollLukXp(state: WorldStateData): void {
+  if (!state.playerBuild) return;
+  const base = state.playerBuild.stats.LUK;
+  if (Math.random() < lukRollChance(base)) {
+    grantStatXp(state, "LUK", STAT_XP_PER_ACTION);
+  }
+}
+
+// Auto-level a move skill while its xp pool allows. Caps at SKILL_LEVEL_MAX
+// and rolls overflow into the next tier (which will simply sit at 0 if the
+// skill is now max).
+function applySkillLevelUps(state: WorldStateData, skillId: string): void {
+  const sk = getSkill(skillId);
+  if (!sk) return;
+  while (true) {
+    const lv = state.skillLevel[skillId] ?? 1;
+    if (lv >= SKILL_LEVEL_MAX) break;
+    const cost = xpToNextLevel(sk, lv);
+    const xp = state.skillExp[skillId] ?? 0;
+    if (xp < cost) break;
+    state.skillLevel[skillId] = lv + 1;
+    state.skillExp[skillId] = xp - cost;
+  }
+  syncPlayerSkillLevels(state);
 }
 
 // In-place time advance. Rolls `time` over each `HOURS_PER_DAY` and
@@ -267,6 +335,9 @@ function chargeTravelIfNeeded(state: WorldStateData, targetSceneId: string): boo
   if (state.stamina < TRAVEL_STAMINA_COST) return false;
   state.stamina -= TRAVEL_STAMINA_COST;
   advanceTime(state, hours);
+  // Successful overworld travel — grant AGI xp + roll for LUK.
+  grantStatXp(state, "AGI", STAT_XP_PER_ACTION);
+  rollLukXp(state);
   return true;
 }
 
@@ -335,6 +406,7 @@ function draftFrom(s: WorldStateData): WorldStateData {
     wExp: s.wExp,
     skillLevel: { ...s.skillLevel },
     skillExp: { ...s.skillExp },
+    statExp: { ...s.statExp },
     day: s.day,
     time: s.time,
     pendingBattle: s.pendingBattle,
@@ -474,17 +546,38 @@ export const useWorldStore = create<WorldStore>()(
           return;
         }
 
-        // Win path: bank w-exp + per-skill xp from each move used in the fight,
-        // then drop hunt spoils if a hunt was in flight, then route to the
-        // encounter's onWin destination.
+        // Win path: bank w-exp + per-skill xp + stat xp from every move
+        // used and every hit taken, then drop hunt spoils if a hunt was in
+        // flight, then route to the encounter's onWin destination.
         draft.wExp = Math.max(0, draft.wExp + W_EXP_FIGHT_WIN);
         const uses = battleState?.skillUses?.A ?? {};
+        let actionTotal = 0;
         for (const [sid, count] of Object.entries(uses)) {
           if (typeof count !== "number" || count <= 0) continue;
-          if (!getSkill(sid)) continue;
+          const sk = getSkill(sid);
+          if (!sk) continue;
+          actionTotal += count;
           draft.skillExp[sid] = (draft.skillExp[sid] ?? 0) + count * SKILL_USE_XP;
           if (!(sid in draft.skillLevel)) draft.skillLevel[sid] = 1;
+          // Per-skill auto-level on overflow.
+          applySkillLevelUps(draft, sid);
+          // STR for physical attacks, POW for internal attacks. Non-attack
+          // skills (pure buffs / debuffs / heals) grant nothing here.
+          if (sk.at === "phy") {
+            grantStatXp(draft, "STR", count * STAT_XP_PER_ACTION);
+          } else if (sk.at === "int") {
+            grantStatXp(draft, "POW", count * STAT_XP_PER_ACTION);
+          }
         }
+        // DEF — one tick per incoming hit landed during the fight.
+        const hits = battleState?.hitsReceived?.A ?? 0;
+        if (hits > 0) {
+          grantStatXp(draft, "DEF", hits * STAT_XP_PER_ACTION);
+        }
+        // LUK — one roll per resolved player action plus per hit absorbed.
+        const lukRolls = actionTotal + hits;
+        for (let i = 0; i < lukRolls; i++) rollLukXp(draft);
+
         const hunt = draft.pendingHuntYield;
         draft.pendingHuntYield = null;
         if (hunt) {
@@ -571,6 +664,9 @@ export const useWorldStore = create<WorldStore>()(
         const xpGained = yieldRoll.passed ? fullXp : Math.floor(fullXp * FAIL_XP_FRACTION);
         draft.lifeSkillXp[res.skill] = (draft.lifeSkillXp[res.skill] ?? 0) + xpGained;
         draft.wExp += W_EXP_GATHER;
+        const statKey = statFromLifeSkill(res.skill);
+        if (statKey) grantStatXp(draft, statKey, STAT_XP_PER_ACTION);
+        rollLukXp(draft);
         set({ ...draft });
         return {
           ok: true,
@@ -639,6 +735,10 @@ export const useWorldStore = create<WorldStore>()(
           draft.lifeSkillXp[skill] = (draft.lifeSkillXp[skill] ?? 0) + xpGained;
         }
         draft.wExp += W_EXP_CRAFT;
+        // Hard crafts → DEX, cultural recipes (drawing / writing) → INT.
+        const craftStat = statFromLifeSkill(skill);
+        if (craftStat) grantStatXp(draft, craftStat, STAT_XP_PER_ACTION);
+        rollLukXp(draft);
         set({ ...draft });
         return {
           ok: true,
@@ -668,6 +768,11 @@ export const useWorldStore = create<WorldStore>()(
         if (eff.t === "trainSkill") {
           draft.lifeSkillXp[eff.skill] = (draft.lifeSkillXp[eff.skill] ?? 0) + eff.xp;
           draft.wExp += W_EXP_USE_ITEM;
+          // Cultural training items (book / song book / image / writing /
+          // chess) feed INT through the same skill→stat map.
+          const itemStat = statFromLifeSkill(eff.skill);
+          if (itemStat) grantStatXp(draft, itemStat, STAT_XP_PER_ACTION);
+          rollLukXp(draft);
           set({ ...draft });
           return { ok: true, itemId, skill: eff.skill, xpGained: eff.xp };
         }
@@ -686,6 +791,9 @@ export const useWorldStore = create<WorldStore>()(
         advanceTime(draft, ACTION_HOURS);
         draft.lifeSkillXp.music = (draft.lifeSkillXp.music ?? 0) + PRACTICE_MUSIC_XP;
         draft.wExp += W_EXP_PRACTICE_MUSIC;
+        // Music is a cultural action → INT.
+        grantStatXp(draft, "INT", STAT_XP_PER_ACTION);
+        rollLukXp(draft);
         set({ ...draft });
         return { ok: true, xpGained: PRACTICE_MUSIC_XP };
       },
@@ -713,24 +821,6 @@ export const useWorldStore = create<WorldStore>()(
         return { ok: true, kind, cost, restored };
       },
 
-      levelUpSkillFromExp: (skillId) => {
-        const s = get();
-        const sk = getSkill(skillId);
-        if (!sk) return { ok: false, reason: "unknown" };
-        const lv = s.skillLevel[skillId] ?? 1;
-        if (lv >= SKILL_LEVEL_MAX) return { ok: false, reason: "maxed" };
-        const cost = xpToNextLevel(sk, lv);
-        const xp = s.skillExp[skillId] ?? 0;
-        if (xp < cost) return { ok: false, reason: "insufficient" };
-
-        const draft = draftFrom(s);
-        draft.skillLevel[skillId] = lv + 1;
-        draft.skillExp[skillId] = xp - cost;
-        syncPlayerSkillLevels(draft);
-        set({ ...draft });
-        return { ok: true, skillId, level: lv + 1, cost };
-      },
-
       levelUpSkillFromWExp: (skillId) => {
         const s = get();
         const sk = getSkill(skillId);
@@ -755,7 +845,7 @@ export const useWorldStore = create<WorldStore>()(
     }),
     {
       name: "wusia-world-v1",
-      version: 5,
+      version: 6,
       // Only persist the data fields, not the action functions.
       partialize: (s) => ({
         hasGame: s.hasGame,
@@ -772,6 +862,7 @@ export const useWorldStore = create<WorldStore>()(
         wExp: s.wExp,
         skillLevel: s.skillLevel,
         skillExp: s.skillExp,
+        statExp: s.statExp,
         day: s.day,
         time: s.time,
         pendingBattle: s.pendingBattle,
@@ -785,6 +876,8 @@ export const useWorldStore = create<WorldStore>()(
       //           after this update find themselves on day 1 morning.
       //   v4 → v5 added wExp / skillLevel / skillExp. Existing skills default
       //           to level 1 (the new nerfed baseline) with empty xp pools.
+      //   v5 → v6 added statExp pools (one per StatKey). Existing players
+      //           start with empty pools and grow stats from there.
       migrate: (persisted, fromVersion) => {
         const p = (persisted ?? {}) as Partial<WorldStateData>;
         const out: WorldStateData = {
@@ -796,6 +889,7 @@ export const useWorldStore = create<WorldStore>()(
           wExp: typeof p.wExp === "number" && p.wExp >= 0 ? p.wExp : 0,
           skillLevel: p.skillLevel && typeof p.skillLevel === "object" ? { ...p.skillLevel } : {},
           skillExp: p.skillExp && typeof p.skillExp === "object" ? { ...p.skillExp } : {},
+          statExp: { ...emptyStatExp(), ...(p.statExp ?? {}) } as Record<StatKey, number>,
           day: typeof p.day === "number" && p.day >= 1 ? p.day : 1,
           time: typeof p.time === "number" && p.time >= 0 ? p.time : 0,
           pendingHuntYield: p.pendingHuntYield ?? null,

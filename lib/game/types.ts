@@ -295,4 +295,8 @@ export interface BattleState {
   // Per-side count of how many times each skill id was used this battle.
   // Read by the world store on battle end to grant per-skill exp.
   skillUses: { A: Record<string, number>; B: Record<string, number> };
+  // Per-side count of incoming hits landed (hitsReceived.A = times A was
+  // hit by B's attacks, regardless of damage). Used to grant DEF stat xp
+  // on battle end. Reflect damage does not count.
+  hitsReceived: { A: number; B: number };
 }

@@ -2,7 +2,7 @@
 // Discriminator field is `t` to match the existing engine convention
 // (lib/game/types.ts uses `t` on SelfEffect / EnemyEffect / ArtPassiveEffect).
 
-import type { CharacterBuild } from "@/lib/game";
+import type { CharacterBuild, StatKey } from "@/lib/game";
 
 // ─── Scenes ────────────────────────────────────────────────────────────
 // Three scene kinds, discriminated on `kind`:
@@ -304,13 +304,20 @@ export interface WorldStateData {
   // Move-skill progression. Every action (gather / craft / fight / etc.)
   // grants a bit of `wExp`, a global pool the player can spend to level up
   // any move skill. Each skill also has its own xp pool that fills only when
-  // that skill is used in battle. Either path levels the skill up; rarer
-  // skills (higher tier) need more xp per level.
+  // that skill is used in battle. Per-skill xp auto-levels the skill when
+  // it crosses the threshold; w-exp is a shortcut to skip ahead.
   wExp: number;
   // skillId → current level (defaults to 1 when missing).
   skillLevel: Record<string, number>;
   // skillId → accumulated xp toward the next level.
   skillExp: Record<string, number>;
+
+  // Passive stat progression. Each base stat has its own xp pool that
+  // accrues from a specific activity (STR from physical skills in battle,
+  // VIT from gathering, INT from cultural actions, etc.). When the pool
+  // crosses 50 × current_base_stat, the stat auto-levels by 1 and the xp
+  // overflow rolls into the next tier. See lib/world/stat-progression.ts.
+  statExp: Record<StatKey, number>;
 
   // Game time. Twelve ชั่วยาม per day; `time` is a fractional within-day
   // counter (0 ≤ time < 12) that advances per action and rolls `day` over

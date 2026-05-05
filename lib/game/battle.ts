@@ -73,6 +73,7 @@ export function makeInitialState(buildA: CharacterBuild, buildB: CharacterBuild)
     cd: { A: [0, 0, 0, 0, 0], B: [0, 0, 0, 0, 0] },
     iaCD: { A: 0, B: 0 },
     skillUses: { A: {}, B: {} },
+    hitsReceived: { A: 0, B: 0 },
   };
 }
 
@@ -256,6 +257,7 @@ export function resolveSkill(
     if (!res.hit) {
       logLine(state, cls, `[${state.turn}] ${nm} → <b>${skill.n}</b>${tag} <span style="color:#AAA">พลาด!</span> ${probe}`);
     } else {
+      state.hitsReceived[ds]++;
       if (ds === "A") state.hA = Math.max(0, state.hA - res.dmg);
       else state.hB = Math.max(0, state.hB - res.dmg);
 
@@ -372,6 +374,7 @@ export function resolveArtActive(
   const doAtkHit = (rawDmg: number, hc: { cp: number }) => {
     const crit = Math.random() * 100 < hc.cp;
     const dmg = Math.round(rawDmg * (crit ? CRIT_MULTIPLIER : 1));
+    state.hitsReceived[ds]++;
     if (ds === "A") state.hA = Math.max(0, state.hA - dmg);
     else state.hB = Math.max(0, state.hB - dmg);
     if (ref > 0) {

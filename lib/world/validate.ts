@@ -6,7 +6,12 @@ import { QUESTS_BY_ID } from "./data/quests";
 import { OPPONENTS_BY_ID } from "./data/opponents";
 import { RESOURCES_BY_ID } from "./data/resources";
 import { SKILLS_BY_ID } from "@/lib/game/data/skills";
-import { SKILL_LEVEL_MAX, SKILL_LEVEL_MIN } from "@/lib/game";
+import {
+  SKILL_LEVEL_MAX,
+  SKILL_LEVEL_MIN,
+  STAT_KEYS,
+  type StatKey,
+} from "@/lib/game";
 
 // Called from persist's onRehydrateStorage. Drops or repairs any references
 // to data ids that don't exist anymore (e.g., a scene was removed between
@@ -137,5 +142,15 @@ export function validateAndRepair(state: WorldStateData): void {
       ...state.playerBuild,
       skillLevels: { ...state.skillLevel },
     };
+  }
+
+  // Stat-progression pools — ensure all 8 keys are present and non-negative.
+  if (!state.statExp || typeof state.statExp !== "object") {
+    state.statExp = Object.fromEntries(STAT_KEYS.map((k) => [k, 0])) as Record<StatKey, number>;
+  } else {
+    for (const k of STAT_KEYS) {
+      const v = state.statExp[k];
+      state.statExp[k] = typeof v === "number" && v >= 0 ? v : 0;
+    }
   }
 }

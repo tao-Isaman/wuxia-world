@@ -31,7 +31,6 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
   const skillLevel = useWorldStore((s) => s.skillLevel);
   const skillExp = useWorldStore((s) => s.skillExp);
   const wExp = useWorldStore((s) => s.wExp);
-  const levelUpFromExp = useWorldStore((s) => s.levelUpSkillFromExp);
   const levelUpFromWExp = useWorldStore((s) => s.levelUpSkillFromWExp);
 
   if (!player) return null;
@@ -70,7 +69,6 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
           const eMg = Math.round(effectiveMg(sk, lv));
           const bpMul = Math.round(bpMultiplier(lv) * 100);
           const mgMul = Math.round(mgMultiplier(lv) * 100);
-          const canSkillExp = !maxed && xp >= cost;
           const canWExp = !maxed && wExp >= cost;
 
           return (
@@ -126,17 +124,10 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
                 </div>
               </div>
               {!maxed && (
-                <div className="flex gap-2 pt-1">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="text-[11px] h-7"
-                    disabled={!canSkillExp}
-                    onClick={() => levelUpFromExp(sid)}
-                    title={canSkillExp ? `ใช้ ${cost} xp ของวิชา` : `ต้องการ ${cost} xp`}
-                  >
-                    เลื่อนขั้นด้วย xp วิชา
-                  </Button>
+                <div className="flex items-center justify-between gap-2 pt-1">
+                  <span className="text-[10px] text-muted-foreground italic">
+                    เลื่อนขั้นเองเมื่อ xp เต็ม
+                  </span>
                   <Button
                     size="sm"
                     variant="outline"
@@ -145,7 +136,7 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
                     onClick={() => levelUpFromWExp(sid)}
                     title={canWExp ? `ใช้ ${cost} w-exp` : `ต้องการ ${cost} w-exp`}
                   >
-                    เลื่อนขั้นด้วย w-exp ({cost})
+                    เร่งด้วย w-exp ({cost})
                   </Button>
                 </div>
               )}

@@ -24,6 +24,7 @@ import {
 } from "@/lib/game";
 import type { EquipSlotType, Skill, StatKey, WeaponFamily } from "@/lib/game";
 import { useWorldStore } from "@/store/world-store";
+import { xpToNextStatLevel } from "@/lib/world/stat-progression";
 
 interface Props {
   open: boolean;
@@ -105,6 +106,7 @@ function describeEquip(id: string | null): string {
 export function ProfilePopup({ open, onClose }: Props) {
   const player = useWorldStore((s) => s.playerBuild);
   const gold = useWorldStore((s) => s.gold);
+  const statExp = useWorldStore((s) => s.statExp);
   if (!player) return null;
 
   const base = player.stats;
@@ -180,6 +182,9 @@ export function ProfilePopup({ open, onClose }: Props) {
               const b = base[k];
               const c = combined[k];
               const d = c - b;
+              const xp = statExp[k] ?? 0;
+              const cost = xpToNextStatLevel(b);
+              const xpPct = cost > 0 ? Math.min(100, Math.round((xp / cost) * 100)) : 0;
               return (
                 <div key={k} className="rounded bg-muted/40 px-2 py-1.5">
                   <div className="text-[9px] text-muted-foreground">
@@ -188,6 +193,12 @@ export function ProfilePopup({ open, onClose }: Props) {
                   <div className="text-xs font-semibold">
                     {c}
                     {d > 0 && <span className="text-[9px] text-emerald-600 ml-1">+{d}</span>}
+                  </div>
+                  <div className="mt-1 h-1 bg-muted rounded overflow-hidden" title={`${xp}/${cost} xp`}>
+                    <div className="h-full bg-primary" style={{ width: `${xpPct}%` }} />
+                  </div>
+                  <div className="text-[8px] text-muted-foreground mt-0.5 font-mono">
+                    {xp}/{cost}
                   </div>
                 </div>
               );
