@@ -21,6 +21,7 @@ import {
   applyEffects,
   gatherSuccessChance,
   getItem,
+  getNpc,
   getRecipe,
   getResource,
   getScene,
@@ -29,11 +30,13 @@ import {
   masteryLevel,
   pickWeighted,
   START_SCENE_ID,
+  TRAIT_KEYS,
   validateAndRepair,
   type Choice,
   type LifeSkill,
   type ResourceDef,
   type SceneEffect,
+  type TraitKey,
   type WorldStateData,
 } from "@/lib/world";
 
@@ -125,6 +128,18 @@ export type LevelUpSkillResult =
   | { ok: false; reason: "unknown" | "maxed" | "insufficient" }
   | { ok: true; skillId: string; level: number; cost: number };
 
+// Result of attempting to start a sparring match with a registered NPC.
+// `unsupported` means the NPC has no `sparOpponentId` configured; `pending`
+// means the player already has a battle queued.
+export type SparResult =
+  | { ok: false; reason: "unknown" | "unsupported" | "pending" }
+  | { ok: true; npcId: string; opponentId: string };
+
+// Generic post-spar landing scenes — all sparring routes here on
+// resolution. Authors don't need a per-NPC outcome scene.
+export const SPAR_WIN_SCENE_ID = "npc_spar_win";
+export const SPAR_LOSE_SCENE_ID = "npc_spar_lose";
+
 // Three rest tiers — see plan above.
 export type RestKind = "inn" | "temple" | "route";
 
@@ -179,6 +194,13 @@ interface WorldStore extends WorldStateData {
   // user action — no separate "level up via skill xp" button is needed.
   levelUpSkillFromWExp: (skillId: string) => LevelUpSkillResult;
 
+  // NPC interactions. The popup calls these on click — they keep all the
+  // state-mutation logic in the store so adding more interaction kinds
+  // (gifting, hiring, training) later means adding one method here, not
+  // pushing logic into the component.
+  meetNpc: (npcId: string) => void;
+  startSparWith: (npcId: string) => SparResult;
+
   // Debug helpers (dev-only consumers).
   _setFlag: (flag: string, value: boolean | number | string) => void;
   _giveGold: (amount: number) => void;
@@ -189,6 +211,9 @@ const emptyLifeSkillXp = (): Record<LifeSkill, number> =>
 
 const emptyStatExp = (): Record<StatKey, number> =>
   Object.fromEntries(STAT_KEYS.map((k) => [k, 0])) as Record<StatKey, number>;
+
+const emptyTraits = (): Record<TraitKey, number> =>
+  Object.fromEntries(TRAIT_KEYS.map((k) => [k, 0])) as Record<TraitKey, number>;
 
 const emptyData = (): WorldStateData => ({
   hasGame: false,
@@ -206,10 +231,13 @@ const emptyData = (): WorldStateData => ({
   skillLevel: {},
   skillExp: {},
   statExp: emptyStatExp(),
+  traits: emptyTraits(),
+  npcStates: {},
   day: 1,
   time: 0,
   pendingBattle: null,
   pendingHuntYield: null,
+  pendingSpar: null,
   gameOver: false,
 });
 
@@ -407,10 +435,13 @@ function draftFrom(s: WorldStateData): WorldStateData {
     skillLevel: { ...s.skillLevel },
     skillExp: { ...s.skillExp },
     statExp: { ...s.statExp },
+    traits: { ...s.traits },
+    npcStates: { ...s.npcStates },
     day: s.day,
     time: s.time,
     pendingBattle: s.pendingBattle,
     pendingHuntYield: s.pendingHuntYield,
+    pendingSpar: s.pendingSpar,
     gameOver: s.gameOver,
   };
 }
@@ -520,7 +551,8 @@ export const useWorldStore = create<WorldStore>()(
 
       canTravelTo: (sceneId) => canAffordTravelTo(get(), sceneId),
 
-      clearPendingBattle: () => set({ pendingBattle: null, pendingHuntYield: null }),
+      clearPendingBattle: () =>
+        set({ pendingBattle: null, pendingHuntYield: null, pendingSpar: null }),
 
       acknowledgeBattleResult: () => {
         const s = get();
@@ -529,17 +561,24 @@ export const useWorldStore = create<WorldStore>()(
         const winner = battleState?.winner;
         if (!winner) return;
 
+        const pb = s.pendingBattle;
         // Combat charges flat 5 stamina + 0.5 ชั่วยาม regardless of outcome.
         const draft = draftFrom(s);
         draft.stamina = Math.max(0, draft.stamina - FIGHT_STAMINA);
         advanceTime(draft, FIGHT_HOURS);
         draft.pendingBattle = null;
 
-        // Loss path → game over. The world UI freezes onto the game-over
-        // screen until the player picks เริ่มใหม่ (resetGame). All hunt
-        // yields are dropped on the floor — losing erases the haul.
+        // Loss path. Fatal battles → game over (existing behaviour).
+        // Non-fatal battles (sparring) → route to onLose, world resumes.
         if (winner !== "A") {
           draft.pendingHuntYield = null;
+          if (pb.nonFatal) {
+            draft.pendingSpar = null;
+            set({ ...draft });
+            useBattleStore.getState().reset();
+            get().gotoScene(pb.onLose);
+            return;
+          }
           draft.gameOver = true;
           set({ ...draft });
           useBattleStore.getState().reset();
@@ -577,6 +616,23 @@ export const useWorldStore = create<WorldStore>()(
         // LUK — one roll per resolved player action plus per hit absorbed.
         const lukRolls = actionTotal + hits;
         for (let i = 0; i < lukRolls; i++) rollLukXp(draft);
+
+        // Sparring victory → grant ชื่อเสียง and bump the NPC's relationship
+        // a touch (winning a friendly match earns respect, not enmity).
+        const spar = draft.pendingSpar;
+        draft.pendingSpar = null;
+        if (spar) {
+          const reward = Math.max(0, spar.fameReward);
+          if (reward > 0) {
+            draft.traits.fame = (draft.traits.fame ?? 0) + reward;
+          }
+          const entry = draft.npcStates[spar.npcId] ?? {};
+          draft.npcStates[spar.npcId] = {
+            ...entry,
+            met: true,
+            relationship: (entry.relationship ?? 0) + 1,
+          };
+        }
 
         const hunt = draft.pendingHuntYield;
         draft.pendingHuntYield = null;
@@ -838,6 +894,43 @@ export const useWorldStore = create<WorldStore>()(
         return { ok: true, skillId, level: lv + 1, cost };
       },
 
+      meetNpc: (npcId) => {
+        const s = get();
+        if (!getNpc(npcId)) return;
+        const entry = s.npcStates[npcId];
+        if (entry?.met) return;
+        set({
+          npcStates: {
+            ...s.npcStates,
+            [npcId]: { ...(entry ?? {}), met: true },
+          },
+        });
+      },
+
+      startSparWith: (npcId) => {
+        const s = get();
+        if (s.pendingBattle) return { ok: false, reason: "pending" };
+        const npc = getNpc(npcId);
+        if (!npc) return { ok: false, reason: "unknown" };
+        if (!npc.sparOpponentId) return { ok: false, reason: "unsupported" };
+
+        const fameReward = Math.max(0, npc.sparFameReward ?? 0);
+        const draft = draftFrom(s);
+        // Mark the player as having met this NPC even if they back out — a
+        // sparring offer counts as an introduction.
+        const entry = draft.npcStates[npcId] ?? {};
+        draft.npcStates[npcId] = { ...entry, met: true };
+        draft.pendingSpar = { npcId, fameReward };
+        draft.pendingBattle = {
+          opponentId: npc.sparOpponentId,
+          onWin: SPAR_WIN_SCENE_ID,
+          onLose: SPAR_LOSE_SCENE_ID,
+          nonFatal: true,
+        };
+        set({ ...draft });
+        return { ok: true, npcId, opponentId: npc.sparOpponentId };
+      },
+
       _setFlag: (flag, value) =>
         set((s) => ({ flags: { ...s.flags, [flag]: value } })),
 
@@ -845,7 +938,7 @@ export const useWorldStore = create<WorldStore>()(
     }),
     {
       name: "wusia-world-v1",
-      version: 6,
+      version: 7,
       // Only persist the data fields, not the action functions.
       partialize: (s) => ({
         hasGame: s.hasGame,
@@ -863,10 +956,13 @@ export const useWorldStore = create<WorldStore>()(
         skillLevel: s.skillLevel,
         skillExp: s.skillExp,
         statExp: s.statExp,
+        traits: s.traits,
+        npcStates: s.npcStates,
         day: s.day,
         time: s.time,
         pendingBattle: s.pendingBattle,
         pendingHuntYield: s.pendingHuntYield,
+        pendingSpar: s.pendingSpar,
         gameOver: s.gameOver,
       }),
       // Migrations:
@@ -878,6 +974,8 @@ export const useWorldStore = create<WorldStore>()(
       //           to level 1 (the new nerfed baseline) with empty xp pools.
       //   v5 → v6 added statExp pools (one per StatKey). Existing players
       //           start with empty pools and grow stats from there.
+      //   v6 → v7 added traits + npcStates + pendingSpar. Existing players
+      //           start with all-zero traits and no NPC interactions.
       migrate: (persisted, fromVersion) => {
         const p = (persisted ?? {}) as Partial<WorldStateData>;
         const out: WorldStateData = {
@@ -890,9 +988,12 @@ export const useWorldStore = create<WorldStore>()(
           skillLevel: p.skillLevel && typeof p.skillLevel === "object" ? { ...p.skillLevel } : {},
           skillExp: p.skillExp && typeof p.skillExp === "object" ? { ...p.skillExp } : {},
           statExp: { ...emptyStatExp(), ...(p.statExp ?? {}) } as Record<StatKey, number>,
+          traits: { ...emptyTraits(), ...(p.traits ?? {}) } as Record<TraitKey, number>,
+          npcStates: p.npcStates && typeof p.npcStates === "object" ? { ...p.npcStates } : {},
           day: typeof p.day === "number" && p.day >= 1 ? p.day : 1,
           time: typeof p.time === "number" && p.time >= 0 ? p.time : 0,
           pendingHuntYield: p.pendingHuntYield ?? null,
+          pendingSpar: p.pendingSpar ?? null,
           gameOver: p.gameOver === true,
         };
         void fromVersion;

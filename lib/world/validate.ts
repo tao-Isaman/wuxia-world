@@ -1,10 +1,11 @@
-import type { LifeSkill, WorldStateData } from "./types";
-import { LIFE_SKILL_KEYS } from "./types";
+import type { LifeSkill, TraitKey, WorldStateData } from "./types";
+import { LIFE_SKILL_KEYS, TRAIT_KEYS } from "./types";
 import { SCENES_BY_ID, START_SCENE_ID } from "./data/scenes";
 import { ITEMS_BY_ID } from "./data/items";
 import { QUESTS_BY_ID } from "./data/quests";
 import { OPPONENTS_BY_ID } from "./data/opponents";
 import { RESOURCES_BY_ID } from "./data/resources";
+import { NPCS_BY_ID } from "./data/npcs";
 import { SKILLS_BY_ID } from "@/lib/game/data/skills";
 import {
   SKILL_LEVEL_MAX,
@@ -152,5 +153,39 @@ export function validateAndRepair(state: WorldStateData): void {
       const v = state.statExp[k];
       state.statExp[k] = typeof v === "number" && v >= 0 ? v : 0;
     }
+  }
+
+  // Character traits — ensure every trait key is present and non-negative.
+  if (!state.traits || typeof state.traits !== "object") {
+    state.traits = Object.fromEntries(TRAIT_KEYS.map((k) => [k, 0])) as Record<TraitKey, number>;
+  } else {
+    for (const k of TRAIT_KEYS) {
+      const v = state.traits[k];
+      state.traits[k] = typeof v === "number" && v >= 0 ? v : 0;
+    }
+  }
+
+  // NPC state — drop entries for NPCs that are no longer in the registry,
+  // and clamp relationship to a sane numeric.
+  if (!state.npcStates || typeof state.npcStates !== "object") {
+    state.npcStates = {};
+  } else {
+    for (const id of Object.keys(state.npcStates)) {
+      if (!NPCS_BY_ID.has(id)) {
+        console.warn(`[world] dropping unknown npc state "${id}"`);
+        delete state.npcStates[id];
+        continue;
+      }
+      const e = state.npcStates[id];
+      if (e && typeof e.relationship !== "number") {
+        state.npcStates[id] = { ...e, relationship: 0 };
+      }
+    }
+  }
+
+  // pendingSpar — clear if the NPC was removed from the registry.
+  if (state.pendingSpar && !NPCS_BY_ID.has(state.pendingSpar.npcId)) {
+    console.warn(`[world] clearing dangling pendingSpar for unknown npc "${state.pendingSpar.npcId}"`);
+    state.pendingSpar = null;
   }
 }

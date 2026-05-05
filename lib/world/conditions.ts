@@ -14,6 +14,18 @@ export function evaluateCondition(state: WorldStateData, c: Condition): boolean 
     }
     case "questStatus":
       return getQuestStatus(state, c.questId) === c.status;
+    case "trait": {
+      const v = state.traits[c.trait] ?? 0;
+      if (c.min !== undefined && v < c.min) return false;
+      if (c.max !== undefined && v > c.max) return false;
+      return true;
+    }
+    case "npcRelationship": {
+      const v = state.npcStates[c.npcId]?.relationship ?? 0;
+      if (c.min !== undefined && v < c.min) return false;
+      if (c.max !== undefined && v > c.max) return false;
+      return true;
+    }
     case "and":
       return c.all.every((sub) => evaluateCondition(state, sub));
     case "or":

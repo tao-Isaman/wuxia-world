@@ -101,10 +101,17 @@ export type SceneEffect =
   | { t: "startQuest"; questId: string }
   | { t: "advanceQuest"; questId: string }
   | { t: "finishQuest"; questId: string; success: boolean }
-  | { t: "triggerBattle"; opponentId: string; onWin: string; onLose: string }
+  | { t: "triggerBattle"; opponentId: string; onWin: string; onLose: string; nonFatal?: boolean }
   | { t: "goto"; sceneId: string }
   | { t: "gotoRandom"; sceneIds: string[] }
-  | { t: "rollRandomEvent" };
+  | { t: "rollRandomEvent" }
+  // Adjust a character trait (good / evil / arrogance / humility / fame).
+  // Negative `amount` removes — clamped to 0 by the dispatcher.
+  | { t: "addTrait"; trait: TraitKey; amount: number }
+  // Adjust a single NPC's relationship value. Used by quest scenes that
+  // reward/penalise the player after talking, sparring, or completing a
+  // delivery for a registered NPC.
+  | { t: "addNpcRelationship"; npcId: string; amount: number };
 
 // ─── Conditions ────────────────────────────────────────────────────────
 
@@ -114,9 +121,79 @@ export type Condition =
   | { t: "flag"; flag: string; equals?: boolean | number | string }
   | { t: "hasItem"; itemId: string; count?: number }
   | { t: "questStatus"; questId: string; status: QuestStatus }
+  // Range check on a character trait. Both bounds inclusive; either may be
+  // omitted for an open-ended bound.
+  | { t: "trait"; trait: TraitKey; min?: number; max?: number }
+  // Range check on a registered NPC's relationship value. Useful for gating
+  // NPC-specific dialog branches behind earned trust.
+  | { t: "npcRelationship"; npcId: string; min?: number; max?: number }
   | { t: "and"; all: Condition[] }
   | { t: "or"; any: Condition[] }
   | { t: "not"; of: Condition };
+
+// ─── Character traits / reputation ─────────────────────────────────────
+// Five passive scores tracked alongside stats. They never affect combat —
+// quests, NPC dialog, and other content gate / branch on them. New traits
+// can be added by appending to TRAIT_KEYS; nothing in the engine cares
+// about which traits exist beyond this list.
+export const TRAIT_KEYS = [
+  "good",       // ความดี — earned by helping people / quest virtue choices
+  "evil",       // ความเลว — earned by killing innocents / cruel choices
+  "arrogance",  // ความหยิ่งยโส — earned from boastful quest decisions / wins
+  "humility",   // ความถ่อมตน — earned by refusing rewards / humble choices
+  "fame",       // ชื่อเสียง — earned by winning sparring matches and tournaments
+] as const;
+export type TraitKey = (typeof TRAIT_KEYS)[number];
+
+export const TRAIT_LABEL: Record<TraitKey, string> = {
+  good: "ความดี",
+  evil: "ความเลว",
+  arrogance: "ความหยิ่งยโส",
+  humility: "ความถ่อมตน",
+  fame: "ชื่อเสียง",
+};
+
+// ─── NPC system ────────────────────────────────────────────────────────
+// NpcDef is a registry entry (static, in lib/world/data/npcs.ts). NpcStateEntry
+// is per-player runtime state (in WorldStateData.npcStates). Authors add a
+// new NPC by appending to the registry and listing the location ids where
+// the NPC appears — LocationView merges registry NPCs with any inline NpcRef
+// the scene already lists.
+//
+// The set of optional capabilities (talk / spar) is intentionally open: add
+// a new field here, give it a default branch in NpcInteractionPopup, and
+// existing NPCs just don't show that button. Same pattern works for future
+// additions (gifting, hiring, training, quest-giving).
+export interface NpcDef {
+  id: string;
+  name: string;
+  description?: string;
+  // Locations where this NPC is present. LocationView pulls registry NPCs
+  // by checking `locationIds.includes(scene.id)`.
+  locationIds: string[];
+  // Optional default talk-to-NPC dialog scene id.
+  dialogSceneId?: string;
+  // When set, the NPC offers a "ขอประลอง" sparring action that triggers a
+  // non-fatal battle against this opponent. Win awards `sparFameReward`.
+  sparOpponentId?: string;
+  sparFameReward?: number;
+  // Optional gating — the NPC is hidden when this evaluates false. Useful
+  // for "appears after quest X" or "gone after Y" plotlines.
+  visibleIf?: Condition;
+  // Free-form tags for future condition queries (e.g., "merchant").
+  tags?: readonly string[];
+}
+
+export interface NpcStateEntry {
+  // Has the player ever opened this NPC's interaction popup?
+  met?: boolean;
+  // Player's standing with this NPC. Quests can move it via
+  // `addNpcRelationship`. Range is open (typically -100..+100).
+  relationship?: number;
+  // Free-form per-NPC flags so quests / dialog can store small bits of
+  // state without polluting the global flag namespace.
+  flags?: Record<string, boolean | number | string>;
+}
 
 // ─── Quests ────────────────────────────────────────────────────────────
 
@@ -270,6 +347,9 @@ export interface PendingBattle {
   opponentId: string;
   onWin: string;
   onLose: string;
+  // When true, defeat does NOT trigger gameOver — the player is routed to
+  // `onLose` and the world resumes. Used for sparring / friendly fights.
+  nonFatal?: boolean;
 }
 
 // Snapshot data only — actions are added by the store.
@@ -319,6 +399,15 @@ export interface WorldStateData {
   // overflow rolls into the next tier. See lib/world/stat-progression.ts.
   statExp: Record<StatKey, number>;
 
+  // Character traits / reputation. Adjusted by quest scenes (`addTrait`
+  // effect) and sparring results. Does not affect combat, only future
+  // quest gating and dialog branches.
+  traits: Record<TraitKey, number>;
+
+  // Per-NPC runtime state, keyed by NpcDef.id. Entries are created lazily
+  // — missing keys mean the player has never interacted with that NPC.
+  npcStates: Record<string, NpcStateEntry>;
+
   // Game time. Twelve ชั่วยาม per day; `time` is a fractional within-day
   // counter (0 ≤ time < 12) that advances per action and rolls `day` over
   // when it crosses 12.
@@ -335,4 +424,13 @@ export interface WorldStateData {
   // here so acknowledgeBattleResult can drop the spoils on win and clear it
   // on lose.
   pendingHuntYield: PendingHuntYield | null;
+  // When a sparring match kicks off, the NPC id and the configured fame
+  // reward are stashed here. acknowledgeBattleResult grants the reward on
+  // win and clears either way. Cleared on game reset.
+  pendingSpar: PendingSpar | null;
+}
+
+export interface PendingSpar {
+  npcId: string;
+  fameReward: number;
 }

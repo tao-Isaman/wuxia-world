@@ -4,17 +4,19 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import type { LocationScene } from "@/lib/world";
+import type { LocationScene, NpcDef } from "@/lib/world";
 import {
   LIFE_SKILL_ICON,
   LIFE_SKILL_LABEL,
   evaluateCondition,
   gatherSuccessChance,
   getItem,
+  getNpcsAtLocation,
   getResource,
   getScene,
   masteryLevel,
 } from "@/lib/world";
+import { NpcInteractionPopup } from "./popups/npc-interaction-popup";
 import {
   useWorldStore,
   TRAVEL_STAMINA_COST,
@@ -41,8 +43,14 @@ export function LocationView({ scene }: Props) {
   // Last gather outcome — shown briefly above the activity buttons. Cleared
   // on the next gather click or when leaving the screen.
   const [lastGather, setLastGather] = useState<GatherResult | null>(null);
+  // The popup-active NPC. null = no popup. Set by clicking a registry NPC.
+  const [activeNpc, setActiveNpc] = useState<NpcDef | null>(null);
 
   const visibleNpcs = scene.npcs.filter(
+    (n) => !n.visibleIf || evaluateCondition(state, n.visibleIf),
+  );
+  // Registry NPCs at this location, also filtered by their visibleIf.
+  const registryNpcs: NpcDef[] = getNpcsAtLocation(scene.id).filter(
     (n) => !n.visibleIf || evaluateCondition(state, n.visibleIf),
   );
   const visibleRoutes = scene.routes.filter(
@@ -81,7 +89,7 @@ export function LocationView({ scene }: Props) {
           <div className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">
             ผู้คน
           </div>
-          {visibleNpcs.length === 0 ? (
+          {visibleNpcs.length === 0 && registryNpcs.length === 0 ? (
             <p className="text-xs text-muted-foreground italic py-1">
               ไม่มีใครให้พูดด้วย
             </p>
@@ -103,6 +111,31 @@ export function LocationView({ scene }: Props) {
                       {npc.hint && (
                         <span className="text-[10px] text-muted-foreground">
                           {npc.hint}
+                        </span>
+                      )}
+                    </span>
+                  </Button>
+                );
+              })}
+              {registryNpcs.map((npc) => {
+                const canSpar = !!npc.sparOpponentId;
+                const canTalk = !!npc.dialogSceneId;
+                return (
+                  <Button
+                    key={`registry-${npc.id}`}
+                    variant="outline"
+                    onClick={() => setActiveNpc(npc)}
+                    className="w-full justify-start text-left h-auto py-2 whitespace-normal"
+                  >
+                    <span className="flex flex-col items-start gap-0.5 w-full">
+                      <span className="flex items-center gap-1.5 flex-wrap">
+                        <span className="font-semibold text-sm">👤 {npc.name}</span>
+                        {canTalk && <Badge variant="outline" className="text-[9px]">💬 ทักทาย</Badge>}
+                        {canSpar && <Badge variant="outline" className="text-[9px]">⚔ ประลอง</Badge>}
+                      </span>
+                      {npc.description && (
+                        <span className="text-[10px] text-muted-foreground">
+                          {npc.description}
                         </span>
                       )}
                     </span>
@@ -218,6 +251,12 @@ export function LocationView({ scene }: Props) {
           </CardContent>
         </Card>
       )}
+
+      <NpcInteractionPopup
+        open={activeNpc !== null}
+        npc={activeNpc}
+        onClose={() => setActiveNpc(null)}
+      />
     </div>
   );
 }

@@ -77,6 +77,7 @@ export function applyEffect(state: WorldStateData, eff: SceneEffect): void {
         opponentId: eff.opponentId,
         onWin: eff.onWin,
         onLose: eff.onLose,
+        nonFatal: eff.nonFatal,
       };
       return;
 
@@ -88,6 +89,19 @@ export function applyEffect(state: WorldStateData, eff: SceneEffect): void {
       if (eff.sceneIds.length === 0) return;
       const i = Math.floor(Math.random() * eff.sceneIds.length);
       state.currentSceneId = eff.sceneIds[i]!;
+      return;
+    }
+
+    case "addTrait": {
+      const cur = state.traits[eff.trait] ?? 0;
+      state.traits[eff.trait] = Math.max(0, cur + eff.amount);
+      return;
+    }
+
+    case "addNpcRelationship": {
+      const entry = state.npcStates[eff.npcId] ?? {};
+      const cur = entry.relationship ?? 0;
+      state.npcStates[eff.npcId] = { ...entry, relationship: cur + eff.amount };
       return;
     }
 

@@ -25,6 +25,7 @@ import {
 import type { EquipSlotType, Skill, StatKey, WeaponFamily } from "@/lib/game";
 import { useWorldStore } from "@/store/world-store";
 import { xpToNextStatLevel } from "@/lib/world/stat-progression";
+import { TRAIT_KEYS, TRAIT_LABEL } from "@/lib/world";
 
 interface Props {
   open: boolean;
@@ -107,6 +108,7 @@ export function ProfilePopup({ open, onClose }: Props) {
   const player = useWorldStore((s) => s.playerBuild);
   const gold = useWorldStore((s) => s.gold);
   const statExp = useWorldStore((s) => s.statExp);
+  const traits = useWorldStore((s) => s.traits);
   if (!player) return null;
 
   const base = player.stats;
@@ -223,6 +225,24 @@ export function ProfilePopup({ open, onClose }: Props) {
                     {cv}
                     {diff > 0 && <span className="text-[9px] text-emerald-600 ml-1">+{diff}</span>}
                   </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* ─── Traits / reputation ─────────────────────────────────── */}
+        <section className="border-t pt-3">
+          <div className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground mb-1">
+            ชื่อเสียงและคุณธรรม
+          </div>
+          <div className="grid grid-cols-5 gap-1.5">
+            {TRAIT_KEYS.map((k) => {
+              const v = traits[k] ?? 0;
+              return (
+                <div key={k} className="rounded bg-muted/40 px-2 py-1.5 text-center">
+                  <div className="text-[9px] text-muted-foreground">{TRAIT_LABEL[k]}</div>
+                  <div className="text-sm font-semibold">{v}</div>
                 </div>
               );
             })}

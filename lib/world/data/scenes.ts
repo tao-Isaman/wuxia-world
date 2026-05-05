@@ -381,6 +381,49 @@ const CORE_SCENES: readonly Scene[] = [
       { text: "ขอตัวก่อน", next: "sect_beggars" },
     ],
   },
+
+  // ─── NPC sparring outcome scenes (generic) ────────────────────────────
+  // Both win and lose are reused by every NPC sparring match. The fame
+  // reward is granted in the world store before navigation, so these
+  // scenes only need to display the result and let the player return.
+  {
+    kind: "dialog",
+    id: "npc_spar_win",
+    lines: [
+      { t: "narration", text: "เสียงปรบมือดังขึ้นรอบลานประลอง — เจ้าชนะการประลองอย่างสมศักดิ์ศรี!" },
+      { t: "narration", text: "ชื่อเสียงของเจ้าแผ่ขจรไปอีกขั้นหนึ่ง" },
+    ],
+    // Terminal → "ปิด" sends the player back to lastLocationId.
+  },
+  {
+    kind: "dialog",
+    id: "npc_spar_lose",
+    lines: [
+      { t: "narration", text: "เจ้าพ่ายแพ้ในการประลอง แต่เป็นมิตรประลอง ไม่ถึงตาย" },
+      { t: "narration", text: "เจ้าหายใจหอบ คู่ต่อสู้ยื่นมือพยุงเจ้าขึ้น" },
+    ],
+    // Terminal → returns to lastLocationId.
+  },
+
+  // ─── Demo registry-NPC dialogs ────────────────────────────────────────
+  // These pair with entries in lib/world/data/npcs.ts. NpcInteractionPopup
+  // routes its 💬 ทักทาย button to whichever dialog the NpcDef points to.
+  {
+    kind: "dialog",
+    id: "swordsman_xiao_talk",
+    lines: [
+      { t: "dialogue", speaker: "เซียวจิ้งเทียน", text: "นักเดินทาง... ดาบของเจ้าดูคมพอจะลองมือกับข้าได้หรือไม่?" },
+      { t: "dialogue", speaker: "เซียวจิ้งเทียน", text: "หากกล้าก็เลือก 'ขอประลอง' ที่หน้าต่างเมื่อกี้นี้ได้เลย" },
+    ],
+  },
+  {
+    kind: "dialog",
+    id: "merchant_wang_talk",
+    lines: [
+      { t: "dialogue", speaker: "เถ้าแก่หวาง", text: "ฮ่าฮ่า ยินดีต้อนรับสู่นครหลวง! เจ้ามาจากไหนกันรึ?" },
+      { t: "dialogue", speaker: "เถ้าแก่หวาง", text: "เรื่องของยุทธจักร ข้าฟังมาเยอะ — ถ้ามีเรื่องสนุก ๆ มาเล่าให้ฟังบ้างก็ดี" },
+    ],
+  },
 ];
 
 // Final scene table: core tutorial + the full world map (84 locations).
