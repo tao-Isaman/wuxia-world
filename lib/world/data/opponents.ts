@@ -42,6 +42,59 @@ export const OPPONENTS: readonly OpponentDef[] = [
     name: "คนร้าย",
     build: () => starter("คนร้าย"),
   },
+
+  // ─── Wild beasts (hunting resources) ─────────────────────────────────
+  // Slightly differentiated stats so different prey feel different in combat
+  // without requiring full balance work. All still calibrated near the
+  // STARTER_BUILD baseline so early hunting is roughly 50/50.
+  {
+    id: "wild_boar",
+    name: "หมูป่า",
+    build: () => ({
+      ...starter("หมูป่า"),
+      stats: { STR: 2, AGI: 1, POW: 1, VIT: 2, DEX: 1, LUK: 1, DEF: 1, INT: 1 },
+    }),
+  },
+  {
+    id: "wild_wolf",
+    name: "หมาป่า",
+    build: () => ({
+      ...starter("หมาป่า"),
+      stats: { STR: 1, AGI: 2, POW: 1, VIT: 1, DEX: 2, LUK: 1, DEF: 1, INT: 1 },
+    }),
+  },
+  {
+    id: "mountain_tiger",
+    name: "เสือภูเขา",
+    build: () => ({
+      ...starter("เสือภูเขา"),
+      stats: { STR: 3, AGI: 2, POW: 1, VIT: 2, DEX: 2, LUK: 1, DEF: 1, INT: 1 },
+    }),
+  },
+  {
+    id: "brown_bear",
+    name: "หมีสีน้ำตาล",
+    build: () => ({
+      ...starter("หมีสีน้ำตาล"),
+      stats: { STR: 3, AGI: 1, POW: 1, VIT: 3, DEX: 1, LUK: 1, DEF: 2, INT: 1 },
+    }),
+  },
+  {
+    id: "viper_snake",
+    name: "งูเห่ายักษ์",
+    build: () => ({
+      ...starter("งูเห่ายักษ์"),
+      stats: { STR: 1, AGI: 2, POW: 1, VIT: 1, DEX: 3, LUK: 2, DEF: 1, INT: 1 },
+    }),
+  },
+  {
+    id: "giant_centipede",
+    name: "ตะขาบยักษ์",
+    build: () => ({
+      ...starter("ตะขาบยักษ์"),
+      stats: { STR: 2, AGI: 2, POW: 1, VIT: 2, DEX: 2, LUK: 1, DEF: 1, INT: 1 },
+    }),
+  },
 ];
 
 export const OPPONENTS_BY_ID = new Map<string, OpponentDef>(

@@ -1,8 +1,10 @@
-import type { WorldStateData } from "./types";
+import type { LifeSkill, WorldStateData } from "./types";
+import { LIFE_SKILL_KEYS } from "./types";
 import { SCENES_BY_ID, START_SCENE_ID } from "./data/scenes";
 import { ITEMS_BY_ID } from "./data/items";
 import { QUESTS_BY_ID } from "./data/quests";
 import { OPPONENTS_BY_ID } from "./data/opponents";
+import { RESOURCES_BY_ID } from "./data/resources";
 
 // Called from persist's onRehydrateStorage. Drops or repairs any references
 // to data ids that don't exist anymore (e.g., a scene was removed between
@@ -66,6 +68,31 @@ export function validateAndRepair(state: WorldStateData): void {
         `[world] clearing dangling pendingBattle (opponent=${opponentOk} onWin=${winOk} onLose=${loseOk})`,
       );
       state.pendingBattle = null;
+    }
+  }
+
+  // pendingHuntYield: drop if the resource id is gone or the return scene
+  // is missing. Without pendingBattle this can also leak across sessions.
+  if (state.pendingHuntYield) {
+    const phy = state.pendingHuntYield;
+    if (!RESOURCES_BY_ID.has(phy.resourceId) || !SCENES_BY_ID.has(phy.returnSceneId)) {
+      console.warn(`[world] clearing dangling pendingHuntYield`);
+      state.pendingHuntYield = null;
+    }
+  }
+
+  // Stamina invariants: never negative, never above max, max sane.
+  if (typeof state.staminaMax !== "number" || state.staminaMax <= 0) state.staminaMax = 100;
+  if (typeof state.stamina !== "number") state.stamina = state.staminaMax;
+  state.stamina = Math.max(0, Math.min(state.staminaMax, state.stamina));
+
+  // Life-skill xp: ensure all six keys are present and non-negative.
+  if (!state.lifeSkillXp || typeof state.lifeSkillXp !== "object") {
+    state.lifeSkillXp = Object.fromEntries(LIFE_SKILL_KEYS.map((k) => [k, 0])) as Record<LifeSkill, number>;
+  } else {
+    for (const k of LIFE_SKILL_KEYS) {
+      const v = state.lifeSkillXp[k];
+      state.lifeSkillXp[k] = typeof v === "number" && v >= 0 ? v : 0;
     }
   }
 }

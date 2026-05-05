@@ -1,5 +1,6 @@
 import type {
   LocationScene,
+  ResourceNodeRef,
   RouteDestination,
   RouteRef,
   RouteScene,
@@ -435,6 +436,76 @@ for (const src of ALL_LEAVES) {
     });
   }
   src.routes = outRoutes;
+}
+
+// ─── Resource nodes (life-skill activities) ───────────────────────────
+// Each leaf gets one or two gather/hunt resources picked from a per-category
+// default. Five hand-curated overrides install the world's only level-5
+// ("legendary") spots — the player has to actually visit those places to
+// access top-tier materials.
+//
+// Authors can append more nodes to a specific leaf by mutating its
+// `.resources` array after this file runs.
+
+const CATEGORY_RESOURCES: Record<string, readonly string[]> = {
+  // city = mixed economy (mining + woodcutting + low-end fishing)
+  cities:    ["mine_iron", "wood_soft"],
+  // sects sit on mountains so mining + woodcutting fit; some sects also
+  // do hunting (forest patrols).
+  sects:     ["wood_hard", "hunt_forest"],
+  // islands face the sea — fishing + light woodcutting
+  isles:     ["fish_sea", "wood_soft"],
+  // mountains/cliffs — mining + tiger/bear hunting
+  terrain:   ["mine_iron", "hunt_mountain"],
+  // caves & valleys — venom + herbs
+  caves:     ["venom_viper", "herb_common"],
+  // temples — calm; herbalism only
+  temples:   ["herb_common"],
+  // mansions — controlled wood lots + garden herbs
+  mansions:  ["wood_hard", "herb_common"],
+  // taverns — river fishing + gather wild herbs out back
+  inns:      ["fish_river", "herb_common"],
+  // NPC homes — light gathering only (one shared activity)
+  homes:     ["herb_common"],
+  // misc — varies; default to forest hunt for desert/tribal flavour
+  misc:      ["hunt_forest"],
+};
+
+// Hand-curated level-5 spots — exactly five so they stay rare.
+const RARE_SPOTS: ReadonlyArray<{ locationId: string; resourceId: string }> = [
+  { locationId: "mt_kunlun_immortal",  resourceId: "mine_mithril" },     // นิรันดร์คุนหลุน — สูงและลึกลับ
+  { locationId: "isle_shenlong",       resourceId: "fish_dragon" },      // เกาะมังกรเทพ
+  { locationId: "valley_jueqing_bottom", resourceId: "herb_snow_lotus" },// ก้นหุบเขาตัดใจ
+  { locationId: "cave_treasure",       resourceId: "venom_centipede" }, // คลังสมบัติลับ
+  { locationId: "sect_xiaoyao",        resourceId: "wood_sacred" },     // พรรคสราญรมย์ — ลึกลับ
+];
+
+function attachCategoryResources(leaves: LocationScene[], category: string): void {
+  const ids = CATEGORY_RESOURCES[category] ?? [];
+  if (ids.length === 0) return;
+  for (const lf of leaves) {
+    if (lf.resources && lf.resources.length > 0) continue;
+    lf.resources = ids.map((rid) => ({ resourceId: rid }) as ResourceNodeRef);
+  }
+}
+
+attachCategoryResources(CITIES,   "cities");
+attachCategoryResources(SECTS,    "sects");
+attachCategoryResources(ISLES,    "isles");
+attachCategoryResources(TERRAIN,  "terrain");
+attachCategoryResources(CAVES,    "caves");
+attachCategoryResources(TEMPLES,  "temples");
+attachCategoryResources(MANSIONS, "mansions");
+attachCategoryResources(INNS,     "inns");
+attachCategoryResources(HOMES,    "homes");
+attachCategoryResources(MISC,     "misc");
+
+// Override with the legendary level-5 spots. Replaces the category default
+// outright so the rare resource stands alone (and the gather UI doesn't
+// hide a level-5 node behind two level-1 ones).
+for (const spot of RARE_SPOTS) {
+  const lf = LEAVES_BY_ID.get(spot.locationId);
+  if (lf) lf.resources = [{ resourceId: spot.resourceId }];
 }
 
 // ─── World hub ────────────────────────────────────────────────────────

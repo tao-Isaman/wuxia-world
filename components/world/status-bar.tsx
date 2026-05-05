@@ -16,6 +16,8 @@ import { useWorldStore } from "@/store/world-store";
 export function StatusBar() {
   const player = useWorldStore((s) => s.playerBuild);
   const gold = useWorldStore((s) => s.gold);
+  const stamina = useWorldStore((s) => s.stamina);
+  const staminaMax = useWorldStore((s) => s.staminaMax);
 
   if (!player) return null;
 
@@ -24,6 +26,7 @@ export function StatusBar() {
   const mpCur = d.MP;
   const hpPct = d.HP > 0 ? (hpCur / d.HP) * 100 : 0;
   const mpPct = d.MP > 0 ? (mpCur / d.MP) * 100 : 0;
+  const stPct = staminaMax > 0 ? (stamina / staminaMax) * 100 : 0;
 
   return (
     <Card>
@@ -31,7 +34,7 @@ export function StatusBar() {
         <div className="flex items-center gap-4 flex-wrap">
           <strong className="text-sm shrink-0">{player.name}</strong>
 
-          <div className="flex-1 min-w-[140px]">
+          <div className="flex-1 min-w-[120px]">
             <div className="flex items-baseline justify-between text-[10px] mb-0.5">
               <span className="font-semibold tracking-wider uppercase text-rose-600">HP</span>
               <span className="font-mono text-foreground">{hpCur} / {d.HP}</span>
@@ -39,12 +42,20 @@ export function StatusBar() {
             <Progress value={hpPct} indicatorColor="hsl(0, 75%, 55%)" className="h-2" />
           </div>
 
-          <div className="flex-1 min-w-[140px]">
+          <div className="flex-1 min-w-[120px]">
             <div className="flex items-baseline justify-between text-[10px] mb-0.5">
               <span className="font-semibold tracking-wider uppercase text-sky-600">MP</span>
               <span className="font-mono text-foreground">{mpCur} / {d.MP}</span>
             </div>
             <Progress value={mpPct} indicatorColor="hsl(210, 75%, 55%)" className="h-2" />
+          </div>
+
+          <div className="flex-1 min-w-[120px]">
+            <div className="flex items-baseline justify-between text-[10px] mb-0.5">
+              <span className="font-semibold tracking-wider uppercase text-emerald-600">⚡ พลัง</span>
+              <span className="font-mono text-foreground">{stamina} / {staminaMax}</span>
+            </div>
+            <Progress value={stPct} indicatorColor="hsl(140, 60%, 45%)" className="h-2" />
           </div>
 
           <div className="shrink-0 text-xs">

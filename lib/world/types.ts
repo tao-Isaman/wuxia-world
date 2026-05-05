@@ -41,6 +41,7 @@ export interface LocationScene {
   description: string;      // long-form arrival narration
   npcs: NpcRef[];           // talk-to-NPC links (each opens a dialog scene)
   routes: RouteRef[];       // outbound paths (each opens a route scene)
+  resources?: ResourceNodeRef[]; // gather/hunt activities at this place
   onEnter?: SceneEffect[];
 }
 
@@ -50,6 +51,7 @@ export interface RouteScene {
   label: string;            // displayed name e.g. "ทางเหนือ"
   description?: string;     // optional travel-narration text
   destinations: RouteDestination[];
+  resources?: ResourceNodeRef[]; // gather/hunt activities while travelling
   // Where the back button sends the player. Defaults to lastLocationId
   // (the location they came from). Set explicitly only if you want a
   // different fallback.
@@ -144,6 +146,72 @@ export interface ItemDef {
   description: string;
 }
 
+// ─── Life skills / gathering ──────────────────────────────────────────
+// Six gathering professions. Each has its own xp pool and mastery level
+// (1-5). Mastery grows with use (5 × resourceLevel xp per gather) and gates
+// access to higher-tier resources downstream.
+export const LIFE_SKILL_KEYS = [
+  "mining",
+  "woodcutting",
+  "hunting",
+  "fishing",
+  "herbalism",
+  "venom",
+] as const;
+export type LifeSkill = (typeof LIFE_SKILL_KEYS)[number];
+
+export type ResourceLevel = 1 | 2 | 3 | 4 | 5;
+
+export interface ResourceYield {
+  itemId: string;
+  weight: number;
+  // [min, max] inclusive count — defaults to [1, 1] when omitted.
+  count?: [number, number];
+}
+
+export interface ResourceDef {
+  id: string;
+  name: string;
+  skill: LifeSkill;
+  level: ResourceLevel;
+  staminaCost: number;
+  // Probability-weighted item drops. The dispatcher rolls 1-3 picks per
+  // gather (more at higher mastery) and merges duplicate item ids.
+  yields: ResourceYield[];
+  // Hunting-only: the gather first triggers a battle from this pool. The
+  // win-handler then rolls `yields` for the spoils. Lose → no spoils.
+  opponentIds?: readonly string[];
+  // Free-form description shown on the activity button.
+  hint?: string;
+}
+
+export interface ResourceNodeRef {
+  resourceId: string;
+  // Optional override for the on-location label / hint, useful when a
+  // category-default resource sits at a flavour-named place.
+  label?: string;
+  hint?: string;
+}
+
+// Crafting recipe. Inputs are consumed, output is added to inventory.
+// `skill` is informational for now (no skill-gating); future iterations
+// can require a mastery threshold here.
+export interface RecipeDef {
+  id: string;
+  name: string;
+  inputs: { itemId: string; count: number }[];
+  output: { itemId: string; count: number };
+  skill?: LifeSkill;
+  description?: string;
+}
+
+// Pending hunt result — the gather flow stashes this when it kicks off
+// a battle so `acknowledgeBattleResult` can drop the spoils on win.
+export interface PendingHuntYield {
+  resourceId: string;
+  returnSceneId: string;
+}
+
 // ─── Opponents (for triggerBattle) ─────────────────────────────────────
 
 // Opponents are wrapped in a build factory so future encounters can scale
@@ -185,6 +253,16 @@ export interface WorldStateData {
   inventory: Record<string, number>;
   gold: number;
 
+  // Activity / professions state.
+  stamina: number;
+  staminaMax: number;
+  // xp per life skill — mastery level is derived in lib/world/data/life-skills.
+  lifeSkillXp: Record<LifeSkill, number>;
+
   // Battle seam.
   pendingBattle: PendingBattle | null;
+  // When a hunting gather kicks off a battle, the resource id is stashed
+  // here so acknowledgeBattleResult can drop the spoils on win and clear it
+  // on lose.
+  pendingHuntYield: PendingHuntYield | null;
 }
