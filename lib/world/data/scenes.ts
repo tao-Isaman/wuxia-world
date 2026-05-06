@@ -1,5 +1,9 @@
 import type { Scene } from "../types";
 import { WORLD_MAP_SCENES } from "./world-map";
+import { SCENES_CITIES } from "./scenes-content/cities";
+import { SCENES_VILLAGES } from "./scenes-content/villages";
+import { SCENES_SECTS_TEMPLES } from "./scenes-content/sects-temples";
+import { SCENES_WILDERNESS } from "./scenes-content/wilderness";
 
 // Scene table — three kinds (dialog / location / route) discriminated by `kind`.
 //
@@ -426,8 +430,17 @@ const CORE_SCENES: readonly Scene[] = [
   },
 ];
 
-// Final scene table: core tutorial + the full world map (84 locations).
-export const SCENES: readonly Scene[] = [...CORE_SCENES, ...WORLD_MAP_SCENES];
+// Final scene table: core tutorial + the full world map (84 locations) +
+// the four regional content batches (NPC dialogs + side-quest beats). Each
+// batch is owned by one content agent — see lib/world/data/scenes-content/.
+export const SCENES: readonly Scene[] = [
+  ...CORE_SCENES,
+  ...WORLD_MAP_SCENES,
+  ...SCENES_CITIES,
+  ...SCENES_VILLAGES,
+  ...SCENES_SECTS_TEMPLES,
+  ...SCENES_WILDERNESS,
+];
 
 export const SCENES_BY_ID = new Map<string, Scene>(SCENES.map((s) => [s.id, s]));
 

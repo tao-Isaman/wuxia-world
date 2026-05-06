@@ -2,7 +2,7 @@ import type { LifeSkill, TraitKey, WorldStateData } from "./types";
 import { LIFE_SKILL_KEYS, TRAIT_KEYS } from "./types";
 import { SCENES_BY_ID, START_SCENE_ID } from "./data/scenes";
 import { ITEMS_BY_ID } from "./data/items";
-import { QUESTS_BY_ID } from "./data/quests";
+import { QUESTS_BY_ID, getQuest } from "./data/quests";
 import { OPPONENTS_BY_ID } from "./data/opponents";
 import { RESOURCES_BY_ID } from "./data/resources";
 import { NPCS_BY_ID } from "./data/npcs";
@@ -59,12 +59,20 @@ export function validateAndRepair(state: WorldStateData): void {
     }
   }
 
-  // Quests: drop unknown quest entries.
+  // Quests: drop unknown quest entries; clamp the stage index into the
+  // current QuestDef.stages range so a content edit that shrinks stages
+  // can't leave a quest pointing past the end.
   for (const questId of Object.keys(state.quests)) {
     if (!QUESTS_BY_ID.has(questId)) {
       console.warn(`[world] dropping unknown quest "${questId}"`);
       delete state.quests[questId];
+      continue;
     }
+    const def = getQuest(questId)!;
+    const q = state.quests[questId]!;
+    const maxStage = Math.max(0, def.stages.length - 1);
+    if (typeof q.stage !== "number" || q.stage < 0) q.stage = 0;
+    else if (q.stage > maxStage) q.stage = maxStage;
   }
 
   // pendingBattle: clear if opponent unknown or its target scenes missing.
@@ -203,6 +211,33 @@ export function validateAndRepair(state: WorldStateData): void {
   if (state.pendingSpar && !NPCS_BY_ID.has(state.pendingSpar.npcId)) {
     console.warn(`[world] clearing dangling pendingSpar for unknown npc "${state.pendingSpar.npcId}"`);
     state.pendingSpar = null;
+  }
+
+  // Quest auto-advance bookkeeping. Drop counters / visits whose target
+  // ids no longer exist; clamp counts to non-negative integers.
+  if (!state.defeatedCounts || typeof state.defeatedCounts !== "object") {
+    state.defeatedCounts = {};
+  } else {
+    for (const id of Object.keys(state.defeatedCounts)) {
+      if (!OPPONENTS_BY_ID.has(id)) {
+        delete state.defeatedCounts[id];
+        continue;
+      }
+      const v = state.defeatedCounts[id];
+      state.defeatedCounts[id] = typeof v === "number" && v >= 0 ? Math.floor(v) : 0;
+    }
+  }
+  if (!Array.isArray(state.visitedLocationIds)) {
+    state.visitedLocationIds = [];
+  } else {
+    state.visitedLocationIds = Array.from(
+      new Set(
+        state.visitedLocationIds.filter((id) => {
+          const sc = SCENES_BY_ID.get(id);
+          return Boolean(sc && sc.kind === "location");
+        }),
+      ),
+    );
   }
 
   // pendingEncounter — clear if the opponent / return scene is gone.

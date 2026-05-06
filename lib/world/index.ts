@@ -10,6 +10,7 @@ export {
   QUESTS,
   QUESTS_BY_ID,
   getQuest,
+  getQuestsForNpc,
   ITEMS,
   ITEMS_BY_ID,
   getItem,
@@ -53,7 +54,13 @@ export {
   pickWeighted,
 } from "./data";
 export { evaluateCondition, getQuestStatus } from "./conditions";
-export { applyEffect, applyEffects } from "./effects";
+export {
+  applyEffect,
+  applyEffects,
+  isQuestOfferable,
+  isQuestTurnInForNpc,
+  tickQuestProgress,
+} from "./effects";
 export { validateAndRepair } from "./validate";
 // `initBattleBridge` is intentionally NOT exported from the barrel —
 // it imports the world & battle stores, which would create a cycle when

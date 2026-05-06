@@ -1,4 +1,4 @@
-import type { SceneEffect, WorldStateData } from "./types";
+import type { QuestDef, QuestReward, SceneEffect, WorldStateData } from "./types";
 import { getQuest } from "./data/quests";
 import { getScene } from "./data/scenes";
 import {
@@ -8,6 +8,7 @@ import {
   fightEventsForLocation,
   pickWeighted,
 } from "./data/random-events";
+import { evaluateCondition } from "./conditions";
 
 // Pure mutation: applies a single effect to the world state in place.
 // `triggerBattle` only sets `pendingBattle` — the battle-bridge module
@@ -67,7 +68,15 @@ export function applyEffect(state: WorldStateData, eff: SceneEffect): void {
     case "finishQuest": {
       const q = state.quests[eff.questId];
       if (!q) return;
+      // Idempotent — once a quest is settled, finishQuest is a no-op even
+      // if the dialog flow lands on a duplicate effect. Without this guard,
+      // re-running would re-grant rewards.
+      if (q.status === "done" || q.status === "failed") return;
       q.status = eff.success ? "done" : "failed";
+      if (eff.success) {
+        const def = getQuest(eff.questId);
+        if (def?.rewards) applyQuestRewards(state, def.rewards);
+      }
       return;
     }
 
@@ -230,7 +239,120 @@ export function applyEffect(state: WorldStateData, eff: SceneEffect): void {
   }
 }
 
-// Convenience: apply an array in order.
+// Convenience: apply an array in order. After the batch runs, we tick the
+// quest progress so any auto-advance stages whose Condition is now true
+// resolve in the same beat (a giveItem effect can immediately complete a
+// "gather X" stage, for example).
 export function applyEffects(state: WorldStateData, effects: readonly SceneEffect[]): void {
   for (const e of effects) applyEffect(state, e);
+  tickQuestProgress(state);
+}
+
+// ─── Quest reward dispatcher ───────────────────────────────────────────
+// Negative numbers are clamped to 0 — a reward never punishes. Unknown ids
+// are silently dropped so a quest reward referencing a renamed/removed
+// item/skill/art doesn't blow up the dialog flow; validateAndRepair logs
+// the broader registry drift.
+function applyQuestRewards(state: WorldStateData, rewards: readonly QuestReward[]): void {
+  for (const r of rewards) {
+    switch (r.t) {
+      case "gold": {
+        if (r.amount > 0) state.gold = Math.max(0, state.gold + r.amount);
+        break;
+      }
+      case "item": {
+        const n = Math.max(1, r.count ?? 1);
+        state.inventory[r.itemId] = (state.inventory[r.itemId] ?? 0) + n;
+        break;
+      }
+      case "wExp": {
+        if (r.amount > 0) state.wExp = Math.max(0, state.wExp + r.amount);
+        break;
+      }
+      case "skillExp": {
+        if (r.amount > 0) {
+          state.skillExp[r.skillId] = (state.skillExp[r.skillId] ?? 0) + r.amount;
+        }
+        break;
+      }
+      case "trait": {
+        const cur = state.traits[r.trait] ?? 0;
+        state.traits[r.trait] = Math.max(0, cur + r.amount);
+        break;
+      }
+      case "npcRelationship": {
+        const entry = state.npcStates[r.npcId] ?? {};
+        const cur = entry.relationship ?? 0;
+        state.npcStates[r.npcId] = { ...entry, relationship: cur + r.amount };
+        break;
+      }
+      case "learnSkill":
+        applyEffect(state, { t: "learnSkill", skillId: r.skillId });
+        break;
+      case "learnArt":
+        applyEffect(state, { t: "learnArt", artId: r.artId, level: r.level });
+        break;
+    }
+  }
+}
+
+// ─── Auto-advance ticker ───────────────────────────────────────────────
+// Walks every active quest. While the current stage's `autoAdvance`
+// condition evaluates true, advances stage. On exhausting all stages,
+// finishes the quest with success=true (which grants its rewards).
+//
+// Bounded loop — at most stages.length iterations per quest per call, so
+// no risk of runaway even if the player triggers many state changes
+// inside a single applyEffects batch.
+export function tickQuestProgress(state: WorldStateData): void {
+  for (const q of Object.values(state.quests)) {
+    if (q.status !== "active") continue;
+    const def = getQuest(q.id);
+    if (!def) continue;
+    let safety = def.stages.length + 1;
+    while (safety-- > 0) {
+      if (q.stage >= def.stages.length) break;
+      const stage = def.stages[q.stage]!;
+      if (!stage.autoAdvance) break;
+      if (!evaluateCondition(state, stage.autoAdvance)) break;
+      const next = q.stage + 1;
+      if (next >= def.stages.length) {
+        q.stage = def.stages.length - 1;
+        q.status = "done";
+        if (def.rewards) applyQuestRewards(state, def.rewards);
+        break;
+      }
+      q.stage = next;
+    }
+  }
+}
+
+// ─── Quest availability helper (used by NPC popup) ─────────────────────
+// Returns true when the player can be offered this quest right now:
+//   - never started (no entry in state.quests)
+//   - prereqs (if any) evaluate true
+// Side quests that finished with success or failure stay in state.quests
+// with their terminal status — so the absence-check below blocks re-offers
+// without any extra side-quest plumbing.
+export function isQuestOfferable(state: WorldStateData, def: QuestDef): boolean {
+  if (state.quests[def.id]) return false;
+  if (def.prereqs && !evaluateCondition(state, def.prereqs)) return false;
+  return true;
+}
+
+// True when an active quest's current stage is a dialog-driven "talk to NPC"
+// step keyed by `turnInNpcId` (or `giverNpcId` if no turn-in is set). The
+// NPC popup uses this to render a "Turn in" button; the actual finish is
+// driven by the quest's dialog scene's effects.
+export function isQuestTurnInForNpc(
+  state: WorldStateData,
+  def: QuestDef,
+  npcId: string,
+): boolean {
+  const q = state.quests[def.id];
+  if (!q || q.status !== "active") return false;
+  const target = def.turnInNpcId ?? def.giverNpcId;
+  if (!target || target !== npcId) return false;
+  // Last stage is the "return to NPC" beat by convention.
+  return q.stage === def.stages.length - 1;
 }

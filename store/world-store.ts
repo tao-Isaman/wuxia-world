@@ -29,6 +29,7 @@ import {
   getItem,
   getNpc,
   getOpponent,
+  getQuest,
   getRecipe,
   getResource,
   getScene,
@@ -47,6 +48,7 @@ import {
   type TraitKey,
   type WorldStateData,
 } from "@/lib/world";
+import { tickQuestProgress } from "@/lib/world/effects";
 
 // ─── Starter build ─────────────────────────────────────────────────────
 // All stats at 1, single basic_punch skill, no art, no equipment.
@@ -167,6 +169,11 @@ export type SparResult =
   | { ok: false; reason: "unknown" | "unsupported" | "pending" }
   | { ok: true; npcId: string; opponentId: string };
 
+// Result of attempting to accept / abandon a quest from the NPC popup.
+export type QuestActionResult =
+  | { ok: false; reason: "unknown" | "already-active" | "already-done" | "prereq" }
+  | { ok: true; questId: string };
+
 // Generic post-spar landing scenes — all sparring routes here on
 // resolution. Authors don't need a per-NPC outcome scene.
 export const SPAR_WIN_SCENE_ID = "npc_spar_win";
@@ -247,6 +254,14 @@ interface WorldStore extends WorldStateData {
   meetNpc: (npcId: string) => void;
   startSparWith: (npcId: string) => SparResult;
 
+  // Quest actions. `acceptQuest` is the lightweight version of dispatching
+  // `startQuest` from a dialog choice — useful when the NPC popup wants to
+  // start a quest directly without routing through a scripted scene.
+  acceptQuest: (questId: string) => QuestActionResult;
+  // Marks the quest as failed (and clears progress). Side quests do not
+  // re-offer after failure — once failed, the NPC popup hides them.
+  abandonQuest: (questId: string) => QuestActionResult;
+
   // Random-encounter resolution. `acceptEncounter` promotes a pending
   // fight-or-flee offer to an actual battle; `fleeEncounter` clears the
   // offer and stays put.
@@ -287,6 +302,8 @@ const emptyData = (): WorldStateData => ({
   statExp: emptyStatExp(),
   traits: emptyTraits(),
   npcStates: {},
+  defeatedCounts: {},
+  visitedLocationIds: [],
   day: 1,
   time: 0,
   pendingBattle: null,
@@ -445,6 +462,8 @@ function followAutoAdvance(state: WorldStateData): void {
     if (!sc) return;
     if (sc.kind === "location") {
       state.lastLocationId = state.currentSceneId;
+      recordVisit(state, state.currentSceneId);
+      tickQuestProgress(state);
       return; // locations wait for the player
     }
     if (sc.kind === "route") return; // routes wait for the player
@@ -506,6 +525,8 @@ function draftFrom(s: WorldStateData): WorldStateData {
     statExp: { ...s.statExp },
     traits: { ...s.traits },
     npcStates: { ...s.npcStates },
+    defeatedCounts: { ...s.defeatedCounts },
+    visitedLocationIds: [...s.visitedLocationIds],
     day: s.day,
     time: s.time,
     pendingBattle: s.pendingBattle,
@@ -515,6 +536,13 @@ function draftFrom(s: WorldStateData): WorldStateData {
     gameOver: s.gameOver,
     actionLog: [...s.actionLog],
   };
+}
+
+// Record a location visit for `Condition.visitedLocation` lookups. Idempotent.
+function recordVisit(state: WorldStateData, locationId: string): void {
+  if (!state.visitedLocationIds.includes(locationId)) {
+    state.visitedLocationIds.push(locationId);
+  }
 }
 
 // Roll loot from an opponent's drop table. Picks count is per-tier:
@@ -700,6 +728,10 @@ export const useWorldStore = create<WorldStore>()(
         // used and every hit taken, then drop hunt spoils if a hunt was in
         // flight, then route to the encounter's onWin destination.
         draft.wExp = Math.max(0, draft.wExp + W_EXP_FIGHT_WIN);
+        // Bump the defeat counter so `Condition.defeatedOpponent` quests
+        // can auto-advance against this kill.
+        draft.defeatedCounts[pb.opponentId] =
+          (draft.defeatedCounts[pb.opponentId] ?? 0) + 1;
         const uses = battleState?.skillUses?.A ?? {};
         let actionTotal = 0;
         for (const [sid, count] of Object.entries(uses)) {
@@ -763,6 +795,11 @@ export const useWorldStore = create<WorldStore>()(
           `ชนะ ${oppDef?.name ?? pb.opponentId}` +
             (lootSummary.length > 0 ? ` · ${lootSummary.join(", ")}` : ""),
         );
+
+        // Now that loot, kill counts, and skill xp have all been written,
+        // give the quest progress ticker a chance to advance any active
+        // quest whose autoAdvance condition just became true.
+        tickQuestProgress(draft);
 
         const hunt = draft.pendingHuntYield;
         draft.pendingHuntYield = null;
@@ -1285,6 +1322,41 @@ export const useWorldStore = create<WorldStore>()(
         return { ok: true, npcId, opponentId: npc.sparOpponentId };
       },
 
+      acceptQuest: (questId) => {
+        const s = get();
+        const def = getQuest(questId);
+        if (!def) return { ok: false, reason: "unknown" };
+        const cur = s.quests[questId];
+        if (cur && cur.status === "active") return { ok: false, reason: "already-active" };
+        if (cur && (cur.status === "done" || cur.status === "failed")) {
+          return { ok: false, reason: "already-done" };
+        }
+        const draft = draftFrom(s);
+        // applyEffects runs the existing startQuest dispatcher and the
+        // quest progress ticker — so a quest whose stage 0 has an
+        // autoAdvance that's already true can resolve a step or two on
+        // accept (e.g., player already has the requested item).
+        applyEffects(draft, [{ t: "startQuest", questId }]);
+        appendActionLog(draft, "quest", `รับภารกิจ: ${def.name}`);
+        set({ ...draft });
+        return { ok: true, questId };
+      },
+
+      abandonQuest: (questId) => {
+        const s = get();
+        const def = getQuest(questId);
+        if (!def) return { ok: false, reason: "unknown" };
+        const cur = s.quests[questId];
+        if (!cur || cur.status !== "active") return { ok: false, reason: "already-done" };
+        const draft = draftFrom(s);
+        // Mark failed without granting rewards — finishQuest's success=false
+        // path skips the reward dispatcher.
+        applyEffects(draft, [{ t: "finishQuest", questId, success: false }]);
+        appendActionLog(draft, "quest", `ละทิ้งภารกิจ: ${def.name}`);
+        set({ ...draft });
+        return { ok: true, questId };
+      },
+
       _setFlag: (flag, value) =>
         set((s) => ({ flags: { ...s.flags, [flag]: value } })),
 
@@ -1292,7 +1364,7 @@ export const useWorldStore = create<WorldStore>()(
     }),
     {
       name: "wusia-world-v1",
-      version: 11,
+      version: 12,
       // Only persist the data fields, not the action functions.
       partialize: (s) => ({
         hasGame: s.hasGame,
@@ -1314,6 +1386,8 @@ export const useWorldStore = create<WorldStore>()(
         statExp: s.statExp,
         traits: s.traits,
         npcStates: s.npcStates,
+        defeatedCounts: s.defeatedCounts,
+        visitedLocationIds: s.visitedLocationIds,
         day: s.day,
         time: s.time,
         pendingBattle: s.pendingBattle,
@@ -1341,6 +1415,10 @@ export const useWorldStore = create<WorldStore>()(
       //           active art are seeded into the learned arrays.
       //   v9 → v10 added pendingEncounter. Existing saves default null.
       //   v10 → v11 added actionLog. Existing saves start with empty log.
+      //   v11 → v12 added defeatedCounts + visitedLocationIds (quest auto-
+      //            advance bookkeeping). Existing saves start empty — quest
+      //            progress that depended on past kills/visits won't auto-
+      //            backfill, which is fine for net-new content.
       migrate: (persisted, fromVersion) => {
         const p = (persisted ?? {}) as Partial<WorldStateData>;
         // Pad the build's skillIds to 10 and back-fill learned arrays.
@@ -1404,6 +1482,13 @@ export const useWorldStore = create<WorldStore>()(
           statExp: { ...emptyStatExp(), ...(p.statExp ?? {}) } as Record<StatKey, number>,
           traits: { ...emptyTraits(), ...(p.traits ?? {}) } as Record<TraitKey, number>,
           npcStates: p.npcStates && typeof p.npcStates === "object" ? { ...p.npcStates } : {},
+          defeatedCounts:
+            p.defeatedCounts && typeof p.defeatedCounts === "object"
+              ? { ...p.defeatedCounts }
+              : {},
+          visitedLocationIds: Array.isArray(p.visitedLocationIds)
+            ? [...p.visitedLocationIds]
+            : [],
           day: typeof p.day === "number" && p.day >= 1 ? p.day : 1,
           time: typeof p.time === "number" && p.time >= 0 ? p.time : 0,
           pendingHuntYield: p.pendingHuntYield ?? null,

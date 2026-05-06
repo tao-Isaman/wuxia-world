@@ -26,6 +26,12 @@ export function evaluateCondition(state: WorldStateData, c: Condition): boolean 
       if (c.max !== undefined && v > c.max) return false;
       return true;
     }
+    case "defeatedOpponent": {
+      const have = state.defeatedCounts[c.opponentId] ?? 0;
+      return have >= (c.count ?? 1);
+    }
+    case "visitedLocation":
+      return state.visitedLocationIds.includes(c.locationId);
     case "and":
       return c.all.every((sub) => evaluateCondition(state, sub));
     case "or":

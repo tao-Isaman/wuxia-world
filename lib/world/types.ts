@@ -134,6 +134,14 @@ export type Condition =
   // Range check on a registered NPC's relationship value. Useful for gating
   // NPC-specific dialog branches behind earned trust.
   | { t: "npcRelationship"; npcId: string; min?: number; max?: number }
+  // Player has defeated this opponent at least `count` times (default 1).
+  // Backed by WorldStateData.defeatedCounts (incremented in
+  // acknowledgeBattleResult on win).
+  | { t: "defeatedOpponent"; opponentId: string; count?: number }
+  // Player has visited this location at least once. Backed by
+  // WorldStateData.visitedLocationIds (recorded in gotoScene/followAutoAdvance
+  // when a "location" scene is entered).
+  | { t: "visitedLocation"; locationId: string }
   | { t: "and"; all: Condition[] }
   | { t: "or"; any: Condition[] }
   | { t: "not"; of: Condition };
@@ -189,6 +197,11 @@ export interface NpcDef {
   visibleIf?: Condition;
   // Free-form tags for future condition queries (e.g., "merchant").
   tags?: readonly string[];
+  // Quests this NPC offers / turns in. The NPC popup looks up each quest
+  // and renders an "Accept" or "Turn in" button as appropriate. Adding a
+  // new quest is one entry in lib/world/data/quests/* plus appending its
+  // id here.
+  questIds?: readonly string[];
 }
 
 export interface NpcStateEntry {
@@ -204,16 +217,56 @@ export interface NpcStateEntry {
 
 // ─── Quests ────────────────────────────────────────────────────────────
 
+// "main" — story-driven quests (any pacing, may unlock new content).
+// "side" — optional one-shot tasks. Once status is "done" or "failed",
+//          a side quest never appears on offer again (the NPC popup hides
+//          the offer when status !== "none"). Designed so players can fill
+//          spare time without polluting the main story flow.
+export type QuestType = "main" | "side";
+
+// Per-stage optional auto-advance. When `autoAdvance` evaluates true while
+// a quest is on this stage, the engine advances stage automatically — no
+// dialog beat needed. Useful for "kill 3 wolves" / "gather 5 herbs" style
+// objectives that resolve through gameplay rather than conversation.
 export interface QuestStage {
   id: string;
   description: string;
+  autoAdvance?: Condition;
 }
+
+// Reward grants applied by `finishQuest({ success: true })`. The dispatcher
+// in effects.ts iterates the array in order. Negative numbers are
+// rejected by the dispatcher (rewards never punish).
+export type QuestReward =
+  | { t: "gold"; amount: number }
+  | { t: "item"; itemId: string; count?: number }
+  | { t: "wExp"; amount: number }
+  | { t: "skillExp"; skillId: string; amount: number }
+  | { t: "trait"; trait: TraitKey; amount: number }
+  | { t: "npcRelationship"; npcId: string; amount: number }
+  | { t: "learnSkill"; skillId: string }
+  | { t: "learnArt"; artId: string; level?: number };
 
 export interface QuestDef {
   id: string;
   name: string;
   description: string;
   stages: QuestStage[];
+  // Defaults to "main" when omitted (existing quests stay main without edits).
+  type?: QuestType;
+  // Short hook shown in the quest log header / NPC offer card.
+  briefSummary?: string;
+  // NPC who offers this quest. The NPC popup uses this to render an "Accept"
+  // button when the player meets the prereqs.
+  giverNpcId?: string;
+  // NPC who closes out the quest. When omitted, defaults to giverNpcId.
+  // Only relevant for quests whose final stage is dialog-driven.
+  turnInNpcId?: string;
+  // Gating for the offer to appear. Evaluated against world state when the
+  // NPC popup decides whether to show the accept button.
+  prereqs?: Condition;
+  // Granted on `finishQuest({ success: true })` in order. May be omitted.
+  rewards?: readonly QuestReward[];
 }
 
 export interface QuestState {
@@ -491,6 +544,17 @@ export interface WorldStateData {
   // Per-NPC runtime state, keyed by NpcDef.id. Entries are created lazily
   // — missing keys mean the player has never interacted with that NPC.
   npcStates: Record<string, NpcStateEntry>;
+
+  // ─── Quest auto-advance bookkeeping ──────────────────────────────────
+  // Counter of opponents the player has defeated. Read by
+  // `Condition.defeatedOpponent` and incremented on every win in
+  // acknowledgeBattleResult. Pure number per id — no per-day decay.
+  defeatedCounts: Record<string, number>;
+  // Set of location ids the player has ever entered (any visit counts).
+  // Read by `Condition.visitedLocation` and pushed when a location scene
+  // is reached. Stored as an array (vs a Set) because Zustand persistence
+  // needs JSON-serialisable shapes.
+  visitedLocationIds: string[];
 
   // Game time. Twelve ชั่วยาม per day; `time` is a fractional within-day
   // counter (0 ≤ time < 12) that advances per action and rolls `day` over
