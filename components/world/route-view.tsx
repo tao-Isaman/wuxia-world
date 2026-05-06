@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import type { RouteScene, SceneEffect } from "@/lib/world";
 import { applyEffect, evaluateCondition } from "@/lib/world";
 import { TRAVEL_STAMINA_COST, useWorldStore } from "@/store/world-store";
-import { flashLoading } from "@/store/loading-store";
 import { RestPanel } from "./rest-panel";
 
 interface Props {
@@ -90,10 +89,7 @@ export function RouteView({ scene }: Props) {
                   key={d.locationId}
                   variant="outline"
                   disabled={tooTired}
-                  onClick={() => {
-                    flashLoading("กำลังเดินทาง...");
-                    travel(d.locationId, d.effects);
-                  }}
+                  onClick={() => travel(d.locationId, d.effects)}
                   className="w-full justify-start text-left h-auto py-2 whitespace-normal"
                 >
                   <span className="flex flex-col items-start gap-0.5">
@@ -115,10 +111,7 @@ export function RouteView({ scene }: Props) {
               variant="ghost"
               size="sm"
               disabled={tooTired}
-              onClick={() => {
-                flashLoading("กำลังเดินทาง...");
-                gotoScene(backTarget);
-              }}
+              onClick={() => gotoScene(backTarget)}
               className="w-full text-xs text-muted-foreground"
             >
               ← ย้อนกลับ

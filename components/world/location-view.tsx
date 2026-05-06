@@ -175,10 +175,7 @@ export function LocationView({ scene }: Props) {
                     key={route.routeSceneId}
                     variant="outline"
                     disabled={!valid || tooTired}
-                    onClick={() => {
-                      flashLoading("กำลังเดินทาง...");
-                      gotoScene(route.routeSceneId);
-                    }}
+                    onClick={() => gotoScene(route.routeSceneId)}
                     className="w-full justify-start text-left h-auto py-2 whitespace-normal"
                   >
                     <span className="flex flex-col items-start gap-0.5">
