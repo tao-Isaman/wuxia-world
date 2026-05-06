@@ -84,6 +84,16 @@ export const SCENES_VILLAGES: readonly Scene[] = [
       { t: "dialogue", speaker: "นางสาวซิ่ว", text: "ท่านผู้เดินทาง! ท่านมาถูกที่แล้ว โรงเตี๊ยมยุเหล่ยดีที่สุดในห้าสิบลี้แถวนี้!" },
       { t: "dialogue", speaker: "นางสาวซิ่ว", text: "ข้าอยู่ที่นี่มาสิบปี รู้ว่าใครผ่านมาบ้าง... อยากรู้เรื่องอะไรถามข้าได้" },
     ],
+    // Recovery branch — when the debt-collector quest is already active
+    // (player accepted in a save built before the offer→confront wiring
+    // fix), give them a way to reach the confrontation from here.
+    choices: [
+      {
+        text: "ไปจัดการนักเลงเรียกหนี้ที่คุกคามเจ้า",
+        next: "qs_qv_inn_debt_collector_confront",
+        visibleIf: { t: "questStatus", questId: "qv_inn_debt_collector", status: "active" },
+      },
+    ],
   },
 
   // ─── เฉาอ้วน (inn_gaosheng) ──────────────────────────────────────
@@ -1012,7 +1022,10 @@ export const SCENES_VILLAGES: readonly Scene[] = [
     choices: [
       {
         text: "รับจัดการเรื่องนี้",
-        next: "inn_yuelai",
+        // Accept routes straight into the confrontation so the quest is
+        // actually completable — without this jump the only entry point
+        // to qs_qv_inn_debt_collector_confront would be unreachable.
+        next: "qs_qv_inn_debt_collector_confront",
         effects: [{ t: "startQuest", questId: "qv_inn_debt_collector" }],
       },
       { text: "เรื่องหนี้ไม่ใช่เรื่องของข้า", next: "inn_yuelai" },

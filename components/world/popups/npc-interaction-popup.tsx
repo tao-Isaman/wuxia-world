@@ -8,6 +8,7 @@ import {
   getItem,
   getQuest,
   getQuestsForNpc,
+  getScene,
   isQuestOfferable,
   isQuestTurnInForNpc,
   type NpcDef,
@@ -37,6 +38,7 @@ export function NpcInteractionPopup({ open, npc, onClose }: Props) {
   const startSparWith = useWorldStore((s) => s.startSparWith);
   const meetNpc = useWorldStore((s) => s.meetNpc);
   const acceptQuest = useWorldStore((s) => s.acceptQuest);
+  const finishQuestNow = useWorldStore((s) => s.finishQuestNow);
   const npcStates = useWorldStore((s) => s.npcStates);
   // Subscribing to the whole world state for the offer/turn-in checks is
   // intentional — these are read-only condition evaluations and the popup
@@ -72,34 +74,53 @@ export function NpcInteractionPopup({ open, npc, onClose }: Props) {
   });
 
   const onAcceptQuest = (def: QuestDef) => {
+    // Always start the quest engine-side first — guarantees `quests[id]`
+    // becomes "active" even if the offer scene is missing or doesn't emit
+    // `startQuest` itself. The startQuest dispatcher is idempotent, so
+    // running it again from the offer scene's choice is a no-op.
     const r = acceptQuest(def.id);
     if (!r.ok) {
       toast("warn", "ยังรับภารกิจนี้ไม่ได้");
       return;
     }
     toast("success", `รับภารกิจ: ${def.name}`);
-    // Offer flow goes to the quest's giver scene if any beat is wired up,
-    // else it just stays in the popup so the player can see the entry land
-    // in the quest log.
-    if (def.giverNpcId === npc.id && npc.dialogSceneId) {
-      onClose();
-      gotoScene(npc.dialogSceneId);
-    } else {
-      onClose();
-    }
+
+    // Routing in priority order:
+    //   1. `qs_<id>_offer` — gives the player the briefing dialog with the
+    //      "what to do next" instructions (which itemId to fetch, where to
+    //      travel, etc.). Without this hop the player just lands back on
+    //      an ambient greet and has no idea what they accepted.
+    //   2. NPC's ambient `dialogSceneId` — fallback for quests with no
+    //      offer scene authored (engine-side accept already ran above).
+    const offerSceneId = `qs_${def.id}_offer`;
+    const target =
+      getScene(offerSceneId) !== null
+        ? offerSceneId
+        : npc.dialogSceneId ?? null;
+    onClose();
+    if (target) gotoScene(target);
   };
 
   const onTurnInQuest = (def: QuestDef) => {
-    // Turn-in is dialog-driven by convention — the quest's final stage
-    // points the player at a scene whose choice emits `finishQuest`. So
-    // here we just route to that scene.
-    const sceneId = def.giverNpcId === npc.id ? npc.dialogSceneId : null;
-    if (!sceneId) {
-      toast("info", "ผู้รับภารกิจอยู่ที่อื่น");
+    // Turn-in routing, in priority order:
+    //   1. `qs_<questId>_complete` — content-author convention. Calling
+    //      finishQuest from that scene grants rewards.
+    //   2. Engine fallback — call `finishQuestNow` directly so the quest
+    //      still pays out even when no complete scene was authored. Pops
+    //      a toast since there's no narrative beat to show.
+    const completeSceneId = `qs_${def.id}_complete`;
+    if (getScene(completeSceneId)) {
+      onClose();
+      gotoScene(completeSceneId);
       return;
     }
+    const r = finishQuestNow(def.id);
+    if (r.ok) {
+      toast("success", `สำเร็จภารกิจ: ${def.name}`);
+    } else {
+      toast("warn", "ยังส่งมอบภารกิจไม่ได้");
+    }
     onClose();
-    gotoScene(sceneId);
   };
 
   return (

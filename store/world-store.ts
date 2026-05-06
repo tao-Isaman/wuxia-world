@@ -261,6 +261,11 @@ interface WorldStore extends WorldStateData {
   // Marks the quest as failed (and clears progress). Side quests do not
   // re-offer after failure — once failed, the NPC popup hides them.
   abandonQuest: (questId: string) => QuestActionResult;
+  // Engine-side turn-in. Used by the NPC popup when a quest has no
+  // `qs_<id>_complete` dialog scene to route to — without this fallback,
+  // such quests would never grant rewards. Equivalent to a dialog choice
+  // that emits `finishQuest({ success: true })`.
+  finishQuestNow: (questId: string) => QuestActionResult;
 
   // Random-encounter resolution. `acceptEncounter` promotes a pending
   // fight-or-flee offer to an actual battle; `fleeEncounter` clears the
@@ -1353,6 +1358,19 @@ export const useWorldStore = create<WorldStore>()(
         // path skips the reward dispatcher.
         applyEffects(draft, [{ t: "finishQuest", questId, success: false }]);
         appendActionLog(draft, "quest", `ละทิ้งภารกิจ: ${def.name}`);
+        set({ ...draft });
+        return { ok: true, questId };
+      },
+
+      finishQuestNow: (questId) => {
+        const s = get();
+        const def = getQuest(questId);
+        if (!def) return { ok: false, reason: "unknown" };
+        const cur = s.quests[questId];
+        if (!cur || cur.status !== "active") return { ok: false, reason: "already-done" };
+        const draft = draftFrom(s);
+        applyEffects(draft, [{ t: "finishQuest", questId, success: true }]);
+        appendActionLog(draft, "quest", `สำเร็จภารกิจ: ${def.name}`);
         set({ ...draft });
         return { ok: true, questId };
       },

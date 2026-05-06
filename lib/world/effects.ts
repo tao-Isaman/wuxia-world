@@ -55,10 +55,15 @@ export function applyEffect(state: WorldStateData, eff: SceneEffect): void {
       const q = state.quests[eff.questId];
       if (!def || !q || q.status !== "active") return;
       const nextStage = q.stage + 1;
-      // If stages are exhausted, mark done; otherwise just advance.
+      // If stages are exhausted, mark done AND grant rewards. Without the
+      // reward grant, content authors who use `advanceQuest` on the final
+      // stage and `finishQuest` on a follow-up scene end up with quests
+      // that never pay out (finishQuest's idempotent guard skips them
+      // because status is already "done").
       if (nextStage >= def.stages.length) {
         q.status = "done";
         q.stage = def.stages.length - 1;
+        if (def.rewards) applyQuestRewards(state, def.rewards);
       } else {
         q.stage = nextStage;
       }
