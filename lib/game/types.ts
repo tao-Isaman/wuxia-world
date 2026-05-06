@@ -215,6 +215,10 @@ export interface Art {
   n: string;
   sc: string;
   tp: string;
+  // Tier (พื้นฐาน → เฉพาะ, 0..4) — same axis as Skill. Drives the rough
+  // power budget: tier 0 inner skills give ~30 HP+MP/level and 10 stats,
+  // climbing to tier 4 = ~70 HP+MP/level and ~50 stats.
+  ti: SkillTierIndex;
   stats: PartialStats;
   hL: number;
   mL: number;
