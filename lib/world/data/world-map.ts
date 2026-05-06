@@ -6,6 +6,7 @@ import type {
   RouteScene,
   Scene,
 } from "../types";
+import { LOCATION_ROUTES } from "./location-routes";
 
 // 85 locations: 83 from location.md (cities, sects, islands, terrain, caves,
 // temples/palaces, mansions, taverns, NPC homes, miscellaneous) plus one new
@@ -68,12 +69,29 @@ function categoryRoute(
   };
 }
 
-// ─── Cities (4) ───────────────────────────────────────────────────────
+// ─── Cities (7) ───────────────────────────────────────────────────────
 const CITIES: LocationScene[] = [
   leaf("city_capital", "นครหลวง", "京城 · ศูนย์กลางเกม · ทอผ้า ตัดเสื้อ เกษตร"),
   leaf("city_xixia", "ซีเซี่ย", "西夏 · ขุดแร่ ล่าสัตว์ ตีเหล็ก"),
   leaf("city_dali", "ต้าหลี่", "大理 · ช่างไม้ ตัดไม้ · บ้านสกุลต้วน"),
   leaf("city_yangzhou", "หยางโจว", "扬州 · หล่อดาบ ทำอาหาร ตกปลา"),
+  leaf("city_suzhou", "ซูโจว", "苏州 · เมืองสายน้ำตอนใต้ · ผ้าไหมและอาหารเลื่องชื่อ"),
+  leaf("city_jinling", "จินหลิง", "金陵 · ราชธานีโบราณฝ่ายใต้ · ตลาดบัณฑิต/วิชาทางใน"),
+  leaf("city_changan", "ฉางอัน", "长安 · ราชธานีโบราณตะวันตก · กระบี่หลวงและช่างราชสำนัก"),
+];
+
+// ─── Villages (7) ────────────────────────────────────────────────────
+// Smaller settlements. Each is a fully-fledged location with rest + a
+// tiny shop (see lib/world/data/shops.ts). Routes are added through the
+// HAND_EDGES table below.
+const VILLAGES: LocationScene[] = [
+  leaf("village_qigu", "หมู่บ้านชีกู่", "หมู่บ้านเชิงเขาเล็ก ๆ ที่คนผ่านไปมาเล่าเรื่องลึกลับเสมอ"),
+  leaf("village_noname", "หมู่บ้านไร้นาม", "ไม่มีใครรู้ชื่อจริง ๆ ของหมู่บ้านนี้ ผู้คนเรียกง่าย ๆ ว่า 'ไร้นาม'"),
+  leaf("village_meihua", "หมู่บ้านดอกเหมย", "หมู่บ้านล้อมด้วยต้นเหมยที่บานเต็มในฤดูหนาว"),
+  leaf("village_huashan", "หมู่บ้านหัวซาน", "หมู่บ้านเชิงเขาหัวซาน ผู้ฝึกกระบี่หลายคนเริ่มต้นที่นี่"),
+  leaf("village_taishan", "หมู่บ้านไท่ซาน", "หมู่บ้านใต้เขาไท่ซานอันสง่างาม"),
+  leaf("village_hengshan", "หมู่บ้านฮิงซาน", "หมู่บ้านในเขตเขาเฮิงซาน ผู้คนจริงใจและรักดนตรี"),
+  leaf("village_wuxia", "หมู่บ้านอวู่เซี่ย", "หมู่บ้านปากแม่น้ำสายลึก ที่หล่อหลอมยอดยุทธหลายรุ่น"),
 ];
 
 // ─── Sects (17) ───────────────────────────────────────────────────────
@@ -200,6 +218,7 @@ const MISC: LocationScene[] = [
 // redirect fires before the location screen draws).
 const ALL_LEAVES: LocationScene[] = [
   ...CITIES,
+  ...VILLAGES,
   ...SECTS,
   ...ISLES,
   ...TERRAIN,
@@ -211,61 +230,26 @@ const ALL_LEAVES: LocationScene[] = [
   ...MISC,
 ];
 
+// home_player is the starter location (see lib/world/data/scenes.ts
+// START_SCENE_ID). Strip its random-event roll so the player can't spawn
+// straight into a fight or a meet-NPC scene on game start.
+{
+  const home = MISC.find((l) => l.id === "home_player");
+  if (home) home.onEnter = [];
+}
+
 const LEAVES_BY_ID = new Map(ALL_LEAVES.map((l) => [l.id, l] as const));
 
 // ─── Connectivity graph ───────────────────────────────────────────────
-// Each leaf gets 1–4 directed-edge routes to other leaves so a player can
-// travel between locations without bouncing through the world map.
-//
-// The graph is built in three passes:
-//   1. Hand-curated edges for obvious geographic / thematic pairs from
-//      location.md (e.g., shaolin and songshan both sit on เขาซงซาน).
-//   2. Deterministic random fill — for each leaf, top up to a target
-//      degree using a seeded PRNG so the layout stays stable across
-//      reloads. Degree caps at 4 to keep the location screen readable.
-//   3. Connectivity guarantee — every leaf must end up with at least one
-//      outbound edge; isolated leaves get attached to the lowest-degree
-//      neighbour we can find.
+// All routes are explicit — the full edge list lives in
+// lib/world/data/location-routes.ts. No random fill, no PRNG; the map
+// only ever connects two leaves that an author wrote down. The
+// connectivity guarantee below remains as a safety net so a typo or a
+// missed entry can't leave a leaf stranded.
 //
 // After the graph is built we generate one RouteScene per directed edge
 // (`route_<src>__to__<dst>`) and rewrite each leaf's `routes` array to
-// reference its outgoing edges plus a final "back to world map" fallback.
-
-function makeRng(seed: number): () => number {
-  let a = seed >>> 0;
-  return () => {
-    a = (a + 0x6d2b79f5) >>> 0;
-    let t = a;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-const HAND_EDGES: ReadonlyArray<readonly [string, string]> = [
-  // Mountains shared between sects / locations
-  ["sect_shaolin", "sect_songshan"], // both at เขาซงซาน
-  ["sect_quanzhen", "palace_zhongyang"], // 全真教 lives at 重阳宫
-  ["sect_xingxiu", "sea_xingxiu"], // ดิงชุนชิว's home + seat
-  ["valley_jueqing", "valley_jueqing_bottom"], // upper / lower
-  ["mt_kunlun", "mt_kunlun_immortal"], // outer / inner
-  ["sect_huashan", "cliff_siguo"], // 思过崖 sits on 华山
-  ["sect_ming", "peak_guangming"], // 明教 at 光明顶
-  ["sect_xueyu", "sect_xuedao"], // both blood-blade sects
-  ["sect_wudu", "city_dali"], // 五毒教 in ยูนนาน, near ต้าหลี่
-  ["sect_emei", "city_dali"], // ง้อไบ๊ near ต้าหลี่
-  ["sect_gumu", "sect_quanzhen"], // 古墓 below 终南山, 全真 above
-  // Flagship cities link to nearby landmarks
-  ["city_capital", "city_yangzhou"],
-  ["city_capital", "inn_yuelai"],
-  ["city_capital", "palace_royal"], // พระราชวังหลวงตั้งอยู่ในนครหลวง
-  ["city_yangzhou", "villa_meizhuang"], // ดงดอกท้อ (สี่อรหันต์) by 扬州
-  ["city_xixia", "desert_ruins"], // ทะเลทราย near ซีเซี่ย
-  ["tribe_huizu", "city_xixia"],
-  ["market_miao", "sect_wudu"],
-  // Player home is the home base — link to the capital
-  ["home_player", "city_capital"],
-];
+// reference its outgoing edges.
 
 const adj = new Map<string, Set<string>>();
 for (const l of ALL_LEAVES) adj.set(l.id, new Set());
@@ -281,32 +265,19 @@ function addEdge(a: string, b: string): boolean {
   return true;
 }
 
-for (const [a, b] of HAND_EDGES) addEdge(a, b);
+// All routes are now read from the explicit table. Authoring lives in
+// lib/world/data/location-routes.ts.
+for (const [a, b] of LOCATION_ROUTES) addEdge(a, b);
 
-const MAX_DEGREE = 4;
-const rng = makeRng(0xc0ffee42);
-
-for (let i = 0; i < ALL_LEAVES.length; i++) {
-  const src = ALL_LEAVES[i]!;
-  const srcAdj = adj.get(src.id)!;
-  // Target between 1 and 4 edges. Hand-curated edges count toward this.
-  const target = 1 + Math.floor(rng() * MAX_DEGREE);
-  let attempts = 0;
-  while (srcAdj.size < target && attempts < 200) {
-    attempts++;
-    const j = Math.floor(rng() * ALL_LEAVES.length);
-    const dst = ALL_LEAVES[j]!;
-    if (dst.id === src.id) continue;
-    if (srcAdj.has(dst.id)) continue;
-    const dstAdj = adj.get(dst.id)!;
-    if (dstAdj.size >= MAX_DEGREE) continue;
-    addEdge(src.id, dst.id);
-  }
-}
-
-// Connectivity guarantee — no isolated leaves.
+// Connectivity safety net — every leaf must end up with at least one
+// outbound edge. If an author forgot to write one, attach the orphan to
+// the lowest-degree neighbour we can find. Logs to console so the gap is
+// visible during development.
 for (const lf of ALL_LEAVES) {
   if (adj.get(lf.id)!.size > 0) continue;
+  console.warn(
+    `[world-map] leaf "${lf.id}" has no explicit route — adding fallback. Add an entry to location-routes.ts.`,
+  );
   let best: LocationScene | null = null;
   for (const cand of ALL_LEAVES) {
     if (cand.id === lf.id) continue;
@@ -524,6 +495,7 @@ function attachCategoryResources(leaves: LocationScene[], category: string): voi
 }
 
 attachCategoryResources(CITIES,   "cities");
+attachCategoryResources(VILLAGES, "homes");
 attachCategoryResources(SECTS,    "sects");
 attachCategoryResources(ISLES,    "isles");
 attachCategoryResources(TERRAIN,  "terrain");
@@ -595,7 +567,8 @@ const WORLD_HUB: LocationScene = {
     "เจ้ายืนอยู่บนสี่แยกแห่งยุทธภพ มองเห็นเส้นทางสู่ดินแดนต่าง ๆ ทั่วทั้งแผ่นดิน เลือกทางที่จะไป",
   npcs: [],
   routes: [
-    { routeSceneId: "cat_cities", label: "🏙 เมืองหลัก (4)", hint: "ศูนย์กลางการค้าและการปกครอง" },
+    { routeSceneId: "cat_cities", label: "🏙 เมืองหลัก (7)", hint: "ศูนย์กลางการค้าและการปกครอง" },
+    { routeSceneId: "cat_villages", label: "🏘 หมู่บ้าน (7)", hint: "ชุมชนเล็กกระจายไปทั่วแผ่นดิน" },
     { routeSceneId: "cat_sects", label: "⚔ สำนักและพรรค (17)", hint: "ที่ตั้งของสำนักวิทยายุทธ์" },
     { routeSceneId: "cat_isles", label: "🏝 เกาะ (10)", hint: "เกาะแก่งกลางมหาสมุทร" },
     { routeSceneId: "cat_terrain", label: "🏔 ภูเขาและหน้าผา (11)", hint: "เขาสูงและหน้าผาสำคัญ" },
@@ -624,6 +597,7 @@ const VILLAGE_TO_WORLD: RouteScene = {
 // ─── Category routes — derived from each leaf array ───────────────────
 const CATEGORY_ROUTES: RouteScene[] = [
   categoryRoute("cat_cities", "ทางสู่เมืองหลัก", "เส้นทางสายหลักเชื่อมเมืองใหญ่ของแผ่นดิน", CITIES),
+  categoryRoute("cat_villages", "ทางสู่หมู่บ้าน", "เส้นทางลัดเลาะสู่ชุมชนเล็ก ๆ ทั่วแผ่นดิน", VILLAGES),
   categoryRoute("cat_sects", "ทางสู่สำนักและพรรค", "เส้นทางสู่สำนักวิทยายุทธ์ทั่วยุทธจักร", SECTS),
   categoryRoute("cat_isles", "ทางสู่เกาะกลางสมุทร", "ท่าเรือออกสู่เกาะลี้ลับต่าง ๆ", ISLES),
   categoryRoute("cat_terrain", "ทางสู่ภูเขาและหน้าผา", "เส้นทางขึ้นเขาสู่ยอดและหน้าผาสำคัญ", TERRAIN),
@@ -644,6 +618,7 @@ export const WORLD_MAP_SCENES: Scene[] = [
   ...CATEGORY_ROUTES,
   ...EDGE_ROUTES,
   ...CITIES,
+  ...VILLAGES,
   ...SECTS,
   ...ISLES,
   ...TERRAIN,

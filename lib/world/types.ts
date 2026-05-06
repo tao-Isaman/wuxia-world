@@ -224,14 +224,50 @@ export interface QuestState {
 
 // ─── Items ─────────────────────────────────────────────────────────────
 
+// ─── Item categories ─────────────────────────────────────────────────
+// Categorisation drives shop / inn UI sorting and which categories an inn
+// will buy from the player. Adding a new bucket is one new key here plus
+// a label in ITEM_CATEGORY_LABEL.
+export const ITEM_CATEGORIES = [
+  "material",
+  "herb",
+  "venom",
+  "potion",
+  "food",
+  "book",
+  "craft",
+  "valuable",
+  "quest",
+  "misc",
+] as const;
+export type ItemCategory = (typeof ITEM_CATEGORIES)[number];
+
+export const ITEM_CATEGORY_LABEL: Record<ItemCategory, string> = {
+  material: "วัตถุดิบ",
+  herb: "สมุนไพร",
+  venom: "พิษ",
+  potion: "ยาฟื้นพลัง",
+  food: "อาหาร",
+  book: "ตำรา / คัมภีร์",
+  craft: "ของช่างฝีมือ",
+  valuable: "ของมีค่า",
+  quest: "ของภารกิจ",
+  misc: "เบ็ดเตล็ด",
+};
+
 export interface ItemDef {
   id: string;
   name: string;
   description: string;
   // Consumable: item shows a "ใช้" action; effect runs on use, one count is
-  // removed from inventory. Currently only `trainSkill` ships, but the
-  // discriminated union leaves room for heal / buff / unlock items later.
+  // removed from inventory.
   use?: ItemUseEffect;
+  // Shop / inventory bucket. Defaults to "misc" when omitted.
+  category?: ItemCategory;
+  // Base shop price in gold. Sell-back is a fraction (typically × 0.5)
+  // determined by the shop. Items with price 0 / undefined are unsellable
+  // (quest items).
+  price?: number;
 }
 
 export type ItemUseEffect =

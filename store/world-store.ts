@@ -144,6 +144,19 @@ export type LevelUpSkillResult =
   | { ok: false; reason: "unknown" | "maxed" | "insufficient" }
   | { ok: true; skillId: string; level: number; cost: number };
 
+// ─── Shop / sect-hall result types ────────────────────────────────────
+export type BuyResult =
+  | { ok: false; reason: "unknown" | "not-for-sale" | "no-gold" }
+  | { ok: true; itemId: string; count: number; spent: number };
+
+export type SellResult =
+  | { ok: false; reason: "unknown" | "missing" | "not-accepted" | "unsellable" }
+  | { ok: true; itemId: string; count: number; gained: number };
+
+export type BuyOfferResult =
+  | { ok: false; reason: "unknown" | "no-gold" | "already-learned" }
+  | { ok: true; id: string; spent: number };
+
 // Result of attempting to start a sparring match with a registered NPC.
 // `unsupported` means the NPC has no `sparOpponentId` configured; `pending`
 // means the player already has a battle queued.
@@ -209,6 +222,13 @@ interface WorldStore extends WorldStateData {
   // one tier. The skill's own xp bar auto-levels on overflow without any
   // user action — no separate "level up via skill xp" button is needed.
   levelUpSkillFromWExp: (skillId: string) => LevelUpSkillResult;
+
+  // Shop / sect-hall purchases. All return a discriminated result so the
+  // popups can show the right toast on success / failure.
+  buyItem: (itemId: string, count: number) => BuyResult;
+  sellItem: (itemId: string, count: number, sellMultiplier: number) => SellResult;
+  buyMoveSkill: (skillId: string, price: number) => BuyOfferResult;
+  buyInnerSkill: (artId: string, price: number) => BuyOfferResult;
 
   // Equip a learned skill or art into a specific slot. `rawId` follows
   // the slot encoding from `lib/game/slots.ts` — bare skill id or
@@ -973,6 +993,100 @@ export const useWorldStore = create<WorldStore>()(
         syncPlayerSkillLevels(draft);
         set({ ...draft });
         return { ok: true, skillId, level: lv + 1, cost };
+      },
+
+      buyItem: (itemId, count) => {
+        if (count <= 0) return { ok: false, reason: "unknown" };
+        const s = get();
+        const def = getItem(itemId);
+        if (!def) return { ok: false, reason: "unknown" };
+        const price = def.price ?? 0;
+        if (price <= 0) return { ok: false, reason: "not-for-sale" };
+        const total = price * count;
+        if (s.gold < total) return { ok: false, reason: "no-gold" };
+        const draft = draftFrom(s);
+        draft.gold -= total;
+        draft.inventory[itemId] = (draft.inventory[itemId] ?? 0) + count;
+        rollLukXp(draft);
+        set({ ...draft });
+        return { ok: true, itemId, count, spent: total };
+      },
+
+      sellItem: (itemId, count, sellMultiplier) => {
+        if (count <= 0) return { ok: false, reason: "unknown" };
+        const s = get();
+        const def = getItem(itemId);
+        if (!def) return { ok: false, reason: "unknown" };
+        const price = def.price ?? 0;
+        if (price <= 0) return { ok: false, reason: "unsellable" };
+        const have = s.inventory[itemId] ?? 0;
+        if (have < count) return { ok: false, reason: "missing" };
+        const draft = draftFrom(s);
+        const remaining = have - count;
+        if (remaining <= 0) delete draft.inventory[itemId];
+        else draft.inventory[itemId] = remaining;
+        const gained = Math.floor(price * sellMultiplier) * count;
+        draft.gold = Math.max(0, draft.gold + gained);
+        rollLukXp(draft);
+        set({ ...draft });
+        return { ok: true, itemId, count, gained };
+      },
+
+      buyMoveSkill: (skillId, price) => {
+        const s = get();
+        if (!s.playerBuild) return { ok: false, reason: "unknown" };
+        const sk = getSkill(skillId);
+        if (!sk) return { ok: false, reason: "unknown" };
+        if ((s.playerBuild.learnedSkillIds ?? []).includes(skillId)) {
+          return { ok: false, reason: "already-learned" };
+        }
+        if (s.gold < price) return { ok: false, reason: "no-gold" };
+        const draft = draftFrom(s);
+        draft.gold -= price;
+        const cur = draft.playerBuild!.learnedSkillIds ?? [];
+        const slots = [...draft.playerBuild!.skillIds];
+        if (!slots.includes(skillId)) {
+          for (let i = 0; i < slots.length; i++) {
+            if (slots[i] === null) { slots[i] = skillId; break; }
+          }
+        }
+        draft.playerBuild = {
+          ...draft.playerBuild!,
+          learnedSkillIds: [...cur, skillId],
+          skillIds: slots,
+        };
+        rollLukXp(draft);
+        set({ ...draft });
+        return { ok: true, id: skillId, spent: price };
+      },
+
+      buyInnerSkill: (artId, price) => {
+        const s = get();
+        if (!s.playerBuild) return { ok: false, reason: "unknown" };
+        if ((s.playerBuild.learnedArtIds ?? []).includes(artId)) {
+          return { ok: false, reason: "already-learned" };
+        }
+        if (s.gold < price) return { ok: false, reason: "no-gold" };
+        const draft = draftFrom(s);
+        draft.gold -= price;
+        const curArts = draft.playerBuild!.learnedArtIds ?? [];
+        const levels = { ...(draft.playerBuild!.artLevels ?? {}) };
+        const slots = [...draft.playerBuild!.skillIds];
+        const slotEntry = `art:${artId}`;
+        if (!slots.includes(slotEntry)) {
+          for (let i = 0; i < slots.length; i++) {
+            if (slots[i] === null) { slots[i] = slotEntry; break; }
+          }
+        }
+        draft.playerBuild = {
+          ...draft.playerBuild!,
+          learnedArtIds: [...curArts, artId],
+          artLevels: { ...levels, [artId]: levels[artId] ?? 1 },
+          skillIds: slots,
+        };
+        rollLukXp(draft);
+        set({ ...draft });
+        return { ok: true, id: artId, spent: price };
       },
 
       equipSlot: (slotIdx, rawId) => {

@@ -14,9 +14,13 @@ import {
   getNpcsAtLocation,
   getResource,
   getScene,
+  getShopAt,
+  getSectHallAt,
   masteryLevel,
 } from "@/lib/world";
 import { NpcInteractionPopup } from "./popups/npc-interaction-popup";
+import { ShopPopup } from "./popups/shop-popup";
+import { SectHallPopup } from "./popups/sect-hall-popup";
 import {
   useWorldStore,
   TRAVEL_STAMINA_COST,
@@ -45,6 +49,12 @@ export function LocationView({ scene }: Props) {
   const [lastGather, setLastGather] = useState<GatherResult | null>(null);
   // The popup-active NPC. null = no popup. Set by clicking a registry NPC.
   const [activeNpc, setActiveNpc] = useState<NpcDef | null>(null);
+  // Toggle state for the shop / sect-hall panels.
+  const [shopOpen, setShopOpen] = useState(false);
+  const [hallOpen, setHallOpen] = useState(false);
+
+  const shop = getShopAt(scene.id);
+  const hall = getSectHallAt(scene.id);
 
   const visibleNpcs = scene.npcs.filter(
     (n) => !n.visibleIf || evaluateCondition(state, n.visibleIf),
@@ -60,11 +70,10 @@ export function LocationView({ scene }: Props) {
     (r) => !r.visibleIf || evaluateCondition(state, r.visibleIf),
   );
 
-  // Rest tier by id prefix. Inns charge gold for a full restore, temples /
-  // palaces give a free half restore, and every other location falls back
-  // to the roadside tier so a player who runs out of stamina can never get
-  // permanently stuck.
-  const restKind: RestKind = scene.id.startsWith("inn_")
+  // Rest tier by id prefix. Cities and inns charge gold for a full restore,
+  // temples / palaces give a free half restore, and every other location
+  // (including villages) falls back to the roadside tier.
+  const restKind: RestKind = scene.id.startsWith("inn_") || scene.id.startsWith("city_")
     ? "inn"
     : scene.id.startsWith("temple_") || scene.id.startsWith("palace_")
       ? "temple"
@@ -188,6 +197,46 @@ export function LocationView({ scene }: Props) {
         </CardContent>
       </Card>
 
+      {(shop || hall) && (
+        <Card>
+          <CardContent className="p-3 space-y-2">
+            <div className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">
+              บริการในเมือง
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+              {shop && (
+                <Button
+                  variant="outline"
+                  onClick={() => setShopOpen(true)}
+                  className="justify-start h-auto py-2 whitespace-normal"
+                >
+                  <span className="flex flex-col items-start gap-0.5">
+                    <span className="font-semibold text-sm">{shop.label}</span>
+                    <span className="text-[10px] text-muted-foreground">
+                      ซื้อ-ขายของ · ขายคืน {Math.round(shop.sellMultiplier * 100)}%
+                    </span>
+                  </span>
+                </Button>
+              )}
+              {hall && (
+                <Button
+                  variant="outline"
+                  onClick={() => setHallOpen(true)}
+                  className="justify-start h-auto py-2 whitespace-normal"
+                >
+                  <span className="flex flex-col items-start gap-0.5">
+                    <span className="font-semibold text-sm">{hall.label}</span>
+                    <span className="text-[10px] text-muted-foreground">
+                      เรียนวิชาฝีมือ / วิชาในกาย ขั้น 0–1
+                    </span>
+                  </span>
+                </Button>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <RestPanel kind={restKind} />
 
       {resources.length > 0 && (
@@ -257,6 +306,9 @@ export function LocationView({ scene }: Props) {
         npc={activeNpc}
         onClose={() => setActiveNpc(null)}
       />
+
+      <ShopPopup open={shopOpen} shop={shop} onClose={() => setShopOpen(false)} />
+      <SectHallPopup open={hallOpen} hall={hall} onClose={() => setHallOpen(false)} />
     </div>
   );
 }

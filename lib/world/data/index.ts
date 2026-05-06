@@ -3,6 +3,14 @@ export { QUESTS, QUESTS_BY_ID, getQuest } from "./quests";
 export { ITEMS, ITEMS_BY_ID, getItem } from "./items";
 export { OPPONENTS, OPPONENTS_BY_ID, getOpponent } from "./opponents";
 export { NPCS, NPCS_BY_ID, getNpc, getNpcsAtLocation } from "./npcs";
+export { SHOPS, SHOPS_BY_LOCATION, getShopAt, type ShopDef } from "./shops";
+export {
+  SECT_HALLS,
+  SECT_HALLS_BY_LOCATION,
+  getSectHallAt,
+  type SectHallDef,
+  type SectHallOffer,
+} from "./sect-halls";
 export {
   MEET_EVENTS,
   FIGHT_EVENTS,

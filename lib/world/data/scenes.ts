@@ -436,4 +436,8 @@ export function getScene(id: string | null | undefined): Scene | null {
   return SCENES_BY_ID.get(id) ?? null;
 }
 
-export const START_SCENE_ID = "start";
+// Player starts at their own home (defined in world-map.ts as home_player)
+// rather than the legacy "start" dialog. The home_player leaf carries a
+// route back into the wider world so the original tutorial scenes are
+// still reachable via "ออกเดินทาง" if quests need them.
+export const START_SCENE_ID = "home_player";
