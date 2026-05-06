@@ -27,6 +27,7 @@ import {
   type GatherResult,
   type RestKind,
 } from "@/store/world-store";
+import { flashLoading } from "@/store/loading-store";
 import { RestPanel } from "./rest-panel";
 
 interface Props {
@@ -176,7 +177,10 @@ export function LocationView({ scene }: Props) {
                     key={route.routeSceneId}
                     variant="outline"
                     disabled={!valid || tooTired}
-                    onClick={() => gotoScene(route.routeSceneId)}
+                    onClick={() => {
+                      flashLoading("กำลังเดินทาง...");
+                      gotoScene(route.routeSceneId);
+                    }}
                     className="w-full justify-start text-left h-auto py-2 whitespace-normal"
                   >
                     <span className="flex flex-col items-start gap-0.5">
@@ -265,7 +269,10 @@ export function LocationView({ scene }: Props) {
                     key={node.resourceId}
                     variant="outline"
                     disabled={tooLow}
-                    onClick={() => setLastGather(gatherResource(node.resourceId))}
+                    onClick={() => {
+                      flashLoading("กำลังเก็บของ...");
+                      setLastGather(gatherResource(node.resourceId));
+                    }}
                     className="w-full justify-start text-left h-auto py-2 whitespace-normal"
                     title={node.hint ?? res.hint}
                   >

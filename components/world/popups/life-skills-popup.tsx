@@ -20,6 +20,7 @@ import {
 } from "@/lib/world";
 import type { LifeSkill, RecipeDef } from "@/lib/world";
 import { useWorldStore } from "@/store/world-store";
+import { flashLoading } from "@/store/loading-store";
 
 interface Props {
   open: boolean;
@@ -231,6 +232,7 @@ function CraftingTab() {
           inventory={inventory}
           masteryLv={r.skill ? masteryLevel(xpMap[r.skill] ?? 0) : MAX_MASTERY}
           onCraft={() => {
+            flashLoading("กำลังประดิษฐ์...");
             const res = craftRecipe(r.id);
             if (!res.ok) {
               setLastResult(

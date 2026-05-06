@@ -19,6 +19,7 @@ import { MenuBar } from "./menu-bar";
 import { DebugOverlay } from "./debug-overlay";
 import { GameOverScreen } from "./game-over-screen";
 import { EncounterScreen } from "./encounter-screen";
+import { LoadingOverlay } from "./loading-overlay";
 import { BattleArena } from "@/components/game/battle-arena";
 
 export function WorldScreen() {
@@ -132,29 +133,32 @@ export function WorldScreen() {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-[1fr_280px] gap-3">
-      <div className="space-y-3">
-        <StatusBar />
-        <MenuBar />
-        {mainView}
-        <div className="flex justify-end">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-[11px] text-muted-foreground"
-            onClick={() => {
-              if (window.confirm("ออกจากเกมและลบเซฟ?")) resetGame();
-            }}
-          >
-            ออกเกม
-          </Button>
+    <>
+      <div className="grid grid-cols-1 md:grid-cols-[1fr_280px] gap-3">
+        <div className="space-y-3">
+          <StatusBar />
+          <MenuBar />
+          {mainView}
+          <div className="flex justify-end">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-[11px] text-muted-foreground"
+              onClick={() => {
+                if (window.confirm("ออกจากเกมและลบเซฟ?")) resetGame();
+              }}
+            >
+              ออกเกม
+            </Button>
+          </div>
+        </div>
+        <div className="space-y-3">
+          <PlayerStatus />
+          <QuestLog />
+          <DebugOverlay />
         </div>
       </div>
-      <div className="space-y-3">
-        <PlayerStatus />
-        <QuestLog />
-        <DebugOverlay />
-      </div>
-    </div>
+      <LoadingOverlay />
+    </>
   );
 }
