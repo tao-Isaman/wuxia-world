@@ -4,9 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-`กำลังภายใน — Battle Sim` (Thai-language wuxia/martial-arts 1v1 turn-based battle simulator) rebuilt as a Next.js 15 + React 19 + TypeScript app. UI uses shadcn/ui (Radix + Tailwind) and is styled with Tailwind v3.4. State lives in two Zustand stores. The runtime is Bun, but Node 20+ also works.
+`กำลังภายใน — Battle Sim` (Thai-language wuxia / martial-arts text-RPG with a 1v1 turn-based battle layer) built as a Next.js 15 + React 19 + TypeScript app. UI uses shadcn/ui (Radix + Tailwind) and is styled with Tailwind v3.4. State lives in four Zustand stores. The runtime is Bun, but Node 20+ also works.
 
-`demo.html` (the original single-file prototype) is preserved as a behavioral reference. Don't edit the rebuilt app to "match the demo's bugs" — but if a tuning question comes up, the demo is the source of truth for damage/effect numbers.
+`demo.html` (the original single-file prototype) is preserved as a behavioral reference for the *combat layer*. The world / RPG layer was designed in the rebuild and has no demo precedent. If a tuning question comes up about damage / effect numbers, the demo is the source of truth.
 
 ## Commands
 
@@ -28,157 +28,205 @@ Layered, strict downward dependency — UI depends on stores, stores depend on t
 ```
 app/, components/        ← React components, Tailwind
    ↓
-store/                   ← Zustand wrappers (character, battle, world)
+store/                   ← Zustand wrappers (character, battle, world, loading, toast)
    ↓
 lib/game/   lib/world/   ← pure TypeScript engines (no React, no I/O)
               ↓
               battle-bridge.ts  ← only place the two stores talk to each other
 ```
 
-### `lib/game/` — pure engine
+### `lib/game/` — pure combat engine
 
-The engine has no React, no DOM, no async, no hooks. It exists to be testable, replaceable, and easy to reason about. Everything UI-facing flows through `lib/game/index.ts` (the public barrel).
+The engine has no React, no DOM, no async, no hooks. Everything UI-facing flows through `lib/game/index.ts` (the public barrel).
 
-- **`types.ts`** — discriminated unions (`SelfEffect`, `EnemyEffect`, `EquipEffect`, `ArtPassiveEffect`) keyed on `t`. New effect types go here first, then in the dispatcher in `effects.ts` — TypeScript's exhaustiveness check on `switch (eff.t)` flags any dispatcher that wasn't updated.
-- **`data/`** — five tables (`TIERS`, `SKILLS`, `ARTS`, `EQUIPMENT`, plus stat metadata). Most balance edits are pure additions/tweaks here.
-- **`derive.ts`** — base stats → derived combat stats (`derive`), plus `combinedStats`/`deriveAll` that layer art-scaled stats, skill stat bonuses, and equipment bonuses on top.
-- **`damage.ts`** — `hitPct`, `critPct`, `hpColor` helpers. Crit multiplier is the constant `CRIT_MULTIPLIER`.
-- **`effects.ts`** — three dispatchers (`applySelfEffect`, `applyEnemyEffect`, `checkPassive`/`applyPassiveEffect`), plus `tickEffects` (poison + duration decrement + equipment HP-regen) and `addBuff`/`addDebuff` mutators that dedupe by `t`.
-- **`battle.ts`** — `BattleContext` (precomputed inputs that don't change during a battle), `makeContext`/`makeInitialState`, ATB-style `getNextTurn`, the central `calcSkillDamage` formula, `resolveSkill`, `resolveArtActive`. The big inline `switch` inside `resolveArtActive` is per-active-type — adding a new active means adding both an `ArtActiveType` literal in `types.ts` and a case here.
-- **`ai.ts`** — `runAITurn` returns a boolean indicating whether it acted; the store uses that to detect lockout and avoid infinite loops.
+- **`types.ts`** — discriminated unions on `t` (`SelfEffect`, `EnemyEffect`, `EquipEffect`, `ArtPassiveEffect`). Also `SkillType` (yin / yang / balance / hard / soft / internal / external) for the conflict system, and `SKILL_SLOT_COUNT = 10`.
+- **`data/`** — static tables: `TIERS`, `SKILLS`, `ARTS`, `EQUIPMENT`, `STAT_KEYS`, `WEAPON_FAMILY_*`, `SECT_ORDER`/`JIANGHU_SECT`/`sectRank` (canonical sect list).
+- **`derive.ts`** — base stats → derived combat stats (`derive`), `combinedStats` (merges base + active art + learned arts + slotted skills + learned skills + equipment, with conflict factors applied), `deriveAll` (adds HP/MP gain from arts), `getMasteryMap` (per-weapon-family mastery, scaled by skill level).
+- **`damage.ts`** — `hitPct`, `critPct`, `hpColor`, `CRIT_MULTIPLIER`.
+- **`leveling.ts`** — `effectiveBp(skill, level)` (lv 1 = 50 % bp, lv 10 = 100 %); `effectiveMg(skill, level)` (lv 1 = 100 %, lv 10 = 200 %); `xpToNextLevel(skill, level)` = `50 × level × (tier + 1)`.
+- **`skill-conflict.ts`** — `computeConflictFactors(build, lookups)`. Counts learned skills + arts (excluding `balance` from axis tallies but including in the trigger threshold). When > 4 typed entries and one type holds > 60 % of an axis pair, the opposing type gets a half / zero modifier on `bp`, `st`, `mg`, and art HP / MP / stat scaling.
+- **`slots.ts`** — slot encoding helpers. A slot string is either a bare skill id (`"tj"`) or an art id with `"art:"` prefix (`"art:taiji"`). `parseSlotId` returns a discriminated `{ kind, skill | art }`. `firstArtSlotIndex` picks the primary art for `BattleContext.artIds`.
+- **`effects.ts`** — `applySelfEffect`, `applyEnemyEffect`, `checkPassive` / `applyPassiveEffect`, `tickEffects` (poison + duration decrement + equipment HP-regen), `addBuff` / `addDebuff`. New self-effect variants (`buff_spd`, etc.) go here first; the dispatcher `switch (eff.t)` enforces exhaustiveness.
+- **`battle.ts`** — `BattleContext`, `makeContext` / `makeInitialState` (accepts `InitialStateOpts.hpA / mpA` for carryover), the central `calcSkillDamage`, `resolveSkill` (tracks `state.skillUses[side][skillId]`, `state.hitsReceived[ds]`), `resolveArtActive` (slot-aware via `opts.slotIdx`). ATB-style `tickGauges` / `getNextTurn` use `effectiveSpd` to layer `buff_spd` on top of derived SPD.
+- **`ai.ts`** — `runAITurn` parses each available slot via `parseSlotId` and dispatches to `resolveSkill` (skill) or `resolveArtActive` (art, MP-gated). Returns a boolean for lockout detection.
 
-The damage formula in `calcSkillDamage` is:
+The damage formula in `calcSkillDamage`:
 
 ```
 raw = max(1, (Atk * stackMod * artBonus + typedAtk + skillEffect) * dm * masteryMod - effectiveDef) * (1 - pctReduce/100)
 ```
 
-Hit %: `clamp(80 + (Acc - Eva)/4, 5, 95)`. Crit %: `clamp(3 + (Cri - Res)/3, 0, 75)`, ×1.5 on crit. Mastery scales as `1 + (mastery/200) * 0.5` per equipped skill of the matching weapon family (cap 200). Art-specific quirks live inline: `taiji` multiplies `IA` by 1.12 on int skills, `scholar` multiplies `Atk` by 1.10 on int skills.
+…where `skillEffect = effectiveBp(sk, level) * conflictFactor * (1 + p/100) + f`.
+
+Hit %: `clamp(80 + (Acc - Eva)/4, 5, 95)`. Crit %: `clamp(3 + (Cri - Res)/3, 0, 75)`, ×1.5 on crit. Mastery scales as `1 + (mastery/200) * 0.5` per equipped skill of the matching family (cap 200), with skill-level + conflict multipliers folded into the per-skill `mg` contribution.
 
 ### ATB turn order (real-time animated)
 
-Gauges fill in real time via `tickGauges(state, dtMs)`. Calibration constants in `lib/game/battle.ts`:
+Calibration constants in `lib/game/battle.ts`:
 
 ```
-ATB_BASELINE      = 60     // gauge gain per tick = Spd + 60
-ATB_THRESHOLD     = 100    // act when gauge reaches this
-ATB_REFERENCE_SPD = 200    // calibration anchor
-ATB_REFERENCE_MS  = 1000   // ↑ at that SPD, gauge fills in this many ms
-ATB_UNIT_MS       = 2600   // derived: ms per (Spd+60) gauge unit
+ATB_BASELINE      = 60     // gauge gain per tick = effectiveSpd + 60
+ATB_THRESHOLD     = 100
+ATB_REFERENCE_SPD = 200
+ATB_REFERENCE_MS  = 1000
+ATB_UNIT_MS       = 2600   // ms per (Spd+60) gauge unit
 ```
 
-So `Spd 200` fills in **1 sec**, `Spd 100` in **~1.6 sec**, `Spd 20` in **~3.25 sec**. The `+60` baseline means raw SPD ratios are compressed — `Spd 20 vs 100` produces a 2:1 turn ratio, not 5:1.
+So `Spd 200` fills in **1 sec**, `Spd 100` in **~1.6 sec**, `Spd 20` in **~3.25 sec**. The `+60` baseline compresses raw SPD ratios — `Spd 20 vs 100` produces a 2:1 turn ratio, not 5:1. **Don't replace the `+60` baseline or carry-over with `if (SpdA > SpdB)` — that breaks the intended balance.**
+
+`effectiveSpd(state, side)` adds `buff_spd` modifiers to `state.dA.Spd / dB.Spd` so a temporary speed buff actually ticks the gauge faster.
 
 The animation pipeline:
 
 1. `BattleArena` runs a `requestAnimationFrame` loop while `state.phase === "filling"`, calling `tick(dt)` each frame.
-2. `tick()` calls `tickGauges` (caps at 100, no overshoot), then `drainToActor` decides who acts.
+2. `tick()` calls `tickGauges` (caps at 100), then `drainToActor`.
 3. When gauge fills:
    - Actor `A` → `phase = "player"` → buttons appear, rAF stops.
    - Actor `B` → `phase = "enemy"` → rAF stops, store schedules `runAITurn` after `ENEMY_ACTION_DELAY_MS` (400 ms).
-4. After any action, `drainToActor` runs again (handles tied-gauge chain), then `phase` either returns to `"filling"` (rAF resumes) or `"player"`/`"enemy"` (next actor).
+4. After any action, `drainToActor` runs again (handles tied-gauge chain).
 
-`getNextTurn` is kept for the synchronous fast-path (`autoAdvance`); it ticks exactly to the next event with no overshoot. **Don't replace the `+60` baseline or the carry-over with `if (SpdA > SpdB)` — that breaks the intended balance.**
+The ATB Progress bar uses `animate={false}` because rAF already updates it every frame.
 
-The ATB Progress bar uses `animate={false}` (no CSS transition) because rAF already updates it every frame; with the default transition the bar would lag behind the actual gauge state.
+### `lib/world/` — pure world / story engine
 
-### `lib/world/` — pure world/story engine
+A second engine layered on top of the battle sim. Same conventions as `lib/game/`: discriminated unions on `t`, data tables, dispatchers, no React.
 
-A second engine layered on top of the battle sim. The world is the text-based RPG outer game; the battle sim is its combat layer. Same conventions as `lib/game/`: discriminated unions on `t`, data tables, dispatchers, no React.
+**Three scene kinds** (`Scene = DialogScene | LocationScene | RouteScene`):
 
-**Three scene kinds** (`Scene = DialogScene | LocationScene | RouteScene`, discriminated on `kind`):
+- **`"dialog"`** — narration + dialogue lines + optional `choices` / `next`. Terminal dialogs (no choices, no next) get a "ปิด" button that returns to `lastLocationId`.
+- **`"location"`** — persistent place. Description + `npcs[]` + `routes[]` + optional `resources[]`. `home_player` is the starter location (`START_SCENE_ID`).
+- **`"route"`** — travel screen. `destinations[]` (each navigates to a location with optional `effects`) + back button.
 
-- **`"dialog"`** — narration + dialogue lines + optional `choices` / `next`. Terminal dialogs (no choices, no next) get a "ปิด" button that returns the player to `lastLocationId`.
-- **`"location"`** — persistent place with a description, an `npcs[]` list (each opens a dialog scene), and a `routes[]` list (each opens a route scene). Visiting a location updates `lastLocationId`.
-- **`"route"`** — travel screen with a description, `destinations[]` (each navigates to a location with optional `effects`), and a back button (defaults to `lastLocationId`, override via `back`).
+`Choice`, `NpcRef`, `RouteRef`, and `RouteDestination` all support `visibleIf: Condition`.
 
-`Choice`, `NpcRef`, `RouteRef`, and `RouteDestination` all support `visibleIf: Condition` for gating. Use the existing `goto` effect and `Condition` machinery to navigate between any scene type — they don't care about kind.
+**Auto-return**: terminal dialogs return to `lastLocationId` via the "ปิด" button. **Dialog auto-advance gotcha**: a dialog with `next` set and no choices auto-advances *without showing its lines*. For narration-then-continue, use a single confirmation choice (`choices: [{ text: "ก้าวต่อไป", next: "..." }]`).
 
-**Auto-return**: when a dialog scene ends naturally (no choices, no `next`), the player clicks "ปิด" → `worldStore.exitToLocation()` → goes to `lastLocationId`. Authors don't add explicit `goto` at the end of every NPC dialog — return is automatic. If a dialog should land somewhere *other* than the previous location, give it a choice with explicit `next`.
+#### Module map (`lib/world/`)
 
-**Dialog auto-advance gotcha**: a dialog scene with `next` set and no choices auto-advances *without showing its lines* (the renderer follows `next` immediately). For narration-then-continue scenes, use a single confirmation choice (`choices: [{ text: "ก้าวต่อไป", next: "..." }]`) rather than `next`. `next` is only useful for true bridge scenes you want the engine to skip through (e.g., redirector ids preserved for save compatibility).
+- **`types.ts`** — scene union, `Choice`, `SceneEffect` (incl. `learnSkill` / `learnArt` / `addTrait` / `addNpcRelationship` / `triggerBattle` with optional `nonFatal`), `Condition` (incl. `trait` / `npcRelationship`), `NpcDef`, `NpcStateEntry`, `OpponentDef` (with `ti`, `category`, `drops`), `ItemDef` (with `category`, `price`, `use: trainSkill | heal`), `TraitKey` (5 traits), `EnemyCategory`, `ITEM_CATEGORIES`, `WorldStateData`, `ActionLogEntry`, `PendingBattle`, `PendingEncounter`, `PendingHuntYield`, `PendingSpar`.
+- **`stat-progression.ts`** — `STAT_XP_PER_ACTION = 10`, `xpToNextStatLevel(base) = 50 × base`, `lukRollChance(base) = min(50%, 10% + 1% × base)`, `STAT_FROM_LIFE_SKILL` (mining/wood/fishing/herbalism/venom → VIT, hard crafts → DEX, cultural → INT).
+- **`conditions.ts`** — `evaluateCondition(state, c)`.
+- **`effects.ts`** — `applyEffect` dispatcher.
+- **`validate.ts`** — drops dangling refs, clamps numeric ranges, syncs `playerBuild.skillLevels` from world `skillLevel` map. Runs on rehydrate.
+- **`battle-bridge.ts`** — module-level Zustand subscription. **One-way**: world → battle is automatic (passes current HP / MP into the next fight); battle → world is user-driven via `acknowledgeBattleResult`.
 
-Module map:
+#### Data tables (`lib/world/data/`)
 
-- **`types.ts`** — scene union, `Choice`, `SceneEffect`, `Condition`, `NpcRef`, `RouteRef`, `RouteDestination`, `QuestDef`, `QuestState`, `ItemDef`, `OpponentDef`, `WorldStateData`.
-- **`data/`** — `scenes.ts`, `quests.ts`, `items.ts`, `opponents.ts`. Authoring rule: every scene id reference (`next`, `routeSceneId`, `dialogSceneId`, `locationId`, `back`, `onWin`, `onLose`) must exist, otherwise `validateAndRepair` (run on save load) resets the player to `START_SCENE_ID`.
-- **`conditions.ts`** — `evaluateCondition(state, c)`: read-only check used by views to filter visible NPCs / routes / destinations / choices.
-- **`effects.ts`** — `applyEffect(state, eff)`: mutating dispatcher. The `triggerBattle` effect just *sets* `pendingBattle` — it does **not** start the battle directly.
-- **`battle-bridge.ts`** — module-level Zustand subscription. **One-way**: only world→battle is automatic; battle→world is user-driven via the "ดำเนินเรื่อง" button calling `worldStore.acknowledgeBattleResult()`.
-- **`validate.ts`** — drops dangling refs (unknown scene ids, removed items/quests, stale `pendingBattle`, `lastLocationId` pointing to non-location scenes).
+- **`scenes.ts`** — Core tutorial scenes + `WORLD_MAP_SCENES`. `START_SCENE_ID = "home_player"`.
+- **`world-map.ts`** — 7 cities, 7 villages, 17 sects, 10 isles, 11 terrain features, 12 caves, 5 temples, 4 mansions, 4 inns, 11 NPC homes, 7 misc — total **~85 leaves**. Builds the connectivity graph from `LOCATION_ROUTES` (no random fill). Direction backtracker (still produces N/S/E/W ordering for sort) is bounded by a step budget.
+- **`location-routes.ts`** — explicit hand-curated edge list. Each entry is a `LocationRoute { a, b, fromA, fromB, hintA?, hintB? }` with **per-direction labels** (the route button reads "ลำคลองใหญ่" going one way and "ลำคลองใหญ่" / "ทางย้อนสู่..." coming back). Adding a new edge only requires appending here.
+- **`sects.ts`** — `SECT_ORDER` and `JIANGHU_SECT = "ยุทธจักร"`. Default sect for unaffiliated skills / arts.
+- **`opponents.ts`** — 35 `OpponentDef`s across **5 tiers** (5 / 10 / 10 / 5 / 5). Each has `ti`, `category` (human / beast / supernatural), `drops`, `build()`. Tier 2+ carry move skills; tier 3+ carry inner skills with levels.
+- **`npcs.ts`** — `NpcDef` registry. `dialogSceneId?` enables 💬 talk; `sparOpponentId?` enables ⚔ spar (non-fatal battle); `locationIds[]` places them.
+- **`items.ts`** — every item has `category` (10 categories) and `price`. `use` can be `{ t: "trainSkill" }` or `{ t: "heal", hp?, mp? }`.
+- **`shops.ts`** — `ShopDef` per location. Inventory + `acceptsCategories` filter + `sellMultiplier`. Cities = full general store (50 % sell-back), inns = food-focused (40 %), villages = tiny (35 %).
+- **`sect-halls.ts`** — `SectHallDef` per city. Each city's martial school sells **different** tier 0 / 1 move skills + inner skills.
+- **`recipes.ts`**, **`resources.ts`**, **`life-skills.ts`** — crafting + gathering catalogs.
+- **`random-events.ts`** — `EVENT_PROBABILITY.fight = 0.15`, treasure scales with LUK (5 % + LUK/200, cap 25 %), meet (10 % + LUK/300, cap 35 %). `FIGHT_EVENTS` is tier-weighted (T0 weight 8 → T4 weight 0.5). `fightEventsForLocation(id)` filters by zone (city = humans only, wild = beasts + humans + a touch of supernatural, etc.) — see `ZONE_CATEGORY_WEIGHT`.
 
 ### Routes
 
 - **`/`** (`app/page.tsx`) — the world game. Renders `<WorldScreen />`, calls `initBattleBridge()` once on mount.
-- **`/debug`** (`app/debug/page.tsx`) — dev sandbox with three tabs: setup (CharacterCard A & B), library (SkillLibrary), and the free-form battle sim (`<BattleArena mode="free" />`). The world player is fully decoupled from the character-store builds here; changes in /debug don't affect the world save.
+- **`/debug`** (`app/debug/page.tsx`) — dev sandbox: setup tab (CharacterCard A & B), library, free-form `<BattleArena mode="free" />`. World player is fully decoupled from `character-store`.
 
 ### `store/` — Zustand wrappers
 
-All `"use client"`. Three stores, all independent:
+All `"use client"`. Five stores:
 
-- **`character-store.ts`** — `/debug` setup-tab state (character A & B). Wrapped with `persist` (`wusia-character-v1`, version 1). The world game does **not** read from this store.
-- **`battle-store.ts`** — runtime battle state. **Not persisted** — combat is ephemeral; reload mid-fight via the bridge's `reconcile()` restarts the encounter from full HP.
-- **`world-store.ts`** — story state (scene, flags, quests, inventory, gold, `pendingBattle`, `playerBuild`). Wrapped with `persist` (`wusia-world-v1`, version 1) + `validateAndRepair` on rehydrate. The world's `playerBuild` is initialized by `startNewGame()` from the local `STARTER_BUILD` (all stats 1, single `basic_punch` skill). Future world progression mutates this build directly — there's no link back to the setup tab.
+- **`character-store.ts`** — `/debug` setup-tab state. Persisted (`wusia-character-v1`, version 2). World does **not** read from this. v1 → v2 padded `skillIds` 5 → 10 and seeded `learnedSkillIds` / `learnedArtIds` / `artLevels`.
+- **`battle-store.ts`** — runtime battle state. **Not persisted**. `start(a, b, opts?)` accepts `hpA / mpA` carryover. `useSkill(slotIdx)` parses the slot and dispatches to `resolveSkill` or `resolveArtActive`.
+- **`world-store.ts`** — story state (scenes, flags, quests, inventory, gold, traits, NPC states, skill / stat progression, action log). Persisted (`wusia-world-v1`, version 11) with `validateAndRepair` on rehydrate.
+- **`loading-store.ts`** — `flashLoading(message, duration?)`. Auto-hides after 300 ms by default. Used for gather / craft / rest action feel (NOT travel — travel is instant).
+- **`toast-store.ts`** — `toast(kind, message, durationMs?)`. Stack of up to 3 visible at once, auto-dismiss after 2.6 s. Kinds: success / info / warn / error.
 
 UI components subscribe via the standard selector pattern: `useWorldStore((s) => s.flags)`. Don't read `getState()` from inside components — only from event handlers / store internals / bridge subscriptions.
 
+### Player progression systems (in world-store)
+
+- **W-exp (`wExp`)** — global pool, earned from any action (gather +10, craft +5, useItem +5, practice +5, fight win +50). Spent via the move-skill popup's "เร่งด้วย w-exp" button.
+- **Per-skill xp (`skillExp[id]`)** — earned per use of that skill in a winning battle (`SKILL_USE_XP × count`). **Auto-levels** when full.
+- **Per-stat xp (`statExp[STR..LUK]`)** — see mapping in `stat-progression.ts`. **Auto-levels** when crossing `xpToNextStatLevel`. Cost scales with the *base* stat (item / skill bonuses excluded).
+- **Traits (`traits.good / evil / arrogance / humility / fame`)** — adjusted by `addTrait` SceneEffect and sparring wins (fame). Read by `Condition.trait`.
+- **NPC relationship (`npcStates[id].relationship`)** — adjusted by `addNpcRelationship` SceneEffect. Read by `Condition.npcRelationship`.
+- **Action log (`actionLog: ActionLogEntry[]`)** — last 100 events. Pushed by `appendActionLog(state, kind, message)` from inside store actions. Surfaced via `📜 บันทึก` menu popup.
+
 ### Battle ↔ World seam (`lib/world/battle-bridge.ts`)
 
-`initBattleBridge()` is called once from `app/page.tsx` (idempotent, SSR-safe). It's **one-way automatic** — only the world-to-battle transition is auto-driven; the battle-to-world transition is user-initiated so players see the result before the world resumes.
+`initBattleBridge()` is called once from `app/page.tsx` (idempotent, SSR-safe). **One-way automatic** — only the world-to-battle transition is auto-driven.
 
-1. **World → Battle (auto)**: `useWorldStore.subscribe` watches `pendingBattle`. When it appears, the bridge looks up the opponent and calls `battleStore.start(playerBuild, opp.build())`. The world UI then renders `<BattleArena mode="world" onContinue={acknowledge} />` inline (no tab navigation).
-2. **Battle → World (manual)**: when `state.winner` is set, `BattleArena` in world mode shows the winner banner with a "ดำเนินเรื่อง →" button. Clicking it calls `worldStore.acknowledgeBattleResult()`, which routes to the right `onWin`/`onLose` scene, clears `pendingBattle`, and resets the battle store.
+1. **World → Battle (auto)**: `useWorldStore.subscribe` watches `pendingBattle`. When set, the bridge looks up the opponent and calls `battleStore.start(playerBuild, opp.build(), { hpA: ws.currentHp, mpA: ws.currentMp })`. The world UI renders `<BattleArena mode="world" onContinue={acknowledge} />` inline.
+2. **Battle → World (manual)**: `BattleArena` shows a "ดำเนินเรื่อง →" button when `state.winner` is set. Clicking calls `worldStore.acknowledgeBattleResult()`, which:
+   - Charges `FIGHT_STAMINA` + advances time by `FIGHT_HOURS`
+   - Snapshots `state.hA / mpA` back into `currentHp / currentMp`
+   - On **win**: rolls opponent's drop table, banks w-exp, grants per-skill xp from `state.skillUses.A`, rolls STR/POW/DEF/LUK stat xp, awards spar fame if `pendingSpar` is set, drops hunt yield if `pendingHuntYield` is set, then `gotoScene(onWin)`
+   - On **non-fatal loss** (sparring): clears state and routes to `onLose`
+   - On **fatal loss**: sets `gameOver = true`
 
-`reconcile()` runs once on bridge init: if the world has a `pendingBattle` but the battle store is null (refresh wiped it), it restarts the battle so the player can finish.
+`reconcile()` runs once on bridge init: if `pendingBattle` exists but the battle store is null (refresh wiped it), it restarts the battle.
 
-The bridge only writes to the battle store — never reads. The UI handles the reverse path. This keeps `applyEffect` purely state-mutating; it never starts a battle directly.
+### Random encounters (fight / flee)
+
+When `rollRandomEvent` rolls a fight (15 % base), it sets `pendingEncounter` (NOT `pendingBattle` directly). The world UI swaps to `<EncounterScreen>` showing tier + category badges and two buttons:
+
+- **⚔ ต่อสู้** → `acceptEncounter()` promotes the offer to `pendingBattle`. Bridge starts the fight.
+- **🏃 หนี** → `fleeEncounter()` clears the offer. Player stays put, no cost.
+
+`fightEventsForLocation(id)` filters the encounter pool by zone — see `ZONE_CATEGORY_WEIGHT` in `random-events.ts`.
 
 ### UI layer
 
-- **`components/ui/`** — shadcn primitives (Button, Card, Combobox, etc.). The custom **`Combobox`** wraps Popover + cmdk.
-- **`components/game/`** — battle/setup feature components. **`BattleArena`** has a `mode?: "free" | "world"` prop:
-  - `"free"` (default): full Reset / Auto / Restart buttons; reads display names from setup-tab character A & B as fallback.
-  - `"world"`: only the post-battle "ดำเนินเรื่อง →" button (calls `onContinue`); display reads from `battleStore.builds` (set by `start()`), so player/opponent names match the world's encounter.
-  
-  The `BattleLog` uses `dangerouslySetInnerHTML` because log lines are pre-formatted with `<b>`, `<span class="lp">`, etc. — those strings are produced inside `lib/game/effects.ts` and `battle.ts` from controlled inputs (no user content). Inline classes (`.lp`, `.lC`) live in `app/globals.css`.
-- **`components/world/`** — world feature components. `WorldScreen` is the page root; it renders one of these based on state:
-  - `<StartScreen />` (no save)
-  - `<BattleArena mode="world" />` (pendingBattle is set)
-  - Otherwise it dispatches on `scene.kind`:
-    - `"dialog"` → `<DialogDisplay />` + `<ChoicePanel />`
-    - `"location"` → `<LocationView />` (description, NPC list, route list)
-    - `"route"` → `<RouteView />` (description, destination list, back button)
-  
-  Sidebar (`PlayerStatus` / `QuestLog` / dev-only `DebugOverlay`) renders alongside all scene kinds. `DialogDisplay` and `ChoicePanel` are typed against `DialogScene` specifically — passing a location/route to them is a TS error.
+- **`components/ui/`** — shadcn primitives (Button, Card, Combobox, Modal, etc.). Custom `Combobox` wraps Popover + cmdk.
+- **`components/game/`** — battle / setup feature components. **`BattleArena`** has a `mode?: "free" | "world"` prop (free = full controls, world = continue-only). `BattleLog` uses `dangerouslySetInnerHTML` because log lines are pre-formatted HTML produced from controlled inputs in `effects.ts` / `battle.ts`. Inline classes (`.lp`, `.lC`) live in `app/globals.css`.
+- **`components/world/`** — world feature components. `WorldScreen` is the page root. Render precedence:
+  - `!hasGame` → `<StartScreen />`
+  - `gameOver` → `<GameOverScreen />`
+  - `pendingBattle` → `<BattleArena mode="world" />`
+  - `pendingEncounter` → `<EncounterScreen />`
+  - else → scene-based (dialog / location / route view)
+  - Always mounted at root: `<LoadingOverlay />` + `<ToastStack />`
+- **`components/world/popups/`** — modal popups for the menu bar (profile, inventory, move skills, inner skills, life skills, action log, NPC interaction, shop, sect hall).
 
 ### Adding new game content
 
 Most additions don't require touching dispatchers:
 
-- **New skill / equipment / art** → append to the relevant table in `lib/game/data/`. Use existing `se`/`ee`/`eff` types if possible.
-- **New location** → append a `{ kind: "location", ... }` entry to `SCENES`. Reference NPC dialogs by `dialogSceneId` and outbound routes by `routeSceneId`.
-- **New route** → append a `{ kind: "route", ... }` entry. List destinations with optional `effects` (e.g., gold cost, flag set on first arrival). The back button defaults to `lastLocationId` — override via `back` only for one-way travel.
-- **New dialog scene** → append a `{ kind: "dialog", ... }` entry. End on either a `choices` array or a terminal scene (no `next`, no `choices`) so the player can return via the auto "ปิด" button. Don't use `next` without `choices` unless you want the lines skipped.
-- **New quest / item / opponent** → append to the relevant table in `lib/world/data/`. The cheapest authoring loop is the dev-only Debug Overlay — jump straight to the new scene without playing through everything.
-- **New effect type** (combat) → variant in `lib/game/types.ts` + case in `lib/game/effects.ts` (or `battle.ts` for art-active types). TS exhaustiveness flags missed dispatchers.
-- **New scene effect / condition** (world) → variant in `lib/world/types.ts` + case in `effects.ts` / `conditions.ts`. Same TS exhaustiveness story.
-- **New world opponent** → append to `OPPONENTS` with a `build()` factory. The factory pattern lets future encounters scale off flags / quest progression without sharing mutable build state. **Calibrate against the player's current stats**: at game start the player has STARTER_BUILD (all 1s + `basic_punch`); demo opponents mirror that for a 50/50 fight.
+- **New skill** → append to `SKILLS` in `lib/game/data/skills.ts` (with `sc` + `ti` + optional `types`). Sort order: by sect → tier.
+- **New inner skill** → append to `ARTS` in `lib/game/data/arts.ts` (same sort).
+- **New equipment** → append to `EQUIPMENT`.
+- **New location** → append a `{ kind: "location", ... }` to `SCENES` (or use the `leaf()` helper in `world-map.ts`). Then add at least one entry to `LOCATION_ROUTES` so it's reachable. Console will warn if a leaf has no explicit route.
+- **New route between locations** → append a `LocationRoute` with both directional labels to `location-routes.ts`.
+- **New dialog scene** → append a `{ kind: "dialog", ... }`. End on `choices` or terminal (auto "ปิด"). Don't use `next` without `choices` unless you want lines skipped.
+- **New quest / item / opponent / NPC / shop / sect hall** → append to the matching table in `lib/world/data/`. Most have a single registry export + a `getX(id)` helper.
+- **New combat effect** → variant in `lib/game/types.ts` + case in `effects.ts` (or `battle.ts` for art-active types). TS exhaustiveness flags missed dispatchers.
+- **New scene effect / condition** → variant in `lib/world/types.ts` + case in `effects.ts` / `conditions.ts`.
+- **New trait** → append to `TRAIT_KEYS` and `TRAIT_LABEL`. The dispatcher and condition handler treat it generically.
+- **New action with toast feedback** → call `toast("success" | "info" | "warn" | "error", message)` and (from the store) `appendActionLog(draft, kind, message)`. Add a label to `KIND_LABEL` / `KIND_COLOR` in `action-log-popup.tsx`.
 
 ### Save format & migrations
 
 Two persisted Zustand slices, separate localStorage keys, separate version fields:
 
-- `wusia-character-v1` — `{ builds: { A, B } }` (only used by /debug)
-- `wusia-world-v1` — world state minus action functions (see `partialize`)
+- `wusia-character-v1` — `{ builds: { A, B } }` (only used by /debug). Version 2 (v1 → v2 padded slots, seeded learned arrays).
+- `wusia-world-v1` — world state minus action functions. Version **11**. Migration chain (additive defaults at each step):
+  1. v1 → v2: stamina + lifeSkillXp(6) + pendingHuntYield
+  2. v2 → v3: lifeSkillXp 6 → 17 keys
+  3. v3 → v4: day / time
+  4. v4 → v5: wExp / skillLevel / skillExp
+  5. v5 → v6: statExp
+  6. v6 → v7: traits / npcStates / pendingSpar
+  7. v7 → v8: currentHp / currentMp
+  8. v8 → v9: skillIds 5 → 10 + learnedSkillIds / learnedArtIds / artLevels (auto-slots legacy `artId` into a free slot)
+  9. v9 → v10: pendingEncounter
+  10. v10 → v11: actionLog
 
 `battle-store` is intentionally not persisted.
 
-When a schema changes, bump `version` and add a `migrate(persisted, fromVersion)` that reshapes old payloads. Identity migrations are fine for additive changes. `validateAndRepair` (world-store only) is a separate safety net for content drift (renamed scene ids, removed items, etc.) — it runs on every rehydrate.
+`validateAndRepair` (world-store only) is the safety net for content drift (renamed scene ids, removed items / quests / opponents / NPCs / arts, stale `pendingBattle` / `pendingEncounter` / `pendingSpar`, dangling `learnedSkillIds` / `learnedArtIds`). It runs on every rehydrate.
 
-`worldStore.resetGame()` wipes the world slice and resets the battle store. Character builds persist independently and are unaffected.
+`worldStore.resetGame()` wipes the world slice and resets the battle store. Character builds persist independently.
 
 ### Conventions kept from the original
 
-The combat data tables use compact field names (`bp`, `p`, `f`, `dm`, `dr`, `se`, `ee`, `mg`, `ti`, `w`, etc.) so they cross-reference cleanly with `demo.html`. **Keep this style in `lib/game/data/`** — verbose names there hurt readability when scanning 80 entries. World data (scenes / quests / items) is touched even more often during authoring, so it uses readable field names (`text`, `speaker`, `description`, etc.) rather than shorthand. Engine functions and React components use full names everywhere.
+The combat data tables use compact field names (`bp`, `p`, `f`, `dm`, `dr`, `se`, `ee`, `mg`, `ti`, `w`, `sc`, `types`) so they cross-reference cleanly with `demo.html`. **Keep this style in `lib/game/data/`** — verbose names there hurt readability when scanning 100+ entries. World data (scenes / quests / items / shops / NPCs) is touched even more often during authoring, so it uses readable field names (`text`, `speaker`, `description`, `category`, `price`, etc.).
 
-Thai is the canonical UI language; skill / art / equipment / scene / quest / item names stay in Thai. If we ever want i18n later, the natural seam is to give each item an i18n key alongside `n`/`name` rather than translating the existing strings.
+Thai is the canonical UI language; skill / art / equipment / scene / quest / item / shop / NPC names stay in Thai. If we ever want i18n later, the natural seam is to give each item an i18n key alongside `n` / `name` rather than translating the existing strings.
