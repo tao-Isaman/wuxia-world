@@ -27,6 +27,7 @@ import {
   gatherSuccessChance,
   getItem,
   getNpc,
+  getOpponent,
   getRecipe,
   getResource,
   getScene,
@@ -40,6 +41,7 @@ import {
   type Choice,
   type LifeSkill,
   type ResourceDef,
+  type ResourceYield,
   type SceneEffect,
   type TraitKey,
   type WorldStateData,
@@ -244,6 +246,12 @@ interface WorldStore extends WorldStateData {
   meetNpc: (npcId: string) => void;
   startSparWith: (npcId: string) => SparResult;
 
+  // Random-encounter resolution. `acceptEncounter` promotes a pending
+  // fight-or-flee offer to an actual battle; `fleeEncounter` clears the
+  // offer and stays put.
+  acceptEncounter: () => void;
+  fleeEncounter: () => void;
+
   // Debug helpers (dev-only consumers).
   _setFlag: (flag: string, value: boolean | number | string) => void;
   _giveGold: (amount: number) => void;
@@ -281,6 +289,7 @@ const emptyData = (): WorldStateData => ({
   day: 1,
   time: 0,
   pendingBattle: null,
+  pendingEncounter: null,
   pendingHuntYield: null,
   pendingSpar: null,
   gameOver: false,
@@ -487,10 +496,32 @@ function draftFrom(s: WorldStateData): WorldStateData {
     day: s.day,
     time: s.time,
     pendingBattle: s.pendingBattle,
+    pendingEncounter: s.pendingEncounter,
     pendingHuntYield: s.pendingHuntYield,
     pendingSpar: s.pendingSpar,
     gameOver: s.gameOver,
   };
+}
+
+// Roll loot from an opponent's drop table. Picks count is per-tier:
+// tier 0/1 = 2 picks, tier 2/3 = 3, tier 4 = 4. Same weighted-pick helper
+// as resources; merges duplicate item ids.
+function rollOpponentLoot(
+  drops: readonly ResourceYield[] | undefined,
+  tier: number,
+): { itemId: string; count: number }[] {
+  if (!drops || drops.length === 0) return [];
+  const picks = tier >= 4 ? 4 : tier >= 2 ? 3 : 2;
+  const merged: Record<string, number> = {};
+  for (let i = 0; i < picks; i++) {
+    const drop = pickWeighted(drops, Math.random());
+    if (!drop) continue;
+    const min = drop.count?.[0] ?? 1;
+    const max = drop.count?.[1] ?? 1;
+    const c = min + Math.floor(Math.random() * Math.max(1, max - min + 1));
+    merged[drop.itemId] = (merged[drop.itemId] ?? 0) + c;
+  }
+  return Object.entries(merged).map(([itemId, count]) => ({ itemId, count }));
 }
 
 // Roll a yield. Two-stage:
@@ -605,7 +636,12 @@ export const useWorldStore = create<WorldStore>()(
       canTravelTo: (sceneId) => canAffordTravelTo(get(), sceneId),
 
       clearPendingBattle: () =>
-        set({ pendingBattle: null, pendingHuntYield: null, pendingSpar: null }),
+        set({
+          pendingBattle: null,
+          pendingEncounter: null,
+          pendingHuntYield: null,
+          pendingSpar: null,
+        }),
 
       acknowledgeBattleResult: () => {
         const s = get();
@@ -693,6 +729,16 @@ export const useWorldStore = create<WorldStore>()(
             met: true,
             relationship: (entry.relationship ?? 0) + 1,
           };
+        }
+
+        // Roll the opponent's drop table (separate from hunt-yield, which
+        // covers gathering kicks; these are the random-encounter loot).
+        const oppDef = getOpponent(pb.opponentId);
+        if (oppDef?.drops && oppDef.drops.length > 0) {
+          const lootRolls = rollOpponentLoot(oppDef.drops, oppDef.ti ?? 0);
+          for (const it of lootRolls) {
+            draft.inventory[it.itemId] = (draft.inventory[it.itemId] ?? 0) + it.count;
+          }
         }
 
         const hunt = draft.pendingHuntYield;
@@ -1108,6 +1154,37 @@ export const useWorldStore = create<WorldStore>()(
         });
       },
 
+      acceptEncounter: () => {
+        const s = get();
+        if (!s.pendingEncounter || s.pendingBattle) return;
+        const enc = s.pendingEncounter;
+        const opp = getOpponent(enc.opponentId);
+        if (!opp) {
+          set({ pendingEncounter: null });
+          return;
+        }
+        // Stage as a real battle. The bridge picks this up and starts
+        // the fight; on resolution acknowledgeBattleResult routes back
+        // to the encounter's returnSceneId.
+        set({
+          pendingEncounter: null,
+          pendingBattle: {
+            opponentId: enc.opponentId,
+            onWin: enc.returnSceneId,
+            onLose: enc.returnSceneId,
+          },
+        });
+      },
+
+      fleeEncounter: () => {
+        const s = get();
+        if (!s.pendingEncounter) return;
+        // No combat: just discard the offer. The player stays at the
+        // location they were on, no stamina cost beyond the move that
+        // brought them here.
+        set({ pendingEncounter: null });
+      },
+
       meetNpc: (npcId) => {
         const s = get();
         if (!getNpc(npcId)) return;
@@ -1152,7 +1229,7 @@ export const useWorldStore = create<WorldStore>()(
     }),
     {
       name: "wusia-world-v1",
-      version: 9,
+      version: 10,
       // Only persist the data fields, not the action functions.
       partialize: (s) => ({
         hasGame: s.hasGame,
@@ -1177,6 +1254,7 @@ export const useWorldStore = create<WorldStore>()(
         day: s.day,
         time: s.time,
         pendingBattle: s.pendingBattle,
+        pendingEncounter: s.pendingEncounter,
         pendingHuntYield: s.pendingHuntYield,
         pendingSpar: s.pendingSpar,
         gameOver: s.gameOver,
@@ -1197,6 +1275,7 @@ export const useWorldStore = create<WorldStore>()(
       //   v8 → v9 expanded skillIds 5 → 10 slots; added learnedSkillIds /
       //           learnedArtIds / artLevels. Existing slotted skills + the
       //           active art are seeded into the learned arrays.
+      //   v9 → v10 added pendingEncounter. Existing saves default null.
       migrate: (persisted, fromVersion) => {
         const p = (persisted ?? {}) as Partial<WorldStateData>;
         // Pad the build's skillIds to 10 and back-fill learned arrays.
@@ -1264,6 +1343,7 @@ export const useWorldStore = create<WorldStore>()(
           time: typeof p.time === "number" && p.time >= 0 ? p.time : 0,
           pendingHuntYield: p.pendingHuntYield ?? null,
           pendingSpar: p.pendingSpar ?? null,
+          pendingEncounter: p.pendingEncounter ?? null,
           gameOver: p.gameOver === true,
         };
         void fromVersion;

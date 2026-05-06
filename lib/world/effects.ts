@@ -3,9 +3,9 @@ import { getQuest } from "./data/quests";
 import { getScene } from "./data/scenes";
 import {
   EVENT_PROBABILITY,
-  FIGHT_EVENTS,
   MEET_EVENTS,
   TREASURE_EVENTS,
+  fightEventsForLocation,
   pickWeighted,
 } from "./data/random-events";
 
@@ -191,13 +191,18 @@ export function applyEffect(state: WorldStateData, eff: SceneEffect): void {
       const r = Math.random();
 
       if (r < fightP) {
-        const ev = pickWeighted(FIGHT_EVENTS, Math.random());
+        // Filter by zone so cities never spawn beasts and the wild
+        // doesn't spawn city-bandits. The result still picks a random
+        // tier, weighted toward lower tiers.
+        const pool = fightEventsForLocation(state.lastLocationId);
+        const ev = pickWeighted(pool, Math.random());
         if (!ev) return;
         state.flags._skipEventRoll = true;
-        state.pendingBattle = {
+        // Stage as a pending encounter — the encounter screen offers
+        // fight / flee. Only "fight" promotes this to pendingBattle.
+        state.pendingEncounter = {
           opponentId: ev.opponentId,
-          onWin: state.lastLocationId,
-          onLose: state.lastLocationId,
+          returnSceneId: state.lastLocationId,
         };
         return;
       }

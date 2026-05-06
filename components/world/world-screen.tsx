@@ -18,6 +18,7 @@ import { StatusBar } from "./status-bar";
 import { MenuBar } from "./menu-bar";
 import { DebugOverlay } from "./debug-overlay";
 import { GameOverScreen } from "./game-over-screen";
+import { EncounterScreen } from "./encounter-screen";
 import { BattleArena } from "@/components/game/battle-arena";
 
 export function WorldScreen() {
@@ -31,6 +32,7 @@ export function WorldScreen() {
   const hasGame = useWorldStore((s) => s.hasGame);
   const currentSceneId = useWorldStore((s) => s.currentSceneId);
   const pendingBattle = useWorldStore((s) => s.pendingBattle);
+  const pendingEncounter = useWorldStore((s) => s.pendingEncounter);
   const gameOver = useWorldStore((s) => s.gameOver);
   const acknowledge = useWorldStore((s) => s.acknowledgeBattleResult);
   const resetGame = useWorldStore((s) => s.resetGame);
@@ -72,6 +74,23 @@ export function WorldScreen() {
     return (
       <div className="space-y-3">
         <BattleArena mode="world" onContinue={acknowledge} />
+      </div>
+    );
+  }
+
+  // Pending encounter — show the fight-or-flee screen. Player picks one
+  // and the store either promotes it to pendingBattle or clears it.
+  if (pendingEncounter) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-[1fr_280px] gap-3">
+        <div className="space-y-3">
+          <StatusBar />
+          <EncounterScreen />
+        </div>
+        <div className="space-y-3">
+          <PlayerStatus />
+          <DebugOverlay />
+        </div>
       </div>
     );
   }

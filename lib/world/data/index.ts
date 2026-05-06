@@ -16,7 +16,11 @@ export {
   FIGHT_EVENTS,
   TREASURE_EVENTS,
   EVENT_PROBABILITY,
+  fightEventsForLocation,
+  zoneOfLocation,
   pickWeighted,
+  ZONE_CATEGORY_WEIGHT,
+  type EnemyZone,
 } from "./random-events";
 export { RESOURCES, RESOURCES_BY_ID, getResource } from "./resources";
 export { RECIPES, RECIPES_BY_ID, getRecipe } from "./recipes";

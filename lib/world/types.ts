@@ -379,11 +379,32 @@ export interface PendingHuntYield {
 
 // ─── Opponents (for triggerBattle) ─────────────────────────────────────
 
+// Enemy biome category — drives which random-event pool a given location
+// pulls from. Cities / villages won't see beasts, wilderness sees more.
+export type EnemyCategory = "human" | "beast" | "supernatural";
+
+export const ENEMY_CATEGORY_LABEL: Record<EnemyCategory, string> = {
+  human: "ฝ่ายมนุษย์",
+  beast: "สัตว์ป่า",
+  supernatural: "ผู้พิเศษ",
+};
+
 // Opponents are wrapped in a build factory so future encounters can scale
 // off flags / story state without mutating a shared object.
 export interface OpponentDef {
   id: string;
   name: string;
+  // Power tier 0..4. Drives spawn rarity in random-events.ts (higher
+  // tier = lower weight) and is shown to the player in the encounter
+  // screen so they can decide whether to fight or flee. New opponents
+  // default to tier 0 when omitted.
+  ti?: 0 | 1 | 2 | 3 | 4;
+  // What kind of foe — humans show up in cities, beasts in the wild,
+  // supernaturals only in deeper / sect / temple zones.
+  category?: EnemyCategory;
+  // Drop table — weighted item rolls when the player wins. Two picks for
+  // tier 0/1, three for tier 2/3, four for tier 4 (handled in store).
+  drops?: readonly ResourceYield[];
   build: () => CharacterBuild;
 }
 
@@ -396,6 +417,16 @@ export interface PendingBattle {
   // When true, defeat does NOT trigger gameOver — the player is routed to
   // `onLose` and the world resumes. Used for sparring / friendly fights.
   nonFatal?: boolean;
+}
+
+// A random-event fight that the player has been offered but not accepted
+// yet. The encounter screen renders fight / flee buttons; only on "fight"
+// does this become a `pendingBattle`. Cleared on flee or game reset.
+export interface PendingEncounter {
+  opponentId: string;
+  // Where the player was when the encounter rolled — flee returns here,
+  // and so do onWin / onLose if they choose to fight.
+  returnSceneId: string;
 }
 
 // Snapshot data only — actions are added by the store.
@@ -473,6 +504,9 @@ export interface WorldStateData {
 
   // Battle seam.
   pendingBattle: PendingBattle | null;
+  // Pending fight-or-flee offer (random encounters route through here so
+  // the player gets a chance to back out).
+  pendingEncounter: PendingEncounter | null;
   // When a hunting gather kicks off a battle, the resource id is stashed
   // here so acknowledgeBattleResult can drop the spoils on win and clear it
   // on lose.

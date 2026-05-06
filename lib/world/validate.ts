@@ -205,6 +205,19 @@ export function validateAndRepair(state: WorldStateData): void {
     state.pendingSpar = null;
   }
 
+  // pendingEncounter — clear if the opponent / return scene is gone.
+  if (state.pendingEncounter) {
+    const enc = state.pendingEncounter;
+    const oppOk = OPPONENTS_BY_ID.has(enc.opponentId);
+    const sceneOk = SCENES_BY_ID.has(enc.returnSceneId);
+    if (!oppOk || !sceneOk) {
+      console.warn(
+        `[world] clearing dangling pendingEncounter (opponent=${oppOk} returnScene=${sceneOk})`,
+      );
+      state.pendingEncounter = null;
+    }
+  }
+
   // Build learn arrays — drop any unknown skill / art ids, dedupe, clamp
   // levels into [1, 10]. Pad skillIds to 10 if a save came through with
   // fewer (the migrate already does this for v8→v9 but a hand-edited save
