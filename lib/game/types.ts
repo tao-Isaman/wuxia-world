@@ -108,6 +108,10 @@ export type SelfEffect =
   | { t: "buff_eva"; v: number; u: number }
   | { t: "buff_reduce"; v: number; u: number }
   | { t: "buff_def"; v: number; u: number }
+  // Speed buff — adds `v` to the side's effective Spd for `u` turns. Read
+  // by tickGauges / getNextTurn so the ATB gauge fills faster while the
+  // buff is active.
+  | { t: "buff_spd"; v: number; u: number }
   | { t: "heal_pct"; v: number }
   | {
       t: "heal_buff";
@@ -135,6 +139,11 @@ export type EnemyEffect =
 export interface Skill {
   id: string;
   n: string;
+  // Sect / school of origin. Use the canonical name from
+  // lib/game/data/sects.ts; default to JIANGHU_SECT ("ยุทธจักร") when the
+  // skill isn't tied to a specific sect. Drives data-file ordering and
+  // future "learn from sect master" content.
+  sc: string;
   ti: SkillTierIndex;
   w: WeaponFamily; // weapon family (mastery key) — see WEAPON_FAMILY_KEYS
   mg: number; // mastery gained per equip

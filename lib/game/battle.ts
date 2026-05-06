@@ -138,12 +138,23 @@ export function gaugeRate(spd: number): number {
   return (spd + ATB_BASELINE) / ATB_UNIT_MS;
 }
 
+// Effective SPD for ATB — base derived SPD plus any `buff_spd` buffs
+// currently active on the side. Floor at 1 so the gauge always advances.
+function effectiveSpd(state: BattleState, side: Side): number {
+  const base = side === "A" ? state.dA.Spd : state.dB.Spd;
+  let bonus = 0;
+  for (const b of state.st[side].buffs) {
+    if (b.t === "buff_spd") bonus += b.v;
+  }
+  return Math.max(1, base + bonus);
+}
+
 // Advance both sides' gauges by `dtMs` real-time milliseconds.
 // Caps at THRESHOLD so animations land exactly on 100 (no overshoot).
 export function tickGauges(state: BattleState, dtMs: number): void {
   if (state.winner) return;
-  state.gA = Math.min(ATB_THRESHOLD, state.gA + gaugeRate(state.dA.Spd) * dtMs);
-  state.gB = Math.min(ATB_THRESHOLD, state.gB + gaugeRate(state.dB.Spd) * dtMs);
+  state.gA = Math.min(ATB_THRESHOLD, state.gA + gaugeRate(effectiveSpd(state, "A")) * dtMs);
+  state.gB = Math.min(ATB_THRESHOLD, state.gB + gaugeRate(effectiveSpd(state, "B")) * dtMs);
 }
 
 // Returns whichever side has reached the threshold, or null if still filling.
@@ -165,8 +176,8 @@ export function consumeGauge(state: BattleState, side: Side): void {
 // Synchronous fast-path used by autoAdvance: ticks exactly to the next event.
 export function getNextTurn(state: BattleState): Side {
   if (state.gA < ATB_THRESHOLD && state.gB < ATB_THRESHOLD) {
-    const tA = (ATB_THRESHOLD - state.gA) / gaugeRate(state.dA.Spd);
-    const tB = (ATB_THRESHOLD - state.gB) / gaugeRate(state.dB.Spd);
+    const tA = (ATB_THRESHOLD - state.gA) / gaugeRate(effectiveSpd(state, "A"));
+    const tB = (ATB_THRESHOLD - state.gB) / gaugeRate(effectiveSpd(state, "B"));
     tickGauges(state, Math.min(tA, tB));
   }
   const actor = peekReadyActor(state);

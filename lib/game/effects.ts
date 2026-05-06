@@ -62,6 +62,10 @@ export function applySelfEffect(
       addBuff(state, side, { t: "buff_def", n: "DEF↑", v: eff.v, u: eff.u });
       logLine(state, "lS", `&nbsp;⟳ ${nm}: DEF+${eff.v}(${eff.u}ตา)`);
       return;
+    case "buff_spd":
+      addBuff(state, side, { t: "buff_spd", n: "เร็ว", v: eff.v, u: eff.u });
+      logLine(state, "lS", `&nbsp;⟳ ${nm}: SPD+${eff.v}(${eff.u}ตา)`);
+      return;
     case "heal_pct": {
       const cap = side === "A" ? state.dA.HP : state.dB.HP;
       const heal = Math.round(cap * eff.v / 100);
