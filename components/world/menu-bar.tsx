@@ -8,10 +8,11 @@ import { InventoryPopup } from "./popups/inventory-popup";
 import { MoveSkillsPopup } from "./popups/move-skills-popup";
 import { InnerSkillsPopup } from "./popups/inner-skills-popup";
 import { LifeSkillsPopup } from "./popups/life-skills-popup";
+import { ActionLogPopup } from "./popups/action-log-popup";
 
-type PopupId = "profile" | "inventory" | "moves" | "inner" | "lifeskills" | null;
+type PopupId = "profile" | "inventory" | "moves" | "inner" | "lifeskills" | "log" | null;
 
-// Main-screen menu bar — four buttons, one popup at a time. The bar lives
+// Main-screen menu bar — popup buttons, one popup at a time. The bar lives
 // directly under the StatusBar in WorldScreen so it's reachable from every
 // scene kind (location / route / dialog).
 export function MenuBar() {
@@ -22,7 +23,7 @@ export function MenuBar() {
     <>
       <Card>
         <CardContent className="p-2">
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5">
+          <div className="grid grid-cols-2 sm:grid-cols-6 gap-1.5">
             <Button variant="outline" size="sm" onClick={() => setOpen("profile")}>
               👤 โปรไฟล์
             </Button>
@@ -38,6 +39,9 @@ export function MenuBar() {
             <Button variant="outline" size="sm" onClick={() => setOpen("lifeskills")}>
               🌾 วิชาชีพ
             </Button>
+            <Button variant="outline" size="sm" onClick={() => setOpen("log")}>
+              📜 บันทึก
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -47,6 +51,7 @@ export function MenuBar() {
       <MoveSkillsPopup  open={open === "moves"}      onClose={close} />
       <InnerSkillsPopup open={open === "inner"}      onClose={close} />
       <LifeSkillsPopup  open={open === "lifeskills"} onClose={close} />
+      <ActionLogPopup   open={open === "log"}        onClose={close} />
     </>
   );
 }

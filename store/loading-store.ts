@@ -24,7 +24,7 @@ interface LoadingStore {
 
 let activeTimer: ReturnType<typeof setTimeout> | null = null;
 
-export const ACTION_LOADING_DURATION_MS = 300;
+export const ACTION_LOADING_DURATION_MS = 1000;
 
 export const useLoadingStore = create<LoadingStore>((set) => ({
   active: false,

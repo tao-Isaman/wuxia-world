@@ -6,6 +6,7 @@ import type { CharacterBuild, StatKey } from "@/lib/game";
 import {
   deriveAll,
   encodeArtSlot,
+  getArt,
   getEquip,
   getSkill,
   isArtSlot,
@@ -293,7 +294,19 @@ const emptyData = (): WorldStateData => ({
   pendingHuntYield: null,
   pendingSpar: null,
   gameOver: false,
+  actionLog: [],
 });
+
+// Append a player-action entry to the rolling log. Keeps the most recent
+// 100. Mutates `state` in place so it's safe to call from inside a draft
+// before the final `set({ ...draft })`.
+const ACTION_LOG_MAX = 100;
+function appendActionLog(state: WorldStateData, kind: string, message: string): void {
+  const entry = { day: state.day, time: state.time, kind, message };
+  const next = [...state.actionLog, entry];
+  if (next.length > ACTION_LOG_MAX) next.splice(0, next.length - ACTION_LOG_MAX);
+  state.actionLog = next;
+}
 
 // Push the current skill levels into the player build so the engine reads
 // them at battle handoff time (BattleContext snapshots `build.skillLevels`).
@@ -500,6 +513,7 @@ function draftFrom(s: WorldStateData): WorldStateData {
     pendingHuntYield: s.pendingHuntYield,
     pendingSpar: s.pendingSpar,
     gameOver: s.gameOver,
+    actionLog: [...s.actionLog],
   };
 }
 
@@ -734,12 +748,21 @@ export const useWorldStore = create<WorldStore>()(
         // Roll the opponent's drop table (separate from hunt-yield, which
         // covers gathering kicks; these are the random-encounter loot).
         const oppDef = getOpponent(pb.opponentId);
+        const lootSummary: string[] = [];
         if (oppDef?.drops && oppDef.drops.length > 0) {
           const lootRolls = rollOpponentLoot(oppDef.drops, oppDef.ti ?? 0);
           for (const it of lootRolls) {
             draft.inventory[it.itemId] = (draft.inventory[it.itemId] ?? 0) + it.count;
+            const def = getItem(it.itemId);
+            lootSummary.push(`${def?.name ?? it.itemId}×${it.count}`);
           }
         }
+        appendActionLog(
+          draft,
+          "combat",
+          `ชนะ ${oppDef?.name ?? pb.opponentId}` +
+            (lootSummary.length > 0 ? ` · ${lootSummary.join(", ")}` : ""),
+        );
 
         const hunt = draft.pendingHuntYield;
         draft.pendingHuntYield = null;
@@ -830,6 +853,18 @@ export const useWorldStore = create<WorldStore>()(
         const statKey = statFromLifeSkill(res.skill);
         if (statKey) grantStatXp(draft, statKey, STAT_XP_PER_ACTION);
         rollLukXp(draft);
+        // Build a one-liner for the toast/log.
+        if (yieldRoll.passed) {
+          const itemPart = yieldRoll.items.length > 0
+            ? yieldRoll.items.map((it) => {
+                const def = getItem(it.itemId);
+                return `${def?.name ?? it.itemId}×${it.count}`;
+              }).join(", ")
+            : "ไม่ได้ของ";
+          appendActionLog(draft, "gather", `เก็บ ${res.name}: ${itemPart} · +${xpGained} xp`);
+        } else {
+          appendActionLog(draft, "gather", `เก็บ ${res.name}: ลองมือไม่สำเร็จ · +${xpGained} xp`);
+        }
         set({ ...draft });
         return {
           ok: true,
@@ -902,6 +937,16 @@ export const useWorldStore = create<WorldStore>()(
         const craftStat = statFromLifeSkill(skill);
         if (craftStat) grantStatXp(draft, craftStat, STAT_XP_PER_ACTION);
         rollLukXp(draft);
+        const outDef = getItem(r.output.itemId);
+        if (dropCheck === "failed") {
+          appendActionLog(draft, "craft", `ประดิษฐ์ ${r.name}: พลาด · +${xpGained} xp`);
+        } else {
+          appendActionLog(
+            draft,
+            "craft",
+            `ประดิษฐ์ ${outDef?.name ?? r.output.itemId}×${r.output.count} · +${xpGained} xp`,
+          );
+        }
         set({ ...draft });
         return {
           ok: true,
@@ -950,6 +995,7 @@ export const useWorldStore = create<WorldStore>()(
           const itemStat = statFromLifeSkill(eff.skill);
           if (itemStat) grantStatXp(draft, itemStat, STAT_XP_PER_ACTION);
           rollLukXp(draft);
+          appendActionLog(draft, "use", `ใช้ ${def.name} · +${eff.xp} xp`);
           set({ ...draft });
           return { ok: true, kind: "trainSkill", itemId, skill: eff.skill, xpGained: eff.xp };
         }
@@ -967,6 +1013,10 @@ export const useWorldStore = create<WorldStore>()(
           draft.currentHp = Math.min(d.HP, draft.currentHp + hpHealed);
           draft.currentMp = Math.min(d.MP, draft.currentMp + mpHealed);
           rollLukXp(draft);
+          const parts: string[] = [];
+          if (hpHealed > 0) parts.push(`HP +${hpHealed}`);
+          if (mpHealed > 0) parts.push(`MP +${mpHealed}`);
+          appendActionLog(draft, "use", `ใช้ ${def.name} · ${parts.join(" / ") || "ไม่มีพลังให้ฟื้น"}`);
           set({ ...draft });
           return { ok: true, kind: "heal", itemId, hpHealed, mpHealed };
         }
@@ -1020,6 +1070,14 @@ export const useWorldStore = create<WorldStore>()(
           draft.currentMp = Math.min(d.MP, draft.currentMp + Math.floor(d.MP * pct));
         }
         advanceTime(draft, REST_HOURS);
+        const restLabel = kind === "inn" ? "พักโรงเตี๊ยม" : kind === "temple" ? "พักวัด" : "พักริมทาง";
+        appendActionLog(
+          draft,
+          "rest",
+          cost > 0
+            ? `${restLabel} · -${cost}🟡 · ฟื้น ${restored} แรง`
+            : `${restLabel} · ฟื้น ${restored} แรง`,
+        );
         set({ ...draft });
         return { ok: true, kind, cost, restored };
       },
@@ -1054,6 +1112,7 @@ export const useWorldStore = create<WorldStore>()(
         draft.gold -= total;
         draft.inventory[itemId] = (draft.inventory[itemId] ?? 0) + count;
         rollLukXp(draft);
+        appendActionLog(draft, "buy", `ซื้อ ${def.name}×${count} · -${total}🟡`);
         set({ ...draft });
         return { ok: true, itemId, count, spent: total };
       },
@@ -1074,6 +1133,7 @@ export const useWorldStore = create<WorldStore>()(
         const gained = Math.floor(price * sellMultiplier) * count;
         draft.gold = Math.max(0, draft.gold + gained);
         rollLukXp(draft);
+        appendActionLog(draft, "sell", `ขาย ${def.name}×${count} · +${gained}🟡`);
         set({ ...draft });
         return { ok: true, itemId, count, gained };
       },
@@ -1102,6 +1162,7 @@ export const useWorldStore = create<WorldStore>()(
           skillIds: slots,
         };
         rollLukXp(draft);
+        appendActionLog(draft, "learn", `เรียน ${sk.n} (วิชาฝีมือ) · -${price}🟡`);
         set({ ...draft });
         return { ok: true, id: skillId, spent: price };
       },
@@ -1131,6 +1192,8 @@ export const useWorldStore = create<WorldStore>()(
           skillIds: slots,
         };
         rollLukXp(draft);
+        const artDef = getArt(artId);
+        appendActionLog(draft, "learn", `เรียน ${artDef?.n ?? artId} (วิชาในกาย) · -${price}🟡`);
         set({ ...draft });
         return { ok: true, id: artId, spent: price };
       },
@@ -1229,7 +1292,7 @@ export const useWorldStore = create<WorldStore>()(
     }),
     {
       name: "wusia-world-v1",
-      version: 10,
+      version: 11,
       // Only persist the data fields, not the action functions.
       partialize: (s) => ({
         hasGame: s.hasGame,
@@ -1258,6 +1321,7 @@ export const useWorldStore = create<WorldStore>()(
         pendingHuntYield: s.pendingHuntYield,
         pendingSpar: s.pendingSpar,
         gameOver: s.gameOver,
+        actionLog: s.actionLog,
       }),
       // Migrations:
       //   v1 → v2 added stamina/staminaMax/lifeSkillXp(6)/pendingHuntYield.
@@ -1276,6 +1340,7 @@ export const useWorldStore = create<WorldStore>()(
       //           learnedArtIds / artLevels. Existing slotted skills + the
       //           active art are seeded into the learned arrays.
       //   v9 → v10 added pendingEncounter. Existing saves default null.
+      //   v10 → v11 added actionLog. Existing saves start with empty log.
       migrate: (persisted, fromVersion) => {
         const p = (persisted ?? {}) as Partial<WorldStateData>;
         // Pad the build's skillIds to 10 and back-fill learned arrays.
@@ -1345,6 +1410,7 @@ export const useWorldStore = create<WorldStore>()(
           pendingSpar: p.pendingSpar ?? null,
           pendingEncounter: p.pendingEncounter ?? null,
           gameOver: p.gameOver === true,
+          actionLog: Array.isArray(p.actionLog) ? p.actionLog.slice(-ACTION_LOG_MAX) : [],
         };
         void fromVersion;
         return out;

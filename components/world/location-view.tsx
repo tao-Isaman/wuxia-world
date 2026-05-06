@@ -28,6 +28,7 @@ import {
   type RestKind,
 } from "@/store/world-store";
 import { flashLoading } from "@/store/loading-store";
+import { toast } from "@/store/toast-store";
 import { RestPanel } from "./rest-panel";
 
 interface Props {
@@ -45,9 +46,6 @@ export function LocationView({ scene }: Props) {
   const stamina = useWorldStore((s) => s.stamina);
   const lifeSkillXp = useWorldStore((s) => s.lifeSkillXp);
 
-  // Last gather outcome — shown briefly above the activity buttons. Cleared
-  // on the next gather click or when leaving the screen.
-  const [lastGather, setLastGather] = useState<GatherResult | null>(null);
   // The popup-active NPC. null = no popup. Set by clicking a registry NPC.
   const [activeNpc, setActiveNpc] = useState<NpcDef | null>(null);
   // Toggle state for the shop / sect-hall panels.
@@ -249,11 +247,6 @@ export function LocationView({ scene }: Props) {
             <div className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">
               กิจกรรม
             </div>
-            {lastGather && (
-              <div className="rounded bg-muted/40 px-2 py-1.5 text-[11px]">
-                {gatherMessage(lastGather)}
-              </div>
-            )}
             <div className="space-y-1.5">
               {resources.map((node) => {
                 const res = getResource(node.resourceId);
@@ -271,7 +264,8 @@ export function LocationView({ scene }: Props) {
                     disabled={tooLow}
                     onClick={() => {
                       flashLoading("กำลังเก็บของ...");
-                      setLastGather(gatherResource(node.resourceId));
+                      const r = gatherResource(node.resourceId);
+                      toast(...gatherToast(r));
                     }}
                     className="w-full justify-start text-left h-auto py-2 whitespace-normal"
                     title={node.hint ?? res.hint}
@@ -320,23 +314,23 @@ export function LocationView({ scene }: Props) {
   );
 }
 
-function gatherMessage(r: GatherResult): string {
+// Map the GatherResult discriminator to the right toast kind + message.
+type ToastTuple = ["success" | "info" | "warn" | "error", string];
+function gatherToast(r: GatherResult): ToastTuple {
   if (!r.ok) {
-    if (r.reason === "stamina") return "พลังไม่พอสำหรับกิจกรรมนี้";
-    if (r.reason === "no-build") return "ตัวละครยังไม่พร้อม";
-    return "ไม่สามารถทำกิจกรรมนี้ได้ขณะนี้";
+    if (r.reason === "stamina") return ["warn", "พลังไม่พอสำหรับกิจกรรมนี้"];
+    if (r.reason === "no-build") return ["error", "ตัวละครยังไม่พร้อม"];
+    return ["error", "ไม่สามารถทำกิจกรรมนี้ได้ขณะนี้"];
   }
-  if (r.type === "battle") return "พบเจอสัตว์ป่า — เตรียมต่อสู้!";
-  // Mastery-vs-level drop check failed: explicit message so the player knows
-  // why nothing dropped (and that they still got partial xp toward mastery).
+  if (r.type === "battle") return ["info", "พบเจอสัตว์ป่า — เตรียมต่อสู้!"];
   if (r.dropCheck === "failed") {
     const pct = Math.round(r.successChance * 100);
-    return `ลองมือไม่สำเร็จ — มาสเตอร์รี่ยังไม่พอ (โอกาส ${pct}%) · +${r.xpGained} xp`;
+    return ["warn", `ลองมือไม่สำเร็จ — มาสเตอร์รี่ยังไม่พอ (โอกาส ${pct}%) · +${r.xpGained} xp`];
   }
-  if (r.items.length === 0) return `เก็บได้แต่ไม่มีของชิ้นใด · +${r.xpGained} xp`;
+  if (r.items.length === 0) return ["info", `เก็บได้แต่ไม่มีของชิ้นใด · +${r.xpGained} xp`];
   const parts = r.items.map((it) => {
     const def = getItem(it.itemId);
-    return `${def?.name ?? it.itemId} ×${it.count}`;
+    return `${def?.name ?? it.itemId}×${it.count}`;
   });
-  return `เจ้าได้: ${parts.join(", ")} (+${r.xpGained} xp)`;
+  return ["success", `${parts.join(", ")} · +${r.xpGained} xp`];
 }

@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import { Modal } from "@/components/ui/modal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
 import {
   ITEM_CATEGORY_LABEL,
   getItem,
@@ -11,6 +11,7 @@ import {
   type ShopDef,
 } from "@/lib/world";
 import { useWorldStore } from "@/store/world-store";
+import { toast } from "@/store/toast-store";
 
 interface Props {
   open: boolean;
@@ -28,7 +29,6 @@ export function ShopPopup({ open, shop, onClose }: Props) {
   const buyItem = useWorldStore((s) => s.buyItem);
   const sellItem = useWorldStore((s) => s.sellItem);
   const [tab, setTab] = useState<"buy" | "sell">("buy");
-  const [last, setLast] = useState<string | null>(null);
 
   if (!shop) return null;
 
@@ -77,10 +77,6 @@ export function ShopPopup({ open, shop, onClose }: Props) {
           </div>
         </div>
 
-        {last && (
-          <div className="rounded bg-muted/40 px-2 py-1 text-[11px]">{last}</div>
-        )}
-
         {tab === "buy" ? (
           <ul className="space-y-1.5">
             {shop.inventory.map((id) => {
@@ -116,10 +112,10 @@ export function ShopPopup({ open, shop, onClose }: Props) {
                       onClick={() => {
                         const r = buyItem(id, 1);
                         if (!r.ok) {
-                          setLast(r.reason === "no-gold" ? "ทองไม่พอ" : "ซื้อไม่ได้");
+                          toast("error", r.reason === "no-gold" ? "ทองไม่พอ" : "ซื้อไม่ได้");
                           return;
                         }
-                        setLast(`ซื้อ ${def.name} · -${r.spent}🟡`);
+                        toast("success", `ซื้อ ${def.name} · -${r.spent}🟡`);
                       }}
                     >
                       ซื้อ
@@ -169,10 +165,10 @@ export function ShopPopup({ open, shop, onClose }: Props) {
                       onClick={() => {
                         const r = sellItem(id, 1, shop.sellMultiplier);
                         if (!r.ok) {
-                          setLast("ขายไม่ได้");
+                          toast("error", "ขายไม่ได้");
                           return;
                         }
-                        setLast(`ขาย ${def.name} · +${r.gained}🟡`);
+                        toast("success", `ขาย ${def.name} · +${r.gained}🟡`);
                       }}
                     >
                       ขาย

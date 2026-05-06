@@ -515,6 +515,22 @@ export interface WorldStateData {
   // reward are stashed here. acknowledgeBattleResult grants the reward on
   // win and clears either way. Cleared on game reset.
   pendingSpar: PendingSpar | null;
+
+  // Rolling action log — last 100 player-driven events (rest, gather,
+  // craft, shop, travel, combat results, etc.). Pushed by world-store
+  // helpers so every UI feedback message lives in one place.
+  actionLog: ActionLogEntry[];
+}
+
+export interface ActionLogEntry {
+  // Game-time when the action happened (day + within-day fraction).
+  day: number;
+  time: number;
+  // Free-form category — used for filtering / icon. e.g. "rest", "gather",
+  // "craft", "buy", "sell", "travel", "combat", "learn".
+  kind: string;
+  // Human-readable Thai message shown in the action-log popup.
+  message: string;
 }
 
 export interface PendingSpar {

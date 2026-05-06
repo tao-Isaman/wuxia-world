@@ -21,6 +21,7 @@ import {
 import type { LifeSkill, RecipeDef } from "@/lib/world";
 import { useWorldStore } from "@/store/world-store";
 import { flashLoading } from "@/store/loading-store";
+import { toast } from "@/store/toast-store";
 
 interface Props {
   open: boolean;
@@ -99,7 +100,6 @@ function PracticeTab() {
   const consumeItem = useWorldStore((s) => s.useItem);
   const practiceMusic = useWorldStore((s) => s.practiceMusic);
   const playerBuild = useWorldStore((s) => s.playerBuild);
-  const [last, setLast] = useState<string | null>(null);
 
   const trainable = ITEMS
     .filter((it) => it.use && (inventory[it.id] ?? 0) > 0)
@@ -114,10 +114,6 @@ function PracticeTab() {
 
   return (
     <div className="space-y-3">
-      {last && (
-        <div className="rounded bg-muted/40 px-2 py-1.5 text-[11px]">{last}</div>
-      )}
-
       {/* Music practice button */}
       <div className="rounded bg-muted/30 px-3 py-2 space-y-1">
         <div className="flex items-center justify-between gap-2">
@@ -133,14 +129,15 @@ function PracticeTab() {
             onClick={() => {
               const r = practiceMusic();
               if (!r.ok) {
-                setLast(
+                toast(
+                  "error",
                   r.reason === "no-instrument"
                     ? "ต้องสวมเครื่องดนตรีในช่องอาวุธก่อน"
                     : "เล่นเพลงไม่ได้ตอนนี้",
                 );
                 return;
               }
-              setLast(`บรรเลงเพลงสั้น ๆ · +${r.xpGained} xp ดนตรี`);
+              toast("success", `บรรเลงเพลงสั้น ๆ · +${r.xpGained} xp ดนตรี`);
             }}
           >
             เล่นเพลง
@@ -192,11 +189,11 @@ function PracticeTab() {
                       onClick={() => {
                         const r = consumeItem(it.id);
                         if (!r.ok) {
-                          setLast("ใช้ไม่สำเร็จ");
+                          toast("error", "ใช้ไม่สำเร็จ");
                           return;
                         }
                         if (r.kind === "trainSkill") {
-                          setLast(`ฝึก ${LIFE_SKILL_LABEL[r.skill]} · +${r.xpGained} xp`);
+                          toast("success", `ฝึก ${LIFE_SKILL_LABEL[r.skill]} · +${r.xpGained} xp`);
                         }
                       }}
                     >
@@ -218,13 +215,9 @@ function CraftingTab() {
   const inventory = useWorldStore((s) => s.inventory);
   const xpMap = useWorldStore((s) => s.lifeSkillXp);
   const craftRecipe = useWorldStore((s) => s.craftRecipe);
-  const [lastResult, setLastResult] = useState<string | null>(null);
 
   return (
     <div className="space-y-2">
-      {lastResult && (
-        <div className="rounded bg-muted/40 px-2 py-1.5 text-[11px]">{lastResult}</div>
-      )}
       {RECIPES.map((r) => (
         <RecipeRow
           key={r.id}
@@ -235,7 +228,8 @@ function CraftingTab() {
             flashLoading("กำลังประดิษฐ์...");
             const res = craftRecipe(r.id);
             if (!res.ok) {
-              setLastResult(
+              toast(
+                "error",
                 res.reason === "missing-input"
                   ? "วัตถุดิบไม่ครบ"
                   : res.reason === "missing-mastery"
@@ -246,10 +240,13 @@ function CraftingTab() {
             }
             const out = getItem(res.outputItemId);
             if (res.dropCheck === "failed") {
-              setLastResult(`พลาดในขั้นตอนสุดท้าย — เสียวัตถุดิบ · +${res.xpGained} xp`);
+              toast("warn", `พลาดในขั้นตอนสุดท้าย — เสียวัตถุดิบ · +${res.xpGained} xp`);
               return;
             }
-            setLastResult(`สร้าง ${out?.name ?? res.outputItemId} ×${res.outputCount} สำเร็จ · +${res.xpGained} xp`);
+            toast(
+              "success",
+              `สร้าง ${out?.name ?? res.outputItemId} ×${res.outputCount} · +${res.xpGained} xp`,
+            );
           }}
         />
       ))}

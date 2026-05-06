@@ -20,6 +20,7 @@ import { DebugOverlay } from "./debug-overlay";
 import { GameOverScreen } from "./game-over-screen";
 import { EncounterScreen } from "./encounter-screen";
 import { LoadingOverlay } from "./loading-overlay";
+import { ToastStack } from "./toast-stack";
 import { BattleArena } from "@/components/game/battle-arena";
 
 export function WorldScreen() {
@@ -159,6 +160,7 @@ export function WorldScreen() {
         </div>
       </div>
       <LoadingOverlay />
+      <ToastStack />
     </>
   );
 }

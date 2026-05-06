@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Modal } from "@/components/ui/modal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,6 +11,7 @@ import {
 } from "@/lib/game";
 import type { SectHallDef } from "@/lib/world";
 import { useWorldStore } from "@/store/world-store";
+import { toast } from "@/store/toast-store";
 
 interface Props {
   open: boolean;
@@ -28,7 +28,6 @@ export function SectHallPopup({ open, hall, onClose }: Props) {
   const gold = useWorldStore((s) => s.gold);
   const buyMoveSkill = useWorldStore((s) => s.buyMoveSkill);
   const buyInnerSkill = useWorldStore((s) => s.buyInnerSkill);
-  const [last, setLast] = useState<string | null>(null);
 
   if (!hall || !player) return null;
 
@@ -46,10 +45,6 @@ export function SectHallPopup({ open, hall, onClose }: Props) {
           <span className="text-muted-foreground">ทอง </span>
           <strong className="text-amber-600">{gold}</strong>
         </div>
-
-        {last && (
-          <div className="rounded bg-muted/40 px-2 py-1 text-[11px]">{last}</div>
-        )}
 
         <ul className="space-y-1.5">
           {hall.offers.map((offer, i) => {
@@ -98,12 +93,12 @@ export function SectHallPopup({ open, hall, onClose }: Props) {
                         ? buyMoveSkill(offer.id, offer.price)
                         : buyInnerSkill(offer.id, offer.price);
                       if (!r.ok) {
-                        if (r.reason === "no-gold") setLast("ทองไม่พอ");
-                        else if (r.reason === "already-learned") setLast("เรียนแล้ว");
-                        else setLast("ซื้อไม่ได้");
+                        if (r.reason === "no-gold") toast("error", "ทองไม่พอ");
+                        else if (r.reason === "already-learned") toast("info", "เรียนแล้ว");
+                        else toast("error", "ซื้อไม่ได้");
                         return;
                       }
-                      setLast(`เรียนสำเร็จ · -${r.spent}🟡 (เพิ่มเข้าช่องว่าง)`);
+                      toast("success", `เรียนสำเร็จ · -${r.spent}🟡 (เพิ่มเข้าช่องว่าง)`);
                     }}
                   >
                     {known ? "เรียนแล้ว" : "เรียน"}
