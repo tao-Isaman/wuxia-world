@@ -8,6 +8,18 @@ import type {
 } from "../types";
 import { LOCATION_ROUTES } from "./location-routes";
 
+// Build a fast directional-label lookup:
+//   "<src>__<dst>" → { label, hint? }
+// Entries come from LOCATION_ROUTES. The route generator below reads this
+// to fill each route's button text — no auto-derived "ไป<dst.name>" or
+// "เส้นทางที่ N" fallback any more; every route ships with its own
+// hand-curated label per direction.
+const ROUTE_LABEL_MAP = new Map<string, { label: string; hint?: string }>();
+for (const r of LOCATION_ROUTES) {
+  ROUTE_LABEL_MAP.set(`${r.a}__${r.b}`, { label: r.fromA, hint: r.hintA });
+  ROUTE_LABEL_MAP.set(`${r.b}__${r.a}`, { label: r.fromB, hint: r.hintB });
+}
+
 // 85 locations: 83 from location.md (cities, sects, islands, terrain, caves,
 // temples/palaces, mansions, taverns, NPC homes, miscellaneous) plus one new
 // sect ("สำนักดาบโลหิต") and one new palace ("พระราชวังหลวง" beside the
@@ -267,7 +279,7 @@ function addEdge(a: string, b: string): boolean {
 
 // All routes are now read from the explicit table. Authoring lives in
 // lib/world/data/location-routes.ts.
-for (const [a, b] of LOCATION_ROUTES) addEdge(a, b);
+for (const r of LOCATION_ROUTES) addEdge(r.a, r.b);
 
 // Connectivity safety net — every leaf must end up with at least one
 // outbound edge. If an author forgot to write one, attach the orphan to
@@ -316,8 +328,9 @@ const DIR_INFO: Record<Dir, { label: string; hint: string }> = {
 // greedy can paint itself into a corner. The backtracker is capped by a step
 // budget — when the graph is too dense to 4-edge-colour with the paired-
 // opposite constraint, the search would otherwise be exponential, so once
-// the budget is exhausted we finish with a greedy pass and let any still-
-// unassigned edges pick up numbered fallback labels downstream.
+// the budget is exhausted we finish with a greedy pass. Edges that even
+// greedy can't satisfy fall through to a destination-name-only label
+// downstream (e.g. "ไปนครหลวง") instead of a numbered placeholder.
 const dirOf = new Map<string, Map<string, Dir>>(); // src -> dst -> direction at src
 const usedAt = new Map<string, Set<Dir>>();
 for (const l of ALL_LEAVES) {
@@ -414,27 +427,27 @@ for (const src of ALL_LEAVES) {
   });
 
   const outRoutes: RouteRef[] = [];
-  let unassignedCount = 0;
   for (const dstId of dstIds) {
     const dst = LEAVES_BY_ID.get(dstId)!;
     const rid = edgeRouteId(src.id, dst.id);
-    const dir = dirOf.get(src.id)!.get(dst.id);
-    const info = dir
-      ? DIR_INFO[dir]
-      : {
-          label: `เส้นทางที่ ${++unassignedCount}`,
-          hint: "เส้นทางออกจากที่นี่",
-        };
+    // Pull the curated directional label from LOCATION_ROUTES. Every
+    // edge in that table ships with its own per-direction text — if a
+    // pair somehow arrives here without a registered label (the
+    // connectivity safety net adds an unauthored edge), we fall back to
+    // the bare destination name plus a generic hint.
+    const override = ROUTE_LABEL_MAP.get(`${src.id}__${dst.id}`);
+    const buttonLabel = override?.label ?? dst.name;
+    const buttonHint = override?.hint ?? `ไปยัง${dst.name}`;
     outRoutes.push({
       routeSceneId: rid,
-      label: info.label,
-      hint: info.hint,
+      label: buttonLabel,
+      hint: buttonHint,
     });
     EDGE_ROUTES.push({
       kind: "route",
       id: rid,
-      label: `${info.label}จาก${src.name}`,
-      description: `เส้นทาง${info.label}ที่ทอดออกจาก${src.name} ปลายทางคือ...`,
+      label: `${buttonLabel} (${src.name} → ${dst.name})`,
+      description: `เดินทางจาก${src.name}ไปยัง${dst.name}`,
       destinations: [
         { locationId: dst.id, label: dst.name, hint: dst.description },
       ],
