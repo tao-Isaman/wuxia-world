@@ -21,12 +21,6 @@ export default function HomePage() {
     <main className="container max-w-3xl mx-auto p-3 space-y-3">
       <div className="flex items-center justify-between">
         <h1 className="text-base font-bold">กำลังภายใน — โลกยุทธภพ</h1>
-        <Link
-          href="/debug"
-          className="text-[11px] text-muted-foreground hover:text-foreground"
-        >
-          🛠 dev tools
-        </Link>
       </div>
       <WorldScreen />
     </main>

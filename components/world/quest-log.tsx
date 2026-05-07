@@ -6,34 +6,64 @@ import { getItem, getQuest, type QuestReward } from "@/lib/world";
 import { useWorldStore } from "@/store/world-store";
 import { cn } from "@/lib/utils";
 
-// Quest log sidebar. Three buckets:
-//   - Active   → currently underway (shows current stage + brief summary)
+// Quest log. Three buckets:
+//   - Active   → currently underway (shows full stage checklist)
 //   - Done     → completed for the run (success path)
 //   - Failed   → abandoned or failed; only side quests can fail and they
 //                stay in this bucket as a record (never re-offered)
 //
 // Side quests get a ✦ marker before the name; main quests use ★. Rewards
 // preview only appears for active quests where the player has yet to claim.
-export function QuestLog() {
+//
+// Two render modes:
+//   - "card"  (default) — wraps the body in a Card for sidebar use
+//   - "popup"           — bare body for use inside the menu-bar Modal
+interface QuestLogProps {
+  variant?: "card" | "popup";
+}
+
+export function QuestLog({ variant = "card" }: QuestLogProps = {}) {
   const quests = useWorldStore((s) => s.quests);
   const entries = Object.values(quests);
 
-  if (entries.length === 0) {
-    return (
-      <Card>
-        <CardContent className="p-3">
-          <h3 className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground mb-2">
-            ภารกิจ
-          </h3>
-          <p className="text-xs text-muted-foreground italic">ยังไม่มีภารกิจ</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
+  const empty = entries.length === 0;
   const active = entries.filter((q) => q.status === "active");
   const done = entries.filter((q) => q.status === "done");
   const failed = entries.filter((q) => q.status === "failed");
+
+  const body = empty ? (
+    <p className="text-xs text-muted-foreground italic">ยังไม่มีภารกิจ</p>
+  ) : (
+    <>
+      {active.length > 0 && (
+        <Section title="กำลังทำ" tone="active">
+          {active.map((q) => (
+            <QuestRow key={q.id} questId={q.id} status="active" stage={q.stage} />
+          ))}
+        </Section>
+      )}
+
+      {done.length > 0 && (
+        <Section title="สำเร็จแล้ว" tone="done">
+          {done.map((q) => (
+            <QuestRow key={q.id} questId={q.id} status="done" stage={q.stage} />
+          ))}
+        </Section>
+      )}
+
+      {failed.length > 0 && (
+        <Section title="ล้มเหลว" tone="failed">
+          {failed.map((q) => (
+            <QuestRow key={q.id} questId={q.id} status="failed" stage={q.stage} />
+          ))}
+        </Section>
+      )}
+    </>
+  );
+
+  if (variant === "popup") {
+    return <div className="space-y-3">{body}</div>;
+  }
 
   return (
     <Card>
@@ -41,30 +71,7 @@ export function QuestLog() {
         <h3 className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">
           ภารกิจ
         </h3>
-
-        {active.length > 0 && (
-          <Section title="กำลังทำ" tone="active">
-            {active.map((q) => (
-              <QuestRow key={q.id} questId={q.id} status="active" stage={q.stage} />
-            ))}
-          </Section>
-        )}
-
-        {done.length > 0 && (
-          <Section title="สำเร็จแล้ว" tone="done">
-            {done.map((q) => (
-              <QuestRow key={q.id} questId={q.id} status="done" stage={q.stage} />
-            ))}
-          </Section>
-        )}
-
-        {failed.length > 0 && (
-          <Section title="ล้มเหลว" tone="failed">
-            {failed.map((q) => (
-              <QuestRow key={q.id} questId={q.id} status="failed" stage={q.stage} />
-            ))}
-          </Section>
-        )}
+        {body}
       </CardContent>
     </Card>
   );

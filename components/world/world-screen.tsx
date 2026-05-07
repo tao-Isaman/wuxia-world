@@ -12,11 +12,8 @@ import { DialogDisplay } from "./dialog-display";
 import { ChoicePanel } from "./choice-panel";
 import { LocationView } from "./location-view";
 import { RouteView } from "./route-view";
-import { QuestLog } from "./quest-log";
-import { PlayerStatus } from "./player-status";
 import { StatusBar } from "./status-bar";
 import { MenuBar } from "./menu-bar";
-import { DebugOverlay } from "./debug-overlay";
 import { GameOverScreen } from "./game-over-screen";
 import { EncounterScreen } from "./encounter-screen";
 import { LoadingOverlay } from "./loading-overlay";
@@ -89,10 +86,6 @@ export function WorldScreen() {
           <StatusBar />
           <EncounterScreen />
         </div>
-        <div className="space-y-3">
-          <PlayerStatus />
-          <DebugOverlay />
-        </div>
       </div>
     );
   }
@@ -113,8 +106,9 @@ export function WorldScreen() {
     );
   }
 
-  // Pick the right view per scene kind. Sidebar (PlayerStatus / QuestLog /
-  // DebugOverlay) renders alongside all three.
+  // Pick the right view per scene kind. PlayerStatus / inventory / quest
+  // tabs all live in the top menu-bar; the world view is single-column
+  // now.
   let mainView: React.ReactNode;
   switch (scene.kind) {
     case "dialog":
@@ -152,11 +146,6 @@ export function WorldScreen() {
               ออกเกม
             </Button>
           </div>
-        </div>
-        <div className="space-y-3">
-          <PlayerStatus />
-          <QuestLog />
-          <DebugOverlay />
         </div>
       </div>
       <LoadingOverlay />
