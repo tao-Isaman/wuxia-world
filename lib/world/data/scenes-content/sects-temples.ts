@@ -1526,4 +1526,146 @@ export const SCENES_SECTS_TEMPLES: readonly Scene[] = [
       },
     ],
   },
+
+  // ─── Sect sparring partners — ambient talks ─────────────────────────
+  // Brief greeting scenes paired with the per-sect sparring NPCs added in
+  // lib/world/data/npcs/sects-temples.ts. Two lines each — keeps the spar
+  // button at the top of the popup while still giving each NPC a voice.
+
+  {
+    kind: "dialog",
+    id: "npc_sect_taishan_disciple_kunwu_talk",
+    lines: [
+      { t: "dialogue", speaker: "ศิษย์คุนหวู่", text: "ดาบไท่ซานสองมือไม่อายใคร อยากลองวัดฝีมือกับข้าหรือ?" },
+      { t: "narration", text: "เขาวางดาบลงบนไหล่อย่างมั่นใจ" },
+    ],
+  },
+  {
+    kind: "dialog",
+    id: "npc_sect_hengshan_south_disciple_yuepan_talk",
+    lines: [
+      { t: "dialogue", speaker: "ศิษย์เยว่ผาน", text: "ห้ายอดเฮิงซานเล่นกระบี่เป็นระบำ มาเต้นกันสักท่าไหม?" },
+      { t: "narration", text: "เขายิ้มกว้าง ปลายกระบี่หมุนเล่นในมือ" },
+    ],
+  },
+  {
+    kind: "dialog",
+    id: "npc_sect_hengshan_north_nun_jingxin_talk",
+    lines: [
+      { t: "dialogue", speaker: "นักพรตจิงซิน", text: "ดนตรีกับดาบไม่ขัดกัน — ถ้าใจสงบ" },
+      { t: "narration", text: "ขลุ่ยในมือเธอแอบบรรจุใบดาบบาง ๆ" },
+    ],
+  },
+  {
+    kind: "dialog",
+    id: "npc_sect_songshan_disciple_lifeng_talk",
+    lines: [
+      { t: "dialogue", speaker: "ศิษย์หลี่เฟิง", text: "เด็กหนุ่มซงซานต้องวัดฝีมือเพื่อก้าวหน้า มาช่วยข้าหน่อย" },
+      { t: "narration", text: "เขาย่อตัวลงในท่ามาตรฐานของซงซาน" },
+    ],
+  },
+  {
+    kind: "dialog",
+    id: "npc_sect_wudang_disciple_qingfeng_talk",
+    lines: [
+      { t: "dialogue", speaker: "สาวกชิงเฟิง", text: "ไทจี้ไม่ใช่การชนะ แต่เป็นการเรียนรู้" },
+      { t: "narration", text: "เขาเคลื่อนไหวอย่างช้า ๆ พลังภายในซ่อนอยู่ในกระบวนท่าทุกท่า" },
+    ],
+  },
+  {
+    kind: "dialog",
+    id: "npc_sect_emei_nun_qingyu_talk",
+    lines: [
+      { t: "dialogue", speaker: "นักพรตชิงอวี้", text: "กระบี่น้ำต้องไหลเหมือนน้ำ จะลองสัมผัสกับข้าไหม?" },
+      { t: "narration", text: "เธอวางมือบนด้ามดาบน้ำค้างอย่างนิ่มนวล" },
+    ],
+  },
+  {
+    kind: "dialog",
+    id: "npc_sect_huashan_disciple_jianyi_talk",
+    lines: [
+      { t: "dialogue", speaker: "ศิษย์เจี้ยนอี้", text: "ฝีมือดาบหัวซานต้องคมเหมือนใจ — เจ้าพร้อมจะรู้ความหมายไหม?" },
+      { t: "narration", text: "เขาดึงดาบออกครึ่งฝัก ตาวาวขึ้น" },
+    ],
+  },
+  {
+    kind: "dialog",
+    id: "npc_sect_lingjiu_lady_zixia_talk",
+    lines: [
+      { t: "dialogue", speaker: "หญิงสาวจื่อเสีย", text: "เข็มและดาบลม — ใช้คู่กันยากกว่าที่คิด" },
+      { t: "narration", text: "เธอเคลื่อนไหวอย่างเงียบ ๆ ราวกับลมพัด" },
+    ],
+  },
+  {
+    kind: "dialog",
+    id: "npc_sect_beggars_brawler_jiu_talk",
+    lines: [
+      { t: "dialogue", speaker: "ยาจกจิ๊ว", text: "หมัดเมาน่ะนะ... โต้ได้ไม่อายใคร แม้จะเดินไม่ตรง" },
+      { t: "narration", text: "เขาดื่มเหล้าอึกใหญ่และยกขวดเชิญเจ้า" },
+    ],
+  },
+  {
+    kind: "dialog",
+    id: "npc_sect_xingxiu_disciple_dushou_talk",
+    lines: [
+      { t: "dialogue", speaker: "ศิษย์ตู๋โซ่ว", text: "พิษไม่ใช่การโกง — มันคือศิลปะ" },
+      { t: "narration", text: "เข็มเล็ก ๆ ในมือเขาแวววาวด้วยของเหลวสีเขียว" },
+    ],
+  },
+  {
+    kind: "dialog",
+    id: "npc_sect_wudu_miao_aman_talk",
+    lines: [
+      { t: "dialogue", speaker: "อาหมาน", text: "งูในย่ามข้าหิวมาทั้งวัน... กล้าลองมือกับข้าไหม?" },
+      { t: "narration", text: "เสียงเลื้อยเบา ๆ ในย่ามทำให้ผมเจ้าตั้งชัน" },
+    ],
+  },
+  {
+    kind: "dialog",
+    id: "npc_sect_quanzhen_disciple_chongxu_talk",
+    lines: [
+      { t: "dialogue", speaker: "สาวกชงซวี", text: "ปราณภายในของฉวนเจินไหลเป็นวงกลม กระบี่ก็เช่นกัน" },
+      { t: "narration", text: "เขาหายใจลึกและจับด้ามกระบี่ด้วยสองมือ" },
+    ],
+  },
+  {
+    kind: "dialog",
+    id: "npc_sect_gumu_disciple_lengyue_talk",
+    lines: [
+      { t: "dialogue", speaker: "ศิษย์เลิ่งเยว่", text: "สาวหยกสอนกระบี่เย็นเหมือนน้ำแข็ง — เจ้ารับไหวหรือ?" },
+      { t: "narration", text: "เธอชักกระบี่ออกอย่างเงียบงัน อากาศรอบตัวเย็นลงทันที" },
+    ],
+  },
+  {
+    kind: "dialog",
+    id: "npc_sect_xiaoyao_master_yunxiao_talk",
+    lines: [
+      { t: "dialogue", speaker: "ปรมาจารย์ยุนเซียว", text: "ฝ่ามือสราญรมย์ผ่อนคลาย แต่อย่าดูถูก" },
+      { t: "narration", text: "เขาเล่นขลุ่ยหยกอย่างผ่อนคลาย ก่อนวางลงและยกฝ่ามือ" },
+    ],
+  },
+  {
+    kind: "dialog",
+    id: "npc_sect_ming_envoy_huozhi_talk",
+    lines: [
+      { t: "dialogue", speaker: "ผู้แทนหั่วจี้", text: "พรรคมิ่งไม่ได้ดำดังคำเล่าลือ — แต่ฝ่ามือเพลิงนี่ของจริง" },
+      { t: "narration", text: "ฝ่ามือเขาเรืองแสงสีแดงจาง ๆ" },
+    ],
+  },
+  {
+    kind: "dialog",
+    id: "npc_sect_xuedao_blade_xuelang_talk",
+    lines: [
+      { t: "dialogue", speaker: "ดาบเลือดเซียะลาง", text: "ดาบของข้ากระหายเลือด... รวมทั้งของเจ้าด้วย" },
+      { t: "narration", text: "ดาบยาวสีเลือดในมือเขาดูเหมือนสั่นเล็กน้อย" },
+    ],
+  },
+  {
+    kind: "dialog",
+    id: "npc_sect_xueyu_master_chiying_talk",
+    lines: [
+      { t: "dialogue", speaker: "จอมยุทธฉือยิง", text: "เจ้าสำนักดาบโลหิตยินดีรับการประลอง — ถ้าเจ้ารอดได้" },
+      { t: "narration", text: "ดวงตาของเขาแดงเหมือนเลือดแห้ง รอยยิ้มเย็นลึกลับ" },
+    ],
+  },
 ];

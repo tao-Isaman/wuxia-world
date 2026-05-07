@@ -139,6 +139,16 @@ export function InventoryPopup({ open, onClose }: Props) {
                             MP +{useEff.mp}
                           </Badge>
                         )}
+                        {useEff?.t === "manualLearnSkill" && (
+                          <Badge variant="outline" className="text-[9px] border-amber-500 text-amber-700">
+                            เรียนวิชา · {useEff.reqStat} {useEff.reqValue}
+                          </Badge>
+                        )}
+                        {useEff?.t === "manualLearnArt" && (
+                          <Badge variant="outline" className="text-[9px] border-emerald-500 text-emerald-700">
+                            เรียนวิชาในกาย · {useEff.reqStat} {useEff.reqValue}
+                          </Badge>
+                        )}
                       </div>
                       {def?.description && (
                         <div className="text-[10px] text-muted-foreground">{def.description}</div>
@@ -155,6 +165,12 @@ export function InventoryPopup({ open, onClose }: Props) {
                             const r = consumeItem(id);
                             if (!r.ok) {
                               if (r.reason === "full") setLastUsed("HP / MP เต็มแล้ว ไม่ต้องใช้");
+                              else if (r.reason === "stat-too-low")
+                                setLastUsed(
+                                  `ฝีมือยังไม่ถึงขั้น · ต้องการ ${r.stat} ${r.needed} (ปัจจุบัน ${r.current})`,
+                                );
+                              else if (r.reason === "already-learned")
+                                setLastUsed("เรียนวิชานี้แล้ว ไม่ต้องอ่านอีก");
                               else setLastUsed("ใช้ไม่ได้");
                               return;
                             }
@@ -165,6 +181,10 @@ export function InventoryPopup({ open, onClose }: Props) {
                               if (r.hpHealed > 0) parts.push(`HP +${r.hpHealed}`);
                               if (r.mpHealed > 0) parts.push(`MP +${r.mpHealed}`);
                               setLastUsed(parts.length > 0 ? `ฟื้นพลัง: ${parts.join(" · ")}` : "ไม่มีพลังให้ฟื้น");
+                            } else if (r.kind === "manualLearnSkill") {
+                              setLastUsed(`เรียนวิชาฝีมือสำเร็จ · พร้อมใช้ทันที`);
+                            } else if (r.kind === "manualLearnArt") {
+                              setLastUsed(`เรียนวิชาในกายสำเร็จ · เริ่มที่ระดับ ${r.level}`);
                             }
                           }}
                         >

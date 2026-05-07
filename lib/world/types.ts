@@ -333,6 +333,7 @@ export const ITEM_CATEGORIES = [
   "potion",
   "food",
   "book",
+  "manual",
   "craft",
   "valuable",
   "quest",
@@ -347,6 +348,7 @@ export const ITEM_CATEGORY_LABEL: Record<ItemCategory, string> = {
   potion: "ยาฟื้นพลัง",
   food: "อาหาร",
   book: "ตำรา / คัมภีร์",
+  manual: "ตำราวิชา",
   craft: "ของช่างฝีมือ",
   valuable: "ของมีค่า",
   quest: "ของภารกิจ",
@@ -372,7 +374,27 @@ export type ItemUseEffect =
   | { t: "trainSkill"; skill: LifeSkill; xp: number }
   // Heal current HP and/or MP, capped at the player's deriveAll max. At
   // least one of `hp` / `mp` must be > 0.
-  | { t: "heal"; hp?: number; mp?: number };
+  | { t: "heal"; hp?: number; mp?: number }
+  // ตำราวิชา — single-use manual that teaches a move skill. Refuses (does
+  // not consume the item) if the player's *base* stat is below `reqValue`,
+  // or if the skill is already learned. Uses base stats (build.stats) so
+  // equipment / skill bonuses can't trivially bypass the gate.
+  | { t: "manualLearnSkill"; skillId: string; reqStat: StatKey; reqValue: number }
+  // ตำราวิชา for an inner art. Same prereq + already-learned semantics.
+  // `level` is the level the player learns the art at (default 1).
+  | { t: "manualLearnArt"; artId: string; reqStat: StatKey; reqValue: number; level?: number };
+
+// Stat threshold per skill / art tier when learning from a manual. T0
+// items have no stat gate; higher tiers escalate. Authors set the stat
+// per manual to whatever fits the move (STR for fist/blade, POW for
+// internal, AGI for evasive, DEX for hidden / venom, VIT for hard arts).
+export const MANUAL_TIER_REQ: Record<0 | 1 | 2 | 3 | 4, number> = {
+  0: 0,
+  1: 10,
+  2: 15,
+  3: 20,
+  4: 30,
+};
 
 // ─── Life skills ──────────────────────────────────────────────────────
 // Seventeen skills across four families. Each has its own xp pool and

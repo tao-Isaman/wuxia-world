@@ -35,7 +35,7 @@ export const NPCS_WILDERNESS: readonly NpcDef[] = [
       "qw_kunlun_exile_truth",
       "qw_kunlun_snow_lotus",
     ],
-    sparOpponentId: "sect_elder",
+    sparOpponentId: "spar_kunlun_qiu",
     sparFameReward: 12,
     tags: ["exile", "master", "mysterious"],
   },

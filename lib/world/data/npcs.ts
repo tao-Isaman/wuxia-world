@@ -29,7 +29,7 @@ const CORE_NPCS: readonly NpcDef[] = [
     description: "นักดาบเร่ร่อนผู้แสวงหาคู่ต่อสู้ระดับเดียวกัน",
     locationIds: ["inn_yuelai"],
     dialogSceneId: "swordsman_xiao_talk",
-    sparOpponentId: "thug",
+    sparOpponentId: "spar_swordsman_xiao",
     sparFameReward: 5,
     tags: ["sparring", "wanderer"],
   },

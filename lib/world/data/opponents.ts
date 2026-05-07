@@ -257,6 +257,203 @@ export const OPPONENTS: readonly OpponentDef[] = [
   { id: "hunt_jungle_serpent", name: "งูยักษ์ป่า", ti: 2, category: "beast",
     drops: [...DROPS_T2, { itemId: "viper_venom", weight: 2 }],
     build: () => build("งูยักษ์ป่า", 2, { skillIds: ["bst_venom", "bst_constrict"] }) },
+
+  // ─── NPC sparring partners ────────────────────────────────────
+  // Bespoke opponents whose move skills + inner art match the NPC's
+  // identity. Pointed to from `NpcDef.sparOpponentId`. Players see
+  // these only via the ⚔ ขอประลอง button — never spawn from random
+  // encounters or hunting, so no entry in random-events.ts.
+
+  // เซียวจิ้งเทียน (inn_yuelai) — wandering swordsman, light agile sword.
+  { id: "spar_swordsman_xiao", name: "เซียวจิ้งเทียน", ti: 2, category: "human",
+    drops: [...DROPS_T2,
+      { itemId: "man_ns1", weight: 1 }, { itemId: "man_qf", weight: 1 },
+      { itemId: "man_nd3", weight: 1 }, { itemId: "man_t0_sevenstar", weight: 1 }],
+    build: () => build("เซียวจิ้งเทียน", 2, {
+      stats: { STR: 5, AGI: 7, DEX: 6, POW: 3, VIT: 4 },
+      artId: "t0_sevenstar", artLevel: 5,
+      skillIds: ["ns1", "qf", "nd3"],
+    }) },
+
+  // อาจารย์ฝาหมิง (sect_shaolin) — Shaolin elder, hard external palm work.
+  { id: "spar_shaolin_faming", name: "อาจารย์ฝาหมิง", ti: 3, category: "human",
+    drops: [...DROPS_T3,
+      { itemId: "man_sf", weight: 1 }, { itemId: "man_nd5", weight: 1 },
+      { itemId: "man_ne1", weight: 1 }, { itemId: "man_t1_goldenbell", weight: 1 }],
+    build: () => build("อาจารย์ฝาหมิง", 3, {
+      stats: { STR: 8, VIT: 8, DEF: 7, POW: 5 },
+      artId: "t1_goldenbell", artLevel: 6,
+      skillIds: ["sf", "nd5", "ne1"],
+    }) },
+
+  // ชิวเฉียน (mt_kunlun) — Kunlun exile, sword-and-internal hermit style.
+  { id: "spar_kunlun_qiu", name: "ชิวเฉียน", ti: 3, category: "human",
+    drops: [...DROPS_T3,
+      { itemId: "man_nm1", weight: 1 }, { itemId: "man_nd11", weight: 1 },
+      { itemId: "man_nc3", weight: 1 }],
+    build: () => build("ชิวเฉียน", 3, {
+      stats: { POW: 8, INT: 7, AGI: 7, DEX: 6 },
+      artId: "t3_voidstep", artLevel: 6,
+      skillIds: ["nm1", "nd11", "nc3"],
+    }) },
+
+  // ─── Per-sect sparring partners (T1-T3) ───────────────────────────
+  // One opponent per sect-NPC sparring partner. Skill / art picks lean on
+  // the sect's signature catalogue so each fight feels distinct (Shaolin
+  // hard external, Wudang taiji-soft, Gumu yin-internal sword, etc.).
+
+  // T1 — early sparring (sect intro)
+  { id: "spar_taishan_disciple", name: "ศิษย์คุนหวู่", ti: 1, category: "human",
+    drops: [...DROPS_T1,
+      { itemId: "man_nc7", weight: 1 }, { itemId: "man_nm2", weight: 1 },
+      { itemId: "man_t0_fiveyuan", weight: 1 }],
+    build: () => build("ศิษย์คุนหวู่", 1, {
+      stats: { STR: 5, VIT: 4 },
+      artId: "t0_fiveyuan", artLevel: 4,
+      skillIds: ["nc7", "nm2"],
+    }) },
+  { id: "spar_hengshan_south_disciple", name: "ศิษย์เยว่ผาน", ti: 1, category: "human",
+    drops: [...DROPS_T1,
+      { itemId: "man_nc3", weight: 1 }, { itemId: "man_nd11", weight: 1 },
+      { itemId: "man_t1_redlotus", weight: 1 }],
+    build: () => build("ศิษย์เยว่ผาน", 1, {
+      stats: { AGI: 5, DEX: 4 },
+      artId: "t1_redlotus", artLevel: 3,
+      skillIds: ["nc3", "nd11"],
+    }) },
+  { id: "spar_hengshan_north_nun", name: "นักพรตจิงซิน", ti: 1, category: "human",
+    drops: [...DROPS_T1,
+      { itemId: "man_nc9", weight: 1 }, { itemId: "man_nm1", weight: 1 },
+      { itemId: "man_t1_blackiron", weight: 1 }],
+    build: () => build("นักพรตจิงซิน", 1, {
+      stats: { POW: 5, INT: 4 },
+      artId: "t1_blackiron", artLevel: 3,
+      skillIds: ["nc9", "nm1"],
+    }) },
+  { id: "spar_songshan_disciple", name: "ศิษย์หลี่เฟิง", ti: 1, category: "human",
+    drops: [...DROPS_T1,
+      { itemId: "man_ns1", weight: 1 }, { itemId: "man_nd3", weight: 1 },
+      { itemId: "man_t1_eagleclaw", weight: 1 }],
+    build: () => build("ศิษย์หลี่เฟิง", 1, {
+      stats: { STR: 5, AGI: 4 },
+      artId: "t1_eagleclaw", artLevel: 3,
+      skillIds: ["ns1", "nd3"],
+    }) },
+
+  // T2 — mid sparring (sect signature styles)
+  { id: "spar_wudang_disciple", name: "สาวกชิงเฟิง", ti: 2, category: "human",
+    drops: [...DROPS_T2,
+      { itemId: "man_tj", weight: 1 }, { itemId: "man_rf", weight: 1 },
+      { itemId: "man_cs", weight: 1 }],
+    build: () => build("สาวกชิงเฟิง", 2, {
+      stats: { POW: 6, AGI: 5, DEX: 4 },
+      artId: "t3_yinyang", artLevel: 4,
+      skillIds: ["tj", "rf", "cs"],
+    }) },
+  { id: "spar_emei_nun", name: "นักพรตชิงอวี้", ti: 2, category: "human",
+    drops: [...DROPS_T2,
+      { itemId: "man_nc3", weight: 1 }, { itemId: "man_nm1", weight: 1 },
+      { itemId: "man_t2_plumblossom", weight: 1 }],
+    build: () => build("นักพรตชิงอวี้", 2, {
+      stats: { POW: 6, INT: 5, DEX: 4 },
+      artId: "t2_plumblossom", artLevel: 4,
+      skillIds: ["nc3", "nm1"],
+    }) },
+  { id: "spar_huashan_disciple", name: "ศิษย์เจี้ยนอี้", ti: 2, category: "human",
+    drops: [...DROPS_T2,
+      { itemId: "man_ns1", weight: 1 }, { itemId: "man_nd3", weight: 1 },
+      { itemId: "man_qf", weight: 1 }, { itemId: "man_t2_eighttri", weight: 1 }],
+    build: () => build("ศิษย์เจี้ยนอี้", 2, {
+      stats: { STR: 6, AGI: 5, DEX: 4 },
+      artId: "t2_eighttri", artLevel: 5,
+      skillIds: ["ns1", "nd3", "qf"],
+    }) },
+  { id: "spar_lingjiu_lady", name: "หญิงสาวจื่อเสีย", ti: 2, category: "human",
+    drops: [...DROPS_T2,
+      { itemId: "man_nd9", weight: 1 }, { itemId: "man_nd11", weight: 1 },
+      { itemId: "man_t2_plumblossom", weight: 1 }],
+    build: () => build("หญิงสาวจื่อเสีย", 2, {
+      stats: { AGI: 7, DEX: 6 },
+      artId: "t2_plumblossom", artLevel: 5,
+      skillIds: ["nd9", "nd11"],
+    }) },
+  { id: "spar_beggars_brawler", name: "ยาจกจิ๊ว", ti: 2, category: "human",
+    drops: [...DROPS_T2,
+      { itemId: "man_nc1", weight: 1 }, { itemId: "man_ne8", weight: 1 },
+      { itemId: "man_t1_eagleclaw", weight: 1 }],
+    build: () => build("ยาจกจิ๊ว", 2, {
+      stats: { STR: 6, AGI: 6, VIT: 4 },
+      artId: "t1_eagleclaw", artLevel: 4,
+      skillIds: ["nc1", "ne8"],
+    }) },
+  { id: "spar_xingxiu_disciple", name: "ศิษย์ตู๋โซ่ว", ti: 2, category: "human",
+    drops: [...DROPS_T2,
+      { itemId: "man_pn", weight: 1 }, { itemId: "man_nd9", weight: 1 },
+      { itemId: "man_t2_snakeform", weight: 1 }],
+    build: () => build("ศิษย์ตู๋โซ่ว", 2, {
+      stats: { DEX: 7, LUK: 5 },
+      artId: "t2_snakeform", artLevel: 4,
+      skillIds: ["pn", "nd9"],
+    }) },
+  { id: "spar_wudu_miao", name: "หมอพิษอาหมาน", ti: 2, category: "human",
+    drops: [...DROPS_T2,
+      { itemId: "man_pn", weight: 1 }, { itemId: "man_nd9", weight: 1 },
+      { itemId: "man_t2_snakeform", weight: 1 }],
+    build: () => build("หมอพิษอาหมาน", 2, {
+      stats: { DEX: 6, LUK: 6, POW: 3 },
+      artId: "t2_snakeform", artLevel: 5,
+      skillIds: ["pn", "nd9"],
+    }) },
+  { id: "spar_quanzhen_disciple", name: "สาวกชงซวี", ti: 2, category: "human",
+    drops: [...DROPS_T2,
+      { itemId: "man_qzjf", weight: 1 }, { itemId: "man_qz_punch", weight: 1 },
+      { itemId: "man_qzzq", weight: 1 }],
+    build: () => build("สาวกชงซวี", 2, {
+      stats: { POW: 6, INT: 6, DEX: 4 },
+      artId: "qzzq", artLevel: 4,
+      skillIds: ["qzjf", "qz_punch"],
+    }) },
+
+  // T3 — late sparring (master tier, sect signature arts)
+  { id: "spar_gumu_disciple", name: "ศิษย์เลิ่งเยว่", ti: 3, category: "human",
+    // All-T3 loadout — drops a thematic T1 sword manual she carries.
+    drops: [...DROPS_T3, { itemId: "man_nd3", weight: 1 }],
+    build: () => build("ศิษย์เลิ่งเยว่", 3, {
+      stats: { POW: 8, INT: 8, DEX: 5 },
+      artId: "ynxj", artLevel: 5,
+      skillIds: ["gm_sword", "ynss"],
+    }) },
+  { id: "spar_xiaoyao_master", name: "ปรมาจารย์ยุนเซียว", ti: 3, category: "human",
+    // All-T3 loadout — drops a thematic T0 fan manual.
+    drops: [...DROPS_T3, { itemId: "man_nc9", weight: 1 }],
+    build: () => build("ปรมาจารย์ยุนเซียว", 3, {
+      stats: { POW: 8, INT: 8, AGI: 6 },
+      artId: "bmzq", artLevel: 5,
+      skillIds: ["xy_punch", "yxjf"],
+    }) },
+  { id: "spar_ming_envoy", name: "ผู้แทนหั่วจี้", ti: 3, category: "human",
+    drops: [...DROPS_T3,
+      { itemId: "man_nd10", weight: 1 }, { itemId: "man_ne8", weight: 1 }],
+    build: () => build("ผู้แทนหั่วจี้", 3, {
+      stats: { STR: 8, POW: 6, AGI: 5 },
+      artId: "t3_dragonelephant", artLevel: 5,
+      skillIds: ["nd10", "ne8"],
+    }) },
+  { id: "spar_xuedao_blade", name: "ดาบเลือดเซียะลาง", ti: 3, category: "human",
+    // All-T3 loadout — drops a thematic T1 sword manual.
+    drops: [...DROPS_T3, { itemId: "man_nd3", weight: 1 }],
+    build: () => build("ดาบเลือดเซียะลาง", 3, {
+      stats: { STR: 9, AGI: 7, DEX: 5 },
+      artId: "blood", artLevel: 4,
+      skillIds: ["bs", "nf6"],
+    }) },
+  { id: "spar_xueyu_master", name: "จอมยุทธฉือยิง", ti: 3, category: "human",
+    drops: [...DROPS_T3, { itemId: "man_nd10", weight: 1 }],
+    build: () => build("จอมยุทธฉือยิง", 3, {
+      stats: { STR: 9, AGI: 8, DEX: 6 },
+      artId: "blood", artLevel: 5,
+      skillIds: ["bs", "nf6", "nd10"],
+    }) },
 ];
 
 export const OPPONENTS_BY_ID = new Map<string, OpponentDef>(

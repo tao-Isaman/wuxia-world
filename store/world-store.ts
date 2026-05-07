@@ -140,8 +140,14 @@ export type BuyRecipeResult =
 
 // Result of using a consumable item (book, song book, image, potion, …).
 // Discriminated on `kind` so the UI can render different feedback per use.
+//
+// Manual-use failure modes are item-preserving: `stat-too-low` and
+// `already-learned` both refuse the use without consuming the item, so
+// the player isn't punished for guessing. The popup shows a toast.
 export type UseItemResult =
   | { ok: false; reason: "unknown" | "missing" | "no-effect" | "no-build" | "full" }
+  | { ok: false; reason: "stat-too-low"; stat: StatKey; needed: number; current: number }
+  | { ok: false; reason: "already-learned"; itemId: string }
   | { ok: true; kind: "trainSkill"; itemId: string; skill: LifeSkill; xpGained: number }
   | {
       ok: true;
@@ -149,7 +155,9 @@ export type UseItemResult =
       itemId: string;
       hpHealed: number;
       mpHealed: number;
-    };
+    }
+  | { ok: true; kind: "manualLearnSkill"; itemId: string; skillId: string }
+  | { ok: true; kind: "manualLearnArt"; itemId: string; artId: string; level: number };
 
 // Result of clicking the "เล่นเพลง" practice button.
 export type PracticeMusicResult =
@@ -1176,6 +1184,34 @@ export const useWorldStore = create<WorldStore>()(
           }
         }
 
+        // Pre-flight for ตำราวิชา (manual) items — refuse without consuming
+        // when the player can't actually use it. Two failure modes:
+        //   - already learned (don't waste the manual)
+        //   - base stat below the requirement (book stays in inventory)
+        // Base stat means `playerBuild.stats[reqStat]` — not the stat
+        // value derived after equipment / arts / skills. Equipment can't
+        // bypass the gate.
+        if (def.use.t === "manualLearnSkill" || def.use.t === "manualLearnArt") {
+          if (!s.playerBuild) return { ok: false, reason: "no-build" };
+          if (def.use.t === "manualLearnSkill") {
+            const learned = s.playerBuild.learnedSkillIds ?? [];
+            if (learned.includes(def.use.skillId)) {
+              return { ok: false, reason: "already-learned", itemId };
+            }
+          } else {
+            const learned = s.playerBuild.learnedArtIds ?? [];
+            if (learned.includes(def.use.artId)) {
+              return { ok: false, reason: "already-learned", itemId };
+            }
+          }
+          const reqStat = def.use.reqStat;
+          const reqValue = def.use.reqValue;
+          const current = s.playerBuild.stats[reqStat] ?? 0;
+          if (current < reqValue) {
+            return { ok: false, reason: "stat-too-low", stat: reqStat, needed: reqValue, current };
+          }
+        }
+
         const draft = draftFrom(s);
         advanceTime(draft, ACTION_HOURS);
         // Consume one count.
@@ -1216,6 +1252,24 @@ export const useWorldStore = create<WorldStore>()(
           appendActionLog(draft, "use", `ใช้ ${def.name} · ${parts.join(" / ") || "ไม่มีพลังให้ฟื้น"}`);
           set({ ...draft });
           return { ok: true, kind: "heal", itemId, hpHealed, mpHealed };
+        }
+        if (eff.t === "manualLearnSkill") {
+          // Pre-flight already verified player meets the stat req and
+          // hasn't learned the skill — apply the learn effect, which also
+          // auto-slots the skill (see lib/world/effects.ts).
+          applyEffects(draft, [{ t: "learnSkill", skillId: eff.skillId }]);
+          draft.wExp += W_EXP_USE_ITEM;
+          appendActionLog(draft, "learn", `ฝึก ${def.name} · เรียนวิชา ${getSkill(eff.skillId)?.n ?? eff.skillId}`);
+          set({ ...draft });
+          return { ok: true, kind: "manualLearnSkill", itemId, skillId: eff.skillId };
+        }
+        if (eff.t === "manualLearnArt") {
+          const lv = eff.level && eff.level >= 1 ? eff.level : 1;
+          applyEffects(draft, [{ t: "learnArt", artId: eff.artId, level: lv }]);
+          draft.wExp += W_EXP_USE_ITEM;
+          appendActionLog(draft, "learn", `ฝึก ${def.name} · เรียนวิชาในกาย ${getArt(eff.artId)?.n ?? eff.artId}`);
+          set({ ...draft });
+          return { ok: true, kind: "manualLearnArt", itemId, artId: eff.artId, level: lv };
         }
         // Unknown effect t — fall through; no xp granted but item consumed.
         set({ ...draft });

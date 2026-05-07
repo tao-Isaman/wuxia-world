@@ -28,7 +28,7 @@ export const NPCS_SECTS_TEMPLES: readonly NpcDef[] = [
     description: "พระอาจารย์อาวุโสแห่งเส้าหลิน ผู้คุมการฝึกหัดของสาวก ท่าทางเข้มขรึมเงียบขรึม",
     locationIds: ["sect_shaolin"],
     dialogSceneId: "npc_sect_shaolin_elder_faming_talk",
-    sparOpponentId: "wudang_disciple",
+    sparOpponentId: "spar_shaolin_faming",
     sparFameReward: 8,
     questIds: ["qst_shaolin_iron_training"],
     tags: ["elder", "monk", "shaolin"],
@@ -147,5 +147,216 @@ export const NPCS_SECTS_TEMPLES: readonly NpcDef[] = [
       "qst_zhongyang_noble_intrigue",
     ],
     tags: ["envoy", "imperial", "zhongyang"],
+  },
+
+  // ─── Sect sparring partners (T1-T3) ─────────────────────────────────
+  // One sparring NPC per sect that didn't already have one. Each fights
+  // with their sect's signature move skills + sect inner art so a player
+  // touring the sects gets to feel each style. Pair with the matching
+  // `spar_<sect>_<role>` entries in lib/world/data/opponents.ts.
+  // Tier distribution (rough): T1×4 (early), T2×8 (mid), T3×5 (late).
+
+  // ─── ไท่ซาน (T1) ────────────────────────────────────────────────────
+  {
+    id: "sect_taishan_disciple_kunwu",
+    name: "ศิษย์คุนหวู่",
+    description: "ลูกศิษย์ดาบไท่ซานวัยกลาง ใจกล้า ใช้ดาบยาวสองมือเป็นอาวุธคู่หู",
+    locationIds: ["sect_taishan"],
+    dialogSceneId: "npc_sect_taishan_disciple_kunwu_talk",
+    sparOpponentId: "spar_taishan_disciple",
+    sparFameReward: 3,
+    tags: ["disciple", "swordsman", "taishan", "sparring"],
+  },
+
+  // ─── เฮิงซานใต้ (T1) ────────────────────────────────────────────────
+  {
+    id: "sect_hengshan_south_disciple_yuepan",
+    name: "ศิษย์เยว่ผาน",
+    description: "ลูกศิษย์เฮิงซานใต้ผู้ชำนาญลีลากระบี่ห้ายอด เคลื่อนไหวเหมือนระบำ",
+    locationIds: ["sect_hengshan_south"],
+    dialogSceneId: "npc_sect_hengshan_south_disciple_yuepan_talk",
+    sparOpponentId: "spar_hengshan_south_disciple",
+    sparFameReward: 3,
+    tags: ["disciple", "swordsman", "hengshan", "sparring"],
+  },
+
+  // ─── เฮิงซานเหนือ (T1) ──────────────────────────────────────────────
+  {
+    id: "sect_hengshan_north_nun_jingxin",
+    name: "นักพรตจิงซิน",
+    description: "ภิกษุณีเฮิงซานเหนือผู้ฝึกดาบในขลุ่ย เสียงดนตรีกับฝีมือเป็นหนึ่งเดียว",
+    locationIds: ["sect_hengshan_north"],
+    dialogSceneId: "npc_sect_hengshan_north_nun_jingxin_talk",
+    sparOpponentId: "spar_hengshan_north_nun",
+    sparFameReward: 3,
+    tags: ["nun", "musician", "hengshan", "sparring"],
+  },
+
+  // ─── ซงซาน (T1) ─────────────────────────────────────────────────────
+  {
+    id: "sect_songshan_disciple_lifeng",
+    name: "ศิษย์หลี่เฟิง",
+    description: "เด็กหนุ่มแห่งซงซาน ฝึกฝีมือด้วยใจเด็ดเดี่ยว มาท้าประลองกับผู้แสวงหา",
+    locationIds: ["sect_songshan"],
+    dialogSceneId: "npc_sect_songshan_disciple_lifeng_talk",
+    sparOpponentId: "spar_songshan_disciple",
+    sparFameReward: 3,
+    tags: ["disciple", "swordsman", "songshan", "sparring"],
+  },
+
+  // ─── อู่ตัง (T2) ────────────────────────────────────────────────────
+  {
+    id: "sect_wudang_disciple_qingfeng",
+    name: "สาวกชิงเฟิง",
+    description: "ศิษย์อู่ตังที่ฝึกไทจี้กับสะท้อนพลังจนเป็นหนึ่งเดียว ใช้กระบี่อย่างสงบนิ่ง",
+    locationIds: ["sect_wudang"],
+    dialogSceneId: "npc_sect_wudang_disciple_qingfeng_talk",
+    sparOpponentId: "spar_wudang_disciple",
+    sparFameReward: 5,
+    tags: ["disciple", "taoist", "wudang", "sparring"],
+  },
+
+  // ─── ง้อไบ๊ (T2) ────────────────────────────────────────────────────
+  {
+    id: "sect_emei_nun_qingyu",
+    name: "นักพรตชิงอวี้",
+    description: "ภิกษุณีง้อไบ๊ผู้ฝึกกระบี่น้ำกับดาบน้ำค้าง ใจเย็นและมือเร็ว",
+    locationIds: ["sect_emei"],
+    dialogSceneId: "npc_sect_emei_nun_qingyu_talk",
+    sparOpponentId: "spar_emei_nun",
+    sparFameReward: 5,
+    tags: ["nun", "swordswoman", "emei", "sparring"],
+  },
+
+  // ─── หัวซาน (T2) ────────────────────────────────────────────────────
+  {
+    id: "sect_huashan_disciple_jianyi",
+    name: "ศิษย์เจี้ยนอี้",
+    description: "ศิษย์ดาบหัวซาน ทะเยอทะยาน เชื่อในการฝึกซ้อมจนเลือดสาด",
+    locationIds: ["sect_huashan"],
+    dialogSceneId: "npc_sect_huashan_disciple_jianyi_talk",
+    sparOpponentId: "spar_huashan_disciple",
+    sparFameReward: 5,
+    tags: ["disciple", "swordsman", "huashan", "sparring"],
+  },
+
+  // ─── ลิ่งจิ้วกง (T2) ───────────────────────────────────────────────
+  {
+    id: "sect_lingjiu_lady_zixia",
+    name: "หญิงสาวจื่อเสีย",
+    description: "หญิงนักรบลิ่งจิ้วกง เคลื่อนไหวรวดเร็ว ใช้เข็มและดาบลมประกอบกัน",
+    locationIds: ["sect_lingjiu"],
+    dialogSceneId: "npc_sect_lingjiu_lady_zixia_talk",
+    sparOpponentId: "spar_lingjiu_lady",
+    sparFameReward: 6,
+    tags: ["lady_warrior", "lingjiu", "sparring"],
+  },
+
+  // ─── พรรคยาจก (T2) ─────────────────────────────────────────────────
+  {
+    id: "sect_beggars_brawler_jiu",
+    name: "ยาจกจิ๊ว",
+    description: "ยาจกแก่ผู้ฝึกหมัดเมาเป็นชีวิตจิตใจ ขวดเหล้าไม่เคยห่างมือ",
+    locationIds: ["sect_beggars"],
+    dialogSceneId: "npc_sect_beggars_brawler_jiu_talk",
+    sparOpponentId: "spar_beggars_brawler",
+    sparFameReward: 6,
+    tags: ["beggar", "drunken_fist", "beggars", "sparring"],
+  },
+
+  // ─── สำนักดาวดึงส์ (T2) ────────────────────────────────────────────
+  {
+    id: "sect_xingxiu_disciple_dushou",
+    name: "ศิษย์ตู๋โซ่ว",
+    description: "ลูกศิษย์ดาวดึงส์ผู้คลั่งพิษ เข็มกับการตีจุดเป็นเครื่องมือสองชิ้นโปรด",
+    locationIds: ["sect_xingxiu"],
+    dialogSceneId: "npc_sect_xingxiu_disciple_dushou_talk",
+    sparOpponentId: "spar_xingxiu_disciple",
+    sparFameReward: 6,
+    tags: ["disciple", "venom", "xingxiu", "sparring"],
+  },
+
+  // ─── พรรคเบญจพิษ (T2) ──────────────────────────────────────────────
+  {
+    id: "sect_wudu_miao_aman",
+    name: "หมอพิษอาหมาน",
+    description: "ชาวเมี่ยวพิษห้าธาตุ พกงูพิษไว้ในย่าม ฝีมือเย็นแต่ลึก",
+    locationIds: ["sect_wudu"],
+    dialogSceneId: "npc_sect_wudu_miao_aman_talk",
+    sparOpponentId: "spar_wudu_miao",
+    sparFameReward: 6,
+    tags: ["miao", "venom", "wudu", "sparring"],
+  },
+
+  // ─── ฉวนเจิน (T2) ──────────────────────────────────────────────────
+  {
+    id: "sect_quanzhen_disciple_chongxu",
+    name: "สาวกชงซวี",
+    description: "ศิษย์ฉวนเจินที่กระบี่ทั้งสามทิศ ปราณภายในหนาแน่นและมั่นคง",
+    locationIds: ["sect_quanzhen"],
+    dialogSceneId: "npc_sect_quanzhen_disciple_chongxu_talk",
+    sparOpponentId: "spar_quanzhen_disciple",
+    sparFameReward: 6,
+    tags: ["disciple", "taoist", "quanzhen", "sparring"],
+  },
+
+  // ─── กู่มู่ (T3) ───────────────────────────────────────────────────
+  {
+    id: "sect_gumu_disciple_lengyue",
+    name: "ศิษย์เลิ่งเยว่",
+    description: "สาวกสุสานโบราณ ใช้กระบี่เย็นและคัมภีร์สาวหยกเป็นทางออกของฝีมือ",
+    locationIds: ["sect_gumu"],
+    dialogSceneId: "npc_sect_gumu_disciple_lengyue_talk",
+    sparOpponentId: "spar_gumu_disciple",
+    sparFameReward: 8,
+    tags: ["disciple", "swordswoman", "gumu", "sparring"],
+  },
+
+  // ─── พรรคสราญรมย์ (T3) ─────────────────────────────────────────────
+  {
+    id: "sect_xiaoyao_master_yunxiao",
+    name: "ปรมาจารย์ยุนเซียว",
+    description: "อาจารย์เซียวหยาวผู้ฝึกฝ่ามือสราญรมย์และกระบี่ขลุ่ยหยกเป็นเลิศ",
+    locationIds: ["sect_xiaoyao"],
+    dialogSceneId: "npc_sect_xiaoyao_master_yunxiao_talk",
+    sparOpponentId: "spar_xiaoyao_master",
+    sparFameReward: 10,
+    tags: ["master", "xiaoyao", "sparring"],
+  },
+
+  // ─── พรรคสว่างมืด (T3) ────────────────────────────────────────────
+  {
+    id: "sect_ming_envoy_huozhi",
+    name: "ผู้แทนหั่วจี้",
+    description: "ผู้แทนพรรคมิ่งผู้ใช้กรงเล็บเพลิงและหมัดเมา เร่าร้อนแต่ไม่ประมาท",
+    locationIds: ["sect_ming"],
+    dialogSceneId: "npc_sect_ming_envoy_huozhi_talk",
+    sparOpponentId: "spar_ming_envoy",
+    sparFameReward: 9,
+    tags: ["envoy", "ming_sect", "sparring"],
+  },
+
+  // ─── สำนักดาบโลหิต (T3) ───────────────────────────────────────────
+  {
+    id: "sect_xuedao_blade_xuelang",
+    name: "ดาบเลือดเซียะลาง",
+    description: "ดาบโลหิตผู้กระหายการต่อสู้ ดวงตาแดงทุกครั้งที่ดึงดาบยาวสีเลือดออกจากฝัก",
+    locationIds: ["sect_xuedao"],
+    dialogSceneId: "npc_sect_xuedao_blade_xuelang_talk",
+    sparOpponentId: "spar_xuedao_blade",
+    sparFameReward: 11,
+    tags: ["blade", "evil_sect", "xuedao", "sparring"],
+  },
+
+  // ─── สำนักดาบโลหิต (สำนักใหม่) (T3) ───────────────────────────────
+  {
+    id: "sect_xueyu_master_chiying",
+    name: "จอมยุทธฉือยิง",
+    description: "เจ้าสำนักดาบโลหิตเลือดเย็น ฝีมือใกล้เคียงดาบราชาแต่อยู่ฝ่ายอธรรม",
+    locationIds: ["sect_xueyu"],
+    dialogSceneId: "npc_sect_xueyu_master_chiying_talk",
+    sparOpponentId: "spar_xueyu_master",
+    sparFameReward: 12,
+    tags: ["master", "evil_sect", "xueyu", "sparring"],
   },
 ];
