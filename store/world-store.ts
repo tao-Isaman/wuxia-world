@@ -198,6 +198,23 @@ export type LevelUpArtResult =
   | { ok: false; reason: "unknown" | "maxed" | "insufficient" }
   | { ok: true; artId: string; level: number; cost: number };
 
+// Result of attempting to forget a learned skill / art. Forgetting
+// removes the id from `learnedSkillIds` / `learnedArtIds`, unslots it
+// from `skillIds` if equipped, and clears its xp + level. The player
+// can re-buy / re-learn it later through normal channels.
+//
+// Why this exists: the conflict system counts every entry in
+// `learnedSkillIds` / `learnedArtIds`, not just slotted ones — so
+// unequipping doesn't help if the player wants to clear a type
+// imbalance. This is the actual escape hatch.
+export type ForgetSkillResult =
+  | { ok: false; reason: "unknown" | "not-learned" | "no-build" }
+  | { ok: true; skillId: string };
+
+export type ForgetArtResult =
+  | { ok: false; reason: "unknown" | "not-learned" | "no-build" }
+  | { ok: true; artId: string };
+
 // Result of attempting "ฝึกฝน" on a learned skill / art at a location.
 export type PracticeResult =
   | { ok: false; reason: "no-build" | "stamina" | "unknown" | "not-allowed" }
@@ -322,6 +339,14 @@ interface WorldStore extends WorldStateData {
   // (2× the equivalent skill cost). Auto-leveling on artExp overflow is
   // handled by applyArtLevelUps post-battle.
   levelUpArtFromWExp: (artId: string) => LevelUpArtResult;
+  // Remove a skill / art from learnedSkillIds / learnedArtIds entirely.
+  // Also unslots it (so an empty slot is left) and wipes its xp + level
+  // entries. Used by the player to clear type-conflict imbalances —
+  // since the conflict system counts every learned entry regardless of
+  // whether it's slotted, the only way to escape a bad imbalance is
+  // forgetting. Destructive: not refundable.
+  forgetSkill: (skillId: string) => ForgetSkillResult;
+  forgetArt: (artId: string) => ForgetArtResult;
   // "ฝึกฝน" — train a single skill / art at the current location. `rawId`
   // accepts the slot-encoded form ("art:xxx" for inner arts, bare id for
   // move skills). Costs PRACTICE_STAMINA_COST + PRACTICE_HOURS; xp scales
@@ -1385,20 +1410,26 @@ export const useWorldStore = create<WorldStore>()(
         if (!sk) return { ok: false, reason: "unknown" };
         const lv = s.skillLevel[skillId] ?? 1;
         if (lv >= SKILL_LEVEL_MAX) return { ok: false, reason: "maxed" };
-        const cost = xpToNextLevel(sk, lv);
-        if (s.wExp < cost) return { ok: false, reason: "insufficient" };
+        const fullCost = xpToNextLevel(sk, lv);
+        // Pay only what's missing — the player's already-banked per-skill
+        // xp counts toward the level-up.
+        const banked = Math.min(s.skillExp[skillId] ?? 0, fullCost);
+        const remaining = Math.max(0, fullCost - banked);
+        if (s.wExp < remaining) return { ok: false, reason: "insufficient" };
 
         const draft = draftFrom(s);
-        draft.wExp -= cost;
+        draft.wExp -= remaining;
+        // Consume the partial xp pool — it's been spent on this level.
+        draft.skillExp[skillId] = 0;
         draft.skillLevel[skillId] = lv + 1;
         syncPlayerSkillLevels(draft);
         appendActionLog(
           draft,
           "learn",
-          `เร่งวิชาฝีมือ ${sk.n} → Lv.${lv + 1} (-${cost} w-exp)`,
+          `เร่งวิชาฝีมือ ${sk.n} → Lv.${lv + 1} (-${remaining} w-exp)`,
         );
         set({ ...draft });
-        return { ok: true, skillId, level: lv + 1, cost };
+        return { ok: true, skillId, level: lv + 1, cost: remaining };
       },
 
       levelUpArtFromWExp: (artId) => {
@@ -1408,11 +1439,14 @@ export const useWorldStore = create<WorldStore>()(
         if (!s.playerBuild) return { ok: false, reason: "unknown" };
         const lv = s.playerBuild.artLevels?.[artId] ?? 1;
         if (lv >= ART_LEVEL_MAX) return { ok: false, reason: "maxed" };
-        const cost = xpToNextArtLevel(art, lv);
-        if (s.wExp < cost) return { ok: false, reason: "insufficient" };
+        const fullCost = xpToNextArtLevel(art, lv);
+        const banked = Math.min(s.artExp[artId] ?? 0, fullCost);
+        const remaining = Math.max(0, fullCost - banked);
+        if (s.wExp < remaining) return { ok: false, reason: "insufficient" };
 
         const draft = draftFrom(s);
-        draft.wExp -= cost;
+        draft.wExp -= remaining;
+        draft.artExp[artId] = 0;
         draft.playerBuild = {
           ...draft.playerBuild!,
           artLevels: {
@@ -1423,10 +1457,84 @@ export const useWorldStore = create<WorldStore>()(
         appendActionLog(
           draft,
           "learn",
-          `เร่งวิชาในกาย ${art.n} → ขั้น ${lv + 1} (-${cost} w-exp)`,
+          `เร่งวิชาในกาย ${art.n} → ขั้น ${lv + 1} (-${remaining} w-exp)`,
         );
         set({ ...draft });
-        return { ok: true, artId, level: lv + 1, cost };
+        return { ok: true, artId, level: lv + 1, cost: remaining };
+      },
+
+      forgetSkill: (skillId) => {
+        const s = get();
+        if (!s.playerBuild) return { ok: false, reason: "no-build" };
+        const sk = getSkill(skillId);
+        if (!sk) return { ok: false, reason: "unknown" };
+        const learned = s.playerBuild.learnedSkillIds ?? [];
+        if (!learned.includes(skillId)) {
+          return { ok: false, reason: "not-learned" };
+        }
+
+        const draft = draftFrom(s);
+        // Drop from the learned list.
+        const nextLearned = learned.filter((id) => id !== skillId);
+        // Also clear any equipped slot holding this skill — leaves an
+        // empty slot (player can reslot something else manually).
+        const nextSlots = draft.playerBuild!.skillIds.map((raw) =>
+          raw === skillId ? null : raw,
+        );
+        const nextSkillLevels = { ...(draft.playerBuild!.skillLevels ?? {}) };
+        delete nextSkillLevels[skillId];
+        draft.playerBuild = {
+          ...draft.playerBuild!,
+          learnedSkillIds: nextLearned,
+          skillIds: nextSlots,
+          skillLevels: nextSkillLevels,
+        };
+        // World-side xp / level tracks too — clear so a future re-learn
+        // starts fresh.
+        delete draft.skillLevel[skillId];
+        delete draft.skillExp[skillId];
+        appendActionLog(draft, "learn", `ลืมวิชาฝีมือ ${sk.n}`);
+        set({ ...draft });
+        return { ok: true, skillId };
+      },
+
+      forgetArt: (artId) => {
+        const s = get();
+        if (!s.playerBuild) return { ok: false, reason: "no-build" };
+        const art = getArt(artId);
+        if (!art || art.id === "none") return { ok: false, reason: "unknown" };
+        const learned = s.playerBuild.learnedArtIds ?? [];
+        if (!learned.includes(artId)) {
+          return { ok: false, reason: "not-learned" };
+        }
+
+        const draft = draftFrom(s);
+        const nextLearned = learned.filter((id) => id !== artId);
+        // Unslot — art slots use the "art:<id>" prefix.
+        const slotEntry = encodeArtSlot(artId);
+        const nextSlots = draft.playerBuild!.skillIds.map((raw) =>
+          raw === slotEntry ? null : raw,
+        );
+        const nextLevels = { ...(draft.playerBuild!.artLevels ?? {}) };
+        delete nextLevels[artId];
+        // If this was the legacy "active" art, fall back to "none" so
+        // the engine doesn't keep applying its scaled bonuses.
+        const nextArtId =
+          draft.playerBuild!.artId === artId ? "none" : draft.playerBuild!.artId;
+        const nextArtLevel =
+          draft.playerBuild!.artId === artId ? 1 : draft.playerBuild!.artLevel;
+        draft.playerBuild = {
+          ...draft.playerBuild!,
+          learnedArtIds: nextLearned,
+          artLevels: nextLevels,
+          artId: nextArtId,
+          artLevel: nextArtLevel,
+          skillIds: nextSlots,
+        };
+        delete draft.artExp[artId];
+        appendActionLog(draft, "learn", `ลืมวิชาในกาย ${art.n}`);
+        set({ ...draft });
+        return { ok: true, artId };
       },
 
       practiceSkill: (rawId) => {

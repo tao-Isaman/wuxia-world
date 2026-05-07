@@ -322,47 +322,6 @@ export function ProfilePopup({ open, onClose }: Props) {
             })}
           </div>
         </section>
-
-        {/* ─── Inner art ───────────────────────────────────────────── */}
-        <section className="border-t pt-3">
-          <div className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground mb-1">
-            กำลังภายใน
-          </div>
-          {art.id === "none" ? (
-            <div className="rounded border border-dashed border-muted-foreground/30 px-3 py-2 text-xs text-center text-muted-foreground italic">
-              ยังไม่ได้เรียนวิชาในกาย
-            </div>
-          ) : (
-            <div className="rounded-md bg-muted/40 p-3 text-[11px] leading-relaxed space-y-1">
-              <div className="flex items-center gap-2 flex-wrap">
-                <ArtTooltip art={art} level={lv}>
-                  <strong className="text-sm cursor-help underline decoration-dotted underline-offset-2">
-                    {art.n}
-                  </strong>
-                </ArtTooltip>
-                <Badge variant="outline" className="text-[9px]">{art.sc}</Badge>
-                <Badge variant="outline" className="text-[9px]">{art.tp}</Badge>
-                <Badge variant="outline" className="text-[9px]">ระดับ {lv}</Badge>
-              </div>
-              <div>
-                {(Object.entries(art.stats) as [StatKey, number][])
-                  .map(([k, v]) => `${k}+${Math.floor((v * lv) / 10)}`)
-                  .join(" ")}{" "}
-                | HP+{art.hL * lv} MP+{art.mL * lv}
-              </div>
-              {art.act && (
-                <div>
-                  ⚡ <strong>{art.act.n}</strong> (MP {art.act.c}, CD {art.act.cd}): {art.act.d}
-                </div>
-              )}
-              {art.pas && <div>◆ {art.pas.d}</div>}
-              <div className="mt-1 border-l-2 border-primary pl-2">
-                รวม HP <strong>{derivedAll.HP}</strong> · MP <strong>{derivedAll.MP}</strong>
-              </div>
-            </div>
-          )}
-        </section>
-
         {/* ─── Equipped skills (both move skills + inner arts) ──────── */}
         <section className="border-t pt-3">
           <div className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground mb-2">

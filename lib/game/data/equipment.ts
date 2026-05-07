@@ -59,7 +59,7 @@ export const EQUIPMENT: readonly Equipment[] = [
   { id: "C5", n: "ประดับมังกรเทพ", ty: "C", atkb: 0, pdb: 0, idb: 0, hpb: 450, mpb: 0, st: { STR: 5, VIT: 5 }, eff: { t: "pct_reduce", v: 8 } },
 
   // ─── Artisan-shop tier 0-1 roster ──────────────────────────────────
-  // Items in this block are sold by the new artisan NPCs (city / village
+  // Items in this block are sold by the new artisan NPCs (city / villageP
   // / sect — see lib/world/data/artisans.ts). They sit BELOW the W1–W5
   // legendary ladder above so the player can equip something from day 1
   // without finding rare drops. ID prefix: `eq_t<tier>_<slot>_<flavor>`.

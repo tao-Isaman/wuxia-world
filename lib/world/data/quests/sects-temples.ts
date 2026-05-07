@@ -145,14 +145,14 @@ export const QUESTS_SECTS_TEMPLES: readonly QuestDef[] = [
   {
     id: "qst_wudang_sacred_herb",
     name: "บัวหิมะศักดิ์สิทธิ์",
-    description: "อาจารย์ชิงซวี่ต้องการบัวหิมะจากยอดเขาสูงเพื่อปรุงยาให้ลูกศิษย์ป่วย",
-    briefSummary: "นำบัวหิมะมาให้อาจารย์อู่ตัง",
+    description: "อาจารย์ชิงซวี่ต้องการบัวหิมะจากก้นหุบเขาตัดใจเพื่อปรุงยาให้ลูกศิษย์ป่วย — มีเพียงที่นั่นที่บัวหิมะแท้งอกได้",
+    briefSummary: "นำบัวหิมะจากก้นหุบเขาตัดใจมาให้อาจารย์อู่ตัง",
     type: "side",
     giverNpcId: "sect_wudang_master_qingxu",
     stages: [
       {
         id: "find_herb",
-        description: "หาบัวหิมะ 1 ดอก",
+        description: "ลงไปยังก้นหุบเขาตัดใจและเก็บบัวหิมะ 1 ดอก",
         autoAdvance: { t: "hasItem", itemId: "snow_lotus", count: 1 },
       },
       {

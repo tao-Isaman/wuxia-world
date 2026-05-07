@@ -114,6 +114,19 @@ export const SCENES_WILDERNESS: readonly Scene[] = [
         },
         next: "qs_qw_kunlun_exile_truth_pickup",
       },
+      // Lost-pet pickup — Wei has been keeping the wandering golden
+      // snake company among his scrolls until its owner came looking.
+      {
+        text: "ตามหางูทองตัวเล็กที่หายเข้ามาในถ้ำ",
+        visibleIf: {
+          t: "and",
+          all: [
+            { t: "questStatus", questId: "qw_jinshe_lost_serpent", status: "active" },
+            { t: "not", of: { t: "hasItem", itemId: "qst_jinshe_golden_snake", count: 1 } },
+          ],
+        },
+        next: "qs_qw_jinshe_lost_serpent_pickup",
+      },
       { text: "ลาจาก", next: "cave_bingcan" },
     ],
   },
@@ -508,8 +521,8 @@ export const SCENES_WILDERNESS: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qw_jinshe_lost_serpent_offer",
     lines: [
-      { t: "dialogue", speaker: "ซวีเหลิงชิง", text: "งูทองของข้าหายไป! มันออกไปในถ้ำลึก ข้าตามหาสามวันแล้ว" },
-      { t: "dialogue", speaker: "ซวีเหลิงชิง", text: "ช่วยตามหาให้หน่อยได้ไหม? งูทองนั้นขี้กลัวแต่ไม่กัดคนที่ไม่รังแกมัน" },
+      { t: "dialogue", speaker: "ซวีเหลิงชิง", text: "งูทองของข้าหายเข้าไปในเขาวงกตถ้ำ! ข้าได้ยินมาว่ามันลึกไปจนถึงถ้ำน้ำแข็งไหม" },
+      { t: "dialogue", speaker: "ซวีเหลิงชิง", text: "ช่วยตามหาให้หน่อยได้ไหม? งูทองนั้นขี้กลัวแต่ไม่กัดคนที่ไม่รังแกมัน บัณฑิตเว่ยที่ถ้ำน้ำแข็งไหมอาจรู้เห็น" },
     ],
     choices: [
       {
@@ -518,6 +531,27 @@ export const SCENES_WILDERNESS: readonly Scene[] = [
         effects: [{ t: "startQuest", questId: "qw_jinshe_lost_serpent" }],
       },
       { text: "งูไม่ใช่สิ่งที่ข้าถนัด", next: "cave_jinshe" },
+    ],
+  },
+  // Pickup branch — invoked from เว่ยชิงเหวิน's NPC dialog at cave_bingcan.
+  // The snake had been hiding amongst Wei's silk-scrolls; he hands it
+  // back when its owner finally sends help.
+  {
+    kind: "dialog",
+    id: "qs_qw_jinshe_lost_serpent_pickup",
+    lines: [
+      { t: "dialogue", speaker: "เว่ยชิงเหวิน", text: "อา งูทองตัวจิ๋วที่นอนขดอยู่ในกล่องตำราของข้านะหรือ?" },
+      { t: "narration", text: "บัณฑิตชราเปิดกล่องไม้สนเก่า — งูทองขดตัวอยู่บนผ้าไหมเหมือนสร้อยข้อมือมีชีวิต" },
+      { t: "dialogue", speaker: "เว่ยชิงเหวิน", text: "ข้านึกแล้วเชียวว่าเจ้าของจะตามมา ฝากเรียนซวีเหลิงชิงด้วยว่าตำราของข้าก็เปื้อนรอยกัดเล็กน้อย" },
+    ],
+    choices: [
+      {
+        text: "รับงูทองและออกเดินทาง",
+        next: "cave_bingcan",
+        effects: [
+          { t: "giveItem", itemId: "qst_jinshe_golden_snake", count: 1 },
+        ],
+      },
     ],
   },
   {
@@ -533,6 +567,7 @@ export const SCENES_WILDERNESS: readonly Scene[] = [
         text: "รับรางวัล",
         next: "cave_jinshe",
         effects: [
+          { t: "takeItem", itemId: "qst_jinshe_golden_snake", count: 1 },
           { t: "finishQuest", questId: "qw_jinshe_lost_serpent", success: true },
         ],
       },
@@ -882,18 +917,27 @@ export const SCENES_WILDERNESS: readonly Scene[] = [
   },
 
   // ─── qw_motian_restless_soul ──────────────────────────────────────────
+  // Accepting hands the player a "rusted sword hilt" — actually the
+  // unique qst_motian_ancient_sword item. The narrative is the hilt
+  // becomes whole when the player stands among the lost treasures, so
+  // mechanically the player must travel to cave_treasure for stage 1's
+  // visitedLocation gate to fire alongside the hasItem check.
   {
     kind: "dialog",
     id: "qs_qw_motian_restless_soul_offer",
     lines: [
       { t: "dialogue", speaker: "เหลียงเก๋อ", text: "ข้าตายที่นี่เพราะถูกทรยศ ดาบของข้าถูกฝังพร้อมกับร่าง แต่สหายที่ทรยศใช้มันต่อไปอีกสามสิบปี" },
-      { t: "dialogue", speaker: "เหลียงเก๋อ", text: "ดาบนั้นตอนนี้อยู่ที่ถ้ำสมบัติลับ นำมันมาคืนข้า แล้วข้าจะไปได้สักที" },
+      { t: "dialogue", speaker: "เหลียงเก๋อ", text: "ใบดาบจริงตอนนี้อยู่ที่คลังสมบัติลับใต้ภูเขา นี่คือด้ามดาบขึ้นสนิมที่ข้ามีติดตัวมาตลอด — เมื่อเจ้าก้าวเข้าคลังสมบัติ ใบดาบกับด้ามจะกลายเป็นหนึ่งเดียว" },
+      { t: "dialogue", speaker: "เหลียงเก๋อ", text: "นำดาบที่สมบูรณ์มาคืนข้า แล้วข้าจะไปได้สักที" },
     ],
     choices: [
       {
-        text: "รับภารกิจ",
+        text: "รับด้ามดาบและออกตามหา",
         next: "cliff_motian",
-        effects: [{ t: "startQuest", questId: "qw_motian_restless_soul" }],
+        effects: [
+          { t: "startQuest", questId: "qw_motian_restless_soul" },
+          { t: "giveItem", itemId: "qst_motian_ancient_sword", count: 1 },
+        ],
       },
       { text: "เรื่องนี้ไม่ใช่ธุระข้า", next: "cliff_motian" },
     ],
@@ -919,7 +963,7 @@ export const SCENES_WILDERNESS: readonly Scene[] = [
         text: "คืนดาบให้วิญญาณตามสัญญา",
         next: "qs_qw_motian_restless_soul_complete_good",
         effects: [
-          { t: "takeItem", itemId: "jade", count: 1 },
+          { t: "takeItem", itemId: "qst_motian_ancient_sword", count: 1 },
           { t: "addTrait", trait: "good", amount: 10 },
           { t: "addTrait", trait: "humility", amount: 5 },
         ],

@@ -50,6 +50,8 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
   const wExp = useWorldStore((s) => s.wExp);
   const levelUpFromWExp = useWorldStore((s) => s.levelUpSkillFromWExp);
   const levelUpArtFromWExp = useWorldStore((s) => s.levelUpArtFromWExp);
+  const forgetSkill = useWorldStore((s) => s.forgetSkill);
+  const forgetArt = useWorldStore((s) => s.forgetArt);
   const equipSlot = useWorldStore((s) => s.equipSlot);
 
   const learnedSkillIds = player?.learnedSkillIds ?? [];
@@ -226,7 +228,10 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
             const aXpPct = artMaxed
               ? 100
               : Math.min(100, Math.round((aXp / aCost) * 100));
-            const canArtWExp = !artMaxed && wExp >= aCost;
+            const aWExpCost = artMaxed
+              ? Infinity
+              : Math.max(0, aCost - Math.min(aXp, aCost));
+            const canArtWExp = !artMaxed && wExp >= aWExpCost;
             return (
               <div key={i} className="rounded bg-muted/30 px-2 py-2 space-y-1.5">
                 {slotHeader}
@@ -295,9 +300,13 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
                         className="text-[11px] h-7"
                         disabled={!canArtWExp}
                         onClick={() => levelUpArtFromWExp(art.id)}
-                        title={canArtWExp ? `ใช้ ${aCost} w-exp` : `ต้องการ ${aCost} w-exp`}
+                        title={
+                          canArtWExp
+                            ? `ใช้ ${aWExpCost} w-exp (xp ${aXpCapped}/${aCost})`
+                            : `ต้องการ ${aWExpCost} w-exp`
+                        }
                       >
-                        เร่งด้วย w-exp ({aCost})
+                        เร่งด้วย w-exp ({aWExpCost})
                       </Button>
                     </div>
                   )}
@@ -319,7 +328,10 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
           const eMg = Math.round(effectiveMg(sk, lv));
           const bpMul = Math.round(bpMultiplier(lv) * 100);
           const mgMul = Math.round(mgMultiplier(lv) * 100);
-          const canWExp = !maxed && wExp >= cost;
+          const wExpCost = maxed
+            ? Infinity
+            : Math.max(0, cost - Math.min(xp, cost));
+          const canWExp = !maxed && wExp >= wExpCost;
           const skillTypes = effectiveTypes(sk);
           const cFactor = getStatusFactor(sk, conflict);
           return (
@@ -398,9 +410,13 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
                       className="text-[11px] h-7"
                       disabled={!canWExp}
                       onClick={() => levelUpFromWExp(sk.id)}
-                      title={canWExp ? `ใช้ ${cost} w-exp` : `ต้องการ ${cost} w-exp`}
+                      title={
+                        canWExp
+                          ? `ใช้ ${wExpCost} w-exp (xp ${xpCapped}/${cost})`
+                          : `ต้องการ ${wExpCost} w-exp`
+                      }
                     >
-                      เร่งด้วย w-exp ({cost})
+                      เร่งด้วย w-exp ({wExpCost})
                     </Button>
                   </div>
                 )}
@@ -439,22 +455,41 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
                     </SkillTooltip>
                     <span className="text-[10px] text-muted-foreground">{WEAPON_FAMILY_LABEL[sk.w]}</span>
                   </span>
-                  {typeof slotIdx === "number" ? (
-                    <Badge variant="outline" className="text-[9px]">ติดตั้งช่อง {slotIdx + 1}</Badge>
-                  ) : (
+                  <span className="flex items-center gap-1">
+                    {typeof slotIdx === "number" ? (
+                      <Badge variant="outline" className="text-[9px]">ติดตั้งช่อง {slotIdx + 1}</Badge>
+                    ) : (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-6 px-2 text-[10px]"
+                        onClick={() => {
+                          const free = slots.findIndex((s) => s === null);
+                          if (free >= 0) equipSlot(free, sid);
+                        }}
+                        disabled={!slots.some((s) => s === null)}
+                      >
+                        ติดตั้ง
+                      </Button>
+                    )}
                     <Button
                       size="sm"
-                      variant="outline"
-                      className="h-6 px-2 text-[10px]"
+                      variant="ghost"
+                      className="h-6 px-2 text-[10px] text-destructive hover:bg-destructive/10"
+                      title="ลบออกจากตำราที่เรียนแล้ว — ลดการขัดแย้งของวิชา"
                       onClick={() => {
-                        const free = slots.findIndex((s) => s === null);
-                        if (free >= 0) equipSlot(free, sid);
+                        if (
+                          window.confirm(
+                            `ลืมวิชา "${sk.n}"?\nค่าประสบการณ์และระดับของวิชานี้จะถูกล้าง และต้องเรียนใหม่จากตำราอีกครั้ง`,
+                          )
+                        ) {
+                          forgetSkill(sid);
+                        }
                       }}
-                      disabled={!slots.some((s) => s === null)}
                     >
-                      ติดตั้ง
+                      ลืม
                     </Button>
-                  )}
+                  </span>
                 </li>
               );
             })}
@@ -477,22 +512,41 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
                     </ArtTooltip>
                     <span className="text-[10px] text-muted-foreground">{art.sc}</span>
                   </span>
-                  {typeof slotIdx === "number" ? (
-                    <Badge variant="outline" className="text-[9px]">ติดตั้งช่อง {slotIdx + 1}</Badge>
-                  ) : (
+                  <span className="flex items-center gap-1">
+                    {typeof slotIdx === "number" ? (
+                      <Badge variant="outline" className="text-[9px]">ติดตั้งช่อง {slotIdx + 1}</Badge>
+                    ) : (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-6 px-2 text-[10px]"
+                        onClick={() => {
+                          const free = slots.findIndex((s) => s === null);
+                          if (free >= 0) equipSlot(free, raw);
+                        }}
+                        disabled={!slots.some((s) => s === null)}
+                      >
+                        ติดตั้ง
+                      </Button>
+                    )}
                     <Button
                       size="sm"
-                      variant="outline"
-                      className="h-6 px-2 text-[10px]"
+                      variant="ghost"
+                      className="h-6 px-2 text-[10px] text-destructive hover:bg-destructive/10"
+                      title="ลบออกจากตำราที่เรียนแล้ว — ลดการขัดแย้งของวิชา"
                       onClick={() => {
-                        const free = slots.findIndex((s) => s === null);
-                        if (free >= 0) equipSlot(free, raw);
+                        if (
+                          window.confirm(
+                            `ลืมวิชา "${art.n}"?\nระดับและค่าประสบการณ์ของวิชานี้จะถูกล้าง และต้องเรียนใหม่จากตำราอีกครั้ง`,
+                          )
+                        ) {
+                          forgetArt(aid);
+                        }
                       }}
-                      disabled={!slots.some((s) => s === null)}
                     >
-                      ติดตั้ง
+                      ลืม
                     </Button>
-                  )}
+                  </span>
                 </li>
               );
             })}

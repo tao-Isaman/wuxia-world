@@ -31,6 +31,10 @@ export const ITEMS: readonly ItemDef[] = [
     description: "ม้วนหนังสือเก่าที่บัณฑิตเว่ยชิงเหวินเก็บไว้ในถ้ำน้ำแข็งไหม — หลักฐานพิสูจน์ความบริสุทธิ์ของฤๅษีชิวเฉียน" },
   { id: "qst_kunlun_snow_ginseng", name: "โสมหิมะคุนหลุน", category: "quest", price: 0,
     description: "โสมหายากที่งอกบนนิรันดร์คุนหลุนเท่านั้น — ฉ่ำเย็นเหมือนน้ำแข็ง ใช้ปรุงยาขจัดไข้น้ำแข็งได้" },
+  { id: "qst_jinshe_golden_snake", name: "งูทองของซวีเหลิงชิง", category: "quest", price: 0,
+    description: "งูทองที่หายไปในถ้ำงูทอง — ตัวเล็กแต่ฉลาด ปลายหางเหมือนปอยทอง" },
+  { id: "qst_motian_ancient_sword", name: "ดาบโบราณของเหลียงเก๋อ", category: "quest", price: 0,
+    description: "ดาบเก่าที่นอนอยู่ในคลังสมบัติลับ ใบดาบขึ้นสนิม แต่จิตวิญญาณยังเรียกร้องเจ้าของอยู่" },
 
   // ─── Valuables ─────────────────────────────────────────────────────
   { id: "jade", name: "หยกล้ำค่า", category: "valuable", price: 1000,

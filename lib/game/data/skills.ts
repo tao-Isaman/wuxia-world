@@ -73,7 +73,7 @@ export const SKILLS: readonly Skill[] = [
   { id: "qf", n: "ชิงเฟิงเจี้ยน", sc: "ยุทธจักร", ti: 0, w: "sword", mg: 20, st: { STR: 5, AGI: 5 }, at: "phy", bp: 40, p: 20, f: 0, dm: 1, se: null, ee: null, d: "Phy+20%", types: ["external"] },
   { id: "dg", n: "ดามอกุน", sc: "ยุทธจักร", ti: 0, w: "long", mg: 20, st: { STR: 6, VIT: 4 }, at: "phy", bp: 55, p: 0, f: 0, dm: 1, se: null, ee: null, d: "Phy พลองหนัก", types: ["external", "hard"] },
   { id: "gn", n: "เข็มทอง", sc: "ยุทธจักร", ti: 0, w: "hidden", mg: 20, st: { DEX: 7, LUK: 3 }, at: "phy", bp: 30, p: 0, f: 0, dm: 1, se: null, ee: null, d: "Phy ระยะไกล", types: ["external"] },
-  { id: "ns1", n: "กระบี่เบื้องต้น", sc: "ยุทธจักร", ti: 0, w: "blade", mg: 20, st: { STR: 5, AGI: 5 }, at: "phy", bp: 38, p: 0, f: 10, dm: 1, se: null, ee: null, d: "Phy ดาบโค้งพื้นฐาน", types: ["external"] },
+  { id: "ns1", n: "กระบี่เบื้องต้น", sc: "ยุทธจักร", ti: 0, w: "sword", mg: 20, st: { STR: 5, AGI: 5 }, at: "phy", bp: 38, p: 0, f: 10, dm: 1, se: null, ee: null, d: "Phy กระบี่พื้นฐาน", types: ["external"] },
   { id: "ns2", n: "ขอเกี่ยวเบื้องต้น", sc: "ยุทธจักร", ti: 0, w: "hidden", mg: 20, st: { STR: 5, DEX: 5 }, at: "phy", bp: 35, p: 0, f: 0, dm: 1, se: null, ee: null, d: "Phy ขอเกี่ยวพื้นฐาน", types: ["external"] },
   { id: "nc3", n: "กระบี่น้ำ", sc: "ยุทธจักร", ti: 0, w: "sword", mg: 20, st: { POW: 5, INT: 5 }, at: "int", bp: 35, p: 0, f: 0, dm: 1, se: null, ee: null, d: "Int กระบี่สายน้ำ", types: ["internal"] },
   { id: "nc4", n: "ฝ่ามือเมฆ", sc: "ยุทธจักร", ti: 0, w: "fist", mg: 20, st: { STR: 5, POW: 5 }, at: "phy", bp: 40, p: 0, f: 10, dm: 1, se: null, ee: null, d: "Phy ฝ่ามือธรรมดา", types: ["external"] },

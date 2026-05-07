@@ -118,7 +118,7 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
     stages: [
       {
         id: "find_herb",
-        description: "หาบัวหิมะ — พบได้บนภูเขาสูงทางเหนือ",
+        description: "หาบัวหิมะ — งอกได้เพียงที่ก้นหุบเขาตัดใจเท่านั้น",
         autoAdvance: { t: "hasItem", itemId: "snow_lotus", count: 1 },
       },
       {
@@ -425,14 +425,14 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
   {
     id: "qc_yangzhou_rare_fish",
     name: "ปลามังกรสำหรับลูกค้าขาใหญ่",
-    description: "พ่อครัวซูต้องการปลามังกรสำหรับเมนูพิเศษที่ลูกค้าขาใหญ่จอง",
-    briefSummary: "หาปลามังกรให้พ่อครัวซูในหยางโจว",
+    description: "พ่อครัวซูต้องการปลามังกรสำหรับเมนูพิเศษที่ลูกค้าขาใหญ่จอง — มีเพียงเกาะมังกรเทพเท่านั้นที่จับได้",
+    briefSummary: "หาปลามังกรจากเกาะมังกรเทพให้พ่อครัวซูในหยางโจว",
     type: "side",
     giverNpcId: "city_yangzhou_chef_su",
     stages: [
       {
         id: "find_fish",
-        description: "หาปลามังกรจากแม่น้ำลึก",
+        description: "เดินทางไปเกาะมังกรเทพและตามรอยปลามังกร",
         autoAdvance: { t: "hasItem", itemId: "fish_dragon", count: 1 },
       },
       {

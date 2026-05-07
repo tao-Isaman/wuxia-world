@@ -32,18 +32,20 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
     ],
   },
 
-  // 2. Deliver — bring peach wine from market_miao
+  // 2. Deliver — bring moon-cakes from market_miao for the hermit's
+  // mid-autumn offering (rebalanced from "peach wine" to match the
+  // existing world-item economy).
   {
     id: "qw_taohua_peach_wine",
-    name: "เหล้าท้อสำหรับฤๅษี",
-    description: "ปรมาจารย์ต้องการเหล้าท้อจากตลาดชาวเมี่ยว",
-    briefSummary: "นำเหล้าท้อจากตลาดเมี่ยวมาให้ฮ่วงเอี้ยะซือ",
+    name: "ขนมไหว้พระจันทร์สำหรับฤๅษี",
+    description: "ปรมาจารย์ต้องการขนมไหว้พระจันทร์จากตลาดชาวเมี่ยวเพื่อพิธีไหว้กลางฤดูใบไม้ร่วง",
+    briefSummary: "นำขนมไหว้พระจันทร์จากตลาดเมี่ยวมาให้ฮ่วงเอี้ยะซือ",
     type: "side",
     giverNpcId: "wld_taohua_hermit_huang",
     stages: [
       {
         id: "buy",
-        description: "ไปซื้อเหล้าท้อที่ตลาดชาวเมี่ยว",
+        description: "ไปซื้อขนมไหว้พระจันทร์ที่ตลาดชาวเมี่ยว",
         autoAdvance: {
           t: "and",
           all: [
@@ -52,7 +54,7 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
           ],
         },
       },
-      { id: "deliver", description: "นำเหล้าท้อมาส่งให้ฮ่วงเอี้ยะซือ" },
+      { id: "deliver", description: "นำขนมไหว้พระจันทร์มาส่งให้ฮ่วงเอี้ยะซือ" },
     ],
     rewards: [
       { t: "gold", amount: 200 },
@@ -159,12 +161,14 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
 
   // ─── หลินชัวซัน (valley_jueqing) ────────────────────────────────────
 
-  // 6. Fetch — gather bitter black flowers from valley bottom
+  // 6. Fetch — gather bitter lotus seeds from valley bottom (used as
+  // a poison antidote ingredient — the lotus pods at the valley
+  // bottom carry an unusual bitterness, distinct from regular lotus).
   {
     id: "qw_jueqing_bitter_flower",
-    name: "ดอกขมก้นหุบเขาตัดใจ",
-    description: "หลินชัวซันต้องการดอกไม้ขมห้าดอกจากก้นหุบเขาตัดใจเพื่อทำยาแก้พิษ",
-    briefSummary: "เก็บดอกไม้ขมห้าดอกจากก้นหุบเขาตัดใจ",
+    name: "เม็ดบัวขมก้นหุบเขาตัดใจ",
+    description: "หลินชัวซันต้องการเม็ดบัวรสขมจากก้นหุบเขาตัดใจสามหน่วยเพื่อทำยาแก้พิษ",
+    briefSummary: "เก็บเม็ดบัวรสขมสามหน่วยจากก้นหุบเขาตัดใจ",
     type: "side",
     giverNpcId: "wld_jueqing_elder_lin",
     stages: [
@@ -175,10 +179,10 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
       },
       {
         id: "gather",
-        description: "เก็บดอกไม้ขมห้าดอก",
+        description: "เก็บเม็ดบัวรสขมสามหน่วย",
         autoAdvance: { t: "hasItem", itemId: "lotus_seed", count: 3 },
       },
-      { id: "return", description: "นำดอกไม้ขมกลับมาให้หลินชัวซัน" },
+      { id: "return", description: "นำเม็ดบัวกลับมาให้หลินชัวซัน" },
     ],
     rewards: [
       { t: "gold", amount: 180 },
@@ -214,18 +218,20 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
 
   // ─── ซวีเหลิงชิง (cave_jinshe) ──────────────────────────────────────
 
-  // 8. Defeat — kill giant centipede for rare venom
+  // 8. Defeat — kill giant centipede for rare venom (only available
+  // in the deep cave network at cave_treasure, where the level-5
+  // venom_centipede node sits per RARE_SPOTS in world-map.ts).
   {
     id: "qw_jinshe_venom_rare",
-    name: "พิษตะขาบยักษ์แห่งคุนหลุน",
-    description: "ซวีเหลิงชิงต้องการพิษตะขาบยักษ์จากแถวเขาคุนหลุน ตะขาบพิทักษ์ถ้ำอยู่",
-    briefSummary: "ปราบตะขาบยักษ์และเก็บพิษ",
+    name: "พิษตะขาบยักษ์แห่งคลังสมบัติลับ",
+    description: "ซวีเหลิงชิงต้องการพิษตะขาบยักษ์จากคลังสมบัติลับที่ลึกที่สุดในเขาวงกตถ้ำ — มีเพียงตะขาบพิทักษ์ที่นั่นเท่านั้นที่มีพิษเข้มข้นพอ",
+    briefSummary: "เก็บพิษตะขาบยักษ์จากคลังสมบัติลับมาให้ซวีเหลิงชิง",
     type: "side",
     giverNpcId: "wld_jinshe_beasttamer_xu",
     stages: [
       {
         id: "hunt",
-        description: "ปราบตะขาบยักษ์และเก็บพิษ",
+        description: "ลึกเข้าไปในคลังสมบัติลับและเก็บพิษตะขาบยักษ์",
         autoAdvance: { t: "hasItem", itemId: "centipede_venom", count: 1 },
       },
       { id: "deliver", description: "ส่งพิษตะขาบให้ซวีเหลิงชิง" },
@@ -238,24 +244,30 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
     ],
   },
 
-  // 9. Fetch / Visit — find the lost golden snake deep in cave
+  // 9. Fetch / Visit — find the lost golden snake deep in the cave
+  // network. Stage 2 keys off the unique qst_jinshe_golden_snake item
+  // — the snake is handed back to the player by ซวีเหลิงชิง himself
+  // through a quest-gated dialog branch the next time the player
+  // talks with him at cave_jinshe AFTER visiting the deeper cave_bingcan.
+  // Was previously `snake_skin` (generic drop from beast hunting),
+  // which let the player satisfy "found the pet" with a random hide.
   {
     id: "qw_jinshe_lost_serpent",
     name: "งูทองหาย",
-    description: "งูทองสัตว์เลี้ยงของซวีเหลิงชิงหายเข้าไปในถ้ำลึก ช่วยตามหา",
-    briefSummary: "ตามหางูทองในถ้ำงูทอง",
+    description: "งูทองสัตว์เลี้ยงของซวีเหลิงชิงหายเข้าไปในเขาวงกตถ้ำ ช่วยตามหาให้ลึกถึงถ้ำน้ำแข็งไหม",
+    briefSummary: "ตามหางูทองให้ถึงถ้ำน้ำแข็งไหม แล้วนำกลับซวีเหลิงชิง",
     type: "side",
     giverNpcId: "wld_jinshe_beasttamer_xu",
     stages: [
       {
         id: "search",
-        description: "เข้าไปในถ้ำงูทองและตามหางูทอง",
-        autoAdvance: { t: "visitedLocation", locationId: "cave_jinshe" },
+        description: "ตามรอยงูทองให้ลึกถึงถ้ำน้ำแข็งไหม",
+        autoAdvance: { t: "visitedLocation", locationId: "cave_bingcan" },
       },
       {
         id: "found",
-        description: "พบงูทองและนำกลับมาอย่างปลอดภัย",
-        autoAdvance: { t: "hasItem", itemId: "snake_skin", count: 1 },
+        description: "พบงูทองและรับกลับมาอย่างปลอดภัย",
+        autoAdvance: { t: "hasItem", itemId: "qst_jinshe_golden_snake", count: 1 },
       },
       { id: "return", description: "คืนงูทองให้ซวีเหลิงชิง" },
     ],
@@ -467,12 +479,17 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
     stages: [
       {
         id: "find_sword",
-        description: "ไปยังคลังสมบัติลับและหาดาบโบราณ",
+        description: "ไปยังคลังสมบัติลับและหาดาบโบราณ — ดาบมีพลังของวิญญาณห่อหุ้มอยู่",
+        // Was previously `hasItem jade × 1` — generic valuable that
+        // dropped from various sources, letting the player skip the
+        // cave entirely. Now keys off the unique sword item, which
+        // only spawns into the bag via the cave_treasure onEnter
+        // effect (see scenes-content/wilderness.ts).
         autoAdvance: {
           t: "and",
           all: [
             { t: "visitedLocation", locationId: "cave_treasure" },
-            { t: "hasItem", itemId: "jade", count: 1 },
+            { t: "hasItem", itemId: "qst_motian_ancient_sword", count: 1 },
           ],
         },
       },

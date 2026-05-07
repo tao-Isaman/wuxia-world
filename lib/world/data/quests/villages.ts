@@ -12,20 +12,20 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
   // fetch
   {
     id: "qv_qigu_missing_seed",
-    name: "เมล็ดพันธุ์หายไป",
-    description: "ชาวนาลาวหนานสูญเสียเมล็ดพันธุ์ข้าวที่สะสมมาทั้งปี เชื่อว่าถูกซ่อนในโกดังเก่า",
-    briefSummary: "หาเมล็ดพันธุ์ 5 หน่วยและนำกลับมาให้ลาวหนาน",
+    name: "สมุนไพรทดแทนเมล็ดพันธุ์",
+    description: "ชาวนาลาวหนานสูญเสียเมล็ดพันธุ์ทั้งหมดให้แก่หนูป่า เขาขอให้หาสมุนไพรพันธุ์ดีมาให้ห้าหน่วยเพื่อปลูกแทน",
+    briefSummary: "เก็บสมุนไพร 5 หน่วยและนำกลับมาให้ลาวหนาน",
     type: "side",
     giverNpcId: "vil_qigu_farmer_lao",
     stages: [
       {
         id: "collect_seed",
-        description: "รวบรวมเมล็ดพันธุ์ข้าว 5 หน่วย",
+        description: "เก็บสมุนไพรพันธุ์ดี 5 หน่วยจากป่ารอบหมู่บ้าน",
         autoAdvance: { t: "hasItem", itemId: "herb", count: 5 },
       },
       {
         id: "return_seed",
-        description: "นำเมล็ดพันธุ์กลับมาให้ลาวหนาน",
+        description: "นำสมุนไพรกลับมาให้ลาวหนาน",
       },
     ],
     rewards: [
@@ -97,14 +97,14 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
   {
     id: "qv_qigu_rare_herb",
     name: "บัวหิมะเพื่อผู้ป่วย",
-    description: "นางเหมยต้องการบัวหิมะเพื่อรักษาผู้ป่วยในหมู่บ้าน แต่ไม่มีเวลาออกไปเองได้",
-    briefSummary: "นำบัวหิมะ 1 ชิ้นมาให้นางเหมย",
+    description: "นางเหมยต้องการบัวหิมะเพื่อรักษาผู้ป่วยในหมู่บ้าน แต่ไม่มีเวลาออกไปเองได้ — บัวหิมะหาได้ที่ก้นหุบเขาตัดใจเท่านั้น",
+    briefSummary: "นำบัวหิมะ 1 ชิ้นจากก้นหุบเขาตัดใจมาให้นางเหมย",
     type: "side",
     giverNpcId: "vil_qigu_herbalist_mei",
     stages: [
       {
         id: "get_herb",
-        description: "หาบัวหิมะจากเชิงเขา",
+        description: "เดินทางลงไปยังก้นหุบเขาตัดใจและเก็บบัวหิมะ",
         autoAdvance: { t: "hasItem", itemId: "snow_lotus", count: 1 },
       },
       {
@@ -201,23 +201,24 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
     ],
   },
 
-  // fetch (simple)
+  // fetch (simple) — uses lotus seeds as festival ornaments paired
+  // with the plum bloom (lotus seeds → bead strings on the altar).
   {
     id: "qv_meihua_plum_festival",
-    name: "ดอกเหมยสำหรับเทศกาล",
-    description: "เฉินเยว่ต้องการดอกเหมยสดสำหรับตกแต่งงานเทศกาลดอกเหมยประจำปี",
-    briefSummary: "เก็บดอกเหมยสด 5 ดอกก่อนรุ่งสาง",
+    name: "เครื่องประดับเทศกาลดอกเหมย",
+    description: "เฉินเยว่ต้องการเม็ดบัวร้อยพวงประดับแท่นบูชาเทศกาลดอกเหมยประจำปี",
+    briefSummary: "เก็บเม็ดบัว 5 หน่วยสำหรับเทศกาลดอกเหมยก่อนรุ่งสาง",
     type: "side",
     giverNpcId: "vil_meihua_musician_chen",
     stages: [
       {
         id: "gather_plum",
-        description: "เก็บดอกเหมยสดจากป่า 5 ดอก",
+        description: "เก็บเม็ดบัว 5 หน่วยจากบ่อน้ำ / ป่ารอบหมู่บ้าน",
         autoAdvance: { t: "hasItem", itemId: "lotus_seed", count: 5 },
       },
       {
         id: "deliver_plum",
-        description: "ส่งดอกเหมยให้เฉินเยว่",
+        description: "ส่งเม็ดบัวให้เฉินเยว่ตกแต่งแท่นบูชา",
       },
     ],
     rewards: [
