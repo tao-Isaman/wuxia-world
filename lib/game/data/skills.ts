@@ -84,6 +84,14 @@ export const SKILLS: readonly Skill[] = [
   { id: "nc9", n: "พัดพื้นฐาน", sc: "ยุทธจักร", ti: 0, w: "short", mg: 20, st: { POW: 5, INT: 5 }, at: "int", bp: 30, p: 0, f: 0, dm: 1, se: null, ee: null, d: "Int พัดสายใน", types: ["internal"] },
   { id: "nc10", n: "ขอเกี่ยวพื้นฐาน", sc: "ยุทธจักร", ti: 0, w: "hidden", mg: 20, st: { STR: 5, DEX: 5 }, at: "phy", bp: 35, p: 0, f: 5, dm: 1, se: null, ee: null, d: "Phy ขอเกี่ยวพื้นฐาน", types: ["external"] },
 
+  // ─── tier 0 — beast moves (สัตว์ป่า) ─────────────
+  // Used by hunting-zone beasts. Intentionally weaker bp than the human
+  // tier 0 skills above — random-event beasts of the same tier should
+  // hit harder than these.
+  { id: "bst_bite", n: "เขี้ยวงับ", sc: "ยุทธจักร", ti: 0, w: "fist", mg: 10, st: { STR: 3 }, at: "phy", bp: 24, p: 0, f: 0, dm: 1, se: null, ee: null, d: "เขี้ยวงับ — กัดด้วยกำลังกาย", types: ["external"] },
+  { id: "bst_claw", n: "กรงเล็บฉีก", sc: "ยุทธจักร", ti: 0, w: "fist", mg: 10, st: { STR: 2, AGI: 2 }, at: "phy", bp: 28, p: 0, f: 0, dm: 1, se: null, ee: null, d: "ฟันด้วยกรงเล็บคม", types: ["external"] },
+  { id: "bst_charge", n: "พุ่งเข้าชน", sc: "ยุทธจักร", ti: 0, w: "fist", mg: 10, st: { STR: 3, VIT: 2 }, at: "phy", bp: 30, p: 0, f: 0, dm: 1, se: null, ee: null, d: "วิ่งพุ่งชนด้วยน้ำหนักตัว", types: ["external", "hard"] },
+
   // ─── tier 1 ────────
   { id: "ig", n: "หมัดเกราะเพชร", sc: "ยุทธจักร", ti: 1, w: "fist", mg: 40, st: { VIT: 7, DEF: 6 }, at: null, bp: 0, p: 0, f: 0, dm: 1, se: { t: "buff_reduce", v: 30, u: 2 }, ee: null, d: "ลด dmg 30% (2 ตา)", types: ["hard"] },
   { id: "dp", n: "ฝ่ามือมังกร", sc: "ยุทธจักร", ti: 1, w: "fist", mg: 40, st: { STR: 7, DEX: 6 }, at: "phy", bp: 50, p: 0, f: 0, dm: 1, se: null, ee: { t: "debuff_eva", v: -12, u: 2 }, d: "Phy + Eva-12 (2 ตา)", types: ["yang"] },
@@ -102,6 +110,14 @@ export const SKILLS: readonly Skill[] = [
   { id: "nd11", n: "กระบี่ลม", sc: "ยุทธจักร", ti: 1, w: "sword", mg: 40, st: { AGI: 8, STR: 5 }, at: "phy", bp: 45, p: 0, f: 0, dm: 1, se: { t: "buff_eva", v: 20, u: 2 }, ee: null, d: "Phy + Eva+20 (2 ตา)", types: ["soft"] },
   { id: "nd12", n: "ฝ่ามือสร้างกำแพง", sc: "ยุทธจักร", ti: 1, w: "fist", mg: 40, st: { STR: 6, DEF: 6 }, at: "phy", bp: 46, p: 0, f: 0, dm: 1, se: { t: "buff_def", v: 15, u: 2 }, ee: null, d: "Phy + DEF+15 (2 ตา)", types: ["hard"] },
 
+  // ─── tier 1 — beast moves (สัตว์ป่า) ─────────────
+  // Mid-strength predator attacks. Lower bp than the tier 1 human skills
+  // above; small flat / debuff effects keep them threatening but not on
+  // par with random-event tier 1 styles.
+  { id: "bst_pounce", n: "ตะปบโหม", sc: "ยุทธจักร", ti: 1, w: "fist", mg: 25, st: { STR: 5, AGI: 4 }, at: "phy", bp: 38, p: 0, f: 0, dm: 1, se: null, ee: null, d: "พุ่งตะปบใส่ศัตรู", types: ["external"] },
+  { id: "bst_fang", n: "เขี้ยวพิษอ่อน", sc: "ยุทธจักร", ti: 1, w: "hidden", mg: 25, st: { DEX: 5, LUK: 3 }, at: "phy", bp: 30, p: 0, f: 0, dm: 1, se: null, ee: { t: "debuff_poison", pp: 2, u: 2, ev: -5 }, d: "เขี้ยวมีพิษเล็กน้อย — พิษ 2%HP/ตา + Eva-5 (2 ตา)", types: ["yin"] },
+  { id: "bst_roar", n: "คำรามขู่", sc: "ยุทธจักร", ti: 1, w: "fist", mg: 25, st: { STR: 4, VIT: 4 }, at: "phy", bp: 35, p: 0, f: 0, dm: 1, se: null, ee: { t: "debuff_acc", v: -8, u: 2 }, d: "เสียงคำรามทำให้ศัตรูพะวง — Acc-8 (2 ตา)", types: [] },
+
   // ─── tier 2 ────────
   { id: "ws", n: "สองดาบล่องลม", sc: "ยุทธจักร", ti: 2, w: "blade", mg: 60, st: { STR: 8, AGI: 7 }, at: "phy", bp: 60, p: 0, f: 0, dm: 1, se: { t: "stack_atk", v: 5, mx: 4 }, ee: null, d: "Phy + สะสม ATK+5% (≤4 ซ้อน)", types: ["external"] },
   { id: "sa", n: "คีตาอาคม", sc: "ยุทธจักร", ti: 2, w: "music", mg: 60, st: { POW: 8, INT: 7 }, at: "int", bp: 30, p: 0, f: 0, dm: 0.7, se: null, ee: { t: "debuff_acc", v: -18, u: 3 }, d: "Int×0.7 + Acc-18 (3 ตา)", types: ["yin", "internal"] },
@@ -119,6 +135,14 @@ export const SKILLS: readonly Skill[] = [
   { id: "ne11", n: "กรงเล็บสิงห์", sc: "ยุทธจักร", ti: 2, w: "fist", mg: 60, st: { STR: 8, DEX: 7 }, at: "phy", bp: 65, p: 0, f: 0, dm: 1, se: null, ee: { t: "debuff_def", v: -15, u: 2 }, d: "Phy PDef-15 (2 ตา)", types: ["yang"] },
   { id: "ne12", n: "กระบี่เก้าฟ้า", sc: "ยุทธจักร", ti: 2, w: "sword", mg: 60, st: { POW: 8, INT: 7 }, at: "int", bp: 65, p: 15, f: 0, dm: 1, se: { t: "stack_atk", v: 6, mx: 3 }, ee: null, d: "Int+15% + สะสม ATK+6%", types: ["internal"] },
   { id: "ne13", n: "ทวนหยินหยาง", sc: "ยุทธจักร", ti: 2, w: "long", mg: 60, st: { STR: 8, POW: 7 }, at: "phy", bp: 68, p: 0, f: 0, dm: 1, se: null, ee: { t: "debuff_acc", v: -15, u: 2 }, d: "Phy Acc-15 (2 ตา)", types: [] },
+
+  // ─── tier 2 — beast moves (สัตว์ป่า) ─────────────
+  // Apex predators. Capped well below ne9 (bp 80) and ne11 (bp 65) so
+  // hunt_legendary remains a stamina + drop-rate grind, not a tuning
+  // wall.
+  { id: "bst_maul", n: "ฉีกตะปบ", sc: "ยุทธจักร", ti: 2, w: "fist", mg: 40, st: { STR: 7, AGI: 5 }, at: "phy", bp: 55, p: 0, f: 0, dm: 1, se: null, ee: { t: "debuff_def", v: -10, u: 2 }, d: "ฉีกร่างศัตรูเปิดแผล — PDef-10 (2 ตา)", types: ["external"] },
+  { id: "bst_venom", n: "เขี้ยวพิษแรง", sc: "ยุทธจักร", ti: 2, w: "hidden", mg: 40, st: { DEX: 7, LUK: 5 }, at: "phy", bp: 45, p: 0, f: 0, dm: 1, se: null, ee: { t: "debuff_poison", pp: 4, u: 3, ev: -8 }, d: "พิษเข้มข้น 4%HP/ตา + Eva-8 (3 ตา)", types: ["yin"] },
+  { id: "bst_constrict", n: "บีบรัด", sc: "ยุทธจักร", ti: 2, w: "fist", mg: 40, st: { DEX: 6, STR: 6 }, at: "phy", bp: 50, p: 0, f: 0, dm: 1, se: null, ee: { t: "multi_debuff", av: -10, ev: -10, u: 2 }, d: "บีบรัดร่างให้แน่น — Acc-10 Eva-10 (2 ตา)", types: ["external"] },
 
   // ─── tier 3 ────────
   { id: "zs", n: "กู่ฉินสะท้านจิต", sc: "ยุทธจักร", ti: 3, w: "music", mg: 80, st: { POW: 9, INT: 9 }, at: "int", bp: 50, p: 0, f: 0, dm: 1, se: null, ee: { t: "multi_debuff", av: -15, ev: -15, u: 3 }, d: "Int + Acc-15 Eva-15 (3 ตา)", types: ["yin", "internal"] },

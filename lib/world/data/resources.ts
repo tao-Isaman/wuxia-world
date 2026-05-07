@@ -103,13 +103,17 @@ export const RESOURCES: readonly ResourceDef[] = [
   },
 
   // ─── Hunting (combat-gated) ─────────────────────────────────────────
+  // Each tier of hunt picks from a tier-scoped beast pool defined in
+  // lib/world/data/opponents.ts (the hunt_* prefix). Hunt beasts use the
+  // bst_* skill family and are intentionally weaker than tier-equivalent
+  // random-event beasts so hunting stays a sustainable grind.
   {
     id: "hunt_forest",
     name: "ล่าสัตว์ในป่า",
     skill: "hunting",
     level: 1,
     staminaCost: 15,
-    opponentIds: ["wild_boar", "wild_wolf"],
+    opponentIds: ["hunt_rabbit", "hunt_pheasant", "hunt_squirrel", "hunt_wild_dog", "hunt_boar"],
     yields: [
       { itemId: "raw_meat", weight: 5, count: [1, 2] },
       { itemId: "fur_pelt", weight: 4 },
@@ -121,7 +125,7 @@ export const RESOURCES: readonly ResourceDef[] = [
     skill: "hunting",
     level: 3,
     staminaCost: 18,
-    opponentIds: ["mountain_tiger", "brown_bear"],
+    opponentIds: ["hunt_jungle_cat", "hunt_alpha_wolf", "hunt_giant_bear", "hunt_mountain_lynx"],
     yields: [
       { itemId: "raw_meat",  weight: 4, count: [1, 2] },
       { itemId: "fur_pelt",  weight: 4 },
@@ -135,7 +139,7 @@ export const RESOURCES: readonly ResourceDef[] = [
     skill: "hunting",
     level: 5,
     staminaCost: 25,
-    opponentIds: ["mountain_tiger", "brown_bear"],
+    opponentIds: ["hunt_alpha_wolf", "hunt_giant_bear", "hunt_mountain_lynx", "hunt_jungle_serpent"],
     yields: [
       { itemId: "tiger_claw", weight: 3 },
       { itemId: "bear_claw",  weight: 3 },

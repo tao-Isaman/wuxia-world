@@ -6,8 +6,27 @@ import type { ItemDef } from "../types";
 // (quest items / story items).
 export const ITEMS: readonly ItemDef[] = [
   // ─── Quest / story items ───────────────────────────────────────────
+  // Quest items use price: 0 so shops won't sell them and players can't
+  // dispose of them by accident — they're consumed via `takeItem` effects
+  // in the completion dialog.
   { id: "old_key", name: "กุญแจเก่า", category: "quest", price: 0,
     description: "กุญแจเก่าแก่ ไม่รู้ว่าใช้กับประตูไหน" },
+  { id: "qst_capital_spice", name: "เครื่องเทศพิเศษนครหลวง", category: "quest", price: 0,
+    description: "ห่อเครื่องเทศพิเศษจากพ่อค้าหวังในนครหลวง สำหรับส่งให้พ่อครัวซูที่หยางโจว" },
+  { id: "qst_capital_silk", name: "ผ้าไหมล็อตราชสำนัก", category: "quest", price: 0,
+    description: "ผ้าไหมคุณภาพสูงล็อตสำคัญจากซีเซี่ย สำหรับส่งให้ลูกค้าในนครหลวง" },
+  { id: "qst_capital_silk_receipt", name: "ใบรับสินค้าจากนครหลวง", category: "quest", price: 0,
+    description: "ใบรับสินค้าผ้าไหมที่ลูกค้าในนครหลวงเซ็นรับ — ต้องนำกลับให้ช่างทอเหมยที่ซีเซี่ย" },
+  { id: "qst_amnesty_letter", name: "หนังสือนิรโทษกรรม", category: "quest", price: 0,
+    description: "หนังสือสำคัญจากนายอำเภอหวู่ สำหรับส่งให้ผู้พิพากษาในจินหลิง" },
+  { id: "qst_amnesty_receipt", name: "ใบรับหนังสือนิรโทษกรรม", category: "quest", price: 0,
+    description: "ใบเซ็นรับหนังสือจากผู้พิพากษาที่จินหลิง — ต้องกลับมารายงานนายอำเภอหวู่" },
+  { id: "qst_dali_book_pages", name: "หน้าหนังสือประวัติศาสตร์", category: "quest", price: 0,
+    description: "หน้าหนังสือที่ขาดหายของบัณฑิตต้วน ได้คืนจากพ่อค้าหนังสือในซูโจว" },
+  { id: "qst_dali_encrypted", name: "จดหมายรหัสลับ", category: "quest", price: 0,
+    description: "จดหมายรหัสลับจากนักยุทธศาสตร์กง สำหรับให้บัณฑิตในต้าหลี่แปล" },
+  { id: "qst_dali_decoded", name: "คำแปลจดหมายลับ", category: "quest", price: 0,
+    description: "คำแปลจดหมายรหัสลับ — ต้องนำกลับให้นักยุทธศาสตร์กงที่จินหลิง" },
 
   // ─── Valuables ─────────────────────────────────────────────────────
   { id: "jade", name: "หยกล้ำค่า", category: "valuable", price: 1000,

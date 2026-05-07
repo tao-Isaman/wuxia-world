@@ -8,7 +8,7 @@ import type {
 } from "./types";
 import { STAT_KEYS } from "./types";
 import { getSkill, getArt, getEquip } from "./data";
-import { effectiveMg } from "./leveling";
+import { bpMultiplier, effectiveMg } from "./leveling";
 import {
   computeConflictFactors,
   getStatusFactor,
@@ -155,22 +155,27 @@ export function combinedStats(
     }
   }
 
-  // Slotted move skills — full contribution (modulated by conflict). Then
-  // learned-but-unslotted move skills — same shape, since the spec says
-  // "learn unlimited skills for gain base status".
+  // Slotted move skills — stat contribution scales with skill level via
+  // bpMultiplier (lv1 → 50%, lv10 → 100%), mirroring how the skill's
+  // damage scales. Then learned-but-unslotted move skills follow the same
+  // rule. Both branches also fold in conflict via getStatusFactor.
   const counted = new Set<string>();
   for (const sid of build.skillIds) {
     if (!sid) continue;
     counted.add(sid);
     const sk = getSkill(sid);
     if (!sk) continue;
-    addScaledPartialStats(out, sk.st, getStatusFactor(sk, factors));
+    const lv = build.skillLevels?.[sid] ?? 1;
+    const f = getStatusFactor(sk, factors) * bpMultiplier(lv);
+    addScaledPartialStats(out, sk.st, f);
   }
   for (const sid of build.learnedSkillIds ?? []) {
     if (counted.has(sid)) continue;
     const sk = getSkill(sid);
     if (!sk) continue;
-    addScaledPartialStats(out, sk.st, getStatusFactor(sk, factors));
+    const lv = build.skillLevels?.[sid] ?? 1;
+    const f = getStatusFactor(sk, factors) * bpMultiplier(lv);
+    addScaledPartialStats(out, sk.st, f);
   }
 
   addPartialStats(out, getEquipStatBonus(build.equipment));

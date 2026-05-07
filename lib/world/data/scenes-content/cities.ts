@@ -24,6 +24,48 @@ export const SCENES_CITIES: readonly Scene[] = [
     ],
   },
 
+  // ─── city_capital_merchant_wang ────────────────────────────────────
+  // Wang is the cross-city pickup / dropoff contact for the capital. He
+  // doesn't offer or turn in any quest himself — branches are gated by
+  // the active quest + inventory state and just hand over (or take) the
+  // quest item.
+  {
+    kind: "dialog",
+    id: "npc_city_capital_merchant_wang_talk",
+    lines: [
+      { t: "dialogue", speaker: "พ่อค้าหวัง", text: "ยินดีต้อนรับสู่ร้านข้า ของหายากจากทั่วยุทธจักรอยู่ที่นี่" },
+      { t: "dialogue", speaker: "พ่อค้าหวัง", text: "ลูกค้าจากเมืองไหนล่ะ? ถ้าฝากของไว้ส่งให้ ข้ามักรับไว้แล้วรอเจ้าของมารับ" },
+    ],
+    choices: [
+      // Spice pickup — for พ่อครัวซู (yangzhou).
+      {
+        text: "ข้ามาจากพ่อครัวซู หยางโจว — ขอรับเครื่องเทศพิเศษ",
+        visibleIf: {
+          t: "and",
+          all: [
+            { t: "questStatus", questId: "qc_yangzhou_spice_delivery", status: "active" },
+            { t: "not", of: { t: "hasItem", itemId: "qst_capital_spice", count: 1 } },
+          ],
+        },
+        next: "qs_qc_yangzhou_spice_delivery_pickup",
+      },
+      // Silk dropoff — for ช่างทอเหมย (suzhou). Take the silk, hand over receipt.
+      {
+        text: "ข้ามาจากช่างทอเหมย ซูโจว — ส่งผ้าไหมราชสำนัก",
+        visibleIf: {
+          t: "and",
+          all: [
+            { t: "questStatus", questId: "qc_suzhou_silk_shipment", status: "active" },
+            { t: "hasItem", itemId: "qst_capital_silk", count: 1 },
+            { t: "not", of: { t: "hasItem", itemId: "qst_capital_silk_receipt", count: 1 } },
+          ],
+        },
+        next: "qs_qc_suzhou_silk_shipment_handoff",
+      },
+      { text: "ลาจาก", next: "city_capital" },
+    ],
+  },
+
   // ─── city_capital_physician_lin ────────────────────────────────────
   {
     kind: "dialog",
@@ -62,6 +104,19 @@ export const SCENES_CITIES: readonly Scene[] = [
       { t: "dialogue", speaker: "บัณฑิตต้วน", text: "มีคัมภีร์โบราณชิ้นหนึ่งที่ข้าตามหาอยู่นาน หากท่านสนใจช่วย ข้าจะรู้สึกขอบคุณอย่างยิ่ง" },
     ],
     choices: [
+      // Coded-letter translation: take encrypted letter, hand back decoded.
+      {
+        text: "ขอให้แปลจดหมายรหัสลับจากนักยุทธศาสตร์กง",
+        visibleIf: {
+          t: "and",
+          all: [
+            { t: "questStatus", questId: "qc_jinling_coded_letter", status: "active" },
+            { t: "hasItem", itemId: "qst_dali_encrypted", count: 1 },
+            { t: "not", of: { t: "hasItem", itemId: "qst_dali_decoded", count: 1 } },
+          ],
+        },
+        next: "qs_qc_jinling_coded_letter_translate",
+      },
       { text: "รับฟังเรื่องคัมภีร์โบราณ", next: "npc_city_dali_scholar_duan_talk" },
       { text: "ถามเรื่องประวัติสกุลต้วน", next: "npc_city_dali_scholar_duan_talk" },
       { text: "ลาจาก", next: "city_dali" },
@@ -112,6 +167,34 @@ export const SCENES_CITIES: readonly Scene[] = [
     ],
   },
 
+  // ─── city_suzhou_book_merchant_li ──────────────────────────────────
+  // Li is the pickup contact for the dali missing-page delivery. He
+  // doesn't offer or turn in any quest — branch is gated by the active
+  // quest + inventory state.
+  {
+    kind: "dialog",
+    id: "npc_city_suzhou_book_merchant_li_talk",
+    lines: [
+      { t: "dialogue", speaker: "พ่อค้าหนังสือลี่", text: "ร้านหนังสือเก่าของข้ามีต้นฉบับโบราณจากทั่วยุทธจักร นักประวัติศาสตร์มักแวะมาสืบที่นี่" },
+      { t: "dialogue", speaker: "พ่อค้าหนังสือลี่", text: "ถ้าท่านตามหาเล่มเฉพาะ บอกชื่อสกุลผู้สนใจมาด้วย ข้ามักรู้ว่าใครซื้อขายอะไร" },
+    ],
+    choices: [
+      // Missing-page pickup — for บัณฑิตต้วน (dali).
+      {
+        text: "ข้ามาจากบัณฑิตต้วน ต้าหลี่ — ขอหน้าหนังสือประวัติศาสตร์ที่หายไป",
+        visibleIf: {
+          t: "and",
+          all: [
+            { t: "questStatus", questId: "qc_dali_missing_page", status: "active" },
+            { t: "not", of: { t: "hasItem", itemId: "qst_dali_book_pages", count: 1 } },
+          ],
+        },
+        next: "qs_qc_dali_missing_page_pickup",
+      },
+      { text: "ลาจาก", next: "city_suzhou" },
+    ],
+  },
+
   // ─── city_suzhou_weaver_mei ────────────────────────────────────────
   {
     kind: "dialog",
@@ -136,6 +219,19 @@ export const SCENES_CITIES: readonly Scene[] = [
       { t: "dialogue", speaker: "นักยุทธศาสตร์กง", text: "มีเครือข่ายสายลับที่แทรกซึมสำนักบางแห่ง ข้าต้องการคนที่วางใจได้ไปสอบสวนให้" },
     ],
     choices: [
+      // Royal-pardon hand-off: take the amnesty letter, hand back a receipt.
+      {
+        text: "ส่งหนังสือนิรโทษกรรมจากนายอำเภอหวู่",
+        visibleIf: {
+          t: "and",
+          all: [
+            { t: "questStatus", questId: "qc_capital_royal_pardon", status: "active" },
+            { t: "hasItem", itemId: "qst_amnesty_letter", count: 1 },
+            { t: "not", of: { t: "hasItem", itemId: "qst_amnesty_receipt", count: 1 } },
+          ],
+        },
+        next: "qs_qc_capital_royal_pardon_handoff",
+      },
       { text: "รับฟังงานสอบสวน", next: "npc_city_jinling_strategist_kong_talk" },
       { text: "ถามเรื่องอดีตในราชการ", next: "npc_city_jinling_strategist_kong_talk" },
       { text: "ลาจาก", next: "city_jinling" },
@@ -267,20 +363,24 @@ export const SCENES_CITIES: readonly Scene[] = [
   },
 
   // ── qc_capital_royal_pardon ────────────────────────────────────────
+  // Refactored deliver-and-return:
+  //   offer (Wu)        → giveItem qst_amnesty_letter
+  //   handoff (Kong)    → takeItem letter, giveItem qst_amnesty_receipt
+  //   complete (Wu)     → takeItem receipt, finishQuest
   {
     kind: "dialog",
     id: "qs_qc_capital_royal_pardon_offer",
     lines: [
-      { t: "dialogue", speaker: "นายอำเภอหวู่", text: "มีนักโทษรายหนึ่งถูกตัดสินอย่างไม่เป็นธรรม ข้าเชื่อว่าเขาบริสุทธิ์ แต่ต้องหาพยาน" },
+      { t: "dialogue", speaker: "นายอำเภอหวู่", text: "มีนักโทษรายหนึ่งถูกตัดสินอย่างไม่เป็นธรรม พยานเดียวที่รู้เรื่องอยู่ที่จินหลิง" },
       { t: "narration", text: "นายอำเภอพูดเบา ๆ ราวกับกลัวคนได้ยิน" },
-      { t: "dialogue", speaker: "นายอำเภอหวู่", text: "พยานคนเดียวที่รู้เรื่องอยู่ที่จินหลิง ต้องการคนนำหนังสือไปให้ด่วน" },
+      { t: "dialogue", speaker: "นายอำเภอหวู่", text: "ขั้นตอน: 1) รับหนังสือนิรโทษกรรม 2) ไปจินหลิง · ส่งให้นักยุทธศาสตร์กง 3) นำใบรับกลับมาให้ข้า" },
     ],
     choices: [
       {
         text: "รับส่งหนังสือสำคัญ",
         effects: [
           { t: "startQuest", questId: "qc_capital_royal_pardon" },
-          { t: "giveItem", itemId: "paper", count: 1 },
+          { t: "giveItem", itemId: "qst_amnesty_letter", count: 1 },
         ],
         next: "qs_qc_capital_royal_pardon_offer_accept",
       },
@@ -292,20 +392,42 @@ export const SCENES_CITIES: readonly Scene[] = [
     id: "qs_qc_capital_royal_pardon_offer_accept",
     lines: [
       { t: "dialogue", speaker: "นายอำเภอหวู่", text: "ขอบคุณ รีบไปจินหลิงก่อนที่คนเลวจะรู้ตัว ระวังตัวด้วย" },
+      { t: "dialogue", speaker: "นายอำเภอหวู่", text: "นักยุทธศาสตร์กงจะเซ็นใบรับให้ — นำกลับมาเป็นหลักฐานว่าหนังสือถึงมือเขาแล้ว" },
     ],
     choices: [{ text: "รับทราบ", next: "city_capital" }],
+  },
+  // Kong's handoff branch — invoked from Kong's NPC talk (gating below).
+  {
+    kind: "dialog",
+    id: "qs_qc_capital_royal_pardon_handoff",
+    lines: [
+      { t: "dialogue", speaker: "นักยุทธศาสตร์กง", text: "หนังสือจากนายอำเภอหวู่... อ่า เข้าใจแล้ว เรื่องนี้เกี่ยวพันกับพยานที่ข้าปกป้องไว้" },
+      { t: "narration", text: "นักยุทธศาสตร์กงหยิบพู่กันลายเซ็นรับหนังสือลงในใบเล็ก ๆ" },
+      { t: "dialogue", speaker: "นักยุทธศาสตร์กง", text: "นี่คือใบรับ — นำกลับให้นายอำเภอหวู่เพื่อยืนยันว่าหนังสือถึงข้าแล้ว" },
+    ],
+    choices: [
+      {
+        text: "รับใบรับและออกเดินทาง",
+        effects: [
+          { t: "takeItem", itemId: "qst_amnesty_letter", count: 1 },
+          { t: "giveItem", itemId: "qst_amnesty_receipt", count: 1 },
+        ],
+        next: "city_jinling",
+      },
+    ],
   },
   {
     kind: "dialog",
     id: "qs_qc_capital_royal_pardon_complete",
     lines: [
-      { t: "dialogue", speaker: "นายอำเภอหวู่", text: "ท่านทำได้สำเร็จ พยานยืนยันแล้ว นักโทษจะได้รับอิสรภาพ" },
+      { t: "dialogue", speaker: "นายอำเภอหวู่", text: "ใบรับจากนักยุทธศาสตร์กง! ท่านทำได้สำเร็จ พยานจะถูกคุ้มครอง นักโทษจะได้รับอิสรภาพ" },
       { t: "dialogue", speaker: "นายอำเภอหวู่", text: "นี่คือรางวัลจากใจข้า ท่านช่วยชีวิตคนบริสุทธิ์ไว้ได้" },
     ],
     choices: [
       {
         text: "รับรางวัลและลาจาก",
         effects: [
+          { t: "takeItem", itemId: "qst_amnesty_receipt", count: 1 },
           { t: "finishQuest", questId: "qc_capital_royal_pardon", success: true },
           { t: "addTrait", trait: "good", amount: 10 },
         ],
@@ -636,12 +758,16 @@ export const SCENES_CITIES: readonly Scene[] = [
   },
 
   // ── qc_dali_missing_page ───────────────────────────────────────────
+  // Refactored fetch flow:
+  //   offer (Duan, dali)        → start quest
+  //   pickup (Li, suzhou)       → giveItem qst_dali_book_pages
+  //   complete (Duan, dali)     → takeItem qst_dali_book_pages, finishQuest
   {
     kind: "dialog",
     id: "qs_qc_dali_missing_page_offer",
     lines: [
-      { t: "dialogue", speaker: "บัณฑิตต้วน", text: "หนังสือประวัติศาสตร์เล่มสำคัญของข้าขาดหน้าตอนกลาง ข้าสงสัยว่าพ่อค้าหนังสือที่ซูโจวซื้อไปโดยไม่รู้ว่าเป็นส่วนหนึ่งของเล่มนี้" },
-      { t: "dialogue", speaker: "บัณฑิตต้วน", text: "ช่วยไปพบเขาที่ซูโจวและขอคืนมาได้ไหม? ข้าจะจ่ายค่าทดแทนให้เขา" },
+      { t: "dialogue", speaker: "บัณฑิตต้วน", text: "หนังสือประวัติศาสตร์เล่มสำคัญของข้าขาดหน้าตอนกลาง พ่อค้าหนังสือลี่ที่ซูโจวซื้อไปโดยไม่รู้ว่าเป็นของข้า" },
+      { t: "dialogue", speaker: "บัณฑิตต้วน", text: "ขั้นตอน: 1) ไปซูโจว 2) คุยพ่อค้าหนังสือลี่เพื่อขอหน้าหนังสือคืน 3) นำกลับมาให้ข้า" },
     ],
     choices: [
       {
@@ -656,23 +782,40 @@ export const SCENES_CITIES: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qc_dali_missing_page_offer_accept",
     lines: [
-      { t: "dialogue", speaker: "บัณฑิตต้วน", text: "พ่อค้าชื่อนายเฉียว อยู่ที่ร้านหนังสือริมน้ำในซูโจว นำกระดาษเปล่านี้ไปเป็นสัญลักษณ์ว่ามาจากข้า" },
-      { t: "narration", text: "บัณฑิตต้วนให้กระดาษพร้อมตราประทับของตระกูลต้วน" },
+      { t: "dialogue", speaker: "บัณฑิตต้วน", text: "พ่อค้าหนังสือลี่อยู่ที่ร้านหนังสือริมน้ำในซูโจว บอกชื่อสกุลต้วน เขาจะรู้ว่าใครส่งท่านมา" },
+      { t: "dialogue", speaker: "บัณฑิตต้วน", text: "ข้าได้จ่ายค่าทดแทนล่วงหน้าให้เขาแล้ว ท่านเพียงไปรับหน้าหนังสือกลับมา" },
     ],
     choices: [{ text: "รับทราบ", next: "city_dali" }],
+  },
+  // Li's pickup branch — invoked from npc_city_suzhou_book_merchant_li_talk.
+  {
+    kind: "dialog",
+    id: "qs_qc_dali_missing_page_pickup",
+    lines: [
+      { t: "dialogue", speaker: "พ่อค้าหนังสือลี่", text: "อา หน้าหนังสือของสกุลต้วน — ข้าเก็บรักษาไว้รอเจ้าของจริงตามที่บัณฑิตต้วนสั่ง" },
+      { t: "narration", text: "พ่อค้าลี่ดึงห่อกระดาษเก่าออกจากหีบไม้ ปลายกระดาษมีตราสกุลต้วน" },
+      { t: "dialogue", speaker: "พ่อค้าหนังสือลี่", text: "นำกลับให้บัณฑิตต้วน หากท่านพบเล่มอื่น ๆ ของท่าน อย่าลืมแวะมาบอกข้านะ" },
+    ],
+    choices: [
+      {
+        text: "รับหน้าหนังสือและออกเดินทาง",
+        effects: [{ t: "giveItem", itemId: "qst_dali_book_pages", count: 1 }],
+        next: "city_suzhou",
+      },
+    ],
   },
   {
     kind: "dialog",
     id: "qs_qc_dali_missing_page_complete",
     lines: [
-      { t: "dialogue", speaker: "บัณฑิตต้วน", text: "นายเฉียวยอมคืนมาแล้ว! หน้านี้สำคัญมาก บันทึกวันที่สกุลต้วนก่อตั้งอาณาจักร" },
+      { t: "dialogue", speaker: "บัณฑิตต้วน", text: "ท่านได้คืนมาแล้ว! หน้านี้สำคัญมาก บันทึกวันที่สกุลต้วนก่อตั้งอาณาจักร" },
       { t: "narration", text: "บัณฑิตต้วนอ่านหน้านั้นซ้ำแล้วซ้ำเล่าด้วยความชื่นชม" },
     ],
     choices: [
       {
         text: "รับรางวัลและลาจาก",
         effects: [
-          { t: "takeItem", itemId: "paper", count: 1 },
+          { t: "takeItem", itemId: "qst_dali_book_pages", count: 1 },
           { t: "finishQuest", questId: "qc_dali_missing_page", success: true },
         ],
         next: "city_dali",
@@ -824,12 +967,16 @@ export const SCENES_CITIES: readonly Scene[] = [
   },
 
   // ── qc_yangzhou_spice_delivery ─────────────────────────────────────
+  // Refactored fetch flow:
+  //   offer (here, Su)   → start quest, no items yet
+  //   pickup (Wang, capital) → giveItem qst_capital_spice, stage 0 auto-advances
+  //   complete (Su)      → takeItem qst_capital_spice, finishQuest
   {
     kind: "dialog",
     id: "qs_qc_yangzhou_spice_delivery_offer",
     lines: [
-      { t: "dialogue", speaker: "พ่อครัวซู", text: "ข้าสั่งเครื่องเทศพิเศษจากพ่อค้าในนครหลวง เขาส่งมาให้แล้ว แต่ใช้ไก่ป่าเป็นแพ็คเกจซ่อนไว้" },
-      { t: "dialogue", speaker: "พ่อครัวซู", text: "ต้องการคนไปรับของที่นครหลวงและนำมาส่งที่นี่โดยไม่ให้ใครรู้" },
+      { t: "dialogue", speaker: "พ่อครัวซู", text: "ข้าสั่งเครื่องเทศพิเศษไว้กับพ่อค้าหวังในนครหลวง ต้องการคนเชื่อใจไปรับและนำกลับมาที่หยางโจว" },
+      { t: "dialogue", speaker: "พ่อครัวซู", text: "ขั้นตอน: 1) ไปนครหลวง 2) คุยพ่อค้าหวังเพื่อรับเครื่องเทศ 3) นำกลับมาส่งให้ข้าที่นี่" },
     ],
     choices: [
       {
@@ -844,21 +991,42 @@ export const SCENES_CITIES: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qc_yangzhou_spice_delivery_offer_accept",
     lines: [
-      { t: "dialogue", speaker: "พ่อครัวซู", text: "ไปพบนายหวังในนครหลวง เขาจะรู้ว่าต้องทำอะไร บอกรหัสว่า 'ต้มยำปลาทอง' แค่นั้น" },
+      { t: "dialogue", speaker: "พ่อครัวซู", text: "ดีแล้ว ไปพบพ่อค้าหวังที่นครหลวง บอกว่ามาจากข้า เขาจะมอบเครื่องเทศให้" },
+      { t: "dialogue", speaker: "พ่อครัวซู", text: "พกของให้ดีและรีบกลับมาทันที — ราคาของแพง อย่าให้ใครเห็น" },
     ],
     choices: [{ text: "รับทราบ", next: "city_yangzhou" }],
+  },
+  // Wang's pickup branch — invoked from Wang's NPC dialog (gating in
+  // npc_city_capital_merchant_wang_talk). giveItem triggers the stage-0
+  // autoAdvance via tickQuestProgress.
+  {
+    kind: "dialog",
+    id: "qs_qc_yangzhou_spice_delivery_pickup",
+    lines: [
+      { t: "dialogue", speaker: "พ่อค้าหวัง", text: "อา ผู้แทนพ่อครัวซู ของล็อตนี้รออยู่นานแล้ว" },
+      { t: "narration", text: "พ่อค้าหวังหยิบห่อใบบัวจากชั้นด้านในร้าน ภายในมีเครื่องเทศกลิ่นแรง" },
+      { t: "dialogue", speaker: "พ่อค้าหวัง", text: "นำกลับให้พ่อครัวซูที่หยางโจวด้วย ข้าจะรอรายงานเมื่อท่านถึงปลายทาง" },
+    ],
+    choices: [
+      {
+        text: "รับเครื่องเทศและออกเดินทาง",
+        effects: [{ t: "giveItem", itemId: "qst_capital_spice", count: 1 }],
+        next: "city_capital",
+      },
+    ],
   },
   {
     kind: "dialog",
     id: "qs_qc_yangzhou_spice_delivery_complete",
     lines: [
-      { t: "dialogue", speaker: "พ่อครัวซู", text: "ท่านนำของมาส่งได้สำเร็จ! นี่คือเครื่องเทศที่หายากที่สุดในยุทธภพ" },
+      { t: "dialogue", speaker: "พ่อครัวซู", text: "ท่านนำเครื่องเทศมาส่งได้สำเร็จ! นี่คือของหายากที่สุดในยุทธภพ" },
       { t: "narration", text: "พ่อครัวซูดมกลิ่นเครื่องเทศแล้วหลับตาเหมือนคนมีความสุข" },
     ],
     choices: [
       {
         text: "รับค่าจ้างและลาจาก",
         effects: [
+          { t: "takeItem", itemId: "qst_capital_spice", count: 1 },
           { t: "finishQuest", questId: "qc_yangzhou_spice_delivery", success: true },
           { t: "addNpcRelationship", npcId: "city_yangzhou_chef_su", amount: 8 },
         ],
@@ -965,19 +1133,23 @@ export const SCENES_CITIES: readonly Scene[] = [
   // ═══════════════════════════════════════════════════════════════════
 
   // ── qc_suzhou_silk_shipment ────────────────────────────────────────
+  // Refactored deliver-and-return:
+  //   offer (Mei)        → giveItem qst_capital_silk
+  //   handoff (Wang)     → takeItem silk, giveItem qst_capital_silk_receipt
+  //   complete (Mei)     → takeItem receipt, finishQuest
   {
     kind: "dialog",
     id: "qs_qc_suzhou_silk_shipment_offer",
     lines: [
-      { t: "dialogue", speaker: "ช่างทอเหมย", text: "ผ้าไหมล็อตสำคัญสำหรับราชสำนักต้องส่งออกภายในสามวัน แต่คนนำส่งล้มป่วยกะทันหัน" },
-      { t: "dialogue", speaker: "ช่างทอเหมย", text: "ต้องการคนที่เชื่อถือได้ไปส่งที่นครหลวง ถ้าตรงเวลา รางวัลดีแน่" },
+      { t: "dialogue", speaker: "ช่างทอเหมย", text: "ผ้าไหมล็อตสำคัญสำหรับราชสำนักต้องส่งให้พ่อค้าหวังที่นครหลวงภายในสามวัน คนนำส่งเดิมล้มป่วยกะทันหัน" },
+      { t: "dialogue", speaker: "ช่างทอเหมย", text: "ขั้นตอน: 1) รับผ้าไหม 2) ไปนครหลวง · ส่งให้พ่อค้าหวังและรับใบรับ 3) นำใบรับกลับมาให้ข้า" },
     ],
     choices: [
       {
         text: "รับงานนำส่งผ้าไหม",
         effects: [
           { t: "startQuest", questId: "qc_suzhou_silk_shipment" },
-          { t: "giveItem", itemId: "silk", count: 3 },
+          { t: "giveItem", itemId: "qst_capital_silk", count: 1 },
         ],
         next: "qs_qc_suzhou_silk_shipment_offer_accept",
       },
@@ -988,9 +1160,30 @@ export const SCENES_CITIES: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qc_suzhou_silk_shipment_offer_accept",
     lines: [
-      { t: "dialogue", speaker: "ช่างทอเหมย", text: "ไปส่งผ้าไหมที่นายอำเภอในนครหลวงและรับใบรับสินค้า แล้วนำใบรับกลับมาให้ข้า" },
+      { t: "dialogue", speaker: "ช่างทอเหมย", text: "ดีแล้ว ไปพบพ่อค้าหวังที่ร้านในนครหลวง บอกว่ามาจากข้า เขาจะรับสินค้าและเซ็นใบรับให้" },
+      { t: "dialogue", speaker: "ช่างทอเหมย", text: "นำใบรับกลับมาให้ข้า ราชสำนักดูแลเราจากเงื่อนไขในใบรับนั้น" },
     ],
     choices: [{ text: "รับทราบ", next: "city_suzhou" }],
+  },
+  // Wang's handoff branch — invoked from Wang's NPC talk dialog.
+  {
+    kind: "dialog",
+    id: "qs_qc_suzhou_silk_shipment_handoff",
+    lines: [
+      { t: "dialogue", speaker: "พ่อค้าหวัง", text: "อา ผ้าไหมล็อตราชสำนักจากซูโจว — ข้ารอมาหลายวันแล้ว" },
+      { t: "narration", text: "พ่อค้าหวังตรวจคุณภาพผ้าไหมอย่างพิถีพิถัน แล้วเซ็นใบรับสินค้า" },
+      { t: "dialogue", speaker: "พ่อค้าหวัง", text: "นี่คือใบรับ — นำกลับให้ช่างทอเหมยเป็นหลักฐานว่าสินค้าถึงมือข้าครบถ้วน" },
+    ],
+    choices: [
+      {
+        text: "รับใบรับและออกเดินทาง",
+        effects: [
+          { t: "takeItem", itemId: "qst_capital_silk", count: 1 },
+          { t: "giveItem", itemId: "qst_capital_silk_receipt", count: 1 },
+        ],
+        next: "city_capital",
+      },
+    ],
   },
   {
     kind: "dialog",
@@ -1003,7 +1196,7 @@ export const SCENES_CITIES: readonly Scene[] = [
       {
         text: "รับค่าตอบแทนและลาจาก",
         effects: [
-          { t: "takeItem", itemId: "silk", count: 3 },
+          { t: "takeItem", itemId: "qst_capital_silk_receipt", count: 1 },
           { t: "finishQuest", questId: "qc_suzhou_silk_shipment", success: true },
         ],
         next: "city_suzhou",
@@ -1151,19 +1344,23 @@ export const SCENES_CITIES: readonly Scene[] = [
   },
 
   // ── qc_jinling_coded_letter ────────────────────────────────────────
+  // Refactored deliver-and-return:
+  //   offer (Kong)              → giveItem qst_dali_encrypted
+  //   translate (Duan, dali)    → takeItem encrypted, giveItem qst_dali_decoded
+  //   complete (Kong)           → takeItem decoded, finishQuest
   {
     kind: "dialog",
     id: "qs_qc_jinling_coded_letter_offer",
     lines: [
       { t: "dialogue", speaker: "นักยุทธศาสตร์กง", text: "ข้าได้จดหมายรหัสลับซึ่งดักจับได้จากผู้ส่งสาร เนื้อหาน่าตกใจหากแปลถูก" },
-      { t: "dialogue", speaker: "นักยุทธศาสตร์กง", text: "ต้องการคนนำจดหมายนี้ไปให้บัณฑิตที่ต้าหลี่แปล เขาเชี่ยวชาญอักษรโบราณ" },
+      { t: "dialogue", speaker: "นักยุทธศาสตร์กง", text: "ขั้นตอน: 1) รับจดหมายรหัสลับ 2) ไปต้าหลี่ · ให้บัณฑิตต้วนแปล 3) นำคำแปลกลับมาให้ข้า" },
     ],
     choices: [
       {
         text: "รับส่งจดหมายรหัส",
         effects: [
           { t: "startQuest", questId: "qc_jinling_coded_letter" },
-          { t: "giveItem", itemId: "paper", count: 1 },
+          { t: "giveItem", itemId: "qst_dali_encrypted", count: 1 },
         ],
         next: "qs_qc_jinling_coded_letter_offer_accept",
       },
@@ -1174,23 +1371,44 @@ export const SCENES_CITIES: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qc_jinling_coded_letter_offer_accept",
     lines: [
-      { t: "dialogue", speaker: "นักยุทธศาสตร์กง", text: "ไปพบบัณฑิตต้วนที่ต้าหลี่ ขอให้เขาแปลและส่งผลการแปลกลับมาให้ข้า ระวังอย่าให้ใครรู้" },
+      { t: "dialogue", speaker: "นักยุทธศาสตร์กง", text: "ไปพบบัณฑิตต้วนที่ต้าหลี่ บอกชื่อข้า เขาจะแปลให้และส่งคำแปลกลับมาในรูปกระดาษอีกแผ่น" },
+      { t: "dialogue", speaker: "นักยุทธศาสตร์กง", text: "ระวังอย่าให้ใครรู้ จดหมายต้นฉบับห้ามเปิดอ่าน" },
     ],
     choices: [{ text: "รับทราบ", next: "city_jinling" }],
+  },
+  // Duan's translate branch — invoked from npc_city_dali_scholar_duan_talk.
+  {
+    kind: "dialog",
+    id: "qs_qc_jinling_coded_letter_translate",
+    lines: [
+      { t: "dialogue", speaker: "บัณฑิตต้วน", text: "อักษรโบราณที่ผสมรหัสลับ... รูปแบบเดียวกับเครือข่ายลับเมื่อยี่สิบปีก่อน" },
+      { t: "narration", text: "บัณฑิตต้วนใช้เวลาครู่หนึ่งแปลและบันทึกคำแปลลงบนกระดาษอีกแผ่น" },
+      { t: "dialogue", speaker: "บัณฑิตต้วน", text: "นี่คือคำแปล — บอกนักยุทธศาสตร์กงว่าเรื่องนี้รุนแรงกว่าที่คิด" },
+    ],
+    choices: [
+      {
+        text: "รับคำแปลและออกเดินทาง",
+        effects: [
+          { t: "takeItem", itemId: "qst_dali_encrypted", count: 1 },
+          { t: "giveItem", itemId: "qst_dali_decoded", count: 1 },
+        ],
+        next: "city_dali",
+      },
+    ],
   },
   {
     kind: "dialog",
     id: "qs_qc_jinling_coded_letter_complete",
     lines: [
-      { t: "dialogue", speaker: "นักยุทธศาสตร์กง", text: "การแปลของบัณฑิตต้วน... น่าวิตกมาก ข้าต้องนำเรื่องนี้ไปพิจารณาต่อ" },
-      { t: "narration", text: "นักยุทธศาสตร์กงพับจดหมายเก็บอย่างรอบคอบ" },
+      { t: "dialogue", speaker: "นักยุทธศาสตร์กง", text: "คำแปลของบัณฑิตต้วน... น่าวิตกมาก ข้าต้องนำเรื่องนี้ไปพิจารณาต่อ" },
+      { t: "narration", text: "นักยุทธศาสตร์กงพับกระดาษเก็บอย่างรอบคอบ" },
       { t: "dialogue", speaker: "นักยุทธศาสตร์กง", text: "ท่านทำงานได้ดีมาก ข้าจะจดจำท่านไว้ในฐานะผู้ที่ไว้ใจได้" },
     ],
     choices: [
       {
         text: "รับรางวัลและลาจาก",
         effects: [
-          { t: "takeItem", itemId: "paper", count: 1 },
+          { t: "takeItem", itemId: "qst_dali_decoded", count: 1 },
           { t: "finishQuest", questId: "qc_jinling_coded_letter", success: true },
           { t: "addNpcRelationship", npcId: "city_jinling_strategist_kong", amount: 8 },
         ],

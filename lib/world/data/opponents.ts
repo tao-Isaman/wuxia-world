@@ -216,6 +216,47 @@ export const OPPONENTS: readonly OpponentDef[] = [
       artId: "jiuyang", artLevel: 9,
       skillIds: ["ep", "ng3", "nu1", "ng2"],
     }) },
+
+  // ─── Hunt-only beasts (tier 0–2) ───────────────────────────────
+  // Spawn ONLY through hunting resources (resources.ts → hunt_*). Stats
+  // follow the base TIER_STATS without overrides — random-event beasts
+  // of the same tier carry stat boosts (e.g., mountain_tiger STR+1
+  // AGI+1) and therefore hit harder. All skills come from the
+  // `bst_*` family in lib/game/data/skills.ts so the hunting layer
+  // feels claw / fang / venom rather than wuxia palm-strike.
+  // ─── tier 0 — small forest game ────────
+  { id: "hunt_rabbit", name: "กระต่ายป่า", ti: 0, category: "beast", drops: DROPS_T0,
+    build: () => build("กระต่ายป่า", 0, { stats: { AGI: 2 }, skillIds: ["bst_bite"] }) },
+  { id: "hunt_pheasant", name: "ไก่ฟ้า", ti: 0, category: "beast", drops: DROPS_T0,
+    build: () => build("ไก่ฟ้า", 0, { stats: { AGI: 2 }, skillIds: ["bst_claw"] }) },
+  { id: "hunt_squirrel", name: "กระรอกแก้ม", ti: 0, category: "beast", drops: DROPS_T0,
+    build: () => build("กระรอกแก้ม", 0, { stats: { AGI: 2, DEX: 2 }, skillIds: ["bst_bite"] }) },
+
+  // ─── tier 1 — woodland predators ────────
+  { id: "hunt_wild_dog", name: "สุนัขป่า", ti: 1, category: "beast", drops: DROPS_T1,
+    build: () => build("สุนัขป่า", 1, { skillIds: ["bst_bite", "bst_pounce"] }) },
+  { id: "hunt_boar", name: "หมูป่าฝูง", ti: 1, category: "beast",
+    drops: [...DROPS_T1, { itemId: "raw_meat", weight: 4 }],
+    build: () => build("หมูป่าฝูง", 1, { stats: { VIT: 4 }, skillIds: ["bst_charge", "bst_bite"] }) },
+  { id: "hunt_jungle_cat", name: "เสือดาวป่า", ti: 1, category: "beast",
+    drops: [...DROPS_T1, { itemId: "fur_pelt", weight: 4 }],
+    build: () => build("เสือดาวป่า", 1, { skillIds: ["bst_claw", "bst_pounce"] }) },
+
+  // ─── tier 2 — mountain & legendary apex ────────
+  // Note: these are deliberately weaker than random-event tier-2 beasts
+  // (mountain_tiger, brown_bear) — they carry no stat overrides while
+  // those carry +1–2 STR/AGI/VIT.
+  { id: "hunt_alpha_wolf", name: "หมาป่าจ่าฝูง", ti: 2, category: "beast", drops: DROPS_T2,
+    build: () => build("หมาป่าจ่าฝูง", 2, { skillIds: ["bst_pounce", "bst_roar"] }) },
+  { id: "hunt_giant_bear", name: "หมีหิน", ti: 2, category: "beast",
+    drops: [...DROPS_T2, { itemId: "bear_claw", weight: 1 }],
+    build: () => build("หมีหิน", 2, { skillIds: ["bst_maul", "bst_charge"] }) },
+  { id: "hunt_mountain_lynx", name: "เสือเขาเล็ก", ti: 2, category: "beast",
+    drops: [...DROPS_T2, { itemId: "tiger_claw", weight: 1 }],
+    build: () => build("เสือเขาเล็ก", 2, { skillIds: ["bst_pounce", "bst_fang"] }) },
+  { id: "hunt_jungle_serpent", name: "งูยักษ์ป่า", ti: 2, category: "beast",
+    drops: [...DROPS_T2, { itemId: "viper_venom", weight: 2 }],
+    build: () => build("งูยักษ์ป่า", 2, { skillIds: ["bst_venom", "bst_constrict"] }) },
 ];
 
 export const OPPONENTS_BY_ID = new Map<string, OpponentDef>(

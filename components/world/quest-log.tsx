@@ -108,7 +108,6 @@ function QuestRow({
   const def = getQuest(questId);
   if (!def) return null;
   const isSide = def.type === "side";
-  const stageDef = def.stages[stage];
 
   return (
     <div className="space-y-1">
@@ -133,18 +132,65 @@ function QuestRow({
         </Badge>
       </div>
       <p className="text-xs text-muted-foreground">{def.briefSummary ?? def.description}</p>
-      {status === "active" && stageDef && (
-        <p className="text-xs pl-2 border-l-2 border-amber-400">
-          ขั้นที่ {stage + 1}/{def.stages.length}: {stageDef.description}
-        </p>
-      )}
-      {status === "active" && def.rewards && def.rewards.length > 0 && (
-        <p className="text-[10px] pl-2 text-emerald-700/80 italic">
-          รางวัล: {summarizeRewards(def.rewards)}
-        </p>
-      )}
+      {/* Full stage checklist — every step shown so the player can plan. */}
+      <ul className="text-xs pl-2 border-l-2 border-amber-400 space-y-0.5">
+        {def.stages.map((s, idx) => {
+          const stepStatus = stepStatusFor(status, stage, idx);
+          return (
+            <li
+              key={s.id}
+              className={cn(
+                "flex gap-1.5",
+                stepStatus === "done" && "text-emerald-700/80 line-through opacity-70",
+                stepStatus === "current" && "text-amber-800 font-medium",
+                stepStatus === "pending" && "text-muted-foreground",
+              )}
+            >
+              <span className="shrink-0 w-3 text-center">
+                {stepStatus === "done" ? "✓" : stepStatus === "current" ? "▸" : "○"}
+              </span>
+              <span>
+                {idx + 1}. {s.description}
+              </span>
+            </li>
+          );
+        })}
+        {/* Final reward step — visible last so the player sees the payoff. */}
+        <li
+          className={cn(
+            "flex gap-1.5",
+            status === "done" && "text-emerald-700/80 line-through opacity-70",
+            status !== "done" && "text-muted-foreground",
+          )}
+        >
+          <span className="shrink-0 w-3 text-center">
+            {status === "done" ? "✓" : "○"}
+          </span>
+          <span>
+            {def.stages.length + 1}. รับรางวัล
+            {def.rewards && def.rewards.length > 0
+              ? ` — ${summarizeRewards(def.rewards)}`
+              : ""}
+          </span>
+        </li>
+      </ul>
     </div>
   );
+}
+
+type StepStatus = "done" | "current" | "pending";
+
+function stepStatusFor(
+  questStatus: "active" | "done" | "failed",
+  currentStage: number,
+  idx: number,
+): StepStatus {
+  if (questStatus === "done") return "done";
+  if (questStatus === "failed") return idx < currentStage ? "done" : "pending";
+  // active
+  if (idx < currentStage) return "done";
+  if (idx === currentStage) return "current";
+  return "pending";
 }
 
 function summarizeRewards(rewards: readonly QuestReward[]): string {

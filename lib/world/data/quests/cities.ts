@@ -75,23 +75,24 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
   {
     id: "qc_capital_royal_pardon",
     name: "หนังสือนิรโทษกรรม",
-    description: "นายอำเภอหวู่ขอให้นำหนังสือสำคัญไปส่งที่จินหลิงเพื่อช่วยเหลือนักโทษที่ถูกจำคุกอย่างไม่เป็นธรรม",
-    briefSummary: "ส่งหนังสือนิรโทษกรรมจากนครหลวงไปยังจินหลิง",
+    description: "นายอำเภอหวู่ขอให้นำหนังสือสำคัญไปส่งให้นักยุทธศาสตร์กงที่จินหลิง แล้วนำใบรับกลับมา",
+    briefSummary: "ส่งหนังสือนิรโทษกรรมให้กงที่จินหลิง · นำใบรับกลับนครหลวง",
     type: "side",
     giverNpcId: "city_capital_magistrate_wu",
     stages: [
       {
         id: "receive_letter",
-        description: "รับหนังสือจากนายอำเภอหวู่",
+        description: "รับหนังสือนิรโทษกรรมจากนายอำเภอหวู่",
+        autoAdvance: { t: "hasItem", itemId: "qst_amnesty_letter", count: 1 },
       },
       {
-        id: "travel_jinling",
-        description: "เดินทางไปยังจินหลิง",
-        autoAdvance: { t: "visitedLocation", locationId: "city_jinling" },
+        id: "deliver_jinling",
+        description: "ไปจินหลิง · ส่งหนังสือให้นักยุทธศาสตร์กงและรับใบรับกลับ",
+        autoAdvance: { t: "hasItem", itemId: "qst_amnesty_receipt", count: 1 },
       },
       {
-        id: "deliver",
-        description: "ส่งหนังสือให้ผู้รับและกลับมารายงานนายอำเภอ",
+        id: "report_back",
+        description: "นำใบรับกลับไปรายงานนายอำเภอหวู่ที่นครหลวง",
       },
     ],
     rewards: [
@@ -320,27 +321,23 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
     ],
   },
 
-  // 11. Deliver — cross-NPC delivery (dali → suzhou → dali)
+  // 11. Deliver — cross-NPC delivery (dali → suzhou → dali).
   {
     id: "qc_dali_missing_page",
     name: "หน้าหนังสือที่หายไป",
-    description: "บัณฑิตต้วนส่งหนังสือประวัติศาสตร์ขาดหน้ากลาง ต้องไปติดต่อพ่อค้าหนังสือในซูโจวเพื่อขอคืน",
-    briefSummary: "นำหน้าหนังสือที่หายไปกลับคืนจากพ่อค้าในซูโจว",
+    description: "บัณฑิตต้วนต้องการให้ไปคุยพ่อค้าหนังสือลี่ที่ซูโจวเพื่อขอหน้าหนังสือที่หายกลับคืน",
+    briefSummary: "ไปขอหน้าหนังสือคืนจากพ่อค้าหนังสือลี่ที่ซูโจว แล้วนำกลับต้าหลี่",
     type: "side",
     giverNpcId: "city_dali_scholar_duan",
     stages: [
       {
-        id: "travel_suzhou",
-        description: "เดินทางไปซูโจวพร้อมกระดาษที่บัณฑิตต้วนให้",
-        autoAdvance: { t: "visitedLocation", locationId: "city_suzhou" },
-      },
-      {
-        id: "negotiate",
-        description: "เจรจาขอหน้าหนังสือคืนจากพ่อค้าหนังสือ",
+        id: "pickup_at_suzhou",
+        description: "ไปซูโจว · คุยพ่อค้าหนังสือลี่เพื่อขอหน้าหนังสือคืน",
+        autoAdvance: { t: "hasItem", itemId: "qst_dali_book_pages", count: 1 },
       },
       {
         id: "return_page",
-        description: "นำหน้าหนังสือกลับต้าหลี่",
+        description: "นำหน้าหนังสือกลับให้บัณฑิตต้วนที่ต้าหลี่",
       },
     ],
     rewards: [
@@ -451,23 +448,25 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
     ],
   },
 
-  // 15. Deliver — cross-city delivery (yangzhou → capital)
+  // 15. Deliver — cross-city delivery (yangzhou → capital → yangzhou).
+  // Stages mirror the user's "1 go 2 buy 3 bring back 4 reward" flow:
+  // pickup auto-advances on the quest item, turn-in consumes it.
   {
     id: "qc_yangzhou_spice_delivery",
     name: "เครื่องเทศพิเศษจากนครหลวง",
-    description: "พ่อครัวซูต้องการคนรับเครื่องเทศพิเศษจากนครหลวงและนำมาส่งที่หยางโจว",
-    briefSummary: "นำเครื่องเทศพิเศษจากนครหลวงมาส่งพ่อครัวซู",
+    description: "พ่อครัวซูต้องการคนรับเครื่องเทศพิเศษจากพ่อค้าหวังในนครหลวงและนำมาส่งที่หยางโจว",
+    briefSummary: "ไปคุยพ่อค้าหวังที่นครหลวงเพื่อรับเครื่องเทศ แล้วนำกลับมาส่งพ่อครัวซู",
     type: "side",
     giverNpcId: "city_yangzhou_chef_su",
     stages: [
       {
-        id: "travel_capital",
-        description: "เดินทางไปนครหลวงและพบนายหวังเพื่อรับสินค้า",
-        autoAdvance: { t: "visitedLocation", locationId: "city_capital" },
+        id: "pickup_at_capital",
+        description: "ไปนครหลวง · คุยพ่อค้าหวังเพื่อรับเครื่องเทศพิเศษ",
+        autoAdvance: { t: "hasItem", itemId: "qst_capital_spice", count: 1 },
       },
       {
         id: "return_delivery",
-        description: "นำเครื่องเทศกลับมาส่งที่หยางโจว",
+        description: "นำเครื่องเทศกลับมาส่งพ่อครัวซูที่หยางโจว",
       },
     ],
     rewards: [
@@ -547,27 +546,28 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
   // city_suzhou_weaver_mei — 3 quests
   // ═══════════════════════════════════════════════════════════════════
 
-  // 18. Deliver — carry silk to capital
+  // 18. Deliver — carry silk to capital, bring receipt back to suzhou.
   {
     id: "qc_suzhou_silk_shipment",
     name: "ส่งผ้าไหมสำหรับราชสำนัก",
-    description: "ช่างทอเหมยต้องการคนส่งผ้าไหมล็อตสำคัญไปยังนครหลวง คนส่งเดิมล้มป่วย",
-    briefSummary: "ส่งผ้าไหมจากซูโจวไปยังนครหลวงในเวลาที่กำหนด",
+    description: "ช่างทอเหมยต้องการคนส่งผ้าไหมล็อตสำคัญให้พ่อค้าหวังที่นครหลวง แล้วนำใบรับกลับมาให้ช่างทอเหมย",
+    briefSummary: "ส่งผ้าไหมให้พ่อค้าหวังที่นครหลวง · นำใบรับกลับซูโจว",
     type: "side",
     giverNpcId: "city_suzhou_weaver_mei",
     stages: [
       {
         id: "receive_silk",
         description: "รับผ้าไหมและใบสั่งงานจากช่างทอเหมย",
+        autoAdvance: { t: "hasItem", itemId: "qst_capital_silk", count: 1 },
       },
       {
-        id: "travel_capital",
-        description: "เดินทางไปนครหลวงพร้อมผ้าไหม",
-        autoAdvance: { t: "visitedLocation", locationId: "city_capital" },
+        id: "deliver_capital",
+        description: "ไปนครหลวง · ส่งผ้าไหมให้พ่อค้าหวังและรับใบรับกลับ",
+        autoAdvance: { t: "hasItem", itemId: "qst_capital_silk_receipt", count: 1 },
       },
       {
-        id: "deliver_and_return",
-        description: "ส่งผ้าไหมและนำใบรับคืนให้ช่างทอเหมย",
+        id: "return_receipt",
+        description: "นำใบรับกลับให้ช่างทอเหมยที่ซูโจว",
       },
     ],
     rewards: [
@@ -670,27 +670,28 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
     ],
   },
 
-  // 22. Deliver — coded letter to scholar in dali
+  // 22. Deliver — coded letter to scholar in dali, bring translation back.
   {
     id: "qc_jinling_coded_letter",
     name: "จดหมายรหัสลับ",
-    description: "นักยุทธศาสตร์กงต้องการให้นำจดหมายรหัสลับไปให้บัณฑิตในต้าหลี่แปล แล้วนำผลการแปลกลับมา",
-    briefSummary: "ส่งจดหมายรหัสลับไปที่ต้าหลี่และนำผลการแปลกลับมาจินหลิง",
+    description: "นักยุทธศาสตร์กงให้นำจดหมายรหัสลับไปให้บัณฑิตต้วนที่ต้าหลี่แปล แล้วนำผลการแปลกลับมา",
+    briefSummary: "ส่งจดหมายรหัสลับให้บัณฑิตต้วนแปลที่ต้าหลี่ · นำคำแปลกลับจินหลิง",
     type: "side",
     giverNpcId: "city_jinling_strategist_kong",
     stages: [
       {
-        id: "travel_dali",
-        description: "เดินทางไปต้าหลี่พร้อมจดหมาย",
-        autoAdvance: { t: "visitedLocation", locationId: "city_dali" },
+        id: "receive_letter",
+        description: "รับจดหมายรหัสลับจากนักยุทธศาสตร์กง",
+        autoAdvance: { t: "hasItem", itemId: "qst_dali_encrypted", count: 1 },
       },
       {
         id: "get_translation",
-        description: "ให้บัณฑิตต้วนแปลจดหมายรหัสลับ",
+        description: "ไปต้าหลี่ · ให้บัณฑิตต้วนแปลจดหมายและรับคำแปลกลับ",
+        autoAdvance: { t: "hasItem", itemId: "qst_dali_decoded", count: 1 },
       },
       {
         id: "return_result",
-        description: "นำผลการแปลกลับมาส่งนักยุทธศาสตร์กงที่จินหลิง",
+        description: "นำคำแปลกลับให้นักยุทธศาสตร์กงที่จินหลิง",
       },
     ],
     rewards: [

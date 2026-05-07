@@ -162,6 +162,19 @@ export function validateAndRepair(state: WorldStateData): void {
     const xp = state.skillExp[sid];
     state.skillExp[sid] = typeof xp === "number" && xp >= 0 ? xp : 0;
   }
+
+  // Inner-art xp pool — drop entries for arts that no longer exist; clamp
+  // to non-negative integers. Levels live on playerBuild.artLevels (handled
+  // below in the build-learn-arrays cleanup).
+  if (!state.artExp || typeof state.artExp !== "object") state.artExp = {};
+  for (const aid of Object.keys(state.artExp)) {
+    if (!ARTS_BY_ID.has(aid)) {
+      delete state.artExp[aid];
+      continue;
+    }
+    const xp = state.artExp[aid];
+    state.artExp[aid] = typeof xp === "number" && xp >= 0 ? xp : 0;
+  }
   if (state.playerBuild) {
     state.playerBuild = {
       ...state.playerBuild,

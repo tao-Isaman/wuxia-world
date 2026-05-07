@@ -53,6 +53,16 @@ export {
   gatherSuccessChance,
   pickWeighted,
 } from "./data";
+export {
+  PRACTICE_BONUS_MULT,
+  PRACTICE_CATEGORIES,
+  CATEGORY_TYPE_BONUS,
+  getLocationCategories,
+  inferCategoriesFromId,
+  canPracticeAt,
+  practiceXpBonus,
+  describeBonusForLocation,
+} from "./location-categories";
 export { evaluateCondition, getQuestStatus } from "./conditions";
 export {
   applyEffect,

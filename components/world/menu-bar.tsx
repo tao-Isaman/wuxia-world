@@ -6,15 +6,18 @@ import { Button } from "@/components/ui/button";
 import { ProfilePopup } from "./popups/profile-popup";
 import { InventoryPopup } from "./popups/inventory-popup";
 import { MoveSkillsPopup } from "./popups/move-skills-popup";
-import { InnerSkillsPopup } from "./popups/inner-skills-popup";
 import { LifeSkillsPopup } from "./popups/life-skills-popup";
 import { ActionLogPopup } from "./popups/action-log-popup";
 
-type PopupId = "profile" | "inventory" | "moves" | "inner" | "lifeskills" | "log" | null;
+type PopupId = "profile" | "inventory" | "moves" | "lifeskills" | "log" | null;
 
 // Main-screen menu bar — popup buttons, one popup at a time. The bar lives
 // directly under the StatusBar in WorldScreen so it's reachable from every
 // scene kind (location / route / dialog).
+//
+// The 🥋 วิชาฝีมือ tab manages BOTH move skills and inner arts: each of the
+// 10 slots can hold either kind, so a separate ☯ inner-skills popup would
+// just duplicate state.
 export function MenuBar() {
   const [open, setOpen] = useState<PopupId>(null);
   const close = () => setOpen(null);
@@ -23,7 +26,7 @@ export function MenuBar() {
     <>
       <Card>
         <CardContent className="p-2">
-          <div className="grid grid-cols-2 sm:grid-cols-6 gap-1.5">
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5">
             <Button variant="outline" size="sm" onClick={() => setOpen("profile")}>
               👤 โปรไฟล์
             </Button>
@@ -32,9 +35,6 @@ export function MenuBar() {
             </Button>
             <Button variant="outline" size="sm" onClick={() => setOpen("moves")}>
               🥋 วิชาฝีมือ
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => setOpen("inner")}>
-              ☯ วิชาในกาย
             </Button>
             <Button variant="outline" size="sm" onClick={() => setOpen("lifeskills")}>
               🌾 วิชาชีพ
@@ -49,7 +49,6 @@ export function MenuBar() {
       <ProfilePopup     open={open === "profile"}    onClose={close} />
       <InventoryPopup   open={open === "inventory"}  onClose={close} />
       <MoveSkillsPopup  open={open === "moves"}      onClose={close} />
-      <InnerSkillsPopup open={open === "inner"}      onClose={close} />
       <LifeSkillsPopup  open={open === "lifeskills"} onClose={close} />
       <ActionLogPopup   open={open === "log"}        onClose={close} />
     </>

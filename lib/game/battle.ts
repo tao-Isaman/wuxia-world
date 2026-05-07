@@ -114,6 +114,7 @@ export function makeInitialState(
     },
     iaCD: { A: 0, B: 0 },
     skillUses: { A: {}, B: {} },
+    artUses: { A: {}, B: {} },
     hitsReceived: { A: 0, B: 0 },
   };
 }
@@ -401,6 +402,9 @@ export function resolveArtActive(
   else state.mpB -= act.c;
   if (typeof slotIdx === "number") state.cd[side][slotIdx] = act.cd;
   else state.iaCD[side] = act.cd;
+
+  // Track art active uses for the world's per-art XP track.
+  state.artUses[side][art.id] = (state.artUses[side][art.id] ?? 0) + 1;
 
   state.turn++;
   tickEffects(state, ctx.equipBonus.A.hp_regen, ctx.equipBonus.B.hp_regen, ctx.names);

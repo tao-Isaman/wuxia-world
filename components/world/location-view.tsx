@@ -8,6 +8,7 @@ import type { LocationScene, NpcDef } from "@/lib/world";
 import {
   LIFE_SKILL_ICON,
   LIFE_SKILL_LABEL,
+  canPracticeAt,
   evaluateCondition,
   gatherSuccessChance,
   getItem,
@@ -21,9 +22,11 @@ import {
 import { NpcInteractionPopup } from "./popups/npc-interaction-popup";
 import { ShopPopup } from "./popups/shop-popup";
 import { SectHallPopup } from "./popups/sect-hall-popup";
+import { PracticePopup } from "./popups/practice-popup";
 import {
   useWorldStore,
   TRAVEL_STAMINA_COST,
+  PRACTICE_STAMINA_COST,
   type GatherResult,
   type RestKind,
 } from "@/store/world-store";
@@ -48,12 +51,14 @@ export function LocationView({ scene }: Props) {
 
   // The popup-active NPC. null = no popup. Set by clicking a registry NPC.
   const [activeNpc, setActiveNpc] = useState<NpcDef | null>(null);
-  // Toggle state for the shop / sect-hall panels.
+  // Toggle state for the shop / sect-hall / practice panels.
   const [shopOpen, setShopOpen] = useState(false);
   const [hallOpen, setHallOpen] = useState(false);
+  const [practiceOpen, setPracticeOpen] = useState(false);
 
   const shop = getShopAt(scene.id);
   const hall = getSectHallAt(scene.id);
+  const canPractice = canPracticeAt(scene);
 
   const visibleNpcs = scene.npcs.filter(
     (n) => !n.visibleIf || evaluateCondition(state, n.visibleIf),
@@ -238,6 +243,32 @@ export function LocationView({ scene }: Props) {
 
       <RestPanel kind={restKind} />
 
+      {canPractice && (
+        <Card>
+          <CardContent className="p-3 space-y-2">
+            <div className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">
+              การฝึกฝน
+            </div>
+            <Button
+              variant="outline"
+              onClick={() => setPracticeOpen(true)}
+              disabled={stamina < PRACTICE_STAMINA_COST}
+              className="w-full justify-start text-left h-auto py-2 whitespace-normal"
+            >
+              <span className="flex flex-col items-start gap-0.5">
+                <span className="font-semibold text-sm">🧘 ฝึกฝน</span>
+                <span className="text-[10px] text-muted-foreground">
+                  เลือกวิชาที่จะฝึก · ⚡ {PRACTICE_STAMINA_COST}
+                  {stamina < PRACTICE_STAMINA_COST && (
+                    <span className="text-rose-600 ml-2">พลังไม่พอ</span>
+                  )}
+                </span>
+              </span>
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
       {resources.length > 0 && (
         <Card>
           <CardContent className="p-3 space-y-2">
@@ -307,6 +338,11 @@ export function LocationView({ scene }: Props) {
 
       <ShopPopup open={shopOpen} shop={shop} onClose={() => setShopOpen(false)} />
       <SectHallPopup open={hallOpen} hall={hall} onClose={() => setHallOpen(false)} />
+      <PracticePopup
+        open={practiceOpen}
+        scene={canPractice ? scene : null}
+        onClose={() => setPracticeOpen(false)}
+      />
     </div>
   );
 }

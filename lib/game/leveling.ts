@@ -1,4 +1,4 @@
-import type { CharacterBuild, Skill } from "./types";
+import type { Art, CharacterBuild, Skill } from "./types";
 
 // ─── Skill leveling ───────────────────────────────────────────────────
 // Every move skill carries a level (1..10). Level 1 cuts the skill's base
@@ -10,6 +10,8 @@ import type { CharacterBuild, Skill } from "./types";
 
 export const SKILL_LEVEL_MIN = 1;
 export const SKILL_LEVEL_MAX = 10;
+export const ART_LEVEL_MIN = 1;
+export const ART_LEVEL_MAX = 10;
 
 // Per-level xp = BASE × current_level × (tier + 1)
 // Tier 0 caps at 50·(1+2+…+9) = 2,250 xp total.
@@ -64,4 +66,24 @@ export function xpToNextLevel(skill: Skill, currentLevel: number): number {
   const lv = clampLevel(currentLevel);
   if (lv >= SKILL_LEVEL_MAX) return Infinity;
   return SKILL_XP_BASE * lv * (skill.ti + 1);
+}
+
+// ─── Inner-art leveling ──────────────────────────────────────────────
+// Arts level on the same 1..10 axis as move skills, but the per-level xp
+// gap is **2× steeper** at the same tier — arts are the slow-burn power
+// curve of a wuxia build, so the climb has to feel weightier than ฝีมือ.
+
+export function clampArtLevel(level: number): number {
+  if (!Number.isFinite(level)) return ART_LEVEL_MIN;
+  if (level < ART_LEVEL_MIN) return ART_LEVEL_MIN;
+  if (level > ART_LEVEL_MAX) return ART_LEVEL_MAX;
+  return Math.floor(level);
+}
+
+// XP cost to advance an inner art from `currentLevel` to `currentLevel + 1`.
+// Twice the skill cost at the same tier; Infinity at ART_LEVEL_MAX.
+export function xpToNextArtLevel(art: Art, currentLevel: number): number {
+  const lv = clampArtLevel(currentLevel);
+  if (lv >= ART_LEVEL_MAX) return Infinity;
+  return SKILL_XP_BASE * 2 * lv * (art.ti + 1);
 }

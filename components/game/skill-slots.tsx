@@ -5,6 +5,7 @@ import {
   SKILLS,
   TIERS,
   WEAPON_FAMILY_LABEL,
+  bpMultiplier,
   getSkill,
   getMasteryMap,
   type Side,
@@ -38,18 +39,22 @@ export function SkillSlots({ side }: Props) {
   const mastery = useMemo(() => getMasteryMap(build.skillIds), [build.skillIds]);
   const equippedSet = new Set(build.skillIds.filter((x): x is string => !!x));
 
-  // Aggregate stat bonuses from equipped skills.
+  // Aggregate stat bonuses from equipped skills — scaled by skill level
+  // (lv1 = 50%, lv10 = 100%) to match combinedStats() in derive.ts.
   const skillStatBonus = useMemo(() => {
     const out: Record<string, number> = {};
     for (const sid of build.skillIds) {
+      if (!sid) continue;
       const sk = getSkill(sid);
       if (!sk) continue;
+      const lv = build.skillLevels?.[sid] ?? 1;
+      const mul = bpMultiplier(lv);
       for (const [k, v] of Object.entries(sk.st)) {
-        out[k] = (out[k] ?? 0) + (v as number);
+        out[k] = (out[k] ?? 0) + Math.floor((v as number) * mul);
       }
     }
     return out;
-  }, [build.skillIds]);
+  }, [build.skillIds, build.skillLevels]);
 
   return (
     <section className="border-t pt-3 mt-3">

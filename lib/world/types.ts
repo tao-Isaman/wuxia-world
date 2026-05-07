@@ -42,8 +42,53 @@ export interface LocationScene {
   npcs: NpcRef[];           // talk-to-NPC links (each opens a dialog scene)
   routes: RouteRef[];       // outbound paths (each opens a route scene)
   resources?: ResourceNodeRef[]; // gather/hunt activities at this place
+  // Optional terrain / civic tags. Drives the practice XP bonus rules in
+  // lib/world/location-categories.ts and gates the "ฝึกฝน" action button.
+  // When omitted the helper infers a default set from the id prefix
+  // (e.g. "sect_*" → ["sect", "mountain"], "cave_*" → ["cave"]) so existing
+  // 80+ locations don't need to be touched. Authors can override per-leaf
+  // (e.g. อู่ตั้ง explicitly tagged ["sect", "mountain"]).
+  categories?: readonly LocationCategory[];
   onEnter?: SceneEffect[];
 }
+
+// ─── Location categories ─────────────────────────────────────────────
+// Used for two things: (1) gating the practice action — only outdoor /
+// training-friendly categories qualify; (2) granting a 30 % practice XP
+// bonus when the location's terrain matches the skill's type tags. See
+// lib/world/location-categories.ts for the bonus table.
+export const LOCATION_CATEGORY_KEYS = [
+  "city",
+  "village",
+  "inn",
+  "home",
+  "sect",
+  "temple",
+  "mansion",
+  "isle",
+  "mountain",
+  "cave",
+  "forest",
+  "river",
+  "frontier",
+] as const;
+export type LocationCategory = (typeof LOCATION_CATEGORY_KEYS)[number];
+
+export const LOCATION_CATEGORY_LABEL: Record<LocationCategory, string> = {
+  city: "เมือง",
+  village: "หมู่บ้าน",
+  inn: "โรงเตี๊ยม",
+  home: "บ้านพัก",
+  sect: "สำนัก",
+  temple: "วัด / วัง",
+  mansion: "คฤหาสน์",
+  isle: "เกาะ",
+  mountain: "ภูเขา",
+  cave: "ถ้ำ",
+  forest: "ป่า",
+  river: "แม่น้ำ / ทะเล",
+  frontier: "ดินแดนชายแดน",
+};
 
 export interface RouteScene {
   kind: "route";
@@ -528,6 +573,11 @@ export interface WorldStateData {
   skillLevel: Record<string, number>;
   // skillId → accumulated xp toward the next level.
   skillExp: Record<string, number>;
+  // Inner-art progression. Parallel to skillExp but per-art. The cost
+  // curve is 2× the move-skill cost at the same tier. Levels themselves
+  // are stored on `playerBuild.artLevels` (unified with the engine's
+  // `artLevels` field on CharacterBuild). Auto-levels on overflow.
+  artExp: Record<string, number>;
 
   // Passive stat progression. Each base stat has its own xp pool that
   // accrues from a specific activity (STR from physical skills in battle,

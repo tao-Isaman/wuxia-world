@@ -11,6 +11,7 @@ import {
   TIERS,
   WEAPON_FAMILY_HINT,
   WEAPON_FAMILY_LABEL,
+  bpMultiplier,
   combinedStats,
   derive,
   deriveAll,
@@ -20,6 +21,7 @@ import {
   getEquipStatBonus,
   getMasteryMap,
   getSkill,
+  parseSlotId,
   totalStatPoints,
 } from "@/lib/game";
 import type { EquipSlotType, Skill, StatKey, WeaponFamily } from "@/lib/game";
@@ -124,14 +126,20 @@ export function ProfilePopup({ open, onClose }: Props) {
   const budgetColor =
     remaining <= 0 ? "#E24B4A" : remaining < 20 ? "#BA7517" : "#7F77DD";
 
-  // Skills + mastery + per-skill stat bonus aggregation (mirrors SkillSlots).
+  // Skills + mastery + per-skill stat bonus aggregation. Stat contribution
+  // scales with skill level via bpMultiplier — keep this in sync with
+  // combinedStats() in derive.ts so the rollup matches engine behavior.
   const mastery = getMasteryMap(player.skillIds, player.skillLevels);
   const skillStatBonus: Record<string, number> = {};
   for (const sid of player.skillIds) {
+    if (!sid) continue;
     const sk = getSkill(sid);
     if (!sk) continue;
+    const lv = player.skillLevels?.[sid] ?? 1;
+    const mul = bpMultiplier(lv);
     for (const [k, v] of Object.entries(sk.st)) {
-      skillStatBonus[k] = (skillStatBonus[k] ?? 0) + (v as number);
+      skillStatBonus[k] =
+        (skillStatBonus[k] ?? 0) + Math.floor((v as number) * mul);
     }
   }
 
@@ -285,15 +293,15 @@ export function ProfilePopup({ open, onClose }: Props) {
           )}
         </section>
 
-        {/* ─── Move skills ─────────────────────────────────────────── */}
+        {/* ─── Equipped skills (both move skills + inner arts) ──────── */}
         <section className="border-t pt-3">
           <div className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground mb-2">
-            วิชาที่ฝึก ({player.skillIds.length} ช่อง)
+            วิชาที่ติดตั้ง ({player.skillIds.length} ช่อง)
           </div>
           <div className="space-y-1.5">
             {player.skillIds.map((sid, i) => {
-              const sk = sid ? getSkill(sid) : null;
-              if (!sk) {
+              const info = sid ? parseSlotId(sid) : null;
+              if (!info) {
                 return (
                   <div key={i} className="flex items-center gap-1.5">
                     <span className="text-[10px] text-muted-foreground w-4 text-center shrink-0">{i + 1}</span>
@@ -301,13 +309,62 @@ export function ProfilePopup({ open, onClose }: Props) {
                   </div>
                 );
               }
+              if (info.kind === "art") {
+                const a = info.art;
+                const aLv = player.artLevels?.[a.id] ?? 1;
+                const artStatRow = (Object.entries(a.stats) as [StatKey, number][])
+                  .map(([k, v]) => `${k}+${Math.floor((v * aLv) / 10)}`)
+                  .join(" ");
+                return (
+                  <div key={i} className="rounded bg-muted/30 px-2 py-1.5">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-1.5 flex-wrap min-w-0">
+                        <span className="text-[10px] text-muted-foreground shrink-0">{i + 1}</span>
+                        <Badge variant="default" className="text-[9px]">☯</Badge>
+                        <strong className="text-xs">{a.n}</strong>
+                        <Badge variant="outline" className="text-[9px]">{a.sc}</Badge>
+                        <Badge variant="outline" className="text-[9px]">{a.tp}</Badge>
+                        <Badge variant="outline" className="text-[9px]">ขั้น {aLv}</Badge>
+                      </div>
+                      {a.act && (
+                        <span className="text-[9px] bg-primary/10 text-primary px-1.5 py-0.5 rounded shrink-0 whitespace-nowrap">
+                          ⚡ MP{a.act.c} CD{a.act.cd}
+                        </span>
+                      )}
+                    </div>
+                    {(artStatRow || a.hL || a.mL) && (
+                      <div className="text-[10px] text-emerald-700 mt-0.5">
+                        โบนัส:{artStatRow ? ` ${artStatRow}` : ""}
+                        {a.hL ? ` HP+${a.hL * aLv}` : ""}
+                        {a.mL ? ` MP+${a.mL * aLv}` : ""}
+                      </div>
+                    )}
+                    {a.act && (
+                      <div className="text-[10px] text-muted-foreground">
+                        ⚡ <strong>{a.act.n}</strong>: {a.act.d}
+                      </div>
+                    )}
+                    {a.pas && (
+                      <div className="text-[10px] text-muted-foreground">◆ {a.pas.d}</div>
+                    )}
+                  </div>
+                );
+              }
+              const sk = info.skill;
               const tier = TIERS[sk.ti];
+              const skLv = player.skillLevels?.[sk.id] ?? 1;
+              const skMul = bpMultiplier(skLv);
+              const skStatRow = (Object.entries(sk.st) as [StatKey, number][])
+                .map(([k, v]) => `${k}+${Math.floor(v * skMul)}`)
+                .join(" ");
               return (
                 <div key={i} className="rounded bg-muted/30 px-2 py-1.5">
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-1.5 flex-wrap min-w-0">
                       <span className="text-[10px] text-muted-foreground shrink-0">{i + 1}</span>
+                      <Badge variant="default" className="text-[9px]">⚔</Badge>
                       <strong className="text-xs">{sk.n}</strong>
+                      <Badge variant="default" className="text-[9px]">Lv.{skLv}</Badge>
                       <Badge variant="outline" className="text-[9px]">{tier?.n}</Badge>
                       <Badge
                         variant="outline"
@@ -321,23 +378,35 @@ export function ProfilePopup({ open, onClose }: Props) {
                       {skillKindIcon(sk)} CD{tier?.cd ?? 0}
                     </span>
                   </div>
-                  <div className="text-[10px] text-muted-foreground mt-0.5">{sk.d}</div>
+                  {skStatRow && (
+                    <div className="text-[10px] text-emerald-700 mt-0.5">
+                      โบนัส: {skStatRow}
+                      <span className="opacity-60"> (×{Math.round(skMul * 100)}% ของ Lv.10)</span>
+                    </div>
+                  )}
+                  <div className="text-[10px] text-muted-foreground">{sk.d}</div>
                 </div>
               );
             })}
           </div>
 
           <div className="flex flex-wrap gap-1 mt-2">
-            {Object.entries(mastery).map(([w, v]) => (
-              <span
-                key={w}
-                className="text-[10px] bg-muted/40 px-2 py-0.5 rounded"
-                title={WEAPON_FAMILY_HINT[w as WeaponFamily]}
-              >
-                ×<strong className="text-primary">{(1 + ((v ?? 0) / 200) * 0.5).toFixed(2)}</strong>{" "}
-                {WEAPON_FAMILY_LABEL[w as WeaponFamily]}
-              </span>
-            ))}
+            {Object.entries(mastery).map(([w, v]) => {
+              const pts = Math.floor(v ?? 0);
+              const mult = (1 + ((v ?? 0) / 200) * 0.5).toFixed(2);
+              return (
+                <span
+                  key={w}
+                  className="text-[10px] bg-muted/40 px-2 py-0.5 rounded"
+                  title={WEAPON_FAMILY_HINT[w as WeaponFamily]}
+                >
+                  <strong className="text-primary">{pts}</strong>
+                  <span className="opacity-70"> pt</span>{" "}
+                  <span className="opacity-70">×{mult}</span>{" "}
+                  {WEAPON_FAMILY_LABEL[w as WeaponFamily]}
+                </span>
+              );
+            })}
             {Object.keys(mastery).length === 0 && (
               <span className="text-[10px] text-muted-foreground">ยังไม่มีความเชี่ยวชาญ</span>
             )}

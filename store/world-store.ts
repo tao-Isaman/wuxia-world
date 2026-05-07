@@ -4,7 +4,9 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { CharacterBuild, StatKey } from "@/lib/game";
 import {
+  ART_LEVEL_MAX,
   deriveAll,
+  effectiveTypes,
   encodeArtSlot,
   getArt,
   getEquip,
@@ -14,6 +16,7 @@ import {
   placeInFirstEmpty,
   SKILL_LEVEL_MAX,
   STAT_KEYS,
+  xpToNextArtLevel,
   xpToNextLevel,
 } from "@/lib/game";
 import {
@@ -25,6 +28,7 @@ import {
 import { useBattleStore } from "@/store/battle-store";
 import {
   applyEffects,
+  canPracticeAt,
   gatherSuccessChance,
   getItem,
   getNpc,
@@ -37,6 +41,7 @@ import {
   LIFE_SKILL_KEYS,
   masteryLevel,
   pickWeighted,
+  practiceXpBonus,
   START_SCENE_ID,
   TRAIT_KEYS,
   validateAndRepair,
@@ -149,6 +154,24 @@ export type LevelUpSkillResult =
   | { ok: false; reason: "unknown" | "maxed" | "insufficient" }
   | { ok: true; skillId: string; level: number; cost: number };
 
+// Result of attempting to level up an inner art via w-exp.
+export type LevelUpArtResult =
+  | { ok: false; reason: "unknown" | "maxed" | "insufficient" }
+  | { ok: true; artId: string; level: number; cost: number };
+
+// Result of attempting "ฝึกฝน" on a learned skill / art at a location.
+export type PracticeResult =
+  | { ok: false; reason: "no-build" | "stamina" | "unknown" | "not-allowed" }
+  | {
+      ok: true;
+      kind: "skill" | "art";
+      id: string;
+      xpGained: number;
+      bonusMult: number;
+      leveledUp: boolean;
+      newLevel: number;
+    };
+
 // ─── Shop / sect-hall result types ────────────────────────────────────
 export type BuyResult =
   | { ok: false; reason: "unknown" | "not-for-sale" | "no-gold" }
@@ -200,6 +223,18 @@ const W_EXP_PRACTICE_MUSIC = 5;
 const W_EXP_FIGHT_WIN = 50;
 // Per-skill xp gained for each use of a skill in a battle the player won.
 const SKILL_USE_XP = 20;
+// Per-art xp gained for each art active fired in a battle the player won.
+// Same value as SKILL_USE_XP — the natural 2× difficulty comes from the
+// art-tier xp curve being 2× the move-skill curve, not from a smaller drop.
+const ART_USE_XP = 20;
+
+// "ฝึกฝน" practice action — costs stamina + ชั่วยาม, awards xp on the
+// chosen skill / art. Practice xp scales with the location's category-type
+// bonus (forest/cave/mountain/river — see lib/world/location-categories.ts).
+export const PRACTICE_STAMINA_COST = 30;
+export const PRACTICE_HOURS = 6;
+const PRACTICE_BASE_XP = 30;
+const W_EXP_PRACTICE = 5;
 
 interface WorldStore extends WorldStateData {
   // Actions
@@ -232,6 +267,15 @@ interface WorldStore extends WorldStateData {
   // one tier. The skill's own xp bar auto-levels on overflow without any
   // user action — no separate "level up via skill xp" button is needed.
   levelUpSkillFromWExp: (skillId: string) => LevelUpSkillResult;
+  // Mirror of levelUpSkillFromWExp for inner arts. Cost = xpToNextArtLevel
+  // (2× the equivalent skill cost). Auto-leveling on artExp overflow is
+  // handled by applyArtLevelUps post-battle.
+  levelUpArtFromWExp: (artId: string) => LevelUpArtResult;
+  // "ฝึกฝน" — train a single skill / art at the current location. `rawId`
+  // accepts the slot-encoded form ("art:xxx" for inner arts, bare id for
+  // move skills). Costs PRACTICE_STAMINA_COST + PRACTICE_HOURS; xp scales
+  // with the location's category-type bonus.
+  practiceSkill: (rawId: string) => PracticeResult;
 
   // Shop / sect-hall purchases. All return a discriminated result so the
   // popups can show the right toast on success / failure.
@@ -304,6 +348,7 @@ const emptyData = (): WorldStateData => ({
   wExp: 0,
   skillLevel: {},
   skillExp: {},
+  artExp: {},
   statExp: emptyStatExp(),
   traits: emptyTraits(),
   npcStates: {},
@@ -386,6 +431,7 @@ function rollLukXp(state: WorldStateData): void {
 function applySkillLevelUps(state: WorldStateData, skillId: string): void {
   const sk = getSkill(skillId);
   if (!sk) return;
+  let levelsGained = 0;
   while (true) {
     const lv = state.skillLevel[skillId] ?? 1;
     if (lv >= SKILL_LEVEL_MAX) break;
@@ -394,8 +440,49 @@ function applySkillLevelUps(state: WorldStateData, skillId: string): void {
     if (xp < cost) break;
     state.skillLevel[skillId] = lv + 1;
     state.skillExp[skillId] = xp - cost;
+    levelsGained++;
+  }
+  if (levelsGained > 0) {
+    appendActionLog(
+      state,
+      "learn",
+      `วิชาฝีมือ ${sk.n} เลื่อนขั้นเป็น Lv.${state.skillLevel[skillId]}`,
+    );
   }
   syncPlayerSkillLevels(state);
+}
+
+// Auto-level an inner art while its xp pool allows. Levels live on
+// `playerBuild.artLevels`; xp lives on top-level `state.artExp`. Caps at
+// ART_LEVEL_MAX and rolls overflow forward.
+function applyArtLevelUps(state: WorldStateData, artId: string): void {
+  const art = getArt(artId);
+  if (!art || art.id === "none") return;
+  let build: CharacterBuild | null = state.playerBuild;
+  if (!build) return;
+  let levelsGained = 0;
+  while (true) {
+    const cur: number = build.artLevels?.[artId] ?? 1;
+    if (cur >= ART_LEVEL_MAX) break;
+    const cost = xpToNextArtLevel(art, cur);
+    const xp = state.artExp[artId] ?? 0;
+    if (xp < cost) break;
+    build = {
+      ...build,
+      artLevels: { ...(build.artLevels ?? {}), [artId]: cur + 1 },
+    };
+    state.artExp[artId] = xp - cost;
+    levelsGained++;
+  }
+  state.playerBuild = build;
+  if (levelsGained > 0) {
+    const newLv = build.artLevels?.[artId] ?? 1;
+    appendActionLog(
+      state,
+      "learn",
+      `วิชาในกาย ${art.n} เลื่อนขั้นเป็น ${newLv}`,
+    );
+  }
 }
 
 // In-place time advance. Rolls `time` over each `HOURS_PER_DAY` and
@@ -527,6 +614,7 @@ function draftFrom(s: WorldStateData): WorldStateData {
     wExp: s.wExp,
     skillLevel: { ...s.skillLevel },
     skillExp: { ...s.skillExp },
+    artExp: { ...s.artExp },
     statExp: { ...s.statExp },
     traits: { ...s.traits },
     npcStates: { ...s.npcStates },
@@ -755,6 +843,29 @@ export const useWorldStore = create<WorldStore>()(
           } else if (sk.at === "int") {
             grantStatXp(draft, "POW", count * STAT_XP_PER_ACTION);
           }
+        }
+        // Inner-art XP — every art active fired counts toward its own
+        // per-art pool, mirroring the move-skill loop above. Auto-levels
+        // when the pool overflows the (2×) art-tier cost.
+        const artUses = battleState?.artUses?.A ?? {};
+        for (const [aid, count] of Object.entries(artUses)) {
+          if (typeof count !== "number" || count <= 0) continue;
+          const art = getArt(aid);
+          if (!art || art.id === "none") continue;
+          draft.artExp[aid] = (draft.artExp[aid] ?? 0) + count * ART_USE_XP;
+          // Make sure an artLevels entry exists so applyArtLevelUps can
+          // read a starting level — also covers legacy builds that learned
+          // an art without populating artLevels.
+          if (draft.playerBuild) {
+            const cur = draft.playerBuild.artLevels?.[aid];
+            if (typeof cur !== "number") {
+              draft.playerBuild = {
+                ...draft.playerBuild,
+                artLevels: { ...(draft.playerBuild.artLevels ?? {}), [aid]: 1 },
+              };
+            }
+          }
+          applyArtLevelUps(draft, aid);
         }
         // DEF — one tick per incoming hit landed during the fight.
         const hits = battleState?.hitsReceived?.A ?? 0;
@@ -1137,8 +1248,128 @@ export const useWorldStore = create<WorldStore>()(
         draft.wExp -= cost;
         draft.skillLevel[skillId] = lv + 1;
         syncPlayerSkillLevels(draft);
+        appendActionLog(
+          draft,
+          "learn",
+          `เร่งวิชาฝีมือ ${sk.n} → Lv.${lv + 1} (-${cost} w-exp)`,
+        );
         set({ ...draft });
         return { ok: true, skillId, level: lv + 1, cost };
+      },
+
+      levelUpArtFromWExp: (artId) => {
+        const s = get();
+        const art = getArt(artId);
+        if (!art || art.id === "none") return { ok: false, reason: "unknown" };
+        if (!s.playerBuild) return { ok: false, reason: "unknown" };
+        const lv = s.playerBuild.artLevels?.[artId] ?? 1;
+        if (lv >= ART_LEVEL_MAX) return { ok: false, reason: "maxed" };
+        const cost = xpToNextArtLevel(art, lv);
+        if (s.wExp < cost) return { ok: false, reason: "insufficient" };
+
+        const draft = draftFrom(s);
+        draft.wExp -= cost;
+        draft.playerBuild = {
+          ...draft.playerBuild!,
+          artLevels: {
+            ...(draft.playerBuild!.artLevels ?? {}),
+            [artId]: lv + 1,
+          },
+        };
+        appendActionLog(
+          draft,
+          "learn",
+          `เร่งวิชาในกาย ${art.n} → ขั้น ${lv + 1} (-${cost} w-exp)`,
+        );
+        set({ ...draft });
+        return { ok: true, artId, level: lv + 1, cost };
+      },
+
+      practiceSkill: (rawId) => {
+        const s = get();
+        if (!s.playerBuild) return { ok: false, reason: "no-build" };
+        const info = parseSlotId(rawId);
+        if (!info) return { ok: false, reason: "unknown" };
+        // Only practice at locations whose categories permit it.
+        const sceneNow = getScene(s.currentSceneId);
+        const locScene = sceneNow?.kind === "location" ? sceneNow : null;
+        if (!locScene || !canPracticeAt(locScene)) {
+          return { ok: false, reason: "not-allowed" };
+        }
+        if (s.stamina < PRACTICE_STAMINA_COST) {
+          return { ok: false, reason: "stamina" };
+        }
+
+        const draft = draftFrom(s);
+        draft.stamina = Math.max(0, draft.stamina - PRACTICE_STAMINA_COST);
+        advanceTime(draft, PRACTICE_HOURS);
+        draft.wExp += W_EXP_PRACTICE;
+
+        if (info.kind === "skill") {
+          const sk = info.skill;
+          const types = effectiveTypes(sk);
+          const mult = practiceXpBonus(locScene, types);
+          const xpGained = Math.floor(PRACTICE_BASE_XP * mult);
+          draft.skillExp[sk.id] = (draft.skillExp[sk.id] ?? 0) + xpGained;
+          if (!(sk.id in draft.skillLevel)) draft.skillLevel[sk.id] = 1;
+          const beforeLv = draft.skillLevel[sk.id]!;
+          applySkillLevelUps(draft, sk.id);
+          const afterLv = draft.skillLevel[sk.id]!;
+          const leveledUp = afterLv > beforeLv;
+          appendActionLog(
+            draft,
+            "learn",
+            `ฝึก ${sk.n} · +${xpGained} xp${mult > 1 ? ` (×${mult.toFixed(2)})` : ""}` +
+              (leveledUp ? ` · ขึ้น Lv.${afterLv}` : ""),
+          );
+          set({ ...draft });
+          return {
+            ok: true,
+            kind: "skill",
+            id: sk.id,
+            xpGained,
+            bonusMult: mult,
+            leveledUp,
+            newLevel: afterLv,
+          };
+        }
+
+        // Art branch
+        const art = info.art;
+        const types = effectiveTypes(art);
+        const mult = practiceXpBonus(locScene, types);
+        const xpGained = Math.floor(PRACTICE_BASE_XP * mult);
+        draft.artExp[art.id] = (draft.artExp[art.id] ?? 0) + xpGained;
+        const beforeLv = draft.playerBuild!.artLevels?.[art.id] ?? 1;
+        // Make sure artLevels has an entry so applyArtLevelUps starts from 1.
+        if (typeof draft.playerBuild!.artLevels?.[art.id] !== "number") {
+          draft.playerBuild = {
+            ...draft.playerBuild!,
+            artLevels: {
+              ...(draft.playerBuild!.artLevels ?? {}),
+              [art.id]: 1,
+            },
+          };
+        }
+        applyArtLevelUps(draft, art.id);
+        const afterLv = draft.playerBuild!.artLevels?.[art.id] ?? beforeLv;
+        const leveledUp = afterLv > beforeLv;
+        appendActionLog(
+          draft,
+          "learn",
+          `ฝึก ${art.n} · +${xpGained} xp${mult > 1 ? ` (×${mult.toFixed(2)})` : ""}` +
+            (leveledUp ? ` · ขึ้นขั้น ${afterLv}` : ""),
+        );
+        set({ ...draft });
+        return {
+          ok: true,
+          kind: "art",
+          id: art.id,
+          xpGained,
+          bonusMult: mult,
+          leveledUp,
+          newLevel: afterLv,
+        };
       },
 
       buyItem: (itemId, count) => {
@@ -1382,7 +1613,7 @@ export const useWorldStore = create<WorldStore>()(
     }),
     {
       name: "wusia-world-v1",
-      version: 12,
+      version: 13,
       // Only persist the data fields, not the action functions.
       partialize: (s) => ({
         hasGame: s.hasGame,
@@ -1401,6 +1632,7 @@ export const useWorldStore = create<WorldStore>()(
         wExp: s.wExp,
         skillLevel: s.skillLevel,
         skillExp: s.skillExp,
+        artExp: s.artExp,
         statExp: s.statExp,
         traits: s.traits,
         npcStates: s.npcStates,
@@ -1437,6 +1669,10 @@ export const useWorldStore = create<WorldStore>()(
       //            advance bookkeeping). Existing saves start empty — quest
       //            progress that depended on past kills/visits won't auto-
       //            backfill, which is fine for net-new content.
+      //   v12 → v13 added artExp (per-art xp pool, parallel to skillExp).
+      //            Existing saves start with empty pools — arts the player
+      //            already learned keep their existing artLevels and grow
+      //            from there.
       migrate: (persisted, fromVersion) => {
         const p = (persisted ?? {}) as Partial<WorldStateData>;
         // Pad the build's skillIds to 10 and back-fill learned arrays.
@@ -1497,6 +1733,7 @@ export const useWorldStore = create<WorldStore>()(
           wExp: typeof p.wExp === "number" && p.wExp >= 0 ? p.wExp : 0,
           skillLevel: p.skillLevel && typeof p.skillLevel === "object" ? { ...p.skillLevel } : {},
           skillExp: p.skillExp && typeof p.skillExp === "object" ? { ...p.skillExp } : {},
+          artExp: p.artExp && typeof p.artExp === "object" ? { ...p.artExp } : {},
           statExp: { ...emptyStatExp(), ...(p.statExp ?? {}) } as Record<StatKey, number>,
           traits: { ...emptyTraits(), ...(p.traits ?? {}) } as Record<TraitKey, number>,
           npcStates: p.npcStates && typeof p.npcStates === "object" ? { ...p.npcStates } : {},

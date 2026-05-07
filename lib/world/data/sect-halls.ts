@@ -1,8 +1,9 @@
 // ─── สำนักยุทธิ์ประจำเมือง / City Sect Halls ────────────────────────
-// Each city has a martial school where the player can purchase tier 0–1
-// move skills and inner skills. The offerings differ per city — the user
-// asked for that variety so picking which city to drift through actually
-// matters for build choice.
+// Each city has a public martial school where the player can purchase
+// tier 0–1 move skills and inner skills. **Open-world / ยุทธจักร styles
+// only** — sect-affiliated lineages (เส้าหลิน, อู่ตัง, …) cannot be
+// bought here; the player has to seek out the parent sect for those.
+// Offerings still differ per city to make wandering the map worthwhile.
 //
 // Buying a skill grants it via the same path as the `learnSkill` /
 // `learnArt` SceneEffect (auto-slots into the first empty slot).
@@ -46,9 +47,9 @@ export const SECT_HALLS: readonly SectHallDef[] = [
     label: "🏯 สำนักยุทธิ์นครหลวง",
     description: "ศูนย์ฝึกประจำนครหลวง รวมวิชาพื้นฐานหลากหลายแขนง",
     offers: [
-      skill("nc1", 0), skill("nc4", 0), skill("nc7", 0),
+      skill("nc4", 0), skill("nc7", 0), skill("nc10", 0),
       skill("nm2", 1), skill("nd11", 1),
-      art("t0_lohan", 0), art("t1_whitehorse", 1),
+      art("t0_fiveyuan", 0), art("t1_whitehorse", 1),
     ],
   },
   // Xixia — frontier physical / harsh-climate styles.
@@ -91,7 +92,7 @@ export const SECT_HALLS: readonly SectHallDef[] = [
     description: "สำนักประจำเมืองสายน้ำริมทะเลสาบ เน้นวิชาอ่อนและคล่องแคล่ว",
     offers: [
       skill("nc8", 0), skill("nc9", 0), skill("ns2", 0),
-      skill("rf", 1), skill("cs", 1), skill("nd1", 1),
+      skill("nd1", 1), skill("nd8", 1), skill("nd11", 1),
       art("t0_butterfly", 0), art("t0_sevenstar", 0), art("t1_whitehorse", 1),
     ],
   },
@@ -101,7 +102,7 @@ export const SECT_HALLS: readonly SectHallDef[] = [
     label: "🏯 สำนักยุทธิ์จินหลิง",
     description: "เมืองโบราณราชธานีฝ่ายใต้ เน้นวิชาทางในและกระบี่บัณฑิต",
     offers: [
-      skill("nc3", 0), skill("nc9", 0), skill("tj", 0),
+      skill("nc3", 0), skill("nc9", 0), skill("qf", 0),
       skill("nm1", 1), skill("nd6", 1), skill("nd2", 1),
       art("t0_butterfly", 0), art("t1_whitehorse", 1), art("t1_redlotus", 1),
     ],
@@ -114,7 +115,7 @@ export const SECT_HALLS: readonly SectHallDef[] = [
     offers: [
       skill("dg", 0), skill("nc5", 0), skill("nc6", 0), skill("nc7", 0),
       skill("ig", 1), skill("nd4", 1), skill("nd10", 1),
-      art("t0_lohan", 0), art("t0_fiveyuan", 0), art("t1_goldenbell", 1),
+      art("t0_sevenstar", 0), art("t0_fiveyuan", 0), art("t1_eagleclaw", 1),
     ],
   },
 ];

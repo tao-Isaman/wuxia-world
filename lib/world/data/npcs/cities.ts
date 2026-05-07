@@ -34,6 +34,17 @@ export const NPCS_CITIES: readonly NpcDef[] = [
     ],
     tags: ["healer", "scholar"],
   },
+  {
+    // Pickup contact for delivery quests originating in the capital. The
+    // merchant himself doesn't offer or turn in any quest; he just hands
+    // over a package when the player arrives with the right active quest.
+    id: "city_capital_merchant_wang",
+    name: "พ่อค้าหวัง",
+    description: "พ่อค้าผู้ค้าเครื่องเทศและของหายากในนครหลวง ลูกค้าทุกหัวเมืองรู้จักชื่อ",
+    locationIds: ["city_capital"],
+    dialogSceneId: "npc_city_capital_merchant_wang_talk",
+    tags: ["merchant"],
+  },
 
   // ─── city_xixia ────────────────────────────────────────────────────
   {
@@ -104,6 +115,17 @@ export const NPCS_CITIES: readonly NpcDef[] = [
   },
 
   // ─── city_suzhou ───────────────────────────────────────────────────
+  {
+    // Pickup contact for the dali missing-page delivery. Holds the missing
+    // pages that scholar_duan wants returned. Doesn't offer / turn in any
+    // quest itself — the dialog branch keys off the active quest status.
+    id: "city_suzhou_book_merchant_li",
+    name: "พ่อค้าหนังสือลี่",
+    description: "พ่อค้าหนังสือเก่าผู้รวบรวมต้นฉบับโบราณจากทั่วยุทธจักร เปิดร้านเล็ก ๆ ใกล้ตลาดริมน้ำซูโจว",
+    locationIds: ["city_suzhou"],
+    dialogSceneId: "npc_city_suzhou_book_merchant_li_talk",
+    tags: ["merchant", "scholar"],
+  },
   {
     id: "city_suzhou_weaver_mei",
     name: "ช่างทอเหมย",

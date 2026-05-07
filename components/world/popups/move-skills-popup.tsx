@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Combobox, type ComboOption } from "@/components/ui/combobox";
 import {
+  ART_LEVEL_MAX,
   SKILL_LEVEL_MAX,
   SKILL_TYPE_LABEL,
   TIERS,
@@ -18,13 +19,16 @@ import {
   effectiveTypes,
   encodeArtSlot,
   getArt,
+  getMasteryMap,
   getSkill,
   getStatusFactor,
   isArtSlot,
   mgMultiplier,
   parseSlotId,
+  xpToNextArtLevel,
   xpToNextLevel,
 } from "@/lib/game";
+import type { WeaponFamily } from "@/lib/game";
 import { useWorldStore } from "@/store/world-store";
 
 interface Props {
@@ -41,8 +45,10 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
   const player = useWorldStore((s) => s.playerBuild);
   const skillLevel = useWorldStore((s) => s.skillLevel);
   const skillExp = useWorldStore((s) => s.skillExp);
+  const artExp = useWorldStore((s) => s.artExp);
   const wExp = useWorldStore((s) => s.wExp);
   const levelUpFromWExp = useWorldStore((s) => s.levelUpSkillFromWExp);
+  const levelUpArtFromWExp = useWorldStore((s) => s.levelUpArtFromWExp);
   const equipSlot = useWorldStore((s) => s.equipSlot);
 
   const learnedSkillIds = player?.learnedSkillIds ?? [];
@@ -97,20 +103,63 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
   // it anyway, but this is clearer UI).
   const equippedSet = new Set(slots.filter((s): s is string => !!s));
 
+  // Aggregate "what have I gained on this tab" — counts, total levels,
+  // mastery points by weapon, currently-equipped art level.
+  const totalSkills = learnedSkillIds.length;
+  const totalArts = learnedArtIds.length;
+  const skillLevelSum = learnedSkillIds.reduce(
+    (sum, sid) => sum + (skillLevel[sid] ?? 1),
+    0,
+  );
+  let equippedArtLv: number | null = null;
+  for (const raw of slots) {
+    const info = parseSlotId(raw);
+    if (info?.kind === "art") {
+      equippedArtLv = player.artLevels?.[info.art.id] ?? 1;
+      break;
+    }
+  }
+  const mastery = getMasteryMap(player.skillIds, player.skillLevels);
+
   return (
     <Modal open={open} onClose={onClose} title={`🥋 วิชาฝีมือ (${slots.length} ช่อง)`}>
-      <div className="mb-3 flex items-center gap-2 text-xs flex-wrap">
-        <Badge variant="outline" className="text-[10px]">
-          ค่าประสบการณ์ (w-exp)
-        </Badge>
-        <span className="font-mono font-semibold">{wExp}</span>
+      {/* ─── Tab status — what's been gained ───────────────────────── */}
+      <div className="mb-3 rounded bg-muted/30 px-3 py-2 space-y-1.5 text-xs">
+        <div className="flex items-center gap-3 flex-wrap">
+          <span className="text-[10px] text-muted-foreground uppercase tracking-wide">
+            สถานะที่สั่งสม
+          </span>
+          <span>วิชาฝีมือ <strong>{totalSkills}</strong></span>
+          <span>วิชาในกาย <strong>{totalArts}</strong></span>
+          <span>ขั้นรวม <strong className="text-emerald-600">{skillLevelSum}</strong></span>
+          {equippedArtLv !== null && (
+            <span>วิชาในกายขั้น <strong>{equippedArtLv}</strong></span>
+          )}
+          <span>w-exp <strong className="font-mono text-primary">{wExp}</strong></span>
+        </div>
+        {Object.keys(mastery).length > 0 && (
+          <div className="flex items-center gap-1.5 flex-wrap text-[10px]">
+            <span className="text-muted-foreground">ฝีมือ:</span>
+            {Object.entries(mastery).map(([w, v]) => (
+              <span
+                key={w}
+                className="bg-muted/50 px-1.5 py-0.5 rounded"
+                title={WEAPON_FAMILY_HINT[w as WeaponFamily]}
+              >
+                <strong className="text-primary">{Math.floor(v ?? 0)}</strong>
+                <span className="opacity-70"> pt </span>
+                {WEAPON_FAMILY_LABEL[w as WeaponFamily]}
+              </span>
+            ))}
+          </div>
+        )}
         {conflictedTypes.length > 0 && (
-          <span className="ml-2 text-[10px] text-rose-600">
+          <div className="text-[10px] text-rose-600">
             ขัดแย้ง:{" "}
             {conflictedTypes
               .map((t) => `${SKILL_TYPE_LABEL[t]} ×${(conflict[t] ?? 1).toFixed(1)}`)
               .join(", ")}
-          </span>
+          </div>
         )}
       </div>
 
@@ -166,6 +215,17 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
             const lv = player.artLevels?.[art.id] ?? 1;
             const types = effectiveTypes(art);
             const cFactor = getStatusFactor(art, conflict);
+            const artStatRow = Object.entries(art.stats)
+              .map(([k, v]) => `${k}+${Math.floor((v * lv) / 10)}`)
+              .join(" ");
+            const artMaxed = lv >= ART_LEVEL_MAX;
+            const aXp = artExp[art.id] ?? 0;
+            const aCost = artMaxed ? Infinity : xpToNextArtLevel(art, lv);
+            const aXpCapped = artMaxed ? 1 : Math.min(aXp, aCost);
+            const aXpPct = artMaxed
+              ? 100
+              : Math.min(100, Math.round((aXp / aCost) * 100));
+            const canArtWExp = !artMaxed && wExp >= aCost;
             return (
               <div key={i} className="rounded bg-muted/30 px-2 py-2 space-y-1.5">
                 {slotHeader}
@@ -173,8 +233,11 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
                   <div className="flex items-center gap-2 flex-wrap">
                     <Badge variant="default" className="text-[10px]">☯ วิชาในกาย</Badge>
                     <strong className="text-sm">{art.n}</strong>
+                    <Badge variant="default" className="text-[10px]">
+                      ขั้น {lv}{artMaxed ? " (สูงสุด)" : ""}
+                    </Badge>
                     <Badge variant="outline" className="text-[9px]">{art.sc}</Badge>
-                    <Badge variant="outline" className="text-[9px]">ขั้น {lv}</Badge>
+                    <Badge variant="outline" className="text-[9px]">{art.tp}</Badge>
                     {types.map((t) => (
                       <Badge key={t} variant="outline" className="text-[9px] opacity-80">
                         {SKILL_TYPE_LABEL[t]}
@@ -186,6 +249,13 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
                       </Badge>
                     )}
                   </div>
+                  {(artStatRow || art.hL || art.mL) && (
+                    <div className="text-[10px] text-emerald-700">
+                      โบนัส:{artStatRow ? ` ${artStatRow}` : ""}
+                      {art.hL ? ` HP+${art.hL * lv}` : ""}
+                      {art.mL ? ` MP+${art.mL * lv}` : ""}
+                    </div>
+                  )}
                   {art.act && (
                     <div className="text-[11px] text-muted-foreground">
                       ⚡ <strong>{art.act.n}</strong> · MP {art.act.c} · CD {art.act.cd} · {art.act.d}
@@ -193,6 +263,38 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
                   )}
                   {art.pas && (
                     <div className="text-[10px] text-muted-foreground">◆ {art.pas.d}</div>
+                  )}
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between text-[10px]">
+                      <span className="text-muted-foreground">
+                        {artMaxed
+                          ? "ขั้นสูงสุดแล้ว"
+                          : `xp ${aXpCapped}/${aCost} (ตี-${art.ti + 1} · 2× ของวิชาฝีมือ)`}
+                      </span>
+                    </div>
+                    <div className="h-1.5 bg-muted rounded overflow-hidden">
+                      <div
+                        className={`h-full ${artMaxed ? "bg-amber-500" : "bg-primary"}`}
+                        style={{ width: `${aXpPct}%` }}
+                      />
+                    </div>
+                  </div>
+                  {!artMaxed && (
+                    <div className="flex items-center justify-between gap-2 pt-1">
+                      <span className="text-[10px] text-muted-foreground italic">
+                        เลื่อนขั้นเองเมื่อ xp เต็ม
+                      </span>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-[11px] h-7"
+                        disabled={!canArtWExp}
+                        onClick={() => levelUpArtFromWExp(art.id)}
+                        title={canArtWExp ? `ใช้ ${aCost} w-exp` : `ต้องการ ${aCost} w-exp`}
+                      >
+                        เร่งด้วย w-exp ({aCost})
+                      </Button>
+                    </div>
                   )}
                 </div>
               </div>
@@ -245,6 +347,15 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
                     </Badge>
                   )}
                 </div>
+                {Object.keys(sk.st).length > 0 && (
+                  <div className="text-[10px] text-emerald-700">
+                    โบนัส:{" "}
+                    {Object.entries(sk.st)
+                      .map(([k, v]) => `${k}+${Math.floor((v as number) * bpMultiplier(lv))}`)
+                      .join(" ")}
+                    <span className="opacity-60"> ({bpMul}% ของ Lv.10)</span>
+                  </div>
+                )}
                 <div className="text-[11px] text-muted-foreground">{sk.d}</div>
                 <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-[10px] text-muted-foreground">
                   <span>BP {eBp} <span className="opacity-60">({bpMul}% ของ {sk.bp})</span></span>

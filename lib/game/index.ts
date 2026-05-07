@@ -39,13 +39,17 @@ export {
   SKILL_LEVEL_MIN,
   SKILL_LEVEL_MAX,
   SKILL_XP_BASE,
+  ART_LEVEL_MIN,
+  ART_LEVEL_MAX,
   getSkillLevel,
   clampLevel,
+  clampArtLevel,
   bpMultiplier,
   mgMultiplier,
   effectiveBp,
   effectiveMg,
   xpToNextLevel,
+  xpToNextArtLevel,
 } from "./leveling";
 export {
   CONFLICT_MIN_LEARNED,
