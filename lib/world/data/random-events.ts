@@ -35,6 +35,12 @@ export const EVENT_PROBABILITY = {
   // Fight is fixed at 15 %. Random encounters now route through a
   // fight-or-flee screen so the player can decline.
   fight: 0.15,
+  // Hunt-boost fight chance — used by `rollRandomEvent` when the player
+  // has at least one active quest stage with a `defeatedOpponent`
+  // autoAdvance AND the target opponent spawns in the current zone.
+  // Treasure / meet bands are suppressed during a hunt (the player is
+  // focused; flavor events get out of the way).
+  fightHunting: 0.80,
   // Treasure: 5 % base + LUK / 200, capped at 25 %.
   treasureBase: 0.05,
   treasureLukDivisor: 200,

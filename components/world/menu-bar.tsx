@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Panel } from "@/components/ui/wuxia/panel";
+import { WuxiaButton } from "@/components/ui/wuxia/button";
 import { Badge } from "@/components/ui/badge";
 import { useWorldStore } from "@/store/world-store";
 import { ProfilePopup } from "./popups/profile-popup";
@@ -21,69 +21,92 @@ type PopupId =
   | "log"
   | null;
 
-// Main-screen menu bar — popup buttons, one popup at a time. The bar lives
-// directly under the StatusBar in WorldScreen so it's reachable from every
-// scene kind (location / route / dialog).
+// Main-screen menu bar — popup buttons, one popup at a time. The bar
+// lives directly under the StatusBar in WorldScreen so it's reachable
+// from every scene kind (location / route / dialog).
 //
-// The 🥋 วิชาฝีมือ tab manages BOTH move skills and inner arts: each of the
-// 10 slots can hold either kind, so a separate ☯ inner-skills popup would
-// just duplicate state.
+// Wuxia redesign: each tab is a pixel-bordered WuxiaButton instead of a
+// plain shadcn outline button. The grid is 3 columns on mobile (two
+// rows of three) and 6 columns on `sm+`, so touch targets stay ≥40px
+// even on the narrowest phones.
+//
+// The 🥋 วิชาฝีมือ tab manages BOTH move skills and inner arts: each
+// of the 10 slots can hold either kind, so a separate ☯ inner-skills
+// popup would just duplicate state.
 export function MenuBar() {
   const [open, setOpen] = useState<PopupId>(null);
   const close = () => setOpen(null);
-  // Active-quest counter for the badge on the ภารกิจ tab — gives the
-  // player a quick at-a-glance "you've got things underway" hint without
-  // them having to open the popup first.
+  // Active-quest counter for the seal badge on the ภารกิจ tab.
   const activeQuestCount = useWorldStore(
     (s) => Object.values(s.quests).filter((q) => q.status === "active").length,
   );
 
   return (
     <>
-      <Card>
-        <CardContent className="p-2">
-          <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5">
-            <Button variant="outline" size="sm" onClick={() => setOpen("profile")}>
-              👤 โปรไฟล์
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => setOpen("inventory")}>
-              🎒 ของในย่าม
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => setOpen("moves")}>
-              🥋 วิชาฝีมือ
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => setOpen("lifeskills")}>
-              🌾 วิชาชีพ
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setOpen("quests")}
-              className="relative"
-            >
-              📋 ภารกิจ
-              {activeQuestCount > 0 && (
-                <Badge
-                  variant="default"
-                  className="ml-1 text-[9px] px-1.5 py-0 h-4 leading-none"
-                >
-                  {activeQuestCount}
-                </Badge>
-              )}
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => setOpen("log")}>
-              📜 บันทึก
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      <Panel padding="p-2">
+        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+          <MenuTab
+            label="โปรไฟล์"
+            onClick={() => setOpen("profile")}
+          />
+          <MenuTab
+            label="ของในย่าม"
+            onClick={() => setOpen("inventory")}
+          />
+          <MenuTab
+            label="วิชาฝีมือ"
+            onClick={() => setOpen("moves")}
+          />
+          <MenuTab
+            label="วิชาชีพ"
+            onClick={() => setOpen("lifeskills")}
+          />
+          <MenuTab
+            label="ภารกิจ"
+            onClick={() => setOpen("quests")}
+            badge={activeQuestCount > 0 ? activeQuestCount : undefined}
+          />
+          <MenuTab label="บันทึก" onClick={() => setOpen("log")} />
+        </div>
+      </Panel>
 
-      <ProfilePopup     open={open === "profile"}    onClose={close} />
-      <InventoryPopup   open={open === "inventory"}  onClose={close} />
-      <MoveSkillsPopup  open={open === "moves"}      onClose={close} />
-      <LifeSkillsPopup  open={open === "lifeskills"} onClose={close} />
-      <QuestLogPopup    open={open === "quests"}     onClose={close} />
-      <ActionLogPopup   open={open === "log"}        onClose={close} />
+      <ProfilePopup open={open === "profile"} onClose={close} />
+      <InventoryPopup open={open === "inventory"} onClose={close} />
+      <MoveSkillsPopup open={open === "moves"} onClose={close} />
+      <LifeSkillsPopup open={open === "lifeskills"} onClose={close} />
+      <QuestLogPopup open={open === "quests"} onClose={close} />
+      <ActionLogPopup open={open === "log"} onClose={close} />
     </>
+  );
+}
+
+interface MenuTabProps {
+  label: string;
+  onClick: () => void;
+  badge?: number;
+}
+
+// Single menu tab. Stack-layout: pixel emoji icon on top, Charm display
+// label below. The icon gets `.pixel` rendering so emojis stay crisp at
+// every DPR; the label uses Charm so the proper-noun feel carries
+// across the whole nav.
+function MenuTab({ label, onClick, badge }: MenuTabProps) {
+  return (
+    <WuxiaButton
+      variant="default"
+      size="sm"
+      onClick={onClick}
+      className="h-auto py-2 flex-col gap-0.5 relative"
+    >
+      <span className="text-[11px] sm:text-xs leading-tight">{label}</span>
+      {typeof badge === "number" && (
+        <Badge
+          variant="seal"
+          className="absolute -top-1 -right-1 text-[9px] px-1 h-4 leading-none"
+        >
+          {badge}
+        </Badge>
+      )}
+    </WuxiaButton>
   );
 }

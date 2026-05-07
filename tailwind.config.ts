@@ -2,6 +2,11 @@ import type { Config } from "tailwindcss";
 import animate from "tailwindcss-animate";
 
 const config: Config = {
+  // Light-mode-only after the wuxia ink-on-paper redesign. Keeping
+  // `darkMode: ["class"]` would let stray `dark:*` Tailwind classes still
+  // engage if anyone forgets to scrub them — set to "class" but the
+  // matching CSS variables in globals.css are gone, so the toggle is a
+  // no-op now.
   darkMode: ["class"],
   content: [
     "./app/**/*.{ts,tsx}",
@@ -52,11 +57,38 @@ const config: Config = {
         // Game-specific accent colors
         sideA: "hsl(var(--side-a))",
         sideB: "hsl(var(--side-b))",
+        // Wuxia palette aliases — semantic names for places where the
+        // shadcn semantic tokens don't fit (e.g., HP red vs destructive
+        // red). All driven by the same CSS variables so a future palette
+        // tweak in globals.css is the single source of truth.
+        ink: "hsl(var(--foreground))",
+        paper: "hsl(var(--background))",
+        vermilion: "hsl(var(--primary))",
+        jade: "hsl(var(--accent))",
+      },
+      fontFamily: {
+        // Charm — calligraphic display font for proper nouns, sect /
+        // character / skill names, and section headers (≥18px). Limited
+        // Thai coverage at small sizes — never use below 16px.
+        display: ["var(--font-display)", "serif"],
+        // Sarabun — high-coverage Thai serif for body text, dialog,
+        // narration, and any number / metric display. Default sans.
+        sans: ["var(--font-body)", "system-ui", "sans-serif"],
       },
       borderRadius: {
+        // Pixel-art chrome has no rounded corners. Existing `rounded-*`
+        // classes in the codebase still compile but render flat.
         lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        md: "var(--radius)",
+        sm: "var(--radius)",
+      },
+      boxShadow: {
+        // Stacked-shadow step-bevel for pixel-art buttons. Inset shadows
+        // produce a 2px inner highlight (top-left) + 2px inner shade
+        // (bottom-right); the outer drop is a 2px ink ledge. `pixel-down`
+        // swaps inset directions for the :active / pressed state.
+        pixel: "inset 2px 2px 0 hsl(40 35% 99%), inset -2px -2px 0 hsl(20 25% 28%), 0 2px 0 hsl(20 15% 12%)",
+        "pixel-down": "inset -2px -2px 0 hsl(40 35% 99%), inset 2px 2px 0 hsl(20 25% 28%), 0 0 0 hsl(20 15% 12%)",
       },
       keyframes: {
         "accordion-down": {

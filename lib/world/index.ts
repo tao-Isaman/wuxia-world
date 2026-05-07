@@ -67,6 +67,7 @@ export { evaluateCondition, getQuestStatus } from "./conditions";
 export {
   applyEffect,
   applyEffects,
+  collectActiveHuntTargets,
   isQuestOfferable,
   isQuestTurnInForNpc,
   tickQuestProgress,

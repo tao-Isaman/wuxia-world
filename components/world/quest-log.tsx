@@ -1,69 +1,100 @@
 "use client";
 
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { getItem, getQuest, type QuestReward } from "@/lib/world";
 import { useWorldStore } from "@/store/world-store";
+import { toast } from "@/store/toast-store";
 import { cn } from "@/lib/utils";
 
-// Quest log. Three buckets:
-//   - Active   → currently underway (shows full stage checklist)
-//   - Done     → completed for the run (success path)
-//   - Failed   → abandoned or failed; only side quests can fail and they
-//                stay in this bucket as a record (never re-offered)
+// Quest log. Tabbed list view:
+//   - กำลังทำ   (active)  — ongoing quests; player can cancel from here
+//   - สำเร็จ    (done)    — completed for the run
+//   - ละทิ้ง   (failed)  — abandoned or failed; only side quests fail and
+//                          they stay here as a record (never re-offered)
 //
-// Side quests get a ✦ marker before the name; main quests use ★. Rewards
-// preview only appears for active quests where the player has yet to claim.
+// Each row shows just the quest name by default (one line per quest);
+// the player clicks a row to expand and read the full briefing, stage
+// checklist, rewards, and (on active quests) a "ละทิ้งภารกิจ" button.
+// Side quests get a ✦ marker; main quests use ★.
 //
 // Two render modes:
 //   - "card"  (default) — wraps the body in a Card for sidebar use
 //   - "popup"           — bare body for use inside the menu-bar Modal
+
+type QuestStatus = "active" | "done" | "failed";
+
 interface QuestLogProps {
   variant?: "card" | "popup";
 }
 
+const TAB_LABEL: Record<QuestStatus, string> = {
+  active: "กำลังทำ",
+  done: "สำเร็จ",
+  failed: "ละทิ้ง",
+};
+
 export function QuestLog({ variant = "card" }: QuestLogProps = {}) {
   const quests = useWorldStore((s) => s.quests);
+  const [tab, setTab] = useState<QuestStatus>("active");
+  // Track which quest rows are expanded — Set so independent rows toggle
+  // freely without forcing an accordion-of-one. Cleared per-tab so the
+  // expansion state doesn't leak across status filters.
+  const [expanded, setExpanded] = useState<Set<string>>(new Set());
+
   const entries = Object.values(quests);
+  const counts: Record<QuestStatus, number> = {
+    active: entries.filter((q) => q.status === "active").length,
+    done: entries.filter((q) => q.status === "done").length,
+    failed: entries.filter((q) => q.status === "failed").length,
+  };
+  const list = entries.filter((q) => q.status === tab);
 
-  const empty = entries.length === 0;
-  const active = entries.filter((q) => q.status === "active");
-  const done = entries.filter((q) => q.status === "done");
-  const failed = entries.filter((q) => q.status === "failed");
+  const onToggle = (questId: string) => {
+    setExpanded((prev) => {
+      const next = new Set(prev);
+      if (next.has(questId)) next.delete(questId);
+      else next.add(questId);
+      return next;
+    });
+  };
+  const onSwitchTab = (next: QuestStatus) => {
+    if (next === tab) return;
+    setTab(next);
+    setExpanded(new Set());
+  };
 
-  const body = empty ? (
-    <p className="text-xs text-muted-foreground italic">ยังไม่มีภารกิจ</p>
-  ) : (
-    <>
-      {active.length > 0 && (
-        <Section title="กำลังทำ" tone="active">
-          {active.map((q) => (
-            <QuestRow key={q.id} questId={q.id} status="active" stage={q.stage} />
+  const body = (
+    <div className="space-y-3">
+      <TabBar tab={tab} counts={counts} onSelect={onSwitchTab} />
+      {list.length === 0 ? (
+        <p className="text-xs text-muted-foreground italic py-2 text-center">
+          {tab === "active"
+            ? "ยังไม่มีภารกิจที่กำลังทำ"
+            : tab === "done"
+              ? "ยังไม่มีภารกิจที่สำเร็จ"
+              : "ยังไม่มีภารกิจที่ละทิ้ง"}
+        </p>
+      ) : (
+        <ul className="space-y-1.5">
+          {list.map((q) => (
+            <QuestRow
+              key={q.id}
+              questId={q.id}
+              status={q.status}
+              stage={q.stage}
+              expanded={expanded.has(q.id)}
+              onToggle={() => onToggle(q.id)}
+            />
           ))}
-        </Section>
+        </ul>
       )}
-
-      {done.length > 0 && (
-        <Section title="สำเร็จแล้ว" tone="done">
-          {done.map((q) => (
-            <QuestRow key={q.id} questId={q.id} status="done" stage={q.stage} />
-          ))}
-        </Section>
-      )}
-
-      {failed.length > 0 && (
-        <Section title="ล้มเหลว" tone="failed">
-          {failed.map((q) => (
-            <QuestRow key={q.id} questId={q.id} status="failed" stage={q.stage} />
-          ))}
-        </Section>
-      )}
-    </>
+    </div>
   );
 
-  if (variant === "popup") {
-    return <div className="space-y-3">{body}</div>;
-  }
+  if (variant === "popup") return body;
 
   return (
     <Card>
@@ -77,118 +108,182 @@ export function QuestLog({ variant = "card" }: QuestLogProps = {}) {
   );
 }
 
-function Section({
-  title,
-  tone,
-  children,
-}: {
-  title: string;
-  tone: "active" | "done" | "failed";
-  children: React.ReactNode;
-}) {
+// ─── Tab bar ─────────────────────────────────────────────────────────
+
+interface TabBarProps {
+  tab: QuestStatus;
+  counts: Record<QuestStatus, number>;
+  onSelect: (t: QuestStatus) => void;
+}
+
+function TabBar({ tab, counts, onSelect }: TabBarProps) {
+  const order: QuestStatus[] = ["active", "done", "failed"];
   return (
-    <div className="space-y-2">
-      <div
-        className={cn(
-          "text-[10px] font-semibold tracking-wider uppercase",
-          tone === "active" && "text-amber-700",
-          tone === "done" && "text-emerald-700",
-          tone === "failed" && "text-rose-700",
-        )}
-      >
-        {title}
-      </div>
-      {children}
+    <div className="flex gap-1 border-b pb-2">
+      {order.map((t) => {
+        const isActive = tab === t;
+        return (
+          <Button
+            key={t}
+            variant={isActive ? "default" : "ghost"}
+            size="sm"
+            className="text-xs h-7"
+            onClick={() => onSelect(t)}
+          >
+            {TAB_LABEL[t]}
+            <span
+              className={cn(
+                "ml-1.5 text-[10px] tabular-nums",
+                isActive ? "opacity-90" : "text-muted-foreground",
+              )}
+            >
+              {counts[t]}
+            </span>
+          </Button>
+        );
+      })}
     </div>
   );
+}
+
+// ─── Quest row (collapsed by default; click to expand) ────────────────
+
+interface QuestRowProps {
+  questId: string;
+  status: QuestStatus;
+  stage: number;
+  expanded: boolean;
+  onToggle: () => void;
 }
 
 function QuestRow({
   questId,
   status,
   stage,
-}: {
-  questId: string;
-  status: "active" | "done" | "failed";
-  stage: number;
-}) {
+  expanded,
+  onToggle,
+}: QuestRowProps) {
   const def = getQuest(questId);
+  const abandonQuest = useWorldStore((s) => s.abandonQuest);
   if (!def) return null;
   const isSide = def.type === "side";
 
+  const onCancel = () => {
+    if (!window.confirm(`ยืนยันละทิ้งภารกิจ "${def.name}"?`)) return;
+    const r = abandonQuest(questId);
+    if (r.ok) toast("warn", `ละทิ้งภารกิจ: ${def.name}`);
+    else toast("error", "ละทิ้งภารกิจไม่ได้");
+  };
+
   return (
-    <div className="space-y-1">
-      <div className="flex items-center gap-2 flex-wrap">
-        <strong className="text-sm">
-          {isSide ? "✦" : "★"} {def.name}
-        </strong>
-        {isSide && (
-          <Badge variant="outline" className="text-[9px] opacity-70">
-            ภารกิจรอง
-          </Badge>
+    <li className="border border-border bg-muted/20 overflow-hidden">
+      {/* Collapsed header — name only, click to expand. */}
+      <button
+        type="button"
+        onClick={onToggle}
+        className={cn(
+          "w-full flex items-center justify-between gap-2 px-3 py-2 text-left",
+          "hover:bg-muted/40 transition-colors",
         )}
-        <Badge
-          className={cn(
-            "text-[9px]",
-            status === "active" && "bg-amber-100 text-amber-800",
-            status === "done" && "bg-emerald-100 text-emerald-800",
-            status === "failed" && "bg-rose-100 text-rose-800",
+        aria-expanded={expanded}
+      >
+        <span className="flex items-center gap-2 min-w-0 flex-wrap">
+          <span className="shrink-0 text-vermilion">{isSide ? "✦" : "★"}</span>
+          <strong className="text-sm font-display truncate">{def.name}</strong>
+          {isSide && (
+            <Badge variant="outline" className="text-[9px] opacity-70">
+              รอง
+            </Badge>
           )}
+        </span>
+        <span
+          className={cn(
+            "shrink-0 text-xs text-muted-foreground transition-transform",
+            expanded && "rotate-90",
+          )}
+          aria-hidden="true"
         >
-          {status === "active" ? "กำลังทำ" : status === "done" ? "สำเร็จ" : "ล้มเหลว"}
-        </Badge>
-      </div>
-      <p className="text-xs text-muted-foreground">{def.briefSummary ?? def.description}</p>
-      {/* Full stage checklist — every step shown so the player can plan. */}
-      <ul className="text-xs pl-2 border-l-2 border-amber-400 space-y-0.5">
-        {def.stages.map((s, idx) => {
-          const stepStatus = stepStatusFor(status, stage, idx);
-          return (
+          ▸
+        </span>
+      </button>
+
+      {/* Expanded detail */}
+      {expanded && (
+        <div className="px-3 pb-3 pt-1 space-y-2 border-t border-border/60 bg-background/40">
+          <p className="text-xs text-muted-foreground">
+            {def.briefSummary ?? def.description}
+          </p>
+
+          <ul className="text-xs pl-2 border-l-2 border-vermilion/60 space-y-0.5">
+            {def.stages.map((s, idx) => {
+              const stepStatus = stepStatusFor(status, stage, idx);
+              return (
+                <li
+                  key={s.id}
+                  className={cn(
+                    "flex gap-1.5",
+                    stepStatus === "done" &&
+                      "text-emerald-700/80 line-through opacity-70",
+                    stepStatus === "current" &&
+                      "text-amber-800 font-medium",
+                    stepStatus === "pending" && "text-muted-foreground",
+                  )}
+                >
+                  <span className="shrink-0 w-3 text-center">
+                    {stepStatus === "done"
+                      ? "✓"
+                      : stepStatus === "current"
+                        ? "▸"
+                        : "○"}
+                  </span>
+                  <span>
+                    {idx + 1}. {s.description}
+                  </span>
+                </li>
+              );
+            })}
             <li
-              key={s.id}
               className={cn(
                 "flex gap-1.5",
-                stepStatus === "done" && "text-emerald-700/80 line-through opacity-70",
-                stepStatus === "current" && "text-amber-800 font-medium",
-                stepStatus === "pending" && "text-muted-foreground",
+                status === "done" &&
+                  "text-emerald-700/80 line-through opacity-70",
+                status !== "done" && "text-muted-foreground",
               )}
             >
               <span className="shrink-0 w-3 text-center">
-                {stepStatus === "done" ? "✓" : stepStatus === "current" ? "▸" : "○"}
+                {status === "done" ? "✓" : "○"}
               </span>
               <span>
-                {idx + 1}. {s.description}
+                {def.stages.length + 1}. รับรางวัล
+                {def.rewards && def.rewards.length > 0
+                  ? ` — ${summarizeRewards(def.rewards)}`
+                  : ""}
               </span>
             </li>
-          );
-        })}
-        {/* Final reward step — visible last so the player sees the payoff. */}
-        <li
-          className={cn(
-            "flex gap-1.5",
-            status === "done" && "text-emerald-700/80 line-through opacity-70",
-            status !== "done" && "text-muted-foreground",
+          </ul>
+
+          {status === "active" && (
+            <div className="flex justify-end pt-1">
+              <Button
+                size="sm"
+                variant="outline"
+                className="text-[11px] h-7 border-rose-400 text-rose-700 hover:bg-rose-50"
+                onClick={onCancel}
+              >
+                ละทิ้งภารกิจ
+              </Button>
+            </div>
           )}
-        >
-          <span className="shrink-0 w-3 text-center">
-            {status === "done" ? "✓" : "○"}
-          </span>
-          <span>
-            {def.stages.length + 1}. รับรางวัล
-            {def.rewards && def.rewards.length > 0
-              ? ` — ${summarizeRewards(def.rewards)}`
-              : ""}
-          </span>
-        </li>
-      </ul>
-    </div>
+        </div>
+      )}
+    </li>
   );
 }
 
 type StepStatus = "done" | "current" | "pending";
 
 function stepStatusFor(
-  questStatus: "active" | "done" | "failed",
+  questStatus: QuestStatus,
   currentStage: number,
   idx: number,
 ): StepStatus {

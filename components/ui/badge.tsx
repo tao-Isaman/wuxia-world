@@ -11,6 +11,12 @@ const badgeVariants = cva(
         secondary: "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
         destructive: "border-transparent bg-destructive text-destructive-foreground shadow hover:bg-destructive/80",
         outline: "text-foreground",
+        // "seal" — vermilion 印章-style stamp. Square corners, ink-on-
+        // vermilion contrast, Charm display font. Used for high-signal
+        // values (gold count, active-quest count) where the cream-on-
+        // cream default badge fades into the panel.
+        seal:
+          "border-2 border-ink bg-vermilion text-primary-foreground font-display tracking-wide [border-radius:0]",
       },
     },
     defaultVariants: { variant: "default" },

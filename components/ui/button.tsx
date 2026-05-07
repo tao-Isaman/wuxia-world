@@ -14,6 +14,12 @@ const buttonVariants = cva(
         secondary: "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
+        // Pixel-art chrome — same recipe as components/ui/wuxia/button.tsx
+        // (stacked box-shadow bevel + 2px ink border) but exposed through
+        // the shadcn Button so existing call sites can opt in by swapping
+        // the variant prop without importing a different component.
+        pixel:
+          "bg-card text-foreground border-2 border-ink shadow-pixel active:shadow-pixel-down active:translate-y-0.5 hover:bg-secondary font-display tracking-wide [border-radius:0]",
       },
       size: {
         default: "h-9 px-4 py-2",

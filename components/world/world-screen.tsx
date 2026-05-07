@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Panel } from "@/components/ui/wuxia/panel";
+import { WuxiaButton } from "@/components/ui/wuxia/button";
 import { useWorldStore } from "@/store/world-store";
 import { useBattleStore } from "@/store/battle-store";
 import { getScene } from "@/lib/world";
@@ -21,8 +21,9 @@ import { ToastStack } from "./toast-stack";
 import { BattleArena } from "@/components/game/battle-arena";
 
 export function WorldScreen() {
-  // Persist middleware hydrates async; render a placeholder until ready so
-  // SSR/client markup matches and we don't flash the StartScreen wrongly.
+  // Persist middleware hydrates async; render a placeholder until ready
+  // so SSR/client markup matches and we don't flash the StartScreen
+  // wrongly.
   const [hydrated, setHydrated] = useState(false);
   useEffect(() => {
     setHydrated(true);
@@ -39,20 +40,18 @@ export function WorldScreen() {
   const battleStateExists = useBattleStore((s) => s.state !== null);
 
   // Defensive: if pendingBattle is set but the (unpersisted) battle store
-  // isn't running yet, kick it off from React's lifecycle. This catches the
-  // edge cases the module-level subscription might miss — hot reloads,
-  // rehydration timing, fresh tabs that resume mid-battle.
+  // isn't running yet, kick it off from React's lifecycle.
   useEffect(() => {
     if (pendingBattle && !battleStateExists) ensureBattleStarted();
   }, [pendingBattle, battleStateExists]);
 
   if (!hydrated) {
     return (
-      <Card>
-        <CardContent className="p-8 text-center text-sm text-muted-foreground">
+      <Panel padding="p-8" className="text-center">
+        <p className="text-sm text-muted-foreground font-display">
           กำลังโหลด...
-        </CardContent>
-      </Card>
+        </p>
+      </Panel>
     );
   }
 
@@ -66,8 +65,8 @@ export function WorldScreen() {
   }
 
   // Active battle — render BattleArena inline. The bridge already started
-  // the battle when pendingBattle was set; if for some reason it hasn't, the
-  // arena shows its own "เริ่มการต่อสู้..." placeholder.
+  // the battle when pendingBattle was set; if for some reason it hasn't,
+  // the arena shows its own "เริ่มการต่อสู้..." placeholder.
   if (pendingBattle) {
     void battleStateExists; // touched so the component re-renders on battle changes
     return (
@@ -81,11 +80,9 @@ export function WorldScreen() {
   // and the store either promotes it to pendingBattle or clears it.
   if (pendingEncounter) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-[1fr_280px] gap-3">
-        <div className="space-y-3">
-          <StatusBar />
-          <EncounterScreen />
-        </div>
+      <div className="space-y-3">
+        <StatusBar />
+        <EncounterScreen />
       </div>
     );
   }
@@ -93,22 +90,19 @@ export function WorldScreen() {
   const scene = getScene(currentSceneId);
   if (!scene) {
     return (
-      <Card>
-        <CardContent className="p-6 text-center space-y-3">
-          <p className="text-sm text-destructive">
-            ไม่พบฉาก &quot;{currentSceneId}&quot;
-          </p>
-          <Button variant="outline" onClick={resetGame}>
-            เริ่มใหม่
-          </Button>
-        </CardContent>
-      </Card>
+      <Panel padding="p-6" className="text-center space-y-3">
+        <p className="text-sm text-destructive font-sans">
+          ไม่พบฉาก &quot;{currentSceneId}&quot;
+        </p>
+        <WuxiaButton variant="default" onClick={resetGame}>
+          เริ่มใหม่
+        </WuxiaButton>
+      </Panel>
     );
   }
 
-  // Pick the right view per scene kind. PlayerStatus / inventory / quest
-  // tabs all live in the top menu-bar; the world view is single-column
-  // now.
+  // Pick the right view per scene kind. Single-column layout — quest log,
+  // inventory, profile etc. all live in the top menu-bar tabs now.
   let mainView: React.ReactNode;
   switch (scene.kind) {
     case "dialog":
@@ -129,23 +123,21 @@ export function WorldScreen() {
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-[1fr_280px] gap-3">
-        <div className="space-y-3">
-          <StatusBar />
-          <MenuBar />
-          {mainView}
-          <div className="flex justify-end">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-[11px] text-muted-foreground"
-              onClick={() => {
-                if (window.confirm("ออกจากเกมและลบเซฟ?")) resetGame();
-              }}
-            >
-              ออกเกม
-            </Button>
-          </div>
+      <div className="space-y-3">
+        <StatusBar />
+        <MenuBar />
+        {mainView}
+        <div className="flex justify-end">
+          <WuxiaButton
+            variant="ghost"
+            size="sm"
+            className="text-[11px] text-muted-foreground"
+            onClick={() => {
+              if (window.confirm("ออกจากเกมและลบเซฟ?")) resetGame();
+            }}
+          >
+            ออกเกม
+          </WuxiaButton>
         </div>
       </div>
       <LoadingOverlay />

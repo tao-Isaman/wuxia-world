@@ -1,18 +1,24 @@
 "use client";
 
-import { Card, CardContent } from "@/components/ui/card";
+import { Panel } from "@/components/ui/wuxia/panel";
+import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { deriveAll } from "@/lib/game";
 import { useWorldStore } from "@/store/world-store";
 
-// Top-of-page status banner — always visible on every world scene so the
-// player can see HP / MP / gold without opening the sidebar. Battle has its
-// own HP bars in BattleArena, so this only renders in the non-combat world.
+// Top-of-page status banner — always visible on every world scene.
 //
-// HP / MP are sourced from `deriveAll(playerBuild)` (max stats). The world
-// store doesn't yet track post-battle damage, so the bars currently sit at
-// 100 %; once a `currentHp / currentMp` field is added to WorldStateData
-// the same component will pick it up automatically.
+// Wuxia redesign: cream paper Panel with vermilion-accented frame; HP /
+// MP / Stamina use the new Progress `variant` prop (hp = red, qi = blue,
+// stamina = jade); proper-noun bits (player name) use the Charm display
+// font; numeric metrics stay in the readable Sarabun body font; gold +
+// w-exp render as vermilion seal-stamp Badges so they read as primary
+// values, not chrome.
+//
+// Mobile layout: the row wraps automatically — at narrow widths the
+// three bars and the metric chips drop onto separate lines instead of
+// crushing each other. Each bar has a min-width so it doesn't squeeze
+// below readability.
 export function StatusBar() {
   const player = useWorldStore((s) => s.playerBuild);
   const gold = useWorldStore((s) => s.gold);
@@ -34,54 +40,90 @@ export function StatusBar() {
   const stPct = staminaMax > 0 ? (stamina / staminaMax) * 100 : 0;
 
   return (
-    <Card>
-      <CardContent className="p-3">
-        <div className="flex items-center gap-4 flex-wrap">
-          <strong className="text-sm shrink-0">{player.name}</strong>
+    <Panel padding="p-3">
+      <div className="flex items-center gap-x-4 gap-y-2 flex-wrap">
+        {/* Player name — Charm display font, no shrink */}
+        <strong className="font-display text-base shrink-0 text-ink">
+          {player.name}
+        </strong>
 
-          <div className="flex-1 min-w-[120px]">
-            <div className="flex items-baseline justify-between text-[10px] mb-0.5">
-              <span className="font-semibold tracking-wider uppercase text-rose-600">HP</span>
-              <span className="font-mono text-foreground">{hpCur} / {d.HP}</span>
-            </div>
-            <Progress value={hpPct} indicatorColor="hsl(0, 75%, 55%)" className="h-2" />
-          </div>
+        <StatGauge
+          label="HP"
+          variant="hp"
+          cur={hpCur}
+          max={d.HP}
+          pct={hpPct}
+        />
+        <StatGauge
+          label="MP"
+          variant="qi"
+          cur={mpCur}
+          max={d.MP}
+          pct={mpPct}
+        />
+        <StatGauge
+          label="พลัง"
+          variant="stamina"
+          cur={stamina}
+          max={staminaMax}
+          pct={stPct}
+        />
 
-          <div className="flex-1 min-w-[120px]">
-            <div className="flex items-baseline justify-between text-[10px] mb-0.5">
-              <span className="font-semibold tracking-wider uppercase text-sky-600">MP</span>
-              <span className="font-mono text-foreground">{mpCur} / {d.MP}</span>
-            </div>
-            <Progress value={mpPct} indicatorColor="hsl(210, 75%, 55%)" className="h-2" />
-          </div>
-
-          <div className="flex-1 min-w-[120px]">
-            <div className="flex items-baseline justify-between text-[10px] mb-0.5">
-              <span className="font-semibold tracking-wider uppercase text-emerald-600">⚡ พลัง</span>
-              <span className="font-mono text-foreground">{stamina} / {staminaMax}</span>
-            </div>
-            <Progress value={stPct} indicatorColor="hsl(140, 60%, 45%)" className="h-2" />
-          </div>
-
-          <div className="shrink-0 text-xs">
-            <span className="text-muted-foreground">ทอง </span>
-            <strong className="text-amber-600">{gold}</strong>
-          </div>
-
-          <div className="shrink-0 text-xs">
-            <span className="text-muted-foreground">w-exp </span>
-            <strong className="text-violet-600">{wExp}</strong>
-          </div>
-
-          <div className="shrink-0 text-xs">
-            <span className="text-muted-foreground">วันที่ </span>
-            <strong>{day}</strong>
-            <span className="text-muted-foreground"> · ⌛ </span>
-            <strong className="font-mono">{time.toFixed(1)}</strong>
-            <span className="text-muted-foreground">/12</span>
-          </div>
+        {/* Metric chips — gold + w-exp use seal badges for high signal */}
+        <div className="flex items-center gap-1.5 text-xs shrink-0">
+          <span className="text-muted-foreground">ทอง</span>
+          <Badge variant="seal" className="font-mono text-[11px] px-2 py-0.5">
+            {gold}
+          </Badge>
         </div>
-      </CardContent>
-    </Card>
+
+        <div className="flex items-center gap-1.5 text-xs shrink-0">
+          <span className="text-muted-foreground">w-exp</span>
+          <Badge
+            variant="outline"
+            className="font-mono text-[11px] px-2 py-0.5 border-2 border-jade text-jade"
+          >
+            {wExp}
+          </Badge>
+        </div>
+
+        {/* Day + time — calligraphic header style */}
+        <div className="shrink-0 text-xs flex items-center gap-1.5">
+          <span className="text-muted-foreground font-display">วันที่</span>
+          <strong className="font-display text-sm text-ink">{day}</strong>
+          <span className="text-muted-foreground">·</span>
+          <span className="font-mono text-foreground">
+            {time.toFixed(1)}
+            <span className="text-muted-foreground">/12</span>
+          </span>
+        </div>
+      </div>
+    </Panel>
+  );
+}
+
+interface StatGaugeProps {
+  label: string;
+  variant: "hp" | "qi" | "stamina";
+  cur: number;
+  max: number;
+  pct: number;
+}
+
+// One stat gauge — label + numeric reading + segmented bar. The
+// segmented bar (`pixel` prop on Progress) gives the classic-JRPG read.
+function StatGauge({ label, variant, cur, max, pct }: StatGaugeProps) {
+  return (
+    <div className="flex-1 min-w-[140px]">
+      <div className="flex items-baseline justify-between text-[10px] mb-0.5">
+        <span className="font-display tracking-wider uppercase text-ink/80">
+          {label}
+        </span>
+        <span className="font-mono text-foreground">
+          {cur} / {max}
+        </span>
+      </div>
+      <Progress value={pct} variant={variant} pixel className="h-2.5" />
+    </div>
   );
 }

@@ -191,24 +191,45 @@ export function applyEffect(state: WorldStateData, eff: SceneEffect): void {
       // returns here even though we are about to redirect away from it.
       state.lastLocationId = state.currentSceneId;
 
+      // Hunt boost — when the player has an active kill-quest stage AND
+      // the target opponent spawns in this zone, the encounter rate jumps
+      // to EVENT_PROBABILITY.fightHunting (default 0.80) and the
+      // encounter pool is restricted to those targets. Treasure / meet
+      // bands are suppressed during the hunt so the player isn't pulled
+      // off the trail by flavor events. Falls back to the normal 0.15 +
+      // full pool when no target fits the current zone.
+      const huntTargets = collectActiveHuntTargets(state);
+      const zonePool = fightEventsForLocation(state.lastLocationId);
+      const huntPool =
+        huntTargets.size > 0
+          ? zonePool.filter((ev) => huntTargets.has(ev.opponentId))
+          : [];
+      const huntActive = huntPool.length > 0;
+
       const luk = state.playerBuild.stats.LUK;
-      const fightP = EVENT_PROBABILITY.fight;
-      const treasureP = Math.min(
-        EVENT_PROBABILITY.treasureCap,
-        EVENT_PROBABILITY.treasureBase + luk / EVENT_PROBABILITY.treasureLukDivisor,
-      );
-      const meetP = Math.min(
-        EVENT_PROBABILITY.meetCap,
-        EVENT_PROBABILITY.meetBase + luk / EVENT_PROBABILITY.meetLukDivisor,
-      );
+      const fightP = huntActive
+        ? EVENT_PROBABILITY.fightHunting
+        : EVENT_PROBABILITY.fight;
+      const treasureP = huntActive
+        ? 0
+        : Math.min(
+            EVENT_PROBABILITY.treasureCap,
+            EVENT_PROBABILITY.treasureBase + luk / EVENT_PROBABILITY.treasureLukDivisor,
+          );
+      const meetP = huntActive
+        ? 0
+        : Math.min(
+            EVENT_PROBABILITY.meetCap,
+            EVENT_PROBABILITY.meetBase + luk / EVENT_PROBABILITY.meetLukDivisor,
+          );
 
       const r = Math.random();
 
       if (r < fightP) {
-        // Filter by zone so cities never spawn beasts and the wild
-        // doesn't spawn city-bandits. The result still picks a random
-        // tier, weighted toward lower tiers.
-        const pool = fightEventsForLocation(state.lastLocationId);
+        // During a hunt, restrict the pool to the quest target(s) so the
+        // boosted rate actually advances the quest instead of spinning
+        // up unrelated tier-1 humans.
+        const pool = huntActive ? huntPool : zonePool;
         const ev = pickWeighted(pool, Math.random());
         if (!ev) return;
         state.flags._skipEventRoll = true;
@@ -343,6 +364,30 @@ export function isQuestOfferable(state: WorldStateData, def: QuestDef): boolean 
   if (state.quests[def.id]) return false;
   if (def.prereqs && !evaluateCondition(state, def.prereqs)) return false;
   return true;
+}
+
+// Find every opponent the player is actively hunting via a quest's
+// current-stage `defeatedOpponent` autoAdvance condition. Used by
+// `rollRandomEvent` above to bias the random-event roll: when at least
+// one target spawns in the current zone, the fight rate jumps to
+// EVENT_PROBABILITY.fightHunting and the encounter pool is restricted
+// to those targets.
+//
+// Exported so any future UI (e.g., a "🎯 ตามล่า" badge in the quest
+// log) can mirror the rule without re-implementing the scan.
+export function collectActiveHuntTargets(state: WorldStateData): Set<string> {
+  const out = new Set<string>();
+  for (const [questId, qs] of Object.entries(state.quests)) {
+    if (qs.status !== "active") continue;
+    const def = getQuest(questId);
+    if (!def) continue;
+    const stage = def.stages[qs.stage];
+    if (!stage?.autoAdvance) continue;
+    if (stage.autoAdvance.t === "defeatedOpponent") {
+      out.add(stage.autoAdvance.opponentId);
+    }
+  }
+  return out;
 }
 
 // True when an active quest's current stage is a dialog-driven "talk to NPC"
