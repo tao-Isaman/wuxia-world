@@ -405,6 +405,10 @@ export const LIFE_SKILL_KEYS = [
   "jewelry",
   "alchemy",
   "chef",
+  // ↓ accessory crafting (charms, talismans, beaded jewellery). Distinct
+  // from `jewelry` (rings / amulets) so cities can host both kinds of
+  // artisan independently.
+  "accessory",
 ] as const;
 export type LifeSkill = (typeof LIFE_SKILL_KEYS)[number];
 
@@ -457,6 +461,12 @@ export interface ResourceNodeRef {
 // `usesDropCheck` makes the craft itself a mastery-vs-difficulty test —
 // failure consumes ingredients but produces no output (used for art/writing
 // recipes where execution is finicky).
+//
+// `basic` (default false): basic recipes appear at every artisan of the
+// matching profession (so the player can buy bread-and-butter recipes
+// from any chef, any forge, etc.). Non-basic ("specialty") recipes are
+// hand-assigned to specific artisans in lib/world/data/artisans.ts so
+// each city/village shop has its own signature offerings.
 export interface RecipeDef {
   id: string;
   name: string;
@@ -466,6 +476,59 @@ export interface RecipeDef {
   requiredMastery?: 1 | 2 | 3 | 4 | 5;
   usesDropCheck?: boolean;
   description?: string;
+  basic?: boolean;
+}
+
+// ─── Artisans (craft NPCs) ───────────────────────────────────────────
+//
+// Mirrors the SectHallDef pattern. Each ArtisanDef anchors a craftsman
+// to one location and exposes three player-facing affordances:
+//   1. ซื้อสูตร  — buy recipes (recipe id → price). The bought recipe
+//                   id is added to WorldStateData.learnedRecipeIds.
+//   2. ประดิษฐ์  — craft using ANY learned recipe whose `skill` matches
+//                   this artisan's profession (the artisan is the gate;
+//                   the popup is where the craftRecipe action fires).
+//   3. ซื้อ-ขาย  — sale inventory + the player can sell items in the
+//                   listed categories at `sellMultiplier`.
+//
+// Recipe assembly is data-driven: the artisan's `recipes` array lists
+// the *specialty* recipes for sale here. Basic recipes (RecipeDef.basic
+// === true) of the same profession are folded in automatically by the
+// helper `recipesOfferedBy(artisan)` so authors don't repeat the staple
+// list at every shop.
+
+export interface ArtisanRecipeOffer {
+  recipeId: string;
+  price: number;
+}
+
+export interface ArtisanDef {
+  // Stable id for popup state.
+  id: string;
+  // Location this artisan lives at — anywhere matching renders the panel.
+  locationId: string;
+  // Profession — drives which life-skill xp ticks on craft and which of
+  // the player's learned recipes can be used at this NPC.
+  profession: LifeSkill;
+  // Display label shown on the LocationView card and the popup header.
+  label: string;
+  // The NPC's display name (used inside the popup header).
+  npcName: string;
+  // Flavor description shown on the LocationView card.
+  description: string;
+  // Specialty recipes this artisan teaches (in addition to basic recipes
+  // for the profession, which are folded in automatically).
+  recipes: readonly ArtisanRecipeOffer[];
+  // Items the artisan sells over the counter (item ids). Prices come
+  // from each ItemDef.price; the artisan does not override them.
+  inventory: readonly string[];
+  // Categories the artisan will buy back from the player. Empty /
+  // undefined means everything.
+  acceptsCategories?: readonly ItemCategory[];
+  // Multiplier on item.price for sell-back. Typical 0.4 (artisan) vs
+  // 0.5 (city general store) — artisans pay a touch less because they
+  // specialise.
+  sellMultiplier: number;
 }
 
 // Pending hunt result — the gather flow stashes this when it kicks off
@@ -578,6 +641,12 @@ export interface WorldStateData {
   // are stored on `playerBuild.artLevels` (unified with the engine's
   // `artLevels` field on CharacterBuild). Auto-levels on overflow.
   artExp: Record<string, number>;
+
+  // Recipes the player has learned (by id). Crafting requires the
+  // recipe to be in this list AND the player to be at an artisan whose
+  // profession matches the recipe's `skill`. Recipes are bought at
+  // artisans via `buyRecipe`.
+  learnedRecipeIds: string[];
 
   // Passive stat progression. Each base stat has its own xp pool that
   // accrues from a specific activity (STR from physical skills in battle,

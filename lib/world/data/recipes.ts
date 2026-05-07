@@ -41,8 +41,13 @@ export const RECIPES: readonly RecipeDef[] = [
     description: "ย่างเนื้อสดบนกองไฟ ได้อาหารสำหรับการเดินทาง",
   },
   {
+    // Note: skill is "herbalism" historically, but artisans of the
+    // alchemy profession still teach this recipe (basic flag fan-out is
+    // by exact-skill match in artisans.ts, so a small alias-recipe lets
+    // alchemists distribute the basic potion). Keep both: one staple
+    // for herbalists who craft inline, one shop-friendly alchemy basic.
     id: "brew_potion",
-    name: "ปรุงยาเลือดเล็ก",
+    name: "ปรุงยาเลือดเล็ก (สมุนไพร)",
     skill: "herbalism",
     inputs: [
       { itemId: "ginseng",    count: 1 },
@@ -50,6 +55,19 @@ export const RECIPES: readonly RecipeDef[] = [
     ],
     output: { itemId: "potion", count: 1 },
     description: "ผสมโสมกับเม็ดบัวเพื่อทำยาฟื้นพลังชีวิตเล็ก",
+  },
+  {
+    id: "alchemy_potion_basic",
+    name: "ปรุงยาเลือดเล็ก",
+    skill: "alchemy",
+    requiredMastery: 1,
+    basic: true,
+    inputs: [
+      { itemId: "ginseng", count: 1 },
+      { itemId: "herb",    count: 1 },
+    ],
+    output: { itemId: "potion", count: 1 },
+    description: "ยาฟื้นพลังชีวิตเล็กฉบับช่างปรุงยา — เริ่มต้นง่าย วัตถุดิบหาง่าย",
   },
   {
     id: "refine_venom",
@@ -94,11 +112,15 @@ export const RECIPES: readonly RecipeDef[] = [
   },
 
   // ─── Forge ───────────────────────────────────────────────────────────
+  // `basic: true` recipes appear at every artisan of the matching
+  // profession (auto-folded by recipesOfferedBy in artisans.ts) so the
+  // staple recipes are always available everywhere.
   {
     id: "forge_iron_blade",
     name: "ตีใบมีดเหล็ก",
     skill: "forge",
     requiredMastery: 1,
+    basic: true,
     inputs: [{ itemId: "iron_ingot", count: 2 }],
     output: { itemId: "iron_blade", count: 1 },
     description: "ตีเหล็กแท่งให้เป็นใบมีดที่พร้อมขึ้นรูป",
@@ -134,6 +156,7 @@ export const RECIPES: readonly RecipeDef[] = [
     name: "ตัดเสื้อผ้าฝ้าย",
     skill: "tailoring",
     requiredMastery: 1,
+    basic: true,
     inputs: [{ itemId: "thread", count: 2 }],
     output: { itemId: "cloth_robe", count: 1 },
     description: "ตัดเสื้อผ้าใส่สบายจากด้ายฝ้าย",
@@ -169,6 +192,7 @@ export const RECIPES: readonly RecipeDef[] = [
     name: "หล่อแหวนเงิน",
     skill: "jewelry",
     requiredMastery: 1,
+    basic: true,
     inputs: [{ itemId: "silver_ore", count: 3 }],
     output: { itemId: "silver_ring", count: 1 },
     description: "หล่อแร่เงินเป็นแหวนรูปทรงเรียบง่าย",
@@ -196,11 +220,15 @@ export const RECIPES: readonly RecipeDef[] = [
   },
 
   // ─── Alchemy ────────────────────────────────────────────────────────
+  // `brew_potion` (under herbalism above) is the basic potion recipe
+  // every alchemist also teaches — listed there so the recipe id stays
+  // singular. This block holds the alchemy-specific specialties.
   {
     id: "alchemy_potion_mid",
     name: "ปรุงยาเลือดกลาง",
     skill: "alchemy",
     requiredMastery: 2,
+    basic: true,
     inputs: [
       { itemId: "ginseng", count: 2 },
       { itemId: "herb",    count: 1 },
@@ -240,6 +268,7 @@ export const RECIPES: readonly RecipeDef[] = [
     name: "ทำข้าวหมูแดง",
     skill: "chef",
     requiredMastery: 1,
+    basic: true,
     inputs: [
       { itemId: "cooked_meat", count: 1 },
       { itemId: "wood_soft",   count: 1 },
@@ -326,6 +355,60 @@ export const RECIPES: readonly RecipeDef[] = [
     ],
     output: { itemId: "alpha_master", count: 1 },
     description: "อักษรงดงามที่ต้องอาศัยมือฝึกแล้ว",
+  },
+
+  // ─── Accessory (charms / belts / talismans) ──────────────────────────
+  // The accessory profession sits parallel to jewelry. Basic recipe:
+  // fortune_charm — every accessory artisan teaches it. Specialty
+  // recipes are city-specific (assigned in artisans.ts CITY_SPECIALTIES).
+  {
+    id: "accessory_fortune_charm",
+    name: "ถักเครื่องรางเสริมโชค",
+    skill: "accessory",
+    requiredMastery: 1,
+    basic: true,
+    inputs: [
+      { itemId: "thread", count: 2 },
+      { itemId: "herb",   count: 1 },
+    ],
+    output: { itemId: "fortune_charm", count: 1 },
+    description: "ถักด้ายแดงประดับสมุนไพร เป็นเครื่องรางเสริมโชค",
+  },
+  {
+    id: "accessory_silk_fan",
+    name: "ทำพัดผ้าไหม",
+    skill: "accessory",
+    requiredMastery: 2,
+    inputs: [
+      { itemId: "silk",      count: 2 },
+      { itemId: "wood_hard", count: 1 },
+    ],
+    output: { itemId: "silk_fan", count: 1 },
+    description: "ขึงผ้าไหมเข้ากับโครงไม้ไผ่เป็นพัดผ้าไหม",
+  },
+  {
+    id: "accessory_warrior_belt",
+    name: "ถักเข็มขัดนักรบ",
+    skill: "accessory",
+    requiredMastery: 3,
+    inputs: [
+      { itemId: "leather",     count: 2 },
+      { itemId: "iron_ingot",  count: 1 },
+    ],
+    output: { itemId: "warrior_belt", count: 1 },
+    description: "เข็มขัดหนังเสริมหัวเข็มขัดโลหะ พร้อมสำหรับสนามรบ",
+  },
+  {
+    id: "accessory_jade_pendant",
+    name: "แกะจี้หยก",
+    skill: "accessory",
+    requiredMastery: 4,
+    inputs: [
+      { itemId: "jade",   count: 1 },
+      { itemId: "thread", count: 1 },
+    ],
+    output: { itemId: "jade_pendant", count: 1 },
+    description: "แกะหยกเป็นจี้และร้อยด้วยเชือกถักเป็นเครื่องประดับชั้นสูง",
   },
 ];
 

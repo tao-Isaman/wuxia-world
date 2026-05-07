@@ -4,13 +4,14 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import type { LocationScene, NpcDef } from "@/lib/world";
+import type { ArtisanDef, LocationScene, NpcDef } from "@/lib/world";
 import {
   LIFE_SKILL_ICON,
   LIFE_SKILL_LABEL,
   canPracticeAt,
   evaluateCondition,
   gatherSuccessChance,
+  getArtisansAt,
   getItem,
   getNpcsAtLocation,
   getResource,
@@ -22,6 +23,7 @@ import {
 import { NpcInteractionPopup } from "./popups/npc-interaction-popup";
 import { ShopPopup } from "./popups/shop-popup";
 import { SectHallPopup } from "./popups/sect-hall-popup";
+import { ArtisanPopup } from "./popups/artisan-popup";
 import { PracticePopup } from "./popups/practice-popup";
 import {
   useWorldStore,
@@ -55,9 +57,11 @@ export function LocationView({ scene }: Props) {
   const [shopOpen, setShopOpen] = useState(false);
   const [hallOpen, setHallOpen] = useState(false);
   const [practiceOpen, setPracticeOpen] = useState(false);
+  const [activeArtisan, setActiveArtisan] = useState<ArtisanDef | null>(null);
 
   const shop = getShopAt(scene.id);
   const hall = getSectHallAt(scene.id);
+  const artisans = getArtisansAt(scene.id);
   const canPractice = canPracticeAt(scene);
 
   const visibleNpcs = scene.npcs.filter(
@@ -241,6 +245,34 @@ export function LocationView({ scene }: Props) {
         </Card>
       )}
 
+      {artisans.length > 0 && (
+        <Card>
+          <CardContent className="p-3 space-y-2">
+            <div className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">
+              ช่างฝีมือ
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+              {artisans.map((a) => (
+                <Button
+                  key={a.id}
+                  variant="outline"
+                  onClick={() => setActiveArtisan(a)}
+                  className="justify-start h-auto py-2 whitespace-normal"
+                >
+                  <span className="flex flex-col items-start gap-0.5">
+                    <span className="font-semibold text-sm">{a.label}</span>
+                    <span className="text-[10px] text-muted-foreground">
+                      {LIFE_SKILL_ICON[a.profession]} {LIFE_SKILL_LABEL[a.profession]}
+                      {" · ซื้อสูตร / ประดิษฐ์ / ขายของ"}
+                    </span>
+                  </span>
+                </Button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <RestPanel kind={restKind} />
 
       {canPractice && (
@@ -338,6 +370,11 @@ export function LocationView({ scene }: Props) {
 
       <ShopPopup open={shopOpen} shop={shop} onClose={() => setShopOpen(false)} />
       <SectHallPopup open={hallOpen} hall={hall} onClose={() => setHallOpen(false)} />
+      <ArtisanPopup
+        open={activeArtisan !== null}
+        artisan={activeArtisan}
+        onClose={() => setActiveArtisan(null)}
+      />
       <PracticePopup
         open={practiceOpen}
         scene={canPractice ? scene : null}

@@ -19,6 +19,7 @@ export const LIFE_SKILL_LABEL: Record<LifeSkill, string> = {
   jewelry:     "ช่างเครื่องประดับ",
   alchemy:     "เภสัช",
   chef:        "ทำอาหาร",
+  accessory:   "ช่างเครื่องสาน",
 };
 
 export const LIFE_SKILL_ICON: Record<LifeSkill, string> = {
@@ -39,6 +40,7 @@ export const LIFE_SKILL_ICON: Record<LifeSkill, string> = {
   jewelry:     "💍",
   alchemy:     "🧪",
   chef:        "🍳",
+  accessory:   "🪭",
 };
 
 // Mastery curve. Index N is the xp needed to reach level N + 1.

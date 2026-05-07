@@ -30,6 +30,7 @@ import {
   applyEffects,
   canPracticeAt,
   gatherSuccessChance,
+  getArtisansAt,
   getItem,
   getNpc,
   getOpponent,
@@ -121,7 +122,7 @@ export type GatherResult =
   | { ok: true; type: "battle"; resourceId: string; opponentId: string };
 
 export type CraftResult =
-  | { ok: false; reason: "missing-input" | "missing-mastery" | "unknown" }
+  | { ok: false; reason: "missing-input" | "missing-mastery" | "not-learned" | "no-artisan" | "unknown" }
   | {
       ok: true;
       recipeId: string;
@@ -130,6 +131,12 @@ export type CraftResult =
       xpGained: number;
       dropCheck: "passed" | "failed" | "none";
     };
+
+// Result of buying a recipe at an artisan. `already-learned` means the
+// recipe is already in learnedRecipeIds; `no-gold` is self-explanatory.
+export type BuyRecipeResult =
+  | { ok: false; reason: "unknown" | "already-learned" | "no-gold" }
+  | { ok: true; recipeId: string; spent: number };
 
 // Result of using a consumable item (book, song book, image, potion, …).
 // Discriminated on `kind` so the UI can render different feedback per use.
@@ -236,6 +243,18 @@ export const PRACTICE_HOURS = 6;
 const PRACTICE_BASE_XP = 30;
 const W_EXP_PRACTICE = 5;
 
+// Crafting professions that require an artisan + learned recipe to
+// craft. Non-artisan recipes (mining-derived, drawing/writing, etc.)
+// keep the legacy "craft inline" behavior.
+const ARTISAN_PROFESSIONS: ReadonlySet<LifeSkill> = new Set<LifeSkill>([
+  "forge",
+  "alchemy",
+  "tailoring",
+  "chef",
+  "jewelry",
+  "accessory",
+]);
+
 interface WorldStore extends WorldStateData {
   // Actions
   startNewGame: () => void;
@@ -283,6 +302,10 @@ interface WorldStore extends WorldStateData {
   sellItem: (itemId: string, count: number, sellMultiplier: number) => SellResult;
   buyMoveSkill: (skillId: string, price: number) => BuyOfferResult;
   buyInnerSkill: (artId: string, price: number) => BuyOfferResult;
+  // Buy a recipe at an artisan — adds the id to learnedRecipeIds. The
+  // popup filters out already-learned recipes so this should rarely
+  // hit the `already-learned` rejection in practice.
+  buyRecipe: (recipeId: string, price: number) => BuyRecipeResult;
 
   // Equip a learned skill or art into a specific slot. `rawId` follows
   // the slot encoding from `lib/game/slots.ts` — bare skill id or
@@ -349,6 +372,7 @@ const emptyData = (): WorldStateData => ({
   skillLevel: {},
   skillExp: {},
   artExp: {},
+  learnedRecipeIds: [],
   statExp: emptyStatExp(),
   traits: emptyTraits(),
   npcStates: {},
@@ -615,6 +639,7 @@ function draftFrom(s: WorldStateData): WorldStateData {
     skillLevel: { ...s.skillLevel },
     skillExp: { ...s.skillExp },
     artExp: { ...s.artExp },
+    learnedRecipeIds: [...s.learnedRecipeIds],
     statExp: { ...s.statExp },
     traits: { ...s.traits },
     npcStates: { ...s.npcStates },
@@ -1036,11 +1061,30 @@ export const useWorldStore = create<WorldStore>()(
         const r = getRecipe(recipeId);
         if (!r) return { ok: false, reason: "unknown" };
 
+        // Artisan gating — the 6 craft professions (forge / alchemy /
+        // tailoring / chef / jewelry / accessory) require:
+        //   1. the recipe is in `learnedRecipeIds` (bought from an
+        //      artisan)
+        //   2. the player is currently at a location with an artisan
+        //      whose profession matches recipe.skill
+        // Other recipes (gathering-derived, drawing/writing) keep the
+        // legacy "craft inline anywhere" behavior — they were never
+        // shop-gated and the user's redesign explicitly targeted the
+        // craftsman shops.
+        const skill = r.skill;
+        if (skill && ARTISAN_PROFESSIONS.has(skill)) {
+          if (!s.learnedRecipeIds.includes(recipeId)) {
+            return { ok: false, reason: "not-learned" };
+          }
+          const here = getArtisansAt(s.currentSceneId);
+          const matching = here.find((a) => a.profession === skill);
+          if (!matching) return { ok: false, reason: "no-artisan" };
+        }
+
         // Mastery gate — recipes can require a minimum mastery level on
         // their `skill`. Below the threshold we refuse the attempt before
         // touching the inventory.
         const required = r.requiredMastery ?? 1;
-        const skill = r.skill;
         const masteryLv = skill ? masteryLevel(s.lifeSkillXp[skill] ?? 0) : MAX_DUMMY_LEVEL;
         if (skill && masteryLv < required) {
           return { ok: false, reason: "missing-mastery" };
@@ -1440,6 +1484,23 @@ export const useWorldStore = create<WorldStore>()(
         return { ok: true, id: skillId, spent: price };
       },
 
+      buyRecipe: (recipeId, price) => {
+        const s = get();
+        const r = getRecipe(recipeId);
+        if (!r) return { ok: false, reason: "unknown" };
+        if (s.learnedRecipeIds.includes(recipeId)) {
+          return { ok: false, reason: "already-learned" };
+        }
+        if (s.gold < price) return { ok: false, reason: "no-gold" };
+        const draft = draftFrom(s);
+        draft.gold -= price;
+        draft.learnedRecipeIds = [...draft.learnedRecipeIds, recipeId];
+        rollLukXp(draft);
+        appendActionLog(draft, "learn", `เรียนสูตร ${r.name} · -${price}🟡`);
+        set({ ...draft });
+        return { ok: true, recipeId, spent: price };
+      },
+
       buyInnerSkill: (artId, price) => {
         const s = get();
         if (!s.playerBuild) return { ok: false, reason: "unknown" };
@@ -1613,7 +1674,7 @@ export const useWorldStore = create<WorldStore>()(
     }),
     {
       name: "wusia-world-v1",
-      version: 13,
+      version: 14,
       // Only persist the data fields, not the action functions.
       partialize: (s) => ({
         hasGame: s.hasGame,
@@ -1633,6 +1694,7 @@ export const useWorldStore = create<WorldStore>()(
         skillLevel: s.skillLevel,
         skillExp: s.skillExp,
         artExp: s.artExp,
+        learnedRecipeIds: s.learnedRecipeIds,
         statExp: s.statExp,
         traits: s.traits,
         npcStates: s.npcStates,
@@ -1673,6 +1735,13 @@ export const useWorldStore = create<WorldStore>()(
       //            Existing saves start with empty pools — arts the player
       //            already learned keep their existing artLevels and grow
       //            from there.
+      //   v13 → v14 added learnedRecipeIds + accessory life-skill key.
+      //            Crafting now requires the recipe to be in
+      //            learnedRecipeIds AND the player to be at an artisan
+      //            of the matching profession (forge / alchemy /
+      //            tailoring / chef / jewelry / accessory). Existing
+      //            saves start with no recipes learned — players have to
+      //            buy them at city / village / sect artisans.
       migrate: (persisted, fromVersion) => {
         const p = (persisted ?? {}) as Partial<WorldStateData>;
         // Pad the build's skillIds to 10 and back-fill learned arrays.
@@ -1734,6 +1803,9 @@ export const useWorldStore = create<WorldStore>()(
           skillLevel: p.skillLevel && typeof p.skillLevel === "object" ? { ...p.skillLevel } : {},
           skillExp: p.skillExp && typeof p.skillExp === "object" ? { ...p.skillExp } : {},
           artExp: p.artExp && typeof p.artExp === "object" ? { ...p.artExp } : {},
+          learnedRecipeIds: Array.isArray(p.learnedRecipeIds)
+            ? [...p.learnedRecipeIds]
+            : [],
           statExp: { ...emptyStatExp(), ...(p.statExp ?? {}) } as Record<StatKey, number>,
           traits: { ...emptyTraits(), ...(p.traits ?? {}) } as Record<TraitKey, number>,
           npcStates: p.npcStates && typeof p.npcStates === "object" ? { ...p.npcStates } : {},

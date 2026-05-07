@@ -207,6 +207,19 @@ export const ITEMS: readonly ItemDef[] = [
   { id: "moon_cake",   name: "ขนมไหว้พระจันทร์",   category: "food", price: 30,
     description: "ของหวานพื้นเมือง รสหวานหอม",
     use: { t: "heal", hp: 20 } },
+
+  // ─── Accessory outputs ─────────────────────────────────────────────
+  // Belts, fans, talismans — crafted by `accessory` artisans. These are
+  // currently flavour items (no `use` effect); future iterations can
+  // wire them up as equippable trinkets in `EQUIPMENT`.
+  { id: "silk_fan",       name: "พัดผ้าไหม",          category: "craft", price: 220,
+    description: "พัดผ้าไหมประดับดวงตรา ใช้คลายร้อนและพกติดกายของผู้สูงศักดิ์" },
+  { id: "warrior_belt",   name: "เข็มขัดนักรบ",       category: "craft", price: 320,
+    description: "เข็มขัดหนังเสริมโลหะ พื้นฐานของยอดยุทธผู้ออกศึก" },
+  { id: "jade_pendant",   name: "จี้หยก",              category: "craft", price: 480,
+    description: "จี้หยกแกะสลักลวดลายเมฆ ผูกด้วยเชือกถัก" },
+  { id: "fortune_charm",  name: "เครื่องรางเสริมโชค",  category: "craft", price: 280,
+    description: "เครื่องรางพันด้ายแดง ผู้คนเชื่อกันว่าเสริมโชคยามเดินทาง" },
 ];
 
 export const ITEMS_BY_ID = new Map<string, ItemDef>(ITEMS.map((i) => [i.id, i]));

@@ -12,6 +12,12 @@ export {
   type SectHallOffer,
 } from "./sect-halls";
 export {
+  ARTISANS,
+  getArtisansAt,
+  getArtisan,
+  recipesOfferedBy,
+} from "./artisans";
+export {
   MEET_EVENTS,
   FIGHT_EVENTS,
   TREASURE_EVENTS,

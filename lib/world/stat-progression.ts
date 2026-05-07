@@ -32,6 +32,7 @@ export const STAT_FROM_LIFE_SKILL: Partial<Record<LifeSkill, StatKey>> = {
   jewelry: "DEX",
   alchemy: "DEX",
   chef: "DEX",
+  accessory: "DEX",
   // Cultural / arts → INT
   reading: "INT",
   music: "INT",

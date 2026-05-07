@@ -6,6 +6,7 @@ import { QUESTS_BY_ID, getQuest } from "./data/quests";
 import { OPPONENTS_BY_ID } from "./data/opponents";
 import { RESOURCES_BY_ID } from "./data/resources";
 import { NPCS_BY_ID } from "./data/npcs";
+import { RECIPES_BY_ID } from "./data/recipes";
 import { SKILLS_BY_ID } from "@/lib/game/data/skills";
 import { ARTS_BY_ID } from "@/lib/game/data/arts";
 import {
@@ -175,6 +176,12 @@ export function validateAndRepair(state: WorldStateData): void {
     const xp = state.artExp[aid];
     state.artExp[aid] = typeof xp === "number" && xp >= 0 ? xp : 0;
   }
+
+  // Learned recipes — drop unknown ids, dedupe.
+  if (!Array.isArray(state.learnedRecipeIds)) state.learnedRecipeIds = [];
+  state.learnedRecipeIds = Array.from(
+    new Set(state.learnedRecipeIds.filter((id) => RECIPES_BY_ID.has(id))),
+  );
   if (state.playerBuild) {
     state.playerBuild = {
       ...state.playerBuild,

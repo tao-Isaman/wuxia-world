@@ -12,7 +12,7 @@ import {
   LIFE_SKILL_KEYS,
   LIFE_SKILL_LABEL,
   MAX_MASTERY,
-  RECIPES,
+  RECIPES_BY_ID,
   gatherSuccessChance,
   getItem,
   masteryLevel,
@@ -20,7 +20,6 @@ import {
 } from "@/lib/world";
 import type { LifeSkill, RecipeDef } from "@/lib/world";
 import { useWorldStore } from "@/store/world-store";
-import { flashLoading } from "@/store/loading-store";
 import { toast } from "@/store/toast-store";
 
 interface Props {
@@ -28,13 +27,15 @@ interface Props {
   onClose: () => void;
 }
 
-type Tab = "skills" | "practice" | "crafting";
+type Tab = "skills" | "practice" | "recipes";
 
 // Combined popup for the menu's "🌾 วิชาชีพ" button. Three tabs:
 //   • มาสเตอร์รี่    — progress bar for each of the 17 life skills
 //   • ฝึกฝน          — consumable training items + เล่นเพลง button
-//   • ประดิษฐ์       — recipes the player can attempt; mastery-gated and
-//                      drop-checked when usesDropCheck is set
+//   • สูตรที่เรียน    — read-only list of learned recipes; the player
+//                      crafts at artisan NPCs (city / village / sect),
+//                      not from this popup. The list is a quick
+//                      reference for what's available where.
 export function LifeSkillsPopup({ open, onClose }: Props) {
   const [tab, setTab] = useState<Tab>("skills");
   return (
@@ -46,14 +47,14 @@ export function LifeSkillsPopup({ open, onClose }: Props) {
         <Button variant={tab === "practice" ? "default" : "ghost"} size="sm" className="text-xs" onClick={() => setTab("practice")}>
           ฝึกฝน
         </Button>
-        <Button variant={tab === "crafting" ? "default" : "ghost"} size="sm" className="text-xs" onClick={() => setTab("crafting")}>
-          ประดิษฐ์
+        <Button variant={tab === "recipes" ? "default" : "ghost"} size="sm" className="text-xs" onClick={() => setTab("recipes")}>
+          สูตรที่เรียน
         </Button>
       </div>
 
       {tab === "skills" && <SkillsTab />}
       {tab === "practice" && <PracticeTab />}
-      {tab === "crafting" && <CraftingTab />}
+      {tab === "recipes" && <RecipesTab />}
     </Modal>
   );
 }
@@ -210,44 +211,46 @@ function PracticeTab() {
   );
 }
 
-// ─── Crafting tab ───────────────────────────────────────────────────
-function CraftingTab() {
+// ─── Recipes tab — read-only "what have I learned" reference ─────────
+//
+// Crafting moved to the artisan popups (city / village / sect). This tab
+// just lists the recipes the player has learned + what they need to
+// craft them, with a hint to visit a matching artisan. Rather than
+// silently swallow the craft button (which used to live here), the row
+// states the profession + tells the player where to go.
+function RecipesTab() {
+  const learnedRecipeIds = useWorldStore((s) => s.learnedRecipeIds);
   const inventory = useWorldStore((s) => s.inventory);
   const xpMap = useWorldStore((s) => s.lifeSkillXp);
-  const craftRecipe = useWorldStore((s) => s.craftRecipe);
+
+  const recipes: RecipeDef[] = learnedRecipeIds
+    .map((id) => RECIPES_BY_ID.get(id))
+    .filter((r): r is RecipeDef => !!r);
+
+  if (recipes.length === 0) {
+    return (
+      <div className="space-y-2">
+        <p className="text-xs text-muted-foreground italic py-3 text-center">
+          ท่านยังไม่ได้เรียนสูตรใด
+        </p>
+        <p className="text-[10px] text-muted-foreground text-center">
+          ไปพบช่างฝีมือในเมือง · หมู่บ้าน · สำนัก เพื่อซื้อสูตรและฝึกประดิษฐ์
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-2">
-      {RECIPES.map((r) => (
+      <p className="text-[10px] text-muted-foreground">
+        ประดิษฐ์ได้ที่ร้านช่างฝีมือ — เลือกร้านในเมืองหรือหมู่บ้านที่สาขาตรงกับสูตร
+      </p>
+      {recipes.map((r) => (
         <RecipeRow
           key={r.id}
           recipe={r}
           inventory={inventory}
           masteryLv={r.skill ? masteryLevel(xpMap[r.skill] ?? 0) : MAX_MASTERY}
-          onCraft={() => {
-            flashLoading("กำลังประดิษฐ์...");
-            const res = craftRecipe(r.id);
-            if (!res.ok) {
-              toast(
-                "error",
-                res.reason === "missing-input"
-                  ? "วัตถุดิบไม่ครบ"
-                  : res.reason === "missing-mastery"
-                    ? "มาสเตอร์รี่ยังไม่ถึงระดับที่กำหนด"
-                    : "ไม่สามารถประดิษฐ์ได้",
-              );
-              return;
-            }
-            const out = getItem(res.outputItemId);
-            if (res.dropCheck === "failed") {
-              toast("warn", `พลาดในขั้นตอนสุดท้าย — เสียวัตถุดิบ · +${res.xpGained} xp`);
-              return;
-            }
-            toast(
-              "success",
-              `สร้าง ${out?.name ?? res.outputItemId} ×${res.outputCount} · +${res.xpGained} xp`,
-            );
-          }}
         />
       ))}
     </div>
@@ -258,23 +261,16 @@ function RecipeRow({
   recipe,
   inventory,
   masteryLv,
-  onCraft,
 }: {
   recipe: RecipeDef;
   inventory: Record<string, number>;
   masteryLv: number;
-  onCraft: () => void;
 }) {
   const required = recipe.requiredMastery ?? 1;
   const masteryOk = masteryLv >= required;
-  const inputsOk = recipe.inputs.every(
-    (inp) => (inventory[inp.itemId] ?? 0) >= inp.count,
-  );
-  const canCraft = masteryOk && inputsOk;
   const out = getItem(recipe.output.itemId);
   const skillKey = recipe.skill;
 
-  // Drop-check preview: only for recipes that actually roll one.
   const successChance = recipe.usesDropCheck
     ? gatherSuccessChance(masteryLv, required)
     : null;
@@ -301,15 +297,11 @@ function RecipeRow({
             </Badge>
           )}
         </div>
-        <Button
-          size="sm"
-          variant="outline"
-          disabled={!canCraft}
-          onClick={onCraft}
-          className="text-[11px] h-7"
-        >
-          ประดิษฐ์
-        </Button>
+        {skillKey && (
+          <span className="text-[10px] text-muted-foreground">
+            ไปร้าน{LIFE_SKILL_LABEL[skillKey]}
+          </span>
+        )}
       </div>
       {recipe.description && (
         <div className="text-[10px] text-muted-foreground">{recipe.description}</div>
