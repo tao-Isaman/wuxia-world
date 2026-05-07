@@ -57,6 +57,68 @@ export const EQUIPMENT: readonly Equipment[] = [
   { id: "C3", n: "ประดับปัญญาสวรรค์", ty: "C", atkb: 0, pdb: 0, idb: 0, hpb: 250, mpb: 0, st: { INT: 5, POW: 5 }, eff: { t: "pct_atk", v: 6 } },
   { id: "C4", n: "ประดับชีวิตนิรันดร์", ty: "C", atkb: 0, pdb: 0, idb: 0, hpb: 500, mpb: 0, st: { VIT: 10 }, eff: { t: "hp_regen", v: 5 } },
   { id: "C5", n: "ประดับมังกรเทพ", ty: "C", atkb: 0, pdb: 0, idb: 0, hpb: 450, mpb: 0, st: { STR: 5, VIT: 5 }, eff: { t: "pct_reduce", v: 8 } },
+
+  // ─── Artisan-shop tier 0-1 roster ──────────────────────────────────
+  // Items in this block are sold by the new artisan NPCs (city / village
+  // / sect — see lib/world/data/artisans.ts). They sit BELOW the W1–W5
+  // legendary ladder above so the player can equip something from day 1
+  // without finding rare drops. ID prefix: `eq_t<tier>_<slot>_<flavor>`.
+  // Stat budget per slot is intentionally small — these are starter
+  // gear, not late-game pieces.
+
+  // ── tier 0 weapons (forge) — 6 weapon families
+  { id: "eq_t0_w_fist",   n: "นวมไม้ฝึกหมัด",      ty: "W", atkb: 8,  pdb: 0, idb: 0, hpb: 0, mpb: 0, st: { STR: 2 },              eff: null },
+  { id: "eq_t0_w_long",   n: "ทวนไม้ฝึก",          ty: "W", atkb: 10, pdb: 0, idb: 0, hpb: 0, mpb: 0, st: { STR: 2, VIT: 1 },      eff: null },
+  { id: "eq_t0_w_sword",  n: "กระบี่ไม้ฝึก",        ty: "W", atkb: 9,  pdb: 0, idb: 0, hpb: 0, mpb: 0, st: { POW: 2, AGI: 1 },      eff: null },
+  { id: "eq_t0_w_blade",  n: "ดาบไม้ฝึก",          ty: "W", atkb: 11, pdb: 0, idb: 0, hpb: 0, mpb: 0, st: { STR: 3 },              eff: null },
+  { id: "eq_t0_w_short",  n: "พัดฝึกฝีมือ",         ty: "W", atkb: 7,  pdb: 0, idb: 0, hpb: 0, mpb: 10, st: { POW: 2, INT: 1 },     eff: null },
+  { id: "eq_t0_w_hidden", n: "เข็มฝึกซ้อม",         ty: "W", atkb: 6,  pdb: 0, idb: 0, hpb: 0, mpb: 0, st: { DEX: 3 },              eff: null },
+
+  // ── tier 0 armor (forge metal: iron / tailoring cloth)
+  { id: "eq_t0_a_cloth",  n: "เสื้อผ้าฝ้ายเรียบ",    ty: "A", atkb: 0, pdb: 18,  idb: 12, hpb: 0, mpb: 0, st: {},                  eff: null },
+  { id: "eq_t0_h_cloth",  n: "ผ้าโพกหัว",           ty: "H", atkb: 0, pdb: 8,   idb: 5,  hpb: 0, mpb: 0, st: {},                  eff: null },
+  { id: "eq_t0_b_cloth",  n: "รองเท้าฟาง",          ty: "B", atkb: 0, pdb: 6,   idb: 4,  hpb: 0, mpb: 0, st: { AGI: 2 },          eff: null },
+  { id: "eq_t0_br_cloth", n: "ปลอกแขนผ้าฝ้าย",     ty: "BR",atkb: 0, pdb: 5,   idb: 3,  hpb: 0, mpb: 0, st: {},                  eff: null },
+  { id: "eq_t0_a_iron",   n: "เกราะแผ่นเหล็กเล็ก",  ty: "A", atkb: 0, pdb: 25,  idb: 15, hpb: 0, mpb: 0, st: { DEF: 3 },          eff: null },
+  { id: "eq_t0_h_iron",   n: "หมวกเหล็กบาง",        ty: "H", atkb: 0, pdb: 12,  idb: 7,  hpb: 0, mpb: 0, st: { DEF: 2 },          eff: null },
+  { id: "eq_t0_b_iron",   n: "รองเท้าหุ้มเหล็ก",     ty: "B", atkb: 0, pdb: 10,  idb: 6,  hpb: 0, mpb: 0, st: { DEF: 2 },          eff: null },
+  { id: "eq_t0_br_iron",  n: "ปลอกแขนเหล็กบาง",    ty: "BR",atkb: 0, pdb: 8,   idb: 5,  hpb: 0, mpb: 0, st: { STR: 2 },          eff: null },
+
+  // ── tier 0 accessories (jewelry / accessory)
+  { id: "eq_t0_r_copper", n: "แหวนทองแดง",         ty: "R", atkb: 0, pdb: 0, idb: 0, hpb: 60,  mpb: 30, st: {},                   eff: null },
+  { id: "eq_t0_c_cloth",  n: "เครื่องรางผ้าแดง",   ty: "C", atkb: 0, pdb: 0, idb: 0, hpb: 100, mpb: 0,  st: { LUK: 2 },          eff: null },
+
+  // ── tier 1 weapons (forge)
+  { id: "eq_t1_w_fist",   n: "หมัดเหล็ก",          ty: "W", atkb: 18, pdb: 0, idb: 0, hpb: 0, mpb: 0,  st: { STR: 5, VIT: 2 },   eff: null },
+  { id: "eq_t1_w_long",   n: "ทวนเหล็ก",          ty: "W", atkb: 22, pdb: 0, idb: 0, hpb: 0, mpb: 0,  st: { STR: 5, AGI: 3 },   eff: null },
+  { id: "eq_t1_w_sword",  n: "กระบี่เหล็ก",        ty: "W", atkb: 20, pdb: 0, idb: 0, hpb: 0, mpb: 0,  st: { POW: 4, DEX: 4 },   eff: null },
+  { id: "eq_t1_w_blade",  n: "ดาบเหล็กกล้า",      ty: "W", atkb: 24, pdb: 0, idb: 0, hpb: 0, mpb: 0,  st: { STR: 6 },           eff: null },
+  { id: "eq_t1_w_short",  n: "พัดเหล็กบาง",        ty: "W", atkb: 16, pdb: 0, idb: 0, hpb: 0, mpb: 20, st: { POW: 4, INT: 4 },   eff: null },
+  { id: "eq_t1_w_hidden", n: "เข็มเหล็กพิษอ่อน",  ty: "W", atkb: 14, pdb: 0, idb: 0, hpb: 0, mpb: 0,  st: { DEX: 6, LUK: 3 },   eff: { t: "on_hit", db: { t: "debuff_eva", v: -5, u: 1 } } },
+
+  // ── tier 1 armor — leather/iron
+  { id: "eq_t1_a_leather",  n: "เสื้อหนัง",          ty: "A", atkb: 0, pdb: 35, idb: 22, hpb: 0, mpb: 0, st: { VIT: 5, DEF: 4 },  eff: null },
+  { id: "eq_t1_h_leather",  n: "หมวกหนังบุนวม",    ty: "H", atkb: 0, pdb: 16, idb: 11, hpb: 0, mpb: 0, st: { VIT: 4 },          eff: null },
+  { id: "eq_t1_b_leather",  n: "รองเท้าหนังหนา",    ty: "B", atkb: 0, pdb: 14, idb: 10, hpb: 0, mpb: 0, st: { AGI: 5, DEX: 2 }, eff: null },
+  { id: "eq_t1_br_leather", n: "ปลอกแขนหนัง",      ty: "BR",atkb: 0, pdb: 10, idb: 8,  hpb: 0, mpb: 0, st: { STR: 4 },          eff: null },
+  { id: "eq_t1_a_iron",     n: "เกราะเหล็กหนา",     ty: "A", atkb: 0, pdb: 48, idb: 32, hpb: 0, mpb: 0, st: { DEF: 8, VIT: 5 }, eff: null },
+  { id: "eq_t1_h_iron",     n: "หมวกเหล็กแข็ง",     ty: "H", atkb: 0, pdb: 22, idb: 16, hpb: 0, mpb: 0, st: { DEF: 6 },          eff: null },
+  { id: "eq_t1_b_iron",     n: "รองเท้าเหล็กแข็ง",   ty: "B", atkb: 0, pdb: 18, idb: 13, hpb: 0, mpb: 0, st: { DEF: 5, VIT: 3 }, eff: null },
+  { id: "eq_t1_br_iron",    n: "ปลอกแขนเหล็กหนา",  ty: "BR",atkb: 0, pdb: 14, idb: 10, hpb: 0, mpb: 0, st: { STR: 5, DEF: 3 }, eff: null },
+
+  // ── tier 1 accessories
+  { id: "eq_t1_r_silver",   n: "แหวนเงิน",          ty: "R", atkb: 0, pdb: 0, idb: 0, hpb: 100, mpb: 60, st: { LUK: 3 },           eff: null },
+  { id: "eq_t1_c_wood",     n: "เครื่องรางไม้แกะสลัก", ty: "C", atkb: 0, pdb: 0, idb: 0, hpb: 180, mpb: 0,  st: { VIT: 3 },          eff: null },
+
+  // ── city specialties — limited to specific city artisans (see
+  // CITY_EQUIPMENT_SPECIALTIES in lib/world/data/artisans.ts)
+  { id: "eq_xixia_w_blade",   n: "ดาบเหล็กชายแดน",    ty: "W", atkb: 30, pdb: 0, idb: 0, hpb: 0, mpb: 0,  st: { STR: 7, VIT: 3 },   eff: null },
+  { id: "eq_yangzhou_w_blade",n: "ดาบโค้งแม่น้ำ",      ty: "W", atkb: 26, pdb: 0, idb: 0, hpb: 0, mpb: 0,  st: { AGI: 6, DEX: 4 },   eff: { t: "flat_eva", v: 8 } },
+  { id: "eq_suzhou_a_silk",   n: "เสื้อผ้าไหมซูโจว",   ty: "A", atkb: 0,  pdb: 28, idb: 38, hpb: 0, mpb: 30, st: { POW: 5, INT: 5 }, eff: null },
+  { id: "eq_jinling_r_jade",  n: "แหวนหยกจินหลิง",    ty: "R", atkb: 0,  pdb: 0,  idb: 0,  hpb: 140, mpb: 100, st: { INT: 5, POW: 3 }, eff: null },
+  { id: "eq_dali_c_herb",     n: "เครื่องรางสมุนไพรต้าหลี่", ty: "C", atkb: 0, pdb: 0, idb: 0, hpb: 220, mpb: 0, st: { VIT: 4 }, eff: { t: "hp_regen", v: 2 } },
+  { id: "eq_changan_br_iron", n: "ปลอกแขนทหารราชสำนัก", ty: "BR",atkb: 0, pdb: 18, idb: 14, hpb: 0, mpb: 0, st: { STR: 6, DEF: 4 }, eff: null },
+  { id: "eq_capital_c_seal",  n: "ตราประทับนครหลวง",   ty: "C", atkb: 0,  pdb: 0,  idb: 0,  hpb: 200, mpb: 60, st: { LUK: 4 }, eff: { t: "pct_atk", v: 4 } },
 ];
 
 export const EQUIPMENT_BY_ID: Map<string, Equipment> = new Map(EQUIPMENT.map((e) => [e.id, e]));

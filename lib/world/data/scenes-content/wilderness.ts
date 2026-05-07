@@ -98,6 +98,24 @@ export const SCENES_WILDERNESS: readonly Scene[] = [
       { t: "dialogue", speaker: "เว่ยชิงเหวิน", text: "ข้าเลือกถ้ำนี้เพราะเย็นสบาย ตำราไม่เสื่อมสภาพ และที่สำคัญ — ไม่มีใครมารบกวน" },
       { t: "dialogue", speaker: "เว่ยชิงเหวิน", text: "แต่เจ้ามาแล้ว... ก็โชคดีพอดี เพราะข้าต้องการความช่วยเหลืออยู่" },
     ],
+    // The kunlun-exile-truth quest is the canonical reason a player
+    // would brave the cave chain. When that quest is active and the
+    // scroll hasn't been claimed yet, surface a dedicated branch that
+    // hands over the evidence scroll. Falls through silently otherwise.
+    choices: [
+      {
+        text: "ข้ามาตามคำขอของฤๅษีชิวเฉียน — ขอม้วนหนังสือพิสูจน์",
+        visibleIf: {
+          t: "and",
+          all: [
+            { t: "questStatus", questId: "qw_kunlun_exile_truth", status: "active" },
+            { t: "not", of: { t: "hasItem", itemId: "qst_kunlun_evidence", count: 1 } },
+          ],
+        },
+        next: "qs_qw_kunlun_exile_truth_pickup",
+      },
+      { text: "ลาจาก", next: "cave_bingcan" },
+    ],
   },
 
   // ─── ต่านเหลาตู (pool_heilong) ───────────────────────────────────────
@@ -263,7 +281,30 @@ export const SCENES_WILDERNESS: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qw_kunlun_exile_truth_progress",
     lines: [
-      { t: "dialogue", speaker: "ชิวเฉียน", text: "ยังไม่พบหลักฐาน? ถ้ำน้ำแข็งไหมอาจมีผู้ดูแลอยู่ ระวังตัวด้วย" },
+      { t: "dialogue", speaker: "ชิวเฉียน", text: "ยังไม่พบหลักฐาน? ถ้ำน้ำแข็งไหมอาจมีผู้ดูแลอยู่ — บัณฑิตเว่ยชิงเหวิน เขารู้เรื่องของข้าดี ลองคุยกับเขาดู" },
+    ],
+  },
+  // Pickup branch — fired from เว่ยชิงเหวิน's NPC dialog choice when the
+  // player has the active kunlun-exile quest and hasn't claimed the
+  // scroll yet. Hands over `qst_kunlun_evidence`, which fires the
+  // stage-2 autoAdvance and moves the quest to "นำหลักฐานกลับ".
+  {
+    kind: "dialog",
+    id: "qs_qw_kunlun_exile_truth_pickup",
+    lines: [
+      { t: "dialogue", speaker: "เว่ยชิงเหวิน", text: "ชิวเฉียน... ในที่สุดเขาก็ส่งคนมา ข้ารอวันนี้นานเหลือเกิน" },
+      { t: "narration", text: "บัณฑิตชราเปิดหีบเก่าใต้ตำรา ดึงม้วนหนังสือผูกด้วยเชือกป่านขึ้นมา" },
+      { t: "dialogue", speaker: "เว่ยชิงเหวิน", text: "นี่คือหลักฐานที่ฝังกล่าวหาเขาไว้ — รายชื่อพยานปลอม ลายมือของผู้ใส่ความ" },
+      { t: "dialogue", speaker: "เว่ยชิงเหวิน", text: "ข้าเก็บไว้ที่นี่เพราะปลอดภัยที่สุดในยุทธจักร นำกลับให้เขาด้วย" },
+    ],
+    choices: [
+      {
+        text: "รับม้วนหนังสือและออกเดินทาง",
+        next: "cave_bingcan",
+        effects: [
+          { t: "giveItem", itemId: "qst_kunlun_evidence", count: 1 },
+        ],
+      },
     ],
   },
   {
@@ -279,6 +320,7 @@ export const SCENES_WILDERNESS: readonly Scene[] = [
         text: "รับคำสอนด้วยความยินดี",
         next: "mt_kunlun",
         effects: [
+          { t: "takeItem", itemId: "qst_kunlun_evidence", count: 1 },
           { t: "finishQuest", questId: "qw_kunlun_exile_truth", success: true },
           { t: "addTrait", trait: "good", amount: 5 },
         ],
@@ -1009,7 +1051,8 @@ export const SCENES_WILDERNESS: readonly Scene[] = [
     id: "qs_qw_bingcan_ice_fever_offer",
     lines: [
       { t: "dialogue", speaker: "เว่ยชิงเหวิน", text: "ข้าสังเกตว่าเจ้าดูซีดผิดปกติ... ข้าเคยเห็นอาการแบบนี้ มันเรียกว่า 'ไข้น้ำแข็ง' เกิดจากถูกพิษหิมะโดยไม่รู้ตัว" },
-      { t: "dialogue", speaker: "เว่ยชิงเหวิน", text: "ข้าสามารถผสมยาแก้ได้แต่ต้องการโสมจากเขาคุนหลุนนิรันดร์ เจ้าจะไปหาให้ข้าได้ไหม?" },
+      { t: "dialogue", speaker: "เว่ยชิงเหวิน", text: "ยาแก้ต้องใช้โสมหิมะ — โสมพิเศษที่งอกได้เพียงบนยอดนิรันดร์คุนหลุนเท่านั้น โสมในร้านยาเมืองทั่วไปไม่มีฤทธิ์พอ" },
+      { t: "dialogue", speaker: "เว่ยชิงเหวิน", text: "ขึ้นไปยอดนิรันดร์ มองหาโสมที่ใบเป็นเกล็ดน้ำแข็ง เก็บมาให้ข้าหนึ่งราก" },
     ],
     choices: [
       {
@@ -1024,7 +1067,7 @@ export const SCENES_WILDERNESS: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qw_bingcan_ice_fever_complete",
     lines: [
-      { t: "dialogue", speaker: "เว่ยชิงเหวิน", text: "โสมสดจากคุนหลุนนิรันดร์! ข้าจะผสมยาให้เดี๋ยวนี้" },
+      { t: "dialogue", speaker: "เว่ยชิงเหวิน", text: "โสมหิมะคุนหลุนของแท้! ใบยังเย็นเป็นน้ำแข็งอยู่เลย — ข้าจะผสมยาให้เดี๋ยวนี้" },
       { t: "narration", text: "บัณฑิตทำงานอย่างชำนาญ ยาสีเขียวอ่อนโผล่ออกมาในขวดแก้ว" },
       { t: "dialogue", speaker: "เว่ยชิงเหวิน", text: "ดื่มยานี้ และเก็บขวดใหม่ไปด้วย ถ้าเกิดอาการอีกก็ใช้ได้เลย" },
     ],
@@ -1033,6 +1076,7 @@ export const SCENES_WILDERNESS: readonly Scene[] = [
         text: "รับยาและขอบคุณ",
         next: "cave_bingcan",
         effects: [
+          { t: "takeItem", itemId: "qst_kunlun_snow_ginseng", count: 1 },
           { t: "finishQuest", questId: "qw_bingcan_ice_fever", success: true },
         ],
       },

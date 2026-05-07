@@ -10,6 +10,7 @@ import {
   LIFE_SKILL_LABEL,
   MAX_MASTERY,
   RECIPES_BY_ID,
+  equipmentOfferedBy,
   gatherSuccessChance,
   getItem,
   getRecipe,
@@ -19,6 +20,7 @@ import {
   type ItemCategory,
   type RecipeDef,
 } from "@/lib/world";
+import { SLOT_LABELS, getEquip } from "@/lib/game";
 import { useWorldStore } from "@/store/world-store";
 import { flashLoading } from "@/store/loading-store";
 import { toast } from "@/store/toast-store";
@@ -340,6 +342,7 @@ function TradeTab({ artisan }: { artisan: ArtisanDef }) {
   const gold = useWorldStore((s) => s.gold);
   const inventory = useWorldStore((s) => s.inventory);
   const buyItem = useWorldStore((s) => s.buyItem);
+  const buyEquipment = useWorldStore((s) => s.buyEquipment);
   const sellItem = useWorldStore((s) => s.sellItem);
   const [sub, setSub] = useState<"buy" | "sell">("buy");
 
@@ -359,6 +362,10 @@ function TradeTab({ artisan }: { artisan: ArtisanDef }) {
     if ((def.price ?? 0) <= 0) return false;
     return canSell(def.category);
   });
+
+  // Equipment-for-sale list — folded from the artisan's specialty list +
+  // the basic profession roster. Helper lives in lib/world/data/artisans.
+  const equipOffers = equipmentOfferedBy(artisan);
 
   return (
     <div className="space-y-2">
@@ -395,13 +402,101 @@ function TradeTab({ artisan }: { artisan: ArtisanDef }) {
       )}
 
       {sub === "buy" ? (
-        artisan.inventory.length === 0 ? (
-          <p className="text-xs text-muted-foreground italic py-3 text-center">
-            ช่างคนนี้ไม่มีของขายในขณะนี้
-          </p>
-        ) : (
-          <ul className="space-y-1.5">
-            {artisan.inventory.map((id) => {
+        <div className="space-y-3">
+          {equipOffers.length > 0 && (
+            <div className="space-y-1.5">
+              <div className="text-[10px] font-semibold tracking-wider uppercase text-muted-foreground">
+                อุปกรณ์
+              </div>
+              <ul className="space-y-1.5">
+                {equipOffers.map((offer) => {
+                  const e = getEquip(offer.equipId);
+                  if (!e) return null;
+                  const canAfford = gold >= offer.price;
+                  return (
+                    <li
+                      key={offer.equipId}
+                      className="rounded bg-muted/30 px-2 py-1.5 text-xs flex items-center justify-between gap-2"
+                    >
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <strong>{e.n}</strong>
+                          <Badge variant="outline" className="text-[9px]">
+                            {SLOT_LABELS[e.ty]}
+                          </Badge>
+                          {e.atkb > 0 && (
+                            <Badge variant="outline" className="text-[9px]">
+                              ATK +{e.atkb}
+                            </Badge>
+                          )}
+                          {e.pdb > 0 && (
+                            <Badge variant="outline" className="text-[9px]">
+                              PD +{e.pdb}
+                            </Badge>
+                          )}
+                          {e.idb > 0 && (
+                            <Badge variant="outline" className="text-[9px]">
+                              ID +{e.idb}
+                            </Badge>
+                          )}
+                          {e.hpb > 0 && (
+                            <Badge variant="outline" className="text-[9px]">
+                              HP +{e.hpb}
+                            </Badge>
+                          )}
+                          {e.mpb > 0 && (
+                            <Badge variant="outline" className="text-[9px]">
+                              MP +{e.mpb}
+                            </Badge>
+                          )}
+                        </div>
+                        {Object.keys(e.st).length > 0 && (
+                          <p className="text-[10px] text-emerald-700 mt-0.5">
+                            {Object.entries(e.st)
+                              .map(([k, v]) => `${k}+${v}`)
+                              .join(" ")}
+                          </p>
+                        )}
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        disabled={!canAfford}
+                        className="h-7 text-[11px] shrink-0"
+                        onClick={() => {
+                          const res = buyEquipment(offer.equipId, offer.price);
+                          if (!res.ok) {
+                            toast(
+                              "error",
+                              res.reason === "no-gold"
+                                ? "ทองไม่พอ"
+                                : "ซื้ออุปกรณ์ไม่สำเร็จ",
+                            );
+                            return;
+                          }
+                          toast("success", `ซื้อ ${e.n} (-${res.spent}🟡)`);
+                        }}
+                      >
+                        {offer.price}🟡
+                      </Button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
+
+          <div className="space-y-1.5">
+            <div className="text-[10px] font-semibold tracking-wider uppercase text-muted-foreground">
+              ของในร้าน
+            </div>
+            {artisan.inventory.length === 0 ? (
+              <p className="text-xs text-muted-foreground italic py-2 text-center">
+                ช่างคนนี้ไม่มีของขายในขณะนี้
+              </p>
+            ) : (
+              <ul className="space-y-1.5">
+                {artisan.inventory.map((id) => {
               const def = getItem(id);
               if (!def) return null;
               const price = def.price ?? 0;
@@ -446,7 +541,9 @@ function TradeTab({ artisan }: { artisan: ArtisanDef }) {
               );
             })}
           </ul>
-        )
+        )}
+          </div>
+        </div>
       ) : sellable.length === 0 ? (
         <p className="text-xs text-muted-foreground italic py-3 text-center">
           ไม่มีของให้ขายในย่าม{!acceptsAll ? " (ตามหมวดที่ช่างรับ)" : ""}

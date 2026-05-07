@@ -27,6 +27,10 @@ export const ITEMS: readonly ItemDef[] = [
     description: "จดหมายรหัสลับจากนักยุทธศาสตร์กง สำหรับให้บัณฑิตในต้าหลี่แปล" },
   { id: "qst_dali_decoded", name: "คำแปลจดหมายลับ", category: "quest", price: 0,
     description: "คำแปลจดหมายรหัสลับ — ต้องนำกลับให้นักยุทธศาสตร์กงที่จินหลิง" },
+  { id: "qst_kunlun_evidence", name: "ม้วนหนังสือพิสูจน์ฤๅษี", category: "quest", price: 0,
+    description: "ม้วนหนังสือเก่าที่บัณฑิตเว่ยชิงเหวินเก็บไว้ในถ้ำน้ำแข็งไหม — หลักฐานพิสูจน์ความบริสุทธิ์ของฤๅษีชิวเฉียน" },
+  { id: "qst_kunlun_snow_ginseng", name: "โสมหิมะคุนหลุน", category: "quest", price: 0,
+    description: "โสมหายากที่งอกบนนิรันดร์คุนหลุนเท่านั้น — ฉ่ำเย็นเหมือนน้ำแข็ง ใช้ปรุงยาขจัดไข้น้ำแข็งได้" },
 
   // ─── Valuables ─────────────────────────────────────────────────────
   { id: "jade", name: "หยกล้ำค่า", category: "valuable", price: 1000,

@@ -1,5 +1,6 @@
 import type {
   ArtisanDef,
+  ArtisanEquipOffer,
   ArtisanRecipeOffer,
   ItemCategory,
 } from "../types";
@@ -65,6 +66,113 @@ const PROF_ACCEPTS: Record<CraftProfession, readonly ItemCategory[]> = {
   jewelry:   ["material", "valuable"],
   accessory: ["material", "valuable"],
 };
+
+// ─── Equipment offers ────────────────────────────────────────────────
+// Tier 0-1 equipment is sold by every artisan of the matching
+// profession (the "basic" roster). City-specific specialty pieces are
+// listed in CITY_EQUIPMENT_SPECIALTIES below — those override / append
+// per-artisan.
+//
+// Equipment id ↔ profession mapping is held in PROF_BASIC_EQUIPMENT;
+// prices come from EQUIPMENT_PRICE. Authors extend the system by:
+//   - adding a new equipment id to lib/game/data/equipment.ts
+//   - registering the id under the right profession below + giving it
+//     a base price
+//   - (optional) appending a row to CITY_EQUIPMENT_SPECIALTIES to
+//     restrict it to a specific city's artisan with its own price
+
+const PROF_BASIC_EQUIPMENT: Record<CraftProfession, readonly string[]> = {
+  forge: [
+    // tier 0 weapons + iron armor
+    "eq_t0_w_fist", "eq_t0_w_long", "eq_t0_w_sword", "eq_t0_w_blade",
+    "eq_t0_w_short", "eq_t0_w_hidden",
+    "eq_t0_a_iron", "eq_t0_h_iron", "eq_t0_b_iron", "eq_t0_br_iron",
+    // tier 1 weapons + iron armor
+    "eq_t1_w_fist", "eq_t1_w_long", "eq_t1_w_sword", "eq_t1_w_blade",
+    "eq_t1_w_short", "eq_t1_w_hidden",
+    "eq_t1_a_iron", "eq_t1_h_iron", "eq_t1_b_iron", "eq_t1_br_iron",
+  ],
+  tailoring: [
+    "eq_t0_a_cloth", "eq_t0_h_cloth", "eq_t0_b_cloth", "eq_t0_br_cloth",
+    "eq_t1_a_leather", "eq_t1_h_leather", "eq_t1_b_leather", "eq_t1_br_leather",
+  ],
+  jewelry:   ["eq_t0_r_copper", "eq_t1_r_silver"],
+  accessory: ["eq_t0_c_cloth",  "eq_t1_c_wood"],
+  alchemy:   [],
+  chef:      [],
+};
+
+// Base price per equipment id. Used for the basic roster fan-out;
+// specialty offers override via CITY_EQUIPMENT_SPECIALTIES.
+const EQUIPMENT_PRICE: Record<string, number> = {
+  // tier 0
+  eq_t0_w_fist:   60,
+  eq_t0_w_long:   70,
+  eq_t0_w_sword:  65,
+  eq_t0_w_blade:  75,
+  eq_t0_w_short:  55,
+  eq_t0_w_hidden: 50,
+  eq_t0_a_cloth:  80,
+  eq_t0_h_cloth:  40,
+  eq_t0_b_cloth:  35,
+  eq_t0_br_cloth: 30,
+  eq_t0_a_iron:  140,
+  eq_t0_h_iron:   70,
+  eq_t0_b_iron:   60,
+  eq_t0_br_iron:  55,
+  eq_t0_r_copper: 90,
+  eq_t0_c_cloth: 100,
+  // tier 1
+  eq_t1_w_fist:   240,
+  eq_t1_w_long:   280,
+  eq_t1_w_sword:  260,
+  eq_t1_w_blade:  300,
+  eq_t1_w_short:  220,
+  eq_t1_w_hidden: 220,
+  eq_t1_a_leather:  340,
+  eq_t1_h_leather:  170,
+  eq_t1_b_leather:  150,
+  eq_t1_br_leather: 130,
+  eq_t1_a_iron:     480,
+  eq_t1_h_iron:     220,
+  eq_t1_b_iron:     200,
+  eq_t1_br_iron:    180,
+  eq_t1_r_silver:   320,
+  eq_t1_c_wood:     280,
+};
+
+// City × profession × specialty equipment. Mirrors CITY_SPECIALTIES for
+// recipes — append a row to give a city's artisan a unique stock entry.
+const CITY_EQUIPMENT_SPECIALTIES: readonly {
+  city: string;
+  prof: CraftProfession;
+  equipId: string;
+  price: number;
+}[] = [
+  // Xixia frontier forge — heavy steel saber.
+  { city: "city_xixia",    prof: "forge",     equipId: "eq_xixia_w_blade",   price: 720 },
+  // Yangzhou river forge — curved evasive saber.
+  { city: "city_yangzhou", prof: "forge",     equipId: "eq_yangzhou_w_blade", price: 680 },
+  // Suzhou silk tailor — premium silk armor.
+  { city: "city_suzhou",   prof: "tailoring", equipId: "eq_suzhou_a_silk",   price: 850 },
+  // Jinling jeweler — court-grade jade ring.
+  { city: "city_jinling",  prof: "jewelry",   equipId: "eq_jinling_r_jade",  price: 900 },
+  // Dali herbalist accessory — regen charm.
+  { city: "city_dali",     prof: "accessory", equipId: "eq_dali_c_herb",     price: 520 },
+  // Changan imperial forge — military bracers.
+  { city: "city_changan",  prof: "forge",     equipId: "eq_changan_br_iron", price: 460 },
+  // Capital court accessory — imperial seal charm.
+  { city: "city_capital",  prof: "accessory", equipId: "eq_capital_c_seal",  price: 780 },
+];
+
+function specialtyEquipFor(
+  city: string,
+  prof: CraftProfession,
+): readonly ArtisanEquipOffer[] {
+  return CITY_EQUIPMENT_SPECIALTIES
+    .filter((s) => s.city === city && s.prof === prof)
+    .map(({ equipId, price }) => ({ equipId, price }));
+}
 
 // ─── City artisan auto-generator ─────────────────────────────────────
 // Cities that host the full 6-profession roster. Adding a new city =
@@ -142,6 +250,7 @@ function buildCityArtisan(
     npcName: `${role}แห่ง${cityName}`,
     description: `${role}ประจำเมือง${cityName} รับซื้อของ ขายวัตถุดิบ และสอนสูตรเฉพาะของท้องถิ่น`,
     recipes: specialtiesFor(cityId, prof),
+    equipment: specialtyEquipFor(cityId, prof),
     inventory: PROF_INVENTORY[prof],
     acceptsCategories: PROF_ACCEPTS[prof],
     sellMultiplier: 0.4,
@@ -153,6 +262,11 @@ const CITY_ARTISANS: readonly ArtisanDef[] = CITIES_WITH_FULL_ROSTER.flatMap(
 );
 
 // ─── Village + sect artisans (single-profession lore picks) ──────────
+//
+// `equipment: []` here means "only the profession's basic roster" — the
+// helper `equipmentOfferedBy()` auto-folds those in. Hand-picked
+// specialty equipment (e.g., the sect huashan-forge "school-pattern
+// sword") goes into the array.
 const SINGLE_PROFESSION_ARTISANS: readonly ArtisanDef[] = [
   // ── Villages — one craft each, matching the village's flavour ────
   {
@@ -163,6 +277,7 @@ const SINGLE_PROFESSION_ARTISANS: readonly ArtisanDef[] = [
     npcName: "ช่างเหล็กถัง",
     description: "ช่างเหล็กรุ่นเก่าตีดาบให้ลูกศิษย์หัวซานมานานหลายชั่วคน",
     recipes: [],
+    equipment: [],
     inventory: ["iron_ingot", "iron_blade"],
     acceptsCategories: ["material"],
     sellMultiplier: 0.35,
@@ -175,6 +290,7 @@ const SINGLE_PROFESSION_ARTISANS: readonly ArtisanDef[] = [
     npcName: "แม่ครัวเสี่ยวหง",
     description: "ทำอาหารดอกเหมยสูตรประจำหมู่บ้าน รสหวานหอมตามฤดูกาล",
     recipes: [],
+    equipment: [],
     inventory: ["rice_dish", "moon_cake"],
     acceptsCategories: ["food", "herb"],
     sellMultiplier: 0.35,
@@ -187,6 +303,7 @@ const SINGLE_PROFESSION_ARTISANS: readonly ArtisanDef[] = [
     npcName: "หมอเฒ่าฉี",
     description: "ปรุงยาเลือดในบ้านไม้เก่าหน้าหมู่บ้าน รับวัตถุดิบป่าทุกชนิด",
     recipes: [],
+    equipment: [],
     inventory: ["potion", "herb"],
     acceptsCategories: ["herb", "venom"],
     sellMultiplier: 0.35,
@@ -199,6 +316,7 @@ const SINGLE_PROFESSION_ARTISANS: readonly ArtisanDef[] = [
     npcName: "ช่างเย็บลีหญิง",
     description: "ช่างตัดเสื้อหนังที่รู้จักกันทั้งปากแม่น้ำ ไม่ขายผ้าไหม",
     recipes: [],
+    equipment: [],
     inventory: ["thread", "leather_robe"],
     acceptsCategories: ["material"],
     sellMultiplier: 0.35,
@@ -216,6 +334,8 @@ const SINGLE_PROFESSION_ARTISANS: readonly ArtisanDef[] = [
       // Forge specialty for the sect's swordsmith identity
       { recipeId: "forge_iron_sword", price: 220 },
     ],
+    // Sect specialty: the school-pattern iron sword sells here too.
+    equipment: [{ equipId: "eq_t1_w_sword", price: 280 }],
     inventory: ["iron_ingot", "iron_blade", "iron_sword"],
     acceptsCategories: ["material"],
     sellMultiplier: 0.35,
@@ -230,6 +350,7 @@ const SINGLE_PROFESSION_ARTISANS: readonly ArtisanDef[] = [
     recipes: [
       { recipeId: "alchemy_potion_mid", price: 280 },
     ],
+    equipment: [],
     inventory: ["potion", "potion_mid", "herb", "ginseng"],
     acceptsCategories: ["herb", "venom"],
     sellMultiplier: 0.35,
@@ -244,6 +365,7 @@ const SINGLE_PROFESSION_ARTISANS: readonly ArtisanDef[] = [
     recipes: [
       { recipeId: "alchemy_poison", price: 600 },
     ],
+    equipment: [],
     inventory: ["poison_vial"],
     acceptsCategories: ["venom", "herb"],
     sellMultiplier: 0.35,
@@ -304,6 +426,34 @@ export function recipesOfferedBy(
     if (seen.has(r.id)) continue;
     seen.add(r.id);
     out.push({ recipeId: r.id, price: PRICE_BASIC });
+  }
+  return out;
+}
+
+// Mirror of recipesOfferedBy for equipment — folds the artisan's
+// specialty equipment offers + the basic roster for their profession
+// (with prices from EQUIPMENT_PRICE). Specialty rows can override the
+// basic price by listing the same equipId; first-write-wins, so
+// specialty appears before basic in the loop.
+export function equipmentOfferedBy(
+  artisan: ArtisanDef,
+): readonly ArtisanEquipOffer[] {
+  const out: ArtisanEquipOffer[] = [];
+  const seen = new Set<string>();
+  for (const offer of artisan.equipment) {
+    if (seen.has(offer.equipId)) continue;
+    seen.add(offer.equipId);
+    out.push(offer);
+  }
+  const basics = PROF_BASIC_EQUIPMENT[artisan.profession as CraftProfession];
+  if (basics) {
+    for (const equipId of basics) {
+      if (seen.has(equipId)) continue;
+      const price = EQUIPMENT_PRICE[equipId];
+      if (typeof price !== "number") continue;
+      seen.add(equipId);
+      out.push({ equipId, price });
+    }
   }
   return out;
 }

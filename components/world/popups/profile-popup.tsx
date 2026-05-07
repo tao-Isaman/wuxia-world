@@ -22,12 +22,15 @@ import {
   getMasteryMap,
   getSkill,
   parseSlotId,
+  statBreakdown,
   totalStatPoints,
 } from "@/lib/game";
+import { InfoPopover } from "@/components/ui/wuxia/info-popover";
 import type { EquipSlotType, Skill, StatKey, WeaponFamily } from "@/lib/game";
 import { useWorldStore } from "@/store/world-store";
 import { xpToNextStatLevel } from "@/lib/world/stat-progression";
 import { TRAIT_KEYS, TRAIT_LABEL } from "@/lib/world";
+import { ArtTooltip, SkillTooltip } from "../skill-tooltip";
 
 interface Props {
   open: boolean;
@@ -115,6 +118,10 @@ export function ProfilePopup({ open, onClose }: Props) {
 
   const base = player.stats;
   const combined = combinedStats(player);
+  // Per-source breakdown — used by the stat-cell tooltips so the player
+  // can see where each stat point comes from (skills + arts count toward
+  // the learn-skill gate; equipment doesn't).
+  const breakdown = statBreakdown(player);
   const derivedAll = deriveAll(player);
   const derivedBase = derive(base);
   const art = getArt(player.artId);
@@ -192,11 +199,16 @@ export function ProfilePopup({ open, onClose }: Props) {
               const b = base[k];
               const c = combined[k];
               const d = c - b;
+              const fromArts = breakdown.fromArts[k];
+              const fromSkills = breakdown.fromSkills[k];
+              const fromEquipment = breakdown.fromEquipment[k];
+              // Sum used by learn-skill / learn-art gates (no equipment).
+              const learnable = b + fromArts + fromSkills;
               const xp = statExp[k] ?? 0;
               const cost = xpToNextStatLevel(b);
               const xpPct = cost > 0 ? Math.min(100, Math.round((xp / cost) * 100)) : 0;
-              return (
-                <div key={k} className="rounded bg-muted/40 px-2 py-1.5">
+              const cellTrigger = (
+                <div className="w-full rounded bg-muted/40 px-2 py-1.5 cursor-help">
                   <div className="text-[9px] text-muted-foreground">
                     {k} <span className="opacity-70">{STAT_LABEL[k]}</span>
                   </div>
@@ -204,13 +216,67 @@ export function ProfilePopup({ open, onClose }: Props) {
                     {c}
                     {d > 0 && <span className="text-[9px] text-emerald-600 ml-1">+{d}</span>}
                   </div>
-                  <div className="mt-1 h-1 bg-muted rounded overflow-hidden" title={`${xp}/${cost} xp`}>
+                  <div className="mt-1 h-1 bg-muted rounded overflow-hidden">
                     <div className="h-full bg-primary" style={{ width: `${xpPct}%` }} />
                   </div>
                   <div className="text-[8px] text-muted-foreground mt-0.5 font-mono">
                     {xp}/{cost}
                   </div>
                 </div>
+              );
+              return (
+                <InfoPopover
+                  key={k}
+                  trigger={cellTrigger}
+                  contentClassName="w-64"
+                >
+                  <div className="space-y-1.5 text-xs">
+                    <div className="flex items-baseline justify-between">
+                      <strong className="font-display">
+                        {k} · {STAT_LABEL[k]}
+                      </strong>
+                      <span className="text-sm font-semibold">{c}</span>
+                    </div>
+                    <ul className="space-y-0.5 text-[11px]">
+                      <li className="flex justify-between">
+                        <span className="text-muted-foreground">พลังพื้นฐาน</span>
+                        <span className="font-mono">{b}</span>
+                      </li>
+                      <li className="flex justify-between">
+                        <span className="text-muted-foreground">วิชาในกาย</span>
+                        <span className="font-mono">
+                          {fromArts > 0 ? `+${fromArts}` : fromArts}
+                        </span>
+                      </li>
+                      <li className="flex justify-between">
+                        <span className="text-muted-foreground">วิชาฝีมือ</span>
+                        <span className="font-mono">
+                          {fromSkills > 0 ? `+${fromSkills}` : fromSkills}
+                        </span>
+                      </li>
+                      <li className="flex justify-between">
+                        <span className="text-muted-foreground">อุปกรณ์</span>
+                        <span className="font-mono">
+                          {fromEquipment > 0 ? `+${fromEquipment}` : fromEquipment}
+                        </span>
+                      </li>
+                    </ul>
+                    <div className="border-t pt-1.5 space-y-0.5 text-[10px]">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">เกณฑ์เรียนตำรา</span>
+                        <span className="font-mono font-semibold text-emerald-700">
+                          {learnable}
+                        </span>
+                      </div>
+                      <div className="text-muted-foreground italic">
+                        ใช้รวม วิชาในกาย + วิชาฝีมือ — ไม่นับอุปกรณ์
+                      </div>
+                    </div>
+                    <div className="border-t pt-1.5 text-[10px] text-muted-foreground">
+                      ค่ารบ: รวมทุกแหล่ง = <strong className="text-foreground">{c}</strong>
+                    </div>
+                  </div>
+                </InfoPopover>
               );
             })}
           </div>
@@ -269,7 +335,11 @@ export function ProfilePopup({ open, onClose }: Props) {
           ) : (
             <div className="rounded-md bg-muted/40 p-3 text-[11px] leading-relaxed space-y-1">
               <div className="flex items-center gap-2 flex-wrap">
-                <strong className="text-sm">{art.n}</strong>
+                <ArtTooltip art={art} level={lv}>
+                  <strong className="text-sm cursor-help underline decoration-dotted underline-offset-2">
+                    {art.n}
+                  </strong>
+                </ArtTooltip>
                 <Badge variant="outline" className="text-[9px]">{art.sc}</Badge>
                 <Badge variant="outline" className="text-[9px]">{art.tp}</Badge>
                 <Badge variant="outline" className="text-[9px]">ระดับ {lv}</Badge>
@@ -321,7 +391,11 @@ export function ProfilePopup({ open, onClose }: Props) {
                       <div className="flex items-center gap-1.5 flex-wrap min-w-0">
                         <span className="text-[10px] text-muted-foreground shrink-0">{i + 1}</span>
                         <Badge variant="default" className="text-[9px]">☯</Badge>
-                        <strong className="text-xs">{a.n}</strong>
+                        <ArtTooltip art={a} level={aLv}>
+                          <strong className="text-xs cursor-help underline decoration-dotted underline-offset-2">
+                            {a.n}
+                          </strong>
+                        </ArtTooltip>
                         <Badge variant="outline" className="text-[9px]">{a.sc}</Badge>
                         <Badge variant="outline" className="text-[9px]">{a.tp}</Badge>
                         <Badge variant="outline" className="text-[9px]">ขั้น {aLv}</Badge>
@@ -363,7 +437,11 @@ export function ProfilePopup({ open, onClose }: Props) {
                     <div className="flex items-center gap-1.5 flex-wrap min-w-0">
                       <span className="text-[10px] text-muted-foreground shrink-0">{i + 1}</span>
                       <Badge variant="default" className="text-[9px]">⚔</Badge>
-                      <strong className="text-xs">{sk.n}</strong>
+                      <SkillTooltip skill={sk} level={skLv}>
+                        <strong className="text-xs cursor-help underline decoration-dotted underline-offset-2">
+                          {sk.n}
+                        </strong>
+                      </SkillTooltip>
                       <Badge variant="default" className="text-[9px]">Lv.{skLv}</Badge>
                       <Badge variant="outline" className="text-[9px]">{tier?.n}</Badge>
                       <Badge

@@ -100,16 +100,33 @@ export function canPracticeAt(
 // Returns 1.0 when no category-type pair matches, PRACTICE_BONUS_MULT
 // otherwise. The bonus does not stack across categories — a skill that
 // matches both forest (yang) and mountain (hard) still gets a single 1.3×.
+//
+// `bonusTypesFor` expands the input to include `"balance"` when the
+// entry has no explicit yin/yang/balance tag. This honors the data
+// convention used throughout `lib/game/data/`: items labeled as
+// balance on the yin/yang axis (e.g., `t0_fiveyuan` with `tp:
+// "สมดุล·ภายนอก"`) are stored with `types: ["external"]` — no literal
+// "balance" tag — so the mountain bonus would otherwise never fire for
+// any art or skill in the game.
+function bonusTypesFor(types: readonly SkillType[]): readonly SkillType[] {
+  const hasYinYang =
+    types.includes("yin") ||
+    types.includes("yang") ||
+    types.includes("balance");
+  if (hasYinYang) return types;
+  return [...types, "balance"];
+}
+
 export function practiceXpBonus(
   scene: Pick<LocationScene, "id" | "categories"> | null | undefined,
   types: readonly SkillType[],
 ): number {
-  if (types.length === 0) return 1.0;
+  const expanded = bonusTypesFor(types);
   const cats = getLocationCategories(scene);
   for (const c of cats) {
     const matchTypes = CATEGORY_TYPE_BONUS[c];
     if (!matchTypes) continue;
-    if (types.some((t) => matchTypes.includes(t))) return PRACTICE_BONUS_MULT;
+    if (expanded.some((t) => matchTypes.includes(t))) return PRACTICE_BONUS_MULT;
   }
   return 1.0;
 }

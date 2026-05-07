@@ -2,9 +2,10 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { CharacterBuild, StatKey } from "@/lib/game";
+import type { CharacterBuild, EquipSlotType, StatKey } from "@/lib/game";
 import {
   ART_LEVEL_MAX,
+  combinedStats,
   deriveAll,
   effectiveTypes,
   encodeArtSlot,
@@ -137,6 +138,29 @@ export type CraftResult =
 export type BuyRecipeResult =
   | { ok: false; reason: "unknown" | "already-learned" | "no-gold" }
   | { ok: true; recipeId: string; spent: number };
+
+// Result of buying a piece of equipment at an artisan. The bought
+// equipment lands in `inventoryEquipment`, NOT directly in a slot.
+export type BuyEquipResult =
+  | { ok: false; reason: "unknown" | "no-gold" }
+  | { ok: true; equipId: string; spent: number };
+
+// Result of equipping a bag item into a slot. `swapped` (when present)
+// is the id of the item that got pushed back into the bag.
+export type EquipResult =
+  | { ok: false; reason: "unknown" | "missing" | "no-build" }
+  | {
+      ok: true;
+      equipId: string;
+      slotType: EquipSlotType;
+      slotIdx: number;
+      swapped: string | null;
+    };
+
+// Result of moving an equipped item back into the bag.
+export type UnequipResult =
+  | { ok: false; reason: "empty" | "unknown" | "no-build" }
+  | { ok: true; equipId: string; slotType: EquipSlotType; slotIdx: number };
 
 // Result of using a consumable item (book, song book, image, potion, …).
 // Discriminated on `kind` so the UI can render different feedback per use.
@@ -314,6 +338,18 @@ interface WorldStore extends WorldStateData {
   // popup filters out already-learned recipes so this should rarely
   // hit the `already-learned` rejection in practice.
   buyRecipe: (recipeId: string, price: number) => BuyRecipeResult;
+  // Buy a piece of equipment at an artisan — drops gold, adds the id
+  // to inventoryEquipment. Equip via `equipFromBag` afterwards.
+  buyEquipment: (equipId: string, price: number) => BuyEquipResult;
+  // Move an equipment id from inventoryEquipment into the matching
+  // slot on playerBuild.equipment. Picks the first empty slot for the
+  // multi-slot types (BR / R / C); on a full slot it swaps with index
+  // 0 and pushes the displaced id back into the bag.
+  equipFromBag: (equipId: string) => EquipResult;
+  // Move a currently-equipped id back into the bag. `slotIdx` is
+  // required for multi-slot types (BR / R / C) and ignored for the
+  // single-slot ones (W / A / H / B).
+  unequipFromSlot: (slotType: EquipSlotType, slotIdx?: 0 | 1) => UnequipResult;
 
   // Equip a learned skill or art into a specific slot. `rawId` follows
   // the slot encoding from `lib/game/slots.ts` — bare skill id or
@@ -381,6 +417,7 @@ const emptyData = (): WorldStateData => ({
   skillExp: {},
   artExp: {},
   learnedRecipeIds: [],
+  inventoryEquipment: {},
   statExp: emptyStatExp(),
   traits: emptyTraits(),
   npcStates: {},
@@ -648,6 +685,7 @@ function draftFrom(s: WorldStateData): WorldStateData {
     skillExp: { ...s.skillExp },
     artExp: { ...s.artExp },
     learnedRecipeIds: [...s.learnedRecipeIds],
+    inventoryEquipment: { ...s.inventoryEquipment },
     statExp: { ...s.statExp },
     traits: { ...s.traits },
     npcStates: { ...s.npcStates },
@@ -1187,10 +1225,15 @@ export const useWorldStore = create<WorldStore>()(
         // Pre-flight for ตำราวิชา (manual) items — refuse without consuming
         // when the player can't actually use it. Two failure modes:
         //   - already learned (don't waste the manual)
-        //   - base stat below the requirement (book stays in inventory)
-        // Base stat means `playerBuild.stats[reqStat]` — not the stat
-        // value derived after equipment / arts / skills. Equipment can't
-        // bypass the gate.
+        //   - effective stat below the requirement (book stays in inventory)
+        //
+        // The stat check uses `combinedStats(playerBuild, undefined,
+        // { excludeEquipment: true })[reqStat]` — i.e. base + slotted /
+        // learned skill bonuses (level-scaled) + art bonuses + conflict,
+        // but NOT equipment. Rationale: a player should earn higher-tier
+        // manuals through training (skills + arts) rather than just
+        // suiting up. Battle damage / derived combat stats keep equipment
+        // included via the default `combinedStats` call.
         if (def.use.t === "manualLearnSkill" || def.use.t === "manualLearnArt") {
           if (!s.playerBuild) return { ok: false, reason: "no-build" };
           if (def.use.t === "manualLearnSkill") {
@@ -1206,7 +1249,10 @@ export const useWorldStore = create<WorldStore>()(
           }
           const reqStat = def.use.reqStat;
           const reqValue = def.use.reqValue;
-          const current = s.playerBuild.stats[reqStat] ?? 0;
+          const current =
+            combinedStats(s.playerBuild, undefined, { excludeEquipment: true })[
+              reqStat
+            ] ?? 0;
           if (current < reqValue) {
             return { ok: false, reason: "stat-too-low", stat: reqStat, needed: reqValue, current };
           }
@@ -1555,6 +1601,111 @@ export const useWorldStore = create<WorldStore>()(
         return { ok: true, recipeId, spent: price };
       },
 
+      buyEquipment: (equipId, price) => {
+        const s = get();
+        const e = getEquip(equipId);
+        if (!e) return { ok: false, reason: "unknown" };
+        if (s.gold < price) return { ok: false, reason: "no-gold" };
+        const draft = draftFrom(s);
+        draft.gold -= price;
+        draft.inventoryEquipment[equipId] =
+          (draft.inventoryEquipment[equipId] ?? 0) + 1;
+        rollLukXp(draft);
+        appendActionLog(draft, "buy", `ซื้อ ${e.n} · -${price}🟡`);
+        set({ ...draft });
+        return { ok: true, equipId, spent: price };
+      },
+
+      equipFromBag: (equipId) => {
+        const s = get();
+        if (!s.playerBuild) return { ok: false, reason: "no-build" };
+        const e = getEquip(equipId);
+        if (!e) return { ok: false, reason: "unknown" };
+        if ((s.inventoryEquipment[equipId] ?? 0) < 1) {
+          return { ok: false, reason: "missing" };
+        }
+
+        const draft = draftFrom(s);
+        const eq = { ...draft.playerBuild!.equipment };
+        const ty = e.ty;
+        let chosenIdx = 0;
+        let swapped: string | null = null;
+
+        // Multi-slot types: prefer the first empty slot, else swap into
+        // index 0 and push the displaced id back to the bag.
+        if (ty === "BR" || ty === "R" || ty === "C") {
+          const arr = [...eq[ty]] as [string | null, string | null];
+          const emptyIdx = arr.findIndex((v) => v === null);
+          chosenIdx = emptyIdx === -1 ? 0 : emptyIdx;
+          if (arr[chosenIdx] !== null) swapped = arr[chosenIdx];
+          arr[chosenIdx] = equipId;
+          eq[ty] = arr;
+        } else {
+          // Single-slot types — direct swap.
+          if (eq[ty] !== null) swapped = eq[ty];
+          eq[ty] = equipId;
+        }
+
+        draft.playerBuild = { ...draft.playerBuild!, equipment: eq };
+
+        // Pull one copy out of the bag; push any displaced id back.
+        const bag = { ...draft.inventoryEquipment };
+        const remain = (bag[equipId] ?? 0) - 1;
+        if (remain <= 0) delete bag[equipId];
+        else bag[equipId] = remain;
+        if (swapped) bag[swapped] = (bag[swapped] ?? 0) + 1;
+        draft.inventoryEquipment = bag;
+
+        const swappedDef = swapped ? getEquip(swapped) : null;
+        appendActionLog(
+          draft,
+          "use",
+          swapped
+            ? `ติดตั้ง ${e.n} (เก็บ ${swappedDef?.n ?? swapped} กลับย่าม)`
+            : `ติดตั้ง ${e.n}`,
+        );
+        set({ ...draft });
+        return {
+          ok: true,
+          equipId,
+          slotType: ty,
+          slotIdx: chosenIdx,
+          swapped,
+        };
+      },
+
+      unequipFromSlot: (slotType, slotIdx) => {
+        const s = get();
+        if (!s.playerBuild) return { ok: false, reason: "no-build" };
+        const idx = (slotIdx ?? 0) as 0 | 1;
+        const eq = { ...s.playerBuild.equipment };
+        let cur: string | null = null;
+        if (slotType === "BR" || slotType === "R" || slotType === "C") {
+          cur = eq[slotType][idx];
+        } else {
+          cur = eq[slotType];
+        }
+        if (!cur) return { ok: false, reason: "empty" };
+        const e = getEquip(cur);
+        if (!e) return { ok: false, reason: "unknown" };
+
+        const draft = draftFrom(s);
+        const next = { ...draft.playerBuild!.equipment };
+        if (slotType === "BR" || slotType === "R" || slotType === "C") {
+          const arr = [...next[slotType]] as [string | null, string | null];
+          arr[idx] = null;
+          next[slotType] = arr;
+        } else {
+          next[slotType] = null;
+        }
+        draft.playerBuild = { ...draft.playerBuild!, equipment: next };
+        draft.inventoryEquipment[cur] =
+          (draft.inventoryEquipment[cur] ?? 0) + 1;
+        appendActionLog(draft, "use", `ถอด ${e.n} เก็บลงย่าม`);
+        set({ ...draft });
+        return { ok: true, equipId: cur, slotType, slotIdx: idx };
+      },
+
       buyInnerSkill: (artId, price) => {
         const s = get();
         if (!s.playerBuild) return { ok: false, reason: "unknown" };
@@ -1728,7 +1879,7 @@ export const useWorldStore = create<WorldStore>()(
     }),
     {
       name: "wusia-world-v1",
-      version: 14,
+      version: 15,
       // Only persist the data fields, not the action functions.
       partialize: (s) => ({
         hasGame: s.hasGame,
@@ -1749,6 +1900,7 @@ export const useWorldStore = create<WorldStore>()(
         skillExp: s.skillExp,
         artExp: s.artExp,
         learnedRecipeIds: s.learnedRecipeIds,
+        inventoryEquipment: s.inventoryEquipment,
         statExp: s.statExp,
         traits: s.traits,
         npcStates: s.npcStates,
@@ -1796,6 +1948,11 @@ export const useWorldStore = create<WorldStore>()(
       //            tailoring / chef / jewelry / accessory). Existing
       //            saves start with no recipes learned — players have to
       //            buy them at city / village / sect artisans.
+      //   v14 → v15 added inventoryEquipment (bag for purchased gear).
+      //            Equipment items can now be bought at artisans into
+      //            this bag and equipped via `equipFromBag` /
+      //            `unequipFromSlot`. Existing saves start with an
+      //            empty bag.
       migrate: (persisted, fromVersion) => {
         const p = (persisted ?? {}) as Partial<WorldStateData>;
         // Pad the build's skillIds to 10 and back-fill learned arrays.
@@ -1860,6 +2017,10 @@ export const useWorldStore = create<WorldStore>()(
           learnedRecipeIds: Array.isArray(p.learnedRecipeIds)
             ? [...p.learnedRecipeIds]
             : [],
+          inventoryEquipment:
+            p.inventoryEquipment && typeof p.inventoryEquipment === "object"
+              ? { ...p.inventoryEquipment }
+              : {},
           statExp: { ...emptyStatExp(), ...(p.statExp ?? {}) } as Record<StatKey, number>,
           traits: { ...emptyTraits(), ...(p.traits ?? {}) } as Record<TraitKey, number>,
           npcStates: p.npcStates && typeof p.npcStates === "object" ? { ...p.npcStates } : {},

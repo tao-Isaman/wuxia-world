@@ -25,14 +25,17 @@ export {
   derive,
   deriveAll,
   combinedStats,
+  statBreakdown,
   getEquipBonus,
   getEquipStatBonus,
   getEquippedItems,
   getMasteryMap,
   getWeaponMastery,
   totalStatPoints,
+  type CombinedStatsOpts,
   type EquipBonus,
   type MasteryMap,
+  type StatBreakdown,
 } from "./derive";
 export { hitPct, critPct, hpColor, CRIT_MULTIPLIER } from "./damage";
 export {

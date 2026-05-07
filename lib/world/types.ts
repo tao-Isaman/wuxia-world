@@ -524,6 +524,15 @@ export interface ArtisanRecipeOffer {
   price: number;
 }
 
+// Equipment-for-sale offer at an artisan. Each entry pins a price per
+// (artisan × equipment) so the same item can cost differently in
+// different cities. Equipment ids reference `EQUIPMENT` in
+// lib/game/data/equipment.ts.
+export interface ArtisanEquipOffer {
+  equipId: string;
+  price: number;
+}
+
 export interface ArtisanDef {
   // Stable id for popup state.
   id: string;
@@ -541,6 +550,11 @@ export interface ArtisanDef {
   // Specialty recipes this artisan teaches (in addition to basic recipes
   // for the profession, which are folded in automatically).
   recipes: readonly ArtisanRecipeOffer[];
+  // Specialty equipment this artisan stocks (in addition to the basic
+  // equipment roster for the profession, which is folded in by
+  // `equipmentOfferedBy()`). Each row pins a per-artisan price, so
+  // city specialties can be priced higher than basics.
+  equipment: readonly ArtisanEquipOffer[];
   // Items the artisan sells over the counter (item ids). Prices come
   // from each ItemDef.price; the artisan does not override them.
   inventory: readonly string[];
@@ -669,6 +683,14 @@ export interface WorldStateData {
   // profession matches the recipe's `skill`. Recipes are bought at
   // artisans via `buyRecipe`.
   learnedRecipeIds: string[];
+
+  // Equipment the player owns but hasn't equipped yet. Keyed by the
+  // Equipment.id (e.g., "eq_t0_w_sword"); count tracks duplicates. The
+  // player buys from artisans into this bag, then equips into
+  // `playerBuild.equipment` via `equipFromBag` (which moves the id out
+  // of this map and into the matching slot, swapping out any
+  // currently-equipped id back into the bag).
+  inventoryEquipment: Record<string, number>;
 
   // Passive stat progression. Each base stat has its own xp pool that
   // accrues from a specific activity (STR from physical skills in battle,

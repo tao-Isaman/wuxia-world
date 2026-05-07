@@ -37,6 +37,7 @@ export {
   getArtisansAt,
   getArtisan,
   recipesOfferedBy,
+  equipmentOfferedBy,
   type SectHallOffer,
   RESOURCES,
   RESOURCES_BY_ID,

@@ -218,6 +218,22 @@ export const RESOURCES: readonly ResourceDef[] = [
       { itemId: "lotus_seed", weight: 4 },
     ],
   },
+  {
+    // Quest-locked legendary node — only attached to mt_kunlun_immortal
+    // by world-map.ts. Yields the qst_kunlun_snow_ginseng quest item
+    // (used by qw_bingcan_ice_fever) plus a small chance of regular
+    // ginseng on the side for general herbalism farming.
+    id: "herb_kunlun_ginseng",
+    name: "เก็บโสมหิมะคุนหลุน",
+    skill: "herbalism",
+    level: 5,
+    staminaCost: 25,
+    yields: [
+      { itemId: "qst_kunlun_snow_ginseng", weight: 4 },
+      { itemId: "ginseng",                 weight: 3 },
+      { itemId: "snow_lotus",              weight: 1 },
+    ],
+  },
 
   // ─── Venom (poisonous fauna) ────────────────────────────────────────
   {

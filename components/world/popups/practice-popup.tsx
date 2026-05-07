@@ -32,6 +32,7 @@ import {
 } from "@/store/world-store";
 import { flashLoading } from "@/store/loading-store";
 import { toast } from "@/store/toast-store";
+import { ArtTooltip, SkillTooltip } from "../skill-tooltip";
 
 interface Props {
   open: boolean;
@@ -149,7 +150,11 @@ export function PracticePopup({ open, scene, onClose }: Props) {
                   <div className="flex items-center justify-between gap-2 flex-wrap">
                     <div className="flex items-center gap-1.5 flex-wrap min-w-0">
                       <Badge variant="default" className="text-[9px]">⚔</Badge>
-                      <strong className="text-xs">{sk.n}</strong>
+                      <SkillTooltip skill={sk} level={lv}>
+                        <strong className="text-xs cursor-help underline decoration-dotted underline-offset-2">
+                          {sk.n}
+                        </strong>
+                      </SkillTooltip>
                       <Badge variant="default" className="text-[9px]">
                         Lv.{lv}
                         {maxed ? " (สูงสุด)" : ""}
@@ -220,7 +225,11 @@ export function PracticePopup({ open, scene, onClose }: Props) {
                   <div className="flex items-center justify-between gap-2 flex-wrap">
                     <div className="flex items-center gap-1.5 flex-wrap min-w-0">
                       <Badge variant="default" className="text-[9px]">☯</Badge>
-                      <strong className="text-xs">{art.n}</strong>
+                      <ArtTooltip art={art} level={lv}>
+                        <strong className="text-xs cursor-help underline decoration-dotted underline-offset-2">
+                          {art.n}
+                        </strong>
+                      </ArtTooltip>
                       <Badge variant="default" className="text-[9px]">
                         ขั้น {lv}
                         {maxed ? " (สูงสุด)" : ""}

@@ -12,6 +12,7 @@ import {
 import type { SectHallDef } from "@/lib/world";
 import { useWorldStore } from "@/store/world-store";
 import { toast } from "@/store/toast-store";
+import { ArtTooltip, SkillTooltip } from "../skill-tooltip";
 
 interface Props {
   open: boolean;
@@ -67,7 +68,19 @@ export function SectHallPopup({ open, hall, onClose }: Props) {
                     <Badge variant="default" className="text-[10px]">
                       {isSkill ? "⚔ วิชาฝีมือ" : "☯ วิชาในกาย"}
                     </Badge>
-                    <strong>{sk?.n ?? art?.n}</strong>
+                    {sk ? (
+                      <SkillTooltip skill={sk}>
+                        <strong className="cursor-help underline decoration-dotted underline-offset-2">
+                          {sk.n}
+                        </strong>
+                      </SkillTooltip>
+                    ) : art ? (
+                      <ArtTooltip art={art}>
+                        <strong className="cursor-help underline decoration-dotted underline-offset-2">
+                          {art.n}
+                        </strong>
+                      </ArtTooltip>
+                    ) : null}
                     <Badge variant="outline" className="text-[9px]">{tierName}</Badge>
                     {sk && (
                       <Badge variant="outline" className="text-[9px]">

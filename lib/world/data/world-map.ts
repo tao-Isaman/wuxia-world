@@ -489,13 +489,21 @@ const CATEGORY_RESOURCES: Record<string, readonly string[]> = {
   misc:      ["hunt_forest"],
 };
 
-// Hand-curated level-5 spots — exactly five so they stay rare.
-const RARE_SPOTS: ReadonlyArray<{ locationId: string; resourceId: string }> = [
-  { locationId: "mt_kunlun_immortal",  resourceId: "mine_mithril" },     // นิรันดร์คุนหลุน — สูงและลึกลับ
-  { locationId: "isle_shenlong",       resourceId: "fish_dragon" },      // เกาะมังกรเทพ
-  { locationId: "valley_jueqing_bottom", resourceId: "herb_snow_lotus" },// ก้นหุบเขาตัดใจ
-  { locationId: "cave_treasure",       resourceId: "venom_centipede" }, // คลังสมบัติลับ
-  { locationId: "sect_xiaoyao",        resourceId: "wood_sacred" },     // พรรคสราญรมย์ — ลึกลับ
+// Hand-curated level-5 spots. Each spot can host more than one rare
+// resource — `mt_kunlun_immortal` carries both mithril mining (its
+// historical theme) and the kunlun-ginseng herbalism node which
+// `qw_bingcan_ice_fever` requires (the quest's narrative says "gather
+// from the immortal peak", and now actually delivers a peak-only
+// ingredient instead of being satisfied by any 50🟡 city ginseng).
+const RARE_SPOTS: ReadonlyArray<{
+  locationId: string;
+  resourceIds: readonly string[];
+}> = [
+  { locationId: "mt_kunlun_immortal",    resourceIds: ["mine_mithril", "herb_kunlun_ginseng"] }, // นิรันดร์คุนหลุน
+  { locationId: "isle_shenlong",         resourceIds: ["fish_dragon"] },     // เกาะมังกรเทพ
+  { locationId: "valley_jueqing_bottom", resourceIds: ["herb_snow_lotus"] }, // ก้นหุบเขาตัดใจ
+  { locationId: "cave_treasure",         resourceIds: ["venom_centipede"] }, // คลังสมบัติลับ
+  { locationId: "sect_xiaoyao",          resourceIds: ["wood_sacred"] },     // พรรคสราญรมย์
 ];
 
 function attachCategoryResources(leaves: LocationScene[], category: string): void {
@@ -520,11 +528,13 @@ attachCategoryResources(HOMES,    "homes");
 attachCategoryResources(MISC,     "misc");
 
 // Override with the legendary level-5 spots. Replaces the category default
-// outright so the rare resource stands alone (and the gather UI doesn't
-// hide a level-5 node behind two level-1 ones).
+// outright so the rare resource(s) stand alone (and the gather UI
+// doesn't hide a level-5 node behind two level-1 ones). Each spot may
+// expose multiple rare nodes — the order in `resourceIds` determines
+// the gather-UI display order.
 for (const spot of RARE_SPOTS) {
   const lf = LEAVES_BY_ID.get(spot.locationId);
-  if (lf) lf.resources = [{ resourceId: spot.resourceId }];
+  if (lf) lf.resources = spot.resourceIds.map((rid) => ({ resourceId: rid }));
 }
 
 // ─── Social activities (chess + begging) ─────────────────────────────

@@ -104,8 +104,13 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
       },
       {
         id: "find_evidence",
-        description: "ค้นหาม้วนหนังสือพิสูจน์ความจริง",
-        autoAdvance: { t: "hasItem", itemId: "book_inter", count: 1 },
+        description: "พบบัณฑิตเว่ยชิงเหวินในถ้ำ — ขอม้วนหนังสือพิสูจน์ความจริง",
+        // Quest-specific scroll only obtainable from เว่ยชิงเหวิน at
+        // cave_bingcan via the dialog branch that gates on this quest's
+        // active status. Was previously `book_inter` (generic ตำราขั้นกลาง)
+        // — that let the player buy a 300🟡 city book and skip the cave
+        // entirely, which broke the narrative.
+        autoAdvance: { t: "hasItem", itemId: "qst_kunlun_evidence", count: 1 },
       },
       { id: "return", description: "นำหลักฐานกลับให้ชิวเฉียน" },
     ],
@@ -546,27 +551,26 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
     ],
   },
 
-  // 19. Fetch — get ginseng from kunlun immortal peak for medicine
+  // 19. Fetch — get the rare snow-ginseng from kunlun immortal peak.
+  // Stage now keys off the unique `qst_kunlun_snow_ginseng` item which
+  // only drops from the herb_kunlun_ginseng node attached to
+  // mt_kunlun_immortal — so common ginseng bought in town no longer
+  // satisfies the quest. The cave trip is mechanically required, not
+  // just a flavor instruction.
   {
     id: "qw_bingcan_ice_fever",
     name: "โสมรักษาไข้น้ำแข็ง",
-    description: "บัณฑิตสังเกตอาการผิดปกติของเจ้า ต้องการโสมจากนิรันดร์คุนหลุนมาผสมยา",
-    briefSummary: "นำโสมจากคุนหลุนนิรันดร์มาให้บัณฑิต",
+    description: "บัณฑิตสังเกตอาการผิดปกติของเจ้า ต้องการโสมหิมะที่งอกบนยอดนิรันดร์คุนหลุนเท่านั้นมาผสมยา",
+    briefSummary: "เก็บโสมหิมะจากยอดนิรันดร์คุนหลุนแล้วนำกลับให้บัณฑิตเว่ย",
     type: "side",
     giverNpcId: "wld_bingcan_scholar_wei",
     stages: [
       {
         id: "gather",
-        description: "เก็บโสมจากนิรันดร์คุนหลุน",
-        autoAdvance: {
-          t: "and",
-          all: [
-            { t: "visitedLocation", locationId: "mt_kunlun_immortal" },
-            { t: "hasItem", itemId: "ginseng", count: 2 },
-          ],
-        },
+        description: "ขึ้นไปนิรันดร์คุนหลุนและเก็บโสมหิมะ (ต้องการมาสเตอร์รี่เก็บสมุนไพรขั้นสูง)",
+        autoAdvance: { t: "hasItem", itemId: "qst_kunlun_snow_ginseng", count: 1 },
       },
-      { id: "deliver", description: "ส่งโสมให้เว่ยชิงเหวิน" },
+      { id: "deliver", description: "ส่งโสมหิมะให้เว่ยชิงเหวินที่ถ้ำน้ำแข็งไหม" },
     ],
     rewards: [
       { t: "gold", amount: 220 },

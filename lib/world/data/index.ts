@@ -16,6 +16,7 @@ export {
   getArtisansAt,
   getArtisan,
   recipesOfferedBy,
+  equipmentOfferedBy,
 } from "./artisans";
 export {
   MEET_EVENTS,

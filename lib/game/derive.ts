@@ -122,43 +122,57 @@ function addScaledPartialStats(
   }
 }
 
-// Combine base stats + art-scaled stats + skill stat bonuses + equipment
-// bonuses. Reads from BOTH slotted skills and learned-but-unslotted skills
-// (everyone learned contributes their `st`). Same for arts. Conflict
-// factors halve / zero misaligned contributions per skill-conflict.ts.
-export function combinedStats(
+// Per-source stat contribution buckets. `base` is just the build's
+// innate stats; `fromArts` / `fromSkills` / `fromEquipment` are the
+// deltas each source contributes after conflict + level scaling.
+// Caller composes the buckets they need:
+//   - battle / damage     → base + arts + skills + equipment (all)
+//   - learn-skill gates   → base + arts + skills (no equipment)
+//   - profile UI          → render each bucket separately
+export interface StatBreakdown {
+  base: StatBlock;
+  fromArts: StatBlock;
+  fromSkills: StatBlock;
+  fromEquipment: StatBlock;
+}
+
+const emptyStatBlock = (): StatBlock => ({
+  STR: 0, AGI: 0, POW: 0, VIT: 0, DEX: 0, LUK: 0, DEF: 0, INT: 0,
+});
+
+// Compute the four-bucket breakdown. Conflict factors and level scaling
+// match `combinedStats`; consumers add buckets together to get the same
+// totals.
+export function statBreakdown(
   build: CharacterBuild,
   conflict?: ConflictFactors,
-): StatBlock {
-  const out: StatBlock = { ...build.stats };
+): StatBreakdown {
   const factors = conflict ?? computeConflictFactors(build, { getSkill, getArt });
 
-  // Active art — scaled by `artLevel`. Then learned arts (excluding the
-  // active one) — scaled by their per-art level (default 1).
+  // ── Arts ──
+  const fromArts = emptyStatBlock();
   const activeArt = getArt(build.artId);
   if (activeArt.id !== "none") {
     const f = (build.artLevel / 10) * getStatusFactor(activeArt, factors);
     for (const k of STAT_KEYS) {
       const v = activeArt.stats[k];
-      if (v) out[k] += Math.floor(v * f);
+      if (v) fromArts[k] += Math.floor(v * f);
     }
   }
   for (const aid of build.learnedArtIds ?? []) {
-    if (aid === build.artId) continue; // already counted
+    if (aid === build.artId) continue;
     const art = getArt(aid);
     if (!art || art.id === "none") continue;
     const lv = build.artLevels?.[aid] ?? 1;
     const f = (lv / 10) * getStatusFactor(art, factors);
     for (const k of STAT_KEYS) {
       const v = art.stats[k];
-      if (v) out[k] += Math.floor(v * f);
+      if (v) fromArts[k] += Math.floor(v * f);
     }
   }
 
-  // Slotted move skills — stat contribution scales with skill level via
-  // bpMultiplier (lv1 → 50%, lv10 → 100%), mirroring how the skill's
-  // damage scales. Then learned-but-unslotted move skills follow the same
-  // rule. Both branches also fold in conflict via getStatusFactor.
+  // ── Move skills (slotted + learned-but-unslotted) ──
+  const fromSkills = emptyStatBlock();
   const counted = new Set<string>();
   for (const sid of build.skillIds) {
     if (!sid) continue;
@@ -167,7 +181,7 @@ export function combinedStats(
     if (!sk) continue;
     const lv = build.skillLevels?.[sid] ?? 1;
     const f = getStatusFactor(sk, factors) * bpMultiplier(lv);
-    addScaledPartialStats(out, sk.st, f);
+    addScaledPartialStats(fromSkills, sk.st, f);
   }
   for (const sid of build.learnedSkillIds ?? []) {
     if (counted.has(sid)) continue;
@@ -175,10 +189,45 @@ export function combinedStats(
     if (!sk) continue;
     const lv = build.skillLevels?.[sid] ?? 1;
     const f = getStatusFactor(sk, factors) * bpMultiplier(lv);
-    addScaledPartialStats(out, sk.st, f);
+    addScaledPartialStats(fromSkills, sk.st, f);
   }
 
-  addPartialStats(out, getEquipStatBonus(build.equipment));
+  // ── Equipment ──
+  const fromEquipment = emptyStatBlock();
+  addPartialStats(fromEquipment, getEquipStatBonus(build.equipment));
+
+  return {
+    base: { ...build.stats },
+    fromArts,
+    fromSkills,
+    fromEquipment,
+  };
+}
+
+export interface CombinedStatsOpts {
+  /** Skip equipment stat additions. Used by gates that should reward
+   *  bonuses earned through training (skills + arts) but not from worn
+   *  gear — most notably the manual learn-skill / learn-art check. */
+  excludeEquipment?: boolean;
+}
+
+// Combine base stats + art-scaled stats + skill stat bonuses + equipment
+// bonuses. Reads from BOTH slotted skills and learned-but-unslotted
+// skills (everyone learned contributes their `st`). Same for arts.
+// Conflict factors halve / zero misaligned contributions per
+// skill-conflict.ts. Pass `{ excludeEquipment: true }` to skip the gear
+// bonuses (used by learn-skill gates).
+export function combinedStats(
+  build: CharacterBuild,
+  conflict?: ConflictFactors,
+  opts?: CombinedStatsOpts,
+): StatBlock {
+  const breakdown = statBreakdown(build, conflict);
+  const out: StatBlock = { ...breakdown.base };
+  for (const k of STAT_KEYS) {
+    out[k] += breakdown.fromArts[k] + breakdown.fromSkills[k];
+    if (!opts?.excludeEquipment) out[k] += breakdown.fromEquipment[k];
+  }
   return out;
 }
 

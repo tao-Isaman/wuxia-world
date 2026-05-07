@@ -8,6 +8,7 @@ import { SLOT_LABELS, getEquip } from "@/lib/game";
 import type { EquipSlotType } from "@/lib/game";
 import { LIFE_SKILL_LABEL, getItem } from "@/lib/world";
 import { useWorldStore } from "@/store/world-store";
+import { toast } from "@/store/toast-store";
 
 interface Props {
   open: boolean;
@@ -43,12 +44,18 @@ const SLOT_ROWS: readonly SlotRow[] = [
 export function InventoryPopup({ open, onClose }: Props) {
   const player = useWorldStore((s) => s.playerBuild);
   const inventory = useWorldStore((s) => s.inventory);
+  const inventoryEquipment = useWorldStore((s) => s.inventoryEquipment);
   const gold = useWorldStore((s) => s.gold);
   const consumeItem = useWorldStore((s) => s.useItem);
+  const equipFromBag = useWorldStore((s) => s.equipFromBag);
+  const unequipFromSlot = useWorldStore((s) => s.unequipFromSlot);
   const [lastUsed, setLastUsed] = useState<string | null>(null);
   if (!player) return null;
 
   const items = Object.entries(inventory).filter(([, n]) => n > 0);
+  const bagEquipment = Object.entries(inventoryEquipment).filter(
+    ([, n]) => n > 0,
+  );
 
   const equipped = (row: SlotRow) => {
     const slot = player.equipment[row.type];
@@ -70,11 +77,11 @@ export function InventoryPopup({ open, onClose }: Props) {
               return (
                 <div
                   key={key}
-                  className="flex items-center justify-between rounded bg-muted/30 px-2 py-1.5 text-xs"
+                  className="flex items-center justify-between gap-2 rounded bg-muted/30 px-2 py-1.5 text-xs"
                 >
                   <span className="text-muted-foreground w-20 shrink-0">{row.label}</span>
                   {eq ? (
-                    <span className="flex-1 text-right">
+                    <span className="flex-1 text-right min-w-0">
                       <strong>{eq.n}</strong>
                       {(eq.atkb || eq.pdb || eq.idb || eq.hpb || eq.mpb) > 0 && (
                         <span className="text-[10px] text-muted-foreground ml-2">
@@ -87,12 +94,112 @@ export function InventoryPopup({ open, onClose }: Props) {
                       )}
                     </span>
                   ) : (
-                    <span className="text-[10px] text-muted-foreground italic">— ว่าง —</span>
+                    <span className="flex-1 text-[10px] text-muted-foreground italic text-right">— ว่าง —</span>
+                  )}
+                  {eq && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-6 px-2 text-[10px] shrink-0"
+                      onClick={() => {
+                        const r = unequipFromSlot(
+                          row.type,
+                          (row.index ?? 0) as 0 | 1,
+                        );
+                        if (!r.ok) {
+                          toast("error", "ถอดอุปกรณ์ไม่สำเร็จ");
+                          return;
+                        }
+                        toast("info", `ถอด ${eq.n} เก็บลงย่าม`);
+                      }}
+                    >
+                      ถอด
+                    </Button>
                   )}
                 </div>
               );
             })}
           </div>
+        </section>
+
+        <section>
+          <div className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground mb-1">
+            อุปกรณ์ในย่าม ({bagEquipment.length})
+          </div>
+          {bagEquipment.length === 0 ? (
+            <p className="text-[10px] text-muted-foreground italic py-1.5 text-center">
+              ไม่มีอุปกรณ์ในย่าม — ซื้อเพิ่มได้ที่ร้านช่างฝีมือ
+            </p>
+          ) : (
+            <ul className="space-y-1.5">
+              {bagEquipment.map(([id, n]) => {
+                const eq = getEquip(id);
+                if (!eq) return null;
+                return (
+                  <li
+                    key={id}
+                    className="rounded bg-muted/30 px-2 py-1.5 text-xs flex items-center justify-between gap-2"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <strong>{eq.n}</strong>
+                        <Badge variant="outline" className="text-[9px]">
+                          {SLOT_LABELS[eq.ty]}
+                        </Badge>
+                        <Badge variant="outline" className="text-[9px]">×{n}</Badge>
+                        {eq.atkb > 0 && (
+                          <span className="text-[10px] text-muted-foreground">
+                            Atk+{eq.atkb}
+                          </span>
+                        )}
+                        {eq.pdb > 0 && (
+                          <span className="text-[10px] text-muted-foreground">
+                            PD+{eq.pdb}
+                          </span>
+                        )}
+                        {eq.hpb > 0 && (
+                          <span className="text-[10px] text-muted-foreground">
+                            HP+{eq.hpb}
+                          </span>
+                        )}
+                        {eq.mpb > 0 && (
+                          <span className="text-[10px] text-muted-foreground">
+                            MP+{eq.mpb}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-6 px-2 text-[10px] shrink-0"
+                      onClick={() => {
+                        const r = equipFromBag(id);
+                        if (!r.ok) {
+                          toast(
+                            "error",
+                            r.reason === "missing"
+                              ? "ไม่มีอุปกรณ์นี้ในย่าม"
+                              : "ติดตั้งไม่สำเร็จ",
+                          );
+                          return;
+                        }
+                        const swappedDef = r.swapped ? getEquip(r.swapped) : null;
+                        toast(
+                          "success",
+                          r.swapped
+                            ? `ติดตั้ง ${eq.n} (เก็บ ${swappedDef?.n ?? r.swapped} กลับย่าม)`
+                            : `ติดตั้ง ${eq.n}`,
+                        );
+                      }}
+                    >
+                      ติดตั้ง
+                    </Button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </section>
 
         <section>

@@ -30,6 +30,7 @@ import {
 } from "@/lib/game";
 import type { WeaponFamily } from "@/lib/game";
 import { useWorldStore } from "@/store/world-store";
+import { ArtTooltip, SkillTooltip } from "../skill-tooltip";
 
 interface Props {
   open: boolean;
@@ -232,7 +233,11 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
                 <div className="pl-7 space-y-1">
                   <div className="flex items-center gap-2 flex-wrap">
                     <Badge variant="default" className="text-[10px]">☯ วิชาในกาย</Badge>
-                    <strong className="text-sm">{art.n}</strong>
+                    <ArtTooltip art={art} level={lv}>
+                      <strong className="text-sm cursor-help underline decoration-dotted underline-offset-2">
+                        {art.n}
+                      </strong>
+                    </ArtTooltip>
                     <Badge variant="default" className="text-[10px]">
                       ขั้น {lv}{artMaxed ? " (สูงสุด)" : ""}
                     </Badge>
@@ -323,7 +328,11 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
               <div className="pl-7 space-y-1">
                 <div className="flex items-center gap-2 flex-wrap">
                   <Badge variant="default" className="text-[10px]">⚔ วิชาฝีมือ</Badge>
-                  <strong className="text-sm">{sk.n}</strong>
+                  <SkillTooltip skill={sk} level={lv}>
+                    <strong className="text-sm cursor-help underline decoration-dotted underline-offset-2">
+                      {sk.n}
+                    </strong>
+                  </SkillTooltip>
                   <Badge variant="default" className="text-[10px]">Lv.{lv}{maxed ? " (สูงสุด)" : ""}</Badge>
                   {tier && (
                     <Badge variant="outline" className="text-[9px]">{tier.n}</Badge>
@@ -423,7 +432,11 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
                 >
                   <span className="flex items-center gap-1.5 flex-wrap">
                     <Badge variant="outline" className="text-[9px]">⚔</Badge>
-                    <strong>{sk.n}</strong>
+                    <SkillTooltip skill={sk} level={skillLevel[sid] ?? 1}>
+                      <strong className="cursor-help underline decoration-dotted underline-offset-2">
+                        {sk.n}
+                      </strong>
+                    </SkillTooltip>
                     <span className="text-[10px] text-muted-foreground">{WEAPON_FAMILY_LABEL[sk.w]}</span>
                   </span>
                   {typeof slotIdx === "number" ? (
@@ -457,7 +470,11 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
                 >
                   <span className="flex items-center gap-1.5 flex-wrap">
                     <Badge variant="outline" className="text-[9px]">☯</Badge>
-                    <strong>{art.n}</strong>
+                    <ArtTooltip art={art} level={player.artLevels?.[aid] ?? 1}>
+                      <strong className="cursor-help underline decoration-dotted underline-offset-2">
+                        {art.n}
+                      </strong>
+                    </ArtTooltip>
                     <span className="text-[10px] text-muted-foreground">{art.sc}</span>
                   </span>
                   {typeof slotIdx === "number" ? (
