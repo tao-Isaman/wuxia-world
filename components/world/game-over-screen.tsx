@@ -3,6 +3,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useWorldStore } from "@/store/world-store";
+import { confirmDialog } from "@/store/confirm-store";
 
 // Shown when `worldStore.gameOver === true`. The only available action is
 // `resetGame`, which wipes the persisted slice back to the start screen.
@@ -22,8 +23,14 @@ export function GameOverScreen() {
         </p>
         <Button
           variant="default"
-          onClick={() => {
-            if (window.confirm("เริ่มต้นใหม่ทั้งหมด?")) resetGame();
+          onClick={async () => {
+            const ok = await confirmDialog({
+              title: "เริ่มต้นใหม่",
+              message: "เริ่มต้นใหม่ทั้งหมด?\nความคืบหน้าทั้งหมดจะถูกลบทิ้ง",
+              confirmText: "เริ่มใหม่",
+              variant: "danger",
+            });
+            if (ok) resetGame();
           }}
         >
           เริ่มต้นใหม่

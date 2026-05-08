@@ -32,6 +32,14 @@ export function evaluateCondition(state: WorldStateData, c: Condition): boolean 
     }
     case "visitedLocation":
       return state.visitedLocationIds.includes(c.locationId);
+    case "stoleFromNpc": {
+      const have = state.stoleFromCounts[c.npcId] ?? 0;
+      return have >= (c.count ?? 1);
+    }
+    case "assassinatedNpc":
+      return state.assassinatedNpcIds.includes(c.npcId);
+    case "kidnappedNpc":
+      return state.kidnappedNpcIds.includes(c.npcId);
     case "and":
       return c.all.every((sub) => evaluateCondition(state, sub));
     case "or":

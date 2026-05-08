@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { getItem, getQuest, type QuestReward } from "@/lib/world";
 import { useWorldStore } from "@/store/world-store";
 import { toast } from "@/store/toast-store";
+import { confirmDialog } from "@/store/confirm-store";
 import { cn } from "@/lib/utils";
 
 // Quest log. Tabbed list view:
@@ -168,8 +169,14 @@ function QuestRow({
   if (!def) return null;
   const isSide = def.type === "side";
 
-  const onCancel = () => {
-    if (!window.confirm(`ยืนยันละทิ้งภารกิจ "${def.name}"?`)) return;
+  const onCancel = async () => {
+    const ok = await confirmDialog({
+      title: "ละทิ้งภารกิจ",
+      message: `ยืนยันละทิ้งภารกิจ "${def.name}"?\nภารกิจรองที่ล้มเหลวจะไม่กลับมาให้รับอีก`,
+      confirmText: "ละทิ้ง",
+      variant: "danger",
+    });
+    if (!ok) return;
     const r = abandonQuest(questId);
     if (r.ok) toast("warn", `ละทิ้งภารกิจ: ${def.name}`);
     else toast("error", "ละทิ้งภารกิจไม่ได้");

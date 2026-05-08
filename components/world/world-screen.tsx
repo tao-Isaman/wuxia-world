@@ -5,6 +5,7 @@ import { Panel } from "@/components/ui/wuxia/panel";
 import { WuxiaButton } from "@/components/ui/wuxia/button";
 import { useWorldStore } from "@/store/world-store";
 import { useBattleStore } from "@/store/battle-store";
+import { confirmDialog } from "@/store/confirm-store";
 import { getScene } from "@/lib/world";
 import { ensureBattleStarted } from "@/lib/world/battle-bridge";
 import { StartScreen } from "./start-screen";
@@ -18,6 +19,7 @@ import { GameOverScreen } from "./game-over-screen";
 import { EncounterScreen } from "./encounter-screen";
 import { LoadingOverlay } from "./loading-overlay";
 import { ToastStack } from "./toast-stack";
+import { ConfirmDialog } from "./confirm-dialog";
 import { BattleArena } from "@/components/game/battle-arena";
 
 export function WorldScreen() {
@@ -132,8 +134,14 @@ export function WorldScreen() {
             variant="ghost"
             size="sm"
             className="text-[11px] text-muted-foreground"
-            onClick={() => {
-              if (window.confirm("ออกจากเกมและลบเซฟ?")) resetGame();
+            onClick={async () => {
+              const ok = await confirmDialog({
+                title: "ออกเกม",
+                message: "ออกจากเกมและลบเซฟ?\nความคืบหน้าทั้งหมดจะถูกลบทิ้ง",
+                confirmText: "ออกและลบ",
+                variant: "danger",
+              });
+              if (ok) resetGame();
             }}
           >
             ออกเกม
@@ -142,6 +150,7 @@ export function WorldScreen() {
       </div>
       <LoadingOverlay />
       <ToastStack />
+      <ConfirmDialog />
     </>
   );
 }

@@ -285,6 +285,35 @@ export function validateAndRepair(state: WorldStateData): void {
     );
   }
 
+  // Bad-action ledgers — drop entries whose target NPCs are no longer in
+  // the registry, dedupe array forms, clamp counters to non-negative ints.
+  if (!state.stoleFromCounts || typeof state.stoleFromCounts !== "object") {
+    state.stoleFromCounts = {};
+  } else {
+    for (const id of Object.keys(state.stoleFromCounts)) {
+      if (!NPCS_BY_ID.has(id)) {
+        delete state.stoleFromCounts[id];
+        continue;
+      }
+      const v = state.stoleFromCounts[id];
+      state.stoleFromCounts[id] = typeof v === "number" && v >= 0 ? Math.floor(v) : 0;
+    }
+  }
+  if (!Array.isArray(state.assassinatedNpcIds)) {
+    state.assassinatedNpcIds = [];
+  } else {
+    state.assassinatedNpcIds = Array.from(
+      new Set(state.assassinatedNpcIds.filter((id) => NPCS_BY_ID.has(id))),
+    );
+  }
+  if (!Array.isArray(state.kidnappedNpcIds)) {
+    state.kidnappedNpcIds = [];
+  } else {
+    state.kidnappedNpcIds = Array.from(
+      new Set(state.kidnappedNpcIds.filter((id) => NPCS_BY_ID.has(id))),
+    );
+  }
+
   // pendingEncounter — clear if the opponent / return scene is gone.
   if (state.pendingEncounter) {
     const enc = state.pendingEncounter;

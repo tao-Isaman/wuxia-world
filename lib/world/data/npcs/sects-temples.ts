@@ -20,6 +20,14 @@ export const NPCS_SECTS_TEMPLES: readonly NpcDef[] = [
       "qst_shaolin_disciple_gone",
       "qst_shaolin_proof_of_heart",
     ],
+    defenseTier: 3,
+    stealLoot: [
+      { itemId: "herb", weight: 4 },
+      { itemId: "ginseng", weight: 3 },
+      { itemId: "paper", weight: 4 },
+      { itemId: "ink", weight: 3 },
+      { itemId: "jade", weight: 1 },
+    ],
     tags: ["sect_master", "monk", "shaolin"],
   },
   {
@@ -60,6 +68,14 @@ export const NPCS_SECTS_TEMPLES: readonly NpcDef[] = [
       "qst_emei_kidnapped_novice",
       "qst_emei_poison_antidote",
     ],
+    defenseTier: 3,
+    stealLoot: [
+      { itemId: "herb", weight: 4 },
+      { itemId: "ginseng", weight: 3 },
+      { itemId: "lotus_seed", weight: 3 },
+      { itemId: "snow_lotus", weight: 1 },
+      { itemId: "potion_mid", weight: 2 },
+    ],
     tags: ["sect_master", "nun", "emei"],
   },
 
@@ -75,6 +91,15 @@ export const NPCS_SECTS_TEMPLES: readonly NpcDef[] = [
       "qst_yaowang_plague_village",
       "qst_yaowang_venom_antidote",
     ],
+    defenseTier: 2,
+    stealLoot: [
+      { itemId: "herb", weight: 4 },
+      { itemId: "ginseng", weight: 4 },
+      { itemId: "lotus_seed", weight: 3 },
+      { itemId: "snow_lotus", weight: 2 },
+      { itemId: "potion_big", weight: 2 },
+      { itemId: "viper_venom", weight: 2 },
+    ],
     tags: ["doctor", "herbalist", "yaowang"],
   },
 
@@ -88,6 +113,14 @@ export const NPCS_SECTS_TEMPLES: readonly NpcDef[] = [
     questIds: [
       "qst_dalun_stolen_relic",
       "qst_dalun_pilgrim_mission",
+    ],
+    defenseTier: 2,
+    stealLoot: [
+      { itemId: "jade", weight: 3 },
+      { itemId: "ginseng", weight: 3 },
+      { itemId: "paper", weight: 4 },
+      { itemId: "ink", weight: 3 },
+      { itemId: "ancient_coin", weight: 2 },
     ],
     tags: ["monk", "temple", "dalun"],
   },
@@ -104,6 +137,14 @@ export const NPCS_SECTS_TEMPLES: readonly NpcDef[] = [
       "qst_yanzi_bodyguard_escort",
       "qst_yanzi_stolen_heirloom",
     ],
+    defenseTier: 3,
+    stealLoot: [
+      { itemId: "jade", weight: 3 },
+      { itemId: "gold_ore", weight: 3 },
+      { itemId: "ancient_coin", weight: 4 },
+      { itemId: "jade_amulet", weight: 1 },
+      { itemId: "silver_ring", weight: 2 },
+    ],
     tags: ["noble", "lord", "yanzi"],
   },
 
@@ -117,6 +158,13 @@ export const NPCS_SECTS_TEMPLES: readonly NpcDef[] = [
     questIds: [
       "qst_ming_spy_mission",
       "qst_ming_defector_choice",
+    ],
+    defenseTier: 3,
+    stealLoot: [
+      { itemId: "ancient_coin", weight: 4 },
+      { itemId: "viper_venom", weight: 3 },
+      { itemId: "iron_blade", weight: 2 },
+      { itemId: "scorpion_venom", weight: 2 },
     ],
     tags: ["elder", "ming_sect", "shadow"],
   },
@@ -145,6 +193,14 @@ export const NPCS_SECTS_TEMPLES: readonly NpcDef[] = [
     questIds: [
       "qst_zhongyang_imperial_letter",
       "qst_zhongyang_noble_intrigue",
+    ],
+    defenseTier: 3,
+    stealLoot: [
+      { itemId: "ancient_coin", weight: 4 },
+      { itemId: "gold_ore", weight: 3 },
+      { itemId: "jade", weight: 2 },
+      { itemId: "paper", weight: 4 },
+      { itemId: "silver_ring", weight: 1 },
     ],
     tags: ["envoy", "imperial", "zhongyang"],
   },

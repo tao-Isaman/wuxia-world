@@ -187,6 +187,16 @@ export type Condition =
   // WorldStateData.visitedLocationIds (recorded in gotoScene/followAutoAdvance
   // when a "location" scene is entered).
   | { t: "visitedLocation"; locationId: string }
+  // Player has successfully stolen from this NPC at least `count` times
+  // (default 1). Counter lives in WorldStateData.stoleFromCounts and is
+  // bumped by `attemptSteal` on a passed check.
+  | { t: "stoleFromNpc"; npcId: string; count?: number }
+  // Player has assassinated this NPC. Boolean; once set, never unset.
+  // Backed by WorldStateData.assassinatedNpcIds.
+  | { t: "assassinatedNpc"; npcId: string }
+  // Player has kidnapped this NPC. Same shape as assassinatedNpc. Backed
+  // by WorldStateData.kidnappedNpcIds.
+  | { t: "kidnappedNpc"; npcId: string }
   | { t: "and"; all: Condition[] }
   | { t: "or"; any: Condition[] }
   | { t: "not"; of: Condition };
@@ -247,6 +257,18 @@ export interface NpcDef {
   // new quest is one entry in lib/world/data/quests/* plus appending its
   // id here.
   questIds?: readonly string[];
+
+  // ─── Bad-action target capability ───────────────────────────────────
+  // How tough this NPC is when bad-action checks (steal / assassinate /
+  // kidnap) fail and they fight back. Maps to TIER_TO_BAD_ACTION_OPPONENT
+  // in lib/world/bad-actions.ts. Defaults to 0 (chaff) when omitted.
+  // Higher tiers = harder fail-fight + harder check (penalty in formula).
+  defenseTier?: 0 | 1 | 2 | 3 | 4;
+  // Loot pool rolled on a successful ขโมย. When omitted, the steal button
+  // is hidden — i.e., this NPC simply has nothing to steal. Authors set
+  // this on every NPC who can be stolen from (merchants, scholars, lords,
+  // etc.), with weights that fit their station.
+  stealLoot?: readonly ResourceYield[];
 }
 
 export interface NpcStateEntry {
@@ -422,6 +444,11 @@ export const LIFE_SKILL_KEYS = [
   "writing",
   "chess",
   "begging",
+  // ขโมย — improves bad-action steal checks (DEX-based). No resource
+  // node feeds it; xp comes from successful AND failed steal attempts via
+  // the attemptSteal store action. Mastery scales the player's edge in
+  // future steals. Mapped through STAT_FROM_LIFE_SKILL → DEX.
+  "steal",
   "forge",
   "tailoring",
   "jewelry",
@@ -718,6 +745,14 @@ export interface WorldStateData {
   // is reached. Stored as an array (vs a Set) because Zustand persistence
   // needs JSON-serialisable shapes.
   visitedLocationIds: string[];
+  // Bad-action ledgers — populated by attemptSteal/Assassinate/Kidnap on
+  // a passed check. `stoleFromCounts` is a per-NPC counter (player can rob
+  // a target repeatedly); the other two are one-shot booleans (NPC is gone
+  // after a successful hit). All three are read by the matching Condition
+  // variants for quest auto-advance.
+  stoleFromCounts: Record<string, number>;
+  assassinatedNpcIds: string[];
+  kidnappedNpcIds: string[];
 
   // Game time. Twelve ชั่วยาม per day; `time` is a fractional within-day
   // counter (0 ≤ time < 12) that advances per action and rolls `day` over

@@ -205,7 +205,7 @@ export function ProfilePopup({ open, onClose }: Props) {
               // Sum used by learn-skill / learn-art gates (no equipment).
               const learnable = b + fromArts + fromSkills;
               const xp = statExp[k] ?? 0;
-              const cost = xpToNextStatLevel(b);
+              const cost = xpToNextStatLevel(b, k);
               const xpPct = cost > 0 ? Math.min(100, Math.round((xp / cost) * 100)) : 0;
               const cellTrigger = (
                 <div className="w-full rounded bg-muted/40 px-2 py-1.5 cursor-help">

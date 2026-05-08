@@ -106,6 +106,13 @@ export const NPCS_VILLAGES: readonly NpcDef[] = [
       "qv_inn_spy_guest",
       "qv_inn_debt_collector",
     ],
+    defenseTier: 1,
+    stealLoot: [
+      { itemId: "ancient_coin", weight: 4 },
+      { itemId: "rice_dish", weight: 3 },
+      { itemId: "spicy_stew", weight: 3 },
+      { itemId: "potion", weight: 2 },
+    ],
     tags: ["innkeeper", "gossip"],
   },
 
@@ -120,6 +127,14 @@ export const NPCS_VILLAGES: readonly NpcDef[] = [
       "qv_inn_special_ingredient",
       "qv_inn_rival_inn",
       "qv_inn_drunk_warrior",
+    ],
+    defenseTier: 2,
+    stealLoot: [
+      { itemId: "ancient_coin", weight: 4 },
+      { itemId: "rice_dish", weight: 3 },
+      { itemId: "spicy_stew", weight: 3 },
+      { itemId: "potion", weight: 2 },
+      { itemId: "iron_blade", weight: 1 },
     ],
     tags: ["innkeeper", "retired_warrior", "chef"],
   },

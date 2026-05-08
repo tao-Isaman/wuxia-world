@@ -3,6 +3,7 @@ import { NPCS_CITIES } from "./npcs/cities";
 import { NPCS_VILLAGES } from "./npcs/villages";
 import { NPCS_SECTS_TEMPLES } from "./npcs/sects-temples";
 import { NPCS_WILDERNESS } from "./npcs/wilderness";
+import { NPCS_EVIL } from "./npcs/evil";
 
 // ─── NPC registry ──────────────────────────────────────────────────────
 // Each entry plants an NPC at one or more locations. Authors fill in the
@@ -49,6 +50,7 @@ export const NPCS: readonly NpcDef[] = [
   ...NPCS_VILLAGES,
   ...NPCS_SECTS_TEMPLES,
   ...NPCS_WILDERNESS,
+  ...NPCS_EVIL,
 ];
 
 export const NPCS_BY_ID = new Map<string, NpcDef>(NPCS.map((n) => [n.id, n]));

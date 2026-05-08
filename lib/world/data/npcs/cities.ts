@@ -20,6 +20,13 @@ export const NPCS_CITIES: readonly NpcDef[] = [
       "qc_capital_corrupt_clerk",
       "qc_capital_royal_pardon",
     ],
+    defenseTier: 2,
+    stealLoot: [
+      { itemId: "ancient_coin", weight: 5 },
+      { itemId: "gold_ore", weight: 2 },
+      { itemId: "paper", weight: 4 },
+      { itemId: "ink", weight: 3 },
+    ],
     tags: ["official", "authority"],
   },
   {
@@ -31,6 +38,13 @@ export const NPCS_CITIES: readonly NpcDef[] = [
     questIds: [
       "qc_capital_rare_herb",
       "qc_capital_stolen_formula",
+    ],
+    defenseTier: 1,
+    stealLoot: [
+      { itemId: "herb", weight: 5 },
+      { itemId: "ginseng", weight: 4 },
+      { itemId: "lotus_seed", weight: 3 },
+      { itemId: "potion_mid", weight: 2 },
     ],
     tags: ["healer", "scholar"],
   },
@@ -73,6 +87,14 @@ export const NPCS_CITIES: readonly NpcDef[] = [
       "qc_dali_history_route",
       "qc_dali_missing_page",
     ],
+    defenseTier: 1,
+    stealLoot: [
+      { itemId: "paper", weight: 5 },
+      { itemId: "ink", weight: 4 },
+      { itemId: "ancient_coin", weight: 3 },
+      { itemId: "book_basic", weight: 2 },
+      { itemId: "book_inter", weight: 1 },
+    ],
     tags: ["scholar", "historian"],
   },
   {
@@ -84,6 +106,14 @@ export const NPCS_CITIES: readonly NpcDef[] = [
     questIds: [
       "qc_dali_herb_collection",
       "qc_dali_venom_beast",
+    ],
+    defenseTier: 1,
+    stealLoot: [
+      { itemId: "herb", weight: 5 },
+      { itemId: "ginseng", weight: 3 },
+      { itemId: "lotus_seed", weight: 3 },
+      { itemId: "viper_venom", weight: 2 },
+      { itemId: "potion", weight: 3 },
     ],
     tags: ["healer", "herbalist"],
   },
@@ -98,6 +128,14 @@ export const NPCS_CITIES: readonly NpcDef[] = [
     questIds: [
       "qc_yangzhou_rare_fish",
       "qc_yangzhou_spice_delivery",
+    ],
+    defenseTier: 1,
+    stealLoot: [
+      { itemId: "rice_dish", weight: 4 },
+      { itemId: "spicy_stew", weight: 3 },
+      { itemId: "moon_cake", weight: 4 },
+      { itemId: "fish_eel", weight: 2 },
+      { itemId: "ancient_coin", weight: 2 },
     ],
     tags: ["chef", "merchant"],
   },
@@ -152,6 +190,14 @@ export const NPCS_CITIES: readonly NpcDef[] = [
       "qc_jinling_coded_letter",
       "qc_jinling_defector",
     ],
+    defenseTier: 2,
+    stealLoot: [
+      { itemId: "paper", weight: 5 },
+      { itemId: "ink", weight: 4 },
+      { itemId: "ancient_coin", weight: 3 },
+      { itemId: "iron_blade", weight: 1 },
+      { itemId: "gold_ore", weight: 1 },
+    ],
     tags: ["scholar", "official"],
   },
 
@@ -166,6 +212,13 @@ export const NPCS_CITIES: readonly NpcDef[] = [
       "qc_changan_gate_intruder",
       "qc_changan_missing_soldier",
       "qc_changan_weapon_smuggle",
+    ],
+    defenseTier: 2,
+    stealLoot: [
+      { itemId: "iron_blade", weight: 4 },
+      { itemId: "iron_ingot", weight: 3 },
+      { itemId: "ancient_coin", weight: 4 },
+      { itemId: "iron_sword", weight: 1 },
     ],
     tags: ["soldier", "authority"],
   },

@@ -30,6 +30,7 @@ import {
 } from "@/lib/game";
 import type { WeaponFamily } from "@/lib/game";
 import { useWorldStore } from "@/store/world-store";
+import { confirmDialog } from "@/store/confirm-store";
 import { ArtTooltip, SkillTooltip } from "../skill-tooltip";
 
 interface Props {
@@ -477,14 +478,14 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
                       variant="ghost"
                       className="h-6 px-2 text-[10px] text-destructive hover:bg-destructive/10"
                       title="ลบออกจากตำราที่เรียนแล้ว — ลดการขัดแย้งของวิชา"
-                      onClick={() => {
-                        if (
-                          window.confirm(
-                            `ลืมวิชา "${sk.n}"?\nค่าประสบการณ์และระดับของวิชานี้จะถูกล้าง และต้องเรียนใหม่จากตำราอีกครั้ง`,
-                          )
-                        ) {
-                          forgetSkill(sid);
-                        }
+                      onClick={async () => {
+                        const ok = await confirmDialog({
+                          title: "ลืมวิชา",
+                          message: `ลืมวิชา "${sk.n}"?\nค่าประสบการณ์และระดับของวิชานี้จะถูกล้าง และต้องเรียนใหม่จากตำราอีกครั้ง`,
+                          confirmText: "ลืมวิชา",
+                          variant: "warn",
+                        });
+                        if (ok) forgetSkill(sid);
                       }}
                     >
                       ลืม
@@ -534,14 +535,14 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
                       variant="ghost"
                       className="h-6 px-2 text-[10px] text-destructive hover:bg-destructive/10"
                       title="ลบออกจากตำราที่เรียนแล้ว — ลดการขัดแย้งของวิชา"
-                      onClick={() => {
-                        if (
-                          window.confirm(
-                            `ลืมวิชา "${art.n}"?\nระดับและค่าประสบการณ์ของวิชานี้จะถูกล้าง และต้องเรียนใหม่จากตำราอีกครั้ง`,
-                          )
-                        ) {
-                          forgetArt(aid);
-                        }
+                      onClick={async () => {
+                        const ok = await confirmDialog({
+                          title: "ลืมวิชาในกาย",
+                          message: `ลืมวิชา "${art.n}"?\nระดับและค่าประสบการณ์ของวิชานี้จะถูกล้าง และต้องเรียนใหม่จากตำราอีกครั้ง`,
+                          confirmText: "ลืมวิชา",
+                          variant: "warn",
+                        });
+                        if (ok) forgetArt(aid);
                       }}
                     >
                       ลืม

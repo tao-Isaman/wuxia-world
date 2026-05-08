@@ -56,6 +56,17 @@ import {
   type WorldStateData,
 } from "@/lib/world";
 import { tickQuestProgress } from "@/lib/world/effects";
+import {
+  ASSASSINATE_TRAIT_EVIL,
+  KIDNAP_TRAIT_EVIL,
+  STEAL_TRAIT_EVIL,
+  STEAL_XP_ON_FAIL,
+  STEAL_XP_ON_PASS,
+  TIER_TO_BAD_ACTION_OPPONENT,
+  assassinateChance,
+  kidnapChance,
+  stealChance,
+} from "@/lib/world/bad-actions";
 
 // ─── Starter build ─────────────────────────────────────────────────────
 // All stats at 1, single basic_punch skill, no art, no equipment.
@@ -253,6 +264,17 @@ export type QuestActionResult =
   | { ok: false; reason: "unknown" | "already-active" | "already-done" | "prereq" }
   | { ok: true; questId: string };
 
+// Result of a bad-action attempt (ขโมย / ลอบทำร้าย / ลักพาตัว). All three
+// share the same shape: pre-flight failures (no build, NPC missing) return
+// `{ ok: false, ... }`. Once the action is committed, the result is either
+// "passed" (effects already applied — items / quest progress / trait deltas)
+// or "failed" (a battle has been queued; the popup should close so the
+// battle bridge can take over).
+export type BadActionResult =
+  | { ok: false; reason: "unknown" | "no-build" | "pending" | "not-stealable" | "already-done" }
+  | { ok: true; outcome: "passed"; chance: number; items?: { itemId: string; count: number }[] }
+  | { ok: true; outcome: "failed"; chance: number };
+
 // Generic post-spar landing scenes — all sparring routes here on
 // resolution. Authors don't need a per-NPC outcome scene.
 export const SPAR_WIN_SCENE_ID = "npc_spar_win";
@@ -390,6 +412,15 @@ interface WorldStore extends WorldStateData {
   meetNpc: (npcId: string) => void;
   startSparWith: (npcId: string) => SparResult;
 
+  // Bad-action attempts. Each runs a stat check; on pass, applies the
+  // outcome (items / quest counter / trait delta) inline. On fail, queues
+  // a triggerBattle vs the tier-mapped opponent — popup should close so
+  // the battle bridge can pick up. Steal-fights are non-fatal; the other
+  // two are real combat. See lib/world/bad-actions.ts for the formulas.
+  attemptSteal: (npcId: string) => BadActionResult;
+  attemptAssassinate: (npcId: string) => BadActionResult;
+  attemptKidnap: (npcId: string) => BadActionResult;
+
   // Quest actions. `acceptQuest` is the lightweight version of dispatching
   // `startQuest` from a dialog choice — useful when the NPC popup wants to
   // start a quest directly without routing through a scripted scene.
@@ -448,6 +479,9 @@ const emptyData = (): WorldStateData => ({
   npcStates: {},
   defeatedCounts: {},
   visitedLocationIds: [],
+  stoleFromCounts: {},
+  assassinatedNpcIds: [],
+  kidnappedNpcIds: [],
   day: 1,
   time: 0,
   pendingBattle: null,
@@ -488,7 +522,7 @@ function applyStatLevelUps(state: WorldStateData, key: StatKey): void {
   let build: CharacterBuild = state.playerBuild;
   while (true) {
     const base: number = build.stats[key];
-    const cost = xpToNextStatLevel(base);
+    const cost = xpToNextStatLevel(base, key);
     const xp = state.statExp[key] ?? 0;
     if (xp < cost) break;
     build = {
@@ -716,6 +750,9 @@ function draftFrom(s: WorldStateData): WorldStateData {
     npcStates: { ...s.npcStates },
     defeatedCounts: { ...s.defeatedCounts },
     visitedLocationIds: [...s.visitedLocationIds],
+    stoleFromCounts: { ...s.stoleFromCounts },
+    assassinatedNpcIds: [...s.assassinatedNpcIds],
+    kidnappedNpcIds: [...s.kidnappedNpcIds],
     day: s.day,
     time: s.time,
     pendingBattle: s.pendingBattle,
@@ -1932,6 +1969,157 @@ export const useWorldStore = create<WorldStore>()(
         return { ok: true, npcId, opponentId: npc.sparOpponentId };
       },
 
+      attemptSteal: (npcId) => {
+        const s = get();
+        if (s.pendingBattle) return { ok: false, reason: "pending" };
+        const npc = getNpc(npcId);
+        if (!npc) return { ok: false, reason: "unknown" };
+        if (!s.playerBuild) return { ok: false, reason: "no-build" };
+        if (!npc.stealLoot || npc.stealLoot.length === 0) {
+          return { ok: false, reason: "not-stealable" };
+        }
+        const stealXp = s.lifeSkillXp.steal ?? 0;
+        const chance = stealChance(s.playerBuild, npc, stealXp);
+        const passed = Math.random() * 100 < chance;
+        const draft = draftFrom(s);
+        advanceTime(draft, ACTION_HOURS);
+        if (passed) {
+          // Pick 1–2 items from the steal pool, weighted.
+          const picks = 1 + (Math.random() < 0.3 ? 1 : 0);
+          const merged: Record<string, number> = {};
+          for (let i = 0; i < picks; i++) {
+            const drop = pickWeighted(npc.stealLoot, Math.random());
+            if (!drop) continue;
+            const min = drop.count?.[0] ?? 1;
+            const max = drop.count?.[1] ?? 1;
+            const c = min + Math.floor(Math.random() * Math.max(1, max - min + 1));
+            merged[drop.itemId] = (merged[drop.itemId] ?? 0) + c;
+          }
+          const items = Object.entries(merged).map(([itemId, count]) => ({ itemId, count }));
+          for (const it of items) {
+            draft.inventory[it.itemId] = (draft.inventory[it.itemId] ?? 0) + it.count;
+          }
+          draft.stoleFromCounts[npcId] = (draft.stoleFromCounts[npcId] ?? 0) + 1;
+          draft.lifeSkillXp.steal = (draft.lifeSkillXp.steal ?? 0) + STEAL_XP_ON_PASS;
+          draft.traits.evil = (draft.traits.evil ?? 0) + STEAL_TRAIT_EVIL;
+          grantStatXp(draft, "DEX", STAT_XP_PER_ACTION);
+          rollLukXp(draft);
+          tickQuestProgress(draft);
+          appendActionLog(
+            draft,
+            "steal",
+            `ขโมย ${npc.name}: ${
+              items.length > 0
+                ? items.map((it) => `${getItem(it.itemId)?.name ?? it.itemId}×${it.count}`).join(", ")
+                : "ไม่ได้อะไร"
+            } (${chance.toFixed(0)}%)`,
+          );
+          set({ ...draft });
+          return { ok: true, outcome: "passed", chance, items };
+        }
+        // Failed — queue a non-fatal fight against the tier-matched opponent.
+        const tier = (npc.defenseTier ?? 0) as 0 | 1 | 2 | 3 | 4;
+        const opponentId = TIER_TO_BAD_ACTION_OPPONENT[tier];
+        draft.lifeSkillXp.steal = (draft.lifeSkillXp.steal ?? 0) + STEAL_XP_ON_FAIL;
+        draft.pendingBattle = {
+          opponentId,
+          onWin: draft.currentSceneId,
+          onLose: draft.currentSceneId,
+          nonFatal: true,
+        };
+        appendActionLog(draft, "steal", `ขโมย ${npc.name} ล้มเหลว (${chance.toFixed(0)}%) — ถูกจับได้`);
+        set({ ...draft });
+        return { ok: true, outcome: "failed", chance };
+      },
+
+      attemptAssassinate: (npcId) => {
+        const s = get();
+        if (s.pendingBattle) return { ok: false, reason: "pending" };
+        const npc = getNpc(npcId);
+        if (!npc) return { ok: false, reason: "unknown" };
+        if (!s.playerBuild) return { ok: false, reason: "no-build" };
+        if (s.assassinatedNpcIds.includes(npcId)) {
+          return { ok: false, reason: "already-done" };
+        }
+        const chance = assassinateChance(s.playerBuild, npc);
+        const passed = Math.random() * 100 < chance;
+        const draft = draftFrom(s);
+        advanceTime(draft, ACTION_HOURS);
+        if (passed) {
+          draft.assassinatedNpcIds.push(npcId);
+          draft.traits.evil = (draft.traits.evil ?? 0) + ASSASSINATE_TRAIT_EVIL;
+          draft.traits.fame = (draft.traits.fame ?? 0) + 2;
+          grantStatXp(draft, "DEX", STAT_XP_PER_ACTION);
+          rollLukXp(draft);
+          tickQuestProgress(draft);
+          appendActionLog(
+            draft,
+            "assassinate",
+            `ลอบสังหาร ${npc.name} สำเร็จ (${chance.toFixed(0)}%)`,
+          );
+          set({ ...draft });
+          return { ok: true, outcome: "passed", chance };
+        }
+        const tier = (npc.defenseTier ?? 0) as 0 | 1 | 2 | 3 | 4;
+        const opponentId = TIER_TO_BAD_ACTION_OPPONENT[tier];
+        draft.pendingBattle = {
+          opponentId,
+          onWin: draft.currentSceneId,
+          onLose: draft.currentSceneId,
+        };
+        appendActionLog(
+          draft,
+          "assassinate",
+          `ลอบสังหาร ${npc.name} ล้มเหลว (${chance.toFixed(0)}%) — ต้องสู้`,
+        );
+        set({ ...draft });
+        return { ok: true, outcome: "failed", chance };
+      },
+
+      attemptKidnap: (npcId) => {
+        const s = get();
+        if (s.pendingBattle) return { ok: false, reason: "pending" };
+        const npc = getNpc(npcId);
+        if (!npc) return { ok: false, reason: "unknown" };
+        if (!s.playerBuild) return { ok: false, reason: "no-build" };
+        if (s.kidnappedNpcIds.includes(npcId)) {
+          return { ok: false, reason: "already-done" };
+        }
+        const chance = kidnapChance(s.playerBuild, npc);
+        const passed = Math.random() * 100 < chance;
+        const draft = draftFrom(s);
+        advanceTime(draft, ACTION_HOURS);
+        if (passed) {
+          draft.kidnappedNpcIds.push(npcId);
+          draft.traits.evil = (draft.traits.evil ?? 0) + KIDNAP_TRAIT_EVIL;
+          draft.traits.arrogance = (draft.traits.arrogance ?? 0) + 1;
+          grantStatXp(draft, "STR", STAT_XP_PER_ACTION);
+          rollLukXp(draft);
+          tickQuestProgress(draft);
+          appendActionLog(
+            draft,
+            "kidnap",
+            `ลักพาตัว ${npc.name} สำเร็จ (${chance.toFixed(0)}%)`,
+          );
+          set({ ...draft });
+          return { ok: true, outcome: "passed", chance };
+        }
+        const tier = (npc.defenseTier ?? 0) as 0 | 1 | 2 | 3 | 4;
+        const opponentId = TIER_TO_BAD_ACTION_OPPONENT[tier];
+        draft.pendingBattle = {
+          opponentId,
+          onWin: draft.currentSceneId,
+          onLose: draft.currentSceneId,
+        };
+        appendActionLog(
+          draft,
+          "kidnap",
+          `ลักพาตัว ${npc.name} ล้มเหลว (${chance.toFixed(0)}%) — ถูกตอบโต้`,
+        );
+        set({ ...draft });
+        return { ok: true, outcome: "failed", chance };
+      },
+
       acceptQuest: (questId) => {
         const s = get();
         const def = getQuest(questId);
@@ -1987,7 +2175,7 @@ export const useWorldStore = create<WorldStore>()(
     }),
     {
       name: "wusia-world-v1",
-      version: 15,
+      version: 16,
       // Only persist the data fields, not the action functions.
       partialize: (s) => ({
         hasGame: s.hasGame,
@@ -2014,6 +2202,9 @@ export const useWorldStore = create<WorldStore>()(
         npcStates: s.npcStates,
         defeatedCounts: s.defeatedCounts,
         visitedLocationIds: s.visitedLocationIds,
+        stoleFromCounts: s.stoleFromCounts,
+        assassinatedNpcIds: s.assassinatedNpcIds,
+        kidnappedNpcIds: s.kidnappedNpcIds,
         day: s.day,
         time: s.time,
         pendingBattle: s.pendingBattle,
@@ -2061,6 +2252,9 @@ export const useWorldStore = create<WorldStore>()(
       //            this bag and equipped via `equipFromBag` /
       //            `unequipFromSlot`. Existing saves start with an
       //            empty bag.
+      //   v15 → v16 added stoleFromCounts / assassinatedNpcIds /
+      //            kidnappedNpcIds (bad-action ledgers) plus the "steal"
+      //            life-skill key. Existing saves start empty.
       migrate: (persisted, fromVersion) => {
         const p = (persisted ?? {}) as Partial<WorldStateData>;
         // Pad the build's skillIds to 10 and back-fill learned arrays.
@@ -2138,6 +2332,16 @@ export const useWorldStore = create<WorldStore>()(
               : {},
           visitedLocationIds: Array.isArray(p.visitedLocationIds)
             ? [...p.visitedLocationIds]
+            : [],
+          stoleFromCounts:
+            p.stoleFromCounts && typeof p.stoleFromCounts === "object"
+              ? { ...p.stoleFromCounts }
+              : {},
+          assassinatedNpcIds: Array.isArray(p.assassinatedNpcIds)
+            ? [...p.assassinatedNpcIds]
+            : [],
+          kidnappedNpcIds: Array.isArray(p.kidnappedNpcIds)
+            ? [...p.kidnappedNpcIds]
             : [],
           day: typeof p.day === "number" && p.day >= 1 ? p.day : 1,
           time: typeof p.time === "number" && p.time >= 0 ? p.time : 0,
