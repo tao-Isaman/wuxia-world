@@ -30,6 +30,7 @@ export const SECT_ORDER: readonly string[] = [
   "พรรคเบญจพิษ",
   "สำนักเลือดดาบ",
   "สำนักดาบโลหิต",
+  "องครักษ์เสื้อแพร",
   JIANGHU_SECT,
 ];
 

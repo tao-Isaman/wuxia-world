@@ -29,6 +29,8 @@ export const LOCATION_ROUTES: readonly LocationRoute[] = [
   { a: "city_capital", b: "city_yangzhou", fromA: "ลำคลองใหญ่",      fromB: "ลำคลองใหญ่",      hintA: "เส้นทางการค้าสายตะวันออกเฉียงใต้" },
   { a: "city_capital", b: "city_changan",  fromA: "ทางหลวงราชา",     fromB: "ทางหลวงราชา" },
   { a: "city_capital", b: "palace_royal",  fromA: "ระเบียงวัง",       fromB: "ตรอกในวัง" },
+  { a: "palace_royal", b: "sect_jinyiwei", fromA: "ตำหนักเสื้อแพร",   fromB: "ระเบียงในวัง",   hintA: "ที่พำนักขององครักษ์ราชสำนัก", hintB: "ทางออกสู่พระราชวังหลวง" },
+  { a: "city_capital", b: "sect_jinyiwei", fromA: "ตรอกองครักษ์",     fromB: "ตรอกออกสู่นคร",  hintA: "ตรอกที่ทหารเสื้อแพรเดินตรวจ" },
   { a: "city_capital", b: "inn_yuelai",    fromA: "ตรอกเก่า",         fromB: "ตรอกเก่า" },
   { a: "city_capital", b: "sect_songshan", fromA: "ทางขึ้นเขา",       fromB: "ทางลงเขา" },
   { a: "city_capital", b: "home_player",   fromA: "ทางกลับบ้าน",      fromB: "ทางออกจากบ้าน" },

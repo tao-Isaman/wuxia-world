@@ -67,6 +67,18 @@ export const SKILLS: readonly Skill[] = [
   { id: "bs", n: "ดาบอสุรี", sc: "สำนักดาบโลหิต", ti: 3, w: "blade", mg: 80, st: { STR: 10, AGI: 8 }, at: "phy", bp: 80, p: 0, f: 0, dm: 1, dr: 30, se: null, ee: null, d: "Phy + ดูด 30% dmg → HP", types: ["yang", "hard"] },
   { id: "nf6", n: "ดาบยาวสีเลือด", sc: "สำนักดาบโลหิต", ti: 3, w: "blade", mg: 80, st: { STR: 10, DEX: 8 }, at: "phy", bp: 90, p: 0, f: 0, dm: 1, dr: 35, se: null, ee: null, d: "Phy + ดูด 35% HP", types: ["yang", "hard"] },
 
+  // ─── องครักษ์เสื้อแพร (Jinyiwei — Brocade-clad Imperial Guard) ─────
+  // Style: hard / external · weapons span hidden-chain, blade, fist (claw),
+  // sword. Built for hunters and grapplers — debuffs that lock movement
+  // (Eva / Spd / Acc) and suppress the target's defenses.
+  { id: "jy_chain", n: "โซ่กรงเล็บฝึกหัด", sc: "องครักษ์เสื้อแพร", ti: 0, w: "hidden", mg: 20, st: { STR: 4, AGI: 4 }, at: "phy", bp: 38, p: 0, f: 8, dm: 1, se: null, ee: null, d: "Phy โซ่ตวัดพื้นฐาน · เริ่มฝึกขององครักษ์", types: ["yang", "external"] },
+  { id: "jy_blade", n: "ดาบราชสำนัก", sc: "องครักษ์เสื้อแพร", ti: 1, w: "blade", mg: 40, st: { STR: 7, DEX: 5, AGI: 4 }, at: "phy", bp: 52, p: 10, f: 0, dm: 1, se: null, ee: { t: "debuff_def", v: -10, u: 2 }, d: "Phy×110% + PDef-10 (2ตา) — ดาบโค้งประจำกรมราช", types: ["yang", "external"] },
+  { id: "jy_eagleclaw", n: "กรงเล็บอินทรี", sc: "องครักษ์เสื้อแพร", ti: 2, w: "fist", mg: 60, st: { STR: 6, DEX: 8, AGI: 6 }, at: "phy", bp: 60, p: 0, f: 0, dm: 1.05, se: null, ee: { t: "debuff_acc", v: -14, u: 2 }, d: "Phy×1.05 + Acc-14 (2ตา) — กรงเล็บฉกผู้หลบหนี", types: ["yang", "external"] },
+  { id: "jy_grapple", n: "กรงเล็บคว้าจับ", sc: "องครักษ์เสื้อแพร", ti: 2, w: "fist", mg: 60, st: { STR: 8, DEX: 6, VIT: 4 }, at: "phy", bp: 65, p: 0, f: 0, dm: 1, se: null, ee: { t: "debuff_eva", v: -18, u: 2 }, d: "Phy + Eva-18 (2ตา) — กรงเล็บล็อกผู้หลบหนี", types: ["yang", "external", "hard"] },
+  { id: "jy_sword", n: "กระบี่จารบุรุษ", sc: "องครักษ์เสื้อแพร", ti: 3, w: "sword", mg: 80, st: { STR: 7, AGI: 9, DEX: 7 }, at: "phy", bp: 72, p: 15, f: 0, dm: 1.1, se: null, ee: { t: "multi_debuff", av: -12, ev: -12, u: 2 }, d: "Phy×115%×1.1 + Acc-12 Eva-12 (2ตา) — กระบี่นักจารกรรม", types: ["yang", "external"] },
+  { id: "jy_chainmaster", n: "โซ่ทองเก้ามังกร", sc: "องครักษ์เสื้อแพร", ti: 3, w: "hidden", mg: 80, st: { STR: 9, DEX: 8, AGI: 5 }, at: "phy", bp: 78, p: 10, f: 5, dm: 1.1, se: null, ee: { t: "multi_debuff", av: -10, ev: -16, u: 2 }, d: "Phy×110%×1.1 + Acc-10 Eva-16 (2ตา) — โซ่เก้ามังกรปลายทอง", types: ["yang", "external", "hard"] },
+  { id: "jy_blade_king", n: "ดาบเจ้าพระยา", sc: "องครักษ์เสื้อแพร", ti: 4, w: "blade", mg: 100, st: { STR: 12, DEX: 8, AGI: 6 }, at: "phy", bp: 92, p: 25, f: 0, dm: 1.2, se: { t: "stack_atk", v: 8, mx: 3 }, ee: { t: "debuff_def", v: -22, u: 3 }, d: "Phy×125%×1.2 + ATK+8%(≤3ซ้อน) + PDef-22 (3ตา) — ดาบเหนือทุกขุนพลของเจ้าพระยา", types: ["yang", "external", "hard"] },
+
   // ─── ยุทธจักร (Jianghu — generic / unaffiliated) ─────────────────
   // ─── tier 0 ────────
   { id: "basic_punch", n: "หมัดตรง", sc: "ยุทธจักร", ti: 0, w: "fist", mg: 10, st: { STR: 2 }, at: "phy", bp: 25, p: 0, f: 0, dm: 1, se: null, ee: null, d: "หมัดเริ่มต้นสำหรับมือใหม่", types: ["external"] },

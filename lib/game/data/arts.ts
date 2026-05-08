@@ -130,6 +130,34 @@ export const ARTS: readonly Art[] = [
     act: { n: "ห้าพิษรวมร่าง", c: 35, cd: 4, t: "debuff_poison", pp: 8, u: 4, ev: -15, d: "พิษ 8%HP/ตา + Eva-15 (4ตา) CD4" },
     pas: { tr: "on_crit", ch: 100, d: "Crit → ศัตรู Acc-12 (3ตา)", e: { t: "debuff_acc", n: "พิษ", v: -12, u: 3 } } },
 
+  // ─── องครักษ์เสื้อแพร (Jinyiwei — Brocade-clad Imperial Guard) ─────
+  // All five tiers lean yang/external — the lineage is built around
+  // hard-conditioned bodies and aggressive foot-pursuit work.
+  { id: "jy_a0_brocade", n: "ลมปราณเสื้อแพร", sc: "องครักษ์เสื้อแพร", tp: "หยาง·ภายนอก", types: ["yang", "external"], ti: 0,
+    stats: { STR: 5, VIT: 4 }, hL: 18, mL: 10,
+    act: { n: "ตั้งแถวรับ", c: 15, cd: 3, t: "buff_reduce", v: 18, u: 2, d: "ลด dmg 18% (2ตา) CD3" },
+    pas: { tr: "hit_recv", ch: 25, d: "ถูกโจมตี 25% → DEF+10 (1ตา)", e: { t: "buff_def", n: "เกราะ", v: 10, u: 1 } } },
+
+  { id: "jy_a1_silktread", n: "ฝีก้าวเส้นไหม", sc: "องครักษ์เสื้อแพร", tp: "หยาง·ภายนอก", types: ["yang", "external"], ti: 1,
+    stats: { STR: 6, AGI: 6, DEX: 4 }, hL: 25, mL: 15,
+    act: { n: "ก้าวรวดเร็ว", c: 20, cd: 3, t: "buff_eva_debuff_eva", selfV: 15, eneV: -10, u: 2, d: "Eva+15 / ศัตรู Eva-10 (2ตา) CD3" },
+    pas: { tr: "on_crit", ch: 100, d: "Crit → ศัตรู Eva-10 (2ตา)", e: { t: "debuff_eva", n: "ตัวสาน", v: -10, u: 2 } } },
+
+  { id: "jy_a2_goldarmor", n: "เกราะทองอนุรักษ์", sc: "องครักษ์เสื้อแพร", tp: "หยาง·ภายนอก", types: ["yang", "external"], ti: 2,
+    stats: { STR: 8, VIT: 8, DEF: 8 }, hL: 35, mL: 15,
+    act: { n: "เกราะทองคุ้ม", c: 25, cd: 3, t: "buff_reduce", v: 30, u: 2, d: "ลด dmg 30% (2ตา) CD3" },
+    pas: { tr: "hit_recv", ch: 30, d: "ถูกโจมตี 30% → ฟื้น 6% HP", e: { t: "heal_pct", v: 6 } } },
+
+  { id: "jy_a3_thunderstride", n: "ฟ้าผ่าก้าวเดิน", sc: "องครักษ์เสื้อแพร", tp: "หยาง·ภายนอก", types: ["yang", "external"], ti: 3,
+    stats: { STR: 12, AGI: 14, DEX: 12 }, hL: 35, mL: 25,
+    act: { n: "ก้าวฟ้า", c: 30, cd: 3, t: "atk_phy_pen", m: 1.4, pen: 35, d: "ทางกาย×1.4 ทะลุ DEF 35% CD3" },
+    pas: { tr: "on_crit", ch: 100, d: "Crit → ATK+5% (≤3 ซ้อน)", e: { t: "stack_atk", v: 5, mx: 3 } } },
+
+  { id: "jy_a4_brocadelord", n: "เจ้านายเสื้อแพร", sc: "องครักษ์เสื้อแพร", tp: "หยาง·ภายนอก", types: ["yang", "external"], ti: 4,
+    stats: { STR: 18, AGI: 16, DEX: 16 }, hL: 40, mL: 30,
+    act: { n: "ยุทธวิธีล่าโจร", c: 35, cd: 4, t: "atk_phy_pen", m: 1.5, pen: 50, d: "ทางกาย×1.5 ทะลุ DEF 50% CD4" },
+    pas: { tr: "on_crit", ch: 100, d: "Crit → ศัตรู PDef-15 (2ตา)", e: { t: "debuff_def", n: "บาดลึก", v: -15, u: 2 } } },
+
   // ─── สำนักดาบโลหิต ───────────────────────────────────────────────
   { id: "blood", n: "โลหิตอสุรา", sc: "สำนักดาบโลหิต", tp: "หยาง·แข็ง", types: ["yang", "hard"], ti: 4,
     stats: { STR: 25, AGI: 15, LUK: 10 }, hL: 45, mL: 25,

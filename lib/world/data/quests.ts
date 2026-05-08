@@ -4,6 +4,7 @@ import { QUESTS_VILLAGES } from "./quests/villages";
 import { QUESTS_SECTS_TEMPLES } from "./quests/sects-temples";
 import { QUESTS_WILDERNESS } from "./quests/wilderness";
 import { QUESTS_EVIL } from "./quests/evil";
+import { QUESTS_SPIES } from "./quests/spies";
 
 // ─── Quest registry ────────────────────────────────────────────────────
 // Aggregator. Authors add new quests to one of the regional files under
@@ -37,6 +38,7 @@ export const QUESTS: readonly QuestDef[] = [
   ...QUESTS_SECTS_TEMPLES,
   ...QUESTS_WILDERNESS,
   ...QUESTS_EVIL,
+  ...QUESTS_SPIES,
 ];
 
 export const QUESTS_BY_ID = new Map<string, QuestDef>(QUESTS.map((q) => [q.id, q]));

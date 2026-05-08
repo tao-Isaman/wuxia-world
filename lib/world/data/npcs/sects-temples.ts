@@ -415,4 +415,63 @@ export const NPCS_SECTS_TEMPLES: readonly NpcDef[] = [
     sparFameReward: 12,
     tags: ["master", "evil_sect", "xueyu", "sparring"],
   },
+
+  // ─── องครักษ์เสื้อแพร / Jinyiwei (3 NPCs) ────────────────────────────
+  // Government-aligned sect: a leader who answers to the throne, and two
+  // enforcers (saber and chain). All three are sparring-only — quests
+  // for this lineage are dispensed by the scattered spies (npcs/spies.ts).
+  // The leader is T4 ("very strong") and drops the t4 skill / art manuals.
+  {
+    id: "sect_jinyiwei_leader_zhao",
+    name: "ผู้บัญชาการจ้าวฝู่",
+    description: "ผู้บัญชาการกรมองครักษ์เสื้อแพร · มือขวาขององค์จักรพรรดิ · ดวงตาคมราวดาบ พูดน้อยแต่หนัก",
+    locationIds: ["sect_jinyiwei"],
+    dialogSceneId: "npc_sect_jinyiwei_leader_zhao_talk",
+    sparOpponentId: "spar_jinyiwei_leader",
+    sparFameReward: 14,
+    defenseTier: 4,
+    stealLoot: [
+      { itemId: "ancient_coin", weight: 5 },
+      { itemId: "jade", weight: 3 },
+      { itemId: "jade_amulet", weight: 2 },
+      { itemId: "potion_big", weight: 3 },
+      { itemId: "man_jy_blade_king", weight: 1 },
+    ],
+    tags: ["sect_master", "imperial", "jinyiwei"],
+  },
+  {
+    id: "sect_jinyiwei_soldier_qin",
+    name: "องครักษ์ฉิน",
+    description: "องครักษ์ระดับสูงประจำกรม · ดาบโค้งเสมอเอว ผู้คุมการสอนรุ่นน้อง",
+    locationIds: ["sect_jinyiwei"],
+    dialogSceneId: "npc_sect_jinyiwei_soldier_qin_talk",
+    sparOpponentId: "spar_jinyiwei_qin",
+    sparFameReward: 10,
+    defenseTier: 3,
+    stealLoot: [
+      { itemId: "iron_blade", weight: 4 },
+      { itemId: "ancient_coin", weight: 3 },
+      { itemId: "potion_mid", weight: 3 },
+      { itemId: "man_jy_blade", weight: 1 },
+    ],
+    tags: ["soldier", "imperial", "jinyiwei", "blade"],
+  },
+  {
+    id: "sect_jinyiwei_soldier_lu",
+    name: "องครักษ์ลู่",
+    description: "องครักษ์ผู้เชี่ยวชาญโซ่และกรงเล็บ · เคยจับโจรชายแดนได้ทั้งกองคนเดียว",
+    locationIds: ["sect_jinyiwei"],
+    dialogSceneId: "npc_sect_jinyiwei_soldier_lu_talk",
+    sparOpponentId: "spar_jinyiwei_lu",
+    sparFameReward: 10,
+    defenseTier: 3,
+    stealLoot: [
+      { itemId: "iron_ingot", weight: 4 },
+      { itemId: "leather", weight: 3 },
+      { itemId: "potion_mid", weight: 3 },
+      { itemId: "man_jy_chain", weight: 1 },
+      { itemId: "man_jy_chainmaster", weight: 1 },
+    ],
+    tags: ["soldier", "imperial", "jinyiwei", "chain"],
+  },
 ];

@@ -31,7 +31,7 @@ for (const r of LOCATION_ROUTES) {
 // Structure:
 //   world_journey  ← the hub
 //     ├─ cat_cities    → 4 cities
-//     ├─ cat_sects     → 17 sects
+//     ├─ cat_sects     → 18 sects
 //     ├─ cat_isles     → 10 islands
 //     ├─ cat_terrain   → 11 mountains/cliffs
 //     ├─ cat_caves     → 12 caves/valleys
@@ -106,7 +106,7 @@ const VILLAGES: LocationScene[] = [
   leaf("village_wuxia", "หมู่บ้านอวู่เซี่ย", "หมู่บ้านปากแม่น้ำสายลึก ที่หล่อหลอมยอดยุทธหลายรุ่น"),
 ];
 
-// ─── Sects (17) ───────────────────────────────────────────────────────
+// ─── Sects (18) ───────────────────────────────────────────────────────
 const SECTS: LocationScene[] = [
   leaf("sect_shaolin", "วัดเส้าหลิน", "少林派 · เขาซงซาน · Tank หลัก · ชายล้วน"),
   leaf("sect_wudang", "อู่ตัง / บู๊ตึ๊ง", "武当派 · เขาอู่ตัง · กระบี่ · แลกปราณเป็นเลือด"),
@@ -125,6 +125,11 @@ const SECTS: LocationScene[] = [
   leaf("sect_xingxiu", "สำนักดาวดึงส์ (เห็งซัว)", "星宿派 · ทะเลดาว · ดิงชุนชิว"),
   leaf("sect_xuedao", "สำนักเลือดดาบ", "血刀门 · ฝ่ายอธรรม"),
   leaf("sect_wudu", "พรรคเบญจพิษ", "五毒教 · ยูนนาน · ชนเผ่าเมี่ยว"),
+  leaf(
+    "sect_jinyiwei",
+    "องครักษ์เสื้อแพร",
+    "锦衣卫 · กรมรักษาวังหลวง · สวมเสื้อแพรปักทอง · จารกรรมและบังคับราชโองการ",
+  ),
 ];
 
 // ─── Islands (10) ─────────────────────────────────────────────────────

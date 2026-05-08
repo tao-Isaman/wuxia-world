@@ -454,6 +454,98 @@ export const OPPONENTS: readonly OpponentDef[] = [
       artId: "blood", artLevel: 5,
       skillIds: ["bs", "nf6", "nd10"],
     }) },
+
+  // ─── Jinyiwei (องครักษ์เสื้อแพร) — sect roster ───────────────────────
+  // Leader = T4 with the signature t4 art + multiple sect skills. Soldiers
+  // = T3 with the t3 art + 2 sect skills. Stats lean on STR/AGI/DEX/VIT
+  // (the lineage is yang/external pursuit work).
+
+  // ผู้บัญชาการจ้าวฝู่ (sect_jinyiwei) — T4 leader, very strong.
+  { id: "spar_jinyiwei_leader", name: "ผู้บัญชาการจ้าวฝู่", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "man_jy_blade_king", weight: 1 }, { itemId: "man_jy_chainmaster", weight: 1 },
+      { itemId: "man_jy_a4_brocadelord", weight: 1 }, { itemId: "man_jy_a3_thunderstride", weight: 1 }],
+    build: () => build("ผู้บัญชาการจ้าวฝู่", 4, {
+      stats: { STR: 14, AGI: 12, DEX: 10, VIT: 10, DEF: 8 },
+      artId: "jy_a4_brocadelord", artLevel: 8,
+      skillIds: ["jy_blade_king", "jy_chainmaster", "jy_grapple", "jy_blade"],
+    }) },
+
+  // องครักษ์ฉิน (sect_jinyiwei) — T3 saber soldier.
+  { id: "spar_jinyiwei_qin", name: "องครักษ์ฉิน", ti: 3, category: "human",
+    drops: [...DROPS_T3,
+      { itemId: "man_jy_blade", weight: 1 }, { itemId: "man_jy_eagleclaw", weight: 1 },
+      { itemId: "man_jy_a3_thunderstride", weight: 1 }, { itemId: "man_jy_a2_goldarmor", weight: 1 }],
+    build: () => build("องครักษ์ฉิน", 3, {
+      stats: { STR: 10, DEX: 9, AGI: 7, VIT: 6 },
+      artId: "jy_a3_thunderstride", artLevel: 6,
+      skillIds: ["jy_blade", "jy_eagleclaw", "jy_chain"],
+    }) },
+
+  // องครักษ์ลู่ (sect_jinyiwei) — T3 chain specialist, grappler.
+  { id: "spar_jinyiwei_lu", name: "องครักษ์ลู่", ti: 3, category: "human",
+    drops: [...DROPS_T3,
+      { itemId: "man_jy_chain", weight: 1 }, { itemId: "man_jy_grapple", weight: 1 },
+      { itemId: "man_jy_a2_goldarmor", weight: 1 }, { itemId: "man_jy_a1_silktread", weight: 1 }],
+    build: () => build("องครักษ์ลู่", 3, {
+      stats: { STR: 9, DEX: 10, AGI: 7, VIT: 7 },
+      artId: "jy_a2_goldarmor", artLevel: 7,
+      skillIds: ["jy_chain", "jy_grapple", "jy_eagleclaw"],
+    }) },
+
+  // ─── Jinyiwei spies scattered across the world (5) ─────────────────
+  // Each spy is sparrable (the player can challenge their cover) and
+  // carries a slimmer Jinyiwei loadout — one move skill + one inner art.
+
+  // สายลับเฟิงในนครหลวง (city_capital) — T2 chief informant.
+  { id: "spar_spy_feng", name: "เฟิงผู้ส่งข่าว", ti: 2, category: "human",
+    drops: [...DROPS_T2,
+      { itemId: "man_jy_chain", weight: 1 }, { itemId: "man_jy_a0_brocade", weight: 1 }],
+    build: () => build("เฟิงผู้ส่งข่าว", 2, {
+      stats: { STR: 5, DEX: 8, AGI: 7, LUK: 5 },
+      artId: "jy_a1_silktread", artLevel: 4,
+      skillIds: ["jy_chain", "ns2"],
+    }) },
+
+  // สายลับซีในหยางโจว (city_yangzhou) — T2 port watcher, sword.
+  { id: "spar_spy_xi", name: "ซีท่าเรือ", ti: 2, category: "human",
+    drops: [...DROPS_T2,
+      { itemId: "man_jy_blade", weight: 1 }, { itemId: "man_jy_a1_silktread", weight: 1 }],
+    build: () => build("ซีท่าเรือ", 2, {
+      stats: { STR: 7, AGI: 7, DEX: 6 },
+      artId: "jy_a1_silktread", artLevel: 5,
+      skillIds: ["jy_blade", "qf"],
+    }) },
+
+  // สายลับเหมยในต้าหลี่ (city_dali) — T2 southwest border ear.
+  { id: "spar_spy_mei", name: "เหมยพรานป่า", ti: 2, category: "human",
+    drops: [...DROPS_T2,
+      { itemId: "man_jy_eagleclaw", weight: 1 }, { itemId: "man_jy_a0_brocade", weight: 1 }],
+    build: () => build("เหมยพรานป่า", 2, {
+      stats: { STR: 6, DEX: 8, AGI: 6, VIT: 4 },
+      artId: "jy_a0_brocade", artLevel: 6,
+      skillIds: ["jy_eagleclaw", "gn"],
+    }) },
+
+  // สายลับโจวในโรงเตี๊ยมยั่วไหล (inn_yuelai) — T1 listening post.
+  { id: "spar_spy_zhou", name: "โจวพ่อค้าเหล้า", ti: 1, category: "human",
+    drops: [...DROPS_T1,
+      { itemId: "man_jy_chain", weight: 1 }, { itemId: "man_jy_a0_brocade", weight: 1 }],
+    build: () => build("โจวพ่อค้าเหล้า", 1, {
+      stats: { STR: 4, DEX: 6, AGI: 5 },
+      artId: "jy_a0_brocade", artLevel: 3,
+      skillIds: ["jy_chain"],
+    }) },
+
+  // สายลับซื่อในชีกู่ (village_qigu) — T1 rural agent posing as farmer.
+  { id: "spar_spy_si", name: "ซื่อชาวนา", ti: 1, category: "human",
+    drops: [...DROPS_T1,
+      { itemId: "man_jy_grapple", weight: 1 }, { itemId: "man_jy_a0_brocade", weight: 1 }],
+    build: () => build("ซื่อชาวนา", 1, {
+      stats: { STR: 6, VIT: 5, DEX: 5 },
+      artId: "jy_a0_brocade", artLevel: 4,
+      skillIds: ["jy_grapple"],
+    }) },
 ];
 
 export const OPPONENTS_BY_ID = new Map<string, OpponentDef>(
