@@ -323,7 +323,16 @@ export function LocationView({ scene }: Props) {
                     variant="outline"
                     disabled={tooLow}
                     onClick={() => {
-                      flashLoading("กำลังเก็บของ...");
+                      // Hunting actions kick straight into a battle screen
+                      // — the loading overlay would flash for a frame and
+                      // then get yanked when BattleArena mounts. Skip it so
+                      // the transition feels snappy. Non-combat gathers
+                      // still get the deliberate "กำลังเก็บของ..." beat.
+                      const isHunt =
+                        res.skill === "hunting" &&
+                        res.opponentIds &&
+                        res.opponentIds.length > 0;
+                      if (!isHunt) flashLoading("กำลังเก็บของ...");
                       const r = gatherResource(node.resourceId);
                       toast(...gatherToast(r));
                     }}

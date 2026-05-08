@@ -12,6 +12,13 @@ import { LifeSkillsPopup } from "./popups/life-skills-popup";
 import { ActionLogPopup } from "./popups/action-log-popup";
 import { QuestLogPopup } from "./popups/quest-log-popup";
 import { SectMembershipPopup } from "./popups/sect-membership-popup";
+import {
+  SECT_MEMBERSHIPS,
+  getQuestsForSect,
+  isSectQuestOfferable,
+  pendingRewardsAtRank,
+  type SectId,
+} from "@/lib/world";
 
 type PopupId =
   | "profile"
@@ -42,9 +49,39 @@ export function MenuBar() {
   const activeQuestCount = useWorldStore(
     (s) => Object.values(s.quests).filter((q) => q.status === "active").length,
   );
-  const sectCount = useWorldStore(
-    (s) => Object.values(s.sectMembership).filter((m) => m).length,
-  );
+  // Sect tab badge counts ACTIONABLE items, not just membership presence.
+  // "1 สำนัก joined" was meaningless — the player wants to know if there
+  // is something to do (claim a reward, accept a quest, rank up), not be
+  // reminded they're a disciple. Count:
+  //   - pending multi-option reward picks at reached ranks
+  //   - affordable rank-up
+  //   - offerable sect / art quests
+  // The full state object is read once and the helper does the work — re-
+  // computes only when the relevant slices change.
+  const sectActions = useWorldStore((s) => {
+    let count = 0;
+    for (const [sid, m] of Object.entries(s.sectMembership)) {
+      if (!m) continue;
+      const def = SECT_MEMBERSHIPS[sid as SectId];
+      if (!def) continue;
+      // Unclaimed reward picks at every reached rank.
+      for (let r = m.rank; r <= def.startRank; r++) {
+        const p = pendingRewardsAtRank(def, r, m.rewardPicks);
+        if (p.skills.length > 0) count++;
+        if (p.arts.length > 0) count++;
+      }
+      // Rank-up affordable.
+      if (m.rank > def.topRank && m.points >= def.rankUpCost(m.rank - 1)) {
+        count++;
+      }
+      // Offerable sect / art quests (excludes ones on cooldown / already
+      // claimed / wrong rank — see isSectQuestOfferable).
+      for (const q of getQuestsForSect(sid)) {
+        if (isSectQuestOfferable(s, q, def.questCooldownDays).offerable) count++;
+      }
+    }
+    return count;
+  });
 
   return (
     <>
@@ -74,7 +111,7 @@ export function MenuBar() {
           <MenuTab
             label="สำนัก"
             onClick={() => setOpen("sect")}
-            badge={sectCount > 0 ? sectCount : undefined}
+            badge={sectActions > 0 ? sectActions : undefined}
           />
           <MenuTab label="บันทึก" onClick={() => setOpen("log")} />
         </div>

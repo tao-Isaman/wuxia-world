@@ -1,4 +1,12 @@
-import type { QuestDef, QuestReward, SceneEffect, WorldStateData } from "./types";
+import type {
+  Condition,
+  QuestDef,
+  QuestReward,
+  SceneEffect,
+  WorldStateData,
+} from "./types";
+import { TRAIT_LABEL } from "./types";
+import { getItem, getNpc, getOpponent } from "./data";
 import { getQuest } from "./data/quests";
 import { getScene } from "./data/scenes";
 import { SECT_MEMBERSHIPS, autoGrantableRewards } from "./data/sect-memberships";
@@ -502,6 +510,171 @@ export function collectActiveHuntTargets(state: WorldStateData): Set<string> {
     }
   }
   return out;
+}
+
+// ─── Stage progress tracker ───────────────────────────────────────────
+// Walks an autoAdvance Condition tree and produces a flat list of
+// trackable sub-conditions with their current vs. required counts.
+// Returned to the quest log UI so the player sees "12/20 herbs" instead
+// of guessing how close they are. `and` / `or` flatten into a single
+// list (with intent annotations), `not` is rendered as "ไม่ต้อง...".
+//
+// Tracking-friendly conditions:
+//   - hasItem            → inventory count vs required
+//   - defeatedOpponent   → kill counter vs required
+//   - stoleFromNpc       → steal counter vs required
+//   - trait              → trait value vs min/max
+//   - npcRelationship    → relationship value vs min/max
+// Non-numeric conditions (visitedLocation, flag, questStatus, etc.) are
+// returned as boolean "done/not done" rows — current/required are 1/1.
+
+export interface QuestProgressLine {
+  label: string;
+  current: number;
+  required: number;
+  done: boolean;
+  // Optional negation marker so `not` clauses render as "ไม่ต้อง <X>".
+  negated?: boolean;
+}
+
+export function describeQuestCondition(
+  state: WorldStateData,
+  c: Condition,
+  depth = 0,
+): QuestProgressLine[] {
+  if (depth > 4) return []; // Safety: avoid runaway recursion on weird trees.
+  switch (c.t) {
+    case "hasItem": {
+      const have = state.inventory[c.itemId] ?? 0;
+      const need = c.count ?? 1;
+      const def = getItem(c.itemId);
+      return [{
+        label: def?.name ?? c.itemId,
+        current: have,
+        required: need,
+        done: have >= need,
+      }];
+    }
+    case "defeatedOpponent": {
+      const have = state.defeatedCounts[c.opponentId] ?? 0;
+      const need = c.count ?? 1;
+      const def = getOpponent(c.opponentId);
+      return [{
+        label: `ปราบ ${def?.name ?? c.opponentId}`,
+        current: have,
+        required: need,
+        done: have >= need,
+      }];
+    }
+    case "stoleFromNpc": {
+      const have = state.stoleFromCounts[c.npcId] ?? 0;
+      const need = c.count ?? 1;
+      const def = getNpc(c.npcId);
+      return [{
+        label: `ขโมยจาก ${def?.name ?? c.npcId}`,
+        current: have,
+        required: need,
+        done: have >= need,
+      }];
+    }
+    case "trait": {
+      const v = state.traits[c.trait] ?? 0;
+      // For trait, prefer the active bound. min = "must reach"; max = "must
+      // stay below". Default to 1/1 if neither is set (trait-exists check).
+      if (c.min !== undefined) {
+        return [{
+          label: `${TRAIT_LABEL[c.trait]} ≥ ${c.min}`,
+          current: v,
+          required: c.min,
+          done: v >= c.min,
+        }];
+      }
+      if (c.max !== undefined) {
+        return [{
+          label: `${TRAIT_LABEL[c.trait]} ≤ ${c.max}`,
+          current: v,
+          required: c.max,
+          done: v <= c.max,
+        }];
+      }
+      return [];
+    }
+    case "npcRelationship": {
+      const v = state.npcStates[c.npcId]?.relationship ?? 0;
+      const def = getNpc(c.npcId);
+      const name = def?.name ?? c.npcId;
+      if (c.min !== undefined) {
+        return [{
+          label: `สัมพันธ์ ${name} ≥ ${c.min}`,
+          current: v,
+          required: c.min,
+          done: v >= c.min,
+        }];
+      }
+      if (c.max !== undefined) {
+        return [{
+          label: `สัมพันธ์ ${name} ≤ ${c.max}`,
+          current: v,
+          required: c.max,
+          done: v <= c.max,
+        }];
+      }
+      return [];
+    }
+    case "visitedLocation":
+      return [{
+        label: `ไปยัง ${c.locationId}`,
+        current: state.visitedLocationIds.includes(c.locationId) ? 1 : 0,
+        required: 1,
+        done: state.visitedLocationIds.includes(c.locationId),
+      }];
+    case "questStatus": {
+      const cur = state.quests[c.questId]?.status ?? "none";
+      return [{
+        label: `${c.questId} = ${c.status}`,
+        current: cur === c.status ? 1 : 0,
+        required: 1,
+        done: cur === c.status,
+      }];
+    }
+    case "flag": {
+      const v = state.flags[c.flag];
+      const target = c.equals;
+      const ok = target === undefined ? Boolean(v) : v === target;
+      return [{
+        label: `flag ${c.flag}${target !== undefined ? ` = ${target}` : ""}`,
+        current: ok ? 1 : 0,
+        required: 1,
+        done: ok,
+      }];
+    }
+    case "assassinatedNpc":
+    case "kidnappedNpc": {
+      const list = c.t === "assassinatedNpc" ? state.assassinatedNpcIds : state.kidnappedNpcIds;
+      const def = getNpc(c.npcId);
+      const verb = c.t === "assassinatedNpc" ? "ลอบสังหาร" : "ลักพาตัว";
+      return [{
+        label: `${verb} ${def?.name ?? c.npcId}`,
+        current: list.includes(c.npcId) ? 1 : 0,
+        required: 1,
+        done: list.includes(c.npcId),
+      }];
+    }
+    case "and":
+      return c.all.flatMap((sub) => describeQuestCondition(state, sub, depth + 1));
+    case "or": {
+      // OR — show every alternative; the stage progresses on any-done.
+      const lines = c.any.flatMap((sub) => describeQuestCondition(state, sub, depth + 1));
+      return lines.map((l) => ({ ...l, label: `(หรือ) ${l.label}` }));
+    }
+    case "not": {
+      const inner = describeQuestCondition(state, c.of, depth + 1);
+      // Flip done: NOT is satisfied when inner is NOT done.
+      return inner.map((l) => ({ ...l, done: !l.done, negated: true }));
+    }
+    default:
+      return [];
+  }
 }
 
 // True when an active quest's current stage is a dialog-driven "talk to NPC"

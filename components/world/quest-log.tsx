@@ -4,7 +4,12 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { getItem, getQuest, type QuestReward } from "@/lib/world";
+import {
+  describeQuestCondition,
+  getItem,
+  getQuest,
+  type QuestReward,
+} from "@/lib/world";
 import { useWorldStore } from "@/store/world-store";
 import { toast } from "@/store/toast-store";
 import { confirmDialog } from "@/store/confirm-store";
@@ -166,6 +171,9 @@ function QuestRow({
 }: QuestRowProps) {
   const def = getQuest(questId);
   const abandonQuest = useWorldStore((s) => s.abandonQuest);
+  // Subscribe to whole world state so progress lines stay live as the
+  // player gathers / defeats / etc. between quest log opens.
+  const worldState = useWorldStore();
   if (!def) return null;
   const isSide = def.type === "side";
 
@@ -224,11 +232,19 @@ function QuestRow({
           <ul className="text-xs pl-2 border-l-2 border-vermilion/60 space-y-0.5">
             {def.stages.map((s, idx) => {
               const stepStatus = stepStatusFor(status, stage, idx);
+              // Show live progress lines for the current stage's
+              // autoAdvance condition (only — past stages already done,
+              // future stages not yet trackable). Lines are flattened
+              // from the condition tree by `describeQuestCondition`.
+              const progress =
+                stepStatus === "current" && s.autoAdvance
+                  ? describeQuestCondition(worldState, s.autoAdvance)
+                  : [];
               return (
                 <li
                   key={s.id}
                   className={cn(
-                    "flex gap-1.5",
+                    "flex flex-col gap-0.5",
                     stepStatus === "done" &&
                       "text-emerald-700/80 line-through opacity-70",
                     stepStatus === "current" &&
@@ -236,16 +252,44 @@ function QuestRow({
                     stepStatus === "pending" && "text-muted-foreground",
                   )}
                 >
-                  <span className="shrink-0 w-3 text-center">
-                    {stepStatus === "done"
-                      ? "✓"
-                      : stepStatus === "current"
-                        ? "▸"
-                        : "○"}
+                  <span className="flex gap-1.5">
+                    <span className="shrink-0 w-3 text-center">
+                      {stepStatus === "done"
+                        ? "✓"
+                        : stepStatus === "current"
+                          ? "▸"
+                          : "○"}
+                    </span>
+                    <span>
+                      {idx + 1}. {s.description}
+                    </span>
                   </span>
-                  <span>
-                    {idx + 1}. {s.description}
-                  </span>
+                  {progress.length > 0 && (
+                    <ul className="pl-5 space-y-0.5 mt-0.5">
+                      {progress.map((p, pIdx) => (
+                        <li
+                          key={pIdx}
+                          className={cn(
+                            "flex items-center gap-1.5 text-[11px] no-underline",
+                            p.done
+                              ? "text-emerald-700"
+                              : "text-muted-foreground",
+                          )}
+                        >
+                          <span className="shrink-0 w-3 text-center">
+                            {p.done ? "✓" : "○"}
+                          </span>
+                          <span className="flex-1">
+                            {p.negated ? "ห้าม " : ""}
+                            {p.label}
+                          </span>
+                          <span className="tabular-nums shrink-0">
+                            {p.current}/{p.required}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </li>
               );
             })}

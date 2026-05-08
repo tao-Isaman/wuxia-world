@@ -22,7 +22,7 @@ export const ARTS: readonly Art[] = [
   // ─── เส้าหลิน ──────────────────────────────────────────────────────
   { id: "t0_lohan", n: "ลมปราณอรหันต์", sc: "เส้าหลิน", tp: "หยาง·แข็ง", types: ["yang", "hard"], ti: 0,
     stats: { STR: 6, VIT: 4 }, hL: 20, mL: 10,
-    act: { n: "หมัดอรหันต์", c: 15, cd: 3, t: "heal", h: 10, d: "ฟื้น 10% HP CD3" },
+    act: { n: "ลมปราณอรหันต์", c: 15, cd: 3, t: "heal", h: 10, d: "ฟื้น 10% HP CD3" },
     pas: { tr: "hit_recv", ch: 25, d: "ถูกโจมตี 25% → DEF+10 (5ตา)", e: { t: "buff_def", n: "เกราะ", v: 10, u: 5 } } },
 
   { id: "t1_goldenbell", n: "กระดิ่งทองพื้นฐาน", sc: "เส้าหลิน", tp: "แข็ง·ภายนอก", types: ["hard", "external"], ti: 1,

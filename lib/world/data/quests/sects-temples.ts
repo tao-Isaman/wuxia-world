@@ -11,13 +11,15 @@ export const QUESTS_SECTS_TEMPLES: readonly QuestDef[] = [
 
   // 0. INTRO — ขอเข้าเป็นศิษย์ (disciple registration intro)
   // Gateway quest. Prereqs gate by gender + evil trait + non-membership.
-  // Single combat stage to prove worth, then return-to-abbot dialog calls
-  // `joinSect` via scene effect (see sects-temples.ts scenes file).
+  // Mixed-herb gathering trial — three medicinal plants (herb + ginseng
+  // + lotus_seed). The herbalism gather node already drops all three so
+  // a single grind run satisfies the whole quest. The abbot wants a
+  // variety of herbs for the apothecary, not just one species.
   {
     id: "qst_shaolin_disciple_intro",
     name: "ขอเข้าเป็นศิษย์เส้าหลิน",
-    description: "ผู้ขอเข้าสำนักเส้าหลินต้องพิสูจน์ความตั้งใจและความสุจริตของจิตใจก่อน เจ้าอาวาสฮุยหยวนยินดีรับฟังหากเจ้ามีคุณสมบัติ",
-    briefSummary: "พิสูจน์ตัวเพื่อเข้าเป็นศิษย์เส้าหลินขั้นที่ 9",
+    description: "ผู้ขอเข้าสำนักเส้าหลินต้องพิสูจน์ความตั้งใจและความขยันก่อน เจ้าอาวาสฮุยหยวนสั่งให้เจ้าเก็บสมุนไพรหลากชนิดมาถวายวัด — สมุนไพรหายาก 10 · โสม 10 · เม็ดบัว 10",
+    briefSummary: "ส่งสมุนไพรหายาก 10 + โสม 10 + เม็ดบัว 10 เข้าเป็นศิษย์เส้าหลินขั้นที่ 9",
     type: "side",
     giverNpcId: "sect_shaolin_abbot_huiyuan",
     prereqs: {
@@ -30,19 +32,31 @@ export const QUESTS_SECTS_TEMPLES: readonly QuestDef[] = [
     },
     stages: [
       {
-        id: "prove_courage",
-        description: "พิสูจน์ความกล้าหาญ — ปราบโจรเร่ร่อน 1 คน",
-        autoAdvance: { t: "defeatedOpponent", opponentId: "thug", count: 1 },
+        id: "gather_herbs",
+        description: "เก็บสมุนไพรหายาก 10 ชิ้น + โสม 10 ราก + เม็ดบัว 10 เม็ด",
+        autoAdvance: {
+          t: "and",
+          all: [
+            { t: "hasItem", itemId: "herb", count: 10 },
+            { t: "hasItem", itemId: "ginseng", count: 10 },
+            { t: "hasItem", itemId: "lotus_seed", count: 10 },
+          ],
+        },
       },
       {
         id: "return_to_abbot",
-        description: "กลับไปรายงานเจ้าอาวาสฮุยหยวน",
+        description: "นำสมุนไพรกลับไปถวายเจ้าอาวาสฮุยหยวน",
       },
     ],
     rewards: [
       { t: "wExp", amount: 50 },
+      { t: "trait", trait: "humility", amount: 3 },
       { t: "npcRelationship", npcId: "sect_shaolin_abbot_huiyuan", amount: 5 },
+      // joinSect must come BEFORE sectPoints — the dispatcher seeds the
+      // membership before sectPoints can deposit into it. Out-of-order
+      // would no-op the points (no membership to add to).
       { t: "joinSect", sectId: "shaolin" },
+      { t: "sectPoints", sectId: "shaolin", amount: 20 },
     ],
   },
 
@@ -174,17 +188,17 @@ export const QUESTS_SECTS_TEMPLES: readonly QuestDef[] = [
     stages: [
       {
         id: "trial_kill",
-        description: "พิสูจน์พลัง — ปราบโจรเสือดำ 2 คน",
-        autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 1 },
+        description: "พิสูจน์พลัง — ปราบหัวหน้าโจร (bandit_chief) 2 คน",
+        autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 2 },
       },
       {
         id: "trial_meditate",
-        description: "นั่งสมาธิ — รวบรวมสมุนไพร 8 ชิ้น",
+        description: "นั่งสมาธิ — รวบรวมสมุนไพรหายาก 8 ชิ้น",
         autoAdvance: { t: "hasItem", itemId: "herb", count: 8 },
       },
       {
         id: "return_art",
-        description: "กลับไปรับตำราจากเจ้าอาวาส",
+        description: "กลับไปรับตำราจากเจ้าอาวาสฮุยหยวน",
       },
     ],
     rewards: [
@@ -217,17 +231,17 @@ export const QUESTS_SECTS_TEMPLES: readonly QuestDef[] = [
     stages: [
       {
         id: "trial_body",
-        description: "พิสูจน์ร่างกาย — ปราบโจรหัวหน้า 1 คน",
+        description: "พิสูจน์ร่างกาย — ปราบหัวหน้าโจร (bandit_chief) 3 คน",
         autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 3 },
       },
       {
         id: "trial_mind",
-        description: "พิสูจน์จิตใจ — ความถ่อมตนถึง 30",
+        description: "พิสูจน์จิตใจ — สะสมความถ่อมตนถึง 30",
         autoAdvance: { t: "trait", trait: "humility", min: 30 },
       },
       {
         id: "return_legend",
-        description: "กลับไปรับตำราจากเจ้าอาวาส",
+        description: "กลับไปรับตำราจากเจ้าอาวาสฮุยหยวน",
       },
     ],
     rewards: [
@@ -272,6 +286,7 @@ export const QUESTS_SECTS_TEMPLES: readonly QuestDef[] = [
       { t: "wExp", amount: 80 },
       { t: "trait", trait: "good", amount: 5 },
       { t: "npcRelationship", npcId: "sect_shaolin_abbot_huiyuan", amount: 15 },
+      { t: "sectPoints", sectId: "shaolin", amount: 80 },
     ],
   },
 
@@ -304,6 +319,7 @@ export const QUESTS_SECTS_TEMPLES: readonly QuestDef[] = [
       { t: "wExp", amount: 60 },
       { t: "trait", trait: "good", amount: 3 },
       { t: "npcRelationship", npcId: "sect_shaolin_abbot_huiyuan", amount: 10 },
+      { t: "sectPoints", sectId: "shaolin", amount: 80 },
     ],
   },
 
@@ -337,6 +353,7 @@ export const QUESTS_SECTS_TEMPLES: readonly QuestDef[] = [
       { t: "learnSkill", skillId: "sf" },
       { t: "npcRelationship", npcId: "sect_shaolin_abbot_huiyuan", amount: 20 },
       { t: "trait", trait: "humility", amount: 5 },
+      { t: "sectPoints", sectId: "shaolin", amount: 120 },
     ],
   },
 
@@ -364,6 +381,7 @@ export const QUESTS_SECTS_TEMPLES: readonly QuestDef[] = [
       { t: "wExp", amount: 100 },
       { t: "learnArt", artId: "t1_goldenbell", level: 1 },
       { t: "npcRelationship", npcId: "sect_shaolin_elder_faming", amount: 15 },
+      { t: "sectPoints", sectId: "shaolin", amount: 70 },
     ],
   },
 
@@ -1076,6 +1094,7 @@ export const QUESTS_SECTS_TEMPLES: readonly QuestDef[] = [
       { t: "learnArt", artId: "t3_yinyang", level: 1 },
       { t: "npcRelationship", npcId: "sect_shaolin_abbot_huiyuan", amount: 25 },
       { t: "npcRelationship", npcId: "sect_wudang_master_qingxu", amount: 25 },
+      { t: "sectPoints", sectId: "shaolin", amount: 200 },
     ],
   },
 ];

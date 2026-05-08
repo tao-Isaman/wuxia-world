@@ -15,6 +15,7 @@ import {
   type NpcStateEntry,
   type QuestDef,
   type QuestReward,
+  type Scene,
 } from "@/lib/world";
 import {
   assassinateChance,
@@ -112,15 +113,24 @@ export function NpcInteractionPopup({ open, npc, onClose }: Props) {
   };
 
   const onTurnInQuest = (def: QuestDef) => {
-    // Turn-in routing, in priority order:
-    //   1. `qs_<questId>_complete` — content-author convention. Calling
-    //      finishQuest from that scene grants rewards.
-    //   2. Engine fallback — call `finishQuestNow` directly so the quest
-    //      still pays out even when no complete scene was authored. Pops
-    //      a toast since there's no narrative beat to show.
+    // Turn-in routing:
+    //   1. If `qs_<questId>_complete` exists AND its scene already fires
+    //      finishQuest on entry or in a choice, just navigate there —
+    //      the scene closes the quest itself.
+    //   2. If the scene exists but does NOT fire finishQuest (legacy
+    //      scenes where the dialog-choice fired finishQuest before
+    //      navigating), the engine calls finishQuestNow as a safety net
+    //      so the player can't re-turn-in indefinitely via the popup.
+    //   3. No scene → finishQuestNow + toast.
     const completeSceneId = `qs_${def.id}_complete`;
-    if (getScene(completeSceneId)) {
+    const sc = getScene(completeSceneId);
+    if (sc) {
+      const handlesFinish = sceneClosesQuest(sc, def.id);
       onClose();
+      if (!handlesFinish) {
+        // Best-effort close; ignore errors (e.g., quest already done).
+        finishQuestNow(def.id);
+      }
       gotoScene(completeSceneId);
       return;
     }
@@ -493,5 +503,27 @@ function stageMentionsCondition(
   if (c.t === "and") return c.all.some((sub) => stageMentionsCondition(sub, kind, npcId));
   if (c.t === "or") return c.any.some((sub) => stageMentionsCondition(sub, kind, npcId));
   if (c.t === "not") return stageMentionsCondition(c.of, kind, npcId);
+  return false;
+}
+
+// True when a scene definitively closes a quest — either via onEnter
+// effects or any choice's effects firing `finishQuest` for that quest
+// id. Used by the turn-in router to decide whether the engine needs to
+// step in (legacy scenes that didn't author finishQuest themselves).
+function sceneClosesQuest(sc: Scene, questId: string): boolean {
+  if (sc.kind !== "dialog") return false;
+  const inOnEnter = (sc.onEnter ?? []).some(
+    (e) => e.t === "finishQuest" && e.questId === questId,
+  );
+  if (inOnEnter) return true;
+  for (const c of sc.choices ?? []) {
+    if (
+      (c.effects ?? []).some(
+        (e) => e.t === "finishQuest" && e.questId === questId,
+      )
+    ) {
+      return true;
+    }
+  }
   return false;
 }

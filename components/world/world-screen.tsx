@@ -57,97 +57,93 @@ export function WorldScreen() {
     );
   }
 
+  // Pick the body content per state. Globals (LoadingOverlay / ToastStack /
+  // ConfirmDialog) are mounted ONCE outside the switch so confirm dialogs
+  // raised by any branch (incl. game-over and the no-scene fallback) get
+  // rendered. Without this, GameOverScreen's confirm-then-resetGame flow
+  // silently hangs because no ConfirmDialog is on the tree.
+  let body: React.ReactNode;
+
   if (!hasGame) {
-    return <StartScreen />;
-  }
-
-  // Game over — player lost a fight. Only "เริ่มต้นใหม่" is available.
-  if (gameOver) {
-    return <GameOverScreen />;
-  }
-
-  // Active battle — render BattleArena inline. The bridge already started
-  // the battle when pendingBattle was set; if for some reason it hasn't,
-  // the arena shows its own "เริ่มการต่อสู้..." placeholder.
-  if (pendingBattle) {
-    void battleStateExists; // touched so the component re-renders on battle changes
-    return (
+    body = <StartScreen />;
+  } else if (gameOver) {
+    body = <GameOverScreen />;
+  } else if (pendingBattle) {
+    void battleStateExists; // re-render when battle state flips
+    body = (
       <div className="space-y-3">
         <BattleArena mode="world" onContinue={acknowledge} />
       </div>
     );
-  }
-
-  // Pending encounter — show the fight-or-flee screen. Player picks one
-  // and the store either promotes it to pendingBattle or clears it.
-  if (pendingEncounter) {
-    return (
+  } else if (pendingEncounter) {
+    body = (
       <div className="space-y-3">
         <StatusBar />
         <EncounterScreen />
       </div>
     );
-  }
-
-  const scene = getScene(currentSceneId);
-  if (!scene) {
-    return (
-      <Panel padding="p-6" className="text-center space-y-3">
-        <p className="text-sm text-destructive font-sans">
-          ไม่พบฉาก &quot;{currentSceneId}&quot;
-        </p>
-        <WuxiaButton variant="default" onClick={resetGame}>
-          เริ่มใหม่
-        </WuxiaButton>
-      </Panel>
-    );
-  }
-
-  // Pick the right view per scene kind. Single-column layout — quest log,
-  // inventory, profile etc. all live in the top menu-bar tabs now.
-  let mainView: React.ReactNode;
-  switch (scene.kind) {
-    case "dialog":
-      mainView = (
-        <>
-          <DialogDisplay scene={scene} />
-          <ChoicePanel scene={scene} />
-        </>
+  } else {
+    const scene = getScene(currentSceneId);
+    if (!scene) {
+      body = (
+        <Panel padding="p-6" className="text-center space-y-3">
+          <p className="text-sm text-destructive font-sans">
+            ไม่พบฉาก &quot;{currentSceneId}&quot;
+          </p>
+          <WuxiaButton variant="default" onClick={resetGame}>
+            เริ่มใหม่
+          </WuxiaButton>
+        </Panel>
       );
-      break;
-    case "location":
-      mainView = <LocationView scene={scene} />;
-      break;
-    case "route":
-      mainView = <RouteView scene={scene} />;
-      break;
+    } else {
+      let mainView: React.ReactNode;
+      switch (scene.kind) {
+        case "dialog":
+          mainView = (
+            <>
+              <DialogDisplay scene={scene} />
+              <ChoicePanel scene={scene} />
+            </>
+          );
+          break;
+        case "location":
+          mainView = <LocationView scene={scene} />;
+          break;
+        case "route":
+          mainView = <RouteView scene={scene} />;
+          break;
+      }
+      body = (
+        <div className="space-y-3">
+          <StatusBar />
+          <MenuBar />
+          {mainView}
+          <div className="flex justify-end">
+            <WuxiaButton
+              variant="ghost"
+              size="sm"
+              className="text-[11px] text-muted-foreground"
+              onClick={async () => {
+                const ok = await confirmDialog({
+                  title: "ออกเกม",
+                  message: "ออกจากเกมและลบเซฟ?\nความคืบหน้าทั้งหมดจะถูกลบทิ้ง",
+                  confirmText: "ออกและลบ",
+                  variant: "danger",
+                });
+                if (ok) resetGame();
+              }}
+            >
+              ออกเกม
+            </WuxiaButton>
+          </div>
+        </div>
+      );
+    }
   }
 
   return (
     <>
-      <div className="space-y-3">
-        <StatusBar />
-        <MenuBar />
-        {mainView}
-        <div className="flex justify-end">
-          <WuxiaButton
-            variant="ghost"
-            size="sm"
-            className="text-[11px] text-muted-foreground"
-            onClick={async () => {
-              const ok = await confirmDialog({
-                title: "ออกเกม",
-                message: "ออกจากเกมและลบเซฟ?\nความคืบหน้าทั้งหมดจะถูกลบทิ้ง",
-                confirmText: "ออกและลบ",
-                variant: "danger",
-              });
-              if (ok) resetGame();
-            }}
-          >
-            ออกเกม
-          </WuxiaButton>
-        </div>
-      </div>
+      {body}
       <LoadingOverlay />
       <ToastStack />
       <ConfirmDialog />

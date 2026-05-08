@@ -73,10 +73,12 @@ export {
   applyEffect,
   applyEffects,
   collectActiveHuntTargets,
+  describeQuestCondition,
   isQuestOfferable,
   isQuestTurnInForNpc,
   isSectQuestOfferable,
   tickQuestProgress,
+  type QuestProgressLine,
 } from "./effects";
 export { validateAndRepair } from "./validate";
 export {

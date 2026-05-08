@@ -7,7 +7,9 @@ export const SCENES_SECTS_TEMPLES: readonly Scene[] = [
   // เส้าหลิน — เจ้าอาวาสฮุยหยวน
   // ══════════════════════════════════════════════════════════════════════
 
-  // NPC ambient
+  // NPC ambient — abbot's default greet. The "ขอเข้าเป็นศิษย์" intro and
+  // "ส่งพระธาตุ" relic-recovery branches both gate by sect membership /
+  // quest status so the player never sees both at once.
   {
     kind: "dialog",
     id: "npc_sect_shaolin_abbot_huiyuan_talk",
@@ -21,10 +23,20 @@ export const SCENES_SECTS_TEMPLES: readonly Scene[] = [
         text: "ข้ามาเพื่อเรียนวิชา",
         next: "npc_sect_shaolin_abbot_huiyuan_talk_skill",
       },
+      // Relic-recovery offer is gated to disciples only — strangers don't
+      // get tasked with retrieving sacred relics. Hidden while the player
+      // is mid-disciple-intro so they can't accidentally start a second
+      // quest while accepting the registration trial.
       {
         text: "ข้ามาเพื่อช่วยเหลือ",
         next: "npc_sect_shaolin_abbot_huiyuan_talk_help",
-        visibleIf: { t: "questStatus", questId: "qst_shaolin_relic_theft", status: "none" },
+        visibleIf: {
+          t: "and",
+          all: [
+            { t: "questStatus", questId: "qst_shaolin_relic_theft", status: "none" },
+            { t: "sectMember", sectId: "shaolin" },
+          ],
+        },
         effects: [{ t: "startQuest", questId: "qst_shaolin_relic_theft" }],
       },
       {
@@ -37,8 +49,59 @@ export const SCENES_SECTS_TEMPLES: readonly Scene[] = [
             { t: "flag", flag: "shaolin_relic_recovered" },
           ],
         },
+        // finishQuest moved to the complete scene's choice (see below).
+        // Both turn-in paths — this dialog choice AND the NPC popup
+        // "Turn in" button — converge there, so the quest reliably
+        // closes regardless of which path the player takes.
+      },
+    ],
+  },
+
+  // Disciple intro — offer beat (NPC popup auto-routes here after Accept).
+  // The quest is ALREADY active when this scene loads (acceptQuest ran
+  // engine-side first). The dialog just briefs the mixed-herb gathering
+  // task and bounces the player back to the sect courtyard so they can
+  // leave and forage. NO `startQuest` effect — that would double-start.
+  {
+    kind: "dialog",
+    id: "qs_qst_shaolin_disciple_intro_offer",
+    lines: [
+      { t: "narration", text: "เจ้าอาวาสฮุยหยวนพยักหน้าช้า ๆ" },
+      { t: "dialogue", speaker: "ฮุยหยวน", text: "เจ้าต้องการเป็นศิษย์เส้าหลิน? ดี — แต่วิชาเส้าหลินไม่ใช่สิ่งที่ให้กันได้ง่าย ๆ" },
+      { t: "dialogue", speaker: "ฮุยหยวน", text: "ห้องยาของวัดต้องการสมุนไพรหลากชนิด — สมุนไพรหายาก ๑๐, โสม ๑๐, เม็ดบัว ๑๐" },
+      { t: "dialogue", speaker: "ฮุยหยวน", text: "นำมาให้ครบ แล้วเจ้าจะได้รับการรับรองเป็นศิษย์ขั้นที่ ๙ — นั่นคือบทพิสูจน์แรกของเจ้า" },
+    ],
+    choices: [
+      {
+        text: "ข้าจะไปทำตามคำสั่ง",
+        next: "sect_shaolin",
+      },
+    ],
+  },
+
+  // Disciple intro — complete beat. Player has the three herb stacks in
+  // inventory; quest is on stage 1 (return to abbot). Choice fires
+  // `finishQuest` which runs the reward chain → `joinSect: shaolin` →
+  // seeds the membership at rank 9 and auto-grants `t0_lohan`. takeItem
+  // strips ALL three herb types in the amounts the abbot asked for.
+  {
+    kind: "dialog",
+    id: "qs_qst_shaolin_disciple_intro_complete",
+    lines: [
+      { t: "narration", text: "เจ้าวางสมุนไพรหลากชนิดลงบนแท่นหินด้านหน้าเจ้าอาวาส" },
+      { t: "dialogue", speaker: "ฮุยหยวน", text: "เจ้ากลับมาแล้ว และครบจำนวนทุกชนิด... ไม่ใช่เรื่องง่าย แต่เจ้าทำได้" },
+      { t: "narration", text: "ท่านพยักหน้าและยกมือขวาขึ้นปลายนิ้วประดิษฐานไว้กลางอก" },
+      { t: "dialogue", speaker: "ฮุยหยวน", text: "ตั้งแต่บัดนี้ เจ้าคือศิษย์เส้าหลินขั้นที่ ๙ — รับเอาลมปราณอรหันต์เป็นวิชาแรกของเจ้า" },
+    ],
+    choices: [
+      {
+        text: "น้อมรับด้วยความขอบพระคุณ",
+        next: "sect_shaolin",
         effects: [
-          { t: "finishQuest", questId: "qst_shaolin_relic_theft", success: true },
+          { t: "takeItem", itemId: "herb", count: 10 },
+          { t: "takeItem", itemId: "ginseng", count: 10 },
+          { t: "takeItem", itemId: "lotus_seed", count: 10 },
+          { t: "finishQuest", questId: "qst_shaolin_disciple_intro", success: true },
         ],
       },
     ],
@@ -73,6 +136,9 @@ export const SCENES_SECTS_TEMPLES: readonly Scene[] = [
       {
         text: "รับรางวัลและกล่าวลา",
         next: "sect_shaolin",
+        effects: [
+          { t: "finishQuest", questId: "qst_shaolin_relic_theft", success: true },
+        ],
       },
     ],
   },
@@ -199,10 +265,12 @@ export const SCENES_SECTS_TEMPLES: readonly Scene[] = [
             { t: "hasItem", itemId: "mithril_ore", count: 1 },
           ],
         },
-        effects: [
-          { t: "takeItem", itemId: "mithril_ore", count: 1 },
-          { t: "finishQuest", questId: "qst_shaolin_iron_training", success: true },
-        ],
+        // Effects DELIBERATELY moved to the complete scene's choice so
+        // both turn-in paths (this dialog choice AND the NPC popup's
+        // "Turn in" button which routes straight to the complete scene)
+        // converge on the same takeItem + finishQuest handler. Without
+        // this, the popup path skipped finishQuest and let the player
+        // re-turn-in indefinitely.
       },
       { text: "พูดคุยทั่วไป", next: "sect_shaolin" },
     ],
@@ -219,6 +287,10 @@ export const SCENES_SECTS_TEMPLES: readonly Scene[] = [
       {
         text: "รับการสอนด้วยความขอบคุณ",
         next: "sect_shaolin",
+        effects: [
+          { t: "takeItem", itemId: "mithril_ore", count: 1 },
+          { t: "finishQuest", questId: "qst_shaolin_iron_training", success: true },
+        ],
       },
     ],
   },
