@@ -23,27 +23,37 @@ export const ARTS: readonly Art[] = [
   { id: "t0_lohan", n: "ลมปราณอรหันต์", sc: "เส้าหลิน", tp: "หยาง·แข็ง", types: ["yang", "hard"], ti: 0,
     stats: { STR: 6, VIT: 4 }, hL: 20, mL: 10,
     act: { n: "หมัดอรหันต์", c: 15, cd: 3, t: "heal", h: 10, d: "ฟื้น 10% HP CD3" },
-    pas: { tr: "hit_recv", ch: 25, d: "ถูกโจมตี 25% → DEF+10 (1ตา)", e: { t: "buff_def", n: "เกราะ", v: 10, u: 1 } } },
+    pas: { tr: "hit_recv", ch: 25, d: "ถูกโจมตี 25% → DEF+10 (5ตา)", e: { t: "buff_def", n: "เกราะ", v: 10, u: 5 } } },
 
   { id: "t1_goldenbell", n: "กระดิ่งทองพื้นฐาน", sc: "เส้าหลิน", tp: "แข็ง·ภายนอก", types: ["hard", "external"], ti: 1,
     stats: { VIT: 10, DEF: 6, STR: 4 }, hL: 30, mL: 10,
-    act: { n: "เปลี่ยนตัวเป็นโลหะ", c: 18, cd: 3, t: "buff_reduce", v: 25, u: 2, d: "ลด dmg 25% (2ตา) CD3" },
-    pas: { tr: "hit_recv", ch: 25, d: "ถูกโจมตี 25% → DEF+15 (2ตา)", e: { t: "buff_def", n: "ระฆังทอง", v: 15, u: 2 } } },
+    act: { n: "เปลี่ยนตัวเป็นโลหะ", c: 18, cd: 3, t: "buff_reduce", v: 25, u: 5, d: "ลด dmg 25% (5ตา) CD3" },
+    pas: { tr: "hit_recv", ch: 25, d: "ถูกโจมตี 25% → DEF+15 (5ตา)", e: { t: "buff_def", n: "ระฆังทอง", v: 15, u: 5 } } },
+
+  { id: "t2_dharma", n: "ลมปราณพุทธธรรม", sc: "เส้าหลิน", tp: "หยาง·แข็ง", types: ["yang", "hard"], ti: 2,
+    stats: { VIT: 12, DEF: 10, STR: 8 }, hL: 35, mL: 15,
+    act: { n: "ลมปราณคุ้มกาย", c: 20, cd: 3, t: "heal", h: 15, d: "ฟื้น 15% HP CD3" },
+    pas: { tr: "hit_recv", ch: 30, d: "ถูกโจมตี 30% → DEF+12 (5ตา)", e: { t: "buff_def", n: "พุทธธรรม", v: 12, u: 5 } } },
 
   { id: "t3_onefinger", n: "เอกนิ้วเซน", sc: "เส้าหลิน", tp: "สมดุล·ภายใน", types: ["internal"], ti: 3,
     stats: { POW: 14, INT: 14, DEX: 12 }, hL: 25, mL: 35,
     act: { n: "นิ้วฟ้าผ่า", c: 35, cd: 4, t: "atk_int_pen", m: 1.5, pen: 35, d: "Int×1.5 ทะลุ IDef 35% CD4" },
-    pas: { tr: "use_int", ch: 100, d: "Int → ศัตรู Acc-12 (3ตา)", e: { t: "debuff_acc", n: "นิ้วประสาท", v: -12, u: 3 } } },
+    pas: { tr: "use_int", ch: 100, d: "Int → ศัตรู Acc-12 (5ตา)", e: { t: "debuff_acc", n: "นิ้วประสาท", v: -12, u: 5 } } },
 
   { id: "tendon", n: "พลังเปลี่ยนเส้นเอ็น", sc: "เส้าหลิน", tp: "หยาง·แข็ง", types: ["yang", "hard"], ti: 4,
     stats: { STR: 20, VIT: 20, DEF: 10 }, hL: 55, mL: 15,
     act: { n: "อุ้มแผ่นดิน", c: 25, cd: 3, t: "heal", h: 22, d: "ฟื้น 22% HP (CD3)" },
-    pas: { tr: "hit_recv", ch: 25, d: "ถูกโจมตี 25% → DEF+20 (2ตา)", e: { t: "buff_def", n: "เกราะ", v: 20, u: 2 } } },
+    pas: { tr: "hit_recv", ch: 25, d: "ถูกโจมตี 25% → DEF+20 (5ตา)", e: { t: "buff_def", n: "เกราะ", v: 20, u: 5 } } },
 
   { id: "diamond", n: "จินกังชี่", sc: "เส้าหลิน", tp: "หยาง·แข็ง", types: ["yang", "hard"], ti: 4,
     stats: { VIT: 25, DEF: 15, STR: 10 }, hL: 55, mL: 15,
-    act: { n: "เกราะเพชร", c: 20, cd: 3, t: "buff_reduce", v: 30, u: 3, d: "ลด dmg 30% (3ตา) CD3" },
+    act: { n: "เกราะเพชร", c: 20, cd: 3, t: "buff_reduce", v: 30, u: 5, d: "ลด dmg 30% (5ตา) CD3" },
     pas: { tr: "hit_recv", ch: 20, d: "ถูกโจมตี 20% → ฟื้น 8% HP", e: { t: "heal_pct", v: 8 } } },
+
+  { id: "t4_demonsubduer", n: "ลมปราณอรหันต์ปราบมาร", sc: "เส้าหลิน", tp: "หยาง·แข็ง", types: ["yang", "hard", "external"], ti: 4,
+    stats: { STR: 18, POW: 14, VIT: 10, DEX: 8 }, hL: 35, mL: 35,
+    act: { n: "หมัดปราบมาร", c: 30, cd: 4, t: "atk_phy_pen", m: 1.5, pen: 30, d: "Phy×1.5 ทะลุ DEF 30% CD4" },
+    pas: { tr: "use_act", ch: 100, d: "ใช้ IA → ATK+8% (≤3 ซ้อน)", e: { t: "stack_atk", v: 8, mx: 3 } } },
 
   // ─── อู่ตัง ───────────────────────────────────────────────────────
   { id: "t3_yinyang", n: "หยินหยางสมดุล", sc: "อู่ตัง", tp: "สมดุล", types: [], ti: 3,

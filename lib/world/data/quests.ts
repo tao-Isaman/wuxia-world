@@ -60,3 +60,12 @@ export function getQuestsForNpc(npcId: string): QuestDef[] {
   }
   return out;
 }
+
+// All quests tagged with a sect id. Used by the sect popup to enumerate
+// repeatable + art quests. Does NOT include the gateway intro quest (which
+// has no sectId — it's a one-shot side quest in the NPC popup).
+export function getQuestsForSect(sectId: string): QuestDef[] {
+  const out: QuestDef[] = [];
+  for (const q of QUESTS) if (q.sectId === sectId) out.push(q);
+  return out;
+}

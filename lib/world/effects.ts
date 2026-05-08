@@ -1,6 +1,7 @@
 import type { QuestDef, QuestReward, SceneEffect, WorldStateData } from "./types";
 import { getQuest } from "./data/quests";
 import { getScene } from "./data/scenes";
+import { SECT_MEMBERSHIPS, autoGrantableRewards } from "./data/sect-memberships";
 import {
   EVENT_PROBABILITY,
   MEET_EVENTS,
@@ -64,6 +65,7 @@ export function applyEffect(state: WorldStateData, eff: SceneEffect): void {
         q.status = "done";
         q.stage = def.stages.length - 1;
         if (def.rewards) applyQuestRewards(state, def.rewards);
+        recordSectQuestCompletion(state, def);
       } else {
         q.stage = nextStage;
       }
@@ -80,7 +82,10 @@ export function applyEffect(state: WorldStateData, eff: SceneEffect): void {
       q.status = eff.success ? "done" : "failed";
       if (eff.success) {
         const def = getQuest(eff.questId);
-        if (def?.rewards) applyQuestRewards(state, def.rewards);
+        if (def) {
+          if (def.rewards) applyQuestRewards(state, def.rewards);
+          recordSectQuestCompletion(state, def);
+        }
       }
       return;
     }
@@ -173,6 +178,42 @@ export function applyEffect(state: WorldStateData, eff: SceneEffect): void {
           (levels[eff.artId] ?? 0) < lv ? { ...levels, [eff.artId]: lv } : levels,
         skillIds: slots,
       };
+      return;
+    }
+
+    case "joinSect": {
+      // Idempotent — if the player is already a member, do nothing.
+      if (state.sectMembership[eff.sectId]) return;
+      const def = SECT_MEMBERSHIPS[eff.sectId];
+      const m = {
+        rank: def.startRank,
+        points: 0,
+        lastQuestDay: {} as Record<string, number>,
+        artQuestsDone: [] as string[],
+        rewardPicks: {} as Record<string, string>,
+        joinedDay: state.day,
+      };
+      state.sectMembership[eff.sectId] = m;
+      // Auto-claim single-option rewards at the entry rank (e.g. Shaolin
+      // grants t0_lohan automatically since rank 9's art pool is one
+      // option). Fires on EVERY joinSect path — store action OR quest
+      // reward — so authors don't need to add a separate learnArt reward.
+      const grants = autoGrantableRewards(def, def.startRank, m.rewardPicks);
+      for (const g of grants) {
+        if (g.kind === "skill") {
+          applyEffect(state, { t: "learnSkill", skillId: g.id });
+        } else {
+          applyEffect(state, { t: "learnArt", artId: g.id, level: 1 });
+        }
+        m.rewardPicks[`${g.rank}-${g.kind}`] = g.id;
+      }
+      return;
+    }
+
+    case "addSectPoints": {
+      const m = state.sectMembership[eff.sectId];
+      if (!m) return;
+      m.points = Math.max(0, m.points + eff.amount);
       return;
     }
 
@@ -318,6 +359,12 @@ function applyQuestRewards(state: WorldStateData, rewards: readonly QuestReward[
       case "learnArt":
         applyEffect(state, { t: "learnArt", artId: r.artId, level: r.level });
         break;
+      case "joinSect":
+        applyEffect(state, { t: "joinSect", sectId: r.sectId });
+        break;
+      case "sectPoints":
+        applyEffect(state, { t: "addSectPoints", sectId: r.sectId, amount: r.amount });
+        break;
     }
   }
 }
@@ -346,6 +393,7 @@ export function tickQuestProgress(state: WorldStateData): void {
         q.stage = def.stages.length - 1;
         q.status = "done";
         if (def.rewards) applyQuestRewards(state, def.rewards);
+        recordSectQuestCompletion(state, def);
         break;
       }
       q.stage = next;
@@ -353,17 +401,83 @@ export function tickQuestProgress(state: WorldStateData): void {
   }
 }
 
+// Helper called by every "quest just turned done" path. For sect quests,
+// record `lastQuestDay` (drives the 30-day cooldown) and add to
+// `artQuestsDone` if the quest is one-shot art-tagged.
+function recordSectQuestCompletion(state: WorldStateData, def: QuestDef): void {
+  if (!def.sectId) return;
+  const m = state.sectMembership[def.sectId];
+  if (!m) return;
+  m.lastQuestDay = { ...m.lastQuestDay, [def.id]: state.day };
+  if (def.isArtQuest && !m.artQuestsDone.includes(def.id)) {
+    m.artQuestsDone = [...m.artQuestsDone, def.id];
+  }
+}
+
 // ─── Quest availability helper (used by NPC popup) ─────────────────────
 // Returns true when the player can be offered this quest right now:
 //   - never started (no entry in state.quests)
 //   - prereqs (if any) evaluate true
+//   - quest is NOT a sect quest (those route through the sect popup)
 // Side quests that finished with success or failure stay in state.quests
 // with their terminal status — so the absence-check below blocks re-offers
 // without any extra side-quest plumbing.
 export function isQuestOfferable(state: WorldStateData, def: QuestDef): boolean {
+  // Sect quests (repeatable + art) live in the sect popup, not the NPC popup.
+  if (def.sectId) return false;
   if (state.quests[def.id]) return false;
   if (def.prereqs && !evaluateCondition(state, def.prereqs)) return false;
   return true;
+}
+
+// Sect-quest offerable check — used by SectMembershipPopup. Honors:
+//   - membership prereq
+//   - rank gate (def.minSectRank)
+//   - cooldown (lastQuestDay + sect.questCooldownDays)
+//   - one-shot art quests (skipped if id is in artQuestsDone)
+//   - in-progress active quests (player can't double-accept)
+export function isSectQuestOfferable(
+  state: WorldStateData,
+  def: QuestDef,
+  cooldownDays: number,
+): { offerable: boolean; cooldownLeft: number; reason?: string } {
+  if (!def.sectId) return { offerable: false, cooldownLeft: 0, reason: "ไม่ใช่ภารกิจสำนัก" };
+  const m = state.sectMembership[def.sectId];
+  if (!m) return { offerable: false, cooldownLeft: 0, reason: "ยังไม่ได้เป็นศิษย์" };
+  if (def.minSectRank != null && m.rank > def.minSectRank) {
+    return {
+      offerable: false,
+      cooldownLeft: 0,
+      reason: `ต้องการขั้น ${def.minSectRank} ขึ้นไป`,
+    };
+  }
+  if (def.isArtQuest && m.artQuestsDone.includes(def.id)) {
+    return { offerable: false, cooldownLeft: 0, reason: "รับวิชาแล้ว" };
+  }
+  const existing = state.quests[def.id];
+  if (existing && existing.status === "active") {
+    return { offerable: false, cooldownLeft: 0, reason: "กำลังทำอยู่" };
+  }
+  // Cooldown only matters for repeatable sect quests, not one-shot art
+  // quests. Art quests are gated by artQuestsDone above, so once done they
+  // won't re-offer; before that, no cooldown.
+  if (!def.isArtQuest) {
+    const last = m.lastQuestDay[def.id];
+    if (typeof last === "number") {
+      const since = state.day - last;
+      if (since < cooldownDays) {
+        return {
+          offerable: false,
+          cooldownLeft: Math.max(0, cooldownDays - since),
+          reason: "อยู่ระหว่างคูลดาวน์",
+        };
+      }
+    }
+  }
+  if (def.prereqs && !evaluateCondition(state, def.prereqs)) {
+    return { offerable: false, cooldownLeft: 0, reason: "ยังไม่ผ่านเงื่อนไข" };
+  }
+  return { offerable: true, cooldownLeft: 0 };
 }
 
 // Find every opponent the player is actively hunting via a quest's

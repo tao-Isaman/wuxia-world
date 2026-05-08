@@ -75,9 +75,17 @@ export {
   collectActiveHuntTargets,
   isQuestOfferable,
   isQuestTurnInForNpc,
+  isSectQuestOfferable,
   tickQuestProgress,
 } from "./effects";
 export { validateAndRepair } from "./validate";
+export {
+  SECT_MEMBERSHIPS,
+  pendingRewardsAtRank,
+  autoGrantableRewards,
+  type SectMembershipDef,
+} from "./data/sect-memberships";
+export { getQuestsForSect } from "./data";
 // `initBattleBridge` is intentionally NOT exported from the barrel —
 // it imports the world & battle stores, which would create a cycle when
 // world-store imports from this barrel. Import it directly from

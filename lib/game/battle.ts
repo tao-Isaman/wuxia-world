@@ -3,8 +3,10 @@ import type {
   CharacterBuild,
   Side,
   Skill,
+  StatBlock,
 } from "./types";
 import {
+  combinedStats,
   deriveAll,
   getEquipBonus,
   getMasteryMap,
@@ -46,6 +48,10 @@ export interface BattleContext {
   // when a side has too many opposing-type skills learned. See
   // lib/game/skill-conflict.ts.
   conflict: Record<Side, ConflictFactors>;
+  // Combined stats per side (base + arts + skills + equipment, conflict-
+  // scaled). Used by skill features that scale flat damage off a stat —
+  // e.g. Skill.vitScale → `vitScale * stats[side].VIT` added to skillEffect.
+  stats: Record<Side, StatBlock>;
 }
 
 // Pick the "primary" art for a side: the first art slotted in slots wins,
@@ -74,6 +80,10 @@ export function makeContext(buildA: CharacterBuild, buildB: CharacterBuild): Bat
     },
     skillLevels: { A: lvA, B: lvB },
     conflict: { A: conflictA, B: conflictB },
+    stats: {
+      A: combinedStats(buildA, conflictA),
+      B: combinedStats(buildB, conflictB),
+    },
   };
 }
 
@@ -231,7 +241,13 @@ export function calcSkillDamage(
   }
 
   // Stack ATK + equipment %ATK
-  const sm = 1 + ast.stk * 0.03 + ctx.equipBonus[side].pct_atk / 100;
+  // debuff_atk on attacker reduces the multiplier (clamped ≥ 0).
+  let atkDebuff = 0;
+  for (const d of ast.debuffs) if (d.t === "debuff_atk" && d.v != null) atkDebuff += d.v;
+  const sm = Math.max(
+    0,
+    1 + ast.stk * 0.03 + ctx.equipBonus[side].pct_atk / 100 + atkDebuff / 100,
+  );
 
   // Effective Acc / Eva with debuffs/buffs
   let ea = ad.Acc;
@@ -261,7 +277,8 @@ export function calcSkillDamage(
   const conflictFactor = getStatusFactor(sk, ctx.conflict[side]);
   const eBp = effectiveBp(sk, typeof lv === "number" ? lv : 1) * conflictFactor;
   const ta = sk.at === "phy" ? ad.PA : ad.IA * im;
-  const se = eBp * (1 + sk.p / 100) + sk.f;
+  const vitBonus = sk.vitScale ? sk.vitScale * (ctx.stats[side].VIT ?? 0) : 0;
+  const se = eBp * (1 + sk.p / 100) + sk.f + vitBonus;
   const ed = Math.max(0, (sk.at === "phy" ? dd.PD : dd.ID) + fD - dR);
   const raw = Math.max(1, (ad.Atk * sm * ab + ta + se) * sk.dm * mm - ed) * (1 - pR / 100);
 
@@ -282,6 +299,12 @@ export function calcSkillDamage(
   return { hit: true, dmg, crit, hpPct: Math.round(hp), critPct: Math.round(cp), reflectDmg };
 }
 
+// Stun check — true if the side has an active stun debuff. Tick has not yet
+// decremented this turn, so durations look one larger than the player sees.
+function isStunned(state: BattleState, side: Side): boolean {
+  return state.st[side].debuffs.some((d) => d.t === "stun" && d.u > 0);
+}
+
 // ─── Skill resolution ───
 export function resolveSkill(
   state: BattleState,
@@ -294,6 +317,12 @@ export function resolveSkill(
   // Per-turn HP regen from equipment is handled in tickEffects.
   tickEffects(state, ctx.equipBonus.A.hp_regen, ctx.equipBonus.B.hp_regen, ctx.names);
   if (state.winner) return;
+
+  if (isStunned(state, side)) {
+    const cls = side === "A" ? "lA" : "lB";
+    logLine(state, cls, `[${state.turn}] ${ctx.names[side]} <span style="color:#AAA">ถูกสตัน — ข้ามตา!</span>`);
+    return;
+  }
 
   const skill = getSkill(skillId);
   if (!skill) return;
@@ -409,6 +438,12 @@ export function resolveArtActive(
   state.turn++;
   tickEffects(state, ctx.equipBonus.A.hp_regen, ctx.equipBonus.B.hp_regen, ctx.names);
   if (state.winner) return true;
+
+  if (isStunned(state, side)) {
+    const stunCls = side === "A" ? "lA" : "lB";
+    logLine(state, stunCls, `[${state.turn}] ${ctx.names[side]} <span style="color:#AAA">ถูกสตัน — ข้ามตา!</span>`);
+    return true;
+  }
 
   const cls = side === "A" ? "lA" : "lB";
   const nm = ctx.names[side];

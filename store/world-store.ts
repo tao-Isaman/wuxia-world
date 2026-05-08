@@ -55,7 +55,12 @@ import {
   type TraitKey,
   type WorldStateData,
 } from "@/lib/world";
-import { tickQuestProgress } from "@/lib/world/effects";
+import { applyEffect, isSectQuestOfferable, tickQuestProgress } from "@/lib/world/effects";
+import { evaluateCondition } from "@/lib/world/conditions";
+import {
+  SECT_MEMBERSHIPS,
+  autoGrantableRewards,
+} from "@/lib/world/data/sect-memberships";
 import {
   ASSASSINATE_TRAIT_EVIL,
   KIDNAP_TRAIT_EVIL,
@@ -328,7 +333,20 @@ const ARTISAN_PROFESSIONS: ReadonlySet<LifeSkill> = new Set<LifeSkill>([
 
 interface WorldStore extends WorldStateData {
   // Actions
-  startNewGame: () => void;
+  startNewGame: (opts?: { name?: string; gender?: import("@/lib/world").Gender }) => void;
+  // Sect membership actions
+  joinSect: (sectId: import("@/lib/world").SectId) => { ok: boolean; reason?: string };
+  // Spend points to upgrade rank (one rank at a time).
+  upgradeSectRank: (sectId: import("@/lib/world").SectId) => { ok: boolean; reason?: string };
+  // Pick a rank-tier reward (one skill OR one art per rank-tier).
+  pickSectReward: (
+    sectId: import("@/lib/world").SectId,
+    rank: number,
+    kind: "skill" | "art",
+    id: string,
+  ) => { ok: boolean; reason?: string };
+  // Accept a sect quest (records lastQuestDay so the cooldown gate works).
+  acceptSectQuest: (sectId: import("@/lib/world").SectId, questId: string) => { ok: boolean; reason?: string };
   makeChoice: (idx: number) => void;
   gotoScene: (sceneId: string) => void;
   // Used by the "ปิด" button on terminal dialogs and by the route-screen
@@ -490,6 +508,8 @@ const emptyData = (): WorldStateData => ({
   pendingSpar: null,
   gameOver: false,
   actionLog: [],
+  gender: "male",
+  sectMembership: {},
 });
 
 // Append a player-action entry to the rolling log. Keeps the most recent
@@ -723,6 +743,31 @@ function takeChoice(state: WorldStateData, choice: Choice): boolean {
   return true;
 }
 
+// Auto-claim every single-option sect reward currently unlocked at the
+// player's rank or above (for Shaolin: rank 9 grants T0 art automatically;
+// reaching rank 7 grants T1 art automatically; etc.). Multi-option pools
+// still require the popup pick. Mutates `state` in place + logs each grant.
+function autoGrantSectRewards(state: WorldStateData, sectId: import("@/lib/world").SectId): void {
+  const m = state.sectMembership[sectId];
+  if (!m || !state.playerBuild) return;
+  const def = SECT_MEMBERSHIPS[sectId];
+  if (!def) return;
+  const grants = autoGrantableRewards(def, m.rank, m.rewardPicks);
+  for (const g of grants) {
+    if (g.kind === "skill") {
+      applyEffect(state, { t: "learnSkill", skillId: g.id });
+    } else {
+      applyEffect(state, { t: "learnArt", artId: g.id, level: 1 });
+    }
+    m.rewardPicks = { ...m.rewardPicks, [`${g.rank}-${g.kind}`]: g.id };
+    appendActionLog(
+      state,
+      "sect",
+      `${def.name} ขั้น ${g.rank} มอบ${g.kind === "skill" ? "วิชาฝีมือ" : "วิชาในกาย"}: ${g.id}`,
+    );
+  }
+}
+
 // Shallow-clone the data fields so the persisted slice picks up the change.
 function draftFrom(s: WorldStateData): WorldStateData {
   return {
@@ -761,6 +806,8 @@ function draftFrom(s: WorldStateData): WorldStateData {
     pendingSpar: s.pendingSpar,
     gameOver: s.gameOver,
     actionLog: [...s.actionLog],
+    gender: s.gender,
+    sectMembership: { ...s.sectMembership },
   };
 }
 
@@ -830,10 +877,13 @@ export const useWorldStore = create<WorldStore>()(
     (set, get) => ({
       ...emptyData(),
 
-      startNewGame: () => {
+      startNewGame: (opts) => {
         const fresh = emptyData();
         fresh.hasGame = true;
-        fresh.playerBuild = STARTER_BUILD();
+        const build = STARTER_BUILD();
+        if (opts?.name && opts.name.trim()) build.name = opts.name.trim();
+        fresh.playerBuild = build;
+        fresh.gender = opts?.gender ?? "male";
         fresh.currentSceneId = START_SCENE_ID;
         // Seed level 1 for the starter skill so the UI has an entry to
         // display from turn one.
@@ -854,6 +904,103 @@ export const useWorldStore = create<WorldStore>()(
         if (start?.onEnter) applyEffects(draft, start.onEnter);
         followAutoAdvance(draft);
         set({ ...draft });
+      },
+
+      joinSect: (sectId) => {
+        const s = get();
+        if (!s.hasGame || !s.playerBuild) return { ok: false, reason: "ยังไม่ได้เริ่มเกม" };
+        if (s.sectMembership[sectId]) return { ok: false, reason: "เป็นศิษย์อยู่แล้ว" };
+        const def = SECT_MEMBERSHIPS[sectId];
+        if (!def) return { ok: false, reason: "ไม่พบสำนัก" };
+        if (!evaluateCondition(s, def.joinRequirements)) {
+          return { ok: false, reason: "ไม่ผ่านเงื่อนไขการรับศิษย์" };
+        }
+        const draft = draftFrom(s);
+        applyEffect(draft, { t: "joinSect", sectId });
+        appendActionLog(draft, "sect", `เข้าร่วมสำนัก${def.name} · ขั้นที่ ${def.startRank}`);
+        autoGrantSectRewards(draft, sectId);
+        set({ ...draft });
+        return { ok: true };
+      },
+
+      upgradeSectRank: (sectId) => {
+        const s = get();
+        const m = s.sectMembership[sectId];
+        if (!m) return { ok: false, reason: "ยังไม่ได้เป็นศิษย์" };
+        const def = SECT_MEMBERSHIPS[sectId];
+        if (!def) return { ok: false, reason: "ไม่พบสำนัก" };
+        if (m.rank <= def.topRank) return { ok: false, reason: "ขั้นสูงสุดแล้ว" };
+        const target = m.rank - 1;
+        const cost = def.rankUpCost(target);
+        if (m.points < cost) {
+          return { ok: false, reason: `ต้องการ ${cost} sect points (มี ${m.points})` };
+        }
+        const draft = draftFrom(s);
+        const dm = draft.sectMembership[sectId];
+        if (!dm) return { ok: false, reason: "membership lost" };
+        dm.points -= cost;
+        dm.rank = target;
+        appendActionLog(
+          draft,
+          "sect",
+          `เลื่อนขั้น${def.name} → ขั้นที่ ${target} (จ่าย ${cost} sect points)`,
+        );
+        autoGrantSectRewards(draft, sectId);
+        set({ ...draft });
+        return { ok: true };
+      },
+
+      pickSectReward: (sectId, rank, kind, id) => {
+        const s = get();
+        const m = s.sectMembership[sectId];
+        if (!m) return { ok: false, reason: "ยังไม่ได้เป็นศิษย์" };
+        const def = SECT_MEMBERSHIPS[sectId];
+        if (!def) return { ok: false, reason: "ไม่พบสำนัก" };
+        if (m.rank > rank) {
+          return { ok: false, reason: `ขั้นต่ำที่จะรับรางวัลนี้คือ ${rank}` };
+        }
+        const key = `${rank}-${kind}`;
+        if (m.rewardPicks[key]) return { ok: false, reason: "รับรางวัลขั้นนี้แล้ว" };
+        const pool = kind === "skill" ? def.skillsByRank[rank] : def.artsByRank[rank];
+        if (!pool || !pool.includes(id)) return { ok: false, reason: "ตัวเลือกไม่ถูกต้อง" };
+        const draft = draftFrom(s);
+        const dm = draft.sectMembership[sectId];
+        if (!dm) return { ok: false, reason: "membership lost" };
+        dm.rewardPicks = { ...dm.rewardPicks, [key]: id };
+        if (kind === "skill") applyEffect(draft, { t: "learnSkill", skillId: id });
+        else applyEffect(draft, { t: "learnArt", artId: id, level: 1 });
+        appendActionLog(
+          draft,
+          "sect",
+          `รับวิชา${kind === "skill" ? "ฝีมือ" : "ในกาย"}จากสำนัก${def.name} ขั้น ${rank}`,
+        );
+        set({ ...draft });
+        return { ok: true };
+      },
+
+      acceptSectQuest: (sectId, questId) => {
+        const s = get();
+        const def = getQuest(questId);
+        if (!def) return { ok: false, reason: "ไม่พบภารกิจ" };
+        const sectDef = SECT_MEMBERSHIPS[sectId];
+        const check = isSectQuestOfferable(s, def, sectDef.questCooldownDays);
+        if (!check.offerable) {
+          return {
+            ok: false,
+            reason: check.reason ?? `รอเหลืออีก ${check.cooldownLeft} วัน`,
+          };
+        }
+        const draft = draftFrom(s);
+        // Reset prior done/failed status so the quest can be re-accepted on
+        // its next cooldown cycle. Active status is blocked by the offer
+        // helper above. lastQuestDay is recorded at completion (see
+        // recordSectQuestCompletion in effects.ts), not at accept — so
+        // abandoning + re-accepting doesn't game the cooldown.
+        delete draft.quests[questId];
+        applyEffect(draft, { t: "startQuest", questId });
+        appendActionLog(draft, "sect", `รับภารกิจสำนัก: ${def.name}`);
+        set({ ...draft });
+        return { ok: true };
       },
 
       makeChoice: (idx) => {
@@ -2175,11 +2322,13 @@ export const useWorldStore = create<WorldStore>()(
     }),
     {
       name: "wusia-world-v1",
-      version: 16,
+      version: 17,
       // Only persist the data fields, not the action functions.
       partialize: (s) => ({
         hasGame: s.hasGame,
         playerBuild: s.playerBuild,
+        gender: s.gender,
+        sectMembership: s.sectMembership,
         currentSceneId: s.currentSceneId,
         lastLocationId: s.lastLocationId,
         flags: s.flags,
@@ -2350,6 +2499,11 @@ export const useWorldStore = create<WorldStore>()(
           pendingEncounter: p.pendingEncounter ?? null,
           gameOver: p.gameOver === true,
           actionLog: Array.isArray(p.actionLog) ? p.actionLog.slice(-ACTION_LOG_MAX) : [],
+          gender: p.gender === "female" ? "female" : "male",
+          sectMembership:
+            p.sectMembership && typeof p.sectMembership === "object"
+              ? { ...p.sectMembership }
+              : {},
         };
         void fromVersion;
         return out;

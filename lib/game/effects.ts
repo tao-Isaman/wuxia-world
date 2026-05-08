@@ -126,6 +126,22 @@ export function applyEnemyEffect(
       addDebuff(state, ds, { t: "debuff_def", n: "DEF↓", v: eff.v, u: eff.u });
       logLine(state, "lS", `&nbsp;✗ ${dnm}: PDef${eff.v}(${eff.u}ตา)`);
       return;
+    case "debuff_atk":
+      addDebuff(state, ds, { t: "debuff_atk", n: "ATK↓", v: eff.v, u: eff.u });
+      logLine(state, "lS", `&nbsp;✗ ${dnm}: ATK${eff.v}%(${eff.u}ตา)`);
+      return;
+    case "burn_hp_mp":
+      addDebuff(state, ds, { t: "burn_hp_mp", n: "เผาไหม้", pp: eff.dmg, mpp: eff.mp, u: eff.u });
+      logLine(state, "lS", `&nbsp;✗ ${dnm}: เผาไหม้ HP${eff.dmg}% MP${eff.mp}%/ตา (${eff.u}ตา)`);
+      return;
+    case "stun":
+      if (Math.random() * 100 < eff.ch) {
+        addDebuff(state, ds, { t: "stun", n: "สตัน", u: eff.u });
+        logLine(state, "lS", `&nbsp;✗ ${dnm}: สตัน (${eff.u}ตา)`);
+      } else {
+        logLine(state, "lS", `&nbsp;✗ ${dnm}: ต้านสตัน`);
+      }
+      return;
     case "debuff_poison":
       addDebuff(state, ds, { t: "debuff_poison", n: "พิษ", pp: eff.pp, u: eff.u });
       addDebuff(state, ds, { t: "debuff_eva", n: "พิษEva", v: eff.ev, u: eff.u });
@@ -251,6 +267,23 @@ export function tickEffects(
       if (side === "A") state.hA = Math.max(0, state.hA - dmg);
       else state.hB = Math.max(0, state.hB - dmg);
       if (dmg > 0) logLine(state, "lS", `&nbsp;☠ ${names[side]} รับพิษ ${dmg}`);
+    }
+
+    const burn = st.debuffs.find((d) => d.t === "burn_hp_mp");
+    if (burn && burn.u > 0) {
+      const hpCap = side === "A" ? state.dA.HP : state.dB.HP;
+      const mpCap = side === "A" ? state.dA.MP : state.dB.MP;
+      const hpDmg = burn.pp != null ? Math.round(hpCap * burn.pp / 100) : 0;
+      const mpDmg = burn.mpp != null ? Math.round(mpCap * burn.mpp / 100) : 0;
+      if (side === "A") {
+        state.hA = Math.max(0, state.hA - hpDmg);
+        state.mpA = Math.max(0, state.mpA - mpDmg);
+      } else {
+        state.hB = Math.max(0, state.hB - hpDmg);
+        state.mpB = Math.max(0, state.mpB - mpDmg);
+      }
+      if (hpDmg > 0 || mpDmg > 0)
+        logLine(state, "lS", `&nbsp;🔥 ${names[side]} เผาไหม้ HP-${hpDmg} MP-${mpDmg}`);
     }
 
     for (const b of st.buffs) if (b.u > 0) b.u--;

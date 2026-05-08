@@ -29,7 +29,7 @@ import { InfoPopover } from "@/components/ui/wuxia/info-popover";
 import type { EquipSlotType, Skill, StatKey, WeaponFamily } from "@/lib/game";
 import { useWorldStore } from "@/store/world-store";
 import { xpToNextStatLevel } from "@/lib/world/stat-progression";
-import { TRAIT_KEYS, TRAIT_LABEL } from "@/lib/world";
+import { GENDER_LABEL, SECT_MEMBERSHIPS, TRAIT_KEYS, TRAIT_LABEL } from "@/lib/world";
 import { ArtTooltip, SkillTooltip } from "../skill-tooltip";
 
 interface Props {
@@ -114,6 +114,8 @@ export function ProfilePopup({ open, onClose }: Props) {
   const gold = useWorldStore((s) => s.gold);
   const statExp = useWorldStore((s) => s.statExp);
   const traits = useWorldStore((s) => s.traits);
+  const gender = useWorldStore((s) => s.gender);
+  const sectMembership = useWorldStore((s) => s.sectMembership);
   if (!player) return null;
 
   const base = player.stats;
@@ -172,12 +174,35 @@ export function ProfilePopup({ open, onClose }: Props) {
         {/* ─── Header ──────────────────────────────────────────────── */}
         <section>
           <div className="flex items-center justify-between">
-            <strong className="text-base">{player.name}</strong>
+            <div>
+              <strong className="text-base">{player.name}</strong>
+              <span className="text-xs text-muted-foreground ml-2">· {GENDER_LABEL[gender]}</span>
+            </div>
             <div className="text-xs">
               <span className="text-muted-foreground">ทอง </span>
               <strong className="text-amber-600">{gold}</strong>
             </div>
           </div>
+          {/* Sect memberships — one row per joined sect. */}
+          {Object.entries(sectMembership).filter(([, m]) => m).length > 0 && (
+            <div className="mt-2 space-y-0.5">
+              {Object.entries(sectMembership).map(([sid, m]) => {
+                if (!m) return null;
+                const def = SECT_MEMBERSHIPS[sid as keyof typeof SECT_MEMBERSHIPS];
+                if (!def) return null;
+                return (
+                  <div key={sid} className="text-xs flex items-center gap-2">
+                    <Badge variant="seal">{def.name}</Badge>
+                    <span className="text-muted-foreground">
+                      ขั้นที่ <strong className="text-foreground">{m.rank}</strong>
+                      <span className="mx-1">·</span>
+                      <span className="text-vermilion">{m.points}</span> sect points
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </section>
 
         {/* ─── Stat budget ─────────────────────────────────────────── */}

@@ -9,6 +9,236 @@ export const QUESTS_SECTS_TEMPLES: readonly QuestDef[] = [
   // เส้าหลิน — เจ้าอาวาสฮุยหยวน
   // ──────────────────────────────────────────────────────────────────────
 
+  // 0. INTRO — ขอเข้าเป็นศิษย์ (disciple registration intro)
+  // Gateway quest. Prereqs gate by gender + evil trait + non-membership.
+  // Single combat stage to prove worth, then return-to-abbot dialog calls
+  // `joinSect` via scene effect (see sects-temples.ts scenes file).
+  {
+    id: "qst_shaolin_disciple_intro",
+    name: "ขอเข้าเป็นศิษย์เส้าหลิน",
+    description: "ผู้ขอเข้าสำนักเส้าหลินต้องพิสูจน์ความตั้งใจและความสุจริตของจิตใจก่อน เจ้าอาวาสฮุยหยวนยินดีรับฟังหากเจ้ามีคุณสมบัติ",
+    briefSummary: "พิสูจน์ตัวเพื่อเข้าเป็นศิษย์เส้าหลินขั้นที่ 9",
+    type: "side",
+    giverNpcId: "sect_shaolin_abbot_huiyuan",
+    prereqs: {
+      t: "and",
+      all: [
+        { t: "gender", equals: "male" },
+        { t: "trait", trait: "evil", max: 10 },
+        { t: "not", of: { t: "sectMember", sectId: "shaolin" } },
+      ],
+    },
+    stages: [
+      {
+        id: "prove_courage",
+        description: "พิสูจน์ความกล้าหาญ — ปราบโจรเร่ร่อน 1 คน",
+        autoAdvance: { t: "defeatedOpponent", opponentId: "thug", count: 1 },
+      },
+      {
+        id: "return_to_abbot",
+        description: "กลับไปรายงานเจ้าอาวาสฮุยหยวน",
+      },
+    ],
+    rewards: [
+      { t: "wExp", amount: 50 },
+      { t: "npcRelationship", npcId: "sect_shaolin_abbot_huiyuan", amount: 5 },
+      { t: "joinSect", sectId: "shaolin" },
+    ],
+  },
+
+  // ──────────────────────────────────────────────────────────────────────
+  // ภารกิจประจำเส้าหลิน — ทำซ้ำได้ทุก 30 วัน — ทุกครั้งที่สำเร็จได้ sect points
+  // (Sect quest cooldown handled by SectMembership.lastQuestDay map. Reward
+  // payouts include `addSectPoints` via the quest's turn-in scene; QuestReward
+  // doesn't carry sect-points directly so the scene effect drives it.)
+  // ──────────────────────────────────────────────────────────────────────
+
+  // SECT-1 · ตรวจตราเขตวัด — sect points 50 (rank 9–7)
+  {
+    id: "qst_shaolin_sect_patrol",
+    name: "ตรวจตราเขตวัด",
+    description: "ภารกิจประจำของศิษย์เส้าหลิน — ออกตรวจตราเขตวัดและกำราบโจรที่ลอบเข้าสำนัก",
+    briefSummary: "ปราบโจรในเขตวัด 2 คน · sect points +50",
+    type: "side",
+    sectId: "shaolin",
+    giverNpcId: "sect_shaolin_abbot_huiyuan",
+    prereqs: { t: "sectMember", sectId: "shaolin" },
+    stages: [
+      {
+        id: "patrol",
+        description: "ปราบโจรเร่ร่อน 2 คน",
+        autoAdvance: { t: "defeatedOpponent", opponentId: "thug", count: 2 },
+      },
+      {
+        id: "report",
+        description: "กลับไปรายงานเจ้าอาวาส",
+      },
+    ],
+    rewards: [
+      { t: "gold", amount: 150 },
+      { t: "wExp", amount: 60 },
+      { t: "npcRelationship", npcId: "sect_shaolin_abbot_huiyuan", amount: 3 },
+      { t: "sectPoints", sectId: "shaolin", amount: 50 },
+    ],
+  },
+
+  // SECT-2 · ส่งสมุนไพร — sect points 60 (rank 9–6)
+  {
+    id: "qst_shaolin_sect_herb_run",
+    name: "ส่งสมุนไพรให้วัด",
+    description: "วัดต้องการสมุนไพรสำหรับยารักษาศิษย์ที่บาดเจ็บ — เก็บสมุนไพรในป่าเขาซงซานและนำกลับมา",
+    briefSummary: "ส่งสมุนไพร 5 ชิ้น · sect points +60",
+    type: "side",
+    sectId: "shaolin",
+    giverNpcId: "sect_shaolin_abbot_huiyuan",
+    prereqs: { t: "sectMember", sectId: "shaolin" },
+    stages: [
+      {
+        id: "gather_herbs",
+        description: "เก็บสมุนไพร 5 ชิ้น",
+        autoAdvance: { t: "hasItem", itemId: "herb", count: 5 },
+      },
+      {
+        id: "deliver",
+        description: "ส่งสมุนไพรให้เจ้าอาวาส",
+      },
+    ],
+    rewards: [
+      { t: "gold", amount: 100 },
+      { t: "wExp", amount: 50 },
+      { t: "npcRelationship", npcId: "sect_shaolin_abbot_huiyuan", amount: 3 },
+      { t: "sectPoints", sectId: "shaolin", amount: 60 },
+    ],
+  },
+
+  // SECT-3 · ปฏิบัติธรรม — sect points 80 (rank 7–5)
+  {
+    id: "qst_shaolin_sect_meditation",
+    name: "ปฏิบัติธรรมที่ถ้ำลึก",
+    description: "นั่งวิปัสนาที่ถ้ำลึกของซงซาน 1 ครั้ง เพื่อชำระจิตใจ — เพิ่มความถ่อมตน",
+    briefSummary: "ปฏิบัติธรรม + เก็บอาหาร 5 ชิ้น · sect points +80",
+    type: "side",
+    sectId: "shaolin",
+    minSectRank: 7,
+    giverNpcId: "sect_shaolin_abbot_huiyuan",
+    prereqs: {
+      t: "and",
+      all: [
+        { t: "sectMember", sectId: "shaolin" },
+        { t: "sectRankAtLeast", sectId: "shaolin", maxRank: 7 },
+      ],
+    },
+    stages: [
+      {
+        id: "meditate",
+        description: "เก็บเนื้อย่างระหว่างเดินทาง 3 ชิ้น",
+        autoAdvance: { t: "hasItem", itemId: "cooked_meat", count: 3 },
+      },
+      {
+        id: "report",
+        description: "กลับไปรายงานเจ้าอาวาส",
+      },
+    ],
+    rewards: [
+      { t: "wExp", amount: 100 },
+      { t: "trait", trait: "humility", amount: 3 },
+      { t: "npcRelationship", npcId: "sect_shaolin_abbot_huiyuan", amount: 5 },
+      { t: "sectPoints", sectId: "shaolin", amount: 80 },
+    ],
+  },
+
+  // ──────────────────────────────────────────────────────────────────────
+  // ภารกิจวิชาในกาย — one-shot, rank-gated. Each completes a small trial
+  // and rewards a bonus high-tier art (in addition to the normal rank pool
+  // pick). Tracked in `sectMembership.shaolin.artQuestsDone`.
+  // ──────────────────────────────────────────────────────────────────────
+
+  // ART-1 · ตำราเอกนิ้วเซน — unlock at rank 5, reward bonus T3 art
+  {
+    id: "qst_shaolin_art_zen_finger",
+    name: "ตำราเอกนิ้วเซน",
+    description: "เจ้าอาวาสยอมเปิดตำราเอกนิ้วเซน (一指禅) ให้ศิษย์ผู้มีจิตใจสูงสุดได้ฝึก — ผ่านการนั่งวิปัสนาที่ถ้ำซงซานและพิสูจน์ฝีมือ",
+    briefSummary: "ฝึกเอกนิ้วเซน — รับ T3 art ของเส้าหลิน",
+    type: "side",
+    sectId: "shaolin",
+    isArtQuest: true,
+    minSectRank: 5,
+    giverNpcId: "sect_shaolin_abbot_huiyuan",
+    prereqs: {
+      t: "and",
+      all: [
+        { t: "sectMember", sectId: "shaolin" },
+        { t: "sectRankAtLeast", sectId: "shaolin", maxRank: 5 },
+      ],
+    },
+    stages: [
+      {
+        id: "trial_kill",
+        description: "พิสูจน์พลัง — ปราบโจรเสือดำ 2 คน",
+        autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 1 },
+      },
+      {
+        id: "trial_meditate",
+        description: "นั่งสมาธิ — รวบรวมสมุนไพร 8 ชิ้น",
+        autoAdvance: { t: "hasItem", itemId: "herb", count: 8 },
+      },
+      {
+        id: "return_art",
+        description: "กลับไปรับตำราจากเจ้าอาวาส",
+      },
+    ],
+    rewards: [
+      { t: "wExp", amount: 200 },
+      { t: "learnArt", artId: "t3_onefinger", level: 3 },
+      { t: "trait", trait: "humility", amount: 5 },
+      { t: "sectPoints", sectId: "shaolin", amount: 100 },
+      { t: "npcRelationship", npcId: "sect_shaolin_abbot_huiyuan", amount: 10 },
+    ],
+  },
+
+  // ART-2 · ตำราเปลี่ยนเส้นเอ็น — unlock at rank 2, reward T4 art
+  {
+    id: "qst_shaolin_art_legendary",
+    name: "ตำราพลังเปลี่ยนเส้นเอ็น",
+    description: "ตำนานสุดยอดของเส้าหลิน — 易筋经. เปิดให้ศิษย์ที่ได้รับความไว้วางใจสูงสุดเท่านั้น พิสูจน์ทั้งกายและจิตใจ",
+    briefSummary: "ฝึกเปลี่ยนเส้นเอ็น — รับ T4 art ลับของเส้าหลิน",
+    type: "side",
+    sectId: "shaolin",
+    isArtQuest: true,
+    minSectRank: 2,
+    giverNpcId: "sect_shaolin_abbot_huiyuan",
+    prereqs: {
+      t: "and",
+      all: [
+        { t: "sectMember", sectId: "shaolin" },
+        { t: "sectRankAtLeast", sectId: "shaolin", maxRank: 2 },
+      ],
+    },
+    stages: [
+      {
+        id: "trial_body",
+        description: "พิสูจน์ร่างกาย — ปราบโจรหัวหน้า 1 คน",
+        autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 3 },
+      },
+      {
+        id: "trial_mind",
+        description: "พิสูจน์จิตใจ — ความถ่อมตนถึง 30",
+        autoAdvance: { t: "trait", trait: "humility", min: 30 },
+      },
+      {
+        id: "return_legend",
+        description: "กลับไปรับตำราจากเจ้าอาวาส",
+      },
+    ],
+    rewards: [
+      { t: "wExp", amount: 400 },
+      { t: "learnArt", artId: "tendon", level: 5 },
+      { t: "trait", trait: "humility", amount: 10 },
+      { t: "sectPoints", sectId: "shaolin", amount: 200 },
+      { t: "npcRelationship", npcId: "sect_shaolin_abbot_huiyuan", amount: 20 },
+    ],
+  },
+
   // 1. FETCH — พระธาตุถูกขโมย (relic theft)
   {
     id: "qst_shaolin_relic_theft",

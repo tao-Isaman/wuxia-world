@@ -163,7 +163,14 @@ export type SceneEffect =
   | { t: "learnSkill"; skillId: string }
   // Add an inner art to the player's `learnedArtIds` and seed its level.
   // Defaults to level 1 when omitted; same caveats as learnSkill.
-  | { t: "learnArt"; artId: string; level?: number };
+  | { t: "learnArt"; artId: string; level?: number }
+  // Sect membership operations.
+  // joinSect: seed sectMembership[sectId] with the sect's starting rank
+  // when the player isn't a member yet (no-op otherwise).
+  | { t: "joinSect"; sectId: SectId }
+  // addSectPoints: bump WorldStateData.sectMembership[sectId].points by
+  // `amount`. Used by sect quest rewards.
+  | { t: "addSectPoints"; sectId: SectId; amount: number };
 
 // ─── Conditions ────────────────────────────────────────────────────────
 
@@ -197,6 +204,13 @@ export type Condition =
   // Player has kidnapped this NPC. Same shape as assassinatedNpc. Backed
   // by WorldStateData.kidnappedNpcIds.
   | { t: "kidnappedNpc"; npcId: string }
+  // Player gender (for sect membership conditions).
+  | { t: "gender"; equals: Gender }
+  // Player is a member of this sect (any rank).
+  | { t: "sectMember"; sectId: SectId }
+  // Player's current rank in the sect is at most `rank` (lower number =
+  // higher rank). e.g. {sectId:"shaolin", maxRank:5} matches rank 5,4,3,2,1.
+  | { t: "sectRankAtLeast"; sectId: SectId; maxRank: number }
   | { t: "and"; all: Condition[] }
   | { t: "or"; any: Condition[] }
   | { t: "not"; of: Condition };
@@ -312,7 +326,12 @@ export type QuestReward =
   | { t: "trait"; trait: TraitKey; amount: number }
   | { t: "npcRelationship"; npcId: string; amount: number }
   | { t: "learnSkill"; skillId: string }
-  | { t: "learnArt"; artId: string; level?: number };
+  | { t: "learnArt"; artId: string; level?: number }
+  // Sect rewards. `joinSect` only seeds the membership when the player isn't
+  // already a member. `sectPoints` bumps the points pool (no-op if not yet
+  // a member of that sect — caller should pair with `joinSect` if needed).
+  | { t: "joinSect"; sectId: SectId }
+  | { t: "sectPoints"; sectId: SectId; amount: number };
 
 export interface QuestDef {
   id: string;
@@ -334,6 +353,19 @@ export interface QuestDef {
   prereqs?: Condition;
   // Granted on `finishQuest({ success: true })` in order. May be omitted.
   rewards?: readonly QuestReward[];
+  // ─── Sect quest tagging ─────────────────────────────────────────────
+  // When set, the quest is gated by the sect popup — NPC popup hides it.
+  // Repeatable: completing it sets `sectMembership[sectId].lastQuestDay[id]`
+  // and prior "done" status is reset on next accept (sect popup driver).
+  sectId?: SectId;
+  // Marks an art quest — one-shot, tracked in
+  // `sectMembership[sectId].artQuestsDone`. The sect popup surfaces these
+  // separately from repeatable sect quests.
+  isArtQuest?: boolean;
+  // For rank-gated sect / art quests: minimum rank (lower = higher prestige)
+  // the player must have achieved in `sectId` before the quest is offerable.
+  // Ignored when the quest isn't sect-tagged.
+  minSectRank?: number;
 }
 
 export interface QuestState {
@@ -782,6 +814,15 @@ export interface WorldStateData {
   // craft, shop, travel, combat results, etc.). Pushed by world-store
   // helpers so every UI feedback message lives in one place.
   actionLog: ActionLogEntry[];
+
+  // Player gender. Set at character creation (StartScreen) and used by
+  // sect membership conditions + dialog gating.
+  gender: Gender;
+
+  // Sect membership state, keyed by SectId. Empty when the player isn't a
+  // disciple anywhere yet. Joining a sect adds an entry seeded with the
+  // sect's starting rank (e.g. Shaolin = 9).
+  sectMembership: Partial<Record<SectId, SectMembership>>;
 }
 
 export interface ActionLogEntry {
@@ -799,3 +840,42 @@ export interface PendingSpar {
   npcId: string;
   fameReward: number;
 }
+
+// ─── Sect membership ──────────────────────────────────────────────────
+// A player can join one or more sects (currently only Shaolin in code,
+// extensible). Membership tracks rank (lower number = higher prestige —
+// for Shaolin: 9 → 1), accumulated sect points (spent to upgrade rank),
+// per-quest cooldowns (sect quests are repeatable every N days), and the
+// pool of one-time art quests already redeemed plus rank-tier rewards
+// already chosen (so a "rank 9 can pick a T1 skill" reward isn't claimed
+// twice).
+export interface SectMembership {
+  // Current rank — semantics defined per-sect in SECT_MEMBERSHIPS.
+  // For Shaolin the table runs 9 (entry) → 1 (top).
+  rank: number;
+  // Accumulated sect points (spent on rank upgrades).
+  points: number;
+  // Map of sect quest id → last completion `day`. Used to gate the next
+  // re-offer (sect quest is offerable when day - lastQuestDay >= cooldown).
+  lastQuestDay: Record<string, number>;
+  // Art quest ids already completed (one-shot per art quest).
+  artQuestsDone: string[];
+  // Reward picks already claimed at each rank — keyed by `rank-skill` or
+  // `rank-art` to allow at most one move-skill pick AND one art pick per
+  // rank tier.
+  rewardPicks: Record<string, string>;
+  // Day the player joined — informational (welcome screen / profile).
+  joinedDay: number;
+}
+
+export type SectId = "shaolin";
+
+// ─── Character gender ─────────────────────────────────────────────────
+// Used by sect membership conditions (e.g. Shaolin admits men only) and
+// future content (some sects may require female disciples).
+export type Gender = "male" | "female";
+
+export const GENDER_LABEL: Record<Gender, string> = {
+  male: "ชาย",
+  female: "หญิง",
+};

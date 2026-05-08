@@ -128,11 +128,19 @@ export type EnemyEffect =
   | { t: "debuff_eva"; v: number; u: number }
   | { t: "debuff_acc"; v: number; u: number }
   | { t: "debuff_def"; v: number; u: number }
+  | { t: "debuff_atk"; v: number; u: number }
   | { t: "debuff_poison"; pp: number; u: number; ev: number }
   | { t: "multi_debuff"; av: number; ev: number; u: number }
   | { t: "heavy_poison"; pp: number; u: number; av: number; ev: number }
   | { t: "drain_mp"; v: number }
-  | { t: "dispel"; acc: number; u: number };
+  | { t: "dispel"; acc: number; u: number }
+  // เผาไหม้ — DoT ทั้ง HP และ MP. `dmg` = % ของ max HP ต่อเทิร์น,
+  // `mp` = % ของ max MP ต่อเทิร์น. ใช้ใน tickEffects ตามจำนวน u.
+  | { t: "burn_hp_mp"; dmg: number; mp: number; u: number }
+  // สตัน — บล็อก action เป้าหมายเป็นเวลา u เทิร์น โดยมีโอกาส ch%
+  // ที่ทำให้ติดสถานะตอนใช้สกิล. ตรวจที่ต้นรอบของ resolveSkill /
+  // resolveArtActive เพื่อข้ามตา.
+  | { t: "stun"; u: number; ch: number };
 
 // ─── Skill definition (SP table) ───────────────────────────────────────
 
@@ -154,6 +162,10 @@ export interface Skill {
   f: number; // flat add
   dm: number; // damage multiplier
   dr?: number; // life-drain % of damage dealt
+  // VIT-scaled flat damage rider. When set, the skill's flat damage gains
+  // `vitScale × caster.VIT` (combined stats) — designed for vit-bruiser
+  // signature moves (อรหันต์พันกร). Read by `calcSkillDamage`.
+  vitScale?: number;
   se: SelfEffect | null;
   ee: EnemyEffect | null;
   d: string; // description
@@ -321,10 +333,15 @@ export interface DebuffRecord {
     | "debuff_acc"
     | "debuff_eva"
     | "debuff_def"
-    | "debuff_poison";
+    | "debuff_atk"
+    | "debuff_poison"
+    | "burn_hp_mp"
+    | "stun";
   n?: string;
   v?: number;
   pp?: number;
+  // burn_hp_mp uses `pp` (HP %) + `mpp` (MP %) per tick.
+  mpp?: number;
   u: number;
 }
 

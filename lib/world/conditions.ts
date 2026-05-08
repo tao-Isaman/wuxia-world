@@ -40,6 +40,15 @@ export function evaluateCondition(state: WorldStateData, c: Condition): boolean 
       return state.assassinatedNpcIds.includes(c.npcId);
     case "kidnappedNpc":
       return state.kidnappedNpcIds.includes(c.npcId);
+    case "gender":
+      return state.gender === c.equals;
+    case "sectMember":
+      return state.sectMembership[c.sectId] != null;
+    case "sectRankAtLeast": {
+      const m = state.sectMembership[c.sectId];
+      if (!m) return false;
+      return m.rank <= c.maxRank;
+    }
     case "and":
       return c.all.every((sub) => evaluateCondition(state, sub));
     case "or":

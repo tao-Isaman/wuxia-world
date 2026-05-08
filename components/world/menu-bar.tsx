@@ -11,6 +11,7 @@ import { MoveSkillsPopup } from "./popups/move-skills-popup";
 import { LifeSkillsPopup } from "./popups/life-skills-popup";
 import { ActionLogPopup } from "./popups/action-log-popup";
 import { QuestLogPopup } from "./popups/quest-log-popup";
+import { SectMembershipPopup } from "./popups/sect-membership-popup";
 
 type PopupId =
   | "profile"
@@ -18,6 +19,7 @@ type PopupId =
   | "moves"
   | "lifeskills"
   | "quests"
+  | "sect"
   | "log"
   | null;
 
@@ -40,11 +42,14 @@ export function MenuBar() {
   const activeQuestCount = useWorldStore(
     (s) => Object.values(s.quests).filter((q) => q.status === "active").length,
   );
+  const sectCount = useWorldStore(
+    (s) => Object.values(s.sectMembership).filter((m) => m).length,
+  );
 
   return (
     <>
       <Panel padding="p-2">
-        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+        <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
           <MenuTab
             label="โปรไฟล์"
             onClick={() => setOpen("profile")}
@@ -66,6 +71,11 @@ export function MenuBar() {
             onClick={() => setOpen("quests")}
             badge={activeQuestCount > 0 ? activeQuestCount : undefined}
           />
+          <MenuTab
+            label="สำนัก"
+            onClick={() => setOpen("sect")}
+            badge={sectCount > 0 ? sectCount : undefined}
+          />
           <MenuTab label="บันทึก" onClick={() => setOpen("log")} />
         </div>
       </Panel>
@@ -75,6 +85,7 @@ export function MenuBar() {
       <MoveSkillsPopup open={open === "moves"} onClose={close} />
       <LifeSkillsPopup open={open === "lifeskills"} onClose={close} />
       <QuestLogPopup open={open === "quests"} onClose={close} />
+      <SectMembershipPopup open={open === "sect"} onClose={close} />
       <ActionLogPopup open={open === "log"} onClose={close} />
     </>
   );

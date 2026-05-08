@@ -22,6 +22,8 @@ const KIND_LABEL: Record<string, string> = {
   travel:  "เดินทาง",
   combat:  "ต่อสู้",
   learn:   "เรียน",
+  quest:   "ภารกิจ",
+  sect:    "สำนัก",
 };
 
 const KIND_COLOR: Record<string, string> = {
@@ -34,6 +36,8 @@ const KIND_COLOR: Record<string, string> = {
   travel:  "border-blue-500/60 text-blue-700",
   combat:  "border-rose-500/60 text-rose-700",
   learn:   "border-indigo-500/60 text-indigo-700",
+  quest:   "border-yellow-600/60 text-yellow-800",
+  sect:    "border-vermilion/60 text-vermilion",
 };
 
 export function ActionLogPopup({ open, onClose }: Props) {

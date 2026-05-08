@@ -37,17 +37,46 @@ interface BuildOpts {
   artId?: string;
   artLevel?: number;
   skillIds?: (string | null)[];
+  // Extra inner arts the NPC has learned in addition to the primary
+  // `artId`. Each contributes its scaled stats + HP/MP via `combinedStats`
+  // (mirrors the player's learned-arts pool). Pair with `extraArtSlots`
+  // to also let the AI fire their actives during the fight.
+  learnedArtIds?: readonly string[];
+  // Per-art level (1..10). Primary art uses `artLevel` (legacy); every
+  // other entry in `learnedArtIds` falls back to 1 when missing here.
+  artLevels?: Record<string, number>;
+  // Art ids whose actives the NPC can fire during battle. These are
+  // appended as `art:xxx` slot strings AFTER the move-skill ids in
+  // `skillIds`, so the AI's slot walker dispatches them via
+  // resolveArtActive (each gets its own slot cooldown). The primary
+  // `artId` doesn't need to be listed — its passive triggers via
+  // ctx.artIds[side] regardless. Authors typically list the primary
+  // here too, though, so its active also rotates with the rest.
+  extraArtSlots?: readonly string[];
 }
 
 function build(name: string, tier: 0 | 1 | 2 | 3 | 4, opts: BuildOpts = {}): CharacterBuild {
   const baseSkills = opts.skillIds ?? ["basic_punch"];
+  const slotArts = opts.extraArtSlots ?? [];
+  const artSlotStrs = slotArts.map((aid) => `art:${aid}`);
+  // Concatenate skills first, then any extra art slots. Padding with nulls
+  // happens in `slots(...)` to reach the 10-slot target.
+  const allSlots = [...baseSkills, ...artSlotStrs];
+  // Build the canonical learnedArtIds set: primary + slotted + author-listed
+  // extras (deduped). All three contribute stats via combinedStats.
+  const primary = opts.artId && opts.artId !== "none" ? [opts.artId] : [];
+  const learned = Array.from(
+    new Set([...primary, ...(opts.learnedArtIds ?? []), ...slotArts]),
+  );
   return {
     name,
     stats: { ...TIER_STATS[tier], ...(opts.stats ?? {}) },
     artId: opts.artId ?? "none",
     artLevel: opts.artLevel ?? 1,
-    skillIds: slots(...baseSkills),
+    skillIds: slots(...allSlots),
     equipment: emptyEquip(),
+    learnedArtIds: learned,
+    artLevels: opts.artLevels,
   };
 }
 
@@ -276,6 +305,8 @@ export const OPPONENTS: readonly OpponentDef[] = [
     }) },
 
   // อาจารย์ฝาหมิง (sect_shaolin) — Shaolin elder, hard external palm work.
+  // Two arts: t1_goldenbell (primary, lv 6) + t0_lohan (lv 8) — defensive
+  // breath rotation typical of an elder monk.
   { id: "spar_shaolin_faming", name: "อาจารย์ฝาหมิง", ti: 3, category: "human",
     drops: [...DROPS_T3,
       { itemId: "man_sf", weight: 1 }, { itemId: "man_nd5", weight: 1 },
@@ -284,6 +315,145 @@ export const OPPONENTS: readonly OpponentDef[] = [
       stats: { STR: 8, VIT: 8, DEF: 7, POW: 5 },
       artId: "t1_goldenbell", artLevel: 6,
       skillIds: ["sf", "nd5", "ne1"],
+      extraArtSlots: ["t1_goldenbell", "t0_lohan"],
+      artLevels: { t1_goldenbell: 6, t0_lohan: 8 },
+    }) },
+
+  // ศิษย์เซวียนจี้ (sect_shaolin) — gatekeeper disciple. Light fist work.
+  { id: "spar_shaolin_xuanji", name: "ศิษย์เซวียนจี้", ti: 1, category: "human",
+    drops: [...DROPS_T1,
+      { itemId: "man_sf", weight: 1 }, { itemId: "man_t0_lohan", weight: 1 }],
+    build: () => build("ศิษย์เซวียนจี้", 1, {
+      stats: { STR: 4, VIT: 4 },
+      artId: "t0_lohan", artLevel: 3,
+      skillIds: ["sf", "sl_long_dharma"],
+    }) },
+
+  // ─── เส้าหลิน strong roster (T3-T4) — sparring against these is a real fight ─
+  // Stats are deliberately above TIER_STATS to make them genuinely fearsome.
+  // Each carries a near-max-level art + 4–5 Shaolin signature skills.
+
+  // หัวหน้าศิษย์หยวนเฉวียน (T3) — head disciple, balanced fist + sword.
+  // Two arts: t1_goldenbell (primary, lv 8) + t0_lohan (lv 6) — both
+  // defensive breaths layered for sustain.
+  { id: "spar_shaolin_yuanquan", name: "หัวหน้าศิษย์หยวนเฉวียน", ti: 3, category: "human",
+    drops: [...DROPS_T3,
+      { itemId: "man_sf", weight: 1 }, { itemId: "man_nd5", weight: 1 },
+      { itemId: "man_ne1", weight: 1 }, { itemId: "man_t1_goldenbell", weight: 1 }],
+    build: () => build("หัวหน้าศิษย์หยวนเฉวียน", 3, {
+      stats: { STR: 10, VIT: 10, DEF: 8, POW: 7, DEX: 7 },
+      artId: "t1_goldenbell", artLevel: 8,
+      skillIds: ["sf", "nd5", "ne1", "ne2"],
+      extraArtSlots: ["t1_goldenbell", "t0_lohan"],
+      artLevels: { t1_goldenbell: 8, t0_lohan: 6 },
+    }) },
+
+  // หลวงพ่อเซียนเหริน (T4) — zen master, Int / finger / sword.
+  // Three arts: t3_onefinger (primary, lv 10) + t1_goldenbell (lv 9) +
+  // t0_lohan (lv 10). Multi-art rotation lets the AI heal, lay defensive
+  // buffs, AND fire 一指禅 nukes in the same fight.
+  { id: "spar_shaolin_xianren", name: "หลวงพ่อเซียนเหริน", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "man_sf", weight: 1 }, { itemId: "man_nd5", weight: 1 },
+      { itemId: "man_ne1", weight: 1 }, { itemId: "man_ne2", weight: 1 },
+      { itemId: "ginseng", weight: 2 }, { itemId: "jade", weight: 1 }],
+    build: () => build("หลวงพ่อเซียนเหริน", 4, {
+      stats: { POW: 18, INT: 18, DEX: 15, AGI: 12, VIT: 10 },
+      artId: "t3_onefinger", artLevel: 10,
+      skillIds: ["nd5", "sl_zen_sword", "sl_petal_finger", "ne2"],
+      extraArtSlots: ["t3_onefinger", "t1_goldenbell", "t0_lohan"],
+      artLevels: { t3_onefinger: 10, t1_goldenbell: 9, t0_lohan: 10 },
+    }) },
+
+  // หลวงพ่อจูตี้ (T4) — staff master, hard-external Phy specialist.
+  // Stacking diamond's damage-reduction with sl_truth_staff's stun for
+  // a brutally durable lockdown fighter. Three arts: diamond (primary,
+  // lv 10) + tendon (lv 10) + t1_goldenbell (lv 9) — every breath layers
+  // on damage reduction or HP recovery.
+  { id: "spar_shaolin_juti", name: "หลวงพ่อจูตี้", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "man_sf", weight: 1 }, { itemId: "man_t1_goldenbell", weight: 1 },
+      { itemId: "wood_hard", weight: 3 }, { itemId: "iron_ingot", weight: 2 },
+      { itemId: "jade", weight: 1 }],
+    build: () => build("หลวงพ่อจูตี้", 4, {
+      stats: { STR: 18, VIT: 18, DEF: 15, DEX: 12, AGI: 8 },
+      artId: "diamond", artLevel: 10,
+      skillIds: ["sl_truth_staff", "sl_staff_dharma", "sl_staff_shaolin", "sl_rock_punch"],
+      extraArtSlots: ["diamond", "tendon", "t1_goldenbell"],
+      artLevels: { diamond: 10, tendon: 10, t1_goldenbell: 9 },
+    }) },
+
+  // หลวงพี่ใหญ่ฮุยเหมียว (T4) — dharma guardian, peak fist tank-bruiser.
+  // Tendon (易筋经) at lv 10 + sl_thousand_arms with vitScale 0.5 makes
+  // his VIT-stacked stat block hit like a freight train. Three arts:
+  // tendon (primary) + diamond + t1_goldenbell stack massive HP and
+  // damage-reduction layers — this monk does not die quietly.
+  { id: "spar_shaolin_huimiao", name: "หลวงพี่ใหญ่ฮุยเหมียว", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "man_sf", weight: 1 }, { itemId: "man_nd5", weight: 1 },
+      { itemId: "man_ne1", weight: 1 }, { itemId: "man_t1_goldenbell", weight: 1 },
+      { itemId: "ginseng", weight: 2 }, { itemId: "jade", weight: 2 },
+      { itemId: "wood_sacred", weight: 1 }],
+    build: () => build("หลวงพี่ใหญ่ฮุยเหมียว", 4, {
+      stats: { STR: 20, VIT: 20, DEF: 15, POW: 10, DEX: 8 },
+      artId: "tendon", artLevel: 10,
+      skillIds: ["sf", "ne1", "sl_thousand_arms", "sl_rock_punch"],
+      extraArtSlots: ["tendon", "diamond", "t1_goldenbell"],
+      artLevels: { tendon: 10, diamond: 10, t1_goldenbell: 9 },
+    }) },
+
+  // เจ้าอาวาสฮุยหยวน (T4) — *boss tier*. Top-of-game opponent. Stats blow
+  // past every other T4 sparring partner: VIT 30 (+ tendon's +20 + diamond's
+  // +25 = ~75 VIT total at lv 10) makes sl_thousand_arms' vitScale 0.5
+  // generate ~+37 flat damage per swing, and t4_demonsubduer's use_act
+  // passive snowballs ATK +24% per active. Six signature skills cover
+  // every range AND he carries the full top-tier art rotation: primary
+  // t4_demonsubduer + tendon + diamond + t3_onefinger + t1_goldenbell.
+  // The combined HP pool from learned arts pushes him over 5000 HP.
+  // Defeating him is endgame for the Shaolin path — sparFameReward 18
+  // is the highest in the game.
+  { id: "spar_shaolin_abbot_huiyuan", name: "เจ้าอาวาสฮุยหยวน", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "man_sf", weight: 1 }, { itemId: "man_nd5", weight: 1 },
+      { itemId: "man_ne1", weight: 1 }, { itemId: "man_ne2", weight: 1 },
+      { itemId: "man_t0_lohan", weight: 1 }, { itemId: "man_t1_goldenbell", weight: 1 },
+      { itemId: "ginseng", weight: 4 }, { itemId: "jade", weight: 4 },
+      { itemId: "ancient_coin", weight: 3 }, { itemId: "wood_sacred", weight: 2 },
+      { itemId: "mithril_ore", weight: 2 }],
+    build: () => build("เจ้าอาวาสฮุยหยวน", 4, {
+      stats: { STR: 22, VIT: 30, DEF: 20, POW: 22, INT: 18, DEX: 15, AGI: 14, LUK: 8 },
+      artId: "t4_demonsubduer", artLevel: 10,
+      skillIds: ["sl_thousand_arms", "sl_truth_staff", "sl_bodhi_palm", "sl_rock_punch", "ne1", "ne2"],
+      extraArtSlots: ["t4_demonsubduer", "tendon", "diamond", "t3_onefinger"],
+      artLevels: {
+        t4_demonsubduer: 10,
+        tendon: 10,
+        diamond: 10,
+        t3_onefinger: 10,
+        t1_goldenbell: 10,
+      },
+      learnedArtIds: ["t1_goldenbell"],
+    }) },
+
+  // รองเจ้าอาวาสลั่วฮั่น (T4) — vice-abbot. The second-strongest in the
+  // sect (behind only the abbot himself). Five skills covering fist +
+  // sword + staff + bodhi palm, with t4_demonsubduer's stack_atk passive
+  // turning every active into a snowballing ATK gain. Four arts:
+  // t4_demonsubduer (primary) + tendon + diamond + t1_goldenbell — every
+  // active fires use_act stack_atk so his damage spirals fast.
+  { id: "spar_shaolin_luohan", name: "รองเจ้าอาวาสลั่วฮั่น", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "man_sf", weight: 1 }, { itemId: "man_nd5", weight: 1 },
+      { itemId: "man_ne1", weight: 1 }, { itemId: "man_ne2", weight: 1 },
+      { itemId: "man_t0_lohan", weight: 1 }, { itemId: "man_t1_goldenbell", weight: 1 },
+      { itemId: "ginseng", weight: 3 }, { itemId: "jade", weight: 3 },
+      { itemId: "ancient_coin", weight: 2 }, { itemId: "mithril_ore", weight: 1 }],
+    build: () => build("รองเจ้าอาวาสลั่วฮั่น", 4, {
+      stats: { STR: 18, VIT: 18, DEF: 15, POW: 15, DEX: 12, AGI: 12 },
+      artId: "t4_demonsubduer", artLevel: 10,
+      skillIds: ["sl_thousand_arms", "sl_truth_staff", "sl_bodhi_palm", "ne1", "ne2"],
+      extraArtSlots: ["t4_demonsubduer", "tendon", "diamond", "t1_goldenbell"],
+      artLevels: { t4_demonsubduer: 10, tendon: 10, diamond: 10, t1_goldenbell: 9 },
     }) },
 
   // ชิวเฉียน (mt_kunlun) — Kunlun exile, sword-and-internal hermit style.
