@@ -33,6 +33,7 @@ export const QUESTS_SECTS_TEMPLES: readonly QuestDef[] = [
         { t: "not", of: { t: "sectMember", sectId: "wudang" } },
         { t: "not", of: { t: "sectMember", sectId: "huashan" } },
         { t: "not", of: { t: "sectMember", sectId: "quanzhen" } },
+        { t: "not", of: { t: "sectMember", sectId: "emei" } },
       ],
     },
     stages: [
@@ -415,6 +416,7 @@ export const QUESTS_SECTS_TEMPLES: readonly QuestDef[] = [
         { t: "not", of: { t: "sectMember", sectId: "shaolin" } },
         { t: "not", of: { t: "sectMember", sectId: "huashan" } },
         { t: "not", of: { t: "sectMember", sectId: "quanzhen" } },
+        { t: "not", of: { t: "sectMember", sectId: "emei" } },
       ],
     },
     stages: [
@@ -670,6 +672,7 @@ export const QUESTS_SECTS_TEMPLES: readonly QuestDef[] = [
         { t: "not", of: { t: "sectMember", sectId: "wudang" } },
         { t: "not", of: { t: "sectMember", sectId: "huashan" } },
         { t: "not", of: { t: "sectMember", sectId: "quanzhen" } },
+        { t: "not", of: { t: "sectMember", sectId: "emei" } },
       ],
     },
     stages: [
@@ -832,6 +835,7 @@ export const QUESTS_SECTS_TEMPLES: readonly QuestDef[] = [
         { t: "not", of: { t: "sectMember", sectId: "wudang" } },
         { t: "not", of: { t: "sectMember", sectId: "huashan" } },
         { t: "not", of: { t: "sectMember", sectId: "quanzhen" } },
+        { t: "not", of: { t: "sectMember", sectId: "emei" } },
       ],
     },
     stages: [
@@ -973,6 +977,174 @@ export const QUESTS_SECTS_TEMPLES: readonly QuestDef[] = [
       { t: "trait", trait: "humility", amount: 5 },
       { t: "sectPoints", sectId: "quanzhen", amount: 100 },
       { t: "npcRelationship", npcId: "sect_quanzhen_master_chongyang", amount: 10 },
+    ],
+  },
+
+  // ──────────────────────────────────────────────────────────────────────
+  // ง้อไบ๊ — ท่านนิ้วห้วนจิงฉาน (Buddhist nun sect — women only)
+  // ──────────────────────────────────────────────────────────────────────
+
+  // 0. INTRO — ขอเข้าเป็นศิษย์ (disciple registration intro)
+  // Same herb-gathering trial as Shaolin but the convent admits women
+  // only. Reward chain seeds rank-9 membership + 20 sect points.
+  {
+    id: "qst_emei_disciple_intro",
+    name: "ขอเข้าเป็นศิษย์ง้อไบ๊",
+    description: "ท่านนิ้วจิงฉานรับเฉพาะศิษย์หญิงที่มีจิตใจเมตตา — เก็บสมุนไพรหลากชนิดมาให้ห้องยาของวัดเพื่อพิสูจน์ความเพียร · สมุนไพรหายาก 10 · โสม 10 · เม็ดบัว 10",
+    briefSummary: "ส่งสมุนไพรหายาก 10 + โสม 10 + เม็ดบัว 10 เข้าเป็นศิษย์ง้อไบ๊ขั้นที่ 9",
+    type: "side",
+    giverNpcId: "sect_emei_abbess_jingchan",
+    prereqs: {
+      t: "and",
+      all: [
+        { t: "gender", equals: "female" },
+        { t: "trait", trait: "evil", max: 10 },
+        { t: "not", of: { t: "sectMember", sectId: "shaolin" } },
+        { t: "not", of: { t: "sectMember", sectId: "wudang" } },
+        { t: "not", of: { t: "sectMember", sectId: "huashan" } },
+        { t: "not", of: { t: "sectMember", sectId: "quanzhen" } },
+        { t: "not", of: { t: "sectMember", sectId: "emei" } },
+      ],
+    },
+    stages: [
+      {
+        id: "gather_herbs",
+        description: "เก็บสมุนไพรหายาก 10 ชิ้น + โสม 10 ราก + เม็ดบัว 10 เม็ด",
+        autoAdvance: {
+          t: "and",
+          all: [
+            { t: "hasItem", itemId: "herb", count: 10 },
+            { t: "hasItem", itemId: "ginseng", count: 10 },
+            { t: "hasItem", itemId: "lotus_seed", count: 10 },
+          ],
+        },
+      },
+      {
+        id: "return_to_abbess",
+        description: "นำสมุนไพรกลับไปถวายท่านนิ้วจิงฉาน",
+      },
+    ],
+    rewards: [
+      { t: "wExp", amount: 50 },
+      { t: "trait", trait: "humility", amount: 3 },
+      { t: "npcRelationship", npcId: "sect_emei_abbess_jingchan", amount: 5 },
+      { t: "joinSect", sectId: "emei" },
+      { t: "sectPoints", sectId: "emei", amount: 20 },
+    ],
+  },
+
+  // ──────────────────────────────────────────────────────────────────────
+  // ภารกิจประจำง้อไบ๊ — ทำซ้ำได้ทุก 30 วัน
+  // ──────────────────────────────────────────────────────────────────────
+
+  // SECT-1 · ลาดตระเวนรอบวัด — sect points 50 (rank 9–7)
+  {
+    id: "qst_emei_sect_patrol",
+    name: "ลาดตระเวนรอบวัดง้อไบ๊",
+    description: "ภารกิจประจำของศิษย์ง้อไบ๊ — ลาดตระเวนรอบวัดและช่วยเหลือผู้ที่หลงเข้ามาในเขต",
+    briefSummary: "ปราบโจรในเขตวัด 2 คน · sect points +50",
+    type: "side",
+    sectId: "emei",
+    giverNpcId: "sect_emei_abbess_jingchan",
+    prereqs: { t: "sectMember", sectId: "emei" },
+    stages: [
+      {
+        id: "patrol",
+        description: "ปราบโจรเร่ร่อน 2 คน",
+        autoAdvance: { t: "defeatedOpponent", opponentId: "thug", count: 2 },
+      },
+      {
+        id: "report",
+        description: "กลับไปรายงานท่านนิ้วจิงฉาน",
+      },
+    ],
+    rewards: [
+      { t: "gold", amount: 150 },
+      { t: "wExp", amount: 60 },
+      { t: "npcRelationship", npcId: "sect_emei_abbess_jingchan", amount: 3 },
+      { t: "sectPoints", sectId: "emei", amount: 50 },
+    ],
+  },
+
+  // SECT-2 · เก็บบัวหิมะ — sect points 60 (rank 9–6)
+  {
+    id: "qst_emei_sect_herb",
+    name: "เก็บสมุนไพรเขาง้อไบ๊",
+    description: "ห้องยาของง้อไบ๊ต้องการบัวหิมะและโสมเพื่อปรุงยารักษาศิษย์ที่บาดเจ็บ — เก็บมาให้ครบ",
+    briefSummary: "ส่งโสม 5 + บัวหิมะ 1 · sect points +60",
+    type: "side",
+    sectId: "emei",
+    giverNpcId: "sect_emei_abbess_jingchan",
+    prereqs: { t: "sectMember", sectId: "emei" },
+    stages: [
+      {
+        id: "gather",
+        description: "เก็บโสม 5 ราก + บัวหิมะ 1 ดอก",
+        autoAdvance: {
+          t: "and",
+          all: [
+            { t: "hasItem", itemId: "ginseng", count: 5 },
+            { t: "hasItem", itemId: "snow_lotus", count: 1 },
+          ],
+        },
+      },
+      {
+        id: "deliver",
+        description: "ส่งสมุนไพรให้ท่านนิ้วจิงฉาน",
+      },
+    ],
+    rewards: [
+      { t: "gold", amount: 100 },
+      { t: "wExp", amount: 50 },
+      { t: "npcRelationship", npcId: "sect_emei_abbess_jingchan", amount: 3 },
+      { t: "sectPoints", sectId: "emei", amount: 60 },
+    ],
+  },
+
+  // ──────────────────────────────────────────────────────────────────────
+  // ภารกิจวิชาในกาย — high sect quest, rank-gated. Awards bonus T4 art.
+  // ──────────────────────────────────────────────────────────────────────
+
+  // ART-1 · ตำราโพธิสัตว์ทรงพรต — unlock at rank 3, reward bonus T4 art
+  {
+    id: "qst_emei_art_bodhi",
+    name: "ตำราโพธิสัตว์ทรงพรต",
+    description: "ท่านนิ้วจิงฉานยอมเปิดตำราโพธิสัตว์ทรงพรตให้ศิษย์ที่ผ่านการพิสูจน์ทั้งดาบและจิตใจ — เป็นวิชาลับสุดยอดของง้อไบ๊",
+    briefSummary: "ฝึกโพธิสัตว์ทรงพรต — รับ T4 art ลับของง้อไบ๊",
+    type: "side",
+    sectId: "emei",
+    isArtQuest: true,
+    minSectRank: 3,
+    giverNpcId: "sect_emei_abbess_jingchan",
+    prereqs: {
+      t: "and",
+      all: [
+        { t: "sectMember", sectId: "emei" },
+        { t: "sectRankAtLeast", sectId: "emei", maxRank: 3 },
+      ],
+    },
+    stages: [
+      {
+        id: "trial_kill",
+        description: "พิสูจน์พลัง — ปราบหัวหน้าโจร (bandit_chief) 3 คน",
+        autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 3 },
+      },
+      {
+        id: "trial_mind",
+        description: "พิสูจน์จิตใจ — สะสมความถ่อมตนถึง 30",
+        autoAdvance: { t: "trait", trait: "humility", min: 30 },
+      },
+      {
+        id: "return_art",
+        description: "กลับไปรับตำราจากท่านนิ้วจิงฉาน",
+      },
+    ],
+    rewards: [
+      { t: "wExp", amount: 400 },
+      { t: "learnArt", artId: "t4_em_bodhi", level: 5 },
+      { t: "trait", trait: "humility", amount: 10 },
+      { t: "sectPoints", sectId: "emei", amount: 200 },
+      { t: "npcRelationship", npcId: "sect_emei_abbess_jingchan", amount: 20 },
     ],
   },
 

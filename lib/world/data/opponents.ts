@@ -700,6 +700,110 @@ export const OPPONENTS: readonly OpponentDef[] = [
       skillIds: ["qz_heavy_sword"],
     }) },
 
+  // ─── ง้อไบ๊ — sect leadership (T1-T4) ──────────────────────────────
+  // Buddhist nun sect — leadership tier matches Shaolin / Wudang. Yin /
+  // internal sword + fist with the bodhisattva-line capstone. Abbess
+  // Jingchan carries the full top-tier kit (4 arts + 6 skills).
+  { id: "spar_emei_abbess_jingchan", name: "ท่านนิ้วห้วนจิงฉาน", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "ginseng", weight: 4 }, { itemId: "snow_lotus", weight: 3 },
+      { itemId: "lotus_seed", weight: 4 }, { itemId: "jade", weight: 4 },
+      { itemId: "ancient_coin", weight: 3 }, { itemId: "wood_sacred", weight: 2 },
+      { itemId: "mithril_ore", weight: 1 }],
+    build: () => build("ท่านนิ้วห้วนจิงฉาน", 4, {
+      stats: { STR: 8, VIT: 22, DEF: 16, POW: 28, INT: 24, DEX: 14, AGI: 14, LUK: 8 },
+      artId: "t4_em_bodhi", artLevel: 10,
+      skillIds: ["em_bodhi_sword", "em_bodhi_palm", "em_plum_sword", "em_buddha_sword", "em_lotus_palm", "em_heart_palm"],
+      extraArtSlots: ["t4_em_bodhi", "emei", "t3_em_heart", "t3_em_grace"],
+      artLevels: { t4_em_bodhi: 10, emei: 10, t3_em_heart: 10, t3_em_grace: 10, t3_em_ice: 10 },
+      learnedArtIds: ["t3_em_ice"],
+    }) },
+
+  { id: "spar_emei_huimiao", name: "รองท่านนิ้วฮุยเหมียว", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "ginseng", weight: 3 }, { itemId: "lotus_seed", weight: 3 },
+      { itemId: "jade", weight: 3 }, { itemId: "ancient_coin", weight: 2 },
+      { itemId: "wood_sacred", weight: 2 }],
+    build: () => build("รองท่านนิ้วฮุยเหมียว", 4, {
+      stats: { POW: 22, INT: 18, VIT: 16, DEF: 12, DEX: 12, AGI: 12 },
+      artId: "emei", artLevel: 10,
+      skillIds: ["em_bodhi_palm", "em_plum_sword", "em_lotus_palm", "em_heart_palm", "em_blossom_sword"],
+      extraArtSlots: ["emei", "t3_em_heart", "t2_em_garland"],
+      artLevels: { emei: 10, t3_em_heart: 9, t2_em_garland: 9 },
+    }) },
+
+  { id: "spar_emei_qingxin", name: "ท่านนิ้วดาบชิงซิน", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "jade", weight: 3 }, { itemId: "iron_ore", weight: 2 },
+      { itemId: "ancient_coin", weight: 2 }],
+    build: () => build("ท่านนิ้วดาบชิงซิน", 4, {
+      stats: { POW: 18, INT: 14, DEX: 16, AGI: 14, STR: 8 },
+      artId: "t3_em_grace", artLevel: 9,
+      skillIds: ["em_bodhi_sword", "em_plum_sword", "em_buddha_sword", "em_blossom_sword"],
+      extraArtSlots: ["t3_em_grace", "t2_em_garland"],
+      artLevels: { t3_em_grace: 9, t2_em_garland: 9 },
+    }) },
+
+  { id: "spar_emei_huiyu", name: "ท่านนิ้วฝ่ามือฮุยอวี้", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "ginseng", weight: 4 }, { itemId: "lotus_seed", weight: 3 },
+      { itemId: "jade", weight: 2 }],
+    build: () => build("ท่านนิ้วฝ่ามือฮุยอวี้", 4, {
+      stats: { POW: 18, INT: 16, VIT: 12, DEX: 8 },
+      artId: "t4_em_bodhi", artLevel: 9,
+      skillIds: ["em_bodhi_palm", "em_lotus_palm", "em_heart_palm"],
+      extraArtSlots: ["t4_em_bodhi", "t3_em_heart"],
+      artLevels: { t4_em_bodhi: 9, t3_em_heart: 9 },
+    }) },
+
+  { id: "spar_emei_yuxin", name: "หมอนิ้วอวี้ซิน", ti: 3, category: "human",
+    drops: [...DROPS_T3,
+      { itemId: "herb", weight: 5 }, { itemId: "ginseng", weight: 4 },
+      { itemId: "snow_lotus", weight: 2 }, { itemId: "potion_mid", weight: 3 }],
+    build: () => build("หมอนิ้วอวี้ซิน", 3, {
+      stats: { POW: 14, INT: 14, VIT: 10, DEX: 6 },
+      artId: "t3_em_heart", artLevel: 8,
+      skillIds: ["em_heart_sword", "em_heart_palm", "em_lotus_palm"],
+      extraArtSlots: ["t3_em_heart", "t2_em_garland"],
+      artLevels: { t3_em_heart: 8, t2_em_garland: 7 },
+    }) },
+
+  { id: "spar_emei_zhihui", name: "หัวหน้าศิษย์จื้อฮุย", ti: 2, category: "human",
+    drops: [...DROPS_T2,
+      { itemId: "herb", weight: 3 }, { itemId: "lotus_seed", weight: 2 }],
+    build: () => build("หัวหน้าศิษย์จื้อฮุย", 2, {
+      stats: { POW: 9, INT: 7, DEX: 6 },
+      artId: "t2_em_garland", artLevel: 6,
+      skillIds: ["em_blossom_sword", "em_heart_sword", "em_graceful_sword"],
+      extraArtSlots: ["t2_em_garland"],
+      artLevels: { t2_em_garland: 6 },
+    }) },
+
+  { id: "spar_emei_xiaoyu", name: "ศิษย์เสี่ยวอวี้", ti: 2, category: "human",
+    drops: [...DROPS_T2,
+      { itemId: "herb", weight: 2 }],
+    build: () => build("ศิษย์เสี่ยวอวี้", 2, {
+      stats: { POW: 7, INT: 6, DEX: 5 },
+      artId: "t1_em_lotus", artLevel: 5,
+      skillIds: ["em_lotus_palm", "em_blossom_sword"],
+    }) },
+
+  { id: "spar_emei_lingxin", name: "ศิษย์หลิงซิน", ti: 1, category: "human",
+    drops: [...DROPS_T1],
+    build: () => build("ศิษย์หลิงซิน", 1, {
+      stats: { POW: 5, DEX: 4 },
+      artId: "t0_em_meditation", artLevel: 4,
+      skillIds: ["em_graceful_sword"],
+    }) },
+
+  { id: "spar_emei_yujie", name: "ศิษย์อวี้เจี๋ย", ti: 1, category: "human",
+    drops: [...DROPS_T1],
+    build: () => build("ศิษย์อวี้เจี๋ย", 1, {
+      stats: { POW: 4, AGI: 4 },
+      artId: "t0_em_meditation", artLevel: 3,
+      skillIds: ["em_graceful_sword"],
+    }) },
+
   // ชิวเฉียน (mt_kunlun) — Kunlun exile, sword-and-internal hermit style.
   { id: "spar_kunlun_qiu", name: "ชิวเฉียน", ti: 3, category: "human",
     drops: [...DROPS_T3,

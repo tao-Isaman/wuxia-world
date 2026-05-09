@@ -266,11 +266,72 @@ const QUANZHEN: SectMembershipDef = {
   questCooldownDays: 30,
 };
 
+// Emei disciple ranks. Big Buddhist nun sect — leadership tier matches
+// Shaolin / Wudang (T4 master). Women only — the abbess turns away men
+// at the gate. Yin / internal sword + fist combat identity, with the
+// bodhisattva-line palm + sword as the T4 capstones and a healing-art
+// focus throughout (heart / lotus / ice breath).
+//
+// Reward layout:
+//   rank 9 → T0 sword + T0 art (gifted on registration)
+//   rank 8 → T1 sword (auto)
+//   rank 7 → T1 art (auto)
+//   rank 6 → T2 art (auto)
+//   rank 5 → choose T3 sword (Buddha-method vs plum-blossom)
+//   rank 4 → choose T3 art (heart vs grace vs ice breath)
+//   rank 3 → choose T4 weapon (bodhi palm vs bodhi-guardian sword)
+//   rank 2 → choose T4 art — ascetic bodhisattva OR the older shengong
+const EMEI: SectMembershipDef = {
+  id: "emei",
+  name: "ง้อไบ๊",
+  hallLocationId: "sect_emei",
+  registrarNpcId: "sect_emei_abbess_jingchan",
+  // Women only — the convent admits no men. Trait gate matches the
+  // other sects (no truly wicked admitted).
+  joinRequirements: {
+    t: "and",
+    all: [
+      { t: "gender", equals: "female" },
+      { t: "trait", trait: "evil", max: 10 },
+    ],
+  },
+  startRank: 9,
+  topRank: 1,
+  rankUpCost: (targetRank) => {
+    const table: Record<number, number> = {
+      8: 100,
+      7: 200,
+      6: 350,
+      5: 500,
+      4: 700,
+      3: 1000,
+      2: 1400,
+      1: 2000,
+    };
+    return table[targetRank] ?? Infinity;
+  },
+  skillsByRank: {
+    9: ["em_graceful_sword"],   // T0 sword — auto on join
+    8: ["em_blossom_sword"],    // T1 sword — auto
+    5: ["em_buddha_sword", "em_plum_sword"], // T3 sword — choice
+    3: ["em_bodhi_palm", "em_bodhi_sword"],  // T4 capstone — choice
+  },
+  artsByRank: {
+    9: ["t0_em_meditation"],    // T0 art — auto on join
+    7: ["t1_em_lotus"],         // T1 art — auto
+    6: ["t2_em_garland"],       // T2 art — auto
+    4: ["t3_em_heart", "t3_em_grace", "t3_em_ice"], // T3 — choice
+    2: ["t4_em_bodhi", "emei"], // T4 capstone — choice (ascetic vs older)
+  },
+  questCooldownDays: 30,
+};
+
 export const SECT_MEMBERSHIPS: Record<SectId, SectMembershipDef> = {
   shaolin: SHAOLIN,
   wudang: WUDANG,
   huashan: HUASHAN,
   quanzhen: QUANZHEN,
+  emei: EMEI,
 };
 
 // Helper: rewards (skill + art ids) the player is *eligible* to pick at a
