@@ -29,6 +29,68 @@ import {
   describeBuff,
   describeDebuff,
 } from "./buff-descriptions";
+import { SkillIcon, ArtIcon } from "./skill-icon";
+import { SkillTooltip, ArtTooltip } from "../world/skill-tooltip";
+
+// Compact icon-first action button used in the player's skill bar
+// during battle. Wrapped externally with SkillTooltip / ArtTooltip for
+// hover details. Shows CD overlay + MP-short tint when needed; clicking
+// fires the underlying useSkill / useArtActive action.
+function SkillButton({
+  icon,
+  disabled,
+  onClick,
+  cd,
+  mpInfo,
+  mpShort,
+  isArt,
+}: {
+  icon: React.ReactNode;
+  disabled: boolean;
+  onClick: () => void;
+  cd: number;
+  mpInfo?: string;
+  mpShort?: boolean;
+  isArt?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={onClick}
+      className={cn(
+        "relative inline-flex items-center justify-center p-0.5",
+        "border-2 border-ink/80 transition-all",
+        isArt
+          ? "bg-emerald-50 hover:bg-emerald-100 hover:border-emerald-700"
+          : "bg-card hover:bg-muted/40 hover:border-vermilion",
+        disabled && "opacity-40 cursor-not-allowed",
+        !disabled && "cursor-pointer hover:scale-105",
+      )}
+      aria-label={isArt ? "ใช้วิชาในกาย" : "ใช้วิชา"}
+    >
+      {icon}
+      {/* CD overlay — covers icon with semi-transparent black + count */}
+      {cd > 0 && (
+        <span className="absolute inset-0 flex items-center justify-center bg-black/65 text-white font-bold text-lg">
+          {cd}
+        </span>
+      )}
+      {/* MP indicator — small badge bottom-left for arts */}
+      {mpInfo && (
+        <span
+          className={cn(
+            "absolute -bottom-1 -left-1 px-1 py-0 text-[8px] leading-none rounded",
+            "bg-emerald-700 text-white border border-emerald-900",
+            mpShort && !cd && "bg-rose-700 border-rose-900",
+          )}
+        >
+          {mpInfo}
+        </span>
+      )}
+    </button>
+  );
+}
 
 // Animation timing for per-hit HP drain — must stay in sync with the
 // damage-pop CSS keyframe + emitCast's CAST_NAME_MS / CAST_HIT_STAGGER_MS
@@ -435,7 +497,7 @@ export function BattleArena({ mode = "free", onContinue }: BattleArenaProps) {
           <p className="text-xs text-center text-muted-foreground">
             เลือกวิชา: <strong>{displayA.name}</strong>
           </p>
-          <div className="flex gap-2 justify-center flex-wrap">
+          <div className="flex gap-1.5 justify-center flex-wrap">
             {displayA.skillIds.map((raw, i) => {
               if (!raw) return null;
               const info = parseSlotId(raw);
@@ -448,71 +510,44 @@ export function BattleArena({ mode = "free", onContinue }: BattleArenaProps) {
                 if (!art.act) return null;
                 const mpShort = state.mpA < art.act.c;
                 return (
-                  <Button
-                    key={i}
-                    size="sm"
-                    disabled={onCd || mpShort}
-                    onClick={() => useSkill(i)}
-                    className="flex-col h-auto py-2 min-w-[82px] bg-emerald-100 hover:bg-emerald-200 text-emerald-900 border border-emerald-700"
-                  >
-                    <span className="font-semibold text-xs">⚡ {art.act.n}</span>
-                    <span className="text-[9px]">
-                      MP {art.act.c}/{state.mpA}{" "}
-                      {onCd ? (
-                        <Badge variant="destructive" className="text-[8px] px-1 py-0">
-                          CD {cd}
-                        </Badge>
-                      ) : (
-                        <span>CD{art.act.cd}</span>
-                      )}
-                    </span>
-                  </Button>
+                  <ArtTooltip key={i} art={art}>
+                    <SkillButton
+                      icon={<ArtIcon art={art} size={48} />}
+                      disabled={onCd || mpShort}
+                      onClick={() => useSkill(i)}
+                      cd={onCd ? cd : 0}
+                      mpInfo={`${art.act.c}/${state.mpA}`}
+                      mpShort={mpShort}
+                      isArt
+                    />
+                  </ArtTooltip>
                 );
               }
 
               const sk = info.skill;
               return (
-                <Button
-                  key={i}
-                  variant="outline"
-                  size="sm"
-                  disabled={onCd}
-                  onClick={() => useSkill(i)}
-                  className="flex-col h-auto py-2 min-w-[82px]"
-                >
-                  <span className="font-semibold text-xs">{sk.n}</span>
-                  <span className="text-[9px] text-muted-foreground">
-                    {sk.at === "phy" ? "⚔" : sk.at === "int" ? "💜" : sk.se ? "⟳" : "💥"} {WEAPON_FAMILY_LABEL[sk.w]}{" "}
-                    {onCd ? (
-                      <Badge variant="destructive" className="text-[8px] px-1 py-0">
-                        CD {cd}
-                      </Badge>
-                    ) : (
-                      <span>{TIERS[sk.ti].n}</span>
-                    )}
-                  </span>
-                </Button>
+                <SkillTooltip key={i} skill={sk}>
+                  <SkillButton
+                    icon={<SkillIcon skill={sk} size={48} />}
+                    disabled={onCd}
+                    onClick={() => useSkill(i)}
+                    cd={onCd ? cd : 0}
+                  />
+                </SkillTooltip>
               );
             })}
             {aA.act && (
-              <Button
-                size="sm"
-                disabled={!canIA}
-                onClick={useArtActive}
-                className="flex-col h-auto py-2 min-w-[82px] bg-emerald-100 hover:bg-emerald-200 text-emerald-900 border border-emerald-700"
-              >
-                <span className="font-semibold text-xs">⚡ {aA.act.n}</span>
-                <span className="text-[9px]">
-                  MP {aA.act.c}/{state.mpA}{" "}
-                  {state.iaCD.A > 0 ? (
-                    <Badge variant="destructive" className="text-[8px] px-1 py-0">
-                      CD {state.iaCD.A}
-                    </Badge>
-                  ) : (
-                    <span>CD{aA.act.cd}</span>
-                  )}
-                </span>
-              </Button>
+              <ArtTooltip art={aA}>
+                <SkillButton
+                  icon={<ArtIcon art={aA} size={48} />}
+                  disabled={!canIA}
+                  onClick={useArtActive}
+                  cd={state.iaCD.A}
+                  mpInfo={`${aA.act.c}/${state.mpA}`}
+                  mpShort={state.mpA < aA.act.c}
+                  isArt
+                />
+              </ArtTooltip>
             )}
           </div>
           {mode === "free" && (

@@ -11,6 +11,17 @@ const emptyLoadout = (): EquipLoadout => ({
   BR: [null, null], R: [null, null], C: [null, null],
 });
 
+// Force the slot array to exactly 10 entries: pad with nulls if short,
+// truncate if a stale persisted state ever drifted past 10. The /debug
+// "ช่อง" header reads `build.skillIds.length` directly, so a drifted
+// 11-slot array would surface as "11 ช่อง" even though every data
+// factory targets 10.
+const clampSlots = (ids: (string | null)[]): (string | null)[] => {
+  const out = ids.slice(0, 10);
+  while (out.length < 10) out.push(null);
+  return out;
+};
+
 const defaultBuild = (name: string): CharacterBuild => ({
   name,
   stats: { ...DEFAULT_STATS },
@@ -36,6 +47,12 @@ interface CharacterStore {
     idx: number | null,
     itemId: string | null,
   ) => void;
+  // Replace the entire build for a side. Used by the NPC preset
+  // dropdown in /debug to drop in a known opponent loadout (Shaolin
+  // abbot, dragon-phoenix master, etc.) without manually setting every
+  // slot. The build is shallow-copied so future store mutations don't
+  // touch the source object.
+  loadBuild: (side: Side, build: CharacterBuild) => void;
   reset: () => void;
 }
 
@@ -102,6 +119,29 @@ export const useCharacterStore = create<CharacterStore>()(
           return { builds: { ...s.builds, [side]: { ...cur, equipment: eq } } };
         }),
 
+      loadBuild: (side, build) =>
+        set((s) => ({
+          builds: {
+            ...s.builds,
+            // Shallow-copy + spread so the source object stays intact.
+            // Slot arrays are copied so per-slot edits in the UI don't
+            // mutate the canonical NPC data.
+            [side]: {
+              ...build,
+              skillIds: clampSlots(build.skillIds),
+              equipment: {
+                ...build.equipment,
+                BR: [...build.equipment.BR],
+                R: [...build.equipment.R],
+                C: [...build.equipment.C],
+              },
+              learnedSkillIds: [...(build.learnedSkillIds ?? [])],
+              learnedArtIds: [...(build.learnedArtIds ?? [])],
+              artLevels: { ...(build.artLevels ?? {}) },
+            },
+          },
+        })),
+
       reset: () =>
         set({
           builds: {
@@ -112,9 +152,11 @@ export const useCharacterStore = create<CharacterStore>()(
     }),
     {
       name: "wusia-character-v1",
-      version: 2,
+      version: 3,
       partialize: (s) => ({ builds: s.builds }),
       // v1 → v2: pad skillIds from 5 → 10 slots; seed learned arrays.
+      // v2 → v3: clamp skillIds to exactly 10 (fixes drift where the
+      //          array grew past 10 from earlier setSkillSlot bugs).
       migrate: (persisted) => {
         const p = (persisted ?? {}) as { builds?: Partial<Record<Side, CharacterBuild>> };
         const builds: Record<Side, CharacterBuild> = {
@@ -123,8 +165,7 @@ export const useCharacterStore = create<CharacterStore>()(
         };
         for (const side of ["A", "B"] as const) {
           const b = builds[side];
-          const slots = Array.isArray(b.skillIds) ? [...b.skillIds] : [];
-          while (slots.length < 10) slots.push(null);
+          const slots = clampSlots(Array.isArray(b.skillIds) ? b.skillIds : []);
           builds[side] = {
             ...b,
             skillIds: slots,

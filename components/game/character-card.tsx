@@ -10,6 +10,7 @@ import { DerivedStats } from "./derived-stats";
 import { ArtSelector } from "./art-selector";
 import { SkillSlots } from "./skill-slots";
 import { EquipmentSlots } from "./equipment-slots";
+import { NpcPresetSelector } from "./npc-preset-selector";
 
 interface Props {
   side: Side;
@@ -33,6 +34,7 @@ export function CharacterCard({ side }: Props) {
           onChange={(e) => setName(side, e.target.value)}
           className="font-semibold"
         />
+        <NpcPresetSelector side={side} />
         <StatSliders side={side} />
         <DerivedStats side={side} />
         <ArtSelector side={side} />
