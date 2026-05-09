@@ -644,7 +644,41 @@ export const SCENES_SECTS_TEMPLES: readonly Scene[] = [
       { t: "dialogue", speaker: "ฉงหยาง", text: "เจ้ามาด้วยความตั้งใจอันใด?" },
     ],
     choices: [
+      // Hidden hint — only visible to a Quanzhen disciple who has
+      // absorbed the sun art. Points players at the Ancient Tomb sect
+      // without spelling out the lock. Routes to a lore beat that
+      // explains Lin Chaoying's grudge against Wang Chongyang.
+      {
+        text: "ข้าได้ยินตำนานเรื่องสุสานข้ามภูเขา...",
+        next: "qs_quanzhen_master_gumu_hint",
+        visibleIf: {
+          t: "and",
+          all: [
+            { t: "sectMember", sectId: "quanzhen" },
+            { t: "learnedArt", artId: "t3_qz_sun" },
+            { t: "not", of: { t: "sectMember", sectId: "gumu" } },
+          ],
+        },
+      },
       { text: "แค่ทักทาย", next: "sect_quanzhen" },
+    ],
+  },
+
+  // Lore hint — Quanzhen master reveals the Lin Chaoying / Wang Chongyang
+  // history. Sets the player up to investigate sect_gumu directly.
+  {
+    kind: "dialog",
+    id: "qs_quanzhen_master_gumu_hint",
+    lines: [
+      { t: "narration", text: "อาจารย์ฉงหยางถอนหายใจเบา ๆ มองออกไปทางหุบเขาด้านเหนือ" },
+      { t: "dialogue", speaker: "ฉงหยาง", text: "เจ้ารู้ตำนานนี้แล้วหรือ... ใช่ ข้ามหุบเขาไปทางเหนือ มีสุสานโบราณตั้งอยู่ตรงข้ามวัดของเรา" },
+      { t: "dialogue", speaker: "ฉงหยาง", text: "หลินเฉาอิง — หญิงสาวที่เคยรักท่านอาจารย์ใหญ่หวังฉงหยางผู้ก่อตั้งฉวนเจิน เมื่อความรักของนางไม่ได้รับการตอบสนอง นางจึงสร้างสุสานนั้นขึ้น" },
+      { t: "dialogue", speaker: "ฉงหยาง", text: "ทุกวิชาในสุสานโบราณถูกออกแบบมาเพื่อรับและแซงหน้าวิชาฉวนเจิน — โดยเฉพาะหนึ่งพลังสุริยันต์ที่เจ้าฝึกอยู่" },
+      { t: "dialogue", speaker: "ฉงหยาง", text: "ว่ากันว่า... ผู้สืบทอดยังคงอยู่ที่นั่น เงียบ และแข็งแกร่งเกินคำบรรยาย หากเจ้าอยากรู้เพิ่ม เดินทางไปดูเองเถิด" },
+      { t: "dialogue", speaker: "ฉงหยาง", text: "แต่จงระวัง — ผู้ที่ก้าวเข้าไป มักไม่กลับออกมาเหมือนเดิม" },
+    ],
+    choices: [
+      { text: "ขอบพระคุณท่าน", next: "sect_quanzhen" },
     ],
   },
 
@@ -699,6 +733,40 @@ export const SCENES_SECTS_TEMPLES: readonly Scene[] = [
       { t: "narration", text: "รองอาจารย์หม่ายวี่ยืนนิ่งอยู่ข้างเสา ใบหน้าสงบเงียบ" },
       { t: "dialogue", speaker: "หม่ายวี่", text: "ดาบของฉวนเจินหนัก — เพราะใจของเจ้าต้องหนักแน่นกว่านั้น" },
       { t: "dialogue", speaker: "หม่ายวี่", text: "ฝึกซ้อมไม่ขาด แล้วเจ้าจะเข้าใจ" },
+    ],
+    choices: [
+      // Secondary hint — only after the player has the sun art. Mayu's
+      // angle is the personal warning rather than the historical lore.
+      {
+        text: "ปลายของวิชาสุริยันต์อยู่ที่ใด?",
+        next: "qs_quanzhen_vice_gumu_hint",
+        visibleIf: {
+          t: "and",
+          all: [
+            { t: "sectMember", sectId: "quanzhen" },
+            { t: "learnedArt", artId: "t3_qz_sun" },
+            { t: "not", of: { t: "sectMember", sectId: "gumu" } },
+          ],
+        },
+      },
+      { text: "แค่ทักทาย", next: "sect_quanzhen" },
+    ],
+  },
+
+  // Lore hint #2 — Mayu warns the player not pursue the cold path.
+  // Light foreshadowing without revealing the registrar.
+  {
+    kind: "dialog",
+    id: "qs_quanzhen_vice_gumu_hint",
+    lines: [
+      { t: "narration", text: "หม่ายวี่หรี่ตามองเจ้านิ่ง ๆ" },
+      { t: "dialogue", speaker: "หม่ายวี่", text: "เจ้าฝึกหนึ่งพลังสุริยันต์จนเจอกำแพงแล้วสิ — ใช่ไหม?" },
+      { t: "dialogue", speaker: "หม่ายวี่", text: "ปลายของแสง... อยู่ในเงา ปลายของไฟ... อยู่ในน้ำแข็ง พลังตรงข้ามนั้นเองที่จะปลดล็อกขั้นต่อไป" },
+      { t: "dialogue", speaker: "หม่ายวี่", text: "ข้ามภูเขาไปทางเหนือ มีสุสานเก่าตั้งอยู่ตรงข้ามวัด — แต่ข้าเตือนเจ้า หากเจ้าก้าวเข้าไปและรับวิชา เจ้าจะไม่เป็นศิษย์ฉวนเจินอีก" },
+      { t: "dialogue", speaker: "หม่ายวี่", text: "เลือกเอง... แต่จงเลือกอย่างมีสติ" },
+    ],
+    choices: [
+      { text: "ขอบคุณคำเตือน", next: "sect_quanzhen" },
     ],
   },
 
@@ -2036,6 +2104,109 @@ export const SCENES_SECTS_TEMPLES: readonly Scene[] = [
     lines: [
       { t: "dialogue", speaker: "ศิษย์เลิ่งเยว่", text: "สาวหยกสอนกระบี่เย็นเหมือนน้ำแข็ง — เจ้ารับไหวหรือ?" },
       { t: "narration", text: "เธอชักกระบี่ออกอย่างเงียบงัน อากาศรอบตัวเย็นลงทันที" },
+    ],
+    choices: [
+      // Hint #3 — for non-disciple Quanzhen members with the sun art.
+      // Lengyue points the player toward the inner chamber where the
+      // mystery woman waits. Closes the breadcrumb chain.
+      {
+        text: "ที่นี่มีอาจารย์อีกผู้หนึ่งหรือ?",
+        next: "qs_gumu_lengyue_hint",
+        visibleIf: {
+          t: "and",
+          all: [
+            { t: "sectMember", sectId: "quanzhen" },
+            { t: "learnedArt", artId: "t3_qz_sun" },
+            { t: "not", of: { t: "sectMember", sectId: "gumu" } },
+          ],
+        },
+      },
+      { text: "แค่ทักทาย", next: "sect_gumu" },
+    ],
+  },
+
+  // Lore hint #3 — Lengyue confirms the existence of her hidden master
+  // and points the player at the inner chamber. This is the breadcrumb
+  // that closes the loop: Quanzhen master → Quanzhen vice → here →
+  // mystery woman's intro quest.
+  {
+    kind: "dialog",
+    id: "qs_gumu_lengyue_hint",
+    lines: [
+      { t: "narration", text: "เลิ่งเยว่หยุดชะงัก สายตาเย็น ๆ ของเธอเปลี่ยนเป็นแววประหลาดใจ" },
+      { t: "dialogue", speaker: "ศิษย์เลิ่งเยว่", text: "เจ้าสัมผัสได้ถึงนาง? น่าประหลาด — ปกติศิษย์ฉวนเจินจะไม่เห็นแม้กระทั่งทางเข้าห้องลึก" },
+      { t: "dialogue", speaker: "ศิษย์เลิ่งเยว่", text: "ใช่... ในห้องลึกของสุสานนี้ มีท่านอาจารย์ของข้า — หญิงผู้สวมชุดขาว ผู้สืบทอดสายเลือดของหลินเฉาอิงโดยตรง" },
+      { t: "dialogue", speaker: "ศิษย์เลิ่งเยว่", text: "นางจะปรากฏแก่เจ้าเองหากเจ้าพร้อม จงเข้าไปด้านในและรอ — แต่จงเตรียมใจให้ดี เพราะนางเฉียบขาดยิ่งกว่าน้ำแข็ง" },
+    ],
+    choices: [
+      { text: "ขอบคุณ ข้าจะลองดู", next: "sect_gumu" },
+    ],
+  },
+
+  // Mystery woman ambient — appears at sect_gumu only for those who've
+  // walked the Quanzhen sun path. The scene itself doesn't gate (the
+  // NPC popup auto-routes here when the player initiates "talk"); the
+  // intro-quest prereq filters who can ACCEPT her quest.
+  //
+  // Lore beat: Lin Chaoying (หลินเฉาอิง) built the Ancient Tomb opposite
+  // Wang Chongyang's Quanzhen monastery on Mt. Zhongnan after losing in
+  // a contest of feelings. Every Gumu art is engineered to absorb and
+  // surpass its Quanzhen counterpart — which is why the player must
+  // walk the Quanzhen path first before the tomb opens to them.
+  {
+    kind: "dialog",
+    id: "npc_sect_gumu_mystery_woman_talk",
+    lines: [
+      { t: "narration", text: "ในห้องลึกของสุสาน หญิงสาวสวมชุดขาวบริสุทธิ์ยืนนิ่งหันหลังให้เจ้า สายตาเย็นเฉียบราวกับน้ำแข็ง" },
+      { t: "dialogue", speaker: "หญิงปริศนา", text: "เจ้ามาถึงที่นี่... แสดงว่าเจ้าได้สัมผัสปลายของวิชาสุริยันต์แห่งฉวนเจินแล้ว" },
+      { t: "dialogue", speaker: "หญิงปริศนา", text: "เจ้ารู้หรือไม่ว่าสุสานโบราณนี้สร้างขึ้นโดยผู้ใด?" },
+      { t: "narration", text: "นางหันหน้าครึ่งหนึ่ง สายลมเย็นพัดเส้นผมขาวยาวสะบัด" },
+      { t: "dialogue", speaker: "หญิงปริศนา", text: "หลินเฉาอิง — หญิงสาวผู้เคยรักหวังฉงหยาง ผู้ก่อตั้งฉวนเจิน" },
+      { t: "dialogue", speaker: "หญิงปริศนา", text: "เมื่อความรักของนางไม่ได้รับการตอบสนอง นางจึงสร้างสุสานโบราณนี้ขึ้นตรงข้ามกับวัดของฉวนเจิน เพื่อให้เป็นเงาสะท้อนของกันและกันชั่วนิรันดร์" },
+      { t: "dialogue", speaker: "หญิงปริศนา", text: "ทุกวิชาในกายาของสุสานโบราณ ถูกสร้างขึ้นเพื่อรับและแซงหน้าวิชาของฉวนเจิน — น้ำแข็งดับไฟ เงามืดกลืนแสง" },
+      { t: "dialogue", speaker: "หญิงปริศนา", text: "เพราะเหตุนั้น ผู้จะเข้าสู่สุสานนี้ต้องเดินทางตามเส้นทางของฉวนเจินถึงปลายเสียก่อน เจ้าถึงจะเข้าใจว่าน้ำแข็งกับไฟไม่ใช่สิ่งตรงข้าม — แต่เป็นใบหน้าสองด้านของพลังเดียวกัน" },
+    ],
+  },
+
+  // Disciple intro — offer beat (NPC popup auto-routes here after Accept).
+  // Pure narration: brief the trial. Mirrors the other sect intros.
+  {
+    kind: "dialog",
+    id: "qs_qst_gumu_disciple_intro_offer",
+    lines: [
+      { t: "narration", text: "หญิงปริศนาหันหน้ามาสบตาเจ้าเป็นครั้งแรก" },
+      { t: "dialogue", speaker: "หญิงปริศนา", text: "เจ้าต้องการเรียนวิชาน้ำแข็ง? ดี — แต่ก่อนอื่น เจ้าต้องสละพันธะกับฉวนเจินเสียก่อน" },
+      { t: "dialogue", speaker: "หญิงปริศนา", text: "พิสูจน์ฝีมือ — ปราบหัวหน้าโจร ๓ คน เพื่อแสดงว่าเจ้าไม่กลัวเลือด" },
+      { t: "dialogue", speaker: "หญิงปริศนา", text: "แล้วนำของถวาย — บัวหิมะ ๓ ดอก และแร่เทพ ๑ ก้อน เพื่อแสดงว่าเจ้าเข้าใจคุณค่าของของหายาก" },
+      { t: "dialogue", speaker: "หญิงปริศนา", text: "เมื่อครบแล้วกลับมา ข้าจะรับเจ้าเป็นศิษย์ — และเจ้าจะไม่เป็นศิษย์ฉวนเจินอีกต่อไป" },
+    ],
+    choices: [
+      { text: "ข้ายอมรับเงื่อนไข", next: "sect_gumu" },
+    ],
+  },
+
+  // Disciple intro — complete beat. Player has the offerings + kill count;
+  // choice fires finishQuest → reward chain leaves Quanzhen + joins Gumu.
+  {
+    kind: "dialog",
+    id: "qs_qst_gumu_disciple_intro_complete",
+    lines: [
+      { t: "narration", text: "เจ้าวางบัวหิมะและแร่เทพลงบนแท่นหินเย็นยะเยือกหน้าหญิงปริศนา" },
+      { t: "dialogue", speaker: "หญิงปริศนา", text: "ครบแล้ว... และดวงตาของเจ้ามีแววของผู้ที่พร้อมจะละทิ้งสิ่งเก่า" },
+      { t: "narration", text: "นางหยิบดวงไข่มุกหยกออกจากอก แล้วยื่นให้เจ้า" },
+      { t: "dialogue", speaker: "หญิงปริศนา", text: "ตั้งแต่บัดนี้ พันธะของเจ้ากับฉวนเจินสิ้นสุดลง — เจ้าคือศิษย์ของสุสานโบราณขั้นที่ ๓" },
+      { t: "dialogue", speaker: "หญิงปริศนา", text: "รับคัมภีร์สาวหยกเป็นวิชาแรก จงฝึกในความเงียบ" },
+    ],
+    choices: [
+      {
+        text: "น้อมรับและสัญญา",
+        next: "sect_gumu",
+        effects: [
+          { t: "takeItem", itemId: "snow_lotus", count: 3 },
+          { t: "takeItem", itemId: "mithril_ore", count: 1 },
+          { t: "finishQuest", questId: "qst_gumu_disciple_intro", success: true },
+        ],
+      },
     ],
   },
   {

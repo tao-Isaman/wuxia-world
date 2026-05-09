@@ -326,12 +326,58 @@ const EMEI: SectMembershipDef = {
   questCooldownDays: 30,
 };
 
+// Ancient Tomb sect (สุสานโบราณ / 古墓派). The secret sixth sect — only
+// 3 ranks (3 → 1) and a sole mystery-woman registrar. The intro quest
+// gates on prior Quanzhen membership + having learned t3_qz_sun (the
+// player must absorb the Quanzhen sun art first), and the registration
+// reward chain SWAPS the player's sect: leaveSect quanzhen → joinSect
+// gumu. So Gumu disciples are ex-Quanzhen by canon.
+//
+// `joinRequirements` here only matter for the membership-check helper
+// (e.g. /sect popups). The real gate lives in the intro quest's prereq.
+//
+// Reward layout:
+//   rank 3 → ynxj T3 art (gifted on registration — the entry breath)
+//   rank 2 → t4_gm_iceweave T4 art (auto on rank-up)
+//   rank 1 → choose T4 capstone — winterstep art OR ansh skill
+const GUMU: SectMembershipDef = {
+  id: "gumu",
+  name: "กู่มู่",
+  hallLocationId: "sect_gumu",
+  registrarNpcId: "sect_gumu_mystery_woman",
+  // Same trait gate as the others — even the ancient tomb won't take
+  // the truly wicked. The real lore-gate (Quanzhen membership + sun
+  // art learned) lives in the intro quest's prereqs.
+  joinRequirements: { t: "trait", trait: "evil", max: 10 },
+  startRank: 3,
+  topRank: 1,
+  // Only 3 ranks total. Steeper costs since the climb is short and the
+  // rewards are all T3-T4 disciple-line.
+  rankUpCost: (targetRank) => {
+    const table: Record<number, number> = {
+      2: 400,
+      1: 1200,
+    };
+    return table[targetRank] ?? Infinity;
+  },
+  skillsByRank: {
+    1: ["ansh"], // T4 ansh as alternate top reward
+  },
+  artsByRank: {
+    3: ["ynxj"],            // T3 — gifted on registration (entry breath)
+    2: ["t4_gm_iceweave"],  // T4 — auto on rank-up
+    1: ["t4_gm_winterstep"], // T4 — auto on rank 1 (paired with ansh skill pick)
+  },
+  questCooldownDays: 30,
+};
+
 export const SECT_MEMBERSHIPS: Record<SectId, SectMembershipDef> = {
   shaolin: SHAOLIN,
   wudang: WUDANG,
   huashan: HUASHAN,
   quanzhen: QUANZHEN,
   emei: EMEI,
+  gumu: GUMU,
 };
 
 // Helper: rewards (skill + art ids) the player is *eligible* to pick at a

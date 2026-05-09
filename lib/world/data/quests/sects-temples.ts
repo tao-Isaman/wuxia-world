@@ -34,6 +34,7 @@ export const QUESTS_SECTS_TEMPLES: readonly QuestDef[] = [
         { t: "not", of: { t: "sectMember", sectId: "huashan" } },
         { t: "not", of: { t: "sectMember", sectId: "quanzhen" } },
         { t: "not", of: { t: "sectMember", sectId: "emei" } },
+        { t: "not", of: { t: "sectMember", sectId: "gumu" } },
       ],
     },
     stages: [
@@ -417,6 +418,7 @@ export const QUESTS_SECTS_TEMPLES: readonly QuestDef[] = [
         { t: "not", of: { t: "sectMember", sectId: "huashan" } },
         { t: "not", of: { t: "sectMember", sectId: "quanzhen" } },
         { t: "not", of: { t: "sectMember", sectId: "emei" } },
+        { t: "not", of: { t: "sectMember", sectId: "gumu" } },
       ],
     },
     stages: [
@@ -673,6 +675,7 @@ export const QUESTS_SECTS_TEMPLES: readonly QuestDef[] = [
         { t: "not", of: { t: "sectMember", sectId: "huashan" } },
         { t: "not", of: { t: "sectMember", sectId: "quanzhen" } },
         { t: "not", of: { t: "sectMember", sectId: "emei" } },
+        { t: "not", of: { t: "sectMember", sectId: "gumu" } },
       ],
     },
     stages: [
@@ -836,6 +839,7 @@ export const QUESTS_SECTS_TEMPLES: readonly QuestDef[] = [
         { t: "not", of: { t: "sectMember", sectId: "huashan" } },
         { t: "not", of: { t: "sectMember", sectId: "quanzhen" } },
         { t: "not", of: { t: "sectMember", sectId: "emei" } },
+        { t: "not", of: { t: "sectMember", sectId: "gumu" } },
       ],
     },
     stages: [
@@ -1004,6 +1008,7 @@ export const QUESTS_SECTS_TEMPLES: readonly QuestDef[] = [
         { t: "not", of: { t: "sectMember", sectId: "huashan" } },
         { t: "not", of: { t: "sectMember", sectId: "quanzhen" } },
         { t: "not", of: { t: "sectMember", sectId: "emei" } },
+        { t: "not", of: { t: "sectMember", sectId: "gumu" } },
       ],
     },
     stages: [
@@ -1145,6 +1150,104 @@ export const QUESTS_SECTS_TEMPLES: readonly QuestDef[] = [
       { t: "trait", trait: "humility", amount: 10 },
       { t: "sectPoints", sectId: "emei", amount: 200 },
       { t: "npcRelationship", npcId: "sect_emei_abbess_jingchan", amount: 20 },
+    ],
+  },
+
+  // ──────────────────────────────────────────────────────────────────────
+  // กู่มู่ — สุสานโบราณ (secret sect, defection from Quanzhen)
+  // ──────────────────────────────────────────────────────────────────────
+
+  // 0. INTRO — ขอเข้าเป็นศิษย์ (secret-sect defection from Quanzhen)
+  // Hidden gate. The mystery woman only offers this to a player who is
+  // ALREADY a Quanzhen disciple AND has learned the t3_qz_sun art (so
+  // they understand the sun path's limit and what lies beyond it). The
+  // reward chain swaps sect: leaveSect quanzhen → joinSect gumu.
+  {
+    id: "qst_gumu_disciple_intro",
+    name: "เส้นทางสู่สุสานโบราณ",
+    description: "หญิงปริศนาในสุสานโบราณบอกใบ้ว่า — เจ้าได้ฝึกหนึ่งพลังสุริยันต์ของฉวนเจินแล้ว แต่ปลายของวิชาสุริยันต์มีเพียงน้ำแข็งเย็นเฉียบรออยู่ · พิสูจน์ใจของเจ้า แล้วนางจะเปิดประตูสุสานให้",
+    briefSummary: "พิสูจน์ใจ — รับเข้าเป็นศิษย์สุสานโบราณ (สละจากฉวนเจิน)",
+    type: "side",
+    giverNpcId: "sect_gumu_mystery_woman",
+    prereqs: {
+      t: "and",
+      all: [
+        { t: "sectMember", sectId: "quanzhen" },
+        { t: "learnedArt", artId: "t3_qz_sun" },
+        { t: "trait", trait: "evil", max: 10 },
+        // Not already in any other sect's secret line
+        { t: "not", of: { t: "sectMember", sectId: "gumu" } },
+      ],
+    },
+    stages: [
+      {
+        id: "trial_blade",
+        description: "พิสูจน์ฝีมือ — ปราบหัวหน้าโจร (bandit_chief) 3 คน",
+        autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 3 },
+      },
+      {
+        id: "trial_offering",
+        description: "นำของถวาย — เก็บบัวหิมะ 3 ดอก + แร่เทพ 1 ก้อน",
+        autoAdvance: {
+          t: "and",
+          all: [
+            { t: "hasItem", itemId: "snow_lotus", count: 3 },
+            { t: "hasItem", itemId: "mithril_ore", count: 1 },
+          ],
+        },
+      },
+      {
+        id: "return_to_woman",
+        description: "กลับไปพบหญิงปริศนาในสุสานโบราณ",
+      },
+    ],
+    rewards: [
+      { t: "wExp", amount: 300 },
+      // Sect swap: leave Quanzhen FIRST, then join Gumu. Order matters
+      // — joinSect is idempotent and would no-op if already a member,
+      // but leaveSect must precede joinSect so the cross-sect-loyalty
+      // condition isn't violated mid-reward-chain.
+      { t: "leaveSect", sectId: "quanzhen" },
+      { t: "joinSect", sectId: "gumu" },
+      { t: "trait", trait: "humility", amount: 5 },
+      { t: "npcRelationship", npcId: "sect_gumu_mystery_woman", amount: 20 },
+    ],
+  },
+
+  // SECT-1 · เก็บของวัตถุดิบ — sect points 80 (sole sect quest)
+  // Gumu has only one repeatable sect quest by design — the secret sect
+  // doesn't need a quest grind to climb (only 3 ranks total, fixed costs).
+  {
+    id: "qst_gumu_sect_lonely",
+    name: "ลำพังในเหมันต์",
+    description: "หญิงปริศนาขอให้เจ้านำสมุนไพรเย็นจากที่สูงและเหล็กพิเศษมาให้ — เพื่อใช้ในการปรุงยาและตีดาบในสุสาน",
+    briefSummary: "ส่งบัวหิมะ 2 + เหล็กดิบ 3 · sect points +80",
+    type: "side",
+    sectId: "gumu",
+    giverNpcId: "sect_gumu_mystery_woman",
+    prereqs: { t: "sectMember", sectId: "gumu" },
+    stages: [
+      {
+        id: "gather",
+        description: "เก็บบัวหิมะ 2 ดอก + เหล็กดิบ 3 ก้อน",
+        autoAdvance: {
+          t: "and",
+          all: [
+            { t: "hasItem", itemId: "snow_lotus", count: 2 },
+            { t: "hasItem", itemId: "iron_ore", count: 3 },
+          ],
+        },
+      },
+      {
+        id: "deliver",
+        description: "ส่งของให้หญิงปริศนา",
+      },
+    ],
+    rewards: [
+      { t: "gold", amount: 200 },
+      { t: "wExp", amount: 100 },
+      { t: "npcRelationship", npcId: "sect_gumu_mystery_woman", amount: 5 },
+      { t: "sectPoints", sectId: "gumu", amount: 80 },
     ],
   },
 

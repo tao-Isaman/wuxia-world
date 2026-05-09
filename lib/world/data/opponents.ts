@@ -941,6 +941,25 @@ export const OPPONENTS: readonly OpponentDef[] = [
       artId: "ynxj", artLevel: 5,
       skillIds: ["gm_sword", "ynss"],
     }) },
+
+  // หญิงปริศนาในสุสาน (T4) — secret-sect mystery woman. Strongest single
+  // opponent in the game: stat budget pushed beyond every other T4 master
+  // (POW 32 + INT 28 + AGI 18 vs the typical 22-24 for Shaolin abbot or
+  // Wudang grandmaster). Carries the FULL Gumu disciple-line — ynxj +
+  // both new T4 ice arts + ansh — plus all 3 gumu skills. Defeating her
+  // is the new endgame benchmark; sparFame 22 is the highest in the game.
+  { id: "spar_gumu_mystery_woman", name: "หญิงปริศนาในสุสาน", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "ginseng", weight: 5 }, { itemId: "snow_lotus", weight: 4 },
+      { itemId: "jade", weight: 5 }, { itemId: "ancient_coin", weight: 4 },
+      { itemId: "wood_sacred", weight: 3 }, { itemId: "mithril_ore", weight: 3 }],
+    build: () => build("หญิงปริศนาในสุสาน", 4, {
+      stats: { STR: 10, VIT: 24, DEF: 18, POW: 32, INT: 28, DEX: 18, AGI: 18, LUK: 8 },
+      artId: "t4_gm_iceweave", artLevel: 10,
+      skillIds: ["ansh", "ynss", "gm_sword"],
+      extraArtSlots: ["t4_gm_iceweave", "t4_gm_winterstep", "ynxj"],
+      artLevels: { t4_gm_iceweave: 10, t4_gm_winterstep: 10, ynxj: 10 },
+    }) },
   { id: "spar_xiaoyao_master", name: "ปรมาจารย์ยุนเซียว", ti: 3, category: "human",
     // All-T3 loadout — drops a thematic T0 fan manual.
     drops: [...DROPS_T3, { itemId: "man_nc9", weight: 1 }],

@@ -158,6 +158,14 @@ export const ARTS: readonly Art[] = [
     stats: { POW: 14, INT: 14, DEX: 12 }, hL: 25, mL: 35,
     act: { n: "หทัยบริสุทธิ์", c: 30, cd: 3, t: "heal_cleanse", h: 22, d: "ฟื้น 22%HP + ลบ debuff CD3 — 玉女心经" },
     pas: { tr: "hit_recv", ch: 25, d: "ถูกโจมตี 25% → ฟื้น 7% HP", e: { t: "heal_pct", v: 7 } } },
+  { id: "t4_gm_iceweave", n: "วิชาไหมน้ำแข็ง", sc: "กู่มู่", tp: "หยิน·ภายใน", types: ["yin", "internal"], ti: 4,
+    stats: { POW: 18, INT: 16, DEX: 14, AGI: 8 }, hL: 35, mL: 35,
+    act: { n: "ไหมน้ำแข็งสะกดศัตรู", c: 30, cd: 3, t: "atk_int_pen", m: 1.5, pen: 35, d: "Int×1.5 ทะลุ IDef 35% CD3 — สายไหมเย็นเฉียบสะกดวิญญาณ" },
+    pas: { tr: "use_int", ch: 100, d: "Int → ศัตรู Acc-15 (5ตา)", e: { t: "debuff_acc", n: "ไหมน้ำแข็ง", v: -15, u: 5 } } },
+  { id: "t4_gm_winterstep", n: "วิชาก้าวย่างเหมันต์", sc: "กู่มู่", tp: "หยิน·ภายใน", types: ["yin", "internal"], ti: 4,
+    stats: { AGI: 22, DEX: 14, POW: 14, INT: 8 }, hL: 30, mL: 40,
+    act: { n: "ก้าวย่างเหมันต์", c: 28, cd: 3, t: "buff_reflect", v: 60, u: 5, d: "สะท้อน 60% (5ตา) CD3 — ก้าวย่างไร้ร่องรอย" },
+    pas: { tr: "use_int", ch: 100, d: "Int skill → Eva+15 (5ตา)", e: { t: "buff_eva", n: "เหมันต์", v: 15, u: 5 } } },
 
   // ─── พรรคยาจก ───
   { id: "wanderer", n: "เจียงหูชี่", sc: "พรรคยาจก", tp: "แข็ง·ภายนอก", types: ["hard", "external"], ti: 4,

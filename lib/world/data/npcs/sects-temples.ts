@@ -863,6 +863,35 @@ export const NPCS_SECTS_TEMPLES: readonly NpcDef[] = [
     tags: ["disciple", "swordswoman", "gumu", "sparring"],
   },
 
+  // ─── กู่มู่ (สุสานโบราณ — secret sect, mystery woman) ────────────────
+  // The Ancient Tomb's lone keeper — appears only to those who already
+  // walk the Quanzhen sun path. Stronger than any of the five public-
+  // sect masters (sparFame 22 vs the next-highest 18 at Shaolin abbot /
+  // Wudang grandmaster / Emei abbess). She gates the secret-sect entry.
+  {
+    id: "sect_gumu_mystery_woman",
+    name: "หญิงปริศนาในสุสาน",
+    description: "หญิงผู้สวมชุดขาวบริสุทธิ์ในสุสานโบราณ · ดวงตาเย็นเฉียบดั่งน้ำแข็ง · ฝีมือเหนือคำบรรยาย เกินกว่าอาจารย์ของพรรคใด ๆ ในยุทธจักร · ปรากฏเฉพาะแก่ผู้ที่เดินทางตามวิชาสุริยันต์มาถึงปลายเส้น",
+    locationIds: ["sect_gumu"],
+    dialogSceneId: "npc_sect_gumu_mystery_woman_talk",
+    sparOpponentId: "spar_gumu_mystery_woman",
+    sparFameReward: 22,
+    questIds: [
+      "qst_gumu_disciple_intro",
+      "qst_gumu_sect_lonely",
+    ],
+    defenseTier: 4,
+    stealLoot: [
+      { itemId: "ginseng", weight: 5 },
+      { itemId: "snow_lotus", weight: 4 },
+      { itemId: "jade", weight: 5 },
+      { itemId: "ancient_coin", weight: 4 },
+      { itemId: "wood_sacred", weight: 3 },
+      { itemId: "mithril_ore", weight: 2 },
+    ],
+    tags: ["sect_master", "mystery", "gumu", "secret"],
+  },
+
   // ─── พรรคสราญรมย์ (T3) ─────────────────────────────────────────────
   {
     id: "sect_xiaoyao_master_yunxiao",

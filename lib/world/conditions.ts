@@ -51,6 +51,8 @@ export function evaluateCondition(state: WorldStateData, c: Condition): boolean 
     }
     case "goldAtLeast":
       return state.gold >= c.amount;
+    case "learnedArt":
+      return (state.playerBuild?.learnedArtIds ?? []).includes(c.artId);
     case "and":
       return c.all.every((sub) => evaluateCondition(state, sub));
     case "or":

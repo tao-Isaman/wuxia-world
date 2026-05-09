@@ -165,6 +165,11 @@ export type SceneEffect =
   // Defaults to level 1 when omitted; same caveats as learnSkill.
   | { t: "learnArt"; artId: string; level?: number }
   // Sect membership operations.
+  // leaveSect: remove the player from the named sect. Idempotent (no-op
+  // if not a member). Used by the Ancient-Tomb intro to swap the player
+  // out of Quanzhen before joining the secret sect — a disciple can be
+  // loyal to one school at a time.
+  | { t: "leaveSect"; sectId: SectId }
   // joinSect: seed sectMembership[sectId] with the sect's starting rank
   // when the player isn't a member yet (no-op otherwise).
   | { t: "joinSect"; sectId: SectId }
@@ -215,6 +220,11 @@ export type Condition =
   // an entry fee — gate the turn-in choice so the player can't proceed
   // while broke.
   | { t: "goldAtLeast"; amount: number }
+  // Player has learned this inner art (regardless of level). Backed by
+  // playerBuild.learnedArtIds. Used by the Gumu intro to require the
+  // player to have absorbed the Quanzhen sun art before the secret-sect
+  // gate appears.
+  | { t: "learnedArt"; artId: string }
   | { t: "and"; all: Condition[] }
   | { t: "or"; any: Condition[] }
   | { t: "not"; of: Condition };
@@ -335,7 +345,11 @@ export type QuestReward =
   // already a member. `sectPoints` bumps the points pool (no-op if not yet
   // a member of that sect — caller should pair with `joinSect` if needed).
   | { t: "joinSect"; sectId: SectId }
-  | { t: "sectPoints"; sectId: SectId; amount: number };
+  | { t: "sectPoints"; sectId: SectId; amount: number }
+  // Same as the SceneEffect — removes the player from the named sect.
+  // Used by quest reward chains that switch the player's sect (e.g.
+  // the Ancient-Tomb defection from Quanzhen).
+  | { t: "leaveSect"; sectId: SectId };
 
 export interface QuestDef {
   id: string;
@@ -872,7 +886,7 @@ export interface SectMembership {
   joinedDay: number;
 }
 
-export type SectId = "shaolin" | "wudang" | "huashan" | "quanzhen" | "emei";
+export type SectId = "shaolin" | "wudang" | "huashan" | "quanzhen" | "emei" | "gumu";
 
 // ─── Character gender ─────────────────────────────────────────────────
 // Used by sect membership conditions (e.g. Shaolin admits men only) and

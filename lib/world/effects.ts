@@ -191,6 +191,16 @@ export function applyEffect(state: WorldStateData, eff: SceneEffect): void {
       return;
     }
 
+    case "leaveSect": {
+      // Idempotent — no-op if not a member. Wipes the membership entry
+      // entirely (rank / points / quest cooldowns / claimed rewards all
+      // gone). The player keeps any skills / arts they already learned
+      // through the sect's reward chain — losing membership only revokes
+      // future progression hooks, not retroactively un-teaches vows.
+      delete state.sectMembership[eff.sectId];
+      return;
+    }
+
     case "joinSect": {
       // Idempotent — if the player is already a member, do nothing.
       if (state.sectMembership[eff.sectId]) return;
@@ -380,6 +390,9 @@ function applyQuestRewards(state: WorldStateData, rewards: readonly QuestReward[
         break;
       case "sectPoints":
         applyEffect(state, { t: "addSectPoints", sectId: r.sectId, amount: r.amount });
+        break;
+      case "leaveSect":
+        applyEffect(state, { t: "leaveSect", sectId: r.sectId });
         break;
     }
   }
