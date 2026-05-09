@@ -217,10 +217,60 @@ const HUASHAN: SectMembershipDef = {
   questCooldownDays: 30,
 };
 
+// Quanzhen disciple ranks. Like Huashan, leadership caps at T3 — strong
+// but not on the legendary Shaolin/Wudang tier. Open to anyone (no
+// gender gate, no money) — Quanzhen Daoists are ascetics: the only fee
+// is sincere effort. Rank rewards mix new yang/hard sword + fist line
+// with the existing T2 entries (qzjf / qz_punch / qzzq).
+//
+// Reward layout:
+//   rank 9 → T0 sword + T0 art (gifted on registration)
+//   rank 8 → T1 sword (auto)
+//   rank 7 → T1 art (auto)
+//   rank 6 → T2 art `qzzq` (auto — uses existing breath)
+//   rank 5 → choose T3 weapon — sun fist OR sun sword
+//   rank 2 → choose T3 art — sun power OR ocean-of-yang dragon-slayer
+//            (Quanzhen tops out at T3 — no T4 capstone art)
+const QUANZHEN: SectMembershipDef = {
+  id: "quanzhen",
+  name: "ฉวนเจิน",
+  hallLocationId: "sect_quanzhen",
+  registrarNpcId: "sect_quanzhen_master_chongyang",
+  joinRequirements: { t: "trait", trait: "evil", max: 10 },
+  startRank: 9,
+  topRank: 1,
+  rankUpCost: (targetRank) => {
+    const table: Record<number, number> = {
+      8: 100,
+      7: 200,
+      6: 350,
+      5: 500,
+      4: 700,
+      3: 1000,
+      2: 1400,
+      1: 2000,
+    };
+    return table[targetRank] ?? Infinity;
+  },
+  skillsByRank: {
+    9: ["qz_heavy_sword"],     // T0 — auto on join
+    8: ["qz_hot_sword"],       // T1 — auto on rank-up
+    5: ["qz_sun_fist", "qz_sun_sword"], // T3 — choice
+  },
+  artsByRank: {
+    9: ["t0_qz_speed"],        // T0 — auto on join
+    7: ["t1_qz_horse"],        // T1 — auto
+    6: ["qzzq"],               // T2 — auto (existing breath)
+    2: ["t3_qz_sun", "t3_qz_dragon"], // T3 — choice (Quanzhen has no T4 art)
+  },
+  questCooldownDays: 30,
+};
+
 export const SECT_MEMBERSHIPS: Record<SectId, SectMembershipDef> = {
   shaolin: SHAOLIN,
   wudang: WUDANG,
   huashan: HUASHAN,
+  quanzhen: QUANZHEN,
 };
 
 // Helper: rewards (skill + art ids) the player is *eligible* to pick at a

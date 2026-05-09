@@ -32,6 +32,7 @@ export const QUESTS_SECTS_TEMPLES: readonly QuestDef[] = [
         { t: "not", of: { t: "sectMember", sectId: "shaolin" } },
         { t: "not", of: { t: "sectMember", sectId: "wudang" } },
         { t: "not", of: { t: "sectMember", sectId: "huashan" } },
+        { t: "not", of: { t: "sectMember", sectId: "quanzhen" } },
       ],
     },
     stages: [
@@ -413,6 +414,7 @@ export const QUESTS_SECTS_TEMPLES: readonly QuestDef[] = [
         { t: "not", of: { t: "sectMember", sectId: "wudang" } },
         { t: "not", of: { t: "sectMember", sectId: "shaolin" } },
         { t: "not", of: { t: "sectMember", sectId: "huashan" } },
+        { t: "not", of: { t: "sectMember", sectId: "quanzhen" } },
       ],
     },
     stages: [
@@ -667,6 +669,7 @@ export const QUESTS_SECTS_TEMPLES: readonly QuestDef[] = [
         { t: "not", of: { t: "sectMember", sectId: "shaolin" } },
         { t: "not", of: { t: "sectMember", sectId: "wudang" } },
         { t: "not", of: { t: "sectMember", sectId: "huashan" } },
+        { t: "not", of: { t: "sectMember", sectId: "quanzhen" } },
       ],
     },
     stages: [
@@ -804,6 +807,172 @@ export const QUESTS_SECTS_TEMPLES: readonly QuestDef[] = [
       { t: "trait", trait: "humility", amount: 5 },
       { t: "sectPoints", sectId: "huashan", amount: 100 },
       { t: "npcRelationship", npcId: "sect_huashan_master_yiqing", amount: 10 },
+    ],
+  },
+
+  // ──────────────────────────────────────────────────────────────────────
+  // ฉวนเจิน — อาจารย์ใหญ่ฉงหยาง (ascetic Daoist sect — no entry fee)
+  // ──────────────────────────────────────────────────────────────────────
+
+  // 0. INTRO — ขอเข้าเป็นศิษย์ (disciple registration intro)
+  // Same ascetic trial pattern as Wudang: gather mountain herbs, no
+  // money required. Quanzhen Daoists value sincere effort over wealth.
+  {
+    id: "qst_quanzhen_disciple_intro",
+    name: "ขอเข้าเป็นศิษย์ฉวนเจิน",
+    description: "อาจารย์ฉงหยางรับศิษย์ใหม่ที่ใจสะอาดและพากเพียร — เก็บสมุนไพรประจำเขาเทียนซานให้ครบสามชนิดเพื่อพิสูจน์ตน · สมุนไพรหายาก 10 · โสม 10 · เม็ดบัว 10",
+    briefSummary: "ส่งสมุนไพรหายาก 10 + โสม 10 + เม็ดบัว 10 เข้าเป็นศิษย์ฉวนเจินขั้นที่ 9",
+    type: "side",
+    giverNpcId: "sect_quanzhen_master_chongyang",
+    prereqs: {
+      t: "and",
+      all: [
+        { t: "trait", trait: "evil", max: 10 },
+        { t: "not", of: { t: "sectMember", sectId: "shaolin" } },
+        { t: "not", of: { t: "sectMember", sectId: "wudang" } },
+        { t: "not", of: { t: "sectMember", sectId: "huashan" } },
+        { t: "not", of: { t: "sectMember", sectId: "quanzhen" } },
+      ],
+    },
+    stages: [
+      {
+        id: "gather_herbs",
+        description: "เก็บสมุนไพรหายาก 10 ชิ้น + โสม 10 ราก + เม็ดบัว 10 เม็ด",
+        autoAdvance: {
+          t: "and",
+          all: [
+            { t: "hasItem", itemId: "herb", count: 10 },
+            { t: "hasItem", itemId: "ginseng", count: 10 },
+            { t: "hasItem", itemId: "lotus_seed", count: 10 },
+          ],
+        },
+      },
+      {
+        id: "return_to_master",
+        description: "นำสมุนไพรกลับไปถวายอาจารย์ฉงหยาง",
+      },
+    ],
+    rewards: [
+      { t: "wExp", amount: 50 },
+      { t: "trait", trait: "humility", amount: 3 },
+      { t: "npcRelationship", npcId: "sect_quanzhen_master_chongyang", amount: 5 },
+      { t: "joinSect", sectId: "quanzhen" },
+      { t: "sectPoints", sectId: "quanzhen", amount: 20 },
+    ],
+  },
+
+  // ──────────────────────────────────────────────────────────────────────
+  // ภารกิจประจำฉวนเจิน — ทำซ้ำได้ทุก 30 วัน
+  // ──────────────────────────────────────────────────────────────────────
+
+  // SECT-1 · ลาดตระเวนรอบจงหยาง — sect points 50 (rank 9–7)
+  {
+    id: "qst_quanzhen_sect_patrol",
+    name: "ลาดตระเวนรอบพระราชวังจงหยาง",
+    description: "ภารกิจประจำของศิษย์ฉวนเจิน — ลาดตระเวนรอบพระราชวังจงหยางและกำราบโจรที่ก่อกวน",
+    briefSummary: "ปราบโจรเร่ร่อน 2 คน · sect points +50",
+    type: "side",
+    sectId: "quanzhen",
+    giverNpcId: "sect_quanzhen_master_chongyang",
+    prereqs: { t: "sectMember", sectId: "quanzhen" },
+    stages: [
+      {
+        id: "patrol",
+        description: "ปราบโจรเร่ร่อน 2 คน",
+        autoAdvance: { t: "defeatedOpponent", opponentId: "thug", count: 2 },
+      },
+      {
+        id: "report",
+        description: "กลับไปรายงานอาจารย์ฉงหยาง",
+      },
+    ],
+    rewards: [
+      { t: "gold", amount: 150 },
+      { t: "wExp", amount: 60 },
+      { t: "npcRelationship", npcId: "sect_quanzhen_master_chongyang", amount: 3 },
+      { t: "sectPoints", sectId: "quanzhen", amount: 50 },
+    ],
+  },
+
+  // SECT-2 · คัดลอกตำราเต๋า — sect points 60 (rank 9–6)
+  {
+    id: "qst_quanzhen_sect_scripture",
+    name: "คัดลอกตำราเต๋า",
+    description: "ห้องสมุดของฉวนเจินต้องการกระดาษและหมึกสำหรับคัดลอกตำราเต๋าเก่า — เก็บมาให้ครบ",
+    briefSummary: "ส่งกระดาษ 5 + หมึก 5 · sect points +60",
+    type: "side",
+    sectId: "quanzhen",
+    giverNpcId: "sect_quanzhen_master_chongyang",
+    prereqs: { t: "sectMember", sectId: "quanzhen" },
+    stages: [
+      {
+        id: "gather",
+        description: "เก็บกระดาษ 5 + หมึก 5",
+        autoAdvance: {
+          t: "and",
+          all: [
+            { t: "hasItem", itemId: "paper", count: 5 },
+            { t: "hasItem", itemId: "ink", count: 5 },
+          ],
+        },
+      },
+      {
+        id: "deliver",
+        description: "ส่งวัสดุให้อาจารย์ฉงหยาง",
+      },
+    ],
+    rewards: [
+      { t: "gold", amount: 100 },
+      { t: "wExp", amount: 50 },
+      { t: "npcRelationship", npcId: "sect_quanzhen_master_chongyang", amount: 3 },
+      { t: "sectPoints", sectId: "quanzhen", amount: 60 },
+    ],
+  },
+
+  // ──────────────────────────────────────────────────────────────────────
+  // ภารกิจวิชาในกาย — high sect quest, rank-gated. Awards bonus T3 art.
+  // ──────────────────────────────────────────────────────────────────────
+
+  // ART-1 · ตำราหนึ่งพลังสุริยันต์ — unlock at rank 5, reward bonus T3 art
+  {
+    id: "qst_quanzhen_art_sun",
+    name: "ตำราหนึ่งพลังสุริยันต์",
+    description: "อาจารย์ฉงหยางยอมเปิดตำราหนึ่งพลังสุริยันต์ให้ศิษย์ที่จิตใจเที่ยงตรง — ผ่านการประลองและการนั่งสมาธิที่หน้าผา",
+    briefSummary: "ฝึกหนึ่งพลังสุริยันต์ — รับ T3 art ของฉวนเจิน",
+    type: "side",
+    sectId: "quanzhen",
+    isArtQuest: true,
+    minSectRank: 5,
+    giverNpcId: "sect_quanzhen_master_chongyang",
+    prereqs: {
+      t: "and",
+      all: [
+        { t: "sectMember", sectId: "quanzhen" },
+        { t: "sectRankAtLeast", sectId: "quanzhen", maxRank: 5 },
+      ],
+    },
+    stages: [
+      {
+        id: "trial_kill",
+        description: "พิสูจน์พลัง — ปราบหัวหน้าโจร (bandit_chief) 2 คน",
+        autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 2 },
+      },
+      {
+        id: "trial_meditate",
+        description: "นั่งสมาธิ — รวบรวมโสม 8 ราก",
+        autoAdvance: { t: "hasItem", itemId: "ginseng", count: 8 },
+      },
+      {
+        id: "return_art",
+        description: "กลับไปรับตำราจากอาจารย์ฉงหยาง",
+      },
+    ],
+    rewards: [
+      { t: "wExp", amount: 200 },
+      { t: "learnArt", artId: "t3_qz_sun", level: 3 },
+      { t: "trait", trait: "humility", amount: 5 },
+      { t: "sectPoints", sectId: "quanzhen", amount: 100 },
+      { t: "npcRelationship", npcId: "sect_quanzhen_master_chongyang", amount: 10 },
     ],
   },
 

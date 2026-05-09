@@ -632,6 +632,88 @@ export const SCENES_SECTS_TEMPLES: readonly Scene[] = [
   },
 
   // ══════════════════════════════════════════════════════════════════════
+  // ฉวนเจิน — อาจารย์ใหญ่ฉงหยาง (ascetic Daoist, no entry fee)
+  // ══════════════════════════════════════════════════════════════════════
+
+  {
+    kind: "dialog",
+    id: "npc_sect_quanzhen_master_chongyang_talk",
+    lines: [
+      { t: "narration", text: "อาจารย์ใหญ่ฉงหยางนั่งขัดสมาธิอยู่หน้าศาลาเก่า มือกุมตำราเต๋าโบราณ" },
+      { t: "dialogue", speaker: "ฉงหยาง", text: "ฉวนเจินไม่ได้สอนวิชาเพื่อชัยชนะ — เราฝึกเพื่อเข้าใจตัวเอง" },
+      { t: "dialogue", speaker: "ฉงหยาง", text: "เจ้ามาด้วยความตั้งใจอันใด?" },
+    ],
+    choices: [
+      { text: "แค่ทักทาย", next: "sect_quanzhen" },
+    ],
+  },
+
+  // Disciple intro — offer beat (NPC popup auto-routes here after Accept).
+  // Pure narration: brief the herb-gathering trial and bounce back to
+  // the courtyard. Mirror the wudang/shaolin pattern — no startQuest.
+  {
+    kind: "dialog",
+    id: "qs_qst_quanzhen_disciple_intro_offer",
+    lines: [
+      { t: "narration", text: "อาจารย์ฉงหยางวางตำราลงและจ้องมองเจ้าด้วยสายตาสงบใส" },
+      { t: "dialogue", speaker: "ฉงหยาง", text: "เจ้าต้องการเป็นศิษย์ฉวนเจิน? ดี — แต่นักพรตของเราไม่รับเงินทอง เพียงรับความเพียรเท่านั้น" },
+      { t: "dialogue", speaker: "ฉงหยาง", text: "ห้องยาของพระราชวังจงหยางต้องการสมุนไพรหลากชนิด — สมุนไพรหายาก ๑๐, โสม ๑๐, เม็ดบัว ๑๐" },
+      { t: "dialogue", speaker: "ฉงหยาง", text: "เก็บมาให้ครบแล้วกลับมา ข้าจะรับเจ้าเป็นศิษย์ขั้นที่ ๙" },
+    ],
+    choices: [
+      { text: "ข้าจะไปทำตามคำสั่ง", next: "sect_quanzhen" },
+    ],
+  },
+
+  // Disciple intro — complete beat. Player has the herbs. Choice fires
+  // finishQuest → reward chain joinSect:quanzhen seeds membership at
+  // rank 9 and auto-grants T0 sword + T0 art.
+  {
+    kind: "dialog",
+    id: "qs_qst_quanzhen_disciple_intro_complete",
+    lines: [
+      { t: "narration", text: "เจ้าวางสมุนไพรหลากชนิดลงบนแท่นไม้หน้าศาลา" },
+      { t: "dialogue", speaker: "ฉงหยาง", text: "เจ้ากลับมา และครบจำนวนทุกชนิด — ความเพียรของเจ้าเป็นเครื่องพิสูจน์ที่ดี" },
+      { t: "narration", text: "ท่านพยักหน้าและประสานมือ" },
+      { t: "dialogue", speaker: "ฉงหยาง", text: "ตั้งแต่บัดนี้ เจ้าคือศิษย์ฉวนเจินขั้นที่ ๙ — รับวิชาเร่งพลังและกระบี่หนักเป็นปฐมเถิด" },
+    ],
+    choices: [
+      {
+        text: "น้อมรับด้วยความขอบพระคุณ",
+        next: "sect_quanzhen",
+        effects: [
+          { t: "takeItem", itemId: "herb", count: 10 },
+          { t: "takeItem", itemId: "ginseng", count: 10 },
+          { t: "takeItem", itemId: "lotus_seed", count: 10 },
+          { t: "finishQuest", questId: "qst_quanzhen_disciple_intro", success: true },
+        ],
+      },
+    ],
+  },
+
+  // Vice master ambient.
+  {
+    kind: "dialog",
+    id: "npc_sect_quanzhen_vice_master_mayu_talk",
+    lines: [
+      { t: "narration", text: "รองอาจารย์หม่ายวี่ยืนนิ่งอยู่ข้างเสา ใบหน้าสงบเงียบ" },
+      { t: "dialogue", speaker: "หม่ายวี่", text: "ดาบของฉวนเจินหนัก — เพราะใจของเจ้าต้องหนักแน่นกว่านั้น" },
+      { t: "dialogue", speaker: "หม่ายวี่", text: "ฝึกซ้อมไม่ขาด แล้วเจ้าจะเข้าใจ" },
+    ],
+  },
+
+  // Sword elder ambient.
+  {
+    kind: "dialog",
+    id: "npc_sect_quanzhen_sword_elder_qiuchuji_talk",
+    lines: [
+      { t: "narration", text: "อาจารย์ดาบชิวฉู่จี้กำลังสาธิตท่ากระบี่สะกดสุริยันต์ในลานฝึก" },
+      { t: "dialogue", speaker: "ชิวฉู่จี้", text: "กระบี่สะกดสุริยันต์ต้องขังเเสงไว้ในใจ แล้วระเบิดออกในจังหวะเดียว" },
+      { t: "dialogue", speaker: "ชิวฉู่จี้", text: "อยากลองดูฝีมือของเจ้าไหม? มาประลองกันก็ได้" },
+    ],
+  },
+
+  // ══════════════════════════════════════════════════════════════════════
   // ง้อไบ๊ — ท่านนิ้วห้วนจิงฉาน
   // ══════════════════════════════════════════════════════════════════════
 

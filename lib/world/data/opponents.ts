@@ -635,6 +635,71 @@ export const OPPONENTS: readonly OpponentDef[] = [
       skillIds: ["hs_basic_sword"],
     }) },
 
+  // ─── ฉวนเจิน — sect leadership (T1-T3) ──────────────────────────────
+  // Ascetic Daoist sect with yang/hard sword + fist identity. Master and
+  // vice cap at T3 (matches Huashan tier — strong but not legendary).
+  // The "sun" sub-line drives crit/stack ATK pressure.
+  { id: "spar_quanzhen_master_chongyang", name: "อาจารย์ใหญ่ฉงหยาง", ti: 3, category: "human",
+    drops: [...DROPS_T3,
+      { itemId: "man_qzjf", weight: 1 }, { itemId: "man_qz_punch", weight: 1 },
+      { itemId: "paper", weight: 4 }, { itemId: "ink", weight: 4 },
+      { itemId: "ginseng", weight: 3 }, { itemId: "jade", weight: 3 },
+      { itemId: "ancient_coin", weight: 2 }, { itemId: "wood_sacred", weight: 2 }],
+    build: () => build("อาจารย์ใหญ่ฉงหยาง", 3, {
+      stats: { STR: 14, POW: 14, INT: 10, VIT: 10, DEX: 8 },
+      artId: "t3_qz_sun", artLevel: 8,
+      skillIds: ["qz_sun_sword", "qz_sun_fist", "qzjf", "qz_punch"],
+      extraArtSlots: ["t3_qz_sun", "qzzq", "t3_qz_dragon"],
+      artLevels: { t3_qz_sun: 8, qzzq: 9, t3_qz_dragon: 8, t1_qz_horse: 8 },
+      learnedArtIds: ["t1_qz_horse"],
+    }) },
+
+  { id: "spar_quanzhen_mayu", name: "รองอาจารย์หม่ายวี่", ti: 3, category: "human",
+    drops: [...DROPS_T3,
+      { itemId: "man_qzjf", weight: 1 },
+      { itemId: "paper", weight: 3 }, { itemId: "ink", weight: 3 },
+      { itemId: "jade", weight: 2 }, { itemId: "ancient_coin", weight: 2 }],
+    build: () => build("รองอาจารย์หม่ายวี่", 3, {
+      stats: { STR: 12, POW: 10, VIT: 10, DEX: 8 },
+      artId: "qzzq", artLevel: 8,
+      skillIds: ["qz_sun_sword", "qzjf", "qz_hot_sword", "qz_heavy_sword"],
+      extraArtSlots: ["qzzq", "t1_qz_horse"],
+      artLevels: { qzzq: 8, t1_qz_horse: 7 },
+    }) },
+
+  { id: "spar_quanzhen_qiuchuji", name: "อาจารย์ดาบชิวฉู่จี้", ti: 2, category: "human",
+    drops: [...DROPS_T2,
+      { itemId: "man_qzjf", weight: 1 },
+      { itemId: "iron_ore", weight: 2 }, { itemId: "paper", weight: 2 }],
+    build: () => build("อาจารย์ดาบชิวฉู่จี้", 2, {
+      stats: { STR: 9, POW: 7, DEX: 6 },
+      artId: "qzzq", artLevel: 6,
+      skillIds: ["qz_sun_sword", "qz_hot_sword", "qzjf"],
+      extraArtSlots: ["qzzq"],
+      artLevels: { qzzq: 6 },
+    }) },
+
+  { id: "spar_quanzhen_yaolan", name: "อาจารย์ปราณเหยาหลัน", ti: 2, category: "human",
+    drops: [...DROPS_T2,
+      { itemId: "man_qz_punch", weight: 1 },
+      { itemId: "paper", weight: 3 }, { itemId: "ink", weight: 3 },
+      { itemId: "ginseng", weight: 2 }],
+    build: () => build("อาจารย์ปราณเหยาหลัน", 2, {
+      stats: { POW: 9, INT: 8, VIT: 6 },
+      artId: "qzzq", artLevel: 6,
+      skillIds: ["qz_sun_fist", "qz_punch", "qzjf"],
+      extraArtSlots: ["qzzq"],
+      artLevels: { qzzq: 6 },
+    }) },
+
+  { id: "spar_quanzhen_yangzi", name: "ศิษย์หยางจื่อ", ti: 1, category: "human",
+    drops: [...DROPS_T1],
+    build: () => build("ศิษย์หยางจื่อ", 1, {
+      stats: { STR: 5, POW: 4 },
+      artId: "t0_qz_speed", artLevel: 4,
+      skillIds: ["qz_heavy_sword"],
+    }) },
+
   // ชิวเฉียน (mt_kunlun) — Kunlun exile, sword-and-internal hermit style.
   { id: "spar_kunlun_qiu", name: "ชิวเฉียน", ti: 3, category: "human",
     drops: [...DROPS_T3,
