@@ -74,6 +74,11 @@ const config: Config = {
         // Sarabun — high-coverage Thai serif for body text, dialog,
         // narration, and any number / metric display. Default sans.
         sans: ["var(--font-body)", "system-ui", "sans-serif"],
+        // SOV_JomYuth — display font for the battle-scene skill-cast
+        // animation overlay. Heavy/calligraphic Thai face; readable at
+        // very large sizes. Loaded eagerly (font-display: block) so the
+        // first cast animation isn't a font-swap flicker.
+        action: ["Jomyuth", "var(--font-display)", "serif"],
       },
       borderRadius: {
         // Pixel-art chrome has no rounded corners. Existing `rounded-*`
@@ -99,10 +104,30 @@ const config: Config = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        // Skill-cast splash: pop in within 0.3s, hold, fade out at end.
+        // Total 1.4s — long enough to read at slot-1 but short enough
+        // that the staggered hit-damages chain follows fast.
+        "skill-cast": {
+          "0%":   { opacity: "0", transform: "scale(0.5) translateY(20px)" },
+          "20%":  { opacity: "1", transform: "scale(1.20) translateY(0)" },
+          "30%":  { opacity: "1", transform: "scale(1.00) translateY(0)" },
+          "85%":  { opacity: "1", transform: "scale(1.00) translateY(0)" },
+          "100%": { opacity: "0", transform: "scale(1.00) translateY(-15px)" },
+        },
+        // Per-hit damage pop: 0.45s. Pops in fast, lifts up, fades out.
+        // Multiple hits stagger via CSS animation-delay on each element.
+        "damage-pop": {
+          "0%":   { opacity: "0", transform: "scale(0.4) translateY(0)" },
+          "25%":  { opacity: "1", transform: "scale(1.40) translateY(-2px)" },
+          "55%":  { opacity: "1", transform: "scale(1.00) translateY(-10px)" },
+          "100%": { opacity: "0", transform: "scale(0.95) translateY(-32px)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "skill-cast": "skill-cast 1.4s ease-out forwards",
+        "damage-pop": "damage-pop 0.45s ease-out forwards",
       },
     },
   },

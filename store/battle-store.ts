@@ -70,7 +70,16 @@ function drainToActor(state: BattleState): void {
 export const useBattleStore = create<BattleStore>((set, get) => {
   // Schedules B's AI action after ENEMY_ACTION_DELAY_MS.
   // Recurses to chain consecutive B turns (each with its own delay).
+  // Honors `castEndsAt` — if a cast animation is still playing, defer
+  // until it finishes so the player sees the full animation before B
+  // attacks.
   const scheduleEnemyAction = () => {
+    const compute = () => {
+      const s = get();
+      const ce = s.state?.castEndsAt ?? 0;
+      const remain = Math.max(0, ce - Date.now());
+      return Math.max(ENEMY_ACTION_DELAY_MS, remain);
+    };
     setTimeout(() => {
       const s = get();
       if (!s.state || !s.ctx || !s.builds) return;
@@ -86,7 +95,7 @@ export const useBattleStore = create<BattleStore>((set, get) => {
       }
       set({ state: { ...st } });
       if (!st.winner && st.phase === "enemy") scheduleEnemyAction();
-    }, ENEMY_ACTION_DELAY_MS);
+    }, compute());
   };
 
   // After any state mutation, if we landed on "enemy" phase, schedule the AI.
@@ -127,6 +136,11 @@ export const useBattleStore = create<BattleStore>((set, get) => {
       const { state, ctx, builds } = get();
       if (!state || !ctx || !builds || state.winner) return;
       if (state.phase !== "filling") return;
+      // Cast hold: pause the ATB while the most-recent skill / art active
+      // animation is still playing. Once Date.now() passes castEndsAt,
+      // the gauge resumes filling — this is what makes "play animation
+      // until done, then count turn" feel right.
+      if (state.castEndsAt && Date.now() < state.castEndsAt) return;
       tickGauges(state, dtMs);
       drainToActor(state);
       set({ state: { ...state } });
@@ -137,6 +151,8 @@ export const useBattleStore = create<BattleStore>((set, get) => {
       const { state, ctx, builds } = get();
       if (!state || !ctx || !builds || state.winner) return;
       if (state.phase !== "player") return;
+      // Block input while a cast animation is still playing.
+      if (state.castEndsAt && Date.now() < state.castEndsAt) return;
       const raw = builds.A.skillIds[slotIdx];
       if (!raw || state.cd.A[slotIdx] > 0) return;
       const info = parseSlotId(raw);
@@ -155,6 +171,7 @@ export const useBattleStore = create<BattleStore>((set, get) => {
       const { state, ctx, builds } = get();
       if (!state || !ctx || !builds || state.winner) return;
       if (state.phase !== "player") return;
+      if (state.castEndsAt && Date.now() < state.castEndsAt) return;
       resolveArtActive(state, "A", ctx);
       if (!state.winner) drainToActor(state);
       set({ state: { ...state } });

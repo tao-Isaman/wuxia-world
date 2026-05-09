@@ -131,6 +131,10 @@ export type EnemyEffect =
   | { t: "debuff_atk"; v: number; u: number }
   | { t: "debuff_poison"; pp: number; u: number; ev: number }
   | { t: "multi_debuff"; av: number; ev: number; u: number }
+  // Combo: PDef + Eva debuff in one effect (mirrors multi_debuff but on
+  // a different axis). Used by chain / sweep weapons that erode both
+  // armor AND footwork. `dv` = PDef value (negative), `ev` = Eva value.
+  | { t: "debuff_def_eva"; dv: number; ev: number; u: number }
   | { t: "heavy_poison"; pp: number; u: number; av: number; ev: number }
   | { t: "drain_mp"; v: number }
   | { t: "dispel"; acc: number; u: number }
@@ -166,6 +170,14 @@ export interface Skill {
   // `vitScale × caster.VIT` (combined stats) — designed for vit-bruiser
   // signature moves (อรหันต์พันกร). Read by `calcSkillDamage`.
   vitScale?: number;
+  // Multi-hit count. When > 1, the skill resolves `hits` damage rolls in
+  // a single turn — each rolled independently (so crits stack, misses
+  // happen, and reflect / hit_recv passives fire per-hit). Each hit deals
+  // `1/hits × normal_damage` rounded so the total approximates a single-
+  // hit damage. Authors who want a multi-hit that totals MORE than a
+  // single hit should also bump `dm` or `bp` to compensate.
+  // Default 1 (single hit) when omitted.
+  hits?: number;
   se: SelfEffect | null;
   ee: EnemyEffect | null;
   d: string; // description
@@ -389,4 +401,32 @@ export interface BattleState {
   // hit by B's attacks, regardless of damage). Used to grant DEF stat xp
   // on battle end. Reflect damage does not count.
   hitsReceived: { A: number; B: number };
+  // Latest cast event — UI overlay reads this and renders a staggered
+  // animation: skill name first (0.3s, large text), then each hit's
+  // damage popping in turn (0.1s stagger). `seq` increments every time
+  // a skill / art active fires so React can detect changes even when the
+  // same skill is cast twice in a row. Cleared when a battle starts;
+  // never persisted.
+  lastCast?: {
+    seq: number;
+    side: Side;
+    name: string;
+    hits: number;        // total hits resolved (≥ 1)
+    // Skill / art tier (0..4) — drives the rarity-tinted name color in
+    // the cast animation overlay (T0 white → T4 orange).
+    tier: SkillTierIndex;
+    // Per-hit results — `length === hits`. Each hit independently rolled
+    // hit/crit/miss in resolveSkill. Buff / no-attack skills emit a
+    // single placeholder hit (damage 0, miss false) so the UI still
+    // announces the cast name.
+    hitDamages: number[];
+    hitCrits: boolean[];
+    hitMisses: boolean[];
+  };
+  // Wall-clock timestamp (Date.now()) at which the most-recent cast
+  // animation finishes playing. While Date.now() < this value, the ATB
+  // tick + enemy-AI scheduler PAUSE so the player has time to read the
+  // animation before the next turn fires. Cleared/expired naturally —
+  // tick logic just compares against Date.now().
+  castEndsAt?: number;
 }

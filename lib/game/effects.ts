@@ -15,15 +15,55 @@ export function opposite(s: Side): Side {
   return s === "A" ? "B" : "A";
 }
 
-// Buff/debuff list mutation: dedupe by `t`, then push the new record.
+// Stackable types — when an existing record of the same `t` is present,
+// add the new value to it and refresh duration to the higher of the two.
+// Non-stackable types replace (the old behavior). Caps prevent runaway
+// stacks: ±200 for stat values, ±100 for percentage values.
+const STACKABLE_BUFF: ReadonlySet<BuffRecord["t"]> = new Set([
+  "buff_def", "buff_eva", "buff_reduce", "buff_reflect", "buff_spd", "buff_iatk",
+]);
+const STACKABLE_DEBUFF: ReadonlySet<DebuffRecord["t"]> = new Set([
+  "debuff_def", "debuff_eva", "debuff_acc", "debuff_atk",
+]);
+const PCT_BUFF: ReadonlySet<BuffRecord["t"]> = new Set([
+  "buff_reduce", "buff_reflect",
+]);
+const STAT_CAP = 200;
+const PCT_CAP = 100;
+function clampBuffValue(t: BuffRecord["t"], v: number): number {
+  const cap = PCT_BUFF.has(t) ? PCT_CAP : STAT_CAP;
+  return Math.max(-cap, Math.min(cap, v));
+}
+function clampDebuffValue(v: number): number {
+  return Math.max(-STAT_CAP, Math.min(STAT_CAP, v));
+}
+
+// Buff/debuff list mutation:
+//   - Stackable types accumulate `v` (clamped) and refresh `u` to max.
+//   - Non-stackable types replace (poison / burn / stun reset cleanly).
+// Same-`t` records are merged in place — list length stays bounded.
 export function addBuff(state: BattleState, side: Side, b: BuffRecord): void {
   const list = state.st[side].buffs;
+  const existing = list.find((x) => x.t === b.t);
+  if (existing && STACKABLE_BUFF.has(b.t)) {
+    existing.v = clampBuffValue(b.t, existing.v + b.v);
+    existing.u = Math.max(existing.u, b.u);
+    if (b.n) existing.n = b.n;
+    return;
+  }
   state.st[side].buffs = list.filter((x) => x.t !== b.t);
   state.st[side].buffs.push({ ...b });
 }
 
 export function addDebuff(state: BattleState, side: Side, d: DebuffRecord): void {
   const list = state.st[side].debuffs;
+  const existing = list.find((x) => x.t === d.t);
+  if (existing && STACKABLE_DEBUFF.has(d.t) && d.v != null && existing.v != null) {
+    existing.v = clampDebuffValue(existing.v + d.v);
+    existing.u = Math.max(existing.u, d.u);
+    if (d.n) existing.n = d.n;
+    return;
+  }
   state.st[side].debuffs = list.filter((x) => x.t !== d.t);
   state.st[side].debuffs.push({ ...d });
 }
@@ -151,6 +191,11 @@ export function applyEnemyEffect(
       addDebuff(state, ds, { t: "debuff_acc", n: "Acc↓", v: eff.av, u: eff.u });
       addDebuff(state, ds, { t: "debuff_eva", n: "Eva↓", v: eff.ev, u: eff.u });
       logLine(state, "lS", `&nbsp;✗ ${dnm}: Acc${eff.av} Eva${eff.ev}(${eff.u}ตา)`);
+      return;
+    case "debuff_def_eva":
+      addDebuff(state, ds, { t: "debuff_def", n: "DEF↓", v: eff.dv, u: eff.u });
+      addDebuff(state, ds, { t: "debuff_eva", n: "Eva↓", v: eff.ev, u: eff.u });
+      logLine(state, "lS", `&nbsp;✗ ${dnm}: PDef${eff.dv} Eva${eff.ev}(${eff.u}ตา)`);
       return;
     case "heavy_poison":
       addDebuff(state, ds, { t: "debuff_poison", n: "พิษร้าย", pp: eff.pp, u: eff.u });

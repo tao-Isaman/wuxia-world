@@ -335,36 +335,67 @@ export function resolveSkill(
   const tag = skillTag(skill);
 
   if (skill.at) {
-    const res = calcSkillDamage(state, side, skill, ctx);
-    const probe = `<span class="lp">[hit${res.hpPct}% crit${res.critPct}%]</span>`;
+    // Multi-hit: split the damage budget across `hits` rolls. Each hit
+    // rolls hit/crit independently so the player sees actual flurry —
+    // some can miss, others can crit. Per-hit damage is the full
+    // calcSkillDamage divided by hit count, rounded so the total
+    // approximates a single-hit cast (no free damage from multi-hit).
+    const hitCount = Math.max(1, skill.hits ?? 1);
+    const hitDamages: number[] = [];
+    const hitCrits: boolean[] = [];
+    const hitMisses: boolean[] = [];
+    let firstProbe = "";
+    for (let h = 0; h < hitCount; h++) {
+      if (state.winner) break;
+      const res = calcSkillDamage(state, side, skill, ctx);
+      const perHitDmg = Math.max(0, Math.round(res.dmg / hitCount));
+      const probe = `<span class="lp">[hit${res.hpPct}% crit${res.critPct}%]</span>`;
+      if (h === 0) firstProbe = probe;
 
-    if (!res.hit) {
-      logLine(state, cls, `[${state.turn}] ${nm} → <b>${skill.n}</b>${tag} <span style="color:#AAA">พลาด!</span> ${probe}`);
-    } else {
+      if (!res.hit) {
+        hitDamages.push(0);
+        hitCrits.push(false);
+        hitMisses.push(true);
+        const hitTag = hitCount > 1 ? ` <span class="lp">(ตี ${h + 1}/${hitCount})</span>` : "";
+        logLine(
+          state,
+          cls,
+          `[${state.turn}] ${nm} → <b>${skill.n}</b>${tag} <span style="color:#AAA">พลาด!</span>${hitTag} ${probe}`,
+        );
+        continue;
+      }
+
+      hitDamages.push(perHitDmg);
+      hitCrits.push(res.crit);
+      hitMisses.push(false);
       state.hitsReceived[ds]++;
-      if (ds === "A") state.hA = Math.max(0, state.hA - res.dmg);
-      else state.hB = Math.max(0, state.hB - res.dmg);
+      if (ds === "A") state.hA = Math.max(0, state.hA - perHitDmg);
+      else state.hB = Math.max(0, state.hB - perHitDmg);
 
-      const dt = res.crit ? `<span class="lC">★CRIT! ${res.dmg}</span>` : `<b>${res.dmg}</b>`;
-      logLine(state, cls, `[${state.turn}] ${nm} → <b>${skill.n}</b>${tag} ${dt} ${probe}`);
+      const dt = res.crit
+        ? `<span class="lC">★CRIT! ${perHitDmg}</span>`
+        : `<b>${perHitDmg}</b>`;
+      const hitTag = hitCount > 1 ? ` <span class="lp">(ตี ${h + 1}/${hitCount})</span>` : "";
+      logLine(state, cls, `[${state.turn}] ${nm} → <b>${skill.n}</b>${tag} ${dt}${hitTag} ${probe}`);
 
-      // Life drain
+      // Life drain (per-hit)
       if (skill.dr && skill.dr > 0) {
-        const heal = Math.round(res.dmg * skill.dr / 100);
+        const heal = Math.round(perHitDmg * skill.dr / 100);
         const cap = side === "A" ? state.dA.HP : state.dB.HP;
         if (side === "A") state.hA = Math.min(cap, state.hA + heal);
         else state.hB = Math.min(cap, state.hB + heal);
         logLine(state, "lS", `&nbsp;→ ดูด ${heal} HP`);
       }
 
-      // Reflect on caster
+      // Reflect on caster (per-hit; consumes the buff stack on first reflect)
       if (res.reflectDmg > 0) {
-        if (side === "A") state.hA = Math.max(0, state.hA - res.reflectDmg);
-        else state.hB = Math.max(0, state.hB - res.reflectDmg);
-        logLine(state, "lS", `&nbsp;↩ สะท้อน ${res.reflectDmg}`);
+        const reflectPerHit = Math.round(res.reflectDmg / hitCount);
+        if (side === "A") state.hA = Math.max(0, state.hA - reflectPerHit);
+        else state.hB = Math.max(0, state.hB - reflectPerHit);
+        logLine(state, "lS", `&nbsp;↩ สะท้อน ${reflectPerHit}`);
       }
 
-      // on_hit weapon effect on attacker's weapon
+      // on_hit weapon effect on attacker's weapon (fires every hit)
       const wId = ctx.weaponEquipIds[side];
       const wep = wId ? getEquip(wId) : null;
       if (wep && wep.eff && wep.eff.t === "on_hit") {
@@ -377,17 +408,78 @@ export function resolveSkill(
       checkPassive(state, ds, ctx.artIds[ds], "hit_recv", ctx.names);
       if (skill.at === "int") checkPassive(state, side, ctx.artIds[side], "use_int", ctx.names);
 
+      // Per-hit enemy effect: each landed hit applies the debuff again.
+      // Stackable types (debuff_def / eva / acc / atk) accumulate via
+      // addDebuff's stacking path; non-stackable types refresh duration.
+      // Misses don't tick the debuff — only landed hits do.
+      if (skill.ee) applyEnemyEffect(state, side, skill.ee, ctx.names);
+
       checkWin(state, ctx.names);
     }
+
+    // Emit cast event for the UI overlay (skill name + per-hit damages).
+    emitCast(state, side, skill.n, hitCount, hitDamages, hitCrits, hitMisses, skill.ti);
+    void firstProbe;
   } else {
     logLine(state, cls, `[${state.turn}] ${nm} → <b>${skill.n}</b>${tag}`);
+    // Pure buff / no-attack skills: ee fires once at the end (no hit
+    // loop). Most pure-effect skills are buff-only anyway, but some have
+    // a debuff payload (e.g., poison needles `pn` with no damage roll).
+    if (skill.ee) applyEnemyEffect(state, side, skill.ee, ctx.names);
+    // Buff / no-attack skills emit a single placeholder hit so the UI
+    // still announces the cast name (no damage shown).
+    emitCast(state, side, skill.n, 1, [0], [false], [false], skill.ti);
   }
 
   if (!state.winner) {
+    // Self-effect (caster buff) fires once per cast — buffs don't stack
+    // across the same cast's hits (would compound too aggressively).
     if (skill.se) applySelfEffect(state, side, skill.se, ctx.names);
-    if (skill.ee) applyEnemyEffect(state, side, skill.ee, ctx.names);
   }
   logLine(state, "lS", `&nbsp;A:${state.hA}/${state.dA.HP} · B:${state.hB}/${state.dB.HP}`);
+}
+
+// Stash the most recent skill / art cast so the UI overlay can pick it
+// up. `seq` increments on every emit so React's effect can detect repeat
+// casts of the same skill (the overlay re-keys off seq). Also sets
+// `castEndsAt` so the ATB tick / AI scheduler pause for the duration of
+// the staggered animation, letting it play out before the next turn.
+//
+// Animation sequence (must stay in sync with cast-overlay CSS):
+//   - 0.00s: skill name pops in
+//   - 0.30s: hit 1 damage pops
+//   - 0.40s: hit 2 damage pops
+//   - 0.30s + (n-1)*0.10s: hit n
+//   - +0.50s tail so the last hit can finish its animation
+let castSeq = 0;
+const CAST_NAME_MS = 300;        // skill name display
+const CAST_HIT_STAGGER_MS = 100; // gap between consecutive hit pops
+const CAST_TAIL_MS = 500;        // tail after last hit so it can fade
+function emitCast(
+  state: BattleState,
+  side: Side,
+  name: string,
+  hits: number,
+  hitDamages: number[],
+  hitCrits: boolean[],
+  hitMisses: boolean[],
+  tier: import("./types").SkillTierIndex,
+): void {
+  castSeq = (castSeq + 1) | 0;
+  const allMissed = hitMisses.length > 0 && hitMisses.every((m) => m);
+  state.lastCast = {
+    seq: castSeq,
+    side,
+    name,
+    hits,
+    tier,
+    hitDamages,
+    hitCrits,
+    hitMisses,
+  };
+  void allMissed;
+  state.castEndsAt =
+    Date.now() + CAST_NAME_MS + hits * CAST_HIT_STAGGER_MS + CAST_TAIL_MS;
 }
 
 function skillTag(sk: Skill): string {
@@ -459,6 +551,11 @@ export function resolveArtActive(
     if (b.t === "buff_reflect") ref = b.v;
   }
 
+  // Cast tracking — emitCast at the bottom uses these.
+  let castDmg = 0;
+  let castCrit = false;
+  const castMiss = false;
+
   const probe = (hp: number, cp: number) => `<span class="lp">[hit${hp}% crit${cp}%]</span>`;
 
   const computeMissProbe = () => {
@@ -488,6 +585,8 @@ export function resolveArtActive(
       state.st[ds].buffs = dst.buffs.filter((b) => b.t !== "buff_reflect");
       logLine(state, "lS", `&nbsp;↩ สะท้อน${rd}`);
     }
+    castDmg += dmg;
+    if (crit) castCrit = true;
     return { dmg, crit };
   };
 
@@ -635,6 +734,19 @@ export function resolveArtActive(
   // Fire the use_act passive for the art that was just activated (not the
   // primary). If multiple arts are slotted, each uses its own passive set.
   if (art.pas?.tr === "use_act") checkPassive(state, side, aid, "use_act", ctx.names);
+
+  // Emit cast event for the UI overlay. Art actives are always 1 logical
+  // cast (no engine-side multi-hit), so hits=1.
+  emitCast(
+    state,
+    side,
+    act.n,
+    1,
+    [castDmg],
+    [castCrit],
+    [castMiss && castDmg === 0],
+    art.ti,
+  );
 
   logLine(state, "lS", `&nbsp;A:${state.hA}/${state.dA.HP} · B:${state.hB}/${state.dB.HP}`);
   return true;

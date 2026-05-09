@@ -63,13 +63,13 @@ export const ARTS: readonly Art[] = [
 
   { id: "taiji", n: "ไทจี้เจิ้นชี่", sc: "อู่ตัง", tp: "สมดุล·อ่อน", types: ["soft"], ti: 4,
     stats: { POW: 20, AGI: 15, INT: 15 }, hL: 35, mL: 35,
-    act: { n: "สะท้อนพลัง", c: 30, cd: 3, t: "buff_reflect", v: 50, u: 1, d: "สะท้อน 50% (1ตา) CD3" },
+    act: { n: "สะท้อนพลัง", c: 30, cd: 3, t: "buff_reflect", v: 50, u: 5, d: "สะท้อน 50% (1ตา) CD3" },
     pas: { tr: "use_int", ch: 100, d: "Int skill → IAtk+12%", e: { t: "mult_iatk" } } },
 
   { id: "zixia", n: "จื่อเสียเซินกง", sc: "อู่ตัง", tp: "สมดุล·อ่อน", types: ["soft"], ti: 4,
     stats: { POW: 20, INT: 15, AGI: 15 }, hL: 30, mL: 40,
     act: { n: "หมอกม่วง", c: 30, cd: 3, t: "heal_cleanse", h: 25, d: "ฟื้น 25%HP + ลบ debuff CD3" },
-    pas: { tr: "use_int", ch: 50, d: "Int skill 50% → Eva+10 (2ตา)", e: { t: "buff_eva", n: "หมอก", v: 10, u: 2 } } },
+    pas: { tr: "use_int", ch: 50, d: "Int skill 50% → Eva+10 (2ตา)", e: { t: "buff_eva", n: "หมอก", v: 10, u: 5 } } },
 
   // ─── ง้อไบ๊ ────────────────────────────────────────────────────────
   { id: "emei", n: "ง้อไบ๊เซินกง", sc: "ง้อไบ๊", tp: "สมดุล·ภายใน", types: ["internal"], ti: 4,
@@ -86,7 +86,7 @@ export const ARTS: readonly Art[] = [
   // ─── ฉวนเจิน ──────────────────────────────────────────────────────
   { id: "qzzq", n: "ลมปราณชวนจินก่า", sc: "ฉวนเจิน", tp: "หยาง·ภายใน", types: ["yang", "internal"], ti: 2,
     stats: { POW: 12, INT: 10, DEF: 8 }, hL: 25, mL: 25,
-    act: { n: "หยางบริสุทธิ์", c: 25, cd: 3, t: "buff_reduce", v: 25, u: 3, d: "ลด dmg 25% (3ตา) — 全真真气 หยางบริสุทธิ์ CD3" },
+    act: { n: "หยางบริสุทธิ์", c: 25, cd: 3, t: "buff_reduce", v: 25, u: 5, d: "ลด dmg 25% (3ตา) — 全真真气 หยางบริสุทธิ์ CD3" },
     pas: { tr: "use_int", ch: 100, d: "Int skill → IAtk+12%", e: { t: "mult_iatk" } } },
 
   // ─── กู่มู่ (โบราณสุสาน) ────────────────────────────────────────
@@ -99,23 +99,23 @@ export const ARTS: readonly Art[] = [
   { id: "wanderer", n: "เจียงหูชี่", sc: "พรรคยาจก", tp: "แข็ง·ภายนอก", types: ["hard", "external"], ti: 4,
     stats: { STR: 15, VIT: 20, AGI: 15 }, hL: 45, mL: 25,
     act: { n: "ฝ่ามือมังกร", c: 25, cd: 4, t: "atk_phy_pen", m: 1.4, pen: 30, d: "ทางกาย×1.4 ทะลุ DEF 30% CD4" },
-    pas: { tr: "hit_recv", ch: 30, d: "ถูกโจมตี 30% → Eva+15 (1ตา)", e: { t: "buff_eva", n: "ว่องไว", v: 15, u: 1 } } },
+    pas: { tr: "hit_recv", ch: 30, d: "ถูกโจมตี 30% → Eva+15 (1ตา)", e: { t: "buff_eva", n: "ว่องไว", v: 15, u: 5 } } },
 
   // ─── พรรคสว่างมืด ─────────────────────────────────────────────────
   { id: "qiankun", n: "เฉียนคุนต้าหนัวอี", sc: "พรรคสว่างมืด", tp: "สมดุล·ภายใน", types: ["internal"], ti: 4,
     stats: { POW: 20, AGI: 15, INT: 15 }, hL: 20, mL: 50,
-    act: { n: "โอนถ่ายพลัง", c: 35, cd: 3, t: "buff_reflect", v: 70, u: 1, d: "สะท้อน 70% ตาถัดไป CD3" },
+    act: { n: "โอนถ่ายพลัง", c: 35, cd: 3, t: "buff_reflect", v: 70, u: 5, d: "สะท้อน 70% ตาถัดไป CD3" },
     pas: { tr: "use_int", ch: 100, d: "Int skill → IAtk+15%", e: { t: "mult_iatk" } } },
 
   { id: "yxhd", n: "ดาวเคลื่อนดาราคล้อย", sc: "พรรคสว่างมืด", tp: "สมดุล·อ่อน", types: ["soft"], ti: 4,
     stats: { AGI: 22, DEX: 16, LUK: 12 }, hL: 35, mL: 35,
-    act: { n: "เบี่ยงดาว", c: 35, cd: 3, t: "buff_reflect", v: 70, u: 2, d: "สะท้อน 70% (2ตา) — 移星换斗 CD3" },
-    pas: { tr: "hit_recv", ch: 30, d: "ถูกโจมตี 30% → Eva+20 (2ตา)", e: { t: "buff_eva", n: "ดาราคล้อย", v: 20, u: 2 } } },
+    act: { n: "เบี่ยงดาว", c: 35, cd: 3, t: "buff_reflect", v: 70, u: 5, d: "สะท้อน 70% (2ตา) — 移星换斗 CD3" },
+    pas: { tr: "hit_recv", ch: 30, d: "ถูกโจมตี 30% → Eva+20 (2ตา)", e: { t: "buff_eva", n: "ดาราคล้อย", v: 20, u: 5 } } },
 
   // ─── พรรคสราญรมย์ (เซียวหยาว) ────────────────────────────────────
   { id: "bmzq", n: "ลมปราณภูติอุดร", sc: "พรรคสราญรมย์", tp: "หยิน·ภายใน", types: ["yin", "internal"], ti: 3,
     stats: { POW: 14, INT: 14, AGI: 12 }, hL: 25, mL: 35,
-    act: { n: "ภูติอุดร", c: 30, cd: 3, t: "buff_reflect", v: 50, u: 2, d: "สะท้อน 50% (2ตา) — 北冥真气 CD3" },
+    act: { n: "ภูติอุดร", c: 30, cd: 3, t: "buff_reflect", v: 50, u: 5, d: "สะท้อน 50% (2ตา) — 北冥真气 CD3" },
     pas: { tr: "use_int", ch: 100, d: "Int → IAtk+15%", e: { t: "mult_iatk" } } },
 
   { id: "bmsg", n: "มหาเวทดูดดาว", sc: "พรรคสราญรมย์", tp: "หยิน·ภายใน", types: ["yin", "internal"], ti: 4,
@@ -126,36 +126,36 @@ export const ARTS: readonly Art[] = [
   // ─── สำนักดาวดึงส์ (เห็งซัว / Xingxiu) ───────────────────────────
   { id: "hgdf", n: "วิชาสลายพลัง", sc: "สำนักดาวดึงส์", tp: "หยิน·ภายใน", types: ["yin", "internal"], ti: 3,
     stats: { POW: 14, INT: 12, DEX: 14 }, hL: 30, mL: 30,
-    act: { n: "สลายพลัง", c: 30, cd: 3, t: "debuff_acc_dmg", ad: -20, u: 3, dm: 0.6, d: "Acc-20 + Int×0.6 (3ตา) — 化功大法 CD3" },
-    pas: { tr: "use_int", ch: 50, d: "Int 50% → ศัตรู PDef-12 (2ตา)", e: { t: "debuff_def", n: "สลาย", v: -12, u: 2 } } },
+    act: { n: "สลายพลัง", c: 30, cd: 3, t: "debuff_acc_dmg", ad: -20, u: 5, dm: 0.6, d: "Acc-20 + Int×0.6 (3ตา) — 化功大法 CD3" },
+    pas: { tr: "use_int", ch: 50, d: "Int 50% → ศัตรู PDef-12 (2ตา)", e: { t: "debuff_def", n: "สลาย", v: -12, u: 5 } } },
 
   // ─── พรรคเบญจพิษ ─────────────────────────────────────────────────
   { id: "t2_snakeform", n: "งูพิษเจ็ดสี", sc: "พรรคเบญจพิษ", tp: "หยิน·อ่อน", types: ["yin", "soft"], ti: 2,
     stats: { DEX: 12, LUK: 10, POW: 8 }, hL: 18, mL: 32,
-    act: { n: "เขี้ยวเจ็ดสี", c: 30, cd: 3, t: "debuff_poison", pp: 5, u: 3, ev: -12, d: "พิษ 5%HP/ตา + Eva-12 CD3" },
-    pas: { tr: "on_crit", ch: 100, d: "Crit → ศัตรู Eva-12 (2ตา)", e: { t: "debuff_eva", n: "พิษงู", v: -12, u: 2 } } },
+    act: { n: "เขี้ยวเจ็ดสี", c: 30, cd: 3, t: "debuff_poison", pp: 5, u: 5, ev: -12, d: "พิษ 5%HP/ตา + Eva-12 CD3" },
+    pas: { tr: "on_crit", ch: 100, d: "Crit → ศัตรู Eva-12 (2ตา)", e: { t: "debuff_eva", n: "พิษงู", v: -12, u: 5 } } },
 
   { id: "np", n: "เบญจพิษรวมกาย", sc: "พรรคเบญจพิษ", tp: "หยิน·อ่อน", types: ["yin", "soft"], ti: 4,
     stats: { DEX: 18, LUK: 18, POW: 14 }, hL: 25, mL: 45,
-    act: { n: "ห้าพิษรวมร่าง", c: 35, cd: 4, t: "debuff_poison", pp: 8, u: 4, ev: -15, d: "พิษ 8%HP/ตา + Eva-15 (4ตา) CD4" },
-    pas: { tr: "on_crit", ch: 100, d: "Crit → ศัตรู Acc-12 (3ตา)", e: { t: "debuff_acc", n: "พิษ", v: -12, u: 3 } } },
+    act: { n: "ห้าพิษรวมร่าง", c: 35, cd: 4, t: "debuff_poison", pp: 8, u: 5, ev: -15, d: "พิษ 8%HP/ตา + Eva-15 (4ตา) CD4" },
+    pas: { tr: "on_crit", ch: 100, d: "Crit → ศัตรู Acc-12 (3ตา)", e: { t: "debuff_acc", n: "พิษ", v: -12, u: 5 } } },
 
   // ─── องครักษ์เสื้อแพร (Jinyiwei — Brocade-clad Imperial Guard) ─────
   // All five tiers lean yang/external — the lineage is built around
   // hard-conditioned bodies and aggressive foot-pursuit work.
   { id: "jy_a0_brocade", n: "ลมปราณเสื้อแพร", sc: "องครักษ์เสื้อแพร", tp: "หยาง·ภายนอก", types: ["yang", "external"], ti: 0,
     stats: { STR: 5, VIT: 4 }, hL: 18, mL: 10,
-    act: { n: "ตั้งแถวรับ", c: 15, cd: 3, t: "buff_reduce", v: 18, u: 2, d: "ลด dmg 18% (2ตา) CD3" },
-    pas: { tr: "hit_recv", ch: 25, d: "ถูกโจมตี 25% → DEF+10 (1ตา)", e: { t: "buff_def", n: "เกราะ", v: 10, u: 1 } } },
+    act: { n: "ตั้งแถวรับ", c: 15, cd: 3, t: "buff_reduce", v: 18, u: 5, d: "ลด dmg 18% (2ตา) CD3" },
+    pas: { tr: "hit_recv", ch: 25, d: "ถูกโจมตี 25% → DEF+10 (1ตา)", e: { t: "buff_def", n: "เกราะ", v: 10, u: 5 } } },
 
   { id: "jy_a1_silktread", n: "ฝีก้าวเส้นไหม", sc: "องครักษ์เสื้อแพร", tp: "หยาง·ภายนอก", types: ["yang", "external"], ti: 1,
     stats: { STR: 6, AGI: 6, DEX: 4 }, hL: 25, mL: 15,
-    act: { n: "ก้าวรวดเร็ว", c: 20, cd: 3, t: "buff_eva_debuff_eva", selfV: 15, eneV: -10, u: 2, d: "Eva+15 / ศัตรู Eva-10 (2ตา) CD3" },
-    pas: { tr: "on_crit", ch: 100, d: "Crit → ศัตรู Eva-10 (2ตา)", e: { t: "debuff_eva", n: "ตัวสาน", v: -10, u: 2 } } },
+    act: { n: "ก้าวรวดเร็ว", c: 20, cd: 3, t: "buff_eva_debuff_eva", selfV: 15, eneV: -10, u: 5, d: "Eva+15 / ศัตรู Eva-10 (2ตา) CD3" },
+    pas: { tr: "on_crit", ch: 100, d: "Crit → ศัตรู Eva-10 (2ตา)", e: { t: "debuff_eva", n: "ตัวสาน", v: -10, u: 5 } } },
 
   { id: "jy_a2_goldarmor", n: "เกราะทองอนุรักษ์", sc: "องครักษ์เสื้อแพร", tp: "หยาง·ภายนอก", types: ["yang", "external"], ti: 2,
     stats: { STR: 8, VIT: 8, DEF: 8 }, hL: 35, mL: 15,
-    act: { n: "เกราะทองคุ้ม", c: 25, cd: 3, t: "buff_reduce", v: 30, u: 2, d: "ลด dmg 30% (2ตา) CD3" },
+    act: { n: "เกราะทองคุ้ม", c: 25, cd: 3, t: "buff_reduce", v: 30, u: 5, d: "ลด dmg 30% (2ตา) CD3" },
     pas: { tr: "hit_recv", ch: 30, d: "ถูกโจมตี 30% → ฟื้น 6% HP", e: { t: "heal_pct", v: 6 } } },
 
   { id: "jy_a3_thunderstride", n: "ฟ้าผ่าก้าวเดิน", sc: "องครักษ์เสื้อแพร", tp: "หยาง·ภายนอก", types: ["yang", "external"], ti: 3,
@@ -166,7 +166,7 @@ export const ARTS: readonly Art[] = [
   { id: "jy_a4_brocadelord", n: "เจ้านายเสื้อแพร", sc: "องครักษ์เสื้อแพร", tp: "หยาง·ภายนอก", types: ["yang", "external"], ti: 4,
     stats: { STR: 18, AGI: 16, DEX: 16 }, hL: 40, mL: 30,
     act: { n: "ยุทธวิธีล่าโจร", c: 35, cd: 4, t: "atk_phy_pen", m: 1.5, pen: 50, d: "ทางกาย×1.5 ทะลุ DEF 50% CD4" },
-    pas: { tr: "on_crit", ch: 100, d: "Crit → ศัตรู PDef-15 (2ตา)", e: { t: "debuff_def", n: "บาดลึก", v: -15, u: 2 } } },
+    pas: { tr: "on_crit", ch: 100, d: "Crit → ศัตรู PDef-15 (2ตา)", e: { t: "debuff_def", n: "บาดลึก", v: -15, u: 5 } } },
 
   // ─── สำนักดาบโลหิต ───────────────────────────────────────────────
   { id: "blood", n: "โลหิตอสุรา", sc: "สำนักดาบโลหิต", tp: "หยาง·แข็ง", types: ["yang", "hard"], ti: 4,
@@ -178,13 +178,13 @@ export const ARTS: readonly Art[] = [
   // ─── tier 0 ────────
   { id: "t0_ironshirt", n: "เกราะผ้าเหล็กพื้น", sc: "ยุทธจักร", tp: "แข็ง·ภายนอก", types: ["hard", "external"], ti: 0,
     stats: { VIT: 6, DEF: 4 }, hL: 25, mL: 5,
-    act: { n: "ปิดประตูร่างกาย", c: 15, cd: 3, t: "buff_reduce", v: 15, u: 2, d: "ลด dmg 15% (2ตา) CD3" },
+    act: { n: "ปิดประตูร่างกาย", c: 15, cd: 3, t: "buff_reduce", v: 15, u: 5, d: "ลด dmg 15% (2ตา) CD3" },
     pas: { tr: "hit_recv", ch: 20, d: "ถูกโจมตี 20% → ฟื้น 5% HP", e: { t: "heal_pct", v: 5 } } },
 
   { id: "t0_sevenstar", n: "เจ็ดดาวเหนือ", sc: "ยุทธจักร", tp: "สมดุล·อ่อน", types: ["soft"], ti: 0,
     stats: { AGI: 5, DEX: 5 }, hL: 15, mL: 15,
-    act: { n: "ดาวลอย", c: 15, cd: 3, t: "buff_eva_debuff_eva", selfV: 10, eneV: -8, u: 2, d: "Eva+10 / ศัตรู Eva-8 (2ตา) CD3" },
-    pas: { tr: "on_crit", ch: 100, d: "Crit → Eva+8 (1ตา)", e: { t: "buff_eva", n: "ดาว", v: 8, u: 1 } } },
+    act: { n: "ดาวลอย", c: 15, cd: 3, t: "buff_eva_debuff_eva", selfV: 10, eneV: -8, u: 5, d: "Eva+10 / ศัตรู Eva-8 (2ตา) CD3" },
+    pas: { tr: "on_crit", ch: 100, d: "Crit → Eva+8 (1ตา)", e: { t: "buff_eva", n: "ดาว", v: 8, u: 5 } } },
 
   { id: "t0_fiveyuan", n: "ห้าธาตุพื้นฐาน", sc: "ยุทธจักร", tp: "สมดุล·ภายนอก", types: ["external"], ti: 0,
     stats: { STR: 3, AGI: 4, DEX: 3 }, hL: 18, mL: 12,
@@ -194,13 +194,13 @@ export const ARTS: readonly Art[] = [
   { id: "t0_butterfly", n: "ลมปราณผีเสื้อ", sc: "ยุทธจักร", tp: "หยิน·อ่อน", types: ["yin", "soft"], ti: 0,
     stats: { POW: 5, INT: 5 }, hL: 10, mL: 20,
     act: { n: "บินเหลือร่อง", c: 18, cd: 3, t: "heal_cleanse", h: 10, d: "ฟื้น 10%HP + ลบ debuff CD3" },
-    pas: { tr: "hit_recv", ch: 20, d: "ถูกโจมตี 20% → Eva+10 (1ตา)", e: { t: "buff_eva", n: "ผีเสื้อ", v: 10, u: 1 } } },
+    pas: { tr: "hit_recv", ch: 20, d: "ถูกโจมตี 20% → Eva+10 (1ตา)", e: { t: "buff_eva", n: "ผีเสื้อ", v: 10, u: 5 } } },
 
   // ─── tier 1 ────────
   { id: "t1_eagleclaw", n: "ลมปราณกรงเล็บอินทรี", sc: "ยุทธจักร", tp: "หยาง·ภายนอก", types: ["yang", "external"], ti: 1,
     stats: { STR: 8, DEX: 6, AGI: 6 }, hL: 25, mL: 15,
     act: { n: "เกาะร่างมรณะ", c: 25, cd: 3, t: "atk_phy_pen", m: 1.3, pen: 25, d: "ทางกาย×1.3 ทะลุ DEF 25% CD3" },
-    pas: { tr: "on_crit", ch: 100, d: "Crit → ศัตรู PDef-8 (2ตา)", e: { t: "debuff_def", n: "บาดแผล", v: -8, u: 2 } } },
+    pas: { tr: "on_crit", ch: 100, d: "Crit → ศัตรู PDef-8 (2ตา)", e: { t: "debuff_def", n: "บาดแผล", v: -8, u: 5 } } },
 
   { id: "t1_whitehorse", n: "ลมปราณม้าขาว", sc: "ยุทธจักร", tp: "สมดุล", types: [], ti: 1,
     stats: { POW: 8, INT: 6, LUK: 6 }, hL: 20, mL: 20,
@@ -210,28 +210,28 @@ export const ARTS: readonly Art[] = [
   { id: "t1_blackiron", n: "ลมปราณเหล็กดำ", sc: "ยุทธจักร", tp: "หยิน·ภายใน", types: ["yin", "internal"], ti: 1,
     stats: { POW: 8, VIT: 6, DEF: 6 }, hL: 22, mL: 18,
     act: { n: "เหล็กกลืนเลือด", c: 25, cd: 3, t: "drain_phy", m: 1.2, h: 25, d: "ทางกาย×1.2 + ดูด 25% CD3" },
-    pas: { tr: "hit_recv", ch: 20, d: "ถูกโจมตี 20% → ศัตรู Acc-10 (2ตา)", e: { t: "debuff_acc", n: "ตาพร่า", v: -10, u: 2 } } },
+    pas: { tr: "hit_recv", ch: 20, d: "ถูกโจมตี 20% → ศัตรู Acc-10 (2ตา)", e: { t: "debuff_acc", n: "ตาพร่า", v: -10, u: 5 } } },
 
   { id: "t1_redlotus", n: "บัวแดงเพลิงน้อย", sc: "ยุทธจักร", tp: "หยาง·ภายใน", types: ["yang", "internal"], ti: 1,
     stats: { POW: 10, INT: 6, DEX: 4 }, hL: 15, mL: 25,
     act: { n: "หมัดเพลิงแดง", c: 25, cd: 3, t: "atk_int_pen", m: 1.3, pen: 20, d: "Int×1.3 ทะลุ IDef 20% CD3" },
-    pas: { tr: "use_int", ch: 50, d: "Int 50% → ศัตรู PDef-10 (2ตา)", e: { t: "debuff_def", n: "เพลิง", v: -10, u: 2 } } },
+    pas: { tr: "use_int", ch: 50, d: "Int 50% → ศัตรู PDef-10 (2ตา)", e: { t: "debuff_def", n: "เพลิง", v: -10, u: 5 } } },
 
   // ─── tier 2 ────────
   { id: "t2_eighttri", n: "แปดทิศมหาเวท", sc: "ยุทธจักร", tp: "สมดุล·อ่อน", types: ["soft"], ti: 2,
     stats: { AGI: 10, DEX: 10, INT: 10 }, hL: 25, mL: 25,
     act: { n: "เจาะแปดประตู", c: 30, cd: 4, t: "drain", m: 1.3, h: 30, d: "Int×1.3 + ดูด 30% dmg CD4" },
-    pas: { tr: "on_crit", ch: 100, d: "Crit → Eva+12 (2ตา)", e: { t: "buff_eva", n: "เกล็ดดาว", v: 12, u: 2 } } },
+    pas: { tr: "on_crit", ch: 100, d: "Crit → Eva+12 (2ตา)", e: { t: "buff_eva", n: "เกล็ดดาว", v: 12, u: 5 } } },
 
   { id: "t2_plumblossom", n: "ลมปราณเหมยห้ากลีบ", sc: "ยุทธจักร", tp: "หยิน·อ่อน", types: ["yin", "soft"], ti: 2,
     stats: { POW: 10, INT: 10, DEX: 10 }, hL: 20, mL: 30,
     act: { n: "เหมยปรานี", c: 25, cd: 3, t: "heal_cleanse", h: 25, d: "ฟื้น 25%HP + ลบ debuff CD3" },
-    pas: { tr: "hit_recv", ch: 25, d: "ถูกโจมตี 25% → Eva+15 (2ตา)", e: { t: "buff_eva", n: "ดอกเหมย", v: 15, u: 2 } } },
+    pas: { tr: "hit_recv", ch: 25, d: "ถูกโจมตี 25% → Eva+15 (2ตา)", e: { t: "buff_eva", n: "ดอกเหมย", v: 15, u: 5 } } },
 
   { id: "t2_craneform", n: "กระเรียนสมาธิ", sc: "ยุทธจักร", tp: "สมดุล·ภายนอก", types: ["external"], ti: 2,
     stats: { AGI: 12, DEX: 10, LUK: 8 }, hL: 30, mL: 20,
     act: { n: "ปีกกระเรียน", c: 30, cd: 4, t: "drain_acc", m: 1.2, h: 35, adv: -12, d: "Int×1.2 + ดูด 35% + Acc-12 CD4" },
-    pas: { tr: "on_crit", ch: 100, d: "Crit → ศัตรู Acc-10 (2ตา)", e: { t: "debuff_acc", n: "ขนนก", v: -10, u: 2 } } },
+    pas: { tr: "on_crit", ch: 100, d: "Crit → ศัตรู Acc-10 (2ตา)", e: { t: "debuff_acc", n: "ขนนก", v: -10, u: 5 } } },
 
   { id: "t2_tigerroar", n: "เสือคำราม", sc: "ยุทธจักร", tp: "หยาง·แข็ง", types: ["yang", "hard"], ti: 2,
     stats: { STR: 14, VIT: 10, AGI: 6 }, hL: 35, mL: 15,
@@ -246,20 +246,20 @@ export const ARTS: readonly Art[] = [
 
   { id: "t3_heartmind", n: "วิชากลใจเป็นจิต", sc: "ยุทธจักร", tp: "สมดุล·ภายใน", types: ["internal"], ti: 3,
     stats: { INT: 16, POW: 14, LUK: 10 }, hL: 20, mL: 40,
-    act: { n: "ส่องใจ", c: 30, cd: 3, t: "debuff_acc_dmg", ad: -22, u: 3, dm: 0.7, d: "Acc-22 + Int×0.7 CD3" },
+    act: { n: "ส่องใจ", c: 30, cd: 3, t: "debuff_acc_dmg", ad: -22, u: 5, dm: 0.7, d: "Acc-22 + Int×0.7 CD3" },
     pas: { tr: "use_int", ch: 100, d: "Int → IAtk+15%", e: { t: "mult_iatk" } } },
 
   { id: "t3_voidstep", n: "ก้าวว่างไร้รอย", sc: "ยุทธจักร", tp: "อ่อน·ภายนอก", types: ["soft", "external"], ti: 3,
     stats: { AGI: 16, DEX: 12, LUK: 12 }, hL: 30, mL: 30,
-    act: { n: "พลิกฟ้าหายตัว", c: 25, cd: 3, t: "buff_eva_debuff_eva", selfV: 25, eneV: -20, u: 3, d: "Eva+25 / ศัตรู Eva-20 (3ตา) CD3" },
-    pas: { tr: "on_crit", ch: 100, d: "Crit → Eva+20 (2ตา)", e: { t: "buff_eva", n: "ก้าวว่าง", v: 20, u: 2 } } },
+    act: { n: "พลิกฟ้าหายตัว", c: 25, cd: 3, t: "buff_eva_debuff_eva", selfV: 25, eneV: -20, u: 5, d: "Eva+25 / ศัตรู Eva-20 (3ตา) CD3" },
+    pas: { tr: "on_crit", ch: 100, d: "Crit → Eva+20 (2ตา)", e: { t: "buff_eva", n: "ก้าวว่าง", v: 20, u: 5 } } },
 
   // ─── tier 4 (legendary / iconic — moved here when their lineage isn't
   // a sect we ship today; re-tag as authors create the relevant sects) ─
   { id: "military", n: "จวินเจิ้นชี่", sc: "ยุทธจักร", tp: "หยาง·ภายนอก", types: ["yang", "external"], ti: 4,
     stats: { STR: 20, DEX: 15, AGI: 15 }, hL: 40, mL: 30,
     act: { n: "สามก้าวสังหาร", c: 30, cd: 4, t: "atk_phy_pen", m: 1.3, pen: 50, d: "ทางกาย×1.3 ทะลุ DEF 50% CD4" },
-    pas: { tr: "on_crit", ch: 100, d: "Crit → ศัตรู Eva-8 (2ตา)", e: { t: "debuff_eva", n: "ตาพร่า", v: -8, u: 2 } } },
+    pas: { tr: "on_crit", ch: 100, d: "Crit → ศัตรู Eva-8 (2ตา)", e: { t: "debuff_eva", n: "ตาพร่า", v: -8, u: 5 } } },
 
   { id: "lotus", n: "เหลียนฮวาชี่", sc: "ยุทธจักร", tp: "สมดุล·อ่อน", types: ["soft"], ti: 4,
     stats: { POW: 15, INT: 15, LUK: 20 }, hL: 35, mL: 35,
@@ -268,13 +268,13 @@ export const ARTS: readonly Art[] = [
 
   { id: "scholar", n: "เหวินชี่", sc: "ยุทธจักร", tp: "สมดุล·ภายใน", types: ["internal"], ti: 4,
     stats: { INT: 20, POW: 15, DEX: 15 }, hL: 25, mL: 45,
-    act: { n: "คีตาอาคม", c: 30, cd: 3, t: "debuff_acc_dmg", ad: -20, u: 2, dm: 0.6, d: "Acc-20 + Int×0.6 CD3" },
+    act: { n: "คีตาอาคม", c: 30, cd: 3, t: "debuff_acc_dmg", ad: -20, u: 5, dm: 0.6, d: "Acc-20 + Int×0.6 CD3" },
     pas: { tr: "use_int", ch: 100, d: "Int skill → ATK+10%", e: { t: "mult_atk" } } },
 
   { id: "poison", n: "อินตู๋ชี่", sc: "ยุทธจักร", tp: "หยิน·อ่อน", types: ["yin", "soft"], ti: 4,
     stats: { DEX: 20, LUK: 20, POW: 10 }, hL: 15, mL: 55,
-    act: { n: "พิษสะสม", c: 35, cd: 3, t: "debuff_poison", pp: 5, u: 3, ev: -10, d: "พิษ 5%HP/ตา + Eva-10 CD3" },
-    pas: { tr: "on_crit", ch: 100, d: "Crit → ศัตรู Acc-8 (2ตา)", e: { t: "debuff_acc", n: "ตาพร่า", v: -8, u: 2 } } },
+    act: { n: "พิษสะสม", c: 35, cd: 3, t: "debuff_poison", pp: 5, u: 5, ev: -10, d: "พิษ 5%HP/ตา + Eva-10 CD3" },
+    pas: { tr: "on_crit", ch: 100, d: "Crit → ศัตรู Acc-8 (2ตา)", e: { t: "debuff_acc", n: "ตาพร่า", v: -8, u: 5 } } },
 
   { id: "heaven", n: "เฉียนคุนต้าฝ่า", sc: "ยุทธจักร", tp: "สมดุล·ภายใน", types: ["internal"], ti: 4,
     stats: { POW: 30, INT: 20 }, hL: 15, mL: 55,
@@ -283,28 +283,28 @@ export const ARTS: readonly Art[] = [
 
   { id: "snow", n: "กำแพงหิมะ", sc: "ยุทธจักร", tp: "หยิน·แข็ง", types: ["yin", "hard"], ti: 4,
     stats: { DEF: 25, VIT: 15, INT: 10 }, hL: 50, mL: 20,
-    act: { n: "กำแพงน้ำแข็ง", c: 20, cd: 3, t: "buff_reduce", v: 50, u: 1, d: "ลด dmg 50% (1ตา) CD3" },
-    pas: { tr: "hit_recv", ch: 25, d: "ถูกโจมตี 25% → ศัตรู Acc-12 (2ตา)", e: { t: "debuff_acc", n: "สับสน", v: -12, u: 2 } } },
+    act: { n: "กำแพงน้ำแข็ง", c: 20, cd: 3, t: "buff_reduce", v: 50, u: 5, d: "ลด dmg 50% (1ตา) CD3" },
+    pas: { tr: "hit_recv", ch: 25, d: "ถูกโจมตี 25% → ศัตรู Acc-12 (2ตา)", e: { t: "debuff_acc", n: "สับสน", v: -12, u: 5 } } },
 
   { id: "fire", n: "เพลิงสวรรค์", sc: "ยุทธจักร", tp: "หยาง·ภายใน", types: ["yang", "internal"], ti: 4,
     stats: { POW: 25, INT: 15, STR: 10 }, hL: 30, mL: 40,
     act: { n: "เพลิงฟ้า", c: 35, cd: 4, t: "atk_int_pen", m: 1.4, pen: 30, d: "Int×1.4 ทะลุ IDef 30% CD4" },
-    pas: { tr: "use_int", ch: 50, d: "Int skill 50% → ศัตรู PDef-12 (2ตา)", e: { t: "debuff_def", n: "ไฟไหม้", v: -12, u: 2 } } },
+    pas: { tr: "use_int", ch: 50, d: "Int skill 50% → ศัตรู PDef-12 (2ตา)", e: { t: "debuff_def", n: "ไฟไหม้", v: -12, u: 5 } } },
 
   { id: "sand", n: "พายุทราย", sc: "ยุทธจักร", tp: "สมดุล·ภายนอก", types: ["external"], ti: 4,
     stats: { AGI: 25, DEX: 15, LUK: 10 }, hL: 35, mL: 35,
-    act: { n: "พายุทราย", c: 25, cd: 3, t: "buff_eva_debuff_eva", selfV: 20, eneV: -15, u: 2, d: "Eva+20 / ศัตรู Eva-15 (2ตา) CD3" },
-    pas: { tr: "on_crit", ch: 100, d: "Crit → ศัตรู Acc-12 (2ตา)", e: { t: "debuff_acc", n: "ทราย", v: -12, u: 2 } } },
+    act: { n: "พายุทราย", c: 25, cd: 3, t: "buff_eva_debuff_eva", selfV: 20, eneV: -15, u: 5, d: "Eva+20 / ศัตรู Eva-15 (2ตา) CD3" },
+    pas: { tr: "on_crit", ch: 100, d: "Crit → ศัตรู Acc-12 (2ตา)", e: { t: "debuff_acc", n: "ทราย", v: -12, u: 5 } } },
 
   { id: "shadow", n: "เงาสังหาร", sc: "ยุทธจักร", tp: "หยิน·ภายนอก", types: ["yin", "external"], ti: 4,
     stats: { DEX: 20, LUK: 20, INT: 10 }, hL: 20, mL: 50,
     act: { n: "ตีจุดมรณะ", c: 35, cd: 4, t: "drain_acc", m: 1.2, h: 40, adv: -15, d: "Int×1.2 + ดูด 40% + Acc-15 CD4" },
-    pas: { tr: "on_crit", ch: 100, d: "Crit → ศัตรู PDef-15 (2ตา)", e: { t: "debuff_def", n: "บาดแผล", v: -15, u: 2 } } },
+    pas: { tr: "on_crit", ch: 100, d: "Crit → ศัตรู PDef-15 (2ตา)", e: { t: "debuff_def", n: "บาดแผล", v: -15, u: 5 } } },
 
   { id: "jiuyin", n: "เก้าหยินจิงชี่", sc: "ยุทธจักร", tp: "หยิน·ภายใน", types: ["yin", "internal"], ti: 4,
     stats: { POW: 20, INT: 20, DEX: 10 }, hL: 10, mL: 60,
     act: { n: "เก้าหยินขาวกระดูก", c: 40, cd: 4, t: "atk_int_pen", m: 1.5, pen: 40, d: "Int×1.5 ทะลุ IDef 40% CD4" },
-    pas: { tr: "use_int", ch: 100, d: "Int skill → ศัตรู PDef-10 (2ตา)", e: { t: "debuff_def", n: "กระดูกร้าว", v: -10, u: 2 } } },
+    pas: { tr: "use_int", ch: 100, d: "Int skill → ศัตรู PDef-10 (2ตา)", e: { t: "debuff_def", n: "กระดูกร้าว", v: -10, u: 5 } } },
 
   { id: "jiuyang", n: "เก้าหยางเซินกง", sc: "ยุทธจักร", tp: "หยาง·แข็ง", types: ["yang", "hard"], ti: 4,
     stats: { STR: 15, VIT: 20, DEF: 15 }, hL: 60, mL: 10,
@@ -313,13 +313,13 @@ export const ARTS: readonly Art[] = [
 
   { id: "shenzhao", n: "เซินจ้าวจิง", sc: "ยุทธจักร", tp: "สมดุล·ภายใน", types: ["internal"], ti: 4,
     stats: { INT: 25, POW: 15, DEX: 10 }, hL: 20, mL: 50,
-    act: { n: "ดวงตาจิต", c: 30, cd: 3, t: "debuff_acc_dmg", ad: -25, u: 3, dm: 0.7, d: "Acc-25 + Int×0.7 CD3" },
+    act: { n: "ดวงตาจิต", c: 30, cd: 3, t: "debuff_acc_dmg", ad: -25, u: 5, dm: 0.7, d: "Acc-25 + Int×0.7 CD3" },
     pas: { tr: "use_int", ch: 100, d: "Int skill → ATK+12%", e: { t: "mult_atk" } } },
 
   { id: "taiyin", n: "ไต้อินเจิ้นชี่", sc: "ยุทธจักร", tp: "หยิน·อ่อน", types: ["yin", "soft"], ti: 4,
     stats: { DEX: 20, LUK: 20, POW: 10 }, hL: 10, mL: 60,
-    act: { n: "มรณะเย็น", c: 40, cd: 4, t: "debuff_poison", pp: 6, u: 4, ev: -15, d: "พิษ 6%HP/ตา + Eva-15 CD4" },
-    pas: { tr: "on_crit", ch: 100, d: "Crit → ศัตรู Acc-10 (3ตา)", e: { t: "debuff_acc", n: "มรณะ", v: -10, u: 3 } } },
+    act: { n: "มรณะเย็น", c: 40, cd: 4, t: "debuff_poison", pp: 6, u: 5, ev: -15, d: "พิษ 6%HP/ตา + Eva-15 CD4" },
+    pas: { tr: "on_crit", ch: 100, d: "Crit → ศัตรู Acc-10 (3ตา)", e: { t: "debuff_acc", n: "มรณะ", v: -10, u: 5 } } },
 
   { id: "huoxue", n: "ฮั่วเสวียสินฝ่า", sc: "ยุทธจักร", tp: "สมดุล·ภายใน", types: ["internal"], ti: 4,
     stats: { VIT: 25, POW: 15, DEF: 10 }, hL: 50, mL: 20,
@@ -338,8 +338,8 @@ export const ARTS: readonly Art[] = [
 
   { id: "khbt", n: "คัมภีร์ทานตะวัน", sc: "ยุทธจักร", tp: "สมดุล·อ่อน", types: ["soft"], ti: 4,
     stats: { AGI: 22, DEX: 18, INT: 10 }, hL: 30, mL: 40,
-    act: { n: "ทานตะวันพลิกฟ้า", c: 30, cd: 3, t: "buff_eva_debuff_eva", selfV: 35, eneV: -25, u: 2, d: "Eva+35 / ศัตรู Eva-25 (2ตา) — 葵花宝典 CD3" },
-    pas: { tr: "on_crit", ch: 100, d: "Crit → Eva+25 (2ตา)", e: { t: "buff_eva", n: "ทานตะวัน", v: 25, u: 2 } } },
+    act: { n: "ทานตะวันพลิกฟ้า", c: 30, cd: 3, t: "buff_eva_debuff_eva", selfV: 35, eneV: -25, u: 5, d: "Eva+35 / ศัตรู Eva-25 (2ตา) — 葵花宝典 CD3" },
+    pas: { tr: "on_crit", ch: 100, d: "Crit → Eva+25 (2ตา)", e: { t: "buff_eva", n: "ทานตะวัน", v: 25, u: 5 } } },
 ];
 
 export const ARTS_BY_ID: Map<string, Art> = new Map(ARTS.map((a) => [a.id, a]));

@@ -2,6 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── Custom display font: SOV_JomYuth ───────────────────────────────
+ * Used for the battle-scene skill-cast animation overlay (font-action
+ * Tailwind class). Bold + regular weights ship as TTF in
+ * /public/fonts/jomyuth/. Loaded eagerly because the cast animation
+ * fires within the first second of combat and a font swap mid-anim
+ * would look like a frame skip. */
+@font-face {
+  font-family: "Jomyuth";
+  src: url("/fonts/jomyuth/SOV_JomYuth/SOV_JomYuth.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: "Jomyuth";
+  src: url("/fonts/jomyuth/SOV_JomYuth/SOV_JomYuth-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: block;
+}
+
 @layer base {
   /*
    * Wuxia ink-on-paper palette. Light mode only — the `.dark` block was
@@ -95,6 +116,22 @@
   .pixel {
     image-rendering: pixelated;
     image-rendering: crisp-edges;
+  }
+
+  /*
+   * `.text-stroke-black` — bold black outline around colored text.
+   * Used by the battle-scene cast-animation overlay so tier-tinted
+   * skill names (especially T0 white) stay legible against the cream
+   * paper background. `paint-order: stroke fill` paints the stroke
+   * under the fill so the colored interior isn't obscured.
+   */
+  .text-stroke-black {
+    -webkit-text-stroke: 2.5px hsl(20 15% 6%);
+    paint-order: stroke fill;
+  }
+  .text-stroke-black-thin {
+    -webkit-text-stroke: 1.5px hsl(20 15% 6%);
+    paint-order: stroke fill;
   }
 
   /*
