@@ -56,6 +56,21 @@ export const ARTS: readonly Art[] = [
     pas: { tr: "use_act", ch: 100, d: "ใช้ IA → ATK+8% (≤3 ซ้อน)", e: { t: "stack_atk", v: 8, mx: 3 } } },
 
   // ─── อู่ตัง ───────────────────────────────────────────────────────
+  { id: "t0_meditation", n: "สมาธิพื้นฐาน", sc: "อู่ตัง", tp: "สมดุล", types: ["balance"], ti: 0,
+    stats: { POW: 4, INT: 4, VIT: 2 }, hL: 15, mL: 15,
+    act: { n: "นิ่งสงบ", c: 12, cd: 3, t: "heal", h: 10, d: "ฟื้น 10% HP CD3" },
+    pas: { tr: "hit_recv", ch: 20, d: "ถูกโจมตี 20% → ฟื้น 4% HP", e: { t: "heal_pct", v: 4 } } },
+
+  { id: "t1_naturalqi", n: "พลังธรรมชาติ", sc: "อู่ตัง", tp: "สมดุล", types: ["balance"], ti: 1,
+    stats: { POW: 6, INT: 6, AGI: 4, DEX: 4 }, hL: 20, mL: 20,
+    act: { n: "ลมปราณนิ่งใส", c: 18, cd: 3, t: "heal_cleanse", h: 15, d: "ฟื้น 15%HP + ลบ debuff CD3" },
+    pas: { tr: "hit_recv", ch: 20, d: "ถูกโจมตี 20% → DEF+8 (5ตา)", e: { t: "buff_def", n: "ลมปราณ", v: 8, u: 5 } } },
+
+  { id: "t2_mindbody", n: "จิตกายนวมเป็นหนึ่ง", sc: "อู่ตัง", tp: "สมดุล", types: ["balance"], ti: 2,
+    stats: { POW: 10, INT: 10, AGI: 6, VIT: 4 }, hL: 25, mL: 25,
+    act: { n: "ผสานกายจิต", c: 22, cd: 3, t: "buff_reflect", v: 30, u: 5, d: "สะท้อน 30% (5ตา) CD3" },
+    pas: { tr: "use_int", ch: 50, d: "Int skill 50% → Eva+8 (5ตา)", e: { t: "buff_eva", n: "นวมเป็นหนึ่ง", v: 8, u: 5 } } },
+
   { id: "t3_yinyang", n: "หยินหยางสมดุล", sc: "อู่ตัง", tp: "สมดุล", types: [], ti: 3,
     stats: { POW: 14, INT: 12, VIT: 8, DEF: 6 }, hL: 35, mL: 25,
     act: { n: "ปรานสมดุล", c: 35, cd: 4, t: "heal_cleanse", h: 30, d: "ฟื้น 30%HP + ลบ debuff CD4" },

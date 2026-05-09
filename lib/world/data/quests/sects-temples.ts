@@ -389,6 +389,167 @@ export const QUESTS_SECTS_TEMPLES: readonly QuestDef[] = [
   // อู่ตัง — อาจารย์ชิงซวี่
   // ──────────────────────────────────────────────────────────────────────
 
+  // 0. INTRO — ขอเข้าเป็นศิษย์ (disciple registration intro)
+  // No gender requirement — Wudang welcomes any sincere seeker. The trial
+  // is herb-gathering across the wider mountain biome (mixed: ginseng +
+  // lotus_seed + snow_lotus from canyon herbs nodes).
+  {
+    id: "qst_wudang_disciple_intro",
+    name: "ขอเข้าเป็นศิษย์อู่ตัง",
+    description: "อาจารย์ชิงซวี่จะรับศิษย์ใหม่เพียงผู้ที่มีความเพียรและใจสงบ — เก็บสมุนไพรประจำเขาให้ครบสามชนิดเพื่อพิสูจน์ตน · สมุนไพรหายาก 10 · โสม 10 · เม็ดบัว 10",
+    briefSummary: "ส่งสมุนไพรหายาก 10 + โสม 10 + เม็ดบัว 10 เข้าเป็นศิษย์อู่ตังขั้นที่ 9",
+    type: "side",
+    giverNpcId: "sect_wudang_master_qingxu",
+    prereqs: {
+      t: "and",
+      all: [
+        { t: "trait", trait: "evil", max: 10 },
+        { t: "not", of: { t: "sectMember", sectId: "wudang" } },
+      ],
+    },
+    stages: [
+      {
+        id: "gather_herbs",
+        description: "เก็บสมุนไพรหายาก 10 ชิ้น + โสม 10 ราก + เม็ดบัว 10 เม็ด",
+        autoAdvance: {
+          t: "and",
+          all: [
+            { t: "hasItem", itemId: "herb", count: 10 },
+            { t: "hasItem", itemId: "ginseng", count: 10 },
+            { t: "hasItem", itemId: "lotus_seed", count: 10 },
+          ],
+        },
+      },
+      {
+        id: "return_to_master",
+        description: "นำสมุนไพรกลับไปถวายอาจารย์ชิงซวี่",
+      },
+    ],
+    rewards: [
+      { t: "wExp", amount: 50 },
+      { t: "trait", trait: "humility", amount: 3 },
+      { t: "npcRelationship", npcId: "sect_wudang_master_qingxu", amount: 5 },
+      { t: "joinSect", sectId: "wudang" },
+      { t: "sectPoints", sectId: "wudang", amount: 20 },
+    ],
+  },
+
+  // ──────────────────────────────────────────────────────────────────────
+  // ภารกิจประจำอู่ตัง — ทำซ้ำได้ทุก 30 วัน
+  // ──────────────────────────────────────────────────────────────────────
+
+  // SECT-1 · ตรวจตรารอบเขา — sect points 50 (rank 9–7)
+  {
+    id: "qst_wudang_sect_patrol",
+    name: "ตรวจตรารอบเขาอู่ตัง",
+    description: "ภารกิจประจำของศิษย์อู่ตัง — ลาดตระเวนรอบเขาและกำราบโจรที่ลอบเข้ามา",
+    briefSummary: "ปราบโจรรอบเขา 2 คน · sect points +50",
+    type: "side",
+    sectId: "wudang",
+    giverNpcId: "sect_wudang_master_qingxu",
+    prereqs: { t: "sectMember", sectId: "wudang" },
+    stages: [
+      {
+        id: "patrol",
+        description: "ปราบโจรเร่ร่อน 2 คน",
+        autoAdvance: { t: "defeatedOpponent", opponentId: "thug", count: 2 },
+      },
+      {
+        id: "report",
+        description: "กลับไปรายงานอาจารย์ชิงซวี่",
+      },
+    ],
+    rewards: [
+      { t: "gold", amount: 150 },
+      { t: "wExp", amount: 60 },
+      { t: "npcRelationship", npcId: "sect_wudang_master_qingxu", amount: 3 },
+      { t: "sectPoints", sectId: "wudang", amount: 50 },
+    ],
+  },
+
+  // SECT-2 · เก็บสมุนไพรประจำสำนัก — sect points 60 (rank 9–6)
+  {
+    id: "qst_wudang_sect_herb_run",
+    name: "เก็บสมุนไพรเขาอู่ตัง",
+    description: "ห้องยาของอู่ตังต้องการสมุนไพรสดสำหรับปรุงยาฟื้นปราณ — เก็บโสมและบัวหิมะแล้วส่งกลับ",
+    briefSummary: "ส่งโสม 5 + บัวหิมะ 1 · sect points +60",
+    type: "side",
+    sectId: "wudang",
+    giverNpcId: "sect_wudang_master_qingxu",
+    prereqs: { t: "sectMember", sectId: "wudang" },
+    stages: [
+      {
+        id: "gather",
+        description: "เก็บโสม 5 ราก + บัวหิมะ 1 ดอก",
+        autoAdvance: {
+          t: "and",
+          all: [
+            { t: "hasItem", itemId: "ginseng", count: 5 },
+            { t: "hasItem", itemId: "snow_lotus", count: 1 },
+          ],
+        },
+      },
+      {
+        id: "deliver",
+        description: "ส่งสมุนไพรให้อาจารย์ชิงซวี่",
+      },
+    ],
+    rewards: [
+      { t: "gold", amount: 100 },
+      { t: "wExp", amount: 50 },
+      { t: "npcRelationship", npcId: "sect_wudang_master_qingxu", amount: 3 },
+      { t: "sectPoints", sectId: "wudang", amount: 60 },
+    ],
+  },
+
+  // ──────────────────────────────────────────────────────────────────────
+  // ภารกิจวิชาในกาย — one-shot, rank-gated. The high sect quest — passes
+  // a multi-stage trial and rewards a bonus T3 inner art outright.
+  // ──────────────────────────────────────────────────────────────────────
+
+  // ART-1 · ตำราหยินหยางสมดุล — unlock at rank 5, reward bonus T3 art
+  {
+    id: "qst_wudang_art_yinyang",
+    name: "ตำราหยินหยางสมดุล",
+    description: "อาจารย์ชิงซวี่ยอมเปิดตำราหยินหยางสมดุล (阴阳平衡) ให้ศิษย์ที่มีจิตเที่ยงตรง — ผ่านการทดสอบหมัดและจิต",
+    briefSummary: "ฝึกหยินหยางสมดุล — รับ T3 art ของอู่ตัง",
+    type: "side",
+    sectId: "wudang",
+    isArtQuest: true,
+    minSectRank: 5,
+    giverNpcId: "sect_wudang_master_qingxu",
+    prereqs: {
+      t: "and",
+      all: [
+        { t: "sectMember", sectId: "wudang" },
+        { t: "sectRankAtLeast", sectId: "wudang", maxRank: 5 },
+      ],
+    },
+    stages: [
+      {
+        id: "trial_kill",
+        description: "พิสูจน์พลัง — ปราบหัวหน้าโจร (bandit_chief) 2 คน",
+        autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 2 },
+      },
+      {
+        id: "trial_meditate",
+        description: "นั่งสมาธิ — รวบรวมโสม 8 ราก",
+        autoAdvance: { t: "hasItem", itemId: "ginseng", count: 8 },
+      },
+      {
+        id: "return_art",
+        description: "กลับไปรับตำราจากอาจารย์ชิงซวี่",
+      },
+    ],
+    rewards: [
+      { t: "wExp", amount: 200 },
+      { t: "learnArt", artId: "t3_yinyang", level: 3 },
+      { t: "trait", trait: "humility", amount: 5 },
+      { t: "sectPoints", sectId: "wudang", amount: 100 },
+      { t: "npcRelationship", npcId: "sect_wudang_master_qingxu", amount: 10 },
+    ],
+  },
+
   // 5. FETCH — สมุนไพรศักดิ์สิทธิ์ (sacred herb)
   {
     id: "qst_wudang_sacred_herb",

@@ -868,7 +868,7 @@ export interface SectMembership {
   joinedDay: number;
 }
 
-export type SectId = "shaolin";
+export type SectId = "shaolin" | "wudang";
 
 // ─── Character gender ─────────────────────────────────────────────────
 // Used by sect membership conditions (e.g. Shaolin admits men only) and

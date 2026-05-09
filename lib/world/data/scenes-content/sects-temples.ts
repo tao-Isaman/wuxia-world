@@ -308,10 +308,19 @@ export const SCENES_SECTS_TEMPLES: readonly Scene[] = [
       { t: "dialogue", speaker: "ชิงซวี่", text: "เจ้ามาเพื่ออะไร?" },
     ],
     choices: [
+      // Sect-disciple lore offers gated to disciples only — outsiders get
+      // pointed at the registration trial instead. Hidden mid-intro so
+      // the player can't double-start while accepting registration.
       {
-        text: "ข้ามาขอความช่วยเหลือ",
+        text: "ข้ามาขอความช่วยเหลือ (บัวหิมะ)",
         next: "qs_qst_wudang_sacred_herb_offer",
-        visibleIf: { t: "questStatus", questId: "qst_wudang_sacred_herb", status: "none" },
+        visibleIf: {
+          t: "and",
+          all: [
+            { t: "questStatus", questId: "qst_wudang_sacred_herb", status: "none" },
+            { t: "sectMember", sectId: "wudang" },
+          ],
+        },
         effects: [{ t: "startQuest", questId: "qst_wudang_sacred_herb" }],
       },
       {
@@ -324,24 +333,99 @@ export const SCENES_SECTS_TEMPLES: readonly Scene[] = [
             { t: "hasItem", itemId: "snow_lotus", count: 1 },
           ],
         },
-        effects: [
-          { t: "takeItem", itemId: "snow_lotus", count: 1 },
-          { t: "finishQuest", questId: "qst_wudang_sacred_herb", success: true },
-        ],
       },
       {
         text: "รับภารกิจลูกศิษย์ทรยศ",
         next: "qs_qst_wudang_traitor_disciple_offer",
-        visibleIf: { t: "questStatus", questId: "qst_wudang_traitor_disciple", status: "none" },
+        visibleIf: {
+          t: "and",
+          all: [
+            { t: "questStatus", questId: "qst_wudang_traitor_disciple", status: "none" },
+            { t: "sectMember", sectId: "wudang" },
+          ],
+        },
         effects: [{ t: "startQuest", questId: "qst_wudang_traitor_disciple" }],
       },
       {
         text: "รับภารกิจตราประทับ",
         next: "qs_qst_wudang_mountain_seal_offer",
-        visibleIf: { t: "questStatus", questId: "qst_wudang_mountain_seal", status: "none" },
+        visibleIf: {
+          t: "and",
+          all: [
+            { t: "questStatus", questId: "qst_wudang_mountain_seal", status: "none" },
+            { t: "sectMember", sectId: "wudang" },
+          ],
+        },
         effects: [{ t: "startQuest", questId: "qst_wudang_mountain_seal" }],
       },
       { text: "แค่ทักทาย", next: "sect_wudang" },
+    ],
+  },
+
+  // Disciple intro — offer beat (NPC popup auto-routes here after Accept).
+  // Quest is ALREADY active when this scene loads. Pure narration + bounce
+  // back to the courtyard so the player can leave and forage. Mirror the
+  // qs_qst_shaolin_disciple_intro_offer pattern — no startQuest effect.
+  {
+    kind: "dialog",
+    id: "qs_qst_wudang_disciple_intro_offer",
+    lines: [
+      { t: "narration", text: "อาจารย์ชิงซวี่จับมือเจ้าอย่างอ่อนโยน สายตาท่านดูทะลุปรุโปร่ง" },
+      { t: "dialogue", speaker: "ชิงซวี่", text: "เจ้าต้องการเป็นศิษย์อู่ตัง? ดี — ดวงใจของเจ้าใสซื่อพอแล้ว" },
+      { t: "dialogue", speaker: "ชิงซวี่", text: "แต่ก่อนจะรับเป็นศิษย์ ขอให้พิสูจน์ความเพียร — เก็บสมุนไพรหายาก ๑๐, โสม ๑๐, เม็ดบัว ๑๐ มาให้ห้องยา" },
+      { t: "dialogue", speaker: "ชิงซวี่", text: "เมื่อครบแล้วกลับมา เจ้าจะได้รับสมาธิพื้นฐานเป็นวิชาแรกของศิษย์อู่ตัง" },
+    ],
+    choices: [
+      { text: "ข้าจะไปทำตามคำสั่ง", next: "sect_wudang" },
+    ],
+  },
+
+  // Disciple intro — complete beat. Player has the three herb stacks;
+  // quest is on stage 1 (return to master). Choice fires `finishQuest`
+  // → reward chain joinSect:wudang seeds membership at rank 9 and
+  // auto-grants `t0_meditation`.
+  {
+    kind: "dialog",
+    id: "qs_qst_wudang_disciple_intro_complete",
+    lines: [
+      { t: "narration", text: "เจ้าวางสมุนไพรหลากชนิดลงบนแท่นไม้หน้าหอจันทร์" },
+      { t: "dialogue", speaker: "ชิงซวี่", text: "เจ้ากลับมา และครบจำนวนทุกชนิด — ความเพียรของเจ้าน่ายกย่อง" },
+      { t: "narration", text: "ท่านรับสมุนไพรไปอย่างเรียบร้อยแล้วประสานมือพยักหน้าช้า ๆ" },
+      { t: "dialogue", speaker: "ชิงซวี่", text: "ตั้งแต่บัดนี้ เจ้าคือศิษย์อู่ตังขั้นที่ ๙ — รับสมาธิพื้นฐานเป็นวิชาแรกเถิด" },
+    ],
+    choices: [
+      {
+        text: "น้อมรับด้วยความขอบพระคุณ",
+        next: "sect_wudang",
+        effects: [
+          { t: "takeItem", itemId: "herb", count: 10 },
+          { t: "takeItem", itemId: "ginseng", count: 10 },
+          { t: "takeItem", itemId: "lotus_seed", count: 10 },
+          { t: "finishQuest", questId: "qst_wudang_disciple_intro", success: true },
+        ],
+      },
+    ],
+  },
+
+  // Vice master ambient — wisdom on the sword path.
+  {
+    kind: "dialog",
+    id: "npc_sect_wudang_vice_master_xuancheng_talk",
+    lines: [
+      { t: "narration", text: "รองอาจารย์เสวียนเฉิงนั่งขัดสมาธิอยู่บนหินใหญ่ กระบี่วางขนานบนตัก" },
+      { t: "dialogue", speaker: "เสวียนเฉิง", text: "กระบี่อู่ตังไม่ใช่อาวุธ แต่เป็นภาษาของลมปราณ" },
+      { t: "dialogue", speaker: "เสวียนเฉิง", text: "เจ้าจะเข้าใจวันใด — วันนั้นกระบี่จะเป็นมือของเจ้า" },
+    ],
+  },
+
+  // Sword elder ambient — invitation to spar / talk technique.
+  {
+    kind: "dialog",
+    id: "npc_sect_wudang_sword_elder_lingyu_talk",
+    lines: [
+      { t: "narration", text: "อาจารย์ดาบหลิงอวี้กำลังลับกระบี่อยู่ใต้ต้นสน เสียงเหล็กกระทบหินดังต่อเนื่อง" },
+      { t: "dialogue", speaker: "หลิงอวี้", text: "ทุกเพลงกระบี่อู่ตังมีจังหวะของมันเอง — เคลื่อนเมฆาก็เคลื่อนตามลม กระบี่เหนือฟ้าก็เด็ดขาดเด็ดเดี่ยว" },
+      { t: "dialogue", speaker: "หลิงอวี้", text: "ฝีมือของเจ้าจะถึงไหน — มาประลองกันสักวันก็ดี" },
     ],
   },
   {

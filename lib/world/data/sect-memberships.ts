@@ -108,8 +108,69 @@ const SHAOLIN: SectMembershipDef = {
   questCooldownDays: 30,
 };
 
+// Wudang disciple ranks. Same 9→1 climb as Shaolin, but no gender gate
+// (men and women alike train under Master Qingxu) and a balance / soft /
+// internal reward pool. The Wudang line emphasises sword + fist taiji
+// styles paired with meditation arts; the rank rewards mirror that:
+//   rank 9 → choose one T1 sword/soft (gifted T0 art)
+//   rank 8 → choose one T2 sword/soft
+//   rank 7 → receive T1 art (balance)
+//   rank 6 → receive T2 art (balance)
+//   rank 5 → choose one T3 cloud-style move
+//   rank 4 → receive T3 art (balance / yinyang)
+//   rank 3 → choose one T4 capstone (sword above heaven OR taiji fist song)
+//   rank 2 → choose one T4 art — taiji vs zixia (the two iconic Wudang breaths)
+const WUDANG: SectMembershipDef = {
+  id: "wudang",
+  name: "อู่ตัง",
+  hallLocationId: "sect_wudang",
+  registrarNpcId: "sect_wudang_master_qingxu",
+  // Open to anyone, regardless of gender — only the truly wicked are
+  // turned away (master Qingxu reads the heart, not the body).
+  joinRequirements: { t: "trait", trait: "evil", max: 10 },
+  startRank: 9,
+  topRank: 1,
+  rankUpCost: (targetRank) => {
+    const table: Record<number, number> = {
+      8: 100,
+      7: 200,
+      6: 350,
+      5: 500,
+      4: 700,
+      3: 1000,
+      2: 1400,
+      1: 2000,
+    };
+    return table[targetRank] ?? Infinity;
+  },
+  skillsByRank: {
+    // T1 — pick one of the disciple-line sword OR existing wind-step / reflect
+    9: ["wd_taiji_sword", "rf", "cs"],
+    // T2 — pick one of the intermediate sword or yin-yang palm
+    8: ["wd_yinyang_sword", "yy"],
+    // T3 — pick one of the cloud-style master moves
+    5: ["wd_cloud_palm", "wd_cloud_sword"],
+    // T4 — capstone signature
+    3: ["wd_heaven_sword", "wd_taiji_fist"],
+  },
+  artsByRank: {
+    // T0 — gifted on registration
+    9: ["t0_meditation"],
+    // T1 — given when reaching rank 7
+    7: ["t1_naturalqi"],
+    // T2 — given when reaching rank 6
+    6: ["t2_mindbody"],
+    // T3 — given when reaching rank 4
+    4: ["t3_yinyang"],
+    // T4 — choose ONE of the two iconic Wudang breaths
+    2: ["taiji", "zixia"],
+  },
+  questCooldownDays: 30,
+};
+
 export const SECT_MEMBERSHIPS: Record<SectId, SectMembershipDef> = {
   shaolin: SHAOLIN,
+  wudang: WUDANG,
 };
 
 // Helper: rewards (skill + art ids) the player is *eligible* to pick at a

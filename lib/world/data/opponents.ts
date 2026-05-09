@@ -478,6 +478,103 @@ export const OPPONENTS: readonly OpponentDef[] = [
       artLevels: { t4_demonsubduer: 10, tendon: 10, diamond: 10, t1_goldenbell: 9 },
     }) },
 
+  // ─── อู่ตัง — sect leadership (T2-T4) ──────────────────────────────
+  // อาจารย์ชิงซวี่ (T4) — Wudang grandmaster. Endgame-tier on the
+  // balance / soft / internal axis. Carries the full taiji-line rotation
+  // (taiji + zixia + t3_yinyang + t2_mindbody) plus the disciple-line
+  // capstone moves (heaven sword + taiji fist song + cloud sword + cloud
+  // palm). Mirrors Shaolin abbot's role for the Wudang path.
+  { id: "spar_wudang_master_qingxu", name: "อาจารย์ชิงซวี่", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "man_tj", weight: 1 }, { itemId: "man_rf", weight: 1 },
+      { itemId: "man_cs", weight: 1 },
+      { itemId: "ginseng", weight: 4 }, { itemId: "snow_lotus", weight: 2 },
+      { itemId: "jade", weight: 4 }, { itemId: "ancient_coin", weight: 3 },
+      { itemId: "wood_sacred", weight: 2 }, { itemId: "mithril_ore", weight: 1 }],
+    build: () => build("อาจารย์ชิงซวี่", 4, {
+      stats: { STR: 12, VIT: 24, DEF: 18, POW: 28, INT: 22, DEX: 14, AGI: 16, LUK: 8 },
+      artId: "taiji", artLevel: 10,
+      skillIds: ["wd_heaven_sword", "wd_taiji_fist", "wd_cloud_sword", "wd_cloud_palm", "yy", "rf"],
+      extraArtSlots: ["taiji", "zixia", "t3_yinyang", "t2_mindbody"],
+      artLevels: { taiji: 10, zixia: 10, t3_yinyang: 10, t2_mindbody: 10, t1_naturalqi: 10 },
+      learnedArtIds: ["t1_naturalqi"],
+    }) },
+
+  // รองอาจารย์เสวียนเฉิง (T4) — vice master, second only to qingxu.
+  // Sword-leaning kit with reflect + cloud sword pressure.
+  { id: "spar_wudang_xuancheng", name: "รองอาจารย์เสวียนเฉิง", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "man_tj", weight: 1 }, { itemId: "man_rf", weight: 1 },
+      { itemId: "ginseng", weight: 3 }, { itemId: "jade", weight: 3 },
+      { itemId: "ancient_coin", weight: 2 }, { itemId: "wood_sacred", weight: 2 }],
+    build: () => build("รองอาจารย์เสวียนเฉิง", 4, {
+      stats: { POW: 22, INT: 18, VIT: 18, DEF: 14, DEX: 12, AGI: 14 },
+      artId: "taiji", artLevel: 10,
+      skillIds: ["wd_heaven_sword", "wd_cloud_sword", "wd_yinyang_sword", "rf", "cs"],
+      extraArtSlots: ["taiji", "t3_yinyang", "t2_mindbody"],
+      artLevels: { taiji: 10, t3_yinyang: 10, t2_mindbody: 9 },
+    }) },
+
+  // อาจารย์ดาบหลิงอวี้ (T4) — sword elder. Pure swordmaster kit.
+  { id: "spar_wudang_lingyu", name: "อาจารย์ดาบหลิงอวี้", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "man_tj", weight: 1 }, { itemId: "man_cs", weight: 1 },
+      { itemId: "jade", weight: 3 }, { itemId: "iron_ore", weight: 2 },
+      { itemId: "ancient_coin", weight: 2 }],
+    build: () => build("อาจารย์ดาบหลิงอวี้", 4, {
+      stats: { POW: 18, INT: 14, DEX: 14, AGI: 16, STR: 8 },
+      artId: "zixia", artLevel: 9,
+      skillIds: ["wd_heaven_sword", "wd_cloud_sword", "wd_yinyang_sword", "wd_taiji_sword"],
+      extraArtSlots: ["zixia", "t3_yinyang"],
+      artLevels: { zixia: 9, t3_yinyang: 8 },
+    }) },
+
+  // อาจารย์ปราณเป่าชุน (T3) — internal-art elder. Soft / yin support skills.
+  { id: "spar_wudang_baochun", name: "อาจารย์ปราณเป่าชุน", ti: 3, category: "human",
+    drops: [...DROPS_T3,
+      { itemId: "man_tj", weight: 1 }, { itemId: "ginseng", weight: 4 },
+      { itemId: "herb", weight: 3 }, { itemId: "paper", weight: 2 }],
+    build: () => build("อาจารย์ปราณเป่าชุน", 3, {
+      stats: { POW: 14, INT: 14, VIT: 10, DEF: 8 },
+      artId: "t3_yinyang", artLevel: 8,
+      skillIds: ["wd_cloud_palm", "wd_yinyang_sword", "yy", "rf"],
+      extraArtSlots: ["t3_yinyang", "t2_mindbody"],
+      artLevels: { t3_yinyang: 8, t2_mindbody: 7 },
+    }) },
+
+  // หัวหน้าศิษย์จื้อหรง (T2) — head disciple. Solid mid-tier mix.
+  { id: "spar_wudang_zhirong", name: "หัวหน้าศิษย์จื้อหรง", ti: 2, category: "human",
+    drops: [...DROPS_T2,
+      { itemId: "man_tj", weight: 1 }, { itemId: "man_rf", weight: 1 },
+      { itemId: "ginseng", weight: 2 }],
+    build: () => build("หัวหน้าศิษย์จื้อหรง", 2, {
+      stats: { POW: 9, INT: 7, AGI: 6, DEX: 5 },
+      artId: "t2_mindbody", artLevel: 6,
+      skillIds: ["wd_yinyang_sword", "wd_taiji_sword", "rf", "cs"],
+      extraArtSlots: ["t2_mindbody"],
+      artLevels: { t2_mindbody: 6 },
+    }) },
+
+  // ศิษย์อวี่เจี้ยน (T2) — sword disciple, mid-tier sparring.
+  { id: "spar_wudang_yujian", name: "ศิษย์อวี่เจี้ยน", ti: 2, category: "human",
+    drops: [...DROPS_T2,
+      { itemId: "man_tj", weight: 1 }, { itemId: "man_cs", weight: 1 }],
+    build: () => build("ศิษย์อวี่เจี้ยน", 2, {
+      stats: { POW: 7, AGI: 6, DEX: 5 },
+      artId: "t1_naturalqi", artLevel: 5,
+      skillIds: ["wd_taiji_sword", "tj", "cs"],
+    }) },
+
+  // ศิษย์ชิงซิน (T1) — gatekeeper disciple, novice sparring.
+  { id: "spar_wudang_qingxin", name: "ศิษย์ชิงซิน", ti: 1, category: "human",
+    drops: [...DROPS_T1,
+      { itemId: "man_tj", weight: 1 }],
+    build: () => build("ศิษย์ชิงซิน", 1, {
+      stats: { POW: 5, AGI: 4 },
+      artId: "t0_meditation", artLevel: 4,
+      skillIds: ["tj", "cs"],
+    }) },
+
   // ชิวเฉียน (mt_kunlun) — Kunlun exile, sword-and-internal hermit style.
   { id: "spar_kunlun_qiu", name: "ชิวเฉียน", ti: 3, category: "human",
     drops: [...DROPS_T3,
