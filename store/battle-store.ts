@@ -144,7 +144,13 @@ export const useBattleStore = create<BattleStore>((set, get) => {
       tickGauges(state, dtMs);
       drainToActor(state);
       set({ state: { ...state } });
-      if (state.phase === "enemy") scheduleEnemyAction();
+      // `drainToActor` may mutate `state.phase` from "filling" → "player"
+      // or "enemy" when a gauge crosses threshold. TS still has the
+      // narrowed type from the early-return guard above, so we re-read
+      // the field through a string-typed alias to dodge the false-
+      // positive "no overlap" comparison.
+      const phaseAfter = state.phase as string;
+      if (phaseAfter === "enemy") scheduleEnemyAction();
     },
 
     useSkill: (slotIdx) => {

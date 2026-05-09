@@ -338,8 +338,11 @@ export function BattleArena({ mode = "free", onContinue }: BattleArenaProps) {
   const battleBuilds = useBattleStore((s) => s.builds);
   const start = useBattleStore((s) => s.start);
   const reset = useBattleStore((s) => s.reset);
-  const useSkill = useBattleStore((s) => s.useSkill);
-  const useArtActive = useBattleStore((s) => s.useArtActive);
+  // Renamed from `useSkill` / `useArtActive` (the store action names) to
+  // verb-form locals so ESLint's react-hooks/rules-of-hooks doesn't
+  // misclassify them as hooks when called inside `onClick` callbacks.
+  const castSkill = useBattleStore((s) => s.useSkill);
+  const castArtActive = useBattleStore((s) => s.useArtActive);
   const autoAdvance = useBattleStore((s) => s.autoAdvance);
   const tick = useBattleStore((s) => s.tick);
   // Battle log defaults closed — the cast-animation banner now carries
@@ -514,7 +517,7 @@ export function BattleArena({ mode = "free", onContinue }: BattleArenaProps) {
                     <SkillButton
                       icon={<ArtIcon art={art} size={48} />}
                       disabled={onCd || mpShort}
-                      onClick={() => useSkill(i)}
+                      onClick={() => castSkill(i)}
                       cd={onCd ? cd : 0}
                       mpInfo={`${art.act.c}/${state.mpA}`}
                       mpShort={mpShort}
@@ -530,7 +533,7 @@ export function BattleArena({ mode = "free", onContinue }: BattleArenaProps) {
                   <SkillButton
                     icon={<SkillIcon skill={sk} size={48} />}
                     disabled={onCd}
-                    onClick={() => useSkill(i)}
+                    onClick={() => castSkill(i)}
                     cd={onCd ? cd : 0}
                   />
                 </SkillTooltip>
@@ -541,7 +544,7 @@ export function BattleArena({ mode = "free", onContinue }: BattleArenaProps) {
                 <SkillButton
                   icon={<ArtIcon art={aA} size={48} />}
                   disabled={!canIA}
-                  onClick={useArtActive}
+                  onClick={castArtActive}
                   cd={state.iaCD.A}
                   mpInfo={`${aA.act.c}/${state.mpA}`}
                   mpShort={state.mpA < aA.act.c}
