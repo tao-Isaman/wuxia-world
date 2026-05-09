@@ -461,13 +461,13 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
     id: "qe_chuangwang_purge_witnesses",
     name: "ลบร่องรอยกิจกรรมมาร",
     description: "ฮุยเป้าต้องการลบหลักฐานที่ผู้อาวุโสจูอิงรวบรวมไว้เกี่ยวกับพิธีกรรมมาร",
-    briefSummary: "ขโมยบันทึกลับจากผู้อาวุโสจูอิงแห่งพรรคสว่างมืด",
+    briefSummary: "ขโมยบันทึกลับจากผู้อาวุโสจูอิงแห่งพรรคตะวันจันทรา",
     type: "side",
     giverNpcId: "evil_chuangwang_heretic_huibao",
     stages: [
       {
         id: "steal",
-        description: "แอบเข้าพรรคสว่างมืดและขโมยบันทึกลับของผู้อาวุโสจูอิง",
+        description: "แอบเข้าพรรคตะวันจันทราและขโมยบันทึกลับของผู้อาวุโสจูอิง",
         autoAdvance: { t: "stoleFromNpc", npcId: "sect_ming_elder_zhuying", count: 1 },
       },
       {
@@ -1013,7 +1013,7 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
   {
     id: "qe_changan_intimidate_judge",
     name: "ปิดปากที่ปรึกษาคดี",
-    description: "ผู้อาวุโสจูอิงแห่งพรรคสว่างมืดทำหน้าที่เป็นที่ปรึกษาคดีที่เป็นอันตรายต่อขุนนางหยาน ต้องหยุดเขาก่อนการพิพากษา",
+    description: "ผู้อาวุโสจูอิงแห่งพรรคตะวันจันทราทำหน้าที่เป็นที่ปรึกษาคดีที่เป็นอันตรายต่อขุนนางหยาน ต้องหยุดเขาก่อนการพิพากษา",
     briefSummary: "สังหารที่ปรึกษาคดีก่อนตัดสิน",
     type: "side",
     giverNpcId: "evil_changan_corrupt_official_yan",
@@ -1021,7 +1021,7 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
     stages: [
       {
         id: "silence_advisor",
-        description: "ลอบสังหารผู้อาวุโสจูอิงแห่งพรรคสว่างมืด",
+        description: "ลอบสังหารผู้อาวุโสจูอิงแห่งพรรคตะวันจันทรา",
         autoAdvance: { t: "assassinatedNpc", npcId: "sect_ming_elder_zhuying" },
       },
       {

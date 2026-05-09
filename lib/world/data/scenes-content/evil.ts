@@ -585,7 +585,7 @@ export const SCENES_EVIL: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qe_chuangwang_purge_witnesses_offer",
     lines: [
-      { t: "dialogue", speaker: "พระอเถระฮุยเป้า", text: "ผู้อาวุโสจูอิงแห่งพรรคสว่างมืดเก็บบันทึกพิธีกรรมที่ข้าเคยทำ" },
+      { t: "dialogue", speaker: "พระอเถระฮุยเป้า", text: "ผู้อาวุโสจูอิงแห่งพรรคตะวันจันทราเก็บบันทึกพิธีกรรมที่ข้าเคยทำ" },
       { t: "dialogue", speaker: "พระอเถระฮุยเป้า", text: "ขโมยบันทึกนั้นมา ข้าต้องทำลายมันก่อนที่มันจะตกถึงมือทางการ เป็นเรื่องเร่งด่วน" },
     ],
     choices: [
@@ -1252,7 +1252,7 @@ export const SCENES_EVIL: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qe_changan_intimidate_judge_offer",
     lines: [
-      { t: "dialogue", speaker: "ขุนนางหยาน", text: "ผู้อาวุโสจูอิงแห่งพรรคสว่างมืด...คนนั้นทำงานเป็นที่ปรึกษาคดีที่จะเปิดโปงข้าพเจ้า" },
+      { t: "dialogue", speaker: "ขุนนางหยาน", text: "ผู้อาวุโสจูอิงแห่งพรรคตะวันจันทรา...คนนั้นทำงานเป็นที่ปรึกษาคดีที่จะเปิดโปงข้าพเจ้า" },
       { t: "narration", text: "ขุนนางหยานพูดเสียงเย็นชา ไร้อารมณ์" },
       { t: "dialogue", speaker: "ขุนนางหยาน", text: "เขาต้องไม่มีชีวิตอยู่ในวันที่คดีนั้นเริ่มต้น ท่านเข้าใจไหม?" },
     ],

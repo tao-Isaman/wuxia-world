@@ -1414,8 +1414,81 @@ export const SCENES_SECTS_TEMPLES: readonly Scene[] = [
   },
 
   // ══════════════════════════════════════════════════════════════════════
-  // พรรคสว่างมืด — ผู้อาวุโสจูอิง
+  // พรรคตะวันจันทรา — เจ้าสำนักต่งฟาง + ผู้อาวุโสจูอิง
   // ══════════════════════════════════════════════════════════════════════
+
+  // Chief Dongfang ambient + sect-disciple intro hook.
+  {
+    kind: "dialog",
+    id: "npc_sect_sunmoon_chief_dongfang_talk",
+    lines: [
+      { t: "narration", text: "เจ้าสำนักต่งฟางปู้ป้ายนั่งบนบัลลังก์มังกร เสื้อคลุมขาวพลิ้วไหวกับลม" },
+      { t: "dialogue", speaker: "ต่งฟาง", text: "เจ้ามาที่ยอดเขาดำต้นไม้นี้เพื่อสิ่งใด?" },
+      { t: "dialogue", speaker: "ต่งฟาง", text: "พรรคตะวันจันทราไม่เคยปฏิเสธผู้กล้า — แต่ก็ไม่เคยรับผู้อ่อนแอ" },
+    ],
+    choices: [
+      { text: "แค่ทักทาย", next: "sect_ming" },
+    ],
+  },
+
+  // Disciple intro — offer beat. Chief briefs the assassination
+  // mission against องครักษ์ฉิน (the Jinyiwei T3 saber soldier).
+  {
+    kind: "dialog",
+    id: "qs_qst_sunmoon_disciple_intro_offer",
+    lines: [
+      { t: "narration", text: "ต่งฟางจ้องเจ้าด้วยสายตาเย็น ก่อนเอ่ยช้าๆ" },
+      { t: "dialogue", speaker: "ต่งฟาง", text: "ต้องการเป็นศิษย์พรรคตะวันจันทรา? ดี — แต่ข้ารับเฉพาะคนใจกล้า" },
+      { t: "dialogue", speaker: "ต่งฟาง", text: "องครักษ์ฉินแห่งกรมเสื้อแพรกำลังตามล่าศิษย์ของพรรค — ลอบสังหารเขา แล้วเจ้าจึงเป็นพวกเรา" },
+      { t: "dialogue", speaker: "ต่งฟาง", text: "อย่าเปิดเผยตัวเอง เมื่อสำเร็จแล้วกลับมารายงาน" },
+    ],
+    choices: [
+      { text: "รับงาน — ข้าจะลงมือทันที", next: "sect_ming" },
+    ],
+  },
+
+  // Disciple intro — complete beat. Player has assassinated qin.
+  // Choice fires finishQuest → joinSect:sunmoon + auto-grants
+  // mi_firepalm + t0_sm_dual.
+  {
+    kind: "dialog",
+    id: "qs_qst_sunmoon_disciple_intro_complete",
+    lines: [
+      { t: "narration", text: "เจ้ายืนรายงานต่อต่งฟาง ผู้บัญชาการพยักหน้าด้วยความพอใจ" },
+      { t: "dialogue", speaker: "ต่งฟาง", text: "องครักษ์ฉินตายในเงา — ดี เจ้าทำได้สะอาด" },
+      { t: "narration", text: "ท่านยกเหรียญทองดวงเล็กให้เจ้าพร้อมตำราม้วนหนึ่ง" },
+      { t: "dialogue", speaker: "ต่งฟาง", text: "ตั้งแต่บัดนี้ เจ้าคือศิษย์พรรคตะวันจันทราขั้นที่ ๙ — รับฝ่ามือเพลิงและพลังสองขั้วเป็นวิชาแรก" },
+    ],
+    choices: [
+      {
+        text: "น้อมรับและสาบาน",
+        next: "sect_ming",
+        effects: [
+          { t: "finishQuest", questId: "qst_sunmoon_disciple_intro", success: true },
+        ],
+      },
+    ],
+  },
+
+  // Vice Renwoxing ambient.
+  {
+    kind: "dialog",
+    id: "npc_sect_sunmoon_vice_renwoxing_talk",
+    lines: [
+      { t: "narration", text: "เหรินหวัวสิงยืนหลังเสาดำ เสื้อสีดำสะท้อนแสงเทียน" },
+      { t: "dialogue", speaker: "เหรินหวัวสิง", text: "พลังดูดดาวของข้าเรียกพลังของศัตรูได้ — เจ้าอยากเห็นไหม?" },
+    ],
+  },
+
+  // Sun elder Zuo Lengchan ambient.
+  {
+    kind: "dialog",
+    id: "npc_sect_sunmoon_sun_elder_zuolengchan_talk",
+    lines: [
+      { t: "narration", text: "จั่วเหลิงฉันยืนนิ่งหน้ากระจกแสง เปลวเพลิงน้อยล้อมรอบฝ่ามือ" },
+      { t: "dialogue", speaker: "จั่วเหลิงฉัน", text: "พลังตะวันคือไฟที่จุดในกาย — ลงมือฝึกหรือถอยไป" },
+    ],
+  },
 
   {
     kind: "dialog",
@@ -1423,7 +1496,7 @@ export const SCENES_SECTS_TEMPLES: readonly Scene[] = [
     lines: [
       { t: "narration", text: "ผู้อาวุโสจูอิงนั่งอยู่ในมุมมืดของห้องรับแขก แสงเทียนน้อยเพียงพอที่จะเห็นรอยยิ้มที่ซ่อนนัยยะ" },
       { t: "dialogue", speaker: "จูอิง", text: "ยอดยุทธผู้มาเยือน... ข้าได้ยินว่าเจ้าน่าไว้วางใจ" },
-      { t: "dialogue", speaker: "จูอิง", text: "พรรคสว่างมืดมีงานบางอย่างที่ต้องการผู้กล้า" },
+      { t: "dialogue", speaker: "จูอิง", text: "พรรคตะวันจันทรามีงานบางอย่างที่ต้องการผู้กล้า" },
     ],
     choices: [
       {

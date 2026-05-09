@@ -86,8 +86,8 @@ export const SKILLS: readonly Skill[] = [
   { id: "ep", n: "18 ฝ่ามือมังกร", sc: "พรรคยาจก", ti: 4, w: "fist", mg: 100, st: { STR: 11, POW: 7, VIT: 4, DEX: 8 }, at: "phy", bp: 90, p: 30, f: 0, dm: 1, se: null, ee: null, d: "Phy×130% หนักมาก", types: ["yang", "hard", "external"] },
   { id: "bg_lucky_staff", n: "เพลงไม้เท้าตีสุข", sc: "พรรคยาจก", ti: 4, w: "long", mg: 100, st: { STR: 12, VIT: 8, AGI: 6, LUK: 4 }, at: "phy", bp: 95, p: 25, f: 0, dm: 1.2, hits: 4, vitScale: 0.4, se: { t: "stack_atk", v: 8, mx: 4 }, ee: null, d: "Phy×125%×1.2 · ตี 4 ครั้ง + VIT scaling (×0.4/VIT) + ATK+8% (≤4 ซ้อน) — เพลงไม้เท้าตีสุข ไม้เท้า ๙ ข้อของหัวหน้าพรรค", types: ["external", "hard"] },
 
-  // ─── พรรคสว่างมืด ───
-  { id: "mi_firepalm", n: "ฝ่ามือเพลิง", sc: "พรรคสว่างมืด", ti: 4, w: "fist", mg: 100, st: { STR: 9, POW: 9, AGI: 4, DEX: 8 }, at: "phy", bp: 85, p: 30, f: 0, dm: 1.2, se: null, ee: { t: "debuff_def", v: -22, u: 5 }, d: "Phy×130%×1.2 + PDef-22 (3ตา) — ฝ่ามือเพลิง", types: ["yang", "hard"] },
+  // ─── พรรคตะวันจันทรา ───
+  { id: "mi_firepalm", n: "ฝ่ามือเพลิง", sc: "พรรคตะวันจันทรา", ti: 3, w: "fist", mg: 80, st: { POW: 11, INT: 10, AGI: 4 }, at: "int", bp: 78, p: 25, f: 0, dm: 1.15, se: null, ee: { t: "burn_hp_mp", dmg: 6, mp: 6, u: 5 }, d: "Int×125%×1.15 + เผาไหม้ HP/MP 6%/ตา (5ตา) — ฝ่ามือเพลิงเสริมไฟใจ", types: ["yang", "internal"] },
 
   // ─── พรรคสราญรมย์ ───
   { id: "xy_punch", n: "เพลงหมัดสราญรมย์", sc: "พรรคสราญรมย์", ti: 3, w: "fist", mg: 80, st: { POW: 11, INT: 11, DEX: 2, AGI: 1 }, at: "int", bp: 65, p: 20, f: 0, dm: 1.1, se: { t: "stack_atk", v: 6, mx: 3 }, ee: null, d: "Int+20%×1.1 + ATK+6%(≤3ซ้อน) — เพลงหมัดสราญรมย์", types: ["yin", "internal"] },

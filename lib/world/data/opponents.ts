@@ -1261,6 +1261,100 @@ export const OPPONENTS: readonly OpponentDef[] = [
       extraArtSlots: ["jiuyin", "shadow", "heaven"],
       artLevels: { jiuyin: 10, shadow: 10, heaven: 10 },
     }) },
+
+  // ─── พรรคตะวันจันทรา — sect leadership (T1-T4) ─────────────────────
+  // Art-focused sect — kits lean heavily on the inner-art rotation.
+  // Chief Dongfang carries the full disciple line: qiankun + yxhd +
+  // t3_sm_dualfusion + t3_sm_sunmoon arts + mi_firepalm fist (the
+  // sect's only move skill).
+  { id: "spar_sunmoon_chief_dongfang", name: "เจ้าสำนักต่งฟางปู้ป้าย", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "ancient_coin", weight: 5 }, { itemId: "jade", weight: 4 },
+      { itemId: "paper", weight: 3 }, { itemId: "ink", weight: 3 },
+      { itemId: "wood_sacred", weight: 2 }, { itemId: "mithril_ore", weight: 1 }],
+    build: () => build("เจ้าสำนักต่งฟางปู้ป้าย", 4, {
+      stats: { POW: 24, INT: 20, AGI: 16, DEX: 14, VIT: 14, DEF: 8 },
+      artId: "qiankun", artLevel: 10,
+      skillIds: ["mi_firepalm"],
+      extraArtSlots: ["qiankun", "yxhd", "t3_sm_dualfusion", "t3_sm_sunmoon"],
+      artLevels: { qiankun: 10, yxhd: 10, t3_sm_dualfusion: 10, t3_sm_sunmoon: 10, t3_sm_sunscript: 10 },
+      learnedArtIds: ["t3_sm_sunscript"],
+    }) },
+
+  { id: "spar_sunmoon_renwoxing", name: "รองเจ้าสำนักเหรินหวัวสิง", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "ancient_coin", weight: 4 }, { itemId: "jade", weight: 3 },
+      { itemId: "viper_venom", weight: 2 }],
+    build: () => build("รองเจ้าสำนักเหรินหวัวสิง", 4, {
+      stats: { POW: 22, INT: 16, STR: 10, AGI: 14, VIT: 8 },
+      artId: "yxhd", artLevel: 10,
+      skillIds: ["mi_firepalm"],
+      extraArtSlots: ["yxhd", "t3_sm_sunmoon", "t2_sm_sunbody"],
+      artLevels: { yxhd: 10, t3_sm_sunmoon: 9, t2_sm_sunbody: 9 },
+    }) },
+
+  { id: "spar_sunmoon_zuolengchan", name: "ผู้อาวุโสตะวันจั่วเหลิงฉัน", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "ancient_coin", weight: 3 }, { itemId: "potion_big", weight: 2 }],
+    build: () => build("ผู้อาวุโสตะวันจั่วเหลิงฉัน", 4, {
+      stats: { POW: 20, INT: 14, STR: 8, VIT: 10, AGI: 8 },
+      artId: "t3_sm_sunmoon", artLevel: 9,
+      skillIds: ["mi_firepalm"],
+      extraArtSlots: ["t3_sm_sunmoon", "t2_sm_sunbody", "t1_sm_sunfire"],
+      artLevels: { t3_sm_sunmoon: 9, t2_sm_sunbody: 9, t1_sm_sunfire: 9 },
+    }) },
+
+  { id: "spar_sunmoon_xianggwentian", name: "ผู้อาวุโสจันทราเสี่ยงเหวินเทียน", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "ancient_coin", weight: 3 }, { itemId: "jade", weight: 2 },
+      { itemId: "potion_big", weight: 2 }],
+    build: () => build("ผู้อาวุโสจันทราเสี่ยงเหวินเทียน", 4, {
+      stats: { POW: 20, INT: 16, AGI: 12, DEX: 10, VIT: 6 },
+      artId: "t3_sm_dualfusion", artLevel: 9,
+      skillIds: ["mi_firepalm"],
+      extraArtSlots: ["t3_sm_dualfusion", "t2_sm_moonbody", "t1_sm_moonweave"],
+      artLevels: { t3_sm_dualfusion: 9, t2_sm_moonbody: 9, t1_sm_moonweave: 9 },
+    }) },
+
+  { id: "spar_sunmoon_qudongfeng", name: "ผู้อาวุโสสมดุลฉวี่ตงเฟิง", ti: 3, category: "human",
+    drops: [...DROPS_T3,
+      { itemId: "paper", weight: 4 }, { itemId: "ink", weight: 4 },
+      { itemId: "ancient_coin", weight: 2 }],
+    build: () => build("ผู้อาวุโสสมดุลฉวี่ตงเฟิง", 3, {
+      stats: { POW: 14, INT: 14, VIT: 8 },
+      artId: "t3_sm_dualfusion", artLevel: 8,
+      skillIds: ["mi_firepalm"],
+      extraArtSlots: ["t3_sm_dualfusion", "t2_sm_sunbody", "t2_sm_moonbody"],
+      artLevels: { t3_sm_dualfusion: 8, t2_sm_sunbody: 7, t2_sm_moonbody: 7 },
+    }) },
+
+  { id: "spar_sunmoon_yilin", name: "หัวหน้าศิษย์อี้หลิน", ti: 2, category: "human",
+    drops: [...DROPS_T2,
+      { itemId: "paper", weight: 3 }, { itemId: "ancient_coin", weight: 2 }],
+    build: () => build("หัวหน้าศิษย์อี้หลิน", 2, {
+      stats: { POW: 9, INT: 7, AGI: 5 },
+      artId: "t2_sm_sunbody", artLevel: 6,
+      skillIds: ["mi_firepalm"],
+      extraArtSlots: ["t2_sm_sunbody"],
+      artLevels: { t2_sm_sunbody: 6 },
+    }) },
+
+  { id: "spar_sunmoon_lanfenghuang", name: "ศิษย์หลานเฟิงหวง", ti: 2, category: "human",
+    drops: [...DROPS_T2,
+      { itemId: "paper", weight: 2 }],
+    build: () => build("ศิษย์หลานเฟิงหวง", 2, {
+      stats: { POW: 8, INT: 6, STR: 4 },
+      artId: "t1_sm_sunfire", artLevel: 5,
+      skillIds: ["mi_firepalm"],
+    }) },
+
+  { id: "spar_sunmoon_xiaoyu", name: "ศิษย์เสี่ยวอวี้", ti: 1, category: "human",
+    drops: [...DROPS_T1],
+    build: () => build("ศิษย์เสี่ยวอวี้", 1, {
+      stats: { POW: 5, INT: 4 },
+      artId: "t0_sm_dual", artLevel: 4,
+      skillIds: ["mi_firepalm"],
+    }) },
 ];
 
 export const OPPONENTS_BY_ID = new Map<string, OpponentDef>(

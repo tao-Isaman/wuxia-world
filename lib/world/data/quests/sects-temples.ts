@@ -1568,7 +1568,7 @@ export const QUESTS_SECTS_TEMPLES: readonly QuestDef[] = [
   },
 
   // ──────────────────────────────────────────────────────────────────────
-  // พรรคสว่างมืด — ผู้อาวุโสจูอิง
+  // พรรคตะวันจันทรา — ผู้อาวุโสจูอิง
   // ──────────────────────────────────────────────────────────────────────
 
   // 18. DELIVER — ภารกิจสายลับ (spy mission — deliver)
@@ -1609,8 +1609,8 @@ export const QUESTS_SECTS_TEMPLES: readonly QuestDef[] = [
   {
     id: "qst_ming_defector_choice",
     name: "ผู้แปรพักตร์",
-    description: "สมาชิกพรรคสว่างมืดต้องการออกจากพรรค ผู้อาวุโสให้เจ้าตัดสิน — ปล่อยไปหรือนำตัวกลับมา?",
-    briefSummary: "ตัดสินชะตากรรมของผู้ที่ต้องการออกจากพรรคสว่างมืด",
+    description: "สมาชิกพรรคตะวันจันทราต้องการออกจากพรรค ผู้อาวุโสให้เจ้าตัดสิน — ปล่อยไปหรือนำตัวกลับมา?",
+    briefSummary: "ตัดสินชะตากรรมของผู้ที่ต้องการออกจากพรรคตะวันจันทรา",
     type: "side",
     giverNpcId: "sect_ming_elder_zhuying",
     prereqs: { t: "questStatus", questId: "qst_ming_spy_mission", status: "done" },
@@ -2165,6 +2165,163 @@ export const QUESTS_SECTS_TEMPLES: readonly QuestDef[] = [
       { t: "trait", trait: "arrogance", amount: 5 },
       { t: "sectPoints", sectId: "jinyiwei", amount: 200 },
       { t: "npcRelationship", npcId: "sect_jinyiwei_leader_zhao", amount: 20 },
+    ],
+  },
+
+  // ──────────────────────────────────────────────────────────────────────
+  // พรรคตะวันจันทรา — เจ้าสำนักต่งฟาง (sun-moon sect, art-focused)
+  // ──────────────────────────────────────────────────────────────────────
+
+  // 0. INTRO — ขอเข้าเป็นศิษย์ (assassinate-the-guard intro)
+  // The chief tests recruits with a wet-work mission against an
+  // imperial guard who's been hunting sect members. Uses the existing
+  // `assassinatedNpc` Condition + `attemptAssassinate` action.
+  {
+    id: "qst_sunmoon_disciple_intro",
+    name: "ขอเข้าเป็นศิษย์พรรคตะวันจันทรา",
+    description: "เจ้าสำนักต่งฟางต้องการพิสูจน์ความจงรักภักดีของเจ้า — ลอบสังหารองครักษ์ฉินแห่งกรมเสื้อแพร ที่กำลังตามล่าศิษย์ของพรรค",
+    briefSummary: "ลอบสังหารองครักษ์ฉินเพื่อพิสูจน์ความจงรักต่อพรรคตะวันจันทรา",
+    type: "side",
+    giverNpcId: "sect_sunmoon_chief_dongfang",
+    prereqs: {
+      t: "and",
+      all: [
+        { t: "trait", trait: "evil", max: 30 },
+        { t: "not", of: { t: "anySectMember" } },
+      ],
+    },
+    stages: [
+      {
+        id: "assassinate_guard",
+        description: "ลอบสังหารองครักษ์ฉิน",
+        autoAdvance: { t: "assassinatedNpc", npcId: "sect_jinyiwei_soldier_qin" },
+      },
+      {
+        id: "report_back",
+        description: "กลับไปรายงานเจ้าสำนักต่งฟาง",
+      },
+    ],
+    rewards: [
+      { t: "wExp", amount: 100 },
+      { t: "trait", trait: "evil", amount: 3 },
+      { t: "npcRelationship", npcId: "sect_sunmoon_chief_dongfang", amount: 10 },
+      { t: "joinSect", sectId: "sunmoon" },
+      { t: "sectPoints", sectId: "sunmoon", amount: 30 },
+    ],
+  },
+
+  // ──────────────────────────────────────────────────────────────────────
+  // ภารกิจประจำพรรคตะวันจันทรา — ทำซ้ำได้ทุก 30 วัน
+  // ──────────────────────────────────────────────────────────────────────
+
+  // SECT-1 · ลาดตระเวนหุบเขา — sect points 50
+  {
+    id: "qst_sunmoon_sect_patrol",
+    name: "ลาดตระเวนหุบเขา",
+    description: "ภารกิจประจำของศิษย์พรรคตะวันจันทรา — ลาดตระเวนหุบเขาและกำราบโจรที่กล้าเข้ามา",
+    briefSummary: "ปราบหัวหน้าโจร 2 คน · sect points +50",
+    type: "side",
+    sectId: "sunmoon",
+    giverNpcId: "sect_sunmoon_chief_dongfang",
+    prereqs: { t: "sectMember", sectId: "sunmoon" },
+    stages: [
+      {
+        id: "patrol",
+        description: "ปราบหัวหน้าโจร (bandit_chief) 2 คน",
+        autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 2 },
+      },
+      {
+        id: "report",
+        description: "กลับไปรายงานเจ้าสำนัก",
+      },
+    ],
+    rewards: [
+      { t: "gold", amount: 200 },
+      { t: "wExp", amount: 70 },
+      { t: "npcRelationship", npcId: "sect_sunmoon_chief_dongfang", amount: 3 },
+      { t: "sectPoints", sectId: "sunmoon", amount: 50 },
+    ],
+  },
+
+  // SECT-2 · เก็บคัมภีร์เก่า — sect points 60
+  {
+    id: "qst_sunmoon_sect_scripture",
+    name: "เก็บคัมภีร์เก่าจากซากเมือง",
+    description: "ห้องคัมภีร์ของพรรคต้องการกระดาษและหมึกเพิ่มเพื่อคัดลอกคัมภีร์ลับ — เก็บมาให้ครบ",
+    briefSummary: "ส่งกระดาษ 6 + หมึก 6 · sect points +60",
+    type: "side",
+    sectId: "sunmoon",
+    giverNpcId: "sect_sunmoon_chief_dongfang",
+    prereqs: { t: "sectMember", sectId: "sunmoon" },
+    stages: [
+      {
+        id: "gather",
+        description: "เก็บกระดาษ 6 + หมึก 6",
+        autoAdvance: {
+          t: "and",
+          all: [
+            { t: "hasItem", itemId: "paper", count: 6 },
+            { t: "hasItem", itemId: "ink", count: 6 },
+          ],
+        },
+      },
+      {
+        id: "deliver",
+        description: "ส่งวัสดุให้เจ้าสำนัก",
+      },
+    ],
+    rewards: [
+      { t: "gold", amount: 150 },
+      { t: "wExp", amount: 60 },
+      { t: "npcRelationship", npcId: "sect_sunmoon_chief_dongfang", amount: 3 },
+      { t: "sectPoints", sectId: "sunmoon", amount: 60 },
+    ],
+  },
+
+  // ──────────────────────────────────────────────────────────────────────
+  // ภารกิจวิชาในกาย — high sect quest. Awards bonus T4 art.
+  // ──────────────────────────────────────────────────────────────────────
+
+  // ART-1 · ตำราสุริยันจันทราขั้นสูง — unlock at rank 3, reward bonus T4 art (qiankun)
+  {
+    id: "qst_sunmoon_art_qiankun",
+    name: "ตำราเฉียนคุนต้าหนัวอี",
+    description: "เจ้าสำนักต่งฟางยอมเปิดตำราเฉียนคุนต้าหนัวอีให้ศิษย์ที่พิสูจน์ทั้งฝีมือและความภักดี — เป็นวิชาลับสุดยอดของพรรคตะวันจันทรา",
+    briefSummary: "ฝึกเฉียนคุนต้าหนัวอี — รับ T4 art ลับของพรรคตะวันจันทรา",
+    type: "side",
+    sectId: "sunmoon",
+    isArtQuest: true,
+    minSectRank: 3,
+    giverNpcId: "sect_sunmoon_chief_dongfang",
+    prereqs: {
+      t: "and",
+      all: [
+        { t: "sectMember", sectId: "sunmoon" },
+        { t: "sectRankAtLeast", sectId: "sunmoon", maxRank: 3 },
+      ],
+    },
+    stages: [
+      {
+        id: "trial_kill",
+        description: "พิสูจน์ฝีมือ — ปราบหัวหน้าโจร (bandit_chief) 4 คน",
+        autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 4 },
+      },
+      {
+        id: "trial_loyalty",
+        description: "พิสูจน์ความภักดี — สะสมความหยิ่ง (arrogance) ถึง 25",
+        autoAdvance: { t: "trait", trait: "arrogance", min: 25 },
+      },
+      {
+        id: "return_art",
+        description: "กลับไปรับตำราจากเจ้าสำนัก",
+      },
+    ],
+    rewards: [
+      { t: "wExp", amount: 400 },
+      { t: "learnArt", artId: "qiankun", level: 5 },
+      { t: "trait", trait: "arrogance", amount: 5 },
+      { t: "sectPoints", sectId: "sunmoon", amount: 200 },
+      { t: "npcRelationship", npcId: "sect_sunmoon_chief_dongfang", amount: 20 },
     ],
   },
 ];

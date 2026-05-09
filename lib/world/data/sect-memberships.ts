@@ -495,6 +495,62 @@ const JINYIWEI: SectMembershipDef = {
   questCooldownDays: 30,
 };
 
+// พรรคตะวันจันทรา (Sun-Moon sect / 日月神教). Big art-focused sect — the
+// disciple line is almost entirely inner arts (only mi_firepalm exists
+// as a fist move skill). Sun (yang) / moon (yin) duality runs through
+// the line, with balance arts capping at T3 and the iconic qiankun +
+// yxhd at T4. Leadership tier matches Shaolin/Wudang/Emei/Beggars.
+//
+// Disciple intro is an assassination mission — the sect tests recruits
+// by ordering them to eliminate a hostile imperial guard. Trait gate is
+// looser than other sects (evil ≤ 30) since the bad-action mechanic
+// nudges the player's evil score up.
+//
+// Reward layout (8 new arts + existing qiankun + yxhd + mi_firepalm
+// fist skill):
+//   rank 9 → mi_firepalm fist + T0 art (auto)
+//   rank 8 → choose T1 art (sun OR moon)
+//   rank 7 → choose T2 art (sun-body OR moon-body)
+//   rank 6 → no reward (art-line takes a breath)
+//   rank 5 → T3 art (sun-script auto — yin/external defensive)
+//   rank 4 → choose T3 art (dual-fusion vs sun-moon)
+//   rank 3 → no reward (rank up only)
+//   rank 2 → choose T4 capstone art (qiankun OR yxhd)
+const SUNMOON: SectMembershipDef = {
+  id: "sunmoon",
+  name: "พรรคตะวันจันทรา",
+  hallLocationId: "sect_ming",
+  registrarNpcId: "sect_sunmoon_chief_dongfang",
+  joinRequirements: { t: "trait", trait: "evil", max: 30 },
+  startRank: 9,
+  topRank: 1,
+  rankUpCost: (targetRank) => {
+    const table: Record<number, number> = {
+      8: 100,
+      7: 200,
+      6: 350,
+      5: 500,
+      4: 700,
+      3: 1000,
+      2: 1400,
+      1: 2000,
+    };
+    return table[targetRank] ?? Infinity;
+  },
+  skillsByRank: {
+    9: ["mi_firepalm"], // T3 fist auto on join — sect's only move skill
+  },
+  artsByRank: {
+    9: ["t0_sm_dual"],                            // T0 auto on join
+    8: ["t1_sm_sunfire", "t1_sm_moonweave"],     // T1 — choice
+    7: ["t2_sm_sunbody", "t2_sm_moonbody"],      // T2 — choice
+    5: ["t3_sm_sunscript"],                       // T3 defensive auto
+    4: ["t3_sm_dualfusion", "t3_sm_sunmoon"],    // T3 offensive — choice
+    2: ["qiankun", "yxhd"],                       // T4 capstone — choice
+  },
+  questCooldownDays: 30,
+};
+
 export const SECT_MEMBERSHIPS: Record<SectId, SectMembershipDef> = {
   shaolin: SHAOLIN,
   wudang: WUDANG,
@@ -504,6 +560,7 @@ export const SECT_MEMBERSHIPS: Record<SectId, SectMembershipDef> = {
   gumu: GUMU,
   beggars: BEGGARS,
   jinyiwei: JINYIWEI,
+  sunmoon: SUNMOON,
 };
 
 // Helper: rewards (skill + art ids) the player is *eligible* to pick at a
