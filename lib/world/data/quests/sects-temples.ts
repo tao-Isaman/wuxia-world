@@ -27,14 +27,10 @@ export const QUESTS_SECTS_TEMPLES: readonly QuestDef[] = [
       all: [
         { t: "gender", equals: "male" },
         { t: "trait", trait: "evil", max: 10 },
-        // A disciple is loyal to one school — joining Shaolin requires
-        // not being affiliated with any other sect that admits disciples.
-        { t: "not", of: { t: "sectMember", sectId: "shaolin" } },
-        { t: "not", of: { t: "sectMember", sectId: "wudang" } },
-        { t: "not", of: { t: "sectMember", sectId: "huashan" } },
-        { t: "not", of: { t: "sectMember", sectId: "quanzhen" } },
-        { t: "not", of: { t: "sectMember", sectId: "emei" } },
-        { t: "not", of: { t: "sectMember", sectId: "gumu" } },
+        // A disciple is loyal to one school — joining requires not being
+        // affiliated with ANY existing sect. New sects added to SectId
+        // are auto-excluded; no per-intro list to maintain.
+        { t: "not", of: { t: "anySectMember" } },
       ],
     },
     stages: [
@@ -411,14 +407,7 @@ export const QUESTS_SECTS_TEMPLES: readonly QuestDef[] = [
       t: "and",
       all: [
         { t: "trait", trait: "evil", max: 10 },
-        // A disciple is loyal to one school — joining Wudang requires
-        // not being affiliated with any other sect that admits disciples.
-        { t: "not", of: { t: "sectMember", sectId: "wudang" } },
-        { t: "not", of: { t: "sectMember", sectId: "shaolin" } },
-        { t: "not", of: { t: "sectMember", sectId: "huashan" } },
-        { t: "not", of: { t: "sectMember", sectId: "quanzhen" } },
-        { t: "not", of: { t: "sectMember", sectId: "emei" } },
-        { t: "not", of: { t: "sectMember", sectId: "gumu" } },
+        { t: "not", of: { t: "anySectMember" } },
       ],
     },
     stages: [
@@ -670,12 +659,7 @@ export const QUESTS_SECTS_TEMPLES: readonly QuestDef[] = [
       t: "and",
       all: [
         { t: "trait", trait: "evil", max: 10 },
-        { t: "not", of: { t: "sectMember", sectId: "shaolin" } },
-        { t: "not", of: { t: "sectMember", sectId: "wudang" } },
-        { t: "not", of: { t: "sectMember", sectId: "huashan" } },
-        { t: "not", of: { t: "sectMember", sectId: "quanzhen" } },
-        { t: "not", of: { t: "sectMember", sectId: "emei" } },
-        { t: "not", of: { t: "sectMember", sectId: "gumu" } },
+        { t: "not", of: { t: "anySectMember" } },
       ],
     },
     stages: [
@@ -834,12 +818,7 @@ export const QUESTS_SECTS_TEMPLES: readonly QuestDef[] = [
       t: "and",
       all: [
         { t: "trait", trait: "evil", max: 10 },
-        { t: "not", of: { t: "sectMember", sectId: "shaolin" } },
-        { t: "not", of: { t: "sectMember", sectId: "wudang" } },
-        { t: "not", of: { t: "sectMember", sectId: "huashan" } },
-        { t: "not", of: { t: "sectMember", sectId: "quanzhen" } },
-        { t: "not", of: { t: "sectMember", sectId: "emei" } },
-        { t: "not", of: { t: "sectMember", sectId: "gumu" } },
+        { t: "not", of: { t: "anySectMember" } },
       ],
     },
     stages: [
@@ -1003,12 +982,7 @@ export const QUESTS_SECTS_TEMPLES: readonly QuestDef[] = [
       all: [
         { t: "gender", equals: "female" },
         { t: "trait", trait: "evil", max: 10 },
-        { t: "not", of: { t: "sectMember", sectId: "shaolin" } },
-        { t: "not", of: { t: "sectMember", sectId: "wudang" } },
-        { t: "not", of: { t: "sectMember", sectId: "huashan" } },
-        { t: "not", of: { t: "sectMember", sectId: "quanzhen" } },
-        { t: "not", of: { t: "sectMember", sectId: "emei" } },
-        { t: "not", of: { t: "sectMember", sectId: "gumu" } },
+        { t: "not", of: { t: "anySectMember" } },
       ],
     },
     stages: [
@@ -1662,7 +1636,167 @@ export const QUESTS_SECTS_TEMPLES: readonly QuestDef[] = [
   },
 
   // ──────────────────────────────────────────────────────────────────────
-  // พรรคยาจก — หัวหน้าหงเทียน
+  // พรรคยาจก — หัวหน้าหงเทียน (big sect, T4 chief — beggars line)
+  // ──────────────────────────────────────────────────────────────────────
+
+  // 0. INTRO — ขอเข้าเป็นศิษย์ (disciple registration)
+  // No money, no gender — only requirement is to have walked the road.
+  // Player must have learned the begging life skill to lv 2 first
+  // (proves they understand the way of the road). Begging trainable at
+  // any city / village / sect with the begging gate flag set.
+  {
+    id: "qst_beggars_disciple_intro",
+    name: "ขอเข้าเป็นศิษย์พรรคยาจก",
+    description: "หัวหน้าหงเทียนรับเฉพาะผู้ที่เข้าใจวิถียาจก — ผู้ที่ฝึกขอทานจนถึงขั้น ๒ แล้วเท่านั้น เก็บอาหารและเงินทองที่ได้จากท้องถนนมาแสดงให้ท่านเห็น",
+    briefSummary: "ส่งข้าวห่อ 5 + เงิน 100 ทอง · เข้าเป็นศิษย์พรรคยาจกขั้นที่ 9",
+    type: "side",
+    giverNpcId: "sect_beggars_chief_hongtian",
+    prereqs: {
+      t: "and",
+      all: [
+        { t: "trait", trait: "evil", max: 10 },
+        { t: "lifeSkillLevel", skill: "begging", min: 2 },
+        { t: "not", of: { t: "anySectMember" } },
+      ],
+    },
+    stages: [
+      {
+        id: "gather_offering",
+        description: "รวบรวมข้าวห่อ 5 + เงิน 100 ทอง จากการขอทาน",
+        autoAdvance: {
+          t: "and",
+          all: [
+            { t: "hasItem", itemId: "rice_dish", count: 5 },
+            { t: "goldAtLeast", amount: 100 },
+          ],
+        },
+      },
+      {
+        id: "return_to_chief",
+        description: "นำของและเงินไปแสดงต่อหัวหน้าหงเทียน",
+      },
+    ],
+    rewards: [
+      { t: "wExp", amount: 50 },
+      { t: "trait", trait: "humility", amount: 3 },
+      { t: "npcRelationship", npcId: "sect_beggars_chief_hongtian", amount: 5 },
+      { t: "joinSect", sectId: "beggars" },
+      { t: "sectPoints", sectId: "beggars", amount: 20 },
+    ],
+  },
+
+  // ──────────────────────────────────────────────────────────────────────
+  // ภารกิจประจำพรรคยาจก — ทำซ้ำได้ทุก 30 วัน
+  // ──────────────────────────────────────────────────────────────────────
+
+  // SECT-1 · ลาดตระเวนตรอกเมือง — sect points 50
+  {
+    id: "qst_beggars_sect_patrol",
+    name: "ลาดตระเวนตรอกเมือง",
+    description: "ภารกิจประจำของศิษย์พรรคยาจก — ลาดตระเวนตรอกเมืองและกำราบโจรที่รังแกผู้อ่อนแอ",
+    briefSummary: "ปราบโจร 2 คน · sect points +50",
+    type: "side",
+    sectId: "beggars",
+    giverNpcId: "sect_beggars_chief_hongtian",
+    prereqs: { t: "sectMember", sectId: "beggars" },
+    stages: [
+      {
+        id: "patrol",
+        description: "ปราบโจรเร่ร่อน 2 คน",
+        autoAdvance: { t: "defeatedOpponent", opponentId: "thug", count: 2 },
+      },
+      {
+        id: "report",
+        description: "กลับไปรายงานหัวหน้าหงเทียน",
+      },
+    ],
+    rewards: [
+      { t: "gold", amount: 150 },
+      { t: "wExp", amount: 60 },
+      { t: "npcRelationship", npcId: "sect_beggars_chief_hongtian", amount: 3 },
+      { t: "sectPoints", sectId: "beggars", amount: 50 },
+    ],
+  },
+
+  // SECT-2 · แจกอาหารคนยาก — sect points 60
+  {
+    id: "qst_beggars_sect_alms",
+    name: "แจกอาหารคนยากไร้",
+    description: "พรรคยาจกช่วยเหลือคนยากไร้เป็นกิจวัตร — เก็บข้าวห่อมาแจกให้ผู้หิวโหยในตรอกเมือง",
+    briefSummary: "ส่งข้าวห่อ 8 · sect points +60",
+    type: "side",
+    sectId: "beggars",
+    giverNpcId: "sect_beggars_chief_hongtian",
+    prereqs: { t: "sectMember", sectId: "beggars" },
+    stages: [
+      {
+        id: "gather",
+        description: "เก็บข้าวห่อ 8 ห่อ",
+        autoAdvance: { t: "hasItem", itemId: "rice_dish", count: 8 },
+      },
+      {
+        id: "deliver",
+        description: "ส่งข้าวห่อให้หัวหน้าหงเทียนนำไปแจก",
+      },
+    ],
+    rewards: [
+      { t: "gold", amount: 100 },
+      { t: "wExp", amount: 50 },
+      { t: "trait", trait: "good", amount: 3 },
+      { t: "npcRelationship", npcId: "sect_beggars_chief_hongtian", amount: 3 },
+      { t: "sectPoints", sectId: "beggars", amount: 60 },
+    ],
+  },
+
+  // ──────────────────────────────────────────────────────────────────────
+  // ภารกิจวิชาในกาย — high sect quest, rank-gated. Awards bonus T4 art.
+  // ──────────────────────────────────────────────────────────────────────
+
+  // ART-1 · ตำราหมื่นมวลชน — unlock at rank 3, reward bonus T4 art
+  {
+    id: "qst_beggars_art_thousandcrowd",
+    name: "ตำราหมื่นมวลชน",
+    description: "หัวหน้าหงเทียนยอมเปิดตำราวิชาหมื่นมวลชนให้ศิษย์ที่พิสูจน์ได้ทั้งฝีมือและน้ำใจ — เป็นวิชาลับสุดยอดของพรรคยาจก",
+    briefSummary: "ฝึกหมื่นมวลชน — รับ T4 art ลับของพรรคยาจก",
+    type: "side",
+    sectId: "beggars",
+    isArtQuest: true,
+    minSectRank: 3,
+    giverNpcId: "sect_beggars_chief_hongtian",
+    prereqs: {
+      t: "and",
+      all: [
+        { t: "sectMember", sectId: "beggars" },
+        { t: "sectRankAtLeast", sectId: "beggars", maxRank: 3 },
+      ],
+    },
+    stages: [
+      {
+        id: "trial_kill",
+        description: "พิสูจน์พลัง — ปราบหัวหน้าโจร (bandit_chief) 3 คน",
+        autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 3 },
+      },
+      {
+        id: "trial_alms",
+        description: "พิสูจน์น้ำใจ — เก็บข้าวห่อ 12 ห่อสำหรับแจกเลี้ยง",
+        autoAdvance: { t: "hasItem", itemId: "rice_dish", count: 12 },
+      },
+      {
+        id: "return_art",
+        description: "กลับไปรับตำราจากหัวหน้าหงเทียน",
+      },
+    ],
+    rewards: [
+      { t: "wExp", amount: 400 },
+      { t: "learnArt", artId: "t4_bg_thousandcrowd", level: 5 },
+      { t: "trait", trait: "good", amount: 5 },
+      { t: "sectPoints", sectId: "beggars", amount: 200 },
+      { t: "npcRelationship", npcId: "sect_beggars_chief_hongtian", amount: 20 },
+    ],
+  },
+
+  // ──────────────────────────────────────────────────────────────────────
+  // พรรคยาจก — original lore quests (still authored by chief Hongtian)
   // ──────────────────────────────────────────────────────────────────────
 
   // 20. INVESTIGATION — รายงานสายลับ (spy report investigation)

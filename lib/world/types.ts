@@ -213,6 +213,11 @@ export type Condition =
   | { t: "gender"; equals: Gender }
   // Player is a member of this sect (any rank).
   | { t: "sectMember"; sectId: SectId }
+  // Player is a member of ANY sect (any rank). Used by intro quests to
+  // express "not affiliated with anything yet" without enumerating every
+  // SectId — adding a new sect to the union no longer requires touching
+  // every other intro's prereq list.
+  | { t: "anySectMember" }
   // Player's current rank in the sect is at most `rank` (lower number =
   // higher rank). e.g. {sectId:"shaolin", maxRank:5} matches rank 5,4,3,2,1.
   | { t: "sectRankAtLeast"; sectId: SectId; maxRank: number }
@@ -225,6 +230,10 @@ export type Condition =
   // player to have absorbed the Quanzhen sun art before the secret-sect
   // gate appears.
   | { t: "learnedArt"; artId: string }
+  // Player's mastery in a life skill (begging / mining / herbalism / …)
+  // is at least `min`. Backed by lifeSkillXp + masteryLevel(). Used by
+  // the Beggars intro to require begging≥2 before the join quest opens.
+  | { t: "lifeSkillLevel"; skill: LifeSkill; min: number }
   | { t: "and"; all: Condition[] }
   | { t: "or"; any: Condition[] }
   | { t: "not"; of: Condition };
@@ -886,7 +895,7 @@ export interface SectMembership {
   joinedDay: number;
 }
 
-export type SectId = "shaolin" | "wudang" | "huashan" | "quanzhen" | "emei" | "gumu";
+export type SectId = "shaolin" | "wudang" | "huashan" | "quanzhen" | "emei" | "gumu" | "beggars";
 
 // ─── Character gender ─────────────────────────────────────────────────
 // Used by sect membership conditions (e.g. Shaolin admits men only) and

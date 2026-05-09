@@ -1,4 +1,5 @@
 import type { Condition, QuestStatus, WorldStateData } from "./types";
+import { masteryLevel } from "./data/life-skills";
 
 // Pure: read-only check against world state. No mutations.
 export function evaluateCondition(state: WorldStateData, c: Condition): boolean {
@@ -44,6 +45,11 @@ export function evaluateCondition(state: WorldStateData, c: Condition): boolean 
       return state.gender === c.equals;
     case "sectMember":
       return state.sectMembership[c.sectId] != null;
+    case "anySectMember":
+      // Object.keys() is fine here — sectMembership is a small map
+      // (≤ SECT_ID count) and only mutated on join / leave. We don't
+      // care which sect, only "is the player affiliated with anything?"
+      return Object.keys(state.sectMembership).length > 0;
     case "sectRankAtLeast": {
       const m = state.sectMembership[c.sectId];
       if (!m) return false;
@@ -53,6 +59,8 @@ export function evaluateCondition(state: WorldStateData, c: Condition): boolean 
       return state.gold >= c.amount;
     case "learnedArt":
       return (state.playerBuild?.learnedArtIds ?? []).includes(c.artId);
+    case "lifeSkillLevel":
+      return masteryLevel(state.lifeSkillXp[c.skill] ?? 0) >= c.min;
     case "and":
       return c.all.every((sub) => evaluateCondition(state, sub));
     case "or":

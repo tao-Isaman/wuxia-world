@@ -1572,10 +1572,17 @@ export const SCENES_SECTS_TEMPLES: readonly Scene[] = [
       { t: "dialogue", speaker: "หงเทียน", text: "พรรคยาจกมีหูมีตาทั่วยุทธภพ — เจ้าต้องการอะไร?" },
     ],
     choices: [
+      // Lore-quest offers gated to disciples only.
       {
         text: "รับภารกิจสายลับ",
         next: "qs_qst_beggars_spy_report_offer",
-        visibleIf: { t: "questStatus", questId: "qst_beggars_spy_report", status: "none" },
+        visibleIf: {
+          t: "and",
+          all: [
+            { t: "questStatus", questId: "qst_beggars_spy_report", status: "none" },
+            { t: "sectMember", sectId: "beggars" },
+          ],
+        },
         effects: [{ t: "startQuest", questId: "qst_beggars_spy_report" }],
       },
       {
@@ -1593,7 +1600,13 @@ export const SCENES_SECTS_TEMPLES: readonly Scene[] = [
       {
         text: "รับภารกิจช่วยเด็ก",
         next: "qs_qst_beggars_hungry_offer",
-        visibleIf: { t: "questStatus", questId: "qst_beggars_hungry_children", status: "none" },
+        visibleIf: {
+          t: "and",
+          all: [
+            { t: "questStatus", questId: "qst_beggars_hungry_children", status: "none" },
+            { t: "sectMember", sectId: "beggars" },
+          ],
+        },
         effects: [{ t: "startQuest", questId: "qst_beggars_hungry_children" }],
       },
       {
@@ -1612,6 +1625,68 @@ export const SCENES_SECTS_TEMPLES: readonly Scene[] = [
         ],
       },
       { text: "แค่ทักทาย", next: "sect_beggars" },
+    ],
+  },
+
+  // Disciple intro — offer beat. NPC popup auto-routes here after Accept.
+  {
+    kind: "dialog",
+    id: "qs_qst_beggars_disciple_intro_offer",
+    lines: [
+      { t: "narration", text: "หัวหน้าหงเทียนหัวเราะลั่นและตบเข่า" },
+      { t: "dialogue", speaker: "หงเทียน", text: "ฮ่าฮ่า เจ้าฝึกขอทานจนถึงขั้น ๒ แล้วสิ — ข้าได้ยินมาจากศิษย์ของข้า" },
+      { t: "dialogue", speaker: "หงเทียน", text: "พรรคยาจกไม่รับเงินทอง ไม่รับของขวัญ — เพียงพิสูจน์ว่าเจ้าเข้าใจวิถีของถนน" },
+      { t: "dialogue", speaker: "หงเทียน", text: "นำข้าวห่อ ๕ ห่อ และเงิน ๑๐๐ ทองที่เจ้าหามาได้จากการขอทานมาแสดง — ข้าอยากรู้ว่าเจ้าใจกว้างพอหรือไม่" },
+      { t: "dialogue", speaker: "หงเทียน", text: "เมื่อครบแล้วกลับมา ข้าจะรับเจ้าเป็นศิษย์ขั้นที่ ๙" },
+    ],
+    choices: [
+      { text: "ข้าจะไปทำตามคำสั่ง", next: "sect_beggars" },
+    ],
+  },
+
+  // Disciple intro — complete beat. Player has rice + 100 gold; choice
+  // fires finishQuest → reward chain joinSect:beggars seeds rank 9 +
+  // auto-grants nc1 + t0_bg_survival.
+  {
+    kind: "dialog",
+    id: "qs_qst_beggars_disciple_intro_complete",
+    lines: [
+      { t: "narration", text: "เจ้าวางข้าวห่อและเงินทองลงบนเสื่อหน้าหัวหน้าหงเทียน" },
+      { t: "dialogue", speaker: "หงเทียน", text: "ครบแล้ว — และเจ้าก็ไม่ได้บ่นแม้แต่นิดเดียว ฮ่าฮ่า" },
+      { t: "narration", text: "ท่านยกไม้เท้าเก้าข้อขึ้นแตะไหล่เจ้าเบา ๆ" },
+      { t: "dialogue", speaker: "หงเทียน", text: "ตั้งแต่บัดนี้ เจ้าคือศิษย์พรรคยาจกขั้นที่ ๙ — รับประกาศิตและวิชาเอาชีวิตรอดเป็นวิชาแรก" },
+    ],
+    choices: [
+      {
+        text: "น้อมรับด้วยความขอบพระคุณ",
+        next: "sect_beggars",
+        effects: [
+          { t: "takeItem", itemId: "rice_dish", count: 5 },
+          { t: "addGold", amount: -100 },
+          { t: "finishQuest", questId: "qst_beggars_disciple_intro", success: true },
+        ],
+      },
+    ],
+  },
+
+  // Vice chief ambient.
+  {
+    kind: "dialog",
+    id: "npc_sect_beggars_vice_chief_lifang_talk",
+    lines: [
+      { t: "narration", text: "รองหัวหน้าหลี่ฟางพิงกำแพงเคี้ยวเศษอาหาร แต่สายตาคมกริบ" },
+      { t: "dialogue", speaker: "หลี่ฟาง", text: "อย่าดูถูกยาจก — ในเสื้อขาดของข้ามีฝ่ามือที่หักกระดูกได้ในจังหวะเดียว" },
+    ],
+  },
+
+  // Staff elder ambient.
+  {
+    kind: "dialog",
+    id: "npc_sect_beggars_staff_elder_qicheng_talk",
+    lines: [
+      { t: "narration", text: "อาจารย์ฉีเฉิงกำลังขัดไม้เท้าด้วยมือที่หยาบกร้าน" },
+      { t: "dialogue", speaker: "ฉีเฉิง", text: "ไม้เท้าของพรรคยาจกไม่ใช่อาวุธ — มันคือเพื่อนเดินทาง" },
+      { t: "dialogue", speaker: "ฉีเฉิง", text: "ฝึกพอ เจ้าจะเข้าใจว่าทำไมเพลงไม้เท้าตีสุขถึงเป็นวิชาสุดยอดของพรรค" },
     ],
   },
   {

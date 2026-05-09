@@ -371,6 +371,68 @@ const GUMU: SectMembershipDef = {
   questCooldownDays: 30,
 };
 
+// Beggars sect (พรรคยาจก / 丐帮). Big sect — leadership tier matches
+// Shaolin / Wudang / Emei (T4 chief). The chief Hongtian is one of the
+// strongest in the world. Open to anyone, no money — but the player
+// must have learned the begging life skill to lv 2 first (proves they
+// understand the way of the road). Combat identity: fist + staff,
+// external / hard. The "wanderer / dragon palm" arts cap the line.
+//
+// Reward layout:
+//   rank 9 → T0 fist nc1 + T0 art (gifted on registration)
+//   rank 8 → choose T1 weapon (snake fist OR snake staff)
+//   rank 7 → T1 art (sun-shadow, auto)
+//   rank 6 → T2 art (nine-shadow, auto)
+//   rank 5 → choose T2 weapon (drift staff OR drift fist)
+//   rank 4 → T3 art (sun-renew, auto)
+//   rank 3 → choose T3 weapon (wander staff OR existing ng3 dragon palm)
+//   rank 2 → choose T4 art (thousand-crowd OR existing wanderer breath)
+//          + the rank itself unlocks T4 weapon picks via the art quest.
+const BEGGARS: SectMembershipDef = {
+  id: "beggars",
+  name: "พรรคยาจก",
+  hallLocationId: "sect_beggars",
+  registrarNpcId: "sect_beggars_chief_hongtian",
+  joinRequirements: {
+    t: "and",
+    all: [
+      { t: "trait", trait: "evil", max: 10 },
+      // Must have learned begging — proves the player has walked the
+      // road. Same value the intro quest checks against.
+      { t: "lifeSkillLevel", skill: "begging", min: 2 },
+    ],
+  },
+  startRank: 9,
+  topRank: 1,
+  rankUpCost: (targetRank) => {
+    const table: Record<number, number> = {
+      8: 100,
+      7: 200,
+      6: 350,
+      5: 500,
+      4: 700,
+      3: 1000,
+      2: 1400,
+      1: 2000,
+    };
+    return table[targetRank] ?? Infinity;
+  },
+  skillsByRank: {
+    9: ["nc1"],                                  // T0 fist auto
+    8: ["bg_snake_fist", "bg_snake_staff"],     // T1 — choice
+    5: ["bg_drift_staff", "bg_drift_fist"],     // T2 — choice
+    3: ["bg_wander_staff", "ng3"],              // T3 — choice (new staff vs old palm)
+  },
+  artsByRank: {
+    9: ["t0_bg_survival"],                       // T0 art auto
+    7: ["t1_bg_sunshadow"],                      // T1 art auto
+    6: ["t2_bg_nineshadow"],                     // T2 art auto
+    4: ["t3_bg_sunrenew"],                       // T3 art auto
+    2: ["t4_bg_thousandcrowd", "wanderer"],     // T4 art — choice
+  },
+  questCooldownDays: 30,
+};
+
 export const SECT_MEMBERSHIPS: Record<SectId, SectMembershipDef> = {
   shaolin: SHAOLIN,
   wudang: WUDANG,
@@ -378,6 +440,7 @@ export const SECT_MEMBERSHIPS: Record<SectId, SectMembershipDef> = {
   quanzhen: QUANZHEN,
   emei: EMEI,
   gumu: GUMU,
+  beggars: BEGGARS,
 };
 
 // Helper: rewards (skill + art ids) the player is *eligible* to pick at a

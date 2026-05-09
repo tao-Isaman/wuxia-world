@@ -567,6 +567,13 @@ for (const city of CITIES) {
     { resourceId: "beg_market", visibleIf: BEGGING_GATE },
   ]);
 }
+// Villages get the street-beg node only — markets are a city thing.
+// User spec: begging works at city + village + sect locations.
+for (const village of VILLAGES) {
+  appendResources(village, [
+    { resourceId: "beg_street", visibleIf: BEGGING_GATE },
+  ]);
+}
 appendResources(LEAVES_BY_ID.get("sect_beggars"), [
   { resourceId: "beg_street", visibleIf: BEGGING_GATE },
 ]);

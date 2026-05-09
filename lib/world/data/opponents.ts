@@ -904,6 +904,109 @@ export const OPPONENTS: readonly OpponentDef[] = [
       artId: "t1_eagleclaw", artLevel: 4,
       skillIds: ["nc1", "ne8"],
     }) },
+
+  // ─── พรรคยาจก — sect leadership (T1-T4) ──────────────────────────────
+  // Big sect, T4 chief tier. Hongtian carries the full disciple-line:
+  // bg_lucky_staff (T4 staff) + ep + ng3 + bg_wander_staff + bg_drift
+  // skills + arts t4_bg_thousandcrowd + wanderer + t3_bg_sunrenew.
+  { id: "spar_beggars_chief_hongtian", name: "หัวหน้าหงเทียน", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "rice_dish", weight: 5 }, { itemId: "ancient_coin", weight: 4 },
+      { itemId: "jade", weight: 3 }, { itemId: "wood_hard", weight: 3 },
+      { itemId: "wood_sacred", weight: 2 }, { itemId: "mithril_ore", weight: 1 }],
+    build: () => build("หัวหน้าหงเทียน", 4, {
+      stats: { STR: 22, VIT: 24, DEF: 16, POW: 14, INT: 10, DEX: 14, AGI: 16, LUK: 10 },
+      artId: "t4_bg_thousandcrowd", artLevel: 10,
+      skillIds: ["bg_lucky_staff", "ep", "ng3", "bg_wander_staff", "bg_drift_staff", "bg_drift_fist"],
+      extraArtSlots: ["t4_bg_thousandcrowd", "wanderer", "t3_bg_sunrenew", "t2_bg_nineshadow"],
+      artLevels: { t4_bg_thousandcrowd: 10, wanderer: 10, t3_bg_sunrenew: 10, t2_bg_nineshadow: 10, t1_bg_sunshadow: 10 },
+      learnedArtIds: ["t1_bg_sunshadow"],
+    }) },
+
+  { id: "spar_beggars_lifang", name: "รองหัวหน้าหลี่ฟาง", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "rice_dish", weight: 4 }, { itemId: "ancient_coin", weight: 3 },
+      { itemId: "jade", weight: 2 }, { itemId: "wood_hard", weight: 2 }],
+    build: () => build("รองหัวหน้าหลี่ฟาง", 4, {
+      stats: { STR: 18, VIT: 18, DEF: 12, AGI: 14, DEX: 10 },
+      artId: "wanderer", artLevel: 10,
+      skillIds: ["bg_lucky_staff", "bg_wander_staff", "ng3", "bg_drift_fist", "ep"],
+      extraArtSlots: ["wanderer", "t3_bg_sunrenew", "t2_bg_nineshadow"],
+      artLevels: { wanderer: 10, t3_bg_sunrenew: 9, t2_bg_nineshadow: 9 },
+    }) },
+
+  { id: "spar_beggars_qicheng", name: "อาจารย์ไม้เท้าฉีเฉิง", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "wood_hard", weight: 4 }, { itemId: "rice_dish", weight: 3 },
+      { itemId: "ancient_coin", weight: 2 }],
+    build: () => build("อาจารย์ไม้เท้าฉีเฉิง", 4, {
+      stats: { STR: 20, VIT: 14, AGI: 12, DEX: 10, DEF: 8 },
+      artId: "t3_bg_sunrenew", artLevel: 9,
+      skillIds: ["bg_lucky_staff", "bg_wander_staff", "bg_drift_staff", "bg_snake_staff"],
+      extraArtSlots: ["t3_bg_sunrenew", "t2_bg_nineshadow"],
+      artLevels: { t3_bg_sunrenew: 9, t2_bg_nineshadow: 8 },
+    }) },
+
+  { id: "spar_beggars_wudao", name: "อาจารย์หมัดอู่เต้า", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "rice_dish", weight: 4 }, { itemId: "ancient_coin", weight: 3 },
+      { itemId: "jade", weight: 2 }],
+    build: () => build("อาจารย์หมัดอู่เต้า", 4, {
+      stats: { STR: 20, VIT: 14, POW: 10, DEX: 8 },
+      artId: "wanderer", artLevel: 9,
+      skillIds: ["ep", "ng3", "bg_drift_fist", "bg_snake_fist"],
+      extraArtSlots: ["wanderer", "t3_bg_sunrenew"],
+      artLevels: { wanderer: 9, t3_bg_sunrenew: 9 },
+    }) },
+
+  { id: "spar_beggars_yunsi", name: "อาจารย์ข่าวสารยุนซือ", ti: 3, category: "human",
+    drops: [...DROPS_T3,
+      { itemId: "paper", weight: 5 }, { itemId: "ink", weight: 4 },
+      { itemId: "ancient_coin", weight: 3 }],
+    build: () => build("อาจารย์ข่าวสารยุนซือ", 3, {
+      stats: { STR: 12, AGI: 14, DEX: 10, VIT: 8 },
+      artId: "t2_bg_nineshadow", artLevel: 8,
+      skillIds: ["bg_drift_fist", "bg_drift_staff", "bg_snake_fist"],
+      extraArtSlots: ["t2_bg_nineshadow", "t1_bg_sunshadow"],
+      artLevels: { t2_bg_nineshadow: 8, t1_bg_sunshadow: 7 },
+    }) },
+
+  { id: "spar_beggars_renhua", name: "หัวหน้าศิษย์เหรินฮัว", ti: 2, category: "human",
+    drops: [...DROPS_T2,
+      { itemId: "rice_dish", weight: 3 }, { itemId: "ancient_coin", weight: 2 }],
+    build: () => build("หัวหน้าศิษย์เหรินฮัว", 2, {
+      stats: { STR: 9, AGI: 7, DEX: 5 },
+      artId: "t1_bg_sunshadow", artLevel: 6,
+      skillIds: ["bg_drift_staff", "bg_snake_fist", "nc1"],
+      extraArtSlots: ["t1_bg_sunshadow"],
+      artLevels: { t1_bg_sunshadow: 6 },
+    }) },
+
+  { id: "spar_beggars_dawei", name: "ศิษย์ต้าเหว่ย", ti: 2, category: "human",
+    drops: [...DROPS_T2,
+      { itemId: "rice_dish", weight: 2 }],
+    build: () => build("ศิษย์ต้าเหว่ย", 2, {
+      stats: { STR: 8, VIT: 6, AGI: 5 },
+      artId: "t1_bg_sunshadow", artLevel: 5,
+      skillIds: ["bg_snake_staff", "nc2"],
+    }) },
+
+  { id: "spar_beggars_xiaohu", name: "ศิษย์เสี่ยวฮู", ti: 2, category: "human",
+    drops: [...DROPS_T2,
+      { itemId: "rice_dish", weight: 2 }],
+    build: () => build("ศิษย์เสี่ยวฮู", 2, {
+      stats: { STR: 7, AGI: 8, DEX: 4 },
+      artId: "t1_bg_sunshadow", artLevel: 5,
+      skillIds: ["bg_drift_fist", "bg_snake_fist"],
+    }) },
+
+  { id: "spar_beggars_xiaomao", name: "ศิษย์เสี่ยวเหมา", ti: 1, category: "human",
+    drops: [...DROPS_T1],
+    build: () => build("ศิษย์เสี่ยวเหมา", 1, {
+      stats: { STR: 5, VIT: 4 },
+      artId: "t0_bg_survival", artLevel: 3,
+      skillIds: ["nc1", "nc2"],
+    }) },
   { id: "spar_xingxiu_disciple", name: "ศิษย์ตู๋โซ่ว", ti: 2, category: "human",
     drops: [...DROPS_T2,
       { itemId: "man_pn", weight: 1 }, { itemId: "man_nd9", weight: 1 },
