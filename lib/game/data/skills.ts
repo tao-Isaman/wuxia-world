@@ -76,7 +76,7 @@ export const SKILLS: readonly Skill[] = [
 
   // ─── พรรคยาจก ───
   { id: "nc1", n: "ประกาศิตพรรคยาจก", sc: "พรรคยาจก", ti: 0, w: "fist", mg: 20, st: { STR: 5, VIT: 5 }, at: "phy", bp: 40, p: 0, f: 0, dm: 1, se: null, ee: null, d: "Phy ฝ่ามือพรรคยาจก", types: ["external"] },
-  { id: "nc2", n: "ไม้เท้าตีสุนัข", sc: "พรรคยาจก", ti: 0, w: "long", mg: 20, st: { STR: 5, AGI: 5 }, at: "phy", bp: 50, p: 0, f: 5, dm: 1, se: null, ee: null, d: "Phy ไม้เท้าพรรคยาจก", types: ["external"] },
+  { id: "nc2", n: "ไม้เท้าขอทาน", sc: "พรรคยาจก", ti: 0, w: "long", mg: 20, st: { STR: 5, AGI: 5 }, at: "phy", bp: 50, p: 0, f: 5, dm: 1, se: null, ee: null, d: "Phy ไม้เท้าพรรคยาจก", types: ["external"] },
   { id: "ne8", n: "หมัดเมา", sc: "พรรคยาจก", ti: 2, w: "fist", mg: 60, st: { STR: 7, AGI: 8 }, at: "phy", bp: 62, p: 0, f: 0, dm: 1, dr: 20, se: null, ee: { t: "debuff_eva", v: -12, u: 5 }, d: "Phy ดูด20% + Eva-12", types: ["soft"] },
   { id: "ng3", n: "ฝ่ามือจับมังกร", sc: "พรรคยาจก", ti: 3, w: "fist", mg: 80, st: { STR: 10, VIT: 6, POW: 4 }, at: "phy", bp: 95, p: 30, f: 0, dm: 1, dr: 25, se: null, ee: null, d: "Phy×80% + ดูด 25% HP", types: ["yang", "hard"] },
   { id: "ep", n: "18 ฝ่ามือมังกร", sc: "พรรคยาจก", ti: 4, w: "fist", mg: 100, st: { STR: 8, POW: 6, VIT: 4 }, at: "phy", bp: 90, p: 30, f: 0, dm: 1, se: null, ee: null, d: "Phy×130% หนักมาก", types: ["yang", "hard", "external"] },
