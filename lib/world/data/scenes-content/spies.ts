@@ -790,6 +790,47 @@ export const SCENES_SPIES: readonly Scene[] = [
       { t: "dialogue", speaker: "จ้าวฝู่", text: "เจ้ามาในกรมเสื้อแพรเพื่อสิ่งใด · หากมาประลอง · ข้าไม่ปฏิเสธ" },
       { t: "dialogue", speaker: "จ้าวฝู่", text: "แต่จงเข้าใจ · ผู้แพ้จะต้องจดจำชื่อข้าไว้นาน" },
     ],
+    choices: [
+      { text: "แค่ทักทาย", next: "sect_jinyiwei" },
+    ],
+  },
+
+  // Disciple intro — offer beat. NPC popup auto-routes here after Accept.
+  // The commander briefs the kidnap mission against envoy Liuying.
+  {
+    kind: "dialog",
+    id: "qs_qst_jinyiwei_disciple_intro_offer",
+    lines: [
+      { t: "narration", text: "จ้าวฝู่จ้องเจ้าอย่างพิเคราะห์ ก่อนชี้ไปทางพระราชวังจงหยาง" },
+      { t: "dialogue", speaker: "จ้าวฝู่", text: "อยากเป็นองครักษ์เสื้อแพร? ข้ารับคนได้ — แต่ไม่รับคนใจอ่อน" },
+      { t: "dialogue", speaker: "จ้าวฝู่", text: "ทูตหลิวอิงในวังจงหยางขายความลับให้ฝ่ายตรงข้ามมาหลายเดือน — ข้าต้องการสอบสวนเขาในที่ของข้า" },
+      { t: "dialogue", speaker: "จ้าวฝู่", text: "ลักพาตัวเขาคืนนี้ อย่าให้มีร่องรอย เมื่อสำเร็จแล้วกลับมารายงาน — ข้าจะรับเจ้าเป็นศิษย์ขั้นที่ ๙" },
+    ],
+    choices: [
+      { text: "รับงาน — ข้าจะลงมือทันที", next: "sect_jinyiwei" },
+    ],
+  },
+
+  // Disciple intro — complete beat. The kidnappedNpc condition is
+  // already satisfied; the choice fires finishQuest → joinSect:jinyiwei.
+  {
+    kind: "dialog",
+    id: "qs_qst_jinyiwei_disciple_intro_complete",
+    lines: [
+      { t: "narration", text: "เจ้ายืนรายงานต่อจ้าวฝู่ ผู้บัญชาการพยักหน้าด้วยความพอใจ" },
+      { t: "dialogue", speaker: "จ้าวฝู่", text: "ทูตอยู่ในห้องสอบสวนของข้าแล้ว — ดี เจ้าทำได้สะอาดดีกว่าที่คาด" },
+      { t: "narration", text: "ท่านยกชุดเสื้อแพรปักทองชุดเล็กให้เจ้า" },
+      { t: "dialogue", speaker: "จ้าวฝู่", text: "ตั้งแต่บัดนี้ เจ้าคือองครักษ์ขั้นที่ ๙ — รับโซ่และลมปราณเสื้อแพรเป็นวิชาแรกของกรมราช" },
+    ],
+    choices: [
+      {
+        text: "น้อมรับและสาบาน",
+        next: "sect_jinyiwei",
+        effects: [
+          { t: "finishQuest", questId: "qst_jinyiwei_disciple_intro", success: true },
+        ],
+      },
+    ],
   },
   {
     kind: "dialog",

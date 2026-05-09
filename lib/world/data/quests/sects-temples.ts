@@ -2008,4 +2008,163 @@ export const QUESTS_SECTS_TEMPLES: readonly QuestDef[] = [
       { t: "sectPoints", sectId: "shaolin", amount: 200 },
     ],
   },
+
+  // ──────────────────────────────────────────────────────────────────────
+  // องครักษ์เสื้อแพร — ผู้บัญชาการจ้าวฝู่ (imperial guard sect — kidnap intro)
+  // ──────────────────────────────────────────────────────────────────────
+
+  // 0. INTRO — ขอเข้าเป็นศิษย์ (kidnap-the-envoy intro)
+  // The commander assigns a kidnap mission as the loyalty test.
+  // Target: palace_zhongyang_envoy_liuying — a noble envoy whose
+  // loyalty is in question. The bad-action mechanic (`attemptKidnap`)
+  // already handles the apprehension; the quest just gates on the
+  // resulting `kidnappedNpc` flag.
+  {
+    id: "qst_jinyiwei_disciple_intro",
+    name: "ขอเข้าเป็นศิษย์องครักษ์",
+    description: "ผู้บัญชาการจ้าวฝู่กำลังจับตามองทูตหลิวอิงในวังจงหยาง — เขาสงสัยว่าทูตคนนี้ขายความลับให้ฝ่ายตรงข้าม จงลักพาตัวเขามาเพื่อสอบสวน",
+    briefSummary: "ลักพาตัวทูตหลิวอิงเพื่อพิสูจน์ความจงรักภักดี",
+    type: "side",
+    giverNpcId: "sect_jinyiwei_leader_zhao",
+    prereqs: {
+      t: "and",
+      all: [
+        { t: "trait", trait: "evil", max: 30 },
+        { t: "not", of: { t: "anySectMember" } },
+      ],
+    },
+    stages: [
+      {
+        id: "kidnap_envoy",
+        description: "ลักพาตัวทูตหลิวอิงที่วังจงหยาง",
+        autoAdvance: { t: "kidnappedNpc", npcId: "palace_zhongyang_envoy_liuying" },
+      },
+      {
+        id: "report_back",
+        description: "กลับไปรายงานผู้บัญชาการจ้าวฝู่",
+      },
+    ],
+    rewards: [
+      { t: "wExp", amount: 80 },
+      { t: "trait", trait: "arrogance", amount: 3 },
+      { t: "npcRelationship", npcId: "sect_jinyiwei_leader_zhao", amount: 10 },
+      { t: "joinSect", sectId: "jinyiwei" },
+      { t: "sectPoints", sectId: "jinyiwei", amount: 30 },
+    ],
+  },
+
+  // ──────────────────────────────────────────────────────────────────────
+  // ภารกิจประจำองครักษ์ — ทำซ้ำได้ทุก 30 วัน
+  // ──────────────────────────────────────────────────────────────────────
+
+  // SECT-1 · ปราบโจรในเขตหลวง — sect points 50
+  {
+    id: "qst_jinyiwei_sect_patrol",
+    name: "ปราบโจรในเขตหลวง",
+    description: "ภารกิจประจำขององครักษ์ — กำราบโจรที่ก่อความวุ่นวายในเขตหลวง",
+    briefSummary: "ปราบหัวหน้าโจร 2 คน · sect points +50",
+    type: "side",
+    sectId: "jinyiwei",
+    giverNpcId: "sect_jinyiwei_leader_zhao",
+    prereqs: { t: "sectMember", sectId: "jinyiwei" },
+    stages: [
+      {
+        id: "patrol",
+        description: "ปราบหัวหน้าโจร (bandit_chief) 2 คน",
+        autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 2 },
+      },
+      {
+        id: "report",
+        description: "กลับไปรายงานผู้บัญชาการ",
+      },
+    ],
+    rewards: [
+      { t: "gold", amount: 200 },
+      { t: "wExp", amount: 70 },
+      { t: "npcRelationship", npcId: "sect_jinyiwei_leader_zhao", amount: 3 },
+      { t: "sectPoints", sectId: "jinyiwei", amount: 50 },
+    ],
+  },
+
+  // SECT-2 · ส่งเหล็กให้โรงตีอาวุธ — sect points 60
+  {
+    id: "qst_jinyiwei_sect_arms",
+    name: "ส่งเหล็กให้โรงตีอาวุธ",
+    description: "โรงตีอาวุธของกรมราชต้องการเหล็กพิเศษและเหล็กดิบเพิ่มเพื่อหลอมดาบโซ่ใหม่ — เก็บมาให้ครบ",
+    briefSummary: "ส่งเหล็กดิบ 6 + เหล็กแท่ง 2 · sect points +60",
+    type: "side",
+    sectId: "jinyiwei",
+    giverNpcId: "sect_jinyiwei_leader_zhao",
+    prereqs: { t: "sectMember", sectId: "jinyiwei" },
+    stages: [
+      {
+        id: "gather",
+        description: "เก็บเหล็กดิบ 6 ก้อน + เหล็กแท่ง 2 ก้อน",
+        autoAdvance: {
+          t: "and",
+          all: [
+            { t: "hasItem", itemId: "iron_ore", count: 6 },
+            { t: "hasItem", itemId: "iron_ingot", count: 2 },
+          ],
+        },
+      },
+      {
+        id: "deliver",
+        description: "ส่งเหล็กให้ผู้บัญชาการ",
+      },
+    ],
+    rewards: [
+      { t: "gold", amount: 150 },
+      { t: "wExp", amount: 60 },
+      { t: "npcRelationship", npcId: "sect_jinyiwei_leader_zhao", amount: 3 },
+      { t: "sectPoints", sectId: "jinyiwei", amount: 60 },
+    ],
+  },
+
+  // ──────────────────────────────────────────────────────────────────────
+  // ภารกิจวิชาในกาย — high sect quest, rank-gated. Awards bonus T4 art.
+  // ──────────────────────────────────────────────────────────────────────
+
+  // ART-1 · ตำราพลังประหารเทพ — unlock at rank 3, reward bonus T4 art
+  {
+    id: "qst_jinyiwei_art_godslayer",
+    name: "ตำราพลังประหารเทพ",
+    description: "ผู้บัญชาการจ้าวฝู่ยอมเปิดตำราพลังประหารเทพให้ศิษย์ที่พิสูจน์ทั้งฝีมือและความภักดี — เป็นวิชาลับสุดยอดของกรมราช",
+    briefSummary: "ฝึกพลังประหารเทพ — รับ T4 art ลับขององครักษ์เสื้อแพร",
+    type: "side",
+    sectId: "jinyiwei",
+    isArtQuest: true,
+    minSectRank: 3,
+    giverNpcId: "sect_jinyiwei_leader_zhao",
+    prereqs: {
+      t: "and",
+      all: [
+        { t: "sectMember", sectId: "jinyiwei" },
+        { t: "sectRankAtLeast", sectId: "jinyiwei", maxRank: 3 },
+      ],
+    },
+    stages: [
+      {
+        id: "trial_kill",
+        description: "พิสูจน์ฝีมือ — ปราบหัวหน้าโจร (bandit_chief) 4 คน",
+        autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 4 },
+      },
+      {
+        id: "trial_loyalty",
+        description: "พิสูจน์ความภักดี — สะสมความหยิ่ง (arrogance) ถึง 20",
+        autoAdvance: { t: "trait", trait: "arrogance", min: 20 },
+      },
+      {
+        id: "return_art",
+        description: "กลับไปรับตำราจากผู้บัญชาการ",
+      },
+    ],
+    rewards: [
+      { t: "wExp", amount: 400 },
+      { t: "learnArt", artId: "t4_jy_godslayer", level: 5 },
+      { t: "trait", trait: "arrogance", amount: 5 },
+      { t: "sectPoints", sectId: "jinyiwei", amount: 200 },
+      { t: "npcRelationship", npcId: "sect_jinyiwei_leader_zhao", amount: 20 },
+    ],
+  },
 ];

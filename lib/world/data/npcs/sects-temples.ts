@@ -1072,11 +1072,17 @@ export const NPCS_SECTS_TEMPLES: readonly NpcDef[] = [
   {
     id: "sect_jinyiwei_leader_zhao",
     name: "ผู้บัญชาการจ้าวฝู่",
-    description: "ผู้บัญชาการกรมองครักษ์เสื้อแพร · มือขวาขององค์จักรพรรดิ · ดวงตาคมราวดาบ พูดน้อยแต่หนัก",
+    description: "ผู้บัญชาการกรมองครักษ์เสื้อแพร · มือขวาขององค์จักรพรรดิ · ฝีมือเทียบเท่าตำนานยุทธจักร · ผู้สืบทอดดาบประหารชีพและพลังประหารเทพ · ดวงตาคมราวดาบ พูดน้อยแต่หนัก",
     locationIds: ["sect_jinyiwei"],
     dialogSceneId: "npc_sect_jinyiwei_leader_zhao_talk",
     sparOpponentId: "spar_jinyiwei_leader",
-    sparFameReward: 14,
+    sparFameReward: 18,
+    questIds: [
+      "qst_jinyiwei_disciple_intro",
+      "qst_jinyiwei_sect_patrol",
+      "qst_jinyiwei_sect_arms",
+      "qst_jinyiwei_art_godslayer",
+    ],
     defenseTier: 4,
     stealLoot: [
       { itemId: "ancient_coin", weight: 5 },
@@ -1084,6 +1090,8 @@ export const NPCS_SECTS_TEMPLES: readonly NpcDef[] = [
       { itemId: "jade_amulet", weight: 2 },
       { itemId: "potion_big", weight: 3 },
       { itemId: "man_jy_blade_king", weight: 1 },
+      { itemId: "wood_sacred", weight: 2 },
+      { itemId: "mithril_ore", weight: 1 },
     ],
     tags: ["sect_master", "imperial", "jinyiwei"],
   },

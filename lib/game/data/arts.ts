@@ -252,10 +252,18 @@ export const ARTS: readonly Art[] = [
     stats: { STR: 12, AGI: 14, DEX: 12 }, hL: 35, mL: 25,
     act: { n: "ก้าวฟ้า", c: 30, cd: 3, t: "atk_phy_pen", m: 1.4, pen: 35, d: "ทางกาย×1.4 ทะลุ DEF 35% CD3" },
     pas: { tr: "on_crit", ch: 100, d: "Crit → ATK+5% (≤3 ซ้อน)", e: { t: "stack_atk", v: 5, mx: 3 } } },
+  { id: "t3_jy_shadow", n: "เงาสังหาร", sc: "องครักษ์เสื้อแพร", tp: "หยาง·ภายนอก", types: ["yang", "external"], ti: 3,
+    stats: { STR: 12, AGI: 14, DEX: 12, LUK: 2 }, hL: 30, mL: 30,
+    act: { n: "เงาตวัด", c: 28, cd: 3, t: "atk_phy_pen", m: 1.4, pen: 30, d: "ทางกาย×1.4 ทะลุ DEF 30% CD3" },
+    pas: { tr: "use_act", ch: 100, d: "ใช้ IA → Eva+12 (5ตา)", e: { t: "buff_eva", n: "เงาสังหาร", v: 12, u: 5 } } },
   { id: "jy_a4_brocadelord", n: "เจ้านายเสื้อแพร", sc: "องครักษ์เสื้อแพร", tp: "หยาง·ภายนอก", types: ["yang", "external"], ti: 4,
     stats: { STR: 18, AGI: 16, DEX: 16 }, hL: 40, mL: 30,
     act: { n: "ยุทธวิธีล่าโจร", c: 35, cd: 4, t: "atk_phy_pen", m: 1.5, pen: 50, d: "ทางกาย×1.5 ทะลุ DEF 50% CD4" },
     pas: { tr: "on_crit", ch: 100, d: "Crit → ศัตรู PDef-15 (2ตา)", e: { t: "debuff_def", n: "บาดลึก", v: -15, u: 5 } } },
+  { id: "t4_jy_godslayer", n: "พลังประหารเทพ", sc: "องครักษ์เสื้อแพร", tp: "หยาง·ภายนอก", types: ["yang", "external"], ti: 4,
+    stats: { STR: 22, DEX: 18, AGI: 10 }, hL: 45, mL: 35,
+    act: { n: "ประหารเทพ", c: 35, cd: 4, t: "atk_phy_pen", m: 1.6, pen: 45, d: "ทางกาย×1.6 ทะลุ DEF 45% CD4 — พลังประหารแม้แต่เทพ" },
+    pas: { tr: "use_act", ch: 100, d: "ใช้ IA → ATK+12% (≤4 ซ้อน) — พลังประหารเทพ", e: { t: "stack_atk", v: 12, mx: 4 } } },
 
   // ─── ยุทธจักร ───
   { id: "t0_ironshirt", n: "เกราะผ้าเหล็กพื้น", sc: "ยุทธจักร", tp: "แข็ง·ภายนอก", types: ["hard", "external"], ti: 0,

@@ -433,6 +433,68 @@ const BEGGARS: SectMembershipDef = {
   questCooldownDays: 30,
 };
 
+// Jinyiwei sect (องครักษ์เสื้อแพร / 锦衣卫). Imperial guard sect — backed
+// by the throne, well-funded, and politically powerful. Leadership tier
+// matches Shaolin / Wudang / Emei / Beggars (T4 commander). Combat
+// identity: yang / external — fist + sword + blade + chain (hidden).
+// The disciple intro is a kidnap mission, mirroring the sect's role as
+// the emperor's interrogation arm — recruits earn membership by proving
+// they can apprehend a person of interest cleanly.
+//
+// Reward layout (rich pool — sect already had a full T0-T3 disciple
+// line authored, plus a T4 art `jy_a4_brocadelord`. New T4 skills +
+// arts slot in at the top):
+//   rank 9 → T0 chain skill jy_chain + T0 art jy_a0_brocade (auto)
+//   rank 8 → T1 blade jy_blade auto
+//   rank 7 → T1 art jy_a1_silktread auto
+//   rank 6 → T2 art jy_a2_goldarmor auto
+//   rank 5 → choose T2 fist (jy_eagleclaw vs jy_grapple)
+//   rank 4 → choose T3 art (jy_a3_thunderstride vs new t3_jy_shadow)
+//   rank 3 → choose T3 weapon (jy_sword vs jy_chainmaster vs jy_blade_king)
+//   rank 2 → choose T4 art (jy_a4_brocadelord vs new t4_jy_godslayer)
+//          + choose T4 weapon (sword vs blade vs chain)
+const JINYIWEI: SectMembershipDef = {
+  id: "jinyiwei",
+  name: "องครักษ์เสื้อแพร",
+  hallLocationId: "sect_jinyiwei",
+  registrarNpcId: "sect_jinyiwei_leader_zhao",
+  // Trait gate same as the rest. The kidnap intro inherently nudges
+  // the player's `evil` trait up via the bad-action mechanic, so the
+  // gate isn't redundant — it stops a player who's already too evil
+  // from joining (the commander wants disciplined agents, not maniacs).
+  joinRequirements: { t: "trait", trait: "evil", max: 30 },
+  startRank: 9,
+  topRank: 1,
+  rankUpCost: (targetRank) => {
+    const table: Record<number, number> = {
+      8: 100,
+      7: 200,
+      6: 350,
+      5: 500,
+      4: 700,
+      3: 1000,
+      2: 1400,
+      1: 2000,
+    };
+    return table[targetRank] ?? Infinity;
+  },
+  skillsByRank: {
+    9: ["jy_chain"],     // T0 chain auto on join
+    8: ["jy_blade"],     // T1 blade auto
+    5: ["jy_eagleclaw", "jy_grapple"], // T2 fist — choice
+    3: ["jy_sword", "jy_chainmaster", "jy_blade_king"], // T3 — 3-way choice
+    2: ["jy_execution_sword", "jy_execution_blade", "jy_chain_assassin"], // T4 — 3-way choice
+  },
+  artsByRank: {
+    9: ["jy_a0_brocade"],       // T0 art auto on join
+    7: ["jy_a1_silktread"],     // T1 art auto
+    6: ["jy_a2_goldarmor"],     // T2 art auto
+    4: ["jy_a3_thunderstride", "t3_jy_shadow"], // T3 art — choice
+    2: ["jy_a4_brocadelord", "t4_jy_godslayer"], // T4 art — choice
+  },
+  questCooldownDays: 30,
+};
+
 export const SECT_MEMBERSHIPS: Record<SectId, SectMembershipDef> = {
   shaolin: SHAOLIN,
   wudang: WUDANG,
@@ -441,6 +503,7 @@ export const SECT_MEMBERSHIPS: Record<SectId, SectMembershipDef> = {
   emei: EMEI,
   gumu: GUMU,
   beggars: BEGGARS,
+  jinyiwei: JINYIWEI,
 };
 
 // Helper: rewards (skill + art ids) the player is *eligible* to pick at a

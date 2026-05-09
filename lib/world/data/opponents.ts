@@ -1100,15 +1100,21 @@ export const OPPONENTS: readonly OpponentDef[] = [
   // = T3 with the t3 art + 2 sect skills. Stats lean on STR/AGI/DEX/VIT
   // (the lineage is yang/external pursuit work).
 
-  // ผู้บัญชาการจ้าวฝู่ (sect_jinyiwei) — T4 leader, very strong.
+  // ผู้บัญชาการจ้าวฝู่ (sect_jinyiwei) — T4 leader, near Shaolin/Wudang
+  // tier. Carries the full disciple-line: T4 godslayer + brocadelord
+  // arts + the 3 new T4 weapon skills (execution sword + blade + chain
+  // assassin) + the T3 chainmaster.
   { id: "spar_jinyiwei_leader", name: "ผู้บัญชาการจ้าวฝู่", ti: 4, category: "human",
     drops: [...DROPS_T4,
       { itemId: "man_jy_blade_king", weight: 1 }, { itemId: "man_jy_chainmaster", weight: 1 },
       { itemId: "man_jy_a4_brocadelord", weight: 1 }, { itemId: "man_jy_a3_thunderstride", weight: 1 }],
     build: () => build("ผู้บัญชาการจ้าวฝู่", 4, {
-      stats: { STR: 14, AGI: 12, DEX: 10, VIT: 10, DEF: 8 },
-      artId: "jy_a4_brocadelord", artLevel: 8,
-      skillIds: ["jy_blade_king", "jy_chainmaster", "jy_grapple", "jy_blade"],
+      stats: { STR: 22, AGI: 16, DEX: 16, VIT: 18, DEF: 14, POW: 8 },
+      artId: "t4_jy_godslayer", artLevel: 10,
+      skillIds: ["jy_execution_blade", "jy_execution_sword", "jy_chain_assassin", "jy_blade_king", "jy_chainmaster", "jy_grapple"],
+      extraArtSlots: ["t4_jy_godslayer", "jy_a4_brocadelord", "t3_jy_shadow", "jy_a3_thunderstride"],
+      artLevels: { t4_jy_godslayer: 10, jy_a4_brocadelord: 10, t3_jy_shadow: 10, jy_a3_thunderstride: 10, jy_a2_goldarmor: 10 },
+      learnedArtIds: ["jy_a2_goldarmor"],
     }) },
 
   // องครักษ์ฉิน (sect_jinyiwei) — T3 saber soldier.
