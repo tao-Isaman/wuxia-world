@@ -14,7 +14,9 @@ import {
   EVENT_PROBABILITY,
   MEET_EVENTS,
   TREASURE_EVENTS,
+  applyOpponentStatScale,
   fightEventsForLocation,
+  playerPowerIndex,
   pickWeighted,
 } from "./data/random-events";
 import { evaluateCondition } from "./conditions";
@@ -248,7 +250,13 @@ export function applyEffect(state: WorldStateData, eff: SceneEffect): void {
       // off the trail by flavor events. Falls back to the normal 0.15 +
       // full pool when no target fits the current zone.
       const huntTargets = collectActiveHuntTargets(state);
-      const zonePool = fightEventsForLocation(state.lastLocationId);
+      // Apply player-power-driven scaling + tier reshape to upcoming
+      // random encounters. The scale multiplier is module-level state
+      // in opponents.ts — set it BEFORE the bridge constructs the
+      // opponent's CharacterBuild so stats are scaled at build time.
+      const power = playerPowerIndex(state);
+      applyOpponentStatScale(state);
+      const zonePool = fightEventsForLocation(state.lastLocationId, power);
       const huntPool =
         huntTargets.size > 0
           ? zonePool.filter((ev) => huntTargets.has(ev.opponentId))

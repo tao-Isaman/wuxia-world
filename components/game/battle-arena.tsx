@@ -135,6 +135,8 @@ function SidePanel({
   const buffs = state.st[side].buffs;
   const debuffs = state.st[side].debuffs;
   const stk = state.st[side].stk;
+  const stkV = state.st[side].stkV;
+  const stkPct = stk * stkV;
 
   return (
     <Card
@@ -239,7 +241,7 @@ function SidePanel({
             <InfoPopover
               trigger={
                 <span className="text-[9px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded cursor-help">
-                  ATK+{stk * 3}%
+                  ATK+{stkPct}%
                 </span>
               }
               contentClassName="max-w-[240px]"
@@ -247,7 +249,7 @@ function SidePanel({
               <div className="space-y-1 text-xs">
                 <div className="font-bold text-amber-700">สะสมพลังโจมตี</div>
                 <div className="text-muted-foreground">
-                  ATK ×{(1 + stk * 0.03).toFixed(2)} ({stk} ชั้น × +3%)
+                  ATK ×{(1 + stkPct / 100).toFixed(2)} ({stk} ชั้น × +{stkV}%)
                 </div>
                 <div className="text-[10px] text-muted-foreground border-t pt-1 mt-1">
                   ค้างจนสุดเกม (ลบโดย dispel)
@@ -576,17 +578,16 @@ function SkillCastOverlay({
   if (!cast) return <div className="h-32" aria-hidden />;
   const { seq, name, hits, hitDamages, hitCrits, hitMisses, tier } = cast;
   // Rarity-tinted name color by skill / art tier:
-  //   T0 white · T1 green · T2 blue · T3 purple · T4 orange
-  // White uses near-white off the cream paper background so it stays
-  // legible. Higher tiers escalate visually (mirrors loot-rarity
-  // conventions in most RPGs).
+  //   T0 grey · T1 green · T2 blue · T3 purple · T4 orange
+  // Higher tiers escalate visually (mirrors loot-rarity conventions in
+  // most RPGs).
   const tierColor =
     [
-      "text-stone-100",   // T0 white
-      "text-emerald-600", // T1 green
-      "text-sky-600",     // T2 blue
-      "text-purple-600",  // T3 purple
-      "text-orange-500",  // T4 orange
+      "text-stone-500",   // T0 medium grey (common)
+      "text-emerald-600", // T1 green       (uncommon)
+      "text-sky-600",     // T2 blue        (rare)
+      "text-purple-600",  // T3 purple      (epic)
+      "text-orange-500",  // T4 orange      (legendary)
     ][tier] ?? "text-foreground";
   return (
     <div

@@ -24,6 +24,8 @@ export {
   TREASURE_EVENTS,
   EVENT_PROBABILITY,
   fightEventsForLocation,
+  applyOpponentStatScale,
+  playerPowerIndex,
   zoneOfLocation,
   pickWeighted,
   ZONE_CATEGORY_WEIGHT,

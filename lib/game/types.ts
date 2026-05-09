@@ -278,11 +278,26 @@ export interface Equipment {
   id: string;
   n: string;
   ty: EquipSlotType;
-  atkb: number;
-  pdb: number;
-  idb: number;
-  hpb: number;
-  mpb: number;
+  // Direct combat-stat boosts. Equipment now contributes ONLY through
+  // these fields — the legacy `st` (base-stat boost) field is kept
+  // type-compatibly but ignored by combinedStats / deriveAll. This
+  // prevents tank stat-stacking from cascading through every derived
+  // formula (PD 415 wall problem).
+  atkb: number;          // ATK
+  pdb: number;           // PD (physical defense)
+  idb: number;           // ID (internal defense)
+  hpb: number;           // HP
+  mpb: number;           // MP
+  pab?: number;          // PA (physical attack)
+  iab?: number;          // IA (internal attack)
+  spdb?: number;         // SPD (ATB gauge speed)
+  evab?: number;         // Eva
+  accb?: number;         // Acc
+  crib?: number;         // Cri
+  resb?: number;         // Res
+  // Legacy base-stat boost — kept for back-compat (older saves /
+  // serialised data) but UNUSED by the engine. Authors should leave
+  // empty `{}` and use the direct boost fields above.
   st: PartialStats;
   eff: EquipEffect | null;
   // Marks the W-slot item as a musical instrument. The world's music
@@ -360,7 +375,13 @@ export interface DebuffRecord {
 export interface SideBattleState {
   buffs: BuffRecord[];
   debuffs: DebuffRecord[];
-  stk: number; // stack_atk count
+  // stack_atk: counter + value-per-stack. The damage formula uses
+  // `stk × stkV / 100` as the ATK% boost, so different skills can grant
+  // different per-stack amounts (e.g., huashan +5%, lmsj +10%, ng7 +10%).
+  // Multiple sources overwrite stkV with the latest applied value —
+  // mixing two skills' stacks isn't a designed scenario.
+  stk: number;
+  stkV: number;
 }
 
 export interface LogLine {

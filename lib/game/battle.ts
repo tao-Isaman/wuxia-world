@@ -115,8 +115,8 @@ export function makeInitialState(
     winner: null,
     phase: "start",
     st: {
-      A: { buffs: [], debuffs: [], stk: 0 },
-      B: { buffs: [], debuffs: [], stk: 0 },
+      A: { buffs: [], debuffs: [], stk: 0, stkV: 0 },
+      B: { buffs: [], debuffs: [], stk: 0, stkV: 0 },
     },
     cd: {
       A: new Array(buildA.skillIds.length).fill(0) as number[],
@@ -246,7 +246,7 @@ export function calcSkillDamage(
   for (const d of ast.debuffs) if (d.t === "debuff_atk" && d.v != null) atkDebuff += d.v;
   const sm = Math.max(
     0,
-    1 + ast.stk * 0.03 + ctx.equipBonus[side].pct_atk / 100 + atkDebuff / 100,
+    1 + (ast.stk * ast.stkV) / 100 + ctx.equipBonus[side].pct_atk / 100 + atkDebuff / 100,
   );
 
   // Effective Acc / Eva with debuffs/buffs
@@ -734,6 +734,18 @@ export function resolveArtActive(
   // Fire the use_act passive for the art that was just activated (not the
   // primary). If multiple arts are slotted, each uses its own passive set.
   if (art.pas?.tr === "use_act") checkPassive(state, side, aid, "use_act", ctx.names);
+
+  // use_int trigger — Int-flavored art actives (atk_int_pen / drain /
+  // drain_acc / debuff_acc_dmg all roll off IA) should fire the primary
+  // art's use_int passive too. Without this, e.g., t3_onefinger's
+  // "นิ้วฟ้าผ่า" wouldn't apply its own debuff_acc payload despite being
+  // a clear Int cast — the passive used to fire only on Int MOVE skills.
+  const intActiveTypes = new Set(["atk_int_pen", "drain", "drain_acc", "debuff_acc_dmg"]);
+  if (intActiveTypes.has(act.t)) {
+    // Use the primary art (ctx.artIds[side]) so the passive ties to the
+    // build's main inner-art rather than each slotted art individually.
+    checkPassive(state, side, ctx.artIds[side], "use_int", ctx.names);
+  }
 
   // Emit cast event for the UI overlay. Art actives are always 1 logical
   // cast (no engine-side multi-hit), so hits=1.

@@ -125,6 +125,10 @@ export function applySelfEffect(
     }
     case "stack_atk": {
       const cur = state.st[side].stk;
+      // Latest skill's per-stack value wins. Stack count caps at the
+      // skill's `mx`. Damage formula reads `stk × stkV / 100` as the
+      // ATK% boost — see calcSkillDamage in battle.ts.
+      state.st[side].stkV = eff.v;
       if (cur < eff.mx) {
         state.st[side].stk++;
         logLine(state, "lS", `&nbsp;⟳ ${nm}: ATK+${state.st[side].stk * eff.v}%`);
@@ -279,6 +283,7 @@ function applyPassiveEffect(
       return;
     case "stack_atk": {
       const cur = state.st[side].stk;
+      state.st[side].stkV = e.v;
       if (cur < e.mx) {
         state.st[side].stk++;
         logLine(state, "lS", `&nbsp;◆ ${nm}: ATK+${state.st[side].stk * e.v}%`);

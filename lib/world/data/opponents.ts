@@ -55,6 +55,28 @@ interface BuildOpts {
   extraArtSlots?: readonly string[];
 }
 
+// Module-level scaling factor for random opponents. Set by the world
+// store before the bridge starts a battle (see initBattleBridge). Higher
+// `OPPONENT_STAT_SCALE` means random encounters get tougher — drives the
+// progression-aware difficulty curve so endgame players don't faceroll
+// T1 bandits in 1 hit. Range: 1.0 (default, no scaling) → ~2.5 (max).
+let OPPONENT_STAT_SCALE = 1;
+export function setOpponentStatScale(scale: number): void {
+  OPPONENT_STAT_SCALE = Math.max(1, Math.min(3, scale));
+}
+export function getOpponentStatScale(): number {
+  return OPPONENT_STAT_SCALE;
+}
+
+function scaleStats(stats: StatBlock): StatBlock {
+  if (OPPONENT_STAT_SCALE === 1) return stats;
+  const out = { ...stats };
+  for (const k of Object.keys(out) as (keyof StatBlock)[]) {
+    out[k] = Math.max(1, Math.floor(out[k] * OPPONENT_STAT_SCALE));
+  }
+  return out;
+}
+
 function build(name: string, tier: 0 | 1 | 2 | 3 | 4, opts: BuildOpts = {}): CharacterBuild {
   const baseSkills = opts.skillIds ?? ["basic_punch"];
   const slotArts = opts.extraArtSlots ?? [];
@@ -70,7 +92,7 @@ function build(name: string, tier: 0 | 1 | 2 | 3 | 4, opts: BuildOpts = {}): Cha
   );
   return {
     name,
-    stats: { ...TIER_STATS[tier], ...(opts.stats ?? {}) },
+    stats: scaleStats({ ...TIER_STATS[tier], ...(opts.stats ?? {}) }),
     artId: opts.artId ?? "none",
     artLevel: opts.artLevel ?? 1,
     skillIds: slots(...allSlots),
@@ -715,6 +737,75 @@ export const OPPONENTS: readonly OpponentDef[] = [
       stats: { STR: 6, VIT: 5, DEX: 5 },
       artId: "jy_a0_brocade", artLevel: 4,
       skillIds: ["jy_grapple"],
+    }) },
+
+  // ─── ELITE — endgame random encounters ────────────────────────────
+  // Spawn weight in FIGHT_EVENTS is gated by player power signal (sect
+  // rank or day) so these only appear once the player is strong enough
+  // to need them. Stats are roughly 2× a regular T4: top-tier multi-art
+  // kits, multi-hit signature skills, debuff_atk / stun threats that
+  // bypass tank walls. Drops are richer (extra manuals + valuables).
+  { id: "elite_blood_rakshasa", name: "อสุรกายโลหิต", ti: 4, category: "supernatural",
+    drops: [...DROPS_T4,
+      { itemId: "ginseng", weight: 4 }, { itemId: "jade", weight: 3 },
+      { itemId: "ancient_coin", weight: 2 }, { itemId: "wood_sacred", weight: 1 }],
+    build: () => build("อสุรกายโลหิต", 4, {
+      stats: { STR: 22, AGI: 18, POW: 16, VIT: 18, DEX: 16, LUK: 10, DEF: 16, INT: 12 },
+      artId: "blood", artLevel: 10,
+      skillIds: ["ep", "ng3", "ne1", "wd_palm"],
+      extraArtSlots: ["blood", "tendon"],
+      artLevels: { blood: 10, tendon: 10 },
+    }) },
+
+  { id: "elite_void_grandmaster", name: "ปรมาจารย์ความว่าง", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "ginseng", weight: 4 }, { itemId: "jade", weight: 3 },
+      { itemId: "ancient_coin", weight: 2 }, { itemId: "mithril_ore", weight: 1 }],
+    build: () => build("ปรมาจารย์ความว่าง", 4, {
+      stats: { POW: 24, INT: 22, DEX: 20, AGI: 20, VIT: 14, LUK: 12 },
+      artId: "qiankun", artLevel: 10,
+      skillIds: ["dgjj", "sl_petal_finger", "ynss", "ansh"],
+      extraArtSlots: ["qiankun", "t3_voidstep"],
+      artLevels: { qiankun: 10, t3_voidstep: 10 },
+    }) },
+
+  { id: "elite_iron_mountain", name: "ภูเขาเหล็ก", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "iron_ore", weight: 5 }, { itemId: "iron_ingot", weight: 4 },
+      { itemId: "ginseng", weight: 3 }, { itemId: "jade", weight: 2 },
+      { itemId: "ancient_coin", weight: 2 }],
+    build: () => build("ภูเขาเหล็ก", 4, {
+      stats: { STR: 24, VIT: 26, DEF: 22, POW: 12, AGI: 8, DEX: 10 },
+      artId: "jiuyang", artLevel: 10,
+      skillIds: ["sl_truth_staff", "sl_thousand_arms", "sl_rock_punch", "ne1"],
+      extraArtSlots: ["jiuyang", "tendon", "diamond"],
+      artLevels: { jiuyang: 10, tendon: 10, diamond: 10 },
+    }) },
+
+  { id: "elite_phoenix_empress", name: "จักรพรรดินีหงส์เพลิง", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "ginseng", weight: 5 }, { itemId: "jade", weight: 4 },
+      { itemId: "ancient_coin", weight: 3 }, { itemId: "wood_sacred", weight: 2 },
+      { itemId: "mithril_ore", weight: 1 }],
+    build: () => build("จักรพรรดินีหงส์เพลิง", 4, {
+      stats: { POW: 22, INT: 20, AGI: 18, DEX: 18, VIT: 16, DEF: 14, LUK: 12 },
+      artId: "fire", artLevel: 10,
+      skillIds: ["sl_petal_finger", "ynss", "qzjf", "yxjf"],
+      extraArtSlots: ["fire", "zixia", "scholar"],
+      artLevels: { fire: 10, zixia: 10, scholar: 10 },
+    }) },
+
+  { id: "elite_demon_emperor", name: "จักรพรรดิมาร", ti: 4, category: "supernatural",
+    drops: [...DROPS_T4,
+      { itemId: "ginseng", weight: 5 }, { itemId: "jade", weight: 5 },
+      { itemId: "ancient_coin", weight: 3 }, { itemId: "wood_sacred", weight: 3 },
+      { itemId: "mithril_ore", weight: 2 }],
+    build: () => build("จักรพรรดิมาร", 4, {
+      stats: { STR: 20, POW: 22, INT: 20, VIT: 22, DEF: 18, DEX: 16, AGI: 16, LUK: 10 },
+      artId: "jiuyin", artLevel: 10,
+      skillIds: ["dgjj", "ansh", "sl_truth_staff", "sl_thousand_arms", "wd_palm"],
+      extraArtSlots: ["jiuyin", "shadow", "heaven"],
+      artLevels: { jiuyin: 10, shadow: 10, heaven: 10 },
     }) },
 ];
 

@@ -17,21 +17,32 @@ import {
 import type { Equipment } from "./types";
 
 // Pure: base stats → derived combat stats.
-// Mirrors `derive()` in demo.html — keep formulas in sync if tuning.
+//
+// POW rebalance (2026-05-09):
+//   MP:  POW × 12 → × 5         (cut down — MP no longer overflows)
+//   MP:  INT × 4  → × 5         (boosted — INT shares MP role)
+//   IA:  POW × 2  → × 4         (doubled — POW is internal-attack stat)
+//   Spd: + POW × 1               (NEW — internal energy improves tempo
+//                                 at half AGI's rate of × 2)
+// Net intent: POW becomes the unambiguous "internal damage + tempo"
+// stat (offense Int + ATB speed in one). INT keeps its balanced
+// offense+defense role with a touch more MP support. Existing high-
+// POW Int casters get boosted Int damage AND faster turns AND keep
+// reasonable MP — POW is now the clear primary for internal builds.
 export function derive(o: StatBlock): Derived {
   return {
     HP: o.VIT * 20 + o.DEF * 10 + o.STR * 3,
-    MP: o.POW * 12 + o.INT * 4,
+    MP: o.POW * 5 + o.INT * 5,
     Atk: o.STR * 3 + o.AGI + o.POW + o.DEX + o.INT * 2,
     PA: o.STR * 2 + o.DEX + o.LUK,
-    IA: o.POW * 2 + o.DEX + o.LUK,
+    IA: o.POW * 4 + o.DEX + o.LUK,
     PD: o.DEF * 2 + o.VIT + o.INT * 2,
     ID: o.DEF * 2 + o.POW + o.VIT + o.INT * 2,
     Eva: o.AGI * 2,
     Acc: o.DEX * 2,
     Cri: o.STR + o.LUK,
     Res: o.LUK + Math.floor(o.DEF * 0.5),
-    Spd: Math.max(o.AGI * 2, 1),
+    Spd: Math.max(o.AGI * 2 + o.POW, 1),
   };
 }
 
@@ -74,6 +85,16 @@ export interface EquipBonus {
   id_: number;
   hp: number;
   mp: number;
+  // Direct derived-stat boosts. Equipment items declare these via
+  // `pab` / `iab` / `spdb` / `evab` / `accb` / `crib` / `resb` (all
+  // optional, default 0). Replaces the legacy `st` (base-stat boost)
+  // route which compounded through every derived formula.
+  pa: number;
+  ia: number;
+  spd: number;
+  acc: number;
+  res: number;
+  // Effect-derived boosts (from `eff`).
   cri: number;
   eva: number;
   pct_atk: number;
@@ -85,6 +106,7 @@ export interface EquipBonus {
 export function getEquipBonus(loadout: EquipLoadout): EquipBonus {
   const b: EquipBonus = {
     atk: 0, pd: 0, id_: 0, hp: 0, mp: 0,
+    pa: 0, ia: 0, spd: 0, acc: 0, res: 0,
     cri: 0, eva: 0, pct_atk: 0, pct_red: 0, hp_regen: 0,
   };
   for (const e of getEquippedItems(loadout)) {
@@ -93,6 +115,13 @@ export function getEquipBonus(loadout: EquipLoadout): EquipBonus {
     b.id_ += e.idb;
     b.hp += e.hpb;
     b.mp += e.mpb;
+    b.pa += e.pab ?? 0;
+    b.ia += e.iab ?? 0;
+    b.spd += e.spdb ?? 0;
+    b.acc += e.accb ?? 0;
+    b.res += e.resb ?? 0;
+    b.cri += e.crib ?? 0;
+    b.eva += e.evab ?? 0;
     if (!e.eff) continue;
     switch (e.eff.t) {
       case "flat_cri": b.cri += e.eff.v; break;
@@ -211,22 +240,33 @@ export interface CombinedStatsOpts {
   excludeEquipment?: boolean;
 }
 
-// Combine base stats + art-scaled stats + skill stat bonuses + equipment
-// bonuses. Reads from BOTH slotted skills and learned-but-unslotted
-// skills (everyone learned contributes their `st`). Same for arts.
-// Conflict factors halve / zero misaligned contributions per
-// skill-conflict.ts. Pass `{ excludeEquipment: true }` to skip the gear
-// bonuses (used by learn-skill gates).
+// Combine base stats + art-scaled stats + skill stat bonuses. Reads from
+// BOTH slotted skills and learned-but-unslotted skills (everyone
+// learned contributes their `st`). Same for arts. Conflict factors
+// halve / zero misaligned contributions per skill-conflict.ts.
+//
+// EQUIPMENT no longer contributes to base stats — by design, equipment
+// boosts derived combat stats directly (Atk / PD / ID / HP / MP via
+// `atkb` / `pdb` / etc. in deriveAll's overlay pass) instead of feeding
+// back into STR / VIT / DEF and compounding through every derived
+// formula. This kept tank stat-stacking from spiraling into invincible
+// damage walls (a 30/30/30 tank with +28/+28/+30 equipment used to
+// reach PD ~415, walling almost every random encounter to 1 dmg/hit).
+//
+// `excludeEquipment` is now a no-op for back-compat — equipment is
+// already excluded everywhere. Kept in the signature so callers don't
+// need to update.
 export function combinedStats(
   build: CharacterBuild,
   conflict?: ConflictFactors,
   opts?: CombinedStatsOpts,
 ): StatBlock {
+  void opts;
   const breakdown = statBreakdown(build, conflict);
   const out: StatBlock = { ...breakdown.base };
   for (const k of STAT_KEYS) {
     out[k] += breakdown.fromArts[k] + breakdown.fromSkills[k];
-    if (!opts?.excludeEquipment) out[k] += breakdown.fromEquipment[k];
+    // fromEquipment intentionally NOT added — see header comment.
   }
   return out;
 }
@@ -260,6 +300,11 @@ export function deriveAll(build: CharacterBuild): Derived {
   d.ID += eb.id_;
   d.HP += eb.hp;
   d.MP += eb.mp;
+  d.PA += eb.pa;
+  d.IA += eb.ia;
+  d.Spd += eb.spd;
+  d.Acc += eb.acc;
+  d.Res += eb.res;
   d.Cri += eb.cri;
   d.Eva += eb.eva;
   return d;

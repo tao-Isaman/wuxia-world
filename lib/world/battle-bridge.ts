@@ -18,6 +18,7 @@
 import { useBattleStore } from "@/store/battle-store";
 import { useWorldStore } from "@/store/world-store";
 import { getOpponent } from "./data/opponents";
+import { applyOpponentStatScale } from "./data/random-events";
 
 // Single chokepoint for "world says fight, battle hasn't started" — used by
 // both the module-level subscription (fast path) and a React useEffect hook
@@ -43,6 +44,11 @@ export function ensureBattleStarted(): void {
     ws.clearPendingBattle();
     return;
   }
+  // Apply progression-based stat scaling RIGHT before opp.build() so the
+  // factory picks up the current OPPONENT_STAT_SCALE module value. Random
+  // encounters set this in rollRandomEvent already; this re-applies for
+  // triggerBattle paths (quest fights, sparring, etc.) too.
+  applyOpponentStatScale(ws);
   bs.start(ws.playerBuild, opp.build(), {
     hpA: ws.currentHp,
     mpA: ws.currentMp,

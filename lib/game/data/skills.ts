@@ -63,7 +63,7 @@ export const SKILLS: readonly Skill[] = [
   // ─── พรรคสราญรมย์ (เซียวหยาว) ────────────────────────────────────
   { id: "xy_punch", n: "เพลงหมัดสราญรมย์", sc: "พรรคสราญรมย์", ti: 3, w: "fist", mg: 80, st: { POW: 9, INT: 9 }, at: "int", bp: 65, p: 20, f: 0, dm: 1.1, se: { t: "stack_atk", v: 6, mx: 3 }, ee: null, d: "Int+20%×1.1 + ATK+6%(≤3ซ้อน) — เพลงหมัดสราญรมย์", types: ["yin", "internal"] },
   { id: "yxjf", n: "กระบี่ขลุ่ยหยก", sc: "พรรคสราญรมย์", ti: 3, w: "sword", mg: 80, st: { POW: 9, INT: 9 }, at: "int", bp: 65, p: 0, f: 0, dm: 1.1, se: { t: "heal_pct", v: 10 }, ee: { t: "debuff_eva", v: -20, u: 5 }, d: "Int×1.1 + ฟื้น 10%HP + Eva-20 (2 ตา) — 玉箫剑法", types: ["yin", "internal"] },
-  { id: "lmsj", n: "กระบี่ 6 ชีพจร", sc: "พรรคสราญรมย์", ti: 4, w: "fist", mg: 100, st: { POW: 9, INT: 8, DEX: 3 }, at: "int", bp: 100, p: 40, f: 0, dm: 1.2, se: { t: "stack_atk", v: 10, mx: 2 }, ee: null, d: "Int×120% bp×140% + ATK+10% (≤2 ซ้อน) — 六脉神剑 ต้องการพลังมหาศาล", types: ["yang", "internal"] },
+  { id: "lmsj", n: "กระบี่ 6 ชีพจร", sc: "พรรคสราญรมย์", ti: 4, w: "fist", mg: 100, st: { POW: 9, INT: 8, DEX: 3 }, at: "int", bp: 100, p: 40, f: 0, dm: 1.2, hits: 6, se: { t: "stack_atk", v: 10, mx: 2 }, ee: null, d: "Int×120% bp×140% · ตี 6 ชีพจร + ATK+10% (≤2 ซ้อน) — 六脉神剑", types: ["yang", "internal"] },
   { id: "xy_palm", n: "ฝ่ามือสราญรมย์", sc: "พรรคสราญรมย์", ti: 4, w: "fist", mg: 100, st: { POW: 10, INT: 8, AGI: 2 }, at: "int", bp: 90, p: 25, f: 0, dm: 1.2, dr: 30, se: null, ee: { t: "debuff_acc", v: -22, u: 5 }, d: "Int×120%×1.25 + ดูด 30%HP + Acc-22(3ตา) — ฝ่ามือสราญรมย์", types: ["yin", "internal"] },
 
   // ─── สำนักดาวดึงส์ (เห็งซัว / Xingxiu) ───────────────────────────
