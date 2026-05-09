@@ -168,9 +168,59 @@ const WUDANG: SectMembershipDef = {
   questCooldownDays: 30,
 };
 
+// Huashan disciple ranks. Same 9→1 climb as the bigger sects (Shaolin /
+// Wudang) but Huashan is a smaller, sword-only school — its leadership
+// caps at T3 power (master + vice are formidable but not legendary like
+// Shaolin's abbot or Wudang's grandmaster). Open to anyone who can pay
+// the entry fee — no gender gate, no trait gate beyond a not-evil floor.
+//
+// Reward layout:
+//   rank 9 → T0 sword + T0 art (gifted on registration)
+//   rank 8 → T1 sword (auto)
+//   rank 7 → T1 art (auto)
+//   rank 6 → T2 art (auto)
+//   rank 5 → T3 sword (auto)
+//   rank 2 → choose ONE of two T4 arts — the disciple-line "purple cloud"
+//            OR the older balanced "huashan-shengong" capstone.
+const HUASHAN: SectMembershipDef = {
+  id: "huashan",
+  name: "หัวซาน",
+  hallLocationId: "sect_huashan",
+  registrarNpcId: "sect_huashan_master_yiqing",
+  joinRequirements: { t: "trait", trait: "evil", max: 10 },
+  startRank: 9,
+  topRank: 1,
+  rankUpCost: (targetRank) => {
+    const table: Record<number, number> = {
+      8: 100,
+      7: 200,
+      6: 350,
+      5: 500,
+      4: 700,
+      3: 1000,
+      2: 1400,
+      1: 2000,
+    };
+    return table[targetRank] ?? Infinity;
+  },
+  skillsByRank: {
+    9: ["hs_basic_sword"],     // T0 sword — auto-grant on join
+    8: ["hs_floating_cloud"],  // T1 sword — auto on rank-up
+    5: ["hs_purple_cloud"],    // T3 sword — auto on rank-up
+  },
+  artsByRank: {
+    9: ["t0_huashan_qi"],      // T0 art — auto on join
+    7: ["t1_huashan_light"],   // T1 art — auto
+    6: ["t2_huashan_cloud"],   // T2 art — auto
+    2: ["t4_huashan_purple", "huashan"], // T4 — pick one of the two breaths
+  },
+  questCooldownDays: 30,
+};
+
 export const SECT_MEMBERSHIPS: Record<SectId, SectMembershipDef> = {
   shaolin: SHAOLIN,
   wudang: WUDANG,
+  huashan: HUASHAN,
 };
 
 // Helper: rewards (skill + art ids) the player is *eligible* to pick at a

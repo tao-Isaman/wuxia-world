@@ -93,6 +93,30 @@ export const ARTS: readonly Art[] = [
     pas: { tr: "hit_recv", ch: 25, d: "ถูกโจมตี 25% → ฟื้น 6% HP", e: { t: "heal_pct", v: 6 } } },
 
   // ─── หัวซาน ───────────────────────────────────────────────────────
+  // Yin-themed sword sect. Inner-art line tracks `t0_huashan_qi → t1
+  // light-body → t2 cloud → t4 purple-cloud`. The standalone `huashan`
+  // capstone is the older balance/hard breath, kept alongside the new
+  // disciple-line so the rank-2 reward pool offers a real choice.
+  { id: "t0_huashan_qi", n: "กำลังภายในหัวซาน", sc: "หัวซาน", tp: "หยิน", types: ["yin"], ti: 0,
+    stats: { POW: 4, DEX: 3, AGI: 2 }, hL: 15, mL: 15,
+    act: { n: "ลมปราณเย็น", c: 12, cd: 3, t: "heal", h: 8, d: "ฟื้น 8% HP CD3" },
+    pas: { tr: "hit_recv", ch: 20, d: "ถูกโจมตี 20% → DEF+8 (5ตา)", e: { t: "buff_def", n: "ลมปราณหัวซาน", v: 8, u: 5 } } },
+
+  { id: "t1_huashan_light", n: "วิชาตัวเบาหัวซาน", sc: "หัวซาน", tp: "หยิน", types: ["yin"], ti: 1,
+    stats: { AGI: 8, DEX: 6, POW: 4 }, hL: 18, mL: 22,
+    act: { n: "ตัวเบาดั่งขนนก", c: 18, cd: 3, t: "buff_reduce", v: 20, u: 5, d: "ลด dmg 20% (5ตา) CD3" },
+    pas: { tr: "use_int", ch: 30, d: "Int skill 30% → Eva+10 (5ตา)", e: { t: "buff_eva", n: "ตัวเบา", v: 10, u: 5 } } },
+
+  { id: "t2_huashan_cloud", n: "พลังเมฆคล้อย", sc: "หัวซาน", tp: "หยิน·แข็ง", types: ["yin", "hard"], ti: 2,
+    stats: { STR: 8, AGI: 8, DEX: 6, VIT: 4 }, hL: 25, mL: 25,
+    act: { n: "เมฆาคลื่นคล้อย", c: 22, cd: 3, t: "atk_phy_pen", m: 1.3, pen: 20, d: "Phy×1.3 ทะลุ DEF 20% CD3" },
+    pas: { tr: "on_crit", ch: 100, d: "Crit → ATK+6% (≤4 ซ้อน)", e: { t: "stack_atk", v: 6, mx: 4 } } },
+
+  { id: "t4_huashan_purple", n: "พลังเมฆม่วง", sc: "หัวซาน", tp: "หยิน·แข็ง", types: ["yin", "hard"], ti: 4,
+    stats: { STR: 16, AGI: 14, DEX: 12, POW: 8 }, hL: 30, mL: 35,
+    act: { n: "เมฆาม่วงสะท้านฟ้า", c: 30, cd: 4, t: "atk_phy_pen", m: 1.5, pen: 35, d: "Phy×1.5 ทะลุ DEF 35% CD4" },
+    pas: { tr: "on_crit", ch: 100, d: "Crit → ATK+8% (≤5 ซ้อน) — เมฆาม่วงสะสมแรง", e: { t: "stack_atk", v: 8, mx: 5 } } },
+
   { id: "huashan", n: "หัวซานเซินกง", sc: "หัวซาน", tp: "สมดุล·แข็ง", types: ["hard"], ti: 4,
     stats: { STR: 20, DEX: 15, POW: 15 }, hL: 35, mL: 35,
     act: { n: "กระบี่หนึ่งในฟ้า", c: 35, cd: 4, t: "atk_phy_pen", m: 1.4, pen: 35, d: "ทางกาย×1.4 ทะลุ DEF 35% CD4" },

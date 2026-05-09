@@ -575,6 +575,66 @@ export const OPPONENTS: readonly OpponentDef[] = [
       skillIds: ["tj", "cs"],
     }) },
 
+  // ─── หัวซาน — sect leadership (T1-T3) ──────────────────────────────
+  // Smaller sword-only sect. Master / vice cap at T3 — strong but not on
+  // the legendary tier of Shaolin abbot or Wudang grandmaster. The kit
+  // leans on the disciple-line purple-cloud sword + the older huashan
+  // shengong art for crit-stack pressure.
+  { id: "spar_huashan_master_yiqing", name: "อาจารย์ใหญ่อี้ชิง", ti: 3, category: "human",
+    drops: [...DROPS_T3,
+      { itemId: "iron_ore", weight: 4 }, { itemId: "wood_hard", weight: 3 },
+      { itemId: "jade", weight: 3 }, { itemId: "ancient_coin", weight: 2 },
+      { itemId: "mithril_ore", weight: 1 }],
+    build: () => build("อาจารย์ใหญ่อี้ชิง", 3, {
+      stats: { STR: 14, DEX: 14, AGI: 12, POW: 8, VIT: 10 },
+      artId: "t4_huashan_purple", artLevel: 8,
+      skillIds: ["hs_purple_cloud", "hs_floating_cloud", "hs_basic_sword"],
+      extraArtSlots: ["t4_huashan_purple", "t2_huashan_cloud"],
+      artLevels: { t4_huashan_purple: 8, t2_huashan_cloud: 8, t1_huashan_light: 8 },
+      learnedArtIds: ["t1_huashan_light"],
+    }) },
+
+  { id: "spar_huashan_zifeng", name: "รองอาจารย์จื่อเฟิง", ti: 3, category: "human",
+    drops: [...DROPS_T3,
+      { itemId: "iron_ore", weight: 3 }, { itemId: "jade", weight: 2 },
+      { itemId: "ancient_coin", weight: 2 }],
+    build: () => build("รองอาจารย์จื่อเฟิง", 3, {
+      stats: { STR: 12, DEX: 10, AGI: 10, VIT: 8 },
+      artId: "t2_huashan_cloud", artLevel: 7,
+      skillIds: ["hs_purple_cloud", "hs_floating_cloud", "hs_basic_sword"],
+      extraArtSlots: ["t2_huashan_cloud"],
+      artLevels: { t2_huashan_cloud: 7, t1_huashan_light: 6 },
+      learnedArtIds: ["t1_huashan_light"],
+    }) },
+
+  { id: "spar_huashan_qingsong", name: "อาจารย์ดาบชิงซ่ง", ti: 2, category: "human",
+    drops: [...DROPS_T2,
+      { itemId: "iron_ore", weight: 3 }, { itemId: "wood_hard", weight: 2 }],
+    build: () => build("อาจารย์ดาบชิงซ่ง", 2, {
+      stats: { STR: 9, DEX: 8, AGI: 7 },
+      artId: "t1_huashan_light", artLevel: 6,
+      skillIds: ["hs_floating_cloud", "hs_basic_sword"],
+      extraArtSlots: ["t1_huashan_light"],
+      artLevels: { t1_huashan_light: 6 },
+    }) },
+
+  { id: "spar_huashan_zhongming", name: "หัวหน้าศิษย์จงหมิง", ti: 2, category: "human",
+    drops: [...DROPS_T2,
+      { itemId: "iron_ore", weight: 2 }],
+    build: () => build("หัวหน้าศิษย์จงหมิง", 2, {
+      stats: { STR: 8, DEX: 7, AGI: 6 },
+      artId: "t1_huashan_light", artLevel: 5,
+      skillIds: ["hs_floating_cloud", "hs_basic_sword"],
+    }) },
+
+  { id: "spar_huashan_xiaoyun", name: "ศิษย์เสี่ยวอวิ๋น", ti: 1, category: "human",
+    drops: [...DROPS_T1],
+    build: () => build("ศิษย์เสี่ยวอวิ๋น", 1, {
+      stats: { STR: 5, DEX: 4 },
+      artId: "t0_huashan_qi", artLevel: 4,
+      skillIds: ["hs_basic_sword"],
+    }) },
+
   // ชิวเฉียน (mt_kunlun) — Kunlun exile, sword-and-internal hermit style.
   { id: "spar_kunlun_qiu", name: "ชิวเฉียน", ti: 3, category: "human",
     drops: [...DROPS_T3,

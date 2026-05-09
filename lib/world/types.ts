@@ -211,6 +211,10 @@ export type Condition =
   // Player's current rank in the sect is at most `rank` (lower number =
   // higher rank). e.g. {sectId:"shaolin", maxRank:5} matches rank 5,4,3,2,1.
   | { t: "sectRankAtLeast"; sectId: SectId; maxRank: number }
+  // Player has at least `amount` gold. Used by sect intros that charge
+  // an entry fee — gate the turn-in choice so the player can't proceed
+  // while broke.
+  | { t: "goldAtLeast"; amount: number }
   | { t: "and"; all: Condition[] }
   | { t: "or"; any: Condition[] }
   | { t: "not"; of: Condition };
@@ -868,7 +872,7 @@ export interface SectMembership {
   joinedDay: number;
 }
 
-export type SectId = "shaolin" | "wudang";
+export type SectId = "shaolin" | "wudang" | "huashan";
 
 // ─── Character gender ─────────────────────────────────────────────────
 // Used by sect membership conditions (e.g. Shaolin admits men only) and

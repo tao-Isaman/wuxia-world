@@ -27,7 +27,11 @@ export const QUESTS_SECTS_TEMPLES: readonly QuestDef[] = [
       all: [
         { t: "gender", equals: "male" },
         { t: "trait", trait: "evil", max: 10 },
+        // A disciple is loyal to one school — joining Shaolin requires
+        // not being affiliated with any other sect that admits disciples.
         { t: "not", of: { t: "sectMember", sectId: "shaolin" } },
+        { t: "not", of: { t: "sectMember", sectId: "wudang" } },
+        { t: "not", of: { t: "sectMember", sectId: "huashan" } },
       ],
     },
     stages: [
@@ -404,7 +408,11 @@ export const QUESTS_SECTS_TEMPLES: readonly QuestDef[] = [
       t: "and",
       all: [
         { t: "trait", trait: "evil", max: 10 },
+        // A disciple is loyal to one school — joining Wudang requires
+        // not being affiliated with any other sect that admits disciples.
         { t: "not", of: { t: "sectMember", sectId: "wudang" } },
+        { t: "not", of: { t: "sectMember", sectId: "shaolin" } },
+        { t: "not", of: { t: "sectMember", sectId: "huashan" } },
       ],
     },
     stages: [
@@ -632,6 +640,170 @@ export const QUESTS_SECTS_TEMPLES: readonly QuestDef[] = [
       { t: "trait", trait: "good", amount: 4 },
       { t: "npcRelationship", npcId: "sect_wudang_master_qingxu", amount: 15 },
       { t: "npcRelationship", npcId: "temple_dalun_monk_kongxin", amount: 10 },
+    ],
+  },
+
+  // ──────────────────────────────────────────────────────────────────────
+  // หัวซาน — อาจารย์ใหญ่อี้ชิง (small sword sect — gold-fee admission)
+  // ──────────────────────────────────────────────────────────────────────
+
+  // 0. INTRO — ขอเข้าเป็นศิษย์ (disciple registration intro)
+  // Huashan is the smallest of the three joinable schools. The master
+  // accepts any sincere swordseeker — but the sect needs funds to keep
+  // the forge running, so an entry fee of 200 gold is required. Bring
+  // proof of wealth + a token of intent (a piece of iron the master
+  // can rework into a practice blade).
+  {
+    id: "qst_huashan_disciple_intro",
+    name: "ขอเข้าเป็นศิษย์หัวซาน",
+    description: "อาจารย์อี้ชิงรับศิษย์ใหม่ทุกคนที่ใจรักดาบ — แต่หัวซานเป็นสำนักเล็ก ต้องการค่าเข้าสำนัก ๕๐๐ เหรียญทอง และเหล็กดิบ ๓ ก้อนสำหรับตีดาบฝึก",
+    briefSummary: "จ่ายค่าเข้าสำนัก 500 ทอง + ส่งเหล็กดิบ 3 ก้อน เข้าเป็นศิษย์หัวซานขั้นที่ 9",
+    type: "side",
+    giverNpcId: "sect_huashan_master_yiqing",
+    prereqs: {
+      t: "and",
+      all: [
+        { t: "trait", trait: "evil", max: 10 },
+        { t: "not", of: { t: "sectMember", sectId: "shaolin" } },
+        { t: "not", of: { t: "sectMember", sectId: "wudang" } },
+        { t: "not", of: { t: "sectMember", sectId: "huashan" } },
+      ],
+    },
+    stages: [
+      {
+        id: "gather_offering",
+        description: "เตรียมเหล็กดิบ 3 ก้อน + เก็บเงินให้ครบ 500 ทอง",
+        autoAdvance: {
+          t: "and",
+          all: [
+            { t: "hasItem", itemId: "iron_ore", count: 3 },
+            { t: "goldAtLeast", amount: 500 },
+          ],
+        },
+      },
+      {
+        id: "return_to_master",
+        description: "นำของและเงินค่าเข้าสำนักไปถวายอาจารย์อี้ชิง",
+      },
+    ],
+    // Gold deduction happens at the complete-scene's choice (addGold:-200)
+    // alongside takeItem for the iron ore, so the player only pays when
+    // they actually accept the registration.
+    rewards: [
+      { t: "wExp", amount: 50 },
+      { t: "trait", trait: "humility", amount: 2 },
+      { t: "npcRelationship", npcId: "sect_huashan_master_yiqing", amount: 5 },
+      { t: "joinSect", sectId: "huashan" },
+      { t: "sectPoints", sectId: "huashan", amount: 20 },
+    ],
+  },
+
+  // ──────────────────────────────────────────────────────────────────────
+  // ภารกิจประจำหัวซาน — ทำซ้ำได้ทุก 30 วัน
+  // ──────────────────────────────────────────────────────────────────────
+
+  // SECT-1 · ลาดตระเวนเชิงเขา — sect points 50 (rank 9–7)
+  {
+    id: "qst_huashan_sect_patrol",
+    name: "ลาดตระเวนเชิงเขาหัวซาน",
+    description: "ภารกิจประจำของศิษย์หัวซาน — ลาดตระเวนเชิงเขาและกำราบโจรที่ตั้งฐานก่อกวน",
+    briefSummary: "ปราบโจรเชิงเขา 2 คน · sect points +50",
+    type: "side",
+    sectId: "huashan",
+    giverNpcId: "sect_huashan_master_yiqing",
+    prereqs: { t: "sectMember", sectId: "huashan" },
+    stages: [
+      {
+        id: "patrol",
+        description: "ปราบโจรเร่ร่อน 2 คน",
+        autoAdvance: { t: "defeatedOpponent", opponentId: "thug", count: 2 },
+      },
+      {
+        id: "report",
+        description: "กลับไปรายงานอาจารย์อี้ชิง",
+      },
+    ],
+    rewards: [
+      { t: "gold", amount: 150 },
+      { t: "wExp", amount: 60 },
+      { t: "npcRelationship", npcId: "sect_huashan_master_yiqing", amount: 3 },
+      { t: "sectPoints", sectId: "huashan", amount: 50 },
+    ],
+  },
+
+  // SECT-2 · ส่งเหล็กให้โรงตีดาบ — sect points 60 (rank 9–6)
+  {
+    id: "qst_huashan_sect_iron",
+    name: "ส่งเหล็กให้โรงตีดาบ",
+    description: "โรงตีดาบของหัวซานต้องการเหล็กดิบเพิ่มเพื่อหลอมดาบฝึกให้ศิษย์รุ่นใหม่ — เก็บเหล็กดิบมาให้ครบ",
+    briefSummary: "ส่งเหล็กดิบ 5 ก้อน · sect points +60",
+    type: "side",
+    sectId: "huashan",
+    giverNpcId: "sect_huashan_master_yiqing",
+    prereqs: { t: "sectMember", sectId: "huashan" },
+    stages: [
+      {
+        id: "gather_iron",
+        description: "เก็บเหล็กดิบ 5 ก้อน",
+        autoAdvance: { t: "hasItem", itemId: "iron_ore", count: 5 },
+      },
+      {
+        id: "deliver",
+        description: "ส่งเหล็กให้อาจารย์อี้ชิง",
+      },
+    ],
+    rewards: [
+      { t: "gold", amount: 100 },
+      { t: "wExp", amount: 50 },
+      { t: "npcRelationship", npcId: "sect_huashan_master_yiqing", amount: 3 },
+      { t: "sectPoints", sectId: "huashan", amount: 60 },
+    ],
+  },
+
+  // ──────────────────────────────────────────────────────────────────────
+  // ภารกิจวิชาในกาย — high sect quest, rank-gated. The capstone art unlock.
+  // ──────────────────────────────────────────────────────────────────────
+
+  // ART-1 · ตำราพลังเมฆม่วง — unlock at rank 5, reward bonus T4 art
+  {
+    id: "qst_huashan_art_purplecloud",
+    name: "ตำราพลังเมฆม่วง",
+    description: "อาจารย์อี้ชิงยอมเปิดตำราพลังเมฆม่วงให้ศิษย์ที่พิสูจน์ได้ทั้งดาบและจิตใจ — ผ่านการประลองกับโจรชั้นสูงและการเก็บเหล็กพิเศษ",
+    briefSummary: "ฝึกพลังเมฆม่วง — รับ T4 art ลับของหัวซาน",
+    type: "side",
+    sectId: "huashan",
+    isArtQuest: true,
+    minSectRank: 5,
+    giverNpcId: "sect_huashan_master_yiqing",
+    prereqs: {
+      t: "and",
+      all: [
+        { t: "sectMember", sectId: "huashan" },
+        { t: "sectRankAtLeast", sectId: "huashan", maxRank: 5 },
+      ],
+    },
+    stages: [
+      {
+        id: "trial_kill",
+        description: "พิสูจน์ดาบ — ปราบหัวหน้าโจร (bandit_chief) 2 คน",
+        autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 2 },
+      },
+      {
+        id: "trial_iron",
+        description: "พิสูจน์ใจ — รวบรวมแร่เทพ 1 ก้อน",
+        autoAdvance: { t: "hasItem", itemId: "mithril_ore", count: 1 },
+      },
+      {
+        id: "return_art",
+        description: "กลับไปรับตำราจากอาจารย์อี้ชิง",
+      },
+    ],
+    rewards: [
+      { t: "wExp", amount: 200 },
+      { t: "learnArt", artId: "t4_huashan_purple", level: 3 },
+      { t: "trait", trait: "humility", amount: 5 },
+      { t: "sectPoints", sectId: "huashan", amount: 100 },
+      { t: "npcRelationship", npcId: "sect_huashan_master_yiqing", amount: 10 },
     ],
   },
 

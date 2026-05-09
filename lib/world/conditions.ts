@@ -49,6 +49,8 @@ export function evaluateCondition(state: WorldStateData, c: Condition): boolean 
       if (!m) return false;
       return m.rank <= c.maxRank;
     }
+    case "goldAtLeast":
+      return state.gold >= c.amount;
     case "and":
       return c.all.every((sub) => evaluateCondition(state, sub));
     case "or":
