@@ -55,6 +55,7 @@ export const LOCATION_ROUTES: readonly LocationRoute[] = [
   // ─── Southwest (Yunnan / Sichuan / Tibetan) ─────────────────────
   { a: "city_dali", b: "sect_emei",       fromA: "ลำธารหุบเขา",     fromB: "ลำธารหุบเขา" },
   { a: "city_dali", b: "sect_wudu",       fromA: "ป่าพิษ",           fromB: "ป่าพิษ" },
+  { a: "city_dali", b: "sect_tang",       fromA: "ทางขึ้นเสฉวน",      fromB: "ทางลงสู่ต้าหลี่",  hintA: "เส้นทางสู่ตระกูลถังในเสฉวน" },
   { a: "city_dali", b: "village_meihua",  fromA: "ดงดอกเหมย",        fromB: "ดงดอกเหมย",       hintA: "ต้นเหมยขึ้นริมทาง" },
   { a: "city_dali", b: "mt_wuliang",      fromA: "ทางขึ้นเขา",       fromB: "ทางลงเขา" },
   { a: "city_dali", b: "home_yideng",     fromA: "ลำธารใต้",         fromB: "ลำธารใต้" },

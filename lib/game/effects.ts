@@ -178,6 +178,14 @@ export function applyEnemyEffect(
       addDebuff(state, ds, { t: "burn_hp_mp", n: "เผาไหม้", pp: eff.dmg, mpp: eff.mp, u: eff.u });
       logLine(state, "lS", `&nbsp;✗ ${dnm}: เผาไหม้ HP${eff.dmg}% MP${eff.mp}%/ตา (${eff.u}ตา)`);
       return;
+    case "poison_dmg":
+      // Pure HP DoT — reuses the existing `debuff_poison` debuff stat
+      // (same tick handler) but skips the bundled Eva/Acc that the old
+      // `debuff_poison` enemy effect adds. Higher pp values than burn
+      // since poison gives up MP damage + secondary debuffs in trade.
+      addDebuff(state, ds, { t: "debuff_poison", n: "พิษ", pp: eff.pp, u: eff.u });
+      logLine(state, "lS", `&nbsp;✗ ${dnm}: พิษ${eff.pp}%HP/ตา (${eff.u}ตา)`);
+      return;
     case "stun":
       if (Math.random() * 100 < eff.ch) {
         addDebuff(state, ds, { t: "stun", n: "สตัน", u: eff.u });

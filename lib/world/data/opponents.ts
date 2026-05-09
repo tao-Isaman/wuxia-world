@@ -1355,6 +1355,99 @@ export const OPPONENTS: readonly OpponentDef[] = [
       artId: "t0_sm_dual", artLevel: 4,
       skillIds: ["mi_firepalm"],
     }) },
+
+  // ─── สำนักสุลถัง — sect leadership (T1-T4) ──────────────────────────
+  // Tang sect leadership. Hidden weapon + poison kits — high DEX/AGI,
+  // multi-hit dart volleys, heavy poison riders. Chief carries the
+  // full T4 disciple line.
+  { id: "spar_tang_chief_tangmen", name: "เจ้าสำนักถังเหมิน", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "viper_venom", weight: 4 }, { itemId: "scorpion_venom", weight: 3 },
+      { itemId: "centipede_venom", weight: 3 }, { itemId: "iron_blade", weight: 3 },
+      { itemId: "ancient_coin", weight: 4 }, { itemId: "mithril_ore", weight: 1 }],
+    build: () => build("เจ้าสำนักถังเหมิน", 4, {
+      stats: { DEX: 24, AGI: 18, STR: 12, LUK: 10, VIT: 12, POW: 4 },
+      artId: "t4_tang_tenkpoisons", artLevel: 10,
+      skillIds: ["tang_heartpierce", "tang_starrain", "tang_meteorpierce", "tang_viperblade", "tang_goldsnake", "tang_starscatter"],
+      extraArtSlots: ["t4_tang_tenkpoisons", "t4_tang_skycleaver", "t3_tang_viperpower", "t3_tang_chase"],
+      artLevels: { t4_tang_tenkpoisons: 10, t4_tang_skycleaver: 10, t3_tang_viperpower: 10, t3_tang_chase: 10, t2_tang_wavewind: 10 },
+      learnedArtIds: ["t2_tang_wavewind"],
+    }) },
+
+  { id: "spar_tang_tangshanhu", name: "รองเจ้าสำนักถังซานหู", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "viper_venom", weight: 3 }, { itemId: "iron_blade", weight: 2 },
+      { itemId: "ancient_coin", weight: 3 }],
+    build: () => build("รองเจ้าสำนักถังซานหู", 4, {
+      stats: { DEX: 22, AGI: 16, LUK: 10, STR: 10, VIT: 4 },
+      artId: "t4_tang_skycleaver", artLevel: 10,
+      skillIds: ["tang_starrain", "tang_meteorpierce", "tang_starscatter", "tang_poison_knife"],
+      extraArtSlots: ["t4_tang_skycleaver", "t3_tang_chase"],
+      artLevels: { t4_tang_skycleaver: 10, t3_tang_chase: 9 },
+    }) },
+
+  { id: "spar_tang_tangzhongtian", name: "ผู้อาวุโสพิษถังจงเทียน", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "viper_venom", weight: 5 }, { itemId: "scorpion_venom", weight: 4 },
+      { itemId: "centipede_venom", weight: 3 }, { itemId: "potion_big", weight: 2 }],
+    build: () => build("ผู้อาวุโสพิษถังจงเทียน", 4, {
+      stats: { DEX: 18, AGI: 12, LUK: 10, VIT: 12, POW: 6 },
+      artId: "t4_tang_tenkpoisons", artLevel: 10,
+      skillIds: ["tang_viperblade", "tang_meteorpierce", "tang_poison_knife", "tang_goldsnake"],
+      extraArtSlots: ["t4_tang_tenkpoisons", "t3_tang_viperpower", "t1_tang_venombody"],
+      artLevels: { t4_tang_tenkpoisons: 10, t3_tang_viperpower: 9, t1_tang_venombody: 9 },
+    }) },
+
+  { id: "spar_tang_tangshibi", name: "ผู้อาวุโสมีดถังซือปี้", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "iron_blade", weight: 4 }, { itemId: "ancient_coin", weight: 2 },
+      { itemId: "potion_big", weight: 2 }],
+    build: () => build("ผู้อาวุโสมีดถังซือปี้", 4, {
+      stats: { STR: 14, DEX: 16, AGI: 10, LUK: 6 },
+      artId: "t4_tang_skycleaver", artLevel: 9,
+      skillIds: ["tang_heartpierce", "tang_viperblade", "tang_goldsnake"],
+      extraArtSlots: ["t4_tang_skycleaver", "t3_tang_viperpower"],
+      artLevels: { t4_tang_skycleaver: 9, t3_tang_viperpower: 9 },
+    }) },
+
+  { id: "spar_tang_tangrong", name: "ผู้อาวุโสไล่ล่าถังหรง", ti: 3, category: "human",
+    drops: [...DROPS_T3,
+      { itemId: "ancient_coin", weight: 3 }, { itemId: "viper_venom", weight: 2 }],
+    build: () => build("ผู้อาวุโสไล่ล่าถังหรง", 3, {
+      stats: { AGI: 16, DEX: 12, STR: 6, LUK: 4 },
+      artId: "t3_tang_chase", artLevel: 8,
+      skillIds: ["tang_meteorpierce", "tang_starscatter", "tang_poison_knife"],
+      extraArtSlots: ["t3_tang_chase", "t2_tang_wavewind"],
+      artLevels: { t3_tang_chase: 8, t2_tang_wavewind: 7 },
+    }) },
+
+  { id: "spar_tang_tanglin", name: "หัวหน้าศิษย์ถังหลิน", ti: 2, category: "human",
+    drops: [...DROPS_T2,
+      { itemId: "viper_venom", weight: 3 }, { itemId: "ancient_coin", weight: 2 }],
+    build: () => build("หัวหน้าศิษย์ถังหลิน", 2, {
+      stats: { DEX: 10, AGI: 7, STR: 5 },
+      artId: "t2_tang_wavewind", artLevel: 6,
+      skillIds: ["tang_starscatter", "tang_poison_knife", "tang_basic_knife"],
+      extraArtSlots: ["t2_tang_wavewind"],
+      artLevels: { t2_tang_wavewind: 6 },
+    }) },
+
+  { id: "spar_tang_tangtao", name: "ศิษย์ถังเทา", ti: 2, category: "human",
+    drops: [...DROPS_T2,
+      { itemId: "viper_venom", weight: 2 }],
+    build: () => build("ศิษย์ถังเทา", 2, {
+      stats: { DEX: 9, AGI: 7, LUK: 4 },
+      artId: "t1_tang_venombody", artLevel: 5,
+      skillIds: ["tang_poison_knife", "tang_basic_knife"],
+    }) },
+
+  { id: "spar_tang_tangxiu", name: "ศิษย์ถังซิ่ว", ti: 1, category: "human",
+    drops: [...DROPS_T1],
+    build: () => build("ศิษย์ถังซิ่ว", 1, {
+      stats: { DEX: 6, AGI: 4 },
+      artId: "t0_tang_sharp", artLevel: 4,
+      skillIds: ["tang_basic_knife"],
+    }) },
 ];
 
 export const OPPONENTS_BY_ID = new Map<string, OpponentDef>(

@@ -551,6 +551,64 @@ const SUNMOON: SectMembershipDef = {
   questCooldownDays: 30,
 };
 
+// Tang sect (สำนักสุลถัง / 唐门). Big Sichuan family — known throughout
+// the world but rarely seen in public, focused on hidden weapons +
+// poisons. Leadership tier matches Shaolin/Wudang. Combat identity:
+// yin / external — short blades + thrown knives + venom-coated darts.
+//
+// Disciple intro: gather poisons + herbs. Trial proves the recruit
+// can navigate the venomous corners of the world (where Tang gets
+// their materials). Hint dialog points players at specific gather
+// locations.
+//
+// Reward layout (8 skills + 7 arts in the sect line):
+//   rank 9 → T0 knife + T0 art (auto on join)
+//   rank 8 → T1 knife (auto)
+//   rank 7 → T1 art auto
+//   rank 6 → T2 art auto
+//   rank 5 → choose T2 hidden vs T3 short (sect leans on knives)
+//   rank 4 → choose T3 art (viper-power vs chase-step)
+//   rank 3 → choose T3 short blade (viper vs gold-snake)
+//   rank 2 → choose T4 art (10000-poisons vs sky-cleaver)
+//          + choose T4 weapon (rain-of-stars vs heart-piercer)
+const TANG: SectMembershipDef = {
+  id: "tang",
+  name: "สำนักสุลถัง",
+  hallLocationId: "sect_tang",
+  registrarNpcId: "sect_tang_chief_tangmen",
+  joinRequirements: { t: "trait", trait: "evil", max: 30 },
+  startRank: 9,
+  topRank: 1,
+  rankUpCost: (targetRank) => {
+    const table: Record<number, number> = {
+      8: 100,
+      7: 200,
+      6: 350,
+      5: 500,
+      4: 700,
+      3: 1000,
+      2: 1400,
+      1: 2000,
+    };
+    return table[targetRank] ?? Infinity;
+  },
+  skillsByRank: {
+    9: ["tang_basic_knife"],                                 // T0 hidden auto
+    8: ["tang_poison_knife"],                                // T1 hidden auto
+    5: ["tang_starscatter"],                                 // T2 hidden auto
+    3: ["tang_meteorpierce", "tang_viperblade", "tang_goldsnake"], // T3 — choice
+    2: ["tang_starrain", "tang_heartpierce"],                // T4 — choice
+  },
+  artsByRank: {
+    9: ["t0_tang_sharp"],                                    // T0 art auto
+    7: ["t1_tang_venombody"],                                // T1 auto
+    6: ["t2_tang_wavewind"],                                 // T2 auto
+    4: ["t3_tang_viperpower", "t3_tang_chase"],              // T3 art — choice
+    2: ["t4_tang_tenkpoisons", "t4_tang_skycleaver"],        // T4 art — choice
+  },
+  questCooldownDays: 30,
+};
+
 export const SECT_MEMBERSHIPS: Record<SectId, SectMembershipDef> = {
   shaolin: SHAOLIN,
   wudang: WUDANG,
@@ -561,6 +619,7 @@ export const SECT_MEMBERSHIPS: Record<SectId, SectMembershipDef> = {
   beggars: BEGGARS,
   jinyiwei: JINYIWEI,
   sunmoon: SUNMOON,
+  tang: TANG,
 };
 
 // Helper: rewards (skill + art ids) the player is *eligible* to pick at a

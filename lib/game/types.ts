@@ -141,6 +141,11 @@ export type EnemyEffect =
   // เผาไหม้ — DoT ทั้ง HP และ MP. `dmg` = % ของ max HP ต่อเทิร์น,
   // `mp` = % ของ max MP ต่อเทิร์น. ใช้ใน tickEffects ตามจำนวน u.
   | { t: "burn_hp_mp"; dmg: number; mp: number; u: number }
+  // พิษ — pure HP DoT (no MP touch, no Eva/Acc bundled). Designed to
+  // hit harder than burn since it sacrifices MP damage + secondary
+  // debuffs for raw HP pressure. `pp` = % of max HP per turn, `u` =
+  // turns. Tang sect's signature flavor + jianghu poison weapons.
+  | { t: "poison_dmg"; pp: number; u: number }
   // สตัน — บล็อก action เป้าหมายเป็นเวลา u เทิร์น โดยมีโอกาส ch%
   // ที่ทำให้ติดสถานะตอนใช้สกิล. ตรวจที่ต้นรอบของ resolveSkill /
   // resolveArtActive เพื่อข้ามตา.
