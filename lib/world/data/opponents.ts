@@ -1071,6 +1071,109 @@ export const OPPONENTS: readonly OpponentDef[] = [
       artId: "bmzq", artLevel: 5,
       skillIds: ["xy_punch", "yxjf"],
     }) },
+
+  // ─── พรรคสราญรมย์ — sect leadership (T1-T4) ────────────────────────
+  // T4 master + 7 disciple-line spar opponents.
+  { id: "spar_xiaoyao_master_yunxiao", name: "ปรมาจารย์ยุนเซียว", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "ginseng", weight: 4 }, { itemId: "jade", weight: 3 },
+      { itemId: "paper", weight: 3 }, { itemId: "wood_sacred", weight: 2 },
+      { itemId: "ancient_coin", weight: 2 }, { itemId: "mithril_ore", weight: 1 }],
+    build: () => build("ปรมาจารย์ยุนเซียว", 4, {
+      stats: { POW: 24, INT: 18, AGI: 16, DEX: 12, VIT: 10 },
+      artId: "bmsg", artLevel: 10,
+      skillIds: ["xy_palm", "yxjf", "xy_punch", "xy_demon_wind_sword", "xy_lesserdemon_fist"],
+      extraArtSlots: ["bmsg", "bmzq", "t3_xy_seepower", "t2_xy_formless_greater"],
+      artLevels: { bmsg: 10, bmzq: 10, t3_xy_seepower: 10, t2_xy_formless_greater: 10, t3_xy_root_poison_qi: 10 },
+      learnedArtIds: ["t3_xy_root_poison_qi"],
+    }) },
+
+  { id: "spar_xiaoyao_tianshan", name: "รองอาจารย์เทียนซาน", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "ginseng", weight: 3 }, { itemId: "jade", weight: 3 },
+      { itemId: "ancient_coin", weight: 2 }],
+    build: () => build("รองอาจารย์เทียนซาน", 4, {
+      stats: { POW: 22, INT: 16, AGI: 14, DEX: 10 },
+      artId: "bmzq", artLevel: 10,
+      skillIds: ["xy_palm", "xy_punch", "xy_demon_wind_sword"],
+      extraArtSlots: ["bmzq", "t3_xy_root_poison_qi"],
+      artLevels: { bmzq: 10, t3_xy_root_poison_qi: 9 },
+    }) },
+
+  { id: "spar_xiaoyao_wuyazi", name: "ผู้อาวุโสกระบี่อู๋หยาจื่อ", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "jade", weight: 3 }, { itemId: "paper", weight: 2 },
+      { itemId: "ancient_coin", weight: 2 }],
+    build: () => build("ผู้อาวุโสกระบี่อู๋หยาจื่อ", 4, {
+      stats: { POW: 18, INT: 14, DEX: 14, AGI: 12 },
+      artId: "t3_xy_seepower", artLevel: 9,
+      skillIds: ["yxjf", "xy_demon_wind_sword", "xy_pathless_sword"],
+      extraArtSlots: ["t3_xy_seepower", "t2_xy_formless_greater"],
+      artLevels: { t3_xy_seepower: 9, t2_xy_formless_greater: 9 },
+    }) },
+
+  { id: "spar_xiaoyao_libai", name: "ผู้อาวุโสฝ่ามือหลี่ไป๋", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "ginseng", weight: 3 }, { itemId: "jade", weight: 2 },
+      { itemId: "ancient_coin", weight: 2 }],
+    build: () => build("ผู้อาวุโสฝ่ามือหลี่ไป๋", 4, {
+      stats: { POW: 18, INT: 14, AGI: 12, DEX: 10 },
+      artId: "bmsg", artLevel: 9,
+      skillIds: ["xy_palm", "xy_punch", "xy_lesserdemon_fist", "xy_root_poison_fist"],
+      extraArtSlots: ["bmsg", "t2_xy_formless_greater"],
+      artLevels: { bmsg: 9, t2_xy_formless_greater: 9 },
+    }) },
+
+  { id: "spar_xiaoyao_xiaorang", name: "ผู้อาวุโสดาบเสี่ยวหรง", ti: 3, category: "human",
+    drops: [...DROPS_T3,
+      { itemId: "iron_blade", weight: 3 }, { itemId: "ancient_coin", weight: 2 }],
+    build: () => build("ผู้อาวุโสดาบเสี่ยวหรง", 3, {
+      stats: { STR: 12, AGI: 10, DEX: 8 },
+      artId: "t2_xy_formless_greater", artLevel: 8,
+      skillIds: ["xy_demon_wind_sword", "xy_lesserdemon_blade", "xy_pathless_sword"],
+      extraArtSlots: ["t2_xy_formless_greater"],
+      artLevels: { t2_xy_formless_greater: 8 },
+    }) },
+
+  { id: "spar_xiaoyao_aliao", name: "หัวหน้าศิษย์อาเหลียว", ti: 2, category: "human",
+    drops: [...DROPS_T2,
+      { itemId: "paper", weight: 2 }],
+    build: () => build("หัวหน้าศิษย์อาเหลียว", 2, {
+      stats: { POW: 9, INT: 7, AGI: 5 },
+      artId: "t1_xy_formless_lesser", artLevel: 6,
+      skillIds: ["xy_lesserdemon_fist", "xy_pathless_sword"],
+      extraArtSlots: ["t1_xy_formless_lesser"],
+      artLevels: { t1_xy_formless_lesser: 6 },
+    }) },
+
+  { id: "spar_xiaoyao_jiumozhi", name: "ศิษย์จิ่วม่อจื้อ", ti: 2, category: "human",
+    drops: [...DROPS_T2],
+    build: () => build("ศิษย์จิ่วม่อจื้อ", 2, {
+      stats: { POW: 8, INT: 7, DEX: 5 },
+      artId: "t1_xy_formless_lesser", artLevel: 5,
+      skillIds: ["xy_root_poison_fist", "xy_pathless_sword"],
+    }) },
+
+  { id: "spar_xiaoyao_xiaolan", name: "ศิษย์เสี่ยวหลาน", ti: 1, category: "human",
+    drops: [...DROPS_T1],
+    build: () => build("ศิษย์เสี่ยวหลาน", 1, {
+      stats: { STR: 5, AGI: 4 },
+      artId: "t0_xy_plum", artLevel: 4,
+      skillIds: ["xy_lesserdemon_blade"],
+    }) },
+
+  // Hunter for betrayed xiaoyao disciples — extends the hunter pool
+  // wired into rollRandomEvent (one per joinable sect).
+  { id: "hunter_xiaoyao", name: "นักล่าพรรคสราญรมย์", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "ginseng", weight: 3 }, { itemId: "jade", weight: 2 }],
+    build: () => build("นักล่าพรรคสราญรมย์", 4, {
+      stats: { POW: 22, INT: 14, AGI: 14, DEX: 8 },
+      artId: "bmsg", artLevel: 9,
+      skillIds: ["xy_palm", "yxjf", "xy_punch"],
+      extraArtSlots: ["bmsg", "t3_xy_seepower"],
+      artLevels: { bmsg: 9, t3_xy_seepower: 9 },
+    }) },
   { id: "spar_ming_envoy", name: "ผู้แทนหั่วจี้", ti: 3, category: "human",
     drops: [...DROPS_T3,
       { itemId: "man_nd10", weight: 1 }, { itemId: "man_ne8", weight: 1 }],

@@ -609,6 +609,59 @@ const TANG: SectMembershipDef = {
   questCooldownDays: 30,
 };
 
+// Xiaoyao sect (พรรคสราญรมย์ / 逍遥派). Big sect — yin / internal art-
+// heavy line with sword + blade + fist split. Leadership tier matches
+// Shaolin / Wudang / etc (T4 master). Disciple intro mirrors the
+// herb-gathering pattern of other public sects.
+//
+// Reward layout:
+//   rank 9 → T0 blade + T0 art (auto)
+//   rank 8 → T1 sword (auto)
+//   rank 7 → T1 art (auto)
+//   rank 6 → T2 art "formless greater" (auto)
+//   rank 5 → choose T2 weapon (lesser-demon fist OR demon-wind sword
+//            OR root-poison fist)
+//   rank 4 → choose T3 art (root-poison qi vs see-power)
+//   rank 3 → choose T3 weapon (xy_punch vs yxjf)
+//   rank 2 → choose T4 capstone art (bmzq vs bmsg) + xy_palm T4 fist auto
+const XIAOYAO: SectMembershipDef = {
+  id: "xiaoyao",
+  name: "พรรคสราญรมย์",
+  hallLocationId: "sect_xiaoyao",
+  registrarNpcId: "sect_xiaoyao_master_yunxiao",
+  joinRequirements: { t: "trait", trait: "evil", max: 15 },
+  startRank: 9,
+  topRank: 1,
+  rankUpCost: (targetRank) => {
+    const table: Record<number, number> = {
+      8: 100,
+      7: 200,
+      6: 350,
+      5: 500,
+      4: 700,
+      3: 1000,
+      2: 1400,
+      1: 2000,
+    };
+    return table[targetRank] ?? Infinity;
+  },
+  skillsByRank: {
+    9: ["xy_lesserdemon_blade"],                                  // T0 blade auto
+    8: ["xy_pathless_sword"],                                     // T1 sword auto
+    5: ["xy_lesserdemon_fist", "xy_demon_wind_sword", "xy_root_poison_fist"], // T2 — choice
+    3: ["xy_punch", "yxjf"],                                      // T3 — choice
+    2: ["xy_palm"],                                               // T4 fist auto
+  },
+  artsByRank: {
+    9: ["t0_xy_plum"],                                            // T0 auto
+    7: ["t1_xy_formless_lesser"],                                 // T1 auto
+    6: ["t2_xy_formless_greater"],                                // T2 auto
+    4: ["t3_xy_root_poison_qi", "t3_xy_seepower"],                // T3 — choice
+    2: ["bmzq", "bmsg"],                                          // T4 — choice
+  },
+  questCooldownDays: 30,
+};
+
 export const SECT_MEMBERSHIPS: Record<SectId, SectMembershipDef> = {
   shaolin: SHAOLIN,
   wudang: WUDANG,
@@ -620,6 +673,7 @@ export const SECT_MEMBERSHIPS: Record<SectId, SectMembershipDef> = {
   jinyiwei: JINYIWEI,
   sunmoon: SUNMOON,
   tang: TANG,
+  xiaoyao: XIAOYAO,
 };
 
 // Helper: rewards (skill + art ids) the player is *eligible* to pick at a
