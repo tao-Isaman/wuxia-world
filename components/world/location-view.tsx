@@ -81,14 +81,22 @@ export function LocationView({ scene }: Props) {
     (r) => !r.visibleIf || evaluateCondition(state, r.visibleIf),
   );
 
-  // Rest tier by id prefix. Cities and inns charge gold for a full restore,
-  // temples / palaces give a free half restore, and every other location
-  // (including villages) falls back to the roadside tier.
-  const restKind: RestKind = scene.id.startsWith("inn_") || scene.id.startsWith("city_")
-    ? "inn"
-    : scene.id.startsWith("temple_") || scene.id.startsWith("palace_")
-      ? "temple"
-      : "route";
+  // Rest options by id prefix. The roadside tier is ALWAYS available as
+  // a no-cost fallback (so a broke player at a city isn't soft-locked
+  // when they can't afford the inn). Richer locations layer the better
+  // tier on top of the roadside fallback:
+  //   - city / inn  → inn (paid full restore) + roadside fallback
+  //   - temple / palace → temple (free half restore) + roadside fallback
+  //   - everywhere else → roadside only
+  const restKinds: RestKind[] = (() => {
+    if (scene.id.startsWith("inn_") || scene.id.startsWith("city_")) {
+      return ["inn", "route"];
+    }
+    if (scene.id.startsWith("temple_") || scene.id.startsWith("palace_")) {
+      return ["temple", "route"];
+    }
+    return ["route"];
+  })();
 
   return (
     <div className="space-y-3">
@@ -293,7 +301,9 @@ export function LocationView({ scene }: Props) {
         </Card>
       )}
 
-      <RestPanel kind={restKind} />
+      {restKinds.map((k) => (
+        <RestPanel key={k} kind={k} />
+      ))}
 
       {canPractice && (
         <Card>
