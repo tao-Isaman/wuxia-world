@@ -274,4 +274,101 @@ export const QUESTS_WUDANG: readonly QuestDef[] = [
       { t: "sectPoints", sectId: "wudang", amount: 50 },
     ],
   },
+
+  {
+    id: "qst_wudang_sect_ginseng_run",
+    name: "เก็บโสมเทพในป่าเขา",
+    description: "ห้องยาของอู่ตังต้องการโสมจำนวนมากเพื่อปรุงยาบำรุงปราณให้ศิษย์รุ่นใหม่ — อาจารย์ชิงซวี่ขอให้ศิษย์ออกเก็บโสมในป่าเขา",
+    briefSummary: "ส่งโสม 8 ราก · sect points +50",
+    type: "side",
+    sectId: "wudang",
+    giverNpcId: "sect_wudang_master_qingxu",
+    prereqs: { t: "sectMember", sectId: "wudang" },
+    stages: [
+      {
+        id: "main",
+        description: "เก็บโสม 8 ราก",
+        autoAdvance: { t: "hasItem", itemId: "ginseng", count: 8 },
+      },
+      {
+        id: "report",
+        description: "ส่งโสมให้อาจารย์ชิงซวี่",
+      },
+    ],
+    rewards: [
+      { t: "gold", amount: 120 },
+      { t: "wExp", amount: 50 },
+      { t: "npcRelationship", npcId: "sect_wudang_master_qingxu", amount: 3 },
+      { t: "sectPoints", sectId: "wudang", amount: 50 },
+    ],
+  },
+
+  {
+    id: "qst_wudang_sect_tiger_hunt",
+    name: "ปราบเสือร้ายเชิงเขา",
+    description: "เสือดุร้ายลงจากเขาทำร้ายผู้แสวงบุญที่ขึ้นมาเขาอู่ตัง อาจารย์ชิงซวี่สั่งให้ศิษย์กำราบเสือและนำหนังของมันกลับมาเป็นหลักฐาน",
+    briefSummary: "ปราบเสือเขา 2 ตัว + นำหนังสัตว์ 3 ผืน · sect points +65",
+    type: "side",
+    sectId: "wudang",
+    giverNpcId: "sect_wudang_master_qingxu",
+    prereqs: { t: "sectMember", sectId: "wudang" },
+    stages: [
+      {
+        id: "fight",
+        description: "ปราบเสือเขา (mountain_tiger) 2 ตัว",
+        autoAdvance: { t: "defeatedOpponent", opponentId: "mountain_tiger", count: 2 },
+      },
+      {
+        id: "gather",
+        description: "นำหนังสัตว์ 3 ผืนเป็นหลักฐาน",
+        autoAdvance: { t: "hasItem", itemId: "fur_pelt", count: 3 },
+      },
+      {
+        id: "report",
+        description: "กลับไปรายงานอาจารย์ชิงซวี่",
+      },
+    ],
+    rewards: [
+      { t: "gold", amount: 150 },
+      { t: "wExp", amount: 60 },
+      { t: "trait", trait: "fame", amount: 2 },
+      { t: "npcRelationship", npcId: "sect_wudang_master_qingxu", amount: 3 },
+      { t: "sectPoints", sectId: "wudang", amount: 65 },
+    ],
+  },
+
+  {
+    id: "qst_wudang_sect_scripture_copy",
+    name: "คัดลอกตำราเต๋า",
+    description: "หอตำราของอู่ตังต้องการเสริมตำราเต๋าเล่มใหม่ อาจารย์ชิงซวี่ให้ศิษย์รวบรวมกระดาษและไม้อ่อนสำหรับทำม้วนตำรา",
+    briefSummary: "ส่งกระดาษ 5 + ไม้อ่อน 3 · sect points +50",
+    type: "side",
+    sectId: "wudang",
+    giverNpcId: "sect_wudang_master_qingxu",
+    prereqs: { t: "sectMember", sectId: "wudang" },
+    stages: [
+      {
+        id: "main",
+        description: "หากระดาษ 5 แผ่น + ไม้อ่อน 3 ชิ้น",
+        autoAdvance: {
+          t: "and",
+          all: [
+            { t: "hasItem", itemId: "paper", count: 5 },
+            { t: "hasItem", itemId: "wood_soft", count: 3 },
+          ],
+        },
+      },
+      {
+        id: "report",
+        description: "ส่งวัสดุให้อาจารย์ชิงซวี่",
+      },
+    ],
+    rewards: [
+      { t: "gold", amount: 110 },
+      { t: "wExp", amount: 50 },
+      { t: "trait", trait: "humility", amount: 1 },
+      { t: "npcRelationship", npcId: "sect_wudang_master_qingxu", amount: 3 },
+      { t: "sectPoints", sectId: "wudang", amount: 50 },
+    ],
+  },
 ];

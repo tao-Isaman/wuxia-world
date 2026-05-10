@@ -137,4 +137,103 @@ export const QUESTS_XIAOYAO: readonly QuestDef[] = [
       { t: "npcRelationship", npcId: "sect_xiaoyao_master_yunxiao", amount: 12 },
     ],
   },
+
+  {
+    id: "qst_xiaoyao_sect_instrument",
+    name: "วัสดุสร้างเครื่องดนตรี",
+    description: "ห้องดนตรีของพรรคสราญรมย์ต้องการไม้เนื้อแข็งสำหรับทำคันพิณและผ้าไหมสำหรับสายพิณ — เก็บมาให้ครบ",
+    briefSummary: "ส่งไม้เนื้อแข็ง 5 + ผ้าไหม 4 · sect points +50",
+    type: "side",
+    sectId: "xiaoyao",
+    giverNpcId: "sect_xiaoyao_master_yunxiao",
+    prereqs: { t: "sectMember", sectId: "xiaoyao" },
+    stages: [
+      {
+        id: "gather",
+        description: "เก็บไม้เนื้อแข็ง 5 ท่อน + ผ้าไหม 4 ผืน",
+        autoAdvance: {
+          t: "and",
+          all: [
+            { t: "hasItem", itemId: "wood_hard", count: 5 },
+            { t: "hasItem", itemId: "silk", count: 4 },
+          ],
+        },
+      },
+      { id: "deliver", description: "ส่งวัสดุให้ห้องดนตรี" },
+    ],
+    rewards: [
+      { t: "gold", amount: 130 },
+      { t: "wExp", amount: 50 },
+      { t: "npcRelationship", npcId: "sect_xiaoyao_master_yunxiao", amount: 3 },
+      { t: "sectPoints", sectId: "xiaoyao", amount: 50 },
+    ],
+  },
+
+  {
+    id: "qst_xiaoyao_sect_intruders",
+    name: "ขับไล่ผู้บุกรุกหุบเขา",
+    description: "โจรป่ากลุ่มหนึ่งบุกเข้ามาเก็บเม็ดบัวในสระศักดิ์สิทธิ์ของพรรค — ขับไล่พวกเขาและนำเม็ดบัวที่เหลือกลับมาเพื่อพิธี",
+    briefSummary: "ปราบโจรป่า 4 + เก็บเม็ดบัว 6 · sect points +65",
+    type: "side",
+    sectId: "xiaoyao",
+    giverNpcId: "sect_xiaoyao_master_yunxiao",
+    prereqs: { t: "sectMember", sectId: "xiaoyao" },
+    stages: [
+      {
+        id: "expel",
+        description: "ปราบโจรป่า (bandit) 4 คน",
+        autoAdvance: { t: "defeatedOpponent", opponentId: "bandit", count: 4 },
+      },
+      {
+        id: "gather_lotus",
+        description: "เก็บเม็ดบัว 6 เม็ดจากสระ",
+        autoAdvance: { t: "hasItem", itemId: "lotus_seed", count: 6 },
+      },
+      { id: "report", description: "กลับไปรายงานปรมาจารย์ยุนเซียว" },
+    ],
+    rewards: [
+      { t: "gold", amount: 150 },
+      { t: "wExp", amount: 60 },
+      { t: "trait", trait: "humility", amount: 2 },
+      { t: "npcRelationship", npcId: "sect_xiaoyao_master_yunxiao", amount: 3 },
+      { t: "sectPoints", sectId: "xiaoyao", amount: 65 },
+    ],
+  },
+
+  {
+    id: "qst_xiaoyao_sect_ritual",
+    name: "เตรียมพิธีบูชาเทพเซียน",
+    description: "พรรคสราญรมย์จัดพิธีประจำปีเพื่อบูชาเทพเซียน — เก็บโสมสำหรับชา เม็ดบัวสำหรับบูชา และหยกสำหรับวางบนแท่นพิธี",
+    briefSummary: "ส่งโสม 8 + เม็ดบัว 8 + หยก 1 · sect points +70",
+    type: "side",
+    sectId: "xiaoyao",
+    giverNpcId: "sect_xiaoyao_master_yunxiao",
+    prereqs: { t: "sectMember", sectId: "xiaoyao" },
+    stages: [
+      {
+        id: "gather_herbs",
+        description: "เก็บโสม 8 ราก + เม็ดบัว 8 เม็ด",
+        autoAdvance: {
+          t: "and",
+          all: [
+            { t: "hasItem", itemId: "ginseng", count: 8 },
+            { t: "hasItem", itemId: "lotus_seed", count: 8 },
+          ],
+        },
+      },
+      {
+        id: "gather_jade",
+        description: "หาหยกล้ำค่า 1 ก้อนสำหรับแท่นพิธี",
+        autoAdvance: { t: "hasItem", itemId: "jade", count: 1 },
+      },
+      { id: "deliver", description: "ส่งทั้งหมดให้ปรมาจารย์ยุนเซียว" },
+    ],
+    rewards: [
+      { t: "gold", amount: 170 },
+      { t: "wExp", amount: 70 },
+      { t: "trait", trait: "humility", amount: 3 },
+      { t: "npcRelationship", npcId: "sect_xiaoyao_master_yunxiao", amount: 4 },
+      { t: "sectPoints", sectId: "xiaoyao", amount: 70 },
+    ],
+  },
 ];

@@ -193,4 +193,100 @@ export const QUESTS_TANG: readonly QuestDef[] = [
       { t: "sectPoints", sectId: "tang", amount: 50 },
     ],
   },
+
+  {
+    id: "qst_tang_sect_herbgather",
+    name: "เก็บสมุนไพรปรุงพิษ",
+    description: "ห้องปรุงพิษถังเหมินขาดวัตถุดิบสมุนไพรสำหรับสกัดเป็นพิษพิเศษ — เก็บสมุนไพรหายาก 8 ต้น และเม็ดบัว 4 ฝัก",
+    briefSummary: "ส่งสมุนไพรหายาก 8 + เม็ดบัว 4 · sect points +50",
+    type: "side",
+    sectId: "tang",
+    giverNpcId: "sect_tang_chief_tangmen",
+    prereqs: { t: "sectMember", sectId: "tang" },
+    stages: [
+      {
+        id: "main",
+        description: "เก็บสมุนไพรหายาก 8 · เม็ดบัว 4",
+        autoAdvance: {
+          t: "and",
+          all: [
+            { t: "hasItem", itemId: "herb", count: 8 },
+            { t: "hasItem", itemId: "lotus_seed", count: 4 },
+          ],
+        },
+      },
+      { id: "report", description: "กลับไปรายงานเจ้าสำนัก" },
+    ],
+    rewards: [
+      { t: "gold", amount: 120 },
+      { t: "wExp", amount: 50 },
+      { t: "npcRelationship", npcId: "sect_tang_chief_tangmen", amount: 3 },
+      { t: "sectPoints", sectId: "tang", amount: 50 },
+    ],
+  },
+
+  {
+    id: "qst_tang_sect_eliminate",
+    name: "กำจัดศัตรูตระกูล",
+    description: "ตระกูลถังต้องกำจัดหัวหน้าโจรที่ลอบเข้ามาขโมยตำราพิษ — เก็บพิษแมงป่องกลับมาเป็นหลักฐานพร้อมหัวหน้าโจร 2 คน",
+    briefSummary: "ปราบหัวหน้าโจร 2 + เก็บพิษแมงป่อง 4 · sect points +60",
+    type: "side",
+    sectId: "tang",
+    giverNpcId: "sect_tang_chief_tangmen",
+    prereqs: { t: "sectMember", sectId: "tang" },
+    stages: [
+      {
+        id: "hunt",
+        description: "ปราบหัวหน้าโจร (bandit_chief) 2 คน",
+        autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 2 },
+      },
+      {
+        id: "venom",
+        description: "เก็บพิษแมงป่อง 4 ขวด",
+        autoAdvance: { t: "hasItem", itemId: "scorpion_venom", count: 4 },
+      },
+      { id: "report", description: "กลับไปรายงานเจ้าสำนัก" },
+    ],
+    rewards: [
+      { t: "gold", amount: 150 },
+      { t: "wExp", amount: 60 },
+      { t: "npcRelationship", npcId: "sect_tang_chief_tangmen", amount: 4 },
+      { t: "sectPoints", sectId: "tang", amount: 65 },
+    ],
+  },
+
+  {
+    id: "qst_tang_sect_forge_knives",
+    name: "ตีมีดบินแห่งถังเหมิน",
+    description: "ช่างตีอาวุธลับของสำนักต้องการแร่เหล็กและไม้เนื้อแข็งเพื่อตีมีดบินรุ่นใหม่ พร้อมพิษเคลือบใบมีด — รวบรวมแร่เหล็ก 6 + ไม้เนื้อแข็ง 5 + พิษงู 3",
+    briefSummary: "ส่งแร่เหล็ก 6 + ไม้เนื้อแข็ง 5 + พิษงู 3 · sect points +70",
+    type: "side",
+    sectId: "tang",
+    giverNpcId: "sect_tang_chief_tangmen",
+    prereqs: { t: "sectMember", sectId: "tang" },
+    stages: [
+      {
+        id: "ore",
+        description: "ขุดแร่เหล็ก 6 ก้อน",
+        autoAdvance: { t: "hasItem", itemId: "iron_ore", count: 6 },
+      },
+      {
+        id: "wood",
+        description: "ตัดไม้เนื้อแข็ง 5 ท่อน",
+        autoAdvance: { t: "hasItem", itemId: "wood_hard", count: 5 },
+      },
+      {
+        id: "venom",
+        description: "เก็บพิษงู 3 ขวด เคลือบใบมีด",
+        autoAdvance: { t: "hasItem", itemId: "viper_venom", count: 3 },
+      },
+      { id: "report", description: "ส่งวัตถุดิบให้ช่างตีอาวุธของสำนัก" },
+    ],
+    rewards: [
+      { t: "gold", amount: 170 },
+      { t: "wExp", amount: 70 },
+      { t: "npcRelationship", npcId: "sect_tang_chief_tangmen", amount: 4 },
+      { t: "sectPoints", sectId: "tang", amount: 70 },
+    ],
+  },
 ];

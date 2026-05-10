@@ -135,13 +135,13 @@ export const QUESTS_SONGSHAN: readonly QuestDef[] = [
     type: "side",
     sectId: "songshan",
     isArtQuest: true,
-    minSectRank: 5,
+    minSectRank: 3,
     giverNpcId: "sect_songshan_master_zuolengchan",
     prereqs: {
       t: "and",
       all: [
         { t: "sectMember", sectId: "songshan" },
-        { t: "sectRankAtLeast", sectId: "songshan", maxRank: 5 },
+        { t: "sectRankAtLeast", sectId: "songshan", maxRank: 3 },
       ],
     },
     stages: [

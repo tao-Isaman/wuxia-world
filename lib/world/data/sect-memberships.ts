@@ -168,19 +168,18 @@ const WUDANG: SectMembershipDef = {
   questCooldownDays: 30,
 };
 
-// Huashan disciple ranks. Same 9→1 climb as the bigger sects (Shaolin /
-// Wudang) but Huashan is a smaller, sword-only school — its leadership
-// caps at T3 power (master + vice are formidable but not legendary like
-// Shaolin's abbot or Wudang's grandmaster). Open to anyone who can pay
-// the entry fee — no gender gate, no trait gate beyond a not-evil floor.
+// Huashan disciple ranks. T3 sect — smaller, sword-only school whose
+// leadership caps at T3 power. Compressed 5-rank ladder (5 → 1) since the
+// climb is shorter than the legendary T4 sects (Shaolin / Wudang / etc).
+// Open to anyone who can pay the entry fee — no gender gate, no trait
+// gate beyond a not-evil floor.
 //
-// Reward layout:
-//   rank 9 → T0 sword + T0 art (gifted on registration)
-//   rank 8 → T1 sword (auto)
-//   rank 7 → T1 art (auto)
-//   rank 6 → T2 art (auto)
-//   rank 5 → T3 sword (auto)
-//   rank 2 → choose ONE of two T4 arts — the disciple-line "purple cloud"
+// Reward layout (T0/T1/T2/T3 + T4 art capstone):
+//   rank 5 → T0 sword + T0 art (gifted on registration)
+//   rank 4 → T1 sword + T1 art (auto)
+//   rank 3 → T2 art (auto — sect's only T2 entry)
+//   rank 2 → T3 sword (auto)
+//   rank 1 → choose ONE of two T4 arts — the disciple-line "purple cloud"
 //            OR the older balanced "huashan-shengong" capstone.
 const HUASHAN: SectMembershipDef = {
   id: "huashan",
@@ -188,156 +187,156 @@ const HUASHAN: SectMembershipDef = {
   hallLocationId: "sect_huashan",
   registrarNpcId: "sect_huashan_master_yiqing",
   joinRequirements: { t: "trait", trait: "evil", max: 10 },
-  startRank: 9,
+  startRank: 5,
   topRank: 1,
   rankUpCost: (targetRank) => {
     const table: Record<number, number> = {
-      8: 100,
-      7: 200,
-      6: 350,
-      5: 500,
-      4: 700,
-      3: 1000,
-      2: 1400,
-      1: 2000,
+      4: 100,
+      3: 250,
+      2: 500,
+      1: 1000,
     };
     return table[targetRank] ?? Infinity;
   },
   skillsByRank: {
-    9: ["hs_basic_sword"],     // T0 sword — auto-grant on join
-    8: ["hs_floating_cloud"],  // T1 sword — auto on rank-up
-    5: ["hs_purple_cloud"],    // T3 sword — auto on rank-up
+    5: ["hs_basic_sword"],     // T0 sword — auto-grant on join
+    4: ["hs_floating_cloud"],  // T1 sword — auto on rank-up
+    2: ["hs_purple_cloud"],    // T3 sword — auto on rank-up
   },
   artsByRank: {
-    9: ["t0_huashan_qi"],      // T0 art — auto on join
-    7: ["t1_huashan_light"],   // T1 art — auto
-    6: ["t2_huashan_cloud"],   // T2 art — auto
-    2: ["t4_huashan_purple", "huashan"], // T4 — pick one of the two breaths
+    5: ["t0_huashan_qi"],      // T0 art — auto on join
+    4: ["t1_huashan_light"],   // T1 art — auto
+    3: ["t2_huashan_cloud"],   // T2 art — auto
+    1: ["t4_huashan_purple", "huashan"], // T4 capstone — pick one
   },
   questCooldownDays: 30,
 };
 
-// Songshan disciple ranks. Central peak iron-sword sect. Leadership caps
-// at T3 (mirror Huashan tier). Single-option pools at every rank so
-// reward auto-grants on rank-up.
+// Songshan disciple ranks. T3 sect — central peak iron-sword. Compressed
+// 5-rank ladder. Reward layout:
+//   rank 5 → T0 sword + T0 art (auto on join)
+//   rank 4 → T1 sword + T1 art (auto)
+//   rank 3 → T2 sword + T2 art (auto)
+//   rank 2 → T3 sword (auto)
+//   rank 1 → T3 art capstone (auto, paired with art quest early-grant)
 const SONGSHAN: SectMembershipDef = {
   id: "songshan",
   name: "ซงซาน",
   hallLocationId: "sect_songshan",
   registrarNpcId: "sect_songshan_master_zuolengchan",
   joinRequirements: { t: "trait", trait: "evil", max: 10 },
-  startRank: 9,
+  startRank: 5,
   topRank: 1,
   rankUpCost: (targetRank) => {
     const table: Record<number, number> = {
-      8: 100, 7: 200, 6: 350, 5: 500, 4: 700, 3: 1000, 2: 1400, 1: 2000,
+      4: 100, 3: 250, 2: 500, 1: 1000,
     };
     return table[targetRank] ?? Infinity;
   },
   skillsByRank: {
-    9: ["ssh_basic_sword"],
-    8: ["ssh_iron_strike"],
-    6: ["ssh_central_blade"],
-    4: ["ssh_song_pillar"],
+    5: ["ssh_basic_sword"],
+    4: ["ssh_iron_strike"],
+    3: ["ssh_central_blade"],
+    2: ["ssh_song_pillar"],
   },
   artsByRank: {
-    9: ["t0_ssh_qi"],
-    7: ["t1_ssh_iron"],
-    6: ["t2_ssh_root"],
-    3: ["t3_ssh_pillar"],
+    5: ["t0_ssh_qi"],
+    4: ["t1_ssh_iron"],
+    3: ["t2_ssh_root"],
+    1: ["t3_ssh_pillar"],
   },
   questCooldownDays: 30,
 };
 
-// Taishan disciple ranks. Eastern peak Daoist sect, yang/external sword
-// styled around dawn-sun precision. Leadership caps at T3.
+// Taishan disciple ranks. T3 sect — eastern peak Daoist, yang/external
+// sword styled around dawn-sun precision. Compressed 5-rank ladder.
 const TAISHAN: SectMembershipDef = {
   id: "taishan",
   name: "ไท่ซาน",
   hallLocationId: "sect_taishan",
   registrarNpcId: "sect_taishan_master_tianmen",
   joinRequirements: { t: "trait", trait: "evil", max: 10 },
-  startRank: 9,
+  startRank: 5,
   topRank: 1,
   rankUpCost: (targetRank) => {
     const table: Record<number, number> = {
-      8: 100, 7: 200, 6: 350, 5: 500, 4: 700, 3: 1000, 2: 1400, 1: 2000,
+      4: 100, 3: 250, 2: 500, 1: 1000,
     };
     return table[targetRank] ?? Infinity;
   },
   skillsByRank: {
-    9: ["tsh_basic_sword"],
-    8: ["tsh_dawn_strike"],
-    6: ["tsh_east_blade"],
-    4: ["tsh_sun_pierce"],
+    5: ["tsh_basic_sword"],
+    4: ["tsh_dawn_strike"],
+    3: ["tsh_east_blade"],
+    2: ["tsh_sun_pierce"],
   },
   artsByRank: {
-    9: ["t0_tsh_qi"],
-    7: ["t1_tsh_dawn"],
-    6: ["t2_tsh_peak"],
-    3: ["t3_tsh_sun"],
+    5: ["t0_tsh_qi"],
+    4: ["t1_tsh_dawn"],
+    3: ["t2_tsh_peak"],
+    1: ["t3_tsh_sun"],
   },
   questCooldownDays: 30,
 };
 
-// Hengshan South disciple ranks (เฮิงซาน — five-peaks sword sect). Yin/soft
-// speed-themed sword line. Leadership caps at T3.
+// Hengshan South disciple ranks (เฮิงซาน — five-peaks sword sect). T3 sect
+// — yin/soft speed-themed sword line. Compressed 5-rank ladder.
 const HENGSHAN_SOUTH: SectMembershipDef = {
   id: "hengshan_south",
   name: "เฮิงซาน",
   hallLocationId: "sect_hengshan_south",
   registrarNpcId: "sect_hengshan_south_master_modaxiansheng",
   joinRequirements: { t: "trait", trait: "evil", max: 10 },
-  startRank: 9,
+  startRank: 5,
   topRank: 1,
   rankUpCost: (targetRank) => {
     const table: Record<number, number> = {
-      8: 100, 7: 200, 6: 350, 5: 500, 4: 700, 3: 1000, 2: 1400, 1: 2000,
+      4: 100, 3: 250, 2: 500, 1: 1000,
     };
     return table[targetRank] ?? Infinity;
   },
   skillsByRank: {
-    9: ["hgs_basic_sword"],
-    8: ["hgs_dancing_step"],
-    6: ["hgs_five_peaks"],
-    4: ["hgs_swift_blade"],
+    5: ["hgs_basic_sword"],
+    4: ["hgs_dancing_step"],
+    3: ["hgs_five_peaks"],
+    2: ["hgs_swift_blade"],
   },
   artsByRank: {
-    9: ["t0_hgs_breath"],
-    7: ["t1_hgs_step"],
-    6: ["t2_hgs_cloud"],
-    3: ["t3_hgs_swift"],
+    5: ["t0_hgs_breath"],
+    4: ["t1_hgs_step"],
+    3: ["t2_hgs_cloud"],
+    1: ["t3_hgs_swift"],
   },
   questCooldownDays: 30,
 };
 
-// Hengshan North disciple ranks (เหิงซาน — Buddhist nun's order). Soft/
-// external defense + reflect themed sword line. Leadership caps at T3.
+// Hengshan North disciple ranks (เหิงซาน — Buddhist nun's order). T3 sect
+// — soft/external defense + reflect themed sword line. Compressed 5-rank.
 const HENGSHAN_NORTH: SectMembershipDef = {
   id: "hengshan_north",
   name: "เหิงซาน",
   hallLocationId: "sect_hengshan_north",
   registrarNpcId: "sect_hengshan_north_abbess_dingyi",
   joinRequirements: { t: "trait", trait: "evil", max: 10 },
-  startRank: 9,
+  startRank: 5,
   topRank: 1,
   rankUpCost: (targetRank) => {
     const table: Record<number, number> = {
-      8: 100, 7: 200, 6: 350, 5: 500, 4: 700, 3: 1000, 2: 1400, 1: 2000,
+      4: 100, 3: 250, 2: 500, 1: 1000,
     };
     return table[targetRank] ?? Infinity;
   },
   skillsByRank: {
-    9: ["hgn_basic_sword"],
-    8: ["hgn_dharma_guard"],
-    6: ["hgn_iron_robe"],
-    4: ["hgn_mirror_blade"],
+    5: ["hgn_basic_sword"],
+    4: ["hgn_dharma_guard"],
+    3: ["hgn_iron_robe"],
+    2: ["hgn_mirror_blade"],
   },
   artsByRank: {
-    9: ["t0_hgn_zen"],
-    7: ["t1_hgn_shield"],
-    6: ["t2_hgn_bell"],
-    3: ["t3_hgn_mirror"],
+    5: ["t0_hgn_zen"],
+    4: ["t1_hgn_shield"],
+    3: ["t2_hgn_bell"],
+    1: ["t3_hgn_mirror"],
   },
   questCooldownDays: 30,
 };
@@ -362,31 +361,33 @@ const QUANZHEN: SectMembershipDef = {
   hallLocationId: "sect_quanzhen",
   registrarNpcId: "sect_quanzhen_master_chongyang",
   joinRequirements: { t: "trait", trait: "evil", max: 10 },
-  startRank: 9,
+  // T3 sect — compressed 5-rank ladder. Reward layout:
+  //   rank 5 → T0 sword + T0 art (auto on join)
+  //   rank 4 → T1 sword + T1 art (auto)
+  //   rank 3 → T2 art qzzq (auto — sect's only T2 entry)
+  //   rank 2 → choose T3 weapon (sun fist OR sun sword)
+  //   rank 1 → choose T3 art (sun power OR ocean-yang dragon-slayer)
+  startRank: 5,
   topRank: 1,
   rankUpCost: (targetRank) => {
     const table: Record<number, number> = {
-      8: 100,
-      7: 200,
-      6: 350,
-      5: 500,
-      4: 700,
-      3: 1000,
-      2: 1400,
-      1: 2000,
+      4: 100,
+      3: 250,
+      2: 500,
+      1: 1000,
     };
     return table[targetRank] ?? Infinity;
   },
   skillsByRank: {
-    9: ["qz_heavy_sword"],     // T0 — auto on join
-    8: ["qz_hot_sword"],       // T1 — auto on rank-up
-    5: ["qz_sun_fist", "qz_sun_sword"], // T3 — choice
+    5: ["qz_heavy_sword"],     // T0 — auto on join
+    4: ["qz_hot_sword"],       // T1 — auto on rank-up
+    2: ["qz_sun_fist", "qz_sun_sword"], // T3 — choice
   },
   artsByRank: {
-    9: ["t0_qz_speed"],        // T0 — auto on join
-    7: ["t1_qz_horse"],        // T1 — auto
-    6: ["qzzq"],               // T2 — auto (existing breath)
-    2: ["t3_qz_sun", "t3_qz_dragon"], // T3 — choice (Quanzhen has no T4 art)
+    5: ["t0_qz_speed"],        // T0 — auto on join
+    4: ["t1_qz_horse"],        // T1 — auto
+    3: ["qzzq"],               // T2 — auto (existing breath)
+    1: ["t3_qz_sun", "t3_qz_dragon"], // T3 — choice (Quanzhen has no T4 art)
   },
   questCooldownDays: 30,
 };

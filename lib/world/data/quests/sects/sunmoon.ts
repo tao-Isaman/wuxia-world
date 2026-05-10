@@ -185,4 +185,100 @@ export const QUESTS_SUNMOON: readonly QuestDef[] = [
       { t: "sectPoints", sectId: "sunmoon", amount: 50 },
     ],
   },
+
+  {
+    id: "qst_sunmoon_sect_suntalisman",
+    name: "วัสดุยันต์ตะวัน",
+    description: "พิธีบูชาตะวันของพรรคต้องใช้กระดาษสาและหยกล้ำค่าเป็นวัสดุยันต์ — เก็บกระดาษสา 6 แผ่น และหยก 2 ก้อน",
+    briefSummary: "ส่งกระดาษสา 6 + หยก 2 · sect points +50",
+    type: "side",
+    sectId: "sunmoon",
+    giverNpcId: "sect_sunmoon_chief_dongfang",
+    prereqs: { t: "sectMember", sectId: "sunmoon" },
+    stages: [
+      {
+        id: "main",
+        description: "เก็บกระดาษสา 6 แผ่น · หยก 2 ก้อน",
+        autoAdvance: {
+          t: "and",
+          all: [
+            { t: "hasItem", itemId: "paper", count: 6 },
+            { t: "hasItem", itemId: "jade", count: 2 },
+          ],
+        },
+      },
+      { id: "report", description: "กลับไปรายงานเจ้าสำนัก" },
+    ],
+    rewards: [
+      { t: "gold", amount: 120 },
+      { t: "wExp", amount: 50 },
+      { t: "npcRelationship", npcId: "sect_sunmoon_chief_dongfang", amount: 3 },
+      { t: "sectPoints", sectId: "sunmoon", amount: 50 },
+    ],
+  },
+
+  {
+    id: "qst_sunmoon_sect_purgespies",
+    name: "กำจัดสายลับฝ่ายธรรมะ",
+    description: "ฝ่ายธรรมะส่งสายลับเข้ามาแฝงตัวเป็นโจรเพื่อสืบความลับของพรรค — กำจัดสายลับ 3 คนและเก็บเหรียญโบราณที่พวกมันถือมา 2 เหรียญเป็นหลักฐาน",
+    briefSummary: "ปราบโจร 3 + เก็บเหรียญโบราณ 2 · sect points +65",
+    type: "side",
+    sectId: "sunmoon",
+    giverNpcId: "sect_sunmoon_chief_dongfang",
+    prereqs: { t: "sectMember", sectId: "sunmoon" },
+    stages: [
+      {
+        id: "purge",
+        description: "ปราบโจร (bandit) 3 คน",
+        autoAdvance: { t: "defeatedOpponent", opponentId: "bandit", count: 3 },
+      },
+      {
+        id: "evidence",
+        description: "เก็บเหรียญโบราณ 2 เหรียญ",
+        autoAdvance: { t: "hasItem", itemId: "ancient_coin", count: 2 },
+      },
+      { id: "report", description: "กลับไปรายงานเจ้าสำนัก" },
+    ],
+    rewards: [
+      { t: "gold", amount: 150 },
+      { t: "wExp", amount: 60 },
+      { t: "npcRelationship", npcId: "sect_sunmoon_chief_dongfang", amount: 4 },
+      { t: "sectPoints", sectId: "sunmoon", amount: 65 },
+    ],
+  },
+
+  {
+    id: "qst_sunmoon_sect_yinyang_elixir",
+    name: "วัสดุโอสถหยินหยาง",
+    description: "ห้องปรุงโอสถของพรรคต้องการวัตถุดิบสำหรับโอสถหยินหยาง — โสมเป็นพลังหยาง บัวหิมะเป็นพลังหยิน และเม็ดบัวสำหรับเชื่อมประสานทั้งสอง",
+    briefSummary: "ส่งโสม 5 + บัวหิมะ 1 + เม็ดบัว 5 · sect points +70",
+    type: "side",
+    sectId: "sunmoon",
+    giverNpcId: "sect_sunmoon_chief_dongfang",
+    prereqs: { t: "sectMember", sectId: "sunmoon" },
+    stages: [
+      {
+        id: "yang",
+        description: "เก็บโสม 5 ราก (พลังหยาง)",
+        autoAdvance: { t: "hasItem", itemId: "ginseng", count: 5 },
+      },
+      {
+        id: "yin",
+        description: "เก็บบัวหิมะ 1 ดอก (พลังหยิน)",
+        autoAdvance: { t: "hasItem", itemId: "snow_lotus", count: 1 },
+      },
+      {
+        id: "bind",
+        description: "เก็บเม็ดบัว 5 ฝัก เชื่อมประสาน",
+        autoAdvance: { t: "hasItem", itemId: "lotus_seed", count: 5 },
+      },
+      { id: "report", description: "ส่งวัตถุดิบให้ห้องโอสถของสำนัก" },
+    ],
+    rewards: [
+      { t: "gold", amount: 170 },
+      { t: "wExp", amount: 70 },
+      { t: "npcRelationship", npcId: "sect_sunmoon_chief_dongfang", amount: 4 },
+      { t: "sectPoints", sectId: "sunmoon", amount: 70 },
+    ],
+  },
 ];

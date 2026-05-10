@@ -10,6 +10,7 @@ import { RECIPES_BY_ID } from "./data/recipes";
 import { SKILLS_BY_ID } from "@/lib/game/data/skills";
 import { ARTS_BY_ID } from "@/lib/game/data/arts";
 import { EQUIPMENT_BY_ID } from "@/lib/game/data/equipment";
+import { SECT_MEMBERSHIPS } from "./data/sect-memberships";
 import {
   deriveAll,
   SKILL_LEVEL_MAX,
@@ -351,5 +352,23 @@ export function validateAndRepair(state: WorldStateData): void {
       learnedArtIds: dedupedArts,
       artLevels: cleanLevels,
     };
+  }
+
+  // Sect membership rank clamp. The T3 sects (Huashan, Quanzhen, Songshan,
+  // Taishan, Hengshan_south, Hengshan_north) were compressed from 9-rank
+  // (9 → 1) to 5-rank (5 → 1). Stale saves may carry rank > startRank;
+  // clamp them down so rank-up + auto-grant logic doesn't soft-lock.
+  for (const [id, m] of Object.entries(state.sectMembership ?? {})) {
+    const def = SECT_MEMBERSHIPS[id as keyof typeof SECT_MEMBERSHIPS];
+    if (!def) continue;
+    if (typeof m.rank === "number" && m.rank > def.startRank) {
+      console.warn(
+        `[world] sectMembership.${id} rank ${m.rank} > startRank ${def.startRank} — clamping`,
+      );
+      m.rank = def.startRank;
+    }
+    if (typeof m.rank === "number" && m.rank < def.topRank) {
+      m.rank = def.topRank;
+    }
   }
 }

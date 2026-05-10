@@ -158,13 +158,13 @@ export const QUESTS_HENGSHAN_NORTH: readonly QuestDef[] = [
     type: "side",
     sectId: "hengshan_north",
     isArtQuest: true,
-    minSectRank: 5,
+    minSectRank: 3,
     giverNpcId: "sect_hengshan_north_abbess_dingyi",
     prereqs: {
       t: "and",
       all: [
         { t: "sectMember", sectId: "hengshan_north" },
-        { t: "sectRankAtLeast", sectId: "hengshan_north", maxRank: 5 },
+        { t: "sectRankAtLeast", sectId: "hengshan_north", maxRank: 3 },
       ],
     },
     stages: [

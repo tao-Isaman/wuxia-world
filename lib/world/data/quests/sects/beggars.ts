@@ -243,4 +243,107 @@ export const QUESTS_BEGGARS: readonly QuestDef[] = [
       { t: "sectPoints", sectId: "beggars", amount: 50 },
     ],
   },
+
+  {
+    id: "qst_beggars_sect_thug_road",
+    name: "กำราบโจรริมทาง",
+    description: "หัวหน้าหงเทียนได้ข่าวว่ามีโจรเร่ร่อนรังแกพ่อค้าและคนเดินทางตามชายป่า — ขอให้ปราบและนำเหรียญที่โจรขโมยไปคืน",
+    briefSummary: "ปราบโจรเร่ร่อน 4 + เหรียญโบราณ 1 · sect points +65",
+    type: "side",
+    sectId: "beggars",
+    giverNpcId: "sect_beggars_chief_hongtian",
+    prereqs: { t: "sectMember", sectId: "beggars" },
+    stages: [
+      {
+        id: "fight",
+        description: "ปราบโจรเร่ร่อน (thug) 4 คน",
+        autoAdvance: { t: "defeatedOpponent", opponentId: "thug", count: 4 },
+      },
+      {
+        id: "recover",
+        description: "เก็บเหรียญโบราณ 1 เหรียญที่โจรปล้นไป",
+        autoAdvance: { t: "hasItem", itemId: "ancient_coin", count: 1 },
+      },
+      {
+        id: "report",
+        description: "กลับไปรายงานหัวหน้าหงเทียน",
+      },
+    ],
+    rewards: [
+      { t: "gold", amount: 150 },
+      { t: "wExp", amount: 60 },
+      { t: "trait", trait: "good", amount: 2 },
+      { t: "npcRelationship", npcId: "sect_beggars_chief_hongtian", amount: 3 },
+      { t: "sectPoints", sectId: "beggars", amount: 65 },
+    ],
+  },
+
+  {
+    id: "qst_beggars_sect_supplies",
+    name: "รวบรวมเสบียงและผ้าให้คนยากไร้",
+    description: "ฤดูหนาวใกล้มาถึง — พรรคยาจกจะแจกข้าวและผ้าให้คนยากไร้ในตรอก หัวหน้าขอให้ช่วยรวบรวมข้าวห่อและผ้าไหมเก่าให้พอแจก",
+    briefSummary: "ส่งข้าวห่อ 6 + ผ้าไหม 4 · sect points +70",
+    type: "side",
+    sectId: "beggars",
+    giverNpcId: "sect_beggars_chief_hongtian",
+    prereqs: { t: "sectMember", sectId: "beggars" },
+    stages: [
+      {
+        id: "gather_food",
+        description: "รวบรวมข้าวห่อ 6 ห่อ",
+        autoAdvance: { t: "hasItem", itemId: "rice_dish", count: 6 },
+      },
+      {
+        id: "gather_silk",
+        description: "หาผ้าไหม 4 ผืนสำหรับห่อกันหนาว",
+        autoAdvance: { t: "hasItem", itemId: "silk", count: 4 },
+      },
+      {
+        id: "report",
+        description: "ส่งเสบียงให้หัวหน้าหงเทียนนำไปแจก",
+      },
+    ],
+    rewards: [
+      { t: "gold", amount: 160 },
+      { t: "wExp", amount: 70 },
+      { t: "trait", trait: "good", amount: 4 },
+      { t: "npcRelationship", npcId: "sect_beggars_chief_hongtian", amount: 3 },
+      { t: "sectPoints", sectId: "beggars", amount: 70 },
+    ],
+  },
+
+  {
+    id: "qst_beggars_sect_village_delivery",
+    name: "ส่งของยังหมู่บ้านอดอยาก",
+    description: "หมู่บ้านชายแดนกำลังประสบภัยอดอยาก — หัวหน้าหงเทียนขอให้นำเนื้อย่างไปส่งและเอาข้าวห่อแจกชาวบ้าน",
+    briefSummary: "ส่งเนื้อย่าง 5 + ข้าวห่อ 4 · sect points +60",
+    type: "side",
+    sectId: "beggars",
+    giverNpcId: "sect_beggars_chief_hongtian",
+    prereqs: { t: "sectMember", sectId: "beggars" },
+    stages: [
+      {
+        id: "main",
+        description: "เก็บเนื้อย่าง 5 ชิ้น + ข้าวห่อ 4 ห่อ",
+        autoAdvance: {
+          t: "and",
+          all: [
+            { t: "hasItem", itemId: "cooked_meat", count: 5 },
+            { t: "hasItem", itemId: "rice_dish", count: 4 },
+          ],
+        },
+      },
+      {
+        id: "report",
+        description: "กลับไปรายงานหัวหน้าหงเทียน",
+      },
+    ],
+    rewards: [
+      { t: "gold", amount: 130 },
+      { t: "wExp", amount: 60 },
+      { t: "trait", trait: "good", amount: 3 },
+      { t: "npcRelationship", npcId: "sect_beggars_chief_hongtian", amount: 3 },
+      { t: "sectPoints", sectId: "beggars", amount: 60 },
+    ],
+  },
 ];

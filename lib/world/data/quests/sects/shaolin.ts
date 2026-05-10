@@ -422,4 +422,67 @@ export const QUESTS_SHAOLIN: readonly QuestDef[] = [
       { t: "npcRelationship", npcId: "sect_shaolin_abbot_huiyuan", amount: 10 },
     ],
   },
+
+  {
+    id: "qst_shaolin_sect_protect_village",
+    name: "ปกป้องชาวบ้านจากโจร",
+    description: "ชาวบ้านใกล้เขาซงซานร้องขอความช่วยเหลือ — โจรลอบเข้ารังแกชาวนาผู้ยากไร้ เจ้าอาวาสสั่งให้ศิษย์เส้าหลินกำราบโจรและนำอาหารไปแจกชาวบ้าน",
+    briefSummary: "ปราบโจร 3 คน + นำข้าวหมูแดง 5 จานแจกชาวบ้าน · sect points +65",
+    type: "side",
+    sectId: "shaolin",
+    giverNpcId: "sect_shaolin_abbot_huiyuan",
+    prereqs: { t: "sectMember", sectId: "shaolin" },
+    stages: [
+      {
+        id: "fight_bandits",
+        description: "ปราบโจร (bandit) 3 คน",
+        autoAdvance: { t: "defeatedOpponent", opponentId: "bandit", count: 3 },
+      },
+      {
+        id: "gather_food",
+        description: "หาข้าวหมูแดง 5 จานแจกชาวบ้าน",
+        autoAdvance: { t: "hasItem", itemId: "rice_dish", count: 5 },
+      },
+      {
+        id: "report",
+        description: "กลับไปรายงานเจ้าอาวาส",
+      },
+    ],
+    rewards: [
+      { t: "gold", amount: 150 },
+      { t: "wExp", amount: 60 },
+      { t: "trait", trait: "good", amount: 2 },
+      { t: "npcRelationship", npcId: "sect_shaolin_abbot_huiyuan", amount: 3 },
+      { t: "sectPoints", sectId: "shaolin", amount: 65 },
+    ],
+  },
+
+  {
+    id: "qst_shaolin_sect_sutra_paper",
+    name: "กระดาษคัดลอกพระสูตร",
+    description: "หอพระสูตรของวัดเส้าหลินขาดกระดาษสำหรับคัดลอกพระไตรปิฎก เจ้าอาวาสฮุยหยวนขอให้ศิษย์ออกหากระดาษคุณภาพดีจากเมืองใกล้เคียง",
+    briefSummary: "ส่งกระดาษ 6 แผ่นเข้าหอพระสูตร · sect points +50",
+    type: "side",
+    sectId: "shaolin",
+    giverNpcId: "sect_shaolin_abbot_huiyuan",
+    prereqs: { t: "sectMember", sectId: "shaolin" },
+    stages: [
+      {
+        id: "main",
+        description: "หากระดาษ 6 แผ่น",
+        autoAdvance: { t: "hasItem", itemId: "paper", count: 6 },
+      },
+      {
+        id: "report",
+        description: "ส่งกระดาษให้เจ้าอาวาส",
+      },
+    ],
+    rewards: [
+      { t: "gold", amount: 110 },
+      { t: "wExp", amount: 50 },
+      { t: "trait", trait: "humility", amount: 1 },
+      { t: "npcRelationship", npcId: "sect_shaolin_abbot_huiyuan", amount: 3 },
+      { t: "sectPoints", sectId: "shaolin", amount: 50 },
+    ],
+  },
 ];

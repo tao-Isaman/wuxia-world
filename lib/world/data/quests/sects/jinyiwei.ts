@@ -185,4 +185,91 @@ export const QUESTS_JINYIWEI: readonly QuestDef[] = [
       { t: "sectPoints", sectId: "jinyiwei", amount: 50 },
     ],
   },
+
+  {
+    id: "qst_jinyiwei_sect_thugs",
+    name: "กวาดล้างตลาดหลวง",
+    description: "พวกอันธพาลเริ่มเก็บค่าคุ้มครองในตลาดหลวง — ผู้บัญชาการจ้าวฝู่สั่งให้ศิษย์ออกไปกวาดล้างและนำสันติกลับสู่ตลาด",
+    briefSummary: "ปราบโจรเร่ร่อน 5 คน · sect points +50",
+    type: "side",
+    sectId: "jinyiwei",
+    giverNpcId: "sect_jinyiwei_leader_zhao",
+    prereqs: { t: "sectMember", sectId: "jinyiwei" },
+    stages: [
+      { id: "main", description: "ปราบโจรเร่ร่อน (thug) 5 คน", autoAdvance: { t: "defeatedOpponent", opponentId: "thug", count: 5 } },
+      { id: "report", description: "กลับไปรายงานผู้บัญชาการ" },
+    ],
+    rewards: [
+      { t: "gold", amount: 120 },
+      { t: "wExp", amount: 50 },
+      { t: "npcRelationship", npcId: "sect_jinyiwei_leader_zhao", amount: 3 },
+      { t: "sectPoints", sectId: "jinyiwei", amount: 50 },
+    ],
+  },
+
+  {
+    id: "qst_jinyiwei_sect_intel",
+    name: "รวบรวมข่าวกรอง",
+    description: "กรมต้องการเขียนรายงานลับให้ราชสำนัก — เก็บกระดาษและหมึกพร้อมเหรียญโบราณที่ใช้เป็นรหัสในการส่งสาร",
+    briefSummary: "ส่งกระดาษ 8 + หมึก 6 + เหรียญโบราณ 2 · sect points +70",
+    type: "side",
+    sectId: "jinyiwei",
+    giverNpcId: "sect_jinyiwei_leader_zhao",
+    prereqs: { t: "sectMember", sectId: "jinyiwei" },
+    stages: [
+      {
+        id: "gather_paper",
+        description: "เก็บกระดาษ 8 ชิ้น + หมึก 6 ชิ้น",
+        autoAdvance: {
+          t: "and",
+          all: [
+            { t: "hasItem", itemId: "paper", count: 8 },
+            { t: "hasItem", itemId: "ink", count: 6 },
+          ],
+        },
+      },
+      {
+        id: "gather_coin",
+        description: "หาเหรียญโบราณ 2 เหรียญสำหรับเป็นรหัสลับ",
+        autoAdvance: { t: "hasItem", itemId: "ancient_coin", count: 2 },
+      },
+      { id: "deliver", description: "ส่งทั้งหมดให้ผู้บัญชาการ" },
+    ],
+    rewards: [
+      { t: "gold", amount: 160 },
+      { t: "wExp", amount: 70 },
+      { t: "npcRelationship", npcId: "sect_jinyiwei_leader_zhao", amount: 4 },
+      { t: "sectPoints", sectId: "jinyiwei", amount: 70 },
+    ],
+  },
+
+  {
+    id: "qst_jinyiwei_sect_fugitive",
+    name: "ตามจับโจรหนีหมายจับ",
+    description: "หัวหน้าโจรหลบหนีจากเขตหลวงพร้อมขโมยเหรียญลับของกรมไป — ตามจับเขามาและนำเหรียญกลับคืน",
+    briefSummary: "ปราบหัวหน้าโจร 3 คน + คืนเหรียญโบราณ 3 · sect points +65",
+    type: "side",
+    sectId: "jinyiwei",
+    giverNpcId: "sect_jinyiwei_leader_zhao",
+    prereqs: { t: "sectMember", sectId: "jinyiwei" },
+    stages: [
+      {
+        id: "hunt",
+        description: "ปราบหัวหน้าโจร (bandit_chief) 3 คน",
+        autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 3 },
+      },
+      {
+        id: "recover",
+        description: "นำเหรียญโบราณ 3 เหรียญคืนกรม",
+        autoAdvance: { t: "hasItem", itemId: "ancient_coin", count: 3 },
+      },
+      { id: "report", description: "กลับไปรายงานผู้บัญชาการจ้าวฝู่" },
+    ],
+    rewards: [
+      { t: "gold", amount: 150 },
+      { t: "wExp", amount: 60 },
+      { t: "npcRelationship", npcId: "sect_jinyiwei_leader_zhao", amount: 3 },
+      { t: "sectPoints", sectId: "jinyiwei", amount: 65 },
+    ],
+  },
 ];

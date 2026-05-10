@@ -140,13 +140,13 @@ export const QUESTS_HENGSHAN_SOUTH: readonly QuestDef[] = [
     type: "side",
     sectId: "hengshan_south",
     isArtQuest: true,
-    minSectRank: 5,
+    minSectRank: 3,
     giverNpcId: "sect_hengshan_south_master_modaxiansheng",
     prereqs: {
       t: "and",
       all: [
         { t: "sectMember", sectId: "hengshan_south" },
-        { t: "sectRankAtLeast", sectId: "hengshan_south", maxRank: 5 },
+        { t: "sectRankAtLeast", sectId: "hengshan_south", maxRank: 3 },
       ],
     },
     stages: [

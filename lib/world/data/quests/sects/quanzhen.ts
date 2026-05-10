@@ -116,13 +116,13 @@ export const QUESTS_QUANZHEN: readonly QuestDef[] = [
     type: "side",
     sectId: "quanzhen",
     isArtQuest: true,
-    minSectRank: 5,
+    minSectRank: 3,
     giverNpcId: "sect_quanzhen_master_chongyang",
     prereqs: {
       t: "and",
       all: [
         { t: "sectMember", sectId: "quanzhen" },
-        { t: "sectRankAtLeast", sectId: "quanzhen", maxRank: 5 },
+        { t: "sectRankAtLeast", sectId: "quanzhen", maxRank: 3 },
       ],
     },
     stages: [

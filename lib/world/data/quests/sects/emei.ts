@@ -250,4 +250,106 @@ export const QUESTS_EMEI: readonly QuestDef[] = [
       { t: "sectPoints", sectId: "emei", amount: 50 },
     ],
   },
+
+  {
+    id: "qst_emei_sect_bandit_clear",
+    name: "กวาดล้างโจรเชิงเขาง้อไบ๊",
+    description: "มีโจรกลุ่มหนึ่งตั้งซ่องเชิงเขาง้อไบ๊ ดักรีดไถผู้แสวงบุญที่ขึ้นมาไหว้พระ — ท่านนิ้วขอให้ปราบและนำสมุนไพรหายากที่โจรปล้นมาคืน",
+    briefSummary: "ปราบโจรป่า 3 คน + เก็บสมุนไพรหายาก 4 ชิ้น · sect points +60",
+    type: "side",
+    sectId: "emei",
+    giverNpcId: "sect_emei_abbess_jingchan",
+    prereqs: { t: "sectMember", sectId: "emei" },
+    stages: [
+      {
+        id: "fight",
+        description: "ปราบโจรป่า (bandit) 3 คน",
+        autoAdvance: { t: "defeatedOpponent", opponentId: "bandit", count: 3 },
+      },
+      {
+        id: "gather",
+        description: "เก็บสมุนไพรหายาก 4 ชิ้นที่โจรปล้นไป",
+        autoAdvance: { t: "hasItem", itemId: "herb", count: 4 },
+      },
+      {
+        id: "report",
+        description: "กลับไปรายงานท่านนิ้วจิงฉาน",
+      },
+    ],
+    rewards: [
+      { t: "gold", amount: 140 },
+      { t: "wExp", amount: 60 },
+      { t: "trait", trait: "good", amount: 2 },
+      { t: "npcRelationship", npcId: "sect_emei_abbess_jingchan", amount: 3 },
+      { t: "sectPoints", sectId: "emei", amount: 60 },
+    ],
+  },
+
+  {
+    id: "qst_emei_sect_snowlotus",
+    name: "บัวหิมะยอดเขาง้อไบ๊",
+    description: "ห้องยาของง้อไบ๊กำลังปรุงยาฟื้นฟูจิตให้แม่ชีรุ่นเก่า — ต้องใช้บัวหิมะและโสมในปริมาณมาก เก็บมาให้ครบเพื่อช่วยเหล่าแม่ชี",
+    briefSummary: "ส่งบัวหิมะ 2 + โสม 6 · sect points +70",
+    type: "side",
+    sectId: "emei",
+    giverNpcId: "sect_emei_abbess_jingchan",
+    prereqs: { t: "sectMember", sectId: "emei" },
+    stages: [
+      {
+        id: "gather_snow",
+        description: "เก็บบัวหิมะ 2 ดอกจากยอดเขาสูง",
+        autoAdvance: { t: "hasItem", itemId: "snow_lotus", count: 2 },
+      },
+      {
+        id: "gather_ginseng",
+        description: "เก็บโสม 6 รากเสริมยา",
+        autoAdvance: { t: "hasItem", itemId: "ginseng", count: 6 },
+      },
+      {
+        id: "report",
+        description: "ส่งสมุนไพรให้ห้องยาง้อไบ๊",
+      },
+    ],
+    rewards: [
+      { t: "gold", amount: 170 },
+      { t: "wExp", amount: 70 },
+      { t: "npcRelationship", npcId: "sect_emei_abbess_jingchan", amount: 3 },
+      { t: "sectPoints", sectId: "emei", amount: 70 },
+    ],
+  },
+
+  {
+    id: "qst_emei_sect_pill_delivery",
+    name: "ส่งยาให้หมอชาวบ้าน",
+    description: "ท่านนิ้วจิงฉานปรุงยาแก้ไข้เสร็จแล้ว — ต้องการกระดาษสาห่อยาและเม็ดบัวเพื่อปรุงเป็นเม็ดยาส่งให้หมอชาวบ้านที่เชิงเขา",
+    briefSummary: "ส่งกระดาษสา 6 + เม็ดบัว 5 · sect points +50",
+    type: "side",
+    sectId: "emei",
+    giverNpcId: "sect_emei_abbess_jingchan",
+    prereqs: { t: "sectMember", sectId: "emei" },
+    stages: [
+      {
+        id: "main",
+        description: "เก็บกระดาษสา 6 แผ่น + เม็ดบัว 5 เม็ด",
+        autoAdvance: {
+          t: "and",
+          all: [
+            { t: "hasItem", itemId: "paper", count: 6 },
+            { t: "hasItem", itemId: "lotus_seed", count: 5 },
+          ],
+        },
+      },
+      {
+        id: "report",
+        description: "ส่งของให้ท่านนิ้วจิงฉานปรุงยา",
+      },
+    ],
+    rewards: [
+      { t: "gold", amount: 110 },
+      { t: "wExp", amount: 50 },
+      { t: "trait", trait: "good", amount: 2 },
+      { t: "npcRelationship", npcId: "sect_emei_abbess_jingchan", amount: 3 },
+      { t: "sectPoints", sectId: "emei", amount: 50 },
+    ],
+  },
 ];

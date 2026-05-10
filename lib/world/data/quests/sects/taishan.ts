@@ -140,13 +140,13 @@ export const QUESTS_TAISHAN: readonly QuestDef[] = [
     type: "side",
     sectId: "taishan",
     isArtQuest: true,
-    minSectRank: 5,
+    minSectRank: 3,
     giverNpcId: "sect_taishan_master_tianmen",
     prereqs: {
       t: "and",
       all: [
         { t: "sectMember", sectId: "taishan" },
-        { t: "sectRankAtLeast", sectId: "taishan", maxRank: 5 },
+        { t: "sectRankAtLeast", sectId: "taishan", maxRank: 3 },
       ],
     },
     stages: [
