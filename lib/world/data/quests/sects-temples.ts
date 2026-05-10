@@ -2488,4 +2488,58 @@ export const QUESTS_SECTS_TEMPLES: readonly QuestDef[] = [
       { t: "npcRelationship", npcId: "sect_tang_chief_tangmen", amount: 20 },
     ],
   },
+
+  // ──────────────────────────────────────────────────────────────────────
+  // Redemption quests — one per joinable sect. Available ONLY when the
+  // player has betrayed that sect. Hard trial (defeat 5 bandit chiefs +
+  // bring rare items). Reward: clears the betrayer status (sets to
+  // "resigned" — hunters stop spawning, but skills permanently freeze).
+  // ──────────────────────────────────────────────────────────────────────
+
+  ...([
+    ["shaolin",   "sect_shaolin_abbot_huiyuan",     "เส้าหลิน",          "ginseng"],
+    ["wudang",    "sect_wudang_master_qingxu",      "อู่ตัง",            "snow_lotus"],
+    ["huashan",   "sect_huashan_master_yiqing",     "หัวซาน",           "iron_ore"],
+    ["quanzhen",  "sect_quanzhen_master_chongyang", "ฉวนเจิน",           "paper"],
+    ["emei",      "sect_emei_abbess_jingchan",      "ง้อไบ๊",            "lotus_seed"],
+    ["gumu",      "sect_gumu_mystery_woman",        "กู่มู่",            "snow_lotus"],
+    ["beggars",   "sect_beggars_chief_hongtian",    "พรรคยาจก",         "rice_dish"],
+    ["jinyiwei",  "sect_jinyiwei_leader_zhao",      "องครักษ์เสื้อแพร",  "iron_ingot"],
+    ["sunmoon",   "sect_sunmoon_chief_dongfang",    "พรรคตะวันจันทรา",   "ancient_coin"],
+    ["tang",      "sect_tang_chief_tangmen",        "สำนักสุลถัง",       "centipede_venom"],
+  ] as const).map(([sectId, npcId, sectName, gatherItem]) => ({
+    id: `qst_${sectId}_redemption`,
+    name: `ไถ่บาปต่อ${sectName}`,
+    description: `เจ้าผู้ทรยศกลับมาขออภัย — เจ้าสำนัก${sectName}ทดสอบความจริงใจเจ้าด้วยภารกิจหนัก ปราบหัวหน้าโจร 5 คนและนำของล้ำค่าของสำนักมาถวาย หากผ่าน ความเป็นทรยศจะถูกล้างเป็น "ลาออก" — นักล่าจะหยุดตามล่า แต่วิชาจะถูกแช่แข็ง`,
+    briefSummary: `ไถ่บาปต่อ${sectName} — ปราบหัวหน้าโจร 5 + ส่งของถวาย 5 ชิ้น`,
+    type: "side" as const,
+    sectId: sectId as import("../../types").SectId,
+    giverNpcId: npcId,
+    prereqs: { t: "sectStatus" as const, sectId: sectId as import("../../types").SectId, status: "betrayed" as const },
+    stages: [
+      {
+        id: "trial_kill",
+        description: "ปราบหัวหน้าโจร (bandit_chief) 5 คน เพื่อพิสูจน์ใจ",
+        autoAdvance: { t: "defeatedOpponent" as const, opponentId: "bandit_chief", count: 5 },
+      },
+      {
+        id: "trial_offering",
+        description: `นำของถวาย — ${gatherItem} 5 ชิ้น`,
+        autoAdvance: { t: "hasItem" as const, itemId: gatherItem, count: 5 },
+      },
+      {
+        id: "return_to_master",
+        description: `กลับไปขออภัยต่อเจ้าสำนัก${sectName}`,
+      },
+    ],
+    rewards: [
+      { t: "wExp" as const, amount: 300 },
+      { t: "trait" as const, trait: "humility" as const, amount: 8 },
+      // Clear the betrayer status — `resignSect` reward sets status to
+      // "resigned" regardless of prior value, so this works as the
+      // forgiveness payload. Hunters stop spawning; skills stay frozen.
+      { t: "resignSect" as const, sectId: sectId as import("../../types").SectId },
+      { t: "npcRelationship" as const, npcId, amount: 10 },
+    ],
+  })),
 ];

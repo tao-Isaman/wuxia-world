@@ -55,7 +55,7 @@ import {
   type TraitKey,
   type WorldStateData,
 } from "@/lib/world";
-import { applyEffect, isSectQuestOfferable, tickQuestProgress } from "@/lib/world/effects";
+import { applyEffect, consumeQuestAutoItems, isSectQuestOfferable, tickQuestProgress } from "@/lib/world/effects";
 import { evaluateCondition } from "@/lib/world/conditions";
 import {
   SECT_MEMBERSHIPS,
@@ -347,6 +347,14 @@ interface WorldStore extends WorldStateData {
   ) => { ok: boolean; reason?: string };
   // Accept a sect quest (records lastQuestDay so the cooldown gate works).
   acceptSectQuest: (sectId: import("@/lib/world").SectId, questId: string) => { ok: boolean; reason?: string };
+  // Leave a sect — formal resignation. Membership stays as a tombstone
+  // for skill-XP freeze tracking. Player keeps current skill levels but
+  // can no longer level rewards earned from this sect.
+  resignSect: (sectId: import("@/lib/world").SectId) => { ok: boolean; reason?: string };
+  // Leave a sect — defection. Skills stay learnable but the sect's
+  // hunter NPC may ambush in random events. Cleared by the redemption
+  // quest (qst_<sectId>_redemption).
+  betraySect: (sectId: import("@/lib/world").SectId) => { ok: boolean; reason?: string };
   makeChoice: (idx: number) => void;
   gotoScene: (sceneId: string) => void;
   // Used by the "ปิด" button on terminal dialogs and by the route-screen
@@ -571,6 +579,28 @@ function rollLukXp(state: WorldStateData): void {
   if (Math.random() < lukRollChance(base)) {
     grantStatXp(state, "LUK", STAT_XP_PER_ACTION);
   }
+}
+
+// Returns true if the skill / art was granted via a sect's reward chain
+// AND that sect's membership status is "resigned". Resigned skills /
+// arts retain their current level but never accumulate further XP —
+// the cost of formal resignation. Betrayed sects keep gaining XP (the
+// trade-off there is hunter ambushes elsewhere).
+function isSkillFrozen(state: WorldStateData, skillId: string): boolean {
+  for (const m of Object.values(state.sectMembership)) {
+    if (!m || m.status !== "resigned") continue;
+    for (const claimed of Object.values(m.rewardPicks)) {
+      if (claimed === skillId) return true;
+    }
+  }
+  return false;
+}
+
+function isArtFrozen(state: WorldStateData, artId: string): boolean {
+  // Same logic as isSkillFrozen — rewardPicks values store both skill
+  // and art ids (keyed by `${rank}-skill` vs `${rank}-art`), so a
+  // single id-equality check covers both.
+  return isSkillFrozen(state, artId);
 }
 
 // Auto-level a move skill while its xp pool allows. Caps at SKILL_LEVEL_MAX
@@ -1003,6 +1033,34 @@ export const useWorldStore = create<WorldStore>()(
         return { ok: true };
       },
 
+      resignSect: (sectId) => {
+        const s = get();
+        const m = s.sectMembership[sectId];
+        if (!m) return { ok: false, reason: "ไม่ได้เป็นศิษย์สำนักนี้" };
+        if ((m.status ?? "active") !== "active") return { ok: false, reason: "ไม่อยู่ในสถานะศิษย์ที่ออกได้" };
+        const draft = draftFrom(s);
+        applyEffect(draft, { t: "resignSect", sectId });
+        const def = SECT_MEMBERSHIPS[sectId];
+        appendActionLog(draft, "sect", `ลาออกอย่างเป็นทางการจากสำนัก${def.name} — วิชาที่ได้จากสำนักจะหยุดเลื่อนขั้น`);
+        set({ ...draft });
+        return { ok: true };
+      },
+
+      betraySect: (sectId) => {
+        const s = get();
+        const m = s.sectMembership[sectId];
+        if (!m) return { ok: false, reason: "ไม่ได้เป็นศิษย์สำนักนี้" };
+        if ((m.status ?? "active") !== "active") return { ok: false, reason: "ไม่อยู่ในสถานะศิษย์ที่ทรยศได้" };
+        const draft = draftFrom(s);
+        applyEffect(draft, { t: "betraySect", sectId });
+        // Betrayal is a moral wound — bumps evil + arrogance traits.
+        applyEffect(draft, { t: "addTrait", trait: "evil", amount: 5 });
+        const def = SECT_MEMBERSHIPS[sectId];
+        appendActionLog(draft, "sect", `ทรยศสำนัก${def.name} — ระวังนักล่าจากสำนักจะตามล่าเจ้าในที่ต่าง ๆ`);
+        set({ ...draft });
+        return { ok: true };
+      },
+
       makeChoice: (idx) => {
         const s = get();
         if (!s.hasGame || s.pendingBattle) return;
@@ -1112,10 +1170,16 @@ export const useWorldStore = create<WorldStore>()(
           const sk = getSkill(sid);
           if (!sk) continue;
           actionTotal += count;
-          draft.skillExp[sid] = (draft.skillExp[sid] ?? 0) + count * SKILL_USE_XP;
-          if (!(sid in draft.skillLevel)) draft.skillLevel[sid] = 1;
-          // Per-skill auto-level on overflow.
-          applySkillLevelUps(draft, sid);
+          // Skip XP entirely when the skill came from a sect the player
+          // has formally RESIGNED from. The skill remains usable at its
+          // current level but never grows further. Betrayed sects keep
+          // earning XP — the cost there is the random-event hunters.
+          if (!isSkillFrozen(draft, sid)) {
+            draft.skillExp[sid] = (draft.skillExp[sid] ?? 0) + count * SKILL_USE_XP;
+            if (!(sid in draft.skillLevel)) draft.skillLevel[sid] = 1;
+            // Per-skill auto-level on overflow.
+            applySkillLevelUps(draft, sid);
+          }
           // STR for physical attacks, POW for internal attacks. Non-attack
           // skills (pure buffs / debuffs / heals) grant nothing here.
           if (sk.at === "phy") {
@@ -1132,6 +1196,9 @@ export const useWorldStore = create<WorldStore>()(
           if (typeof count !== "number" || count <= 0) continue;
           const art = getArt(aid);
           if (!art || art.id === "none") continue;
+          // Same freeze rule as move skills — skip XP for arts learned
+          // from a resigned sect.
+          if (isArtFrozen(draft, aid)) continue;
           draft.artExp[aid] = (draft.artExp[aid] ?? 0) + count * ART_USE_XP;
           // Make sure an artLevels entry exists so applyArtLevelUps can
           // read a starting level — also covers legacy builds that learned
@@ -2073,9 +2140,39 @@ export const useWorldStore = create<WorldStore>()(
       fleeEncounter: () => {
         const s = get();
         if (!s.pendingEncounter) return;
-        // No combat: just discard the offer. The player stays at the
-        // location they were on, no stamina cost beyond the move that
-        // brought them here.
+        // Hunter encounters (opponentId starts with `hunter_`) require an
+        // AGI + LUK check to flee — the hunter is hand-picked to chase
+        // YOU, not just a random bandit. Formula: 30% base + (AGI+LUK)/2%.
+        // Cap 90% so a maxed-out player still has a small fail chance.
+        // Fail → forced into the fight (promote to pendingBattle).
+        const oppId = s.pendingEncounter.opponentId;
+        if (oppId.startsWith("hunter_")) {
+          const stats = s.playerBuild?.stats;
+          const agi = stats?.AGI ?? 0;
+          const luk = stats?.LUK ?? 0;
+          const chance = Math.min(90, 30 + (agi + luk) / 2);
+          const roll = Math.random() * 100;
+          if (roll >= chance) {
+            // Failed flee — fight is forced. Promote the encounter to
+            // a pendingBattle so the bridge spawns the hunter fight.
+            // onWin/onLose route back to the location the player rolled
+            // the encounter at (matches the normal accept-encounter flow).
+            const draft = draftFrom(s);
+            appendActionLog(draft, "encounter", `หนีนักล่าไม่สำเร็จ (${chance.toFixed(0)}% สำเร็จ) — ต้องสู้`);
+            const back = s.pendingEncounter.returnSceneId;
+            draft.pendingBattle = { opponentId: oppId, onWin: back, onLose: back };
+            draft.pendingEncounter = null;
+            set({ ...draft });
+            return;
+          }
+          // Successful flee — log it and clear.
+          const draft = draftFrom(s);
+          appendActionLog(draft, "encounter", `หนีนักล่าสำเร็จ (${chance.toFixed(0)}%)`);
+          draft.pendingEncounter = null;
+          set({ ...draft });
+          return;
+        }
+        // Normal encounter — flee is free.
         set({ pendingEncounter: null });
       },
 
@@ -2309,6 +2406,13 @@ export const useWorldStore = create<WorldStore>()(
         const cur = s.quests[questId];
         if (!cur || cur.status !== "active") return { ok: false, reason: "already-done" };
         const draft = draftFrom(s);
+        // Auto-consume gathered items BEFORE finishQuest fires (so the
+        // log entry can show what was taken). This is the popup turn-in
+        // path — no scene explicitly handles takeItem here, so the
+        // engine cleans up. Scene-driven completes still use explicit
+        // takeItem effects and never reach this code path.
+        const draftQ = draft.quests[questId];
+        if (draftQ) consumeQuestAutoItems(draft, def, draftQ);
         applyEffects(draft, [{ t: "finishQuest", questId, success: true }]);
         appendActionLog(draft, "quest", `สำเร็จภารกิจ: ${def.name}`);
         set({ ...draft });

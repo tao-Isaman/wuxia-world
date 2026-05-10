@@ -3,6 +3,7 @@ import type {
   QuestDef,
   QuestReward,
   SceneEffect,
+  SectMembership,
   WorldStateData,
 } from "./types";
 import { TRAIT_LABEL } from "./types";
@@ -57,7 +58,29 @@ export function applyEffect(state: WorldStateData, eff: SceneEffect): void {
       if (!def) return;
       // Idempotent: don't reset an already-active or completed quest.
       if (state.quests[eff.questId]) return;
-      state.quests[eff.questId] = { id: eff.questId, status: "active", stage: 0 };
+      // Snapshot cumulative counters so repeatable sect quests don't
+      // auto-complete on prior kills / inventory. Walk all stages'
+      // autoAdvance conditions to find the opponentIds + itemIds the
+      // quest cares about and pin their current values.
+      const defeatedSnap: Record<string, number> = {};
+      const hasItemSnap: Record<string, number> = {};
+      for (const stage of def.stages) {
+        if (!stage.autoAdvance) continue;
+        walkConditions(stage.autoAdvance, (c) => {
+          if (c.t === "defeatedOpponent") {
+            defeatedSnap[c.opponentId] = state.defeatedCounts[c.opponentId] ?? 0;
+          } else if (c.t === "hasItem") {
+            hasItemSnap[c.itemId] = state.inventory[c.itemId] ?? 0;
+          }
+        });
+      }
+      state.quests[eff.questId] = {
+        id: eff.questId,
+        status: "active",
+        stage: 0,
+        acceptedDefeatedAt: defeatedSnap,
+        acceptedHasItemAt: hasItemSnap,
+      };
       return;
     }
 
@@ -192,26 +215,52 @@ export function applyEffect(state: WorldStateData, eff: SceneEffect): void {
     }
 
     case "leaveSect": {
-      // Idempotent — no-op if not a member. Wipes the membership entry
-      // entirely (rank / points / quest cooldowns / claimed rewards all
-      // gone). The player keeps any skills / arts they already learned
-      // through the sect's reward chain — losing membership only revokes
-      // future progression hooks, not retroactively un-teaches vows.
-      delete state.sectMembership[eff.sectId];
+      // Legacy effect (originally used by the Gumu defection from
+      // Quanzhen). Maps to a clean "resigned" status — keeps the
+      // membership entry around for skill-freeze tracking but stops
+      // counting as an active disciple. New content should prefer
+      // `resignSect` / `betraySect` for the explicit semantic.
+      const m = state.sectMembership[eff.sectId];
+      if (!m) return;
+      m.status = "resigned";
+      return;
+    }
+
+    case "resignSect": {
+      // Formal resignation. Marks the membership "resigned" — keeps the
+      // entry so we can track which skills were granted via sect rewards
+      // (those skills are XP-frozen for resigned sects). Player can join
+      // a new sect.
+      const m = state.sectMembership[eff.sectId];
+      if (!m) return;
+      m.status = "resigned";
+      return;
+    }
+
+    case "betraySect": {
+      // Defection without leave. Marks "betrayed" — skills can still
+      // level up, BUT a sect-hunter NPC may ambush in random events.
+      // Cleared by completing the sect's redemption quest.
+      const m = state.sectMembership[eff.sectId];
+      if (!m) return;
+      m.status = "betrayed";
       return;
     }
 
     case "joinSect": {
       // Idempotent — if the player is already a member, do nothing.
+      // (Includes resigned / betrayed memberships — those slots stay
+      // permanently allocated to track skill-freeze + hunter state.)
       if (state.sectMembership[eff.sectId]) return;
       const def = SECT_MEMBERSHIPS[eff.sectId];
-      const m = {
+      const m: SectMembership = {
         rank: def.startRank,
         points: 0,
         lastQuestDay: {} as Record<string, number>,
         artQuestsDone: [] as string[],
         rewardPicks: {} as Record<string, string>,
         joinedDay: state.day,
+        status: "active",
       };
       state.sectMembership[eff.sectId] = m;
       // Auto-claim single-option rewards at the entry rank (e.g. Shaolin
@@ -289,6 +338,25 @@ export function applyEffect(state: WorldStateData, eff: SceneEffect): void {
             EVENT_PROBABILITY.meetCap,
             EVENT_PROBABILITY.meetBase + luk / EVENT_PROBABILITY.meetLukDivisor,
           );
+
+      // Sect-hunter ambush — 30% chance per random-event roll if the
+      // player has any "betrayed" sect membership. Picks one betrayed
+      // sect at random and spawns its `hunter_<sectId>` opponent.
+      // Overrides the normal fight roll entirely (treasure / meet are
+      // also skipped — a hunter doesn't care about flowers and herbs).
+      const betrayedSects: string[] = [];
+      for (const [sid, m] of Object.entries(state.sectMembership)) {
+        if (m && m.status === "betrayed") betrayedSects.push(sid);
+      }
+      if (betrayedSects.length > 0 && Math.random() < 0.3) {
+        const sid = betrayedSects[Math.floor(Math.random() * betrayedSects.length)]!;
+        state.flags._skipEventRoll = true;
+        state.pendingEncounter = {
+          opponentId: `hunter_${sid}`,
+          returnSceneId: state.lastLocationId,
+        };
+        return;
+      }
 
       const r = Math.random();
 
@@ -394,6 +462,12 @@ function applyQuestRewards(state: WorldStateData, rewards: readonly QuestReward[
       case "leaveSect":
         applyEffect(state, { t: "leaveSect", sectId: r.sectId });
         break;
+      case "resignSect":
+        applyEffect(state, { t: "resignSect", sectId: r.sectId });
+        break;
+      case "betraySect":
+        applyEffect(state, { t: "betraySect", sectId: r.sectId });
+        break;
     }
   }
 }
@@ -406,6 +480,83 @@ function applyQuestRewards(state: WorldStateData, rewards: readonly QuestReward[
 // Bounded loop — at most stages.length iterations per quest per call, so
 // no risk of runaway even if the player triggers many state changes
 // inside a single applyEffects batch.
+// Walk every leaf condition in a Condition tree, calling `cb` on each.
+// Used by quest snapshot collection + auto-consume — we need the
+// concrete defeatedOpponent / hasItem leaves nested inside and/or/not.
+function walkConditions(c: Condition, cb: (leaf: Condition) => void): void {
+  if (c.t === "and") {
+    for (const sub of c.all) walkConditions(sub, cb);
+  } else if (c.t === "or") {
+    for (const sub of c.any) walkConditions(sub, cb);
+  } else if (c.t === "not") {
+    walkConditions(c.of, cb);
+  } else {
+    cb(c);
+  }
+}
+
+// Delta-aware autoAdvance evaluator. For `defeatedOpponent` and
+// `hasItem` conditions, checks (current - snapshot) >= count instead
+// of cumulative count. This makes repeatable sect quests (e.g. "ปราบ
+// thug 2 คน") count only kills SINCE the player accepted the quest,
+// rather than auto-completing on prior kills the player already had.
+// All other conditions defer to the normal evaluateCondition.
+function evaluateAutoAdvance(
+  state: WorldStateData,
+  cond: Condition,
+  q: import("./types").QuestState,
+): boolean {
+  switch (cond.t) {
+    case "defeatedOpponent": {
+      const want = cond.count ?? 1;
+      const cur = state.defeatedCounts[cond.opponentId] ?? 0;
+      const snap = q.acceptedDefeatedAt?.[cond.opponentId] ?? 0;
+      return cur - snap >= want;
+    }
+    case "hasItem": {
+      const want = cond.count ?? 1;
+      const cur = state.inventory[cond.itemId] ?? 0;
+      const snap = q.acceptedHasItemAt?.[cond.itemId] ?? 0;
+      return cur - snap >= want;
+    }
+    case "and":
+      return cond.all.every((sub) => evaluateAutoAdvance(state, sub, q));
+    case "or":
+      return cond.any.some((sub) => evaluateAutoAdvance(state, sub, q));
+    case "not":
+      return !evaluateAutoAdvance(state, cond.of, q);
+    default:
+      return evaluateCondition(state, cond);
+  }
+}
+
+// Consume items the quest's autoAdvance hasItem conditions require.
+// Called from the auto-finish paths (tickQuestProgress done branch +
+// store's finishQuestNow) so popup turn-ins clean up gathered items.
+// Scene-driven completes still use explicit `takeItem` effects — this
+// helper only fires for engine-completed quests, so no double-consume.
+// Each itemId consumes `min(count, current - snapshot)` so the player
+// keeps any pre-existing stash from before they accepted the quest.
+export function consumeQuestAutoItems(
+  state: WorldStateData,
+  def: import("./types").QuestDef,
+  q: import("./types").QuestState,
+): void {
+  for (const stage of def.stages) {
+    if (!stage.autoAdvance) continue;
+    walkConditions(stage.autoAdvance, (c) => {
+      if (c.t !== "hasItem") return;
+      const want = c.count ?? 1;
+      const cur = state.inventory[c.itemId] ?? 0;
+      const snap = q.acceptedHasItemAt?.[c.itemId] ?? 0;
+      const take = Math.min(want, cur - snap, cur);
+      if (take <= 0) return;
+      state.inventory[c.itemId] = cur - take;
+      if (state.inventory[c.itemId] === 0) delete state.inventory[c.itemId];
+    });
+  }
+}
+
 export function tickQuestProgress(state: WorldStateData): void {
   for (const q of Object.values(state.quests)) {
     if (q.status !== "active") continue;
@@ -416,11 +567,14 @@ export function tickQuestProgress(state: WorldStateData): void {
       if (q.stage >= def.stages.length) break;
       const stage = def.stages[q.stage]!;
       if (!stage.autoAdvance) break;
-      if (!evaluateCondition(state, stage.autoAdvance)) break;
+      if (!evaluateAutoAdvance(state, stage.autoAdvance, q)) break;
       const next = q.stage + 1;
       if (next >= def.stages.length) {
         q.stage = def.stages.length - 1;
         q.status = "done";
+        // Auto-consume gathered items (popup turn-in style — no scene
+        // explicitly handles this finish, so the engine cleans up).
+        consumeQuestAutoItems(state, def, q);
         if (def.rewards) applyQuestRewards(state, def.rewards);
         recordSectQuestCompletion(state, def);
         break;

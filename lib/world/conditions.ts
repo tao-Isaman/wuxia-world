@@ -43,13 +43,25 @@ export function evaluateCondition(state: WorldStateData, c: Condition): boolean 
       return state.kidnappedNpcIds.includes(c.npcId);
     case "gender":
       return state.gender === c.equals;
-    case "sectMember":
-      return state.sectMembership[c.sectId] != null;
+    case "sectMember": {
+      // Only ACTIVE membership counts as "is a disciple". Resigned /
+      // betrayed memberships are tombstones for skill-freeze + hunter
+      // tracking and don't grant any sect benefits.
+      const m = state.sectMembership[c.sectId];
+      return m != null && (m.status ?? "active") === "active";
+    }
     case "anySectMember":
-      // Object.keys() is fine here — sectMembership is a small map
-      // (≤ SECT_ID count) and only mutated on join / leave. We don't
-      // care which sect, only "is the player affiliated with anything?"
-      return Object.keys(state.sectMembership).length > 0;
+      // Same gate — only active memberships count. Resigned / betrayed
+      // players can join a new sect freely.
+      for (const m of Object.values(state.sectMembership)) {
+        if (m && (m.status ?? "active") === "active") return true;
+      }
+      return false;
+    case "sectStatus": {
+      const m = state.sectMembership[c.sectId];
+      if (!m) return false;
+      return (m.status ?? "active") === c.status;
+    }
     case "sectRankAtLeast": {
       const m = state.sectMembership[c.sectId];
       if (!m) return false;

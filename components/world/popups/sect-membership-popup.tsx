@@ -37,18 +37,27 @@ export function SectMembershipPopup({ open, onClose }: Props) {
   const upgradeSectRank = useWorldStore((s) => s.upgradeSectRank);
   const pickSectReward = useWorldStore((s) => s.pickSectReward);
   const acceptSectQuest = useWorldStore((s) => s.acceptSectQuest);
+  const resignSect = useWorldStore((s) => s.resignSect);
+  const betraySect = useWorldStore((s) => s.betraySect);
   const day = useWorldStore((s) => s.day);
   // Subscribing to whole state for offer checks — popup is mounted only
   // while interacting with the sect tab so the read cost is fine.
   const worldState = useWorldStore();
 
+  // Only ACTIVE memberships are shown in this popup (resigned / betrayed
+  // tombstones are tracked silently for skill-XP freeze + hunter spawn).
   const joinedIds = useMemo(
     () =>
-      Object.keys(sectMembership).filter(
-        (k) => sectMembership[k as SectId],
-      ) as SectId[],
+      Object.keys(sectMembership).filter((k) => {
+        const m = sectMembership[k as SectId];
+        return m && (m.status ?? "active") === "active";
+      }) as SectId[],
     [sectMembership],
   );
+
+  // Two-step confirm for the ออกจากสำนัก button. `null` = closed; a
+  // sectId means the confirm modal is open for that sect.
+  const [leaveConfirm, setLeaveConfirm] = useState<SectId | null>(null);
 
   const [activeId, setActiveId] = useState<SectId | null>(joinedIds[0] ?? null);
   const [tab, setTab] = useState<Tab>("rewards");
@@ -178,6 +187,90 @@ export function SectMembershipPopup({ open, onClose }: Props) {
             onAccept={(qid) => acceptSectQuest(current, qid)}
           />
         )}
+      </div>
+
+      {/* ─── Leave sect ─────────────────────────────────────────────
+        * Disciple can either formally resign (skills freeze, no hunters)
+        * or betray (skills keep leveling but hunters spawn). Both clear
+        * `anySectMember` so the player can join another sect.
+        */}
+      <div className="mt-4 pt-3 border-t border-border flex justify-end">
+        <button
+          onClick={() => setLeaveConfirm(current)}
+          className="text-xs text-muted-foreground hover:text-destructive transition-colors"
+        >
+          🚪 ออกจากสำนัก
+        </button>
+      </div>
+
+      {/* Leave-sect confirm modal — overlays the parent popup. */}
+      {leaveConfirm && (
+        <LeaveSectConfirm
+          sectId={leaveConfirm}
+          sectName={SECT_MEMBERSHIPS[leaveConfirm].name}
+          onClose={() => setLeaveConfirm(null)}
+          onResign={() => {
+            resignSect(leaveConfirm);
+            setLeaveConfirm(null);
+            onClose();
+          }}
+          onBetray={() => {
+            betraySect(leaveConfirm);
+            setLeaveConfirm(null);
+            onClose();
+          }}
+        />
+      )}
+    </Modal>
+  );
+}
+
+// ─── Leave-sect confirm ──────────────────────────────────────────────
+// Two-choice confirmation. Resign = clean break (skills freeze, no
+// hunters). Betray = keep growing skills but a sect-hunter NPC may
+// ambush in random events (cleared by the redemption quest).
+function LeaveSectConfirm({
+  sectName,
+  onClose,
+  onResign,
+  onBetray,
+}: {
+  sectId: SectId;
+  sectName: string;
+  onClose: () => void;
+  onResign: () => void;
+  onBetray: () => void;
+}) {
+  return (
+    <Modal open onClose={onClose} title={`ออกจาก${sectName}`} maxWidth="max-w-md">
+      <div className="space-y-3 text-sm">
+        <p className="text-muted-foreground">
+          เลือกวิธีออกจากสำนัก — แต่ละทางเลือกมีผลแตกต่างกัน
+        </p>
+        <button
+          onClick={onResign}
+          className="w-full text-left p-3 border border-border hover:border-primary transition-colors"
+        >
+          <div className="font-semibold">ลาออกอย่างเป็นทางการ</div>
+          <div className="text-xs text-muted-foreground mt-1">
+            จากกันด้วยดี — ไม่มีนักล่ามาตามล่า · แต่วิชา / ลมปราณที่ได้จากสำนักจะหยุดเลื่อนขั้น (ระดับเดิมยังใช้ได้)
+          </div>
+        </button>
+        <button
+          onClick={onBetray}
+          className="w-full text-left p-3 border border-border hover:border-destructive text-destructive transition-colors"
+        >
+          <div className="font-semibold">ทรยศสำนัก</div>
+          <div className="text-xs text-muted-foreground mt-1">
+            หนีโดยไม่บอกใคร — วิชาจากสำนักยังเลื่อนขั้นได้ตามปกติ · แต่นักล่าจากสำนักจะตามล่าเจ้าในที่ต่าง ๆ (เช็กหนีด้วย AGI + LUK) · ล้างได้ด้วยภารกิจไถ่บาปกับเจ้าสำนัก
+          </div>
+        </button>
+        <button
+          onClick={onClose}
+          className="w-full text-center p-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
+        >
+          ยกเลิก
+        </button>
       </div>
     </Modal>
   );

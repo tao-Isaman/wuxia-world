@@ -165,11 +165,18 @@ export type SceneEffect =
   // Defaults to level 1 when omitted; same caveats as learnSkill.
   | { t: "learnArt"; artId: string; level?: number }
   // Sect membership operations.
-  // leaveSect: remove the player from the named sect. Idempotent (no-op
-  // if not a member). Used by the Ancient-Tomb intro to swap the player
-  // out of Quanzhen before joining the secret sect — a disciple can be
-  // loyal to one school at a time.
+  // leaveSect: legacy effect — maps to "resigned" status. Kept for the
+  // Gumu defection from Quanzhen. New content should use resignSect /
+  // betraySect for explicit semantics.
   | { t: "leaveSect"; sectId: SectId }
+  // resignSect: formal resignation. Membership stays as "resigned" so
+  // we can track which skills were granted via sect rewards (those
+  // skills are XP-frozen). Player free to join a new sect; no hunters.
+  | { t: "resignSect"; sectId: SectId }
+  // betraySect: defection without leave. Status → "betrayed". Skills
+  // can still level up but a sect-hunter NPC may ambush in random
+  // events. Cleared by the sect's redemption quest.
+  | { t: "betraySect"; sectId: SectId }
   // joinSect: seed sectMembership[sectId] with the sect's starting rank
   // when the player isn't a member yet (no-op otherwise).
   | { t: "joinSect"; sectId: SectId }
@@ -218,6 +225,10 @@ export type Condition =
   // SectId — adding a new sect to the union no longer requires touching
   // every other intro's prereq list.
   | { t: "anySectMember" }
+  // Player's membership in `sectId` has the given `status` (active,
+  // resigned, or betrayed). Used by redemption quests to gate "only
+  // available to betrayers".
+  | { t: "sectStatus"; sectId: SectId; status: "active" | "resigned" | "betrayed" }
   // Player's current rank in the sect is at most `rank` (lower number =
   // higher rank). e.g. {sectId:"shaolin", maxRank:5} matches rank 5,4,3,2,1.
   | { t: "sectRankAtLeast"; sectId: SectId; maxRank: number }
@@ -355,10 +366,11 @@ export type QuestReward =
   // a member of that sect — caller should pair with `joinSect` if needed).
   | { t: "joinSect"; sectId: SectId }
   | { t: "sectPoints"; sectId: SectId; amount: number }
-  // Same as the SceneEffect — removes the player from the named sect.
-  // Used by quest reward chains that switch the player's sect (e.g.
-  // the Ancient-Tomb defection from Quanzhen).
-  | { t: "leaveSect"; sectId: SectId };
+  // Legacy quest reward — same semantics as the SceneEffect. Maps to
+  // "resigned" status. New quests should prefer resignSect/betraySect.
+  | { t: "leaveSect"; sectId: SectId }
+  | { t: "resignSect"; sectId: SectId }
+  | { t: "betraySect"; sectId: SectId };
 
 export interface QuestDef {
   id: string;
@@ -399,6 +411,16 @@ export interface QuestState {
   id: string;
   status: "active" | "done" | "failed";
   stage: number;
+  // Snapshots of cumulative counters at quest-accept time. Used by the
+  // delta-based autoAdvance evaluator (lib/world/effects.ts) so that
+  // repeatable sect quests don't auto-complete on the player's prior
+  // kills / inventory.
+  //   - acceptedDefeatedAt[opponentId] = defeatedCounts at start
+  //   - acceptedHasItemAt[itemId]      = inventory[itemId] at start
+  // Optional + Record so legacy persisted quests (no snapshot) fall back
+  // to "0 baseline" automatically.
+  acceptedDefeatedAt?: Record<string, number>;
+  acceptedHasItemAt?: Record<string, number>;
 }
 
 // ─── Items ─────────────────────────────────────────────────────────────
@@ -893,6 +915,17 @@ export interface SectMembership {
   rewardPicks: Record<string, string>;
   // Day the player joined — informational (welcome screen / profile).
   joinedDay: number;
+  // Membership status. Drives `sectMember` Condition + cross-sect
+  // exclusion + skill-XP freeze + hunter random events:
+  //   "active"    — current disciple, all sect benefits enabled
+  //   "resigned"  — formal resignation. Rewards-from-sect are FROZEN
+  //                 (no XP gain). Player is free to join a new sect.
+  //                 Hunters do NOT spawn.
+  //   "betrayed"  — left without leave. Skills can level up, but a
+  //                 strong sect-hunter NPC may ambush in random events.
+  //                 Cleared by completing the sect's redemption quest.
+  // Defaults to "active" via the persist migration / joinSect dispatcher.
+  status?: "active" | "resigned" | "betrayed";
 }
 
 export type SectId = "shaolin" | "wudang" | "huashan" | "quanzhen" | "emei" | "gumu" | "beggars" | "jinyiwei" | "sunmoon" | "tang";

@@ -1448,6 +1448,122 @@ export const OPPONENTS: readonly OpponentDef[] = [
       artId: "t0_tang_sharp", artLevel: 4,
       skillIds: ["tang_basic_knife"],
     }) },
+
+  // ─── Sect hunters ─────────────────────────────────────────────────
+  // One per joinable sect. Spawned by random-event when the player has
+  // a "betrayed" membership for that sect. Stats around T4 disciple
+  // tier (a notch below the actual sect leader so the encounter is
+  // dangerous but not auto-loss). Carries a sect-flavored kit so the
+  // fight reads as "their best hunter, not their grandmaster".
+  { id: "hunter_shaolin", name: "นักล่าเส้าหลิน", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "ginseng", weight: 3 }, { itemId: "jade", weight: 2 }],
+    build: () => build("นักล่าเส้าหลิน", 4, {
+      stats: { STR: 18, VIT: 16, DEF: 12, POW: 10, DEX: 6, AGI: 8 },
+      artId: "tendon", artLevel: 9,
+      skillIds: ["sl_thousand_arms", "sl_truth_staff", "sl_rock_punch", "ne1"],
+      extraArtSlots: ["tendon", "t1_goldenbell"],
+      artLevels: { tendon: 9, t1_goldenbell: 8 },
+    }) },
+
+  { id: "hunter_wudang", name: "นักล่าอู่ตัง", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "ginseng", weight: 3 }, { itemId: "jade", weight: 2 }],
+    build: () => build("นักล่าอู่ตัง", 4, {
+      stats: { POW: 20, INT: 14, AGI: 14, DEX: 8 },
+      artId: "taiji", artLevel: 9,
+      skillIds: ["wd_heaven_sword", "wd_cloud_sword", "wd_yinyang_sword"],
+      extraArtSlots: ["taiji", "t3_yinyang"],
+      artLevels: { taiji: 9, t3_yinyang: 8 },
+    }) },
+
+  { id: "hunter_huashan", name: "นักล่าหัวซาน", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "iron_ore", weight: 3 }, { itemId: "jade", weight: 2 }],
+    build: () => build("นักล่าหัวซาน", 4, {
+      stats: { STR: 16, AGI: 14, DEX: 12, POW: 8, VIT: 6 },
+      artId: "t4_huashan_purple", artLevel: 9,
+      skillIds: ["hs_purple_cloud", "hs_floating_cloud", "dgjj"],
+      extraArtSlots: ["t4_huashan_purple", "t2_huashan_cloud"],
+      artLevels: { t4_huashan_purple: 9, t2_huashan_cloud: 8 },
+    }) },
+
+  { id: "hunter_quanzhen", name: "นักล่าฉวนเจิน", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "paper", weight: 3 }, { itemId: "ancient_coin", weight: 2 }],
+    build: () => build("นักล่าฉวนเจิน", 4, {
+      stats: { STR: 16, POW: 14, INT: 10, DEX: 10, VIT: 6 },
+      artId: "t3_qz_sun", artLevel: 9,
+      skillIds: ["qz_sun_sword", "qz_sun_fist", "qzjf"],
+      extraArtSlots: ["t3_qz_sun", "qzzq"],
+      artLevels: { t3_qz_sun: 9, qzzq: 8 },
+    }) },
+
+  { id: "hunter_emei", name: "นักล่าง้อไบ๊", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "ginseng", weight: 3 }, { itemId: "lotus_seed", weight: 2 }],
+    build: () => build("นักล่าง้อไบ๊", 4, {
+      stats: { POW: 18, INT: 14, AGI: 12, VIT: 8, DEX: 6 },
+      artId: "t4_em_bodhi", artLevel: 9,
+      skillIds: ["em_bodhi_sword", "em_plum_sword", "em_buddha_sword"],
+      extraArtSlots: ["t4_em_bodhi", "t3_em_grace"],
+      artLevels: { t4_em_bodhi: 9, t3_em_grace: 8 },
+    }) },
+
+  { id: "hunter_gumu", name: "นักล่ากู่มู่", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "snow_lotus", weight: 3 }, { itemId: "jade", weight: 2 }],
+    build: () => build("นักล่ากู่มู่", 4, {
+      stats: { POW: 20, INT: 14, AGI: 14, DEX: 10 },
+      artId: "t4_gm_iceweave", artLevel: 9,
+      skillIds: ["ansh", "ynss", "gm_sword"],
+      extraArtSlots: ["t4_gm_iceweave", "t4_gm_winterstep"],
+      artLevels: { t4_gm_iceweave: 9, t4_gm_winterstep: 9 },
+    }) },
+
+  { id: "hunter_beggars", name: "นักล่าพรรคยาจก", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "rice_dish", weight: 3 }, { itemId: "ancient_coin", weight: 2 }],
+    build: () => build("นักล่าพรรคยาจก", 4, {
+      stats: { STR: 18, VIT: 16, AGI: 12, DEX: 8 },
+      artId: "t4_bg_thousandcrowd", artLevel: 9,
+      skillIds: ["bg_lucky_staff", "bg_wander_staff", "ep"],
+      extraArtSlots: ["t4_bg_thousandcrowd", "wanderer"],
+      artLevels: { t4_bg_thousandcrowd: 9, wanderer: 8 },
+    }) },
+
+  { id: "hunter_jinyiwei", name: "นักล่าองครักษ์เสื้อแพร", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "ancient_coin", weight: 4 }, { itemId: "iron_blade", weight: 2 }],
+    build: () => build("นักล่าองครักษ์เสื้อแพร", 4, {
+      stats: { STR: 18, AGI: 14, DEX: 14, VIT: 10 },
+      artId: "t4_jy_godslayer", artLevel: 9,
+      skillIds: ["jy_execution_blade", "jy_chain_assassin", "jy_blade_king"],
+      extraArtSlots: ["t4_jy_godslayer", "jy_a4_brocadelord"],
+      artLevels: { t4_jy_godslayer: 9, jy_a4_brocadelord: 8 },
+    }) },
+
+  { id: "hunter_sunmoon", name: "นักล่าพรรคตะวันจันทรา", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "paper", weight: 3 }, { itemId: "ink", weight: 2 }],
+    build: () => build("นักล่าพรรคตะวันจันทรา", 4, {
+      stats: { POW: 20, INT: 16, AGI: 12, DEX: 8 },
+      artId: "qiankun", artLevel: 9,
+      skillIds: ["mi_firepalm"],
+      extraArtSlots: ["qiankun", "yxhd", "t3_sm_sunmoon"],
+      artLevels: { qiankun: 9, yxhd: 9, t3_sm_sunmoon: 9 },
+    }) },
+
+  { id: "hunter_tang", name: "นักล่าสำนักสุลถัง", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "viper_venom", weight: 3 }, { itemId: "centipede_venom", weight: 2 }],
+    build: () => build("นักล่าสำนักสุลถัง", 4, {
+      stats: { DEX: 22, AGI: 16, STR: 10, LUK: 6, VIT: 6 },
+      artId: "t4_tang_tenkpoisons", artLevel: 9,
+      skillIds: ["tang_heartpierce", "tang_starrain", "tang_meteorpierce"],
+      extraArtSlots: ["t4_tang_tenkpoisons", "t4_tang_skycleaver"],
+      artLevels: { t4_tang_tenkpoisons: 9, t4_tang_skycleaver: 9 },
+    }) },
 ];
 
 export const OPPONENTS_BY_ID = new Map<string, OpponentDef>(
