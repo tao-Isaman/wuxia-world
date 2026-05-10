@@ -21,6 +21,7 @@ import {
   pickWeighted,
 } from "./data/random-events";
 import { evaluateCondition } from "./conditions";
+import { generatePlayerEcho } from "./rumor-engine";
 
 // Pure mutation: applies a single effect to the world state in place.
 // `triggerBattle` only sets `pendingBattle` — the battle-bridge module
@@ -99,6 +100,7 @@ export function applyEffect(state: WorldStateData, eff: SceneEffect): void {
         q.stage = def.stages.length - 1;
         if (def.rewards) applyQuestRewards(state, def.rewards);
         recordSectQuestCompletion(state, def);
+        recordMajorQuestCompletion(state, def);
       } else {
         q.stage = nextStage;
       }
@@ -118,6 +120,7 @@ export function applyEffect(state: WorldStateData, eff: SceneEffect): void {
         if (def) {
           if (def.rewards) applyQuestRewards(state, def.rewards);
           recordSectQuestCompletion(state, def);
+          recordMajorQuestCompletion(state, def);
         }
       }
       return;
@@ -283,6 +286,49 @@ export function applyEffect(state: WorldStateData, eff: SceneEffect): void {
       const m = state.sectMembership[eff.sectId];
       if (!m) return;
       m.points = Math.max(0, m.points + eff.amount);
+      return;
+    }
+
+    // ─── Liveness Layer dispatchers ──────────────────────────────────
+    // firePlayerEcho generates a rumor from the matching template pool
+    // (lib/world/data/rumor-templates.ts) keyed by `actionId`. Player-
+    // action callers (joinSect / resignSect / betraySect / rank-up /
+    // duel-win-named / major-quest-complete) emit one of these so the
+    // rumor pool reflects the player's deeds. markRumorHeard logs the
+    // current player's exposure for the selection de-prioritiser.
+    // revealNpcStatus is a no-op on the simulation — it's a refresh
+    // hint for cached UI views.
+    case "firePlayerEcho": {
+      // Drive the rumor engine: pick a matching template from the action's
+      // pool, render with the player's archetype label + scene location,
+      // push onto rumorPool. Any caps/eviction work is folded into the
+      // engine itself.
+      generatePlayerEcho({
+        state,
+        actionId: eff.actionId,
+        targetNpcId: eff.targetNpcId,
+      });
+      return;
+    }
+    case "markRumorHeard": {
+      const log = state.rumorSeenLog ?? [];
+      const exists = log.some((entry) => entry.rumorId === eff.rumorId);
+      if (exists) return;
+      log.push({
+        rumorId: eff.rumorId,
+        dayHeard: state.day,
+        location: state.lastLocationId ?? state.currentSceneId,
+      });
+      // Cap 50 — drop oldest first (simple shift since the array is
+      // append-only above).
+      while (log.length > 50) log.shift();
+      state.rumorSeenLog = log;
+      return;
+    }
+    case "revealNpcStatus": {
+      // No-op on the simulation. UI cache invalidation happens via the
+      // store's notify cycle when this scene effect fires.
+      void eff;
       return;
     }
 
@@ -577,6 +623,7 @@ export function tickQuestProgress(state: WorldStateData): void {
         consumeQuestAutoItems(state, def, q);
         if (def.rewards) applyQuestRewards(state, def.rewards);
         recordSectQuestCompletion(state, def);
+        recordMajorQuestCompletion(state, def);
         break;
       }
       q.stage = next;
@@ -595,6 +642,21 @@ function recordSectQuestCompletion(state: WorldStateData, def: QuestDef): void {
   if (def.isArtQuest && !m.artQuestsDone.includes(def.id)) {
     m.artQuestsDone = [...m.artQuestsDone, def.id];
   }
+}
+
+// Liveness Layer §3.2.2 — fire a player-echo rumor when a major quest
+// finishes successfully. Major quests are flagged via `QuestDef.isMajor`
+// so the engine doesn't spam the rumor pool on routine fetch quests.
+// Called from every "quest just turned done with success" path
+// (case "finishQuest" + case "advanceQuest" final-stage overflow +
+// tickQuestProgress auto-advance).
+function recordMajorQuestCompletion(state: WorldStateData, def: QuestDef): void {
+  if (!def.isMajor) return;
+  applyEffect(state, {
+    t: "firePlayerEcho",
+    actionId: "quest_major_complete",
+    targetNpcId: def.giverNpcId,
+  });
 }
 
 // ─── Quest availability helper (used by NPC popup) ─────────────────────

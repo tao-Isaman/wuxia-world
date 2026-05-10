@@ -25,6 +25,9 @@ import { ShopPopup } from "./popups/shop-popup";
 import { SectHallPopup } from "./popups/sect-hall-popup";
 import { ArtisanPopup } from "./popups/artisan-popup";
 import { PracticePopup } from "./popups/practice-popup";
+import { RumorBanner } from "./rumor-banner";
+import { RumorListenButton } from "./rumor-listen-button";
+import { NpcStatusBadge } from "./npc-status-badge";
 import {
   useWorldStore,
   TRAVEL_STAMINA_COST,
@@ -89,6 +92,12 @@ export function LocationView({ scene }: Props) {
 
   return (
     <div className="space-y-3">
+      {/* Liveness Layer §4.2 — passive arrival rumor banner. Renders
+          itself only when the scene is city-like and the 7-day cooldown
+          has elapsed. No-op everywhere else, so it's safe to mount
+          unconditionally above the main location card. */}
+      <RumorBanner locationId={scene.id} />
+
       <Card>
         <CardContent className="p-4 space-y-2">
           <div className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">
@@ -147,6 +156,10 @@ export function LocationView({ scene }: Props) {
                     <span className="flex flex-col items-start gap-0.5 w-full">
                       <span className="flex items-center gap-1.5 flex-wrap">
                         <span className="font-semibold text-sm">👤 {npc.name}</span>
+                        {/* Liveness Layer §4.3 — sim status (dead /
+                            secluded / missing). Renders nothing for
+                            alive / generic NPCs. */}
+                        <NpcStatusBadge npcId={npc.id} />
                         {canTalk && <Badge variant="outline" className="text-[9px]">💬 ทักทาย</Badge>}
                         {canSpar && <Badge variant="outline" className="text-[9px]">⚔ ประลอง</Badge>}
                       </span>
@@ -204,6 +217,13 @@ export function LocationView({ scene }: Props) {
           )}
         </CardContent>
       </Card>
+
+      {/* Liveness Layer §4.1 — "ฟังข่าวลือ" entry. The button itself
+          decides whether to render based on the scene id + the player's
+          sect membership; rendering this wrapper always is safe. We put
+          it inside its own card so it lives next to other location-
+          level actions like ซื้อ-ขาย / สำนัก / ฝึกฝน. */}
+      <RumorListenSection locationId={scene.id} />
 
       {(shop || hall) && (
         <Card>
@@ -412,4 +432,40 @@ function gatherToast(r: GatherResult): ToastTuple {
     return `${def?.name ?? it.itemId}×${it.count}`;
   });
   return ["success", `${parts.join(", ")} · +${r.xpGained} xp`];
+}
+
+// Wraps the RumorListenButton in a header card. Renders nothing when
+// the button itself decides not to render — we keep the section + card
+// chrome out of the DOM in that case so the LocationView stays clean
+// at sect halls the player isn't a member of, wilderness leaves, etc.
+function RumorListenSection({ locationId }: { locationId: string }) {
+  // Mirror the button's gating so we don't render an empty header.
+  // Using the same membership read keeps the resolution in one spot:
+  // any change to RumorListenButton's matrix flows here automatically.
+  // (The double render of the button's gate is cheap — a couple of
+  // string prefix checks per scene mount.)
+  const sectMembership = useWorldStore((s) => s.sectMembership);
+  const show = (() => {
+    if (locationId.includes("market")) return true;
+    if (locationId.startsWith("inn_")) return true;
+    if (locationId.startsWith("city_")) return true;
+    if (locationId.startsWith("sect_")) {
+      const sectId = locationId.slice("sect_".length);
+      const m = sectMembership[sectId as keyof typeof sectMembership];
+      return !!m && m.status === "active";
+    }
+    return false;
+  })();
+  if (!show) return null;
+
+  return (
+    <Card>
+      <CardContent className="p-3 space-y-2">
+        <div className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">
+          ข่าวลือในย่าน
+        </div>
+        <RumorListenButton locationId={locationId} />
+      </CardContent>
+    </Card>
+  );
 }

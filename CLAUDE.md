@@ -271,12 +271,37 @@ Most additions don't require touching dispatchers:
 - **New trait** → append to `TRAIT_KEYS` and `TRAIT_LABEL`. The dispatcher and condition handler treat it generically.
 - **New action with toast feedback** → call `toast("success" | "info" | "warn" | "error", message)` and (from the store) `appendActionLog(draft, kind, message)`. Add a label to `KIND_LABEL` / `KIND_COLOR` in `action-log-popup.tsx`.
 
+### Liveness Layer (NPC simulation + rumors)
+
+A passive simulation that ticks every 7 world days inside `advanceTime`, mutating ~20 named NPCs (chiefs + vice/elders pulled from the existing roster) and producing rumors that propagate to inn / market / sect-hall scenes. Spec: `bigchange.md`. Plan: `bigchange-plan.md`.
+
+- **`lib/world/types.ts`** — adds `NpcExtState` (per-named-NPC sim state: power/age/status/sect/sectRank/goals/rivals/allies/eventHistory), `NpcGoal` (5 kinds: master_art/climb_sect/avenge/find_treasure/seek_wisdom), `NpcEventKind` (12 events), `Rumor` + `RumorChannel` + `RumorTruth` + `Region`. New `WorldStateData` fields: `npcExt`, `rumorPool`, `rumorArchive`, `rumorSeenLog`, `lastNpcTickDay`. Three new `SceneEffect` variants: `firePlayerEcho`, `markRumorHeard`, `revealNpcStatus`. Three new `Condition` variants: `heardRumor`, `heardRumorAbout`, `npcStatus`.
+- **`lib/world/npc-tick.ts`** — `tickAllNamedNpcs(state, { currentDay })`. Throttled at 4 batches per call (28 days); excess time accrues only aging. Per NPC: aging → natural death roll (5%/15% over 70/85) → power growth from goals → goal progression → 8% random-event roll. Goal-completion fires the matching event + 50% reroll a replacement. Lazy-seeds `npcExt` from `data/named-npcs.ts` on first tick.
+- **`lib/world/rumor-engine.ts`** — `generateNpcEventEcho`, `generatePlayerEcho`, `generateWarning`, `selectRumorsForScene`, `maintainRumors`. Distortion roll (15% distorted / 5% false; player echo: 25/10). Big-news boost (×2 weight + 120-day lifespan) for `death_combat`, `master_art`, `betray_sect`, or actor `sectRank ≤ 3`. 7-day dedup window (collapses identical event-rumors by bumping weight). Soft cap 200 / hard cap 500. Region propagation deferred to v2.
+- **`lib/world/data/regions.ts`** — `LOCATION_REGION` map of every named location → 1 of 6 regions (`heartland | north | south | west | east | jianghu_wild`); `regionOf(locationId)` falls back to `jianghu_wild`. Plus `REGION_NEIGHBORS` adjacency graph and `CHANNEL_ADMITS` matrix (`inn → [inn, market, wilderness]`, `sect_internal → [sect_internal]`, etc.).
+- **`lib/world/data/named-npcs.ts`** — `NAMED_NPC_DEFAULTS` map: 15 sect chiefs + 5 vice/elder picks, each with authored `power/age/sectRank/goals/rivals/allies`. Generic NPCs are NOT in the map and never tick.
+- **`lib/world/data/rumor-templates.ts`** — `NPC_EVENT_TEMPLATES` (12 kinds × 1-2 templates), `PLAYER_ECHO_TEMPLATES` (5 hardcoded action ids × 2 templates), `WARNING_TEMPLATES` (5 kinds). Big-news templates carry `distorted` + `fake` variants. Tokens: `{npc} {npc2} {location} {sect} {art} {item} {archetype} {days} {event}`.
+- **`lib/world/data/lore-rumors.ts`** — `LORE_RUMORS`: 30 hand-authored static rumors. 4 categories: sect legends (10), jianghu history (6), old hero lore (6), treasure/secret-art hints with `leadsTo` (8). Lore rumors never expire — they rotate via the engine's selection step.
+- **Player-echo trigger sites** (5 hardcoded actions in `store/world-store.ts`):
+  - `duel_win_named` — `acknowledgeBattleResult` win against an opponent in the named roster
+  - `sect_join` — `joinSect` after seeding membership
+  - `sect_leave_or_betray` — both `resignSect` and `betraySect` (player-visible: "left the sect")
+  - `quest_major_complete` — any quest with `isMajor: true` finished successfully (fired from `effects.ts` so it catches all 3 finalize paths)
+  - `sect_rank_up` — `upgradeSectRank` after rank decrement
+- **Quest-fail-on-death cascade** — when `tickAllNamedNpcs` kills a named NPC, `advanceTime` scans active quests for `giverNpcId` matches and fails them with a toast + action log entry. Generic NPC givers are skipped (they're not simulated).
+- **UI surfaces** —
+  - `components/world/popups/rumor-popup.tsx` — modal popup driven by `selectRumorsForScene`. Source icons (💬 npc_event, 🌬 player_echo, 📜 lore, ⚠ warning). Distortion / falsehood NOT shown to the player. "ฟังต่อ" button calls `recordRumorHeard`.
+  - `components/world/rumor-banner.tsx` — passive entry banner showing the top-1 rumor when entering a city for the first time in 7 days. Cooldown via `flags._lastBannerDay`.
+  - `components/world/npc-status-badge.tsx` — small chip rendered in NPC lists. Suppressed for living NPCs; shown for dead/secluded/missing.
+  - `components/world/rumor-listen-button.tsx` — drop-in button. Self-gates by location id prefix (`inn_*`/`city_*` → inn channel, `*market*` → market, `sect_<id>` → sect_internal if active member).
+- **Smoke test** — `bun scripts/smoke-liveness.ts` runs a 90-day advance against a fresh state and asserts the 4 acceptance criteria (≥3 NPC events, ≥3 inn rumors, hard cap respected, tick advanced).
+
 ### Save format & migrations
 
 Two persisted Zustand slices, separate localStorage keys, separate version fields:
 
 - `wusia-character-v1` — `{ builds: { A, B } }` (only used by /debug). Version 2 (v1 → v2 padded slots, seeded learned arrays).
-- `wusia-world-v1` — world state minus action functions. **Version 17**. Migration chain (additive defaults at each step):
+- `wusia-world-v1` — world state minus action functions. **Version 18**. Migration chain (additive defaults at each step):
   1. v1 → v2: stamina + lifeSkillXp(6) + pendingHuntYield
   2. v2 → v3: lifeSkillXp 6 → 17 keys
   3. v3 → v4: day / time
@@ -293,6 +318,7 @@ Two persisted Zustand slices, separate localStorage keys, separate version field
   14. v14 → v15: stoleFromCounts + assassinatedNpcIds + kidnappedNpcIds (bad-action mechanics)
   15. v15 → v16: gender field on the world slice
   16. v16 → v17: sectMembership map (rank ladder, points, lastQuestDay, artQuestsDone, rewardPicks, joinedDay) + `status: "active" | "resigned" | "betrayed"` on each entry. Existing legacy memberships default `status = "active"` on the migration's first read.
+  17. v17 → v18: Liveness Layer fields — `npcExt` (per-named-NPC sim state), `rumorPool`, `rumorArchive`, `rumorSeenLog`, `lastNpcTickDay`. Existing saves start with all empty; `npcExt` lazy-seeds from the authored roster on first tick. Plus an optional `isMajor` flag on `QuestDef` (drives player-echo rumor on completion).
 
 `battle-store` is intentionally not persisted.
 

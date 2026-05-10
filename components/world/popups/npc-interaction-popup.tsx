@@ -26,6 +26,7 @@ import { useWorldStore } from "@/store/world-store";
 import { toast } from "@/store/toast-store";
 import { confirmDialog } from "@/store/confirm-store";
 import { flashLoading } from "@/store/loading-store";
+import { NpcStatusBadge } from "../npc-status-badge";
 
 interface Props {
   open: boolean;
@@ -147,6 +148,11 @@ export function NpcInteractionPopup({ open, npc, onClose }: Props) {
     <Modal open={open} onClose={onClose} title={`💬 ${npc.name}`} maxWidth="max-w-md">
       <div className="space-y-3">
         <div className="flex items-center gap-2 flex-wrap">
+          {/* Liveness Layer §4.3 — sim-status chip. Renders only for
+              named NPCs in a non-alive state (dead / secluded /
+              missing); generic NPCs and live named NPCs render
+              nothing, so this is a no-op in the common case. */}
+          <NpcStatusBadge npcId={npc.id} />
           {state.met && (
             <Badge variant="outline" className="text-[9px]">เคยพบ</Badge>
           )}

@@ -182,7 +182,20 @@ export type SceneEffect =
   | { t: "joinSect"; sectId: SectId }
   // addSectPoints: bump WorldStateData.sectMembership[sectId].points by
   // `amount`. Used by sect quest rewards.
-  | { t: "addSectPoints"; sectId: SectId; amount: number };
+  | { t: "addSectPoints"; sectId: SectId; amount: number }
+  // ─── Liveness Layer (NPC sim + rumor system) ────────────────────────
+  // Fire a player-echo rumor for the given action id. Action id resolves
+  // to a template pool in lib/world/data/rumor-templates.ts. Used by
+  // store actions (duel-win-named, sect-join/leave/betray, major quest
+  // complete, sect rank-up). Region defaults to player's current region.
+  | { t: "firePlayerEcho"; actionId: string; targetNpcId?: string }
+  // Mark a rumor as heard by the player — pushes onto rumorSeenLog so
+  // future rumor selections de-prioritise it. Used by the inn/market
+  // listen popups when the player picks a rumor to focus on.
+  | { t: "markRumorHeard"; rumorId: string }
+  // Force-update an NPC's status in the encyclopedia UI. No-op on the
+  // simulation itself — purely a refresh hint for cached UI views.
+  | { t: "revealNpcStatus"; npcId: string };
 
 // ─── Conditions ────────────────────────────────────────────────────────
 
@@ -245,6 +258,17 @@ export type Condition =
   // is at least `min`. Backed by lifeSkillXp + masteryLevel(). Used by
   // the Beggars intro to require begging≥2 before the join quest opens.
   | { t: "lifeSkillLevel"; skill: LifeSkill; min: number }
+  // ─── Liveness Layer conditions ──────────────────────────────────────
+  // Player has heard this specific rumor (its id appears in rumorSeenLog).
+  | { t: "heardRumor"; rumorId: string }
+  // Player has heard any rumor whose `aboutNpcId/Loc/Sect` matches the
+  // given target. Useful for "if you've heard about X" gates without
+  // pinning to a specific rumor variant.
+  | { t: "heardRumorAbout"; target: string }
+  // NPC's current `status` field matches. Reads from the named-NPC ext
+  // map (npcExt). For NPCs not in the ext map (generic NPCs), evaluates
+  // true only when the requested status is "alive" (default assumption).
+  | { t: "npcStatus"; npcId: string; status: NpcSimStatus }
   | { t: "and"; all: Condition[] }
   | { t: "or"; any: Condition[] }
   | { t: "not"; of: Condition };
@@ -405,6 +429,10 @@ export interface QuestDef {
   // the player must have achieved in `sectId` before the quest is offerable.
   // Ignored when the quest isn't sect-tagged.
   minSectRank?: number;
+  // Marks a milestone quest. Completing one fires a player-echo rumor with
+  // archetype-flavored phrasing in the player's current region (Liveness
+  // Layer §3.2.2). Default false.
+  isMajor?: boolean;
 }
 
 export interface QuestState {
@@ -734,6 +762,151 @@ export interface PendingEncounter {
   returnSceneId: string;
 }
 
+// ─── Liveness Layer (NPC simulation + rumor system) ──────────────────
+// New module v0.1 (2026-05-10). Layered on top of the existing world state
+// to give the world the feeling of motion: ~20 named NPCs tick every 7
+// world days (advance goals / age / fight / die), and each event produces
+// rumors that propagate region-by-region for the player to overhear in
+// inns and markets. Spec lives in /bigchange.md and /bigchange-plan.md.
+
+// NPC sim status. Generic NPCs (without an NpcExtState entry) are
+// implicitly "alive". Once they enter the ext map they own the status.
+export type NpcSimStatus = "alive" | "dead" | "missing" | "secluded";
+
+// Long-running NPC objective. The tick engine rolls progress on each
+// goal every 7 days; on completion the goal fires its associated event
+// and either gets removed or replaced by a new goal (50% reroll).
+export type NpcGoal =
+  | { kind: "master_art"; artId: string; progress: number; threshold: number }
+  | { kind: "climb_sect"; targetRank: number; progress: number; threshold: number }
+  | { kind: "avenge"; targetNpcId: string; progress: number; threshold: number }
+  | { kind: "find_treasure"; itemId: string; locationId: string; progress: number; threshold: number }
+  | { kind: "seek_wisdom"; locationId: string; progress: number; threshold: number };
+
+// NPC event types — every fired event mutates state, pushes onto
+// eventHistory, and (typically) generates a rumor in the rumor pool.
+export type NpcEventKind =
+  | "death_natural"
+  | "death_combat"
+  | "sect_promotion"
+  | "sect_demotion"
+  | "master_art"
+  | "found_treasure"
+  | "travel"
+  | "secluded"
+  | "marry"
+  | "betray_sect"
+  | "take_disciple"
+  | "defeated_by_player";
+
+export interface NpcEventLog {
+  kind: NpcEventKind;
+  day: number;
+  // Free-form payload for rumor templating (locationId, killer NpcId,
+  // artId, item id — varies per kind). Read by rumor-engine when
+  // generating the echo rumor.
+  data?: Record<string, string | number | boolean>;
+}
+
+// Per-named-NPC simulation state. Lives in worldState.npcExt keyed by
+// NpcDef.id — separate from npcStates so legacy code paths (relationship,
+// flags, met) keep working untouched. Authored defaults live in
+// lib/world/data/named-npcs.ts and seed lazily when the player first
+// causes a tick.
+export interface NpcExtState {
+  power: number;             // 0..100 — current 武功 strength
+  age: number;               // years
+  status: NpcSimStatus;
+  currentLocation: string;   // LocationId
+  homeLocation: string;      // LocationId
+  sect: SectId | null;
+  sectRank: number;          // 0 (unaffiliated) ..10 (grandmaster)
+  goals: NpcGoal[];          // 1..3 active
+  rivals: string[];          // NpcId list
+  allies: string[];          // NpcId list
+  lastTickDay: number;
+  eventHistory: NpcEventLog[]; // last 10 entries, most recent first
+}
+
+// Region taxonomy. Hand-assigned per location in
+// lib/world/data/regions.ts. Used by the rumor distribution graph
+// (an event in `north` produces rumors that initially land in `north`
+// and expand outward over time).
+export type Region =
+  | "heartland"      // central plains — capital, big cities
+  | "north"          // northern peaks (ฉวนเจิน, อู่ตัง, taishan, songshan)
+  | "south"          // southern provinces (เส้าหลิน, ง้อไบ๊, hengshan)
+  | "west"           // western frontier (huashan, kunlun, gumu)
+  | "east"           // eastern coast (jinyiwei, tang, sunmoon)
+  | "jianghu_wild"   // generic wilderness fallback
+  | "global";        // pseudo-region for warnings / huge news
+
+// Inn / market / sect-hall channel system. Each scene declares which
+// channels it accepts (Inn pulls inn+market+wilderness; sect halls pull
+// only sect_internal); rumors carry the channel they were generated on.
+export type RumorChannel = "inn" | "market" | "sect_internal" | "wilderness";
+
+// Truth axis for rumors. Distorted/false rumors render the same way as
+// true ones in the UI — players only know in retrospect.
+export type RumorTruth = "true" | "distorted" | "false";
+
+// Rumor source category — drives template pool selection + lifespan +
+// distortion roll rates.
+export type RumorSource = "npc_event" | "player_echo" | "lore" | "warning";
+
+// What an event-derived rumor was about — helpful for UI display +
+// dedup logic. One of these or null.
+export interface EventRef {
+  eventKind: NpcEventKind;
+  day: number;
+  // Optional ids carried into the rumor for dedup logic
+  // (collapse two rumors about the same NPC death within 7 days).
+  aboutNpcId?: string;
+}
+
+// Optional pointer for treasure/wisdom rumors that promise a reward at
+// a location. Engine guarantees a partial reward on visit even when
+// truth is false.
+export interface LeadTarget {
+  locationId: string;
+  // Optional: specific item / encounter / quest the rumor hints at.
+  hintItemId?: string;
+  hintQuestId?: string;
+  hintNpcId?: string;
+}
+
+export interface Rumor {
+  id: string;
+  text: string;
+  source: RumorSource;
+  createdDay: number;
+  expiresDay: number;
+  truth: RumorTruth;
+  region: Region;
+  channel: RumorChannel;
+  about: string | null;       // NpcId | LocationId | SectId
+  refersToEvent: EventRef | null;
+  leadsTo: LeadTarget | null;
+  prerequisites: Condition[]; // optional gating
+  weight: number;             // 0..10 priority
+}
+
+// Compressed rumor record for the archive. Lifespan: 1 year world time
+// after the original Rumor expires. Used by `heardRumor` lookups when
+// the original rumor has already been pruned from the active pool.
+export interface RumorSummary {
+  id: string;
+  about: string | null;
+  truth: RumorTruth;
+  expiredDay: number;
+}
+
+export interface RumorSeenEntry {
+  rumorId: string;
+  dayHeard: number;
+  location: string; // LocationId
+}
+
 // Snapshot data only — actions are added by the store.
 export interface WorldStateData {
   hasGame: boolean;
@@ -872,6 +1045,23 @@ export interface WorldStateData {
   // disciple anywhere yet. Joining a sect adds an entry seeded with the
   // sect's starting rank (e.g. Shaolin = 9).
   sectMembership: Partial<Record<SectId, SectMembership>>;
+
+  // ─── Liveness Layer (NPC simulation + rumor system) ──────────────────
+  // Per-named-NPC extended sim state. Authored defaults seed lazily from
+  // lib/world/data/named-npcs.ts on first tick. Generic NPCs are absent
+  // from this map — they show as "alive" by default and never tick.
+  npcExt: Record<string, NpcExtState>;
+  // Active rumor pool. Cap soft 200 / hard 500 — over hard cap, the
+  // rumor engine drops oldest-expiring + lowest-weight first.
+  rumorPool: Rumor[];
+  // Compressed history of expired rumors. Pruned at 1 year world time.
+  rumorArchive: RumorSummary[];
+  // Player has heard these rumors — drives de-prioritisation in
+  // selection. Cap 50 entries (oldest dropped first).
+  rumorSeenLog: RumorSeenEntry[];
+  // Last day the global tick ran. tickAllNamedNpcs reads this to compute
+  // how many 7-day batches to process when the player advanceTimes a lot.
+  lastNpcTickDay: number;
 }
 
 export interface ActionLogEntry {

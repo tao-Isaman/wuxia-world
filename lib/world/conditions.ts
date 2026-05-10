@@ -73,6 +73,22 @@ export function evaluateCondition(state: WorldStateData, c: Condition): boolean 
       return (state.playerBuild?.learnedArtIds ?? []).includes(c.artId);
     case "lifeSkillLevel":
       return masteryLevel(state.lifeSkillXp[c.skill] ?? 0) >= c.min;
+    case "heardRumor":
+      return (state.rumorSeenLog ?? []).some((e) => e.rumorId === c.rumorId);
+    case "heardRumorAbout": {
+      const seenIds = new Set((state.rumorSeenLog ?? []).map((e) => e.rumorId));
+      return (state.rumorPool ?? []).some(
+        (r) => r.about === c.target && seenIds.has(r.id),
+      ) || (state.rumorArchive ?? []).some(
+        (r) => r.about === c.target && seenIds.has(r.id),
+      );
+    }
+    case "npcStatus": {
+      const ext = (state.npcExt ?? {})[c.npcId];
+      // Generic NPCs (absent from npcExt) read as alive by default.
+      const status = ext?.status ?? "alive";
+      return status === c.status;
+    }
     case "and":
       return c.all.every((sub) => evaluateCondition(state, sub));
     case "or":

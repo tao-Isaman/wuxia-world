@@ -57,6 +57,10 @@ import {
 } from "@/lib/world";
 import { applyEffect, consumeQuestAutoItems, isSectQuestOfferable, tickQuestProgress } from "@/lib/world/effects";
 import { evaluateCondition } from "@/lib/world/conditions";
+import { tickAllNamedNpcs } from "@/lib/world/npc-tick";
+import { maintainRumors, RUMOR_SEEN_CAP } from "@/lib/world/rumor-engine";
+import { namedNpcIds } from "@/lib/world/data/named-npcs";
+import { toast } from "@/store/toast-store";
 import {
   SECT_MEMBERSHIPS,
   autoGrantableRewards,
@@ -466,6 +470,12 @@ interface WorldStore extends WorldStateData {
   acceptEncounter: () => void;
   fleeEncounter: () => void;
 
+  // Liveness Layer — record that the player has heard a specific rumor.
+  // Pushes onto rumorSeenLog so future `selectRumorsForScene` calls
+  // de-prioritise it. Caps the log at 50 entries (FIFO eviction).
+  // Idempotent: re-recording the same rumorId is a no-op.
+  recordRumorHeard: (rumorId: string) => void;
+
   // Debug helpers (dev-only consumers).
   _setFlag: (flag: string, value: boolean | number | string) => void;
   _giveGold: (amount: number) => void;
@@ -518,6 +528,13 @@ const emptyData = (): WorldStateData => ({
   actionLog: [],
   gender: "male",
   sectMembership: {},
+  // Liveness Layer (NPC sim + rumors). v18+. Defaults are empty —
+  // npcExt seeds lazily on first tickAllNamedNpcs from authored roster.
+  npcExt: {},
+  rumorPool: [],
+  rumorArchive: [],
+  rumorSeenLog: [],
+  lastNpcTickDay: 1,
 });
 
 // Append a player-action entry to the rolling log. Keeps the most recent
@@ -675,6 +692,66 @@ function advanceTime(state: WorldStateData, hours: number): void {
   }
   state.time = total;
   state.day = day;
+  // ─── Liveness Layer hook ────────────────────────────────────────────
+  // After the clock has advanced to its final value, run NPC simulation
+  // + rumor housekeeping ONCE per advanceTime call. The tick engine
+  // batches internally based on (state.day - state.lastNpcTickDay) and
+  // throttles to ≤ 4 batches per call, so the cost stays bounded even
+  // when the player advances by 90+ days at once. After ticking, scan
+  // for any active quest whose `giverNpcId` died this batch and auto-
+  // fail it — see decision §3 in bigchange-plan.md.
+  failQuestsForDeadGivers(state, () => {
+    tickAllNamedNpcs(state, { currentDay: state.day });
+  });
+  maintainRumors(state, state.day);
+}
+
+// Run `tickFn` (the NPC tick) and afterwards diff the npcExt status map
+// against its pre-tick snapshot. Any quest whose `giverNpcId` is in the
+// named roster AND just transitioned to "dead" is failed with an
+// action-log entry + warn toast. Generic-NPC givers (not in
+// namedNpcIds) are skipped — those NPCs aren't simulated, so they
+// can't die from sim ticks.
+function failQuestsForDeadGivers(
+  state: WorldStateData,
+  tickFn: () => void,
+): void {
+  // Snapshot which named NPCs were alive *before* the tick. We diff
+  // against this after the tick so we only fail quests whose giver
+  // newly died — pre-existing dead NPCs (e.g., killed in a prior
+  // tick whose quest the player has since accepted anyway) don't
+  // re-fire the toast.
+  const wasAlive = new Set<string>();
+  const ids = namedNpcIds();
+  for (const id of ids) {
+    const ext = state.npcExt[id];
+    // Treat "no ext yet" (lazy-seeded on first tick) the same as alive —
+    // the NPC simply hasn't been simulated yet.
+    if (!ext || ext.status === "alive") wasAlive.add(id);
+  }
+  tickFn();
+  for (const q of Object.values(state.quests)) {
+    if (q.status !== "active") continue;
+    const def = getQuest(q.id);
+    if (!def?.giverNpcId) continue;
+    const giverId = def.giverNpcId;
+    if (!wasAlive.has(giverId)) continue;
+    const ext = state.npcExt[giverId];
+    if (!ext || ext.status !== "dead") continue;
+    // Giver was alive before the tick + is dead now → fail the quest.
+    q.status = "failed";
+    const giverDef = getNpc(giverId);
+    const giverName = giverDef?.name ?? giverId;
+    appendActionLog(
+      state,
+      "quest",
+      `ผู้ให้ภารกิจ ${giverName} เสียชีวิต — ภารกิจ '${def.name}' หยุดลง`,
+    );
+    toast(
+      "warn",
+      `ผู้ให้ภารกิจ ${giverName} เสียชีวิต — ภารกิจ '${def.name}' หยุดลง`,
+    );
+  }
 }
 
 // Returns true when the move is either free (story warp / same scene) or
@@ -838,6 +915,12 @@ function draftFrom(s: WorldStateData): WorldStateData {
     actionLog: [...s.actionLog],
     gender: s.gender,
     sectMembership: { ...s.sectMembership },
+    // v18+: Liveness Layer
+    npcExt: { ...s.npcExt },
+    rumorPool: [...s.rumorPool],
+    rumorArchive: [...s.rumorArchive],
+    rumorSeenLog: [...s.rumorSeenLog],
+    lastNpcTickDay: s.lastNpcTickDay,
   };
 }
 
@@ -949,6 +1032,9 @@ export const useWorldStore = create<WorldStore>()(
         applyEffect(draft, { t: "joinSect", sectId });
         appendActionLog(draft, "sect", `เข้าร่วมสำนัก${def.name} · ขั้นที่ ${def.startRank}`);
         autoGrantSectRewards(draft, sectId);
+        // Liveness Layer: drop a player-echo rumor into the pool so
+        // inn-goers in the player's region eventually hear about it.
+        applyEffect(draft, { t: "firePlayerEcho", actionId: "sect_join" });
         set({ ...draft });
         return { ok: true };
       },
@@ -976,6 +1062,9 @@ export const useWorldStore = create<WorldStore>()(
           `เลื่อนขั้น${def.name} → ขั้นที่ ${target} (จ่าย ${cost} sect points)`,
         );
         autoGrantSectRewards(draft, sectId);
+        // Liveness Layer: rank-up is a public milestone — player-echo
+        // rumor lands in the pool for inn-goers to repeat.
+        applyEffect(draft, { t: "firePlayerEcho", actionId: "sect_rank_up" });
         set({ ...draft });
         return { ok: true };
       },
@@ -1042,6 +1131,10 @@ export const useWorldStore = create<WorldStore>()(
         applyEffect(draft, { t: "resignSect", sectId });
         const def = SECT_MEMBERSHIPS[sectId];
         appendActionLog(draft, "sect", `ลาออกอย่างเป็นทางการจากสำนัก${def.name} — วิชาที่ได้จากสำนักจะหยุดเลื่อนขั้น`);
+        // Liveness Layer: from the public's view a resign and a betray
+        // both look like "the player left" — same actionId so they share
+        // the template pool.
+        applyEffect(draft, { t: "firePlayerEcho", actionId: "sect_leave_or_betray" });
         set({ ...draft });
         return { ok: true };
       },
@@ -1057,6 +1150,10 @@ export const useWorldStore = create<WorldStore>()(
         applyEffect(draft, { t: "addTrait", trait: "evil", amount: 5 });
         const def = SECT_MEMBERSHIPS[sectId];
         appendActionLog(draft, "sect", `ทรยศสำนัก${def.name} — ระวังนักล่าจากสำนักจะตามล่าเจ้าในที่ต่าง ๆ`);
+        // Liveness Layer: same actionId as resign — the rumor mill
+        // doesn't differentiate "left politely" vs "betrayed" until
+        // a specific accuser surfaces.
+        applyEffect(draft, { t: "firePlayerEcho", actionId: "sect_leave_or_betray" });
         set({ ...draft });
         return { ok: true };
       },
@@ -1238,6 +1335,27 @@ export const useWorldStore = create<WorldStore>()(
             met: true,
             relationship: (entry.relationship ?? 0) + 1,
           };
+        }
+
+        // Liveness Layer: drop a `duel_win_named` player-echo when the
+        // defeated foe is in the named-NPC roster. Spar fights set
+        // `pendingSpar.npcId` directly; scripted duels (if the
+        // pendingBattle.opponentId itself happens to match a named-NPC
+        // id) also count. Generic mob fights are skipped — no rumor
+        // for "ชนะ thug ที่ตลาด".
+        const namedSet = new Set(namedNpcIds());
+        const echoTargetNpcId =
+          spar && namedSet.has(spar.npcId)
+            ? spar.npcId
+            : namedSet.has(pb.opponentId)
+              ? pb.opponentId
+              : null;
+        if (echoTargetNpcId) {
+          applyEffect(draft, {
+            t: "firePlayerEcho",
+            actionId: "duel_win_named",
+            targetNpcId: echoTargetNpcId,
+          });
         }
 
         // Roll the opponent's drop table (separate from hunt-yield, which
@@ -2419,6 +2537,23 @@ export const useWorldStore = create<WorldStore>()(
         return { ok: true, questId };
       },
 
+      recordRumorHeard: (rumorId) => {
+        const s = get();
+        const log = [...(s.rumorSeenLog ?? [])];
+        // Idempotent — same rumor recorded twice is a no-op so the
+        // selection's de-prioritisation logic doesn't get confused by
+        // duplicates.
+        if (log.some((entry) => entry.rumorId === rumorId)) return;
+        log.push({
+          rumorId,
+          dayHeard: s.day,
+          location: s.lastLocationId ?? s.currentSceneId,
+        });
+        // Cap matches RUMOR_SEEN_CAP — drop oldest first (FIFO).
+        while (log.length > RUMOR_SEEN_CAP) log.shift();
+        set({ rumorSeenLog: log });
+      },
+
       _setFlag: (flag, value) =>
         set((s) => ({ flags: { ...s.flags, [flag]: value } })),
 
@@ -2426,7 +2561,7 @@ export const useWorldStore = create<WorldStore>()(
     }),
     {
       name: "wusia-world-v1",
-      version: 17,
+      version: 18,
       // Only persist the data fields, not the action functions.
       partialize: (s) => ({
         hasGame: s.hasGame,
@@ -2466,6 +2601,12 @@ export const useWorldStore = create<WorldStore>()(
         pendingSpar: s.pendingSpar,
         gameOver: s.gameOver,
         actionLog: s.actionLog,
+        // v18+: Liveness Layer.
+        npcExt: s.npcExt,
+        rumorPool: s.rumorPool,
+        rumorArchive: s.rumorArchive,
+        rumorSeenLog: s.rumorSeenLog,
+        lastNpcTickDay: s.lastNpcTickDay,
       }),
       // Migrations:
       //   v1 → v2 added stamina/staminaMax/lifeSkillXp(6)/pendingHuntYield.
@@ -2508,6 +2649,11 @@ export const useWorldStore = create<WorldStore>()(
       //   v15 → v16 added stoleFromCounts / assassinatedNpcIds /
       //            kidnappedNpcIds (bad-action ledgers) plus the "steal"
       //            life-skill key. Existing saves start empty.
+      //   v17 → v18 added Liveness Layer fields: npcExt (per-named-NPC
+      //            sim state), rumorPool / rumorArchive / rumorSeenLog,
+      //            lastNpcTickDay. Existing saves start with all fields
+      //            empty — npcExt seeds lazily on first tick from the
+      //            authored roster in lib/world/data/named-npcs.ts.
       migrate: (persisted, fromVersion) => {
         const p = (persisted ?? {}) as Partial<WorldStateData>;
         // Pad the build's skillIds to 10 and back-fill learned arrays.
@@ -2608,6 +2754,15 @@ export const useWorldStore = create<WorldStore>()(
             p.sectMembership && typeof p.sectMembership === "object"
               ? { ...p.sectMembership }
               : {},
+          // v18+: Liveness Layer
+          npcExt: p.npcExt && typeof p.npcExt === "object" ? { ...p.npcExt } : {},
+          rumorPool: Array.isArray(p.rumorPool) ? [...p.rumorPool] : [],
+          rumorArchive: Array.isArray(p.rumorArchive) ? [...p.rumorArchive] : [],
+          rumorSeenLog: Array.isArray(p.rumorSeenLog) ? [...p.rumorSeenLog] : [],
+          lastNpcTickDay:
+            typeof p.lastNpcTickDay === "number" && p.lastNpcTickDay >= 1
+              ? p.lastNpcTickDay
+              : (typeof p.day === "number" && p.day >= 1 ? p.day : 1),
         };
         void fromVersion;
         return out;
