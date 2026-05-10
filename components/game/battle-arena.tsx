@@ -161,6 +161,155 @@ function useAnimatedHp(
   return displayHp;
 }
 
+// Real-time stats tooltip rendered inside the InfoPopover that wraps a
+// fighter's name in SidePanel. Shows base derived stats merged with the
+// caster's currently-active buff / debuff modifiers, plus Hit/Crit %
+// against the opposing fighter — so the player can see the live values
+// that drive damage rolls without committing the chrome to the panel.
+function FighterStatsTooltip({
+  name,
+  d,
+  opp,
+  hPct,
+  cPct,
+  buffs,
+  debuffs,
+  stkPct,
+}: {
+  name: string;
+  d: BattleState["dA"];
+  opp: BattleState["dA"];
+  hPct: number;
+  cPct: number;
+  buffs: BattleState["st"]["A"]["buffs"];
+  debuffs: BattleState["st"]["A"]["debuffs"];
+  stkPct: number;
+}) {
+  // Sum modifier contributions from current buffs / debuffs onto each
+  // affected stat. Mirrors the math in lib/game/battle.ts (effectiveSpd /
+  // effectiveCri) and lib/game/effects.ts addBuff/addDebuff conventions:
+  // buff_* values are positive, debuff_* values are stored negative.
+  let spdMod = 0, criMod = 0, accMod = 0, evaMod = 0, defMod = 0;
+  let reduceMod = 0, reflectMod = 0, iatkMod = 0;
+  for (const b of buffs) {
+    switch (b.t) {
+      case "buff_spd": spdMod += b.v; break;
+      case "buff_cri": criMod += b.v; break;
+      case "buff_eva": evaMod += b.v; break;
+      case "buff_def": defMod += b.v; break;
+      case "buff_reduce": reduceMod += b.v; break;
+      case "buff_reflect": reflectMod += b.v; break;
+      case "buff_iatk": iatkMod += b.v; break;
+      case "buff_iatk_reduce": iatkMod += b.v; reduceMod += b.v; break;
+      case "buff_reflect_eva": reflectMod += b.v; evaMod += b.v; break;
+      default: break;
+    }
+  }
+  for (const x of debuffs) {
+    switch (x.t) {
+      case "debuff_acc": accMod += x.v ?? 0; break;
+      case "debuff_eva": evaMod += x.v ?? 0; break;
+      case "debuff_def": defMod += x.v ?? 0; break;
+      default: break;
+    }
+  }
+  const eSpd = d.Spd + spdMod;
+  const eCri = d.Cri + criMod;
+  const eAcc = d.Acc + accMod;
+  const eEva = d.Eva + evaMod;
+  const ePD = d.PD + defMod;
+
+  const sign = (n: number) => (n === 0 ? "" : n > 0 ? ` (+${n})` : ` (${n})`);
+  const modClass = (n: number) =>
+    n > 0 ? "text-emerald-700" : n < 0 ? "text-rose-700" : "text-muted-foreground";
+
+  return (
+    <div className="space-y-2 text-[11px]">
+      <div className="font-display text-sm border-b pb-1 mb-1">{name}</div>
+      <div className="grid grid-cols-2 gap-x-3 gap-y-0.5">
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">HP</span>
+          <span><strong>{d.HP}</strong></span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">MP</span>
+          <span><strong>{d.MP}</strong></span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">SPD</span>
+          <span><strong>{eSpd}</strong><span className={modClass(spdMod)}>{sign(spdMod)}</span></span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">Cri</span>
+          <span><strong>{eCri}</strong><span className={modClass(criMod)}>{sign(criMod)}</span></span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">Acc</span>
+          <span><strong>{eAcc}</strong><span className={modClass(accMod)}>{sign(accMod)}</span></span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">Eva</span>
+          <span><strong>{eEva}</strong><span className={modClass(evaMod)}>{sign(evaMod)}</span></span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">ATK</span>
+          <span><strong>{d.Atk}</strong></span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">IA</span>
+          <span><strong>{d.IA}</strong>
+            {iatkMod !== 0 && <span className={modClass(iatkMod)}> (+{iatkMod}%)</span>}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">PD</span>
+          <span><strong>{ePD}</strong><span className={modClass(defMod)}>{sign(defMod)}</span></span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">ID</span>
+          <span><strong>{d.ID}</strong></span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">Res</span>
+          <span><strong>{d.Res}</strong></span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">Hit</span>
+          <span className="text-emerald-700"><strong>{hPct}%</strong></span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">Crit</span>
+          <span className="text-amber-700"><strong>{cPct}%</strong></span>
+        </div>
+      </div>
+      {(stkPct > 0 || reduceMod > 0 || reflectMod > 0) && (
+        <div className="border-t pt-1 mt-1 space-y-0.5">
+          {stkPct > 0 && (
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">ATK stack</span>
+              <span className="text-emerald-700"><strong>+{stkPct}%</strong></span>
+            </div>
+          )}
+          {reduceMod > 0 && (
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">ลด dmg รับ</span>
+              <span className="text-emerald-700"><strong>{reduceMod}%</strong></span>
+            </div>
+          )}
+          {reflectMod > 0 && (
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">สะท้อน</span>
+              <span className="text-amber-700"><strong>{reflectMod}%</strong></span>
+            </div>
+          )}
+        </div>
+      )}
+      <div className="text-[9px] text-muted-foreground border-t pt-1">
+        Hit / Crit คำนวณกับศัตรูปัจจุบัน · ค่าในวงเล็บเป็นโบนัสจาก buff / debuff
+      </div>
+    </div>
+  );
+}
+
 function SidePanel({
   side,
   state,
@@ -209,7 +358,27 @@ function SidePanel({
     >
       <CardContent className="p-3 space-y-1">
         <div className="font-semibold text-sm">
-          {name}
+          <InfoPopover
+            trigger={
+              <span className="cursor-help underline decoration-dotted decoration-muted-foreground/50 underline-offset-2">
+                {name}
+              </span>
+            }
+            side="bottom"
+            align="start"
+            contentClassName="w-72"
+          >
+            <FighterStatsTooltip
+              name={name}
+              d={d}
+              opp={opp}
+              hPct={hPct}
+              cPct={cPct}
+              buffs={buffs}
+              debuffs={debuffs}
+              stkPct={stkPct}
+            />
+          </InfoPopover>
           {art.id !== "none" && (
             <span
               className={cn(
@@ -239,16 +408,6 @@ function SidePanel({
           className="h-1.5"
           animate={false}
         />
-        <div className="flex flex-wrap gap-1 mt-1 text-[9px]">
-          <span className="bg-muted/40 px-1.5 py-0.5 rounded">SPD <strong>{d.Spd}</strong></span>
-          <span className="bg-muted/40 px-1.5 py-0.5 rounded">Acc <strong>{d.Acc}</strong></span>
-          <span className="bg-muted/40 px-1.5 py-0.5 rounded">Eva <strong>{d.Eva}</strong></span>
-          <span className="bg-muted/40 px-1.5 py-0.5 rounded">Cri <strong>{d.Cri}</strong></span>
-        </div>
-        <div className="text-[11px] text-muted-foreground">
-          Hit<strong className="text-emerald-600"> {hPct}%</strong> · Crit
-          <strong className="text-amber-600"> {cPct}%</strong>
-        </div>
         <div className="flex flex-wrap gap-1 mt-1 min-h-[16px]">
           {buffs.map((b, i) => {
             const desc = describeBuff(b);

@@ -7,7 +7,6 @@ import { type Side } from "@/lib/game";
 import { useCharacterStore } from "@/store/character-store";
 import { StatSliders } from "./stat-sliders";
 import { DerivedStats } from "./derived-stats";
-import { ArtSelector } from "./art-selector";
 import { SkillSlots } from "./skill-slots";
 import { EquipmentSlots } from "./equipment-slots";
 import { NpcPresetSelector } from "./npc-preset-selector";
@@ -37,7 +36,6 @@ export function CharacterCard({ side }: Props) {
         <NpcPresetSelector side={side} />
         <StatSliders side={side} />
         <DerivedStats side={side} />
-        <ArtSelector side={side} />
         <SkillSlots side={side} />
         <EquipmentSlots side={side} />
       </CardContent>

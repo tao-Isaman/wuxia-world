@@ -41,6 +41,15 @@ interface CharacterStore {
   setArt: (side: Side, artId: string) => void;
   setArtLevel: (side: Side, lv: number) => void;
   setSkillSlot: (side: Side, slot: number, skillId: string | null) => void;
+  // Per-skill level on the build's `skillLevels` map. Used by the
+  // unified skill/art slot picker in /debug so each slotted skill can
+  // be tuned independently. Clamps to [1, 10].
+  setSkillLevel: (side: Side, skillId: string, lv: number) => void;
+  // Per-art level on the build's `artLevels` map. Mirrors setArtLevel
+  // but keyed by id (so multiple slotted arts can each have their own
+  // level). Also syncs the legacy `artLevel` when the id matches the
+  // current primary `artId`.
+  setArtLevelById: (side: Side, artId: string, lv: number) => void;
   setEquipSlot: (
     side: Side,
     slot: keyof EquipLoadout,
@@ -103,6 +112,29 @@ export const useCharacterStore = create<CharacterStore>()(
           }
           next[slot] = skillId;
           return { builds: { ...s.builds, [side]: { ...cur, skillIds: next } } };
+        }),
+
+      setSkillLevel: (side, skillId, lv) =>
+        set((s) => {
+          const cur = s.builds[side];
+          const cv = clamp(lv, 1, 10);
+          const map = { ...(cur.skillLevels ?? {}) };
+          map[skillId] = cv;
+          return { builds: { ...s.builds, [side]: { ...cur, skillLevels: map } } };
+        }),
+
+      setArtLevelById: (side, artId, lv) =>
+        set((s) => {
+          const cur = s.builds[side];
+          const cv = clamp(lv, 1, 10);
+          const map = { ...(cur.artLevels ?? {}) };
+          map[artId] = cv;
+          // Keep the legacy primary `artLevel` in sync when the id
+          // matches the primary art so derive() readers that still hit
+          // `build.artLevel` see the same number.
+          const patch: Partial<typeof cur> = { artLevels: map };
+          if (cur.artId === artId) patch.artLevel = cv;
+          return { builds: { ...s.builds, [side]: { ...cur, ...patch } } };
         }),
 
       setEquipSlot: (side, slot, idx, itemId) =>
