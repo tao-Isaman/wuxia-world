@@ -26,11 +26,12 @@ The starter location is the player's home (`home_player`), which connects to the
 
 ### World (text-RPG layer)
 
-- **~85 locations** organised by category — 7 cities, 7 villages, 17 sects, 10 isles, 11 mountains/cliffs, 12 caves/valleys, 5 temples/palaces, 4 mansions, 4 inns, 11 NPC homes, plus misc.
+- **~86 locations** organised by category — 7 cities, 7 villages, 18 sects (incl. สำนักสุลถัง / Tang clan), 10 isles, 11 mountains/cliffs, 12 caves/valleys, 5 temples/palaces, 4 mansions, 4 inns, 11 NPC homes, plus misc.
 - **Hand-curated routes** — every connection between two locations is in `lib/world/data/location-routes.ts`, with its own per-direction Thai label like "ลำคลองใหญ่" or "ทางขึ้นเขา". No procedural generation.
 - **Travel costs** — moving between a location and a route costs 10 stamina + 1–2 ชั่วยาม. Cities and inns offer paid rest; temples / palaces a free half restore; every other location offers free roadside rest.
 - **Random encounters** — 15 % chance per location entry, with a fight-or-flee screen. Pool is filtered by zone (cities never spawn beasts; wild zones favour beasts; sects / temples carry the supernatural pool) and weighted by tier (tier-0 chaff is common, tier-4 legendary foes are rare).
 - **Hunt-boost mechanic** — when the player has an active "kill X enemies" quest stage AND the target spawns in the current zone, the encounter rate jumps from 15 % → **80 %** and the pool is restricted to the target. Treasure / meet bands are suppressed during a hunt. Falls back to the normal cadence when no target fits the zone.
+- **Sect-hunter ambush** — when the player has betrayed any sect (`betraySect` reward), each random-event roll has a 30 % chance to spawn that sect's `hunter_<sectId>` opponent (overrides the normal fight roll). Flee uses an AGI + LUK check (30 % base + (AGI+LUK)/2 %, cap 90 %); fail forces the fight.
 - **Location categories** — every leaf has one or more tags (city / village / sect / mountain / forest / cave / river / temple / etc.) inferred from its id prefix, used to gate the practice action and to apply skill-type XP bonuses (forest → yang/external, cave → yin/soft, mountain → balance/hard, river → internal).
 - **Dialogs** with branching choices, gated by flags / quests / traits / NPC relationships.
 - **Quests** with a numbered stage checklist + a final "รับรางวัล" step shown in the **📋 ภารกิจ** menu tab. Three sub-tabs (กำลังทำ / สำเร็จ / ละทิ้ง). Active quests can be cancelled inline.
@@ -42,12 +43,14 @@ The starter location is the player's home (`home_player`), which connects to the
 ### Combat (battle sim)
 
 - **1v1 ATB-style** turn order with real-time gauge animation. Speed differences feel natural (2:1 SPD ≈ 2:1 turn count, not 5:1).
+- **Multi-hit + cast animation** — skills can declare a `hits` count (e.g., `dgjj` 9 swords, `tang_starrain` 15 darts); each hit pops its own damage number and stacks debuffs per-hit. Cast banner shows skill name (0.3 s) then per-hit numbers (0.1 s stagger), with HP bars draining in sync.
 - **10 unified slots** per build, holding either a move skill or an inner skill (with `art:` prefix).
-- **90+ move skills** across 5 tiers + a beast-move family (`bst_*` claws / fangs / venoms used by hunt-only opponents). Sects: เส้าหลิน, อู่ตัง, ฉวนเจิน, กู่มู่, หัวซาน, พรรคยาจก, พรรคสว่างมืด, พรรคสราญรมย์, สำนักดาวดึงส์, พรรคเบญจพิษ, สำนักดาบโลหิต, ยุทธจักร (catch-all).
-- **45 inner skills** (กำลังภายใน) across 5 tiers with active + passive, scaled stats and HP/MP per level.
+- **160+ move skills** across 5 tiers + a beast-move family (`bst_*` claws / fangs / venoms used by hunt-only opponents). 15 sects represented: เส้าหลิน, อู่ตัง, ง้อไบ๊, หัวซาน, ฉวนเจิน, กู่มู่, พรรคยาจก, พรรคตะวันจันทรา, พรรคสราญรมย์, สำนักดาวดึงส์, พรรคเบญจพิษ, สำนักดาบโลหิต, องครักษ์เสื้อแพร, สำนักสุลถัง, ยุทธจักร (catch-all).
+- **Per-tier stat-sum budget** — every move skill targets a normalized stat budget per tier (T0=10, T1=15, T2=20, T3=25, T4=30). Maintained by `scripts/normalize-t3-stats.ts` (despite the name, handles all tiers via a target table).
+- **108 inner skills** (กำลังภายใน) across 5 tiers with active + passive, scaled stats and HP/MP per level. Auto-sorted by sect via `scripts/sort-by-sect.ts`.
 - **25 weapon families** of equipment (`W / A / H / B / BR / R / C` slots with multi-slot bracelets, rings, charms).
 - **Mastery** — each skill counts toward its weapon family's mastery (cap 200), scales the family's per-skill damage multiplier. Profile shows raw points + multiplier.
-- **45 opponents** in 5 tiers including 10 hunt-only beasts that spawn through hunting resources only — tuned weaker than tier-equivalent random-event beasts so hunting stays a sustainable grind.
+- **131 NPCs · 229 quests · 940 scenes · ~150 opponents** including 10 hunt-only beasts (sustainable grind tier) and 11 sect hunters (one per joinable sect, T4 tier — appear via random event when the player betrays).
 
 ### Player progression
 
@@ -59,6 +62,15 @@ The starter location is the player's home (`home_player`), which connects to the
 - **5 reputation traits** — ความดี / ความเลว / ความหยิ่งยโส / ความถ่อมตน / ชื่อเสียง. Adjusted by quest choices and sparring; readable by quest conditions.
 - **NPC relationships** — quests / sparring move per-NPC standing.
 - **Action log** — last 100 events (rest, gather, craft, buy, sell, use, learn, combat, quest).
+
+### Disciple / sect membership
+
+- **11 joinable sects** — shaolin, wudang, huashan, quanzhen, emei, gumu, beggars, jinyiwei, sunmoon, tang, xiaoyao. Each has a 9 → 1 rank ladder (3-rank for the secret Gumu sect) with auto-grant skill / art rewards per rank.
+- **Cross-sect loyalty** — `anySectMember` Condition gates the intro quest of every sect, so you can only be an active disciple of one sect at a time.
+- **Joining** — each sect has a unique intro quest at its hall. Most are herb-gather trials (ascetic sects); some have specific gates (Shaolin = male, Emei = female, Huashan = 500 gold fee, Beggars = begging life-skill ≥ lv 2, Jinyiwei = kidnap a noble, Sunmoon = assassinate an imperial guard, Gumu = secret — must be a Quanzhen disciple AND have learned `t3_qz_sun`).
+- **Leaving** — disciples can resign (`ลาออกอย่างเป็นทางการ`, sect-skills XP freezes but no consequences) or betray (`ทรยศสำนัก`, skills keep growing but the sect's hunter chases you in random events). Both clear the active-membership gate so you can join a new sect.
+- **Redemption** — every sect has a `qst_<sect>_redemption` quest available only to betrayers. Completing it converts betrayed → resigned (hunters stop, skills stay frozen).
+- **Per-sect content** lives in `lib/world/data/{npcs,quests,scenes-content}/sects/<sectId>.ts` — adding a new sect is creating 3 small files + 3 import lines in the barrel.
 
 ### Activities
 
@@ -73,7 +85,7 @@ The starter location is the player's home (`home_player`), which connects to the
 - **Tabs in the menu bar** — 👤 โปรไฟล์ · 🎒 ของในย่าม · 🥋 วิชาฝีมือ (manages BOTH move skills and arts in one slot system) · 🌾 วิชาชีพ · 📋 ภารกิจ · 📜 บันทึก.
 - **Toast notifications** at the top of the screen for every action result.
 - **Loading overlay** flashes briefly during gather / craft / rest / practice for tactile feedback.
-- **Persistent saves** via Zustand persist middleware (localStorage). Schema migration chain handles version bumps (currently world-store v14).
+- **Persistent saves** via Zustand persist middleware (localStorage). Schema migration chain handles version bumps (currently world-store **v17** — added gender, sectMembership.status, and quest-accept snapshots along the way).
 - **Game-over screen** on fatal battle loss; "เริ่มใหม่" wipes the world slice (character builds are independent).
 
 ## Project layout
@@ -101,25 +113,35 @@ lib/
     location-categories.ts  Inferred category tags + practice eligibility + bonus
     data/
       scenes.ts          Tutorial scenes
-      world-map.ts       7 cities + 7 villages + 17 sects + ... = ~85 leaves
+      world-map.ts       7 cities + 7 villages + 18 sects + ... = ~86 leaves
       location-routes.ts Hand-curated edge list with per-direction labels
       sects.ts           Canonical sect list + sort order
-      opponents.ts       45 enemies in 5 tiers (35 + 10 hunt-only beasts)
-      npcs.ts            NPC registry (talk / spar)
+      sect-memberships.ts Per-sect rank ladder + reward pools (11 joinable sects)
+      opponents.ts       150+ enemies — random-event, hunt-only, sect spar, sect hunters
+      npcs/sects-temples.ts (barrel) → sects/<sectId>.ts (per-sect NPC files)
       items.ts           Items with category + price + use effect
       shops.ts           Per-location shop catalogues
       sect-halls.ts      Per-city tier 0–1 ยุทธจักร skill / art offerings
       artisans.ts        Per-location craft NPCs (forge/alchemy/tailoring/chef/jewelry/accessory)
       recipes.ts         Crafting recipes (with `basic` flag for shared staples)
       resources.ts       Gather + hunt nodes (hunt nodes use weak hunt_* beasts)
-      random-events.ts   Fight / treasure / meet pool, hunt-boost when kill quest is active
-      quests.ts          Quest definitions
-    types.ts             Scene union, conditions, effects, traits, etc.
-    effects.ts           SceneEffect dispatcher + collectActiveHuntTargets
-    conditions.ts        Condition evaluator
+      random-events.ts   Fight / treasure / meet pool, hunt-boost + sect-hunter spawn
+      quests/sects-temples.ts (barrel) → sects/<sectId>.ts (per-sect quest files)
+      scenes-content/sects-temples.ts (barrel) → sects/<sectId>.ts (per-sect scene files)
+    types.ts             Scene union, conditions, effects, traits, SectMembership.status, etc.
+    effects.ts           SceneEffect dispatcher, quest snapshot + auto-consume helpers
+    conditions.ts        Condition evaluator (incl. anySectMember / sectStatus / lifeSkillLevel / learnedArt / goldAtLeast)
     validate.ts          Save-rehydrate sanity pass
     battle-bridge.ts     World ↔ battle subscription glue
     stat-progression.ts  Per-stat xp helpers + LUK roll formula
+
+scripts/                  One-shot maintenance scripts
+  audit-content.ts        Reference audit (NPCs/quests/scenes/items)
+  audit-quest-flow.ts     Offer→accept→complete chain audit
+  sort-by-sect.ts         Re-sort skills.ts + arts.ts by SECT_ORDER
+  normalize-t3-stats.ts   Per-tier stat-sum normalizer (T0=10..T4=30)
+  split-sects-file.ts     Splits the sects-temples.ts trio per-sect
+  rework-poison.ts        Rework poison skills to use the new poison_dmg DoT
 
 store/
   character-store.ts     /debug A & B character builds (persisted, v2)

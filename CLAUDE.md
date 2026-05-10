@@ -19,6 +19,9 @@ bun run lint         # next lint (ESLint flat config)
 bun run typecheck    # tsc --noEmit
 bun scripts/audit-content.ts     # scene / quest / NPC / item reference audit
 bun scripts/audit-quest-flow.ts  # offer→accept→complete chain audit
+bun scripts/sort-by-sect.ts      # re-sort skills.ts + arts.ts by SECT_ORDER (idempotent)
+bun scripts/normalize-t3-stats.ts # normalize move-skill stat sums per tier (T0=10..T4=30)
+bun scripts/split-sects-file.ts <quests|npcs|scenes>  # split sects-temples.ts trio into per-sect files
 ```
 
 There are no tests yet. If you add some, prefer Vitest (zero-config with the Bun runner).
@@ -41,7 +44,7 @@ lib/game/   lib/world/   ← pure TypeScript engines (no React, no I/O)
 
 The engine has no React, no DOM, no async, no hooks. Everything UI-facing flows through `lib/game/index.ts` (the public barrel).
 
-- **`types.ts`** — discriminated unions on `t` (`SelfEffect`, `EnemyEffect`, `EquipEffect`, `ArtPassiveEffect`). Also `SkillType` (yin / yang / balance / hard / soft / internal / external) for the conflict system, and `SKILL_SLOT_COUNT = 10`. `BattleState` carries both `skillUses` and `artUses` (per-side counters used by the world store to grant per-skill / per-art XP post-battle).
+- **`types.ts`** — discriminated unions on `t` (`SelfEffect`, `EnemyEffect`, `EquipEffect`, `ArtPassiveEffect`). Also `SkillType` (yin / yang / balance / hard / soft / internal / external) for the conflict system, and `SKILL_SLOT_COUNT = 10`. `BattleState` carries both `skillUses` and `artUses` (per-side counters used by the world store to grant per-skill / per-art XP post-battle). Skills can carry an optional `hits: number` for multi-strike attacks (each hit gets its own damage roll + applies enemy effects per-hit, used by `dgjj` / `tang_starrain` / `jy_chain_assassin` / etc). `EnemyEffect` includes `poison_dmg` (pure HP DoT, stronger than burn — no MP drain, no Eva/Acc bundle) alongside the older `debuff_poison` + `heavy_poison` (which still bundle Eva/Acc); the Tang sect + jianghu poison weapons all use the new clean form.
 - **`data/`** — static tables: `TIERS`, `SKILLS` (incl. `bst_*` beast moves), `ARTS`, `EQUIPMENT`, `STAT_KEYS`, `WEAPON_FAMILY_*`, `SECT_ORDER`/`JIANGHU_SECT`/`sectRank` (canonical sect list).
 - **`derive.ts`** — base stats → derived combat stats (`derive`), `combinedStats` (merges base + active art + learned arts + slotted skills + learned skills + equipment, with conflict factors AND skill-level scaling on `sk.st`), `deriveAll` (adds HP/MP gain from arts), `getMasteryMap` (per-weapon-family mastery, scaled by skill level).
 - **`damage.ts`** — `hitPct`, `critPct`, `hpColor`, `CRIT_MULTIPLIER`.
@@ -96,22 +99,23 @@ A second engine layered on top of the battle sim. Same conventions as `lib/game/
 
 #### Module map (`lib/world/`)
 
-- **`types.ts`** — scene union, `Choice`, `SceneEffect` (incl. `learnSkill` / `learnArt` / `addTrait` / `addNpcRelationship` / `triggerBattle` with optional `nonFatal`), `Condition` (incl. `trait` / `npcRelationship` / `defeatedOpponent` / `visitedLocation`), `NpcDef`, `NpcStateEntry`, `OpponentDef` (with `ti`, `category`, `drops`), `ItemDef` (with `category`, `price`, `use: trainSkill | heal`), `TraitKey` (5 traits), `EnemyCategory`, `LocationCategory` (13 keys), `ITEM_CATEGORIES`, `WorldStateData` (incl. `artExp`, `learnedRecipeIds`), `ActionLogEntry`, `PendingBattle`, `PendingEncounter`, `PendingHuntYield`, `PendingSpar`, `RecipeDef.basic?: boolean`, `ArtisanDef`.
+- **`types.ts`** — scene union, `Choice`, `SceneEffect` (incl. `learnSkill` / `learnArt` / `addTrait` / `addNpcRelationship` / `triggerBattle` with optional `nonFatal` / `joinSect` / `leaveSect` (legacy alias for resign) / `resignSect` / `betraySect` / `addGold`), `Condition` (incl. `trait` / `npcRelationship` / `defeatedOpponent` / `visitedLocation` / `gender` / `sectMember` / `sectRankAtLeast` / `anySectMember` / `sectStatus` / `goldAtLeast` / `learnedArt` / `lifeSkillLevel`), `NpcDef`, `NpcStateEntry`, `OpponentDef` (with `ti`, `category`, `drops`), `ItemDef` (with `category`, `price`, `use: trainSkill | heal`), `TraitKey` (5 traits), `EnemyCategory`, `LocationCategory` (13 keys), `ITEM_CATEGORIES`, `SectMembership` (incl. `status: "active" | "resigned" | "betrayed"` and `acceptedDefeatedAt` / `acceptedHasItemAt` snapshot fields on `QuestState`), `WorldStateData` (incl. `artExp`, `learnedRecipeIds`, `gender`, `sectMembership`, `kidnappedNpcIds`, `assassinatedNpcIds`), `ActionLogEntry`, `PendingBattle`, `PendingEncounter`, `PendingHuntYield`, `PendingSpar`, `RecipeDef.basic?: boolean`, `ArtisanDef`.
 - **`location-categories.ts`** — `inferCategoriesFromId`, `getLocationCategories`, `canPracticeAt`, `practiceXpBonus`, `describeBonusForLocation`. Practice categories: sect / mountain / forest / cave / river / temple. Bonus map: forest → yang/external, cave → yin/soft, mountain → balance/hard, river → internal. Bonus is a flat 1.30× multiplier — no stacking.
 - **`stat-progression.ts`** — `STAT_XP_PER_ACTION = 10`, `xpToNextStatLevel(base) = 50 × base`, `lukRollChance(base) = min(50%, 10% + 1% × base)`, `STAT_FROM_LIFE_SKILL` (mining / wood / fishing / herbalism / venom → VIT, hard crafts incl. accessory → DEX, cultural → INT).
-- **`conditions.ts`** — `evaluateCondition(state, c)`.
-- **`effects.ts`** — `applyEffect` dispatcher, plus `tickQuestProgress`, `isQuestOfferable`, `isQuestTurnInForNpc`, **`collectActiveHuntTargets(state)`** (Set of opponentIds the player is hunting via current-stage `defeatedOpponent` autoAdvance — used by `rollRandomEvent` for the hunt-boost rule).
+- **`conditions.ts`** — `evaluateCondition(state, c)`. `sectMember` / `anySectMember` only return true for `status === "active"` memberships — resigned + betrayed tombstones don't count, so cross-sect exclusion is automatic via the single-line `{ t: "not", of: { t: "anySectMember" } }` prereq instead of enumerating every SectId.
+- **`effects.ts`** — `applyEffect` dispatcher, plus `tickQuestProgress` (uses delta-based `evaluateAutoAdvance` for `defeatedOpponent` + `hasItem` so repeatable quests don't auto-complete on the player's prior counts), `consumeQuestAutoItems` (called from auto-finish + popup turn-in to deduct items the player gathered for the quest — scene-driven completes still use explicit `takeItem` and never trigger this), `isQuestOfferable`, `isQuestTurnInForNpc`, **`collectActiveHuntTargets(state)`** (Set of opponentIds the player is hunting via current-stage `defeatedOpponent` autoAdvance — used by `rollRandomEvent` for the hunt-boost rule). On `startQuest` the dispatcher also snapshots current `defeatedCounts` / `inventory` for opponentIds + itemIds mentioned in the quest's autoAdvance conditions, into `QuestState.acceptedDefeatedAt` / `acceptedHasItemAt`.
 - **`validate.ts`** — drops dangling refs, clamps numeric ranges, drops unknown skill / art / recipe ids, syncs `playerBuild.skillLevels` from world `skillLevel` map. Runs on rehydrate.
 - **`battle-bridge.ts`** — module-level Zustand subscription. **One-way**: world → battle is automatic (passes current HP / MP into the next fight); battle → world is user-driven via `acknowledgeBattleResult`.
 
 #### Data tables (`lib/world/data/`)
 
 - **`scenes.ts`** — Core tutorial scenes + `WORLD_MAP_SCENES`. `START_SCENE_ID = "home_player"`.
-- **`world-map.ts`** — 7 cities, 7 villages, 17 sects, 10 isles, 11 terrain features, 12 caves, 5 temples, 4 mansions, 4 inns, 11 NPC homes, 7 misc — total **~85 leaves**. Builds the connectivity graph from `LOCATION_ROUTES` (no random fill).
+- **`world-map.ts`** — 7 cities, 7 villages, 18 sects (incl. สำนักสุลถัง / Tang clan), 10 isles, 11 terrain features, 12 caves, 5 temples, 4 mansions, 4 inns, 11 NPC homes, 7 misc — total **~86 leaves**. Builds the connectivity graph from `LOCATION_ROUTES` (no random fill).
 - **`location-routes.ts`** — explicit hand-curated edge list. Each entry is a `LocationRoute { a, b, fromA, fromB, hintA?, hintB? }` with **per-direction labels**.
 - **`sects.ts`** — `SECT_ORDER` and `JIANGHU_SECT = "ยุทธจักร"`. Default sect for unaffiliated skills / arts.
-- **`opponents.ts`** — **45 `OpponentDef`s** across **5 tiers** (5 / 10 / 10 / 5 / 5 random-event roster + **10 hunt-only beasts** with the `hunt_*` prefix). Hunt opponents use base TIER_STATS (no overrides) so they're naturally weaker than tier-equivalent random-event beasts; they carry the `bst_*` skill family.
-- **`npcs.ts` / `npcs/`** — `NpcDef` registry. `dialogSceneId?` enables 💬 talk; `sparOpponentId?` enables ⚔ spar (non-fatal battle); `locationIds[]` places them. Two pickup-only contacts added in cities for delivery quests (Wang at the capital, Li the book merchant at suzhou).
+- **`sect-memberships.ts`** — `SECT_MEMBERSHIPS` map keyed by `SectId` (11 entries: shaolin · wudang · huashan · quanzhen · emei · gumu · beggars · jinyiwei · sunmoon · tang · xiaoyao). Each `SectMembershipDef` declares the rank ladder, per-rank reward pools (skills + arts the player picks one of), join requirements (`Condition`), `rankUpCost(rank) → points`, `questCooldownDays`, and the registrar NPC. Helpers: `pendingRewardsAtRank(def, rank, claimed)` and `autoGrantableRewards(def, currentRank, claimed)` (the latter auto-claims single-option pools when the player joins / climbs).
+- **`opponents.ts`** — 150+ `OpponentDef`s across **5 tiers**, organised in named blocks: random-event roster · 10 hunt-only beasts (`hunt_*` prefix, weaker than tier-equivalent random-event beasts, carry the `bst_*` skill family) · per-sect spar opponents (each disciple/elder NPC has a `spar_<sectid>_<name>` entry) · 11 sect hunters (`hunter_<sectId>` — appear via random event when the player has `sectMembership[sectId].status === "betrayed"`).
+- **`npcs/sects-temples.ts`** — barrel that re-exports the per-sect `npcs/sects/<sectId>.ts` files. Adding a new sect = create one file + one import + one spread in the barrel. `NpcDef` registry pattern: `dialogSceneId?` enables 💬 talk; `sparOpponentId?` enables ⚔ spar (non-fatal battle); `locationIds[]` places them; `defenseTier?` + `stealLoot[]` enable the steal mechanic. Two pickup-only contacts added in cities for delivery quests (Wang at the capital, Li the book merchant at suzhou).
 - **`items.ts`** — every item has `category` (10 categories) and `price`. `use` can be `{ t: "trainSkill" }` or `{ t: "heal", hp?, mp? }`. Quest items carry `category: "quest"` + `price: 0` so shops won't sell them.
 - **`shops.ts`** — `ShopDef` per location. Inventory + `acceptsCategories` filter + `sellMultiplier`. Cities = full general store (50 % sell-back), inns = food-focused (40 %), villages = tiny (35 %).
 - **`sect-halls.ts`** — `SectHallDef` per city. **Tier 0–1 ยุทธจักร skills + arts only** — sect-affiliated styles must be learned at the parent sect, not the public city hall. Each city's roster differs.
@@ -119,8 +123,9 @@ A second engine layered on top of the battle sim. Same conventions as `lib/game/
 - **`recipes.ts`** — crafting recipes. `RecipeDef.basic === true` opts a recipe into the per-profession fan-out (every artisan of that profession sells it). Specialty recipes are hand-assigned to specific artisans in `artisans.ts`.
 - **`life-skills.ts`** — 18 life skills incl. the new `accessory`. `LIFE_SKILL_LABEL`, `LIFE_SKILL_ICON`, mastery thresholds, drop-check formula.
 - **`resources.ts`** — gather + hunt nodes. Hunt nodes (`hunt_forest`, `hunt_mountain`, `hunt_legendary`) point at the dedicated `hunt_*` opponent pool — separate from random-event beasts.
-- **`random-events.ts`** — `EVENT_PROBABILITY.fight = 0.15`, **`fightHunting = 0.80`** (hunt boost); treasure / meet scale with LUK (5 % + LUK/200, cap 25 %; 10 % + LUK/300, cap 35 %). `FIGHT_EVENTS` is tier-weighted (T0 weight 8 → T4 weight 0.5). `fightEventsForLocation(id)` filters by zone (city = humans only, wild = beasts + humans + a touch of supernatural, etc.) — see `ZONE_CATEGORY_WEIGHT`.
-- **`quests.ts`** — quest definitions split per zone (`cities.ts` / `villages.ts` / `sects-temples.ts` / `wilderness.ts`). Stages have optional `autoAdvance: Condition`; the engine ticks progress after every effect via `tickQuestProgress`.
+- **`random-events.ts`** — `EVENT_PROBABILITY.fight = 0.15`, **`fightHunting = 0.80`** (hunt boost); treasure / meet scale with LUK (5 % + LUK/200, cap 25 %; 10 % + LUK/300, cap 35 %). `FIGHT_EVENTS` is tier-weighted (T0 weight 8 → T4 weight 0.5). `fightEventsForLocation(id)` filters by zone (city = humans only, wild = beasts + humans + a touch of supernatural, etc.) — see `ZONE_CATEGORY_WEIGHT`. The `rollRandomEvent` dispatcher in `effects.ts` first checks for any betrayed sect — if found, 30 % chance to spawn `hunter_<sectId>` (overrides the normal fight/treasure/meet roll entirely). The encounter screen's `🏃 หนี` action delegates to `fleeEncounter` in world-store; for `hunter_*` opponents it runs an AGI + LUK check (30 % + (AGI+LUK)/2 %, cap 90 %) — fail forces the fight via `pendingBattle` promotion.
+- **`quests/sects-temples.ts`** — barrel re-exporting per-sect quest files in `quests/sects/<sectId>.ts`. Same pattern for villages / cities / wilderness / evil / spies / temples-misc (`_other.ts`). Stages have optional `autoAdvance: Condition`; the engine ticks progress after every effect via `tickQuestProgress`. **`startQuest` snapshots cumulative counters** (`defeatedCounts` / `inventory`) into `QuestState.acceptedDefeatedAt` / `acceptedHasItemAt` so the autoAdvance evaluator can use delta semantics — repeatable sect quests don't auto-complete on prior counts. **Auto-finish + popup turn-in also call `consumeQuestAutoItems`** to deduct items the player gathered for the quest (scene-driven completes use explicit `takeItem` and bypass this — no double-consume).
+- **`scenes-content/sects-temples.ts`** — barrel re-exporting per-sect scene files in `scenes-content/sects/<sectId>.ts`. `qs_qst_<questId>_offer` + `qs_qst_<questId>_complete` is the scene-driven flow; sect quests with no completion scene rely on the popup turn-in path.
 
 ### Routes
 
@@ -133,7 +138,7 @@ All `"use client"`. Five stores:
 
 - **`character-store.ts`** — `/debug` setup-tab state. Persisted (`wusia-character-v1`, version 2). World does **not** read from this. v1 → v2 padded `skillIds` 5 → 10 and seeded `learnedSkillIds` / `learnedArtIds` / `artLevels`.
 - **`battle-store.ts`** — runtime battle state. **Not persisted**. `start(a, b, opts?)` accepts `hpA / mpA` carryover. `useSkill(slotIdx)` parses the slot and dispatches to `resolveSkill` or `resolveArtActive`. `BattleState` tracks both `skillUses` and `artUses` for the world store to drain on win.
-- **`world-store.ts`** — story state (scenes, flags, quests, inventory, gold, traits, NPC states, skill / art / stat progression, learned recipes, action log). Persisted (`wusia-world-v1`, **version 14**) with `validateAndRepair` on rehydrate. Notable actions: `practiceSkill`, `levelUpArtFromWExp`, `levelUpSkillFromWExp`, `buyRecipe`, `craftRecipe` (artisan-gated for the 6 craft professions), `abandonQuest`.
+- **`world-store.ts`** — story state (scenes, flags, quests, inventory, gold, traits, NPC states, skill / art / stat progression, learned recipes, action log, sect membership, gender). Persisted (`wusia-world-v1`, **version 17**) with `validateAndRepair` on rehydrate. Notable actions: `practiceSkill`, `levelUpArtFromWExp`, `levelUpSkillFromWExp`, `buyRecipe`, `craftRecipe` (artisan-gated for the 6 craft professions), `abandonQuest`, `joinSect`, `upgradeSectRank`, `pickSectReward`, `acceptSectQuest`, **`resignSect`** (formal — skills freeze), **`betraySect`** (skills keep growing but hunters spawn), `attemptSteal`, `attemptKidnap`, `attemptAssassinate`, `finishQuestNow` (popup turn-in path — calls `consumeQuestAutoItems` before firing `finishQuest`). Internal helpers `isSkillFrozen` / `isArtFrozen` short-circuit per-skill / per-art XP grants when the source sect is in `"resigned"` status.
 - **`loading-store.ts`** — `flashLoading(message, duration?)`. Auto-hides after 300 ms by default. Used for gather / craft / rest / practice action feel (NOT travel — travel is instant).
 - **`toast-store.ts`** — `toast(kind, message, durationMs?)`. Stack of up to 3 visible at once, auto-dismiss after 2.6 s. Kinds: success / info / warn / error.
 
@@ -160,6 +165,29 @@ UI components subscribe via the standard selector pattern: `useWorldStore((s) =>
 - **Location bonus**: `practiceXpBonus(scene, types)` returns `1.30` when the location's category set intersects the skill/art's `types` per the rule `forest→yang/external · cave→yin/soft · mountain→balance/hard · river→internal`. Otherwise `1.0`.
 - Eligibility: `canPracticeAt(scene)` must return true (sect / mountain / forest / cave / river / temple). LocationView renders the "🧘 ฝึกฝน" button only for eligible locations.
 - Popup: `components/world/popups/practice-popup.tsx`. Shows learned skills + arts, location's matched bonus types, stamina check; uses `flashLoading` for a 1-sec deliberate pause.
+
+### Sect membership / disciple system
+
+**11 joinable sects** declared in `lib/world/data/sect-memberships.ts`. Each `SectMembershipDef` has:
+
+- `id`, `name`, `hallLocationId`, `registrarNpcId`
+- `joinRequirements: Condition` — gate evaluated when the intro quest's reward chain calls `joinSect`. Common gates: `gender` (Shaolin = male, Emei = female), `lifeSkillLevel` (Beggars = begging ≥ lv 2), `goldAtLeast` (Huashan = 500 gold), `learnedArt` (Gumu = `t3_qz_sun`).
+- `startRank`, `topRank`, `rankUpCost(targetRank) → points`, `questCooldownDays`
+- `skillsByRank: Record<rank, readonly skillId[]>` + `artsByRank: Record<rank, readonly artId[]>` — each rank's reward pool. Single-element pools auto-grant via `autoGrantableRewards`; multi-element pools become a UI picker.
+
+**Membership status** lives on `SectMembership.status`:
+- `"active"` — current disciple. Counts toward `sectMember` / `anySectMember` Conditions, gets all sect benefits.
+- `"resigned"` — formal resignation via `resignSect` reward / store action. Skills + arts learned via this sect's `rewardPicks` are XP-frozen (`isSkillFrozen` / `isArtFrozen` checks). Hunter does NOT spawn. Player free to join a new sect.
+- `"betrayed"` — defection via `betraySect`. Skills keep gaining XP but `rollRandomEvent` may spawn `hunter_<sectId>` (30 % roll per random event). Cleared by completing the redemption quest (`qst_<sectId>_redemption` — `prereqs: { t: "sectStatus", sectId, status: "betrayed" }`, reward chain ends with `resignSect` so betrayed → resigned).
+
+**Cross-sect exclusion** is one line per intro: `{ t: "not", of: { t: "anySectMember" } }`. Adding a new SectId doesn't require touching the other intros.
+
+**Snapshots in QuestState** prevent repeatable sect quests from auto-completing on prior counts:
+- `acceptedDefeatedAt[opponentId]` — defeatedCounts at `startQuest` time
+- `acceptedHasItemAt[itemId]` — inventory at `startQuest` time
+- `evaluateAutoAdvance` checks `(current - snapshot) >= count` for `defeatedOpponent` + `hasItem`
+
+**Auto-consume on turn-in** (`consumeQuestAutoItems`) deducts items the player gathered for the quest at finish time. Only called from `tickQuestProgress` done branch (auto-advance) + `finishQuestNow` store action (popup turn-in). Scene-driven completes use explicit `takeItem` and bypass this — no double-consume.
 
 ### Hunt-boost mechanic
 
@@ -228,8 +256,9 @@ When `rollRandomEvent` rolls a fight (15 % base, **80 % during a hunt**), it set
 
 Most additions don't require touching dispatchers:
 
-- **New skill** → append to `SKILLS` in `lib/game/data/skills.ts` (with `sc` + `ti` + optional `types`). Sort order: by sect → tier.
+- **New skill** → append to `SKILLS` in `lib/game/data/skills.ts` (with `sc` + `ti` + optional `types`). Sort order: by sect → tier. Run `bun scripts/sort-by-sect.ts` to reorder + `bun scripts/normalize-t3-stats.ts` to confirm the stat sum hits the per-tier budget (T0=10 / T1=15 / T2=20 / T3=25 / T4=30).
 - **New inner skill** → append to `ARTS` in `lib/game/data/arts.ts` (same sort).
+- **New sect (joinable)** → 7 spots: (1) extend `SectId` union in `lib/world/types.ts`; (2) add the sect's name to `SECT_ORDER` in `lib/game/data/sects.ts`; (3) add a `SectMembershipDef` to `SECT_MEMBERSHIPS` in `lib/world/data/sect-memberships.ts`; (4) create `lib/world/data/{npcs,quests,scenes-content}/sects/<sectId>.ts` (3 mirror files) + add 3 import + spread lines in each `sects-temples.ts` barrel; (5) add the sect's location to `world-map.ts` + a `LocationRoute` to `location-routes.ts`; (6) add a `hunter_<sectId>` opponent in `opponents.ts` for betrayer ambushes; (7) add the redemption quest `qst_<sectId>_redemption` (gated by `sectStatus: "betrayed"`, reward `resignSect`).
 - **New equipment** → append to `EQUIPMENT`.
 - **New location** → append a `{ kind: "location", ... }` to `SCENES` (or use the `leaf()` helper in `world-map.ts`). Optionally pass `categories: [...]` to override the prefix-inferred set. Then add at least one entry to `LOCATION_ROUTES` so it's reachable. Console will warn if a leaf has no explicit route.
 - **New route between locations** → append a `LocationRoute` with both directional labels to `location-routes.ts`.
@@ -247,7 +276,7 @@ Most additions don't require touching dispatchers:
 Two persisted Zustand slices, separate localStorage keys, separate version fields:
 
 - `wusia-character-v1` — `{ builds: { A, B } }` (only used by /debug). Version 2 (v1 → v2 padded slots, seeded learned arrays).
-- `wusia-world-v1` — world state minus action functions. **Version 14**. Migration chain (additive defaults at each step):
+- `wusia-world-v1` — world state minus action functions. **Version 17**. Migration chain (additive defaults at each step):
   1. v1 → v2: stamina + lifeSkillXp(6) + pendingHuntYield
   2. v2 → v3: lifeSkillXp 6 → 17 keys
   3. v3 → v4: day / time
@@ -261,6 +290,9 @@ Two persisted Zustand slices, separate localStorage keys, separate version field
   11. v11 → v12: defeatedCounts + visitedLocationIds (quest auto-advance bookkeeping)
   12. v12 → v13: artExp (per-art XP pool)
   13. v13 → v14: learnedRecipeIds + accessory life-skill key. Crafting now requires the recipe to be learned + the player to be at a matching artisan.
+  14. v14 → v15: stoleFromCounts + assassinatedNpcIds + kidnappedNpcIds (bad-action mechanics)
+  15. v15 → v16: gender field on the world slice
+  16. v16 → v17: sectMembership map (rank ladder, points, lastQuestDay, artQuestsDone, rewardPicks, joinedDay) + `status: "active" | "resigned" | "betrayed"` on each entry. Existing legacy memberships default `status = "active"` on the migration's first read.
 
 `battle-store` is intentionally not persisted.
 

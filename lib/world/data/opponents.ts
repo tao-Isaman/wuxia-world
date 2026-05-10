@@ -1370,12 +1370,12 @@ export const OPPONENTS: readonly OpponentDef[] = [
   // Chief Dongfang carries the full disciple line: qiankun + yxhd +
   // t3_sm_dualfusion + t3_sm_sunmoon arts + mi_firepalm fist (the
   // sect's only move skill).
-  { id: "spar_sunmoon_chief_dongfang", name: "เจ้าสำนักต่งฟางปู้ป้าย", ti: 4, category: "human",
+  { id: "spar_sunmoon_chief_dongfang", name: "อาจารย์ใหญ่หยินอวี้", ti: 4, category: "human",
     drops: [...DROPS_T4,
       { itemId: "ancient_coin", weight: 5 }, { itemId: "jade", weight: 4 },
       { itemId: "paper", weight: 3 }, { itemId: "ink", weight: 3 },
       { itemId: "wood_sacred", weight: 2 }, { itemId: "mithril_ore", weight: 1 }],
-    build: () => build("เจ้าสำนักต่งฟางปู้ป้าย", 4, {
+    build: () => build("อาจารย์ใหญ่หยินอวี้", 4, {
       stats: { POW: 24, INT: 20, AGI: 16, DEX: 14, VIT: 14, DEF: 8 },
       artId: "qiankun", artLevel: 10,
       skillIds: ["mi_firepalm"],

@@ -7,7 +7,7 @@ import type { NpcDef } from "../../../types";
 export const NPCS_MING: readonly NpcDef[] = [
   {
     id: "sect_sunmoon_chief_dongfang",
-    name: "เจ้าสำนักต่งฟางปู้ป้าย",
+    name: "อาจารย์ใหญ่หยินอวี้",
     description: "เจ้าสำนักพรรคตะวันจันทรา · ผู้สืบทอดเฉียนคุนต้าหนัวอีและพลังสุริยันจันทรา · ฝีมือเทียบเท่าตำนานยุทธจักร · ใจเด็ดเดี่ยวและคิดล้ำลึก",
     locationIds: ["sect_ming"],
     dialogSceneId: "npc_sect_sunmoon_chief_dongfang_talk",
