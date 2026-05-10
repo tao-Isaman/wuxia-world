@@ -106,6 +106,10 @@ export function applySelfEffect(
       addBuff(state, side, { t: "buff_spd", n: "เร็ว", v: eff.v, u: eff.u });
       logLine(state, "lS", `&nbsp;⟳ ${nm}: SPD+${eff.v}(${eff.u}ตา)`);
       return;
+    case "buff_cri":
+      addBuff(state, side, { t: "buff_cri", n: "วงคริต", v: eff.v, u: eff.u });
+      logLine(state, "lS", `&nbsp;⟳ ${nm}: Cri+${eff.v}(${eff.u}ตา)`);
+      return;
     case "heal_pct": {
       const cap = side === "A" ? state.dA.HP : state.dB.HP;
       const heal = Math.round(cap * eff.v / 100);
@@ -269,6 +273,15 @@ function applyPassiveEffect(
       addBuff(state, side, { t: "buff_eva", n: e.n ?? "Eva↑", v: e.v, u: e.u });
       logLine(state, "lS", `&nbsp;◆ ${nm}: Eva+${e.v}(${e.u}ตา)`);
       return;
+    case "buff_reflect":
+      addBuff(state, side, { t: "buff_reflect", n: e.n ?? "สะท้อน", v: e.v, u: e.u });
+      logLine(state, "lS", `&nbsp;◆ ${nm}: สะท้อน${e.v}%(${e.u}ตา)`);
+      return;
+    case "buff_spd_cri":
+      addBuff(state, side, { t: "buff_spd", n: e.n ?? "เร็ว", v: e.sv, u: e.u });
+      addBuff(state, side, { t: "buff_cri", n: e.n ?? "วงคริต", v: e.cv, u: e.u });
+      logLine(state, "lS", `&nbsp;◆ ${nm}: SPD+${e.sv} / Cri+${e.cv}(${e.u}ตา)`);
+      return;
     case "heal_pct": {
       const cap = side === "A" ? state.dA.HP : state.dB.HP;
       const heal = Math.round(cap * e.v / 100);
@@ -307,12 +320,15 @@ function applyPassiveEffect(
 
 // ─── Per-turn buff/debuff tick ───
 // Applies poison damage, decrements durations, prunes expired records,
-// regenerates HP from equipment, and detects death by DOT.
+// regenerates HP from equipment AND from primary-art aura (hpRegenPct /
+// mpRegenPct on the active art), and detects death by DOT.
 export function tickEffects(
   state: BattleState,
   hpRegenA: number,
   hpRegenB: number,
   names: Record<Side, string>,
+  artIdA?: string | null,
+  artIdB?: string | null,
 ): void {
   if (state.winner) return;
 
@@ -363,6 +379,27 @@ export function tickEffects(
       if (side === "A") state.hA = Math.min(cap, state.hA + heal);
       else state.hB = Math.min(cap, state.hB + heal);
       if (heal > 0) logLine(state, "lS", `&nbsp;💊 ${names[side]} ฟื้น ${heal} (อุปกรณ์)`);
+    }
+
+    // Art aura regen — capstone arts (e.g., วิชาเก้าเอี้ยง) grant a
+    // constant HP/MP trickle each turn from their primary-art slot.
+    const artId = side === "A" ? artIdA : artIdB;
+    if (artId && hp > 0 && !state.winner) {
+      const art = getArt(artId);
+      const hpCap = side === "A" ? state.dA.HP : state.dB.HP;
+      const mpCap = side === "A" ? state.dA.MP : state.dB.MP;
+      if (art.hpRegenPct && art.hpRegenPct > 0) {
+        const heal = Math.round(hpCap * art.hpRegenPct / 100);
+        if (side === "A") state.hA = Math.min(hpCap, state.hA + heal);
+        else state.hB = Math.min(hpCap, state.hB + heal);
+        if (heal > 0) logLine(state, "lS", `&nbsp;🌱 ${names[side]} ฟื้น ${heal} HP (${art.n})`);
+      }
+      if (art.mpRegenPct && art.mpRegenPct > 0) {
+        const mpHeal = Math.round(mpCap * art.mpRegenPct / 100);
+        if (side === "A") state.mpA = Math.min(mpCap, state.mpA + mpHeal);
+        else state.mpB = Math.min(mpCap, state.mpB + mpHeal);
+        if (mpHeal > 0) logLine(state, "lS", `&nbsp;🌱 ${names[side]} ฟื้น ${mpHeal} MP (${art.n})`);
+      }
     }
   }
 }

@@ -24,6 +24,7 @@ export function buffBadgeLabel(b: BuffRecord): string {
     case "buff_reduce": return "ทรงพลัง";
     case "buff_reflect": return "สะท้อนพลัง";
     case "buff_spd": return "ว่องไว";
+    case "buff_cri": return "วงคริต";
     case "heal_pct": return "ฟื้นพลัง";
     case "heal_buff": return "ฟื้นพลังต่อเนื่อง";
     case "stack_atk": return "สะสมพลังโจมตี";
@@ -73,6 +74,11 @@ export function describeBuff(b: BuffRecord): BuffDescription {
       return {
         title: "ว่องไว",
         detail: `SPD ${sign(b.v)} — เกจ ATB ไหลเร็วขึ้น (ตาเร็วกว่าศัตรู)`,
+      };
+    case "buff_cri":
+      return {
+        title: "วงคริต",
+        detail: `Cri ${sign(b.v)} — โอกาสคริติคอลต่อเทิร์นสูงขึ้น`,
       };
     case "heal_pct":
       return {

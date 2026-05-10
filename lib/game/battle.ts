@@ -31,6 +31,7 @@ import {
   opposite,
   tickEffects,
   addDebuff,
+  addBuff,
 } from "./effects";
 
 // ─── Battle context: precomputed inputs that don't change during the battle ───
@@ -160,6 +161,17 @@ function effectiveSpd(state: BattleState, side: Side): number {
   return Math.max(1, base + bonus);
 }
 
+// Effective Cri for damage rolls — base derived Cri plus any `buff_cri`
+// buffs currently active. Read inside the per-hit critPct call so a
+// freshly-applied crit buff lands on the very next strike.
+function effectiveCri(state: BattleState, side: Side, baseCri: number): number {
+  let bonus = 0;
+  for (const b of state.st[side].buffs) {
+    if (b.t === "buff_cri") bonus += b.v;
+  }
+  return baseCri + bonus;
+}
+
 // Advance both sides' gauges by `dtMs` real-time milliseconds.
 // Caps at THRESHOLD so animations land exactly on 100 (no overshoot).
 export function tickGauges(state: BattleState, dtMs: number): void {
@@ -286,7 +298,7 @@ export function calcSkillDamage(
   if (Math.random() * 100 >= hp) {
     return { hit: false, dmg: 0, crit: false, hpPct: Math.round(hp), critPct: 0, reflectDmg: 0 };
   }
-  const cp = critPct(ad.Cri, dd.Res);
+  const cp = critPct(effectiveCri(state, side, ad.Cri), dd.Res);
   const crit = Math.random() * 100 < cp;
   const dmg = Math.round(raw * (crit ? CRIT_MULTIPLIER : 1));
 
@@ -315,7 +327,7 @@ export function resolveSkill(
 ): void {
   state.turn++;
   // Per-turn HP regen from equipment is handled in tickEffects.
-  tickEffects(state, ctx.equipBonus.A.hp_regen, ctx.equipBonus.B.hp_regen, ctx.names);
+  tickEffects(state, ctx.equipBonus.A.hp_regen, ctx.equipBonus.B.hp_regen, ctx.names, ctx.artIds.A, ctx.artIds.B);
   if (state.winner) return;
 
   if (isStunned(state, side)) {
@@ -528,7 +540,7 @@ export function resolveArtActive(
   state.artUses[side][art.id] = (state.artUses[side][art.id] ?? 0) + 1;
 
   state.turn++;
-  tickEffects(state, ctx.equipBonus.A.hp_regen, ctx.equipBonus.B.hp_regen, ctx.names);
+  tickEffects(state, ctx.equipBonus.A.hp_regen, ctx.equipBonus.B.hp_regen, ctx.names, ctx.artIds.A, ctx.artIds.B);
   if (state.winner) return true;
 
   if (isStunned(state, side)) {
@@ -567,7 +579,7 @@ export function resolveArtActive(
     return {
       ea, ee,
       hp: Math.round(hitPct(ea, ee)),
-      cp: Math.round(critPct(ad.Cri, dd.Res)),
+      cp: Math.round(critPct(effectiveCri(state, side, ad.Cri), dd.Res)),
     };
   };
 
@@ -608,6 +620,23 @@ export function resolveArtActive(
       logLine(state, cls, `[${state.turn}] ${nm} ⚡<b>${act.n}</b> → ฟื้น <b>${heal}</b> HP${removed ? ` +ลบ[${removed.n}]` : ""}`);
       break;
     }
+    case "heal_full_cleanse": {
+      const hpCap = side === "A" ? state.dA.HP : state.dB.HP;
+      const mpCap = side === "A" ? state.dA.MP : state.dB.MP;
+      const hpHeal = Math.round(hpCap * (act.h ?? 0) / 100);
+      const mpHeal = Math.round(mpCap * (act.mh ?? 0) / 100);
+      if (side === "A") {
+        state.hA = Math.min(hpCap, state.hA + hpHeal);
+        state.mpA = Math.min(mpCap, state.mpA + mpHeal);
+      } else {
+        state.hB = Math.min(hpCap, state.hB + hpHeal);
+        state.mpB = Math.min(mpCap, state.mpB + mpHeal);
+      }
+      const removedCount = state.st[side].debuffs.length;
+      state.st[side].debuffs = [];
+      logLine(state, cls, `[${state.turn}] ${nm} ⚡<b>${act.n}</b> → ฟื้น <b>${hpHeal}</b> HP / <b>${mpHeal}</b> MP +ลบดีบัฟ ${removedCount} ระดับ`);
+      break;
+    }
     case "atk_phy_pen": {
       const hc = computeMissProbe();
       if (Math.random() * 100 >= hc.hp) {
@@ -644,6 +673,11 @@ export function resolveArtActive(
     case "buff_reduce": {
       addReduceBuff(state, side, act.v ?? 0, act.u ?? 1);
       logLine(state, cls, `[${state.turn}] ${nm} ⚡<b>${act.n}</b> → ลดdmg${act.v}%(${act.u}ตา)`);
+      break;
+    }
+    case "buff_spd": {
+      addBuff(state, side, { t: "buff_spd", n: act.n, v: act.v ?? 0, u: act.u ?? 1 });
+      logLine(state, cls, `[${state.turn}] ${nm} ⚡<b>${act.n}</b> → SPD+${act.v}(${act.u}ตา)`);
       break;
     }
     case "drain": {

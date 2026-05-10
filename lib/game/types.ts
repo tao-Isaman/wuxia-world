@@ -36,7 +36,7 @@ export interface Derived {
 
 export type AttackType = "phy" | "int" | null;
 
-export type SkillTierIndex = 0 | 1 | 2 | 3 | 4;
+export type SkillTierIndex = 0 | 1 | 2 | 3 | 4 | 5;
 
 // ─── Weapon mastery families ──────────────────────────────────────────
 // Each skill belongs to exactly one family. Mastery is summed per family
@@ -112,6 +112,10 @@ export type SelfEffect =
   // by tickGauges / getNextTurn so the ATB gauge fills faster while the
   // buff is active.
   | { t: "buff_spd"; v: number; u: number }
+  // Crit-rate buff — adds `v` to the side's effective Cri stat for `u`
+  // turns. Read by `effectiveCri` in damage calc so the boost shows up
+  // in critPct rolls per hit.
+  | { t: "buff_cri"; v: number; u: number }
   | { t: "heal_pct"; v: number }
   | {
       t: "heal_buff";
@@ -198,6 +202,11 @@ export type ArtPassiveTrigger = "hit_recv" | "on_crit" | "use_int" | "use_act";
 export type ArtPassiveEffect =
   | { t: "buff_def"; n?: string; v: number; u: number }
   | { t: "buff_eva"; n?: string; v: number; u: number }
+  | { t: "buff_reflect"; n?: string; v: number; u: number }
+  // Combo passive: applies `buff_spd v=sv` AND `buff_cri v=cv` for the
+  // same `u` turns in one trigger. Used by the Sunflower Manual capstone
+  // which rewards crits with both faster turns and snowballed crit rate.
+  | { t: "buff_spd_cri"; n?: string; sv: number; cv: number; u: number }
   | { t: "heal_pct"; v: number }
   | { t: "debuff_acc"; n?: string; v: number; u: number }
   | { t: "debuff_eva"; n?: string; v: number; u: number }
@@ -216,10 +225,16 @@ export interface ArtPassive {
 export type ArtActiveType =
   | "heal"
   | "heal_cleanse"
+  // Full-recovery active: heals HP by `h` % AND MP by `mh` % AND clears
+  // ALL debuffs on the caster's side. Used by capstone T5 arts (e.g.,
+  // วิชาเก้าเอี้ยง / Nine-Yang Manual).
+  | "heal_full_cleanse"
   | "atk_phy_pen"
   | "atk_int_pen"
   | "buff_reflect"
   | "buff_reduce"
+  // Self-only speed buff active. `v` = SPD bonus, `u` = duration turns.
+  | "buff_spd"
   | "drain"
   | "drain_phy"
   | "drain_acc"
@@ -234,7 +249,8 @@ export interface ArtActive {
   t: ArtActiveType;
   d: string;
   // per-type optional fields — kept loose because shape varies by type
-  h?: number;
+  h?: number;  // HP heal % of max (heal / heal_cleanse / heal_full_cleanse)
+  mh?: number; // MP heal % of max (heal_full_cleanse)
   v?: number;
   u?: number;
   m?: number;
@@ -262,6 +278,12 @@ export interface Art {
   mL: number;
   act: ArtActive | null;
   pas: ArtPassive | null;
+  // Optional always-on aura applied each turn (in tickEffects) by the
+  // primary art carrier. Used by capstone arts that grant a constant
+  // life-force trickle (e.g., the Nine-Yang Manual). `hpRegenPct` /
+  // `mpRegenPct` are flat % of max HP / MP regenerated per turn.
+  hpRegenPct?: number;
+  mpRegenPct?: number;
   // Philosophical type tags. See SKILL_TYPE_KEYS above. When omitted, the
   // engine derives them from the human-readable `tp` string at load time.
   types?: readonly SkillType[];

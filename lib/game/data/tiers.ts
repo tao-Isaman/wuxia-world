@@ -7,4 +7,5 @@ export const TIERS: readonly Tier[] = [
   { n: "ขั้นสูง", cd: 3, c: "tier-2" },
   { n: "ลับ", cd: 4, c: "tier-3" },
   { n: "เฉพาะ", cd: 5, c: "tier-4" },
+  { n: "ปรมัตถ์", cd: 6, c: "tier-5" },
 ] as const;

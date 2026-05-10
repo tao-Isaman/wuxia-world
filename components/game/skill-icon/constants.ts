@@ -17,6 +17,7 @@ export const TIER_FRAME_COLOR: Record<SkillTierIndex, string> = {
   2: "#0284c7",  // T2 sky-600 blue
   3: "#9333ea",  // T3 purple-600 purple
   4: "#f97316",  // T4 orange-500 orange
+  5: "#dc2626",  // T5 red-600 vermilion (capstone — ปรมัตถ์)
 };
 
 // Inner background gradient — top-stop → bottom-stop, tier-tinted to
@@ -28,4 +29,5 @@ export const TIER_BG_GRADIENT: Record<SkillTierIndex, [string, string]> = {
   2: ["#dbeafe", "#93c5fd"],
   3: ["#ede9fe", "#c4b5fd"],
   4: ["#fed7aa", "#fb923c"],
+  5: ["#fecaca", "#dc2626"], // T5 red gradient — vermilion capstone
 };

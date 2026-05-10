@@ -540,14 +540,15 @@ export const ARTS: readonly Art[] = [
     stats: { INT: 20, POW: 20, LUK: 10 }, hL: 15, mL: 55,
     act: { n: "กลืนชีพ", c: 40, cd: 4, t: "drain", m: 1.3, h: 50, d: "Int×1.3 + ดูด 50% dmg CD4" },
     pas: { tr: "use_act", ch: 100, d: "ใช้ IA → ATK+4% (≤+20%)", e: { t: "stack_atk", v: 4, mx: 5 } } },
-  { id: "ng7", n: "นพเก้าฟ้าคืนดาว", sc: "ยุทธจักร", tp: "สมดุล·ภายใน", types: ["internal"], ti: 4,
-    stats: { POW: 18, INT: 18, AGI: 14 }, hL: 30, mL: 40,
-    act: { n: "ฟ้าคืนดาว", c: 40, cd: 4, t: "drain", m: 1.3, h: 40, d: "Int×1.3 + ดูด 40% — นพเก้าฟ้าคืนดาว CD4" },
-    pas: { tr: "use_int", ch: 100, d: "Int → ATK+10% (≤+30%)", e: { t: "stack_atk", v: 10, mx: 3 } } },
-  { id: "khbt", n: "คัมภีร์ทานตะวัน", sc: "ยุทธจักร", tp: "สมดุล·อ่อน", types: ["soft"], ti: 4,
-    stats: { AGI: 22, DEX: 18, INT: 10 }, hL: 30, mL: 40,
-    act: { n: "ทานตะวันพลิกฟ้า", c: 30, cd: 3, t: "buff_eva_debuff_eva", selfV: 35, eneV: -25, u: 5, d: "Eva+35 / ศัตรู Eva-25 (2ตา) — 葵花宝典 CD3" },
-    pas: { tr: "on_crit", ch: 100, d: "Crit → Eva+25 (2ตา)", e: { t: "buff_eva", n: "ทานตะวัน", v: 25, u: 5 } } },
+  { id: "khbt", n: "คัมภีร์ทานตะวัน", sc: "ยุทธจักร", tp: "สมดุล·อ่อน", types: ["balance", "soft"], ti: 5,
+    stats: { AGI: 50, STR: 10, POW: 10, LUK: 10 }, hL: 30, mL: 50,
+    act: { n: "ทานตะวันพลิกฟ้า", c: 60, cd: 6, t: "buff_spd", v: 100, u: 5, d: "SPD+100 (5ตา) — 葵花宝典 CD6" },
+    pas: { tr: "on_crit", ch: 100, d: "Crit → SPD+50 / Cri+15 (5ตา) — ทานตะวันสะสมความเร็ว", e: { t: "buff_spd_cri", n: "ทานตะวัน", sv: 50, cv: 15, u: 5 } } },
+  { id: "kuyt", n: "วิชาเก้าเอี้ยง", sc: "ยุทธจักร", tp: "สมดุล·ภายใน", types: ["balance", "internal"], ti: 5,
+    stats: { STR: 20, POW: 20, AGI: 20, VIT: 20 }, hL: 40, mL: 40,
+    hpRegenPct: 5, mpRegenPct: 5,
+    act: { n: "ฟื้นพลังเก้าเอี้ยง", c: 50, cd: 6, t: "heal_full_cleanse", h: 50, mh: 50, d: "ฟื้น 50% HP/MP + ลบดีบัฟทุกระดับ CD6" },
+    pas: { tr: "hit_recv", ch: 100, d: "ถูกโจมตี 100% → สะท้อน 20% (5ตา) — เก้าเอี้ยงสะท้อนกลับ", e: { t: "buff_reflect", n: "เก้าเอี้ยง", v: 20, u: 5 } } },
 ];
 
 export const ARTS_BY_ID: Map<string, Art> = new Map(ARTS.map((a) => [a.id, a]));
