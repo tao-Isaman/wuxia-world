@@ -13,6 +13,10 @@ import { QUESTS_SHAOLIN } from "./sects/shaolin";
 import { QUESTS_WUDANG } from "./sects/wudang";
 import { QUESTS_EMEI } from "./sects/emei";
 import { QUESTS_HUASHAN } from "./sects/huashan";
+import { QUESTS_SONGSHAN } from "./sects/songshan";
+import { QUESTS_TAISHAN } from "./sects/taishan";
+import { QUESTS_HENGSHAN_SOUTH } from "./sects/hengshan_south";
+import { QUESTS_HENGSHAN_NORTH } from "./sects/hengshan_north";
 import { QUESTS_QUANZHEN } from "./sects/quanzhen";
 import { QUESTS_GUMU } from "./sects/gumu";
 import { QUESTS_BEGGARS } from "./sects/beggars";
@@ -31,6 +35,10 @@ export const QUESTS_SECTS_TEMPLES: readonly QuestDef[] = [
   ...QUESTS_WUDANG,
   ...QUESTS_EMEI,
   ...QUESTS_HUASHAN,
+  ...QUESTS_SONGSHAN,
+  ...QUESTS_TAISHAN,
+  ...QUESTS_HENGSHAN_SOUTH,
+  ...QUESTS_HENGSHAN_NORTH,
   ...QUESTS_QUANZHEN,
   ...QUESTS_GUMU,
   ...QUESTS_BEGGARS,

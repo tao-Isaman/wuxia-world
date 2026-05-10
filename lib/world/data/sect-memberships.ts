@@ -217,6 +217,131 @@ const HUASHAN: SectMembershipDef = {
   questCooldownDays: 30,
 };
 
+// Songshan disciple ranks. Central peak iron-sword sect. Leadership caps
+// at T3 (mirror Huashan tier). Single-option pools at every rank so
+// reward auto-grants on rank-up.
+const SONGSHAN: SectMembershipDef = {
+  id: "songshan",
+  name: "ซงซาน",
+  hallLocationId: "sect_songshan",
+  registrarNpcId: "sect_songshan_master_zuolengchan",
+  joinRequirements: { t: "trait", trait: "evil", max: 10 },
+  startRank: 9,
+  topRank: 1,
+  rankUpCost: (targetRank) => {
+    const table: Record<number, number> = {
+      8: 100, 7: 200, 6: 350, 5: 500, 4: 700, 3: 1000, 2: 1400, 1: 2000,
+    };
+    return table[targetRank] ?? Infinity;
+  },
+  skillsByRank: {
+    9: ["ssh_basic_sword"],
+    8: ["ssh_iron_strike"],
+    6: ["ssh_central_blade"],
+    4: ["ssh_song_pillar"],
+  },
+  artsByRank: {
+    9: ["t0_ssh_qi"],
+    7: ["t1_ssh_iron"],
+    6: ["t2_ssh_root"],
+    3: ["t3_ssh_pillar"],
+  },
+  questCooldownDays: 30,
+};
+
+// Taishan disciple ranks. Eastern peak Daoist sect, yang/external sword
+// styled around dawn-sun precision. Leadership caps at T3.
+const TAISHAN: SectMembershipDef = {
+  id: "taishan",
+  name: "ไท่ซาน",
+  hallLocationId: "sect_taishan",
+  registrarNpcId: "sect_taishan_master_tianmen",
+  joinRequirements: { t: "trait", trait: "evil", max: 10 },
+  startRank: 9,
+  topRank: 1,
+  rankUpCost: (targetRank) => {
+    const table: Record<number, number> = {
+      8: 100, 7: 200, 6: 350, 5: 500, 4: 700, 3: 1000, 2: 1400, 1: 2000,
+    };
+    return table[targetRank] ?? Infinity;
+  },
+  skillsByRank: {
+    9: ["tsh_basic_sword"],
+    8: ["tsh_dawn_strike"],
+    6: ["tsh_east_blade"],
+    4: ["tsh_sun_pierce"],
+  },
+  artsByRank: {
+    9: ["t0_tsh_qi"],
+    7: ["t1_tsh_dawn"],
+    6: ["t2_tsh_peak"],
+    3: ["t3_tsh_sun"],
+  },
+  questCooldownDays: 30,
+};
+
+// Hengshan South disciple ranks (เฮิงซาน — five-peaks sword sect). Yin/soft
+// speed-themed sword line. Leadership caps at T3.
+const HENGSHAN_SOUTH: SectMembershipDef = {
+  id: "hengshan_south",
+  name: "เฮิงซาน",
+  hallLocationId: "sect_hengshan_south",
+  registrarNpcId: "sect_hengshan_south_master_modaxiansheng",
+  joinRequirements: { t: "trait", trait: "evil", max: 10 },
+  startRank: 9,
+  topRank: 1,
+  rankUpCost: (targetRank) => {
+    const table: Record<number, number> = {
+      8: 100, 7: 200, 6: 350, 5: 500, 4: 700, 3: 1000, 2: 1400, 1: 2000,
+    };
+    return table[targetRank] ?? Infinity;
+  },
+  skillsByRank: {
+    9: ["hgs_basic_sword"],
+    8: ["hgs_dancing_step"],
+    6: ["hgs_five_peaks"],
+    4: ["hgs_swift_blade"],
+  },
+  artsByRank: {
+    9: ["t0_hgs_breath"],
+    7: ["t1_hgs_step"],
+    6: ["t2_hgs_cloud"],
+    3: ["t3_hgs_swift"],
+  },
+  questCooldownDays: 30,
+};
+
+// Hengshan North disciple ranks (เหิงซาน — Buddhist nun's order). Soft/
+// external defense + reflect themed sword line. Leadership caps at T3.
+const HENGSHAN_NORTH: SectMembershipDef = {
+  id: "hengshan_north",
+  name: "เหิงซาน",
+  hallLocationId: "sect_hengshan_north",
+  registrarNpcId: "sect_hengshan_north_abbess_dingyi",
+  joinRequirements: { t: "trait", trait: "evil", max: 10 },
+  startRank: 9,
+  topRank: 1,
+  rankUpCost: (targetRank) => {
+    const table: Record<number, number> = {
+      8: 100, 7: 200, 6: 350, 5: 500, 4: 700, 3: 1000, 2: 1400, 1: 2000,
+    };
+    return table[targetRank] ?? Infinity;
+  },
+  skillsByRank: {
+    9: ["hgn_basic_sword"],
+    8: ["hgn_dharma_guard"],
+    6: ["hgn_iron_robe"],
+    4: ["hgn_mirror_blade"],
+  },
+  artsByRank: {
+    9: ["t0_hgn_zen"],
+    7: ["t1_hgn_shield"],
+    6: ["t2_hgn_bell"],
+    3: ["t3_hgn_mirror"],
+  },
+  questCooldownDays: 30,
+};
+
 // Quanzhen disciple ranks. Like Huashan, leadership caps at T3 — strong
 // but not on the legendary Shaolin/Wudang tier. Open to anyone (no
 // gender gate, no money) — Quanzhen Daoists are ascetics: the only fee
@@ -666,6 +791,10 @@ export const SECT_MEMBERSHIPS: Record<SectId, SectMembershipDef> = {
   shaolin: SHAOLIN,
   wudang: WUDANG,
   huashan: HUASHAN,
+  songshan: SONGSHAN,
+  taishan: TAISHAN,
+  hengshan_south: HENGSHAN_SOUTH,
+  hengshan_north: HENGSHAN_NORTH,
   quanzhen: QUANZHEN,
   emei: EMEI,
   gumu: GUMU,

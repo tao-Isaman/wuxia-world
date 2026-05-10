@@ -7,7 +7,8 @@ import { SCENES_EMEI } from "./sects/emei";
 import { SCENES_HUASHAN } from "./sects/huashan";
 import { SCENES_SONGSHAN } from "./sects/songshan";
 import { SCENES_TAISHAN } from "./sects/taishan";
-import { SCENES_HENGSHAN } from "./sects/hengshan";
+import { SCENES_HENGSHAN_SOUTH } from "./sects/hengshan_south";
+import { SCENES_HENGSHAN_NORTH } from "./sects/hengshan_north";
 import { SCENES_QUANZHEN } from "./sects/quanzhen";
 import { SCENES_GUMU } from "./sects/gumu";
 import { SCENES_LINGJIU } from "./sects/lingjiu";
@@ -32,7 +33,8 @@ export const SCENES_SECTS_TEMPLES: readonly Scene[] = [
   ...SCENES_HUASHAN,
   ...SCENES_SONGSHAN,
   ...SCENES_TAISHAN,
-  ...SCENES_HENGSHAN,
+  ...SCENES_HENGSHAN_SOUTH,
+  ...SCENES_HENGSHAN_NORTH,
   ...SCENES_QUANZHEN,
   ...SCENES_GUMU,
   ...SCENES_LINGJIU,

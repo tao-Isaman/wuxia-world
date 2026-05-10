@@ -12,7 +12,8 @@ import { NPCS_EMEI } from "./sects/emei";
 import { NPCS_HUASHAN } from "./sects/huashan";
 import { NPCS_SONGSHAN } from "./sects/songshan";
 import { NPCS_TAISHAN } from "./sects/taishan";
-import { NPCS_HENGSHAN } from "./sects/hengshan";
+import { NPCS_HENGSHAN_SOUTH } from "./sects/hengshan_south";
+import { NPCS_HENGSHAN_NORTH } from "./sects/hengshan_north";
 import { NPCS_QUANZHEN } from "./sects/quanzhen";
 import { NPCS_GUMU } from "./sects/gumu";
 import { NPCS_LINGJIU } from "./sects/lingjiu";
@@ -37,7 +38,8 @@ export const NPCS_SECTS_TEMPLES: readonly NpcDef[] = [
   ...NPCS_HUASHAN,
   ...NPCS_SONGSHAN,
   ...NPCS_TAISHAN,
-  ...NPCS_HENGSHAN,
+  ...NPCS_HENGSHAN_SOUTH,
+  ...NPCS_HENGSHAN_NORTH,
   ...NPCS_QUANZHEN,
   ...NPCS_GUMU,
   ...NPCS_LINGJIU,

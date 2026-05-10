@@ -700,6 +700,263 @@ export const OPPONENTS: readonly OpponentDef[] = [
       skillIds: ["qz_heavy_sword"],
     }) },
 
+  // ─── ซงซาน — sect leadership (T1-T3) ──────────────────────────────
+  // Heavy iron-sword sect of the central peak. Master + vice cap at T3.
+  // Kit leans on stack_atk + def-break — sustained crushing pressure.
+  { id: "spar_songshan_master_zuolengchan", name: "อาจารย์ใหญ่จั่วเหลิงฉาน", ti: 3, category: "human",
+    drops: [...DROPS_T3,
+      { itemId: "iron_ore", weight: 4 }, { itemId: "iron_ingot", weight: 3 },
+      { itemId: "wood_hard", weight: 2 }, { itemId: "ancient_coin", weight: 2 },
+      { itemId: "mithril_ore", weight: 1 }],
+    build: () => build("อาจารย์ใหญ่จั่วเหลิงฉาน", 3, {
+      stats: { STR: 16, DEX: 12, POW: 10, VIT: 10, AGI: 8 },
+      artId: "t3_ssh_pillar", artLevel: 8,
+      skillIds: ["ssh_song_pillar", "ssh_central_blade", "ssh_basic_sword"],
+      extraArtSlots: ["t3_ssh_pillar", "t2_ssh_root"],
+      artLevels: { t3_ssh_pillar: 8, t2_ssh_root: 8, t1_ssh_iron: 7 },
+      learnedArtIds: ["t1_ssh_iron"],
+    }) },
+
+  { id: "spar_songshan_vice_lubai", name: "รองอาจารย์ลู่ไป๋", ti: 3, category: "human",
+    drops: [...DROPS_T3,
+      { itemId: "iron_ore", weight: 3 }, { itemId: "iron_ingot", weight: 2 },
+      { itemId: "ancient_coin", weight: 2 }],
+    build: () => build("รองอาจารย์ลู่ไป๋", 3, {
+      stats: { STR: 13, DEX: 10, POW: 8, VIT: 8 },
+      artId: "t2_ssh_root", artLevel: 7,
+      skillIds: ["ssh_song_pillar", "ssh_central_blade", "ssh_basic_sword"],
+      extraArtSlots: ["t2_ssh_root"],
+      artLevels: { t2_ssh_root: 7, t1_ssh_iron: 6 },
+      learnedArtIds: ["t1_ssh_iron"],
+    }) },
+
+  { id: "spar_songshan_elder_dingmian", name: "อาจารย์อาวุโสติงเหมียน", ti: 2, category: "human",
+    drops: [...DROPS_T2,
+      { itemId: "iron_ore", weight: 3 }, { itemId: "wood_hard", weight: 2 }],
+    build: () => build("อาจารย์อาวุโสติงเหมียน", 2, {
+      stats: { STR: 10, DEX: 8, POW: 6, VIT: 6 },
+      artId: "t2_ssh_root", artLevel: 5,
+      skillIds: ["ssh_central_blade", "ssh_iron_strike", "ssh_basic_sword"],
+      extraArtSlots: ["t2_ssh_root"],
+      artLevels: { t2_ssh_root: 5, t1_ssh_iron: 4 },
+      learnedArtIds: ["t1_ssh_iron"],
+    }) },
+
+  { id: "spar_songshan_disciple", name: "ศิษย์หลี่เฟิง", ti: 1, category: "human",
+    drops: [...DROPS_T1,
+      { itemId: "iron_ore", weight: 2 }, { itemId: "wood_hard", weight: 2 }],
+    build: () => build("ศิษย์หลี่เฟิง", 1, {
+      stats: { STR: 6, DEX: 5, VIT: 3 },
+      artId: "t1_ssh_iron", artLevel: 3,
+      skillIds: ["ssh_iron_strike", "ssh_basic_sword"],
+      extraArtSlots: ["t1_ssh_iron"],
+      artLevels: { t1_ssh_iron: 3, t0_ssh_qi: 3 },
+      learnedArtIds: ["t0_ssh_qi"],
+    }) },
+
+  { id: "spar_songshan_disciple2", name: "ศิษย์หยางจง", ti: 1, category: "human",
+    drops: [...DROPS_T1,
+      { itemId: "iron_ore", weight: 2 }, { itemId: "wood_hard", weight: 1 }],
+    build: () => build("ศิษย์หยางจง", 1, {
+      stats: { STR: 5, DEX: 5, VIT: 4 },
+      artId: "t0_ssh_qi", artLevel: 4,
+      skillIds: ["ssh_iron_strike", "ssh_basic_sword"],
+      extraArtSlots: ["t0_ssh_qi"],
+      artLevels: { t0_ssh_qi: 4, t1_ssh_iron: 2 },
+      learnedArtIds: ["t1_ssh_iron"],
+    }) },
+
+  // ─── ไท่ซาน — sect leadership (T1-T3) ─────────────────────────────
+  // Eastern peak Daoist sect, yang/external sword styled around the
+  // dawn-sun rising. Master Tianmen Daoren caps at T3.
+  { id: "spar_taishan_master_tianmen", name: "เจ้าสำนักเทียนเหมินเต้าเหริน", ti: 3, category: "human",
+    drops: [...DROPS_T3,
+      { itemId: "jade", weight: 4 }, { itemId: "iron_ore", weight: 3 },
+      { itemId: "ancient_coin", weight: 2 }, { itemId: "wood_hard", weight: 2 },
+      { itemId: "mithril_ore", weight: 1 }],
+    build: () => build("เจ้าสำนักเทียนเหมินเต้าเหริน", 3, {
+      stats: { STR: 14, DEX: 14, AGI: 10, POW: 8, VIT: 8 },
+      artId: "t3_tsh_sun", artLevel: 8,
+      skillIds: ["tsh_sun_pierce", "tsh_east_blade", "tsh_basic_sword"],
+      extraArtSlots: ["t3_tsh_sun", "t2_tsh_peak"],
+      artLevels: { t3_tsh_sun: 8, t2_tsh_peak: 8, t1_tsh_dawn: 8 },
+      learnedArtIds: ["t1_tsh_dawn"],
+    }) },
+
+  { id: "spar_taishan_yuyangzi", name: "รองเจ้าสำนักอวี้หยางจื่อ", ti: 3, category: "human",
+    drops: [...DROPS_T3,
+      { itemId: "jade", weight: 3 }, { itemId: "iron_ore", weight: 2 },
+      { itemId: "ancient_coin", weight: 2 }],
+    build: () => build("รองเจ้าสำนักอวี้หยางจื่อ", 3, {
+      stats: { STR: 12, DEX: 11, AGI: 9, POW: 6, VIT: 6 },
+      artId: "t2_tsh_peak", artLevel: 7,
+      skillIds: ["tsh_sun_pierce", "tsh_east_blade", "tsh_basic_sword"],
+      extraArtSlots: ["t2_tsh_peak"],
+      artLevels: { t2_tsh_peak: 7, t1_tsh_dawn: 6 },
+      learnedArtIds: ["t1_tsh_dawn"],
+    }) },
+
+  { id: "spar_taishan_chiyangzi", name: "อาจารย์อาวุโสฉื่อหยางจื่อ", ti: 2, category: "human",
+    drops: [...DROPS_T2,
+      { itemId: "jade", weight: 3 }, { itemId: "iron_ore", weight: 3 },
+      { itemId: "wood_hard", weight: 2 }],
+    build: () => build("อาจารย์อาวุโสฉื่อหยางจื่อ", 2, {
+      stats: { STR: 10, DEX: 10, AGI: 7, POW: 4 },
+      artId: "t2_tsh_peak", artLevel: 6,
+      skillIds: ["tsh_east_blade", "tsh_dawn_strike", "tsh_basic_sword"],
+      extraArtSlots: ["t2_tsh_peak"],
+      artLevels: { t2_tsh_peak: 6, t1_tsh_dawn: 6 },
+      learnedArtIds: ["t1_tsh_dawn"],
+    }) },
+
+  { id: "spar_taishan_disciple", name: "ศิษย์คุนหวู่", ti: 1, category: "human",
+    drops: [...DROPS_T1,
+      { itemId: "jade", weight: 2 }, { itemId: "iron_ore", weight: 2 }],
+    build: () => build("ศิษย์คุนหวู่", 1, {
+      stats: { STR: 7, DEX: 6, AGI: 5, POW: 2 },
+      artId: "t1_tsh_dawn", artLevel: 4,
+      skillIds: ["tsh_dawn_strike", "tsh_basic_sword"],
+      extraArtSlots: ["t1_tsh_dawn"],
+      artLevels: { t1_tsh_dawn: 4, t0_tsh_qi: 4 },
+      learnedArtIds: ["t0_tsh_qi"],
+    }) },
+
+  { id: "spar_taishan_jingyang", name: "ศิษย์จิ้งหยาง", ti: 1, category: "human",
+    drops: [...DROPS_T1,
+      { itemId: "jade", weight: 2 }, { itemId: "iron_ore", weight: 2 }],
+    build: () => build("ศิษย์จิ้งหยาง", 1, {
+      stats: { STR: 6, DEX: 6, AGI: 5, POW: 2 },
+      artId: "t1_tsh_dawn", artLevel: 3,
+      skillIds: ["tsh_dawn_strike", "tsh_basic_sword"],
+      extraArtSlots: ["t1_tsh_dawn"],
+      artLevels: { t1_tsh_dawn: 3, t0_tsh_qi: 4 },
+      learnedArtIds: ["t0_tsh_qi"],
+    }) },
+
+  // ─── เฮิงซานใต้ — sect leadership (T1-T3) ──────────────────────────
+  // Yin/soft sword sect themed around AGI + Spd + Eva. Master caps at T3.
+  // Kit leans on the disciple-line swift_blade + the t3_hgs_swift art for
+  // stacked Spd/Eva pressure.
+  { id: "spar_hengshan_south_master", name: "อาจารย์ใหญ่โม่ต้า", ti: 3, category: "human",
+    drops: [...DROPS_T3,
+      { itemId: "iron_ore", weight: 4 }, { itemId: "wood_hard", weight: 3 },
+      { itemId: "jade", weight: 3 }, { itemId: "ancient_coin", weight: 2 },
+      { itemId: "mithril_ore", weight: 1 }],
+    build: () => build("อาจารย์ใหญ่โม่ต้า", 3, {
+      stats: { AGI: 16, DEX: 14, STR: 10, POW: 8, VIT: 8 },
+      artId: "t3_hgs_swift", artLevel: 8,
+      skillIds: ["hgs_swift_blade", "hgs_five_peaks", "hgs_basic_sword"],
+      extraArtSlots: ["t3_hgs_swift", "t2_hgs_cloud"],
+      artLevels: { t3_hgs_swift: 8, t2_hgs_cloud: 8, t1_hgs_step: 8 },
+      learnedArtIds: ["t1_hgs_step"],
+    }) },
+
+  { id: "spar_hengshan_south_vice", name: "รองอาจารย์หลิวเจิ้งเฟิง", ti: 2, category: "human",
+    drops: [...DROPS_T2,
+      { itemId: "iron_ore", weight: 3 }, { itemId: "jade", weight: 2 },
+      { itemId: "ancient_coin", weight: 2 }],
+    build: () => build("รองอาจารย์หลิวเจิ้งเฟิง", 2, {
+      stats: { AGI: 12, DEX: 9, STR: 7, POW: 5 },
+      artId: "t2_hgs_cloud", artLevel: 7,
+      skillIds: ["hgs_five_peaks", "hgs_dancing_step", "hgs_basic_sword"],
+      extraArtSlots: ["t2_hgs_cloud"],
+      artLevels: { t2_hgs_cloud: 7, t1_hgs_step: 6 },
+      learnedArtIds: ["t1_hgs_step"],
+    }) },
+
+  { id: "spar_hengshan_south_elder", name: "อาจารย์กระบี่ลู่เก๋อ", ti: 2, category: "human",
+    drops: [...DROPS_T2,
+      { itemId: "iron_ore", weight: 3 }, { itemId: "wood_hard", weight: 2 }],
+    build: () => build("อาจารย์กระบี่ลู่เก๋อ", 2, {
+      stats: { AGI: 10, DEX: 8, STR: 6 },
+      artId: "t1_hgs_step", artLevel: 6,
+      skillIds: ["hgs_five_peaks", "hgs_dancing_step", "hgs_basic_sword"],
+      extraArtSlots: ["t1_hgs_step"],
+      artLevels: { t1_hgs_step: 6 },
+    }) },
+
+  { id: "spar_hengshan_south_disciple", name: "ศิษย์เยว่ผาน", ti: 1, category: "human",
+    drops: [...DROPS_T1,
+      { itemId: "iron_ore", weight: 2 }, { itemId: "wood_hard", weight: 2 }],
+    build: () => build("ศิษย์เยว่ผาน", 1, {
+      stats: { AGI: 6, DEX: 4 },
+      artId: "t0_hgs_breath", artLevel: 4,
+      skillIds: ["hgs_dancing_step", "hgs_basic_sword"],
+    }) },
+
+  { id: "spar_hengshan_south_disciple2", name: "ศิษย์ชิงเฟิง", ti: 1, category: "human",
+    drops: [...DROPS_T1,
+      { itemId: "iron_ore", weight: 2 }],
+    build: () => build("ศิษย์ชิงเฟิง", 1, {
+      stats: { AGI: 7, DEX: 3 },
+      artId: "t0_hgs_breath", artLevel: 4,
+      skillIds: ["hgs_dancing_step", "hgs_basic_sword"],
+    }) },
+
+  // ─── เหิงซานเหนือ — Buddhist nun's order (defense + reflect) ───────
+  // Abbess Dingyi caps at ti:3 with the T3 mirror art for reflect pressure.
+  { id: "spar_hengshan_north_dingyi", name: "ภิกษุณีติ่งอี้", ti: 3, category: "human",
+    drops: [...DROPS_T3,
+      { itemId: "paper", weight: 4 }, { itemId: "jade", weight: 3 },
+      { itemId: "wood_soft", weight: 3 }, { itemId: "lotus_seed", weight: 2 },
+      { itemId: "ancient_coin", weight: 2 }],
+    build: () => build("ภิกษุณีติ่งอี้", 3, {
+      stats: { POW: 12, VIT: 14, DEX: 10, AGI: 8, INT: 4 },
+      artId: "t3_hgn_mirror", artLevel: 8,
+      skillIds: ["hgn_mirror_blade", "hgn_iron_robe", "hgn_dharma_guard"],
+      extraArtSlots: ["t3_hgn_mirror", "t2_hgn_bell"],
+      artLevels: { t3_hgn_mirror: 8, t2_hgn_bell: 8, t1_hgn_shield: 7 },
+      learnedArtIds: ["t1_hgn_shield"],
+    }) },
+
+  { id: "spar_hengshan_north_yihe", name: "ภิกษุณีอี๋เหอ", ti: 2, category: "human",
+    drops: [...DROPS_T2,
+      { itemId: "paper", weight: 3 }, { itemId: "jade", weight: 2 },
+      { itemId: "ancient_coin", weight: 1 }],
+    build: () => build("ภิกษุณีอี๋เหอ", 2, {
+      stats: { POW: 9, VIT: 10, DEX: 7, AGI: 4 },
+      artId: "t2_hgn_bell", artLevel: 6,
+      skillIds: ["hgn_iron_robe", "hgn_dharma_guard", "hgn_basic_sword"],
+      extraArtSlots: ["t2_hgn_bell"],
+      artLevels: { t2_hgn_bell: 6, t1_hgn_shield: 5 },
+      learnedArtIds: ["t1_hgn_shield"],
+    }) },
+
+  { id: "spar_hengshan_north_yiqing", name: "ภิกษุณีอี๋ชิง", ti: 2, category: "human",
+    drops: [...DROPS_T2,
+      { itemId: "paper", weight: 3 }, { itemId: "wood_soft", weight: 2 },
+      { itemId: "jade", weight: 2 }],
+    build: () => build("ภิกษุณีอี๋ชิง", 2, {
+      stats: { POW: 8, VIT: 9, DEX: 6, AGI: 4 },
+      artId: "t2_hgn_bell", artLevel: 5,
+      skillIds: ["hgn_iron_robe", "hgn_dharma_guard", "hgn_basic_sword"],
+      extraArtSlots: ["t2_hgn_bell"],
+      artLevels: { t2_hgn_bell: 5, t1_hgn_shield: 4 },
+    }) },
+
+  { id: "spar_hengshan_north_nun", name: "นักพรตจิงซิน", ti: 1, category: "human",
+    drops: [...DROPS_T1,
+      { itemId: "paper", weight: 3 }, { itemId: "wood_soft", weight: 2 },
+      { itemId: "lotus_seed", weight: 2 }],
+    build: () => build("นักพรตจิงซิน", 1, {
+      stats: { POW: 5, VIT: 6, DEX: 4 },
+      artId: "t1_hgn_shield", artLevel: 3,
+      skillIds: ["hgn_dharma_guard", "hgn_basic_sword"],
+      extraArtSlots: ["t1_hgn_shield"],
+      artLevels: { t1_hgn_shield: 3 },
+    }) },
+
+  { id: "spar_hengshan_north_yilin", name: "นักพรตอี๋หลิน", ti: 1, category: "human",
+    drops: [...DROPS_T1,
+      { itemId: "paper", weight: 2 }, { itemId: "lotus_seed", weight: 2 }],
+    build: () => build("นักพรตอี๋หลิน", 1, {
+      stats: { POW: 4, VIT: 5, DEX: 4 },
+      artId: "t0_hgn_zen", artLevel: 4,
+      skillIds: ["hgn_dharma_guard", "hgn_basic_sword"],
+      extraArtSlots: ["t0_hgn_zen"],
+      artLevels: { t0_hgn_zen: 4 },
+    }) },
+
   // ─── ง้อไบ๊ — sect leadership (T1-T4) ──────────────────────────────
   // Buddhist nun sect — leadership tier matches Shaolin / Wudang. Yin /
   // internal sword + fist with the bodhisattva-line capstone. Abbess
@@ -820,43 +1077,8 @@ export const OPPONENTS: readonly OpponentDef[] = [
   // the sect's signature catalogue so each fight feels distinct (Shaolin
   // hard external, Wudang taiji-soft, Gumu yin-internal sword, etc.).
 
-  // T1 — early sparring (sect intro)
-  { id: "spar_taishan_disciple", name: "ศิษย์คุนหวู่", ti: 1, category: "human",
-    drops: [...DROPS_T1,
-      { itemId: "man_nc7", weight: 1 }, { itemId: "man_nm2", weight: 1 },
-      { itemId: "man_t0_fiveyuan", weight: 1 }],
-    build: () => build("ศิษย์คุนหวู่", 1, {
-      stats: { STR: 5, VIT: 4 },
-      artId: "t0_fiveyuan", artLevel: 4,
-      skillIds: ["nc7", "nm2"],
-    }) },
-  { id: "spar_hengshan_south_disciple", name: "ศิษย์เยว่ผาน", ti: 1, category: "human",
-    drops: [...DROPS_T1,
-      { itemId: "man_nc3", weight: 1 }, { itemId: "man_nd11", weight: 1 },
-      { itemId: "man_t1_redlotus", weight: 1 }],
-    build: () => build("ศิษย์เยว่ผาน", 1, {
-      stats: { AGI: 5, DEX: 4 },
-      artId: "t1_redlotus", artLevel: 3,
-      skillIds: ["nc3", "nd11"],
-    }) },
-  { id: "spar_hengshan_north_nun", name: "นักพรตจิงซิน", ti: 1, category: "human",
-    drops: [...DROPS_T1,
-      { itemId: "man_nc9", weight: 1 }, { itemId: "man_nm1", weight: 1 },
-      { itemId: "man_t1_blackiron", weight: 1 }],
-    build: () => build("นักพรตจิงซิน", 1, {
-      stats: { POW: 5, INT: 4 },
-      artId: "t1_blackiron", artLevel: 3,
-      skillIds: ["nc9", "nm1"],
-    }) },
-  { id: "spar_songshan_disciple", name: "ศิษย์หลี่เฟิง", ti: 1, category: "human",
-    drops: [...DROPS_T1,
-      { itemId: "man_ns1", weight: 1 }, { itemId: "man_nd3", weight: 1 },
-      { itemId: "man_t1_eagleclaw", weight: 1 }],
-    build: () => build("ศิษย์หลี่เฟิง", 1, {
-      stats: { STR: 5, AGI: 4 },
-      artId: "t1_eagleclaw", artLevel: 3,
-      skillIds: ["ns1", "nd3"],
-    }) },
+  // (T1 stubs for taishan/hengshan_south/hengshan_north/songshan disciples
+  //  were promoted into the sect-leadership blocks above with full kits.)
 
   // T2 — mid sparring (sect signature styles)
   { id: "spar_wudang_disciple", name: "สาวกชิงเฟิง", ti: 2, category: "human",
@@ -1600,6 +1822,53 @@ export const OPPONENTS: readonly OpponentDef[] = [
       skillIds: ["qz_sun_sword", "qz_sun_fist", "qzjf"],
       extraArtSlots: ["t3_qz_sun", "qzzq"],
       artLevels: { t3_qz_sun: 9, qzzq: 8 },
+    }) },
+
+  { id: "hunter_songshan", name: "นักล่าซงซาน", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "iron_ore", weight: 4 }, { itemId: "iron_ingot", weight: 3 },
+      { itemId: "ancient_coin", weight: 2 }],
+    build: () => build("นักล่าซงซาน", 4, {
+      stats: { STR: 18, DEX: 14, POW: 10, VIT: 8, AGI: 6 },
+      artId: "t3_ssh_pillar", artLevel: 9,
+      skillIds: ["ssh_song_pillar", "ssh_central_blade", "ssh_iron_strike"],
+      extraArtSlots: ["t3_ssh_pillar", "t2_ssh_root"],
+      artLevels: { t3_ssh_pillar: 9, t2_ssh_root: 8 },
+    }) },
+
+  { id: "hunter_taishan", name: "นักล่าไท่ซาน", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "jade", weight: 3 }, { itemId: "iron_ore", weight: 2 }],
+    build: () => build("นักล่าไท่ซาน", 4, {
+      stats: { STR: 16, DEX: 14, AGI: 10, POW: 8, VIT: 6 },
+      artId: "t3_tsh_sun", artLevel: 9,
+      skillIds: ["tsh_sun_pierce", "tsh_east_blade", "tsh_dawn_strike"],
+      extraArtSlots: ["t3_tsh_sun", "t2_tsh_peak"],
+      artLevels: { t3_tsh_sun: 9, t2_tsh_peak: 8 },
+    }) },
+
+  { id: "hunter_hengshan_south", name: "นักล่าเฮิงซานใต้", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "iron_ore", weight: 3 }, { itemId: "jade", weight: 2 }],
+    build: () => build("นักล่าเฮิงซานใต้", 4, {
+      stats: { AGI: 18, DEX: 14, STR: 12, POW: 8, VIT: 6 },
+      artId: "t3_hgs_swift", artLevel: 9,
+      skillIds: ["hgs_swift_blade", "hgs_five_peaks", "dgjj"],
+      extraArtSlots: ["t3_hgs_swift", "t2_hgs_cloud"],
+      artLevels: { t3_hgs_swift: 9, t2_hgs_cloud: 8 },
+    }) },
+
+  { id: "hunter_hengshan_north", name: "นักล่าเหิงซานเหนือ", ti: 4, category: "human",
+    drops: [...DROPS_T4,
+      { itemId: "paper", weight: 3 }, { itemId: "jade", weight: 2 },
+      { itemId: "lotus_seed", weight: 1 }],
+    build: () => build("นักล่าเหิงซานเหนือ", 4, {
+      stats: { POW: 14, VIT: 16, DEX: 10, AGI: 8, INT: 4 },
+      artId: "t3_hgn_mirror", artLevel: 9,
+      skillIds: ["hgn_mirror_blade", "hgn_iron_robe", "hgn_dharma_guard"],
+      extraArtSlots: ["t3_hgn_mirror", "t2_hgn_bell"],
+      artLevels: { t3_hgn_mirror: 9, t2_hgn_bell: 9, t1_hgn_shield: 8 },
+      learnedArtIds: ["t1_hgn_shield"],
     }) },
 
   { id: "hunter_emei", name: "นักล่าง้อไบ๊", ti: 4, category: "human",

@@ -26,7 +26,7 @@ The starter location is the player's home (`home_player`), which connects to the
 
 ### World (text-RPG layer)
 
-- **~86 locations** organised by category — 7 cities, 7 villages, 18 sects (incl. สำนักสุลถัง / Tang clan), 10 isles, 11 mountains/cliffs, 12 caves/valleys, 5 temples/palaces, 4 mansions, 4 inns, 11 NPC homes, plus misc.
+- **~86 locations** organised by category — 7 cities, 7 villages, **20 sects** (11 joinable + 9 lore-only — see the disciple section below), 10 isles, 11 mountains/cliffs, 12 caves/valleys, 5 temples/palaces, 4 mansions, 4 inns, 11 NPC homes, plus misc.
 - **Hand-curated routes** — every connection between two locations is in `lib/world/data/location-routes.ts`, with its own per-direction Thai label like "ลำคลองใหญ่" or "ทางขึ้นเขา". No procedural generation.
 - **Travel costs** — moving between a location and a route costs 10 stamina + 1–2 ชั่วยาม. Cities and inns offer paid rest; temples / palaces a free half restore; every other location offers free roadside rest.
 - **Random encounters** — 15 % chance per location entry, with a fight-or-flee screen. Pool is filtered by zone (cities never spawn beasts; wild zones favour beasts; sects / temples carry the supernatural pool) and weighted by tier (tier-0 chaff is common, tier-4 legendary foes are rare).
@@ -45,7 +45,7 @@ The starter location is the player's home (`home_player`), which connects to the
 - **1v1 ATB-style** turn order with real-time gauge animation. Speed differences feel natural (2:1 SPD ≈ 2:1 turn count, not 5:1).
 - **Multi-hit + cast animation** — skills can declare a `hits` count (e.g., `dgjj` 9 swords, `tang_starrain` 15 darts); each hit pops its own damage number and stacks debuffs per-hit. Cast banner shows skill name (0.3 s) then per-hit numbers (0.1 s stagger), with HP bars draining in sync.
 - **10 unified slots** per build, holding either a move skill or an inner skill (with `art:` prefix).
-- **160+ move skills** across 5 tiers + a beast-move family (`bst_*` claws / fangs / venoms used by hunt-only opponents). 15 sects represented: เส้าหลิน, อู่ตัง, ง้อไบ๊, หัวซาน, ฉวนเจิน, กู่มู่, พรรคยาจก, พรรคตะวันจันทรา, พรรคสราญรมย์, สำนักดาวดึงส์, พรรคเบญจพิษ, สำนักดาบโลหิต, องครักษ์เสื้อแพร, สำนักสุลถัง, ยุทธจักร (catch-all).
+- **160+ move skills** across 5 tiers + a beast-move family (`bst_*` claws / fangs / venoms used by hunt-only opponents). 15 sects represented in the skill catalog: เส้าหลิน, อู่ตัง, ง้อไบ๊, หัวซาน, ฉวนเจิน, กู่มู่, พรรคยาจก, พรรคตะวันจันทรา, พรรคสราญรมย์, สำนักดาวดึงส์, พรรคเบญจพิษ, สำนักดาบโลหิต, องครักษ์เสื้อแพร, สำนักสุลถัง, ยุทธจักร (catch-all).
 - **Per-tier stat-sum budget** — every move skill targets a normalized stat budget per tier (T0=10, T1=15, T2=20, T3=25, T4=30). Maintained by `scripts/normalize-t3-stats.ts` (despite the name, handles all tiers via a target table).
 - **108 inner skills** (กำลังภายใน) across 5 tiers with active + passive, scaled stats and HP/MP per level. Auto-sorted by sect via `scripts/sort-by-sect.ts`.
 - **25 weapon families** of equipment (`W / A / H / B / BR / R / C` slots with multi-slot bracelets, rings, charms).
@@ -63,9 +63,34 @@ The starter location is the player's home (`home_player`), which connects to the
 - **NPC relationships** — quests / sparring move per-NPC standing.
 - **Action log** — last 100 events (rest, gather, craft, buy, sell, use, learn, combat, quest).
 
+### Sects (20 total · 11 joinable)
+
+| Sect | Display name | Joinable |
+|---|---|---|
+| `sect_shaolin` | วัดเส้าหลิน | ✓ T4 |
+| `sect_wudang` | อู่ตัง / บู๊ตึ๊ง | ✓ T4 |
+| `sect_emei` | ง้อไบ๊ | ✓ T4 (♀) |
+| `sect_huashan` | หัวซาน | ✓ T3 (500g fee) |
+| `sect_quanzhen` | ฉวนเจิน / ชวนจิน | ✓ T3 |
+| `sect_gumu` | กู่มู่ / โบราณสุสาน | ✓ T3 (secret — Quanzhen + sun-art) |
+| `sect_beggars` | พรรคยาจก | ✓ T4 (begging ≥ lv 2) |
+| `sect_ming` | พรรคตะวันจันทรา | ✓ T4 (assassinate intro) |
+| `sect_xiaoyao` | พรรคสราญรมย์ | ✓ T4 |
+| `sect_jinyiwei` | องครักษ์เสื้อแพร | ✓ T4 (kidnap intro) |
+| `sect_tang` | สำนักสุลถัง | ✓ T4 (venom-gather intro) |
+| `sect_hengshan_south` | เฮิงซาน | lore-only |
+| `sect_hengshan_north` | เหิงซาน | lore-only |
+| `sect_songshan` | ซงซาน | lore-only |
+| `sect_taishan` | ไท่ซาน | lore-only |
+| `sect_lingjiu` | ลิ่งจิ้วกง | lore-only |
+| `sect_xingxiu` | สำนักดาวดึงส์ | lore-only |
+| `sect_xuedao` | พรรคอสูรโลหิต | lore-only (ฝ่ายอธรรม) |
+| `sect_wudu` | พรรคเบญจพิษ | lore-only |
+| `sect_xueyu` | สำนักดาบโลหิต | lore-only (in MISC block) |
+
 ### Disciple / sect membership
 
-- **11 joinable sects** — shaolin, wudang, huashan, quanzhen, emei, gumu, beggars, jinyiwei, sunmoon, tang, xiaoyao. Each has a 9 → 1 rank ladder (3-rank for the secret Gumu sect) with auto-grant skill / art rewards per rank.
+- **11 joinable sects** — see table above. Each has a 9 → 1 rank ladder (3-rank for the secret Gumu sect) with auto-grant skill / art rewards per rank.
 - **Cross-sect loyalty** — `anySectMember` Condition gates the intro quest of every sect, so you can only be an active disciple of one sect at a time.
 - **Joining** — each sect has a unique intro quest at its hall. Most are herb-gather trials (ascetic sects); some have specific gates (Shaolin = male, Emei = female, Huashan = 500 gold fee, Beggars = begging life-skill ≥ lv 2, Jinyiwei = kidnap a noble, Sunmoon = assassinate an imperial guard, Gumu = secret — must be a Quanzhen disciple AND have learned `t3_qz_sun`).
 - **Leaving** — disciples can resign (`ลาออกอย่างเป็นทางการ`, sect-skills XP freezes but no consequences) or betray (`ทรยศสำนัก`, skills keep growing but the sect's hunter chases you in random events). Both clear the active-membership gate so you can join a new sect.
