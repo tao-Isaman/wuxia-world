@@ -56,9 +56,23 @@ export function ChoicePanel({ scene }: Props) {
     <Card>
       <CardContent className="p-3 space-y-2">
         {visibleChoices.length === 0 && (
-          <p className="text-xs text-muted-foreground italic text-center py-2">
-            (ไม่มีตัวเลือก — สถานการณ์อาจเปลี่ยนไป)
-          </p>
+          <>
+            <p className="text-xs text-muted-foreground italic text-center py-2">
+              (ไม่มีตัวเลือก — สถานการณ์อาจเปลี่ยนไป)
+            </p>
+            {/* All choices were filtered out by visibleIf — give the player
+                an escape hatch back to the last location. Without this,
+                conditional-only choice blocks soft-lock the dialog. */}
+            {scene.next ? (
+              <Button onClick={() => gotoScene(scene.next!)} className="w-full">
+                ต่อไป →
+              </Button>
+            ) : state.lastLocationId ? (
+              <Button onClick={exitToLocation} variant="outline" className="w-full">
+                ปิด
+              </Button>
+            ) : null}
+          </>
         )}
         {visibleChoices.map(({ choice, idx }) => (
           <Button
