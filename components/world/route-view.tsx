@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import type { RouteScene, SceneEffect } from "@/lib/world";
 import { applyEffect, evaluateCondition } from "@/lib/world";
 import { TRAVEL_STAMINA_COST, useWorldStore } from "@/store/world-store";
-import { RestPanel } from "./rest-panel";
 
 interface Props {
   scene: RouteScene;
@@ -120,8 +119,6 @@ export function RouteView({ scene }: Props) {
           )}
         </CardContent>
       </Card>
-
-      <RestPanel kind="route" />
     </div>
   );
 }

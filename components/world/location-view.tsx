@@ -23,6 +23,9 @@ import {
 } from "@/lib/world";
 import { LocationMap } from "./location-map";
 import { NpcInteractionPopup } from "./popups/npc-interaction-popup";
+import { RestPopup } from "./popups/rest-popup";
+import { RumorPopup } from "./popups/rumor-popup";
+import { resolveRumorChannel } from "./rumor-listen-button";
 import { ShopPopup } from "./popups/shop-popup";
 import { SectHallPopup } from "./popups/sect-hall-popup";
 import { ArtisanPopup } from "./popups/artisan-popup";
@@ -35,11 +38,9 @@ import {
   TRAVEL_STAMINA_COST,
   PRACTICE_STAMINA_COST,
   type GatherResult,
-  type RestKind,
 } from "@/store/world-store";
 import { flashLoading } from "@/store/loading-store";
 import { toast } from "@/store/toast-store";
-import { RestPanel } from "./rest-panel";
 
 interface Props {
   scene: LocationScene;
@@ -63,6 +64,9 @@ export function LocationView({ scene }: Props) {
   const [hallOpen, setHallOpen] = useState(false);
   const [practiceOpen, setPracticeOpen] = useState(false);
   const [activeArtisan, setActiveArtisan] = useState<ArtisanDef | null>(null);
+  // Map-spot popups: rest + rumor objects on the painted map.
+  const [restOpen, setRestOpen] = useState(false);
+  const [rumorOpen, setRumorOpen] = useState(false);
 
   const shop = getShopAt(scene.id);
   const hall = getSectHallAt(scene.id);
@@ -101,22 +105,33 @@ export function LocationView({ scene }: Props) {
   const showNpcCard = !map || cardNpcs.length + cardRegistryNpcs.length > 0;
   const showRouteCard = !map || cardRoutes.length > 0;
 
-  // Rest options by id prefix. The roadside tier is ALWAYS available as
-  // a no-cost fallback (so a broke player at a city isn't soft-locked
-  // when they can't afford the inn). Richer locations layer the better
-  // tier on top of the roadside fallback:
-  //   - city / inn  → inn (paid full restore) + roadside fallback
-  //   - temple / palace → temple (free half restore) + roadside fallback
-  //   - everywhere else → roadside only
-  const restKinds: RestKind[] = (() => {
-    if (scene.id.startsWith("inn_") || scene.id.startsWith("city_")) {
-      return ["inn", "route"];
-    }
-    if (scene.id.startsWith("temple_") || scene.id.startsWith("palace_")) {
-      return ["temple", "route"];
-    }
-    return ["route"];
-  })();
+  // Service spots placed on the map drop out of the cards below.
+  const spotKinds = new Set((map?.spots ?? []).map((s) => s.kind));
+  const spotArtisanIds = new Set(
+    (map?.spots ?? []).flatMap((s) => (s.kind === "artisan" ? [s.artisanId] : [])),
+  );
+  const spotResourceIds = new Set(
+    (map?.spots ?? []).flatMap((s) => (s.kind === "resource" ? [s.resourceId] : [])),
+  );
+  const showShopBtn = !!shop && !spotKinds.has("shop");
+  const showHallBtn = !!hall && !spotKinds.has("sectHall");
+  const cardArtisans = artisans.filter((a) => !spotArtisanIds.has(a.id));
+  const cardResources = resources.filter((n) => !spotResourceIds.has(n.resourceId));
+  const rumorChannel = resolveRumorChannel(scene.id, state.sectMembership);
+
+  // Shared gather runner — used by the resource cards and map spots.
+  function runGather(resourceId: string) {
+    const res = getResource(resourceId);
+    if (!res) return;
+    // Hunting actions kick straight into a battle screen — the loading
+    // overlay would flash for a frame and then get yanked when
+    // BattleArena mounts. Skip it so the transition feels snappy.
+    const isHunt =
+      res.skill === "hunting" && res.opponentIds && res.opponentIds.length > 0;
+    if (!isHunt) flashLoading("กำลังเก็บของ...");
+    const r = gatherResource(resourceId);
+    toast(...gatherToast(r));
+  }
 
   return (
     <div className="space-y-3">
@@ -126,25 +141,40 @@ export function LocationView({ scene }: Props) {
           unconditionally above the main location card. */}
       <RumorBanner locationId={scene.id} />
 
-      <Card>
-        <CardContent className="p-4 space-y-2">
-          <div className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">
-            สถานที่
-          </div>
-          <h2 className="text-lg font-bold">{scene.name}</h2>
-          <p className="text-sm leading-relaxed text-muted-foreground italic">
-            {scene.description}
-          </p>
-        </CardContent>
-      </Card>
+      {!map && (
+        <Card>
+          <CardContent className="p-4 space-y-2">
+            <div className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">
+              สถานที่
+            </div>
+            <h2 className="text-lg font-bold">{scene.name}</h2>
+            <p className="text-sm leading-relaxed text-muted-foreground italic">
+              {scene.description}
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
       {map && (
-        <LocationMap
-          key={scene.id}
-          scene={scene}
-          map={map}
-          onRegistryNpc={setActiveNpc}
-        />
+        <>
+          <LocationMap
+            key={scene.id}
+            scene={scene}
+            map={map}
+            handlers={{
+              onRegistryNpc: setActiveNpc,
+              onShop: () => setShopOpen(true),
+              onSectHall: () => setHallOpen(true),
+              onArtisan: (a) => setActiveArtisan(a),
+              onRest: () => setRestOpen(true),
+              onRumor: () => setRumorOpen(true),
+              onResource: runGather,
+            }}
+          />
+          <p className="text-xs leading-relaxed text-muted-foreground italic px-1">
+            {scene.description}
+          </p>
+        </>
       )}
 
       {showNpcCard && (
@@ -264,16 +294,16 @@ export function LocationView({ scene }: Props) {
           sect membership; rendering this wrapper always is safe. We put
           it inside its own card so it lives next to other location-
           level actions like ซื้อ-ขาย / สำนัก / ฝึกฝน. */}
-      <RumorListenSection locationId={scene.id} />
+      {!spotKinds.has("rumor") && <RumorListenSection locationId={scene.id} />}
 
-      {(shop || hall) && (
+      {(showShopBtn || showHallBtn) && (
         <Card>
           <CardContent className="p-3 space-y-2">
             <div className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">
               บริการในเมือง
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-              {shop && (
+              {showShopBtn && shop && (
                 <Button
                   variant="outline"
                   onClick={() => setShopOpen(true)}
@@ -287,7 +317,7 @@ export function LocationView({ scene }: Props) {
                   </span>
                 </Button>
               )}
-              {hall && (
+              {showHallBtn && hall && (
                 <Button
                   variant="outline"
                   onClick={() => setHallOpen(true)}
@@ -306,14 +336,14 @@ export function LocationView({ scene }: Props) {
         </Card>
       )}
 
-      {artisans.length > 0 && (
+      {cardArtisans.length > 0 && (
         <Card>
           <CardContent className="p-3 space-y-2">
             <div className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">
               ช่างฝีมือ
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-              {artisans.map((a) => (
+              {cardArtisans.map((a) => (
                 <Button
                   key={a.id}
                   variant="outline"
@@ -333,10 +363,6 @@ export function LocationView({ scene }: Props) {
           </CardContent>
         </Card>
       )}
-
-      {restKinds.map((k) => (
-        <RestPanel key={k} kind={k} />
-      ))}
 
       {canPractice && (
         <Card>
@@ -364,14 +390,14 @@ export function LocationView({ scene }: Props) {
         </Card>
       )}
 
-      {resources.length > 0 && (
+      {cardResources.length > 0 && (
         <Card>
           <CardContent className="p-3 space-y-2">
             <div className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">
               กิจกรรม
             </div>
             <div className="space-y-1.5">
-              {resources.map((node) => {
+              {cardResources.map((node) => {
                 const res = getResource(node.resourceId);
                 if (!res) return null;
                 const tooLow = stamina < res.staminaCost;
@@ -385,20 +411,7 @@ export function LocationView({ scene }: Props) {
                     key={node.resourceId}
                     variant="outline"
                     disabled={tooLow}
-                    onClick={() => {
-                      // Hunting actions kick straight into a battle screen
-                      // — the loading overlay would flash for a frame and
-                      // then get yanked when BattleArena mounts. Skip it so
-                      // the transition feels snappy. Non-combat gathers
-                      // still get the deliberate "กำลังเก็บของ..." beat.
-                      const isHunt =
-                        res.skill === "hunting" &&
-                        res.opponentIds &&
-                        res.opponentIds.length > 0;
-                      if (!isHunt) flashLoading("กำลังเก็บของ...");
-                      const r = gatherResource(node.resourceId);
-                      toast(...gatherToast(r));
-                    }}
+                    onClick={() => runGather(node.resourceId)}
                     className="w-full justify-start text-left h-auto py-2 whitespace-normal"
                     title={node.hint ?? res.hint}
                   >
@@ -452,6 +465,14 @@ export function LocationView({ scene }: Props) {
         scene={canPractice ? scene : null}
         onClose={() => setPracticeOpen(false)}
       />
+      <RestPopup open={restOpen} onClose={() => setRestOpen(false)} />
+      {rumorChannel && (
+        <RumorPopup
+          open={rumorOpen}
+          channel={rumorChannel.channel}
+          onClose={() => setRumorOpen(false)}
+        />
+      )}
     </div>
   );
 }

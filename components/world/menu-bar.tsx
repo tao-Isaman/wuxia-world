@@ -12,6 +12,7 @@ import { LifeSkillsPopup } from "./popups/life-skills-popup";
 import { ActionLogPopup } from "./popups/action-log-popup";
 import { QuestLogPopup } from "./popups/quest-log-popup";
 import { SectMembershipPopup } from "./popups/sect-membership-popup";
+import { RestPopup } from "./popups/rest-popup";
 import {
   SECT_MEMBERSHIPS,
   getQuestsForSect,
@@ -28,6 +29,7 @@ type PopupId =
   | "quests"
   | "sect"
   | "log"
+  | "rest"
   | null;
 
 // Main-screen menu bar — popup buttons, one popup at a time. The bar
@@ -86,34 +88,41 @@ export function MenuBar() {
   return (
     <>
       <Panel padding="p-2">
-        <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
+        <div className="grid grid-cols-4 sm:grid-cols-8 gap-1.5">
           <MenuTab
+            icon="👤"
             label="โปรไฟล์"
             onClick={() => setOpen("profile")}
           />
           <MenuTab
-            label="ของในย่าม"
+            icon="🎒"
+            label="ย่าม"
             onClick={() => setOpen("inventory")}
           />
           <MenuTab
-            label="วิชาฝีมือ"
+            icon="🥋"
+            label="วิชา"
             onClick={() => setOpen("moves")}
           />
           <MenuTab
-            label="วิชาชีพ"
+            icon="🛠"
+            label="อาชีพ"
             onClick={() => setOpen("lifeskills")}
           />
           <MenuTab
+            icon="📜"
             label="ภารกิจ"
             onClick={() => setOpen("quests")}
             badge={activeQuestCount > 0 ? activeQuestCount : undefined}
           />
           <MenuTab
+            icon="⛩"
             label="สำนัก"
             onClick={() => setOpen("sect")}
             badge={sectActions > 0 ? sectActions : undefined}
           />
-          <MenuTab label="บันทึก" onClick={() => setOpen("log")} />
+          <MenuTab icon="🛏" label="พักผ่อน" onClick={() => setOpen("rest")} />
+          <MenuTab icon="📖" label="บันทึก" onClick={() => setOpen("log")} />
         </div>
       </Panel>
 
@@ -124,29 +133,34 @@ export function MenuBar() {
       <QuestLogPopup open={open === "quests"} onClose={close} />
       <SectMembershipPopup open={open === "sect"} onClose={close} />
       <ActionLogPopup open={open === "log"} onClose={close} />
+      <RestPopup open={open === "rest"} onClose={close} />
     </>
   );
 }
 
 interface MenuTabProps {
+  icon: string;
   label: string;
   onClick: () => void;
   badge?: number;
 }
 
-// Single menu tab. Stack-layout: pixel emoji icon on top, Charm display
-// label below. The icon gets `.pixel` rendering so emojis stay crisp at
-// every DPR; the label uses Charm so the proper-noun feel carries
-// across the whole nav.
-function MenuTab({ label, onClick, badge }: MenuTabProps) {
+// Single menu tab — game-style icon button: big pixel emoji with a tiny
+// caption below so the bar reads as a game HUD, not a text nav. The
+// label doubles as the hover tooltip.
+function MenuTab({ icon, label, onClick, badge }: MenuTabProps) {
   return (
     <WuxiaButton
       variant="default"
       size="sm"
       onClick={onClick}
-      className="h-auto py-2 flex-col gap-0.5 relative"
+      title={label}
+      className="h-auto py-1.5 flex-col gap-0 relative"
     >
-      <span className="text-[11px] sm:text-xs leading-tight">{label}</span>
+      <span className="text-lg leading-none pixel">{icon}</span>
+      <span className="text-[9px] leading-tight text-muted-foreground">
+        {label}
+      </span>
       {typeof badge === "number" && (
         <Badge
           variant="seal"
