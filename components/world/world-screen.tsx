@@ -23,6 +23,49 @@ import { ToastStack } from "./toast-stack";
 import { ConfirmDialog } from "./confirm-dialog";
 import { BattleArena } from "@/components/game/battle-arena";
 
+// Fullscreen overlay that shows the player's current surroundings (the
+// map painting of the scene, or of the last location for dialogs and
+// mid-travel events) as a darkened cover background, with the given
+// panels floating above as a HUD. Falls back to the classic paper
+// column when no painting applies. `bottom` anchors content low —
+// the JRPG conversation-box position.
+function MapBackdrop({
+  children,
+  bottom,
+}: {
+  children: React.ReactNode;
+  bottom?: boolean;
+}) {
+  const currentSceneId = useWorldStore((s) => s.currentSceneId);
+  const lastLocationId = useWorldStore((s) => s.lastLocationId);
+  const img =
+    getLocationMap(currentSceneId)?.image ??
+    getRouteMap(currentSceneId)?.image ??
+    (lastLocationId ? getLocationMap(lastLocationId)?.image : undefined);
+
+  if (!img) return <div className="space-y-3">{children}</div>;
+
+  return (
+    // !mt-0 counters the page wrapper's space-y margin on fixed layers.
+    <div className="fixed inset-0 z-40 !mt-0 overflow-y-auto bg-ink">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={img}
+        alt=""
+        draggable={false}
+        className="fixed inset-0 w-full h-full object-cover pixel opacity-40 pointer-events-none"
+      />
+      <div
+        className={`relative z-10 max-w-3xl mx-auto p-3 min-h-full flex flex-col gap-3 ${
+          bottom ? "justify-end" : "justify-center"
+        }`}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
+
 export function WorldScreen() {
   // Persist middleware hydrates async; render a placeholder until ready
   // so SSR/client markup matches and we don't flash the StartScreen
@@ -72,16 +115,16 @@ export function WorldScreen() {
   } else if (pendingBattle) {
     void battleStateExists; // re-render when battle state flips
     body = (
-      <div className="space-y-3">
+      <MapBackdrop>
         <BattleArena mode="world" onContinue={acknowledge} />
-      </div>
+      </MapBackdrop>
     );
   } else if (pendingEncounter) {
     body = (
-      <div className="space-y-3">
+      <MapBackdrop>
         <StatusBar />
         <EncounterScreen />
-      </div>
+      </MapBackdrop>
     );
   } else {
     const scene = getScene(currentSceneId);
@@ -97,16 +140,24 @@ export function WorldScreen() {
         </Panel>
       );
     } else {
-      let mainView: React.ReactNode;
-      switch (scene.kind) {
-        case "dialog":
-          mainView = (
-            <>
+      // Dialogs render as a HUD conversation box over the current map
+      // (the location the player is standing in) — game-style text box
+      // anchored low, choices beneath it.
+      if (scene.kind === "dialog") {
+        return (
+          <>
+            <MapBackdrop bottom>
               <DialogDisplay scene={scene} />
               <ChoicePanel scene={scene} />
-            </>
-          );
-          break;
+            </MapBackdrop>
+            <LoadingOverlay />
+            <ToastStack />
+            <ConfirmDialog />
+          </>
+        );
+      }
+      let mainView: React.ReactNode;
+      switch (scene.kind) {
         case "location":
           mainView = <LocationView scene={scene} />;
           break;

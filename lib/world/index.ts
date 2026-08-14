@@ -95,6 +95,7 @@ export {
   type RouteMapDef,
   type RouteMapType,
 } from "./data/route-maps";
+export { npcPortrait } from "./data/npc-portraits";
 export {
   SECT_MEMBERSHIPS,
   pendingRewardsAtRank,
