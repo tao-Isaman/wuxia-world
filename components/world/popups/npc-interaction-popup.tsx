@@ -11,6 +11,7 @@ import {
   getScene,
   isQuestOfferable,
   isQuestTurnInForNpc,
+  npcPortrait,
   type NpcDef,
   type NpcStateEntry,
   type QuestDef,
@@ -147,6 +148,15 @@ export function NpcInteractionPopup({ open, npc, onClose }: Props) {
   return (
     <Modal open={open} onClose={onClose} title={`💬 ${npc.name}`} maxWidth="max-w-md">
       <div className="space-y-3">
+        {npcPortrait(npc.id) && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={npcPortrait(npc.id)}
+            alt={npc.name}
+            draggable={false}
+            className="w-20 h-20 pixel shadow-pixel border border-ink/60 float-right ml-2"
+          />
+        )}
         <div className="flex items-center gap-2 flex-wrap">
           {/* Liveness Layer §4.3 — sim-status chip. Renders only for
               named NPCs in a non-alive state (dead / secluded /

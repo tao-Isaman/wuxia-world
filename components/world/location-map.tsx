@@ -17,6 +17,7 @@ import {
   getScene,
   getSectHallAt,
   getShopAt,
+  npcPortrait,
 } from "@/lib/world";
 import { useWorldStore, TRAVEL_STAMINA_COST } from "@/store/world-store";
 import { toast } from "@/store/toast-store";
@@ -249,6 +250,7 @@ export function LocationMap({ scene, map, handlers }: Props) {
               x={spots[npc.id].x}
               y={spots[npc.id].y}
               icon="💬"
+              img={npcPortrait(npc.id)}
               label={npc.name}
               onClick={() => handleSceneNpc(npc, spots[npc.id])}
             />
@@ -259,6 +261,7 @@ export function LocationMap({ scene, map, handlers }: Props) {
               x={spots[npc.id].x}
               y={spots[npc.id].y}
               icon="👤"
+              img={npcPortrait(npc.id)}
               label={npc.name}
               onClick={() =>
                 walkTo(spots[npc.id].x, spots[npc.id].y + 3, () =>
@@ -306,6 +309,7 @@ function MapMarker({
   x,
   y,
   icon,
+  img,
   label,
   muted,
   onClick,
@@ -313,6 +317,7 @@ function MapMarker({
   x: number;
   y: number;
   icon: string;
+  img?: string;
   label: string;
   muted?: boolean;
   onClick: () => void;
@@ -327,9 +332,19 @@ function MapMarker({
         onClick();
       }}
     >
-      <span className="text-xl leading-none drop-shadow-[0_2px_2px_rgba(0,0,0,0.55)] transition-transform group-hover:-translate-y-0.5">
-        {icon}
-      </span>
+      {img ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={img}
+          alt={label}
+          draggable={false}
+          className="w-8 h-8 pixel shadow-pixel border border-ink/60 transition-transform group-hover:-translate-y-0.5"
+        />
+      ) : (
+        <span className="text-xl leading-none drop-shadow-[0_2px_2px_rgba(0,0,0,0.55)] transition-transform group-hover:-translate-y-0.5">
+          {icon}
+        </span>
+      )}
       <span
         className={`mt-0.5 px-1 py-px text-[9px] font-semibold whitespace-nowrap shadow-pixel ${
           muted ? "bg-muted text-muted-foreground" : "bg-paper/95 text-ink"
