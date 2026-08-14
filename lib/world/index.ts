@@ -82,6 +82,13 @@ export {
 } from "./effects";
 export { validateAndRepair } from "./validate";
 export {
+  LOCATION_MAPS,
+  getLocationMap,
+  type LocationMapDef,
+  type LocationMapExit,
+  type MapPoint,
+} from "./data/location-maps";
+export {
   SECT_MEMBERSHIPS,
   pendingRewardsAtRank,
   autoGrantableRewards,
