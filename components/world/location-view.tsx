@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Modal } from "@/components/ui/modal";
 import type { ArtisanDef, LocationScene, NpcDef } from "@/lib/world";
 import {
   LIFE_SKILL_ICON,
@@ -22,6 +23,8 @@ import {
   masteryLevel,
 } from "@/lib/world";
 import { LocationMap } from "./location-map";
+import { MapHud } from "./map-hud";
+import { MenuBar } from "./menu-bar";
 import { NpcInteractionPopup } from "./popups/npc-interaction-popup";
 import { RestPopup } from "./popups/rest-popup";
 import { RumorPopup } from "./popups/rumor-popup";
@@ -67,6 +70,8 @@ export function LocationView({ scene }: Props) {
   // Map-spot popups: rest + rumor objects on the painted map.
   const [restOpen, setRestOpen] = useState(false);
   const [rumorOpen, setRumorOpen] = useState(false);
+  // Fullscreen safety drawer for content a map hasn't placed yet.
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const shop = getShopAt(scene.id);
   const hall = getSectHallAt(scene.id);
@@ -133,50 +138,19 @@ export function LocationView({ scene }: Props) {
     toast(...gatherToast(r));
   }
 
-  return (
-    <div className="space-y-3">
-      {/* Liveness Layer §4.2 — passive arrival rumor banner. Renders
-          itself only when the scene is city-like and the 7-day cooldown
-          has elapsed. No-op everywhere else, so it's safe to mount
-          unconditionally above the main location card. */}
-      <RumorBanner locationId={scene.id} />
+  // Anything the map hasn't placed — surfaced in the fullscreen drawer
+  // so unplaced content is never unreachable.
+  const hasLeftovers =
+    cardNpcs.length + cardRegistryNpcs.length > 0 ||
+    cardRoutes.length > 0 ||
+    showShopBtn ||
+    showHallBtn ||
+    cardArtisans.length > 0 ||
+    cardResources.length > 0 ||
+    canPractice;
 
-      {!map && (
-        <Card>
-          <CardContent className="p-4 space-y-2">
-            <div className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">
-              สถานที่
-            </div>
-            <h2 className="text-lg font-bold">{scene.name}</h2>
-            <p className="text-sm leading-relaxed text-muted-foreground italic">
-              {scene.description}
-            </p>
-          </CardContent>
-        </Card>
-      )}
-
-      {map && (
-        <>
-          <LocationMap
-            key={scene.id}
-            scene={scene}
-            map={map}
-            handlers={{
-              onRegistryNpc: setActiveNpc,
-              onShop: () => setShopOpen(true),
-              onSectHall: () => setHallOpen(true),
-              onArtisan: (a) => setActiveArtisan(a),
-              onRest: () => setRestOpen(true),
-              onRumor: () => setRumorOpen(true),
-              onResource: runGather,
-            }}
-          />
-          <p className="text-xs leading-relaxed text-muted-foreground italic px-1">
-            {scene.description}
-          </p>
-        </>
-      )}
-
+  const cards = (
+    <>
       {showNpcCard && (
       <Card>
         <CardContent className="p-3 space-y-2">
@@ -447,12 +421,16 @@ export function LocationView({ scene }: Props) {
         </Card>
       )}
 
+    </>
+  );
+
+  const popups = (
+    <>
       <NpcInteractionPopup
         open={activeNpc !== null}
         npc={activeNpc}
         onClose={() => setActiveNpc(null)}
       />
-
       <ShopPopup open={shopOpen} shop={shop} onClose={() => setShopOpen(false)} />
       <SectHallPopup open={hallOpen} hall={hall} onClose={() => setHallOpen(false)} />
       <ArtisanPopup
@@ -473,6 +451,79 @@ export function LocationView({ scene }: Props) {
           onClose={() => setRumorOpen(false)}
         />
       )}
+    </>
+  );
+
+  // ── fullscreen game mode — the map IS the screen ────────────────────
+  if (map) {
+    return (
+      // !mt-0: the page wrapper's space-y-3 would otherwise push this
+      // fixed layer 12px down — margins still offset fixed elements.
+      <div className="fixed inset-0 z-40 bg-ink !mt-0">
+        <LocationMap
+          key={scene.id}
+          scene={scene}
+          map={map}
+          handlers={{
+            onRegistryNpc: setActiveNpc,
+            onShop: () => setShopOpen(true),
+            onSectHall: () => setHallOpen(true),
+            onArtisan: (a) => setActiveArtisan(a),
+            onRest: () => setRestOpen(true),
+            onRumor: () => setRumorOpen(true),
+            onResource: runGather,
+          }}
+        />
+        <MapHud />
+        <MenuBar hud />
+        {hasLeftovers && (
+          <button
+            type="button"
+            title="อื่น ๆ ในบริเวณนี้"
+            onClick={() => setDrawerOpen(true)}
+            className="absolute bottom-2 right-2 z-30 w-11 h-11 frame-pixel-quiet bg-ink/80 hover:bg-ink transition-colors text-xl"
+          >
+            📋
+          </button>
+        )}
+        <Modal
+          open={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
+          title={scene.name}
+        >
+          <p className="text-xs leading-relaxed text-muted-foreground italic mb-3">
+            {scene.description}
+          </p>
+          <div className="space-y-3">{cards}</div>
+        </Modal>
+        {popups}
+      </div>
+    );
+  }
+
+  // ── classic card layout for locations without a map ─────────────────
+  return (
+    <div className="space-y-3">
+      {/* Liveness Layer §4.2 — passive arrival rumor banner. Renders
+          itself only when the scene is city-like and the 7-day cooldown
+          has elapsed. No-op everywhere else, so it's safe to mount
+          unconditionally above the main location card. */}
+      <RumorBanner locationId={scene.id} />
+
+      <Card>
+        <CardContent className="p-4 space-y-2">
+          <div className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">
+            สถานที่
+          </div>
+          <h2 className="text-lg font-bold">{scene.name}</h2>
+          <p className="text-sm leading-relaxed text-muted-foreground italic">
+            {scene.description}
+          </p>
+        </CardContent>
+      </Card>
+
+      {cards}
+      {popups}
     </div>
   );
 }

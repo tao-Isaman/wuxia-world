@@ -53,7 +53,7 @@ export interface LocationMapDef {
 export const LOCATION_MAPS: Record<string, LocationMapDef> = {
   home_player: {
     image: "/maps/home_player.png",
-    zoom: 2,
+    zoom: 2.2,
     spawn: { x: 42, y: 50 }, // courtyard, between house steps and the well
     exits: [
       // main gate + dirt path running off the bottom edge → the capital
@@ -69,7 +69,7 @@ export const LOCATION_MAPS: Record<string, LocationMapDef> = {
 
   city_capital: {
     image: "/maps/city_capital.png",
-    zoom: 2.4,
+    zoom: 2.6,
     spawn: { x: 47, y: 78 }, // just inside the main south gate
     npcSpots: {
       city_capital_magistrate_wu: { x: 56, y: 27 }, // steps of the north compound
@@ -77,6 +77,7 @@ export const LOCATION_MAPS: Record<string, LocationMapDef> = {
       city_capital_merchant_wang: { x: 42, y: 44 }, // among the market stalls
       spy_capital_feng: { x: 62, y: 57 },           // noodle stand by the kitchen row
       evil_capital_blackmarket_zhou: { x: 90, y: 33 }, // shadowy corner near the east gate
+      merchant_wang: { x: 27, y: 50 },              // เถ้าแก่หวาง, by the general store
     },
     exits: [
       { to: "home_player", x: 47, y: 88, icon: "🏠" },   // main south gate
@@ -99,6 +100,8 @@ export const LOCATION_MAPS: Record<string, LocationMapDef> = {
       { kind: "artisan", artisanId: "artisan_city_capital_chef", x: 56, y: 72, icon: "🍜", label: "ครัว" },
       { kind: "artisan", artisanId: "artisan_city_capital_jewelry", x: 69, y: 72, icon: "💍", label: "อัญมณี" },
       { kind: "artisan", artisanId: "artisan_city_capital_accessory", x: 81, y: 72, icon: "🧿", label: "เครื่องราง" },
+      { kind: "resource", resourceId: "mine_iron", x: 93, y: 71, icon: "⛏", label: "ขุดแร่" },
+      { kind: "resource", resourceId: "wood_soft", x: 15, y: 18, icon: "🪓", label: "ตัดไม้" },
     ],
   },
 };

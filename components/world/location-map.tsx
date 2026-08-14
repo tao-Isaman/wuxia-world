@@ -39,12 +39,13 @@ interface Props {
   handlers: MapSpotHandlers;
 }
 
-// AI-painted location map rendered as a camera viewport: the painting is
-// zoomed to `map.zoom`× the viewport width so the player only sees part
-// of the world; the camera follows the token (clamped at map edges).
-// Clicking ground walks the token; clicking a marker walks there first,
-// then fires the action. Mount with key={scene.id} so the token resets
-// to spawn when the location changes.
+// AI-painted location map rendered as a fullscreen camera viewport: the
+// painting is zoomed to `map.zoom`× the viewport width so the player
+// only sees part of the world; the camera follows the token (clamped at
+// map edges). Clicking ground walks the token; clicking a marker walks
+// there first, then fires the action. Fills its nearest positioned
+// ancestor — LocationView mounts it inside a `fixed inset-0` container
+// with key={scene.id} so the token resets to spawn on location change.
 export function LocationMap({ scene, map, handlers }: Props) {
   const state = useWorldStore();
   const gotoScene = useWorldStore((s) => s.gotoScene);
@@ -54,19 +55,33 @@ export function LocationMap({ scene, map, handlers }: Props) {
   const [walkMs, setWalkMs] = useState(0);
   const timer = useRef<number | null>(null);
   const worldRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
   useEffect(() => () => {
     if (timer.current) clearTimeout(timer.current);
   }, []);
 
   // ── camera ──────────────────────────────────────────────────────────
-  // Viewport is 16:9 of its own width; the world layer is zoom× the
-  // viewport width, height derived from the painting's 3:2 ratio. All
-  // math stays in % of the world so no pixel measuring is needed:
-  //   visible width  = 100/zoom            (% of world width)
-  //   visible height = (9/16)/(zoom·2/3)   (fraction of world height)
-  const zoom = Math.max(1, map.zoom ?? 2.2);
+  // The viewport is the full screen, so its aspect (h/w) is measured and
+  // tracked through resize. The world layer is zoom× the viewport width,
+  // height derived from the painting's 3:2 ratio:
+  //   visible width  = 100/zoom              (% of world width)
+  //   visible height = aspect/(zoom·2/3)     (fraction of world height)
+  // On tall/portrait screens the authored zoom could leave the world
+  // shorter than the viewport, so zoom is raised to keep full coverage.
+  const [aspect, setAspect] = useState(9 / 16);
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el) return;
+    const update = () =>
+      setAspect(el.clientHeight / Math.max(1, el.clientWidth));
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  const zoom = Math.max(map.zoom ?? 2.2, (aspect / (2 / 3)) * 1.001);
   const viewFracX = 100 / zoom;
-  const viewFracY = Math.min(100, ((9 / 16) / (zoom * (2 / 3))) * 100);
+  const viewFracY = Math.min(100, (aspect / (zoom * (2 / 3))) * 100);
   const camX = clamp(pos.x - viewFracX / 2, 0, 100 - viewFracX);
   const camY = clamp(pos.y - viewFracY / 2, 0, 100 - viewFracY);
 
@@ -180,9 +195,11 @@ export function LocationMap({ scene, map, handlers }: Props) {
   }
 
   return (
-    <div className="space-y-1">
-      <div className="relative w-full overflow-hidden frame-pixel aspect-video cursor-pointer select-none bg-ink/10">
-        {/* world layer — zoom× viewport width, camera-follow transform */}
+    <div
+      ref={rootRef}
+      className="absolute inset-0 overflow-hidden cursor-pointer select-none bg-ink"
+    >
+      {/* world layer — zoom× viewport width, camera-follow transform */}
         <div
           ref={worldRef}
           className="absolute top-0 left-0"
@@ -268,16 +285,12 @@ export function LocationMap({ scene, map, handlers }: Props) {
               onClick={() => handleExit(exit, route.routeSceneId)}
             />
           ))}
-        </div>
-
-        {/* location name chip — HUD overlay, not part of the world */}
-        <div className="absolute top-1.5 left-1.5 z-30 pointer-events-none px-1.5 py-0.5 bg-ink/80 text-paper text-[11px] font-display font-bold">
-          {scene.name}
-        </div>
       </div>
-      <p className="text-[10px] text-muted-foreground text-center">
-        คลิกบนแผนที่เพื่อเดิน · คลิกป้ายเพื่อโต้ตอบ · เดินทาง ⚡ {TRAVEL_STAMINA_COST}
-      </p>
+
+      {/* hint chip — HUD overlay, not part of the world */}
+      <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 z-30 pointer-events-none px-2 py-0.5 bg-ink/70 text-paper/90 text-[10px] whitespace-nowrap">
+        คลิกเพื่อเดิน · คลิกป้ายเพื่อโต้ตอบ · เดินทาง ⚡ {TRAVEL_STAMINA_COST}
+      </div>
     </div>
   );
 }
