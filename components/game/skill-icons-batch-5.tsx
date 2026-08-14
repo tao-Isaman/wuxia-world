@@ -1,5 +1,5 @@
 import type { IconRenderer } from "./skill-icons-registry";
-import { SKILL_ICON_OVERRIDES, ART_ICON_OVERRIDES } from "./skill-icons-registry";
+import { SKILL_ICON_OVERRIDES, ART_ICON_OVERRIDES, ART_ICON_RASTER } from "./skill-icons-registry";
 
 // ─── Batch 5: T2-T4 Jianghu skills + beast moves + Wuxia inner-energy arts ───
 //
@@ -1666,3 +1666,132 @@ const ART_BATCH: Record<string, IconRenderer> = {
 
 Object.assign(SKILL_ICON_OVERRIDES, SKILL_BATCH);
 Object.assign(ART_ICON_OVERRIDES, ART_BATCH);
+
+// Raster (PNG) overrides for inner arts - AI-generated portraits in
+// public/icons/arts/<id>.png. Raster takes precedence over the SVG
+// overrides above; tier frame + type accents still layer on top.
+Object.assign(ART_ICON_RASTER, {
+  t0_lohan: "/icons/arts/t0_lohan.png", // ลมปราณอรหันต์
+  t1_goldenbell: "/icons/arts/t1_goldenbell.png", // กระดิ่งทองพื้นฐาน
+  t2_dharma: "/icons/arts/t2_dharma.png", // ลมปราณพุทธธรรม
+  t3_onefinger: "/icons/arts/t3_onefinger.png", // เอกนิ้วเซน
+  tendon: "/icons/arts/tendon.png", // พลังเปลี่ยนเส้นเอ็น
+  diamond: "/icons/arts/diamond.png", // จินกังชี่
+  t4_demonsubduer: "/icons/arts/t4_demonsubduer.png", // ลมปราณอรหันต์ปราบมาร
+  t0_meditation: "/icons/arts/t0_meditation.png", // สมาธิพื้นฐาน
+  t1_naturalqi: "/icons/arts/t1_naturalqi.png", // พลังธรรมชาติ
+  t2_mindbody: "/icons/arts/t2_mindbody.png", // จิตกายนวมเป็นหนึ่ง
+  t3_yinyang: "/icons/arts/t3_yinyang.png", // หยินหยางสมดุล
+  taiji: "/icons/arts/taiji.png", // ไทจี้เจิ้นชี่
+  zixia: "/icons/arts/zixia.png", // จื่อเสียเซินกง
+  t0_em_meditation: "/icons/arts/t0_em_meditation.png", // สมาธิเยือกเย็น
+  t1_em_lotus: "/icons/arts/t1_em_lotus.png", // บัวบานภายใน
+  t2_em_garland: "/icons/arts/t2_em_garland.png", // บุปผาร้อยมาลัย
+  t3_em_heart: "/icons/arts/t3_em_heart.png", // พลังรักษาใจ
+  t3_em_grace: "/icons/arts/t3_em_grace.png", // พลังกายาพริ้วไหว
+  t3_em_ice: "/icons/arts/t3_em_ice.png", // ลมหายใจน้ำแข็ง
+  t4_em_bodhi: "/icons/arts/t4_em_bodhi.png", // โพธิสัตว์ทรงพรต
+  emei: "/icons/arts/emei.png", // ง้อไบ๊เซินกง
+  t0_huashan_qi: "/icons/arts/t0_huashan_qi.png", // กำลังภายในหัวซาน
+  t1_huashan_light: "/icons/arts/t1_huashan_light.png", // วิชาตัวเบาหัวซาน
+  t2_huashan_cloud: "/icons/arts/t2_huashan_cloud.png", // พลังเมฆคล้อย
+  t4_huashan_purple: "/icons/arts/t4_huashan_purple.png", // พลังเมฆม่วง
+  huashan: "/icons/arts/huashan.png", // หัวซานเซินกง
+  t0_ssh_qi: "/icons/arts/t0_ssh_qi.png", // กำลังภายในซงซาน
+  t1_ssh_iron: "/icons/arts/t1_ssh_iron.png", // วิชาเหล็กหนัก
+  t2_ssh_root: "/icons/arts/t2_ssh_root.png", // พลังรากภูผา
+  t3_ssh_pillar: "/icons/arts/t3_ssh_pillar.png", // พลังเสาภูผา
+  t0_tsh_qi: "/icons/arts/t0_tsh_qi.png", // กำลังภายในไท่ซาน
+  t1_tsh_dawn: "/icons/arts/t1_tsh_dawn.png", // วิชาตวัดอรุณ
+  t2_tsh_peak: "/icons/arts/t2_tsh_peak.png", // พลังยอดเขาบูรพา
+  t3_tsh_sun: "/icons/arts/t3_tsh_sun.png", // หนึ่งกระบี่บูชาตะวัน
+  t0_hgs_breath: "/icons/arts/t0_hgs_breath.png", // ลมหายใจห้ายอด
+  t1_hgs_step: "/icons/arts/t1_hgs_step.png", // ตัวเบาเฮิงซาน
+  t2_hgs_cloud: "/icons/arts/t2_hgs_cloud.png", // ระบำเมฆาห้ายอด
+  t3_hgs_swift: "/icons/arts/t3_hgs_swift.png", // ลมรวดเร็ว
+  t0_hgn_zen: "/icons/arts/t0_hgn_zen.png", // ลมปราณนิ่งสงบ
+  t1_hgn_shield: "/icons/arts/t1_hgn_shield.png", // โล่ธรรมจักรวาล
+  t2_hgn_bell: "/icons/arts/t2_hgn_bell.png", // ระฆังพระธรรม
+  t3_hgn_mirror: "/icons/arts/t3_hgn_mirror.png", // พลังกระจกธรรม
+  t0_qz_speed: "/icons/arts/t0_qz_speed.png", // วิชาเร่งพลัง
+  t1_qz_horse: "/icons/arts/t1_qz_horse.png", // ท่วงท่าถอยม้า
+  qzzq: "/icons/arts/qzzq.png", // ลมปราณชวนจินก่า
+  t3_qz_sun: "/icons/arts/t3_qz_sun.png", // หนึ่งพลังสุริยันต์
+  t3_qz_dragon: "/icons/arts/t3_qz_dragon.png", // หยังทะเลพิฆาตมังกร
+  ynxj: "/icons/arts/ynxj.png", // คัมภีร์สาวหยก
+  t4_gm_iceweave: "/icons/arts/t4_gm_iceweave.png", // วิชาไหมน้ำแข็ง
+  t4_gm_winterstep: "/icons/arts/t4_gm_winterstep.png", // วิชาก้าวย่างเหมันต์
+  t0_bg_survival: "/icons/arts/t0_bg_survival.png", // วิชาเอาชีวิตรอดพื้นฐาน
+  t1_bg_sunshadow: "/icons/arts/t1_bg_sunshadow.png", // พลังคล้อยตะวัน
+  t2_bg_nineshadow: "/icons/arts/t2_bg_nineshadow.png", // วิชาเก้าไร้เงา
+  t3_bg_sunrenew: "/icons/arts/t3_bg_sunrenew.png", // พลังฟื้นตะวัน
+  t4_bg_thousandcrowd: "/icons/arts/t4_bg_thousandcrowd.png", // วิชาหมื่นมวลชน
+  wanderer: "/icons/arts/wanderer.png", // เจียงหูชี่
+  t0_sm_dual: "/icons/arts/t0_sm_dual.png", // พลังสองขั้ว
+  t1_sm_sunfire: "/icons/arts/t1_sm_sunfire.png", // พลังเพลิงตะวัน
+  t1_sm_moonweave: "/icons/arts/t1_sm_moonweave.png", // พลังร้อยจันทรา
+  t2_sm_sunbody: "/icons/arts/t2_sm_sunbody.png", // พลังกายสุริยัน
+  t2_sm_moonbody: "/icons/arts/t2_sm_moonbody.png", // พลังกายจันทรา
+  t3_sm_dualfusion: "/icons/arts/t3_sm_dualfusion.png", // พลังสองขั้วผสาน
+  t3_sm_sunmoon: "/icons/arts/t3_sm_sunmoon.png", // พลังสุริยันจันทรา
+  t3_sm_sunscript: "/icons/arts/t3_sm_sunscript.png", // คัมภีร์ทานตะวัน (ฉบับย่อ)
+  qiankun: "/icons/arts/qiankun.png", // เฉียนคุนต้าหนัวอี
+  yxhd: "/icons/arts/yxhd.png", // ดาวเคลื่อนดาราคล้อย
+  t0_xy_plum: "/icons/arts/t0_xy_plum.png", // ลมปราณดอกเหมย
+  t1_xy_formless_lesser: "/icons/arts/t1_xy_formless_lesser.png", // พลังไร้ลักษณ์น้อย
+  t2_xy_formless_greater: "/icons/arts/t2_xy_formless_greater.png", // พลังไร้ลักษณ์ใหญ่
+  t3_xy_root_poison_qi: "/icons/arts/t3_xy_root_poison_qi.png", // ลมปราณรากพิษ
+  t3_xy_seepower: "/icons/arts/t3_xy_seepower.png", // วิชาดูพลัง
+  bmzq: "/icons/arts/bmzq.png", // ลมปราณภูติอุดร
+  bmsg: "/icons/arts/bmsg.png", // มหาเวทดูดดาว
+  hgdf: "/icons/arts/hgdf.png", // วิชาสลายพลัง
+  t2_snakeform: "/icons/arts/t2_snakeform.png", // งูพิษเจ็ดสี
+  np: "/icons/arts/np.png", // เบญจพิษรวมกาย
+  blood: "/icons/arts/blood.png", // โลหิตอสุรา
+  jy_a0_brocade: "/icons/arts/jy_a0_brocade.png", // ลมปราณเสื้อแพร
+  jy_a1_silktread: "/icons/arts/jy_a1_silktread.png", // ฝีก้าวเส้นไหม
+  jy_a2_goldarmor: "/icons/arts/jy_a2_goldarmor.png", // เกราะทองอนุรักษ์
+  jy_a3_thunderstride: "/icons/arts/jy_a3_thunderstride.png", // ฟ้าผ่าก้าวเดิน
+  t3_jy_shadow: "/icons/arts/t3_jy_shadow.png", // เงาสังหาร
+  jy_a4_brocadelord: "/icons/arts/jy_a4_brocadelord.png", // เจ้านายเสื้อแพร
+  t4_jy_godslayer: "/icons/arts/t4_jy_godslayer.png", // พลังประหารเทพ
+  t0_tang_sharp: "/icons/arts/t0_tang_sharp.png", // สมาธิเฉียบคม
+  t1_tang_venombody: "/icons/arts/t1_tang_venombody.png", // กายาร้อยพิษ
+  t2_tang_wavewind: "/icons/arts/t2_tang_wavewind.png", // ท่าร่างคลื่นลม
+  t3_tang_viperpower: "/icons/arts/t3_tang_viperpower.png", // พลังอสรพิษ
+  t3_tang_chase: "/icons/arts/t3_tang_chase.png", // ท่าเท้าไล่ล่า
+  t4_tang_tenkpoisons: "/icons/arts/t4_tang_tenkpoisons.png", // พลังถังหมื่นพิษ
+  t4_tang_skycleaver: "/icons/arts/t4_tang_skycleaver.png", // พลังกรัดฟ้า
+  t0_ironshirt: "/icons/arts/t0_ironshirt.png", // เกราะผ้าเหล็กพื้น
+  t0_sevenstar: "/icons/arts/t0_sevenstar.png", // เจ็ดดาวเหนือ
+  t0_fiveyuan: "/icons/arts/t0_fiveyuan.png", // ห้าธาตุพื้นฐาน
+  t0_butterfly: "/icons/arts/t0_butterfly.png", // ลมปราณผีเสื้อ
+  t1_eagleclaw: "/icons/arts/t1_eagleclaw.png", // ลมปราณกรงเล็บอินทรี
+  t1_whitehorse: "/icons/arts/t1_whitehorse.png", // ลมปราณม้าขาว
+  t1_blackiron: "/icons/arts/t1_blackiron.png", // ลมปราณเหล็กดำ
+  t1_redlotus: "/icons/arts/t1_redlotus.png", // บัวแดงเพลิงน้อย
+  t2_eighttri: "/icons/arts/t2_eighttri.png", // แปดทิศมหาเวท
+  t2_plumblossom: "/icons/arts/t2_plumblossom.png", // ลมปราณเหมยห้ากลีบ
+  t2_craneform: "/icons/arts/t2_craneform.png", // กระเรียนสมาธิ
+  t2_tigerroar: "/icons/arts/t2_tigerroar.png", // เสือคำราม
+  t3_dragonelephant: "/icons/arts/t3_dragonelephant.png", // มังกร-ช้างปัญญา
+  t3_heartmind: "/icons/arts/t3_heartmind.png", // วิชากลใจเป็นจิต
+  t3_voidstep: "/icons/arts/t3_voidstep.png", // ก้าวว่างไร้รอย
+  military: "/icons/arts/military.png", // จวินเจิ้นชี่
+  lotus: "/icons/arts/lotus.png", // เหลียนฮวาชี่
+  scholar: "/icons/arts/scholar.png", // เหวินชี่
+  poison: "/icons/arts/poison.png", // อินตู๋ชี่
+  heaven: "/icons/arts/heaven.png", // เฉียนคุนต้าฝ่า
+  snow: "/icons/arts/snow.png", // กำแพงหิมะ
+  fire: "/icons/arts/fire.png", // เพลิงสวรรค์
+  sand: "/icons/arts/sand.png", // พายุทราย
+  shadow: "/icons/arts/shadow.png", // เงาสังหาร
+  jiuyin: "/icons/arts/jiuyin.png", // เก้าหยินจิงชี่
+  jiuyang: "/icons/arts/jiuyang.png", // เก้าหยางเซินกง
+  shenzhao: "/icons/arts/shenzhao.png", // เซินจ้าวจิง
+  taiyin: "/icons/arts/taiyin.png", // ไต้อินเจิ้นชี่
+  huoxue: "/icons/arts/huoxue.png", // ฮั่วเสวียสินฝ่า
+  dongxuan: "/icons/arts/dongxuan.png", // ตงซวนเซินกง
+  khbt: "/icons/arts/khbt.png", // คัมภีร์ทานตะวัน
+  kuyt: "/icons/arts/kuyt.png", // วิชาเก้าเอี้ยง
+});
