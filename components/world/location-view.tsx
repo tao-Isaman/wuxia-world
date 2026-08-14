@@ -13,6 +13,7 @@ import {
   gatherSuccessChance,
   getArtisansAt,
   getItem,
+  getLocationMap,
   getNpcsAtLocation,
   getResource,
   getScene,
@@ -20,6 +21,7 @@ import {
   getSectHallAt,
   masteryLevel,
 } from "@/lib/world";
+import { LocationMap } from "./location-map";
 import { NpcInteractionPopup } from "./popups/npc-interaction-popup";
 import { ShopPopup } from "./popups/shop-popup";
 import { SectHallPopup } from "./popups/sect-hall-popup";
@@ -81,6 +83,24 @@ export function LocationView({ scene }: Props) {
     (r) => !r.visibleIf || evaluateCondition(state, r.visibleIf),
   );
 
+  // AI-painted map view (see lib/world/data/location-maps.ts). Entries
+  // placed on the map drop out of the button cards below; anything the
+  // map doesn't place (or locations with no map at all) keeps the
+  // classic card UI.
+  const map = getLocationMap(scene.id);
+  const onMap = (npcId: string) => !!map?.npcSpots?.[npcId];
+  const onMapRoute = (routeSceneId: string) =>
+    !!map?.exits?.some((e) => `route_${scene.id}__to__${e.to}` === routeSceneId);
+  const cardNpcs = map ? visibleNpcs.filter((n) => !onMap(n.id)) : visibleNpcs;
+  const cardRegistryNpcs = map
+    ? registryNpcs.filter((n) => !onMap(n.id))
+    : registryNpcs;
+  const cardRoutes = map
+    ? visibleRoutes.filter((r) => !onMapRoute(r.routeSceneId))
+    : visibleRoutes;
+  const showNpcCard = !map || cardNpcs.length + cardRegistryNpcs.length > 0;
+  const showRouteCard = !map || cardRoutes.length > 0;
+
   // Rest options by id prefix. The roadside tier is ALWAYS available as
   // a no-cost fallback (so a broke player at a city isn't soft-locked
   // when they can't afford the inn). Richer locations layer the better
@@ -118,18 +138,28 @@ export function LocationView({ scene }: Props) {
         </CardContent>
       </Card>
 
+      {map && (
+        <LocationMap
+          key={scene.id}
+          scene={scene}
+          map={map}
+          onRegistryNpc={setActiveNpc}
+        />
+      )}
+
+      {showNpcCard && (
       <Card>
         <CardContent className="p-3 space-y-2">
           <div className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">
             ผู้คน
           </div>
-          {visibleNpcs.length === 0 && registryNpcs.length === 0 ? (
+          {cardNpcs.length === 0 && cardRegistryNpcs.length === 0 ? (
             <p className="text-xs text-muted-foreground italic py-1">
               ไม่มีใครให้พูดด้วย
             </p>
           ) : (
             <div className="space-y-1.5">
-              {visibleNpcs.map((npc) => {
+              {cardNpcs.map((npc) => {
                 const target = getScene(npc.dialogSceneId);
                 const valid = target?.kind === "dialog";
                 return (
@@ -151,7 +181,7 @@ export function LocationView({ scene }: Props) {
                   </Button>
                 );
               })}
-              {registryNpcs.map((npc) => {
+              {cardRegistryNpcs.map((npc) => {
                 const canSpar = !!npc.sparOpponentId;
                 const canTalk = !!npc.dialogSceneId;
                 return (
@@ -184,19 +214,21 @@ export function LocationView({ scene }: Props) {
           )}
         </CardContent>
       </Card>
+      )}
 
+      {showRouteCard && (
       <Card>
         <CardContent className="p-3 space-y-2">
           <div className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">
             เส้นทาง
           </div>
-          {visibleRoutes.length === 0 ? (
+          {cardRoutes.length === 0 ? (
             <p className="text-xs text-muted-foreground italic py-1">
               ไม่มีเส้นทางออกจากที่นี่
             </p>
           ) : (
             <div className="space-y-1.5">
-              {visibleRoutes.map((route) => {
+              {cardRoutes.map((route) => {
                 const target = getScene(route.routeSceneId);
                 const valid = target?.kind === "route";
                 const tooTired = stamina < TRAVEL_STAMINA_COST;
@@ -225,6 +257,7 @@ export function LocationView({ scene }: Props) {
           )}
         </CardContent>
       </Card>
+      )}
 
       {/* Liveness Layer §4.1 — "ฟังข่าวลือ" entry. The button itself
           decides whether to render based on the scene id + the player's
