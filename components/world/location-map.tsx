@@ -104,10 +104,12 @@ export function LocationMap({ scene, map, handlers }: Props) {
   }
 
   function handleGroundClick(e: React.MouseEvent) {
-    const rect = worldRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    const el = worldRef.current;
+    if (!el || e.target !== el) return;
+    // offsetX/Y are reported in the element's LOCAL (pre-transform)
+    // coordinate space, so this survives the mobile-landscape rotation.
+    const x = (e.nativeEvent.offsetX / el.offsetWidth) * 100;
+    const y = (e.nativeEvent.offsetY / el.offsetHeight) * 100;
     walkTo(clamp(x, 2, 98), clamp(y, 4, 96));
   }
 
