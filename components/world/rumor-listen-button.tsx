@@ -29,7 +29,7 @@ type Resolution = {
   hint: string;
 } | null;
 
-function resolveChannel(
+export function resolveRumorChannel(
   locationId: string,
   membership: ReturnType<typeof useWorldStore.getState>["sectMembership"],
 ): Resolution {
@@ -86,7 +86,7 @@ export function RumorListenButton({ locationId }: Props) {
   const [open, setOpen] = useState(false);
   const sectMembership = useWorldStore((s) => s.sectMembership);
 
-  const resolution = resolveChannel(locationId, sectMembership);
+  const resolution = resolveRumorChannel(locationId, sectMembership);
   if (!resolution) return null;
   const { channel, label, hint } = resolution;
 

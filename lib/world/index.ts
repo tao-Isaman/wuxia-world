@@ -87,6 +87,7 @@ export {
   type LocationMapDef,
   type LocationMapExit,
   type MapPoint,
+  type MapSpot,
 } from "./data/location-maps";
 export {
   SECT_MEMBERSHIPS,

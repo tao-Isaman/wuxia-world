@@ -1,25 +1,51 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import type { LocationMapDef, LocationScene, NpcDef, NpcRef } from "@/lib/world";
-import { evaluateCondition, getNpcsAtLocation, getScene } from "@/lib/world";
+import type {
+  ArtisanDef,
+  LocationMapDef,
+  LocationScene,
+  MapSpot,
+  NpcDef,
+  NpcRef,
+} from "@/lib/world";
+import {
+  evaluateCondition,
+  getArtisan,
+  getNpcsAtLocation,
+  getResource,
+  getScene,
+  getSectHallAt,
+  getShopAt,
+} from "@/lib/world";
 import { useWorldStore, TRAVEL_STAMINA_COST } from "@/store/world-store";
 import { toast } from "@/store/toast-store";
+
+// Callbacks into LocationView's popup state — the map is a spatial
+// front-end over the exact same flows as the classic cards.
+export interface MapSpotHandlers {
+  onRegistryNpc: (npc: NpcDef) => void;
+  onShop: () => void;
+  onSectHall: () => void;
+  onArtisan: (artisan: ArtisanDef) => void;
+  onRest: () => void;
+  onRumor: () => void;
+  onResource: (resourceId: string) => void;
+}
 
 interface Props {
   scene: LocationScene;
   map: LocationMapDef;
-  /** registry-NPC marker clicked → parent opens NpcInteractionPopup */
-  onRegistryNpc: (npc: NpcDef) => void;
+  handlers: MapSpotHandlers;
 }
 
-// AI-painted location map with a click-to-move player token. Markers
-// (NPCs / exits) are %-positioned over the painting; clicking one walks
-// the token there first, then fires the action — same behaviors as the
-// old button lists, just spatial. Mount with key={scene.id} so the
-// token resets to spawn when the location changes.
-export function LocationMap({ scene, map, onRegistryNpc }: Props) {
+// AI-painted location map rendered as a camera viewport: the painting is
+// zoomed to `map.zoom`× the viewport width so the player only sees part
+// of the world; the camera follows the token (clamped at map edges).
+// Clicking ground walks the token; clicking a marker walks there first,
+// then fires the action. Mount with key={scene.id} so the token resets
+// to spawn when the location changes.
+export function LocationMap({ scene, map, handlers }: Props) {
   const state = useWorldStore();
   const gotoScene = useWorldStore((s) => s.gotoScene);
   const stamina = useWorldStore((s) => s.stamina);
@@ -27,15 +53,28 @@ export function LocationMap({ scene, map, onRegistryNpc }: Props) {
   const [pos, setPos] = useState(map.spawn);
   const [walkMs, setWalkMs] = useState(0);
   const timer = useRef<number | null>(null);
+  const worldRef = useRef<HTMLDivElement>(null);
   useEffect(() => () => {
     if (timer.current) clearTimeout(timer.current);
   }, []);
+
+  // ── camera ──────────────────────────────────────────────────────────
+  // Viewport is 16:9 of its own width; the world layer is zoom× the
+  // viewport width, height derived from the painting's 3:2 ratio. All
+  // math stays in % of the world so no pixel measuring is needed:
+  //   visible width  = 100/zoom            (% of world width)
+  //   visible height = (9/16)/(zoom·2/3)   (fraction of world height)
+  const zoom = Math.max(1, map.zoom ?? 2.2);
+  const viewFracX = 100 / zoom;
+  const viewFracY = Math.min(100, ((9 / 16) / (zoom * (2 / 3))) * 100);
+  const camX = clamp(pos.x - viewFracX / 2, 0, 100 - viewFracX);
+  const camY = clamp(pos.y - viewFracY / 2, 0, 100 - viewFracY);
 
   // Walk the token to (x, y), then fire `after`. A new click cancels the
   // pending action of the previous walk (the token changes course).
   function walkTo(x: number, y: number, after?: () => void) {
     const dist = Math.hypot(x - pos.x, y - pos.y);
-    const ms = Math.max(250, Math.round(dist * 28)); // ~28ms per % unit
+    const ms = Math.max(250, Math.round(dist * 32)); // ~32ms per % unit
     if (timer.current) clearTimeout(timer.current);
     setWalkMs(ms);
     setPos({ x, y });
@@ -44,14 +83,15 @@ export function LocationMap({ scene, map, onRegistryNpc }: Props) {
     }, ms + 80);
   }
 
-  function handleGroundClick(e: React.MouseEvent<HTMLDivElement>) {
-    const rect = e.currentTarget.getBoundingClientRect();
+  function handleGroundClick(e: React.MouseEvent) {
+    const rect = worldRef.current?.getBoundingClientRect();
+    if (!rect) return;
     const x = ((e.clientX - rect.left) / rect.width) * 100;
     const y = ((e.clientY - rect.top) / rect.height) * 100;
-    walkTo(clamp(x, 2, 98), clamp(y, 6, 96));
+    walkTo(clamp(x, 2, 98), clamp(y, 4, 96));
   }
 
-  // NPC markers: scene NPCs + registry NPCs that have an authored spot.
+  // ── markers ─────────────────────────────────────────────────────────
   const spots = map.npcSpots ?? {};
   const sceneNpcs = scene.npcs.filter(
     (n) => spots[n.id] && (!n.visibleIf || evaluateCondition(state, n.visibleIf)),
@@ -60,9 +100,6 @@ export function LocationMap({ scene, map, onRegistryNpc }: Props) {
     (n) => spots[n.id] && (!n.visibleIf || evaluateCondition(state, n.visibleIf)),
   );
 
-  // Exit markers bind to the generated route scene for their destination;
-  // unmatched or hidden routes simply don't render (they stay in the
-  // fallback เส้นทาง card instead).
   const visibleRoutes = scene.routes.filter(
     (r) => !r.visibleIf || evaluateCondition(state, r.visibleIf),
   );
@@ -75,11 +112,7 @@ export function LocationMap({ scene, map, onRegistryNpc }: Props) {
 
   function handleSceneNpc(npc: NpcRef, spot: { x: number; y: number }) {
     if (getScene(npc.dialogSceneId)?.kind !== "dialog") return;
-    walkTo(spot.x, spot.y + 4, () => gotoScene(npc.dialogSceneId));
-  }
-
-  function handleRegistryNpc(npc: NpcDef, spot: { x: number; y: number }) {
-    walkTo(spot.x, spot.y + 4, () => onRegistryNpc(npc));
+    walkTo(spot.x, spot.y + 3, () => gotoScene(npc.dialogSceneId));
   }
 
   function handleExit(exit: { x: number; y: number }, routeSceneId: string) {
@@ -90,17 +123,81 @@ export function LocationMap({ scene, map, onRegistryNpc }: Props) {
     walkTo(exit.x, exit.y, () => gotoScene(routeSceneId));
   }
 
+  // Resolve a service spot to its marker face + click action. Returns
+  // null when the backing service doesn't exist at this location (e.g.,
+  // a typo'd artisanId) so a bad author entry renders nothing.
+  function resolveSpot(spot: MapSpot): { icon: string; label: string; act: () => void } | null {
+    switch (spot.kind) {
+      case "shop": {
+        const shop = getShopAt(scene.id);
+        if (!shop) return null;
+        return {
+          icon: spot.icon ?? "🏪",
+          label: spot.label ?? shop.label,
+          act: handlers.onShop,
+        };
+      }
+      case "sectHall": {
+        const hall = getSectHallAt(scene.id);
+        if (!hall) return null;
+        return {
+          icon: spot.icon ?? "🏯",
+          label: spot.label ?? hall.label,
+          act: handlers.onSectHall,
+        };
+      }
+      case "artisan": {
+        const artisan = getArtisan(spot.artisanId);
+        if (!artisan || artisan.locationId !== scene.id) return null;
+        return {
+          icon: spot.icon ?? "🛠",
+          label: spot.label ?? artisan.label,
+          act: () => handlers.onArtisan(artisan),
+        };
+      }
+      case "rest":
+        return {
+          icon: spot.icon ?? "🛏",
+          label: spot.label ?? "พักผ่อน",
+          act: handlers.onRest,
+        };
+      case "rumor":
+        return {
+          icon: spot.icon ?? "🍶",
+          label: spot.label ?? "ฟังข่าวลือ",
+          act: handlers.onRumor,
+        };
+      case "resource": {
+        const res = getResource(spot.resourceId);
+        if (!res) return null;
+        return {
+          icon: spot.icon ?? "🌿",
+          label: spot.label ?? res.name,
+          act: () => handlers.onResource(spot.resourceId),
+        };
+      }
+    }
+  }
+
   return (
-    <Card>
-      <CardContent className="p-2 space-y-1.5">
+    <div className="space-y-1">
+      <div className="relative w-full overflow-hidden frame-pixel aspect-video cursor-pointer select-none bg-ink/10">
+        {/* world layer — zoom× viewport width, camera-follow transform */}
         <div
-          className="relative w-full overflow-hidden frame-pixel cursor-pointer select-none"
+          ref={worldRef}
+          className="absolute top-0 left-0"
+          style={{
+            width: `${zoom * 100}%`,
+            transform: `translate(${-camX}%, ${-camY}%)`,
+            transition: `transform ${walkMs}ms linear`,
+            willChange: "transform",
+          }}
           onClick={handleGroundClick}
         >
           <img
             src={map.image}
             alt={scene.name}
-            className="block w-full h-auto pointer-events-none"
+            className="block w-full h-auto pointer-events-none pixel"
             draggable={false}
           />
 
@@ -139,9 +236,27 @@ export function LocationMap({ scene, map, onRegistryNpc }: Props) {
               y={spots[npc.id].y}
               icon="👤"
               label={npc.name}
-              onClick={() => handleRegistryNpc(npc, spots[npc.id])}
+              onClick={() =>
+                walkTo(spots[npc.id].x, spots[npc.id].y + 3, () =>
+                  handlers.onRegistryNpc(npc),
+                )
+              }
             />
           ))}
+          {(map.spots ?? []).map((spot, i) => {
+            const r = resolveSpot(spot);
+            if (!r) return null;
+            return (
+              <MapMarker
+                key={`spot-${i}`}
+                x={spot.x}
+                y={spot.y}
+                icon={r.icon}
+                label={r.label}
+                onClick={() => walkTo(spot.x, spot.y + 3, r.act)}
+              />
+            );
+          })}
           {exits.map(({ exit, route }) => (
             <MapMarker
               key={route.routeSceneId}
@@ -154,11 +269,16 @@ export function LocationMap({ scene, map, onRegistryNpc }: Props) {
             />
           ))}
         </div>
-        <p className="text-[10px] text-muted-foreground text-center">
-          คลิกบนแผนที่เพื่อเดิน · คลิกป้ายเพื่อพูดคุยหรือเดินทาง (⚡ {TRAVEL_STAMINA_COST})
-        </p>
-      </CardContent>
-    </Card>
+
+        {/* location name chip — HUD overlay, not part of the world */}
+        <div className="absolute top-1.5 left-1.5 z-30 pointer-events-none px-1.5 py-0.5 bg-ink/80 text-paper text-[11px] font-display font-bold">
+          {scene.name}
+        </div>
+      </div>
+      <p className="text-[10px] text-muted-foreground text-center">
+        คลิกบนแผนที่เพื่อเดิน · คลิกป้ายเพื่อโต้ตอบ · เดินทาง ⚡ {TRAVEL_STAMINA_COST}
+      </p>
+    </div>
   );
 }
 
