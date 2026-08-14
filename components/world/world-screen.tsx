@@ -6,7 +6,13 @@ import { WuxiaButton } from "@/components/ui/wuxia/button";
 import { useWorldStore } from "@/store/world-store";
 import { useBattleStore } from "@/store/battle-store";
 import { confirmDialog } from "@/store/confirm-store";
-import { getLocationMap, getRouteMap, getScene } from "@/lib/world";
+import {
+  NPCS,
+  getLocationMap,
+  getRouteMap,
+  getScene,
+  npcBodySprite,
+} from "@/lib/world";
 import { ensureBattleStarted } from "@/lib/world/battle-bridge";
 import { StartScreen } from "./start-screen";
 import { DialogDisplay } from "./dialog-display";
@@ -16,6 +22,7 @@ import { RouteView } from "./route-view";
 import { RouteMapView } from "./route-map-view";
 import { StatusBar } from "./status-bar";
 import { MenuBar } from "./menu-bar";
+import { MapHud } from "./map-hud";
 import { GameOverScreen } from "./game-over-screen";
 import { EncounterScreen } from "./encounter-screen";
 import { LoadingOverlay } from "./loading-overlay";
@@ -32,9 +39,15 @@ import { BattleArena } from "@/components/game/battle-arena";
 function MapBackdrop({
   children,
   bottom,
+  hud,
+  art,
 }: {
   children: React.ReactNode;
   bottom?: boolean;
+  /** keep the in-game HUD (status panel + menu icons) on screen */
+  hud?: boolean;
+  /** large scene art (e.g. the speaking NPC's sprite) behind the panels */
+  art?: React.ReactNode;
 }) {
   const currentSceneId = useWorldStore((s) => s.currentSceneId);
   const lastLocationId = useWorldStore((s) => s.lastLocationId);
@@ -55,6 +68,7 @@ function MapBackdrop({
         draggable={false}
         className="fixed inset-0 w-full h-full object-cover pixel opacity-40 pointer-events-none"
       />
+      {art}
       <div
         className={`relative z-10 max-w-3xl mx-auto p-3 min-h-full flex flex-col gap-3 ${
           bottom ? "justify-end" : "justify-center"
@@ -62,6 +76,12 @@ function MapBackdrop({
       >
         {children}
       </div>
+      {hud && (
+        <>
+          <MapHud />
+          <MenuBar hud />
+        </>
+      )}
     </div>
   );
 }
@@ -140,13 +160,41 @@ export function WorldScreen() {
         </Panel>
       );
     } else {
-      // Dialogs render as a HUD conversation box over the current map
-      // (the location the player is standing in) — game-style text box
-      // anchored low, choices beneath it.
+      // Dialogs render as part of the game HUD: the status panel + menu
+      // icons stay on screen, the speaking NPC's sprite stands beside a
+      // game-style text box anchored low, choices beneath it.
       if (scene.kind === "dialog") {
+        // Who is talking? Prefer the NPC whose talk scene this is; fall
+        // back to matching the first speech line's speaker name (covers
+        // chained sub-scenes). No match → no sprite, box only.
+        const talkNpc =
+          NPCS.find((n) => n.dialogSceneId === scene.id) ??
+          (() => {
+            const speech = scene.lines.find(
+              (l) => l.t !== "narration" && "speaker" in l,
+            ) as { speaker?: string } | undefined;
+            return speech?.speaker
+              ? NPCS.find((n) => n.name === speech.speaker)
+              : undefined;
+          })();
+        const artSprite = talkNpc ? npcBodySprite(talkNpc.id) : undefined;
         return (
           <>
-            <MapBackdrop bottom>
+            <MapBackdrop
+              bottom
+              hud
+              art={
+                artSprite ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={artSprite}
+                    alt={talkNpc?.name ?? ""}
+                    draggable={false}
+                    className="fixed bottom-0 left-2 md:left-14 z-[5] h-[46vh] w-auto pixel drop-shadow-[0_8px_10px_rgba(0,0,0,0.6)] pointer-events-none"
+                  />
+                ) : undefined
+              }
+            >
               <DialogDisplay scene={scene} />
               <ChoicePanel scene={scene} />
             </MapBackdrop>
