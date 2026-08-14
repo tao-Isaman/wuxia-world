@@ -6,7 +6,7 @@ import { WuxiaButton } from "@/components/ui/wuxia/button";
 import { useWorldStore } from "@/store/world-store";
 import { useBattleStore } from "@/store/battle-store";
 import { confirmDialog } from "@/store/confirm-store";
-import { getScene } from "@/lib/world";
+import { getLocationMap, getScene } from "@/lib/world";
 import { ensureBattleStarted } from "@/lib/world/battle-bridge";
 import { StartScreen } from "./start-screen";
 import { DialogDisplay } from "./dialog-display";
@@ -112,6 +112,19 @@ export function WorldScreen() {
         case "route":
           mainView = <RouteView scene={scene} />;
           break;
+      }
+      // Mapped locations render as a fullscreen game screen — the map
+      // carries its own HUD (status + menu icons), so the page chrome
+      // (StatusBar / MenuBar / exit button) stays out of the tree.
+      if (scene.kind === "location" && getLocationMap(scene.id)) {
+        return (
+          <>
+            {mainView}
+            <LoadingOverlay />
+            <ToastStack />
+            <ConfirmDialog />
+          </>
+        );
       }
       body = (
         <div className="space-y-3">

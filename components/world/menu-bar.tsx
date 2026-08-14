@@ -44,7 +44,7 @@ type PopupId =
 // The 🥋 วิชาฝีมือ tab manages BOTH move skills and inner arts: each
 // of the 10 slots can hold either kind, so a separate ☯ inner-skills
 // popup would just duplicate state.
-export function MenuBar() {
+export function MenuBar({ hud }: { hud?: boolean } = {}) {
   const [open, setOpen] = useState<PopupId>(null);
   const close = () => setOpen(null);
   // Active-quest counter for the seal badge on the ภารกิจ tab.
@@ -85,47 +85,34 @@ export function MenuBar() {
     return count;
   });
 
-  return (
-    <>
-      <Panel padding="p-2">
-        <div className="grid grid-cols-4 sm:grid-cols-8 gap-1.5">
-          <MenuTab
-            icon="👤"
-            label="โปรไฟล์"
-            onClick={() => setOpen("profile")}
-          />
-          <MenuTab
-            icon="🎒"
-            label="ย่าม"
-            onClick={() => setOpen("inventory")}
-          />
-          <MenuTab
-            icon="🥋"
-            label="วิชา"
-            onClick={() => setOpen("moves")}
-          />
-          <MenuTab
-            icon="🛠"
-            label="อาชีพ"
-            onClick={() => setOpen("lifeskills")}
-          />
-          <MenuTab
-            icon="📜"
-            label="ภารกิจ"
-            onClick={() => setOpen("quests")}
-            badge={activeQuestCount > 0 ? activeQuestCount : undefined}
-          />
-          <MenuTab
-            icon="⛩"
-            label="สำนัก"
-            onClick={() => setOpen("sect")}
-            badge={sectActions > 0 ? sectActions : undefined}
-          />
-          <MenuTab icon="🛏" label="พักผ่อน" onClick={() => setOpen("rest")} />
-          <MenuTab icon="📖" label="บันทึก" onClick={() => setOpen("log")} />
-        </div>
-      </Panel>
+  const tabs: {
+    id: Exclude<PopupId, null>;
+    icon: string;
+    label: string;
+    badge?: number;
+  }[] = [
+    { id: "profile", icon: "/icons/ui/profile.png", label: "โปรไฟล์" },
+    { id: "inventory", icon: "/icons/ui/bag.png", label: "ย่าม" },
+    { id: "moves", icon: "/icons/ui/skills.png", label: "วิชา" },
+    { id: "lifeskills", icon: "/icons/ui/craft.png", label: "อาชีพ" },
+    {
+      id: "quests",
+      icon: "/icons/ui/quest.png",
+      label: "ภารกิจ",
+      badge: activeQuestCount > 0 ? activeQuestCount : undefined,
+    },
+    {
+      id: "sect",
+      icon: "/icons/ui/sect.png",
+      label: "สำนัก",
+      badge: sectActions > 0 ? sectActions : undefined,
+    },
+    { id: "rest", icon: "/icons/ui/rest.png", label: "พักผ่อน" },
+    { id: "log", icon: "/icons/ui/log.png", label: "บันทึก" },
+  ];
 
+  const popups = (
+    <>
       <ProfilePopup open={open === "profile"} onClose={close} />
       <InventoryPopup open={open === "inventory"} onClose={close} />
       <MoveSkillsPopup open={open === "moves"} onClose={close} />
@@ -134,6 +121,61 @@ export function MenuBar() {
       <SectMembershipPopup open={open === "sect"} onClose={close} />
       <ActionLogPopup open={open === "log"} onClose={close} />
       <RestPopup open={open === "rest"} onClose={close} />
+    </>
+  );
+
+  // HUD variant — icon column overlaid on the fullscreen map (top-right).
+  if (hud) {
+    return (
+      <>
+        <div className="absolute top-2 right-2 z-30 flex flex-col gap-1.5">
+          {tabs.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              title={t.label}
+              onClick={() => setOpen(t.id)}
+              className="relative w-11 h-11 frame-pixel-quiet bg-ink/80 hover:bg-ink transition-colors"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={t.icon}
+                alt={t.label}
+                className="w-full h-full pixel"
+                draggable={false}
+              />
+              {typeof t.badge === "number" && (
+                <Badge
+                  variant="seal"
+                  className="absolute -top-1 -right-1 text-[9px] px-1 h-4 leading-none"
+                >
+                  {t.badge}
+                </Badge>
+              )}
+            </button>
+          ))}
+        </div>
+        {popups}
+      </>
+    );
+  }
+
+  return (
+    <>
+      <Panel padding="p-2">
+        <div className="grid grid-cols-4 sm:grid-cols-8 gap-1.5">
+          {tabs.map((t) => (
+            <MenuTab
+              key={t.id}
+              icon={t.icon}
+              label={t.label}
+              badge={t.badge}
+              onClick={() => setOpen(t.id)}
+            />
+          ))}
+        </div>
+      </Panel>
+      {popups}
     </>
   );
 }
@@ -145,9 +187,8 @@ interface MenuTabProps {
   badge?: number;
 }
 
-// Single menu tab — game-style icon button: big pixel emoji with a tiny
-// caption below so the bar reads as a game HUD, not a text nav. The
-// label doubles as the hover tooltip.
+// Single menu tab — game-style icon button: painted pixel icon with a
+// tiny caption below so the bar reads as a game HUD, not a text nav.
 function MenuTab({ icon, label, onClick, badge }: MenuTabProps) {
   return (
     <WuxiaButton
@@ -155,9 +196,15 @@ function MenuTab({ icon, label, onClick, badge }: MenuTabProps) {
       size="sm"
       onClick={onClick}
       title={label}
-      className="h-auto py-1.5 flex-col gap-0 relative"
+      className="h-auto py-1.5 flex-col gap-0.5 relative"
     >
-      <span className="text-lg leading-none pixel">{icon}</span>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={icon}
+        alt={label}
+        className="w-7 h-7 pixel"
+        draggable={false}
+      />
       <span className="text-[9px] leading-tight text-muted-foreground">
         {label}
       </span>
