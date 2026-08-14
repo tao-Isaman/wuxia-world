@@ -6,13 +6,14 @@ import { WuxiaButton } from "@/components/ui/wuxia/button";
 import { useWorldStore } from "@/store/world-store";
 import { useBattleStore } from "@/store/battle-store";
 import { confirmDialog } from "@/store/confirm-store";
-import { getLocationMap, getScene } from "@/lib/world";
+import { getLocationMap, getRouteMap, getScene } from "@/lib/world";
 import { ensureBattleStarted } from "@/lib/world/battle-bridge";
 import { StartScreen } from "./start-screen";
 import { DialogDisplay } from "./dialog-display";
 import { ChoicePanel } from "./choice-panel";
 import { LocationView } from "./location-view";
 import { RouteView } from "./route-view";
+import { RouteMapView } from "./route-map-view";
 import { StatusBar } from "./status-bar";
 import { MenuBar } from "./menu-bar";
 import { GameOverScreen } from "./game-over-screen";
@@ -113,10 +114,15 @@ export function WorldScreen() {
           mainView = <RouteView scene={scene} />;
           break;
       }
-      // Mapped locations render as a fullscreen game screen — the map
-      // carries its own HUD (status + menu icons), so the page chrome
-      // (StatusBar / MenuBar / exit button) stays out of the tree.
-      if (scene.kind === "location" && getLocationMap(scene.id)) {
+      // Mapped locations and mapped route edges render as fullscreen
+      // game screens — the map carries its own HUD (status + menu
+      // icons), so the page chrome (StatusBar / MenuBar / exit button)
+      // stays out of the tree.
+      const routeMap = scene.kind === "route" ? getRouteMap(scene.id) : undefined;
+      if (routeMap && scene.kind === "route") {
+        mainView = <RouteMapView key={scene.id} scene={scene} map={routeMap} />;
+      }
+      if ((scene.kind === "location" && getLocationMap(scene.id)) || routeMap) {
         return (
           <>
             {mainView}

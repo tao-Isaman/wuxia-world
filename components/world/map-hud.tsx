@@ -25,7 +25,9 @@ export function MapHud() {
   const hpCur = Math.min(d.HP, currentHp);
   const mpCur = Math.min(d.MP, currentMp);
   const scene = getScene(currentSceneId);
-  const sceneName = scene?.kind === "location" ? scene.name : "";
+  const sceneName =
+    scene?.kind === "location" ? scene.name :
+    scene?.kind === "route" ? scene.label : "";
 
   return (
     <div className="absolute top-2 left-2 z-30 w-56 p-2 bg-ink/80 text-paper space-y-1 shadow-pixel">
