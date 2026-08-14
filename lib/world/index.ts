@@ -90,6 +90,12 @@ export {
   type MapSpot,
 } from "./data/location-maps";
 export {
+  classifyRouteEdge,
+  getRouteMap,
+  type RouteMapDef,
+  type RouteMapType,
+} from "./data/route-maps";
+export {
   SECT_MEMBERSHIPS,
   pendingRewardsAtRank,
   autoGrantableRewards,
