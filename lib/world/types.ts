@@ -1041,6 +1041,10 @@ export interface WorldStateData {
   // sect membership conditions + dialog gating.
   gender: Gender;
 
+  // Selected body sprite id (see lib/world/data/player-bodies.ts).
+  // Chosen at character creation; drives the map token sprite.
+  playerBodyId: string;
+
   // Sect membership state, keyed by SectId. Empty when the player isn't a
   // disciple anywhere yet. Joining a sect adds an entry seeded with the
   // sect's starting rank (e.g. Shaolin = 9).

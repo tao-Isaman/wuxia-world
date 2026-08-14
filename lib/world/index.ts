@@ -97,6 +97,12 @@ export {
 } from "./data/route-maps";
 export { npcBodySprite, npcPortrait } from "./data/npc-portraits";
 export {
+  PLAYER_BODIES,
+  PLAYER_BODY_LABEL,
+  defaultBodyFor,
+  playerBodySprite,
+} from "./data/player-bodies";
+export {
   SECT_MEMBERSHIPS,
   pendingRewardsAtRank,
   autoGrantableRewards,

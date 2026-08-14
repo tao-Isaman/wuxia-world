@@ -16,6 +16,7 @@ function freshState(): WorldStateData {
   return {
     hasGame: true,
     playerBuild: null,
+    playerBodyId: "m1",
     currentSceneId: "city_capital",
     lastLocationId: "city_capital",
     flags: {},

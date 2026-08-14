@@ -337,7 +337,11 @@ const ARTISAN_PROFESSIONS: ReadonlySet<LifeSkill> = new Set<LifeSkill>([
 
 interface WorldStore extends WorldStateData {
   // Actions
-  startNewGame: (opts?: { name?: string; gender?: import("@/lib/world").Gender }) => void;
+  startNewGame: (opts?: {
+    name?: string;
+    gender?: import("@/lib/world").Gender;
+    bodyId?: string;
+  }) => void;
   // Sect membership actions
   joinSect: (sectId: import("@/lib/world").SectId) => { ok: boolean; reason?: string };
   // Spend points to upgrade rank (one rank at a time).
@@ -527,6 +531,7 @@ const emptyData = (): WorldStateData => ({
   gameOver: false,
   actionLog: [],
   gender: "male",
+  playerBodyId: "m1",
   sectMembership: {},
   // Liveness Layer (NPC sim + rumors). v18+. Defaults are empty —
   // npcExt seeds lazily on first tickAllNamedNpcs from authored roster.
@@ -914,6 +919,7 @@ function draftFrom(s: WorldStateData): WorldStateData {
     gameOver: s.gameOver,
     actionLog: [...s.actionLog],
     gender: s.gender,
+    playerBodyId: s.playerBodyId,
     sectMembership: { ...s.sectMembership },
     // v18+: Liveness Layer
     npcExt: { ...s.npcExt },
@@ -997,6 +1003,8 @@ export const useWorldStore = create<WorldStore>()(
         if (opts?.name && opts.name.trim()) build.name = opts.name.trim();
         fresh.playerBuild = build;
         fresh.gender = opts?.gender ?? "male";
+        fresh.playerBodyId =
+          opts?.bodyId ?? (fresh.gender === "female" ? "f1" : "m1");
         fresh.currentSceneId = START_SCENE_ID;
         // Seed level 1 for the starter skill so the UI has an entry to
         // display from turn one.
@@ -2561,12 +2569,13 @@ export const useWorldStore = create<WorldStore>()(
     }),
     {
       name: "wusia-world-v1",
-      version: 18,
+      version: 19,
       // Only persist the data fields, not the action functions.
       partialize: (s) => ({
         hasGame: s.hasGame,
         playerBuild: s.playerBuild,
         gender: s.gender,
+        playerBodyId: s.playerBodyId,
         sectMembership: s.sectMembership,
         currentSceneId: s.currentSceneId,
         lastLocationId: s.lastLocationId,
@@ -2750,6 +2759,13 @@ export const useWorldStore = create<WorldStore>()(
           gameOver: p.gameOver === true,
           actionLog: Array.isArray(p.actionLog) ? p.actionLog.slice(-ACTION_LOG_MAX) : [],
           gender: p.gender === "female" ? "female" : "male",
+          // v19+: selected body sprite; default by gender for old saves.
+          playerBodyId:
+            typeof p.playerBodyId === "string" && p.playerBodyId
+              ? p.playerBodyId
+              : p.gender === "female"
+                ? "f1"
+                : "m1",
           sectMembership:
             p.sectMembership && typeof p.sectMembership === "object"
               ? { ...p.sectMembership }
