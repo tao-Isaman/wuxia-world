@@ -54,16 +54,18 @@ export const LOCATION_MAPS: Record<string, LocationMapDef> = {
   home_player: {
     image: "/maps/home_player.png",
     zoom: 2.2,
-    spawn: { x: 42, y: 50 }, // courtyard, between house steps and the well
+    spawn: { x: 46, y: 48 }, // courtyard, between the porch steps and the well
     exits: [
       // main gate + dirt path running off the bottom edge → the capital
-      { to: "city_capital", x: 54, y: 86, icon: "🚶" },
-      // hedge-lined alley on the right edge → Hong's house
-      { to: "home_hong", x: 87, y: 46, icon: "🌿" },
+      { to: "city_capital", x: 47, y: 87, icon: "🚶" },
+      // hedge-lined road climbing the right edge → Hong's house
+      { to: "home_hong", x: 85, y: 36, icon: "🌿" },
     ],
     spots: [
-      // sleep in your own bed — roadside-tier rest via the rest popup
-      { kind: "rest", x: 30, y: 38, icon: "🛏", label: "นอนพัก" },
+      // sleep on your own porch — roadside-tier rest via the rest popup
+      { kind: "rest", x: 37, y: 37, icon: "🛏", label: "นอนพัก" },
+      // hunt in the pine woods past the bottom-left fence
+      { kind: "resource", resourceId: "hunt_forest", x: 10, y: 86, icon: "🏹", label: "ล่าสัตว์" },
     ],
   },
 
