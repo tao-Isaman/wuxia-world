@@ -17,6 +17,7 @@ import {
   getScene,
   getSectHallAt,
   getShopAt,
+  npcBodySprite,
   npcPortrait,
 } from "@/lib/world";
 import { useWorldStore, TRAVEL_STAMINA_COST } from "@/store/world-store";
@@ -250,6 +251,7 @@ export function LocationMap({ scene, map, handlers }: Props) {
               x={spots[npc.id].x}
               y={spots[npc.id].y}
               icon="💬"
+              body={npcBodySprite(npc.id)}
               img={npcPortrait(npc.id)}
               label={npc.name}
               onClick={() => handleSceneNpc(npc, spots[npc.id])}
@@ -261,6 +263,7 @@ export function LocationMap({ scene, map, handlers }: Props) {
               x={spots[npc.id].x}
               y={spots[npc.id].y}
               icon="👤"
+              body={npcBodySprite(npc.id)}
               img={npcPortrait(npc.id)}
               label={npc.name}
               onClick={() =>
@@ -310,6 +313,7 @@ function MapMarker({
   y,
   icon,
   img,
+  body,
   label,
   muted,
   onClick,
@@ -318,6 +322,7 @@ function MapMarker({
   y: number;
   icon: string;
   img?: string;
+  body?: string;
   label: string;
   muted?: boolean;
   onClick: () => void;
@@ -332,7 +337,16 @@ function MapMarker({
         onClick();
       }}
     >
-      {img ? (
+      {body ? (
+        // full-body transparent sprite standing on the painting
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={body}
+          alt={label}
+          draggable={false}
+          className="w-14 h-14 pixel drop-shadow-[0_3px_3px_rgba(0,0,0,0.5)] transition-transform group-hover:-translate-y-0.5"
+        />
+      ) : img ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={img}
