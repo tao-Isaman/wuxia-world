@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useWorldStore } from "@/store/world-store";
+import { clearMapPositions } from "./location-map";
 import type { Gender } from "@/lib/world";
 import {
   GENDER_LABEL,
@@ -113,7 +114,10 @@ export function StartScreen() {
           <Button
             size="lg"
             disabled={!canStart}
-            onClick={() => startNewGame({ name: trimmed, gender, bodyId })}
+            onClick={() => {
+              clearMapPositions();
+              startNewGame({ name: trimmed, gender, bodyId });
+            }}
           >
             เริ่มเกมใหม่
           </Button>

@@ -2387,9 +2387,11 @@ export const useWorldStore = create<WorldStore>()(
           set({ ...draft });
           return { ok: true, outcome: "passed", chance, items };
         }
-        // Failed — queue a non-fatal fight against the tier-matched opponent.
+        // Failed — caught in the act. Fight the NPC themselves when they
+        // have a battle build (sparOpponentId); only NPCs without one
+        // fall back to the tier-matched guard.
         const tier = (npc.defenseTier ?? 0) as 0 | 1 | 2 | 3 | 4;
-        const opponentId = TIER_TO_BAD_ACTION_OPPONENT[tier];
+        const opponentId = npc.sparOpponentId ?? TIER_TO_BAD_ACTION_OPPONENT[tier];
         draft.lifeSkillXp.steal = (draft.lifeSkillXp.steal ?? 0) + STEAL_XP_ON_FAIL;
         draft.pendingBattle = {
           opponentId,

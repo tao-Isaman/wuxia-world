@@ -43,6 +43,17 @@ interface Props {
   handlers: MapSpotHandlers;
 }
 
+// Where the token last stood, per location. Dialogs, battles, and
+// encounters unmount the map — on return the player resumes from the
+// same spot instead of snapping back to spawn. Leaving through an exit
+// clears the entry so the NEXT arrival starts at the gate again.
+const LAST_POS = new Map<string, { x: number; y: number }>();
+
+// Fresh game → forget every remembered position (called by StartScreen).
+export function clearMapPositions() {
+  LAST_POS.clear();
+}
+
 // AI-painted location map rendered as a fullscreen camera viewport: the
 // painting is zoomed to `map.zoom`× the viewport width so the player
 // only sees part of the world; the camera follows the token (clamped at
@@ -56,7 +67,7 @@ export function LocationMap({ scene, map, handlers }: Props) {
   const stamina = useWorldStore((s) => s.stamina);
   const playerBodyId = useWorldStore((s) => s.playerBodyId);
 
-  const [pos, setPos] = useState(map.spawn);
+  const [pos, setPos] = useState(() => LAST_POS.get(scene.id) ?? map.spawn);
   const [walkMs, setWalkMs] = useState(0);
   const timer = useRef<number | null>(null);
   const worldRef = useRef<HTMLDivElement>(null);
@@ -98,6 +109,7 @@ export function LocationMap({ scene, map, handlers }: Props) {
     if (timer.current) clearTimeout(timer.current);
     setWalkMs(ms);
     setPos({ x, y });
+    LAST_POS.set(scene.id, { x, y });
     timer.current = window.setTimeout(() => {
       after?.();
     }, ms + 80);
@@ -142,7 +154,11 @@ export function LocationMap({ scene, map, handlers }: Props) {
       toast("warn", "พลังไม่พอสำหรับการเดินทาง");
       return;
     }
-    walkTo(exit.x, exit.y, () => gotoScene(routeSceneId));
+    walkTo(exit.x, exit.y, () => {
+      // Actually leaving — next arrival here starts at spawn again.
+      LAST_POS.delete(scene.id);
+      gotoScene(routeSceneId);
+    });
   }
 
   // Resolve a service spot to its marker face + click action. Returns
