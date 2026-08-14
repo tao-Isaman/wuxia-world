@@ -30,6 +30,7 @@ export interface MapSpotHandlers {
   onArtisan: (artisan: ArtisanDef) => void;
   onRest: () => void;
   onRumor: () => void;
+  onPractice: () => void;
   onResource: (resourceId: string) => void;
 }
 
@@ -181,6 +182,12 @@ export function LocationMap({ scene, map, handlers }: Props) {
           icon: spot.icon ?? "🍶",
           label: spot.label ?? "ฟังข่าวลือ",
           act: handlers.onRumor,
+        };
+      case "practice":
+        return {
+          icon: spot.icon ?? "🧘",
+          label: spot.label ?? "ฝึกฝน",
+          act: handlers.onPractice,
         };
       case "resource": {
         const res = getResource(spot.resourceId);

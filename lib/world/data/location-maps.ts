@@ -12,6 +12,8 @@
 // y: 0..100 top→bottom) so markers stay glued to the painting at any
 // render width.
 
+import { buildAutoMap } from "./auto-maps";
+
 export interface MapPoint {
   x: number;
   y: number;
@@ -34,6 +36,7 @@ export type MapSpot =
   | ({ kind: "artisan"; artisanId: string; icon?: string; label?: string } & MapPoint)
   | ({ kind: "rest"; icon?: string; label?: string } & MapPoint)
   | ({ kind: "rumor"; icon?: string; label?: string } & MapPoint)
+  | ({ kind: "practice"; icon?: string; label?: string } & MapPoint)
   | ({ kind: "resource"; resourceId: string; icon?: string; label?: string } & MapPoint);
 
 export interface LocationMapDef {
@@ -72,42 +75,45 @@ export const LOCATION_MAPS: Record<string, LocationMapDef> = {
   city_capital: {
     image: "/maps/city_capital.png",
     zoom: 2.6,
-    spawn: { x: 47, y: 78 }, // just inside the main south gate
+    spawn: { x: 50, y: 78 }, // just inside the main south gate
     npcSpots: {
-      city_capital_magistrate_wu: { x: 56, y: 27 }, // steps of the north compound
-      city_capital_physician_lin: { x: 33, y: 60 }, // in front of the apothecary
-      city_capital_merchant_wang: { x: 42, y: 44 }, // among the market stalls
-      spy_capital_feng: { x: 62, y: 57 },           // noodle stand by the kitchen row
-      evil_capital_blackmarket_zhou: { x: 90, y: 33 }, // shadowy corner near the east gate
-      merchant_wang: { x: 27, y: 50 },              // เถ้าแก่หวาง, by the general store
+      city_capital_magistrate_wu: { x: 52, y: 27 }, // gate of the north compound
+      city_capital_physician_lin: { x: 35, y: 58 }, // in front of the apothecary
+      city_capital_merchant_wang: { x: 58, y: 44 }, // among the market stalls
+      spy_capital_feng: { x: 62, y: 58 },           // noodle stand by the kitchen row
+      evil_capital_blackmarket_zhou: { x: 90, y: 47 }, // shadowy corner below the east gate
+      merchant_wang: { x: 27, y: 42 },              // เถ้าแก่หวาง, by the general store
     },
     exits: [
-      { to: "home_player", x: 47, y: 88, icon: "🏠" },   // main south gate
-      { to: "village_qigu", x: 30, y: 7, icon: "🌾" },    // north fields
-      { to: "palace_royal", x: 64, y: 6, icon: "🏯" },    // palace walkway, north
-      { to: "sect_songshan", x: 9, y: 10, icon: "⛰" },   // mountain trail, north-west
-      { to: "city_changan", x: 3, y: 32, icon: "🚶" },    // royal highway, west
-      { to: "city_yangzhou", x: 4, y: 62, icon: "⛵" },   // grand canal, south-west
-      { to: "sect_jinyiwei", x: 92, y: 19, icon: "🎽" },  // guard alley, east gate
-      { to: "inn_yuelai", x: 95, y: 55, icon: "🏮" },     // old alley, east
+      { to: "home_player", x: 50, y: 88, icon: "🏠" },   // main south gate
+      { to: "village_qigu", x: 28, y: 6, icon: "🌾" },    // north fields
+      { to: "palace_royal", x: 78, y: 5, icon: "🏯" },    // palace walkway, north-east
+      { to: "sect_songshan", x: 8, y: 8, icon: "⛰" },    // mountain trail, north-west
+      { to: "city_changan", x: 4, y: 40, icon: "🚶" },    // royal highway, west
+      { to: "city_yangzhou", x: 10, y: 88, icon: "⛵" },  // grand canal, south-west
+      { to: "sect_jinyiwei", x: 93, y: 28, icon: "🎽" },  // guard gate, east
+      { to: "inn_yuelai", x: 95, y: 62, icon: "🏮" },     // old alley, east
     ],
     spots: [
-      { kind: "shop", x: 20, y: 44, icon: "🏪", label: "ตลาดนครหลวง" },
-      { kind: "sectHall", x: 50, y: 24, icon: "🏯", label: "สำนักยุทธิ์" },
-      { kind: "rest", x: 76, y: 46, icon: "🍵", label: "โรงเตี๊ยม" },
-      { kind: "rumor", x: 81, y: 52, icon: "🍶", label: "ฟังข่าวลือ" },
-      { kind: "artisan", artisanId: "artisan_city_capital_forge", x: 17, y: 72, icon: "🔨", label: "ตีเหล็ก" },
-      { kind: "artisan", artisanId: "artisan_city_capital_alchemy", x: 30, y: 72, icon: "⚗️", label: "ปรุงยา" },
-      { kind: "artisan", artisanId: "artisan_city_capital_tailoring", x: 43, y: 72, icon: "🧵", label: "ตัดเย็บ" },
-      { kind: "artisan", artisanId: "artisan_city_capital_chef", x: 56, y: 72, icon: "🍜", label: "ครัว" },
-      { kind: "artisan", artisanId: "artisan_city_capital_jewelry", x: 69, y: 72, icon: "💍", label: "อัญมณี" },
-      { kind: "artisan", artisanId: "artisan_city_capital_accessory", x: 81, y: 72, icon: "🧿", label: "เครื่องราง" },
-      { kind: "resource", resourceId: "mine_iron", x: 93, y: 71, icon: "⛏", label: "ขุดแร่" },
-      { kind: "resource", resourceId: "wood_soft", x: 15, y: 18, icon: "🪓", label: "ตัดไม้" },
+      { kind: "shop", x: 25, y: 38, icon: "🏪", label: "ตลาดนครหลวง" },
+      { kind: "sectHall", x: 48, y: 22, icon: "🏯", label: "สำนักยุทธิ์" },
+      { kind: "rest", x: 78, y: 40, icon: "🍵", label: "โรงเตี๊ยม" },
+      { kind: "rumor", x: 72, y: 47, icon: "🍶", label: "ฟังข่าวลือ" },
+      { kind: "artisan", artisanId: "artisan_city_capital_forge", x: 21, y: 72, icon: "🔨", label: "ตีเหล็ก" },
+      { kind: "artisan", artisanId: "artisan_city_capital_alchemy", x: 35, y: 72, icon: "⚗️", label: "ปรุงยา" },
+      { kind: "artisan", artisanId: "artisan_city_capital_tailoring", x: 47, y: 72, icon: "🧵", label: "ตัดเย็บ" },
+      { kind: "artisan", artisanId: "artisan_city_capital_chef", x: 60, y: 72, icon: "🍜", label: "ครัว" },
+      { kind: "artisan", artisanId: "artisan_city_capital_jewelry", x: 72, y: 72, icon: "💍", label: "อัญมณี" },
+      { kind: "artisan", artisanId: "artisan_city_capital_accessory", x: 83, y: 72, icon: "🧿", label: "เครื่องราง" },
+      { kind: "resource", resourceId: "mine_iron", x: 93, y: 90, icon: "⛏", label: "ขุดแร่" },
+      { kind: "resource", resourceId: "wood_soft", x: 6, y: 55, icon: "🪓", label: "ตัดไม้" },
     ],
   },
 };
 
 export function getLocationMap(id: string): LocationMapDef | undefined {
-  return LOCATION_MAPS[id];
+  // Hand-authored entries win; every other painted location falls back
+  // to the convention-based auto builder (see auto-maps.ts, which
+  // imports only types from this module — no runtime cycle).
+  return LOCATION_MAPS[id] ?? buildAutoMap(id);
 }

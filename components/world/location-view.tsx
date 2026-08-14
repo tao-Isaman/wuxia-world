@@ -120,6 +120,7 @@ export function LocationView({ scene }: Props) {
   );
   const showShopBtn = !!shop && !spotKinds.has("shop");
   const showHallBtn = !!hall && !spotKinds.has("sectHall");
+  const showPracticeCard = canPractice && !spotKinds.has("practice");
   const cardArtisans = artisans.filter((a) => !spotArtisanIds.has(a.id));
   const cardResources = resources.filter((n) => !spotResourceIds.has(n.resourceId));
   const rumorChannel = resolveRumorChannel(scene.id, state.sectMembership);
@@ -147,7 +148,7 @@ export function LocationView({ scene }: Props) {
     showHallBtn ||
     cardArtisans.length > 0 ||
     cardResources.length > 0 ||
-    canPractice;
+    showPracticeCard;
 
   const cards = (
     <>
@@ -338,7 +339,7 @@ export function LocationView({ scene }: Props) {
         </Card>
       )}
 
-      {canPractice && (
+      {showPracticeCard && (
         <Card>
           <CardContent className="p-3 space-y-2">
             <div className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">
@@ -471,6 +472,7 @@ export function LocationView({ scene }: Props) {
             onArtisan: (a) => setActiveArtisan(a),
             onRest: () => setRestOpen(true),
             onRumor: () => setRumorOpen(true),
+            onPractice: () => setPracticeOpen(true),
             onResource: runGather,
           }}
         />
