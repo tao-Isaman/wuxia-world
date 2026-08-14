@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { RouteMapDef, RouteScene, SceneEffect } from "@/lib/world";
-import { applyEffect, evaluateCondition } from "@/lib/world";
+import { applyEffect, evaluateCondition, playerBodySprite } from "@/lib/world";
 import { useWorldStore, TRAVEL_STAMINA_COST } from "@/store/world-store";
 import { toast } from "@/store/toast-store";
 import { MapHud } from "./map-hud";
@@ -21,6 +21,7 @@ export function RouteMapView({ scene, map }: Props) {
   const state = useWorldStore();
   const gotoScene = useWorldStore((s) => s.gotoScene);
   const stamina = useWorldStore((s) => s.stamina);
+  const playerBodyId = useWorldStore((s) => s.playerBodyId);
   const tooTired = stamina < TRAVEL_STAMINA_COST;
 
   const [pos, setPos] = useState(map.spawn);
@@ -135,10 +136,14 @@ export function RouteMapView({ scene, map }: Props) {
               transition: `left ${walkMs}ms linear, top ${walkMs}ms linear`,
             }}
           >
-            <span className="text-2xl leading-none drop-shadow-[0_2px_2px_rgba(0,0,0,0.55)]">
-              🧍
-            </span>
-            <span className="mt-0.5 px-1 text-[9px] font-bold bg-vermilion text-white shadow-pixel">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={playerBodySprite(playerBodyId)}
+              alt="เจ้า"
+              draggable={false}
+              className="w-[168px] h-[168px] pixel drop-shadow-[0_4px_4px_rgba(0,0,0,0.5)]"
+            />
+            <span className="mt-0.5 px-2 text-[27px] font-bold bg-vermilion text-white shadow-pixel leading-tight">
               เจ้า
             </span>
           </div>
@@ -173,7 +178,7 @@ export function RouteMapView({ scene, map }: Props) {
         </div>
 
         {/* travel label — HUD overlay */}
-        <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 z-30 pointer-events-none px-2 py-0.5 bg-ink/70 text-paper/90 text-[10px] whitespace-nowrap">
+        <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 z-30 pointer-events-none px-3 py-1 bg-ink/70 text-paper/90 text-[30px] leading-tight whitespace-nowrap">
           🚶 {scene.label} · เดินทาง ⚡ {TRAVEL_STAMINA_COST}
         </div>
       </div>
@@ -209,11 +214,11 @@ function RouteMarker({
         onClick();
       }}
     >
-      <span className="text-xl leading-none font-bold text-paper drop-shadow-[0_2px_2px_rgba(0,0,0,0.7)] transition-transform group-hover:-translate-y-0.5">
+      <span className="text-4xl leading-none font-bold text-paper drop-shadow-[0_2px_2px_rgba(0,0,0,0.7)] transition-transform group-hover:-translate-y-0.5">
         {icon}
       </span>
       <span
-        className={`mt-0.5 px-1 py-px text-[9px] font-semibold whitespace-nowrap shadow-pixel ${
+        className={`mt-0.5 px-2 py-0.5 text-[27px] font-semibold whitespace-nowrap shadow-pixel leading-tight ${
           muted ? "bg-muted text-muted-foreground" : "bg-paper/95 text-ink"
         }`}
       >

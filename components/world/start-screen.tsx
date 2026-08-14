@@ -5,7 +5,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useWorldStore } from "@/store/world-store";
 import type { Gender } from "@/lib/world";
-import { GENDER_LABEL } from "@/lib/world";
+import {
+  GENDER_LABEL,
+  PLAYER_BODIES,
+  PLAYER_BODY_LABEL,
+  defaultBodyFor,
+  playerBodySprite,
+} from "@/lib/world";
 
 // Shown only when `hasGame === false`. Player picks a name + gender, then
 // "เริ่มเกมใหม่" creates a fresh world bound to those choices. Gender is
@@ -14,7 +20,13 @@ import { GENDER_LABEL } from "@/lib/world";
 export function StartScreen() {
   const startNewGame = useWorldStore((s) => s.startNewGame);
   const [name, setName] = useState("");
-  const [gender, setGender] = useState<Gender>("male");
+  const [gender, setGenderRaw] = useState<Gender>("male");
+  const [bodyId, setBodyId] = useState<string>(defaultBodyFor("male"));
+  // Switching gender resets the body pick to that gender's first option.
+  const setGender = (g: Gender) => {
+    setGenderRaw(g);
+    setBodyId(defaultBodyFor(g));
+  };
 
   const trimmed = name.trim();
   const canStart = trimmed.length > 0 && trimmed.length <= 24;
@@ -65,13 +77,43 @@ export function StartScreen() {
               บางสำนักรับเฉพาะเพศที่กำหนด เช่น เส้าหลินรับเฉพาะชาย ง้อไบ๊รับเฉพาะหญิง
             </p>
           </fieldset>
+
+          <fieldset className="space-y-1">
+            <legend className="text-sm text-foreground/80 mb-1">รูปร่าง</legend>
+            <div className="grid grid-cols-4 gap-2">
+              {PLAYER_BODIES[gender].map((b) => (
+                <button
+                  key={b}
+                  type="button"
+                  onClick={() => setBodyId(b)}
+                  title={PLAYER_BODY_LABEL[b]}
+                  className={`border p-1 transition-colors ${
+                    bodyId === b
+                      ? "border-primary bg-primary/10"
+                      : "border-border bg-background hover:border-foreground/40"
+                  }`}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={playerBodySprite(b)}
+                    alt={PLAYER_BODY_LABEL[b]}
+                    draggable={false}
+                    className="w-full h-auto pixel"
+                  />
+                </button>
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground text-center">
+              {PLAYER_BODY_LABEL[bodyId]}
+            </p>
+          </fieldset>
         </div>
 
         <div className="text-center">
           <Button
             size="lg"
             disabled={!canStart}
-            onClick={() => startNewGame({ name: trimmed, gender })}
+            onClick={() => startNewGame({ name: trimmed, gender, bodyId })}
           >
             เริ่มเกมใหม่
           </Button>
