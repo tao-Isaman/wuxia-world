@@ -111,7 +111,7 @@ export function DialogStage({ scene, speaker, locationName }: {
             </button>}
           </header>
           <div ref={content} className={styles.content} tabIndex={0} role="region" aria-label="บทสนทนาและตัวเลือก">
-            <div className={styles.lines}><DialogDisplay scene={scene} /></div>
+            <div className={styles.lines}><DialogDisplay scene={scene} speakerName={speaker?.name} /></div>
             <div className={styles.choices}><ChoicePanel scene={scene} /></div>
           </div>
           {moreBelow && <div className={styles.scrollHint} aria-hidden="true">เลื่อนลงเพื่ออ่านต่อและดูตัวเลือก ↓</div>}

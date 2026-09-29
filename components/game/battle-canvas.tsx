@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useBattleStore } from "@/store/battle-store";
 import { useWorldStore } from "@/store/world-store";
-import { NPCS, getOpponent } from "@/lib/world";
+import { NPCS, getOpponent, npcBattleSprite, npcPixelSprite } from "@/lib/world";
 import { characterId, npcCharacterId } from "@/lib/characters/catalog";
 import type { BattleCastProgress } from "@/lib/three/battle-runtime";
 import { resolveBattleBackground } from "@/lib/three/battle-background";
@@ -21,7 +21,10 @@ export function useBattleActors(mode: "world" | "free") {
     /bat/.test(opponentId ?? "") ? 7 : 0 : null;
   const characterA = characterId(mode === "world" ? bodyId : "m1");
   const characterB = npcCharacterId(npc?.id ?? opponentId ?? "thug");
-  return { characterA, characterB, creatureFrame };
+  // A sparring NPC fights in the same unique sprite the player met in the world.
+  const spriteB = creatureFrame === null && npc ? npcBattleSprite(npc.id) : undefined;
+  const iconB = creatureFrame === null && npc ? npcPixelSprite(npc.id) : undefined;
+  return { characterA, characterB, creatureFrame, spriteB, iconB };
 }
 
 export function BattleCanvas({ mode, onCastProgress }: {
@@ -39,7 +42,7 @@ export function BattleCanvas({ mode, onCastProgress }: {
   const [attempt, setAttempt] = useState(0);
   const progressCallback = useRef(onCastProgress);
   progressCallback.current = onCastProgress;
-  const { characterA, characterB, creatureFrame } = useBattleActors(mode);
+  const { characterA, characterB, creatureFrame, spriteB } = useBattleActors(mode);
   useEffect(() => {
     let disposed = false;
     let runtime: { destroy: () => void } | undefined;
@@ -47,14 +50,14 @@ export function BattleCanvas({ mode, onCastProgress }: {
     void import("@/lib/three/battle-runtime").then(({ createBattleRuntime }) => {
       if (disposed || !host.current) return;
       runtime = createBattleRuntime(host.current, {
-        characterA, characterB, creatureFrame, background,
+        characterA, characterB, spriteB, creatureFrame, background,
         onReady: () => { if (!disposed) setReady(true); },
         onError: () => { if (!disposed) { setReady(false); setError(true); } },
         onCastProgress: (progress) => { if (!disposed) progressCallback.current?.(progress); },
       });
     }).catch(() => { if (!disposed) setError(true); });
     return () => { disposed = true; runtime?.destroy(); };
-  }, [characterA, characterB, builds, attempt, creatureFrame, background]);
+  }, [characterA, characterB, spriteB, builds, attempt, creatureFrame, background]);
   return <div className="battle-stage">
     <div ref={host} className="absolute inset-0" role="img"
       aria-label={`${background.label} · ${builds?.A.name ?? "จอมยุทธ์"} กับ ${builds?.B.name ?? "คู่ต่อสู้"}`}

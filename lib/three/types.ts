@@ -5,8 +5,12 @@ export interface WorldMarker extends Point {
   label: string;
   kind: "npc" | "exit" | "service";
   image?: string;
+  /** Unique native-pixel world sprite for this NPC (single frame); archetype sheet otherwise. */
+  sprite?: string;
   icon?: string;
   disabled?: boolean;
+  /** Quest marker over an NPC: "offer" shows !, "turnin" shows ?. */
+  quest?: "offer" | "turnin";
   onActivate: () => void;
 }
 

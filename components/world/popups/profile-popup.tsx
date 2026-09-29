@@ -31,25 +31,26 @@ import { useWorldStore } from "@/store/world-store";
 import { xpToNextStatLevel } from "@/lib/world/stat-progression";
 import { GENDER_LABEL, SECT_MEMBERSHIPS, TRAIT_KEYS, TRAIT_LABEL } from "@/lib/world";
 import { ArtTooltip, SkillTooltip } from "../skill-tooltip";
+import { CharacterPreview } from "@/components/game/character-preview";
 
 interface Props {
   open: boolean;
   onClose: () => void;
 }
 
-const DERIVED_ROWS: { label: string; key: keyof ReturnType<typeof deriveAll> }[] = [
-  { label: "HP",  key: "HP" },
-  { label: "MP",  key: "MP" },
-  { label: "ATK", key: "Atk" },
-  { label: "PA",  key: "PA" },
-  { label: "IA",  key: "IA" },
-  { label: "PD",  key: "PD" },
-  { label: "ID",  key: "ID" },
-  { label: "SPD", key: "Spd" },
-  { label: "Eva", key: "Eva" },
-  { label: "Acc", key: "Acc" },
-  { label: "Cri", key: "Cri" },
-  { label: "Res", key: "Res" },
+const DERIVED_ROWS: { label: string; thai: string; key: keyof ReturnType<typeof deriveAll> }[] = [
+  { label: "HP",  thai: "พลังชีวิต", key: "HP" },
+  { label: "MP",  thai: "พลังปราณ", key: "MP" },
+  { label: "ATK", thai: "พลังโจมตี", key: "Atk" },
+  { label: "PA",  thai: "โจมตีกาย", key: "PA" },
+  { label: "IA",  thai: "โจมตีใน", key: "IA" },
+  { label: "PD",  thai: "ป้องกันกาย", key: "PD" },
+  { label: "ID",  thai: "ป้องกันใน", key: "ID" },
+  { label: "SPD", thai: "ความเร็ว", key: "Spd" },
+  { label: "Eva", thai: "หลบหลีก", key: "Eva" },
+  { label: "Acc", thai: "แม่นยำ", key: "Acc" },
+  { label: "Cri", thai: "คริติคอล", key: "Cri" },
+  { label: "Res", thai: "ต้านทาน", key: "Res" },
 ];
 
 type EquipSlotRow = {
@@ -116,6 +117,9 @@ export function ProfilePopup({ open, onClose }: Props) {
   const traits = useWorldStore((s) => s.traits);
   const gender = useWorldStore((s) => s.gender);
   const sectMembership = useWorldStore((s) => s.sectMembership);
+  const bodyId = useWorldStore((s) => s.playerBodyId);
+  const currentHp = useWorldStore((s) => s.currentHp);
+  const currentMp = useWorldStore((s) => s.currentMp);
   if (!player) return null;
 
   const base = player.stats;
@@ -172,16 +176,17 @@ export function ProfilePopup({ open, onClose }: Props) {
     <Modal open={open} onClose={onClose} title={`👤 โปรไฟล์ — ${player.name}`} maxWidth="max-w-3xl">
       <div className="space-y-4">
         {/* ─── Header ──────────────────────────────────────────────── */}
-        <section>
-          <div className="flex items-center justify-between">
-            <div>
-              <strong className="text-base">{player.name}</strong>
-              <span className="text-xs text-muted-foreground ml-2">· {GENDER_LABEL[gender]}</span>
-            </div>
-            <div className="text-xs">
-              <span className="text-muted-foreground">ทอง </span>
-              <strong className="text-amber-600">{gold}</strong>
-            </div>
+        <section className="profile-hero">
+          <div className="profile-figure" aria-hidden="true"><CharacterPreview id={bodyId} animate /></div>
+          <div className="profile-identity">
+            <h3>{player.name}</h3>
+            <p>{GENDER_LABEL[gender]} · ทอง <strong className="text-amber-600">{gold.toLocaleString()}</strong></p>
+            <dl className="profile-vitals">
+              <div><dt>HP</dt><dd>{Math.min(currentHp, derivedAll.HP)}/{derivedAll.HP}</dd></div>
+              <div><dt>MP</dt><dd>{Math.min(currentMp, derivedAll.MP)}/{derivedAll.MP}</dd></div>
+              <div><dt>ATK</dt><dd>{derivedAll.Atk}</dd></div>
+              <div><dt>SPD</dt><dd>{derivedAll.Spd}</dd></div>
+            </dl>
           </div>
           {/* Sect memberships — one row per joined sect. */}
           {Object.entries(sectMembership).filter(([, m]) => m).length > 0 && (
@@ -219,7 +224,7 @@ export function ProfilePopup({ open, onClose }: Props) {
           <div className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground mb-1">
             พลังพื้นฐาน
           </div>
-          <div className="grid grid-cols-4 gap-1.5">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
             {STAT_KEYS.map((k) => {
               const b = base[k];
               const c = combined[k];
@@ -312,14 +317,14 @@ export function ProfilePopup({ open, onClose }: Props) {
           <div className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground mb-1">
             พลังที่คำนวณ
           </div>
-          <div className="grid grid-cols-4 gap-1.5">
-            {DERIVED_ROWS.map(({ label, key }) => {
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+            {DERIVED_ROWS.map(({ label, thai, key }) => {
               const cv = derivedAll[key];
               const bv = derivedBase[key as keyof typeof derivedBase] ?? cv;
               const diff = cv - bv;
               return (
                 <div key={label} className="rounded bg-muted/40 px-2 py-1.5">
-                  <div className="text-[9px] text-muted-foreground">{label}</div>
+                  <div className="text-[9px] text-muted-foreground">{thai} <span className="opacity-60">{label}</span></div>
                   <div className="text-xs font-semibold">
                     {cv}
                     {diff > 0 && <span className="text-[9px] text-emerald-600 ml-1">+{diff}</span>}
@@ -335,7 +340,7 @@ export function ProfilePopup({ open, onClose }: Props) {
           <div className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground mb-1">
             ชื่อเสียงและคุณธรรม
           </div>
-          <div className="grid grid-cols-5 gap-1.5">
+          <div className="grid grid-cols-3 sm:grid-cols-5 gap-1.5">
             {TRAIT_KEYS.map((k) => {
               const v = traits[k] ?? 0;
               return (

@@ -127,6 +127,7 @@ test("first errand leads to safe training, recovery, and an earned skill upgrade
   await expect(page.locator(".journey-guide")).toContainText("เร่งด้วย w-exp (30)");
 
   async function restAtRoadside() {
+    await page.getByRole("button", { name: "เมนู", exact: true }).click();
     await page.getByRole("navigation", { name: "เมนูเกม" }).getByRole("button", { name: "พักผ่อน", exact: true }).click();
     const row = page.getByRole("dialog").getByText("🌿 พักริมทาง", { exact: true }).locator("../..");
     const rest = row.getByRole("button", { name: "พักผ่อน", exact: true });
@@ -143,6 +144,7 @@ test("first errand leads to safe training, recovery, and an earned skill upgrade
   expect((await state(page)).currentHp).toBe(34);
   expect((await state(page)).gold).toBe(30);
 
+  await page.getByRole("button", { name: "เมนู", exact: true }).click();
   await page.getByRole("navigation", { name: "เมนูเกม" }).getByRole("button", { name: "วิชา", exact: true }).click();
   const upgrade = page.getByRole("button", { name: "เร่งด้วย w-exp (30)", exact: true });
   await expect(upgrade).toBeEnabled();

@@ -48,7 +48,11 @@ export function StartScreen() {
               ))}
             </div>
           </fieldset>
-          <fieldset className="mt-5">
+          <div className="creation-preview" aria-hidden="true">
+            <CharacterPreview key={bodyId} id={bodyId} animate />
+            <span>{PLAYER_BODY_LABEL[bodyId] ?? ""}</span>
+          </div>
+          <fieldset className="mt-3">
             <legend className="creation-label">รูปร่าง</legend>
             <div className="body-options">
               {PLAYER_BODIES[gender].map((id) => (

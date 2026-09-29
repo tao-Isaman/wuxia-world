@@ -1,0 +1,223 @@
+/* ── Exploration HUD: Dragon Quest XI layout, wuxia dress ──────────────────
+   The world stays clear. Lacquer-brown boxes with gold hairlines carry the
+   chrome: command box top-left, purse + sundial top-right, ringed minimap
+   bottom-left, party card bottom-right, gold name banner on arrival. */
+:root {
+  --dq-box: #2a1611e8; --dq-box-solid: #2d1812; --dq-edge: #9a7442; --dq-gold: #e2bd6a; --dq-text: #f7eedb; --dq-name: #9fe38a;
+}
+.dq-box, .command-toggle, .command-window, .hud-strip, .hud-purse, .hud-hour, .minimap figcaption {
+  color: var(--dq-text); background: var(--dq-box); border: 2px solid var(--dq-edge); border-radius: 6px;
+  box-shadow: inset 0 0 0 1px #e2bd6a2e, 0 0 0 1px #140a07, 0 4px 10px #0a05038c; text-shadow: 1px 1px 0 #140a07;
+}
+
+/* Command box (DQ "Items / Equipment / …" window). */
+.command-toggle {
+  position: absolute; z-index: 31; top: max(14px, env(safe-area-inset-top)); left: 14px; display: inline-flex; align-items: center; gap: 8px;
+  min-height: 42px; padding: 4px 14px; font-size: 16px; font-weight: 600;
+}
+.command-toggle:hover, .command-toggle[aria-expanded=true] { border-color: var(--dq-gold); }
+.command-toggle-glyph { color: var(--dq-gold); font-size: 13px; }
+.command-toggle kbd, .command-item kbd { font: 700 10px/15px ui-monospace, monospace; padding: 0 4px; color: #2a1611; background: var(--dq-gold); border-radius: 3px; }
+.command-scrim { position: absolute; inset: 0; z-index: 32; }
+.command-window {
+  position: absolute; z-index: 33; top: calc(max(14px, env(safe-area-inset-top)) + 50px); left: 14px;
+  display: grid; grid-template-columns: repeat(2, minmax(150px, auto)); grid-auto-flow: column; grid-template-rows: repeat(4, auto);
+  gap: 2px 18px; padding: 12px 18px 12px 34px; animation: command-open 120ms ease-out;
+}
+.command-window::before, .command-window::after { content: "❖" / ""; position: absolute; color: var(--dq-gold); font-size: 11px; line-height: 1; }
+.command-window::before { top: 4px; left: 5px; } .command-window::after { right: 5px; bottom: 4px; }
+@keyframes command-open { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+.command-item { position: relative; display: flex; align-items: center; gap: 9px; min-height: 40px; padding: 2px 6px; font-size: 18px; color: var(--dq-text); text-align: left; }
+.command-item img { width: 24px; height: 24px; }
+.command-item kbd { margin-left: auto; opacity: .55; }
+.command-item .game-menu-badge { min-width: 18px; height: 18px; padding: 0 4px; display: grid; place-items: center; font-size: 11px; color: #fff4dc; background: #b33a2c; border: 1px solid #f0b39a; border-radius: 9px; }
+/* The gold pointing hand. */
+.command-item::before { content: "☛" / ""; position: absolute; left: -28px; top: 50%; transform: translateY(-50%); font-size: 22px; color: var(--dq-gold); opacity: 0; text-shadow: 1px 1px 0 #140a07; }
+.command-item:hover::before, .command-item:focus-visible::before { opacity: 1; animation: command-hand 900ms ease-in-out infinite; }
+.command-item:hover, .command-item:focus-visible { color: #fff; outline: none; background: linear-gradient(90deg, #e2bd6a26, transparent); }
+@keyframes command-hand { 0%, 100% { translate: 0 0; } 50% { translate: -4px 0; } }
+
+/* Party card, bottom-right (portrait, green name, pill gauges). */
+.player-hud {
+  position: absolute; z-index: 30; right: 16px; bottom: max(16px, env(safe-area-inset-bottom)); display: flex; align-items: center;
+  pointer-events: none; filter: drop-shadow(2px 3px 0 #0a0503aa);
+}
+.hud-portrait {
+  position: relative; z-index: 1; flex: 0 0 auto; width: 74px; height: 74px; margin-right: -18px; overflow: hidden; border-radius: 50%;
+  background: radial-gradient(circle at 50% 35%, #6a4a30, #2a1611 70%); border: 3px solid var(--dq-gold); box-shadow: 0 0 0 2px #140a07;
+}
+.hud-portrait .character-preview { width: 118%; max-width: none; height: 118%; margin: -3% 0 0 -9%; }
+.hud-strip { width: 250px; padding: 6px 12px 8px 28px; }
+.hud-player-name { display: block; font: 700 18px/1.3 var(--font-display); color: var(--dq-name); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hud-vitals { display: grid; gap: 4px; margin-top: 2px; }
+.hud-gauge { display: grid; grid-template-columns: 38px 1fr 42px; align-items: center; gap: 6px; }
+.hud-gauge-label { display: grid; place-items: center; height: 16px; font-size: 11px; font-weight: 700; color: #1a0f0a; border-radius: 8px; background: #d9d3bd; }
+.hud-gauge--hp .hud-gauge-label { background: #8fd66b; } .hud-gauge--mp .hud-gauge-label { background: #7fb9f0; } .hud-gauge--st .hud-gauge-label { background: #e7c46a; }
+.hud-gauge-track { height: 10px; overflow: hidden; background: #140a07; border: 1px solid #6b4f30; border-radius: 6px; }
+.hud-gauge-track > div { height: 100%; border-radius: 5px; transition: width 240ms ease-out; box-shadow: inset 0 2px #ffffff55; }
+.hud-gauge--hp .hud-gauge-track > div { background: linear-gradient(#a8ec7c, #4fa83a); }
+.hud-gauge--mp .hud-gauge-track > div { background: linear-gradient(#a6d4ff, #3a7ec9); }
+.hud-gauge--st .hud-gauge-track > div { background: linear-gradient(#f6dc8a, #c7962e); }
+.hud-gauge small { font: 700 15px/1 var(--font-body); font-variant-numeric: tabular-nums; text-align: right; color: var(--dq-text); }
+
+/* Purse + sundial, top-right. */
+.location-hud { position: absolute; z-index: 30; top: max(12px, env(safe-area-inset-top)); right: 14px; display: grid; grid-template-columns: auto auto; grid-template-rows: auto auto; gap: 4px 10px; align-items: start; justify-items: end; pointer-events: none; }
+.hud-purse { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; min-width: 150px; padding: 6px 14px; }
+.hud-purse > span { display: inline-flex; align-items: baseline; gap: 6px; font-size: 20px; font-variant-numeric: tabular-nums; }
+.hud-purse b { font-weight: 700; } .hud-purse i { font-style: normal; font-size: 14px; color: var(--dq-gold); }
+.hud-purse .hud-purse-wexp { font-size: 14px; } .hud-purse-wexp i { color: #93dccb; font: 700 13px serif; }
+.hud-clock { grid-row: span 2; display: flex; flex-direction: column; align-items: center; }
+.hud-hour { grid-column: 1; padding: 1px 10px; font-size: 13px; white-space: nowrap; }
+.sundial { width: 100px; height: 100px; filter: drop-shadow(2px 3px 0 #0a0503aa); }
+.sundial svg { width: 100%; height: 100%; overflow: visible; }
+.sundial-rim { fill: #3a2414; stroke: var(--dq-gold); stroke-width: 3; }
+.sundial-sky { fill: #2d5c7c; stroke: #16252d; stroke-width: 1.5; }
+.sundial--night .sundial-sky { fill: #16223f; }
+.sundial-ring { transition: transform 900ms ease-in-out; }
+.sundial-ring text { font: 11px serif; fill: #f3e6c2; text-anchor: middle; }
+.sundial-ring text.sundial-current { fill: #ffd76b; font-weight: 700; }
+.sundial-face { fill: #efdcac; stroke: #8c6c33; stroke-width: 2; }
+.sundial--night .sundial-face { fill: #c9c4e8; }
+.sundial-hour { font: 700 19px serif; fill: #3b2a12; text-anchor: middle; }
+.sundial-pointer { fill: #ffcf5a; stroke: #6d4d17; stroke-width: 1; }
+.hud-day { margin-top: -8px; padding: 0 12px; font-size: 12px; color: var(--dq-text); background: var(--dq-box-solid); border: 2px solid var(--dq-edge); border-radius: 999px; white-space: nowrap; }
+.hud-day b { font: 700 16px/1.3 var(--font-display); color: #fff3cf; }
+
+/* Ringed minimap, bottom-left. */
+.minimap { position: absolute; z-index: 30; left: 16px; bottom: max(14px, env(safe-area-inset-bottom)); margin: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; pointer-events: none; }
+.minimap-face {
+  --mx: 0px; --my: 0px; position: relative; width: 168px; height: 168px; overflow: hidden; border-radius: 50%;
+  background: #3a2a18; border: 5px solid #b08a4c; box-shadow: 0 0 0 2px #140a07, inset 0 0 0 2px #140a07, inset 0 0 18px #0009, 0 4px 10px #0a05038c;
+}
+.minimap-face::after { content: ""; position: absolute; inset: 0; border-radius: 50%; box-shadow: inset 0 0 0 3px #e2bd6a55, inset 0 0 26px #1a0e06aa; pointer-events: none; }
+.minimap-layer {
+  position: absolute; left: var(--mx); top: var(--my); width: calc(100% * var(--zoom)); height: calc(100% * var(--zoom) * 0.6667);
+  background: var(--map) 0 0 / 100% 100% no-repeat; filter: sepia(.35) saturate(.9) brightness(.95); transition: left 120ms linear, top 120ms linear;
+}
+.minimap-pin { position: absolute; width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 50%; border: 1px solid #140a07; }
+.minimap-pin--npc { background: #9fe38a; }
+.minimap-pin--spot { width: 6px; height: 6px; margin: -3px 0 0 -3px; background: #f0d9a0; }
+.minimap-pin--exit { width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 2px; background: #e2bd6a; transform: rotate(45deg); }
+.minimap-hero { position: absolute; left: 50%; top: 50%; width: 0; height: 0; margin: -7px 0 0 -6px; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 13px solid #ffd24a; filter: drop-shadow(0 0 1px #140a07) drop-shadow(0 0 1px #140a07); }
+.minimap-hero[data-facing=east] { transform: rotate(90deg); } .minimap-hero[data-facing=south] { transform: rotate(180deg); } .minimap-hero[data-facing=west] { transform: rotate(270deg); }
+.minimap figcaption { max-width: 190px; padding: 1px 12px; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Arrival banner (DQ "Heliodor"). */
+.arrival-banner {
+  position: absolute; z-index: 29; left: 50%; top: 20%; transform: translateX(-50%); display: flex; align-items: center; gap: 18px;
+  min-width: min(620px, 86vw); justify-content: center; padding: 10px 40px; pointer-events: none;
+  background: linear-gradient(90deg, transparent, #3a2410e0 18%, #4a2e12f0 50%, #3a2410e0 82%, transparent);
+  border-top: 2px solid #e2bd6aaa; border-bottom: 2px solid #e2bd6aaa; animation: arrival 3.2s ease-in-out forwards;
+}
+.arrival-banner strong { font: 36px/1.45 var(--font-display); color: #fff1c8; text-shadow: 0 0 12px #e2bd6a99, 2px 2px 0 #140a07; white-space: nowrap; }
+.arrival-flourish { color: var(--dq-gold); font-size: 18px; }
+@keyframes arrival { 0% { opacity: 0; letter-spacing: .3em; } 14% { opacity: 1; letter-spacing: .02em; } 78% { opacity: 1; } 100% { opacity: 0; } }
+
+.journey-guide:not(.journey-guide--inline) { top: calc(max(14px, env(safe-area-inset-top)) + 54px); left: 14px; width: 330px; }
+
+/* Controls hint: a slim pill centred at the bottom, between minimap and party. */
+.world-controls { left: 50%; transform: translateX(-50%); bottom: max(18px, env(safe-area-inset-bottom)); padding: 2px 6px 2px 14px; gap: 10px; font-size: 12px; background: var(--dq-box); border: 1px solid var(--dq-edge); border-radius: 999px; }
+.world-controls button { padding: 0 10px; border-left: 1px solid #e2bd6a44; }
+@media (pointer: fine) { .world-controls button { min-height: 36px; } }
+
+/* "Other things here" drawer. */
+.journey-extras { top: 158px !important; right: 40px !important; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--dq-box-solid) !important; border: 2px solid var(--dq-edge) !important; }
+
+@media (max-width: 900px) {
+  .hud-strip { width: 220px; }
+  .minimap-face { width: 136px; height: 136px; }
+}
+@media (max-width: 640px) {
+  .command-toggle { top: max(8px, env(safe-area-inset-top)); left: 8px; min-height: 40px; padding: 2px 12px; font-size: 15px; }
+  .command-toggle kbd, .command-item kbd { display: none; }
+  .command-window { top: calc(max(8px, env(safe-area-inset-top)) + 48px); left: 8px; right: 8px; grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 10px 10px 10px 30px; }
+  .command-item { font-size: 16px; min-height: 42px; }
+  .player-hud { right: 8px; bottom: max(8px, env(safe-area-inset-bottom)); }
+  .hud-portrait { width: 56px; height: 56px; border-width: 2px; margin-right: -14px; }
+  .hud-strip { width: 196px; padding: 4px 8px 6px 20px; }
+  .hud-player-name { font-size: 15px; }
+  .hud-gauge { grid-template-columns: 32px 1fr 34px; gap: 4px; }
+  .hud-gauge-label { font-size: 10px; height: 14px; }
+  .hud-gauge-track { height: 8px; }
+  .hud-gauge small { font-size: 13px; }
+  .location-hud { top: max(6px, env(safe-area-inset-top)); right: 6px; gap: 3px 6px; }
+  .hud-purse { min-width: 0; padding: 3px 9px; }
+  .hud-purse > span { font-size: 15px; } .hud-purse .hud-purse-wexp { font-size: 12px; }
+  .sundial { width: 70px; height: 70px; }
+  .hud-day { margin-top: -6px; padding: 0 8px; font-size: 11px; } .hud-day b { font-size: 14px; }
+  .hud-hour { display: none; }
+  .minimap { left: 8px; bottom: max(8px, env(safe-area-inset-bottom)); }
+  .minimap-face { width: 108px; height: 108px; border-width: 4px; }
+  .minimap figcaption { max-width: 124px; font-size: 11px; padding: 0 8px; }
+  .arrival-banner { top: 16%; padding: 8px 18px; gap: 10px; } .arrival-banner strong { font-size: 26px; }
+  .journey-guide:not(.journey-guide--inline) { top: 96px; left: 8px; width: calc(100% - 16px); }
+  .world-controls { bottom: 150px; }
+  .journey-extras { top: 104px !important; right: 12px !important; }
+}
+@media (max-height: 560px) and (min-width: 641px) {
+  .command-toggle { top: 6px; left: 8px; min-height: 36px; font-size: 14px; }
+  .command-window { top: 48px; left: 8px; grid-template-rows: repeat(4, auto); padding-top: 6px; padding-bottom: 6px; }
+  .command-item { min-height: 34px; font-size: 15px; }
+  .player-hud { right: 8px; bottom: 6px; }
+  .hud-portrait { width: 52px; height: 52px; margin-right: -14px; }
+  .hud-strip { width: 200px; padding: 3px 8px 4px 20px; }
+  .hud-player-name { font-size: 14px; }
+  .hud-vitals { gap: 2px; }
+  .hud-gauge-track { height: 7px; }
+  .hud-gauge small { font-size: 12px; }
+  .location-hud { top: 4px; right: 8px; }
+  .hud-purse { padding: 2px 10px; } .hud-purse > span { font-size: 15px; }
+  .sundial { width: 64px; height: 64px; }
+  .hud-day { margin-top: -6px; font-size: 11px; } .hud-day b { font-size: 13px; }
+  .hud-hour { display: none; }
+  .minimap { left: 8px; bottom: 6px; }
+  .minimap-face { width: 96px; height: 96px; border-width: 4px; }
+  .minimap figcaption { font-size: 11px; }
+  .arrival-banner { top: 14%; } .arrival-banner strong { font-size: 26px; }
+  .journey-guide:not(.journey-guide--inline) { top: 48px; left: 8px; width: 280px; }
+  .world-controls { bottom: 6px; font-size: 11px; }
+  .journey-extras { top: 96px !important; }
+}
+@media (pointer: coarse) { .command-toggle kbd, .command-item kbd { display: none; } }
+@media (prefers-reduced-motion: reduce) { .sundial-ring, .hud-gauge-track > div, .minimap-layer { transition: none; } .command-item::before, .arrival-banner, .command-window { animation: none; } }
+
+/* ── Title screen: large preview of the chosen hero ──────────────────── */
+.title-kicker { line-height: 1.6; }
+.title-intro h1 { line-height: 1.5; padding-top: 6px; }
+.creation-preview { position: relative; height: 150px; margin-top: 18px; background: radial-gradient(ellipse at 50% 92%, #0007 0 22%, transparent 23%), radial-gradient(circle at 50% 45%, #2c4238, #0f211e 70%); border: 1px solid #50604f; }
+.creation-preview .character-preview { width: 100%; height: 100%; }
+.creation-preview span { position: absolute; left: 8px; bottom: 6px; font-size: 12px; color: #e7c788; }
+@media (max-width: 640px) { .creation-preview { height: 118px; } }
+@media (max-height: 760px) and (min-width: 641px) { .creation-preview { height: 110px; } }
+@media (max-height: 500px) and (orientation: landscape) { .creation-preview { display: none; } }
+
+/* Landscape title: the form alone, compact, so Start stays on screen. */
+@media (max-height: 500px) and (orientation: landscape) {
+  .title-content { grid-template-columns: 1fr 380px; padding: 10px 24px; gap: 20px; align-items: start; }
+  .title-description, .title-rule, .title-footnote { display: none; }
+  .title-seal { width: 38px; height: 46px; font-size: 26px; margin-bottom: 8px; }
+  .title-intro h1 { font-size: 42px; }
+  .hero-creation { padding: 12px 16px; }
+  .creation-heading { font-size: 18px; padding-bottom: 6px; margin-bottom: 8px; }
+  .creation-input { padding: 6px 10px; }
+  .hero-creation fieldset { margin-top: 8px; }
+  .body-options button { height: 72px; }
+  .body-options .character-preview { height: 64px; }
+  .creation-note, .creation-save-note { display: none; }
+  .start-adventure { margin-top: 10px; padding-top: 8px; padding-bottom: 8px; }
+}
+
+/* Gamification beats: purse deltas and the autosave quill. */
+.hud-purse { position: relative; }
+.purse-delta { position: absolute; right: 10px; top: -4px; font-size: 18px; font-weight: 800; color: #ffe07a; text-shadow: 1px 1px 0 #140a07, 0 0 8px #ffd24a88; animation: purse-float 1.6s ease-out forwards; pointer-events: none; }
+.purse-delta--spend { color: #ff9c86; text-shadow: 1px 1px 0 #140a07; }
+@keyframes purse-float { 0% { opacity: 0; transform: translateY(10px) scale(.9); } 15% { opacity: 1; transform: none; } 70% { opacity: 1; } 100% { opacity: 0; transform: translateY(-14px); } }
+.autosave-note { position: absolute; z-index: 30; right: 20px; bottom: calc(max(16px, env(safe-area-inset-bottom)) + 104px); display: flex; align-items: center; gap: 6px;
+  font-size: 14px; color: #fff4d6; text-shadow: 1px 1px 0 #140a07, 0 0 6px #140a07; pointer-events: none; animation: autosave 2.6s ease-in-out forwards; }
+.autosave-note span { color: #e2bd6a; font-size: 18px; animation: autosave-quill .6s ease-in-out infinite alternate; }
+@keyframes autosave { 0%, 100% { opacity: 0; } 12%, 80% { opacity: 1; } }
+@keyframes autosave-quill { from { transform: rotate(-12deg); } to { transform: rotate(8deg); } }
+@media (max-width: 640px) { .autosave-note { right: 10px; bottom: calc(max(8px, env(safe-area-inset-bottom)) + 84px); font-size: 12px; } }
+@media (max-height: 560px) and (min-width: 641px) { .autosave-note { bottom: 76px; } }
+@media (prefers-reduced-motion: reduce) { .purse-delta, .autosave-note, .autosave-note span { animation-duration: .01ms; } }

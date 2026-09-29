@@ -26,6 +26,7 @@ test("exploration: movement, menu pause, travel, NPC and save reload", async ({ 
   await expect.poll(async () => Number(await world.getAttribute("data-player-x"))).toBeGreaterThan(before + 20);
   await page.keyboard.up("d");
 
+  await page.getByRole("button", { name: "เมนู", exact: true }).click();
   await page.getByRole("button", { name: "ย่าม", exact: true }).click();
   await expect(page.getByRole("dialog")).toBeVisible();
   const pausedX = await world.getAttribute("data-player-x");
@@ -145,7 +146,7 @@ test("portrait touch and landscape resize keep one usable canvas", async ({ page
   await expect.poll(async () => Number(await world.getAttribute("data-player-y"))).not.toBe(before);
   await page.screenshot({ path: "test-results/screenshots/world-mobile.png" });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-  await expect(page.getByRole("button", { name: "วิชา", exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "เมนู", exact: true })).toBeVisible();
   await page.setViewportSize({ width: 844, height: 390 });
   await expect(page.locator('[data-renderer="three"] canvas')).toHaveCount(1);
   await expect.poll(async () => (await page.locator('[data-renderer="three"] canvas').boundingBox())?.width).toBe(844);

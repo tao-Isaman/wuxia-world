@@ -45,8 +45,8 @@ function MapBackdrop({
 }: {
   children: React.ReactNode;
   bottom?: boolean;
-  /** keep the in-game HUD (status panel + menu icons) on screen */
-  hud?: boolean;
+  /** keep the in-game HUD on screen: true = status + menu, "status" = status only */
+  hud?: boolean | "status";
 }) {
   const currentSceneId = useWorldStore((s) => s.currentSceneId);
   const lastLocationId = useWorldStore((s) => s.lastLocationId);
@@ -69,7 +69,7 @@ function MapBackdrop({
       />
       <div
         className={`relative z-10 max-w-3xl mx-auto p-3 min-h-full flex flex-col gap-3 ${
-          bottom ? "justify-end pb-28 pt-44" : "justify-center"
+          hud === "status" ? "backdrop-focus justify-center" : bottom ? "justify-end pb-28 pt-44" : "justify-center"
         }`}
       >
         {children}
@@ -77,7 +77,7 @@ function MapBackdrop({
       {hud && (
         <>
           <MapHud />
-          <MenuBar hud />
+          {hud === true && <MenuBar hud />}
         </>
       )}
     </div>
@@ -172,8 +172,7 @@ export function WorldScreen() {
     );
   } else if (pendingEncounter) {
     body = (
-      <MapBackdrop>
-        <StatusBar />
+      <MapBackdrop bottom hud="status">
         <EncounterScreen />
       </MapBackdrop>
     );

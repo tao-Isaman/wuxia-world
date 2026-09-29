@@ -146,3 +146,61 @@ New benchmark-driven UI (plus a brief "ถึงตาเจ้า" turn callout
 Environment note for cloud sessions: Playwright 1.63 expects Chromium build 1243, and this container has 1194
 under `/opt/pw-browsers`. Symlink the 1194 binaries into `chromium-1243/chrome-linux64/chrome` and
 `chromium_headless_shell-1243/chrome-headless-shell-linux64/chrome-headless-shell`.
+
+### 2026-09-29 — wave 12: Hero's Adventure UI pass (Claude Code, branch `claude/nice-lamport-hc9w5n`)
+
+Goal: bring the whole UI up to the Hero's Adventure: Road to Passion standard. Evidence is captured by
+`review/ui-driver.ts <label>` → `review/ui-evidence/<label>/` (desktop 1440×900, phone 390×844, landscape 844×390).
+Independent critiques: `review/wave12-ui-critic.md` (first pass, about 65–70 %) and `review/wave12-ui-critic-2.md`
+(about 74 %). The fixes after pass 2 are verified in `review/ui-evidence/wave12h/`.
+
+What changed:
+- **Menus** (`components/ui/modal.tsx`, `components/ui/game-menu-context.tsx`, `app/game-menu.css`): menu-bar popups open in one
+  full-screen tabbed shell (keys 1–8, red ✕, pixel tab icons in titles). All popups use dark lacquer with bronze frames; light
+  utility colours and small text are remapped centrally. Portaled popovers go dark while a panel is open.
+- **HUD** (`components/world/map-hud.tsx`, `app/game-hud.css`): round portrait, status strip, place plaque, a sundial with the
+  twelve double-hours plus Thai hour/phase, and a medallion menu row with number keys.
+- **World** (`lib/three/world-runtime.ts`, `components/world/location-map.tsx`): green NPC name tags kept on screen, !/? quest
+  markers from the same rules as the NPC popup, and far service/exit badges fade.
+- **Bag / skills / profile / shop / NPC card**: rarity-framed item tiles (`components/ui/wuxia/item-tile.tsx`,
+  `lib/ui/rarity.ts`), a round skill loadout, a hero block, a portrait band.
+- **Dialogue**: parchment box, name tab, framed portrait plate breaking the top edge.
+- **Encounter**: confrontation panel with a tier colour and F/Esc.
+- **Battle**: round hotbar (keys 1–9, cooldown dial, riposte badge), side-coloured turn queue, two docked log lines, big
+  gold/red damage numbers with a 暴擊 crit tag.
+
+Still open from the critiques (needs new systems or art, not UI polish):
+- Battle has no Item / Retreat / Auto actions; the engine has none of these, so a UI rail was not faked.
+- Item icons are category glyphs in rarity frames; the game has no item artwork. Drop 32 px sprites into ItemTile when drawn.
+- Painted NPC portraits are opaque squares, so the dialogue bust is a framed plate rather than a cut-out.
+- Life-skill and rest rows still use their data emoji (⛏ 🪓 🍵).
+
+### 2026-09-29 — wave 13: unique NPCs + Dragon Quest XI HUD (Claude Code)
+
+**Unique NPC characters.** All 159 NPCs had a unique painted body (`public/npcs/body/<id>.png`) but the world drew
+them from 7 shared costume sheets. `bun scripts/build-npc-sprites.ts` turns each painting into native-pixel sprites
+(trim, palette reduction, hard alpha, 1 px outline): `public/npcs/pixel/` (72 px, world) and
+`public/npcs/pixel-battle/` (150 px, battle). `npcPixelSprite` / `npcBattleSprite` in `lib/world/data/npc-portraits.ts`
+feed the world runtime (unique single-pose sprite, archetype sheet as fallback), sparring battles and the turn
+queue. The sprites are single poses, so they move with the engine's lunge, recoil and breathing, not frame
+animation. Adding a new NPC: drop its painted body PNG in `public/npcs/body/` and rerun the script.
+
+**HUD standard: Dragon Quest XI** (reference captures in `review/baseline/dq11/`, gitignored), kept in wuxia dress:
+- Exploration (`components/world/map-hud.tsx`, `app/game-hud.css`): one เมนู button (M) opens a DQ command window with a
+  gold ☛ cursor (arrows, 1–8). There is a party card bottom-right (portrait, green name, pill HP/MP/พลัง gauges), a
+  purse in ตำลึง plus the sundial top-right, a ringed minimap bottom-left that follows the hero from the canvas
+  data attributes, a gold name banner and autosave quill on arrival, and floating +/− gold deltas.
+- Menus, shops and popups (`app/dq-theme.css`, loaded last): parchment scrolls with a cinnabar ribbon title,
+  lacquer-brown tabs, and paper-inked rarity text.
+- Dialogue: a translucent lacquer box with a name tab and gold ☛ choice cursor; the portrait plate breaks the edge.
+- Battle: a DQ command list (medal, move name, cost, number key, ☛ cursor) beside a message box (last log lines plus
+  the pointed move), with lacquer-brown fighter plates and a green player name.
+- Accessibility: decorative CSS glyphs use `content: "☛" / ""` so they stay out of accessible names (this broke
+  e2e once).
+
+**Phaser.js: decided against** for now. The game already runs a WebGL renderer (Three.js, orthographic 2D) for
+exploration and battle, with collision, pathfinding, per-map footprints, sprite atlases, and tests built on it.
+Earlier history also shows a Phaser runtime was built and then removed (see "History that matters" above). Porting
+would rebuild both runtimes without new capability. The "gamification" asked for (juicy feedback, clear commands,
+arrival beats, reward deltas) is delivered in the DOM/Three layers above. If a future feature truly needs Phaser
+(e.g. tilemap-driven physics), host it as a third runtime behind the same `WorldPresentation` contract.

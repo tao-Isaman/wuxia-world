@@ -158,19 +158,15 @@ export function NpcInteractionPopup({ open, npc, onClose }: Props) {
   };
 
   return (
-    <Modal open={open} onClose={onClose} title={`💬 ${npc.name}`} maxWidth="max-w-md">
+    <Modal open={open} onClose={onClose} maxWidth="max-w-md">
       <div className="space-y-3">
-        {npcPortrait(npc.id) ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={npcPortrait(npc.id)}
-            alt={npc.name}
-            draggable={false}
-            className="w-20 h-20 pixel shadow-pixel border border-ink/60 float-right ml-2"
-          />
-        ) : <div className="w-20 h-20 float-right ml-2 bg-ink/10 border border-ink/30 [&_canvas]:w-full [&_canvas]:h-full">
-          <CharacterPreview id={npcCharacterId(npc.id)} animate framing="bust" />
-        </div>}
+        <div className="npc-card-portrait">
+          {npcPortrait(npc.id) ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={npcPortrait(npc.id)} alt={npc.name} draggable={false} />
+          ) : <CharacterPreview id={npcCharacterId(npc.id)} animate framing="bust" />}
+          <span className="npc-card-name">{npc.name}</span>
+        </div>
         <div className="flex items-center gap-2 flex-wrap">
           {/* Liveness Layer §4.3 — sim-status chip. Renders only for
               named NPCs in a non-alive state (dead / secluded /
@@ -206,7 +202,7 @@ export function NpcInteractionPopup({ open, npc, onClose }: Props) {
               className="w-full justify-start text-left h-auto py-2 whitespace-normal"
             >
               <span className="flex flex-col items-start gap-0.5">
-                <span className="font-semibold text-sm">💬 ทักทาย</span>
+                <span className="font-semibold text-sm npc-action-label">ทักทาย</span>
                 <span className="text-[10px] text-muted-foreground">
                   พูดคุยกับ{npc.name}
                 </span>
@@ -220,7 +216,7 @@ export function NpcInteractionPopup({ open, npc, onClose }: Props) {
               className="w-full justify-start text-left h-auto py-2 whitespace-normal"
             >
               <span className="flex flex-col items-start gap-0.5">
-                <span className="font-semibold text-sm">⚔ ขอประลอง</span>
+                <span className="font-semibold text-sm npc-action-label">ขอประลอง</span>
                 <span className="text-[10px] text-muted-foreground">
                   ฝีมือต่อฝีมือ — ชนะได้ชื่อเสียง +{npc.sparFameReward ?? 0}
                 </span>
@@ -272,7 +268,7 @@ export function NpcInteractionPopup({ open, npc, onClose }: Props) {
               className="w-full justify-start text-left h-auto py-2 whitespace-normal border-stone-400"
             >
               <span className="flex flex-col items-start gap-0.5">
-                <span className="font-semibold text-sm">🥷 ขโมย</span>
+                <span className="font-semibold text-sm npc-action-label">ขโมย</span>
                 <span className="text-[10px] text-muted-foreground">
                   ความสำเร็จ ~{stealChance(worldState.playerBuild, npc, worldState.lifeSkillXp.steal ?? 0).toFixed(0)}% · ขโมยได้ +ความเลว
                 </span>
@@ -311,7 +307,7 @@ export function NpcInteractionPopup({ open, npc, onClose }: Props) {
               className="w-full justify-start text-left h-auto py-2 whitespace-normal border-rose-500 bg-rose-50/40"
             >
               <span className="flex flex-col items-start gap-0.5">
-                <span className="font-semibold text-sm text-rose-700">🗡 ลอบทำร้าย</span>
+                <span className="font-semibold text-sm text-rose-700 npc-action-label">ลอบทำร้าย</span>
                 <span className="text-[10px] text-muted-foreground">
                   ความสำเร็จ ~{assassinateChance(worldState.playerBuild, npc).toFixed(0)}% · ฆ่าเป้าหมายเพื่อภารกิจร้าย
                 </span>

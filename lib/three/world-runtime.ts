@@ -18,6 +18,11 @@ const WIDTH = 960;
 const HEIGHT = 640;
 const SPEED = 150;
 const LOAD_TIMEOUT = 20_000;
+// Unique NPC sprites are ~74 native px tall; this frame/size pair gives them the
+// same on-screen height as the archetype sheets (54 units × 108/128 of a frame).
+const UNIQUE_FRAME = 80;
+const UNIQUE_FEET = 78;
+const UNIQUE_NPC_SIZE = 50;
 const toWorld = (point: Point): Point => ({ x: point.x * WIDTH / 100, y: point.y * HEIGHT / 100 });
 const toPercent = (point: Point): Point => ({ x: point.x / WIDTH * 100, y: point.y / HEIGHT * 100 });
 const clampPosition = (point: Point): Point => ({
@@ -46,6 +51,11 @@ type MarkerVisual = {
   hit: THREE.Mesh;
   label: THREE.Sprite;
   labelText: string;
+  /** Hero's Adventure-style always-on name over an NPC (hidden while the boxed label shows). */
+  nameTag?: THREE.Sprite;
+  questMark?: THREE.Sprite;
+  /** Service / exit badge; fades when the player is far away. */
+  icon?: THREE.Sprite;
   halo: THREE.Sprite;
   character?: CharacterVisual;
   opacity: number;
@@ -89,6 +99,7 @@ export function createWorldRuntime(
   const materials = new Set<THREE.Material>();
   const geometries = new Set<THREE.BufferGeometry>();
   const markers = new Map<string, MarkerVisual>();
+  let questMarks: Record<"!" | "?", THREE.Texture> = {} as Record<"!" | "?", THREE.Texture>;
   const props = new Map<string, THREE.Sprite>();
   const bystanders = new Map<string, { group: THREE.Group; character: CharacterVisual }>();
   const hitTargets: THREE.Mesh[] = [];
@@ -211,8 +222,10 @@ export function createWorldRuntime(
   }
   function setCharacterFrame(character: CharacterVisual, frame: number, facingLeft = character.facingLeft) {
     if (character.frame === frame && character.facingLeft === facingLeft) return;
-    const column = frame % character.columns;
-    const row = Math.floor(frame / character.columns);
+    // Single-frame (unique NPC) atlases always show their one pose.
+    const cell = frame % (character.columns * character.rows);
+    const column = cell % character.columns;
+    const row = Math.floor(cell / character.columns);
     character.texture.repeat.set((facingLeft ? -1 : 1) / character.columns, 1 / character.rows);
     character.texture.offset.set((column + (facingLeft ? 1 : 0)) / character.columns, 1 - (row + 1) / character.rows);
     character.frame = frame;
@@ -233,6 +246,35 @@ export function createWorldRuntime(
       context.textAlign = "center";
       context.textBaseline = "middle";
       context.fillText(text, width / 2, 13);
+    });
+  }
+  function nameTagTexture(text: string): THREE.Texture {
+    const measurement = document.createElement("canvas").getContext("2d");
+    if (!measurement) throw new Error("Canvas context unavailable");
+    measurement.font = `600 13px ${font}`;
+    const width = Math.ceil(measurement.measureText(text).width) + 10;
+    return drawnTexture(width, 22, (context) => {
+      context.font = `600 13px ${font}`;
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+      context.lineJoin = "round";
+      context.lineWidth = 4;
+      context.strokeStyle = "rgba(8, 20, 14, 0.95)";
+      context.strokeText(text, width / 2, 11);
+      context.fillStyle = "#8ee67a";
+      context.fillText(text, width / 2, 11);
+    });
+  }
+  function questMarkTexture(glyph: "!" | "?"): THREE.Texture {
+    return drawnTexture(22, 30, (context) => {
+      context.font = "900 26px serif";
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+      context.lineWidth = 5;
+      context.strokeStyle = "#2a1a05";
+      context.strokeText(glyph, 11, 16);
+      context.fillStyle = glyph === "!" ? "#ffd24a" : "#f4f0e4";
+      context.fillText(glyph, 11, 16);
     });
   }
   function makeLabel(text: string): THREE.Sprite {
@@ -377,6 +419,24 @@ export function createWorldRuntime(
     ]);
     if (disposed || failed) return;
     const atlases = new Map(atlasEntries);
+    // Unique NPC sprites: one native-pixel pose drawn into an 80 px frame so
+    // the figure height matches the archetype sheets at size UNIQUE_NPC_SIZE.
+    const uniqueAtlases = new Map<string, Atlas>();
+    await Promise.all(initial.markers.filter((marker) => marker.kind === "npc" && marker.sprite).map(async (marker) => {
+      try {
+        const image = await loadImage(marker.sprite!);
+        const canvas = document.createElement("canvas");
+        canvas.width = canvas.height = UNIQUE_FRAME;
+        const context = canvas.getContext("2d");
+        if (!context) return;
+        context.imageSmoothingEnabled = false;
+        const scale = Math.min(1, (UNIQUE_FRAME - 2) / image.width, (UNIQUE_FEET - 1) / image.height);
+        const width = Math.round(image.width * scale), height = Math.round(image.height * scale);
+        context.drawImage(image, Math.round((UNIQUE_FRAME - width) / 2), UNIQUE_FEET - height, width, height);
+        uniqueAtlases.set(marker.id, { image: canvas, frameSize: UNIQUE_FRAME, feetY: UNIQUE_FEET, columns: 1, rows: 1, directional: false } as unknown as Atlas);
+      } catch { /* keep the archetype sheet for this NPC */ }
+    }));
+    if (disposed || failed) return;
     const backgroundTexture = drawnTexture(WIDTH, HEIGHT, (context) => context.drawImage(landscape, 0, 0, WIDTH, HEIGHT));
     const background = new THREE.Mesh(resourceGeometry(new THREE.PlaneGeometry(WIDTH, HEIGHT)),
       resourceMaterial(new THREE.MeshBasicMaterial({ map: backgroundTexture, depthTest: false, depthWrite: false, toneMapped: false })));
@@ -443,6 +503,7 @@ export function createWorldRuntime(
       bystanders.set(bystander.id, { group, character });
     }
     const exitBadge = markerBadge("exit");
+    questMarks = { "!": questMarkTexture("!"), "?": questMarkTexture("?") };
     initial.markers.forEach((marker, index) => {
       const point = toWorld(marker);
       const group = new THREE.Group();
@@ -453,11 +514,13 @@ export function createWorldRuntime(
       halo.visible = false;
       group.add(halo);
       let character: CharacterVisual | undefined;
+      let markerIcon: THREE.Sprite | undefined;
       if (marker.kind === "npc") {
         const shadow = sprite(shadowTexture, 28, 10);
         shadow.renderOrder = 1;
         group.add(shadow);
-        character = makeCharacter(atlases.get(npcCharacterId(marker.id))!, 54);
+        const unique = uniqueAtlases.get(marker.id);
+        character = unique ? makeCharacter(unique, UNIQUE_NPC_SIZE) : makeCharacter(atlases.get(npcCharacterId(marker.id))!, 54);
         character.sprite.renderOrder = 100 + point.y * 10;
         group.add(character.sprite);
       } else {
@@ -466,10 +529,26 @@ export function createWorldRuntime(
         icon.position.y = 5;
         icon.renderOrder = 8000;
         group.add(icon);
+        markerIcon = icon;
       }
       const label = makeLabel(marker.label);
       label.visible = false;
       group.add(label);
+      let nameTag: THREE.Sprite | undefined;
+      let questMark: THREE.Sprite | undefined;
+      if (character) {
+        const tagTexture = nameTagTexture(marker.label);
+        const tagCanvas = tagTexture.image as HTMLCanvasElement;
+        nameTag = sprite(tagTexture, tagCanvas.width, tagCanvas.height);
+        nameTag.center.set(0.5, 0);
+        nameTag.renderOrder = 9_000;
+        group.add(nameTag);
+        questMark = sprite(questMarks[marker.quest === "turnin" ? "?" : "!"], 22, 30);
+        questMark.center.set(0.5, 0);
+        questMark.renderOrder = 9_001;
+        questMark.visible = false;
+        group.add(questMark);
+      }
       const hitWidth = marker.kind === "npc" ? 50 : 44;
       const hitHeight = marker.kind === "npc" ? 76 : 52;
       const hit = new THREE.Mesh(resourceGeometry(new THREE.PlaneGeometry(hitWidth, hitHeight)),
@@ -479,7 +558,7 @@ export function createWorldRuntime(
       hit.userData.markerId = marker.id;
       group.add(hit);
       hitTargets.push(hit);
-      markers.set(marker.id, { group, hit, label, labelText: marker.label, halo, character, opacity: 1, phase: index * 0.47 });
+      markers.set(marker.id, { group, hit, label, labelText: marker.label, nameTag, questMark, icon: markerIcon, halo, character, opacity: 1, phase: index * 0.47 });
     });
 
     actor = new THREE.Group();
@@ -618,6 +697,24 @@ export function createWorldRuntime(
       const halfLabel = visual.label.scale.x / 2;
       visual.label.position.x = THREE.MathUtils.clamp(point.x, camera.position.x - viewWidth / 2 + halfLabel + 6,
         camera.position.x + viewWidth / 2 - halfLabel - 6) - point.x;
+      if (visual.nameTag) {
+        const tagCanvas = visual.nameTag.material.map!.image as HTMLCanvasElement;
+        const tagScale = 1 / viewScale;
+        visual.nameTag.scale.set(tagCanvas.width * tagScale, tagCanvas.height * tagScale, 1);
+        visual.nameTag.position.y = 56;
+        visual.nameTag.visible = !visual.label.visible;
+        const halfTag = visual.nameTag.scale.x / 2;
+        visual.nameTag.position.x = THREE.MathUtils.clamp(point.x, camera.position.x - viewWidth / 2 + halfTag + 4,
+          camera.position.x + viewWidth / 2 - halfTag - 4) - point.x;
+      }
+      if (visual.questMark) {
+        const mark = marker.quest === "turnin" ? "?" : "!";
+        if (visual.questMark.material.map !== questMarks[mark]) visual.questMark.material.map = questMarks[mark];
+        const bob = reducedMotion ? 0 : Math.sin(animationTime * 3 + visual.phase) * 2;
+        visual.questMark.scale.set(22 / viewScale, 30 / viewScale, 1);
+        visual.questMark.position.y = 56 + (visual.label.visible ? visual.label.scale.y : 22 / viewScale) + 2 + bob;
+        visual.questMark.visible = !!marker.quest;
+      }
       visual.halo.visible = selected || (marker.kind === "npc" && distance < 80);
       if (visual.character) {
         const idle = CHARACTER_CLIPS.idle;
@@ -631,6 +728,8 @@ export function createWorldRuntime(
         visual.group.traverse((object) => { if (object instanceof THREE.Sprite) object.material.opacity = opacity; });
         visual.opacity = opacity;
       }
+      // Keep the painted map in front: far-off service/exit badges recede.
+      if (visual.icon) visual.icon.material.opacity = opacity * (selected || distance < 230 ? 1 : 0.5);
     }
     particles.forEach((particle, index) => {
       particle.visible = !reducedMotion;

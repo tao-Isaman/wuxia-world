@@ -48,17 +48,6 @@
 .combat-buffs span.cursor-help { white-space: nowrap; border-radius: 0; }
 .combat-hud .combat-fighter-active { border-color: #f1d18b; box-shadow: inset 3px 0 #e8c67d, 0 3px 0 #15231d88; }
 .combat-decision { grid-area: actions; min-height: 0; min-width: 0; }
-.combat-actions { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(200px, 1fr); gap: 10px; overflow-x: auto; scrollbar-width: thin; padding: 1px 1px 3px; }
-.combat-action { display: flex; align-items: center; gap: 12px; min-width: 0; min-height: 91px; padding: 12px 16px; border: 1px solid #a29a71; text-align: left; color: #f0e2bb; background: #2c4433; transition: background 120ms, border-color 120ms; }
-.combat-action:enabled:hover { border-color: #f0d492; background: #3b523b; }
-.combat-action:focus-visible { outline: 2px solid #ffe0a0; outline-offset: -4px; }
-.combat-action:disabled { cursor: default; color: #b7c2ac; background: #1d3128; border-color: #526751; }
-.combat-action-icon { flex: 0 0 36px; display: grid; place-items: center; color: #e7cd93; }
-.combat-action:disabled .combat-action-icon { opacity: .6; }
-.combat-action-copy { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-.combat-action-copy strong { font-size: 17px; line-height: 1.3; font-weight: 600; }
-.combat-action-copy > span { font-size: 12px; line-height: 1.5; color: #c9d2b6; }
-.combat-action-copy small { font-size: 12px; line-height: 1.4; color: #e3cf98; }
 .combat-result { min-height: 97px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 22px; border: 1px solid #c1a770; background: #2c4433; }
 .combat-result > div:first-child { display: grid; gap: 3px; }
 .combat-result span { font-size: 12px; color: #e7cb8f; }
@@ -77,10 +66,12 @@
 .combat-debug-controls { position: absolute; top: 7px; right: 80px; z-index: 8; }
 /* Turn order (Hero's Adventure-style): the acting face leads, the queue follows. */
 .turn-timeline { display: flex; align-items: center; gap: 5px; margin-left: auto; list-style: none; padding: 0; }
-.turn-timeline li { position: relative; flex: 0 0 auto; width: 34px; height: 34px; overflow: hidden; background: #20352d; border: 2px solid #56705e; opacity: .78; }
-.turn-timeline li[data-side=A] { border-color: #7f93c4; }
-.turn-timeline li[data-side=B] { border-color: #c4775a; }
-.turn-timeline li:first-child { width: 42px; height: 42px; opacity: 1; margin-right: 4px; box-shadow: 0 0 0 2px #11211f; }
+.turn-timeline li { position: relative; flex: 0 0 auto; width: 38px; height: 38px; background: #20352d; border: 3px solid #56705e; opacity: .8; }
+.turn-timeline li canvas, .turn-timeline .turn-glyph { overflow: hidden; }
+.turn-timeline li[data-side=A] { border-color: #5f86d8; background: #1c2a45; }
+.turn-timeline li[data-side=B] { border-color: #d0613f; background: #43221a; }
+.turn-timeline li:first-child { width: 50px; height: 50px; opacity: 1; margin-right: 8px; box-shadow: 0 0 0 2px #11211f; }
+.turn-timeline-tag { position: absolute; left: 50%; bottom: -9px; transform: translateX(-50%); padding: 0 5px; white-space: nowrap; font-size: 10px; line-height: 14px; font-weight: 700; color: #1b1a12; background: #e9cf8c; border: 1px solid #7a5e2a; }
 .turn-timeline li[data-acting=true] { border-color: #f4dc9c; box-shadow: 0 0 0 2px #11211f, 0 0 10px #f4dc9c88; }
 .turn-timeline canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
 .turn-glyph { display: grid; place-items: center; width: 100%; height: 100%; color: #f0c9a8; font-size: 18px; }
@@ -118,13 +109,6 @@
   .combat-meter-row span b { font-size: 9px; }
   .combat-buffs:not(:empty) { margin-top: 4px; }
   .combat-buffs span.cursor-help { font-size: 9px; padding: 1px 3px; }
-  .combat-actions { grid-auto-flow: row; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-columns: auto; gap: 7px; max-height: 252px; overflow-y: auto; overflow-x: hidden; }
-  .combat-action { min-height: 91px; padding: 9px; gap: 8px; }
-  .combat-action-skill:first-child { grid-column: 1 / -1; min-height: 70px; }
-  .combat-action-icon { flex-basis: 29px; }
-  .combat-action-copy { gap: 3px; }
-  .combat-action-copy strong { font-size: 14px; }
-  .combat-action-copy > span, .combat-action-copy small { font-size: 10px; line-height: 1.45; }
   .combat-result { min-height: 174px; flex-direction: column; justify-content: center; text-align: center; }
   .combat-result strong { font-size: 22px; }
 }
@@ -136,7 +120,8 @@
   .combat-status { min-height: 0; padding: 0 2px; }
   .combat-status strong { font-size: 18px; line-height: 1.2; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
   .combat-status small { font-size: 12px; }
-  .turn-timeline li { width: 24px; height: 24px; }
+  .turn-timeline li { width: 26px; height: 26px; border-width: 2px; }
+  .turn-timeline-tag { display: none; }
   .turn-timeline li:first-child { width: 30px; height: 30px; }
   .combat-hud { top: 7px; left: 7px; right: 7px; grid-template-columns: minmax(0, 1fr) 25px minmax(0, 1fr); gap: 7px; }
   .battle-arena .battle-fighter > .combat-fighter-content { padding: 6px 8px; }
@@ -153,15 +138,107 @@
   .combat-versus { font-size: 17px; padding-top: 4px; }
   .combat-buffs:not(:empty) { margin-top: 4px; }
   .combat-buffs span.cursor-help { font-size: 9px; padding: 1px 3px; }
-  .combat-actions { display: flex; flex-direction: column; height: 100%; max-height: 100%; gap: 6px; overflow-y: auto; overflow-x: hidden; padding: 0; }
-  .combat-action { flex: 1 0 76px; min-height: 76px; padding: 7px 9px; gap: 8px; }
-  .combat-action-icon { flex-basis: 30px; }
-  .combat-action-copy { gap: 2px; }
-  .combat-action-copy strong { font-size: 16px; }
-  .combat-action-copy > span, .combat-action-copy small { font-size: 12px; line-height: 1.35; }
   .combat-result { height: 100%; min-height: 0; flex-direction: column; justify-content: center; text-align: center; padding: 14px; }
   .combat-result strong { font-size: 22px; }
   .combat-log > button { padding: 0 3px; min-height: 24px; font-size: 10px; }
   .combat-debug-controls { top: 3px; right: 80px; }
 }
-@media (prefers-reduced-motion: reduce) { .combat-action { transition: none; } .turn-callout { display: none; } }
+
+
+/* ── Command window (Dragon Quest XI battle list, wuxia dress) ───────────
+   Left: a lacquer box listing moves with the gold hand cursor, number keys
+   and costs. Right: the message box — last log lines + the pointed move. */
+.combat-actions-wrap {
+  display: grid; grid-template: "list recent" auto "list detail" 1fr / minmax(300px, 420px) minmax(0, 1fr);
+  gap: 8px 12px; min-height: 0; height: 100%; align-items: stretch;
+}
+.combat-actions, .combat-message {
+  color: #f7eedb; background: #2a1611ea; border: 2px solid #9a7442; border-radius: 8px;
+  box-shadow: inset 0 0 0 1px #e2bd6a33, 0 0 0 1px #140a07, 0 4px 12px #0a05038c; text-shadow: 1px 1px 0 #140a07;
+}
+.combat-actions { grid-area: list; display: flex; flex-direction: column; gap: 1px; padding: 8px 10px 8px 34px; max-height: 100%; overflow-y: auto; scrollbar-width: thin; }
+.combat-recent { grid-area: recent; display: flex; flex-direction: column; gap: 1px; min-height: 0; margin: 0; padding: 8px 14px 0; list-style: none; font-size: 14px; line-height: 1.55; color: #eadfc4; background: #2a1611ea; border: 2px solid #9a7442; border-bottom: 0; border-radius: 8px 8px 0 0; box-shadow: inset 0 1px 0 #e2bd6a33; }
+.combat-recent:empty { display: none; }
+.combat-recent li { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: .7; }
+.combat-recent li:last-child { opacity: 1; }
+.combat-recent li[data-log-kind=lA] { color: #b9d2ff; }
+.combat-recent li[data-log-kind=lB] { color: #ffc0a0; }
+.combat-recent li[data-log-kind=lC] { color: #ffd76b; font-weight: 700; }
+.combat-action-detail {
+  grid-area: detail; margin: 0; padding: 8px 14px; font-size: 15px; line-height: 1.6; color: #f7eedb; text-shadow: 1px 1px 0 #140a07;
+  background: #2a1611ea; border: 2px solid #9a7442; border-radius: 0 0 8px 8px; box-shadow: inset 0 -1px 0 #e2bd6a33;
+}
+.combat-recent:empty + .combat-action-detail { border-radius: 8px; }
+.combat-action-detail strong { display: block; color: #f3c979; font: 20px/1.4 var(--font-display); }
+.combat-action-detail small { color: #e2bd6a; font-size: 13px; }
+.combat-action {
+  position: relative; display: flex; align-items: center; gap: 10px; width: 100%; min-height: 44px; padding: 3px 8px;
+  color: #f7eedb; text-align: left; background: none; border: 1px solid transparent; border-radius: 4px;
+}
+.combat-action::before {
+  content: "☛" / ""; position: absolute; left: -26px; top: 50%; transform: translateY(-50%); font-size: 21px; color: #e2bd6a; opacity: 0;
+}
+.combat-action:enabled:hover, .combat-action:focus-visible { outline: none; background: linear-gradient(90deg, #e2bd6a2e, transparent); border-color: #e2bd6a44; }
+.combat-action:enabled:hover::before, .combat-action:focus-visible::before { opacity: 1; animation: action-hand 900ms ease-in-out infinite; }
+@keyframes action-hand { 0%, 100% { translate: 0 0; } 50% { translate: -4px 0; } }
+.combat-action-medal {
+  position: relative; flex: 0 0 auto; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%;
+  background: radial-gradient(circle at 50% 36%, #6a4a30, #2a1611 72%); border: 2px solid #b08a4c;
+}
+.combat-action-guard .combat-action-medal { border-color: #7f9bd0; }
+.combat-action-recover .combat-action-medal { border-color: #7fcf9c; }
+.combat-action-icon { display: grid; place-items: center; color: #f3d58f; }
+.combat-action-icon svg, .combat-action-icon img, .combat-action-icon canvas { max-width: 24px; max-height: 24px; }
+.combat-action kbd {
+  order: 3; margin-left: auto; min-width: 18px; padding: 0 4px; text-align: center;
+  font: 700 11px/16px ui-monospace, monospace; color: #2a1611; background: #e2bd6a; border-radius: 3px; opacity: .7;
+}
+.combat-action-cd { position: absolute; inset: 0; display: grid; place-items: center; border-radius: 50%; font: 700 17px/1 var(--font-display); color: #fff1cc; background: #0a0503c4; }
+.combat-action-flag {
+  position: absolute; left: 50%; bottom: -9px; transform: translateX(-50%); padding: 0 5px; white-space: nowrap; font-size: 10px; line-height: 14px;
+  font-weight: 700; color: #2a1611; background: #f0c95a; border: 1px solid #6b4a1a; border-radius: 3px; text-shadow: none;
+}
+.combat-action-copy { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex: 1; min-width: 0; }
+.combat-action-copy strong { font-size: 18px; line-height: 1.35; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.combat-action-copy small { flex-shrink: 0; font-size: 13px; color: #e2bd6a; white-space: nowrap; }
+.combat-action:disabled { cursor: default; color: #a8987c; }
+.combat-action:disabled .combat-action-medal { filter: grayscale(.6) brightness(.7); }
+.combat-action:disabled .combat-action-copy small { color: #9c8a6a; }
+
+@media (max-width: 640px) and (min-height: 561px) {
+  .combat-actions-wrap { grid-template: "detail" auto "list" auto / minmax(0, 1fr); gap: 6px; }
+  .combat-recent { display: none; }
+  .combat-action-detail { border-radius: 8px; padding: 5px 10px; font-size: 12.5px; line-height: 1.45; }
+  .combat-action-detail strong { display: inline; font-size: 15px; margin-right: 6px; }
+  .combat-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 6px; padding: 6px 6px 6px 26px; max-height: 240px; }
+  .combat-action { min-height: 44px; gap: 6px; padding: 2px 4px; }
+  .combat-action::before { left: -22px; font-size: 18px; }
+  .combat-action-medal { width: 30px; height: 30px; }
+  .combat-action-icon svg, .combat-action-icon img, .combat-action-icon canvas { max-width: 20px; max-height: 20px; }
+  .combat-action kbd { display: none; }
+  .combat-action-copy { flex-direction: column; align-items: flex-start; gap: 0; }
+  .combat-action-copy strong { font-size: 15px; }
+  .combat-action-copy small { font-size: 11px; }
+  .turn-timeline li { width: 28px; height: 28px; border-width: 2px; }
+  .turn-timeline li:first-child { width: 36px; height: 36px; margin-right: 4px; }
+  .turn-timeline-tag { display: none; }
+}
+@media (max-height: 560px) and (min-width: 641px) {
+  .combat-actions-wrap { grid-template: "list" 1fr / minmax(0, 1fr); }
+  .combat-action-detail, .combat-recent { display: none; }
+  .combat-actions { height: 100%; gap: 4px; padding: 5px 5px 5px 24px; }
+  .combat-action { flex: 1 0 auto; min-height: 52px; gap: 8px; padding: 3px 5px; }
+  .combat-action::before { left: -21px; font-size: 18px; }
+  .combat-action-medal { width: 32px; height: 32px; }
+  .combat-action kbd { display: none; }
+  .combat-action-copy { flex-direction: column; align-items: flex-start; gap: 0; }
+  .combat-action-copy strong { font-size: 16px; }
+  .combat-action-copy small { font-size: 12px; }
+  .combat-action-flag { left: auto; right: -6px; bottom: -6px; transform: none; }
+}
+@media (pointer: coarse) { .combat-action kbd { display: none; } }
+@media (prefers-reduced-motion: reduce) { .combat-action::before { animation: none; } .turn-callout { display: none; } }
+
+@media (max-width: 640px) { .combat-status strong { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .combat-status > span { min-width: 0; } }
+.turn-timeline .turn-sprite { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 4%; image-rendering: pixelated; transform: scale(1.6); transform-origin: 50% 0; }
+.turn-crop { display: block; width: 100%; height: 100%; overflow: hidden; }

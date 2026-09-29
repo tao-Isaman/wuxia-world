@@ -34,6 +34,8 @@ import { useWorldStore } from "@/store/world-store";
 import { confirmDialog } from "@/store/confirm-store";
 import { ArtTooltip, SkillTooltip } from "../skill-tooltip";
 import { UpgradePayoff, type UpgradeReceipt } from "./upgrade-payoff";
+import { ArtIcon, SkillIcon } from "@/components/game/skill-icon";
+import { rarityColor } from "@/lib/ui/rarity";
 
 interface Props {
   open: boolean;
@@ -57,6 +59,8 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
   const forgetArt = useWorldStore((s) => s.forgetArt);
   const equipSlot = useWorldStore((s) => s.equipSlot);
   const [upgradeReceipt, setUpgradeReceipt] = useState<UpgradeReceipt | null>(null);
+  // Hero's Adventure-style loadout: a row of round slots, one selected at a time.
+  const [selectedSlot, setSelectedSlot] = useState(0);
 
   useEffect(() => {
     if (!open) setUpgradeReceipt(null);
@@ -228,8 +232,27 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
         )}
       </div>
 
+      <div className="skill-loadout" role="tablist" aria-label="ช่องวิชาที่ติดตั้ง">
+        {slots.map((raw, i) => {
+          const info = parseSlotId(raw);
+          const name = info ? (info.kind === "art" ? info.art.n : info.skill.n) : "ว่าง";
+          const lv = info ? (info.kind === "art" ? player.artLevels?.[info.art.id] ?? 1 : skillLevel[info.skill.id] ?? 1) : 0;
+          const tierIndex = info ? (info.kind === "art" ? info.art.ti : info.skill.ti) : 0;
+          return <button key={i} type="button" role="tab" aria-selected={selectedSlot === i}
+            className={`skill-slot${info ? "" : " skill-slot--empty"}`} onClick={() => setSelectedSlot(i)}
+            style={{ "--rarity": rarityColor(tierIndex) } as React.CSSProperties} title={`ช่อง ${i + 1}: ${name}`}>
+            <span className="skill-slot-medal">
+              {info ? (info.kind === "art" ? <ArtIcon art={info.art} size={34} /> : <SkillIcon skill={info.skill} size={34} />) : <span aria-hidden="true">+</span>}
+              {info && <b className="skill-slot-level">{lv}</b>}
+            </span>
+            <span className="skill-slot-name">{name}</span>
+          </button>;
+        })}
+      </div>
+
       <div className="space-y-2">
         {slots.map((raw, i) => {
+          if (i !== selectedSlot) return null;
           const info = parseSlotId(raw);
           const disabled = new Set(equippedSet);
           if (raw) disabled.delete(raw);
