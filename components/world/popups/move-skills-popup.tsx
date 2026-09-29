@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Modal } from "@/components/ui/modal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,7 @@ import {
   WEAPON_FAMILY_LABEL,
   bpMultiplier,
   computeConflictFactors,
+  deriveAll,
   effectiveBp,
   effectiveMg,
   effectiveTypes,
@@ -32,6 +33,7 @@ import type { WeaponFamily } from "@/lib/game";
 import { useWorldStore } from "@/store/world-store";
 import { confirmDialog } from "@/store/confirm-store";
 import { ArtTooltip, SkillTooltip } from "../skill-tooltip";
+import { UpgradePayoff, type UpgradeReceipt } from "./upgrade-payoff";
 
 interface Props {
   open: boolean;
@@ -54,6 +56,65 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
   const forgetSkill = useWorldStore((s) => s.forgetSkill);
   const forgetArt = useWorldStore((s) => s.forgetArt);
   const equipSlot = useWorldStore((s) => s.equipSlot);
+  const [upgradeReceipt, setUpgradeReceipt] = useState<UpgradeReceipt | null>(null);
+
+  useEffect(() => {
+    if (!open) setUpgradeReceipt(null);
+  }, [open]);
+
+  const upgrade = (rawId: string) => {
+    // Snapshot the live store, not render-time values: rapid clicks must show
+    // the level and cost of the action that actually succeeded.
+    const before = useWorldStore.getState();
+    const info = parseSlotId(rawId);
+    if (!before.playerBuild || !info) return;
+    const result = info.kind === "skill"
+      ? levelUpFromWExp(info.skill.id)
+      : levelUpArtFromWExp(info.art.id);
+    if (!result.ok) return;
+    const after = useWorldStore.getState();
+    if (!after.playerBuild) return;
+
+    const previousLevel = result.level - 1;
+    const factors = computeConflictFactors(after.playerBuild, { getSkill, getArt });
+    const definition = info.kind === "skill" ? info.skill : info.art;
+    const factor = getStatusFactor(definition, factors);
+    const changes: UpgradeReceipt["changes"] = [];
+    if (info.kind === "skill") {
+      const sk = info.skill;
+      changes.push({
+        label: "พลังท่า (BP)",
+        before: Math.round(effectiveBp(sk, previousLevel) * factor),
+        after: Math.round(effectiveBp(sk, result.level) * factor),
+      }, {
+        label: `ความชำนาญ${WEAPON_FAMILY_LABEL[sk.w]}`,
+        before: getMasteryMap(before.playerBuild.skillIds, before.playerBuild.skillLevels, factors)[sk.w] ?? 0,
+        after: getMasteryMap(after.playerBuild.skillIds, after.playerBuild.skillLevels, factors)[sk.w] ?? 0,
+      });
+    } else {
+      const previousStats = deriveAll(before.playerBuild);
+      const nextStats = deriveAll(after.playerBuild);
+      changes.push(
+        { label: "พลังชีวิตสูงสุด (HP)", before: previousStats.HP, after: nextStats.HP },
+        { label: "ปราณสูงสุด (MP)", before: previousStats.MP, after: nextStats.MP },
+      );
+    }
+    setUpgradeReceipt({
+      rawId,
+      name: definition.n,
+      bodyId: after.playerBodyId,
+      previousLevel,
+      level: result.level,
+      cost: result.cost,
+      remaining: after.wExp,
+      changes,
+      detail: factor < 1
+        ? "ค่าที่แสดงหักผลจากวิชาขัดแย้งแล้ว"
+        : info.kind === "skill"
+          ? "พลังท่าและความชำนาญช่วยเพิ่มความเสียหายเมื่อโจมตี"
+          : "ค่าพลังสูงสุดใหม่มีผลแล้ว · พักผ่อนเพื่อฟื้นพลัง",
+    });
+  };
 
   const learnedSkillIds = player?.learnedSkillIds ?? [];
   const learnedArtIds = player?.learnedArtIds ?? [];
@@ -300,7 +361,7 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
                         variant="outline"
                         className="text-[11px] h-7"
                         disabled={!canArtWExp}
-                        onClick={() => levelUpArtFromWExp(art.id)}
+                        onClick={() => upgrade(encodeArtSlot(art.id))}
                         title={
                           canArtWExp
                             ? `ใช้ ${aWExpCost} w-exp (xp ${aXpCapped}/${aCost})`
@@ -312,6 +373,13 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
                     </div>
                   )}
                 </div>
+                {upgradeReceipt?.rawId === raw && (
+                  <UpgradePayoff
+                    key={`${raw}-${upgradeReceipt.level}`}
+                    receipt={upgradeReceipt}
+                    onDismiss={() => setUpgradeReceipt(null)}
+                  />
+                )}
               </div>
             );
           }
@@ -410,7 +478,7 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
                       variant="outline"
                       className="text-[11px] h-7"
                       disabled={!canWExp}
-                      onClick={() => levelUpFromWExp(sk.id)}
+                      onClick={() => upgrade(sk.id)}
                       title={
                         canWExp
                           ? `ใช้ ${wExpCost} w-exp (xp ${xpCapped}/${cost})`
@@ -422,6 +490,13 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
                   </div>
                 )}
               </div>
+              {upgradeReceipt?.rawId === raw && (
+                <UpgradePayoff
+                  key={`${raw}-${upgradeReceipt.level}`}
+                  receipt={upgradeReceipt}
+                  onDismiss={() => setUpgradeReceipt(null)}
+                />
+              )}
             </div>
           );
         })}

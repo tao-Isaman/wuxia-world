@@ -14,23 +14,24 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
   {
     id: "qc_capital_lost_ledger",
     name: "บัญชีคลังหลวงที่หายไป",
-    description: "นายอำเภอหวู่ขอให้สืบหาบัญชีรายรับรายจ่ายของคลังหลวงที่ถูกขโมยจากห้องเก็บเอกสาร",
-    briefSummary: "สืบหาบัญชีคลังที่หายและนำกลับมาให้นายอำเภอ",
+    description: "นายอำเภอหวู่ขอให้สืบหาบัญชีคลังหลวง เริ่มจากเสมียนนายฉิงที่หน้าสำนักงานทางเหนือของนครหลวง ด้านซ้ายของนายอำเภอ",
+    briefSummary: "คุยกับเสมียนนายฉิงข้างหวู่ · เปิดหีบเอกสาร · นำบัญชีกลับมา",
     type: "side",
     giverNpcId: "city_capital_magistrate_wu",
     stages: [
       {
         id: "investigate",
-        description: "สืบสวนว่าใครขโมยบัญชีคลังหลวง พูดคุยกับเสมียนในสำนักงาน",
+        description: "ทักทายเสมียนนายฉิงที่หน้าสำนักงานทางเหนือของนครหลวง ด้านซ้ายของนายอำเภอหวู่ แล้วถามถึงบัญชีที่หายไป",
+        autoAdvance: { t: "flag", flag: "capital_ledger_qing_interviewed" },
       },
       {
         id: "find_ledger",
-        description: "ค้นหาบัญชีที่ถูกซ่อน ต้องมีกุญแจเก่าอยู่ในครอบครอง",
-        autoAdvance: { t: "hasItem", itemId: "old_key", count: 1 },
+        description: "คุยกับเสมียนนายฉิงแล้วเลือกตรวจหีบเอกสาร ใช้กุญแจเก่าเปิดหีบและหยิบบัญชี หากไม่มีกุญแจให้ขอยืมจากนายฉิง",
+        autoAdvance: { t: "flag", flag: "capital_ledger_recovered" },
       },
       {
         id: "return",
-        description: "นำบัญชีกลับคืนนายอำเภอหวู่",
+        description: "นำบัญชีที่หยิบจากหีบข้างเสมียนนายฉิงไปส่งนายอำเภอหวู่ที่นครหลวง แล้วรับรางวัล",
       },
     ],
     rewards: [
@@ -51,11 +52,12 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
     stages: [
       {
         id: "surveil",
-        description: "ติดตามสังเกตเสมียนต้องสงสัยในและรอบสำนักงาน",
+        description: "ทักทายเสมียนนายฉิงด้านซ้ายของนายอำเภอหวู่ที่นครหลวง แล้วถามเรื่องสินบนในสำนักงาน",
+        autoAdvance: { t: "flag", flag: "capital_clerk_bribery_lead" },
       },
       {
         id: "confront",
-        description: "ปราบโจรหรือนักเลงที่เป็นพวกพ้องของเสมียน เพื่อให้ได้หลักฐาน",
+        description: "ปราบนักเลง 2 คนที่พบระหว่างเดินทางหลังรับงาน เพื่อรวบรวมหลักฐาน หากยังไม่พร้อมให้พักและฝึกฝีมือก่อน",
         autoAdvance: { t: "defeatedOpponent", opponentId: "thug", count: 2 },
       },
       {
@@ -104,21 +106,47 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
   },
 
   // ═══════════════════════════════════════════════════════════════════
-  // city_capital_physician_lin — 2 quests
+  // city_capital_physician_lin — 3 quests
   // ═══════════════════════════════════════════════════════════════════
+
+  // A local first errand: no inventory, mastery or combat gate.
+  {
+    id: "qc_capital_clinic_supplies",
+    name: "เสบียงยาของคลินิก",
+    description: "หมอหลินต้องการผู้ช่วยส่งคำขอเสบียงยาให้นายอำเภอหวู่ ทั้งสองอยู่ในนครหลวง",
+    briefSummary: "แจ้งนายอำเภอหวู่เรื่องเสบียงยา แล้วกลับมารายงานหมอหลิน · ทำได้ในนครหลวง",
+    type: "side",
+    giverNpcId: "city_capital_physician_lin",
+    stages: [
+      {
+        id: "deliver_request",
+        description: "พบนายอำเภอหวู่ในนครหลวง เลือกทักทาย แล้วส่งคำขอเสบียงจากหมอหลิน",
+      },
+      {
+        id: "report_to_lin",
+        description: "กลับไปหาหมอหลินในนครหลวง ส่งมอบภารกิจเสบียงยาของคลินิกเพื่อรับรางวัล",
+      },
+    ],
+    rewards: [
+      { t: "gold", amount: 80 },
+      { t: "item", itemId: "herb", count: 3 },
+      { t: "wExp", amount: 20 },
+      { t: "npcRelationship", npcId: "city_capital_physician_lin", amount: 2 },
+    ],
+  },
 
   // 4. Fetch — auto-advance on item
   {
     id: "qc_capital_rare_herb",
     name: "บัวหิมะเพื่อผู้ป่วย",
-    description: "หมอหลินต้องการบัวหิมะสำหรับปรุงยาพิเศษให้ผู้ป่วยหนัก",
-    briefSummary: "หาบัวหิมะหนึ่งดอกส่งให้หมอหลินในนครหลวง",
+    description: "หมอหลินต้องการบัวหิมะจากก้นหุบเขาตัดใจสำหรับปรุงยาให้ผู้ป่วยหนัก ต้องมีทักษะเก็บสมุนไพรระดับ 5 จึงเก็บได้",
+    briefSummary: "เก็บบัวหิมะที่ก้นหุบเขาตัดใจ · เก็บสมุนไพรระดับ 5 · ส่งให้หมอหลินในนครหลวง",
     type: "side",
     giverNpcId: "city_capital_physician_lin",
     stages: [
       {
         id: "find_herb",
-        description: "หาบัวหิมะ — งอกได้เพียงที่ก้นหุบเขาตัดใจเท่านั้น",
+        description: "เก็บบัวหิมะที่ก้นหุบเขาตัดใจ — ต้องมีทักษะเก็บสมุนไพรระดับ 5",
         autoAdvance: { t: "hasItem", itemId: "snow_lotus", count: 1 },
       },
       {

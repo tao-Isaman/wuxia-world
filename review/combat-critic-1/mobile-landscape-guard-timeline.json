@@ -1,0 +1,322 @@
+[
+  {
+    "ms": 18.400000005960464,
+    "text": "กำลังภายใน — โลกยุทธภพ\nถึงตาเจ้า · เลือกกระบวนท่า\nตาที่ 3\nReviewer\n5 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\nพร้อม\n對\nขโมยน้อย\n5 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\n100%\nหมัดตรง\nโจมตีภายนอก · 1 ครั้ง\n0 MP · 1 ตา\nตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา\nรวบรวมปราณ\nMP เต็ม · ใช้เมื่อปราณพร่อง\n0 MP · 1 ตา\nบันทึกการต่อสู้ (6)\n+",
+    "canvas": {
+      "testid": "battle-canvas",
+      "renderer": "three",
+      "ready": "true",
+      "reducedMotion": "false",
+      "impactCount": "2",
+      "castSeq": "2",
+      "fighterACharacter": "m1",
+      "fighterAMotion": "guard",
+      "fighterAFrame": "13",
+      "fighterBCharacter": "bandit",
+      "fighterBMotion": "idle",
+      "fighterBFrame": "2",
+      "paused": "false",
+      "lastImpact": "2:0"
+    }
+  },
+  {
+    "ms": 156.7000000178814,
+    "text": "กำลังภายใน — โลกยุทธภพ\nกำลังใช้ · ตั้งรับ\nตาที่ 3\nReviewer\n5 / 36 HP\n8 / 10 MP\nจังหวะโจมตี\n0%\nทรงพลัง(2)\nสวนกลับ +20% · 1 ครั้ง\n對\nขโมยน้อย\n5 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\n0%\nหมัดตรง\nสวนกลับ +20% · 1 ครั้ง\n0 MP · 1 ตา\nตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา\nรวบรวมปราณ\nMP +2 · หลบหลีก −15 จังหวะถัดไป\n0 MP · 1 ตา\nบันทึกการต่อสู้ (7)\n+",
+    "canvas": {
+      "testid": "battle-canvas",
+      "renderer": "three",
+      "ready": "true",
+      "reducedMotion": "false",
+      "impactCount": "2",
+      "castSeq": "-4",
+      "fighterACharacter": "m1",
+      "fighterAMotion": "guard",
+      "fighterAFrame": "13",
+      "fighterBCharacter": "bandit",
+      "fighterBMotion": "guard",
+      "fighterBFrame": "13",
+      "paused": "false",
+      "lastImpact": "2:0"
+    }
+  },
+  {
+    "ms": 404.09999999403954,
+    "text": "กำลังภายใน — โลกยุทธภพ\nกำลังใช้ · ตั้งรับ\nตาที่ 3\nReviewer\n5 / 36 HP\n8 / 10 MP\nจังหวะโจมตี\n0%\nทรงพลัง(2)\nสวนกลับ +20% · 1 ครั้ง\n對\nขโมยน้อย\n5 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\n0%\nหมัดตรง\nสวนกลับ +20% · 1 ครั้ง\n0 MP · 1 ตา\nตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา\nรวบรวมปราณ\nMP +2 · หลบหลีก −15 จังหวะถัดไป\n0 MP · 1 ตา\nบันทึกการต่อสู้ (7)\n+",
+    "canvas": {
+      "testid": "battle-canvas",
+      "renderer": "three",
+      "ready": "true",
+      "reducedMotion": "false",
+      "impactCount": "3",
+      "castSeq": "-4",
+      "fighterACharacter": "m1",
+      "fighterAMotion": "guard",
+      "fighterAFrame": "13",
+      "fighterBCharacter": "bandit",
+      "fighterBMotion": "guard",
+      "fighterBFrame": "13",
+      "paused": "false",
+      "lastImpact": "-4:0"
+    }
+  },
+  {
+    "ms": 673.4000000059605,
+    "text": "กำลังภายใน — โลกยุทธภพ\nกำลังใช้ · ตั้งรับ\nตาที่ 3\nReviewer\n5 / 36 HP\n8 / 10 MP\nจังหวะโจมตี\n0%\nทรงพลัง(2)\nสวนกลับ +20% · 1 ครั้ง\n對\nขโมยน้อย\n5 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\n0%\nหมัดตรง\nสวนกลับ +20% · 1 ครั้ง\n0 MP · 1 ตา\nตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา\nรวบรวมปราณ\nMP +2 · หลบหลีก −15 จังหวะถัดไป\n0 MP · 1 ตา\nบันทึกการต่อสู้ (7)\n+",
+    "canvas": {
+      "testid": "battle-canvas",
+      "renderer": "three",
+      "ready": "true",
+      "reducedMotion": "false",
+      "impactCount": "3",
+      "castSeq": "-4",
+      "fighterACharacter": "m1",
+      "fighterAMotion": "idle",
+      "fighterAFrame": "0",
+      "fighterBCharacter": "bandit",
+      "fighterBMotion": "guard",
+      "fighterBFrame": "13",
+      "paused": "false",
+      "lastImpact": "-4:0"
+    }
+  },
+  {
+    "ms": 916.0999999940395,
+    "text": "กำลังภายใน — โลกยุทธภพ\nกำลังใช้ · ตั้งรับ\nตาที่ 3\nReviewer\n5 / 36 HP\n8 / 10 MP\nจังหวะโจมตี\n0%\nทรงพลัง(2)\nสวนกลับ +20% · 1 ครั้ง\n對\nขโมยน้อย\n5 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\n0%\nหมัดตรง\nสวนกลับ +20% · 1 ครั้ง\n0 MP · 1 ตา\nตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา\nรวบรวมปราณ\nMP +2 · หลบหลีก −15 จังหวะถัดไป\n0 MP · 1 ตา\nบันทึกการต่อสู้ (7)\n+",
+    "canvas": {
+      "testid": "battle-canvas",
+      "renderer": "three",
+      "ready": "true",
+      "reducedMotion": "false",
+      "impactCount": "3",
+      "castSeq": "-4",
+      "fighterACharacter": "m1",
+      "fighterAMotion": "idle",
+      "fighterAFrame": "1",
+      "fighterBCharacter": "bandit",
+      "fighterBMotion": "guard",
+      "fighterBFrame": "13",
+      "paused": "false",
+      "lastImpact": "-4:0"
+    }
+  },
+  {
+    "ms": 1015.2000000178814,
+    "text": "กำลังภายใน — โลกยุทธภพ\nขโมยน้อย กำลังออกกระบวนท่า\nตาที่ 4\nReviewer\n5 / 36 HP\n8 / 10 MP\nจังหวะโจมตี\n0%\nทรงพลัง(2)\nสวนกลับ +20% · 1 ครั้ง\n對\nขโมยน้อย\n5 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\nพร้อม\nหมัดตรง\nสวนกลับ +20% · 1 ครั้ง\n0 MP · 1 ตา\nตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา\nรวบรวมปราณ\nMP +2 · หลบหลีก −15 จังหวะถัดไป\n0 MP · 1 ตา\nบันทึกการต่อสู้ (7)\n+",
+    "canvas": {
+      "testid": "battle-canvas",
+      "renderer": "three",
+      "ready": "true",
+      "reducedMotion": "false",
+      "impactCount": "3",
+      "castSeq": "-4",
+      "fighterACharacter": "m1",
+      "fighterAMotion": "idle",
+      "fighterAFrame": "1",
+      "fighterBCharacter": "bandit",
+      "fighterBMotion": "guard",
+      "fighterBFrame": "13",
+      "paused": "false",
+      "lastImpact": "-4:0"
+    }
+  },
+  {
+    "ms": 1168.800000011921,
+    "text": "กำลังภายใน — โลกยุทธภพ\nขโมยน้อย กำลังออกกระบวนท่า\nตาที่ 4\nReviewer\n5 / 36 HP\n8 / 10 MP\nจังหวะโจมตี\n0%\nทรงพลัง(2)\nสวนกลับ +20% · 1 ครั้ง\n對\nขโมยน้อย\n5 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\nพร้อม\nหมัดตรง\nสวนกลับ +20% · 1 ครั้ง\n0 MP · 1 ตา\nตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา\nรวบรวมปราณ\nMP +2 · หลบหลีก −15 จังหวะถัดไป\n0 MP · 1 ตา\nบันทึกการต่อสู้ (7)\n+",
+    "canvas": {
+      "testid": "battle-canvas",
+      "renderer": "three",
+      "ready": "true",
+      "reducedMotion": "false",
+      "impactCount": "3",
+      "castSeq": "-4",
+      "fighterACharacter": "m1",
+      "fighterAMotion": "idle",
+      "fighterAFrame": "2",
+      "fighterBCharacter": "bandit",
+      "fighterBMotion": "guard",
+      "fighterBFrame": "13",
+      "paused": "false",
+      "lastImpact": "-4:0"
+    }
+  },
+  {
+    "ms": 1412.0999999940395,
+    "text": "กำลังภายใน — โลกยุทธภพ\nกำลังใช้ · หมัดตรง\nตาที่ 4\nReviewer\n5 / 36 HP\n8 / 10 MP\nจังหวะโจมตี\n0%\nทรงพลัง(1)\nสวนกลับ +20% · 1 ครั้ง\n對\nขโมยน้อย\n5 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\n0%\nหมัดตรง\nสวนกลับ +20% · 1 ครั้ง\n0 MP · 1 ตา\nตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา\nรวบรวมปราณ\nMP +2 · หลบหลีก −15 จังหวะถัดไป\n0 MP · 1 ตา\nบันทึกการต่อสู้ (10)\n+",
+    "canvas": {
+      "testid": "battle-canvas",
+      "renderer": "three",
+      "ready": "true",
+      "reducedMotion": "false",
+      "impactCount": "3",
+      "castSeq": "3",
+      "fighterACharacter": "m1",
+      "fighterAMotion": "idle",
+      "fighterAFrame": "2",
+      "fighterBCharacter": "bandit",
+      "fighterBMotion": "attack",
+      "fighterBFrame": "8",
+      "paused": "false",
+      "lastImpact": "-4:0"
+    }
+  },
+  {
+    "ms": 1434.300000011921,
+    "text": "กำลังภายใน — โลกยุทธภพ\nกำลังใช้ · หมัดตรง\nตาที่ 4\nReviewer\n5 / 36 HP\n8 / 10 MP\nจังหวะโจมตี\n0%\nทรงพลัง(1)\nสวนกลับ +20% · 1 ครั้ง\n對\nขโมยน้อย\n5 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\n0%\nหมัดตรง\nสวนกลับ +20% · 1 ครั้ง\n0 MP · 1 ตา\nตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา\nรวบรวมปราณ\nMP +2 · หลบหลีก −15 จังหวะถัดไป\n0 MP · 1 ตา\nบันทึกการต่อสู้ (10)\n+",
+    "canvas": {
+      "testid": "battle-canvas",
+      "renderer": "three",
+      "ready": "true",
+      "reducedMotion": "false",
+      "impactCount": "3",
+      "castSeq": "3",
+      "fighterACharacter": "m1",
+      "fighterAMotion": "idle",
+      "fighterAFrame": "3",
+      "fighterBCharacter": "bandit",
+      "fighterBMotion": "attack",
+      "fighterBFrame": "8",
+      "paused": "false",
+      "lastImpact": "-4:0"
+    }
+  },
+  {
+    "ms": 1537.5999999940395,
+    "text": "กำลังภายใน — โลกยุทธภพ\nกำลังใช้ · หมัดตรง\nตาที่ 4\nReviewer\n5 / 36 HP\n8 / 10 MP\nจังหวะโจมตี\n0%\nทรงพลัง(1)\nสวนกลับ +20% · 1 ครั้ง\n對\nขโมยน้อย\n5 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\n0%\nหมัดตรง\nสวนกลับ +20% · 1 ครั้ง\n0 MP · 1 ตา\nตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา\nรวบรวมปราณ\nMP +2 · หลบหลีก −15 จังหวะถัดไป\n0 MP · 1 ตา\nบันทึกการต่อสู้ (10)\n+",
+    "canvas": {
+      "testid": "battle-canvas",
+      "renderer": "three",
+      "ready": "true",
+      "reducedMotion": "false",
+      "impactCount": "3",
+      "castSeq": "3",
+      "fighterACharacter": "m1",
+      "fighterAMotion": "idle",
+      "fighterAFrame": "3",
+      "fighterBCharacter": "bandit",
+      "fighterBMotion": "attack",
+      "fighterBFrame": "9",
+      "paused": "false",
+      "lastImpact": "-4:0"
+    }
+  },
+  {
+    "ms": 1669.4000000059605,
+    "text": "กำลังภายใน — โลกยุทธภพ\nกำลังใช้ · หมัดตรง\nตาที่ 4\nReviewer\n5 / 36 HP\n8 / 10 MP\nจังหวะโจมตี\n0%\nทรงพลัง(1)\nสวนกลับ +20% · 1 ครั้ง\n對\nขโมยน้อย\n5 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\n0%\nหมัดตรง\nสวนกลับ +20% · 1 ครั้ง\n0 MP · 1 ตา\nตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา\nรวบรวมปราณ\nMP +2 · หลบหลีก −15 จังหวะถัดไป\n0 MP · 1 ตา\nบันทึกการต่อสู้ (10)\n+",
+    "canvas": {
+      "testid": "battle-canvas",
+      "renderer": "three",
+      "ready": "true",
+      "reducedMotion": "false",
+      "impactCount": "3",
+      "castSeq": "3",
+      "fighterACharacter": "m1",
+      "fighterAMotion": "idle",
+      "fighterAFrame": "0",
+      "fighterBCharacter": "bandit",
+      "fighterBMotion": "attack",
+      "fighterBFrame": "9",
+      "paused": "false",
+      "lastImpact": "-4:0"
+    }
+  },
+  {
+    "ms": 1707.800000011921,
+    "text": "กำลังภายใน — โลกยุทธภพ\nกำลังใช้ · หมัดตรง\nตาที่ 4\nReviewer\n0 / 36 HP\n8 / 10 MP\nจังหวะโจมตี\n0%\nทรงพลัง(1)\nสวนกลับ +20% · 1 ครั้ง\n對\nขโมยน้อย\n5 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\n0%\nหมัดตรง\nสวนกลับ +20% · 1 ครั้ง\n0 MP · 1 ตา\nตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา\nรวบรวมปราณ\nMP +2 · หลบหลีก −15 จังหวะถัดไป\n0 MP · 1 ตา\nบันทึกการต่อสู้ (10)\n+",
+    "canvas": {
+      "testid": "battle-canvas",
+      "renderer": "three",
+      "ready": "true",
+      "reducedMotion": "false",
+      "impactCount": "4",
+      "castSeq": "3",
+      "fighterACharacter": "m1",
+      "fighterAMotion": "hurt",
+      "fighterAFrame": "12",
+      "fighterBCharacter": "bandit",
+      "fighterBMotion": "attack",
+      "fighterBFrame": "10",
+      "paused": "false",
+      "lastImpact": "3:0"
+    }
+  },
+  {
+    "ms": 1784.0999999940395,
+    "text": "กำลังภายใน — โลกยุทธภพ\nกำลังใช้ · หมัดตรง\nตาที่ 4\nReviewer\n0 / 36 HP\n8 / 10 MP\nจังหวะโจมตี\n0%\nทรงพลัง(1)\nสวนกลับ +20% · 1 ครั้ง\n對\nขโมยน้อย\n5 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\n0%\nหมัดตรง\nสวนกลับ +20% · 1 ครั้ง\n0 MP · 1 ตา\nตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา\nรวบรวมปราณ\nMP +2 · หลบหลีก −15 จังหวะถัดไป\n0 MP · 1 ตา\nบันทึกการต่อสู้ (10)\n+",
+    "canvas": {
+      "testid": "battle-canvas",
+      "renderer": "three",
+      "ready": "true",
+      "reducedMotion": "false",
+      "impactCount": "4",
+      "castSeq": "3",
+      "fighterACharacter": "m1",
+      "fighterAMotion": "hurt",
+      "fighterAFrame": "12",
+      "fighterBCharacter": "bandit",
+      "fighterBMotion": "attack",
+      "fighterBFrame": "11",
+      "paused": "false",
+      "lastImpact": "3:0"
+    }
+  },
+  {
+    "ms": 1873.300000011921,
+    "text": "กำลังภายใน — โลกยุทธภพ\nกำลังใช้ · หมัดตรง\nตาที่ 4\nReviewer\n0 / 36 HP\n8 / 10 MP\nจังหวะโจมตี\n0%\nทรงพลัง(1)\nสวนกลับ +20% · 1 ครั้ง\n對\nขโมยน้อย\n5 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\n0%\nหมัดตรง\nสวนกลับ +20% · 1 ครั้ง\n0 MP · 1 ตา\nตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา\nรวบรวมปราณ\nMP +2 · หลบหลีก −15 จังหวะถัดไป\n0 MP · 1 ตา\nบันทึกการต่อสู้ (10)\n+",
+    "canvas": {
+      "testid": "battle-canvas",
+      "renderer": "three",
+      "ready": "true",
+      "reducedMotion": "false",
+      "impactCount": "4",
+      "castSeq": "3",
+      "fighterACharacter": "m1",
+      "fighterAMotion": "idle",
+      "fighterAFrame": "0",
+      "fighterBCharacter": "bandit",
+      "fighterBMotion": "attack",
+      "fighterBFrame": "11",
+      "paused": "false",
+      "lastImpact": "3:0"
+    }
+  },
+  {
+    "ms": 1936.4000000059605,
+    "text": "กำลังภายใน — โลกยุทธภพ\nกำลังใช้ · หมัดตรง\nตาที่ 4\nReviewer\n0 / 36 HP\n8 / 10 MP\nจังหวะโจมตี\n0%\nทรงพลัง(1)\nสวนกลับ +20% · 1 ครั้ง\n對\nขโมยน้อย\n5 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\n0%\nหมัดตรง\nสวนกลับ +20% · 1 ครั้ง\n0 MP · 1 ตา\nตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา\nรวบรวมปราณ\nMP +2 · หลบหลีก −15 จังหวะถัดไป\n0 MP · 1 ตา\nบันทึกการต่อสู้ (10)\n+",
+    "canvas": {
+      "testid": "battle-canvas",
+      "renderer": "three",
+      "ready": "true",
+      "reducedMotion": "false",
+      "impactCount": "4",
+      "castSeq": "3",
+      "fighterACharacter": "m1",
+      "fighterAMotion": "defeat",
+      "fighterAFrame": "15",
+      "fighterBCharacter": "bandit",
+      "fighterBMotion": "victory",
+      "fighterBFrame": "14",
+      "paused": "false",
+      "lastImpact": "3:0"
+    }
+  },
+  {
+    "ms": 2332.300000011921,
+    "text": "กำลังภายใน — โลกยุทธภพ\nการประลองสิ้นสุด\nตาที่ 4\nReviewer\n0 / 36 HP\n8 / 10 MP\nจังหวะโจมตี\n0%\nทรงพลัง(1)\nสวนกลับ +20% · 1 ครั้ง\n對\nขโมยน้อย\n5 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\n0%\nพ่ายแพ้\nขโมยน้อย ชนะ\nประลอง 4 ตา\nดำเนินเรื่อง →\nบันทึกการต่อสู้ (10)\n+",
+    "canvas": {
+      "testid": "battle-canvas",
+      "renderer": "three",
+      "ready": "true",
+      "reducedMotion": "false",
+      "impactCount": "4",
+      "castSeq": "3",
+      "fighterACharacter": "m1",
+      "fighterAMotion": "defeat",
+      "fighterAFrame": "15",
+      "fighterBCharacter": "bandit",
+      "fighterBMotion": "victory",
+      "fighterBFrame": "14",
+      "paused": "false",
+      "lastImpact": "3:0"
+    }
+  }
+]

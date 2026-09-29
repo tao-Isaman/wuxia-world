@@ -1,0 +1,191 @@
+{
+  "ok": true,
+  "command": {
+    "op": "click",
+    "name": "จุดหมาย",
+    "exact": false
+  },
+  "text": "กำลังภายใน — โลกยุทธภพ\nแตะพื้นเพื่อเดิน\nจุดหมาย −\n↗ นครหลวง\n↗ ย้อนกลับ\nผู้เดินทาง\nHP\n36/36\nMP\n10/10\nพลัง\n90/100\nเงิน 0\nW-EXP 0\n◇\nทางออกจากบ้าน (คฤหาสน์ตนเอง → นครหลวง)\n\nวันที่ 1 · ยามเช้า\n\nโปรไฟล์\nย่าม\nวิชา\nอาชีพ\nภารกิจ\nสำนัก\nพักผ่อน\nบันทึก",
+  "controls": [
+    {
+      "index": 0,
+      "tag": "BUTTON",
+      "role": null,
+      "ariaLabel": null,
+      "text": "จุดหมาย −",
+      "type": "button",
+      "disabled": false,
+      "box": {
+        "x": 732.5546875,
+        "y": 754,
+        "width": 63.6875,
+        "height": 44
+      }
+    },
+    {
+      "index": 1,
+      "tag": "BUTTON",
+      "role": null,
+      "ariaLabel": null,
+      "text": "↗ นครหลวง",
+      "type": "button",
+      "disabled": false,
+      "box": {
+        "x": 545,
+        "y": 660,
+        "width": 350,
+        "height": 43
+      }
+    },
+    {
+      "index": 2,
+      "tag": "BUTTON",
+      "role": null,
+      "ariaLabel": null,
+      "text": "↗ ย้อนกลับ",
+      "type": "button",
+      "disabled": false,
+      "box": {
+        "x": 545,
+        "y": 703,
+        "width": 350,
+        "height": 43
+      }
+    },
+    {
+      "index": 3,
+      "tag": "BUTTON",
+      "role": null,
+      "ariaLabel": "ย่อคำแนะนำการเดินทาง",
+      "text": "",
+      "type": "button",
+      "disabled": false,
+      "box": {
+        "x": 19,
+        "y": 172,
+        "width": 296,
+        "height": 44
+      }
+    },
+    {
+      "index": 4,
+      "tag": "BUTTON",
+      "role": null,
+      "ariaLabel": "โปรไฟล์",
+      "text": "โปรไฟล์",
+      "type": "button",
+      "disabled": false,
+      "box": {
+        "x": 458,
+        "y": 818,
+        "width": 62,
+        "height": 59
+      }
+    },
+    {
+      "index": 5,
+      "tag": "BUTTON",
+      "role": null,
+      "ariaLabel": "ย่าม",
+      "text": "ย่าม",
+      "type": "button",
+      "disabled": false,
+      "box": {
+        "x": 524,
+        "y": 818,
+        "width": 62,
+        "height": 59
+      }
+    },
+    {
+      "index": 6,
+      "tag": "BUTTON",
+      "role": null,
+      "ariaLabel": "วิชา",
+      "text": "วิชา",
+      "type": "button",
+      "disabled": false,
+      "box": {
+        "x": 590,
+        "y": 818,
+        "width": 62,
+        "height": 59
+      }
+    },
+    {
+      "index": 7,
+      "tag": "BUTTON",
+      "role": null,
+      "ariaLabel": "อาชีพ",
+      "text": "อาชีพ",
+      "type": "button",
+      "disabled": false,
+      "box": {
+        "x": 656,
+        "y": 818,
+        "width": 62,
+        "height": 59
+      }
+    },
+    {
+      "index": 8,
+      "tag": "BUTTON",
+      "role": null,
+      "ariaLabel": "ภารกิจ",
+      "text": "ภารกิจ",
+      "type": "button",
+      "disabled": false,
+      "box": {
+        "x": 722,
+        "y": 818,
+        "width": 62,
+        "height": 59
+      }
+    },
+    {
+      "index": 9,
+      "tag": "BUTTON",
+      "role": null,
+      "ariaLabel": "สำนัก",
+      "text": "สำนัก",
+      "type": "button",
+      "disabled": false,
+      "box": {
+        "x": 788,
+        "y": 818,
+        "width": 62,
+        "height": 59
+      }
+    },
+    {
+      "index": 10,
+      "tag": "BUTTON",
+      "role": null,
+      "ariaLabel": "พักผ่อน",
+      "text": "พักผ่อน",
+      "type": "button",
+      "disabled": false,
+      "box": {
+        "x": 854,
+        "y": 818,
+        "width": 62,
+        "height": 59
+      }
+    },
+    {
+      "index": 11,
+      "tag": "BUTTON",
+      "role": null,
+      "ariaLabel": "บันทึก",
+      "text": "บันทึก",
+      "type": "button",
+      "disabled": false,
+      "box": {
+        "x": 920,
+        "y": 818,
+        "width": 62,
+        "height": 59
+      }
+    }
+  ]
+}

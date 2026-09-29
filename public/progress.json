@@ -1,0 +1,189 @@
+{
+    "updated":  "2026-09-29T04:00:19.6205129Z",
+    "wave":  "Wave 11 — character readability across the cast",
+    "summary":  "The fresh neutral A/B review preferred the compact character candidate for clearer faces, hands and action silhouettes. Male, female and supporting cast builders are extending that direction; candidates remain inactive until complete frame and running-game review. Latest production passes the conversation, opening and investigation follow-up checks; an independent live playthrough is underway.",
+    "pieces":  [
+                   {
+                       "id":  "01",
+                       "name":  "Character silhouettes and detail",
+                       "status":  "revision",
+                       "owner":  "Three character-art builders + fresh critic",
+                       "detail":  "Neutral A/B review preferred the new M1 candidate at actual world scale. Full cast and matching hero directions are being prepared with original identities intact. No commercial parity claim."
+                   },
+                   {
+                       "id":  "02",
+                       "name":  "Walking and idle animation",
+                       "status":  "verified",
+                       "owner":  "World renderer builder",
+                       "detail":  "All eight hero bodies pass production idle, horizontal/north/south walk and retained-facing checks. Nearby NPCs now turn toward the player."
+                   },
+                   {
+                       "id":  "03",
+                       "name":  "Exploration camera and input",
+                       "status":  "verified",
+                       "owner":  "World renderer builder",
+                       "detail":  "Keyboard, touch, camera follow, modal pause, travel, reload and context recovery pass. Home/capital collision and path detours have 11 rule checks."
+                   },
+                   {
+                       "id":  "04",
+                       "name":  "Combat animation and impact",
+                       "status":  "verified",
+                       "owner":  "Battle renderer builder",
+                       "detail":  "Fresh actual captures confirm punches meet the defender, poses change and HP follows contact. Guard-to-strike combat completed with unchanged starter stats."
+                   },
+                   {
+                       "id":  "05",
+                       "name":  "World atmosphere and lighting",
+                       "status":  "verified",
+                       "owner":  "World renderer builder",
+                       "detail":  "Independent checks pass home/capital depth, collision, directional movement, night lantern pools and all four phone interaction endpoints. References still have stronger actor variety and architectural readability."
+                   },
+                   {
+                       "id":  "06",
+                       "name":  "Strategic combat choices",
+                       "status":  "verified",
+                       "owner":  "Combat choices builder",
+                       "detail":  "Fresh critic independently passed persistent touch stats, pause/resume and rotation. Landscape titles now 16 px, costs/explanations 12 px. All three starter choices fit alongside fighters and HP."
+                   },
+                   {
+                       "id":  "07",
+                       "name":  "First-session guidance",
+                       "status":  "verified",
+                       "owner":  "First-session builder",
+                       "detail":  "Latest production passes the complete errand, supplies, tactical training and earned upgrade flow. Clinic handoffs now return locally without rerolling arrival encounters; choices are numbered consecutively."
+                   },
+                   {
+                       "id":  "08",
+                       "name":  "Mobile and whole-game coherence",
+                       "status":  "review",
+                       "owner":  "Fresh integration reviewer",
+                       "detail":  "Latest production passes portrait/landscape controls, restored dialogue, visible open chest, same-canvas continuity and complete earned progression. Fresh independent visual recheck underway."
+                   },
+                   {
+                       "id":  "09",
+                       "name":  "Casual dialogue responses",
+                       "status":  "verified",
+                       "owner":  "Narrative builder",
+                       "detail":  "Production browser verifies real Lin/Wu responses, safe returns, unchanged quest state and a random monk meeting that clears the preceding local speaker."
+                   },
+                   {
+                       "id":  "10",
+                       "name":  "Missing-ledger investigation",
+                       "status":  "verified",
+                       "owner":  "Quest builder",
+                       "detail":  "Fresh ordinary play found Qing and completed ledger without a walkthrough. New production also opens the chest visibly, retains the canvas and restores the hero beside Qing after reload; exact reward remains once."
+                   },
+                   {
+                       "id":  "11",
+                       "name":  "Rumors and next activities",
+                       "status":  "verified",
+                       "owner":  "World-content builder",
+                       "detail":  "Authored capital rumors and saved listening history work. Dynamic rumor names resolve from real registry IDs; 104 template variants and NPC/sect events pass without unresolved tokens. Previously saved text stays unchanged."
+                   },
+                   {
+                       "id":  "12",
+                       "name":  "Sprite frame integrity",
+                       "status":  "verified",
+                       "owner":  "Atlas builder + fresh art critic",
+                       "detail":  "All 23 source sheets and 304 poses pass ownership and rendered integrity checks. New production renders and all fifteen gallery characters are clean; readability criticism remains separately open."
+                   },
+                   {
+                       "id":  "13",
+                       "name":  "Battle location identity",
+                       "status":  "review",
+                       "owner":  "Scene builder",
+                       "detail":  "Production street/practice-yard selection and responsive battle canvas pass. Rendered desktop/landscape outputs show both fighters on the open ground; fresh reference comparison underway."
+                   },
+                   {
+                       "id":  "14",
+                       "name":  "Restored conversation staging",
+                       "status":  "verified",
+                       "owner":  "World renderer builder",
+                       "detail":  "Actual phone reload places hero beside Qing on connected ground, facing him, with both actors above the dialogue. Position/input/canvas assertions pass; no gameplay or save-schema change."
+                   }
+               ],
+    "reviews":  [
+                    {
+                        "title":  "Baseline: reference wins",
+                        "verdict":  "Largest gap: characters do not inhabit the environment convincingly. Fix gate/well occlusion, articulated motion and scale before more decorative detail."
+                    },
+                    {
+                        "title":  "Other observed gaps",
+                        "verdict":  "No clear first objective, understated battle turn/choice UI, and a landscape resize defect. Fresh reviewers will inspect these fixes in the running game."
+                    },
+                    {
+                        "title":  "Wave 1 A/B: reference still preferred",
+                        "verdict":  "Largest gap: actor size/color and black-backed markers break visual unity. Review also found side-facing north movement and walking through capital storefronts. Builder is revising these. Required shared context prevents claiming strict blinding."
+                    },
+                    {
+                        "title":  "Combat review: landscape fails",
+                        "verdict":  "Actions and HP work, hit timing is correct, Guard/Recover costs are honest. At 844×390 the tall battle panel separates status from actions. Punch contact also falls short of the target. Builder is revising both."
+                    },
+                    {
+                        "title":  "Combat revision: layout and contact pass",
+                        "verdict":  "Fresh reviewer verified actions, costs, fighters and status together at 1440×900,390×844 and 844×390. Touch disclosure fix is being independently retried."
+                    },
+                    {
+                        "title":  "Whole-game revision: opening quest completes",
+                        "verdict":  "The first recommendation previously required advanced herbalism. New local errand completed without edited saves. Purchases and quest reward survive reload. Next gap: preparation after the reward."
+                    },
+                    {
+                        "title":  "Opening preparation: passed",
+                        "verdict":  "Actual store shows HP effects before buying. The optional first-potion hint shows real price, heal amount and WEXP gap, then disappears after purchase. Portrait/landscape menus and reload pass."
+                    },
+                    {
+                        "title":  "Production regression: passed",
+                        "verdict":  "All 8 character directions/poses, reduced motion, WebGL recovery, travel/NPC/reload, battle completion with the log open, touch stats, rotation and legacy-save migration pass. Fresh world comparison remains underway."
+                    },
+                    {
+                        "title":  "Fresh world review: identity mismatch",
+                        "verdict":  "Movement, roof depth, market approach and phone controls work. Lin\u0027s world age/costume differed from his portrait; builder is matching identity and making his conversation staging less cramped."
+                    },
+                    {
+                        "title":  "Next challenge gap",
+                        "verdict":  "The successful first errand leads to useful supplies, but the next activities are unranked. An optional, clearly described beginner duel will connect the reward to tactical play and progression."
+                    },
+                    {
+                        "title":  "Wave 6 independent verdict",
+                        "verdict":  "World interaction fixes pass in both phone orientations. Normal quest, supplies, tactical practice, skill upgrade and reload pass. References still win on NPC individuality and memorable progression payoff. Both gaps are now with builders."
+                    },
+                    {
+                        "title":  "Wave 7 regression repairs verified",
+                        "verdict":  "Browser checks found a missed mutable-state transition and a reward panel behind the canvas. Independent snapshots and correct stacking fix both; visible reward → Continue → purchase → duel → upgrade acknowledgment → reload now passes in production."
+                    },
+                    {
+                        "title":  "Fresh unguided play: confusing goodbye",
+                        "verdict":  "The Feng greeting offers job previews without an immediate leave choice. A preview can be declined, so this is not forced quest acceptance. Builder is adding clear exits to equivalent spy greetings."
+                    },
+                    {
+                        "title":  "Wave 7 whole-game verdict: reference still wins",
+                        "verdict":  "No opening progression blocker. Largest gap: conversations remove actors from the town, and successful work changes resources without a visible world response. Wave 8 addresses both. Mandatory shared context prevents a strict blind-study claim."
+                    },
+                    {
+                        "title":  "Wave 8 live review: unanswered question",
+                        "verdict":  "After an ordinary thief encounter, Lin greeting keeps the scene assembled. Asking about medicinal herbs produces the same lines/options. Builder is investigating this response while independent play continues."
+                    },
+                    {
+                        "title":  "Wave 8 extended play: next investigation is broken",
+                        "verdict":  "The opening and visible clinic consequence work. After upgrading, the lost-ledger quest asks for a nonexistent clerk/office; the reviewer guessed the palace and found generic activities instead. A complete playable capital investigation is required next."
+                    },
+                    {
+                        "title":  "Wave 9 whole-game review: playable, reference preferred",
+                        "verdict":  "Fresh ordinary play completed clinic, supplies, tactical practice, upgrade and ledger; both palace exits and reload worked. Biggest gap remains character/event staging. Closed chest, small portrait, palace wording and weak dialogue overflow cue led to the next revision."
+                    },
+                    {
+                        "title":  "Wave 10 neutral A/B: compact candidate preferred",
+                        "verdict":  "Before the mapping was revealed, the critic chose B for the larger face, clearer hands/sleeves and punch silhouette. Base-sheet stills and deterministic walk captures support this direction; full cast, new directions and actual battle playback still need review."
+                    }
+                ],
+    "checks":  [
+                   "Wave 10 production build passes; main route 471 kB first-load JS, progress 111 kB",
+                   "Lint passes with 6 existing warnings",
+                   "10 runtime, 12 combat and 18 navigation/restored-placement checks pass",
+                   "Opening, rumor initialization/history and capital investigation real-store suites pass",
+                   "Content audit: 155 NPCs, 276 unique quests, 986 scenes; all references resolve",
+                   "All 11 wave 10 production browser cases pass together in 2.6 minutes",
+                   "Actual store receipt regression passes: one completion receipt, correct deltas, no replay or duplicate reward",
+                   "Production art loading passes: no title directions, no extra capital NPC directions, all 15 gallery characters render"
+               ]
+}

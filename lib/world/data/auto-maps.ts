@@ -136,7 +136,7 @@ function build(id: string): LocationMapDef | undefined {
     spots.push({ kind: "rest", ...ZONES.rest, icon: "🍵", label: "โรงเตี๊ยม" });
     spots.push({ kind: "rumor", ...ZONES.rumor, icon: "🍶", label: "ฟังข่าวลือ" });
   } else if (id.startsWith("temple_") || id.startsWith("palace_")) {
-    spots.push({ kind: "rest", ...ZONES.rest, icon: "🏛", label: "พักที่วัด" });
+    spots.push({ kind: "rest", ...ZONES.rest, icon: "🏛", label: id.startsWith("palace_") ? "พักในลานวัง" : "พักที่วัด" });
   }
   if (canPracticeAt(scene)) {
     spots.push({ kind: "practice", ...ZONES.practice, icon: "🧘", label: "ฝึกฝน" });

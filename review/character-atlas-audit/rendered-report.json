@@ -1,0 +1,1702 @@
+[
+  {
+    "id": "m1",
+    "sameBase": true,
+    "sameFull": true,
+    "cacheVariantsCorrect": true,
+    "baseRows": 4,
+    "rows": 6,
+    "expectedRows": 6,
+    "directional": true,
+    "frames": [
+      {
+        "frame": 0,
+        "pixels": 4176,
+        "edgePixels": 0
+      },
+      {
+        "frame": 1,
+        "pixels": 4201,
+        "edgePixels": 0
+      },
+      {
+        "frame": 2,
+        "pixels": 4210,
+        "edgePixels": 0
+      },
+      {
+        "frame": 3,
+        "pixels": 4151,
+        "edgePixels": 0
+      },
+      {
+        "frame": 4,
+        "pixels": 4150,
+        "edgePixels": 0
+      },
+      {
+        "frame": 5,
+        "pixels": 3886,
+        "edgePixels": 0
+      },
+      {
+        "frame": 6,
+        "pixels": 4125,
+        "edgePixels": 0
+      },
+      {
+        "frame": 7,
+        "pixels": 3878,
+        "edgePixels": 0
+      },
+      {
+        "frame": 8,
+        "pixels": 4585,
+        "edgePixels": 0
+      },
+      {
+        "frame": 9,
+        "pixels": 5020,
+        "edgePixels": 0
+      },
+      {
+        "frame": 10,
+        "pixels": 4743,
+        "edgePixels": 0
+      },
+      {
+        "frame": 11,
+        "pixels": 4433,
+        "edgePixels": 0
+      },
+      {
+        "frame": 12,
+        "pixels": 4863,
+        "edgePixels": 0
+      },
+      {
+        "frame": 13,
+        "pixels": 4452,
+        "edgePixels": 0
+      },
+      {
+        "frame": 14,
+        "pixels": 4004,
+        "edgePixels": 0
+      },
+      {
+        "frame": 15,
+        "pixels": 3281,
+        "edgePixels": 0
+      },
+      {
+        "frame": 16,
+        "pixels": 4078,
+        "edgePixels": 0
+      },
+      {
+        "frame": 17,
+        "pixels": 3767,
+        "edgePixels": 0
+      },
+      {
+        "frame": 18,
+        "pixels": 4006,
+        "edgePixels": 0
+      },
+      {
+        "frame": 19,
+        "pixels": 3672,
+        "edgePixels": 0
+      },
+      {
+        "frame": 20,
+        "pixels": 3963,
+        "edgePixels": 0
+      },
+      {
+        "frame": 21,
+        "pixels": 3662,
+        "edgePixels": 0
+      },
+      {
+        "frame": 22,
+        "pixels": 3973,
+        "edgePixels": 0
+      },
+      {
+        "frame": 23,
+        "pixels": 3665,
+        "edgePixels": 0
+      }
+    ]
+  },
+  {
+    "id": "m2",
+    "sameBase": true,
+    "sameFull": true,
+    "cacheVariantsCorrect": true,
+    "baseRows": 4,
+    "rows": 6,
+    "expectedRows": 6,
+    "directional": true,
+    "frames": [
+      {
+        "frame": 0,
+        "pixels": 4567,
+        "edgePixels": 0
+      },
+      {
+        "frame": 1,
+        "pixels": 4584,
+        "edgePixels": 0
+      },
+      {
+        "frame": 2,
+        "pixels": 4593,
+        "edgePixels": 0
+      },
+      {
+        "frame": 3,
+        "pixels": 4595,
+        "edgePixels": 0
+      },
+      {
+        "frame": 4,
+        "pixels": 4245,
+        "edgePixels": 0
+      },
+      {
+        "frame": 5,
+        "pixels": 3316,
+        "edgePixels": 0
+      },
+      {
+        "frame": 6,
+        "pixels": 3838,
+        "edgePixels": 0
+      },
+      {
+        "frame": 7,
+        "pixels": 3164,
+        "edgePixels": 0
+      },
+      {
+        "frame": 8,
+        "pixels": 4030,
+        "edgePixels": 0
+      },
+      {
+        "frame": 9,
+        "pixels": 3995,
+        "edgePixels": 0
+      },
+      {
+        "frame": 10,
+        "pixels": 4329,
+        "edgePixels": 0
+      },
+      {
+        "frame": 11,
+        "pixels": 3970,
+        "edgePixels": 0
+      },
+      {
+        "frame": 12,
+        "pixels": 4363,
+        "edgePixels": 0
+      },
+      {
+        "frame": 13,
+        "pixels": 3764,
+        "edgePixels": 0
+      },
+      {
+        "frame": 14,
+        "pixels": 4334,
+        "edgePixels": 0
+      },
+      {
+        "frame": 15,
+        "pixels": 3307,
+        "edgePixels": 0
+      },
+      {
+        "frame": 16,
+        "pixels": 3810,
+        "edgePixels": 0
+      },
+      {
+        "frame": 17,
+        "pixels": 3795,
+        "edgePixels": 0
+      },
+      {
+        "frame": 18,
+        "pixels": 3682,
+        "edgePixels": 0
+      },
+      {
+        "frame": 19,
+        "pixels": 3754,
+        "edgePixels": 0
+      },
+      {
+        "frame": 20,
+        "pixels": 3895,
+        "edgePixels": 0
+      },
+      {
+        "frame": 21,
+        "pixels": 3938,
+        "edgePixels": 0
+      },
+      {
+        "frame": 22,
+        "pixels": 3896,
+        "edgePixels": 0
+      },
+      {
+        "frame": 23,
+        "pixels": 3850,
+        "edgePixels": 0
+      }
+    ]
+  },
+  {
+    "id": "m3",
+    "sameBase": true,
+    "sameFull": true,
+    "cacheVariantsCorrect": true,
+    "baseRows": 4,
+    "rows": 6,
+    "expectedRows": 6,
+    "directional": true,
+    "frames": [
+      {
+        "frame": 0,
+        "pixels": 3800,
+        "edgePixels": 0
+      },
+      {
+        "frame": 1,
+        "pixels": 4054,
+        "edgePixels": 0
+      },
+      {
+        "frame": 2,
+        "pixels": 4118,
+        "edgePixels": 0
+      },
+      {
+        "frame": 3,
+        "pixels": 4083,
+        "edgePixels": 0
+      },
+      {
+        "frame": 4,
+        "pixels": 3845,
+        "edgePixels": 0
+      },
+      {
+        "frame": 5,
+        "pixels": 3452,
+        "edgePixels": 0
+      },
+      {
+        "frame": 6,
+        "pixels": 3790,
+        "edgePixels": 0
+      },
+      {
+        "frame": 7,
+        "pixels": 3506,
+        "edgePixels": 0
+      },
+      {
+        "frame": 8,
+        "pixels": 3728,
+        "edgePixels": 0
+      },
+      {
+        "frame": 9,
+        "pixels": 4116,
+        "edgePixels": 0
+      },
+      {
+        "frame": 10,
+        "pixels": 3958,
+        "edgePixels": 0
+      },
+      {
+        "frame": 11,
+        "pixels": 3461,
+        "edgePixels": 0
+      },
+      {
+        "frame": 12,
+        "pixels": 4159,
+        "edgePixels": 0
+      },
+      {
+        "frame": 13,
+        "pixels": 3888,
+        "edgePixels": 0
+      },
+      {
+        "frame": 14,
+        "pixels": 4217,
+        "edgePixels": 0
+      },
+      {
+        "frame": 15,
+        "pixels": 3275,
+        "edgePixels": 0
+      },
+      {
+        "frame": 16,
+        "pixels": 3601,
+        "edgePixels": 0
+      },
+      {
+        "frame": 17,
+        "pixels": 3548,
+        "edgePixels": 0
+      },
+      {
+        "frame": 18,
+        "pixels": 3664,
+        "edgePixels": 0
+      },
+      {
+        "frame": 19,
+        "pixels": 3385,
+        "edgePixels": 0
+      },
+      {
+        "frame": 20,
+        "pixels": 3647,
+        "edgePixels": 0
+      },
+      {
+        "frame": 21,
+        "pixels": 3472,
+        "edgePixels": 0
+      },
+      {
+        "frame": 22,
+        "pixels": 3745,
+        "edgePixels": 0
+      },
+      {
+        "frame": 23,
+        "pixels": 3465,
+        "edgePixels": 0
+      }
+    ]
+  },
+  {
+    "id": "m4",
+    "sameBase": true,
+    "sameFull": true,
+    "cacheVariantsCorrect": true,
+    "baseRows": 4,
+    "rows": 6,
+    "expectedRows": 6,
+    "directional": true,
+    "frames": [
+      {
+        "frame": 0,
+        "pixels": 4326,
+        "edgePixels": 0
+      },
+      {
+        "frame": 1,
+        "pixels": 4437,
+        "edgePixels": 0
+      },
+      {
+        "frame": 2,
+        "pixels": 4400,
+        "edgePixels": 0
+      },
+      {
+        "frame": 3,
+        "pixels": 4502,
+        "edgePixels": 0
+      },
+      {
+        "frame": 4,
+        "pixels": 4382,
+        "edgePixels": 0
+      },
+      {
+        "frame": 5,
+        "pixels": 4294,
+        "edgePixels": 0
+      },
+      {
+        "frame": 6,
+        "pixels": 4572,
+        "edgePixels": 0
+      },
+      {
+        "frame": 7,
+        "pixels": 4204,
+        "edgePixels": 0
+      },
+      {
+        "frame": 8,
+        "pixels": 4645,
+        "edgePixels": 0
+      },
+      {
+        "frame": 9,
+        "pixels": 5082,
+        "edgePixels": 0
+      },
+      {
+        "frame": 10,
+        "pixels": 4990,
+        "edgePixels": 0
+      },
+      {
+        "frame": 11,
+        "pixels": 4539,
+        "edgePixels": 0
+      },
+      {
+        "frame": 12,
+        "pixels": 4623,
+        "edgePixels": 0
+      },
+      {
+        "frame": 13,
+        "pixels": 4496,
+        "edgePixels": 0
+      },
+      {
+        "frame": 14,
+        "pixels": 4772,
+        "edgePixels": 0
+      },
+      {
+        "frame": 15,
+        "pixels": 3504,
+        "edgePixels": 0
+      },
+      {
+        "frame": 16,
+        "pixels": 3674,
+        "edgePixels": 0
+      },
+      {
+        "frame": 17,
+        "pixels": 3472,
+        "edgePixels": 0
+      },
+      {
+        "frame": 18,
+        "pixels": 3813,
+        "edgePixels": 0
+      },
+      {
+        "frame": 19,
+        "pixels": 3499,
+        "edgePixels": 0
+      },
+      {
+        "frame": 20,
+        "pixels": 3948,
+        "edgePixels": 0
+      },
+      {
+        "frame": 21,
+        "pixels": 3639,
+        "edgePixels": 0
+      },
+      {
+        "frame": 22,
+        "pixels": 4047,
+        "edgePixels": 0
+      },
+      {
+        "frame": 23,
+        "pixels": 3632,
+        "edgePixels": 0
+      }
+    ]
+  },
+  {
+    "id": "f1",
+    "sameBase": true,
+    "sameFull": true,
+    "cacheVariantsCorrect": true,
+    "baseRows": 4,
+    "rows": 6,
+    "expectedRows": 6,
+    "directional": true,
+    "frames": [
+      {
+        "frame": 0,
+        "pixels": 4411,
+        "edgePixels": 0
+      },
+      {
+        "frame": 1,
+        "pixels": 4473,
+        "edgePixels": 0
+      },
+      {
+        "frame": 2,
+        "pixels": 4603,
+        "edgePixels": 0
+      },
+      {
+        "frame": 3,
+        "pixels": 4526,
+        "edgePixels": 0
+      },
+      {
+        "frame": 4,
+        "pixels": 4713,
+        "edgePixels": 0
+      },
+      {
+        "frame": 5,
+        "pixels": 4105,
+        "edgePixels": 0
+      },
+      {
+        "frame": 6,
+        "pixels": 4610,
+        "edgePixels": 0
+      },
+      {
+        "frame": 7,
+        "pixels": 4165,
+        "edgePixels": 0
+      },
+      {
+        "frame": 8,
+        "pixels": 4858,
+        "edgePixels": 0
+      },
+      {
+        "frame": 9,
+        "pixels": 4836,
+        "edgePixels": 0
+      },
+      {
+        "frame": 10,
+        "pixels": 5324,
+        "edgePixels": 0
+      },
+      {
+        "frame": 11,
+        "pixels": 4453,
+        "edgePixels": 0
+      },
+      {
+        "frame": 12,
+        "pixels": 5137,
+        "edgePixels": 0
+      },
+      {
+        "frame": 13,
+        "pixels": 4826,
+        "edgePixels": 0
+      },
+      {
+        "frame": 14,
+        "pixels": 4474,
+        "edgePixels": 0
+      },
+      {
+        "frame": 15,
+        "pixels": 2982,
+        "edgePixels": 0
+      },
+      {
+        "frame": 16,
+        "pixels": 4028,
+        "edgePixels": 0
+      },
+      {
+        "frame": 17,
+        "pixels": 3813,
+        "edgePixels": 0
+      },
+      {
+        "frame": 18,
+        "pixels": 4002,
+        "edgePixels": 0
+      },
+      {
+        "frame": 19,
+        "pixels": 3819,
+        "edgePixels": 0
+      },
+      {
+        "frame": 20,
+        "pixels": 3837,
+        "edgePixels": 0
+      },
+      {
+        "frame": 21,
+        "pixels": 3870,
+        "edgePixels": 0
+      },
+      {
+        "frame": 22,
+        "pixels": 3956,
+        "edgePixels": 0
+      },
+      {
+        "frame": 23,
+        "pixels": 4002,
+        "edgePixels": 0
+      }
+    ]
+  },
+  {
+    "id": "f2",
+    "sameBase": true,
+    "sameFull": true,
+    "cacheVariantsCorrect": true,
+    "baseRows": 4,
+    "rows": 6,
+    "expectedRows": 6,
+    "directional": true,
+    "frames": [
+      {
+        "frame": 0,
+        "pixels": 3542,
+        "edgePixels": 0
+      },
+      {
+        "frame": 1,
+        "pixels": 3560,
+        "edgePixels": 0
+      },
+      {
+        "frame": 2,
+        "pixels": 3611,
+        "edgePixels": 0
+      },
+      {
+        "frame": 3,
+        "pixels": 3670,
+        "edgePixels": 0
+      },
+      {
+        "frame": 4,
+        "pixels": 3425,
+        "edgePixels": 0
+      },
+      {
+        "frame": 5,
+        "pixels": 3333,
+        "edgePixels": 0
+      },
+      {
+        "frame": 6,
+        "pixels": 3337,
+        "edgePixels": 0
+      },
+      {
+        "frame": 7,
+        "pixels": 3199,
+        "edgePixels": 0
+      },
+      {
+        "frame": 8,
+        "pixels": 3284,
+        "edgePixels": 0
+      },
+      {
+        "frame": 9,
+        "pixels": 3269,
+        "edgePixels": 0
+      },
+      {
+        "frame": 10,
+        "pixels": 3468,
+        "edgePixels": 0
+      },
+      {
+        "frame": 11,
+        "pixels": 3114,
+        "edgePixels": 0
+      },
+      {
+        "frame": 12,
+        "pixels": 3451,
+        "edgePixels": 0
+      },
+      {
+        "frame": 13,
+        "pixels": 3069,
+        "edgePixels": 0
+      },
+      {
+        "frame": 14,
+        "pixels": 3495,
+        "edgePixels": 0
+      },
+      {
+        "frame": 15,
+        "pixels": 2137,
+        "edgePixels": 0
+      },
+      {
+        "frame": 16,
+        "pixels": 3526,
+        "edgePixels": 0
+      },
+      {
+        "frame": 17,
+        "pixels": 3519,
+        "edgePixels": 0
+      },
+      {
+        "frame": 18,
+        "pixels": 3548,
+        "edgePixels": 0
+      },
+      {
+        "frame": 19,
+        "pixels": 3677,
+        "edgePixels": 0
+      },
+      {
+        "frame": 20,
+        "pixels": 3620,
+        "edgePixels": 0
+      },
+      {
+        "frame": 21,
+        "pixels": 3594,
+        "edgePixels": 0
+      },
+      {
+        "frame": 22,
+        "pixels": 3601,
+        "edgePixels": 0
+      },
+      {
+        "frame": 23,
+        "pixels": 3545,
+        "edgePixels": 0
+      }
+    ]
+  },
+  {
+    "id": "f3",
+    "sameBase": true,
+    "sameFull": true,
+    "cacheVariantsCorrect": true,
+    "baseRows": 4,
+    "rows": 6,
+    "expectedRows": 6,
+    "directional": true,
+    "frames": [
+      {
+        "frame": 0,
+        "pixels": 5451,
+        "edgePixels": 0
+      },
+      {
+        "frame": 1,
+        "pixels": 5351,
+        "edgePixels": 0
+      },
+      {
+        "frame": 2,
+        "pixels": 5329,
+        "edgePixels": 0
+      },
+      {
+        "frame": 3,
+        "pixels": 5527,
+        "edgePixels": 0
+      },
+      {
+        "frame": 4,
+        "pixels": 5194,
+        "edgePixels": 0
+      },
+      {
+        "frame": 5,
+        "pixels": 4956,
+        "edgePixels": 0
+      },
+      {
+        "frame": 6,
+        "pixels": 5189,
+        "edgePixels": 0
+      },
+      {
+        "frame": 7,
+        "pixels": 4864,
+        "edgePixels": 0
+      },
+      {
+        "frame": 8,
+        "pixels": 5307,
+        "edgePixels": 0
+      },
+      {
+        "frame": 9,
+        "pixels": 5718,
+        "edgePixels": 0
+      },
+      {
+        "frame": 10,
+        "pixels": 5741,
+        "edgePixels": 0
+      },
+      {
+        "frame": 11,
+        "pixels": 4947,
+        "edgePixels": 0
+      },
+      {
+        "frame": 12,
+        "pixels": 5249,
+        "edgePixels": 0
+      },
+      {
+        "frame": 13,
+        "pixels": 5127,
+        "edgePixels": 0
+      },
+      {
+        "frame": 14,
+        "pixels": 5771,
+        "edgePixels": 0
+      },
+      {
+        "frame": 15,
+        "pixels": 3504,
+        "edgePixels": 0
+      },
+      {
+        "frame": 16,
+        "pixels": 4917,
+        "edgePixels": 0
+      },
+      {
+        "frame": 17,
+        "pixels": 4349,
+        "edgePixels": 0
+      },
+      {
+        "frame": 18,
+        "pixels": 4567,
+        "edgePixels": 0
+      },
+      {
+        "frame": 19,
+        "pixels": 4165,
+        "edgePixels": 0
+      },
+      {
+        "frame": 20,
+        "pixels": 5134,
+        "edgePixels": 0
+      },
+      {
+        "frame": 21,
+        "pixels": 4546,
+        "edgePixels": 0
+      },
+      {
+        "frame": 22,
+        "pixels": 5001,
+        "edgePixels": 0
+      },
+      {
+        "frame": 23,
+        "pixels": 4374,
+        "edgePixels": 0
+      }
+    ]
+  },
+  {
+    "id": "f4",
+    "sameBase": true,
+    "sameFull": true,
+    "cacheVariantsCorrect": true,
+    "baseRows": 4,
+    "rows": 6,
+    "expectedRows": 6,
+    "directional": true,
+    "frames": [
+      {
+        "frame": 0,
+        "pixels": 4230,
+        "edgePixels": 0
+      },
+      {
+        "frame": 1,
+        "pixels": 4171,
+        "edgePixels": 0
+      },
+      {
+        "frame": 2,
+        "pixels": 4169,
+        "edgePixels": 0
+      },
+      {
+        "frame": 3,
+        "pixels": 4290,
+        "edgePixels": 0
+      },
+      {
+        "frame": 4,
+        "pixels": 4374,
+        "edgePixels": 0
+      },
+      {
+        "frame": 5,
+        "pixels": 4162,
+        "edgePixels": 0
+      },
+      {
+        "frame": 6,
+        "pixels": 4144,
+        "edgePixels": 0
+      },
+      {
+        "frame": 7,
+        "pixels": 4146,
+        "edgePixels": 0
+      },
+      {
+        "frame": 8,
+        "pixels": 4210,
+        "edgePixels": 0
+      },
+      {
+        "frame": 9,
+        "pixels": 4678,
+        "edgePixels": 0
+      },
+      {
+        "frame": 10,
+        "pixels": 4668,
+        "edgePixels": 0
+      },
+      {
+        "frame": 11,
+        "pixels": 4159,
+        "edgePixels": 0
+      },
+      {
+        "frame": 12,
+        "pixels": 4306,
+        "edgePixels": 0
+      },
+      {
+        "frame": 13,
+        "pixels": 3979,
+        "edgePixels": 0
+      },
+      {
+        "frame": 14,
+        "pixels": 3994,
+        "edgePixels": 0
+      },
+      {
+        "frame": 15,
+        "pixels": 3220,
+        "edgePixels": 0
+      },
+      {
+        "frame": 16,
+        "pixels": 3623,
+        "edgePixels": 0
+      },
+      {
+        "frame": 17,
+        "pixels": 3736,
+        "edgePixels": 0
+      },
+      {
+        "frame": 18,
+        "pixels": 3700,
+        "edgePixels": 0
+      },
+      {
+        "frame": 19,
+        "pixels": 3556,
+        "edgePixels": 0
+      },
+      {
+        "frame": 20,
+        "pixels": 3594,
+        "edgePixels": 0
+      },
+      {
+        "frame": 21,
+        "pixels": 3577,
+        "edgePixels": 0
+      },
+      {
+        "frame": 22,
+        "pixels": 3651,
+        "edgePixels": 0
+      },
+      {
+        "frame": 23,
+        "pixels": 3637,
+        "edgePixels": 0
+      }
+    ]
+  },
+  {
+    "id": "elder",
+    "sameBase": true,
+    "sameFull": true,
+    "cacheVariantsCorrect": true,
+    "baseRows": 4,
+    "rows": 4,
+    "expectedRows": 4,
+    "directional": false,
+    "frames": [
+      {
+        "frame": 0,
+        "pixels": 4926,
+        "edgePixels": 0
+      },
+      {
+        "frame": 1,
+        "pixels": 4888,
+        "edgePixels": 0
+      },
+      {
+        "frame": 2,
+        "pixels": 5040,
+        "edgePixels": 0
+      },
+      {
+        "frame": 3,
+        "pixels": 4900,
+        "edgePixels": 0
+      },
+      {
+        "frame": 4,
+        "pixels": 5335,
+        "edgePixels": 0
+      },
+      {
+        "frame": 5,
+        "pixels": 4978,
+        "edgePixels": 0
+      },
+      {
+        "frame": 6,
+        "pixels": 4843,
+        "edgePixels": 0
+      },
+      {
+        "frame": 7,
+        "pixels": 4828,
+        "edgePixels": 0
+      },
+      {
+        "frame": 8,
+        "pixels": 5079,
+        "edgePixels": 0
+      },
+      {
+        "frame": 9,
+        "pixels": 5048,
+        "edgePixels": 0
+      },
+      {
+        "frame": 10,
+        "pixels": 5671,
+        "edgePixels": 0
+      },
+      {
+        "frame": 11,
+        "pixels": 4617,
+        "edgePixels": 0
+      },
+      {
+        "frame": 12,
+        "pixels": 5471,
+        "edgePixels": 0
+      },
+      {
+        "frame": 13,
+        "pixels": 4844,
+        "edgePixels": 0
+      },
+      {
+        "frame": 14,
+        "pixels": 5352,
+        "edgePixels": 0
+      },
+      {
+        "frame": 15,
+        "pixels": 3734,
+        "edgePixels": 0
+      }
+    ]
+  },
+  {
+    "id": "monk",
+    "sameBase": true,
+    "sameFull": true,
+    "cacheVariantsCorrect": true,
+    "baseRows": 4,
+    "rows": 4,
+    "expectedRows": 4,
+    "directional": false,
+    "frames": [
+      {
+        "frame": 0,
+        "pixels": 3476,
+        "edgePixels": 0
+      },
+      {
+        "frame": 1,
+        "pixels": 3730,
+        "edgePixels": 0
+      },
+      {
+        "frame": 2,
+        "pixels": 3706,
+        "edgePixels": 0
+      },
+      {
+        "frame": 3,
+        "pixels": 3699,
+        "edgePixels": 0
+      },
+      {
+        "frame": 4,
+        "pixels": 3988,
+        "edgePixels": 0
+      },
+      {
+        "frame": 5,
+        "pixels": 3498,
+        "edgePixels": 0
+      },
+      {
+        "frame": 6,
+        "pixels": 3496,
+        "edgePixels": 0
+      },
+      {
+        "frame": 7,
+        "pixels": 3181,
+        "edgePixels": 0
+      },
+      {
+        "frame": 8,
+        "pixels": 3906,
+        "edgePixels": 0
+      },
+      {
+        "frame": 9,
+        "pixels": 4176,
+        "edgePixels": 0
+      },
+      {
+        "frame": 10,
+        "pixels": 4154,
+        "edgePixels": 0
+      },
+      {
+        "frame": 11,
+        "pixels": 3779,
+        "edgePixels": 0
+      },
+      {
+        "frame": 12,
+        "pixels": 4293,
+        "edgePixels": 0
+      },
+      {
+        "frame": 13,
+        "pixels": 3725,
+        "edgePixels": 0
+      },
+      {
+        "frame": 14,
+        "pixels": 3678,
+        "edgePixels": 0
+      },
+      {
+        "frame": 15,
+        "pixels": 3336,
+        "edgePixels": 0
+      }
+    ]
+  },
+  {
+    "id": "merchant",
+    "sameBase": true,
+    "sameFull": true,
+    "cacheVariantsCorrect": true,
+    "baseRows": 4,
+    "rows": 4,
+    "expectedRows": 4,
+    "directional": false,
+    "frames": [
+      {
+        "frame": 0,
+        "pixels": 4349,
+        "edgePixels": 0
+      },
+      {
+        "frame": 1,
+        "pixels": 4415,
+        "edgePixels": 0
+      },
+      {
+        "frame": 2,
+        "pixels": 4501,
+        "edgePixels": 0
+      },
+      {
+        "frame": 3,
+        "pixels": 4525,
+        "edgePixels": 0
+      },
+      {
+        "frame": 4,
+        "pixels": 4589,
+        "edgePixels": 0
+      },
+      {
+        "frame": 5,
+        "pixels": 4615,
+        "edgePixels": 0
+      },
+      {
+        "frame": 6,
+        "pixels": 4639,
+        "edgePixels": 0
+      },
+      {
+        "frame": 7,
+        "pixels": 4381,
+        "edgePixels": 0
+      },
+      {
+        "frame": 8,
+        "pixels": 4545,
+        "edgePixels": 0
+      },
+      {
+        "frame": 9,
+        "pixels": 5007,
+        "edgePixels": 0
+      },
+      {
+        "frame": 10,
+        "pixels": 5323,
+        "edgePixels": 0
+      },
+      {
+        "frame": 11,
+        "pixels": 4384,
+        "edgePixels": 0
+      },
+      {
+        "frame": 12,
+        "pixels": 4829,
+        "edgePixels": 0
+      },
+      {
+        "frame": 13,
+        "pixels": 4228,
+        "edgePixels": 0
+      },
+      {
+        "frame": 14,
+        "pixels": 4593,
+        "edgePixels": 0
+      },
+      {
+        "frame": 15,
+        "pixels": 3214,
+        "edgePixels": 0
+      }
+    ]
+  },
+  {
+    "id": "bandit",
+    "sameBase": true,
+    "sameFull": true,
+    "cacheVariantsCorrect": true,
+    "baseRows": 4,
+    "rows": 4,
+    "expectedRows": 4,
+    "directional": false,
+    "frames": [
+      {
+        "frame": 0,
+        "pixels": 3976,
+        "edgePixels": 0
+      },
+      {
+        "frame": 1,
+        "pixels": 3972,
+        "edgePixels": 0
+      },
+      {
+        "frame": 2,
+        "pixels": 3999,
+        "edgePixels": 0
+      },
+      {
+        "frame": 3,
+        "pixels": 3944,
+        "edgePixels": 0
+      },
+      {
+        "frame": 4,
+        "pixels": 4125,
+        "edgePixels": 0
+      },
+      {
+        "frame": 5,
+        "pixels": 3825,
+        "edgePixels": 0
+      },
+      {
+        "frame": 6,
+        "pixels": 4140,
+        "edgePixels": 0
+      },
+      {
+        "frame": 7,
+        "pixels": 3633,
+        "edgePixels": 0
+      },
+      {
+        "frame": 8,
+        "pixels": 4124,
+        "edgePixels": 0
+      },
+      {
+        "frame": 9,
+        "pixels": 4576,
+        "edgePixels": 0
+      },
+      {
+        "frame": 10,
+        "pixels": 4503,
+        "edgePixels": 0
+      },
+      {
+        "frame": 11,
+        "pixels": 3997,
+        "edgePixels": 0
+      },
+      {
+        "frame": 12,
+        "pixels": 4314,
+        "edgePixels": 0
+      },
+      {
+        "frame": 13,
+        "pixels": 4132,
+        "edgePixels": 0
+      },
+      {
+        "frame": 14,
+        "pixels": 4352,
+        "edgePixels": 0
+      },
+      {
+        "frame": 15,
+        "pixels": 3583,
+        "edgePixels": 0
+      }
+    ]
+  },
+  {
+    "id": "feng",
+    "sameBase": true,
+    "sameFull": true,
+    "cacheVariantsCorrect": true,
+    "baseRows": 4,
+    "rows": 4,
+    "expectedRows": 4,
+    "directional": false,
+    "frames": [
+      {
+        "frame": 0,
+        "pixels": 4124,
+        "edgePixels": 0
+      },
+      {
+        "frame": 1,
+        "pixels": 3989,
+        "edgePixels": 0
+      },
+      {
+        "frame": 2,
+        "pixels": 4061,
+        "edgePixels": 0
+      },
+      {
+        "frame": 3,
+        "pixels": 4026,
+        "edgePixels": 0
+      },
+      {
+        "frame": 4,
+        "pixels": 4085,
+        "edgePixels": 0
+      },
+      {
+        "frame": 5,
+        "pixels": 4039,
+        "edgePixels": 0
+      },
+      {
+        "frame": 6,
+        "pixels": 4180,
+        "edgePixels": 0
+      },
+      {
+        "frame": 7,
+        "pixels": 3891,
+        "edgePixels": 0
+      },
+      {
+        "frame": 8,
+        "pixels": 4356,
+        "edgePixels": 0
+      },
+      {
+        "frame": 9,
+        "pixels": 4522,
+        "edgePixels": 0
+      },
+      {
+        "frame": 10,
+        "pixels": 4508,
+        "edgePixels": 0
+      },
+      {
+        "frame": 11,
+        "pixels": 4134,
+        "edgePixels": 0
+      },
+      {
+        "frame": 12,
+        "pixels": 4755,
+        "edgePixels": 0
+      },
+      {
+        "frame": 13,
+        "pixels": 4376,
+        "edgePixels": 0
+      },
+      {
+        "frame": 14,
+        "pixels": 4131,
+        "edgePixels": 0
+      },
+      {
+        "frame": 15,
+        "pixels": 3491,
+        "edgePixels": 0
+      }
+    ]
+  },
+  {
+    "id": "wang",
+    "sameBase": true,
+    "sameFull": true,
+    "cacheVariantsCorrect": true,
+    "baseRows": 4,
+    "rows": 4,
+    "expectedRows": 4,
+    "directional": false,
+    "frames": [
+      {
+        "frame": 0,
+        "pixels": 5772,
+        "edgePixels": 0
+      },
+      {
+        "frame": 1,
+        "pixels": 5789,
+        "edgePixels": 0
+      },
+      {
+        "frame": 2,
+        "pixels": 5829,
+        "edgePixels": 0
+      },
+      {
+        "frame": 3,
+        "pixels": 5613,
+        "edgePixels": 0
+      },
+      {
+        "frame": 4,
+        "pixels": 5294,
+        "edgePixels": 0
+      },
+      {
+        "frame": 5,
+        "pixels": 4863,
+        "edgePixels": 0
+      },
+      {
+        "frame": 6,
+        "pixels": 5247,
+        "edgePixels": 0
+      },
+      {
+        "frame": 7,
+        "pixels": 4552,
+        "edgePixels": 0
+      },
+      {
+        "frame": 8,
+        "pixels": 5105,
+        "edgePixels": 0
+      },
+      {
+        "frame": 9,
+        "pixels": 5554,
+        "edgePixels": 0
+      },
+      {
+        "frame": 10,
+        "pixels": 5687,
+        "edgePixels": 0
+      },
+      {
+        "frame": 11,
+        "pixels": 4637,
+        "edgePixels": 0
+      },
+      {
+        "frame": 12,
+        "pixels": 5418,
+        "edgePixels": 0
+      },
+      {
+        "frame": 13,
+        "pixels": 4522,
+        "edgePixels": 0
+      },
+      {
+        "frame": 14,
+        "pixels": 5229,
+        "edgePixels": 0
+      },
+      {
+        "frame": 15,
+        "pixels": 3686,
+        "edgePixels": 0
+      }
+    ]
+  },
+  {
+    "id": "qing",
+    "sameBase": true,
+    "sameFull": true,
+    "cacheVariantsCorrect": true,
+    "baseRows": 4,
+    "rows": 4,
+    "expectedRows": 4,
+    "directional": false,
+    "frames": [
+      {
+        "frame": 0,
+        "pixels": 3287,
+        "edgePixels": 0
+      },
+      {
+        "frame": 1,
+        "pixels": 3321,
+        "edgePixels": 0
+      },
+      {
+        "frame": 2,
+        "pixels": 3338,
+        "edgePixels": 0
+      },
+      {
+        "frame": 3,
+        "pixels": 3266,
+        "edgePixels": 0
+      },
+      {
+        "frame": 4,
+        "pixels": 3739,
+        "edgePixels": 0
+      },
+      {
+        "frame": 5,
+        "pixels": 3569,
+        "edgePixels": 0
+      },
+      {
+        "frame": 6,
+        "pixels": 3627,
+        "edgePixels": 0
+      },
+      {
+        "frame": 7,
+        "pixels": 3574,
+        "edgePixels": 0
+      },
+      {
+        "frame": 8,
+        "pixels": 4180,
+        "edgePixels": 0
+      },
+      {
+        "frame": 9,
+        "pixels": 4234,
+        "edgePixels": 0
+      },
+      {
+        "frame": 10,
+        "pixels": 4343,
+        "edgePixels": 0
+      },
+      {
+        "frame": 11,
+        "pixels": 4082,
+        "edgePixels": 0
+      },
+      {
+        "frame": 12,
+        "pixels": 3712,
+        "edgePixels": 0
+      },
+      {
+        "frame": 13,
+        "pixels": 3903,
+        "edgePixels": 0
+      },
+      {
+        "frame": 14,
+        "pixels": 3815,
+        "edgePixels": 0
+      },
+      {
+        "frame": 15,
+        "pixels": 3061,
+        "edgePixels": 0
+      }
+    ]
+  }
+]

@@ -1,0 +1,42 @@
+.progress-page { max-width: 1280px; margin: auto; padding: 42px 32px 80px; color: #24352f; font-family: var(--font-sans), sans-serif; }
+.progress-page header { display: flex; align-items: center; justify-content: space-between; gap: 24px; border-bottom: 1px solid #bdbba8; padding-bottom: 28px; }
+.progress-eyebrow { letter-spacing: .13em; font-size: 11px; color: #667364; }
+.progress-page h1 { font: 42px Georgia, serif; margin-top: 12px; }
+.progress-page header a { padding: 12px 18px; color: #f7f0dd; background: #203e32; font-size: 13px; }
+.progress-page a:hover { text-decoration: underline; }
+.progress-intro { padding: 34px 0; max-width: 760px; }
+.progress-live { font-size: 11px; color: #3e7055; }
+.progress-intro h2 { font: 28px Georgia, serif; margin: 12px 0; }
+.progress-page p { line-height: 1.7; font-size: 14px; }
+.progress-intro small { display: block; margin-top: 14px; color: #667364; }
+.progress-columns { display: grid; grid-template-columns: 1fr 300px; gap: 38px; }
+.progress-columns h2 { font-size: 15px; font-weight: 600; margin-bottom: 16px; }
+.progress-pieces { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid #bdbba8; border-left: 1px solid #bdbba8; }
+.progress-pieces article { padding: 20px; border-right: 1px solid #bdbba8; border-bottom: 1px solid #bdbba8; background: #fffcf455; }
+.progress-piece-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 11px; color: #7a8172; }
+.progress-piece-top b { font-weight: 500; background: #e3e5d7; padding: 3px 7px; color: #53604c; }
+.progress-piece-top b[data-status=building] { background: #f0dfb8; color: #795723; }
+.progress-piece-top b[data-status=verified] { background: #dbe8d8; color: #325438; }
+.progress-piece-top b[data-status=revision] { background: #f0d5c9; color: #8c4934; }
+.progress-pieces h3 { margin: 20px 0 10px; font: 21px Georgia, serif; }
+.progress-pieces p { color: #596354; font-size: 13px; }
+.progress-pieces footer { display: flex; gap: 12px; justify-content: space-between; font-size: 11px; color: #70806d; margin-top: 20px; }
+.progress-page aside section { border-top: 1px solid #bdbba8; padding: 18px 0 22px; }
+.progress-page aside article { margin: 20px 0; }
+.progress-page aside h3 { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+.progress-page aside p, .progress-page aside li { font-size: 12px; color: #63715e; }
+.progress-page aside a { display: block; font-size: 12px; margin: 12px 0; color: #376344; }
+.progress-page aside li { margin: 10px 0; padding-left: 14px; position: relative; }
+.progress-page aside li:before { content: '✓'; position: absolute; left: 0; }
+.progress-note { margin-top: 20px; font-style: italic; }
+.progress-character-study { margin-top: 44px; border-top: 1px solid #bdbba8; padding-top: 24px; }
+.progress-character-study h2 { font: 28px Georgia, serif; margin-bottom: 12px; }
+.progress-motion-controls { display: flex; flex-wrap: wrap; gap: 6px; margin: 18px 0; }
+.progress-motion-controls button { border: 1px solid #aebba4; padding: 8px 14px; font-size: 12px; text-transform: capitalize; }
+.progress-motion-controls button[aria-pressed=true] { background: #203e32; color: #fff3d8; }
+.progress-character-gallery { display: grid; grid-template-columns: repeat(4,1fr); gap: 1px; background: #556449; border: 1px solid #556449; }
+.progress-character-gallery figure { background: #21392f; padding: 16px; }
+.progress-character-gallery canvas { width: 100%; height: 180px; image-rendering: pixelated; object-fit: contain; }
+.progress-character-gallery figcaption { text-align: center; font-size: 11px; letter-spacing: .1em; color: #d8c597; }
+@media(max-width:760px) { .progress-character-gallery { grid-template-columns: 1fr 1fr; }.progress-character-gallery canvas { height: 140px; } }
+@media(max-width:760px) { .progress-page { padding: 24px 18px; }.progress-page header { align-items: start; }.progress-page h1 { font-size: 30px; }.progress-columns { grid-template-columns: 1fr; }.progress-pieces { grid-template-columns: 1fr; }.progress-page header a { max-width: 110px; } }

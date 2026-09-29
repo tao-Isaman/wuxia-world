@@ -73,8 +73,12 @@ export function logLine(state: BattleState, cls: "lA" | "lB" | "lS" | "lC", txt:
   if (state.log.length > 100) state.log.shift();
 }
 
+export function escapeBattleText(value: string): string {
+  return value.replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]!);
+}
+
 function nameOf(side: Side, names: Record<Side, string>): string {
-  return names[side];
+  return escapeBattleText(names[side]);
 }
 
 // ─── Self-effect dispatcher (skill `se` + art active self-buff ops) ───
@@ -340,7 +344,7 @@ export function tickEffects(
       const dmg = Math.round(cap * poison.pp / 100);
       if (side === "A") state.hA = Math.max(0, state.hA - dmg);
       else state.hB = Math.max(0, state.hB - dmg);
-      if (dmg > 0) logLine(state, "lS", `&nbsp;☠ ${names[side]} รับพิษ ${dmg}`);
+      if (dmg > 0) logLine(state, "lS", `&nbsp;☠ ${nameOf(side, names)} รับพิษ ${dmg}`);
     }
 
     const burn = st.debuffs.find((d) => d.t === "burn_hp_mp");
@@ -357,10 +361,10 @@ export function tickEffects(
         state.mpB = Math.max(0, state.mpB - mpDmg);
       }
       if (hpDmg > 0 || mpDmg > 0)
-        logLine(state, "lS", `&nbsp;🔥 ${names[side]} เผาไหม้ HP-${hpDmg} MP-${mpDmg}`);
+        logLine(state, "lS", `&nbsp;🔥 ${nameOf(side, names)} เผาไหม้ HP-${hpDmg} MP-${mpDmg}`);
     }
 
-    for (const b of st.buffs) if (b.u > 0) b.u--;
+    for (const b of st.buffs) if (b.u > 0 && b.t !== "buff_riposte") b.u--;
     state.st[side].buffs = st.buffs.filter((b) => b.u > 0);
     for (const d of st.debuffs) if (d.u > 0) d.u--;
     state.st[side].debuffs = st.debuffs.filter((d) => d.u > 0);
@@ -369,7 +373,7 @@ export function tickEffects(
     if (hp <= 0 && !state.winner) {
       state.winner = opposite(side);
       state.phase = "over";
-      logLine(state, "lS", `━━ ${names[state.winner]} ชนะ! (พิษ) ━━`);
+      logLine(state, "lS", `━━ ${nameOf(state.winner, names)} ชนะ! (พิษ) ━━`);
     }
 
     const regen = side === "A" ? hpRegenA : hpRegenB;
@@ -378,7 +382,7 @@ export function tickEffects(
       const heal = Math.round(cap * regen / 100);
       if (side === "A") state.hA = Math.min(cap, state.hA + heal);
       else state.hB = Math.min(cap, state.hB + heal);
-      if (heal > 0) logLine(state, "lS", `&nbsp;💊 ${names[side]} ฟื้น ${heal} (อุปกรณ์)`);
+      if (heal > 0) logLine(state, "lS", `&nbsp;💊 ${nameOf(side, names)} ฟื้น ${heal} (อุปกรณ์)`);
     }
 
     // Art aura regen — capstone arts (e.g., วิชาเก้าเอี้ยง) grant a
@@ -392,13 +396,13 @@ export function tickEffects(
         const heal = Math.round(hpCap * art.hpRegenPct / 100);
         if (side === "A") state.hA = Math.min(hpCap, state.hA + heal);
         else state.hB = Math.min(hpCap, state.hB + heal);
-        if (heal > 0) logLine(state, "lS", `&nbsp;🌱 ${names[side]} ฟื้น ${heal} HP (${art.n})`);
+        if (heal > 0) logLine(state, "lS", `&nbsp;🌱 ${nameOf(side, names)} ฟื้น ${heal} HP (${art.n})`);
       }
       if (art.mpRegenPct && art.mpRegenPct > 0) {
         const mpHeal = Math.round(mpCap * art.mpRegenPct / 100);
         if (side === "A") state.mpA = Math.min(mpCap, state.mpA + mpHeal);
         else state.mpB = Math.min(mpCap, state.mpB + mpHeal);
-        if (mpHeal > 0) logLine(state, "lS", `&nbsp;🌱 ${names[side]} ฟื้น ${mpHeal} MP (${art.n})`);
+        if (mpHeal > 0) logLine(state, "lS", `&nbsp;🌱 ${nameOf(side, names)} ฟื้น ${mpHeal} MP (${art.n})`);
       }
     }
   }
@@ -410,6 +414,6 @@ export function checkWin(state: BattleState, names: Record<Side, string>): void 
   if (w) {
     state.winner = w;
     state.phase = "over";
-    logLine(state, "lS", `━━ ${names[w]} ชนะ! (${state.turn} ตา) ━━`);
+    logLine(state, "lS", `━━ ${nameOf(w, names)} ชนะ! (${state.turn} ตา) ━━`);
   }
 }

@@ -1,0 +1,77 @@
+[
+  {
+    "data": {
+      "testid": "battle-canvas",
+      "renderer": "three",
+      "ready": "true",
+      "viewWidth": "768.0",
+      "viewHeight": "374.1",
+      "reducedMotion": "false",
+      "impactCount": "1",
+      "castSeq": "-2",
+      "fighterACharacter": "m1",
+      "fighterAMotion": "guard",
+      "fighterAFrame": "13",
+      "fighterBCharacter": "bandit",
+      "fighterBMotion": "guard",
+      "fighterBFrame": "13",
+      "paused": "false",
+      "fighterAX": "207.4",
+      "fighterBX": "560.6",
+      "contactX": "251.9",
+      "contactY": "236.5",
+      "lastImpact": "-2:0"
+    },
+    "text": "กำลังภายใน — โลกยุทธภพ\nกำลังใช้ · ตั้งรับ\nตาที่ 1\nCritic Two\nⓘ\n36 / 36 HP\n8 / 10 MP\nจังหวะ\n0%\nทรงพลัง(2)\nสวนกลับ +20% · 1 ครั้ง\n對\nขโมยน้อย\nⓘ\n36 / 36 HP\n10 / 10 MP\nจังหวะ\n0%\nหมัดตรง\nสวนกลับ +20% · 1 ครั้ง\n0 MP · 1 ตา\nตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา\nรวบรวมปราณ\nMP +2 · หลบหลีก −15 จังหวะถัดไป\n0 MP · 1 ตา\nบันทึกการต่อสู้ (3)\n+"
+  },
+  {
+    "data": {
+      "testid": "battle-canvas",
+      "renderer": "three",
+      "ready": "true",
+      "viewWidth": "768.0",
+      "viewHeight": "374.1",
+      "reducedMotion": "false",
+      "impactCount": "2",
+      "castSeq": "1",
+      "fighterACharacter": "m1",
+      "fighterAMotion": "hurt",
+      "fighterAFrame": "12",
+      "fighterBCharacter": "bandit",
+      "fighterBMotion": "attack",
+      "fighterBFrame": "10",
+      "paused": "false",
+      "fighterAX": "207.4",
+      "fighterBX": "323.2",
+      "contactX": "251.9",
+      "contactY": "241.9",
+      "lastImpact": "1:0"
+    },
+    "text": "กำลังภายใน — โลกยุทธภพ\nกำลังใช้ · หมัดตรง\nตาที่ 2\nCritic Two\nⓘ\n36 / 36 HP\n8 / 10 MP\nจังหวะ\n0%\nทรงพลัง(1)\nสวนกลับ +20% · 1 ครั้ง\n對\nขโมยน้อย\nⓘ\n36 / 36 HP\n10 / 10 MP\nจังหวะ\n0%\nหมัดตรง\nสวนกลับ +20% · 1 ครั้ง\n0 MP · 1 ตา\nตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา\nรวบรวมปราณ\nMP +2 · หลบหลีก −15 จังหวะถัดไป\n0 MP · 1 ตา\nบันทึกการต่อสู้ (5)\n+"
+  },
+  {
+    "data": {
+      "testid": "battle-canvas",
+      "renderer": "three",
+      "ready": "true",
+      "viewWidth": "768.0",
+      "viewHeight": "374.1",
+      "reducedMotion": "false",
+      "impactCount": "3",
+      "castSeq": "2",
+      "fighterACharacter": "m1",
+      "fighterAMotion": "attack",
+      "fighterAFrame": "10",
+      "fighterBCharacter": "bandit",
+      "fighterBMotion": "hurt",
+      "fighterBFrame": "12",
+      "paused": "false",
+      "fighterAX": "466.5",
+      "fighterBX": "560.6",
+      "contactX": "539.3",
+      "contactY": "236.5",
+      "lastImpact": "2:0"
+    },
+    "text": "กำลังภายใน — โลกยุทธภพ\nกำลังใช้ · หมัดตรง\nตาที่ 3\nCritic Two\nⓘ\n16 / 36 HP\n8 / 10 MP\nจังหวะ\n0%\n對\nขโมยน้อย\nⓘ\n36 / 36 HP\n10 / 10 MP\nจังหวะ\n100%\nหมัดตรง\nโจมตีภายนอก · 1 ครั้ง\n0 MP · 1 ตา\nตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา\nรวบรวมปราณ\nMP +2 · หลบหลีก −15 จังหวะถัดไป\n0 MP · 1 ตา\nบันทึกการต่อสู้ (8)\n+"
+  }
+]

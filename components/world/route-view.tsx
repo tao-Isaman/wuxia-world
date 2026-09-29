@@ -2,8 +2,8 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import type { RouteScene, SceneEffect } from "@/lib/world";
-import { applyEffect, evaluateCondition } from "@/lib/world";
+import type { RouteScene } from "@/lib/world";
+import { evaluateCondition } from "@/lib/world";
 import { TRAVEL_STAMINA_COST, useWorldStore } from "@/store/world-store";
 
 interface Props {
@@ -27,34 +27,7 @@ export function RouteView({ scene }: Props) {
 
   const backTarget = scene.back ?? state.lastLocationId;
 
-  // Travel: applies destination effects then navigates. We mutate a local
-  // shallow draft and then push it to the store so onEnter + auto-advance
-  // still kick in via gotoScene.
-  const travel = (locationId: string, effects?: SceneEffect[]) => {
-    if (effects && effects.length > 0) {
-      // Apply effects through the store so persist sees them.
-      const draft = { ...state };
-      // Shallow clone the maps the effects might touch.
-      draft.flags = { ...draft.flags };
-      draft.quests = { ...draft.quests };
-      draft.inventory = { ...draft.inventory };
-      for (const e of effects) applyEffect(draft, e);
-      // Push the effect changes (but not currentSceneId — gotoScene handles that).
-      useWorldStore.setState({
-        flags: draft.flags,
-        quests: draft.quests,
-        inventory: draft.inventory,
-        gold: draft.gold,
-        // pendingBattle could be set by an effect; let it through.
-        pendingBattle: draft.pendingBattle,
-      });
-      // If a triggerBattle effect fired, the bridge will start the battle
-      // and we should NOT navigate to the destination yet — pendingBattle's
-      // onWin/onLose takes over.
-      if (draft.pendingBattle) return;
-    }
-    gotoScene(locationId);
-  };
+  const travel = useWorldStore((s) => s.travelRoute);
 
   return (
     <div className="space-y-3">
@@ -88,7 +61,7 @@ export function RouteView({ scene }: Props) {
                   key={d.locationId}
                   variant="outline"
                   disabled={tooTired}
-                  onClick={() => travel(d.locationId, d.effects)}
+                  onClick={() => travel(d.locationId)}
                   className="w-full justify-start text-left h-auto py-2 whitespace-normal"
                 >
                   <span className="flex flex-col items-start gap-0.5">

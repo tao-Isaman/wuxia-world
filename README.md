@@ -2,7 +2,7 @@
 
 Thai-language wuxia / martial-arts text-RPG with a 1v1 turn-based battle layer. The world is a network of cities, sects, mountains, valleys, islands and homes; the combat sim drops in whenever a fight is triggered.
 
-Built with **Next.js 15 + React 19 + TypeScript + Zustand + Tailwind v3.4 + shadcn/ui**, runs on **Bun** (Node 20+ also works). UI ships an ink-wash + pixel-art Y2K wuxia aesthetic — Charm calligraphic display font over Sarabun body, cream paper background, vermilion seal accents, pixel-bordered chrome.
+Built with **Three.js 0.186 + Next.js 15 + React 19 + TypeScript + Zustand + Tailwind v3.4**, runs on **Bun** (Node 20+ also works). Detailed 32-bit pixel-art scenery, jade-and-gold HUD, animated battles and parchment dialogs retain the Thai wuxia setting. Charm headings and Sarabun body text keep Thai readable.
 
 ## Quick start
 
@@ -18,9 +18,35 @@ bun run build       # next build
 bun start           # run production build
 bun run lint        # ESLint flat config
 bun run typecheck   # tsc --noEmit
+bun run test:runtime # deterministic movement, battle timing and travel regressions
+bun run test:combat  # Guard/riposte/Recover and combat-effect regressions
+bun run test:opening # clinic, training, reward presentation and safe conversation exits
+bun scripts/test-quest-completion-receipt.ts # exactly-once reward presentation
+bun run test:navigation # authored collision and path detours
+bun run test:battle-background # training/capital origin and generic fallback
+bun run test:rumors # authored lore, selection gates and save history
+bun run test:investigation # clerk, key, chest, legacy stages and exact rewards
+bunx playwright install chromium # once, for browser tests
+bun run test:e2e    # starts a test server on port 3017
 ```
 
 The starter location is the player's home (`home_player`), which connects to the capital (`city_capital`). From there the world opens up.
+
+The optional opening guide follows a local clinic errand, an earned supply purchase, a free nonfatal duel at the capital school, and the first affordable skill upgrade. The school opponent stays at beginner strength, awards normal battle experience, and retires after the first victory. Recovery remains available when HP or MP is low even if stamina is full.
+
+Local NPC conversations preserve the live town and actors behind a compact dialogue panel. The clinic delivery leaves medicine supplies and a waiting patient beside Lin; this response reads the existing quest result and survives reload. Spy job briefings have a direct goodbye before any quest is accepted.
+
+The capital's missing-ledger investigation leads to a visible clerk and document chest: interview Qing, obtain a key, recover the ledger, then report to Wu. Its existing quest ID and saved stage IDs are preserved. Authored lore now appears through the rumor service in new and existing saves, respecting discovery gates and heard history.
+
+The practice duel uses the capital school's own yard, and confirmed capital encounters use a town street. Other locations retain the original courtyard. Reloading a local conversation places the hero beside the resolved speaker on reachable ground; recovered ledger evidence leaves its chest visibly open.
+
+## Three.js runtime and controls
+
+Click or tap the ground to walk; select a character or destination to approach and interact. Keyboard controls are **WASD / arrows** to walk and **E** to interact nearby. The **จุดหมาย** destination list provides equivalent keyboard-accessible actions. Menus pause movement. Portrait and landscape layouts use the actual viewport, with no CSS rotation.
+
+`lib/three/world-runtime.ts` owns scene loading, movement, depth sorting and the camera. `lib/three/battle-runtime.ts` owns the combat update loop, enemy action timing and cast effects. React supplies accessible forms, HUD, inventory, dialogs and skill buttons. Pure combat/story rules remain in `lib/game` and `lib/world`; Zustand connects them to the scenes and persists version-19 saves. Three.js is dynamically imported on the client and destroyed when its view unmounts.
+
+The live development journal is available at **`/progress`**, including the actual animated character gallery and unresolved review findings. Eight heroes use 24 poses each (idle, three walking directions with horizontal mirroring, attack, hurt, guard and outcomes); four supporting archetypes and three individually drawn townspeople use 16 poses. Source-specific frame boundaries preserve complete figures across all 304 poses. Quest completion shows the giver's thanks and granted rewards; upgrades explain actual before/after stats. See [DESIGN.md](DESIGN.md) for architecture and scope, [environment provenance](public/art/README.md), [character prompts](public/art/characters/README.md), [named townspeople prompts](public/art/characters/townspeople.md), and [Qing's source prompt](public/art/characters/qing.md). Browser evidence stays under `review/`; regression screenshots are recreated under `test-results/`.
 
 ## What's in the game
 
@@ -50,7 +76,7 @@ The starter location is the player's home (`home_player`), which connects to the
 - **108 inner skills** (กำลังภายใน) across 5 tiers with active + passive, scaled stats and HP/MP per level. Auto-sorted by sect via `scripts/sort-by-sect.ts`.
 - **25 weapon families** of equipment (`W / A / H / B / BR / R / C` slots with multi-slot bracelets, rings, charms).
 - **Mastery** — each skill counts toward its weapon family's mastery (cap 200), scales the family's per-skill damage multiplier. Profile shows raw points + multiplier.
-- **131 NPCs · 229 quests · 940 scenes · ~150 opponents** including 10 hunt-only beasts (sustainable grind tier) and 11 sect hunters (one per joinable sect, T4 tier — appear via random event when the player betrays).
+- **155 NPCs · 276 unique quests · 986 scenes · ~150 opponents** including 10 hunt-only beasts (sustainable grind tier) and 11 sect hunters (one per joinable sect, T4 tier — appear via random event when the player betrays).
 
 ### Player progression
 
@@ -105,12 +131,12 @@ The starter location is the player's home (`home_player`), which connects to the
 
 ### UX
 
-- **Wuxia ink-on-paper UI** — cream paper background with a paper-noise texture, ink-black foreground, vermilion seal accents, jade highlights. Charm display font on proper-noun labels and headers; Sarabun on dialog and body. Pixel-bordered Panel chrome via `border-image` 9-slice; pixel-bevel WuxiaButton via stacked `box-shadow`. Light mode only (dark mode was dropped). Mobile + desktop responsive.
-- **Status bar + Menu bar** — always-on top chrome. Status bar shows segmented HP / MP / Stamina bars (classic-JRPG `pixel` mode on Progress) + day/time + gold + w-exp. Menu bar collapses to a 3-col grid on mobile, 6-col on `sm+`.
+- **Detailed pixel-art UI** — jade landscapes, dark lacquer HUD, warm gold borders and parchment dialogs. Charm headings and Sarabun body text retain readable Thai. The title and battle court use a generated 32-bit-style environment; world scenes retain their location-specific art with nearest-neighbor sampling.
+- **Status + menu HUD** — portrait, HP / MP / stamina gauges, time and currency remain visible over the map. An eight-action menu sits at the bottom, adapting to portrait and landscape screens.
 - **Tabs in the menu bar** — 👤 โปรไฟล์ · 🎒 ของในย่าม · 🥋 วิชาฝีมือ (manages BOTH move skills and arts in one slot system) · 🌾 วิชาชีพ · 📋 ภารกิจ · 📜 บันทึก.
 - **Toast notifications** at the top of the screen for every action result.
 - **Loading overlay** flashes briefly during gather / craft / rest / practice for tactile feedback.
-- **Persistent saves** via Zustand persist middleware (localStorage). Schema migration chain handles version bumps (currently world-store **v17** — added gender, sectMembership.status, and quest-accept snapshots along the way).
+- **Persistent saves** via Zustand persist middleware (localStorage), with the existing migration chain and world-store **v19** schema. Three.js objects and movement state never enter the save.
 - **Game-over screen** on fatal battle loss; "เริ่มใหม่" wipes the world slice (character builds are independent).
 
 ## Project layout
@@ -119,10 +145,13 @@ The starter location is the player's home (`home_player`), which connects to the
 app/                     Next.js app router
   page.tsx               World game (renders <WorldScreen />)
   layout.tsx             Loads Charm + Sarabun via next/font/google
-  globals.css            Wuxia palette, paper texture, .pixel/.frame-pixel utils
+  globals.css            Shared palette, paper texture and utility styles
+  pixel-game.css         Pixel title, world HUD, responsive canvas and battle theme
   debug/page.tsx         Dev sandbox (free-form battle, character setup)
 
 lib/
+  three/                 Client-only exploration/combat rendering, navigation and movement helpers
+  characters/            Sprite atlas normalization, animation clips and archetypes
   game/                  Pure combat engine (no React, no I/O)
     data/                SKILLS, ARTS, EQUIPMENT, TIERS, sect list
     types.ts             Discriminated unions for all combat effects

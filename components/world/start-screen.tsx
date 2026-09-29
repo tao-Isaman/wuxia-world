@@ -1,128 +1,70 @@
 "use client";
-
 import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { useWorldStore } from "@/store/world-store";
-import { clearMapPositions } from "./location-map";
+import { clearMapPositions } from "@/lib/three/types";
 import type { Gender } from "@/lib/world";
-import {
-  GENDER_LABEL,
-  PLAYER_BODIES,
-  PLAYER_BODY_LABEL,
-  defaultBodyFor,
-  playerBodySprite,
-} from "@/lib/world";
+import { GENDER_LABEL, PLAYER_BODIES, PLAYER_BODY_LABEL, defaultBodyFor } from "@/lib/world";
+import { CharacterPreview } from "@/components/game/character-preview";
 
-// Shown only when `hasGame === false`. Player picks a name + gender, then
-// "เริ่มเกมใหม่" creates a fresh world bound to those choices. Gender is
-// load-bearing — sect membership conditions read it (Shaolin admits men
-// only, etc.).
 export function StartScreen() {
   const startNewGame = useWorldStore((s) => s.startNewGame);
   const [name, setName] = useState("");
-  const [gender, setGenderRaw] = useState<Gender>("male");
+  const [gender, setGender] = useState<Gender>("male");
   const [bodyId, setBodyId] = useState<string>(defaultBodyFor("male"));
-  // Switching gender resets the body pick to that gender's first option.
-  const setGender = (g: Gender) => {
-    setGenderRaw(g);
-    setBodyId(defaultBodyFor(g));
-  };
-
   const trimmed = name.trim();
   const canStart = trimmed.length > 0 && trimmed.length <= 24;
-
   return (
-    <Card>
-      <CardContent className="p-8 space-y-6">
-        <div className="text-center space-y-2">
-          <h2 className="text-xl font-bold">โลกยุทธภพ</h2>
-          <p className="text-sm text-muted-foreground max-w-md mx-auto">
-            ผจญภัยในโลกของผู้กล้า เริ่มต้นจากหมู่บ้านเล็ก ๆ บนเชิงเขา
-            เจ้าจะเริ่มด้วยพละกำลังพื้นฐาน 1 ทุกค่า และวิชา <strong>หมัดตรง</strong>
-          </p>
+    <div className="title-screen">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/art/jade-courtyard.png" alt="" className="title-landscape" draggable={false} />
+      <div className="title-shade" />
+      <div className="title-content">
+        <div className="title-intro">
+          <span className="title-seal" aria-hidden="true">武</span>
+          <p className="title-kicker">กำลังภายใน</p>
+          <h1>โลกยุทธภพ</h1>
+          <p className="title-description">หนึ่งชีวิต หนึ่งเส้นทางยุทธ์<br />เรื่องราวของเจ้าเริ่มต้นที่นี่</p>
+          <div className="title-rule" />
+          <p className="title-footnote">ออกเดินทาง · ฝึกวิชา · สร้างตำนาน</p>
         </div>
-
-        <div className="space-y-3 max-w-sm mx-auto">
-          <label className="block text-sm">
-            <span className="block mb-1 text-foreground/80">ชื่อตัวละคร</span>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              maxLength={24}
-              placeholder="ชื่อ (1–24 ตัวอักษร)"
-              className="w-full border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:border-primary"
-            />
-          </label>
-
-          <fieldset className="space-y-1">
-            <legend className="text-sm text-foreground/80 mb-1">เพศ</legend>
-            <div className="flex gap-2">
-              {(["male", "female"] as const).map((g) => (
-                <button
-                  key={g}
-                  type="button"
-                  onClick={() => setGender(g)}
-                  className={`flex-1 border px-3 py-2 text-sm transition-colors ${
-                    gender === g
-                      ? "border-primary bg-primary/10 text-primary"
-                      : "border-border bg-background hover:border-foreground/40"
-                  }`}
-                >
-                  {GENDER_LABEL[g]}
+        <form className="hero-creation pixel-panel" onSubmit={(event) => {
+          event.preventDefault();
+          if (!canStart) return;
+          clearMapPositions();
+          startNewGame({ name: trimmed, gender, bodyId });
+        }}>
+          <div className="creation-heading"><span>สร้างตัวละคร</span><span className="text-[#d7bd82]">初</span></div>
+          <label className="creation-label" htmlFor="hero-name">ชื่อตัวละคร</label>
+          <input id="hero-name" name="heroName" autoComplete="off" value={name} onChange={(e) => setName(e.target.value)}
+            maxLength={24} placeholder="ชื่อของเจ้า" className="creation-input" required />
+          <fieldset className="mt-5">
+            <legend className="creation-label">เพศ</legend>
+            <div className="gender-options">
+              {(["male", "female"] as const).map((value) => (
+                <button type="button" key={value} aria-pressed={gender === value}
+                  onClick={() => { setGender(value); setBodyId(defaultBodyFor(value)); }}>
+                  {GENDER_LABEL[value]}
                 </button>
               ))}
             </div>
-            <p className="text-xs text-muted-foreground">
-              บางสำนักรับเฉพาะเพศที่กำหนด เช่น เส้าหลินรับเฉพาะชาย ง้อไบ๊รับเฉพาะหญิง
-            </p>
           </fieldset>
-
-          <fieldset className="space-y-1">
-            <legend className="text-sm text-foreground/80 mb-1">รูปร่าง</legend>
-            <div className="grid grid-cols-4 gap-2">
-              {PLAYER_BODIES[gender].map((b) => (
-                <button
-                  key={b}
-                  type="button"
-                  onClick={() => setBodyId(b)}
-                  title={PLAYER_BODY_LABEL[b]}
-                  className={`border p-1 transition-colors ${
-                    bodyId === b
-                      ? "border-primary bg-primary/10"
-                      : "border-border bg-background hover:border-foreground/40"
-                  }`}
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={playerBodySprite(b)}
-                    alt={PLAYER_BODY_LABEL[b]}
-                    draggable={false}
-                    className="w-full h-auto pixel"
-                  />
+          <fieldset className="mt-5">
+            <legend className="creation-label">รูปร่าง</legend>
+            <div className="body-options">
+              {PLAYER_BODIES[gender].map((id) => (
+                <button type="button" key={id} aria-label={PLAYER_BODY_LABEL[id]} aria-pressed={bodyId === id}
+                  onClick={() => setBodyId(id)}>
+                  <CharacterPreview id={id} animate={bodyId === id} />
+                  <span aria-hidden="true">{bodyId === id ? "◆" : "◇"}</span>
                 </button>
               ))}
             </div>
-            <p className="text-xs text-muted-foreground text-center">
-              {PLAYER_BODY_LABEL[bodyId]}
-            </p>
           </fieldset>
-        </div>
-
-        <div className="text-center">
-          <Button
-            size="lg"
-            disabled={!canStart}
-            onClick={() => {
-              clearMapPositions();
-              startNewGame({ name: trimmed, gender, bodyId });
-            }}
-          >
-            เริ่มเกมใหม่
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+          <p className="creation-note">เริ่มต้นด้วยพลังพื้นฐาน 1 ทุกค่า และวิชาหมัดตรง<br />บางสำนักรับศิษย์ตามเพศที่กำหนด</p>
+          <button type="submit" className="pixel-action start-adventure" disabled={!canStart}>เริ่มเกมใหม่ <span aria-hidden="true">↗</span></button>
+          <p className="creation-save-note">บันทึกความคืบหน้าอัตโนมัติในเบราว์เซอร์นี้</p>
+        </form>
+      </div>
+    </div>
   );
 }

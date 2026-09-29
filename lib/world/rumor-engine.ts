@@ -4,6 +4,10 @@
 // All randomness via Math.random(); all time inputs come from the caller.
 
 import { evaluateCondition } from "./conditions";
+import { ARTS_BY_ID } from "../game/data/arts";
+import { ITEMS_BY_ID } from "./data/items";
+import { LORE_RUMORS } from "./data/lore-rumors";
+import { SECT_MEMBERSHIPS } from "./data/sect-memberships";
 import { CHANNEL_ADMITS, regionOf } from "./data/regions";
 import { getNamedDefault } from "./data/named-npcs";
 import { NPCS_BY_ID } from "./data/npcs";
@@ -25,6 +29,7 @@ import type {
   RumorChannel,
   RumorSummary,
   RumorTruth,
+  SectId,
   TraitKey,
   WorldStateData,
 } from "./types";
@@ -37,6 +42,32 @@ export const RUMOR_POOL_SOFT_CAP = 200;
 export const RUMOR_POOL_HARD_CAP = 500;
 export const RUMOR_SEEN_CAP = 50;
 export const RUMOR_ARCHIVE_DAYS = 365;
+
+// JSON turns Infinity into null. A finite sentinel keeps static lore alive
+// across saves while retaining the same numeric expiry/filter semantics.
+const LORE_EXPIRES_DAY = Number.MAX_SAFE_INTEGER;
+const loreId = (suffix: string): string => suffix.startsWith("lore_") ? suffix : `lore_${suffix}`;
+const LORE_IDS = new Set(LORE_RUMORS.map((lore) => loreId(lore.idSuffix)));
+
+/** Add authored lore once, without replacing dynamic rumors or heard history. */
+export function seedLoreRumors(state: WorldStateData): void {
+  ensureRumorArrays(state);
+  const ids = new Set(state.rumorPool.map((rumor) => rumor.id));
+  // Repair pre-seeded lore whose non-expiring deadline became null in JSON.
+  // Replace entries rather than mutating a caller's previous snapshot.
+  const pool = state.rumorPool.map((rumor) =>
+    rumor.source === "lore" && LORE_IDS.has(rumor.id) && rumor.expiresDay !== LORE_EXPIRES_DAY
+      ? { ...rumor, expiresDay: LORE_EXPIRES_DAY }
+      : rumor,
+  );
+  for (const { idSuffix, ...lore } of LORE_RUMORS) {
+    const id = loreId(idSuffix);
+    if (ids.has(id)) continue;
+    pool.push({ ...lore, prerequisites: [...lore.prerequisites], id, createdDay: 1, expiresDay: LORE_EXPIRES_DAY });
+    ids.add(id);
+  }
+  state.rumorPool = pool;
+}
 
 // Big-news rule used by both lifespan + weight booster. Spec §3.2.1.
 const BIG_EVENT_KINDS: ReadonlySet<NpcEventKind> = new Set([
@@ -129,6 +160,27 @@ function locationDisplayName(locationId: string | undefined | null): string {
   return locationId;
 }
 
+// Event payloads carry IDs (artId/itemId/formerSect), while prose uses
+// display tokens (art/item/sect). Keep explicit authored labels when given.
+function resolveDetailNames(vars: Record<string, string>, sectId?: string | null): void {
+  const sect = vars.formerSect ?? vars.sectId ?? vars.sect ?? sectId;
+  vars.sect = (sect ? SECT_MEMBERSHIPS[sect as SectId]?.name : undefined)
+    ?? vars.sect ?? "ที่ไม่เปิดเผยชื่อ";
+  vars.art = ARTS_BY_ID.get(vars.artId ?? vars.art)?.n ?? vars.art ?? "ที่ไม่เปิดเผยชื่อ";
+  vars.item = ITEMS_BY_ID.get(vars.itemId ?? vars.item)?.name ?? vars.item ?? "สมบัติที่ไม่ทราบชนิด";
+}
+
+function playerEchoSect(state: WorldStateData, actionId: string): string | undefined {
+  // The legacy action does not carry a sectId. A sole matching membership
+  // is reliable; guessing between several would name the wrong school.
+  const leaving = actionId === "sect_leave_or_betray";
+  const memberships = Object.entries(state.sectMembership).filter(([, membership]) =>
+    leaving ? membership.status === "resigned" || membership.status === "betrayed"
+      : (membership.status ?? "active") === "active",
+  );
+  return memberships.length === 1 ? memberships[0][0] : undefined;
+}
+
 function ensureRumorArrays(state: WorldStateData): void {
   // Defensive: legacy saves may load before the v18 migration. Allocate
   // fresh arrays so we don't mutate frozen literals.
@@ -181,12 +233,12 @@ function variantText(tpl: RumorTemplate, truth: RumorTruth): string {
 // early; hard cap evicts on a (expiresDay asc, weight asc) priority so
 // the freshest / loudest rumors survive.
 function applyCaps(state: WorldStateData, currentDay: number): void {
-  // Soft cap: archive anything older than 90 days when over 200.
+  // Soft cap: archive old news when over 200. Static lore does not age out.
   if (state.rumorPool.length > RUMOR_POOL_SOFT_CAP) {
     const stale: number[] = [];
     for (let i = 0; i < state.rumorPool.length; i++) {
       const r = state.rumorPool[i]!;
-      if (currentDay - r.createdDay >= EARLY_ARCHIVE_AGE_DAYS) {
+      if (r.source !== "lore" && currentDay - r.createdDay >= EARLY_ARCHIVE_AGE_DAYS) {
         stale.push(i);
       }
     }
@@ -252,6 +304,8 @@ export function generateNpcEventEcho(args: NpcEventEchoArgs): string | null {
       if (vars[k] === undefined || vars[k] === "") vars[k] = String(v);
     }
   }
+  const npc = state.npcExt[npcId] ?? getNamedDefault(npcId);
+  resolveDetailNames(vars, npc?.sect);
 
   const truth = rollDistortion();
   const text = renderTemplate(variantText(tpl, truth), vars);
@@ -328,6 +382,7 @@ export function generatePlayerEcho(args: PlayerEchoArgs): string | null {
     npc2: targetName,
     location: locName,
   };
+  resolveDetailNames(vars, playerEchoSect(state, actionId));
 
   // Player-echo distortion: heavier than the standard split.
   const r = Math.random();

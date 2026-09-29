@@ -1,15 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
-  TIERS,
-  WEAPON_FAMILY_LABEL,
   getArt,
-  getSkill,
   hitPct,
   critPct,
   hpColor,
@@ -21,6 +18,7 @@ import {
 import { useBattleStore } from "@/store/battle-store";
 import { useCharacterStore } from "@/store/character-store";
 import { BattleLog } from "./battle-log";
+import { BattleCanvas } from "./battle-canvas";
 import { cn } from "@/lib/utils";
 import { InfoPopover } from "@/components/ui/wuxia/info-popover";
 import {
@@ -30,146 +28,55 @@ import {
   describeDebuff,
 } from "./buff-descriptions";
 import { SkillIcon, ArtIcon } from "./skill-icon";
-import { SkillTooltip, ArtTooltip } from "../world/skill-tooltip";
+import { recoveryAmount, GUARD_REDUCTION, GUARD_MP_COST, RIPOSTE_BONUS, RECOVER_EVASION_COST } from "@/lib/game/combat-actions";
+import type { BattleCastProgress } from "@/lib/three/battle-runtime";
+import { Shield, Wind } from "lucide-react";
+import "@/app/combat-actions.css";
 
-// Compact icon-first action button used in the player's skill bar
-// during battle. Wrapped externally with SkillTooltip / ArtTooltip for
-// hover details. Shows CD overlay + MP-short tint when needed; clicking
-// fires the underlying useSkill / useArtActive action.
-function SkillButton({
-  icon,
-  disabled,
-  onClick,
-  cd,
-  mpInfo,
-  mpShort,
-  isArt,
-}: {
-  icon: React.ReactNode;
-  disabled: boolean;
-  onClick: () => void;
-  cd: number;
-  mpInfo?: string;
-  mpShort?: boolean;
-  isArt?: boolean;
+function SkillButton({ name, icon, disabled, onClick, cd = 0, mp = 0, detail, mpShort = false, kind = "skill" }: {
+  name: string; icon: React.ReactNode; disabled: boolean; onClick: () => void;
+  cd?: number; mp?: number; detail: string; mpShort?: boolean; kind?: "skill" | "guard" | "recover";
 }) {
-  return (
-    <button
-      type="button"
-      disabled={disabled}
-      onClick={onClick}
-      className={cn(
-        "relative inline-flex items-center justify-center p-0.5",
-        "border-2 border-ink/80 transition-all",
-        isArt
-          ? "bg-emerald-50 hover:bg-emerald-100 hover:border-emerald-700"
-          : "bg-card hover:bg-muted/40 hover:border-vermilion",
-        disabled && "opacity-40 cursor-not-allowed",
-        !disabled && "cursor-pointer hover:scale-105",
-      )}
-      aria-label={isArt ? "ใช้วิชาในกาย" : "ใช้วิชา"}
-    >
-      {icon}
-      {/* CD overlay — covers icon with semi-transparent black + count */}
-      {cd > 0 && (
-        <span className="absolute inset-0 flex items-center justify-center bg-black/65 text-white font-bold text-lg">
-          {cd}
-        </span>
-      )}
-      {/* MP indicator — small badge bottom-left for arts */}
-      {mpInfo && (
-        <span
-          className={cn(
-            "absolute -bottom-1 -left-1 px-1 py-0 text-[8px] leading-none rounded",
-            "bg-emerald-700 text-white border border-emerald-900",
-            mpShort && !cd && "bg-rose-700 border-rose-900",
-          )}
-        >
-          {mpInfo}
-        </span>
-      )}
-    </button>
-  );
+  return <button type="button" disabled={disabled} onClick={onClick}
+    className={`combat-action combat-action-${kind}`} aria-label={name}>
+    <span className="combat-action-icon" aria-hidden="true">{icon}</span>
+    <span className="combat-action-copy">
+      <strong>{name}</strong>
+      <span>{detail}</span>
+      <small>{cd > 0 ? `รอ ${cd} ตา` : mpShort ? `MP ไม่พอ \xb7 ใช้ ${mp} MP` : `${mp} MP \xb7 1 ตา`}</small>
+    </span>
+  </button>;
 }
 
-// Animation timing for per-hit HP drain — must stay in sync with the
-// damage-pop CSS keyframe + emitCast's CAST_NAME_MS / CAST_HIT_STAGGER_MS
-// constants in battle.ts. Each hit's damage number pops at this offset,
-// and the matching HP drain fires at the same moment.
-const ANIM_NAME_MS = 300;
-const ANIM_HIT_STAGGER_MS = 100;
-
-// Drains the HP bar in sync with the per-hit cast animation. When a new
-// `lastCast` arrives that targeted THIS side, the hook:
-//   1. snaps display HP back to the pre-cast value (actualHp + total
-//      damage that the cast already applied to the engine state)
-//   2. schedules a setTimeout per hit to drop display HP by that hit's
-//      damage at the moment the damage number pops in the overlay
-// Heals / regen / non-damage state changes snap immediately (no anim).
-function useAnimatedHp(
-  actualHp: number,
-  lastCast: BattleState["lastCast"],
-  side: Side,
-): number {
-  const [displayHp, setDisplayHp] = useState(actualHp);
-  // Track the most-recent seq we animated for so the effect doesn't
-  // re-fire on unrelated re-renders (e.g., a sibling SidePanel updates).
-  const lastSeqRef = useRef<number>(-1);
-
-  useEffect(() => {
-    // No active cast → snap to actual.
-    if (!lastCast) {
-      setDisplayHp(actualHp);
-      lastSeqRef.current = -1;
-      return;
-    }
-    // Same cast as before → don't re-animate.
-    if (lastCast.seq === lastSeqRef.current) return;
-    lastSeqRef.current = lastCast.seq;
-
-    // Caster targets the OTHER side — only animate if WE are the target.
-    const targeted = lastCast.side !== side;
-    if (!targeted) {
-      // Non-target: caster's own HP shouldn't budge from the cast.
-      // Snap to actualHp in case some other thing moved it.
-      setDisplayHp(actualHp);
-      return;
-    }
-
-    // Sum landed damages (misses contribute 0 to actualHp delta).
-    const totalDmg = lastCast.hitDamages.reduce((a, b) => a + b, 0);
-    if (totalDmg <= 0) {
-      // Buff / no-damage cast — nothing to drain.
-      setDisplayHp(actualHp);
-      return;
-    }
-    // Pre-cast HP = current actualHp + damage the engine already deducted.
-    const preHp = actualHp + totalDmg;
-    setDisplayHp(preHp);
-
-    const timers: ReturnType<typeof setTimeout>[] = [];
-    let cumulative = preHp;
-    lastCast.hitDamages.forEach((dmg, i) => {
-      const delay = ANIM_NAME_MS + i * ANIM_HIT_STAGGER_MS;
-      cumulative = Math.max(0, cumulative - dmg);
-      const target = cumulative;
-      timers.push(setTimeout(() => setDisplayHp(target), delay));
-    });
-    return () => timers.forEach(clearTimeout);
-  }, [lastCast, actualHp, side]);
-
-  return displayHp;
+// HP follows renderer impacts, including dialog pauses. Remember actual
+// pre-cast HP, because overkill damage cannot reconstruct it accurately.
+function useAnimatedHp(actualHp: number, maxHp: number, lastCast: BattleState["lastCast"],
+  side: Side, progress: BattleCastProgress | null): number {
+  const seq = lastCast?.seq ?? null;
+  const [snapshot, setSnapshot] = useState({ seq, actualHp, beforeHp: actualHp });
+  if (snapshot.seq !== seq) {
+    setSnapshot({ seq, actualHp, beforeHp: snapshot.actualHp });
+  } else if (snapshot.actualHp !== actualHp) {
+    setSnapshot({ ...snapshot, actualHp });
+  }
+  if (!lastCast || lastCast.side === side || lastCast.hitDamages.every((damage) => damage <= 0)
+    || (progress?.seq === seq && progress.complete)) {
+    return Math.max(0, Math.min(maxHp, actualHp));
+  }
+  const hits = progress?.seq === seq ? progress.hits : 0;
+  const damage = lastCast.hitDamages.slice(0, hits).reduce((sum, value) => sum + value, 0);
+  return Math.max(0, Math.min(maxHp, Math.max(actualHp, snapshot.beforeHp - damage)));
 }
 
-// Real-time stats tooltip rendered inside the InfoPopover that wraps a
-// fighter's name in SidePanel. Shows base derived stats merged with the
+// Real-time stats shown in the tap/click popover opened by a fighter's
+// name in SidePanel. Shows base derived stats merged with the
 // caster's currently-active buff / debuff modifiers, plus Hit/Crit %
 // against the opposing fighter — so the player can see the live values
 // that drive damage rolls without committing the chrome to the panel.
 function FighterStatsTooltip({
   name,
   d,
-  opp,
+  opp: _opp,
   hPct,
   cPct,
   buffs,
@@ -225,7 +132,7 @@ function FighterStatsTooltip({
 
   return (
     <div className="space-y-2 text-[11px]">
-      <div className="font-display text-sm border-b pb-1 mb-1">{name}</div>
+      <div className="font-display text-sm border-b pb-1 pr-8 mb-1">{name}</div>
       <div className="grid grid-cols-2 gap-x-3 gap-y-0.5">
         <div className="flex justify-between">
           <span className="text-muted-foreground">HP</span>
@@ -317,6 +224,7 @@ function SidePanel({
   artId,
   artLevel,
   name,
+  progress,
 }: {
   side: Side;
   state: BattleState;
@@ -324,7 +232,9 @@ function SidePanel({
   artId: string;
   artLevel: number;
   name: string;
+  progress: BattleCastProgress | null;
 }) {
+  const [statsOpen, setStatsOpen] = useState(false);
   const d = side === "A" ? state.dA : state.dB;
   const actualHp = side === "A" ? state.hA : state.hB;
   const mp = side === "A" ? state.mpA : state.mpB;
@@ -336,8 +246,8 @@ function SidePanel({
   // delay the visual drop so each hit's damage number pop matches a
   // matching dip in the HP bar. Drains to actualHp by the end of the
   // cast hold, never exceeds it.
-  const hp = useAnimatedHp(actualHp, state.lastCast, side);
-  const hpPct = Math.max(0, (hp / d.HP) * 100);
+  const hp = useAnimatedHp(actualHp, d.HP, state.lastCast, side, progress);
+  const hpPct = Math.max(0, Math.min(100, (hp / d.HP) * 100));
   const mpPct = d.MP > 0 ? Math.max(0, (mp / d.MP) * 100) : 0;
   const gaugePct = Math.min(100, gauge);
   const hPct = Math.round(hitPct(d.Acc, opp.Eva));
@@ -352,63 +262,60 @@ function SidePanel({
   return (
     <Card
       className={cn(
-        isActive && side === "A" && "ring-2 ring-indigo-400",
-        isActive && side === "B" && "ring-2 ring-orange-400",
+        "battle-fighter",
+        isActive && "combat-fighter-active",
       )}
     >
-      <CardContent className="p-3 space-y-1">
-        <div className="font-semibold text-sm">
-          <InfoPopover
-            trigger={
-              <span className="cursor-help underline decoration-dotted decoration-muted-foreground/50 underline-offset-2">
-                {name}
-              </span>
-            }
-            side="bottom"
-            align="start"
-            contentClassName="w-72"
-          >
-            <FighterStatsTooltip
-              name={name}
-              d={d}
-              opp={opp}
-              hPct={hPct}
-              cPct={cPct}
-              buffs={buffs}
-              debuffs={debuffs}
-              stkPct={stkPct}
-            />
-          </InfoPopover>
+      <CardContent className="combat-fighter-content">
+        <div className="combat-fighter-heading">
+          <Popover open={statsOpen} onOpenChange={setStatsOpen}>
+            <PopoverTrigger asChild>
+              <button type="button" className="combat-fighter-name" aria-label={`ดูค่าสถานะของ ${name}`} title={name}>
+                <strong>{name}</strong><span aria-hidden="true">ⓘ</span>
+              </button>
+            </PopoverTrigger>
+            <PopoverContent side="bottom" align="start" sideOffset={6}
+              aria-label={`ค่าสถานะ ${name}`} className="relative w-72 max-w-[90vw] max-h-[70dvh] overflow-y-auto p-3">
+              <button type="button" onClick={() => setStatsOpen(false)} aria-label="ปิดค่าสถานะ"
+                className="absolute right-1 top-1 flex h-8 w-8 items-center justify-center text-lg hover:bg-muted focus-visible:outline focus-visible:outline-2">
+                <span aria-hidden="true">×</span>
+              </button>
+              <FighterStatsTooltip
+                name={name}
+                d={d}
+                opp={opp}
+                hPct={hPct}
+                cPct={cPct}
+                buffs={buffs}
+                debuffs={debuffs}
+                stkPct={stkPct}
+              />
+            </PopoverContent>
+          </Popover>
           {art.id !== "none" && (
             <span
-              className={cn(
-                "text-[10px] ml-1",
-                side === "A" ? "text-indigo-600" : "text-orange-700",
-              )}
+              className="combat-fighter-art"
             >
               [{art.n.substring(0, 7)}{artLevel}]
             </span>
           )}
         </div>
-        <div className="text-[10px] text-muted-foreground">{hp} / {d.HP} HP</div>
-        <Progress value={hpPct} indicatorColor={hpColor(hpPct)} className="h-3" />
-        {d.MP > 0 && (
-          <>
-            <div className="text-[10px] text-muted-foreground">{mp} / {d.MP} MP</div>
-            <Progress value={mpPct} className="h-1.5" />
-          </>
-        )}
-        <div className="text-[10px] text-muted-foreground mt-1 flex justify-between">
-          <span>ATB</span>
-          <span>{Math.floor(gaugePct)}%</span>
+        <div className="combat-hp-line">
+          <Progress value={hpPct} indicatorColor={hpColor(hpPct)} aria-label={`พลังชีวิต ${name}`} className="combat-hp-bar" />
+          <span data-testid={`fighter-${side.toLowerCase()}-hp`}>{hp} / {d.HP} HP</span>
         </div>
-        <Progress
-          value={gaugePct}
-          indicatorColor={side === "A" ? "#7F77DD" : "#D85A30"}
-          className="h-1.5"
-          animate={false}
-        />
-        <div className="flex flex-wrap gap-1 mt-1 min-h-[16px]">
+        <div className="combat-meter-row">
+          {d.MP > 0 && <div>
+            <span>{mp} / {d.MP} MP</span>
+            <Progress value={mpPct} variant="qi" aria-label={`พลังปราณ ${name}`} className="combat-small-bar" />
+          </div>}
+          <div>
+            <span>จังหวะ <b>{isActive ? "พร้อม" : `${Math.floor(gaugePct)}%`}</b></span>
+            <Progress value={isActive ? 100 : gaugePct} aria-label={`จังหวะโจมตี ${name}`}
+              indicatorColor={side === "A" ? "#d9c58b" : "#d69368"} className="combat-small-bar" animate={false} />
+          </div>
+        </div>
+        <div className="combat-buffs">
           {buffs.map((b, i) => {
             const desc = describeBuff(b);
             // Canonical badge label per type — prevents "two separate
@@ -420,7 +327,7 @@ function SidePanel({
                 key={i}
                 trigger={
                   <span className="text-[9px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded cursor-help">
-                    {label}({b.u})
+                    {label}{b.t === "buff_riposte" ? " · 1 ครั้ง" : `(${b.u})`}
                   </span>
                 }
                 contentClassName="max-w-[240px]"
@@ -429,7 +336,7 @@ function SidePanel({
                   <div className="font-bold text-emerald-700">{desc.title}</div>
                   <div className="text-muted-foreground">{desc.detail}</div>
                   <div className="text-[10px] text-muted-foreground border-t pt-1 mt-1">
-                    เหลือ <strong className="text-foreground">{b.u}</strong> เทิร์น
+                    {b.t === "buff_riposte" ? "สิทธิ์สวนกลับจะหมดเมื่อโจมตีกาย แม้พลาด" : <>เหลือ <strong className="text-foreground">{b.u}</strong> เทิร์น</>}
                   </div>
                 </div>
               </InfoPopover>
@@ -503,7 +410,8 @@ export function BattleArena({ mode = "free", onContinue }: BattleArenaProps) {
   const castSkill = useBattleStore((s) => s.useSkill);
   const castArtActive = useBattleStore((s) => s.useArtActive);
   const autoAdvance = useBattleStore((s) => s.autoAdvance);
-  const tick = useBattleStore((s) => s.tick);
+  const takeCombatAction = useBattleStore((s) => s.useCombatAction);
+  const [castProgress, setCastProgress] = useState<BattleCastProgress | null>(null);
   // Battle log defaults closed — the cast-animation banner now carries
   // the moment-to-moment narration, so the log is for after-the-fact
   // review only. Player can toggle open/closed via the header button.
@@ -518,24 +426,7 @@ export function BattleArena({ mode = "free", onContinue }: BattleArenaProps) {
   const displayA: CharacterBuild = battleBuilds?.A ?? setupA;
   const displayB: CharacterBuild = battleBuilds?.B ?? setupB;
 
-  // rAF-driven gauge animation. Runs only while a side hasn't filled yet —
-  // when phase changes to "player"/"enemy"/"over", the effect cleans up and
-  // the loop stops. Restarts when phase returns to "filling".
-  const phase = state?.phase;
-  useEffect(() => {
-    if (phase !== "filling") return;
-    let raf = 0;
-    let lastTime = performance.now();
-    const loop = (now: number) => {
-      // Cap dt so a backgrounded tab can't jump the simulation forward.
-      const dt = Math.min(now - lastTime, 100);
-      lastTime = now;
-      tick(dt);
-      raf = requestAnimationFrame(loop);
-    };
-    raf = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(raf);
-  }, [phase, tick]);
+  // BattleCanvas owns the Three.js update loop and reports visual impacts.
 
   if (!state) {
     if (mode === "world") {
@@ -559,298 +450,93 @@ export function BattleArena({ mode = "free", onContinue }: BattleArenaProps) {
     );
   }
 
-  const isAActive = state.phase === "player";
-  const isBActive = state.phase === "enemy" || state.phase === "resolving";
+  const casting = !!state.lastCast && !(castProgress?.seq === state.lastCast.seq && castProgress.complete);
+  const resultReady = !!state.winner && !casting;
+  const canAct = !state.winner && !casting && state.phase === "player";
+  const isAActive = canAct;
+  const isBActive = !state.winner && !casting && state.phase === "enemy";
   const aA = getArt(displayA.artId);
   const canIA = !!aA.act && state.mpA >= aA.act.c && state.iaCD.A === 0;
+  const recoverMp = Math.min(state.dA.MP - state.mpA, recoveryAmount(state.dA.MP));
+  const riposteReady = state.st.A.buffs.some((buff) => buff.t === "buff_riposte" && buff.u > 0);
+  const headline = resultReady ? "การประลองสิ้นสุด" : casting ? `กำลังใช้ · ${state.lastCast?.name}` :
+    canAct ? "ถึงตาเจ้า · เลือกกระบวนท่า" : isBActive ? `${displayB.name} กำลังออกกระบวนท่า` : "รอจังหวะ · กำลังรวบรวมพลัง";
 
   return (
-    <div className="space-y-3">
-      <div className="grid grid-cols-[1fr_36px_1fr] gap-2">
-        <SidePanel
-          side="A"
-          state={state}
-          isActive={isAActive}
-          artId={displayA.artId}
-          artLevel={displayA.artLevel}
-          name={displayA.name}
-        />
-        <div className="flex items-start justify-center pt-4 text-2xl font-bold text-muted-foreground">VS</div>
-        <SidePanel
-          side="B"
-          state={state}
-          isActive={isBActive}
-          artId={displayB.artId}
-          artLevel={displayB.artLevel}
-          name={displayB.name}
-        />
+    <div className="battle-arena pixel-panel" data-mode={mode}>
+      <div className="combat-status" data-testid="combat-status" data-phase={resultReady ? "over" : casting ? "casting" : state.phase}>
+        <span role="status" aria-live="polite"><i aria-hidden="true" /><strong>{headline}</strong></span>
+        <small>ตาที่ {Math.max(1, state.turn + (!state.winner && !casting ? 1 : 0))}</small>
+      </div>
+      <div className="combat-field">
+        <BattleCanvas mode={mode} onCastProgress={setCastProgress} />
+        <div className="combat-hud">
+          <SidePanel side="A" state={state} isActive={isAActive} artId={displayA.artId}
+            artLevel={displayA.artLevel} name={displayA.name} progress={castProgress} />
+          <div className="combat-versus" aria-hidden="true">對</div>
+          <SidePanel side="B" state={state} isActive={isBActive} artId={displayB.artId}
+            artLevel={displayB.artLevel} name={displayB.name} progress={castProgress} />
+        </div>
+        {showLog && <div id="combat-log-drawer" className="combat-log-drawer" role="region" aria-label="บันทึกการต่อสู้">
+          <BattleLog log={state.log} />
+        </div>}
       </div>
 
-      {/* Skill-cast banner — sits BELOW the side-panel status UI so it
-          doesn't overlap HP / MP / gauge bars. Reserved 96px height
-          keeps the layout stable across cast / no-cast frames. */}
-      <SkillCastOverlay cast={state.lastCast} />
-
-      {state.winner && (
-        <Card>
-          <CardContent
-            className={cn(
-              "p-4 text-center",
-              state.winner === "A" ? "bg-indigo-50 dark:bg-indigo-950" : "bg-orange-50 dark:bg-orange-950",
-            )}
-          >
-            <div className={cn(
-              "text-xl font-bold",
-              state.winner === "A" ? "text-indigo-900 dark:text-indigo-200" : "text-orange-900 dark:text-orange-200",
-            )}>
-              🏆 {state.winner === "A" ? displayA.name : displayB.name} ชนะ!
-            </div>
-            <div className="text-xs text-muted-foreground mt-1">{state.turn} ตา</div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Battle log — collapsible. Header toggles, body conditional. */}
-      <div>
-        <button
-          type="button"
-          onClick={() => setShowLog((v) => !v)}
-          className="w-full flex items-center justify-between gap-2 px-2 py-1.5 text-xs border border-border bg-muted/30 hover:bg-muted/50 transition-colors"
-          aria-expanded={showLog}
-        >
-          <span className="font-display">
-            📜 บันทึกการต่อสู้{" "}
-            <span className="text-muted-foreground">({state.log.length})</span>
-          </span>
-          <span
-            className={cn(
-              "text-muted-foreground transition-transform",
-              showLog && "rotate-90",
-            )}
-            aria-hidden="true"
-          >
-            ▸
-          </span>
-        </button>
-        {showLog && (
-          <div className="mt-1">
-            <BattleLog log={state.log} />
-          </div>
-        )}
-      </div>
-
-      {state.winner ? (
-        mode === "world" ? (
-          <div className="flex justify-center">
-            <Button size="lg" onClick={() => onContinue?.()}>
-              ดำเนินเรื่อง →
-            </Button>
+      <section className="combat-decision" aria-label="กระบวนท่าต่อสู้">
+        {resultReady ? (
+          <div className="combat-result" data-testid="combat-result">
+            <div><span>{state.winner === "A" ? "ชัยชนะ" : "พ่ายแพ้"}</span>
+              <strong>{state.winner === "A" ? displayA.name : displayB.name} ชนะ</strong>
+              <small>ประลอง {state.turn} ตา</small></div>
+            {mode === "world" ? <Button onClick={() => onContinue?.()}>ดำเนินเรื่อง →</Button> :
+              <div className="flex gap-2"><Button onClick={() => start(setupA, setupB)}>เริ่มใหม่</Button>
+                <Button variant="outline" onClick={reset}>Reset</Button></div>}
           </div>
         ) : (
-          <div className="flex justify-center gap-2">
-            <Button onClick={() => start(setupA, setupB)}>เริ่มใหม่</Button>
-            <Button variant="outline" onClick={reset}>
-              Reset
-            </Button>
-          </div>
-        )
-      ) : state.phase === "player" ? (
-        <div className="space-y-2">
-          <p className="text-xs text-center text-muted-foreground">
-            เลือกวิชา: <strong>{displayA.name}</strong>
-          </p>
-          <div className="flex gap-1.5 justify-center flex-wrap">
+          <div className="combat-actions">
             {displayA.skillIds.map((raw, i) => {
               if (!raw) return null;
               const info = parseSlotId(raw);
               if (!info) return null;
-              const cd = state.cd.A[i];
-              const onCd = cd > 0;
-
+              const cd = state.cd.A[i] ?? 0;
               if (info.kind === "art") {
                 const art = info.art;
                 if (!art.act) return null;
                 const mpShort = state.mpA < art.act.c;
-                return (
-                  <ArtTooltip key={i} art={art}>
-                    <SkillButton
-                      icon={<ArtIcon art={art} size={48} />}
-                      disabled={onCd || mpShort}
-                      onClick={() => castSkill(i)}
-                      cd={onCd ? cd : 0}
-                      mpInfo={`${art.act.c}/${state.mpA}`}
-                      mpShort={mpShort}
-                      isArt
-                    />
-                  </ArtTooltip>
-                );
+                return <SkillButton key={i} name={art.n} icon={<ArtIcon art={art} size={34} />}
+                  disabled={!canAct || cd > 0 || mpShort} onClick={() => castSkill(i)} cd={cd}
+                  mp={art.act.c} mpShort={mpShort} detail="วิชาในกาย · ใช้ปราณ" />;
               }
-
               const sk = info.skill;
-              return (
-                <SkillTooltip key={i} skill={sk}>
-                  <SkillButton
-                    icon={<SkillIcon skill={sk} size={48} />}
-                    disabled={onCd}
-                    onClick={() => castSkill(i)}
-                    cd={onCd ? cd : 0}
-                  />
-                </SkillTooltip>
-              );
+              const detail = sk.at ? `${sk.at === "phy" ? riposteReady ? `สวนกลับ +${RIPOSTE_BONUS}%` : "โจมตีภายนอก" : "โจมตีปราณ"} · ${sk.hits ?? 1} ครั้ง` : "เสริมพลัง · เปลี่ยนจังหวะ";
+              return <SkillButton key={i} name={sk.n} icon={<SkillIcon skill={sk} size={34} />}
+                disabled={!canAct || cd > 0} onClick={() => castSkill(i)} cd={cd} detail={detail} />;
             })}
-            {aA.act && (
-              <ArtTooltip art={aA}>
-                <SkillButton
-                  icon={<ArtIcon art={aA} size={48} />}
-                  disabled={!canIA}
-                  onClick={castArtActive}
-                  cd={state.iaCD.A}
-                  mpInfo={`${aA.act.c}/${state.mpA}`}
-                  mpShort={state.mpA < aA.act.c}
-                  isArt
-                />
-              </ArtTooltip>
-            )}
+            {aA.act && !displayA.skillIds.includes(`art:${aA.id}`) &&
+              <SkillButton name={aA.n} icon={<ArtIcon art={aA} size={34} />}
+                disabled={!canAct || !canIA} onClick={castArtActive} cd={state.iaCD.A}
+                mp={aA.act.c} mpShort={state.mpA < aA.act.c} detail="วิชาในกาย · ใช้ปราณ" />}
+            <SkillButton name="ตั้งรับ" icon={<Shield size={27} strokeWidth={1.5} />} kind="guard"
+              disabled={!canAct || state.mpA < GUARD_MP_COST} onClick={() => takeCombatAction("guard")}
+              mp={GUARD_MP_COST} mpShort={state.mpA < GUARD_MP_COST}
+              detail={`ลดรับ ${GUARD_REDUCTION}% · กายครั้งถัดไป +${RIPOSTE_BONUS}% (ใช้แม้พลาด)`} />
+            <SkillButton name="รวบรวมปราณ" icon={<Wind size={27} strokeWidth={1.5} />} kind="recover"
+              disabled={!canAct || recoverMp <= 0} onClick={() => takeCombatAction("recover")}
+              detail={recoverMp > 0 ? `MP +${recoverMp} · หลบหลีก −${RECOVER_EVASION_COST} จังหวะถัดไป` : "MP เต็ม · ใช้เมื่อปราณพร่อง"} />
           </div>
-          {mode === "free" && (
-            <div className="flex justify-center gap-2">
-              <Button variant="outline" size="sm" onClick={autoAdvance}>
-                Auto ▶▶
-              </Button>
-              <Button variant="outline" size="sm" onClick={reset}>
-                Reset
-              </Button>
-            </div>
-          )}
-        </div>
-      ) : state.phase === "filling" ? (
-        <div className="text-center space-y-2">
-          <p className="text-sm italic text-muted-foreground py-2">
-            กำลังสะสมพลัง... (A {Math.floor(state.gA)}% · B {Math.floor(state.gB)}%)
-          </p>
-          {mode === "free" && (
-            <div className="flex justify-center gap-2">
-              <Button variant="outline" size="sm" onClick={autoAdvance}>
-                Auto ▶▶
-              </Button>
-              <Button variant="outline" size="sm" onClick={reset}>
-                Reset
-              </Button>
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className="text-center space-y-2">
-          <p className="text-sm italic text-muted-foreground py-2">{displayB.name} กำลังโจมตี...</p>
-          {mode === "free" && (
-            <Button variant="outline" size="sm" onClick={reset}>
-              Reset
-            </Button>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─── Skill-cast animation banner ──────────────────────────────────────
-// Renders the most-recent skill / art active cast in a fixed-height
-// banner placed BELOW the side-panel status UI (HP / MP / gauges).
-//
-// Animation sequence (must stay synced with `castEndsAt` in battle.ts):
-//   - 0.00s: skill name pops in BIG (animate-skill-cast)
-//   - 0.30s: hit 1 damage pops (animate-damage-pop with delay 0.3s)
-//   - 0.40s: hit 2 damage pops
-//   - 0.30s + (n-1)*0.10s: hit n
-// Each hit shows either its damage (with ★ for crits) or "พลาดเป้า"
-// for misses. Layout stays stable because the container reserves a
-// fixed height regardless of cast presence.
-function SkillCastOverlay({
-  cast,
-}: {
-  cast: BattleState["lastCast"];
-}) {
-  // Reserve the height even when no cast yet — keeps the BattleLog
-  // anchored at a stable Y so the layout doesn't shift mid-battle.
-  if (!cast) return <div className="h-32" aria-hidden />;
-  const { seq, name, hits, hitDamages, hitCrits, hitMisses, tier } = cast;
-  // Rarity-tinted name color by skill / art tier:
-  //   T0 grey · T1 green · T2 blue · T3 purple · T4 orange
-  // Higher tiers escalate visually (mirrors loot-rarity conventions in
-  // most RPGs).
-  const tierColor =
-    [
-      "text-stone-500",   // T0 medium grey (common)
-      "text-emerald-600", // T1 green       (uncommon)
-      "text-sky-600",     // T2 blue        (rare)
-      "text-purple-600",  // T3 purple      (epic)
-      "text-orange-500",  // T4 orange      (legendary)
-    ][tier] ?? "text-foreground";
-  return (
-    <div
-      key={seq}
-      className="pointer-events-none flex h-32 flex-col items-center justify-start pt-1"
-      aria-hidden
-    >
-      {/* Skill name — large, top tier of the banner. */}
-      <div
-        className={cn(
-          "font-action font-bold animate-skill-cast",
-          "text-4xl sm:text-5xl md:text-6xl leading-none",
-          "text-center px-2 py-0.5",
-          "text-stroke-black drop-shadow-[2px_2px_0_hsl(20_15%_12%/0.9)]",
-          tierColor,
         )}
-      >
-        {name}
-        {hits > 1 && (
-          <span className="ml-1.5 text-sm align-top text-muted-foreground">
-            ×{hits}
-          </span>
-        )}
-      </div>
+      </section>
 
-      {/* Per-hit damage row — staggered. Each hit waits for skill name
-          (0.3s) plus its index × 0.1s before popping in. */}
-      <div className="mt-2 flex gap-2 items-center justify-center min-h-[2.25rem]">
-        {hitDamages.map((dmg, i) => {
-          const isMiss = hitMisses[i];
-          const isCrit = hitCrits[i];
-          const delayMs = 300 + i * 100;
-          const styleVar = { animationDelay: `${delayMs}ms` } as React.CSSProperties;
-          if (isMiss) {
-            return (
-              <span
-                key={i}
-                className={cn(
-                  "font-action text-xl sm:text-2xl text-muted-foreground",
-                  "animate-damage-pop opacity-0",
-                  "drop-shadow-[1px_1px_0_hsl(20_15%_12%/0.6)]",
-                )}
-                style={styleVar}
-              >
-                พลาดเป้า
-              </span>
-            );
-          }
-          if (dmg <= 0) return null; // buff / no-damage cast
-          return (
-            <span
-              key={i}
-              className={cn(
-                "font-action font-bold leading-none animate-damage-pop opacity-0",
-                "text-3xl sm:text-4xl md:text-5xl",
-                "drop-shadow-[2px_2px_0_hsl(20_15%_12%/0.9)]",
-                isCrit ? "text-red-600" : "text-amber-700",
-              )}
-              style={styleVar}
-            >
-              {isCrit && <span className="mr-0.5 text-xl align-top">★</span>}
-              {dmg}
-            </span>
-          );
-        })}
+      <div className="combat-log">
+        <button type="button" onClick={() => setShowLog((value) => !value)} aria-expanded={showLog} aria-controls="combat-log-drawer">
+          <span>บันทึกการต่อสู้ <small>({state.log.length})</small></span>
+          <span aria-hidden="true">{showLog ? "−" : "+"}</span>
+        </button>
       </div>
+      {mode === "free" && !state.winner && <div className="combat-debug-controls flex justify-center gap-2">
+        <Button variant="outline" size="sm" onClick={autoAdvance} disabled={casting}>Auto ▶▶</Button>
+        <Button variant="outline" size="sm" onClick={reset}>Reset</Button>
+      </div>}
     </div>
   );
 }

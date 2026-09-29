@@ -1,0 +1,18 @@
+{
+  "stats": {
+    "STR": 1,
+    "AGI": 1,
+    "POW": 1,
+    "VIT": 1,
+    "DEX": 1,
+    "LUK": 1,
+    "DEF": 1,
+    "INT": 1
+  },
+  "pending": {
+    "opponentId": "petty_thief",
+    "onWin": "home_player",
+    "onLose": "home_player",
+    "nonFatal": true
+  }
+}

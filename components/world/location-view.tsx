@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -25,6 +25,7 @@ import {
 import { LocationMap } from "./location-map";
 import { MapHud } from "./map-hud";
 import { MenuBar } from "./menu-bar";
+import { JourneyGuide } from "./journey-guide";
 import { NpcInteractionPopup } from "./popups/npc-interaction-popup";
 import { RestPopup } from "./popups/rest-popup";
 import { RumorPopup } from "./popups/rumor-popup";
@@ -47,13 +48,16 @@ import { toast } from "@/store/toast-store";
 
 interface Props {
   scene: LocationScene;
+  /** Keep the same location runtime visible beneath a scripted conversation. */
+  readOnly?: boolean;
+  dialogueSpeakerId?: string;
 }
 
 // Location view: place description, talk-to-NPC list, outbound routes.
 // Routes navigate to a route scene (kind "route") which is its own selection
 // screen — even single-destination routes get that intermediate screen so
 // authors can give travel narration and the back-button stays consistent.
-export function LocationView({ scene }: Props) {
+export function LocationView({ scene, readOnly = false, dialogueSpeakerId }: Props) {
   const state = useWorldStore();
   const gotoScene = useWorldStore((s) => s.gotoScene);
   const gatherResource = useWorldStore((s) => s.gatherResource);
@@ -72,6 +76,20 @@ export function LocationView({ scene }: Props) {
   const [rumorOpen, setRumorOpen] = useState(false);
   // Fullscreen safety drawer for content a map hasn't placed yet.
   const [drawerOpen, setDrawerOpen] = useState(false);
+
+  useEffect(() => {
+    if (!readOnly) return;
+    // The location now survives dialogue. Clear its old overlays as the previous
+    // unmount did, so returning from a conversation restores unobstructed play.
+    setActiveNpc(null);
+    setShopOpen(false);
+    setHallOpen(false);
+    setPracticeOpen(false);
+    setActiveArtisan(null);
+    setRestOpen(false);
+    setRumorOpen(false);
+    setDrawerOpen(false);
+  }, [readOnly]);
 
   const shop = getShopAt(scene.id);
   const hall = getSectHallAt(scene.id);
@@ -236,6 +254,10 @@ export function LocationView({ scene }: Props) {
               {cardRoutes.map((route) => {
                 const target = getScene(route.routeSceneId);
                 const valid = target?.kind === "route";
+                const duplicateLabel = visibleRoutes.some(other => other !== route && other.label === route.label);
+                const destinations = valid ? target.destinations.map(destination => getScene(destination.locationId))
+                  .flatMap(destination => destination?.kind === "location" ? [destination.name] : []).join(" / ") : "";
+                const label = duplicateLabel && destinations ? `${route.label} · ${destinations}` : route.label;
                 const tooTired = stamina < TRAVEL_STAMINA_COST;
                 return (
                   <Button
@@ -246,7 +268,7 @@ export function LocationView({ scene }: Props) {
                     className="w-full justify-start text-left h-auto py-2 whitespace-normal"
                   >
                     <span className="flex flex-col items-start gap-0.5">
-                      <span className="font-semibold text-sm">🚶 {route.label}</span>
+                      <span className="font-semibold text-sm">🚶 {label}</span>
                       <span className="text-[10px] text-muted-foreground">
                         ⚡ {TRAVEL_STAMINA_COST}
                         {route.hint && <span className="ml-2">{route.hint}</span>}
@@ -460,11 +482,13 @@ export function LocationView({ scene }: Props) {
     return (
       // !mt-0: the page wrapper's space-y-3 would otherwise push this
       // fixed layer 12px down — margins still offset fixed elements.
-      <div className="fixed inset-0 z-40 bg-ink !mt-0">
+      <div className="fixed inset-0 z-40 bg-ink !mt-0" inert={readOnly || undefined} aria-hidden={readOnly || undefined}>
         <LocationMap
           key={scene.id}
           scene={scene}
           map={map}
+          readOnly={readOnly}
+          dialogueSpeakerId={dialogueSpeakerId}
           handlers={{
             onRegistryNpc: setActiveNpc,
             onShop: () => setShopOpen(true),
@@ -476,14 +500,16 @@ export function LocationView({ scene }: Props) {
             onResource: runGather,
           }}
         />
+        {!readOnly && <>
         <MapHud />
+        <JourneyGuide />
         <MenuBar hud />
         {hasLeftovers && (
           <button
             type="button"
             title="อื่น ๆ ในบริเวณนี้"
             onClick={() => setDrawerOpen(true)}
-            className="absolute bottom-2 right-2 z-30 w-11 h-11 frame-pixel-quiet bg-ink/80 hover:bg-ink transition-colors text-xl"
+            className="journey-extras absolute top-40 right-3 z-30 w-11 h-11 pixel-panel hover:brightness-125 text-xl"
           >
             📋
           </button>
@@ -499,6 +525,7 @@ export function LocationView({ scene }: Props) {
           <div className="space-y-3">{cards}</div>
         </Modal>
         {popups}
+        </>}
       </div>
     );
   }
@@ -506,6 +533,7 @@ export function LocationView({ scene }: Props) {
   // ── classic card layout for locations without a map ─────────────────
   return (
     <div className="space-y-3">
+      <JourneyGuide inline />
       {/* Liveness Layer §4.2 — passive arrival rumor banner. Renders
           itself only when the scene is city-like and the 7-day cooldown
           has elapsed. No-op everywhere else, so it's safe to mount

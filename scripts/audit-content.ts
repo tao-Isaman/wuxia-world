@@ -31,6 +31,15 @@ function require(label: string, ok: boolean): void {
   if (!ok) issues.push(label);
 }
 
+// Map construction otherwise silently hides duplicate authored entries.
+for (const [kind, entries] of [["NPC", NPCS], ["Quest", QUESTS]] as const) {
+  const seen = new Set<string>();
+  for (const entry of entries) {
+    require(`${kind}: duplicate id "${entry.id}"`, !seen.has(entry.id));
+    seen.add(entry.id);
+  }
+}
+
 function checkCondition(ctx: string, c: Condition): void {
   switch (c.t) {
     case "hasItem":

@@ -1,0 +1,14 @@
+{
+  "cookies": [],
+  "origins": [
+    {
+      "origin": "http://127.0.0.1:3017",
+      "localStorage": [
+        {
+          "name": "wusia-world-v1",
+          "value": "{\"state\":{\"hasGame\":true,\"playerBuild\":{\"name\":\"ศึกทดลอง\",\"stats\":{\"STR\":1,\"AGI\":1,\"POW\":1,\"VIT\":1,\"DEX\":1,\"LUK\":1,\"DEF\":1,\"INT\":1},\"artId\":\"none\",\"artLevel\":1,\"skillIds\":[\"basic_punch\",null,null,null,null,null,null,null,null,null],\"equipment\":{\"W\":null,\"A\":null,\"H\":null,\"B\":null,\"BR\":[null,null],\"R\":[null,null],\"C\":[null,null]},\"learnedSkillIds\":[\"basic_punch\"],\"learnedArtIds\":[],\"artLevels\":{},\"skillLevels\":{\"basic_punch\":1}},\"gender\":\"male\",\"playerBodyId\":\"m1\",\"sectMembership\":{},\"currentSceneId\":\"home_player\",\"lastLocationId\":\"home_player\",\"flags\":{},\"quests\":{},\"inventory\":{},\"gold\":0,\"stamina\":100,\"staminaMax\":100,\"currentHp\":36,\"currentMp\":10,\"lifeSkillXp\":{\"mining\":0,\"woodcutting\":0,\"hunting\":0,\"fishing\":0,\"herbalism\":0,\"venom\":0,\"reading\":0,\"music\":0,\"drawing\":0,\"writing\":0,\"chess\":0,\"begging\":0,\"steal\":0,\"forge\":0,\"tailoring\":0,\"jewelry\":0,\"alchemy\":0,\"chef\":0,\"accessory\":0},\"wExp\":0,\"skillLevel\":{\"basic_punch\":1},\"skillExp\":{},\"artExp\":{},\"learnedRecipeIds\":[],\"inventoryEquipment\":{},\"statExp\":{\"STR\":0,\"AGI\":0,\"POW\":0,\"VIT\":0,\"DEX\":0,\"LUK\":0,\"DEF\":0,\"INT\":0},\"traits\":{\"good\":0,\"evil\":0,\"arrogance\":0,\"humility\":0,\"fame\":0},\"npcStates\":{},\"defeatedCounts\":{},\"visitedLocationIds\":[\"home_player\"],\"stoleFromCounts\":{},\"assassinatedNpcIds\":[],\"kidnappedNpcIds\":[],\"day\":1,\"time\":0,\"pendingBattle\":null,\"pendingEncounter\":null,\"pendingHuntYield\":null,\"pendingSpar\":null,\"gameOver\":false,\"actionLog\":[],\"npcExt\":{},\"rumorPool\":[],\"rumorArchive\":[],\"rumorSeenLog\":[],\"lastNpcTickDay\":1},\"version\":19}"
+        }
+      ]
+    }
+  ]
+}

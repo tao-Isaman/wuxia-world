@@ -1,10 +1,20 @@
-import type { Scene } from "../../types";
+import type { Condition, Scene } from "../../types";
+import { CAPITAL_TRAINING_SCENES } from "../capital-training";
+
+const ledgerActive: Condition = { t: "questStatus", questId: "qc_capital_lost_ledger", status: "active" };
+const ledgerPending: Condition = { t: "and", all: [ledgerActive,
+  { t: "not", of: { t: "flag", flag: "capital_ledger_recovered" } },
+] };
+const ledgerArchiveAccess: Condition = { t: "and", all: [ledgerPending,
+  { t: "flag", flag: "capital_ledger_qing_interviewed" },
+] };
 
 // NPC ambient dialogs + quest beats for the 7 cities. Owned by content
 // agent A. Every dialog scene id referenced from
 // lib/world/data/npcs/cities.ts (`dialogSceneId`) and
 // lib/world/data/quests/cities.ts (giver/turn-in flows) must resolve here.
 export const SCENES_CITIES: readonly Scene[] = [
+  ...CAPITAL_TRAINING_SCENES,
 
   // ═══════════════════════════════════════════════════════════════════
   // AMBIENT NPC DIALOGS
@@ -19,8 +29,181 @@ export const SCENES_CITIES: readonly Scene[] = [
       { t: "dialogue", speaker: "นายอำเภอหวู่", text: "แต่ถ้าท่านมีฝีมือและจิตใจซื่อสัตย์ ข้ามีงานให้ทำหลายชิ้น บ้านเมืองนี้กำลังเต็มไปด้วยปัญหา" },
     ],
     choices: [
-      { text: "รับฟังงานที่นายอำเภอมอบหมาย", next: "npc_city_capital_magistrate_wu_talk" },
-      { text: "กลับไปสำรวจนครหลวง", next: "city_capital" },
+      {
+        text: "ส่งคำขอเสบียงจากหมอหลิน",
+        // The delivery fact and stage advance are committed in one choice.
+        // An active quest with no delivery yet is this quest's first stage.
+        visibleIf: {
+          t: "and",
+          all: [
+            { t: "questStatus", questId: "qc_capital_clinic_supplies", status: "active" },
+            { t: "not", of: { t: "flag", flag: "clinic_supplies_delivered" } },
+          ],
+        },
+        effects: [
+          { t: "setFlag", flag: "clinic_supplies_delivered", value: true },
+          { t: "advanceQuest", questId: "qc_capital_clinic_supplies" },
+        ],
+        next: "qs_qc_capital_clinic_supplies_delivery",
+      },
+      { text: "รับฟังงานที่นายอำเภอมอบหมาย", next: "npc_city_capital_magistrate_wu_jobs" },
+      { text: "กลับไปสำรวจนครหลวง", next: "npc_city_capital_magistrate_wu_return" },
+    ],
+  },
+  {
+    kind: "dialog",
+    id: "npc_city_capital_magistrate_wu_jobs",
+    lines: [
+      { t: "dialogue", speaker: "นายอำเภอหวู่", text: "บัญชีคลังหลวงที่หายไปเป็นงานสืบสวนในนครหลวง ไปคุยกับเสมียนนายฉิงที่ยืนด้านซ้ายของข้า เขาให้ยืมกุญแจเก่าเปิดหีบเอกสารได้ ไม่ต้องเดินทางไปพระราชวัง" },
+      { t: "dialogue", speaker: "นายอำเภอหวู่", text: "ส่วนคดีเสมียนฉ้อฉล ให้ถามนายฉิงเรื่องสินบนก่อน แล้วต้องปราบนักเลง 2 คน เตรียมฝีมือให้พร้อม" },
+      { t: "dialogue", speaker: "นายอำเภอหวู่", text: "หนังสือนิรโทษกรรมเป็นงานเดินทางไปจินหลิง ส่งให้นักยุทธศาสตร์กง แล้วนำใบรับกลับมานครหลวง เมื่อพร้อมค่อยกลับมาเลือกภารกิจที่เปิดให้รับ" },
+    ],
+    choices: [
+      { text: "กลับไปคุยเรื่องอื่น", next: "npc_city_capital_magistrate_wu_talk" },
+      { text: "ขอบคุณ ข้าขอเตรียมตัวก่อน", next: "npc_city_capital_magistrate_wu_return" },
+    ],
+  },
+  {
+    kind: "dialog",
+    id: "npc_city_capital_magistrate_wu_return",
+    lines: [],
+    onEnter: [{ t: "goto", sceneId: "city_capital" }],
+  },
+
+  // Qing's local investigation uses facts rather than advanceQuest, so
+  // repeat interviews cannot skip a stage or finish a legacy stage-2 save.
+  {
+    kind: "dialog",
+    id: "npc_city_capital_clerk_qing_talk",
+    lines: [
+      { t: "narration", text: "เสมียนผู้หนึ่งประคองทะเบียนแนบอก ข้างเท้าเป็นหีบเอกสารผูกเชือกแดง" },
+      { t: "dialogue", speaker: "เสมียนนายฉิง", text: "ข้าดูแลเอกสารของสำนักงาน ท่านมีเรื่องใดให้ข้าช่วยหรือ?" },
+    ],
+    choices: [
+      {
+        text: "ถามถึงบัญชีคลังหลวงที่หายไป",
+        visibleIf: ledgerPending,
+        effects: [{ t: "setFlag", flag: "capital_ledger_qing_interviewed", value: true }],
+        next: "qs_qc_capital_lost_ledger_clue",
+      },
+      { text: "ตรวจหีบเอกสารข้างเสมียนนายฉิง", visibleIf: ledgerArchiveAccess, next: "qs_qc_capital_lost_ledger_chest" },
+      {
+        text: "ถามเรื่องสินบนในสำนักงาน",
+        visibleIf: { t: "and", all: [
+          { t: "questStatus", questId: "qc_capital_corrupt_clerk", status: "active" },
+          { t: "not", of: { t: "flag", flag: "capital_clerk_bribery_lead" } },
+        ] },
+        effects: [{ t: "setFlag", flag: "capital_clerk_bribery_lead", value: true }],
+        next: "qs_qc_capital_corrupt_clerk_contact",
+      },
+      {
+        text: "ข้านำบัญชีไปให้นายอำเภอหวู่ได้แล้วใช่ไหม",
+        visibleIf: { t: "and", all: [ledgerActive, { t: "flag", flag: "capital_ledger_recovered" }] },
+        next: "qs_qc_capital_lost_ledger_recovered",
+      },
+      { text: "ขอตัวไปสำรวจนครหลวง", next: "npc_city_capital_clerk_qing_return" },
+    ],
+  },
+  {
+    kind: "dialog",
+    id: "npc_city_capital_clerk_qing_return",
+    lines: [],
+    onEnter: [{ t: "goto", sceneId: "city_capital" }],
+  },
+  {
+    kind: "dialog",
+    id: "qs_qc_capital_lost_ledger_clue",
+    lines: [
+      { t: "dialogue", speaker: "เสมียนนายฉิง", text: "คืนฝนตก ข้าย้ายเอกสารหนีน้ำลงหีบข้างตัว บัญชีเล่มที่ผูกด้ายแดงอาจปะปนอยู่ใต้ผ้าคลุม ยังไม่มีใครเปิดตรวจเลย" },
+      { t: "dialogue", speaker: "เสมียนนายฉิง", text: "ตรวจรอยตราบนหีบก่อนได้ แล้วใช้กุญแจเก่าเปิดดู หากท่านไม่มี ข้าให้ยืมหนึ่งดอก ไม่ต้องจ่ายเงิน" },
+    ],
+    choices: [
+      { text: "ตรวจหีบเอกสารข้างเสมียนนายฉิง", visibleIf: ledgerArchiveAccess, next: "qs_qc_capital_lost_ledger_chest" },
+      { text: "กลับไปถามนายฉิง", next: "npc_city_capital_clerk_qing_talk" },
+      { text: "ขอตัวไปสำรวจนครหลวง", next: "npc_city_capital_clerk_qing_return" },
+    ],
+  },
+  {
+    kind: "dialog",
+    id: "qs_qc_capital_lost_ledger_chest",
+    lines: [
+      { t: "narration", text: "ตราประทับบนเชือกแดงยังอยู่ครบ ฝาหีบมีรอยชื้น แต่แม่กุญแจไม่มีรอยงัด ต้องเปิดจึงจะเห็นเอกสารข้างใน" },
+      { t: "dialogue", speaker: "เสมียนนายฉิง", text: "นี่คือหีบที่ข้าใช้เก็บเอกสารคืนนั้น กุญแจเก่าไขแม่กุญแจนี้ได้" },
+    ],
+    choices: [
+      {
+        text: "ใช้กุญแจเก่าเปิดหีบและหยิบบัญชี",
+        visibleIf: { t: "and", all: [ledgerArchiveAccess, { t: "hasItem", itemId: "old_key", count: 1 }] },
+        effects: [{ t: "setFlag", flag: "capital_ledger_recovered", value: true }],
+        next: "qs_qc_capital_lost_ledger_recovered",
+      },
+      {
+        text: "ขอยืมกุญแจเก่าจากนายฉิง",
+        visibleIf: { t: "and", all: [ledgerArchiveAccess,
+          { t: "not", of: { t: "hasItem", itemId: "old_key", count: 1 } },
+          { t: "not", of: { t: "flag", flag: "capital_ledger_key_lent" } },
+        ] },
+        effects: [
+          { t: "setFlag", flag: "capital_ledger_key_lent", value: true },
+          { t: "giveItem", itemId: "old_key", count: 1 },
+        ],
+        next: "qs_qc_capital_lost_ledger_key",
+      },
+      {
+        // Another quest can consume old_key. Allow the clerk's spare to
+        // open this chest without creating a repeatable source of keys.
+        text: "กุญแจที่ยืมไม่อยู่แล้ว ขอให้นายฉิงไขหีบให้",
+        visibleIf: { t: "and", all: [ledgerArchiveAccess,
+          { t: "not", of: { t: "hasItem", itemId: "old_key", count: 1 } },
+          { t: "flag", flag: "capital_ledger_key_lent" },
+        ] },
+        effects: [{ t: "setFlag", flag: "capital_ledger_recovered", value: true }],
+        next: "qs_qc_capital_lost_ledger_spare",
+      },
+      { text: "กลับไปถามนายฉิง", next: "npc_city_capital_clerk_qing_talk" },
+      { text: "ขอตัวไปสำรวจนครหลวง", next: "npc_city_capital_clerk_qing_return" },
+    ],
+  },
+  {
+    kind: "dialog",
+    id: "qs_qc_capital_lost_ledger_key",
+    lines: [
+      { t: "dialogue", speaker: "เสมียนนายฉิง", text: "นี่ กุญแจเก่าหนึ่งดอก เก็บไว้ใช้ต่อได้ แต่ช่วยตรวจหีบให้ข้าทีเถิด ข้าไม่อยากให้เอกสารสูญไปจริง ๆ" },
+      { t: "narration", text: "ท่านรับกุญแจมาแล้ว หีบยังปิดอยู่ — ต้องไขหีบจึงจะได้บัญชี" },
+    ],
+    choices: [
+      { text: "กลับไปตรวจหีบเอกสาร", visibleIf: ledgerArchiveAccess, next: "qs_qc_capital_lost_ledger_chest" },
+      { text: "ขอตัวไปสำรวจนครหลวง", next: "npc_city_capital_clerk_qing_return" },
+    ],
+  },
+  {
+    kind: "dialog",
+    id: "qs_qc_capital_lost_ledger_spare",
+    lines: [
+      { t: "dialogue", speaker: "เสมียนนายฉิง", text: "ไม่เป็นไร ข้ายังมีกุญแจสำรองของสำนักงาน ข้าจะไขให้ แต่ดอกนี้ข้าต้องเก็บไว้" },
+      { t: "narration", text: "นายฉิงไขหีบ ท่านยกผ้าคลุมและหยิบบัญชีผูกด้ายแดงขึ้นมา หน้ากระดาษยังครบถ้วน" },
+    ],
+    choices: [{ text: "นำบัญชีไปรายงานนายอำเภอหวู่", next: "npc_city_capital_clerk_qing_return" }],
+  },
+  {
+    kind: "dialog",
+    id: "qs_qc_capital_lost_ledger_recovered",
+    lines: [
+      { t: "narration", text: "บัญชีคลังหลวงผูกด้ายแดงอยู่กับท่านแล้ว หน้ากระดาษครบถ้วน ตรงกับรายการที่นายอำเภอแจ้งไว้" },
+      { t: "dialogue", speaker: "เสมียนนายฉิง", text: "โล่งอกไปที! โปรดนำบัญชีไปให้นายอำเภอหวู่ที่ยืนด้านขวาของข้า และบอกท่านด้วยว่าเราเจอในหีบหนีน้ำ กุญแจเก่าท่านเก็บไว้ได้" },
+    ],
+    choices: [{ text: "นำบัญชีไปรายงานนายอำเภอหวู่", next: "npc_city_capital_clerk_qing_return" }],
+  },
+  {
+    kind: "dialog",
+    id: "qs_qc_capital_corrupt_clerk_contact",
+    lines: [
+      { t: "dialogue", speaker: "เสมียนนายฉิง", text: "มีนักเลงนำเงินจากพ่อค้ามาฝากเสมียนในสำนักงานจริง แต่พวกมันเก็บใบรับเงินไว้ ข้าบอกได้เพียงเบาะแส ยังไม่พอเอาผิดใคร" },
+      { t: "dialogue", speaker: "เสมียนนายฉิง", text: "หากพบนักเลงระหว่างเดินทาง ให้รวบรวมหลักฐานจากพวกมัน 2 คนหลังรับงาน แล้วกลับไปหาหวู่ อย่าฝืนสู้หากบาดเจ็บหรือยังไม่พร้อม" },
+    ],
+    choices: [
+      { text: "กลับไปถามนายฉิง", next: "npc_city_capital_clerk_qing_talk" },
+      { text: "ขอตัวไปเตรียมฝีมือ", next: "npc_city_capital_clerk_qing_return" },
     ],
   },
 
@@ -75,9 +258,28 @@ export const SCENES_CITIES: readonly Scene[] = [
       { t: "dialogue", speaker: "หมอหลิน", text: "ตำรับยาของข้าสืบทอดมาหลายชั่วคน แต่ช่วงนี้มีคนพยายามขโมยความรับรู้ น่ากังวลนัก" },
     ],
     choices: [
-      { text: "ถามเรื่องยาสมุนไพร", next: "npc_city_capital_physician_lin_talk" },
-      { text: "ลาจาก", next: "city_capital" },
+      { text: "ถามเรื่องยาสมุนไพร", next: "npc_city_capital_physician_lin_herbs" },
+      { text: "ลาจาก", next: "npc_city_capital_physician_lin_return" },
     ],
+  },
+  {
+    kind: "dialog",
+    id: "npc_city_capital_physician_lin_herbs",
+    lines: [
+      { t: "dialogue", speaker: "หมอหลิน", text: "สมุนไพรหายากเป็นวัตถุดิบปรุงยา หากบาดเจ็บ ตลาดนครหลวงมียาเลือดเล็ก ราคา 50 ทอง ใช้จากย่ามเพื่อฟื้น HP ได้สูงสุด 30" },
+      { t: "dialogue", speaker: "หมอหลิน", text: "ส่วนบัวหิมะอยู่ที่ก้นหุบเขาตัดใจ ต้องมีทักษะเก็บสมุนไพรระดับ 5 จึงเก็บได้ เตรียมตัวให้พร้อมก่อนเดินทางไกลนะ" },
+    ],
+    choices: [
+      { text: "กลับไปคุยเรื่องอื่น", next: "npc_city_capital_physician_lin_talk" },
+      { text: "ขอบคุณหมอ ขอตัวก่อน", next: "npc_city_capital_physician_lin_return" },
+    ],
+  },
+  {
+    kind: "dialog",
+    id: "npc_city_capital_physician_lin_return",
+    lines: [],
+    // Ending this local conversation is not another arrival in the city.
+    onEnter: [{ t: "goto", sceneId: "city_capital" }],
   },
 
   // ─── city_xixia_blacksmith_dugu ────────────────────────────────────
@@ -262,26 +464,29 @@ export const SCENES_CITIES: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qc_capital_lost_ledger_offer",
     lines: [
-      { t: "dialogue", speaker: "นายอำเภอหวู่", text: "บัญชีรายรับรายจ่ายของคลังหลวงหายไป มีคนขโมยจากห้องเก็บเอกสาร" },
-      { t: "dialogue", speaker: "นายอำเภอหวู่", text: "ข้าสงสัยว่าเสมียนนายฉิง ผู้ดูแลเอกสาร อาจรู้เห็นเป็นใจ แต่ยังไม่มีหลักฐาน" },
+      { t: "dialogue", speaker: "นายอำเภอหวู่", text: "บัญชีรายรับรายจ่ายของคลังหลวงหายจากห้องเก็บเอกสาร ข้ากังวลว่าอาจถูกขโมย แต่เราต้องหาความจริงก่อน" },
+      { t: "dialogue", speaker: "นายอำเภอหวู่", text: "เสมียนนายฉิงผู้ดูแลเอกสารยืนด้านซ้ายของข้า ที่หน้าสำนักงานทางเหนือของนครหลวง เริ่มจากทักทายแล้วถามเรื่องบัญชี อย่าเพิ่งกล่าวหาเขาโดยไม่มีหลักฐาน" },
       { t: "narration", text: "นายอำเภอหวู่มองตาท่านอย่างตั้งใจ" },
     ],
     choices: [
       {
         text: "รับสืบสวนคดีบัญชีหาย",
+        visibleIf: { t: "questStatus", questId: "qc_capital_lost_ledger", status: "none" },
         effects: [{ t: "startQuest", questId: "qc_capital_lost_ledger" }],
         next: "qs_qc_capital_lost_ledger_offer_accept",
       },
-      { text: "ปฏิเสธ", next: "qs_qc_capital_lost_ledger_decline" },
+      { text: "ข้าจะไปพบเสมียนนายฉิง", visibleIf: ledgerActive, next: "qs_qc_capital_lost_ledger_offer_accept" },
+      { text: "ขอเตรียมตัวก่อน", visibleIf: ledgerActive, next: "npc_city_capital_magistrate_wu_return" },
+      { text: "ปฏิเสธ", visibleIf: { t: "questStatus", questId: "qc_capital_lost_ledger", status: "none" }, next: "qs_qc_capital_lost_ledger_decline" },
     ],
   },
   {
     kind: "dialog",
     id: "qs_qc_capital_lost_ledger_offer_accept",
     lines: [
-      { t: "dialogue", speaker: "นายอำเภอหวู่", text: "ขอบคุณ ไปพบเสมียนนายฉิงที่ห้องทำงานก่อน แล้วสังเกตดูว่าเขาพูดอะไร" },
+      { t: "dialogue", speaker: "นายอำเภอหวู่", text: "ขอบคุณ ไปพบเสมียนนายฉิงที่ยืนด้านซ้ายของข้าในนครหลวง ถามถึงบัญชี แล้วตรวจหีบเอกสารข้างตัวเขา กุญแจเก่าที่ใช้เปิดหีบขอยืมจากเขาได้" },
     ],
-    choices: [{ text: "รับทราบ", next: "city_capital" }],
+    choices: [{ text: "รับทราบ", next: "npc_city_capital_magistrate_wu_return" }],
   },
   {
     kind: "dialog",
@@ -289,32 +494,34 @@ export const SCENES_CITIES: readonly Scene[] = [
     lines: [
       { t: "dialogue", speaker: "นายอำเภอหวู่", text: "เข้าใจ แต่ถ้าเปลี่ยนใจก็กลับมาพูดคุยได้" },
     ],
-    choices: [{ text: "ลาจาก", next: "city_capital" }],
+    choices: [{ text: "ลาจาก", next: "npc_city_capital_magistrate_wu_return" }],
   },
   {
     kind: "dialog",
     id: "qs_qc_capital_lost_ledger_progress",
     lines: [
-      { t: "dialogue", speaker: "นายอำเภอหวู่", text: "ยังหาบัญชีไม่เจอหรือ? ลองตรวจดูหีบเก็บของส่วนตัวของนายฉิงให้ละเอียด" },
+      { t: "dialogue", speaker: "นายอำเภอหวู่", text: "นายฉิงยืนด้านซ้ายของข้า ถามถึงบัญชีแล้วเลือกตรวจหีบเอกสาร หากไม่มีกุญแจเก่าให้ขอยืมจากเขา อย่าลืมเปิดหีบและหยิบบัญชีก่อนกลับมารายงาน" },
     ],
-    choices: [{ text: "รับทราบ", next: "city_capital" }],
+    choices: [{ text: "รับทราบ", next: "npc_city_capital_magistrate_wu_return" }],
   },
   {
     kind: "dialog",
     id: "qs_qc_capital_lost_ledger_complete",
     lines: [
-      { t: "dialogue", speaker: "นายอำเภอหวู่", text: "ท่านพบบัญชีแล้ว ดีมาก ข้าจะนำเรื่องขึ้นรายงานเจ้าเมืองทันที" },
-      { t: "narration", text: "นายอำเภอหวู่รับบัญชีไปด้วยมือสั่น ๆ ด้วยความโล่งอก" },
+      { t: "dialogue", speaker: "นายอำเภอหวู่", text: "ขอบคุณที่พบบัญชีและตรวจหลักฐานจนรู้ว่าเอกสารถูกย้ายหนีน้ำ ความรอบคอบของท่านช่วยให้เราไม่ด่วนกล่าวหาผู้ใด" },
+      { t: "dialogue", speaker: "นายอำเภอหวู่", text: "ค่าตอบแทนคือ 150 ทอง และ 30 WEXP กุญแจเก่าท่านเก็บไว้ใช้ต่อได้" },
     ],
     choices: [
       {
         text: "ส่งมอบบัญชีและรับรางวัล",
+        visibleIf: { t: "and", all: [ledgerActive, { t: "flag", flag: "capital_ledger_recovered" }] },
         effects: [
-          { t: "takeItem", itemId: "old_key", count: 1 },
           { t: "finishQuest", questId: "qc_capital_lost_ledger", success: true },
         ],
-        next: "city_capital",
+        next: "npc_city_capital_magistrate_wu_return",
       },
+      { text: "ขอกลับไปตรวจหีบกับนายฉิงก่อน", visibleIf: ledgerPending, next: "npc_city_capital_magistrate_wu_return" },
+      { text: "ขอตัวก่อน", next: "npc_city_capital_magistrate_wu_return" },
     ],
   },
 
@@ -324,24 +531,27 @@ export const SCENES_CITIES: readonly Scene[] = [
     id: "qs_qc_capital_corrupt_clerk_offer",
     lines: [
       { t: "dialogue", speaker: "นายอำเภอหวู่", text: "เสมียนคนหนึ่งในสำนักงานรับสินบนจากพ่อค้า ข้าต้องการหลักฐาน ไม่ใช่แค่ข่าวลือ" },
-      { t: "dialogue", speaker: "นายอำเภอหวู่", text: "ต้องการคนที่ไม่หน้าตาคุ้นกับพวกเสมียนไปสืบ เจ้าเหมาะมาก" },
+      { t: "dialogue", speaker: "นายอำเภอหวู่", text: "เริ่มถามเสมียนนายฉิงที่ยืนด้านซ้ายของข้าในนครหลวง เรื่องนี้ต้องปราบนักเลง 2 คนหลังรับงาน จึงควรเตรียมฝีมือและยาก่อนออกเดินทาง" },
     ],
     choices: [
       {
         text: "รับงานสืบสวนเสมียน",
+        visibleIf: { t: "questStatus", questId: "qc_capital_corrupt_clerk", status: "none" },
         effects: [{ t: "startQuest", questId: "qc_capital_corrupt_clerk" }],
         next: "qs_qc_capital_corrupt_clerk_offer_accept",
       },
-      { text: "ปฏิเสธ", next: "city_capital" },
+      { text: "ข้าจะไปถามนายฉิงเรื่องสินบน", visibleIf: { t: "questStatus", questId: "qc_capital_corrupt_clerk", status: "active" }, next: "qs_qc_capital_corrupt_clerk_offer_accept" },
+      { text: "ขอเตรียมตัวก่อน", visibleIf: { t: "questStatus", questId: "qc_capital_corrupt_clerk", status: "active" }, next: "npc_city_capital_magistrate_wu_return" },
+      { text: "ปฏิเสธ", visibleIf: { t: "questStatus", questId: "qc_capital_corrupt_clerk", status: "none" }, next: "npc_city_capital_magistrate_wu_return" },
     ],
   },
   {
     kind: "dialog",
     id: "qs_qc_capital_corrupt_clerk_offer_accept",
     lines: [
-      { t: "dialogue", speaker: "นายอำเภอหวู่", text: "ปล่อยเสมียนอยู่ที่ร้านค้าทางตะวันออกก่อน สังเกตการพบปะของเขา แล้วกลับมารายงาน" },
+      { t: "dialogue", speaker: "นายอำเภอหวู่", text: "ทักทายเสมียนนายฉิงที่ยืนด้านซ้ายของข้า เลือกถามเรื่องสินบนในสำนักงานเพื่อรับเบาะแส แล้วค่อยไปหาหลักฐานจากนักเลง 2 คนที่พบระหว่างเดินทาง" },
     ],
-    choices: [{ text: "รับทราบ", next: "city_capital" }],
+    choices: [{ text: "รับทราบ", next: "npc_city_capital_magistrate_wu_return" }],
   },
   {
     kind: "dialog",
@@ -440,13 +650,64 @@ export const SCENES_CITIES: readonly Scene[] = [
   // QUEST SCENES — city_capital_physician_lin
   // ═══════════════════════════════════════════════════════════════════
 
+  // ── qc_capital_clinic_supplies ────────────────────────────────────
+  {
+    kind: "dialog",
+    id: "qs_qc_capital_clinic_supplies_offer",
+    lines: [
+      { t: "dialogue", speaker: "หมอหลิน", text: "ยินดีที่ได้รู้จัก คลินิกของข้ากำลังขาดสมุนไพรพื้นฐาน แต่ข้าทิ้งผู้ป่วยไปไม่ได้" },
+      { t: "dialogue", speaker: "หมอหลิน", text: "ช่วยแจ้งนายอำเภอหวู่ที่ด้านเหนือของนครหลวงให้ส่งเสบียงยามาที เลือกทักทายแล้วบอกว่ามาจากข้า จากนั้นกลับมารายงานก็พอ" },
+      { t: "narration", text: "งานนี้ทำได้ภายในนครหลวง ไม่ต้องหาสิ่งของหรือประลองฝีมือ" },
+    ],
+    choices: [
+      {
+        text: "ไปส่งคำขอให้นายอำเภอหวู่",
+        effects: [{ t: "startQuest", questId: "qc_capital_clinic_supplies" }],
+        next: "npc_city_capital_physician_lin_return",
+      },
+    ],
+  },
+  {
+    kind: "dialog",
+    id: "qs_qc_capital_clinic_supplies_delivery",
+    lines: [
+      { t: "dialogue", speaker: "นายอำเภอหวู่", text: "คลินิกของหมอหลินช่วยผู้คนไว้มาก ข้าจะให้คลังเมืองจัดสมุนไพรไปส่งวันนี้" },
+      { t: "narration", text: "นายอำเภอหวู่ลงนามในคำสั่ง แล้วส่งให้เจ้าหน้าที่นำเสบียงยาไปที่คลินิก" },
+      { t: "dialogue", speaker: "นายอำเภอหวู่", text: "กลับไปบอกหมอหลินได้เลยว่าเสบียงกำลังไปถึง ขอบใจที่ช่วยเป็นธุระ" },
+    ],
+    choices: [{ text: "กลับไปรายงานหมอหลิน", next: "npc_city_capital_magistrate_wu_return" }],
+  },
+  {
+    kind: "dialog",
+    id: "qs_qc_capital_clinic_supplies_complete",
+    lines: [
+      { t: "dialogue", speaker: "หมอหลิน", text: "เจ้าหน้าที่นำเสบียงมาส่งแล้ว! วันนี้ผู้ป่วยทุกคนจะได้รับยา ขอบใจเจ้ามาก" },
+      { t: "dialogue", speaker: "หมอหลิน", text: "เก็บค่าตอบแทนกับสมุนไพรนี้ไว้ใช้ระหว่างเดินทาง เรื่องเล็ก ๆ เช่นนี้ก็เปลี่ยนชีวิตผู้คนได้" },
+    ],
+    choices: [
+      {
+        text: "รับรางวัลเสบียงยาของคลินิก",
+        visibleIf: {
+          t: "and",
+          all: [
+            { t: "questStatus", questId: "qc_capital_clinic_supplies", status: "active" },
+            { t: "flag", flag: "clinic_supplies_delivered" },
+          ],
+        },
+        effects: [{ t: "finishQuest", questId: "qc_capital_clinic_supplies", success: true }],
+        next: "npc_city_capital_physician_lin_return",
+      },
+      { text: "กลับไปสำรวจนครหลวง", next: "npc_city_capital_physician_lin_return" },
+    ],
+  },
+
   // ── qc_capital_rare_herb ───────────────────────────────────────────
   {
     kind: "dialog",
     id: "qs_qc_capital_rare_herb_offer",
     lines: [
-      { t: "dialogue", speaker: "หมอหลิน", text: "ข้าต้องการบัวหิมะสำหรับยาพิเศษ แต่มันขึ้นเฉพาะบนภูเขาสูง" },
-      { t: "dialogue", speaker: "หมอหลิน", text: "ผู้ป่วยของข้ารอไม่ได้นาน ถ้าท่านพอมีฝีมือก็น่าจะไหว" },
+      { t: "dialogue", speaker: "หมอหลิน", text: "ข้าต้องการบัวหิมะสำหรับยาพิเศษ มันขึ้นที่ก้นหุบเขาตัดใจ" },
+      { t: "dialogue", speaker: "หมอหลิน", text: "งานนี้ต้องเดินทางไกลและมีทักษะเก็บสมุนไพรระดับ 5 จึงเก็บบัวหิมะได้ ฝึกฝนให้พร้อมก่อนออกเดินทาง" },
     ],
     choices: [
       {
@@ -461,7 +722,7 @@ export const SCENES_CITIES: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qc_capital_rare_herb_offer_accept",
     lines: [
-      { t: "dialogue", speaker: "หมอหลิน", text: "ต้องการบัวหิมะอย่างน้อยหนึ่งดอก หาได้แล้วรีบนำมาส่ง เวลาสำคัญมาก" },
+      { t: "dialogue", speaker: "หมอหลิน", text: "เมื่อเก็บสมุนไพรถึงระดับ 5 ให้ไปเก็บบัวหิมะหนึ่งดอกที่ก้นหุบเขาตัดใจ แล้วนำกลับมาส่งข้าที่นครหลวง" },
     ],
     choices: [{ text: "รับทราบ", next: "city_capital" }],
   },

@@ -1,0 +1,34 @@
+[
+  {
+    "dismiss": "outside",
+    "open": true,
+    "paused": "true"
+  },
+  {
+    "dismiss": "escape",
+    "open": true,
+    "paused": "true"
+  },
+  {
+    "dismiss": "close",
+    "open": true,
+    "paused": "true"
+  },
+  {
+    "dismiss": "trigger",
+    "open": true,
+    "paused": "true"
+  },
+  {
+    "midCastPause": true,
+    "before": {
+      "impact": "1",
+      "frame": "0",
+      "seq": "1"
+    }
+  },
+  {
+    "keyboard": true,
+    "errors": []
+  }
+]

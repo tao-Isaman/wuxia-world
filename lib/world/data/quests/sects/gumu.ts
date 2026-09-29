@@ -102,25 +102,4 @@ export const QUESTS_GUMU: readonly QuestDef[] = [
       { t: "sectPoints", sectId: "gumu", amount: 50 },
     ],
   },
-
-  {
-    id: "qst_gumu_sect_offering",
-    name: "ส่งของถวายสุสาน",
-    description: "หญิงปริศนาขอให้นำเหล็กดิบและกระดาษมาเพิ่ม — สำหรับซ่อมแซมห้องลึก",
-    briefSummary: "ส่งเหล็กดิบ 4 + กระดาษ 4 · sect points +50",
-    type: "side",
-    sectId: "gumu",
-    giverNpcId: "sect_gumu_mystery_woman",
-    prereqs: { t: "sectMember", sectId: "gumu" },
-    stages: [
-      { id: "gather", description: "เก็บเหล็กดิบ 4 + กระดาษ 4", autoAdvance: { t: "and", all: [{ t: "hasItem", itemId: "iron_ore", count: 4 }, { t: "hasItem", itemId: "paper", count: 4 }] } },
-      { id: "deliver", description: "ส่งของให้หญิงปริศนา" },
-    ],
-    rewards: [
-      { t: "gold", amount: 150 },
-      { t: "wExp", amount: 60 },
-      { t: "npcRelationship", npcId: "sect_gumu_mystery_woman", amount: 3 },
-      { t: "sectPoints", sectId: "gumu", amount: 50 },
-    ],
-  },
 ];

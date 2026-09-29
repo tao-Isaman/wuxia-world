@@ -1,0 +1,108 @@
+{
+  "records": [
+    {
+      "name": "01-home-portrait",
+      "guide": {
+        "x": 10,
+        "y": 248,
+        "width": 370,
+        "height": 46
+      },
+      "heroFoot": {
+        "x": 195,
+        "y": 405.12
+      },
+      "heroTopElement": "CANVAS",
+      "text": "จุดหมาย → ทางออกจากบ้าน\nดูเพิ่ม",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "02-home-landscape",
+      "guide": {
+        "x": 16,
+        "y": 169,
+        "width": 272,
+        "height": 46
+      },
+      "heroFoot": {
+        "x": 388.24,
+        "y": 195
+      },
+      "heroTopElement": "CANVAS",
+      "text": "จุดหมาย → ทางออกจากบ้าน\nดูเพิ่ม",
+      "viewport": {
+        "width": 844,
+        "height": 390
+      }
+    },
+    {
+      "name": "03-capital-portrait",
+      "guide": {
+        "x": 10,
+        "y": 248,
+        "width": 370,
+        "height": 46
+      },
+      "heroFoot": {
+        "x": 195,
+        "y": 658.3199999999999
+      },
+      "heroTopElement": "CANVAS",
+      "text": "จุดหมาย → หมอหลิน\nดูเพิ่ม",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "04-capital-landscape",
+      "guide": {
+        "x": 16,
+        "y": 169,
+        "width": 272,
+        "height": 46
+      },
+      "heroFoot": {
+        "x": 422,
+        "y": 266.21333333333337
+      },
+      "heroTopElement": "CANVAS",
+      "text": "จุดหมาย → หมอหลิน\nดูเพิ่ม",
+      "viewport": {
+        "width": 844,
+        "height": 390
+      }
+    },
+    {
+      "name": "05-capital-after-touch",
+      "guide": {
+        "x": 10,
+        "y": 248,
+        "width": 370,
+        "height": 46
+      },
+      "heroFoot": {
+        "x": 195,
+        "y": 510.09250000000003
+      },
+      "heroTopElement": "CANVAS",
+      "text": "จุดหมาย → หมอหลิน\nดูเพิ่ม",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    }
+  ],
+  "errors": [],
+  "checks": [
+    "actual new-game home-road-capital navigation",
+    "default compact portrait and landscape",
+    "hero pixels directly target canvas at all four spawn shots",
+    "portrait ground touch moves hero",
+    "explicit expand/collapse reload preference retained",
+    "guide toggle leaves game save unchanged"
+  ]
+}

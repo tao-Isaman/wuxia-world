@@ -22,3 +22,12 @@ next-env.d.ts
 .idea/
 
 bun.lockb
+playwright-report/
+test-results/
+
+# Local rendered review evidence; reports and reproduction scripts stay trackable.
+review/**/*.png
+review/**/*.jpg
+review/**/*.webm
+review/**/*.zip
+.pterminal/

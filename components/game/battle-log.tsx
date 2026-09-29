@@ -35,6 +35,7 @@ export function BattleLog({ log }: Props) {
         .map((l, i) => (
           <div
             key={log.length - i}
+            data-log-kind={l.cls}
             className={cn(CLASS_MAP[l.cls])}
             dangerouslySetInnerHTML={{ __html: l.txt }}
           />

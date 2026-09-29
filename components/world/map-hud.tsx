@@ -1,77 +1,50 @@
 "use client";
-
-import { Progress } from "@/components/ui/progress";
 import { deriveAll } from "@/lib/game";
 import { getScene } from "@/lib/world";
+import { CharacterPreview } from "@/components/game/character-preview";
 import { useWorldStore } from "@/store/world-store";
 
-// Compact in-map status HUD (top-left overlay of the fullscreen map):
-// location name, player name, HP / MP / stamina bars, gold, w-exp,
-// day + time — the fullscreen replacement for StatusBar.
 export function MapHud() {
   const player = useWorldStore((s) => s.playerBuild);
+  const bodyId = useWorldStore((s) => s.playerBodyId);
   const gold = useWorldStore((s) => s.gold);
   const stamina = useWorldStore((s) => s.stamina);
   const staminaMax = useWorldStore((s) => s.staminaMax);
-  const currentHp = useWorldStore((s) => s.currentHp);
-  const currentMp = useWorldStore((s) => s.currentMp);
+  const hp = useWorldStore((s) => s.currentHp);
+  const mp = useWorldStore((s) => s.currentMp);
   const day = useWorldStore((s) => s.day);
   const time = useWorldStore((s) => s.time);
   const wExp = useWorldStore((s) => s.wExp);
   const currentSceneId = useWorldStore((s) => s.currentSceneId);
-
   if (!player) return null;
-  const d = deriveAll(player);
-  const hpCur = Math.min(d.HP, currentHp);
-  const mpCur = Math.min(d.MP, currentMp);
+  const stats = deriveAll(player);
   const scene = getScene(currentSceneId);
-  const sceneName =
-    scene?.kind === "location" ? scene.name :
-    scene?.kind === "route" ? scene.label : "";
-
-  return (
-    <div className="absolute top-2 left-2 z-30 w-56 p-2 bg-ink/80 text-paper space-y-1 shadow-pixel">
-      <div className="flex items-baseline justify-between gap-2">
-        <strong className="font-display text-sm truncate">{player.name}</strong>
-        <span className="text-[10px] text-paper/70 font-display truncate">
-          {sceneName}
-        </span>
+  const name = scene?.kind === "location" ? scene.name : scene?.kind === "route" ? scene.label : "ยุทธภพ";
+  return <>
+    <section className="player-hud pixel-panel" aria-label="สถานะตัวละคร">
+      <div className="hud-portrait">
+        <CharacterPreview id={bodyId} />
       </div>
-      <HudGauge label="HP" variant="hp" cur={hpCur} max={d.HP} />
-      <HudGauge label="MP" variant="qi" cur={mpCur} max={d.MP} />
-      <HudGauge label="พลัง" variant="stamina" cur={stamina} max={staminaMax} />
-      <div className="flex items-center justify-between text-[10px] text-paper/80 font-mono">
-        <span>💰 {gold}</span>
-        <span className="text-jade">w-exp {wExp}</span>
-        <span>
-          วันที่ {day} · {time.toFixed(1)}/12
-        </span>
+      <div className="hud-vitals">
+        <strong className="hud-player-name">{player.name}</strong>
+        <Gauge label="HP" value={hp} max={stats.HP} color="#cf6555" />
+        <Gauge label="MP" value={mp} max={stats.MP} color="#75a5b6" />
+        <Gauge label="พลัง" value={stamina} max={staminaMax} color="#a3b476" />
       </div>
-    </div>
-  );
+      <div className="hud-wallet"><span>เงิน <b>{gold.toLocaleString()}</b></span><span>W-EXP <b>{wExp.toLocaleString()}</b></span></div>
+    </section>
+    <section className="location-hud pixel-panel" aria-label="สถานที่และเวลา">
+      <span className="location-ornament" aria-hidden="true">◇</span>
+      <div><strong>{name}</strong><p>วันที่ {day} · {time < 4 ? "ยามเช้า" : time < 8 ? "ยามบ่าย" : "ยามค่ำ"}</p></div>
+    </section>
+  </>;
 }
-
-function HudGauge({
-  label,
-  variant,
-  cur,
-  max,
-}: {
-  label: string;
-  variant: "hp" | "qi" | "stamina";
-  cur: number;
-  max: number;
-}) {
-  const pct = max > 0 ? (cur / max) * 100 : 0;
-  return (
-    <div className="flex items-center gap-1.5">
-      <span className="w-8 text-[9px] font-display tracking-wider uppercase text-paper/80">
-        {label}
-      </span>
-      <Progress value={pct} variant={variant} pixel className="h-2 flex-1" />
-      <span className="w-14 text-right text-[9px] font-mono text-paper/90">
-        {cur}/{max}
-      </span>
-    </div>
-  );
+function Gauge({ label, value, max, color }: { label: string; value: number; max: number; color: string }) {
+  const current = Math.max(0, Math.min(value, max));
+  return <div className="hud-gauge">
+    <span>{label}</span>
+    <div role="progressbar" aria-label={label} aria-valuenow={current} aria-valuemin={0} aria-valuemax={max}
+      className="hud-gauge-track"><div style={{ width: (max > 0 ? current / max * 100 : 0) + "%", backgroundColor: color }} /></div>
+    <small>{Math.round(current)}/{max}</small>
+  </div>;
 }

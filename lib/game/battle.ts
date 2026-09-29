@@ -28,6 +28,7 @@ import {
   checkPassive,
   checkWin,
   logLine,
+  escapeBattleText,
   opposite,
   tickEffects,
   addDebuff,
@@ -227,6 +228,14 @@ export interface DamageResult {
   reflectDmg: number;
 }
 
+/** Consume before the hit roll: a miss spends the one-use stance too. */
+function consumeRiposte(state: BattleState, side: Side): number {
+  const charge = state.st[side].buffs.find((buff) => buff.t === "buff_riposte" && buff.u > 0);
+  if (!charge) return 1;
+  state.st[side].buffs = state.st[side].buffs.filter((buff) => buff.t !== "buff_riposte");
+  return 1 + Math.max(0, charge.v) / 100;
+}
+
 export function calcSkillDamage(
   state: BattleState,
   side: Side,
@@ -239,6 +248,7 @@ export function calcSkillDamage(
   const ast = state.st[side];
   const dst = state.st[ds];
   const aid = ctx.artIds[side];
+  const riposte = sk.at === "phy" ? consumeRiposte(state, side) : 1;
 
   // IAtk multiplier from buff_iatk + art-specific bonuses
   let iatkBuff = 0;
@@ -300,7 +310,7 @@ export function calcSkillDamage(
   }
   const cp = critPct(effectiveCri(state, side, ad.Cri), dd.Res);
   const crit = Math.random() * 100 < cp;
-  const dmg = Math.round(raw * (crit ? CRIT_MULTIPLIER : 1));
+  const dmg = Math.round(raw * riposte * (crit ? CRIT_MULTIPLIER : 1));
 
   let reflectDmg = 0;
   if (ref > 0) {
@@ -332,7 +342,7 @@ export function resolveSkill(
 
   if (isStunned(state, side)) {
     const cls = side === "A" ? "lA" : "lB";
-    logLine(state, cls, `[${state.turn}] ${ctx.names[side]} <span style="color:#AAA">ถูกสตัน — ข้ามตา!</span>`);
+    logLine(state, cls, `[${state.turn}] ${escapeBattleText(ctx.names[side])} <span style="color:#AAA">ถูกสตัน — ข้ามตา!</span>`);
     return;
   }
 
@@ -343,7 +353,7 @@ export function resolveSkill(
 
   const ds = opposite(side);
   const cls = side === "A" ? "lA" : "lB";
-  const nm = ctx.names[side];
+  const nm = escapeBattleText(ctx.names[side]);
   const tag = skillTag(skill);
 
   if (skill.at) {
@@ -522,12 +532,12 @@ export function resolveArtActive(
   const onCd =
     typeof slotIdx === "number" ? state.cd[side][slotIdx] : state.iaCD[side];
   if (onCd > 0) {
-    logLine(state, "lS", `[IA] ${ctx.names[side]}: กำลังภายใน CD ${onCd}`);
+    logLine(state, "lS", `[IA] ${escapeBattleText(ctx.names[side])}: กำลังภายใน CD ${onCd}`);
     return false;
   }
   const mp = side === "A" ? state.mpA : state.mpB;
   if (mp < act.c) {
-    logLine(state, "lS", `[IA] ${ctx.names[side]}: MP ไม่พอ`);
+    logLine(state, "lS", `[IA] ${escapeBattleText(ctx.names[side])}: MP ไม่พอ`);
     return false;
   }
 
@@ -545,18 +555,19 @@ export function resolveArtActive(
 
   if (isStunned(state, side)) {
     const stunCls = side === "A" ? "lA" : "lB";
-    logLine(state, stunCls, `[${state.turn}] ${ctx.names[side]} <span style="color:#AAA">ถูกสตัน — ข้ามตา!</span>`);
+    logLine(state, stunCls, `[${state.turn}] ${escapeBattleText(ctx.names[side])} <span style="color:#AAA">ถูกสตัน — ข้ามตา!</span>`);
     return true;
   }
 
   const cls = side === "A" ? "lA" : "lB";
-  const nm = ctx.names[side];
+  const nm = escapeBattleText(ctx.names[side]);
   const ds = opposite(side);
   const ad = side === "A" ? state.dA : state.dB;
   const dd = ds === "A" ? state.dA : state.dB;
   const dst = state.st[ds];
 
   let fD = 0, pR = 0, ref = 0;
+  const riposte = act.t === "atk_phy_pen" || act.t === "drain_phy" ? consumeRiposte(state, side) : 1;
   for (const b of dst.buffs) {
     if (b.t === "buff_def") fD += b.v;
     if (b.t === "buff_reduce") pR += b.v;
@@ -586,7 +597,7 @@ export function resolveArtActive(
   // doAtkHit applies damage, optional reflect; returns final dmg + crit flag.
   const doAtkHit = (rawDmg: number, hc: { cp: number }) => {
     const crit = Math.random() * 100 < hc.cp;
-    const dmg = Math.round(rawDmg * (crit ? CRIT_MULTIPLIER : 1));
+    const dmg = Math.round(rawDmg * riposte * (crit ? CRIT_MULTIPLIER : 1));
     state.hitsReceived[ds]++;
     if (ds === "A") state.hA = Math.max(0, state.hA - dmg);
     else state.hB = Math.max(0, state.hB - dmg);
@@ -813,4 +824,3 @@ function addEvaBuff(state: BattleState, side: Side, v: number, u: number) {
   list.push({ t: "buff_eva", n: "ว่องไว", v, u });
   state.st[side].buffs = list;
 }
-

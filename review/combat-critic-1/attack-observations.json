@@ -1,0 +1,826 @@
+{
+  "mode": "attack",
+  "errors": [],
+  "snapshots": [
+    {
+      "step": "initial",
+      "at": "2026-09-28T14:27:39.247Z",
+      "text": "กำลังภายใน — โลกยุทธภพ\nรอจังหวะ · กำลังรวบรวมพลัง\nตาที่ 1\nReviewer\n36 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\n2%\n對\nขโมยน้อย\n36 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\n2%\nหมัดตรง\nโจมตีภายนอก · 1 ครั้ง\n0 MP · 1 ตา\nตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา\nรวบรวมปราณ\nMP เต็ม · ใช้เมื่อปราณพร่อง\n0 MP · 1 ตา\nบันทึกการต่อสู้ (2)\n+",
+      "buttons": [
+        {
+          "text": "หมัดตรง\nโจมตีภายนอก · 1 ครั้ง\n0 MP · 1 ตา",
+          "disabled": true,
+          "rect": {
+            "x": 364,
+            "y": 692.15625,
+            "width": 232.65625,
+            "height": 92.1875,
+            "top": 692.15625,
+            "right": 596.65625,
+            "bottom": 784.34375,
+            "left": 364
+          }
+        },
+        {
+          "text": "ตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา",
+          "disabled": true,
+          "rect": {
+            "x": 603.65625,
+            "y": 692.15625,
+            "width": 232.671875,
+            "height": 92.1875,
+            "top": 692.15625,
+            "right": 836.328125,
+            "bottom": 784.34375,
+            "left": 603.65625
+          }
+        },
+        {
+          "text": "รวบรวมปราณ\nMP เต็ม · ใช้เมื่อปราณพร่อง\n0 MP · 1 ตา",
+          "disabled": true,
+          "rect": {
+            "x": 843.328125,
+            "y": 692.15625,
+            "width": 232.671875,
+            "height": 92.1875,
+            "top": 692.15625,
+            "right": 1076,
+            "bottom": 784.34375,
+            "left": 843.328125
+          }
+        },
+        {
+          "text": "บันทึกการต่อสู้ (2)\n+",
+          "disabled": false,
+          "rect": {
+            "x": 364,
+            "y": 796.34375,
+            "width": 712,
+            "height": 31.5,
+            "top": 796.34375,
+            "right": 1076,
+            "bottom": 827.84375,
+            "left": 364
+          }
+        }
+      ],
+      "canvas": {
+        "testid": "battle-canvas",
+        "renderer": "three",
+        "ready": "true",
+        "reducedMotion": "false",
+        "impactCount": "0",
+        "castSeq": "-1",
+        "fighterACharacter": "m1",
+        "fighterAMotion": "idle",
+        "fighterAFrame": "0",
+        "fighterBCharacter": "bandit",
+        "fighterBMotion": "idle",
+        "fighterBFrame": "0",
+        "paused": "false"
+      },
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "scrollWidth": 1440,
+        "scrollHeight": 900,
+        "scrollY": 0
+      }
+    },
+    {
+      "step": "attack-first-before",
+      "at": "2026-09-28T14:27:43.285Z",
+      "text": "กำลังภายใน — โลกยุทธภพ\nถึงตาเจ้า · เลือกกระบวนท่า\nตาที่ 1\nReviewer\n36 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\nพร้อม\n對\nขโมยน้อย\n36 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\n100%\nหมัดตรง\nโจมตีภายนอก · 1 ครั้ง\n0 MP · 1 ตา\nตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา\nรวบรวมปราณ\nMP เต็ม · ใช้เมื่อปราณพร่อง\n0 MP · 1 ตา\nบันทึกการต่อสู้ (2)\n+",
+      "buttons": [
+        {
+          "text": "หมัดตรง\nโจมตีภายนอก · 1 ครั้ง\n0 MP · 1 ตา",
+          "disabled": false,
+          "rect": {
+            "x": 364,
+            "y": 692.15625,
+            "width": 232.65625,
+            "height": 92.1875,
+            "top": 692.15625,
+            "right": 596.65625,
+            "bottom": 784.34375,
+            "left": 364
+          }
+        },
+        {
+          "text": "ตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา",
+          "disabled": false,
+          "rect": {
+            "x": 603.65625,
+            "y": 692.15625,
+            "width": 232.671875,
+            "height": 92.1875,
+            "top": 692.15625,
+            "right": 836.328125,
+            "bottom": 784.34375,
+            "left": 603.65625
+          }
+        },
+        {
+          "text": "รวบรวมปราณ\nMP เต็ม · ใช้เมื่อปราณพร่อง\n0 MP · 1 ตา",
+          "disabled": true,
+          "rect": {
+            "x": 843.328125,
+            "y": 692.15625,
+            "width": 232.671875,
+            "height": 92.1875,
+            "top": 692.15625,
+            "right": 1076,
+            "bottom": 784.34375,
+            "left": 843.328125
+          }
+        },
+        {
+          "text": "บันทึกการต่อสู้ (2)\n+",
+          "disabled": false,
+          "rect": {
+            "x": 364,
+            "y": 796.34375,
+            "width": 712,
+            "height": 31.5,
+            "top": 796.34375,
+            "right": 1076,
+            "bottom": 827.84375,
+            "left": 364
+          }
+        }
+      ],
+      "canvas": {
+        "testid": "battle-canvas",
+        "renderer": "three",
+        "ready": "true",
+        "reducedMotion": "false",
+        "impactCount": "0",
+        "castSeq": "-1",
+        "fighterACharacter": "m1",
+        "fighterAMotion": "guard",
+        "fighterAFrame": "13",
+        "fighterBCharacter": "bandit",
+        "fighterBMotion": "idle",
+        "fighterBFrame": "0",
+        "paused": "false"
+      },
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "scrollWidth": 1440,
+        "scrollHeight": 900,
+        "scrollY": 0
+      }
+    },
+    {
+      "step": "attack-first-after",
+      "at": "2026-09-28T14:27:51.342Z",
+      "text": "กำลังภายใน — โลกยุทธภพ\nถึงตาเจ้า · เลือกกระบวนท่า\nตาที่ 3\nReviewer\n5 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\nพร้อม\n對\nขโมยน้อย\n5 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\n100%\nหมัดตรง\nโจมตีภายนอก · 1 ครั้ง\n0 MP · 1 ตา\nตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา\nรวบรวมปราณ\nMP เต็ม · ใช้เมื่อปราณพร่อง\n0 MP · 1 ตา\nบันทึกการต่อสู้ (6)\n+",
+      "buttons": [
+        {
+          "text": "หมัดตรง\nโจมตีภายนอก · 1 ครั้ง\n0 MP · 1 ตา",
+          "disabled": false,
+          "rect": {
+            "x": 364,
+            "y": 692.15625,
+            "width": 232.65625,
+            "height": 92.1875,
+            "top": 692.15625,
+            "right": 596.65625,
+            "bottom": 784.34375,
+            "left": 364
+          }
+        },
+        {
+          "text": "ตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา",
+          "disabled": false,
+          "rect": {
+            "x": 603.65625,
+            "y": 692.15625,
+            "width": 232.671875,
+            "height": 92.1875,
+            "top": 692.15625,
+            "right": 836.328125,
+            "bottom": 784.34375,
+            "left": 603.65625
+          }
+        },
+        {
+          "text": "รวบรวมปราณ\nMP เต็ม · ใช้เมื่อปราณพร่อง\n0 MP · 1 ตา",
+          "disabled": true,
+          "rect": {
+            "x": 843.328125,
+            "y": 692.15625,
+            "width": 232.671875,
+            "height": 92.1875,
+            "top": 692.15625,
+            "right": 1076,
+            "bottom": 784.34375,
+            "left": 843.328125
+          }
+        },
+        {
+          "text": "บันทึกการต่อสู้ (6)\n+",
+          "disabled": false,
+          "rect": {
+            "x": 364,
+            "y": 796.34375,
+            "width": 712,
+            "height": 31.5,
+            "top": 796.34375,
+            "right": 1076,
+            "bottom": 827.84375,
+            "left": 364
+          }
+        }
+      ],
+      "canvas": {
+        "testid": "battle-canvas",
+        "renderer": "three",
+        "ready": "true",
+        "reducedMotion": "false",
+        "impactCount": "2",
+        "castSeq": "2",
+        "fighterACharacter": "m1",
+        "fighterAMotion": "guard",
+        "fighterAFrame": "13",
+        "fighterBCharacter": "bandit",
+        "fighterBMotion": "idle",
+        "fighterBFrame": "2",
+        "paused": "false",
+        "lastImpact": "2:0"
+      },
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "scrollWidth": 1440,
+        "scrollHeight": 900,
+        "scrollY": 0
+      }
+    },
+    {
+      "step": "attack-continue-0-before",
+      "at": "2026-09-28T14:27:51.424Z",
+      "text": "กำลังภายใน — โลกยุทธภพ\nถึงตาเจ้า · เลือกกระบวนท่า\nตาที่ 3\nReviewer\n5 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\nพร้อม\n對\nขโมยน้อย\n5 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\n100%\nหมัดตรง\nโจมตีภายนอก · 1 ครั้ง\n0 MP · 1 ตา\nตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา\nรวบรวมปราณ\nMP เต็ม · ใช้เมื่อปราณพร่อง\n0 MP · 1 ตา\nบันทึกการต่อสู้ (6)\n+",
+      "buttons": [
+        {
+          "text": "หมัดตรง\nโจมตีภายนอก · 1 ครั้ง\n0 MP · 1 ตา",
+          "disabled": false,
+          "rect": {
+            "x": 364,
+            "y": 692.15625,
+            "width": 232.65625,
+            "height": 92.1875,
+            "top": 692.15625,
+            "right": 596.65625,
+            "bottom": 784.34375,
+            "left": 364
+          }
+        },
+        {
+          "text": "ตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา",
+          "disabled": false,
+          "rect": {
+            "x": 603.65625,
+            "y": 692.15625,
+            "width": 232.671875,
+            "height": 92.1875,
+            "top": 692.15625,
+            "right": 836.328125,
+            "bottom": 784.34375,
+            "left": 603.65625
+          }
+        },
+        {
+          "text": "รวบรวมปราณ\nMP เต็ม · ใช้เมื่อปราณพร่อง\n0 MP · 1 ตา",
+          "disabled": true,
+          "rect": {
+            "x": 843.328125,
+            "y": 692.15625,
+            "width": 232.671875,
+            "height": 92.1875,
+            "top": 692.15625,
+            "right": 1076,
+            "bottom": 784.34375,
+            "left": 843.328125
+          }
+        },
+        {
+          "text": "บันทึกการต่อสู้ (6)\n+",
+          "disabled": false,
+          "rect": {
+            "x": 364,
+            "y": 796.34375,
+            "width": 712,
+            "height": 31.5,
+            "top": 796.34375,
+            "right": 1076,
+            "bottom": 827.84375,
+            "left": 364
+          }
+        }
+      ],
+      "canvas": {
+        "testid": "battle-canvas",
+        "renderer": "three",
+        "ready": "true",
+        "reducedMotion": "false",
+        "impactCount": "2",
+        "castSeq": "2",
+        "fighterACharacter": "m1",
+        "fighterAMotion": "guard",
+        "fighterAFrame": "13",
+        "fighterBCharacter": "bandit",
+        "fighterBMotion": "idle",
+        "fighterBFrame": "2",
+        "paused": "false",
+        "lastImpact": "2:0"
+      },
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "scrollWidth": 1440,
+        "scrollHeight": 900,
+        "scrollY": 0
+      }
+    },
+    {
+      "step": "attack-continue-0-after",
+      "at": "2026-09-28T14:27:53.096Z",
+      "text": "กำลังภายใน — โลกยุทธภพ\nการประลองสิ้นสุด\nตาที่ 3\nReviewer\n5 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\n0%\n對\nขโมยน้อย\n0 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\n100%\nชัยชนะ\nReviewer ชนะ\nประลอง 3 ตา\nดำเนินเรื่อง →\nบันทึกการต่อสู้ (9)\n+",
+      "buttons": [
+        {
+          "text": "ดำเนินเรื่อง →",
+          "disabled": false,
+          "rect": {
+            "x": 946.296875,
+            "y": 720.25,
+            "width": 112.703125,
+            "height": 36,
+            "top": 720.25,
+            "right": 1059,
+            "bottom": 756.25,
+            "left": 946.296875
+          }
+        },
+        {
+          "text": "บันทึกการต่อสู้ (9)\n+",
+          "disabled": false,
+          "rect": {
+            "x": 364,
+            "y": 794.75,
+            "width": 712,
+            "height": 31.5,
+            "top": 794.75,
+            "right": 1076,
+            "bottom": 826.25,
+            "left": 364
+          }
+        }
+      ],
+      "canvas": {
+        "testid": "battle-canvas",
+        "renderer": "three",
+        "ready": "true",
+        "reducedMotion": "false",
+        "impactCount": "3",
+        "castSeq": "3",
+        "fighterACharacter": "m1",
+        "fighterAMotion": "victory",
+        "fighterAFrame": "14",
+        "fighterBCharacter": "bandit",
+        "fighterBMotion": "defeat",
+        "fighterBFrame": "15",
+        "paused": "false",
+        "lastImpact": "3:0"
+      },
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "scrollWidth": 1440,
+        "scrollHeight": 900,
+        "scrollY": 0
+      }
+    },
+    {
+      "step": "outcome",
+      "text": "กำลังภายใน — โลกยุทธภพ\nการประลองสิ้นสุด\nตาที่ 3\nReviewer\n5 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\n0%\n對\nขโมยน้อย\n0 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\n100%\nชัยชนะ\nReviewer ชนะ\nประลอง 3 ตา\nดำเนินเรื่อง →\nบันทึกการต่อสู้ (9)\n+",
+      "buttons": [
+        {
+          "text": "ดำเนินเรื่อง →",
+          "disabled": false,
+          "rect": {
+            "x": 946.296875,
+            "y": 720.25,
+            "width": 112.703125,
+            "height": 36,
+            "top": 720.25,
+            "right": 1059,
+            "bottom": 756.25,
+            "left": 946.296875
+          }
+        },
+        {
+          "text": "บันทึกการต่อสู้ (9)\n+",
+          "disabled": false,
+          "rect": {
+            "x": 364,
+            "y": 794.75,
+            "width": 712,
+            "height": 31.5,
+            "top": 794.75,
+            "right": 1076,
+            "bottom": 826.25,
+            "left": 364
+          }
+        }
+      ],
+      "canvas": {
+        "testid": "battle-canvas",
+        "renderer": "three",
+        "ready": "true",
+        "reducedMotion": "false",
+        "impactCount": "3",
+        "castSeq": "3",
+        "fighterACharacter": "m1",
+        "fighterAMotion": "victory",
+        "fighterAFrame": "14",
+        "fighterBCharacter": "bandit",
+        "fighterBMotion": "defeat",
+        "fighterBFrame": "15",
+        "paused": "false",
+        "lastImpact": "3:0"
+      },
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "scrollWidth": 1440,
+        "scrollHeight": 900,
+        "scrollY": 0
+      }
+    },
+    {
+      "step": "outcome-log",
+      "text": "กำลังภายใน — โลกยุทธภพ\nการประลองสิ้นสุด\nตาที่ 3\nReviewer\n5 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\n0%\n對\nขโมยน้อย\n0 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\n100%\nชัยชนะ\nReviewer ชนะ\nประลอง 3 ตา\nดำเนินเรื่อง →\nบันทึกการต่อสู้ (9)\n−\n A:5/36 · B:0/36\n━━ Reviewer ชนะ! (3 ตา) ━━\n[3] Reviewer → หมัดตรง⚔ 31 [hit82% crit4%]\n A:5/36 · B:5/36\n[2] ขโมยน้อย → หมัดตรง⚔ 31 [hit82% crit4%]\n A:36/36 · B:5/36\n[1] Reviewer → หมัดตรง⚔ 31 [hit82% crit4%]\nA: fist ×1.02\n━━ เริ่มการต่อสู้ ━━",
+      "buttons": [
+        {
+          "text": "ดำเนินเรื่อง →",
+          "disabled": false,
+          "rect": {
+            "x": 946.296875,
+            "y": 674.5,
+            "width": 112.703125,
+            "height": 36,
+            "top": 674.5,
+            "right": 1059,
+            "bottom": 710.5,
+            "left": 946.296875
+          }
+        },
+        {
+          "text": "บันทึกการต่อสู้ (9)\n−",
+          "disabled": false,
+          "rect": {
+            "x": 364,
+            "y": 749,
+            "width": 712,
+            "height": 31.5,
+            "top": 749,
+            "right": 1076,
+            "bottom": 780.5,
+            "left": 364
+          }
+        }
+      ],
+      "canvas": {
+        "testid": "battle-canvas",
+        "renderer": "three",
+        "ready": "true",
+        "reducedMotion": "false",
+        "impactCount": "3",
+        "castSeq": "3",
+        "fighterACharacter": "m1",
+        "fighterAMotion": "victory",
+        "fighterAFrame": "14",
+        "fighterBCharacter": "bandit",
+        "fighterBMotion": "defeat",
+        "fighterBFrame": "15",
+        "paused": "false",
+        "lastImpact": "3:0"
+      },
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "scrollWidth": 1440,
+        "scrollHeight": 900,
+        "scrollY": 0
+      }
+    },
+    {
+      "step": "returned",
+      "text": "กำลังภายใน — โลกยุทธภพ\nWASD / ลูกศร เดิน · E โต้ตอบ\nจุดหมาย +\nReviewer\nHP\n5/36\nMP\n10/10\nพลัง\n95/100\nเงิน 0\nW-EXP 50\n◇\nคฤหาสน์ตนเอง\n\nวันที่ 1 · ยามเช้า\n\nเส้นทางแนะนำ\nย่อ\nออกเดินทางสู่นครหลวง\n\nหมอหลินต้องการบัวหิมะสำหรับปรุงยาพิเศษให้ผู้ป่วยหนัก\n\nจุดหมาย → ทางออกจากบ้าน\n\nพลังรวม 20 · ออกถนน 10 + เข้าเมือง 10\n\nโปรไฟล์\nย่าม\nวิชา\nอาชีพ\nภารกิจ\nสำนัก\nพักผ่อน\nบันทึก",
+      "buttons": [
+        {
+          "text": "จุดหมาย +",
+          "disabled": false,
+          "rect": {
+            "x": 765.90625,
+            "y": 766,
+            "width": 63.6875,
+            "height": 32,
+            "top": 766,
+            "right": 829.59375,
+            "bottom": 798,
+            "left": 765.90625
+          }
+        },
+        {
+          "text": "เส้นทางแนะนำ\nย่อ",
+          "disabled": false,
+          "rect": {
+            "x": 19,
+            "y": 172,
+            "width": 296,
+            "height": 44,
+            "top": 172,
+            "right": 315,
+            "bottom": 216,
+            "left": 19
+          }
+        },
+        {
+          "text": "โปรไฟล์",
+          "disabled": false,
+          "rect": {
+            "x": 458,
+            "y": 818,
+            "width": 62,
+            "height": 59,
+            "top": 818,
+            "right": 520,
+            "bottom": 877,
+            "left": 458
+          }
+        },
+        {
+          "text": "ย่าม",
+          "disabled": false,
+          "rect": {
+            "x": 524,
+            "y": 818,
+            "width": 62,
+            "height": 59,
+            "top": 818,
+            "right": 586,
+            "bottom": 877,
+            "left": 524
+          }
+        },
+        {
+          "text": "วิชา",
+          "disabled": false,
+          "rect": {
+            "x": 590,
+            "y": 818,
+            "width": 62,
+            "height": 59,
+            "top": 818,
+            "right": 652,
+            "bottom": 877,
+            "left": 590
+          }
+        },
+        {
+          "text": "อาชีพ",
+          "disabled": false,
+          "rect": {
+            "x": 656,
+            "y": 818,
+            "width": 62,
+            "height": 59,
+            "top": 818,
+            "right": 718,
+            "bottom": 877,
+            "left": 656
+          }
+        },
+        {
+          "text": "ภารกิจ",
+          "disabled": false,
+          "rect": {
+            "x": 722,
+            "y": 818,
+            "width": 62,
+            "height": 59,
+            "top": 818,
+            "right": 784,
+            "bottom": 877,
+            "left": 722
+          }
+        },
+        {
+          "text": "สำนัก",
+          "disabled": false,
+          "rect": {
+            "x": 788,
+            "y": 818,
+            "width": 62,
+            "height": 59,
+            "top": 818,
+            "right": 850,
+            "bottom": 877,
+            "left": 788
+          }
+        },
+        {
+          "text": "พักผ่อน",
+          "disabled": false,
+          "rect": {
+            "x": 854,
+            "y": 818,
+            "width": 62,
+            "height": 59,
+            "top": 818,
+            "right": 916,
+            "bottom": 877,
+            "left": 854
+          }
+        },
+        {
+          "text": "บันทึก",
+          "disabled": false,
+          "rect": {
+            "x": 920,
+            "y": 818,
+            "width": 62,
+            "height": 59,
+            "top": 818,
+            "right": 982,
+            "bottom": 877,
+            "left": 920
+          }
+        }
+      ],
+      "canvas": {},
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "scrollWidth": 1440,
+        "scrollHeight": 900,
+        "scrollY": 0
+      },
+      "save": {
+        "state": {
+          "hasGame": true,
+          "playerBuild": {
+            "name": "Reviewer",
+            "stats": {
+              "STR": 1,
+              "AGI": 1,
+              "POW": 1,
+              "VIT": 1,
+              "DEX": 1,
+              "LUK": 1,
+              "DEF": 1,
+              "INT": 1
+            },
+            "artId": "none",
+            "artLevel": 1,
+            "skillIds": [
+              "basic_punch",
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "equipment": {
+              "W": null,
+              "A": null,
+              "H": null,
+              "B": null,
+              "BR": [
+                null,
+                null
+              ],
+              "R": [
+                null,
+                null
+              ],
+              "C": [
+                null,
+                null
+              ]
+            },
+            "learnedSkillIds": [
+              "basic_punch"
+            ],
+            "learnedArtIds": [],
+            "artLevels": {},
+            "skillLevels": {
+              "basic_punch": 1
+            }
+          },
+          "gender": "male",
+          "playerBodyId": "m1",
+          "sectMembership": {},
+          "currentSceneId": "home_player",
+          "lastLocationId": "home_player",
+          "flags": {},
+          "quests": {},
+          "inventory": {
+            "wood_soft": 2
+          },
+          "gold": 0,
+          "stamina": 95,
+          "staminaMax": 100,
+          "currentHp": 5,
+          "currentMp": 10,
+          "lifeSkillXp": {
+            "mining": 0,
+            "woodcutting": 0,
+            "hunting": 0,
+            "fishing": 0,
+            "herbalism": 0,
+            "venom": 0,
+            "reading": 0,
+            "music": 0,
+            "drawing": 0,
+            "writing": 0,
+            "chess": 0,
+            "begging": 0,
+            "steal": 0,
+            "forge": 0,
+            "tailoring": 0,
+            "jewelry": 0,
+            "alchemy": 0,
+            "chef": 0,
+            "accessory": 0
+          },
+          "wExp": 50,
+          "skillLevel": {
+            "basic_punch": 1
+          },
+          "skillExp": {
+            "basic_punch": 40
+          },
+          "artExp": {},
+          "learnedRecipeIds": [],
+          "inventoryEquipment": {},
+          "statExp": {
+            "STR": 20,
+            "AGI": 0,
+            "POW": 0,
+            "VIT": 0,
+            "DEX": 0,
+            "LUK": 0,
+            "DEF": 10,
+            "INT": 0
+          },
+          "traits": {
+            "good": 0,
+            "evil": 0,
+            "arrogance": 0,
+            "humility": 0,
+            "fame": 0
+          },
+          "npcStates": {},
+          "defeatedCounts": {
+            "petty_thief": 1
+          },
+          "visitedLocationIds": [
+            "home_player"
+          ],
+          "stoleFromCounts": {},
+          "assassinatedNpcIds": [],
+          "kidnappedNpcIds": [],
+          "day": 1,
+          "time": 0.5,
+          "pendingBattle": null,
+          "pendingEncounter": null,
+          "pendingHuntYield": null,
+          "pendingSpar": null,
+          "gameOver": false,
+          "actionLog": [
+            {
+              "day": 1,
+              "time": 0.5,
+              "kind": "combat",
+              "message": "ชนะ ขโมยน้อย · ไม้เนื้ออ่อน×2"
+            }
+          ],
+          "npcExt": {},
+          "rumorPool": [],
+          "rumorArchive": [],
+          "rumorSeenLog": [],
+          "lastNpcTickDay": 1
+        },
+        "version": 19
+      }
+    }
+  ]
+}

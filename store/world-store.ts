@@ -58,7 +58,7 @@ import {
 import { applyEffect, consumeQuestAutoItems, isSectQuestOfferable, tickQuestProgress } from "@/lib/world/effects";
 import { evaluateCondition } from "@/lib/world/conditions";
 import { tickAllNamedNpcs } from "@/lib/world/npc-tick";
-import { maintainRumors, RUMOR_SEEN_CAP } from "@/lib/world/rumor-engine";
+import { maintainRumors, seedLoreRumors, RUMOR_SEEN_CAP } from "@/lib/world/rumor-engine";
 import { namedNpcIds } from "@/lib/world/data/named-npcs";
 import { toast } from "@/store/toast-store";
 import {
@@ -365,6 +365,8 @@ interface WorldStore extends WorldStateData {
   betraySect: (sectId: import("@/lib/world").SectId) => { ok: boolean; reason?: string };
   makeChoice: (idx: number) => void;
   gotoScene: (sceneId: string) => void;
+  /** Resolve a visible route destination atomically through the world engine. */
+  travelRoute: (locationId: string) => void;
   // Used by the "ปิด" button on terminal dialogs and by the route-screen
   // back button. No-op if lastLocationId is null (very early in a fresh game).
   exitToLocation: () => void;
@@ -1018,6 +1020,7 @@ export const useWorldStore = create<WorldStore>()(
         const d = deriveAll(fresh.playerBuild);
         fresh.currentHp = d.HP;
         fresh.currentMp = d.MP;
+        seedLoreRumors(fresh);
         set({ ...fresh });
         // Run start scene's onEnter + auto-advance through any chained scenes.
         const draft = draftFrom(get());
@@ -1180,6 +1183,19 @@ export const useWorldStore = create<WorldStore>()(
         set({ ...draft });
       },
 
+      travelRoute: (locationId) => {
+        const s = get();
+        if (!s.hasGame || s.pendingBattle || s.pendingEncounter || s.gameOver) return;
+        const scene = getScene(s.currentSceneId);
+        if (scene?.kind !== "route") return;
+        const destination = scene.destinations.find((d) => d.locationId === locationId &&
+          (!d.visibleIf || evaluateCondition(s, d.visibleIf)));
+        if (!destination || !getScene(locationId)) return;
+        const draft = draftFrom(s);
+        if (!takeChoice(draft, { text: destination.label, next: locationId, effects: destination.effects })) return;
+        set({ ...draft });
+      },
+
       gotoScene: (sceneId) => {
         if (!getScene(sceneId)) {
           console.warn(`[world] gotoScene: unknown scene "${sceneId}"`);
@@ -1234,10 +1250,8 @@ export const useWorldStore = create<WorldStore>()(
         draft.stamina = Math.max(0, draft.stamina - FIGHT_STAMINA);
         advanceTime(draft, FIGHT_HOURS);
         draft.pendingBattle = null;
-        // Carry surviving HP / MP back into the world. Even on loss we copy
-        // — non-fatal sparring leaves the player with whatever HP they had
-        // at the final hit, fatal losses route to gameOver and the values
-        // get reset by `resetGame` anyway.
+        // Carry resources back into the world. Non-fatal defeat leaves one HP
+        // below; fatal losses preserve zero and route to gameOver.
         if (battleState) {
           draft.currentHp = Math.max(0, battleState.hA);
           draft.currentMp = Math.max(0, battleState.mpA);
@@ -1248,6 +1262,8 @@ export const useWorldStore = create<WorldStore>()(
         if (winner !== "A") {
           draft.pendingHuntYield = null;
           if (pb.nonFatal) {
+            draft.currentHp = Math.max(1, draft.currentHp ?? 1);
+            appendActionLog(draft, "battle", "พ่ายแพ้ในการประลอง แต่ยังมีชีวิต — พักผ่อนก่อนสู้ครั้งต่อไป");
             draft.pendingSpar = null;
             set({ ...draft });
             useBattleStore.getState().reset();
@@ -2572,6 +2588,13 @@ export const useWorldStore = create<WorldStore>()(
     {
       name: "wusia-world-v1",
       version: 19,
+      // Content backfill also runs for current-version saves (migrate does
+      // not). Keep the standard shallow merge and add only missing lore.
+      merge: (persisted, current) => {
+        const merged = { ...current, ...(persisted as Partial<WorldStateData>) };
+        if (merged.hasGame) seedLoreRumors(merged);
+        return merged;
+      },
       // Only persist the data fields, not the action functions.
       partialize: (s) => ({
         hasGame: s.hasGame,

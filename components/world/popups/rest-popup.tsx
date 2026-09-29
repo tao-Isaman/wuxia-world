@@ -6,6 +6,7 @@ import type { RestKind } from "@/store/world-store";
 import { useWorldStore } from "@/store/world-store";
 import { flashLoading } from "@/store/loading-store";
 import { toast } from "@/store/toast-store";
+import { deriveAll } from "@/lib/game";
 
 // Which rest tiers a scene offers. The roadside tier is ALWAYS available
 // as a no-cost fallback (so a broke player can't get soft-locked); richer
@@ -37,16 +38,20 @@ export function RestPopup({ open, onClose }: Props) {
   const stamina = useWorldStore((s) => s.stamina);
   const staminaMax = useWorldStore((s) => s.staminaMax);
   const gold = useWorldStore((s) => s.gold);
+  const player = useWorldStore((s) => s.playerBuild);
+  const hp = useWorldStore((s) => s.currentHp);
+  const mp = useWorldStore((s) => s.currentMp);
 
   const kinds = restKindsForScene(currentSceneId);
-  const atFull = stamina >= staminaMax;
+  const maximum = player ? deriveAll(player) : null;
+  const atFull = stamina >= staminaMax && (!maximum || (hp >= maximum.HP && mp >= maximum.MP));
 
   return (
     <Modal open={open} onClose={onClose} title="🛏 พักผ่อน">
       <div className="space-y-2">
         {atFull && (
           <p className="text-[11px] text-muted-foreground italic">
-            แรงเต็มอยู่แล้ว
+            HP, MP และพลังเต็มแล้ว
           </p>
         )}
         {kinds.map((kind) => {
@@ -54,7 +59,7 @@ export function RestPopup({ open, onClose }: Props) {
           const goldShort = gold < costGold;
           const title =
             kind === "inn"    ? "🍵 พักที่โรงเตี๊ยม" :
-            kind === "temple" ? "🏛 พักที่วัด" :
+            kind === "temple" ? (currentSceneId.startsWith("palace_") ? "🏛 พักในลานวัง" : "🏛 พักที่วัด") :
                                 "🌿 พักริมทาง";
           const detail =
             kind === "inn"    ? `ราคา ${costGold} ทอง · 12 ชั่วยาม · ฟื้นเต็ม` :

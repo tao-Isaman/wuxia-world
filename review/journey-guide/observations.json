@@ -1,0 +1,518 @@
+{
+  "observations": [
+    {
+      "name": "home-desktop",
+      "box": {
+        "x": 16,
+        "y": 171,
+        "width": 300,
+        "height": 177.9375
+      },
+      "controls": [
+        {
+          "className": "world-controls",
+          "x": 597.40625,
+          "y": 760,
+          "width": 245.1875,
+          "height": 44
+        },
+        {
+          "className": "player-hud pixel-panel",
+          "x": 16,
+          "y": 16,
+          "width": 300,
+          "height": 145
+        },
+        {
+          "className": "location-hud pixel-panel",
+          "x": 1263.09375,
+          "y": 16,
+          "width": 160.90625,
+          "height": 73.5
+        },
+        {
+          "className": "game-menu pixel-panel",
+          "x": 448,
+          "y": 811,
+          "width": 544,
+          "height": 73
+        }
+      ],
+      "overflow": false,
+      "text": "เส้นทางแนะนำ\nออกเดินทางสู่นครหลวง\n\nหมอหลินต้องการบัวหิมะสำหรับปรุงยาพิเศษให้ผู้ป่วยหนัก\n\nจุดหมาย → ทางออกจากบ้าน\n\nพลังรวม 20 · ออกถนน 10 + เข้าเมือง 10",
+      "bodyScroll": false
+    },
+    {
+      "name": "home-portrait",
+      "box": {
+        "x": 10,
+        "y": 541.0625,
+        "width": 370,
+        "height": 156.9375
+      },
+      "controls": [
+        {
+          "className": "world-controls",
+          "x": 105.7578125,
+          "y": 713,
+          "width": 178.484375,
+          "height": 44
+        },
+        {
+          "className": "player-hud pixel-panel",
+          "x": 10,
+          "y": 10,
+          "width": 240,
+          "height": 137
+        },
+        {
+          "className": "location-hud pixel-panel",
+          "x": 10,
+          "y": 152,
+          "width": 134.09375,
+          "height": 59.5
+        },
+        {
+          "className": "game-menu pixel-panel",
+          "x": 10,
+          "y": 766,
+          "width": 370,
+          "height": 68
+        }
+      ],
+      "overflow": false,
+      "text": "เส้นทางแนะนำ\nออกเดินทางสู่นครหลวง\n\nหมอหลินต้องการบัวหิมะสำหรับปรุงยาพิเศษให้ผู้ป่วยหนัก\n\nจุดหมาย → ทางออกจากบ้าน\n\nพลังรวม 20 · ออกถนน 10 + เข้าเมือง 10",
+      "bodyScroll": false
+    },
+    {
+      "name": "home-landscape",
+      "box": {
+        "x": 16,
+        "y": 169,
+        "width": 272,
+        "height": 137.5
+      },
+      "controls": [
+        {
+          "className": "world-controls",
+          "x": 299.40625,
+          "y": 270,
+          "width": 245.1875,
+          "height": 44
+        },
+        {
+          "className": "player-hud pixel-panel",
+          "x": 16,
+          "y": 16,
+          "width": 272,
+          "height": 145
+        },
+        {
+          "className": "location-hud pixel-panel",
+          "x": 667.09375,
+          "y": 16,
+          "width": 160.90625,
+          "height": 73.5
+        },
+        {
+          "className": "game-menu pixel-panel",
+          "x": 190,
+          "y": 322.5,
+          "width": 464,
+          "height": 59.5
+        }
+      ],
+      "overflow": false,
+      "text": "ออกเดินทางสู่นครหลวง\n\nหมอหลินต้องการบัวหิมะสำหรับปรุงยาพิเศษให้ผู้ป่วยหนัก\n\nจุดหมาย → ทางออกจากบ้าน\n\nพลังรวม 20 · ออกถนน 10 + เข้าเมือง 10",
+      "bodyScroll": false
+    },
+    {
+      "name": "home-collapsed",
+      "box": {
+        "x": 16,
+        "y": 169,
+        "width": 272,
+        "height": 46
+      },
+      "controls": [
+        {
+          "className": "world-controls",
+          "x": 299.40625,
+          "y": 270,
+          "width": 245.1875,
+          "height": 44
+        },
+        {
+          "className": "player-hud pixel-panel",
+          "x": 16,
+          "y": 16,
+          "width": 272,
+          "height": 145
+        },
+        {
+          "className": "location-hud pixel-panel",
+          "x": 667.09375,
+          "y": 16,
+          "width": 160.90625,
+          "height": 73.5
+        },
+        {
+          "className": "game-menu pixel-panel",
+          "x": 190,
+          "y": 322.5,
+          "width": 464,
+          "height": 59.5
+        }
+      ],
+      "overflow": false,
+      "text": "ออกเดินทางสู่นครหลวง",
+      "bodyScroll": false
+    },
+    {
+      "name": "route-portrait",
+      "box": {
+        "x": 10,
+        "y": 541.0625,
+        "width": 370,
+        "height": 156.9375
+      },
+      "controls": [
+        {
+          "className": "world-controls",
+          "x": 105.7578125,
+          "y": 713,
+          "width": 178.484375,
+          "height": 44
+        },
+        {
+          "className": "player-hud pixel-panel",
+          "x": 10,
+          "y": 10,
+          "width": 240,
+          "height": 137
+        },
+        {
+          "className": "location-hud pixel-panel",
+          "x": 10,
+          "y": 152,
+          "width": 260,
+          "height": 84.5
+        },
+        {
+          "className": "game-menu pixel-panel",
+          "x": 10,
+          "y": 766,
+          "width": 370,
+          "height": 68
+        }
+      ],
+      "overflow": false,
+      "text": "ระหว่างทาง\nไปพบหมอหลินที่นครหลวง\n\nหมอหลินต้องการบัวหิมะสำหรับปรุงยาพิเศษให้ผู้ป่วยหนัก\n\nจุดหมาย → นครหลวง\n\nเข้าเมืองใช้พลังอีก 10 · มี 90/100",
+      "bodyScroll": false
+    },
+    {
+      "name": "route-landscape",
+      "box": {
+        "x": 16,
+        "y": 169,
+        "width": 272,
+        "height": 137.5
+      },
+      "controls": [
+        {
+          "className": "world-controls",
+          "x": 299.40625,
+          "y": 270,
+          "width": 245.1875,
+          "height": 44
+        },
+        {
+          "className": "player-hud pixel-panel",
+          "x": 16,
+          "y": 16,
+          "width": 272,
+          "height": 145
+        },
+        {
+          "className": "location-hud pixel-panel",
+          "x": 598,
+          "y": 16,
+          "width": 230,
+          "height": 129.5
+        },
+        {
+          "className": "game-menu pixel-panel",
+          "x": 190,
+          "y": 322.5,
+          "width": 464,
+          "height": 59.5
+        }
+      ],
+      "overflow": false,
+      "text": "ไปพบหมอหลินที่นครหลวง\n\nหมอหลินต้องการบัวหิมะสำหรับปรุงยาพิเศษให้ผู้ป่วยหนัก\n\nจุดหมาย → นครหลวง\n\nเข้าเมืองใช้พลังอีก 10 · มี 90/100",
+      "bodyScroll": false
+    },
+    {
+      "name": "capital-portrait",
+      "box": {
+        "x": 10,
+        "y": 541.0625,
+        "width": 370,
+        "height": 156.9375
+      },
+      "controls": [
+        {
+          "className": "world-controls",
+          "x": 105.7578125,
+          "y": 713,
+          "width": 178.484375,
+          "height": 44
+        },
+        {
+          "className": "player-hud pixel-panel",
+          "x": 10,
+          "y": 10,
+          "width": 240,
+          "height": 137
+        },
+        {
+          "className": "location-hud pixel-panel",
+          "x": 10,
+          "y": 152,
+          "width": 122.515625,
+          "height": 59.5
+        },
+        {
+          "className": "game-menu pixel-panel",
+          "x": 10,
+          "y": 766,
+          "width": 370,
+          "height": 68
+        }
+      ],
+      "overflow": false,
+      "text": "คนที่น่าพบ\nพบหมอหลิน\n\nหมอหลินต้องการบัวหิมะสำหรับปรุงยาพิเศษให้ผู้ป่วยหนัก\n\nจุดหมาย → หมอหลิน → บัวหิมะเพื่อผู้ป่วย\n\nเลือกภารกิจที่เปิดให้รับ · สำรวจต่อได้ตามใจ",
+      "bodyScroll": false
+    },
+    {
+      "name": "capital-landscape",
+      "box": {
+        "x": 16,
+        "y": 169,
+        "width": 272,
+        "height": 137.5
+      },
+      "controls": [
+        {
+          "className": "world-controls",
+          "x": 299.40625,
+          "y": 270,
+          "width": 245.1875,
+          "height": 44
+        },
+        {
+          "className": "player-hud pixel-panel",
+          "x": 16,
+          "y": 16,
+          "width": 272,
+          "height": 145
+        },
+        {
+          "className": "location-hud pixel-panel",
+          "x": 688.921875,
+          "y": 16,
+          "width": 139.078125,
+          "height": 73.5
+        },
+        {
+          "className": "game-menu pixel-panel",
+          "x": 190,
+          "y": 322.5,
+          "width": 464,
+          "height": 59.5
+        }
+      ],
+      "overflow": false,
+      "text": "พบหมอหลิน\n\nหมอหลินต้องการบัวหิมะสำหรับปรุงยาพิเศษให้ผู้ป่วยหนัก\n\nจุดหมาย → หมอหลิน → บัวหิมะเพื่อผู้ป่วย\n\nเลือกภารกิจที่เปิดให้รับ · สำรวจต่อได้ตามใจ",
+      "bodyScroll": false
+    },
+    {
+      "name": "quest-portrait",
+      "box": {
+        "x": 10,
+        "y": 541.0625,
+        "width": 370,
+        "height": 156.9375
+      },
+      "controls": [
+        {
+          "className": "world-controls",
+          "x": 105.7578125,
+          "y": 713,
+          "width": 178.484375,
+          "height": 44
+        },
+        {
+          "className": "player-hud pixel-panel",
+          "x": 10,
+          "y": 10,
+          "width": 240,
+          "height": 137
+        },
+        {
+          "className": "location-hud pixel-panel",
+          "x": 10,
+          "y": 152,
+          "width": 122.515625,
+          "height": 59.5
+        },
+        {
+          "className": "game-menu pixel-panel",
+          "x": 10,
+          "y": 766,
+          "width": 370,
+          "height": 68
+        }
+      ],
+      "overflow": false,
+      "text": "ภารกิจของเจ้า\nบัวหิมะเพื่อผู้ป่วย\n\nหาบัวหิมะ — งอกได้เพียงที่ก้นหุบเขาตัดใจเท่านั้น\n\nดูขั้นตอนและรางวัลในเมนู ภารกิจ\n\nขั้นที่ 1 / 2",
+      "bodyScroll": false
+    },
+    {
+      "name": "quest-landscape",
+      "box": {
+        "x": 16,
+        "y": 169,
+        "width": 272,
+        "height": 119.5
+      },
+      "controls": [
+        {
+          "className": "world-controls",
+          "x": 299.40625,
+          "y": 270,
+          "width": 245.1875,
+          "height": 44
+        },
+        {
+          "className": "player-hud pixel-panel",
+          "x": 16,
+          "y": 16,
+          "width": 272,
+          "height": 145
+        },
+        {
+          "className": "location-hud pixel-panel",
+          "x": 688.921875,
+          "y": 16,
+          "width": 139.078125,
+          "height": 73.5
+        },
+        {
+          "className": "game-menu pixel-panel",
+          "x": 190,
+          "y": 322.5,
+          "width": 464,
+          "height": 59.5
+        }
+      ],
+      "overflow": false,
+      "text": "บัวหิมะเพื่อผู้ป่วย\n\nหาบัวหิมะ — งอกได้เพียงที่ก้นหุบเขาตัดใจเท่านั้น\n\nดูขั้นตอนและรางวัลในเมนู ภารกิจ\n\nขั้นที่ 1 / 2",
+      "bodyScroll": false
+    },
+    {
+      "name": "quest-desktop",
+      "box": {
+        "x": 16,
+        "y": 171,
+        "width": 300,
+        "height": 156.9375
+      },
+      "controls": [
+        {
+          "className": "world-controls",
+          "x": 597.40625,
+          "y": 760,
+          "width": 245.1875,
+          "height": 44
+        },
+        {
+          "className": "player-hud pixel-panel",
+          "x": 16,
+          "y": 16,
+          "width": 300,
+          "height": 145
+        },
+        {
+          "className": "location-hud pixel-panel",
+          "x": 1284.921875,
+          "y": 16,
+          "width": 139.078125,
+          "height": 73.5
+        },
+        {
+          "className": "game-menu pixel-panel",
+          "x": 448,
+          "y": 811,
+          "width": 544,
+          "height": 73
+        }
+      ],
+      "overflow": false,
+      "text": "ภารกิจของเจ้า\nบัวหิมะเพื่อผู้ป่วย\n\nหาบัวหิมะ — งอกได้เพียงที่ก้นหุบเขาตัดใจเท่านั้น\n\nดูขั้นตอนและรางวัลในเมนู ภารกิจ\n\nขั้นที่ 1 / 2",
+      "bodyScroll": false
+    },
+    {
+      "name": "low-stamina-portrait",
+      "box": {
+        "x": 10,
+        "y": 541.0625,
+        "width": 370,
+        "height": 156.9375
+      },
+      "controls": [
+        {
+          "className": "world-controls",
+          "x": 105.7578125,
+          "y": 713,
+          "width": 178.484375,
+          "height": 44
+        },
+        {
+          "className": "player-hud pixel-panel",
+          "x": 10,
+          "y": 10,
+          "width": 240,
+          "height": 137
+        },
+        {
+          "className": "location-hud pixel-panel",
+          "x": 10,
+          "y": 152,
+          "width": 134.09375,
+          "height": 59.5
+        },
+        {
+          "className": "game-menu pixel-panel",
+          "x": 10,
+          "y": 766,
+          "width": 370,
+          "height": 68
+        }
+      ],
+      "overflow": false,
+      "text": "เส้นทางแนะนำ\nออกเดินทางสู่นครหลวง\n\nหมอหลินต้องการบัวหิมะสำหรับปรุงยาพิเศษให้ผู้ป่วยหนัก\n\nเติมพลังที่เมนู พักผ่อน ก่อนออกเดินทาง\n\nพลังรวม 20 · ออกถนน 10 + เข้าเมือง 10",
+      "bodyScroll": false
+    }
+  ],
+  "errors": [],
+  "checks": [
+    "real home-road-capital travel: 100 → 90 → 80 stamina",
+    "real physician quest acceptance",
+    "all viewport HUD/controls non-overlap",
+    "collapse persisted without modifying game save",
+    "guide hidden during destination chooser",
+    "quest stage reload",
+    "fixture: stage two; done hidden; low stamina"
+  ]
+}

@@ -23,6 +23,7 @@ export function buffBadgeLabel(b: BuffRecord): string {
     case "buff_eva": return "พริ้วไหว";
     case "buff_reduce": return "ทรงพลัง";
     case "buff_reflect": return "สะท้อนพลัง";
+    case "buff_riposte": return `สวนกลับ +${b.v}%`;
     case "buff_spd": return "ว่องไว";
     case "buff_cri": return "วงคริต";
     case "heal_pct": return "ฟื้นพลัง";
@@ -69,6 +70,11 @@ export function describeBuff(b: BuffRecord): BuffDescription {
       return {
         title: "สะท้อนพลังร้าย",
         detail: `สะท้อน ${b.v}% ของ damage ที่ได้รับ กลับไปยังผู้โจมตี · ใช้ครั้งเดียวแล้วหายไป`,
+      };
+    case "buff_riposte":
+      return {
+        title: "พร้อมสวนกลับ",
+        detail: `โจมตีกายครั้งถัดไปแรงขึ้น ${b.v}% · ใช้ได้ 1 ครั้ง แม้โจมตีพลาดก็เสียสิทธิ์ · ไม่หมดระหว่างตาศัตรู`,
       };
     case "buff_spd":
       return {

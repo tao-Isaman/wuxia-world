@@ -1,0 +1,63 @@
+const { chromium, expect } = require('@playwright/test');
+const fs = require('node:fs');
+const path = require('node:path');
+(async () => {
+  const browser = await chromium.launch({ headless: true });
+  const errors = [];
+  const observations = [];
+  const deadline = setTimeout(async () => { await browser.close(); process.exit(1); }, 120000);
+  try {
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, deviceScaleFactor: 1 });
+    const page = await context.newPage();
+    page.on('pageerror', e => errors.push(e.message));
+    await page.goto('http://127.0.0.1:3017', { waitUntil: 'domcontentloaded', timeout: 60000 });
+    await page.locator('#hero-name').fill('Critic Two');
+    await page.getByRole('button', { name: 'เริ่มเกมใหม่' }).tap();
+    await page.getByTestId('world-canvas').waitFor({ timeout: 60000 });
+    const stats = await page.evaluate(() => {
+      const p = JSON.parse(localStorage.getItem('wusia-world-v1'));
+      p.state.pendingBattle = { opponentId: 'petty_thief', onWin: 'home_player', onLose: 'home_player', nonFatal: true };
+      localStorage.setItem('wusia-world-v1', JSON.stringify(p));
+      return p.state.playerBuild.stats;
+    });
+    await page.reload({ waitUntil: 'domcontentloaded', timeout: 60000 });
+    const battle = page.getByTestId('battle-canvas');
+    await expect(battle).toHaveAttribute('data-ready', 'true', { timeout: 60000 });
+    await expect(page.getByRole('button', { name: 'หมัดตรง', exact: true })).toBeEnabled({ timeout: 15000 });
+    const hero = page.getByRole('button', { name: 'ดูค่าสถานะของ Critic Two', exact: true });
+    const record = async name => {
+      const data = await page.evaluate(() => ({ width: innerWidth, height: innerHeight, text: document.body.innerText, paused: document.querySelector('[data-testid="battle-canvas"]').dataset.paused, dialogs: [...document.querySelectorAll('[role="dialog"]')].map(e => e.getBoundingClientRect().toJSON()) }));
+      observations.push({ name, ...data });
+      await page.screenshot({ path: path.join(__dirname, name + '.png') });
+    };
+    await hero.tap();
+    await page.waitForTimeout(450);
+    await expect(page.getByRole('dialog')).toBeVisible();
+    await expect(battle).toHaveAttribute('data-paused', 'true');
+    await record('fixed-portrait-stats');
+    await page.setViewportSize({ width: 844, height: 390 });
+    await page.waitForTimeout(400);
+    await expect(page.getByRole('dialog')).toBeVisible();
+    await expect(battle).toHaveAttribute('data-paused', 'true');
+    await record('fixed-landscape-stats');
+    await page.getByRole('button', { name: 'ปิดค่าสถานะ', exact: true }).tap();
+    await expect(page.getByRole('dialog')).toHaveCount(0);
+    await expect(battle).toHaveAttribute('data-paused', 'false');
+    observations.push({ name: 'close-button', passed: true });
+    await page.getByRole('button', { name: 'ดูค่าสถานะของ ขโมยน้อย', exact: true }).tap();
+    await expect(page.getByRole('dialog')).toBeVisible();
+    await page.touchscreen.tap(450, 325);
+    await expect(page.getByRole('dialog')).toHaveCount(0);
+    await expect(battle).toHaveAttribute('data-paused', 'false');
+    observations.push({ name: 'enemy-tap-and-outside-dismiss', passed: true });
+    await hero.tap();
+    await expect(page.getByRole('dialog')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('dialog')).toHaveCount(0);
+    await expect(battle).toHaveAttribute('data-paused', 'false');
+    observations.push({ name: 'escape-dismiss', passed: true });
+    const fonts = await page.locator('button[aria-label="ตั้งรับ"],button[aria-label="หมัดตรง"],button[aria-label="รวบรวมปราณ"]').evaluateAll(buttons => buttons.map(b => ({ text: b.innerText, leaves: [...b.querySelectorAll('*')].filter(e => e.childElementCount === 0 && e.textContent.trim()).map(e => ({ text: e.textContent, fontSize: getComputedStyle(e).fontSize })) })));
+    fs.writeFileSync(path.join(__dirname, 'fixed-retest.json'), JSON.stringify({ stats, observations, fonts, errors, passed: true }, null, 2));
+    console.log(JSON.stringify({ passed: true, observations, fonts, errors }));
+  } finally { clearTimeout(deadline); await browser.close(); console.log('BROWSER CLOSED'); }
+})().catch(e => { console.error(e); process.exit(1); });

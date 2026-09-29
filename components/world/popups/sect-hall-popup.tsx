@@ -13,6 +13,8 @@ import type { SectHallDef } from "@/lib/world";
 import { useWorldStore } from "@/store/world-store";
 import { toast } from "@/store/toast-store";
 import { ArtTooltip, SkillTooltip } from "../skill-tooltip";
+import { capitalTrainingStatus } from "@/lib/world/capital-training";
+import { CAPITAL_TRAINING_NAME, CAPITAL_TRAINING_SCENE_ID } from "@/lib/world/data/capital-training";
 
 interface Props {
   open: boolean;
@@ -25,8 +27,8 @@ interface Props {
 // per-city in lib/world/data/sect-halls.ts. Anything they already know is
 // marked "เรียนแล้ว".
 export function SectHallPopup({ open, hall, onClose }: Props) {
-  const player = useWorldStore((s) => s.playerBuild);
-  const gold = useWorldStore((s) => s.gold);
+  const state = useWorldStore();
+  const { playerBuild: player, gold } = state;
   const buyMoveSkill = useWorldStore((s) => s.buyMoveSkill);
   const buyInnerSkill = useWorldStore((s) => s.buyInnerSkill);
 
@@ -34,6 +36,7 @@ export function SectHallPopup({ open, hall, onClose }: Props) {
 
   const learnedSkills = new Set(player.learnedSkillIds ?? []);
   const learnedArts = new Set(player.learnedArtIds ?? []);
+  const training = hall.locationId === "city_capital" ? capitalTrainingStatus(state) : null;
 
   return (
     <Modal open={open} onClose={onClose} title={hall.label}>
@@ -41,6 +44,31 @@ export function SectHallPopup({ open, hall, onClose }: Props) {
         <p className="text-xs text-muted-foreground italic leading-relaxed">
           {hall.description}
         </p>
+
+        {training && (
+          <section className="space-y-2 rounded border border-amber-700/40 bg-amber-950/10 p-3 text-xs" aria-label="บทฝึกตั้งรับและสวนกลับ">
+            <strong className="block text-sm">{training.completed ? "ผ่านบทฝึกตั้งรับแล้ว" : "บทฝึกตั้งรับและสวนกลับ"}</strong>
+            <p>{CAPITAL_TRAINING_NAME} · คู่ฝึกระดับเริ่มต้น</p>
+            {!training.completed && <>
+              <p className="leading-relaxed">ลอง ตั้งรับ แล้วใช้ หมัดตรง ในตาถัดไปเพื่อสวนกลับแรงขึ้น · ตั้งรับใช้ 2 MP</p>
+              <p className="text-muted-foreground leading-relaxed">ไม่มีค่าฝึก · แพ้ไม่เสียชีวิต · ชนะรับ 50 W-EXP และประสบการณ์วิชาที่ใช้ · จบแล้วกลับนครหลวง</p>
+              <p className="text-muted-foreground">ใช้ 5 แรง และ 0.5 ชั่วยามทั้งแพ้และชนะ · ผ่านได้หนึ่งครั้ง</p>
+            </>}
+            {training.needsRest && <p className="leading-relaxed">HP {training.hp}/{training.maxHp} · MP {training.mp} · พักฟื้นก่อนฝึกได้ฟรี</p>}
+            <div className="flex flex-wrap gap-2">
+              {!training.completed && <Button size="sm" disabled={!training.canStart} onClick={() => {
+                if (!capitalTrainingStatus(useWorldStore.getState())?.canStart) return;
+                onClose();
+                state.gotoScene(CAPITAL_TRAINING_SCENE_ID);
+              }}>ฝึกประลองฟรี</Button>}
+              {training.needsRest && <Button size="sm" variant="outline" onClick={() => {
+                const result = state.rest("route");
+                if (result.ok) toast("success", "พักริมทางแล้ว · ฟื้น HP, MP และแรง ¼ · ผ่านไป 12 ชั่วยาม");
+              }}>พักริมทาง · ฟรี</Button>}
+            </div>
+            {training.needsRest && <p className="text-[10px] text-muted-foreground">พักครั้งละ 12 ชั่วยาม · ฟื้น HP, MP และแรง ¼</p>}
+          </section>
+        )}
 
         <div className="text-xs">
           <span className="text-muted-foreground">ทอง </span>

@@ -1,5 +1,6 @@
 import type { CharacterBuild, EquipLoadout, StatBlock } from "@/lib/game";
 import type { OpponentDef, ResourceYield } from "../types";
+import { CAPITAL_TRAINING_OPPONENT } from "./capital-training";
 
 // ─── Opponent roster (35 entries, organised by tier) ────────────────
 // Tier 0 (5): chaff — STARTER_BUILD-equivalent.
@@ -146,6 +147,8 @@ const DROPS_T4: readonly ResourceYield[] = [
 ];
 
 export const OPPONENTS: readonly OpponentDef[] = [
+  // Offered once at the capital hall, never included in random events.
+  CAPITAL_TRAINING_OPPONENT,
   // ─── Tier 0 (5) ─────────────────────────────────────────────────
   { id: "petty_thief", name: "ขโมยน้อย", ti: 0, category: "human", drops: DROPS_T0,
     build: () => build("ขโมยน้อย", 0) },
