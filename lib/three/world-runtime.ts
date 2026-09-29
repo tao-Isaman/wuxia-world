@@ -49,6 +49,8 @@ type MarkerVisual = {
   /** Hero's Adventure-style always-on name over an NPC (hidden while the boxed label shows). */
   nameTag?: THREE.Sprite;
   questMark?: THREE.Sprite;
+  /** Service / exit badge; fades when the player is far away. */
+  icon?: THREE.Sprite;
   halo: THREE.Sprite;
   character?: CharacterVisual;
   opacity: number;
@@ -487,6 +489,7 @@ export function createWorldRuntime(
       halo.visible = false;
       group.add(halo);
       let character: CharacterVisual | undefined;
+      let markerIcon: THREE.Sprite | undefined;
       if (marker.kind === "npc") {
         const shadow = sprite(shadowTexture, 28, 10);
         shadow.renderOrder = 1;
@@ -500,6 +503,7 @@ export function createWorldRuntime(
         icon.position.y = 5;
         icon.renderOrder = 8000;
         group.add(icon);
+        markerIcon = icon;
       }
       const label = makeLabel(marker.label);
       label.visible = false;
@@ -528,7 +532,7 @@ export function createWorldRuntime(
       hit.userData.markerId = marker.id;
       group.add(hit);
       hitTargets.push(hit);
-      markers.set(marker.id, { group, hit, label, labelText: marker.label, nameTag, questMark, halo, character, opacity: 1, phase: index * 0.47 });
+      markers.set(marker.id, { group, hit, label, labelText: marker.label, nameTag, questMark, icon: markerIcon, halo, character, opacity: 1, phase: index * 0.47 });
     });
 
     actor = new THREE.Group();
@@ -673,6 +677,9 @@ export function createWorldRuntime(
         visual.nameTag.scale.set(tagCanvas.width * tagScale, tagCanvas.height * tagScale, 1);
         visual.nameTag.position.y = 56;
         visual.nameTag.visible = !visual.label.visible;
+        const halfTag = visual.nameTag.scale.x / 2;
+        visual.nameTag.position.x = THREE.MathUtils.clamp(point.x, camera.position.x - viewWidth / 2 + halfTag + 4,
+          camera.position.x + viewWidth / 2 - halfTag - 4) - point.x;
       }
       if (visual.questMark) {
         const mark = marker.quest === "turnin" ? "?" : "!";
@@ -695,6 +702,8 @@ export function createWorldRuntime(
         visual.group.traverse((object) => { if (object instanceof THREE.Sprite) object.material.opacity = opacity; });
         visual.opacity = opacity;
       }
+      // Keep the painted map in front: far-off service/exit badges recede.
+      if (visual.icon) visual.icon.material.opacity = opacity * (selected || distance < 230 ? 1 : 0.5);
     }
     particles.forEach((particle, index) => {
       particle.visible = !reducedMotion;

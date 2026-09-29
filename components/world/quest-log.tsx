@@ -76,13 +76,14 @@ export function QuestLog({ variant = "card" }: QuestLogProps = {}) {
     <div className="space-y-3">
       <TabBar tab={tab} counts={counts} onSelect={onSwitchTab} />
       {list.length === 0 ? (
-        <p className="text-xs text-muted-foreground italic py-2 text-center">
-          {tab === "active"
+        <div className="menu-empty" data-glyph="令">
+          <strong>{tab === "active"
             ? "ยังไม่มีภารกิจที่กำลังทำ"
             : tab === "done"
               ? "ยังไม่มีภารกิจที่สำเร็จ"
-              : "ยังไม่มีภารกิจที่ละทิ้ง"}
-        </p>
+              : "ยังไม่มีภารกิจที่ละทิ้ง"}</strong>
+          {tab === "active" && <span>ผู้ที่มีเครื่องหมาย <b className="menu-empty-mark">!</b> เหนือศีรษะมีงานให้ทำ — เดินไปคุยเพื่อรับภารกิจ</span>}
+        </div>
       ) : (
         <ul className="space-y-1.5">
           {list.map((q) => (

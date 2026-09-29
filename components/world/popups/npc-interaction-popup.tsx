@@ -158,7 +158,7 @@ export function NpcInteractionPopup({ open, npc, onClose }: Props) {
   };
 
   return (
-    <Modal open={open} onClose={onClose} title={`💬 ${npc.name}`} maxWidth="max-w-md">
+    <Modal open={open} onClose={onClose} maxWidth="max-w-md">
       <div className="space-y-3">
         <div className="npc-card-portrait">
           {npcPortrait(npc.id) ? (

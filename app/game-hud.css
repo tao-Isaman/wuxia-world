@@ -20,11 +20,11 @@
 .hud-vitals { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
 .hud-gauge { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; align-items: center; column-gap: 5px; min-width: 0; }
 .hud-glyph { grid-row: 1 / 3; font: 700 18px/1 serif; text-shadow: 1px 1px 0 #07120f; }
-.hud-gauge-track { height: 7px; background: #0b1814; border: 1px solid #53604a; }
+.hud-gauge-track { height: 9px; background: #0b1814; border: 1px solid #53604a; }
 .hud-gauge-track > div { height: 100%; box-shadow: inset 0 1px #ffffff45; transition: width 240ms ease-out; }
-.hud-gauge small { font: 11px/1.3 ui-monospace, monospace; color: #efe9cf; }
+.hud-gauge small { font-size: 13px; line-height: 1.3; font-variant-numeric: tabular-nums; color: #efe9cf; }
 .hud-gauge small span { color: #9fa68f; }
-.hud-wallet { display: flex; gap: 12px; font: 13px ui-monospace, monospace; color: #f2d998; white-space: nowrap; }
+.hud-wallet { display: flex; gap: 12px; font-size: 14px; font-variant-numeric: tabular-nums; color: #f2d998; white-space: nowrap; }
 .hud-wallet > span { display: inline-flex; align-items: center; gap: 5px; }
 .hud-coin { width: 14px; height: 14px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #ffe7a0, #c98f2a 70%); box-shadow: inset 0 0 0 3px #a8741f, inset 0 0 0 4px #f5d180; }
 .hud-wexp { font: 700 13px/1 serif; font-style: normal; color: #86d0bd; }
@@ -57,6 +57,7 @@
   background: #101c26ee; border: 2px solid #6d8aa5; border-radius: 999px; white-space: nowrap;
 }
 .hud-day b { font: 700 18px/1.3 var(--font-display); color: #fff3cf; }
+.hud-hour { margin-top: 3px; padding: 0 8px; font-size: 12px; color: #f0e3bf; text-shadow: 1px 1px 0 #07120f, -1px -1px 0 #07120f; white-space: nowrap; }
 
 .game-menu {
   position: absolute; z-index: 30; bottom: max(14px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%);
@@ -99,9 +100,11 @@
   .hud-player-name { font-size: 15px; }
   .hud-vitals { gap: 5px; }
   .hud-glyph { font-size: 14px; }
-  .hud-gauge small { font-size: 9.5px; }
+  .hud-gauge small { font-size: 11px; }
   .hud-gauge small span { display: none; }
-  .hud-wallet { font-size: 11px; gap: 8px; }
+  .hud-gauge-track { height: 7px; }
+  .hud-wallet { font-size: 12px; gap: 8px; }
+  .hud-hour { display: none; }
   .location-hud { top: max(6px, env(safe-area-inset-top)); right: 6px; }
   .sundial { width: 74px; height: 74px; }
   .hud-day { margin-top: -6px; padding: 0 9px; font-size: 11px; }
@@ -123,9 +126,11 @@
   .hud-player-name { font-size: 14px; }
   .hud-vitals { gap: 6px; }
   .hud-glyph { font-size: 14px; }
-  .hud-gauge small { font-size: 9.5px; }
+  .hud-gauge small { font-size: 11px; }
   .hud-gauge small span { display: none; }
-  .hud-wallet { font-size: 11px; }
+  .hud-gauge-track { height: 7px; }
+  .hud-wallet { font-size: 12px; }
+  .hud-hour { display: none; }
   .location-plaque { top: 8px; left: auto; right: 84px; transform: none; max-width: 22vw; text-align: right; }
   .location-plaque span { padding: 3px 14px; font-size: 16px; border-left: 0; background: #0f1d19ee; }
   .sundial { width: 70px; height: 70px; }
@@ -150,10 +155,13 @@
 .creation-preview span { position: absolute; left: 8px; bottom: 6px; font-size: 12px; color: #e7c788; }
 @media (max-width: 640px) { .creation-preview { height: 118px; } }
 @media (max-height: 760px) and (min-width: 641px) { .creation-preview { height: 110px; } }
+@media (max-height: 500px) and (orientation: landscape) { .creation-preview { display: none; } }
 
 /* Controls hint: a slim pill, not a boxed panel. */
-.world-controls { padding: 2px 6px 2px 14px; gap: 10px; font-size: 12px; background: #0b1714a8; border: 1px solid #c9a55c55; border-radius: 999px; bottom: 100px; }
+/* Bottom-left, clear of the centred map exits and the medallion dock. */
+.world-controls { left: 14px; transform: none; padding: 2px 6px 2px 14px; gap: 10px; font-size: 12px; background: #0b1714a8; border: 1px solid #c9a55c55; border-radius: 999px; bottom: 22px; }
 .world-controls button { padding: 0 10px; border-left: 1px solid #c9a55c44; }
 @media (pointer: fine) { .world-controls button { min-height: 36px; } }
-@media (max-width: 640px) { .world-controls { bottom: 82px; } }
-@media (max-height: 560px) and (min-width: 641px) { .world-controls { bottom: 72px; font-size: 11px; } }
+@media (max-width: 1100px) { .world-controls { bottom: 100px; } }
+@media (max-width: 640px) { .world-controls { left: 8px; bottom: 82px; } }
+@media (max-height: 560px) and (min-width: 641px) { .world-controls { left: 8px; bottom: 72px; font-size: 11px; } }

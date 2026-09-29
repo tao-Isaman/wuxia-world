@@ -423,6 +423,7 @@ function TurnTimeline({ state, mode, nameA, nameB, casting }: {
       data-acting={index === 0 && acting ? "true" : undefined} title={side === "A" ? nameA : nameB}>
       {side === "B" && creatureFrame !== null ? <span className="turn-glyph" aria-hidden="true">獸</span> :
         <CharacterPreview id={side === "A" ? characterA : characterB} framing="bust" />}
+      {index === 0 && <span className="turn-timeline-tag" aria-hidden="true">{acting ? "ลงมือ" : "ถัดไป"}</span>}
     </li>)}
   </ol>;
 }
@@ -588,6 +589,11 @@ export function BattleArena({ mode = "free", onContinue }: BattleArenaProps) {
           </div>
         ) : (
           <div className="combat-actions-wrap">
+            <ol className="combat-recent" aria-hidden="true">
+              {state.log.filter((line) => line.cls !== "lS").slice(-2).map((line, index, recent) =>
+                <li key={state.log.length - recent.length + index} data-log-kind={line.cls}
+                  dangerouslySetInnerHTML={{ __html: line.txt }} />)}
+            </ol>
             {focusedAction && <p className="combat-action-detail" aria-live="polite">
               <strong>{focusedAction.name}</strong> <span>{focusedAction.detail}</span> <small>{actionMeta(focusedAction)}</small>
             </p>}

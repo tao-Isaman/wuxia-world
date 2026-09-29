@@ -91,11 +91,11 @@
 }
 /* Bronze corner brackets, like the reference game's framed panels. */
 .hud-menu-panel::before, .hud-menu-panel::after {
-  content: ""; position: absolute; width: 22px; height: 22px; pointer-events: none;
-  border: 3px solid #c9a55c;
+  content: ""; position: absolute; z-index: 1; width: 22px; height: 22px; pointer-events: none;
+  border: 4px solid #c9a55c;
 }
-.hud-menu-panel::before { top: -5px; left: -5px; border-right: 0; border-bottom: 0; }
-.hud-menu-panel::after { bottom: -5px; right: -5px; border-left: 0; border-top: 0; }
+.hud-menu-panel::before { top: -4px; left: -4px; border-right: 0; border-bottom: 0; }
+.hud-menu-panel::after { bottom: -4px; right: -4px; border-left: 0; border-top: 0; }
 .hud-menu-title {
   flex: 0 0 auto; padding: 10px 20px; font-family: var(--font-display); font-size: 21px; line-height: 1.5;
   color: #f1dfae; background: linear-gradient(90deg, #1b2c26, #13231f 70%);
@@ -133,10 +133,17 @@
 .game-modal-body .text-xs { font-size: 13px; }
 
 @media (max-width: 480px) {
-  .hud-menu-tabs { gap: 2px; }
-  .hud-menu-tab { flex: 1 1 0; min-width: 0; padding: 5px 1px 6px; font-size: 10px; }
-  .hud-menu-tab span { max-width: 100%; overflow: hidden; text-overflow: clip; white-space: nowrap; }
-  .hud-menu-close { width: 40px; font-size: 28px; }
+  /* Two rows of four so every label stays whole and legible. */
+  .hud-menu-bar { align-items: center; padding-bottom: 6px; }
+  .hud-menu-tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; overflow: visible; }
+  .hud-menu-tab { flex-direction: row; justify-content: center; gap: 4px; min-width: 0; min-height: 40px; margin-bottom: 0; padding: 4px 2px; font-size: 12.5px; border-bottom-color: #4e4a36; }
+  .hud-menu-tab[aria-selected=true] { border-bottom-color: #f6e2a8; }
+  .hud-menu-tab img { width: 20px; height: 20px; }
+  .hud-menu-tab span { white-space: nowrap; }
+  .hud-menu-close { width: 40px; height: 44px; font-size: 28px; margin-bottom: 0; }
+  .bag-filters { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; max-width: 100%; }
+  .bag-filters::-webkit-scrollbar { display: none; }
+  .bag-filters button { flex: 0 0 auto; }
 }
 
 /* ── Encounter confrontation ─────────────────────────────────────────── */
@@ -191,7 +198,9 @@ button.item-tile:hover { transform: translateY(-2px); box-shadow: inset 0 0 0 2p
 .bag-gold { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: #c6c1a8; }
 .bag-gold strong { color: #f2d998; font-family: ui-monospace, monospace; }
 .bag-notice { margin-bottom: 10px; padding: 6px 10px; font-size: 14px; color: #bfe7c4; background: #1f4a3a55; border-left: 3px solid #7fcfa0; }
-.bag-grid { display: grid; grid-template-columns: repeat(auto-fill, 58px); gap: 8px; }
+.bag-grid { display: grid; grid-template-columns: repeat(auto-fill, 76px); gap: 10px 6px; }
+.bag-cell { display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 0; }
+.bag-cell > span { max-width: 100%; font-size: 12px; line-height: 1.35; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .bag-empty { padding: 28px 0; text-align: center; color: #9fa591; font-size: 14px; }
 .bag-detail { min-height: 220px; display: flex; flex-direction: column; gap: 8px; }
 .bag-detail-hint { color: #9fa591; font-size: 14px; }
@@ -215,7 +224,8 @@ button.item-tile:hover { transform: translateY(-2px); box-shadow: inset 0 0 0 2p
   .bag-gear-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px 4px; }
   .bag-gear .item-tile { width: 50px; height: 50px; }
   .bag-gear-label { font-size: 10.5px; }
-  .bag-grid { grid-template-columns: repeat(auto-fill, 54px); gap: 6px; }
+  .bag-grid { grid-template-columns: repeat(auto-fill, 66px); gap: 8px 4px; }
+  .bag-cell > span { font-size: 11px; }
   .bag-grid .item-tile { width: 54px; height: 54px; }
   .bag-detail { min-height: 0; }
 }
@@ -310,3 +320,39 @@ button.item-tile:hover { transform: translateY(-2px); box-shadow: inset 0 0 0 2p
   .skill-slot-medal { width: 44px; height: 44px; }
   .skill-slot-name { font-size: 10.5px; }
 }
+
+/* Encounter keeps clear of the top HUD and fits short landscape screens. */
+.backdrop-focus { padding-top: 120px; padding-bottom: 16px; }
+@media (max-height: 500px) and (orientation: landscape) {
+  .backdrop-focus { padding-top: 64px; padding-bottom: 6px; }
+  .encounter-panel { padding: 10px 14px 8px; width: min(640px, 100%); }
+  .encounter-body { grid-template-columns: 80px 1fr; gap: 12px; margin-top: 4px; }
+  .encounter-portrait { height: 80px; }
+  .encounter-copy h2 { font-size: 22px; }
+  .encounter-flavor { margin-top: 4px; font-size: 13px; line-height: 1.45; }
+  .encounter-actions { margin-top: 8px; }
+  .encounter-actions button { padding-top: 7px; padding-bottom: 7px; }
+  .encounter-note { display: none; }
+}
+.hud-menu-title { display: flex; align-items: center; gap: 10px; }
+.hud-menu-title img { width: 28px; height: 28px; }
+.game-modal-ornament { margin-right: 10px; color: #c9a55c; font-size: 14px; vertical-align: 2px; }
+
+/* Empty states: a faint seal glyph plus a next step, not a lone italic line. */
+.menu-empty { position: relative; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 42px 20px 36px; text-align: center; overflow: hidden; }
+.menu-empty::before { content: attr(data-glyph); position: absolute; top: 50%; left: 50%; transform: translate(-50%, -52%); font: 700 150px/1 serif; color: #c9a55c14; pointer-events: none; }
+.menu-empty strong { position: relative; font-size: 17px; color: #e6d7ae; }
+.menu-empty span { position: relative; max-width: 460px; font-size: 14px; line-height: 1.7; color: #aeb59c; }
+.menu-empty-mark { display: inline-block; padding: 0 6px; color: #2a1a05; background: #ffd24a; font-weight: 900; }
+
+/* NPC card: the portrait band carries the name, so the header bar is just the close mark. */
+.game-modal-card:has(.npc-card-portrait) .game-modal-heading { position: absolute; z-index: 2; right: 16px; top: 16px; margin: 0; padding: 0; background: none; border: 0; }
+.game-modal-card:has(.npc-card-portrait) .game-modal-heading h3 { display: none; }
+.game-modal-card:has(.npc-card-portrait) .game-modal-heading button { background: #0b1512cc; border: 1px solid #8f7a4f; }
+.game-modal-card:has(.npc-card-portrait) { position: relative; }
+.hud-menu-body .text-\[8px\], .game-modal-body .text-\[8px\] { font-size: 11px; }
+/* Tooltip triggers: a quiet dotted hint, not a hyperlink underline. */
+:is(.hud-menu-body, .game-modal-body) .underline.decoration-dotted { text-decoration-color: #c9a55c55; }
+/* Destructive ghost actions (ลืม) read as framed buttons. */
+:is(.hud-menu-body, .game-modal-body) button.text-destructive { border: 1px solid #8f524466; }
+:is(.hud-menu-body, .game-modal-body) button.text-destructive:hover { background: #3a1f1a; border-color: #b0624f; }

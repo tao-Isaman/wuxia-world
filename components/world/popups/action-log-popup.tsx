@@ -50,9 +50,10 @@ export function ActionLogPopup({ open, onClose }: Props) {
         แสดงรายการล่าสุด (ไม่เกิน 100 รายการ)
       </div>
       {reversed.length === 0 ? (
-        <p className="text-xs text-muted-foreground italic py-4 text-center">
-          ยังไม่มีบันทึกการกระทำ
-        </p>
+        <div className="menu-empty" data-glyph="錄">
+          <strong>ยังไม่มีบันทึกการกระทำ</strong>
+          <span>การเดินทาง การต่อสู้ และภารกิจของเจ้าจะถูกจดไว้ที่นี่</span>
+        </div>
       ) : (
         <ul className="space-y-1">
           {reversed.map((e, i) => {

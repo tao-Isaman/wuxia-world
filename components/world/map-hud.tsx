@@ -50,7 +50,8 @@ export function MapHud() {
     <section className="location-hud" aria-label="สถานที่และเวลา">
       <Sundial time={time} />
       <p className="hud-day"><span>วันที่</span> <b>{day}</b></p>
-      <p className="sr-only">{name} · วันที่ {day} · {phase}</p>
+      <p className="hud-hour">{SHICHEN_THAI[((Math.floor(time) % 12) + 12) % 12]} · {phase}</p>
+      <p className="sr-only">{name}</p>
     </section>
   </>;
 }

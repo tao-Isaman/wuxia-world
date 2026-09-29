@@ -109,10 +109,14 @@ export function InventoryPopup({ open, onClose }: Props) {
     setSelection(null);
   };
 
-  const isSelected = (candidate: Selection) => !!selection && selection.kind === candidate.kind &&
+  // Nothing picked yet → show the first visible entry, so the detail pane is never blank.
+  const firstGear = shownGear.find(([id]) => getEquip(id));
+  const current: Selection | null = selection ?? (firstGear ? { kind: "bagEquip", id: firstGear[0] }
+    : shownItems[0] ? { kind: "item", id: shownItems[0][0] } : null);
+  const isSelected = (candidate: Selection) => !!current && current.kind === candidate.kind &&
     (candidate.kind === "slot"
-      ? selection.kind === "slot" && selection.row.type === candidate.row.type && selection.row.index === candidate.row.index
-      : selection.kind !== "slot" && selection.id === candidate.id);
+      ? current.kind === "slot" && current.row.type === candidate.row.type && current.row.index === candidate.row.index
+      : current.kind !== "slot" && current.id === candidate.id);
 
   return (
     <Modal open={open} onClose={onClose} title="🎒 ของในย่ามและเครื่องประดับ">
@@ -153,22 +157,30 @@ export function InventoryPopup({ open, onClose }: Props) {
               {shownGear.map(([id, n]) => {
                 const eq = getEquip(id);
                 if (!eq) return null;
-                return <ItemTile key={`eq-${id}`} glyph={CATEGORY_GLYPH[eq.ty]} rarity={equipRarity(eq)} count={n}
-                  label={`${eq.n} ×${n}`} selected={isSelected({ kind: "bagEquip", id })}
-                  onClick={() => setSelection({ kind: "bagEquip", id })} />;
+                const rarity = equipRarity(eq);
+                return <div key={`eq-${id}`} className="bag-cell">
+                  <ItemTile glyph={CATEGORY_GLYPH[eq.ty]} rarity={rarity} count={n}
+                    label={`${eq.n} ×${n}`} selected={isSelected({ kind: "bagEquip", id })}
+                    onClick={() => setSelection({ kind: "bagEquip", id })} />
+                  <span style={{ color: rarityColor(rarity) }} aria-hidden="true">{eq.n}</span>
+                </div>;
               })}
               {shownItems.map(([id, n]) => {
                 const def = getItem(id);
-                return <ItemTile key={id} glyph={CATEGORY_GLYPH[def?.category ?? "misc"]} rarity={itemRarity(def?.price)}
-                  count={n} label={`${def?.name ?? id} ×${n}`} selected={isSelected({ kind: "item", id })}
-                  onClick={() => setSelection({ kind: "item", id })} />;
+                const rarity = itemRarity(def?.price);
+                return <div key={id} className="bag-cell">
+                  <ItemTile glyph={CATEGORY_GLYPH[def?.category ?? "misc"]} rarity={rarity}
+                    count={n} label={`${def?.name ?? id} ×${n}`} selected={isSelected({ kind: "item", id })}
+                    onClick={() => setSelection({ kind: "item", id })} />
+                  <span style={{ color: rarityColor(rarity) }} aria-hidden="true">{def?.name ?? id}</span>
+                </div>;
               })}
             </div>
           )}
         </section>
 
         <aside className="bag-detail" aria-live="polite">
-          <BagDetail selection={selection} inventory={inventory} inventoryEquipment={inventoryEquipment}
+          <BagDetail selection={current} inventory={inventory} inventoryEquipment={inventoryEquipment}
             equipped={equipped} onUse={use} onEquip={equip} onUnequip={unequip} />
         </aside>
       </div>

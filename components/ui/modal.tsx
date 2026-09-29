@@ -14,6 +14,9 @@ interface Props {
   maxWidth?: string;
 }
 
+/** System emoji clash with the pixel icon set; titles lose any leading emoji. */
+const cleanTitle = (title?: string) => title?.replace(/^(?:\p{Extended_Pictographic}|\uFE0F|\u200D|\s)+/u, "") ?? "";
+
 const typing = (target: EventTarget | null) =>
   target instanceof HTMLElement && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName));
 
@@ -40,9 +43,10 @@ export function Modal({ open, onClose, title, children, maxWidth = "max-w-2xl" }
 
   if (!open) return null;
 
+  const activeTab = menu?.tabs.find((tab) => tab.id === menu.active);
   if (shell && menu) {
     return (
-      <div className="hud-menu" role="dialog" aria-modal="true" aria-label={title}>
+      <div className="hud-menu" role="dialog" aria-modal="true" aria-label={cleanTitle(title)}>
         <header className="hud-menu-bar">
           <nav className="hud-menu-tabs" role="tablist" aria-label="หมวดเมนู">
             {menu.tabs.map((tab) => (
@@ -60,7 +64,11 @@ export function Modal({ open, onClose, title, children, maxWidth = "max-w-2xl" }
         </header>
         <div className="hud-menu-stage" onClick={onClose}>
           <section className="hud-menu-panel game-modal-card" onClick={(e) => e.stopPropagation()}>
-            {title && <h2 className="hud-menu-title">{title}</h2>}
+            {title && <h2 className="hud-menu-title">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              {activeTab && <img src={activeTab.icon} alt="" className="pixel" draggable={false} />}
+              {cleanTitle(title)}
+            </h2>}
             <div className="hud-menu-body">
               <InsideMenuShellContext.Provider value>{children}</InsideMenuShellContext.Provider>
             </div>
@@ -83,7 +91,7 @@ export function Modal({ open, onClose, title, children, maxWidth = "max-w-2xl" }
       >
         <CardContent className="p-4 space-y-3">
           <div className="game-modal-heading flex items-center justify-between border-b pb-2">
-            <h3 className="text-base font-bold">{title ?? ""}</h3>
+            <h3 className="text-base font-bold">{title && <span className="game-modal-ornament" aria-hidden="true">❖</span>}{cleanTitle(title)}</h3>
             <Button
               variant="ghost"
               size="sm"

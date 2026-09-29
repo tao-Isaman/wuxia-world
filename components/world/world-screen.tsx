@@ -69,7 +69,7 @@ function MapBackdrop({
       />
       <div
         className={`relative z-10 max-w-3xl mx-auto p-3 min-h-full flex flex-col gap-3 ${
-          bottom ? "justify-end pb-28 pt-44" : "justify-center"
+          hud === "status" ? "backdrop-focus justify-center" : bottom ? "justify-end pb-28 pt-44" : "justify-center"
         }`}
       >
         {children}
