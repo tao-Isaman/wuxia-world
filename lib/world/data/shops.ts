@@ -54,7 +54,8 @@ export const SHOPS: readonly ShopDef[] = [
   { id: "shop_xixia",    locationId: "city_xixia",    label: "🏪 ตลาดซีเซี่ย",       inventory: COMMON_CITY_SHOP, sellMultiplier: 0.5 },
   { id: "shop_dali",     locationId: "city_dali",     label: "🏪 ตลาดต้าหลี่",       inventory: COMMON_CITY_SHOP, sellMultiplier: 0.5 },
   { id: "shop_yangzhou", locationId: "city_yangzhou", label: "🏪 ตลาดหยางโจว",      inventory: COMMON_CITY_SHOP, sellMultiplier: 0.5 },
-  { id: "shop_suzhou",   locationId: "city_suzhou",   label: "🏪 ตลาดซูโจว",         inventory: COMMON_CITY_SHOP, sellMultiplier: 0.5 },
+  // Suzhou is the silk city: the only seller of silk (sect supply quests, silk robe/fan recipes).
+  { id: "shop_suzhou",   locationId: "city_suzhou",   label: "🏪 ตลาดซูโจว",         inventory: [...COMMON_CITY_SHOP, "silk"], sellMultiplier: 0.5 },
   { id: "shop_jinling",  locationId: "city_jinling",  label: "🏪 ตลาดจินหลิง",       inventory: COMMON_CITY_SHOP, sellMultiplier: 0.5 },
   { id: "shop_changan",  locationId: "city_changan",  label: "🏪 ตลาดฉางอัน",        inventory: COMMON_CITY_SHOP, sellMultiplier: 0.5 },
 

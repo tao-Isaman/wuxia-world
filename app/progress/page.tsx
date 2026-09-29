@@ -36,7 +36,7 @@ export default function ProgressPage() {
       </div></section><aside><section><h2>Independent review</h2>{progress.reviews.map((review, index) => <article key={index}><h3>{review.title}</h3><p>{review.verdict}</p></article>)}</section>
         <section><h2>Verified checks</h2><ul>{progress.checks.map((check) => <li key={check}>{check}</li>)}</ul></section>
         <section><h2>Quality references</h2><p>Original assets, judged for readability, animation, atmosphere and meaningful choices.</p>
-          <a href="https://store.steampowered.com/app/1948980/">Hero’s Adventure: Road to Passion ↗</a><a href="https://dokaponkingdom.com/">Dokapon Kingdom: Connect ↗</a>
+          <a href="https://store.steampowered.com/app/1948980/">Hero’s Adventure: Road to Passion ↗</a>
           <p className="progress-note">Comparisons are reviewer judgments, not claims of commercial-game parity. Unresolved gaps stay visible.</p></section>
       </aside></div>
       <section className="progress-character-study"><h2>Character animation study</h2><p>The actual game atlases at their native pixel grid: eight heroes, four supporting archetypes and three individually drawn townspeople. Select a motion to inspect them.</p>

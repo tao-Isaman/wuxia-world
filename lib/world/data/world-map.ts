@@ -466,6 +466,15 @@ for (const src of ALL_LEAVES) {
   src.routes = outRoutes;
 }
 
+// The tutorial foothill village (core scenes: elder, tavern brawl, viewpoint)
+// hangs off the player's home. Its route scenes live in scenes.ts; the home
+// painting has no marker for it, so it shows as a route card.
+LEAVES_BY_ID.get("home_player")!.routes.push({
+  routeSceneId: "route_home_player__to__village",
+  label: "ทางขึ้นเชิงเขา",
+  hint: "หมู่บ้านของผู้อาวุโส",
+});
+
 // ─── Resource nodes (life-skill activities) ───────────────────────────
 // Each leaf gets one or two gather/hunt resources picked from a per-category
 // default. Five hand-curated overrides install the world's only level-5

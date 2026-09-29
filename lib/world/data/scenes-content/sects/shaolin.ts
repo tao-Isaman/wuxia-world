@@ -164,6 +164,20 @@ export const SCENES_SHAOLIN: readonly Scene[] = [
   },
 
   {
+    // The NPC popup opens qs_<id>_offer after accepting; without it the
+    // trial scene (the only stage-0 advance) was unreachable.
+    kind: "dialog",
+    id: "qs_qst_shaolin_proof_of_heart_offer",
+    lines: [
+      { t: "dialogue", speaker: "ฮุยหยวน", text: "วิชาของเส้าหลินมิได้เริ่มที่กำปั้น แต่เริ่มที่ใจ" },
+      { t: "dialogue", speaker: "ฮุยหยวน", text: "ตามข้ามา ข้าจะทดสอบจิตใจของเจ้าเอง" },
+    ],
+    choices: [
+      { text: "เข้ารับการทดสอบ", next: "qs_qst_shaolin_proof_of_heart_trial" },
+    ],
+  },
+
+  {
     kind: "dialog",
     id: "qs_qst_shaolin_proof_of_heart_trial",
     lines: [
@@ -292,6 +306,28 @@ export const SCENES_SHAOLIN: readonly Scene[] = [
         next: "sect_shaolin",
         visibleIf: { t: "questStatus", questId: "qst_shaolin_wudang_joint", status: "none" },
         effects: [{ t: "startQuest", questId: "qst_shaolin_wudang_joint" }],
+      },
+    ],
+  },
+
+  {
+    // Popup accept lands here. Stages 0-1 (discover_connection, enter_cave)
+    // have no autoAdvance; these two beats advance them, then the guardian
+    // fight's defeatedOpponent autoAdvance and the truth scenes finish it.
+    kind: "dialog",
+    id: "qs_qst_shaolin_wudang_joint_offer",
+    lines: [
+      { t: "dialogue", speaker: "ฮุยหยวน", text: "พระธาตุของเรากับตราประทับของอู่ตัง ล้วนชี้ไปยังที่เดียวกัน" },
+      { t: "narration", text: "เมื่อเจ้าเชื่อมโยงร่องรอยทั้งสองเข้าด้วยกัน มันชี้ไปยังถ้ำโบราณที่อยู่ระหว่างสองสำนัก" },
+    ],
+    choices: [
+      {
+        text: "เดินทางไปยังถ้ำโบราณ",
+        next: "qs_qst_shaolin_wudang_joint_cave",
+        effects: [
+          { t: "advanceQuest", questId: "qst_shaolin_wudang_joint" }, // → enter_cave
+          { t: "advanceQuest", questId: "qst_shaolin_wudang_joint" }, // → defeat_guardian
+        ],
       },
     ],
   },

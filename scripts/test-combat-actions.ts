@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { makeContext, makeInitialState, calcSkillDamage, resolveSkill, resolveArtActive } from "../lib/game/battle";
+import { makeContext, makeInitialState, calcSkillDamage, resolveSkill, resolveArtActive, predictTurnOrder, getNextTurn } from "../lib/game/battle";
 import { tickEffects } from "../lib/game/effects";
 import { SKILLS, ARTS, getSkill } from "../lib/game/data";
 import { resolveCombatAction, recoveryAmount, GUARD_MP_COST } from "../lib/game/combat-actions";
@@ -187,6 +187,24 @@ check("store consumes the player turn, blocks repeated input, and keeps ATB/cool
   assert.equal(useBattleStore.getState().state!.phase, "player");
   assert.equal(useBattleStore.getState().state!.cd.A[0], 1);
   useBattleStore.getState().reset();
+});
+
+check("turn-order forecast matches real ATB turns without mutating the battle", () => {
+  const fast = { ...build, name: "Fast", stats: { ...build.stats, AGI: 60 } };
+  const state = makeInitialState(fast, build);
+  state.phase = "filling";
+  const before = { gA: state.gA, gB: state.gB, turn: state.turn };
+  const forecast = predictTurnOrder(state, 8);
+  assert.deepEqual({ gA: state.gA, gB: state.gB, turn: state.turn }, before);
+  assert.equal(forecast.length, 8);
+  assert.ok(state.dA.Spd > state.dB.Spd);
+  assert.ok(forecast.filter((side) => side === "A").length > forecast.filter((side) => side === "B").length);
+  const replay = { ...state };
+  assert.deepEqual(Array.from({ length: 8 }, () => getNextTurn(replay)), forecast);
+  state.phase = "enemy";
+  assert.equal(predictTurnOrder(state, 3)[0], "B");
+  state.winner = "A";
+  assert.deepEqual(predictTurnOrder(state, 3), []);
 });
 
 console.log(`${checks} combat action checks passed`);

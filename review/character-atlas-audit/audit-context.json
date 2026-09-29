@@ -1,5 +1,5 @@
 {
   "loader": "workspace lib/characters/sheet.ts",
-  "artwork": "workspace files via diagnostic-only page.route (production Qing returned 404)",
+  "artwork": "production static PNGs",
   "origin": "http://127.0.0.1:3017"
 }

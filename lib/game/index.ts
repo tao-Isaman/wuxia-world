@@ -88,6 +88,7 @@ export {
   makeContext,
   makeInitialState,
   getNextTurn,
+  predictTurnOrder,
   gaugeRate,
   tickGauges,
   peekReadyActor,

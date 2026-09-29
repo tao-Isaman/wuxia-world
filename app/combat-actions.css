@@ -75,12 +75,34 @@
 .combat-log-drawer [data-log-kind=lS] { color: #5e5949; }
 .combat-log-drawer [data-log-kind=lC] { color: #79500e; }
 .combat-debug-controls { position: absolute; top: 7px; right: 80px; z-index: 8; }
+/* Turn order (Hero's Adventure-style): the acting face leads, the queue follows. */
+.turn-timeline { display: flex; align-items: center; gap: 5px; margin-left: auto; list-style: none; padding: 0; }
+.turn-timeline li { position: relative; flex: 0 0 auto; width: 34px; height: 34px; overflow: hidden; background: #20352d; border: 2px solid #56705e; opacity: .78; }
+.turn-timeline li[data-side=A] { border-color: #7f93c4; }
+.turn-timeline li[data-side=B] { border-color: #c4775a; }
+.turn-timeline li:first-child { width: 42px; height: 42px; opacity: 1; margin-right: 4px; box-shadow: 0 0 0 2px #11211f; }
+.turn-timeline li[data-acting=true] { border-color: #f4dc9c; box-shadow: 0 0 0 2px #11211f, 0 0 10px #f4dc9c88; }
+.turn-timeline canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
+.turn-glyph { display: grid; place-items: center; width: 100%; height: 100%; color: #f0c9a8; font-size: 18px; }
+
+/* Hero's Adventure-style "Action" beat: a brief seal when the player's turn opens. */
+.turn-callout { position: absolute; z-index: 3; inset: 0; display: grid; place-items: center; pointer-events: none; }
+.turn-callout span { padding: 6px 26px; color: #fbe7b0; font-family: var(--font-display); font-size: 34px; line-height: 1.4;
+  background: linear-gradient(90deg, transparent, #11211fe6 18%, #11211fe6 82%, transparent); border-block: 2px solid #c9a860;
+  text-shadow: 0 2px 0 #0b1714; animation: turn-callout 1.1s ease-out forwards; }
+@keyframes turn-callout { 0% { opacity: 0; transform: scale(1.25); } 18% { opacity: 1; transform: scale(1); } 70% { opacity: 1; } 100% { opacity: 0; } }
+@media (max-width: 640px) { .turn-callout span { font-size: 24px; padding: 4px 18px; } }
+
 @media (max-width: 640px) and (min-height: 561px) {
   .battle-arena[data-mode=world] { padding: max(8px, env(safe-area-inset-top)) 10px max(8px, env(safe-area-inset-bottom)); gap: 8px; }
   .combat-status { min-height: 57px; gap: 8px; }
   .combat-status > span { gap: 9px; }
-  .combat-status strong { font-size: 19px; line-height: 1.35; }
+  .combat-status strong { font-size: 17px; line-height: 1.35; }
   .combat-status small { font-size: 12px; padding-left: 9px; }
+  .turn-timeline { gap: 3px; }
+  .turn-timeline li { width: 26px; height: 26px; }
+  .turn-timeline li:first-child { width: 32px; height: 32px; margin-right: 2px; }
+  .turn-timeline li:nth-child(n+5) { display: none; }
   .combat-hud { top: 9px; left: 8px; right: 8px; grid-template-columns: minmax(0, 1fr) 14px minmax(0, 1fr); gap: 4px; }
   .battle-arena .battle-fighter > .combat-fighter-content { padding: 7px; }
   .combat-versus { font-size: 16px; padding-top: 5px; }
@@ -114,6 +136,8 @@
   .combat-status { min-height: 0; padding: 0 2px; }
   .combat-status strong { font-size: 18px; line-height: 1.2; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
   .combat-status small { font-size: 12px; }
+  .turn-timeline li { width: 24px; height: 24px; }
+  .turn-timeline li:first-child { width: 30px; height: 30px; }
   .combat-hud { top: 7px; left: 7px; right: 7px; grid-template-columns: minmax(0, 1fr) 25px minmax(0, 1fr); gap: 7px; }
   .battle-arena .battle-fighter > .combat-fighter-content { padding: 6px 8px; }
   .combat-fighter-heading { min-height: 18px; }
@@ -140,4 +164,4 @@
   .combat-log > button { padding: 0 3px; min-height: 24px; font-size: 10px; }
   .combat-debug-controls { top: 3px; right: 80px; }
 }
-@media (prefers-reduced-motion: reduce) { .combat-action { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .combat-action { transition: none; } .turn-callout { display: none; } }

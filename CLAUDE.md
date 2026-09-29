@@ -19,12 +19,16 @@ bun run lint         # next lint (ESLint flat config)
 bun run typecheck    # tsc --noEmit
 bun scripts/audit-content.ts     # scene / quest / NPC / item reference audit
 bun scripts/audit-quest-flow.ts  # offer→accept→complete chain audit
+bun run test:quests               # every quest startable/progressable/finishable from home_player (+ regressions)
+bun scripts/map-collision-tool.ts <id> [json] [png]  # author/check a painted map's collision footprints
+bun scripts/build-map-footprints.ts <dir>            # regenerate lib/three/world-footprints-data.ts
+bun scripts/repack-character-sheet.ts <in> <out> [rows]  # re-pack a generated sprite sheet onto an equal grid
 bun scripts/sort-by-sect.ts      # re-sort skills.ts + arts.ts by SECT_ORDER (idempotent)
 bun scripts/normalize-t3-stats.ts # normalize move-skill stat sums per tier (T0=10..T4=30)
 bun scripts/split-sects-file.ts <quests|npcs|scenes>  # split sects-temples.ts trio into per-sect files
 ```
 
-There are no tests yet. If you add some, prefer Vitest (zero-config with the Bun runner).
+Tests are Bun scripts and `bun test` files wired as `test:*` in package.json (runtime, combat, navigation, opening, rumors, investigation, battle-background, quests), plus Playwright `test:e2e` against a production build on :3017.
 
 ## Architecture
 

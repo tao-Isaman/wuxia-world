@@ -72,11 +72,12 @@ const CORE_SCENES: readonly Scene[] = [
         hint: "เส้นทางขึ้นเขาสำหรับชมทิวทัศน์",
       },
       {
-        // Connector to the larger world (84 locations from location.md).
-        // See lib/world/data/world-map.ts.
-        routeSceneId: "village_to_world",
-        label: "🗺 ออกเดินทางสู่ยุทธภพ",
-        hint: "เริ่มผจญภัยในโลกกว้าง",
+        // Two-way link with home_player (the reverse is appended to the
+        // home leaf in world-map.ts). The old village_to_world connector led
+        // to the retired random-teleport hub and left this area orphaned.
+        routeSceneId: "route_village__to__home_player",
+        label: "ทางลงเขาสู่บ้าน",
+        hint: "เส้นทางกลับบ้านของเจ้าและออกสู่ยุทธภพ",
       },
     ],
   },
@@ -421,6 +422,20 @@ const CORE_SCENES: readonly Scene[] = [
       { t: "dialogue", speaker: "เซียวจิ้งเทียน", text: "นักเดินทาง... ดาบของเจ้าดูคมพอจะลองมือกับข้าได้หรือไม่?" },
       { t: "dialogue", speaker: "เซียวจิ้งเทียน", text: "หากกล้าก็เลือก 'ขอประลอง' ที่หน้าต่างเมื่อกี้นี้ได้เลย" },
     ],
+  },
+  {
+    kind: "route",
+    id: "route_village__to__home_player",
+    label: "ทางลงเขาสู่บ้าน (หมู่บ้านบนเชิงเขา → คฤหาสน์ตนเอง)",
+    description: "เดินทางจากหมู่บ้านบนเชิงเขาไปยังคฤหาสน์ตนเอง",
+    destinations: [{ locationId: "home_player", label: "คฤหาสน์ตนเอง", hint: "บ้านของเจ้า" }],
+  },
+  {
+    kind: "route",
+    id: "route_home_player__to__village",
+    label: "ทางขึ้นเชิงเขา (คฤหาสน์ตนเอง → หมู่บ้านบนเชิงเขา)",
+    description: "เดินทางจากคฤหาสน์ตนเองไปยังหมู่บ้านบนเชิงเขา",
+    destinations: [{ locationId: "village", label: "หมู่บ้านบนเชิงเขา", hint: "หมู่บ้านของผู้อาวุโส ผู้มีงานให้คนหนุ่มสาวช่วย" }],
   },
   {
     kind: "dialog",
