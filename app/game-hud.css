@@ -57,7 +57,7 @@
   background: #101c26ee; border: 2px solid #6d8aa5; border-radius: 999px; white-space: nowrap;
 }
 .hud-day b { font: 700 18px/1.3 var(--font-display); color: #fff3cf; }
-.hud-hour { margin-top: 3px; padding: 0 8px; font-size: 12px; color: #f0e3bf; text-shadow: 1px 1px 0 #07120f, -1px -1px 0 #07120f; white-space: nowrap; }
+.hud-hour { margin-top: 4px; padding: 1px 10px; font-size: 13px; color: #f6ead0; background: #0b1714d9; border: 1px solid #c9a55c66; white-space: nowrap; }
 
 .game-menu {
   position: absolute; z-index: 30; bottom: max(14px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%);
@@ -109,7 +109,7 @@
   .sundial { width: 74px; height: 74px; }
   .hud-day { margin-top: -6px; padding: 0 9px; font-size: 11px; }
   .hud-day b { font-size: 15px; }
-  .location-plaque { top: 78px; left: 8px; max-width: calc(100% - 100px); }
+  .location-plaque { top: 84px; left: 8px; max-width: calc(100% - 100px); }
   .location-plaque span { font-size: 16px; }
   .journey-guide:not(.journey-guide--inline) { top: 118px; left: 8px; width: calc(100% - 16px); }
   .game-menu { gap: 0; padding: 4px 2px 3px; width: 100%; justify-content: space-around; bottom: 0; padding-bottom: max(4px, env(safe-area-inset-bottom)); }
@@ -165,3 +165,23 @@
 @media (max-width: 1100px) { .world-controls { bottom: 100px; } }
 @media (max-width: 640px) { .world-controls { left: 8px; bottom: 82px; } }
 @media (max-height: 560px) and (min-width: 641px) { .world-controls { left: 8px; bottom: 72px; font-size: 11px; } }
+
+/* Landscape title: the form alone, compact, so Start stays on screen. */
+@media (max-height: 500px) and (orientation: landscape) {
+  .title-content { grid-template-columns: 1fr 380px; padding: 10px 24px; gap: 20px; align-items: start; }
+  .title-description, .title-rule, .title-footnote { display: none; }
+  .title-seal { width: 38px; height: 46px; font-size: 26px; margin-bottom: 8px; }
+  .title-intro h1 { font-size: 42px; }
+  .hero-creation { padding: 12px 16px; }
+  .creation-heading { font-size: 18px; padding-bottom: 6px; margin-bottom: 8px; }
+  .creation-input { padding: 6px 10px; }
+  .hero-creation fieldset { margin-top: 8px; }
+  .body-options button { height: 72px; }
+  .body-options .character-preview { height: 64px; }
+  .creation-note, .creation-save-note { display: none; }
+  .start-adventure { margin-top: 10px; padding-top: 8px; padding-bottom: 8px; }
+}
+/* "Other things here" drawer: a medallion under the sundial, not an emoji box. */
+.journey-extras { top: 170px !important; right: 30px !important; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center;
+  background: radial-gradient(circle at 50% 38%, #2f463b, #101d19 72%) !important; border: 2px solid #b8975a !important; }
+@media (max-width: 640px) { .journey-extras { top: 118px !important; right: 12px !important; } }

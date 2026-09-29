@@ -202,7 +202,7 @@ export function NpcInteractionPopup({ open, npc, onClose }: Props) {
               className="w-full justify-start text-left h-auto py-2 whitespace-normal"
             >
               <span className="flex flex-col items-start gap-0.5">
-                <span className="font-semibold text-sm">💬 ทักทาย</span>
+                <span className="font-semibold text-sm npc-action-label">ทักทาย</span>
                 <span className="text-[10px] text-muted-foreground">
                   พูดคุยกับ{npc.name}
                 </span>
@@ -216,7 +216,7 @@ export function NpcInteractionPopup({ open, npc, onClose }: Props) {
               className="w-full justify-start text-left h-auto py-2 whitespace-normal"
             >
               <span className="flex flex-col items-start gap-0.5">
-                <span className="font-semibold text-sm">⚔ ขอประลอง</span>
+                <span className="font-semibold text-sm npc-action-label">ขอประลอง</span>
                 <span className="text-[10px] text-muted-foreground">
                   ฝีมือต่อฝีมือ — ชนะได้ชื่อเสียง +{npc.sparFameReward ?? 0}
                 </span>
@@ -268,7 +268,7 @@ export function NpcInteractionPopup({ open, npc, onClose }: Props) {
               className="w-full justify-start text-left h-auto py-2 whitespace-normal border-stone-400"
             >
               <span className="flex flex-col items-start gap-0.5">
-                <span className="font-semibold text-sm">🥷 ขโมย</span>
+                <span className="font-semibold text-sm npc-action-label">ขโมย</span>
                 <span className="text-[10px] text-muted-foreground">
                   ความสำเร็จ ~{stealChance(worldState.playerBuild, npc, worldState.lifeSkillXp.steal ?? 0).toFixed(0)}% · ขโมยได้ +ความเลว
                 </span>
@@ -307,7 +307,7 @@ export function NpcInteractionPopup({ open, npc, onClose }: Props) {
               className="w-full justify-start text-left h-auto py-2 whitespace-normal border-rose-500 bg-rose-50/40"
             >
               <span className="flex flex-col items-start gap-0.5">
-                <span className="font-semibold text-sm text-rose-700">🗡 ลอบทำร้าย</span>
+                <span className="font-semibold text-sm text-rose-700 npc-action-label">ลอบทำร้าย</span>
                 <span className="text-[10px] text-muted-foreground">
                   ความสำเร็จ ~{assassinateChance(worldState.playerBuild, npc).toFixed(0)}% · ฆ่าเป้าหมายเพื่อภารกิจร้าย
                 </span>

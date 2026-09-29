@@ -141,9 +141,6 @@
   .hud-menu-tab img { width: 20px; height: 20px; }
   .hud-menu-tab span { white-space: nowrap; }
   .hud-menu-close { width: 40px; height: 44px; font-size: 28px; margin-bottom: 0; }
-  .bag-filters { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; max-width: 100%; }
-  .bag-filters::-webkit-scrollbar { display: none; }
-  .bag-filters button { flex: 0 0 auto; }
 }
 
 /* ── Encounter confrontation ─────────────────────────────────────────── */
@@ -366,3 +363,19 @@ body:has(.hud-menu, .game-modal) [data-radix-popper-content-wrapper] > * {
 }
 .hud-menu-body button[role=combobox] { min-height: 40px; font-size: 15px; background: #0f1c19; border-color: #6f5f3d; }
 .hud-menu-body button[role=combobox]:hover { border-color: #c9a55c; background: #15241f; }
+
+@media (max-width: 480px) {
+  .bag-toolbar .bag-filters { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; max-width: 100%; }
+  .bag-toolbar .bag-filters::-webkit-scrollbar { display: none; }
+  .bag-filters button { flex: 0 0 auto; }
+}
+
+/* Scroll cue: long panels fade at the bottom edge instead of a hard cut. */
+.hud-menu-body, .game-modal-body {
+  -webkit-mask-image: linear-gradient(#000 calc(100% - 26px), transparent);
+  mask-image: linear-gradient(#000 calc(100% - 26px), transparent);
+  padding-bottom: 28px;
+}
+/* Sparse sections no longer sit in a tall empty frame. */
+.hud-menu-panel { min-height: 0; }
+.npc-action-label::before { content: "◆"; margin-right: 7px; font-size: 11px; color: #c9a55c; vertical-align: 2px; }

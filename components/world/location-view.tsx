@@ -509,9 +509,11 @@ export function LocationView({ scene, readOnly = false, dialogueSpeakerId }: Pro
             type="button"
             title="อื่น ๆ ในบริเวณนี้"
             onClick={() => setDrawerOpen(true)}
-            className="journey-extras absolute top-40 right-3 z-30 w-11 h-11 pixel-panel hover:brightness-125 text-xl"
+            aria-label="อื่น ๆ ในบริเวณนี้"
+            className="journey-extras absolute top-40 right-3 z-30 w-11 h-11 pixel-panel hover:brightness-125"
           >
-            📋
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/icons/ui/log.png" alt="" className="pixel w-7 h-7" draggable={false} />
           </button>
         )}
         <Modal
