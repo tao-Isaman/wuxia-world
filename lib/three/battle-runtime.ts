@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { useBattleStore } from "@/store/battle-store";
 import { SKILLS, type BattleState, type Side } from "@/lib/game";
-import { CHARACTER_CLIPS, type CharacterId, type CharacterMotion } from "@/lib/characters/catalog";
+import { CHARACTER_CLIPS, CHARACTER_FEET_Y, CHARACTER_FRAME_SIZE, type CharacterId, type CharacterMotion } from "@/lib/characters/catalog";
 import { loadCharacterAtlas } from "@/lib/characters/sheet";
 import { BATTLE_BACKGROUNDS, type BattleBackground } from "./battle-background";
 
@@ -26,6 +26,8 @@ interface Fighter {
   texture: THREE.Texture;
   character: string;
   beast: boolean;
+  /** Single-pose unique sprite: poses come from lunge/recoil/breath, not frames. */
+  still?: boolean;
   baseX: number;
   width: number;
   height: number;
@@ -59,6 +61,8 @@ interface Effect {
 export interface BattleRuntimeOptions {
   characterA: CharacterId;
   characterB: CharacterId;
+  /** Unique single-pose pixel sprite for fighter B (a sparring NPC); archetype sheet otherwise. */
+  spriteB?: string;
   creatureFrame?: number | null;
   background?: BattleBackground;
   onReady: () => void;
@@ -268,7 +272,7 @@ export function createBattleRuntime(parent: HTMLElement, options: BattleRuntimeO
     effects.push(effect);
   }
   function setFrame(fighter: Fighter, frame: number, side: number) {
-    if (!fighter.beast && frame !== fighter.frame) {
+    if (!fighter.beast && !fighter.still && frame !== fighter.frame) {
       fighter.texture.offset.set(frame % fighter.columns / fighter.columns,
         1 - (Math.floor(frame / fighter.columns) + 1) / fighter.rows);
     }
@@ -389,7 +393,7 @@ export function createBattleRuntime(parent: HTMLElement, options: BattleRuntimeO
     const recoil = reduced || motion !== "hurt" ? 0 : Math.sin((fighter.hurtUntil - elapsed) / 180 * Math.PI) * 7;
     const x = fighter.baseX + (index ? -lunge + recoil : lunge - recoil);
     parent.dataset[index ? "fighterBX" : "fighterAX"] = x.toFixed(1);
-    const breath = fighter.beast && !reduced && motion === "idle" ? Math.sin(elapsed / 450 + index) * 0.006 : 0;
+    const breath = (fighter.beast || fighter.still) && !reduced && (motion === "idle" || motion === "guard") ? Math.sin(elapsed / 450 + index) * 0.008 : 0;
     const defeat = fighter.beast && motion === "defeat";
     const height = fighter.height * (defeat ? 0.68 : 1 + breath);
     const y = GROUND - (fighter.feet - 0.5) * height;
@@ -457,10 +461,11 @@ export function createBattleRuntime(parent: HTMLElement, options: BattleRuntimeO
   async function initialize() {
     const creatureFrame = options.creatureFrame ?? null;
     const backdrop = options.background ?? BATTLE_BACKGROUNDS.courtyard;
-    const [stage, atlasA, atlasB, creature] = await Promise.all([
+    const [stage, atlasA, atlasB, creature, uniqueB] = await Promise.all([
       loadImage(backdrop.image), loadCharacterAtlas(options.characterA),
       creatureFrame === null ? loadCharacterAtlas(options.characterB) : Promise.resolve(null),
       creatureFrame !== null ? loadImage("/art/creature-atlas.png") : Promise.resolve(null),
+      creatureFrame === null && options.spriteB ? stillAtlas(options.spriteB).catch(() => null) : Promise.resolve(null),
     ]);
     if (destroyed || failed) return;
     parent.dataset.backgroundImage = backdrop.image;
@@ -469,8 +474,9 @@ export function createBattleRuntime(parent: HTMLElement, options: BattleRuntimeO
     const shade = mesh(plane, 0x10251e, 1);
     shade.material.opacity = 0.12;
     place(shade, WIDTH / 2, HEIGHT / 2, WIDTH, HEIGHT);
-    [atlasA, atlasB].forEach((atlas, index) => {
+    [atlasA, uniqueB ?? atlasB].forEach((atlas, index) => {
       const beast = index === 1 && creatureFrame !== null && creature !== null;
+      const still = index === 1 && !!uniqueB;
       const source = beast ? creature : atlas?.image;
       if (!source) throw new Error("Battle fighter texture is unavailable");
       const map = texture(source);
@@ -478,7 +484,8 @@ export function createBattleRuntime(parent: HTMLElement, options: BattleRuntimeO
       let height = 128 * 1.55;
       let width = height;
       let frame = 0;
-      const frameBounds = atlas ? characterBounds(atlas.image, atlas.frameSize) : [];
+      const frameBounds = still && atlas ? Array.from({ length: 16 }, () => characterBounds(atlas.image, atlas.frameSize)[0])
+        : atlas ? characterBounds(atlas.image, atlas.frameSize) : [];
       const columns = atlas ? atlas.image.width / atlas.frameSize : 4;
       const rows = atlas ? atlas.image.height / atlas.frameSize : 2;
       if (beast && creature) {
@@ -499,7 +506,7 @@ export function createBattleRuntime(parent: HTMLElement, options: BattleRuntimeO
       const groundRing = mesh(ring, index ? 0xe4ae7c : 0xd9dcb0, 6);
       const actor = mesh(plane, 0xffffff, 10 + index, map);
       const character = beast ? `beast-${frame}` : index ? options.characterB : options.characterA;
-      const fighter: Fighter = { mesh: actor, shadow, ring: groundRing, texture: map, character, beast,
+      const fighter: Fighter = { mesh: actor, shadow, ring: groundRing, texture: map, character, beast, still,
         baseX, width, height, feet, columns, rows, frameBounds, frame, motion: "idle", motionStarted: 0, hurtUntil: 0, flashUntil: 0 };
       fighters.push(fighter);
       parent.dataset[index ? "fighterBCharacter" : "fighterACharacter"] = character;
@@ -517,6 +524,24 @@ export function createBattleRuntime(parent: HTMLElement, options: BattleRuntimeO
   }
   void initialize().catch(fail);
   return { destroy };
+}
+
+/** A unique NPC sprite in one 128 px frame, with the archetype sheets' figure height and feet line. */
+async function stillAtlas(url: string) {
+  const image = await loadImage(url);
+  // Same proportions as a 128 px sheet frame (figure 108, feet at 120), at the
+  // source's own density so the denser battle art is never downsampled.
+  const unit = Math.max(1, image.height / 108, image.width / 124);
+  const size = Math.round(CHARACTER_FRAME_SIZE * unit), feet = Math.round(CHARACTER_FEET_Y * unit);
+  const canvas = document.createElement("canvas");
+  canvas.width = canvas.height = size;
+  const context = canvas.getContext("2d");
+  if (!context) throw new Error("Battle sprite canvas is unavailable");
+  context.imageSmoothingEnabled = false;
+  const scale = Math.min(108 * unit / image.height, 124 * unit / image.width);
+  const width = Math.round(image.width * scale), height = Math.round(image.height * scale);
+  context.drawImage(image, Math.round((size - width) / 2), feet - height, width, height);
+  return { image: canvas, frameSize: size, feetY: feet };
 }
 
 /** Horizontal visible bounds, relative to the normalized cell center. */

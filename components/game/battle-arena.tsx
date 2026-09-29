@@ -413,7 +413,7 @@ const TIMELINE_LENGTH = 6;
 function TurnTimeline({ state, mode, nameA, nameB, casting }: {
   state: BattleState; mode: "world" | "free"; nameA: string; nameB: string; casting: boolean;
 }) {
-  const { characterA, characterB, creatureFrame } = useBattleActors(mode);
+  const { characterA, characterB, creatureFrame, iconB } = useBattleActors(mode);
   const order = predictTurnOrder(state, TIMELINE_LENGTH);
   if (!order.length) return null;
   const acting = !casting && (state.phase === "player" || state.phase === "enemy");
@@ -422,6 +422,7 @@ function TurnTimeline({ state, mode, nameA, nameB, casting }: {
     {order.map((side, index) => <li key={`${state.turn}-${index}`} data-side={side}
       data-acting={index === 0 && acting ? "true" : undefined} title={side === "A" ? nameA : nameB}>
       {side === "B" && creatureFrame !== null ? <span className="turn-glyph" aria-hidden="true">獸</span> :
+        side === "B" && iconB ? <span className="turn-crop">{/* eslint-disable-next-line @next/next/no-img-element */}<img className="turn-sprite" src={iconB} alt="" draggable={false} /></span> :
         <CharacterPreview id={side === "A" ? characterA : characterB} framing="bust" />}
       {index === 0 && <span className="turn-timeline-tag" aria-hidden="true">{acting ? "ลงมือ" : "ถัดไป"}</span>}
     </li>)}

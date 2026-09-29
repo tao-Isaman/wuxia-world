@@ -18,6 +18,11 @@ const WIDTH = 960;
 const HEIGHT = 640;
 const SPEED = 150;
 const LOAD_TIMEOUT = 20_000;
+// Unique NPC sprites are ~74 native px tall; this frame/size pair gives them the
+// same on-screen height as the archetype sheets (54 units × 108/128 of a frame).
+const UNIQUE_FRAME = 80;
+const UNIQUE_FEET = 78;
+const UNIQUE_NPC_SIZE = 50;
 const toWorld = (point: Point): Point => ({ x: point.x * WIDTH / 100, y: point.y * HEIGHT / 100 });
 const toPercent = (point: Point): Point => ({ x: point.x / WIDTH * 100, y: point.y / HEIGHT * 100 });
 const clampPosition = (point: Point): Point => ({
@@ -217,8 +222,10 @@ export function createWorldRuntime(
   }
   function setCharacterFrame(character: CharacterVisual, frame: number, facingLeft = character.facingLeft) {
     if (character.frame === frame && character.facingLeft === facingLeft) return;
-    const column = frame % character.columns;
-    const row = Math.floor(frame / character.columns);
+    // Single-frame (unique NPC) atlases always show their one pose.
+    const cell = frame % (character.columns * character.rows);
+    const column = cell % character.columns;
+    const row = Math.floor(cell / character.columns);
     character.texture.repeat.set((facingLeft ? -1 : 1) / character.columns, 1 / character.rows);
     character.texture.offset.set((column + (facingLeft ? 1 : 0)) / character.columns, 1 - (row + 1) / character.rows);
     character.frame = frame;
@@ -412,6 +419,24 @@ export function createWorldRuntime(
     ]);
     if (disposed || failed) return;
     const atlases = new Map(atlasEntries);
+    // Unique NPC sprites: one native-pixel pose drawn into an 80 px frame so
+    // the figure height matches the archetype sheets at size UNIQUE_NPC_SIZE.
+    const uniqueAtlases = new Map<string, Atlas>();
+    await Promise.all(initial.markers.filter((marker) => marker.kind === "npc" && marker.sprite).map(async (marker) => {
+      try {
+        const image = await loadImage(marker.sprite!);
+        const canvas = document.createElement("canvas");
+        canvas.width = canvas.height = UNIQUE_FRAME;
+        const context = canvas.getContext("2d");
+        if (!context) return;
+        context.imageSmoothingEnabled = false;
+        const scale = Math.min(1, (UNIQUE_FRAME - 2) / image.width, (UNIQUE_FEET - 1) / image.height);
+        const width = Math.round(image.width * scale), height = Math.round(image.height * scale);
+        context.drawImage(image, Math.round((UNIQUE_FRAME - width) / 2), UNIQUE_FEET - height, width, height);
+        uniqueAtlases.set(marker.id, { image: canvas, frameSize: UNIQUE_FRAME, feetY: UNIQUE_FEET, columns: 1, rows: 1, directional: false } as unknown as Atlas);
+      } catch { /* keep the archetype sheet for this NPC */ }
+    }));
+    if (disposed || failed) return;
     const backgroundTexture = drawnTexture(WIDTH, HEIGHT, (context) => context.drawImage(landscape, 0, 0, WIDTH, HEIGHT));
     const background = new THREE.Mesh(resourceGeometry(new THREE.PlaneGeometry(WIDTH, HEIGHT)),
       resourceMaterial(new THREE.MeshBasicMaterial({ map: backgroundTexture, depthTest: false, depthWrite: false, toneMapped: false })));
@@ -494,7 +519,8 @@ export function createWorldRuntime(
         const shadow = sprite(shadowTexture, 28, 10);
         shadow.renderOrder = 1;
         group.add(shadow);
-        character = makeCharacter(atlases.get(npcCharacterId(marker.id))!, 54);
+        const unique = uniqueAtlases.get(marker.id);
+        character = unique ? makeCharacter(unique, UNIQUE_NPC_SIZE) : makeCharacter(atlases.get(npcCharacterId(marker.id))!, 54);
         character.sprite.renderOrder = 100 + point.y * 10;
         group.add(character.sprite);
       } else {

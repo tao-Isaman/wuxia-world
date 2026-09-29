@@ -95,7 +95,7 @@ export {
   type RouteMapDef,
   type RouteMapType,
 } from "./data/route-maps";
-export { npcBodySprite, npcPortrait } from "./data/npc-portraits";
+export { npcBattleSprite, npcBodySprite, npcPixelSprite, npcPortrait } from "./data/npc-portraits";
 export {
   PLAYER_BODIES,
   PLAYER_BODY_LABEL,
