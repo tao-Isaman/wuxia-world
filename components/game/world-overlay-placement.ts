@@ -20,7 +20,7 @@ export function protectActorFromGuide(host: HTMLElement): () => void {
     const protectedBoxes = [actor, ...nearby.map((box) => ({ ...box, left: bounds.left + box.left, top: bounds.top + box.top }))];
     const rect = guide.getBoundingClientRect();
     const base = { left: rect.left - dx, top: rect.top - dy, width: rect.width, height: rect.height };
-    const controls = [...document.querySelectorAll<HTMLElement>(".player-hud, .location-hud, .world-controls, .game-menu")]
+    const controls = [...document.querySelectorAll<HTMLElement>(".player-hud, .location-hud, .world-controls, .minimap, .command-toggle")]
       .map((element) => element.getBoundingClientRect());
     const lowerEdge = Math.min(bounds.bottom - 12, ...controls.filter((box) => box.top > bounds.height / 2).map((box) => box.top - 12));
     const right = Math.max(10, bounds.right - base.width - 10);

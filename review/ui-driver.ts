@@ -43,6 +43,8 @@ for (const v of views) {
   });
   await page.reload(); await ready(page); await page.waitForTimeout(1200);
   for (const [i, m] of menus.entries()) {
+    if (i === 0) { await page.getByRole("button", { name: "เมนู", exact: true }).click(); await page.waitForTimeout(300); await shot(page, v.name, "05-command"); }
+    else await page.getByRole("button", { name: "เมนู", exact: true }).click();
     const button = page.locator('nav[aria-label="เมนูเกม"]').getByRole("button", { name: m, exact: true });
     if (!(await button.count())) { console.log(`${v.name}: no menu button ${m}`); continue; }
     await button.click(); await page.waitForTimeout(500);

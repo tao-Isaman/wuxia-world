@@ -174,3 +174,33 @@ Still open from the critiques (needs new systems or art, not UI polish):
 - Item icons are category glyphs in rarity frames; the game has no item artwork. Drop 32 px sprites into ItemTile when drawn.
 - Painted NPC portraits are opaque squares, so the dialogue bust is a framed plate rather than a cut-out.
 - Life-skill and rest rows still use their data emoji (⛏ 🪓 🍵).
+
+### 2026-09-29 — wave 13: unique NPCs + Dragon Quest XI HUD (Claude Code)
+
+**Unique NPC characters.** All 159 NPCs had a unique painted body (`public/npcs/body/<id>.png`) but the world drew
+them from 7 shared costume sheets. `bun scripts/build-npc-sprites.ts` turns each painting into native-pixel sprites
+(trim, palette reduction, hard alpha, 1 px outline): `public/npcs/pixel/` (72 px, world) and
+`public/npcs/pixel-battle/` (150 px, battle). `npcPixelSprite` / `npcBattleSprite` in `lib/world/data/npc-portraits.ts`
+feed the world runtime (unique single-pose sprite, archetype sheet as fallback), sparring battles and the turn
+queue. The sprites are single poses, so they move with the engine's lunge, recoil and breathing, not frame
+animation. Adding a new NPC: drop its painted body PNG in `public/npcs/body/` and rerun the script.
+
+**HUD standard: Dragon Quest XI** (reference captures in `review/baseline/dq11/`, gitignored), kept in wuxia dress:
+- Exploration (`components/world/map-hud.tsx`, `app/game-hud.css`): one เมนู button (M) opens a DQ command window with a
+  gold ☛ cursor (arrows, 1–8). There is a party card bottom-right (portrait, green name, pill HP/MP/พลัง gauges), a
+  purse in ตำลึง plus the sundial top-right, a ringed minimap bottom-left that follows the hero from the canvas
+  data attributes, a gold name banner and autosave quill on arrival, and floating +/− gold deltas.
+- Menus, shops and popups (`app/dq-theme.css`, loaded last): parchment scrolls with a cinnabar ribbon title,
+  lacquer-brown tabs, and paper-inked rarity text.
+- Dialogue: a translucent lacquer box with a name tab and gold ☛ choice cursor; the portrait plate breaks the edge.
+- Battle: a DQ command list (medal, move name, cost, number key, ☛ cursor) beside a message box (last log lines plus
+  the pointed move), with lacquer-brown fighter plates and a green player name.
+- Accessibility: decorative CSS glyphs use `content: "☛" / ""` so they stay out of accessible names (this broke
+  e2e once).
+
+**Phaser.js: decided against** for now. The game already runs a WebGL renderer (Three.js, orthographic 2D) for
+exploration and battle, with collision, pathfinding, per-map footprints, sprite atlases, and tests built on it.
+Earlier history also shows a Phaser runtime was built and then removed (see "History that matters" above). Porting
+would rebuild both runtimes without new capability. The "gamification" asked for (juicy feedback, clear commands,
+arrival beats, reward deltas) is delivered in the DOM/Three layers above. If a future feature truly needs Phaser
+(e.g. tilemap-driven physics), host it as a third runtime behind the same `WorldPresentation` contract.

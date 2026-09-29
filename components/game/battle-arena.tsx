@@ -54,12 +54,12 @@ function SkillButton({ action, hotkey, onFocusDetail }: { action: CombatActionVi
       <span className="combat-action-icon">{icon}</span>
       {cd > 0 && <span className="combat-action-cd">{cd}</span>}
       {flag && <span className="combat-action-flag">{flag}</span>}
-      <kbd>{hotkey}</kbd>
     </span>
     <span className="combat-action-copy">
       <strong>{name}</strong>
       <small>{actionMeta(action)}</small>
     </span>
+    <kbd aria-hidden="true">{hotkey}</kbd>
   </button>;
 }
 

@@ -1,0 +1,196 @@
+/* ── Dragon Quest XI standard, wuxia dress ─────────────────────────────────
+   Loaded after game-menu.css / game-hud.css. Two surfaces, as in DQ XI:
+   • lacquer-brown boxes with gold hairlines for the always-on chrome
+     (command box, party card, dialogue, battle commands, encounter);
+   • a parchment scroll with a cinnabar ribbon title for full menus,
+     shops and popups.                                                        */
+
+:root {
+  --scroll-paper: #f0e2bf; --scroll-paper-deep: #e3cd9c; --scroll-ink: #3a2616; --scroll-ink-soft: #6b5334;
+  --scroll-edge: #7b5530; --scroll-line: #c6a86c; --ribbon: #a8392a; --ribbon-deep: #6f1f16; --scroll-gold: #c99a45;
+}
+
+/* ── Parchment surfaces ─────────────────────────────────────────────────── */
+.game-modal-card, .hud-menu-panel,
+body:has(.hud-menu, .game-modal) [data-radix-popper-content-wrapper] > * {
+  --background: 42 58% 84%; --foreground: 25 44% 16%;
+  --card: 42 60% 88%; --card-foreground: 25 44% 16%;
+  --popover: 42 60% 88%; --popover-foreground: 25 44% 16%;
+  --primary: 6 60% 38%; --primary-foreground: 42 70% 94%;
+  --secondary: 40 45% 78%; --secondary-foreground: 25 44% 16%;
+  --muted: 40 42% 78%; --muted-foreground: 32 33% 31%;
+  --accent: 40 55% 74%; --accent-foreground: 25 44% 16%;
+  --destructive: 356 62% 38%; --destructive-foreground: 42 70% 95%;
+  --border: 34 40% 52%; --input: 34 40% 52%; --ring: 6 60% 38%;
+}
+.game-modal-card, .hud-menu-panel {
+  color: var(--scroll-ink);
+  background: radial-gradient(ellipse at 50% 42%, #f6ead0 0 48%, var(--scroll-paper) 70%, #d8bf8a 100%);
+  border: 3px solid var(--scroll-edge); border-radius: 6px;
+  box-shadow: inset 0 0 0 2px #f8eed7, inset 0 0 38px #a47a3f66, 0 0 0 2px #2a170c, 0 10px 30px #0a0503b3;
+}
+.game-modal { background: #1a0e07a6; }
+.game-modal-heading { background: linear-gradient(90deg, var(--ribbon-deep), var(--ribbon) 50%, var(--ribbon-deep)); border-bottom: 2px solid var(--scroll-gold); color: #f8dfa2; border-radius: 3px 3px 0 0; }
+.game-modal-heading h3 { color: #f8dfa2; text-shadow: 1px 1px 0 #3a0f08; }
+.game-modal-heading button { color: #f8dfa2; }
+.game-modal-heading button:hover { background: #ffffff1f; color: #fff4d0; }
+.game-modal-ornament { color: #f3c979; }
+
+/* Utility colours re-inked for paper. */
+:is(.game-modal-card, .hud-menu-panel) :is(.text-ink, .text-slate-900, .text-slate-700, .text-stone-700) { color: var(--scroll-ink); }
+:is(.game-modal-card, .hud-menu-panel) [class*="text-emerald-"] { color: #2c6a37; }
+:is(.game-modal-card, .hud-menu-panel) :is([class*="text-rose-"], [class*="text-red-"]) { color: #a02f27; }
+:is(.game-modal-card, .hud-menu-panel) :is([class*="text-amber-"], [class*="text-yellow-"]) { color: #86570d; }
+:is(.game-modal-card, .hud-menu-panel) [class*="text-orange-"] { color: #a1511d; }
+:is(.game-modal-card, .hud-menu-panel) :is([class*="text-sky-"], [class*="text-blue-"], [class*="text-indigo-"]) { color: #2b568d; }
+:is(.game-modal-card, .hud-menu-panel) :is([class*="text-violet-"], [class*="text-purple-"]) { color: #683c8f; }
+:is(.game-modal-card, .hud-menu-panel) .text-vermilion { color: #a02f27; }
+:is(.game-modal-card, .hud-menu-panel) .text-jade { color: #2c6a55; }
+:is(.game-modal-card, .hud-menu-panel) :is(.bg-emerald-50, .bg-emerald-100, .bg-emerald-100\/40) { background-color: #2c6a3722; }
+:is(.game-modal-card, .hud-menu-panel) :is(.bg-rose-50, .bg-rose-100, .bg-rose-50\/40) { background-color: #a02f2722; }
+:is(.game-modal-card, .hud-menu-panel) :is(.bg-amber-50, .bg-amber-100, .bg-amber-50\/40, .bg-amber-950\/10) { background-color: #b0802a26; }
+:is(.game-modal-card, .hud-menu-panel) :is(.bg-orange-100, .bg-stone-100, .bg-stone-200, .bg-slate-50) { background-color: #7b553018; }
+:is(.game-modal-card, .hud-menu-panel) :is(.bg-sky-50, .bg-blue-100, .bg-indigo-100) { background-color: #2b568d1f; }
+
+/* ── Full-screen menu: world dimmed behind, a scroll in front ───────────── */
+.hud-menu { background: radial-gradient(ellipse at 50% 45%, #1a0e0799, #0c0603d9 80%); }
+.hud-menu-bar { background: none; border-bottom: 0; padding-bottom: 6px; }
+.hud-menu-tab {
+  color: #f4ead2; background: #2a1611e8; border: 2px solid #9a7442; border-radius: 6px; margin-bottom: 0;
+  box-shadow: inset 0 0 0 1px #e2bd6a2e, 0 2px 0 #140a07; text-shadow: 1px 1px 0 #140a07;
+}
+.hud-menu-tab:hover { color: #fff; background: #3a2016f0; border-color: #e2bd6a; }
+.hud-menu-tab[aria-selected=true] {
+  color: #fbe6b0; background: linear-gradient(#b8412c, #7a2418); border-color: #e2bd6a; border-bottom-color: #e2bd6a;
+}
+.hud-menu-close { color: #e14a36; text-shadow: 2px 2px 0 #2a0c06, -1px -1px 0 #ff9a84; }
+.hud-menu-panel::before, .hud-menu-panel::after { border-color: var(--scroll-gold); }
+.hud-menu-title {
+  position: relative; justify-content: center; margin: 14px 18px 4px; padding: 8px 40px; border: 0; border-radius: 3px;
+  color: #f8dfa2; background: linear-gradient(90deg, transparent, var(--ribbon-deep) 7%, var(--ribbon) 50%, var(--ribbon-deep) 93%, transparent);
+  box-shadow: inset 0 2px 0 #e2bd6a88, inset 0 -2px 0 #e2bd6a88; text-shadow: 1px 1px 0 #3a0f08;
+}
+.hud-menu-title::before, .hud-menu-title::after { content: "❖" / ""; color: #f3c979; font-size: 14px; }
+.hud-menu-body { scrollbar-color: var(--scroll-edge) var(--scroll-paper-deep); }
+
+/* Lists: DQ rows — a soft band, gold highlight under the cursor. */
+:is(.game-modal-card, .hud-menu-panel) :is(li, div).rounded.bg-muted\/30, .shop-row {
+  background: linear-gradient(90deg, #e8d5a6, #efe0bb 80%); border: 1px solid var(--scroll-line); border-radius: 3px;
+}
+:is(.game-modal-card, .hud-menu-panel) li.rounded.bg-muted\/30:hover, .shop-row:hover {
+  border-color: var(--scroll-gold); background: linear-gradient(90deg, #fff5d8, #f3e4bf 70%);
+}
+.shop-price { color: #7a4f10; }
+.shop-price .hud-coin { box-shadow: inset 0 0 0 3px #a8741f, inset 0 0 0 4px #f5d180, 0 0 0 1px #6b4a1a; }
+
+/* Item slots: dark inkstone squares on the paper, rarity frames stay bright. */
+.item-tile { background: radial-gradient(circle at 50% 38%, #6b4a2c, #2e1c10 78%); box-shadow: inset 0 0 0 2px #1a0e07, 0 1px 0 #fff5d8; }
+.item-tile--selected { box-shadow: inset 0 0 0 2px #1a0e07, 0 0 0 2px var(--ribbon), 0 0 12px #c99a4599; }
+
+/* Bag, skills, profile panels. */
+.bag-heading { color: var(--ribbon-deep); }
+.bag-gear, .bag-detail, .skill-loadout { background: #e7d3a2aa; border: 1px solid var(--scroll-line); border-radius: 4px; }
+.bag-gear-label, .bag-gold, .skill-slot { color: var(--scroll-ink); }
+.bag-gold strong { color: #7a4f10; }
+.bag-filters button { color: var(--scroll-ink); background: #e8d5a6; border: 1px solid var(--scroll-line); border-radius: 3px; }
+.bag-filters button[aria-selected=true] { color: #fbe6b0; background: linear-gradient(#b8412c, #7a2418); border-color: #7a2418; }
+.bag-notice { color: #245c30; background: #2c6a3722; border-left-color: #2c6a37; }
+.bag-empty, .bag-detail-hint, .bag-detail-meta { color: var(--scroll-ink-soft); }
+.bag-detail-text { color: var(--scroll-ink); }
+.bag-detail-stats { color: #2c6a37; }
+.bag-detail-secondary { color: #fbe6b0; background: #7a2418; border-color: #4f140c; }
+.bag-detail-secondary:hover { background: #95301f; }
+.skill-slot-medal { background: radial-gradient(circle at 50% 36%, #6b4a2c, #2e1c10 72%); box-shadow: 0 0 0 2px #1a0e07, inset 0 0 0 2px #4a2f1a; }
+.skill-slot--empty .skill-slot-medal { border-color: #a88a5a; color: #8a6c44; background: #e3cd9c; box-shadow: none; }
+.skill-slot--empty .skill-slot-name { color: var(--scroll-ink-soft); }
+.skill-slot[aria-selected=true] .skill-slot-medal { box-shadow: 0 0 0 2px #1a0e07, inset 0 0 0 2px #4a2f1a, 0 0 0 5px var(--ribbon), 0 0 14px #c99a4599; }
+.skill-slot[aria-selected=true] .skill-slot-name { color: var(--ribbon-deep); }
+.profile-hero { background: linear-gradient(90deg, #e7d3a2, #f0e2bf00); border: 1px solid var(--scroll-line); border-radius: 4px; }
+.profile-figure { background: radial-gradient(ellipse at 50% 92%, #3a261640 0 26%, transparent 27%), radial-gradient(circle at 50% 42%, #fff4d6, transparent 70%); }
+.profile-identity h3 { color: var(--ribbon-deep); text-shadow: none; }
+.profile-identity p, .profile-vitals dt { color: var(--scroll-ink-soft); }
+.profile-vitals dd { color: var(--scroll-ink); }
+
+/* NPC card: character on the scroll, name in cinnabar. */
+.npc-card-portrait { background: radial-gradient(ellipse at 28% 40%, #fff3d4, #e2c992 75%); border-bottom: 2px solid var(--scroll-line); }
+.npc-card-name { color: var(--ribbon-deep); text-shadow: 0 1px 0 #fff5d8; }
+.game-modal-card:has(.npc-card-portrait) .game-modal-heading button { color: #fbe6b0; background: #7a2418; border-color: #4f140c; }
+.npc-action-label::before { color: var(--ribbon); }
+
+.menu-empty::before { color: #7b553022; }
+.menu-empty strong { color: var(--scroll-ink); }
+.menu-empty span { color: var(--scroll-ink-soft); }
+:is(.hud-menu-body, .game-modal-body) .underline.decoration-dotted { text-decoration-color: #7b553066; }
+:is(.hud-menu-body, .game-modal-body) button.text-destructive { border-color: #a02f2766; }
+:is(.hud-menu-body, .game-modal-body) button.text-destructive:hover { background: #a02f271f; border-color: #a02f27; }
+body:has(.hud-menu, .game-modal) [data-radix-popper-content-wrapper] > * { border-color: var(--scroll-edge); }
+.hud-menu-body button[role=combobox] { background: #f6ead0; border-color: var(--scroll-line); }
+.hud-menu-body button[role=combobox]:hover { border-color: var(--scroll-gold); background: #fff5d8; }
+
+/* ── Lacquer-brown boxes (DQ command/dialogue/battle windows) ───────────── */
+.pixel-panel {
+  color: #f7eedb; background: #2a1611ea; border: 2px solid #9a7442; border-radius: 6px;
+  box-shadow: inset 0 0 0 1px #e2bd6a2e, 0 0 0 1px #140a07, 0 4px 12px #0a05038c;
+}
+.journey-guide { color: #f4ead2; background: #2a1611e8; border: 2px solid #9a7442; border-left: 2px solid #9a7442; border-radius: 6px; box-shadow: inset 0 0 0 1px #e2bd6a2e, 0 0 0 1px #140a07; }
+.journey-guide-toggle { color: #e2bd6a; } .journey-guide-toggle:hover { background: #ffffff10; }
+.journey-guide-content h2 { color: #fff4d6; }
+.journey-guide-description { color: #e6dcc2; } .journey-guide-action { color: #f3cf7c; } .journey-guide-note { color: #cbbd9c; }
+.world-places button:hover, .world-places button:focus-visible { background: #e2bd6a22; }
+
+/* Encounter: the confrontation box. */
+.encounter-kicker { color: #f0a489; }
+.encounter-portrait { background: radial-gradient(circle at 50% 40%, #6a4a30, #2a1611 72%); }
+.encounter-flavor { color: #eadfc4; }
+.encounter-flee { color: #f4ead2; background: #3a2016; border-color: #9a7442; }
+.encounter-flee:hover { background: #4a2a1c; }
+.encounter-note { color: #c8b894; }
+
+/* ── Battle in lacquer brown (".battle-arena" prefix outranks combat-actions.css,
+   which the battle component imports after this sheet) ───────────────────── */
+.battle-arena.battle-arena {
+  --foreground: 42 52% 92%; --muted-foreground: 38 30% 72%; --card: 12 42% 11%; --card-foreground: 42 52% 92%;
+  --secondary: 12 45% 7%; --muted: 14 30% 20%; --border: 33 38% 43%; --primary: 41 67% 65%; --primary-foreground: 12 45% 10%;
+  background: #1c0f0a; border-radius: 0;
+}
+.battle-arena .combat-status { color: #eadfc4; }
+.battle-arena .combat-status[data-phase=player] { color: #f3c979; }
+.battle-arena .combat-status[data-phase=player] i { background: #f3c979; }
+.battle-arena .combat-status i { background: #9a7442; }
+.battle-arena .combat-status small { color: #e2bd6a; border-left-color: #6b4f30; }
+.battle-arena .combat-field { border: 2px solid #9a7442; border-radius: 6px; background: #2a1611; box-shadow: 0 0 0 1px #140a07; }
+.battle-arena .combat-hud .battle-fighter { color: #f7eedb; background: #2a1611e6; border: 2px solid #9a7442; border-radius: 6px; box-shadow: inset 0 0 0 1px #e2bd6a2e, 0 3px 0 #0a050388; }
+.battle-arena .combat-hud .combat-fighter-active { border-color: #f3c979; box-shadow: inset 0 0 0 1px #f3c97955, 0 0 12px #f3c97955; }
+.battle-arena .combat-fighter-name { color: #9fe38a; }
+.battle-arena .combat-fighter-name > span, .battle-arena .combat-fighter-art { color: #d9c9a6; }
+.battle-arena .combat-meter-row span { color: #eadfc4; } .battle-arena .combat-meter-row b { color: #f3c979; }
+.battle-arena .combat-versus { color: #f3c979; }
+.battle-arena .combat-log > button { color: #e2bd6a; }
+.battle-arena .turn-timeline li { border-radius: 4px; }
+.battle-arena .turn-timeline-tag { background: #e2bd6a; border-color: #6b4a1a; }
+.battle-arena .combat-result { color: #f7eedb; background: #2a1611ea; border: 2px solid #9a7442; border-radius: 8px; }
+
+/* Rarity colours were tuned for dark slots; on paper, text versions are inked darker. */
+:is(.game-modal-card, .hud-menu-panel) :is(.shop-name, .bag-detail-name, .bag-cell > span) { filter: brightness(.55) saturate(1.7); text-shadow: none; }
+.hud-coin { display: inline-block; width: 14px; height: 14px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #ffe7a0, #c98f2a 70%); box-shadow: inset 0 0 0 3px #a8741f, inset 0 0 0 4px #f5d180; vertical-align: -2px; }
+@media (max-width: 480px) {
+  .hud-menu-title { margin: 8px 8px 2px; padding: 6px 18px; font-size: 16px; gap: 6px; }
+  .hud-menu-title img { width: 22px; height: 22px; }
+  .hud-menu-title::before, .hud-menu-title::after { font-size: 10px; }
+}
+
+/* Title card in lacquer brown to match. */
+.creation-input { background: #1a0e0a; border-color: #9a7442; color: #fbf3e0; border-radius: 4px; }
+.creation-input:focus { outline-color: #e2bd6a; }
+.gender-options button { color: #f4ead2; background: #3a2016; border-color: #9a7442; border-radius: 4px; }
+.gender-options button[aria-pressed=true] { color: #fbe6b0; background: linear-gradient(#b8412c, #7a2418); border-color: #e2bd6a; }
+.creation-preview, .body-options button { background: radial-gradient(circle at 50% 45%, #5a3a24, #1a0e0a 72%); border-color: #6b4f30; border-radius: 4px; }
+.body-options button[aria-pressed=true] { border-color: #e2bd6a; background: radial-gradient(circle at 50% 45%, #7a5232, #2a1611 72%); }
+.creation-heading { border-bottom-color: #6b4f30; }
+.creation-label, .creation-note, .creation-save-note { color: #d9c9a6; }
+.start-adventure, .pixel-action { border-radius: 4px; }
+
+/* Battle: the message box sizes to its text, like DQ's. */
+.battle-arena .combat-actions-wrap { align-items: start; }
+.battle-arena .combat-action-detail { align-self: start; }
+.encounter-portrait { border-radius: 4px; }

@@ -1,6 +1,7 @@
 "use client";
+import { useEffect, useRef, useState } from "react";
 import { deriveAll } from "@/lib/game";
-import { getScene } from "@/lib/world";
+import { getLocationMap, getRouteMap, getScene } from "@/lib/world";
 import { CharacterPreview } from "@/components/game/character-preview";
 import { useWorldStore } from "@/store/world-store";
 
@@ -11,8 +12,9 @@ import { useWorldStore } from "@/store/world-store";
 const SHICHEN = ["卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥", "子", "丑", "寅"] as const;
 const SHICHEN_THAI = ["ยามเหม่า", "ยามเฉิน", "ยามซื่อ", "ยามอู่", "ยามเว่ย", "ยามเซิน", "ยามโหย่ว", "ยามซวี", "ยามไฮ่", "ยามจื่อ", "ยามโฉ่ว", "ยามอิ๋น"];
 
-// Hero's Adventure-style exploration HUD: a slim status strip (top-left), the
-// place name on a plaque (top-centre) and a sundial with the day (top-right).
+// Dragon Quest XI-style exploration HUD in wuxia dress: the world stays clear;
+// a party card sits bottom-right, gold and the sundial top-right, a ringed
+// minimap bottom-left, and arriving somewhere new raises a gold name banner.
 export function MapHud() {
   const player = useWorldStore((s) => s.playerBuild);
   const bodyId = useWorldStore((s) => s.playerBodyId);
@@ -25,44 +27,51 @@ export function MapHud() {
   const time = useWorldStore((s) => s.time);
   const wExp = useWorldStore((s) => s.wExp);
   const currentSceneId = useWorldStore((s) => s.currentSceneId);
+  const lastLocationId = useWorldStore((s) => s.lastLocationId);
   if (!player) return null;
   const stats = deriveAll(player);
   const scene = getScene(currentSceneId);
-  const name = scene?.kind === "location" ? scene.name : scene?.kind === "route" ? scene.label.replace(/\s*\(.*\)$/, "") : "ยุทธภพ";
+  const place = scene?.kind === "location" || scene?.kind === "route" ? scene : getScene(lastLocationId);
+  const name = place?.kind === "location" ? place.name : place?.kind === "route" ? place.label.replace(/\s*\(.*\)$/, "") : "ยุทธภพ";
   const phase = time < 4 ? "ยามเช้า" : time < 8 ? "ยามบ่าย" : "ยามค่ำ";
+  const hour = ((Math.floor(time) % 12) + 12) % 12;
   return <>
     <section className="player-hud" aria-label="สถานะตัวละคร">
       <div className="hud-portrait" aria-hidden="true"><CharacterPreview id={bodyId} framing="bust" /></div>
-      <div className="hud-strip pixel-panel">
+      <div className="hud-strip">
         <strong className="hud-player-name">{player.name}</strong>
         <div className="hud-vitals">
-          <Gauge label="HP" glyph="血" value={hp} max={stats.HP} color="#d4604f" />
-          <Gauge label="MP" glyph="氣" value={mp} max={stats.MP} color="#6fa9c7" />
-          <Gauge label="พลัง" glyph="力" value={stamina} max={staminaMax} color="#a9bb6c" />
-        </div>
-        <div className="hud-wallet">
-          <span title="เงิน"><i className="hud-coin" aria-hidden="true" />{gold.toLocaleString()}<span className="sr-only"> เงิน</span></span>
-          <span title="W-EXP"><i className="hud-wexp" aria-hidden="true">悟</i>{wExp.toLocaleString()}<span className="sr-only"> W-EXP</span></span>
+          <Gauge label="HP" value={hp} max={stats.HP} tone="hp" />
+          <Gauge label="MP" value={mp} max={stats.MP} tone="mp" />
+          <Gauge label="พลัง" value={stamina} max={staminaMax} tone="st" />
         </div>
       </div>
     </section>
-    <h2 className="location-plaque" aria-label={`สถานที่: ${name}`}><span>{name}</span></h2>
     <section className="location-hud" aria-label="สถานที่และเวลา">
-      <Sundial time={time} />
-      <p className="hud-day"><span>วันที่</span> <b>{day}</b></p>
-      <p className="hud-hour">{SHICHEN_THAI[((Math.floor(time) % 12) + 12) % 12]} · {phase}</p>
+      <div className="hud-purse">
+        <PurseDelta value={gold} />
+        <span title="เงิน"><b>{gold.toLocaleString()}</b> <i>ตำลึง</i></span>
+        <span title="W-EXP" className="hud-purse-wexp"><b>{wExp.toLocaleString()}</b> <i>悟</i></span>
+      </div>
+      <div className="hud-clock">
+        <Sundial time={time} />
+        <p className="hud-day"><span>วันที่</span> <b>{day}</b></p>
+      </div>
+      <p className="hud-hour">{SHICHEN_THAI[hour]} · {phase}</p>
       <p className="sr-only">{name}</p>
     </section>
+    <Minimap sceneId={place?.id ?? currentSceneId} name={name} />
+    <ArrivalBanner sceneId={place?.kind === "location" ? place.id : null} name={name} />
   </>;
 }
 
-function Gauge({ label, glyph, value, max, color }: { label: string; glyph: string; value: number; max: number; color: string }) {
+function Gauge({ label, value, max, tone }: { label: string; value: number; max: number; tone: "hp" | "mp" | "st" }) {
   const current = Math.max(0, Math.min(value, max));
-  return <div className="hud-gauge" title={`${label} ${Math.round(current)}/${max}`}>
-    <span className="hud-glyph" style={{ color }} aria-hidden="true">{glyph}</span>
+  return <div className={`hud-gauge hud-gauge--${tone}`} title={`${label} ${Math.round(current)}/${max}`}>
+    <span className="hud-gauge-label">{label}</span>
     <div role="progressbar" aria-label={label} aria-valuenow={current} aria-valuemin={0} aria-valuemax={max}
-      className="hud-gauge-track"><div style={{ width: (max > 0 ? current / max * 100 : 0) + "%", backgroundColor: color }} /></div>
-    <small>{Math.round(current)}<span>/{max}</span></small>
+      className="hud-gauge-track"><div style={{ width: (max > 0 ? current / max * 100 : 0) + "%" }} /></div>
+    <small>{Math.round(current)}</small>
   </div>;
 }
 
@@ -89,4 +98,102 @@ function Sundial({ time }: { time: number }) {
       <path d="M0 -49 L5 -40 L-5 -40 Z" className="sundial-pointer" />
     </svg>
   </div>;
+}
+
+const MINIMAP_ZOOM = 2.4; // map pixels per minimap pixel ÷ this = how much of the painting shows
+
+/**
+ * Ringed minimap (DQ XI bottom-left). Shows the painted map around the hero,
+ * with exits, people and services from the location's marker layout. The
+ * hero's position is read from the canvas's data attributes, not the store,
+ * so walking never re-renders React.
+ */
+function Minimap({ sceneId, name }: { sceneId: string; name: string }) {
+  const map = getLocationMap(sceneId);
+  const route = map ? undefined : getRouteMap(sceneId);
+  const image = map?.image ?? route?.image;
+  const face = useRef<HTMLDivElement>(null);
+  const arrow = useRef<HTMLSpanElement>(null);
+  useEffect(() => {
+    if (!image) return;
+    let frame = 0, last = 0;
+    const tick = (now: number) => {
+      frame = requestAnimationFrame(tick);
+      if (now - last < 100) return;
+      last = now;
+      const canvas = document.querySelector<HTMLElement>('[data-testid="world-canvas"]');
+      const node = face.current;
+      if (!canvas || !node) return;
+      const x = Number(canvas.dataset.playerX), y = Number(canvas.dataset.playerY);
+      if (!Number.isFinite(x) || !Number.isFinite(y)) return;
+      const size = node.clientWidth;
+      node.style.setProperty("--mx", `${size / 2 - (x / 960) * size * MINIMAP_ZOOM}px`);
+      node.style.setProperty("--my", `${size / 2 - (y / 640) * size * MINIMAP_ZOOM * (640 / 960)}px`);
+      const facing = canvas.dataset.playerFacing;
+      if (arrow.current) arrow.current.dataset.facing = facing ?? "south";
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [image]);
+  if (!image) return null;
+  const pins = [
+    ...(map?.exits ?? []).map((exit) => ({ key: `exit-${exit.to}`, x: exit.x, y: exit.y, kind: "exit" })),
+    ...Object.entries(map?.npcSpots ?? {}).map(([id, point]) => ({ key: `npc-${id}`, x: point.x, y: point.y, kind: "npc" })),
+    ...(map?.spots ?? []).map((spot, index) => ({ key: `spot-${index}`, x: spot.x, y: spot.y, kind: "spot" })),
+  ];
+  return <figure className="minimap" aria-label={`แผนที่ย่อ: ${name}`}>
+    <div ref={face} className="minimap-face" style={{ "--map": `url("${image}")`, "--zoom": MINIMAP_ZOOM } as React.CSSProperties}>
+      <div className="minimap-layer" aria-hidden="true">
+        {pins.map((pin) => <i key={pin.key} className={`minimap-pin minimap-pin--${pin.kind}`}
+          style={{ left: `${pin.x}%`, top: `${pin.y}%` }} />)}
+      </div>
+      <span ref={arrow} className="minimap-hero" aria-hidden="true" data-facing="south" />
+    </div>
+    <figcaption>{name}</figcaption>
+  </figure>;
+}
+
+/** DQ XI-style gold name banner when entering a location; fades by itself. */
+function ArrivalBanner({ sceneId, name }: { sceneId: string | null; name: string }) {
+  const [shown, setShown] = useState<{ id: string; name: string } | null>(null);
+  const previous = useRef<string | null>(null);
+  useEffect(() => {
+    if (!sceneId || sceneId === previous.current) return;
+    const first = previous.current === null;
+    previous.current = sceneId;
+    // A reload into the same place is not an arrival worth announcing.
+    if (first && sessionStorage.getItem("wuxia:lastBanner") === sceneId) return;
+    try { sessionStorage.setItem("wuxia:lastBanner", sceneId); } catch { /* private mode */ }
+    setShown({ id: sceneId, name });
+    const timer = setTimeout(() => setShown(null), 3200);
+    return () => clearTimeout(timer);
+  }, [sceneId, name]);
+  if (!shown) return null;
+  return <>
+    <div key={shown.id} className="arrival-banner" role="status" aria-live="polite">
+      <span className="arrival-flourish" aria-hidden="true">❖</span>
+      <strong>{shown.name}</strong>
+      <span className="arrival-flourish" aria-hidden="true">❖</span>
+    </div>
+    {/* The save is written continuously; arriving is when DQ says so. */}
+    <p key={`save-${shown.id}`} className="autosave-note" aria-hidden="true"><span>✒</span> บันทึกอัตโนมัติ…</p>
+  </>;
+}
+
+/** Floating +N / −N beside the purse whenever gold changes (DQ reward feel). */
+function PurseDelta({ value }: { value: number }) {
+  const previous = useRef(value);
+  const [delta, setDelta] = useState<{ id: number; amount: number } | null>(null);
+  useEffect(() => {
+    const amount = value - previous.current;
+    previous.current = value;
+    if (!amount) return;
+    setDelta({ id: Date.now(), amount });
+    const timer = setTimeout(() => setDelta(null), 1600);
+    return () => clearTimeout(timer);
+  }, [value]);
+  if (!delta) return null;
+  return <b key={delta.id} className={`purse-delta${delta.amount < 0 ? " purse-delta--spend" : ""}`} aria-hidden="true">
+    {delta.amount > 0 ? "+" : "−"}{Math.abs(delta.amount).toLocaleString()}
+  </b>;
 }

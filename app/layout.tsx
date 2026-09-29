@@ -4,6 +4,7 @@ import "./globals.css";
 import "./pixel-game.css";
 import "./game-menu.css";
 import "./game-hud.css";
+import "./dq-theme.css";
 
 // Charm — calligraphic display font reserved for proper nouns, sect /
 // character / skill names, and section headers (≥18px). Thai tone-mark

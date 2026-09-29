@@ -378,4 +378,4 @@ body:has(.hud-menu, .game-modal) [data-radix-popper-content-wrapper] > * {
 }
 /* Sparse sections no longer sit in a tall empty frame. */
 .hud-menu-panel { min-height: 0; }
-.npc-action-label::before { content: "◆"; margin-right: 7px; font-size: 11px; color: #c9a55c; vertical-align: 2px; }
+.npc-action-label::before { content: "◆" / ""; margin-right: 7px; font-size: 11px; color: #c9a55c; vertical-align: 2px; }

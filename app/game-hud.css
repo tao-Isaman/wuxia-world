@@ -1,48 +1,76 @@
-/* ── Exploration HUD (Hero's Adventure-style) ──────────────────────────────
-   Slim status strip top-left, place plaque top-centre, sundial top-right,
-   round medallion menu with number hotkeys at the bottom. */
+/* ── Exploration HUD: Dragon Quest XI layout, wuxia dress ──────────────────
+   The world stays clear. Lacquer-brown boxes with gold hairlines carry the
+   chrome: command box top-left, purse + sundial top-right, ringed minimap
+   bottom-left, party card bottom-right, gold name banner on arrival. */
+:root {
+  --dq-box: #2a1611e8; --dq-box-solid: #2d1812; --dq-edge: #9a7442; --dq-gold: #e2bd6a; --dq-text: #f7eedb; --dq-name: #9fe38a;
+}
+.dq-box, .command-toggle, .command-window, .hud-strip, .hud-purse, .hud-hour, .minimap figcaption {
+  color: var(--dq-text); background: var(--dq-box); border: 2px solid var(--dq-edge); border-radius: 6px;
+  box-shadow: inset 0 0 0 1px #e2bd6a2e, 0 0 0 1px #140a07, 0 4px 10px #0a05038c; text-shadow: 1px 1px 0 #140a07;
+}
 
+/* Command box (DQ "Items / Equipment / …" window). */
+.command-toggle {
+  position: absolute; z-index: 31; top: max(14px, env(safe-area-inset-top)); left: 14px; display: inline-flex; align-items: center; gap: 8px;
+  min-height: 42px; padding: 4px 14px; font-size: 16px; font-weight: 600;
+}
+.command-toggle:hover, .command-toggle[aria-expanded=true] { border-color: var(--dq-gold); }
+.command-toggle-glyph { color: var(--dq-gold); font-size: 13px; }
+.command-toggle kbd, .command-item kbd { font: 700 10px/15px ui-monospace, monospace; padding: 0 4px; color: #2a1611; background: var(--dq-gold); border-radius: 3px; }
+.command-scrim { position: absolute; inset: 0; z-index: 32; }
+.command-window {
+  position: absolute; z-index: 33; top: calc(max(14px, env(safe-area-inset-top)) + 50px); left: 14px;
+  display: grid; grid-template-columns: repeat(2, minmax(150px, auto)); grid-auto-flow: column; grid-template-rows: repeat(4, auto);
+  gap: 2px 18px; padding: 12px 18px 12px 34px; animation: command-open 120ms ease-out;
+}
+.command-window::before, .command-window::after { content: "❖" / ""; position: absolute; color: var(--dq-gold); font-size: 11px; line-height: 1; }
+.command-window::before { top: 4px; left: 5px; } .command-window::after { right: 5px; bottom: 4px; }
+@keyframes command-open { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+.command-item { position: relative; display: flex; align-items: center; gap: 9px; min-height: 40px; padding: 2px 6px; font-size: 18px; color: var(--dq-text); text-align: left; }
+.command-item img { width: 24px; height: 24px; }
+.command-item kbd { margin-left: auto; opacity: .55; }
+.command-item .game-menu-badge { min-width: 18px; height: 18px; padding: 0 4px; display: grid; place-items: center; font-size: 11px; color: #fff4dc; background: #b33a2c; border: 1px solid #f0b39a; border-radius: 9px; }
+/* The gold pointing hand. */
+.command-item::before { content: "☛" / ""; position: absolute; left: -28px; top: 50%; transform: translateY(-50%); font-size: 22px; color: var(--dq-gold); opacity: 0; text-shadow: 1px 1px 0 #140a07; }
+.command-item:hover::before, .command-item:focus-visible::before { opacity: 1; animation: command-hand 900ms ease-in-out infinite; }
+.command-item:hover, .command-item:focus-visible { color: #fff; outline: none; background: linear-gradient(90deg, #e2bd6a26, transparent); }
+@keyframes command-hand { 0%, 100% { translate: 0 0; } 50% { translate: -4px 0; } }
+
+/* Party card, bottom-right (portrait, green name, pill gauges). */
 .player-hud {
-  position: absolute; z-index: 30; top: 14px; left: 14px; display: flex; align-items: center;
-  pointer-events: none; filter: drop-shadow(3px 4px 0 #07120f66);
+  position: absolute; z-index: 30; right: 16px; bottom: max(16px, env(safe-area-inset-bottom)); display: flex; align-items: center;
+  pointer-events: none; filter: drop-shadow(2px 3px 0 #0a0503aa);
 }
 .hud-portrait {
-  position: relative; z-index: 1; flex: 0 0 auto; width: 70px; height: 70px; overflow: hidden; border-radius: 50%;
-  background: radial-gradient(circle at 50% 35%, #3d5446, #142520 70%);
-  border: 3px solid #c9a55c; box-shadow: 0 0 0 2px #0d1a16, inset 0 0 0 2px #1a2b25;
+  position: relative; z-index: 1; flex: 0 0 auto; width: 74px; height: 74px; margin-right: -18px; overflow: hidden; border-radius: 50%;
+  background: radial-gradient(circle at 50% 35%, #6a4a30, #2a1611 70%); border: 3px solid var(--dq-gold); box-shadow: 0 0 0 2px #140a07;
 }
 .hud-portrait .character-preview { width: 118%; max-width: none; height: 118%; margin: -3% 0 0 -9%; }
-.hud-strip {
-  margin-left: -16px; padding: 7px 14px 8px 26px; width: 430px;
-  display: grid; grid-template-columns: 1fr auto; grid-template-rows: auto auto; gap: 3px 12px; align-items: center;
-}
-.hud-player-name { font-family: var(--font-display); font-size: 18px; line-height: 1.3; color: #f6e6b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.hud-vitals { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
-.hud-gauge { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; align-items: center; column-gap: 5px; min-width: 0; }
-.hud-glyph { grid-row: 1 / 3; font: 700 18px/1 serif; text-shadow: 1px 1px 0 #07120f; }
-.hud-gauge-track { height: 9px; background: #0b1814; border: 1px solid #53604a; }
-.hud-gauge-track > div { height: 100%; box-shadow: inset 0 1px #ffffff45; transition: width 240ms ease-out; }
-.hud-gauge small { font-size: 13px; line-height: 1.3; font-variant-numeric: tabular-nums; color: #efe9cf; }
-.hud-gauge small span { color: #9fa68f; }
-.hud-wallet { display: flex; gap: 12px; font-size: 14px; font-variant-numeric: tabular-nums; color: #f2d998; white-space: nowrap; }
-.hud-wallet > span { display: inline-flex; align-items: center; gap: 5px; }
-.hud-coin { width: 14px; height: 14px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #ffe7a0, #c98f2a 70%); box-shadow: inset 0 0 0 3px #a8741f, inset 0 0 0 4px #f5d180; }
-.hud-wexp { font: 700 13px/1 serif; font-style: normal; color: #86d0bd; }
+.hud-strip { width: 250px; padding: 6px 12px 8px 28px; }
+.hud-player-name { display: block; font: 700 18px/1.3 var(--font-display); color: var(--dq-name); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hud-vitals { display: grid; gap: 4px; margin-top: 2px; }
+.hud-gauge { display: grid; grid-template-columns: 38px 1fr 42px; align-items: center; gap: 6px; }
+.hud-gauge-label { display: grid; place-items: center; height: 16px; font-size: 11px; font-weight: 700; color: #1a0f0a; border-radius: 8px; background: #d9d3bd; }
+.hud-gauge--hp .hud-gauge-label { background: #8fd66b; } .hud-gauge--mp .hud-gauge-label { background: #7fb9f0; } .hud-gauge--st .hud-gauge-label { background: #e7c46a; }
+.hud-gauge-track { height: 10px; overflow: hidden; background: #140a07; border: 1px solid #6b4f30; border-radius: 6px; }
+.hud-gauge-track > div { height: 100%; border-radius: 5px; transition: width 240ms ease-out; box-shadow: inset 0 2px #ffffff55; }
+.hud-gauge--hp .hud-gauge-track > div { background: linear-gradient(#a8ec7c, #4fa83a); }
+.hud-gauge--mp .hud-gauge-track > div { background: linear-gradient(#a6d4ff, #3a7ec9); }
+.hud-gauge--st .hud-gauge-track > div { background: linear-gradient(#f6dc8a, #c7962e); }
+.hud-gauge small { font: 700 15px/1 var(--font-body); font-variant-numeric: tabular-nums; text-align: right; color: var(--dq-text); }
 
-.location-plaque {
-  position: absolute; z-index: 29; top: 14px; left: 50%; transform: translateX(-50%); max-width: min(420px, 36vw);
-  pointer-events: none; text-align: center;
-}
-.location-plaque span {
-  display: block; padding: 6px 30px; font: 21px/1.45 var(--font-display); color: #f7e7ba; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  background: linear-gradient(90deg, transparent, #0f1d19ee 16%, #0f1d19ee 84%, transparent);
-  border-top: 2px solid #b8975a; border-bottom: 2px solid #b8975a; text-shadow: 2px 2px 0 #07120f;
-}
-
-.location-hud { position: absolute; z-index: 30; top: 10px; right: 14px; display: flex; flex-direction: column; align-items: center; pointer-events: none; }
-.sundial { width: 104px; height: 104px; filter: drop-shadow(3px 4px 0 #07120f70); }
+/* Purse + sundial, top-right. */
+.location-hud { position: absolute; z-index: 30; top: max(12px, env(safe-area-inset-top)); right: 14px; display: grid; grid-template-columns: auto auto; grid-template-rows: auto auto; gap: 4px 10px; align-items: start; justify-items: end; pointer-events: none; }
+.hud-purse { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; min-width: 150px; padding: 6px 14px; }
+.hud-purse > span { display: inline-flex; align-items: baseline; gap: 6px; font-size: 20px; font-variant-numeric: tabular-nums; }
+.hud-purse b { font-weight: 700; } .hud-purse i { font-style: normal; font-size: 14px; color: var(--dq-gold); }
+.hud-purse .hud-purse-wexp { font-size: 14px; } .hud-purse-wexp i { color: #93dccb; font: 700 13px serif; }
+.hud-clock { grid-row: span 2; display: flex; flex-direction: column; align-items: center; }
+.hud-hour { grid-column: 1; padding: 1px 10px; font-size: 13px; white-space: nowrap; }
+.sundial { width: 100px; height: 100px; filter: drop-shadow(2px 3px 0 #0a0503aa); }
 .sundial svg { width: 100%; height: 100%; overflow: visible; }
-.sundial-rim { fill: #3a2f1e; stroke: #d0ad62; stroke-width: 3; }
+.sundial-rim { fill: #3a2414; stroke: var(--dq-gold); stroke-width: 3; }
 .sundial-sky { fill: #2d5c7c; stroke: #16252d; stroke-width: 1.5; }
 .sundial--night .sundial-sky { fill: #16223f; }
 .sundial-ring { transition: transform 900ms ease-in-out; }
@@ -52,100 +80,107 @@
 .sundial--night .sundial-face { fill: #c9c4e8; }
 .sundial-hour { font: 700 19px serif; fill: #3b2a12; text-anchor: middle; }
 .sundial-pointer { fill: #ffcf5a; stroke: #6d4d17; stroke-width: 1; }
-.hud-day {
-  margin-top: -8px; padding: 1px 14px; font-size: 13px; color: #cfd9e6;
-  background: #101c26ee; border: 2px solid #6d8aa5; border-radius: 999px; white-space: nowrap;
-}
-.hud-day b { font: 700 18px/1.3 var(--font-display); color: #fff3cf; }
-.hud-hour { margin-top: 4px; padding: 1px 10px; font-size: 13px; color: #f6ead0; background: #0b1714d9; border: 1px solid #c9a55c66; white-space: nowrap; }
+.hud-day { margin-top: -8px; padding: 0 12px; font-size: 12px; color: var(--dq-text); background: var(--dq-box-solid); border: 2px solid var(--dq-edge); border-radius: 999px; white-space: nowrap; }
+.hud-day b { font: 700 16px/1.3 var(--font-display); color: #fff3cf; }
 
-.game-menu {
-  position: absolute; z-index: 30; bottom: max(14px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%);
-  display: flex; gap: 6px; padding: 6px 12px 4px;
-  background: linear-gradient(transparent, #0b1714c7 30%); border-bottom: 2px solid #8f7a4f;
+/* Ringed minimap, bottom-left. */
+.minimap { position: absolute; z-index: 30; left: 16px; bottom: max(14px, env(safe-area-inset-bottom)); margin: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; pointer-events: none; }
+.minimap-face {
+  --mx: 0px; --my: 0px; position: relative; width: 168px; height: 168px; overflow: hidden; border-radius: 50%;
+  background: #3a2a18; border: 5px solid #b08a4c; box-shadow: 0 0 0 2px #140a07, inset 0 0 0 2px #140a07, inset 0 0 18px #0009, 0 4px 10px #0a05038c;
 }
-.game-menu-button { position: relative; display: flex; flex-direction: column; align-items: center; width: 64px; gap: 2px; color: #e9ddba; }
-.game-menu-medal {
-  position: relative; display: grid; place-items: center; width: 50px; height: 50px; border-radius: 50%;
-  background: radial-gradient(circle at 50% 38%, #2f463b, #101d19 72%); border: 2px solid #b8975a;
-  box-shadow: 0 0 0 2px #0b1512, inset 0 0 0 2px #1d2f28, 0 3px 0 #07120f; transition: transform 120ms, border-color 120ms, background 120ms;
+.minimap-face::after { content: ""; position: absolute; inset: 0; border-radius: 50%; box-shadow: inset 0 0 0 3px #e2bd6a55, inset 0 0 26px #1a0e06aa; pointer-events: none; }
+.minimap-layer {
+  position: absolute; left: var(--mx); top: var(--my); width: calc(100% * var(--zoom)); height: calc(100% * var(--zoom) * 0.6667);
+  background: var(--map) 0 0 / 100% 100% no-repeat; filter: sepia(.35) saturate(.9) brightness(.95); transition: left 120ms linear, top 120ms linear;
 }
-.game-menu-medal img { width: 32px; height: 32px; }
-.game-menu-button span.game-menu-label { font-size: 12px; white-space: nowrap; text-shadow: 1px 1px 0 #07120f; }
-.game-menu-button kbd {
-  position: absolute; left: 50%; bottom: -5px; transform: translateX(-50%); min-width: 17px; padding: 0 3px;
-  font: 700 10px/15px ui-monospace, monospace; color: #1b1a12; background: #e9cf8c; border: 1px solid #7a5e2a; border-radius: 3px;
-}
-.game-menu-button:hover .game-menu-medal, .game-menu-button:focus-visible .game-menu-medal { transform: translateY(-2px); border-color: #f4dc9c; background: radial-gradient(circle at 50% 38%, #3f5b4c, #152621 72%); }
-.game-menu-button:focus-visible { outline: none; }
-.game-menu-button:focus-visible .game-menu-medal { outline: 2px solid #f2d790; outline-offset: 2px; }
-.game-menu-badge {
-  position: absolute; top: -4px; right: 2px; min-width: 18px; height: 18px; padding: 0 4px; display: grid; place-items: center;
-  font-size: 11px; color: #fff4dc; background: #b33a2c; border: 1px solid #f0b39a; border-radius: 9px;
-}
+.minimap-pin { position: absolute; width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 50%; border: 1px solid #140a07; }
+.minimap-pin--npc { background: #9fe38a; }
+.minimap-pin--spot { width: 6px; height: 6px; margin: -3px 0 0 -3px; background: #f0d9a0; }
+.minimap-pin--exit { width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 2px; background: #e2bd6a; transform: rotate(45deg); }
+.minimap-hero { position: absolute; left: 50%; top: 50%; width: 0; height: 0; margin: -7px 0 0 -6px; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 13px solid #ffd24a; filter: drop-shadow(0 0 1px #140a07) drop-shadow(0 0 1px #140a07); }
+.minimap-hero[data-facing=east] { transform: rotate(90deg); } .minimap-hero[data-facing=south] { transform: rotate(180deg); } .minimap-hero[data-facing=west] { transform: rotate(270deg); }
+.minimap figcaption { max-width: 190px; padding: 1px 12px; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-.journey-guide:not(.journey-guide--inline) { top: 104px; left: 14px; width: 330px; }
+/* Arrival banner (DQ "Heliodor"). */
+.arrival-banner {
+  position: absolute; z-index: 29; left: 50%; top: 20%; transform: translateX(-50%); display: flex; align-items: center; gap: 18px;
+  min-width: min(620px, 86vw); justify-content: center; padding: 10px 40px; pointer-events: none;
+  background: linear-gradient(90deg, transparent, #3a2410e0 18%, #4a2e12f0 50%, #3a2410e0 82%, transparent);
+  border-top: 2px solid #e2bd6aaa; border-bottom: 2px solid #e2bd6aaa; animation: arrival 3.2s ease-in-out forwards;
+}
+.arrival-banner strong { font: 36px/1.45 var(--font-display); color: #fff1c8; text-shadow: 0 0 12px #e2bd6a99, 2px 2px 0 #140a07; white-space: nowrap; }
+.arrival-flourish { color: var(--dq-gold); font-size: 18px; }
+@keyframes arrival { 0% { opacity: 0; letter-spacing: .3em; } 14% { opacity: 1; letter-spacing: .02em; } 78% { opacity: 1; } 100% { opacity: 0; } }
+
+.journey-guide:not(.journey-guide--inline) { top: calc(max(14px, env(safe-area-inset-top)) + 54px); left: 14px; width: 330px; }
+
+/* Controls hint: a slim pill centred at the bottom, between minimap and party. */
+.world-controls { left: 50%; transform: translateX(-50%); bottom: max(18px, env(safe-area-inset-bottom)); padding: 2px 6px 2px 14px; gap: 10px; font-size: 12px; background: var(--dq-box); border: 1px solid var(--dq-edge); border-radius: 999px; }
+.world-controls button { padding: 0 10px; border-left: 1px solid #e2bd6a44; }
+@media (pointer: fine) { .world-controls button { min-height: 36px; } }
+
+/* "Other things here" drawer. */
+.journey-extras { top: 158px !important; right: 40px !important; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--dq-box-solid) !important; border: 2px solid var(--dq-edge) !important; }
 
 @media (max-width: 900px) {
-  .hud-strip { width: 360px; }
-  .hud-vitals { gap: 7px; }
-  .location-plaque { top: 120px; left: 14px; transform: none; max-width: 300px; text-align: left; }
-  .location-plaque span { padding: 4px 22px 4px 12px; font-size: 18px; background: linear-gradient(90deg, #0f1d19ee 80%, transparent); border-left: 2px solid #b8975a; }
-  .journey-guide:not(.journey-guide--inline) { top: 166px; }
+  .hud-strip { width: 220px; }
+  .minimap-face { width: 136px; height: 136px; }
 }
 @media (max-width: 640px) {
-  .player-hud { top: max(8px, env(safe-area-inset-top)); left: 8px; right: 86px; }
-  .hud-portrait { width: 54px; height: 54px; border-width: 2px; }
-  .hud-strip { flex: 1; min-width: 0; width: auto; margin-left: -12px; padding: 5px 8px 6px 18px; gap: 2px 8px; }
+  .command-toggle { top: max(8px, env(safe-area-inset-top)); left: 8px; min-height: 40px; padding: 2px 12px; font-size: 15px; }
+  .command-toggle kbd, .command-item kbd { display: none; }
+  .command-window { top: calc(max(8px, env(safe-area-inset-top)) + 48px); left: 8px; right: 8px; grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 10px 10px 10px 30px; }
+  .command-item { font-size: 16px; min-height: 42px; }
+  .player-hud { right: 8px; bottom: max(8px, env(safe-area-inset-bottom)); }
+  .hud-portrait { width: 56px; height: 56px; border-width: 2px; margin-right: -14px; }
+  .hud-strip { width: 196px; padding: 4px 8px 6px 20px; }
   .hud-player-name { font-size: 15px; }
-  .hud-vitals { gap: 5px; }
-  .hud-glyph { font-size: 14px; }
-  .hud-gauge small { font-size: 11px; }
-  .hud-gauge small span { display: none; }
-  .hud-gauge-track { height: 7px; }
-  .hud-wallet { font-size: 12px; gap: 8px; }
+  .hud-gauge { grid-template-columns: 32px 1fr 34px; gap: 4px; }
+  .hud-gauge-label { font-size: 10px; height: 14px; }
+  .hud-gauge-track { height: 8px; }
+  .hud-gauge small { font-size: 13px; }
+  .location-hud { top: max(6px, env(safe-area-inset-top)); right: 6px; gap: 3px 6px; }
+  .hud-purse { min-width: 0; padding: 3px 9px; }
+  .hud-purse > span { font-size: 15px; } .hud-purse .hud-purse-wexp { font-size: 12px; }
+  .sundial { width: 70px; height: 70px; }
+  .hud-day { margin-top: -6px; padding: 0 8px; font-size: 11px; } .hud-day b { font-size: 14px; }
   .hud-hour { display: none; }
-  .location-hud { top: max(6px, env(safe-area-inset-top)); right: 6px; }
-  .sundial { width: 74px; height: 74px; }
-  .hud-day { margin-top: -6px; padding: 0 9px; font-size: 11px; }
-  .hud-day b { font-size: 15px; }
-  .location-plaque { top: 84px; left: 8px; max-width: calc(100% - 100px); }
-  .location-plaque span { font-size: 16px; }
-  .journey-guide:not(.journey-guide--inline) { top: 118px; left: 8px; width: calc(100% - 16px); }
-  .game-menu { gap: 0; padding: 4px 2px 3px; width: 100%; justify-content: space-around; bottom: 0; padding-bottom: max(4px, env(safe-area-inset-bottom)); }
-  .game-menu-button { width: 12.5%; }
-  .game-menu-medal { width: 40px; height: 40px; }
-  .game-menu-medal img { width: 26px; height: 26px; }
-  .game-menu-button span.game-menu-label { font-size: 10px; }
-  .game-menu-button kbd { display: none; }
+  .minimap { left: 8px; bottom: max(8px, env(safe-area-inset-bottom)); }
+  .minimap-face { width: 108px; height: 108px; border-width: 4px; }
+  .minimap figcaption { max-width: 124px; font-size: 11px; padding: 0 8px; }
+  .arrival-banner { top: 16%; padding: 8px 18px; gap: 10px; } .arrival-banner strong { font-size: 26px; }
+  .journey-guide:not(.journey-guide--inline) { top: 96px; left: 8px; width: calc(100% - 16px); }
+  .world-controls { bottom: 150px; }
+  .journey-extras { top: 104px !important; right: 12px !important; }
 }
 @media (max-height: 560px) and (min-width: 641px) {
-  .player-hud { top: 6px; left: 8px; }
-  .hud-portrait { width: 48px; height: 48px; border-width: 2px; }
-  .hud-strip { width: 330px; margin-left: -12px; padding: 3px 8px 4px 18px; gap: 1px 8px; }
+  .command-toggle { top: 6px; left: 8px; min-height: 36px; font-size: 14px; }
+  .command-window { top: 48px; left: 8px; grid-template-rows: repeat(4, auto); padding-top: 6px; padding-bottom: 6px; }
+  .command-item { min-height: 34px; font-size: 15px; }
+  .player-hud { right: 8px; bottom: 6px; }
+  .hud-portrait { width: 52px; height: 52px; margin-right: -14px; }
+  .hud-strip { width: 200px; padding: 3px 8px 4px 20px; }
   .hud-player-name { font-size: 14px; }
-  .hud-vitals { gap: 6px; }
-  .hud-glyph { font-size: 14px; }
-  .hud-gauge small { font-size: 11px; }
-  .hud-gauge small span { display: none; }
+  .hud-vitals { gap: 2px; }
   .hud-gauge-track { height: 7px; }
-  .hud-wallet { font-size: 12px; }
+  .hud-gauge small { font-size: 12px; }
+  .location-hud { top: 4px; right: 8px; }
+  .hud-purse { padding: 2px 10px; } .hud-purse > span { font-size: 15px; }
+  .sundial { width: 64px; height: 64px; }
+  .hud-day { margin-top: -6px; font-size: 11px; } .hud-day b { font-size: 13px; }
   .hud-hour { display: none; }
-  .location-plaque { top: 8px; left: auto; right: 84px; transform: none; max-width: 22vw; text-align: right; }
-  .location-plaque span { padding: 3px 14px; font-size: 16px; border-left: 0; background: #0f1d19ee; }
-  .sundial { width: 70px; height: 70px; }
-  .hud-day { margin-top: -6px; font-size: 11px; }
-  .hud-day b { font-size: 14px; }
-  .journey-guide:not(.journey-guide--inline) { top: 64px; left: 8px; width: 280px; }
-  .game-menu { bottom: 4px; padding: 3px 8px 2px; }
-  .game-menu-button { width: 54px; }
-  .game-menu-medal { width: 38px; height: 38px; }
-  .game-menu-medal img { width: 24px; height: 24px; }
-  .game-menu-button span.game-menu-label { font-size: 10px; }
-  .game-menu-button kbd { display: none; }
+  .minimap { left: 8px; bottom: 6px; }
+  .minimap-face { width: 96px; height: 96px; border-width: 4px; }
+  .minimap figcaption { font-size: 11px; }
+  .arrival-banner { top: 14%; } .arrival-banner strong { font-size: 26px; }
+  .journey-guide:not(.journey-guide--inline) { top: 48px; left: 8px; width: 280px; }
+  .world-controls { bottom: 6px; font-size: 11px; }
+  .journey-extras { top: 96px !important; }
 }
-@media (pointer: coarse) { .game-menu-button kbd { display: none; } }
-@media (prefers-reduced-motion: reduce) { .sundial-ring, .hud-gauge-track > div { transition: none; } }
+@media (pointer: coarse) { .command-toggle kbd, .command-item kbd { display: none; } }
+@media (prefers-reduced-motion: reduce) { .sundial-ring, .hud-gauge-track > div, .minimap-layer { transition: none; } .command-item::before, .arrival-banner, .command-window { animation: none; } }
 
 /* ── Title screen: large preview of the chosen hero ──────────────────── */
 .title-kicker { line-height: 1.6; }
@@ -156,15 +191,6 @@
 @media (max-width: 640px) { .creation-preview { height: 118px; } }
 @media (max-height: 760px) and (min-width: 641px) { .creation-preview { height: 110px; } }
 @media (max-height: 500px) and (orientation: landscape) { .creation-preview { display: none; } }
-
-/* Controls hint: a slim pill, not a boxed panel. */
-/* Bottom-left, clear of the centred map exits and the medallion dock. */
-.world-controls { left: 14px; transform: none; padding: 2px 6px 2px 14px; gap: 10px; font-size: 12px; background: #0b1714a8; border: 1px solid #c9a55c55; border-radius: 999px; bottom: 22px; }
-.world-controls button { padding: 0 10px; border-left: 1px solid #c9a55c44; }
-@media (pointer: fine) { .world-controls button { min-height: 36px; } }
-@media (max-width: 1100px) { .world-controls { bottom: 100px; } }
-@media (max-width: 640px) { .world-controls { left: 8px; bottom: 82px; } }
-@media (max-height: 560px) and (min-width: 641px) { .world-controls { left: 8px; bottom: 72px; font-size: 11px; } }
 
 /* Landscape title: the form alone, compact, so Start stays on screen. */
 @media (max-height: 500px) and (orientation: landscape) {
@@ -181,7 +207,17 @@
   .creation-note, .creation-save-note { display: none; }
   .start-adventure { margin-top: 10px; padding-top: 8px; padding-bottom: 8px; }
 }
-/* "Other things here" drawer: a medallion under the sundial, not an emoji box. */
-.journey-extras { top: 170px !important; right: 30px !important; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center;
-  background: radial-gradient(circle at 50% 38%, #2f463b, #101d19 72%) !important; border: 2px solid #b8975a !important; }
-@media (max-width: 640px) { .journey-extras { top: 118px !important; right: 12px !important; } }
+
+/* Gamification beats: purse deltas and the autosave quill. */
+.hud-purse { position: relative; }
+.purse-delta { position: absolute; right: 10px; top: -4px; font-size: 18px; font-weight: 800; color: #ffe07a; text-shadow: 1px 1px 0 #140a07, 0 0 8px #ffd24a88; animation: purse-float 1.6s ease-out forwards; pointer-events: none; }
+.purse-delta--spend { color: #ff9c86; text-shadow: 1px 1px 0 #140a07; }
+@keyframes purse-float { 0% { opacity: 0; transform: translateY(10px) scale(.9); } 15% { opacity: 1; transform: none; } 70% { opacity: 1; } 100% { opacity: 0; transform: translateY(-14px); } }
+.autosave-note { position: absolute; z-index: 30; right: 20px; bottom: calc(max(16px, env(safe-area-inset-bottom)) + 104px); display: flex; align-items: center; gap: 6px;
+  font-size: 14px; color: #fff4d6; text-shadow: 1px 1px 0 #140a07, 0 0 6px #140a07; pointer-events: none; animation: autosave 2.6s ease-in-out forwards; }
+.autosave-note span { color: #e2bd6a; font-size: 18px; animation: autosave-quill .6s ease-in-out infinite alternate; }
+@keyframes autosave { 0%, 100% { opacity: 0; } 12%, 80% { opacity: 1; } }
+@keyframes autosave-quill { from { transform: rotate(-12deg); } to { transform: rotate(8deg); } }
+@media (max-width: 640px) { .autosave-note { right: 10px; bottom: calc(max(8px, env(safe-area-inset-bottom)) + 84px); font-size: 12px; } }
+@media (max-height: 560px) and (min-width: 641px) { .autosave-note { bottom: 76px; } }
+@media (prefers-reduced-motion: reduce) { .purse-delta, .autosave-note, .autosave-note span { animation-duration: .01ms; } }
