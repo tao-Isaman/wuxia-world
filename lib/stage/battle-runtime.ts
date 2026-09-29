@@ -1,9 +1,10 @@
-import * as THREE from "three";
+import * as Phaser from "phaser";
 import { useBattleStore } from "@/store/battle-store";
 import { SKILLS, type BattleState, type Side } from "@/lib/game";
 import { CHARACTER_CLIPS, CHARACTER_FEET_Y, CHARACTER_FRAME_SIZE, type CharacterId, type CharacterMotion } from "@/lib/characters/catalog";
 import { loadCharacterAtlas } from "@/lib/characters/sheet";
 import { BATTLE_BACKGROUNDS, type BattleBackground } from "./battle-background";
+import { addGridFrames, canvasTexture, createStage, type Stage } from "./phaser-stage";
 
 const WIDTH = 768;
 const HEIGHT = 432;
@@ -11,7 +12,6 @@ const GROUND = 369;
 const HIT_DELAY = 300;
 const HIT_GAP = 100;
 type Cast = NonNullable<BattleState["lastCast"]>;
-type PixelMesh = THREE.Mesh<THREE.BufferGeometry, THREE.MeshBasicMaterial>;
 interface FrameBounds {
   left: number;
   right: number;
@@ -20,20 +20,18 @@ interface FrameBounds {
 }
 
 interface Fighter {
-  mesh: PixelMesh;
-  shadow: PixelMesh;
-  ring: PixelMesh;
-  texture: THREE.Texture;
+  image: Phaser.GameObjects.Image;
+  shadow: Phaser.GameObjects.Ellipse;
+  ring: Phaser.GameObjects.Ellipse;
   character: string;
   beast: boolean;
   /** Single-pose unique sprite: poses come from lunge/recoil/breath, not frames. */
   still?: boolean;
   baseX: number;
+  x: number;
   width: number;
   height: number;
   feet: number;
-  columns: number;
-  rows: number;
   frameBounds: FrameBounds[];
   frame: number;
   motion: CharacterMotion;
@@ -42,8 +40,13 @@ interface Fighter {
   flashUntil: number;
 }
 
+/** Anything an effect animates: sized images / rectangles, or unit-space graphics scaled up. */
+type EffectObject = (Phaser.GameObjects.Image | Phaser.GameObjects.Rectangle | Phaser.GameObjects.Graphics) & Phaser.GameObjects.Components.Transform & Phaser.GameObjects.Components.AlphaSingle;
+
 interface Effect {
-  mesh: PixelMesh;
+  item: EffectObject;
+  /** Unit-space graphics: width / height are scale factors, not display sizes. */
+  unit: boolean;
   born: number;
   life: number;
   x: number;
@@ -55,7 +58,7 @@ interface Effect {
   spin: number;
   grow: number;
   opacity: number;
-  ownTexture?: boolean;
+  ownTexture?: string;
 }
 
 export interface BattleRuntimeOptions {
@@ -66,36 +69,36 @@ export interface BattleRuntimeOptions {
   creatureFrame?: number | null;
   background?: BattleBackground;
   onReady: () => void;
-  onError: () => void;
+  onError: (reason?: string) => void;
   onCastProgress?: (progress: BattleCastProgress) => void;
 }
 
 export interface BattleCastProgress { seq: number; hits: number; complete: boolean }
 
-/** A single Three.js scene owns the battle's animation clock and GPU resources. */
+/**
+ * A single Phaser stage owns the battle's animation clock and textures.
+ * Map units are 768×432, y down; narrow screens crop the sky and the sides.
+ */
 export function createBattleRuntime(parent: HTMLElement, options: BattleRuntimeOptions): { destroy: () => void } {
   let destroyed = false;
   let failed = false;
   let ready = false;
-  let animationFrame = 0;
   let lastTime = 0;
   let elapsed = 0;
   let castSequence = -1;
   let impactCount = 0;
   let shakeUntil = 0;
+  let textSerial = 0;
+  let viewWidth = WIDTH;
+  let viewHeight = HEIGHT;
   let activeCast: { cast: Cast; started: number; nextHit: number; duration: number; support: boolean } | null = null;
-  let label: { mesh: PixelMesh; born: number; until: number } | null = null;
+  let label: { item: Phaser.GameObjects.Image; key: string; born: number; until: number } | null = null;
   const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
   let reduced = motionPreference.matches;
   const font = getComputedStyle(document.body).fontFamily;
-  const owned = new Set<{ dispose: () => void }>();
   const effects: Effect[] = [];
   const fighters: Fighter[] = [];
-  const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x172723);
-  const camera = new THREE.OrthographicCamera(0, WIDTH, HEIGHT, 0, 0.1, 100);
-  camera.position.z = 10;
-  let renderer: THREE.WebGLRenderer | undefined;
+  let scene: Phaser.Scene | undefined;
   let observer: ResizeObserver | undefined;
 
   function frameFront(fighter: Fighter, attack = false): number {
@@ -113,24 +116,12 @@ export function createBattleRuntime(parent: HTMLElement, options: BattleRuntimeO
     return { y, targetFront, distance: Math.max(32, frameFront(attacker, true) + targetFront - 2) };
   }
 
-  function own<T extends { dispose: () => void }>(resource: T): T {
-    owned.add(resource);
-    return resource;
-  }
-  function release(resource: { dispose: () => void }) {
-    owned.delete(resource);
-    resource.dispose();
-  }
-  function fail() {
+  function fail(cause?: unknown) {
     if (destroyed || failed) return;
     failed = true;
     parent.dataset.ready = "false";
-    cancelAnimationFrame(animationFrame);
-    options.onError();
-  }
-  function onContextLost(event: Event) {
-    event.preventDefault();
-    fail();
+    if (cause) console.error("[battle] stage failed:", cause);
+    options.onError(cause instanceof Error ? cause.message : typeof cause === "string" ? cause : undefined);
   }
   function onMotionChange(event: MediaQueryListEvent) {
     reduced = event.matches;
@@ -139,98 +130,71 @@ export function createBattleRuntime(parent: HTMLElement, options: BattleRuntimeO
   function destroy() {
     if (destroyed) return;
     destroyed = true;
-    cancelAnimationFrame(animationFrame);
     observer?.disconnect();
     motionPreference.removeEventListener("change", onMotionChange);
-    renderer?.domElement.removeEventListener("webglcontextlost", onContextLost);
-    for (const resource of owned) resource.dispose();
-    owned.clear();
-    scene.clear();
-    renderer?.dispose();
-    renderer?.forceContextLoss();
-    renderer?.domElement.remove();
+    stage.destroy();
   }
 
-  try {
-    renderer = new THREE.WebGLRenderer({ antialias: false, alpha: false, powerPreference: "low-power" });
-    renderer.outputColorSpace = THREE.SRGBColorSpace;
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-    renderer.domElement.style.cssText = "display:block;width:100%;height:100%;image-rendering:pixelated";
-    renderer.domElement.setAttribute("aria-hidden", "true");
-    renderer.domElement.dataset.renderer = "three";
-    renderer.domElement.addEventListener("webglcontextlost", onContextLost);
-    parent.appendChild(renderer.domElement);
-    const resize = () => {
-      if (destroyed || !renderer) return;
-      const width = Math.max(1, Math.round(parent.clientWidth));
-      const height = Math.max(1, Math.round(parent.clientHeight));
-      renderer.setSize(width, height, false);
-      // Crop scenery instead of stretching sprites. Narrow screens bring the
-      // fighters closer; wide screens use more courtyard and less empty sky.
-      const ratio = width / height;
-      const viewHeight = Math.min(HEIGHT, WIDTH / ratio);
-      const viewWidth = viewHeight * ratio;
-      camera.left = (WIDTH - viewWidth) / 2;
-      camera.right = camera.left + viewWidth;
-      camera.top = viewHeight;
-      camera.bottom = 0;
-      camera.updateProjectionMatrix();
-      fighters.forEach((fighter, index) => { fighter.baseX = camera.left + viewWidth * (index ? 0.73 : 0.27); });
-      if (label) {
-        label.mesh.position.y = camera.top - 45;
-        label.mesh.visible = width >= 900;
-      }
-      parent.dataset.viewWidth = viewWidth.toFixed(1);
-      parent.dataset.viewHeight = viewHeight.toFixed(1);
-      if (ready) renderer.render(scene, camera);
-    };
-    observer = new ResizeObserver(resize);
-    observer.observe(parent);
-    resize();
-    motionPreference.addEventListener("change", onMotionChange);
-    parent.dataset.renderer = "three";
-    parent.dataset.reducedMotion = String(reduced);
-    parent.dataset.impactCount = "0";
-    parent.dataset.castSeq = "-1";
-  } catch {
-    fail();
-    return { destroy };
+  function resize() {
+    if (destroyed) return;
+    const width = Math.max(1, Math.round(parent.clientWidth));
+    const height = Math.max(1, Math.round(parent.clientHeight));
+    stage.fit(width, height);
+    // Crop scenery instead of stretching sprites. Narrow screens bring the
+    // fighters closer; wide screens use more courtyard and less empty sky.
+    const ratio = width / height;
+    viewHeight = Math.min(HEIGHT, WIDTH / ratio);
+    viewWidth = viewHeight * ratio;
+    const left = (WIDTH - viewWidth) / 2;
+    fighters.forEach((fighter, index) => { fighter.baseX = left + viewWidth * (index ? 0.73 : 0.27); });
+    if (label) {
+      label.item.setY(HEIGHT - viewHeight + 45);
+      label.item.setVisible(width >= 900);
+    }
+    placeCamera(0);
+    parent.dataset.viewWidth = viewWidth.toFixed(1);
+    parent.dataset.viewHeight = viewHeight.toFixed(1);
+  }
+  function placeCamera(shake: number) {
+    const camera = scene?.cameras.main;
+    if (!camera) return;
+    camera.setZoom(Math.max(1, parent.clientWidth) * stage.dpr / viewWidth);
+    camera.centerOn(WIDTH / 2 + shake, HEIGHT - viewHeight / 2 - shake * 0.4);
   }
 
-  const plane = own(new THREE.PlaneGeometry(1, 1));
-  const circle = own(new THREE.CircleGeometry(1, 40));
-  const ring = own(new THREE.RingGeometry(0.96, 1, 64));
-  const arc = own(new THREE.RingGeometry(0.89, 1, 36, 1, -Math.PI * 0.64, Math.PI * 1.28));
+  const stage: Stage = createStage(parent, "#172723", {
+    create(created) {
+      scene = created;
+      observer = new ResizeObserver(resize);
+      observer.observe(parent);
+      resize();
+      void initialize().catch(fail);
+    },
+    update: (time) => update(time),
+    contextLost: () => fail("WebGL context lost"),
+    error: fail,
+  });
+  motionPreference.addEventListener("change", onMotionChange);
+  parent.dataset.renderer = "phaser";
+  parent.dataset.reducedMotion = String(reduced);
+  parent.dataset.impactCount = "0";
+  parent.dataset.castSeq = "-1";
 
-  function texture(image: HTMLCanvasElement | HTMLImageElement) {
-    const map = own(new THREE.Texture(image));
-    map.colorSpace = THREE.SRGBColorSpace;
-    map.magFilter = THREE.NearestFilter;
-    map.minFilter = THREE.NearestFilter;
-    map.generateMipmaps = false;
-    map.needsUpdate = true;
-    return map;
+  /** A filled ring sector in unit space (radius 1), y down; scale it to size. */
+  function ring(inner: number, start: number, length: number, color: number, depth: number, segments = 48) {
+    const graphics = scene!.add.graphics().setDepth(depth);
+    graphics.fillStyle(color, 1);
+    for (let n = 0; n < segments; n++) {
+      const a = start + length * n / segments, b = start + length * (n + 1) / segments;
+      // Authored with y up (as the arcs were designed); flipped to screen space.
+      const outerA = [Math.cos(a), -Math.sin(a)], outerB = [Math.cos(b), -Math.sin(b)];
+      const innerA = [outerA[0] * inner, outerA[1] * inner], innerB = [outerB[0] * inner, outerB[1] * inner];
+      graphics.fillTriangle(outerA[0], outerA[1], outerB[0], outerB[1], innerB[0], innerB[1]);
+      graphics.fillTriangle(outerA[0], outerA[1], innerB[0], innerB[1], innerA[0], innerA[1]);
+    }
+    return graphics;
   }
-  function mesh(geometry: THREE.BufferGeometry, color: number, order: number, map?: THREE.Texture): PixelMesh {
-    const material = own(new THREE.MeshBasicMaterial({
-      color, map, transparent: true, depthTest: false, depthWrite: false,
-      side: THREE.DoubleSide, toneMapped: false,
-    }));
-    const item = new THREE.Mesh(geometry, material);
-    item.renderOrder = order;
-    scene.add(item);
-    return item;
-  }
-  function place(item: PixelMesh, x: number, y: number, width: number, height: number) {
-    item.position.set(x, HEIGHT - y, 0);
-    item.scale.set(width, height, 1);
-  }
-  function remove(item: PixelMesh, ownTexture = false) {
-    scene.remove(item);
-    if (ownTexture && item.material.map) release(item.material.map);
-    release(item.material);
-  }
-  function textMesh(text: string, color: string, size: number, banner = false) {
+  function textImage(text: string, color: string, size: number, banner = false) {
     const canvas = document.createElement("canvas");
     const context = canvas.getContext("2d");
     if (!context) throw new Error("Battle label canvas is unavailable");
@@ -260,22 +224,29 @@ export function createBattleRuntime(parent: HTMLElement, options: BattleRuntimeO
     context.strokeText(text, width / 2, height / 2 + 1, width - 24);
     context.fillStyle = color;
     context.fillText(text, width / 2, height / 2 + 1, width - 24);
-    const item = mesh(plane, 0xffffff, 40, texture(canvas));
-    item.scale.set(width, height, 1);
-    return item;
+    const key = `text:${textSerial++}`;
+    canvasTexture(scene!, key, canvas);
+    const item = scene!.add.image(0, 0, key).setDepth(40).setDisplaySize(width, height);
+    return { item, key, width, height };
   }
-  function addEffect(item: PixelMesh, x: number, y: number, width: number, height: number,
+  function addEffect(item: EffectObject, unit: boolean, x: number, y: number, width: number, height: number,
     life: number, extra: Partial<Effect> = {}) {
-    const effect: Effect = { mesh: item, born: elapsed, life, x, y, vx: 0, vy: 0,
+    const effect: Effect = { item, unit, born: elapsed, life, x, y, vx: 0, vy: 0,
       width, height, spin: 0, grow: 0, opacity: 1, ...extra };
-    place(item, x, y, width, height);
+    placeEffect(effect, x, y, width, height);
     effects.push(effect);
   }
+  function placeEffect(effect: Effect, x: number, y: number, width: number, height: number) {
+    effect.item.setPosition(x, y);
+    if (effect.unit) effect.item.setScale(width, height);
+    else (effect.item as Phaser.GameObjects.Image | Phaser.GameObjects.Rectangle).setDisplaySize(width, height);
+  }
+  function removeEffect(effect: Effect) {
+    effect.item.destroy();
+    if (effect.ownTexture) scene?.textures.remove(effect.ownTexture);
+  }
   function setFrame(fighter: Fighter, frame: number, side: number) {
-    if (!fighter.beast && !fighter.still && frame !== fighter.frame) {
-      fighter.texture.offset.set(frame % fighter.columns / fighter.columns,
-        1 - (Math.floor(frame / fighter.columns) + 1) / fighter.rows);
-    }
+    if (!fighter.beast && !fighter.still && frame !== fighter.frame) fighter.image.setFrame(frame, false, false);
     fighter.frame = frame;
     parent.dataset[side ? "fighterBFrame" : "fighterAFrame"] = String(frame);
   }
@@ -292,12 +263,11 @@ export function createBattleRuntime(parent: HTMLElement, options: BattleRuntimeO
     activeCast = { cast, started: elapsed, nextHit: 0, duration: HIT_DELAY + cast.hits * HIT_GAP + 500,
       support: cast.hitDamages.every((damage) => damage === 0) && !cast.hitMisses.some(Boolean) };
     options.onCastProgress?.({ seq: cast.seq, hits: 0, complete: false });
-    if (label) remove(label.mesh, true);
+    if (label) { label.item.destroy(); scene?.textures.remove(label.key); }
     const colors = ["#f7edcf", "#b7e9cc", "#abd3ed", "#e3bcec", "#f4cc91"];
-    const item = textMesh(cast.name, colors[cast.tier] ?? colors[0], 18, true);
-    item.position.set(WIDTH / 2, camera.top - 45, 0);
-    item.visible = parent.clientWidth >= 900;
-    label = { mesh: item, born: elapsed, until: elapsed + activeCast.duration };
+    const text = textImage(cast.name, colors[cast.tier] ?? colors[0], 18, true);
+    text.item.setPosition(WIDTH / 2, HEIGHT - viewHeight + 45).setVisible(parent.clientWidth >= 900);
+    label = { item: text.item, key: text.key, born: elapsed, until: elapsed + activeCast.duration };
   }
   function hit(cast: Cast, index: number, support: boolean) {
     const attackerSide = cast.side === "A" ? 0 : 1;
@@ -307,7 +277,7 @@ export function createBattleRuntime(parent: HTMLElement, options: BattleRuntimeO
     const damage = cast.hitDamages[index] ?? 0;
     const critical = cast.hitCrits[index];
     const contact = contactPoint(fighters[attackerSide], target, !missed);
-    const x = target.mesh.position.x + (targetSide ? -1 : 1) * contact.targetFront;
+    const x = target.x + (targetSide ? -1 : 1) * contact.targetFront;
     const y = contact.y;
     parent.dataset.contactX = x.toFixed(1);
     parent.dataset.contactY = y.toFixed(1);
@@ -316,14 +286,14 @@ export function createBattleRuntime(parent: HTMLElement, options: BattleRuntimeO
     const onPlayer = targetSide === 0;
     const color = missed ? "#c7d3c5" : support ? "#9ff0b4" : critical ? "#ffd24a" : onPlayer ? "#ff7a64" : "#fff0c8";
     const text = missed ? "พลาด" : damage > 0 ? String(damage) : "ปราณ";
-    const number = textMesh(text, color, missed ? 24 : critical ? 44 : damage > 0 ? 34 : 24);
-    const numberX = target.mesh.position.x + (index % 3 - 1) * 26, numberY = GROUND - 158 - (index % 2) * 20;
-    addEffect(number, numberX, numberY, number.scale.x, number.scale.y, reduced ? 700 : 900,
-      { vy: reduced ? 0 : -46, ownTexture: true, grow: critical && !reduced ? 0.12 : 0 });
+    const number = textImage(text, color, missed ? 24 : critical ? 44 : damage > 0 ? 34 : 24);
+    const numberX = target.x + (index % 3 - 1) * 26, numberY = GROUND - 158 - (index % 2) * 20;
+    addEffect(number.item, false, numberX, numberY, number.width, number.height, reduced ? 700 : 900,
+      { vy: reduced ? 0 : -46, ownTexture: number.key, grow: critical && !reduced ? 0.12 : 0 });
     if (critical && !missed && damage > 0) {
-      const tag = textMesh("暴擊", "#ffe9a8", 18, true);
-      addEffect(tag, numberX, numberY - 38, tag.scale.x, tag.scale.y, reduced ? 700 : 900,
-        { vy: reduced ? 0 : -46, ownTexture: true });
+      const tag = textImage("暴擊", "#ffe9a8", 18, true);
+      addEffect(tag.item, false, numberX, numberY - 38, tag.width, tag.height, reduced ? 700 : 900,
+        { vy: reduced ? 0 : -46, ownTexture: tag.key });
     }
     impactCount++;
     parent.dataset.impactCount = String(impactCount);
@@ -337,22 +307,24 @@ export function createBattleRuntime(parent: HTMLElement, options: BattleRuntimeO
     }
     if (reduced) return;
     if (support) {
-      const aura = mesh(ring, 0xbbe8c2, 25);
-      addEffect(aura, x, GROUND - 38, 34, 48, 480, { grow: 0.7, opacity: 0.8 });
+      const aura = ring(0.96, 0, Math.PI * 2, 0xbbe8c2, 25, 64);
+      addEffect(aura, true, x, GROUND - 38, 34, 48, 480, { grow: 0.7, opacity: 0.8 });
       return;
     }
     const unarmed = fighters[attackerSide].beast || SKILLS.find((skill) => skill.n === cast.name)?.w === "fist";
-    const slash = mesh(unarmed ? ring : arc, critical ? 0xffe4a0 : 0xf2f0d0, 25);
-    slash.rotation.z = attackerSide ? Math.PI + 0.32 : -0.32;
-    addEffect(slash, x, y, unarmed ? 12 : critical ? 46 : 34, unarmed ? 16 : critical ? 69 : 57, 230,
+    const color2 = critical ? 0xffe4a0 : 0xf2f0d0;
+    const slash = unarmed ? ring(0.96, 0, Math.PI * 2, color2, 25, 64) : ring(0.89, -Math.PI * 0.64, Math.PI * 1.28, color2, 25, 36);
+    // Screen space is y-down, so the authored (y-up) rotation flips sign.
+    slash.setRotation(-(attackerSide ? Math.PI + 0.32 : -0.32));
+    addEffect(slash, true, x, y, unarmed ? 12 : critical ? 46 : 34, unarmed ? 16 : critical ? 69 : 57, 230,
       { grow: unarmed ? 1.2 : 0.25, spin: attackerSide ? -1.9 : 1.9, opacity: 0.94 });
     const count = critical ? 11 : 7;
     for (let n = 0; n < count; n++) {
-      const spark = mesh(plane, n % 3 === 0 ? 0xc56b43 : 0xffdc95, 30);
+      const spark = scene!.add.rectangle(0, 0, 1, 1, n % 3 === 0 ? 0xc56b43 : 0xffdc95).setDepth(30);
       const angle = n * 2.39996 + index;
       const speed = 50 + n * 12;
-      addEffect(spark, x, y, n % 3 === 0 ? 4 : 2, n % 3 === 0 ? 2 : 3, 260 + n * 14,
-        { vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, spin: n % 2 ? 2 : -2 });
+      addEffect(spark, false, x, y, n % 3 === 0 ? 4 : 2, n % 3 === 0 ? 2 : 3, 260 + n * 14,
+        { vx: Math.cos(angle) * speed, vy: -Math.sin(angle) * speed, spin: n % 2 ? 2 : -2 });
     }
   }
   function updateFighter(fighter: Fighter, index: number, state: BattleState) {
@@ -392,22 +364,21 @@ export function createBattleRuntime(parent: HTMLElement, options: BattleRuntimeO
     setFrame(fighter, frame, index);
     const recoil = reduced || motion !== "hurt" ? 0 : Math.sin((fighter.hurtUntil - elapsed) / 180 * Math.PI) * 7;
     const x = fighter.baseX + (index ? -lunge + recoil : lunge - recoil);
+    fighter.x = x;
     parent.dataset[index ? "fighterBX" : "fighterAX"] = x.toFixed(1);
     const breath = (fighter.beast || fighter.still) && !reduced && (motion === "idle" || motion === "guard") ? Math.sin(elapsed / 450 + index) * 0.008 : 0;
     const defeat = fighter.beast && motion === "defeat";
     const height = fighter.height * (defeat ? 0.68 : 1 + breath);
     const y = GROUND - (fighter.feet - 0.5) * height;
-    place(fighter.mesh, Math.round(x), y, fighter.width * (index && !fighter.beast ? -1 : 1), height);
-    fighter.mesh.material.color.setHex(fighter.flashUntil > elapsed ? 0xffc3a0 : 0xffffff);
-    fighter.mesh.material.opacity = motion === "defeat" ? 0.72 : 1;
-    place(fighter.shadow, Math.round(x), GROUND + 1, fighter.beast ? 53 : 32, 8);
+    fighter.image.setPosition(Math.round(x), y).setDisplaySize(fighter.width, height);
+    if (fighter.flashUntil > elapsed) fighter.image.setTint(0xffc3a0); else fighter.image.clearTint();
+    fighter.image.setAlpha(motion === "defeat" ? 0.72 : 1);
+    fighter.shadow.setPosition(Math.round(x), GROUND + 1);
     const active = !state.winner && ((state.phase === "player" && !index) || (state.phase === "enemy" && index === 1));
-    fighter.ring.material.opacity = active ? 0.54 : 0.12;
-    place(fighter.ring, Math.round(x), GROUND + 1, fighter.beast ? 61 : 46, 11);
+    fighter.ring.setPosition(Math.round(x), GROUND + 1).setAlpha(active ? 0.54 : 0.12);
   }
   function update(now: number) {
-    if (destroyed || failed) return;
-    animationFrame = requestAnimationFrame(update);
+    if (destroyed || failed || !ready) return;
     const delta = lastTime ? Math.min(100, Math.max(0, now - lastTime)) : 0;
     lastTime = now;
     const paused = document.hidden || !!document.querySelector('[role="dialog"], dialog[open]');
@@ -436,93 +407,88 @@ export function createBattleRuntime(parent: HTMLElement, options: BattleRuntimeO
         const effect = effects[index];
         const age = elapsed - effect.born;
         if (age >= effect.life) {
-          remove(effect.mesh, effect.ownTexture);
+          removeEffect(effect);
           effects.splice(index, 1);
           continue;
         }
         const t = age / effect.life;
         const growth = 1 + t * effect.grow;
-        place(effect.mesh, effect.x + effect.vx * age / 1000, effect.y + effect.vy * age / 1000,
+        placeEffect(effect, effect.x + effect.vx * age / 1000, effect.y + effect.vy * age / 1000,
           effect.width * growth, effect.height * growth);
-        effect.mesh.rotation.z += reduced ? 0 : effect.spin * delta / 1000;
-        effect.mesh.material.opacity = effect.opacity * Math.min(1, (1 - t) * 2.3);
+        if (!reduced) effect.item.rotation -= effect.spin * delta / 1000;
+        effect.item.setAlpha(effect.opacity * Math.min(1, (1 - t) * 2.3));
       }
       if (label) {
-        label.mesh.material.opacity = Math.min(1, Math.max(0, (label.until - elapsed) / 180));
-        if (elapsed >= label.until) { remove(label.mesh, true); label = null; }
+        label.item.setAlpha(Math.min(1, Math.max(0, (label.until - elapsed) / 180)));
+        if (elapsed >= label.until) { label.item.destroy(); scene?.textures.remove(label.key); label = null; }
       }
-      const shake = !reduced && elapsed < shakeUntil ? Math.sin(elapsed * 0.13) * 1.6 : 0;
-      camera.position.x = shake;
-      camera.position.y = shake * 0.4;
-      renderer?.render(scene, camera);
-    } catch { fail(); }
+      placeCamera(!reduced && elapsed < shakeUntil ? Math.sin(elapsed * 0.13) * 1.6 : 0);
+    } catch (error) { fail(error); }
   }
 
   async function initialize() {
     const creatureFrame = options.creatureFrame ?? null;
     const backdrop = options.background ?? BATTLE_BACKGROUNDS.courtyard;
-    const [stage, atlasA, atlasB, creature, uniqueB] = await Promise.all([
+    const [backgroundImage, atlasA, atlasB, creature, uniqueB] = await Promise.all([
       loadImage(backdrop.image), loadCharacterAtlas(options.characterA),
       creatureFrame === null ? loadCharacterAtlas(options.characterB) : Promise.resolve(null),
       creatureFrame !== null ? loadImage("/art/creature-atlas.png") : Promise.resolve(null),
       creatureFrame === null && options.spriteB ? stillAtlas(options.spriteB).catch(() => null) : Promise.resolve(null),
     ]);
-    if (destroyed || failed) return;
+    if (destroyed || failed || !scene) return;
     parent.dataset.backgroundImage = backdrop.image;
-    const background = mesh(plane, 0xffffff, 0, texture(stage));
-    place(background, WIDTH / 2, HEIGHT / 2, WIDTH, HEIGHT);
-    const shade = mesh(plane, 0x10251e, 1);
-    shade.material.opacity = 0.12;
-    place(shade, WIDTH / 2, HEIGHT / 2, WIDTH, HEIGHT);
+    scene.textures.addImage("backdrop", backgroundImage);
+    scene.add.image(WIDTH / 2, HEIGHT / 2, "backdrop").setDisplaySize(WIDTH, HEIGHT).setDepth(0);
+    scene.add.rectangle(WIDTH / 2, HEIGHT / 2, WIDTH, HEIGHT, 0x10251e, 0.12).setDepth(1);
     [atlasA, uniqueB ?? atlasB].forEach((atlas, index) => {
       const beast = index === 1 && creatureFrame !== null && creature !== null;
       const still = index === 1 && !!uniqueB;
-      const source = beast ? creature : atlas?.image;
-      if (!source) throw new Error("Battle fighter texture is unavailable");
-      const map = texture(source);
+      const key = `fighter:${index}`;
       let feet = atlas ? atlas.feetY / atlas.frameSize : 1;
       let height = 128 * 1.55;
       let width = height;
       let frame = 0;
       const frameBounds = still && atlas ? Array.from({ length: 16 }, () => characterBounds(atlas.image, atlas.frameSize)[0])
         : atlas ? characterBounds(atlas.image, atlas.frameSize) : [];
-      const columns = atlas ? atlas.image.width / atlas.frameSize : 4;
-      const rows = atlas ? atlas.image.height / atlas.frameSize : 2;
       if (beast && creature) {
         frame = creatureFrame;
-        map.repeat.set(0.25, 0.5);
-        map.offset.set(frame % 4 / 4, 1 - (Math.floor(frame / 4) + 1) / 2);
+        const texture = scene!.textures.addImage(key, creature);
+        if (!texture) throw new Error("Battle creature texture is unavailable");
+        for (let cell = 0; cell < 8; cell++) {
+          const column = cell % 4, row = Math.floor(cell / 4);
+          const left = Math.round(column * creature.width / 4), top = Math.round(row * creature.height / 2);
+          texture.add(cell, 0, left, top, Math.round((column + 1) * creature.width / 4) - left, Math.round((row + 1) * creature.height / 2) - top);
+        }
         feet = creatureFeet(creature, frame);
         frameBounds[frame] = creatureBounds(creature, frame);
         height = 200;
         width = height * (creature.width / 4) / (creature.height / 2);
-      } else {
-        map.repeat.set(1 / columns, 1 / rows);
-        map.offset.set(0, 1 - 1 / rows);
-      }
-      const baseX = camera.left + (camera.right - camera.left) * (index ? 0.73 : 0.27);
-      const shadow = mesh(circle, 0x0a1819, 5);
-      shadow.material.opacity = 0.42;
-      const groundRing = mesh(ring, index ? 0xe4ae7c : 0xd9dcb0, 6);
-      const actor = mesh(plane, 0xffffff, 10 + index, map);
+      } else if (atlas) {
+        const columns = Math.max(1, Math.round(atlas.image.width / atlas.frameSize));
+        const rows = Math.max(1, Math.round(atlas.image.height / atlas.frameSize));
+        addGridFrames(canvasTexture(scene!, key, atlas.image), atlas.frameSize, columns, rows);
+      } else throw new Error("Battle fighter texture is unavailable");
+      const baseX = (WIDTH - viewWidth) / 2 + viewWidth * (index ? 0.73 : 0.27);
+      const shadow = scene!.add.ellipse(baseX, GROUND + 1, beast ? 106 : 64, 16, 0x0a1819, 0.42).setDepth(5);
+      const groundRing = scene!.add.ellipse(baseX, GROUND + 1, beast ? 122 : 92, 22).setDepth(6)
+        .setStrokeStyle(1.5, index ? 0xe4ae7c : 0xd9dcb0, 1).setAlpha(0.12);
+      groundRing.isFilled = false;
+      const image = scene!.add.image(baseX, 0, key, frame).setDepth(10 + index);
+      // Fighter B faces the player; the creature art already faces left.
+      image.setFlipX(index === 1 && !beast);
       const character = beast ? `beast-${frame}` : index ? options.characterB : options.characterA;
-      const fighter: Fighter = { mesh: actor, shadow, ring: groundRing, texture: map, character, beast, still,
-        baseX, width, height, feet, columns, rows, frameBounds, frame, motion: "idle", motionStarted: 0, hurtUntil: 0, flashUntil: 0 };
+      const fighter: Fighter = { image, shadow, ring: groundRing, character, beast, still,
+        baseX, x: baseX, width, height, feet, frameBounds, frame, motion: "idle", motionStarted: 0, hurtUntil: 0, flashUntil: 0 };
       fighters.push(fighter);
       parent.dataset[index ? "fighterBCharacter" : "fighterACharacter"] = character;
       parent.dataset[index ? "fighterBMotion" : "fighterAMotion"] = "idle";
       setFrame(fighter, frame, index);
-      place(actor, baseX, GROUND - (feet - 0.5) * height, width * (index && !beast ? -1 : 1), height);
-      place(shadow, baseX, GROUND + 1, beast ? 53 : 32, 8);
-      place(groundRing, baseX, GROUND + 1, beast ? 61 : 46, 11);
-      groundRing.material.opacity = 0.12;
+      image.setPosition(baseX, GROUND - (feet - 0.5) * height).setDisplaySize(width, height);
     });
     ready = true;
-    renderer?.render(scene, camera);
+    resize();
     options.onReady();
-    animationFrame = requestAnimationFrame(update);
   }
-  void initialize().catch(fail);
   return { destroy };
 }
 

@@ -23,7 +23,7 @@ export function probeWorldMap(spawn: Point, markers: readonly ProbeMarker[], foo
   const results = markers.map((marker): ProbeResult => {
     const path = planWorldPath(start, markerApproach(marker, marker.kind), footprints);
     if (!path.length) return { id: marker.id, kind: marker.kind, ok: false, reason: "no path from spawn" };
-    const end = path.at(-1)!;
+    const end = path[path.length - 1];
     const reach = Math.hypot(end.x - marker.x, end.y - marker.y);
     if (reach > 100) return { id: marker.id, kind: marker.kind, ok: false, reason: `walk ends ${Math.round(reach)} px away`, end };
     return { id: marker.id, kind: marker.kind, ok: true, end };

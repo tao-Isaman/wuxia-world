@@ -2,7 +2,7 @@
 
 Thai-language wuxia / martial-arts text-RPG with a 1v1 turn-based battle layer. The world is a network of cities, sects, mountains, valleys, islands and homes; the combat sim drops in whenever a fight is triggered.
 
-Built with **Three.js 0.186 + Next.js 15 + React 19 + TypeScript + Zustand + Tailwind v3.4**, runs on **Bun** (Node 20+ also works). Detailed 32-bit pixel-art scenery, jade-and-gold HUD, animated battles and parchment dialogs retain the Thai wuxia setting. Charm headings and Sarabun body text keep Thai readable.
+Built with **Phaser 4 + Next.js 15 + React 19 + TypeScript + Zustand + Tailwind v3.4**, runs on **Bun** (Node 20+ also works). Detailed 32-bit pixel-art scenery, jade-and-gold HUD, animated battles and parchment dialogs retain the Thai wuxia setting. Charm headings and Sarabun body text keep Thai readable.
 
 ## Quick start
 
@@ -40,11 +40,11 @@ The capital's missing-ledger investigation leads to a visible clerk and document
 
 The practice duel uses the capital school's own yard, and confirmed capital encounters use a town street. Other locations retain the original courtyard. Reloading a local conversation places the hero beside the resolved speaker on reachable ground; recovered ledger evidence leaves its chest visibly open.
 
-## Three.js runtime and controls
+## Phaser runtime and controls
 
 Click or tap the ground to walk; select a character or destination to approach and interact. Keyboard controls are **WASD / arrows** to walk and **E** to interact nearby. The **จุดหมาย** destination list provides equivalent keyboard-accessible actions. Menus pause movement. Portrait and landscape layouts use the actual viewport, with no CSS rotation.
 
-`lib/three/world-runtime.ts` owns scene loading, movement, depth sorting and the camera. `lib/three/battle-runtime.ts` owns the combat update loop, enemy action timing and cast effects. React supplies accessible forms, HUD, inventory, dialogs and skill buttons. Pure combat/story rules remain in `lib/game` and `lib/world`; Zustand connects them to the scenes and persists version-19 saves. Three.js is dynamically imported on the client and destroyed when its view unmounts.
+`lib/stage/world-runtime.ts` owns scene loading, movement, depth sorting and the camera. `lib/stage/battle-runtime.ts` owns the combat update loop, enemy action timing and cast effects. React supplies accessible forms, HUD, inventory, dialogs and skill buttons. Pure combat/story rules remain in `lib/game` and `lib/world`; Zustand connects them to the scenes and persists version-19 saves. Phaser is dynamically imported on the client (WebGL, or Canvas on devices without WebGL) and destroyed when its view unmounts.
 
 The live development journal is available at **`/progress`**, including the actual animated character gallery and unresolved review findings. Eight heroes use 24 poses each (idle, three walking directions with horizontal mirroring, attack, hurt, guard and outcomes); four supporting archetypes and three individually drawn townspeople use 16 poses. Source-specific frame boundaries preserve complete figures across all 304 poses. Quest completion shows the giver's thanks and granted rewards; upgrades explain actual before/after stats. See [DESIGN.md](DESIGN.md) for architecture and scope, [environment provenance](public/art/README.md), [character prompts](public/art/characters/README.md), [named townspeople prompts](public/art/characters/townspeople.md), and [Qing's source prompt](public/art/characters/qing.md). Browser evidence stays under `review/`; regression screenshots are recreated under `test-results/`.
 
@@ -136,7 +136,7 @@ The live development journal is available at **`/progress`**, including the actu
 - **Tabs in the menu bar** — 👤 โปรไฟล์ · 🎒 ของในย่าม · 🥋 วิชาฝีมือ (manages BOTH move skills and arts in one slot system) · 🌾 วิชาชีพ · 📋 ภารกิจ · 📜 บันทึก.
 - **Toast notifications** at the top of the screen for every action result.
 - **Loading overlay** flashes briefly during gather / craft / rest / practice for tactile feedback.
-- **Persistent saves** via Zustand persist middleware (localStorage), with the existing migration chain and world-store **v19** schema. Three.js objects and movement state never enter the save.
+- **Persistent saves** via Zustand persist middleware (localStorage), with the existing migration chain and world-store **v19** schema. Renderer objects and movement state never enter the save.
 - **Game-over screen** on fatal battle loss; "เริ่มใหม่" wipes the world slice (character builds are independent).
 
 ## Project layout
@@ -150,7 +150,7 @@ app/                     Next.js app router
   debug/page.tsx         Dev sandbox (free-form battle, character setup)
 
 lib/
-  three/                 Client-only exploration/combat rendering, navigation and movement helpers
+  stage/                 Client-only Phaser exploration/combat runtimes, navigation and movement helpers
   characters/            Sprite atlas normalization, animation clips and archetypes
   game/                  Pure combat engine (no React, no I/O)
     data/                SKILLS, ARTS, EQUIPMENT, TIERS, sect list

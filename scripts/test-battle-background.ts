@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { BATTLE_BACKGROUNDS, resolveBattleBackground } from "../lib/three/battle-background";
+import { BATTLE_BACKGROUNDS, resolveBattleBackground } from "../lib/stage/battle-background";
 import { CAPITAL_TRAINING_OPPONENT_ID, CAPITAL_TRAINING_SCENE_ID } from "../lib/world/data/capital-training";
 import type { PendingBattle } from "../lib/world/types";
 

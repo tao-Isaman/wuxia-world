@@ -18,7 +18,7 @@ test("exploration: movement, menu pause, travel, NPC and save reload", async ({ 
   await page.screenshot({ path: "test-results/screenshots/title-desktop.png" });
   await start(page);
   const world = page.getByTestId("world-canvas");
-  await expect(page.locator('[data-renderer="three"] canvas')).toHaveCount(1);
+  await expect(page.locator('[data-renderer="phaser"] canvas')).toHaveCount(1);
   await page.screenshot({ path: "test-results/screenshots/world-desktop.png" });
   const before = Number(await world.getAttribute("data-player-x"));
   await world.focus();
@@ -59,11 +59,11 @@ test("exploration: movement, menu pause, travel, NPC and save reload", async ({ 
   await expect(world).toHaveAttribute("data-ready", "true");
   expect((await save(page)).currentSceneId).toBe("city_capital");
   expect((await save(page)).playerBuild.name).toBe("จอมยุทธ์");
-  await expect(page.locator('[data-renderer="three"] canvas')).toHaveCount(1);
+  await expect(page.locator('[data-renderer="phaser"] canvas')).toHaveCount(1);
   expect(errors).toEqual([]);
 });
 
-test("Three.js battle clock, skill input, result and return to world", async ({ page }) => {
+test("Phaser battle clock, skill input, result and return to world", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await start(page);
@@ -92,7 +92,7 @@ test("Three.js battle clock, skill input, result and return to world", async ({ 
   await page.getByRole("button", { name: /ดำเนินเรื่อง/ }).click();
   await expect(page.getByTestId("world-canvas")).toHaveAttribute("data-ready", "true");
   expect((await save(page)).pendingBattle).toBeNull();
-  await expect(page.locator('[data-renderer="three"] canvas')).toHaveCount(1);
+  await expect(page.locator('[data-renderer="phaser"] canvas')).toHaveCount(1);
   expect(errors).toEqual([]);
 });
 
@@ -148,8 +148,8 @@ test("portrait touch and landscape resize keep one usable canvas", async ({ page
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await expect(page.getByRole("button", { name: "เมนู", exact: true })).toBeVisible();
   await page.setViewportSize({ width: 844, height: 390 });
-  await expect(page.locator('[data-renderer="three"] canvas')).toHaveCount(1);
-  await expect.poll(async () => (await page.locator('[data-renderer="three"] canvas').boundingBox())?.width).toBe(844);
+  await expect(page.locator('[data-renderer="phaser"] canvas')).toHaveCount(1);
+  await expect.poll(async () => (await page.locator('[data-renderer="phaser"] canvas').boundingBox())?.width).toBe(844);
   await page.screenshot({ path: "test-results/screenshots/world-landscape.png" });
 });
 });
@@ -175,9 +175,9 @@ test("version 18 saves migrate and beast battles load the creature atlas", async
   expect(state.gold).toBe(321);
   expect(state.playerBuild.name).toBe("จอมยุทธ์");
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem("wusia-world-v1")!).version)).toBe(19);
-  await expect(page.locator('[data-renderer="three"] canvas')).toHaveCount(1);
+  await expect(page.locator('[data-renderer="phaser"] canvas')).toHaveCount(1);
   await page.setViewportSize({ width: 390, height: 844 });
-  await expect.poll(async () => (await page.locator('[data-renderer="three"] canvas').boundingBox())!.width).toBeLessThan(390);
+  await expect.poll(async () => (await page.locator('[data-renderer="phaser"] canvas').boundingBox())!.width).toBeLessThan(390);
   await page.screenshot({ path: "test-results/screenshots/battle-mobile.png" });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   expect(errors).toEqual([]);

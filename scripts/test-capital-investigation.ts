@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { evaluateCondition, getNpc, getNpcsAtLocation, getQuest, getScene, isQuestTurnInForNpc } from "../lib/world";
 import { LOCATION_MAPS } from "../lib/world/data/location-maps";
-import { planWorldPath, worldFootprints, worldPointBlocked, worldSegmentClear } from "../lib/three/world-navigation";
+import { planWorldPath, worldFootprints, worldPointBlocked, worldSegmentClear } from "../lib/stage/world-navigation";
 import { observeQuestReceipts, type QuestReceipt } from "../components/world/quest-completion-receipt-data";
 import type { DialogScene, WorldStateData } from "../lib/world/types";
 

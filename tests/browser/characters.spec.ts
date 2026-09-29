@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-test("all eight characters have distinct idle and walking frames in Three.js", async ({ page }) => {
+test("all eight characters have distinct idle and walking frames in Phaser", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/");
@@ -16,7 +16,7 @@ test("all eight characters have distinct idle and walking frames in Three.js", a
     }, id);
     await page.reload();
     await expect(world).toHaveAttribute("data-ready", "true");
-    await expect(world).toHaveAttribute("data-renderer", "three");
+    await expect(world).toHaveAttribute("data-renderer", "phaser");
     await expect(world).toHaveAttribute("data-player-motion", "idle");
     const idleFrame = await world.getAttribute("data-player-frame");
     await expect.poll(() => world.getAttribute("data-player-frame")).not.toBe(idleFrame);
@@ -53,8 +53,8 @@ test("reduced motion and WebGL recovery preserve one playable world", async ({ p
   await page.waitForTimeout(600);
   await expect(world).toHaveAttribute("data-player-frame", "0");
   await world.locator("canvas").evaluate((node: HTMLCanvasElement) => {
-    const gl = node.getContext("webgl2");
-    if (!gl) throw new Error("Expected a Three.js WebGL2 context");
+    const gl = node.getContext("webgl");
+    if (!gl) throw new Error("Expected a Phaser WebGL context");
     const extension = gl.getExtension("WEBGL_lose_context");
     if (!extension) throw new Error("WebGL context-loss simulation unavailable");
     extension.loseContext();

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { WorldPresentation, WorldRuntime } from "@/lib/three/types";
+import type { WorldPresentation, WorldRuntime } from "@/lib/stage/types";
 import { protectActorFromGuide } from "./world-overlay-placement";
 
 export function WorldCanvas({ presentation }: { presentation: WorldPresentation }) {
@@ -28,25 +28,29 @@ export function WorldCanvas({ presentation }: { presentation: WorldPresentation 
     setReady(false);
     setError(null);
     setShowPlaces(false);
-    void import("@/lib/three/world-runtime").then(({ createWorldRuntime }) => {
+    void import("@/lib/stage/world-runtime").then(({ createWorldRuntime }) => {
       if (disposed || !host.current) return;
       instance = createWorldRuntime(host.current, () => latest.current,
         () => { if (!disposed) setReady(true); },
         (message) => { if (!disposed) { setReady(false); setError(message); } });
       runtime.current = instance;
-    }).catch(() => { if (!disposed) setError("เริ่มฉากไม่ได้ กรุณาลองใหม่"); });
+    }).catch((cause: unknown) => {
+      // A chunk failed to download or Phaser could not boot — say so.
+      console.error("[world] renderer could not start:", cause);
+      if (!disposed) setError(`เริ่มฉากไม่ได้ กรุณาลองใหม่\n(${cause instanceof Error ? cause.message : String(cause)})`);
+    });
     return () => { disposed = true; runtime.current = null; instance?.destroy(); };
   }, [presentation.key, presentation.image, presentation.playerImage, signature, attempt]);
 
   return (
     <div className="world-viewport">
-      <div ref={host} className="three-host" data-testid="world-canvas" data-renderer="three" data-ready={ready}
+      <div ref={host} className="stage-host" data-testid="world-canvas" data-renderer="phaser" data-ready={ready}
         data-read-only={!!presentation.readOnly} role="region" aria-label={`แผนที่ ${presentation.name}`} tabIndex={presentation.readOnly ? -1 : 0} />
       {presentation.worldDescription && <span className="sr-only" role="status">{presentation.worldDescription}</span>}
       {(!ready || error) && (
         <div className="canvas-loading" role="status">
           <div className="pixel-panel p-6 text-center space-y-3">
-            <p>{error ?? "กำลังเดินทางเข้าสู่ยุทธภพ..."}</p>
+            <p className="whitespace-pre-line">{error ?? "กำลังเดินทางเข้าสู่ยุทธภพ..."}</p>
             {error && <button className="pixel-action" onClick={() => setAttempt((n) => n + 1)}>ลองใหม่</button>}
           </div>
         </div>

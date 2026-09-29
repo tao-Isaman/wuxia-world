@@ -1,4 +1,4 @@
-import * as THREE from "three";
+import type * as Phaser from "phaser";
 import {
   CHARACTER_CLIPS, characterId, npcCharacterId,
   type CharacterId,
@@ -9,6 +9,7 @@ import { createWorldLighting } from "./world-lighting";
 import { drawWorldBadge, warmWorldCharacter } from "./world-style";
 import { moveOnWorldGround, planWorldPath, worldFootprints } from "./world-navigation";
 import { initialWorldPlacement } from "./world-placement";
+import { addGridFrames, canvasTexture, createStage, drawCanvas, stagePixelRatio, type Stage } from "./phaser-stage";
 import {
   getRememberedMapPosition, rememberMapPosition, stepTowards,
   type Point, type WorldMarker, type WorldPresentation, type WorldRuntime,
@@ -23,12 +24,10 @@ const LOAD_TIMEOUT = 20_000;
 const UNIQUE_FRAME = 80;
 const UNIQUE_FEET = 78;
 const UNIQUE_NPC_SIZE = 50;
+const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 const toWorld = (point: Point): Point => ({ x: point.x * WIDTH / 100, y: point.y * HEIGHT / 100 });
 const toPercent = (point: Point): Point => ({ x: point.x / WIDTH * 100, y: point.y / HEIGHT * 100 });
-const clampPosition = (point: Point): Point => ({
-  x: THREE.MathUtils.clamp(point.x, 12, WIDTH - 12),
-  y: THREE.MathUtils.clamp(point.y, 18, HEIGHT - 12),
-});
+const clampPosition = (point: Point): Point => ({ x: clamp(point.x, 12, WIDTH - 12), y: clamp(point.y, 18, HEIGHT - 12) });
 
 export function worldInputBlocked(): boolean {
   const active = document.activeElement;
@@ -36,33 +35,32 @@ export function worldInputBlocked(): boolean {
     !!active?.matches('input, textarea, select, [contenteditable="true"]');
 }
 
-type Atlas = Awaited<ReturnType<typeof loadCharacterAtlas>>;
+type Atlas = { image: HTMLCanvasElement; frameSize: number; feetY: number };
 type CharacterVisual = {
-  sprite: THREE.Sprite;
-  texture: THREE.Texture;
+  image: Phaser.GameObjects.Image;
   frame: number;
   facingLeft: boolean;
-  columns: number;
-  rows: number;
+  frames: number;
   directional: boolean;
 };
+type TextSprite = { image: Phaser.GameObjects.Image; width: number; height: number };
 type MarkerVisual = {
-  group: THREE.Group;
-  hit: THREE.Mesh;
-  label: THREE.Sprite;
+  point: Point;
+  halo: Phaser.GameObjects.Image;
+  shadow?: Phaser.GameObjects.Image;
+  label: TextSprite;
   labelText: string;
   /** Hero's Adventure-style always-on name over an NPC (hidden while the boxed label shows). */
-  nameTag?: THREE.Sprite;
-  questMark?: THREE.Sprite;
+  nameTag?: TextSprite;
+  questMark?: Phaser.GameObjects.Image;
   /** Service / exit badge; fades when the player is far away. */
-  icon?: THREE.Sprite;
-  halo: THREE.Sprite;
+  icon?: Phaser.GameObjects.Image;
   character?: CharacterVisual;
   opacity: number;
   phase: number;
 };
 
-/** A flat orthographic world: map coordinates increase down, Three's Y increases up. */
+/** A flat 2D world in 960×640 map units, drawn by Phaser (WebGL, or Canvas on old devices). */
 export function createWorldRuntime(
   parent: HTMLElement,
   read: () => WorldPresentation,
@@ -75,41 +73,17 @@ export function createWorldRuntime(
   const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
   let reducedMotion = motionQuery.matches;
   const font = getComputedStyle(document.body).fontFamily;
-  const renderer = new THREE.WebGLRenderer({ alpha: false, antialias: false, powerPreference: "low-power" });
-  renderer.setClearColor(0x172723, 1);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-  renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.domElement.setAttribute("aria-hidden", "true");
-  renderer.domElement.style.width = "100%";
-  renderer.domElement.style.height = "100%";
-  renderer.domElement.style.display = "block";
-  renderer.domElement.style.imageRendering = "pixelated";
-  parent.appendChild(renderer.domElement);
-  parent.dataset.renderer = "three";
-
-  const scene = new THREE.Scene();
-  const lighting = createWorldLighting(scene, initial.key);
-  const camera = new THREE.OrthographicCamera(-WIDTH / 2, WIDTH / 2, HEIGHT / 2, -HEIGHT / 2, 0.1, 2000);
-  camera.position.set(WIDTH / 2, -HEIGHT / 2, 1000);
-  const raycaster = new THREE.Raycaster();
-  const pointer = new THREE.Vector2();
-  const groundPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
-  const groundPoint = new THREE.Vector3();
-  const textures = new Set<THREE.Texture>();
-  const materials = new Set<THREE.Material>();
-  const geometries = new Set<THREE.BufferGeometry>();
+  const lighting = createWorldLighting(initial.key);
   const markers = new Map<string, MarkerVisual>();
-  let questMarks: Record<"!" | "?", THREE.Texture> = {} as Record<"!" | "?", THREE.Texture>;
-  const props = new Map<string, THREE.Sprite>();
-  const bystanders = new Map<string, { group: THREE.Group; character: CharacterVisual }>();
-  const hitTargets: THREE.Mesh[] = [];
+  const props = new Map<string, Phaser.GameObjects.Image>();
+  const bystanders = new Map<string, { shadow: Phaser.GameObjects.Image; character: CharacterVisual }>();
   const keys = new Set<string>();
   const abort = new AbortController();
-  const particles: THREE.Sprite[] = [];
+  const particles: { image: Phaser.GameObjects.Image; x: number; y: number }[] = [];
+  let scene: Phaser.Scene | undefined;
   let disposed = false;
   let failed = false;
   let ready = false;
-  let animationFrame = 0;
   let lastTime = 0;
   let animationTime = 0;
   let motionTime = 0;
@@ -125,50 +99,41 @@ export function createWorldRuntime(
   let viewWidth = WIDTH;
   let viewHeight = HEIGHT;
   let viewScale = 1;
+  let textureSerial = 0;
   let player: CharacterVisual | undefined;
-  let actor: THREE.Group | undefined;
-  let targetRing: THREE.Sprite | undefined;
+  let actor: { shadow: Phaser.GameObjects.Image; ring: Phaser.GameObjects.Image; sign: Phaser.GameObjects.Image } | undefined;
+  let targetRing: Phaser.GameObjects.Image | undefined;
+  let veil: { image: Phaser.GameObjects.Image; texture: Phaser.Textures.CanvasTexture } | undefined;
   const position = placement.position;
   const cameraPosition: Point = { ...position };
 
+  const dpr = stagePixelRatio();
+  let markerQuestMarks: Record<"!" | "?", string> = { "!": "", "?": "" };
   const blocked = () => read().readOnly || read().paused || document.hidden || worldInputBlocked();
-  const resourceMaterial = <T extends THREE.Material>(material: T): T => { materials.add(material); return material; };
-  const resourceGeometry = <T extends THREE.BufferGeometry>(geometry: T): T => { geometries.add(geometry); return geometry; };
-  const canvasTexture = (canvas: HTMLCanvasElement): THREE.CanvasTexture => {
-    const texture = new THREE.CanvasTexture(canvas);
-    texture.colorSpace = THREE.SRGBColorSpace;
-    texture.magFilter = THREE.NearestFilter;
-    texture.minFilter = THREE.NearestFilter;
-    texture.generateMipmaps = false;
-    textures.add(texture);
-    return texture;
-  };
-  function drawnTexture(width: number, height: number, draw: (context: CanvasRenderingContext2D) => void) {
-    const canvas = document.createElement("canvas");
-    canvas.width = width;
-    canvas.height = height;
-    const context = canvas.getContext("2d");
-    if (!context) throw new Error("Canvas context unavailable");
-    context.imageSmoothingEnabled = false;
-    draw(context);
-    return canvasTexture(canvas);
-  }
-  function sprite(texture: THREE.Texture, width: number, height: number, opacity = 1) {
-    const material = resourceMaterial(new THREE.SpriteMaterial({
-      map: texture, transparent: true, depthTest: false, depthWrite: false, opacity, toneMapped: false,
-    }));
-    const result = new THREE.Sprite(material);
-    result.scale.set(width, height, 1);
-    return result;
-  }
-  function fail() {
+
+  parent.dataset.renderer = "phaser";
+  const stage: Stage = createStage(parent, "#172723", {
+    create(created) {
+      scene = created;
+      resize();
+      void initialize().catch(fail);
+    },
+    update: (time) => tick(time),
+    contextLost: () => fail("WebGL context lost"),
+    error: fail,
+  });
+
+  function fail(cause?: unknown) {
     if (disposed || failed) return;
     failed = true;
     ready = false;
-    cancelAnimationFrame(animationFrame);
     keys.clear();
     parent.style.cursor = "";
-    onError("โหลดฉากไม่สำเร็จ กรุณาลองใหม่");
+    // Keep the real reason visible (and in the console) so a player's report
+    // says what broke instead of only "failed to load".
+    const reason = cause instanceof Error ? cause.message : typeof cause === "string" ? cause : "";
+    if (cause) console.error("[world] scene failed:", cause);
+    onError(`โหลดฉากไม่สำเร็จ กรุณาลองใหม่${reason ? `\n(${reason})` : ""}`);
   }
   function loadImage(source: string): Promise<HTMLImageElement> {
     return new Promise((resolve, reject) => {
@@ -186,7 +151,7 @@ export function createWorldRuntime(
       const cancel = () => finish(new Error("World disposed"));
       const timeout = window.setTimeout(() => finish(new Error("Image load timed out")), LOAD_TIMEOUT);
       image.onload = () => finish();
-      image.onerror = () => finish(new Error("Image load failed"));
+      image.onerror = () => finish(new Error(`Image load failed: ${source}`));
       abort.signal.addEventListener("abort", cancel, { once: true });
       image.src = source;
     });
@@ -208,35 +173,56 @@ export function createWorldRuntime(
       if (cancel) abort.signal.removeEventListener("abort", cancel);
     }
   }
-  function makeCharacter(atlas: Atlas, size: number): CharacterVisual {
-    const texture = canvasTexture(atlas.image);
-    const body = sprite(texture, size, size);
-    warmWorldCharacter(body.material);
-    // Each actor owns its UV transform; all frames use the same authored foot baseline.
-    body.center.set(0.5, 1 - atlas.feetY / atlas.frameSize);
-    const columns = atlas.image.width / atlas.frameSize;
-    const rows = atlas.image.height / atlas.frameSize;
-    const visual = { sprite: body, texture, frame: -1, facingLeft: false, columns, rows, directional: rows * columns >= 24 };
+  function texture(canvas: HTMLCanvasElement, prefix = "t"): string {
+    const key = `${prefix}:${textureSerial++}`;
+    canvasTexture(scene!, key, canvas);
+    return key;
+  }
+  function image(key: string, depth: number, width?: number, height?: number): Phaser.GameObjects.Image {
+    const item = scene!.add.image(0, 0, key).setDepth(depth);
+    if (width !== undefined && height !== undefined) item.setDisplaySize(width, height);
+    return item;
+  }
+  /** One warmed atlas texture per character sheet, with numbered frames. */
+  function characterTexture(key: string, atlas: Atlas): { key: string; frames: number } {
+    const columns = Math.max(1, Math.round(atlas.image.width / atlas.frameSize));
+    const rows = Math.max(1, Math.round(atlas.image.height / atlas.frameSize));
+    if (!scene!.textures.exists(key)) addGridFrames(canvasTexture(scene!, key, warmWorldCharacter(atlas.image)), atlas.frameSize, columns, rows);
+    return { key, frames: columns * rows };
+  }
+  function makeCharacter(key: string, atlas: Atlas, size: number): CharacterVisual {
+    const sheet = characterTexture(key, atlas);
+    const body = scene!.add.image(0, 0, sheet.key, 0);
+    // All frames share the authored foot baseline.
+    body.setOrigin(0.5, atlas.feetY / atlas.frameSize).setDisplaySize(size, size);
+    const visual = { image: body, frame: -1, facingLeft: false, frames: sheet.frames, directional: sheet.frames >= 24 };
     setCharacterFrame(visual, 0, false);
     return visual;
   }
   function setCharacterFrame(character: CharacterVisual, frame: number, facingLeft = character.facingLeft) {
     if (character.frame === frame && character.facingLeft === facingLeft) return;
     // Single-frame (unique NPC) atlases always show their one pose.
-    const cell = frame % (character.columns * character.rows);
-    const column = cell % character.columns;
-    const row = Math.floor(cell / character.columns);
-    character.texture.repeat.set((facingLeft ? -1 : 1) / character.columns, 1 / character.rows);
-    character.texture.offset.set((column + (facingLeft ? 1 : 0)) / character.columns, 1 - (row + 1) / character.rows);
+    character.image.setFrame(frame % character.frames, false, false);
+    character.image.setFlipX(facingLeft);
     character.frame = frame;
     character.facingLeft = facingLeft;
   }
-  function labelTexture(text: string): THREE.Texture {
-    const measurement = document.createElement("canvas").getContext("2d");
-    if (!measurement) throw new Error("Canvas context unavailable");
-    measurement.font = `13px ${font}`;
-    const width = Math.ceil(measurement.measureText(text).width) + 18;
-    return drawnTexture(width, 27, (context) => {
+  /** Text drawn at device resolution; `width` / `height` are CSS pixels. */
+  function textSprite(width: number, height: number, draw: (context: CanvasRenderingContext2D) => void, depth: number): TextSprite {
+    const canvas = drawCanvas(width * dpr, height * dpr, (context) => { context.scale(dpr, dpr); draw(context); });
+    const item = image(texture(canvas, "text"), depth);
+    item.setOrigin(0.5, 1);
+    return { image: item, width, height };
+  }
+  function measure(text: string, weight = ""): number {
+    const context = document.createElement("canvas").getContext("2d");
+    if (!context) throw new Error("Canvas context unavailable");
+    context.font = `${weight}13px ${font}`;
+    return context.measureText(text).width;
+  }
+  function makeLabel(text: string): TextSprite {
+    const width = Math.ceil(measure(text)) + 18;
+    return textSprite(width, 27, (context) => {
       context.fillStyle = "rgba(16, 35, 30, 0.92)";
       context.fillRect(0, 0, width, 27);
       context.fillStyle = "rgba(221, 191, 126, 0.45)";
@@ -246,14 +232,11 @@ export function createWorldRuntime(
       context.textAlign = "center";
       context.textBaseline = "middle";
       context.fillText(text, width / 2, 13);
-    });
+    }, 10_000);
   }
-  function nameTagTexture(text: string): THREE.Texture {
-    const measurement = document.createElement("canvas").getContext("2d");
-    if (!measurement) throw new Error("Canvas context unavailable");
-    measurement.font = `600 13px ${font}`;
-    const width = Math.ceil(measurement.measureText(text).width) + 10;
-    return drawnTexture(width, 22, (context) => {
+  function makeNameTag(text: string): TextSprite {
+    const width = Math.ceil(measure(text, "600 ")) + 10;
+    return textSprite(width, 22, (context) => {
       context.font = `600 13px ${font}`;
       context.textAlign = "center";
       context.textBaseline = "middle";
@@ -263,10 +246,11 @@ export function createWorldRuntime(
       context.strokeText(text, width / 2, 11);
       context.fillStyle = "#8ee67a";
       context.fillText(text, width / 2, 11);
-    });
+    }, 9_010);
   }
-  function questMarkTexture(glyph: "!" | "?"): THREE.Texture {
-    return drawnTexture(22, 30, (context) => {
+  function questMarkCanvas(glyph: "!" | "?"): HTMLCanvasElement {
+    return drawCanvas(22 * dpr, 30 * dpr, (context) => {
+      context.scale(dpr, dpr);
       context.font = "900 26px serif";
       context.textAlign = "center";
       context.textBaseline = "middle";
@@ -277,17 +261,8 @@ export function createWorldRuntime(
       context.fillText(glyph, 11, 16);
     });
   }
-  function makeLabel(text: string): THREE.Sprite {
-    const texture = labelTexture(text);
-    const canvas = texture.image as HTMLCanvasElement;
-    const label = sprite(texture, canvas.width, canvas.height);
-    label.center.set(0.5, 0);
-    label.position.y = 38;
-    label.renderOrder = 10_000;
-    return label;
-  }
   function groundRing(color: string, filled = false) {
-    return drawnTexture(64, 24, (context) => {
+    return drawCanvas(64, 24, (context) => {
       context.strokeStyle = color;
       context.fillStyle = "rgba(232, 207, 139, 0.10)";
       context.lineWidth = 2;
@@ -300,7 +275,7 @@ export function createWorldRuntime(
     });
   }
   function markerBadge(kind: WorldMarker["kind"], icon?: string) {
-    return drawnTexture(32, 36, (context) => drawWorldBadge(context, kind === "exit", icon));
+    return drawCanvas(32, 36, (context) => drawWorldBadge(context, kind === "exit", icon));
   }
   function rememberPosition() {
     if (initial.rememberPosition !== false) rememberMapPosition(initial.key, toPercent(position));
@@ -309,16 +284,15 @@ export function createWorldRuntime(
     destination = null;
     waypoints = [];
     interaction = null;
-    if (targetRing) targetRing.visible = false;
+    targetRing?.setVisible(false);
   }
   function walk(point: Point, marker?: string) {
     lastInteraction = null;
     waypoints = planWorldPath(position, clampPosition(point), footprints);
-    destination = waypoints.at(-1) ?? null;
+    destination = waypoints[waypoints.length - 1] ?? null;
     if (!destination) { cancelWalk(); return; }
     interaction = marker ?? null;
-    targetRing?.position.set(destination.x, -destination.y, 0);
-    if (targetRing) targetRing.visible = true;
+    targetRing?.setPosition(destination.x, destination.y).setVisible(true);
   }
   function faceMovement(dx: number, dy: number) {
     if (Math.abs(dy) > Math.abs(dx)) playerFacing = dy < 0 ? "north" : "south";
@@ -336,16 +310,22 @@ export function createWorldRuntime(
       : { x: point.x, y: point.y + (marker.kind === "service" ? 34 : 10) };
     walk(approach, id);
   }
+  /** Camera centre in map units, snapped to whole device pixels. */
+  function cameraCenter(): Point {
+    const unit = viewScale * dpr;
+    return { x: Math.round(cameraPosition.x * unit) / unit, y: Math.round(cameraPosition.y * unit) / unit };
+  }
   function placeCamera(snap = false, dt = 0) {
-    const targetX = viewWidth >= WIDTH ? WIDTH / 2 : THREE.MathUtils.clamp(position.x, viewWidth / 2, WIDTH - viewWidth / 2);
-    const targetY = viewHeight >= HEIGHT ? HEIGHT / 2 : THREE.MathUtils.clamp(position.y, viewHeight / 2, HEIGHT - viewHeight / 2);
+    const targetX = viewWidth >= WIDTH ? WIDTH / 2 : clamp(position.x, viewWidth / 2, WIDTH - viewWidth / 2);
+    const targetY = viewHeight >= HEIGHT ? HEIGHT / 2 : clamp(position.y, viewHeight / 2, HEIGHT - viewHeight / 2);
     const follow = snap || reducedMotion ? 1 : 1 - Math.exp(-8 * dt);
     cameraPosition.x += (targetX - cameraPosition.x) * follow;
     cameraPosition.y += (targetY - cameraPosition.y) * follow;
-    const scale = Math.max(renderer.domElement.clientWidth, 1) / viewWidth;
-    camera.position.x = Math.round(cameraPosition.x * scale) / scale;
-    camera.position.y = -Math.round(cameraPosition.y * scale) / scale;
-    camera.updateMatrixWorld();
+    const camera = scene?.cameras.main;
+    if (!camera) return;
+    const center = cameraCenter();
+    camera.setZoom(viewScale * dpr);
+    camera.centerOn(center.x, center.y);
   }
   function resize() {
     if (disposed) return;
@@ -356,41 +336,50 @@ export function createWorldRuntime(
     viewScale = scale;
     viewWidth = width / scale;
     viewHeight = height / scale;
-    renderer.setSize(width, height, false);
-    camera.left = -viewWidth / 2;
-    camera.right = viewWidth / 2;
-    camera.top = viewHeight / 2;
-    camera.bottom = -viewHeight / 2;
-    camera.updateProjectionMatrix();
+    stage.fit(width, height);
     placeCamera(true);
-    if (ready) renderer.render(scene, camera);
   }
-  function pointRay(event: PointerEvent) {
-    const bounds = renderer.domElement.getBoundingClientRect();
-    pointer.set((event.clientX - bounds.left) / bounds.width * 2 - 1, 1 - (event.clientY - bounds.top) / bounds.height * 2);
-    raycaster.setFromCamera(pointer, camera);
+  /** CSS pixel inside the host → map units. */
+  function toMap(event: PointerEvent): Point {
+    const bounds = parent.getBoundingClientRect();
+    const center = cameraCenter();
+    return {
+      x: center.x - viewWidth / 2 + (event.clientX - bounds.left) / viewScale,
+      y: center.y - viewHeight / 2 + (event.clientY - bounds.top) / viewScale,
+    };
   }
-  function markerUnderPointer(): string | null {
-    const hits = raycaster.intersectObjects(hitTargets, false);
-    // Overlapping transparent hit areas resolve to the visually frontmost actor.
-    hits.sort((a, b) => b.object.renderOrder - a.object.renderOrder);
-    return hits[0]?.object.userData.markerId as string | undefined ?? null;
+  function toScreen(point: Point): Point {
+    const center = cameraCenter();
+    return { x: (point.x - center.x + viewWidth / 2) * viewScale, y: (point.y - center.y + viewHeight / 2) * viewScale };
+  }
+  function markerAt(point: Point): string | null {
+    let best: { id: string; y: number } | null = null;
+    for (const marker of read().markers) {
+      if (!markers.has(marker.id)) continue;
+      const at = toWorld(marker);
+      const width = marker.kind === "npc" ? 50 : 44;
+      const height = marker.kind === "npc" ? 76 : 52;
+      if (Math.abs(point.x - at.x) > width / 2 || point.y > at.y + 8 || point.y < at.y + 8 - height) continue;
+      // Overlapping hit areas resolve to the visually frontmost actor.
+      if (!best || at.y > best.y) best = { id: marker.id, y: at.y };
+    }
+    return best?.id ?? null;
   }
   function pointerMove(event: PointerEvent) {
     if (!ready || blocked()) { pointerLeave(); return; }
-    pointRay(event);
-    hovered = markerUnderPointer();
+    hovered = markerAt(toMap(event));
     parent.style.cursor = hovered ? "pointer" : "crosshair";
   }
   function pointerLeave() { hovered = null; parent.style.cursor = ""; }
   function pointerDown(event: PointerEvent) {
     if (!ready || event.button !== 0 || blocked()) return;
+    if (!(event.target instanceof HTMLCanvasElement)) return;
     event.preventDefault();
     parent.focus({ preventScroll: true });
-    pointRay(event);
-    const marker = markerUnderPointer();
+    const point = toMap(event);
+    const marker = markerAt(point);
     if (marker) { moveToMarker(marker); return; }
-    if (raycaster.ray.intersectPlane(groundPlane, groundPoint)) walk({ x: groundPoint.x, y: -groundPoint.y });
+    walk(point);
   }
   const movementKeys = new Set(["KeyW", "KeyA", "KeyS", "KeyD", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "KeyE"]);
   function keyDown(event: KeyboardEvent) {
@@ -403,7 +392,6 @@ export function createWorldRuntime(
   function loseFocus() { keys.clear(); interactPressed = false; cancelWalk(); lastTime = 0; }
   function visibilityChanged() { if (document.hidden) loseFocus(); else lastTime = 0; }
   function motionChanged() { reducedMotion = motionQuery.matches; }
-  function contextLost(event: Event) { event.preventDefault(); fail(); }
 
   async function initialize() {
     const playerId = characterId(initial.playerImage.match(/(?:^|\/)([mf][1-4])(?:\.|\/|$)/)?.[1] ?? "m1");
@@ -417,31 +405,28 @@ export function createWorldRuntime(
       Promise.all([...ids].map(async (id) => [id, await loadAtlas(id, id === playerId)] as const)),
       Promise.all((initial.props ?? []).map(async (prop) => [prop.id, await loadImage(prop.image)] as const)),
     ]);
-    if (disposed || failed) return;
+    if (disposed || failed || !scene) return;
     const atlases = new Map(atlasEntries);
     // Unique NPC sprites: one native-pixel pose drawn into an 80 px frame so
     // the figure height matches the archetype sheets at size UNIQUE_NPC_SIZE.
     const uniqueAtlases = new Map<string, Atlas>();
     await Promise.all(initial.markers.filter((marker) => marker.kind === "npc" && marker.sprite).map(async (marker) => {
       try {
-        const image = await loadImage(marker.sprite!);
-        const canvas = document.createElement("canvas");
-        canvas.width = canvas.height = UNIQUE_FRAME;
-        const context = canvas.getContext("2d");
-        if (!context) return;
-        context.imageSmoothingEnabled = false;
-        const scale = Math.min(1, (UNIQUE_FRAME - 2) / image.width, (UNIQUE_FEET - 1) / image.height);
-        const width = Math.round(image.width * scale), height = Math.round(image.height * scale);
-        context.drawImage(image, Math.round((UNIQUE_FRAME - width) / 2), UNIQUE_FEET - height, width, height);
-        uniqueAtlases.set(marker.id, { image: canvas, frameSize: UNIQUE_FRAME, feetY: UNIQUE_FEET, columns: 1, rows: 1, directional: false } as unknown as Atlas);
+        const source = await loadImage(marker.sprite!);
+        const canvas = drawCanvas(UNIQUE_FRAME, UNIQUE_FRAME, (context) => {
+          const scale = Math.min(1, (UNIQUE_FRAME - 2) / source.width, (UNIQUE_FEET - 1) / source.height);
+          const width = Math.round(source.width * scale), height = Math.round(source.height * scale);
+          context.drawImage(source, Math.round((UNIQUE_FRAME - width) / 2), UNIQUE_FEET - height, width, height);
+        });
+        uniqueAtlases.set(marker.id, { image: canvas, frameSize: UNIQUE_FRAME, feetY: UNIQUE_FEET });
       } catch { /* keep the archetype sheet for this NPC */ }
     }));
-    if (disposed || failed) return;
-    const backgroundTexture = drawnTexture(WIDTH, HEIGHT, (context) => context.drawImage(landscape, 0, 0, WIDTH, HEIGHT));
-    const background = new THREE.Mesh(resourceGeometry(new THREE.PlaneGeometry(WIDTH, HEIGHT)),
-      resourceMaterial(new THREE.MeshBasicMaterial({ map: backgroundTexture, depthTest: false, depthWrite: false, toneMapped: false })));
-    background.position.set(WIDTH / 2, -HEIGHT / 2, -1);
-    scene.add(background);
+    if (disposed || failed || !scene) return;
+    const backgroundCanvas = drawCanvas(WIDTH, HEIGHT, (context) => {
+      if (initial.mirrorImage) { context.translate(WIDTH, 0); context.scale(-1, 1); }
+      context.drawImage(landscape, 0, 0, WIDTH, HEIGHT);
+    });
+    image(texture(backgroundCanvas, "map"), -1).setOrigin(0, 0);
 
     for (const foreground of worldForeground(initial.key, initial.image)) {
       const points = foreground.contours.flat();
@@ -449,7 +434,7 @@ export function createWorldRuntime(
       const top = Math.floor(Math.min(...points.map((point) => point[1])));
       const width = Math.ceil(Math.max(...points.map((point) => point[0]))) - left;
       const height = Math.ceil(Math.max(...points.map((point) => point[1]))) - top;
-      const texture = drawnTexture(width, height, (context) => {
+      const cutout = drawCanvas(width, height, (context) => {
         context.beginPath();
         foreground.contours.forEach((contour) => {
           contour.forEach(([x, y], index) => {
@@ -458,152 +443,96 @@ export function createWorldRuntime(
           context.closePath();
         });
         context.clip();
-        context.drawImage(backgroundTexture.image as HTMLCanvasElement, -left, -top);
+        context.drawImage(backgroundCanvas, -left, -top);
       });
-      const cutout = sprite(texture, width, height);
-      cutout.position.set(left + width / 2, -(top + height / 2), 0);
-      cutout.renderOrder = 100 + foreground.depth * 10;
-      scene.add(cutout);
+      image(texture(cutout, "occluder"), 100 + foreground.depth * 10).setOrigin(0, 0).setPosition(left, top);
     }
 
-    const shadowTexture = drawnTexture(64, 24, (context) => {
+    const shadowKey = texture(drawCanvas(64, 24, (context) => {
       context.fillStyle = "rgba(29, 28, 15, 0.38)";
       context.beginPath(); context.ellipse(32, 12, 24, 7, 0, 0, Math.PI * 2); context.fill();
       context.fillStyle = "rgba(22, 23, 15, 0.22)";
       context.beginPath(); context.ellipse(32, 12, 17, 4, 0, 0, Math.PI * 2); context.fill();
-    });
-    const npcRing = groundRing("rgba(224, 196, 129, 0.72)");
+    }), "shadow");
+    const npcRing = texture(groundRing("rgba(224, 196, 129, 0.72)"), "ring");
     for (const prop of initial.props ?? []) {
-      const image = propImages.find(([id]) => id === prop.id)![1];
-      const texture = drawnTexture(128, 112, (context) => {
-        context.imageSmoothingEnabled = false;
-        context.drawImage(image, 0, 0, 128, 112);
-      });
-      const visual = sprite(texture, prop.width, prop.height);
-      visual.center.set(0.5, 0.05);
+      const source = propImages.find(([id]) => id === prop.id)![1];
+      const key = texture(drawCanvas(128, 112, (context) => context.drawImage(source, 0, 0, 128, 112)), "prop");
       const point = toWorld(prop);
-      visual.position.set(point.x, -point.y, 0);
-      visual.renderOrder = 100 + point.y * 10;
-      visual.visible = prop.visible !== false;
-      scene.add(visual);
+      const visual = image(key, 100 + point.y * 10, prop.width, prop.height).setOrigin(0.5, 0.95).setPosition(point.x, point.y);
+      visual.setVisible(prop.visible !== false);
       props.set(prop.id, visual);
     }
     for (const bystander of initial.bystanders ?? []) {
       const point = toWorld(bystander);
-      const group = new THREE.Group();
-      group.position.set(point.x, -point.y, 0);
-      const shadow = sprite(shadowTexture, 27, 10);
-      shadow.renderOrder = 1;
-      group.add(shadow);
-      const character = makeCharacter(atlases.get(characterId(bystander.characterId))!, bystander.size ?? 51);
-      character.sprite.renderOrder = 100 + point.y * 10;
-      group.add(character.sprite);
-      group.visible = bystander.visible !== false;
-      scene.add(group);
-      bystanders.set(bystander.id, { group, character });
+      const shadow = image(shadowKey, 1, 27, 10).setPosition(point.x, point.y);
+      const id = characterId(bystander.characterId);
+      const character = makeCharacter(`char:${id}`, atlases.get(id)!, bystander.size ?? 51);
+      character.image.setPosition(point.x, point.y).setDepth(100 + point.y * 10);
+      shadow.setVisible(bystander.visible !== false);
+      character.image.setVisible(bystander.visible !== false);
+      bystanders.set(bystander.id, { shadow, character });
     }
-    const exitBadge = markerBadge("exit");
-    questMarks = { "!": questMarkTexture("!"), "?": questMarkTexture("?") };
+    const exitBadge = texture(markerBadge("exit"), "badge");
+    const questMarks = { "!": texture(questMarkCanvas("!"), "quest"), "?": texture(questMarkCanvas("?"), "quest") };
     initial.markers.forEach((marker, index) => {
       const point = toWorld(marker);
-      const group = new THREE.Group();
-      group.position.set(point.x, -point.y, 0);
-      scene.add(group);
-      const halo = sprite(npcRing, 42, 16);
-      halo.renderOrder = 2;
-      halo.visible = false;
-      group.add(halo);
+      const halo = image(npcRing, 2, 42, 16).setPosition(point.x, point.y).setVisible(false);
       let character: CharacterVisual | undefined;
-      let markerIcon: THREE.Sprite | undefined;
+      let shadow: Phaser.GameObjects.Image | undefined;
+      let markerIcon: Phaser.GameObjects.Image | undefined;
       if (marker.kind === "npc") {
-        const shadow = sprite(shadowTexture, 28, 10);
-        shadow.renderOrder = 1;
-        group.add(shadow);
+        shadow = image(shadowKey, 1, 28, 10).setPosition(point.x, point.y);
         const unique = uniqueAtlases.get(marker.id);
-        character = unique ? makeCharacter(unique, UNIQUE_NPC_SIZE) : makeCharacter(atlases.get(npcCharacterId(marker.id))!, 54);
-        character.sprite.renderOrder = 100 + point.y * 10;
-        group.add(character.sprite);
+        const id = npcCharacterId(marker.id);
+        character = unique ? makeCharacter(`unique:${marker.id}`, unique, UNIQUE_NPC_SIZE) : makeCharacter(`char:${id}`, atlases.get(id)!, 54);
+        character.image.setPosition(point.x, point.y).setDepth(100 + point.y * 10);
       } else {
-        const icon = sprite(marker.kind === "exit" ? exitBadge : markerBadge(marker.kind, marker.icon), 24, 27);
-        icon.center.set(0.5, 0);
-        icon.position.y = 5;
-        icon.renderOrder = 8000;
-        group.add(icon);
-        markerIcon = icon;
+        const key = marker.kind === "exit" ? exitBadge : texture(markerBadge(marker.kind, marker.icon), "badge");
+        markerIcon = image(key, 8000, 24, 27).setOrigin(0.5, 1).setPosition(point.x, point.y - 5);
       }
       const label = makeLabel(marker.label);
-      label.visible = false;
-      group.add(label);
-      let nameTag: THREE.Sprite | undefined;
-      let questMark: THREE.Sprite | undefined;
+      label.image.setVisible(false);
+      let nameTag: TextSprite | undefined;
+      let questMark: Phaser.GameObjects.Image | undefined;
       if (character) {
-        const tagTexture = nameTagTexture(marker.label);
-        const tagCanvas = tagTexture.image as HTMLCanvasElement;
-        nameTag = sprite(tagTexture, tagCanvas.width, tagCanvas.height);
-        nameTag.center.set(0.5, 0);
-        nameTag.renderOrder = 9_000;
-        group.add(nameTag);
-        questMark = sprite(questMarks[marker.quest === "turnin" ? "?" : "!"], 22, 30);
-        questMark.center.set(0.5, 0);
-        questMark.renderOrder = 9_001;
-        questMark.visible = false;
-        group.add(questMark);
+        nameTag = makeNameTag(marker.label);
+        questMark = image(questMarks[marker.quest === "turnin" ? "?" : "!"], 9_011).setOrigin(0.5, 1).setVisible(false);
       }
-      const hitWidth = marker.kind === "npc" ? 50 : 44;
-      const hitHeight = marker.kind === "npc" ? 76 : 52;
-      const hit = new THREE.Mesh(resourceGeometry(new THREE.PlaneGeometry(hitWidth, hitHeight)),
-        resourceMaterial(new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false, colorWrite: false })));
-      hit.position.y = hitHeight / 2 - 8;
-      hit.renderOrder = point.y;
-      hit.userData.markerId = marker.id;
-      group.add(hit);
-      hitTargets.push(hit);
-      markers.set(marker.id, { group, hit, label, labelText: marker.label, nameTag, questMark, icon: markerIcon, halo, character, opacity: 1, phase: index * 0.47 });
+      markers.set(marker.id, { point, halo, shadow, label, labelText: marker.label, nameTag, questMark, icon: markerIcon, character, opacity: 1, phase: index * 0.47 });
     });
+    markerQuestMarks = questMarks;
 
-    actor = new THREE.Group();
-    actor.position.set(position.x, -position.y, 0);
-    const playerShadow = sprite(shadowTexture, 30, 11);
-    playerShadow.renderOrder = 1;
-    const playerRing = sprite(groundRing("rgba(225, 199, 139, 0.55)"), 28, 10);
-    playerRing.renderOrder = 2;
-    player = makeCharacter(atlases.get(playerId)!, 56);
-    actor.add(playerShadow, playerRing, player.sprite);
-    const playerSign = sprite(drawnTexture(9, 7, (context) => {
+    const playerShadow = image(shadowKey, 1, 30, 11);
+    const playerRing = image(texture(groundRing("rgba(225, 199, 139, 0.55)"), "ring"), 2, 28, 10);
+    player = makeCharacter(`char:${playerId}`, atlases.get(playerId)!, 56);
+    const playerSign = image(texture(drawCanvas(9, 7, (context) => {
       context.fillStyle = "#172b26"; context.fillRect(0, 0, 9, 3); context.fillRect(2, 3, 5, 2); context.fillRect(4, 5, 1, 2);
       context.fillStyle = "#fff0bd"; context.fillRect(1, 1, 7, 1); context.fillRect(2, 2, 5, 1); context.fillRect(3, 3, 3, 1); context.fillRect(4, 4, 1, 1);
-    }), 7, 5);
-    playerSign.position.y = 57;
-    playerSign.renderOrder = 10_001;
-    actor.add(playerSign);
-    scene.add(actor);
-    targetRing = sprite(groundRing("#f4d690"), 26, 12);
-    targetRing.renderOrder = 3;
-    targetRing.visible = false;
-    scene.add(targetRing);
+    }), "sign"), 10_001, 7, 5);
+    actor = { shadow: playerShadow, ring: playerRing, sign: playerSign };
+    targetRing = image(texture(groundRing("#f4d690"), "ring"), 3, 26, 12).setVisible(false);
 
-    const moteTexture = drawnTexture(4, 4, (context) => { context.fillStyle = "#f5e0ab"; context.fillRect(1, 0, 2, 4); });
+    lighting.update(read().time ?? 0, 0, reducedMotion);
+    const veilTexture = canvasTexture(scene, "veil", lighting.canvas);
+    veil = { image: image("veil", 8900).setOrigin(0, 0).setAlpha(lighting.opacity), texture: veilTexture };
+
+    const mote = texture(drawCanvas(4, 4, (context) => { context.fillStyle = "#f5e0ab"; context.fillRect(1, 0, 2, 4); }), "mote");
     for (let index = 0; index < 20; index++) {
-      const mote = sprite(moteTexture, index % 3 ? 2 : 3, index % 3 ? 2 : 4, 0.16);
-      mote.position.set((index * 137 + 37) % WIDTH, -((index * 73 + 67) % HEIGHT), 0);
-      mote.renderOrder = 9000;
-      mote.visible = !reducedMotion;
-      particles.push(mote);
-      scene.add(mote);
+      const item = image(mote, 9000, index % 3 ? 2 : 3, index % 3 ? 2 : 4).setAlpha(0.16).setVisible(!reducedMotion);
+      particles.push({ image: item, x: (index * 137 + 37) % WIDTH, y: (index * 73 + 67) % HEIGHT });
     }
     ready = true;
     resize();
     updatePresentation(0, false);
     reportPosition();
-    renderer.render(scene, camera);
     onReady();
-    animationFrame = requestAnimationFrame(tick);
   }
 
   function reportPosition() {
-    const projected = new THREE.Vector3(position.x, -position.y, 0).project(camera);
-    parent.dataset.playerScreenX = String((projected.x + 1) * parent.clientWidth / 2);
-    parent.dataset.playerScreenY = String((1 - projected.y) * parent.clientHeight / 2);
+    const screen = toScreen(position);
+    parent.dataset.playerScreenX = String(screen.x);
+    parent.dataset.playerScreenY = String(screen.y);
     parent.dataset.playerScreenHeight = String(56 * viewScale);
     const nearbyBounds: { left: number; top: number; width: number; height: number }[] = [];
     for (const marker of read().markers) {
@@ -611,17 +540,16 @@ export function createWorldRuntime(
       if (Math.hypot(position.x - point.x, position.y - point.y) > 105) continue;
       const visual = markers.get(marker.id);
       if (!visual) continue;
-      const projectedNpc = new THREE.Vector3(point.x, -point.y, 0).project(camera);
-      const x = (projectedNpc.x + 1) * parent.clientWidth / 2;
-      const y = (1 - projectedNpc.y) * parent.clientHeight / 2;
+      const { x, y } = toScreen(point);
       const height = 54 * viewScale;
       if (visual.character) nearbyBounds.push({ left: x - height * 0.42 - 8,
         top: y - height - 8, width: height * 0.84 + 16, height: height + 16 });
-      if (visual.label.visible) {
-        const width = visual.label.scale.x * viewScale;
-        const labelHeight = visual.label.scale.y * viewScale;
-        nearbyBounds.push({ left: x + visual.label.position.x * viewScale - width / 2 - 4,
-          top: y - visual.label.position.y * viewScale - labelHeight - 4, width: width + 8, height: labelHeight + 8 });
+      if (visual.label.image.visible) {
+        const label = visual.label.image;
+        const box = toScreen({ x: label.x, y: label.y });
+        const width = label.displayWidth * viewScale;
+        const labelHeight = label.displayHeight * viewScale;
+        nearbyBounds.push({ left: box.x - width / 2 - 4, top: box.y - labelHeight - 4, width: width + 8, height: labelHeight + 8 });
       }
     }
     parent.dataset.nearbyScreenBounds = JSON.stringify(nearbyBounds);
@@ -633,8 +561,10 @@ export function createWorldRuntime(
   }
   function updatePresentation(dt: number, moving: boolean) {
     if (!actor || !player) return;
-    actor.position.set(position.x, -position.y, 0);
-    player.sprite.renderOrder = 101 + position.y * 10;
+    actor.shadow.setPosition(position.x, position.y);
+    actor.ring.setPosition(position.x, position.y);
+    actor.sign.setPosition(position.x, position.y - 57);
+    player.image.setPosition(position.x, position.y).setDepth(101 + position.y * 10);
     const nextMotion = moving ? "walk" : "idle";
     if (playerMotion !== nextMotion) { playerMotion = nextMotion; motionTime = 0; }
     const vertical = player.directional && (playerFacing === "north" || playerFacing === "south");
@@ -645,20 +575,18 @@ export function createWorldRuntime(
     parent.dataset.playerFrame = String(frame);
     parent.dataset.playerFacing = playerFacing;
     const presentation = read();
-    for (const prop of presentation.props ?? []) {
-      const visual = props.get(prop.id);
-      if (visual) visual.visible = prop.visible !== false;
-    }
+    for (const prop of presentation.props ?? []) props.get(prop.id)?.setVisible(prop.visible !== false);
     for (const [index, bystander] of (presentation.bystanders ?? []).entries()) {
       const visual = bystanders.get(bystander.id);
       if (!visual) continue;
-      visual.group.visible = bystander.visible !== false;
+      visual.shadow.setVisible(bystander.visible !== false);
+      visual.character.image.setVisible(bystander.visible !== false);
       const idle = CHARACTER_CLIPS.idle;
-      const frame = idle.frames[reducedMotion ? 0 : Math.floor((animationTime + index * 0.37) * idle.fps) % idle.frames.length];
-      setCharacterFrame(visual.character, frame, !!bystander.facingLeft);
+      const idleFrame = idle.frames[reducedMotion ? 0 : Math.floor((animationTime + index * 0.37) * idle.fps) % idle.frames.length];
+      setCharacterFrame(visual.character, idleFrame, !!bystander.facingLeft);
     }
     parent.dataset.visibleProps = (presentation.props ?? []).filter(prop => prop.visible !== false).map(prop => prop.id).join(",");
-    const currentMarkers = read().markers;
+    const currentMarkers = presentation.markers;
     let nearest: string | null = null;
     let nearestDistance = 105;
     for (const marker of currentMarkers) {
@@ -669,75 +597,73 @@ export function createWorldRuntime(
     const lastMarker = currentMarkers.find((marker) => marker.id === lastInteraction);
     if (!lastMarker || Math.hypot(position.x - toWorld(lastMarker).x, position.y - toWorld(lastMarker).y) > 90) lastInteraction = null;
     const focusedMarker = hovered ?? interaction ?? lastInteraction ?? nearest;
+    const center = cameraCenter();
+    const viewLeft = center.x - viewWidth / 2, viewRight = center.x + viewWidth / 2;
     for (const marker of currentMarkers) {
       const visual = markers.get(marker.id);
       if (!visual) continue;
       const point = toWorld(marker);
+      visual.point = point;
       const distance = Math.hypot(position.x - point.x, position.y - point.y);
       const selected = hovered === marker.id || interaction === marker.id;
-      visual.group.position.set(point.x, -point.y, 0);
-      visual.hit.renderOrder = point.y;
+      visual.halo.setPosition(point.x, point.y);
+      visual.shadow?.setPosition(point.x, point.y);
+      visual.icon?.setPosition(point.x, point.y - 5);
       if (visual.labelText !== marker.label) {
-        const oldTexture = visual.label.material.map;
-        const texture = labelTexture(marker.label);
-        visual.label.material.map = texture;
-        oldTexture?.dispose();
-        if (oldTexture) textures.delete(oldTexture);
+        const old = visual.label.image;
+        const oldKey = old.texture.key;
+        visual.label = makeLabel(marker.label);
+        old.destroy();
+        scene?.textures.remove(oldKey);
         visual.labelText = marker.label;
       }
-      const labelWidth = (visual.label.material.map!.image as HTMLCanvasElement).width;
-      const labelScale = Math.min(1, (parent.clientWidth - 24) / labelWidth) / viewScale;
-      visual.label.scale.set(labelWidth * labelScale, 27 * labelScale, 1);
-      visual.label.visible = marker.id === focusedMarker;
-      visual.label.position.y = visual.character ? 58 : 33;
+      const label = visual.label;
+      const labelScale = Math.min(1, (parent.clientWidth - 24) / label.width) / viewScale;
+      const labelWidth = label.width * labelScale, labelHeight = label.height * labelScale;
+      label.image.setDisplaySize(labelWidth, labelHeight);
+      label.image.setVisible(marker.id === focusedMarker);
+      let lift = visual.character ? 58 : 33;
       // A nearby sign's caption stays above the hero instead of crossing their torso.
-      if (Math.abs(position.x - point.x) < visual.label.scale.x / 2 + 20 && distance < 90) {
-        visual.label.position.y = Math.max(visual.label.position.y, point.y - position.y + 60);
-      }
-      const halfLabel = visual.label.scale.x / 2;
-      visual.label.position.x = THREE.MathUtils.clamp(point.x, camera.position.x - viewWidth / 2 + halfLabel + 6,
-        camera.position.x + viewWidth / 2 - halfLabel - 6) - point.x;
+      if (Math.abs(position.x - point.x) < labelWidth / 2 + 20 && distance < 90) lift = Math.max(lift, point.y - position.y + 60);
+      label.image.setPosition(clamp(point.x, viewLeft + labelWidth / 2 + 6, viewRight - labelWidth / 2 - 6), point.y - lift);
       if (visual.nameTag) {
-        const tagCanvas = visual.nameTag.material.map!.image as HTMLCanvasElement;
-        const tagScale = 1 / viewScale;
-        visual.nameTag.scale.set(tagCanvas.width * tagScale, tagCanvas.height * tagScale, 1);
-        visual.nameTag.position.y = 56;
-        visual.nameTag.visible = !visual.label.visible;
-        const halfTag = visual.nameTag.scale.x / 2;
-        visual.nameTag.position.x = THREE.MathUtils.clamp(point.x, camera.position.x - viewWidth / 2 + halfTag + 4,
-          camera.position.x + viewWidth / 2 - halfTag - 4) - point.x;
+        const tag = visual.nameTag;
+        const tagWidth = tag.width / viewScale;
+        tag.image.setDisplaySize(tagWidth, tag.height / viewScale);
+        tag.image.setVisible(!label.image.visible);
+        tag.image.setPosition(clamp(point.x, viewLeft + tagWidth / 2 + 4, viewRight - tagWidth / 2 - 4), point.y - 56);
       }
       if (visual.questMark) {
         const mark = marker.quest === "turnin" ? "?" : "!";
-        if (visual.questMark.material.map !== questMarks[mark]) visual.questMark.material.map = questMarks[mark];
+        if (visual.questMark.texture.key !== markerQuestMarks[mark]) visual.questMark.setTexture(markerQuestMarks[mark]);
         const bob = reducedMotion ? 0 : Math.sin(animationTime * 3 + visual.phase) * 2;
-        visual.questMark.scale.set(22 / viewScale, 30 / viewScale, 1);
-        visual.questMark.position.y = 56 + (visual.label.visible ? visual.label.scale.y : 22 / viewScale) + 2 + bob;
-        visual.questMark.visible = !!marker.quest;
+        visual.questMark.setDisplaySize(22 / viewScale, 30 / viewScale);
+        visual.questMark.setPosition(point.x, point.y - (56 + (label.image.visible ? labelHeight : 22 / viewScale) + 2 + bob));
+        visual.questMark.setVisible(!!marker.quest);
       }
-      visual.halo.visible = selected || (marker.kind === "npc" && distance < 80);
+      visual.halo.setVisible(selected || (marker.kind === "npc" && distance < 80));
       if (visual.character) {
         const idle = CHARACTER_CLIPS.idle;
         const idleFrame = reducedMotion ? idle.frames[0] : idle.frames[Math.floor((animationTime + visual.phase) * idle.fps) % idle.frames.length];
-        const nearby = Math.hypot(position.x - point.x, position.y - point.y) < 90;
-        setCharacterFrame(visual.character, idleFrame, nearby ? position.x < point.x : visual.character.facingLeft);
-        visual.character.sprite.renderOrder = 100 + point.y * 10;
+        setCharacterFrame(visual.character, idleFrame, distance < 90 ? position.x < point.x : visual.character.facingLeft);
+        visual.character.image.setPosition(point.x, point.y).setDepth(100 + point.y * 10);
       }
       const opacity = marker.disabled ? 0.5 : 1;
       if (visual.opacity !== opacity) {
-        visual.group.traverse((object) => { if (object instanceof THREE.Sprite) object.material.opacity = opacity; });
+        for (const item of [visual.halo, visual.shadow, visual.label.image, visual.nameTag?.image, visual.questMark, visual.character?.image]) item?.setAlpha(opacity);
         visual.opacity = opacity;
       }
       // Keep the painted map in front: far-off service/exit badges recede.
-      if (visual.icon) visual.icon.material.opacity = opacity * (selected || distance < 230 ? 1 : 0.5);
+      visual.icon?.setAlpha(opacity * (selected || distance < 230 ? 1 : 0.5));
     }
     particles.forEach((particle, index) => {
-      particle.visible = !reducedMotion;
+      particle.image.setVisible(!reducedMotion);
       if (reducedMotion) return;
-      particle.position.x = (particle.position.x + dt * (3 + index % 3)) % WIDTH;
-      particle.position.y -= dt * 2;
-      if (particle.position.y < -HEIGHT) particle.position.y = 0;
-      particle.material.opacity = 0.10 + Math.sin(animationTime * 0.7 + index) ** 2 * 0.10;
+      particle.x = (particle.x + dt * (3 + index % 3)) % WIDTH;
+      particle.y += dt * 2;
+      if (particle.y > HEIGHT) particle.y = 0;
+      particle.image.setPosition(particle.x, particle.y);
+      particle.image.setAlpha(0.10 + Math.sin(animationTime * 0.7 + index) ** 2 * 0.10);
     });
   }
   function tick(time: number) {
@@ -802,18 +728,18 @@ export function createWorldRuntime(
         }
       }
       updatePresentation(ambientActive ? dt : 0, moving);
-      lighting.update(read().time ?? 0, animationTime, reducedMotion);
+      if (veil) {
+        if (lighting.update(read().time ?? 0, animationTime, reducedMotion)) veil.texture.refresh();
+        veil.image.setAlpha(lighting.opacity);
+      }
       placeCamera(false, dt);
       if (time - lastPositionReport > 150) { reportPosition(); lastPositionReport = time; }
-      renderer.render(scene, camera);
-      animationFrame = requestAnimationFrame(tick);
-    } catch { fail(); }
+    } catch (error) { fail(error); }
   }
 
-  renderer.domElement.addEventListener("pointermove", pointerMove);
-  renderer.domElement.addEventListener("pointerleave", pointerLeave);
-  renderer.domElement.addEventListener("pointerdown", pointerDown);
-  renderer.domElement.addEventListener("webglcontextlost", contextLost);
+  parent.addEventListener("pointermove", pointerMove);
+  parent.addEventListener("pointerleave", pointerLeave);
+  parent.addEventListener("pointerdown", pointerDown);
   window.addEventListener("keydown", keyDown);
   window.addEventListener("keyup", keyUp);
   window.addEventListener("blur", loseFocus);
@@ -821,8 +747,6 @@ export function createWorldRuntime(
   motionQuery.addEventListener("change", motionChanged);
   const observer = new ResizeObserver(resize);
   observer.observe(parent);
-  resize();
-  void initialize().catch(fail);
 
   return {
     interact: moveToMarker,
@@ -830,7 +754,6 @@ export function createWorldRuntime(
       if (disposed) return;
       disposed = true;
       ready = false;
-      cancelAnimationFrame(animationFrame);
       abort.abort();
       observer.disconnect();
       window.removeEventListener("keydown", keyDown);
@@ -838,18 +761,10 @@ export function createWorldRuntime(
       window.removeEventListener("blur", loseFocus);
       document.removeEventListener("visibilitychange", visibilityChanged);
       motionQuery.removeEventListener("change", motionChanged);
-      renderer.domElement.removeEventListener("pointermove", pointerMove);
-      renderer.domElement.removeEventListener("pointerleave", pointerLeave);
-      renderer.domElement.removeEventListener("pointerdown", pointerDown);
-      renderer.domElement.removeEventListener("webglcontextlost", contextLost);
-      textures.forEach((texture) => texture.dispose());
-      materials.forEach((material) => material.dispose());
-      geometries.forEach((geometry) => geometry.dispose());
-      lighting.destroy();
-      scene.clear();
-      renderer.dispose();
-      renderer.forceContextLoss();
-      renderer.domElement.remove();
+      parent.removeEventListener("pointermove", pointerMove);
+      parent.removeEventListener("pointerleave", pointerLeave);
+      parent.removeEventListener("pointerdown", pointerDown);
+      stage.destroy();
       parent.style.cursor = "";
       delete parent.dataset.playerX;
       delete parent.dataset.playerY;

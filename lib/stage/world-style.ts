@@ -1,17 +1,36 @@
-import type { SpriteMaterial } from "three";
-
-/** Match the painted world's warm light without changing source artwork or alpha. */
-export function warmWorldCharacter(material: SpriteMaterial): void {
-  material.onBeforeCompile = (shader) => {
-    shader.fragmentShader = shader.fragmentShader.replace("#include <map_fragment>", `
-      #include <map_fragment>
-      float inkLight = dot(diffuseColor.rgb, vec3(0.2126, 0.7152, 0.0722));
-      vec3 warmInk = inkLight * vec3(1.06, 1.0, 0.86);
-      diffuseColor.rgb = mix(warmInk, diffuseColor.rgb, 0.78) * vec3(0.97, 0.94, 0.86);
-      diffuseColor.rgb += vec3(0.005, 0.004, 0.002);
-    `);
+/**
+ * Match the painted world's warm light without changing source artwork or
+ * alpha. Baked once into the atlas pixels (in linear light, as the old shader
+ * did) so both the WebGL and Canvas renderers show the same ink.
+ */
+export function warmWorldCharacter(source: HTMLCanvasElement): HTMLCanvasElement {
+  const canvas = document.createElement("canvas");
+  canvas.width = source.width;
+  canvas.height = source.height;
+  const context = canvas.getContext("2d", { willReadFrequently: true });
+  if (!context) return source;
+  context.drawImage(source, 0, 0);
+  const image = context.getImageData(0, 0, canvas.width, canvas.height);
+  const pixels = image.data;
+  const toLinear = new Float32Array(256);
+  for (let i = 0; i < 256; i++) {
+    const c = i / 255;
+    toLinear[i] = c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  }
+  const toSrgb = (c: number) => {
+    const v = Math.min(1, Math.max(0, c));
+    return Math.round((v <= 0.0031308 ? v * 12.92 : 1.055 * v ** (1 / 2.4) - 0.055) * 255);
   };
-  material.customProgramCacheKey = () => "world-warm-ink-v1";
+  for (let i = 0; i < pixels.length; i += 4) {
+    if (!pixels[i + 3]) continue;
+    const r = toLinear[pixels[i]], g = toLinear[pixels[i + 1]], b = toLinear[pixels[i + 2]];
+    const ink = r * 0.2126 + g * 0.7152 + b * 0.0722;
+    pixels[i] = toSrgb((ink * 1.06 * 0.22 + r * 0.78) * 0.97 + 0.005);
+    pixels[i + 1] = toSrgb((ink * 0.22 + g * 0.78) * 0.94 + 0.004);
+    pixels[i + 2] = toSrgb((ink * 0.86 * 0.22 + b * 0.78) * 0.86 + 0.002);
+  }
+  context.putImageData(image, 0, 0);
+  return canvas;
 }
 
 /** Small semantic map signs use a shared muted palette, not inventory thumbnails. */

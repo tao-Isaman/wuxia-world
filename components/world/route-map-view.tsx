@@ -3,7 +3,7 @@ import type { RouteMapDef, RouteScene } from "@/lib/world";
 import { evaluateCondition, playerBodySprite } from "@/lib/world";
 import { useWorldStore, TRAVEL_STAMINA_COST } from "@/store/world-store";
 import { WorldCanvas } from "@/components/game/world-canvas";
-import type { WorldMarker } from "@/lib/three/types";
+import type { WorldMarker } from "@/lib/stage/types";
 import { toast } from "@/store/toast-store";
 import { MapHud } from "./map-hud";
 import { MenuBar } from "./menu-bar";
@@ -30,7 +30,7 @@ export function RouteMapView({ scene, map }: { scene: RouteScene; map: RouteMapD
       current.gotoScene(back);
     } });
   return <div className="fixed inset-0 z-40 !mt-0 bg-[#172723]">
-    <WorldCanvas presentation={{ key: scene.id, name: scene.label, image: map.image,
+    <WorldCanvas presentation={{ key: scene.id, name: scene.label, image: map.image, mirrorImage: map.mirror,
       time: state.time, playerImage: playerBodySprite(state.playerBodyId), spawn: map.spawn, markers }} />
     <MapHud /><JourneyGuide /><MenuBar hud />
   </div>;
