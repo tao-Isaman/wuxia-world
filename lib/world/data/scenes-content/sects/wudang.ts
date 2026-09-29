@@ -158,7 +158,9 @@ export const SCENES_WUDANG: readonly Scene[] = [
       { t: "dialogue", speaker: "ชิงซวี่", text: "ข้าไม่อยากทำร้ายเขา แต่ก็ห้ามไม่ได้ เจ้าช่วยได้ไหม?" },
     ],
     choices: [
-      { text: "รับภารกิจ", next: "sect_wudang" },
+      // Stage 0 ("find_traitor") has no autoAdvance: the search itself is
+      // this beat, and the decide scene advances the quest.
+      { text: "ออกตามหาลูกศิษย์ผู้หลงทาง", next: "qs_qst_wudang_traitor_disciple_decide" },
     ],
   },
 

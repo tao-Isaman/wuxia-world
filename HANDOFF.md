@@ -122,9 +122,20 @@ Status of the open items above:
    Perimeter walls, gates, paths and plazas stay open by rule. Author or adjust a map with
    `bun scripts/map-collision-tool.ts <id> <json> <overlay.png>`. `test:navigation` proves that on every
    painted map the spawn is open and every NPC, exit and service is reachable (walk ends within 100 px).
-   Still unverified: a full campaign playthrough end to end. `scripts/audit-quest-flow.ts` reports
-   false-positive "no-finish-path" entries for quests turned in by talking to an NPC (for example, the
-   ledger quest, which e2e proves completes).
+   **Campaign completability: verified structurally.** `bun run test:quests` runs
+   `scripts/audit-quest-completion.ts`, which traces every quest's real engine path: start (giver popup,
+   sect popup, or `startQuest`), each stage (`autoAdvance` or a reachable `advanceQuest`/`finishQuest`), and
+   turn-in. It also checks that items, opponents, NPCs and locations are reachable from `home_player`.
+   It found and fixed:
+   - The foothill tutorial area (`village`, `tavern`, `viewpoint`, the elder, `first_steps`) was orphaned.
+     It is now linked two-way with `home_player`.
+   - Silk was never sold. The Suzhou market now sells it (3 sect quests and 2 recipes need it).
+   - `qst_wudang_traitor_disciple`, `qst_shaolin_proof_of_heart` and `qst_shaolin_wudang_joint` stalled at
+     stage 0 because their advance scenes were unlinked. Old saves stuck there can abandon and re-accept.
+   Result: all 276 quests can be started, progressed and finished, and all 101 locations are reachable.
+   `scripts/test-quest-dead-ends.ts` replays the fixes through the real store. The older
+   `audit-quest-flow.ts` heuristic still lists false positives for NPC turn-ins. A manual playthrough of every
+   quest in a browser has not been done; the structural audit plus e2e opening/investigation flows stand in for it.
 
 New benchmark-driven UI (plus a brief "ถึงตาเจ้า" turn callout when the player's turn opens, hidden under reduced motion):
 - Dialogue: large face-cropped speaker bust column (188 px desktop, 104 px phone, 132 px short landscape),
