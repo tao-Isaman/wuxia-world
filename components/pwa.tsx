@@ -66,7 +66,7 @@ function useInstallMode(): InstallMode {
  * iOS Safari (no prompt API) gets the Share → Add to Home Screen steps.
  * Renders nothing once installed or where installing is not offered.
  */
-export function InstallGameButton({ className = "" }: { className?: string }) {
+export function InstallGameButton({ className = "", variant = "pill" }: { className?: string; variant?: "pill" | "icon" }) {
   const mode = useInstallMode();
   const [hint, setHint] = useState(false);
   if (!mode) return null;
@@ -79,16 +79,29 @@ export function InstallGameButton({ className = "" }: { className?: string }) {
     deferred = null;
     notify();
   };
+  const hintText = (
+    <p className="pwa-install-hint" role="status">
+      แตะปุ่ม <b>แชร์</b> <span aria-hidden="true">(□↑)</span> ของ Safari แล้วเลือก <b>เพิ่มไปยังหน้าจอโฮม</b> เพื่อเล่นแบบเต็มจอ
+    </p>
+  );
+  if (variant === "icon") {
+    return (
+      <span className={`pwa-install pwa-install--icon ${className}`}>
+        <button type="button" className="hud-icon" onClick={install} aria-label="ติดตั้งเกมลงเครื่อง" title="ติดตั้งเกมลงเครื่อง"
+          aria-expanded={mode === "ios" ? hint : undefined}>
+          <span className="hud-icon-glyph" aria-hidden="true">⬇</span>
+          <span className="hud-icon-label" aria-hidden="true">ติดตั้ง</span>
+        </button>
+        {mode === "ios" && hint && hintText}
+      </span>
+    );
+  }
   return (
     <div className={`pwa-install ${className}`}>
       <button type="button" className="pwa-install-button" onClick={install} aria-expanded={mode === "ios" ? hint : undefined}>
         <span aria-hidden="true">⬇</span> ติดตั้งเกมลงเครื่อง
       </button>
-      {mode === "ios" && hint && (
-        <p className="pwa-install-hint" role="status">
-          แตะปุ่ม <b>แชร์</b> <span aria-hidden="true">(□↑)</span> ของ Safari แล้วเลือก <b>เพิ่มไปยังหน้าจอโฮม</b> เพื่อเล่นแบบเต็มจอ
-        </p>
-      )}
+      {mode === "ios" && hint && hintText}
     </div>
   );
 }

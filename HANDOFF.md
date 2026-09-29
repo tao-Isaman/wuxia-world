@@ -232,3 +232,11 @@ Requested by the user after an in-browser error report ("rewrite it to be Phaser
   already in localStorage, and installed apps now request persistent storage.
 - Install control on the title screen and in the เมนู window (iOS shows Add-to-Home-Screen steps).
 - Verified: Chrome reports no installability errors; e2e `pwa.spec.ts` reloads the world offline (12/12 e2e pass).
+
+## Wave 16: mobile-first HUD
+
+- Removed the เมนู command box, the ringed minimap and the floating journey guide ("เตรียมเดินทางครั้งต่อไป").
+- Top icon bar for every menu section (`hud-iconbar`), floating left-thumb joystick (`touch-stick.tsx`,
+  runtime `setStick` / `tapAt`), and a context action button when the hero stands next to an NPC, sign or exit
+  (runtime `onNearby`). Styles in `app/mobile-hud.css`.
+- E2E: new `mobile-controls.spec.ts` (icons, joystick drag, action button); 13/13 pass.

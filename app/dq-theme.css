@@ -132,10 +132,6 @@ body:has(.hud-menu, .game-modal) [data-radix-popper-content-wrapper] > * { borde
   color: #f7eedb; background: #2a1611ea; border: 2px solid #9a7442; border-radius: 6px;
   box-shadow: inset 0 0 0 1px #e2bd6a2e, 0 0 0 1px #140a07, 0 4px 12px #0a05038c;
 }
-.journey-guide { color: #f4ead2; background: #2a1611e8; border: 2px solid #9a7442; border-left: 2px solid #9a7442; border-radius: 6px; box-shadow: inset 0 0 0 1px #e2bd6a2e, 0 0 0 1px #140a07; }
-.journey-guide-toggle { color: #e2bd6a; } .journey-guide-toggle:hover { background: #ffffff10; }
-.journey-guide-content h2 { color: #fff4d6; }
-.journey-guide-description { color: #e6dcc2; } .journey-guide-action { color: #f3cf7c; } .journey-guide-note { color: #cbbd9c; }
 .world-places button:hover, .world-places button:focus-visible { background: #e2bd6a22; }
 
 /* Encounter: the confrontation box. */

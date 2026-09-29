@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { WorldPresentation, WorldRuntime } from "@/lib/stage/types";
-import { protectActorFromGuide } from "./world-overlay-placement";
+import type { WorldMarker, WorldPresentation, WorldRuntime } from "@/lib/stage/types";
+import { TouchStick } from "./touch-stick";
 
 export function WorldCanvas({ presentation }: { presentation: WorldPresentation }) {
   const host = useRef<HTMLDivElement>(null);
@@ -13,14 +13,11 @@ export function WorldCanvas({ presentation }: { presentation: WorldPresentation 
   const [error, setError] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
   const [showPlaces, setShowPlaces] = useState(false);
+  const [nearby, setNearby] = useState<string | null>(null);
   const signature = presentation.markers.map((m) => `${m.id}:${m.image ?? m.icon ?? ""}`).join("|") +
     (presentation.props ?? []).map((prop) => `${prop.id}:${prop.image}`).join("|") +
     (presentation.bystanders ?? []).map((actor) => `${actor.id}:${actor.characterId}`).join("|");
   useEffect(() => { if (presentation.readOnly) setShowPlaces(false); }, [presentation.readOnly]);
-  useEffect(() => {
-    if (!ready || !host.current) return;
-    return protectActorFromGuide(host.current);
-  }, [ready, presentation.key]);
 
   useEffect(() => {
     let disposed = false;
@@ -28,11 +25,13 @@ export function WorldCanvas({ presentation }: { presentation: WorldPresentation 
     setReady(false);
     setError(null);
     setShowPlaces(false);
+    setNearby(null);
     void import("@/lib/stage/world-runtime").then(({ createWorldRuntime }) => {
       if (disposed || !host.current) return;
       instance = createWorldRuntime(host.current, () => latest.current,
         () => { if (!disposed) setReady(true); },
-        (message) => { if (!disposed) { setReady(false); setError(message); } });
+        (message) => { if (!disposed) { setReady(false); setError(message); } },
+        (id) => { if (!disposed) setNearby(id); });
       runtime.current = instance;
     }).catch((cause: unknown) => {
       // A chunk failed to download or Phaser could not boot — say so.
@@ -46,6 +45,9 @@ export function WorldCanvas({ presentation }: { presentation: WorldPresentation 
     <div className="world-viewport">
       <div ref={host} className="stage-host" data-testid="world-canvas" data-renderer="phaser" data-ready={ready}
         data-read-only={!!presentation.readOnly} role="region" aria-label={`แผนที่ ${presentation.name}`} tabIndex={presentation.readOnly ? -1 : 0} />
+      {ready && !error && !presentation.readOnly && <TouchStick host={host} runtime={runtime} />}
+      {ready && !error && !presentation.readOnly && <ActionPrompt marker={presentation.markers.find((m) => m.id === nearby)}
+        onAct={(id) => { host.current?.focus({ preventScroll: true }); runtime.current?.interact(id); }} />}
       {presentation.worldDescription && <span className="sr-only" role="status">{presentation.worldDescription}</span>}
       {(!ready || error) && (
         <div className="canvas-loading" role="status">
@@ -57,7 +59,7 @@ export function WorldCanvas({ presentation }: { presentation: WorldPresentation 
       )}
       {!presentation.readOnly && <div className="world-controls">
         <span className="world-keyboard-hint">WASD / ลูกศร เดิน · E โต้ตอบ</span>
-        <span className="world-touch-hint">แตะพื้นเพื่อเดิน</span>
+        <span className="world-touch-hint">ลากจอซ้ายเพื่อเดิน · แตะเพื่อไปที่นั่น</span>
         <button type="button" aria-expanded={showPlaces} onClick={() => setShowPlaces((v) => !v)}>
           จุดหมาย <span aria-hidden="true">{showPlaces ? "−" : "+"}</span>
         </button>
@@ -76,5 +78,22 @@ export function WorldCanvas({ presentation }: { presentation: WorldPresentation 
         </nav>
       )}
     </div>
+  );
+}
+
+const ACTION_VERB: Record<WorldMarker["kind"], string> = { npc: "คุยกับ", exit: "ไปที่", service: "ใช้" };
+const ACTION_GLYPH: Record<WorldMarker["kind"], string> = { npc: "💬", exit: "➜", service: "✋" };
+
+/** Context action when the hero stands next to a person, sign or exit: one big thumb button. */
+function ActionPrompt({ marker, onAct }: { marker?: WorldMarker; onAct: (id: string) => void }) {
+  if (!marker) return null;
+  const text = `${ACTION_VERB[marker.kind]} ${marker.label}`;
+  return (
+    <button key={marker.id} type="button" className={`action-prompt action-prompt--${marker.kind}`} data-action-marker={marker.id}
+      aria-label={text} aria-disabled={marker.disabled} aria-keyshortcuts="E" onClick={() => onAct(marker.id)}>
+      <span className="action-prompt-glyph" aria-hidden="true">{ACTION_GLYPH[marker.kind]}</span>
+      <span className="action-prompt-text"><small>{ACTION_VERB[marker.kind]}</small>{marker.label}</span>
+      <kbd aria-hidden="true">E</kbd>
+    </button>
   );
 }

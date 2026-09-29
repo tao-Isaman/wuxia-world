@@ -36,6 +36,10 @@ export interface WorldPresentation {
 
 export interface WorldRuntime {
   interact: (id: string) => void;
+  /** Forward a tap (viewport coordinates) that the joystick layer did not turn into a drag. */
+  tapAt: (clientX: number, clientY: number) => void;
+  /** Analog movement from the on-screen joystick (x/y in −1…1), or null when released. */
+  setStick: (vector: Point | null) => void;
   destroy: () => void;
 }
 

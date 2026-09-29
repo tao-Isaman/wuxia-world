@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { deriveAll } from "@/lib/game";
-import { getLocationMap, getRouteMap, getScene } from "@/lib/world";
+import { getScene } from "@/lib/world";
 import { CharacterPreview } from "@/components/game/character-preview";
 import { useWorldStore } from "@/store/world-store";
 
@@ -12,9 +12,9 @@ import { useWorldStore } from "@/store/world-store";
 const SHICHEN = ["卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥", "子", "丑", "寅"] as const;
 const SHICHEN_THAI = ["ยามเหม่า", "ยามเฉิน", "ยามซื่อ", "ยามอู่", "ยามเว่ย", "ยามเซิน", "ยามโหย่ว", "ยามซวี", "ยามไฮ่", "ยามจื่อ", "ยามโฉ่ว", "ยามอิ๋น"];
 
-// Dragon Quest XI-style exploration HUD in wuxia dress: the world stays clear;
-// a party card sits bottom-right, gold and the sundial top-right, a ringed
-// minimap bottom-left, and arriving somewhere new raises a gold name banner.
+// Mobile-first exploration HUD in wuxia dress: the world stays clear; a party
+// card sits bottom-right, gold and the sundial top-right, the bottom-left is
+// left free for the thumb joystick, and arriving somewhere raises a gold banner.
 export function MapHud() {
   const player = useWorldStore((s) => s.playerBuild);
   const bodyId = useWorldStore((s) => s.playerBodyId);
@@ -60,7 +60,6 @@ export function MapHud() {
       <p className="hud-hour">{SHICHEN_THAI[hour]} · {phase}</p>
       <p className="sr-only">{name}</p>
     </section>
-    <Minimap sceneId={place?.id ?? currentSceneId} name={name} />
     <ArrivalBanner sceneId={place?.kind === "location" ? place.id : null} name={name} />
   </>;
 }
@@ -98,60 +97,6 @@ function Sundial({ time }: { time: number }) {
       <path d="M0 -49 L5 -40 L-5 -40 Z" className="sundial-pointer" />
     </svg>
   </div>;
-}
-
-const MINIMAP_ZOOM = 2.4; // map pixels per minimap pixel ÷ this = how much of the painting shows
-
-/**
- * Ringed minimap (DQ XI bottom-left). Shows the painted map around the hero,
- * with exits, people and services from the location's marker layout. The
- * hero's position is read from the canvas's data attributes, not the store,
- * so walking never re-renders React.
- */
-function Minimap({ sceneId, name }: { sceneId: string; name: string }) {
-  const map = getLocationMap(sceneId);
-  const route = map ? undefined : getRouteMap(sceneId);
-  const image = map?.image ?? route?.image;
-  const face = useRef<HTMLDivElement>(null);
-  const arrow = useRef<HTMLSpanElement>(null);
-  useEffect(() => {
-    if (!image) return;
-    let frame = 0, last = 0;
-    const tick = (now: number) => {
-      frame = requestAnimationFrame(tick);
-      if (now - last < 100) return;
-      last = now;
-      const canvas = document.querySelector<HTMLElement>('[data-testid="world-canvas"]');
-      const node = face.current;
-      if (!canvas || !node) return;
-      const x = Number(canvas.dataset.playerX), y = Number(canvas.dataset.playerY);
-      if (!Number.isFinite(x) || !Number.isFinite(y)) return;
-      const size = node.clientWidth;
-      node.style.setProperty("--mx", `${size / 2 - (x / 960) * size * MINIMAP_ZOOM}px`);
-      node.style.setProperty("--my", `${size / 2 - (y / 640) * size * MINIMAP_ZOOM * (640 / 960)}px`);
-      const facing = canvas.dataset.playerFacing;
-      if (arrow.current) arrow.current.dataset.facing = facing ?? "south";
-    };
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  }, [image]);
-  if (!image) return null;
-  const pins = [
-    ...(map?.exits ?? []).map((exit) => ({ key: `exit-${exit.to}`, x: exit.x, y: exit.y, kind: "exit" })),
-    ...Object.entries(map?.npcSpots ?? {}).map(([id, point]) => ({ key: `npc-${id}`, x: point.x, y: point.y, kind: "npc" })),
-    ...(map?.spots ?? []).map((spot, index) => ({ key: `spot-${index}`, x: spot.x, y: spot.y, kind: "spot" })),
-  ];
-  return <figure className="minimap" aria-label={`แผนที่ย่อ: ${name}`}>
-    <div ref={face} className={`minimap-face${route?.mirror ? " minimap-face--mirror" : ""}`}
-      style={{ "--map": `url("${image}")`, "--zoom": MINIMAP_ZOOM } as React.CSSProperties}>
-      <div className="minimap-layer" aria-hidden="true">
-        {pins.map((pin) => <i key={pin.key} className={`minimap-pin minimap-pin--${pin.kind}`}
-          style={{ left: `${pin.x}%`, top: `${pin.y}%` }} />)}
-      </div>
-      <span ref={arrow} className="minimap-hero" aria-hidden="true" data-facing="south" />
-    </div>
-    <figcaption>{name}</figcaption>
-  </figure>;
 }
 
 /** DQ XI-style gold name banner when entering a location; fades by itself. */

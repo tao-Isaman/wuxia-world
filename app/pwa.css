@@ -14,9 +14,6 @@
   background: #1d130ae6; border: 1px solid #8f7a4f; border-radius: 8px;
 }
 .pwa-install-hint b { color: #ffd98a; }
-/* Inside the เมนู command window: a full-width row under the sections. */
-.command-window .pwa-install { grid-column: 1 / -1; grid-row: 5; margin-top: 6px; max-width: none; }
-.command-window .pwa-install-button { font-size: 14px; min-height: 36px; }
 
 /* Home-screen app: no rubber-band pull-to-refresh, no long-press callouts on the stage. */
 @media (display-mode: standalone), (display-mode: fullscreen) {
@@ -26,7 +23,6 @@
 
 /* Landscape phones with a notch: keep side-anchored HUD clear of the cut-out. */
 @supports (padding: max(0px)) {
-  .command-toggle, .command-window, .minimap, .journey-guide:not(.journey-guide--inline) { margin-left: env(safe-area-inset-left); }
   .player-hud, .location-hud, .autosave-note { margin-right: env(safe-area-inset-right); }
 }
 @media (max-width: 900px) {

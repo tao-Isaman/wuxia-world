@@ -6,6 +6,7 @@ import "./game-menu.css";
 import "./game-hud.css";
 import "./dq-theme.css";
 import "./pwa.css";
+import "./mobile-hud.css";
 import { PwaRegister } from "@/components/pwa";
 
 // Charm — calligraphic display font reserved for proper nouns, sect /

@@ -66,6 +66,8 @@ export function createWorldRuntime(
   read: () => WorldPresentation,
   onReady: () => void,
   onError: (message: string) => void,
+  /** The interactable marker the hero is standing next to changed (drives the action button). */
+  onNearby?: (markerId: string | null) => void,
 ): WorldRuntime {
   const initial = read();
   const footprints = worldFootprints(initial.key, initial.image);
@@ -96,6 +98,9 @@ export function createWorldRuntime(
   let lastInteraction: string | null = placement.speakerMarkerId ?? null;
   let hovered: string | null = null;
   let interactPressed = false;
+  /** Analog stick from the on-screen joystick: x/y in −1…1, null when released. */
+  let stick: Point | null = null;
+  let nearbyReported: string | null | undefined;
   let viewWidth = WIDTH;
   let viewHeight = HEIGHT;
   let viewScale = 1;
@@ -375,8 +380,13 @@ export function createWorldRuntime(
     if (!ready || event.button !== 0 || blocked()) return;
     if (!(event.target instanceof HTMLCanvasElement)) return;
     event.preventDefault();
+    tapAt(event.clientX, event.clientY);
+  }
+  /** A tap on the map (viewport coordinates): approach a marker, or walk to the ground point. */
+  function tapAt(clientX: number, clientY: number) {
+    if (!ready || blocked()) return;
     parent.focus({ preventScroll: true });
-    const point = toMap(event);
+    const point = toMap({ clientX, clientY } as PointerEvent);
     const marker = markerAt(point);
     if (marker) { moveToMarker(marker); return; }
     walk(point);
@@ -597,6 +607,13 @@ export function createWorldRuntime(
     const lastMarker = currentMarkers.find((marker) => marker.id === lastInteraction);
     if (!lastMarker || Math.hypot(position.x - toWorld(lastMarker).x, position.y - toWorld(lastMarker).y) > 90) lastInteraction = null;
     const focusedMarker = hovered ?? interaction ?? lastInteraction ?? nearest;
+    // The action button offers whatever the hero is standing next to.
+    const reachable = nearestDistance <= 95 ? nearest : null;
+    if (reachable !== nearbyReported) {
+      nearbyReported = reachable;
+      parent.dataset.nearbyMarker = reachable ?? "";
+      onNearby?.(reachable);
+    }
     const center = cameraCenter();
     const viewLeft = center.x - viewWidth / 2, viewRight = center.x + viewWidth / 2;
     for (const marker of currentMarkers) {
@@ -681,14 +698,21 @@ export function createWorldRuntime(
         interactPressed = false;
       } else {
         const held = (key: string) => keys.has(key) ? 1 : 0;
-        const dx = held("KeyD") + held("ArrowRight") - held("KeyA") - held("ArrowLeft");
-        const dy = held("KeyS") + held("ArrowDown") - held("KeyW") - held("ArrowUp");
+        let dx = held("KeyD") + held("ArrowRight") - held("KeyA") - held("ArrowLeft");
+        let dy = held("KeyS") + held("ArrowDown") - held("KeyW") - held("ArrowUp");
+        // The joystick is analog: a small push walks slowly, a full push at full speed.
+        let pace = 1;
+        const push = stick ? Math.hypot(stick.x, stick.y) : 0;
+        if (!dx && !dy && stick && push > 0.18) {
+          dx = stick.x; dy = stick.y;
+          pace = Math.min(1, 0.35 + push);
+        }
         const previous = { ...position };
         if (dx || dy) {
           lastInteraction = null;
           cancelWalk();
           const length = Math.hypot(dx, dy);
-          Object.assign(position, moveOnWorldGround(position, { x: dx / length * SPEED * dt, y: dy / length * SPEED * dt }, footprints));
+          Object.assign(position, moveOnWorldGround(position, { x: dx / length * SPEED * pace * dt, y: dy / length * SPEED * pace * dt }, footprints));
           faceMovement(dx, dy);
           rememberPosition();
         } else if (destination) {
@@ -750,6 +774,11 @@ export function createWorldRuntime(
 
   return {
     interact: moveToMarker,
+    tapAt,
+    setStick(vector) {
+      stick = vector;
+      if (vector) { lastInteraction = null; cancelWalk(); }
+    },
     destroy() {
       if (disposed) return;
       disposed = true;
@@ -773,6 +802,7 @@ export function createWorldRuntime(
       delete parent.dataset.playerFacing;
       delete parent.dataset.nearbyScreenBounds;
       delete parent.dataset.visibleProps;
+      delete parent.dataset.nearbyMarker;
     },
   };
 }
