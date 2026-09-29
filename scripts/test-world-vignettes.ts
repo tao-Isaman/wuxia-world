@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { capitalVignette } from "../lib/three/world-vignettes";
+import { capitalVignette } from "../lib/stage/world-vignettes";
 
 const initial = capitalVignette("city_capital", false, false);
 const signature = (vignette: ReturnType<typeof capitalVignette>) =>

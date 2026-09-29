@@ -31,7 +31,7 @@ import {
 } from "./buff-descriptions";
 import { SkillIcon, ArtIcon } from "./skill-icon";
 import { recoveryAmount, GUARD_REDUCTION, GUARD_MP_COST, RIPOSTE_BONUS, RECOVER_EVASION_COST } from "@/lib/game/combat-actions";
-import type { BattleCastProgress } from "@/lib/three/battle-runtime";
+import type { BattleCastProgress } from "@/lib/stage/battle-runtime";
 import { Shield, Wind } from "lucide-react";
 import "@/app/combat-actions.css";
 
@@ -482,7 +482,7 @@ export function BattleArena({ mode = "free", onContinue }: BattleArenaProps) {
   const displayA: CharacterBuild = battleBuilds?.A ?? setupA;
   const displayB: CharacterBuild = battleBuilds?.B ?? setupB;
 
-  // BattleCanvas owns the Three.js update loop and reports visual impacts.
+  // BattleCanvas owns the Phaser update loop and reports visual impacts.
 
   if (!state) {
     if (mode === "world") {

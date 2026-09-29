@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 import { CHARACTER_CLIPS, characterId, type CharacterMotion } from "@/lib/characters/catalog";
 import { loadCharacterAtlas } from "@/lib/characters/sheet";
 
-/** Small 2D previews share the normalized sprite atlas with the Three.js scenes. */
+/** Small 2D previews share the normalized sprite atlas with the Phaser stages. */
 export function CharacterPreview({ id, animate = false, motion = "idle", framing = "body" }: {
   id: string; animate?: boolean; motion?: CharacterMotion; framing?: "body" | "bust";
 }) {

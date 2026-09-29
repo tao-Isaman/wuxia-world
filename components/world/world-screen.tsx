@@ -190,7 +190,7 @@ export function WorldScreen() {
       );
     } else {
       // This keyed sibling stays at the same position across location → dialog
-      // → location. The Three.js canvas, actor positions and camera survive.
+      // → location. The Phaser canvas, actor positions and camera survive.
       if (mappedLocation) {
         return (
           <>

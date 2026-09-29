@@ -21,7 +21,7 @@ bun scripts/audit-content.ts     # scene / quest / NPC / item reference audit
 bun scripts/audit-quest-flow.ts  # offer→accept→complete chain audit
 bun run test:quests               # every quest startable/progressable/finishable from home_player (+ regressions)
 bun scripts/map-collision-tool.ts <id> [json] [png]  # author/check a painted map's collision footprints
-bun scripts/build-map-footprints.ts <dir>            # regenerate lib/three/world-footprints-data.ts
+bun scripts/build-map-footprints.ts <dir>            # regenerate lib/stage/world-footprints-data.ts
 bun scripts/repack-character-sheet.ts <in> <out> [rows]  # re-pack a generated sprite sheet onto an equal grid
 bun scripts/sort-by-sect.ts      # re-sort skills.ts + arts.ts by SECT_ORDER (idempotent)
 bun scripts/normalize-t3-stats.ts # normalize move-skill stat sums per tier (T0=10..T4=30)
@@ -130,6 +130,16 @@ A second engine layered on top of the battle sim. Same conventions as `lib/game/
 - **`random-events.ts`** — `EVENT_PROBABILITY.fight = 0.15`, **`fightHunting = 0.80`** (hunt boost); treasure / meet scale with LUK (5 % + LUK/200, cap 25 %; 10 % + LUK/300, cap 35 %). `FIGHT_EVENTS` is tier-weighted (T0 weight 8 → T4 weight 0.5). `fightEventsForLocation(id)` filters by zone (city = humans only, wild = beasts + humans + a touch of supernatural, etc.) — see `ZONE_CATEGORY_WEIGHT`. The `rollRandomEvent` dispatcher in `effects.ts` first checks for any betrayed sect — if found, 30 % chance to spawn `hunter_<sectId>` (overrides the normal fight/treasure/meet roll entirely). The encounter screen's `🏃 หนี` action delegates to `fleeEncounter` in world-store; for `hunter_*` opponents it runs an AGI + LUK check (30 % + (AGI+LUK)/2 %, cap 90 %) — fail forces the fight via `pendingBattle` promotion.
 - **`quests/sects-temples.ts`** — barrel re-exporting per-sect quest files in `quests/sects/<sectId>.ts`. Same pattern for villages / cities / wilderness / evil / spies / temples-misc (`_other.ts`). Stages have optional `autoAdvance: Condition`; the engine ticks progress after every effect via `tickQuestProgress`. **`startQuest` snapshots cumulative counters** (`defeatedCounts` / `inventory`) into `QuestState.acceptedDefeatedAt` / `acceptedHasItemAt` so the autoAdvance evaluator can use delta semantics — repeatable sect quests don't auto-complete on prior counts. **Auto-finish + popup turn-in also call `consumeQuestAutoItems`** to deduct items the player gathered for the quest (scene-driven completes use explicit `takeItem` and bypass this — no double-consume).
 - **`scenes-content/sects-temples.ts`** — barrel re-exporting per-sect scene files in `scenes-content/sects/<sectId>.ts`. `qs_qst_<questId>_offer` + `qs_qst_<questId>_complete` is the scene-driven flow; sect quests with no completion scene rely on the popup turn-in path.
+
+### `lib/stage/` — Phaser 4 rendering (client only)
+
+Both scenes are Phaser 4 games, dynamically imported by `components/game/world-canvas.tsx` and `battle-canvas.tsx`.
+
+- **`phaser-stage.ts`** — `createStage(parent, bg, { create, update, contextLost, error })`: one `Phaser.Game` per view, `Phaser.AUTO` (WebGL 1, Canvas fallback for old / GPU-blocked browsers), `pixelArt`, `Scale.NONE` with the drawing buffer at host size × DPR (cap 2). Phaser input is **off**; the runtimes use DOM pointer / key listeners. Helpers: `canvasTexture`, `addGridFrames`, `drawCanvas`.
+- **`world-runtime.ts`** — exploration: 960×640 map units (y down), cover-fit camera following the hero, WASD / click-to-walk via `world-navigation.ts`, marker picking, name tags, quest marks, props, bystanders, foreground occluders, lighting veil. Reports state on the host's `data-*` attributes (`data-player-x/y/frame/motion/facing`, `data-visible-props`, …) — the e2e suite and HUD minimap read these.
+- **`battle-runtime.ts`** — 768×432 stage cropped to the viewport, drives `battleStore.tick`, cast banners, hit numbers, slashes, sparks, fighter poses; reports `data-fighter-*`, `data-cast-seq`, `data-impact-count`, `data-paused`.
+- Pure helpers (no Phaser): `world-navigation.ts`, `world-placement.ts`, `world-footprints-data.ts`, `world-occlusion.ts`, `world-vignettes.ts`, `world-map-probe.ts`, `battle-background.ts`, `types.ts`.
+- Don't put Phaser objects in stores or saves; don't enable Phaser input (modal pause rules live in `worldInputBlocked`).
 
 ### Routes
 

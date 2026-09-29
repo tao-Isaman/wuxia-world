@@ -3,7 +3,7 @@ import type { RouteMapDef, RouteScene } from "@/lib/world";
 import { evaluateCondition, playerBodySprite } from "@/lib/world";
 import { useWorldStore, TRAVEL_STAMINA_COST } from "@/store/world-store";
 import { WorldCanvas } from "@/components/game/world-canvas";
-import type { WorldMarker } from "@/lib/three/types";
+import type { WorldMarker } from "@/lib/stage/types";
 import { toast } from "@/store/toast-store";
 import { MapHud } from "./map-hud";
 import { MenuBar } from "./menu-bar";

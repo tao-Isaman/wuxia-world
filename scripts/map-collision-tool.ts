@@ -9,8 +9,8 @@
 import sharp from "sharp";
 import { readFileSync } from "node:fs";
 import { getLocationMap } from "../lib/world/data/location-maps";
-import { worldFootprints, type WorldFootprint } from "../lib/three/world-navigation";
-import { probeWorldMap, type ProbeMarker } from "../lib/three/world-map-probe";
+import { worldFootprints, type WorldFootprint } from "../lib/stage/world-navigation";
+import { probeWorldMap, type ProbeMarker } from "../lib/stage/world-map-probe";
 
 const [id, jsonPath, overlayPath] = process.argv.slice(2);
 if (!id) throw new Error("usage: bun scripts/map-collision-tool.ts <locationId> [footprints.json] [overlay.png]");

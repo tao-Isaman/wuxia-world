@@ -5,9 +5,9 @@ import { evaluateCondition, getArtisan, getQuestsForNpc, isQuestOfferable, isQue
 import { useWorldStore, TRAVEL_STAMINA_COST } from "@/store/world-store";
 import { toast } from "@/store/toast-store";
 import { WorldCanvas } from "@/components/game/world-canvas";
-import { forgetMapPosition, type WorldMarker, type WorldPresentation } from "@/lib/three/types";
-import { capitalVignette } from "@/lib/three/world-vignettes";
-export { clearMapPositions } from "@/lib/three/types";
+import { forgetMapPosition, type WorldMarker, type WorldPresentation } from "@/lib/stage/types";
+import { capitalVignette } from "@/lib/stage/world-vignettes";
+export { clearMapPositions } from "@/lib/stage/types";
 
 export interface MapSpotHandlers {
   onRegistryNpc: (npc: NpcDef) => void;

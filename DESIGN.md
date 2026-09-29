@@ -1,4 +1,4 @@
-# Wuxia pixel-art / Three.js design
+# Wuxia pixel-art / Phaser design
 
 ## Visual direction
 
@@ -6,18 +6,18 @@ Detailed 32-bit-era pixel characters inhabit warm Chinese courtyards, market str
 
 ## Runtime boundaries
 
-Three.js 0.186 owns the orthographic WebGL world and combat scene. Both runtimes are dynamically imported only in the browser. React owns accessible forms, HUD, menus, dialogs and action controls. Pure TypeScript combat/story rules remain in `lib/game` and `lib/world`; Zustand connects them to rendering and persists version-19 saves. Renderer objects, GPU resources and walking positions never enter a save. The earlier Phaser prototype and dependency have been removed.
+Phaser 4 owns the 2D world and combat stages (`lib/stage/phaser-stage.ts`): WebGL when available, the Canvas renderer otherwise. Both runtimes are dynamically imported only in the browser. React owns accessible forms, HUD, menus, dialogs and action controls. Pure TypeScript combat/story rules remain in `lib/game` and `lib/world`; Zustand connects them to rendering and persists version-19 saves. Renderer objects, GPU resources and walking positions never enter a save. Three.js (which required WebGL 2) was replaced by Phaser in wave 14.
 
-- `lib/three/world-runtime.ts`: loading, nearest texture sampling, depth sorting, keyboard/touch input, marker picking, camera follow and animation.
-- `lib/three/world-navigation.ts`: authored solid footprints, swept movement with sliding, nearest accessible ground and visibility-graph detours.
-- `lib/three/world-occlusion.ts`: foreground cutouts from the original paintings, sorted against character feet.
-- `lib/three/world-lighting.ts`: game-clock atmosphere, with authored home/capital lantern pools. This is a stylized flat lighting pass, not dynamic 3D shadow simulation.
-- `lib/three/world-placement.ts`: restores a local conversation beside its known speaker when no session position exists; preserves remembered positions and checks connected ground.
-- `lib/three/battle-background.ts`: selects the practice yard for the exact beginner duel and a capital street only for confirmed capital-origin encounters. Other/debug contexts retain the courtyard; no missing route origin is invented.
-- `lib/three/battle-runtime.ts`: combat clock, local cast timing, sprite poses, impacts and explicit progress callbacks. HP and outcome presentation follow actual impacts rather than independent wall-clock timers.
+- `lib/stage/world-runtime.ts`: loading, nearest texture sampling, depth sorting, keyboard/touch input, marker picking, camera follow and animation.
+- `lib/stage/world-navigation.ts`: authored solid footprints, swept movement with sliding, nearest accessible ground and visibility-graph detours.
+- `lib/stage/world-occlusion.ts`: foreground cutouts from the original paintings, sorted against character feet.
+- `lib/stage/world-lighting.ts`: game-clock atmosphere, with authored home/capital lantern pools. This is a stylized flat lighting pass, not dynamic 3D shadow simulation.
+- `lib/stage/world-placement.ts`: restores a local conversation beside its known speaker when no session position exists; preserves remembered positions and checks connected ground.
+- `lib/stage/battle-background.ts`: selects the practice yard for the exact beginner duel and a capital street only for confirmed capital-origin encounters. Other/debug contexts retain the courtyard; no missing route origin is invented.
+- `lib/stage/battle-runtime.ts`: combat clock, local cast timing, sprite poses, impacts and explicit progress callbacks. HP and outcome presentation follow actual impacts rather than independent wall-clock timers.
 - `lib/characters`: original-image catalog, shared atlas normalization and animation metadata. Each sheet is scaled once rather than resizing each pose independently.
 
-All GPU resources, input handlers, observers and animation frames are released on teardown. Dialogs, hidden tabs and form input suspend game input; queued world walking is cancelled. Reduced motion removes ambient drift and camera/impact shake, and holds static poses. A lost WebGL context exposes a retry control.
+All Phaser games, textures, input handlers, observers and animation frames are released on teardown. Dialogs, hidden tabs and form input suspend game input; queued world walking is cancelled. Reduced motion removes ambient drift and camera/impact shake, and holds static poses. A lost WebGL context exposes a retry control.
 
 ## Characters and spatial design
 
@@ -47,7 +47,7 @@ Completion receipts observe real active-to-done quest transitions, cap displayed
 
 Local NPC dialogue keeps the same keyed world canvas, camera, actors and lighting mounted. World input pauses while ambient animation continues; a compact focus-contained panel presents the existing authored lines and choices. Its close control only mirrors an available effect-free departure or an existing terminal close, so mandatory narrative decisions cannot be skipped. Unassociated narration and travel events retain their illustrated fallback. All five spy greetings include unconditional authored returns without travel cost or encounter rerolls; job previews remain separate from acceptance.
 
-The completed clinic delivery reveals a supply crate and waiting elder beside Lin. `lib/three/world-vignettes.ts` reads the original quest status; generic prop/bystander rendering adds no save flags or rewards. Their visibility changes without rebuilding the scene. This is one authored consequence, not a town-wide NPC schedule simulation.
+The completed clinic delivery reveals a supply crate and waiting elder beside Lin. `lib/stage/world-vignettes.ts` reads the original quest status; generic prop/bystander rendering adds no save flags or rewards. Their visibility changes without rebuilding the scene. This is one authored consequence, not a town-wide NPC schedule simulation.
 
 The capital investigation places clerk Qing and a sealed document chest near Wu. Explicit interview and retrieval flags advance the existing ledger stages; possession of an old key alone no longer counts as retrieving evidence. Qing lends at most one key and can use his spare if another quest consumes that loan. Existing keys remain usable, and a guarded return awards the original 150 gold, 30 WEXP and eight relationship points once. Mid-conversation reloads, previous stage IDs and older inventories remain supported. Lin's herb advice and Wu's job overview have authored responses and safe returns. Unrelated random meetings cannot inherit the preceding local speaker.
 

@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useWorldStore } from "@/store/world-store";
-import { clearMapPositions } from "@/lib/three/types";
+import { clearMapPositions } from "@/lib/stage/types";
 import type { Gender } from "@/lib/world";
 import { GENDER_LABEL, PLAYER_BODIES, PLAYER_BODY_LABEL, defaultBodyFor } from "@/lib/world";
 import { CharacterPreview } from "@/components/game/character-preview";

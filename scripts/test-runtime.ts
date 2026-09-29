@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { stepTowards, clearMapPositions, getMapPosition, rememberMapPosition } from "../lib/three/types";
+import { stepTowards, clearMapPositions, getMapPosition, rememberMapPosition } from "../lib/stage/types";
 import type { RouteScene } from "../lib/world/types";
 import { makeContext, makeInitialState, resolveSkill } from "../lib/game/battle";
 import { checkWin } from "../lib/game/effects";

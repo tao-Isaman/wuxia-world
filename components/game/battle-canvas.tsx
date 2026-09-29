@@ -4,10 +4,10 @@ import { useBattleStore } from "@/store/battle-store";
 import { useWorldStore } from "@/store/world-store";
 import { NPCS, getOpponent, npcBattleSprite, npcPixelSprite } from "@/lib/world";
 import { characterId, npcCharacterId } from "@/lib/characters/catalog";
-import type { BattleCastProgress } from "@/lib/three/battle-runtime";
-import { resolveBattleBackground } from "@/lib/three/battle-background";
+import type { BattleCastProgress } from "@/lib/stage/battle-runtime";
+import { resolveBattleBackground } from "@/lib/stage/battle-background";
 
-/** Which sprites stand on the stage; shared by the Three.js scene and HUD portraits. */
+/** Which sprites stand on the stage; shared by the Phaser stage and HUD portraits. */
 export function useBattleActors(mode: "world" | "free") {
   const builds = useBattleStore((s) => s.builds);
   const bodyId = useWorldStore((s) => s.playerBodyId);
@@ -47,7 +47,7 @@ export function BattleCanvas({ mode, onCastProgress }: {
     let disposed = false;
     let runtime: { destroy: () => void } | undefined;
     setReady(false); setError(false);
-    void import("@/lib/three/battle-runtime").then(({ createBattleRuntime }) => {
+    void import("@/lib/stage/battle-runtime").then(({ createBattleRuntime }) => {
       if (disposed || !host.current) return;
       runtime = createBattleRuntime(host.current, {
         characterA, characterB, spriteB, creatureFrame, background,
@@ -64,7 +64,7 @@ export function BattleCanvas({ mode, onCastProgress }: {
   return <div className="battle-stage">
     <div ref={host} className="absolute inset-0" role="img"
       aria-label={`${background.label} · ${builds?.A.name ?? "จอมยุทธ์"} กับ ${builds?.B.name ?? "คู่ต่อสู้"}`}
-      data-testid="battle-canvas" data-renderer="three" data-ready={ready} data-battle-background={background.id} />
+      data-testid="battle-canvas" data-renderer="phaser" data-ready={ready} data-battle-background={background.id} />
     {(!ready || error !== false) && <div className="canvas-loading" role="status">
       {error !== false ? <div className="text-center space-y-2">
         <button type="button" className="pixel-action" onClick={() => setAttempt((n) => n + 1)}>โหลดฉากใหม่</button>
