@@ -34,7 +34,11 @@ export function WorldCanvas({ presentation }: { presentation: WorldPresentation 
         () => { if (!disposed) setReady(true); },
         (message) => { if (!disposed) { setReady(false); setError(message); } });
       runtime.current = instance;
-    }).catch(() => { if (!disposed) setError("เริ่มฉากไม่ได้ กรุณาลองใหม่"); });
+    }).catch((cause: unknown) => {
+      // Most often WebGL 2 is unavailable (old iOS / blocked GPU) — say so.
+      console.error("[world] renderer could not start:", cause);
+      if (!disposed) setError(`เริ่มฉากไม่ได้ กรุณาลองใหม่\n(${cause instanceof Error ? cause.message : String(cause)})`);
+    });
     return () => { disposed = true; runtime.current = null; instance?.destroy(); };
   }, [presentation.key, presentation.image, presentation.playerImage, signature, attempt]);
 
@@ -46,7 +50,7 @@ export function WorldCanvas({ presentation }: { presentation: WorldPresentation 
       {(!ready || error) && (
         <div className="canvas-loading" role="status">
           <div className="pixel-panel p-6 text-center space-y-3">
-            <p>{error ?? "กำลังเดินทางเข้าสู่ยุทธภพ..."}</p>
+            <p className="whitespace-pre-line">{error ?? "กำลังเดินทางเข้าสู่ยุทธภพ..."}</p>
             {error && <button className="pixel-action" onClick={() => setAttempt((n) => n + 1)}>ลองใหม่</button>}
           </div>
         </div>

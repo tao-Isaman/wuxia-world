@@ -161,14 +161,18 @@ export function createWorldRuntime(
     result.scale.set(width, height, 1);
     return result;
   }
-  function fail() {
+  function fail(cause?: unknown) {
     if (disposed || failed) return;
     failed = true;
     ready = false;
     cancelAnimationFrame(animationFrame);
     keys.clear();
     parent.style.cursor = "";
-    onError("โหลดฉากไม่สำเร็จ กรุณาลองใหม่");
+    // Keep the real reason visible (and in the console) so a player's report
+    // says what broke instead of only "failed to load".
+    const reason = cause instanceof Error ? cause.message : typeof cause === "string" ? cause : "";
+    if (cause) console.error("[world] scene failed:", cause);
+    onError(`โหลดฉากไม่สำเร็จ กรุณาลองใหม่${reason ? `\n(${reason})` : ""}`);
   }
   function loadImage(source: string): Promise<HTMLImageElement> {
     return new Promise((resolve, reject) => {
@@ -314,7 +318,7 @@ export function createWorldRuntime(
   function walk(point: Point, marker?: string) {
     lastInteraction = null;
     waypoints = planWorldPath(position, clampPosition(point), footprints);
-    destination = waypoints.at(-1) ?? null;
+    destination = waypoints[waypoints.length - 1] ?? null;
     if (!destination) { cancelWalk(); return; }
     interaction = marker ?? null;
     targetRing?.position.set(destination.x, -destination.y, 0);
@@ -403,7 +407,7 @@ export function createWorldRuntime(
   function loseFocus() { keys.clear(); interactPressed = false; cancelWalk(); lastTime = 0; }
   function visibilityChanged() { if (document.hidden) loseFocus(); else lastTime = 0; }
   function motionChanged() { reducedMotion = motionQuery.matches; }
-  function contextLost(event: Event) { event.preventDefault(); fail(); }
+  function contextLost(event: Event) { event.preventDefault(); fail("WebGL context lost"); }
 
   async function initialize() {
     const playerId = characterId(initial.playerImage.match(/(?:^|\/)([mf][1-4])(?:\.|\/|$)/)?.[1] ?? "m1");
@@ -437,7 +441,10 @@ export function createWorldRuntime(
       } catch { /* keep the archetype sheet for this NPC */ }
     }));
     if (disposed || failed) return;
-    const backgroundTexture = drawnTexture(WIDTH, HEIGHT, (context) => context.drawImage(landscape, 0, 0, WIDTH, HEIGHT));
+    const backgroundTexture = drawnTexture(WIDTH, HEIGHT, (context) => {
+      if (initial.mirrorImage) { context.translate(WIDTH, 0); context.scale(-1, 1); }
+      context.drawImage(landscape, 0, 0, WIDTH, HEIGHT);
+    });
     const background = new THREE.Mesh(resourceGeometry(new THREE.PlaneGeometry(WIDTH, HEIGHT)),
       resourceMaterial(new THREE.MeshBasicMaterial({ map: backgroundTexture, depthTest: false, depthWrite: false, toneMapped: false })));
     background.position.set(WIDTH / 2, -HEIGHT / 2, -1);
@@ -807,7 +814,7 @@ export function createWorldRuntime(
       if (time - lastPositionReport > 150) { reportPosition(); lastPositionReport = time; }
       renderer.render(scene, camera);
       animationFrame = requestAnimationFrame(tick);
-    } catch { fail(); }
+    } catch (error) { fail(error); }
   }
 
   renderer.domElement.addEventListener("pointermove", pointerMove);

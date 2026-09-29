@@ -142,7 +142,8 @@ function Minimap({ sceneId, name }: { sceneId: string; name: string }) {
     ...(map?.spots ?? []).map((spot, index) => ({ key: `spot-${index}`, x: spot.x, y: spot.y, kind: "spot" })),
   ];
   return <figure className="minimap" aria-label={`แผนที่ย่อ: ${name}`}>
-    <div ref={face} className="minimap-face" style={{ "--map": `url("${image}")`, "--zoom": MINIMAP_ZOOM } as React.CSSProperties}>
+    <div ref={face} className={`minimap-face${route?.mirror ? " minimap-face--mirror" : ""}`}
+      style={{ "--map": `url("${image}")`, "--zoom": MINIMAP_ZOOM } as React.CSSProperties}>
       <div className="minimap-layer" aria-hidden="true">
         {pins.map((pin) => <i key={pin.key} className={`minimap-pin minimap-pin--${pin.kind}`}
           style={{ left: `${pin.x}%`, top: `${pin.y}%` }} />)}

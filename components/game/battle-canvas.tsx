@@ -38,7 +38,7 @@ export function BattleCanvas({ mode, onCastProgress }: {
   const lastLocationId = useWorldStore((s) => s.lastLocationId);
   const background = resolveBattleBackground({ mode, pendingBattle, currentSceneId, lastLocationId });
   const [ready, setReady] = useState(false);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<string | false>(false);
   const [attempt, setAttempt] = useState(0);
   const progressCallback = useRef(onCastProgress);
   progressCallback.current = onCastProgress;
@@ -52,18 +52,24 @@ export function BattleCanvas({ mode, onCastProgress }: {
       runtime = createBattleRuntime(host.current, {
         characterA, characterB, spriteB, creatureFrame, background,
         onReady: () => { if (!disposed) setReady(true); },
-        onError: () => { if (!disposed) { setReady(false); setError(true); } },
+        onError: (reason) => { if (!disposed) { setReady(false); setError(reason ?? ""); } },
         onCastProgress: (progress) => { if (!disposed) progressCallback.current?.(progress); },
       });
-    }).catch(() => { if (!disposed) setError(true); });
+    }).catch((cause: unknown) => {
+      console.error("[battle] renderer could not start:", cause);
+      if (!disposed) setError(cause instanceof Error ? cause.message : String(cause));
+    });
     return () => { disposed = true; runtime?.destroy(); };
   }, [characterA, characterB, spriteB, builds, attempt, creatureFrame, background]);
   return <div className="battle-stage">
     <div ref={host} className="absolute inset-0" role="img"
       aria-label={`${background.label} · ${builds?.A.name ?? "จอมยุทธ์"} กับ ${builds?.B.name ?? "คู่ต่อสู้"}`}
       data-testid="battle-canvas" data-renderer="three" data-ready={ready} data-battle-background={background.id} />
-    {(!ready || error) && <div className="canvas-loading" role="status">
-      {error ? <button type="button" className="pixel-action" onClick={() => setAttempt((n) => n + 1)}>โหลดฉากใหม่</button> : "กำลังเตรียมลานประลอง..."}
+    {(!ready || error !== false) && <div className="canvas-loading" role="status">
+      {error !== false ? <div className="text-center space-y-2">
+        <button type="button" className="pixel-action" onClick={() => setAttempt((n) => n + 1)}>โหลดฉากใหม่</button>
+        {error && <p className="text-xs opacity-80">({error})</p>}
+      </div> : "กำลังเตรียมลานประลอง..."}
     </div>}
   </div>;
 }

@@ -66,7 +66,7 @@ export interface BattleRuntimeOptions {
   creatureFrame?: number | null;
   background?: BattleBackground;
   onReady: () => void;
-  onError: () => void;
+  onError: (reason?: string) => void;
   onCastProgress?: (progress: BattleCastProgress) => void;
 }
 
@@ -121,16 +121,17 @@ export function createBattleRuntime(parent: HTMLElement, options: BattleRuntimeO
     owned.delete(resource);
     resource.dispose();
   }
-  function fail() {
+  function fail(cause?: unknown) {
     if (destroyed || failed) return;
     failed = true;
     parent.dataset.ready = "false";
     cancelAnimationFrame(animationFrame);
-    options.onError();
+    if (cause) console.error("[battle] stage failed:", cause);
+    options.onError(cause instanceof Error ? cause.message : typeof cause === "string" ? cause : undefined);
   }
   function onContextLost(event: Event) {
     event.preventDefault();
-    fail();
+    fail("WebGL context lost");
   }
   function onMotionChange(event: MediaQueryListEvent) {
     reduced = event.matches;
@@ -192,8 +193,8 @@ export function createBattleRuntime(parent: HTMLElement, options: BattleRuntimeO
     parent.dataset.reducedMotion = String(reduced);
     parent.dataset.impactCount = "0";
     parent.dataset.castSeq = "-1";
-  } catch {
-    fail();
+  } catch (error) {
+    fail(error);
     return { destroy };
   }
 
@@ -455,7 +456,7 @@ export function createBattleRuntime(parent: HTMLElement, options: BattleRuntimeO
       camera.position.x = shake;
       camera.position.y = shake * 0.4;
       renderer?.render(scene, camera);
-    } catch { fail(); }
+    } catch (error) { fail(error); }
   }
 
   async function initialize() {

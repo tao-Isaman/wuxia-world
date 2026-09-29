@@ -18,6 +18,8 @@ export interface WorldPresentation {
   key: string;
   name: string;
   image: string;
+  /** Draw the background painting mirrored left↔right (route variety). */
+  mirrorImage?: boolean;
   playerImage: string;
   spawn: Point;
   markers: WorldMarker[];

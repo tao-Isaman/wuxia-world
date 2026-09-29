@@ -53,7 +53,9 @@ function measureFrames(source: HTMLImageElement, rows: number, layout?: Characte
     return { source, x: left, y: top, width: right - left + 1, height: bottom - top + 1, regions };
   });
 }
-function median(values: number[]) { const sorted = values.toSorted((a, b) => a - b); return sorted[Math.floor(sorted.length / 2)]; }
+// Copy-then-sort rather than toSorted(): Safari < 16 / Chrome < 110 lack it and
+// every character atlas (so the whole map) would fail to load there.
+function median(values: number[]) { const sorted = [...values].sort((a, b) => a - b); return sorted[Math.floor(sorted.length / 2)]; }
 
 /** Normalize padding and scale per source sheet, preserving pose variation and original PNGs. */
 async function prepareAtlas(id: CharacterId, directional: boolean): Promise<CharacterAtlas> {
