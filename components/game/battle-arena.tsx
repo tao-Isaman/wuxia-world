@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -35,23 +35,34 @@ import type { BattleCastProgress } from "@/lib/three/battle-runtime";
 import { Shield, Wind } from "lucide-react";
 import "@/app/combat-actions.css";
 
-function SkillButton({ name, icon, disabled, onClick, cd = 0, mp = 0, detail, mpShort = false, kind = "skill" }: {
-  name: string; icon: React.ReactNode; disabled: boolean; onClick: () => void;
+interface CombatActionView {
+  key: string; name: string; icon: React.ReactNode; disabled: boolean; onClick: () => void;
+  /** Short state callout shown on the slot itself (e.g. a readied riposte). */
+  flag?: string;
   cd?: number; mp?: number; detail: string; mpShort?: boolean; kind?: "skill" | "guard" | "recover";
-}) {
-  return <button type="button" disabled={disabled} onClick={onClick}
-    className={`combat-action combat-action-${kind}`} aria-label={name}>
-    <span className="combat-action-icon" aria-hidden="true">{icon}</span>
+}
+const actionMeta = ({ cd = 0, mp = 0, mpShort = false }: CombatActionView) =>
+  cd > 0 ? `รอ ${cd} ตา` : mpShort ? `MP ไม่พอ \xb7 ใช้ ${mp} MP` : `${mp} MP \xb7 1 ตา`;
+
+/** Hero's Adventure-style hotbar slot: round medallion, number key, cooldown dial. */
+function SkillButton({ action, hotkey, onFocusDetail }: { action: CombatActionView; hotkey: number; onFocusDetail: () => void }) {
+  const { name, icon, disabled, onClick, cd = 0, detail, kind = "skill", flag } = action;
+  return <button type="button" disabled={disabled} onClick={onClick} onMouseEnter={onFocusDetail} onFocus={onFocusDetail}
+    className={`combat-action combat-action-${kind}`} aria-label={name} aria-keyshortcuts={String(hotkey)}
+    title={`${name} (${hotkey}) — ${detail}`} data-cooldown={cd > 0 ? cd : undefined}>
+    <span className="combat-action-medal" aria-hidden="true">
+      <span className="combat-action-icon">{icon}</span>
+      {cd > 0 && <span className="combat-action-cd">{cd}</span>}
+      {flag && <span className="combat-action-flag">{flag}</span>}
+      <kbd>{hotkey}</kbd>
+    </span>
     <span className="combat-action-copy">
       <strong>{name}</strong>
-      <span>{detail}</span>
-      <small>{cd > 0 ? `รอ ${cd} ตา` : mpShort ? `MP ไม่พอ \xb7 ใช้ ${mp} MP` : `${mp} MP \xb7 1 ตา`}</small>
+      <small>{actionMeta(action)}</small>
     </span>
   </button>;
 }
 
-// HP follows renderer impacts, including dialog pauses. Remember actual
-// pre-cast HP, because overkill damage cannot reconstruct it accurately.
 function useAnimatedHp(actualHp: number, maxHp: number, lastCast: BattleState["lastCast"],
   side: Side, progress: BattleCastProgress | null): number {
   const seq = lastCast?.seq ?? null;
@@ -441,6 +452,24 @@ export function BattleArena({ mode = "free", onContinue }: BattleArenaProps) {
   // the moment-to-moment narration, so the log is for after-the-fact
   // review only. Player can toggle open/closed via the header button.
   const [showLog, setShowLog] = useState(false);
+  const [focusedKey, setFocusedKey] = useState<string | null>(null);
+  const actionsRef = useRef<CombatActionView[]>([]);
+  // Number keys fire hotbar slots, like the reference game's F-keys/1-9.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.repeat || e.altKey || e.ctrlKey || e.metaKey) return;
+      const target = e.target;
+      if (target instanceof HTMLElement && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName))) return;
+      if (document.querySelector('[role="dialog"]')) return;
+      const action = actionsRef.current[Number(e.key) - 1];
+      if (!action || action.disabled) return;
+      e.preventDefault();
+      setFocusedKey(action.key);
+      action.onClick();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   // Setup-tab builds — used in free mode for the "start fresh" button only.
   const setupA = useCharacterStore((s) => s.builds.A);
@@ -484,6 +513,42 @@ export function BattleArena({ mode = "free", onContinue }: BattleArenaProps) {
   const canIA = !!aA.act && state.mpA >= aA.act.c && state.iaCD.A === 0;
   const recoverMp = Math.min(state.dA.MP - state.mpA, recoveryAmount(state.dA.MP));
   const riposteReady = state.st.A.buffs.some((buff) => buff.t === "buff_riposte" && buff.u > 0);
+  const actions: CombatActionView[] = [];
+  displayA.skillIds.forEach((raw, i) => {
+    if (!raw) return;
+    const info = parseSlotId(raw);
+    if (!info) return;
+    const cd = state.cd.A[i] ?? 0;
+    if (info.kind === "art") {
+      const art = info.art;
+      if (!art.act) return;
+      const mpShort = state.mpA < art.act.c;
+      actions.push({ key: `slot-${i}`, name: art.n, icon: <ArtIcon art={art} size={34} />,
+        disabled: !canAct || cd > 0 || mpShort, onClick: () => castSkill(i), cd, mp: art.act.c, mpShort,
+        detail: "วิชาในกาย · ใช้ปราณ" });
+      return;
+    }
+    const sk = info.skill;
+    const detail = sk.at ? `${sk.at === "phy" ? riposteReady ? `สวนกลับ +${RIPOSTE_BONUS}%` : "โจมตีภายนอก" : "โจมตีปราณ"} · ${sk.hits ?? 1} ครั้ง` : "เสริมพลัง · เปลี่ยนจังหวะ";
+    actions.push({ key: `slot-${i}`, name: sk.n, icon: <SkillIcon skill={sk} size={34} />,
+      disabled: !canAct || cd > 0, onClick: () => castSkill(i), cd, detail,
+      flag: sk.at === "phy" && riposteReady ? `สวนกลับ +${RIPOSTE_BONUS}%` : undefined });
+  });
+  if (aA.act && !displayA.skillIds.includes(`art:${aA.id}`)) {
+    actions.push({ key: "inner-art", name: aA.n, icon: <ArtIcon art={aA} size={34} />,
+      disabled: !canAct || !canIA, onClick: castArtActive, cd: state.iaCD.A,
+      mp: aA.act.c, mpShort: state.mpA < aA.act.c, detail: "วิชาในกาย · ใช้ปราณ" });
+  }
+  actions.push({ key: "guard", name: "ตั้งรับ", icon: <Shield size={27} strokeWidth={1.5} />, kind: "guard",
+    disabled: !canAct || state.mpA < GUARD_MP_COST, onClick: () => takeCombatAction("guard"),
+    mp: GUARD_MP_COST, mpShort: state.mpA < GUARD_MP_COST,
+    detail: `ลดรับ ${GUARD_REDUCTION}% · กายครั้งถัดไป +${RIPOSTE_BONUS}% (ใช้แม้พลาด)` });
+  actions.push({ key: "recover", name: "รวบรวมปราณ", icon: <Wind size={27} strokeWidth={1.5} />, kind: "recover",
+    disabled: !canAct || recoverMp <= 0, onClick: () => takeCombatAction("recover"),
+    detail: recoverMp > 0 ? `MP +${recoverMp} · หลบหลีก −${RECOVER_EVASION_COST} จังหวะถัดไป` : "MP เต็ม · ใช้เมื่อปราณพร่อง" });
+  actionsRef.current = actions;
+  const focusedAction = actions.find((action) => action.key === focusedKey) ?? actions.find((action) => !action.disabled) ?? actions[0];
+
   const headline = resultReady ? "การประลองสิ้นสุด" : casting ? `กำลังใช้ · ${state.lastCast?.name}` :
     canAct ? "ถึงตาเจ้า · เลือกกระบวนท่า" : isBActive ? `${displayB.name} กำลังออกกระบวนท่า` : "รอจังหวะ · กำลังรวบรวมพลัง";
 
@@ -522,36 +587,14 @@ export function BattleArena({ mode = "free", onContinue }: BattleArenaProps) {
                 <Button variant="outline" onClick={reset}>Reset</Button></div>}
           </div>
         ) : (
-          <div className="combat-actions">
-            {displayA.skillIds.map((raw, i) => {
-              if (!raw) return null;
-              const info = parseSlotId(raw);
-              if (!info) return null;
-              const cd = state.cd.A[i] ?? 0;
-              if (info.kind === "art") {
-                const art = info.art;
-                if (!art.act) return null;
-                const mpShort = state.mpA < art.act.c;
-                return <SkillButton key={i} name={art.n} icon={<ArtIcon art={art} size={34} />}
-                  disabled={!canAct || cd > 0 || mpShort} onClick={() => castSkill(i)} cd={cd}
-                  mp={art.act.c} mpShort={mpShort} detail="วิชาในกาย · ใช้ปราณ" />;
-              }
-              const sk = info.skill;
-              const detail = sk.at ? `${sk.at === "phy" ? riposteReady ? `สวนกลับ +${RIPOSTE_BONUS}%` : "โจมตีภายนอก" : "โจมตีปราณ"} · ${sk.hits ?? 1} ครั้ง` : "เสริมพลัง · เปลี่ยนจังหวะ";
-              return <SkillButton key={i} name={sk.n} icon={<SkillIcon skill={sk} size={34} />}
-                disabled={!canAct || cd > 0} onClick={() => castSkill(i)} cd={cd} detail={detail} />;
-            })}
-            {aA.act && !displayA.skillIds.includes(`art:${aA.id}`) &&
-              <SkillButton name={aA.n} icon={<ArtIcon art={aA} size={34} />}
-                disabled={!canAct || !canIA} onClick={castArtActive} cd={state.iaCD.A}
-                mp={aA.act.c} mpShort={state.mpA < aA.act.c} detail="วิชาในกาย · ใช้ปราณ" />}
-            <SkillButton name="ตั้งรับ" icon={<Shield size={27} strokeWidth={1.5} />} kind="guard"
-              disabled={!canAct || state.mpA < GUARD_MP_COST} onClick={() => takeCombatAction("guard")}
-              mp={GUARD_MP_COST} mpShort={state.mpA < GUARD_MP_COST}
-              detail={`ลดรับ ${GUARD_REDUCTION}% · กายครั้งถัดไป +${RIPOSTE_BONUS}% (ใช้แม้พลาด)`} />
-            <SkillButton name="รวบรวมปราณ" icon={<Wind size={27} strokeWidth={1.5} />} kind="recover"
-              disabled={!canAct || recoverMp <= 0} onClick={() => takeCombatAction("recover")}
-              detail={recoverMp > 0 ? `MP +${recoverMp} · หลบหลีก −${RECOVER_EVASION_COST} จังหวะถัดไป` : "MP เต็ม · ใช้เมื่อปราณพร่อง"} />
+          <div className="combat-actions-wrap">
+            {focusedAction && <p className="combat-action-detail" aria-live="polite">
+              <strong>{focusedAction.name}</strong> <span>{focusedAction.detail}</span> <small>{actionMeta(focusedAction)}</small>
+            </p>}
+            <div className="combat-actions">
+              {actions.map((action, index) => <SkillButton key={action.key} action={action} hotkey={index + 1}
+                onFocusDetail={() => setFocusedKey(action.key)} />)}
+            </div>
           </div>
         )}
       </section>

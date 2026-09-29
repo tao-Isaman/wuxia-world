@@ -1,0 +1,138 @@
+/* ── Exploration HUD (Hero's Adventure-style) ──────────────────────────────
+   Slim status strip top-left, place plaque top-centre, sundial top-right,
+   round medallion menu with number hotkeys at the bottom. */
+
+.player-hud {
+  position: absolute; z-index: 30; top: 14px; left: 14px; display: flex; align-items: center;
+  pointer-events: none; filter: drop-shadow(3px 4px 0 #07120f66);
+}
+.hud-portrait {
+  position: relative; z-index: 1; flex: 0 0 auto; width: 70px; height: 70px; overflow: hidden; border-radius: 50%;
+  background: radial-gradient(circle at 50% 35%, #3d5446, #142520 70%);
+  border: 3px solid #c9a55c; box-shadow: 0 0 0 2px #0d1a16, inset 0 0 0 2px #1a2b25;
+}
+.hud-portrait .character-preview { width: 118%; max-width: none; height: 118%; margin: -3% 0 0 -9%; }
+.hud-strip {
+  margin-left: -16px; padding: 7px 14px 8px 26px; width: 430px;
+  display: grid; grid-template-columns: 1fr auto; grid-template-rows: auto auto; gap: 3px 12px; align-items: center;
+}
+.hud-player-name { font-family: var(--font-display); font-size: 18px; line-height: 1.3; color: #f6e6b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hud-vitals { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.hud-gauge { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; align-items: center; column-gap: 5px; min-width: 0; }
+.hud-glyph { grid-row: 1 / 3; font: 700 18px/1 serif; text-shadow: 1px 1px 0 #07120f; }
+.hud-gauge-track { height: 7px; background: #0b1814; border: 1px solid #53604a; }
+.hud-gauge-track > div { height: 100%; box-shadow: inset 0 1px #ffffff45; transition: width 240ms ease-out; }
+.hud-gauge small { font: 11px/1.3 ui-monospace, monospace; color: #efe9cf; }
+.hud-gauge small span { color: #9fa68f; }
+.hud-wallet { display: flex; gap: 12px; font: 13px ui-monospace, monospace; color: #f2d998; white-space: nowrap; }
+.hud-wallet > span { display: inline-flex; align-items: center; gap: 5px; }
+.hud-coin { width: 14px; height: 14px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #ffe7a0, #c98f2a 70%); box-shadow: inset 0 0 0 3px #a8741f, inset 0 0 0 4px #f5d180; }
+.hud-wexp { font: 700 13px/1 serif; font-style: normal; color: #86d0bd; }
+
+.location-plaque {
+  position: absolute; z-index: 29; top: 14px; left: 50%; transform: translateX(-50%); max-width: min(420px, 36vw);
+  pointer-events: none; text-align: center;
+}
+.location-plaque span {
+  display: block; padding: 6px 30px; font: 21px/1.45 var(--font-display); color: #f7e7ba; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  background: linear-gradient(90deg, transparent, #0f1d19ee 16%, #0f1d19ee 84%, transparent);
+  border-top: 2px solid #b8975a; border-bottom: 2px solid #b8975a; text-shadow: 2px 2px 0 #07120f;
+}
+
+.location-hud { position: absolute; z-index: 30; top: 10px; right: 14px; display: flex; flex-direction: column; align-items: center; pointer-events: none; }
+.sundial { width: 104px; height: 104px; filter: drop-shadow(3px 4px 0 #07120f70); }
+.sundial svg { width: 100%; height: 100%; overflow: visible; }
+.sundial-rim { fill: #3a2f1e; stroke: #d0ad62; stroke-width: 3; }
+.sundial-sky { fill: #2d5c7c; stroke: #16252d; stroke-width: 1.5; }
+.sundial--night .sundial-sky { fill: #16223f; }
+.sundial-ring { transition: transform 900ms ease-in-out; }
+.sundial-ring text { font: 11px serif; fill: #f3e6c2; text-anchor: middle; }
+.sundial-ring text.sundial-current { fill: #ffd76b; font-weight: 700; }
+.sundial-face { fill: #efdcac; stroke: #8c6c33; stroke-width: 2; }
+.sundial--night .sundial-face { fill: #c9c4e8; }
+.sundial-hour { font: 700 19px serif; fill: #3b2a12; text-anchor: middle; }
+.sundial-pointer { fill: #ffcf5a; stroke: #6d4d17; stroke-width: 1; }
+.hud-day {
+  margin-top: -8px; padding: 1px 14px; font-size: 13px; color: #cfd9e6;
+  background: #101c26ee; border: 2px solid #6d8aa5; border-radius: 999px; white-space: nowrap;
+}
+.hud-day b { font: 700 18px/1.3 var(--font-display); color: #fff3cf; }
+
+.game-menu {
+  position: absolute; z-index: 30; bottom: max(14px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%);
+  display: flex; gap: 6px; padding: 6px 12px 4px;
+  background: linear-gradient(transparent, #0b1714c7 30%); border-bottom: 2px solid #8f7a4f;
+}
+.game-menu-button { position: relative; display: flex; flex-direction: column; align-items: center; width: 64px; gap: 2px; color: #e9ddba; }
+.game-menu-medal {
+  position: relative; display: grid; place-items: center; width: 50px; height: 50px; border-radius: 50%;
+  background: radial-gradient(circle at 50% 38%, #2f463b, #101d19 72%); border: 2px solid #b8975a;
+  box-shadow: 0 0 0 2px #0b1512, inset 0 0 0 2px #1d2f28, 0 3px 0 #07120f; transition: transform 120ms, border-color 120ms, background 120ms;
+}
+.game-menu-medal img { width: 32px; height: 32px; }
+.game-menu-button span.game-menu-label { font-size: 12px; white-space: nowrap; text-shadow: 1px 1px 0 #07120f; }
+.game-menu-button kbd {
+  position: absolute; left: 50%; bottom: -5px; transform: translateX(-50%); min-width: 17px; padding: 0 3px;
+  font: 700 10px/15px ui-monospace, monospace; color: #1b1a12; background: #e9cf8c; border: 1px solid #7a5e2a; border-radius: 3px;
+}
+.game-menu-button:hover .game-menu-medal, .game-menu-button:focus-visible .game-menu-medal { transform: translateY(-2px); border-color: #f4dc9c; background: radial-gradient(circle at 50% 38%, #3f5b4c, #152621 72%); }
+.game-menu-button:focus-visible { outline: none; }
+.game-menu-button:focus-visible .game-menu-medal { outline: 2px solid #f2d790; outline-offset: 2px; }
+.game-menu-badge {
+  position: absolute; top: -4px; right: 2px; min-width: 18px; height: 18px; padding: 0 4px; display: grid; place-items: center;
+  font-size: 11px; color: #fff4dc; background: #b33a2c; border: 1px solid #f0b39a; border-radius: 9px;
+}
+
+.journey-guide:not(.journey-guide--inline) { top: 104px; left: 14px; width: 330px; }
+
+@media (max-width: 900px) {
+  .hud-strip { width: 360px; }
+  .hud-vitals { gap: 7px; }
+  .location-plaque { top: 120px; left: 14px; transform: none; max-width: 300px; text-align: left; }
+  .location-plaque span { padding: 4px 22px 4px 12px; font-size: 18px; background: linear-gradient(90deg, #0f1d19ee 80%, transparent); border-left: 2px solid #b8975a; }
+  .journey-guide:not(.journey-guide--inline) { top: 166px; }
+}
+@media (max-width: 640px) {
+  .player-hud { top: max(8px, env(safe-area-inset-top)); left: 8px; right: 86px; }
+  .hud-portrait { width: 54px; height: 54px; border-width: 2px; }
+  .hud-strip { flex: 1; min-width: 0; width: auto; margin-left: -12px; padding: 5px 8px 6px 18px; gap: 2px 8px; }
+  .hud-player-name { font-size: 15px; }
+  .hud-vitals { gap: 5px; }
+  .hud-glyph { font-size: 14px; }
+  .hud-gauge small { font-size: 9.5px; }
+  .hud-gauge small span { display: none; }
+  .hud-wallet { font-size: 11px; gap: 8px; }
+  .location-hud { top: max(6px, env(safe-area-inset-top)); right: 6px; }
+  .sundial { width: 74px; height: 74px; }
+  .hud-day { margin-top: -6px; padding: 0 9px; font-size: 11px; }
+  .hud-day b { font-size: 15px; }
+  .location-plaque { top: 78px; left: 8px; max-width: calc(100% - 100px); }
+  .location-plaque span { font-size: 16px; }
+  .journey-guide:not(.journey-guide--inline) { top: 118px; left: 8px; width: calc(100% - 16px); }
+  .game-menu { gap: 0; padding: 4px 2px 3px; width: 100%; justify-content: space-around; bottom: 0; padding-bottom: max(4px, env(safe-area-inset-bottom)); }
+  .game-menu-button { width: 12.5%; }
+  .game-menu-medal { width: 40px; height: 40px; }
+  .game-menu-medal img { width: 26px; height: 26px; }
+  .game-menu-button span.game-menu-label { font-size: 10px; }
+  .game-menu-button kbd { display: none; }
+}
+@media (max-height: 560px) and (min-width: 641px) {
+  .player-hud { top: 6px; left: 8px; }
+  .hud-portrait { width: 52px; height: 52px; }
+  .hud-strip { width: 400px; padding: 4px 10px 5px 20px; gap: 1px 10px; }
+  .hud-player-name { font-size: 15px; }
+  .location-plaque { top: 6px; left: 50%; transform: translateX(-50%); max-width: 26vw; text-align: center; }
+  .location-plaque span { padding: 3px 18px; font-size: 16px; border-left: 0; background: linear-gradient(90deg, transparent, #0f1d19ee 16%, #0f1d19ee 84%, transparent); }
+  .sundial { width: 70px; height: 70px; }
+  .hud-day { margin-top: -6px; font-size: 11px; }
+  .hud-day b { font-size: 14px; }
+  .journey-guide:not(.journey-guide--inline) { top: 70px; left: 8px; width: 300px; }
+  .game-menu { bottom: 4px; padding: 3px 8px 2px; }
+  .game-menu-button { width: 54px; }
+  .game-menu-medal { width: 38px; height: 38px; }
+  .game-menu-medal img { width: 24px; height: 24px; }
+  .game-menu-button span.game-menu-label { font-size: 10px; }
+  .game-menu-button kbd { display: none; }
+}
+@media (pointer: coarse) { .game-menu-button kbd { display: none; } }
+@media (prefers-reduced-motion: reduce) { .sundial-ring, .hud-gauge-track > div { transition: none; } }

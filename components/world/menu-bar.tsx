@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Panel } from "@/components/ui/wuxia/panel";
 import { WuxiaButton } from "@/components/ui/wuxia/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +13,7 @@ import { ActionLogPopup } from "./popups/action-log-popup";
 import { QuestLogPopup } from "./popups/quest-log-popup";
 import { SectMembershipPopup } from "./popups/sect-membership-popup";
 import { RestPopup } from "./popups/rest-popup";
+import { GameMenuContext } from "@/components/ui/game-menu-context";
 import {
   SECT_MEMBERSHIPS,
   getQuestsForSect,
@@ -111,8 +112,15 @@ export function MenuBar({ hud }: { hud?: boolean } = {}) {
     { id: "log", icon: "/icons/ui/log.png", label: "บันทึก" },
   ];
 
+  // Hero's Adventure-style unified menu: the open popup renders inside one
+  // full-screen tabbed shell, and number keys 1-8 switch sections in place.
+  const menu = {
+    tabs: tabs.map((t, i) => ({ ...t, hotkey: String(i + 1) })),
+    active: open,
+    select: (id: string) => setOpen(id as Exclude<PopupId, null>),
+  };
   const popups = (
-    <>
+    <GameMenuContext.Provider value={menu}>
       <ProfilePopup open={open === "profile"} onClose={close} />
       <InventoryPopup open={open === "inventory"} onClose={close} />
       <MoveSkillsPopup open={open === "moves"} onClose={close} />
@@ -121,39 +129,47 @@ export function MenuBar({ hud }: { hud?: boolean } = {}) {
       <SectMembershipPopup open={open === "sect"} onClose={close} />
       <ActionLogPopup open={open === "log"} onClose={close} />
       <RestPopup open={open === "rest"} onClose={close} />
-    </>
+    </GameMenuContext.Provider>
   );
 
-  // HUD variant — icon column overlaid on the fullscreen map (top-right).
+  // World hotkeys 1-8 open a menu section when nothing else is on screen
+  // (inside the menu the shell handles the same keys to switch tabs).
+  useEffect(() => {
+    if (!hud || open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.repeat || e.altKey || e.ctrlKey || e.metaKey) return;
+      const target = e.target;
+      if (target instanceof HTMLElement && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName))) return;
+      if (document.querySelector('[role="dialog"], [role="alertdialog"]')) return;
+      const index = Number(e.key) - 1;
+      if (Number.isInteger(index) && index >= 0 && index < tabs.length) { e.preventDefault(); setOpen(tabs[index].id); }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  });
+
+  // HUD variant — round medallion row overlaid on the fullscreen map.
   if (hud) {
     return (
       <>
-        <nav className="game-menu pixel-panel" aria-label="เมนูเกม">
-          {tabs.map((t) => (
+        <nav className="game-menu" aria-label="เมนูเกม">
+          {tabs.map((t, i) => (
             <button
               key={t.id}
               type="button"
-              title={t.label}
+              title={`${t.label} (${i + 1})`}
               onClick={() => setOpen(t.id)}
               aria-label={t.label}
+              aria-keyshortcuts={String(i + 1)}
               className="game-menu-button"
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={t.icon}
-                alt={t.label}
-                className="h-8 w-8 pixel"
-                draggable={false}
-              />
-              <span>{t.label}</span>
-              {typeof t.badge === "number" && (
-                <Badge
-                  variant="seal"
-                  className="absolute -top-1 -right-1 text-[9px] px-1 h-4 leading-none"
-                >
-                  {t.badge}
-                </Badge>
-              )}
+              <span className="game-menu-medal">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={t.icon} alt="" className="pixel" draggable={false} />
+                {typeof t.badge === "number" && <b className="game-menu-badge">{t.badge}</b>}
+                <kbd aria-hidden="true">{i + 1}</kbd>
+              </span>
+              <span className="game-menu-label">{t.label}</span>
             </button>
           ))}
         </nav>

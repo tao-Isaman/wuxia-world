@@ -1,0 +1,164 @@
+/* ── Hero's Adventure-style menus ──────────────────────────────────────────
+   Every popup is dark lacquer with bronze frames (was cream paper). Menu-bar
+   popups open inside one full-screen tabbed shell with a red close mark. */
+
+.game-modal-card, .hud-menu-panel {
+  --background: 160 22% 11%; --foreground: 43 38% 88%;
+  --card: 160 20% 14%; --card-foreground: 43 38% 88%;
+  --popover: 160 22% 12%; --popover-foreground: 43 38% 88%;
+  --primary: 41 55% 58%; --primary-foreground: 160 30% 10%;
+  --secondary: 160 16% 19%; --secondary-foreground: 43 38% 88%;
+  --muted: 160 14% 18%; --muted-foreground: 55 12% 68%;
+  --accent: 150 30% 30%; --accent-foreground: 43 40% 92%;
+  --destructive: 356 62% 55%; --destructive-foreground: 43 40% 95%;
+  --border: 40 22% 34%; --input: 40 22% 34%; --ring: 41 55% 58%;
+  color: hsl(var(--foreground));
+  background: #13231f;
+  border: 2px solid #8f7a4f;
+  box-shadow: inset 0 0 0 1px #2c3f35, 0 0 0 2px #0b1512, 6px 8px 0 #060e0c99;
+}
+.game-modal { background: #050b09c2; }
+.game-modal-heading { background: #0f1c19; border-bottom: 2px solid #8f7a4f; color: #f1dfae; }
+.game-modal-heading h3 { color: #f1dfae; }
+
+/* Light-theme utility colours authored for cream paper, re-inked for lacquer. */
+:is(.game-modal-card, .hud-menu-panel) :is(.text-ink, .text-slate-900, .text-slate-700, .text-stone-700) { color: hsl(var(--foreground)); }
+:is(.game-modal-card, .hud-menu-panel) [class*="text-emerald-"] { color: #86d8a6; }
+:is(.game-modal-card, .hud-menu-panel) [class*="text-rose-"], :is(.game-modal-card, .hud-menu-panel) [class*="text-red-"] { color: #f19186; }
+:is(.game-modal-card, .hud-menu-panel) [class*="text-amber-"], :is(.game-modal-card, .hud-menu-panel) [class*="text-yellow-"] { color: #f0c870; }
+:is(.game-modal-card, .hud-menu-panel) [class*="text-orange-"] { color: #f3aa70; }
+:is(.game-modal-card, .hud-menu-panel) :is([class*="text-sky-"], [class*="text-blue-"], [class*="text-indigo-"]) { color: #93b9f2; }
+:is(.game-modal-card, .hud-menu-panel) :is([class*="text-violet-"], [class*="text-purple-"]) { color: #c6a4f2; }
+:is(.game-modal-card, .hud-menu-panel) .text-vermilion { color: #f08b71; }
+:is(.game-modal-card, .hud-menu-panel) .text-jade { color: #7fcfb0; }
+:is(.game-modal-card, .hud-menu-panel) :is(.bg-emerald-50, .bg-emerald-100, .bg-emerald-100\/40) { background-color: #2f7a5233; }
+:is(.game-modal-card, .hud-menu-panel) :is(.bg-rose-50, .bg-rose-100, .bg-rose-50\/40) { background-color: #a0403c33; }
+:is(.game-modal-card, .hud-menu-panel) :is(.bg-amber-50, .bg-amber-100, .bg-amber-50\/40, .bg-amber-950\/10) { background-color: #a6802f33; }
+:is(.game-modal-card, .hud-menu-panel) :is(.bg-orange-100, .bg-stone-100, .bg-stone-200, .bg-slate-50) { background-color: #ffffff12; }
+:is(.game-modal-card, .hud-menu-panel) :is(.bg-sky-50, .bg-blue-100, .bg-indigo-100) { background-color: #3f5f9a33; }
+:is(.game-modal-card, .hud-menu-panel) :is(.bg-paper, .bg-white) { background-color: hsl(var(--card)); }
+:is(.game-modal-card, .hud-menu-panel) :is(.border-ink, .border-ink\/30, .border-ink\/60, .border-ink\/70) { border-color: hsl(var(--border)); }
+
+/* Full-screen tabbed shell. */
+.hud-menu {
+  position: fixed; inset: 0; z-index: 50; display: flex; flex-direction: column;
+  background: radial-gradient(ellipse at 50% 40%, #102320e8, #050b09f2 75%);
+  animation: hud-menu-in 140ms ease-out;
+}
+@keyframes hud-menu-in { from { opacity: 0; } to { opacity: 1; } }
+.hud-menu-bar {
+  display: flex; align-items: flex-end; gap: 12px; flex: 0 0 auto;
+  padding: max(14px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) 0 max(20px, env(safe-area-inset-left));
+  border-bottom: 2px solid #6f5f3d; background: linear-gradient(#0a1512, #0d1a17);
+}
+.hud-menu-tabs { flex: 1; display: flex; justify-content: center; gap: 6px; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+.hud-menu-tabs::-webkit-scrollbar { display: none; }
+.hud-menu-tab {
+  position: relative; flex: 0 0 auto; display: flex; align-items: center; gap: 8px;
+  min-height: 48px; padding: 6px 16px 8px; margin-bottom: -2px;
+  color: #bdb79e; font-size: 16px; background: #15231f;
+  border: 2px solid #4e4a36; border-bottom-color: #6f5f3d;
+  box-shadow: inset 0 0 0 1px #0b1512;
+  transition: color 120ms, background 120ms;
+}
+.hud-menu-tab img { width: 26px; height: 26px; }
+.hud-menu-tab:hover { color: #f3e2b4; background: #1f3029; }
+.hud-menu-tab[aria-selected=true] {
+  color: #1b1a12; background: linear-gradient(#f0d58f, #c9a55c); font-weight: 700;
+  border-color: #f6e2a8; border-bottom-color: #c9a55c;
+}
+.hud-menu-tab:focus-visible { outline: 2px solid #f2d790; outline-offset: 2px; }
+.hud-menu-badge {
+  position: absolute; top: -7px; right: -6px; min-width: 18px; height: 18px; padding: 0 4px;
+  display: grid; place-items: center; font-size: 11px; color: #fff4dc;
+  background: #b33a2c; border: 1px solid #f0b39a;
+}
+.hud-menu-close {
+  flex: 0 0 auto; width: 52px; height: 52px; margin-bottom: 6px;
+  font-size: 36px; line-height: 1; font-weight: 900; color: #e04b3b;
+  text-shadow: 2px 2px 0 #3d0f0a, -1px -1px 0 #ff9a84;
+  transition: transform 120ms, color 120ms;
+}
+.hud-menu-close:hover { color: #ff6a55; transform: scale(1.08); }
+.hud-menu-close:focus-visible { outline: 2px solid #f2d790; }
+.hud-menu-stage {
+  flex: 1; min-height: 0; display: flex; justify-content: center;
+  padding: 18px max(20px, env(safe-area-inset-right)) max(18px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+}
+.hud-menu-panel {
+  position: relative; width: min(1120px, 100%); display: flex; flex-direction: column; min-height: 0;
+  padding: 0;
+}
+/* Bronze corner brackets, like the reference game's framed panels. */
+.hud-menu-panel::before, .hud-menu-panel::after {
+  content: ""; position: absolute; width: 22px; height: 22px; pointer-events: none;
+  border: 3px solid #c9a55c;
+}
+.hud-menu-panel::before { top: -5px; left: -5px; border-right: 0; border-bottom: 0; }
+.hud-menu-panel::after { bottom: -5px; right: -5px; border-left: 0; border-top: 0; }
+.hud-menu-title {
+  flex: 0 0 auto; padding: 10px 20px; font-family: var(--font-display); font-size: 21px; line-height: 1.5;
+  color: #f1dfae; background: linear-gradient(90deg, #1b2c26, #13231f 70%);
+  border-bottom: 1px solid #5d5236;
+}
+.hud-menu-body { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 16px 20px 22px; scrollbar-color: #8f7a4f #13231f; }
+
+@media (max-width: 760px) {
+  .hud-menu-bar { gap: 4px; padding-left: 6px; padding-right: 4px; }
+  .hud-menu-tabs { justify-content: flex-start; gap: 3px; }
+  .hud-menu-tab { flex-direction: column; gap: 1px; min-height: 54px; padding: 5px 8px 6px; font-size: 11px; }
+  .hud-menu-tab img { width: 24px; height: 24px; }
+  .hud-menu-close { width: 44px; height: 48px; font-size: 30px; }
+  .hud-menu-stage { padding: 8px 6px max(8px, env(safe-area-inset-bottom)); }
+  .hud-menu-panel::before, .hud-menu-panel::after { display: none; }
+  .hud-menu-title { font-size: 18px; padding: 8px 12px; }
+  .hud-menu-body { padding: 12px 12px 18px; }
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  .hud-menu-bar { padding-top: 4px; }
+  .hud-menu-tab { min-height: 40px; padding: 3px 9px 4px; font-size: 12px; }
+  .hud-menu-tab img { width: 20px; height: 20px; }
+  .hud-menu-close { height: 40px; font-size: 28px; }
+  .hud-menu-stage { padding-top: 6px; padding-bottom: 6px; }
+  .hud-menu-title { padding: 5px 14px; font-size: 17px; }
+}
+@media (prefers-reduced-motion: reduce) { .hud-menu { animation: none; } }
+
+/* Readable type in the menus (content was authored at 9-11px for a cream card). */
+.hud-menu-body :is(.text-\[9px\], .text-\[10px\]) { font-size: 12px; line-height: 1.5; }
+.hud-menu-body .text-\[11px\] { font-size: 13px; line-height: 1.5; }
+.hud-menu-body .text-xs { font-size: 13.5px; line-height: 1.55; }
+.hud-menu-body .text-sm { font-size: 15px; line-height: 1.6; }
+.game-modal-body :is(.text-\[9px\], .text-\[10px\]) { font-size: 11.5px; }
+.game-modal-body .text-xs { font-size: 13px; }
+
+@media (max-width: 480px) {
+  .hud-menu-tabs { gap: 2px; }
+  .hud-menu-tab { flex: 1 1 0; min-width: 0; padding: 5px 1px 6px; font-size: 10px; }
+  .hud-menu-tab span { max-width: 100%; overflow: hidden; text-overflow: clip; white-space: nowrap; }
+  .hud-menu-close { width: 40px; font-size: 28px; }
+}
+
+/* ── Encounter confrontation ─────────────────────────────────────────── */
+.encounter-panel { width: min(560px, 100%); margin: 0 auto; padding: 18px 20px 14px; }
+.encounter-kicker { color: #e3a27b; font-size: 13px; letter-spacing: .04em; }
+.encounter-body { display: grid; grid-template-columns: 112px 1fr; gap: 16px; align-items: center; margin-top: 10px; }
+.encounter-portrait { height: 112px; overflow: hidden; background: radial-gradient(circle at 50% 40%, #2c4238, #101d19 72%); border: 2px solid; box-shadow: inset 0 0 0 1px #0b1512; }
+.encounter-portrait .character-preview { width: 150%; max-width: none; height: 150%; margin: -12% 0 0 -25%; }
+.encounter-glyph { display: grid; place-items: center; height: 100%; font-size: 52px; color: #f0c9a8; }
+.encounter-copy h2 { font-family: var(--font-display); font-size: 30px; line-height: 1.35; text-shadow: 2px 2px 0 #0b1512; }
+.encounter-tier { display: inline-block; margin-top: 2px; padding: 1px 8px; border: 1px solid; font-size: 13px; }
+.encounter-flavor { margin-top: 8px; color: #d6d0b8; font-size: 15px; line-height: 1.6; }
+.encounter-actions { display: grid; grid-template-columns: 1.4fr 1fr; gap: 10px; margin-top: 16px; }
+.encounter-actions kbd { margin-left: 8px; padding: 0 5px; font: 11px ui-monospace, monospace; border: 1px solid currentColor; opacity: .7; }
+.encounter-fight { font-size: 17px; background: #c9493a; color: #fff3df; border-color: #f2a48f; box-shadow: inset -2px -2px 0 #7c2319, 0 3px 0 #0d1c18; }
+.encounter-flee { padding: 12px 18px; font-size: 16px; color: #e8dfc2; background: #1f3029; border: 2px solid #6f7a5c; }
+.encounter-flee:hover { background: #2a3d34; }
+.encounter-note { margin-top: 10px; text-align: center; color: #9fa591; font-size: 12px; }
+@media (max-width: 480px) {
+  .encounter-body { grid-template-columns: 84px 1fr; gap: 12px; }
+  .encounter-portrait { height: 92px; }
+  .encounter-copy h2 { font-size: 24px; }
+  .encounter-actions kbd { display: none; }
+}
+@media (pointer: coarse) { .encounter-actions kbd { display: none; } }

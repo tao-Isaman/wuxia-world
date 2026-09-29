@@ -2,9 +2,7 @@
 .journey-guide {
   position: absolute;
   z-index: 20;
-  top: 171px;
-  left: 16px;
-  width: 300px;
+  /* top / left / width follow the HUD layout in game-hud.css */
   color: #eae5d1;
   background: #172c29f5;
   border: 1px solid #8e8962;
@@ -37,16 +35,7 @@
 /* The destination chooser needs its full touch area while it is open. */
 .world-viewport:has(.world-places) ~ .journey-guide { visibility: hidden; pointer-events: none; }
 
-@media (max-width: 640px) {
-  .journey-guide:not(.journey-guide--inline) {
-    top: 248px;
-    bottom: auto;
-    left: 10px;
-    width: calc(100% - 20px);
-  }
-}
 @media (max-height: 560px) and (min-width: 641px) {
-  .journey-guide:not(.journey-guide--inline) { top: 169px; left: 16px; width: 272px; }
   .journey-guide-toggle { padding: 6px 10px; }
   .journey-guide-content { padding: 0 10px 9px; max-height: calc(100dvh - 292px); overflow-y: auto; }
   .journey-guide-description { line-height: 1.5; }

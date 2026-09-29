@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef } from "react";
 import type { ArtisanDef, LocationMapDef, LocationScene, MapSpot, NpcDef } from "@/lib/world";
-import { evaluateCondition, getArtisan, getNpcsAtLocation, getResource, getScene, getSectHallAt, getShopAt, npcBodySprite, playerBodySprite } from "@/lib/world";
+import { evaluateCondition, getArtisan, getQuestsForNpc, isQuestOfferable, isQuestTurnInForNpc, getNpcsAtLocation, getResource, getScene, getSectHallAt, getShopAt, npcBodySprite, playerBodySprite } from "@/lib/world";
 import { useWorldStore, TRAVEL_STAMINA_COST } from "@/store/world-store";
 import { toast } from "@/store/toast-store";
 import { WorldCanvas } from "@/components/game/world-canvas";
@@ -36,7 +36,11 @@ export function LocationMap({ scene, map, handlers, readOnly = false, dialogueSp
       } });
   }
   for (const npc of registry) {
-    markers.push({ id: "npc-" + npc.id, ...spots[npc.id], kind: "npc", label: npc.name,
+    // Same filters as the NPC popup: a turn-in outranks a fresh offer.
+    const quests = getQuestsForNpc(npc.id);
+    const quest = quests.some((q) => isQuestTurnInForNpc(state, q, npc.id)) ? "turnin" as const
+      : quests.some((q) => isQuestOfferable(state, q)) ? "offer" as const : undefined;
+    markers.push({ id: "npc-" + npc.id, ...spots[npc.id], kind: "npc", label: npc.name, quest,
       image: npcBodySprite(npc.id), onActivate: () => handlers.onRegistryNpc(npc) });
   }
   function service(spot: MapSpot): { label: string; icon: string; action: () => void } | null {

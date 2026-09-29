@@ -7,6 +7,8 @@ export interface WorldMarker extends Point {
   image?: string;
   icon?: string;
   disabled?: boolean;
+  /** Quest marker over an NPC: "offer" shows !, "turnin" shows ?. */
+  quest?: "offer" | "turnin";
   onActivate: () => void;
 }
 

@@ -46,6 +46,9 @@ type MarkerVisual = {
   hit: THREE.Mesh;
   label: THREE.Sprite;
   labelText: string;
+  /** Hero's Adventure-style always-on name over an NPC (hidden while the boxed label shows). */
+  nameTag?: THREE.Sprite;
+  questMark?: THREE.Sprite;
   halo: THREE.Sprite;
   character?: CharacterVisual;
   opacity: number;
@@ -89,6 +92,7 @@ export function createWorldRuntime(
   const materials = new Set<THREE.Material>();
   const geometries = new Set<THREE.BufferGeometry>();
   const markers = new Map<string, MarkerVisual>();
+  let questMarks: Record<"!" | "?", THREE.Texture> = {} as Record<"!" | "?", THREE.Texture>;
   const props = new Map<string, THREE.Sprite>();
   const bystanders = new Map<string, { group: THREE.Group; character: CharacterVisual }>();
   const hitTargets: THREE.Mesh[] = [];
@@ -233,6 +237,35 @@ export function createWorldRuntime(
       context.textAlign = "center";
       context.textBaseline = "middle";
       context.fillText(text, width / 2, 13);
+    });
+  }
+  function nameTagTexture(text: string): THREE.Texture {
+    const measurement = document.createElement("canvas").getContext("2d");
+    if (!measurement) throw new Error("Canvas context unavailable");
+    measurement.font = `600 13px ${font}`;
+    const width = Math.ceil(measurement.measureText(text).width) + 10;
+    return drawnTexture(width, 22, (context) => {
+      context.font = `600 13px ${font}`;
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+      context.lineJoin = "round";
+      context.lineWidth = 4;
+      context.strokeStyle = "rgba(8, 20, 14, 0.95)";
+      context.strokeText(text, width / 2, 11);
+      context.fillStyle = "#8ee67a";
+      context.fillText(text, width / 2, 11);
+    });
+  }
+  function questMarkTexture(glyph: "!" | "?"): THREE.Texture {
+    return drawnTexture(22, 30, (context) => {
+      context.font = "900 26px serif";
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+      context.lineWidth = 5;
+      context.strokeStyle = "#2a1a05";
+      context.strokeText(glyph, 11, 16);
+      context.fillStyle = glyph === "!" ? "#ffd24a" : "#f4f0e4";
+      context.fillText(glyph, 11, 16);
     });
   }
   function makeLabel(text: string): THREE.Sprite {
@@ -443,6 +476,7 @@ export function createWorldRuntime(
       bystanders.set(bystander.id, { group, character });
     }
     const exitBadge = markerBadge("exit");
+    questMarks = { "!": questMarkTexture("!"), "?": questMarkTexture("?") };
     initial.markers.forEach((marker, index) => {
       const point = toWorld(marker);
       const group = new THREE.Group();
@@ -470,6 +504,21 @@ export function createWorldRuntime(
       const label = makeLabel(marker.label);
       label.visible = false;
       group.add(label);
+      let nameTag: THREE.Sprite | undefined;
+      let questMark: THREE.Sprite | undefined;
+      if (character) {
+        const tagTexture = nameTagTexture(marker.label);
+        const tagCanvas = tagTexture.image as HTMLCanvasElement;
+        nameTag = sprite(tagTexture, tagCanvas.width, tagCanvas.height);
+        nameTag.center.set(0.5, 0);
+        nameTag.renderOrder = 9_000;
+        group.add(nameTag);
+        questMark = sprite(questMarks[marker.quest === "turnin" ? "?" : "!"], 22, 30);
+        questMark.center.set(0.5, 0);
+        questMark.renderOrder = 9_001;
+        questMark.visible = false;
+        group.add(questMark);
+      }
       const hitWidth = marker.kind === "npc" ? 50 : 44;
       const hitHeight = marker.kind === "npc" ? 76 : 52;
       const hit = new THREE.Mesh(resourceGeometry(new THREE.PlaneGeometry(hitWidth, hitHeight)),
@@ -479,7 +528,7 @@ export function createWorldRuntime(
       hit.userData.markerId = marker.id;
       group.add(hit);
       hitTargets.push(hit);
-      markers.set(marker.id, { group, hit, label, labelText: marker.label, halo, character, opacity: 1, phase: index * 0.47 });
+      markers.set(marker.id, { group, hit, label, labelText: marker.label, nameTag, questMark, halo, character, opacity: 1, phase: index * 0.47 });
     });
 
     actor = new THREE.Group();
@@ -618,6 +667,21 @@ export function createWorldRuntime(
       const halfLabel = visual.label.scale.x / 2;
       visual.label.position.x = THREE.MathUtils.clamp(point.x, camera.position.x - viewWidth / 2 + halfLabel + 6,
         camera.position.x + viewWidth / 2 - halfLabel - 6) - point.x;
+      if (visual.nameTag) {
+        const tagCanvas = visual.nameTag.material.map!.image as HTMLCanvasElement;
+        const tagScale = 1 / viewScale;
+        visual.nameTag.scale.set(tagCanvas.width * tagScale, tagCanvas.height * tagScale, 1);
+        visual.nameTag.position.y = 56;
+        visual.nameTag.visible = !visual.label.visible;
+      }
+      if (visual.questMark) {
+        const mark = marker.quest === "turnin" ? "?" : "!";
+        if (visual.questMark.material.map !== questMarks[mark]) visual.questMark.material.map = questMarks[mark];
+        const bob = reducedMotion ? 0 : Math.sin(animationTime * 3 + visual.phase) * 2;
+        visual.questMark.scale.set(22 / viewScale, 30 / viewScale, 1);
+        visual.questMark.position.y = 56 + (visual.label.visible ? visual.label.scale.y : 22 / viewScale) + 2 + bob;
+        visual.questMark.visible = !!marker.quest;
+      }
       visual.halo.visible = selected || (marker.kind === "npc" && distance < 80);
       if (visual.character) {
         const idle = CHARACTER_CLIPS.idle;

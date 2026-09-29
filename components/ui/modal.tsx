@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { Card, CardContent } from "./card";
 import { Button } from "./button";
+import { InsideMenuShellContext, useGameMenu, useInsideMenuShell } from "./game-menu-context";
 
 interface Props {
   open: boolean;
@@ -13,20 +14,61 @@ interface Props {
   maxWidth?: string;
 }
 
+const typing = (target: EventTarget | null) =>
+  target instanceof HTMLElement && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName));
+
 // Lightweight modal — backdrop click + Escape close, scrolls inside the card
-// if the content overflows the viewport. Built on top of Card so the visual
-// language matches the rest of the world UI.
+// if the content overflows the viewport. Opened from the HUD menu bar it
+// becomes the full-screen tabbed menu shell (see game-menu-context.tsx).
 export function Modal({ open, onClose, title, children, maxWidth = "max-w-2xl" }: Props) {
+  const menu = useGameMenu();
+  const nested = useInsideMenuShell();
+  const shell = !!menu?.active && !nested;
+
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") { onClose(); return; }
+      // Number keys jump between menu tabs, like the reference game's hotkeys.
+      if (!shell || !menu || typing(e.target) || e.altKey || e.ctrlKey || e.metaKey) return;
+      const tab = menu.tabs.find((candidate) => candidate.hotkey === e.key);
+      if (tab) { e.preventDefault(); menu.select(tab.id); }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
+  }, [open, onClose, shell, menu]);
 
   if (!open) return null;
+
+  if (shell && menu) {
+    return (
+      <div className="hud-menu" role="dialog" aria-modal="true" aria-label={title}>
+        <header className="hud-menu-bar">
+          <nav className="hud-menu-tabs" role="tablist" aria-label="หมวดเมนู">
+            {menu.tabs.map((tab) => (
+              <button key={tab.id} type="button" role="tab" aria-selected={tab.id === menu.active}
+                className="hud-menu-tab" onClick={() => menu.select(tab.id)}
+                title={tab.hotkey ? `${tab.label} (${tab.hotkey})` : tab.label}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={tab.icon} alt="" className="pixel" draggable={false} />
+                <span>{tab.label}</span>
+                {typeof tab.badge === "number" && <b className="hud-menu-badge">{tab.badge}</b>}
+              </button>
+            ))}
+          </nav>
+          <button type="button" className="hud-menu-close" onClick={onClose} aria-label="ปิด">✕</button>
+        </header>
+        <div className="hud-menu-stage" onClick={onClose}>
+          <section className="hud-menu-panel game-modal-card" onClick={(e) => e.stopPropagation()}>
+            {title && <h2 className="hud-menu-title">{title}</h2>}
+            <div className="hud-menu-body">
+              <InsideMenuShellContext.Provider value>{children}</InsideMenuShellContext.Provider>
+            </div>
+          </section>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -52,7 +94,9 @@ export function Modal({ open, onClose, title, children, maxWidth = "max-w-2xl" }
               ✕
             </Button>
           </div>
-          <div className="game-modal-body max-h-[70vh] overflow-y-auto pr-1">{children}</div>
+          <div className="game-modal-body max-h-[70vh] overflow-y-auto pr-1">
+            <InsideMenuShellContext.Provider value>{children}</InsideMenuShellContext.Provider>
+          </div>
         </CardContent>
       </Card>
     </div>
