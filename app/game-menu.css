@@ -356,3 +356,13 @@ button.item-tile:hover { transform: translateY(-2px); box-shadow: inset 0 0 0 2p
 /* Destructive ghost actions (ลืม) read as framed buttons. */
 :is(.hud-menu-body, .game-modal-body) button.text-destructive { border: 1px solid #8f524466; }
 :is(.hud-menu-body, .game-modal-body) button.text-destructive:hover { background: #3a1f1a; border-color: #b0624f; }
+
+/* Portaled popovers (combobox lists, info popovers) opened from a dark panel. */
+body:has(.hud-menu, .game-modal) [data-radix-popper-content-wrapper] > * {
+  --background: 160 22% 11%; --foreground: 43 38% 88%; --popover: 160 22% 12%; --popover-foreground: 43 38% 88%;
+  --muted: 160 14% 18%; --muted-foreground: 55 12% 68%; --accent: 150 18% 21%; --accent-foreground: 43 45% 93%;
+  --border: 40 22% 34%; --input: 40 22% 34%; --primary: 41 55% 58%; --primary-foreground: 160 30% 10%;
+  color: hsl(var(--popover-foreground)); background-color: hsl(var(--popover)); border-color: #8f7a4f;
+}
+.hud-menu-body button[role=combobox] { min-height: 40px; font-size: 15px; background: #0f1c19; border-color: #6f5f3d; }
+.hud-menu-body button[role=combobox]:hover { border-color: #c9a55c; background: #15241f; }
