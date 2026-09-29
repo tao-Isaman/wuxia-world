@@ -3,6 +3,9 @@ import { test } from "node:test";
 import {
   moveOnWorldGround, nearestWorldGround, planWorldPath, worldFootprints, worldPointBlocked, worldSegmentClear,
 } from "./world-navigation";
+import { probeWorldMap, type ProbeMarker } from "./world-map-probe";
+import { getLocationMap } from "../world/data/location-maps";
+import { AUTO_MAP_IDS } from "../world/data/auto-map-ids";
 
 const home = worldFootprints("home_player", "/maps/home_player.png");
 const capital = worldFootprints("city_capital", "/maps/city_capital.png");
@@ -99,4 +102,27 @@ test("old positions inside authored objects recover to free ground; unmapped wor
   const unknown = worldFootprints("other_map", "/maps/other.png");
   assert.deepEqual(planWorldPath({ x: 400, y: 300 }, { x: 550, y: 300 }, unknown), [{ x: 550, y: 300 }]);
   assert.deepEqual(moveOnWorldGround({ x: 940, y: 620 }, { x: 100, y: 100 }, unknown), { x: 948, y: 628 });
+});
+
+test("every painted location keeps spawn open and every NPC, exit and service reachable", () => {
+  const ids = ["home_player", "city_capital", ...AUTO_MAP_IDS];
+  const failures: string[] = [];
+  let solid = 0;
+  for (const id of ids) {
+    const map = getLocationMap(id);
+    if (!map) continue;
+    const footprints = worldFootprints(id, map.image);
+    if (footprints.length) solid++;
+    const w = (p: { x: number; y: number }) => ({ x: p.x * 9.6, y: p.y * 6.4 });
+    const markers: ProbeMarker[] = [
+      ...Object.entries(map.npcSpots ?? {}).map(([npc, p]) => ({ id: npc, kind: "npc" as const, ...w(p) })),
+      ...(map.exits ?? []).map((exit) => ({ id: `exit ${exit.to}`, kind: "exit" as const, ...w(exit) })),
+      ...(map.spots ?? []).map((spot, index) => ({ id: `${spot.kind} ${index}`, kind: "service" as const, ...w(spot) })),
+    ];
+    const { spawnOk, results } = probeWorldMap(w(map.spawn), markers, footprints);
+    if (!spawnOk) failures.push(`${id}: spawn blocked`);
+    for (const result of results) if (!result.ok) failures.push(`${id}: ${result.id} ${result.reason}`);
+  }
+  assert.deepEqual(failures, []);
+  assert.ok(solid >= 2);
 });

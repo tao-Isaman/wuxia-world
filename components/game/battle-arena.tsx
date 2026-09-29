@@ -496,6 +496,9 @@ export function BattleArena({ mode = "free", onContinue }: BattleArenaProps) {
       </div>
       <div className="combat-field">
         <BattleCanvas mode={mode} onCastProgress={setCastProgress} />
+        {canAct && <div key={`turn-${state.turn}`} className="turn-callout" aria-hidden="true">
+          <span>ถึงตาเจ้า</span>
+        </div>}
         <div className="combat-hud">
           <SidePanel side="A" state={state} isActive={isAActive} artId={displayA.artId}
             artLevel={displayA.artLevel} name={displayA.name} progress={castProgress} />

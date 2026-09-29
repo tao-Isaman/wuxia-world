@@ -1,4 +1,5 @@
 import type { Point } from "./types";
+import { PAINTED_MAP_FOOTPRINTS } from "./world-footprints-data";
 
 export type WorldFootprint =
   | { kind: "rect"; left: number; top: number; right: number; bottom: number }
@@ -11,7 +12,7 @@ const distance = (a: Point, b: Point) => Math.hypot(a.x - b.x, a.y - b.y);
 const clamp = (value: number, low: number, high: number) => Math.max(low, Math.min(high, value));
 const inBounds = (point: Point): Point => ({ x: clamp(point.x, 12, 948), y: clamp(point.y, 18, 628) });
 
-/** Only grounded, authored objects are solid. Unmapped paintings retain open movement. */
+/** Only grounded, authored objects are solid. Paintings without footprints retain open movement. */
 export function worldFootprints(key: string, image: string): readonly WorldFootprint[] {
   if (key === "home_player" && image === "/maps/home_player.png") return [
     { kind: "ellipse", x: 520, y: 337, radiusX: 33, radiusY: 22 },
@@ -32,6 +33,7 @@ export function worldFootprints(key: string, image: string): readonly WorldFootp
     { kind: "rect", left: 363, top: 245, right: 450, bottom: 283 },
     { kind: "rect", left: 517, top: 239, right: 610, bottom: 274 },
   ];
+  if (image === `/maps/${key}.webp`) return PAINTED_MAP_FOOTPRINTS[key] ?? [];
   return [];
 }
 
