@@ -5,6 +5,7 @@ import { clearMapPositions } from "@/lib/stage/types";
 import type { Gender } from "@/lib/world";
 import { GENDER_LABEL, PLAYER_BODIES, PLAYER_BODY_LABEL, defaultBodyFor } from "@/lib/world";
 import { CharacterPreview } from "@/components/game/character-preview";
+import { InstallGameButton } from "@/components/pwa";
 
 export function StartScreen() {
   const startNewGame = useWorldStore((s) => s.startNewGame);
@@ -26,6 +27,7 @@ export function StartScreen() {
           <p className="title-description">หนึ่งชีวิต หนึ่งเส้นทางยุทธ์<br />เรื่องราวของเจ้าเริ่มต้นที่นี่</p>
           <div className="title-rule" />
           <p className="title-footnote">ออกเดินทาง · ฝึกวิชา · สร้างตำนาน</p>
+          <InstallGameButton />
         </div>
         <form className="hero-creation pixel-panel" onSubmit={(event) => {
           event.preventDefault();

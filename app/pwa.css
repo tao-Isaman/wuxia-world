@@ -1,0 +1,34 @@
+/* Installable-app polish: install control, home-screen (standalone) behaviour, notch-safe HUD. */
+
+.pwa-install { margin-top: 18px; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; max-width: 360px; }
+.pwa-install-button {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 42px; padding: 6px 16px;
+  font-weight: 700; font-size: 15px; color: #f6e7bd; background: #1d130acc;
+  border: 1px solid #c9a15a; border-radius: 999px; box-shadow: 0 0 0 1px #140a07, 0 3px 8px #0a050380;
+  text-shadow: 1px 1px 0 #140a07; transition: filter 120ms, transform 120ms;
+}
+.pwa-install-button:hover { filter: brightness(1.15); }
+.pwa-install-button:active { transform: translateY(1px); }
+.pwa-install-hint {
+  font-size: 13px; line-height: 1.6; color: #f1e4c3; padding: 8px 12px;
+  background: #1d130ae6; border: 1px solid #8f7a4f; border-radius: 8px;
+}
+.pwa-install-hint b { color: #ffd98a; }
+/* Inside the เมนู command window: a full-width row under the sections. */
+.command-window .pwa-install { grid-column: 1 / -1; grid-row: 5; margin-top: 6px; max-width: none; }
+.command-window .pwa-install-button { font-size: 14px; min-height: 36px; }
+
+/* Home-screen app: no rubber-band pull-to-refresh, no long-press callouts on the stage. */
+@media (display-mode: standalone), (display-mode: fullscreen) {
+  html, body { overscroll-behavior: none; }
+}
+.stage-host, .battle-stage { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; }
+
+/* Landscape phones with a notch: keep side-anchored HUD clear of the cut-out. */
+@supports (padding: max(0px)) {
+  .command-toggle, .command-window, .minimap, .journey-guide:not(.journey-guide--inline) { margin-left: env(safe-area-inset-left); }
+  .player-hud, .location-hud, .autosave-note { margin-right: env(safe-area-inset-right); }
+}
+@media (max-width: 900px) {
+  .title-intro .pwa-install { margin-inline: auto; align-items: center; }
+}
