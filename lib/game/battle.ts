@@ -213,6 +213,23 @@ export function getNextTurn(state: BattleState): Side {
   return actor;
 }
 
+/**
+ * Forecast the next `count` actors without touching the live battle. The side
+ * already holding the turn (phase "player" / "enemy") comes first; the rest run
+ * the real getNextTurn on a gauge-only copy, so carry-over, the +60 baseline and
+ * active buff_spd all apply. Buff expiry is not simulated, so the tail of the
+ * forecast is a projection, not a promise.
+ */
+export function predictTurnOrder(state: BattleState, count: number): Side[] {
+  if (state.winner || count <= 0) return [];
+  const order: Side[] = [];
+  if (state.phase === "player") order.push("A");
+  else if (state.phase === "enemy") order.push("B");
+  const copy: BattleState = { ...state, gA: state.gA, gB: state.gB };
+  while (order.length < count) order.push(getNextTurn(copy));
+  return order;
+}
+
 export function decrementCooldowns(state: BattleState, side: Side): void {
   state.cd[side] = state.cd[side].map((v) => Math.max(0, v - 1));
   state.iaCD[side] = Math.max(0, state.iaCD[side] - 1);

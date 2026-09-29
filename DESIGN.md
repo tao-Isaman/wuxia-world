@@ -2,7 +2,7 @@
 
 ## Visual direction
 
-Detailed 32-bit-era pixel characters inhabit warm Chinese courtyards, market streets and mountain landscapes. The palette uses jade, lacquer, muted gold and warm earth. Thai names, story, world geography and progression remain the game's identity. Hero's Adventure: Road to Passion is the benchmark for coherent character/world scale, perspective and pixel texture; Dokapon Kingdom is the benchmark for clear battle decisions. These are quality references, not copied assets or verified parity claims.
+Detailed 32-bit-era pixel characters inhabit warm Chinese courtyards, market streets and mountain landscapes. The palette uses jade, lacquer, muted gold and warm earth. Thai names, story, world geography and progression remain the game's identity. Hero's Adventure: Road to Passion is the single benchmark: coherent character/world scale, perspective, pixel texture, expressive character staging, and clear battle decisions. It is a quality reference, not a source of copied assets or a verified parity claim.
 
 ## Runtime boundaries
 

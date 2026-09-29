@@ -7,23 +7,11 @@ import { characterId, npcCharacterId } from "@/lib/characters/catalog";
 import type { BattleCastProgress } from "@/lib/three/battle-runtime";
 import { resolveBattleBackground } from "@/lib/three/battle-background";
 
-export function BattleCanvas({ mode, onCastProgress }: {
-  mode: "world" | "free";
-  onCastProgress?: (progress: BattleCastProgress) => void;
-}) {
-  const host = useRef<HTMLDivElement>(null);
+/** Which sprites stand on the stage; shared by the Three.js scene and HUD portraits. */
+export function useBattleActors(mode: "world" | "free") {
   const builds = useBattleStore((s) => s.builds);
   const bodyId = useWorldStore((s) => s.playerBodyId);
-  const pendingBattle = useWorldStore((s) => s.pendingBattle);
-  const currentSceneId = useWorldStore((s) => s.currentSceneId);
-  const lastLocationId = useWorldStore((s) => s.lastLocationId);
-  const opponentId = pendingBattle?.opponentId;
-  const background = resolveBattleBackground({ mode, pendingBattle, currentSceneId, lastLocationId });
-  const [ready, setReady] = useState(false);
-  const [error, setError] = useState(false);
-  const [attempt, setAttempt] = useState(0);
-  const progressCallback = useRef(onCastProgress);
-  progressCallback.current = onCastProgress;
+  const opponentId = useWorldStore((s) => s.pendingBattle?.opponentId);
   const npc = NPCS.find((n) => n.sparOpponentId === opponentId || n.name === builds?.B.name);
   const opponent = getOpponent(mode === "world" ? opponentId : undefined);
   const beast = opponent?.category === "beast";
@@ -33,6 +21,25 @@ export function BattleCanvas({ mode, onCastProgress }: {
     /bat/.test(opponentId ?? "") ? 7 : 0 : null;
   const characterA = characterId(mode === "world" ? bodyId : "m1");
   const characterB = npcCharacterId(npc?.id ?? opponentId ?? "thug");
+  return { characterA, characterB, creatureFrame };
+}
+
+export function BattleCanvas({ mode, onCastProgress }: {
+  mode: "world" | "free";
+  onCastProgress?: (progress: BattleCastProgress) => void;
+}) {
+  const host = useRef<HTMLDivElement>(null);
+  const builds = useBattleStore((s) => s.builds);
+  const pendingBattle = useWorldStore((s) => s.pendingBattle);
+  const currentSceneId = useWorldStore((s) => s.currentSceneId);
+  const lastLocationId = useWorldStore((s) => s.lastLocationId);
+  const background = resolveBattleBackground({ mode, pendingBattle, currentSceneId, lastLocationId });
+  const [ready, setReady] = useState(false);
+  const [error, setError] = useState(false);
+  const [attempt, setAttempt] = useState(0);
+  const progressCallback = useRef(onCastProgress);
+  progressCallback.current = onCastProgress;
+  const { characterA, characterB, creatureFrame } = useBattleActors(mode);
   useEffect(() => {
     let disposed = false;
     let runtime: { destroy: () => void } | undefined;

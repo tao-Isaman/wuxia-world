@@ -1,5 +1,29 @@
 # Animated character sheets
 
+## Active art: readability v2 (adopted 2026-09-29)
+
+Hero's Adventure: Road to Passion is the benchmark: faces, hands and action
+silhouettes must read when a character is only 60–70 screen pixels tall. The
+twelve `*-readability-v2.png` candidates (m1–m4, f1–f4, elder, monk, merchant,
+bandit) plus the four `*-readability-v2-directions.png` supplements (m1, m2, m3,
+f1) are now the active sheets: larger faces, visible fists and fewer noisy folds.
+Their per-sheet prompts and provenance are in the matching `*-readability-v2*.md`.
+
+- `<id>.png` / `<id>-directions.png` are produced from the v2 source by
+  `bun scripts/repack-character-sheet.ts <v2.png> <out.png> [rows]`. The generated
+  sources use irregular gutters, and a raised victory fist can rise into the band
+  of the row above, so straight cuts fail. The script labels 8-connected alpha
+  components (threshold 32, like the loader), clusters them into rows and columns,
+  and copies each pose pixel-for-pixel, with no resampling, onto an exact equal
+  grid with feet on a shared 88 % baseline. No catalog layout is needed.
+- The previous sheets are kept as `<id>-v1.png` / `<id>-v1-directions.png` for rollback.
+- m4, f2, f3 and f4 have no v2 north/south supplement yet and still use their v1
+  `-directions.png`. The loader calibrates them to the v2 standing height. This is
+  the remaining visual mismatch in the set.
+- Wang, Feng and Qing are unchanged and keep their measured layouts in `lib/characters/catalog.ts`.
+- Verify: `node --experimental-strip-types scripts/render-character-atlas-audit.ts`
+  with the production build on port 3017 (all 304 poses, no clipping).
+
 
 ## Additional NPC archetypes
 

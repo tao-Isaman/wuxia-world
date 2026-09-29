@@ -43,8 +43,10 @@ Art: 15 characters, 23 sprite sheets, 304 poses under `public/art/characters/`.
 ## Review loop the previous agent used
 
 Each wave: builder makes changes, rebuilds, reruns the suites above, then a fresh subagent
-"critic" plays the production build and writes `review/waveN-*.md` against two reference games
-(Hero's Adventure and Dokapon Kingdom, captures in `review/baseline/`). The recurring critic
+"critic" plays the production build and writes `review/waveN-*.md` against the reference game.
+**As of 2026-09-29 the single benchmark is Hero's Adventure: Road to Passion** (Steam app 1948980;
+manifest `review/baseline/reference-1948980.json`, captures fetched locally as `ref-1948980-*.jpg`,
+which are gitignored). Dokapon Kingdom is no longer a goal; older wave reports still mention it as history. The recurring critic
 verdict through wave 9 and 10: locations look good, but character and event staging still falls
 short of the references. Actors read as "soft clusters" at faces, hands and cloth edges at combat scale.
 
@@ -95,3 +97,34 @@ short of the references. Actors read as "soft clusters" at faces, hands and clot
   commit `e50bcf1` is no longer local-only.
 - Planned first task: open item 2 (readability-v2 sprites), folding in item 5
   (escape names in `components/game/battle-log.tsx`) in the same wave.
+
+### 2026-09-29 — wave 11 (Claude Code, branch `claude/nice-lamport-hc9w5n`)
+
+Benchmark narrowed to Hero's Adventure: Road to Passion only (DESIGN.md, `/progress`, Dokapon manifest removed).
+
+Baseline re-verified before changes: build, typecheck, lint (6 warnings, 0 errors), all 7 `test:*`
+suites, content audit, and `test:e2e` 11/11 against the production build.
+
+Status of the open items above:
+1. Wave-10 visual gap: addressed by items 2 and the two HUD changes below. Evidence:
+   `review/wave11-evidence/` (`review/wave11-driver.ts`, production build on :3017).
+2. **Readability v2 sprites adopted** for m1–m4, f1–f4, elder, monk, merchant and bandit (+ v2
+   north/south supplements for m1, m2, m3, f1). They were re-packed onto exact equal grids by
+   `scripts/repack-character-sheet.ts` (component clustering, no resampling). The old sheets are kept as `*-v1.png`.
+   Character atlas audit: 304 poses, none empty or clipped. Still to do: v2 north/south supplements for m4, f2, f3, f4.
+3. Clinic pacing/ledger: covered and passing in `test:opening`, `test:investigation` and the e2e opening/investigation cases.
+4. Choice numbering: verified visible ("1.", "2.") in the production dialogue capture.
+5. Both sub-items were already fixed: `escapeBattleText` in `lib/game/effects.ts`, and
+   `seedLoreRumors` runs at runtime in `store/world-store.ts`.
+6. Collision: only `home_player` and `city_capital` have footprints. The other 99 painted maps are
+   open ground, so you can walk through buildings. This is the next task.
+
+New benchmark-driven UI:
+- Dialogue: large face-cropped speaker bust column (188 px desktop, 104 px phone, 132 px short landscape),
+  up from 80/60/38 px. It is Hero's Adventure's "face beside the words" framing within our opaque 256 px portraits.
+- Battle: turn-order timeline in the status bar (`predictTurnOrder` in `lib/game/battle.ts` runs the real
+  `getNextTurn` on a gauge-only copy; unit-tested in `test:combat`). This mirrors Hero's Adventure's action timeline.
+
+Environment note for cloud sessions: Playwright 1.63 expects Chromium build 1243, and this container has 1194
+under `/opt/pw-browsers`. Symlink the 1194 binaries into `chromium-1243/chrome-linux64/chrome` and
+`chromium_headless_shell-1243/chrome-headless-shell-linux64/chrome-headless-shell`.

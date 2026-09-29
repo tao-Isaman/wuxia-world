@@ -92,26 +92,30 @@ export function DialogStage({ scene, speaker, locationName }: {
           }
         }}
       >
-        <header className={styles.heading}>
+        {(portrait || speaker) && <div className={styles.bust} aria-hidden="true">
           {portrait ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img className={styles.portrait} src={portrait} alt="" draggable={false} />
-          ) : speaker && <div className={styles.portrait} aria-hidden="true">
+          ) : speaker && <div className={styles.portrait}>
             <CharacterPreview id={npcCharacterId(speaker.id)} animate framing="bust" />
           </div>}
-          <div className={styles.identity}>
-            <h2 ref={heading} id={headingId} tabIndex={-1}>{speaker?.name ?? "บทสนทนา"}</h2>
-            <p>{locationName}</p>
+        </div>}
+        <div className={styles.main}>
+          <header className={styles.heading}>
+            <div className={styles.identity}>
+              <h2 ref={heading} id={headingId} tabIndex={-1}>{speaker?.name ?? "บทสนทนา"}</h2>
+              <p>{locationName}</p>
+            </div>
+            {close && <button type="button" className={styles.close} onClick={close} title={leave?.choice.text}>
+              จบบทสนทนา <span aria-hidden="true">×</span>
+            </button>}
+          </header>
+          <div ref={content} className={styles.content} tabIndex={0} role="region" aria-label="บทสนทนาและตัวเลือก">
+            <div className={styles.lines}><DialogDisplay scene={scene} /></div>
+            <div className={styles.choices}><ChoicePanel scene={scene} /></div>
           </div>
-          {close && <button type="button" className={styles.close} onClick={close} title={leave?.choice.text}>
-            จบบทสนทนา <span aria-hidden="true">×</span>
-          </button>}
-        </header>
-        <div ref={content} className={styles.content} tabIndex={0} role="region" aria-label="บทสนทนาและตัวเลือก">
-          <div className={styles.lines}><DialogDisplay scene={scene} /></div>
-          <div className={styles.choices}><ChoicePanel scene={scene} /></div>
+          {moreBelow && <div className={styles.scrollHint} aria-hidden="true">เลื่อนลงเพื่ออ่านต่อและดูตัวเลือก ↓</div>}
         </div>
-        {moreBelow && <div className={styles.scrollHint} aria-hidden="true">เลื่อนลงเพื่ออ่านต่อและดูตัวเลือก ↓</div>}
       </section>
     </div>
   );

@@ -11,6 +11,7 @@ import {
   critPct,
   hpColor,
   parseSlotId,
+  predictTurnOrder,
   type BattleState,
   type CharacterBuild,
   type Side,
@@ -18,7 +19,8 @@ import {
 import { useBattleStore } from "@/store/battle-store";
 import { useCharacterStore } from "@/store/character-store";
 import { BattleLog } from "./battle-log";
-import { BattleCanvas } from "./battle-canvas";
+import { BattleCanvas, useBattleActors } from "./battle-canvas";
+import { CharacterPreview } from "./character-preview";
 import { cn } from "@/lib/utils";
 import { InfoPopover } from "@/components/ui/wuxia/info-popover";
 import {
@@ -391,6 +393,29 @@ function SidePanel({
   );
 }
 
+const TIMELINE_LENGTH = 6;
+
+/**
+ * Hero's Adventure-style turn order: faces queue toward the acting slot, so
+ * who moves next (and how often a faster side acts twice) reads at a glance.
+ */
+function TurnTimeline({ state, mode, nameA, nameB, casting }: {
+  state: BattleState; mode: "world" | "free"; nameA: string; nameB: string; casting: boolean;
+}) {
+  const { characterA, characterB, creatureFrame } = useBattleActors(mode);
+  const order = predictTurnOrder(state, TIMELINE_LENGTH);
+  if (!order.length) return null;
+  const acting = !casting && (state.phase === "player" || state.phase === "enemy");
+  const label = order.map((side) => side === "A" ? nameA : nameB).join(" → ");
+  return <ol className="turn-timeline" aria-label={`ลำดับการลงมือ: ${label}`} data-testid="turn-timeline">
+    {order.map((side, index) => <li key={`${state.turn}-${index}`} data-side={side}
+      data-acting={index === 0 && acting ? "true" : undefined} title={side === "A" ? nameA : nameB}>
+      {side === "B" && creatureFrame !== null ? <span className="turn-glyph" aria-hidden="true">獸</span> :
+        <CharacterPreview id={side === "A" ? characterA : characterB} framing="bust" />}
+    </li>)}
+  </ol>;
+}
+
 interface BattleArenaProps {
   // "free"  — /debug battle tab. User can configure builds and reset freely.
   // "world" — embedded in WorldScreen. No reset; "ดำเนินเรื่อง" closes the
@@ -466,6 +491,7 @@ export function BattleArena({ mode = "free", onContinue }: BattleArenaProps) {
     <div className="battle-arena pixel-panel" data-mode={mode}>
       <div className="combat-status" data-testid="combat-status" data-phase={resultReady ? "over" : casting ? "casting" : state.phase}>
         <span role="status" aria-live="polite"><i aria-hidden="true" /><strong>{headline}</strong></span>
+        <TurnTimeline state={state} mode={mode} nameA={displayA.name} nameB={displayB.name} casting={casting} />
         <small>ตาที่ {Math.max(1, state.turn + (!state.winner && !casting ? 1 : 0))}</small>
       </div>
       <div className="combat-field">
