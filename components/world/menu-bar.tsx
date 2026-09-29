@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Panel } from "@/components/ui/wuxia/panel";
 import { WuxiaButton } from "@/components/ui/wuxia/button";
 import { Badge } from "@/components/ui/badge";
@@ -133,12 +133,8 @@ export function MenuBar({ hud }: { hud?: boolean } = {}) {
     </GameMenuContext.Provider>
   );
 
-  // DQ XI-style command window: one เมนู button (or M) opens a small framed
-  // list with a gold hand cursor; picking an entry opens that section.
-  const [command, setCommand] = useState(false);
-  const commandRef = useRef<HTMLElement>(null);
-  // World hotkeys 1-8 open a section directly; M toggles the command window.
-  // Inside the section shell the same digits switch tabs (see Modal).
+  // World hotkeys 1-8 open a section directly (desktop); inside the section
+  // shell the same digits switch tabs (see Modal).
   useEffect(() => {
     if (!hud || open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -146,51 +142,29 @@ export function MenuBar({ hud }: { hud?: boolean } = {}) {
       const target = e.target;
       if (target instanceof HTMLElement && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName))) return;
       if (document.querySelector('[role="dialog"], [role="alertdialog"]')) return;
-      if (e.key === "Escape" && command) { e.preventDefault(); setCommand(false); return; }
-      if (e.key.toLowerCase() === "m") { e.preventDefault(); setCommand((value) => !value); return; }
       const index = Number(e.key) - 1;
-      if (Number.isInteger(index) && index >= 0 && index < tabs.length) { e.preventDefault(); setCommand(false); setOpen(tabs[index].id); }
+      if (Number.isInteger(index) && index >= 0 && index < tabs.length) { e.preventDefault(); setOpen(tabs[index].id); }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   });
-  useEffect(() => {
-    if (command) commandRef.current?.querySelector<HTMLElement>("button")?.focus({ preventScroll: true });
-  }, [command]);
-  const moveFocus = (event: React.KeyboardEvent<HTMLElement>) => {
-    const buttons = [...event.currentTarget.querySelectorAll<HTMLButtonElement>("button")];
-    const at = buttons.indexOf(document.activeElement as HTMLButtonElement);
-    if (at < 0) return;
-    const half = Math.ceil(buttons.length / 2);
-    const step = { ArrowDown: 1, ArrowUp: -1, ArrowRight: half, ArrowLeft: -half }[event.key];
-    if (!step) return;
-    event.preventDefault();
-    buttons[(at + step + buttons.length) % buttons.length].focus();
-  };
 
+  // Mobile-first HUD: every section is one tap away as an icon along the top.
   if (hud) {
     return (
       <>
-        <button type="button" className="command-toggle" aria-label="เมนู" aria-expanded={command} aria-keyshortcuts="M"
-          onClick={() => setCommand((value) => !value)}>
-          <span aria-hidden="true" className="command-toggle-glyph">❖</span> เมนู <kbd aria-hidden="true">M</kbd>
-        </button>
-        {command && <>
-          <div className="command-scrim" aria-hidden="true" onClick={() => setCommand(false)} />
-          <nav ref={commandRef} className="command-window" aria-label="เมนูเกม" onKeyDown={moveFocus}>
-            {tabs.map((t, i) => (
-              <button key={t.id} type="button" title={`${t.label} (${i + 1})`} aria-label={t.label} aria-keyshortcuts={String(i + 1)}
-                className="command-item" onClick={() => { setCommand(false); setOpen(t.id); }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={t.icon} alt="" className="pixel" draggable={false} />
-                <span className="game-menu-label">{t.label}</span>
-                {typeof t.badge === "number" && <b className="game-menu-badge">{t.badge}</b>}
-                <kbd aria-hidden="true">{i + 1}</kbd>
-              </button>
-            ))}
-            <InstallGameButton />
-          </nav>
-        </>}
+        <nav className="hud-iconbar" aria-label="เมนูเกม">
+          {tabs.map((t, i) => (
+            <button key={t.id} type="button" title={`${t.label} (${i + 1})`} aria-label={t.label} aria-keyshortcuts={String(i + 1)}
+              className="hud-icon" onClick={() => setOpen(t.id)}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={t.icon} alt="" className="pixel" draggable={false} />
+              <span className="hud-icon-label" aria-hidden="true">{t.label}</span>
+              {typeof t.badge === "number" && <b className="hud-icon-badge" aria-hidden="true">{t.badge}</b>}
+            </button>
+          ))}
+          <InstallGameButton variant="icon" />
+        </nav>
         {popups}
       </>
     );

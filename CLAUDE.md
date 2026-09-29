@@ -147,6 +147,13 @@ Both scenes are Phaser 4 games, dynamically imported by `components/game/world-c
 - `public/sw.js` — hand-written service worker, registered by `<PwaRegister />` (`components/pwa.tsx`) in production only as `/sw.js?v=<NEXT_PUBLIC_BUILD_ID>` (set in `next.config.ts` from the Vercel commit SHA). Navigations network-first → cached `/` offline; `/_next/static` cache-first per deploy; `/art /maps /npcs /player /icons /fonts /pwa` stale-while-revalidate, capped at 900 entries. `sw.js` is served `no-cache`.
 - `<InstallGameButton />` (title screen + เมนู command window): native prompt on Chrome/Android, Share → Add to Home Screen steps on iOS; hidden once installed.
 
+### Mobile-first HUD (world)
+
+- **Top icon bar** — `MenuBar hud` renders `nav[aria-label="เมนูเกม"]` with one icon per section (profile, bag, skills, crafts, quests, sect, rest, log) + install; digits 1–8 still open sections on desktop. No command box.
+- **Joystick** — `components/game/touch-stick.tsx`: a touch on the left half of the map plants a floating stick; dragging calls `runtime.setStick({x,y})` (analog, −1…1); a touch that never drags is forwarded as `runtime.tapAt()`. Mouse input is untouched. The minimap was removed to free the bottom-left.
+- **Action button** — the world runtime reports the marker within 95 map units via its `onNearby` callback (and `data-nearby-marker`); `WorldCanvas` shows `.action-prompt` (คุยกับ / ไปที่ / ใช้ + label) which calls `runtime.interact(id)`. Keyboard E does the same.
+- The floating journey guide panel was removed; guidance lives in the quest log.
+
 ### Routes
 
 - **`/`** (`app/page.tsx`) — the world game. Renders `<WorldScreen />`, calls `initBattleBridge()` once on mount.

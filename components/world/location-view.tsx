@@ -25,7 +25,6 @@ import {
 import { LocationMap } from "./location-map";
 import { MapHud } from "./map-hud";
 import { MenuBar } from "./menu-bar";
-import { JourneyGuide } from "./journey-guide";
 import { NpcInteractionPopup } from "./popups/npc-interaction-popup";
 import { RestPopup } from "./popups/rest-popup";
 import { RumorPopup } from "./popups/rumor-popup";
@@ -502,7 +501,6 @@ export function LocationView({ scene, readOnly = false, dialogueSpeakerId }: Pro
         />
         {!readOnly && <>
         <MapHud />
-        <JourneyGuide />
         <MenuBar hud />
         {hasLeftovers && (
           <button
@@ -535,7 +533,6 @@ export function LocationView({ scene, readOnly = false, dialogueSpeakerId }: Pro
   // ── classic card layout for locations without a map ─────────────────
   return (
     <div className="space-y-3">
-      <JourneyGuide inline />
       {/* Liveness Layer §4.2 — passive arrival rumor banner. Renders
           itself only when the scene is city-like and the 7-day cooldown
           has elapsed. No-op everywhere else, so it's safe to mount

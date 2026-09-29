@@ -51,17 +51,6 @@ test("first errand leads to safe training, recovery, and an earned skill upgrade
   await page.getByRole("button", { name: /ทักทาย/ }).click();
   await page.getByRole("button", { name: "ส่งคำขอเสบียงจากหมอหลิน" }).click();
   await page.getByRole("button", { name: "กลับไปรายงานหมอหลิน" }).click();
-  // Check the exact short guide state observed over the hero in phone review.
-  await expect.poll(() => page.getByTestId("world-canvas").evaluate(host => {
-    const guide = document.querySelector(".journey-guide")?.getBoundingClientRect();
-    if (!guide) return true;
-    const box = host.getBoundingClientRect();
-    const height = Number(host.dataset.playerScreenHeight);
-    const x = box.left + Number(host.dataset.playerScreenX);
-    const y = box.top + Number(host.dataset.playerScreenY);
-    return guide.left < x + height * 0.42 && guide.right > x - height * 0.42 &&
-      guide.top < y && guide.bottom > y - height;
-  })).toBe(false);
   await page.screenshot({ path: "test-results/screenshots/phone-after-clinic-delivery.png" });
   await page.setViewportSize({ width: 1440, height: 900 });
   await visit(page, "npc-city_capital_physician_lin");
@@ -98,7 +87,6 @@ test("first errand leads to safe training, recovery, and an earned skill upgrade
   await expect(page.getByTestId("world-canvas")).toHaveAttribute("data-visible-props", /clinic-medicines/);
   await expect(receipt).toHaveCount(0);
 
-  await expect(page.locator(".journey-guide")).toContainText("ฝึกประลองฟรี");
   await visit(page, "service-1");
   await expect(page.getByRole("dialog")).toContainText("ศิษย์ฝึกหัดอาเฉิง");
   await expect(page.getByRole("dialog")).toContainText("แพ้ไม่เสียชีวิต");
@@ -124,10 +112,8 @@ test("first errand leads to safe training, recovery, and an earned skill upgrade
   expect(trained.wExp).toBe(70);
   expect(trained.skillExp.basic_punch).toBe(20);
   expect(trained.currentHp).toBe(16);
-  await expect(page.locator(".journey-guide")).toContainText("เร่งด้วย w-exp (30)");
 
   async function restAtRoadside() {
-    await page.getByRole("button", { name: "เมนู", exact: true }).click();
     await page.getByRole("navigation", { name: "เมนูเกม" }).getByRole("button", { name: "พักผ่อน", exact: true }).click();
     const row = page.getByRole("dialog").getByText("🌿 พักริมทาง", { exact: true }).locator("../..");
     const rest = row.getByRole("button", { name: "พักผ่อน", exact: true });
@@ -144,7 +130,6 @@ test("first errand leads to safe training, recovery, and an earned skill upgrade
   expect((await state(page)).currentHp).toBe(34);
   expect((await state(page)).gold).toBe(30);
 
-  await page.getByRole("button", { name: "เมนู", exact: true }).click();
   await page.getByRole("navigation", { name: "เมนูเกม" }).getByRole("button", { name: "วิชา", exact: true }).click();
   const upgrade = page.getByRole("button", { name: "เร่งด้วย w-exp (30)", exact: true });
   await expect(upgrade).toBeEnabled();
@@ -158,7 +143,6 @@ test("first errand leads to safe training, recovery, and an earned skill upgrade
   await payoff.getByRole("button", { name: "รับทราบ", exact: true }).click();
   await expect(payoff).toHaveCount(0);
   await page.getByRole("button", { name: "ปิด", exact: true }).click();
-  await expect(page.locator(".journey-guide")).toHaveCount(0);
   await visit(page, "service-1");
   await expect(page.getByRole("dialog")).toContainText("ผ่านบทฝึกตั้งรับแล้ว");
   await expect(page.getByRole("button", { name: "ฝึกประลองฟรี", exact: true })).toHaveCount(0);
@@ -171,6 +155,5 @@ test("first errand leads to safe training, recovery, and an earned skill upgrade
   expect(upgraded.wExp).toBe(40);
   expect(upgraded.inventory).toMatchObject({ herb: 3, potion: 1 });
   expect(upgraded.defeatedCounts.training_capital_apprentice).toBe(1);
-  await expect(page.locator(".journey-guide")).toHaveCount(0);
   expect(errors).toEqual([]);
 });

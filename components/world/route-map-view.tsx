@@ -7,7 +7,6 @@ import type { WorldMarker } from "@/lib/stage/types";
 import { toast } from "@/store/toast-store";
 import { MapHud } from "./map-hud";
 import { MenuBar } from "./menu-bar";
-import { JourneyGuide } from "./journey-guide";
 
 export function RouteMapView({ scene, map }: { scene: RouteScene; map: RouteMapDef }) {
   const state = useWorldStore();
@@ -32,6 +31,6 @@ export function RouteMapView({ scene, map }: { scene: RouteScene; map: RouteMapD
   return <div className="fixed inset-0 z-40 !mt-0 bg-[#172723]">
     <WorldCanvas presentation={{ key: scene.id, name: scene.label, image: map.image, mirrorImage: map.mirror,
       time: state.time, playerImage: playerBodySprite(state.playerBodyId), spawn: map.spawn, markers }} />
-    <MapHud /><JourneyGuide /><MenuBar hud />
+    <MapHud /><MenuBar hud />
   </div>;
 }
