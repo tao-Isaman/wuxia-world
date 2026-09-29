@@ -23,7 +23,7 @@ export const SCENES_SPIES: readonly Scene[] = [
     choices: [
       // Offer: seal ledger
       {
-        text: "รับงานบัญชีตราพระราชา",
+        text: "ฟังเรื่องบัญชีตราพระราชา",
         next: "qs_qst_spy_capital_seal_ledger_offer",
         visibleIf: { t: "questStatus", questId: "qst_spy_capital_seal_ledger", status: "none" },
       },
@@ -44,7 +44,7 @@ export const SCENES_SPIES: readonly Scene[] = [
       },
       // Offer: court traitor
       {
-        text: "สืบเรื่องคนทรยศในวัง",
+        text: "ฟังเรื่องคนทรยศในวัง",
         next: "qs_qst_spy_capital_court_traitor_offer",
         visibleIf: {
           t: "and",
@@ -70,7 +70,7 @@ export const SCENES_SPIES: readonly Scene[] = [
       },
       // Bad: frame merchant
       {
-        text: "(ลับ) รับงานปลูกหลักฐานพ่อค้า",
+        text: "(ลับ) ฟังเรื่องปลูกหลักฐานพ่อค้า",
         next: "qs_qe_spy_capital_frame_merchant_offer",
         visibleIf: { t: "questStatus", questId: "qe_spy_capital_frame_merchant", status: "none" },
       },
@@ -88,6 +88,7 @@ export const SCENES_SPIES: readonly Scene[] = [
           { t: "finishQuest", questId: "qe_spy_capital_frame_merchant", success: true },
         ],
       },
+      { text: "ขอตัวก่อน กลับไปสำรวจนครหลวง", next: "npc_spy_capital_feng_return" },
     ],
   },
 
@@ -185,7 +186,7 @@ export const SCENES_SPIES: readonly Scene[] = [
     ],
     choices: [
       {
-        text: "รับงานเรือลักลอบ",
+        text: "ฟังเรื่องเรือลักลอบ",
         next: "qs_qst_spy_yangzhou_smuggler_ship_offer",
         visibleIf: { t: "questStatus", questId: "qst_spy_yangzhou_smuggler_ship", status: "none" },
       },
@@ -204,7 +205,7 @@ export const SCENES_SPIES: readonly Scene[] = [
         ],
       },
       {
-        text: "รับงานตราผ้าไหมหลวง",
+        text: "ฟังเรื่องตราผ้าไหมหลวง",
         next: "qs_qst_spy_yangzhou_silk_seal_offer",
         visibleIf: { t: "questStatus", questId: "qst_spy_yangzhou_silk_seal", status: "none" },
       },
@@ -223,7 +224,7 @@ export const SCENES_SPIES: readonly Scene[] = [
         ],
       },
       {
-        text: "(ลับ) รับงานปิดปากผู้พิพากษา",
+        text: "(ลับ) ฟังเรื่องปิดปากผู้พิพากษา",
         next: "qs_qe_spy_yangzhou_silence_witness_offer",
         visibleIf: { t: "questStatus", questId: "qe_spy_yangzhou_silence_witness", status: "none" },
       },
@@ -241,6 +242,7 @@ export const SCENES_SPIES: readonly Scene[] = [
           { t: "finishQuest", questId: "qe_spy_yangzhou_silence_witness", success: true },
         ],
       },
+      { text: "ขอตัวก่อน กลับไปสำรวจหยางโจว", next: "npc_spy_yangzhou_xi_return" },
     ],
   },
 
@@ -337,7 +339,7 @@ export const SCENES_SPIES: readonly Scene[] = [
     ],
     choices: [
       {
-        text: "รับงานตามรอยพ่อค้าพิษ",
+        text: "ฟังเรื่องพ่อค้าพิษ",
         next: "qs_qst_spy_dali_poisoner_track_offer",
         visibleIf: { t: "questStatus", questId: "qst_spy_dali_poisoner_track", status: "none" },
       },
@@ -356,7 +358,7 @@ export const SCENES_SPIES: readonly Scene[] = [
         ],
       },
       {
-        text: "รับงานทูตใต้",
+        text: "ฟังเรื่องทูตใต้",
         next: "qs_qst_spy_dali_southern_envoy_offer",
         visibleIf: {
           t: "and",
@@ -381,7 +383,7 @@ export const SCENES_SPIES: readonly Scene[] = [
         ],
       },
       {
-        text: "(ลับ) รับงานลักยาแก้พิษ",
+        text: "(ลับ) ฟังเรื่องลักยาแก้พิษ",
         next: "qs_qe_spy_dali_steal_antidote_offer",
         visibleIf: { t: "questStatus", questId: "qe_spy_dali_steal_antidote", status: "none" },
       },
@@ -399,6 +401,7 @@ export const SCENES_SPIES: readonly Scene[] = [
           { t: "finishQuest", questId: "qe_spy_dali_steal_antidote", success: true },
         ],
       },
+      { text: "ขอตัวก่อน กลับไปสำรวจต้าหลี่", next: "npc_spy_dali_mei_return" },
     ],
   },
 
@@ -489,7 +492,7 @@ export const SCENES_SPIES: readonly Scene[] = [
     ],
     choices: [
       {
-        text: "รับงานคนเมา",
+        text: "ฟังเรื่องคนเมา",
         next: "qs_qst_spy_inn_drunk_confession_offer",
         visibleIf: { t: "questStatus", questId: "qst_spy_inn_drunk_confession", status: "none" },
       },
@@ -508,7 +511,7 @@ export const SCENES_SPIES: readonly Scene[] = [
         ],
       },
       {
-        text: "รับงานดาบพเนจร",
+        text: "ฟังเรื่องดาบพเนจร",
         next: "qs_qst_spy_inn_wandering_blade_offer",
         visibleIf: {
           t: "and",
@@ -533,7 +536,7 @@ export const SCENES_SPIES: readonly Scene[] = [
         ],
       },
       {
-        text: "(ลับ) รับงานม้วนกลยุทธ์",
+        text: "(ลับ) ฟังเรื่องม้วนกลยุทธ์",
         next: "qs_qe_spy_inn_intimidate_drunk_offer",
         visibleIf: { t: "questStatus", questId: "qe_spy_inn_intimidate_drunk", status: "none" },
       },
@@ -551,6 +554,7 @@ export const SCENES_SPIES: readonly Scene[] = [
           { t: "finishQuest", questId: "qe_spy_inn_intimidate_drunk", success: true },
         ],
       },
+      { text: "ขอตัวก่อน กลับไปพักในโรงเตี๊ยม", next: "npc_spy_inn_zhou_return" },
     ],
   },
 
@@ -641,7 +645,7 @@ export const SCENES_SPIES: readonly Scene[] = [
     ],
     choices: [
       {
-        text: "รับงานผู้ส่งสารหายตัว",
+        text: "ฟังเรื่องผู้ส่งสารหายตัว",
         next: "qs_qst_spy_village_missing_courier_offer",
         visibleIf: { t: "questStatus", questId: "qst_spy_village_missing_courier", status: "none" },
       },
@@ -660,7 +664,7 @@ export const SCENES_SPIES: readonly Scene[] = [
         ],
       },
       {
-        text: "รับงานคาราวานเหล็ก",
+        text: "ฟังเรื่องคาราวานเหล็ก",
         next: "qs_qst_spy_village_iron_caravan_offer",
         visibleIf: {
           t: "and",
@@ -685,7 +689,7 @@ export const SCENES_SPIES: readonly Scene[] = [
         ],
       },
       {
-        text: "(ลับ) รับงานลักพาตัวพ่อค้า",
+        text: "(ลับ) ฟังเรื่องลักพาตัวพ่อค้า",
         next: "qs_qe_spy_village_kidnap_witness_offer",
         visibleIf: { t: "questStatus", questId: "qe_spy_village_kidnap_witness", status: "none" },
       },
@@ -703,6 +707,7 @@ export const SCENES_SPIES: readonly Scene[] = [
           { t: "finishQuest", questId: "qe_spy_village_kidnap_witness", success: true },
         ],
       },
+      { text: "ขอตัวก่อน กลับไปสำรวจหมู่บ้านชีกู่", next: "npc_spy_village_si_return" },
     ],
   },
 
@@ -847,5 +852,28 @@ export const SCENES_SPIES: readonly Scene[] = [
       { t: "narration", text: "องครักษ์ลู่กำลังพันโซ่ทองรอบแขนเปลือยอย่างชำนาญ" },
       { t: "dialogue", speaker: "ลู่", text: "โซ่กับกรงเล็บของกรม · ใช้ล่าได้ทั้งคนและเสือ · เจ้าอยากเป็นเหยื่อตัวไหน?" },
     ],
+  },
+
+  // Ending a greeting stays in the same place. These short returns use the
+  // existing goto effect without re-entering the location's travel-event hook.
+  {
+    kind: "dialog", id: "npc_spy_capital_feng_return", lines: [],
+    onEnter: [{ t: "goto", sceneId: "city_capital" }],
+  },
+  {
+    kind: "dialog", id: "npc_spy_yangzhou_xi_return", lines: [],
+    onEnter: [{ t: "goto", sceneId: "city_yangzhou" }],
+  },
+  {
+    kind: "dialog", id: "npc_spy_dali_mei_return", lines: [],
+    onEnter: [{ t: "goto", sceneId: "city_dali" }],
+  },
+  {
+    kind: "dialog", id: "npc_spy_inn_zhou_return", lines: [],
+    onEnter: [{ t: "goto", sceneId: "inn_yuelai" }],
+  },
+  {
+    kind: "dialog", id: "npc_spy_village_si_return", lines: [],
+    onEnter: [{ t: "goto", sceneId: "village_qigu" }],
   },
 ];

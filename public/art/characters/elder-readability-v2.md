@@ -1,0 +1,9 @@
+# elder readability candidate
+
+Generated with the built-in image generation tool using the original elder.png for identity and m1-readability-v2.png for proportions. The generated PNG is preserved unchanged. Candidate only; activation requires source-boundary and rendered animation review.
+
+Source: exec-be3b83ed-aefc-400e-9a0f-617fd4b80035.png
+
+## Exact prompt
+
+Redraw reference image 1 as a production sprite sheet, preserving that character's exact identity, age, costume palette and accessories. Reference image 2 is ONLY the approved proportion/pixel-cluster style guide; do not copy its blue clothes or young face. Match its compact adult RPG proportions: head including hair about one quarter of standing body height, visibly larger expressive face and hands, strong deliberate pixel clusters, clean cloth color masses with selective 32-bit detail, no muddy microtexture, no smooth 3D shine. Exactly 16 complete poses in a regular four-column by four-row grid on genuine transparent alpha. Generous fully transparent gutters separate every limb and cloth tail from all neighboring poses and sheet edges. All poses share one scale and baseline per row; all face right in slight three-quarter side view. Row1: four subtle idle breathing frames. Row2: four alternating stepping walk frames with clear foot contact. Row3: ready fists, windup, fully extended punch to right, recovery. Row4: hurt recoil, defensive guard, raised-hand victory, kneeling non-gory defeat. Preserve full fingers, headwear, hair and shoes. No text, grid marks, numbers, background or extra props. This character is an elderly martial elder: long white beard and brows, grey hair in topknot with blue ribbon, dignified blue outer robe with broad gold trim, muted jade inner robe, gold belt medallion and brown shoes. Retain old age, slightly broad robe silhouette, open palm gestures in idle/guard, and full white beard; do not make him a young hero.

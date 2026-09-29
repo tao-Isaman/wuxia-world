@@ -1,0 +1,56 @@
+/* A quiet compass note, sized around the existing lacquer HUD and controls. */
+.journey-guide {
+  position: absolute;
+  z-index: 20;
+  top: 171px;
+  left: 16px;
+  width: 300px;
+  color: #eae5d1;
+  background: #172c29f5;
+  border: 1px solid #8e8962;
+  border-left: 3px solid #cfb879;
+  box-shadow: 0 3px 10px #07171230;
+}
+.journey-guide-toggle {
+  width: 100%;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  color: #d6c28d;
+  text-align: left;
+  font-size: 12px;
+}
+.journey-guide-toggle span { flex: 1; min-width: 0; }
+.journey-guide[data-collapsed=true] .journey-guide-kicker { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.journey-guide-toggle .journey-guide-toggle-label { flex: none; color: #e7d5a8; font-size: 11px; }
+.journey-guide-toggle svg { flex: none; }
+.journey-guide-toggle:hover { background: #31453a; }
+.journey-guide-content { padding: 0 12px 12px; touch-action: pan-y; overscroll-behavior: contain; }
+.journey-guide-content h2 { font-size: 15px; line-height: 1.6; font-weight: 700; color: #f8edcf; }
+.journey-guide-description { margin-top: 3px; font-size: 12px; line-height: 1.75; color: #ced5bd; }
+.journey-guide-action { margin-top: 8px; font-size: 12px; line-height: 1.65; color: #f0dcab; }
+.journey-guide-note { margin-top: 5px; font-size: 11px; line-height: 1.65; color: #aebda8; }
+.journey-guide[data-tired=true] .journey-guide-action { color: #f3bd98; }
+.journey-guide--inline { position: relative; inset: auto; width: 100%; }
+/* The destination chooser needs its full touch area while it is open. */
+.world-viewport:has(.world-places) ~ .journey-guide { visibility: hidden; pointer-events: none; }
+
+@media (max-width: 640px) {
+  .journey-guide:not(.journey-guide--inline) {
+    top: 248px;
+    bottom: auto;
+    left: 10px;
+    width: calc(100% - 20px);
+  }
+}
+@media (max-height: 560px) and (min-width: 641px) {
+  .journey-guide:not(.journey-guide--inline) { top: 169px; left: 16px; width: 272px; }
+  .journey-guide-toggle { padding: 6px 10px; }
+  .journey-guide-content { padding: 0 10px 9px; max-height: calc(100dvh - 292px); overflow-y: auto; }
+  .journey-guide-description { line-height: 1.5; }
+  .journey-guide-action { margin-top: 5px; line-height: 1.5; }
+  .journey-guide-note { margin-top: 4px; line-height: 1.5; }
+  .journey-extras { top: auto; bottom: 90px; }
+}

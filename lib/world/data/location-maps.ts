@@ -77,7 +77,8 @@ export const LOCATION_MAPS: Record<string, LocationMapDef> = {
     zoom: 2.6,
     spawn: { x: 50, y: 78 }, // just inside the main south gate
     npcSpots: {
-      city_capital_magistrate_wu: { x: 52, y: 27 }, // gate of the north compound
+      city_capital_magistrate_wu: { x: 49, y: 35 }, // paved courtyard below the north gate
+      city_capital_clerk_qing: { x: 41, y: 31 }, // government frontage above the left market awning; lateral approach stays clear of Wu
       city_capital_physician_lin: { x: 35, y: 58 }, // in front of the apothecary
       city_capital_merchant_wang: { x: 58, y: 44 }, // among the market stalls
       spy_capital_feng: { x: 62, y: 58 },           // noodle stand by the kitchen row
@@ -96,7 +97,7 @@ export const LOCATION_MAPS: Record<string, LocationMapDef> = {
     ],
     spots: [
       { kind: "shop", x: 25, y: 38, icon: "🏪", label: "ตลาดนครหลวง" },
-      { kind: "sectHall", x: 48, y: 22, icon: "🏯", label: "สำนักยุทธิ์" },
+      { kind: "sectHall", x: 52, y: 33, icon: "🏯", label: "สำนักยุทธิ์" }, // courtyard entrance, below the gate roof
       { kind: "rest", x: 78, y: 40, icon: "🍵", label: "โรงเตี๊ยม" },
       { kind: "rumor", x: 72, y: 47, icon: "🍶", label: "ฟังข่าวลือ" },
       { kind: "artisan", artisanId: "artisan_city_capital_forge", x: 21, y: 72, icon: "🔨", label: "ตีเหล็ก" },

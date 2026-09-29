@@ -1,0 +1,1038 @@
+{
+  "context": "Diagnostic import of actual workspace atlas loader and Three world runtime, not production UI.",
+  "origin": "http://127.0.0.1:3017",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "spawn": {
+    "x": 45,
+    "y": 31.5
+  },
+  "time": 8,
+  "staticPoses": "Frames forced through diagnostic idle-clip selection; attack is posed, not a combat action.",
+  "genuineWalking": "Real KeyD event and actual world movement/animation, advanced at deterministic 60 Hz RAF steps.",
+  "environment": "Actual capital ground, foreground, lighting, world shader and closed archive chest; NPC/UI layers omitted equally.",
+  "directions": "Existing m1 north/south supplement loaded unchanged for both. Candidate has no new direction supplement; vertical walking not validated.",
+  "variants": {
+    "A": {
+      "sha256": "5c990486d4ec1bde29ad24b186c688aa9303954db8cbbd75f864f39afa5032b7",
+      "atlas": {
+        "frameSize": 128,
+        "feetY": 120,
+        "rows": 6,
+        "directional": true,
+        "frames": [
+          {
+            "frame": 0,
+            "pixels": 4176,
+            "edgePixels": 0,
+            "bounds": {
+              "x": 35,
+              "y": 9,
+              "width": 58,
+              "height": 111
+            }
+          },
+          {
+            "frame": 1,
+            "pixels": 4201,
+            "edgePixels": 0,
+            "bounds": {
+              "x": 34,
+              "y": 8,
+              "width": 61,
+              "height": 112
+            }
+          },
+          {
+            "frame": 2,
+            "pixels": 4210,
+            "edgePixels": 0,
+            "bounds": {
+              "x": 34,
+              "y": 9,
+              "width": 61,
+              "height": 111
+            }
+          },
+          {
+            "frame": 3,
+            "pixels": 4151,
+            "edgePixels": 0,
+            "bounds": {
+              "x": 34,
+              "y": 9,
+              "width": 61,
+              "height": 111
+            }
+          },
+          {
+            "frame": 4,
+            "pixels": 4150,
+            "edgePixels": 0,
+            "bounds": {
+              "x": 29,
+              "y": 12,
+              "width": 71,
+              "height": 108
+            }
+          },
+          {
+            "frame": 5,
+            "pixels": 3886,
+            "edgePixels": 0,
+            "bounds": {
+              "x": 30,
+              "y": 12,
+              "width": 69,
+              "height": 108
+            }
+          },
+          {
+            "frame": 6,
+            "pixels": 4125,
+            "edgePixels": 0,
+            "bounds": {
+              "x": 30,
+              "y": 12,
+              "width": 68,
+              "height": 108
+            }
+          },
+          {
+            "frame": 7,
+            "pixels": 3878,
+            "edgePixels": 0,
+            "bounds": {
+              "x": 30,
+              "y": 12,
+              "width": 69,
+              "height": 108
+            }
+          },
+          {
+            "frame": 8,
+            "pixels": 4585,
+            "edgePixels": 0,
+            "bounds": {
+              "x": 26,
+              "y": 16,
+              "width": 76,
+              "height": 104
+            }
+          },
+          {
+            "frame": 9,
+            "pixels": 5020,
+            "edgePixels": 0,
+            "bounds": {
+              "x": 19,
+              "y": 15,
+              "width": 91,
+              "height": 105
+            }
+          },
+          {
+            "frame": 10,
+            "pixels": 4743,
+            "edgePixels": 0,
+            "bounds": {
+              "x": 16,
+              "y": 19,
+              "width": 96,
+              "height": 101
+            }
+          },
+          {
+            "frame": 11,
+            "pixels": 4433,
+            "edgePixels": 0,
+            "bounds": {
+              "x": 28,
+              "y": 16,
+              "width": 73,
+              "height": 104
+            }
+          },
+          {
+            "frame": 12,
+            "pixels": 4863,
+            "edgePixels": 0,
+            "bounds": {
+              "x": 19,
+              "y": 15,
+              "width": 90,
+              "height": 105
+            }
+          },
+          {
+            "frame": 13,
+            "pixels": 4452,
+            "edgePixels": 0,
+            "bounds": {
+              "x": 25,
+              "y": 16,
+              "width": 78,
+              "height": 104
+            }
+          },
+          {
+            "frame": 14,
+            "pixels": 4004,
+            "edgePixels": 0,
+            "bounds": {
+              "x": 34,
+              "y": 6,
+              "width": 60,
+              "height": 114
+            }
+          },
+          {
+            "frame": 15,
+            "pixels": 3281,
+            "edgePixels": 0,
+            "bounds": {
+              "x": 26,
+              "y": 43,
+              "width": 76,
+              "height": 77
+            }
+          }
+        ]
+      },
+      "frames": [
+        {
+          "name": "pose-00",
+          "kind": "forced static base-frame pose",
+          "clip": {
+            "x": 584,
+            "y": 196,
+            "width": 128,
+            "height": 128
+          },
+          "worldX": 432,
+          "worldY": 201.6,
+          "screenX": 648,
+          "screenY": 302.4,
+          "nominalScreenHeight": 84,
+          "frame": 0
+        },
+        {
+          "name": "pose-01",
+          "kind": "forced static base-frame pose",
+          "clip": {
+            "x": 584,
+            "y": 196,
+            "width": 128,
+            "height": 128
+          },
+          "worldX": 432,
+          "worldY": 201.6,
+          "screenX": 648,
+          "screenY": 302.4,
+          "nominalScreenHeight": 84,
+          "frame": 1
+        },
+        {
+          "name": "pose-02",
+          "kind": "forced static base-frame pose",
+          "clip": {
+            "x": 584,
+            "y": 196,
+            "width": 128,
+            "height": 128
+          },
+          "worldX": 432,
+          "worldY": 201.6,
+          "screenX": 648,
+          "screenY": 302.4,
+          "nominalScreenHeight": 84,
+          "frame": 2
+        },
+        {
+          "name": "pose-03",
+          "kind": "forced static base-frame pose",
+          "clip": {
+            "x": 584,
+            "y": 196,
+            "width": 128,
+            "height": 128
+          },
+          "worldX": 432,
+          "worldY": 201.6,
+          "screenX": 648,
+          "screenY": 302.4,
+          "nominalScreenHeight": 84,
+          "frame": 3
+        },
+        {
+          "name": "pose-04",
+          "kind": "forced static base-frame pose",
+          "clip": {
+            "x": 584,
+            "y": 196,
+            "width": 128,
+            "height": 128
+          },
+          "worldX": 432,
+          "worldY": 201.6,
+          "screenX": 648,
+          "screenY": 302.4,
+          "nominalScreenHeight": 84,
+          "frame": 4
+        },
+        {
+          "name": "pose-05",
+          "kind": "forced static base-frame pose",
+          "clip": {
+            "x": 584,
+            "y": 196,
+            "width": 128,
+            "height": 128
+          },
+          "worldX": 432,
+          "worldY": 201.6,
+          "screenX": 648,
+          "screenY": 302.4,
+          "nominalScreenHeight": 84,
+          "frame": 5
+        },
+        {
+          "name": "pose-06",
+          "kind": "forced static base-frame pose",
+          "clip": {
+            "x": 584,
+            "y": 196,
+            "width": 128,
+            "height": 128
+          },
+          "worldX": 432,
+          "worldY": 201.6,
+          "screenX": 648,
+          "screenY": 302.4,
+          "nominalScreenHeight": 84,
+          "frame": 6
+        },
+        {
+          "name": "pose-07",
+          "kind": "forced static base-frame pose",
+          "clip": {
+            "x": 584,
+            "y": 196,
+            "width": 128,
+            "height": 128
+          },
+          "worldX": 432,
+          "worldY": 201.6,
+          "screenX": 648,
+          "screenY": 302.4,
+          "nominalScreenHeight": 84,
+          "frame": 7
+        },
+        {
+          "name": "pose-08",
+          "kind": "forced static base-frame pose",
+          "clip": {
+            "x": 584,
+            "y": 196,
+            "width": 128,
+            "height": 128
+          },
+          "worldX": 432,
+          "worldY": 201.6,
+          "screenX": 648,
+          "screenY": 302.4,
+          "nominalScreenHeight": 84,
+          "frame": 8
+        },
+        {
+          "name": "pose-09",
+          "kind": "forced static base-frame pose",
+          "clip": {
+            "x": 584,
+            "y": 196,
+            "width": 128,
+            "height": 128
+          },
+          "worldX": 432,
+          "worldY": 201.6,
+          "screenX": 648,
+          "screenY": 302.4,
+          "nominalScreenHeight": 84,
+          "frame": 9
+        },
+        {
+          "name": "pose-10",
+          "kind": "forced static base-frame pose",
+          "clip": {
+            "x": 584,
+            "y": 196,
+            "width": 128,
+            "height": 128
+          },
+          "worldX": 432,
+          "worldY": 201.6,
+          "screenX": 648,
+          "screenY": 302.4,
+          "nominalScreenHeight": 84,
+          "frame": 10
+        },
+        {
+          "name": "pose-11",
+          "kind": "forced static base-frame pose",
+          "clip": {
+            "x": 584,
+            "y": 196,
+            "width": 128,
+            "height": 128
+          },
+          "worldX": 432,
+          "worldY": 201.6,
+          "screenX": 648,
+          "screenY": 302.4,
+          "nominalScreenHeight": 84,
+          "frame": 11
+        },
+        {
+          "name": "pose-12",
+          "kind": "forced static base-frame pose",
+          "clip": {
+            "x": 584,
+            "y": 196,
+            "width": 128,
+            "height": 128
+          },
+          "worldX": 432,
+          "worldY": 201.6,
+          "screenX": 648,
+          "screenY": 302.4,
+          "nominalScreenHeight": 84,
+          "frame": 12
+        },
+        {
+          "name": "pose-13",
+          "kind": "forced static base-frame pose",
+          "clip": {
+            "x": 584,
+            "y": 196,
+            "width": 128,
+            "height": 128
+          },
+          "worldX": 432,
+          "worldY": 201.6,
+          "screenX": 648,
+          "screenY": 302.4,
+          "nominalScreenHeight": 84,
+          "frame": 13
+        },
+        {
+          "name": "pose-14",
+          "kind": "forced static base-frame pose",
+          "clip": {
+            "x": 584,
+            "y": 196,
+            "width": 128,
+            "height": 128
+          },
+          "worldX": 432,
+          "worldY": 201.6,
+          "screenX": 648,
+          "screenY": 302.4,
+          "nominalScreenHeight": 84,
+          "frame": 14
+        },
+        {
+          "name": "pose-15",
+          "kind": "forced static base-frame pose",
+          "clip": {
+            "x": 584,
+            "y": 196,
+            "width": 128,
+            "height": 128
+          },
+          "worldX": 432,
+          "worldY": 201.6,
+          "screenX": 648,
+          "screenY": 302.4,
+          "nominalScreenHeight": 84,
+          "frame": 15
+        },
+        {
+          "name": "walk-4",
+          "kind": "genuine walking from keyboard input",
+          "clip": {
+            "x": 584,
+            "y": 196,
+            "width": 128,
+            "height": 128
+          },
+          "worldX": 432,
+          "worldY": 201.6,
+          "screenX": 648,
+          "screenY": 302.4,
+          "nominalScreenHeight": 84,
+          "frame": 4
+        },
+        {
+          "name": "walk-5",
+          "kind": "genuine walking from keyboard input",
+          "clip": {
+            "x": 599,
+            "y": 196,
+            "width": 128,
+            "height": 128
+          },
+          "worldX": 442,
+          "worldY": 201.6,
+          "screenX": 663.0000000000003,
+          "screenY": 302.4,
+          "nominalScreenHeight": 84,
+          "frame": 5
+        },
+        {
+          "name": "walk-6",
+          "kind": "genuine walking from keyboard input",
+          "clip": {
+            "x": 633,
+            "y": 196,
+            "width": 128,
+            "height": 128
+          },
+          "worldX": 464.5,
+          "worldY": 201.6,
+          "screenX": 696.7500000000011,
+          "screenY": 302.4,
+          "nominalScreenHeight": 84,
+          "frame": 6
+        },
+        {
+          "name": "walk-7",
+          "kind": "genuine walking from keyboard input",
+          "clip": {
+            "x": 667,
+            "y": 196,
+            "width": 128,
+            "height": 128
+          },
+          "worldX": 487,
+          "worldY": 201.6,
+          "screenX": 730.5000000000018,
+          "screenY": 302.4,
+          "nominalScreenHeight": 84,
+          "frame": 7
+        }
+      ]
+    },
+    "B": {
+      "sha256": "8ac959e94b38f1df2b008345d9df43618177448b4662b7265e9e2602291f63da",
+      "atlas": {
+        "frameSize": 128,
+        "feetY": 120,
+        "rows": 6,
+        "directional": true,
+        "frames": [
+          {
+            "frame": 0,
+            "pixels": 5380,
+            "edgePixels": 0,
+            "bounds": {
+              "x": 29,
+              "y": 11,
+              "width": 70,
+              "height": 109
+            }
+          },
+          {
+            "frame": 1,
+            "pixels": 5408,
+            "edgePixels": 0,
+            "bounds": {
+              "x": 29,
+              "y": 11,
+              "width": 70,
+              "height": 109
+            }
+          },
+          {
+            "frame": 2,
+            "pixels": 5425,
+            "edgePixels": 0,
+            "bounds": {
+              "x": 29,
+              "y": 12,
+              "width": 71,
+              "height": 108
+            }
+          },
+          {
+            "frame": 3,
+            "pixels": 5378,
+            "edgePixels": 0,
+            "bounds": {
+              "x": 29,
+              "y": 12,
+              "width": 70,
+              "height": 108
+            }
+          },
+          {
+            "frame": 4,
+            "pixels": 5437,
+            "edgePixels": 0,
+            "bounds": {
+              "x": 28,
+              "y": 12,
+              "width": 73,
+              "height": 108
+            }
+          },
+          {
+            "frame": 5,
+            "pixels": 5403,
+            "edgePixels": 0,
+            "bounds": {
+              "x": 27,
+              "y": 12,
+              "width": 75,
+              "height": 108
+            }
+          },
+          {
+            "frame": 6,
+            "pixels": 5596,
+            "edgePixels": 0,
+            "bounds": {
+              "x": 26,
+              "y": 12,
+              "width": 77,
+              "height": 108
+            }
+          },
+          {
+            "frame": 7,
+            "pixels": 5419,
+            "edgePixels": 0,
+            "bounds": {
+              "x": 27,
+              "y": 12,
+              "width": 75,
+              "height": 108
+            }
+          },
+          {
+            "frame": 8,
+            "pixels": 5496,
+            "edgePixels": 0,
+            "bounds": {
+              "x": 25,
+              "y": 16,
+              "width": 78,
+              "height": 104
+            }
+          },
+          {
+            "frame": 9,
+            "pixels": 5776,
+            "edgePixels": 0,
+            "bounds": {
+              "x": 20,
+              "y": 16,
+              "width": 89,
+              "height": 104
+            }
+          },
+          {
+            "frame": 10,
+            "pixels": 5708,
+            "edgePixels": 0,
+            "bounds": {
+              "x": 16,
+              "y": 18,
+              "width": 96,
+              "height": 102
+            }
+          },
+          {
+            "frame": 11,
+            "pixels": 5392,
+            "edgePixels": 0,
+            "bounds": {
+              "x": 25,
+              "y": 17,
+              "width": 78,
+              "height": 103
+            }
+          },
+          {
+            "frame": 12,
+            "pixels": 5781,
+            "edgePixels": 0,
+            "bounds": {
+              "x": 14,
+              "y": 20,
+              "width": 100,
+              "height": 100
+            }
+          },
+          {
+            "frame": 13,
+            "pixels": 5427,
+            "edgePixels": 0,
+            "bounds": {
+              "x": 25,
+              "y": 19,
+              "width": 79,
+              "height": 101
+            }
+          },
+          {
+            "frame": 14,
+            "pixels": 5052,
+            "edgePixels": 0,
+            "bounds": {
+              "x": 30,
+              "y": 11,
+              "width": 68,
+              "height": 109
+            }
+          },
+          {
+            "frame": 15,
+            "pixels": 4175,
+            "edgePixels": 0,
+            "bounds": {
+              "x": 24,
+              "y": 41,
+              "width": 80,
+              "height": 79
+            }
+          }
+        ]
+      },
+      "frames": [
+        {
+          "name": "pose-00",
+          "kind": "forced static base-frame pose",
+          "clip": {
+            "x": 584,
+            "y": 196,
+            "width": 128,
+            "height": 128
+          },
+          "worldX": 432,
+          "worldY": 201.6,
+          "screenX": 648,
+          "screenY": 302.4,
+          "nominalScreenHeight": 84,
+          "frame": 0
+        },
+        {
+          "name": "pose-01",
+          "kind": "forced static base-frame pose",
+          "clip": {
+            "x": 584,
+            "y": 196,
+            "width": 128,
+            "height": 128
+          },
+          "worldX": 432,
+          "worldY": 201.6,
+          "screenX": 648,
+          "screenY": 302.4,
+          "nominalScreenHeight": 84,
+          "frame": 1
+        },
+        {
+          "name": "pose-02",
+          "kind": "forced static base-frame pose",
+          "clip": {
+            "x": 584,
+            "y": 196,
+            "width": 128,
+            "height": 128
+          },
+          "worldX": 432,
+          "worldY": 201.6,
+          "screenX": 648,
+          "screenY": 302.4,
+          "nominalScreenHeight": 84,
+          "frame": 2
+        },
+        {
+          "name": "pose-03",
+          "kind": "forced static base-frame pose",
+          "clip": {
+            "x": 584,
+            "y": 196,
+            "width": 128,
+            "height": 128
+          },
+          "worldX": 432,
+          "worldY": 201.6,
+          "screenX": 648,
+          "screenY": 302.4,
+          "nominalScreenHeight": 84,
+          "frame": 3
+        },
+        {
+          "name": "pose-04",
+          "kind": "forced static base-frame pose",
+          "clip": {
+            "x": 584,
+            "y": 196,
+            "width": 128,
+            "height": 128
+          },
+          "worldX": 432,
+          "worldY": 201.6,
+          "screenX": 648,
+          "screenY": 302.4,
+          "nominalScreenHeight": 84,
+          "frame": 4
+        },
+        {
+          "name": "pose-05",
+          "kind": "forced static base-frame pose",
+          "clip": {
+            "x": 584,
+            "y": 196,
+            "width": 128,
+            "height": 128
+          },
+          "worldX": 432,
+          "worldY": 201.6,
+          "screenX": 648,
+          "screenY": 302.4,
+          "nominalScreenHeight": 84,
+          "frame": 5
+        },
+        {
+          "name": "pose-06",
+          "kind": "forced static base-frame pose",
+          "clip": {
+            "x": 584,
+            "y": 196,
+            "width": 128,
+            "height": 128
+          },
+          "worldX": 432,
+          "worldY": 201.6,
+          "screenX": 648,
+          "screenY": 302.4,
+          "nominalScreenHeight": 84,
+          "frame": 6
+        },
+        {
+          "name": "pose-07",
+          "kind": "forced static base-frame pose",
+          "clip": {
+            "x": 584,
+            "y": 196,
+            "width": 128,
+            "height": 128
+          },
+          "worldX": 432,
+          "worldY": 201.6,
+          "screenX": 648,
+          "screenY": 302.4,
+          "nominalScreenHeight": 84,
+          "frame": 7
+        },
+        {
+          "name": "pose-08",
+          "kind": "forced static base-frame pose",
+          "clip": {
+            "x": 584,
+            "y": 196,
+            "width": 128,
+            "height": 128
+          },
+          "worldX": 432,
+          "worldY": 201.6,
+          "screenX": 648,
+          "screenY": 302.4,
+          "nominalScreenHeight": 84,
+          "frame": 8
+        },
+        {
+          "name": "pose-09",
+          "kind": "forced static base-frame pose",
+          "clip": {
+            "x": 584,
+            "y": 196,
+            "width": 128,
+            "height": 128
+          },
+          "worldX": 432,
+          "worldY": 201.6,
+          "screenX": 648,
+          "screenY": 302.4,
+          "nominalScreenHeight": 84,
+          "frame": 9
+        },
+        {
+          "name": "pose-10",
+          "kind": "forced static base-frame pose",
+          "clip": {
+            "x": 584,
+            "y": 196,
+            "width": 128,
+            "height": 128
+          },
+          "worldX": 432,
+          "worldY": 201.6,
+          "screenX": 648,
+          "screenY": 302.4,
+          "nominalScreenHeight": 84,
+          "frame": 10
+        },
+        {
+          "name": "pose-11",
+          "kind": "forced static base-frame pose",
+          "clip": {
+            "x": 584,
+            "y": 196,
+            "width": 128,
+            "height": 128
+          },
+          "worldX": 432,
+          "worldY": 201.6,
+          "screenX": 648,
+          "screenY": 302.4,
+          "nominalScreenHeight": 84,
+          "frame": 11
+        },
+        {
+          "name": "pose-12",
+          "kind": "forced static base-frame pose",
+          "clip": {
+            "x": 584,
+            "y": 196,
+            "width": 128,
+            "height": 128
+          },
+          "worldX": 432,
+          "worldY": 201.6,
+          "screenX": 648,
+          "screenY": 302.4,
+          "nominalScreenHeight": 84,
+          "frame": 12
+        },
+        {
+          "name": "pose-13",
+          "kind": "forced static base-frame pose",
+          "clip": {
+            "x": 584,
+            "y": 196,
+            "width": 128,
+            "height": 128
+          },
+          "worldX": 432,
+          "worldY": 201.6,
+          "screenX": 648,
+          "screenY": 302.4,
+          "nominalScreenHeight": 84,
+          "frame": 13
+        },
+        {
+          "name": "pose-14",
+          "kind": "forced static base-frame pose",
+          "clip": {
+            "x": 584,
+            "y": 196,
+            "width": 128,
+            "height": 128
+          },
+          "worldX": 432,
+          "worldY": 201.6,
+          "screenX": 648,
+          "screenY": 302.4,
+          "nominalScreenHeight": 84,
+          "frame": 14
+        },
+        {
+          "name": "pose-15",
+          "kind": "forced static base-frame pose",
+          "clip": {
+            "x": 584,
+            "y": 196,
+            "width": 128,
+            "height": 128
+          },
+          "worldX": 432,
+          "worldY": 201.6,
+          "screenX": 648,
+          "screenY": 302.4,
+          "nominalScreenHeight": 84,
+          "frame": 15
+        },
+        {
+          "name": "walk-4",
+          "kind": "genuine walking from keyboard input",
+          "clip": {
+            "x": 584,
+            "y": 196,
+            "width": 128,
+            "height": 128
+          },
+          "worldX": 432,
+          "worldY": 201.6,
+          "screenX": 648,
+          "screenY": 302.4,
+          "nominalScreenHeight": 84,
+          "frame": 4
+        },
+        {
+          "name": "walk-5",
+          "kind": "genuine walking from keyboard input",
+          "clip": {
+            "x": 599,
+            "y": 196,
+            "width": 128,
+            "height": 128
+          },
+          "worldX": 442,
+          "worldY": 201.6,
+          "screenX": 663.0000000000003,
+          "screenY": 302.4,
+          "nominalScreenHeight": 84,
+          "frame": 5
+        },
+        {
+          "name": "walk-6",
+          "kind": "genuine walking from keyboard input",
+          "clip": {
+            "x": 633,
+            "y": 196,
+            "width": 128,
+            "height": 128
+          },
+          "worldX": 464.5,
+          "worldY": 201.6,
+          "screenX": 696.7500000000011,
+          "screenY": 302.4,
+          "nominalScreenHeight": 84,
+          "frame": 6
+        },
+        {
+          "name": "walk-7",
+          "kind": "genuine walking from keyboard input",
+          "clip": {
+            "x": 667,
+            "y": 196,
+            "width": 128,
+            "height": 128
+          },
+          "worldX": 487,
+          "worldY": 201.6,
+          "screenX": 730.5000000000018,
+          "screenY": 302.4,
+          "nominalScreenHeight": 84,
+          "frame": 7
+        }
+      ]
+    }
+  },
+  "errors": []
+}

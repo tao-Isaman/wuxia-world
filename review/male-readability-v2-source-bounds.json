@@ -1,0 +1,1022 @@
+[
+    {
+        "file":  "m1-readability-v2.png",
+        "sha256":  "8ac959e94b38f1df2b008345d9df43618177448b4662b7265e9e2602291f63da",
+        "audit":  {
+                      "width":  1199,
+                      "height":  1312,
+                      "columns":  [
+                                      0,
+                                      309,
+                                      600,
+                                      905,
+                                      1199
+                                  ],
+                      "rows":  [
+                                   0,
+                                   349,
+                                   666,
+                                   972,
+                                   1312
+                               ],
+                      "frameCount":  16,
+                      "alphaThreshold":  32,
+                      "sourcePixels":  651927,
+                      "assignedPixels":  651927,
+                      "cellEdgePixels":  0,
+                      "outerEdgePixels":  0,
+                      "fullyTransparentPixels":  847135,
+                      "faintAlphaPixels":  74026,
+                      "partialAlphaPixels":  651417,
+                      "fullyOpaquePixels":  510,
+                      "emptyColumns":  [
+                                           [
+                                               0,
+                                               31
+                                           ],
+                                           [
+                                               308,
+                                               343
+                                           ],
+                                           [
+                                               590,
+                                               640
+                                           ],
+                                           [
+                                               904,
+                                               932
+                                           ],
+                                           [
+                                               1164,
+                                               1198
+                                           ]
+                                       ],
+                      "emptyRows":  [
+                                        [
+                                            0,
+                                            48
+                                        ],
+                                        [
+                                            348,
+                                            367
+                                        ],
+                                        [
+                                            665,
+                                            679
+                                        ],
+                                        [
+                                            966,
+                                            972
+                                        ],
+                                        [
+                                            1276,
+                                            1311
+                                        ]
+                                    ],
+                      "frames":  [
+                                     {
+                                         "index":  0,
+                                         "x":  48,
+                                         "y":  49,
+                                         "width":  193,
+                                         "height":  299,
+                                         "pixels":  40712,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  1,
+                                         "x":  351,
+                                         "y":  49,
+                                         "width":  193,
+                                         "height":  299,
+                                         "pixels":  40865,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  2,
+                                         "x":  651,
+                                         "y":  50,
+                                         "width":  194,
+                                         "height":  298,
+                                         "pixels":  40823,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  3,
+                                         "x":  956,
+                                         "y":  50,
+                                         "width":  192,
+                                         "height":  298,
+                                         "pixels":  40658,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  4,
+                                         "x":  55,
+                                         "y":  368,
+                                         "width":  202,
+                                         "height":  297,
+                                         "pixels":  41404,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  5,
+                                         "x":  352,
+                                         "y":  368,
+                                         "width":  205,
+                                         "height":  297,
+                                         "pixels":  40529,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  6,
+                                         "x":  652,
+                                         "y":  368,
+                                         "width":  212,
+                                         "height":  297,
+                                         "pixels":  42338,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  7,
+                                         "x":  955,
+                                         "y":  368,
+                                         "width":  206,
+                                         "height":  297,
+                                         "pixels":  40828,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  8,
+                                         "x":  40,
+                                         "y":  681,
+                                         "width":  215,
+                                         "height":  285,
+                                         "pixels":  41491,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  9,
+                                         "x":  344,
+                                         "y":  680,
+                                         "width":  246,
+                                         "height":  286,
+                                         "pixels":  43942,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  10,
+                                         "x":  641,
+                                         "y":  686,
+                                         "width":  263,
+                                         "height":  280,
+                                         "pixels":  42877,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  11,
+                                         "x":  949,
+                                         "y":  682,
+                                         "width":  215,
+                                         "height":  284,
+                                         "pixels":  41045,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  12,
+                                         "x":  32,
+                                         "y":  997,
+                                         "width":  276,
+                                         "height":  275,
+                                         "pixels":  43724,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  13,
+                                         "x":  347,
+                                         "y":  994,
+                                         "width":  217,
+                                         "height":  279,
+                                         "pixels":  41086,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  14,
+                                         "x":  652,
+                                         "y":  973,
+                                         "width":  187,
+                                         "height":  300,
+                                         "pixels":  38172,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  15,
+                                         "x":  933,
+                                         "y":  1058,
+                                         "width":  219,
+                                         "height":  218,
+                                         "pixels":  31433,
+                                         "edgePixels":  0
+                                     }
+                                 ]
+                  }
+    },
+    {
+        "file":  "m1-readability-v2-directions.png",
+        "sha256":  "f4b49540ddfbebe68a14049197aef19f5e4b627dd50c65773a7dc6f15ae93e1d",
+        "audit":  {
+                      "width":  1536,
+                      "height":  1024,
+                      "columns":  [
+                                      0,
+                                      384,
+                                      768,
+                                      1152,
+                                      1536
+                                  ],
+                      "rows":  [
+                                   0,
+                                   512,
+                                   1024
+                               ],
+                      "frameCount":  8,
+                      "alphaThreshold":  32,
+                      "sourcePixels":  567242,
+                      "assignedPixels":  567242,
+                      "cellEdgePixels":  0,
+                      "outerEdgePixels":  0,
+                      "fullyTransparentPixels":  947073,
+                      "faintAlphaPixels":  58549,
+                      "partialAlphaPixels":  567242,
+                      "fullyOpaquePixels":  0,
+                      "emptyColumns":  [
+                                           [
+                                               0,
+                                               78
+                                           ],
+                                           [
+                                               348,
+                                               472
+                                           ],
+                                           [
+                                               703,
+                                               815
+                                           ],
+                                           [
+                                               1093,
+                                               1224
+                                           ],
+                                           [
+                                               1481,
+                                               1535
+                                           ]
+                                       ],
+                      "emptyRows":  [
+                                        [
+                                            0,
+                                            56
+                                        ],
+                                        [
+                                            500,
+                                            531
+                                        ],
+                                        [
+                                            966,
+                                            1023
+                                        ]
+                                    ],
+                      "frames":  [
+                                     {
+                                         "index":  0,
+                                         "x":  79,
+                                         "y":  57,
+                                         "width":  269,
+                                         "height":  443,
+                                         "pixels":  75699,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  1,
+                                         "x":  475,
+                                         "y":  58,
+                                         "width":  228,
+                                         "height":  438,
+                                         "pixels":  68506,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  2,
+                                         "x":  816,
+                                         "y":  58,
+                                         "width":  277,
+                                         "height":  442,
+                                         "pixels":  75280,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  3,
+                                         "x":  1225,
+                                         "y":  57,
+                                         "width":  220,
+                                         "height":  434,
+                                         "pixels":  66214,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  4,
+                                         "x":  92,
+                                         "y":  532,
+                                         "width":  255,
+                                         "height":  434,
+                                         "pixels":  72282,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  5,
+                                         "x":  473,
+                                         "y":  532,
+                                         "width":  225,
+                                         "height":  434,
+                                         "pixels":  66667,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  6,
+                                         "x":  833,
+                                         "y":  532,
+                                         "width":  253,
+                                         "height":  434,
+                                         "pixels":  73144,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  7,
+                                         "x":  1225,
+                                         "y":  532,
+                                         "width":  256,
+                                         "height":  434,
+                                         "pixels":  69450,
+                                         "edgePixels":  0
+                                     }
+                                 ]
+                  }
+    },
+    {
+        "file":  "m2-readability-v2.png",
+        "sha256":  "2b02f6eeb28a75b7be32347e67aa4d4157e0da36846ffc8df4dfe9c56a17a2d0",
+        "audit":  {
+                      "width":  1254,
+                      "height":  1254,
+                      "columns":  [
+                                      0,
+                                      314,
+                                      627,
+                                      958,
+                                      1254
+                                  ],
+                      "rows":  [
+                                   0,
+                                   337,
+                                   654,
+                                   940,
+                                   1254
+                               ],
+                      "frameCount":  16,
+                      "alphaThreshold":  32,
+                      "sourcePixels":  577419,
+                      "assignedPixels":  577419,
+                      "cellEdgePixels":  1077,
+                      "outerEdgePixels":  0,
+                      "fullyTransparentPixels":  879262,
+                      "faintAlphaPixels":  115835,
+                      "partialAlphaPixels":  575763,
+                      "fullyOpaquePixels":  1656,
+                      "emptyColumns":  [
+                                           [
+                                               0,
+                                               54
+                                           ],
+                                           [
+                                               292,
+                                               356
+                                           ],
+                                           [
+                                               604,
+                                               654
+                                           ],
+                                           [
+                                               957,
+                                               992
+                                           ],
+                                           [
+                                               1220,
+                                               1253
+                                           ]
+                                       ],
+                      "emptyRows":  [
+                                        [
+                                            0,
+                                            25
+                                        ],
+                                        [
+                                            336,
+                                            347
+                                        ],
+                                        [
+                                            653,
+                                            661
+                                        ],
+                                        [
+                                            1238,
+                                            1253
+                                        ]
+                                    ],
+                      "frames":  [
+                                     {
+                                         "index":  0,
+                                         "x":  69,
+                                         "y":  26,
+                                         "width":  198,
+                                         "height":  310,
+                                         "pixels":  38993,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  1,
+                                         "x":  371,
+                                         "y":  26,
+                                         "width":  205,
+                                         "height":  310,
+                                         "pixels":  38673,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  2,
+                                         "x":  681,
+                                         "y":  26,
+                                         "width":  202,
+                                         "height":  310,
+                                         "pixels":  39246,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  3,
+                                         "x":  995,
+                                         "y":  26,
+                                         "width":  199,
+                                         "height":  310,
+                                         "pixels":  38769,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  4,
+                                         "x":  65,
+                                         "y":  348,
+                                         "width":  227,
+                                         "height":  305,
+                                         "pixels":  39295,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  5,
+                                         "x":  387,
+                                         "y":  348,
+                                         "width":  210,
+                                         "height":  305,
+                                         "pixels":  32412,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  6,
+                                         "x":  673,
+                                         "y":  348,
+                                         "width":  238,
+                                         "height":  305,
+                                         "pixels":  38012,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  7,
+                                         "x":  999,
+                                         "y":  348,
+                                         "width":  209,
+                                         "height":  305,
+                                         "pixels":  32740,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  8,
+                                         "x":  55,
+                                         "y":  663,
+                                         "width":  227,
+                                         "height":  277,
+                                         "pixels":  33608,
+                                         "edgePixels":  131
+                                     },
+                                     {
+                                         "index":  9,
+                                         "x":  357,
+                                         "y":  664,
+                                         "width":  245,
+                                         "height":  276,
+                                         "pixels":  36729,
+                                         "edgePixels":  128
+                                     },
+                                     {
+                                         "index":  10,
+                                         "x":  655,
+                                         "y":  669,
+                                         "width":  302,
+                                         "height":  271,
+                                         "pixels":  37590,
+                                         "edgePixels":  149
+                                     },
+                                     {
+                                         "index":  11,
+                                         "x":  993,
+                                         "y":  662,
+                                         "width":  227,
+                                         "height":  278,
+                                         "pixels":  33634,
+                                         "edgePixels":  129
+                                     },
+                                     {
+                                         "index":  12,
+                                         "x":  55,
+                                         "y":  940,
+                                         "width":  232,
+                                         "height":  297,
+                                         "pixels":  37374,
+                                         "edgePixels":  130
+                                     },
+                                     {
+                                         "index":  13,
+                                         "x":  357,
+                                         "y":  940,
+                                         "width":  247,
+                                         "height":  298,
+                                         "pixels":  33288,
+                                         "edgePixels":  128
+                                     },
+                                     {
+                                         "index":  14,
+                                         "x":  655,
+                                         "y":  940,
+                                         "width":  252,
+                                         "height":  298,
+                                         "pixels":  36379,
+                                         "edgePixels":  154
+                                     },
+                                     {
+                                         "index":  15,
+                                         "x":  993,
+                                         "y":  940,
+                                         "width":  227,
+                                         "height":  298,
+                                         "pixels":  30677,
+                                         "edgePixels":  128
+                                     }
+                                 ]
+                  }
+    },
+    {
+        "file":  "m3-readability-v2.png",
+        "sha256":  "43117e02d4dbf8de0730d01ac2e3557dc21e72cfb834e3228d30f339a2b3eedc",
+        "audit":  {
+                      "width":  1254,
+                      "height":  1254,
+                      "columns":  [
+                                      0,
+                                      323,
+                                      627,
+                                      945,
+                                      1254
+                                  ],
+                      "rows":  [
+                                   0,
+                                   327,
+                                   647,
+                                   940,
+                                   1254
+                               ],
+                      "frameCount":  16,
+                      "alphaThreshold":  32,
+                      "sourcePixels":  718425,
+                      "assignedPixels":  718425,
+                      "cellEdgePixels":  774,
+                      "outerEdgePixels":  0,
+                      "fullyTransparentPixels":  745337,
+                      "faintAlphaPixels":  108754,
+                      "partialAlphaPixels":  717522,
+                      "fullyOpaquePixels":  903,
+                      "emptyColumns":  [
+                                           [
+                                               0,
+                                               53
+                                           ],
+                                           [
+                                               322,
+                                               370
+                                           ],
+                                           [
+                                               612,
+                                               652
+                                           ],
+                                           [
+                                               944,
+                                               973
+                                           ],
+                                           [
+                                               1205,
+                                               1253
+                                           ]
+                                       ],
+                      "emptyRows":  [
+                                        [
+                                            0,
+                                            20
+                                        ],
+                                        [
+                                            326,
+                                            332
+                                        ],
+                                        [
+                                            646,
+                                            651
+                                        ],
+                                        [
+                                            1241,
+                                            1253
+                                        ]
+                                    ],
+                      "frames":  [
+                                     {
+                                         "index":  0,
+                                         "x":  91,
+                                         "y":  21,
+                                         "width":  201,
+                                         "height":  305,
+                                         "pixels":  44747,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  1,
+                                         "x":  386,
+                                         "y":  21,
+                                         "width":  200,
+                                         "height":  305,
+                                         "pixels":  45033,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  2,
+                                         "x":  671,
+                                         "y":  21,
+                                         "width":  196,
+                                         "height":  305,
+                                         "pixels":  44143,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  3,
+                                         "x":  974,
+                                         "y":  21,
+                                         "width":  196,
+                                         "height":  305,
+                                         "pixels":  44104,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  4,
+                                         "x":  79,
+                                         "y":  333,
+                                         "width":  224,
+                                         "height":  312,
+                                         "pixels":  47003,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  5,
+                                         "x":  377,
+                                         "y":  336,
+                                         "width":  235,
+                                         "height":  309,
+                                         "pixels":  45027,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  6,
+                                         "x":  671,
+                                         "y":  337,
+                                         "width":  228,
+                                         "height":  309,
+                                         "pixels":  47348,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  7,
+                                         "x":  976,
+                                         "y":  337,
+                                         "width":  223,
+                                         "height":  308,
+                                         "pixels":  44368,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  8,
+                                         "x":  64,
+                                         "y":  654,
+                                         "width":  243,
+                                         "height":  286,
+                                         "pixels":  44889,
+                                         "edgePixels":  94
+                                     },
+                                     {
+                                         "index":  9,
+                                         "x":  371,
+                                         "y":  657,
+                                         "width":  238,
+                                         "height":  283,
+                                         "pixels":  47544,
+                                         "edgePixels":  91
+                                     },
+                                     {
+                                         "index":  10,
+                                         "x":  653,
+                                         "y":  659,
+                                         "width":  291,
+                                         "height":  281,
+                                         "pixels":  47693,
+                                         "edgePixels":  117
+                                     },
+                                     {
+                                         "index":  11,
+                                         "x":  983,
+                                         "y":  652,
+                                         "width":  222,
+                                         "height":  288,
+                                         "pixels":  44104,
+                                         "edgePixels":  95
+                                     },
+                                     {
+                                         "index":  12,
+                                         "x":  54,
+                                         "y":  940,
+                                         "width":  268,
+                                         "height":  299,
+                                         "pixels":  48972,
+                                         "edgePixels":  88
+                                     },
+                                     {
+                                         "index":  13,
+                                         "x":  376,
+                                         "y":  940,
+                                         "width":  228,
+                                         "height":  300,
+                                         "pixels":  44137,
+                                         "edgePixels":  84
+                                     },
+                                     {
+                                         "index":  14,
+                                         "x":  664,
+                                         "y":  940,
+                                         "width":  226,
+                                         "height":  301,
+                                         "pixels":  44145,
+                                         "edgePixels":  115
+                                     },
+                                     {
+                                         "index":  15,
+                                         "x":  976,
+                                         "y":  940,
+                                         "width":  224,
+                                         "height":  300,
+                                         "pixels":  35168,
+                                         "edgePixels":  90
+                                     }
+                                 ]
+                  }
+    },
+    {
+        "file":  "m4-readability-v2.png",
+        "sha256":  "41264438f5b0b5f9f291b0ab230cd7c136d777e539a74ae0e0a709ee08adbcd9",
+        "audit":  {
+                      "width":  1254,
+                      "height":  1254,
+                      "columns":  [
+                                      0,
+                                      314,
+                                      627,
+                                      944,
+                                      1254
+                                  ],
+                      "rows":  [
+                                   0,
+                                   314,
+                                   627,
+                                   919,
+                                   1254
+                               ],
+                      "frameCount":  16,
+                      "alphaThreshold":  32,
+                      "sourcePixels":  637584,
+                      "assignedPixels":  637584,
+                      "cellEdgePixels":  0,
+                      "outerEdgePixels":  0,
+                      "fullyTransparentPixels":  850147,
+                      "faintAlphaPixels":  84785,
+                      "partialAlphaPixels":  636421,
+                      "fullyOpaquePixels":  1163,
+                      "emptyColumns":  [
+                                           [
+                                               0,
+                                               30
+                                           ],
+                                           [
+                                               303,
+                                               348
+                                           ],
+                                           [
+                                               589,
+                                               643
+                                           ],
+                                           [
+                                               943,
+                                               971
+                                           ],
+                                           [
+                                               1217,
+                                               1253
+                                           ]
+                                       ],
+                      "emptyRows":  [
+                                        [
+                                            0,
+                                            10
+                                        ],
+                                        [
+                                            310,
+                                            323
+                                        ],
+                                        [
+                                            620,
+                                            634
+                                        ],
+                                        [
+                                            918,
+                                            919
+                                        ],
+                                        [
+                                            1224,
+                                            1253
+                                        ]
+                                    ],
+                      "frames":  [
+                                     {
+                                         "index":  0,
+                                         "x":  36,
+                                         "y":  11,
+                                         "width":  216,
+                                         "height":  299,
+                                         "pixels":  40608,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  1,
+                                         "x":  351,
+                                         "y":  11,
+                                         "width":  222,
+                                         "height":  299,
+                                         "pixels":  41027,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  2,
+                                         "x":  668,
+                                         "y":  11,
+                                         "width":  214,
+                                         "height":  299,
+                                         "pixels":  40809,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  3,
+                                         "x":  984,
+                                         "y":  11,
+                                         "width":  212,
+                                         "height":  299,
+                                         "pixels":  40780,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  4,
+                                         "x":  34,
+                                         "y":  326,
+                                         "width":  238,
+                                         "height":  294,
+                                         "pixels":  38895,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  5,
+                                         "x":  351,
+                                         "y":  324,
+                                         "width":  228,
+                                         "height":  295,
+                                         "pixels":  37813,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  6,
+                                         "x":  659,
+                                         "y":  324,
+                                         "width":  233,
+                                         "height":  296,
+                                         "pixels":  40151,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  7,
+                                         "x":  979,
+                                         "y":  326,
+                                         "width":  224,
+                                         "height":  294,
+                                         "pixels":  37865,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  8,
+                                         "x":  31,
+                                         "y":  635,
+                                         "width":  245,
+                                         "height":  282,
+                                         "pixels":  41298,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  9,
+                                         "x":  349,
+                                         "y":  635,
+                                         "width":  231,
+                                         "height":  282,
+                                         "pixels":  43024,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  10,
+                                         "x":  644,
+                                         "y":  638,
+                                         "width":  299,
+                                         "height":  280,
+                                         "pixels":  43530,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  11,
+                                         "x":  978,
+                                         "y":  635,
+                                         "width":  239,
+                                         "height":  282,
+                                         "pixels":  39729,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  12,
+                                         "x":  62,
+                                         "y":  950,
+                                         "width":  241,
+                                         "height":  271,
+                                         "pixels":  41153,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  13,
+                                         "x":  358,
+                                         "y":  945,
+                                         "width":  231,
+                                         "height":  277,
+                                         "pixels":  40426,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  14,
+                                         "x":  662,
+                                         "y":  920,
+                                         "width":  230,
+                                         "height":  303,
+                                         "pixels":  40200,
+                                         "edgePixels":  0
+                                     },
+                                     {
+                                         "index":  15,
+                                         "x":  972,
+                                         "y":  1011,
+                                         "width":  232,
+                                         "height":  213,
+                                         "pixels":  30276,
+                                         "edgePixels":  0
+                                     }
+                                 ]
+                  }
+    }
+]

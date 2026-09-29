@@ -30,17 +30,17 @@ export function Modal({ open, onClose, title, children, maxWidth = "max-w-2xl" }
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-3 sm:p-6 bg-black/50 overflow-y-auto"
+      className="game-modal fixed inset-0 z-50 flex items-start sm:items-center justify-center p-3 sm:p-6 bg-black/50 overflow-y-auto"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
     >
       <Card
-        className={`w-full ${maxWidth} my-auto`}
+        className={`game-modal-card w-full ${maxWidth} my-auto`}
         onClick={(e) => e.stopPropagation()}
       >
         <CardContent className="p-4 space-y-3">
-          <div className="flex items-center justify-between border-b pb-2">
+          <div className="game-modal-heading flex items-center justify-between border-b pb-2">
             <h3 className="text-base font-bold">{title ?? ""}</h3>
             <Button
               variant="ghost"
@@ -52,7 +52,7 @@ export function Modal({ open, onClose, title, children, maxWidth = "max-w-2xl" }
               ✕
             </Button>
           </div>
-          <div className="max-h-[70vh] overflow-y-auto pr-1">{children}</div>
+          <div className="game-modal-body max-h-[70vh] overflow-y-auto pr-1">{children}</div>
         </CardContent>
       </Card>
     </div>

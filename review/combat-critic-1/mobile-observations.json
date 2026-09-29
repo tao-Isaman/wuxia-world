@@ -1,0 +1,638 @@
+{
+  "mode": "mobile",
+  "errors": [
+    {
+      "type": "console",
+      "message": "WebSocket connection to 'ws://127.0.0.1:3017/_next/webpack-hmr' failed: Error in connection establishment: net::ERR_NO_BUFFER_SPACE"
+    }
+  ],
+  "snapshots": [
+    {
+      "step": "initial",
+      "at": "2026-09-28T14:28:04.732Z",
+      "text": "กำลังภายใน — โลกยุทธภพ\nรอจังหวะ · กำลังรวบรวมพลัง\nตาที่ 1\nReviewer\n36 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\n2%\n對\nขโมยน้อย\n36 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\n2%\nหมัดตรง\nโจมตีภายนอก · 1 ครั้ง\n0 MP · 1 ตา\nตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา\nรวบรวมปราณ\nMP เต็ม · ใช้เมื่อปราณพร่อง\n0 MP · 1 ตา\nบันทึกการต่อสู้ (2)\n+",
+      "buttons": [
+        {
+          "text": "หมัดตรง\nโจมตีภายนอก · 1 ครั้ง\n0 MP · 1 ตา",
+          "disabled": true,
+          "rect": {
+            "x": 28,
+            "y": 520.390625,
+            "width": 334,
+            "height": 71.296875,
+            "top": 520.390625,
+            "right": 362,
+            "bottom": 591.6875,
+            "left": 28
+          }
+        },
+        {
+          "text": "ตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา",
+          "disabled": true,
+          "rect": {
+            "x": 28,
+            "y": 598.6875,
+            "width": 163.5,
+            "height": 86.796875,
+            "top": 598.6875,
+            "right": 191.5,
+            "bottom": 685.484375,
+            "left": 28
+          }
+        },
+        {
+          "text": "รวบรวมปราณ\nMP เต็ม · ใช้เมื่อปราณพร่อง\n0 MP · 1 ตา",
+          "disabled": true,
+          "rect": {
+            "x": 198.5,
+            "y": 598.6875,
+            "width": 163.5,
+            "height": 86.796875,
+            "top": 598.6875,
+            "right": 362,
+            "bottom": 685.484375,
+            "left": 198.5
+          }
+        },
+        {
+          "text": "บันทึกการต่อสู้ (2)\n+",
+          "disabled": false,
+          "rect": {
+            "x": 28,
+            "y": 697.484375,
+            "width": 334,
+            "height": 31.5,
+            "top": 697.484375,
+            "right": 362,
+            "bottom": 728.984375,
+            "left": 28
+          }
+        }
+      ],
+      "canvas": {
+        "testid": "battle-canvas",
+        "renderer": "three",
+        "ready": "true",
+        "reducedMotion": "false",
+        "impactCount": "0",
+        "castSeq": "-1",
+        "fighterACharacter": "m1",
+        "fighterAMotion": "idle",
+        "fighterAFrame": "0",
+        "fighterBCharacter": "bandit",
+        "fighterBMotion": "idle",
+        "fighterBFrame": "0",
+        "paused": "false"
+      },
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "scrollWidth": 390,
+        "scrollHeight": 844,
+        "scrollY": 0
+      }
+    },
+    {
+      "step": "mobile-portrait-strike-before",
+      "at": "2026-09-28T14:28:08.781Z",
+      "text": "กำลังภายใน — โลกยุทธภพ\nถึงตาเจ้า · เลือกกระบวนท่า\nตาที่ 1\nReviewer\n36 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\nพร้อม\n對\nขโมยน้อย\n36 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\n100%\nหมัดตรง\nโจมตีภายนอก · 1 ครั้ง\n0 MP · 1 ตา\nตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา\nรวบรวมปราณ\nMP เต็ม · ใช้เมื่อปราณพร่อง\n0 MP · 1 ตา\nบันทึกการต่อสู้ (2)\n+",
+      "buttons": [
+        {
+          "text": "หมัดตรง\nโจมตีภายนอก · 1 ครั้ง\n0 MP · 1 ตา",
+          "disabled": false,
+          "rect": {
+            "x": 28,
+            "y": 520.390625,
+            "width": 334,
+            "height": 71.296875,
+            "top": 520.390625,
+            "right": 362,
+            "bottom": 591.6875,
+            "left": 28
+          }
+        },
+        {
+          "text": "ตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา",
+          "disabled": false,
+          "rect": {
+            "x": 28,
+            "y": 598.6875,
+            "width": 163.5,
+            "height": 86.796875,
+            "top": 598.6875,
+            "right": 191.5,
+            "bottom": 685.484375,
+            "left": 28
+          }
+        },
+        {
+          "text": "รวบรวมปราณ\nMP เต็ม · ใช้เมื่อปราณพร่อง\n0 MP · 1 ตา",
+          "disabled": true,
+          "rect": {
+            "x": 198.5,
+            "y": 598.6875,
+            "width": 163.5,
+            "height": 86.796875,
+            "top": 598.6875,
+            "right": 362,
+            "bottom": 685.484375,
+            "left": 198.5
+          }
+        },
+        {
+          "text": "บันทึกการต่อสู้ (2)\n+",
+          "disabled": false,
+          "rect": {
+            "x": 28,
+            "y": 697.484375,
+            "width": 334,
+            "height": 31.5,
+            "top": 697.484375,
+            "right": 362,
+            "bottom": 728.984375,
+            "left": 28
+          }
+        }
+      ],
+      "canvas": {
+        "testid": "battle-canvas",
+        "renderer": "three",
+        "ready": "true",
+        "reducedMotion": "false",
+        "impactCount": "0",
+        "castSeq": "-1",
+        "fighterACharacter": "m1",
+        "fighterAMotion": "guard",
+        "fighterAFrame": "13",
+        "fighterBCharacter": "bandit",
+        "fighterBMotion": "idle",
+        "fighterBFrame": "0",
+        "paused": "false"
+      },
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "scrollWidth": 390,
+        "scrollHeight": 844,
+        "scrollY": 0
+      }
+    },
+    {
+      "step": "mobile-portrait-strike-after",
+      "at": "2026-09-28T14:28:12.591Z",
+      "text": "กำลังภายใน — โลกยุทธภพ\nรอจังหวะ · กำลังรวบรวมพลัง\nตาที่ 3\nReviewer\n5 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\n32%\n對\nขโมยน้อย\n5 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\n32%\nหมัดตรง\nโจมตีภายนอก · 1 ครั้ง\n0 MP · 1 ตา\nตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา\nรวบรวมปราณ\nMP เต็ม · ใช้เมื่อปราณพร่อง\n0 MP · 1 ตา\nบันทึกการต่อสู้ (6)\n+",
+      "buttons": [
+        {
+          "text": "หมัดตรง\nโจมตีภายนอก · 1 ครั้ง\n0 MP · 1 ตา",
+          "disabled": true,
+          "rect": {
+            "x": 28,
+            "y": 520.390625,
+            "width": 334,
+            "height": 71.296875,
+            "top": 520.390625,
+            "right": 362,
+            "bottom": 591.6875,
+            "left": 28
+          }
+        },
+        {
+          "text": "ตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา",
+          "disabled": true,
+          "rect": {
+            "x": 28,
+            "y": 598.6875,
+            "width": 163.5,
+            "height": 86.796875,
+            "top": 598.6875,
+            "right": 191.5,
+            "bottom": 685.484375,
+            "left": 28
+          }
+        },
+        {
+          "text": "รวบรวมปราณ\nMP เต็ม · ใช้เมื่อปราณพร่อง\n0 MP · 1 ตา",
+          "disabled": true,
+          "rect": {
+            "x": 198.5,
+            "y": 598.6875,
+            "width": 163.5,
+            "height": 86.796875,
+            "top": 598.6875,
+            "right": 362,
+            "bottom": 685.484375,
+            "left": 198.5
+          }
+        },
+        {
+          "text": "บันทึกการต่อสู้ (6)\n+",
+          "disabled": false,
+          "rect": {
+            "x": 28,
+            "y": 697.484375,
+            "width": 334,
+            "height": 31.5,
+            "top": 697.484375,
+            "right": 362,
+            "bottom": 728.984375,
+            "left": 28
+          }
+        }
+      ],
+      "canvas": {
+        "testid": "battle-canvas",
+        "renderer": "three",
+        "ready": "true",
+        "reducedMotion": "false",
+        "impactCount": "2",
+        "castSeq": "2",
+        "fighterACharacter": "m1",
+        "fighterAMotion": "idle",
+        "fighterAFrame": "2",
+        "fighterBCharacter": "bandit",
+        "fighterBMotion": "idle",
+        "fighterBFrame": "2",
+        "paused": "false",
+        "lastImpact": "2:0"
+      },
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "scrollWidth": 390,
+        "scrollHeight": 844,
+        "scrollY": 0
+      }
+    },
+    {
+      "step": "landscape-top",
+      "text": "กำลังภายใน — โลกยุทธภพ\nรอจังหวะ · กำลังรวบรวมพลัง\nตาที่ 3\nReviewer\n5 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\n57%\n對\nขโมยน้อย\n5 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\n57%\nหมัดตรง\nโจมตีภายนอก · 1 ครั้ง\n0 MP · 1 ตา\nตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา\nรวบรวมปราณ\nMP เต็ม · ใช้เมื่อปราณพร่อง\n0 MP · 1 ตา\nบันทึกการต่อสู้ (6)\n+",
+      "buttons": [
+        {
+          "text": "หมัดตรง\nโจมตีภายนอก · 1 ครั้ง\n0 MP · 1 ตา",
+          "disabled": true,
+          "rect": {
+            "x": 66,
+            "y": 648,
+            "width": 232.65625,
+            "height": 92.1875,
+            "top": 648,
+            "right": 298.65625,
+            "bottom": 740.1875,
+            "left": 66
+          }
+        },
+        {
+          "text": "ตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา",
+          "disabled": true,
+          "rect": {
+            "x": 305.65625,
+            "y": 648,
+            "width": 232.671875,
+            "height": 92.1875,
+            "top": 648,
+            "right": 538.328125,
+            "bottom": 740.1875,
+            "left": 305.65625
+          }
+        },
+        {
+          "text": "รวบรวมปราณ\nMP เต็ม · ใช้เมื่อปราณพร่อง\n0 MP · 1 ตา",
+          "disabled": true,
+          "rect": {
+            "x": 545.328125,
+            "y": 648,
+            "width": 232.671875,
+            "height": 92.1875,
+            "top": 648,
+            "right": 778,
+            "bottom": 740.1875,
+            "left": 545.328125
+          }
+        },
+        {
+          "text": "บันทึกการต่อสู้ (6)\n+",
+          "disabled": false,
+          "rect": {
+            "x": 66,
+            "y": 752.1875,
+            "width": 712,
+            "height": 31.5,
+            "top": 752.1875,
+            "right": 778,
+            "bottom": 783.6875,
+            "left": 66
+          }
+        }
+      ],
+      "canvas": {
+        "testid": "battle-canvas",
+        "renderer": "three",
+        "ready": "true",
+        "reducedMotion": "false",
+        "impactCount": "2",
+        "castSeq": "2",
+        "fighterACharacter": "m1",
+        "fighterAMotion": "idle",
+        "fighterAFrame": "3",
+        "fighterBCharacter": "bandit",
+        "fighterBMotion": "idle",
+        "fighterBFrame": "2",
+        "paused": "false",
+        "lastImpact": "2:0"
+      },
+      "viewport": {
+        "width": 844,
+        "height": 390,
+        "scrollWidth": 844,
+        "scrollHeight": 390,
+        "scrollY": 0
+      }
+    },
+    {
+      "step": "landscape-controls",
+      "text": "กำลังภายใน — โลกยุทธภพ\nรอจังหวะ · กำลังรวบรวมพลัง\nตาที่ 3\nReviewer\n5 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\n67%\n對\nขโมยน้อย\n5 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\n67%\nหมัดตรง\nโจมตีภายนอก · 1 ครั้ง\n0 MP · 1 ตา\nตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา\nรวบรวมปราณ\nMP เต็ม · ใช้เมื่อปราณพร่อง\n0 MP · 1 ตา\nบันทึกการต่อสู้ (6)\n+",
+      "buttons": [
+        {
+          "text": "หมัดตรง\nโจมตีภายนอก · 1 ครั้ง\n0 MP · 1 ตา",
+          "disabled": true,
+          "rect": {
+            "x": 66,
+            "y": 226,
+            "width": 232.65625,
+            "height": 92.1875,
+            "top": 226,
+            "right": 298.65625,
+            "bottom": 318.1875,
+            "left": 66
+          }
+        },
+        {
+          "text": "ตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา",
+          "disabled": true,
+          "rect": {
+            "x": 305.65625,
+            "y": 226,
+            "width": 232.671875,
+            "height": 92.1875,
+            "top": 226,
+            "right": 538.328125,
+            "bottom": 318.1875,
+            "left": 305.65625
+          }
+        },
+        {
+          "text": "รวบรวมปราณ\nMP เต็ม · ใช้เมื่อปราณพร่อง\n0 MP · 1 ตา",
+          "disabled": true,
+          "rect": {
+            "x": 545.328125,
+            "y": 226,
+            "width": 232.671875,
+            "height": 92.1875,
+            "top": 226,
+            "right": 778,
+            "bottom": 318.1875,
+            "left": 545.328125
+          }
+        },
+        {
+          "text": "บันทึกการต่อสู้ (6)\n+",
+          "disabled": false,
+          "rect": {
+            "x": 66,
+            "y": 330.1875,
+            "width": 712,
+            "height": 31.5,
+            "top": 330.1875,
+            "right": 778,
+            "bottom": 361.6875,
+            "left": 66
+          }
+        }
+      ],
+      "canvas": {
+        "testid": "battle-canvas",
+        "renderer": "three",
+        "ready": "true",
+        "reducedMotion": "false",
+        "impactCount": "2",
+        "castSeq": "2",
+        "fighterACharacter": "m1",
+        "fighterAMotion": "idle",
+        "fighterAFrame": "0",
+        "fighterBCharacter": "bandit",
+        "fighterBMotion": "idle",
+        "fighterBFrame": "0",
+        "paused": "false",
+        "lastImpact": "2:0"
+      },
+      "viewport": {
+        "width": 844,
+        "height": 390,
+        "scrollWidth": 844,
+        "scrollHeight": 390,
+        "scrollY": 0
+      }
+    },
+    {
+      "step": "mobile-landscape-guard-before",
+      "at": "2026-09-28T14:28:15.393Z",
+      "text": "กำลังภายใน — โลกยุทธภพ\nถึงตาเจ้า · เลือกกระบวนท่า\nตาที่ 3\nReviewer\n5 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\nพร้อม\n對\nขโมยน้อย\n5 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\n100%\nหมัดตรง\nโจมตีภายนอก · 1 ครั้ง\n0 MP · 1 ตา\nตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา\nรวบรวมปราณ\nMP เต็ม · ใช้เมื่อปราณพร่อง\n0 MP · 1 ตา\nบันทึกการต่อสู้ (6)\n+",
+      "buttons": [
+        {
+          "text": "หมัดตรง\nโจมตีภายนอก · 1 ครั้ง\n0 MP · 1 ตา",
+          "disabled": false,
+          "rect": {
+            "x": 66,
+            "y": 226,
+            "width": 232.65625,
+            "height": 92.1875,
+            "top": 226,
+            "right": 298.65625,
+            "bottom": 318.1875,
+            "left": 66
+          }
+        },
+        {
+          "text": "ตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา",
+          "disabled": false,
+          "rect": {
+            "x": 305.65625,
+            "y": 226,
+            "width": 232.671875,
+            "height": 92.1875,
+            "top": 226,
+            "right": 538.328125,
+            "bottom": 318.1875,
+            "left": 305.65625
+          }
+        },
+        {
+          "text": "รวบรวมปราณ\nMP เต็ม · ใช้เมื่อปราณพร่อง\n0 MP · 1 ตา",
+          "disabled": true,
+          "rect": {
+            "x": 545.328125,
+            "y": 226,
+            "width": 232.671875,
+            "height": 92.1875,
+            "top": 226,
+            "right": 778,
+            "bottom": 318.1875,
+            "left": 545.328125
+          }
+        },
+        {
+          "text": "บันทึกการต่อสู้ (6)\n+",
+          "disabled": false,
+          "rect": {
+            "x": 66,
+            "y": 330.1875,
+            "width": 712,
+            "height": 31.5,
+            "top": 330.1875,
+            "right": 778,
+            "bottom": 361.6875,
+            "left": 66
+          }
+        }
+      ],
+      "canvas": {
+        "testid": "battle-canvas",
+        "renderer": "three",
+        "ready": "true",
+        "reducedMotion": "false",
+        "impactCount": "2",
+        "castSeq": "2",
+        "fighterACharacter": "m1",
+        "fighterAMotion": "guard",
+        "fighterAFrame": "13",
+        "fighterBCharacter": "bandit",
+        "fighterBMotion": "idle",
+        "fighterBFrame": "1",
+        "paused": "false",
+        "lastImpact": "2:0"
+      },
+      "viewport": {
+        "width": 844,
+        "height": 390,
+        "scrollWidth": 844,
+        "scrollHeight": 390,
+        "scrollY": 0
+      }
+    },
+    {
+      "step": "mobile-landscape-guard-after",
+      "at": "2026-09-28T14:28:19.248Z",
+      "text": "กำลังภายใน — โลกยุทธภพ\nการประลองสิ้นสุด\nตาที่ 4\nReviewer\n0 / 36 HP\n8 / 10 MP\nจังหวะโจมตี\n0%\nทรงพลัง(1)\nสวนกลับ +20% · 1 ครั้ง\n對\nขโมยน้อย\n5 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\n0%\nพ่ายแพ้\nขโมยน้อย ชนะ\nประลอง 4 ตา\nดำเนินเรื่อง →\nบันทึกการต่อสู้ (10)\n+",
+      "buttons": [
+        {
+          "text": "ดำเนินเรื่อง →",
+          "disabled": false,
+          "rect": {
+            "x": 648.296875,
+            "y": 256,
+            "width": 112.703125,
+            "height": 36,
+            "top": 256,
+            "right": 761,
+            "bottom": 292,
+            "left": 648.296875
+          }
+        },
+        {
+          "text": "บันทึกการต่อสู้ (10)\n+",
+          "disabled": false,
+          "rect": {
+            "x": 66,
+            "y": 330.5,
+            "width": 712,
+            "height": 31.5,
+            "top": 330.5,
+            "right": 778,
+            "bottom": 362,
+            "left": 66
+          }
+        }
+      ],
+      "canvas": {
+        "testid": "battle-canvas",
+        "renderer": "three",
+        "ready": "true",
+        "reducedMotion": "false",
+        "impactCount": "4",
+        "castSeq": "3",
+        "fighterACharacter": "m1",
+        "fighterAMotion": "defeat",
+        "fighterAFrame": "15",
+        "fighterBCharacter": "bandit",
+        "fighterBMotion": "victory",
+        "fighterBFrame": "14",
+        "paused": "false",
+        "lastImpact": "3:0"
+      },
+      "viewport": {
+        "width": 844,
+        "height": 390,
+        "scrollWidth": 844,
+        "scrollHeight": 390,
+        "scrollY": 0
+      }
+    },
+    {
+      "step": "portrait-return",
+      "text": "กำลังภายใน — โลกยุทธภพ\nการประลองสิ้นสุด\nตาที่ 4\nReviewer\n0 / 36 HP\n8 / 10 MP\nจังหวะโจมตี\n0%\nทรงพลัง(1)\nสวนกลับ +20% · 1 ครั้ง\n對\nขโมยน้อย\n5 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\n0%\nพ่ายแพ้\nขโมยน้อย ชนะ\nประลอง 4 ตา\nดำเนินเรื่อง →\nบันทึกการต่อสู้ (10)\n+",
+      "buttons": [
+        {
+          "text": "ดำเนินเรื่อง →",
+          "disabled": false,
+          "rect": {
+            "x": 138.640625,
+            "y": 635.9375,
+            "width": 112.703125,
+            "height": 36,
+            "top": 635.9375,
+            "right": 251.34375,
+            "bottom": 671.9375,
+            "left": 138.640625
+          }
+        },
+        {
+          "text": "บันทึกการต่อสู้ (10)\n+",
+          "disabled": false,
+          "rect": {
+            "x": 28,
+            "y": 702.9375,
+            "width": 334,
+            "height": 31.5,
+            "top": 702.9375,
+            "right": 362,
+            "bottom": 734.4375,
+            "left": 28
+          }
+        }
+      ],
+      "canvas": {
+        "testid": "battle-canvas",
+        "renderer": "three",
+        "ready": "true",
+        "reducedMotion": "false",
+        "impactCount": "4",
+        "castSeq": "3",
+        "fighterACharacter": "m1",
+        "fighterAMotion": "defeat",
+        "fighterAFrame": "15",
+        "fighterBCharacter": "bandit",
+        "fighterBMotion": "victory",
+        "fighterBFrame": "14",
+        "paused": "false",
+        "lastImpact": "3:0"
+      },
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "scrollWidth": 390,
+        "scrollHeight": 844,
+        "scrollY": 0
+      }
+    }
+  ]
+}

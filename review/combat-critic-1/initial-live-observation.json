@@ -1,0 +1,69 @@
+{
+  "text": "กำลังภายใน — โลกยุทธภพ\nรอจังหวะ · กำลังรวบรวมพลัง\nตาที่ 1\nReviewer\n36 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\n38%\n對\nขโมยน้อย\n36 / 36 HP\n10 / 10 MP\nจังหวะโจมตี\n38%\nหมัดตรง\nโจมตีภายนอก · 1 ครั้ง\n0 MP · 1 ตา\nตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา\nรวบรวมปราณ\nMP เต็ม · ใช้เมื่อปราณพร่อง\n0 MP · 1 ตา\nบันทึกการต่อสู้ (2)\n+",
+  "buttons": [
+    {
+      "text": "หมัดตรง\nโจมตีภายนอก · 1 ครั้ง\n0 MP · 1 ตา",
+      "disabled": true,
+      "rect": {
+        "x": 364,
+        "y": 692.15625,
+        "width": 232.65625,
+        "height": 92.1875,
+        "top": 692.15625,
+        "right": 596.65625,
+        "bottom": 784.34375,
+        "left": 364
+      }
+    },
+    {
+      "text": "ตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา",
+      "disabled": true,
+      "rect": {
+        "x": 603.65625,
+        "y": 692.15625,
+        "width": 232.671875,
+        "height": 92.1875,
+        "top": 692.15625,
+        "right": 836.328125,
+        "bottom": 784.34375,
+        "left": 603.65625
+      }
+    },
+    {
+      "text": "รวบรวมปราณ\nMP เต็ม · ใช้เมื่อปราณพร่อง\n0 MP · 1 ตา",
+      "disabled": true,
+      "rect": {
+        "x": 843.328125,
+        "y": 692.15625,
+        "width": 232.671875,
+        "height": 92.1875,
+        "top": 692.15625,
+        "right": 1076,
+        "bottom": 784.34375,
+        "left": 843.328125
+      }
+    },
+    {
+      "text": "บันทึกการต่อสู้ (2)\n+",
+      "disabled": false,
+      "rect": {
+        "x": 364,
+        "y": 796.34375,
+        "width": 712,
+        "height": 31.5,
+        "top": 796.34375,
+        "right": 1076,
+        "bottom": 827.84375,
+        "left": 364
+      }
+    }
+  ],
+  "canvases": [
+    {
+      "width": 708,
+      "height": 397,
+      "parent": "<div class=\"absolute inset-0\" role=\"img\" aria-label=\"ฉากประลองยุทธ์ Reviewer กับ ขโมยน้อย\" data-testid=\"battle-canvas\" data-renderer=\"three\" data-ready=\"true\" data-reduced-motion=\"false\" data-impact-count=\"0\" data-cast-seq=\"-1\" data-fighter-a-character=\"m1\" data-fighter-a-motion=\"idle\" data-fighter-a-frame=\"2\" data-fighter-b-character=\"bandit\" data-fighter-b-motion=\"idle\" data-fighter-b-frame=\"2\" data-paused=\"false\"><canvas data-engine=\"three.js r186\" width=\"708\" height=\"397\" aria-hidden=\"true\" data-renderer=\"three\" style=\"display: block; width: 100%; height: 100%; image-rendering: pixelated;\"></canvas></div>"
+    }
+  ],
+  "errors": []
+}

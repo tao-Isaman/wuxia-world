@@ -1,0 +1,89 @@
+{
+  "scenario": "Clean starter vs petty_thief; all base stats 1, basic_punch, no equipment or inner art; opponent scale 1",
+  "derivedBothSides": {
+    "HP": 36,
+    "MP": 10,
+    "Atk": 14,
+    "PA": 9,
+    "IA": 9,
+    "PD": 5,
+    "ID": 6,
+    "Eva": 2,
+    "Acc": 8,
+    "Cri": 3,
+    "Res": 1,
+    "Spd": 3
+  },
+  "hitPercentBothSides": 81.5,
+  "critPercentBothSides": 3.6666666666666665,
+  "normalPunchDamage": 31,
+  "criticalPunchDamage": 47,
+  "guardedNormalDamage": 20,
+  "guardedCriticalDamage": 31,
+  "beforeRiposte": {
+    "simulation": {
+      "engine": "Existing getNextTurn, resolveSkill, resolveCombatAction; cast wall-time omitted, gauge turn order preserved",
+      "seed": 125983,
+      "rng": "LCG state=(1664525*state+1013904223) unsigned32; continuous across policies",
+      "runsPerPolicy": 20000,
+      "punchOnly": {
+        "wins": 14927,
+        "winRate": 0.74635,
+        "meanActions": 3.36005
+      },
+      "guardFirstThenPunch": {
+        "wins": 5352,
+        "winRate": 0.2676,
+        "meanActions": 4.4378
+      }
+    },
+    "finding": "At this opening, Guard forfeits 31 outgoing damage to save 11 incoming; Recover has no use while basic_punch is the only attack and costs 0 MP."
+  },
+  "implementedRules": {
+    "guardMpCost": 2,
+    "guardReductionPercent": 35,
+    "mitigationExpiry": "After the next global action",
+    "ripostePercent": 20,
+    "riposteExpiry": "One-use charge; next physical attempt consumes it, including misses; only first strike in a multi-hit skill; internal attacks preserve it; new battle resets it",
+    "stacking": "Repeated Guard pays the MP cost and refreshes one charge, never stacks"
+  },
+  "afterRiposte": {
+    "runsPerPolicy": 20000,
+    "seedPerPolicy": 125983,
+    "results": [
+      {
+        "scenario": "fresh-starter",
+        "punchWins": 14927,
+        "guardFirstWins": 16654,
+        "punchWinRate": 0.74635,
+        "guardFirstWinRate": 0.8327,
+        "punchMeanWinnerHp": 11.658136263147316,
+        "guardMeanWinnerHp": 19.200732556743123,
+        "punchMeanWinnerMp": 10,
+        "guardMeanWinnerMp": 8
+      },
+      {
+        "scenario": "foe-at-20hp",
+        "punchWins": 19429,
+        "guardFirstWins": 17406,
+        "punchWinRate": 0.97145,
+        "guardFirstWinRate": 0.8703
+      },
+      {
+        "scenario": "STR3-normal-punch42",
+        "punchWins": 19429,
+        "guardFirstWins": 17406,
+        "punchWinRate": 0.97145,
+        "guardFirstWinRate": 0.8703
+      },
+      {
+        "scenario": "player-at-16hp",
+        "punchWins": 3116,
+        "guardFirstWins": 3000,
+        "punchWinRate": 0.1558,
+        "guardFirstWinRate": 0.15
+      }
+    ],
+    "finding": "Guard improves survival for the fresh full-health opening and spends 2 MP. Immediate attack remains better against a finishable foe and when the next reduced enemy strike would still be lethal."
+  }
+}

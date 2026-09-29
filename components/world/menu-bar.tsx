@@ -128,22 +128,24 @@ export function MenuBar({ hud }: { hud?: boolean } = {}) {
   if (hud) {
     return (
       <>
-        <div className="absolute top-2 right-2 z-30 flex flex-col gap-1.5">
+        <nav className="game-menu pixel-panel" aria-label="เมนูเกม">
           {tabs.map((t) => (
             <button
               key={t.id}
               type="button"
               title={t.label}
               onClick={() => setOpen(t.id)}
-              className="relative w-11 h-11 frame-pixel-quiet bg-ink/80 hover:bg-ink transition-colors"
+              aria-label={t.label}
+              className="game-menu-button"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={t.icon}
                 alt={t.label}
-                className="w-full h-full pixel"
+                className="h-8 w-8 pixel"
                 draggable={false}
               />
+              <span>{t.label}</span>
               {typeof t.badge === "number" && (
                 <Badge
                   variant="seal"
@@ -154,7 +156,7 @@ export function MenuBar({ hud }: { hud?: boolean } = {}) {
               )}
             </button>
           ))}
-        </div>
+        </nav>
         {popups}
       </>
     );

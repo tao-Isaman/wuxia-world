@@ -1,0 +1,214 @@
+{
+    "width":  1199,
+    "height":  1312,
+    "columns":  [
+                    0,
+                    326,
+                    610,
+                    920,
+                    1199
+                ],
+    "rows":  [
+                 0,
+                 359,
+                 674,
+                 970,
+                 1312
+             ],
+    "alphaThreshold":  32,
+    "sourcePixels":  651927,
+    "assignedPixels":  651927,
+    "cellEdgePixels":  0,
+    "fullyTransparentPixels":  847135,
+    "intermediateAlphaPixels":  725443,
+    "emptyColumns":  [
+                         [
+                             0,
+                             31
+                         ],
+                         [
+                             308,
+                             343
+                         ],
+                         [
+                             590,
+                             640
+                         ],
+                         [
+                             904,
+                             932
+                         ],
+                         [
+                             1164,
+                             1198
+                         ]
+                     ],
+    "emptyRows":  [
+                      [
+                          0,
+                          48
+                      ],
+                      [
+                          348,
+                          367
+                      ],
+                      [
+                          665,
+                          679
+                      ],
+                      [
+                          966,
+                          972
+                      ],
+                      [
+                          1276,
+                          1311
+                      ]
+                  ],
+    "frames":  [
+                   {
+                       "index":  0,
+                       "x":  48,
+                       "y":  49,
+                       "width":  193,
+                       "height":  299,
+                       "pixels":  40712,
+                       "edgePixels":  0
+                   },
+                   {
+                       "index":  1,
+                       "x":  351,
+                       "y":  49,
+                       "width":  193,
+                       "height":  299,
+                       "pixels":  40865,
+                       "edgePixels":  0
+                   },
+                   {
+                       "index":  2,
+                       "x":  651,
+                       "y":  50,
+                       "width":  194,
+                       "height":  298,
+                       "pixels":  40823,
+                       "edgePixels":  0
+                   },
+                   {
+                       "index":  3,
+                       "x":  956,
+                       "y":  50,
+                       "width":  192,
+                       "height":  298,
+                       "pixels":  40658,
+                       "edgePixels":  0
+                   },
+                   {
+                       "index":  4,
+                       "x":  55,
+                       "y":  368,
+                       "width":  202,
+                       "height":  297,
+                       "pixels":  41404,
+                       "edgePixels":  0
+                   },
+                   {
+                       "index":  5,
+                       "x":  352,
+                       "y":  368,
+                       "width":  205,
+                       "height":  297,
+                       "pixels":  40529,
+                       "edgePixels":  0
+                   },
+                   {
+                       "index":  6,
+                       "x":  652,
+                       "y":  368,
+                       "width":  212,
+                       "height":  297,
+                       "pixels":  42338,
+                       "edgePixels":  0
+                   },
+                   {
+                       "index":  7,
+                       "x":  955,
+                       "y":  368,
+                       "width":  206,
+                       "height":  297,
+                       "pixels":  40828,
+                       "edgePixels":  0
+                   },
+                   {
+                       "index":  8,
+                       "x":  40,
+                       "y":  681,
+                       "width":  215,
+                       "height":  285,
+                       "pixels":  41491,
+                       "edgePixels":  0
+                   },
+                   {
+                       "index":  9,
+                       "x":  344,
+                       "y":  680,
+                       "width":  246,
+                       "height":  286,
+                       "pixels":  43942,
+                       "edgePixels":  0
+                   },
+                   {
+                       "index":  10,
+                       "x":  641,
+                       "y":  686,
+                       "width":  263,
+                       "height":  280,
+                       "pixels":  42877,
+                       "edgePixels":  0
+                   },
+                   {
+                       "index":  11,
+                       "x":  949,
+                       "y":  682,
+                       "width":  215,
+                       "height":  284,
+                       "pixels":  41045,
+                       "edgePixels":  0
+                   },
+                   {
+                       "index":  12,
+                       "x":  32,
+                       "y":  997,
+                       "width":  276,
+                       "height":  275,
+                       "pixels":  43724,
+                       "edgePixels":  0
+                   },
+                   {
+                       "index":  13,
+                       "x":  347,
+                       "y":  994,
+                       "width":  217,
+                       "height":  279,
+                       "pixels":  41086,
+                       "edgePixels":  0
+                   },
+                   {
+                       "index":  14,
+                       "x":  652,
+                       "y":  973,
+                       "width":  187,
+                       "height":  300,
+                       "pixels":  38172,
+                       "edgePixels":  0
+                   },
+                   {
+                       "index":  15,
+                       "x":  933,
+                       "y":  1058,
+                       "width":  219,
+                       "height":  218,
+                       "pixels":  31433,
+                       "edgePixels":  0
+                   }
+               ]
+}

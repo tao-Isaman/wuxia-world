@@ -6,7 +6,7 @@ import type { Rumor } from "../types";
 
 // Hand-authored static rumors — `id` should be unique and start with
 // `lore_`. `createdDay` / `expiresDay` are filled by the rumor engine
-// at seed time (lore rumors get expiresDay = Infinity).
+// at seed time (lore uses a finite, JSON-safe non-expiring deadline).
 export type LoreRumorTemplate = Omit<Rumor, "createdDay" | "expiresDay" | "id"> & {
   // Stable id fragment — engine prepends `lore_` if the user provides
   // a bare suffix; otherwise the id is used as-is.

@@ -82,14 +82,14 @@ export function ChoicePanel({ scene }: Props) {
           ) : null}
         </>
       )}
-      {visibleChoices.map(({ choice, idx }) => (
+      {visibleChoices.map(({ choice, idx }, displayIndex) => (
         <Button
           key={idx}
           variant="outline"
           className={choiceBtnCls}
           onClick={() => makeChoice(idx)}
         >
-          <span className="text-paper/50 mr-2">{idx + 1}.</span>
+          <span className="text-paper/50 mr-2">{displayIndex + 1}.</span>
           {choice.text}
         </Button>
       ))}

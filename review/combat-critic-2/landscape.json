@@ -1,0 +1,135 @@
+{
+  "text": "กำลังภายใน — โลกยุทธภพ\nถึงตาเจ้า · เลือกกระบวนท่า\nตาที่ 1\nCritic Two\nⓘ\n36 / 36 HP\n10 / 10 MP\nจังหวะ\nพร้อม\n對\nขโมยน้อย\nⓘ\n36 / 36 HP\n10 / 10 MP\nจังหวะ\n100%\nหมัดตรง\nโจมตีภายนอก · 1 ครั้ง\n0 MP · 1 ตา\nตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา\nรวบรวมปราณ\nMP เต็ม · ใช้เมื่อปราณพร่อง\n0 MP · 1 ตา\nบันทึกการต่อสู้ (2)\n+",
+  "buttons": [
+    {
+      "text": "Critic Two\nⓘ",
+      "label": "ดูค่าสถานะของ Critic Two",
+      "disabled": false,
+      "box": {
+        "x": 26,
+        "y": 60.59375,
+        "width": 71.4375,
+        "height": 16.796875,
+        "top": 60.59375,
+        "right": 97.4375,
+        "bottom": 77.390625,
+        "left": 26
+      }
+    },
+    {
+      "text": "ขโมยน้อย\nⓘ",
+      "label": "ดูค่าสถานะของ ขโมยน้อย",
+      "disabled": false,
+      "box": {
+        "x": 328,
+        "y": 60.59375,
+        "width": 66.609375,
+        "height": 16.796875,
+        "top": 60.59375,
+        "right": 394.609375,
+        "bottom": 77.390625,
+        "left": 328
+      }
+    },
+    {
+      "text": "หมัดตรง\nโจมตีภายนอก · 1 ครั้ง\n0 MP · 1 ตา",
+      "label": "หมัดตรง",
+      "disabled": false,
+      "box": {
+        "x": 597,
+        "y": 45,
+        "width": 238,
+        "height": 98.65625,
+        "top": 45,
+        "right": 835,
+        "bottom": 143.65625,
+        "left": 597
+      }
+    },
+    {
+      "text": "ตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา",
+      "label": "ตั้งรับ",
+      "disabled": false,
+      "box": {
+        "x": 597,
+        "y": 149.65625,
+        "width": 238,
+        "height": 98.671875,
+        "top": 149.65625,
+        "right": 835,
+        "bottom": 248.328125,
+        "left": 597
+      }
+    },
+    {
+      "text": "รวบรวมปราณ\nMP เต็ม · ใช้เมื่อปราณพร่อง\n0 MP · 1 ตา",
+      "label": "รวบรวมปราณ",
+      "disabled": true,
+      "box": {
+        "x": 597,
+        "y": 254.328125,
+        "width": 238,
+        "height": 98.671875,
+        "top": 254.328125,
+        "right": 835,
+        "bottom": 353,
+        "left": 597
+      }
+    },
+    {
+      "text": "บันทึกการต่อสู้ (2)\n+",
+      "label": null,
+      "disabled": false,
+      "box": {
+        "x": 597,
+        "y": 360,
+        "width": 238,
+        "height": 24,
+        "top": 360,
+        "right": 835,
+        "bottom": 384,
+        "left": 597
+      }
+    },
+    {
+      "text": "",
+      "label": "Open Next.js Dev Tools",
+      "disabled": false,
+      "box": {
+        "x": 22,
+        "y": 336,
+        "width": 32,
+        "height": 32,
+        "top": 336,
+        "right": 54,
+        "bottom": 368,
+        "left": 22
+      }
+    }
+  ],
+  "canvas": [
+    {
+      "width": 579,
+      "height": 337,
+      "box": {
+        "x": 10,
+        "y": 46,
+        "width": 579,
+        "height": 337,
+        "top": 46,
+        "right": 589,
+        "bottom": 383,
+        "left": 10
+      },
+      "parent": "<div class=\"absolute inset-0\" role=\"img\" aria-label=\"ฉากประลองยุทธ์ Critic Two กับ ขโมยน้อย\" data-testid=\"battle-canvas\" data-renderer=\"three\" data-ready=\"true\" data-view-width=\"742.2\" data-view-height=\"432.0\" data-reduced-motion=\"false\" data-impact-count=\"0\" data-cast-seq=\"-1\" data-fighter-a-character=\"m1\" data-fighter-a-motion=\"guard\" data-fighter-a-frame=\"13\" data-fighter-b-character=\"bandit\" data-fighter-b-motion=\"idle\" data-fighter-b-frame=\"2\" data-paused=\"false\" data-fighter-a-x=\"213.3\" data-fighter-b-x=\"554.7\"><canvas data-engine=\"three.js r186\" width=\"579\" height=\"337\" aria-hidden=\"true\" data-renderer=\"three\" style=\"display: block; width: 100%; height: 100%; image-rendering: pixelated;\"></canvas></div>"
+    }
+  ],
+  "scroll": {
+    "width": 844,
+    "height": 390,
+    "x": 0,
+    "y": 0,
+    "sw": 844,
+    "sh": 390
+  }
+}

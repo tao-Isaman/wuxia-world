@@ -2,11 +2,11 @@
 // Runs the tick + rumor engines against a synthetic 90-day advance and
 // asserts the spec's acceptance criteria hold.
 
-import { LORE_RUMORS } from "../lib/world/data/lore-rumors";
 import { tickAllNamedNpcs } from "../lib/world/npc-tick";
 import {
   generatePlayerEcho,
   maintainRumors,
+  seedLoreRumors,
   selectRumorsForScene,
   RUMOR_POOL_HARD_CAP,
 } from "../lib/world/rumor-engine";
@@ -62,15 +62,7 @@ function freshState(): WorldStateData {
 
 function run() {
   const s = freshState();
-  // Seed lore.
-  for (const lore of LORE_RUMORS) {
-    s.rumorPool.push({
-      ...lore,
-      id: `lore_${lore.idSuffix}`,
-      createdDay: 1,
-      expiresDay: Infinity,
-    });
-  }
+  seedLoreRumors(s);
 
   // Simulate 90-day advance, tick at days 7, 14, 21... 90.
   for (let day = 8; day <= 91; day += 7) {

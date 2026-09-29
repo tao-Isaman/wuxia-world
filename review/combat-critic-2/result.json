@@ -1,0 +1,105 @@
+{
+  "text": "กำลังภายใน — โลกยุทธภพ\nการประลองสิ้นสุด\nตาที่ 3\nCritic Two\nⓘ\n16 / 36 HP\n8 / 10 MP\nจังหวะ\n0%\n對\nขโมยน้อย\nⓘ\n0 / 36 HP\n10 / 10 MP\nจังหวะ\n100%\nชัยชนะ\nCritic Two ชนะ\nประลอง 3 ตา\nดำเนินเรื่อง →\nบันทึกการต่อสู้ (8)\n−\n A:16/36 · B:0/36\n━━ Critic Two ชนะ! (3 ตา) ━━\n[3] Critic Two → หมัดตรง⚔ 38 [hit82% crit4%]\n A:16/36 · B:36/36\n[2] ขโมยน้อย → หมัดตรง⚔ 20 [hit82% crit4%]\n[1] ตั้งรับ → MP -2 · ลดรับ 35% จังหวะถัดไป · โจมตีกายครั้งถัดไป +20% (ใช้สิทธิ์แม้พลาด)\nA: fist ×1.02\n━━ เริ่มการต่อสู้ ━━",
+  "buttons": [
+    {
+      "text": "Critic Two\nⓘ",
+      "label": "ดูค่าสถานะของ Critic Two",
+      "disabled": false,
+      "box": {
+        "x": 26,
+        "y": 60.59375,
+        "width": 71.4375,
+        "height": 16.796875,
+        "top": 60.59375,
+        "right": 97.4375,
+        "bottom": 77.390625,
+        "left": 26
+      }
+    },
+    {
+      "text": "ขโมยน้อย\nⓘ",
+      "label": "ดูค่าสถานะของ ขโมยน้อย",
+      "disabled": false,
+      "box": {
+        "x": 328,
+        "y": 60.59375,
+        "width": 66.609375,
+        "height": 16.796875,
+        "top": 60.59375,
+        "right": 394.609375,
+        "bottom": 77.390625,
+        "left": 328
+      }
+    },
+    {
+      "text": "ดำเนินเรื่อง →",
+      "label": null,
+      "disabled": false,
+      "box": {
+        "x": 659.640625,
+        "y": 227.5,
+        "width": 112.703125,
+        "height": 36,
+        "top": 227.5,
+        "right": 772.34375,
+        "bottom": 263.5,
+        "left": 659.640625
+      }
+    },
+    {
+      "text": "บันทึกการต่อสู้ (8)\n−",
+      "label": null,
+      "disabled": false,
+      "box": {
+        "x": 597,
+        "y": 360,
+        "width": 238,
+        "height": 24,
+        "top": 360,
+        "right": 835,
+        "bottom": 384,
+        "left": 597
+      }
+    },
+    {
+      "text": "",
+      "label": "Open Next.js Dev Tools",
+      "disabled": false,
+      "box": {
+        "x": 22,
+        "y": 336,
+        "width": 32,
+        "height": 32,
+        "top": 336,
+        "right": 54,
+        "bottom": 368,
+        "left": 22
+      }
+    }
+  ],
+  "canvas": [
+    {
+      "width": 579,
+      "height": 337,
+      "box": {
+        "x": 10,
+        "y": 46,
+        "width": 579,
+        "height": 337,
+        "top": 46,
+        "right": 589,
+        "bottom": 383,
+        "left": 10
+      },
+      "parent": "<div class=\"absolute inset-0\" role=\"img\" aria-label=\"ฉากประลองยุทธ์ Critic Two กับ ขโมยน้อย\" data-testid=\"battle-canvas\" data-renderer=\"three\" data-ready=\"true\" data-view-width=\"742.2\" data-view-height=\"432.0\" data-reduced-motion=\"false\" data-impact-count=\"3\" data-cast-seq=\"2\" data-fighter-a-character=\"m1\" data-fighter-a-motion=\"victory\" data-fighter-a-frame=\"14\" data-fighter-b-character=\"bandit\" data-fighter-b-motion=\"defeat\" data-fighter-b-frame=\"15\" data-paused=\"false\" data-fighter-a-x=\"213.3\" data-fighter-b-x=\"554.7\" data-contact-x=\"539.3\" data-contact-y=\"236.5\" data-last-impact=\"2:0\"><canvas data-engine=\"three.js r186\" width=\"579\" height=\"337\" aria-hidden=\"true\" data-renderer=\"three\" style=\"display: block; width: 100%; height: 100%; image-rendering: pixelated;\"></canvas></div>"
+    }
+  ],
+  "scroll": {
+    "width": 844,
+    "height": 390,
+    "x": 0,
+    "y": 0,
+    "sw": 844,
+    "sh": 390
+  }
+}

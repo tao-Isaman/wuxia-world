@@ -1,0 +1,119 @@
+{
+  "stats": {
+    "STR": 1,
+    "AGI": 1,
+    "POW": 1,
+    "VIT": 1,
+    "DEX": 1,
+    "LUK": 1,
+    "DEF": 1,
+    "INT": 1
+  },
+  "observations": [
+    {
+      "name": "fixed-portrait-stats",
+      "width": 390,
+      "height": 844,
+      "text": "กำลังภายใน — โลกยุทธภพ\nถึงตาเจ้า · เลือกกระบวนท่า\nตาที่ 1\nCritic Two\nⓘ\n36 / 36 HP\n10 / 10 MP\nจังหวะ\nพร้อม\n對\nขโมยน้อย\nⓘ\n36 / 36 HP\n10 / 10 MP\nจังหวะ\n100%\nหมัดตรง\nโจมตีภายนอก · 1 ครั้ง\n0 MP · 1 ตา\nตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา\nรวบรวมปราณ\nMP เต็ม · ใช้เมื่อปราณพร่อง\n0 MP · 1 ตา\nบันทึกการต่อสู้ (2)\n+\n×\nCritic Two\nHP\n36\nMP\n10\nSPD\n3\nCri\n3\nAcc\n8\nEva\n2\nATK\n14\nIA\n9\nPD\n5\nID\n6\nRes\n1\nHit\n82%\nCrit\n4%\nHit / Crit คำนวณกับศัตรูปัจจุบัน · ค่าในวงเล็บเป็นโบนัสจาก buff / debuff",
+      "paused": "true",
+      "dialogs": [
+        {
+          "x": 27,
+          "y": 118,
+          "width": 288,
+          "height": 226.5,
+          "top": 118,
+          "right": 315,
+          "bottom": 344.5,
+          "left": 27
+        }
+      ]
+    },
+    {
+      "name": "fixed-landscape-stats",
+      "width": 844,
+      "height": 390,
+      "text": "กำลังภายใน — โลกยุทธภพ\nถึงตาเจ้า · เลือกกระบวนท่า\nตาที่ 1\nCritic Two\nⓘ\n36 / 36 HP\n10 / 10 MP\nจังหวะ\nพร้อม\n對\nขโมยน้อย\nⓘ\n36 / 36 HP\n10 / 10 MP\nจังหวะ\n100%\nหมัดตรง\nโจมตีภายนอก · 1 ครั้ง\n0 MP · 1 ตา\nตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา\nรวบรวมปราณ\nMP เต็ม · ใช้เมื่อปราณพร่อง\n0 MP · 1 ตา\nบันทึกการต่อสู้ (2)\n+\n×\nCritic Two\nHP\n36\nMP\n10\nSPD\n3\nCri\n3\nAcc\n8\nEva\n2\nATK\n14\nIA\n9\nPD\n5\nID\n6\nRes\n1\nHit\n82%\nCrit\n4%\nHit / Crit คำนวณกับศัตรูปัจจุบัน · ค่าในวงเล็บเป็นโบนัสจาก buff / debuff",
+      "paused": "true",
+      "dialogs": [
+        {
+          "x": 26,
+          "y": 83,
+          "width": 288,
+          "height": 226.5,
+          "top": 83,
+          "right": 314,
+          "bottom": 309.5,
+          "left": 26
+        }
+      ]
+    },
+    {
+      "name": "close-button",
+      "passed": true
+    },
+    {
+      "name": "enemy-tap-and-outside-dismiss",
+      "passed": true
+    },
+    {
+      "name": "escape-dismiss",
+      "passed": true
+    }
+  ],
+  "fonts": [
+    {
+      "text": "หมัดตรง\nโจมตีภายนอก · 1 ครั้ง\n0 MP · 1 ตา",
+      "leaves": [
+        {
+          "text": "หมัดตรง",
+          "fontSize": "14px"
+        },
+        {
+          "text": "โจมตีภายนอก · 1 ครั้ง",
+          "fontSize": "10px"
+        },
+        {
+          "text": "0 MP · 1 ตา",
+          "fontSize": "10px"
+        }
+      ]
+    },
+    {
+      "text": "ตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา",
+      "leaves": [
+        {
+          "text": "ตั้งรับ",
+          "fontSize": "14px"
+        },
+        {
+          "text": "ลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)",
+          "fontSize": "10px"
+        },
+        {
+          "text": "2 MP · 1 ตา",
+          "fontSize": "10px"
+        }
+      ]
+    },
+    {
+      "text": "รวบรวมปราณ\nMP เต็ม · ใช้เมื่อปราณพร่อง\n0 MP · 1 ตา",
+      "leaves": [
+        {
+          "text": "รวบรวมปราณ",
+          "fontSize": "14px"
+        },
+        {
+          "text": "MP เต็ม · ใช้เมื่อปราณพร่อง",
+          "fontSize": "10px"
+        },
+        {
+          "text": "0 MP · 1 ตา",
+          "fontSize": "10px"
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

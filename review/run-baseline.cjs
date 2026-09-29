@@ -1,0 +1,61 @@
+const { chromium } = require('@playwright/test');
+const fs = require('node:fs');
+const path = require('node:path');
+const dir = path.join(__dirname, 'baseline');
+const records = [];
+async function shot(page, name) {
+  await page.screenshot({ path: path.join(dir, `${name}.png`), fullPage: true });
+  const row = { name, time: new Date().toISOString(), text: await page.locator('body').innerText(), buttons: await page.getByRole('button').allTextContents() };
+  records.push(row); fs.writeFileSync(path.join(dir, 'observations.json'), JSON.stringify(records, null, 2));
+  console.log(name, JSON.stringify(row.buttons));
+}
+(async () => {
+  const browser = await chromium.launch({ headless: true });
+  const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, recordVideo: { dir: path.join(dir, 'video'), size: { width: 1440, height: 900 } } });
+  const page = await context.newPage();
+  page.on('pageerror', e => console.log('PAGE ERROR:', e.message));
+  await page.goto('http://127.0.0.1:3017');
+  await shot(page, 'title-desktop');
+  await page.locator('#hero-name').fill('นักเดินทาง');
+  await page.getByRole('button', { name: 'เริ่มเกมใหม่' }).click();
+  await page.getByTestId('world-canvas').waitFor();
+  await page.waitForTimeout(1500);
+  await shot(page, 'world-desktop');
+  await page.getByTestId('world-canvas').focus();
+  await page.keyboard.down('d'); await page.waitForTimeout(700); await page.keyboard.up('d');
+  await shot(page, 'world-moved');
+  await page.getByRole('button', { name: /จุดหมาย/ }).click();
+  await shot(page, 'world-destinations');
+  await page.locator('[data-marker-id="route_home_player__to__city_capital"]').click();
+  await page.waitForTimeout(800);
+  await shot(page, 'route-desktop');
+  await page.getByRole('button', { name: /จุดหมาย/ }).click();
+  await page.locator('[data-marker-id="destination-0"]').click();
+  await page.waitForTimeout(800);
+  await shot(page, 'destination-result');
+  await context.storageState({path: path.join(dir,'world-state.json')});
+  await page.evaluate(() => {
+    const persisted = JSON.parse(localStorage.getItem('wusia-world-v1'));
+    persisted.state.pendingEncounter = null;
+    persisted.state.pendingBattle = { opponentId: 'petty_thief', onWin: 'home_player', onLose: 'home_player', nonFatal: true };
+    persisted.state.playerBuild.stats.STR = 25;
+    persisted.state.playerBuild.stats.AGI = 10;
+    localStorage.setItem('wusia-world-v1', JSON.stringify(persisted));
+  });
+  await page.reload();
+  await page.getByTestId('battle-canvas').waitFor(); await page.waitForTimeout(500);
+  await shot(page, 'battle-desktop');
+  await page.getByRole('button', {name:/หมัดตรง/}).first().click();
+  for (let i = 0; i < 6; i++) { await page.waitForTimeout(120); await shot(page, `battle-action-${i}`); }
+  await page.waitForTimeout(1800); await shot(page,'battle-after-action');
+  await page.setViewportSize({width:390,height:844}); await page.waitForTimeout(500); await shot(page,'battle-mobile');
+  await context.close();
+  const mobile = await browser.newContext({viewport:{width:390,height:844},hasTouch:true,isMobile:true,recordVideo:{dir:path.join(dir,'video-mobile'),size:{width:390,height:844}}});
+  const mp = await mobile.newPage(); await mp.goto('http://127.0.0.1:3017'); await shot(mp,'title-mobile');
+  await mp.locator('#hero-name').fill('นักเดินทาง'); await mp.getByRole('button',{name:'เริ่มเกมใหม่'}).click();
+  await mp.getByTestId('world-canvas').waitFor(); await mp.waitForTimeout(800); await shot(mp,'world-mobile');
+  await mp.touchscreen.tap(260,480); await mp.waitForTimeout(700); await shot(mp,'world-mobile-tapped');
+  await mp.setViewportSize({width:844,height:390}); await mp.waitForTimeout(500); await shot(mp,'world-landscape');
+  await mobile.close();
+  await browser.close();
+})().catch(e => { console.error(e); process.exitCode = 1; });

@@ -12,6 +12,7 @@ import {
 } from "@/lib/world";
 import { useWorldStore } from "@/store/world-store";
 import { toast } from "@/store/toast-store";
+import { ItemEffects } from "@/components/world/item-effects";
 
 interface Props {
   open: boolean;
@@ -101,13 +102,17 @@ export function ShopPopup({ open, shop, onClose }: Props) {
                     {def.description && (
                       <div className="text-[10px] text-muted-foreground">{def.description}</div>
                     )}
+                    <div className="mt-1 flex flex-wrap items-center gap-1" aria-label="ผลเมื่อใช้">
+                      <ItemEffects effect={def.use} />
+                      <span className="text-[10px] text-muted-foreground">มี {inventory[id] ?? 0} ชิ้น</span>
+                    </div>
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0">
                     <span className="text-[11px] text-amber-700 font-mono">{price}🟡</span>
                     <Button
                       size="sm"
                       variant="outline"
-                      className="h-6 px-2 text-[10px]"
+                      className="min-h-11 min-w-11 px-2 text-[11px]"
                       disabled={!canAfford}
                       onClick={() => {
                         const r = buyItem(id, 1);
@@ -161,7 +166,7 @@ export function ShopPopup({ open, shop, onClose }: Props) {
                     <Button
                       size="sm"
                       variant="outline"
-                      className="h-6 px-2 text-[10px]"
+                      className="min-h-11 min-w-11 px-2 text-[11px]"
                       onClick={() => {
                         const r = sellItem(id, 1, shop.sellMultiplier);
                         if (!r.ok) {

@@ -10,6 +10,15 @@ import type { NpcDef } from "../../types";
 export const NPCS_CITIES: readonly NpcDef[] = [
   // ─── city_capital ──────────────────────────────────────────────────
   {
+    id: "city_capital_clerk_qing",
+    name: "เสมียนนายฉิง",
+    description: "ผู้ดูแลทะเบียนและหีบเอกสาร ยืนอยู่ด้านซ้ายของนายอำเภอหวู่ที่หน้าสำนักงานทางเหนือของนครหลวง",
+    locationIds: ["city_capital"],
+    dialogSceneId: "npc_city_capital_clerk_qing_talk",
+    defenseTier: 1,
+    tags: ["official"],
+  },
+  {
     id: "city_capital_magistrate_wu",
     name: "นายอำเภอหวู่",
     description: "นายอำเภอผู้กุมอำนาจในนครหลวง มีทั้งภาระราชการและปัญหาส่วนตัวที่ซ่อนอยู่",
@@ -36,6 +45,7 @@ export const NPCS_CITIES: readonly NpcDef[] = [
     locationIds: ["city_capital"],
     dialogSceneId: "npc_city_capital_physician_lin_talk",
     questIds: [
+      "qc_capital_clinic_supplies",
       "qc_capital_rare_herb",
       "qc_capital_stolen_formula",
     ],

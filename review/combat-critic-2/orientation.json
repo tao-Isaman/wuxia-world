@@ -1,0 +1,38 @@
+{
+  "orientation": [
+    {
+      "name": "portrait",
+      "width": 390,
+      "height": 844,
+      "type": "portrait-primary",
+      "angle": 0,
+      "events": 1,
+      "canvases": 1,
+      "scrollWidth": 390,
+      "scrollHeight": 844
+    },
+    {
+      "name": "landscape",
+      "width": 844,
+      "height": 390,
+      "type": "landscape-primary",
+      "angle": 90,
+      "events": 2,
+      "canvases": 1,
+      "scrollWidth": 844,
+      "scrollHeight": 390
+    },
+    {
+      "name": "portrait-return",
+      "width": 390,
+      "height": 844,
+      "type": "portrait-primary",
+      "angle": 0,
+      "events": 3,
+      "canvases": 1,
+      "scrollWidth": 390,
+      "scrollHeight": 844
+    }
+  ],
+  "statText": "กำลังภายใน — โลกยุทธภพ\nถึงตาเจ้า · เลือกกระบวนท่า\nตาที่ 1\nCritic Two\nⓘ\n36 / 36 HP\n10 / 10 MP\nจังหวะ\nพร้อม\n對\nขโมยน้อย\nⓘ\n36 / 36 HP\n10 / 10 MP\nจังหวะ\n100%\nหมัดตรง\nโจมตีภายนอก · 1 ครั้ง\n0 MP · 1 ตา\nตั้งรับ\nลดรับ 35% · กายครั้งถัดไป +20% (ใช้แม้พลาด)\n2 MP · 1 ตา\nรวบรวมปราณ\nMP เต็ม · ใช้เมื่อปราณพร่อง\n0 MP · 1 ตา\nบันทึกการต่อสู้ (2)\n+"
+}

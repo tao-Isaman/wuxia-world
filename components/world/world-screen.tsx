@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Panel } from "@/components/ui/wuxia/panel";
 import { WuxiaButton } from "@/components/ui/wuxia/button";
 import { useWorldStore } from "@/store/world-store";
@@ -9,14 +9,16 @@ import { confirmDialog } from "@/store/confirm-store";
 import {
   NPCS,
   getLocationMap,
+  getNpcsAtLocation,
   getRouteMap,
   getScene,
-  npcBodySprite,
+  type LocationScene,
 } from "@/lib/world";
 import { ensureBattleStarted } from "@/lib/world/battle-bridge";
 import { StartScreen } from "./start-screen";
 import { DialogDisplay } from "./dialog-display";
 import { ChoicePanel } from "./choice-panel";
+import { DialogStage, type DialogSpeaker } from "./dialog-stage";
 import { LocationView } from "./location-view";
 import { RouteView } from "./route-view";
 import { RouteMapView } from "./route-map-view";
@@ -40,14 +42,11 @@ function MapBackdrop({
   children,
   bottom,
   hud,
-  art,
 }: {
   children: React.ReactNode;
   bottom?: boolean;
   /** keep the in-game HUD (status panel + menu icons) on screen */
   hud?: boolean;
-  /** large scene art (e.g. the speaking NPC's sprite) behind the panels */
-  art?: React.ReactNode;
 }) {
   const currentSceneId = useWorldStore((s) => s.currentSceneId);
   const lastLocationId = useWorldStore((s) => s.lastLocationId);
@@ -68,10 +67,9 @@ function MapBackdrop({
         draggable={false}
         className="fixed inset-0 w-full h-full object-cover pixel opacity-40 pointer-events-none"
       />
-      {art}
       <div
         className={`relative z-10 max-w-3xl mx-auto p-3 min-h-full flex flex-col gap-3 ${
-          bottom ? "justify-end" : "justify-center"
+          bottom ? "justify-end pb-28 pt-44" : "justify-center"
         }`}
       >
         {children}
@@ -97,6 +95,7 @@ export function WorldScreen() {
 
   const hasGame = useWorldStore((s) => s.hasGame);
   const currentSceneId = useWorldStore((s) => s.currentSceneId);
+  const lastLocationId = useWorldStore((s) => s.lastLocationId);
   const pendingBattle = useWorldStore((s) => s.pendingBattle);
   const pendingEncounter = useWorldStore((s) => s.pendingEncounter);
   const gameOver = useWorldStore((s) => s.gameOver);
@@ -104,6 +103,38 @@ export function WorldScreen() {
   const resetGame = useWorldStore((s) => s.resetGame);
   // Subscribe to battle state so the layout updates when winner is set / cleared.
   const battleStateExists = useBattleStore((s) => s.state !== null);
+  const scene = getScene(currentSceneId);
+  const source = useRef<{ location: LocationScene; nextSceneIds: string[]; speaker?: DialogSpeaker } | null>(null);
+  const hasRenderedScene = useRef(false);
+  const lastLocation = lastLocationId ? getScene(lastLocationId) : undefined;
+  const candidate = source.current?.location ??
+    (!hasRenderedScene.current && lastLocation?.kind === "location" ? lastLocation : undefined);
+  const localNpcs = candidate ? [...getNpcsAtLocation(candidate.id), ...candidate.npcs] : [];
+  const speaker = scene?.kind === "dialog"
+    ? [...localNpcs, ...NPCS].find((npc) => npc.dialogSceneId === scene.id) ??
+      scene.lines.flatMap((line) => line.t === "dialogue"
+        ? [...localNpcs, ...NPCS].filter((npc) => npc.name === line.speaker) : [])[0]
+    : undefined;
+  const speakingHere = speaker && localNpcs.some((npc) => npc.id === speaker.id);
+  // Only an authored successor belongs to this conversation. Returning to town
+  // can dispatch a random meeting; that new speaker must not inherit Lin's face.
+  const continuesConversation = scene?.kind === "dialog" && source.current?.nextSceneIds.includes(scene.id) &&
+    (!speaker || speakingHere);
+  const dialogueLocation = scene?.kind === "dialog" && candidate?.id === lastLocationId &&
+    (continuesConversation || speakingHere) && getLocationMap(candidate.id)
+    ? candidate : undefined;
+  const mappedLocation = scene?.kind === "location" && getLocationMap(scene.id) ? scene : dialogueLocation;
+  const stagedSpeaker = speaker ?? (dialogueLocation ? source.current?.speaker : undefined);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    hasRenderedScene.current = true;
+    source.current = hasGame && !gameOver && !pendingBattle && !pendingEncounter && mappedLocation
+      ? { location: mappedLocation, speaker: stagedSpeaker, nextSceneIds: scene?.kind === "dialog"
+        ? [scene.next, ...(scene.choices ?? []).map(choice => choice.next)].filter((id): id is string => !!id)
+        : [] }
+      : null;
+  }, [hydrated, hasGame, gameOver, pendingBattle, pendingEncounter, mappedLocation, scene, stagedSpeaker]);
 
   // Defensive: if pendingBattle is set but the (unpersisted) battle store
   // isn't running yet, kick it off from React's lifecycle.
@@ -147,7 +178,6 @@ export function WorldScreen() {
       </MapBackdrop>
     );
   } else {
-    const scene = getScene(currentSceneId);
     if (!scene) {
       body = (
         <Panel padding="p-6" className="text-center space-y-3">
@@ -160,41 +190,26 @@ export function WorldScreen() {
         </Panel>
       );
     } else {
-      // Dialogs render as part of the game HUD: the status panel + menu
-      // icons stay on screen, the speaking NPC's sprite stands beside a
-      // game-style text box anchored low, choices beneath it.
-      if (scene.kind === "dialog") {
-        // Who is talking? Prefer the NPC whose talk scene this is; fall
-        // back to matching the first speech line's speaker name (covers
-        // chained sub-scenes). No match → no sprite, box only.
-        const talkNpc =
-          NPCS.find((n) => n.dialogSceneId === scene.id) ??
-          (() => {
-            const speech = scene.lines.find(
-              (l) => l.t !== "narration" && "speaker" in l,
-            ) as { speaker?: string } | undefined;
-            return speech?.speaker
-              ? NPCS.find((n) => n.name === speech.speaker)
-              : undefined;
-          })();
-        const artSprite = talkNpc ? npcBodySprite(talkNpc.id) : undefined;
+      // This keyed sibling stays at the same position across location → dialog
+      // → location. The Three.js canvas, actor positions and camera survive.
+      if (mappedLocation) {
         return (
           <>
-            <MapBackdrop
-              bottom
-              hud
-              art={
-                artSprite ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={artSprite}
-                    alt={talkNpc?.name ?? ""}
-                    draggable={false}
-                    className="fixed bottom-0 left-2 md:left-14 z-[5] h-[46vh] w-auto pixel drop-shadow-[0_8px_10px_rgba(0,0,0,0.6)] pointer-events-none"
-                  />
-                ) : undefined
-              }
-            >
+            <LocationView key={mappedLocation.id} scene={mappedLocation} readOnly={scene.kind === "dialog"}
+              dialogueSpeakerId={scene.kind === "dialog" ? stagedSpeaker?.id : undefined} />
+            {scene.kind === "dialog" && <DialogStage scene={scene} speaker={stagedSpeaker} locationName={mappedLocation.name} />}
+            <LoadingOverlay key="loading" />
+            <ToastStack key="toasts" />
+            <ConfirmDialog key="confirm" />
+          </>
+        );
+      }
+      // Travel events, the opening and unassociated narration retain their
+      // safe illustrated fallback instead of inventing a location or actors.
+      if (scene.kind === "dialog") {
+        return (
+          <>
+            <MapBackdrop bottom hud>
               <DialogDisplay scene={scene} />
               <ChoicePanel scene={scene} />
             </MapBackdrop>
@@ -221,7 +236,7 @@ export function WorldScreen() {
       if (routeMap && scene.kind === "route") {
         mainView = <RouteMapView key={scene.id} scene={scene} map={routeMap} />;
       }
-      if ((scene.kind === "location" && getLocationMap(scene.id)) || routeMap) {
+      if (routeMap) {
         return (
           <>
             {mainView}

@@ -1,0 +1,9 @@
+# merchant readability candidate
+
+Built-in image generation; original merchant.png identity reference, m1-readability-v2.png proportion reference. PNG preserved unchanged. Candidate pending complete rendered validation.
+
+Source: exec-da2d0bdd-ff3b-4535-ac6a-61b601254b28.png
+
+## Exact prompt
+
+Redraw reference image 1 as a production sprite sheet, preserving that character's exact identity, age, costume palette and accessories. Reference image 2 is ONLY the approved proportion/pixel-cluster style guide; do not copy its blue clothes or young face. Match its compact adult RPG proportions: head including hair about one quarter of standing body height, visibly larger expressive face and hands, strong deliberate pixel clusters, clean cloth color masses with selective 32-bit detail, no muddy microtexture, no smooth 3D shine. Exactly 16 complete poses in a regular four-column by four-row grid on genuine transparent alpha. Generous fully transparent gutters separate every limb and cloth tail from all neighboring poses and sheet edges. All poses share one scale and baseline per row; all face right in slight three-quarter side view. Row1: four subtle idle breathing frames. Row2: four alternating stepping walk frames with clear foot contact. Row3: ready fists, windup, fully extended punch to right, recovery. Row4: hurt recoil, defensive guard, raised-hand victory, kneeling non-gory defeat. Preserve full fingers, headwear, hair and shoes. No text, grid marks, numbers, background or extra props. This is a dignified middle-aged merchant with black topknot and brown ribbon, thin moustache and pointed goatee, deep teal-green robe, warm gold patterned front brocade, cream collar and wide sleeve lining, dark red sash, round gold belt buckle, brown purse and shoes. Preserve mature face and elaborate but readable warm brocade, distinct from a blue martial hero.

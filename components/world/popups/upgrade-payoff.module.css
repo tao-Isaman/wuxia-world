@@ -1,0 +1,52 @@
+.payoff {
+  margin-top: .75rem;
+  padding: .65rem .8rem .5rem;
+  border: 1px solid #a59970;
+  border-top: 3px solid #427159;
+  background: #f6efd8;
+  color: #213b2f;
+  font-size: .875rem;
+  line-height: 1.5;
+  scroll-margin-block: .5rem;
+  animation: arrive 280ms ease-out both;
+}
+
+.heading { display: flex; align-items: center; gap: .65rem; }
+.hero { flex: 0 0 3.25rem; height: 3.5rem; animation: salute 550ms ease-out both; }
+.title { display: grid; flex: 1; min-width: 0; }
+.title strong { font-family: var(--font-display), serif; font-size: 1.2rem; }
+.title span { overflow-wrap: anywhere; }
+.level { flex-shrink: 0; text-align: right; }
+.level > span { display: block; color: #56604a; font-size: .75rem; }
+.level b { font-size: 1.4rem; font-variant-numeric: tabular-nums; }
+.level b > span:first-child { font-weight: 400; color: #647058; }
+.level i { font-style: normal; font-size: .9rem; color: #887443; }
+
+.changes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem 1rem; margin-top: .55rem; }
+.changes > div { min-width: 0; }
+.changes dt { font-size: .8rem; color: #4c5c47; overflow-wrap: anywhere; }
+.changes dd { font-size: 1.1rem; font-variant-numeric: tabular-nums; }
+.previous { color: #627058; }
+.changes small { display: inline-block; margin-left: .4rem; color: #2b6843; font-weight: 700; font-size: .8rem; }
+.detail { margin-top: .45rem; color: #56604a; font-size: .75rem; }
+.footer { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin-top: .5rem; border-top: 1px solid #d1c5a0; padding-top: .25rem; }
+.footer p { font-size: .75rem; }
+.footer p span { display: inline-block; }
+.footer button { flex-shrink: 0; min-height: 44px; padding: .35rem .75rem; color: #234d37; font-weight: 700; text-decoration: underline; text-underline-offset: .2em; transition: background-color 150ms ease; }
+.footer button:hover { background: #e4e6cb; }
+.footer button:active { background: #d6ddbf; }
+.footer button:focus-visible { outline: 2px solid #356347; outline-offset: -2px; }
+
+@keyframes arrive {
+  from { opacity: 0; transform: translateY(.35rem); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes salute {
+  0% { transform: translateY(.25rem); }
+  45% { transform: translateY(-.2rem); }
+  100% { transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .payoff, .hero { animation: none; }
+  .footer button { transition: none; }
+}

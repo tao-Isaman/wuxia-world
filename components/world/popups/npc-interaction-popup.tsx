@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import {
   evaluateCondition,
   getItem,
+  getNpc,
+  TRAIT_LABEL,
   getQuest,
   getQuestsForNpc,
   getScene,
@@ -28,6 +30,16 @@ import { toast } from "@/store/toast-store";
 import { confirmDialog } from "@/store/confirm-store";
 import { flashLoading } from "@/store/loading-store";
 import { NpcStatusBadge } from "../npc-status-badge";
+import { getSkill, getArt } from "@/lib/game";
+import { CharacterPreview } from "@/components/game/character-preview";
+import { npcCharacterId } from "@/lib/characters/catalog";
+
+const NPC_ROLE_LABEL: Record<string, string> = {
+  healer: "แพทย์", scholar: "บัณฑิต", official: "ขุนนาง", authority: "ฝ่ายราชการ",
+  merchant: "พ่อค้า", trader: "พ่อค้า", elder: "ผู้อาวุโส", master: "อาจารย์",
+  disciple: "ศิษย์สำนัก", monk: "พระ", guard: "องครักษ์", spy: "สายข่าว",
+  criminal: "นอกกฎหมาย", blackmarket: "ตลาดมืด", craftsman: "ช่างฝีมือ",
+};
 
 interface Props {
   open: boolean;
@@ -148,7 +160,7 @@ export function NpcInteractionPopup({ open, npc, onClose }: Props) {
   return (
     <Modal open={open} onClose={onClose} title={`💬 ${npc.name}`} maxWidth="max-w-md">
       <div className="space-y-3">
-        {npcPortrait(npc.id) && (
+        {npcPortrait(npc.id) ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={npcPortrait(npc.id)}
@@ -156,7 +168,9 @@ export function NpcInteractionPopup({ open, npc, onClose }: Props) {
             draggable={false}
             className="w-20 h-20 pixel shadow-pixel border border-ink/60 float-right ml-2"
           />
-        )}
+        ) : <div className="w-20 h-20 float-right ml-2 bg-ink/10 border border-ink/30 [&_canvas]:w-full [&_canvas]:h-full">
+          <CharacterPreview id={npcCharacterId(npc.id)} animate framing="bust" />
+        </div>}
         <div className="flex items-center gap-2 flex-wrap">
           {/* Liveness Layer §4.3 — sim-status chip. Renders only for
               named NPCs in a non-alive state (dead / secluded /
@@ -171,9 +185,9 @@ export function NpcInteractionPopup({ open, npc, onClose }: Props) {
               ความสัมพันธ์ {state.relationship > 0 ? `+${state.relationship}` : state.relationship}
             </Badge>
           )}
-          {npc.tags?.map((t) => (
+          {npc.tags?.filter((t) => NPC_ROLE_LABEL[t]).map((t) => (
             <Badge key={t} variant="outline" className="text-[9px] opacity-70">
-              {t}
+              {NPC_ROLE_LABEL[t]}
             </Badge>
           ))}
         </div>
@@ -441,19 +455,19 @@ function summarizeRewards(rewards: readonly QuestReward[]): string {
         parts.push(`+${r.amount} w-exp`);
         break;
       case "skillExp":
-        parts.push(`+${r.amount} xp · ${r.skillId}`);
+        parts.push(`+${r.amount} ประสบการณ์ · ${getSkill(r.skillId)?.n ?? "วิชา"}`);
         break;
       case "trait":
-        parts.push(`${r.trait} +${r.amount}`);
+        parts.push(`${TRAIT_LABEL[r.trait]} +${r.amount}`);
         break;
       case "npcRelationship":
-        parts.push(`สัมพันธ์ ${r.npcId} ${r.amount > 0 ? "+" : ""}${r.amount}`);
+        parts.push(`สัมพันธ์ ${getNpc(r.npcId)?.name ?? "สหาย"} ${r.amount > 0 ? "+" : ""}${r.amount}`);
         break;
       case "learnSkill":
-        parts.push(`วิชา ${r.skillId}`);
+        parts.push(`วิชา ${getSkill(r.skillId)?.n ?? "ใหม่"}`);
         break;
       case "learnArt":
-        parts.push(`วิชาในกาย ${r.artId}`);
+        parts.push(`วิชาในกาย ${getArt(r.artId)?.n ?? "ใหม่"}`);
         break;
     }
   }

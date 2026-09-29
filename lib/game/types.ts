@@ -376,9 +376,11 @@ export interface CharacterBuild {
 // ─── Live battle state ─────────────────────────────────────────────────
 
 export interface BuffRecord {
-  t: SelfEffect["t"] | "buff_iatk"; // including derived buff_iatk
+  t: SelfEffect["t"] | "buff_iatk" | "buff_riposte";
   n?: string;
   v: number;
+  // For buff_riposte this is a one-use charge, consumed on the next physical
+  // attempt; other buffs use the existing global-turn duration.
   u: number;
 }
 

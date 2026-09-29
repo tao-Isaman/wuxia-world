@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
-import Link from "next/link";
 import { WorldScreen } from "@/components/world/world-screen";
+import { QuestCompletionReceipt } from "@/components/world/quest-completion-receipt";
 import { MobileLandscape } from "@/components/mobile-landscape";
 import { initBattleBridge } from "@/lib/world/battle-bridge";
 
@@ -25,6 +25,7 @@ export default function HomePage() {
           <h1 className="text-base font-bold">กำลังภายใน — โลกยุทธภพ</h1>
         </div>
         <WorldScreen />
+        <QuestCompletionReceipt />
       </main>
     </MobileLandscape>
   );

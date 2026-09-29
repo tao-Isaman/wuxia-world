@@ -1,0 +1,133 @@
+{
+  "records": [
+    {
+      "name": "01-first-objective",
+      "scene": "home_player",
+      "stamina": 100,
+      "gold": 0,
+      "herb": 0,
+      "xp": 0,
+      "relationship": 0
+    },
+    {
+      "name": "02-lin-local-offer",
+      "scene": "city_capital",
+      "stamina": 80,
+      "gold": 0,
+      "herb": 0,
+      "xp": 0,
+      "relationship": 0
+    },
+    {
+      "name": "03-clinic-briefing",
+      "scene": "qs_qc_capital_clinic_supplies_offer",
+      "quest": {
+        "id": "qc_capital_clinic_supplies",
+        "status": "active",
+        "stage": 0,
+        "acceptedDefeatedAt": {},
+        "acceptedHasItemAt": {}
+      },
+      "stamina": 80,
+      "gold": 0,
+      "herb": 0,
+      "xp": 0,
+      "relationship": 0
+    },
+    {
+      "name": "04-wu-delivery-choice",
+      "scene": "npc_city_capital_magistrate_wu_talk",
+      "quest": {
+        "id": "qc_capital_clinic_supplies",
+        "status": "active",
+        "stage": 0,
+        "acceptedDefeatedAt": {},
+        "acceptedHasItemAt": {}
+      },
+      "stamina": 80,
+      "gold": 50,
+      "herb": 0,
+      "xp": 0,
+      "relationship": 0
+    },
+    {
+      "name": "05-wu-reply",
+      "scene": "qs_qc_capital_clinic_supplies_delivery",
+      "quest": {
+        "id": "qc_capital_clinic_supplies",
+        "status": "active",
+        "stage": 1,
+        "acceptedDefeatedAt": {},
+        "acceptedHasItemAt": {}
+      },
+      "stamina": 80,
+      "gold": 50,
+      "herb": 0,
+      "xp": 0,
+      "relationship": 0
+    },
+    {
+      "name": "06-lin-turn-in",
+      "scene": "city_capital",
+      "quest": {
+        "id": "qc_capital_clinic_supplies",
+        "status": "active",
+        "stage": 1,
+        "acceptedDefeatedAt": {},
+        "acceptedHasItemAt": {}
+      },
+      "stamina": 80,
+      "gold": 50,
+      "herb": 0,
+      "xp": 0,
+      "relationship": 0
+    },
+    {
+      "name": "07-completed-reward",
+      "scene": "city_capital",
+      "quest": {
+        "id": "qc_capital_clinic_supplies",
+        "status": "done",
+        "stage": 1,
+        "acceptedDefeatedAt": {},
+        "acceptedHasItemAt": {}
+      },
+      "stamina": 80,
+      "gold": 130,
+      "herb": 3,
+      "xp": 20,
+      "relationship": 2
+    },
+    {
+      "name": "08-earned-items",
+      "scene": "city_capital",
+      "quest": {
+        "id": "qc_capital_clinic_supplies",
+        "status": "done",
+        "stage": 1,
+        "acceptedDefeatedAt": {},
+        "acceptedHasItemAt": {}
+      },
+      "stamina": 80,
+      "gold": 130,
+      "herb": 3,
+      "xp": 20,
+      "relationship": 2
+    }
+  ],
+  "errors": [],
+  "reward": {
+    "gold": 80,
+    "herb": 3,
+    "wExp": 20,
+    "linRelationship": 2
+  },
+  "checks": [
+    "real new-game home-capital-Lin-Wu-Lin completion",
+    "advanced quest requirement visible in offer",
+    "Wu delivery cannot repeat while active stage one",
+    "exact reward deltas through normal UI",
+    "completed quest cannot be offered or turned in again",
+    "completed save reload"
+  ]
+}

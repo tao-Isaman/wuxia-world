@@ -1,6 +1,7 @@
 "use client";
 
 import { create } from "zustand";
+import { resolveCombatAction, type CombatAction } from "@/lib/game/combat-actions";
 import type {
   BattleState,
   CharacterBuild,
@@ -34,12 +35,12 @@ interface BattleStore {
   start: (a: CharacterBuild, b: CharacterBuild, opts?: InitialStateOpts) => void;
   reset: () => void;
 
-  // UI animation tick — called from a requestAnimationFrame loop while
-  // `state.phase === "filling"`. dtMs is real-time milliseconds since last frame.
+  // Three.js scene update drives both gauge fill and delayed enemy actions.
   tick: (dtMs: number) => void;
 
   useSkill: (slotIdx: number) => void;
   useArtActive: () => void;
+  useCombatAction: (action: CombatAction) => void;
   // Auto-plays both sides via AI, no animation, until battle ends.
   autoAdvance: () => void;
 }
@@ -68,41 +69,8 @@ function drainToActor(state: BattleState): void {
 }
 
 export const useBattleStore = create<BattleStore>((set, get) => {
-  // Schedules B's AI action after ENEMY_ACTION_DELAY_MS.
-  // Recurses to chain consecutive B turns (each with its own delay).
-  // Honors `castEndsAt` — if a cast animation is still playing, defer
-  // until it finishes so the player sees the full animation before B
-  // attacks.
-  const scheduleEnemyAction = () => {
-    const compute = () => {
-      const s = get();
-      const ce = s.state?.castEndsAt ?? 0;
-      const remain = Math.max(0, ce - Date.now());
-      return Math.max(ENEMY_ACTION_DELAY_MS, remain);
-    };
-    setTimeout(() => {
-      const s = get();
-      if (!s.state || !s.ctx || !s.builds) return;
-      if (s.state.winner || s.state.phase !== "enemy") return;
-      const st = s.state;
-      const acted = runAITurn(st, "B", s.ctx, s.builds.B.skillIds);
-      if (!st.winner) {
-        if (!acted) {
-          st.phase = "filling";
-        } else {
-          drainToActor(st);
-        }
-      }
-      set({ state: { ...st } });
-      if (!st.winner && st.phase === "enemy") scheduleEnemyAction();
-    }, compute());
-  };
-
-  // After any state mutation, if we landed on "enemy" phase, schedule the AI.
-  const maybeScheduleEnemy = () => {
-    const s = get();
-    if (s.state?.phase === "enemy" && !s.state.winner) scheduleEnemyAction();
-  };
+  // Elapsed scene time cannot leak into a replacement battle, unlike timers.
+  let enemyElapsedMs = 0;
 
   return {
     state: null,
@@ -110,6 +78,7 @@ export const useBattleStore = create<BattleStore>((set, get) => {
     builds: null,
 
     start: (a, b, opts) => {
+      enemyElapsedMs = 0;
       const ctx = makeContext(a, b);
       const state = makeInitialState(a, b, opts);
       logLine(state, "lS", "━━ เริ่มการต่อสู้ ━━");
@@ -130,27 +99,34 @@ export const useBattleStore = create<BattleStore>((set, get) => {
       set({ state: { ...state }, ctx, builds: { A: a, B: b } });
     },
 
-    reset: () => set({ state: null, ctx: null, builds: null }),
+    reset: () => { enemyElapsedMs = 0; set({ state: null, ctx: null, builds: null }); },
 
     tick: (dtMs) => {
       const { state, ctx, builds } = get();
       if (!state || !ctx || !builds || state.winner) return;
-      if (state.phase !== "filling") return;
       // Cast hold: pause the ATB while the most-recent skill / art active
       // animation is still playing. Once Date.now() passes castEndsAt,
       // the gauge resumes filling — this is what makes "play animation
       // until done, then count turn" feel right.
       if (state.castEndsAt && Date.now() < state.castEndsAt) return;
-      tickGauges(state, dtMs);
+      const delta = Number.isFinite(dtMs) ? Math.max(0, Math.min(dtMs, 100)) : 0;
+      if (state.phase === "enemy") {
+        enemyElapsedMs += delta;
+        if (enemyElapsedMs < ENEMY_ACTION_DELAY_MS) return;
+        enemyElapsedMs = 0;
+        const acted = runAITurn(state, "B", ctx, builds.B.skillIds);
+        if (!state.winner) {
+          if (acted) drainToActor(state);
+          else state.phase = "filling";
+        }
+        set({ state: { ...state } });
+        return;
+      }
+      if (state.phase !== "filling") return;
+      enemyElapsedMs = 0;
+      tickGauges(state, delta);
       drainToActor(state);
       set({ state: { ...state } });
-      // `drainToActor` may mutate `state.phase` from "filling" → "player"
-      // or "enemy" when a gauge crosses threshold. TS still has the
-      // narrowed type from the early-return guard above, so we re-read
-      // the field through a string-typed alias to dodge the false-
-      // positive "no overlap" comparison.
-      const phaseAfter = state.phase as string;
-      if (phaseAfter === "enemy") scheduleEnemyAction();
     },
 
     useSkill: (slotIdx) => {
@@ -170,7 +146,7 @@ export const useBattleStore = create<BattleStore>((set, get) => {
       }
       if (!state.winner) drainToActor(state);
       set({ state: { ...state } });
-      maybeScheduleEnemy();
+      enemyElapsedMs = 0;
     },
 
     useArtActive: () => {
@@ -181,10 +157,19 @@ export const useBattleStore = create<BattleStore>((set, get) => {
       resolveArtActive(state, "A", ctx);
       if (!state.winner) drainToActor(state);
       set({ state: { ...state } });
-      maybeScheduleEnemy();
+      enemyElapsedMs = 0;
+    },
+
+    useCombatAction: (action) => {
+      const { state, ctx } = get();
+      if (!state || !ctx || !resolveCombatAction(state, ctx, action)) return;
+      if (!state.winner) drainToActor(state);
+      enemyElapsedMs = 0;
+      set({ state: { ...state } });
     },
 
     autoAdvance: () => {
+      enemyElapsedMs = 0;
       const { state, ctx, builds } = get();
       if (!state || !ctx || !builds || state.winner) return;
       let safety = 250;
