@@ -30,3 +30,4 @@ review/**/*.png
 review/**/*.jpg
 review/**/*.webm
 review/**/*.zip
+.pterminal/

@@ -80,3 +80,18 @@ short of the references. Actors read as "soft clusters" at faces, hands and clot
 - Message the orchestrator with a `{"to":"orchestrator","from":"<agent>","text":"..."}` line in
   `D:\wusia-sim-web\.pterminal\messages.jsonl`. Write UTF-8 with no BOM (see README-agents.md).
 - Commit as you go on your own `pt/<agent>` branch. Do not leave a day of work uncommitted again.
+
+## Takeover log
+
+### 2026-09-29 — Claude Code agent (resumed-7116b3f9) takes over
+
+- Read this doc. Could not read `D:\wusia-sim-web\.pterminal\shared.md` from the worktree
+  sandbox (permission denied outside the worktree); waves 7 to 10 notes still need a re-read
+  once access is granted.
+- Verified on this branch: `bun run typecheck` passes. Build, lint, unit suites and e2e not
+  yet re-run by the new agent.
+- `.gitignore` now excludes `.pterminal/` so coordination files never land in a commit.
+- Branch `pt/agent-175` pushed to `origin` (github.com/tao-Isaman/wuxia-world) so the WIP
+  commit `e50bcf1` is no longer local-only.
+- Planned first task: open item 2 (readability-v2 sprites), folding in item 5
+  (escape names in `components/game/battle-log.tsx`) in the same wave.
