@@ -160,17 +160,13 @@ export function NpcInteractionPopup({ open, npc, onClose }: Props) {
   return (
     <Modal open={open} onClose={onClose} title={`💬 ${npc.name}`} maxWidth="max-w-md">
       <div className="space-y-3">
-        {npcPortrait(npc.id) ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={npcPortrait(npc.id)}
-            alt={npc.name}
-            draggable={false}
-            className="w-20 h-20 pixel shadow-pixel border border-ink/60 float-right ml-2"
-          />
-        ) : <div className="w-20 h-20 float-right ml-2 bg-ink/10 border border-ink/30 [&_canvas]:w-full [&_canvas]:h-full">
-          <CharacterPreview id={npcCharacterId(npc.id)} animate framing="bust" />
-        </div>}
+        <div className="npc-card-portrait">
+          {npcPortrait(npc.id) ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={npcPortrait(npc.id)} alt={npc.name} draggable={false} />
+          ) : <CharacterPreview id={npcCharacterId(npc.id)} animate framing="bust" />}
+          <span className="npc-card-name">{npc.name}</span>
+        </div>
         <div className="flex items-center gap-2 flex-wrap">
           {/* Liveness Layer §4.3 — sim-status chip. Renders only for
               named NPCs in a non-alive state (dead / secluded /

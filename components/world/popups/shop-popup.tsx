@@ -13,6 +13,8 @@ import {
 import { useWorldStore } from "@/store/world-store";
 import { toast } from "@/store/toast-store";
 import { ItemEffects } from "@/components/world/item-effects";
+import { CATEGORY_GLYPH, ItemTile } from "@/components/ui/wuxia/item-tile";
+import { itemRarity, rarityColor } from "@/lib/ui/rarity";
 
 interface Props {
   open: boolean;
@@ -88,11 +90,12 @@ export function ShopPopup({ open, shop, onClose }: Props) {
               return (
                 <li
                   key={id}
-                  className="rounded bg-muted/30 px-2 py-1.5 text-xs flex items-center justify-between gap-2"
+                  className="shop-row"
                 >
+                  <ItemTile glyph={CATEGORY_GLYPH[def.category ?? "misc"]} rarity={itemRarity(def.price)} label={def.name} />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      <strong>{def.name}</strong>
+                      <strong className="shop-name" style={{ color: rarityColor(itemRarity(def.price)) }}>{def.name}</strong>
                       {def.category && (
                         <Badge variant="outline" className="text-[9px]">
                           {ITEM_CATEGORY_LABEL[def.category]}
@@ -108,7 +111,7 @@ export function ShopPopup({ open, shop, onClose }: Props) {
                     </div>
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0">
-                    <span className="text-[11px] text-amber-700 font-mono">{price}🟡</span>
+                    <span className="shop-price"><i className="hud-coin" aria-hidden="true" />{price}</span>
                     <Button
                       size="sm"
                       variant="outline"
@@ -148,11 +151,12 @@ export function ShopPopup({ open, shop, onClose }: Props) {
               return (
                 <li
                   key={id}
-                  className="rounded bg-muted/30 px-2 py-1.5 text-xs flex items-center justify-between gap-2"
+                  className="shop-row"
                 >
+                  <ItemTile glyph={CATEGORY_GLYPH[def.category ?? "misc"]} rarity={itemRarity(def.price)} count={n} label={`${def.name} ×${n}`} />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      <strong>{def.name}</strong>
+                      <strong className="shop-name" style={{ color: rarityColor(itemRarity(def.price)) }}>{def.name}</strong>
                       <Badge variant="outline" className="text-[10px]">×{n}</Badge>
                       {def.category && (
                         <Badge variant="outline" className="text-[9px]">
@@ -162,7 +166,7 @@ export function ShopPopup({ open, shop, onClose }: Props) {
                     </div>
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0">
-                    <span className="text-[11px] text-amber-700 font-mono">{sellPrice}🟡</span>
+                    <span className="shop-price"><i className="hud-coin" aria-hidden="true" />{sellPrice}</span>
                     <Button
                       size="sm"
                       variant="outline"

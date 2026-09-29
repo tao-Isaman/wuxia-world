@@ -252,7 +252,7 @@ export function createBattleRuntime(parent: HTMLElement, options: BattleRuntimeO
     context.textBaseline = "middle";
     context.lineJoin = "round";
     context.strokeStyle = "#152620";
-    context.lineWidth = 4;
+    context.lineWidth = size >= 30 ? 6 : 4;
     context.strokeText(text, width / 2, height / 2 + 1, width - 24);
     context.fillStyle = color;
     context.fillText(text, width / 2, height / 2 + 1, width - 24);
@@ -307,12 +307,20 @@ export function createBattleRuntime(parent: HTMLElement, options: BattleRuntimeO
     const y = contact.y;
     parent.dataset.contactX = x.toFixed(1);
     parent.dataset.contactY = y.toFixed(1);
-    const color = missed ? "#c7d3c5" : support ? "#bde9c8" : critical ? "#ffe09a" : "#fff2d4";
-    const text = missed ? "พลาด" : damage > 0 ? `${critical ? "✦ " : ""}${damage}` : "ปราณ";
-    const number = textMesh(text, color, critical ? 26 : 21);
-    addEffect(number, target.mesh.position.x + (index % 3 - 1) * 23, GROUND - 155 - (index % 2) * 17,
-      number.scale.x, number.scale.y, reduced ? 660 : 820,
-      { vy: reduced ? 0 : -40, ownTexture: true });
+    // Hero's Adventure-style big numbers: the player's hits read warm gold,
+    // hits on the player read red, crits are larger with a 暴擊 tag.
+    const onPlayer = targetSide === 0;
+    const color = missed ? "#c7d3c5" : support ? "#9ff0b4" : critical ? "#ffd24a" : onPlayer ? "#ff7a64" : "#fff0c8";
+    const text = missed ? "พลาด" : damage > 0 ? String(damage) : "ปราณ";
+    const number = textMesh(text, color, missed ? 24 : critical ? 44 : damage > 0 ? 34 : 24);
+    const numberX = target.mesh.position.x + (index % 3 - 1) * 26, numberY = GROUND - 158 - (index % 2) * 20;
+    addEffect(number, numberX, numberY, number.scale.x, number.scale.y, reduced ? 700 : 900,
+      { vy: reduced ? 0 : -46, ownTexture: true, grow: critical && !reduced ? 0.12 : 0 });
+    if (critical && !missed && damage > 0) {
+      const tag = textMesh("暴擊", "#ffe9a8", 18, true);
+      addEffect(tag, numberX, numberY - 38, tag.scale.x, tag.scale.y, reduced ? 700 : 900,
+        { vy: reduced ? 0 : -46, ownTexture: true });
+    }
     impactCount++;
     parent.dataset.impactCount = String(impactCount);
     parent.dataset.lastImpact = `${cast.seq}:${index}`;

@@ -33,6 +33,15 @@ for (const v of views) {
   await page.waitForFunction(() => JSON.parse(localStorage.getItem("wusia-world-v1")!).state.currentSceneId === "city_capital");
   await ready(page); await page.waitForTimeout(1500);
   await shot(page, v.name, "03-capital");
+  // Stock the bag so the inventory grid has something to show.
+  await page.evaluate(() => {
+    const save = JSON.parse(localStorage.getItem("wusia-world-v1")!);
+    Object.assign(save.state.inventory, { potion: 3, potion_mid: 1, herb: 5, rice_dish: 2, iron_ore: 4, silk: 2, snow_lotus: 1 });
+    Object.assign(save.state.inventoryEquipment ?? (save.state.inventoryEquipment = {}), { W1: 1, W3: 1 });
+    save.state.gold = 1250;
+    localStorage.setItem("wusia-world-v1", JSON.stringify(save));
+  });
+  await page.reload(); await ready(page); await page.waitForTimeout(1200);
   for (const [i, m] of menus.entries()) {
     const button = page.locator('nav[aria-label="เมนูเกม"]').getByRole("button", { name: m, exact: true });
     if (!(await button.count())) { console.log(`${v.name}: no menu button ${m}`); continue; }
@@ -45,6 +54,14 @@ for (const v of views) {
   await page.locator('[data-marker-id="npc-city_capital_physician_lin"]').click();
   await page.waitForSelector('[role="dialog"]', { timeout: 15_000 }); await page.waitForTimeout(400);
   await shot(page, v.name, "20-npc");
+  await page.getByRole("button", { name: /ทักทาย/ }).click();
+  await page.getByTestId("dialog-stage").waitFor(); await page.waitForTimeout(900);
+  await shot(page, v.name, "22-dialogue");
+  const leave = page.getByTestId("dialog-stage").getByRole("button", { name: /ลาจาก|จบบทสนทนา/ }).first();
+  await leave.click(); await page.waitForSelector('[data-testid="dialog-stage"]', { state: "detached" }); await ready(page);
+  await page.getByRole("button", { name: /จุดหมาย/ }).click();
+  await page.locator('[data-marker-id="npc-city_capital_physician_lin"]').click();
+  await page.waitForSelector('[role="dialog"]', { timeout: 15_000 }); await page.waitForTimeout(300);
   await page.keyboard.press("Escape"); await page.waitForTimeout(300);
   await page.getByRole("button", { name: /จุดหมาย/ }).click();
   const shop = page.locator('[data-marker-id^="service-"]').first();

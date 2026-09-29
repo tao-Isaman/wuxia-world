@@ -31,6 +31,7 @@ import { useWorldStore } from "@/store/world-store";
 import { xpToNextStatLevel } from "@/lib/world/stat-progression";
 import { GENDER_LABEL, SECT_MEMBERSHIPS, TRAIT_KEYS, TRAIT_LABEL } from "@/lib/world";
 import { ArtTooltip, SkillTooltip } from "../skill-tooltip";
+import { CharacterPreview } from "@/components/game/character-preview";
 
 interface Props {
   open: boolean;
@@ -116,6 +117,9 @@ export function ProfilePopup({ open, onClose }: Props) {
   const traits = useWorldStore((s) => s.traits);
   const gender = useWorldStore((s) => s.gender);
   const sectMembership = useWorldStore((s) => s.sectMembership);
+  const bodyId = useWorldStore((s) => s.playerBodyId);
+  const currentHp = useWorldStore((s) => s.currentHp);
+  const currentMp = useWorldStore((s) => s.currentMp);
   if (!player) return null;
 
   const base = player.stats;
@@ -172,16 +176,17 @@ export function ProfilePopup({ open, onClose }: Props) {
     <Modal open={open} onClose={onClose} title={`👤 โปรไฟล์ — ${player.name}`} maxWidth="max-w-3xl">
       <div className="space-y-4">
         {/* ─── Header ──────────────────────────────────────────────── */}
-        <section>
-          <div className="flex items-center justify-between">
-            <div>
-              <strong className="text-base">{player.name}</strong>
-              <span className="text-xs text-muted-foreground ml-2">· {GENDER_LABEL[gender]}</span>
-            </div>
-            <div className="text-xs">
-              <span className="text-muted-foreground">ทอง </span>
-              <strong className="text-amber-600">{gold}</strong>
-            </div>
+        <section className="profile-hero">
+          <div className="profile-figure" aria-hidden="true"><CharacterPreview id={bodyId} animate /></div>
+          <div className="profile-identity">
+            <h3>{player.name}</h3>
+            <p>{GENDER_LABEL[gender]} · ทอง <strong className="text-amber-600">{gold.toLocaleString()}</strong></p>
+            <dl className="profile-vitals">
+              <div><dt>HP</dt><dd>{Math.min(currentHp, derivedAll.HP)}/{derivedAll.HP}</dd></div>
+              <div><dt>MP</dt><dd>{Math.min(currentMp, derivedAll.MP)}/{derivedAll.MP}</dd></div>
+              <div><dt>ATK</dt><dd>{derivedAll.Atk}</dd></div>
+              <div><dt>SPD</dt><dd>{derivedAll.Spd}</dd></div>
+            </dl>
           </div>
           {/* Sect memberships — one row per joined sect. */}
           {Object.entries(sectMembership).filter(([, m]) => m).length > 0 && (
