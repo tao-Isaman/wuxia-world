@@ -14,6 +14,7 @@ import { QuestLogPopup } from "./popups/quest-log-popup";
 import { SectMembershipPopup } from "./popups/sect-membership-popup";
 import { RestPopup } from "./popups/rest-popup";
 import { GameMenuContext } from "@/components/ui/game-menu-context";
+import { InstallGameButton } from "@/components/pwa";
 import {
   SECT_MEMBERSHIPS,
   getQuestsForSect,
@@ -187,6 +188,7 @@ export function MenuBar({ hud }: { hud?: boolean } = {}) {
                 <kbd aria-hidden="true">{i + 1}</kbd>
               </button>
             ))}
+            <InstallGameButton />
           </nav>
         </>}
         {popups}

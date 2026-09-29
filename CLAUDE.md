@@ -141,6 +141,12 @@ Both scenes are Phaser 4 games, dynamically imported by `components/game/world-c
 - Pure helpers (no Phaser): `world-navigation.ts`, `world-placement.ts`, `world-footprints-data.ts`, `world-occlusion.ts`, `world-vignettes.ts`, `world-map-probe.ts`, `battle-background.ts`, `types.ts`.
 - Don't put Phaser objects in stores or saves; don't enable Phaser input (modal pause rules live in `worldInputBlocked`).
 
+### PWA (installable, offline)
+
+- `app/manifest.ts` → `/manifest.webmanifest` (fullscreen, any orientation, icons in `public/pwa/`, regenerate with `bun scripts/build-pwa-icons.ts`). `app/layout.tsx` exports `viewport` (`viewport-fit=cover` for `env(safe-area-inset-*)`) and Apple web-app metadata.
+- `public/sw.js` — hand-written service worker, registered by `<PwaRegister />` (`components/pwa.tsx`) in production only as `/sw.js?v=<NEXT_PUBLIC_BUILD_ID>` (set in `next.config.ts` from the Vercel commit SHA). Navigations network-first → cached `/` offline; `/_next/static` cache-first per deploy; `/art /maps /npcs /player /icons /fonts /pwa` stale-while-revalidate, capped at 900 entries. `sw.js` is served `no-cache`.
+- `<InstallGameButton />` (title screen + เมนู command window): native prompt on Chrome/Android, Share → Add to Home Screen steps on iOS; hidden once installed.
+
 ### Routes
 
 - **`/`** (`app/page.tsx`) — the world game. Renders `<WorldScreen />`, calls `initBattleBridge()` once on mount.

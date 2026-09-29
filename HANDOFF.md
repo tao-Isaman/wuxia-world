@@ -223,3 +223,12 @@ Requested by the user after an in-browser error report ("rewrite it to be Phaser
 - Verified: tsc, lint (existing warnings only), 8 unit suites, e2e 11/11, and smoke runs in Chromium with
   WebGL disabled (`--disable-webgl --disable-3d-apis`): world, night veil and battle all render on Canvas.
 - `three` and `@types/three` were removed from package.json.
+
+## Wave 15: installable PWA
+
+- Manifest (`app/manifest.ts`), home-screen icons from the hero sprite (`scripts/build-pwa-icons.ts` → `public/pwa/`),
+  Apple web-app meta, `viewport-fit=cover` plus left/right notch insets for the HUD (`app/pwa.css`).
+- `public/sw.js` caches the app shell, hashed Next chunks and visited art so the game reloads offline; saves were
+  already in localStorage, and installed apps now request persistent storage.
+- Install control on the title screen and in the เมนู window (iOS shows Add-to-Home-Screen steps).
+- Verified: Chrome reports no installability errors; e2e `pwa.spec.ts` reloads the world offline (12/12 e2e pass).
