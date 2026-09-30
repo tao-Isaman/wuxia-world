@@ -566,8 +566,8 @@ const emptyData = (): WorldStateData => ({
 // A random encounter promoted to a battle. Law pursuers are non-fatal:
 // losing to them ends in their city's jail (the jail_cell scene), not death.
 function encounterBattle(opponentId: string, returnSceneId: string): NonNullable<WorldStateData["pendingBattle"]> {
-  if (isLawOpponent(opponentId)) return { opponentId, onWin: returnSceneId, onLose: "jail_cell", nonFatal: true };
-  return { opponentId, onWin: returnSceneId, onLose: returnSceneId };
+  if (isLawOpponent(opponentId)) return { opponentId, onWin: returnSceneId, onLose: "jail_cell", nonFatal: true, withPack: true };
+  return { opponentId, onWin: returnSceneId, onLose: returnSceneId, withPack: true };
 }
 
 // ─── Walk ticks ────────────────────────────────────────────────────────

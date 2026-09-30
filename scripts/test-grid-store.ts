@@ -48,8 +48,9 @@ function newGame(extra: Partial<ReturnType<typeof useWorldStore.getState>> = {})
   useWorldStore.getState().startNewGame({ name: "Grid test" });
   useWorldStore.setState({ currentSceneId: "city_capital", lastLocationId: "city_capital", ...extra });
 }
-function fight(opponentId: string, extra: { nonFatal?: boolean } = {}) {
-  useWorldStore.setState({ pendingBattle: { opponentId, onWin: "city_capital", onLose: "city_capital", ...extra } });
+// Defaults to a roadside encounter (packs come along); pass withPack:false for a quest fight.
+function fight(opponentId: string, extra: { nonFatal?: boolean; withPack?: boolean } = {}) {
+  useWorldStore.setState({ pendingBattle: { opponentId, onWin: "city_capital", onLose: "city_capital", withPack: true, ...extra } });
   ensureBattleStarted();
   assert.ok(bs().state, `battle started for ${opponentId}`);
 }
@@ -122,6 +123,12 @@ check("bridge: pack opponents spawn their weaker members as extra enemies", () =
   assert.equal(s.units.find((u) => u.team === "enemy")!.id, "B", "primary enemy is the compat 'B'");
   assert.equal(new Set(s.units.map((u) => cellKey(u.pos))).size, 4, "no overlapping units");
   assert.ok(s.log.some((l) => l.txt.includes("พวกอีก 2")));
+  // A quest fight against the same chief stays one-on-one.
+  useBattleStore.getState().reset();
+  fight("bandit_chief", { withPack: false });
+  assert.equal(st().units.length, 2, "quest / spar fights bring no pack");
+  useBattleStore.getState().reset();
+  fight("bandit_chief");
 
   newGame();
   fight("wild_wolf");

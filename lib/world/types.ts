@@ -762,6 +762,9 @@ export interface PendingBattle {
   // When true, defeat does NOT trigger gameOver — the player is routed to
   // `onLose` and the world resumes. Used for sparring / friendly fights.
   nonFatal?: boolean;
+  // Random roadside encounters bring the opponent's pack (OpponentDef.pack);
+  // quest / spar fights with the same opponent stay one-on-one.
+  withPack?: boolean;
 }
 
 // A random-event fight that the player has been offered but not accepted

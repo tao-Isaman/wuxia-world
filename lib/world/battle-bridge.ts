@@ -52,9 +52,9 @@ export function ensureBattleStarted(): void {
   // already; this re-applies for triggerBattle paths (quest fights,
   // sparring, etc.) too.
   applyOpponentStatScale(ws);
-  const setup = worldBattleSetup(opponentId, { bodyId: ws.playerBodyId })!;
-  // Grid battle: the hero (leader) vs the opponent, plus its pack if it
-  // has one (quest / spar foes without a pack stay 1v1).
+  const setup = worldBattleSetup(opponentId, { bodyId: ws.playerBodyId, withPack: ws.pendingBattle.withPack })!;
+  // Grid battle: the hero (leader) vs the opponent, plus its pack on random
+  // encounters (quest / spar fights stay 1v1).
   bs.start(ws.playerBuild, setup.build, {
     hpA: ws.currentHp,
     mpA: ws.currentMp,

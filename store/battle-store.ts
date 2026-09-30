@@ -16,18 +16,14 @@
 
 import { create } from "zustand";
 import type { CharacterBuild } from "@/lib/game/types";
-import { getArt, getMasteryMap, parseSlotId } from "@/lib/game";
+import { getArt, getMasteryMap } from "@/lib/game";
 import {
   activeUnit,
-  aimableFor,
   applyAction,
   beginNextTurn,
   createGridBattle,
-  manhattan,
   planTurn,
-  reachableFor,
   sameCell,
-  targetsFor,
   type Cell,
   type GridAction,
   type GridBattleState,
@@ -73,16 +69,6 @@ interface BattleStore {
   /** Tests / debug: step until the player must act or the battle ends. */
   stepAll: () => void;
 
-  // DEPRECATED: removed once the grid UI lands (old ATB arena / runtime).
-  tick: (dtMs: number) => void;
-  // DEPRECATED: removed once the grid UI lands.
-  useSkill: (slotIdx: number) => void;
-  // DEPRECATED: removed once the grid UI lands.
-  useArtActive: () => void;
-  // DEPRECATED: removed once the grid UI lands.
-  useCombatAction: (action: "guard" | "recover" | "flee") => void;
-  // DEPRECATED: removed once the grid UI lands.
-  autoAdvance: () => void;
 }
 
 export const PLAYER_UNIT = "A";
@@ -136,33 +122,10 @@ export function cloneBattle(s: GridBattleState): GridBattleState {
   };
 }
 
-// ─── Deprecated shim helpers (old one-button arena) ────────────────────
-// Aim `slot` at the closest cell that hits something; walk toward the
-// nearest foe first when nothing is in range.
-function autoAim(state: GridBattleState, u: GridUnit, slot: number): Cell | null {
-  const cells = aimableFor(state, u.id, slot)
-    .filter((c) => targetsFor(state, u.id, slot, c).length > 0)
-    .sort((a, b) => manhattan(u.pos, a) - manhattan(u.pos, b));
-  return cells[0] ?? null;
-}
-
-function stepToward(state: GridBattleState, u: GridUnit): Cell | null {
-  const foes = state.units.filter((o) => o.alive && o.team !== u.team);
-  if (!foes.length) return null;
-  let best: Cell | null = null, bestD = Infinity;
-  for (const path of reachableFor(state, u.id).values()) {
-    const c = path[path.length - 1];
-    const d = Math.min(...foes.map((f) => manhattan(c, f.pos)));
-    if (d < bestD && d >= 1) { bestD = d; best = c; }
-  }
-  return best && !sameCell(best, u.pos) ? best : null;
-}
-
 export const useBattleStore = create<BattleStore>((set, get) => {
   // The AI plans a whole turn up front; after the move beat, its action
   // is replayed on the next step() so both animate separately.
   let planned: { unitId: string; turn: number; action: TurnPlan["action"] } | null = null;
-  let tickMs = 0;
 
   const publish = (state: GridBattleState) => set({ state });
 
@@ -227,7 +190,6 @@ export const useBattleStore = create<BattleStore>((set, get) => {
 
     start: (a, b, opts = {}) => {
       planned = null;
-      tickMs = 0;
       const looks = opts.looks ?? DEFAULT_LOOKS;
       const specs: UnitSpec[] = [
         { id: PLAYER_UNIT, team: "ally", build: a, look: looks.A, hp: opts.hpA, mp: opts.mpA, leader: true },
@@ -251,7 +213,7 @@ export const useBattleStore = create<BattleStore>((set, get) => {
       set({ state: cloneBattle(state), builds: { A: a, B: b } });
     },
 
-    reset: () => { planned = null; tickMs = 0; set({ state: null, builds: null, auto: false }); },
+    reset: () => { planned = null; set({ state: null, builds: null, auto: false }); },
 
     setAuto: (on) => set({ auto: on }),
 
@@ -262,39 +224,5 @@ export const useBattleStore = create<BattleStore>((set, get) => {
     step,
     stepAll,
 
-    // ── DEPRECATED shims: removed once the grid UI lands ──────────────
-    tick: (dtMs) => {
-      const dt = Number.isFinite(dtMs) ? Math.max(0, Math.min(dtMs, 100)) : 0;
-      tickMs += dt;
-      if (tickMs < 400) return;
-      tickMs = 0;
-      step();
-    },
-    useSkill: (slotIdx) => {
-      const { state, auto } = get();
-      if (!state || !isPlayerTurn(state, auto)) return;
-      const u = activeUnit(state)!;
-      let aim = autoAim(state, u, slotIdx);
-      if (!aim && state.phase === "turn") {
-        const to = stepToward(state, u);
-        if (to && get().move(to)) {
-          const s2 = get().state!;
-          aim = autoAim(s2, activeUnit(s2)!, slotIdx);
-        }
-      }
-      if (!aim || !get().act(slotIdx, aim)) get().wait();
-    },
-    useArtActive: () => {
-      const { builds } = get();
-      const slot = builds?.A.skillIds.findIndex((raw) => parseSlotId(raw ?? "")?.kind === "art") ?? -1;
-      if (slot >= 0) get().useSkill(slot);
-    },
-    useCombatAction: (action) => { if (action === "flee") get().flee(); else get().wait(); },
-    autoAdvance: () => {
-      const was = get().auto;
-      set({ auto: true });
-      stepAll();
-      set({ auto: was });
-    },
   };
 });

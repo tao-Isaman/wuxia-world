@@ -82,7 +82,7 @@ export function enemyPackSpecs(opp: OpponentDef): UnitSpec[] {
 }
 
 /** Everything the battle store needs to start a world battle against `opponentId`. */
-export function worldBattleSetup(opponentId: string, opts: { bodyId?: string | null } = {}): {
+export function worldBattleSetup(opponentId: string, opts: { bodyId?: string | null; withPack?: boolean } = {}): {
   opponent: OpponentDef;
   build: CharacterBuild;
   looks: { A: UnitLook; B: UnitLook };
@@ -96,6 +96,6 @@ export function worldBattleSetup(opponentId: string, opts: { bodyId?: string | n
     opponent,
     build,
     looks: { A: playerLook(opts.bodyId), B: opponentLook(opponentId, npc) },
-    enemies: enemyPackSpecs(opponent),
+    enemies: opts.withPack ? enemyPackSpecs(opponent) : [],
   };
 }
