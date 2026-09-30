@@ -6,7 +6,7 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-09-30
 
-### Docs rewrite
+### Docs rewrite ([#30](https://github.com/tao-Isaman/wuxia-world/pull/30))
 
 - **Audit.** Every document was checked against the code, and the stale claims were corrected. Examples:
   - save version 21, not 19;

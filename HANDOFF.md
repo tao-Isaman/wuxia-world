@@ -8,7 +8,7 @@ The wave-by-wave history that used to live in this file has moved to [docs/chang
 
 - grid tactics combat (PR [#28](https://github.com/tao-Isaman/wuxia-world/pull/28));
 - quest objectives and quest tracking (PR [#29](https://github.com/tao-Isaman/wuxia-world/pull/29));
-- the documentation rewrite that produced this file.
+- the documentation rewrite that produced this file (PR [#30](https://github.com/tao-Isaman/wuxia-world/pull/30)).
 
 ## Contents
 
