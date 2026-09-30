@@ -28,7 +28,7 @@ bun scripts/normalize-t3-stats.ts # normalize move-skill stat sums per tier (T0=
 bun scripts/split-sects-file.ts <quests|npcs|scenes>  # split sects-temples.ts trio into per-sect files
 ```
 
-Tests are Bun scripts and `bun test` files wired as `test:*` in package.json (runtime, combat, navigation, opening, rumors, investigation, battle-background, quests, audio, law), plus Playwright `test:e2e` against :3017. `playwright.config.ts` seeds `localStorage["wuxia-random-events"]="off"` so walk ticks don't ambush unrelated specs; specs that test encounters remove the key.
+Tests are Bun scripts and `bun test` files wired as `test:*` in package.json (runtime, combat, navigation, opening, rumors, investigation, battle-background, quests, audio, law, walk), plus Playwright `test:e2e` against :3017. `playwright.config.ts` seeds `localStorage["wuxia-random-events"]="off"` so walk ticks don't ambush unrelated specs; specs that test encounters remove the key.
 
 ## Architecture
 
@@ -157,7 +157,9 @@ Both scenes are Phaser 4 games, dynamically imported by `components/game/world-c
 
 ### Mobile-first HUD (world)
 
-- **Top-left** — the party card (HP / MP / พลัง, `MapHud` `.player-hud`, plus a `⛓●●○○○` wanted chip when `wanted > 0`); `MenuBar hud` renders `nav[aria-label="เมนูเกม"]` directly beneath it as a small 2-row icon grid (profile, bag, skills, crafts, quests, sect, log, sound) + install; digits 1–7 open sections on desktop. No command box. The `.hud-iconbar` `top` offsets in `mobile-hud.css` are tuned to the card's height per breakpoint.
+- **Top-left** — no party card (removed at the user's request; HP / MP / พลัง live in the profile popup and battle). `MenuBar hud` renders `nav[aria-label="เมนูเกม"]` in the corner as a small 2-row icon grid (profile, bag, skills, crafts, quests, sect, log, sound) + install; digits 1–7 open sections on desktop. Law status floats top-centre (`.hud-law`: `⛓ หมายจับ ●●○○○` and the jail sentence).
+- **Map signs + places list** — `WorldMarker.badge` picks a line-art glyph per activity (`GLYPHS` in `lib/stage/world-style.ts`: shop, sect, rest, rumor, practice, each craft profession, each gathering skill, chess, begging, jail gate / labour / dice / escape); `glyph` (the spot's emoji) shows on the action button and in the list; `category` (`npc` / `route` / `place` / `activity`, default from `kind`) sorts จุดหมาย into tabs (`PlacesPanel` in `world-canvas.tsx`; buttons carry `data-places-tab` / `data-category`).
+- **Walk cycle** — `lib/characters/walk-cycle.ts` post-processes the atlas walk cells (side, north, south): left foot up → passing (+1 px bob) → right foot up → passing, bending the lower body from the hip so feet clearly alternate.
 - **Busy overlay** — `flashLoading(message, ms, kind)` (`work` / `rest` / `stealth`) shows `.work-overlay[data-world-busy]`: the hero at work + a progress bar that fills over the action's duration. It swallows taps, and `worldInputBlocked` / menu hotkeys treat `[data-world-busy]` as a pause, so the action button can't be pressed mid-activity.
 - **Quest guide** — `lib/world/quest-guide.ts`: `stageTargetNpc` finds the person the current stage names (earliest NPC name in the stage description; final stage → turn-in / giver), `pathBetween` BFS over location → route → location, `activeGuide(state)` (tracked `flags.trackedQuestId`, else newest guidable active quest), `guideMarkerId` (NPC at the target map, the exit toward the next hop elsewhere, the best destination on route maps). Map views set `WorldMarker.guide`; the runtime draws a bobbing jade arrow over it plus an edge pointer when off-screen (`data-guide-marker`). The quest log shows `📍 NPC · location — อีก n ช่วงทาง` with a `➤ นำทาง` button.
 - **Dialogue** — `DialogStage` is full-screen (portrait bust column / top band on phones, lines + choices side-by-side in landscape) and shrinks text via `--dialog-scale` (floor 0.62) until nothing scrolls. Dialogs away from a staged map (quest offers, travel events, narration) use the same stage over the `MapBackdrop` painting, titled by the first dialogue speaker.
@@ -177,7 +179,7 @@ All `"use client"`. Five stores:
 
 - **`character-store.ts`** — `/debug` setup-tab state. Persisted (`wusia-character-v1`, version 2). World does **not** read from this. v1 → v2 padded `skillIds` 5 → 10 and seeded `learnedSkillIds` / `learnedArtIds` / `artLevels`.
 - **`battle-store.ts`** — runtime battle state. **Not persisted**. `start(a, b, opts?)` accepts `hpA / mpA` carryover. `useSkill(slotIdx)` parses the slot and dispatches to `resolveSkill` or `resolveArtActive`. `BattleState` tracks both `skillUses` and `artUses` for the world store to drain on win.
-- **`world-store.ts`** — story state (scenes, flags, quests, inventory, gold, traits, NPC states, skill / art / stat progression, learned recipes, action log, sect membership, gender). Persisted (`wusia-world-v1`, **version 20**) with `validateAndRepair` on rehydrate. Notable actions: `practiceSkill`, `levelUpArtFromWExp`, `levelUpSkillFromWExp`, `buyRecipe`, `craftRecipe` (artisan-gated for the 6 craft professions), `abandonQuest`, `joinSect`, `upgradeSectRank`, `pickSectReward`, `acceptSectQuest`, **`resignSect`** (formal — skills freeze), **`betraySect`** (skills keep growing but hunters spawn), `attemptSteal`, `attemptKidnap`, `attemptAssassinate`, `finishQuestNow` (popup turn-in path — calls `consumeQuestAutoItems` before firing `finishQuest`). Internal helpers `isSkillFrozen` / `isArtFrozen` short-circuit per-skill / per-art XP grants when the source sect is in `"resigned"` status.
+- **`world-store.ts`** — story state (scenes, flags, quests, inventory, gold, traits, NPC states, skill / art / stat progression, learned recipes, action log, sect membership, gender). Persisted (`wusia-world-v1`, **version 21**) with `validateAndRepair` on rehydrate. Notable actions: `practiceSkill`, `levelUpArtFromWExp`, `levelUpSkillFromWExp`, `buyRecipe`, `craftRecipe` (artisan-gated for the 6 craft professions), `abandonQuest`, `joinSect`, `upgradeSectRank`, `pickSectReward`, `acceptSectQuest`, **`resignSect`** (formal — skills freeze), **`betraySect`** (skills keep growing but hunters spawn), `attemptSteal`, `attemptKidnap`, `attemptAssassinate`, `finishQuestNow` (popup turn-in path — calls `consumeQuestAutoItems` before firing `finishQuest`). Internal helpers `isSkillFrozen` / `isArtFrozen` short-circuit per-skill / per-art XP grants when the source sect is in `"resigned"` status.
 - **`loading-store.ts`** — `flashLoading(message, duration?)`. Auto-hides after 300 ms by default. Used for gather / craft / rest / practice action feel (NOT travel — travel is instant).
 - **`toast-store.ts`** — `toast(kind, message, durationMs?)`. Stack of up to 3 visible at once, auto-dismiss after 2.6 s. Kinds: success / info / warn / error.
 
@@ -264,6 +266,10 @@ UI components subscribe via the standard selector pattern: `useWorldStore((s) =>
 
 **Walk ticks, not scene changes.** Entering a map no longer rolls anything (`rollRandomEvent` scene effect is a no-op; `leaf()` has no `onEnter`). The world runtime calls `onWalkTick` every `WALK_TICK_UNITS = 220` map units walked → `worldStore.walkTick()` → `rollWalkEvent(draft, 0.4)` (probabilities scaled by 0.4). `home_player` is safe. `localStorage["wuxia-random-events"]="off"` disables ticks (tests).
 
+**Jail map.** Losing a law fight → `jail_cell` (arrest; bribe option) → `imprison` sets `jailUntil` (absolute ชั่วยาม = day×12+time, 2 days per mark; marks clear) and moves the player into the `jail` location (painted by `scripts/build-jail-map.ts`, `LOCATION_MAPS.jail`, footprints in `worldFootprints`). It has no exits; `jailBlocks` in world-store refuses any location/route while `jailUntil` is set. Map activities (`lib/world/data/activities.ts`, spot kind `activity`, store `doActivity`): ทุบหิน (6 h, sentence −6 h extra, STR xp), ทอยเต๋า (bet 10), นั่งสมาธิ (MP full), แหกคุก (AGI chance; success +2 marks, fail +1 day), ประตูคุก (opens once served, else offers `serveSentence`). NPCs ตาเฒ่าหลิว (tips) and ผู้คุมจาง (bribe). Save v21 adds `jailUntil`.
+
+**Retreat.** The fight tab shows skills + **ถอยหนี** only (ตั้งรับ / รวบรวมปราณ buttons removed; the engine actions remain). `resolveCombatAction(..., "flee")`: `fleeChance(SpdA, SpdB)` = 50 % ±1 %/4 Spd (20–90 %); success sets `state.escaped` + phase over (no winner), failure spends the turn. `acknowledgeBattleResult` handles escapes: stamina/time cost, no rewards, back to the location, law escape clears `jailCityId`.
+
 **Wanted marks (`lib/world/law.ts`).** A failed steal adds a หมายจับ mark (max 5, decays 1 per 10 quiet days). Each walk tick first rolls `lawChance(marks)` (5 % + 8 %/mark, cap 45 %); `pickLawPursuer` picks `law_constable` (T1) / `law_imperial_guard` (T3) / `law_bounty_hunter` (T3), weighted toward the latter as marks grow. Law fights are nonFatal with `onLose: "jail_cell"`; fleeing uses the hunter AGI+LUK check. In `jail_cell`, `serveJail` advances `2 × marks` days, clears marks and releases the player in `jailCityFor(scene)` (region → city); `bribeJail` (300 gold) drops 2 marks. Winning clears `jailCityId`.
 
 
@@ -345,7 +351,7 @@ A passive simulation that ticks every 7 world days inside `advanceTime`, mutatin
 Two persisted Zustand slices, separate localStorage keys, separate version fields:
 
 - `wusia-character-v1` — `{ builds: { A, B } }` (only used by /debug). Version 2 (v1 → v2 padded slots, seeded learned arrays).
-- `wusia-world-v1` — world state minus action functions. **Version 20**. Migration chain (additive defaults at each step):
+- `wusia-world-v1` — world state minus action functions. **Version 21**. Migration chain (additive defaults at each step):
   1. v1 → v2: stamina + lifeSkillXp(6) + pendingHuntYield
   2. v2 → v3: lifeSkillXp 6 → 17 keys
   3. v3 → v4: day / time
@@ -365,6 +371,7 @@ Two persisted Zustand slices, separate localStorage keys, separate version field
   17. v17 → v18: Liveness Layer fields — `npcExt` (per-named-NPC sim state), `rumorPool`, `rumorArchive`, `rumorSeenLog`, `lastNpcTickDay`. Existing saves start with all empty; `npcExt` lazy-seeds from the authored roster on first tick. Plus an optional `isMajor` flag on `QuestDef` (drives player-echo rumor on completion).
   18. v18 → v19: `playerBodyId` (defaults by gender).
   19. v19 → v20: `wanted`, `wantedDay`, `jailCityId` (wanted marks + jail).
+  20. v20 → v21: `jailUntil` (imprisonment lock on the jail map).
 
 `battle-store` is intentionally not persisted.
 

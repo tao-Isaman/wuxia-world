@@ -301,8 +301,8 @@ export function createWorldRuntime(
       context.fillRect(30, 1, 4, 2);
     });
   }
-  function markerBadge(kind: WorldMarker["kind"], icon?: string) {
-    return drawCanvas(32, 36, (context) => drawWorldBadge(context, kind === "exit", icon));
+  function markerBadge(kind: WorldMarker["kind"], glyph?: string) {
+    return drawCanvas(32, 36, (context) => drawWorldBadge(context, kind === "exit", glyph));
   }
   function rememberPosition() {
     if (initial.rememberPosition !== false) rememberMapPosition(initial.key, toPercent(position));
@@ -520,7 +520,7 @@ export function createWorldRuntime(
         character = unique ? makeCharacter(`unique:${marker.id}`, unique, UNIQUE_NPC_SIZE) : makeCharacter(`char:${id}`, atlases.get(id)!, 54);
         character.image.setPosition(point.x, point.y).setDepth(100 + point.y * 10);
       } else {
-        const key = marker.kind === "exit" ? exitBadge : texture(markerBadge(marker.kind, marker.icon), "badge");
+        const key = marker.kind === "exit" ? exitBadge : texture(markerBadge(marker.kind, marker.badge ?? marker.icon), "badge");
         markerIcon = image(key, 8000, 24, 27).setOrigin(0.5, 1).setPosition(point.x, point.y - 5);
       }
       const label = makeLabel(marker.label);

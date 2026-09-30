@@ -46,11 +46,11 @@ export function SectHallPopup({ open, hall, onClose }: Props) {
         </p>
 
         {training && (
-          <section className="space-y-2 rounded border border-amber-700/40 bg-amber-950/10 p-3 text-xs" aria-label="บทฝึกตั้งรับและสวนกลับ">
-            <strong className="block text-sm">{training.completed ? "ผ่านบทฝึกตั้งรับแล้ว" : "บทฝึกตั้งรับและสวนกลับ"}</strong>
+          <section className="space-y-2 rounded border border-amber-700/40 bg-amber-950/10 p-3 text-xs" aria-label="บทฝึกประลองพื้นฐาน">
+            <strong className="block text-sm">{training.completed ? "ผ่านบทฝึกประลองแล้ว" : "บทฝึกประลองพื้นฐาน"}</strong>
             <p>{CAPITAL_TRAINING_NAME} · คู่ฝึกระดับเริ่มต้น</p>
             {!training.completed && <>
-              <p className="leading-relaxed">ลอง ตั้งรับ แล้วใช้ หมัดตรง ในตาถัดไปเพื่อสวนกลับแรงขึ้น · ตั้งรับใช้ 2 MP</p>
+              <p className="leading-relaxed">ใช้ หมัดตรง ออกกระบวนท่าเมื่อถึงตา · ถ้าเพลี่ยงพล้ำ กด ถอยหนี เพื่อออกจากการต่อสู้</p>
               <p className="text-muted-foreground leading-relaxed">ไม่มีค่าฝึก · แพ้ไม่เสียชีวิต · ชนะรับ 50 W-EXP และประสบการณ์วิชาที่ใช้ · จบแล้วกลับนครหลวง</p>
               <p className="text-muted-foreground">ใช้ 5 แรง และ 0.5 ชั่วยามทั้งแพ้และชนะ · ผ่านได้หนึ่งครั้ง</p>
             </>}

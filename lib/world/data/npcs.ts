@@ -35,6 +35,23 @@ const CORE_NPCS: readonly NpcDef[] = [
     sparFameReward: 5,
     tags: ["sparring", "wanderer"],
   },
+  // The jail's two regulars (lib/world/data/activities.ts runs its chores).
+  {
+    id: "jail_elder_prisoner",
+    name: "ตาเฒ่าหลิวนักโทษ",
+    description: "นักโทษชราผู้รู้ทุกซอกมุมของคุกหลวง",
+    locationIds: ["jail"],
+    dialogSceneId: "jail_elder_prisoner_talk",
+    tags: ["prisoner"],
+  },
+  {
+    id: "jail_guard_zhang",
+    name: "ผู้คุมจาง",
+    description: "ผู้คุมเวรประตูเหล็ก · รับสินบนถ้าไม่มีใครเห็น",
+    locationIds: ["jail"],
+    dialogSceneId: "jail_guard_zhang_talk",
+    tags: ["guard"],
+  },
   {
     id: "merchant_wang",
     name: "เถ้าแก่หวาง",

@@ -9,6 +9,7 @@ async function ready(page: Page) {
 async function visit(page: Page, id: string) {
   await ready(page);
   await page.getByRole("button", { name: /จุดหมาย/ }).click();
+  await page.locator(`[data-places-tab="${await page.locator(`[data-marker-id="${id}"]`).getAttribute("data-category")}"]`).click();
   await page.locator(`[data-marker-id="${id}"]`).click();
 }
 
@@ -95,13 +96,18 @@ test("first errand leads to safe training, recovery, and an earned skill upgrade
   await expect(page.getByTestId("battle-canvas")).toHaveAttribute("data-battle-background", "capital-training");
   await expect(page.getByTestId("battle-canvas")).toHaveAttribute("data-background-image", "/art/battle-capital-training.png");
   await page.screenshot({ path: "test-results/screenshots/training-yard-desktop.png" });
-  await expect(page.getByRole("button", { name: "ตั้งรับ", exact: true })).toBeEnabled();
-  await page.getByRole("button", { name: "ตั้งรับ", exact: true }).click();
+  // The fight tab: skills and ถอยหนี only (no guard / recover buttons).
+  await expect(page.getByRole("button", { name: "ถอยหนี", exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "ตั้งรับ", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "รวบรวมปราณ", exact: true })).toHaveCount(0);
   const punch = page.getByRole("button", { name: "หมัดตรง", exact: true });
-  await expect(punch).toContainText("สวนกลับ +20%");
-  await expect(punch).toBeEnabled();
-  await punch.click();
-  await expect(page.getByTestId("combat-result")).toContainText("ชัยชนะ");
+  const result = page.getByTestId("combat-result");
+  for (let turn = 0; turn < 12; turn++) {
+    await expect.poll(async () => (await result.count()) > 0 || await punch.isEnabled(), { timeout: 20_000 }).toBe(true);
+    if (await result.count()) break;
+    await punch.click();
+  }
+  await expect(result).toContainText("ชัยชนะ");
   await page.getByRole("button", { name: "ดำเนินเรื่อง →" }).click();
   await ready(page);
   const trained = await state(page);
@@ -111,7 +117,8 @@ test("first errand leads to safe training, recovery, and an earned skill upgrade
   expect(trained.gold).toBe(30);
   expect(trained.wExp).toBe(70);
   expect(trained.skillExp.basic_punch).toBe(20);
-  expect(trained.currentHp).toBe(16);
+  expect(trained.currentHp).toBeGreaterThan(0);
+  expect(trained.currentHp).toBeLessThanOrEqual(27);
 
   async function restAtRoadside() {
     // Rest is a quick bubble on the right edge, not a menu page.
@@ -124,10 +131,10 @@ test("first errand leads to safe training, recovery, and an earned skill upgrade
   await restAtRoadside();
   const firstRest = await state(page);
   expect(firstRest.stamina).toBe(firstRest.staminaMax);
-  expect(firstRest.currentHp).toBe(25);
+  expect(firstRest.currentHp).toBe(Math.min(36, trained.currentHp + 9));
   // Full stamina must not block a second rest while HP is still injured.
   await restAtRoadside();
-  expect((await state(page)).currentHp).toBe(34);
+  expect((await state(page)).currentHp).toBe(Math.min(36, firstRest.currentHp + 9));
   expect((await state(page)).gold).toBe(30);
 
   await page.getByRole("navigation", { name: "เมนูเกม" }).getByRole("button", { name: "วิชา", exact: true }).click();
@@ -144,7 +151,7 @@ test("first errand leads to safe training, recovery, and an earned skill upgrade
   await expect(payoff).toHaveCount(0);
   await page.getByRole("button", { name: "ปิด", exact: true }).click();
   await visit(page, "service-1");
-  await expect(page.getByRole("dialog")).toContainText("ผ่านบทฝึกตั้งรับแล้ว");
+  await expect(page.getByRole("dialog")).toContainText("ผ่านบทฝึกประลองแล้ว");
   await expect(page.getByRole("button", { name: "ฝึกประลองฟรี", exact: true })).toHaveCount(0);
   await page.getByRole("button", { name: "ปิด", exact: true }).click();
   await page.reload();

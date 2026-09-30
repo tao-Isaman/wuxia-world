@@ -24,7 +24,7 @@ test("capital encounter keeps its street setting through reload and phone rotati
   const canvas = await battle.locator("canvas").elementHandle();
   for (const viewport of [{ width: 390, height: 844 }, { width: 844, height: 390 }]) {
     await page.setViewportSize(viewport);
-    await expect(page.getByRole("button", { name: "ตั้งรับ", exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "ถอยหนี", exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "หมัดตรง", exact: true })).toBeVisible();
     expect(await canvas!.evaluate(node => node === document.querySelector('[data-testid="battle-canvas"] canvas'))).toBe(true);
     await page.screenshot({ path: `test-results/screenshots/capital-battle-${viewport.width}.png` });

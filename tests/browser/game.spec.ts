@@ -36,10 +36,12 @@ test("exploration: movement, menu pause, travel, NPC and save reload", async ({ 
   await page.getByRole("button", { name: "ปิด", exact: true }).click();
 
   await page.getByRole("button", { name: /จุดหมาย/ }).click();
+  await page.locator(`[data-places-tab="${await page.locator('[data-marker-id="route_home_player__to__city_capital"]').getAttribute("data-category")}"]`).click();
   await page.locator('[data-marker-id="route_home_player__to__city_capital"]').click();
   await expect.poll(async () => (await save(page)).currentSceneId).toBe("route_home_player__to__city_capital");
   await expect(world).toHaveAttribute("data-ready", "true");
   await page.getByRole("button", { name: /จุดหมาย/ }).click();
+  await page.locator(`[data-places-tab="${await page.locator('[data-marker-id="destination-0"]').getAttribute("data-category")}"]`).click();
   await page.locator('[data-marker-id="destination-0"]').click();
   await expect.poll(async () => {
     const state = await save(page);
@@ -51,6 +53,7 @@ test("exploration: movement, menu pause, travel, NPC and save reload", async ({ 
   await expect(world).toHaveAttribute("data-ready", "true");
   await page.screenshot({ path: "test-results/screenshots/capital-desktop.png" });
   await page.getByRole("button", { name: /จุดหมาย/ }).click();
+  await page.locator(`[data-places-tab="${await page.locator('[data-marker-id="npc-city_capital_physician_lin"]').getAttribute("data-category")}"]`).click();
   await page.locator('[data-marker-id="npc-city_capital_physician_lin"]').click();
   await expect(page.getByRole("dialog")).toBeVisible();
   await page.getByRole("button", { name: "ปิด", exact: true }).click();
@@ -173,7 +176,7 @@ test("version 18 saves migrate and beast battles load the creature atlas", async
   expect(state.playerBodyId).toBe("f1");
   expect(state.gold).toBe(321);
   expect(state.playerBuild.name).toBe("จอมยุทธ์");
-  expect(await page.evaluate(() => JSON.parse(localStorage.getItem("wusia-world-v1")!).version)).toBe(20);
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem("wusia-world-v1")!).version)).toBe(21);
   await expect(page.locator('[data-renderer="phaser"] canvas')).toHaveCount(1);
   await page.setViewportSize({ width: 390, height: 844 });
   await expect.poll(async () => (await page.locator('[data-renderer="phaser"] canvas').boundingBox())!.width).toBeLessThan(390);

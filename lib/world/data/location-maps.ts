@@ -37,7 +37,8 @@ export type MapSpot =
   | ({ kind: "rest"; icon?: string; label?: string } & MapPoint)
   | ({ kind: "rumor"; icon?: string; label?: string } & MapPoint)
   | ({ kind: "practice"; icon?: string; label?: string } & MapPoint)
-  | ({ kind: "resource"; resourceId: string; icon?: string; label?: string } & MapPoint);
+  | ({ kind: "resource"; resourceId: string; icon?: string; label?: string } & MapPoint)
+  | ({ kind: "activity"; activityId: string; icon?: string; label?: string } & MapPoint);
 
 export interface LocationMapDef {
   /** public-relative path of the painted map (3:2 landscape) */
@@ -114,6 +115,28 @@ export const LOCATION_MAPS: Record<string, LocationMapDef> = {
       { kind: "resource", resourceId: "beg_market", x: 31, y: 50, icon: "🥣", label: "ขอเงินในตลาด" },
     ],
   },
+};
+
+// The prison courtyard (painted by scripts/build-jail-map.ts). No exits:
+// the only ways out are the gate once the sentence is served, a bribe, or
+// the cracked east wall.
+LOCATION_MAPS.jail = {
+  image: "/maps/jail.png",
+  zoom: 2.4,
+  spawn: { x: 50, y: 62 },
+  npcSpots: {
+    jail_elder_prisoner: { x: 36, y: 42 },
+    jail_guard_zhang: { x: 66, y: 72 },
+  },
+  exits: [],
+  spots: [
+    { kind: "rest", x: 22, y: 45, icon: "🛏", label: "นอนบนฟาง" },
+    { kind: "activity", activityId: "jail_labor", x: 22, y: 66, icon: "🪨" },
+    { kind: "activity", activityId: "jail_dice", x: 79, y: 74, icon: "🎲" },
+    { kind: "activity", activityId: "jail_meditate", x: 80, y: 42, icon: "🧘" },
+    { kind: "activity", activityId: "jail_escape", x: 90, y: 50, icon: "🧱" },
+    { kind: "activity", activityId: "jail_gate", x: 50, y: 88, icon: "🔒" },
+  ],
 };
 
 export function getLocationMap(id: string): LocationMapDef | undefined {

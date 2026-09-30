@@ -1,9 +1,8 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { deriveAll } from "@/lib/game";
 import { getScene } from "@/lib/world";
-import { CharacterPreview } from "@/components/game/character-preview";
 import { useWorldStore } from "@/store/world-store";
+import { describeSentence, sentenceLeft } from "@/lib/world/law";
 
 /**
  * The twelve double-hours (ชั่วยาม). A world day is 12 units long and starts
@@ -12,45 +11,34 @@ import { useWorldStore } from "@/store/world-store";
 const SHICHEN = ["卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥", "子", "丑", "寅"] as const;
 const SHICHEN_THAI = ["ยามเหม่า", "ยามเฉิน", "ยามซื่อ", "ยามอู่", "ยามเว่ย", "ยามเซิน", "ยามโหย่ว", "ยามซวี", "ยามไฮ่", "ยามจื่อ", "ยามโฉ่ว", "ยามอิ๋น"];
 
-// Mobile-first exploration HUD in wuxia dress: the world stays clear; a party
-// card sits bottom-right, gold and the sundial top-right, the bottom-left is
-// left free for the thumb joystick, and arriving somewhere raises a gold banner.
+// Mobile-first exploration HUD in wuxia dress: the world stays clear (menu
+// icons top-left, gold and the sundial top-right, the bottom-left free for the
+// thumb joystick), and arriving somewhere raises a gold banner. HP / MP / พลัง
+// live in the profile popup and the battle screen.
 export function MapHud() {
   const player = useWorldStore((s) => s.playerBuild);
-  const bodyId = useWorldStore((s) => s.playerBodyId);
   const gold = useWorldStore((s) => s.gold);
-  const stamina = useWorldStore((s) => s.stamina);
-  const staminaMax = useWorldStore((s) => s.staminaMax);
-  const hp = useWorldStore((s) => s.currentHp);
-  const mp = useWorldStore((s) => s.currentMp);
   const day = useWorldStore((s) => s.day);
   const time = useWorldStore((s) => s.time);
   const wExp = useWorldStore((s) => s.wExp);
   const wanted = useWorldStore((s) => s.wanted ?? 0);
+  const sentence = useWorldStore((s) => s.jailUntil == null ? null : sentenceLeft(s));
   const currentSceneId = useWorldStore((s) => s.currentSceneId);
   const lastLocationId = useWorldStore((s) => s.lastLocationId);
   if (!player) return null;
-  const stats = deriveAll(player);
   const scene = getScene(currentSceneId);
   const place = scene?.kind === "location" || scene?.kind === "route" ? scene : getScene(lastLocationId);
   const name = place?.kind === "location" ? place.name : place?.kind === "route" ? place.label.replace(/\s*\(.*\)$/, "") : "ยุทธภพ";
   const phase = time < 4 ? "ยามเช้า" : time < 8 ? "ยามบ่าย" : "ยามค่ำ";
   const hour = ((Math.floor(time) % 12) + 12) % 12;
   return <>
-    <section className="player-hud" aria-label="สถานะตัวละคร">
-      <div className="hud-portrait" aria-hidden="true"><CharacterPreview id={bodyId} framing="bust" /></div>
-      <div className="hud-strip">
-        <strong className="hud-player-name">{player.name}
-          {wanted > 0 && <span className="hud-wanted" title={`หมายจับ ${wanted}/5 — ระวังเจ้าหน้าที่ตามล่า`} aria-label={`หมายจับ ${wanted} จาก 5`}>
-            ⛓{"●".repeat(wanted)}<i>{"○".repeat(5 - wanted)}</i></span>}
-        </strong>
-        <div className="hud-vitals">
-          <Gauge label="HP" value={hp} max={stats.HP} tone="hp" />
-          <Gauge label="MP" value={mp} max={stats.MP} tone="mp" />
-          <Gauge label="พลัง" value={stamina} max={staminaMax} tone="st" />
-        </div>
-      </div>
-    </section>
+    {/* No party card: the map stays clear. Law status floats top-centre. */}
+    {(wanted > 0 || sentence != null) && <div className="hud-law" role="status">
+      {wanted > 0 && <span className="hud-wanted" title={`หมายจับ ${wanted}/5 — ระวังเจ้าหน้าที่ตามล่า`} aria-label={`หมายจับ ${wanted} จาก 5`}>
+        ⛓ หมายจับ {"●".repeat(wanted)}<i>{"○".repeat(5 - wanted)}</i></span>}
+      {sentence != null && <span className="hud-sentence">
+        {sentence > 0 ? `⛓ เหลือโทษ ${describeSentence(sentence)}` : "🔓 พ้นโทษแล้ว · ไปที่ประตูคุก"}</span>}
+    </div>}
     <section className="location-hud" aria-label="สถานที่และเวลา">
       <div className="hud-purse">
         <PurseDelta value={gold} />
@@ -66,16 +54,6 @@ export function MapHud() {
     </section>
     <ArrivalBanner sceneId={place?.kind === "location" ? place.id : null} name={name} />
   </>;
-}
-
-function Gauge({ label, value, max, tone }: { label: string; value: number; max: number; tone: "hp" | "mp" | "st" }) {
-  const current = Math.max(0, Math.min(value, max));
-  return <div className={`hud-gauge hud-gauge--${tone}`} title={`${label} ${Math.round(current)}/${max}`}>
-    <span className="hud-gauge-label">{label}</span>
-    <div role="progressbar" aria-label={label} aria-valuenow={current} aria-valuemin={0} aria-valuemax={max}
-      className="hud-gauge-track"><div style={{ width: (max > 0 ? current / max * 100 : 0) + "%" }} /></div>
-    <small>{Math.round(current)}</small>
-  </div>;
 }
 
 /** Sundial: the current double-hour sits under the gold pointer at the top. */

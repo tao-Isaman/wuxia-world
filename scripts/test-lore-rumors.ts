@@ -25,7 +25,7 @@ function assertLore(state: WorldStateData) {
   assert.ok(lore.every(rumor => Number.isSafeInteger(rumor.expiresDay) && rumor.expiresDay > state.day));
   assert.ok(lore.every(rumor => rumor.source === "lore" && rumor.refersToEvent === null));
 }
-async function load(state: WorldStateData, version = 20) {
+async function load(state: WorldStateData, version = 21) {
   memory.set(saveKey, JSON.stringify({ state, version }));
   await useWorldStore.persist.rehydrate();
   assert.equal(useWorldStore.persist.hasHydrated(), true);
@@ -88,7 +88,7 @@ try {
   useWorldStore.getState().recordRumorHeard(unheard.id);
   assert.deepEqual(useWorldStore.getState().rumorSeenLog, heard.rumorSeenLog, "repeated hearing is idempotent");
   const saved = JSON.parse(memory.get(saveKey)!) as { version: number; state: WorldStateData };
-  assert.equal(saved.version, 20);
+  assert.equal(saved.version, 21);
   assertLore(saved.state);
   for (let i = 0; i < 2; i++) {
     await useWorldStore.persist.rehydrate();

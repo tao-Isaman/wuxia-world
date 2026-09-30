@@ -24,6 +24,7 @@ const KIND_LABEL: Record<string, string> = {
   learn:   "เรียน",
   quest:   "ภารกิจ",
   sect:    "สำนัก",
+  law:     "ทางการ",
 };
 
 const KIND_COLOR: Record<string, string> = {
@@ -38,6 +39,7 @@ const KIND_COLOR: Record<string, string> = {
   learn:   "border-indigo-500/60 text-indigo-700",
   quest:   "border-yellow-600/60 text-yellow-800",
   sect:    "border-vermilion/60 text-vermilion",
+  law:     "border-stone-500/60 text-stone-700",
 };
 
 export function ActionLogPopup({ open, onClose }: Props) {

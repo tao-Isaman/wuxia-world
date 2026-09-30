@@ -115,9 +115,9 @@ check("unaffordable, hidden and unknown route destinations have no effects", () 
   assert.equal(useWorldStore.getState().currentSceneId, route.id);
   assert.equal(useWorldStore.getState().gold, 0);
 });
-check("Three.js runtime objects never enter the version 20 save", () => {
+check("Three.js runtime objects never enter the version 21 save", () => {
   const options = useWorldStore.persist.getOptions();
-  assert.equal(options.version, 20);
+  assert.equal(options.version, 21);
   const saved = options.partialize!(useWorldStore.getState());
   assert.equal(JSON.stringify(saved).includes("enemyElapsedMs"), false);
   assert.equal("travelRoute" in saved, false);

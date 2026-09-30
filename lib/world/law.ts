@@ -40,6 +40,19 @@ export function pickLawPursuer(marks: number, roll: number): LawOpponentId {
   return "law_constable";
 }
 
+/** ชั่วยาม per day (mirrors HOURS_PER_DAY in the world store). */
+export const JAIL_HOURS_PER_DAY = 12;
+/** Absolute game time in ชั่วยาม, the unit `jailUntil` is stored in. */
+export const absoluteHours = (state: { day: number; time: number }) => state.day * JAIL_HOURS_PER_DAY + state.time;
+/** ชั่วยาม still to serve (0 once free or released). */
+export const sentenceLeft = (state: { day: number; time: number; jailUntil?: number | null }) =>
+  state.jailUntil == null ? 0 : Math.max(0, state.jailUntil - absoluteHours(state));
+/** "2 วัน 4 ชั่วยาม" */
+export function describeSentence(hours: number): string {
+  const days = Math.floor(hours / JAIL_HOURS_PER_DAY), rest = hours % JAIL_HOURS_PER_DAY;
+  return [days ? `${days} วัน` : "", rest ? `${rest} ชั่วยาม` : ""].filter(Boolean).join(" ") || "ไม่เหลือ";
+}
+
 export const jailDays = (marks: number) => Math.max(1, Math.min(WANTED_MAX, marks)) * JAIL_DAYS_PER_MARK;
 
 // Region → the city whose jail takes the prisoner.

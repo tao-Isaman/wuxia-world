@@ -105,7 +105,7 @@ test("old positions inside authored objects recover to free ground; unmapped wor
 });
 
 test("every painted location keeps spawn open and every NPC, exit and service reachable", () => {
-  const ids = ["home_player", "city_capital", ...AUTO_MAP_IDS];
+  const ids = ["home_player", "city_capital", "jail", ...AUTO_MAP_IDS];
   const failures: string[] = [];
   let solid = 0;
   for (const id of ids) {
