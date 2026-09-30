@@ -69,6 +69,7 @@ export {
   describeBonusForLocation,
 } from "./location-categories";
 export { evaluateCondition, getQuestStatus } from "./conditions";
+export { activeGuide, guideForQuest, guideMarkerId, pathBetween, stageTargetNpc, type QuestGuide } from "./quest-guide";
 export {
   applyEffect,
   applyEffects,

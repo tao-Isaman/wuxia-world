@@ -28,7 +28,7 @@ bun scripts/normalize-t3-stats.ts # normalize move-skill stat sums per tier (T0=
 bun scripts/split-sects-file.ts <quests|npcs|scenes>  # split sects-temples.ts trio into per-sect files
 ```
 
-Tests are Bun scripts and `bun test` files wired as `test:*` in package.json (runtime, combat, navigation, opening, rumors, investigation, battle-background, quests), plus Playwright `test:e2e` against a production build on :3017.
+Tests are Bun scripts and `bun test` files wired as `test:*` in package.json (runtime, combat, navigation, opening, rumors, investigation, battle-background, quests, audio, law), plus Playwright `test:e2e` against :3017. `playwright.config.ts` seeds `localStorage["wuxia-random-events"]="off"` so walk ticks don't ambush unrelated specs; specs that test encounters remove the key.
 
 ## Architecture
 
@@ -157,7 +157,10 @@ Both scenes are Phaser 4 games, dynamically imported by `components/game/world-c
 
 ### Mobile-first HUD (world)
 
-- **Top row** — the party card (HP / MP / พลัง, `MapHud` `.player-hud`) sits top-left; `MenuBar hud` renders `nav[aria-label="เมนูเกม"]` beside it (a row beneath on portrait phones) with one icon per section (profile, bag, skills, crafts, quests, sect, log) + install; digits 1–7 open sections on desktop. No command box.
+- **Top-left** — the party card (HP / MP / พลัง, `MapHud` `.player-hud`, plus a `⛓●●○○○` wanted chip when `wanted > 0`); `MenuBar hud` renders `nav[aria-label="เมนูเกม"]` directly beneath it as a small 2-row icon grid (profile, bag, skills, crafts, quests, sect, log, sound) + install; digits 1–7 open sections on desktop. No command box. The `.hud-iconbar` `top` offsets in `mobile-hud.css` are tuned to the card's height per breakpoint.
+- **Busy overlay** — `flashLoading(message, ms, kind)` (`work` / `rest` / `stealth`) shows `.work-overlay[data-world-busy]`: the hero at work + a progress bar that fills over the action's duration. It swallows taps, and `worldInputBlocked` / menu hotkeys treat `[data-world-busy]` as a pause, so the action button can't be pressed mid-activity.
+- **Quest guide** — `lib/world/quest-guide.ts`: `stageTargetNpc` finds the person the current stage names (earliest NPC name in the stage description; final stage → turn-in / giver), `pathBetween` BFS over location → route → location, `activeGuide(state)` (tracked `flags.trackedQuestId`, else newest guidable active quest), `guideMarkerId` (NPC at the target map, the exit toward the next hop elsewhere, the best destination on route maps). Map views set `WorldMarker.guide`; the runtime draws a bobbing jade arrow over it plus an edge pointer when off-screen (`data-guide-marker`). The quest log shows `📍 NPC · location — อีก n ช่วงทาง` with a `➤ นำทาง` button.
+- **Dialogue** — `DialogStage` is full-screen (portrait bust column / top band on phones, lines + choices side-by-side in landscape) and shrinks text via `--dialog-scale` (floor 0.62) until nothing scrolls.
 - **Rest** — `components/world/rest-quick-action.tsx`: round พัก button bottom-right that pops a small bubble of rest choices (`restKindsForScene`); `openRestBubble()` opens it from map rest spots. There is no rest page.
 - **Joystick** — `components/game/touch-stick.tsx`: a touch on the left half of the map plants a floating stick; dragging calls `runtime.setStick({x,y})` (analog, −1…1); a touch that never drags is forwarded as `runtime.tapAt()`. Mouse input is untouched. The minimap was removed to free the bottom-left.
 - **Action button** — the world runtime reports the marker within 95 map units via its `onNearby` callback (and `data-nearby-marker`); `WorldCanvas` shows `.action-prompt` (คุยกับ / ไปที่ / ใช้ + label) which calls `runtime.interact(id)`. Keyboard E does the same.
@@ -174,7 +177,7 @@ All `"use client"`. Five stores:
 
 - **`character-store.ts`** — `/debug` setup-tab state. Persisted (`wusia-character-v1`, version 2). World does **not** read from this. v1 → v2 padded `skillIds` 5 → 10 and seeded `learnedSkillIds` / `learnedArtIds` / `artLevels`.
 - **`battle-store.ts`** — runtime battle state. **Not persisted**. `start(a, b, opts?)` accepts `hpA / mpA` carryover. `useSkill(slotIdx)` parses the slot and dispatches to `resolveSkill` or `resolveArtActive`. `BattleState` tracks both `skillUses` and `artUses` for the world store to drain on win.
-- **`world-store.ts`** — story state (scenes, flags, quests, inventory, gold, traits, NPC states, skill / art / stat progression, learned recipes, action log, sect membership, gender). Persisted (`wusia-world-v1`, **version 17**) with `validateAndRepair` on rehydrate. Notable actions: `practiceSkill`, `levelUpArtFromWExp`, `levelUpSkillFromWExp`, `buyRecipe`, `craftRecipe` (artisan-gated for the 6 craft professions), `abandonQuest`, `joinSect`, `upgradeSectRank`, `pickSectReward`, `acceptSectQuest`, **`resignSect`** (formal — skills freeze), **`betraySect`** (skills keep growing but hunters spawn), `attemptSteal`, `attemptKidnap`, `attemptAssassinate`, `finishQuestNow` (popup turn-in path — calls `consumeQuestAutoItems` before firing `finishQuest`). Internal helpers `isSkillFrozen` / `isArtFrozen` short-circuit per-skill / per-art XP grants when the source sect is in `"resigned"` status.
+- **`world-store.ts`** — story state (scenes, flags, quests, inventory, gold, traits, NPC states, skill / art / stat progression, learned recipes, action log, sect membership, gender). Persisted (`wusia-world-v1`, **version 20**) with `validateAndRepair` on rehydrate. Notable actions: `practiceSkill`, `levelUpArtFromWExp`, `levelUpSkillFromWExp`, `buyRecipe`, `craftRecipe` (artisan-gated for the 6 craft professions), `abandonQuest`, `joinSect`, `upgradeSectRank`, `pickSectReward`, `acceptSectQuest`, **`resignSect`** (formal — skills freeze), **`betraySect`** (skills keep growing but hunters spawn), `attemptSteal`, `attemptKidnap`, `attemptAssassinate`, `finishQuestNow` (popup turn-in path — calls `consumeQuestAutoItems` before firing `finishQuest`). Internal helpers `isSkillFrozen` / `isArtFrozen` short-circuit per-skill / per-art XP grants when the source sect is in `"resigned"` status.
 - **`loading-store.ts`** — `flashLoading(message, duration?)`. Auto-hides after 300 ms by default. Used for gather / craft / rest / practice action feel (NOT travel — travel is instant).
 - **`toast-store.ts`** — `toast(kind, message, durationMs?)`. Stack of up to 3 visible at once, auto-dismiss after 2.6 s. Kinds: success / info / warn / error.
 
@@ -259,6 +262,11 @@ UI components subscribe via the standard selector pattern: `useWorldStore((s) =>
 
 ### Random encounters (fight / flee)
 
+**Walk ticks, not scene changes.** Entering a map no longer rolls anything (`rollRandomEvent` scene effect is a no-op; `leaf()` has no `onEnter`). The world runtime calls `onWalkTick` every `WALK_TICK_UNITS = 220` map units walked → `worldStore.walkTick()` → `rollWalkEvent(draft, 0.4)` (probabilities scaled by 0.4). `home_player` is safe. `localStorage["wuxia-random-events"]="off"` disables ticks (tests).
+
+**Wanted marks (`lib/world/law.ts`).** A failed steal adds a หมายจับ mark (max 5, decays 1 per 10 quiet days). Each walk tick first rolls `lawChance(marks)` (5 % + 8 %/mark, cap 45 %); `pickLawPursuer` picks `law_constable` (T1) / `law_imperial_guard` (T3) / `law_bounty_hunter` (T3), weighted toward the latter as marks grow. Law fights are nonFatal with `onLose: "jail_cell"`; fleeing uses the hunter AGI+LUK check. In `jail_cell`, `serveJail` advances `2 × marks` days, clears marks and releases the player in `jailCityFor(scene)` (region → city); `bribeJail` (300 gold) drops 2 marks. Winning clears `jailCityId`.
+
+
 When `rollRandomEvent` rolls a fight (15 % base, **80 % during a hunt**), it sets `pendingEncounter` (NOT `pendingBattle` directly). The world UI swaps to `<EncounterScreen>` showing tier + category badges and two buttons:
 
 - **⚔ ต่อสู้** → `acceptEncounter()` promotes the offer to `pendingBattle`. Bridge starts the fight.
@@ -337,7 +345,7 @@ A passive simulation that ticks every 7 world days inside `advanceTime`, mutatin
 Two persisted Zustand slices, separate localStorage keys, separate version fields:
 
 - `wusia-character-v1` — `{ builds: { A, B } }` (only used by /debug). Version 2 (v1 → v2 padded slots, seeded learned arrays).
-- `wusia-world-v1` — world state minus action functions. **Version 18**. Migration chain (additive defaults at each step):
+- `wusia-world-v1` — world state minus action functions. **Version 20**. Migration chain (additive defaults at each step):
   1. v1 → v2: stamina + lifeSkillXp(6) + pendingHuntYield
   2. v2 → v3: lifeSkillXp 6 → 17 keys
   3. v3 → v4: day / time
@@ -355,6 +363,8 @@ Two persisted Zustand slices, separate localStorage keys, separate version field
   15. v15 → v16: gender field on the world slice
   16. v16 → v17: sectMembership map (rank ladder, points, lastQuestDay, artQuestsDone, rewardPicks, joinedDay) + `status: "active" | "resigned" | "betrayed"` on each entry. Existing legacy memberships default `status = "active"` on the migration's first read.
   17. v17 → v18: Liveness Layer fields — `npcExt` (per-named-NPC sim state), `rumorPool`, `rumorArchive`, `rumorSeenLog`, `lastNpcTickDay`. Existing saves start with all empty; `npcExt` lazy-seeds from the authored roster on first tick. Plus an optional `isMajor` flag on `QuestDef` (drives player-echo rumor on completion).
+  18. v18 → v19: `playerBodyId` (defaults by gender).
+  19. v19 → v20: `wanted`, `wantedDay`, `jailCityId` (wanted marks + jail).
 
 `battle-store` is intentionally not persisted.
 

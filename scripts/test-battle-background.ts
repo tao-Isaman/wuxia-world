@@ -49,10 +49,12 @@ try {
   useWorldStore.getState().startNewGame({ name: "Battle origin test" });
   useWorldStore.getState().gotoScene("route_home_player__to__city_capital");
   assert.equal(useWorldStore.getState().pendingEncounter, null, "the road scene itself has no random arrival roll");
-  // Force only the existing arrival-event lottery; no saved origin fields
-  // are invented or edited. Then accept through the real encounter action.
+  // Arrival itself never rolls; a walk tick in the city does. No saved origin
+  // fields are invented or edited. Then accept through the real encounter action.
   Math.random = () => 0;
   useWorldStore.getState().travelRoute("city_capital");
+  assert.equal(useWorldStore.getState().pendingEncounter, null, "arriving is not an encounter roll");
+  useWorldStore.getState().walkTick();
   const arrival = useWorldStore.getState();
   assert.equal(arrival.currentSceneId, "city_capital");
   assert.equal(arrival.lastLocationId, "city_capital");
@@ -61,7 +63,7 @@ try {
   useWorldStore.getState().acceptEncounter();
   assert.equal(resolveBattleBackground({ ...useWorldStore.getState(), mode: "world" }).id, "capital-street");
   const saved = JSON.parse(memory.get("wusia-world-v1")!);
-  assert.equal(saved.version, 19);
+  assert.equal(saved.version, 20);
   assert.equal(resolveBattleBackground({ ...saved.state, mode: "world" }).id, "capital-street", "existing serialized world fields retain the honest city origin");
   await useWorldStore.persist.rehydrate();
   assert.equal(resolveBattleBackground({ ...useWorldStore.getState(), mode: "world" }).id, "capital-street");

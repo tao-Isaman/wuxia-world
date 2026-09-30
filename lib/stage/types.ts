@@ -11,6 +11,8 @@ export interface WorldMarker extends Point {
   disabled?: boolean;
   /** Quest marker over an NPC: "offer" shows !, "turnin" shows ?. */
   quest?: "offer" | "turnin";
+  /** Quest guide target: a bobbing arrow above it (and an edge pointer while off-screen). */
+  guide?: boolean;
   onActivate: () => void;
 }
 
@@ -33,6 +35,9 @@ export interface WorldPresentation {
   worldDescription?: string;
   rememberPosition?: boolean;
 }
+
+/** Map distance (960×640 units) per random-event walk tick. */
+export const WALK_TICK_UNITS = 220;
 
 export interface WorldRuntime {
   interact: (id: string) => void;

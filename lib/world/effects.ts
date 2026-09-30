@@ -21,6 +21,8 @@ import {
   pickWeighted,
 } from "./data/random-events";
 import { evaluateCondition } from "./conditions";
+import { JAIL_BRIBE_GOLD, jailCityFor, jailDays, lawChance, pickLawPursuer } from "./law";
+import { deriveAll } from "../game";
 import { generatePlayerEcho } from "./rumor-engine";
 
 // Pure mutation: applies a single effect to the world state in place.
@@ -333,117 +335,161 @@ export function applyEffect(state: WorldStateData, eff: SceneEffect): void {
     }
 
     case "rollRandomEvent": {
-      // Suppress the immediate re-roll that fires when a meet/treasure dialog
-      // auto-returns to the leaf, or when a fight's onWin/onLose routes back.
-      // The flag is single-use and is also wiped by validateAndRepair on
-      // rehydrate so it can never leak across sessions.
-      if (state.flags._skipEventRoll) {
-        delete state.flags._skipEventRoll;
-        return;
-      }
-      if (!state.playerBuild) return;
+      // Random events now roll while the player walks (see rollWalkEvent,
+      // called per stretch walked), not on entering a map. Kept as a no-op
+      // so older content referencing it stays valid.
+      return;
+    }
 
-      // Pin the leaf as lastLocationId so the upcoming event dialog's "ปิด"
-      // returns here even though we are about to redirect away from it.
-      state.lastLocationId = state.currentSceneId;
-
-      // Hunt boost — when the player has an active kill-quest stage AND
-      // the target opponent spawns in this zone, the encounter rate jumps
-      // to EVENT_PROBABILITY.fightHunting (default 0.80) and the
-      // encounter pool is restricted to those targets. Treasure / meet
-      // bands are suppressed during the hunt so the player isn't pulled
-      // off the trail by flavor events. Falls back to the normal 0.15 +
-      // full pool when no target fits the current zone.
-      const huntTargets = collectActiveHuntTargets(state);
-      // Apply player-power-driven scaling + tier reshape to upcoming
-      // random encounters. The scale multiplier is module-level state
-      // in opponents.ts — set it BEFORE the bridge constructs the
-      // opponent's CharacterBuild so stats are scaled at build time.
-      const power = playerPowerIndex(state);
-      applyOpponentStatScale(state);
-      const zonePool = fightEventsForLocation(state.lastLocationId, power);
-      const huntPool =
-        huntTargets.size > 0
-          ? zonePool.filter((ev) => huntTargets.has(ev.opponentId))
-          : [];
-      const huntActive = huntPool.length > 0;
-
-      const luk = state.playerBuild.stats.LUK;
-      const fightP = huntActive
-        ? EVENT_PROBABILITY.fightHunting
-        : EVENT_PROBABILITY.fight;
-      const treasureP = huntActive
-        ? 0
-        : Math.min(
-            EVENT_PROBABILITY.treasureCap,
-            EVENT_PROBABILITY.treasureBase + luk / EVENT_PROBABILITY.treasureLukDivisor,
-          );
-      const meetP = huntActive
-        ? 0
-        : Math.min(
-            EVENT_PROBABILITY.meetCap,
-            EVENT_PROBABILITY.meetBase + luk / EVENT_PROBABILITY.meetLukDivisor,
-          );
-
-      // Sect-hunter ambush — 30% chance per random-event roll if the
-      // player has any "betrayed" sect membership. Picks one betrayed
-      // sect at random and spawns its `hunter_<sectId>` opponent.
-      // Overrides the normal fight roll entirely (treasure / meet are
-      // also skipped — a hunter doesn't care about flowers and herbs).
-      const betrayedSects: string[] = [];
-      for (const [sid, m] of Object.entries(state.sectMembership)) {
-        if (m && m.status === "betrayed") betrayedSects.push(sid);
+    case "serveJail": {
+      const days = jailDays(state.wanted);
+      const city = state.jailCityId ?? jailCityFor(state.lastLocationId);
+      state.day += days;
+      state.time = 0;
+      state.wanted = 0;
+      state.wantedDay = state.day;
+      state.jailCityId = null;
+      state.lastLocationId = city;
+      // Prison food and rest: released tired but on your feet.
+      if (state.playerBuild) {
+        const max = deriveAll(state.playerBuild);
+        state.currentHp = Math.max(state.currentHp ?? 0, Math.round(max.HP * 0.6));
+        state.currentMp = Math.max(state.currentMp ?? 0, Math.round(max.MP * 0.6));
       }
-      if (betrayedSects.length > 0 && Math.random() < 0.3) {
-        const sid = betrayedSects[Math.floor(Math.random() * betrayedSects.length)]!;
-        state.flags._skipEventRoll = true;
-        state.pendingEncounter = {
-          opponentId: `hunter_${sid}`,
-          returnSceneId: state.lastLocationId,
-        };
-        return;
-      }
+      return;
+    }
 
-      const r = Math.random();
-
-      if (r < fightP) {
-        // During a hunt, restrict the pool to the quest target(s) so the
-        // boosted rate actually advances the quest instead of spinning
-        // up unrelated tier-1 humans.
-        const pool = huntActive ? huntPool : zonePool;
-        const ev = pickWeighted(pool, Math.random());
-        if (!ev) return;
-        state.flags._skipEventRoll = true;
-        // Stage as a pending encounter — the encounter screen offers
-        // fight / flee. Only "fight" promotes this to pendingBattle.
-        state.pendingEncounter = {
-          opponentId: ev.opponentId,
-          returnSceneId: state.lastLocationId,
-        };
-        return;
-      }
-      if (r < fightP + treasureP) {
-        const ev = pickWeighted(TREASURE_EVENTS, Math.random());
-        if (!ev) return;
-        state.flags._skipEventRoll = true;
-        state.currentSceneId = ev.dialogSceneId;
-        const dest = getScene(ev.dialogSceneId);
-        if (dest?.onEnter) applyEffects(state, dest.onEnter);
-        return;
-      }
-      if (r < fightP + treasureP + meetP) {
-        const ev = pickWeighted(MEET_EVENTS, Math.random());
-        if (!ev) return;
-        state.flags._skipEventRoll = true;
-        state.currentSceneId = ev.dialogSceneId;
-        const dest = getScene(ev.dialogSceneId);
-        if (dest?.onEnter) applyEffects(state, dest.onEnter);
-        return;
-      }
-      // r ≥ all bands → nothing happens; player just sees the location.
+    case "bribeJail": {
+      if (state.gold < JAIL_BRIBE_GOLD) return;
+      state.gold -= JAIL_BRIBE_GOLD;
+      state.wanted = Math.max(0, state.wanted - 2);
+      state.wantedDay = state.day;
+      state.lastLocationId = state.jailCityId ?? jailCityFor(state.lastLocationId);
+      state.jailCityId = null;
+      state.currentHp = Math.max(1, state.currentHp ?? 1);
       return;
     }
   }
+}
+
+// ─── Walk ticks ────────────────────────────────────────────────────────
+// Called by the world store for every stretch the player walks on a map
+// (see WALK_TICK_UNITS). Rolls, in order: the law (if wanted), a sect
+// hunter (if betrayed), then fight / treasure / meet bands. `chanceScale`
+// shrinks the per-trip probabilities to per-stretch ones.
+export function rollWalkEvent(state: WorldStateData, chanceScale: number): void {
+  if (!state.playerBuild) return;
+
+  // Pin the map as lastLocationId so the upcoming event dialog's "ปิด"
+  // returns here even though we are about to redirect away from it.
+  state.lastLocationId = state.currentSceneId;
+
+  // Wanted players: the law may catch up first (lib/world/law.ts).
+  if (state.wanted > 0 && Math.random() < lawChance(state.wanted)) {
+    applyOpponentStatScale(state);
+    state.jailCityId = jailCityFor(state.currentSceneId);
+    state.pendingEncounter = {
+      opponentId: pickLawPursuer(state.wanted, Math.random()),
+      returnSceneId: state.currentSceneId,
+    };
+    return;
+  }
+
+  // Hunt boost — when the player has an active kill-quest stage AND
+  // the target opponent spawns in this zone, the encounter rate jumps
+  // to EVENT_PROBABILITY.fightHunting (default 0.80) and the
+  // encounter pool is restricted to those targets. Treasure / meet
+  // bands are suppressed during the hunt so the player isn't pulled
+  // off the trail by flavor events. Falls back to the normal 0.15 +
+  // full pool when no target fits the current zone.
+  const huntTargets = collectActiveHuntTargets(state);
+  // Apply player-power-driven scaling + tier reshape to upcoming
+  // random encounters. The scale multiplier is module-level state
+  // in opponents.ts — set it BEFORE the bridge constructs the
+  // opponent's CharacterBuild so stats are scaled at build time.
+  const power = playerPowerIndex(state);
+  applyOpponentStatScale(state);
+  const zonePool = fightEventsForLocation(state.lastLocationId, power);
+  const huntPool =
+    huntTargets.size > 0
+      ? zonePool.filter((ev) => huntTargets.has(ev.opponentId))
+      : [];
+  const huntActive = huntPool.length > 0;
+
+  const luk = state.playerBuild.stats.LUK;
+  const fightP = (huntActive
+    ? EVENT_PROBABILITY.fightHunting
+    : EVENT_PROBABILITY.fight) * chanceScale;
+  const treasureP = huntActive
+    ? 0
+    : chanceScale * Math.min(
+        EVENT_PROBABILITY.treasureCap,
+        EVENT_PROBABILITY.treasureBase + luk / EVENT_PROBABILITY.treasureLukDivisor,
+      );
+  const meetP = huntActive
+    ? 0
+    : chanceScale * Math.min(
+        EVENT_PROBABILITY.meetCap,
+        EVENT_PROBABILITY.meetBase + luk / EVENT_PROBABILITY.meetLukDivisor,
+      );
+
+  // Sect-hunter ambush — 30% chance per random-event roll if the
+  // player has any "betrayed" sect membership. Picks one betrayed
+  // sect at random and spawns its `hunter_<sectId>` opponent.
+  // Overrides the normal fight roll entirely (treasure / meet are
+  // also skipped — a hunter doesn't care about flowers and herbs).
+  const betrayedSects: string[] = [];
+  for (const [sid, m] of Object.entries(state.sectMembership)) {
+    if (m && m.status === "betrayed") betrayedSects.push(sid);
+  }
+  if (betrayedSects.length > 0 && Math.random() < 0.3) {
+    const sid = betrayedSects[Math.floor(Math.random() * betrayedSects.length)]!;
+    state.flags._skipEventRoll = true;
+    state.pendingEncounter = {
+      opponentId: `hunter_${sid}`,
+      returnSceneId: state.lastLocationId,
+    };
+    return;
+  }
+
+  const r = Math.random();
+
+  if (r < fightP) {
+    // During a hunt, restrict the pool to the quest target(s) so the
+    // boosted rate actually advances the quest instead of spinning
+    // up unrelated tier-1 humans.
+    const pool = huntActive ? huntPool : zonePool;
+    const ev = pickWeighted(pool, Math.random());
+    if (!ev) return;
+    state.flags._skipEventRoll = true;
+    // Stage as a pending encounter — the encounter screen offers
+    // fight / flee. Only "fight" promotes this to pendingBattle.
+    state.pendingEncounter = {
+      opponentId: ev.opponentId,
+      returnSceneId: state.lastLocationId,
+    };
+    return;
+  }
+  if (r < fightP + treasureP) {
+    const ev = pickWeighted(TREASURE_EVENTS, Math.random());
+    if (!ev) return;
+    state.flags._skipEventRoll = true;
+    state.currentSceneId = ev.dialogSceneId;
+    const dest = getScene(ev.dialogSceneId);
+    if (dest?.onEnter) applyEffects(state, dest.onEnter);
+    return;
+  }
+  if (r < fightP + treasureP + meetP) {
+    const ev = pickWeighted(MEET_EVENTS, Math.random());
+    if (!ev) return;
+    state.flags._skipEventRoll = true;
+    state.currentSceneId = ev.dialogSceneId;
+    const dest = getScene(ev.dialogSceneId);
+    if (dest?.onEnter) applyEffects(state, dest.onEnter);
+    return;
+  }
+  // r ≥ all bands → nothing happens; player just sees the location.
+  return;
 }
 
 // Convenience: apply an array in order. After the batch runs, we tick the

@@ -139,7 +139,7 @@ export function MenuBar({ hud }: { hud?: boolean } = {}) {
       if (e.repeat || e.altKey || e.ctrlKey || e.metaKey) return;
       const target = e.target;
       if (target instanceof HTMLElement && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName))) return;
-      if (document.querySelector('[role="dialog"], [role="alertdialog"]')) return;
+      if (document.querySelector('[role="dialog"], [role="alertdialog"], [data-world-busy]')) return;
       const index = Number(e.key) - 1;
       if (Number.isInteger(index) && index >= 0 && index < tabs.length) { e.preventDefault(); setOpen(tabs[index].id); }
     };

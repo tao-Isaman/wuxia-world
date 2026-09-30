@@ -51,17 +51,11 @@ test("local replies preserve the scene and unrelated meetings clear the previous
   await visit(page, "npc-merchant_wang");
   await page.getByRole("button", { name: /ทักทาย/ }).click();
   await expect(stage.getByRole("heading", { name: "เถ้าแก่หวาง" })).toBeVisible();
-  // Reproduce the reviewer's random meeting immediately after a local goodbye.
-  await page.evaluate(() => {
-    const rolls = [0.3, 0.5];
-    Math.random = () => rolls.shift() ?? 0.5;
-  });
+  // Leaving a conversation is not a walk: no random meeting rolls, even on RNG 0.
+  await page.evaluate(() => { Math.random = () => 0; });
   await stage.getByRole("button", { name: "ปิด", exact: true }).click();
-  await expect.poll(() => currentScene(page)).toBe("evt_meet_monk");
-  await expect(stage).toHaveCount(0);
-  await expect(page.getByText("พระผู้แสวงบุญรูปหนึ่งเดินผ่านมา", { exact: true })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "เถ้าแก่หวาง" })).toHaveCount(0);
-  await page.getByRole("button", { name: "ปิด", exact: true }).click();
   await expect.poll(() => currentScene(page)).toBe("city_capital");
+  await expect(stage).toHaveCount(0);
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem("wusia-world-v1")!).state.pendingEncounter)).toBeNull();
   expect(errors).toEqual([]);
 });

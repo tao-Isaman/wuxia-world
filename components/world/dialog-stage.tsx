@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import type { DialogScene } from "@/lib/world";
 import { evaluateCondition, npcPortrait } from "@/lib/world";
 import { useWorldStore } from "@/store/world-store";
@@ -49,10 +49,25 @@ export function DialogStage({ scene, speaker, locationName }: {
     heading.current?.focus({ preventScroll: true });
   }, [scene.id]);
 
+  // Fit the conversation to the screen: shrink the text a step at a time until
+  // the lines and every choice show without scrolling (floor 62 %).
+  const [scale, setScale] = useState(1);
+  useLayoutEffect(() => { setScale(1); }, [scene.id]);
+  const shrinkToFit = () => {
+    const node = content.current;
+    if (node && node.scrollHeight - node.clientHeight > 2) setScale((value) => value > 0.62 ? Math.max(0.62, +(value - 0.06).toFixed(2)) : value);
+  };
+  useLayoutEffect(shrinkToFit, [scale, scene.id]);
+  useEffect(() => {
+    const refit = () => setScale(1);
+    window.addEventListener("resize", refit);
+    return () => window.removeEventListener("resize", refit);
+  }, []);
+
   useEffect(() => {
     const node = content.current;
     if (!node) return;
-    const measure = () => setMoreBelow(node.scrollHeight - node.clientHeight - node.scrollTop > 4);
+    const measure = () => { setMoreBelow(node.scrollHeight - node.clientHeight - node.scrollTop > 4); shrinkToFit(); };
     const observer = new ResizeObserver(measure);
     observer.observe(node);
     for (const child of node.children) observer.observe(child);
@@ -62,7 +77,8 @@ export function DialogStage({ scene, speaker, locationName }: {
   }, [scene.id]);
 
   return (
-    <div className={styles.stage} data-testid="dialog-stage">
+    <div className={styles.stage} data-testid="dialog-stage" data-dialog-scale={scale}
+      style={{ "--dialog-scale": scale } as React.CSSProperties}>
       <section
         className={styles.panel}
         role="dialog"

@@ -54,12 +54,11 @@ test("capital rumors and the ledger investigation survive a mid-dialogue reload 
   await expect.poll(async () => Number(await world.getAttribute("data-player-x"))).toBeCloseTo(431.6, 0);
   await expect.poll(async () => Number(await world.getAttribute("data-player-y"))).toBeCloseTo(202.4, 0);
   await expect(world).toHaveAttribute("data-player-facing", "west");
-  await expect.poll(() => world.evaluate(host => {
+  // Full-screen conversation: the lines and every choice fit without scrolling.
+  await expect.poll(() => page.evaluate(() => {
     const panel = document.querySelector('[data-testid="dialog-stage"] [role="dialog"]')!.getBoundingClientRect();
-    const box = host.getBoundingClientRect();
-    const feet = box.top + Number(host.dataset.playerScreenY);
-    const head = feet - Number(host.dataset.playerScreenHeight);
-    return head >= 0 && feet < panel.top;
+    const content = document.querySelector<HTMLElement>('[data-testid="dialog-stage"] [role="region"]')!;
+    return panel.height > innerHeight * 0.85 && content.scrollHeight - content.clientHeight <= 2;
   })).toBe(true);
   const restoredPosition = await world.getAttribute("data-player-x");
   await page.keyboard.down("d");

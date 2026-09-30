@@ -1,6 +1,6 @@
 "use client";
 import type { RouteMapDef, RouteScene } from "@/lib/world";
-import { evaluateCondition, playerBodySprite } from "@/lib/world";
+import { activeGuide, evaluateCondition, guideMarkerId, playerBodySprite } from "@/lib/world";
 import { useWorldStore, TRAVEL_STAMINA_COST } from "@/store/world-store";
 import { WorldCanvas } from "@/components/game/world-canvas";
 import type { WorldMarker } from "@/lib/stage/types";
@@ -28,6 +28,9 @@ export function RouteMapView({ scene, map }: { scene: RouteScene; map: RouteMapD
       if (!current.canTravelTo(back)) { toast("warn", "พลังไม่พอสำหรับการเดินทาง"); return; }
       current.gotoScene(back);
     } });
+  const guide = activeGuide(state);
+  const guideId = guide ? guideMarkerId(state, guide) : null;
+  for (const marker of markers) if (marker.id === guideId) marker.guide = true;
   return <div className="fixed inset-0 z-40 !mt-0 bg-[#172723]">
     <WorldCanvas presentation={{ key: scene.id, name: scene.label, image: map.image, mirrorImage: map.mirror,
       time: state.time, playerImage: playerBodySprite(state.playerBodyId), spawn: map.spawn, markers }} />

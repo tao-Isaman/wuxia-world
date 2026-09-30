@@ -54,6 +54,11 @@ export function validateAndRepair(state: WorldStateData): void {
   // would silently swallow the next on-enter event if it leaked.
   delete state.flags._skipEventRoll;
 
+  // Wanted marks: 0–5; a jail city must be a real city.
+  state.wanted = Math.max(0, Math.min(5, Math.floor(Number(state.wanted) || 0)));
+  if (typeof state.wantedDay !== "number") state.wantedDay = state.day;
+  if (state.jailCityId && SCENES_BY_ID.get(state.jailCityId)?.kind !== "location") state.jailCityId = null;
+
   // Inventory: drop unknown items.
   for (const itemId of Object.keys(state.inventory)) {
     if (!ITEMS_BY_ID.has(itemId)) {

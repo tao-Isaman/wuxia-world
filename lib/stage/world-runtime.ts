@@ -11,7 +11,7 @@ import { moveOnWorldGround, planWorldPath, worldFootprints } from "./world-navig
 import { initialWorldPlacement } from "./world-placement";
 import { addGridFrames, canvasTexture, createStage, drawCanvas, stagePixelRatio, type Stage } from "./phaser-stage";
 import {
-  getRememberedMapPosition, rememberMapPosition, stepTowards,
+  WALK_TICK_UNITS, getRememberedMapPosition, rememberMapPosition, stepTowards,
   type Point, type WorldMarker, type WorldPresentation, type WorldRuntime,
 } from "./types";
 
@@ -31,7 +31,7 @@ const clampPosition = (point: Point): Point => ({ x: clamp(point.x, 12, WIDTH - 
 
 export function worldInputBlocked(): boolean {
   const active = document.activeElement;
-  return !!document.querySelector('[role="dialog"], [role="alertdialog"]') ||
+  return !!document.querySelector('[role="dialog"], [role="alertdialog"], [data-world-busy]') ||
     !!active?.matches('input, textarea, select, [contenteditable="true"]');
 }
 
@@ -68,6 +68,8 @@ export function createWorldRuntime(
   onError: (message: string) => void,
   /** The interactable marker the hero is standing next to changed (drives the action button). */
   onNearby?: (markerId: string | null) => void,
+  /** Called for every WALK_TICK_UNITS the hero walks (random-event ticks). */
+  onWalkTick?: () => void,
 ): WorldRuntime {
   const initial = read();
   const footprints = worldFootprints(initial.key, initial.image);
@@ -101,6 +103,7 @@ export function createWorldRuntime(
   /** Analog stick from the on-screen joystick: x/y in −1…1, null when released. */
   let stick: Point | null = null;
   let nearbyReported: string | null | undefined;
+  let walked = 0;
   let viewWidth = WIDTH;
   let viewHeight = HEIGHT;
   let viewScale = 1;
@@ -114,6 +117,8 @@ export function createWorldRuntime(
 
   const dpr = stagePixelRatio();
   let markerQuestMarks: Record<"!" | "?", string> = { "!": "", "?": "" };
+  let guideArrow: Phaser.GameObjects.Image | null = null;
+  let guideEdge: Phaser.GameObjects.Image | null = null;
   const blocked = () => read().readOnly || read().paused || document.hidden || worldInputBlocked();
 
   parent.dataset.renderer = "phaser";
@@ -264,6 +269,23 @@ export function createWorldRuntime(
       context.strokeText(glyph, 11, 16);
       context.fillStyle = glyph === "!" ? "#ffd24a" : "#f4f0e4";
       context.fillText(glyph, 11, 16);
+    });
+  }
+  /** Downward jade arrow for the quest guide (points right when used as the edge pointer, see rotation). */
+  function guideArrowCanvas(): HTMLCanvasElement {
+    return drawCanvas(28 * dpr, 30 * dpr, (context) => {
+      context.scale(dpr, dpr);
+      context.beginPath();
+      context.moveTo(14, 28); context.lineTo(2, 13); context.lineTo(9, 13); context.lineTo(9, 2);
+      context.lineTo(19, 2); context.lineTo(19, 13); context.lineTo(26, 13); context.closePath();
+      context.lineJoin = "round";
+      context.lineWidth = 3;
+      context.strokeStyle = "#10261d";
+      context.stroke();
+      context.fillStyle = "#6fe0a8";
+      context.fill();
+      context.fillStyle = "rgba(255,255,255,0.55)";
+      context.fillRect(11, 4, 3, 10);
     });
   }
   function groundRing(color: string, filled = false) {
@@ -512,6 +534,9 @@ export function createWorldRuntime(
       markers.set(marker.id, { point, halo, shadow, label, labelText: marker.label, nameTag, questMark, icon: markerIcon, character, opacity: 1, phase: index * 0.47 });
     });
     markerQuestMarks = questMarks;
+    const guideKey = texture(guideArrowCanvas(), "guide");
+    guideArrow = image(guideKey, 9_012).setOrigin(0.5, 1).setVisible(false);
+    guideEdge = image(guideKey, 12_000).setOrigin(0.5, 0.5).setVisible(false);
 
     const playerShadow = image(shadowKey, 1, 30, 11);
     const playerRing = image(texture(groundRing("rgba(225, 199, 139, 0.55)"), "ring"), 2, 28, 10);
@@ -673,6 +698,7 @@ export function createWorldRuntime(
       // Keep the painted map in front: far-off service/exit badges recede.
       visual.icon?.setAlpha(opacity * (selected || distance < 230 ? 1 : 0.5));
     }
+    updateGuide(currentMarkers, center);
     particles.forEach((particle, index) => {
       particle.image.setVisible(!reducedMotion);
       if (reducedMotion) return;
@@ -682,6 +708,30 @@ export function createWorldRuntime(
       particle.image.setPosition(particle.x, particle.y);
       particle.image.setAlpha(0.10 + Math.sin(animationTime * 0.7 + index) ** 2 * 0.10);
     });
+  }
+  /** Quest guide: an arrow bobbing over the guided marker, or a pointer on the view's edge toward it. */
+  function updateGuide(currentMarkers: WorldMarker[], center: Point) {
+    if (!guideArrow || !guideEdge) return;
+    const target = currentMarkers.find((marker) => marker.guide);
+    parent.dataset.guideMarker = target?.id ?? "";
+    if (!target) { guideArrow.setVisible(false); guideEdge.setVisible(false); return; }
+    const visual = markers.get(target.id);
+    const point = toWorld(target);
+    const bob = reducedMotion ? 0 : Math.abs(Math.sin(animationTime * 3.4)) * 7;
+    const lift = (visual?.character ? 64 + (visual.questMark?.visible ? 30 : 0) : 40) + bob;
+    guideArrow.setDisplaySize(26 / viewScale, 28 / viewScale).setPosition(point.x, point.y - lift).setVisible(true);
+    const halfW = viewWidth / 2, halfH = viewHeight / 2;
+    const margin = 26 / viewScale;
+    const dx = point.x - center.x, dy = point.y - 30 - center.y;
+    const offscreen = Math.abs(dx) > halfW - margin || Math.abs(dy) > halfH - margin;
+    guideEdge.setVisible(offscreen);
+    if (offscreen) {
+      const scale = Math.min((halfW - margin) / Math.max(Math.abs(dx), 1), (halfH - margin) / Math.max(Math.abs(dy), 1));
+      const pulse = reducedMotion ? 1 : 1 + Math.sin(animationTime * 5) * 0.08;
+      guideEdge.setDisplaySize(30 * pulse / viewScale, 32 * pulse / viewScale)
+        .setPosition(center.x + dx * scale, center.y + dy * scale)
+        .setRotation(Math.atan2(dy, dx) - Math.PI / 2);
+    }
   }
   function tick(time: number) {
     if (disposed || failed || !ready || !player) return;
@@ -742,7 +792,14 @@ export function createWorldRuntime(
             if (disposed || failed) return;
           }
         }
-        moving = Math.hypot(position.x - previous.x, position.y - previous.y) > 0.01;
+        const step = Math.hypot(position.x - previous.x, position.y - previous.y);
+        moving = step > 0.01;
+        walked += step;
+        if (walked >= WALK_TICK_UNITS) {
+          walked -= WALK_TICK_UNITS;
+          onWalkTick?.();
+          if (disposed || failed) return;
+        }
         if (interactPressed) {
           interactPressed = false;
           const preferred = read().markers.find((marker) => marker.id === lastInteraction);

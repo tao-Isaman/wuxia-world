@@ -147,9 +147,11 @@ try {
   Math.random = () => 0;
   useWorldStore.getState().travelRoute("city_capital");
   assert.equal(useWorldStore.getState().currentSceneId, "city_capital");
-  assert.ok(useWorldStore.getState().pendingEncounter, "ordinary route arrival still rolls its encounter with the same RNG 0");
+  assert.equal(useWorldStore.getState().pendingEncounter, null, "arrival no longer rolls; walking does");
+  useWorldStore.getState().walkTick();
+  assert.ok(useWorldStore.getState().pendingEncounter, "a walk tick in the capital rolls its encounter with the same RNG 0");
   assert.equal(useWorldStore.getState().pendingEncounter!.returnSceneId, "city_capital");
-  console.log("PASS ordinary home→capital arrival retains the existing encounter lottery");
+  console.log("PASS ordinary home→capital arrival is quiet; walking the capital rolls the encounter lottery");
 } finally {
   Math.random = random;
 }

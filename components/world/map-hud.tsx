@@ -26,6 +26,7 @@ export function MapHud() {
   const day = useWorldStore((s) => s.day);
   const time = useWorldStore((s) => s.time);
   const wExp = useWorldStore((s) => s.wExp);
+  const wanted = useWorldStore((s) => s.wanted ?? 0);
   const currentSceneId = useWorldStore((s) => s.currentSceneId);
   const lastLocationId = useWorldStore((s) => s.lastLocationId);
   if (!player) return null;
@@ -39,7 +40,10 @@ export function MapHud() {
     <section className="player-hud" aria-label="สถานะตัวละคร">
       <div className="hud-portrait" aria-hidden="true"><CharacterPreview id={bodyId} framing="bust" /></div>
       <div className="hud-strip">
-        <strong className="hud-player-name">{player.name}</strong>
+        <strong className="hud-player-name">{player.name}
+          {wanted > 0 && <span className="hud-wanted" title={`หมายจับ ${wanted}/5 — ระวังเจ้าหน้าที่ตามล่า`} aria-label={`หมายจับ ${wanted} จาก 5`}>
+            ⛓{"●".repeat(wanted)}<i>{"○".repeat(5 - wanted)}</i></span>}
+        </strong>
         <div className="hud-vitals">
           <Gauge label="HP" value={hp} max={stats.HP} tone="hp" />
           <Gauge label="MP" value={mp} max={stats.MP} tone="mp" />

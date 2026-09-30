@@ -16,6 +16,7 @@
     "test:rumors": "bun scripts/test-lore-rumors.ts && bun scripts/test-rumor-formatting.ts",
     "test:investigation": "bun scripts/test-capital-investigation.ts",
     "test:audio": "bun scripts/test-audio.ts",
+    "test:law": "bun scripts/test-law.ts",
     "test:quests": "bun scripts/audit-quest-completion.ts && bun scripts/test-quest-dead-ends.ts",
     "test:e2e": "playwright test"
   },

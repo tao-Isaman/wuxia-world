@@ -241,7 +241,7 @@ export function NpcInteractionPopup({ open, npc, onClose }: Props) {
                 // before resolving so the steal feels like a real attempt
                 // rather than an instant click. The overlay auto-hides via
                 // its own timer; we await so the toast lands afterwards.
-                flashLoading("กำลังย่องเข้าหา...", 1000);
+                flashLoading("กำลังย่องเข้าหา...", 1000, "stealth");
                 await new Promise((r) => setTimeout(r, 1000));
                 const r = attemptSteal(npc.id);
                 if (!r.ok) {
@@ -261,7 +261,7 @@ export function NpcInteractionPopup({ open, npc, onClose }: Props) {
                     : "ไม่ได้ของ";
                   toast("success", `ขโมยสำเร็จ! ${loot}`);
                 } else {
-                  toast("error", `ถูกจับได้! ต้องสู้กับลูกน้อง`);
+                  toast("error", `ถูกจับได้! ถูกออกหมายจับ ${useWorldStore.getState().wanted}/5 — ต้องสู้หนีเอาตัวรอด`);
                   onClose();
                 }
               }}

@@ -1939,6 +1939,17 @@ export const OPPONENTS: readonly OpponentDef[] = [
       extraArtSlots: ["t4_tang_tenkpoisons", "t4_tang_skycleaver"],
       artLevels: { t4_tang_tenkpoisons: 9, t4_tang_skycleaver: 9 },
     }) },
+
+  // ─── Law pursuers ──────────────────────────────────────────────────
+  // Sent after a player with หมายจับ (wanted marks, from failed thefts).
+  // Walk ticks pick one by mark count (lib/world/law.ts); losing to them
+  // is non-fatal and ends in a city jail instead of death.
+  { id: "law_constable", name: "เจ้าหน้าที่รัฐ", ti: 1, category: "human", drops: DROPS_T1,
+    build: () => build("เจ้าหน้าที่รัฐ", 1, { stats: { STR: 5, VIT: 4, DEX: 3 }, skillIds: ["basic_punch", "nc2"] }) },
+  { id: "law_imperial_guard", name: "องครักษ์หลวง", ti: 3, category: "human", drops: DROPS_T3,
+    build: () => build("องครักษ์หลวง", 3, { stats: { STR: 12, VIT: 10, DEF: 8, DEX: 6 }, skillIds: ["ne2", "nc2", "basic_punch"] }) },
+  { id: "law_bounty_hunter", name: "นักล่าค่าหัว", ti: 3, category: "human", drops: DROPS_T3,
+    build: () => build("นักล่าค่าหัว", 3, { stats: { AGI: 12, DEX: 12, STR: 8, LUK: 6 }, skillIds: ["jy_chain", "ne4", "basic_punch"] }) },
 ];
 
 export const OPPONENTS_BY_ID = new Map<string, OpponentDef>(
