@@ -71,7 +71,8 @@ Checked on 2026-09-30 for the docs rewrite:
 | `test:quests` | the campaign audit passes (276 quests, 102 reachable locations); 213 item / kill / objective quests hand in through the real store; guidance covers 650 of 657 stages |
 | `test:docs` | the generated reference is current; every link, repo path and command in the docs resolves |
 | `bun scripts/audit-content.ts` | 157 NPCs · 276 quests · 996 scenes, all references resolve |
-| `bun run test:e2e` | 19 Playwright tests, against a production build on :3017 |
+| `bun run build` | passes; `/` first-load JS 505 kB |
+| `bun run test:e2e` | all 19 Playwright tests pass against the production build on :3017 (about 10 minutes, Chromium 141 via the container shim) |
 
 Not verified:
 
