@@ -1,3 +1,7 @@
+> **Status (2026-09-30):** the original location concept list (Thai names, Chinese names, notes), kept as history. It predates the rebuild and its numbers are old: it counts 83 places and 4 cities. The game now has 102 location scenes, 97 of them on the world map, including 7 cities (plus `city_lingxiao` filed under temples), 7 villages and 20 sect grounds. The current list with ids, regions, maps and roads is the generated [reference/locations.md](../reference/locations.md); how locations are built is in [content-authoring.md](../content-authoring.md#a-location).
+
+---
+
 รวม **83 สถานที่** · เมืองหลัก 4 · สำนัก 16 · เกาะ 10 · ถ้ำ/หุบเขา 12 · ภูเขา 8 · บ้าน NPC 11 · โรงเตี๊ยม 4 · อื่นๆ 18
 
 ---

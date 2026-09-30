@@ -1,6 +1,6 @@
 # F1 readability candidate v2: directional supplement
 
-Status: isolated candidate. Separate actual-engine review is required before integration.
+Status (2026-09-30): **active.** The sheet was generated (`f1-readability-v2-directions.png`), adopted on 2026-09-29 and repacked into `f1-directions.png`. The notes below are the original candidate record.
 
 Tool: built-in imagegen. Local original directions sheet is the identity/back-equipment reference. Generated compact female base is the matching character reference. Local M1 v2 supplies only proportion/readability guidance. No commercial artwork is used.
 

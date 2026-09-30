@@ -1,6 +1,6 @@
 # elder readability candidate
 
-Generated with the built-in image generation tool using the original elder.png for identity and m1-readability-v2.png for proportions. The generated PNG is preserved unchanged. Candidate only; activation requires source-boundary and rendered animation review.
+Generated with the built-in image generation tool using the original elder.png for identity and m1-readability-v2.png for proportions. The generated PNG is preserved unchanged. **Status (2026-09-30): active** — adopted on 2026-09-29 and repacked into `elder.png` (see [README.md](README.md)).
 
 Source: exec-be3b83ed-aefc-400e-9a0f-617fd4b80035.png
 

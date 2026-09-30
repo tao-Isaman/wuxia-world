@@ -1,6 +1,14 @@
 # Sect Authoring Sheet — เส้าหลิน (Shaolin)
 
-Filled-in copy of `sect-template.md` capturing the **current in-game data** for วัดเส้าหลิน, plus suggested expansion slots where the template recommends more entries than the codebase currently has. Sources: `lib/game/data/skills.ts`, `lib/game/data/arts.ts`, `lib/world/data/npcs/sects-temples.ts`, `lib/world/data/quests/sects-temples.ts`, `lib/world/data/opponents.ts`, `lib/world/data/world-map.ts`, `lib/world/data/location-routes.ts`.
+> **Status (2026-09-30):** a worked example of [sect-template.md](sect-template.md), filled in **from the code as it is now**.
+>
+> - An earlier version of this sheet (commit `6dc7a10`) proposed nine skills, two arts, a third NPC and four engine features (`burn_hp_mp`, `debuff_atk`, `vitScale`, `stun`). All of them were built, and the numbers below are the built values.
+> - Data lives in:
+>   - skills and arts: `lib/game/data/skills.ts`, `lib/game/data/arts.ts`;
+>   - NPCs, quests, scenes: `lib/world/data/npcs/sects/shaolin.ts`, `quests/sects/shaolin.ts`, `scenes-content/sects/shaolin.ts`;
+>   - the rank ladder: `lib/world/data/sect-memberships.ts`;
+>   - spar builds: `lib/world/data/opponents.ts`.
+> - Every sect's current data: [reference/sects.md](../reference/sects.md).
 
 ---
 
@@ -9,11 +17,12 @@ Filled-in copy of `sect-template.md` capturing the **current in-game data** for 
 | Field | Value |
 |---|---|
 | Thai name (canonical) | `เส้าหลิน` |
+| `SectId` | `shaolin` |
 | One-line concept | "วัดพุทธบนเขาซงซาน · Tank หลัก · ชายล้วน · หมัด-เซน-อรหันต์" |
 | Alignment | `orthodox` |
-| Dominant philosophical axes | `yang` · `hard` · `external` (capstone arts touch `internal` for เซน finger / tendon-changing) |
-| Signature weapon families | `fist` (primary) · `long` (ไม้พลอง/ไม้เท้า — secondary, ตามชุด T1 ใหม่) · `sword` (อรหันต์ดาบ + กระบี่วิธีเซน — tertiary) |
-| Color / motif keyword | "ผ้ากาสาวพัสตร์ส้มอิฐ + ทองอักขระ · กระดิ่งทอง · กลีบดอกบัว" |
+| Dominant axes | `yang` · `hard` · `external` (สายเซนแตะ `internal` / `soft`) |
+| Signature weapon families | `fist` (หลัก) · `long` (ไม้พลอง / ไม้เท้า) · `sword` (ดาบอรหันต์, กระบี่วิธีเซน) |
+| Motif | "ผ้ากาสาวพัสตร์ส้มอิฐ + ทองอักขระ · กระดิ่งทอง · กลีบดอกบัว" |
 
 ---
 
@@ -21,265 +30,173 @@ Filled-in copy of `sect-template.md` capturing the **current in-game data** for 
 
 | Field | Value |
 |---|---|
-| Location id | `sect_shaolin` |
-| Display name (Thai) | `วัดเส้าหลิน` |
-| Description | "少林派 · เขาซงซาน · พลังกล้าแกร่ง · ชายล้วน" *(จาก `world-map.ts:111`)* |
-| Anchor neighbors | `sect_songshan` *(เขาซงซาน — เส้นทางเดียวที่มีอยู่ในปัจจุบัน)* |
-| Per-direction route labels | `sect_shaolin ⇄ sect_songshan` — `fromA: "เนินยอดเขา"` / `fromB: "เนินยอดเขา"` *(จาก `location-routes.ts:104`)* |
+| Location id | `sect_shaolin` (array `SECTS` ใน `world-map.ts`) |
+| Display name | `วัดเส้าหลิน` |
+| Description | "少林派 · เขาซงซาน · Tank หลัก · ชายล้วน" |
+| Region | `south` (`regions.ts`) — คุกที่ใกล้ที่สุดคือต้าหลี่ |
+| Roads | `sect_shaolin ⇄ sect_songshan` — `fromA / fromB: "เนินยอดเขา"` (ถนนเส้นเดียว) |
+| Categories | sect + mountain → ฝึกฝนได้, โบนัส balance / hard |
+| Painting | auto layout, `/maps/sect_shaolin.webp` |
 
-**Suggested expansion** (ยังไม่มีในโค้ด): เพิ่มเส้นทางลงสู่ `village_dengfeng` หรือ `city_luoyang` เพื่อให้วัดเข้าถึงได้จากเมืองโดยไม่ต้องผ่านยอดเขาเสมอ — สอดคล้องกับภูมิศาสตร์จริง (เติ้งเฟิง, มณฑลเหอหนาน).
+**ช่องว่าง:** มีถนนเส้นเดียวผ่านเขาซงซาน ถ้าจะเพิ่มทางลงเมืองต้องเพิ่ม `LocationRoute` ใหม่
 
 ---
 
-## 3 · Move skills (วิชาฝีมือ)
+## 3 · Move skills (วิชาฝีมือ) — 13 วิชา
 
-### 3.1 ปัจจุบัน (4 skills ในโค้ด)
+T0×2, T1×3, T2×3, T3×3, T4×2 · ระยะเวลา buff / debuff ทุกตัวเป็น 5 เทิร์น (`u:5`) ยกเว้น stun (3)
 
-T0×1, T1×1, T2×2, T3×0, T4×0.
+| id | ชื่อ | Tier | อาวุธ | ประเภท | Stats | bp / p / f / dm | อื่น ๆ | se | ee | Types |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `sf` | หมัดเส้าหลิน | 0 | fist | phy | STR 5, VIT 5 | 42 / 0 / 20 / 1 | — | — | — | external, hard |
+| `sl_long_dharma` | หมัดยาวพุทธธรรม | 0 | fist | phy | STR 6, AGI 4 | 38 / 0 / 12 / 1 | ระยะ 1–2 ช่อง | — | — | external, yang |
+| `nd5` | หมัดอรหันต์ | 1 | fist | phy | STR 6, VIT 9 | 50 / 0 / 10 / 1 | `hits: 3` | — | — | external, hard |
+| `sl_staff_dharma` | ไม้พลองพุทธธรรม | 1 | long | phy | STR 6, VIT 5, DEX 4 | 50 / 0 / 0 / 1 | — | `buff_def +12` | — | external, hard |
+| `sl_staff_shaolin` | ไม้พลองเส้าหลิน | 1 | long | phy | STR 6, AGI 6, DEX 3 | 55 / 10 / 0 / 1 | — | — | `debuff_atk −12` | external, yang |
+| `ne1` | วิชากรงเล็บมังกร | 2 | fist | phy | STR 9, VIT 8, DEX 3 | 75 / 25 / 0 / 1 | — | — | — | yang, hard |
+| `ne2` | ดาบอรหันต์เส้าหลิน | 2 | sword | phy | STR 9, DEF 8, DEX 3 | 68 / 0 / 0 / 1 | — | `buff_def +20` | `burn_hp_mp` 8 % HP + 8 % MP | external, hard |
+| `sl_zen_sword` | กระบี่วิธีเซน | 2 | sword | int | POW 8, INT 7, DEX 5 | 78 / 20 / 0 / 1.15 | — | — | — | internal, soft |
+| `sl_bodhi_palm` | ฝ่ามือโพธิสัตว์ | 3 | fist | phy | STR 10, VIT 9, POW 5, DEX 1 | 78 / 20 / 0 / 1.1 | — | `buff_reflect 30` | — | yang, hard |
+| `sl_petal_finger` | ดัชนีเด็ดบุปผา | 3 | fist | int | POW 8, INT 9, DEX 7, AGI 1 | 70 / 0 / 0 / 1.15 | `hits: 2` | `buff_eva +15` | `debuff_acc −12` | internal, soft |
+| `sl_rock_punch` | หมัดทลายผา | 3 | fist | phy | STR 12, VIT 8, POW 4, DEX 1 | 82 / 30 / 0 / 1 | — | — | `debuff_def −15` | yang, hard, external |
+| `sl_thousand_arms` | อรหันต์พันกร | 4 | fist | phy | STR 8, VIT 12, POW 5, DEX 5 | 88 / 25 / 0 / 1.2 | `hits: 5`, `vitScale: 0.5` | — | — | yang, hard, external |
+| `sl_truth_staff` | ไม้เท้าสัจธรรม | 4 | long | phy | STR 8, POW 9, VIT 7, INT 5, DEX 1 | 95 / 25 / 0 / 1.2 | — | — | `stun` 3 เทิร์น (100 %) | balance, hard |
 
-| # | id | Thai name | Tier | Weapon | Stats | bp / p / f / dm | dr | se | ee | Types | Notes |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1 | `sf` | หมัดเส้าหลิน | 0 | fist | STR 5, VIT 5 | 42 / 0 / 20 / 1 | — | — | — | external, hard | "Phy + flat 20" — entry ทุกศิษย์ |
-| 2 | `nd5` | หมัดอรหันต์ | 1 | fist | STR 6, VIT 7 | 50 / 0 / 10 / 1 | — | — | — | external, hard | **redesigned**: Phy external — ตัด `multi_debuff` ออก, สลับ stat → STR/VIT, เปลี่ยน type จาก `internal` → `external` |
-| 3 | `ne1` | วิชากรงเล็บมังกร | 2 | fist | STR 8, VIT 7 | 75 / 25 / 0 / 1 | — | — | — | yang, hard | "Phy×125% หนักมาก" |
-| 4 | `ne2` | ดาบอรหันต์เส้าหลิน | 2 | sword | STR 8, DEF 7 | 68 / 0 / 0 / 1 | — | `buff_def v:20 u:5` | `burn_hp_mp dmg:8% mp:8% u:5` ⚠ | external, hard | **redesigned**: คง `buff_def` + เพิ่ม "เผาไหม้" — DoT ทั้ง HP และ MP (ต้องเพิ่ม variant ใหม่ใน `lib/game/types.ts`, ดู §3.4) |
+ผลรวม stat ต่อ tier ตรงงบ 10 / 15 / 20 / 25 / 30 ทุกตัว · mg = 20 / 40 / 60 / 80 / 100
 
-### 3.2 ที่เสนอเพิ่ม (จาก spec ผู้เขียน)
+---
 
-รวมหลังเพิ่ม: T0×2, T1×3, T2×3, T3×3, T4×2 — เกินเพดาน 5–8 ของเทมเพลต. แนะนำตัดบางตัวที่ซ้ำ flavor หรือยุบ T1 ไม้พลอง 2 ตัวให้เหลือตัวเดียว.
+## 4 · Inner arts (วิชาในกาย) — 7 วิชา
 
-| # | Thai name | Tier | Weapon | Stat budget (~) | bp / p / f / dm (เป้าหมาย) | se | ee | Types | Intent |
-|---|---|---|---|---|---|---|---|---|---|
-| 5 | `หมัดยาวพุทธธรรม` | 0 | fist | STR 4, AGI 4 | 38 / 0 / 12 / 1 | — | — | external, yang | T0 ทางเลือก — เน้น reach + flat dmg เล็ก ผู้เริ่มต้นที่ไม่ใช่สาย VIT |
-| 6 | `ไม้พลองพุทธธรรม` | 1 | long | STR 5, VIT 5, DEX 4 | 50 / 0 / 0 / 1 | `buff_def v:12 u:5` | — | external, hard | T1 staff สาย tank — ตี + ตั้งการ์ด **5 เทิร์น** |
-| 7 | `ไม้พลองเส้าหลิน` | 1 | long | STR 6, AGI 6, DEX 3 | 55 / 10 / 0 / 1 | — | `debuff_atk v:-12 u:5` ⚠ | external, yang | T1 staff สาย control — ตีและทำให้ศัตรูโจมตีเบา **5 เทิร์น** (ต้องเพิ่ม `debuff_atk` variant — ดู §3.4) |
-| 8 | `กระบี่วิธีเซน` | 2 | sword | POW 8, INT 9, DEX 5 | 78 / 20 / 0 / 1.15 | — | — | internal, soft | T2 sword ฝั่ง Int — ไม่มีบัฟ/ดีบัฟ แต่ damage สูงสุดในกลุ่ม T2 (ดั่งกระบี่นิ่งเข้าฝักก่อนตัดสินทุกอย่างในครั้งเดียว) |
-| 9 | `ฝ่ามือโพธิสัตว์` | 3 | fist | STR 9, VIT 8, POW 5 | 78 / 20 / 0 / 1.1 | `buff_reflect v:30 u:5` | — | yang, hard | T3 tank-counter — ฝ่ามือเมตตา สะท้อนแรงร้าย **5 เทิร์น** |
-| 10 | `ดัชนีเด็ดบุปผา` | 3 | fist | POW 8, INT 9, DEX 7 | 70 / 0 / 0 / 1.15 | `buff_eva v:15 u:5` | `debuff_acc v:-12 u:5` | internal, soft | T3 finger-strike Int — แม่นและลื่นไหล **5 เทิร์น** (拈花指 inspired) |
-| 11 | `หมัดทลายผา` | 3 | fist | STR 10, VIT 7, POW 4 | 82 / 30 / 0 / 1 | — | `debuff_def v:-15 u:5` | yang, hard, external | T3 brute-force — ทุบหินทะลุเกราะ **5 เทิร์น** |
-| 12 | `อรหันต์พันกร` | 4 | fist | STR 8, VIT 12, POW 5, DEX 5 | 88 / 25 / 0 / 1.2 | — | — | yang, hard, external | T4 capstone — **damage scales with caster VIT** (เพิ่ม `vitScale: 0.5` field — ทุก 1 VIT = +0.5 flat dmg, ดู §3.4). ตัด `stack_atk` ออก |
-| 13 | `ไม้เท้าสัจธรรม` | 4 *(?)* | long | STR 7, POW 8, VIT 7, INT 5 | 95 / 25 / 0 / 1.2 | — | `stun u:5 ch:50%` ⚠ | balance, hard | T4 staff capstone — ตีหนัก + **โอกาสสตันศัตรู 5 เทิร์น** (ต้องเพิ่ม `stun` variant ใหม่ — ดู §3.4) |
+T0×1, T1×1, T2×1, T3×1, T4×3
 
-> **หมายเหตุ tier discipline**: T3–T4 ขณะนี้ว่างเปล่าทั้งคู่ ลำดับความจำเป็น = T4 capstone (#12 หรือ #13) > T3 tank-counter (#9) > เติม T1 staff > ตัวอื่นเป็น flavor เสริม.
-> **ขอยืนยันเพิ่ม** กับผู้เขียน: (a) tier ของ `ไม้เท้าสัจธรรม` (`t` ที่ค้างใน spec — เดาเป็น T4 capstone ฝั่ง long), (b) จะเก็บไม้พลองทั้ง 2 ตัวไหม หรือยุบเหลือ 1.
+| id | ชื่อ | Tier | Stats (lv 10) | hL / mL | Active | Passive | Types |
+|---|---|---|---|---|---|---|---|
+| `t0_lohan` | ลมปราณอรหันต์ | 0 | STR 6, VIT 4 | 20 / 10 | `heal` 10 % HP · MP 15 · CD 3 | ถูกตี 25 % → DEF +10 (5 เทิร์น) | yang, hard |
+| `t1_goldenbell` | กระดิ่งทองพื้นฐาน | 1 | VIT 10, DEF 6, STR 4 | 30 / 10 | "เปลี่ยนตัวเป็นโลหะ" `buff_reduce` 25 % 5 เทิร์น · MP 18 · CD 3 | ถูกตี 25 % → DEF +15 | hard, external |
+| `t2_dharma` | ลมปราณพุทธธรรม | 2 | VIT 12, DEF 10, STR 8 | 35 / 15 | "ลมปราณคุ้มกาย" `heal` 15 % · MP 20 · CD 3 | ถูกตี 30 % → DEF +12 | yang, hard |
+| `t3_onefinger` | เอกนิ้วเซน | 3 | POW 14, INT 14, DEX 12 | 25 / 35 | "นิ้วฟ้าผ่า" `atk_int_pen` ×1.5 ทะลุ 35 % · MP 35 · CD 4 | ใช้วิชา int 100 % → ศัตรู Acc −12 | internal |
+| `tendon` | พลังเปลี่ยนเส้นเอ็น | 4 | STR 20, VIT 20, DEF 10 | 55 / 15 | "อุ้มแผ่นดิน" `heal` 22 % · MP 25 · CD 3 | ถูกตี 25 % → DEF +20 | yang, hard |
+| `diamond` | จินกังชี่ | 4 | VIT 25, DEF 15, STR 10 | 55 / 15 | "เกราะเพชร" `buff_reduce` 30 % 5 เทิร์น · MP 20 · CD 3 | ถูกตี 20 % → ฟื้น 8 % HP | yang, hard |
+| `t4_demonsubduer` | ลมปราณอรหันต์ปราบมาร | 4 | STR 18, POW 14, VIT 10, DEX 8 | 35 / 35 | "หมัดปราบมาร" `atk_phy_pen` ×1.5 ทะลุ 30 % · MP 30 · CD 4 | ใช้ active 100 % → ATK +8 % (ซ้อนได้ 3 ชั้น) | yang, hard, external |
 
-### 3.3 Tuning notes (จาก feedback ผู้เขียน รอบล่าสุด)
+---
 
-- ระยะเวลา **5 เทิร์น** = `u:5` ทั้งหมด **ทั่วทั้งเอกสาร** ทุก buff/debuff ทุก skill ทุก art (รวมถึง #4 `ne2` burn, #13 stun, และ arts ที่อยู่ในโค้ดอยู่แล้วใน §4.1) — global rule รอบล่าสุด.
-- `nd5 หมัดอรหันต์` พลิกเป็นสาย external pure-Phy ไม่มี debuff (ดู §3.1).
-- `ne2 ดาบอรหันต์เส้าหลิน` คง `buff_def` แต่เพิ่ม **เผาไหม้ HP+MP** เป็น DoT เข้าศัตรู.
-- `กระบี่วิธีเซน` (#8) → ไม่มี se/ee, ผลักไปทาง pure-damage T2 ที่แรงสุดในกลุ่ม.
-- `อรหันต์พันกร` (#12) → ไม่มี se ใดๆ, damage **คูณด้วย VIT** ของผู้ใช้ (เปลี่ยน archetype จาก stacking-glass เป็น tank-bruiser).
-- `ไม้เท้าสัจธรรม` (#13) → ลบทั้ง se/ee, เปลี่ยนเป็น **stun chance** เพียวๆ.
+## 5 · Membership (สมาชิกภาพ)
 
-### 3.4 Engine extensions ที่ต้องเพิ่มก่อน implement
+| Field | Value |
+|---|---|
+| Registrar | `sect_shaolin_abbot_huiyuan` (เจ้าอาวาสฮุยหยวน) |
+| Ladder | 9 → 1 · quest cooldown 30 วัน |
+| Rank-up cost (แต้มสำนัก) | 8:100 · 7:200 · 6:350 · 5:500 · 4:700 · 3:1000 · 2:1400 · 1:2000 (รวม 6250) |
+| Join gate (intro quest) | ชาย · evil ≤ 10 · ยังไม่อยู่สำนักใด |
+| Intro task | `qst_shaolin_disciple_intro`: สมุนไพรหายาก 10 · โสม 10 · เม็ดบัว 10 → รางวัล `joinSect` + 20 แต้ม |
+| Hunter (เมื่อทรยศ) | `hunter_shaolin` นักล่าเส้าหลิน (T4) |
+| Redemption | `qst_shaolin_redemption`: ชนะหัวหน้าโจร 5 · โสม 5 → `resignSect` |
 
-วิชาที่แก้ใหม่บางตัว **เกินขอบเขต variant ที่มีอยู่ใน `lib/game/types.ts`** ต้องเพิ่ม dispatcher ใน `lib/game/effects.ts` ก่อน:
+รางวัลตามขั้น (ถ้ามีตัวเดียวได้เลยอัตโนมัติ ถ้ามีหลายตัวต้องเลือกหนึ่ง):
 
-| Variant ใหม่ | ใช้ที่ | Spec คร่าวๆ |
+| ขั้น | วิชาฝีมือ | วิชาในกาย |
 |---|---|---|
-| `burn_hp_mp` (ee) | #4 `ne2` | DoT ต่อเทิร์น: ลด HP `dmg%` + ลด MP `mp%` ของ max ตามจำนวนเทิร์น `u`. ผ่าน `tickEffects`. |
-| `debuff_atk` (ee) | #7 ไม้พลองเส้าหลิน | ลด ATK% ของศัตรู (ทั้ง phy + int) เป็นเทิร์น. ใช้ใน `combinedStats` หรือ `calcSkillDamage`. *ทางเลือก*: ใช้ `buff_iatk_reduce` ที่มีอยู่แล้วถ้า scope เฉพาะ Int — แต่ตามคำขอ (ลดพลังโจมตี) ควรครอบคลุมทั้ง phy+int. |
-| `vitScale` (skill field, ไม่ใช่ effect) | #12 อรหันต์พันกร | เพิ่ม field `vitScale?: number` ใน `Skill` type — ใน `calcSkillDamage` บวก `vitScale × dA.VIT` เข้า `skillEffect` flat. |
-| `stun` (ee) | #13 ไม้เท้าสัจธรรม | flag ที่บล็อก action ของศัตรู `u` เทิร์น. ต้อง check ใน `getNextTurn` / `runAITurn` ก่อน roll. มี chance roll `ch%`. |
+| 9 (เข้าสำนัก) | เลือก 1: `nd5`, `sl_staff_dharma`, `sl_staff_shaolin` | `t0_lohan` |
+| 8 | เลือก 1: `ne1`, `ne2`, `sl_zen_sword` | — |
+| 7 | — | `t1_goldenbell` |
+| 6 | — | `t2_dharma` |
+| 5 | เลือก 1: `sl_bodhi_palm`, `sl_petal_finger`, `sl_rock_punch` | — |
+| 4 | — | `t3_onefinger` |
+| 3 | เลือก 1: `sl_thousand_arms`, `sl_truth_staff` | — |
+| 2 | — | เลือก 1: `tendon`, `diamond`, `t4_demonsubduer` |
 
-> ก่อนเริ่ม implement ในโค้ด แนะนำให้ผู้เขียน **review ตาราง 3.4 นี้** เพื่อยืนยันรูปแบบ variant + ผลข้างเคียงต่อ balance (เช่น 5-turn buff/debuff ส่วนใหญ่ยาวเกินค่าเฉลี่ย 2-turn ของระบบเดิม — อาจต้องลดค่า `v` ทดแทน).
-
----
-
-## 4 · Inner arts (วิชาในกาย)
-
-### 4.1 ปัจจุบัน (5 arts ในโค้ด)
-
-T0×1, T1×1, T3×1, T4×2.
-
-| # | id | Thai name | Tier | Stats | hL / mL | Active | Passive | Types | Notes |
-|---|---|---|---|---|---|---|---|---|---|
-| 1 | `t0_lohan` | ลมปราณอรหันต์ | 0 | STR 6, VIT 4 | 20 / 10 | "หมัดอรหันต์" — `heal h:10 c:15 cd:3` | `hit_recv 25% → buff_def +10 u:5` ⚙ | yang, hard | foundation breath *(u:1 → u:5 ตาม global rule)* |
-| 2 | `t1_goldenbell` | กระดิ่งทองพื้นฐาน | 1 | VIT 10, DEF 6, STR 4 | 30 / 10 | "เปลี่ยนตัวเป็นโลหะ" — `buff_reduce v:25 u:5 c:18 cd:3` ⚙ | `hit_recv 25% → buff_def +15 u:5` ⚙ | hard, external | tank intermediate *(u:2 → u:5 ทั้งคู่)* |
-| 3 | `t3_onefinger` | เอกนิ้วเซน | 3 | POW 14, INT 14, DEX 12 | 25 / 35 | "นิ้วฟ้าผ่า" — `atk_int_pen m:1.5 pen:35 c:35 cd:4` | `use_int 100% → debuff_acc -12 u:5` ⚙ | internal | 一指禅 — burst Int *(u:3 → u:5)* |
-| 4 | `tendon` | พลังเปลี่ยนเส้นเอ็น | 4 | STR 20, VIT 20, DEF 10 | 55 / 15 | "อุ้มแผ่นดิน" — `heal h:22 c:25 cd:3` | `hit_recv 25% → buff_def +20 u:5` ⚙ | yang, hard | 易筋经 — bruiser capstone *(u:2 → u:5)* |
-| 5 | `diamond` | จินกังชี่ | 4 | VIT 25, DEF 15, STR 10 | 55 / 15 | "เกราะเพชร" — `buff_reduce v:30 u:5 c:20 cd:3` ⚙ | `hit_recv 20% → heal_pct 8` | yang, hard | 金刚气 — wall capstone *(u:3 → u:5)* |
-
-### 4.2 ที่เสนอเพิ่ม (จาก spec ผู้เขียน)
-
-รวมหลังเพิ่ม: T0×1, T1×1, **T2×1**, T3×1, **T4×3** — เกินคำแนะนำ 3–5 ของเทมเพลต (รวม 7) แต่ T4 ทั้ง 3 ตัวเล่นคนละ archetype (defense / heal / offense) จึงไม่ซ้ำ flavor.
-
-| # | id (เสนอ) | Thai name | Tier | Stats | hL / mL | Active | Passive | Types | Notes |
-|---|---|---|---|---|---|---|---|---|---|
-| 6 | `t2_dharma` | ลมปราณพุทธธรรม | 2 | VIT 12, DEF 10, STR 8 | 35 / 15 | "ลมปราณคุ้มกาย" — `heal h:15 c:20 cd:3` (ฟื้น 15% HP) | `hit_recv 30% → buff_def +12 u:5` | yang, hard | T2 ที่ขาดอยู่ — combo ฟื้นเลือด + เสริมเกราะ **5 เทิร์น** ตอนถูกตี |
-| 7 | `t4_demonsubduer` | ลมปราณอรหันต์ปราบมาร | 4 | STR 18, POW 14, VIT 10, DEX 8 | 35 / 35 | "หมัดปราบมาร" — `atk_phy_pen m:1.5 pen:30 c:30 cd:4` (Phy×1.5 ทะลุ PDef 30%) | `use_act 100% → stack_atk +8 mx:3 u:5` | yang, hard, external | T4 capstone สาย offense — ทุกครั้งที่ใช้ active สะสม ATK+8% **5 เทิร์น** (สูงสุด 3 ชั้น) |
-
-### 4.3 Tuning notes (จาก spec ผู้เขียน)
-
-- **Global 5-turn rule**: ทุก buff/debuff (`u:N`) ใน §4.1 + §4.2 ปรับเป็น `u:5` ทั้งหมด. รายการที่เปลี่ยน (มี ⚙ กำกับใน §4.1):
-  - `t0_lohan` passive `buff_def`: u:1 → u:5
-  - `t1_goldenbell` active `buff_reduce`: u:2 → u:5, passive `buff_def`: u:2 → u:5
-  - `t3_onefinger` passive `debuff_acc`: u:3 → u:5
-  - `tendon` passive `buff_def`: u:2 → u:5
-  - `diamond` active `buff_reduce`: u:3 → u:5
-  - `t2_dharma` (เสนอใหม่) passive `buff_def`: u:5
-  - `t4_demonsubduer` (เสนอใหม่) passive `stack_atk`: u:5
-- `t2_dharma ลมปราณพุทธธรรม` → active = heal HP, passive = buff_def trigger เมื่อถูกตี. (ใช้ variant เดิมทั้งคู่ ไม่ต้องแก้ engine)
-- `t4_demonsubduer ลมปราณอรหันต์ปราบมาร` → active = หมัด Phy ทะลุ PDef, passive = stack_atk ทุกครั้งที่ใช้ active เพิ่มโบนัสพลังโจมตี (ทับทับเป็น 3 ชั้น). (ใช้ variant เดิมทั้งคู่ — `atk_phy_pen` มีอยู่ใน active list, `stack_atk` มีใน se)
-- ทั้งสองไม่ต้องเพิ่ม engine variant ใหม่ — struct เดียวกับ `t1_goldenbell` (active+passive แยกกัน) ใส่เข้า `lib/game/data/arts.ts` ได้เลย
-
-⚠ **Balance warning** (สำคัญ): การยืด duration จาก 1–3 → 5 เทิร์น มีผลรุนแรง:
-- `tendon` + `diamond` ตอนนี้แทบ uptime DEF buff เต็มเวลา (CD:3, u:5) → tank รุ่นใหม่อยู่ยงเกินคาด
-- `t1_goldenbell` `buff_reduce 25% u:5` หมายถึงลด dmg ครึ่งสนามรบ
-- `t4_demonsubduer` `stack_atk +24% u:5` (3 ชั้น × 5 เทิร์น) → snowball offensive ที่ไม่หยุด
-- ก่อน implement แนะนำ **ลดค่า v ลงประมาณ 40–60%** เพื่อชดเชย uptime ที่ยาวขึ้น (เช่น `buff_def +20 u:2` → `buff_def +10 u:5` พลังรวมใกล้เคียงเดิม)
+`sf` ได้จากภารกิจ `qst_shaolin_proof_of_heart` หรือคัมภีร์ `man_sf` ส่วน `sl_long_dharma` ผู้เล่นยังเรียนไม่ได้ (มีแต่ในร่างของคู่ประลอง)
 
 ---
 
-## 5 · Sect-resident NPCs
+## 6 · Sect-resident NPCs — 8 คน
 
-**ปัจจุบันมี 2 NPCs** — ขั้นต่ำของเทมเพลต.
+| id | ชื่อ | บทบาท | ประลอง (tier / fame) | defenseTier | ของที่ขโมยได้ | ให้ภารกิจ |
+|---|---|---|---|---|---|---|
+| `sect_shaolin_abbot_huiyuan` | เจ้าอาวาสฮุยหยวน | เจ้าสำนัก, ผู้รับสมัคร, 1 ใน 20 NPC ที่จำลองชีวิต | `spar_shaolin_abbot_huiyuan` T4 / 18 | 4 | herb 4, ginseng 5, paper 3, ink 3, jade 4, ancient_coin 3, wood_sacred 2, mithril_ore 1 | 13 |
+| `sect_shaolin_vice_abbot_luohan` | รองเจ้าอาวาสลั่วฮั่น | รองเจ้าสำนัก (จำลองชีวิต) | `spar_shaolin_luohan` T4 / 14 | 4 | ginseng 5, jade 4, ancient_coin 2, wood_sacred 2, mithril_ore 1 | — |
+| `sect_shaolin_dharma_guardian_huimiao` | หลวงพี่ใหญ่ฮุยเหมียว | ผู้พิทักษ์พระธรรม | `spar_shaolin_huimiao` T4 / 14 | 4 | ginseng 4, jade 3, ancient_coin 2, wood_sacred 1 | — |
+| `sect_shaolin_zen_master_xianren` | หลวงพ่อเซียนเหริน | อาจารย์สายเซน | `spar_shaolin_xianren` T4 / 12 | 4 | ginseng 4, paper 3, ink 3, jade 2, ancient_coin 1 | — |
+| `sect_shaolin_staff_master_juti` | หลวงพ่อจูตี้ | ปรมาจารย์พลอง | `spar_shaolin_juti` T4 / 12 | 4 | wood_hard 5, iron_ore 3, jade 2, ancient_coin 1 | — |
+| `sect_shaolin_elder_faming` | อาจารย์ฝาหมิง | อาจารย์คุมการฝึก | `spar_shaolin_faming` T3 / 8 | — | — | 1 (`qst_shaolin_iron_training`) |
+| `sect_shaolin_head_disciple_yuanquan` | หัวหน้าศิษย์หยวนเฉวียน | หัวหน้าศิษย์ | `spar_shaolin_yuanquan` T3 / 8 | 2 | herb 4, paper 3, ink 3, ginseng 1 | — |
+| `sect_shaolin_disciple_xuanji` | ศิษย์เซวียนจี้ | ศิษย์เฝ้าประตู | `spar_shaolin_xuanji` T1 / 4 | — | — | — |
 
-### 5.1 เจ้าอาวาสฮุยหยวน
+มีบทสนทนา (💬) เฉพาะฮุยหยวนกับฝาหมิง
 
-| Field | Value |
-|---|---|
-| `id` | `sect_shaolin_abbot_huiyuan` |
-| Thai name | `เจ้าอาวาสฮุยหยวน` |
-| Description | "เจ้าอาวาสวัดเส้าหลิน วัยสูงอายุแต่ยังดูแข็งแกร่ง สายตาแหลมคม ผู้รักษากฎเหล็กของสำนัก" |
-| Tier | 4 *(เป้าโจรกรรม / ลอบสังหารระดับสูง)* |
-| Sparrable? | **no** *(ไม่มี `sparOpponentId`)* |
-| `defenseTier` | 3 |
-| `stealLoot` | herb ×4 · ginseng ×3 · paper ×4 · ink ×3 · jade ×1 |
-| Hosts quests? | side ×4 *(`qst_shaolin_relic_theft`, `qst_shaolin_disciple_gone`, `qst_shaolin_proof_of_heart`, `qst_shaolin_wudang_joint`)* |
-| Personality cue | "พูดสุภาพ กฎเหล็ก เน้นจิตใจมากกว่าฝีมือ" |
-
-### 5.2 อาจารย์ฝาหมิง
-
-| Field | Value |
-|---|---|
-| `id` | `sect_shaolin_elder_faming` |
-| Thai name | `อาจารย์ฝาหมิง` |
-| Description | "พระอาจารย์อาวุโสแห่งเส้าหลิน ผู้คุมการฝึกหัดของสาวก ท่าทางเข้มขรึมเงียบขรึม" |
-| Tier | 3 |
-| Sparrable? | **yes** — `spar_shaolin_faming` (ti 3, fist hard-external) |
-| `sparFameReward` | 8 |
-| `defenseTier` | *(ไม่ตั้งค่า — default)* |
-| `stealLoot` | *(ไม่ตั้งค่า)* |
-| Hosts quests? | side ×1 *(`qst_shaolin_iron_training`)* |
-| Personality cue | "พูดน้อย เข้มขรึม สอนด้วยการลงมือทำ" |
-
-### Suggested NPC #3 (เพื่อให้ถึง 3–4 ตามคำแนะนำ)
-
-| Field | Suggestion |
-|---|---|
-| `id` | `sect_shaolin_disciple_xuanji` |
-| Thai name | `ศิษย์เซวียนจี้` |
-| Role | gatekeeper / errand-giver — รับคนใหม่, ส่งภารกิจซื้อสมุนไพร |
-| Tier | 1 |
-| Sparrable? | yes (`spar_shaolin_xuanji` — fist + `t0_lohan`) |
-| `sparFameReward` | 4 |
-| Hosts quests? | side ×1–2 (เช่น เก็บสมุนไพรในป่าซงซาน, ส่งจดหมายถึงอู่ตัง) |
-| Personality cue | "อ่อนน้อม กระตือรือร้น เกรงใจรุ่นพี่" |
+คู่ประลองดรอปคัมภีร์ของสำนัก: `man_sf`, `man_nd5`, `man_ne1`, `man_t0_lohan`, `man_t1_goldenbell`. สามตัว (`spar_shaolin_xianren`, `spar_shaolin_abbot_huiyuan`, `spar_shaolin_luohan`) ยังดรอป `man_ne2` ซึ่ง**ไม่มีอยู่ในตารางไอเท็ม** (ดู [HANDOFF.md](../../HANDOFF.md#known-issues))
 
 ---
 
-## 6 · Scattered / ranged NPCs
+## 7 · Scattered / ranged NPCs
 
-**ไม่มี** — เส้าหลินไม่มีสายลับ/ผู้ส่งสารนอกวัดในโค้ดปัจจุบัน. เหมาะกับ alignment `orthodox` ของวัดที่ไม่ส่งคนแฝงตัว.
-
----
-
-## 7 · Quests
-
-**ปัจจุบันมี 5 side + 0 bad** *(เป้าหมายของ bad-quest หลายตัวเล็งเส้าหลิน — ดู §7.6)*.
-
-### 7.1 `qst_shaolin_relic_theft` (เริ่มต้น)
-- **Giver**: เจ้าอาวาสฮุยหยวน
-- **Brief**: ตามล่าผู้ขโมยพระบรมสารีริกธาตุของวัด
-- **Stages**: ไปถึง `sect_shaolin` → ตามล่า → กลับมารายงาน *(ดู `quests/sects-temples.ts:14`)*
-- **Rewards**: gold + wExp + relationship +15 (huiyuan)
-
-### 7.2 `qst_shaolin_disciple_gone`
-- **Giver**: เจ้าอาวาสฮุยหยวน · **Prereq**: `qst_shaolin_relic_theft` = done
-- **Brief**: ศิษย์หายตัวไป — ต้องตามหาตัว
-- **Rewards**: relationship +10
-
-### 7.3 `qst_shaolin_proof_of_heart`
-- **Giver**: เจ้าอาวาสฮุยหยวน · **Prereq**: `qst_shaolin_disciple_gone` = done
-- **Brief**: บททดสอบจิตใจ — capstone ของเส้นเรื่องวัด
-- **Rewards**: relationship +20 *(เปิดให้ `qst_shaolin_wudang_joint`)*
-
-### 7.4 `qst_shaolin_iron_training`
-- **Giver**: อาจารย์ฝาหมิง
-- **Brief**: บททดสอบกายเหล็ก — ฝึกหนักกับอาจารย์
-- **Rewards**: relationship +15 (faming)
-
-### 7.5 `qst_shaolin_wudang_joint` (cross-sect)
-- **Giver**: เจ้าอาวาสฮุยหยวน · **Prereq**: `qst_shaolin_proof_of_heart` = done
-- **Brief**: ภารกิจร่วมกับอู่ตัง — สองสำนักจับมือกัน
-- **Rewards**: relationship +25 (huiyuan), อาจมี `learnArt` / `learnSkill` ระดับสูง
-
-### 7.6 Bad-quest targets ที่อ้างอิงเส้าหลิน (จาก `quests/evil.ts`)
-- ลอบสังหาร `sect_shaolin_abbot_huiyuan` (line 210) — `assassinatedNpc`
-- ลักพาตัว `sect_shaolin_elder_faming` (line 386) — `kidnappedNpc`
-- ขโมยจาก `sect_shaolin_abbot_huiyuan` (line 589, 1323) — `stoleFromNpc`
-- ลักพาตัวเจ้าอาวาส (line 1234) — `kidnappedNpc`
-
-> เส้าหลินทำหน้าที่เป็น **เป้าหมายฝั่งดี** ของ bad-quest หลายตัว — สำนักเองไม่ออก `qe_*` (สอดคล้องกับ alignment).
-
-### Suggested quest expansion (ถ้าจะเติม)
-- **Side**: เก็บสมุนไพรหายากบนเขาซงซาน (ฝาหมิง สั่งให้ฝึก stamina + แวะที่ `forest_*`)
-- **Side**: ปราบโจรปล้นวัด (`defeatedOpponent` กับ bandit T1–T2)
-- **Side**: บูรณะหอพระไตรปิฎก — ตามหา `paper` + `ink` + `jade` มาส่ง
+ไม่มี — เส้าหลินไม่มีสายลับนอกวัด (เข้ากับ alignment `orthodox`)
 
 ---
 
-## 8 · Equipment line (optional)
+## 8 · Quests — 14 ภารกิจ (side ทั้งหมด)
 
-ปัจจุบัน **ไม่มี** equipment เฉพาะของเส้าหลินในโค้ด.
+| id | ชื่อ | ผู้ให้ | ประเภท | เงื่อนไขรับ | ขั้นตอน | รางวัลเด่น |
+|---|---|---|---|---|---|---|
+| `qst_shaolin_disciple_intro` | ขอเข้าเป็นศิษย์เส้าหลิน | ฮุยหยวน | intro | ชาย, evil ≤ 10, ไม่มีสำนัก | สมุนไพรหายาก / โสม / เม็ดบัว ×10 → กลับ | `joinSect`, 20 แต้ม |
+| `qst_shaolin_sect_patrol` | ตรวจตราเขตวัด | ฮุยหยวน | ประจำสำนัก | สมาชิก | ชนะโจรเร่ร่อน 2 → รายงาน | 150 ทอง, 50 แต้ม |
+| `qst_shaolin_sect_herb_run` | ส่งสมุนไพรให้วัด | ฮุยหยวน | ประจำสำนัก | สมาชิก | สมุนไพร 5 → ส่ง | 100 ทอง, 60 แต้ม |
+| `qst_shaolin_sect_protect_village` | ปกป้องชาวบ้านจากโจร | ฮุยหยวน | ประจำสำนัก | สมาชิก | ชนะโจรป่า 3 → ข้าวหมูแดง 5 → รายงาน | 150 ทอง, 65 แต้ม |
+| `qst_shaolin_sect_sutra_paper` | กระดาษคัดลอกพระสูตร | ฮุยหยวน | ประจำสำนัก | สมาชิก | กระดาษสา 6 → รายงาน | 110 ทอง, 50 แต้ม |
+| `qst_shaolin_sect_meditation` | ปฏิบัติธรรมที่ถ้ำลึก | ฮุยหยวน | ประจำสำนัก | ขั้น ≤ 7 | เนื้อย่าง 3 → รายงาน | 80 แต้ม |
+| `qst_shaolin_art_zen_finger` | ตำราเอกนิ้วเซน | ฮุยหยวน | วิชา (ครั้งเดียว) | ขั้น ≤ 5 | ชนะหัวหน้าโจร 2 → สมุนไพร 8 → กลับ | `learnArt t3_onefinger` lv 3, 100 แต้ม |
+| `qst_shaolin_art_legendary` | ตำราพลังเปลี่ยนเส้นเอ็น | ฮุยหยวน | วิชา (ครั้งเดียว) | ขั้น ≤ 2 | ชนะหัวหน้าโจร 3 → humility ≥ 30 → กลับ | `learnArt tendon` lv 5, 200 แต้ม |
+| `qst_shaolin_redemption` | ไถ่บาปต่อเส้าหลิน | ฮุยหยวน | ไถ่บาป | ทรยศเส้าหลิน | ชนะหัวหน้าโจร 5 → โสม 5 → กลับ | `resignSect` |
+| `qst_shaolin_relic_theft` | พระธาตุสูญหาย | ฮุยหยวน | เรื่องราว | — | ไปถึงวัด → 🔍 ตามรอย → ชนะหัวหน้าโจร → กลับ | 500 ทอง, good +5 |
+| `qst_shaolin_disciple_gone` | ลูกศิษย์สาบสูญ | ฮุยหยวน | เรื่องราว | relic_theft เสร็จ | 🔍 ค้นหาในเมือง → ชนะลูกศิษย์สำนัก → พากลับ | 300 ทอง |
+| `qst_shaolin_proof_of_heart` | บทพิสูจน์แห่งจิตใจ | ฮุยหยวน | เรื่องราว | disciple_gone เสร็จ, good ≥ 5 | เข้าบททดสอบ → จบบททดสอบ (บทสนทนา) | `learnSkill sf` |
+| `qst_shaolin_wudang_joint` | ความลับใต้ผืนดิน | ฮุยหยวน | ร่วมกับอู่ตัง | proof_of_heart + `qst_wudang_mountain_seal` เสร็จ | ค้นพบ → เข้าถ้ำ → ชนะจอมยุทธมาร → เปิดเผยความจริง | 1500 ทอง, fame +10, `learnArt t3_yinyang` |
+| `qst_shaolin_iron_training` | วัตถุดิบฝึกเหล็ก | ฝาหมิง | เรื่องราว | — | แร่เทพ 1 → ส่ง | 800 ทอง, `learnArt t1_goldenbell` |
 
-### Suggested signature gear
+ภารกิจที่มี `sectId` (7 ตัว) รับจากเมนูสำนักและส่งจากเมนูเดียวกัน ส่วนที่เหลือรับจากการ์ดของ NPC
 
-| id | Slot | Tier | Stats | Weapon family | Sold at |
-|---|---|---|---|---|---|
-| `eq_t1_a_sl_kasaya` | A (armor) | 1 | VIT +6, DEF +4 | — | sect-hall เส้าหลิน |
-| `eq_t2_w_sl_iron_staff` | W | 2 | STR +6, fist mastery +20 | fist | tailor/forge ที่เติ้งเฟิง |
-| `eq_t3_c_sl_prayer_beads` | C (charm) | 3 | INT +8, POW +6 | — | quest reward (`qst_shaolin_proof_of_heart`) |
-| `eq_t4_a_sl_diamond_robe` | A | 4 | VIT +14, DEF +12 | — | drop จาก spar T4 / quest capstone |
+ภารกิจชั่ว (จาก `quests/evil.ts`) ที่มีเป้าหมายเป็นคนของเส้าหลิน:
 
----
-
-## 9 · Sect-hall offerings (optional)
-
-**ปัจจุบัน**: เส้าหลินยังไม่มี hall เปิดสอนแบบจ่ายเงินเรียนได้ (ใช้ระบบ quest reward + drop manuals แทน — ดู `spar_shaolin_faming` drops มี `man_sf`, `man_nd5`, `man_ne1`, `man_t1_goldenbell`).
-
-### Suggested hall (ถ้าจะเปิด)
-
-| Type | Id | Tier | Price |
-|---|---|---|---|
-| Skill | `sf` (หมัดเส้าหลิน) | 0 | 200g |
-| Skill | `nd5` (อรหันต์พันมือ) | 1 | 800g |
-| Art | `t0_lohan` (ลมปราณอรหันต์) | 0 | 500g |
-| Art | `t1_goldenbell` (กระดิ่งทอง) | 1 | 2000g |
-
-T2+ ทุกตัว **ไม่ขาย** — บังคับให้ผู้เล่นไต่ relationship + ทำ quest chain ของฮุยหยวน/ฝาหมิงแทน. ให้ feel ของ "วัดที่หวงวิชา".
-
----
-
-## 10 · Save migration
-
-ไม่ต้องเพิ่มเวอร์ชัน — `validateAndRepair` จัดการ ref ที่หายเอง. (อ้างอิง `CLAUDE.md` §"Save format & migrations".)
+| Quest | เป้าหมาย | การกระทำ |
+|---|---|---|
+| `qe_zhizhu_assassinate_master` | เจ้าอาวาสฮุยหยวน | ลอบสังหาร |
+| `qe_chuangwang_kidnap_novice` | อาจารย์ฝาหมิง | ลักพาตัว |
+| `qe_shenlong_collect_tribute` | เจ้าอาวาสฮุยหยวน | ขโมย |
+| `qe_xueyu_sect_initiation` | เจ้าอาวาสฮุยหยวน | ลักพาตัว |
+| `qe_xueyu_steal_sutra` | เจ้าอาวาสฮุยหยวน | ขโมย |
 
 ---
 
-## Summary of gaps vs. template
+## 9 · Equipment line
 
-| Section | Current | Recommended | Gap |
-|---|---|---|---|
-| Move skills | 4 | 5–8 | spec ผู้เขียนเสนอเพิ่มอีก 9 ตัว (T0×1, T1×2, T2×1, T3×3, T4×2) — เกินเพดาน, ดู §3.2 |
-| Inner arts | 5 | 3–5 | spec ผู้เขียนเสนอเพิ่ม 2 ตัว (T2×1 ปิดช่อง, T4×1 สาย offense) — รวมเป็น 7, ดู §4.2 |
-| Sect NPCs | 2 | 2–4 | +1 (gatekeeper/disciple) |
-| Spies | 0 | optional | — (เหมาะกับ alignment) |
-| Side quests | 5 | — | ✅ พอดี |
-| Bad quests | 0 (เป็นเป้า, ไม่ใช่ผู้ให้) | — | ✅ ตามดีไซน์ |
-| Equipment line | 0 | optional | +3–4 ถ้าต้องการ signature gear |
-| Sect-hall | 0 | optional | เปิด T0–T1 ได้ถ้าอยากให้ผู้เล่นซื้อเรียน |
+ยังไม่มีอุปกรณ์เฉพาะของเส้าหลิน (ยังไม่มีสำนักใดมี) ถ้าจะเพิ่มให้ทำตาม [sect-template.md §9](sect-template.md#9--equipment-line-optional)
 
-> หมายเหตุ: ตัวเลข `bp / mg / hL+mL` ทั้งหมดในเอกสารนี้คัดมาจากโค้ดจริง ณ commit ปัจจุบัน (`6dc7a10`). ถ้าจะ rebalance ให้แก้ที่ `lib/game/data/skills.ts` + `lib/game/data/arts.ts` แล้วอัปเดตตารางนี้ตาม.
+---
+
+## 10 · Sect-hall offerings
+
+ไม่มีหอเรียนในวัด — ผู้เล่นเรียนวิชาตามขั้น (§5) หรือจากคัมภีร์ที่คู่ประลองดรอป หอเรียนในเมืองขายเฉพาะวิชายุทธจักร tier 0–1
+
+---
+
+## 11 · Save migration
+
+ไม่ต้องเพิ่มเวอร์ชันเซฟ — เนื้อหาใหม่เพิ่มในตารางได้เลย และ `validateAndRepair` ตัด id ที่หายไปออกเองตอนโหลด
+
+---
+
+## Summary
+
+| Section | ตอนนี้ | หมายเหตุ |
+|---|---|---|
+| Move skills | 13 (T0 2 · T1 3 · T2 3 · T3 3 · T4 2) | `sl_long_dharma` ยังเรียนไม่ได้ |
+| Inner arts | 7 (T0–T3 อย่างละ 1 · T4 3) | |
+| Rank ladder | 9 → 1, รวม 6250 แต้ม | |
+| NPCs | 8 (ประลองได้ทั้งหมด, คุยได้ 2) | |
+| Quests | 14 (intro 1 · ประจำ 5 · วิชา 2 · ไถ่บาป 1 · เรื่องราว 5) | |
+| Evil quests ที่เล็งเส้าหลิน | 5 | |
+| Roads | 1 (ผ่าน `sect_songshan`) | |
+| Equipment / hall | ไม่มี | |
+| ข้อมูลเสีย | คู่ประลอง 3 ตัวดรอป `man_ne2` ที่ไม่มีอยู่ | |

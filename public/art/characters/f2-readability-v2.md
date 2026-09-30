@@ -1,6 +1,6 @@
 # F2 readability candidate v2
 
-Status: isolated candidate. Active assets and runtime are unchanged. Separate actual-engine review is required.
+Status (2026-09-30): **active.** Adopted on 2026-09-29 and repacked into `f2.png` with `scripts/repack-character-sheet.ts` (see [README.md](README.md)). The candidate notes below (including "Pending generation and source-alpha audit") are the original record, kept as history.
 
 Tool: built-in imagegen. Original local F2 sheet is the identity/pose reference; local M1 readability v2 is the proportion/readability reference. No commercial artwork is used.
 
