@@ -141,7 +141,8 @@ check("long attrition battles (tanky sampled builds: cooldowns, MP, arts, buffs)
     ];
     if (seed % 2) specs.push({ id: "a2", team: "ally", build: tank(seed * 3 + 2), look }, { id: "e2", team: "enemy", build: tank(seed * 3 + 100), look });
     const s = createGridBattle(specs);
-    const r = withRandom(rng, () => runAiBattle(s));
+    // VIT 160 tanks grind: allow a longer cap than ordinary fights (seed 5 runs ~330).
+    const r = withRandom(rng, () => runAiBattle(s, 600));
     assert.ok(isOver(s) && s.winner, `tank seed ${seed}: finished (${r.turns} turns)`);
     total += r.turns; longest = Math.max(longest, r.turns); casts += r.skills; waits += r.waits;
   }

@@ -57,7 +57,7 @@ check("layout: teams in their columns, spread, no overlaps, never on rocks, name
   assert.equal(keys.size, 6);
   for (const b of blocked) assert.ok(!keys.has(cellKey(b)));
   for (const u of s.units) {
-    assert.ok(u.team === "ally" ? u.pos.x >= 1 && u.pos.x <= 2 : u.pos.x >= 7 && u.pos.x <= 8, `${u.id} column`);
+    assert.ok(u.team === "ally" ? u.pos.x >= 2 && u.pos.x <= 3 : u.pos.x >= 6 && u.pos.x <= 7, `${u.id} column`);
     assert.ok(Math.abs(u.pos.y - 3) <= 2, `${u.id} near the middle row`);
     assert.equal(u.facing, u.team === "ally" ? "right" : "left");
     assert.equal(u.move, Math.max(3, Math.min(6, 3 + Math.floor(u.derived.Spd / 80))));

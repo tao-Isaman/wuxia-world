@@ -12,8 +12,10 @@ number exactly as it is today.
 - **Teams**: `ally` (player; the leader unit is the world's hero) and
   `enemy` (the opponent, optionally with pack members). Engine supports any
   N vs M.
-- **Layout**: allies start in columns 1–2, enemies in columns cols-3..cols-2,
-  spread around the middle row, facing each other.
+- **Layout**: front lines 3 tiles apart (columns 3 and 6 on a 10-wide board,
+  back ranks behind them), spread around the middle row, facing each other —
+  close enough that whoever acts first can walk in and strike on turn one, so
+  first-mover advantage matches the old 1v1 duel.
 - **Turn order**: per-unit ATB using the existing constants — gauge gain per
   ms = `(effectiveSpd + 60) / 2600`, threshold 100, carry-over kept, `buff_spd`
   counts. The engine jumps straight to the next ready unit (no real-time wait).

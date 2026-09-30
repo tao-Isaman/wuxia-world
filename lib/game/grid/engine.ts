@@ -74,10 +74,15 @@ export function unitSpd(u: GridUnit): number {
 }
 
 // ─── Creation ─────────────────────────────────────────────────────────
-/** Default starting cells: allies in columns 1–2, enemies in cols-3..cols-2, fanned around the middle row. */
+/**
+ * Default starting cells, fanned around the middle row. The front lines stand
+ * 3 tiles apart (columns 3 and 6 on a 10-wide board): with the minimum move of 3
+ * whoever acts first can close in and strike on turn one, so first-mover
+ * advantage matches the old 1v1 duel instead of flipping to the second mover.
+ */
 function layoutCells(team: "ally" | "enemy", cols: number, rows: number, taken: Set<string>): Cell[] {
-  const front = team === "ally" ? 2 : cols - 3;
-  const back = team === "ally" ? 1 : cols - 2;
+  const front = team === "ally" ? Math.max(1, Math.floor(cols / 2) - 2) : Math.min(cols - 2, Math.ceil(cols / 2) + 1);
+  const back = team === "ally" ? front - 1 : front + 1;
   const mid = Math.floor(rows / 2);
   const cells: { c: Cell; k: number }[] = [];
   for (let y = 0; y < rows; y++) {
