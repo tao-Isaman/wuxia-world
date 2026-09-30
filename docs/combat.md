@@ -336,7 +336,7 @@ Per tier 32 / 37 / 42 / 41 / 26; 9 beast moves (`bst_*`, used by hunting beasts)
 
 ### Equipment (`EQUIPMENT`, `lib/game/data/equipment.ts`) — 76
 
-Per slot: W 21 · A 10 · H 9 · B 9 · BR 10 · R 8 · C 9. A loadout has 9 slots: W, A, H, B, two BR, two R, two C.
+Per slot: W 21 · A 10 · H 9 · B 9 · BR 10 · R 8 · C 9. A loadout has 10 slots: W, A, H, B, two BR, two R, two C.
 
 | Field | Meaning |
 | --- | --- |
