@@ -1,7 +1,9 @@
 /**
  * Keeps the docs pointing at real things. For every Markdown doc (root docs,
  * docs/, public/art/, review/README.md) it checks:
- *   - relative links [text](path) resolve to a file or folder in the repo;
+ *   - relative links [text](path) resolve to a file or folder in the repo,
+ *     and a #fragment (same file or another .md) names a real heading
+ *     (GitHub's slug rules);
  *   - repo paths written in backticks (`lib/world/quest-guide.ts`,
  *     `scripts/test-law.ts`, `app/manifest.ts`) exist;
  *   - `bun run <script>` commands name a script in package.json.
@@ -36,6 +38,37 @@ const problems: string[] = [];
 
 const placeholder = (p: string) => /[<>*{}…]|\.\.\.|\$|\s/.test(p);
 
+// GitHub heading anchors: lower-case, drop everything but letters, marks,
+// numbers, "_", "-" and spaces, then each space becomes "-". Repeats get -1, -2…
+function slugify(heading: string): string {
+  return heading
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
+    .replace(/<[^>]+>/g, "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^\p{L}\p{M}\p{N}_\s-]/gu, "")
+    .replace(/\s/g, "-");
+}
+const anchorCache = new Map<string, Set<string>>();
+function anchorsOf(absFile: string): Set<string> {
+  let set = anchorCache.get(absFile);
+  if (set) return set;
+  set = new Set<string>();
+  const seen = new Map<string, number>();
+  let inFence = false;
+  for (const line of readFileSync(absFile, "utf8").split("\n")) {
+    if (line.trimStart().startsWith("```")) { inFence = !inFence; continue; }
+    const m = !inFence && /^#{1,6}\s+(.*?)\s*#*\s*$/.exec(line);
+    if (!m) continue;
+    const base = slugify(m[1]);
+    const n = seen.get(base) ?? 0;
+    seen.set(base, n + 1);
+    set.add(n === 0 ? base : `${base}-${n}`);
+  }
+  anchorCache.set(absFile, set);
+  return set;
+}
+
 for (const file of files) {
   const text = readFileSync(join(ROOT, file), "utf8");
   const lines = text.split("\n");
@@ -48,11 +81,16 @@ for (const file of files) {
     if (!fence) {
       for (const m of line.matchAll(/\[[^\]]*\]\(([^)\s]+)\)/g)) {
         const target = m[1];
-        if (/^(https?:|mailto:|#)/.test(target)) continue;
-        const path = decodeURI(target.split("#")[0]);
-        if (!path || placeholder(path)) continue;
-        const abs = resolve(dirname(join(ROOT, file)), path);
-        if (!existsSync(abs)) problems.push(`${at}: link to missing ${relative(ROOT, abs)}`);
+        if (/^(https?:|mailto:)/.test(target)) continue;
+        const [rawPath, rawFragment] = target.split("#");
+        const path = decodeURI(rawPath);
+        if (path && placeholder(path)) continue;
+        const abs = path ? resolve(dirname(join(ROOT, file)), path) : join(ROOT, file);
+        if (!existsSync(abs)) { problems.push(`${at}: link to missing ${relative(ROOT, abs)}`); continue; }
+        if (rawFragment && abs.endsWith(".md") && !historical) {
+          const fragment = decodeURIComponent(rawFragment).toLowerCase();
+          if (!anchorsOf(abs).has(fragment)) problems.push(`${at}: no heading #${fragment} in ${relative(ROOT, abs)}`);
+        }
       }
     }
     // Backticked repo paths (inside or outside fences: `lib/…` in prose, or bare in code blocks).

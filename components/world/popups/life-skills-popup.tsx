@@ -30,7 +30,7 @@ interface Props {
 type Tab = "skills" | "practice" | "recipes";
 
 // Combined popup for the menu's "🌾 วิชาชีพ" button. Three tabs:
-//   • มาสเตอร์รี่    — progress bar for each of the 17 life skills
+//   • มาสเตอร์รี่    — progress bar for each of the 19 life skills
 //   • ฝึกฝน          — consumable training items + เล่นเพลง button
 //   • สูตรที่เรียน    — read-only list of learned recipes; the player
 //                      crafts at artisan NPCs (city / village / sect),

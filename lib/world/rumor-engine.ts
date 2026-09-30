@@ -81,7 +81,7 @@ const PLAYER_ECHO_DISTORT_PCT = 0.25;
 const PLAYER_ECHO_FAKE_PCT = 0.10;
 
 // Dedup window: bump weight on a matching rumor created in the last N days
-// instead of pushing a new entry (spec §3.2 + bigchange-plan decision #2).
+// instead of pushing a new entry (spec §3.2 + docs/specs/liveness-plan.md decision #2).
 const DEDUP_WINDOW_DAYS = 7;
 
 // Soft-cap early-archive threshold — a rumor older than this can be moved

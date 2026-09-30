@@ -51,7 +51,11 @@ Engine semantics (scene kinds, every effect and condition, how quests advance) a
 | regions (rumors, jail city) | `lib/world/data/regions.ts` | `regionOf` |
 | simulated NPCs, rumor text, lore | `lib/world/data/named-npcs.ts`, `rumor-templates.ts`, `lore-rumors.ts` | see [liveness.md](liveness.md) |
 
-The per-sect files are named after the **location** suffix, not the `SectId`. For example, `npcs/sects/ming.ts` holds the Sun-Moon sect, whose `SectId` is `sunmoon` and whose grounds are `sect_ming`.
+The per-sect files are mostly named after the **location** suffix, not the `SectId`:
+
+- The Sun-Moon sect (`SectId` `sunmoon`, grounds `sect_ming`) keeps its NPCs in `npcs/sects/ming.ts`. Its quests and scenes are split between `ming.ts` and `sunmoon.ts`.
+- Jinyiwei has no `scenes-content/sects/` file; its scenes are in `scenes-content/spies.ts`.
+- Lore-only sects have NPC and scene files but no quest file.
 
 ## Checks to run
 

@@ -316,4 +316,3 @@ Which actions grant which stat: [gameplay.md](gameplay.md#stats).
 - An abandoned quest can never be accepted again; a sect the hero left can never be rejoined.
 - The `_skipEventRoll` flag is still written but nothing reads it.
 - The forest practice bonus is unreachable (no forest locations).
-- Stale code comments still mention `rollRandomEvent` as the encounter roller (`lib/world/data/random-events.ts`, `lib/world/validate.ts`, `lib/stage/battle-background.ts`).

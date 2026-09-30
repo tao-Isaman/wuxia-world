@@ -2,8 +2,9 @@ import type { Skill } from "../types";
 
 // ─── Move skills (วิชาฝีมือ) ─────────────────────────────────────────
 //
-// 80+ skills across 5 tiers, organised by sect first, then by tier.
-// Sects mirror lib/world/data/world-map.ts; unaffiliated / generic
+// 178 skills across 5 tiers (incl. 9 bst_* beast moves), organised by sect
+// first, then by tier.
+// Sect names follow SECT_ORDER (lib/game/data/sects.ts); unaffiliated / generic
 // techniques live under "ยุทธจักร" (JIANGHU_SECT) at the bottom.
 //
 // Field shorthand (kept identical to demo.html for cross-referencing):

@@ -1,8 +1,8 @@
 import type { Condition, SectId } from "../types";
 
 // ─── Sect membership definitions ─────────────────────────────────────
-// Per-sect rank table + reward unlock pools. Indexed by SectId (currently
-// only "shaolin" — extend as more sects open membership).
+// Per-sect rank table + reward unlock pools. Indexed by SectId — 15 joinable
+// sects, ladders 9 → 1 (8 sects), 5 → 1 (6 sects) or 3 → 1 (gumu).
 //
 // Rank semantics:
 //   - lower number = higher prestige

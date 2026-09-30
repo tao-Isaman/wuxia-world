@@ -28,21 +28,22 @@ for (const r of LOCATION_ROUTES) {
 // to the world hub. Authors flesh these out by appending NPCs, additional routes, and
 // onEnter effects directly to the leaf entries.
 //
-// Structure:
-//   world_journey  ← the hub
-//     ├─ cat_cities    → 4 cities
-//     ├─ cat_sects     → 18 sects
+// Structure (97 leaves in 11 arrays; each array also gets a cat_* route):
+//   world_journey  ← the hub (reachable only from two tutorial dialogs)
+//     ├─ cat_cities    → 7 cities
+//     ├─ cat_villages  → 7 villages
+//     ├─ cat_sects     → 19 sects (the 20th, sect_xueyu, is in MISC)
 //     ├─ cat_isles     → 10 islands
 //     ├─ cat_terrain   → 11 mountains/cliffs
 //     ├─ cat_caves     → 12 caves/valleys
-//     ├─ cat_temples   → 5 temples/palaces (incl. the new "พระราชวังหลวง")
+//     ├─ cat_temples   → 5 temples/palaces (incl. city_lingxiao)
 //     ├─ cat_mansions  → 4 mansions
 //     ├─ cat_inns      → 4 taverns
 //     ├─ cat_homes     → 11 NPC homes
-//     └─ cat_misc      → 7 misc (incl. the new "สำนักดาบโลหิต")
+//     └─ cat_misc      → 7 misc (incl. home_player and สำนักดาบโลหิต)
 //
-// Each leaf has 1–4 directed-edge routes to other leaves built by the
-// connectivity pass below.
+// Routes between leaves come only from LOCATION_ROUTES (location-routes.ts);
+// the connectivity pass below turns each entry into two route scenes.
 
 // ─── Helpers ──────────────────────────────────────────────────────────
 
@@ -628,7 +629,8 @@ const WORLD_HUB: LocationScene = {
   onEnter: [{ t: "gotoRandom", sceneIds: ALL_LEAVES.map((l) => l.id) }],
 };
 
-// Connector — village → world hub. Referenced from village.routes in scenes.ts.
+// Connector — village → world hub. Currently orphaned: no RouteRef points
+// to it (the foothill village links to home_player instead).
 const VILLAGE_TO_WORLD: RouteScene = {
   kind: "route",
   id: "village_to_world",

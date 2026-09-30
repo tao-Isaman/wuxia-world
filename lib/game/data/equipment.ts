@@ -1,9 +1,11 @@
 import type { Equipment, EquipSlotType } from "../types";
 
-// 35 equipment items across 7 slot types.
+// 76 equipment items across 7 slot types.
 // Slot capacities (per character):
-//   W:1, A:1, H:1, B:1, BR:2, R:2, C:2  → 9 total slots
-// `eff` is a single special effect bound to the item; stat boosts go in `st`.
+//   W:1, A:1, H:1, B:1, BR:2, R:2, C:2  → 10 total slots
+// `eff` is a single special effect bound to the item. Boosts are the direct
+// fields (atkb, pdb, idb, hpb, mpb, pab, iab, spdb, evab, accb, crib, resb);
+// the legacy `st` stat block is ignored — keep it `{}`.
 export const EQUIPMENT: readonly Equipment[] = [
   // อาวุธ W — base: ATK
   { id: "W1", n: "ดาบเหล็กสามัญ", ty: "W", atkb: 20, pdb: 0, idb: 0, hpb: 0, mpb: 0, st: {}, eff: null },

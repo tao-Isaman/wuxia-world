@@ -14,7 +14,7 @@ Many describe things that no longer exist: the Three.js renderer, the 1v1 Attack
 
 - **Tracked:** the reports, JSON and text evidence, and the driver scripts.
 - **Local only:** screenshots and videos (`review/**/*.png`, `*.jpg`, `*.webm`, `*.zip` are git-ignored). A fresh clone has none of them, so many image links in the reports do not resolve.
-- **Missing:** `.pterminal/` (a Windows-side coordination folder) and `review/wave10-evidence/` are not in the repo.
+- **Missing:** `.pterminal/` (a Windows-side coordination folder) and the `wave10-evidence` folder that `wave10-visual-critic.md` cites are not in the repo.
 
 ## Reports
 

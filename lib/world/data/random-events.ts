@@ -1,13 +1,18 @@
-// Random events fired by `{ t: "rollRandomEvent" }` on a leaf's onEnter.
+// Random-event tables: probabilities, pools, zones and power scaling. The
+// roll itself is `rollWalkEvent` in lib/world/effects.ts, called by the store's
+// `walkTick` every WALK_TICK_UNITS walked, with these probabilities × 0.4
+// (entering a map rolls nothing; the `rollRandomEvent` effect is a no-op).
 //
-// On each entry the engine:
-//   1. Computes per-type probabilities (fight is fixed, treasure/meet scale
+// On each walk tick the engine:
+//   1. Checks the law (wanted marks) and betrayed-sect hunters first.
+//   2. Computes per-type probabilities (fight is fixed, treasure/meet scale
 //      with the player's LUK stat).
-//   2. Rolls a single uniform [0, 1) — first fight, then treasure, then meet.
+//   3. Rolls a single uniform [0, 1) — first fight, then treasure, then meet.
 //      Whatever doesn't fall in those bands is "nothing happens".
-//   3. Picks a specific event from the relevant pool by weight, then
-//      dispatches it: fight → triggerBattle, treasure/meet → goto a small
-//      dialog scene whose own onEnter applies the loot / lore.
+//   4. Picks a specific event from the relevant pool by weight, then
+//      dispatches it: fight → a fight-or-flee `pendingEncounter`,
+//      treasure/meet → goto a small dialog scene whose own onEnter applies
+//      the loot / lore.
 //
 // Adding new events is additive: append a record to one of the pool arrays,
 // and (for meet/treasure) define the matching scene id in scenes.ts.
@@ -35,7 +40,7 @@ export const EVENT_PROBABILITY = {
   // Fight is fixed at 15 %. Random encounters now route through a
   // fight-or-flee screen so the player can decline.
   fight: 0.15,
-  // Hunt-boost fight chance — used by `rollRandomEvent` when the player
+  // Hunt-boost fight chance — used by `rollWalkEvent` when the player
   // has at least one active quest stage with a `defeatedOpponent`
   // autoAdvance AND the target opponent spawns in the current zone.
   // Treasure / meet bands are suppressed during a hunt (the player is

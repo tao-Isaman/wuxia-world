@@ -23,8 +23,9 @@ export function resolveBattleBackground(context: BattleBackgroundContext): Battl
   if (context.mode !== "world" || !battle) return BATTLE_BACKGROUNDS.courtyard;
   if (battle.opponentId === CAPITAL_TRAINING_OPPONENT_ID) return BATTLE_BACKGROUNDS["capital-training"];
 
-  // Random events fire on location arrival. The former route is no longer
-  // recorded, so a home→capital journey must not imply a road-side fight.
+  // Random events roll while walking (walk ticks), on location and road maps.
+  // The former route is not recorded, so a home→capital journey must not
+  // imply a road-side fight.
   // Require both location anchors and both returns to agree on the city.
   if (context.currentSceneId === "city_capital" && context.lastLocationId === "city_capital" &&
       battle.onWin === "city_capital" && battle.onLose === "city_capital") {

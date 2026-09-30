@@ -161,7 +161,7 @@ Real behaviour today, found during the docs audit. Each is small and self-contai
     - `test-world-vignettes.ts` passes but is not wired into a suite.
     - `public/progress.json` is frozen at wave 11.
     - `next lint` is deprecated and will need replacing for Next 16.
-32. **Stale code comments.** Some still describe removed behaviour: `rollRandomEvent` as the encounter roller, "11 sects", "17 life skills", `battle-runtime.ts`. The guides list them where they matter.
+32. **A few stale comments remain in UI and CSS files.** Examples: the party-card rules in `app/game-hud.css` / `app/mobile-hud.css`, the column counts in `components/world/menu-bar.tsx`, `components/world/status-bar.tsx`, and `app/dq-theme.css` naming `combat-actions.css`. Comments in the engines and data tables were corrected in the docs rewrite.
 
 ## Suggested next steps
 

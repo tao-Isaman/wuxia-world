@@ -6,11 +6,20 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-09-30
 
-### Docs rewrite (this change)
+### Docs rewrite
 
-- Every doc rewritten against the code: [README](../README.md), [CLAUDE.md](../CLAUDE.md), [HANDOFF.md](../HANDOFF.md), [DESIGN.md](../DESIGN.md), [ONBOARDING.md](../ONBOARDING.md), and topic guides under [docs/](README.md).
-- Generated reference pages ([docs/reference/](reference/README.md)) built by `scripts/build-docs-reference.ts`, with a `--check` mode that fails when a page is stale.
-- Loose root documents moved under `docs/`: the Liveness Layer spec and plan, the sect template, the Shaolin sheet and the location concept list.
+- **Audit.** Every document was checked against the code, and the stale claims were corrected. Examples:
+  - save version 21, not 19;
+  - 15 joinable sects, not 11;
+  - encounters roll per walk tick, not on arrival;
+  - item stages count what the hero holds;
+  - there are six stores.
+- **Rewritten:** [README](../README.md), [CLAUDE.md](../CLAUDE.md), [HANDOFF.md](../HANDOFF.md) (now current state, known issues and next steps; its wave log moved here), [DESIGN.md](../DESIGN.md) and [ONBOARDING.md](../ONBOARDING.md).
+- **New topic guides** under [docs/](README.md): gameplay, architecture, combat, grid combat, world engine, Liveness Layer, content authoring, rendering and UI, audio, PWA, save format, testing, scripts.
+- **Generated reference pages** ([docs/reference/](reference/README.md)) for every location, sect, quest, NPC, skill, art, gear, item, recipe and opponent. `scripts/build-docs-reference.ts` builds them, and its `--check` mode fails when a page is stale.
+- **`bun run test:docs`** checks that the reference is current and that every link, backticked repo path and command in the docs resolves (`scripts/check-docs.ts`).
+- **Specs moved under `docs/specs/`** with status banners: the Liveness Layer spec and plan, the sect template (updated to the membership system and current budgets), the Shaolin sheet (rewritten from current data) and the location concept list.
+- **`review/README.md`** indexes the historical critic reports. The `public/art` provenance notes now show which sheets are active.
 
 ### Wave 25 — quest objectives and quest tracking ([#29](https://github.com/tao-Isaman/wuxia-world/pull/29))
 

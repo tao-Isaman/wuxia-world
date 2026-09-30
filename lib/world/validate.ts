@@ -49,9 +49,9 @@ export function validateAndRepair(state: WorldStateData): void {
     }
   }
 
-  // Transient engine flags must never survive a reload — `_skipEventRoll`
-  // is set by rollRandomEvent to suppress the immediate return-roll, and
-  // would silently swallow the next on-enter event if it leaked.
+  // Transient engine flags must never survive a reload. `_skipEventRoll` is
+  // still written by walk events and hunting (rollWalkEvent), though nothing
+  // reads it since encounters moved from arrival to walk ticks.
   delete state.flags._skipEventRoll;
 
   // Wanted marks: 0–5; a jail city must be a real city.
@@ -127,7 +127,7 @@ export function validateAndRepair(state: WorldStateData): void {
     state.currentMp = Math.max(0, state.currentMp ?? 0);
   }
 
-  // Life-skill xp: ensure all six keys are present and non-negative.
+  // Life-skill xp: ensure every LIFE_SKILL_KEYS entry (19) is present and non-negative.
   if (!state.lifeSkillXp || typeof state.lifeSkillXp !== "object") {
     state.lifeSkillXp = Object.fromEntries(LIFE_SKILL_KEYS.map((k) => [k, 0])) as Record<LifeSkill, number>;
   } else {

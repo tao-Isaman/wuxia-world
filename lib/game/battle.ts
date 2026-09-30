@@ -50,8 +50,9 @@ export interface BattleContext {
   // when a side has too many opposing-type skills learned. See
   // lib/game/skill-conflict.ts.
   conflict: Record<Side, ConflictFactors>;
-  // Combined stats per side (base + arts + skills + equipment, conflict-
-  // scaled). Used by skill features that scale flat damage off a stat —
+  // Combined stats per side (base + arts + skills, conflict-scaled; gear is
+  // not included — deriveAll adds it). Used by skill features that scale
+  // flat damage off a stat —
   // e.g. Skill.vitScale → `vitScale * stats[side].VIT` added to skillEffect.
   stats: Record<Side, StatBlock>;
 }

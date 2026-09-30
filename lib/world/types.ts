@@ -45,9 +45,9 @@ export interface LocationScene {
   // Optional terrain / civic tags. Drives the practice XP bonus rules in
   // lib/world/location-categories.ts and gates the "ฝึกฝน" action button.
   // When omitted the helper infers a default set from the id prefix
-  // (e.g. "sect_*" → ["sect", "mountain"], "cave_*" → ["cave"]) so existing
-  // 80+ locations don't need to be touched. Authors can override per-leaf
-  // (e.g. อู่ตั้ง explicitly tagged ["sect", "mountain"]).
+  // (e.g. "sect_*" → ["sect", "mountain"], "cave_*" → ["cave"]). No location
+  // sets this today; `leaf()` in world-map.ts has no parameter for it, so an
+  // override is added to the scene object by hand.
   categories?: readonly LocationCategory[];
   onEnter?: SceneEffect[];
 }
@@ -407,8 +407,8 @@ export interface QuestObjective {
 }
 
 // Reward grants applied by `finishQuest({ success: true })`. The dispatcher
-// in effects.ts iterates the array in order. Negative numbers are
-// rejected by the dispatcher (rewards never punish).
+// in effects.ts iterates the array in order. Negative gold / wExp / skillExp
+// amounts are ignored (rewards never punish).
 export type QuestReward =
   | { t: "gold"; amount: number }
   | { t: "item"; itemId: string; count?: number }
@@ -540,9 +540,9 @@ export type ItemUseEffect =
   // least one of `hp` / `mp` must be > 0.
   | { t: "heal"; hp?: number; mp?: number }
   // ตำราวิชา — single-use manual that teaches a move skill. Refuses (does
-  // not consume the item) if the player's *base* stat is below `reqValue`,
-  // or if the skill is already learned. Uses base stats (build.stats) so
-  // equipment / skill bonuses can't trivially bypass the gate.
+  // not consume the item) if the player's stat is below `reqValue`, or if
+  // the skill is already learned. The store checks base + skills + arts
+  // (`combinedStats` without equipment), so gear can't bypass the gate.
   | { t: "manualLearnSkill"; skillId: string; reqStat: StatKey; reqValue: number }
   // ตำราวิชา for an inner art. Same prereq + already-learned semantics.
   // `level` is the level the player learns the art at (default 1).
@@ -561,7 +561,7 @@ export const MANUAL_TIER_REQ: Record<0 | 1 | 2 | 3 | 4, number> = {
 };
 
 // ─── Life skills ──────────────────────────────────────────────────────
-// Seventeen skills across four families. Each has its own xp pool and
+// Nineteen skills (LIFE_SKILL_KEYS). Each has its own xp pool and
 // mastery level (1-5). Mastery grows with use and gates higher-tier
 // recipes / resources / activities.
 //
@@ -1124,8 +1124,9 @@ export interface ActionLogEntry {
   // Game-time when the action happened (day + within-day fraction).
   day: number;
   time: number;
-  // Free-form category — used for filtering / icon. e.g. "rest", "gather",
-  // "craft", "buy", "sell", "travel", "combat", "learn".
+  // Free-form category — used for the badge in the log popup. Written
+  // today: battle, buy, combat, craft, encounter, gather, law, learn, quest,
+  // rest, sect, sell, steal, assassinate, kidnap, use (no "travel").
   kind: string;
   // Human-readable Thai message shown in the action-log popup.
   message: string;
@@ -1137,9 +1138,9 @@ export interface PendingSpar {
 }
 
 // ─── Sect membership ──────────────────────────────────────────────────
-// A player can join one or more sects (currently only Shaolin in code,
-// extensible). Membership tracks rank (lower number = higher prestige —
-// for Shaolin: 9 → 1), accumulated sect points (spent to upgrade rank),
+// Fifteen joinable sects (SECT_MEMBERSHIPS). Intro quests allow one active
+// membership at a time. Membership tracks rank (lower number = higher
+// prestige — 9 → 1, 5 → 1 or 3 → 1), accumulated sect points (spent to upgrade rank),
 // per-quest cooldowns (sect quests are repeatable every N days), and the
 // pool of one-time art quests already redeemed plus rank-tier rewards
 // already chosen (so a "rank 9 can pick a T1 skill" reward isn't claimed
@@ -1170,7 +1171,8 @@ export interface SectMembership {
   //   "betrayed"  — left without leave. Skills can level up, but a
   //                 strong sect-hunter NPC may ambush in random events.
   //                 Cleared by completing the sect's redemption quest.
-  // Defaults to "active" via the persist migration / joinSect dispatcher.
+  // Missing means "active": readers apply `status ?? "active"` (nothing
+  // back-fills it in old saves).
   status?: "active" | "resigned" | "betrayed";
 }
 

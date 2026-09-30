@@ -404,7 +404,6 @@ These are how the code behaves today; fix them deliberately, with tests.
 6. `components/world/skill-tooltip.tsx` (`describeEffect`) has no text for `buff_cri`, `debuff_atk`, `debuff_def_eva`, `burn_hp_mp`, `poison_dmg` or `stun`, so about 18 skill tooltips show the raw effect name.
 7. `lib/game/grid/ai.ts` re-implements the damage formulas as an estimator. Change both together.
 8. Unused but dispatched: self effects `buff_cri`, `buff_iatk_reduce`, `buff_reflect_eva`; enemy effects `drain_mp`, `dispel`.
-9. Stale code comments: `types.ts` points at `lib/world/skill-conflict.ts` (it is in `lib/game/`), says art tiers are 0–4 (they are 0–5) and that types are derived from `tp` (they are not); `battle.ts` says `ctx.stats` includes equipment (it does not); the headers of `skills.ts`, `arts.ts` and `equipment.ts` give old counts.
 
 ## Changing combat safely
 

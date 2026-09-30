@@ -2,7 +2,10 @@ import type { CharacterBuild, EquipLoadout, StatBlock } from "@/lib/game";
 import type { OpponentDef, ResourceYield } from "../types";
 import { CAPITAL_TRAINING_OPPONENT } from "./capital-training";
 
-// ─── Opponent roster (35 entries, organised by tier) ────────────────
+// ─── Opponent roster: 180 entries in named blocks ──────────────────
+// The random-event roster below has 35 entries, organised by tier; later
+// blocks add hunt_* beasts, spar_* partners, hunter_* (one per SectId),
+// elite_*, law_* and the capital training apprentice.
 // Tier 0 (5): chaff — STARTER_BUILD-equivalent.
 // Tier 1 (10): early roadside threats.
 // Tier 2 (10): journeyman fighters with one move skill apiece.
@@ -1393,7 +1396,7 @@ export const OPPONENTS: readonly OpponentDef[] = [
     }) },
 
   // Hunter for betrayed xiaoyao disciples — extends the hunter pool
-  // wired into rollRandomEvent (one per joinable sect).
+  // rolled by rollWalkEvent (one per joinable sect).
   { id: "hunter_xiaoyao", name: "นักล่าพรรคสราญรมย์", ti: 4, category: "human",
     drops: [...DROPS_T4,
       { itemId: "ginseng", weight: 3 }, { itemId: "jade", weight: 2 }],
