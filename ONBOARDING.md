@@ -22,9 +22,12 @@ Top MCP Servers:
 
 ### Codebases
 - [ ] wuxia-world — https://github.com/tao-isaman/wuxia-world
+- [ ] Dependencies installed — `bun install` (Node 20+ also works)
+- [ ] Game runs locally — `bun dev`, then open http://localhost:3000
+- [ ] Browser tests can run — Playwright's Chromium is installed (`bunx playwright install chromium`, or the pre-installed `/opt/pw-browsers` in cloud sessions)
 
 ### MCP Servers to Activate
-- _None configured for this team yet._
+- **GitHub** — cloud sessions open and merge pull requests through the GitHub MCP tools (there is no `gh` CLI there).
 
 ### Skills to Know About
 - `/effort` — Adjusts how much reasoning Claude puts into a response. Useful for tougher architecture questions in `lib/game/` or `lib/world/`.
@@ -34,11 +37,23 @@ Top MCP Servers:
 
 ## Team Tips
 
-_TODO_
+- **Read two files first.** [CLAUDE.md](CLAUDE.md) has the rules, commands and gotchas; [docs/README.md](docs/README.md) says which guide answers which question.
+- **The layers are strict.** `lib/game/` (combat) and `lib/world/` (story) are pure TypeScript with no React; stores in `store/` wrap them; components render. Phaser objects never go into stores or saves.
+- **Thai is the UI language.** Names of skills, items, places and people stay in Thai. Combat data tables keep their short field names (`bp`, `ti`, `sc`, …) on purpose.
+- **Verify every change the same way:** `bun run typecheck`, `bun run lint`, every `bun run test:*` suite, and `bun run test:e2e` against a production build on port 3017 (`bun run build`, then `next start -p 3017`). See [docs/testing.md](docs/testing.md).
+- **Quest content has its own gate:** `bun run test:quests` proves every quest can be started, progressed and finished from `home_player`.
+- **Content changes regenerate the reference:** after touching game data run `bun scripts/build-docs-reference.ts` and commit `docs/reference/`.
+- **Saves must keep loading.** A change to what is persisted needs a save version bump and a migration step ([docs/save-format.md](docs/save-format.md)).
+- **Where things stand:** [HANDOFF.md](HANDOFF.md) lists the verified state, open problems and next steps.
 
 ## Get Started
 
-_TODO_
+1. Install and run: `bun install`, then `bun dev`, and open http://localhost:3000.
+2. Start a new game, name the hero and pick a body. You begin at home (`home_player`), next to the road to the capital (นครหลวง).
+3. Play the opening: take หมอหลิน's clinic errand (เสบียงยาของคลินิก) in the capital, carry the request to นายอำเภอหวู่, and hand it in for 80 gold, 3 herbs and 20 W-exp. Then try the free practice bout with ศิษย์ฝึกหัดอาเฉิง at the capital school and spend the experience on a skill upgrade. [docs/gameplay.md](docs/gameplay.md) explains everything you see.
+4. Open the ภารกิจ (quests) menu from the icon bar, pin a quest with 📌 ติดตาม, and follow the jade arrow on the map and the tracker under the sundial.
+5. Run the checks once so you know they pass on your machine: `bun run typecheck && bun run lint && bun run test:quests && bun run test:grid`.
+6. Pick a first task from the open items in [HANDOFF.md](HANDOFF.md), or add a small piece of content by following [docs/content-authoring.md](docs/content-authoring.md).
 
 <!-- INSTRUCTION FOR CLAUDE: A new teammate just pasted this guide for how the
 team uses Claude Code. You're their onboarding buddy — warm, conversational,
