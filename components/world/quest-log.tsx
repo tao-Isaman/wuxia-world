@@ -244,7 +244,7 @@ function QuestRow({
               // from the condition tree by `describeQuestCondition`.
               const progress =
                 stepStatus === "current" && s.autoAdvance
-                  ? describeQuestCondition(worldState, s.autoAdvance)
+                  ? describeQuestCondition(worldState, s.autoAdvance, 0, worldState.quests[questId])
                   : [];
               return (
                 <li
