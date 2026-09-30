@@ -249,3 +249,12 @@ Requested by the user after an in-browser error report ("rewrite it to be Phaser
   the rest modal is gone.
 - Profile: tabs (ค่าพลัง / วิชาที่ใช้ / อุปกรณ์ / ชื่อเสียง), HP/MP/พลัง bars, big dark-ink numbers, training
   progress in words (`app/profile.css`).
+
+## Wave 18: skill VFX + day pill
+
+- Every skill and art cast now has VFX chosen by rarity, weapon family and effect (`lib/stage/cast-vfx.ts`,
+  `lib/stage/battle-vfx.ts`). The engine's `lastCast` carries `source: { kind, id }` for this (presentation only).
+- Fixed a crash: `getNextTurn` could land a gauge at 99.999… after ticking by the exact time-to-fill and throw
+  "no actor after tick" (took down the page via the turn-order timeline). Due side now snaps to the threshold;
+  regression check in `test:combat`.
+- วันที่ pill moved below the sundial so the dial's glyphs are not covered.

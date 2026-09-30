@@ -178,6 +178,9 @@ export const useBattleStore = create<BattleStore>((set, get) => {
           const tA = (100 - state.gA) / gaugeRate(state.dA.Spd);
           const tB = (100 - state.gB) / gaugeRate(state.dB.Spd);
           tickGauges(state, Math.min(tA, tB));
+          // Same floating-point guard as getNextTurn: the due side acts.
+          if (tA <= tB) state.gA = Math.max(state.gA, 100);
+          if (tB <= tA) state.gB = Math.max(state.gB, 100);
         }
         const actor = peekReadyActor(state);
         if (!actor) break;

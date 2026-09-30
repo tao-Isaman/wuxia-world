@@ -203,6 +203,10 @@ export function getNextTurn(state: BattleState): Side {
     const tA = (ATB_THRESHOLD - state.gA) / gaugeRate(effectiveSpd(state, "A"));
     const tB = (ATB_THRESHOLD - state.gB) / gaugeRate(effectiveSpd(state, "B"));
     tickGauges(state, Math.min(tA, tB));
+    // Ticking by exactly the time-to-fill can land a hair under the
+    // threshold in floating point (99.99999…); the side that was due must act.
+    if (tA <= tB) state.gA = Math.max(state.gA, ATB_THRESHOLD);
+    if (tB <= tA) state.gB = Math.max(state.gB, ATB_THRESHOLD);
   }
   const actor = peekReadyActor(state);
   if (!actor) {
@@ -457,7 +461,7 @@ export function resolveSkill(
     }
 
     // Emit cast event for the UI overlay (skill name + per-hit damages).
-    emitCast(state, side, skill.n, hitCount, hitDamages, hitCrits, hitMisses, skill.ti);
+    emitCast(state, side, skill.n, hitCount, hitDamages, hitCrits, hitMisses, skill.ti, { kind: "skill", id: skill.id });
     void firstProbe;
   } else {
     logLine(state, cls, `[${state.turn}] ${nm} → <b>${skill.n}</b>${tag}`);
@@ -467,7 +471,7 @@ export function resolveSkill(
     if (skill.ee) applyEnemyEffect(state, side, skill.ee, ctx.names);
     // Buff / no-attack skills emit a single placeholder hit so the UI
     // still announces the cast name (no damage shown).
-    emitCast(state, side, skill.n, 1, [0], [false], [false], skill.ti);
+    emitCast(state, side, skill.n, 1, [0], [false], [false], skill.ti, { kind: "skill", id: skill.id });
   }
 
   if (!state.winner) {
@@ -503,6 +507,7 @@ function emitCast(
   hitCrits: boolean[],
   hitMisses: boolean[],
   tier: import("./types").SkillTierIndex,
+  source?: { kind: "skill" | "art"; id: string },
 ): void {
   castSeq = (castSeq + 1) | 0;
   const allMissed = hitMisses.length > 0 && hitMisses.every((m) => m);
@@ -515,6 +520,7 @@ function emitCast(
     hitDamages,
     hitCrits,
     hitMisses,
+    source,
   };
   void allMissed;
   state.castEndsAt =
@@ -820,6 +826,7 @@ export function resolveArtActive(
     [castCrit],
     [castMiss && castDmg === 0],
     art.ti,
+    { kind: "art", id: art.id },
   );
 
   logLine(state, "lS", `&nbsp;A:${state.hA}/${state.dA.HP} · B:${state.hB}/${state.dB.HP}`);

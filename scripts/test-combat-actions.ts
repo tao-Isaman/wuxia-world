@@ -207,4 +207,19 @@ check("turn-order forecast matches real ATB turns without mutating the battle", 
   assert.deepEqual(predictTurnOrder(state, 3), []);
 });
 
+check("turn order never loses its actor to floating-point gauge rounding", () => {
+  // Ticking by exactly the time-to-fill used to leave a gauge at 99.9999…,
+  // and getNextTurn threw — crashing the battle's turn-order timeline.
+  let seed = 7;
+  const random = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  for (let run = 0; run < 3000; run++) {
+    const state = fresh();
+    state.dA.Spd = Math.round(random() * 300);
+    state.dB.Spd = Math.round(random() * 300);
+    state.gA = random() * 99;
+    state.gB = random() * 99;
+    assert.equal(predictTurnOrder(state, 12).length, 12);
+  }
+});
+
 console.log(`${checks} combat action checks passed`);

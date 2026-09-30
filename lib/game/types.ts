@@ -472,6 +472,9 @@ export interface BattleState {
     hitDamages: number[];
     hitCrits: boolean[];
     hitMisses: boolean[];
+    // What was cast, for presentation only (battle VFX pick their look from
+    // the skill's weapon family / effects or the art's active type).
+    source?: { kind: "skill" | "art"; id: string };
   };
   // Wall-clock timestamp (Date.now()) at which the most-recent cast
   // animation finishes playing. While Date.now() < this value, the ATB

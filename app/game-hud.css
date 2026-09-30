@@ -55,7 +55,7 @@
 .sundial--night .sundial-face { fill: #c9c4e8; }
 .sundial-hour { font: 700 19px serif; fill: #3b2a12; text-anchor: middle; }
 .sundial-pointer { fill: #ffcf5a; stroke: #6d4d17; stroke-width: 1; }
-.hud-day { margin-top: -8px; padding: 0 12px; font-size: 12px; color: var(--dq-text); background: var(--dq-box-solid); border: 2px solid var(--dq-edge); border-radius: 999px; white-space: nowrap; }
+.hud-day { position: relative; z-index: 1; margin-top: 5px; padding: 0 12px; font-size: 12px; color: var(--dq-text); background: var(--dq-box-solid); border: 2px solid var(--dq-edge); border-radius: 999px; white-space: nowrap; }
 .hud-day b { font: 700 16px/1.3 var(--font-display); color: #fff3cf; }
 
 /* Arrival banner (DQ "Heliodor"). */
@@ -93,7 +93,7 @@
   .hud-purse { min-width: 0; padding: 3px 9px; }
   .hud-purse > span { font-size: 15px; } .hud-purse .hud-purse-wexp { font-size: 12px; }
   .sundial { width: 70px; height: 70px; }
-  .hud-day { margin-top: -6px; padding: 0 8px; font-size: 11px; } .hud-day b { font-size: 14px; }
+  .hud-day { margin-top: 4px; padding: 0 8px; font-size: 11px; } .hud-day b { font-size: 14px; }
   .hud-hour { display: none; }
   .arrival-banner { top: 16%; padding: 8px 18px; gap: 10px; } .arrival-banner strong { font-size: 26px; }
   .world-controls { bottom: 150px; }
@@ -109,7 +109,7 @@
   .location-hud { top: 4px; right: 8px; }
   .hud-purse { padding: 2px 10px; } .hud-purse > span { font-size: 15px; }
   .sundial { width: 64px; height: 64px; }
-  .hud-day { margin-top: -6px; font-size: 11px; } .hud-day b { font-size: 13px; }
+  .hud-day { margin-top: 3px; font-size: 11px; } .hud-day b { font-size: 13px; }
   .hud-hour { display: none; }
   .arrival-banner { top: 14%; } .arrival-banner strong { font-size: 26px; }
   .world-controls { bottom: 6px; font-size: 11px; }
