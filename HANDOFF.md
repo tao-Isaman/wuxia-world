@@ -1,312 +1,217 @@
-# Handoff: wusia-sim-web, from Codex agent-175 to the next agent
+# Handoff
 
-Written by the orchestrator on 2026-09-29 after agent-175 (Codex) hit its usage limit
-at 10:59 local. Codex credits reset on Oct 5 2026 12:20 PM. The next agent runs on
-Claude Code and continues from this worktree's branch.
+The state of the project for whoever picks it up next: what it is, what is verified, what is broken, what to do next, and how to work here.
 
-## Where the work lives
+The wave-by-wave history that used to live in this file has moved to [docs/changelog.md](docs/changelog.md).
 
-- Worktree: `D:\wusia-sim-web-wt\agent-175`, branch `pt/agent-175`, based on `main` at `f43819b` (PR #14).
-- The 15 hours of work from 2026-09-28 19:25 to 2026-09-29 10:59 was uncommitted when the agent
-  stopped. The orchestrator committed it as a single WIP commit on `pt/agent-175` so a new
-  worktree can branch from it. Nothing is pushed. Nothing is merged to `main`.
-- Shared coordination notes: `D:\wusia-sim-web\.pterminal\shared.md` (read the agent-175 entries, waves 7 to 10).
-- Design and art notes: `DESIGN.md`, `public/art/README.md`.
-- Live journal used by the review critics: `public/progress.json`, served at `/progress`.
-- Review evidence, critic reports, screenshots: `review/` (latest: `review/wave10-visual-critic.md`, `review/wave10-visual-play/`).
+**As of 2026-09-30**, `main` includes:
 
-## What the project is now
+- grid tactics combat (PR [#28](https://github.com/tao-Isaman/wuxia-world/pull/28));
+- quest objectives and quest tracking (PR [#29](https://github.com/tao-Isaman/wuxia-world/pull/29));
+- the documentation rewrite that produced this file.
 
-A Next.js 15 / React 19 wuxia sim. Exploration and battle render through Phaser 4
-(`lib/stage/`, `components/game/world-canvas.tsx`, `components/game/battle-canvas.tsx`):
-WebGL 1 when available, Phaser's Canvas renderer otherwise.
-Pure world and combat rules stay in `lib/game/` and `lib/world/`; state in `store/`.
-Save format is version 19 and must stay loadable (a version-18 migration test exists).
+## Contents
 
-History that matters: an early Phaser 3 prototype was replaced by Three.js (r186), and
-wave 14 moved both runtimes back to Phaser 4 at the user's request. Three.js required
-WebGL 2 and showed nothing on old or GPU-blocklisted browsers; Phaser falls back to Canvas.
+- [The project in one minute](#the-project-in-one-minute)
+- [Where things are](#where-things-are)
+- [Verified state](#verified-state)
+- [Known issues](#known-issues)
+- [Suggested next steps](#suggested-next-steps)
+- [Environment notes](#environment-notes)
+- [How work is done here](#how-work-is-done-here)
 
-Content at the stop: 155 NPCs, 276 unique quests, 986 scenes, all references resolve.
-Art: 15 characters, 23 sprite sheets, 304 poses under `public/art/characters/`.
+## The project in one minute
 
-## Verified state at the stop
+A Thai wuxia RPG in the browser: Next.js 15, React 19, TypeScript, Phaser 4, Zustand.
 
-- `bun run build` passes. Main route first-load JS 471 kB, `/progress` 111 kB.
-- `bun run typecheck` passes. `bun run lint` has 6 pre-existing warnings, no errors.
-- `bun run test:runtime` (10), `test:combat` (12), `test:navigation` (18), `test:opening`,
-  `test:rumors`, `test:investigation`, `test:battle-background` pass.
-- `bun run test:e2e` (Playwright, Chromium only, emulated phones): all 11 production browser
-  cases pass together in about 2.6 minutes. Run against a production build, not `next dev`.
-- Content audit: `bun scripts/audit-content.ts`.
-- A production preview was served at http://127.0.0.1:3017. That process is probably gone; restart
-  with `bun run build && bun run start -p 3017` (or whatever port the tests expect; check `playwright.config.ts`).
+- **Exploring.** The hero walks painted maps: 102 places, 128 roads.
+- **Doing.** They talk to 157 NPCs, take 276 quests, join one of 15 sects, gather, craft, steal, and land in jail.
+- **Fighting.** Battles are turn-based tactics on a 10 × 7 board.
+- **Code.** Two pure engines (`lib/game`, `lib/world`) sit under Zustand stores and React / Phaser views. The world saves to `localStorage` (version 21).
 
-## Review loop the previous agent used
+Start with [README.md](README.md), then [docs/README.md](docs/README.md).
 
-Each wave: builder makes changes, rebuilds, reruns the suites above, then a fresh subagent
-"critic" plays the production build and writes `review/waveN-*.md` against the reference game.
-**As of 2026-09-29 the single benchmark is Hero's Adventure: Road to Passion** (Steam app 1948980;
-manifest `review/baseline/reference-1948980.json`, captures fetched locally as `ref-1948980-*.jpg`,
-which are gitignored). Dokapon Kingdom is no longer a goal; older wave reports still mention it as history. The recurring critic
-verdict through wave 9 and 10: locations look good, but character and event staging still falls
-short of the references. Actors read as "soft clusters" at faces, hands and cloth edges at combat scale.
+## Where things are
 
-## Open items, in priority order
+| What | Where |
+| --- | --- |
+| Repository | github.com/tao-Isaman/wuxia-world — `main` is the release branch; work happens on a feature branch and merges by pull request |
+| Guides | `docs/` — index at [docs/README.md](docs/README.md) |
+| Content reference | `docs/reference/` — generated by `bun scripts/build-docs-reference.ts` |
+| Working rules for Claude Code | [CLAUDE.md](CLAUDE.md) |
+| Art / UX direction | [DESIGN.md](DESIGN.md) |
+| History | [docs/changelog.md](docs/changelog.md) |
+| Old review evidence | `review/` (history; see [review/README.md](review/README.md)) |
+| Old live journal | `/progress` — frozen at wave 11 |
 
-1. Wave 10 critic verdict on the new production output was still pending. The neutral A/B on the
-   hero sprite chose candidate B (larger face, clearer hands and sleeves, stronger punch silhouette).
-   Full cast, new directions and actual battle playback still need review.
-2. "Readability v2" sprite candidates were being generated when the limit hit: f1, f2, m1, m2, m3,
-   merchant, monk (`public/art/characters/*-readability-v2*`). The m1 candidate is NOT active in the
-   game. Nothing from v2 is wired in yet. Decide whether to adopt them, then update the atlas and
-   rerun the art-loading test.
-3. Clinic local-return pacing and ledger acknowledgment followup was underway. Check the diff in
-   `lib/world/clinic-preparation.ts`, `components/world/dialog-stage.tsx` and the scenes-content files.
-4. Visible choice numbering correction in dialogue was done but awaited a rebuild to verify.
-5. Known but unfixed from the first scan: character names flow into raw HTML in battle logs
-   (`components/game/battle-log.tsx`), so escape them. The 30 authored lore rumors are seeded only
-   by the smoke script, not at runtime.
-6. Unverified areas: the full campaign end to end, and collision on every map. Only opening, home
-   and capital flows were browser-tested.
+Deploys are implied to be on Vercel (`VERCEL_GIT_COMMIT_SHA` sets the service-worker build id). There is no CI workflow in the repo, so the checks below are run by hand.
 
-## Suggested first hour for the new agent
+## Verified state
 
-1. Read `shared.md` agent-175 entries and `DESIGN.md`.
-2. `bun install`, `bun run build`, `bun run typecheck`, `bun run test:e2e`. Confirm the numbers above.
-3. Open the preview on a phone-sized viewport and play the opening through the clinic quest and
-   one capital battle. Compare against `review/wave10-visual-critic.md`.
-4. Pick up open item 1 or 2 and keep the wave cadence: change, rebuild, test, critic, note in `shared.md`.
+Checked on 2026-09-30 for the docs rewrite:
 
-## Coordination rules
+| Check | Result |
+| --- | --- |
+| `bun run typecheck` | passes |
+| `bun run lint` | passes: 0 errors, 5 known warnings |
+| `test:runtime` | 9 checks pass |
+| `test:combat` | 15 checks pass |
+| `test:opening` | 12 checks pass |
+| `test:navigation` | 19 tests pass |
+| `test:battle-background` | 2 checks pass |
+| `test:rumors` | 5 + 4 checks pass |
+| `test:investigation` | 5 checks pass |
+| `test:audio` | 4 checks pass |
+| `test:law` | 8 checks pass |
+| `test:walk` | 1 check passes |
+| `test:grid` | 14 checks pass |
+| `test:grid-ai` | 13 checks pass |
+| `test:grid-skills` | 7 checks pass |
+| `test:grid-store` | 10 checks pass |
+| `test:quests` | the campaign audit passes (276 quests, 102 reachable locations); 213 item / kill / objective quests hand in through the real store; guidance covers 650 of 657 stages |
+| `test:docs` | the generated reference is current; every link, repo path and command in the docs resolves |
+| `bun scripts/audit-content.ts` | 157 NPCs · 276 quests · 996 scenes, all references resolve |
+| `bun run test:e2e` | 19 Playwright tests, against a production build on :3017 |
 
-- Append progress to `D:\wusia-sim-web\.pterminal\shared.md` under a new heading with your agent name.
-- Message the orchestrator with a `{"to":"orchestrator","from":"<agent>","text":"..."}` line in
-  `D:\wusia-sim-web\.pterminal\messages.jsonl`. Write UTF-8 with no BOM (see README-agents.md).
-- Commit as you go on your own `pt/<agent>` branch. Do not leave a day of work uncommitted again.
+Not verified:
 
-## Takeover log
+- **Browsers.** Only Chromium has run the browser tests, and only with emulated phone viewports, never physical phones.
+- **Quests by hand.** No one has played all 276 quests by hand; the quest audits stand in.
+- **Balance.** No systematic balance pass has been done since the grid battle.
 
-### 2026-09-29 — Claude Code agent (resumed-7116b3f9) takes over
+## Known issues
 
-- Read this doc. Could not read `D:\wusia-sim-web\.pterminal\shared.md` from the worktree
-  sandbox (permission denied outside the worktree); waves 7 to 10 notes still need a re-read
-  once access is granted.
-- Verified on this branch: `bun run typecheck` passes. Build, lint, unit suites and e2e not
-  yet re-run by the new agent.
-- `.gitignore` now excludes `.pterminal/` so coordination files never land in a commit.
-- Branch `pt/agent-175` pushed to `origin` (github.com/tao-Isaman/wuxia-world) so the WIP
-  commit `e50bcf1` is no longer local-only.
-- Planned first task: open item 2 (readability-v2 sprites), folding in item 5
-  (escape names in `components/game/battle-log.tsx`) in the same wave.
+Real behaviour today, found during the docs audit. Each is small and self-contained unless noted.
 
-### 2026-09-29 — wave 11 (Claude Code, branch `claude/nice-lamport-hc9w5n`)
+### Quests and sects
 
-Benchmark narrowed to Hero's Adventure: Road to Passion only (DESIGN.md, `/progress`, Dokapon manifest removed).
+1. **Abandoned quests can never be taken again.**
+   - `abandonQuest` marks the quest `failed`.
+   - `acceptQuest` refuses failed quests, and `isQuestOfferable` hides any quest with an entry.
+2. **Leaving a sect blocks rejoining it forever.** Any membership entry, including resigned and betrayed ones, blocks both the `joinSect` action and the reward.
+3. **สำนักสราญรมย์ has no redemption quest.** A betrayer's `hunter_xiaoyao` never stops.
+4. **`joinRequirements` is only read by the store `joinSect` action, which no UI calls.** Real joins go through the intro quest's `joinSect` reward, which does not check it.
 
-Baseline re-verified before changes: build, typecheck, lint (6 warnings, 0 errors), all 7 `test:*`
-suites, content audit, and `test:e2e` 11/11 against the production build.
+   The intro quests' `prereqs` carry the same gates today, so nothing is broken yet, but the two can drift apart.
+5. **Two player echoes never fire.**
+   - `sect_join`, because joins go through the quest reward, which does not echo.
+   - `quest_major_complete`, because no quest sets `isMajor`.
 
-Status of the open items above:
-1. Wave-10 visual gap: addressed by items 2 and the two HUD changes below. Evidence:
-   `review/wave11-evidence/` (`review/wave11-driver.ts`, production build on :3017).
-2. **Readability v2 sprites adopted** for m1–m4, f1–f4, elder, monk, merchant and bandit (+ v2
-   north/south supplements for m1, m2, m3, f1). They were re-packed onto exact equal grids by
-   `scripts/repack-character-sheet.ts` (component clustering, no resampling). The old sheets are kept as `*-v1.png`.
-   Character atlas audit: 304 poses, none empty or clipped. Still to do: v2 north/south supplements for m4, f2, f3, f4.
-3. Clinic pacing/ledger: covered and passing in `test:opening`, `test:investigation` and the e2e opening/investigation cases.
-4. Choice numbering: verified visible ("1.", "2.") in the production dialogue capture.
-5. Both sub-items were already fixed: `escapeBattleText` in `lib/game/effects.ts`, and
-   `seedLoreRumors` runs at runtime in `store/world-store.ts`.
-6. **Collision: done for all 100 painted maps.** `home_player` and `city_capital` keep their hand-tuned
-   shapes. The other 98 now have 850 grounded footprints (building bodies, wells, stall tables, ponds, rock
-   piles, tree clumps) in `lib/stage/world-footprints-data.ts`, generated by `scripts/build-map-footprints.ts`.
-   Perimeter walls, gates, paths and plazas stay open by rule. Author or adjust a map with
-   `bun scripts/map-collision-tool.ts <id> <json> <overlay.png>`. `test:navigation` proves that on every
-   painted map the spawn is open and every NPC, exit and service is reachable (walk ends within 100 px).
-   **Campaign completability: verified structurally.** `bun run test:quests` runs
-   `scripts/audit-quest-completion.ts`, which traces every quest's real engine path: start (giver popup,
-   sect popup, or `startQuest`), each stage (`autoAdvance` or a reachable `advanceQuest`/`finishQuest`), and
-   turn-in. It also checks that items, opponents, NPCs and locations are reachable from `home_player`.
-   It found and fixed:
-   - The foothill tutorial area (`village`, `tavern`, `viewpoint`, the elder, `first_steps`) was orphaned.
-     It is now linked two-way with `home_player`.
-   - Silk was never sold. The Suzhou market now sells it (3 sect quests and 2 recipes need it).
-   - `qst_wudang_traitor_disciple`, `qst_shaolin_proof_of_heart` and `qst_shaolin_wudang_joint` stalled at
-     stage 0 because their advance scenes were unlinked. Old saves stuck there can abandon and re-accept.
-   Result: all 276 quests can be started, progressed and finished, and all 101 locations are reachable.
-   `scripts/test-quest-dead-ends.ts` replays the fixes through the real store. The older
-   `audit-quest-flow.ts` heuristic still lists false positives for NPC turn-ins. A manual playthrough of every
-   quest in a browser has not been done; the structural audit plus e2e opening/investigation flows stand in for it.
+   Resign or betray through quest rewards also skip the echo, the log line and betrayal's evil +5.
+6. **Resigning freezes only battle xp** for that sect's skills. Practice, w-exp level-ups and quest `skillExp` still raise them.
+7. **Store sect actions don't check status.** `upgradeSectRank`, `pickSectReward` and `acceptSectQuest` ignore it; only the UI hides inactive memberships.
 
-New benchmark-driven UI (plus a brief "ถึงตาเจ้า" turn callout when the player's turn opens, hidden under reduced motion):
-- Dialogue: large face-cropped speaker bust column (188 px desktop, 104 px phone, 132 px short landscape),
-  up from 80/60/38 px. It is Hero's Adventure's "face beside the words" framing within our opaque 256 px portraits.
-- Battle: turn-order timeline in the status bar (`predictTurnOrder` in `lib/game/battle.ts` runs the real
-  `getNextTurn` on a gauge-only copy; unit-tested in `test:combat`). This mirrors Hero's Adventure's action timeline.
+### Content data
 
-Environment note for cloud sessions: Playwright 1.63 expects Chromium build 1243, and this container has 1194
-under `/opt/pw-browsers`. Symlink the 1194 binaries into `chromium-1243/chrome-linux64/chrome` and
-`chromium_headless_shell-1243/chrome-headless-shell-linux64/chrome-headless-shell`.
+8. **Twelve non-artisan recipes have no crafting button** (drawing, writing, mining, hunting, fishing, herbalism, venom, woodcutting). The store could craft them anywhere, but only the artisan popup calls `craftRecipe`.
+9. **A dangling drop.** `spar_shaolin_xianren`, `spar_shaolin_abbot_huiyuan` and `spar_shaolin_luohan` drop `man_ne2`, which is not an item. `audit-content.ts` does not check drop tables.
+10. **Unused content:**
+    - `spar_xiaoyao_master` is referenced by nothing.
+    - Six gathering nodes are placed nowhere: `mine_rock`, `mine_silver`, `mine_gold`, `hunt_legendary`, `herb_rare`, `venom_scorpion`.
+    - Three recipes are sold nowhere: `tailor_leather`, `chef_stew`, `accessory_jade_pendant`.
+11. **No way to learn `sl_long_dharma`.** It sits in no rank pool, hall, manual or reward.
+12. **Unread or orphaned fields:**
+    - `NpcDef.questIds` is never read by code.
+    - The `village_to_world` road is orphaned.
+    - `world_journey` is reachable only from two tutorial dialogs.
+13. **A missing location.** The Liveness `find_treasure` reroll points at `cave_heimu`, which does not exist.
 
-### 2026-09-29 — wave 12: Hero's Adventure UI pass (Claude Code, branch `claude/nice-lamport-hc9w5n`)
+### Liveness (NPC simulation and rumors)
 
-Goal: bring the whole UI up to the Hero's Adventure: Road to Passion standard. Evidence is captured by
-`review/ui-driver.ts <label>` → `review/ui-evidence/<label>/` (desktop 1440×900, phone 390×844, landscape 844×390).
-Independent critiques: `review/wave12-ui-critic.md` (first pass, about 65–70 %) and `review/wave12-ui-critic-2.md`
-(about 74 %). The fixes after pass 2 are verified in `review/ui-evidence/wave12h/`.
+14. **Birthdays stop after year one.** Aging checks `simDay % 365` on a 7-day grid.
+15. **Dead masters keep working.** They stay on their map and keep offering quests.
+16. **Heartland inns never hear the masters' news.** No simulated NPC lives there, and rumors don't spread between regions.
+17. **Market and sect rumors are hard to reach.**
+    - Sect-internal news is only in the "อื่น ๆ" drawer.
+    - Sun-Moon members never get it (`sect_ming` ≠ `sunmoon`).
+    - The only market has no rumor spot.
+    - The rumor banner never renders.
 
-What changed:
-- **Menus** (`components/ui/modal.tsx`, `components/ui/game-menu-context.tsx`, `app/game-menu.css`): menu-bar popups open in one
-  full-screen tabbed shell (keys 1–8, red ✕, pixel tab icons in titles). All popups use dark lacquer with bronze frames; light
-  utility colours and small text are remapped centrally. Portaled popovers go dark while a panel is open.
-- **HUD** (`components/world/map-hud.tsx`, `app/game-hud.css`): round portrait, status strip, place plaque, a sundial with the
-  twelve double-hours plus Thai hour/phase, and a medallion menu row with number keys.
-- **World** (`lib/stage/world-runtime.ts`, `components/world/location-map.tsx`): green NPC name tags kept on screen, !/? quest
-  markers from the same rules as the NPC popup, and far service/exit badges fade.
-- **Bag / skills / profile / shop / NPC card**: rarity-framed item tiles (`components/ui/wuxia/item-tile.tsx`,
-  `lib/ui/rarity.ts`), a round skill loadout, a hero block, a portrait band.
-- **Dialogue**: parchment box, name tab, framed portrait plate breaking the top edge.
-- **Encounter**: confrontation panel with a tier colour and F/Esc.
-- **Battle**: round hotbar (keys 1–9, cooldown dial, riposte badge), side-coloured turn queue, two docked log lines, big
-  gold/red damage numbers with a 暴擊 crit tag.
+   More detail: [docs/liveness.md](docs/liveness.md#known-gaps).
 
-Still open from the critiques (needs new systems or art, not UI polish):
-- Battle has no Item / Retreat / Auto actions; the engine has none of these, so a UI rail was not faked.
-- Item icons are category glyphs in rarity frames; the game has no item artwork. Drop 32 px sprites into ItemTile when drawn.
-- Painted NPC portraits are opaque squares, so the dialogue bust is a framed plate rather than a cut-out.
-- Life-skill and rest rows still use their data emoji (⛏ 🪓 🍵).
+### UI and rendering
 
-### 2026-09-29 — wave 13: unique NPCs + Dragon Quest XI HUD (Claude Code)
+18. **The quest tracker may cover the "อื่น ๆ" drawer button** at the top right, on the six maps that show it (including `home_player`). Not yet confirmed in a browser.
+19. **Action-log names.** The kinds `battle`, `encounter`, `steal`, `assassinate` and `kidnap` show their raw English names; the `travel` label is never used.
+20. **`/progress` fills the cache.** Its 5-second polling of `/progress.json?t=…` fills the service worker's 900-entry asset cache and can evict real art.
+21. **Night disagrees.** The sundial calls 戌–丑 night; the lighting and music use ชั่วยาม 8–11.
+22. **Raw effect names.** Skill tooltips have no text for `buff_cri`, `debuff_atk`, `debuff_def_eva`, `burn_hp_mp`, `poison_dmg` and `stun`, so about 18 skills show the raw name.
 
-**Unique NPC characters.** All 159 NPCs had a unique painted body (`public/npcs/body/<id>.png`) but the world drew
-them from 7 shared costume sheets. `bun scripts/build-npc-sprites.ts` turns each painting into native-pixel sprites
-(trim, palette reduction, hard alpha, 1 px outline): `public/npcs/pixel/` (72 px, world) and
-`public/npcs/pixel-battle/` (150 px, battle). `npcPixelSprite` / `npcBattleSprite` in `lib/world/data/npc-portraits.ts`
-feed the world runtime (unique single-pose sprite, archetype sheet as fallback), sparring battles and the turn
-queue. The sprites are single poses, so they move with the engine's lunge, recoil and breathing, not frame
-animation. Adding a new NPC: drop its painted body PNG in `public/npcs/body/` and rerun the script.
+### Combat
 
-**HUD standard: Dragon Quest XI** (reference captures in `review/baseline/dq11/`, gitignored), kept in wuxia dress:
-- Exploration (`components/world/map-hud.tsx`, `app/game-hud.css`): one เมนู button (M) opens a DQ command window with a
-  gold ☛ cursor (arrows, 1–8). There is a party card bottom-right (portrait, green name, pill HP/MP/พลัง gauges), a
-  purse in ตำลึง plus the sundial top-right, a ringed minimap bottom-left that follows the hero from the canvas
-  data attributes, a gold name banner and autosave quill on arrival, and floating +/− gold deltas.
-- Menus, shops and popups (`app/dq-theme.css`, loaded last): parchment scrolls with a cinnabar ribbon title,
-  lacquer-brown tabs, and paper-inked rarity text.
-- Dialogue: a translucent lacquer box with a name tab and gold ☛ choice cursor; the portrait plate breaks the edge.
-- Battle: a DQ command list (medal, move name, cost, number key, ☛ cursor) beside a message box (last log lines plus
-  the pointed move), with lacquer-brown fighter plates and a green player name.
-- Accessibility: decorative CSS glyphs use `content: "☛" / ""` so they stay out of accessible names (this broke
-  e2e once).
+23. **`mult_iatk` / `mult_atk` passives work only for `taiji` and `scholar`.** Nine other arts carry them for nothing.
+24. **Hunt packs never spawn.** The `hunt_boar` and `hunt_alpha_wolf` packs don't appear, because hunting fights are 1v1.
+25. **Art actives skip several modifiers:** mastery, stacks, `pct_atk`, the target's `debuff_def` and gear `pct_reduce`. A stunned caster still pays MP.
 
-**Phaser.js: adopted in wave 14** (see below). The earlier "decided against" note is superseded.
+   More: [docs/combat.md](docs/combat.md#known-quirks) and [docs/grid-combat.md](docs/grid-combat.md#known-gaps).
 
-## Wave 14: Phaser 4 runtimes (replaces Three.js)
+### Balance and data
 
-Requested by the user after an in-browser error report ("rewrite it to be Phaser.js").
+26. **The forest practice bonus is unreachable.** No location id is `forest_` / `grove_`.
+27. **Power jumps early.** Joining any sect that starts at rank 5 sets encounter power to 0.5 at once, which scales every opponent ×1.3.
 
-- `lib/three/` was renamed `lib/stage/`. The pure modules (navigation, placement, footprints, occlusion
-  contours, vignettes, battle backgrounds, map probe, types) are unchanged.
-- `lib/stage/phaser-stage.ts`: one `Phaser.Game` per stage (`Phaser.AUTO`, `pixelArt`, `Scale.NONE`, drawing
-  buffer = host size × devicePixelRatio capped at 2, canvas styled 100 %). Phaser's own input is disabled:
-  keyboard, pointer and marker picking stay on DOM listeners so modal pause rules and tests are unchanged.
-  `data-renderer="phaser"`, plus `data-renderer-backend="webgl" | "canvas"` on the host.
-- `lib/stage/world-runtime.ts` and `battle-runtime.ts` are line-for-line ports of the Three versions: same
-  exported API, same dataset contract (player x/y/frame/motion/facing, screen bounds, visible props, fighter
-  frames/motions, cast/impact counters, view size, background image, paused), same timings. Map units
-  are y-down now, so there is no y flip anywhere.
-- The warm character shader is now baked once into each atlas's pixels (`warmWorldCharacter` in
-  `world-style.ts`, in linear light). The lantern/night veil is a canvas redrawn only when the hour
-  changes, or at ~10 fps while lanterns flicker (`world-lighting.ts`).
-- A lost WebGL context still surfaces the retry control (e2e covers it; the test uses `getContext("webgl")`).
-- Verified: tsc, lint (existing warnings only), 8 unit suites, e2e 11/11, and smoke runs in Chromium with
-  WebGL disabled (`--disable-webgl --disable-3d-apis`): world, night veil and battle all render on Canvas.
-- `three` and `@types/three` were removed from package.json.
+### Tooling
 
-## Wave 15: installable PWA
+28. **`sharp` is undeclared.** It is used by `build-npc-sprites.ts`, `build-pwa-icons.ts`, `build-route-variants.ts` and `map-collision-tool.ts`, but not listed in `package.json`; it arrives through Next.
+29. **Footprints can't be rebuilt safely.** The per-map footprint JSON sources are not in the repo, so `build-map-footprints.ts` cannot rebuild the data without dropping maps.
+30. **Dangerous scripts:**
+    - `split-sects-file.ts` and `append-templated-quests.ts` are one-off migrations; rerunning them empties the sect barrels or duplicates 20 quests.
+    - `audit-quest-flow.ts` is a legacy audit that fails with 168 false positives.
+31. **Loose ends:**
+    - `test-world-vignettes.ts` passes but is not wired into a suite.
+    - `public/progress.json` is frozen at wave 11.
+    - `next lint` is deprecated and will need replacing for Next 16.
+32. **Stale code comments.** Some still describe removed behaviour: `rollRandomEvent` as the encounter roller, "11 sects", "17 life skills", `battle-runtime.ts`. The guides list them where they matter.
 
-- Manifest (`app/manifest.ts`), home-screen icons from the hero sprite (`scripts/build-pwa-icons.ts` → `public/pwa/`),
-  Apple web-app meta, `viewport-fit=cover` plus left/right notch insets for the HUD (`app/pwa.css`).
-- `public/sw.js` caches the app shell, hashed Next chunks and visited art so the game reloads offline; saves were
-  already in localStorage, and installed apps now request persistent storage.
-- Install control on the title screen and in the เมนู window (iOS shows Add-to-Home-Screen steps).
-- Verified: Chrome reports no installability errors; e2e `pwa.spec.ts` reloads the world offline (12/12 e2e pass).
+## Suggested next steps
 
-## Wave 16: mobile-first HUD
+In rough priority order:
 
-- Removed the เมนู command box, the ringed minimap and the floating journey guide ("เตรียมเดินทางครั้งต่อไป").
-- Top icon bar for every menu section (`hud-iconbar`), floating left-thumb joystick (`touch-stick.tsx`,
-  runtime `setStick` / `tapAt`), and a context action button when the hero stands next to an NPC, sign or exit
-  (runtime `onNearby`). Styles in `app/mobile-hud.css`.
-- E2E: new `mobile-controls.spec.ts` (icons, joystick drag, action button); 13/13 pass.
+1. **Quest and sect dead ends** (issues 1–3): allow re-accepting an abandoned side quest (or hide abandon for one-shot story quests), allow rejoining a resigned sect or say clearly that it is final, and add `qst_xiaoyao_redemption`.
+2. **Data fixes:**
+   - Replace `man_ne2` with a real manual, or add the item.
+   - Place or delete the six unused nodes.
+   - Sell or delete the three orphan recipes.
+   - Make `audit-content.ts` check drop tables.
+3. **Non-artisan crafting** (issue 8): a craft tab in the life-skills popup for recipes whose skill is not an artisan profession.
+4. **Liveness polish:**
+   - Hide or replace dead masters.
+   - Fix aging.
+   - Give the heartland some news (a named NPC there, or region spread).
+   - Put a rumor spot on `market_miao` and sect grounds.
+5. **UI fixes:**
+   - Check and fix the tracker / drawer overlap.
+   - Add action-log labels.
+   - Stop caching `/progress.json`, or retire `/progress`.
+   - Add tooltip text for the six effects.
+6. **Combat:**
+   - Make `mult_*` passives generic.
+   - Let hunting use packs.
+   - Do a balance pass on encounter power scaling.
+7. **Tooling:**
+   - Declare `sharp`.
+   - Wire `test-world-vignettes.ts`.
+   - Move off `next lint`.
+   - Add a CI workflow that runs typecheck, lint and the `test:*` suites.
 
-## Wave 17: HUD polish
+## Environment notes
 
-- Party card (HP/MP/พลัง) moved top-left; icons beside it (landscape/desktop) or in a row beneath (portrait).
-- Context action button made compact; right thumb column bottom-up: พัก button, action, จุดหมาย.
-- พักผ่อน left the icon bar: a round button opens a small bubble of rest choices (`rest-quick-action.tsx`);
-  the rest modal is gone.
-- Profile: tabs (ค่าพลัง / วิชาที่ใช้ / อุปกรณ์ / ชื่อเสียง), HP/MP/พลัง bars, big dark-ink numbers, training
-  progress in words (`app/profile.css`).
+- **Commands:** `bun install`, `bun dev` (:3000), `bun run build`, `bun run start -p 3017`.
+- **Browser tests** need a production server on :3017. `pwa.spec.ts` can only pass there, because the service worker registers only in production. See [docs/testing.md](docs/testing.md#running-e2e-against-a-production-build).
+- **Cloud containers:** Playwright 1.63 wants Chromium 1243, but `/opt/pw-browsers` ships 1194. Link the 1194 binaries into the 1243 folders ([docs/testing.md](docs/testing.md#cloud-container-notes) has the commands). Don't run `playwright install`.
+- **Stopping the server:** use `fuser -k 3017/tcp`. `pkill -f "next start"` can kill your own shell.
+- **Never run bare `bun test`.** It picks up the Playwright specs; use the `test:*` scripts.
+- **Harmless warnings.** Four suites print harmless `[zustand persist middleware] Unable to update item` warnings.
+- **GitHub** is reached through the GitHub MCP tools in cloud sessions (no `gh` CLI).
+- **Other environments.** Windows-only tools (`*.ps1`) cannot run in the Linux container. The old coordination paths (`D:\wusia-sim-web\…`, `.pterminal/`) are from the original Windows workstation and do not exist here.
 
-## Wave 18: skill VFX + day pill
+## How work is done here
 
-- Every skill and art cast now has VFX chosen by rarity, weapon family and effect (`lib/stage/cast-vfx.ts`,
-  `lib/stage/battle-vfx.ts`). The engine's `lastCast` carries `source: { kind, id }` for this (presentation only).
-- Fixed a crash: `getNextTurn` could land a gauge at 99.999… after ticking by the exact time-to-fill and throw
-  "no actor after tick" (took down the page via the turn-order timeline). Due side now snaps to the threshold;
-  regression check in `test:combat`.
-- วันที่ pill moved below the sundial so the dial's glyphs are not covered.
-
-## Wave 19: music and sound effects
-
-- Procedural soundtrack and SFX (no audio files): `lib/audio/songs.ts` (pentatonic scores), `engine.ts`
-  (synth instruments, reverb, sequencer), `cast-sfx.ts` (skill sounds from the VFX profile).
-- Music follows the screen (title / world / night / battle) with jingles for encounters, victory, defeat,
-  quest done and level up; coins, rest, travel and button ticks have small cues.
-- ♪ settings bubble (music / effects on-off + volume) in the top icon bar, battle header and title screen.
-- Tests: `bun run test:audio` (song structure, pentatonic leads), e2e `audio.spec.ts`. Offline renders of every
-  track had no clipping (peaks 0.13–0.41).
-
-## Wave 20: walk ticks, wanted marks, quest guide, busy overlay, full-screen dialogue
-
-- HUD: smaller icons in a 2-row grid under the HP card (offsets tuned per breakpoint in `mobile-hud.css`).
-- Random events roll while walking (`onWalkTick` every 220 map units → `walkTick` → `rollWalkEvent`), never on
-  map change. Test switch: `localStorage["wuxia-random-events"]="off"` (seeded by `playwright.config.ts`).
-- Failed steals add หมายจับ marks (1–5, shown as `⛓●●○○○`); walk ticks may bring constables, imperial guards or
-  bounty hunters (`lib/world/law.ts`). Losing sends the player to the region's city jail for 2 days per mark
-  (`jail_cell` scene; bribe 300 gold). Save v20.
-- Activities show the hero working behind a progress bar (`.work-overlay[data-world-busy]`) that blocks taps,
-  the action button and menu hotkeys until the action is done.
-- Quest guide (`lib/world/quest-guide.ts`): the quest log names who to find and where, with a นำทาง button; the
-  map shows a jade arrow over the target / the exit toward it, plus an edge pointer when off-screen.
-- Talking to an NPC is full-screen and auto-fits text so nothing scrolls.
-- Tests: `bun run test:law`; e2e `law-guide.spec.ts`; dialogue/investigation/opening specs updated for the new
-  rules (no encounter on arrival or goodbye; dialogue fits without scroll).
-
-## Wave 21: dialogue fit everywhere, social activities in towns
-
-- Quest-offer / event dialogs that aren't staged on a map now use the full-screen `DialogStage` too (auto-fit, no scroll).
-- Chess and begging moved to cities + villages only (removed from NPC homes, inns and wild sects), placed on
-  street corners near the market / tea house; hidden map spots respect the node's `visibleIf`.
-- e2e: new dialogue fit check at 1000×450, 844×390 and 390×844; characters spec gets a 150 s budget.
-
-## Wave 22: jail map, retreat, places tabs, activity glyphs, walk cycle, no party card
-
-- Jail is a real map (`jail`, painted by `scripts/build-jail-map.ts`): locked in until the sentence ends; labour,
-  dice, meditation, a risky escape, the gate (serve the rest at once), a prisoner and a bribable guard. Save v21.
-- Battle: ถอยหนี replaces ตั้งรับ / รวบรวมปราณ in the fight tab (Spd-based escape, no winner, no rewards).
-- จุดหมาย has tabs (บุคคล / เส้นทาง / สถานที่ / กิจกรรม); every map activity has its own badge glyph and emoji.
-- Walk cycle alternates feet (left up / right up) via `lib/characters/walk-cycle.ts`.
-- Top-left party card removed; icons sit in the corner; wanted / sentence chips float top-centre.
-- Tests: `test:walk`, law checks for the jail map, combat retreat check, e2e jail map + retreat; opening spec
-  now wins the tutorial bout with punches.
-
-## Wave 23: item / kill quests always hand in
-
-- Bug: fetch quests (e.g. แร่เหล็กสำหรับตีเหล็ก) counted only items gained after accepting while the quest log
-  showed the bag total — 10/10 in the log, stage never advanced, no hand-in. Item stages now count what the
-  player holds; kill stages keep "since accepting" and the log now shows that same number.
-- The store re-checks quest progress after any inventory / kill change (subscription), not only on scene moves.
-- `scripts/test-quest-turnins.ts` (in `test:quests`): all 156 item/kill quests accept → progress → hand in → done.
+- **Branch.** Develop on a feature branch cut from `main` (for Claude Code sessions, the branch the session names). Merge by pull request.
+- **Verify before pushing:**
+  - typecheck and lint;
+  - every `bun run test:*` suite;
+  - `bun run test:e2e` against a production build for anything that touches UI or rendering.
+- **Content changes:** also run `bun scripts/audit-content.ts` and regenerate the reference (`bun scripts/build-docs-reference.ts`; `test:docs` fails if you forget).
+- **Save changes:** bump the version and follow [docs/save-format.md](docs/save-format.md#changing-the-save).
+- **Keep the docs true.** Update the guide for the system you touched, add a line to [docs/changelog.md](docs/changelog.md), and update this file's verified state and known issues.

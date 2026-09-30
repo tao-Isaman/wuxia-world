@@ -1,237 +1,104 @@
-# กำลังภายใน — Battle Sim
+# กำลังภายใน — ยุทธภพ
 
-Thai-language wuxia / martial-arts text-RPG with a 1v1 turn-based battle layer. The world is a network of cities, sects, mountains, valleys, islands and homes; the combat sim drops in whenever a fight is triggered.
+A Thai-language wuxia RPG that runs in the browser. You walk a painted world of cities, sects, mountains, caves and islands. You take quests, join one of fifteen sects and learn its martial arts, gather and craft, and fight turn-based **tactics battles** on a tile board.
 
-Built with **Phaser 4 + Next.js 15 + React 19 + TypeScript + Zustand + Tailwind v3.4**, runs on **Bun** (Node 20+ also works). Detailed 32-bit pixel-art scenery, jade-and-gold HUD, animated battles and parchment dialogs retain the Thai wuxia setting. Charm headings and Sarabun body text keep Thai readable.
+- **Built with** Next.js 15, React 19, TypeScript, Phaser 4, Zustand and Tailwind; runs on Bun (Node 20+ also works).
+- **Look.** Pixel art with a Dragon Quest XI–style lacquer HUD and parchment menus.
+- **Language.** Every word the player reads is Thai.
+- **Install.** The game installs as a full-screen app and plays offline once visited.
 
 ## Quick start
 
 ```bash
 bun install
-bun dev          # http://localhost:3000
+bun dev            # http://localhost:3000
 ```
 
-Other commands:
+A new game starts at the hero's home (`home_player`), next door to the capital (`city_capital`). The first session usually runs through:
 
-```bash
-bun run build       # next build
-bun start           # run production build
-bun run lint        # ESLint flat config
-bun run typecheck   # tsc --noEmit
-bun run test:runtime # deterministic movement, battle timing and travel regressions
-bun run test:combat  # Guard/riposte/Recover and combat-effect regressions
-bun run test:opening # clinic, training, reward presentation and safe conversation exits
-bun scripts/test-quest-completion-receipt.ts # exactly-once reward presentation
-bun run test:navigation # authored collision and path detours
-bun run test:battle-background # training/capital origin and generic fallback
-bun run test:rumors # authored lore, selection gates and save history
-bun run test:investigation # clerk, key, chest, legacy stages and exact rewards
-bunx playwright install chromium # once, for browser tests
-bun run test:e2e    # starts a test server on port 3017
-```
+1. Physician Lin's clinic errand.
+2. A free training duel at the capital hall.
+3. The first skill upgrade with earned w-exp.
 
-The starter location is the player's home (`home_player`), which connects to the capital (`city_capital`). From there the world opens up.
+## Commands
 
-The optional opening guide follows a local clinic errand, an earned supply purchase, a free nonfatal duel at the capital school, and the first affordable skill upgrade. The school opponent stays at beginner strength, awards normal battle experience, and retires after the first victory. Recovery remains available when HP or MP is low even if stamina is full.
+| Command | Does |
+| --- | --- |
+| `bun dev` | development server on :3000 |
+| `bun run build` / `bun start` | production build / serve it |
+| `bun run typecheck` | `tsc --noEmit` |
+| `bun run lint` | ESLint (app, components, lib) |
+| `bun run test:<suite>` | unit suites — `runtime`, `combat`, `opening`, `navigation`, `battle-background`, `rumors`, `investigation`, `audio`, `law`, `walk`, `grid`, `grid-ai`, `grid-skills`, `grid-store`, `quests`, `docs` |
+| `bun run test:e2e` | Playwright browser tests on :3017 — run `bun run build` and `bun run start -p 3017` first |
+| `bun scripts/audit-content.ts` | check every content reference resolves |
+| `bun scripts/build-docs-reference.ts` | regenerate the content reference in `docs/reference/` |
 
-Local NPC conversations preserve the live town and actors behind a compact dialogue panel. The clinic delivery leaves medicine supplies and a waiting patient beside Lin; this response reads the existing quest result and survives reload. Spy job briefings have a direct goodbye before any quest is accepted.
-
-The capital's missing-ledger investigation leads to a visible clerk and document chest: interview Qing, obtain a key, recover the ledger, then report to Wu. Its existing quest ID and saved stage IDs are preserved. Authored lore now appears through the rumor service in new and existing saves, respecting discovery gates and heard history.
-
-The practice duel uses the capital school's own yard, and confirmed capital encounters use a town street. Other locations retain the original courtyard. Reloading a local conversation places the hero beside the resolved speaker on reachable ground; recovered ledger evidence leaves its chest visibly open.
-
-## Phaser runtime and controls
-
-Click or tap the ground to walk; select a character or destination to approach and interact. Keyboard controls are **WASD / arrows** to walk and **E** to interact nearby. The **จุดหมาย** destination list provides equivalent keyboard-accessible actions. Menus pause movement. Portrait and landscape layouts use the actual viewport, with no CSS rotation.
-
-`lib/stage/world-runtime.ts` owns scene loading, movement, depth sorting and the camera. `lib/stage/battle-runtime.ts` owns the combat update loop, enemy action timing and cast effects. React supplies accessible forms, HUD, inventory, dialogs and skill buttons. Pure combat/story rules remain in `lib/game` and `lib/world`; Zustand connects them to the scenes and persists version-19 saves. Phaser is dynamically imported on the client (WebGL, or Canvas on devices without WebGL) and destroyed when its view unmounts.
-
-The live development journal is available at **`/progress`**, including the actual animated character gallery and unresolved review findings. Eight heroes use 24 poses each (idle, three walking directions with horizontal mirroring, attack, hurt, guard and outcomes); four supporting archetypes and three individually drawn townspeople use 16 poses. Source-specific frame boundaries preserve complete figures across all 304 poses. Quest completion shows the giver's thanks and granted rewards; upgrades explain actual before/after stats. See [DESIGN.md](DESIGN.md) for architecture and scope, [environment provenance](public/art/README.md), [character prompts](public/art/characters/README.md), [named townspeople prompts](public/art/characters/townspeople.md), and [Qing's source prompt](public/art/characters/qing.md). Browser evidence stays under `review/`; regression screenshots are recreated under `test-results/`.
+What each suite covers and how to run e2e: [docs/testing.md](docs/testing.md). Every script: [docs/scripts.md](docs/scripts.md).
 
 ## What's in the game
 
-### World (text-RPG layer)
+| | |
+| --- | --- |
+| **World** | 102 places (97 on the world map), joined by 128 hand-named roads; 101 painted maps with collision; day and night on a 12-ชั่วยาม clock |
+| **People** | 157 NPCs with portraits and sprites; 20 of them (the sect masters) age, train, feud and die in a weekly background simulation |
+| **Quests** | 276 quests (1 main, 275 side, 97 of them sect quests), with item, kill, visit, objective and dialog stages; any quest can be tracked, with a HUD tracker and a map arrow |
+| **Sects** | 20 sect grounds; 15 are joinable, each with an intro quest, a rank ladder, rank rewards, repeatable sect quests, and hunters for betrayers |
+| **Combat** | turn-based tactics on a 10 × 7 board. Per-unit turn order by speed; move and cast with ranges and areas; enemy packs; retreat; auto-play |
+| **Martial arts** | 178 move skills and 123 inner arts in tiers 0–4 (two tier-5 arts). Levels 1–10, weapon mastery, type conflict; 76 pieces of gear |
+| **Life** | 19 life skills, 25 gathering nodes, 49 artisans with 32 recipes, 19 shops, 7 city halls, 126 items |
+| **Danger** | random encounters while walking, scaled to your progress; stealing, assassination and kidnapping; wanted marks, law pursuers and a jail map |
+| **Rumors** | inns carry news of the masters' deeds, the hero's own echoes, and old lore |
+| **Sound** | procedural pentatonic music and synthesized skill sounds — no audio files |
 
-- **~86 locations** organised by category — 7 cities, 7 villages, **20 sects** (11 joinable + 9 lore-only — see the disciple section below), 10 isles, 11 mountains/cliffs, 12 caves/valleys, 5 temples/palaces, 4 mansions, 4 inns, 11 NPC homes, plus misc.
-- **Hand-curated routes** — every connection between two locations is in `lib/world/data/location-routes.ts`, with its own per-direction Thai label like "ลำคลองใหญ่" or "ทางขึ้นเขา". No procedural generation.
-- **Travel costs** — moving between a location and a route costs 10 stamina + 1–2 ชั่วยาม. Cities and inns offer paid rest; temples / palaces a free half restore; every other location offers free roadside rest.
-- **Random encounters** — 15 % chance per location entry, with a fight-or-flee screen. Pool is filtered by zone (cities never spawn beasts; wild zones favour beasts; sects / temples carry the supernatural pool) and weighted by tier (tier-0 chaff is common, tier-4 legendary foes are rare).
-- **Hunt-boost mechanic** — when the player has an active "kill X enemies" quest stage AND the target spawns in the current zone, the encounter rate jumps from 15 % → **80 %** and the pool is restricted to the target. Treasure / meet bands are suppressed during a hunt. Falls back to the normal cadence when no target fits the zone.
-- **Sect-hunter ambush** — when the player has betrayed any sect (`betraySect` reward), each random-event roll has a 30 % chance to spawn that sect's `hunter_<sectId>` opponent (overrides the normal fight roll). Flee uses an AGI + LUK check (30 % base + (AGI+LUK)/2 %, cap 90 %); fail forces the fight.
-- **Location categories** — every leaf has one or more tags (city / village / sect / mountain / forest / cave / river / temple / etc.) inferred from its id prefix, used to gate the practice action and to apply skill-type XP bonuses (forest → yang/external, cave → yin/soft, mountain → balance/hard, river → internal).
-- **Dialogs** with branching choices, gated by flags / quests / traits / NPC relationships.
-- **Quests** with a numbered stage checklist + a final "รับรางวัล" step shown in the **📋 ภารกิจ** menu tab. Three sub-tabs (กำลังทำ / สำเร็จ / ละทิ้ง). Active quests can be cancelled inline.
-- **Cities** carry a market (full general store), an inn (food + 12-hour rest), a martial-school hall (`สำนักยุทธิ์`) selling tier 0–1 ยุทธจักร skills + arts (sect-specific styles must be learned at the parent sect), and **all 6 craft artisans** (forge / alchemy / tailoring / chef / jewelry / accessory).
-- **Inns** at non-city inn locations carry a smaller food-focused shop.
-- **Villages** carry a tiny stall + free roadside rest + one craft artisan (when configured).
-- **Sects** carry one thematic artisan where lore fits (e.g. หัวซาน = swordsmith, ง้อไบ๊ = alchemist).
+How all of it plays, with the numbers: [docs/gameplay.md](docs/gameplay.md). Every place, person, quest, skill, item and foe: [docs/reference/](docs/reference/README.md).
 
-### Combat (battle sim)
-
-- **1v1 ATB-style** turn order with real-time gauge animation. Speed differences feel natural (2:1 SPD ≈ 2:1 turn count, not 5:1).
-- **Multi-hit + cast animation** — skills can declare a `hits` count (e.g., `dgjj` 9 swords, `tang_starrain` 15 darts); each hit pops its own damage number and stacks debuffs per-hit. Cast banner shows skill name (0.3 s) then per-hit numbers (0.1 s stagger), with HP bars draining in sync.
-- **10 unified slots** per build, holding either a move skill or an inner skill (with `art:` prefix).
-- **160+ move skills** across 5 tiers + a beast-move family (`bst_*` claws / fangs / venoms used by hunt-only opponents). 15 sects represented in the skill catalog: เส้าหลิน, อู่ตัง, ง้อไบ๊, หัวซาน, ฉวนเจิน, กู่มู่, พรรคยาจก, พรรคตะวันจันทรา, พรรคสราญรมย์, สำนักดาวดึงส์, พรรคเบญจพิษ, สำนักดาบโลหิต, องครักษ์เสื้อแพร, สำนักสุลถัง, ยุทธจักร (catch-all).
-- **Per-tier stat-sum budget** — every move skill targets a normalized stat budget per tier (T0=10, T1=15, T2=20, T3=25, T4=30). Maintained by `scripts/normalize-t3-stats.ts` (despite the name, handles all tiers via a target table).
-- **108 inner skills** (กำลังภายใน) across 5 tiers with active + passive, scaled stats and HP/MP per level. Auto-sorted by sect via `scripts/sort-by-sect.ts`.
-- **25 weapon families** of equipment (`W / A / H / B / BR / R / C` slots with multi-slot bracelets, rings, charms).
-- **Mastery** — each skill counts toward its weapon family's mastery (cap 200), scales the family's per-skill damage multiplier. Profile shows raw points + multiplier.
-- **155 NPCs · 276 unique quests · 986 scenes · ~150 opponents** including 10 hunt-only beasts (sustainable grind tier) and 11 sect hunters (one per joinable sect, T4 tier — appear via random event when the player betrays).
-
-### Player progression
-
-- **Per-stat xp** for each of STR / AGI / POW / VIT / DEX / LUK / DEF / INT, earned by activity (physical skill use → STR; gathering → VIT; cultural → INT; hard crafts → DEX; etc.). Auto-levels when full; cost scales with the *base* stat.
-- **Per-skill xp (move skills)** — earned per use in a winning battle. Auto-levels when full; level scales `bp` from 50 % → 100 % AND each skill's stat contribution (`sk.st`) by the same curve.
-- **Per-art xp (inner skills)** — parallel pool tracked in `artExp[id]`. Each art active fired in a winning battle banks xp; auto-levels at the cap. **Cost curve = 2× the move-skill cost** at the same tier. Cap at level 10.
-- **W-exp** — global pool earned from any action; spend to skip the per-skill or per-art grind via "เร่งด้วย w-exp" buttons.
-- **Skill type-conflict** — every skill / art carries philosophical tags (yin / yang / hard / soft / internal / external / balance). Once you have > 4 typed entries learned, any axis dominated by > 60 % halves (or zeros, for internal ↔ external) the contribution of opposing-type skills.
-- **5 reputation traits** — ความดี / ความเลว / ความหยิ่งยโส / ความถ่อมตน / ชื่อเสียง. Adjusted by quest choices and sparring; readable by quest conditions.
-- **NPC relationships** — quests / sparring move per-NPC standing.
-- **Action log** — last 100 events (rest, gather, craft, buy, sell, use, learn, combat, quest).
-
-### Sects (20 total · 11 joinable)
-
-| Sect | Display name | Joinable |
-|---|---|---|
-| `sect_shaolin` | วัดเส้าหลิน | ✓ T4 |
-| `sect_wudang` | อู่ตัง / บู๊ตึ๊ง | ✓ T4 |
-| `sect_emei` | ง้อไบ๊ | ✓ T4 (♀) |
-| `sect_huashan` | หัวซาน | ✓ T3 (500g fee) |
-| `sect_quanzhen` | ฉวนเจิน / ชวนจิน | ✓ T3 |
-| `sect_gumu` | กู่มู่ / โบราณสุสาน | ✓ T3 (secret — Quanzhen + sun-art) |
-| `sect_beggars` | พรรคยาจก | ✓ T4 (begging ≥ lv 2) |
-| `sect_ming` | พรรคตะวันจันทรา | ✓ T4 (assassinate intro) |
-| `sect_xiaoyao` | พรรคสราญรมย์ | ✓ T4 |
-| `sect_jinyiwei` | องครักษ์เสื้อแพร | ✓ T4 (kidnap intro) |
-| `sect_tang` | สำนักสุลถัง | ✓ T4 (venom-gather intro) |
-| `sect_hengshan_south` | เฮิงซาน | lore-only |
-| `sect_hengshan_north` | เหิงซาน | lore-only |
-| `sect_songshan` | ซงซาน | lore-only |
-| `sect_taishan` | ไท่ซาน | lore-only |
-| `sect_lingjiu` | ลิ่งจิ้วกง | lore-only |
-| `sect_xingxiu` | สำนักดาวดึงส์ | lore-only |
-| `sect_xuedao` | พรรคอสูรโลหิต | lore-only (ฝ่ายอธรรม) |
-| `sect_wudu` | พรรคเบญจพิษ | lore-only |
-| `sect_xueyu` | สำนักดาบโลหิต | lore-only (in MISC block) |
-
-### Disciple / sect membership
-
-- **11 joinable sects** — see table above. Each has a 9 → 1 rank ladder (3-rank for the secret Gumu sect) with auto-grant skill / art rewards per rank.
-- **Cross-sect loyalty** — `anySectMember` Condition gates the intro quest of every sect, so you can only be an active disciple of one sect at a time.
-- **Joining** — each sect has a unique intro quest at its hall. Most are herb-gather trials (ascetic sects); some have specific gates (Shaolin = male, Emei = female, Huashan = 500 gold fee, Beggars = begging life-skill ≥ lv 2, Jinyiwei = kidnap a noble, Sunmoon = assassinate an imperial guard, Gumu = secret — must be a Quanzhen disciple AND have learned `t3_qz_sun`).
-- **Leaving** — disciples can resign (`ลาออกอย่างเป็นทางการ`, sect-skills XP freezes but no consequences) or betray (`ทรยศสำนัก`, skills keep growing but the sect's hunter chases you in random events). Both clear the active-membership gate so you can join a new sect.
-- **Redemption** — every sect has a `qst_<sect>_redemption` quest available only to betrayers. Completing it converts betrayed → resigned (hunters stop, skills stay frozen).
-- **Per-sect content** lives in `lib/world/data/{npcs,quests,scenes-content}/sects/<sectId>.ts` — adding a new sect is creating 3 small files + 3 import lines in the barrel.
-
-### Activities
-
-- **🧘 Practice (ฝึกฝน)** — at sect / mountain / forest / cave / river / temple locations the player can spend 30 stamina + 6 ชั่วยาม to bank xp on a chosen skill or art. **+30 % xp** when the skill's `types` overlap with the location's category (e.g., yang skills in forest, internal skills near rivers).
-- **Gather / Hunt** — 18 life skills (mining / woodcutting / hunting / fishing / herbalism / venom / reading / music / drawing / writing / chess / begging / forge / tailoring / jewelry / alchemy / chef / accessory). Mastery 1–5 per skill; gather success rolls scale with mastery vs resource level.
-- **Craft (artisan-gated)** — 6 craft professions require **a learned recipe + the player to be at an artisan of the matching profession**. Buy recipes at any artisan of that craft; basic recipes are sold by every artisan, specialty recipes are unique to specific cities (xixia → steel sword, suzhou → silk robe, dali → poison & big potion, jinling → jade amulet, capital → moon-cake, yangzhou → silk fan, changan → warrior's belt). Other recipes (mining / hunting / herbalism / drawing / writing) keep the legacy "craft inline" behavior.
-
-### UX
-
-- **Detailed pixel-art UI** — jade landscapes, dark lacquer HUD, warm gold borders and parchment dialogs. Charm headings and Sarabun body text retain readable Thai. The title and battle court use a generated 32-bit-style environment; world scenes retain their location-specific art with nearest-neighbor sampling.
-- **Status + menu HUD** — portrait, HP / MP / stamina gauges, time and currency remain visible over the map. An eight-action menu sits at the bottom, adapting to portrait and landscape screens.
-- **Tabs in the menu bar** — 👤 โปรไฟล์ · 🎒 ของในย่าม · 🥋 วิชาฝีมือ (manages BOTH move skills and arts in one slot system) · 🌾 วิชาชีพ · 📋 ภารกิจ · 📜 บันทึก.
-- **Toast notifications** at the top of the screen for every action result.
-- **Loading overlay** flashes briefly during gather / craft / rest / practice for tactile feedback.
-- **Persistent saves** via Zustand persist middleware (localStorage), with the existing migration chain and world-store **v19** schema. Renderer objects and movement state never enter the save.
-- **Game-over screen** on fatal battle loss; "เริ่มใหม่" wipes the world slice (character builds are independent).
-
-## Project layout
+## How the code is organised
 
 ```
-app/                     Next.js app router
-  page.tsx               World game (renders <WorldScreen />)
-  layout.tsx             Loads Charm + Sarabun via next/font/google
-  globals.css            Shared palette, paper texture and utility styles
-  pixel-game.css         Pixel title, world HUD, responsive canvas and battle theme
-  debug/page.tsx         Dev sandbox (free-form battle, character setup)
-
-lib/
-  stage/                 Client-only Phaser exploration/combat runtimes, navigation and movement helpers
-  characters/            Sprite atlas normalization, animation clips and archetypes
-  game/                  Pure combat engine (no React, no I/O)
-    data/                SKILLS, ARTS, EQUIPMENT, TIERS, sect list
-    types.ts             Discriminated unions for all combat effects
-    derive.ts            Stat derivation; skill stats scale by bpMultiplier(lv)
-    battle.ts            ATB + damage formula; tracks skillUses + artUses
-    effects.ts           Self / enemy / passive effect dispatchers
-    skill-conflict.ts    > 60 % type-conflict modifier system
-    leveling.ts          Per-skill bp / mg, art level cap + xpToNextArtLevel (2×)
-    slots.ts             Slot encoding (skill id vs "art:<id>")
-    ai.ts                Simple AI
-
-  world/                 Pure world / story engine
-    location-categories.ts  Inferred category tags + practice eligibility + bonus
-    data/
-      scenes.ts          Tutorial scenes
-      world-map.ts       7 cities + 7 villages + 18 sects + ... = ~86 leaves
-      location-routes.ts Hand-curated edge list with per-direction labels
-      sects.ts           Canonical sect list + sort order
-      sect-memberships.ts Per-sect rank ladder + reward pools (11 joinable sects)
-      opponents.ts       150+ enemies — random-event, hunt-only, sect spar, sect hunters
-      npcs/sects-temples.ts (barrel) → sects/<sectId>.ts (per-sect NPC files)
-      items.ts           Items with category + price + use effect
-      shops.ts           Per-location shop catalogues
-      sect-halls.ts      Per-city tier 0–1 ยุทธจักร skill / art offerings
-      artisans.ts        Per-location craft NPCs (forge/alchemy/tailoring/chef/jewelry/accessory)
-      recipes.ts         Crafting recipes (with `basic` flag for shared staples)
-      resources.ts       Gather + hunt nodes (hunt nodes use weak hunt_* beasts)
-      random-events.ts   Fight / treasure / meet pool, hunt-boost + sect-hunter spawn
-      quests/sects-temples.ts (barrel) → sects/<sectId>.ts (per-sect quest files)
-      scenes-content/sects-temples.ts (barrel) → sects/<sectId>.ts (per-sect scene files)
-    types.ts             Scene union, conditions, effects, traits, SectMembership.status, etc.
-    effects.ts           SceneEffect dispatcher, quest snapshot + auto-consume helpers
-    conditions.ts        Condition evaluator (incl. anySectMember / sectStatus / lifeSkillLevel / learnedArt / goldAtLeast)
-    validate.ts          Save-rehydrate sanity pass
-    battle-bridge.ts     World ↔ battle subscription glue
-    stat-progression.ts  Per-stat xp helpers + LUK roll formula
-
-scripts/                  One-shot maintenance scripts
-  audit-content.ts        Reference audit (NPCs/quests/scenes/items)
-  audit-quest-flow.ts     Offer→accept→complete chain audit
-  sort-by-sect.ts         Re-sort skills.ts + arts.ts by SECT_ORDER
-  normalize-t3-stats.ts   Per-tier stat-sum normalizer (T0=10..T4=30)
-  split-sects-file.ts     Splits the sects-temples.ts trio per-sect
-  rework-poison.ts        Rework poison skills to use the new poison_dmg DoT
-
-store/
-  character-store.ts     /debug A & B character builds (persisted, v2)
-  battle-store.ts        Runtime battle state (NOT persisted) — tracks skillUses + artUses
-  world-store.ts         World state (persisted, v14) — practiceSkill, levelUpArtFromWExp,
-                         buyRecipe, hunt-target boost, location categories, learnedRecipeIds
-  loading-store.ts       300 ms loading-overlay flash
-  toast-store.ts         Top-of-screen toast stack
-
-components/
-  ui/                    shadcn primitives (Button, Card, Combobox, Modal, ...)
-    wuxia/               Wuxia primitives — Panel (pixel border), WuxiaButton (bevel),
-                         OrnamentDivider
-  game/                  BattleArena, BattleLog, SkillSlots, EquipmentSlots, ...
-  world/                 WorldScreen, LocationView, RouteView, DialogDisplay,
-                         StatusBar, MenuBar, EncounterScreen, RestPanel,
-                         GameOverScreen, ToastStack, LoadingOverlay,
-                         popups/ (Profile, Inventory, MoveSkills, LifeSkills,
-                                  QuestLog, ActionLog, NpcInteraction, Shop,
-                                  SectHall, Artisan, Practice)
+app/, components/        React: screens, HUD, menus, popups, battle UI
+store/                   Zustand: world (saved), battle, character (/debug), loading, toast, confirm
+lib/game/                pure combat engine (+ grid/ tactics engine, data/ tables)
+lib/world/               pure story engine (+ data/ content tables); battle-bridge.ts joins world and battle
+lib/stage/               Phaser renderers for the map and the battle board, collision, VFX
+lib/characters/          sprite atlases and animation
+lib/audio/               procedural music and sound
+public/                  maps, art, portraits, icons, the service worker
+scripts/                 tests, audits, generators, tools
+tests/browser/           Playwright specs
+docs/                    guides, generated reference, specs, changelog
 ```
 
-## Authoring tips
+The engines are plain TypeScript with no React or I/O. Stores wrap them, and components read the stores. The world state saves to `localStorage` (save version 21). Details: [docs/architecture.md](docs/architecture.md).
 
-The cheapest content loop:
+## Documentation
 
-- **New skill** → append to `lib/game/data/skills.ts` (compact field shorthand: `sc` / `ti` / `w` / `mg` / `bp` / `p` / `f` / `dm` / `se` / `ee` / `types`).
-- **New inner skill** → same in `lib/game/data/arts.ts` (`sc` / `ti` / `tp` / `types` / `stats` / `hL` / `mL` / `act` / `pas`).
-- **New location** → add a `leaf("id", "name", "desc")` in the matching array in `world-map.ts`, then **at least one** entry in `location-routes.ts` so it's reachable. Console will warn if a leaf has no explicit route.
-- **New shop / sect hall / NPC / opponent / quest / item / recipe** → append to its registry in `lib/world/data/`. Most have a `getX(id)` helper for lookups.
-- **New artisan** → append to `SINGLE_PROFESSION_ARTISANS` in `artisans.ts`. To give a city's existing artisan a unique recipe, append a row to `CITY_SPECIALTIES` (one line: `{ city, prof, recipeId, price }`). Basic recipes (RecipeDef.basic === true) auto-fan-out to every matching artisan, so you only declare specialties.
-- **New quest scene effect / condition** → variant in `lib/world/types.ts` + case in `effects.ts` / `conditions.ts`. TS exhaustiveness flags missed dispatchers.
-- **Teach the player a new skill / recipe mid-game** → drop a `{ t: "learnSkill", skillId: "..." }` (or `learnArt`) in any quest / NPC dialog. Recipes are bought through the artisan popup; they can also be granted via store action `buyRecipe` if you wire a custom dialog effect.
+Start at **[docs/README.md](docs/README.md)** — it maps every question to a document. The main guides:
 
-## License & credits
+| Guide | For |
+| --- | --- |
+| [Gameplay](docs/gameplay.md) | every system from the player's side |
+| [Architecture](docs/architecture.md) | layers, stores, data flow |
+| [Combat engine](docs/combat.md) · [Grid combat](docs/grid-combat.md) | damage and effects · the tactics battle |
+| [World engine](docs/world-engine.md) · [Liveness Layer](docs/liveness.md) | scenes, quests, encounters, law · NPC simulation and rumors |
+| [Content authoring](docs/content-authoring.md) | adding places, people, quests, items, skills, sects |
+| [Rendering and UI](docs/rendering.md) · [Audio](docs/audio.md) · [PWA](docs/pwa.md) | the map, HUD and menus · sound · install and offline |
+| [Save format](docs/save-format.md) · [Testing](docs/testing.md) · [Scripts](docs/scripts.md) | saves and migration · checks · tools |
+| [Changelog](docs/changelog.md) | what changed, by pull request |
 
-Wuxia / 武林 source material — Jin Yong (金庸) and Gu Long (古龙) novels, plus the *9 Yin* / *JY Online* MMOs — informed many of the sect, skill, and inner-art names. The `demo.html` prototype that seeded the combat formula was hand-written by the author; the rebuild ports those numbers as faithfully as possible.
+Top-level documents:
 
-The repo is a single-author personal project; treat the code as work-in-progress. CLAUDE.md captures the architectural conventions if you want to contribute.
+- [HANDOFF.md](HANDOFF.md) — current state, known issues, next steps.
+- [DESIGN.md](DESIGN.md) — art and UX direction.
+- [CLAUDE.md](CLAUDE.md) — working rules for Claude Code.
+- [ONBOARDING.md](ONBOARDING.md) — getting a new teammate started.
+
+## Other routes
+
+- **`/debug`** — a combat sandbox. Build two characters (stats, slots, gear) and fight them on the grid. It is separate from the world save.
+- **`/progress`** — the old development journal and a character animation gallery; its data stopped at wave 11.
+
+## License and credits
+
+Sect, skill and inner-art names draw on wuxia fiction — Jin Yong (金庸) and Gu Long (古龙) — and the *9 Yin* / *JY Online* games. The author hand-wrote the combat numbers first in the single-file prototype `demo.html`; the rebuild ports them.
+
+The artwork was generated for this project; provenance and prompts are in [public/art/README.md](public/art/README.md). This is a single-author personal project and a work in progress.

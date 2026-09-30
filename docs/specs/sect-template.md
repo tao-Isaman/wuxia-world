@@ -66,7 +66,7 @@ Optional extras: `hits: n` (multi-strike; enemy effects roll per hit), `dr` (lif
 
 **Effect variants** (pick from these — `lib/game/types.ts` has the unions; [combat.md](../combat.md#effects) explains each):
 
-- `se` (self, once per cast): `buff_def` `buff_eva` `buff_reflect` `buff_reduce` `buff_spd` `buff_cri` `heal_pct` `heal_buff`
+- `se` (self, once per cast): `buff_def` `buff_eva` `buff_reflect` `buff_reduce` `buff_spd` `buff_cri` `heal_pct` `heal_buff` `stack_atk` `buff_iatk_reduce` `buff_reflect_eva`
 - `ee` (enemy, per landed hit): `debuff_eva` `debuff_acc` `debuff_def` `debuff_atk` `debuff_def_eva` `debuff_poison` `heavy_poison` `poison_dmg` `burn_hp_mp` `multi_debuff` `drain_mp` `dispel` `stun`
 
 If you don't know which to pick, just describe the *intent* ("hits hard once, then weakens enemy defense") and I'll choose the variant.
@@ -102,7 +102,7 @@ Two arts are tier 5 (`khbt`, `kuyt`); sect arts stay within 0-4.
 
 **Active types** (14): `heal`, `heal_cleanse`, `heal_full_cleanse`, `buff_reduce`, `buff_reflect`, `buff_spd`, `buff_eva_debuff_eva`, `atk_phy_pen`, `atk_int_pen`, `drain`, `drain_phy`, `drain_acc`, `debuff_poison`, `debuff_acc_dmg`.
 
-**Passive triggers (`tr`)**: `hit_recv` (when hit) · `on_crit` · `use_int` · `use_act`. Passive effects: `buff_def` `buff_eva` `buff_reflect` `buff_spd_cri` `heal_pct` `debuff_acc` `debuff_eva` `debuff_def` `stack_atk` (`mult_atk` / `mult_iatk` exist in the type but do nothing today — see [combat.md](../combat.md#art-passives)).
+**Passive triggers (`tr`)**: `hit_recv` (when hit) · `on_crit` · `use_int` · `use_act`. Passive effects: `buff_def` `buff_eva` `buff_reflect` `buff_spd_cri` `heal_pct` `debuff_acc` `debuff_eva` `debuff_def` `stack_atk`. Avoid `mult_atk` / `mult_iatk`: they only take effect for the arts `taiji` and `scholar` (see [combat.md](../combat.md#art-passives)).
 
 If unsure: tell me the *flavor* ("steady defensive breath" / "burst-strike capstone") and I'll wire variants.
 
