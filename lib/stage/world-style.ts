@@ -79,6 +79,8 @@ const GLYPHS: Record<string, (c: Pen) => void> = {
   chess: (c) => { c.rect(7, 7, 18, 18); line(c, 13, 7, 13, 25); line(c, 19, 7, 19, 25); line(c, 7, 13, 25, 13); line(c, 7, 19, 25, 19); circle(c, 16, 16, 3); },
   begging: (c) => { line(c, 7, 17, 25, 17); c.moveTo(7, 17); c.quadraticCurveTo(16, 29, 25, 17); circle(c, 16, 11, 3); },
   // Jail.
+  // Magnifier: a quest objective to investigate in person.
+  investigate: (c) => { circle(c, 14, 14, 6); line(c, 18, 18, 25, 25); },
   gate: (c) => { c.rect(8, 7, 16, 19); line(c, 12, 7, 12, 26); line(c, 16, 7, 16, 26); line(c, 20, 7, 20, 26); line(c, 8, 16, 24, 16); },
   labor: (c) => { circle(c, 11, 21, 5); line(c, 18, 8, 25, 15); line(c, 21, 11, 14, 18); },
   dice: (c) => { c.rect(8, 8, 16, 16); circle(c, 12, 12, 1.2); circle(c, 16, 16, 1.2); circle(c, 20, 20, 1.2); },

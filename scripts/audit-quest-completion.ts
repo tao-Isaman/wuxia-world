@@ -23,6 +23,7 @@ import {
 } from "@/lib/world";
 import { FIGHT_EVENTS, MEET_EVENTS, TREASURE_EVENTS } from "@/lib/world/data/random-events";
 import { SECT_MEMBERSHIPS } from "@/lib/world/data/sect-memberships";
+import { getLocationMap } from "@/lib/world/data/location-maps";
 
 // ── Scene reachability ──────────────────────────────────────────────────
 function effectsOf(scene: Scene): SceneEffect[] {
@@ -62,6 +63,8 @@ const queue = [START_SCENE_ID, "jail_cell", ...MEET_EVENTS.map((e) => e.dialogSc
 // Quest offer/complete scenes open from the NPC popup; they are reachable
 // whenever that NPC is (checked per quest below), so seed them too.
 for (const q of QUESTS) for (const s of [`qs_${q.id}_offer`, `qs_${q.id}_complete`]) if (SCENES_BY_ID.has(s)) queue.push(s);
+// Objective spots may open a dialog (QuestObjectiveSpot.sceneId).
+for (const q of QUESTS) for (const stage of q.stages) for (const spot of stage.objective?.spots ?? []) if (spot.sceneId) queue.push(spot.sceneId);
 while (queue.length) {
   const id = queue.pop()!;
   if (reachable.has(id)) continue;
@@ -122,6 +125,15 @@ function satisfiable(c: Condition, why: string[]): boolean {
   }
 }
 
+// ── Flags content can set ───────────────────────────────────────────────
+const settableFlags = new Set<string>();
+for (const eff of reachableEffects) if (eff.t === "setFlag") settableFlags.add(eff.flag);
+function flagsIn(c: Condition): string[] {
+  if (c.t === "and") return c.all.flatMap(flagsIn);
+  if (c.t === "or") return c.any.flatMap(flagsIn);
+  return c.t === "flag" ? [c.flag] : [];
+}
+
 // ── Per-quest verdicts ──────────────────────────────────────────────────
 const blockers: string[] = [];
 const effectFor = (t: "startQuest" | "advanceQuest" | "finishQuest", id: string) =>
@@ -136,9 +148,23 @@ for (const q of QUESTS) {
   startedBy.set(q.id, viaNpc ? "npc" : viaSect ? "sect" : viaScene ? "scene" : "-");
   if (q.prereqs) { const why: string[] = []; if (!satisfiable(q.prereqs, why)) problems.push(`prereqs: ${why.join("; ")}`); }
   const sceneAdvance = effectFor("advanceQuest", q.id), sceneFinish = effectFor("finishQuest", q.id);
+  // Each middle stage with neither autoAdvance nor objective needs its own
+  // advanceQuest beat; the _complete scene only opens at the last stage, so
+  // it can't carry the player past a middle one.
+  const advanceBeats = reachableEffects.filter((e) => e.t === "advanceQuest" && e.questId === q.id).length;
+  const manualStages = q.stages.filter((stage, index) => index < q.stages.length - 1 && !stage.autoAdvance && !stage.objective).length;
+  if (manualStages > advanceBeats) problems.push(`${manualStages} middle stage(s) wait on a dialog beat but only ${advanceBeats} advanceQuest effect(s) exist — add an objective`);
   q.stages.forEach((stage, index) => {
     const last = index === q.stages.length - 1;
+    for (const spot of stage.objective?.spots ?? []) {
+      if (!reachableLocations.has(spot.locationId)) problems.push(`stage ${index} objective at unreachable ${spot.locationId}`);
+      else if (!spot.npcId && !getLocationMap(spot.locationId)) problems.push(`stage ${index} objective at ${spot.locationId}, which has no map to place it on`);
+      if (spot.sceneId && !SCENES_BY_ID.has(spot.sceneId)) problems.push(`stage ${index} objective opens missing scene ${spot.sceneId}`);
+      if (spot.npcId && !NPCS.some((n) => n.id === spot.npcId && n.locationIds.includes(spot.locationId))) problems.push(`stage ${index} objective NPC ${spot.npcId} is not at ${spot.locationId}`);
+    }
+    if (stage.objective) return;
     if (stage.autoAdvance) {
+      for (const flag of flagsIn(stage.autoAdvance)) if (!settableFlags.has(flag)) problems.push(`stage ${index} "${stage.id}" waits on flag ${flag} that nothing sets`);
       const why: string[] = [];
       if (!satisfiable(stage.autoAdvance, why)) problems.push(`stage ${index} "${stage.id}": ${why.join("; ")}`);
       return;

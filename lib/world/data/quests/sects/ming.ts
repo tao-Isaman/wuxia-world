@@ -16,6 +16,11 @@ export const QUESTS_MING: readonly QuestDef[] = [
       {
         id: "receive_letter",
         description: "รับจดหมายลับจากผู้อาวุโส",
+        objective: {
+          spots: [
+            { locationId: "sect_ming", label: "รับจดหมายลับจากผู้อาวุโสจูอิง", npcId: "sect_ming_elder_zhuying", text: "ผู้อาวุโสจูอิงยื่นจดหมายผนึกขี้ผึ้งให้ — ห้ามให้ใครเห็นเด็ดขาด" },
+          ],
+        },
       },
       {
         id: "travel_palace",
@@ -25,6 +30,11 @@ export const QUESTS_MING: readonly QuestDef[] = [
       {
         id: "deliver_letter",
         description: "ส่งจดหมายให้สายลับอย่างลับ ๆ",
+        objective: {
+          spots: [
+            { locationId: "palace_zhongyang", label: "ส่งจดหมายให้สายลับในวัง", text: "ขันทีผู้หนึ่งรับจดหมายไปอย่างแนบเนียนแล้วหายเข้าระเบียงวัง" },
+          ],
+        },
       },
       {
         id: "return_confirm",
@@ -50,10 +60,20 @@ export const QUESTS_MING: readonly QuestDef[] = [
       {
         id: "find_defector",
         description: "ตามหาผู้แปรพักตร์",
+        objective: {
+          spots: [
+            { locationId: "cliff_heimu", label: "ตามหาผู้แปรพักตร์ที่ผาดำ", text: "พบชายผู้หนึ่งหลบซ่อนอยู่ในเงาผา เขายอมพูดด้วยหากไม่ถูกทำร้าย" },
+          ],
+        },
       },
       {
         id: "hear_story",
         description: "ฟังเรื่องราวของเขา",
+        objective: {
+          spots: [
+            { locationId: "cliff_heimu", label: "ฟังเรื่องราวของผู้แปรพักตร์", text: "เขาเล่าว่าพรรคบังคับให้ฆ่าคนบริสุทธิ์ จึงหนีออกมา — ต้องกลับไปตัดสินใจกับผู้อาวุโส" },
+          ],
+        },
       },
       {
         id: "decide",

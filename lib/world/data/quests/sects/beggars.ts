@@ -156,6 +156,13 @@ export const QUESTS_BEGGARS: readonly QuestDef[] = [
       {
         id: "visit_three_places",
         description: "สืบหาข้อมูลจากสามสถานที่ต่างกัน",
+        objective: {
+          spots: [
+            { locationId: "city_capital", label: "สืบข่าวในโรงน้ำชาเมืองหลวง", text: "คนในโรงน้ำชาพูดถึงนักฆ่าชุดดำที่ถามหาเส้นทางลับ" },
+            { locationId: "city_yangzhou", label: "สืบข่าวที่ท่าเรือหยางโจว", text: "คนแบกของเห็นเรือไร้ธงขนหีบลับขึ้นฝั่งตอนดึก" },
+            { locationId: "city_jinling", label: "สืบข่าวในตลาดจินหลิง", text: "พ่อค้าเล่าว่ามีคนจ่ายทองซื้อแผนที่สำนักต่าง ๆ" },
+          ],
+        },
       },
       {
         id: "confront_spy",

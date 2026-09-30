@@ -217,6 +217,11 @@ export const QUESTS_WUDANG: readonly QuestDef[] = [
       {
         id: "get_seal",
         description: "รับตราประทับจากพระวัดตาหลุน",
+        objective: {
+          spots: [
+            { locationId: "temple_dalun", label: "รับตราประทับจากพระกงซิน", npcId: "temple_dalun_monk_kongxin", text: "พระกงซินมอบตราประทับศักดิ์สิทธิ์ให้ห่อผ้าไหมอย่างดี" },
+          ],
+        },
       },
       {
         id: "return_seal",

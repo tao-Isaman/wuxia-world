@@ -131,6 +131,11 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
       {
         id: "investigate",
         description: "สืบสวนสอดสวนรอยเท้าใกล้บ่อน้ำ",
+        objective: {
+          spots: [
+            { locationId: "village_qigu", label: "ตรวจรอยเท้าข้างบ่อน้ำ", text: "รอยเท้าเปื้อนผงสีเขียวนำออกไปจากบ่อ — นางเหมยน่าจะรู้ว่าเป็นของใคร" },
+          ],
+        },
       },
       {
         id: "confront",
@@ -328,6 +333,11 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
       {
         id: "hear_both_sides",
         description: "ฟังทั้งสองฝ่ายและตัดสินใจ",
+        objective: {
+          spots: [
+            { locationId: "village_hengshan", label: "ฟังความสองครอบครัว", sceneId: "qs_qv_hengshan_dispute_land_mediate" },
+          ],
+        },
       },
       {
         id: "resolve",
@@ -417,7 +427,12 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
       {
         id: "investigate_sound",
         description: "ค้นหาแหล่งเสียงประหลาดในยามค่ำ",
-        autoAdvance: { t: "flag", flag: "river_ghost_discovered" },
+        objective: {
+          hours: 2,
+          spots: [
+            { locationId: "village_wuxia", label: "ซุ่มฟังเสียงริมแม่น้ำยามค่ำ", text: "เสียงผีมาจากขลุ่ยที่พวกลักลอบขนของเป่าส่งสัญญาณกันใต้ต้นหลิว" },
+          ],
+        },
       },
       {
         id: "resolve",
@@ -502,6 +517,11 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
       {
         id: "observe_guest",
         description: "สังเกตพฤติกรรมแขกห้อง 3",
+        objective: {
+          spots: [
+            { locationId: "inn_yuelai", label: "สังเกตแขกห้อง 3", sceneId: "qs_qv_inn_spy_guest_confront" },
+          ],
+        },
       },
       {
         id: "confront",
@@ -603,6 +623,11 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
       {
         id: "talk_warrior",
         description: "ไปพูดคุยกับนักรบผู้นั้น",
+        objective: {
+          spots: [
+            { locationId: "inn_gaosheng", label: "คุยกับนักรบผู้เศร้าโศก", sceneId: "qs_qv_inn_drunk_warrior_talk" },
+          ],
+        },
       },
       {
         id: "report_back",
@@ -660,6 +685,11 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
       {
         id: "search_area",
         description: "สืบหาร่องรอยของผู้หญิงที่หายไป",
+        objective: {
+          spots: [
+            { locationId: "inn_heluo", label: "สืบร่องรอยหญิงที่หายไป", sceneId: "qs_qv_inn_missing_traveler_found" },
+          ],
+        },
       },
       {
         id: "resolve_situation",

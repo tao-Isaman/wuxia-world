@@ -175,6 +175,11 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
       {
         id: "investigate",
         description: "สืบสวนว่าใครขโมยตำรับยาจากคลินิก",
+        objective: {
+          spots: [
+            { locationId: "city_capital", label: "สืบร่องรอยหลังคลินิก", text: "รอยเท้าเปื้อนผงยาพาไปถึงตรอกหลังตลาด — คนร้ายเป็นหัวขโมยเร่ร่อนที่ชอบดักคนตามทาง" },
+          ],
+        },
       },
       {
         id: "find_thief",
@@ -645,6 +650,11 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
       {
         id: "surveil_market",
         description: "สังเกตตลาดริมน้ำหาพ่อค้าที่ขายผ้าลอกลวดลาย",
+        objective: {
+          spots: [
+            { locationId: "city_suzhou", label: "สังเกตแผงผ้าริมน้ำ", text: "พ่อค้าแผงหนึ่งขายผ้าลายเดียวกับของช่างทอเหมย มีนักเลงคอยคุ้มกันอยู่ไม่ห่าง" },
+          ],
+        },
       },
       {
         id: "confront_guild",
@@ -685,6 +695,12 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
       {
         id: "observe",
         description: "สังเกตสถานการณ์ที่ประตูเมืองและตลาด",
+        objective: {
+          hours: 2,
+          spots: [
+            { locationId: "city_changan", label: "สังเกตประตูเมืองและตลาด", text: "คนแปลกหน้ากลุ่มหนึ่งผ่านประตูเมืองโดยไม่ถูกตรวจ แล้วแยกย้ายหายเข้าตลาด — ต้องรีบรายงานนักยุทธศาสตร์กง" },
+          ],
+        },
       },
       {
         id: "report_back",
@@ -779,6 +795,11 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
       {
         id: "investigate",
         description: "ติดตามรอยเท้าจากประตูเมืองไปยังตลาดตะวันออก",
+        objective: {
+          spots: [
+            { locationId: "city_changan", label: "ตามรอยเท้าจากประตูเมือง", text: "รอยเท้าลากไปถึงตลาดตะวันออก ผู้บุกรุกยังวนเวียนอยู่แถวนอกเมือง" },
+          ],
+        },
       },
       {
         id: "confront",
@@ -809,6 +830,11 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
       {
         id: "search",
         description: "ค้นหาทหารที่หายไปบริเวณชายเมืองด้านใต้",
+        objective: {
+          spots: [
+            { locationId: "city_changan", label: "ค้นชายเมืองด้านใต้", text: "พบป้ายประจำตัวทหารตกอยู่หน้าโกดังร้าง — มีโจรปล้นทางซุ่มอยู่แถวนั้น" },
+          ],
+        },
       },
       {
         id: "defeat_captors",
@@ -842,6 +868,11 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
       {
         id: "investigate",
         description: "สืบสวนเครือข่ายลักลอบขนอาวุธในเมืองฉางอัน",
+        objective: {
+          spots: [
+            { locationId: "city_changan", label: "สืบโกดังลักลอบขนอาวุธ", text: "ลังไม้ในโกดังซ่อนดาบไว้ใต้ฟาง อันธพาลกลุ่มหนึ่งคอยขนของออกไปยามค่ำ" },
+          ],
+        },
       },
       {
         id: "defeat_smugglers",

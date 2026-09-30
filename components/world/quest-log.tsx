@@ -5,8 +5,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  activeGuide,
+  TRACK_NONE,
   describeQuestCondition,
+  objectiveSpotsFor,
+  trackedQuestId,
   guideForQuest,
   getItem,
   getQuest,
@@ -180,7 +182,13 @@ function QuestRow({
   const setFlag = useWorldStore((s) => s._setFlag);
   if (!def) return null;
   const guide = status === "active" ? guideForQuest(worldState, questId) : null;
-  const guiding = !!guide && activeGuide(worldState)?.questId === questId;
+  const tracked = status === "active" && trackedQuestId(worldState) === questId;
+  const guiding = !!guide && tracked;
+  const spots = status === "active" ? objectiveSpotsFor(worldState, def) : [];
+  const onTrack = () => {
+    setFlag("trackedQuestId", tracked ? TRACK_NONE : questId);
+    toast("info", tracked ? "เลิกติดตามภารกิจ" : `ติดตามภารกิจ: ${def.name}`);
+  };
   const isSide = def.type === "side";
 
   const onCancel = async () => {
@@ -197,8 +205,10 @@ function QuestRow({
   };
 
   return (
-    <li className="border border-border bg-muted/20 overflow-hidden">
-      {/* Collapsed header — name only, click to expand. */}
+    <li className={cn("border border-border bg-muted/20 overflow-hidden", tracked && "border-jade/70 bg-jade/5")}
+      data-quest-id={questId} data-tracked={tracked || undefined}>
+      {/* Collapsed header — name + track pin, click the name to expand. */}
+      <div className="flex items-stretch">
       <button
         type="button"
         onClick={onToggle}
@@ -227,6 +237,22 @@ function QuestRow({
           ▸
         </span>
       </button>
+      {status === "active" && (
+        <button
+          type="button"
+          onClick={onTrack}
+          aria-pressed={tracked}
+          aria-label={tracked ? "เลิกติดตามภารกิจนี้" : "ติดตามภารกิจนี้"}
+          title={tracked ? "กำลังติดตาม — แตะเพื่อเลิก" : "ติดตามภารกิจนี้บนจอเกม"}
+          className={cn(
+            "quest-track shrink-0 border-l border-border px-2 text-[11px] font-semibold transition-colors",
+            tracked ? "bg-jade/20 text-jade" : "text-muted-foreground hover:bg-muted/40",
+          )}
+        >
+          📌 {tracked ? "ติดตามอยู่" : "ติดตาม"}
+        </button>
+      )}
+      </div>
 
       {/* Expanded detail */}
       {expanded && (
@@ -273,10 +299,14 @@ function QuestRow({
                   {stepStatus === "current" && guide && (
                     <div className="quest-guide ml-5 mt-1 flex items-center gap-2 border border-jade/50 bg-jade/10 px-2 py-1 text-[11px] font-normal text-foreground">
                       <span className="flex-1 min-w-0">
-                        📍 <strong>{guide.npcName}</strong> · {guide.locationName}
-                        <span className="text-muted-foreground">
-                          {guide.path.length <= 1 ? " — อยู่ที่นี่" : ` — อีก ${guide.path.length - 1} ช่วงทาง`}
-                        </span>
+                        🎯 <strong>{guide.action}</strong>
+                        {guide.progress && <span className="tabular-nums"> ({guide.progress.current}/{guide.progress.required})</span>}
+                        {guide.locationName && <>
+                          <br />📍 {guide.locationName}
+                          <span className="text-muted-foreground">
+                            {guide.path.length <= 1 ? " — อยู่ที่นี่" : ` — อีก ${guide.path.length - 1} ช่วงทาง`}
+                          </span>
+                        </>}
                       </span>
                       <Button
                         type="button"
@@ -284,14 +314,26 @@ function QuestRow({
                         variant={guiding ? "secondary" : "outline"}
                         className="h-6 shrink-0 px-2 text-[11px]"
                         aria-pressed={guiding}
+                        disabled={!guide.locationName}
                         onClick={() => {
                           setFlag("trackedQuestId", questId);
-                          toast("info", `นำทางไปหา${guide.npcName} · ${guide.locationName}`);
+                          toast("info", `นำทาง: ${guide.action}${guide.locationName ? ` · ${guide.locationName}` : ""}`);
                         }}
                       >
                         {guiding ? "➤ กำลังนำทาง" : "➤ นำทาง"}
                       </Button>
                     </div>
+                  )}
+                  {stepStatus === "current" && spots.length > 0 && (
+                    <ul className="pl-5 space-y-0.5 mt-0.5">
+                      {spots.map((spot) => (
+                        <li key={spot.spotIndex} className={cn("flex items-center gap-1.5 text-[11px] no-underline",
+                          spot.done ? "text-emerald-700" : "text-muted-foreground")}>
+                          <span className="shrink-0 w-3 text-center">{spot.done ? "✓" : "🔍"}</span>
+                          <span className="flex-1">{spot.spot.label}</span>
+                        </li>
+                      ))}
+                    </ul>
                   )}
                   {progress.length > 0 && (
                     <ul className="pl-5 space-y-0.5 mt-0.5">

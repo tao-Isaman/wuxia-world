@@ -162,6 +162,11 @@ export const QUESTS_EMEI: readonly QuestDef[] = [
       {
         id: "locate_hideout",
         description: "หาที่ซ่อนของโจร",
+        objective: {
+          spots: [
+            { locationId: "village_meihua", label: "สืบที่ซ่อนโจรจากชาวบ้าน", text: "ชาวบ้านดงดอกเหมยชี้ว่าหัวหน้าโจรพาเด็กสาวขึ้นไปทางป่าเขา" },
+          ],
+        },
       },
       {
         id: "rescue",
