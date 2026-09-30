@@ -26,7 +26,7 @@ import { LocationMap } from "./location-map";
 import { MapHud } from "./map-hud";
 import { MenuBar } from "./menu-bar";
 import { NpcInteractionPopup } from "./popups/npc-interaction-popup";
-import { RestPopup } from "./popups/rest-popup";
+import { openRestBubble } from "./rest-quick-action";
 import { RumorPopup } from "./popups/rumor-popup";
 import { resolveRumorChannel } from "./rumor-listen-button";
 import { ShopPopup } from "./popups/shop-popup";
@@ -71,7 +71,6 @@ export function LocationView({ scene, readOnly = false, dialogueSpeakerId }: Pro
   const [practiceOpen, setPracticeOpen] = useState(false);
   const [activeArtisan, setActiveArtisan] = useState<ArtisanDef | null>(null);
   // Map-spot popups: rest + rumor objects on the painted map.
-  const [restOpen, setRestOpen] = useState(false);
   const [rumorOpen, setRumorOpen] = useState(false);
   // Fullscreen safety drawer for content a map hasn't placed yet.
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -85,7 +84,6 @@ export function LocationView({ scene, readOnly = false, dialogueSpeakerId }: Pro
     setHallOpen(false);
     setPracticeOpen(false);
     setActiveArtisan(null);
-    setRestOpen(false);
     setRumorOpen(false);
     setDrawerOpen(false);
   }, [readOnly]);
@@ -465,7 +463,6 @@ export function LocationView({ scene, readOnly = false, dialogueSpeakerId }: Pro
         scene={canPractice ? scene : null}
         onClose={() => setPracticeOpen(false)}
       />
-      <RestPopup open={restOpen} onClose={() => setRestOpen(false)} />
       {rumorChannel && (
         <RumorPopup
           open={rumorOpen}
@@ -493,7 +490,7 @@ export function LocationView({ scene, readOnly = false, dialogueSpeakerId }: Pro
             onShop: () => setShopOpen(true),
             onSectHall: () => setHallOpen(true),
             onArtisan: (a) => setActiveArtisan(a),
-            onRest: () => setRestOpen(true),
+            onRest: openRestBubble,
             onRumor: () => setRumorOpen(true),
             onPractice: () => setPracticeOpen(true),
             onResource: runGather,

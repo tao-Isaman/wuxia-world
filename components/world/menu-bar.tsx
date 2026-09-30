@@ -12,7 +12,7 @@ import { LifeSkillsPopup } from "./popups/life-skills-popup";
 import { ActionLogPopup } from "./popups/action-log-popup";
 import { QuestLogPopup } from "./popups/quest-log-popup";
 import { SectMembershipPopup } from "./popups/sect-membership-popup";
-import { RestPopup } from "./popups/rest-popup";
+import { RestQuickAction } from "./rest-quick-action";
 import { GameMenuContext } from "@/components/ui/game-menu-context";
 import { InstallGameButton } from "@/components/pwa";
 import {
@@ -31,7 +31,6 @@ type PopupId =
   | "quests"
   | "sect"
   | "log"
-  | "rest"
   | null;
 
 // Main-screen menu bar — popup buttons, one popup at a time. The bar
@@ -109,7 +108,6 @@ export function MenuBar({ hud }: { hud?: boolean } = {}) {
       label: "สำนัก",
       badge: sectActions > 0 ? sectActions : undefined,
     },
-    { id: "rest", icon: "/icons/ui/rest.png", label: "พักผ่อน" },
     { id: "log", icon: "/icons/ui/log.png", label: "บันทึก" },
   ];
 
@@ -129,7 +127,6 @@ export function MenuBar({ hud }: { hud?: boolean } = {}) {
       <QuestLogPopup open={open === "quests"} onClose={close} />
       <SectMembershipPopup open={open === "sect"} onClose={close} />
       <ActionLogPopup open={open === "log"} onClose={close} />
-      <RestPopup open={open === "rest"} onClose={close} />
     </GameMenuContext.Provider>
   );
 
@@ -165,6 +162,7 @@ export function MenuBar({ hud }: { hud?: boolean } = {}) {
           ))}
           <InstallGameButton variant="icon" />
         </nav>
+        <RestQuickAction />
         {popups}
       </>
     );
@@ -185,6 +183,7 @@ export function MenuBar({ hud }: { hud?: boolean } = {}) {
           ))}
         </div>
       </Panel>
+      <RestQuickAction />
       {popups}
     </>
   );

@@ -114,12 +114,12 @@ test("first errand leads to safe training, recovery, and an earned skill upgrade
   expect(trained.currentHp).toBe(16);
 
   async function restAtRoadside() {
-    await page.getByRole("navigation", { name: "เมนูเกม" }).getByRole("button", { name: "พักผ่อน", exact: true }).click();
-    const row = page.getByRole("dialog").getByText("🌿 พักริมทาง", { exact: true }).locator("../..");
-    const rest = row.getByRole("button", { name: "พักผ่อน", exact: true });
-    await expect(rest).toBeEnabled();
-    await rest.click();
-    await expect(page.getByRole("dialog")).not.toBeVisible();
+    // Rest is a quick bubble on the right edge, not a menu page.
+    await page.getByRole("button", { name: "พักผ่อน", exact: true }).click();
+    const roadside = page.getByRole("group", { name: "เลือกวิธีพักผ่อน" }).getByRole("button", { name: /พักริมทาง/ });
+    await expect(roadside).toBeEnabled();
+    await roadside.click();
+    await expect(page.getByRole("group", { name: "เลือกวิธีพักผ่อน" })).toHaveCount(0);
   }
   await restAtRoadside();
   const firstRest = await state(page);
