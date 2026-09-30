@@ -16,9 +16,10 @@ const { useWorldStore } = await import("../store/world-store");
 const store = () => useWorldStore.getState();
 Math.random = () => 0.5;
 
-type Need = { items: Record<string, number>; kills: Record<string, number>; other: boolean };
-function needs(c: Condition, out: Need = { items: {}, kills: {}, other: false }): Need {
+type Need = { items: Record<string, number>; kills: Record<string, number>; visits: string[]; other: boolean };
+function needs(c: Condition, out: Need = { items: {}, kills: {}, visits: [], other: false }): Need {
   if (c.t === "and") c.all.forEach((sub) => needs(sub, out));
+  else if (c.t === "visitedLocation") out.visits.push(c.locationId);
   else if (c.t === "or") needs(c.any[0], out);
   else if (c.t === "hasItem") out.items[c.itemId] = Math.max(out.items[c.itemId] ?? 0, c.count ?? 1);
   else if (c.t === "defeatedOpponent") out.kills[c.opponentId] = Math.max(out.kills[c.opponentId] ?? 0, c.count ?? 1);
@@ -26,7 +27,8 @@ function needs(c: Condition, out: Need = { items: {}, kills: {}, other: false })
   return out;
 }
 
-const counted = QUESTS.filter((q) => q.stages.some((stage) => stage.autoAdvance));
+const counted = QUESTS.filter((q) => q.stages.some((stage) => stage.autoAdvance || stage.objective));
+let objectiveStages = 0;
 let played = 0, skipped = 0;
 const failures: string[] = [];
 
@@ -56,7 +58,8 @@ for (const def of counted) {
   // Only quests whose counted stages are items / kills and whose other stages
   // are the final hand-in can be driven generically; dialog-driven middles are
   // covered by test:quests.
-  const drivable = def.stages.every((stage, i) => (wants[i] ? !wants[i]!.other : i === lastIndex));
+  const drivable = def.stages.every((stage, i) => (stage.objective ? !stage.objective.spots.some((spot) => spot.sceneId)
+    : wants[i] ? !wants[i]!.other : i === lastIndex));
   if (!drivable) { skipped++; continue; }
   try {
     // Carry every required item BEFORE accepting (the regression).
@@ -67,7 +70,20 @@ for (const def of counted) {
     applyEffect(draft, { t: "startQuest", questId: def.id });
     useWorldStore.setState({ quests: draft.quests });
     for (const [i, want] of wants.entries()) {
+      const objective = def.stages[i].objective;
+      if (objective && store().quests[def.id]?.stage === i) {
+        // Walk to each spot and use it, the way the map / NPC popup does.
+        for (const [spotIndex, spot] of objective.spots.entries()) {
+          useWorldStore.setState({ currentSceneId: spot.locationId, lastLocationId: spot.locationId });
+          const result = store().doQuestObjective(def.id, spotIndex);
+          assert.ok(result.ok, `${def.id}: objective ${spot.label} at ${spot.locationId}: ${result.ok ? "" : result.message}`);
+        }
+        assert.ok((store().quests[def.id]?.stage ?? 0) > i || store().quests[def.id]?.status === "done", `${def.id}: objective stage ${i} advanced`);
+        objectiveStages++;
+        continue;
+      }
       if (!want) continue;
+      if (want.visits.length) useWorldStore.setState({ visitedLocationIds: [...new Set([...store().visitedLocationIds, ...want.visits])] });
       const kills = { ...store().defeatedCounts };
       for (const [opponent, count] of Object.entries(want.kills)) kills[opponent] = (kills[opponent] ?? 0) + count;
       // Nudge the bag too so the store re-checks progress even for item-only stages.
@@ -104,4 +120,4 @@ if (failures.length) {
   console.error(failures.join("\n"));
   process.exit(1);
 }
-console.log(`PASS ${played} item/kill quests accept → progress → hand in → done (${skipped} dialog-driven ones left to test:quests)`);
+console.log(`PASS ${played} item/kill/objective quests accept → progress → hand in → done (${objectiveStages} objective stages; ${skipped} dialog-driven ones left to test:quests)`);

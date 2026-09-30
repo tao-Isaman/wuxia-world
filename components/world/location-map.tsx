@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef } from "react";
 import type { ArtisanDef, LocationMapDef, LocationScene, MapSpot, NpcDef } from "@/lib/world";
-import { activeGuide, evaluateCondition, guideMarkerId, getArtisan, getQuestsForNpc, isQuestOfferable, isQuestTurnInForNpc, getNpcsAtLocation, getResource, getScene, getSectHallAt, getShopAt, npcBodySprite, npcPixelSprite, playerBodySprite } from "@/lib/world";
+import { activeGuide, evaluateCondition, guideMarkerId, objectiveMarkerId, objectiveSpotsAt, objectiveSpotsForNpc, getArtisan, getQuestsForNpc, isQuestOfferable, isQuestTurnInForNpc, getNpcsAtLocation, getResource, getScene, getSectHallAt, getShopAt, npcBodySprite, npcPixelSprite, playerBodySprite } from "@/lib/world";
 import { useWorldStore, TRAVEL_STAMINA_COST } from "@/store/world-store";
 import { getActivity } from "@/lib/world/data/activities";
 import { toast } from "@/store/toast-store";
@@ -20,6 +20,17 @@ export interface MapSpotHandlers {
   onPractice: () => void;
   onResource: (resourceId: string) => void;
   onActivity: (activityId: string) => void;
+  onObjective: (questId: string, spotIndex: number) => void;
+}
+
+/** A free spot for a quest objective marker: near the arrival point, clear of other markers. */
+function freeSpot(spawn: { x: number; y: number }, taken: readonly { x: number; y: number }[]) {
+  const offsets = [[9, -5], [-9, -5], [10, 7], [-10, 7], [0, -11], [15, 0], [-15, 0], [0, 12], [18, -10], [-18, -10]];
+  for (const [dx, dy] of offsets) {
+    const point = { x: Math.min(92, Math.max(8, spawn.x + dx)), y: Math.min(90, Math.max(10, spawn.y + dy)) };
+    if (taken.every((other) => Math.hypot(other.x - point.x, other.y - point.y) >= 7)) return point;
+  }
+  return { x: spawn.x + 6, y: spawn.y - 4 };
 }
 export function LocationMap({ scene, map, handlers, readOnly = false, dialogueSpeakerId }: {
   scene: LocationScene; map: LocationMapDef; handlers: MapSpotHandlers; readOnly?: boolean; dialogueSpeakerId?: string;
@@ -40,7 +51,7 @@ export function LocationMap({ scene, map, handlers, readOnly = false, dialogueSp
   for (const npc of registry) {
     // Same filters as the NPC popup: a turn-in outranks a fresh offer.
     const quests = getQuestsForNpc(npc.id);
-    const quest = quests.some((q) => isQuestTurnInForNpc(state, q, npc.id)) ? "turnin" as const
+    const quest = quests.some((q) => isQuestTurnInForNpc(state, q, npc.id)) || objectiveSpotsForNpc(state, npc.id).length ? "turnin" as const
       : quests.some((q) => isQuestOfferable(state, q)) ? "offer" as const : undefined;
     markers.push({ id: "npc-" + npc.id, ...spots[npc.id], kind: "npc", label: npc.name, quest,
       image: npcBodySprite(npc.id), sprite: npcPixelSprite(npc.id), onActivate: () => handlers.onRegistryNpc(npc) });
@@ -84,6 +95,13 @@ export function LocationMap({ scene, map, handlers, readOnly = false, dialogueSp
     if (entry) markers.push({ id: "service-" + index, x: spot.x, y: spot.y, kind: "service", label: entry.label,
       badge: entry.badge, glyph: spot.icon, category: entry.category, onActivate: entry.action });
   });
+  // Hands-on quest objectives here ("observe the city gate") — magnifier spots.
+  for (const entry of objectiveSpotsAt(state, scene.id)) {
+    const point = freeSpot(map.spawn, markers);
+    markers.push({ id: objectiveMarkerId(entry.questId, entry.spotIndex), ...point, kind: "service", label: entry.spot.label,
+      badge: "investigate", glyph: "🔍", category: "activity", quest: "turnin",
+      onActivate: () => handlers.onObjective(entry.questId, entry.spotIndex) });
+  }
   for (const exit of map.exits ?? []) {
     const routeId = "route_" + scene.id + "__to__" + exit.to;
     const route = scene.routes.find((r) => r.routeSceneId === routeId && (!r.visibleIf || evaluateCondition(state, r.visibleIf)));

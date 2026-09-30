@@ -205,7 +205,11 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
       {
         id: "investigate",
         description: "ลงไปสืบสวนในก้นหุบเขายามค่ำ",
-        autoAdvance: { t: "flag", flag: "jueqing_ghost_clue" },
+        objective: {
+          spots: [
+            { locationId: "valley_jueqing", label: "ลงสืบก้นหุบเขายามค่ำ", text: "เสียงหลอนมาจากลมลอดโพรงหินและคนเลี้ยงงูที่ซ่อนตัวในถ้ำ — ต้องรายงานหลินชัวซัน" },
+          ],
+        },
       },
       { id: "report", description: "นำข้อมูลกลับมารายงานหลินชัวซัน" },
     ],
@@ -292,11 +296,9 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
       {
         id: "go_miao",
         description: "นำจารึกไปให้หัวหน้าเผ่าเมี่ยวแปล",
-        autoAdvance: {
-          t: "and",
-          all: [
-            { t: "visitedLocation", locationId: "market_miao" },
-            { t: "flag", flag: "desert_map_decoded" },
+        objective: {
+          spots: [
+            { locationId: "market_miao", label: "ให้หัวหน้าเผ่าอาเป่าแปลจารึก", npcId: "wld_miao_tribaleldr_abao", text: "อาเป่าอ่านจารึกออก: เป็นแผนที่ไปยังบ่อน้ำใต้ดินกลางทะเลทราย" },
           ],
         },
       },
@@ -359,7 +361,11 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
       {
         id: "enter_ruins",
         description: "เข้าไปในซากปรักหักพังและพบผู้พิทักษ์",
-        autoAdvance: { t: "flag", flag: "desert_guardian_found" },
+        objective: {
+          spots: [
+            { locationId: "desert_ruins", label: "เข้าไปในซากปรักหักพัง", text: "ลึกเข้าไปในซากมีโจรทะเลทรายเฝ้าสมบัติอยู่ — เขาคือผู้พิทักษ์ที่โม่ฉิงเทียนพูดถึง" },
+          ],
+        },
       },
       {
         id: "defeat",
@@ -420,12 +426,20 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
       {
         id: "search",
         description: "ค้นหาสัตว์ศักดิ์สิทธิ์ในป่าแถวตลาดเมี่ยว",
-        autoAdvance: { t: "flag", flag: "miao_beast_found" },
+        objective: {
+          spots: [
+            { locationId: "market_miao", label: "ค้นป่าหลังตลาดเมี่ยว", text: "พบกรงไม้ไผ่ซ่อนในพุ่มไม้ สัตว์ศักดิ์สิทธิ์ขดตัวอยู่ข้างใน" },
+          ],
+        },
       },
       {
         id: "free",
         description: "ปล่อยสัตว์ศักดิ์สิทธิ์จากกรง",
-        autoAdvance: { t: "flag", flag: "miao_beast_freed" },
+        objective: {
+          spots: [
+            { locationId: "market_miao", label: "ปล่อยสัตว์ศักดิ์สิทธิ์จากกรง", text: "สัตว์ศักดิ์สิทธิ์วิ่งกลับเข้าป่า หันมามองครู่หนึ่งก่อนหายไป" },
+          ],
+        },
       },
       { id: "report", description: "กลับมารายงานหัวหน้าเผ่า" },
     ],
@@ -454,7 +468,11 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
       {
         id: "place_offering",
         description: "วางของถวายที่แท่นหินในถ้ำ",
-        autoAdvance: { t: "flag", flag: "miao_offering_placed" },
+        objective: {
+          spots: [
+            { locationId: "cave_tangshi", label: "วางของถวายบนแท่นหิน", text: "ของถวายวางบนแท่นเรียบร้อย ลมเย็นพัดผ่านถ้ำราวกับรับรู้" },
+          ],
+        },
       },
       { id: "return", description: "กลับมารายงานหัวหน้าเผ่า" },
     ],
@@ -610,7 +628,12 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
       {
         id: "dive",
         description: "ดำลงไปสำรวจก้นสระมังกรดำ",
-        autoAdvance: { t: "flag", flag: "heilong_depths_visited" },
+        objective: {
+          hours: 2,
+          spots: [
+            { locationId: "pool_heilong", label: "ดำลงสำรวจก้นสระ", text: "ก้นสระไม่มีมังกร มีเพียงหอยมุกยักษ์ส่องแสงอยู่ในโพรงหิน" },
+          ],
+        },
       },
       { id: "decide", description: "กลับขึ้นมาและบอกความจริงแก่ต่านเหลาตู" },
     ],
@@ -632,7 +655,11 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
       {
         id: "search",
         description: "ค้นหาชาวประมงรอบสระมังกรดำ",
-        autoAdvance: { t: "flag", flag: "heilong_fisher_found" },
+        objective: {
+          spots: [
+            { locationId: "pool_heilong", label: "ค้นหารอบสระมังกรดำ", text: "พบเรือของชาวประมงผูกอยู่กับเรือโจรสลัดในดงกก" },
+          ],
+        },
       },
       {
         id: "rescue",
@@ -662,7 +689,12 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
       {
         id: "wait_fullmoon",
         description: "รอวันเพ็ญและดำลงไปตามแสง",
-        autoAdvance: { t: "flag", flag: "heilong_red_found" },
+        objective: {
+          hours: 4,
+          spots: [
+            { locationId: "pool_heilong", label: "ดำตามแสงสีแดงในคืนเพ็ญ", text: "แสงแดงมาจากสายแร่เรืองแสงในผนังหินใต้น้ำ" },
+          ],
+        },
       },
       {
         id: "collect_ore",
@@ -697,7 +729,11 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
       {
         id: "find_cache",
         description: "เข้าไปในถ้ำและค้นพบความจริงของสมบัติ",
-        autoAdvance: { t: "flag", flag: "hong_treasure_truth_found" },
+        objective: {
+          spots: [
+            { locationId: "home_hong", label: "ค้นถ้ำสมบัติตามแผนที่", text: "สมบัติคือหีบจดหมายของโฮ่งชีก๋งถึงศิษย์ — ความทรงจำ ไม่ใช่ทองคำ" },
+          ],
+        },
       },
       { id: "report", description: "กลับมารายงานหลัวเฟย์หาว" },
     ],

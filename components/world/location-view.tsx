@@ -15,6 +15,8 @@ import {
   getArtisansAt,
   getItem,
   getLocationMap,
+  getQuest,
+  objectiveSpotsFor,
   getNpcsAtLocation,
   getResource,
   getScene,
@@ -164,6 +166,20 @@ export function LocationView({ scene, readOnly = false, dialogueSpeakerId }: Pro
       return;
     }
     toast("warn", result.message);
+  }
+
+  // Quest objective spots: a short busy beat, then what the player found.
+  function runObjective(questId: string, spotIndex: number) {
+    const store = useWorldStore.getState();
+    const def = getQuest(questId);
+    const spot = def ? objectiveSpotsFor(store, def)[spotIndex] : undefined;
+    if (!spot) return;
+    if (!spot.spot.sceneId) flashLoading(`${spot.spot.label}...`, 1200, "stealth");
+    const result = store.doQuestObjective(questId, spotIndex);
+    if (!result.ok) { toast("warn", result.message); return; }
+    if (result.sceneId) return;
+    toast("success", result.message, 6000);
+    if (result.advanced) toast("info", `ภารกิจ「${def!.name}」คืบหน้า`);
   }
 
   function runGather(resourceId: string) {
@@ -520,6 +536,7 @@ export function LocationView({ scene, readOnly = false, dialogueSpeakerId }: Pro
             onPractice: () => setPracticeOpen(true),
             onResource: runGather,
             onActivity: (id) => void runActivity(id),
+            onObjective: runObjective,
           }}
         />
         {!readOnly && <>

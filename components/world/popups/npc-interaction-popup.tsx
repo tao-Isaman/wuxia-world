@@ -13,6 +13,7 @@ import {
   getScene,
   isQuestOfferable,
   isQuestTurnInForNpc,
+  objectiveSpotsForNpc,
   npcPortrait,
   type NpcDef,
   type NpcStateEntry,
@@ -93,6 +94,8 @@ export function NpcInteractionPopup({ open, npc, onClose }: Props) {
   const npcQuests = getQuestsForNpc(npc.id);
   const offerable = npcQuests.filter((q) => isQuestOfferable(worldState, q));
   const turnIns = npcQuests.filter((q) => isQuestTurnInForNpc(worldState, q, npc.id));
+  // Hands-on objectives done with this person (hand over a letter, ask for a seal).
+  const objectives = objectiveSpotsForNpc(worldState, npc.id).filter((entry) => entry.spot.locationId === worldState.currentSceneId);
   const inProgress = npcQuests.filter((q) => {
     const entry = worldState.quests[q.id];
     return entry?.status === "active" && !isQuestTurnInForNpc(worldState, q, npc.id);
@@ -352,6 +355,36 @@ export function NpcInteractionPopup({ open, npc, onClose }: Props) {
                 </span>
               </span>
             </Button>
+          )}
+
+          {objectives.length > 0 && (
+            <div className="pt-2 space-y-1.5">
+              <div className="text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
+                งานภารกิจ
+              </div>
+              {objectives.map((entry) => (
+                <Button
+                  key={`${entry.questId}-${entry.spotIndex}`}
+                  variant="outline"
+                  data-quest-objective={entry.questId}
+                  onClick={() => {
+                    onClose();
+                    if (!entry.spot.sceneId) flashLoading(`${entry.spot.label}...`, 1000, "work");
+                    const r = useWorldStore.getState().doQuestObjective(entry.questId, entry.spotIndex);
+                    if (!r.ok) { toast("warn", r.message); return; }
+                    if (r.sceneId) return;
+                    toast("success", r.message, 6000);
+                    if (r.advanced) toast("info", `ภารกิจ「${entry.questName}」คืบหน้า`);
+                  }}
+                  className="w-full justify-start text-left h-auto py-2 whitespace-normal border-emerald-300"
+                >
+                  <span className="flex flex-col items-start gap-0.5">
+                    <span className="font-semibold text-sm">🔍 {entry.spot.label}</span>
+                    <span className="text-[10px] text-muted-foreground">{entry.questName}</span>
+                  </span>
+                </Button>
+              ))}
+            </div>
           )}
 
           {turnIns.length > 0 && (

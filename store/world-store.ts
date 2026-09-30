@@ -56,6 +56,7 @@ import {
   type TraitKey,
   type WorldStateData,
 } from "@/lib/world";
+import { completeObjectiveSpot, type ObjectiveResult } from "@/lib/world/quest-objectives";
 import { applyEffect, consumeQuestAutoItems, isSectQuestOfferable, tickQuestProgress } from "@/lib/world/effects";
 import { evaluateCondition } from "@/lib/world/conditions";
 import { tickAllNamedNpcs } from "@/lib/world/npc-tick";
@@ -485,6 +486,8 @@ interface WorldStore extends WorldStateData {
   doActivity: (id: string) => ActivityResult;
   // Sit out the rest of a jail sentence at once and walk free.
   serveSentence: () => void;
+  // Use a hands-on quest objective spot here (see lib/world/quest-objectives.ts).
+  doQuestObjective: (questId: string, spotIndex: number) => ObjectiveResult;
   fleeEncounter: () => void;
 
   // Liveness Layer — record that the player has heard a specific rumor.
@@ -2445,6 +2448,18 @@ export const useWorldStore = create<WorldStore>()(
         appendActionLog(draft, "law", message);
         set({ ...draft });
         return { ok: true, message };
+      },
+
+      doQuestObjective: (questId, spotIndex) => {
+        const draft = draftFrom(get());
+        const result = completeObjectiveSpot(draft, questId, spotIndex);
+        if (!result.ok) return result;
+        if (result.sceneId) { get().gotoScene(result.sceneId); return result; }
+        advanceTime(draft, result.hours);
+        const quest = getQuest(questId);
+        appendActionLog(draft, "quest", `${quest?.name ?? questId}: ${result.message}`);
+        set({ ...draft });
+        return result;
       },
 
       serveSentence: () => {

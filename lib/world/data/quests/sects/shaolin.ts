@@ -244,6 +244,11 @@ export const QUESTS_SHAOLIN: readonly QuestDef[] = [
       {
         id: "track_thief",
         description: "ติดตามโจรที่หลบหนีออกไปทางป่า",
+        objective: {
+          spots: [
+            { locationId: "sect_songshan", label: "ตามรอยโจรบนเนินซงซาน", text: "กิ่งไม้หักและรอยเท้าบอกว่าโจรหนีไปรวมกับหัวหน้าโจรแถบภูเขา" },
+          ],
+        },
       },
       {
         id: "defeat_thief",
@@ -276,6 +281,11 @@ export const QUESTS_SHAOLIN: readonly QuestDef[] = [
       {
         id: "search_city",
         description: "ค้นหาลูกศิษย์ตามเมืองใกล้เคียง",
+        objective: {
+          spots: [
+            { locationId: "city_capital", label: "สอบถามหาลูกศิษย์ในเมืองหลวง", text: "ชาวบ้านเห็นภิกษุหนุ่มก่อเรื่องแล้วหนีออกนอกเมือง — เขายังท่องไปตามทาง" },
+          ],
+        },
       },
       {
         id: "confront",

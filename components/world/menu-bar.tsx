@@ -11,6 +11,7 @@ import { MoveSkillsPopup } from "./popups/move-skills-popup";
 import { LifeSkillsPopup } from "./popups/life-skills-popup";
 import { ActionLogPopup } from "./popups/action-log-popup";
 import { QuestLogPopup } from "./popups/quest-log-popup";
+import { QuestTracker } from "./quest-tracker";
 import { SectMembershipPopup } from "./popups/sect-membership-popup";
 import { RestQuickAction } from "./rest-quick-action";
 import { GameMenuContext } from "@/components/ui/game-menu-context";
@@ -164,6 +165,7 @@ export function MenuBar({ hud }: { hud?: boolean } = {}) {
           <SoundButton />
           <InstallGameButton variant="icon" />
         </nav>
+        <QuestTracker onOpen={() => setOpen("quests")} />
         <RestQuickAction />
         {popups}
       </>

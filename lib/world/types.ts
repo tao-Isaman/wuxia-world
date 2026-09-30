@@ -378,6 +378,32 @@ export interface QuestStage {
   id: string;
   description: string;
   autoAdvance?: Condition;
+  /**
+   * Hands-on objective for a stage no dialog or counter can advance
+   * ("observe the city gate", "search the south edge of town"): spots on the
+   * map (or an action on a person's popup when `npcId` is set) the player
+   * uses in person. The stage advances once every spot is done. See
+   * lib/world/quest-objectives.ts.
+   */
+  objective?: QuestObjective;
+}
+
+export interface QuestObjectiveSpot {
+  locationId: string;
+  /** Short action label on the map / NPC popup ("สังเกตประตูเมือง"). */
+  label: string;
+  /** Do it through this person's popup instead of a map spot. */
+  npcId?: string;
+  /** What the player learns (toast + action log). */
+  text?: string;
+  /** Open this dialog instead; its choices advance the quest themselves. */
+  sceneId?: string;
+}
+
+export interface QuestObjective {
+  spots: QuestObjectiveSpot[];
+  /** ชั่วยาม spent per spot (default 1). */
+  hours?: number;
 }
 
 // Reward grants applied by `finishQuest({ success: true })`. The dispatcher

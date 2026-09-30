@@ -48,11 +48,20 @@ export const QUESTS__OTHER: readonly QuestDef[] = [
       {
         id: "visit_village",
         description: "เดินทางไปสำรวจหมู่บ้านที่ป่วย",
-        autoAdvance: { t: "flag", flag: "visited_plague_village" },
+        objective: {
+          spots: [
+            { locationId: "valley_hudie", label: "สำรวจหมู่บ้านที่ป่วย", text: "ชาวบ้านไข้สูง ผิวขึ้นผื่นม่วง ดูคล้ายพิษจากสมุนไพรบางชนิด" },
+          ],
+        },
       },
       {
         id: "collect_sample",
         description: "เก็บตัวอย่างสมุนไพรและรายงานอาการ",
+        objective: {
+          spots: [
+            { locationId: "valley_hudie", label: "เก็บตัวอย่างสมุนไพรและบันทึกอาการ", text: "เก็บต้นหญ้าริมลำธารที่ชาวบ้านใช้ต้มกิน และจดอาการไว้ครบ" },
+          ],
+        },
       },
       {
         id: "return_report",
@@ -78,6 +87,11 @@ export const QUESTS__OTHER: readonly QuestDef[] = [
       {
         id: "investigate_scene",
         description: "สืบสวนสถานที่เกิดเหตุ",
+        objective: {
+          spots: [
+            { locationId: "cave_zhizhu", label: "สืบสวนปากถ้ำแมงมุม", text: "พบเศษขวดยาและรอยเท้าคนเลี้ยงพิษ — ต้องหาพิษงูมาเทียบ" },
+          ],
+        },
       },
       {
         id: "find_clues",
@@ -118,6 +132,11 @@ export const QUESTS__OTHER: readonly QuestDef[] = [
       {
         id: "question_monks",
         description: "สัมภาษณ์พระในวัดเพื่อหาเบาะแส",
+        objective: {
+          spots: [
+            { locationId: "temple_dalun", label: "สอบถามพระในวัด", text: "พระเณรรูปหนึ่งเห็นเงาชุดดำปีนกำแพงคืนพายุ มุ่งหน้าออกนอกวัด" },
+          ],
+        },
       },
       {
         id: "find_culprit",
@@ -207,6 +226,11 @@ export const QUESTS__OTHER: readonly QuestDef[] = [
       {
         id: "depart",
         description: "รับภารกิจคุ้มกันและออกเดินทาง",
+        objective: {
+          spots: [
+            { locationId: "villa_yanzi", label: "พบพ่อค้าที่หน้าคฤหาสน์", text: "พ่อค้าบรรทุกเกวียนเสร็จแล้ว ออกเดินทางได้ — ระวังโจรดักปล้นตามทาง" },
+          ],
+        },
       },
       {
         id: "fend_ambush",
@@ -216,6 +240,11 @@ export const QUESTS__OTHER: readonly QuestDef[] = [
       {
         id: "deliver_safely",
         description: "ส่งพ่อค้าถึงจุดหมายโดยสวัสดิภาพ",
+        objective: {
+          spots: [
+            { locationId: "city_capital", label: "ส่งพ่อค้าถึงร้านในเมืองหลวง", text: "พ่อค้าถึงเมืองหลวงอย่างปลอดภัย ฝากคำขอบคุณถึงเจ้าบ้าน" },
+          ],
+        },
       },
       {
         id: "return_report",
@@ -241,10 +270,22 @@ export const QUESTS__OTHER: readonly QuestDef[] = [
       {
         id: "investigate",
         description: "สืบสวนร่องรอยในคฤหาสน์",
+        objective: {
+          spots: [
+            { locationId: "villa_yanzi", label: "สืบร่องรอยในห้องเก็บดาบ", text: "กุญแจไม่ถูกงัด — คนร้ายต้องเป็นคนที่อยู่ในงานเลี้ยงคืนนั้น" },
+          ],
+        },
       },
       {
         id: "question_suspects",
         description: "สอบสวนผู้ต้องสงสัยสามคน",
+        objective: {
+          spots: [
+            { locationId: "villa_yanzi", label: "สอบสวนพ่อบ้าน", text: "พ่อบ้านอยู่ในครัวทั้งคืน มีพยานยืนยัน" },
+            { locationId: "villa_yanzi", label: "สอบสวนแขกนักดนตรี", text: "นักดนตรีเล่นพิณไม่หยุดจนรุ่งเช้า" },
+            { locationId: "villa_yanzi", label: "สอบสวนองครักษ์", text: "องครักษ์ผู้หนึ่งพูดวกวน และแขนมีรอยแผลใหม่ — เขาคือนักฆ่าเงาที่แฝงตัวมา" },
+          ],
+        },
       },
       {
         id: "confront_thief",
@@ -275,6 +316,11 @@ export const QUESTS__OTHER: readonly QuestDef[] = [
       {
         id: "receive_letter",
         description: "รับสาส์นจากทูตหลิวอิง",
+        objective: {
+          spots: [
+            { locationId: "palace_zhongyang", label: "รับสาส์นจากทูตหลิวอิง", npcId: "palace_zhongyang_envoy_liuying", text: "ทูตหลิวอิงมอบสาส์นประทับตรามังกร — ต้องถึงมืออาจารย์ชิงซวี่เท่านั้น" },
+          ],
+        },
       },
       {
         id: "travel_wudang",
@@ -284,6 +330,11 @@ export const QUESTS__OTHER: readonly QuestDef[] = [
       {
         id: "deliver_letter",
         description: "ส่งสาส์นให้อาจารย์ชิงซวี่",
+        objective: {
+          spots: [
+            { locationId: "sect_wudang", label: "ส่งสาส์นให้อาจารย์ชิงซวี่", npcId: "sect_wudang_master_qingxu", text: "อาจารย์ชิงซวี่อ่านสาส์นแล้วพยักหน้า ฝากคำตอบกลับไปยังทูต" },
+          ],
+        },
       },
       {
         id: "return_confirm",
@@ -310,14 +361,29 @@ export const QUESTS__OTHER: readonly QuestDef[] = [
       {
         id: "spy_faction_a",
         description: "สอดแนมฝ่ายขุนนางฝั่งแรก",
+        objective: {
+          spots: [
+            { locationId: "palace_zhongyang", label: "สอดแนมเรือนขุนนางฝั่งตะวันออก", text: "ขุนนางฝั่งตะวันออกนับทองกับพ่อค้าเกลือเถื่อนกลางดึก" },
+          ],
+        },
       },
       {
         id: "spy_faction_b",
         description: "สอดแนมฝ่ายขุนนางฝั่งที่สอง",
+        objective: {
+          spots: [
+            { locationId: "palace_zhongyang", label: "สอดแนมเรือนขุนนางฝั่งตะวันตก", text: "ขุนนางฝั่งตะวันตกเขียนฎีกาทูลเรื่องภาษีอย่างซื่อตรง" },
+          ],
+        },
       },
       {
         id: "discover_truth",
         description: "ค้นพบความจริง",
+        objective: {
+          spots: [
+            { locationId: "palace_zhongyang", label: "ค้นห้องเก็บเอกสาร", text: "บัญชีลับยืนยันว่าฝั่งตะวันออกยักยอกภาษี — ต้องตัดสินใจว่าจะรายงานทูตอย่างไร" },
+          ],
+        },
       },
       {
         id: "report_with_choice",
