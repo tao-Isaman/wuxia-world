@@ -195,7 +195,13 @@ export type SceneEffect =
   | { t: "markRumorHeard"; rumorId: string }
   // Force-update an NPC's status in the encyclopedia UI. No-op on the
   // simulation itself — purely a refresh hint for cached UI views.
-  | { t: "revealNpcStatus"; npcId: string };
+  | { t: "revealNpcStatus"; npcId: string }
+  // ─── Law (wanted marks / jail) ──────────────────────────────────────
+  // Serve the jail sentence (2 days per wanted mark): time passes, marks
+  // clear, the player is released into the jail's city.
+  | { t: "serveJail" }
+  // Bribe the jailer (JAIL_BRIBE_GOLD): released now, two marks lifted.
+  | { t: "bribeJail" };
 
 // ─── Conditions ────────────────────────────────────────────────────────
 
@@ -1066,6 +1072,13 @@ export interface WorldStateData {
   // Last day the global tick ran. tickAllNamedNpcs reads this to compute
   // how many 7-day batches to process when the player advanceTimes a lot.
   lastNpcTickDay: number;
+  // ─── Law (v20) ───────────────────────────────────────────────────────
+  // หมายจับ — wanted marks from failed thefts (0–5). See lib/world/law.ts.
+  wanted: number;
+  // Day of the last crime (or last decay step): marks fade after 10 quiet days.
+  wantedDay: number;
+  // City whose jail holds the player while in the jail scene.
+  jailCityId: string | null;
 }
 
 export interface ActionLogEntry {

@@ -58,6 +58,8 @@ import {
 import { applyEffect, consumeQuestAutoItems, isSectQuestOfferable, tickQuestProgress } from "@/lib/world/effects";
 import { evaluateCondition } from "@/lib/world/conditions";
 import { tickAllNamedNpcs } from "@/lib/world/npc-tick";
+import { rollWalkEvent } from "@/lib/world/effects";
+import { WANTED_DECAY_DAYS, WANTED_MAX, isLawOpponent } from "@/lib/world/law";
 import { maintainRumors, seedLoreRumors, RUMOR_SEEN_CAP } from "@/lib/world/rumor-engine";
 import { namedNpcIds } from "@/lib/world/data/named-npcs";
 import { toast } from "@/store/toast-store";
@@ -474,6 +476,8 @@ interface WorldStore extends WorldStateData {
   // fight-or-flee offer to an actual battle; `fleeEncounter` clears the
   // offer and stays put.
   acceptEncounter: () => void;
+  // One walk tick (the map runtime calls this every WALK_TICK_UNITS walked).
+  walkTick: () => void;
   fleeEncounter: () => void;
 
   // Liveness Layer — record that the player has heard a specific rumor.
@@ -542,7 +546,29 @@ const emptyData = (): WorldStateData => ({
   rumorArchive: [],
   rumorSeenLog: [],
   lastNpcTickDay: 1,
+  wanted: 0,
+  wantedDay: 1,
+  jailCityId: null,
 });
+
+// A random encounter promoted to a battle. Law pursuers are non-fatal:
+// losing to them ends in their city's jail (the jail_cell scene), not death.
+function encounterBattle(opponentId: string, returnSceneId: string): NonNullable<WorldStateData["pendingBattle"]> {
+  if (isLawOpponent(opponentId)) return { opponentId, onWin: returnSceneId, onLose: "jail_cell", nonFatal: true };
+  return { opponentId, onWin: returnSceneId, onLose: returnSceneId };
+}
+
+// ─── Walk ticks ────────────────────────────────────────────────────────
+// Random events roll while the player walks: every WALK_TICK_UNITS of map
+// distance (lib/stage/types.ts) is one tick at WALK_TICK_CHANCE of the old per-trip odds, so a
+// map crossing (~2–3 ticks) feels like the old one roll per trip — but it
+// can happen anywhere along the way. The player's home is safe ground.
+const WALK_TICK_CHANCE = 0.4;
+const SAFE_SCENES = new Set(["home_player"]);
+/** Test/QA switch: localStorage["wuxia-random-events"] = "off" disables walk events. */
+function walkEventsDisabled(): boolean {
+  try { return typeof localStorage !== "undefined" && localStorage.getItem("wuxia-random-events") === "off"; } catch { return false; }
+}
 
 // Append a player-action entry to the rolling log. Keeps the most recent
 // 100. Mutates `state` in place so it's safe to call from inside a draft
@@ -699,6 +725,11 @@ function advanceTime(state: WorldStateData, hours: number): void {
   }
   state.time = total;
   state.day = day;
+  // Wanted marks fade one at a time after WANTED_DECAY_DAYS without a new crime.
+  while (state.wanted > 0 && state.day - state.wantedDay >= WANTED_DECAY_DAYS) {
+    state.wanted -= 1;
+    state.wantedDay += WANTED_DECAY_DAYS;
+  }
   // ─── Liveness Layer hook ────────────────────────────────────────────
   // After the clock has advanced to its final value, run NPC simulation
   // + rumor housekeeping ONCE per advanceTime call. The tick engine
@@ -929,6 +960,9 @@ function draftFrom(s: WorldStateData): WorldStateData {
     rumorArchive: [...s.rumorArchive],
     rumorSeenLog: [...s.rumorSeenLog],
     lastNpcTickDay: s.lastNpcTickDay,
+    wanted: s.wanted ?? 0,
+    wantedDay: s.wantedDay ?? s.day,
+    jailCityId: s.jailCityId ?? null,
   };
 }
 
@@ -1280,6 +1314,8 @@ export const useWorldStore = create<WorldStore>()(
         // used and every hit taken, then drop hunt spoils if a hunt was in
         // flight, then route to the encounter's onWin destination.
         draft.wExp = Math.max(0, draft.wExp + W_EXP_FIGHT_WIN);
+        // Beat the law this time: no jail pending (the marks stay).
+        if (isLawOpponent(pb.opponentId)) draft.jailCityId = null;
         // Bump the defeat counter so `Condition.defeatedOpponent` quests
         // can auto-advance against this kill.
         draft.defeatedCounts[pb.opponentId] =
@@ -2271,12 +2307,21 @@ export const useWorldStore = create<WorldStore>()(
         // to the encounter's returnSceneId.
         set({
           pendingEncounter: null,
-          pendingBattle: {
-            opponentId: enc.opponentId,
-            onWin: enc.returnSceneId,
-            onLose: enc.returnSceneId,
-          },
+          pendingBattle: encounterBattle(enc.opponentId, enc.returnSceneId),
         });
+      },
+
+      walkTick: () => {
+        const s = get();
+        if (!s.hasGame || s.gameOver || s.pendingBattle || s.pendingEncounter || walkEventsDisabled()) return;
+        const scene = getScene(s.currentSceneId);
+        if (!scene || (scene.kind !== "location" && scene.kind !== "route") || SAFE_SCENES.has(scene.id)) return;
+        const draft = draftFrom(s);
+        rollWalkEvent(draft, WALK_TICK_CHANCE);
+        if (draft.pendingEncounter && isLawOpponent(draft.pendingEncounter.opponentId)) {
+          appendActionLog(draft, "encounter", `ถูกตามจับ! หมายจับ ${draft.wanted}/${WANTED_MAX}`);
+        }
+        if (draft.pendingEncounter || draft.currentSceneId !== s.currentSceneId || draft.jailCityId !== s.jailCityId) set({ ...draft });
       },
 
       fleeEncounter: () => {
@@ -2288,7 +2333,7 @@ export const useWorldStore = create<WorldStore>()(
         // Cap 90% so a maxed-out player still has a small fail chance.
         // Fail → forced into the fight (promote to pendingBattle).
         const oppId = s.pendingEncounter.opponentId;
-        if (oppId.startsWith("hunter_")) {
+        if (oppId.startsWith("hunter_") || isLawOpponent(oppId)) {
           const stats = s.playerBuild?.stats;
           const agi = stats?.AGI ?? 0;
           const luk = stats?.LUK ?? 0;
@@ -2302,7 +2347,7 @@ export const useWorldStore = create<WorldStore>()(
             const draft = draftFrom(s);
             appendActionLog(draft, "encounter", `หนีนักล่าไม่สำเร็จ (${chance.toFixed(0)}% สำเร็จ) — ต้องสู้`);
             const back = s.pendingEncounter.returnSceneId;
-            draft.pendingBattle = { opponentId: oppId, onWin: back, onLose: back };
+            draft.pendingBattle = encounterBattle(oppId, back);
             draft.pendingEncounter = null;
             set({ ...draft });
             return;
@@ -2409,13 +2454,16 @@ export const useWorldStore = create<WorldStore>()(
         const tier = (npc.defenseTier ?? 0) as 0 | 1 | 2 | 3 | 4;
         const opponentId = npc.sparOpponentId ?? TIER_TO_BAD_ACTION_OPPONENT[tier];
         draft.lifeSkillXp.steal = (draft.lifeSkillXp.steal ?? 0) + STEAL_XP_ON_FAIL;
+        // Caught: a หมายจับ goes out (max 5). The law now hunts the player.
+        draft.wanted = Math.min(WANTED_MAX, (draft.wanted ?? 0) + 1);
+        draft.wantedDay = draft.day;
         draft.pendingBattle = {
           opponentId,
           onWin: draft.currentSceneId,
           onLose: draft.currentSceneId,
           nonFatal: true,
         };
-        appendActionLog(draft, "steal", `ขโมย ${npc.name} ล้มเหลว (${chance.toFixed(0)}%) — ถูกจับได้`);
+        appendActionLog(draft, "steal", `ขโมย ${npc.name} ล้มเหลว (${chance.toFixed(0)}%) — ถูกจับได้ · หมายจับ ${draft.wanted}/${WANTED_MAX}`);
         set({ ...draft });
         return { ok: true, outcome: "failed", chance };
       },
@@ -2587,7 +2635,7 @@ export const useWorldStore = create<WorldStore>()(
     }),
     {
       name: "wusia-world-v1",
-      version: 19,
+      version: 20,
       // Content backfill also runs for current-version saves (migrate does
       // not). Keep the standard shallow merge and add only missing lore.
       merge: (persisted, current) => {
@@ -2641,6 +2689,9 @@ export const useWorldStore = create<WorldStore>()(
         rumorArchive: s.rumorArchive,
         rumorSeenLog: s.rumorSeenLog,
         lastNpcTickDay: s.lastNpcTickDay,
+        wanted: s.wanted,
+        wantedDay: s.wantedDay,
+        jailCityId: s.jailCityId,
       }),
       // Migrations:
       //   v1 → v2 added stamina/staminaMax/lifeSkillXp(6)/pendingHuntYield.
@@ -2804,6 +2855,10 @@ export const useWorldStore = create<WorldStore>()(
             typeof p.lastNpcTickDay === "number" && p.lastNpcTickDay >= 1
               ? p.lastNpcTickDay
               : (typeof p.day === "number" && p.day >= 1 ? p.day : 1),
+          // v20+: wanted marks / jail
+          wanted: typeof p.wanted === "number" ? Math.max(0, Math.min(5, Math.floor(p.wanted))) : 0,
+          wantedDay: typeof p.wantedDay === "number" ? p.wantedDay : (typeof p.day === "number" ? p.day : 1),
+          jailCityId: typeof p.jailCityId === "string" ? p.jailCityId : null,
         };
         void fromVersion;
         return out;

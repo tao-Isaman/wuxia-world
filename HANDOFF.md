@@ -268,3 +268,19 @@ Requested by the user after an in-browser error report ("rewrite it to be Phaser
 - ♪ settings bubble (music / effects on-off + volume) in the top icon bar, battle header and title screen.
 - Tests: `bun run test:audio` (song structure, pentatonic leads), e2e `audio.spec.ts`. Offline renders of every
   track had no clipping (peaks 0.13–0.41).
+
+## Wave 20: walk ticks, wanted marks, quest guide, busy overlay, full-screen dialogue
+
+- HUD: smaller icons in a 2-row grid under the HP card (offsets tuned per breakpoint in `mobile-hud.css`).
+- Random events roll while walking (`onWalkTick` every 220 map units → `walkTick` → `rollWalkEvent`), never on
+  map change. Test switch: `localStorage["wuxia-random-events"]="off"` (seeded by `playwright.config.ts`).
+- Failed steals add หมายจับ marks (1–5, shown as `⛓●●○○○`); walk ticks may bring constables, imperial guards or
+  bounty hunters (`lib/world/law.ts`). Losing sends the player to the region's city jail for 2 days per mark
+  (`jail_cell` scene; bribe 300 gold). Save v20.
+- Activities show the hero working behind a progress bar (`.work-overlay[data-world-busy]`) that blocks taps,
+  the action button and menu hotkeys until the action is done.
+- Quest guide (`lib/world/quest-guide.ts`): the quest log names who to find and where, with a นำทาง button; the
+  map shows a jade arrow over the target / the exit toward it, plus an edge pointer when off-screen.
+- Talking to an NPC is full-screen and auto-fits text so nothing scrolls.
+- Tests: `bun run test:law`; e2e `law-guide.spec.ts`; dialogue/investigation/opening specs updated for the new
+  rules (no encounter on arrival or goodbye; dialogue fits without scroll).

@@ -48,9 +48,8 @@ for (const r of LOCATION_ROUTES) {
 
 function leaf(id: string, name: string, description: string): LocationScene {
   // routes are populated below in the connectivity pass — every leaf gets
-  // 1–4 directed-edge routes to other leaves. Each leaf also rolls a random
-  // event on every entry (fight / treasure / meet / nothing), implemented
-  // in lib/world/effects.ts.
+  // 1–4 directed-edge routes to other leaves. Random events roll while the
+  // player walks on the map (walk ticks — rollWalkEvent in lib/world/effects.ts).
   return {
     kind: "location",
     id,
@@ -58,7 +57,6 @@ function leaf(id: string, name: string, description: string): LocationScene {
     description,
     npcs: [],
     routes: [],
-    onEnter: [{ t: "rollRandomEvent" }],
   };
 }
 

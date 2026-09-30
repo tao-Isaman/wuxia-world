@@ -57,6 +57,9 @@ function freshState(): WorldStateData {
     rumorArchive: [],
     rumorSeenLog: [],
     lastNpcTickDay: 1,
+    wanted: 0,
+    wantedDay: 1,
+    jailCityId: null,
   };
 }
 

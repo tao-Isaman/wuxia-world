@@ -1,31 +1,34 @@
 "use client";
 
 import { useLoadingStore } from "@/store/loading-store";
+import { useWorldStore } from "@/store/world-store";
+import { CharacterPreview } from "@/components/game/character-preview";
 
-// Full-screen translucent overlay with a spinner + message. Shown for ~300ms
-// while a world action (gather / travel / craft) is "happening" — even
-// though the underlying store call is synchronous, the brief flash gives
-// the click a satisfying weight.
-//
-// Mounted once at the top level in WorldScreen so it sits above every
-// scene / popup. Pointer events fall through (`pointer-events-none`) so
-// the overlay doesn't accidentally swallow taps if a click triggers a
-// follow-up action while it's still visible.
+// While an action runs, the hero is shown at work over a progress bar and
+// the screen takes no input (the layer catches taps, and `data-world-busy`
+// makes the world runtime ignore keys) until the bar fills.
 export function LoadingOverlay() {
   const active = useLoadingStore((s) => s.active);
   const message = useLoadingStore((s) => s.message);
+  const kind = useLoadingStore((s) => s.kind);
+  const duration = useLoadingStore((s) => s.duration);
+  const job = useLoadingStore((s) => s.job);
+  const bodyId = useWorldStore((s) => s.playerBodyId);
 
   if (!active) return null;
 
   return (
-    <div
-      className="fixed inset-0 z-[200] flex items-center justify-center bg-black/30 pointer-events-none"
-      aria-live="polite"
-      aria-busy="true"
-    >
-      <div className="bg-card border rounded-lg shadow-lg px-4 py-3 flex items-center gap-3 pointer-events-auto">
-        <div className="h-5 w-5 rounded-full border-2 border-primary border-t-transparent animate-spin" />
-        <span className="text-sm font-medium">{message || "กำลังโหลด..."}</span>
+    <div className="work-overlay" data-world-busy="" aria-busy="true" onPointerDown={(event) => event.preventDefault()}>
+      <div className="work-card" role="status" aria-live="polite">
+        <div className={`work-hero work-hero--${kind}`} aria-hidden="true">
+          <CharacterPreview id={bodyId} animate motion={kind === "rest" ? "idle" : "attack"} />
+        </div>
+        <div className="work-body">
+          <span className="work-label">{message || "กำลังทำงาน..."}</span>
+          <div className="work-track" role="progressbar" aria-label={message || "กำลังทำงาน"}>
+            <div key={job} className="work-fill" style={{ animationDuration: `${duration}ms` }} />
+          </div>
+        </div>
       </div>
     </div>
   );

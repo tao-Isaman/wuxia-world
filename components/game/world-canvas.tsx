@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { WorldMarker, WorldPresentation, WorldRuntime } from "@/lib/stage/types";
 import { TouchStick } from "./touch-stick";
+import { useWorldStore } from "@/store/world-store";
 
 export function WorldCanvas({ presentation }: { presentation: WorldPresentation }) {
   const host = useRef<HTMLDivElement>(null);
@@ -31,7 +32,8 @@ export function WorldCanvas({ presentation }: { presentation: WorldPresentation 
       instance = createWorldRuntime(host.current, () => latest.current,
         () => { if (!disposed) setReady(true); },
         (message) => { if (!disposed) { setReady(false); setError(message); } },
-        (id) => { if (!disposed) setNearby(id); });
+        (id) => { if (!disposed) setNearby(id); },
+        () => { if (!disposed) useWorldStore.getState().walkTick(); });
       runtime.current = instance;
     }).catch((cause: unknown) => {
       // A chunk failed to download or Phaser could not boot — say so.

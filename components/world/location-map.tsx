@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef } from "react";
 import type { ArtisanDef, LocationMapDef, LocationScene, MapSpot, NpcDef } from "@/lib/world";
-import { evaluateCondition, getArtisan, getQuestsForNpc, isQuestOfferable, isQuestTurnInForNpc, getNpcsAtLocation, getResource, getScene, getSectHallAt, getShopAt, npcBodySprite, npcPixelSprite, playerBodySprite } from "@/lib/world";
+import { activeGuide, evaluateCondition, guideMarkerId, getArtisan, getQuestsForNpc, isQuestOfferable, isQuestTurnInForNpc, getNpcsAtLocation, getResource, getScene, getSectHallAt, getShopAt, npcBodySprite, npcPixelSprite, playerBodySprite } from "@/lib/world";
 import { useWorldStore, TRAVEL_STAMINA_COST } from "@/store/world-store";
 import { toast } from "@/store/toast-store";
 import { WorldCanvas } from "@/components/game/world-canvas";
@@ -87,8 +87,11 @@ export function LocationMap({ scene, map, handlers, readOnly = false, dialogueSp
         current.gotoScene(routeId);
       } });
   }
+  const guide = activeGuide(state);
+  const guideId = guide ? guideMarkerId(state, guide) : null;
+  const guidedMarkers = guideId ? markers.map((marker) => marker.id === guideId ? { ...marker, guide: true } : marker) : markers;
   const presentation: WorldPresentation = { key: scene.id, name: scene.name, image: map.image,
-    time: state.time, spawn: map.spawn, playerImage: playerBodySprite(state.playerBodyId), markers,
+    time: state.time, spawn: map.spawn, playerImage: playerBodySprite(state.playerBodyId), markers: guidedMarkers,
     ...capitalVignette(scene.id, state.quests.qc_capital_clinic_supplies?.status === "done",
       state.flags.capital_ledger_recovered === true) };
   useEffect(() => {

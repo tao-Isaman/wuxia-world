@@ -290,8 +290,38 @@ const CORE_SCENES: readonly Scene[] = [
     ],
   },
 
+  // ─── Jail (lost to the law while wanted — lib/world/law.ts) ────────────
+  {
+    kind: "dialog",
+    id: "jail_cell",
+    lines: [
+      { t: "narration", text: "เจ้าพ่ายแพ้และถูกคุมตัวเข้าคุกหลวงของเมือง ประตูเหล็กปิดลงเสียงดังกังวาน" },
+      { t: "dialogue", speaker: "ผู้คุม", text: "หมายจับหนึ่งใบ โทษสองวัน นั่งนับวันไปเถอะ… เว้นแต่เจ้าจะมีอะไรมาแลกความสะดวก" },
+    ],
+    choices: [
+      { text: "รับโทษจนพ้นกำหนด (หมายจับละ 2 วัน · ล้างหมายจับ)", effects: [{ t: "serveJail" }], next: "jail_released" },
+      { text: "ติดสินบนผู้คุม (300 ตำลึง · ลดหมายจับ 2)", visibleIf: { t: "goldAtLeast", amount: 300 }, effects: [{ t: "bribeJail" }], next: "jail_bribed" },
+    ],
+  },
+  {
+    kind: "dialog",
+    id: "jail_released",
+    lines: [
+      { t: "narration", text: "วันเวลาผ่านไปในห้องขังอันอับชื้น จนผู้คุมไขกุญแจปล่อยตัว" },
+      { t: "dialogue", speaker: "ผู้คุม", text: "พ้นโทษแล้ว หมายจับของเจ้าถูกเผาทิ้ง อย่าให้ข้าเห็นหน้าอีก" },
+    ],
+  },
+  {
+    kind: "dialog",
+    id: "jail_bribed",
+    lines: [
+      { t: "narration", text: "ถุงเงินเปลี่ยนมือเงียบ ๆ ผู้คุมหันไปมองทางอื่น" },
+      { t: "dialogue", speaker: "ผู้คุม", text: "ข้าไม่เห็นอะไรทั้งนั้น รีบไปก่อนเปลี่ยนเวร" },
+    ],
+  },
+
   // ─── Random-event scenes ─────────────────────────────────────────────
-  // Fired by `rollRandomEvent` in lib/world/effects.ts. Each is a terminal
+  // Fired by walk ticks (`rollWalkEvent` in lib/world/effects.ts). Each is a terminal
   // dialog whose onEnter applies the loot; pressing "ปิด" auto-returns to
   // lastLocationId (the leaf the player just stepped onto).
 

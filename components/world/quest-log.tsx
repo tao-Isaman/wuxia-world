@@ -5,7 +5,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
+  activeGuide,
   describeQuestCondition,
+  guideForQuest,
   getItem,
   getQuest,
   type QuestReward,
@@ -175,7 +177,10 @@ function QuestRow({
   // Subscribe to whole world state so progress lines stay live as the
   // player gathers / defeats / etc. between quest log opens.
   const worldState = useWorldStore();
+  const setFlag = useWorldStore((s) => s._setFlag);
   if (!def) return null;
+  const guide = status === "active" ? guideForQuest(worldState, questId) : null;
+  const guiding = !!guide && activeGuide(worldState)?.questId === questId;
   const isSide = def.type === "side";
 
   const onCancel = async () => {
@@ -265,6 +270,29 @@ function QuestRow({
                       {idx + 1}. {s.description}
                     </span>
                   </span>
+                  {stepStatus === "current" && guide && (
+                    <div className="quest-guide ml-5 mt-1 flex items-center gap-2 border border-jade/50 bg-jade/10 px-2 py-1 text-[11px] font-normal text-foreground">
+                      <span className="flex-1 min-w-0">
+                        📍 <strong>{guide.npcName}</strong> · {guide.locationName}
+                        <span className="text-muted-foreground">
+                          {guide.path.length <= 1 ? " — อยู่ที่นี่" : ` — อีก ${guide.path.length - 1} ช่วงทาง`}
+                        </span>
+                      </span>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant={guiding ? "secondary" : "outline"}
+                        className="h-6 shrink-0 px-2 text-[11px]"
+                        aria-pressed={guiding}
+                        onClick={() => {
+                          setFlag("trackedQuestId", questId);
+                          toast("info", `นำทางไปหา${guide.npcName} · ${guide.locationName}`);
+                        }}
+                      >
+                        {guiding ? "➤ กำลังนำทาง" : "➤ นำทาง"}
+                      </Button>
+                    </div>
+                  )}
                   {progress.length > 0 && (
                     <ul className="pl-5 space-y-0.5 mt-0.5">
                       {progress.map((p, pIdx) => (
