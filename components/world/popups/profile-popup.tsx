@@ -1,8 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { Modal } from "@/components/ui/modal";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import {
   SLOT_LABELS,
   STAT_BUDGET,
@@ -15,7 +15,6 @@ import {
   combinedStats,
   derive,
   deriveAll,
-  getArt,
   getEquip,
   getEquipBonus,
   getEquipStatBonus,
@@ -120,6 +119,9 @@ export function ProfilePopup({ open, onClose }: Props) {
   const bodyId = useWorldStore((s) => s.playerBodyId);
   const currentHp = useWorldStore((s) => s.currentHp);
   const currentMp = useWorldStore((s) => s.currentMp);
+  const stamina = useWorldStore((s) => s.stamina);
+  const staminaMax = useWorldStore((s) => s.staminaMax);
+  const [tab, setTab] = useState<ProfileTab>("stats");
   if (!player) return null;
 
   const base = player.stats;
@@ -130,14 +132,8 @@ export function ProfilePopup({ open, onClose }: Props) {
   const breakdown = statBreakdown(player);
   const derivedAll = deriveAll(player);
   const derivedBase = derive(base);
-  const art = getArt(player.artId);
-  const lv = player.artLevel;
 
   const totalSpent = totalStatPoints(base);
-  const remaining = STAT_BUDGET - totalSpent;
-  const budgetPct = (totalSpent / STAT_BUDGET) * 100;
-  const budgetColor =
-    remaining <= 0 ? "#E24B4A" : remaining < 20 ? "#BA7517" : "#7F77DD";
 
   // Skills + mastery + per-skill stat bonus aggregation. Stat contribution
   // scales with skill level via bpMultiplier — keep this in sync with
@@ -172,21 +168,23 @@ export function ProfilePopup({ open, onClose }: Props) {
   if (eb.hp_regen) equipSummary.push(`ฟื้น${eb.hp_regen}%/ตา`);
   for (const [k, v] of Object.entries(sb)) equipSummary.push(`${k}+${v}`);
 
+  const staminaPct = staminaMax > 0 ? Math.min(100, (stamina / staminaMax) * 100) : 0;
+  const hpNow = Math.min(currentHp, derivedAll.HP), mpNow = Math.min(currentMp, derivedAll.MP);
+
   return (
     <Modal open={open} onClose={onClose} title={`👤 โปรไฟล์ — ${player.name}`} maxWidth="max-w-3xl">
-      <div className="space-y-4">
-        {/* ─── Header ──────────────────────────────────────────────── */}
+      <div className="profile">
+        {/* ─── Header: who, and how they are right now ─────────────── */}
         <section className="profile-hero">
           <div className="profile-figure" aria-hidden="true"><CharacterPreview id={bodyId} animate /></div>
           <div className="profile-identity">
             <h3>{player.name}</h3>
-            <p>{GENDER_LABEL[gender]} · ทอง <strong className="text-amber-600">{gold.toLocaleString()}</strong></p>
-            <dl className="profile-vitals">
-              <div><dt>HP</dt><dd>{Math.min(currentHp, derivedAll.HP)}/{derivedAll.HP}</dd></div>
-              <div><dt>MP</dt><dd>{Math.min(currentMp, derivedAll.MP)}/{derivedAll.MP}</dd></div>
-              <div><dt>ATK</dt><dd>{derivedAll.Atk}</dd></div>
-              <div><dt>SPD</dt><dd>{derivedAll.Spd}</dd></div>
-            </dl>
+            <p>{GENDER_LABEL[gender]} · ทอง <strong>{gold.toLocaleString()}</strong> ตำลึง</p>
+            <div className="profile-bars">
+              <VitalBar label="HP" tone="hp" value={hpNow} max={derivedAll.HP} />
+              <VitalBar label="MP" tone="mp" value={mpNow} max={derivedAll.MP} />
+              <VitalBar label="พลัง" tone="st" value={stamina} max={staminaMax} pct={staminaPct} />
+            </div>
           </div>
           {/* Sect memberships — one row per joined sect. */}
           {Object.entries(sectMembership).filter(([, m]) => m).length > 0 && (
@@ -210,151 +208,92 @@ export function ProfilePopup({ open, onClose }: Props) {
           )}
         </section>
 
-        {/* ─── Stat budget ─────────────────────────────────────────── */}
-        <section>
-          <div className="flex justify-between text-xs text-muted-foreground mb-1">
-            <span>คะแนนพลัง <strong className="text-foreground">{totalSpent}</strong>/{STAT_BUDGET}</span>
-            <span className={remaining <= 0 ? "text-destructive" : ""}>เหลือ {remaining}</span>
-          </div>
-          <Progress value={budgetPct} indicatorColor={budgetColor} className="h-2" />
-        </section>
+        <div className="profile-tabs" role="tablist" aria-label="ข้อมูลตัวละคร">
+          {PROFILE_TABS.map((entry) => (
+            <button key={entry.id} type="button" role="tab" aria-selected={tab === entry.id} onClick={() => setTab(entry.id)}>
+              {entry.label}
+            </button>
+          ))}
+        </div>
 
-        {/* ─── Base stats ──────────────────────────────────────────── */}
-        <section>
-          <div className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground mb-1">
-            พลังพื้นฐาน
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
-            {STAT_KEYS.map((k) => {
-              const b = base[k];
-              const c = combined[k];
-              const d = c - b;
-              const fromArts = breakdown.fromArts[k];
-              const fromSkills = breakdown.fromSkills[k];
-              const fromEquipment = breakdown.fromEquipment[k];
-              // Sum used by learn-skill / learn-art gates (no equipment).
-              const learnable = b + fromArts + fromSkills;
-              const xp = statExp[k] ?? 0;
-              const cost = xpToNextStatLevel(b, k);
-              const xpPct = cost > 0 ? Math.min(100, Math.round((xp / cost) * 100)) : 0;
-              const cellTrigger = (
-                <div className="w-full rounded bg-muted/40 px-2 py-1.5 cursor-help">
-                  <div className="text-[9px] text-muted-foreground">
-                    {k} <span className="opacity-70">{STAT_LABEL[k]}</span>
+        {tab === "stats" && <>
+          {/* ─── Base stats: name, value, training progress ─────────── */}
+          <section className="profile-panel">
+            <div className="profile-heading">พลังพื้นฐาน <small>แตะเพื่อดูที่มา</small></div>
+            <div className="profile-stats">
+              {STAT_KEYS.map((k) => {
+                const b = base[k];
+                const c = combined[k];
+                const d = c - b;
+                const fromArts = breakdown.fromArts[k];
+                const fromSkills = breakdown.fromSkills[k];
+                const fromEquipment = breakdown.fromEquipment[k];
+                // Sum used by learn-skill / learn-art gates (no equipment).
+                const learnable = b + fromArts + fromSkills;
+                const xp = statExp[k] ?? 0;
+                const cost = xpToNextStatLevel(b, k);
+                const xpPct = cost > 0 ? Math.min(100, Math.round((xp / cost) * 100)) : 0;
+                const cellTrigger = (
+                  <div className="profile-stat">
+                    <span className="profile-stat-name">{STAT_LABEL[k]}<small>{k}</small></span>
+                    <b className="profile-stat-value">{c}{d > 0 && <em>+{d}</em>}</b>
+                    <span className="profile-stat-train" aria-label={`ฝึก ${xp} จาก ${cost}`}>
+                      <i><span style={{ width: `${xpPct}%` }} /></i>
+                      <small>ฝึก {xp}/{cost}</small>
+                    </span>
                   </div>
-                  <div className="text-xs font-semibold">
-                    {c}
-                    {d > 0 && <span className="text-[9px] text-emerald-600 ml-1">+{d}</span>}
-                  </div>
-                  <div className="mt-1 h-1 bg-muted rounded overflow-hidden">
-                    <div className="h-full bg-primary" style={{ width: `${xpPct}%` }} />
-                  </div>
-                  <div className="text-[8px] text-muted-foreground mt-0.5 font-mono">
-                    {xp}/{cost}
-                  </div>
-                </div>
-              );
-              return (
-                <InfoPopover
-                  key={k}
-                  trigger={cellTrigger}
-                  contentClassName="w-64"
-                >
-                  <div className="space-y-1.5 text-xs">
-                    <div className="flex items-baseline justify-between">
-                      <strong className="font-display">
-                        {k} · {STAT_LABEL[k]}
-                      </strong>
-                      <span className="text-sm font-semibold">{c}</span>
-                    </div>
-                    <ul className="space-y-0.5 text-[11px]">
-                      <li className="flex justify-between">
-                        <span className="text-muted-foreground">พลังพื้นฐาน</span>
-                        <span className="font-mono">{b}</span>
-                      </li>
-                      <li className="flex justify-between">
-                        <span className="text-muted-foreground">วิชาในกาย</span>
-                        <span className="font-mono">
-                          {fromArts > 0 ? `+${fromArts}` : fromArts}
-                        </span>
-                      </li>
-                      <li className="flex justify-between">
-                        <span className="text-muted-foreground">วิชาฝีมือ</span>
-                        <span className="font-mono">
-                          {fromSkills > 0 ? `+${fromSkills}` : fromSkills}
-                        </span>
-                      </li>
-                      <li className="flex justify-between">
-                        <span className="text-muted-foreground">อุปกรณ์</span>
-                        <span className="font-mono">
-                          {fromEquipment > 0 ? `+${fromEquipment}` : fromEquipment}
-                        </span>
-                      </li>
-                    </ul>
-                    <div className="border-t pt-1.5 space-y-0.5 text-[10px]">
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">เกณฑ์เรียนตำรา</span>
-                        <span className="font-mono font-semibold text-emerald-700">
-                          {learnable}
-                        </span>
+                );
+                return (
+                  <InfoPopover key={k} trigger={cellTrigger} contentClassName="w-64">
+                    <div className="space-y-1.5 text-sm">
+                      <div className="flex items-baseline justify-between">
+                        <strong className="font-display">{STAT_LABEL[k]} · {k}</strong>
+                        <span className="text-base font-semibold">{c}</span>
                       </div>
-                      <div className="text-muted-foreground italic">
-                        ใช้รวม วิชาในกาย + วิชาฝีมือ — ไม่นับอุปกรณ์
+                      <ul className="space-y-0.5 text-[13px]">
+                        <li className="flex justify-between"><span className="text-muted-foreground">พลังพื้นฐาน</span><span className="font-mono">{b}</span></li>
+                        <li className="flex justify-between"><span className="text-muted-foreground">วิชาในกาย</span><span className="font-mono">{fromArts > 0 ? `+${fromArts}` : fromArts}</span></li>
+                        <li className="flex justify-between"><span className="text-muted-foreground">วิชาฝีมือ</span><span className="font-mono">{fromSkills > 0 ? `+${fromSkills}` : fromSkills}</span></li>
+                        <li className="flex justify-between"><span className="text-muted-foreground">อุปกรณ์</span><span className="font-mono">{fromEquipment > 0 ? `+${fromEquipment}` : fromEquipment}</span></li>
+                      </ul>
+                      <div className="border-t pt-1.5 space-y-0.5 text-xs">
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">เกณฑ์เรียนตำรา</span>
+                          <span className="font-mono font-semibold text-emerald-700">{learnable}</span>
+                        </div>
+                        <div className="text-muted-foreground italic">ใช้รวม วิชาในกาย + วิชาฝีมือ — ไม่นับอุปกรณ์</div>
                       </div>
                     </div>
-                    <div className="border-t pt-1.5 text-[10px] text-muted-foreground">
-                      ค่ารบ: รวมทุกแหล่ง = <strong className="text-foreground">{c}</strong>
-                    </div>
-                  </div>
-                </InfoPopover>
-              );
-            })}
-          </div>
-        </section>
+                  </InfoPopover>
+                );
+              })}
+            </div>
+          </section>
 
-        {/* ─── Derived stats ───────────────────────────────────────── */}
-        <section>
-          <div className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground mb-1">
-            พลังที่คำนวณ
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
-            {DERIVED_ROWS.map(({ label, thai, key }) => {
-              const cv = derivedAll[key];
-              const bv = derivedBase[key as keyof typeof derivedBase] ?? cv;
-              const diff = cv - bv;
-              return (
-                <div key={label} className="rounded bg-muted/40 px-2 py-1.5">
-                  <div className="text-[9px] text-muted-foreground">{thai} <span className="opacity-60">{label}</span></div>
-                  <div className="text-xs font-semibold">
-                    {cv}
-                    {diff > 0 && <span className="text-[9px] text-emerald-600 ml-1">+{diff}</span>}
+          {/* ─── Combat numbers ──────────────────────────────────────── */}
+          <section className="profile-panel">
+            <div className="profile-heading">ค่าต่อสู้</div>
+            <dl className="profile-derived">
+              {DERIVED_ROWS.map(({ label, thai, key }) => {
+                const cv = derivedAll[key];
+                const bv = derivedBase[key as keyof typeof derivedBase] ?? cv;
+                const diff = cv - bv;
+                return (
+                  <div key={label}>
+                    <dt>{thai}<small>{label}</small></dt>
+                    <dd>{cv}{diff > 0 && <em>+{diff}</em>}</dd>
                   </div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
+                );
+              })}
+            </dl>
+            <p className="profile-budget">คะแนนพลังรวม {totalSpent}/{STAT_BUDGET}</p>
+          </section>
+        </>}
 
-        {/* ─── Traits / reputation ─────────────────────────────────── */}
-        <section className="border-t pt-3">
-          <div className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground mb-1">
-            ชื่อเสียงและคุณธรรม
-          </div>
-          <div className="grid grid-cols-3 sm:grid-cols-5 gap-1.5">
-            {TRAIT_KEYS.map((k) => {
-              const v = traits[k] ?? 0;
-              return (
-                <div key={k} className="rounded bg-muted/40 px-2 py-1.5 text-center">
-                  <div className="text-[9px] text-muted-foreground">{TRAIT_LABEL[k]}</div>
-                  <div className="text-sm font-semibold">{v}</div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
+        {tab === "skills" && <>
         {/* ─── Equipped skills (both move skills + inner arts) ──────── */}
-        <section className="border-t pt-3">
-          <div className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground mb-2">
+        <section className="profile-panel">
+          <div className="profile-heading">
             วิชาที่ติดตั้ง ({player.skillIds.length} ช่อง)
           </div>
           <div className="space-y-1.5">
@@ -363,8 +302,8 @@ export function ProfilePopup({ open, onClose }: Props) {
               if (!info) {
                 return (
                   <div key={i} className="flex items-center gap-1.5">
-                    <span className="text-[10px] text-muted-foreground w-4 text-center shrink-0">{i + 1}</span>
-                    <span className="flex-1 text-[11px] text-muted-foreground italic px-2">— ว่าง —</span>
+                    <span className="text-[13px] text-muted-foreground w-4 text-center shrink-0">{i + 1}</span>
+                    <span className="flex-1 text-[13px] text-muted-foreground italic px-2">— ว่าง —</span>
                   </div>
                 );
               }
@@ -378,37 +317,37 @@ export function ProfilePopup({ open, onClose }: Props) {
                   <div key={i} className="rounded bg-muted/30 px-2 py-1.5">
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-1.5 flex-wrap min-w-0">
-                        <span className="text-[10px] text-muted-foreground shrink-0">{i + 1}</span>
-                        <Badge variant="default" className="text-[9px]">☯</Badge>
+                        <span className="text-[13px] text-muted-foreground shrink-0">{i + 1}</span>
+                        <Badge variant="default" className="text-sm">☯</Badge>
                         <ArtTooltip art={a} level={aLv}>
-                          <strong className="text-xs cursor-help underline decoration-dotted underline-offset-2">
+                          <strong className="text-sm cursor-help underline decoration-dotted underline-offset-2">
                             {a.n}
                           </strong>
                         </ArtTooltip>
-                        <Badge variant="outline" className="text-[9px]">{a.sc}</Badge>
-                        <Badge variant="outline" className="text-[9px]">{a.tp}</Badge>
-                        <Badge variant="outline" className="text-[9px]">ขั้น {aLv}</Badge>
+                        <Badge variant="outline" className="text-sm">{a.sc}</Badge>
+                        <Badge variant="outline" className="text-sm">{a.tp}</Badge>
+                        <Badge variant="outline" className="text-sm">ขั้น {aLv}</Badge>
                       </div>
                       {a.act && (
-                        <span className="text-[9px] bg-primary/10 text-primary px-1.5 py-0.5 rounded shrink-0 whitespace-nowrap">
+                        <span className="text-sm bg-primary/10 text-primary px-1.5 py-0.5 rounded shrink-0 whitespace-nowrap">
                           ⚡ MP{a.act.c} CD{a.act.cd}
                         </span>
                       )}
                     </div>
                     {(artStatRow || a.hL || a.mL) && (
-                      <div className="text-[10px] text-emerald-700 mt-0.5">
+                      <div className="text-[13px] text-emerald-700 mt-0.5">
                         โบนัส:{artStatRow ? ` ${artStatRow}` : ""}
                         {a.hL ? ` HP+${a.hL * aLv}` : ""}
                         {a.mL ? ` MP+${a.mL * aLv}` : ""}
                       </div>
                     )}
                     {a.act && (
-                      <div className="text-[10px] text-muted-foreground">
+                      <div className="text-[13px] text-muted-foreground">
                         ⚡ <strong>{a.act.n}</strong>: {a.act.d}
                       </div>
                     )}
                     {a.pas && (
-                      <div className="text-[10px] text-muted-foreground">◆ {a.pas.d}</div>
+                      <div className="text-[13px] text-muted-foreground">◆ {a.pas.d}</div>
                     )}
                   </div>
                 );
@@ -424,34 +363,34 @@ export function ProfilePopup({ open, onClose }: Props) {
                 <div key={i} className="rounded bg-muted/30 px-2 py-1.5">
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-1.5 flex-wrap min-w-0">
-                      <span className="text-[10px] text-muted-foreground shrink-0">{i + 1}</span>
-                      <Badge variant="default" className="text-[9px]">⚔</Badge>
+                      <span className="text-[13px] text-muted-foreground shrink-0">{i + 1}</span>
+                      <Badge variant="default" className="text-sm">⚔</Badge>
                       <SkillTooltip skill={sk} level={skLv}>
-                        <strong className="text-xs cursor-help underline decoration-dotted underline-offset-2">
+                        <strong className="text-sm cursor-help underline decoration-dotted underline-offset-2">
                           {sk.n}
                         </strong>
                       </SkillTooltip>
-                      <Badge variant="default" className="text-[9px]">Lv.{skLv}</Badge>
-                      <Badge variant="outline" className="text-[9px]">{tier?.n}</Badge>
+                      <Badge variant="default" className="text-sm">Lv.{skLv}</Badge>
+                      <Badge variant="outline" className="text-sm">{tier?.n}</Badge>
                       <Badge
                         variant="outline"
-                        className="text-[9px]"
+                        className="text-sm"
                         title={WEAPON_FAMILY_HINT[sk.w]}
                       >
                         {WEAPON_FAMILY_LABEL[sk.w]}
                       </Badge>
                     </div>
-                    <span className="text-[9px] bg-primary/10 text-primary px-1.5 py-0.5 rounded shrink-0 whitespace-nowrap">
+                    <span className="text-sm bg-primary/10 text-primary px-1.5 py-0.5 rounded shrink-0 whitespace-nowrap">
                       {skillKindIcon(sk)} CD{tier?.cd ?? 0}
                     </span>
                   </div>
                   {skStatRow && (
-                    <div className="text-[10px] text-emerald-700 mt-0.5">
+                    <div className="text-[13px] text-emerald-700 mt-0.5">
                       โบนัส: {skStatRow}
                       <span className="opacity-60"> (×{Math.round(skMul * 100)}% ของ Lv.10)</span>
                     </div>
                   )}
-                  <div className="text-[10px] text-muted-foreground">{sk.d}</div>
+                  <div className="text-[13px] text-muted-foreground">{sk.d}</div>
                 </div>
               );
             })}
@@ -464,7 +403,7 @@ export function ProfilePopup({ open, onClose }: Props) {
               return (
                 <span
                   key={w}
-                  className="text-[10px] bg-muted/40 px-2 py-0.5 rounded"
+                  className="text-[13px] bg-muted/40 px-2 py-0.5 rounded"
                   title={WEAPON_FAMILY_HINT[w as WeaponFamily]}
                 >
                   <strong className="text-primary">{pts}</strong>
@@ -475,11 +414,11 @@ export function ProfilePopup({ open, onClose }: Props) {
               );
             })}
             {Object.keys(mastery).length === 0 && (
-              <span className="text-[10px] text-muted-foreground">ยังไม่มีความเชี่ยวชาญ</span>
+              <span className="text-[13px] text-muted-foreground">ยังไม่มีความเชี่ยวชาญ</span>
             )}
           </div>
 
-          <div className="text-[10px] text-muted-foreground mt-1">
+          <div className="text-[13px] text-muted-foreground mt-1">
             โบนัสจากวิชา:{" "}
             {Object.entries(skillStatBonus).length > 0
               ? Object.entries(skillStatBonus).map(([k, v]) => `${k}+${v}`).join(" ")
@@ -487,9 +426,12 @@ export function ProfilePopup({ open, onClose }: Props) {
           </div>
         </section>
 
+        </>}
+
+        {tab === "gear" && <>
         {/* ─── Equipment ───────────────────────────────────────────── */}
-        <section className="border-t pt-3">
-          <div className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground mb-2">
+        <section className="profile-panel">
+          <div className="profile-heading">
             อุปกรณ์ ({EQUIP_ROWS.length} ช่อง)
           </div>
           <div className="space-y-1">
@@ -500,12 +442,12 @@ export function ProfilePopup({ open, onClose }: Props) {
               const key = `${row.type}-${row.index ?? "x"}`;
               return (
                 <div key={key} className="flex items-center gap-1.5 text-xs">
-                  <span className="text-[11px] text-muted-foreground w-24 shrink-0">{row.label}</span>
+                  <span className="text-[13px] text-muted-foreground w-28 shrink-0">{row.label}</span>
                   <div className="flex-1 min-w-0">
-                    {e ? <strong>{e.n}</strong> : <span className="text-[10px] text-muted-foreground italic">— ว่าง —</span>}
+                    {e ? <strong>{e.n}</strong> : <span className="text-[13px] text-muted-foreground italic">— ว่าง —</span>}
                   </div>
                   {e && (
-                    <span className="text-[9px] bg-primary/10 text-primary px-1.5 py-0.5 rounded shrink-0 whitespace-nowrap">
+                    <span className="text-sm bg-primary/10 text-primary px-1.5 py-0.5 rounded shrink-0 whitespace-nowrap">
                       {describeEquip(id)}
                     </span>
                   )}
@@ -514,11 +456,42 @@ export function ProfilePopup({ open, onClose }: Props) {
             })}
           </div>
 
-          <div className="mt-2 rounded-md bg-muted/40 p-2 border-l-2 border-orange-500 text-[10px] leading-relaxed">
+          <div className="mt-2 rounded-md bg-muted/40 p-2 border-l-2 border-orange-500 text-[13px] leading-relaxed">
             รวม: {equipSummary.length > 0 ? equipSummary.join(" · ") : "ไม่มีโบนัส"}
           </div>
         </section>
+        </>}
+
+        {tab === "fame" && (
+          <section className="profile-panel">
+            <div className="profile-heading">ชื่อเสียงและคุณธรรม</div>
+            <dl className="profile-derived">
+              {TRAIT_KEYS.map((k) => (
+                <div key={k}><dt>{TRAIT_LABEL[k]}</dt><dd>{traits[k] ?? 0}</dd></div>
+              ))}
+            </dl>
+          </section>
+        )}
       </div>
     </Modal>
+  );
+}
+
+const PROFILE_TABS = [
+  { id: "stats", label: "ค่าพลัง" },
+  { id: "skills", label: "วิชาที่ใช้" },
+  { id: "gear", label: "อุปกรณ์" },
+  { id: "fame", label: "ชื่อเสียง" },
+] as const;
+type ProfileTab = (typeof PROFILE_TABS)[number]["id"];
+
+function VitalBar({ label, tone, value, max, pct }: { label: string; tone: "hp" | "mp" | "st"; value: number; max: number; pct?: number }) {
+  const width = pct ?? (max > 0 ? Math.min(100, (value / max) * 100) : 0);
+  return (
+    <div className={`profile-bar profile-bar--${tone}`}>
+      <span>{label}</span>
+      <i role="progressbar" aria-label={label} aria-valuenow={value} aria-valuemin={0} aria-valuemax={max}><span style={{ width: `${width}%` }} /></i>
+      <b>{Math.round(value)}<small>/{max}</small></b>
+    </div>
   );
 }

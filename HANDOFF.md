@@ -240,3 +240,12 @@ Requested by the user after an in-browser error report ("rewrite it to be Phaser
   runtime `setStick` / `tapAt`), and a context action button when the hero stands next to an NPC, sign or exit
   (runtime `onNearby`). Styles in `app/mobile-hud.css`.
 - E2E: new `mobile-controls.spec.ts` (icons, joystick drag, action button); 13/13 pass.
+
+## Wave 17: HUD polish
+
+- Party card (HP/MP/พลัง) moved top-left; icons beside it (landscape/desktop) or in a row beneath (portrait).
+- Context action button made compact; right thumb column bottom-up: พัก button, action, จุดหมาย.
+- พักผ่อน left the icon bar: a round button opens a small bubble of rest choices (`rest-quick-action.tsx`);
+  the rest modal is gone.
+- Profile: tabs (ค่าพลัง / วิชาที่ใช้ / อุปกรณ์ / ชื่อเสียง), HP/MP/พลัง bars, big dark-ink numbers, training
+  progress in words (`app/profile.css`).

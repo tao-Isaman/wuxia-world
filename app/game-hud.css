@@ -12,9 +12,9 @@
 
 /* The gold pointing hand. */
 
-/* Party card, bottom-right (portrait, green name, pill gauges). */
+/* Party card (portrait, green name, pill gauges); placed top-left in mobile-hud.css. */
 .player-hud {
-  position: absolute; z-index: 30; right: 16px; bottom: max(16px, env(safe-area-inset-bottom)); display: flex; align-items: center;
+  position: absolute; z-index: 30; display: flex; align-items: center;
   pointer-events: none; filter: drop-shadow(2px 3px 0 #0a0503aa);
 }
 .hud-portrait {
@@ -82,7 +82,6 @@
   .hud-strip { width: 220px; }
 }
 @media (max-width: 640px) {
-  .player-hud { right: 8px; bottom: max(8px, env(safe-area-inset-bottom)); }
   .hud-portrait { width: 56px; height: 56px; border-width: 2px; margin-right: -14px; }
   .hud-strip { width: 196px; padding: 4px 8px 6px 20px; }
   .hud-player-name { font-size: 15px; }
@@ -101,7 +100,6 @@
   .journey-extras { top: 104px !important; right: 12px !important; }
 }
 @media (max-height: 560px) and (min-width: 641px) {
-  .player-hud { right: 8px; bottom: 6px; }
   .hud-portrait { width: 52px; height: 52px; margin-right: -14px; }
   .hud-strip { width: 200px; padding: 3px 8px 4px 20px; }
   .hud-player-name { font-size: 14px; }

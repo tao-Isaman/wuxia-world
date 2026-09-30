@@ -25,11 +25,24 @@ test("mobile HUD: top icons, left-thumb joystick and a context action button", a
 
   // Every menu section is an icon along the top; no command box, minimap or guide panel.
   const icons = page.getByRole("navigation", { name: "เมนูเกม" });
-  for (const label of ["โปรไฟล์", "ย่าม", "วิชา", "อาชีพ", "ภารกิจ", "สำนัก", "พักผ่อน", "บันทึก"]) {
+  for (const label of ["โปรไฟล์", "ย่าม", "วิชา", "อาชีพ", "ภารกิจ", "สำนัก", "บันทึก"]) {
     await expect(icons.getByRole("button", { name: label, exact: true })).toBeVisible();
   }
   await expect(page.getByRole("button", { name: "เมนู", exact: true })).toHaveCount(0);
   await expect(page.locator(".minimap, .journey-guide")).toHaveCount(0);
+  // HP / MP card sits top-left, above the icons.
+  const card = await page.getByRole("region", { name: "สถานะตัวละคร" }).boundingBox();
+  expect(card!.x).toBeLessThan(20);
+  expect(card!.y).toBeLessThan(20);
+
+  // Rest is a quick bubble, not a page: pick a choice right there.
+  await page.getByRole("button", { name: "พักผ่อน", exact: true }).click();
+  const bubble = page.getByRole("group", { name: "เลือกวิธีพักผ่อน" });
+  await expect(bubble.getByRole("button", { name: /พักริมทาง/ })).toBeVisible();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await page.screenshot({ path: "test-results/screenshots/mobile-rest-bubble.png" });
+  await page.keyboard.press("Escape");
+  await expect(bubble).toHaveCount(0);
 
   // Left half: the stick appears under the thumb and drags the hero.
   const before = Number(await world.getAttribute("data-player-x"));
@@ -62,5 +75,16 @@ test("mobile HUD: top icons, left-thumb joystick and a context action button", a
   await page.screenshot({ path: "test-results/screenshots/mobile-action.png" });
   await action.click();
   await expect(page.getByRole("dialog")).toBeVisible();
+  await page.getByRole("button", { name: "ปิด", exact: true }).click();
+
+  // Profile: tabs of large readable rows.
+  await page.getByRole("navigation", { name: "เมนูเกม" }).getByRole("button", { name: "โปรไฟล์", exact: true }).click();
+  const profileTabs = page.getByRole("tablist", { name: "ข้อมูลตัวละคร" });
+  await expect(profileTabs.getByRole("tab", { name: "ค่าพลัง" })).toHaveAttribute("aria-selected", "true");
+  const fontSize = await page.locator(".profile-stat-value").first().evaluate((node) => parseFloat(getComputedStyle(node).fontSize));
+  expect(fontSize).toBeGreaterThanOrEqual(18);
+  await page.screenshot({ path: "test-results/screenshots/mobile-profile.png" });
+  await profileTabs.getByRole("tab", { name: "วิชาที่ใช้" }).click();
+  await expect(page.getByText("หมัดตรง").first()).toBeVisible();
   expect(errors).toEqual([]);
 });
