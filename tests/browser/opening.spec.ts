@@ -9,6 +9,7 @@ async function ready(page: Page) {
 async function visit(page: Page, id: string) {
   await ready(page);
   await page.getByRole("button", { name: /จุดหมาย/ }).click();
+  await page.locator(`[data-places-tab="${await page.locator(`[data-marker-id="${id}"]`).getAttribute("data-category")}"]`).click();
   await page.locator(`[data-marker-id="${id}"]`).click();
 }
 
@@ -95,13 +96,18 @@ test("first errand leads to safe training, recovery, and an earned skill upgrade
   await expect(page.getByTestId("battle-canvas")).toHaveAttribute("data-battle-background", "capital-training");
   await expect(page.getByTestId("battle-canvas")).toHaveAttribute("data-background-image", "/art/battle-capital-training.png");
   await page.screenshot({ path: "test-results/screenshots/training-yard-desktop.png" });
-  await expect(page.getByRole("button", { name: "ตั้งรับ", exact: true })).toBeEnabled();
-  await page.getByRole("button", { name: "ตั้งรับ", exact: true }).click();
+  // The fight tab: skills and ถอยหนี only (no guard / recover buttons).
+  await expect(page.getByRole("button", { name: "ถอยหนี", exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "ตั้งรับ", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "รวบรวมปราณ", exact: true })).toHaveCount(0);
   const punch = page.getByRole("button", { name: "หมัดตรง", exact: true });
-  await expect(punch).toContainText("สวนกลับ +20%");
-  await expect(punch).toBeEnabled();
-  await punch.click();
-  await expect(page.getByTestId("combat-result")).toContainText("ชัยชนะ");
+  const result = page.getByTestId("combat-result");
+  for (let turn = 0; turn < 12; turn++) {
+    await expect.poll(async () => (await result.count()) > 0 || await punch.isEnabled(), { timeout: 20_000 }).toBe(true);
+    if (await result.count()) break;
+    await punch.click();
+  }
+  await expect(result).toContainText("ชัยชนะ");
   await page.getByRole("button", { name: "ดำเนินเรื่อง →" }).click();
   await ready(page);
   const trained = await state(page);
@@ -110,8 +116,12 @@ test("first errand leads to safe training, recovery, and an earned skill upgrade
   expect(trained.defeatedCounts.training_capital_apprentice).toBe(1);
   expect(trained.gold).toBe(30);
   expect(trained.wExp).toBe(70);
-  expect(trained.skillExp.basic_punch).toBe(20);
-  expect(trained.currentHp).toBe(16);
+  // 10 XP per punch landed; still short of the 50 needed to level on its own.
+  expect(trained.skillExp.basic_punch % 10).toBe(0);
+  expect(trained.skillExp.basic_punch).toBeGreaterThanOrEqual(20);
+  expect(trained.skillExp.basic_punch).toBeLessThan(50);
+  expect(trained.currentHp).toBeGreaterThan(0);
+  expect(trained.currentHp).toBeLessThanOrEqual(27);
 
   async function restAtRoadside() {
     // Rest is a quick bubble on the right edge, not a menu page.
@@ -124,18 +134,20 @@ test("first errand leads to safe training, recovery, and an earned skill upgrade
   await restAtRoadside();
   const firstRest = await state(page);
   expect(firstRest.stamina).toBe(firstRest.staminaMax);
-  expect(firstRest.currentHp).toBe(25);
+  expect(firstRest.currentHp).toBe(Math.min(36, trained.currentHp + 9));
   // Full stamina must not block a second rest while HP is still injured.
   await restAtRoadside();
-  expect((await state(page)).currentHp).toBe(34);
+  expect((await state(page)).currentHp).toBe(Math.min(36, firstRest.currentHp + 9));
   expect((await state(page)).gold).toBe(30);
 
   await page.getByRole("navigation", { name: "เมนูเกม" }).getByRole("button", { name: "วิชา", exact: true }).click();
-  const upgrade = page.getByRole("button", { name: "เร่งด้วย w-exp (30)", exact: true });
+  // The w-exp top-up costs what the punch still lacks to reach level 2 (50 XP).
+  const upgradeCost = 50 - trained.skillExp.basic_punch;
+  const upgrade = page.getByRole("button", { name: `เร่งด้วย w-exp (${upgradeCost})`, exact: true });
   await expect(upgrade).toBeEnabled();
   await upgrade.click();
   await expect.poll(async () => (await state(page)).skillLevel.basic_punch).toBe(2);
-  expect((await state(page)).wExp).toBe(40);
+  expect((await state(page)).wExp).toBe(70 - upgradeCost);
   const payoff = page.getByRole("region", { name: "เลื่อนขั้น หมัดตรง สำเร็จ" });
   await expect(payoff).toBeVisible();
   await expect(payoff).toContainText("พลังท่า (BP)");
@@ -144,7 +156,7 @@ test("first errand leads to safe training, recovery, and an earned skill upgrade
   await expect(payoff).toHaveCount(0);
   await page.getByRole("button", { name: "ปิด", exact: true }).click();
   await visit(page, "service-1");
-  await expect(page.getByRole("dialog")).toContainText("ผ่านบทฝึกตั้งรับแล้ว");
+  await expect(page.getByRole("dialog")).toContainText("ผ่านบทฝึกประลองแล้ว");
   await expect(page.getByRole("button", { name: "ฝึกประลองฟรี", exact: true })).toHaveCount(0);
   await page.getByRole("button", { name: "ปิด", exact: true }).click();
   await page.reload();
@@ -152,7 +164,7 @@ test("first errand leads to safe training, recovery, and an earned skill upgrade
   const upgraded = await state(page);
   expect(upgraded.skillLevel.basic_punch).toBe(2);
   expect(upgraded.skillExp.basic_punch).toBe(0);
-  expect(upgraded.wExp).toBe(40);
+  expect(upgraded.wExp).toBe(70 - upgradeCost);
   expect(upgraded.inventory).toMatchObject({ herb: 3, potion: 1 });
   expect(upgraded.defeatedCounts.training_capital_apprentice).toBe(1);
   expect(errors).toEqual([]);

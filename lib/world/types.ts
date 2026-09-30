@@ -197,8 +197,9 @@ export type SceneEffect =
   // simulation itself — purely a refresh hint for cached UI views.
   | { t: "revealNpcStatus"; npcId: string }
   // ─── Law (wanted marks / jail) ──────────────────────────────────────
-  // Serve the jail sentence (2 days per wanted mark): time passes, marks
-  // clear, the player is released into the jail's city.
+  // Locked into the jail map: sentence = 2 days per wanted mark, marks clear.
+  | { t: "imprison" }
+  // Sit out the whole remaining sentence at once, then walk free into the city.
   | { t: "serveJail" }
   // Bribe the jailer (JAIL_BRIBE_GOLD): released now, two marks lifted.
   | { t: "bribeJail" };
@@ -1079,6 +1080,9 @@ export interface WorldStateData {
   wantedDay: number;
   // City whose jail holds the player while in the jail scene.
   jailCityId: string | null;
+  // v21+: while imprisoned, the absolute ชั่วยาม (day × 12 + time) the
+  // sentence ends. Non-null locks the player inside the jail map.
+  jailUntil: number | null;
 }
 
 export interface ActionLogEntry {

@@ -436,6 +436,8 @@ export interface BattleState {
   turn: number;
   log: LogLine[];
   winner: Side | null;
+  /** A retreated successfully: the battle ended with no winner. */
+  escaped?: boolean;
   phase: BattlePhase;
   st: { A: SideBattleState; B: SideBattleState };
   cd: { A: number[]; B: number[] }; // skill cooldowns

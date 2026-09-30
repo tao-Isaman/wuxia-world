@@ -6,6 +6,7 @@ async function state(page: Page) {
 async function visit(page: Page, marker: string) {
   await expect(page.getByTestId("world-canvas")).toHaveAttribute("data-ready", "true", { timeout: 60_000 });
   await page.getByRole("button", { name: /จุดหมาย/ }).click();
+  await page.locator(`[data-places-tab="${await page.locator(`[data-marker-id="${marker}"]`).getAttribute("data-category")}"]`).click();
   await page.locator(`[data-marker-id="${marker}"]`).click();
 }
 

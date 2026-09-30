@@ -58,6 +58,7 @@ export function validateAndRepair(state: WorldStateData): void {
   state.wanted = Math.max(0, Math.min(5, Math.floor(Number(state.wanted) || 0)));
   if (typeof state.wantedDay !== "number") state.wantedDay = state.day;
   if (state.jailCityId && SCENES_BY_ID.get(state.jailCityId)?.kind !== "location") state.jailCityId = null;
+  if (typeof state.jailUntil !== "number" || !Number.isFinite(state.jailUntil)) state.jailUntil = null;
 
   // Inventory: drop unknown items.
   for (const itemId of Object.keys(state.inventory)) {

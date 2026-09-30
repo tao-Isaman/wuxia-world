@@ -1,4 +1,5 @@
 import { CHARACTER_FEET_Y, CHARACTER_FRAME_SIZE, CHARACTER_GRID, CHARACTER_SHEET_LAYOUTS, CHARACTER_DIRECTION_LAYOUTS, characterSheet, hasDirectionalSheet, type CharacterId, type CharacterSheetLayout } from "./catalog";
+import { applyWalkBeat, WALK_BEATS } from "./walk-cycle";
 
 export interface CharacterAtlas {
   image: HTMLCanvasElement; frameSize: 128; feetY: 120; columns: 4; rows: number; directional: boolean;
@@ -104,6 +105,15 @@ async function prepareAtlas(id: CharacterId, directional: boolean): Promise<Char
     output.drawImage(frame.source, frame.x, frame.y, frame.width, frame.height, targetX, targetY, width, height);
     output.restore();
   });
+  // Give every walk clip a clear left-foot / right-foot beat.
+  const pixels = output.getImageData(0, 0, image.width, image.height);
+  const walkCells = [4, 5, 6, 7, ...(directional ? [16, 17, 18, 19, 20, 21, 22, 23] : [])];
+  for (const index of walkCells) {
+    applyWalkBeat(pixels.data, image.width, { x: index % CHARACTER_GRID * CHARACTER_FRAME_SIZE,
+      y: Math.floor(index / CHARACTER_GRID) * CHARACTER_FRAME_SIZE, size: CHARACTER_FRAME_SIZE, feetY: CHARACTER_FEET_Y },
+    WALK_BEATS[index % 4]);
+  }
+  output.putImageData(pixels, 0, 0);
   return { image, frameSize: CHARACTER_FRAME_SIZE, feetY: CHARACTER_FEET_Y, columns: CHARACTER_GRID, rows, directional };
 }
 

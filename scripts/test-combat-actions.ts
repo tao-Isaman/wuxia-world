@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { makeContext, makeInitialState, calcSkillDamage, resolveSkill, resolveArtActive, predictTurnOrder, getNextTurn } from "../lib/game/battle";
 import { tickEffects } from "../lib/game/effects";
 import { SKILLS, ARTS, getSkill } from "../lib/game/data";
-import { resolveCombatAction, recoveryAmount, GUARD_MP_COST } from "../lib/game/combat-actions";
+import { resolveCombatAction, recoveryAmount, GUARD_MP_COST, fleeChance } from "../lib/game/combat-actions";
 import { useBattleStore } from "../store/battle-store";
 import type { CharacterBuild } from "../lib/game/types";
 
@@ -220,6 +220,28 @@ check("turn order never loses its actor to floating-point gauge rounding", () =>
     state.gB = random() * 99;
     assert.equal(predictTurnOrder(state, 12).length, 12);
   }
+});
+
+check("retreat: odds follow Spd; success ends the fight with no winner, failure spends the turn", () => {
+  assert.equal(fleeChance(100, 100), 50);
+  assert.equal(fleeChance(400, 0), 90);
+  assert.equal(fleeChance(0, 400), 20);
+  const random = Math.random;
+  try {
+    Math.random = () => 0.1;
+    const won = fresh();
+    assert.equal(resolveCombatAction(won, ctx, "flee", 1000), true);
+    assert.equal(won.escaped, true);
+    assert.equal(won.phase, "over");
+    assert.equal(won.winner, null);
+    Math.random = () => 0.99;
+    const lost = fresh();
+    assert.equal(resolveCombatAction(lost, ctx, "flee", 1000), true);
+    assert.equal(lost.escaped, undefined);
+    assert.equal(lost.turn, 1);
+    assert.equal(lost.lastCast?.name, "ถอยหนี");
+    assert.equal(resolveCombatAction(won, ctx, "flee", 5000), false, "no actions after escaping");
+  } finally { Math.random = random; }
 });
 
 console.log(`${checks} combat action checks passed`);

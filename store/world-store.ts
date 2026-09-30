@@ -58,8 +58,9 @@ import {
 import { applyEffect, consumeQuestAutoItems, isSectQuestOfferable, tickQuestProgress } from "@/lib/world/effects";
 import { evaluateCondition } from "@/lib/world/conditions";
 import { tickAllNamedNpcs } from "@/lib/world/npc-tick";
-import { rollWalkEvent } from "@/lib/world/effects";
-import { WANTED_DECAY_DAYS, WANTED_MAX, isLawOpponent } from "@/lib/world/law";
+import { releaseFromJail, rollWalkEvent } from "@/lib/world/effects";
+import { WANTED_DECAY_DAYS, WANTED_MAX, describeSentence, isLawOpponent, sentenceLeft } from "@/lib/world/law";
+import { JAIL_SCENE_ID, getActivity, jailDiceChance, jailEscapeChance } from "@/lib/world/data/activities";
 import { maintainRumors, seedLoreRumors, RUMOR_SEEN_CAP } from "@/lib/world/rumor-engine";
 import { namedNpcIds } from "@/lib/world/data/named-npcs";
 import { toast } from "@/store/toast-store";
@@ -478,6 +479,11 @@ interface WorldStore extends WorldStateData {
   acceptEncounter: () => void;
   // One walk tick (the map runtime calls this every WALK_TICK_UNITS walked).
   walkTick: () => void;
+  // Map activities (see lib/world/data/activities.ts) — the jail's labour,
+  // dice, meditation, gate and escape. Returns a message for the toast.
+  doActivity: (id: string) => ActivityResult;
+  // Sit out the rest of a jail sentence at once and walk free.
+  serveSentence: () => void;
   fleeEncounter: () => void;
 
   // Liveness Layer — record that the player has heard a specific rumor.
@@ -490,6 +496,10 @@ interface WorldStore extends WorldStateData {
   _setFlag: (flag: string, value: boolean | number | string) => void;
   _giveGold: (amount: number) => void;
 }
+
+export type ActivityResult =
+  | { ok: true; message: string }
+  | { ok: false; reason: "unknown" | "not-here" | "stamina" | "gold" | "locked"; message: string; hoursLeft?: number };
 
 const emptyLifeSkillXp = (): Record<LifeSkill, number> =>
   Object.fromEntries(LIFE_SKILL_KEYS.map((k) => [k, 0])) as Record<LifeSkill, number>;
@@ -549,6 +559,7 @@ const emptyData = (): WorldStateData => ({
   wanted: 0,
   wantedDay: 1,
   jailCityId: null,
+  jailUntil: null,
 });
 
 // A random encounter promoted to a battle. Law pursuers are non-fatal:
@@ -564,7 +575,7 @@ function encounterBattle(opponentId: string, returnSceneId: string): NonNullable
 // map crossing (~2–3 ticks) feels like the old one roll per trip — but it
 // can happen anywhere along the way. The player's home is safe ground.
 const WALK_TICK_CHANCE = 0.4;
-const SAFE_SCENES = new Set(["home_player"]);
+const SAFE_SCENES = new Set(["home_player", JAIL_SCENE_ID]);
 /** Test/QA switch: localStorage["wuxia-random-events"] = "off" disables walk events. */
 function walkEventsDisabled(): boolean {
   try { return typeof localStorage !== "undefined" && localStorage.getItem("wuxia-random-events") === "off"; } catch { return false; }
@@ -805,8 +816,16 @@ function travelTransitionHours(
   return null;
 }
 
+/** While a sentence runs, no location or road outside the jail can be entered. */
+function jailBlocks(state: WorldStateData, targetSceneId: string): boolean {
+  if (state.jailUntil == null || targetSceneId === JAIL_SCENE_ID) return false;
+  const kind = getScene(targetSceneId)?.kind;
+  return kind === "location" || kind === "route";
+}
+
 function canAffordTravelTo(state: WorldStateData, targetSceneId: string): boolean {
   if (state.currentSceneId === targetSceneId) return true;
+  if (jailBlocks(state, targetSceneId)) return false;
   const target = getScene(targetSceneId);
   const source = getScene(state.currentSceneId);
   const hours = travelTransitionHours(source, target);
@@ -963,6 +982,7 @@ function draftFrom(s: WorldStateData): WorldStateData {
     wanted: s.wanted ?? 0,
     wantedDay: s.wantedDay ?? s.day,
     jailCityId: s.jailCityId ?? null,
+    jailUntil: s.jailUntil ?? null,
   };
 }
 
@@ -1236,6 +1256,7 @@ export const useWorldStore = create<WorldStore>()(
           return;
         }
         const draft = draftFrom(get());
+        if (jailBlocks(draft, sceneId)) return;
         // Refuse the move entirely when stamina is too low for an overworld
         // travel hop — UI buttons should also be disabled, but defend here
         // in case something slips through.
@@ -1276,6 +1297,27 @@ export const useWorldStore = create<WorldStore>()(
         if (!s.pendingBattle) return;
         const battleState = useBattleStore.getState().state;
         const winner = battleState?.winner;
+        if (battleState?.escaped) {
+          // Retreat: the fight simply ends. No rewards, no defeat; the player
+          // stays where the fight found them (an escaped arrest means no jail).
+          const pb = s.pendingBattle;
+          const draft = draftFrom(s);
+          draft.stamina = Math.max(0, draft.stamina - FIGHT_STAMINA);
+          advanceTime(draft, FIGHT_HOURS);
+          draft.pendingBattle = null;
+          draft.pendingSpar = null;
+          draft.pendingHuntYield = null;
+          draft.currentHp = Math.max(1, battleState.hA);
+          draft.currentMp = Math.max(0, battleState.mpA);
+          if (isLawOpponent(pb.opponentId)) draft.jailCityId = null;
+          const opponent = getOpponent(pb.opponentId);
+          appendActionLog(draft, "battle", `ถอยหนีจาก${opponent?.name ?? "ศัตรู"}สำเร็จ`);
+          const back = getScene(draft.currentSceneId)?.kind === "dialog" ? draft.lastLocationId : null;
+          set({ ...draft });
+          useBattleStore.getState().reset();
+          if (back && back !== draft.currentSceneId) get().gotoScene(back);
+          return;
+        }
         if (!winner) return;
 
         const pb = s.pendingBattle;
@@ -2324,6 +2366,91 @@ export const useWorldStore = create<WorldStore>()(
         if (draft.pendingEncounter || draft.currentSceneId !== s.currentSceneId || draft.jailCityId !== s.jailCityId) set({ ...draft });
       },
 
+      doActivity: (id) => {
+        const activity = getActivity(id);
+        if (!activity) return { ok: false, reason: "unknown", message: "ไม่มีกิจกรรมนี้" };
+        const s = get();
+        if (s.currentSceneId !== JAIL_SCENE_ID) return { ok: false, reason: "not-here", message: "ทำที่นี่ไม่ได้" };
+        if (s.stamina < activity.stamina) return { ok: false, reason: "stamina", message: `พลังไม่พอ (ต้องใช้ ${activity.stamina})` };
+        const draft = draftFrom(s);
+        const derived = draft.playerBuild ? deriveAll(draft.playerBuild) : null;
+        let message = "";
+        switch (activity.id) {
+          case "jail_gate": {
+            const left = sentenceLeft(draft);
+            if (draft.jailUntil != null && left > 0) {
+              return { ok: false, reason: "locked", hoursLeft: left, message: `ประตูลั่นกุญแจ · เหลือโทษอีก ${describeSentence(left)}` };
+            }
+            releaseFromJail(draft);
+            draft.currentSceneId = draft.lastLocationId!;
+            appendActionLog(draft, "law", "พ้นโทษ ออกจากคุกหลวง");
+            set({ ...draft });
+            return { ok: true, message: "ผู้คุมไขประตู · เจ้าเป็นอิสระแล้ว" };
+          }
+          case "jail_labor": {
+            draft.stamina -= activity.stamina;
+            advanceTime(draft, activity.hours);
+            // Hard labour counts double toward the sentence.
+            if (draft.jailUntil != null) draft.jailUntil -= activity.hours;
+            grantStatXp(draft, "STR", STAT_XP_PER_ACTION * 2);
+            draft.wExp += 5;
+            message = `ทุบหินจนเหงื่อโชก · โทษลดลง ${activity.hours} ชั่วยาม · เหลือ ${describeSentence(sentenceLeft(draft))}`;
+            break;
+          }
+          case "jail_dice": {
+            if (draft.gold < 10) return { ok: false, reason: "gold", message: "ต้องมีเงินเดิมพัน 10 ตำลึง" };
+            draft.stamina -= activity.stamina;
+            advanceTime(draft, activity.hours);
+            const won = Math.random() < jailDiceChance(draft.playerBuild?.stats.LUK ?? 0);
+            draft.gold += won ? 10 : -10;
+            grantStatXp(draft, "LUK", STAT_XP_PER_ACTION);
+            message = won ? "ทอยได้แต้มสูง · ชนะ 10 ตำลึง" : "แต้มต่ำกว่าผู้คุม · เสีย 10 ตำลึง";
+            break;
+          }
+          case "jail_meditate": {
+            advanceTime(draft, activity.hours);
+            if (derived) {
+              draft.currentMp = derived.MP;
+              draft.currentHp = Math.min(derived.HP, (draft.currentHp ?? 0) + Math.round(derived.HP * 0.2));
+            }
+            draft.stamina = Math.min(draft.staminaMax, draft.stamina + 15);
+            draft.wExp += 5;
+            message = "จิตสงบท่ามกลางซี่กรง · ปราณเต็มเปี่ยม";
+            break;
+          }
+          case "jail_escape": {
+            draft.stamina -= activity.stamina;
+            advanceTime(draft, activity.hours);
+            if (Math.random() < jailEscapeChance(draft.playerBuild?.stats.AGI ?? 0)) {
+              releaseFromJail(draft);
+              draft.wanted = Math.min(WANTED_MAX, draft.wanted + 2);
+              draft.wantedDay = draft.day;
+              draft.currentSceneId = draft.lastLocationId!;
+              appendActionLog(draft, "law", `แหกคุกสำเร็จ! หมายจับ ${draft.wanted}/${WANTED_MAX}`);
+              set({ ...draft });
+              return { ok: true, message: `ปีนกำแพงร้าวหนีออกมาได้ · หมายจับเพิ่มเป็น ${draft.wanted}/${WANTED_MAX}` };
+            }
+            if (draft.jailUntil != null) draft.jailUntil += HOURS_PER_DAY;
+            message = `ผู้คุมจับได้คาหนังคาเขา · โทษเพิ่ม 1 วัน · เหลือ ${describeSentence(sentenceLeft(draft))}`;
+            break;
+          }
+        }
+        appendActionLog(draft, "law", message);
+        set({ ...draft });
+        return { ok: true, message };
+      },
+
+      serveSentence: () => {
+        const s = get();
+        if (s.jailUntil == null) return;
+        const draft = draftFrom(s);
+        advanceTime(draft, sentenceLeft(draft));
+        releaseFromJail(draft);
+        draft.currentSceneId = draft.lastLocationId!;
+        appendActionLog(draft, "law", "นั่งนับวันจนพ้นโทษ ออกจากคุกหลวง");
+        set({ ...draft });
+      },
+
       fleeEncounter: () => {
         const s = get();
         if (!s.pendingEncounter) return;
@@ -2635,7 +2762,7 @@ export const useWorldStore = create<WorldStore>()(
     }),
     {
       name: "wusia-world-v1",
-      version: 20,
+      version: 21,
       // Content backfill also runs for current-version saves (migrate does
       // not). Keep the standard shallow merge and add only missing lore.
       merge: (persisted, current) => {
@@ -2692,6 +2819,7 @@ export const useWorldStore = create<WorldStore>()(
         wanted: s.wanted,
         wantedDay: s.wantedDay,
         jailCityId: s.jailCityId,
+        jailUntil: s.jailUntil,
       }),
       // Migrations:
       //   v1 → v2 added stamina/staminaMax/lifeSkillXp(6)/pendingHuntYield.
@@ -2859,6 +2987,8 @@ export const useWorldStore = create<WorldStore>()(
           wanted: typeof p.wanted === "number" ? Math.max(0, Math.min(5, Math.floor(p.wanted))) : 0,
           wantedDay: typeof p.wantedDay === "number" ? p.wantedDay : (typeof p.day === "number" ? p.day : 1),
           jailCityId: typeof p.jailCityId === "string" ? p.jailCityId : null,
+          // v21+: imprisonment lock
+          jailUntil: typeof p.jailUntil === "number" ? p.jailUntil : null,
         };
         void fromVersion;
         return out;

@@ -2,7 +2,9 @@ import type { BattleState } from "./types";
 import type { BattleContext } from "./battle";
 import { logLine, tickEffects } from "./effects";
 
-export type CombatAction = "guard" | "recover";
+export type CombatAction = "guard" | "recover" | "flee";
+/** Retreat odds: 50 % at even speed, ±1 % per 4 Spd, clamped 20–90 %. */
+export const fleeChance = (spdA: number, spdB: number) => Math.max(20, Math.min(90, 50 + (spdA - spdB) / 4));
 export const GUARD_REDUCTION = 35;
 export const GUARD_MP_COST = 2;
 export const RIPOSTE_BONUS = 20;
@@ -22,7 +24,16 @@ export function resolveCombatAction(state: BattleState, ctx: BattleContext, acti
     return true;
   }
 
-  if (action === "guard") {
+  if (action === "flee") {
+    const chance = fleeChance(state.dA.Spd, state.dB.Spd);
+    if (Math.random() * 100 < chance) {
+      state.escaped = true;
+      state.phase = "over";
+      logLine(state, "lA", `[${state.turn}] ถอยหนีสำเร็จ (โอกาส ${Math.round(chance)}%) — หลุดพ้นจากการต่อสู้`);
+      return true;
+    }
+    logLine(state, "lA", `[${state.turn}] ถอยหนีไม่พ้น (โอกาส ${Math.round(chance)}%) — เสียจังหวะ`);
+  } else if (action === "guard") {
     // A burn tick can reduce MP after the initial availability check. The turn
     // is still spent, matching skills that lose their action to a status tick.
     if (state.mpA < GUARD_MP_COST) {
@@ -48,7 +59,7 @@ export function resolveCombatAction(state: BattleState, ctx: BattleContext, acti
   }
   // Skills use positive sequence IDs. Tactical turns use a disjoint negative
   // sequence, so switching between them always starts a fresh animation.
-  state.lastCast = { seq: -(state.turn + 1), side: "A", name: action === "guard" ? "ตั้งรับ" : "รวบรวมปราณ",
+  state.lastCast = { seq: -(state.turn + 1), side: "A", name: action === "guard" ? "ตั้งรับ" : action === "flee" ? "ถอยหนี" : "รวบรวมปราณ",
     hits: 1, tier: 0, hitDamages: [0], hitCrits: [false], hitMisses: [false] };
   state.castEndsAt = now + 900;
   return true;

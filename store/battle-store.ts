@@ -163,7 +163,7 @@ export const useBattleStore = create<BattleStore>((set, get) => {
     useCombatAction: (action) => {
       const { state, ctx } = get();
       if (!state || !ctx || !resolveCombatAction(state, ctx, action)) return;
-      if (!state.winner) drainToActor(state);
+      if (!state.winner && !state.escaped) drainToActor(state);
       enemyElapsedMs = 0;
       set({ state: { ...state } });
     },

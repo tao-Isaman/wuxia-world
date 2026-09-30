@@ -30,10 +30,11 @@ test("mobile HUD: top icons, left-thumb joystick and a context action button", a
   }
   await expect(page.getByRole("button", { name: "เมนู", exact: true })).toHaveCount(0);
   await expect(page.locator(".minimap, .journey-guide")).toHaveCount(0);
-  // HP / MP card sits top-left, above the icons.
-  const card = await page.getByRole("region", { name: "สถานะตัวละคร" }).boundingBox();
-  expect(card!.x).toBeLessThan(20);
-  expect(card!.y).toBeLessThan(20);
+  // No character card any more: the icon grid itself sits in the top-left corner.
+  await expect(page.getByRole("region", { name: "สถานะตัวละคร" })).toHaveCount(0);
+  const grid = await icons.boundingBox();
+  expect(grid!.x).toBeLessThan(20);
+  expect(grid!.y).toBeLessThan(20);
 
   // Rest is a quick bubble, not a page: pick a choice right there.
   await page.getByRole("button", { name: "พักผ่อน", exact: true }).click();
@@ -66,6 +67,7 @@ test("mobile HUD: top icons, left-thumb joystick and a context action button", a
   await page.reload();
   await expect(world).toHaveAttribute("data-ready", "true");
   await page.getByRole("button", { name: /จุดหมาย/ }).click();
+  await page.locator(`[data-places-tab="${await page.locator('[data-marker-id="npc-city_capital_physician_lin"]').getAttribute("data-category")}"]`).click();
   await page.locator('[data-marker-id="npc-city_capital_physician_lin"]').click();
   await expect(page.getByRole("dialog")).toBeVisible();
   await page.getByRole("button", { name: "ปิด", exact: true }).click();

@@ -51,29 +51,13 @@ try {
   const enemy = opponent.build();
   const ctx = makeContext(player, enemy);
   const battle = makeInitialState(player, enemy);
-  const baselineDamage = calcSkillDamage(makeInitialState(player, enemy), "A", getSkill("basic_punch")!, ctx).dmg;
-  let guarded = false;
-  let riposteDamage: number | null = null;
+  // The fight tab offers skills and ถอยหนี only: plain punches must win it.
   while (!battle.winner && battle.turn < 30) {
     const side = getNextTurn(battle);
     decrementCooldowns(battle, side);
-    if (side === "A" && !guarded) {
-      battle.phase = "player";
-      assert.equal(resolveCombatAction(battle, ctx, "guard", 0), true);
-      guarded = true;
-    } else {
-      const firstReply = side === "A" && riposteDamage === null;
-      if (firstReply) assert.ok(battle.st.A.buffs.some(buff => buff.t === "buff_riposte"));
-      resolveSkill(battle, side, 0, "basic_punch", ctx);
-      if (firstReply) {
-        riposteDamage = battle.lastCast!.hitDamages[0];
-        assert.ok(riposteDamage > baselineDamage, "Guard empowers the next physical attempt");
-        assert.ok(!battle.st.A.buffs.some(buff => buff.t === "buff_riposte"));
-      }
-    }
+    resolveSkill(battle, side, 0, "basic_punch", ctx);
   }
-  assert.equal(battle.winner, "A", "unmodified starter can win using Guard then basic punches");
-  assert.ok(battle.log.some(line => line.txt.includes("ตั้งรับ")));
+  assert.equal(battle.winner, "A", "unmodified starter can win with basic punches alone");
   assert.ok(battle.hA > 0);
   useBattleStore.setState({ state: battle, ctx, builds: { A: player, B: enemy } });
   useWorldStore.getState().acknowledgeBattleResult();

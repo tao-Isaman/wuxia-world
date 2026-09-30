@@ -60,6 +60,7 @@ function freshState(): WorldStateData {
     wanted: 0,
     wantedDay: 1,
     jailCityId: null,
+    jailUntil: null,
   };
 }
 

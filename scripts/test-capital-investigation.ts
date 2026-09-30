@@ -131,7 +131,7 @@ try {
   assert.equal(visible(chest, borrow), false, "no repeat loan while holding a key");
   const midQuest = clone(useWorldStore.getState());
   const stored = JSON.parse(memory.get("wusia-world-v1")!);
-  assert.equal(stored.version, 20);
+  assert.equal(stored.version, 21);
   await useWorldStore.persist.rehydrate();
   assert.deepEqual(useWorldStore.getState().quests, midQuest.quests);
   assert.deepEqual(useWorldStore.getState().inventory, midQuest.inventory);

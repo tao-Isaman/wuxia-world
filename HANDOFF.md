@@ -291,3 +291,14 @@ Requested by the user after an in-browser error report ("rewrite it to be Phaser
 - Chess and begging moved to cities + villages only (removed from NPC homes, inns and wild sects), placed on
   street corners near the market / tea house; hidden map spots respect the node's `visibleIf`.
 - e2e: new dialogue fit check at 1000×450, 844×390 and 390×844; characters spec gets a 150 s budget.
+
+## Wave 22: jail map, retreat, places tabs, activity glyphs, walk cycle, no party card
+
+- Jail is a real map (`jail`, painted by `scripts/build-jail-map.ts`): locked in until the sentence ends; labour,
+  dice, meditation, a risky escape, the gate (serve the rest at once), a prisoner and a bribable guard. Save v21.
+- Battle: ถอยหนี replaces ตั้งรับ / รวบรวมปราณ in the fight tab (Spd-based escape, no winner, no rewards).
+- จุดหมาย has tabs (บุคคล / เส้นทาง / สถานที่ / กิจกรรม); every map activity has its own badge glyph and emoji.
+- Walk cycle alternates feet (left up / right up) via `lib/characters/walk-cycle.ts`.
+- Top-left party card removed; icons sit in the corner; wanted / sentence chips float top-centre.
+- Tests: `test:walk`, law checks for the jail map, combat retreat check, e2e jail map + retreat; opening spec
+  now wins the tutorial bout with punches.

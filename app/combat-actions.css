@@ -185,8 +185,7 @@
   position: relative; flex: 0 0 auto; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%;
   background: radial-gradient(circle at 50% 36%, #6a4a30, #2a1611 72%); border: 2px solid #b08a4c;
 }
-.combat-action-guard .combat-action-medal { border-color: #7f9bd0; }
-.combat-action-recover .combat-action-medal { border-color: #7fcf9c; }
+.combat-action-flee .combat-action-medal { border-color: #c9a36a; }
 .combat-action-icon { display: grid; place-items: center; color: #f3d58f; }
 .combat-action-icon svg, .combat-action-icon img, .combat-action-icon canvas { max-width: 24px; max-height: 24px; }
 .combat-action kbd {

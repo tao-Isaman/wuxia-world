@@ -7,7 +7,7 @@
 
 /* Icon menu: small icons tucked under the party card, wrapping into two rows. */
 .hud-iconbar {
-  position: absolute; z-index: 31; top: calc(max(10px, env(safe-area-inset-top)) + 104px); left: max(10px, env(safe-area-inset-left));
+  position: absolute; z-index: 31; top: max(10px, env(safe-area-inset-top)); left: max(10px, env(safe-area-inset-left));
   display: flex; flex-wrap: wrap; gap: 5px; max-width: 250px;
 }
 .hud-icon {
@@ -104,7 +104,7 @@
 
 /* Tablets / small laptops: slimmer card, icons wrap beside it. */
 @media (max-width: 900px) and (min-width: 641px) {
-  .hud-iconbar { top: calc(max(10px, env(safe-area-inset-top)) + 104px); }
+  .hud-iconbar { top: max(10px, env(safe-area-inset-top)); }
 }
 /* Phones (portrait): small card top-left, clock top-right, icons in a row beneath. */
 @media (max-width: 640px) {
@@ -118,7 +118,7 @@
   .hud-gauge-track { height: 6px; }
   .hud-gauge small { font-size: 11px; }
   .sundial { width: 62px; height: 62px; }
-  .hud-iconbar { top: calc(max(6px, env(safe-area-inset-top)) + 76px); left: max(6px, env(safe-area-inset-left)); max-width: 200px; gap: 4px; }
+  .hud-iconbar { top: max(6px, env(safe-area-inset-top)); left: max(6px, env(safe-area-inset-left)); max-width: 200px; gap: 4px; }
   .hud-icon { width: 38px; height: 40px; border-radius: 8px; }
   .hud-icon img { width: 19px; height: 19px; }
   .hud-icon-label { font-size: 9px; }
@@ -133,7 +133,7 @@
 /* Phones (landscape): one compact row across the top. */
 @media (max-height: 560px) and (min-width: 641px) {
   .player-hud { top: max(6px, env(safe-area-inset-top)); left: max(8px, env(safe-area-inset-left)); }
-  .hud-iconbar { top: calc(max(6px, env(safe-area-inset-top)) + 88px); left: max(8px, env(safe-area-inset-left)); gap: 4px; max-width: 240px; }
+  .hud-iconbar { top: max(6px, env(safe-area-inset-top)); left: max(8px, env(safe-area-inset-left)); gap: 4px; max-width: 240px; }
   .hud-icon { width: 40px; height: 40px; }
   .hud-icon img { width: 19px; height: 19px; }
   .hud-icon-label { font-size: 9px; }
@@ -179,5 +179,10 @@
 @keyframes work-fill { from { width: 0; } to { width: 100%; } }
 
 /* หมายจับ: wanted marks beside the hero's name. */
-.hud-wanted { margin-left: 6px; font: 700 12px/1 var(--font-body); color: #ff8a70; letter-spacing: 1px; vertical-align: middle; text-shadow: 1px 1px 0 #140a07; }
+.hud-law { position: fixed; z-index: 32; top: calc(max(8px, env(safe-area-inset-top)) + 2px); left: 50%; transform: translateX(-50%);
+  display: flex; gap: 6px; pointer-events: none; }
+.hud-wanted, .hud-sentence { padding: 5px 12px; border: 1px solid #9a7442; border-radius: 999px; background: #2a1611e6; white-space: nowrap;
+  font: 700 12px/1.3 var(--font-body); letter-spacing: .5px; text-shadow: 1px 1px 0 #140a07; }
+.hud-wanted { color: #ff8a70; }
 .hud-wanted i { font-style: normal; color: #8a6a55; }
+.hud-sentence { color: #ffd79a; }

@@ -21,7 +21,8 @@ import {
   pickWeighted,
 } from "./data/random-events";
 import { evaluateCondition } from "./conditions";
-import { JAIL_BRIBE_GOLD, jailCityFor, jailDays, lawChance, pickLawPursuer } from "./law";
+import { JAIL_BRIBE_GOLD, JAIL_HOURS_PER_DAY, absoluteHours, jailCityFor, jailDays, lawChance, pickLawPursuer, sentenceLeft } from "./law";
+import { JAIL_SCENE_ID } from "./data/activities";
 import { deriveAll } from "../game";
 import { generatePlayerEcho } from "./rumor-engine";
 
@@ -341,21 +342,26 @@ export function applyEffect(state: WorldStateData, eff: SceneEffect): void {
       return;
     }
 
-    case "serveJail": {
-      const days = jailDays(state.wanted);
-      const city = state.jailCityId ?? jailCityFor(state.lastLocationId);
-      state.day += days;
-      state.time = 0;
+    case "imprison": {
+      const hours = jailDays(state.wanted) * JAIL_HOURS_PER_DAY;
+      state.jailCityId = state.jailCityId ?? jailCityFor(state.lastLocationId);
+      state.jailUntil = absoluteHours(state) + hours;
+      // The marks become the sentence.
       state.wanted = 0;
       state.wantedDay = state.day;
-      state.jailCityId = null;
-      state.lastLocationId = city;
-      // Prison food and rest: released tired but on your feet.
-      if (state.playerBuild) {
-        const max = deriveAll(state.playerBuild);
-        state.currentHp = Math.max(state.currentHp ?? 0, Math.round(max.HP * 0.6));
-        state.currentMp = Math.max(state.currentMp ?? 0, Math.round(max.MP * 0.6));
-      }
+      state.lastLocationId = JAIL_SCENE_ID;
+      state.currentHp = Math.max(1, state.currentHp ?? 1);
+      return;
+    }
+
+    case "serveJail": {
+      // Sit out whatever remains (or a fresh sentence if never locked up).
+      const hours = state.jailUntil != null ? sentenceLeft(state) : jailDays(state.wanted) * JAIL_HOURS_PER_DAY;
+      const total = state.time + hours;
+      state.day += Math.floor(total / JAIL_HOURS_PER_DAY);
+      state.time = total % JAIL_HOURS_PER_DAY;
+      state.wanted = 0;
+      releaseFromJail(state);
       return;
     }
 
@@ -363,12 +369,27 @@ export function applyEffect(state: WorldStateData, eff: SceneEffect): void {
       if (state.gold < JAIL_BRIBE_GOLD) return;
       state.gold -= JAIL_BRIBE_GOLD;
       state.wanted = Math.max(0, state.wanted - 2);
-      state.wantedDay = state.day;
-      state.lastLocationId = state.jailCityId ?? jailCityFor(state.lastLocationId);
-      state.jailCityId = null;
-      state.currentHp = Math.max(1, state.currentHp ?? 1);
+      releaseFromJail(state);
       return;
     }
+  }
+}
+
+/**
+ * Walk free: the lock lifts and the player's "home" location becomes the
+ * jail's city (the next exit / close lands there). Prison food and rest mean
+ * they leave tired but on their feet.
+ */
+export function releaseFromJail(state: WorldStateData): void {
+  const city = state.jailCityId ?? jailCityFor(state.lastLocationId);
+  state.jailUntil = null;
+  state.jailCityId = null;
+  state.wantedDay = state.day;
+  state.lastLocationId = city;
+  if (state.playerBuild) {
+    const max = deriveAll(state.playerBuild);
+    state.currentHp = Math.max(state.currentHp ?? 0, Math.round(max.HP * 0.6));
+    state.currentMp = Math.max(state.currentMp ?? 0, Math.round(max.MP * 0.6));
   }
 }
 

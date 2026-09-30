@@ -33,6 +33,20 @@ export function worldFootprints(key: string, image: string): readonly WorldFootp
     { kind: "rect", left: 363, top: 245, right: 450, bottom: 283 },
     { kind: "rect", left: 517, top: 239, right: 610, bottom: 274 },
   ];
+  if (key === "jail" && image === "/maps/jail.png") return [
+    // Cell block, side walls and the south wall either side of the gate.
+    { kind: "rect", left: 0, top: 0, right: 960, bottom: 196 },
+    { kind: "rect", left: 0, top: 0, right: 40, bottom: 640 },
+    { kind: "rect", left: 920, top: 0, right: 960, bottom: 640 },
+    { kind: "rect", left: 0, top: 600, right: 434, bottom: 640 },
+    { kind: "rect", left: 526, top: 600, right: 960, bottom: 640 },
+    // Rock pile, millstone, trough, guard desk, weapon rack.
+    { kind: "rect", left: 70, top: 452, right: 200, bottom: 520 },
+    { kind: "ellipse", x: 262, y: 526, radiusX: 32, radiusY: 20 },
+    { kind: "rect", left: 356, top: 318, right: 444, bottom: 348 },
+    { kind: "rect", left: 700, top: 400, right: 820, bottom: 455 },
+    { kind: "rect", left: 880, top: 400, right: 918, bottom: 500 },
+  ];
   if (image === `/maps/${key}.webp`) return PAINTED_MAP_FOOTPRINTS[key] ?? [];
   return [];
 }

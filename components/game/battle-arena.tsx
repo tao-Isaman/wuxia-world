@@ -30,17 +30,17 @@ import {
   describeDebuff,
 } from "./buff-descriptions";
 import { SkillIcon, ArtIcon } from "./skill-icon";
-import { recoveryAmount, GUARD_REDUCTION, GUARD_MP_COST, RIPOSTE_BONUS, RECOVER_EVASION_COST } from "@/lib/game/combat-actions";
+import { RIPOSTE_BONUS, fleeChance } from "@/lib/game/combat-actions";
 import type { BattleCastProgress } from "@/lib/stage/battle-runtime";
 import { SoundButton } from "@/components/sound-button";
-import { Shield, Wind } from "lucide-react";
+import { Footprints } from "lucide-react";
 import "@/app/combat-actions.css";
 
 interface CombatActionView {
   key: string; name: string; icon: React.ReactNode; disabled: boolean; onClick: () => void;
   /** Short state callout shown on the slot itself (e.g. a readied riposte). */
   flag?: string;
-  cd?: number; mp?: number; detail: string; mpShort?: boolean; kind?: "skill" | "guard" | "recover";
+  cd?: number; mp?: number; detail: string; mpShort?: boolean; kind?: "skill" | "flee";
 }
 const actionMeta = ({ cd = 0, mp = 0, mpShort = false }: CombatActionView) =>
   cd > 0 ? `รอ ${cd} ตา` : mpShort ? `MP ไม่พอ \xb7 ใช้ ${mp} MP` : `${mp} MP \xb7 1 ตา`;
@@ -508,13 +508,12 @@ export function BattleArena({ mode = "free", onContinue }: BattleArenaProps) {
   }
 
   const casting = !!state.lastCast && !(castProgress?.seq === state.lastCast.seq && castProgress.complete);
-  const resultReady = !!state.winner && !casting;
-  const canAct = !state.winner && !casting && state.phase === "player";
+  const resultReady = (!!state.winner || !!state.escaped) && !casting;
+  const canAct = !state.winner && !state.escaped && !casting && state.phase === "player";
   const isAActive = canAct;
   const isBActive = !state.winner && !casting && state.phase === "enemy";
   const aA = getArt(displayA.artId);
   const canIA = !!aA.act && state.mpA >= aA.act.c && state.iaCD.A === 0;
-  const recoverMp = Math.min(state.dA.MP - state.mpA, recoveryAmount(state.dA.MP));
   const riposteReady = state.st.A.buffs.some((buff) => buff.t === "buff_riposte" && buff.u > 0);
   const actions: CombatActionView[] = [];
   displayA.skillIds.forEach((raw, i) => {
@@ -542,13 +541,12 @@ export function BattleArena({ mode = "free", onContinue }: BattleArenaProps) {
       disabled: !canAct || !canIA, onClick: castArtActive, cd: state.iaCD.A,
       mp: aA.act.c, mpShort: state.mpA < aA.act.c, detail: "วิชาในกาย · ใช้ปราณ" });
   }
-  actions.push({ key: "guard", name: "ตั้งรับ", icon: <Shield size={27} strokeWidth={1.5} />, kind: "guard",
-    disabled: !canAct || state.mpA < GUARD_MP_COST, onClick: () => takeCombatAction("guard"),
-    mp: GUARD_MP_COST, mpShort: state.mpA < GUARD_MP_COST,
-    detail: `ลดรับ ${GUARD_REDUCTION}% · กายครั้งถัดไป +${RIPOSTE_BONUS}% (ใช้แม้พลาด)` });
-  actions.push({ key: "recover", name: "รวบรวมปราณ", icon: <Wind size={27} strokeWidth={1.5} />, kind: "recover",
-    disabled: !canAct || recoverMp <= 0, onClick: () => takeCombatAction("recover"),
-    detail: recoverMp > 0 ? `MP +${recoverMp} · หลบหลีก −${RECOVER_EVASION_COST} จังหวะถัดไป` : "MP เต็ม · ใช้เมื่อปราณพร่อง" });
+  // Retreat replaces the old guard / recover buttons: a Spd-based chance to
+  // leave the fight; a failed attempt spends the turn.
+  const escapeOdds = Math.round(fleeChance(state.dA.Spd, state.dB.Spd));
+  actions.push({ key: "flee", name: "ถอยหนี", icon: <Footprints size={27} strokeWidth={1.5} />, kind: "flee",
+    disabled: !canAct, onClick: () => takeCombatAction("flee"),
+    detail: `โอกาสหนีรอด ${escapeOdds}% · พลาดจะเสียตานี้` });
   actionsRef.current = actions;
   const focusedAction = actions.find((action) => action.key === focusedKey) ?? actions.find((action) => !action.disabled) ?? actions[0];
 
@@ -583,8 +581,8 @@ export function BattleArena({ mode = "free", onContinue }: BattleArenaProps) {
       <section className="combat-decision" aria-label="กระบวนท่าต่อสู้">
         {resultReady ? (
           <div className="combat-result" data-testid="combat-result">
-            <div><span>{state.winner === "A" ? "ชัยชนะ" : "พ่ายแพ้"}</span>
-              <strong>{state.winner === "A" ? displayA.name : displayB.name} ชนะ</strong>
+            <div><span>{state.escaped ? "หนีรอด" : state.winner === "A" ? "ชัยชนะ" : "พ่ายแพ้"}</span>
+              <strong>{state.escaped ? `${displayA.name} ถอยหนีจาก ${displayB.name}` : `${state.winner === "A" ? displayA.name : displayB.name} ชนะ`}</strong>
               <small>ประลอง {state.turn} ตา</small></div>
             {mode === "world" ? <Button onClick={() => onContinue?.()}>ดำเนินเรื่อง →</Button> :
               <div className="flex gap-2"><Button onClick={() => start(setupA, setupB)}>เริ่มใหม่</Button>

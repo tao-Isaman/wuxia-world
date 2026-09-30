@@ -3,6 +3,7 @@ import { useEffect, useRef } from "react";
 import type { ArtisanDef, LocationMapDef, LocationScene, MapSpot, NpcDef } from "@/lib/world";
 import { activeGuide, evaluateCondition, guideMarkerId, getArtisan, getQuestsForNpc, isQuestOfferable, isQuestTurnInForNpc, getNpcsAtLocation, getResource, getScene, getSectHallAt, getShopAt, npcBodySprite, npcPixelSprite, playerBodySprite } from "@/lib/world";
 import { useWorldStore, TRAVEL_STAMINA_COST } from "@/store/world-store";
+import { getActivity } from "@/lib/world/data/activities";
 import { toast } from "@/store/toast-store";
 import { WorldCanvas } from "@/components/game/world-canvas";
 import { forgetMapPosition, type WorldMarker, type WorldPresentation } from "@/lib/stage/types";
@@ -18,6 +19,7 @@ export interface MapSpotHandlers {
   onRumor: () => void;
   onPractice: () => void;
   onResource: (resourceId: string) => void;
+  onActivity: (activityId: string) => void;
 }
 export function LocationMap({ scene, map, handlers, readOnly = false, dialogueSpeakerId }: {
   scene: LocationScene; map: LocationMapDef; handlers: MapSpotHandlers; readOnly?: boolean; dialogueSpeakerId?: string;
@@ -43,36 +45,44 @@ export function LocationMap({ scene, map, handlers, readOnly = false, dialogueSp
     markers.push({ id: "npc-" + npc.id, ...spots[npc.id], kind: "npc", label: npc.name, quest,
       image: npcBodySprite(npc.id), sprite: npcPixelSprite(npc.id), onActivate: () => handlers.onRegistryNpc(npc) });
   }
-  function service(spot: MapSpot): { label: string; icon: string; action: () => void } | null {
+  type Service = { label: string; badge: string; category: "place" | "activity"; action: () => void };
+  function service(spot: MapSpot): Service | null {
     switch (spot.kind) {
       case "shop": {
         const shop = getShopAt(scene.id);
-        return shop ? { label: spot.label ?? shop.label, icon: "bag", action: handlers.onShop } : null;
+        return shop ? { label: spot.label ?? shop.label, badge: "shop", category: "place", action: handlers.onShop } : null;
       }
       case "sectHall": {
         const hall = getSectHallAt(scene.id);
-        return hall ? { label: spot.label ?? hall.label, icon: "sect", action: handlers.onSectHall } : null;
+        return hall ? { label: spot.label ?? hall.label, badge: "sect", category: "place", action: handlers.onSectHall } : null;
       }
       case "artisan": {
         const artisan = getArtisan(spot.artisanId);
-        return artisan?.locationId === scene.id ? { label: spot.label ?? artisan.label, icon: "craft", action: () => handlers.onArtisan(artisan) } : null;
+        return artisan?.locationId === scene.id ? { label: spot.label ?? artisan.label, badge: artisan.profession,
+          category: "place", action: () => handlers.onArtisan(artisan) } : null;
       }
-      case "rest": return { label: spot.label ?? "พักผ่อน", icon: "rest", action: handlers.onRest };
-      case "rumor": return { label: spot.label ?? "ฟังข่าวลือ", icon: "log", action: handlers.onRumor };
-      case "practice": return { label: spot.label ?? "ฝึกฝน", icon: "skills", action: handlers.onPractice };
+      case "rest": return { label: spot.label ?? "พักผ่อน", badge: "rest", category: "place", action: handlers.onRest };
+      case "rumor": return { label: spot.label ?? "ฟังข่าวลือ", badge: "rumor", category: "place", action: handlers.onRumor };
+      case "practice": return { label: spot.label ?? "ฝึกฝน", badge: "practice", category: "activity", action: handlers.onPractice };
       case "resource": {
         // Gated nodes (begging before it's learned) stay hidden on the map too.
         const node = scene.resources?.find((r) => r.resourceId === spot.resourceId);
         if (node?.visibleIf && !evaluateCondition(state, node.visibleIf)) return null;
         const resource = getResource(spot.resourceId);
-        return resource ? { label: spot.label ?? resource.name, icon: "craft", action: () => handlers.onResource(spot.resourceId) } : null;
+        return resource ? { label: spot.label ?? resource.name, badge: resource.skill, category: "activity",
+          action: () => handlers.onResource(spot.resourceId) } : null;
+      }
+      case "activity": {
+        const activity = getActivity(spot.activityId);
+        return activity ? { label: spot.label ?? activity.label, badge: activity.badge, category: "activity",
+          action: () => handlers.onActivity(activity.id) } : null;
       }
     }
   }
   (map.spots ?? []).forEach((spot, index) => {
     const entry = service(spot);
-    if (entry) markers.push({ id: "service-" + index, x: spot.x, y: spot.y, kind: "service",
-      label: entry.label, icon: "/icons/ui/" + entry.icon + ".png", onActivate: entry.action });
+    if (entry) markers.push({ id: "service-" + index, x: spot.x, y: spot.y, kind: "service", label: entry.label,
+      badge: entry.badge, glyph: spot.icon, category: entry.category, onActivate: entry.action });
   });
   for (const exit of map.exits ?? []) {
     const routeId = "route_" + scene.id + "__to__" + exit.to;

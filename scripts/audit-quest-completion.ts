@@ -56,7 +56,9 @@ function childScenes(scene: Scene): string[] {
   return out;
 }
 const reachable = new Set<string>();
-const queue = [START_SCENE_ID, ...MEET_EVENTS.map((e) => e.dialogSceneId), ...TREASURE_EVENTS.map((e) => e.dialogSceneId)];
+// Losing to a law pursuer (a walk-tick encounter, see lib/world/law.ts) routes to
+// jail_cell, so the arrest scene and the jail map it leads to are reachable too.
+const queue = [START_SCENE_ID, "jail_cell", ...MEET_EVENTS.map((e) => e.dialogSceneId), ...TREASURE_EVENTS.map((e) => e.dialogSceneId)];
 // Quest offer/complete scenes open from the NPC popup; they are reachable
 // whenever that NPC is (checked per quest below), so seed them too.
 for (const q of QUESTS) for (const s of [`qs_${q.id}_offer`, `qs_${q.id}_complete`]) if (SCENES_BY_ID.has(s)) queue.push(s);

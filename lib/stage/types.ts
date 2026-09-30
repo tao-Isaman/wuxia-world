@@ -1,5 +1,9 @@
 export interface Point { x: number; y: number }
 
+export type WorldMarkerCategory = "npc" | "route" | "place" | "activity";
+export const markerCategory = (marker: Pick<WorldMarker, "kind" | "category">): WorldMarkerCategory =>
+  marker.category ?? (marker.kind === "npc" ? "npc" : marker.kind === "exit" ? "route" : "place");
+
 export interface WorldMarker extends Point {
   id: string;
   label: string;
@@ -8,6 +12,12 @@ export interface WorldMarker extends Point {
   /** Unique native-pixel world sprite for this NPC (single frame); archetype sheet otherwise. */
   sprite?: string;
   icon?: string;
+  /** Map sign glyph key (service kind or life-skill id); falls back to the icon's file name. */
+  badge?: string;
+  /** Emoji shown on the action button and in the places list. */
+  glyph?: string;
+  /** Places-list tab: people, ways out, services, or things to do. */
+  category?: WorldMarkerCategory;
   disabled?: boolean;
   /** Quest marker over an NPC: "offer" shows !, "turnin" shows ?. */
   quest?: "offer" | "turnin";

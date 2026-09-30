@@ -44,6 +44,8 @@ import {
 } from "@/store/world-store";
 import { flashLoading } from "@/store/loading-store";
 import { toast } from "@/store/toast-store";
+import { confirmDialog } from "@/store/confirm-store";
+import { getActivity } from "@/lib/world/data/activities";
 
 interface Props {
   scene: LocationScene;
@@ -141,6 +143,29 @@ export function LocationView({ scene, readOnly = false, dialogueSpeakerId }: Pro
   const rumorChannel = resolveRumorChannel(scene.id, state.sectMembership);
 
   // Shared gather runner — used by the resource cards and map spots.
+  // Jail activities: the work overlay while time passes, then the outcome.
+  // The gate either opens or offers to sit out the rest of the sentence.
+  async function runActivity(id: string) {
+    const activity = getActivity(id);
+    if (!activity) return;
+    const store = useWorldStore.getState();
+    if (activity.hours > 0 && store.stamina >= activity.stamina) {
+      flashLoading(`${activity.label}...`, 1200, activity.id === "jail_meditate" ? "rest" : "work");
+    }
+    const result = store.doActivity(id);
+    if (result.ok) { toast("success", result.message); return; }
+    if (result.reason === "locked") {
+      const ok = await confirmDialog({ title: "ประตูคุก", message: `${result.message}\nนั่งนับวันจนพ้นโทษเลยหรือไม่?`,
+        confirmText: "นั่งนับวัน", cancelText: "ยังก่อน" });
+      if (!ok) return;
+      flashLoading("นับวันในห้องขัง...", 1600, "rest");
+      useWorldStore.getState().serveSentence();
+      toast("success", "พ้นโทษแล้ว · ผู้คุมไขประตูปล่อยตัว");
+      return;
+    }
+    toast("warn", result.message);
+  }
+
   function runGather(resourceId: string) {
     const res = getResource(resourceId);
     if (!res) return;
@@ -494,6 +519,7 @@ export function LocationView({ scene, readOnly = false, dialogueSpeakerId }: Pro
             onRumor: () => setRumorOpen(true),
             onPractice: () => setPracticeOpen(true),
             onResource: runGather,
+            onActivity: (id) => void runActivity(id),
           }}
         />
         {!readOnly && <>
