@@ -20,9 +20,10 @@ import { SCENES_SPIES } from "./scenes-content/spies";
 //
 // Authoring rule: every `next`, `routeSceneId`, `dialogSceneId`, `locationId`,
 // and route `back` must reference a scene id in this table. validateAndRepair
-// resets unknown ids to "start" on save load.
+// resets an unknown current scene to "home_player" on save load.
 // Core (tutorial) scenes. The full SCENES array below appends WORLD_MAP_SCENES
-// (84 locations from location.md plus their hub + category routes).
+// (every world location plus its hub + category routes — see
+// docs/reference/locations.md).
 const CORE_SCENES: readonly Scene[] = [
   // ─── Opening ─────────────────────────────────────────────────────────
   {

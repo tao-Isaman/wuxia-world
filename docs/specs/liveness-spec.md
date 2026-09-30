@@ -1,3 +1,11 @@
+> **Status (2026-09-30):** the original requirement for the Liveness Layer, kept unchanged as history (moved here from `bigchange.md`). It was partly built.
+>
+> - What the code does today: [docs/liveness.md](../liveness.md).
+> - Item by item, what was built, built differently, or not built: [docs/liveness.md → Spec versus code](../liveness.md#spec-versus-code).
+> - In short: the weekly NPC tick, rumors, caps and selection are built. Region spread, scheduled warnings, rumor rotation, listening costs and most NPC side effects (travel, marriage, disciples, hunters) are not.
+
+---
+
 Requirement: NPC Simulation + Rumor System
 Project: กำลังภายใน — Battle Sim
 Module: World Liveness Layer

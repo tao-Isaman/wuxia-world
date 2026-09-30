@@ -752,7 +752,7 @@ function advanceTime(state: WorldStateData, hours: number): void {
   // throttles to ≤ 4 batches per call, so the cost stays bounded even
   // when the player advances by 90+ days at once. After ticking, scan
   // for any active quest whose `giverNpcId` died this batch and auto-
-  // fail it — see decision §3 in bigchange-plan.md.
+  // fail it — see decision §3 in docs/specs/liveness-plan.md.
   failQuestsForDeadGivers(state, () => {
     tickAllNamedNpcs(state, { currentDay: state.day });
   });
@@ -1546,7 +1546,7 @@ export const useWorldStore = create<WorldStore>()(
             onWin: s.currentSceneId,
             onLose: s.currentSceneId,
           };
-          // Suppress the post-battle return-roll just like other on-enter events.
+          // Legacy flag: nothing reads it since encounters moved to walk ticks.
           draft.flags._skipEventRoll = true;
           set({ ...draft });
           return { ok: true, type: "battle", resourceId: res.id, opponentId: oppId };
@@ -2884,11 +2884,18 @@ export const useWorldStore = create<WorldStore>()(
       //   v15 → v16 added stoleFromCounts / assassinatedNpcIds /
       //            kidnappedNpcIds (bad-action ledgers) plus the "steal"
       //            life-skill key. Existing saves start empty.
+      //   v16 → v17 added gender + sectMembership (the membership `status`
+      //            field came later without a bump; missing = "active").
       //   v17 → v18 added Liveness Layer fields: npcExt (per-named-NPC
       //            sim state), rumorPool / rumorArchive / rumorSeenLog,
       //            lastNpcTickDay. Existing saves start with all fields
       //            empty — npcExt seeds lazily on first tick from the
       //            authored roster in lib/world/data/named-npcs.ts.
+      //   v18 → v19 added playerBodyId (defaults by gender).
+      //   v19 → v20 added wanted / wantedDay / jailCityId (law).
+      //   v20 → v21 added jailUntil (the jail map sentence).
+      // Despite the list, `migrate` is one idempotent normalizer: it ignores
+      // fromVersion and fills every missing field. See docs/save-format.md.
       migrate: (persisted, fromVersion) => {
         const p = (persisted ?? {}) as Partial<WorldStateData>;
         // Pad the build's skillIds to 10 and back-fill learned arrays.

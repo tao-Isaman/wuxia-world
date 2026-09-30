@@ -1,6 +1,6 @@
 # F3 readability candidate v2: directional supplement
 
-Status: isolated candidate. Separate actual-engine review is required before integration.
+Status (2026-09-30): **never generated.** This prompt was prepared, but no `f3-readability-v2-directions.png` exists; the game still uses the v1 `f3-directions.png`, calibrated to the v2 standing height (see [README.md](README.md)).
 
 Tool: built-in imagegen. Local original directions sheet is the identity/back-equipment reference. Generated compact female base is the matching character reference. Local M1 v2 supplies only proportion/readability guidance. No commercial artwork is used.
 

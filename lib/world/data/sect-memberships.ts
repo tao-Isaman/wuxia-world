@@ -1,8 +1,8 @@
 import type { Condition, SectId } from "../types";
 
 // ─── Sect membership definitions ─────────────────────────────────────
-// Per-sect rank table + reward unlock pools. Indexed by SectId (currently
-// only "shaolin" — extend as more sects open membership).
+// Per-sect rank table + reward unlock pools. Indexed by SectId — 15 joinable
+// sects, ladders 9 → 1 (8 sects), 5 → 1 (6 sects) or 3 → 1 (gumu).
 //
 // Rank semantics:
 //   - lower number = higher prestige
@@ -44,7 +44,7 @@ export interface SectMembershipDef {
 }
 
 // Shaolin disciple ranks. Climbing from rank 9 (entry, novice) to rank 1
-// (abbot's right hand). Rewards mirror saolin.md spec:
+// (abbot's right hand). Rewards mirror docs/specs/shaolin-sheet.md:
 //   rank 9 → choose one T1 move skill + receive T0 art
 //   rank 8 → choose one T2 move skill
 //   rank 7 → receive T1 art

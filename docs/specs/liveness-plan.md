@@ -1,3 +1,7 @@
+> **Status (2026-09-30):** the implementation plan for [liveness-spec.md](liveness-spec.md) (the spec was `bigchange.md` when this was written), kept as history. Decisions 2–5 were built as described. Decision 7's `sectRank ≤ 3` big-news rule never matches, because the roster uses 10 for the top rank. The plan planned 5 lore rumors with `leadsTo`; 8 were written. The as-built behaviour is in [docs/liveness.md](../liveness.md).
+
+---
+
 # bigchange v0.1 — implementation plan
 
 Date: 2026-05-10. Source spec: `bigchange.md`.

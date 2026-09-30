@@ -114,7 +114,7 @@ export function MenuBar({ hud }: { hud?: boolean } = {}) {
   ];
 
   // Hero's Adventure-style unified menu: the open popup renders inside one
-  // full-screen tabbed shell, and number keys 1-8 switch sections in place.
+  // full-screen tabbed shell, and number keys 1-7 switch sections in place.
   const menu = {
     tabs: tabs.map((t, i) => ({ ...t, hotkey: String(i + 1) })),
     active: open,
@@ -132,7 +132,7 @@ export function MenuBar({ hud }: { hud?: boolean } = {}) {
     </GameMenuContext.Provider>
   );
 
-  // World hotkeys 1-8 open a section directly (desktop); inside the section
+  // World hotkeys 1-7 open a section directly (desktop); inside the section
   // shell the same digits switch tabs (see Modal).
   useEffect(() => {
     if (!hud || open) return;

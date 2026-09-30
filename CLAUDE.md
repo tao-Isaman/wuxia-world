@@ -1,393 +1,323 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository. It is the short version: the rules, commands and facts you need every session. The detail lives in `docs/` — start at [docs/README.md](docs/README.md).
 
 ## Project
 
-`กำลังภายใน — Battle Sim` (Thai-language wuxia / martial-arts text-RPG with a 1v1 turn-based battle layer) built as a Next.js 15 + React 19 + TypeScript app. UI uses shadcn/ui (Radix + Tailwind) wrapped in a custom **wuxia ink-on-paper** theme (Charm display + Sarabun body, vermilion + jade + cream palette, pixel-bordered chrome). Light mode only. State lives in five Zustand stores. The runtime is Bun, but Node 20+ also works.
+**กำลังภายใน — ยุทธภพ** is a Thai-language wuxia RPG in the browser.
 
-`demo.html` (the original single-file prototype) is preserved as a behavioral reference for the *combat layer*. The world / RPG layer was designed in the rebuild and has no demo precedent. If a tuning question comes up about damage / effect numbers, the demo is the source of truth.
+- **Stack:** Next.js 15 + React 19 + TypeScript, Phaser 4 for the map and the battle board, Zustand for state (six stores), Tailwind + hand-written CSS.
+- **Look:** a Dragon Quest XI–style lacquer HUD with parchment menus and full-screen dialogue.
+- **Runtime:** Bun (Node 20+ also works).
+- **Language:** everything the player reads is Thai; code, ids and comments are English.
+
+**What the player does:**
+
+- Explores 102 places (101 painted maps) joined by 128 roads.
+- Meets 157 NPCs and takes 276 quests.
+- Joins one of 15 sects and learns 178 move skills and 123 inner arts.
+- Gathers and crafts (19 life skills).
+- Steals and gets jailed.
+- Fights **turn-based tactics on a 10 × 7 board**.
+
+`demo.html` is the original single-file combat prototype. It is the reference for combat *numbers* (damage and effect tuning); everything else was designed in the rebuild.
+
+## Where to look
+
+| Question | Doc |
+| --- | --- |
+| How does a system play, with its numbers? | [docs/gameplay.md](docs/gameplay.md) |
+| Layers, stores, data flow, where code goes | [docs/architecture.md](docs/architecture.md) |
+| Stats, damage, effects, levels, type conflict | [docs/combat.md](docs/combat.md) |
+| The tactics battle: board, turns, ranges, AI, store, renderer, UI | [docs/grid-combat.md](docs/grid-combat.md) |
+| Scenes, effects, conditions, quests, objectives, guide, encounters, law, bad actions | [docs/world-engine.md](docs/world-engine.md) |
+| NPC simulation and rumors | [docs/liveness.md](docs/liveness.md) |
+| Adding content (places, NPCs, quests, items, skills, sects…) | [docs/content-authoring.md](docs/content-authoring.md) |
+| Map runtime, collision, characters, HUD, menus, CSS | [docs/rendering.md](docs/rendering.md) |
+| Music and sound · install and offline | [docs/audio.md](docs/audio.md) · [docs/pwa.md](docs/pwa.md) |
+| Saves, migration, repair | [docs/save-format.md](docs/save-format.md) |
+| Tests and scripts | [docs/testing.md](docs/testing.md) · [docs/scripts.md](docs/scripts.md) |
+| Every place / NPC / quest / skill / item / foe | [docs/reference/](docs/reference/README.md) (generated) |
+| Current state, known issues, next steps | [HANDOFF.md](HANDOFF.md) |
+| History | [docs/changelog.md](docs/changelog.md) |
 
 ## Commands
 
 ```bash
-bun install          # install deps
-bun dev              # next dev — http://localhost:3000
-bun run build        # next build
-bun start            # run prod build
-bun run lint         # next lint (ESLint flat config)
-bun run typecheck    # tsc --noEmit
-bun scripts/audit-content.ts     # scene / quest / NPC / item reference audit
-bun scripts/audit-quest-flow.ts  # offer→accept→complete chain audit
-bun run test:quests               # every quest startable/progressable/finishable from home_player (+ regressions)
-bun scripts/map-collision-tool.ts <id> [json] [png]  # author/check a painted map's collision footprints
-bun scripts/build-map-footprints.ts <dir>            # regenerate lib/stage/world-footprints-data.ts
-bun scripts/repack-character-sheet.ts <in> <out> [rows]  # re-pack a generated sprite sheet onto an equal grid
-bun scripts/sort-by-sect.ts      # re-sort skills.ts + arts.ts by SECT_ORDER (idempotent)
-bun scripts/normalize-t3-stats.ts # normalize move-skill stat sums per tier (T0=10..T4=30)
-bun scripts/split-sects-file.ts <quests|npcs|scenes>  # split sects-temples.ts trio into per-sect files
+bun install
+bun dev                     # http://localhost:3000
+bun run build               # next build
+bun run start -p 3017       # serve the production build (the e2e port)
+bun run typecheck           # tsc --noEmit — must be clean
+bun run lint                # next lint — 0 errors, 5 known warnings
+bun run test:runtime        # the unit suites, one per line:
+bun run test:combat
+bun run test:opening
+bun run test:navigation
+bun run test:battle-background
+bun run test:rumors
+bun run test:investigation
+bun run test:audio
+bun run test:law
+bun run test:walk
+bun run test:grid
+bun run test:grid-ai
+bun run test:grid-skills
+bun run test:grid-store
+bun run test:quests         # campaign audit + dead ends + every item/kill/objective quest + guidance
+bun run test:docs           # generated reference is current + docs links/paths/commands resolve
+bun run test:e2e            # Playwright (Chromium) on :3017 — start a production server first
+bun scripts/audit-content.ts            # every NPC / quest / scene reference resolves
+bun scripts/build-docs-reference.ts     # regenerate docs/reference/ after data changes
+bun scripts/sort-by-sect.ts             # re-sort skills.ts + arts.ts by sect, then tier (idempotent)
+bun scripts/normalize-t3-stats.ts       # rewrite move-skill stat sums to 10/15/20/25/30 (review the diff)
+bun scripts/map-collision-tool.ts <id> [json] [png]   # check / draw a painted map's collision
+bun scripts/build-npc-sprites.ts        # NPC pixel sprites from public/npcs/body/
+bun scripts/smoke-liveness.ts           # 90-day NPC simulation smoke test
 ```
 
-Tests are Bun scripts and `bun test` files wired as `test:*` in package.json (runtime, combat, navigation, opening, rumors, investigation, battle-background, quests, audio, law, walk, grid, grid-skills, grid-ai, grid-store), plus Playwright `test:e2e` against :3017. `playwright.config.ts` seeds `localStorage["wuxia-random-events"]="off"` so walk ticks don't ambush unrelated specs; specs that test encounters remove the key.
+**Do not run:**
+
+- **`scripts/split-sects-file.ts`** or **`scripts/append-templated-quests.ts`** — applied one-off migrations; rerunning them empties the sect barrels or duplicates 20 quests.
+- **`bun scripts/build-map-footprints.ts`** with a partial folder — the per-map JSON sources are not in the repo.
+- **Bare `bun test`** — it picks up the Playwright specs and fails.
+- **`bun scripts/audit-quest-flow.ts`** as a gate — it is a legacy audit with 168 known false positives; `test:quests` replaced it.
+
+## Verify before pushing
+
+1. **Checks.** `bun run typecheck`, `bun run lint`, and every `bun run test:*` suite above.
+2. **Browser tests.** For anything touching UI, rendering, stores or saves, run `bun run build`, then `bun run start -p 3017` in the background, then `bun run test:e2e`.
+   - Stop the server with `fuser -k 3017/tcp`, **not** `pkill -f "next start"`, which can kill your own shell.
+   - `pwa.spec.ts` only passes against a production server.
+3. **Content changes.** Also run `bun scripts/audit-content.ts` and `bun scripts/build-docs-reference.ts`; commit the regenerated pages (`test:docs` fails otherwise).
+4. **Docs.** Update the guide for the system you touched, add a line to [docs/changelog.md](docs/changelog.md), and refresh [HANDOFF.md](HANDOFF.md) when the verified state or known issues change.
+
+**Cloud containers:**
+
+- Browsers come from `PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers`; never run `playwright install`.
+- Playwright 1.63 wants Chromium 1243, but the container ships 1194. Link the 1194 binaries into the 1243 folders first — the commands are in [docs/testing.md](docs/testing.md#cloud-container-notes).
+- `localStorage["wuxia-random-events"] = "off"` (seeded by `playwright.config.ts`) stops walk-tick encounters in tests; only `law-guide.spec.ts` removes it.
 
 ## Architecture
 
-Layered, strict downward dependency — UI depends on stores, stores depend on the engines, engines depend on nothing else (and not on each other except via the explicit bridge):
-
 ```
-app/, components/        ← React components, Tailwind, wuxia primitives
+app/, components/         React: screens, HUD, menus, popups, battle UI
    ↓
-store/                   ← Zustand wrappers (character, battle, world, loading, toast)
+store/                    Zustand: world (saved, v21), battle, character (/debug, v3), loading, toast, confirm
    ↓
-lib/game/   lib/world/   ← pure TypeScript engines (no React, no I/O)
-              ↓
-              battle-bridge.ts  ← only place the two stores talk to each other
+lib/world/  ──────►  lib/game/          pure engines — no React, no DOM, no I/O
+   └ battle-bridge.ts: the one place the world and battle stores meet
+lib/stage/ (Phaser, browser only) · lib/characters/ · lib/audio/
 ```
 
-### `lib/game/` — pure combat engine
-
-The engine has no React, no DOM, no async, no hooks. Everything UI-facing flows through `lib/game/index.ts` (the public barrel).
-
-- **`types.ts`** — discriminated unions on `t` (`SelfEffect`, `EnemyEffect`, `EquipEffect`, `ArtPassiveEffect`). Also `SkillType` (yin / yang / balance / hard / soft / internal / external) for the conflict system, and `SKILL_SLOT_COUNT = 10`. `BattleState` carries both `skillUses` and `artUses` (per-side counters used by the world store to grant per-skill / per-art XP post-battle). Skills can carry an optional `hits: number` for multi-strike attacks (each hit gets its own damage roll + applies enemy effects per-hit, used by `dgjj` / `tang_starrain` / `jy_chain_assassin` / etc). `EnemyEffect` includes `poison_dmg` (pure HP DoT, stronger than burn — no MP drain, no Eva/Acc bundle) alongside the older `debuff_poison` + `heavy_poison` (which still bundle Eva/Acc); the Tang sect + jianghu poison weapons all use the new clean form.
-- **`data/`** — static tables: `TIERS`, `SKILLS` (incl. `bst_*` beast moves), `ARTS`, `EQUIPMENT`, `STAT_KEYS`, `WEAPON_FAMILY_*`, `SECT_ORDER`/`JIANGHU_SECT`/`sectRank` (canonical sect list).
-- **`derive.ts`** — base stats → derived combat stats (`derive`), `combinedStats` (merges base + active art + learned arts + slotted skills + learned skills + equipment, with conflict factors AND skill-level scaling on `sk.st`), `deriveAll` (adds HP/MP gain from arts), `getMasteryMap` (per-weapon-family mastery, scaled by skill level).
-- **`damage.ts`** — `hitPct`, `critPct`, `hpColor`, `CRIT_MULTIPLIER`.
-- **`leveling.ts`** — `effectiveBp(skill, level)` (lv 1 = 50 % bp, lv 10 = 100 %); `effectiveMg(skill, level)` (lv 1 = 100 %, lv 10 = 200 %); `xpToNextLevel(skill, level)` = `50 × level × (tier + 1)`. **Inner arts** also level 1–10 (`ART_LEVEL_MAX = 10`); `xpToNextArtLevel(art, lv)` = **2× the equivalent skill cost** (`100 × lv × (tier + 1)`).
-- **`skill-conflict.ts`** — `computeConflictFactors(build, lookups)`. Counts learned skills + arts (excluding `balance` from axis tallies but including in the trigger threshold). When > 4 typed entries and one type holds > 60 % of an axis pair, the opposing type gets a half / zero modifier on `bp`, `st`, `mg`, and art HP / MP / stat scaling.
-- **`slots.ts`** — slot encoding helpers. A slot string is either a bare skill id (`"tj"`) or an art id with `"art:"` prefix (`"art:taiji"`). `parseSlotId` returns a discriminated `{ kind, skill | art }`. `firstArtSlotIndex` picks the primary art for `BattleContext.artIds`.
-- **`effects.ts`** — `applySelfEffect`, `applyEnemyEffect`, `checkPassive` / `applyPassiveEffect`, `tickEffects` (poison + duration decrement + equipment HP-regen), `addBuff` / `addDebuff`. New self-effect variants (`buff_spd`, etc.) go here first; the dispatcher `switch (eff.t)` enforces exhaustiveness.
-- **`battle.ts`** — `BattleContext`, `makeContext` / `makeInitialState` (accepts `InitialStateOpts.hpA / mpA` for carryover), the central `calcSkillDamage`, `resolveSkill` (tracks `state.skillUses[side][skillId]`, `state.hitsReceived[ds]`), `resolveArtActive` (slot-aware via `opts.slotIdx`; tracks `state.artUses[side][artId]`). ATB-style `tickGauges` / `getNextTurn` use `effectiveSpd` to layer `buff_spd` on top of derived SPD.
-- **`ai.ts`** — `runAITurn` parses each available slot via `parseSlotId` and dispatches to `resolveSkill` (skill) or `resolveArtActive` (art, MP-gated). Returns a boolean for lockout detection.
-
-The damage formula in `calcSkillDamage`:
-
-```
-raw = max(1, (Atk * stackMod * artBonus + typedAtk + skillEffect) * dm * masteryMod - effectiveDef) * (1 - pctReduce/100)
-```
-
-…where `skillEffect = effectiveBp(sk, level) * conflictFactor * (1 + p/100) + f`.
-
-Hit %: `clamp(80 + (Acc - Eva)/4, 5, 95)`. Crit %: `clamp(3 + (Cri - Res)/3, 0, 75)`, ×1.5 on crit. Mastery scales as `1 + (mastery/200) * 0.5` per equipped skill of the matching family (cap 200), with skill-level + conflict multipliers folded into the per-skill `mg` contribution.
-
-**Skill-stat scaling**: `combinedStats` multiplies each move-skill's `sk.st` contribution by `bpMultiplier(skLv)` (lv 1 = 50 %, lv 10 = 100 %), so a freshly learned skill grants half its listed stat bonus and the full value at lv 10 — same curve as bp. Arts continue to scale stats by `lv / 10`.
-
-### Grid tactics combat (`lib/game/grid/`) — the live battle system
-
-Wandering-Sword-style turn-based tactics on a 10×7 tile board. Design + contract: `docs/grid-combat.md`. Modules: `types.ts` (contract: `GridUnit`, `GridBattleState`, `GridAction`, `GridEvent`, `UnitLook`, compat fields `winner/escaped/hA/mpA/skillUses/artUses/hitsReceived` the world reads), `geometry.ts` (Manhattan ranges, `reachableCells` — allies passable, enemies/rocks block — `aimCells`, `areaCells` for single/diamond/square/line/arc/cross), `skill-grid.ts` (`skillGrid`/`artGrid`/`slotGrid` + 18 `SKILL_GRID_OVERRIDES` + Thai `describeGrid`; table-driven by weapon family × attack type × tier × hits), `engine.ts` (`createGridBattle`, per-unit ATB `beginNextTurn` / `predictOrder`, `applyAction` move→act/wait/flee, `reachableFor`/`aimableFor`/`previewArea`/`targetsFor`/`slotReady`), `duel.ts` (**reuses battle.ts**: each cast builds a per-pair duel view A = actor, B = target and calls `resolveSkill` / `resolveArtActive` with `tick:false`; extra area targets resolve as `secondary` — no cooldown / uses / MP / self-effect again; `tickSideEffects` ticks one unit on its own turn), `ai.ts` (`planTurn`: scores reachable tile × ready slot × aim by expected damage, kills, focus, area sums, heals when low, fresh buffs; otherwise walks toward the nearest attack spot; deterministic). Move range `clamp(3 + floor(Spd/80), 3, 6)`. Buff/debuff durations tick on the owner's turn. Packs: `OpponentDef.pack` adds up to 2 weaker enemies, only on random encounters (`PendingBattle.withPack`, set by `encounterBattle`); quest / spar fights stay 1v1. Looks: `lib/world/battle-looks.ts` (`playerLook`, `opponentLook`, `creatureFrameFor`, `worldBattleSetup`).
-
-The 1v1 ATB below is still the damage / effect core the grid drives (and `/debug` math), but its real-time side-view presentation is gone.
-
-### ATB turn order (per-unit in the grid)
-
-Calibration constants in `lib/game/battle.ts`:
-
-```
-ATB_BASELINE      = 60     // gauge gain per tick = effectiveSpd + 60
-ATB_THRESHOLD     = 100
-ATB_REFERENCE_SPD = 200
-ATB_REFERENCE_MS  = 1000
-ATB_UNIT_MS       = 2600   // ms per (Spd+60) gauge unit
-```
-
-So `Spd 200` fills in **1 sec**, `Spd 100` in **~1.6 sec**, `Spd 20` in **~3.25 sec**. The `+60` baseline compresses raw SPD ratios — `Spd 20 vs 100` produces a 2:1 turn ratio, not 5:1. **Don't replace the `+60` baseline or carry-over with `if (SpdA > SpdB)` — that breaks the intended balance.**
-
-`effectiveSpd(state, side)` adds `buff_spd` modifiers to `state.dA.Spd / dB.Spd` so a temporary speed buff actually ticks the gauge faster.
-
-### `lib/world/` — pure world / story engine
-
-A second engine layered on top of the battle sim. Same conventions as `lib/game/`: discriminated unions on `t`, data tables, dispatchers, no React.
-
-**Three scene kinds** (`Scene = DialogScene | LocationScene | RouteScene`):
-
-- **`"dialog"`** — narration + dialogue lines + optional `choices` / `next`. Terminal dialogs (no choices, no next) get a "ปิด" button that returns to `lastLocationId`.
-- **`"location"`** — persistent place. Description + `npcs[]` + `routes[]` + optional `resources[]` + optional `categories[]`. `home_player` is the starter location (`START_SCENE_ID`).
-- **`"route"`** — travel screen. `destinations[]` (each navigates to a location with optional `effects`) + back button.
-
-`Choice`, `NpcRef`, `RouteRef`, and `RouteDestination` all support `visibleIf: Condition`.
-
-**Auto-return**: terminal dialogs return to `lastLocationId` via the "ปิด" button. **Dialog auto-advance gotcha**: a dialog with `next` set and no choices auto-advances *without showing its lines*. For narration-then-continue, use a single confirmation choice (`choices: [{ text: "ก้าวต่อไป", next: "..." }]`).
-
-#### Module map (`lib/world/`)
-
-- **`types.ts`** — scene union, `Choice`, `SceneEffect` (incl. `learnSkill` / `learnArt` / `addTrait` / `addNpcRelationship` / `triggerBattle` with optional `nonFatal` / `joinSect` / `leaveSect` (legacy alias for resign) / `resignSect` / `betraySect` / `addGold`), `Condition` (incl. `trait` / `npcRelationship` / `defeatedOpponent` / `visitedLocation` / `gender` / `sectMember` / `sectRankAtLeast` / `anySectMember` / `sectStatus` / `goldAtLeast` / `learnedArt` / `lifeSkillLevel`), `NpcDef`, `NpcStateEntry`, `OpponentDef` (with `ti`, `category`, `drops`), `ItemDef` (with `category`, `price`, `use: trainSkill | heal`), `TraitKey` (5 traits), `EnemyCategory`, `LocationCategory` (13 keys), `ITEM_CATEGORIES`, `SectMembership` (incl. `status: "active" | "resigned" | "betrayed"` and `acceptedDefeatedAt` / `acceptedHasItemAt` snapshot fields on `QuestState`), `WorldStateData` (incl. `artExp`, `learnedRecipeIds`, `gender`, `sectMembership`, `kidnappedNpcIds`, `assassinatedNpcIds`), `ActionLogEntry`, `PendingBattle`, `PendingEncounter`, `PendingHuntYield`, `PendingSpar`, `RecipeDef.basic?: boolean`, `ArtisanDef`.
-- **`location-categories.ts`** — `inferCategoriesFromId`, `getLocationCategories`, `canPracticeAt`, `practiceXpBonus`, `describeBonusForLocation`. Practice categories: sect / mountain / forest / cave / river / temple. Bonus map: forest → yang/external, cave → yin/soft, mountain → balance/hard, river → internal. Bonus is a flat 1.30× multiplier — no stacking.
-- **`stat-progression.ts`** — `STAT_XP_PER_ACTION = 10`, `xpToNextStatLevel(base) = 50 × base`, `lukRollChance(base) = min(50%, 10% + 1% × base)`, `STAT_FROM_LIFE_SKILL` (mining / wood / fishing / herbalism / venom → VIT, hard crafts incl. accessory → DEX, cultural → INT).
-- **`conditions.ts`** — `evaluateCondition(state, c)`. `sectMember` / `anySectMember` only return true for `status === "active"` memberships — resigned + betrayed tombstones don't count, so cross-sect exclusion is automatic via the single-line `{ t: "not", of: { t: "anySectMember" } }` prereq instead of enumerating every SectId.
-- **`effects.ts`** — `applyEffect` dispatcher, plus `tickQuestProgress` (uses delta-based `evaluateAutoAdvance` for `defeatedOpponent` + `hasItem` so repeatable quests don't auto-complete on the player's prior counts), `consumeQuestAutoItems` (called from auto-finish + popup turn-in to deduct items the player gathered for the quest — scene-driven completes still use explicit `takeItem` and never trigger this), `isQuestOfferable`, `isQuestTurnInForNpc`, **`collectActiveHuntTargets(state)`** (Set of opponentIds the player is hunting via current-stage `defeatedOpponent` autoAdvance — used by `rollRandomEvent` for the hunt-boost rule). On `startQuest` the dispatcher also snapshots current `defeatedCounts` / `inventory` for opponentIds + itemIds mentioned in the quest's autoAdvance conditions, into `QuestState.acceptedDefeatedAt` / `acceptedHasItemAt`.
-- **`validate.ts`** — drops dangling refs, clamps numeric ranges, drops unknown skill / art / recipe ids, syncs `playerBuild.skillLevels` from world `skillLevel` map. Runs on rehydrate.
-- **`battle-bridge.ts`** — module-level Zustand subscription. **One-way**: world → battle is automatic (passes current HP / MP into the next fight); battle → world is user-driven via `acknowledgeBattleResult`.
-
-#### Data tables (`lib/world/data/`)
-
-- **`scenes.ts`** — Core tutorial scenes + `WORLD_MAP_SCENES`. `START_SCENE_ID = "home_player"`.
-- **`world-map.ts`** — 7 cities, 7 villages, 18 sects (incl. สำนักสุลถัง / Tang clan), 10 isles, 11 terrain features, 12 caves, 5 temples, 4 mansions, 4 inns, 11 NPC homes, 7 misc — total **~86 leaves**. Builds the connectivity graph from `LOCATION_ROUTES` (no random fill).
-- **`location-routes.ts`** — explicit hand-curated edge list. Each entry is a `LocationRoute { a, b, fromA, fromB, hintA?, hintB? }` with **per-direction labels**.
-- **`sects.ts`** — `SECT_ORDER` and `JIANGHU_SECT = "ยุทธจักร"`. Default sect for unaffiliated skills / arts.
-- **`sect-memberships.ts`** — `SECT_MEMBERSHIPS` map keyed by `SectId` (11 entries: shaolin · wudang · huashan · quanzhen · emei · gumu · beggars · jinyiwei · sunmoon · tang · xiaoyao). Each `SectMembershipDef` declares the rank ladder, per-rank reward pools (skills + arts the player picks one of), join requirements (`Condition`), `rankUpCost(rank) → points`, `questCooldownDays`, and the registrar NPC. Helpers: `pendingRewardsAtRank(def, rank, claimed)` and `autoGrantableRewards(def, currentRank, claimed)` (the latter auto-claims single-option pools when the player joins / climbs).
-- **`opponents.ts`** — 150+ `OpponentDef`s across **5 tiers**, organised in named blocks: random-event roster · 10 hunt-only beasts (`hunt_*` prefix, weaker than tier-equivalent random-event beasts, carry the `bst_*` skill family) · per-sect spar opponents (each disciple/elder NPC has a `spar_<sectid>_<name>` entry) · 11 sect hunters (`hunter_<sectId>` — appear via random event when the player has `sectMembership[sectId].status === "betrayed"`).
-- **`npcs/sects-temples.ts`** — barrel that re-exports the per-sect `npcs/sects/<sectId>.ts` files. Adding a new sect = create one file + one import + one spread in the barrel. `NpcDef` registry pattern: `dialogSceneId?` enables 💬 talk; `sparOpponentId?` enables ⚔ spar (non-fatal battle); `locationIds[]` places them; `defenseTier?` + `stealLoot[]` enable the steal mechanic. Two pickup-only contacts added in cities for delivery quests (Wang at the capital, Li the book merchant at suzhou).
-- **`items.ts`** — every item has `category` (10 categories) and `price`. `use` can be `{ t: "trainSkill" }` or `{ t: "heal", hp?, mp? }`. Quest items carry `category: "quest"` + `price: 0` so shops won't sell them.
-- **`shops.ts`** — `ShopDef` per location. Inventory + `acceptsCategories` filter + `sellMultiplier`. Cities = full general store (50 % sell-back), inns = food-focused (40 %), villages = tiny (35 %).
-- **`sect-halls.ts`** — `SectHallDef` per city. **Tier 0–1 ยุทธจักร skills + arts only** — sect-affiliated styles must be learned at the parent sect, not the public city hall. Each city's roster differs.
-- **`artisans.ts`** — `ArtisanDef` per location. **All 7 cities auto-generate 6 craft artisans each** (forge / alchemy / tailoring / chef / jewelry / accessory) via the `buildCityArtisan` helper. Plus hand-curated single-profession artisans in select villages and sects. `recipesOfferedBy(artisan)` folds in basic recipes for the profession + the artisan's specialty list, so authors only declare specialties — basic staples come for free.
-- **`recipes.ts`** — crafting recipes. `RecipeDef.basic === true` opts a recipe into the per-profession fan-out (every artisan of that profession sells it). Specialty recipes are hand-assigned to specific artisans in `artisans.ts`.
-- **`life-skills.ts`** — 18 life skills incl. the new `accessory`. `LIFE_SKILL_LABEL`, `LIFE_SKILL_ICON`, mastery thresholds, drop-check formula.
-- **`resources.ts`** — gather + hunt nodes. Social nodes (chess, begging) are appended only to cities and villages in `world-map.ts`; `auto-maps.ts` places them on `ZONES.social` street corners (nature nodes keep the map-edge `ZONES.resources`), and `LocationMap` hides a spot whose node `visibleIf` fails. Hunt nodes (`hunt_forest`, `hunt_mountain`, `hunt_legendary`) point at the dedicated `hunt_*` opponent pool — separate from random-event beasts.
-- **`random-events.ts`** — `EVENT_PROBABILITY.fight = 0.15`, **`fightHunting = 0.80`** (hunt boost); treasure / meet scale with LUK (5 % + LUK/200, cap 25 %; 10 % + LUK/300, cap 35 %). `FIGHT_EVENTS` is tier-weighted (T0 weight 8 → T4 weight 0.5). `fightEventsForLocation(id)` filters by zone (city = humans only, wild = beasts + humans + a touch of supernatural, etc.) — see `ZONE_CATEGORY_WEIGHT`. The `rollRandomEvent` dispatcher in `effects.ts` first checks for any betrayed sect — if found, 30 % chance to spawn `hunter_<sectId>` (overrides the normal fight/treasure/meet roll entirely). The encounter screen's `🏃 หนี` action delegates to `fleeEncounter` in world-store; for `hunter_*` opponents it runs an AGI + LUK check (30 % + (AGI+LUK)/2 %, cap 90 %) — fail forces the fight via `pendingBattle` promotion.
-- **`quests/sects-temples.ts`** — barrel re-exporting per-sect quest files in `quests/sects/<sectId>.ts`. Same pattern for villages / cities / wilderness / evil / spies / temples-misc (`_other.ts`). Stages have optional `autoAdvance: Condition`; the engine ticks progress after every effect via `tickQuestProgress`. **`startQuest` snapshots `defeatedCounts`** into `QuestState.acceptedDefeatedAt` so kill stages count only kills since accepting (repeatable sect quests don't auto-complete on prior kills; the quest log shows the same since-accepted number). **Item stages count what the player holds now** (`hasItem` is absolute — a fetch quest accepts ore already in the bag); `acceptedHasItemAt` is still recorded but no longer used. A world-store subscription re-runs `tickQuestProgress` whenever `inventory` or `defeatedCounts` change, so progress never waits for a scene change. `scripts/test-quest-turnins.ts` (in `test:quests`) plays every item/kill/objective quest accept → progress → hand-in → done; `scripts/test-quest-guide.ts` checks guidance for every stage of every quest. **Auto-finish + popup turn-in also call `consumeQuestAutoItems`** to deduct items the player gathered for the quest (scene-driven completes use explicit `takeItem` and bypass this — no double-consume).
-- **`scenes-content/sects-temples.ts`** — barrel re-exporting per-sect scene files in `scenes-content/sects/<sectId>.ts`. `qs_qst_<questId>_offer` + `qs_qst_<questId>_complete` is the scene-driven flow; sect quests with no completion scene rely on the popup turn-in path.
-
-### `lib/stage/` — Phaser 4 rendering (client only)
-
-Both scenes are Phaser 4 games, dynamically imported by `components/game/world-canvas.tsx` and `battle-canvas.tsx`.
-
-- **`phaser-stage.ts`** — `createStage(parent, bg, { create, update, contextLost, error })`: one `Phaser.Game` per view, `Phaser.AUTO` (WebGL 1, Canvas fallback for old / GPU-blocked browsers), `pixelArt`, `Scale.NONE` with the drawing buffer at host size × DPR (cap 2). Phaser input is **off**; the runtimes use DOM pointer / key listeners. Helpers: `canvasTexture`, `addGridFrames`, `drawCanvas`.
-- **`world-runtime.ts`** — exploration: 960×640 map units (y down), cover-fit camera following the hero, WASD / click-to-walk via `world-navigation.ts`, marker picking, name tags, quest marks, props, bystanders, foreground occluders, lighting veil. Reports state on the host's `data-*` attributes (`data-player-x/y/frame/motion/facing`, `data-visible-props`, …) — the e2e suite and HUD minimap read these.
-- **`grid-battle-runtime.ts`** — the tactics board: 2.5D tile grid in perspective over the battle background, every unit drawn from its own `UnitLook` (character atlases play their own idle/walk/attack/hurt/victory/defeat clips; creature-atlas beasts and unique stills get procedural bob/hop/lunge/flash/fall), HP bars, active ring, blue move / red aim / orange area tiles, DOM pointer → cell hit test. Plays `state.events` in order (walk 180 ms/tile, cast banner + cast-vfx + cast-sfx + damage numbers, hurt, defeat, victory) and calls `battleStore.step()` ~350 ms after the queue drains so AI turns animate one beat at a time. Host data: `data-ready/phase/active-unit/units/event-seq/anim/highlight/battle-background`, `gridCellPoint(x,y)` test hook.
-- **Skill VFX** — `cast-vfx.ts` (pure) maps a cast (`lastCast.source` = skill / art id + `tier`) to a profile: **rarity** T0–T4 → palette (parchment → jade → sky → violet → gold) and layers (T1 glow · T2 afterimage + shockwave · T3 rune circles + element burst + petals · T4 stage dim, light pillar, rays, screen flash); **weapon family** → shape (sword crescent, blade heavy cleave, fist burst, long thrust, short flurry, hidden needles, music waves; arts = qi orb); **effects / types** → element accent (poison, fire, frost, thunder, blood drain, qi, shadow, holy). `battle-vfx.ts` draws it with per-colour canvas textures (works on the Canvas renderer too); ranged shapes don't lunge. Misses get a whiff; buffs/heals get a caster aura. Reduced motion skips VFX.
-- Pure helpers (no Phaser): `world-navigation.ts`, `world-placement.ts`, `world-footprints-data.ts`, `world-occlusion.ts`, `world-vignettes.ts`, `world-map-probe.ts`, `battle-background.ts`, `types.ts`.
-- Don't put Phaser objects in stores or saves; don't enable Phaser input (modal pause rules live in `worldInputBlocked`).
-
-### Audio (`lib/audio/`, procedural — no audio files)
-
-- **`songs.ts`** (pure) — music as note data, all pentatonic: `world` (D gong, 76 bpm, guzheng + dizi), `night` (slower, flute over sparse strings), `battle` (E yu, 138 bpm, taiko + bass-string ostinato + erhu), `title`, and jingles `victory` / `defeat` / `encounter` / `quest` / `levelup`. `phrase("A4:2 D5:2 …")` = melody shorthand in eighth notes. Tested by `bun run test:audio`.
-- **`engine.ts`** — Web Audio graph (music + sfx buses, generated hall reverb, compressor), synthesized instruments (Karplus–Strong zither/bass, breathy flute, bowed erhu, taiko, woodblock, gong, bell), a look-ahead sequencer (`playMusic` crossfades loops; `playJingle(track, returnTo)` plays once then hands back), SFX primitives (`swoosh` / `tone` / `thump` / `note`), `uiSound`, `renderTrack` (offline render for previews / level checks). Starts on the first tap or key (`unlockAudio`), sleeps when the tab is hidden. Settings persist in `localStorage["wuxia-audio-v1"]`; `<html data-audio / data-music>` expose state for tests.
-- **`cast-sfx.ts`** — skill sounds from the same `CastVfx` profile as the VFX (weapon shape, rarity layers, element accent); called by `battle-runtime.ts` at cast start / each hit / miss / support.
-- **UI** — `components/sound-director.tsx` (mounted in `app/page.tsx`) picks title / world / night / battle music and fires encounter, victory, defeat, quest, level-up and coin cues; `components/sound-button.tsx` (♪ in the top icon bar, battle header and title screen) opens a small bubble with music / effects switches and volumes.
-
-### PWA (installable, offline)
-
-- `app/manifest.ts` → `/manifest.webmanifest` (fullscreen, any orientation, icons in `public/pwa/`, regenerate with `bun scripts/build-pwa-icons.ts`). `app/layout.tsx` exports `viewport` (`viewport-fit=cover` for `env(safe-area-inset-*)`) and Apple web-app metadata.
-- `public/sw.js` — hand-written service worker, registered by `<PwaRegister />` (`components/pwa.tsx`) in production only as `/sw.js?v=<NEXT_PUBLIC_BUILD_ID>` (set in `next.config.ts` from the Vercel commit SHA). Navigations network-first → cached `/` offline; `/_next/static` cache-first per deploy; `/art /maps /npcs /player /icons /fonts /pwa` stale-while-revalidate, capped at 900 entries. `sw.js` is served `no-cache`.
-- `<InstallGameButton />` (title screen + top icon bar): native prompt on Chrome/Android, Share → Add to Home Screen steps on iOS; hidden once installed.
-
-### Mobile-first HUD (world)
-
-- **Top-left** — no party card (removed at the user's request; HP / MP / พลัง live in the profile popup and battle). `MenuBar hud` renders `nav[aria-label="เมนูเกม"]` in the corner as a small 2-row icon grid (profile, bag, skills, crafts, quests, sect, log, sound) + install; digits 1–7 open sections on desktop. Law status floats top-centre (`.hud-law`: `⛓ หมายจับ ●●○○○` and the jail sentence).
-- **Map signs + places list** — `WorldMarker.badge` picks a line-art glyph per activity (`GLYPHS` in `lib/stage/world-style.ts`: shop, sect, rest, rumor, practice, each craft profession, each gathering skill, chess, begging, jail gate / labour / dice / escape); `glyph` (the spot's emoji) shows on the action button and in the list; `category` (`npc` / `route` / `place` / `activity`, default from `kind`) sorts จุดหมาย into tabs (`PlacesPanel` in `world-canvas.tsx`; buttons carry `data-places-tab` / `data-category`).
-- **Walk cycle** — `lib/characters/walk-cycle.ts` post-processes the atlas walk cells (side, north, south): left foot up → passing (+1 px bob) → right foot up → passing, bending the lower body from the hip so feet clearly alternate.
-- **Busy overlay** — `flashLoading(message, ms, kind)` (`work` / `rest` / `stealth`) shows `.work-overlay[data-world-busy]`: the hero at work + a progress bar that fills over the action's duration. It swallows taps, and `worldInputBlocked` / menu hotkeys treat `[data-world-busy]` as a pause, so the action button can't be pressed mid-activity.
-- **Quest guide + tracking** — `lib/world/quest-guide.ts`: `guideForQuest(state, id)` works for every stage type and returns `kind` (`objective` spot · `npc` · `place` · `shop` / `gather` / `hunt` / `wander` for item and kill stages, picked from shops, resource nodes, hunt pools and zone fight pools, nearest by route · `none` for trait goals), an `action` line, an optional `progress` counter, the target `locationId`, the BFS `path` and the `markerId` to point at there. Fallbacks: the NPC named in the stage text, a location named in it, else the giver. `trackedQuestId(state)` = `flags.trackedQuestId` while active (`TRACK_NONE` = off), else the newest active quest; `activeGuide` guides it; `guideMarkerId` gives the target marker at the target map, the exit toward the next hop elsewhere, the best destination on route maps. Map views set `WorldMarker.guide` (bobbing jade arrow + edge pointer, `data-guide-marker`). The quest log has a 📌 ติดตาม pin per active quest plus the 🎯 action / 📍 place box with ➤ นำทาง; `components/world/quest-tracker.tsx` (in the HUD menu bar, top-right under the sundial) shows the tracked quest's stage, action, counter and distance, and opens the quest log.
-- **Quest objectives** — `QuestStage.objective.spots[]` (`lib/world/quest-objectives.ts`) for stages no dialog or counter can drive ("สังเกตประตูเมือง"): each spot is a 🔍 map marker at `locationId` (id `objective-<quest>-<i>`, placed clear of other markers near the spawn), or an action in the `npcId`'s popup, or opens `sceneId` (a dialog whose choices advance the quest). Using one (`worldStore.doQuestObjective`) costs `hours` (default 1), toasts `text`, and when the stage's last spot is done advances the quest. Progress per spot is a flag `qobj:<quest>:<stage>:<i>`. `audit-quest-completion.ts` fails on a middle stage with neither autoAdvance, objective nor enough reachable `advanceQuest` beats, and on flag stages nothing sets.
-- **Dialogue** — `DialogStage` is full-screen (portrait bust column / top band on phones, lines + choices side-by-side in landscape) and shrinks text via `--dialog-scale` (floor 0.62) until nothing scrolls. Dialogs away from a staged map (quest offers, travel events, narration) use the same stage over the `MapBackdrop` painting, titled by the first dialogue speaker.
-- **Rest** — `components/world/rest-quick-action.tsx`: round พัก button bottom-right that pops a small bubble of rest choices (`restKindsForScene`); `openRestBubble()` opens it from map rest spots. There is no rest page.
-- **Joystick** — `components/game/touch-stick.tsx`: a touch on the left half of the map plants a floating stick; dragging calls `runtime.setStick({x,y})` (analog, −1…1); a touch that never drags is forwarded as `runtime.tapAt()`. Mouse input is untouched. The minimap was removed to free the bottom-left.
-- **Action button** — the world runtime reports the marker within 95 map units via its `onNearby` callback (and `data-nearby-marker`); `WorldCanvas` shows `.action-prompt` (คุยกับ / ไปที่ / ใช้ + label) which calls `runtime.interact(id)`. Keyboard E does the same.
-- The floating journey guide panel was removed; guidance lives in the quest log.
-
-### Routes
-
-- **`/`** (`app/page.tsx`) — the world game. Renders `<WorldScreen />`, calls `initBattleBridge()` once on mount.
-- **`/debug`** (`app/debug/page.tsx`) — dev sandbox: setup tab (CharacterCard A & B), library, free-form `<BattleArena mode="free" />`. World player is fully decoupled from `character-store`.
-
-### `store/` — Zustand wrappers
-
-All `"use client"`. Five stores:
-
-- **`character-store.ts`** — `/debug` setup-tab state. Persisted (`wusia-character-v1`, version 2). World does **not** read from this. v1 → v2 padded `skillIds` 5 → 10 and seeded `learnedSkillIds` / `learnedArtIds` / `artLevels`.
-- **`battle-store.ts`** — the grid battle (`state: GridBattleState`). **Not persisted**. `start(a, b, { hpA, mpA, enemies, looks, blocked })`, `move(to)` / `act(slot, target)` / `wait()` / `flee()` (player turn only), `setAuto(on)` (อัตโนมัติ: AI plays the player too), `step()` (one AI beat: begin turn / planned move / planned action), `stepAll()`; helpers `isPlayerTurn`, `aiControls`, `cloneBattle`. Unit ids: `A` leader, `B` primary enemy, `pack<n>:<opponentId>`. Every change publishes fresh `state/units/events/log` references.
-- **`world-store.ts`** — story state (scenes, flags, quests, inventory, gold, traits, NPC states, skill / art / stat progression, learned recipes, action log, sect membership, gender). Persisted (`wusia-world-v1`, **version 21**) with `validateAndRepair` on rehydrate. Notable actions: `practiceSkill`, `levelUpArtFromWExp`, `levelUpSkillFromWExp`, `buyRecipe`, `craftRecipe` (artisan-gated for the 6 craft professions), `abandonQuest`, `joinSect`, `upgradeSectRank`, `pickSectReward`, `acceptSectQuest`, **`resignSect`** (formal — skills freeze), **`betraySect`** (skills keep growing but hunters spawn), `attemptSteal`, `attemptKidnap`, `attemptAssassinate`, `finishQuestNow` (popup turn-in path — calls `consumeQuestAutoItems` before firing `finishQuest`). Internal helpers `isSkillFrozen` / `isArtFrozen` short-circuit per-skill / per-art XP grants when the source sect is in `"resigned"` status.
-- **`loading-store.ts`** — `flashLoading(message, duration?)`. Auto-hides after 300 ms by default. Used for gather / craft / rest / practice action feel (NOT travel — travel is instant).
-- **`toast-store.ts`** — `toast(kind, message, durationMs?)`. Stack of up to 3 visible at once, auto-dismiss after 2.6 s. Kinds: success / info / warn / error.
-
-UI components subscribe via the standard selector pattern: `useWorldStore((s) => s.flags)`. Don't read `getState()` from inside components — only from event handlers / store internals / bridge subscriptions.
-
-### Player progression systems (in world-store)
-
-- **W-exp (`wExp`)** — global pool, earned from any action (gather +10, craft +5, useItem +5, practice +5, fight win +50). Spent via "เร่งด้วย w-exp" buttons on either move skills or arts.
-- **Per-skill xp (`skillExp[id]`)** — earned per use of that skill in a winning battle (`SKILL_USE_XP × count`). **Auto-levels** when full.
-- **Per-art xp (`artExp[id]`)** — parallel to `skillExp`. Earned per art active fired in a winning battle. **Cost curve = 2× the move-skill cost** (`xpToNextArtLevel` in lib/game/leveling). **Auto-levels** when full; level cap = 10. Levels live on `playerBuild.artLevels`.
-- **Per-stat xp (`statExp[STR..LUK]`)** — see mapping in `stat-progression.ts`. **Auto-levels** when crossing `xpToNextStatLevel`. Cost scales with the *base* stat (item / skill bonuses excluded).
-- **Traits (`traits.good / evil / arrogance / humility / fame`)** — adjusted by `addTrait` SceneEffect and sparring wins (fame). Read by `Condition.trait`.
-- **NPC relationship (`npcStates[id].relationship`)** — adjusted by `addNpcRelationship` SceneEffect. Read by `Condition.npcRelationship`.
-- **Defeated counts (`defeatedCounts[opponentId]`)** — incremented in `acknowledgeBattleResult` on win. Read by `Condition.defeatedOpponent`. Drives the hunt-boost rule.
-- **Visited locations (`visitedLocationIds`)** — pushed when a location scene is entered. Read by `Condition.visitedLocation`.
-- **Learned recipes (`learnedRecipeIds`)** — recipe id list; populated by `buyRecipe` at artisan popups. `craftRecipe` requires the recipe to be in this list AND the player to be at an artisan whose profession matches `recipe.skill` (for the 6 craft professions only).
-- **Action log (`actionLog: ActionLogEntry[]`)** — last 100 events. Pushed by `appendActionLog(state, kind, message)` from inside store actions. Surfaced via `📜 บันทึก` menu popup.
-
-### Practice action
-
-- `store/world-store.ts` → `practiceSkill(rawId)` accepts the slot-encoded form (`"art:xxx"` for inner arts, bare id for move skills).
-- Costs `PRACTICE_STAMINA_COST = 30` + advances `PRACTICE_HOURS = 6` ชั่วยาม.
-- Awards `PRACTICE_BASE_XP = 30` xp on the chosen skill / art (hits `skillExp` or `artExp`); auto-levels.
-- **Location bonus**: `practiceXpBonus(scene, types)` returns `1.30` when the location's category set intersects the skill/art's `types` per the rule `forest→yang/external · cave→yin/soft · mountain→balance/hard · river→internal`. Otherwise `1.0`.
-- Eligibility: `canPracticeAt(scene)` must return true (sect / mountain / forest / cave / river / temple). LocationView renders the "🧘 ฝึกฝน" button only for eligible locations.
-- Popup: `components/world/popups/practice-popup.tsx`. Shows learned skills + arts, location's matched bonus types, stamina check; uses `flashLoading` for a 1-sec deliberate pause.
-
-### Sect membership / disciple system
-
-**11 joinable sects** declared in `lib/world/data/sect-memberships.ts`. Each `SectMembershipDef` has:
-
-- `id`, `name`, `hallLocationId`, `registrarNpcId`
-- `joinRequirements: Condition` — gate evaluated when the intro quest's reward chain calls `joinSect`. Common gates: `gender` (Shaolin = male, Emei = female), `lifeSkillLevel` (Beggars = begging ≥ lv 2), `goldAtLeast` (Huashan = 500 gold), `learnedArt` (Gumu = `t3_qz_sun`).
-- `startRank`, `topRank`, `rankUpCost(targetRank) → points`, `questCooldownDays`
-- `skillsByRank: Record<rank, readonly skillId[]>` + `artsByRank: Record<rank, readonly artId[]>` — each rank's reward pool. Single-element pools auto-grant via `autoGrantableRewards`; multi-element pools become a UI picker.
-
-**Membership status** lives on `SectMembership.status`:
-- `"active"` — current disciple. Counts toward `sectMember` / `anySectMember` Conditions, gets all sect benefits.
-- `"resigned"` — formal resignation via `resignSect` reward / store action. Skills + arts learned via this sect's `rewardPicks` are XP-frozen (`isSkillFrozen` / `isArtFrozen` checks). Hunter does NOT spawn. Player free to join a new sect.
-- `"betrayed"` — defection via `betraySect`. Skills keep gaining XP but `rollRandomEvent` may spawn `hunter_<sectId>` (30 % roll per random event). Cleared by completing the redemption quest (`qst_<sectId>_redemption` — `prereqs: { t: "sectStatus", sectId, status: "betrayed" }`, reward chain ends with `resignSect` so betrayed → resigned).
-
-**Cross-sect exclusion** is one line per intro: `{ t: "not", of: { t: "anySectMember" } }`. Adding a new SectId doesn't require touching the other intros.
-
-**Snapshots in QuestState** prevent repeatable sect quests from auto-completing on prior counts:
-- `acceptedDefeatedAt[opponentId]` — defeatedCounts at `startQuest` time
-- `acceptedHasItemAt[itemId]` — inventory at `startQuest` time
-- `evaluateAutoAdvance` checks `(current - snapshot) >= count` for `defeatedOpponent` + `hasItem`
-
-**Auto-consume on turn-in** (`consumeQuestAutoItems`) deducts items the player gathered for the quest at finish time. Only called from `tickQuestProgress` done branch (auto-advance) + `finishQuestNow` store action (popup turn-in). Scene-driven completes use explicit `takeItem` and bypass this — no double-consume.
-
-### Hunt-boost mechanic
-
-- Active when `collectActiveHuntTargets(state)` returns a non-empty set AND at least one target appears in `fightEventsForLocation(currentSceneId)`.
-- `rollRandomEvent` swaps the encounter chance from `EVENT_PROBABILITY.fight` (0.15) to `EVENT_PROBABILITY.fightHunting` (0.80) and restricts the pool to the targets only.
-- Treasure / meet bands are suppressed during a hunt (the player is in focus mode).
-- Falls back to default behavior when no target fits the zone (e.g., kill-tigers quest while inside a city zone where beasts are filtered out).
-- The boost ends automatically when the quest stage advances past the kill condition (e.g., to "return to NPC") because `collectActiveHuntTargets` only inspects current-stage `defeatedOpponent` autoAdvances.
-
-### Crafting / artisans
-
-- 6 craft professions are artisan-gated: **forge / alchemy / tailoring / chef / jewelry / accessory**. `craftRecipe` for these professions requires (a) `learnedRecipeIds.includes(recipeId)` AND (b) the player be at a location with `getArtisansAt(scene.id)` containing an artisan whose `profession === recipe.skill`.
-- Other recipes (mining / hunting / herbalism / venom / woodcutting / fishing / drawing / writing) keep the legacy "craft inline anywhere" behavior — they were never shop-gated.
-- Cities: every city auto-hosts all 6 artisans via `buildCityArtisan` in `artisans.ts`.
-- Villages / sects: hand-curated, one profession per location.
-- Recipe distribution: `RecipeDef.basic === true` recipes auto-fan-out to every artisan of that profession at a default basic price. Specialty (non-basic) recipes appear only on artisans listed in `CITY_SPECIALTIES` or in `SINGLE_PROFESSION_ARTISANS.recipes`. Adding a new specialty = one row in `CITY_SPECIALTIES`.
-- ArtisanPopup (`components/world/popups/artisan-popup.tsx`) exposes three tabs: ซื้อสูตร (buy recipes filtered to unlearned) · ประดิษฐ์ (craft from learned recipes filtered to this profession) · ซื้อ-ขาย (small item shop with `acceptsCategories` filter on sell-back).
-- The lifeskills popup's "สูตรที่เรียน" tab is read-only — it lists what the player has learned and points them at the right artisan; no craft button.
-
-### Battle ↔ World seam (`lib/world/battle-bridge.ts`)
-
-`initBattleBridge()` is called once from `app/page.tsx` (idempotent, SSR-safe). **One-way automatic** — only the world-to-battle transition is auto-driven.
-
-1. **World → Battle (auto)**: `useWorldStore.subscribe` watches `pendingBattle`. When set, the bridge looks up the opponent and calls `battleStore.start(playerBuild, opp.build(), { hpA: ws.currentHp, mpA: ws.currentMp })`. The world UI renders `<BattleArena mode="world" onContinue={acknowledge} />` inline.
-2. **Battle → World (manual)**: `BattleArena` shows a "ดำเนินเรื่อง →" button when `state.winner` is set. Clicking calls `worldStore.acknowledgeBattleResult()`, which:
-   - Charges `FIGHT_STAMINA` + advances time by `FIGHT_HOURS`
-   - Snapshots `state.hA / mpA` back into `currentHp / currentMp`
-   - On **win**: rolls opponent's drop table, banks w-exp, grants per-skill xp from `state.skillUses.A`, **per-art xp from `state.artUses.A`**, rolls STR/POW/DEF/LUK stat xp, awards spar fame if `pendingSpar` is set, drops hunt yield if `pendingHuntYield` is set, increments `defeatedCounts[opponentId]`, then `gotoScene(onWin)`
-   - On **non-fatal loss** (sparring): clears state and routes to `onLose`
-   - On **fatal loss**: sets `gameOver = true`
-
-`reconcile()` runs once on bridge init: if `pendingBattle` exists but the battle store is null (refresh wiped it), it restarts the battle.
-
-### Random encounters (fight / flee)
-
-**Walk ticks, not scene changes.** Entering a map no longer rolls anything (`rollRandomEvent` scene effect is a no-op; `leaf()` has no `onEnter`). The world runtime calls `onWalkTick` every `WALK_TICK_UNITS = 220` map units walked → `worldStore.walkTick()` → `rollWalkEvent(draft, 0.4)` (probabilities scaled by 0.4). `home_player` is safe. `localStorage["wuxia-random-events"]="off"` disables ticks (tests).
-
-**Jail map.** Losing a law fight → `jail_cell` (arrest; bribe option) → `imprison` sets `jailUntil` (absolute ชั่วยาม = day×12+time, 2 days per mark; marks clear) and moves the player into the `jail` location (painted by `scripts/build-jail-map.ts`, `LOCATION_MAPS.jail`, footprints in `worldFootprints`). It has no exits; `jailBlocks` in world-store refuses any location/route while `jailUntil` is set. Map activities (`lib/world/data/activities.ts`, spot kind `activity`, store `doActivity`): ทุบหิน (6 h, sentence −6 h extra, STR xp), ทอยเต๋า (bet 10), นั่งสมาธิ (MP full), แหกคุก (AGI chance; success +2 marks, fail +1 day), ประตูคุก (opens once served, else offers `serveSentence`). NPCs ตาเฒ่าหลิว (tips) and ผู้คุมจาง (bribe). Save v21 adds `jailUntil`.
-
-**Retreat.** The battle bar shows skill cards + **รอ** / **ถอยหนี** / **อัตโนมัติ**. Flee: `fleeChance(leader Spd, fastest living enemy Spd)` = 50 % ±1 %/4 Spd (20–90 %); success sets `state.escaped` + phase over (no winner), failure spends the turn. `acknowledgeBattleResult` handles escapes: stamina/time cost, no rewards, back to the location, law escape clears `jailCityId`.
-
-**Wanted marks (`lib/world/law.ts`).** A failed steal adds a หมายจับ mark (max 5, decays 1 per 10 quiet days). Each walk tick first rolls `lawChance(marks)` (5 % + 8 %/mark, cap 45 %); `pickLawPursuer` picks `law_constable` (T1) / `law_imperial_guard` (T3) / `law_bounty_hunter` (T3), weighted toward the latter as marks grow. Law fights are nonFatal with `onLose: "jail_cell"`; fleeing uses the hunter AGI+LUK check. In `jail_cell`, `serveJail` advances `2 × marks` days, clears marks and releases the player in `jailCityFor(scene)` (region → city); `bribeJail` (300 gold) drops 2 marks. Winning clears `jailCityId`.
-
-
-When `rollRandomEvent` rolls a fight (15 % base, **80 % during a hunt**), it sets `pendingEncounter` (NOT `pendingBattle` directly). The world UI swaps to `<EncounterScreen>` showing tier + category badges and two buttons:
-
-- **⚔ ต่อสู้** → `acceptEncounter()` promotes the offer to `pendingBattle`. Bridge starts the fight.
-- **🏃 หนี** → `fleeEncounter()` clears the offer. Player stays put, no cost.
-
-`fightEventsForLocation(id)` filters the encounter pool by zone — see `ZONE_CATEGORY_WEIGHT` in `random-events.ts`. The hunt-boost rule additionally restricts the pool to `defeatedOpponent` quest targets.
-
-### UI layer
-
-- **`components/ui/`** — shadcn primitives (Button, Card, Combobox, Modal, Progress, Badge). `Button` has a `pixel` variant; `Progress` has a `variant: "hp" | "qi" | "exp" | "stamina"` plus a `pixel` boolean for segmented JRPG-style fills; `Badge` has a `seal` variant for vermilion 印章 stamps.
-- **`components/ui/wuxia/`** — wuxia-only primitives: `Panel` (pixel-bordered frame via `border-image` 9-slice from inline SVG; variants `default` vermilion, `quiet` ink, `flat` borderless), `WuxiaButton` (stacked-shadow pixel bevel, `default` / `primary` / `ghost` variants), `OrnamentDivider` (vermilion ❖ section break).
-- **`components/game/`** — battle / setup feature components. **`BattleArena`** (grid UI: turn-order timeline, skill cards with `describeGrid` range labels, รอ / ถอยหนี / อัตโนมัติ / ยกเลิก / ยืนยัน, unit info card, result panel; hotkeys 1–9, W, A, Esc, Enter; styles in `app/grid-battle.css`) has a `mode?: "free" | "world"` prop (free = `/debug` sandbox with เริ่มใหม่/Reset, world = ถอยหนี + ดำเนินเรื่อง). `BattleLog` uses `dangerouslySetInnerHTML` because log lines are pre-formatted HTML produced from controlled inputs in `effects.ts` / `battle.ts`. Inline classes (`.lp`, `.lC`) live in `app/globals.css`; `.lC` (crit / special-name highlight) is now driven by `--primary` (vermilion), not a hardcoded amber.
-- **`components/world/`** — world feature components. `WorldScreen` is the page root. Single-column layout (sidebar removed; quest log / profile / etc. all live in the menu-bar popups). Render precedence:
-  - `!hasGame` → `<StartScreen />`
-  - `gameOver` → `<GameOverScreen />`
-  - `pendingBattle` → `<BattleArena mode="world" />`
-  - `pendingEncounter` → `<EncounterScreen />`
-  - else → scene-based (dialog / location / route view)
-  - Always mounted at root: `<LoadingOverlay />` + `<ToastStack />`
-- **`components/world/popups/`** — modal popups for the menu bar: profile, inventory, move skills, life skills, **quest log** (tabbed: กำลังทำ / สำเร็จ / ละทิ้ง with click-to-expand stage checklist + cancel button), action log, NPC interaction, shop, sect hall, **artisan**, **practice**.
-
-### Theme tokens (`app/globals.css` + `tailwind.config.ts`)
-
-- **Palette** — light only. `--background` cream paper, `--foreground` ink black, `--primary` vermilion 朱红, `--accent` jade 翠青, `--destructive` deeper crimson, `--border` faded ink. Battle-side accents: `--side-a` indigo ink, `--side-b` vermilion. `--radius: 0` (pixel chrome has no curves).
-- **Fonts** — `var(--font-display)` = Charm (Google), `var(--font-body)` = Sarabun. Loaded via `next/font/google` in `app/layout.tsx`. **Charm is reserved for ≥ 16px headers / proper-noun labels**; Thai tone marks render blurry below that — use Sarabun for body / dialog.
-- **Background** — body has a tiled inline-SVG paper-noise texture, *not* pixelated.
-- **Pixel utilities** — `.pixel` (`image-rendering: pixelated`), `.frame-pixel` and `.frame-pixel-quiet` (9-slice border via inline-SVG `border-image`). Tailwind `boxShadow.pixel` / `pixel-down` provide the WuxiaButton bevel.
-- **Wuxia color aliases** — `bg-ink`, `bg-paper`, `bg-vermilion`, `bg-jade`, `text-ink`, `text-vermilion`, `text-jade` for places where the shadcn semantic tokens (`primary` / `accent`) don't fit the use case (e.g., HP red distinct from vermilion primary).
-
-### Adding new game content
-
-Most additions don't require touching dispatchers:
-
-- **New skill** → append to `SKILLS` in `lib/game/data/skills.ts` (with `sc` + `ti` + optional `types`). Sort order: by sect → tier. Run `bun scripts/sort-by-sect.ts` to reorder + `bun scripts/normalize-t3-stats.ts` to confirm the stat sum hits the per-tier budget (T0=10 / T1=15 / T2=20 / T3=25 / T4=30).
-- **New inner skill** → append to `ARTS` in `lib/game/data/arts.ts` (same sort).
-- **New sect (joinable)** → 7 spots: (1) extend `SectId` union in `lib/world/types.ts`; (2) add the sect's name to `SECT_ORDER` in `lib/game/data/sects.ts`; (3) add a `SectMembershipDef` to `SECT_MEMBERSHIPS` in `lib/world/data/sect-memberships.ts`; (4) create `lib/world/data/{npcs,quests,scenes-content}/sects/<sectId>.ts` (3 mirror files) + add 3 import + spread lines in each `sects-temples.ts` barrel; (5) add the sect's location to `world-map.ts` + a `LocationRoute` to `location-routes.ts`; (6) add a `hunter_<sectId>` opponent in `opponents.ts` for betrayer ambushes; (7) add the redemption quest `qst_<sectId>_redemption` (gated by `sectStatus: "betrayed"`, reward `resignSect`).
-- **New equipment** → append to `EQUIPMENT`.
-- **New location** → append a `{ kind: "location", ... }` to `SCENES` (or use the `leaf()` helper in `world-map.ts`). Optionally pass `categories: [...]` to override the prefix-inferred set. Then add at least one entry to `LOCATION_ROUTES` so it's reachable. Console will warn if a leaf has no explicit route.
-- **New route between locations** → append a `LocationRoute` with both directional labels to `location-routes.ts`.
-- **New dialog scene** → append a `{ kind: "dialog", ... }`. End on `choices` or terminal (auto "ปิด"). Don't use `next` without `choices` unless you want lines skipped.
-- **New quest / item / opponent / NPC / shop / sect hall** → append to the matching table in `lib/world/data/`. Most have a single registry export + a `getX(id)` helper.
-- **New artisan** → append to `SINGLE_PROFESSION_ARTISANS` in `artisans.ts`. To give a city's existing auto-generated artisan a unique recipe, append a row to `CITY_SPECIALTIES` (one line: `{ city, prof, recipeId, price }`).
-- **New basic recipe** → set `basic: true` on the `RecipeDef`. It auto-fans out to every artisan of that profession; no manual wiring per shop.
-- **New combat effect** → variant in `lib/game/types.ts` + case in `effects.ts` (or `battle.ts` for art-active types). TS exhaustiveness flags missed dispatchers.
-- **New scene effect / condition** → variant in `lib/world/types.ts` + case in `effects.ts` / `conditions.ts`.
-- **New trait** → append to `TRAIT_KEYS` and `TRAIT_LABEL`. The dispatcher and condition handler treat it generically.
-- **New action with toast feedback** → call `toast("success" | "info" | "warn" | "error", message)` and (from the store) `appendActionLog(draft, kind, message)`. Add a label to `KIND_LABEL` / `KIND_COLOR` in `action-log-popup.tsx`.
-
-### Liveness Layer (NPC simulation + rumors)
-
-A passive simulation that ticks every 7 world days inside `advanceTime`, mutating ~20 named NPCs (chiefs + vice/elders pulled from the existing roster) and producing rumors that propagate to inn / market / sect-hall scenes. Spec: `bigchange.md`. Plan: `bigchange-plan.md`.
-
-- **`lib/world/types.ts`** — adds `NpcExtState` (per-named-NPC sim state: power/age/status/sect/sectRank/goals/rivals/allies/eventHistory), `NpcGoal` (5 kinds: master_art/climb_sect/avenge/find_treasure/seek_wisdom), `NpcEventKind` (12 events), `Rumor` + `RumorChannel` + `RumorTruth` + `Region`. New `WorldStateData` fields: `npcExt`, `rumorPool`, `rumorArchive`, `rumorSeenLog`, `lastNpcTickDay`. Three new `SceneEffect` variants: `firePlayerEcho`, `markRumorHeard`, `revealNpcStatus`. Three new `Condition` variants: `heardRumor`, `heardRumorAbout`, `npcStatus`.
-- **`lib/world/npc-tick.ts`** — `tickAllNamedNpcs(state, { currentDay })`. Throttled at 4 batches per call (28 days); excess time accrues only aging. Per NPC: aging → natural death roll (5%/15% over 70/85) → power growth from goals → goal progression → 8% random-event roll. Goal-completion fires the matching event + 50% reroll a replacement. Lazy-seeds `npcExt` from `data/named-npcs.ts` on first tick.
-- **`lib/world/rumor-engine.ts`** — `generateNpcEventEcho`, `generatePlayerEcho`, `generateWarning`, `selectRumorsForScene`, `maintainRumors`. Distortion roll (15% distorted / 5% false; player echo: 25/10). Big-news boost (×2 weight + 120-day lifespan) for `death_combat`, `master_art`, `betray_sect`, or actor `sectRank ≤ 3`. 7-day dedup window (collapses identical event-rumors by bumping weight). Soft cap 200 / hard cap 500. Region propagation deferred to v2.
-- **`lib/world/data/regions.ts`** — `LOCATION_REGION` map of every named location → 1 of 6 regions (`heartland | north | south | west | east | jianghu_wild`); `regionOf(locationId)` falls back to `jianghu_wild`. Plus `REGION_NEIGHBORS` adjacency graph and `CHANNEL_ADMITS` matrix (`inn → [inn, market, wilderness]`, `sect_internal → [sect_internal]`, etc.).
-- **`lib/world/data/named-npcs.ts`** — `NAMED_NPC_DEFAULTS` map: 15 sect chiefs + 5 vice/elder picks, each with authored `power/age/sectRank/goals/rivals/allies`. Generic NPCs are NOT in the map and never tick.
-- **`lib/world/data/rumor-templates.ts`** — `NPC_EVENT_TEMPLATES` (12 kinds × 1-2 templates), `PLAYER_ECHO_TEMPLATES` (5 hardcoded action ids × 2 templates), `WARNING_TEMPLATES` (5 kinds). Big-news templates carry `distorted` + `fake` variants. Tokens: `{npc} {npc2} {location} {sect} {art} {item} {archetype} {days} {event}`.
-- **`lib/world/data/lore-rumors.ts`** — `LORE_RUMORS`: 30 hand-authored static rumors. 4 categories: sect legends (10), jianghu history (6), old hero lore (6), treasure/secret-art hints with `leadsTo` (8). Lore rumors never expire — they rotate via the engine's selection step.
-- **Player-echo trigger sites** (5 hardcoded actions in `store/world-store.ts`):
-  - `duel_win_named` — `acknowledgeBattleResult` win against an opponent in the named roster
-  - `sect_join` — `joinSect` after seeding membership
-  - `sect_leave_or_betray` — both `resignSect` and `betraySect` (player-visible: "left the sect")
-  - `quest_major_complete` — any quest with `isMajor: true` finished successfully (fired from `effects.ts` so it catches all 3 finalize paths)
-  - `sect_rank_up` — `upgradeSectRank` after rank decrement
-- **Quest-fail-on-death cascade** — when `tickAllNamedNpcs` kills a named NPC, `advanceTime` scans active quests for `giverNpcId` matches and fails them with a toast + action log entry. Generic NPC givers are skipped (they're not simulated).
-- **UI surfaces** —
-  - `components/world/popups/rumor-popup.tsx` — modal popup driven by `selectRumorsForScene`. Source icons (💬 npc_event, 🌬 player_echo, 📜 lore, ⚠ warning). Distortion / falsehood NOT shown to the player. "ฟังต่อ" button calls `recordRumorHeard`.
-  - `components/world/rumor-banner.tsx` — passive entry banner showing the top-1 rumor when entering a city for the first time in 7 days. Cooldown via `flags._lastBannerDay`.
-  - `components/world/npc-status-badge.tsx` — small chip rendered in NPC lists. Suppressed for living NPCs; shown for dead/secluded/missing.
-  - `components/world/rumor-listen-button.tsx` — drop-in button. Self-gates by location id prefix (`inn_*`/`city_*` → inn channel, `*market*` → market, `sect_<id>` → sect_internal if active member).
-- **Smoke test** — `bun scripts/smoke-liveness.ts` runs a 90-day advance against a fresh state and asserts the 4 acceptance criteria (≥3 NPC events, ≥3 inn rumors, hard cap respected, tick advanced).
-
-### Save format & migrations
-
-Two persisted Zustand slices, separate localStorage keys, separate version fields:
-
-- `wusia-character-v1` — `{ builds: { A, B } }` (only used by /debug). Version 2 (v1 → v2 padded slots, seeded learned arrays).
-- `wusia-world-v1` — world state minus action functions. **Version 21**. Migration chain (additive defaults at each step):
-  1. v1 → v2: stamina + lifeSkillXp(6) + pendingHuntYield
-  2. v2 → v3: lifeSkillXp 6 → 17 keys
-  3. v3 → v4: day / time
-  4. v4 → v5: wExp / skillLevel / skillExp
-  5. v5 → v6: statExp
-  6. v6 → v7: traits / npcStates / pendingSpar
-  7. v7 → v8: currentHp / currentMp
-  8. v8 → v9: skillIds 5 → 10 + learnedSkillIds / learnedArtIds / artLevels (auto-slots legacy `artId` into a free slot)
-  9. v9 → v10: pendingEncounter
-  10. v10 → v11: actionLog
-  11. v11 → v12: defeatedCounts + visitedLocationIds (quest auto-advance bookkeeping)
-  12. v12 → v13: artExp (per-art XP pool)
-  13. v13 → v14: learnedRecipeIds + accessory life-skill key. Crafting now requires the recipe to be learned + the player to be at a matching artisan.
-  14. v14 → v15: stoleFromCounts + assassinatedNpcIds + kidnappedNpcIds (bad-action mechanics)
-  15. v15 → v16: gender field on the world slice
-  16. v16 → v17: sectMembership map (rank ladder, points, lastQuestDay, artQuestsDone, rewardPicks, joinedDay) + `status: "active" | "resigned" | "betrayed"` on each entry. Existing legacy memberships default `status = "active"` on the migration's first read.
-  17. v17 → v18: Liveness Layer fields — `npcExt` (per-named-NPC sim state), `rumorPool`, `rumorArchive`, `rumorSeenLog`, `lastNpcTickDay`. Existing saves start with all empty; `npcExt` lazy-seeds from the authored roster on first tick. Plus an optional `isMajor` flag on `QuestDef` (drives player-echo rumor on completion).
-  18. v18 → v19: `playerBodyId` (defaults by gender).
-  19. v19 → v20: `wanted`, `wantedDay`, `jailCityId` (wanted marks + jail).
-  20. v20 → v21: `jailUntil` (imprisonment lock on the jail map).
-
-`battle-store` is intentionally not persisted.
-
-`validateAndRepair` (world-store only) is the safety net for content drift (renamed scene ids, removed items / quests / opponents / NPCs / arts / recipes, stale `pendingBattle` / `pendingEncounter` / `pendingSpar`, dangling `learnedSkillIds` / `learnedArtIds` / `learnedRecipeIds`). It runs on every rehydrate.
-
-`worldStore.resetGame()` wipes the world slice and resets the battle store. Character builds persist independently.
-
-### Conventions kept from the original
-
-The combat data tables use compact field names (`bp`, `p`, `f`, `dm`, `dr`, `se`, `ee`, `mg`, `ti`, `w`, `sc`, `types`) so they cross-reference cleanly with `demo.html`. **Keep this style in `lib/game/data/`** — verbose names there hurt readability when scanning 100+ entries. World data (scenes / quests / items / shops / NPCs / artisans) is touched even more often during authoring, so it uses readable field names (`text`, `speaker`, `description`, `category`, `price`, etc.).
-
-Thai is the canonical UI language; skill / art / equipment / scene / quest / item / shop / NPC / artisan names stay in Thai. If we ever want i18n later, the natural seam is to give each item an i18n key alongside `n` / `name` rather than translating the existing strings.
+**Import rules:**
+
+- `lib/game` imports nothing outside itself.
+- `lib/world` imports `lib/game`, never React or stores.
+- Stores use the engines; components use stores, engines and renderers.
+
+Two deliberate exceptions reach into stores:
+
+- `lib/world/battle-bridge.ts` watches `pendingBattle` and starts the battle store.
+- `lib/stage/grid-battle-runtime.ts` reads the battle store each frame and calls `step()` for AI turns.
+
+`initBattleBridge` is not in the `lib/world` barrel; import it from `@/lib/world/battle-bridge`. `app/page.tsx` calls it once.
+
+**Routes:**
+
+| Route | What |
+| --- | --- |
+| `/` | the game |
+| `/debug` | combat sandbox with two builds from `character-store` and a free grid battle; independent of the world save |
+| `/progress` | old journal, data frozen at wave 11 |
+| `/manifest.webmanifest` | PWA manifest |
+
+## Combat engine (`lib/game/`)
+
+- **`types.ts`** holds discriminated unions on `t`:
+  - `SelfEffect` (11 kinds);
+  - `EnemyEffect` (13, including `poison_dmg`, `burn_hp_mp`, `stun`, `debuff_atk`);
+  - `ArtPassiveEffect`, `EquipEffect`, 14 art-active types;
+  - `SkillType` (yin / yang / balance / hard / soft / internal / external);
+  - `SKILL_SLOT_COUNT = 10`.
+- **Data tables** (`data/`): `TIERS`, `STAT_KEYS`, weapon families, `SECT_ORDER` / `JIANGHU_SECT` (`sects.ts`), `SKILLS` (178, incl. `bst_*` beast moves), `ARTS` (123 + the `none` placeholder), `EQUIPMENT` (76).
+- **Stats.** `derive.ts` (`derive`, `combinedStats`, `deriveAll`, `getMasteryMap`).
+  - `combinedStats` merges base + arts + slotted / learned skills with conflict and level scaling.
+  - Equipment is **not** in `combinedStats`; `deriveAll` adds it.
+- **Damage.** `battle.ts` has `calcSkillDamage`, `resolveSkill` and `resolveArtActive`, which track `skillUses` / `artUses` / `hitsReceived`.
+
+  ```
+  raw = max(1, (Atk × stackMod × artBonus + typedAtk + skillEffect) × dm × masteryMod − effectiveDef) × (1 − pctReduce/100)
+  skillEffect = effectiveBp(skill, level) × conflict × (1 + p/100) + f + vitScale × VIT
+  ```
+
+  - Hit `clamp(80 + (Acc − Eva)/4, 5, 95)`.
+  - Crit `clamp(3 + (Cri − Res)/3, 0, 75)`, ×1.5.
+  - Mastery `1 + (mastery/200) × 0.5` per matching weapon family (cap 200).
+- **Levels 1–10** (`leveling.ts`).
+  - `effectiveBp` goes from 50 % at lv 1 to 100 % at lv 10; a skill's `st` bonus scales the same way. Art stats scale by `level/10`.
+  - Xp to the next level: skill `50 × lv × (tier+1)`; art `100 × lv × (tier+1)`.
+- **Type conflict** (`skill-conflict.ts`). With more than 4 typed entries and one side above 60 % of an axis, the opposing type is halved (internal ↔ external: zeroed).
+- **Slots** (`slots.ts`). A slot holds a bare skill id or `"art:<id>"` (`parseSlotId`). The first art slot is the primary art.
+- **Turn gauge.** It fills at `(Spd + 60) / 2600` per ms and acts at 100, keeping the overflow. **Don't replace the `+60` baseline with a straight Spd comparison** — it keeps slow characters in the fight (Spd 100 vs 20 is 2:1, not 5:1).
+- **The grid** (`lib/game/grid/`) is the live battle system:
+  - `engine.ts` handles per-unit gauges, move → act / wait / flee, and packs;
+  - `duel.ts` reuses `battle.ts` per target;
+  - `skill-grid.ts` has range and area profiles plus 18 overrides;
+  - `ai.ts` has `planTurn`.
+  - Move range is `clamp(3 + floor(Spd/80), 3, 6)`. Buffs and cooldowns tick on the owner's turn.
+  - Retreat odds are `fleeChance` (`combat-actions.ts`), 20–90 %.
+- **Legacy.** The 1v1 loop (`tickGauges` / `getNextTurn`), `ai.ts` `runAITurn` and the guard / recover actions are kept only for tests.
+
+## World engine (`lib/world/`)
+
+- **Scenes** (`kind`: `dialog | location | route`).
+  - A dialog with `next` and no `choices` **auto-advances without showing its lines**. For narration, use one confirmation choice (`{ text: "ก้าวต่อไป", next }`).
+  - A terminal dialog (no choices, no next) shows "ปิด", which returns to `lastLocationId`.
+- **`SceneEffect`** (26 kinds) and **`Condition`** (24 kinds) live in `types.ts`, dispatched by `effects.ts` / `conditions.ts`.
+  - **The `applyEffect` switch has no exhaustiveness guard**: a new variant without a case compiles and does nothing.
+  - Counted conditions also need `describeQuestCondition` and the quest guide's `unmetLeaf`.
+- **Quest progress.**
+  - Kill stages (`defeatedOpponent`) count kills **since accepting** (snapshot in `acceptedDefeatedAt`).
+  - Item stages (`hasItem`) count what the hero **holds now**; items carried before accepting count, and auto-finish / popup hand-in take them (`consumeQuestAutoItems`).
+  - A store subscription re-ticks progress whenever `inventory` or `defeatedCounts` changes.
+  - The last stage is the "return to the giver" beat; the NPC card offers hand-in there.
+  - `qs_<questId>_offer` / `qs_<questId>_complete` are the optional briefing and hand-in dialogs.
+- **Objectives** (`quest-objectives.ts`). `QuestStage.objective.spots[]` are 🔍 map spots, NPC-card actions or dialogs for stages nothing else can drive.
+  - Each flag is `qobj:<quest>:<stageId>:<i>`.
+  - A spot needs the hero at its `locationId` and costs `hours` (default 1).
+- **Guide and tracking** (`quest-guide.ts`). `guideForQuest` gives an action, an optional counter, a place and a path for every stage type.
+  - `trackedQuestId` is `flags.trackedQuestId`, else the newest active quest.
+  - It feeds the quest log, the HUD tracker and the map's guide arrow.
+- **Encounters roll while walking**, not on arrival.
+  - Every 220 map units walked, `walkTick()` calls `rollWalkEvent(state, 0.4)`; `home_player` and `jail` are safe.
+  - Per tick: fight 6 % (32 % while hunting a kill-quest target in this zone), treasure / meeting scaled by LUK.
+  - The **law** roll (`lawChance(marks)`, 13–45 %) and the **30 % sect-hunter roll** are **not** scaled.
+  - Foes are picked by zone and scaled by the hero's power (`max(day/200, (9 − best sect rank)/8)`): tier mix, elites, and opponent stats ×(1 + 0.6·power) for **every** battle.
+  - `rollRandomEvent` is a no-op kept for old content.
+- **Law** (`law.ts`).
+  - Wanted marks (max 5) come from failed steals (+1) and jail escapes (+2); one fades every 10 quiet days.
+  - Law fights are non-fatal. A loss goes to `jail_cell`: arrest (the `jail` map, `jailUntil`, 2 days per mark) or a 300-gold bribe.
+- **Bad actions** (`bad-actions.ts`). Steal, assassinate and kidnap use base stats. A failed steal is a non-fatal fight plus a mark; failed assassinations and kidnappings are fatal.
+- **Sects** (`data/sect-memberships.ts`, 15 joinable).
+  - Ladders: 9 → 1 (eight sects), 5 → 1 (six) or 3 → 1 (Gumu).
+  - Each rank has a reward pool; a single-item pool auto-grants.
+  - Sect quests are repeatable after a 30-day cooldown.
+  - Membership status is `active | resigned | betrayed`. Only `active` counts for `sectMember` / `anySectMember`.
+  - Joins go through each intro quest's `joinSect` **reward**, which does not check `joinRequirements`; the intro's `prereqs` are the real gate.
+  - Betrayal brings `hunter_<sectId>`; `qst_<sectId>_redemption` (14 sects; not xiaoyao) turns betrayed into resigned.
+- **Liveness** (`npc-tick.ts`, `rumor-engine.ts`). Every `advanceTime` call:
+  - runs the weekly tick of 20 named NPCs (up to 4 batches; leftover days are dropped);
+  - fails active quests whose giver just died;
+  - maintains rumors (caps 200 / 500, archive after 365 days).
+
+  Rumors stay in their region. See [docs/liveness.md](docs/liveness.md).
+- **Repair** (`validate.ts`). `validateAndRepair` runs on every load and drops dangling ids.
+
+## Stores (`store/`)
+
+- **`world-store.ts`** is saved as `wusia-world-v1`, **version 21**.
+  - Actions draft a copy (`draftFrom`, **one level deep** — nested quest, sect and NPC entries are shared), call engine functions, then `set`.
+  - Time goes through `advanceTime` (12 ชั่วยาม = 1 day). The player-visible log uses `appendActionLog` (newest 100).
+- **`battle-store.ts`** is not saved.
+  - `start(a, b, { hpA, mpA, enemies, looks, blocked })`, then `move` / `act` / `wait` / `flee` (player turn), `setAuto`, `step` (one AI beat), `stepAll`, `reset`.
+  - Unit ids: `A` hero, `B` main foe, `pack<n>:<opponentId>`.
+- **`character-store.ts`** holds the /debug builds, saved as `wusia-character-v1`, version 3.
+- **Small stores:**
+  - `loading-store.ts`: `flashLoading(message, ms = 1000, kind: "work" | "rest" | "stealth")`, which blocks input while shown.
+  - `toast-store.ts`: `toast(kind, message, ms = 2600)`, max 3.
+  - `confirm-store.ts`: `await confirmDialog({...})`.
+- **Reading stores.** Components read stores with selectors (`useWorldStore((s) => s.flags)`). `getState()` is for event handlers, store internals and the bridge.
+
+**Battle ↔ world:**
+
+1. `pendingBattle` makes the bridge call `ensureBattleStarted()`: scale the foe, run `worldBattleSetup` (looks and pack), then `battleStore.start` with the hero's HP / MP.
+2. At the end, the player's ดำเนินเรื่อง → `acknowledgeBattleResult()`. It applies:
+   - stamina −5 and 0.5 ชั่วยาม;
+   - HP / MP carry-over;
+   - on a win: loot, 50 w-exp, 20 xp per skill / art use, stat xp and kill counts (pack members included), then quest progress and `onWin`;
+   - on a non-fatal loss: `onLose` with at least 1 HP;
+   - on a fatal loss: `gameOver`;
+   - on an escape: no rewards.
+
+## Rendering (`lib/stage/`)
+
+- **Stage.** `phaser-stage.ts` makes one `Phaser.Game` per view: `AUTO` (WebGL, Canvas fallback), `pixelArt`, DPR cap 2. **Phaser input is off** — the runtimes use DOM listeners.
+- **World runtime.** `world-runtime.ts` works in 960 × 640 map units (y down).
+  - Cover-fit camera; WASD, tap-to-walk and a joystick.
+  - The action target is the nearest marker within 95 units; E reaches 100.
+  - Walk ticks every 220 units; a guide arrow; name tags and quest marks.
+  - It pauses while any `[role="dialog"]`, `[role="alertdialog"]` or `[data-world-busy]` exists (`worldInputBlocked`).
+  - It publishes `data-*` attributes (`data-ready`, `data-player-x/y/frame/motion/facing`, `data-nearby-marker`, `data-guide-marker`, `data-visible-props`…) for tests.
+- **Battle runtime.** `grid-battle-runtime.ts` draws the board in 2.5D and plays `state.events`: walk 180 ms per tile, casts with VFX and SFX, damage numbers. It calls `battleStore.step()` about 350 ms after playback idles. Skill VFX come from `cast-vfx.ts` (pure) and `battle-vfx.ts`; skill sounds from `lib/audio/cast-sfx.ts`, using the same profile.
+- **Collision.** `world-navigation.ts` (+ `world-footprints-data.ts`) covers all 101 painted maps; `test:navigation` probes every map.
+- **Rules.** Never put Phaser objects in stores or saves. Don't enable Phaser input. Respect `prefers-reduced-motion`. New popups are `Modal`s, so the map pauses by itself.
+
+## UI and theme
+
+- **Root.** `components/world/world-screen.tsx` picks a view: start → game over → battle → encounter → mapped location (+ dialog over the same canvas) → dialog over a painting → road map → the classic card layout (only `world_journey` and 16 unpainted roads).
+- **HUD** (mobile first):
+  - the icon grid at the top left: 1 โปรไฟล์ 2 ย่าม 3 วิชา 4 อาชีพ 5 ภารกิจ 6 สำนัก 7 บันทึก, then ♪ and install;
+  - purse, sundial and day at the top right, with the quest tracker below;
+  - law chips at the top centre;
+  - พัก and the action button at the bottom right;
+  - the จุดหมาย list of markers in tabs.
+- **Look.** It comes from `app/game-hud.css`, `app/mobile-hud.css`, `app/game-menu.css` and `app/dq-theme.css` (parchment menus), loaded after `app/globals.css`. The cream / ink / vermilion root tokens show only in fallback layouts, toasts and `/debug`.
+- **Fonts.** Charm (`--font-display`) for headings of 16 px or more; Sarabun (`--font-body`) for everything else — Thai tone marks blur in Charm below 16 px.
+
+## Conventions
+
+- **Field names.** Combat tables in `lib/game/data/` keep **short field names** (`n`, `sc`, `ti`, `w`, `mg`, `st`, `at`, `bp`, `p`, `f`, `dm`, `dr`, `se`, `ee`, `types`), matching `demo.html`. World tables use readable names (`name`, `description`, `price`).
+- **Ids** are lowercase snake case with conventional prefixes:
+  - places: `city_`, `village_`, `sect_`, `cave_`, `inn_`…;
+  - quests: `qc_`, `qv_`, `qw_`, `qe_`, `qst_`;
+  - opponents: `spar_`, `hunt_`, `hunter_`, `law_`, `elite_`;
+  - manuals: `man_`.
+
+  **A location's prefix decides** its categories (practice, bonus), encounter zone, rest options and auto-map spots.
+- **Per-sect content** lives in `lib/world/data/{npcs,quests,scenes-content}/sects/<file>.ts`, one import + one spread per barrel (`sects-temples.ts`).
+  - Files are mostly named by the **location** suffix.
+  - Sun-Moon (`SectId` `sunmoon`, grounds `sect_ming`) is split: its NPCs are in `ming.ts`, while quests and scenes are in both `ming.ts` and `sunmoon.ts`.
+  - Jinyiwei's scenes live in `scenes-content/spies.ts`.
+- **Skill sort order.** Skills and arts are sorted by sect, then tier — run `bun scripts/sort-by-sect.ts`. Move-skill stat sums per tier are exactly 10 / 15 / 20 / 25 / 30.
+- **Player feedback.** Use `toast(kind, message)` in the UI and `appendActionLog(draft, kind, message)` in store actions. Add a label for a new log kind in `components/world/popups/action-log-popup.tsx`.
+
+## Adding content
+
+Most additions are data only. Follow [docs/content-authoring.md](docs/content-authoring.md):
+
+| Adding | Where |
+| --- | --- |
+| a place | a `leaf()` in `world-map.ts` + a road in `location-routes.ts` + a region in `regions.ts` (+ a painting) |
+| an NPC | a regional `npcs/` file (+ talk dialog, spar opponent, art ids) |
+| a quest | a regional `quests/` file (+ `qs_` scenes); stages need an `autoAdvance`, an `objective` or reachable dialog beats |
+| an item, shop, hall, recipe, artisan, node or opponent | its table in `lib/world/data/` |
+| a skill or art | `lib/game/data/`; then sort, icon, battle range, and a way to learn it |
+| a joinable sect | the long checklist in the guide |
+
+New engine variants (effects, conditions, combat effects) are code changes. Update every dispatcher; for combat, see [docs/combat.md](docs/combat.md#changing-combat-safely).
+
+Content changes need **no save version bump**. Removed ids are dropped on load.
+
+## Saves
+
+- **Keys.** The world save is `localStorage["wusia-world-v1"]`, **version 21**. The "wusia" spelling is historical — never rename it.
+- **Migration.** `migrate` is one idempotent normalizer (it ignores `fromVersion`). The persist `merge` also back-fills lore rumors on every load, and `onRehydrateStorage` runs `validateAndRepair`.
+- **Adding a persisted field:**
+  1. `WorldStateData` + `emptyData()`;
+  2. `partialize`;
+  3. a default in `migrate`;
+  4. bump `version`;
+  5. repair in `validate.ts` if it holds ids;
+  6. update [docs/save-format.md](docs/save-format.md) and the e2e test that expects the version (`tests/browser/game.spec.ts`).
+- **Not saved:** the battle store (a reload restarts the fight from the saved HP / MP), map positions, and anything Phaser.
+
+## Gotchas
+
+- **Store warnings.** `test:law`, `test:grid`, `test:grid-ai` and `test:quests` print harmless `[zustand persist middleware] Unable to update item` warnings.
+- **Quests are one-shot.** `abandonQuest` fails a quest for good (it can't be re-accepted). Leaving a sect blocks rejoining it.
+- **`_setFlag` looks dev-only but isn't.** The quest-log pin (`trackedQuestId`) and the rumor banner use it.
+- **Two rumors never fire.** `sect_join` and `quest_major_complete` player echoes can't happen in play — joins come from quest rewards, and no quest sets `isMajor`.
+- **Advisory audits fail by design.** `audit-quest-counts.ts`, `audit-complete-scenes.ts` and `audit-quest-flow.ts` report known false positives.
+- **`sharp`** is used by the image scripts but comes in through Next; it is not in `package.json`.
+- **More.** [HANDOFF.md](HANDOFF.md#known-issues) lists every known issue.

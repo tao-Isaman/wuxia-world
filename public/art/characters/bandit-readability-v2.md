@@ -1,6 +1,6 @@
 # bandit readability candidate
 
-Generated with the built-in image generation tool using the original bandit.png for identity and m1-readability-v2.png for proportions. The generated PNG is preserved unchanged. Candidate only; activation requires source-boundary and rendered animation review.
+Generated with the built-in image generation tool using the original bandit.png for identity and m1-readability-v2.png for proportions. The generated PNG is preserved unchanged. **Status (2026-09-30): active** — adopted on 2026-09-29 and repacked into `bandit.png` (see [README.md](README.md)).
 
 Source: exec-37c81840-e1c8-4aff-a79a-259305155aa5.png
 

@@ -700,7 +700,8 @@ export function tickQuestProgress(state: WorldStateData): void {
 }
 
 // Helper called by every "quest just turned done" path. For sect quests,
-// record `lastQuestDay` (drives the 30-day cooldown) and add to
+// record `lastQuestDay` (drives the sect's questCooldownDays, 30 for every
+// sect today) and add to
 // `artQuestsDone` if the quest is one-shot art-tagged.
 function recordSectQuestCompletion(state: WorldStateData, def: QuestDef): void {
   if (!def.sectId) return;
@@ -795,7 +796,7 @@ export function isSectQuestOfferable(
 
 // Find every opponent the player is actively hunting via a quest's
 // current-stage `defeatedOpponent` autoAdvance condition. Used by
-// `rollRandomEvent` above to bias the random-event roll: when at least
+// `rollWalkEvent` above to bias the random-event roll: when at least
 // one target spawns in the current zone, the fight rate jumps to
 // EVENT_PROBABILITY.fightHunting and the encounter pool is restricted
 // to those targets.

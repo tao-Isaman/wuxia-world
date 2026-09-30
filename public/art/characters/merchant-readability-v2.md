@@ -1,6 +1,6 @@
 # merchant readability candidate
 
-Built-in image generation; original merchant.png identity reference, m1-readability-v2.png proportion reference. PNG preserved unchanged. Candidate pending complete rendered validation.
+Built-in image generation; original merchant.png identity reference, m1-readability-v2.png proportion reference. PNG preserved unchanged. **Status (2026-09-30): active** — adopted on 2026-09-29 and repacked into `merchant.png` (see [README.md](README.md)).
 
 Source: exec-da2d0bdd-ff3b-4535-ac6a-61b601254b28.png
 

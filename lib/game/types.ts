@@ -70,7 +70,7 @@ export type WeaponFamily = (typeof WEAPON_FAMILY_KEYS)[number];
 //   internal / external — qi-driven vs body-conditioned
 //   balance           — neutral on whichever axis it's listed on
 //
-// See lib/world/skill-conflict.ts for how counts and the > 60 % threshold
+// See lib/game/skill-conflict.ts for how counts and the > 60 % threshold
 // drive the half/zero base-status modifiers.
 export const SKILL_TYPE_KEYS = [
   "yin",
@@ -191,7 +191,7 @@ export interface Skill {
   ee: EnemyEffect | null;
   d: string; // description
   // Philosophical type tags. A skill may have zero, one, or several tags
-  // (one per axis). Used by the conflict system in lib/world/skill-conflict.ts.
+  // (one per axis). Used by the conflict system in lib/game/skill-conflict.ts.
   types?: readonly SkillType[];
 }
 
@@ -269,9 +269,10 @@ export interface Art {
   n: string;
   sc: string;
   tp: string;
-  // Tier (พื้นฐาน → เฉพาะ, 0..4) — same axis as Skill. Drives the rough
-  // power budget: tier 0 inner skills give ~30 HP+MP/level and 10 stats,
-  // climbing to tier 4 = ~70 HP+MP/level and ~50 stats.
+  // Tier (พื้นฐาน → ปรมัตถ์, 0..5) — same axis as Skill; only `khbt` and
+  // `kuyt` are tier 5. Drives the rough power budget: tier 0 inner skills
+  // give ~30 HP+MP/level and ~10 stats, climbing to tier 4 = ~70 HP+MP/level
+  // and ~42–60 stats.
   ti: SkillTierIndex;
   stats: PartialStats;
   hL: number;
@@ -284,8 +285,8 @@ export interface Art {
   // `mpRegenPct` are flat % of max HP / MP regenerated per turn.
   hpRegenPct?: number;
   mpRegenPct?: number;
-  // Philosophical type tags. See SKILL_TYPE_KEYS above. When omitted, the
-  // engine derives them from the human-readable `tp` string at load time.
+  // Philosophical type tags. See SKILL_TYPE_KEYS above. When omitted the
+  // art is neutral in the conflict system (`tp` is display text only).
   types?: readonly SkillType[];
 }
 

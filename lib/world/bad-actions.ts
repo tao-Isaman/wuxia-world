@@ -19,10 +19,9 @@ function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
 }
 
-// Tier → fail-fight opponent. When a check fails, the NPC fights back with
-// a tier-matched opponent (no need to author per-NPC combat builds — the
-// shared roster from lib/world/data/opponents.ts covers it). Tiers are
-// already populated by the OPPONENT_BY_ID registry.
+// Tier → fail-fight opponent. When a check fails, the NPC fights back: the
+// store uses the NPC's own spar build (`sparOpponentId`) when it has one,
+// else this tier-matched opponent from lib/world/data/opponents.ts.
 //
 // Steal failures use the "non-fatal" version (player escapes badly, no
 // game-over); assassinate / kidnap failures use the fatal version because
@@ -40,8 +39,8 @@ function defenseTierOf(npc: NpcDef): 0 | 1 | 2 | 3 | 4 {
 }
 
 // ─── ขโมย — DEX + LUK/2 + steal_mastery × 3 ─────────────────────────
-// Mastery is the one rating that scales: a level-3 thief beats a level-0
-// thief by +9 percentage points before any other modifier. Tier penalty
+// Mastery is the one rating that scales: a mastery-4 thief beats a
+// mastery-1 thief by +9 percentage points before any other modifier. Tier penalty
 // is gentle (×5) so a careful T2 player can still rob T3 lords with risk.
 export function stealChance(
   build: CharacterBuild | null,

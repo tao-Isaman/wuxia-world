@@ -1,5 +1,5 @@
 // NPCs anchored at sects, temples, palaces, mansions:
-//   17 sects (sect_shaolin … sect_wudu) + sect_xueyu
+//   20 sect grounds (per-sect files in ./sects/, named by location suffix)
 //   5 temples/palaces + 4 mansions + palace_royal
 //
 // Owned by content agent C. Dialog scenes live in

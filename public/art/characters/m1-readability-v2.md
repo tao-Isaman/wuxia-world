@@ -1,6 +1,6 @@
 # M1 readability candidate v2
 
-Status: isolated candidate; not integrated into the runtime catalog.
+Status (2026-09-30): **active.** Adopted on 2026-09-29 and repacked into `m1.png` with `scripts/repack-character-sheet.ts`; its north/south supplement `m1-readability-v2-directions.png` became `m1-directions.png` (see [README.md](README.md)). The record below is the original candidate review, kept as history — it mentions the Three.js runtime that Phaser has since replaced.
 
 Generated with the built-in imagegen tool. Original m1.png is the identity and pose-order reference. Official Hero’s Adventure screenshots in review/baseline were inspected for small-scale readability only; no commercial artwork is included in this asset.
 

@@ -1,6 +1,6 @@
 # monk readability candidate
 
-Built-in image generation; original monk.png identity reference, m1-readability-v2.png proportion reference. PNG preserved unchanged. Candidate pending complete rendered validation.
+Built-in image generation; original monk.png identity reference, m1-readability-v2.png proportion reference. PNG preserved unchanged. **Status (2026-09-30): active** — adopted on 2026-09-29 and repacked into `monk.png` (see [README.md](README.md)).
 
 Source: exec-2de55ec3-ec3c-4ee8-8338-e3e0d64a28bd.png
 

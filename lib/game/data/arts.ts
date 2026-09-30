@@ -2,8 +2,8 @@ import type { Art } from "../types";
 
 // ─── Inner skills (วิชาในกาย / กำลังภายใน) ────────────────────────
 //
-// Organised by sect first, then by tier (0..4). Sect names mirror
-// lib/world/data/world-map.ts; anything not tied to a specific sect
+// 123 arts (+ the `none` placeholder), organised by sect first, then by
+// tier (0..5). Sect names follow SECT_ORDER; anything not tied to a specific sect
 // lives under "ยุทธจักร" (JIANGHU_SECT) at the bottom.
 //
 // Each art scales `stats` by `level/10`, contributes `hL` HP and `mL` MP

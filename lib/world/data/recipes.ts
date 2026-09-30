@@ -4,8 +4,10 @@ import type { RecipeDef } from "../types";
 // player's inventory. The store's `craftRecipe` action enforces input
 // availability before mutating anything.
 //
-// Skill is informational for now (no gating); future iterations can require
-// e.g. masteryLevel(state.lifeSkillXp.mining) >= 2 before allowing.
+// Gating: every recipe checks `requiredMastery` (default 1). Recipes for the
+// six artisan professions also need the recipe learned (learnedRecipeIds)
+// and a matching artisan at the current location; `basic: true` recipes are
+// sold by every artisan of that profession. See docs/content-authoring.md.
 export const RECIPES: readonly RecipeDef[] = [
   {
     id: "smelt_iron",

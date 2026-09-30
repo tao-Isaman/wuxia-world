@@ -17,11 +17,12 @@ import type { NpcEventKind, RumorChannel, RumorTruth } from "../types";
 // {event}      — scheduled-event label (warning rumors only)
 export interface RumorTemplate {
   text: string;
-  // 0-10. Boosted ×2 by rumor engine when actor sectRank ≤ 3 OR event
-  // kind in {death_combat, master_art, betray_sect}.
+  // 0-10. Boosted ×2 by the rumor engine for big news: event kind in
+  // {death_combat, master_art, betray_sect}. (Its "actor sectRank ≤ 3" rule
+  // never matches — the named roster uses 10 for the top rank.)
   weight: number;
-  // For event-derived rumors. Default 60 days. Big news (death of
-  // grandmaster, betrayal) bumps to 120.
+  // Informational only: the engine ignores this and uses
+  // DEFAULT_LIFESPAN_DAYS (60) or BIG_NEWS_LIFESPAN_DAYS (120) below.
   lifespan: number;
   channel: RumorChannel;
   // Optional distorted version of the same news (engine rolls 15%).
