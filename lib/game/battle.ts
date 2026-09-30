@@ -348,6 +348,18 @@ function isStunned(state: BattleState, side: Side): boolean {
   return state.st[side].debuffs.some((d) => d.t === "stun" && d.u > 0);
 }
 
+/**
+ * Options for callers that drive battle.ts from outside the 1v1 loop (grid
+ * combat). `tick: false` skips the global tickEffects at the top (the caller
+ * already ticked). `secondary: true` resolves an extra target of an area cast:
+ * no tick, no stun check, no cooldown / use count / MP cost, no self-effect —
+ * only the damage roll(s) and the enemy effect on B.
+ */
+export interface ResolveOpts {
+  tick?: boolean;
+  secondary?: boolean;
+}
+
 // ─── Skill resolution ───
 export function resolveSkill(
   state: BattleState,
@@ -355,13 +367,16 @@ export function resolveSkill(
   slotIdx: number,
   skillId: string,
   ctx: BattleContext,
+  opts?: ResolveOpts,
 ): void {
-  state.turn++;
+  const secondary = opts?.secondary === true;
+  if (!secondary) state.turn++;
   // Per-turn HP regen from equipment is handled in tickEffects.
-  tickEffects(state, ctx.equipBonus.A.hp_regen, ctx.equipBonus.B.hp_regen, ctx.names, ctx.artIds.A, ctx.artIds.B);
+  if (!secondary && opts?.tick !== false)
+    tickEffects(state, ctx.equipBonus.A.hp_regen, ctx.equipBonus.B.hp_regen, ctx.names, ctx.artIds.A, ctx.artIds.B);
   if (state.winner) return;
 
-  if (isStunned(state, side)) {
+  if (!secondary && isStunned(state, side)) {
     const cls = side === "A" ? "lA" : "lB";
     logLine(state, cls, `[${state.turn}] ${escapeBattleText(ctx.names[side])} <span style="color:#AAA">ถูกสตัน — ข้ามตา!</span>`);
     return;
@@ -369,8 +384,10 @@ export function resolveSkill(
 
   const skill = getSkill(skillId);
   if (!skill) return;
-  state.cd[side][slotIdx] = TIERS[skill.ti].cd;
-  state.skillUses[side][skillId] = (state.skillUses[side][skillId] ?? 0) + 1;
+  if (!secondary) {
+    state.cd[side][slotIdx] = TIERS[skill.ti].cd;
+    state.skillUses[side][skillId] = (state.skillUses[side][skillId] ?? 0) + 1;
+  }
 
   const ds = opposite(side);
   const cls = side === "A" ? "lA" : "lB";
@@ -474,7 +491,7 @@ export function resolveSkill(
     emitCast(state, side, skill.n, 1, [0], [false], [false], skill.ti, { kind: "skill", id: skill.id });
   }
 
-  if (!state.winner) {
+  if (!state.winner && !secondary) {
     // Self-effect (caster buff) fires once per cast — buffs don't stack
     // across the same cast's hits (would compound too aggressively).
     if (skill.se) applySelfEffect(state, side, skill.se, ctx.names);
@@ -544,39 +561,43 @@ export function resolveArtActive(
   state: BattleState,
   side: Side,
   ctx: BattleContext,
-  opts?: { slotIdx?: number; artId?: string },
+  opts?: { slotIdx?: number; artId?: string } & ResolveOpts,
 ): boolean {
   const aid = opts?.artId ?? ctx.artIds[side];
   const art = getArt(aid);
   if (!art.act) return false;
   const act = art.act;
+  const secondary = opts?.secondary === true;
 
-  const slotIdx = opts?.slotIdx;
-  const onCd =
-    typeof slotIdx === "number" ? state.cd[side][slotIdx] : state.iaCD[side];
-  if (onCd > 0) {
-    logLine(state, "lS", `[IA] ${escapeBattleText(ctx.names[side])}: กำลังภายใน CD ${onCd}`);
-    return false;
+  if (!secondary) {
+    const slotIdx = opts?.slotIdx;
+    const onCd =
+      typeof slotIdx === "number" ? state.cd[side][slotIdx] : state.iaCD[side];
+    if (onCd > 0) {
+      logLine(state, "lS", `[IA] ${escapeBattleText(ctx.names[side])}: กำลังภายใน CD ${onCd}`);
+      return false;
+    }
+    const mp = side === "A" ? state.mpA : state.mpB;
+    if (mp < act.c) {
+      logLine(state, "lS", `[IA] ${escapeBattleText(ctx.names[side])}: MP ไม่พอ`);
+      return false;
+    }
+
+    if (side === "A") state.mpA -= act.c;
+    else state.mpB -= act.c;
+    if (typeof slotIdx === "number") state.cd[side][slotIdx] = act.cd;
+    else state.iaCD[side] = act.cd;
+
+    // Track art active uses for the world's per-art XP track.
+    state.artUses[side][art.id] = (state.artUses[side][art.id] ?? 0) + 1;
+
+    state.turn++;
+    if (opts?.tick !== false)
+      tickEffects(state, ctx.equipBonus.A.hp_regen, ctx.equipBonus.B.hp_regen, ctx.names, ctx.artIds.A, ctx.artIds.B);
   }
-  const mp = side === "A" ? state.mpA : state.mpB;
-  if (mp < act.c) {
-    logLine(state, "lS", `[IA] ${escapeBattleText(ctx.names[side])}: MP ไม่พอ`);
-    return false;
-  }
-
-  if (side === "A") state.mpA -= act.c;
-  else state.mpB -= act.c;
-  if (typeof slotIdx === "number") state.cd[side][slotIdx] = act.cd;
-  else state.iaCD[side] = act.cd;
-
-  // Track art active uses for the world's per-art XP track.
-  state.artUses[side][art.id] = (state.artUses[side][art.id] ?? 0) + 1;
-
-  state.turn++;
-  tickEffects(state, ctx.equipBonus.A.hp_regen, ctx.equipBonus.B.hp_regen, ctx.names, ctx.artIds.A, ctx.artIds.B);
   if (state.winner) return true;
 
-  if (isStunned(state, side)) {
+  if (!secondary && isStunned(state, side)) {
     const stunCls = side === "A" ? "lA" : "lB";
     logLine(state, stunCls, `[${state.turn}] ${escapeBattleText(ctx.names[side])} <span style="color:#AAA">ถูกสตัน — ข้ามตา!</span>`);
     return true;
@@ -801,7 +822,7 @@ export function resolveArtActive(
 
   // Fire the use_act passive for the art that was just activated (not the
   // primary). If multiple arts are slotted, each uses its own passive set.
-  if (art.pas?.tr === "use_act") checkPassive(state, side, aid, "use_act", ctx.names);
+  if (art.pas?.tr === "use_act" && !secondary) checkPassive(state, side, aid, "use_act", ctx.names);
 
   // use_int trigger — Int-flavored art actives (atk_int_pen / drain /
   // drain_acc / debuff_acc_dmg all roll off IA) should fire the primary

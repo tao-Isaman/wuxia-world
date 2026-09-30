@@ -172,21 +172,20 @@ check("tactical turns preserve poison death and stun rules", () => {
   assert.equal(stunned.st.A.debuffs.length, 1);
 });
 
-check("store consumes the player turn, blocks repeated input, and keeps ATB/cooldowns", () => {
-  useBattleStore.getState().start(build, build);
-  const state = useBattleStore.getState().state!;
-  state.phase = "player"; state.cd.A[0] = 2;
-  useBattleStore.getState().useCombatAction("guard");
-  assert.equal(useBattleStore.getState().state!.phase, "filling");
-  useBattleStore.getState().useCombatAction("guard");
-  assert.equal(useBattleStore.getState().state!.turn, 1);
-  for (let i = 0; i < 10; i++) useBattleStore.getState().tick(100);
-  assert.equal(useBattleStore.getState().state!.gA, 0);
-  useBattleStore.getState().state!.castEndsAt = 0;
-  for (let i = 0; i < 100 && useBattleStore.getState().state!.phase === "filling"; i++) useBattleStore.getState().tick(100);
-  assert.equal(useBattleStore.getState().state!.phase, "player");
-  assert.equal(useBattleStore.getState().state!.cd.A[0], 1);
-  useBattleStore.getState().reset();
+check("grid store consumes the player turn, blocks repeated input, and keeps ATB/cooldowns", () => {
+  const store = useBattleStore.getState;
+  store().start(build, build);
+  store().stepAll();
+  const mine = store().state!.units.find((u) => u.id === "A")!;
+  assert.equal(store().state!.activeId, "A", "ties go to the player");
+  mine.cd[0] = 2;
+  assert.equal(store().wait(), true);
+  assert.equal(store().wait(), false, "the turn is already spent");
+  assert.equal(store().state!.turn, 1);
+  store().stepAll();
+  assert.equal(store().state!.activeId, "A");
+  assert.equal(store().state!.units.find((u) => u.id === "A")!.cd[0], 1, "cooldown ticks at the start of the unit's own turn");
+  store().reset();
 });
 
 check("turn-order forecast matches real ATB turns without mutating the battle", () => {

@@ -8,6 +8,9 @@
 // driven by user action (`acknowledgeBattleResult` in the world store) so
 // players see the result before the world resumes.
 //
+// Battles are grid (tactics) battles: see docs/grid-combat.md. Unit looks and
+// enemy packs come from ./battle-looks.
+//
 // This wiring lives outside the React tree so it survives unmounts.
 //
 // Activated by importing once from app/page.tsx:
@@ -19,6 +22,7 @@ import { useBattleStore } from "@/store/battle-store";
 import { useWorldStore } from "@/store/world-store";
 import { getOpponent } from "./data/opponents";
 import { applyOpponentStatScale } from "./data/random-events";
+import { worldBattleSetup } from "./battle-looks";
 
 // Single chokepoint for "world says fight, battle hasn't started" — used by
 // both the module-level subscription (fast path) and a React useEffect hook
@@ -36,22 +40,26 @@ export function ensureBattleStarted(): void {
     ws.clearPendingBattle();
     return;
   }
-  const opp = getOpponent(ws.pendingBattle.opponentId);
-  if (!opp) {
-    console.warn(
-      `[bridge] unknown opponentId "${ws.pendingBattle.opponentId}" — clearing`,
-    );
+  const opponentId = ws.pendingBattle.opponentId;
+  if (!getOpponent(opponentId)) {
+    console.warn(`[bridge] unknown opponentId "${opponentId}" — clearing`);
     ws.clearPendingBattle();
     return;
   }
-  // Apply progression-based stat scaling RIGHT before opp.build() so the
-  // factory picks up the current OPPONENT_STAT_SCALE module value. Random
-  // encounters set this in rollRandomEvent already; this re-applies for
-  // triggerBattle paths (quest fights, sparring, etc.) too.
+  // Apply progression-based stat scaling RIGHT before the builds are made so
+  // the factories pick up the current OPPONENT_STAT_SCALE module value
+  // (pack members included). Random encounters set this in rollRandomEvent
+  // already; this re-applies for triggerBattle paths (quest fights,
+  // sparring, etc.) too.
   applyOpponentStatScale(ws);
-  bs.start(ws.playerBuild, opp.build(), {
+  const setup = worldBattleSetup(opponentId, { bodyId: ws.playerBodyId, withPack: ws.pendingBattle.withPack })!;
+  // Grid battle: the hero (leader) vs the opponent, plus its pack on random
+  // encounters (quest / spar fights stay 1v1).
+  bs.start(ws.playerBuild, setup.build, {
     hpA: ws.currentHp,
     mpA: ws.currentMp,
+    looks: setup.looks,
+    enemies: setup.enemies,
   });
 }
 

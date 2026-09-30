@@ -1,197 +1,228 @@
 "use client";
 
+// Battle store — the grid (tactics) battle.
+//
+// Wraps the pure engine in lib/game/grid (see docs/grid-combat.md, "Store
+// API"). Every change works on a fresh copy of the state and then publishes
+// it, so React subscribers see new references for the state, `units`,
+// `events` and `log` whenever anything changes.
+//
+// Pacing: the store never runs a timer. The renderer calls `step()` each time
+// it has finished animating the latest events; one call does at most one
+// visible thing (start the next turn and/or one AI move or action). When
+// `isPlayerTurn(state, auto)` is true the store waits for `move` / `act` /
+// `wait` / `flee`. UI selection state (picked skill, hovered tile) lives in
+// the UI, not here.
+
 import { create } from "zustand";
-import { resolveCombatAction, type CombatAction } from "@/lib/game/combat-actions";
-import type {
-  BattleState,
-  CharacterBuild,
-  Side,
-} from "@/lib/game";
+import type { CharacterBuild } from "@/lib/game/types";
+import { getArt, getMasteryMap } from "@/lib/game";
 import {
-  consumeGauge,
-  decrementCooldowns,
-  gaugeRate,
-  getArt,
-  getMasteryMap,
-  logLine,
-  makeContext,
-  makeInitialState,
-  parseSlotId,
-  peekReadyActor,
-  resolveArtActive,
-  resolveSkill,
-  runAITurn,
-  tickGauges,
-  type BattleContext,
-  type InitialStateOpts,
-} from "@/lib/game";
+  activeUnit,
+  applyAction,
+  beginNextTurn,
+  createGridBattle,
+  planTurn,
+  sameCell,
+  type Cell,
+  type GridAction,
+  type GridBattleState,
+  type GridUnit,
+  type TurnPlan,
+  type UnitLook,
+  type UnitSpec,
+} from "@/lib/game/grid";
 
-interface BattleStore {
-  state: BattleState | null;
-  ctx: BattleContext | null;
-  // Build references — kept so AI can read skill ids per slot.
-  builds: Record<Side, CharacterBuild> | null;
-
-  start: (a: CharacterBuild, b: CharacterBuild, opts?: InitialStateOpts) => void;
-  reset: () => void;
-
-  // Three.js scene update drives both gauge fill and delayed enemy actions.
-  tick: (dtMs: number) => void;
-
-  useSkill: (slotIdx: number) => void;
-  useArtActive: () => void;
-  useCombatAction: (action: CombatAction) => void;
-  // Auto-plays both sides via AI, no animation, until battle ends.
-  autoAdvance: () => void;
+export interface BattleStartOpts {
+  /** Leader's starting HP / MP (world carryover); defaults to full. */
+  hpA?: number;
+  mpA?: number;
+  /** Extra enemy units (pack members) after the primary opponent. */
+  enemies?: UnitSpec[];
+  /** Looks for the leader (A) and the primary enemy (B). */
+  looks?: { A: UnitLook; B: UnitLook };
+  /** Impassable board cells. */
+  blocked?: Cell[];
 }
 
-// How long to pause once B's gauge fills, before the AI action resolves.
-// Gives the player a moment to register "B is about to attack".
-const ENEMY_ACTION_DELAY_MS = 400;
+interface BattleStore {
+  state: GridBattleState | null;
+  /** Leader + primary enemy builds. */
+  builds: { A: CharacterBuild; B: CharacterBuild } | null;
+  /** อัตโนมัติ: the AI also plays the player's side. */
+  auto: boolean;
 
-// Mutate-then-publish pattern: pure logic mutates the BattleState in place,
-// then the store calls set({ state: { ...state } }) so subscribers re-render
-// via reference change.
+  start: (a: CharacterBuild, b: CharacterBuild, opts?: BattleStartOpts) => void;
+  reset: () => void;
+  setAuto: (on: boolean) => void;
 
-// Drains all immediately-ready turns by consuming gauges, decrementing CDs,
-// and setting phase. Does NOT execute AI — that's deferred so the UI can
-// show a brief "enemy is acting" state before the action resolves.
-function drainToActor(state: BattleState): void {
-  if (state.winner || state.phase === "over") return;
-  const actor = peekReadyActor(state);
-  if (!actor) {
-    state.phase = "filling";
-    return;
-  }
-  consumeGauge(state, actor);
-  decrementCooldowns(state, actor);
-  state.phase = actor === "A" ? "player" : "enemy";
+  /** Player's active unit walks to `to` (before acting). */
+  move: (to: Cell) => boolean;
+  /** Player's active unit uses skill / art slot `slot` aimed at `target`. */
+  act: (slot: number, target: Cell) => boolean;
+  /** Player's active unit ends its turn. */
+  wait: () => boolean;
+  /** Leader tries to retreat (fails → turn spent). */
+  flee: () => boolean;
+  /** Advance one visible beat of non-player play (see header). */
+  step: () => void;
+  /** Tests / debug: step until the player must act or the battle ends. */
+  stepAll: () => void;
+
+}
+
+export const PLAYER_UNIT = "A";
+export const PRIMARY_ENEMY_UNIT = "B";
+const DEFAULT_LOOKS: { A: UnitLook; B: UnitLook } = {
+  A: { kind: "character", characterId: "m1" },
+  B: { kind: "character", characterId: "bandit" },
+};
+/** Safety bound for stepAll (each step makes progress, so this is never hit in practice). */
+const STEP_ALL_LIMIT = 5000;
+
+/** Whether the AI plays this unit right now (enemies always; allies when auto is on). */
+export function aiControls(unit: GridUnit, auto: boolean): boolean {
+  return unit.team === "enemy" || auto;
+}
+
+/** True when the battle is waiting for the player's input (their unit holds the turn, auto off). */
+export function isPlayerTurn(state: GridBattleState | null, auto: boolean): boolean {
+  if (!state || state.phase === "over") return false;
+  const u = activeUnit(state);
+  return !!u && !aiControls(u, auto);
+}
+
+// ─── Copy-on-write ─────────────────────────────────────────────────────
+function cloneUnit(u: GridUnit): GridUnit {
+  return {
+    ...u,
+    pos: { ...u.pos },
+    status: {
+      ...u.status,
+      buffs: u.status.buffs.map((b) => ({ ...b })),
+      debuffs: u.status.debuffs.map((d) => ({ ...d })),
+    },
+    cd: [...u.cd],
+    skillUses: { ...u.skillUses },
+    artUses: { ...u.artUses },
+  };
+}
+
+/** Deep-enough copy that the engine can mutate it without touching the published state. */
+export function cloneBattle(s: GridBattleState): GridBattleState {
+  return {
+    ...s,
+    blocked: [...s.blocked],
+    units: s.units.map(cloneUnit),
+    log: [...s.log],
+    events: [...s.events],
+    skillUses: { A: { ...s.skillUses.A }, B: { ...s.skillUses.B } },
+    artUses: { A: { ...s.artUses.A }, B: { ...s.artUses.B } },
+    hitsReceived: { ...s.hitsReceived },
+  };
 }
 
 export const useBattleStore = create<BattleStore>((set, get) => {
-  // Elapsed scene time cannot leak into a replacement battle, unlike timers.
-  let enemyElapsedMs = 0;
+  // The AI plans a whole turn up front; after the move beat, its action
+  // is replayed on the next step() so both animate separately.
+  let planned: { unitId: string; turn: number; action: TurnPlan["action"] } | null = null;
+
+  const publish = (state: GridBattleState) => set({ state });
+
+  /** Apply one player action for the active unit if it is the player's turn. */
+  const playerAction = (action: GridAction): boolean => {
+    const { state, auto } = get();
+    if (!state || !isPlayerTurn(state, auto)) return false;
+    const next = cloneBattle(state);
+    const u = activeUnit(next)!;
+    if (!applyAction(next, u.id, action)) return false;
+    planned = null;
+    publish(next);
+    return true;
+  };
+
+  const step = () => {
+    const { state, auto } = get();
+    if (!state || state.phase === "over") return;
+    const next = cloneBattle(state);
+    let u = activeUnit(next);
+    if (!u) {
+      u = beginNextTurn(next);
+      planned = null;
+      // Player's turn (or battle over): publish the new turn and wait.
+      if (!u || !aiControls(u, auto)) { publish(next); return; }
+    } else if (!aiControls(u, auto)) {
+      return; // waiting for the player
+    }
+
+    // One AI beat: the move, or (after moving / when not moving) the action.
+    if (next.phase === "turn") {
+      const plan = planTurn(next, u.id);
+      if (plan.move && !sameCell(plan.move, u.pos) && applyAction(next, u.id, { t: "move", to: plan.move })) {
+        planned = { unitId: u.id, turn: next.turn, action: plan.action };
+        publish(next);
+        return;
+      }
+      if (!applyAction(next, u.id, plan.action)) applyAction(next, u.id, { t: "wait" });
+    } else {
+      const action = planned && planned.unitId === u.id && planned.turn === next.turn
+        ? planned.action
+        : planTurn(next, u.id).action;
+      if (!applyAction(next, u.id, action)) applyAction(next, u.id, { t: "wait" });
+    }
+    planned = null;
+    publish(next);
+  };
+
+  const stepAll = () => {
+    for (let i = 0; i < STEP_ALL_LIMIT; i++) {
+      const before = get().state;
+      if (!before || before.phase === "over" || isPlayerTurn(before, get().auto)) return;
+      step();
+      if (get().state === before) return; // no progress possible
+    }
+  };
 
   return {
     state: null,
-    ctx: null,
     builds: null,
+    auto: false,
 
-    start: (a, b, opts) => {
-      enemyElapsedMs = 0;
-      const ctx = makeContext(a, b);
-      const state = makeInitialState(a, b, opts);
-      logLine(state, "lS", "━━ เริ่มการต่อสู้ ━━");
-      if (typeof opts?.hpA === "number" && state.hA < state.dA.HP) {
-        logLine(state, "lS", `A เริ่มต้นด้วย HP ${state.hA}/${state.dA.HP}`);
-      }
-      if (typeof opts?.mpA === "number" && state.mpA < state.dA.MP) {
-        logLine(state, "lS", `A เริ่มต้นด้วย MP ${state.mpA}/${state.dA.MP}`);
-      }
+    start: (a, b, opts = {}) => {
+      planned = null;
+      const looks = opts.looks ?? DEFAULT_LOOKS;
+      const specs: UnitSpec[] = [
+        { id: PLAYER_UNIT, team: "ally", build: a, look: looks.A, hp: opts.hpA, mp: opts.mpA, leader: true },
+        { id: PRIMARY_ENEMY_UNIT, team: "enemy", build: b, look: looks.B },
+        ...(opts.enemies ?? []).map((e) => ({ ...e, team: "enemy" as const, leader: false })),
+      ];
+      const state = createGridBattle(specs, { blocked: opts.blocked });
+      const leader = state.units[0];
+      const log = (txt: string) => state.log.push({ cls: "lS", txt });
+      log("━━ เริ่มการต่อสู้ ━━");
+      if (typeof opts.hpA === "number" && leader.hp < leader.derived.HP) log(`A เริ่มต้นด้วย HP ${leader.hp}/${leader.derived.HP}`);
+      if (typeof opts.mpA === "number" && leader.mp < leader.derived.MP) log(`A เริ่มต้นด้วย MP ${leader.mp}/${leader.derived.MP}`);
       for (const [w, v] of Object.entries(getMasteryMap(a.skillIds, a.skillLevels))) {
-        logLine(state, "lS", `A: ${w} ×${(1 + (v / 200) * 0.5).toFixed(2)}`);
+        log(`A: ${w} ×${(1 + (v / 200) * 0.5).toFixed(2)}`);
       }
-      const aA = getArt(a.artId);
-      const aB = getArt(b.artId);
-      if (aA.id !== "none") logLine(state, "lS", `A IA: ${aA.n} ขั้น${a.artLevel} HP+${aA.hL * a.artLevel} MP+${aA.mL * a.artLevel}`);
-      if (aB.id !== "none") logLine(state, "lS", `B IA: ${aB.n} ขั้น${b.artLevel} HP+${aB.hL * b.artLevel} MP+${aB.mL * b.artLevel}`);
-      state.phase = "filling";
-      set({ state: { ...state }, ctx, builds: { A: a, B: b } });
+      const aA = getArt(a.artId), aB = getArt(b.artId);
+      if (aA.id !== "none") log(`A IA: ${aA.n} ขั้น${a.artLevel} HP+${aA.hL * a.artLevel} MP+${aA.mL * a.artLevel}`);
+      if (aB.id !== "none") log(`B IA: ${aB.n} ขั้น${b.artLevel} HP+${aB.hL * b.artLevel} MP+${aB.mL * b.artLevel}`);
+      const extra = state.units.length - 2;
+      if (extra > 0) log(`ฝ่ายศัตรูมีพวกอีก ${extra} คน`);
+      set({ state: cloneBattle(state), builds: { A: a, B: b } });
     },
 
-    reset: () => { enemyElapsedMs = 0; set({ state: null, ctx: null, builds: null }); },
+    reset: () => { planned = null; set({ state: null, builds: null, auto: false }); },
 
-    tick: (dtMs) => {
-      const { state, ctx, builds } = get();
-      if (!state || !ctx || !builds || state.winner) return;
-      // Cast hold: pause the ATB while the most-recent skill / art active
-      // animation is still playing. Once Date.now() passes castEndsAt,
-      // the gauge resumes filling — this is what makes "play animation
-      // until done, then count turn" feel right.
-      if (state.castEndsAt && Date.now() < state.castEndsAt) return;
-      const delta = Number.isFinite(dtMs) ? Math.max(0, Math.min(dtMs, 100)) : 0;
-      if (state.phase === "enemy") {
-        enemyElapsedMs += delta;
-        if (enemyElapsedMs < ENEMY_ACTION_DELAY_MS) return;
-        enemyElapsedMs = 0;
-        const acted = runAITurn(state, "B", ctx, builds.B.skillIds);
-        if (!state.winner) {
-          if (acted) drainToActor(state);
-          else state.phase = "filling";
-        }
-        set({ state: { ...state } });
-        return;
-      }
-      if (state.phase !== "filling") return;
-      enemyElapsedMs = 0;
-      tickGauges(state, delta);
-      drainToActor(state);
-      set({ state: { ...state } });
-    },
+    setAuto: (on) => set({ auto: on }),
 
-    useSkill: (slotIdx) => {
-      const { state, ctx, builds } = get();
-      if (!state || !ctx || !builds || state.winner) return;
-      if (state.phase !== "player") return;
-      // Block input while a cast animation is still playing.
-      if (state.castEndsAt && Date.now() < state.castEndsAt) return;
-      const raw = builds.A.skillIds[slotIdx];
-      if (!raw || state.cd.A[slotIdx] > 0) return;
-      const info = parseSlotId(raw);
-      if (!info) return;
-      if (info.kind === "skill") {
-        resolveSkill(state, "A", slotIdx, info.skill.id, ctx);
-      } else {
-        resolveArtActive(state, "A", ctx, { slotIdx, artId: info.art.id });
-      }
-      if (!state.winner) drainToActor(state);
-      set({ state: { ...state } });
-      enemyElapsedMs = 0;
-    },
+    move: (to) => playerAction({ t: "move", to }),
+    act: (slot, target) => playerAction({ t: "skill", slot, target }),
+    wait: () => playerAction({ t: "wait" }),
+    flee: () => playerAction({ t: "flee" }),
+    step,
+    stepAll,
 
-    useArtActive: () => {
-      const { state, ctx, builds } = get();
-      if (!state || !ctx || !builds || state.winner) return;
-      if (state.phase !== "player") return;
-      if (state.castEndsAt && Date.now() < state.castEndsAt) return;
-      resolveArtActive(state, "A", ctx);
-      if (!state.winner) drainToActor(state);
-      set({ state: { ...state } });
-      enemyElapsedMs = 0;
-    },
-
-    useCombatAction: (action) => {
-      const { state, ctx } = get();
-      if (!state || !ctx || !resolveCombatAction(state, ctx, action)) return;
-      if (!state.winner && !state.escaped) drainToActor(state);
-      enemyElapsedMs = 0;
-      set({ state: { ...state } });
-    },
-
-    autoAdvance: () => {
-      enemyElapsedMs = 0;
-      const { state, ctx, builds } = get();
-      if (!state || !ctx || !builds || state.winner) return;
-      let safety = 250;
-      while (safety-- > 0 && !state.winner && state.phase !== "over") {
-        if (state.gA < 100 && state.gB < 100) {
-          const tA = (100 - state.gA) / gaugeRate(state.dA.Spd);
-          const tB = (100 - state.gB) / gaugeRate(state.dB.Spd);
-          tickGauges(state, Math.min(tA, tB));
-          // Same floating-point guard as getNextTurn: the due side acts.
-          if (tA <= tB) state.gA = Math.max(state.gA, 100);
-          if (tB <= tA) state.gB = Math.max(state.gB, 100);
-        }
-        const actor = peekReadyActor(state);
-        if (!actor) break;
-        consumeGauge(state, actor);
-        decrementCooldowns(state, actor);
-        const acted = runAITurn(state, actor, ctx, builds[actor].skillIds);
-        if (state.winner) break;
-        if (!acted) break;
-      }
-      state.phase = state.winner ? "over" : "filling";
-      set({ state: { ...state } });
-    },
   };
 });

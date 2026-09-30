@@ -100,13 +100,25 @@ test("first errand leads to safe training, recovery, and an earned skill upgrade
   await expect(page.getByRole("button", { name: "ถอยหนี", exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "ตั้งรับ", exact: true })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "รวบรวมปราณ", exact: true })).toHaveCount(0);
-  const punch = page.getByRole("button", { name: "หมัดตรง", exact: true });
+  // On the grid: walk up to the apprentice (tap a blue tile), then pick หมัดตรง
+  // and tap the target tile; อัตโนมัติ finishes the bout if it runs long.
   const result = page.getByTestId("combat-result");
-  for (let turn = 0; turn < 12; turn++) {
-    await expect.poll(async () => (await result.count()) > 0 || await punch.isEnabled(), { timeout: 20_000 }).toBe(true);
-    if (await result.count()) break;
-    await punch.click();
-  }
+  const battle = page.getByTestId("battle-canvas");
+  const units = async () => JSON.parse((await battle.getAttribute("data-units")) ?? "[]") as { id: string; x: number; y: number; alive: boolean }[];
+  const tap = async (x: number, y: number) => {
+    const point = await battle.evaluate((host, c) =>
+      (host as HTMLElement & { gridCellPoint?: (x: number, y: number) => { x: number; y: number } | null }).gridCellPoint?.(c.x, c.y) ?? null, { x, y });
+    if (point) await page.mouse.click(point.x, point.y);
+  };
+  await expect(page.getByTestId("combat-status")).toHaveAttribute("data-phase", "player", { timeout: 30_000 });
+  await expect(battle).toHaveAttribute("data-anim", "idle");
+  const [hero, foe] = await units().then((list) => [list.find((u) => u.id === "A")!, list.find((u) => u.id === "B")!]);
+  // Step toward the apprentice along the row (the move range is at least 3).
+  const stepX = hero.x + Math.max(-3, Math.min(3, foe.x - 1 - hero.x));
+  await tap(stepX, hero.y);
+  await expect.poll(async () => (await units()).find((u) => u.id === "A")!.x).toBe(stepX);
+  await page.getByRole("button", { name: /อัตโนมัติ/ }).click();
+  await expect(result).toBeVisible({ timeout: 90_000 });
   await expect(result).toContainText("ชัยชนะ");
   await page.getByRole("button", { name: "ดำเนินเรื่อง →" }).click();
   await ready(page);

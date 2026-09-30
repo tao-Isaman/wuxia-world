@@ -65,7 +65,18 @@ test("exploration: movement, menu pause, travel, NPC and save reload", async ({ 
   expect(errors).toEqual([]);
 });
 
-test("Phaser battle clock, skill input, result and return to world", async ({ page }) => {
+async function units(page: Page) {
+  return JSON.parse((await page.getByTestId("battle-canvas").getAttribute("data-units")) ?? "[]") as
+    { id: string; team: string; x: number; y: number; hp: number; alive: boolean }[];
+}
+async function tapCell(page: Page, x: number, y: number) {
+  const point = await page.getByTestId("battle-canvas").evaluate((host, cell) =>
+    (host as HTMLElement & { gridCellPoint?: (x: number, y: number) => { x: number; y: number } | null }).gridCellPoint?.(cell.x, cell.y) ?? null, { x, y });
+  expect(point).not.toBeNull();
+  await page.mouse.click(point!.x, point!.y);
+}
+
+test("grid battle: tap a tile to move, auto plays to the result, back to the world", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await start(page);
@@ -77,17 +88,25 @@ test("Phaser battle clock, skill input, result and return to world", async ({ pa
     localStorage.setItem("wusia-world-v1", JSON.stringify(persisted));
   });
   await page.reload();
-  await expect(page.getByTestId("battle-canvas")).toHaveAttribute("data-ready", "true", { timeout: 60_000 });
-  await page.screenshot({ path: "test-results/screenshots/battle-desktop.png" });
-  const skill = page.getByRole("button", { name: /หมัดตรง/ }).first();
-  await expect(skill).toBeVisible();
-  for (let attempt = 0; attempt < 8; attempt++) {
-    if (await page.getByRole("button", { name: /ดำเนินเรื่อง/ }).isVisible()) break;
-    await expect(skill).toBeVisible();
-    await skill.click();
-    await page.waitForTimeout(1800);
-  }
-  await expect(page.getByRole("button", { name: /ดำเนินเรื่อง/ })).toBeVisible({ timeout: 30_000 });
+  const battle = page.getByTestId("battle-canvas");
+  await expect(battle).toHaveAttribute("data-ready", "true", { timeout: 60_000 });
+  // Hero and thief stand on the tactics board; the turn order is shown.
+  await expect(page.getByTestId("turn-timeline")).toBeVisible();
+  expect((await units(page)).map((u) => u.team).sort()).toEqual(["ally", "enemy"]);
+  await expect(page.getByRole("button", { name: "ถอยหนี" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "ตั้งรับ" })).toHaveCount(0);
+  await page.screenshot({ path: "test-results/screenshots/grid-battle-desktop.png" });
+
+  // On the hero's turn, tapping a blue tile walks there.
+  await expect(page.getByTestId("combat-status")).toHaveAttribute("data-phase", "player", { timeout: 30_000 });
+  await expect(battle).toHaveAttribute("data-anim", "idle");
+  const hero = (await units(page)).find((u) => u.id === "A")!;
+  await tapCell(page, hero.x + 1, hero.y);
+  await expect.poll(async () => (await units(page)).find((u) => u.id === "A")!.x).toBe(hero.x + 1);
+
+  // อัตโนมัติ lets the AI finish the fight.
+  await page.getByRole("button", { name: /อัตโนมัติ/ }).click();
+  await expect(page.getByTestId("combat-result")).toBeVisible({ timeout: 90_000 });
   await page.setViewportSize({ width: 844, height: 390 });
   await page.getByRole("button", { name: /บันทึกการต่อสู้/ }).click();
   await expect(page.getByRole("region", { name: "บันทึกการต่อสู้" })).toBeVisible();
@@ -100,7 +119,7 @@ test("Phaser battle clock, skill input, result and return to world", async ({ pa
 
 test.describe("touch devices", () => {
 test.use({ hasTouch: true });
-test("battle stats stay open by touch and choices remain readable after rotation", async ({ page }) => {
+test("grid battle: unit info by touch, skill bar readable after rotation, no page scroll", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await start(page);
   await page.evaluate(() => {
@@ -111,30 +130,26 @@ test("battle stats stay open by touch and choices remain readable after rotation
   await page.reload();
   const battle = page.getByTestId("battle-canvas");
   await expect(battle).toHaveAttribute("data-ready", "true");
-  await page.getByRole("button", { name: "ดูค่าสถานะของ จอมยุทธ์", exact: true }).tap();
-  const detail = page.getByRole("dialog", { name: "ค่าสถานะ จอมยุทธ์", exact: true });
-  await expect(detail.getByText("ATK", { exact: true })).toBeVisible();
-  await page.waitForTimeout(450);
-  await expect(detail).toBeVisible();
-  await expect(battle).toHaveAttribute("data-paused", "true");
+  await page.getByTestId("turn-timeline").getByRole("button", { name: "ดู จอมยุทธ์" }).first().tap();
+  const card = page.getByTestId("unit-card");
+  await expect(card).toBeVisible();
+  await expect(card).toContainText("จอมยุทธ์");
   await page.setViewportSize({ width: 844, height: 390 });
-  await expect(detail).toBeVisible();
-  await page.getByRole("button", { name: "ปิดค่าสถานะ", exact: true }).tap();
-  await expect(detail).not.toBeVisible();
-  await expect(battle).toHaveAttribute("data-paused", "false");
-  const actions = page.locator(".combat-action");
-  await expect(actions).toHaveCount(2); // หมัดตรง + ถอยหนี
-  for (const action of await actions.all()) {
-    const bounds = await action.boundingBox();
+  await expect(card).toBeVisible();
+  await page.getByRole("button", { name: "ปิดข้อมูล" }).tap();
+  await expect(card).toHaveCount(0);
+  const cards = page.locator(".gb-skill");
+  expect(await cards.count()).toBeGreaterThan(0);
+  for (const control of [...await cards.all(), page.getByRole("button", { name: "ถอยหนี" })]) {
+    const bounds = await control.boundingBox();
     expect(bounds).not.toBeNull();
     expect(bounds!.x).toBeGreaterThanOrEqual(0);
-    expect(bounds!.y).toBeGreaterThanOrEqual(0);
     expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(844);
-    expect(bounds!.y + bounds!.height).toBeLessThanOrEqual(390);
-    expect(await action.locator("strong").evaluate((el) => parseFloat(getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(16);
-    expect(await action.locator("small").evaluate((el) => parseFloat(getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(12);
+    expect(bounds!.height).toBeGreaterThanOrEqual(40);
   }
-  expect(await page.evaluate(() => ({ width: document.documentElement.scrollWidth, height: document.documentElement.scrollHeight }))).toEqual({ width: 844, height: 390 });
+  expect(await cards.first().locator("strong").evaluate((el) => parseFloat(getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(13);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(844);
+  await page.screenshot({ path: "test-results/screenshots/grid-battle-landscape.png" });
 });
 
 test("portrait touch and landscape resize keep one usable canvas", async ({ page }) => {

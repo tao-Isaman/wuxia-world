@@ -337,73 +337,102 @@ export function tickEffects(
   if (state.winner) return;
 
   for (const side of ["A", "B"] as const) {
-    const st = state.st[side];
-    const poison = st.debuffs.find((d) => d.t === "debuff_poison");
-    if (poison && poison.u > 0 && poison.pp != null) {
-      const cap = side === "A" ? state.dA.HP : state.dB.HP;
-      const dmg = Math.round(cap * poison.pp / 100);
-      if (side === "A") state.hA = Math.max(0, state.hA - dmg);
-      else state.hB = Math.max(0, state.hB - dmg);
-      if (dmg > 0) logLine(state, "lS", `&nbsp;☠ ${nameOf(side, names)} รับพิษ ${dmg}`);
-    }
-
-    const burn = st.debuffs.find((d) => d.t === "burn_hp_mp");
-    if (burn && burn.u > 0) {
-      const hpCap = side === "A" ? state.dA.HP : state.dB.HP;
-      const mpCap = side === "A" ? state.dA.MP : state.dB.MP;
-      const hpDmg = burn.pp != null ? Math.round(hpCap * burn.pp / 100) : 0;
-      const mpDmg = burn.mpp != null ? Math.round(mpCap * burn.mpp / 100) : 0;
-      if (side === "A") {
-        state.hA = Math.max(0, state.hA - hpDmg);
-        state.mpA = Math.max(0, state.mpA - mpDmg);
-      } else {
-        state.hB = Math.max(0, state.hB - hpDmg);
-        state.mpB = Math.max(0, state.mpB - mpDmg);
-      }
-      if (hpDmg > 0 || mpDmg > 0)
-        logLine(state, "lS", `&nbsp;🔥 ${nameOf(side, names)} เผาไหม้ HP-${hpDmg} MP-${mpDmg}`);
-    }
-
-    for (const b of st.buffs) if (b.u > 0 && b.t !== "buff_riposte") b.u--;
-    state.st[side].buffs = st.buffs.filter((b) => b.u > 0);
-    for (const d of st.debuffs) if (d.u > 0) d.u--;
-    state.st[side].debuffs = st.debuffs.filter((d) => d.u > 0);
-
+    tickDots(state, side, names);
     const hp = side === "A" ? state.hA : state.hB;
     if (hp <= 0 && !state.winner) {
       state.winner = opposite(side);
       state.phase = "over";
       logLine(state, "lS", `━━ ${nameOf(state.winner, names)} ชนะ! (พิษ) ━━`);
     }
+    // A side at 0 HP always leaves a winner set, so this also skips the dead.
+    if (!state.winner) tickRegen(state, side, side === "A" ? hpRegenA : hpRegenB, names, side === "A" ? artIdA : artIdB);
+  }
+}
 
-    const regen = side === "A" ? hpRegenA : hpRegenB;
-    if (regen > 0 && hp > 0 && !state.winner) {
-      const cap = side === "A" ? state.dA.HP : state.dB.HP;
-      const heal = Math.round(cap * regen / 100);
-      if (side === "A") state.hA = Math.min(cap, state.hA + heal);
-      else state.hB = Math.min(cap, state.hB + heal);
-      if (heal > 0) logLine(state, "lS", `&nbsp;💊 ${nameOf(side, names)} ฟื้น ${heal} (อุปกรณ์)`);
+/**
+ * One side's tick only (grid combat: each unit ticks on its own turn).
+ * Same poison / burn / duration / regen rules as tickEffects, but never
+ * declares a winner — the caller checks HP.
+ */
+export function tickSideEffects(
+  state: BattleState,
+  side: Side,
+  hpRegen: number,
+  names: Record<Side, string>,
+  artId?: string | null,
+): void {
+  tickDots(state, side, names);
+  if ((side === "A" ? state.hA : state.hB) > 0) tickRegen(state, side, hpRegen, names, artId);
+}
+
+// Poison + burn damage, then duration decrement and pruning.
+function tickDots(state: BattleState, side: Side, names: Record<Side, string>): void {
+  const st = state.st[side];
+  const poison = st.debuffs.find((d) => d.t === "debuff_poison");
+  if (poison && poison.u > 0 && poison.pp != null) {
+    const cap = side === "A" ? state.dA.HP : state.dB.HP;
+    const dmg = Math.round(cap * poison.pp / 100);
+    if (side === "A") state.hA = Math.max(0, state.hA - dmg);
+    else state.hB = Math.max(0, state.hB - dmg);
+    if (dmg > 0) logLine(state, "lS", `&nbsp;☠ ${nameOf(side, names)} รับพิษ ${dmg}`);
+  }
+
+  const burn = st.debuffs.find((d) => d.t === "burn_hp_mp");
+  if (burn && burn.u > 0) {
+    const hpCap = side === "A" ? state.dA.HP : state.dB.HP;
+    const mpCap = side === "A" ? state.dA.MP : state.dB.MP;
+    const hpDmg = burn.pp != null ? Math.round(hpCap * burn.pp / 100) : 0;
+    const mpDmg = burn.mpp != null ? Math.round(mpCap * burn.mpp / 100) : 0;
+    if (side === "A") {
+      state.hA = Math.max(0, state.hA - hpDmg);
+      state.mpA = Math.max(0, state.mpA - mpDmg);
+    } else {
+      state.hB = Math.max(0, state.hB - hpDmg);
+      state.mpB = Math.max(0, state.mpB - mpDmg);
     }
+    if (hpDmg > 0 || mpDmg > 0)
+      logLine(state, "lS", `&nbsp;🔥 ${nameOf(side, names)} เผาไหม้ HP-${hpDmg} MP-${mpDmg}`);
+  }
 
-    // Art aura regen — capstone arts (e.g., วิชาเก้าเอี้ยง) grant a
-    // constant HP/MP trickle each turn from their primary-art slot.
-    const artId = side === "A" ? artIdA : artIdB;
-    if (artId && hp > 0 && !state.winner) {
-      const art = getArt(artId);
-      const hpCap = side === "A" ? state.dA.HP : state.dB.HP;
-      const mpCap = side === "A" ? state.dA.MP : state.dB.MP;
-      if (art.hpRegenPct && art.hpRegenPct > 0) {
-        const heal = Math.round(hpCap * art.hpRegenPct / 100);
-        if (side === "A") state.hA = Math.min(hpCap, state.hA + heal);
-        else state.hB = Math.min(hpCap, state.hB + heal);
-        if (heal > 0) logLine(state, "lS", `&nbsp;🌱 ${nameOf(side, names)} ฟื้น ${heal} HP (${art.n})`);
-      }
-      if (art.mpRegenPct && art.mpRegenPct > 0) {
-        const mpHeal = Math.round(mpCap * art.mpRegenPct / 100);
-        if (side === "A") state.mpA = Math.min(mpCap, state.mpA + mpHeal);
-        else state.mpB = Math.min(mpCap, state.mpB + mpHeal);
-        if (mpHeal > 0) logLine(state, "lS", `&nbsp;🌱 ${nameOf(side, names)} ฟื้น ${mpHeal} MP (${art.n})`);
-      }
+  for (const b of st.buffs) if (b.u > 0 && b.t !== "buff_riposte") b.u--;
+  state.st[side].buffs = st.buffs.filter((b) => b.u > 0);
+  for (const d of st.debuffs) if (d.u > 0) d.u--;
+  state.st[side].debuffs = st.debuffs.filter((d) => d.u > 0);
+}
+
+// Equipment HP regen + primary-art aura regen for a living side.
+function tickRegen(
+  state: BattleState,
+  side: Side,
+  regen: number,
+  names: Record<Side, string>,
+  artId?: string | null,
+): void {
+  if (regen > 0) {
+    const cap = side === "A" ? state.dA.HP : state.dB.HP;
+    const heal = Math.round(cap * regen / 100);
+    if (side === "A") state.hA = Math.min(cap, state.hA + heal);
+    else state.hB = Math.min(cap, state.hB + heal);
+    if (heal > 0) logLine(state, "lS", `&nbsp;💊 ${nameOf(side, names)} ฟื้น ${heal} (อุปกรณ์)`);
+  }
+
+  // Art aura regen — capstone arts (e.g., วิชาเก้าเอี้ยง) grant a
+  // constant HP/MP trickle each turn from their primary-art slot.
+  if (artId) {
+    const art = getArt(artId);
+    const hpCap = side === "A" ? state.dA.HP : state.dB.HP;
+    const mpCap = side === "A" ? state.dA.MP : state.dB.MP;
+    if (art.hpRegenPct && art.hpRegenPct > 0) {
+      const heal = Math.round(hpCap * art.hpRegenPct / 100);
+      if (side === "A") state.hA = Math.min(hpCap, state.hA + heal);
+      else state.hB = Math.min(hpCap, state.hB + heal);
+      if (heal > 0) logLine(state, "lS", `&nbsp;🌱 ${nameOf(side, names)} ฟื้น ${heal} HP (${art.n})`);
+    }
+    if (art.mpRegenPct && art.mpRegenPct > 0) {
+      const mpHeal = Math.round(mpCap * art.mpRegenPct / 100);
+      if (side === "A") state.mpA = Math.min(mpCap, state.mpA + mpHeal);
+      else state.mpB = Math.min(mpCap, state.mpB + mpHeal);
+      if (mpHeal > 0) logLine(state, "lS", `&nbsp;🌱 ${nameOf(side, names)} ฟื้น ${mpHeal} MP (${art.n})`);
     }
   }
 }

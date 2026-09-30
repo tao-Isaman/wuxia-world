@@ -1,435 +1,155 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { parseSlotId } from "@/lib/game";
 import {
-  getArt,
-  hitPct,
-  critPct,
-  hpColor,
-  parseSlotId,
-  predictTurnOrder,
-  type BattleState,
-  type CharacterBuild,
-  type Side,
-} from "@/lib/game";
-import { useBattleStore } from "@/store/battle-store";
+  activeUnit,
+  aimableFor,
+  cellKey,
+  describeGrid,
+  predictOrder,
+  reachableFor,
+  sameCell,
+  slotGrid,
+  slotReady,
+  targetsFor,
+  unitById,
+  type Cell,
+  type GridBattleState,
+  type GridUnit,
+  type UnitLook,
+} from "@/lib/game/grid";
+import { fleeChance } from "@/lib/game/combat-actions";
+import { isPlayerTurn, useBattleStore } from "@/store/battle-store";
 import { useCharacterStore } from "@/store/character-store";
 import { BattleLog } from "./battle-log";
-import { BattleCanvas, useBattleActors } from "./battle-canvas";
+import { BattleCanvas } from "./battle-canvas";
 import { CharacterPreview } from "./character-preview";
-import { cn } from "@/lib/utils";
 import { InfoPopover } from "@/components/ui/wuxia/info-popover";
-import {
-  buffBadgeLabel,
-  debuffBadgeLabel,
-  describeBuff,
-  describeDebuff,
-} from "./buff-descriptions";
+import { buffBadgeLabel, debuffBadgeLabel, describeBuff, describeDebuff } from "./buff-descriptions";
 import { SkillIcon, ArtIcon } from "./skill-icon";
-import { RIPOSTE_BONUS, fleeChance } from "@/lib/game/combat-actions";
-import type { BattleCastProgress } from "@/lib/stage/battle-runtime";
 import { SoundButton } from "@/components/sound-button";
-import { Footprints } from "lucide-react";
-import "@/app/combat-actions.css";
+import type { GridBattleUi } from "@/lib/stage/grid-battle-runtime";
+import { Bot, Check, Footprints, Hourglass, X } from "lucide-react";
+import "@/app/grid-battle.css";
 
-interface CombatActionView {
-  key: string; name: string; icon: React.ReactNode; disabled: boolean; onClick: () => void;
-  /** Short state callout shown on the slot itself (e.g. a readied riposte). */
-  flag?: string;
-  cd?: number; mp?: number; detail: string; mpShort?: boolean; kind?: "skill" | "flee";
-}
-const actionMeta = ({ cd = 0, mp = 0, mpShort = false }: CombatActionView) =>
-  cd > 0 ? `รอ ${cd} ตา` : mpShort ? `MP ไม่พอ \xb7 ใช้ ${mp} MP` : `${mp} MP \xb7 1 ตา`;
+const TIMELINE_LENGTH = 8;
 
-/** Hero's Adventure-style hotbar slot: round medallion, number key, cooldown dial. */
-function SkillButton({ action, hotkey, onFocusDetail }: { action: CombatActionView; hotkey: number; onFocusDetail: () => void }) {
-  const { name, icon, disabled, onClick, cd = 0, detail, kind = "skill", flag } = action;
-  return <button type="button" disabled={disabled} onClick={onClick} onMouseEnter={onFocusDetail} onFocus={onFocusDetail}
-    className={`combat-action combat-action-${kind}`} aria-label={name} aria-keyshortcuts={String(hotkey)}
-    title={`${name} (${hotkey}) — ${detail}`} data-cooldown={cd > 0 ? cd : undefined}>
-    <span className="combat-action-medal" aria-hidden="true">
-      <span className="combat-action-icon">{icon}</span>
-      {cd > 0 && <span className="combat-action-cd">{cd}</span>}
-      {flag && <span className="combat-action-flag">{flag}</span>}
-    </span>
-    <span className="combat-action-copy">
-      <strong>{name}</strong>
-      <small>{actionMeta(action)}</small>
-    </span>
-    <kbd aria-hidden="true">{hotkey}</kbd>
-  </button>;
-}
-
-function useAnimatedHp(actualHp: number, maxHp: number, lastCast: BattleState["lastCast"],
-  side: Side, progress: BattleCastProgress | null): number {
-  const seq = lastCast?.seq ?? null;
-  const [snapshot, setSnapshot] = useState({ seq, actualHp, beforeHp: actualHp });
-  if (snapshot.seq !== seq) {
-    setSnapshot({ seq, actualHp, beforeHp: snapshot.actualHp });
-  } else if (snapshot.actualHp !== actualHp) {
-    setSnapshot({ ...snapshot, actualHp });
+// ─── Small pieces ──────────────────────────────────────────────────────
+/** A unit's face for the timeline / info card, drawn from its own look. */
+function UnitPortrait({ look }: { look: UnitLook }) {
+  if (look.kind === "creature") {
+    const f = Math.max(0, Math.min(7, look.frame));
+    return <span className="gb-creature" aria-hidden="true"
+      style={{ backgroundPosition: `${(f % 4) * 100 / 3}% ${Math.floor(f / 4) * 100}%` }} />;
   }
-  if (!lastCast || lastCast.side === side || lastCast.hitDamages.every((damage) => damage <= 0)
-    || (progress?.seq === seq && progress.complete)) {
-    return Math.max(0, Math.min(maxHp, actualHp));
+  if (look.still) {
+    // eslint-disable-next-line @next/next/no-img-element
+    return <span className="gb-still" aria-hidden="true"><img src={look.still} alt="" draggable={false} /></span>;
   }
-  const hits = progress?.seq === seq ? progress.hits : 0;
-  const damage = lastCast.hitDamages.slice(0, hits).reduce((sum, value) => sum + value, 0);
-  return Math.max(0, Math.min(maxHp, Math.max(actualHp, snapshot.beforeHp - damage)));
+  return <CharacterPreview id={look.characterId} framing="bust" />;
 }
 
-// Real-time stats shown in the tap/click popover opened by a fighter's
-// name in SidePanel. Shows base derived stats merged with the
-// caster's currently-active buff / debuff modifiers, plus Hit/Crit %
-// against the opposing fighter — so the player can see the live values
-// that drive damage rolls without committing the chrome to the panel.
-function FighterStatsTooltip({
-  name,
-  d,
-  opp: _opp,
-  hPct,
-  cPct,
-  buffs,
-  debuffs,
-  stkPct,
-}: {
-  name: string;
-  d: BattleState["dA"];
-  opp: BattleState["dA"];
-  hPct: number;
-  cPct: number;
-  buffs: BattleState["st"]["A"]["buffs"];
-  debuffs: BattleState["st"]["A"]["debuffs"];
-  stkPct: number;
-}) {
-  // Sum modifier contributions from current buffs / debuffs onto each
-  // affected stat. Mirrors the math in lib/game/battle.ts (effectiveSpd /
-  // effectiveCri) and lib/game/effects.ts addBuff/addDebuff conventions:
-  // buff_* values are positive, debuff_* values are stored negative.
-  let spdMod = 0, criMod = 0, accMod = 0, evaMod = 0, defMod = 0;
-  let reduceMod = 0, reflectMod = 0, iatkMod = 0;
-  for (const b of buffs) {
-    switch (b.t) {
-      case "buff_spd": spdMod += b.v; break;
-      case "buff_cri": criMod += b.v; break;
-      case "buff_eva": evaMod += b.v; break;
-      case "buff_def": defMod += b.v; break;
-      case "buff_reduce": reduceMod += b.v; break;
-      case "buff_reflect": reflectMod += b.v; break;
-      case "buff_iatk": iatkMod += b.v; break;
-      case "buff_iatk_reduce": iatkMod += b.v; reduceMod += b.v; break;
-      case "buff_reflect_eva": reflectMod += b.v; evaMod += b.v; break;
-      default: break;
-    }
-  }
-  for (const x of debuffs) {
-    switch (x.t) {
-      case "debuff_acc": accMod += x.v ?? 0; break;
-      case "debuff_eva": evaMod += x.v ?? 0; break;
-      case "debuff_def": defMod += x.v ?? 0; break;
-      default: break;
-    }
-  }
-  const eSpd = d.Spd + spdMod;
-  const eCri = d.Cri + criMod;
-  const eAcc = d.Acc + accMod;
-  const eEva = d.Eva + evaMod;
-  const ePD = d.PD + defMod;
-
-  const sign = (n: number) => (n === 0 ? "" : n > 0 ? ` (+${n})` : ` (${n})`);
-  const modClass = (n: number) =>
-    n > 0 ? "text-emerald-700" : n < 0 ? "text-rose-700" : "text-muted-foreground";
-
-  return (
-    <div className="space-y-2 text-[11px]">
-      <div className="font-display text-sm border-b pb-1 pr-8 mb-1">{name}</div>
-      <div className="grid grid-cols-2 gap-x-3 gap-y-0.5">
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">HP</span>
-          <span><strong>{d.HP}</strong></span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">MP</span>
-          <span><strong>{d.MP}</strong></span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">SPD</span>
-          <span><strong>{eSpd}</strong><span className={modClass(spdMod)}>{sign(spdMod)}</span></span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">Cri</span>
-          <span><strong>{eCri}</strong><span className={modClass(criMod)}>{sign(criMod)}</span></span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">Acc</span>
-          <span><strong>{eAcc}</strong><span className={modClass(accMod)}>{sign(accMod)}</span></span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">Eva</span>
-          <span><strong>{eEva}</strong><span className={modClass(evaMod)}>{sign(evaMod)}</span></span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">ATK</span>
-          <span><strong>{d.Atk}</strong></span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">IA</span>
-          <span><strong>{d.IA}</strong>
-            {iatkMod !== 0 && <span className={modClass(iatkMod)}> (+{iatkMod}%)</span>}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">PD</span>
-          <span><strong>{ePD}</strong><span className={modClass(defMod)}>{sign(defMod)}</span></span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">ID</span>
-          <span><strong>{d.ID}</strong></span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">Res</span>
-          <span><strong>{d.Res}</strong></span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">Hit</span>
-          <span className="text-emerald-700"><strong>{hPct}%</strong></span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">Crit</span>
-          <span className="text-amber-700"><strong>{cPct}%</strong></span>
-        </div>
-      </div>
-      {(stkPct > 0 || reduceMod > 0 || reflectMod > 0) && (
-        <div className="border-t pt-1 mt-1 space-y-0.5">
-          {stkPct > 0 && (
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">ATK stack</span>
-              <span className="text-emerald-700"><strong>+{stkPct}%</strong></span>
-            </div>
-          )}
-          {reduceMod > 0 && (
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">ลด dmg รับ</span>
-              <span className="text-emerald-700"><strong>{reduceMod}%</strong></span>
-            </div>
-          )}
-          {reflectMod > 0 && (
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">สะท้อน</span>
-              <span className="text-amber-700"><strong>{reflectMod}%</strong></span>
-            </div>
-          )}
-        </div>
-      )}
-      <div className="text-[9px] text-muted-foreground border-t pt-1">
-        Hit / Crit คำนวณกับศัตรูปัจจุบัน · ค่าในวงเล็บเป็นโบนัสจาก buff / debuff
-      </div>
-    </div>
-  );
-}
-
-function SidePanel({
-  side,
-  state,
-  isActive,
-  artId,
-  artLevel,
-  name,
-  progress,
-}: {
-  side: Side;
-  state: BattleState;
-  isActive: boolean;
-  artId: string;
-  artLevel: number;
-  name: string;
-  progress: BattleCastProgress | null;
-}) {
-  const [statsOpen, setStatsOpen] = useState(false);
-  const d = side === "A" ? state.dA : state.dB;
-  const actualHp = side === "A" ? state.hA : state.hB;
-  const mp = side === "A" ? state.mpA : state.mpB;
-  const gauge = side === "A" ? state.gA : state.gB;
-  const opp = side === "A" ? state.dB : state.dA;
-
-  // Animated HP — drains in sync with the per-hit cast animation. The
-  // engine applies all damage instantly at cast resolution time, but we
-  // delay the visual drop so each hit's damage number pop matches a
-  // matching dip in the HP bar. Drains to actualHp by the end of the
-  // cast hold, never exceeds it.
-  const hp = useAnimatedHp(actualHp, d.HP, state.lastCast, side, progress);
-  const hpPct = Math.max(0, Math.min(100, (hp / d.HP) * 100));
-  const mpPct = d.MP > 0 ? Math.max(0, (mp / d.MP) * 100) : 0;
-  const gaugePct = Math.min(100, gauge);
-  const hPct = Math.round(hitPct(d.Acc, opp.Eva));
-  const cPct = Math.round(critPct(d.Cri, opp.Res));
-  const art = getArt(artId);
-  const buffs = state.st[side].buffs;
-  const debuffs = state.st[side].debuffs;
-  const stk = state.st[side].stk;
-  const stkV = state.st[side].stkV;
-  const stkPct = stk * stkV;
-
-  return (
-    <Card
-      className={cn(
-        "battle-fighter",
-        isActive && "combat-fighter-active",
-      )}
-    >
-      <CardContent className="combat-fighter-content">
-        <div className="combat-fighter-heading">
-          <Popover open={statsOpen} onOpenChange={setStatsOpen}>
-            <PopoverTrigger asChild>
-              <button type="button" className="combat-fighter-name" aria-label={`ดูค่าสถานะของ ${name}`} title={name}>
-                <strong>{name}</strong><span aria-hidden="true">ⓘ</span>
-              </button>
-            </PopoverTrigger>
-            <PopoverContent side="bottom" align="start" sideOffset={6}
-              aria-label={`ค่าสถานะ ${name}`} className="relative w-72 max-w-[90vw] max-h-[70dvh] overflow-y-auto p-3">
-              <button type="button" onClick={() => setStatsOpen(false)} aria-label="ปิดค่าสถานะ"
-                className="absolute right-1 top-1 flex h-8 w-8 items-center justify-center text-lg hover:bg-muted focus-visible:outline focus-visible:outline-2">
-                <span aria-hidden="true">×</span>
-              </button>
-              <FighterStatsTooltip
-                name={name}
-                d={d}
-                opp={opp}
-                hPct={hPct}
-                cPct={cPct}
-                buffs={buffs}
-                debuffs={debuffs}
-                stkPct={stkPct}
-              />
-            </PopoverContent>
-          </Popover>
-          {art.id !== "none" && (
-            <span
-              className="combat-fighter-art"
-            >
-              [{art.n.substring(0, 7)}{artLevel}]
-            </span>
-          )}
-        </div>
-        <div className="combat-hp-line">
-          <Progress value={hpPct} indicatorColor={hpColor(hpPct)} aria-label={`พลังชีวิต ${name}`} className="combat-hp-bar" />
-          <span data-testid={`fighter-${side.toLowerCase()}-hp`}>{hp} / {d.HP} HP</span>
-        </div>
-        <div className="combat-meter-row">
-          {d.MP > 0 && <div>
-            <span>{mp} / {d.MP} MP</span>
-            <Progress value={mpPct} variant="qi" aria-label={`พลังปราณ ${name}`} className="combat-small-bar" />
-          </div>}
-          <div>
-            <span>จังหวะ <b>{isActive ? "พร้อม" : `${Math.floor(gaugePct)}%`}</b></span>
-            <Progress value={isActive ? 100 : gaugePct} aria-label={`จังหวะโจมตี ${name}`}
-              indicatorColor={side === "A" ? "#d9c58b" : "#d69368"} className="combat-small-bar" animate={false} />
-          </div>
-        </div>
-        <div className="combat-buffs">
-          {buffs.map((b, i) => {
-            const desc = describeBuff(b);
-            // Canonical badge label per type — prevents "two separate
-            // entries" confusion when different sources (skill / art /
-            // weapon) tag the same debuff with different `n` values.
-            const label = buffBadgeLabel(b);
-            return (
-              <InfoPopover
-                key={i}
-                trigger={
-                  <span className="text-[9px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded cursor-help">
-                    {label}{b.t === "buff_riposte" ? " · 1 ครั้ง" : `(${b.u})`}
-                  </span>
-                }
-                contentClassName="max-w-[240px]"
-              >
-                <div className="space-y-1 text-xs">
-                  <div className="font-bold text-emerald-700">{desc.title}</div>
-                  <div className="text-muted-foreground">{desc.detail}</div>
-                  <div className="text-[10px] text-muted-foreground border-t pt-1 mt-1">
-                    {b.t === "buff_riposte" ? "สิทธิ์สวนกลับจะหมดเมื่อโจมตีกาย แม้พลาด" : <>เหลือ <strong className="text-foreground">{b.u}</strong> เทิร์น</>}
-                  </div>
-                </div>
-              </InfoPopover>
-            );
-          })}
-          {debuffs.map((d, i) => {
-            const desc = describeDebuff(d);
-            const label = debuffBadgeLabel(d);
-            return (
-              <InfoPopover
-                key={i}
-                trigger={
-                  <span className="text-[9px] bg-rose-100 text-rose-800 px-1.5 py-0.5 rounded cursor-help">
-                    {label}({d.u})
-                  </span>
-                }
-                contentClassName="max-w-[240px]"
-              >
-                <div className="space-y-1 text-xs">
-                  <div className="font-bold text-rose-700">{desc.title}</div>
-                  <div className="text-muted-foreground">{desc.detail}</div>
-                  <div className="text-[10px] text-muted-foreground border-t pt-1 mt-1">
-                    เหลือ <strong className="text-foreground">{d.u}</strong> เทิร์น
-                  </div>
-                </div>
-              </InfoPopover>
-            );
-          })}
-          {stk > 0 && (
-            <InfoPopover
-              trigger={
-                <span className="text-[9px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded cursor-help">
-                  ATK+{stkPct}%
-                </span>
-              }
-              contentClassName="max-w-[240px]"
-            >
-              <div className="space-y-1 text-xs">
-                <div className="font-bold text-amber-700">สะสมพลังโจมตี</div>
-                <div className="text-muted-foreground">
-                  ATK ×{(1 + stkPct / 100).toFixed(2)} ({stk} ชั้น × +{stkV}%)
-                </div>
-                <div className="text-[10px] text-muted-foreground border-t pt-1 mt-1">
-                  ค้างจนสุดเกม (ลบโดย dispel)
-                </div>
-              </div>
-            </InfoPopover>
-          )}
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-const TIMELINE_LENGTH = 6;
-
-/**
- * Hero's Adventure-style turn order: faces queue toward the acting slot, so
- * who moves next (and how often a faster side acts twice) reads at a glance.
- */
-function TurnTimeline({ state, mode, nameA, nameB, casting }: {
-  state: BattleState; mode: "world" | "free"; nameA: string; nameB: string; casting: boolean;
-}) {
-  const { characterA, characterB, creatureFrame, iconB } = useBattleActors(mode);
-  const order = predictTurnOrder(state, TIMELINE_LENGTH);
+function TurnTimeline({ state, onPick }: { state: GridBattleState; onPick: (id: string) => void }) {
+  const order = state.phase === "over" ? [] : predictOrder(state, TIMELINE_LENGTH);
   if (!order.length) return null;
-  const acting = !casting && (state.phase === "player" || state.phase === "enemy");
-  const label = order.map((side) => side === "A" ? nameA : nameB).join(" → ");
-  return <ol className="turn-timeline" aria-label={`ลำดับการลงมือ: ${label}`} data-testid="turn-timeline">
-    {order.map((side, index) => <li key={`${state.turn}-${index}`} data-side={side}
-      data-acting={index === 0 && acting ? "true" : undefined} title={side === "A" ? nameA : nameB}>
-      {side === "B" && creatureFrame !== null ? <span className="turn-glyph" aria-hidden="true">獸</span> :
-        side === "B" && iconB ? <span className="turn-crop">{/* eslint-disable-next-line @next/next/no-img-element */}<img className="turn-sprite" src={iconB} alt="" draggable={false} /></span> :
-        <CharacterPreview id={side === "A" ? characterA : characterB} framing="bust" />}
-      {index === 0 && <span className="turn-timeline-tag" aria-hidden="true">{acting ? "ลงมือ" : "ถัดไป"}</span>}
-    </li>)}
+  const names = order.map((id) => unitById(state, id)?.name ?? id);
+  return <ol className="gb-timeline" aria-label={`ลำดับการลงมือ: ${names.join(" → ")}`} data-testid="turn-timeline">
+    {order.map((id, index) => {
+      const unit = unitById(state, id);
+      if (!unit) return null;
+      return <li key={`${id}-${index}`} data-team={unit.team} data-active={index === 0 && state.activeId === id ? "true" : undefined}>
+        <button type="button" onClick={() => onPick(id)} aria-label={`ดู ${unit.name}`} title={unit.name}>
+          <UnitPortrait look={unit.look} />
+        </button>
+      </li>;
+    })}
   </ol>;
 }
 
+function Meter({ value, max, kind, label }: { value: number; max: number; kind: "hp" | "mp"; label: string }) {
+  const pct = max > 0 ? Math.max(0, Math.min(100, (value / max) * 100)) : 0;
+  return <div className="gb-meter" data-kind={kind}>
+    <span className="gb-meter-track" role="meter" aria-label={label} aria-valuemin={0} aria-valuemax={max} aria-valuenow={value}>
+      <i style={{ width: `${pct}%` }} />
+    </span>
+    <small>{value}/{max} {kind === "hp" ? "HP" : "MP"}</small>
+  </div>;
+}
+
+function UnitCard({ unit, onClose }: { unit: GridUnit; onClose: () => void }) {
+  const { buffs, debuffs, stk, stkV } = unit.status;
+  return <section className="gb-unit-card" data-team={unit.team} aria-label={`ข้อมูล ${unit.name}`} data-testid="unit-card">
+    <header>
+      <span className="gb-unit-face"><UnitPortrait look={unit.look} /></span>
+      <div>
+        <strong>{unit.name}</strong>
+        <small>{unit.team === "ally" ? "ฝ่ายเรา" : "ฝ่ายศัตรู"}{unit.alive ? ` · เดิน ${unit.move} ช่อง · SPD ${unit.derived.Spd}` : " · ล้มลงแล้ว"}</small>
+      </div>
+      <button type="button" onClick={onClose} aria-label="ปิดข้อมูล"><X size={16} aria-hidden="true" /></button>
+    </header>
+    <Meter value={unit.hp} max={unit.derived.HP} kind="hp" label={`พลังชีวิต ${unit.name}`} />
+    {unit.derived.MP > 0 && <Meter value={unit.mp} max={unit.derived.MP} kind="mp" label={`พลังปราณ ${unit.name}`} />}
+    {(buffs.length > 0 || debuffs.length > 0 || stk > 0) && <div className="gb-buffs">
+      {buffs.map((b, i) => {
+        const desc = describeBuff(b);
+        return <InfoPopover key={`b${i}`} contentClassName="max-w-[240px]"
+          trigger={<span className="gb-chip" data-kind="buff">{buffBadgeLabel(b)}{b.t === "buff_riposte" ? "" : `(${b.u})`}</span>}>
+          <div className="space-y-1 text-xs"><div className="font-bold text-emerald-700">{desc.title}</div>
+            <div className="text-muted-foreground">{desc.detail}</div></div>
+        </InfoPopover>;
+      })}
+      {debuffs.map((d, i) => {
+        const desc = describeDebuff(d);
+        return <InfoPopover key={`d${i}`} contentClassName="max-w-[240px]"
+          trigger={<span className="gb-chip" data-kind="debuff">{debuffBadgeLabel(d)}({d.u})</span>}>
+          <div className="space-y-1 text-xs"><div className="font-bold text-rose-700">{desc.title}</div>
+            <div className="text-muted-foreground">{desc.detail}</div></div>
+        </InfoPopover>;
+      })}
+      {stk > 0 && <span className="gb-chip" data-kind="stack">ATK+{stk * stkV}%</span>}
+    </div>}
+  </section>;
+}
+
+interface SlotView {
+  slot: number;
+  name: string;
+  icon: React.ReactNode;
+  range: string;
+  cd: number;
+  mp: number;
+  mpShort: boolean;
+  ready: boolean;
+  inReach: boolean;
+}
+
+function slotViews(state: GridBattleState, unit: GridUnit | undefined): SlotView[] {
+  if (!unit) return [];
+  const out: SlotView[] = [];
+  unit.build.skillIds.forEach((raw, slot) => {
+    if (!raw) return;
+    const info = parseSlotId(raw);
+    const profile = slotGrid(raw);
+    if (!info || !profile) return;
+    const cd = unit.cd[slot] ?? 0;
+    const ready = slotReady(state, unit.id, slot);
+    const inReach = ready && aimableFor(state, unit.id, slot).some((c) => targetsFor(state, unit.id, slot, c).length > 0);
+    if (info.kind === "art") {
+      const cost = info.art.act?.c ?? 0;
+      out.push({ slot, name: info.art.n, icon: <ArtIcon art={info.art} size={30} />, range: describeGrid(profile),
+        cd, mp: cost, mpShort: unit.mp < cost, ready, inReach });
+    } else {
+      out.push({ slot, name: info.skill.n, icon: <SkillIcon skill={info.skill} size={30} />, range: describeGrid(profile),
+        cd, mp: 0, mpShort: false, ready, inReach });
+    }
+  });
+  return out;
+}
+
+// ─── Arena ─────────────────────────────────────────────────────────────
 interface BattleArenaProps {
   // "free"  — /debug battle tab. User can configure builds and reset freely.
   // "world" — embedded in WorldScreen. No reset; "ดำเนินเรื่อง" closes the
@@ -438,184 +158,263 @@ interface BattleArenaProps {
   onContinue?: () => void;
 }
 
+interface Selection { key: string; slot: number | null; aimed: Cell | null }
+
 export function BattleArena({ mode = "free", onContinue }: BattleArenaProps) {
   const state = useBattleStore((s) => s.state);
-  const battleBuilds = useBattleStore((s) => s.builds);
+  const auto = useBattleStore((s) => s.auto);
   const start = useBattleStore((s) => s.start);
   const reset = useBattleStore((s) => s.reset);
-  // Renamed from `useSkill` / `useArtActive` (the store action names) to
-  // verb-form locals so ESLint's react-hooks/rules-of-hooks doesn't
-  // misclassify them as hooks when called inside `onClick` callbacks.
-  const castSkill = useBattleStore((s) => s.useSkill);
-  const castArtActive = useBattleStore((s) => s.useArtActive);
-  const autoAdvance = useBattleStore((s) => s.autoAdvance);
-  const takeCombatAction = useBattleStore((s) => s.useCombatAction);
-  const [castProgress, setCastProgress] = useState<BattleCastProgress | null>(null);
-  // Battle log defaults closed — the cast-animation banner now carries
-  // the moment-to-moment narration, so the log is for after-the-fact
-  // review only. Player can toggle open/closed via the header button.
+  const setupA = useCharacterStore((s) => s.builds.A);
+  const setupB = useCharacterStore((s) => s.builds.B);
+
+  const [animating, setAnimating] = useState(false);
+  const builds = useBattleStore((s) => s.builds);
+  // Playback progress belongs to one battle (start() replaces `builds`).
+  const [played, setPlayed] = useState<{ builds: typeof builds; seq: number }>({ builds: null, seq: 0 });
+  const playedSeq = played.builds === builds ? played.seq : 0;
+  const [hover, setHover] = useState<Cell | null>(null);
+  const [inspect, setInspect] = useState<string | null>(null);
   const [showLog, setShowLog] = useState(false);
-  const [focusedKey, setFocusedKey] = useState<string | null>(null);
-  const actionsRef = useRef<CombatActionView[]>([]);
-  // Number keys fire hotbar slots, like the reference game's F-keys/1-9.
+  const [notice, setNotice] = useState<string | null>(null);
+  const [rendererDown, setRendererDown] = useState(false);
+  const [rawSelection, setSelection] = useState<Selection>({ key: "", slot: null, aimed: null });
+
+  // A selection belongs to one turn of one unit; a new turn clears it.
+  const turnKey = state ? `${state.activeId}:${state.turn}` : "";
+  const selection = rawSelection.key === turnKey ? rawSelection : { key: turnKey, slot: null, aimed: null };
+  const lastSeq = state?.events.length ? state.events[state.events.length - 1].seq : 0;
+  const caughtUp = playedSeq >= lastSeq && !animating;
+  const myTurn = !!state && caughtUp && isPlayerTurn(state, auto);
+  const active = state ? activeUnit(state) : null;
+  const leader = state?.units.find((u) => u.leader) ?? state?.units.find((u) => u.team === "ally");
+  const controlled = active && active.team === "ally" ? active : leader;
+
+  const refs = useRef({ state, myTurn, selection, inspect });
+  refs.current = { state, myTurn, selection, inspect };
+
+  useEffect(() => {
+    if (!notice) return;
+    const timer = setTimeout(() => setNotice(null), 2200);
+    return () => clearTimeout(timer);
+  }, [notice]);
+
+  // If the stage can't run, keep the battle moving without animation.
+  useEffect(() => {
+    if (!rendererDown || !state || state.phase === "over" || isPlayerTurn(state, auto)) return;
+    const timer = setTimeout(() => useBattleStore.getState().step(), 350);
+    return () => clearTimeout(timer);
+  }, [rendererDown, state, auto]);
+
+  const clearSelection = useCallback(() => setSelection({ key: turnKey, slot: null, aimed: null }), [turnKey]);
+
+  const confirm = useCallback((slot: number, cell: Cell) => {
+    if (useBattleStore.getState().act(slot, cell)) {
+      setSelection({ key: "", slot: null, aimed: null });
+      setHover(null);
+    } else setNotice("ไม่มีเป้าหมายในพื้นที่นี้");
+  }, []);
+
+  const selectSlot = useCallback((slot: number) => {
+    const { state: s, myTurn: mine, selection: sel } = refs.current;
+    if (!s || !mine) return;
+    const unit = activeUnit(s);
+    if (!unit || !slotReady(s, unit.id, slot)) return;
+    if (sel.slot === slot) { setSelection({ key: turnKey, slot: null, aimed: null }); return; }
+    const profile = slotGrid(unit.build.skillIds[slot]);
+    // Self skills aim at the caster's own tile straight away; otherwise
+    // pre-aim when exactly one tile hits something (tap it or ยืนยัน).
+    let aimed: Cell | null = null;
+    if (profile?.target === "self") aimed = { ...unit.pos };
+    else {
+      const hits = aimableFor(s, unit.id, slot).filter((c) => targetsFor(s, unit.id, slot, c).length > 0);
+      if (hits.length === 1) aimed = hits[0];
+      else if (!hits.length) setNotice("ยังไม่มีเป้าในระยะ · เดินเข้าใกล้ก่อน");
+    }
+    setSelection({ key: turnKey, slot, aimed });
+  }, [turnKey]);
+
+  const onTap = useCallback((cell: Cell | null, unitId: string | null, pointerType: string) => {
+    const { state: s, myTurn: mine, selection: sel, inspect: open } = refs.current;
+    if (!s) return;
+    const unit = mine ? activeUnit(s) : null;
+    if (cell && unit) {
+      if (sel.slot !== null) {
+        const aim = aimableFor(s, unit.id, sel.slot);
+        if (aim.some((c) => sameCell(c, cell))) {
+          if (pointerType === "mouse" || (sel.aimed && sameCell(sel.aimed, cell))) confirm(sel.slot, cell);
+          else setSelection({ ...sel, aimed: cell });
+          return;
+        }
+        if (!unitId) { setSelection({ key: sel.key, slot: null, aimed: null }); return; }
+      } else if (!sameCell(cell, unit.pos) && reachableFor(s, unit.id).has(cellKey(cell))) {
+        useBattleStore.getState().move(cell);
+        return;
+      }
+    }
+    setInspect(unitId && unitId !== open ? unitId : null);
+  }, [confirm]);
+
+  const onAnim = useCallback((playing: boolean) => setAnimating(playing), []);
+  const onPlayed = useCallback((seq: number) => {
+    if (seq === Number.MAX_SAFE_INTEGER) setRendererDown(true);
+    setPlayed({ builds: useBattleStore.getState().builds, seq });
+  }, []);
+
+  const doWait = useCallback(() => { if (refs.current.myTurn) useBattleStore.getState().wait(); }, []);
+  const doFlee = useCallback(() => { if (refs.current.myTurn) useBattleStore.getState().flee(); }, []);
+  const toggleAuto = useCallback(() => {
+    const store = useBattleStore.getState();
+    store.setAuto(!store.auto);
+    setSelection({ key: "", slot: null, aimed: null });
+  }, []);
+
+  const slots = useMemo(() => (state ? slotViews(state, controlled ?? undefined) : []), [state, controlled]);
+  const slotsRef = useRef(slots);
+  slotsRef.current = slots;
+
+  // Hotkeys: 1–9 slots, W wait, A auto, Esc cancel, Enter confirm.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.repeat || e.altKey || e.ctrlKey || e.metaKey) return;
       const target = e.target;
       if (target instanceof HTMLElement && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName))) return;
       if (document.querySelector('[role="dialog"]')) return;
-      const action = actionsRef.current[Number(e.key) - 1];
-      if (!action || action.disabled) return;
-      e.preventDefault();
-      setFocusedKey(action.key);
-      action.onClick();
+      const key = e.key.toLowerCase();
+      if (/^[1-9]$/.test(key)) {
+        const view = slotsRef.current[Number(key) - 1];
+        if (view) { e.preventDefault(); selectSlot(view.slot); }
+      } else if (key === "w") { e.preventDefault(); doWait(); }
+      else if (key === "a") { e.preventDefault(); toggleAuto(); }
+      else if (key === "escape") { setSelection({ key: "", slot: null, aimed: null }); setInspect(null); }
+      else if (key === "enter") {
+        const sel = refs.current.selection;
+        if (sel.slot !== null && sel.aimed) { e.preventDefault(); confirm(sel.slot, sel.aimed); }
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  }, [selectSlot, doWait, toggleAuto, confirm]);
 
-  // Setup-tab builds — used in free mode for the "start fresh" button only.
-  const setupA = useCharacterStore((s) => s.builds.A);
-  const setupB = useCharacterStore((s) => s.builds.B);
-
-  // What's actually fighting (set by `start()`). Falls back to setup builds
-  // for the brief render when the battle hasn't been started yet in free mode.
-  const displayA: CharacterBuild = battleBuilds?.A ?? setupA;
-  const displayB: CharacterBuild = battleBuilds?.B ?? setupB;
-
-  // BattleCanvas owns the Phaser update loop and reports visual impacts.
+  const ui: GridBattleUi = useMemo(() => ({
+    slot: myTurn ? selection.slot : null,
+    aimed: myTurn ? selection.aimed : null,
+    hover,
+    inspect,
+  }), [myTurn, selection.slot, selection.aimed, hover, inspect]);
 
   if (!state) {
     if (mode === "world") {
-      return (
-        <Card>
-          <CardContent className="p-8 text-center text-sm text-muted-foreground">
-            กำลังเริ่มการต่อสู้...
-          </CardContent>
-        </Card>
-      );
+      return <Card><CardContent className="p-8 text-center text-sm text-muted-foreground">กำลังเริ่มการต่อสู้...</CardContent></Card>;
     }
-    return (
-      <Card>
-        <CardContent className="p-8 text-center space-y-4">
-          <p className="text-sm text-muted-foreground">ตั้งค่าตัวละครและเลือกวิชาก่อน</p>
-          <Button size="lg" onClick={() => start(setupA, setupB)}>
-            ⚔ เริ่มการต่อสู้
-          </Button>
-        </CardContent>
-      </Card>
-    );
+    return <Card><CardContent className="p-8 text-center space-y-4">
+      <p className="text-sm text-muted-foreground">ตั้งค่าตัวละครและเลือกวิชาก่อน</p>
+      <Button size="lg" onClick={() => start(setupA, setupB)}>⚔ เริ่มการต่อสู้</Button>
+    </CardContent></Card>;
   }
 
-  const casting = !!state.lastCast && !(castProgress?.seq === state.lastCast.seq && castProgress.complete);
-  const resultReady = (!!state.winner || !!state.escaped) && !casting;
-  const canAct = !state.winner && !state.escaped && !casting && state.phase === "player";
-  const isAActive = canAct;
-  const isBActive = !state.winner && !casting && state.phase === "enemy";
-  const aA = getArt(displayA.artId);
-  const canIA = !!aA.act && state.mpA >= aA.act.c && state.iaCD.A === 0;
-  const riposteReady = state.st.A.buffs.some((buff) => buff.t === "buff_riposte" && buff.u > 0);
-  const actions: CombatActionView[] = [];
-  displayA.skillIds.forEach((raw, i) => {
-    if (!raw) return;
-    const info = parseSlotId(raw);
-    if (!info) return;
-    const cd = state.cd.A[i] ?? 0;
-    if (info.kind === "art") {
-      const art = info.art;
-      if (!art.act) return;
-      const mpShort = state.mpA < art.act.c;
-      actions.push({ key: `slot-${i}`, name: art.n, icon: <ArtIcon art={art} size={34} />,
-        disabled: !canAct || cd > 0 || mpShort, onClick: () => castSkill(i), cd, mp: art.act.c, mpShort,
-        detail: "วิชาในกาย · ใช้ปราณ" });
-      return;
-    }
-    const sk = info.skill;
-    const detail = sk.at ? `${sk.at === "phy" ? riposteReady ? `สวนกลับ +${RIPOSTE_BONUS}%` : "โจมตีภายนอก" : "โจมตีปราณ"} · ${sk.hits ?? 1} ครั้ง` : "เสริมพลัง · เปลี่ยนจังหวะ";
-    actions.push({ key: `slot-${i}`, name: sk.n, icon: <SkillIcon skill={sk} size={34} />,
-      disabled: !canAct || cd > 0, onClick: () => castSkill(i), cd, detail,
-      flag: sk.at === "phy" && riposteReady ? `สวนกลับ +${RIPOSTE_BONUS}%` : undefined });
-  });
-  if (aA.act && !displayA.skillIds.includes(`art:${aA.id}`)) {
-    actions.push({ key: "inner-art", name: aA.n, icon: <ArtIcon art={aA} size={34} />,
-      disabled: !canAct || !canIA, onClick: castArtActive, cd: state.iaCD.A,
-      mp: aA.act.c, mpShort: state.mpA < aA.act.c, detail: "วิชาในกาย · ใช้ปราณ" });
-  }
-  // Retreat replaces the old guard / recover buttons: a Spd-based chance to
-  // leave the fight; a failed attempt spends the turn.
-  const escapeOdds = Math.round(fleeChance(state.dA.Spd, state.dB.Spd));
-  actions.push({ key: "flee", name: "ถอยหนี", icon: <Footprints size={27} strokeWidth={1.5} />, kind: "flee",
-    disabled: !canAct, onClick: () => takeCombatAction("flee"),
-    detail: `โอกาสหนีรอด ${escapeOdds}% · พลาดจะเสียตานี้` });
-  actionsRef.current = actions;
-  const focusedAction = actions.find((action) => action.key === focusedKey) ?? actions.find((action) => !action.disabled) ?? actions[0];
+  const over = state.phase === "over";
+  const resultReady = over && (caughtUp || rendererDown);
+  const selected = slots.find((v) => v.slot === selection.slot);
+  const inspected = inspect ? unitById(state, inspect) : undefined;
+  const enemyName = state.units.find((u) => u.team === "enemy")?.name ?? "คู่ต่อสู้";
+  const fleeOdds = leader ? Math.round(fleeChance(leader.derived.Spd,
+    Math.max(0, ...state.units.filter((u) => u.alive && u.team === "enemy").map((u) => u.derived.Spd)))) : 0;
 
-  const headline = resultReady ? "การประลองสิ้นสุด" : casting ? `กำลังใช้ · ${state.lastCast?.name}` :
-    canAct ? "ถึงตาเจ้า · เลือกกระบวนท่า" : isBActive ? `${displayB.name} กำลังออกกระบวนท่า` : "รอจังหวะ · กำลังรวบรวมพลัง";
+  const lastEvent = state.events[state.events.length - 1];
+  const playingName = !caughtUp && lastEvent && "unitId" in lastEvent ? unitById(state, lastEvent.unitId)?.name : undefined;
+  const headline = resultReady ? "การประลองสิ้นสุด"
+    : myTurn && active ? selected ? `เล็งเป้า · ${selected.name}` : `ถึงตา ${active.name}${state.phase === "moved" ? " · เลือกกระบวนท่า" : ""}`
+    : active && active.team === "ally" && auto ? `อัตโนมัติ · ${active.name}`
+    : active ? `${active.name} กำลังลงมือ` : playingName ? `${playingName} กำลังลงมือ` : "รอจังหวะ...";
+  const statusPhase = resultReady ? "over" : myTurn ? "player" : active?.team === "enemy" ? "enemy" : "waiting";
+  const hint = notice ?? (myTurn ? selected
+    ? selection.aimed ? "แตะช่องเดิมอีกครั้ง หรือกด ยืนยัน" : "แตะช่องสีแดงเพื่อเล็ง"
+    : state.phase === "turn" ? "แตะช่องสีฟ้าเพื่อเดิน · หรือเลือกกระบวนท่า" : "เลือกกระบวนท่า หรือ รอ" : null);
+
+  const winnerLabel = state.escaped ? "หนีรอด" : state.winnerTeam === "ally" ? "ชัยชนะ" : "พ่ายแพ้";
+  const winnerLine = state.escaped ? `${leader?.name ?? "จอมยุทธ์"} ถอยหนีจาก ${enemyName}`
+    : state.winnerTeam === "ally" ? `${leader?.name ?? "ฝ่ายเรา"} ชนะ` : `${enemyName} ชนะ`;
 
   return (
-    <div className="battle-arena pixel-panel" data-mode={mode}>
-      <div className="combat-status" data-testid="combat-status" data-phase={resultReady ? "over" : casting ? "casting" : state.phase}>
+    <div className="battle-arena grid-battle" data-mode={mode} data-testid="grid-battle">
+      <header className="gb-status combat-status" data-testid="combat-status" data-phase={statusPhase}>
         <span role="status" aria-live="polite"><i aria-hidden="true" /><strong>{headline}</strong></span>
-        <TurnTimeline state={state} mode={mode} nameA={displayA.name} nameB={displayB.name} casting={casting} />
-        <small>ตาที่ {Math.max(1, state.turn + (!state.winner && !casting ? 1 : 0))}</small>
+        <TurnTimeline state={state} onPick={(id) => setInspect(id)} />
+        <small className="gb-turn">ตาที่ {Math.max(1, state.turn + (over ? 0 : 1))}</small>
+        <button type="button" className="gb-log-toggle" onClick={() => setShowLog((v) => !v)} aria-expanded={showLog}
+          aria-controls="combat-log-drawer" aria-label="บันทึกการต่อสู้">
+          <span aria-hidden="true">📜</span>
+        </button>
         <SoundButton className="hud-icon combat-sound" />
-      </div>
-      <div className="combat-field">
-        <BattleCanvas mode={mode} onCastProgress={setCastProgress} />
-        {canAct && <div key={`turn-${state.turn}`} className="turn-callout" aria-hidden="true">
-          <span>ถึงตาเจ้า</span>
-        </div>}
-        <div className="combat-hud">
-          <SidePanel side="A" state={state} isActive={isAActive} artId={displayA.artId}
-            artLevel={displayA.artLevel} name={displayA.name} progress={castProgress} />
-          <div className="combat-versus" aria-hidden="true">對</div>
-          <SidePanel side="B" state={state} isActive={isBActive} artId={displayB.artId}
-            artLevel={displayB.artLevel} name={displayB.name} progress={castProgress} />
-        </div>
-        {showLog && <div id="combat-log-drawer" className="combat-log-drawer" role="region" aria-label="บันทึกการต่อสู้">
+      </header>
+
+      <div className="gb-field">
+        <BattleCanvas mode={mode} ui={ui} onTap={onTap} onHover={setHover} onAnim={onAnim} onPlayed={onPlayed} />
+        {myTurn && active && <div key={turnKey} className="gb-callout" aria-hidden="true"><span>ถึงตาเจ้า</span></div>}
+        {inspected && <UnitCard unit={inspected} onClose={() => setInspect(null)} />}
+        {hint && !resultReady && <p className="gb-hint" aria-live="polite" data-notice={notice ? "true" : undefined}>{hint}</p>}
+        {showLog && <div id="combat-log-drawer" className="gb-log-drawer" role="region" aria-label="บันทึกการต่อสู้">
           <BattleLog log={state.log} />
         </div>}
       </div>
 
-      <section className="combat-decision" aria-label="กระบวนท่าต่อสู้">
+      <section className="gb-bar" aria-label="กระบวนท่าต่อสู้">
         {resultReady ? (
-          <div className="combat-result" data-testid="combat-result">
-            <div><span>{state.escaped ? "หนีรอด" : state.winner === "A" ? "ชัยชนะ" : "พ่ายแพ้"}</span>
-              <strong>{state.escaped ? `${displayA.name} ถอยหนีจาก ${displayB.name}` : `${state.winner === "A" ? displayA.name : displayB.name} ชนะ`}</strong>
-              <small>ประลอง {state.turn} ตา</small></div>
+          <div className="gb-result" data-testid="combat-result" data-outcome={state.escaped ? "escaped" : state.winnerTeam ?? "none"}>
+            <div><span>{winnerLabel}</span><strong>{winnerLine}</strong><small>ประลอง {state.turn} ตา</small></div>
             {mode === "world" ? <Button onClick={() => onContinue?.()}>ดำเนินเรื่อง →</Button> :
               <div className="flex gap-2"><Button onClick={() => start(setupA, setupB)}>เริ่มใหม่</Button>
                 <Button variant="outline" onClick={reset}>Reset</Button></div>}
           </div>
-        ) : (
-          <div className="combat-actions-wrap">
-            <ol className="combat-recent" aria-hidden="true">
-              {state.log.filter((line) => line.cls !== "lS").slice(-2).map((line, index, recent) =>
-                <li key={state.log.length - recent.length + index} data-log-kind={line.cls}
-                  dangerouslySetInnerHTML={{ __html: line.txt }} />)}
-            </ol>
-            {focusedAction && <p className="combat-action-detail" aria-live="polite">
-              <strong>{focusedAction.name}</strong> <span>{focusedAction.detail}</span> <small>{actionMeta(focusedAction)}</small>
-            </p>}
-            <div className="combat-actions">
-              {actions.map((action, index) => <SkillButton key={action.key} action={action} hotkey={index + 1}
-                onFocusDetail={() => setFocusedKey(action.key)} />)}
-            </div>
+        ) : <>
+          <div className="gb-skills" role="group" aria-label={`กระบวนท่าของ ${controlled?.name ?? ""}`}>
+            {slots.map((v, index) => {
+              const pressed = selection.slot === v.slot && myTurn;
+              const meta = v.cd > 0 ? `รอ ${v.cd} ตา` : v.mpShort ? `MP ไม่พอ (${v.mp})` : v.mp ? `${v.mp} MP` : v.inReach ? "พร้อม" : "นอกระยะ";
+              return <button key={v.slot} type="button" className="gb-skill combat-action" aria-label={v.name}
+                aria-pressed={pressed} aria-keyshortcuts={index < 9 ? String(index + 1) : undefined}
+                disabled={!myTurn || !v.ready} onClick={() => selectSlot(v.slot)}
+                title={`${v.name} — ${v.range} · ${meta}`} data-cooldown={v.cd > 0 ? v.cd : undefined}
+                data-in-reach={v.inReach ? "true" : "false"}>
+                <span className="gb-skill-icon" aria-hidden="true">{v.icon}{v.cd > 0 && <b>{v.cd}</b>}</span>
+                <span className="gb-skill-copy">
+                  <strong>{v.name}</strong>
+                  <small>{v.range}</small>
+                  <em>{meta}</em>
+                </span>
+                {index < 9 && <kbd aria-hidden="true">{index + 1}</kbd>}
+              </button>;
+            })}
           </div>
-        )}
+          <div className="gb-controls">
+            {selection.slot !== null && myTurn ? <>
+              <button type="button" className="gb-control" data-kind="cancel" onClick={clearSelection} aria-keyshortcuts="Escape">
+                <X size={18} aria-hidden="true" /><span>ยกเลิก</span>
+              </button>
+              <button type="button" className="gb-control" data-kind="confirm" disabled={!selection.aimed}
+                onClick={() => selection.aimed && selection.slot !== null && confirm(selection.slot, selection.aimed)} aria-keyshortcuts="Enter">
+                <Check size={18} aria-hidden="true" /><span>ยืนยัน</span>
+              </button>
+            </> : <>
+              <button type="button" className="gb-control" onClick={doWait} disabled={!myTurn} aria-keyshortcuts="W" title="จบตานี้โดยไม่ออกกระบวนท่า">
+                <Hourglass size={18} aria-hidden="true" /><span>รอ</span>
+              </button>
+              {mode === "world" && <button type="button" className="gb-control" data-kind="flee" onClick={doFlee}
+                disabled={!myTurn || !active?.leader} title={`โอกาสหนีรอด ${fleeOdds}% · พลาดจะเสียตานี้`}>
+                <Footprints size={18} aria-hidden="true" /><span>ถอยหนี</span>
+              </button>}
+            </>}
+            <button type="button" className="gb-control" data-kind="auto" aria-pressed={auto} onClick={toggleAuto} aria-keyshortcuts="A"
+              title="ให้ AI เล่นฝ่ายเรา">
+              <Bot size={18} aria-hidden="true" /><span>อัตโนมัติ</span>
+            </button>
+            {mode === "free" && <button type="button" className="gb-control" data-kind="reset" onClick={reset}>
+              <span>Reset</span>
+            </button>}
+          </div>
+        </>}
       </section>
-
-      <div className="combat-log">
-        <button type="button" onClick={() => setShowLog((value) => !value)} aria-expanded={showLog} aria-controls="combat-log-drawer">
-          <span>บันทึกการต่อสู้ <small>({state.log.length})</small></span>
-          <span aria-hidden="true">{showLog ? "−" : "+"}</span>
-        </button>
-      </div>
-      {mode === "free" && !state.winner && <div className="combat-debug-controls flex justify-center gap-2">
-        <Button variant="outline" size="sm" onClick={autoAdvance} disabled={casting}>Auto ▶▶</Button>
-        <Button variant="outline" size="sm" onClick={reset}>Reset</Button>
-      </div>}
     </div>
   );
 }

@@ -27,6 +27,7 @@ import {
   xpToNextStatLevel,
 } from "@/lib/world/stat-progression";
 import { useBattleStore } from "@/store/battle-store";
+import { packOpponentIdOf } from "@/lib/world/battle-looks";
 import {
   applyEffects,
   canPracticeAt,
@@ -565,8 +566,8 @@ const emptyData = (): WorldStateData => ({
 // A random encounter promoted to a battle. Law pursuers are non-fatal:
 // losing to them ends in their city's jail (the jail_cell scene), not death.
 function encounterBattle(opponentId: string, returnSceneId: string): NonNullable<WorldStateData["pendingBattle"]> {
-  if (isLawOpponent(opponentId)) return { opponentId, onWin: returnSceneId, onLose: "jail_cell", nonFatal: true };
-  return { opponentId, onWin: returnSceneId, onLose: returnSceneId };
+  if (isLawOpponent(opponentId)) return { opponentId, onWin: returnSceneId, onLose: "jail_cell", nonFatal: true, withPack: true };
+  return { opponentId, onWin: returnSceneId, onLose: returnSceneId, withPack: true };
 }
 
 // ─── Walk ticks ────────────────────────────────────────────────────────
@@ -1362,6 +1363,12 @@ export const useWorldStore = create<WorldStore>()(
         // can auto-advance against this kill.
         draft.defeatedCounts[pb.opponentId] =
           (draft.defeatedCounts[pb.opponentId] ?? 0) + 1;
+        // Grid battles: fallen pack members (a chief's bandits, an alpha's
+        // wolves) count too. Only the primary foe's drops roll.
+        for (const unit of battleState?.units ?? []) {
+          const packId = unit.team === "enemy" && !unit.alive ? packOpponentIdOf(unit.id) : null;
+          if (packId) draft.defeatedCounts[packId] = (draft.defeatedCounts[packId] ?? 0) + 1;
+        }
         const uses = battleState?.skillUses?.A ?? {};
         let actionTotal = 0;
         for (const [sid, count] of Object.entries(uses)) {
