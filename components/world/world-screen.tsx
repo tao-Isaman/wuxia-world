@@ -16,8 +16,6 @@ import {
 } from "@/lib/world";
 import { ensureBattleStarted } from "@/lib/world/battle-bridge";
 import { StartScreen } from "./start-screen";
-import { DialogDisplay } from "./dialog-display";
-import { ChoicePanel } from "./choice-panel";
 import { DialogStage, type DialogSpeaker } from "./dialog-stage";
 import { LocationView } from "./location-view";
 import { RouteView } from "./route-view";
@@ -208,10 +206,10 @@ export function WorldScreen() {
       if (scene.kind === "dialog") {
         return (
           <>
-            <MapBackdrop bottom hud>
-              <DialogDisplay scene={scene} />
-              <ChoicePanel scene={scene} />
-            </MapBackdrop>
+            <MapBackdrop>{null}</MapBackdrop>
+            <DialogStage scene={scene} speaker={speaker ? { id: speaker.id, name: speaker.name } : undefined}
+              title={scene.lines.find((line) => line.t === "dialogue")?.speaker}
+              locationName={lastLocation?.kind === "location" ? lastLocation.name : ""} />
             <LoadingOverlay />
             <ToastStack />
             <ConfirmDialog />

@@ -1,6 +1,8 @@
 import { test, expect } from "@playwright/test";
 
 test("all eight characters have distinct idle and walking frames in Phaser", async ({ page }) => {
+  // Eight reloads with walk cycles in four directions: ~11 s per character.
+  test.setTimeout(150_000);
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/");

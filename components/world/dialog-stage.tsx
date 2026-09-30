@@ -13,9 +13,11 @@ import styles from "./dialog-stage.module.css";
 export interface DialogSpeaker { id: string; name: string }
 
 /** The location canvas remains a sibling, with its input and chrome suspended. */
-export function DialogStage({ scene, speaker, locationName }: {
+export function DialogStage({ scene, speaker, title, locationName }: {
   scene: DialogScene;
   speaker?: DialogSpeaker;
+  /** Heading when the speaker isn't a registered NPC (travel events, narration). */
+  title?: string;
   locationName: string;
 }) {
   const state = useWorldStore();
@@ -119,8 +121,8 @@ export function DialogStage({ scene, speaker, locationName }: {
         <div className={styles.main}>
           <header className={styles.heading}>
             <div className={styles.identity}>
-              <h2 ref={heading} id={headingId} tabIndex={-1}>{speaker?.name ?? "บทสนทนา"}</h2>
-              <p>{locationName}</p>
+              <h2 ref={heading} id={headingId} tabIndex={-1}>{speaker?.name ?? title ?? "บทสนทนา"}</h2>
+              {locationName && <p>{locationName}</p>}
             </div>
             {close && <button type="button" className={styles.close} onClick={close} title={leave?.choice.text}>
               จบบทสนทนา <span aria-hidden="true">×</span>

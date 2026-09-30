@@ -82,14 +82,20 @@ test("quest guide: the log names who and where, the map points the way, busy wor
 
   // Resting shows the hero at work behind a progress bar that swallows taps.
   await page.getByRole("button", { name: "พักผ่อน", exact: true }).click();
+  // Probe in the browser the moment the overlay mounts: the centre of the
+  // screen must hit the overlay and it must carry a progress bar.
+  const blocked = page.evaluate(() => new Promise<boolean>((resolve) => {
+    const check = () => {
+      const overlay = document.querySelector(".work-overlay");
+      if (!overlay) return requestAnimationFrame(check);
+      const hit = document.elementFromPoint(innerWidth / 2, innerHeight / 2);
+      resolve(!!hit?.closest("[data-world-busy]") && !!overlay.querySelector('[role="progressbar"]'));
+    };
+    check();
+  }));
   await page.getByRole("group", { name: "เลือกวิธีพักผ่อน" }).locator("button:enabled").first().click();
+  expect(await blocked).toBe(true);
   const overlay = page.locator(".work-overlay");
-  await expect(overlay).toBeVisible();
-  await expect(overlay.getByRole("progressbar")).toBeVisible();
-  expect(await page.evaluate(() => {
-    const hit = document.elementFromPoint(innerWidth / 2, innerHeight / 2);
-    return !!hit?.closest("[data-world-busy]");
-  })).toBe(true);
   await expect(overlay).toHaveCount(0);
   expect(errors).toEqual([]);
 });

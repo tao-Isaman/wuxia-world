@@ -59,6 +59,12 @@ export const ZONES = {
   artisanRowY: 70,              // workshop row across the south
   artisanRowX0: 24,
   artisanRowStep: 11,
+  social: [                     // street corners by the market and tea house (chess, begging)
+    { x: 40, y: 55 },
+    { x: 80, y: 34 },
+    { x: 22, y: 52 },
+    { x: 56, y: 40 },
+  ],
   resources: [                  // nature corners, assigned in order
     { x: 12, y: 78 },
     { x: 88, y: 74 },
@@ -144,17 +150,22 @@ function build(id: string): LocationMapDef | undefined {
   const resources = [...(scene.resources ?? [])].sort((a, b) =>
     a.resourceId.localeCompare(b.resourceId),
   );
-  resources.slice(0, ZONES.resources.length).forEach((node, i) => {
+  // Chess and begging happen among people, gathering at the edges of the map.
+  const social = (skill: string) => skill === "chess" || skill === "begging";
+  let socialIndex = 0, natureIndex = 0;
+  for (const node of resources) {
     const res = RESOURCES_BY_ID.get(node.resourceId);
-    if (!res) return;
+    if (!res) continue;
+    const zone = social(res.skill) ? ZONES.social[socialIndex++] : ZONES.resources[natureIndex++];
+    if (!zone) continue;
     spots.push({
       kind: "resource",
       resourceId: node.resourceId,
-      ...ZONES.resources[i],
+      ...zone,
       icon: LIFE_SKILL_ICON[res.skill],
       label: res.name,
     });
-  });
+  }
 
   return {
     image: `/maps/${id}.webp`,

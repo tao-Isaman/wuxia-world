@@ -59,3 +59,31 @@ test("local replies preserve the scene and unrelated meetings clear the previous
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem("wusia-world-v1")!).state.pendingEncounter)).toBeNull();
   expect(errors).toEqual([]);
 });
+
+test("quest offers away from a staged map are full-screen and fit without scrolling", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("pageerror", error => errors.push(error.message));
+  await page.goto("/");
+  await page.locator("#hero-name").fill("ผู้ฟัง");
+  await page.getByRole("button", { name: "เริ่มเกมใหม่" }).click();
+  await expect(page.getByTestId("world-canvas")).toHaveAttribute("data-ready", "true", { timeout: 60_000 });
+  await page.evaluate(() => {
+    const save = JSON.parse(localStorage.getItem("wusia-world-v1")!);
+    save.state.currentSceneId = "qs_qw_hong_treasure_map_offer";
+    localStorage.setItem("wusia-world-v1", JSON.stringify(save));
+  });
+  for (const viewport of [{ width: 1000, height: 450 }, { width: 844, height: 390 }, { width: 390, height: 844 }]) {
+    await page.setViewportSize(viewport);
+    await page.reload();
+    const stage = page.getByTestId("dialog-stage");
+    await expect(stage.getByRole("heading", { name: "หลัวเฟย์หาว" })).toBeVisible();
+    await expect(stage.getByRole("button", { name: /รับภารกิจ/ })).toBeInViewport();
+    await expect.poll(() => page.evaluate(() => {
+      const panel = document.querySelector('[data-testid="dialog-stage"] [role="dialog"]')!.getBoundingClientRect();
+      const content = document.querySelector<HTMLElement>('[data-testid="dialog-stage"] [role="region"]')!;
+      return panel.height > innerHeight * 0.85 && content.scrollHeight - content.clientHeight <= 2;
+    })).toBe(true);
+    await page.screenshot({ path: `test-results/screenshots/quest-offer-${viewport.width}x${viewport.height}.png` });
+  }
+  expect(errors).toEqual([]);
+});
