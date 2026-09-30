@@ -123,7 +123,7 @@ test("battle stats stay open by touch and choices remain readable after rotation
   await expect(detail).not.toBeVisible();
   await expect(battle).toHaveAttribute("data-paused", "false");
   const actions = page.locator(".combat-action");
-  await expect(actions).toHaveCount(3);
+  await expect(actions).toHaveCount(2); // หมัดตรง + ถอยหนี
   for (const action of await actions.all()) {
     const bounds = await action.boundingBox();
     expect(bounds).not.toBeNull();

@@ -116,7 +116,10 @@ test("first errand leads to safe training, recovery, and an earned skill upgrade
   expect(trained.defeatedCounts.training_capital_apprentice).toBe(1);
   expect(trained.gold).toBe(30);
   expect(trained.wExp).toBe(70);
-  expect(trained.skillExp.basic_punch).toBe(20);
+  // 10 XP per punch landed; still short of the 50 needed to level on its own.
+  expect(trained.skillExp.basic_punch % 10).toBe(0);
+  expect(trained.skillExp.basic_punch).toBeGreaterThanOrEqual(20);
+  expect(trained.skillExp.basic_punch).toBeLessThan(50);
   expect(trained.currentHp).toBeGreaterThan(0);
   expect(trained.currentHp).toBeLessThanOrEqual(27);
 
@@ -138,11 +141,13 @@ test("first errand leads to safe training, recovery, and an earned skill upgrade
   expect((await state(page)).gold).toBe(30);
 
   await page.getByRole("navigation", { name: "เมนูเกม" }).getByRole("button", { name: "วิชา", exact: true }).click();
-  const upgrade = page.getByRole("button", { name: "เร่งด้วย w-exp (30)", exact: true });
+  // The w-exp top-up costs what the punch still lacks to reach level 2 (50 XP).
+  const upgradeCost = 50 - trained.skillExp.basic_punch;
+  const upgrade = page.getByRole("button", { name: `เร่งด้วย w-exp (${upgradeCost})`, exact: true });
   await expect(upgrade).toBeEnabled();
   await upgrade.click();
   await expect.poll(async () => (await state(page)).skillLevel.basic_punch).toBe(2);
-  expect((await state(page)).wExp).toBe(40);
+  expect((await state(page)).wExp).toBe(70 - upgradeCost);
   const payoff = page.getByRole("region", { name: "เลื่อนขั้น หมัดตรง สำเร็จ" });
   await expect(payoff).toBeVisible();
   await expect(payoff).toContainText("พลังท่า (BP)");
@@ -159,7 +164,7 @@ test("first errand leads to safe training, recovery, and an earned skill upgrade
   const upgraded = await state(page);
   expect(upgraded.skillLevel.basic_punch).toBe(2);
   expect(upgraded.skillExp.basic_punch).toBe(0);
-  expect(upgraded.wExp).toBe(40);
+  expect(upgraded.wExp).toBe(70 - upgradeCost);
   expect(upgraded.inventory).toMatchObject({ herb: 3, potion: 1 });
   expect(upgraded.defeatedCounts.training_capital_apprentice).toBe(1);
   expect(errors).toEqual([]);
