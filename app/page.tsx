@@ -5,6 +5,7 @@ import { WorldScreen } from "@/components/world/world-screen";
 import { QuestCompletionReceipt } from "@/components/world/quest-completion-receipt";
 import { MobileLandscape } from "@/components/mobile-landscape";
 import { initBattleBridge } from "@/lib/world/battle-bridge";
+import { SoundDirector } from "@/components/sound-director";
 
 // World page (`/`) — the main game. Setup / skill library / free battle sim
 // live in /debug as dev tools. The world owns its own player build (see
@@ -26,6 +27,7 @@ export default function HomePage() {
         </div>
         <WorldScreen />
         <QuestCompletionReceipt />
+        <SoundDirector />
       </main>
     </MobileLandscape>
   );

@@ -258,3 +258,13 @@ Requested by the user after an in-browser error report ("rewrite it to be Phaser
   "no actor after tick" (took down the page via the turn-order timeline). Due side now snaps to the threshold;
   regression check in `test:combat`.
 - วันที่ pill moved below the sundial so the dial's glyphs are not covered.
+
+## Wave 19: music and sound effects
+
+- Procedural soundtrack and SFX (no audio files): `lib/audio/songs.ts` (pentatonic scores), `engine.ts`
+  (synth instruments, reverb, sequencer), `cast-sfx.ts` (skill sounds from the VFX profile).
+- Music follows the screen (title / world / night / battle) with jingles for encounters, victory, defeat,
+  quest done and level up; coins, rest, travel and button ticks have small cues.
+- ♪ settings bubble (music / effects on-off + volume) in the top icon bar, battle header and title screen.
+- Tests: `bun run test:audio` (song structure, pentatonic leads), e2e `audio.spec.ts`. Offline renders of every
+  track had no clipping (peaks 0.13–0.41).

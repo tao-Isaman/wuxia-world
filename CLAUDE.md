@@ -142,6 +142,13 @@ Both scenes are Phaser 4 games, dynamically imported by `components/game/world-c
 - Pure helpers (no Phaser): `world-navigation.ts`, `world-placement.ts`, `world-footprints-data.ts`, `world-occlusion.ts`, `world-vignettes.ts`, `world-map-probe.ts`, `battle-background.ts`, `types.ts`.
 - Don't put Phaser objects in stores or saves; don't enable Phaser input (modal pause rules live in `worldInputBlocked`).
 
+### Audio (`lib/audio/`, procedural — no audio files)
+
+- **`songs.ts`** (pure) — music as note data, all pentatonic: `world` (D gong, 76 bpm, guzheng + dizi), `night` (slower, flute over sparse strings), `battle` (E yu, 138 bpm, taiko + bass-string ostinato + erhu), `title`, and jingles `victory` / `defeat` / `encounter` / `quest` / `levelup`. `phrase("A4:2 D5:2 …")` = melody shorthand in eighth notes. Tested by `bun run test:audio`.
+- **`engine.ts`** — Web Audio graph (music + sfx buses, generated hall reverb, compressor), synthesized instruments (Karplus–Strong zither/bass, breathy flute, bowed erhu, taiko, woodblock, gong, bell), a look-ahead sequencer (`playMusic` crossfades loops; `playJingle(track, returnTo)` plays once then hands back), SFX primitives (`swoosh` / `tone` / `thump` / `note`), `uiSound`, `renderTrack` (offline render for previews / level checks). Starts on the first tap or key (`unlockAudio`), sleeps when the tab is hidden. Settings persist in `localStorage["wuxia-audio-v1"]`; `<html data-audio / data-music>` expose state for tests.
+- **`cast-sfx.ts`** — skill sounds from the same `CastVfx` profile as the VFX (weapon shape, rarity layers, element accent); called by `battle-runtime.ts` at cast start / each hit / miss / support.
+- **UI** — `components/sound-director.tsx` (mounted in `app/page.tsx`) picks title / world / night / battle music and fires encounter, victory, defeat, quest, level-up and coin cues; `components/sound-button.tsx` (♪ in the top icon bar, battle header and title screen) opens a small bubble with music / effects switches and volumes.
+
 ### PWA (installable, offline)
 
 - `app/manifest.ts` → `/manifest.webmanifest` (fullscreen, any orientation, icons in `public/pwa/`, regenerate with `bun scripts/build-pwa-icons.ts`). `app/layout.tsx` exports `viewport` (`viewport-fit=cover` for `env(safe-area-inset-*)`) and Apple web-app metadata.
