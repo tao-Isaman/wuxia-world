@@ -11,7 +11,7 @@ Object.defineProperty(globalThis, "localStorage", { configurable: true, value: {
   removeItem: (key: string) => memory.delete(key),
 } });
 Object.defineProperty(globalThis, "window", { configurable: true, value: { localStorage: globalThis.localStorage } });
-const { useBattleStore } = await import("../store/battle-store");
+const { useBattleStore, isPlayerTurn } = await import("../store/battle-store");
 const { useWorldStore } = await import("../store/world-store");
 const { SCENES_BY_ID } = await import("../lib/world/data/scenes");
 
@@ -47,31 +47,22 @@ check("player names remain literal text in attack and victory logs", () => {
   assert.ok(state.log.every((entry) => !entry.txt.includes("<img")));
   assert.equal(context.names.A, named.name);
 });
-check("enemy turns require scene ticks, and a reset clears accrued delay", () => {
-  useBattleStore.getState().start(build, build);
-  useBattleStore.setState({ state: { ...useBattleStore.getState().state!, phase: "enemy" } });
-  for (let i = 0; i < 3; i++) useBattleStore.getState().tick(100);
-  assert.equal(useBattleStore.getState().state!.turn, 0);
+check("enemy turns wait for step(), and a reset clears the battle", () => {
+  useBattleStore.getState().start(build, { ...build, stats: { ...build.stats, AGI: 40 } });
+  assert.equal(useBattleStore.getState().state!.turn, 0, "nothing happens until the renderer steps");
+  useBattleStore.getState().step();
+  const first = useBattleStore.getState().state!;
+  assert.ok(first.activeId !== null || first.events.length > 0, "one step begins the fast enemy's turn");
   useBattleStore.getState().reset();
-  useBattleStore.getState().start(build, build);
-  useBattleStore.setState({ state: { ...useBattleStore.getState().state!, phase: "enemy" } });
-  useBattleStore.getState().tick(100);
-  assert.equal(useBattleStore.getState().state!.turn, 0);
-  for (let i = 0; i < 3; i++) useBattleStore.getState().tick(100);
-  assert.equal(useBattleStore.getState().state!.turn, 1);
+  assert.equal(useBattleStore.getState().state, null);
 });
-check("invalid and background-sized deltas cannot skip the combat clock", () => {
-  useBattleStore.getState().start(build, build);
-  useBattleStore.getState().tick(Number.NaN);
-  useBattleStore.getState().tick(-100);
-  assert.equal(useBattleStore.getState().state!.gA, 0);
-  useBattleStore.getState().tick(100_000);
-  assert.ok(useBattleStore.getState().state!.gA < 100);
-});
-check("cast holds prevent enemy actions until visual feedback completes", () => {
-  useBattleStore.setState({ state: { ...useBattleStore.getState().state!, phase: "enemy", castEndsAt: Date.now() + 10_000 } });
-  for (let i = 0; i < 10; i++) useBattleStore.getState().tick(100);
-  assert.equal(useBattleStore.getState().state!.turn, 0);
+check("a waiting player turn cannot be skipped by stepping", () => {
+  useBattleStore.getState().start({ ...build, stats: { ...build.stats, AGI: 40 } }, build);
+  useBattleStore.getState().stepAll();
+  const waiting = useBattleStore.getState().state!;
+  assert.equal(isPlayerTurn(waiting, false), true);
+  for (let i = 0; i < 10; i++) useBattleStore.getState().step();
+  assert.equal(useBattleStore.getState().state, waiting);
   useBattleStore.getState().reset();
 });
 

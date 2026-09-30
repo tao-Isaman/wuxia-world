@@ -173,10 +173,12 @@ export const OPPONENTS: readonly OpponentDef[] = [
   { id: "wild_boar", name: "หมูป่า", ti: 1, category: "beast", drops: DROPS_T1,
     build: () => build("หมูป่า", 1, { stats: { STR: 4, VIT: 4 } }) },
   { id: "wild_wolf", name: "หมาป่า", ti: 1, category: "beast", drops: DROPS_T1,
+    pack: { opponentId: "wild_dog", count: 1 },
     build: () => build("หมาป่า", 1, { stats: { AGI: 5, DEX: 4 } }) },
   { id: "road_bandit", name: "โจรเส้นทาง", ti: 1, category: "human", drops: DROPS_T1,
     build: () => build("โจรเส้นทาง", 1, { skillIds: ["ns1"] }) },
   { id: "river_pirate", name: "โจรสลัดน้ำ", ti: 1, category: "human",
+    pack: { opponentId: "thug", count: 1 },
     drops: [...DROPS_T1, { itemId: "fish_carp", weight: 4 }],
     build: () => build("โจรสลัดน้ำ", 1, { stats: { STR: 4, AGI: 3 }, skillIds: ["nc8"] }) },
   { id: "desert_marauder", name: "นักรบทะเลทราย", ti: 1, category: "human", drops: DROPS_T1,
@@ -198,6 +200,7 @@ export const OPPONENTS: readonly OpponentDef[] = [
     drops: [...DROPS_T2, { itemId: "scorpion_venom", weight: 2 }],
     build: () => build("ตะขาบยักษ์", 2, { stats: { DEX: 5, VIT: 5 } }) },
   { id: "bandit_chief", name: "หัวหน้าโจร", ti: 2, category: "human", drops: DROPS_T2,
+    pack: { opponentId: "bandit", count: 2 },
     build: () => build("หัวหน้าโจร", 2, { skillIds: ["nc7", "nm2"] }) },
   { id: "iron_palm_thug", name: "นักเลงฝ่ามือเหล็ก", ti: 2, category: "human", drops: DROPS_T2,
     build: () => build("นักเลงฝ่ามือเหล็ก", 2, { stats: { STR: 6 }, skillIds: ["nc4", "nd7"] }) },
@@ -290,6 +293,7 @@ export const OPPONENTS: readonly OpponentDef[] = [
   { id: "hunt_wild_dog", name: "สุนัขป่า", ti: 1, category: "beast", drops: DROPS_T1,
     build: () => build("สุนัขป่า", 1, { skillIds: ["bst_bite", "bst_pounce"] }) },
   { id: "hunt_boar", name: "หมูป่าฝูง", ti: 1, category: "beast",
+    pack: { opponentId: "hunt_boar", count: 1 },
     drops: [...DROPS_T1, { itemId: "raw_meat", weight: 4 }],
     build: () => build("หมูป่าฝูง", 1, { stats: { VIT: 4 }, skillIds: ["bst_charge", "bst_bite"] }) },
   { id: "hunt_jungle_cat", name: "เสือดาวป่า", ti: 1, category: "beast",
@@ -301,6 +305,7 @@ export const OPPONENTS: readonly OpponentDef[] = [
   // (mountain_tiger, brown_bear) — they carry no stat overrides while
   // those carry +1–2 STR/AGI/VIT.
   { id: "hunt_alpha_wolf", name: "หมาป่าจ่าฝูง", ti: 2, category: "beast", drops: DROPS_T2,
+    pack: { opponentId: "hunt_wild_dog", count: 2 },
     build: () => build("หมาป่าจ่าฝูง", 2, { skillIds: ["bst_pounce", "bst_roar"] }) },
   { id: "hunt_giant_bear", name: "หมีหิน", ti: 2, category: "beast",
     drops: [...DROPS_T2, { itemId: "bear_claw", weight: 1 }],
@@ -1949,6 +1954,7 @@ export const OPPONENTS: readonly OpponentDef[] = [
   { id: "law_imperial_guard", name: "องครักษ์หลวง", ti: 3, category: "human", drops: DROPS_T3,
     build: () => build("องครักษ์หลวง", 3, { stats: { STR: 12, VIT: 10, DEF: 8, DEX: 6 }, skillIds: ["ne2", "nc2", "basic_punch"] }) },
   { id: "law_bounty_hunter", name: "นักล่าค่าหัว", ti: 3, category: "human", drops: DROPS_T3,
+    pack: { opponentId: "law_constable", count: 1 },
     build: () => build("นักล่าค่าหัว", 3, { stats: { AGI: 12, DEX: 12, STR: 8, LUK: 6 }, skillIds: ["jy_chain", "ne4", "basic_punch"] }) },
 ];
 

@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
-import { makeContext, makeInitialState, getNextTurn, decrementCooldowns, resolveSkill, calcSkillDamage } from "../lib/game/battle";
-import { getSkill } from "../lib/game";
-import { resolveCombatAction } from "../lib/game/combat-actions";
+import { makeContext, makeInitialState, getNextTurn, decrementCooldowns, resolveSkill } from "../lib/game/battle";
+import { activeUnit, manhattan, reachableFor } from "../lib/game/grid";
 import { CAPITAL_TRAINING_OPPONENT_ID, CAPITAL_TRAINING_SCENE_ID } from "../lib/world/data/capital-training";
 import { getOpponent, setOpponentStatScale } from "../lib/world/data/opponents";
 import { FIGHT_EVENTS } from "../lib/world/data/random-events";
@@ -17,6 +16,7 @@ Object.defineProperty(globalThis, "localStorage", { configurable: true, value: {
 Object.defineProperty(globalThis, "window", { configurable: true, value: { localStorage: globalThis.localStorage } });
 const { useWorldStore } = await import("../store/world-store");
 const { useBattleStore } = await import("../store/battle-store");
+const { ensureBattleStarted } = await import("../lib/world/battle-bridge");
 const originalRandom = Math.random;
 Math.random = () => 0.5;
 
@@ -50,16 +50,38 @@ try {
   const player = useWorldStore.getState().playerBuild!;
   const enemy = opponent.build();
   const ctx = makeContext(player, enemy);
-  const battle = makeInitialState(player, enemy);
-  // The fight tab offers skills and ถอยหนี only: plain punches must win it.
-  while (!battle.winner && battle.turn < 30) {
-    const side = getNextTurn(battle);
-    decrementCooldowns(battle, side);
-    resolveSkill(battle, side, 0, "basic_punch", ctx);
+  const duel = makeInitialState(player, enemy);
+  // Engine level (battle.ts 1v1): plain punches must win it.
+  while (!duel.winner && duel.turn < 30) {
+    const side = getNextTurn(duel);
+    decrementCooldowns(duel, side);
+    resolveSkill(duel, side, 0, "basic_punch", ctx);
   }
-  assert.equal(battle.winner, "A", "unmodified starter can win with basic punches alone");
+  assert.equal(duel.winner, "A", "unmodified starter can win with basic punches alone");
+  // Grid battle through the bridge: the player waits for the novice to
+  // close in, then steps up and punches first.
+  ensureBattleStarted();
+  const store = useBattleStore.getState;
+  for (let i = 0; i < 200 && store().state!.phase !== "over"; i++) {
+    store().stepAll();
+    const s = store().state!;
+    if (s.phase === "over") break;
+    const me = activeUnit(s)!;
+    let done = false;
+    for (const path of reachableFor(s, me.id).values()) {
+      const cell = path[path.length - 1];
+      const foe = s.units.find((u) => u.alive && u.team === "enemy" && manhattan(u.pos, cell) === 1);
+      if (!foe) continue;
+      if (cell.x !== me.pos.x || cell.y !== me.pos.y) assert.equal(store().move(cell), true);
+      assert.equal(store().act(0, foe.pos), true);
+      done = true;
+      break;
+    }
+    if (!done) assert.equal(store().wait(), true);
+  }
+  const battle = store().state!;
+  assert.equal(battle.winner, "A", "starter wins the grid duel with basic punches alone");
   assert.ok(battle.hA > 0);
-  useBattleStore.setState({ state: battle, ctx, builds: { A: player, B: enemy } });
   useWorldStore.getState().acknowledgeBattleResult();
   const won = useWorldStore.getState();
   assert.equal(won.currentSceneId, "city_capital");
@@ -81,11 +103,11 @@ try {
   assert.equal(clinicPreparation(useWorldStore.getState()), null, "one real upgrade ends the optional guidance");
   useWorldStore.getState().acknowledgeBattleResult();
   assert.equal(useWorldStore.getState().wExp, 70 - upgrade.cost, "acknowledging twice never repeats rewards");
-  console.log(`PASS fixed novice duel: Guard → riposte wins in ${battle.turn} turns at ${battle.hA} HP; ${battle.skillUses.A.basic_punch} punches; upgrade costs ${upgrade.cost} W-EXP`);
+  console.log(`PASS fixed novice duel: waiting, then punching first wins the grid duel in ${battle.turn} turns at ${battle.hA} HP; ${battle.skillUses.A.basic_punch} punches; upgrade costs ${upgrade.cost} W-EXP`);
 
   newTrainee();
   useWorldStore.getState().gotoScene(CAPITAL_TRAINING_SCENE_ID);
-  useBattleStore.getState().start(player, enemy);
+  ensureBattleStarted();
   useBattleStore.setState({ state: { ...useBattleStore.getState().state!, hA: 0, mpA: 0, winner: "B", phase: "over" } });
   useWorldStore.getState().acknowledgeBattleResult();
   const lost = useWorldStore.getState();

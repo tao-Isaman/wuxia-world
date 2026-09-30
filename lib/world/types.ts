@@ -745,6 +745,11 @@ export interface OpponentDef {
   // Drop table — weighted item rolls when the player wins. Two picks for
   // tier 0/1, three for tier 2/3, four for tier 4 (handled in store).
   drops?: readonly ResourceYield[];
+  // Grid battles only: extra enemies that fight alongside this one (a gang
+  // leader's thugs, an alpha's wolves). `count` ≤ 2; members are the same
+  // tier or weaker. Spawned by the battle bridge; only the primary foe's
+  // drops roll, but each fallen member counts in `defeatedCounts`.
+  pack?: { opponentId: string; count: number };
   build: () => CharacterBuild;
 }
 
