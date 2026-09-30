@@ -2,7 +2,7 @@
 
 # Martial arts and equipment
 
-178 move skills (`lib/game/data/skills.ts`), 124 inner arts (`lib/game/data/arts.ts`) and 76 pieces of equipment (`lib/game/data/equipment.ts`).
+178 move skills (`lib/game/data/skills.ts`), 123 inner arts (`lib/game/data/arts.ts`, not counting the `none` placeholder) and 76 pieces of equipment (`lib/game/data/equipment.ts`).
 
 Move skills per tier: T0 พื้นฐาน: 32 · T1 ขั้นกลาง: 37 · T2 ขั้นสูง: 42 · T3 ลับ: 41 · T4 เฉพาะ: 26.
 
@@ -508,12 +508,6 @@ Grid column: the skill's range and area on the tactics board (`skillGrid` / `art
 | `dongxuan` | ตงซวนเซินกง | T4 เฉพาะ | กลืนชีพ (drain, 40 MP, cd 4) | ระยะ 1–3 · วงรัศมี 1 | use_act 100% → stack_atk | 15 / 55 | yin, internal |
 | `khbt` | คัมภีร์ทานตะวัน | T5 ปรมัตถ์ | ทานตะวันพลิกฟ้า (buff_spd, 60 MP, cd 6) | ตนเอง | on_crit 100% → buff_spd_cri | 30 / 50 | balance, soft |
 | `kuyt` | วิชาเก้าเอี้ยง | T5 ปรมัตถ์ | ฟื้นพลังเก้าเอี้ยง (heal_full_cleanse, 50 MP, cd 6) | ตนเอง | hit_recv 100% → buff_reflect | 40 / 40 | balance, internal |
-
-###  (1)
-
-| Id | Name | Tier | Active | Grid | Passive | HP/MP per level | Types |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| `none` | — ไม่มี — | T0 พื้นฐาน | — | — | — | 0 / 0 | — |
 
 ## Equipment by slot
 

@@ -53,6 +53,8 @@ const locName = (id: string) => { const s = getScene(id); return s?.kind === "lo
 const npcName = (id: string | undefined) => (id ? getNpc(id)?.name ?? id : "—");
 const skillName = (id: string) => SKILLS.find((s) => s.id === id)?.n ?? id;
 const artName = (id: string) => ARTS.find((a) => a.id === id)?.n ?? id;
+// ARTS[0] is the "none" placeholder (getArt's fallback), not a learnable art.
+const LEARNABLE_ARTS = ARTS.filter((a) => a.id !== "none");
 
 const REGION_LABEL: Record<string, string> = {
   heartland: "heartland", north: "north", south: "south", west: "west", east: "east", jianghu_wild: "wild", global: "global",
@@ -292,13 +294,13 @@ const pages: Record<string, string> = {};
 {
   let md = "# Martial arts and equipment\n\n";
   const tiers = count(SKILLS, (s) => tierName(s.ti));
-  md += `${SKILLS.length} move skills (\`lib/game/data/skills.ts\`), ${ARTS.length} inner arts (\`lib/game/data/arts.ts\`) and ${EQUIPMENT.length} pieces of equipment (\`lib/game/data/equipment.ts\`).\n\n`;
+  md += `${SKILLS.length} move skills (\`lib/game/data/skills.ts\`), ${LEARNABLE_ARTS.length} inner arts (\`lib/game/data/arts.ts\`, not counting the \`none\` placeholder) and ${EQUIPMENT.length} pieces of equipment (\`lib/game/data/equipment.ts\`).\n\n`;
   md += "Move skills per tier: " + Object.entries(tiers).map(([k, v]) => `${k}: ${v}`).join(" · ") + ".\n\n";
   md += "Grid column: the skill's range and area on the tactics board (`skillGrid` / `artGrid` + `describeGrid` in `lib/game/grid/skill-grid.ts`). Weapon families: " +
     Object.entries(WEAPON_FAMILY_LABEL).map(([k, v]) => `${code(k)} ${esc(v)}`).join(" · ") + ".\n\n";
   md += "## Contents\n\n- [Move skills by sect](#move-skills-by-sect)\n- [Inner arts by sect](#inner-arts-by-sect)\n- [Equipment by slot](#equipment-by-slot)\n\n";
   const sectOrder = (sc: string) => { const i = SECT_ORDER.indexOf(sc); return i < 0 ? 999 : i; };
-  const sects = [...new Set([...SKILLS.map((s) => s.sc), ...ARTS.map((a) => a.sc)])].sort((a, b) => sectOrder(a) - sectOrder(b));
+  const sects = [...new Set([...SKILLS.map((s) => s.sc), ...LEARNABLE_ARTS.map((a) => a.sc)])].sort((a, b) => sectOrder(a) - sectOrder(b));
   md += "## Move skills by sect\n\n";
   for (const sc of sects) {
     const list = SKILLS.filter((s) => s.sc === sc).sort((a, b) => a.ti - b.ti);
@@ -311,7 +313,7 @@ const pages: Record<string, string> = {};
   }
   md += "## Inner arts by sect\n\n";
   for (const sc of sects) {
-    const list = ARTS.filter((a) => a.sc === sc).sort((a, b) => a.ti - b.ti);
+    const list = LEARNABLE_ARTS.filter((a) => a.sc === sc).sort((a, b) => a.ti - b.ti);
     if (!list.length) continue;
     md += `### ${esc(sc)} (${list.length})\n\n`;
     md += table(["Id", "Name", "Tier", "Active", "Grid", "Passive", "HP/MP per level", "Types"], list.map((a: Art) => {
@@ -459,7 +461,7 @@ const pages: Record<string, string> = {};
     ["Painted maps (hand-placed / auto layout)", `${locations.filter((l) => LOCATION_MAPS[l.id]).length} / ${locations.filter((l) => !LOCATION_MAPS[l.id] && AUTO_MAP_IDS.has(l.id)).length}`],
     ["Sect locations / memberships", `${locations.filter((l) => l.id.startsWith("sect_")).length} / ${Object.keys(SECT_MEMBERSHIPS).length}`],
     ["NPCs", NPCS.length], ["Quests", QUESTS.length], ["Quest stages", QUESTS.reduce((n, q) => n + q.stages.length, 0)],
-    ["Move skills / inner arts / equipment", `${SKILLS.length} / ${ARTS.length} / ${EQUIPMENT.length}`],
+    ["Move skills / inner arts / equipment", `${SKILLS.length} / ${LEARNABLE_ARTS.length} / ${EQUIPMENT.length}`],
     ["Items", ITEMS.length], ["Shops / martial halls / artisans", `${SHOPS.length} / ${SECT_HALLS.length} / ${ARTISANS.length}`],
     ["Recipes", RECIPES.length], ["Gathering and hunting nodes", RESOURCES.length], ["Life skills", LIFE_SKILL_KEYS.length],
     ["Opponents", OPPONENTS.length], ["Random fight / treasure / meeting events", `${FIGHT_EVENTS.length} / ${TREASURE_EVENTS.length} / ${MEET_EVENTS.length}`],

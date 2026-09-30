@@ -28,7 +28,7 @@ Generated lists of everything in the game, taken straight from the data tables. 
 | NPCs | 157 |
 | Quests | 276 |
 | Quest stages | 657 |
-| Move skills / inner arts / equipment | 178 / 124 / 76 |
+| Move skills / inner arts / equipment | 178 / 123 / 76 |
 | Items | 126 |
 | Shops / martial halls / artisans | 19 / 7 / 49 |
 | Recipes | 32 |
