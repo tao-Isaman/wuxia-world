@@ -302,3 +302,11 @@ Requested by the user after an in-browser error report ("rewrite it to be Phaser
 - Top-left party card removed; icons sit in the corner; wanted / sentence chips float top-centre.
 - Tests: `test:walk`, law checks for the jail map, combat retreat check, e2e jail map + retreat; opening spec
   now wins the tutorial bout with punches.
+
+## Wave 23: item / kill quests always hand in
+
+- Bug: fetch quests (e.g. แร่เหล็กสำหรับตีเหล็ก) counted only items gained after accepting while the quest log
+  showed the bag total — 10/10 in the log, stage never advanced, no hand-in. Item stages now count what the
+  player holds; kill stages keep "since accepting" and the log now shows that same number.
+- The store re-checks quest progress after any inventory / kill change (subscription), not only on scene moves.
+- `scripts/test-quest-turnins.ts` (in `test:quests`): all 156 item/kill quests accept → progress → hand in → done.

@@ -627,10 +627,12 @@ function evaluateAutoAdvance(
       return cur - snap >= want;
     }
     case "hasItem": {
+      // Items count by what the player holds now, snapshot or not: a fetch
+      // quest is "bring me 10 ore", and ore already in the bag is still ore.
+      // (Counting only post-accept gains left players holding 10/10 in the
+      // quest log with a quest that never advanced.)
       const want = cond.count ?? 1;
-      const cur = state.inventory[cond.itemId] ?? 0;
-      const snap = q.acceptedHasItemAt?.[cond.itemId] ?? 0;
-      return cur - snap >= want;
+      return (state.inventory[cond.itemId] ?? 0) >= want;
     }
     case "and":
       return cond.all.every((sub) => evaluateAutoAdvance(state, sub, q));
@@ -648,8 +650,7 @@ function evaluateAutoAdvance(
 // store's finishQuestNow) so popup turn-ins clean up gathered items.
 // Scene-driven completes still use explicit `takeItem` effects — this
 // helper only fires for engine-completed quests, so no double-consume.
-// Each itemId consumes `min(count, current - snapshot)` so the player
-// keeps any pre-existing stash from before they accepted the quest.
+// Each itemId consumes `min(count, current)` — the delivery itself.
 export function consumeQuestAutoItems(
   state: WorldStateData,
   def: import("./types").QuestDef,
@@ -659,10 +660,10 @@ export function consumeQuestAutoItems(
     if (!stage.autoAdvance) continue;
     walkConditions(stage.autoAdvance, (c) => {
       if (c.t !== "hasItem") return;
+      void q;
       const want = c.count ?? 1;
       const cur = state.inventory[c.itemId] ?? 0;
-      const snap = q.acceptedHasItemAt?.[c.itemId] ?? 0;
-      const take = Math.min(want, cur - snap, cur);
+      const take = Math.min(want, cur);
       if (take <= 0) return;
       state.inventory[c.itemId] = cur - take;
       if (state.inventory[c.itemId] === 0) delete state.inventory[c.itemId];
@@ -845,6 +846,8 @@ export function describeQuestCondition(
   state: WorldStateData,
   c: Condition,
   depth = 0,
+  /** The quest being described: kill counts then read "since accepted", like the evaluator. */
+  quest?: import("./types").QuestState,
 ): QuestProgressLine[] {
   if (depth > 4) return []; // Safety: avoid runaway recursion on weird trees.
   switch (c.t) {
@@ -860,7 +863,8 @@ export function describeQuestCondition(
       }];
     }
     case "defeatedOpponent": {
-      const have = state.defeatedCounts[c.opponentId] ?? 0;
+      const since = quest?.acceptedDefeatedAt?.[c.opponentId] ?? 0;
+      const have = Math.max(0, (state.defeatedCounts[c.opponentId] ?? 0) - since);
       const need = c.count ?? 1;
       const def = getOpponent(c.opponentId);
       return [{
@@ -965,14 +969,14 @@ export function describeQuestCondition(
       }];
     }
     case "and":
-      return c.all.flatMap((sub) => describeQuestCondition(state, sub, depth + 1));
+      return c.all.flatMap((sub) => describeQuestCondition(state, sub, depth + 1, quest));
     case "or": {
       // OR — show every alternative; the stage progresses on any-done.
-      const lines = c.any.flatMap((sub) => describeQuestCondition(state, sub, depth + 1));
+      const lines = c.any.flatMap((sub) => describeQuestCondition(state, sub, depth + 1, quest));
       return lines.map((l) => ({ ...l, label: `(หรือ) ${l.label}` }));
     }
     case "not": {
-      const inner = describeQuestCondition(state, c.of, depth + 1);
+      const inner = describeQuestCondition(state, c.of, depth + 1, quest);
       // Flip done: NOT is satisfied when inner is NOT done.
       return inner.map((l) => ({ ...l, done: !l.done, negated: true }));
     }

@@ -3000,5 +3000,21 @@ export const useWorldStore = create<WorldStore>()(
   ),
 );
 
+// Quest stages waiting on items or kills re-check after ANY change to the bag
+// or the kill tally, whichever action caused it (shop, craft, loot, gift, a
+// scene effect…), so "10/10 in the log but the quest never advanced" can't
+// happen. Only writes back when a stage actually moved.
+useWorldStore.subscribe((s, prev) => {
+  if (!s.hasGame || (s.inventory === prev.inventory && s.defeatedCounts === prev.defeatedCounts)) return;
+  const draft = draftFrom(s);
+  draft.quests = Object.fromEntries(Object.entries(s.quests).map(([id, q]) => [id, { ...q }]));
+  tickQuestProgress(draft);
+  const moved = Object.values(draft.quests).some((q) => {
+    const before = s.quests[q.id];
+    return !before || before.stage !== q.stage || before.status !== q.status;
+  });
+  if (moved) useWorldStore.setState({ ...draft });
+});
+
 // Re-export helpers commonly used alongside the store.
 export { getQuestStatus };
