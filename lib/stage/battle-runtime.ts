@@ -1,10 +1,12 @@
 import * as Phaser from "phaser";
 import { useBattleStore } from "@/store/battle-store";
-import { SKILLS, type BattleState, type Side } from "@/lib/game";
+import type { BattleState, Side } from "@/lib/game";
 import { CHARACTER_CLIPS, CHARACTER_FEET_Y, CHARACTER_FRAME_SIZE, type CharacterId, type CharacterMotion } from "@/lib/characters/catalog";
 import { loadCharacterAtlas } from "@/lib/characters/sheet";
 import { BATTLE_BACKGROUNDS, type BattleBackground } from "./battle-background";
 import { addGridFrames, canvasTexture, createStage, type Stage } from "./phaser-stage";
+import { castVfx, type CastVfx } from "./cast-vfx";
+import { createBattleVfx, type BattleVfx } from "./battle-vfx";
 
 const WIDTH = 768;
 const HEIGHT = 432;
@@ -91,7 +93,10 @@ export function createBattleRuntime(parent: HTMLElement, options: BattleRuntimeO
   let textSerial = 0;
   let viewWidth = WIDTH;
   let viewHeight = HEIGHT;
-  let activeCast: { cast: Cast; started: number; nextHit: number; duration: number; support: boolean } | null = null;
+  let activeCast: { cast: Cast; started: number; nextHit: number; duration: number; support: boolean; vfx: CastVfx } | null = null;
+  let vfx: BattleVfx | undefined;
+  let shakeAmp = 1.6;
+  let peakParticles = 0;
   let label: { item: Phaser.GameObjects.Image; key: string; born: number; until: number } | null = null;
   const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
   let reduced = motionPreference.matches;
@@ -132,6 +137,7 @@ export function createBattleRuntime(parent: HTMLElement, options: BattleRuntimeO
     destroyed = true;
     observer?.disconnect();
     motionPreference.removeEventListener("change", onMotionChange);
+    vfx?.destroy();
     stage.destroy();
   }
 
@@ -180,20 +186,6 @@ export function createBattleRuntime(parent: HTMLElement, options: BattleRuntimeO
   parent.dataset.impactCount = "0";
   parent.dataset.castSeq = "-1";
 
-  /** A filled ring sector in unit space (radius 1), y down; scale it to size. */
-  function ring(inner: number, start: number, length: number, color: number, depth: number, segments = 48) {
-    const graphics = scene!.add.graphics().setDepth(depth);
-    graphics.fillStyle(color, 1);
-    for (let n = 0; n < segments; n++) {
-      const a = start + length * n / segments, b = start + length * (n + 1) / segments;
-      // Authored with y up (as the arcs were designed); flipped to screen space.
-      const outerA = [Math.cos(a), -Math.sin(a)], outerB = [Math.cos(b), -Math.sin(b)];
-      const innerA = [outerA[0] * inner, outerA[1] * inner], innerB = [outerB[0] * inner, outerB[1] * inner];
-      graphics.fillTriangle(outerA[0], outerA[1], outerB[0], outerB[1], innerB[0], innerB[1]);
-      graphics.fillTriangle(outerA[0], outerA[1], innerB[0], innerB[1], innerA[0], innerA[1]);
-    }
-    return graphics;
-  }
   function textImage(text: string, color: string, size: number, banner = false) {
     const canvas = document.createElement("canvas");
     const context = canvas.getContext("2d");
@@ -261,7 +253,16 @@ export function createBattleRuntime(parent: HTMLElement, options: BattleRuntimeO
     castSequence = cast.seq;
     parent.dataset.castSeq = String(cast.seq);
     activeCast = { cast, started: elapsed, nextHit: 0, duration: HIT_DELAY + cast.hits * HIT_GAP + 500,
-      support: cast.hitDamages.every((damage) => damage === 0) && !cast.hitMisses.some(Boolean) };
+      support: cast.hitDamages.every((damage) => damage === 0) && !cast.hitMisses.some(Boolean), vfx: castVfx(cast) };
+    parent.dataset.vfxTier = String(activeCast.vfx.tier);
+    parent.dataset.vfxShape = activeCast.vfx.shape;
+    parent.dataset.vfxElement = activeCast.vfx.element;
+    if (!reduced && !activeCast.support && vfx) {
+      const side = cast.side === "A" ? 0 : 1;
+      const caster = fighters[side], target = fighters[1 - side];
+      vfx.cast(activeCast.vfx, chest(caster), chest(target), side ? -1 : 1,
+        cast.hitDamages.map((_, index) => HIT_DELAY + index * HIT_GAP), elapsed, activeCast.duration);
+    }
     options.onCastProgress?.({ seq: cast.seq, hits: 0, complete: false });
     if (label) { label.item.destroy(); scene?.textures.remove(label.key); }
     const colors = ["#f7edcf", "#b7e9cc", "#abd3ed", "#e3bcec", "#f4cc91"];
@@ -299,33 +300,27 @@ export function createBattleRuntime(parent: HTMLElement, options: BattleRuntimeO
     parent.dataset.impactCount = String(impactCount);
     parent.dataset.lastImpact = `${cast.seq}:${index}`;
     options.onCastProgress?.({ seq: cast.seq, hits: index + 1, complete: false });
-    if (missed) return;
+    if (missed) {
+      if (!reduced && vfx && activeCast) vfx.whiff(activeCast.vfx, { x, y }, attackerSide ? -1 : 1, index, elapsed);
+      return;
+    }
     if (damage > 0) {
       target.hurtUntil = elapsed + 180;
       target.flashUntil = elapsed + 70;
       if (!reduced) shakeUntil = elapsed + (critical ? 85 : 55);
     }
-    if (reduced) return;
+    if (reduced || !vfx || !activeCast) return;
+    const profile = activeCast.vfx;
     if (support) {
-      const aura = ring(0.96, 0, Math.PI * 2, 0xbbe8c2, 25, 64);
-      addEffect(aura, true, x, GROUND - 38, 34, 48, 480, { grow: 0.7, opacity: 0.8 });
+      vfx.support(profile, { x: target.x, y: GROUND }, target.height * 0.8, elapsed);
       return;
     }
-    const unarmed = fighters[attackerSide].beast || SKILLS.find((skill) => skill.n === cast.name)?.w === "fist";
-    const color2 = critical ? 0xffe4a0 : 0xf2f0d0;
-    const slash = unarmed ? ring(0.96, 0, Math.PI * 2, color2, 25, 64) : ring(0.89, -Math.PI * 0.64, Math.PI * 1.28, color2, 25, 36);
-    // Screen space is y-down, so the authored (y-up) rotation flips sign.
-    slash.setRotation(-(attackerSide ? Math.PI + 0.32 : -0.32));
-    addEffect(slash, true, x, y, unarmed ? 12 : critical ? 46 : 34, unarmed ? 16 : critical ? 69 : 57, 230,
-      { grow: unarmed ? 1.2 : 0.25, spin: attackerSide ? -1.9 : 1.9, opacity: 0.94 });
-    const count = critical ? 11 : 7;
-    for (let n = 0; n < count; n++) {
-      const spark = scene!.add.rectangle(0, 0, 1, 1, n % 3 === 0 ? 0xc56b43 : 0xffdc95).setDepth(30);
-      const angle = n * 2.39996 + index;
-      const speed = 50 + n * 12;
-      addEffect(spark, false, x, y, n % 3 === 0 ? 4 : 2, n % 3 === 0 ? 2 : 3, 260 + n * 14,
-        { vx: Math.cos(angle) * speed, vy: -Math.sin(angle) * speed, spin: n % 2 ? 2 : -2 });
-    }
+    if (damage > 0) { shakeAmp = 1.6 + profile.tier * 0.6 + (critical ? 1 : 0); shakeUntil = elapsed + (critical ? 85 : 55) + profile.tier * 25; }
+    vfx.impact(profile, { x, y }, chest(fighters[attackerSide]), attackerSide ? -1 : 1, index, critical, elapsed);
+  }
+  /** Mid-torso of a fighter, where qi gathers and strikes land. */
+  function chest(fighter: Fighter) {
+    return { x: fighter.x, y: GROUND - fighter.height * (fighter.beast ? 0.38 : 0.47) };
   }
   function updateFighter(fighter: Fighter, index: number, state: BattleState) {
     const side: Side = index ? "B" : "A";
@@ -338,7 +333,8 @@ export function createBattleRuntime(parent: HTMLElement, options: BattleRuntimeO
     else if (fighter.hurtUntil > elapsed) motion = "hurt";
     else if (activeCast?.cast.side === side && age < lastImpact + 280) {
       motion = activeCast.support ? "guard" : "attack";
-      if (!reduced && !activeCast.support) {
+      const ranged = activeCast.vfx.shape === "projectile" || activeCast.vfx.shape === "wave" || activeCast.vfx.shape === "orb";
+      if (!reduced && !activeCast.support && !ranged) {
         const approach = Math.min(1, Math.max(0, (age - 70) / 200));
         const retreat = Math.min(1, Math.max(0, (age - lastImpact - 65) / 220));
         const target = fighters[1 - index];
@@ -422,7 +418,12 @@ export function createBattleRuntime(parent: HTMLElement, options: BattleRuntimeO
         label.item.setAlpha(Math.min(1, Math.max(0, (label.until - elapsed) / 180)));
         if (elapsed >= label.until) { label.item.destroy(); scene?.textures.remove(label.key); label = null; }
       }
-      placeCamera(!reduced && elapsed < shakeUntil ? Math.sin(elapsed * 0.13) * 1.6 : 0);
+      if (vfx) {
+        vfx.update(elapsed);
+        const live = vfx.count();
+        if (live > peakParticles) { peakParticles = live; parent.dataset.vfxPeak = String(live); }
+      }
+      placeCamera(!reduced && elapsed < shakeUntil ? Math.sin(elapsed * 0.13) * shakeAmp : 0);
     } catch (error) { fail(error); }
   }
 
@@ -485,6 +486,7 @@ export function createBattleRuntime(parent: HTMLElement, options: BattleRuntimeO
       setFrame(fighter, frame, index);
       image.setPosition(baseX, GROUND - (feet - 0.5) * height).setDisplaySize(width, height);
     });
+    vfx = createBattleVfx(scene, () => ({ left: (WIDTH - viewWidth) / 2, top: HEIGHT - viewHeight, width: viewWidth, height: viewHeight }));
     ready = true;
     resize();
     options.onReady();

@@ -118,11 +118,11 @@
   .hud-gauge-track { height: 6px; }
   .hud-gauge small { font-size: 11px; }
   .sundial { width: 62px; height: 62px; }
-  .hud-iconbar { top: calc(max(6px, env(safe-area-inset-top)) + 88px); left: max(6px, env(safe-area-inset-left)); max-width: calc(100% - 12px); gap: 4px; }
+  .hud-iconbar { top: calc(max(6px, env(safe-area-inset-top)) + 96px); left: max(6px, env(safe-area-inset-left)); max-width: calc(100% - 12px); gap: 4px; }
   .hud-icon { width: 43px; height: 48px; border-radius: 9px; }
   .hud-icon img { width: 22px; height: 22px; }
   .hud-icon-label { font-size: 10px; }
-  .journey-extras { top: 146px !important; right: 8px !important; }
+  .journey-extras { top: 154px !important; right: 8px !important; }
   .rest-quick { right: max(10px, env(safe-area-inset-right)); bottom: max(10px, env(safe-area-inset-bottom)); }
   .rest-quick-button { width: 54px; height: 54px; }
   .action-prompt { right: 10px; bottom: calc(max(10px, env(safe-area-inset-bottom)) + 64px); }
