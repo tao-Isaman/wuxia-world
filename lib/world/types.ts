@@ -808,7 +808,8 @@ export interface PendingEncounter {
 // to give the world the feeling of motion: ~20 named NPCs tick every 7
 // world days (advance goals / age / fight / die), and each event produces
 // rumors that propagate region-by-region for the player to overhear in
-// inns and markets. Spec lives in /bigchange.md and /bigchange-plan.md.
+// inns and markets. Spec: docs/specs/liveness-spec.md + liveness-plan.md;
+// as built: docs/liveness.md.
 
 // NPC sim status. Generic NPCs (without an NpcExtState entry) are
 // implicitly "alive". Once they enter the ext map they own the status.

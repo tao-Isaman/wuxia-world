@@ -752,7 +752,7 @@ function advanceTime(state: WorldStateData, hours: number): void {
   // throttles to ≤ 4 batches per call, so the cost stays bounded even
   // when the player advances by 90+ days at once. After ticking, scan
   // for any active quest whose `giverNpcId` died this batch and auto-
-  // fail it — see decision §3 in bigchange-plan.md.
+  // fail it — see decision §3 in docs/specs/liveness-plan.md.
   failQuestsForDeadGivers(state, () => {
     tickAllNamedNpcs(state, { currentDay: state.day });
   });

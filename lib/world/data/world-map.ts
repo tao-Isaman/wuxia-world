@@ -20,12 +20,12 @@ for (const r of LOCATION_ROUTES) {
   ROUTE_LABEL_MAP.set(`${r.b}__${r.a}`, { label: r.fromB, hint: r.hintB });
 }
 
-// 85 locations: 83 from location.md (cities, sects, islands, terrain, caves,
-// temples/palaces, mansions, taverns, NPC homes, miscellaneous) plus one new
-// sect ("สำนักดาบโลหิต") and one new palace ("พระราชวังหลวง" beside the
-// capital). Each leaf is a bare LocationScene with a description (Chinese name
-// + note from location.md) and a single "กลับสู่แผนที่" route back to the
-// world hub. Authors flesh these out by appending NPCs, additional routes, and
+// World locations (cities, sects, islands, terrain, caves, temples/palaces,
+// mansions, taverns, NPC homes, miscellaneous). They started from the concept
+// list in docs/specs/location-concepts.md; the live list with counts is
+// generated into docs/reference/locations.md. Each leaf is a LocationScene
+// with a description (Chinese name + note) and a "กลับสู่แผนที่" route back
+// to the world hub. Authors flesh these out by appending NPCs, additional routes, and
 // onEnter effects directly to the leaf entries.
 //
 // Structure:
