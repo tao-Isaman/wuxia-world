@@ -568,10 +568,12 @@ const BEGGING_GATE: ResourceNodeRef["visibleIf"] = {
   flag: "begging_learned",
 };
 
-for (const inn of INNS) appendResources(inn, [{ resourceId: "chess_basic" }]);
-for (const home of HOMES.slice(0, 4)) appendResources(home, [{ resourceId: "chess_basic" }]);
-appendResources(LEAVES_BY_ID.get("sect_quanzhen"), [{ resourceId: "chess_master" }]);
-appendResources(LEAVES_BY_ID.get("sect_xiaoyao"), [{ resourceId: "chess_master" }]);
+// Social activities (chess, begging) only happen where people gather:
+// cities and villages — never at a waterfall home or a mountain sect.
+for (const village of VILLAGES) appendResources(village, [{ resourceId: "chess_basic" }]);
+for (const city of CITIES) appendResources(city, [{ resourceId: "chess_basic" }]);
+appendResources(LEAVES_BY_ID.get("city_suzhou"), [{ resourceId: "chess_master" }]);
+appendResources(LEAVES_BY_ID.get("city_yangzhou"), [{ resourceId: "chess_master" }]);
 
 for (const city of CITIES) {
   appendResources(city, [
@@ -580,15 +582,12 @@ for (const city of CITIES) {
   ]);
 }
 // Villages get the street-beg node only — markets are a city thing.
-// User spec: begging works at city + village + sect locations.
+// Begging works in cities and villages only (learned at the Beggars' sect).
 for (const village of VILLAGES) {
   appendResources(village, [
     { resourceId: "beg_street", visibleIf: BEGGING_GATE },
   ]);
 }
-appendResources(LEAVES_BY_ID.get("sect_beggars"), [
-  { resourceId: "beg_street", visibleIf: BEGGING_GATE },
-]);
 
 // Beggar-trainer NPC at sect_beggars — first visit unlocks the begging
 // resource nodes via the `begging_learned` flag. Once set, the dialog still

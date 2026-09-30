@@ -108,6 +108,10 @@ export const LOCATION_MAPS: Record<string, LocationMapDef> = {
       { kind: "artisan", artisanId: "artisan_city_capital_accessory", x: 83, y: 72, icon: "🧿", label: "เครื่องราง" },
       { kind: "resource", resourceId: "mine_iron", x: 93, y: 90, icon: "⛏", label: "ขุดแร่" },
       { kind: "resource", resourceId: "wood_soft", x: 6, y: 55, icon: "🪓", label: "ตัดไม้" },
+      // Street life: chess by the tea house, begging along the market street.
+      { kind: "resource", resourceId: "chess_basic", x: 85, y: 52, icon: "♟", label: "เล่นหมากรุก" },
+      { kind: "resource", resourceId: "beg_street", x: 45, y: 50, icon: "🥣", label: "ขอเงินคนผ่านไปมา" },
+      { kind: "resource", resourceId: "beg_market", x: 31, y: 50, icon: "🥣", label: "ขอเงินในตลาด" },
     ],
   },
 };

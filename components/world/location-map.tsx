@@ -61,6 +61,9 @@ export function LocationMap({ scene, map, handlers, readOnly = false, dialogueSp
       case "rumor": return { label: spot.label ?? "ฟังข่าวลือ", icon: "log", action: handlers.onRumor };
       case "practice": return { label: spot.label ?? "ฝึกฝน", icon: "skills", action: handlers.onPractice };
       case "resource": {
+        // Gated nodes (begging before it's learned) stay hidden on the map too.
+        const node = scene.resources?.find((r) => r.resourceId === spot.resourceId);
+        if (node?.visibleIf && !evaluateCondition(state, node.visibleIf)) return null;
         const resource = getResource(spot.resourceId);
         return resource ? { label: spot.label ?? resource.name, icon: "craft", action: () => handlers.onResource(spot.resourceId) } : null;
       }

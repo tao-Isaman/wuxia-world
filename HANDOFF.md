@@ -284,3 +284,10 @@ Requested by the user after an in-browser error report ("rewrite it to be Phaser
 - Talking to an NPC is full-screen and auto-fits text so nothing scrolls.
 - Tests: `bun run test:law`; e2e `law-guide.spec.ts`; dialogue/investigation/opening specs updated for the new
   rules (no encounter on arrival or goodbye; dialogue fits without scroll).
+
+## Wave 21: dialogue fit everywhere, social activities in towns
+
+- Quest-offer / event dialogs that aren't staged on a map now use the full-screen `DialogStage` too (auto-fit, no scroll).
+- Chess and begging moved to cities + villages only (removed from NPC homes, inns and wild sects), placed on
+  street corners near the market / tea house; hidden map spots respect the node's `visibleIf`.
+- e2e: new dialogue fit check at 1000×450, 844×390 and 390×844; characters spec gets a 150 s budget.
