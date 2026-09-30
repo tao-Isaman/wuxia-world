@@ -7,6 +7,7 @@ import { BATTLE_BACKGROUNDS, type BattleBackground } from "./battle-background";
 import { addGridFrames, canvasTexture, createStage, type Stage } from "./phaser-stage";
 import { castVfx, type CastVfx } from "./cast-vfx";
 import { createBattleVfx, type BattleVfx } from "./battle-vfx";
+import { castStartSfx, impactSfx, supportSfx, whiffSfx } from "../audio/cast-sfx";
 
 const WIDTH = 768;
 const HEIGHT = 432;
@@ -257,6 +258,7 @@ export function createBattleRuntime(parent: HTMLElement, options: BattleRuntimeO
     parent.dataset.vfxTier = String(activeCast.vfx.tier);
     parent.dataset.vfxShape = activeCast.vfx.shape;
     parent.dataset.vfxElement = activeCast.vfx.element;
+    if (!activeCast.support) castStartSfx(activeCast.vfx);
     if (!reduced && !activeCast.support && vfx) {
       const side = cast.side === "A" ? 0 : 1;
       const caster = fighters[side], target = fighters[1 - side];
@@ -300,6 +302,11 @@ export function createBattleRuntime(parent: HTMLElement, options: BattleRuntimeO
     parent.dataset.impactCount = String(impactCount);
     parent.dataset.lastImpact = `${cast.seq}:${index}`;
     options.onCastProgress?.({ seq: cast.seq, hits: index + 1, complete: false });
+    if (activeCast) {
+      if (missed) whiffSfx(activeCast.vfx);
+      else if (support) { if (index === 0) supportSfx(activeCast.vfx); }
+      else impactSfx(activeCast.vfx, index, !!critical);
+    }
     if (missed) {
       if (!reduced && vfx && activeCast) vfx.whiff(activeCast.vfx, { x, y }, attackerSide ? -1 : 1, index, elapsed);
       return;

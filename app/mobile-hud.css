@@ -143,3 +143,20 @@
   .autosave-note { bottom: calc(max(8px, env(safe-area-inset-bottom)) + 150px); }
 }
 @media (prefers-reduced-motion: reduce) { .action-prompt, .rest-bubble { animation: none; } }
+
+/* ♪ sound control: icon + small bubble with music / effects switches. */
+.sound-control { position: relative; display: inline-flex; }
+.sound-bubble {
+  position: absolute; z-index: 40; top: calc(100% + 8px); left: 0; width: 236px; padding: 10px; display: grid; gap: 8px;
+  color: var(--dq-text, #f7eedb); background: var(--dq-box-solid, #2d1812); border: 2px solid var(--dq-gold, #e2bd6a); border-radius: 12px;
+  box-shadow: 0 0 0 2px #140a07, 0 6px 16px #0a0503b0; animation: action-in 140ms ease-out;
+}
+.sound-bubble label { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 4px 8px; font-size: 14px; }
+.sound-bubble input[type=checkbox] { width: 18px; height: 18px; accent-color: #e2bd6a; }
+.sound-bubble input[type=range] { grid-column: 1 / -1; width: 100%; accent-color: #e2bd6a; }
+.title-sound { position: fixed; z-index: 45; top: max(12px, env(safe-area-inset-top)); right: max(12px, env(safe-area-inset-right)); }
+.title-sound .sound-bubble { left: auto; right: 0; }
+.combat-status .sound-control { margin-left: 8px; }
+.combat-sound.hud-icon { width: 42px; height: 42px; }
+.combat-sound .hud-icon-label { display: none; }
+.combat-status .sound-bubble { left: auto; right: 0; }

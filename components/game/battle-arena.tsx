@@ -32,6 +32,7 @@ import {
 import { SkillIcon, ArtIcon } from "./skill-icon";
 import { recoveryAmount, GUARD_REDUCTION, GUARD_MP_COST, RIPOSTE_BONUS, RECOVER_EVASION_COST } from "@/lib/game/combat-actions";
 import type { BattleCastProgress } from "@/lib/stage/battle-runtime";
+import { SoundButton } from "@/components/sound-button";
 import { Shield, Wind } from "lucide-react";
 import "@/app/combat-actions.css";
 
@@ -560,6 +561,7 @@ export function BattleArena({ mode = "free", onContinue }: BattleArenaProps) {
         <span role="status" aria-live="polite"><i aria-hidden="true" /><strong>{headline}</strong></span>
         <TurnTimeline state={state} mode={mode} nameA={displayA.name} nameB={displayB.name} casting={casting} />
         <small>ตาที่ {Math.max(1, state.turn + (!state.winner && !casting ? 1 : 0))}</small>
+        <SoundButton className="hud-icon combat-sound" />
       </div>
       <div className="combat-field">
         <BattleCanvas mode={mode} onCastProgress={setCastProgress} />

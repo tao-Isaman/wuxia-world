@@ -15,6 +15,7 @@ import { SectMembershipPopup } from "./popups/sect-membership-popup";
 import { RestQuickAction } from "./rest-quick-action";
 import { GameMenuContext } from "@/components/ui/game-menu-context";
 import { InstallGameButton } from "@/components/pwa";
+import { SoundButton } from "@/components/sound-button";
 import {
   SECT_MEMBERSHIPS,
   getQuestsForSect,
@@ -160,6 +161,7 @@ export function MenuBar({ hud }: { hud?: boolean } = {}) {
               {typeof t.badge === "number" && <b className="hud-icon-badge" aria-hidden="true">{t.badge}</b>}
             </button>
           ))}
+          <SoundButton />
           <InstallGameButton variant="icon" />
         </nav>
         <RestQuickAction />

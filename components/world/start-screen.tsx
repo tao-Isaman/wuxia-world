@@ -6,6 +6,7 @@ import type { Gender } from "@/lib/world";
 import { GENDER_LABEL, PLAYER_BODIES, PLAYER_BODY_LABEL, defaultBodyFor } from "@/lib/world";
 import { CharacterPreview } from "@/components/game/character-preview";
 import { InstallGameButton } from "@/components/pwa";
+import { SoundButton } from "@/components/sound-button";
 
 export function StartScreen() {
   const startNewGame = useWorldStore((s) => s.startNewGame);
@@ -16,6 +17,7 @@ export function StartScreen() {
   const canStart = trimmed.length > 0 && trimmed.length <= 24;
   return (
     <div className="title-screen">
+      <div className="title-sound"><SoundButton /></div>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src="/art/jade-courtyard.png" alt="" className="title-landscape" draggable={false} />
       <div className="title-shade" />
