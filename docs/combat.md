@@ -291,7 +291,7 @@ The grid engine runs this gauge per unit (`advanceGauges`, `predictOrder` in `li
 
 Exact lists with every id: [reference/martial-arts.md](reference/martial-arts.md). Short field names are kept on purpose (they match `demo.html` and make 100-row tables scannable).
 
-**Tiers** (`TIERS`, `lib/game/data/tiers.ts`): 0 พื้นฐาน · 1 ขั้นกลาง · 2 ขั้นสูง · 3 ลับ · 4 เฉพาะ · 5 ปรมัตถ์ (cooldowns 0–6). Skills use tiers 0–4; two arts are tier 5 (`khbt` คัมภีร์ทานตะวัน and `kuyt` วิชาเก้าเอี้ยง).
+**Tiers** (`TIERS`, `lib/game/data/tiers.ts`): 0 พื้นฐาน · 1 ขั้นกลาง · 2 ขั้นสูง · 3 ลับ · 4 เฉพาะ · 5 ปรมัตถ์ (cooldowns 0–6). Skills use tiers 0–4; three arts are tier 5 (`khbt` คัมภีร์ทานตะวัน, `kuyt` วิชาเก้าเอี้ยง and `kgim` คัมภีร์เก้าอิม).
 
 **Sects** (`lib/game/data/sects.ts`): `SECT_ORDER` lists 21 names in display order, ending with `JIANGHU_SECT` = ยุทธจักร (unaffiliated). Both tables are sorted by sect, then tier (`bun scripts/sort-by-sect.ts`). ลิ่งจิ้วกง and พรรคอสูรโลหิต have no skills or arts yet.
 
@@ -319,7 +319,7 @@ Per tier 32 / 37 / 42 / 41 / 26; 9 beast moves (`bst_*`, used by hunting beasts)
 | `d` | description |
 | `types?` | conflict tags |
 
-### Inner arts (`ARTS`, `lib/game/data/arts.ts`) — 123
+### Inner arts (`ARTS`, `lib/game/data/arts.ts`) — 122
 
 `ARTS[0]` is the `none` placeholder (`getArt` falls back to it and never returns null). Per tier 18 / 19 / 20 / 27 / 37 / 2. Every art has both an active and a passive.
 

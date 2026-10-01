@@ -438,7 +438,7 @@ More styling details:
 | `public/art/` | `jade-courtyard.png` (title and default battle), `battle-capital-training.png`, `battle-capital-street.png`, `creature-atlas.png`; `characters/` sheets; `props/` story props. Provenance: [public/art/README.md](../public/art/README.md) |
 | `public/npcs/` | 159 portraits; `body/` 159 paintings (build input); `pixel/` and `pixel-battle/` 159 sprites each |
 | `public/player/` | 8 hero stills (build input for the PWA icons) |
-| `public/icons/` | `skills/` 178, `arts/` 123, `ui/` 8 menu icons |
+| `public/icons/` | `skills/` 178, `arts/` 122, `ui/` 8 menu icons |
 | `public/pwa/` | install icons (see [pwa.md](pwa.md)) |
 | `public/fonts/jomyuth/` | a declared, unused font |
 | `public/sw.js`, `public/progress.json` | the service worker; the frozen journal data |
