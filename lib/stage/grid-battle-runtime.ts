@@ -84,6 +84,8 @@ interface Actor {
   id: string;
   team: Team;
   index: number;
+  /** Variant colour multiplied into the sprite (UnitLook.tint). */
+  tint?: number;
   kind: ActorKind;
   directional: boolean;
   image: Phaser.GameObjects.Image;
@@ -505,9 +507,10 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
     const tex = await textureFor(unit.look);
     const frame = tex.kind === "creature" && unit.look.kind === "creature" ? Math.max(0, Math.min(7, unit.look.frame)) : 0;
     const feet = tex.feet[tex.kind === "creature" ? frame : 0] ?? 0.94;
-    const dispH = tex.kind === "creature" ? FRAME * 0.92 : FRAME;
+    const size = Math.max(0.6, Math.min(1.6, unit.look.size ?? 1));
+    const dispH = (tex.kind === "creature" ? FRAME * 0.92 : FRAME) * size;
     const dispW = dispH * tex.w / tex.h;
-    const head = tex.kind === "creature" ? dispH * feet * 0.72 : FIGURE;
+    const head = tex.kind === "creature" ? dispH * feet * 0.72 : FIGURE * size;
     const image = scene!.add.image(0, 0, tex.key, tex.kind === "still" ? undefined : frame).setOrigin(0.5, feet);
     const shadow = scene!.add.ellipse(0, 0, TW * 0.56, TH * 0.4, 0x080604, 0.4).setDepth(3);
     const ring = scene!.add.ellipse(0, 0, TW * 0.72, TH * 0.6).setDepth(3.2);
@@ -527,6 +530,7 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
       dead: !unit.alive, deadAt: -10_000, fledAt: -1,
       hp: unit.hp, mp: unit.mp, maxHp: unit.derived.HP, maxMp: unit.derived.MP,
       x: 0, y: 0, s: 1,
+      tint: unit.look.tint,
     };
     if (actor.dead) setMotion(actor, "defeat");
     placeTag(actor);
@@ -662,6 +666,7 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
       .setRotation(rotation).setAlpha(alpha)
       .setDepth(5 + actor.v * 2 + actor.index * 0.001 + (actor.attack ? 0.5 : 0));
     if (actor.flashUntil > elapsed) actor.image.setTint(0xffffff).setTintMode(Phaser.TintModes.FILL);
+    else if (actor.tint !== undefined) actor.image.setTint(actor.tint).setTintMode(Phaser.TintModes.MULTIPLY);
     else actor.image.clearTint().setTintMode(Phaser.TintModes.MULTIPLY);
     actor.shadow.setPosition(x, y + 2 * s).setScale(s * (creature ? 1.3 : 1)).setAlpha(actor.dead ? 0.15 : 0.4 * alpha);
     const active = activeId === actor.id && !actor.dead;

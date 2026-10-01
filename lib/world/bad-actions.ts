@@ -1,6 +1,7 @@
 import type { CharacterBuild } from "@/lib/game";
-import type { NpcDef } from "./types";
+import type { Condition, NpcDef, QuestDef, WorldStateData } from "./types";
 import { masteryLevel } from "./data/life-skills";
+import { getQuest } from "./data/quests";
 
 // Pure helpers for the three "bad action" checks: ขโมย, ลอบทำร้าย, ลักพาตัว.
 // All three follow the same shape:
@@ -99,3 +100,55 @@ export const STEAL_XP_ON_FAIL = 8;
 export const STEAL_TRAIT_EVIL = 2;
 export const ASSASSINATE_TRAIT_EVIL = 8;
 export const KIDNAP_TRAIT_EVIL = 6;
+
+// ─── Which bad actions an NPC offers ─────────────────────────────────
+// Steal is offered on any NPC with `stealLoot`. Assassinate and kidnap are
+// never generic: they appear only while an active quest's current stage
+// needs that deed against this NPC. A quest stage that needs a steal also
+// unlocks the steal action on an NPC without loot (the deed is what counts).
+
+export type BadActionKind = "steal" | "assassinate" | "kidnap";
+
+const KIND_CONDITION: Record<BadActionKind, "stoleFromNpc" | "assassinatedNpc" | "kidnappedNpc"> = {
+  steal: "stoleFromNpc",
+  assassinate: "assassinatedNpc",
+  kidnap: "kidnappedNpc",
+};
+
+function mentions(c: Condition | undefined, kind: BadActionKind, npcId: string): boolean {
+  if (!c) return false;
+  if (c.t === KIND_CONDITION[kind]) return c.npcId === npcId;
+  if (c.t === "and") return c.all.some((sub) => mentions(sub, kind, npcId));
+  if (c.t === "or") return c.any.some((sub) => mentions(sub, kind, npcId));
+  if (c.t === "not") return mentions(c.of, kind, npcId);
+  return false;
+}
+
+/** Active quests whose current stage needs `kind` against `npcId`. */
+export function questsNeedingBadAction(
+  state: Pick<WorldStateData, "quests">,
+  npcId: string,
+  kind: BadActionKind,
+): QuestDef[] {
+  const out: QuestDef[] = [];
+  for (const q of Object.values(state.quests)) {
+    if (q.status !== "active") continue;
+    const def = getQuest(q.id);
+    if (def && mentions(def.stages[q.stage]?.autoAdvance, kind, npcId)) out.push(def);
+  }
+  return out;
+}
+
+/** True when the NPC card should show the action. */
+export function badActionOffered(
+  state: Pick<WorldStateData, "quests" | "assassinatedNpcIds" | "kidnappedNpcIds">,
+  npc: NpcDef,
+  kind: BadActionKind,
+): boolean {
+  if (kind === "steal") {
+    return (npc.stealLoot?.length ?? 0) > 0 || questsNeedingBadAction(state, npc.id, "steal").length > 0;
+  }
+  if (kind === "assassinate" && state.assassinatedNpcIds.includes(npc.id)) return false;
+  if (kind === "kidnap" && state.kidnappedNpcIds.includes(npc.id)) return false;
+  return questsNeedingBadAction(state, npc.id, kind).length > 0;
+}

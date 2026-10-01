@@ -28,6 +28,7 @@ import {
 import { AUTO_MAP_IDS } from "@/lib/world/data/auto-map-ids";
 import { LOCATION_ROUTES } from "@/lib/world/data/location-routes";
 import { regionOf } from "@/lib/world/data/regions";
+import { packMembers } from "@/lib/world/battle-looks";
 import { FIGHT_EVENTS, MEET_EVENTS, TREASURE_EVENTS, fightEventsForLocation, zoneOfLocation } from "@/lib/world/data/random-events";
 
 const OUT_DIR = fileURLToPath(new URL("../docs/reference/", import.meta.url));
@@ -433,7 +434,7 @@ const pages: Record<string, string> = {};
       if (questFights[o.id]) via.push(`scene ×${questFights[o.id]}`);
       if (o.id.startsWith("law_")) via.push("law");
       if (o.id.startsWith("hunter_")) via.push("betrayal");
-      return [code(o.id), esc(o.name), o.category ?? "human", o.pack ? `${o.pack.count}× ${esc(getOpponent(o.pack.opponentId)?.name ?? o.pack.opponentId)}` : "—",
+      return [code(o.id), esc(o.name), o.category ?? "human", packMembers(o).map((m) => `${m.count}× ${esc(getOpponent(m.opponentId)?.name ?? m.opponentId)}`).join(" + ") || "—",
         o.drops?.length ?? 0, via.join(", ") || "—"];
     }));
     md += "\n";

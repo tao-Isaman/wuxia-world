@@ -158,7 +158,7 @@ Treasure and meetings stop while you are hunting.
 
 It shows the foe, its tier and its kind (human, beast, supernatural). You choose:
 
-- **⚔ ต่อสู้** — fight. A few foes bring weaker companions (up to two): the wolf, the river pirate, the bandit chief and the bounty hunter.
+- **⚔ ต่อสู้** — fight. Many foes bring weaker companions — wolves, bats, cultists, bandit gangs — and more of them as the hero grows stronger (up to six). The strongest bosses (the bandit king, the cult elder, the bear king) come with their whole gang.
 - **🏃 หนี** — leave. Free against ordinary foes.
 
   Against a **sect hunter** or a **law pursuer** it is a check of `min(90 %, 30 % + (AGI + LUK) / 2)` on base stats (31 % at the start). A failed check forces the fight.
@@ -194,9 +194,9 @@ Joining a sect that starts at rank 5 sets power to 0.5 at once. The capital appr
 
 ## Battles
 
-Battles are turn-based tactics on a 10 × 7 board. The full rules are in [grid-combat.md](grid-combat.md).
+Battles are turn-based tactics on a board of 10 × 7 tiles, growing to 15 × 10 when many foes join. The full rules are in [grid-combat.md](grid-combat.md).
 
-- **Units.** You are one unit. An accepted encounter can add the foe's companions (up to two); quest fights, spars and hunts are one against one.
+- **Units.** You are one unit. An accepted encounter can add the foe's companions (up to six); quest fights, spars and hunts are one against one.
 - **Your turn.** Move, then use one of the (up to 10) skills or inner arts in your slots, or รอ (wait), or ถอยหนี (retreat).
 - **Retreat** succeeds 20–90 % by speed. It gives no rewards and costs the turn if it fails.
 - **อัตโนมัติ** lets the AI play for you.
@@ -217,7 +217,7 @@ Walk up to a person and talk. The NPC card offers what that person supports:
 | 💬 ทักทาย | a dialog | their conversation |
 | ⚔ ขอประลอง | a spar build (110 NPCs) | a non-fatal duel; a win gives fame (3–22 by their strength) and +1 relationship |
 | quests | they give or receive one | offer, progress and turn-in sections |
-| ขโมย | something to steal (92 NPCs) | see [Bad actions](#bad-actions) |
+| ขโมย | something to steal (94 NPCs), or a quest asks for it | see [Bad actions](#bad-actions) |
 | ลอบทำร้าย / 🪢 ลักพาตัว | an active quest stage that names them | see [Bad actions](#bad-actions) |
 
 - **Quest marks.** A gold **!** over a person means a quest to offer; **?** means something to hand in.

@@ -26,7 +26,7 @@ A Thai wuxia RPG in the browser: Next.js 15, React 19, TypeScript, Phaser 4, Zus
 
 - **Exploring.** The hero walks painted maps: 102 places, 128 roads.
 - **Doing.** They talk to 157 NPCs, take 276 quests, join one of 15 sects, gather, craft, steal, and land in jail.
-- **Fighting.** Battles are turn-based tactics on a 10 × 7 board.
+- **Fighting.** Battles are turn-based tactics on a 10 × 7 board that grows to 15 × 10 for big gangs (up to 6 pack members plus the leader).
 - **Code.** Two pure engines (`lib/game`, `lib/world`) sit under Zustand stores and React / Phaser views. The world saves to `localStorage` (version 21).
 
 Start with [README.md](README.md), then [docs/README.md](docs/README.md).
@@ -48,7 +48,7 @@ Deploys are implied to be on Vercel (`VERCEL_GIT_COMMIT_SHA` sets the service-wo
 
 ## Verified state
 
-Checked on 2026-09-30 for the docs rewrite:
+Checked on 2026-10-01 for wave 26 (enemy variety, bigger boards, skill strip):
 
 | Check | Result |
 | --- | --- |
@@ -67,11 +67,11 @@ Checked on 2026-09-30 for the docs rewrite:
 | `test:grid` | 14 checks pass |
 | `test:grid-ai` | 13 checks pass |
 | `test:grid-skills` | 7 checks pass |
-| `test:grid-store` | 10 checks pass |
-| `test:quests` | the campaign audit passes (276 quests, 102 reachable locations); 213 item / kill / objective quests hand in through the real store; guidance covers 650 of 657 stages |
+| `test:grid-store` | 12 checks pass |
+| `test:quests` | the campaign audit passes (276 quests, 102 reachable locations); 213 item / kill / objective quests hand in through the real store; guidance covers 650 of 657 stages; all 39 steal / assassinate / kidnap stages offer the action and advance |
 | `test:docs` | the generated reference is current; every link, repo path and command in the docs resolves |
 | `bun scripts/audit-content.ts` | 157 NPCs · 276 quests · 996 scenes, all references resolve |
-| `bun run build` | passes; `/` first-load JS 505 kB |
+| `bun run build` | passes; `/` first-load JS 507 kB |
 | `bun run test:e2e` | all 19 Playwright tests pass against the production build on :3017 (about 10 minutes, Chromium 141 via the container shim) |
 
 Not verified:

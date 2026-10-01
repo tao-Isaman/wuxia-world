@@ -757,6 +757,11 @@ export const ENEMY_CATEGORY_LABEL: Record<EnemyCategory, string> = {
 
 // Opponents are wrapped in a build factory so future encounters can scale
 // off flags / story state without mutating a shared object.
+export interface PackMember {
+  opponentId: string;
+  count: number;
+}
+
 export interface OpponentDef {
   id: string;
   name: string;
@@ -772,10 +777,16 @@ export interface OpponentDef {
   // tier 0/1, three for tier 2/3, four for tier 4 (handled in store).
   drops?: readonly ResourceYield[];
   // Grid battles only: extra enemies that fight alongside this one (a gang
-  // leader's thugs, an alpha's wolves). `count` ≤ 2; members are the same
-  // tier or weaker. Spawned by the battle bridge; only the primary foe's
-  // drops roll, but each fallen member counts in `defeatedCounts`.
-  pack?: { opponentId: string; count: number };
+  // leader's thugs, an alpha's wolves). One entry or a list of kinds; members
+  // are the same tier or weaker. Spawned by the battle bridge on accepted
+  // encounters (up to MAX_PACK_SIZE, more as the hero's power grows); only
+  // the primary foe's drops roll, but each fallen member counts in
+  // `defeatedCounts`.
+  pack?: PackMember | readonly PackMember[];
+  // Battle look override: an archetype / hero sheet id (`sheet`), a
+  // creature-atlas frame (beasts), a colour tint (0xRRGGBB) and a size
+  // (1 = normal; bosses 1.2–1.4). Without it the look comes from the id.
+  look?: { sheet?: string; frame?: number; tint?: number; size?: number };
   build: () => CharacterBuild;
 }
 

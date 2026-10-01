@@ -21,6 +21,7 @@ import {
   activeUnit,
   applyAction,
   beginNextTurn,
+  boardSizeFor,
   createGridBattle,
   planTurn,
   sameCell,
@@ -43,6 +44,9 @@ export interface BattleStartOpts {
   looks?: { A: UnitLook; B: UnitLook };
   /** Impassable board cells. */
   blocked?: Cell[];
+  /** Board size; defaults to `boardSizeFor(unit count)` (10 × 7 up to 15 × 10). */
+  cols?: number;
+  rows?: number;
 }
 
 interface BattleStore {
@@ -196,7 +200,8 @@ export const useBattleStore = create<BattleStore>((set, get) => {
         { id: PRIMARY_ENEMY_UNIT, team: "enemy", build: b, look: looks.B },
         ...(opts.enemies ?? []).map((e) => ({ ...e, team: "enemy" as const, leader: false })),
       ];
-      const state = createGridBattle(specs, { blocked: opts.blocked });
+      const size = opts.cols && opts.rows ? { cols: opts.cols, rows: opts.rows } : boardSizeFor(specs.length);
+      const state = createGridBattle(specs, { blocked: opts.blocked, ...size });
       const leader = state.units[0];
       const log = (txt: string) => state.log.push({ cls: "lS", txt });
       log("━━ เริ่มการต่อสู้ ━━");

@@ -10,11 +10,11 @@
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `merchant_wang` | เถ้าแก่หวาง | 💬 | — |
+| `merchant_wang` | เถ้าแก่หวาง | 💬 🤏 | — |
 | `city_capital_clerk_qing` | เสมียนนายฉิง | 💬 | — |
 | `city_capital_magistrate_wu` | นายอำเภอหวู่ | 💬 🤏 | 3 |
 | `city_capital_physician_lin` | หมอหลิน | 💬 🤏 | 3 |
-| `city_capital_merchant_wang` | พ่อค้าหวัง | 💬 | — |
+| `city_capital_merchant_wang` | พ่อค้าหวัง | 💬 🤏 | — |
 | `evil_capital_blackmarket_zhou` | เถ้าแก่โจวตลาดมืด | 💬 🤏 | 7 |
 | `spy_capital_feng` | เฟิงเจ้าของร้านบะหมี่ | 💬 ⚔ 🤏 | 3 |
 

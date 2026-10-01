@@ -78,6 +78,7 @@ import {
   STEAL_XP_ON_PASS,
   TIER_TO_BAD_ACTION_OPPONENT,
   assassinateChance,
+  badActionOffered,
   kidnapChance,
   stealChance,
 } from "@/lib/world/bad-actions";
@@ -2555,7 +2556,7 @@ export const useWorldStore = create<WorldStore>()(
         const npc = getNpc(npcId);
         if (!npc) return { ok: false, reason: "unknown" };
         if (!s.playerBuild) return { ok: false, reason: "no-build" };
-        if (!npc.stealLoot || npc.stealLoot.length === 0) {
+        if (!badActionOffered(s, npc, "steal")) {
           return { ok: false, reason: "not-stealable" };
         }
         const stealXp = s.lifeSkillXp.steal ?? 0;
@@ -2568,7 +2569,7 @@ export const useWorldStore = create<WorldStore>()(
           const picks = 1 + (Math.random() < 0.3 ? 1 : 0);
           const merged: Record<string, number> = {};
           for (let i = 0; i < picks; i++) {
-            const drop = pickWeighted(npc.stealLoot, Math.random());
+            const drop = pickWeighted(npc.stealLoot ?? [], Math.random());
             if (!drop) continue;
             const min = drop.count?.[0] ?? 1;
             const max = drop.count?.[1] ?? 1;

@@ -1,6 +1,6 @@
 /* ── Grid (tactics) battle: lacquer-brown DQ chrome around a 2.5D board ────
-   Layout: status + turn order on top, the board in the middle, the skill bar
-   at the thumb. Landscape phones move the skill bar to a right-hand column. */
+   Layout: status + turn order on top, the board in the middle, and a single
+   horizontal move strip along the bottom in every orientation. */
 .grid-battle {
   display: grid;
   grid-template: "status" auto "field" minmax(0, 1fr) "bar" auto / minmax(0, 1fr);
@@ -80,29 +80,36 @@
 .gb-log-drawer { position: absolute; z-index: 5; top: 8px; right: 8px; width: min(calc(100% - 16px), 560px); border: 1px solid #a59b6d; border-radius: 6px; background: #eee4ce; box-shadow: 0 6px 20px #0a0503c0; overflow: hidden; }
 .gb-log-drawer > div { max-height: 40dvh; background: transparent; }
 
-/* Skill bar */
-.gb-bar { grid-area: bar; display: flex; align-items: stretch; gap: 8px; min-width: 0; min-height: 0; }
-.gb-skills { flex: 1 1 auto; display: flex; flex-wrap: wrap; align-content: flex-start; gap: 6px; min-width: 0; max-height: 132px; overflow-y: auto; scrollbar-width: thin; }
-.gb-skill { position: relative; display: flex; align-items: center; gap: 8px; width: 184px; min-height: 58px; padding: 5px 8px; text-align: left;
-  color: #f7eedb; background: #2a1611ea; border: 2px solid #9a7442; border-radius: 6px; box-shadow: inset 0 0 0 1px #e2bd6a22; text-shadow: 1px 1px 0 #140a07; }
-.gb-skill:enabled:hover, .gb-skill:focus-visible { outline: none; border-color: #e2bd6a; background: #3a2016; }
-.gb-skill[aria-pressed=true] { border-color: #f3c979; background: #4a2a18; box-shadow: inset 0 0 0 1px #f3c97988, 0 0 10px #f3c97966; }
+/* Skill bar — a Wandering Sword–style strip along the bottom: one row of
+   square move tiles (icon over name) that scrolls sideways, with the turn
+   controls at its right end. */
+.gb-bar { grid-area: bar; display: flex; align-items: stretch; gap: 8px; min-width: 0; min-height: 0; padding: 6px;
+  background: linear-gradient(#2a1611f2, #1c0f0af2); border: 2px solid #9a7442; border-radius: 8px; box-shadow: inset 0 0 0 1px #e2bd6a26; }
+.gb-skills { flex: 1 1 auto; display: flex; flex-wrap: nowrap; align-items: stretch; gap: 5px; min-width: 0;
+  overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scroll-snap-type: x proximity; scrollbar-width: thin; scrollbar-color: #9a7442 transparent; }
+.gb-skill { position: relative; flex: 0 0 74px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 3px;
+  width: 74px; min-height: 84px; padding: 6px 4px 4px; text-align: center; scroll-snap-align: start;
+  color: #f7eedb; background: #3a2016; border: 2px solid #6b4f30; border-radius: 6px; box-shadow: inset 0 0 0 1px #e2bd6a1f; text-shadow: 1px 1px 0 #140a07; }
+.gb-skill:enabled:hover, .gb-skill:focus-visible { outline: none; border-color: #e2bd6a; background: #4a2a18; }
+.gb-skill[aria-pressed=true] { border-color: #f3c979; background: #5a3418; box-shadow: inset 0 0 0 1px #f3c97988, 0 0 10px #f3c97966; transform: translateY(-2px); }
 .gb-skill:disabled { cursor: default; color: #a8987c; }
 .gb-skill:disabled .gb-skill-icon { filter: grayscale(.6) brightness(.7); }
 .gb-skill[data-in-reach=false]:enabled em { color: #d9c9a6; }
-.gb-skill-icon { position: relative; flex: 0 0 34px; display: grid; place-items: center; width: 34px; height: 34px; }
-.gb-skill-icon svg, .gb-skill-icon img, .gb-skill-icon canvas { max-width: 32px; max-height: 32px; }
-.gb-skill-icon b { position: absolute; inset: 0; display: grid; place-items: center; font: 700 16px/1 var(--font-display); color: #fff1cc; background: #0a0503c4; border-radius: 50%; }
-.gb-skill-copy { display: grid; min-width: 0; flex: 1; line-height: 1.25; }
-.gb-skill-copy strong { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.gb-skill-copy small { font-size: 11px; color: #d9c9a6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.gb-skill-copy em { font-style: normal; font-size: 11px; color: #e2bd6a; white-space: nowrap; }
-.gb-skill kbd { position: absolute; top: 3px; right: 4px; min-width: 14px; padding: 0 3px; text-align: center; font: 700 10px/14px ui-monospace, monospace; color: #2a1611; background: #e2bd6a; border-radius: 3px; opacity: .7; }
-.gb-controls { flex: 0 0 auto; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(64px, auto); gap: 6px; align-content: start; }
-.gb-control { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-width: 64px; min-height: 58px; padding: 4px 8px;
-  font-size: 13px; color: #f7eedb; background: #2a1611ea; border: 2px solid #9a7442; border-radius: 6px; text-shadow: 1px 1px 0 #140a07; }
+.gb-skill-icon { position: relative; flex: 0 0 40px; display: grid; place-items: center; width: 40px; height: 40px;
+  background: radial-gradient(circle at 50% 40%, #5a3a24, #1c0f0a 75%); border: 1px solid #9a7442; border-radius: 5px; }
+.gb-skill-icon svg, .gb-skill-icon img, .gb-skill-icon canvas { max-width: 36px; max-height: 36px; }
+.gb-skill-icon b { position: absolute; inset: 0; display: grid; place-items: center; font: 700 18px/1 var(--font-display); color: #fff1cc; background: #0a0503c4; border-radius: 4px; }
+.gb-skill-copy { display: grid; justify-items: center; width: 100%; min-width: 0; line-height: 1.2; }
+.gb-skill-copy strong { max-width: 100%; font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gb-skill-copy small { display: none; }
+.gb-skill-copy em { max-width: 100%; font-style: normal; font-size: 10.5px; color: #e2bd6a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gb-skill kbd { position: absolute; top: 2px; left: 3px; min-width: 13px; padding: 0 2px; text-align: center; font: 700 10px/13px ui-monospace, monospace; color: #2a1611; background: #e2bd6a; border-radius: 3px; opacity: .75; }
+.gb-controls { flex: 0 0 auto; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(62px, auto); gap: 5px; align-content: stretch;
+  padding-left: 8px; border-left: 1px solid #6b4f30; }
+.gb-control { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-width: 62px; min-height: 84px; padding: 4px 6px;
+  font-size: 13px; color: #f7eedb; background: #3a2016; border: 2px solid #9a7442; border-radius: 6px; text-shadow: 1px 1px 0 #140a07; }
 .gb-control svg { color: #e2bd6a; }
-.gb-control:enabled:hover, .gb-control:focus-visible { outline: none; border-color: #e2bd6a; background: #3a2016; }
+.gb-control:enabled:hover, .gb-control:focus-visible { outline: none; border-color: #e2bd6a; background: #4a2a18; }
 .gb-control:disabled { color: #a8987c; cursor: default; }
 .gb-control:disabled svg { color: #7d6a4c; }
 .gb-control[aria-pressed=true], .gb-control[aria-pressed=true]:enabled:hover { color: #1c0f0a; background: linear-gradient(#f3c979, #c99a4a); border-color: #f6dc9c; text-shadow: none; }
@@ -110,6 +117,7 @@
 .gb-control[data-kind=confirm]:enabled { color: #1c0f0a; background: linear-gradient(#9fe38a, #4fae6e); border-color: #cff5c0; text-shadow: none; }
 .gb-control[data-kind=confirm]:enabled svg { color: #1c0f0a; }
 .gb-control[data-kind=cancel] svg, .gb-control[data-kind=flee] svg { color: #f0a489; }
+.gb-bar:has(.gb-result) { padding: 0; background: none; border: 0; box-shadow: none; }
 
 /* Result */
 .gb-result { flex: 1; display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 88px; padding: 10px 18px;
@@ -124,7 +132,7 @@
 @media (pointer: coarse) { .gb-skill kbd { display: none; } }
 @media (prefers-reduced-motion: reduce) { .gb-callout { display: none; } }
 
-/* Portrait phones: turn order on its own row; two columns of skills; controls full width. */
+/* Portrait phones: turn order on its own row; the move strip above a full-width control row. */
 @media (max-width: 640px) and (min-height: 561px) {
   .grid-battle { gap: 6px; padding-left: 8px; padding-right: 8px; }
   .gb-status { flex-wrap: wrap; row-gap: 4px; gap: 6px; }
@@ -134,22 +142,21 @@
   .gb-timeline { order: 5; flex: 1 0 100%; gap: 3px; }
   .gb-timeline li { width: 30px; height: 30px; }
   .gb-timeline li:first-child { width: 36px; height: 36px; }
-  .gb-bar { flex-direction: column; gap: 6px; }
-  .gb-skills { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); max-height: 190px; }
-  .gb-skill { width: auto; min-height: 56px; gap: 6px; padding: 4px 6px; }
-  .gb-skill-copy strong { font-size: 13.5px; }
-  .gb-controls { grid-auto-columns: minmax(0, 1fr); }
-  .gb-control { flex-direction: row; min-height: 46px; gap: 6px; }
+  .gb-bar { flex-direction: column; gap: 6px; padding: 5px; }
+  .gb-skill { flex-basis: 66px; width: 66px; min-height: 78px; }
+  .gb-controls { grid-auto-columns: minmax(0, 1fr); padding: 6px 0 0; border-left: 0; border-top: 1px solid #6b4f30; }
+  .gb-control { flex-direction: row; min-height: 44px; gap: 6px; }
   .gb-result { flex-direction: column; justify-content: center; text-align: center; min-height: 150px; }
   .gb-result strong { font-size: 21px; }
   .gb-callout span { font-size: 22px; padding: 4px 16px; }
   .gb-hint { font-size: 12px; }
 }
 
-/* Landscape phones: board left, skills in a right-hand column. */
+/* Landscape phones: the board fills the middle, the move strip stays a single
+   compact row along the bottom edge. */
 @media (max-height: 560px) and (min-width: 561px) {
   .grid-battle, .grid-battle[data-mode=world] {
-    grid-template: "status status" auto "field bar" minmax(0, 1fr) / minmax(0, 1fr) 236px; gap: 6px;
+    grid-template: "status" auto "field" minmax(0, 1fr) "bar" auto / minmax(0, 1fr); gap: 5px;
     padding: max(5px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(5px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
   }
   .gb-status { min-height: 38px; gap: 8px; }
@@ -157,12 +164,16 @@
   .gb-timeline li { width: 28px; height: 28px; }
   .gb-timeline li:first-child { width: 34px; height: 34px; }
   .gb-log-toggle { width: 36px; height: 36px; }
-  .gb-bar { flex-direction: column; gap: 6px; }
-  .gb-skills { display: grid; grid-template-columns: minmax(0, 1fr); max-height: none; flex: 1 1 0; min-height: 0; align-content: start; }
-  .gb-skill { width: auto; min-height: 50px; }
-  .gb-controls { grid-auto-flow: row; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .gb-control { flex-direction: row; min-width: 0; min-height: 44px; padding: 3px 4px; font-size: 12.5px; gap: 5px; }
-  .gb-result { flex-direction: column; justify-content: center; text-align: center; min-height: 0; padding: 12px; }
+  .gb-bar { padding: 4px; gap: 6px; }
+  .gb-skills { gap: 4px; }
+  .gb-skill { flex-basis: 58px; width: 58px; min-height: 62px; padding: 3px 2px 2px; gap: 1px; }
+  .gb-skill-icon { flex-basis: 30px; width: 30px; height: 30px; }
+  .gb-skill-icon svg, .gb-skill-icon img, .gb-skill-icon canvas { max-width: 28px; max-height: 28px; }
+  .gb-skill-copy em { display: none; }
+  .gb-skill kbd { display: none; }
+  .gb-controls { grid-auto-columns: minmax(54px, auto); gap: 4px; padding-left: 6px; }
+  .gb-control { min-width: 54px; min-height: 62px; padding: 2px 4px; font-size: 12px; }
+  .gb-result { flex-direction: row; justify-content: space-between; text-align: left; min-height: 0; padding: 8px 14px; }
   .gb-result strong { font-size: 20px; }
   .gb-callout span { font-size: 22px; }
 }

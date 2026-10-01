@@ -67,6 +67,12 @@ export const NPCS_CITIES: readonly NpcDef[] = [
     description: "พ่อค้าผู้ค้าเครื่องเทศและของหายากในนครหลวง ลูกค้าทุกหัวเมืองรู้จักชื่อ",
     locationIds: ["city_capital"],
     dialogSceneId: "npc_city_capital_merchant_wang_talk",
+    defenseTier: 1,
+    stealLoot: [
+      { itemId: "ancient_coin", weight: 3 },
+      { itemId: "herb", weight: 4 },
+      { itemId: "silk", weight: 2 },
+    ],
     tags: ["merchant"],
   },
 

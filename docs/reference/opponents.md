@@ -2,11 +2,11 @@
 
 # Opponents
 
-180 opponents (`lib/world/data/opponents.ts`). Random encounters draw from 40 fight events (plus 4 treasure and 3 meeting events) filtered by zone (`lib/world/data/random-events.ts`).
+194 opponents (`lib/world/data/opponents.ts`). Random encounters draw from 54 fight events (plus 4 treasure and 3 meeting events) filtered by zone (`lib/world/data/random-events.ts`).
 
 Met via: **roams** = random walk encounters in the listed zones · **hunt** = a hunting node · **spar** = an NPC's practice bout · **scene** = a quest or story battle (count of scene choices) · **law** = pursuers after wanted marks · **betrayal** = hunters after betraying a sect.
 
-Per tier: T0: 9 · T1: 34 · T2: 49 · T3: 33 · T4: 55. Per category: ฝ่ายมนุษย์ (human): 155 · สัตว์ป่า (beast): 20 · ผู้พิเศษ (supernatural): 5.
+Per tier: T0: 9 · T1: 36 · T2: 54 · T3: 37 · T4: 58. Per category: ฝ่ายมนุษย์ (human): 161 · สัตว์ป่า (beast): 27 · ผู้พิเศษ (supernatural): 6.
 
 ## Tier 0 (9)
 
@@ -22,7 +22,7 @@ Per tier: T0: 9 · T1: 34 · T2: 49 · T3: 33 · T4: 55. Per category: ฝ่า
 | `hunt_pheasant` | ไก่ฟ้า | beast | — | 3 | hunt |
 | `hunt_squirrel` | กระรอกแก้ม | beast | — | 3 | hunt |
 
-## Tier 1 (34)
+## Tier 1 (36)
 
 | Id | Name | Category | Pack | Drops | Met via |
 | --- | --- | --- | --- | --- | --- |
@@ -32,7 +32,7 @@ Per tier: T0: 9 · T1: 34 · T2: 49 · T3: 33 · T4: 55. Per category: ฝ่า
 | `wild_beast` | สัตว์ป่าดุร้าย | beast | — | 5 | roams (frontier, isle, wild) |
 | `wild_boar` | หมูป่า | beast | — | 5 | roams (frontier, isle, wild) |
 | `wild_wolf` | หมาป่า | beast | 1× หมาป่าเล็ก | 5 | roams (frontier, isle, wild) |
-| `road_bandit` | โจรเส้นทาง | human | — | 5 | roams (city, frontier, isle, mansion, sect, temple, wild) |
+| `road_bandit` | โจรเส้นทาง | human | 1× โจรเร่ร่อน | 5 | roams (city, frontier, isle, mansion, sect, temple, wild) |
 | `river_pirate` | โจรสลัดน้ำ | human | 1× โจรเร่ร่อน | 6 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×2 |
 | `desert_marauder` | นักรบทะเลทราย | human | — | 5 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×1 |
 | `fortune_thief` | หมอดูปลอม | human | — | 5 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×2 |
@@ -60,14 +60,16 @@ Per tier: T0: 9 · T1: 34 · T2: 49 · T3: 33 · T4: 55. Per category: ฝ่า
 | `spar_sunmoon_xiaoyu` | ศิษย์เสี่ยวอวี้ | human | — | 5 | spar |
 | `spar_tang_tangxiu` | ศิษย์ถังซิ่ว | human | — | 5 | spar |
 | `law_constable` | เจ้าหน้าที่รัฐ | human | — | 5 | law |
+| `vampire_bat` | ค้างคาวดูดเลือด | beast | 2× ค้างคาวดูดเลือด | 5 | roams (frontier, isle, wild) |
+| `bandit_archer` | มือเข็มโจรป่า | human | — | 5 | roams (city, frontier, isle, mansion, sect, temple, wild) |
 
-## Tier 2 (49)
+## Tier 2 (54)
 
 | Id | Name | Category | Pack | Drops | Met via |
 | --- | --- | --- | --- | --- | --- |
 | `mountain_tiger` | เสือภูเขา | beast | — | 7 | roams (frontier, isle, wild), scene ×1 |
 | `brown_bear` | หมีสีน้ำตาล | beast | — | 7 | roams (frontier, isle, wild), scene ×1 |
-| `viper_snake` | งูเห่ายักษ์ | beast | — | 7 | roams (frontier, isle, wild) |
+| `viper_snake` | งูเห่ายักษ์ | beast | 2× งูเล็ก | 7 | roams (frontier, isle, wild) |
 | `giant_centipede` | ตะขาบยักษ์ | beast | — | 7 | roams (frontier, isle, wild), scene ×1 |
 | `bandit_chief` | หัวหน้าโจร | human | 2× โจรป่า | 6 | roams (city, frontier, isle, mansion, sect, temple, wild) |
 | `iron_palm_thug` | นักเลงฝ่ามือเหล็ก | human | — | 6 | roams (city, frontier, isle, mansion, sect, temple, wild) |
@@ -114,13 +116,18 @@ Per tier: T0: 9 · T1: 34 · T2: 49 · T3: 33 · T4: 55. Per category: ฝ่า
 | `spar_sunmoon_lanfenghuang` | ศิษย์หลานเฟิงหวง | human | — | 7 | spar |
 | `spar_tang_tanglin` | หัวหน้าศิษย์ถังหลิน | human | — | 8 | spar |
 | `spar_tang_tangtao` | ศิษย์ถังเทา | human | — | 7 | spar |
+| `frost_wolf` | หมาป่าหิมะ | beast | 2× หมาป่า | 7 | roams (frontier, isle, wild) |
+| `blood_boar` | หมูป่าเลือดคลั่ง | beast | 1× หมูป่า | 6 | roams (frontier, isle, wild) |
+| `bandit_lieutenant` | รองหัวหน้าโจร | human | 1× โจรป่า + 1× มือเข็มโจรป่า | 6 | roams (city, frontier, isle, mansion, sect, temple, wild) |
+| `night_blade` | มือมีดราตรี | human | — | 6 | roams (city, frontier, isle, mansion, sect, temple, wild) |
+| `demon_cult_zealot` | สาวกลัทธิมาร | human | 2× สาวกลัทธิมาร | 6 | roams (city, frontier, isle, mansion, sect, temple, wild) |
 
-## Tier 3 (33)
+## Tier 3 (37)
 
 | Id | Name | Category | Pack | Drops | Met via |
 | --- | --- | --- | --- | --- | --- |
-| `blade_master` | อาจารย์ดาบ | human | — | 7 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×1 |
-| `shadow_assassin` | นักฆ่าเงา | human | — | 7 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×1 |
+| `blade_master` | อาจารย์ดาบ | human | 1× กระบี่พเนจร | 7 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×1 |
+| `shadow_assassin` | นักฆ่าเงา | human | 2× มือมีดราตรี | 7 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×1 |
 | `wudang_disciple` | สาวกอู่ตัง | human | — | 7 | roams (city, frontier, isle, mansion, sect, temple, wild) |
 | `snow_demon` | ปีศาจหิมะ | supernatural | — | 8 | roams (sect, temple, wild) |
 | `sect_elder` | ผู้อาวุโสสำนัก | human | — | 7 | roams (city, frontier, isle, mansion, sect, temple, wild) |
@@ -152,13 +159,17 @@ Per tier: T0: 9 · T1: 34 · T2: 49 · T3: 33 · T4: 55. Per category: ฝ่า
 | `spar_tang_tangrong` | ผู้อาวุโสไล่ล่าถังหรง | human | — | 9 | spar |
 | `law_imperial_guard` | องครักษ์หลวง | human | — | 7 | law |
 | `law_bounty_hunter` | นักล่าค่าหัว | human | 1× เจ้าหน้าที่รัฐ | 7 | law |
+| `golden_tiger` | เสือทองคำ | beast | — | 8 | roams (frontier, isle, wild) |
+| `jade_python` | งูเหลือมหยก | beast | — | 9 | roams (frontier, isle, wild) |
+| `thunder_eagle` | อินทรีสายฟ้า | beast | — | 7 | roams (frontier, isle, wild) |
+| `ghost_swordsman` | วิญญาณจอมกระบี่ | supernatural | — | 7 | roams (sect, temple, wild) |
 
-## Tier 4 (55)
+## Tier 4 (58)
 
 | Id | Name | Category | Pack | Drops | Met via |
 | --- | --- | --- | --- | --- | --- |
-| `demonic_master` | จอมยุทธมาร | human | — | 8 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×1 |
-| `legendary_swordsman` | ราชากระบี่ | human | — | 8 | roams (city, frontier, isle, mansion, sect, temple, wild) |
+| `demonic_master` | จอมยุทธมาร | human | 2× สาวกลัทธิมาร | 8 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×1 |
+| `legendary_swordsman` | ราชากระบี่ | human | 2× กระบี่พเนจร | 8 | roams (city, frontier, isle, mansion, sect, temple, wild) |
 | `dragon_phoenix_master` | ปรมาจารย์มังกร-หงส์ | supernatural | — | 8 | roams (sect, temple, wild) |
 | `heretical_grandmaster` | เจ้าสำนักอธรรม | human | — | 8 | roams (city, frontier, isle, mansion, sect, temple, wild) |
 | `immortal_warrior` | นักรบอมตะ | supernatural | — | 8 | roams (sect, temple, wild) |
@@ -185,11 +196,11 @@ Per tier: T0: 9 · T1: 34 · T2: 49 · T3: 33 · T4: 55. Per category: ฝ่า
 | `spar_xiaoyao_libai` | ผู้อาวุโสฝ่ามือหลี่ไป๋ | human | — | 11 | spar |
 | `hunter_xiaoyao` | นักล่าพรรคสราญรมย์ | human | — | 10 | betrayal |
 | `spar_jinyiwei_leader` | ผู้บัญชาการจ้าวฝู่ | human | — | 12 | spar |
-| `elite_blood_rakshasa` | อสุรกายโลหิต | supernatural | — | 12 | — |
-| `elite_void_grandmaster` | ปรมาจารย์ความว่าง | human | — | 12 | — |
-| `elite_iron_mountain` | ภูเขาเหล็ก | human | — | 13 | — |
-| `elite_phoenix_empress` | จักรพรรดินีหงส์เพลิง | human | — | 13 | — |
-| `elite_demon_emperor` | จักรพรรดิมาร | supernatural | — | 13 | — |
+| `elite_blood_rakshasa` | อสุรกายโลหิต | supernatural | 3× ค้างคาวดูดเลือด | 12 | — |
+| `elite_void_grandmaster` | ปรมาจารย์ความว่าง | human | 1× วิญญาณจอมกระบี่ | 12 | — |
+| `elite_iron_mountain` | ภูเขาเหล็ก | human | 2× นักเลงฝ่ามือเหล็ก | 13 | — |
+| `elite_phoenix_empress` | จักรพรรดินีหงส์เพลิง | human | 2× มือมีดราตรี | 13 | — |
+| `elite_demon_emperor` | จักรพรรดิมาร | supernatural | 2× สาวกลัทธิมาร + 1× วิญญาณจอมกระบี่ | 13 | — |
 | `spar_sunmoon_chief_dongfang` | อาจารย์ใหญ่หยินอวี้ | human | — | 14 | spar |
 | `spar_sunmoon_renwoxing` | รองเจ้าสำนักเหรินหวัวสิง | human | — | 11 | spar |
 | `spar_sunmoon_zuolengchan` | ผู้อาวุโสตะวันจั่วเหลิงฉัน | human | — | 10 | spar |
@@ -212,3 +223,6 @@ Per tier: T0: 9 · T1: 34 · T2: 49 · T3: 33 · T4: 55. Per category: ฝ่า
 | `hunter_jinyiwei` | นักล่าองครักษ์เสื้อแพร | human | — | 10 | betrayal |
 | `hunter_sunmoon` | นักล่าพรรคตะวันจันทรา | human | — | 10 | betrayal |
 | `hunter_tang` | นักล่าสำนักสุลถัง | human | — | 10 | betrayal |
+| `elite_bandit_king` | ราชาโจรภูเขา | human | 1× รองหัวหน้าโจร + 2× มือเข็มโจรป่า + 2× โจรป่า | 10 | — |
+| `elite_cult_elder` | ผู้อาวุโสลัทธิมาร | human | 3× สาวกลัทธิมาร | 10 | — |
+| `elite_bear_king` | ราชาหมีพันปี | beast | 1× หมีสีน้ำตาล | 9 | — |

@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import { ARTS, SKILLS } from "../lib/game/data";
 import type { CharacterBuild, StatBlock } from "../lib/game/types";
 import {
-  activeUnit, applyAction, beginNextTurn, cellKey, createGridBattle, isOver, manhattan, planTurn,
+  boardSizeFor, activeUnit, applyAction, beginNextTurn, cellKey, createGridBattle, isOver, manhattan, planTurn,
   reachableFor, scoreAction, slotGrid, targetsFor, unitById,
   type Cell, type GridBattleState, type GridUnit, type TurnPlan, type UnitSpec,
 } from "../lib/game/grid";
@@ -326,6 +326,26 @@ check("planning time", () => {
   console.log(`  3v3 sample: ${(ms / Math.max(1, n)).toFixed(2)} ms/turn over ${n} turns · all battles: ${avgAll.toFixed(2)} ms avg, worst ${worstMs.toFixed(1)} ms over ${plans} plans`);
   assert.ok(avgAll < 15, `average plan time ${avgAll.toFixed(2)} ms < 15 ms`);
   assert.ok(ms / Math.max(1, n) < 15, "3v3 average under 15 ms");
+
+  // The largest world battle: the hero against 7 foes on the 15 × 10 board.
+  const big = createGridBattle([0, 1, 2, 3, 4, 5, 6, 7].map((i) => ({
+    id: `b${i}`, team: i === 0 ? "ally" : "enemy", build: sample(i * 7 + 3), look, leader: i === 0,
+  } as UnitSpec)), boardSizeFor(8));
+  assert.deepEqual([big.cols, big.rows], [15, 10]);
+  let bigMs = 0, bigN = 0, bigWorst = 0;
+  withRandom(seeded(7), () => {
+    for (let t = 0; t < 80 && !isOver(big); t++) {
+      const u = beginNextTurn(big);
+      if (!u) break;
+      const t0 = performance.now();
+      planTurn(big, u.id);
+      const dt = performance.now() - t0;
+      bigMs += dt; bigN++; bigWorst = Math.max(bigWorst, dt);
+      playAiTurn(big, u);
+    }
+  });
+  console.log(`  1v7 on 15 × 10: ${(bigMs / Math.max(1, bigN)).toFixed(2)} ms/turn over ${bigN} turns, worst ${bigWorst.toFixed(1)} ms`);
+  assert.ok(bigMs / Math.max(1, bigN) < 25, "1v7 average under 25 ms");
 });
 
 console.log(`${checks} grid AI checks passed`);
