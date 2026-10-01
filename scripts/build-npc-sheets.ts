@@ -47,9 +47,9 @@ interface Raster { w: number; h: number; data: Uint8ClampedArray }
 const blank = (w: number, h: number): Raster => ({ w, h, data: new Uint8ClampedArray(w * h * 4) });
 const opaque = (r: Raster, x: number, y: number) => x >= 0 && y >= 0 && x < r.w && y < r.h && r.data[(y * r.w + x) * 4 + 3] >= 128;
 
-async function figure(id: string): Promise<Raster> {
+async function figure(id: string, maxWidth?: number): Promise<Raster> {
   const trimmed = await sharp(`${SRC}/${id}.png`).trim({ threshold: 8 }).toBuffer();
-  const reduced = await sharp(trimmed).resize({ height: FIGURE, kernel: "lanczos3" })
+  const reduced = await sharp(trimmed).resize({ height: FIGURE, ...(maxWidth ? { width: maxWidth, fit: "inside" as const } : {}), kernel: "lanczos3" })
     .png({ palette: true, colours: 40, dither: 0 }).toBuffer();
   const { data, info } = await sharp(reduced).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
   const r: Raster = { w: info.width, h: info.height, data: new Uint8ClampedArray(data) };
@@ -300,8 +300,7 @@ const VERTICAL_POSES: Pose[] = [
 ];
 
 mkdirSync(OUT, { recursive: true });
-for (const id of ANIMATED_NPC_IDS) {
-  const front = await figure(id);
+function rig(front: Raster) {
   const a = anatomy(front);
   const back = backView(front, a);
   const sheet = blank(CELL * 4, CELL * 4);
@@ -310,6 +309,10 @@ for (const id of ANIMATED_NPC_IDS) {
   const directions = blank(CELL * 4, CELL * 2);
   VERTICAL_POSES.forEach((p, i) => drawPose(back, a, directions, i, { ...p, body: { sx: 0.98 } }));
   VERTICAL_POSES.forEach((p, i) => drawPose(front, a, directions, 4 + i, p));
+  return { sheet, directions };
+}
+/** The first cell whose pose touches the cell edge (clipped), or null. */
+function clipped(sheet: Raster, directions: Raster): string | null {
   for (const [name, r, rows] of [["sheet", sheet, 4], ["directions", directions, 2]] as const) {
     for (let cell = 0; cell < rows * 4; cell++) {
       const sub = blank(CELL, CELL);
@@ -318,10 +321,20 @@ for (const id of ANIMATED_NPC_IDS) {
         for (let c = 0; c < 4; c++) sub.data[t + c] = r.data[s + c];
       }
       const b = bounds(sub);
-      // A pose that touches the cell edge was clipped.
-      if (b.left <= 0 || b.top <= 0 || b.right >= CELL - 1) throw new Error(`${id} ${name} cell ${cell} is clipped by its cell`);
+      if (b.left <= 0 || b.top <= 0 || b.right >= CELL - 1) return `${name} cell ${cell}`;
     }
   }
+  return null;
+}
+
+mkdirSync(OUT, { recursive: true });
+for (const id of ANIMATED_NPC_IDS) {
+  let { sheet, directions } = rig(await figure(id));
+  // A wide prop (a carrying pole) can push a lunge out of its cell: narrow the
+  // figure step by step until every pose fits.
+  for (let maxWidth = 96; clipped(sheet, directions) && maxWidth >= 56; maxWidth -= 8) ({ sheet, directions } = rig(await figure(id, maxWidth)));
+  const clip = clipped(sheet, directions);
+  if (clip) throw new Error(`${id} ${clip} is clipped by its cell`);
   const png = (r: Raster) => sharp(Buffer.from(r.data.buffer), { raw: { width: r.w, height: r.h, channels: 4 } })
     .png({ compressionLevel: 9, palette: true, colours: 64, dither: 0 });
   await png(sheet).toFile(`${OUT}/${id}.png`);

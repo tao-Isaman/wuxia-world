@@ -5,6 +5,7 @@
 // battle bridge (which builds the grid battle's UnitSpecs) and the battle UI.
 
 import { characterId, npcCharacterId } from "@/lib/characters/catalog";
+import { hasAnimatedSheet } from "@/lib/characters/npc-sheets";
 import type { CharacterBuild } from "@/lib/game/types";
 import type { UnitLook, UnitSpec } from "@/lib/game/grid/types";
 import { NPCS } from "./data/npcs";
@@ -64,7 +65,8 @@ export function opponentLook(opponentId: string | null | undefined, npc?: NpcDef
   const sheet = opp?.look?.sheet;
   // A rigged NPC (its own sheet) plays full clips; other named NPCs keep their still.
   const npcId = npc?.id ?? opp?.look?.npc;
-  const look: UnitLook = { kind: "character", characterId: sheet ? characterId(sheet) : npcCharacterId(npcId ?? opponentId ?? "thug"), ...variant };
+  const own = !!npcId && hasAnimatedSheet(npcId);
+  const look: UnitLook = { kind: "character", characterId: !own && sheet ? characterId(sheet) : npcCharacterId(npcId ?? opponentId ?? "thug"), ...variant };
   const still = npcId ? npcBattleSprite(npcId) : undefined;
   return still ? { ...look, still } : look;
 }

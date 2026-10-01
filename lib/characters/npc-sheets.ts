@@ -41,6 +41,26 @@ export const ANIMATED_NPC_IDS = [
   "evil_chuangwang_heretic_huibao",
   "sect_xuedao_blade_xuelang",
   "sect_xingxiu_disciple_dushou",
+  // Townsfolk of the villages, towns and homes who stroll around their spot
+  // (lib/world/data/places/, NpcDef.look.wander).
+  "village_noname_carter_lu",
+  "village_noname_child_xiaowu",
+  "village_huashan_dreamer_yang",
+  "village_huashan_apprentice_tie",
+  "village_taishan_porter_shi",
+  "village_taishan_pilgrim_chen",
+  "city_lingxiao_guard_feng",
+  "city_lingxiao_child_xue",
+  "palace_royal_guard_zhao",
+  "palace_royal_maid_cui",
+  "tribe_huizu_wrestler_ma",
+  "tribe_huizu_herder_aisha",
+  "home_player_gatekeeper_zhou",
+  "home_player_neighbor_niu",
+  "home_hufei_guest_yuan",
+  "home_hufei_guest_jiu",
+  "home_chengkun_gardener_wu",
+  "home_chengkun_maid_cui",
 ] as const;
 export type AnimatedNpcId = typeof ANIMATED_NPC_IDS[number];
 const ANIMATED: ReadonlySet<string> = new Set(ANIMATED_NPC_IDS);

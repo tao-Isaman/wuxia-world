@@ -14,10 +14,13 @@ import { getLocationMap } from "../lib/world/data/location-maps";
 import { KIDNAP_RETURN_DAYS, npcPresent } from "../lib/world/npc-presence";
 import { GIFT_COOLDOWN_DAYS, giftOutcome, giftWorth, npcTastes } from "../lib/world/gifts";
 import { npcCharacterId } from "../lib/characters/catalog";
+import { hasAnimatedSheet } from "../lib/characters/npc-sheets";
+import { npcBattleSprite, npcBodySprite, npcPixelSprite, npcPortrait } from "../lib/world/data/npc-portraits";
 import type { Condition } from "../lib/world/types";
 import { rollPlaceMeeting } from "../lib/world/effects";
 import { useWorldStore } from "../store/world-store";
 
+const WALKER_BODIES = new Set(["m1", "m2", "m3", "m4", "f1", "f2", "f3", "f4"]);
 let passed = 0;
 function check(name: string, fn: () => void) {
   try { fn(); passed++; console.log(`PASS ${name}`); } catch (error) { console.error(`FAIL ${name}`); throw error; }
@@ -28,7 +31,6 @@ const PLACES = [
   "home_player", "home_hufei", "home_chengkun", "home_xuemuhua", "home_nanxian", "home_yideng", "home_tianboguang",
   "home_miaoren", "home_chengying", "home_yanji", "home_beichou", "villa_meizhuang", "villa_fuwei",
 ];
-const WALKER_BODIES = new Set(["m1", "m2", "m3", "m4", "f1", "f2", "f3", "f4"]);
 
 // Who teaches what: every learnSkill / learnArt in a quest's rewards.
 const taughtBy = new Map<string, string[]>();
@@ -87,20 +89,34 @@ check("each village, town and home has people, an activity and three quests", ()
   }
 });
 
-check("new NPCs: a talk dialog, a look (only walker bodies wander), gift tastes", () => {
-  let wander = 0;
+check("new NPCs: a talk dialog, their own art (strollers rigged, the rest a unique sprite), gift tastes", () => {
+  let wander = 0, noArt = 0;
   for (const n of PLACE_NPCS) {
     assert.equal(getScene(n.dialogSceneId ?? "")?.kind, "dialog", `${n.id}: talk dialog`);
     assert.ok(n.look?.body, `${n.id}: look.body`);
-    assert.equal(npcCharacterId(n.id), n.look!.body, `${n.id}: the body registry resolves`);
-    if (n.look?.wander) { wander++; assert.ok(WALKER_BODIES.has(n.look.body!), `${n.id}: ${n.look.body} cannot wander`); }
+    if (!npcBodySprite(n.id)) {
+      // Not painted yet: the authored body stands in (only m/f bodies can walk).
+      noArt++;
+      assert.ok(!hasAnimatedSheet(n.id), `${n.id}: rigged without a painted body`);
+      if (n.look?.wander) { wander++; assert.ok(WALKER_BODIES.has(n.look.body!), `${n.id}: ${n.look.body} cannot wander`); }
+      assert.equal(npcCharacterId(n.id), n.look!.body, `${n.id}: falls back to its authored body`);
+    } else if (n.look?.wander) {
+      assert.ok(npcPortrait(n.id), `${n.id}: a portrait`);
+      wander++;
+      assert.ok(hasAnimatedSheet(n.id), `${n.id} wanders, so it needs its own rigged sheet (ANIMATED_NPC_IDS)`);
+      assert.equal(npcCharacterId(n.id), n.id, `${n.id}: plays its own sheet`);
+    } else {
+      assert.ok(npcPortrait(n.id), `${n.id}: a portrait`);
+      assert.ok(!hasAnimatedSheet(n.id), `${n.id} stands still`);
+      assert.ok(npcPixelSprite(n.id) && npcBattleSprite(n.id), `${n.id}: a unique pixel sprite (bun scripts/build-npc-sprites.ts)`);
+    }
     assert.ok((n.likes?.length ?? 0) >= 1, `${n.id}: likes`);
     for (const t of [...(n.likes ?? []), ...(n.dislikes ?? [])]) {
       const ok = t === "gold" || ["material", "herb", "venom", "potion", "food", "book", "craft", "valuable", "misc"].includes(t) || !!getItem(t);
       assert.ok(ok, `${n.id}: taste ${t} is not an item, category or gold`);
     }
   }
-  console.log(`  ${PLACE_NPCS.length} new NPCs, ${wander} wander`);
+  console.log(`  ${PLACE_NPCS.length} new NPCs, ${wander} wander, ${PLACE_NPCS.length - noArt} with their own art`);
   assert.ok(wander > 0 && wander < PLACE_NPCS.length, "some wander, some stand");
 });
 

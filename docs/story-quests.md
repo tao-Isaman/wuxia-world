@@ -89,7 +89,7 @@ A cutscene is registered under `cs_<sceneId>` and played by a dialog whose `cuts
 - **Stage.** The location's painted map (`getLocationMap(stage).image`), centred on `around` (an NPC's spot) or the map's arrival point.
   - Cast positions are grid steps (26 × 18 map units) around that centre, snapped onto walkable ground (`nearestWorldGround`).
   - The camera eases to `camera` targets; `zoom` is in map widths per view (default 2.4).
-- **Actors** use the same atlases as the map: hero bodies, archetypes, the 30 rigged NPC sheets, `"hero"` (the player's body), or creature-atlas beasts.
+- **Actors** use the same atlases as the map: hero bodies, archetypes, the 48 rigged NPC sheets, `"hero"` (the player's body), or creature-atlas beasts.
   - They walk with the walk clips (north / south rows when moving vertically), lunge on `attack`, and hold `hurt` / `guard` / `victory` / `defeat`.
   - Speakers turn toward the nearest other actor.
 - **Effects:**

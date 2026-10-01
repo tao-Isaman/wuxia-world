@@ -90,6 +90,7 @@ Real behaviour today, found during the docs audit. Each is small and self-contai
 
 ### Places
 
+- **32 place NPCs still have no art of their own** (the image credits ran out): the people of the homes of หนานเสียน, อิดเต็ง, เถียนป๋อกวง, เหมียวเหรินเฟิง, เฉิงอิ๋ง, หยานจี, เป่ยฉิว, the Plum Manor, Fuwei, plus หูเตาถ่าน and two of หมอเซวี่ย's guests. They use their `look.body` archetype until painted: add `<dir>/body/<id>.png` + `<dir>/portrait/<id>.png`, run `import-npc-art.ts`, add the strollers to `ANIMATED_NPC_IDS`, then `build-npc-sprites.ts` and `build-npc-sheets.ts`.
 - **New place content is unplayed by hand.** The 97 place quests pass the store play-through and audits; their writing was checked by the agents that wrote it, not proofread.
 - **Two systems teach some ยุทธจักร moves.** 35 of the 69 moves that got a quest can also be bought from city school halls or read from a manual; that is intended (quests are the way for every move), but the hall prices weren't retuned.
 - **Kidnapped NPCs can't be kidnapped again** after they return (`kidnappedNpcIds` stays for quest conditions).
@@ -176,7 +177,7 @@ Real behaviour today, found during the docs audit. Each is small and self-contai
 
 ### Rigged NPCs
 
-33. **Approximate side and back views.** The 30 rigged sheets are puppet poses of front-facing paintings: limbs bend as whole parts (sleeves and robes swing with the leg or torso they sit on), the side walk is a narrower, leaning front view, and the back view only repaints the head (a beard below the neck stays). New side and back art per NPC would replace `public/art/characters/npc/` one for one.
+33. **Approximate side and back views.** The 48 rigged sheets are puppet poses of front-facing paintings: limbs bend as whole parts (sleeves and robes swing with the leg or torso they sit on), the side walk is a narrower, leaning front view, and the back view only repaints the head (a beard below the neck stays). New side and back art per NPC would replace `public/art/characters/npc/` one for one.
 34. **Villain bosses and their NPCs coexist.** A villain met on the road is the same person who stands at their base; beating them on the road changes nothing there. Only killing, kidnapping or a death in the simulation removes them from the encounter pool.
 
 ### Roads and directions

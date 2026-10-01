@@ -176,6 +176,7 @@ Then run `bun run test:navigation`: every painted map must keep its spawn open a
 5. **Art** is resolved by id:
    - Put a 256×256 portrait at `public/npcs/<id>.png` and a 192×192 body at `public/npcs/body/<id>.png`.
    - Add the id to `npc-portrait-ids.ts` and `npc-body-ids.ts`.
+   - Or paint them on a flat light background and run `bun scripts/import-npc-art.ts --from <dir>` (`<dir>/body/<id>.png`, `<dir>/portrait/<id>.png`): it cuts the figure out, fits it into the 192 px frame, sizes the portrait and registers both ids.
    - Run `bun scripts/build-npc-sprites.ts`, which writes `public/npcs/pixel/`, `public/npcs/pixel-battle/` and `npc-pixel-ids.ts`.
 
    Without art, the NPC uses an archetype costume chosen by `npcCharacterId` (`lib/characters/catalog.ts`) from its id.
