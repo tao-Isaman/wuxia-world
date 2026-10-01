@@ -1,3 +1,4 @@
+import { gradePixels } from "./route-grade";
 import type * as Phaser from "phaser";
 import {
   CHARACTER_CLIPS, characterId, npcCharacterId,
@@ -464,6 +465,11 @@ export function createWorldRuntime(
     const backgroundCanvas = drawCanvas(WIDTH, HEIGHT, (context) => {
       if (initial.mirrorImage) { context.translate(WIDTH, 0); context.scale(-1, 1); }
       context.drawImage(landscape, 0, 0, WIDTH, HEIGHT);
+      if (initial.imageGrade) {
+        const pixels = context.getImageData(0, 0, WIDTH, HEIGHT);
+        gradePixels(pixels.data, initial.imageGrade);
+        context.putImageData(pixels, 0, 0);
+      }
     });
     image(texture(backgroundCanvas, "map"), -1).setOrigin(0, 0);
 

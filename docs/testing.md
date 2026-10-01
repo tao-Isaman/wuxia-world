@@ -50,6 +50,7 @@ Each suite is a Bun script (or `bun test` file) wired as `test:*` in `package.js
 | `test:grid-store` | `scripts/test-grid-store.ts` | 13 | battle store + bridge + looks + the world hand-off: HP carry-over, packs and board sizes, spar sprites, rigged NPC sheets, flee, auto mode, win / loss / escape results |
 | `test:npcs` | `scripts/test-npc-sheets.ts` | 7 | the 30 rigged NPCs: art, placement, complete sheets, every frame a distinct pose, catalog wiring, the 10 villain bosses in the encounter pool; wandering stays near home, off blocked ground and still when frozen |
 | `test:story` | `scripts/test-story-quests.ts` | — | every sect skill and art has exactly one quest source and nothing else (rank, manual, hall, dialog, other quest) teaches it; lineage quests (teacher, foe, item, spar tier, lines) and sagas (8–10 chapters, lines, cutscenes, small rewards) are well formed; every cutscene's stage, cast and beats resolve; **every** lineage quest and saga chapter plays through in the real store to the learned skill or art; difficulty gates by tier. `STORY_SECT=<label>` limits it to one sect |
+| `test:routes` | `scripts/test-routes.ts` | 7 | world coords are current; compass helpers; one exit per slot and every exit within 90° of its destination's bearing; every road runs its exit's way and has its painting; road geometry on the painting for all 8 directions; regional grades; arrivals land beside the exit back |
 | `test:quests` | 5 scripts | — | the campaign audit, dead-end regressions, playing **every** item / kill / objective quest (213) through the real store, guidance for all 657 stages, and every steal / assassinate / kidnap quest stage (39) |
 | `test:docs` | `scripts/build-docs-reference.ts --check`, `scripts/check-docs.ts` | — | the generated reference is current; links, repo paths and commands in the docs resolve |
 
@@ -104,7 +105,7 @@ Read-only scripts, not wired into `package.json`:
 
 Many specs replace `Math.random` in the page to make rolls predictable.
 
-22 tests in 12 spec files:
+23 tests in 13 spec files:
 
 | Spec | Tests | Covers |
 | --- | --- | --- |
@@ -119,6 +120,7 @@ Many specs replace `Math.random` in the page to make rolls predictable.
 | `opening.spec.ts` | 1 | the first session: clinic errand, a bought potion, the free duel on auto, rests, a w-exp upgrade |
 | `pwa.spec.ts` | 1 | manifest and icons, an active service worker, an offline reload — **needs a production server** |
 | `quest-tracking.spec.ts` | 1 | pinning a quest, the HUD tracker, and the ฉางอัน spy objective advancing in person |
+| `routes.spec.ts` | 1 | home → capital: the road map's direction, the hero starting at its near end, and arriving beside the exit back home |
 | `story.spec.ts` | 2 | a saga chapter's film plays (title card, tap, skip), the long briefing pages, and the quest log's ตำนาน tab replays the film; the sect window's ขั้นและวิชา tab lists the sect's skills with their quests, and a rank-up pays gold and teaches nothing |
 
 Screenshots from specs go to `test-results/screenshots/`; failure traces go to `test-results/<test>/`. Both are git-ignored.

@@ -6,6 +6,13 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-01
 
+### Directional roads
+
+- **Exits face where they go.** Every place has a spot on a world map (`lib/world/data/world-coords.ts`, built by `scripts/build-world-coords.ts`). Exits on a location map sit on the edge facing their destination: a place to the east is reached by the right-hand edge. Auto maps prefer their painted paths when one points within ~43°; hand maps keep their gates and reassign destinations.
+- **Roads run the way you left.** 56 new top-down road paintings, 7 types × 8 directions (N, NE, E, SE, S, SW, W, NW), replace the 42 bottom-to-top ones. Leave by the right edge and you start at the road's left end, walk right, and the destination waits at the right end. Regional colours are graded when the map loads (`lib/stage/route-grade.ts`), so the folder shrank from 19 MB to 14 MB.
+- **Arrive on the side you came in.** Reaching a place (or turning back) puts the hero beside the exit back where they came from, facing into the map. A road always starts at its near end.
+- New `lib/world/compass.ts`, `bun run test:routes` and `tests/browser/routes.spec.ts`.
+
 ### One way to every sect skill: its quest
 
 - **Sect ranks no longer grant martial arts.** The skill and art pools (`skillsByRank` / `artsByRank`), the reward picker and the auto-grants are gone. A rank-up now pays gold (`rankUpGold`, half its point cost) and opens more lineage quests and sagas. The sect window's tab is now 🎖 ขั้นและวิชา: rank-up, then every sect skill and art with its quest and what it still needs.

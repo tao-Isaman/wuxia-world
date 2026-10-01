@@ -13,6 +13,7 @@
 // render width.
 
 import { buildAutoMap } from "./auto-maps";
+import { assignSlotsByBearing } from "../compass";
 
 export interface MapPoint {
   x: number;
@@ -139,9 +140,32 @@ LOCATION_MAPS.jail = {
   ],
 };
 
+const compassed = new Map<string, LocationMapDef>();
+
+/**
+ * A hand map keeps its painted gate positions, but each destination takes
+ * the gate that best matches its compass bearing on the world map (its icon
+ * goes with it), like the auto maps.
+ */
+function withCompassExits(id: string, def: LocationMapDef): LocationMapDef {
+  const exits = def.exits ?? [];
+  if (exits.length < 2) return def;
+  const slotOf = assignSlotsByBearing(id, exits.map((e) => e.to), exits);
+  return { ...def, exits: exits.map((e, i) => ({ ...exits[slotOf[i]], to: e.to, icon: e.icon })) };
+}
+
 export function getLocationMap(id: string): LocationMapDef | undefined {
   // Hand-authored entries win; every other painted location falls back
   // to the convention-based auto builder (see auto-maps.ts, which
   // imports only types from this module — no runtime cycle).
-  return LOCATION_MAPS[id] ?? buildAutoMap(id);
+  const hand = LOCATION_MAPS[id];
+  if (!hand) return buildAutoMap(id);
+  let def = compassed.get(id);
+  if (!def) { def = withCompassExits(id, hand); compassed.set(id, def); }
+  return def;
+}
+
+/** Where a location's map shows its way out to `to`, if it is on the map. */
+export function mapExitTo(id: string, to: string): LocationMapExit | undefined {
+  return getLocationMap(id)?.exits?.find((e) => e.to === to);
 }

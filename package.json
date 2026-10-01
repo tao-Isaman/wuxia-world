@@ -24,6 +24,7 @@
     "test:grid-store": "bun scripts/test-grid-store.ts",
     "test:npcs": "bun scripts/test-npc-sheets.ts",
     "test:story": "bun scripts/test-story-quests.ts",
+    "test:routes": "bun scripts/test-routes.ts",
     "test:quests": "bun scripts/audit-quest-completion.ts && bun scripts/test-quest-dead-ends.ts && bun scripts/test-quest-turnins.ts && bun scripts/test-quest-guide.ts && bun scripts/test-bad-action-quests.ts",
     "test:docs": "bun scripts/build-docs-reference.ts --check && bun scripts/check-docs.ts",
     "test:e2e": "playwright test"

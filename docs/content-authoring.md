@@ -123,8 +123,9 @@ Append to `LOCATION_ROUTES` in `lib/world/data/location-routes.ts`:
 ```
 
 - Both directions are generated: `route_<a>__to__<b>` and `route_<b>__to__<a>`, each using its own label.
-- The road painting is chosen from the two endpoints' prefixes (coast, gorge, mountain, forest, lane, highway or country) and graded by region.
-- An auto-laid map shows at most **8 exits**. The ninth road of a place (by destination id) is listed only in the "อื่น ๆ" drawer.
+- The road painting is chosen from the two endpoints' prefixes (coast, gorge, mountain, forest, lane, highway or country), the direction the road leaves by, and the region.
+- **After adding a place or a road,** run `bun scripts/build-world-coords.ts` (the world-map spot that sets exit directions); `bun run test:routes` fails while it is stale.
+- An auto-laid map shows at most **8 exits**, each on the edge facing its destination. With more roads, the worst-fitting one is listed only in the "อื่น ๆ" drawer.
 
 ## A painted map
 

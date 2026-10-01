@@ -1,12 +1,12 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ArtisanDef, LocationMapDef, LocationScene, MapSpot, NpcDef } from "@/lib/world";
 import { activeGuide, evaluateCondition, guideMarkerId, objectiveMarkerId, objectiveSpotsAt, objectiveSpotsForNpc, getArtisan, getQuestsForNpc, isQuestOfferable, isQuestTurnInForNpc, getNpcsAtLocation, getResource, getScene, getSectHallAt, getShopAt, npcBodySprite, npcPixelSprite, playerBodySprite } from "@/lib/world";
 import { useWorldStore, TRAVEL_STAMINA_COST } from "@/store/world-store";
 import { getActivity } from "@/lib/world/data/activities";
 import { toast } from "@/store/toast-store";
 import { WorldCanvas } from "@/components/game/world-canvas";
-import { forgetMapPosition, type WorldMarker, type WorldPresentation } from "@/lib/stage/types";
+import { clearArrivalFrom, forgetMapPosition, peekArrivalFrom, type WorldMarker, type WorldPresentation } from "@/lib/stage/types";
 import { capitalVignette } from "@/lib/stage/world-vignettes";
 export { clearMapPositions } from "@/lib/stage/types";
 
@@ -32,11 +32,27 @@ function freeSpot(spawn: { x: number; y: number }, taken: readonly { x: number; 
   }
   return { x: spawn.x + 6, y: spawn.y - 4 };
 }
+/** Spawn just inside the exit back to `from`, facing into the map; null without one. */
+function arrivalSpawn(map: LocationMapDef, from: string | undefined) {
+  const exit = from ? map.exits?.find((e) => e.to === from) : undefined;
+  if (!exit) return null;
+  // 70 map units (of 960 × 640) in from the exit, toward the middle: within
+  // reach of the way back, clear of the edge.
+  const centre = { x: 50, y: 56 };
+  const dx = (centre.x - exit.x) * 9.6, dy = (centre.y - exit.y) * 6.4, length = Math.hypot(dx, dy) || 1;
+  const spawn = { x: exit.x + dx / length * 70 / 9.6, y: exit.y + dy / length * 70 / 6.4 };
+  const facing: "east" | "west" | "north" | "south" = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? "east" : "west") : (dy > 0 ? "south" : "north");
+  return { spawn, facing };
+}
+
 export function LocationMap({ scene, map, handlers, readOnly = false, dialogueSpeakerId }: {
   scene: LocationScene; map: LocationMapDef; handlers: MapSpotHandlers; readOnly?: boolean; dialogueSpeakerId?: string;
 }) {
   const state = useWorldStore();
   const lastInteractivePresentation = useRef<WorldPresentation | null>(null);
+  // Walked in from a road: start beside the exit that leads back there.
+  const [arrivedFrom] = useState(() => peekArrivalFrom(scene.id));
+  useEffect(() => () => { clearArrivalFrom(scene.id); }, [scene.id]);
   const markers: WorldMarker[] = [];
   const spots = map.npcSpots ?? {};
   const registry = getNpcsAtLocation(scene.id).filter((n) => spots[n.id] && (!n.visibleIf || evaluateCondition(state, n.visibleIf)));
@@ -115,14 +131,16 @@ export function LocationMap({ scene, map, handlers, readOnly = false, dialogueSp
         const current = useWorldStore.getState();
         if (!current.canTravelTo(routeId)) { toast("warn", "พลังไม่พอสำหรับการเดินทาง"); return; }
         forgetMapPosition(scene.id);
+        forgetMapPosition(routeId); // a road always starts at its near end
         current.gotoScene(routeId);
       } });
   }
   const guide = activeGuide(state);
   const guideId = guide ? guideMarkerId(state, guide) : null;
   const guidedMarkers = guideId ? markers.map((marker) => marker.id === guideId ? { ...marker, guide: true } : marker) : markers;
+  const arrival = arrivalSpawn(map, arrivedFrom);
   const presentation: WorldPresentation = { key: scene.id, name: scene.name, image: map.image,
-    time: state.time, spawn: map.spawn, playerImage: playerBodySprite(state.playerBodyId), markers: guidedMarkers,
+    time: state.time, spawn: arrival?.spawn ?? map.spawn, spawnFacing: arrival?.facing, playerImage: playerBodySprite(state.playerBodyId), markers: guidedMarkers,
     ...capitalVignette(scene.id, state.quests.qc_capital_clinic_supplies?.status === "done",
       state.flags.capital_ledger_recovered === true) };
   useEffect(() => {

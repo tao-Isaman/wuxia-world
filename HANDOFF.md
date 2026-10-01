@@ -69,12 +69,13 @@ Checked on 2026-10-01 for wave 27 (animated, wandering NPCs and villain bosses):
 | `test:grid-skills` | 7 checks pass |
 | `test:grid-store` | 13 checks pass |
 | `test:npcs` | 7 checks pass |
+| `test:routes` | 7 checks pass: 255 exits on 98 maps (246 within 45° of their bearing), 258 roads on 54 of the 56 paintings, 254/256 arrivals on the side the road came from |
 | `test:story` | 7 checks pass: 154 lineage quests, 38 sagas (340 chapters), 292 cutscenes; every quest and chapter plays through in the real store |
 | `test:quests` | the campaign audit passes (770 quests, 102 reachable locations); 213 item / kill / objective quests hand in through the real store; guidance covers 650 of 657 stages; all 39 steal / assassinate / kidnap stages offer the action and advance |
 | `test:docs` | the generated reference is current; every link, repo path and command in the docs resolves |
 | `bun scripts/audit-content.ts` | 157 NPCs · 770 quests · 2529 scenes, all references resolve |
 | `bun run build` | passes; `/` first-load JS 984 kB (was 508 kB; the saga text is about 2.9 MB of source, ~500 kB gzipped) |
-| `bun run test:e2e` | all 22 Playwright tests pass against the production build on :3017 (about 10 minutes, Chromium 141 via the container shim) |
+| `bun run test:e2e` | all 23 Playwright tests pass against the production build on :3017 (about 10 minutes, Chromium 141 via the container shim) |
 
 Not verified:
 
@@ -170,6 +171,11 @@ Real behaviour today, found during the docs audit. Each is small and self-contai
 
 33. **Approximate side and back views.** The 30 rigged sheets are puppet poses of front-facing paintings: limbs bend as whole parts (sleeves and robes swing with the leg or torso they sit on), the side walk is a narrower, leaning front view, and the back view only repaints the head (a beard below the neck stays). New side and back art per NPC would replace `public/art/characters/npc/` one for one.
 34. **Villain bosses and their NPCs coexist.** A villain met on the road is the same person who stands at their base; beating them on the road changes nothing there. Only killing, kidnapping or a death in the simulation removes them from the encounter pool.
+
+### Roads and directions
+
+40. **Exits off their painted path.** Auto-map paintings have paths at the first N edge slots (in the old destination-id order). An exit now goes to the edge facing its destination, so on some maps it stands where no path is painted and a painted path leads nowhere. Repainting those maps (and their collision footprints) would fix it.
+41. **The world map is a layout, not geography.** `world-coords.ts` is a force layout seeded from regions; a few wild places are pinned by hand. Directions follow it, so a road's direction can differ from the real-world one.
 
 ### Story quests
 
