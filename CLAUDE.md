@@ -67,6 +67,7 @@ bun run test:grid-skills
 bun run test:grid-store
 bun run test:npcs
 bun run test:story          # every sect skill/art has a quest; lineage + sagas + cutscenes well formed; all play through
+bun run test:routes         # compass exits, 8-way road paintings and arrival sides; world coords current
 bun run test:quests         # campaign audit + dead ends + every item/kill/objective quest + guidance + bad-action stages
 bun run test:docs           # generated reference is current + docs links/paths/commands resolve
 bun run test:e2e            # Playwright (Chromium) on :3017 — start a production server first
@@ -78,6 +79,8 @@ bun scripts/map-collision-tool.ts <id> [json] [png]   # check / draw a painted m
 bun scripts/build-npc-sprites.ts        # NPC pixel sprites from public/npcs/body/
 bun scripts/build-npc-sheets.ts         # rigged animation sheets for the 30 NPCs in lib/characters/npc-sheets.ts
 bun scripts/smoke-liveness.ts           # 90-day NPC simulation smoke test
+bun scripts/build-world-coords.ts       # each place's world-map spot (exit / road directions); rerun after adding a place or road
+bun scripts/build-route-variants.ts --from <dir>   # import the 56 directional road paintings (<type>-<dir8>.png)
 ```
 
 **Do not run:**
@@ -260,6 +263,7 @@ Two deliberate exceptions reach into stores:
   - It pauses while any `[role="dialog"]`, `[role="alertdialog"]` or `[data-world-busy]` exists (`worldInputBlocked`).
   - It publishes `data-*` attributes (`data-ready`, `data-player-x/y/frame/motion/facing`, `data-nearby-marker`, `data-guide-marker`, `data-visible-props`…) for tests.
 - **Battle runtime.** `grid-battle-runtime.ts` draws the board in 2.5D and plays `state.events`: walk 180 ms per tile, casts with VFX and SFX, damage numbers. It calls `battleStore.step()` about 350 ms after playback idles. Skill VFX come from `cast-vfx.ts` (pure) and `battle-vfx.ts`; skill sounds from `lib/audio/cast-sfx.ts`, using the same profile.
+- **Directions.** Travel follows the world-map compass (`lib/world/compass.ts`, `data/world-coords.ts`). Exits sit on the map edge facing their destination (`assignSlotsByBearing`); a road runs the way its exit faces (`routeDirection`, 8 ways, painting `/maps/routes/<type>-<dir>.webp`, region graded at load by `lib/stage/route-grade.ts`); arriving puts the hero beside the exit back (`setArrivalFrom` hints in `lib/stage/types.ts`).
 - **Collision.** `world-navigation.ts` (+ `world-footprints-data.ts`) covers all 101 painted maps; `test:navigation` probes every map.
 - **Rules.** Never put Phaser objects in stores or saves. Don't enable Phaser input. Respect `prefers-reduced-motion`. New popups are `Modal`s, so the map pauses by itself.
 

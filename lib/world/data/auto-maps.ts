@@ -5,8 +5,9 @@
 // layout convention (see scripts in the session scratchpad), and this
 // module rebuilds marker positions from the SAME conventions at
 // runtime — the prompt generator and this builder must stay in
-// lockstep: exits go to EXIT_SLOTS in route order (sorted by
-// destination id), services go to fixed zones, NPCs fill NPC_SLOTS in
+// lockstep: the paintings have paths at the first N EXIT_SLOTS (N = the
+// number of routes, max 8); which destination uses which painted path is
+// chosen by compass bearing (see build()), services go to fixed zones, NPCs fill NPC_SLOTS in
 // registry order. Markers therefore land in the right *area* of the
 // painting; hand-tune a location by adding a full entry to
 // LOCATION_MAPS in location-maps.ts (hand entries always win).
@@ -20,6 +21,7 @@ import { getNpcsAtLocation } from "./npcs";
 import { RESOURCES_BY_ID } from "./resources";
 import { LIFE_SKILL_ICON } from "./life-skills";
 import { canPracticeAt } from "../location-categories";
+import { assignSlotsByBearing } from "../compass";
 
 // Edge slots for exits, in assignment order. The prompt generator
 // describes "a path leaving at the <label> edge" for each used slot.
@@ -100,14 +102,21 @@ function build(id: string): LocationMapDef | undefined {
   const scene = SCENES_BY_ID.get(id);
   if (!scene || scene.kind !== "location") return undefined;
 
-  // Exits: routes sorted by destination id → EXIT_SLOTS in order.
+  // Exits: the painting has a path at each of the first min(8, routes)
+  // EXIT_SLOTS. Each destination takes the slot that best matches its compass
+  // bearing on the world map (compass.ts) — a painted path when one points
+  // within ~43°, else the edge facing it — so a place to the east leaves by
+  // the right-hand edge. Leftovers (9+ routes) stay as cards.
   const dests = scene.routes
     .map((r) => routeDest(id, r.routeSceneId))
     .filter((d): d is string => !!d)
     .sort();
+  const slotOf = assignSlotsByBearing(id, dests, EXIT_SLOTS, Math.min(dests.length, EXIT_SLOTS.length));
   const exits: LocationMapExit[] = dests
-    .slice(0, EXIT_SLOTS.length)
-    .map((to, i) => ({ to, x: EXIT_SLOTS[i].x, y: EXIT_SLOTS[i].y }));
+    .map((to, i) => ({ to, slot: slotOf[i] }))
+    .filter((e) => e.slot >= 0)
+    .sort((a, b) => a.slot - b.slot)
+    .map(({ to, slot }) => ({ to, x: EXIT_SLOTS[slot].x, y: EXIT_SLOTS[slot].y }));
 
   // NPCs: registry NPCs at this location + scene NPCs, sorted by id.
   const npcIds = [

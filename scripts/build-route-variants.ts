@@ -1,40 +1,44 @@
 /**
- * Regional colour grades for the shared road paintings.
- *   bun scripts/build-route-variants.ts [--preview <out.jpg>]
- * Each /maps/routes/<type>.webp gets one graded copy per region
- * (/maps/routes/<type>-<region>.webp; heartland keeps the original), so a
- * mountain pass in the snowy north, the western desert or the lush south
- * reads as a different road. Mirroring is done at runtime (RouteMapDef.mirror).
+ * Road paintings for the travel screens.
+ *   bun scripts/build-route-variants.ts --from <dir>              # import new paintings
+ *   bun scripts/build-route-variants.ts --preview <out.jpg> [type-dir]   # see the regional grades
+ * --from <dir> imports <type>-<dir8>.png (1536×1024, the road painted from one
+ * edge or corner to the opposite one) as /maps/routes/<type>-<dir8>.webp at
+ * 1152×768 and deletes any other route file. Regions are not baked: the world
+ * runtime grades the pixels when a road map loads (lib/stage/route-grade.ts),
+ * and --preview runs that same code.
  */
 import sharp from "sharp";
-import { readdirSync } from "node:fs";
+import { readdirSync, unlinkSync } from "node:fs";
+import { DIR8 } from "../lib/world/compass";
+import { ROUTE_GRADES, gradePixels } from "../lib/stage/route-grade";
 
 const DIR = "public/maps/routes";
-type Grade = (image: sharp.Sharp) => sharp.Sharp;
-export const ROUTE_GRADES: Record<string, Grade> = {
-  // Frost highlands: cooled, desaturated, lifted toward snow light.
-  north: (i) => i.recomb([[0.62, 0.26, 0.12], [0.22, 0.64, 0.14], [0.2, 0.26, 0.64]]).linear([0.92, 0.95, 1.04], [26, 28, 40]).modulate({ saturation: 0.8 }),
-  // Western desert: ochre sand, sun-bleached greens.
-  west: (i) => i.recomb([[1.12, 0.22, 0], [0.24, 0.8, 0], [0.08, 0.22, 0.42]]).linear([1, 0.98, 0.95], [18, 10, 0]).modulate({ saturation: 0.8 }),
-  // Lush humid south: deeper, greener, richer.
-  south: (i) => i.recomb([[0.82, 0.08, 0.06], [0.04, 1.02, 0.08], [0, 0.12, 1.02]]).modulate({ saturation: 1.3, brightness: 0.9, hue: 10 }),
-  // Misty eastern coast at dawn: soft contrast, rose-teal haze.
-  east: (i) => i.linear([0.8, 0.8, 0.84], [44, 36, 44]).recomb([[1.02, 0, 0.02], [0, 0.98, 0.04], [0.02, 0.04, 1.02]]).modulate({ saturation: 0.9 }),
-  // Wild jianghu: dusk — cool violet shadow, the road lit by the last light.
-  jianghu_wild: (i) => i.linear([0.66, 0.66, 0.86], [4, 6, 24]).modulate({ saturation: 0.82 }),
-};
-
+const TYPES = ["highway", "country", "forest", "mountain", "gorge", "coast", "lane"];
 const args = process.argv.slice(2);
-const types = readdirSync(DIR).filter((f) => /^[a-z]+\.webp$/.test(f)).map((f) => f.replace(".webp", ""));
+
 if (args[0] === "--preview") {
-  const source = `${DIR}/${args[2] ?? "mountain"}.webp`, W = 384, H = 256;
-  const tiles = [await sharp(source).resize(W, H).toBuffer()];
-  for (const grade of Object.values(ROUTE_GRADES)) tiles.push(await grade(sharp(source).resize(W, H)).toBuffer());
+  const source = `${DIR}/${args[2] ?? "mountain-N"}.webp`, W = 384, H = 256;
+  const regions = [undefined, ...Object.keys(ROUTE_GRADES)];
+  const tiles = await Promise.all(regions.map(async (region) => {
+    const { data, info } = await sharp(source).resize(W, H).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+    gradePixels(data, region);
+    return sharp(data, { raw: { width: info.width, height: info.height, channels: 4 } }).png().toBuffer();
+  }));
   await sharp({ create: { width: W * 3, height: H * 2, channels: 3, background: "#000" } })
     .composite(tiles.map((input, i) => ({ input, left: (i % 3) * W, top: Math.floor(i / 3) * H }))).jpeg().toFile(args[1]);
-} else {
-  for (const type of types) for (const [region, grade] of Object.entries(ROUTE_GRADES)) {
-    await grade(sharp(`${DIR}/${type}.webp`)).webp({ quality: 80 }).toFile(`${DIR}/${type}-${region}.webp`);
+  console.log(`wrote ${args[1]}: base, ${Object.keys(ROUTE_GRADES).join(", ")}`);
+} else if (args[0] === "--from" && args[1]) {
+  const keep = new Set<string>();
+  for (const type of TYPES) for (const dir of DIR8) {
+    const file = `${type}-${dir}.webp`;
+    await sharp(`${args[1]}/${type}-${dir}.png`).resize(1152, 768).webp({ quality: 62 }).toFile(`${DIR}/${file}`);
+    keep.add(file);
   }
-  console.log(`wrote ${types.length * Object.keys(ROUTE_GRADES).length} graded route paintings`);
+  let removed = 0;
+  for (const file of readdirSync(DIR)) if (!keep.has(file)) { unlinkSync(`${DIR}/${file}`); removed++; }
+  console.log(`imported ${keep.size} road paintings; removed ${removed} other files`);
+} else {
+  console.error("usage: --from <dir> | --preview <out.jpg> [type-dir]");
+  process.exit(1);
 }

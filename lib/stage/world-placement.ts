@@ -17,7 +17,7 @@ export function initialWorldPlacement(
 ): WorldPlacement {
   const remembered = presentation.rememberPosition === false ? undefined : rememberedPosition;
   const position = nearestWorldGround(toWorld(remembered ?? presentation.spawn), footprints);
-  const fallback: WorldPlacement = { position, facing: "east" };
+  const fallback: WorldPlacement = { position, facing: remembered ? "east" : presentation.spawnFacing ?? "east" };
   // Mounted conversations do not call this again. A recreated live canvas must
   // also keep its remembered position, even while dialogue is open.
   if (!presentation.readOnly || remembered || !presentation.dialogueSpeakerId) return fallback;

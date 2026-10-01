@@ -1,15 +1,18 @@
 // ─── Route (edge) maps ────────────────────────────────────────────────
 //
-// Travel screens between locations reuse a small set of road paintings
+// Travel screens between locations reuse a set of top-down road paintings
 // keyed by edge TYPE (mountain trail, forest road, coastal path, ...),
-// classified from the two endpoint location ids. Each painting shows a
-// road running bottom → top: the player walks up to the destination
-// marker at the top edge, or back down to the return marker at the
-// bottom. Only generated `route_<src>__to__<dst>` scenes get maps —
-// authored/tutorial route scenes keep the classic card UI.
+// classified from the two endpoint location ids, and by DIRECTION: the
+// road runs the way the player left. Leave a place by its right-hand
+// (east) exit and the road is painted west → east: the hero starts at the
+// left edge and walks right to the destination marker, then arrives on the
+// left side of the next place (lib/stage/types.ts arrival hints). Only
+// generated `route_<src>__to__<dst>` scenes get maps — authored/tutorial
+// route scenes keep the classic card UI.
 
-import type { MapPoint } from "./location-maps";
+import { mapExitTo, type MapPoint } from "./location-maps";
 import { regionOf } from "./regions";
+import { DIR8, dir8Of, dirVector, mapPointDir, worldBearing, type Dir8 } from "../compass";
 
 export type RouteMapType =
   | "highway"
@@ -22,7 +25,11 @@ export type RouteMapType =
 
 export interface RouteMapDef {
   image: string;
-  /** Draw the painting mirrored left↔right (the road stays centred). */
+  /** Region whose colour grade the painting gets when drawn (lib/stage/route-grade.ts); none = heartland. */
+  grade?: string;
+  /** The way the road runs, from the start (back marker) to the destination. */
+  direction: Dir8;
+  /** Draw the painting mirrored left↔right. Unused by the 8-direction set. */
   mirror?: boolean;
   zoom: number;
   spawn: MapPoint;
@@ -74,20 +81,35 @@ export function classifyRouteEdge(src: string, dst: string): RouteMapType {
   return "forest";
 }
 
-// Shared geometry: road runs up the middle. Destination gate sits at the
-// top of the road; extra destinations (rare) fan out beside it.
-const GEOMETRY = {
-  zoom: 1.7,
-  spawn: { x: 50, y: 80 },
-  destSlots: [
-    { x: 50, y: 12 },
-    { x: 30, y: 16 },
-    { x: 70, y: 16 },
-    { x: 18, y: 24 },
-    { x: 82, y: 24 },
-  ],
-  back: { x: 50, y: 93 },
-} as const;
+/**
+ * The way a road runs. It leaves the start place by the side its exit sits on
+ * (so the painting continues the way the player walked off the map); a road
+ * with no exit on the map (a card) follows the world-map bearing instead.
+ */
+export function routeDirection(src: string, dst: string): Dir8 {
+  const exit = mapExitTo(src, dst);
+  if (exit) return mapPointDir(exit);
+  const bearing = worldBearing(src, dst);
+  return bearing === null ? "N" : dir8Of(Math.cos(bearing), Math.sin(bearing));
+}
+
+const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
+/** A point `t` of the way along the painted road, edge to edge (percent of the 3:2 painting). */
+function along(dir: Dir8, t: number): MapPoint {
+  const v = dirVector(dir);
+  // Edge-to-edge in each axis: cardinal roads cross the middle, diagonals run corner to corner.
+  const sx = v.x === 0 ? 0 : Math.sign(v.x) * 46, sy = v.y === 0 ? 0 : Math.sign(v.y) * 45;
+  return { x: clamp(50 + sx * (2 * t - 1), 3, 97), y: clamp(50 + sy * (2 * t - 1), 4, 95) };
+}
+
+/** Spawn, destination and back markers for a road running `dir`. */
+export function routeGeometry(dir: Dir8): Pick<RouteMapDef, "zoom" | "spawn" | "destSlots" | "back"> {
+  const dest = along(dir, 0.97);
+  // Rare extra destinations fan out beside the far end.
+  const side = dirVector(DIR8[(DIR8.indexOf(dir) + 2) % 8]);
+  const extra = [1, -1, 2, -2].map((k) => ({ x: clamp(dest.x + side.x * 14 * k, 6, 94), y: clamp(dest.y + side.y * 12 * k, 8, 92) }));
+  return { zoom: 1.7, spawn: along(dir, 0.12), destSlots: [dest, ...extra], back: along(dir, 0.02) };
+}
 
 export function getRouteMap(routeSceneId: string): RouteMapDef | undefined {
   if (!routeSceneId.startsWith("route_")) return undefined;
@@ -96,22 +118,18 @@ export function getRouteMap(routeSceneId: string): RouteMapDef | undefined {
   const src = routeSceneId.slice("route_".length, sep);
   const dst = routeSceneId.slice(sep + "__to__".length);
   const type = classifyRouteEdge(src, dst);
-  return { image: routeImage(type, src, dst), mirror: routeMirror(src, dst), ...GEOMETRY };
+  const direction = routeDirection(src, dst);
+  return { image: routeImage(type, direction), grade: routeRegion(src, dst) ?? undefined, direction, ...routeGeometry(direction) };
 }
 
-// Region grades (scripts/build-route-variants.ts): the road takes the look of
-// the land it crosses — the more distinctive endpoint region wins, with the
-// destination preferred. Heartland keeps the original painting.
+// Region grades: the road takes the look of the land it crosses — the more
+// distinctive endpoint region wins, with the destination preferred. Heartland
+// keeps the painting as it is; the others are graded when the road map is
+// drawn (lib/stage/route-grade.ts), so 56 base paintings serve every region.
 const GRADED = new Set(["north", "west", "south", "east", "jianghu_wild"]);
-function routeImage(type: RouteMapType, src: string, dst: string): string {
-  const region = [regionOf(dst), regionOf(src)].find((r) => GRADED.has(r));
-  return region ? `/maps/routes/${type}-${region}.webp` : `/maps/routes/${type}.webp`;
+export function routeRegion(src: string, dst: string): string | null {
+  return [regionOf(dst), regionOf(src)].find((r) => GRADED.has(r)) ?? null;
 }
-
-/** Stable per road (both directions agree), so the same road never flips. */
-function routeMirror(src: string, dst: string): boolean {
-  const key = [src, dst].sort().join("|");
-  let hash = 2166136261;
-  for (let i = 0; i < key.length; i++) hash = Math.imul(hash ^ key.charCodeAt(i), 16777619);
-  return (hash >>> 0) % 2 === 1;
+export function routeImage(type: RouteMapType, dir: Dir8): string {
+  return `/maps/routes/${type}-${dir}.webp`;
 }

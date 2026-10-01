@@ -32,8 +32,12 @@ export interface WorldPresentation {
   image: string;
   /** Draw the background painting mirrored left↔right (route variety). */
   mirrorImage?: boolean;
+  /** Regional colour grade for the painting (route maps; lib/stage/route-grade.ts). */
+  imageGrade?: string;
   playerImage: string;
   spawn: Point;
+  /** Which way the hero faces at `spawn` (default east). */
+  spawnFacing?: "east" | "west" | "north" | "south";
   markers: WorldMarker[];
   time?: number;
   paused?: boolean;
@@ -64,7 +68,15 @@ export const getRememberedMapPosition = (key: string) => positions.get(key);
 export const getMapPosition = (key: string, fallback: Point) => positions.get(key) ?? fallback;
 export const rememberMapPosition = (key: string, point: Point) => positions.set(key, point);
 export const forgetMapPosition = (key: string) => positions.delete(key);
-export const clearMapPositions = () => positions.clear();
+export const clearMapPositions = () => { positions.clear(); arrivals.clear(); };
+
+// Arrival hints: the place the hero is walking in from, so a location map
+// can put them at the exit leading back there (arrive on the side you came
+// in). Session-only like positions; set by the route view on arrival.
+const arrivals = new Map<string, string>();
+export const setArrivalFrom = (locationId: string, fromId: string) => arrivals.set(locationId, fromId);
+export const peekArrivalFrom = (locationId: string) => arrivals.get(locationId);
+export const clearArrivalFrom = (locationId: string) => arrivals.delete(locationId);
 
 export function stepTowards(from: Point, to: Point, distance: number): Point {
   const length = Math.hypot(to.x - from.x, to.y - from.y);

@@ -130,7 +130,8 @@ There is no passive regeneration. HP and MP carry from fight to fight. Other way
 
 ## Travel
 
-- **Exits.** Each location map has exits (signs with an arrow). Taking one puts you on the road (a painted route map, or a plain card for a few old roads), where you pick a destination or turn back.
+- **Exits.** Each location map has exits (signs with an arrow) on the side facing where the road goes: a place to the east is reached by the right-hand edge. Taking one puts you on the road (a painted route map, or a plain card for a few old roads), where you pick a destination or turn back.
+- **Directions.** The road runs the way you left: leave by the right edge and you walk from left to right along it, then arrive on the left side of the next place, beside the exit back.
 - **Cost.** A full hop from place to place costs 20 stamina and 3 ชั่วยาม, and trains AGI (see [Stats](#stats)).
 - **Tired.** Below 10 stamina, exits are disabled until you rest.
 - **Free warps.** Story warps (a dialog that sends you somewhere) and "ปิด" back to the last place are free.
