@@ -270,9 +270,11 @@ Jail activities (`doActivity`, only in `jail`):
 | --- | --- | --- | --- |
 | Score | DEX + 0.5 LUK + 3 × steal mastery (1–5) | STR + DEX + 0.5 LUK | STR + VIT + 0.5 LUK |
 | Penalty | 5 × `defenseTier` | 8 × tier | 7 × tier |
-| Offered | NPCs with `stealLoot` (92 of 157), repeatable | when an active quest stage names the NPC; once per NPC | same |
+| Offered | NPCs with `stealLoot` (94 of 157) or a quest stage that needs the steal, repeatable | when an active quest stage names the NPC; once per NPC | same |
 | Success | 1 loot pick (+1 with 30 %), steal xp +25, evil +2, DEX xp +10 | evil +8, fame +2, DEX xp +10 | evil +6, arrogance +1, STR xp +10 |
 | Failure | steal xp +8, **+1 wanted mark**, a **non-fatal** fight with the NPC's own spar build (or a tier guard) | a **fatal** fight with a tier guard | a **fatal** fight with a tier guard |
+
+`badActionOffered(state, npc, kind)` is the one rule for which buttons the NPC card shows; `attemptSteal` uses it too. `scripts/test-bad-action-quests.ts` (in `test:quests`) checks that every quest stage needing a steal, assassination or kidnapping offers it on the target's card and advances when done.
 
 Tier guards (`TIER_TO_BAD_ACTION_OPPONENT`): 0 `thug`, 1 `ruffian`, 2 `iron_palm_thug`, 3 `blade_master`, 4 `demonic_master`.
 

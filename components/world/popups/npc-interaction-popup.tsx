@@ -23,6 +23,7 @@ import {
 } from "@/lib/world";
 import {
   assassinateChance,
+  badActionOffered,
   kidnapChance,
   stealChance,
 } from "@/lib/world/bad-actions";
@@ -227,7 +228,7 @@ export function NpcInteractionPopup({ open, npc, onClose }: Props) {
             </Button>
           )}
 
-          {npc.stealLoot && npc.stealLoot.length > 0 && (
+          {badActionOffered(worldState, npc, "steal") && (
             <Button
               variant="outline"
               onClick={async () => {
@@ -279,7 +280,7 @@ export function NpcInteractionPopup({ open, npc, onClose }: Props) {
             </Button>
           )}
 
-          {npcSupportsAssassinate(worldState, npc) && (
+          {badActionOffered(worldState, npc, "assassinate") && (
             <Button
               variant="outline"
               onClick={async () => {
@@ -318,7 +319,7 @@ export function NpcInteractionPopup({ open, npc, onClose }: Props) {
             </Button>
           )}
 
-          {npcSupportsKidnap(worldState, npc) && (
+          {badActionOffered(worldState, npc, "kidnap") && (
             <Button
               variant="outline"
               onClick={async () => {
@@ -512,57 +513,6 @@ function isOfferableNow(state: ReturnType<typeof useWorldStore.getState>, q: Que
   if (state.quests[q.id]) return false;
   if (q.prereqs && !evaluateCondition(state, q.prereqs)) return false;
   return true;
-}
-
-// True when the player has at least one active quest whose stage is gated
-// on `assassinatedNpc:<this npc>`. The button only shows in that context
-// — drive-by murder isn't a generic action. Once the npc is already in
-// state.assassinatedNpcIds the button hides too (the action helper would
-// refuse anyway).
-function npcSupportsAssassinate(
-  state: ReturnType<typeof useWorldStore.getState>,
-  npc: NpcDef,
-): boolean {
-  if (state.assassinatedNpcIds.includes(npc.id)) return false;
-  return Object.values(state.quests).some((q) => {
-    if (q.status !== "active") return false;
-    const def = getQuest(q.id);
-    if (!def) return false;
-    const stage = def.stages[q.stage];
-    return stageMentionsCondition(stage?.autoAdvance, "assassinatedNpc", npc.id);
-  });
-}
-
-// Same shape as assassinate but for kidnap conditions. Hides when the
-// target is already in state.kidnappedNpcIds.
-function npcSupportsKidnap(
-  state: ReturnType<typeof useWorldStore.getState>,
-  npc: NpcDef,
-): boolean {
-  if (state.kidnappedNpcIds.includes(npc.id)) return false;
-  return Object.values(state.quests).some((q) => {
-    if (q.status !== "active") return false;
-    const def = getQuest(q.id);
-    if (!def) return false;
-    const stage = def.stages[q.stage];
-    return stageMentionsCondition(stage?.autoAdvance, "kidnappedNpc", npc.id);
-  });
-}
-
-// Walks a Condition tree looking for a leaf of the given kind targeting
-// the given NPC id. Used to decide whether a stage's auto-advance is
-// satisfied by attempting the bad action against this NPC.
-function stageMentionsCondition(
-  c: import("@/lib/world").Condition | undefined,
-  kind: "assassinatedNpc" | "kidnappedNpc",
-  npcId: string,
-): boolean {
-  if (!c) return false;
-  if (c.t === kind && c.npcId === npcId) return true;
-  if (c.t === "and") return c.all.some((sub) => stageMentionsCondition(sub, kind, npcId));
-  if (c.t === "or") return c.any.some((sub) => stageMentionsCondition(sub, kind, npcId));
-  if (c.t === "not") return stageMentionsCondition(c.of, kind, npcId);
-  return false;
 }
 
 // True when a scene definitively closes a quest — either via onEnter

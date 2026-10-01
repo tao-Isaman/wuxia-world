@@ -58,6 +58,12 @@ const CORE_NPCS: readonly NpcDef[] = [
     description: "พ่อค้าใหญ่ในนครหลวง · ชอบฟังเรื่องราวจากผู้เดินทาง",
     locationIds: ["city_capital"],
     dialogSceneId: "merchant_wang_talk",
+    defenseTier: 1,
+    stealLoot: [
+      { itemId: "ancient_coin", weight: 4 },
+      { itemId: "jade", weight: 2 },
+      { itemId: "silk", weight: 3 },
+    ],
     tags: ["merchant"],
   },
 ];

@@ -209,6 +209,21 @@ export const FIGHT_EVENTS: readonly FightEventDef[] = [
   { id: "fight_elite_iron_mountain",   weight: 0, opponentId: "elite_iron_mountain" },
   { id: "fight_elite_phoenix_empress", weight: 0, opponentId: "elite_phoenix_empress" },
   { id: "fight_elite_demon_emperor",   weight: 0, opponentId: "elite_demon_emperor" },
+  // ─── Variants and gangs (tier weight comes from the opponent's `ti`) ──
+  { id: "fight_vampire_bat",       weight: TIER_SPAWN_WEIGHT[1], opponentId: "vampire_bat" },
+  { id: "fight_bandit_archer",     weight: TIER_SPAWN_WEIGHT[1], opponentId: "bandit_archer" },
+  { id: "fight_frost_wolf",        weight: TIER_SPAWN_WEIGHT[2], opponentId: "frost_wolf" },
+  { id: "fight_blood_boar",        weight: TIER_SPAWN_WEIGHT[2], opponentId: "blood_boar" },
+  { id: "fight_bandit_lieutenant", weight: TIER_SPAWN_WEIGHT[2], opponentId: "bandit_lieutenant" },
+  { id: "fight_night_blade",       weight: TIER_SPAWN_WEIGHT[2], opponentId: "night_blade" },
+  { id: "fight_demon_cult_zealot", weight: TIER_SPAWN_WEIGHT[2], opponentId: "demon_cult_zealot" },
+  { id: "fight_golden_tiger",      weight: TIER_SPAWN_WEIGHT[3], opponentId: "golden_tiger" },
+  { id: "fight_jade_python",       weight: TIER_SPAWN_WEIGHT[3], opponentId: "jade_python" },
+  { id: "fight_thunder_eagle",     weight: TIER_SPAWN_WEIGHT[3], opponentId: "thunder_eagle" },
+  { id: "fight_ghost_swordsman",   weight: TIER_SPAWN_WEIGHT[3], opponentId: "ghost_swordsman" },
+  { id: "fight_elite_bandit_king", weight: 0, opponentId: "elite_bandit_king" },
+  { id: "fight_elite_cult_elder",  weight: 0, opponentId: "elite_cult_elder" },
+  { id: "fight_elite_bear_king",   weight: 0, opponentId: "elite_bear_king" },
 ];
 
 export const TREASURE_EVENTS: readonly TreasureEventDef[] = [

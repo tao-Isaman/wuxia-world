@@ -179,6 +179,7 @@ export const OPPONENTS: readonly OpponentDef[] = [
     pack: { opponentId: "wild_dog", count: 1 },
     build: () => build("หมาป่า", 1, { stats: { AGI: 5, DEX: 4 } }) },
   { id: "road_bandit", name: "โจรเส้นทาง", ti: 1, category: "human", drops: DROPS_T1,
+    pack: { opponentId: "thug", count: 1 },
     build: () => build("โจรเส้นทาง", 1, { skillIds: ["ns1"] }) },
   { id: "river_pirate", name: "โจรสลัดน้ำ", ti: 1, category: "human",
     pack: { opponentId: "thug", count: 1 },
@@ -197,6 +198,7 @@ export const OPPONENTS: readonly OpponentDef[] = [
     drops: [...DROPS_T2, { itemId: "bear_claw", weight: 1 }],
     build: () => build("หมีสีน้ำตาล", 2, { stats: { STR: 7, VIT: 6 } }) },
   { id: "viper_snake", name: "งูเห่ายักษ์", ti: 2, category: "beast",
+    pack: { opponentId: "small_snake", count: 2 },
     drops: [...DROPS_T2, { itemId: "viper_venom", weight: 2 }],
     build: () => build("งูเห่ายักษ์", 2, { stats: { DEX: 6, AGI: 5 } }) },
   { id: "giant_centipede", name: "ตะขาบยักษ์", ti: 2, category: "beast",
@@ -219,11 +221,13 @@ export const OPPONENTS: readonly OpponentDef[] = [
 
   // ─── Tier 3 (5) — masters with inner skill + multi skills ───────
   { id: "blade_master", name: "อาจารย์ดาบ", ti: 3, category: "human", drops: DROPS_T3,
+    pack: { opponentId: "wandering_swordsman", count: 1 },
     build: () => build("อาจารย์ดาบ", 3, {
       artId: "t1_eagleclaw", artLevel: 5,
       skillIds: ["ns1", "nd3", "ne9"],
     }) },
   { id: "shadow_assassin", name: "นักฆ่าเงา", ti: 3, category: "human", drops: DROPS_T3,
+    pack: { opponentId: "night_blade", count: 2 },
     build: () => build("นักฆ่าเงา", 3, {
       stats: { DEX: 8, AGI: 7, LUK: 5 },
       artId: "t1_blackiron", artLevel: 5,
@@ -249,11 +253,13 @@ export const OPPONENTS: readonly OpponentDef[] = [
 
   // ─── Tier 4 (5) — legendary foes ────────────────────────────────
   { id: "demonic_master", name: "จอมยุทธมาร", ti: 4, category: "human", drops: DROPS_T4,
+    pack: { opponentId: "demon_cult_zealot", count: 2 },
     build: () => build("จอมยุทธมาร", 4, {
       artId: "blood", artLevel: 8,
       skillIds: ["bs", "ep", "nf3", "ng2"],
     }) },
   { id: "legendary_swordsman", name: "ราชากระบี่", ti: 4, category: "human", drops: DROPS_T4,
+    pack: { opponentId: "wandering_swordsman", count: 2 },
     build: () => build("ราชากระบี่", 4, {
       stats: { STR: 11, AGI: 10, DEX: 9 },
       artId: "huashan", artLevel: 8,
@@ -1536,6 +1542,7 @@ export const OPPONENTS: readonly OpponentDef[] = [
   // kits, multi-hit signature skills, debuff_atk / stun threats that
   // bypass tank walls. Drops are richer (extra manuals + valuables).
   { id: "elite_blood_rakshasa", name: "อสุรกายโลหิต", ti: 4, category: "supernatural",
+    pack: { opponentId: "vampire_bat", count: 3 },
     drops: [...DROPS_T4,
       { itemId: "ginseng", weight: 4 }, { itemId: "jade", weight: 3 },
       { itemId: "ancient_coin", weight: 2 }, { itemId: "wood_sacred", weight: 1 }],
@@ -1548,6 +1555,7 @@ export const OPPONENTS: readonly OpponentDef[] = [
     }) },
 
   { id: "elite_void_grandmaster", name: "ปรมาจารย์ความว่าง", ti: 4, category: "human",
+    pack: { opponentId: "ghost_swordsman", count: 1 },
     drops: [...DROPS_T4,
       { itemId: "ginseng", weight: 4 }, { itemId: "jade", weight: 3 },
       { itemId: "ancient_coin", weight: 2 }, { itemId: "mithril_ore", weight: 1 }],
@@ -1560,6 +1568,7 @@ export const OPPONENTS: readonly OpponentDef[] = [
     }) },
 
   { id: "elite_iron_mountain", name: "ภูเขาเหล็ก", ti: 4, category: "human",
+    pack: { opponentId: "iron_palm_thug", count: 2 },
     drops: [...DROPS_T4,
       { itemId: "iron_ore", weight: 5 }, { itemId: "iron_ingot", weight: 4 },
       { itemId: "ginseng", weight: 3 }, { itemId: "jade", weight: 2 },
@@ -1573,6 +1582,7 @@ export const OPPONENTS: readonly OpponentDef[] = [
     }) },
 
   { id: "elite_phoenix_empress", name: "จักรพรรดินีหงส์เพลิง", ti: 4, category: "human",
+    pack: { opponentId: "night_blade", count: 2 },
     drops: [...DROPS_T4,
       { itemId: "ginseng", weight: 5 }, { itemId: "jade", weight: 4 },
       { itemId: "ancient_coin", weight: 3 }, { itemId: "wood_sacred", weight: 2 },
@@ -1586,6 +1596,7 @@ export const OPPONENTS: readonly OpponentDef[] = [
     }) },
 
   { id: "elite_demon_emperor", name: "จักรพรรดิมาร", ti: 4, category: "supernatural",
+    pack: [{ opponentId: "demon_cult_zealot", count: 2 }, { opponentId: "ghost_swordsman", count: 1 }],
     drops: [...DROPS_T4,
       { itemId: "ginseng", weight: 5 }, { itemId: "jade", weight: 5 },
       { itemId: "ancient_coin", weight: 3 }, { itemId: "wood_sacred", weight: 3 },
@@ -1959,6 +1970,85 @@ export const OPPONENTS: readonly OpponentDef[] = [
   { id: "law_bounty_hunter", name: "นักล่าค่าหัว", ti: 3, category: "human", drops: DROPS_T3,
     pack: { opponentId: "law_constable", count: 1 },
     build: () => build("นักล่าค่าหัว", 3, { stats: { AGI: 12, DEX: 12, STR: 8, LUK: 6 }, skillIds: ["jy_chain", "ne4", "basic_punch"] }) },
+
+  // ─── Variants, gangs and bosses (random encounters) ─────────────
+  // Recoloured / resized beasts and humans drawn from the shared sheets
+  // (`look`), gang members that fill bigger boards, and three `elite_`
+  // bosses that only appear once the hero has some power (see
+  // tierWeightForPower in random-events.ts).
+  { id: "vampire_bat", name: "ค้างคาวดูดเลือด", ti: 1, category: "beast", drops: DROPS_T1,
+    look: { frame: 7, tint: 0xc7a6ff },
+    pack: { opponentId: "vampire_bat", count: 2 },
+    build: () => build("ค้างคาวดูดเลือด", 1, { stats: { AGI: 6, DEX: 4, VIT: 2 }, skillIds: ["bst_fang", "bst_bite"] }) },
+  { id: "bandit_archer", name: "มือเข็มโจรป่า", ti: 1, category: "human", drops: DROPS_T1,
+    look: { sheet: "m2", tint: 0xe6d3b0 },
+    build: () => build("มือเข็มโจรป่า", 1, { stats: { DEX: 5, AGI: 4 }, skillIds: ["gn", "nc10"] }) },
+  { id: "frost_wolf", name: "หมาป่าหิมะ", ti: 2, category: "beast",
+    drops: [...DROPS_T2, { itemId: "snow_lotus", weight: 1 }],
+    look: { frame: 0, tint: 0xc6e6ff, size: 1.08 },
+    pack: { opponentId: "wild_wolf", count: 2 },
+    build: () => build("หมาป่าหิมะ", 2, { stats: { AGI: 8, DEX: 6, VIT: 5 }, skillIds: ["bst_bite", "bst_pounce", "bst_maul"] }) },
+  { id: "blood_boar", name: "หมูป่าเลือดคลั่ง", ti: 2, category: "beast", drops: DROPS_T2,
+    look: { frame: 3, tint: 0xff9c8c, size: 1.12 },
+    pack: { opponentId: "wild_boar", count: 1 },
+    build: () => build("หมูป่าเลือดคลั่ง", 2, { stats: { STR: 8, VIT: 8, DEF: 5 }, skillIds: ["bst_charge", "bst_maul"] }) },
+  { id: "bandit_lieutenant", name: "รองหัวหน้าโจร", ti: 2, category: "human", drops: DROPS_T2,
+    look: { sheet: "bandit", tint: 0xffd2b4 },
+    pack: [{ opponentId: "bandit", count: 1 }, { opponentId: "bandit_archer", count: 1 }],
+    build: () => build("รองหัวหน้าโจร", 2, { stats: { STR: 7, VIT: 5 }, skillIds: ["ws", "nd7", "nc7"] }) },
+  { id: "night_blade", name: "มือมีดราตรี", ti: 2, category: "human", drops: DROPS_T2,
+    look: { sheet: "f3", tint: 0x9c9cc0 },
+    build: () => build("มือมีดราตรี", 2, { stats: { AGI: 7, DEX: 7, LUK: 3 }, skillIds: ["ne4", "nd9"] }) },
+  { id: "demon_cult_zealot", name: "สาวกลัทธิมาร", ti: 2, category: "human", drops: DROPS_T2,
+    look: { sheet: "m3", tint: 0xcaa4ff },
+    pack: { opponentId: "demon_cult_zealot", count: 2 },
+    build: () => build("สาวกลัทธิมาร", 2, { stats: { POW: 6, DEX: 5 }, skillIds: ["nd8", "ne6"] }) },
+  { id: "golden_tiger", name: "เสือทองคำ", ti: 3, category: "beast",
+    drops: [...DROPS_T3, { itemId: "tiger_claw", weight: 2 }],
+    look: { frame: 1, tint: 0xffd76e, size: 1.2 },
+    build: () => build("เสือทองคำ", 3, { stats: { STR: 11, AGI: 9, VIT: 8, DEX: 6 }, skillIds: ["bst_maul", "bst_pounce", "bst_roar"] }) },
+  { id: "jade_python", name: "งูเหลือมหยก", ti: 3, category: "beast",
+    drops: [...DROPS_T3, { itemId: "viper_venom", weight: 3 }, { itemId: "jade", weight: 1 }],
+    look: { frame: 4, tint: 0x96f0b8, size: 1.3 },
+    build: () => build("งูเหลือมหยก", 3, { stats: { VIT: 11, STR: 8, DEX: 8, DEF: 6 }, skillIds: ["bst_constrict", "bst_venom", "bst_bite"] }) },
+  { id: "thunder_eagle", name: "อินทรีสายฟ้า", ti: 3, category: "beast", drops: DROPS_T3,
+    look: { frame: 6, tint: 0xc8d0ff, size: 1.15 },
+    build: () => build("อินทรีสายฟ้า", 3, { stats: { AGI: 12, DEX: 9, STR: 7 }, skillIds: ["bst_claw", "bst_pounce", "bst_roar"] }) },
+  { id: "ghost_swordsman", name: "วิญญาณจอมกระบี่", ti: 3, category: "supernatural", drops: DROPS_T3,
+    look: { sheet: "m1", tint: 0xa8c8ff },
+    build: () => build("วิญญาณจอมกระบี่", 3, {
+      stats: { DEX: 9, AGI: 9, POW: 7 },
+      artId: "shadow", artLevel: 4,
+      skillIds: ["nh2", "nf2", "ne12"],
+    }) },
+  { id: "elite_bandit_king", name: "ราชาโจรภูเขา", ti: 4, category: "human",
+    drops: [...DROPS_T4, { itemId: "ancient_coin", weight: 4 }, { itemId: "jade", weight: 2 }],
+    look: { sheet: "bandit", tint: 0xffb48c, size: 1.25 },
+    pack: [{ opponentId: "bandit_lieutenant", count: 1 }, { opponentId: "bandit_archer", count: 2 }, { opponentId: "bandit", count: 2 }],
+    build: () => build("ราชาโจรภูเขา", 4, {
+      stats: { STR: 18, VIT: 16, DEF: 12, AGI: 10, DEX: 10 },
+      artId: "military", artLevel: 8,
+      skillIds: ["ng5", "ws", "ne9", "nd7"],
+      extraArtSlots: ["military"],
+    }) },
+  { id: "elite_cult_elder", name: "ผู้อาวุโสลัทธิมาร", ti: 4, category: "human",
+    drops: [...DROPS_T4, { itemId: "ginseng", weight: 3 }, { itemId: "scorpion_venom", weight: 3 }],
+    look: { sheet: "elder", tint: 0xb890ff, size: 1.2 },
+    pack: { opponentId: "demon_cult_zealot", count: 3 },
+    build: () => build("ผู้อาวุโสลัทธิมาร", 4, {
+      stats: { POW: 18, INT: 14, DEX: 14, VIT: 12, AGI: 10 },
+      artId: "huoxue", artLevel: 8,
+      skillIds: ["nf7", "nf4", "ng4"],
+      extraArtSlots: ["huoxue"],
+    }) },
+  { id: "elite_bear_king", name: "ราชาหมีพันปี", ti: 4, category: "beast",
+    drops: [...DROPS_T4, { itemId: "bear_claw", weight: 4 }],
+    look: { frame: 2, tint: 0xdcb48c, size: 1.4 },
+    pack: { opponentId: "brown_bear", count: 1 },
+    build: () => build("ราชาหมีพันปี", 4, {
+      stats: { STR: 20, VIT: 22, DEF: 14, AGI: 8, DEX: 8 },
+      skillIds: ["bst_maul", "bst_roar", "bst_constrict", "bst_charge"],
+    }) },
 ];
 
 export const OPPONENTS_BY_ID = new Map<string, OpponentDef>(

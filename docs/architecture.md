@@ -94,7 +94,7 @@ Two deliberate exceptions reach up into stores:
 - **Data:** `types.ts` and `data/` (tiers, stats, weapons, sects, 178 skills, 123 arts, 76 gear).
 - **Numbers:** `derive.ts` (stats → HP, attack, speed…), `damage.ts`, `leveling.ts`, `skill-conflict.ts`, `slots.ts`, `effects.ts`.
 - **One duel:** `battle.ts` resolves one skill or art between two sides (`resolveSkill`, `resolveArtActive`).
-- **The live battle:** `grid/` drives it on a 10 × 7 board. It **reuses `battle.ts`** for every hit by building a two-sided "duel view" per target.
+- **The live battle:** `grid/` drives it on a 10 × 7 to 15 × 10 board. It **reuses `battle.ts`** for every hit by building a two-sided "duel view" per target.
 - **Legacy:** `ai.ts`, `combat-actions.ts` and the 1v1 turn loop are kept for tests; `fleeChance` is the only live piece.
 
 **`lib/world/` — story** (details in [world-engine.md](world-engine.md) and [liveness.md](liveness.md)):

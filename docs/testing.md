@@ -48,7 +48,7 @@ Each suite is a Bun script (or `bun test` file) wired as `test:*` in `package.js
 | `test:grid-ai` | `scripts/test-grid-ai.ts` | 13 | AI legality and behaviour over dozens of seeded battles; average planning time under 15 ms |
 | `test:grid-skills` | `scripts/test-grid-skills.ts` | 7 | every skill (178) and art (123) has a valid battle range; the 18 overrides exist; Thai range labels |
 | `test:grid-store` | `scripts/test-grid-store.ts` | 10 | battle store + bridge + looks + the world hand-off: HP carry-over, packs, spar sprites, flee, auto mode, win / loss / escape results |
-| `test:quests` | 4 scripts | — | the campaign audit, dead-end regressions, playing **every** item / kill / objective quest (213) through the real store, and guidance for all 657 stages |
+| `test:quests` | 5 scripts | — | the campaign audit, dead-end regressions, playing **every** item / kill / objective quest (213) through the real store, guidance for all 657 stages, and every steal / assassinate / kidnap quest stage (39) |
 | `test:docs` | `scripts/build-docs-reference.ts --check`, `scripts/check-docs.ts` | — | the generated reference is current; links, repo paths and commands in the docs resolve |
 
 ### `test:quests` in detail
@@ -60,6 +60,7 @@ Each suite is a Bun script (or `bun test` file) wired as `test:*` in `package.js
   - It fails on a middle stage with too few beats, and on a flag stage that nothing sets.
 - **`scripts/test-quest-dead-ends.ts`** covers regressions for quests that were once impossible.
 - **`scripts/test-quest-turnins.ts`** accepts, progresses and hands in every item, kill and objective quest through the real store. Items are carried before accepting, objective spots are used in place, and kills count only after accepting.
+- **`scripts/test-bad-action-quests.ts`** finds every stage that needs a steal, assassination or kidnapping and checks that the target stands on a map, that their card offers the action, and that a successful attempt through the real store moves the quest on.
 - **`scripts/test-quest-guide.ts`** checks tracking (newest, pinned, off) and that every stage of every quest has an action; fewer than 10 % may lack a place. `GUIDE_DEBUG=1` lists the stages with no place.
 
 ## Content audits

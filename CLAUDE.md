@@ -18,7 +18,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Joins one of 15 sects and learns 178 move skills and 123 inner arts.
 - Gathers and crafts (19 life skills).
 - Steals and gets jailed.
-- Fights **turn-based tactics on a 10 × 7 board**.
+- Fights **turn-based tactics on a 10 × 7 to 15 × 10 board**.
 
 `demo.html` is the original single-file combat prototype. It is the reference for combat *numbers* (damage and effect tuning); everything else was designed in the rebuild.
 
@@ -64,7 +64,7 @@ bun run test:grid
 bun run test:grid-ai
 bun run test:grid-skills
 bun run test:grid-store
-bun run test:quests         # campaign audit + dead ends + every item/kill/objective quest + guidance
+bun run test:quests         # campaign audit + dead ends + every item/kill/objective quest + guidance + bad-action stages
 bun run test:docs           # generated reference is current + docs links/paths/commands resolve
 bun run test:e2e            # Playwright (Chromium) on :3017 — start a production server first
 bun scripts/audit-content.ts            # every NPC / quest / scene reference resolves
@@ -160,7 +160,7 @@ Two deliberate exceptions reach into stores:
 - **Type conflict** (`skill-conflict.ts`). With more than 4 typed entries and one side above 60 % of an axis, the opposing type is halved (internal ↔ external: zeroed).
 - **Slots** (`slots.ts`). A slot holds a bare skill id or `"art:<id>"` (`parseSlotId`). The first art slot is the primary art.
 - **Turn gauge.** It fills at `(Spd + 60) / 2600` per ms and acts at 100, keeping the overflow. **Don't replace the `+60` baseline with a straight Spd comparison** — it keeps slow characters in the fight (Spd 100 vs 20 is 2:1, not 5:1).
-- **The grid** (`lib/game/grid/`) is the live battle system:
+- **The grid** (`lib/game/grid/`) is the live battle system (board 10 × 7 up to 15 × 10 by unit count, `boardSizeFor`; packs up to 6, `MAX_PACK_SIZE`):
   - `engine.ts` handles per-unit gauges, move → act / wait / flee, and packs;
   - `duel.ts` reuses `battle.ts` per target;
   - `skill-grid.ts` has range and area profiles plus 18 overrides;

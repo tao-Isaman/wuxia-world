@@ -21,7 +21,7 @@
 import { useBattleStore } from "@/store/battle-store";
 import { useWorldStore } from "@/store/world-store";
 import { getOpponent } from "./data/opponents";
-import { applyOpponentStatScale } from "./data/random-events";
+import { applyOpponentStatScale, playerPowerIndex } from "./data/random-events";
 import { worldBattleSetup } from "./battle-looks";
 
 // Single chokepoint for "world says fight, battle hasn't started" — used by
@@ -52,7 +52,11 @@ export function ensureBattleStarted(): void {
   // already; this re-applies for triggerBattle paths (quest fights,
   // sparring, etc.) too.
   applyOpponentStatScale(ws);
-  const setup = worldBattleSetup(opponentId, { bodyId: ws.playerBodyId, withPack: ws.pendingBattle.withPack })!;
+  const setup = worldBattleSetup(opponentId, {
+    bodyId: ws.playerBodyId,
+    withPack: ws.pendingBattle.withPack,
+    power: playerPowerIndex(ws),
+  })!;
   // Grid battle: the hero (leader) vs the opponent, plus its pack on random
   // encounters (quest / spar fights stay 1v1).
   bs.start(ws.playerBuild, setup.build, {

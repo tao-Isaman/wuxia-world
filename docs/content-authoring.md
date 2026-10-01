@@ -323,7 +323,8 @@ Then run `bun run test:navigation`: every painted map must keep its spawn open a
 - **`ti`** (0–4) sets the stats baseline in `build()`, the loot count (2 / 3 / 4 picks) and the encounter tier weight.
 - **`category`** (`human` / `beast` / `supernatural`) sets which zones it appears in and how it looks. A beast picks a creature-atlas frame by keywords in its id (tiger, bear, boar, snake / centipede / scorpion, chicken, eagle / bird, bat; else generic).
 - **`drops`** — per-tier defaults `DROPS_T0`…`DROPS_T4`, or a custom list. Check the item ids yourself.
-- **`pack`** adds up to 2 weaker companions, only when the fight comes from an accepted encounter.
+- **`pack`** adds weaker companions, only when the fight comes from an accepted encounter. It is one `{ opponentId, count }` or a list for a mixed gang (`[{ opponentId: "bandit_lieutenant", count: 1 }, { opponentId: "bandit_archer", count: 2 }]`). The first kind gains +1 / +2 as the hero grows stronger; the total is capped at 6. Members must not be stronger than the leader (`test:grid-store` checks).
+- **`look`** (optional) makes a variant from an existing sprite: `{ sheet: "m2" }` picks a character sheet, `{ frame: 0 }` a creature-atlas cell, `tint: 0xc6e6ff` multiplies a colour over it and `size: 1.25` draws it larger (0.6–1.6). Bosses use a larger size so they stand out from their gang.
 - **Random encounters.** Add `{ id: "fight_…", weight: TIER_SPAWN_WEIGHT[ti], opponentId }` to `FIGHT_EVENTS` in `random-events.ts`. The weight is replaced by the power-scaled tier weight at runtime.
 - **Other ways to meet it:**
   - a scene `triggerBattle` (add `nonFatal: true` for a friendly fight);

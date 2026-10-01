@@ -10,7 +10,7 @@ import type { UnitLook, UnitSpec } from "@/lib/game/grid/types";
 import { NPCS } from "./data/npcs";
 import { npcBattleSprite } from "./data/npc-portraits";
 import { getOpponent } from "./data/opponents";
-import type { NpcDef, OpponentDef } from "./types";
+import type { NpcDef, OpponentDef, PackMember } from "./types";
 
 /** Grid unit ids used for world battles. */
 export const PLAYER_UNIT_ID = "A";
@@ -30,6 +30,7 @@ export function playerLook(bodyId: string | null | undefined): UnitLook {
 export function creatureFrameFor(opponentId: string | null | undefined): number | null {
   const opp = getOpponent(opponentId);
   if (!opp || opp.category !== "beast") return null;
+  if (opp.look?.frame !== undefined) return opp.look.frame;
   const id = opponentId ?? "";
   if (/tiger/.test(id)) return 1;
   if (/bear/.test(id)) return 2;
@@ -52,9 +53,14 @@ export function findOpponentNpc(opponentId: string | null | undefined, buildName
  * NPCs, the unique battle sprite the player met in the world.
  */
 export function opponentLook(opponentId: string | null | undefined, npc?: NpcDef): UnitLook {
+  const opp = getOpponent(opponentId);
+  const variant: { tint?: number; size?: number } = {};
+  if (opp?.look?.tint !== undefined) variant.tint = opp.look.tint;
+  if (opp?.look?.size !== undefined) variant.size = opp.look.size;
   const frame = creatureFrameFor(opponentId);
-  if (frame !== null) return { kind: "creature", frame };
-  const look: UnitLook = { kind: "character", characterId: npcCharacterId(npc?.id ?? opponentId ?? "thug") };
+  if (frame !== null) return { kind: "creature", frame, ...variant };
+  const sheet = opp?.look?.sheet;
+  const look: UnitLook = { kind: "character", characterId: sheet ? characterId(sheet) : npcCharacterId(npc?.id ?? opponentId ?? "thug"), ...variant };
   const still = npc ? npcBattleSprite(npc.id) : undefined;
   return still ? { ...look, still } : look;
 }
@@ -68,21 +74,46 @@ export function packOpponentIdOf(unitId: string): string | null {
   return m ? m[1] : null;
 }
 
-/** Extra enemy units for an opponent's pack (empty when it fights alone). Builds are made now. */
-export function enemyPackSpecs(opp: OpponentDef): UnitSpec[] {
+/** Most companions an opponent can bring (the board grows to fit them). */
+export const MAX_PACK_SIZE = 6;
+
+/** The opponent's pack as a list of member kinds. */
+export function packMembers(opp: OpponentDef): PackMember[] {
   const pack = opp.pack;
-  if (!pack || pack.count <= 0) return [];
-  const member = getOpponent(pack.opponentId);
-  if (!member) return [];
+  if (!pack) return [];
+  return (Array.isArray(pack) ? [...pack] : [pack as PackMember]).filter((m) => m.count > 0 && getOpponent(m.opponentId));
+}
+
+/**
+ * Companions joining the fight: the authored pack, plus reinforcements of the
+ * first member kind as the hero grows stronger (+1 at power 0.4, +2 at 0.75),
+ * capped at MAX_PACK_SIZE. `power` is `playerPowerIndex` (0–1).
+ */
+export function packCounts(opp: OpponentDef, power = 0): PackMember[] {
+  const members = packMembers(opp);
+  if (members.length === 0) return [];
+  const extra = power >= 0.75 ? 2 : power >= 0.4 ? 1 : 0;
+  const out = members.map((m, i) => ({ opponentId: m.opponentId, count: m.count + (i === 0 ? extra : 0) }));
+  let room = MAX_PACK_SIZE;
+  for (const m of out) { m.count = Math.min(m.count, room); room -= m.count; }
+  return out.filter((m) => m.count > 0);
+}
+
+/** Extra enemy units for an opponent's pack (empty when it fights alone). Builds are made now. */
+export function enemyPackSpecs(opp: OpponentDef, power = 0): UnitSpec[] {
   const out: UnitSpec[] = [];
-  for (let i = 1; i <= Math.min(2, pack.count); i++) {
-    out.push({ id: packUnitId(member.id, i), team: "enemy", build: member.build(), look: opponentLook(member.id) });
+  let n = 0;
+  for (const m of packCounts(opp, power)) {
+    const member = getOpponent(m.opponentId)!;
+    for (let i = 0; i < m.count; i++) {
+      out.push({ id: packUnitId(member.id, ++n), team: "enemy", build: member.build(), look: opponentLook(member.id) });
+    }
   }
   return out;
 }
 
 /** Everything the battle store needs to start a world battle against `opponentId`. */
-export function worldBattleSetup(opponentId: string, opts: { bodyId?: string | null; withPack?: boolean } = {}): {
+export function worldBattleSetup(opponentId: string, opts: { bodyId?: string | null; withPack?: boolean; power?: number } = {}): {
   opponent: OpponentDef;
   build: CharacterBuild;
   looks: { A: UnitLook; B: UnitLook };
@@ -96,6 +127,6 @@ export function worldBattleSetup(opponentId: string, opts: { bodyId?: string | n
     opponent,
     build,
     looks: { A: playerLook(opts.bodyId), B: opponentLook(opponentId, npc) },
-    enemies: opts.withPack ? enemyPackSpecs(opponent) : [],
+    enemies: opts.withPack ? enemyPackSpecs(opponent, opts.power ?? 0) : [],
   };
 }

@@ -62,9 +62,14 @@ export type AreaShape =
 
 // ─── Units ─────────────────────────────────────────────────────────────
 /** How the renderer draws a unit (resolved by the store from world data). */
+/**
+ * How a unit is drawn. `tint` multiplies the sprite's colours (0xRRGGBB) and
+ * `size` scales it (1 = normal) — used to tell enemy variants apart (a frost
+ * wolf, a hulking boss) on top of a shared sheet or creature frame.
+ */
 export type UnitLook =
-  | { kind: "character"; characterId: string; still?: string }   // atlas (+ optional unique still sprite)
-  | { kind: "creature"; frame: number };                         // /art/creature-atlas.png frame
+  | { kind: "character"; characterId: string; still?: string; tint?: number; size?: number }   // atlas (+ optional unique still sprite)
+  | { kind: "creature"; frame: number; tint?: number; size?: number };                        // /art/creature-atlas.png frame
 
 export interface UnitSpec {
   id: string;
@@ -186,3 +191,18 @@ export const GRID_DEFAULT_ROWS = 7;
 
 /** The per-pair duel view type the engine builds to call battle.ts (A = actor, B = target). */
 export type DuelView = BattleState;
+
+/** The largest board a battle grows to (fits a phone held sideways). */
+export const GRID_MAX_COLS = 15;
+export const GRID_MAX_ROWS = 10;
+
+/**
+ * Board size for a battle with `units` units in total: the 10 × 7 duel board
+ * for small fights, growing with the crowd up to 15 × 10.
+ */
+export function boardSizeFor(units: number): { cols: number; rows: number } {
+  if (units <= 3) return { cols: GRID_DEFAULT_COLS, rows: GRID_DEFAULT_ROWS };
+  if (units <= 5) return { cols: 12, rows: 8 };
+  if (units <= 7) return { cols: 13, rows: 9 };
+  return { cols: GRID_MAX_COLS, rows: GRID_MAX_ROWS };
+}

@@ -20,7 +20,7 @@ const { ensureBattleStarted } = await import("../lib/world/battle-bridge");
 const { NPCS } = await import("../lib/world/data/npcs");
 const { npcBattleSprite } = await import("../lib/world/data/npc-portraits");
 const { OPPONENTS, getOpponent } = await import("../lib/world/data/opponents");
-const { packOpponentIdOf, opponentLook } = await import("../lib/world/battle-looks");
+const { packOpponentIdOf, opponentLook, packMembers, packCounts, MAX_PACK_SIZE } = await import("../lib/world/battle-looks");
 
 const originalWarn = console.warn;
 console.warn = (...args: unknown[]) => {
@@ -105,12 +105,19 @@ check("bridge: pendingBattle starts a 1v1 grid battle with world HP/MP and looks
 
 check("bridge: pack opponents spawn their weaker members as extra enemies", () => {
   const packs = OPPONENTS.filter((o) => o.pack);
-  assert.ok(packs.length >= 4 && packs.length <= 8, `curated pack list (${packs.length})`);
+  assert.ok(packs.length >= 15, `pack list (${packs.length})`);
   for (const o of packs) {
-    const m = getOpponent(o.pack!.opponentId);
-    assert.ok(m, `${o.id} pack member exists`);
-    assert.ok((m!.ti ?? 0) <= (o.ti ?? 0), `${o.id} pack member is not stronger`);
-    assert.ok(o.pack!.count >= 1 && o.pack!.count <= 2);
+    const members = packMembers(o);
+    assert.equal(members.length, Array.isArray(o.pack) ? o.pack.length : 1, `${o.id}: every pack member exists`);
+    for (const pm of members) {
+      const m = getOpponent(pm.opponentId)!;
+      assert.ok((m.ti ?? 0) <= (o.ti ?? 0), `${o.id} pack member ${m.id} is not stronger`);
+      assert.ok(pm.count >= 1);
+    }
+    for (const power of [0, 0.5, 1]) {
+      const total = packCounts(o, power).reduce((n, m) => n + m.count, 0);
+      assert.ok(total <= MAX_PACK_SIZE, `${o.id}: at most ${MAX_PACK_SIZE} companions`);
+    }
   }
   newGame();
   fight("bandit_chief");
@@ -137,6 +144,42 @@ check("bridge: pack opponents spawn their weaker members as extra enemies", () =
   fight("mountain_tiger");
   assert.deepEqual(unitById(st(), "B")!.look, { kind: "creature", frame: 1 });
   assert.equal(st().units.length, 2, "no pack → 1v1");
+  assert.equal(st().cols, 10, "a duel keeps the 10 × 7 board");
+  assert.equal(st().rows, 7);
+});
+
+check("bridge: big gangs get a bigger board, stronger heroes meet more companions", () => {
+  newGame();
+  fight("elite_bandit_king");
+  const s = st();
+  assert.equal(s.units.length, 7, "king + lieutenant + 2 archers + 2 bandits + hero");
+  assert.deepEqual([s.cols, s.rows], [13, 9], "7 units → 13 × 9");
+  assert.equal(new Set(s.units.map((u) => cellKey(u.pos))).size, 7, "no overlapping units");
+  useBattleStore.getState().reset();
+  // Day 200 → power 1: the first member kind brings two more, capped at MAX_PACK_SIZE.
+  newGame({ day: 200 });
+  fight("elite_bandit_king");
+  assert.equal(st().units.length, 1 + 1 + MAX_PACK_SIZE);
+  assert.deepEqual([st().cols, st().rows], [15, 10], "a full board is 15 × 10");
+  useBattleStore.getState().reset();
+  newGame({ day: 120 });
+  fight("bandit_chief");
+  assert.equal(st().units.length, 5, "power 0.6: the chief brings 3 bandits");
+  useBattleStore.getState().reset();
+});
+
+check("looks: enemy variants carry their tint and size", () => {
+  newGame();
+  fight("frost_wolf");
+  assert.deepEqual(unitById(st(), "B")!.look, { kind: "creature", frame: 0, tint: 0xc6e6ff, size: 1.08 });
+  useBattleStore.getState().reset();
+  newGame();
+  fight("elite_cult_elder");
+  const look = unitById(st(), "B")!.look;
+  assert.equal(look.kind, "character");
+  assert.equal(look.kind === "character" && look.characterId, "elder");
+  assert.equal(look.size, 1.2);
+  useBattleStore.getState().reset();
 });
 
 check("bridge: sparring NPCs fight in their unique battle sprite", () => {

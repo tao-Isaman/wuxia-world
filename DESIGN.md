@@ -75,7 +75,7 @@ The interface follows a **Dragon Quest XI** reading of that direction:
 
 ## Battles
 
-- **The board.** Battles are tactics on a 10 × 7 board, drawn in 2.5D perspective over a painted background:
+- **The board.** Battles are tactics on a 10 × 7 board (up to 15 × 10 when a gang joins), drawn in 2.5D perspective over a painted background:
   - the capital training yard for the beginner duel;
   - a capital street for capital fights;
   - the jade courtyard otherwise.
