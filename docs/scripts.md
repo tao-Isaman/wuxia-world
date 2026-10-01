@@ -45,6 +45,7 @@ Every file in `scripts/`, what it does, and whether it is safe to run. Run them 
 | Script | Usage | Writes | Notes |
 | --- | --- | --- | --- |
 | `build-docs-reference.ts` | `bun scripts/build-docs-reference.ts [--check]` | `docs/reference/*.md` | `--check` writes nothing and fails when a page is stale |
+| `build-npc-sheets.ts` | `bun scripts/build-npc-sheets.ts` | `public/art/characters/npc/<id>.png` (4 × 4) and `<id>-directions.png` (4 × 2) for each id in `lib/characters/npc-sheets.ts` | reads `public/npcs/body/*.png`; deterministic; needs `sharp` |
 | `build-npc-sprites.ts` | `bun scripts/build-npc-sprites.ts` | `public/npcs/pixel/*.png` (72 px), `public/npcs/pixel-battle/*.png` (150 px), `lib/world/data/npc-pixel-ids.ts` | reads `public/npcs/body/*.png`; needs `sharp` |
 | `build-pwa-icons.ts` | `bun scripts/build-pwa-icons.ts` | `public/pwa/icon-192.png`, `icon-512.png`, `icon-maskable-512.png`, `apple-touch-icon.png` | source `public/player/m1.png`; needs `sharp` |
 | `build-route-variants.ts` | `bun scripts/build-route-variants.ts` or `--preview <out.jpg> [type]` | `public/maps/routes/<type>-<region>.webp` | regional colour grades of the 7 road paintings; needs `sharp` |

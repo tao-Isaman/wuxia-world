@@ -199,7 +199,7 @@ applyAction(state, unitId, action, rng = Math.random): boolean   // false (state
 - `OpponentDef.pack` is one `{ opponentId, count }` or a list of them (a gang of mixed kinds), e.g. `elite_bandit_king` brings a lieutenant, two archers and two bandits. Members are the same tier or weaker (`enemyPackSpecs` in `lib/world/battle-looks.ts`, `packMembers` reads either form). Unit ids: `A` hero, `B` primary enemy, `pack1:<id>` … `pack6:<id>`.
 - **Reinforcements.** The first member kind gets +1 when the hero's power (`playerPowerIndex`) is at least 0.4 and +2 at 0.75 (`packCounts`). The pack is capped at `MAX_PACK_SIZE = 6`, so a battle has at most 8 units.
 - Packs come only with **random encounters** (`PendingBattle.withPack`, set by `encounterBattle` — accepting an encounter, or failing to flee a hunter or the law). Quest battles, spars, hunts and bad-action fights stay 1 v 1.
-- 23 opponents have packs — from `vampire_bat` (+2 bats) and `wild_wolf` (+1 wild dog) up to the three bosses `elite_bandit_king`, `elite_cult_elder` and `elite_bear_king`. `hunt_boar` / `hunt_alpha_wolf` only appear on hunting nodes, which never bring packs. The full list is the Pack column of [reference/opponents.md](reference/opponents.md).
+- 35 opponents have packs — from `vampire_bat` (+2 bats) and `wild_wolf` (+1 wild dog) up to the bosses `elite_bandit_king`, `elite_cult_elder`, `elite_bear_king` and the ten `elite_villain_*` named villains. `hunt_boar` / `hunt_alpha_wolf` only appear on hunting nodes, which never bring packs. The full list is the Pack column of [reference/opponents.md](reference/opponents.md).
 - The battle log says "ฝ่ายศัตรูมีพวกอีก N คน" at the start. On a win, only the primary enemy's drops roll, but every fallen pack member counts toward `defeatedCounts` (so pack kills advance kill quests).
 
 ## Battle store
@@ -255,7 +255,7 @@ Details of the rewards: [gameplay.md](gameplay.md#progression).
 `UnitLook` is `{ kind: "character", characterId, still? }` (a character atlas, optionally with a unique still sprite) or `{ kind: "creature", frame }` (a cell of `/art/creature-atlas.png`, 8 frames). Both take an optional `tint` (a colour multiplied over the sprite) and `size` (a scale, clamped 0.6–1.6) so one sprite can make several variants — a pale frost wolf, a purple vampire bat, a boss drawn larger than its gang.
 
 - `playerLook(bodyId)` — the hero's chosen body.
-- `opponentLook(opponentId, npc?)` — `OpponentDef.look = { sheet?, frame?, tint?, size? }` overrides the defaults below. Beasts otherwise use `creatureFrameFor(id)` (tiger 1, bear 2, boar 3, snakes / spiders / scorpions 4, chickens 5, birds 6, bats 7, else 0); people use an archetype sheet picked from the id, plus their own battle sprite (`/npcs/pixel-battle/<npcId>.png`) when the opponent is a known NPC.
+- `opponentLook(opponentId, npc?)` — `OpponentDef.look = { sheet?, frame?, tint?, size?, npc? }` overrides the defaults below. `npc` names the NPC the foe is (the 10 villain bosses); a rigged NPC (the sect heads' spars, the villains) fights with its own sheet and real clips, never a still. Beasts otherwise use `creatureFrameFor(id)` (tiger 1, bear 2, boar 3, snakes / spiders / scorpions 4, chickens 5, birds 6, bats 7, else 0); people use an archetype sheet picked from the id, plus their own battle sprite (`/npcs/pixel-battle/<npcId>.png`) when the opponent is a known NPC.
 - `worldBattleSetup` returns `{ opponent, build, looks, enemies }`. Pack members get their archetype look, never a still.
 - /debug battles use the default looks (hero m1 vs the bandit archetype).
 
@@ -305,7 +305,7 @@ Details of the rewards: [gameplay.md](gameplay.md#progression).
 | `bun run test:grid` (`scripts/test-grid-engine.ts`, 14 checks) | layout, name suffixes, move range, walking rules, turn-order ratios and forecast, reach, areas, cooldowns, art MP, own-turn ticks, stun skips, poison deaths, compat mirrors, hero-only flee, full battles ending within 300 turns |
 | `bun run test:grid-ai` (13) | legal plans across 36 seeded battles, attrition up to 600 turns, attacks when adjacent, walk-and-strike, ranged units keep distance, areas aim for 2+ foes, heals only when low, plan time < 15 ms, a 1 v 7 plan on 15 × 10 < 25 ms |
 | `bun run test:grid-skills` (7) | every skill and art profile is valid, the self / enemy rule, the 18 overrides, `slotGrid`, `describeGrid` labels |
-| `bun run test:grid-store` (12) | bridge start with HP / MP and looks, packs (mixed gangs, power reinforcements, the 6 cap), board size per unit count, variant tint / size, spar sprites, step pacing, refused input, flee, auto, win rewards including pack kills, fatal vs non-fatal loss, escape without rewards |
+| `bun run test:grid-store` (13) | bridge start with HP / MP and looks, packs (mixed gangs, power reinforcements, the 6 cap), board size per unit count, variant tint / size, rigged NPC sheets for spars and villains, spar sprites, step pacing, refused input, flee, auto, win rewards including pack kills, fatal vs non-fatal loss, escape without rewards |
 | `bun run test:combat` (15) | legacy 1v1 checks plus grid store turns, ties, cooldown timing and flee odds |
 | `bun run test:battle-background` | background choice |
 

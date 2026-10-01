@@ -48,7 +48,7 @@ Deploys are implied to be on Vercel (`VERCEL_GIT_COMMIT_SHA` sets the service-wo
 
 ## Verified state
 
-Checked on 2026-10-01 for wave 26 (enemy variety, bigger boards, skill strip):
+Checked on 2026-10-01 for wave 27 (animated, wandering NPCs and villain bosses):
 
 | Check | Result |
 | --- | --- |
@@ -67,12 +67,13 @@ Checked on 2026-10-01 for wave 26 (enemy variety, bigger boards, skill strip):
 | `test:grid` | 14 checks pass |
 | `test:grid-ai` | 13 checks pass |
 | `test:grid-skills` | 7 checks pass |
-| `test:grid-store` | 12 checks pass |
+| `test:grid-store` | 13 checks pass |
+| `test:npcs` | 6 checks pass |
 | `test:quests` | the campaign audit passes (276 quests, 102 reachable locations); 213 item / kill / objective quests hand in through the real store; guidance covers 650 of 657 stages; all 39 steal / assassinate / kidnap stages offer the action and advance |
 | `test:docs` | the generated reference is current; every link, repo path and command in the docs resolves |
 | `bun scripts/audit-content.ts` | 157 NPCs · 276 quests · 996 scenes, all references resolve |
-| `bun run build` | passes; `/` first-load JS 507 kB |
-| `bun run test:e2e` | all 19 Playwright tests pass against the production build on :3017 (about 10 minutes, Chromium 141 via the container shim) |
+| `bun run build` | passes; `/` first-load JS 508 kB |
+| `bun run test:e2e` | all 20 Playwright tests pass against the production build on :3017 (about 10 minutes, Chromium 141 via the container shim) |
 
 Not verified:
 
@@ -153,7 +154,7 @@ Real behaviour today, found during the docs audit. Each is small and self-contai
 
 ### Tooling
 
-28. **`sharp` is undeclared.** It is used by `build-npc-sprites.ts`, `build-pwa-icons.ts`, `build-route-variants.ts` and `map-collision-tool.ts`, but not listed in `package.json`; it arrives through Next.
+28. **`sharp` is undeclared.** It is used by `build-npc-sprites.ts`, `build-npc-sheets.ts`, `test-npc-sheets.ts`, `build-pwa-icons.ts`, `build-route-variants.ts` and `map-collision-tool.ts`, but not listed in `package.json`; it arrives through Next.
 29. **Footprints can't be rebuilt safely.** The per-map footprint JSON sources are not in the repo, so `build-map-footprints.ts` cannot rebuild the data without dropping maps.
 30. **Dangerous scripts:**
     - `split-sects-file.ts` and `append-templated-quests.ts` are one-off migrations; rerunning them empties the sect barrels or duplicates 20 quests.
@@ -163,6 +164,11 @@ Real behaviour today, found during the docs audit. Each is small and self-contai
     - `public/progress.json` is frozen at wave 11.
     - `next lint` is deprecated and will need replacing for Next 16.
 32. **A few stale comments remain in UI and CSS files.** Examples: the party-card rules in `app/game-hud.css` / `app/mobile-hud.css`, the column counts in `components/world/menu-bar.tsx`, `components/world/status-bar.tsx`, and `app/dq-theme.css` naming `combat-actions.css`. Comments in the engines and data tables were corrected in the docs rewrite.
+
+### Rigged NPCs
+
+33. **Approximate side and back views.** The 30 rigged sheets come from front-facing paintings: the side walk is a narrower, leaning front view, and the back view only repaints the head (a beard below the neck stays). New side and back art per NPC would replace `public/art/characters/npc/` one for one.
+34. **Villain bosses and their NPCs coexist.** A villain met on the road is the same person who stands at their base; beating them on the road changes nothing there. Only killing, kidnapping or a death in the simulation removes them from the encounter pool.
 
 ## Suggested next steps
 

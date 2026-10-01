@@ -398,6 +398,14 @@ export function releaseFromJail(state: WorldStateData): void {
 // (see WALK_TICK_UNITS). Rolls, in order: the law (if wanted), a sect
 // hunter (if betrayed), then fight / treasure / meet bands. `chanceScale`
 // shrinks the per-trip probabilities to per-stretch ones.
+/** A named villain (`look.npc`) the hero has killed or carried off, or who died, never ambushes again. */
+export function encounterFoeAvailable(state: Pick<WorldStateData, "npcExt" | "assassinatedNpcIds" | "kidnappedNpcIds">, opponentId: string): boolean {
+  const npcId = getOpponent(opponentId)?.look?.npc;
+  if (!npcId) return true;
+  return ((state.npcExt ?? {})[npcId]?.status ?? "alive") === "alive" &&
+    !(state.assassinatedNpcIds ?? []).includes(npcId) && !(state.kidnappedNpcIds ?? []).includes(npcId);
+}
+
 export function rollWalkEvent(state: WorldStateData, chanceScale: number): void {
   if (!state.playerBuild) return;
 
@@ -430,7 +438,7 @@ export function rollWalkEvent(state: WorldStateData, chanceScale: number): void 
   // opponent's CharacterBuild so stats are scaled at build time.
   const power = playerPowerIndex(state);
   applyOpponentStatScale(state);
-  const zonePool = fightEventsForLocation(state.lastLocationId, power);
+  const zonePool = fightEventsForLocation(state.lastLocationId, power).filter((ev) => encounterFoeAvailable(state, ev.opponentId));
   const huntPool =
     huntTargets.size > 0
       ? zonePool.filter((ev) => huntTargets.has(ev.opponentId))

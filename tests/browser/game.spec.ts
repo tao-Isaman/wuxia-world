@@ -199,3 +199,28 @@ test("version 18 saves migrate and beast battles load the creature atlas", async
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   expect(errors).toEqual([]);
 });
+
+test("rigged NPCs stroll around their spot and stand still when the hero comes to talk", async ({ page }) => {
+  await start(page);
+  await page.evaluate(() => {
+    const raw = JSON.parse(localStorage.getItem("wusia-world-v1")!);
+    Object.assign(raw.state, { currentSceneId: "city_capital", lastLocationId: "city_capital" });
+    localStorage.setItem("wusia-world-v1", JSON.stringify(raw));
+  });
+  await page.reload();
+  const world = page.getByTestId("world-canvas");
+  await expect(world).toHaveAttribute("data-ready", "true", { timeout: 60_000 });
+  const positions = async () => JSON.parse((await world.getAttribute("data-wandering-npcs")) || "{}") as Record<string, [number, number]>;
+  const first = await positions();
+  expect(Object.keys(first)).toContain("npc-city_capital_physician_lin");
+  // Someone sets off within a few seconds.
+  await expect.poll(async () => {
+    const now = await positions();
+    return Object.keys(first).some((id) => now[id] && Math.hypot(now[id][0] - first[id][0], now[id][1] - first[id][1]) > 3);
+  }, { timeout: 12_000 }).toBe(true);
+  // Walking up to Lin: she waits, and her card opens.
+  await page.getByRole("button", { name: /จุดหมาย/ }).click();
+  await page.locator(`[data-places-tab="${await page.locator('[data-marker-id="npc-city_capital_physician_lin"]').getAttribute("data-category")}"]`).click();
+  await page.locator('[data-marker-id="npc-city_capital_physician_lin"]').click();
+  await expect(page.getByRole("dialog")).toBeVisible({ timeout: 15_000 });
+});

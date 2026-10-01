@@ -94,6 +94,10 @@ Both runtimes are loaded with a dynamic `import()` in the browser only. The host
 - **Nearby.** The nearest marker within **95** units drives the action button (`onNearby`, `data-nearby-marker`). **E** uses the last-used marker, else the nearest within 100.
 
   NPCs within 90 units face the hero. Signs 230+ units away fade to 50 %, and disabled markers draw at 50 %.
+- **Wandering NPCs.** The 30 rigged NPCs (see NPC looks below) stroll around their map spot (`lib/stage/npc-wander.ts`): a standable point within 34 units of home (flattened vertically), at 36 units/s, then a 1.5–4.5 s pause, with a seeded random per NPC. They play the walk clip for the way they head (north / south rows included).
+  - A wanderer stands still while the hero is within 120 units, while the hero is walking to it or hovering it, while the map is paused or read-only, and under `prefers-reduced-motion`. It never steps onto blocked ground or within 36 units of the hero.
+  - Picking, the action button, **E**, the approach point, the guide arrow and the nearby bounds all use the NPC's current spot (`markerPoint`), not the authored one.
+  - `data-wandering-npcs` publishes `{ markerId: [x, y] }` for tests.
 - **Walk ticks.** Every 220 units actually walked, the runtime calls `onWalkTick()`, which calls `useWorldStore.getState().walkTick()` (random encounters, see [world-engine.md](world-engine.md#random-encounters)).
 - **Positions.** The hero's spot on each map is remembered for the session only (never saved).
   - Leaving by an exit forgets that map's spot.
@@ -233,12 +237,15 @@ Pure code in `lib/stage/world-navigation.ts`, in 960 × 640 map units.
 - **Atlas build** (`sheet.ts`):
   - It measures each pose's opaque bounds and scales the whole sheet once, so the median standing height is 108 px.
   - Output is a 512 × 512 atlas (512 × 768 with directions).
-  - Direction sheets load only when needed: the world loads them for the hero only.
+  - Direction sheets load only when needed: the world loads them for the hero and the rigged NPCs.
   - A failed load is evicted so it can retry.
 - **Walk cycle** (`walk-cycle.ts`): left foot up → pass → right foot up → pass. The lifted leg bends from the hip, and passing frames bob 1 px. Tested by `bun run test:walk`.
 - **World tint.** `warmWorldCharacter` bakes a warm ink tint into world atlases (`world-style.ts`); previews stay untinted.
 - **NPC looks.**
-  - 159 NPC ids have a unique single-pose world sprite (`/npcs/pixel/<id>.png`, 74 px) and battle sprite (`/npcs/pixel-battle/<id>.png`, 152 px), built from `/npcs/body/<id>.png` by `scripts/build-npc-sprites.ts`.
+  - **30 rigged NPCs** (`ANIMATED_NPC_IDS` in `lib/characters/npc-sheets.ts`: the 15 sect heads, the five opening / key city people and the 10 villains) have a full sheet in the hero layout — idle, walk, attack, hurt, guard, victory, defeat, walk north and walk south — at `/art/characters/npc/<id>.png` (4 × 4) and `<id>-directions.png` (4 × 2). Their character id is the NPC id (`npcCharacterId`), so the same loader and clips play them on the map and in battle.
+    - `scripts/build-npc-sheets.ts` rigs each sheet from the painted body: a 104 px pixel figure, warped per pose (breathing, a leaning profile for walking, a lean back / strike / follow-through for attacks, a crouch, a lying defeat), with the 1 px outline. The back view repaints the head above the neck in the hair or hat colour and shades the body. The loader adds the foot beats to every walk row.
+    - Limits: the paintings face front, so the side walk is a narrower, leaning front view, and the back view is approximate (a beard below the neck stays). Real side and back art would replace these sheets one for one.
+  - The other 129 NPC ids with art have a unique single-pose world sprite (`/npcs/pixel/<id>.png`, 74 px) and battle sprite (`/npcs/pixel-battle/<id>.png`, 152 px), built from `/npcs/body/<id>.png` by `scripts/build-npc-sprites.ts`. They stand at their spot and get procedural motion in battle.
   - The others use an archetype sheet chosen by `npcCharacterId(id)`: named overrides, then id patterns (women and nuns → f1 / f3, monks → monk, thieves → bandit, elders → elder, officials → m3, merchants → merchant, beggars → m2, guards → m4…).
   - Three registry NPCs have no art at all: `jail_elder_prisoner`, `jail_guard_zhang`, `city_capital_clerk_qing`.
 - **Portraits.** `/npcs/<id>.png` (256 × 256), used by the dialog bust, the NPC card and the quest receipt.

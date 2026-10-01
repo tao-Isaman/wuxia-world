@@ -64,6 +64,7 @@ bun run test:grid
 bun run test:grid-ai
 bun run test:grid-skills
 bun run test:grid-store
+bun run test:npcs
 bun run test:quests         # campaign audit + dead ends + every item/kill/objective quest + guidance + bad-action stages
 bun run test:docs           # generated reference is current + docs links/paths/commands resolve
 bun run test:e2e            # Playwright (Chromium) on :3017 — start a production server first
@@ -73,6 +74,7 @@ bun scripts/sort-by-sect.ts             # re-sort skills.ts + arts.ts by sect, t
 bun scripts/normalize-t3-stats.ts       # rewrite move-skill stat sums to 10/15/20/25/30 (review the diff)
 bun scripts/map-collision-tool.ts <id> [json] [png]   # check / draw a painted map's collision
 bun scripts/build-npc-sprites.ts        # NPC pixel sprites from public/npcs/body/
+bun scripts/build-npc-sheets.ts         # rigged animation sheets for the 30 NPCs in lib/characters/npc-sheets.ts
 bun scripts/smoke-liveness.ts           # 90-day NPC simulation smoke test
 ```
 
@@ -247,6 +249,7 @@ Two deliberate exceptions reach into stores:
   - Cover-fit camera; WASD, tap-to-walk and a joystick.
   - The action target is the nearest marker within 95 units; E reaches 100.
   - Walk ticks every 220 units; a guide arrow; name tags and quest marks.
+  - The 30 rigged NPCs (`ANIMATED_NPC_IDS`, own 4 × 6 sheets) wander near their spot (`npc-wander.ts`) and freeze when the hero is near or coming to them; picking uses `markerPoint` (their current spot).
   - It pauses while any `[role="dialog"]`, `[role="alertdialog"]` or `[data-world-busy]` exists (`worldInputBlocked`).
   - It publishes `data-*` attributes (`data-ready`, `data-player-x/y/frame/motion/facing`, `data-nearby-marker`, `data-guide-marker`, `data-visible-props`…) for tests.
 - **Battle runtime.** `grid-battle-runtime.ts` draws the board in 2.5D and plays `state.events`: walk 180 ms per tile, casts with VFX and SFX, damage numbers. It calls `battleStore.step()` about 350 ms after playback idles. Skill VFX come from `cast-vfx.ts` (pure) and `battle-vfx.ts`; skill sounds from `lib/audio/cast-sfx.ts`, using the same profile.

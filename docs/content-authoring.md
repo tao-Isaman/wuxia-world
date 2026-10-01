@@ -178,6 +178,8 @@ Then run `bun run test:navigation`: every painted map must keep its spawn open a
    - Run `bun scripts/build-npc-sprites.ts`, which writes `public/npcs/pixel/`, `public/npcs/pixel-battle/` and `npc-pixel-ids.ts`.
 
    Without art, the NPC uses an archetype costume chosen by `npcCharacterId` (`lib/characters/catalog.ts`) from its id.
+
+   **To make the NPC walk and wander** (a full animation sheet instead of the single pose), add its id to `ANIMATED_NPC_IDS` in `lib/characters/npc-sheets.ts` and run `bun scripts/build-npc-sheets.ts`. It needs the body painting. Commit the two PNGs in `public/art/characters/npc/`; `bun run test:npcs` checks them.
 6. **Map placement.** An auto map places up to 10 NPCs per location. More spill into the "อื่น ๆ" drawer.
 
 ## A dialog scene
@@ -324,7 +326,7 @@ Then run `bun run test:navigation`: every painted map must keep its spawn open a
 - **`category`** (`human` / `beast` / `supernatural`) sets which zones it appears in and how it looks. A beast picks a creature-atlas frame by keywords in its id (tiger, bear, boar, snake / centipede / scorpion, chicken, eagle / bird, bat; else generic).
 - **`drops`** — per-tier defaults `DROPS_T0`…`DROPS_T4`, or a custom list. Check the item ids yourself.
 - **`pack`** adds weaker companions, only when the fight comes from an accepted encounter. It is one `{ opponentId, count }` or a list for a mixed gang (`[{ opponentId: "bandit_lieutenant", count: 1 }, { opponentId: "bandit_archer", count: 2 }]`). The first kind gains +1 / +2 as the hero grows stronger; the total is capped at 6. Members must not be stronger than the leader (`test:grid-store` checks).
-- **`look`** (optional) makes a variant from an existing sprite: `{ sheet: "m2" }` picks a character sheet, `{ frame: 0 }` a creature-atlas cell, `tint: 0xc6e6ff` multiplies a colour over it and `size: 1.25` draws it larger (0.6–1.6). Bosses use a larger size so they stand out from their gang.
+- **`look`** (optional) makes a variant from an existing sprite. `{ npc: "evil_capital_blackmarket_zhou" }` makes the foe that NPC, drawn with the NPC's own sheet (the villain bosses do this). Otherwise: `{ sheet: "m2" }` picks a character sheet, `{ frame: 0 }` a creature-atlas cell, `tint: 0xc6e6ff` multiplies a colour over it and `size: 1.25` draws it larger (0.6–1.6). Bosses use a larger size so they stand out from their gang.
 - **Random encounters.** Add `{ id: "fight_…", weight: TIER_SPAWN_WEIGHT[ti], opponentId }` to `FIGHT_EVENTS` in `random-events.ts`. The weight is replaced by the power-scaled tier weight at runtime.
 - **Other ways to meet it:**
   - a scene `triggerBattle` (add `nonFatal: true` for a friendly fight);

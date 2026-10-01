@@ -194,6 +194,21 @@ check("bridge: sparring NPCs fight in their unique battle sprite", () => {
   assert.equal(st().units.length, 2, "spar stays 1v1");
 });
 
+check("bridge: rigged NPCs fight with their own sheet; villain bosses bring their gang", () => {
+  newGame();
+  fight("spar_shaolin_abbot_huiyuan", { nonFatal: true });
+  const abbot = unitById(st(), "B")!.look;
+  assert.deepEqual(abbot, { kind: "character", characterId: "sect_shaolin_abbot_huiyuan" }, "a sect head plays real clips, no still");
+  useBattleStore.getState().reset();
+  newGame();
+  fight("elite_villain_zhou", { withPack: true });
+  const zhou = unitById(st(), "B")!.look;
+  assert.equal(zhou.kind === "character" && zhou.characterId, "evil_capital_blackmarket_zhou");
+  assert.equal(zhou.kind === "character" && zhou.still, undefined);
+  assert.ok(st().units.length >= 4, "the black-market boss comes with his thugs");
+  useBattleStore.getState().reset();
+});
+
 // ─── Pacing + input ───────────────────────────────────────────────────
 check("step(): enemy turns are driven beat by beat until the player's turn", () => {
   bs().reset();

@@ -785,8 +785,10 @@ export interface OpponentDef {
   pack?: PackMember | readonly PackMember[];
   // Battle look override: an archetype / hero sheet id (`sheet`), a
   // creature-atlas frame (beasts), a colour tint (0xRRGGBB) and a size
-  // (1 = normal; bosses 1.2–1.4). Without it the look comes from the id.
-  look?: { sheet?: string; frame?: number; tint?: number; size?: number };
+  // (1 = normal; bosses 1.2–1.4). `npc` names the NPC this foe is: the
+  // battle draws that NPC's own sheet (rigged NPCs play full clips). Without
+  // it the look comes from the id.
+  look?: { sheet?: string; frame?: number; tint?: number; size?: number; npc?: string };
   build: () => CharacterBuild;
 }
 
