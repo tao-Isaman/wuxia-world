@@ -436,13 +436,15 @@ export function createWorldRuntime(
     const playerId = characterId(initial.playerImage.match(/(?:^|\/)([mf][1-4])(?:\.|\/|$)/)?.[1] ?? "m1");
     const ids = new Set<CharacterId>([playerId]);
     initial.markers.filter((marker) => marker.kind === "npc").forEach((marker) => ids.add(npcCharacterId(marker.id)));
+    // Sheets that walk in four directions: the hero's, rigged NPCs', and wandering NPCs' bodies.
+    const walkers = new Set<string>(initial.markers.filter((marker) => marker.kind === "npc" && marker.wander).map((marker) => npcCharacterId(marker.id)));
     initial.bystanders?.forEach((actor) => ids.add(characterId(actor.characterId)));
     const [landscape, atlasEntries, propImages] = await Promise.all([
       loadImage(initial.image),
       // Only the controlled hero walks north/south. Stationary NPCs sharing a
       // hero costume need its base poses, not the large direction supplement.
       // Rigged NPCs walk in every direction, so they load it too.
-      Promise.all([...ids].map(async (id) => [id, await loadAtlas(id, id === playerId || hasAnimatedSheet(id))] as const)),
+      Promise.all([...ids].map(async (id) => [id, await loadAtlas(id, id === playerId || hasAnimatedSheet(id) || walkers.has(id))] as const)),
       Promise.all((initial.props ?? []).map(async (prop) => [prop.id, await loadImage(prop.image)] as const)),
     ]);
     if (disposed || failed || !scene) return;
@@ -532,7 +534,7 @@ export function createWorldRuntime(
         const id = npcCharacterId(marker.id);
         character = unique ? makeCharacter(`unique:${marker.id}`, unique, UNIQUE_NPC_SIZE) : makeCharacter(`char:${id}`, atlases.get(id)!, 54);
         character.image.setPosition(point.x, point.y).setDepth(100 + point.y * 10);
-        if (!unique && hasAnimatedSheet(id) && character.directional) wanderers.set(marker.id, createWanderer(marker.id, point));
+        if (!unique && (hasAnimatedSheet(id) || marker.wander) && character.directional) wanderers.set(marker.id, createWanderer(marker.id, point));
       } else {
         const key = marker.kind === "exit" ? exitBadge : texture(markerBadge(marker.kind, marker.badge ?? marker.icon), "badge");
         markerIcon = image(key, 8000, 24, 27).setOrigin(0.5, 1).setPosition(point.x, point.y - 5);

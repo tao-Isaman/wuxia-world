@@ -59,6 +59,8 @@ import {
 import { completeObjectiveSpot, type ObjectiveResult } from "@/lib/world/quest-objectives";
 import { applyEffect, consumeQuestAutoItems, isSectQuestOfferable, tickQuestProgress } from "@/lib/world/effects";
 import { evaluateCondition } from "@/lib/world/conditions";
+import { KIDNAP_RETURN_DAYS, npcPresent } from "@/lib/world/npc-presence";
+import { GIFT_REACTION_LINE, giftOutcome, giftWaitDays, giftable, type GiftReaction } from "@/lib/world/gifts";
 import { tickAllNamedNpcs } from "@/lib/world/npc-tick";
 import { releaseFromJail, rollWalkEvent } from "@/lib/world/effects";
 import { WANTED_DECAY_DAYS, WANTED_MAX, describeSentence, isLawOpponent, sentenceLeft } from "@/lib/world/law";
@@ -450,6 +452,9 @@ interface WorldStore extends WorldStateData {
   // the battle bridge can pick up. Steal-fights are non-fatal; the other
   // two are real combat. See lib/world/bad-actions.ts for the formulas.
   attemptSteal: (npcId: string) => BadActionResult;
+  /** Give an NPC an item or gold, once per GIFT_COOLDOWN_DAYS; raises (or lowers) the relationship. */
+  giveGift: (npcId: string, gift: { itemId: string } | { gold: number }) =>
+    { ok: true; reaction: GiftReaction; points: number } | { ok: false; reason: "unknown" | "absent" | "cooldown" | "not-giftable" | "missing"; message: string };
   attemptAssassinate: (npcId: string) => BadActionResult;
   attemptKidnap: (npcId: string) => BadActionResult;
 
@@ -494,7 +499,7 @@ interface WorldStore extends WorldStateData {
 
 export type ActivityResult =
   | { ok: true; message: string }
-  | { ok: false; reason: "unknown" | "not-here" | "stamina" | "gold" | "locked"; message: string; hoursLeft?: number };
+  | { ok: false; reason: "unknown" | "not-here" | "stamina" | "gold" | "locked" | "cooldown"; message: string; hoursLeft?: number };
 
 const emptyLifeSkillXp = (): Record<LifeSkill, number> =>
   Object.fromEntries(LIFE_SKILL_KEYS.map((k) => [k, 0])) as Record<LifeSkill, number>;
@@ -533,6 +538,9 @@ const emptyData = (): WorldStateData => ({
   stoleFromCounts: {},
   assassinatedNpcIds: [],
   kidnappedNpcIds: [],
+  kidnappedUntil: {},
+  giftDays: {},
+  activityDays: {},
   day: 1,
   time: 0,
   pendingBattle: null,
@@ -937,6 +945,9 @@ function draftFrom(s: WorldStateData): WorldStateData {
     stoleFromCounts: { ...s.stoleFromCounts },
     assassinatedNpcIds: [...s.assassinatedNpcIds],
     kidnappedNpcIds: [...s.kidnappedNpcIds],
+    kidnappedUntil: { ...s.kidnappedUntil },
+    giftDays: { ...s.giftDays },
+    activityDays: { ...s.activityDays },
     day: s.day,
     time: s.time,
     pendingBattle: s.pendingBattle,
@@ -2326,6 +2337,50 @@ export const useWorldStore = create<WorldStore>()(
         const activity = getActivity(id);
         if (!activity) return { ok: false, reason: "unknown", message: "ไม่มีกิจกรรมนี้" };
         const s = get();
+        const place = activity.place;
+        if (place) {
+          // A place activity: here, off cooldown, affordable — then its rewards.
+          if (!place.locationIds.includes(s.currentSceneId)) return { ok: false, reason: "not-here", message: "ทำที่นี่ไม่ได้" };
+          const last = s.activityDays[activity.id];
+          const cooldown = place.cooldownDays ?? 1;
+          if (last !== undefined && s.day - last < cooldown) {
+            return { ok: false, reason: "cooldown", message: `ทำไปแล้ว · ทำได้อีกใน ${cooldown - (s.day - last)} วัน` };
+          }
+          if (s.stamina < activity.stamina) return { ok: false, reason: "stamina", message: `พลังไม่พอ (ต้องใช้ ${activity.stamina})` };
+          if (place.costGold && s.gold < place.costGold) return { ok: false, reason: "gold", message: `ต้องใช้เงิน ${place.costGold} ตำลึง` };
+          const draft = draftFrom(s);
+          draft.stamina -= activity.stamina;
+          if (place.costGold) draft.gold -= place.costGold;
+          if (activity.hours) advanceTime(draft, activity.hours);
+          const gains: string[] = [];
+          const r = place.reward;
+          if (r.gold) {
+            const won = Math.round(r.gold[0] + Math.random() * (r.gold[1] - r.gold[0]));
+            draft.gold += won; if (won) gains.push(`${won} ตำลึง`);
+          }
+          if (r.wExp) { draft.wExp += r.wExp; gains.push(`${r.wExp} 悟`); }
+          if (r.statXp) grantStatXp(draft, r.statXp, STAT_XP_PER_ACTION);
+          if (r.trait) applyEffect(draft, { t: "addTrait", trait: r.trait.trait, amount: r.trait.amount });
+          if (r.item && Math.random() < (r.item.chance ?? 1)) {
+            const count = r.item.count ?? 1;
+            draft.inventory = { ...draft.inventory, [r.item.itemId]: (draft.inventory[r.item.itemId] ?? 0) + count };
+            gains.push(`${getItem(r.item.itemId)?.name ?? r.item.itemId} ×${count}`);
+          }
+          if (r.stamina) draft.stamina = Math.min(draft.staminaMax, draft.stamina + r.stamina);
+          if (r.heal) {
+            const derived = draft.playerBuild ? deriveAll(draft.playerBuild) : null;
+            if (derived) {
+              draft.currentHp = Math.min(derived.HP, (draft.currentHp ?? 0) + Math.round(derived.HP * r.heal));
+              draft.currentMp = Math.min(derived.MP, (draft.currentMp ?? 0) + Math.round(derived.MP * r.heal));
+            }
+          }
+          if (r.relationship) applyEffect(draft, { t: "addNpcRelationship", npcId: r.relationship.npcId, amount: r.relationship.amount });
+          draft.activityDays = { ...draft.activityDays, [activity.id]: draft.day };
+          const message = gains.length ? `${place.doneText} · ได้ ${gains.join(", ")}` : place.doneText;
+          appendActionLog(draft, "activity", `${activity.label}: ${message}`);
+          set({ ...draft });
+          return { ok: true, message };
+        }
         if (s.currentSceneId !== JAIL_SCENE_ID) return { ok: false, reason: "not-here", message: "ทำที่นี่ไม่ได้" };
         if (s.stamina < activity.stamina) return { ok: false, reason: "stamina", message: `พลังไม่พอ (ต้องใช้ ${activity.stamina})` };
         const draft = draftFrom(s);
@@ -2495,6 +2550,38 @@ export const useWorldStore = create<WorldStore>()(
         return { ok: true, npcId, opponentId: npc.sparOpponentId };
       },
 
+      giveGift: (npcId, gift) => {
+        const s = get();
+        const npc = getNpc(npcId);
+        if (!npc) return { ok: false, reason: "unknown", message: "ไม่พบบุคคลนี้" };
+        if (!npcPresent(s, npcId)) return { ok: false, reason: "absent", message: `${npc.name} ไม่อยู่ที่นี่` };
+        const wait = giftWaitDays(s, npcId);
+        if (wait > 0) return { ok: false, reason: "cooldown", message: `เพิ่งให้ของขวัญไป · ให้ได้อีกใน ${wait} วัน` };
+        const draft = draftFrom(s);
+        let outcome;
+        let what: string;
+        if ("gold" in gift) {
+          if (!(gift.gold > 0) || draft.gold < gift.gold) return { ok: false, reason: "missing", message: "เงินไม่พอ" };
+          draft.gold -= gift.gold;
+          outcome = giftOutcome(npc, { gold: gift.gold });
+          what = `เงิน ${gift.gold} ตำลึง`;
+        } else {
+          const item = getItem(gift.itemId);
+          if (!giftable(item)) return { ok: false, reason: "not-giftable", message: "ของชิ้นนี้ให้เป็นของขวัญไม่ได้" };
+          if ((draft.inventory[item.id] ?? 0) < 1) return { ok: false, reason: "missing", message: "ไม่มีของชิ้นนี้" };
+          draft.inventory = { ...draft.inventory, [item.id]: draft.inventory[item.id] - 1 };
+          if (draft.inventory[item.id] <= 0) delete draft.inventory[item.id];
+          outcome = giftOutcome(npc, { item });
+          what = item.name;
+        }
+        const prev = draft.npcStates[npcId] ?? {};
+        draft.npcStates = { ...draft.npcStates, [npcId]: { ...prev, met: true, relationship: (prev.relationship ?? 0) + outcome.points } };
+        draft.giftDays = { ...draft.giftDays, [npcId]: draft.day };
+        appendActionLog(draft, "gift", `ให้${what}แก่${npc.name} · ${GIFT_REACTION_LINE[outcome.reaction]} (ความสนิท ${outcome.points >= 0 ? "+" : ""}${outcome.points})`);
+        set({ ...draft });
+        return { ok: true, reaction: outcome.reaction, points: outcome.points };
+      },
+
       attemptSteal: (npcId) => {
         const s = get();
         if (s.pendingBattle) return { ok: false, reason: "pending" };
@@ -2622,6 +2709,8 @@ export const useWorldStore = create<WorldStore>()(
         advanceTime(draft, ACTION_HOURS);
         if (passed) {
           draft.kidnappedNpcIds.push(npcId);
+          // Taken away now; back at their spot after KIDNAP_RETURN_DAYS.
+          draft.kidnappedUntil = { ...draft.kidnappedUntil, [npcId]: draft.day + KIDNAP_RETURN_DAYS };
           draft.traits.evil = (draft.traits.evil ?? 0) + KIDNAP_TRAIT_EVIL;
           draft.traits.arrogance = (draft.traits.arrogance ?? 0) + 1;
           grantStatXp(draft, "STR", STAT_XP_PER_ACTION);
@@ -2733,7 +2822,7 @@ export const useWorldStore = create<WorldStore>()(
     }),
     {
       name: "wusia-world-v1",
-      version: 21,
+      version: 22,
       // Content backfill also runs for current-version saves (migrate does
       // not). Keep the standard shallow merge and add only missing lore.
       merge: (persisted, current) => {
@@ -2773,6 +2862,9 @@ export const useWorldStore = create<WorldStore>()(
         stoleFromCounts: s.stoleFromCounts,
         assassinatedNpcIds: s.assassinatedNpcIds,
         kidnappedNpcIds: s.kidnappedNpcIds,
+        kidnappedUntil: s.kidnappedUntil,
+        giftDays: s.giftDays,
+        activityDays: s.activityDays,
         day: s.day,
         time: s.time,
         pendingBattle: s.pendingBattle,
@@ -2933,6 +3025,9 @@ export const useWorldStore = create<WorldStore>()(
           kidnappedNpcIds: Array.isArray(p.kidnappedNpcIds)
             ? [...p.kidnappedNpcIds]
             : [],
+          kidnappedUntil: p.kidnappedUntil && typeof p.kidnappedUntil === "object" ? { ...p.kidnappedUntil } : {},
+          giftDays: p.giftDays && typeof p.giftDays === "object" ? { ...p.giftDays } : {},
+          activityDays: p.activityDays && typeof p.activityDays === "object" ? { ...p.activityDays } : {},
           day: typeof p.day === "number" && p.day >= 1 ? p.day : 1,
           time: typeof p.time === "number" && p.time >= 0 ? p.time : 0,
           pendingHuntYield: p.pendingHuntYield ?? null,

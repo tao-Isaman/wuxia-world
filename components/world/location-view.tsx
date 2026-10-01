@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Modal } from "@/components/ui/modal";
 import type { ArtisanDef, LocationScene, NpcDef } from "@/lib/world";
-import {
+import { npcPresent,
   LIFE_SKILL_ICON,
   LIFE_SKILL_LABEL,
   canPracticeAt,
@@ -102,7 +102,7 @@ export function LocationView({ scene, readOnly = false, dialogueSpeakerId }: Pro
   );
   // Registry NPCs at this location, also filtered by their visibleIf.
   const registryNpcs: NpcDef[] = getNpcsAtLocation(scene.id).filter(
-    (n) => !n.visibleIf || evaluateCondition(state, n.visibleIf),
+    (n) => npcPresent(state, n.id) && (!n.visibleIf || evaluateCondition(state, n.visibleIf)),
   );
   const visibleRoutes = scene.routes.filter(
     (r) => !r.visibleIf || evaluateCondition(state, r.visibleIf),
@@ -151,7 +151,9 @@ export function LocationView({ scene, readOnly = false, dialogueSpeakerId }: Pro
     const activity = getActivity(id);
     if (!activity) return;
     const store = useWorldStore.getState();
-    if (activity.hours > 0 && store.stamina >= activity.stamina) {
+    const last = store.activityDays[id];
+    const cooling = !!activity.place && last !== undefined && store.day - last < (activity.place.cooldownDays ?? 1);
+    if (activity.hours > 0 && store.stamina >= activity.stamina && !cooling) {
       flashLoading(`${activity.label}...`, 1200, activity.id === "jail_meditate" ? "rest" : "work");
     }
     const result = store.doActivity(id);

@@ -22,6 +22,7 @@ import { RESOURCES_BY_ID } from "./resources";
 import { LIFE_SKILL_ICON } from "./life-skills";
 import { canPracticeAt } from "../location-categories";
 import { assignSlotsByBearing } from "../compass";
+import { placeActivitiesAt } from "./activities";
 import { AUTO_MAP_EXIT_POINTS } from "./auto-map-exits";
 
 // Edge slots for exits, in assignment order. The prompt generator
@@ -49,6 +50,15 @@ export const NPC_SLOTS: readonly MapPoint[] = [
   { x: 60, y: 35 },
   { x: 26, y: 60 },
   { x: 52, y: 30 },
+];
+
+// Open ground for place activities (games, chores, shrines) when the
+// activity names no spot of its own.
+export const ACTIVITY_SLOTS: readonly MapPoint[] = [
+  { x: 44, y: 46 },
+  { x: 57, y: 61 },
+  { x: 35, y: 66 },
+  { x: 67, y: 40 },
 ];
 
 // Service zones (match the layout language in the prompts).
@@ -176,6 +186,13 @@ function build(id: string): LocationMapDef | undefined {
       label: res.name,
     });
   }
+
+  // Place activities (data/place-activities.ts): their own spot, else the
+  // next free activity slot.
+  placeActivitiesAt(id).forEach((activity, i) => {
+    const at = activity.place?.spot ?? ACTIVITY_SLOTS[i % ACTIVITY_SLOTS.length];
+    spots.push({ kind: "activity", activityId: activity.id, ...at, icon: activity.icon, label: activity.label });
+  });
 
   return {
     image: `/maps/${id}.webp`,

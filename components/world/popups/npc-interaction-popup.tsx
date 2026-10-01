@@ -35,6 +35,7 @@ import { NpcStatusBadge } from "../npc-status-badge";
 import { getSkill, getArt } from "@/lib/game";
 import { CharacterPreview } from "@/components/game/character-preview";
 import { npcCharacterId } from "@/lib/characters/catalog";
+import { GiftPicker } from "./gift-picker";
 
 const NPC_ROLE_LABEL: Record<string, string> = {
   healer: "แพทย์", scholar: "บัณฑิต", official: "ขุนนาง", authority: "ฝ่ายราชการ",
@@ -227,6 +228,8 @@ export function NpcInteractionPopup({ open, npc, onClose }: Props) {
               </span>
             </Button>
           )}
+
+          <GiftPicker npc={npc} />
 
           {badActionOffered(worldState, npc, "steal") && (
             <Button

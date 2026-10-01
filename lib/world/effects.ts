@@ -497,8 +497,14 @@ export function rollWalkEvent(state: WorldStateData, chanceScale: number): void 
     return;
   }
   if (r < fightP + treasureP + meetP) {
-    const ev = pickWeighted(MEET_EVENTS, Math.random());
+    // Place events of where the hero walks join the anywhere-events; once-only
+    // events and conditions filter the pool.
+    const here = state.currentSceneId;
+    const pool = MEET_EVENTS.filter((e) => (!e.locationIds || e.locationIds.includes(here)) &&
+      (!e.once || !state.flags[`meet:${e.id}`]) && (!e.condition || evaluateCondition(state, e.condition)));
+    const ev = pickWeighted(pool, Math.random());
     if (!ev) return;
+    if (ev.once) state.flags[`meet:${ev.id}`] = true;
     state.flags._skipEventRoll = true;
     state.currentSceneId = ev.dialogSceneId;
     const dest = getScene(ev.dialogSceneId);

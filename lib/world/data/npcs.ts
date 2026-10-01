@@ -1,3 +1,5 @@
+import { PLACE_NPCS } from "./places";
+import { registerNpcBodies } from "@/lib/characters/catalog";
 import type { NpcDef } from "../types";
 import { NPCS_CITIES } from "./npcs/cities";
 import { NPCS_VILLAGES } from "./npcs/villages";
@@ -76,9 +78,11 @@ export const NPCS: readonly NpcDef[] = [
   ...NPCS_WILDERNESS,
   ...NPCS_EVIL,
   ...NPCS_SPIES,
+  ...PLACE_NPCS,
 ];
 
 export const NPCS_BY_ID = new Map<string, NpcDef>(NPCS.map((n) => [n.id, n]));
+registerNpcBodies(Object.fromEntries(NPCS.filter((n) => n.look?.body).map((n) => [n.id, n.look!.body!])));
 
 export function getNpc(id: string | null | undefined): NpcDef | null {
   if (!id) return null;

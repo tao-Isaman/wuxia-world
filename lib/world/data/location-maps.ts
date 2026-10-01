@@ -14,6 +14,7 @@
 
 import { buildAutoMap } from "./auto-maps";
 import { assignSlotsByBearing } from "../compass";
+import { placeActivitiesAt } from "./activities";
 
 export interface MapPoint {
   x: number;
@@ -161,7 +162,14 @@ export function getLocationMap(id: string): LocationMapDef | undefined {
   const hand = LOCATION_MAPS[id];
   if (!hand) return buildAutoMap(id);
   let def = compassed.get(id);
-  if (!def) { def = withCompassExits(id, hand); compassed.set(id, def); }
+  if (!def) {
+    def = withCompassExits(id, hand);
+    // Place activities authored for a hand-painted map must name their spot.
+    const extra = placeActivitiesAt(id).filter((a) => a.place?.spot)
+      .map((a) => ({ kind: "activity" as const, activityId: a.id, ...a.place!.spot!, icon: a.icon, label: a.label }));
+    if (extra.length) def = { ...def, spots: [...(def.spots ?? []), ...extra] };
+    compassed.set(id, def);
+  }
   return def;
 }
 

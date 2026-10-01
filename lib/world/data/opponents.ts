@@ -2,6 +2,7 @@ import type { CharacterBuild, EquipLoadout, StatBlock } from "@/lib/game";
 import type { OpponentDef, ResourceYield } from "../types";
 import { CAPITAL_TRAINING_OPPONENT } from "./capital-training";
 import { STORY_OPPONENT_SPECS } from "./story";
+import { PLACE_OPPONENT_SPECS } from "./places";
 
 // ─── Opponent roster: 180 entries in named blocks ──────────────────
 // The random-event roster below has 35 entries, organised by tier; later
@@ -2113,7 +2114,7 @@ export const OPPONENTS: readonly OpponentDef[] = [
 // ─── Story saga foes (lib/world/data/story) ────────────────────────
 // Named villains a saga's duels need, built from their data spec.
 const STORY_DROPS = [DROPS_T0, DROPS_T1, DROPS_T2, DROPS_T3, DROPS_T4] as const;
-for (const spec of STORY_OPPONENT_SPECS) {
+for (const spec of [...STORY_OPPONENT_SPECS, ...PLACE_OPPONENT_SPECS]) {
   (OPPONENTS as OpponentDef[]).push({
     id: spec.id, name: spec.name, ti: spec.ti, category: spec.category ?? "human",
     drops: STORY_DROPS[spec.ti],

@@ -65,7 +65,7 @@ const REGION_LABEL: Record<string, string> = {
 // Location groups by id prefix (see lib/world/data/world-map.ts).
 const GROUPS: { title: string; match: (id: string) => boolean }[] = [
   { title: "Cities", match: (id) => id.startsWith("city_") },
-  { title: "Villages, markets and the foothill tutorial area", match: (id) => /^(village|market|tribe)(_|$)|^(tavern|viewpoint)$/.test(id) },
+  { title: "Villages, markets and the foothill tutorial area", match: (id) => /^(village|market|tribe)(_|$)|^(tavern)$/.test(id) },
   { title: "Sects", match: (id) => id.startsWith("sect_") },
   { title: "Temples and palaces", match: (id) => /^(temple|palace)_/.test(id) },
   { title: "Villas and mansions", match: (id) => id.startsWith("villa_") },

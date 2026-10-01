@@ -465,7 +465,7 @@ for (const src of ALL_LEAVES) {
   src.routes = outRoutes;
 }
 
-// The tutorial foothill village (core scenes: elder, tavern brawl, viewpoint)
+// The tutorial foothill village (core scenes: elder, tavern brawl)
 // hangs off the player's home. Its route scenes live in scenes.ts; the home
 // painting has no marker for it, so it shows as a route card.
 LEAVES_BY_ID.get("home_player")!.routes.push({

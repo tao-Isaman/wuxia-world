@@ -313,6 +313,12 @@ export function validateAndRepair(state: WorldStateData): void {
       new Set(state.assassinatedNpcIds.filter((id) => NPCS_BY_ID.has(id))),
     );
   }
+  for (const key of ["kidnappedUntil", "giftDays"] as const) {
+    const table = state[key];
+    if (!table || typeof table !== "object") { state[key] = {}; continue; }
+    for (const [id, day] of Object.entries(table)) if (!NPCS_BY_ID.has(id) || typeof day !== "number") delete table[id];
+  }
+  if (!state.activityDays || typeof state.activityDays !== "object") state.activityDays = {};
   if (!Array.isArray(state.kidnappedNpcIds)) {
     state.kidnappedNpcIds = [];
   } else {

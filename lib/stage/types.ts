@@ -23,6 +23,8 @@ export interface WorldMarker extends Point {
   quest?: "offer" | "turnin";
   /** Quest guide target: a bobbing arrow above it (and an edge pointer while off-screen). */
   guide?: boolean;
+  /** NPC strolls around its spot (NpcDef.look.wander; needs a four-way walk sheet). */
+  wander?: boolean;
   onActivate: () => void;
 }
 

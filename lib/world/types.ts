@@ -365,6 +365,20 @@ export interface NpcDef {
   // this on every NPC who can be stolen from (merchants, scholars, lords,
   // etc.), with weights that fit their station.
   stealLoot?: readonly ResourceYield[];
+
+  // ─── Look on the map ────────────────────────────────────────────────
+  // `body` picks the character sheet (an archetype id: m1–m4, f1–f4, elder,
+  // monk, merchant, bandit…); without it the id-based guess in
+  // lib/characters/catalog.ts applies. `wander: true` lets the NPC stroll
+  // around its spot like the rigged NPCs; only m1–m4 / f1–f4 bodies have the
+  // four-way walk sheets that needs.
+  look?: { body?: string; wander?: boolean };
+
+  // ─── Gifts ──────────────────────────────────────────────────────────
+  // What this NPC likes and dislikes as a gift (item categories or item
+  // ids). Without it, tastes come from the NPC's tags (lib/world/gifts.ts).
+  likes?: readonly string[];
+  dislikes?: readonly string[];
 }
 
 export interface NpcStateEntry {
@@ -1085,6 +1099,13 @@ export interface WorldStateData {
   stoleFromCounts: Record<string, number>;
   assassinatedNpcIds: string[];
   kidnappedNpcIds: string[];
+  // Kidnapped NPCs are away until this day, then stand at their spot again
+  // (lib/world/npc-presence.ts). Assassinated NPCs never come back.
+  kidnappedUntil: Record<string, number>;
+  // Day each NPC last received a gift (one gift per 30 days; lib/world/gifts.ts).
+  giftDays: Record<string, number>;
+  // Day each place activity was last done (its own cooldown; data/activities.ts).
+  activityDays: Record<string, number>;
 
   // Game time. Twelve ชั่วยาม per day; `time` is a fractional within-day
   // counter (0 ≤ time < 12) that advances per action and rolls `day` over
