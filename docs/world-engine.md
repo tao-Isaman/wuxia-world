@@ -86,7 +86,7 @@ Not in the barrel (import by path): `rollWalkEvent`, `releaseFromJail`, `consume
 | `addTrait` | trait, amount | floored at 0 | several |
 | `addNpcRelationship` | npcId, amount | unclamped | 11 |
 | `learnSkill` / `learnArt` | skillId / artId, level? | learn and auto-slot into the first empty slot | several |
-| `joinSect` | sectId | seed a membership at the start rank, auto-grant single-option rewards; no-op if any membership (even resigned / betrayed) exists | 15 |
+| `joinSect` | sectId | seed a membership at the start rank (no skills: the sect's lineage quests teach them); no-op if any membership (even resigned / betrayed) exists | 15 |
 | `resignSect` / `leaveSect` | sectId | status `resigned` (`leaveSect` is the legacy name) | 14 / 1 |
 | `betraySect` | sectId | status `betrayed` | 0 (store action only) |
 | `addSectPoints` | sectId, amount | floored at 0 | via quest rewards |

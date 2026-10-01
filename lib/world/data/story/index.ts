@@ -70,4 +70,20 @@ export const SAGA_PROLOGUES: Readonly<Record<string, string>> = {
   qiankun: "qst_sunmoon_art_qiankun",
 };
 
+/**
+ * Eight sect art quests used to teach their T3 art directly (and the art sat
+ * in a rank pool too). Each art now has one source, its lineage quest; the
+ * old art quest is its prologue trial. art id → trial quest id.
+ */
+export const LINEAGE_PROLOGUES: Readonly<Record<string, string>> = {
+  t3_onefinger: "qst_shaolin_art_zen_finger",
+  t3_yinyang: "qst_wudang_art_yinyang",
+  t3_ssh_pillar: "qst_songshan_art_pillar",
+  t3_tsh_sun: "qst_taishan_art_sun",
+  t3_hgs_swift: "qst_hengshan_south_art_swiftblade",
+  t3_hgn_mirror: "qst_hengshan_north_art_mirror",
+  t3_qz_sun: "qst_quanzhen_art_sun",
+  t3_xy_seepower: "qst_xiaoyao_art_seepower",
+};
+
 export const STORY_OPPONENT_SPECS: readonly StoryOpponentSpec[] = STORY_ARC_SPECS.flatMap((a) => a.opponents ?? []);

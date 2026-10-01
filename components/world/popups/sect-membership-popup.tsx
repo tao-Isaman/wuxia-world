@@ -9,8 +9,13 @@ import {
   SECT_MEMBERSHIPS,
   getQuestsForSect,
   isSectQuestOfferable,
-  pendingRewardsAtRank,
+  isQuestOfferable,
+  describeQuestCondition,
+  getNpc,
+  getQuest,
+  rankUpGold,
 } from "@/lib/world";
+import { sectLineage, getStoryArc } from "@/lib/world/story/registry";
 import type { SectId, QuestDef } from "@/lib/world";
 import { getSkill, getArt } from "@/lib/game";
 
@@ -22,20 +27,20 @@ interface Props {
 type Tab = "rewards" | "quests" | "art";
 
 const TAB_LABEL: Record<Tab, string> = {
-  rewards: "🎖 รางวัลขั้น",
+  rewards: "🎖 ขั้นและวิชา",
   quests: "📜 ภารกิจประจำ",
   art: "☯ วิชาในกาย",
 };
 
 // Multi-tab sect popup. Sect picker (when player has more than one
 // membership) sits at the very top; below that:
-//   - rewards: rank-tier reward picker (current + locked higher ranks)
+//   - rewards: rank-up (pays gold) and the sect's martial line — every skill
+//              and art, the lineage quest or saga that teaches it, and its gate
 //   - quests: repeatable sect quests with cooldown countdown + accept
 //   - art:    one-shot rank-gated art quests
 export function SectMembershipPopup({ open, onClose }: Props) {
   const sectMembership = useWorldStore((s) => s.sectMembership);
   const upgradeSectRank = useWorldStore((s) => s.upgradeSectRank);
-  const pickSectReward = useWorldStore((s) => s.pickSectReward);
   const acceptSectQuest = useWorldStore((s) => s.acceptSectQuest);
   const resignSect = useWorldStore((s) => s.resignSect);
   const betraySect = useWorldStore((s) => s.betraySect);
@@ -161,9 +166,8 @@ export function SectMembershipPopup({ open, onClose }: Props) {
             nextRank={nextRank}
             nextCost={nextCost}
             canRankUp={canRankUp}
-            rewardPicks={m.rewardPicks}
+            worldState={worldState}
             onUpgrade={() => upgradeSectRank(current)}
-            onPick={(rank, kind, id) => pickSectReward(current, rank, kind, id)}
           />
         )}
 
@@ -285,31 +289,14 @@ interface RewardsTabProps {
   nextRank: number;
   nextCost: number;
   canRankUp: boolean;
-  rewardPicks: Record<string, string>;
+  worldState: import("@/lib/world").WorldStateData;
   onUpgrade: () => void;
-  onPick: (rank: number, kind: "skill" | "art", id: string) => void;
 }
 
-function RewardsTab({
-  def,
-  rank,
-  atTop,
-  nextRank,
-  nextCost,
-  canRankUp,
-  rewardPicks,
-  onUpgrade,
-  onPick,
-}: RewardsTabProps) {
-  // Pending picks across every rank the player has reached.
-  // (Lower number = higher prestige; player has reached [currentRank, startRank].)
-  const reachedSections: { rank: number; skills: readonly string[]; arts: readonly string[] }[] = [];
-  for (let r = rank; r <= def.startRank; r++) {
-    const p = pendingRewardsAtRank(def, r, rewardPicks);
-    if (p.skills.length === 0 && p.arts.length === 0) continue;
-    reachedSections.push({ rank: r, skills: p.skills, arts: p.arts });
-  }
-
+function RewardsTab({ def, rank, atTop, nextRank, nextCost, canRankUp, worldState, onUpgrade }: RewardsTabProps) {
+  const learnedSkills = worldState.playerBuild?.learnedSkillIds ?? [];
+  const learnedArts = worldState.playerBuild?.learnedArtIds ?? [];
+  const lineage = sectLineage(def.name);
   return (
     <>
       {/* ─── Rank-up ─────────────────────────────────────────────── */}
@@ -326,103 +313,47 @@ function RewardsTab({
           )}
         </div>
         {!atTop && (
-          <WuxiaButton
-            variant={canRankUp ? "primary" : "default"}
-            disabled={!canRankUp}
-            onClick={onUpgrade}
-          >
-            เลื่อนเป็นขั้น {nextRank} (จ่าย {nextCost})
+          <WuxiaButton variant={canRankUp ? "primary" : "default"} disabled={!canRankUp} onClick={onUpgrade}>
+            เลื่อนเป็นขั้น {nextRank} (จ่าย {nextCost} · รับ {rankUpGold(def, nextRank)} ตำลึง)
           </WuxiaButton>
         )}
+        <p className="mt-2 text-xs text-muted-foreground">
+          ขั้นที่สูงขึ้นเปิดภารกิจสืบทอดวิชาและตำนานของสำนัก — วิชาทุกวิชาได้จากภารกิจเหล่านั้นเท่านั้น
+        </p>
       </section>
 
-      {/* ─── Pending picks across all reached ranks ───────────── */}
-      <section className="border-t border-border pt-3 space-y-3">
-        <strong>รางวัลรอรับ</strong>
-
-        {reachedSections.length === 0 ? (
-          <div className="text-xs text-muted-foreground">
-            ไม่มีรางวัลรอรับ — เลื่อนขั้นเพื่อปลดล็อกใหม่
-          </div>
-        ) : (
-          reachedSections.map((s) => (
-            <div key={s.rank} className="space-y-2">
-              <div className="text-xs">
-                <span className="text-muted-foreground">ขั้นที่ </span>
-                <strong className="text-foreground">{s.rank}</strong>
-              </div>
-
-              {s.skills.length > 0 && (
-                <div className="space-y-1 pl-2 border-l border-border">
-                  <div className="text-xs text-muted-foreground">วิชาฝีมือ — เลือก 1</div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
-                    {s.skills.map((sid) => {
-                      const sk = getSkill(sid);
-                      if (!sk) return null;
-                      return (
-                        <WuxiaButton
-                          key={sid}
-                          variant="default"
-                          size="sm"
-                          onClick={() => onPick(s.rank, "skill", sid)}
-                        >
-                          {sk.n}{" "}
-                          <span className="text-muted-foreground text-[10px]">T{sk.ti}</span>
-                        </WuxiaButton>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {s.arts.length > 0 && (
-                <div className="space-y-1 pl-2 border-l border-border">
-                  <div className="text-xs text-muted-foreground">วิชาในกาย — เลือก 1</div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
-                    {s.arts.map((aid) => {
-                      const a = getArt(aid);
-                      if (!a) return null;
-                      return (
-                        <WuxiaButton
-                          key={aid}
-                          variant="default"
-                          size="sm"
-                          onClick={() => onPick(s.rank, "art", aid)}
-                        >
-                          {a.n}{" "}
-                          <span className="text-muted-foreground text-[10px]">T{a.ti}</span>
-                        </WuxiaButton>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-            </div>
-          ))
-        )}
-      </section>
-
-      {/* ─── Future rank preview ──────────────────────────────── */}
-      <section className="border-t border-border pt-3 text-xs text-muted-foreground space-y-1">
-        <strong className="text-foreground block mb-1 text-sm">รางวัลที่ปลดล็อกในอนาคต</strong>
-        {(() => {
-          const rows: { rank: number; label: string }[] = [];
-          for (let r = rank - 1; r >= def.topRank; r--) {
-            const skills = def.skillsByRank[r] ?? [];
-            const arts = def.artsByRank[r] ?? [];
-            if (skills.length === 0 && arts.length === 0) continue;
-            const parts: string[] = [];
-            if (skills.length) parts.push(`วิชาฝีมือ ×${skills.length}`);
-            if (arts.length) parts.push(`วิชาในกาย ×${arts.length}`);
-            rows.push({ rank: r, label: parts.join(" + ") });
+      {/* ─── The sect's martial line ─────────────────────────────── */}
+      <section className="border-t border-border pt-3 space-y-1.5" data-testid="sect-lineage">
+        <strong>วิชาของสำนัก</strong>
+        {lineage.length === 0 && <div className="text-xs text-muted-foreground">สำนักนี้ยังไม่มีวิชาให้สืบทอด</div>}
+        {lineage.map((e) => {
+          const item = e.kind === "skill" ? getSkill(e.id) : getArt(e.id);
+          const learned = e.kind === "skill" ? learnedSkills.includes(e.id) : learnedArts.includes(e.id);
+          const quest = getQuest(e.questId);
+          const qs = worldState.quests[e.questId];
+          const arc = e.arcId ? getStoryArc(e.arcId) : null;
+          const giver = quest?.giverNpcId ? getNpc(quest.giverNpcId)?.name : undefined;
+          let status: string;
+          if (learned) status = "✓ เรียนแล้ว";
+          else if (arc) {
+            const done = arc.questIds.filter((id) => worldState.quests[id]?.status === "done").length;
+            status = done || qs ? `ตำนาน ${done}/${arc.questIds.length} บท` : e.rank !== null && rank > e.rank ? `ต้องขั้น ${e.rank}` : quest && isQuestOfferable(worldState, quest) ? `รับได้จาก ${giver ?? "—"}` : "ยังไม่ครบเงื่อนไข";
+          } else if (qs?.status === "active") status = "▶ กำลังทำ";
+          else if (e.rank !== null && rank > e.rank) status = `ต้องขั้น ${e.rank}`;
+          else if (quest && isQuestOfferable(worldState, quest)) status = `รับได้จาก ${giver ?? "—"}`;
+          else {
+            const unmet = quest ? describeQuestCondition(worldState, quest.prereqs ?? { t: "and", all: [] }).filter((l) => !l.done && !l.negated) : [];
+            status = unmet.length ? `ต้องการ ${unmet.map((l) => l.label).join(", ")}` : "ยังไม่ครบเงื่อนไข";
           }
-          if (rows.length === 0) return <div>ไม่มีรางวัลขั้นถัดไป</div>;
-          return rows.map((r) => (
-            <div key={r.rank}>
-              ขั้น {r.rank} → {r.label}
+          return (
+            <div key={`${e.kind}:${e.id}`} className="flex items-baseline justify-between gap-2 text-xs" data-lineage-id={e.id}>
+              <span className="min-w-0 truncate">
+                {item?.n ?? e.id} <span className="text-muted-foreground text-[10px]">T{item?.ti} · {e.kind === "skill" ? "วิชาฝีมือ" : "วิชาในกาย"}{arc ? ` · 📜 ${arc.title}` : ""}</span>
+              </span>
+              <span className={`shrink-0 ${learned ? "text-jade" : "text-muted-foreground"}`}>{status}</span>
             </div>
-          ));
-        })()}
+          );
+        })}
       </section>
     </>
   );

@@ -21,7 +21,6 @@ import {
   SECT_MEMBERSHIPS,
   getQuestsForSect,
   isSectQuestOfferable,
-  pendingRewardsAtRank,
   type SectId,
 } from "@/lib/world";
 
@@ -58,7 +57,6 @@ export function MenuBar({ hud }: { hud?: boolean } = {}) {
   // "1 สำนัก joined" was meaningless — the player wants to know if there
   // is something to do (claim a reward, accept a quest, rank up), not be
   // reminded they're a disciple. Count:
-  //   - pending multi-option reward picks at reached ranks
   //   - affordable rank-up
   //   - offerable sect / art quests
   // The full state object is read once and the helper does the work — re-
@@ -69,12 +67,6 @@ export function MenuBar({ hud }: { hud?: boolean } = {}) {
       if (!m) continue;
       const def = SECT_MEMBERSHIPS[sid as SectId];
       if (!def) continue;
-      // Unclaimed reward picks at every reached rank.
-      for (let r = m.rank; r <= def.startRank; r++) {
-        const p = pendingRewardsAtRank(def, r, m.rewardPicks);
-        if (p.skills.length > 0) count++;
-        if (p.arts.length > 0) count++;
-      }
       // Rank-up affordable.
       if (m.rank > def.topRank && m.points >= def.rankUpCost(m.rank - 1)) {
         count++;

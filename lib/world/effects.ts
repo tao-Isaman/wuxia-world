@@ -10,7 +10,7 @@ import { TRAIT_LABEL } from "./types";
 import { getItem, getNpc, getOpponent } from "./data";
 import { getQuest } from "./data/quests";
 import { getScene } from "./data/scenes";
-import { SECT_MEMBERSHIPS, autoGrantableRewards } from "./data/sect-memberships";
+import { SECT_MEMBERSHIPS } from "./data/sect-memberships";
 import {
   EVENT_PROBABILITY,
   MEET_EVENTS,
@@ -269,19 +269,7 @@ export function applyEffect(state: WorldStateData, eff: SceneEffect): void {
         status: "active",
       };
       state.sectMembership[eff.sectId] = m;
-      // Auto-claim single-option rewards at the entry rank (e.g. Shaolin
-      // grants t0_lohan automatically since rank 9's art pool is one
-      // option). Fires on EVERY joinSect path — store action OR quest
-      // reward — so authors don't need to add a separate learnArt reward.
-      const grants = autoGrantableRewards(def, def.startRank, m.rewardPicks);
-      for (const g of grants) {
-        if (g.kind === "skill") {
-          applyEffect(state, { t: "learnSkill", skillId: g.id });
-        } else {
-          applyEffect(state, { t: "learnArt", artId: g.id, level: 1 });
-        }
-        m.rewardPicks[`${g.rank}-${g.kind}`] = g.id;
-      }
+      // No martial arts on joining: the sect's lineage quests teach them.
       return;
     }
 

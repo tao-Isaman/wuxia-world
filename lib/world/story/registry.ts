@@ -3,12 +3,12 @@
 import { ARTS_BY_ID } from "@/lib/game/data/arts";
 import { SKILLS_BY_ID } from "@/lib/game/data/skills";
 import type { StatKey } from "@/lib/game";
-import type { DialogScene, QuestDef } from "../types";
+import type { Condition, DialogScene, QuestDef } from "../types";
 import { NPCS } from "../data/npcs";
 import { getItem } from "../data/items";
 import { OPPONENTS_BY_ID } from "../data/opponents";
 import { SECT_MEMBERSHIPS } from "../data/sect-memberships";
-import { LINEAGE_SPECS, SAGA_PROLOGUES, STORY_ARC_SPECS } from "../data/story";
+import { LINEAGE_PROLOGUES, LINEAGE_SPECS, SAGA_PROLOGUES, STORY_ARC_SPECS } from "../data/story";
 import { compileArc, compileLineage, type StoryResolvers } from "./compile";
 import type { CutsceneDef, StoryArcInfo } from "./types";
 
@@ -45,7 +45,11 @@ const quests: QuestDef[] = [];
 const scenes: DialogScene[] = [];
 const cutscenes: CutsceneDef[] = [];
 const arcs: StoryArcInfo[] = [];
-for (const spec of LINEAGE_SPECS) {
+for (const raw of LINEAGE_SPECS) {
+  // A lineage quest with a prologue trial (an older sect art quest) opens only after it.
+  const trial = LINEAGE_PROLOGUES[raw.id];
+  const done: Condition | undefined = trial ? { t: "questStatus", questId: trial, status: "done" } : undefined;
+  const spec = done ? { ...raw, require: raw.require ? { t: "and" as const, all: [raw.require, done] } : done } : raw;
   const c = compileLineage(spec, STORY_RESOLVERS);
   quests.push(...c.quests); scenes.push(...c.scenes); cutscenes.push(...c.cutscenes);
 }
@@ -66,3 +70,41 @@ const CUTSCENES_BY_ID = new Map(cutscenes.map((c) => [c.id, c]));
 const ARCS_BY_ID = new Map(arcs.map((a) => [a.id, a]));
 export function getCutscene(id: string | null | undefined): CutsceneDef | null { return (id && CUTSCENES_BY_ID.get(id)) || null; }
 export function getStoryArc(id: string | null | undefined): StoryArcInfo | null { return (id && ARCS_BY_ID.get(id)) || null; }
+
+/** One way into a sect's martial line: a lineage quest or a saga's first chapter. */
+export interface SectLineageEntry {
+  kind: "skill" | "art";
+  id: string;
+  /** The lineage quest, or the saga's first chapter. */
+  questId: string;
+  /** The saga, when this is a T4. */
+  arcId?: string;
+  /** The rank the quest needs (`sectRankAtLeast`), or null. */
+  rank: number | null;
+}
+
+function rankGate(c: Condition | undefined): number | null {
+  if (!c) return null;
+  if (c.t === "sectRankAtLeast") return c.maxRank;
+  if (c.t === "and") for (const sub of c.all) { const r = rankGate(sub); if (r !== null) return r; }
+  return null;
+}
+
+const QUESTS_BY_ID = new Map(quests.map((q) => [q.id, q]));
+const LINEAGE_BY_SECT = new Map<string, SectLineageEntry[]>();
+for (const q of quests) {
+  if (!q.lineage) continue;
+  const info = STORY_RESOLVERS.martial(q.lineage.kind, q.lineage.id);
+  if (!info) continue;
+  LINEAGE_BY_SECT.set(info.sc, [...(LINEAGE_BY_SECT.get(info.sc) ?? []), { ...q.lineage, questId: q.id, rank: rankGate(q.prereqs) }]);
+}
+for (const a of arcs) {
+  const first = QUESTS_BY_ID.get(a.questIds[0]);
+  LINEAGE_BY_SECT.set(a.sc, [...(LINEAGE_BY_SECT.get(a.sc) ?? []), { ...a.reward, questId: a.questIds[0], arcId: a.id, rank: rankGate(first?.prereqs) }]);
+}
+
+/** Every lineage quest and saga of a sect (by its Thai label), in tier order. */
+export function sectLineage(sc: string): readonly SectLineageEntry[] {
+  const tier = (e: SectLineageEntry) => STORY_RESOLVERS.martial(e.kind, e.id)?.ti ?? 0;
+  return [...(LINEAGE_BY_SECT.get(sc) ?? [])].sort((a, b) => tier(a) - tier(b) || (b.rank ?? 99) - (a.rank ?? 99));
+}

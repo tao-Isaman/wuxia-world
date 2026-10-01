@@ -1241,11 +1241,10 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
       },
     ],
     rewards: [
-      { t: "gold", amount: 500 },
+      { t: "gold", amount: 1500 },
       { t: "trait", trait: "evil", amount: 12 },
       { t: "trait", trait: "arrogance", amount: 3 },
       { t: "wExp", amount: 130 },
-      { t: "learnArt", artId: "blood", level: 1 },
       { t: "npcRelationship", npcId: "evil_xueyu_envoy_xie", amount: 15 },
     ],
   },

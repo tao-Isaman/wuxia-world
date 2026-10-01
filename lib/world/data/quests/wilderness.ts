@@ -118,9 +118,8 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
     ],
     rewards: [
       { t: "wExp", amount: 100 },
-      { t: "gold", amount: 400 },
+      { t: "gold", amount: 800 },
       { t: "trait", trait: "good", amount: 5 },
-      { t: "learnSkill", skillId: "cs" },
       { t: "npcRelationship", npcId: "wld_kunlun_exile_qiu", amount: 25 },
     ],
   },

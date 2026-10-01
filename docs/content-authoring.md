@@ -278,7 +278,7 @@ Then run `bun run test:navigation`: every painted map must keep its spawn open a
 - **`use`** — one of:
   - `{ t: "heal", hp?, mp? }`;
   - `{ t: "trainSkill", skill, xp }`;
-  - `{ t: "manualLearnSkill" | "manualLearnArt", … }`, for manuals with the `man_` prefix. The stat gate by tier is 0 / 10 / 15 / 20 / 30.
+  - `{ t: "manualLearnSkill" | "manualLearnArt", … }`, for manuals with the `man_` prefix — unaffiliated skills only; sect skills come only from quests. The stat gate by tier is 0 / 10 / 15 / 20 / 30.
 - **Obtainable.** Make the item reachable: a shop, a node yield, a drop table, steal loot, a recipe, `giveItem` or a quest reward. `test:quests` computes what can be obtained and fails quests that need an unobtainable item.
 
 ## A shop or a sect-hall offer
@@ -346,14 +346,13 @@ Then run `bun run test:navigation`: every painted map must keep its spawn open a
 3. **Stat budgets.** Run `bun scripts/normalize-t3-stats.ts`. It **rewrites** `skills.ts` toward the budgets (single-line entries only), so review the diff.
 4. **Icon.** Add `public/icons/skills/<id>.png` or `public/icons/arts/<id>.png`. Otherwise it gets a generic glyph.
 5. **Battle range.** Check it with `bun run test:grid-skills`. The profile is derived from weapon family, attack type, tier and hits; add a `SKILL_GRID_OVERRIDES` entry in `lib/game/grid/skill-grid.ts` for special shapes.
-6. **Make it learnable** — one or more of:
-   - a sect rank pool in `sect-memberships.ts` (a one-item pool is granted automatically);
-   - a city hall offer (unaffiliated tier 0–1 only);
+6. **Make it learnable.** A **sect** skill or art has exactly one source, its lineage quest or saga (below); nothing else may teach it. An unaffiliated (ยุทธจักร) one uses one or more of:
+   - a city hall offer (tier 0–1 only);
    - a manual item (`man_…` with `manualLearnSkill` / `manualLearnArt`; check with `bun scripts/audit-manual-names.ts`);
    - a quest reward `learnSkill` / `learnArt`;
    - an opponent's build, which shows it in battle only.
 
-   **A sect skill or art also needs exactly one quest source** (`bun run test:story` fails otherwise): a `LineageSpec` for T0–T3, or a whole `StoryArcSpec` saga for T4, in `lib/world/data/story/<sect>.ts`. See [story-writing.md](story-writing.md).
+   **A sect skill or art needs exactly one quest source, and no other** (`bun run test:story` fails otherwise): a `LineageSpec` for T0–T3, or a whole `StoryArcSpec` saga for T4, in `lib/world/data/story/<sect>.ts`. See [story-writing.md](story-writing.md).
 7. **Check it.** Run `bun run typecheck` and `bun run test:grid-skills`, then regenerate the reference ([reference/martial-arts.md](reference/martial-arts.md)).
 
 New **effect** kinds (a new `se` / `ee` / passive / art-active type) are engine changes: see [combat.md](combat.md#changing-combat-safely).
@@ -382,7 +381,6 @@ This touches many files. In order:
    - `name`, `hallLocationId`, `registrarNpcId`;
    - `startRank` / `topRank` (9 → 1, 5 → 1 or 3 → 1) and `rankUpCost(rank)`;
    - `questCooldownDays` (30 elsewhere);
-   - `skillsByRank` / `artsByRank` pools;
    - `joinRequirements`. The quest reward does **not** check it; put the real gate in the intro quest's `prereqs`.
 4. **Files.** Create the three mirror files and add one import + one spread line to each barrel:
    - `lib/world/data/npcs/sects/<file>.ts` (barrel: `npcs/sects-temples.ts`);

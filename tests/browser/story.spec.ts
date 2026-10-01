@@ -55,3 +55,31 @@ test("story saga: the chapter's film plays (skippable), the long briefing pages,
   await expect(page.getByTestId("cutscene")).toHaveCount(0, { timeout: 10_000 });
   expect(errors).toEqual([]);
 });
+
+test("sect window: ranks grant no skills; the ขั้นและวิชา tab lists every sect skill with its quest", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await start(page);
+  await page.evaluate(() => {
+    const raw = JSON.parse(localStorage.getItem("wusia-world-v1")!);
+    raw.state.sectMembership = { wudang: { rank: 9, points: 5000, lastQuestDay: {}, artQuestsDone: [], rewardPicks: {}, joinedDay: 0, status: "active" } };
+    localStorage.setItem("wusia-world-v1", JSON.stringify(raw));
+  });
+  await page.reload();
+  await expect(page.getByTestId("world-canvas")).toHaveAttribute("data-ready", "true", { timeout: 60_000 });
+  const gold = await page.evaluate(() => JSON.parse(localStorage.getItem("wusia-world-v1")!).state.gold as number);
+
+  await page.getByRole("navigation", { name: "เมนูเกม" }).getByRole("button", { name: "สำนัก", exact: true }).click();
+  await page.getByRole("button", { name: /ขั้นและวิชา/ }).click();
+  const line = page.getByTestId("sect-lineage");
+  await expect(line).toContainText("วิชาของสำนัก");
+  await expect(line.locator('[data-lineage-id="tj"]')).toContainText(/รับได้จาก|ต้องการ/);
+  await expect(line.locator('[data-lineage-id="taiji"]')).toContainText("ต้องขั้น");
+
+  // A rank-up pays gold and teaches nothing.
+  await page.getByRole("button", { name: /เลื่อนเป็นขั้น 8/ }).click();
+  await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem("wusia-world-v1")!).state.gold as number)).toBeGreaterThan(gold);
+  const learned = await page.evaluate(() => JSON.parse(localStorage.getItem("wusia-world-v1")!).state.playerBuild.learnedSkillIds as string[]);
+  expect(learned).not.toContain("rf");
+  expect(errors).toEqual([]);
+});

@@ -2,7 +2,7 @@
 
 # Sects
 
-20 sect locations; 15 of them run a membership (`SECT_MEMBERSHIPS` in `lib/world/data/sect-memberships.ts`). Lower rank numbers are more senior: a member starts at `startRank` and climbs toward `topRank` by spending sect points earned from sect quests. At each rank the member may pick one skill and one art from that rank's pool; single-option pools are granted automatically.
+20 sect locations; 15 of them run a membership (`SECT_MEMBERSHIPS` in `lib/world/data/sect-memberships.ts`). Lower rank numbers are more senior: a member starts at `startRank` and climbs toward `topRank` by spending sect points earned from sect quests; each rank-up pays gold (half the points it costs). Ranks grant no martial arts: every sect skill and art is taught only by its lineage quest (T0–T3) or story saga (T4), and rank gates those quests.
 
 | Location | Name | Membership id | Registrar | Ranks | Sect quests |
 | --- | --- | --- | --- | --- | --- |
@@ -35,16 +35,32 @@
 - Rank-up cost (sect points): →8: 100 · →7: 200 · →6: 350 · →5: 500 · →4: 700 · →3: 1000 · →2: 1400 · →1: 2000
 - Sect quests: 8 (2 art quests) · redemption quest `qst_shaolin_redemption` · betrayal hunter `hunter_shaolin`
 
-| Rank | Skill pool | Art pool |
-| --- | --- | --- |
-| 9 | หมัดอรหันต์ (`nd5`), ไม้พลองพุทธธรรม (`sl_staff_dharma`), ไม้พลองเส้าหลิน (`sl_staff_shaolin`) | ลมปราณอรหันต์ (`t0_lohan`) |
-| 8 | วิชากรงเล็บมังกร (`ne1`), ดาบอรหันต์เส้าหลิน (`ne2`), กระบี่วิธีเซน (`sl_zen_sword`) | — |
-| 7 | — | กระดิ่งทองพื้นฐาน (`t1_goldenbell`) |
-| 6 | — | ลมปราณพุทธธรรม (`t2_dharma`) |
-| 5 | ฝ่ามือโพธิสัตว์ (`sl_bodhi_palm`), ดัชนีเด็ดบุปผา (`sl_petal_finger`), หมัดทลายผา (`sl_rock_punch`) | — |
-| 4 | — | เอกนิ้วเซน (`t3_onefinger`) |
-| 3 | อรหันต์พันกร (`sl_thousand_arms`), ไม้เท้าสัจธรรม (`sl_truth_staff`) | — |
-| 2 | — | พลังเปลี่ยนเส้นเอ็น (`tendon`), จินกังชี่ (`diamond`), ลมปราณอรหันต์ปราบมาร (`t4_demonsubduer`) |
+- Rank-up gold: →8: 50 · →7: 100 · →6: 175 · →5: 250 · →4: 350 · →3: 500 · →2: 700 · →1: 1000
+
+Martial line — every skill and art is taught only by its lineage quest or saga:
+
+| Rank | Kind | Skill / art | Quest |
+| --- | --- | --- | --- |
+| — | skill | หมัดเส้าหลิน (`sf`) | `ql_skill_sf` |
+| — | skill | หมัดยาวพุทธธรรม (`sl_long_dharma`) | `ql_skill_sl_long_dharma` |
+| — | art | ลมปราณอรหันต์ (`t0_lohan`) | `ql_art_t0_lohan` |
+| 7 | skill | หมัดอรหันต์ (`nd5`) | `ql_skill_nd5` |
+| 7 | skill | ไม้พลองพุทธธรรม (`sl_staff_dharma`) | `ql_skill_sl_staff_dharma` |
+| 7 | skill | ไม้พลองเส้าหลิน (`sl_staff_shaolin`) | `ql_skill_sl_staff_shaolin` |
+| 7 | art | กระดิ่งทองพื้นฐาน (`t1_goldenbell`) | `ql_art_t1_goldenbell` |
+| 5 | skill | วิชากรงเล็บมังกร (`ne1`) | `ql_skill_ne1` |
+| 5 | skill | ดาบอรหันต์เส้าหลิน (`ne2`) | `ql_skill_ne2` |
+| 5 | skill | กระบี่วิธีเซน (`sl_zen_sword`) | `ql_skill_sl_zen_sword` |
+| 5 | art | ลมปราณพุทธธรรม (`t2_dharma`) | `ql_art_t2_dharma` |
+| 3 | skill | ฝ่ามือโพธิสัตว์ (`sl_bodhi_palm`) | `ql_skill_sl_bodhi_palm` |
+| 3 | skill | ดัชนีเด็ดบุปผา (`sl_petal_finger`) | `ql_skill_sl_petal_finger` |
+| 3 | skill | หมัดทลายผา (`sl_rock_punch`) | `ql_skill_sl_rock_punch` |
+| 3 | art | เอกนิ้วเซน (`t3_onefinger`) | `ql_art_t3_onefinger` |
+| 3 | skill | อรหันต์พันกร (`sl_thousand_arms`) | saga `shaolin_thousand_arms` |
+| 3 | skill | ไม้เท้าสัจธรรม (`sl_truth_staff`) | saga `shaolin_truth_staff` |
+| 3 | art | พลังเปลี่ยนเส้นเอ็น (`tendon`) | saga `shaolin_tendon` |
+| 3 | art | จินกังชี่ (`diamond`) | saga `shaolin_diamond` |
+| 3 | art | ลมปราณอรหันต์ปราบมาร (`t4_demonsubduer`) | saga `shaolin_demonsubduer` |
 
 ## อู่ตัง (`wudang`)
 
@@ -54,16 +70,28 @@
 - Rank-up cost (sect points): →8: 100 · →7: 200 · →6: 350 · →5: 500 · →4: 700 · →3: 1000 · →2: 1400 · →1: 2000
 - Sect quests: 8 (1 art quests) · redemption quest `qst_wudang_redemption` · betrayal hunter `hunter_wudang`
 
-| Rank | Skill pool | Art pool |
-| --- | --- | --- |
-| 9 | กระบี่ไทเก๊ก (`wd_taiji_sword`), สะท้อนพลัง (`rf`), ก้าวเมฆหมอก (`cs`) | สมาธิพื้นฐาน (`t0_meditation`) |
-| 8 | กระบี่หยินหยาง (`wd_yinyang_sword`), หยิน-หยางฝ่า (`yy`) | — |
-| 7 | — | พลังธรรมชาติ (`t1_naturalqi`) |
-| 6 | — | จิตกายนวมเป็นหนึ่ง (`t2_mindbody`) |
-| 5 | หมัดเคลื่อนเมฆา (`wd_cloud_palm`), กระบี่เคลื่อนเมฆา (`wd_cloud_sword`) | — |
-| 4 | — | หยินหยางสมดุล (`t3_yinyang`) |
-| 3 | กระบี่เหนือฟ้า (`wd_heaven_sword`), เพลงหมัดไทเก๊ก (`wd_taiji_fist`) | — |
-| 2 | — | ไทจี้เจิ้นชี่ (`taiji`), จื่อเสียเซินกง (`zixia`) |
+- Rank-up gold: →8: 50 · →7: 100 · →6: 175 · →5: 250 · →4: 350 · →3: 500 · →2: 700 · →1: 1000
+
+Martial line — every skill and art is taught only by its lineage quest or saga:
+
+| Rank | Kind | Skill / art | Quest |
+| --- | --- | --- | --- |
+| — | skill | ไทจี้เจี้ยน (`tj`) | `ql_skill_tj` |
+| — | art | สมาธิพื้นฐาน (`t0_meditation`) | `ql_art_t0_meditation` |
+| 7 | skill | สะท้อนพลัง (`rf`) | `ql_skill_rf` |
+| 7 | skill | ก้าวเมฆหมอก (`cs`) | `ql_skill_cs` |
+| 7 | skill | กระบี่ไทเก๊ก (`wd_taiji_sword`) | `ql_skill_wd_taiji_sword` |
+| 7 | art | พลังธรรมชาติ (`t1_naturalqi`) | `ql_art_t1_naturalqi` |
+| 5 | skill | หยิน-หยางฝ่า (`yy`) | `ql_skill_yy` |
+| 5 | skill | กระบี่หยินหยาง (`wd_yinyang_sword`) | `ql_skill_wd_yinyang_sword` |
+| 5 | art | จิตกายนวมเป็นหนึ่ง (`t2_mindbody`) | `ql_art_t2_mindbody` |
+| 3 | skill | หมัดเคลื่อนเมฆา (`wd_cloud_palm`) | `ql_skill_wd_cloud_palm` |
+| 3 | skill | กระบี่เคลื่อนเมฆา (`wd_cloud_sword`) | `ql_skill_wd_cloud_sword` |
+| 3 | art | หยินหยางสมดุล (`t3_yinyang`) | `ql_art_t3_yinyang` |
+| 3 | skill | เพลงหมัดไทเก๊ก (`wd_taiji_fist`) | saga `wudang_taiji_fist` |
+| 3 | skill | กระบี่เหนือฟ้า (`wd_heaven_sword`) | saga `wudang_heaven_sword` |
+| 3 | art | ไทจี้เจิ้นชี่ (`taiji`) | saga `wudang_taiji` |
+| 3 | art | จื่อเสียเซินกง (`zixia`) | saga `wudang_zixia` |
 
 ## หัวซาน (`huashan`)
 
@@ -73,13 +101,20 @@
 - Rank-up cost (sect points): →4: 100 · →3: 250 · →2: 500 · →1: 1000
 - Sect quests: 5 (1 art quests) · redemption quest `qst_huashan_redemption` · betrayal hunter `hunter_huashan`
 
-| Rank | Skill pool | Art pool |
-| --- | --- | --- |
-| 5 | กระบี่หัวซาน (`hs_basic_sword`) | กำลังภายในหัวซาน (`t0_huashan_qi`) |
-| 4 | กระบี่เมฆาล่องลอย (`hs_floating_cloud`) | วิชาตัวเบาหัวซาน (`t1_huashan_light`) |
-| 3 | — | พลังเมฆคล้อย (`t2_huashan_cloud`) |
-| 2 | กระบี่เมฆาม่วง (`hs_purple_cloud`) | — |
-| 1 | — | พลังเมฆม่วง (`t4_huashan_purple`), หัวซานเซินกง (`huashan`) |
+- Rank-up gold: →4: 50 · →3: 125 · →2: 250 · →1: 500
+
+Martial line — every skill and art is taught only by its lineage quest or saga:
+
+| Rank | Kind | Skill / art | Quest |
+| --- | --- | --- | --- |
+| — | skill | กระบี่หัวซาน (`hs_basic_sword`) | `ql_skill_hs_basic_sword` |
+| — | art | กำลังภายในหัวซาน (`t0_huashan_qi`) | `ql_art_t0_huashan_qi` |
+| 4 | skill | กระบี่เมฆาล่องลอย (`hs_floating_cloud`) | `ql_skill_hs_floating_cloud` |
+| 4 | art | วิชาตัวเบาหัวซาน (`t1_huashan_light`) | `ql_art_t1_huashan_light` |
+| 3 | art | พลังเมฆคล้อย (`t2_huashan_cloud`) | `ql_art_t2_huashan_cloud` |
+| 2 | skill | กระบี่เมฆาม่วง (`hs_purple_cloud`) | `ql_skill_hs_purple_cloud` |
+| 2 | art | หัวซานเซินกง (`huashan`) | saga `huashan_black_page` |
+| 2 | art | พลังเมฆม่วง (`t4_huashan_purple`) | saga `huashan_purple_two_poles` |
 
 ## ซงซาน (`songshan`)
 
@@ -89,13 +124,20 @@
 - Rank-up cost (sect points): →4: 100 · →3: 250 · →2: 500 · →1: 1000
 - Sect quests: 5 (1 art quests) · redemption quest `qst_songshan_redemption` · betrayal hunter `hunter_songshan`
 
-| Rank | Skill pool | Art pool |
-| --- | --- | --- |
-| 5 | กระบี่เหล็กซงซาน (`ssh_basic_sword`) | กำลังภายในซงซาน (`t0_ssh_qi`) |
-| 4 | เพลงกระบี่ตีเหล็ก (`ssh_iron_strike`) | วิชาเหล็กหนัก (`t1_ssh_iron`) |
-| 3 | กระบี่ยอดเขากลาง (`ssh_central_blade`) | พลังรากภูผา (`t2_ssh_root`) |
-| 2 | กระบี่เสาภูผาซงซาน (`ssh_song_pillar`) | — |
-| 1 | — | พลังเสาภูผา (`t3_ssh_pillar`) |
+- Rank-up gold: →4: 50 · →3: 125 · →2: 250 · →1: 500
+
+Martial line — every skill and art is taught only by its lineage quest or saga:
+
+| Rank | Kind | Skill / art | Quest |
+| --- | --- | --- | --- |
+| — | skill | กระบี่เหล็กซงซาน (`ssh_basic_sword`) | `ql_skill_ssh_basic_sword` |
+| — | art | กำลังภายในซงซาน (`t0_ssh_qi`) | `ql_art_t0_ssh_qi` |
+| 4 | skill | เพลงกระบี่ตีเหล็ก (`ssh_iron_strike`) | `ql_skill_ssh_iron_strike` |
+| 4 | art | วิชาเหล็กหนัก (`t1_ssh_iron`) | `ql_art_t1_ssh_iron` |
+| 3 | skill | กระบี่ยอดเขากลาง (`ssh_central_blade`) | `ql_skill_ssh_central_blade` |
+| 3 | art | พลังรากภูผา (`t2_ssh_root`) | `ql_art_t2_ssh_root` |
+| 2 | skill | กระบี่เสาภูผาซงซาน (`ssh_song_pillar`) | `ql_skill_ssh_song_pillar` |
+| 2 | art | พลังเสาภูผา (`t3_ssh_pillar`) | `ql_art_t3_ssh_pillar` |
 
 ## ไท่ซาน (`taishan`)
 
@@ -105,13 +147,20 @@
 - Rank-up cost (sect points): →4: 100 · →3: 250 · →2: 500 · →1: 1000
 - Sect quests: 5 (1 art quests) · redemption quest `qst_taishan_redemption` · betrayal hunter `hunter_taishan`
 
-| Rank | Skill pool | Art pool |
-| --- | --- | --- |
-| 5 | กระบี่ไท่ซาน (`tsh_basic_sword`) | กำลังภายในไท่ซาน (`t0_tsh_qi`) |
-| 4 | กระบี่อรุณรุ่ง (`tsh_dawn_strike`) | วิชาตวัดอรุณ (`t1_tsh_dawn`) |
-| 3 | กระบี่บูรพาส่อง (`tsh_east_blade`) | พลังยอดเขาบูรพา (`t2_tsh_peak`) |
-| 2 | กระบี่ทะลวงสุริยัน (`tsh_sun_pierce`) | — |
-| 1 | — | หนึ่งกระบี่บูชาตะวัน (`t3_tsh_sun`) |
+- Rank-up gold: →4: 50 · →3: 125 · →2: 250 · →1: 500
+
+Martial line — every skill and art is taught only by its lineage quest or saga:
+
+| Rank | Kind | Skill / art | Quest |
+| --- | --- | --- | --- |
+| — | skill | กระบี่ไท่ซาน (`tsh_basic_sword`) | `ql_skill_tsh_basic_sword` |
+| — | art | กำลังภายในไท่ซาน (`t0_tsh_qi`) | `ql_art_t0_tsh_qi` |
+| 4 | skill | กระบี่อรุณรุ่ง (`tsh_dawn_strike`) | `ql_skill_tsh_dawn_strike` |
+| 4 | art | วิชาตวัดอรุณ (`t1_tsh_dawn`) | `ql_art_t1_tsh_dawn` |
+| 3 | skill | กระบี่บูรพาส่อง (`tsh_east_blade`) | `ql_skill_tsh_east_blade` |
+| 3 | art | พลังยอดเขาบูรพา (`t2_tsh_peak`) | `ql_art_t2_tsh_peak` |
+| 2 | skill | กระบี่ทะลวงสุริยัน (`tsh_sun_pierce`) | `ql_skill_tsh_sun_pierce` |
+| 2 | art | หนึ่งกระบี่บูชาตะวัน (`t3_tsh_sun`) | `ql_art_t3_tsh_sun` |
 
 ## เฮิงซาน (`hengshan_south`)
 
@@ -121,13 +170,20 @@
 - Rank-up cost (sect points): →4: 100 · →3: 250 · →2: 500 · →1: 1000
 - Sect quests: 5 (1 art quests) · redemption quest `qst_hengshan_south_redemption` · betrayal hunter `hunter_hengshan_south`
 
-| Rank | Skill pool | Art pool |
-| --- | --- | --- |
-| 5 | กระบี่เฮิงซาน (`hgs_basic_sword`) | ลมหายใจห้ายอด (`t0_hgs_breath`) |
-| 4 | กระบี่ระบำเริงรำ (`hgs_dancing_step`) | ตัวเบาเฮิงซาน (`t1_hgs_step`) |
-| 3 | กระบี่ห้ายอด (`hgs_five_peaks`) | ระบำเมฆาห้ายอด (`t2_hgs_cloud`) |
-| 2 | กระบี่ลมรวดเร็ว (`hgs_swift_blade`) | — |
-| 1 | — | ลมรวดเร็ว (`t3_hgs_swift`) |
+- Rank-up gold: →4: 50 · →3: 125 · →2: 250 · →1: 500
+
+Martial line — every skill and art is taught only by its lineage quest or saga:
+
+| Rank | Kind | Skill / art | Quest |
+| --- | --- | --- | --- |
+| — | skill | กระบี่เฮิงซาน (`hgs_basic_sword`) | `ql_skill_hgs_basic_sword` |
+| — | art | ลมหายใจห้ายอด (`t0_hgs_breath`) | `ql_art_t0_hgs_breath` |
+| 4 | skill | กระบี่ระบำเริงรำ (`hgs_dancing_step`) | `ql_skill_hgs_dancing_step` |
+| 4 | art | ตัวเบาเฮิงซาน (`t1_hgs_step`) | `ql_art_t1_hgs_step` |
+| 3 | skill | กระบี่ห้ายอด (`hgs_five_peaks`) | `ql_skill_hgs_five_peaks` |
+| 3 | art | ระบำเมฆาห้ายอด (`t2_hgs_cloud`) | `ql_art_t2_hgs_cloud` |
+| 2 | skill | กระบี่ลมรวดเร็ว (`hgs_swift_blade`) | `ql_skill_hgs_swift_blade` |
+| 2 | art | ลมรวดเร็ว (`t3_hgs_swift`) | `ql_art_t3_hgs_swift` |
 
 ## เหิงซาน (`hengshan_north`)
 
@@ -137,13 +193,20 @@
 - Rank-up cost (sect points): →4: 100 · →3: 250 · →2: 500 · →1: 1000
 - Sect quests: 5 (1 art quests) · redemption quest `qst_hengshan_north_redemption` · betrayal hunter `hunter_hengshan_north`
 
-| Rank | Skill pool | Art pool |
-| --- | --- | --- |
-| 5 | กระบี่ธรรมเหิงซาน (`hgn_basic_sword`) | ลมปราณนิ่งสงบ (`t0_hgn_zen`) |
-| 4 | กระบี่อารักษ์ธรรม (`hgn_dharma_guard`) | โล่ธรรมจักรวาล (`t1_hgn_shield`) |
-| 3 | กระบี่จีวรเหล็ก (`hgn_iron_robe`) | ระฆังพระธรรม (`t2_hgn_bell`) |
-| 2 | กระบี่กระจกธรรม (`hgn_mirror_blade`) | — |
-| 1 | — | พลังกระจกธรรม (`t3_hgn_mirror`) |
+- Rank-up gold: →4: 50 · →3: 125 · →2: 250 · →1: 500
+
+Martial line — every skill and art is taught only by its lineage quest or saga:
+
+| Rank | Kind | Skill / art | Quest |
+| --- | --- | --- | --- |
+| — | skill | กระบี่ธรรมเหิงซาน (`hgn_basic_sword`) | `ql_skill_hgn_basic_sword` |
+| — | art | ลมปราณนิ่งสงบ (`t0_hgn_zen`) | `ql_art_t0_hgn_zen` |
+| 4 | skill | กระบี่อารักษ์ธรรม (`hgn_dharma_guard`) | `ql_skill_hgn_dharma_guard` |
+| 4 | art | โล่ธรรมจักรวาล (`t1_hgn_shield`) | `ql_art_t1_hgn_shield` |
+| 3 | skill | กระบี่จีวรเหล็ก (`hgn_iron_robe`) | `ql_skill_hgn_iron_robe` |
+| 3 | art | ระฆังพระธรรม (`t2_hgn_bell`) | `ql_art_t2_hgn_bell` |
+| 2 | skill | กระบี่กระจกธรรม (`hgn_mirror_blade`) | `ql_skill_hgn_mirror_blade` |
+| 2 | art | พลังกระจกธรรม (`t3_hgn_mirror`) | `ql_art_t3_hgn_mirror` |
 
 ## ฉวนเจิน (`quanzhen`)
 
@@ -153,13 +216,23 @@
 - Rank-up cost (sect points): →4: 100 · →3: 250 · →2: 500 · →1: 1000
 - Sect quests: 5 (1 art quests) · redemption quest `qst_quanzhen_redemption` · betrayal hunter `hunter_quanzhen`
 
-| Rank | Skill pool | Art pool |
-| --- | --- | --- |
-| 5 | กระบี่หนักชวนจิน (`qz_heavy_sword`) | วิชาเร่งพลัง (`t0_qz_speed`) |
-| 4 | กระบี่ร้อนชวนจิน (`qz_hot_sword`) | ท่วงท่าถอยม้า (`t1_qz_horse`) |
-| 3 | — | ลมปราณชวนจินก่า (`qzzq`) |
-| 2 | หมัดสุริยัน (`qz_sun_fist`), กระบี่สะกดสุริยันต์ (`qz_sun_sword`) | — |
-| 1 | — | หนึ่งพลังสุริยันต์ (`t3_qz_sun`), หยังทะเลพิฆาตมังกร (`t3_qz_dragon`) |
+- Rank-up gold: →4: 50 · →3: 125 · →2: 250 · →1: 500
+
+Martial line — every skill and art is taught only by its lineage quest or saga:
+
+| Rank | Kind | Skill / art | Quest |
+| --- | --- | --- | --- |
+| — | skill | กระบี่หนักชวนจิน (`qz_heavy_sword`) | `ql_skill_qz_heavy_sword` |
+| — | art | วิชาเร่งพลัง (`t0_qz_speed`) | `ql_art_t0_qz_speed` |
+| 4 | skill | กระบี่ร้อนชวนจิน (`qz_hot_sword`) | `ql_skill_qz_hot_sword` |
+| 4 | art | ท่วงท่าถอยม้า (`t1_qz_horse`) | `ql_art_t1_qz_horse` |
+| 3 | skill | กระบี่ชวนจินก่า (`qzjf`) | `ql_skill_qzjf` |
+| 3 | skill | หมัดชวนจินก่า (`qz_punch`) | `ql_skill_qz_punch` |
+| 3 | art | ลมปราณชวนจินก่า (`qzzq`) | `ql_art_qzzq` |
+| 2 | skill | หมัดสุริยัน (`qz_sun_fist`) | `ql_skill_qz_sun_fist` |
+| 2 | skill | กระบี่สะกดสุริยันต์ (`qz_sun_sword`) | `ql_skill_qz_sun_sword` |
+| 2 | art | หนึ่งพลังสุริยันต์ (`t3_qz_sun`) | `ql_art_t3_qz_sun` |
+| 2 | art | หยังทะเลพิฆาตมังกร (`t3_qz_dragon`) | `ql_art_t3_qz_dragon` |
 
 ## ง้อไบ๊ (`emei`)
 
@@ -169,16 +242,29 @@
 - Rank-up cost (sect points): →8: 100 · →7: 200 · →6: 350 · →5: 500 · →4: 700 · →3: 1000 · →2: 1400 · →1: 2000
 - Sect quests: 8 (1 art quests) · redemption quest `qst_emei_redemption` · betrayal hunter `hunter_emei`
 
-| Rank | Skill pool | Art pool |
-| --- | --- | --- |
-| 9 | กระบี่อ่อนช้อย (`em_graceful_sword`) | สมาธิเยือกเย็น (`t0_em_meditation`) |
-| 8 | กระบี่ดอกบุปผา (`em_blossom_sword`) | — |
-| 7 | — | บัวบานภายใน (`t1_em_lotus`) |
-| 6 | — | บุปผาร้อยมาลัย (`t2_em_garland`) |
-| 5 | กระบี่วิธีพุทธ (`em_buddha_sword`), กระบี่ดอกเหมย (`em_plum_sword`) | — |
-| 4 | — | พลังรักษาใจ (`t3_em_heart`), พลังกายาพริ้วไหว (`t3_em_grace`), ลมหายใจน้ำแข็ง (`t3_em_ice`) |
-| 3 | ฝ่ามือโพธิสัตว์ง้อไบ๊ (`em_bodhi_palm`), กระบี่พิทักษ์โพธิสัตว์ (`em_bodhi_sword`) | — |
-| 2 | — | โพธิสัตว์ทรงพรต (`t4_em_bodhi`), ง้อไบ๊เซินกง (`emei`) |
+- Rank-up gold: →8: 50 · →7: 100 · →6: 175 · →5: 250 · →4: 350 · →3: 500 · →2: 700 · →1: 1000
+
+Martial line — every skill and art is taught only by its lineage quest or saga:
+
+| Rank | Kind | Skill / art | Quest |
+| --- | --- | --- | --- |
+| — | skill | กระบี่อ่อนช้อย (`em_graceful_sword`) | `ql_skill_em_graceful_sword` |
+| — | art | สมาธิเยือกเย็น (`t0_em_meditation`) | `ql_art_t0_em_meditation` |
+| 7 | skill | กระบี่ดอกบุปผา (`em_blossom_sword`) | `ql_skill_em_blossom_sword` |
+| 7 | art | บัวบานภายใน (`t1_em_lotus`) | `ql_art_t1_em_lotus` |
+| 5 | skill | กระบี่รักษาใจ (`em_heart_sword`) | `ql_skill_em_heart_sword` |
+| 5 | skill | ฝ่ามือรักษาใจ (`em_heart_palm`) | `ql_skill_em_heart_palm` |
+| 5 | skill | ฝ่ามือดอกบัวบาน (`em_lotus_palm`) | `ql_skill_em_lotus_palm` |
+| 5 | art | บุปผาร้อยมาลัย (`t2_em_garland`) | `ql_art_t2_em_garland` |
+| 3 | skill | กระบี่วิธีพุทธ (`em_buddha_sword`) | `ql_skill_em_buddha_sword` |
+| 3 | art | พลังกายาพริ้วไหว (`t3_em_grace`) | `ql_art_t3_em_grace` |
+| 3 | skill | กระบี่ดอกเหมย (`em_plum_sword`) | `ql_skill_em_plum_sword` |
+| 3 | art | ลมหายใจน้ำแข็ง (`t3_em_ice`) | `ql_art_t3_em_ice` |
+| 3 | art | พลังรักษาใจ (`t3_em_heart`) | `ql_art_t3_em_heart` |
+| 3 | skill | ฝ่ามือโพธิสัตว์ง้อไบ๊ (`em_bodhi_palm`) | saga `emei_bodhi_palm` |
+| 3 | skill | กระบี่พิทักษ์โพธิสัตว์ (`em_bodhi_sword`) | saga `emei_bodhi_sword` |
+| 3 | art | ง้อไบ๊เซินกง (`emei`) | saga `emei_founding` |
+| 3 | art | โพธิสัตว์ทรงพรต (`t4_em_bodhi`) | saga `emei_ascetic` |
 
 ## กู่มู่ (`gumu`)
 
@@ -188,11 +274,18 @@
 - Rank-up cost (sect points): →2: 400 · →1: 1200
 - Sect quests: 4 (0 art quests) · redemption quest `qst_gumu_redemption` · betrayal hunter `hunter_gumu`
 
-| Rank | Skill pool | Art pool |
-| --- | --- | --- |
-| 3 | — | คัมภีร์สาวหยก (`ynxj`) |
-| 2 | — | วิชาไหมน้ำแข็ง (`t4_gm_iceweave`) |
-| 1 | ฝ่ามือกำสรดวิญญาณสลาย (`ansh`) | วิชาก้าวย่างเหมันต์ (`t4_gm_winterstep`) |
+- Rank-up gold: →2: 200 · →1: 600
+
+Martial line — every skill and art is taught only by its lineage quest or saga:
+
+| Rank | Kind | Skill / art | Quest |
+| --- | --- | --- | --- |
+| 2 | skill | กระบี่สุสานโบราณ (`gm_sword`) | `ql_skill_gm_sword` |
+| 2 | skill | เพลงกระบี่สุรางคนางค์ใจพิสุทธิ์ (`ynss`) | `ql_skill_ynss` |
+| 2 | art | คัมภีร์สาวหยก (`ynxj`) | `ql_art_ynxj` |
+| 1 | skill | ฝ่ามือกำสรดวิญญาณสลาย (`ansh`) | saga `gumu_sixteen_years` |
+| 1 | art | วิชาก้าวย่างเหมันต์ (`t4_gm_winterstep`) | saga `gumu_snow_footprints` |
+| 1 | art | วิชาไหมน้ำแข็ง (`t4_gm_iceweave`) | saga `gumu_ice_silk` |
 
 ## พรรคยาจก (`beggars`)
 
@@ -202,16 +295,28 @@
 - Rank-up cost (sect points): →8: 100 · →7: 200 · →6: 350 · →5: 500 · →4: 700 · →3: 1000 · →2: 1400 · →1: 2000
 - Sect quests: 8 (1 art quests) · redemption quest `qst_beggars_redemption` · betrayal hunter `hunter_beggars`
 
-| Rank | Skill pool | Art pool |
-| --- | --- | --- |
-| 9 | ประกาศิตพรรคยาจก (`nc1`) | วิชาเอาชีวิตรอดพื้นฐาน (`t0_bg_survival`) |
-| 8 | เพลงหมัดอสรพิษคนจร (`bg_snake_fist`), ไม้เท้าอสรพิษคนจร (`bg_snake_staff`) | — |
-| 7 | — | พลังคล้อยตะวัน (`t1_bg_sunshadow`) |
-| 6 | — | วิชาเก้าไร้เงา (`t2_bg_nineshadow`) |
-| 5 | ไม้เท้าล่องลอย (`bg_drift_staff`), เพลงหมัดล่องลอย (`bg_drift_fist`) | — |
-| 4 | — | พลังฟื้นตะวัน (`t3_bg_sunrenew`) |
-| 3 | ไม้เท้าพเนจร (`bg_wander_staff`), ฝ่ามือจับมังกร (`ng3`) | — |
-| 2 | — | วิชาหมื่นมวลชน (`t4_bg_thousandcrowd`), เจียงหูชี่ (`wanderer`) |
+- Rank-up gold: →8: 50 · →7: 100 · →6: 175 · →5: 250 · →4: 350 · →3: 500 · →2: 700 · →1: 1000
+
+Martial line — every skill and art is taught only by its lineage quest or saga:
+
+| Rank | Kind | Skill / art | Quest |
+| --- | --- | --- | --- |
+| — | skill | ประกาศิตพรรคยาจก (`nc1`) | `ql_skill_nc1` |
+| — | skill | ไม้เท้าขอทาน (`nc2`) | `ql_skill_nc2` |
+| — | art | วิชาเอาชีวิตรอดพื้นฐาน (`t0_bg_survival`) | `ql_art_t0_bg_survival` |
+| 7 | skill | เพลงหมัดอสรพิษคนจร (`bg_snake_fist`) | `ql_skill_bg_snake_fist` |
+| 7 | skill | ไม้เท้าอสรพิษคนจร (`bg_snake_staff`) | `ql_skill_bg_snake_staff` |
+| 7 | art | พลังคล้อยตะวัน (`t1_bg_sunshadow`) | `ql_art_t1_bg_sunshadow` |
+| 5 | skill | ไม้เท้าล่องลอย (`bg_drift_staff`) | `ql_skill_bg_drift_staff` |
+| 5 | skill | เพลงหมัดล่องลอย (`bg_drift_fist`) | `ql_skill_bg_drift_fist` |
+| 5 | art | วิชาเก้าไร้เงา (`t2_bg_nineshadow`) | `ql_art_t2_bg_nineshadow` |
+| 3 | skill | ไม้เท้าพเนจร (`bg_wander_staff`) | `ql_skill_bg_wander_staff` |
+| 3 | skill | ฝ่ามือจับมังกร (`ng3`) | `ql_skill_ng3` |
+| 3 | art | พลังฟื้นตะวัน (`t3_bg_sunrenew`) | `ql_art_t3_bg_sunrenew` |
+| 3 | skill | 18 ฝ่ามือมังกร (`ep`) | saga `beggars_dragon_palms` |
+| 3 | skill | เพลงไม้เท้าตีสุข (`bg_lucky_staff`) | saga `beggars_lucky_staff` |
+| 3 | art | วิชาหมื่นมวลชน (`t4_bg_thousandcrowd`) | saga `beggars_thousand_crowd` |
+| 3 | art | เจียงหูชี่ (`wanderer`) | saga `beggars_wanderer` |
 
 ## องครักษ์เสื้อแพร (`jinyiwei`)
 
@@ -221,16 +326,29 @@
 - Rank-up cost (sect points): →8: 100 · →7: 200 · →6: 350 · →5: 500 · →4: 700 · →3: 1000 · →2: 1400 · →1: 2000
 - Sect quests: 8 (1 art quests) · redemption quest `qst_jinyiwei_redemption` · betrayal hunter `hunter_jinyiwei`
 
-| Rank | Skill pool | Art pool |
-| --- | --- | --- |
-| 9 | โซ่กรงเล็บฝึกหัด (`jy_chain`) | ลมปราณเสื้อแพร (`jy_a0_brocade`) |
-| 8 | ดาบราชสำนัก (`jy_blade`) | — |
-| 7 | — | ฝีก้าวเส้นไหม (`jy_a1_silktread`) |
-| 6 | — | เกราะทองอนุรักษ์ (`jy_a2_goldarmor`) |
-| 5 | กรงเล็บอินทรี (`jy_eagleclaw`), กรงเล็บคว้าจับ (`jy_grapple`) | — |
-| 4 | — | ฟ้าผ่าก้าวเดิน (`jy_a3_thunderstride`), เงาสังหาร (`t3_jy_shadow`) |
-| 3 | กระบี่จารบุรุษ (`jy_sword`), โซ่ทองเก้ามังกร (`jy_chainmaster`), ดาบเจ้าพระยา (`jy_blade_king`) | — |
-| 2 | กระบี่สำเร็จโทษ (`jy_execution_sword`), ดาบประหารชีพ (`jy_execution_blade`), โซ่ล่าสังหาร (`jy_chain_assassin`) | เจ้านายเสื้อแพร (`jy_a4_brocadelord`), พลังประหารเทพ (`t4_jy_godslayer`) |
+- Rank-up gold: →8: 50 · →7: 100 · →6: 175 · →5: 250 · →4: 350 · →3: 500 · →2: 700 · →1: 1000
+
+Martial line — every skill and art is taught only by its lineage quest or saga:
+
+| Rank | Kind | Skill / art | Quest |
+| --- | --- | --- | --- |
+| — | skill | โซ่กรงเล็บฝึกหัด (`jy_chain`) | `ql_skill_jy_chain` |
+| — | art | ลมปราณเสื้อแพร (`jy_a0_brocade`) | `ql_art_jy_a0_brocade` |
+| 7 | skill | ดาบราชสำนัก (`jy_blade`) | `ql_skill_jy_blade` |
+| 7 | art | ฝีก้าวเส้นไหม (`jy_a1_silktread`) | `ql_art_jy_a1_silktread` |
+| 5 | skill | กรงเล็บอินทรี (`jy_eagleclaw`) | `ql_skill_jy_eagleclaw` |
+| 5 | skill | กรงเล็บคว้าจับ (`jy_grapple`) | `ql_skill_jy_grapple` |
+| 5 | art | เกราะทองอนุรักษ์ (`jy_a2_goldarmor`) | `ql_art_jy_a2_goldarmor` |
+| 3 | skill | กระบี่จารบุรุษ (`jy_sword`) | `ql_skill_jy_sword` |
+| 3 | skill | โซ่ทองเก้ามังกร (`jy_chainmaster`) | `ql_skill_jy_chainmaster` |
+| 3 | skill | ดาบเจ้าพระยา (`jy_blade_king`) | `ql_skill_jy_blade_king` |
+| 3 | art | ฟ้าผ่าก้าวเดิน (`jy_a3_thunderstride`) | `ql_art_jy_a3_thunderstride` |
+| 3 | art | เงาสังหาร (`t3_jy_shadow`) | `ql_art_t3_jy_shadow` |
+| 3 | skill | กระบี่สำเร็จโทษ (`jy_execution_sword`) | saga `jinyiwei_execution_sword` |
+| 3 | skill | ดาบประหารชีพ (`jy_execution_blade`) | saga `jinyiwei_execution_blade` |
+| 3 | skill | โซ่ล่าสังหาร (`jy_chain_assassin`) | saga `jinyiwei_chain_assassin` |
+| 3 | art | เจ้านายเสื้อแพร (`jy_a4_brocadelord`) | saga `jinyiwei_brocade_lord` |
+| 3 | art | พลังประหารเทพ (`t4_jy_godslayer`) | saga `jinyiwei_godslayer` |
 
 ## พรรคตะวันจันทรา (`sunmoon`)
 
@@ -240,14 +358,23 @@
 - Rank-up cost (sect points): →8: 100 · →7: 200 · →6: 350 · →5: 500 · →4: 700 · →3: 1000 · →2: 1400 · →1: 2000
 - Sect quests: 8 (1 art quests) · redemption quest `qst_sunmoon_redemption` · betrayal hunter `hunter_sunmoon`
 
-| Rank | Skill pool | Art pool |
-| --- | --- | --- |
-| 9 | ฝ่ามือเพลิง (`mi_firepalm`) | พลังสองขั้ว (`t0_sm_dual`) |
-| 8 | — | พลังเพลิงตะวัน (`t1_sm_sunfire`), พลังร้อยจันทรา (`t1_sm_moonweave`) |
-| 7 | — | พลังกายสุริยัน (`t2_sm_sunbody`), พลังกายจันทรา (`t2_sm_moonbody`) |
-| 5 | — | คัมภีร์ทานตะวัน (ฉบับย่อ) (`t3_sm_sunscript`) |
-| 4 | — | พลังสองขั้วผสาน (`t3_sm_dualfusion`), พลังสุริยันจันทรา (`t3_sm_sunmoon`) |
-| 2 | — | เฉียนคุนต้าหนัวอี (`qiankun`), ดาวเคลื่อนดาราคล้อย (`yxhd`) |
+- Rank-up gold: →8: 50 · →7: 100 · →6: 175 · →5: 250 · →4: 350 · →3: 500 · →2: 700 · →1: 1000
+
+Martial line — every skill and art is taught only by its lineage quest or saga:
+
+| Rank | Kind | Skill / art | Quest |
+| --- | --- | --- | --- |
+| — | art | พลังสองขั้ว (`t0_sm_dual`) | `ql_art_t0_sm_dual` |
+| 7 | art | พลังเพลิงตะวัน (`t1_sm_sunfire`) | `ql_art_t1_sm_sunfire` |
+| 7 | art | พลังร้อยจันทรา (`t1_sm_moonweave`) | `ql_art_t1_sm_moonweave` |
+| 5 | art | พลังกายสุริยัน (`t2_sm_sunbody`) | `ql_art_t2_sm_sunbody` |
+| 5 | art | พลังกายจันทรา (`t2_sm_moonbody`) | `ql_art_t2_sm_moonbody` |
+| 3 | skill | ฝ่ามือเพลิง (`mi_firepalm`) | `ql_skill_mi_firepalm` |
+| 3 | art | พลังสองขั้วผสาน (`t3_sm_dualfusion`) | `ql_art_t3_sm_dualfusion` |
+| 3 | art | พลังสุริยันจันทรา (`t3_sm_sunmoon`) | `ql_art_t3_sm_sunmoon` |
+| 3 | art | คัมภีร์ทานตะวัน (ฉบับย่อ) (`t3_sm_sunscript`) | `ql_art_t3_sm_sunscript` |
+| 3 | art | เฉียนคุนต้าหนัวอี (`qiankun`) | saga `sunmoon_qiankun_tunnel` |
+| 3 | art | ดาวเคลื่อนดาราคล้อย (`yxhd`) | saga `sunmoon_holy_fire_tokens` |
 
 ## สำนักสุลถัง (`tang`)
 
@@ -257,16 +384,27 @@
 - Rank-up cost (sect points): →8: 100 · →7: 200 · →6: 350 · →5: 500 · →4: 700 · →3: 1000 · →2: 1400 · →1: 2000
 - Sect quests: 8 (1 art quests) · redemption quest `qst_tang_redemption` · betrayal hunter `hunter_tang`
 
-| Rank | Skill pool | Art pool |
-| --- | --- | --- |
-| 9 | มีดบินพื้นฐาน (`tang_basic_knife`) | สมาธิเฉียบคม (`t0_tang_sharp`) |
-| 8 | มีดบินเคลือบพิษ (`tang_poison_knife`) | — |
-| 7 | — | กายาร้อยพิษ (`t1_tang_venombody`) |
-| 6 | — | ท่าร่างคลื่นลม (`t2_tang_wavewind`) |
-| 5 | ดารากระจายฟ้า (`tang_starscatter`) | — |
-| 4 | — | พลังอสรพิษ (`t3_tang_viperpower`), ท่าเท้าไล่ล่า (`t3_tang_chase`) |
-| 3 | ดาวตกแหวกฟ้า (`tang_meteorpierce`), มีดสั้นร้อยอสรพิษ (`tang_viperblade`), มีดสั้นงูทอง (`tang_goldsnake`) | — |
-| 2 | ดาราพิรุณโปรย (`tang_starrain`), มีดสั้นทะลวงใจ (`tang_heartpierce`) | พลังถังหมื่นพิษ (`t4_tang_tenkpoisons`), พลังกรัดฟ้า (`t4_tang_skycleaver`) |
+- Rank-up gold: →8: 50 · →7: 100 · →6: 175 · →5: 250 · →4: 350 · →3: 500 · →2: 700 · →1: 1000
+
+Martial line — every skill and art is taught only by its lineage quest or saga:
+
+| Rank | Kind | Skill / art | Quest |
+| --- | --- | --- | --- |
+| — | skill | มีดบินพื้นฐาน (`tang_basic_knife`) | `ql_skill_tang_basic_knife` |
+| — | art | สมาธิเฉียบคม (`t0_tang_sharp`) | `ql_art_t0_tang_sharp` |
+| 7 | skill | มีดบินเคลือบพิษ (`tang_poison_knife`) | `ql_skill_tang_poison_knife` |
+| 7 | art | กายาร้อยพิษ (`t1_tang_venombody`) | `ql_art_t1_tang_venombody` |
+| 5 | skill | ดารากระจายฟ้า (`tang_starscatter`) | `ql_skill_tang_starscatter` |
+| 5 | art | ท่าร่างคลื่นลม (`t2_tang_wavewind`) | `ql_art_t2_tang_wavewind` |
+| 3 | skill | ดาวตกแหวกฟ้า (`tang_meteorpierce`) | `ql_skill_tang_meteorpierce` |
+| 3 | skill | มีดสั้นร้อยอสรพิษ (`tang_viperblade`) | `ql_skill_tang_viperblade` |
+| 3 | skill | มีดสั้นงูทอง (`tang_goldsnake`) | `ql_skill_tang_goldsnake` |
+| 3 | art | พลังอสรพิษ (`t3_tang_viperpower`) | `ql_art_t3_tang_viperpower` |
+| 3 | art | ท่าเท้าไล่ล่า (`t3_tang_chase`) | `ql_art_t3_tang_chase` |
+| 3 | skill | ดาราพิรุณโปรย (`tang_starrain`) | saga `tang_star_rain` |
+| 3 | skill | มีดสั้นทะลวงใจ (`tang_heartpierce`) | saga `tang_heart_pierce` |
+| 3 | art | พลังถังหมื่นพิษ (`t4_tang_tenkpoisons`) | saga `tang_ten_thousand_poisons` |
+| 3 | art | พลังกรัดฟ้า (`t4_tang_skycleaver`) | saga `tang_sky_cleaver` |
 
 ## พรรคสราญรมย์ (`xiaoyao`)
 
@@ -276,13 +414,24 @@
 - Rank-up cost (sect points): →8: 100 · →7: 200 · →6: 350 · →5: 500 · →4: 700 · →3: 1000 · →2: 1400 · →1: 2000
 - Sect quests: 7 (1 art quests) · betrayal hunter `hunter_xiaoyao`
 
-| Rank | Skill pool | Art pool |
-| --- | --- | --- |
-| 9 | ดาบอสูรน้อย (`xy_lesserdemon_blade`) | ลมปราณดอกเหมย (`t0_xy_plum`) |
-| 8 | กระบี่ไร้วิถี (`xy_pathless_sword`) | — |
-| 7 | — | พลังไร้ลักษณ์น้อย (`t1_xy_formless_lesser`) |
-| 6 | — | พลังไร้ลักษณ์ใหญ่ (`t2_xy_formless_greater`) |
-| 5 | หมัดอสูรน้อย (`xy_lesserdemon_fist`), กระบี่ลมอสูร (`xy_demon_wind_sword`), หมัดรากพิษ (`xy_root_poison_fist`) | — |
-| 4 | — | ลมปราณรากพิษ (`t3_xy_root_poison_qi`), วิชาดูพลัง (`t3_xy_seepower`) |
-| 3 | เพลงหมัดสราญรมย์ (`xy_punch`), กระบี่ขลุ่ยหยก (`yxjf`) | — |
-| 2 | ฝ่ามือสราญรมย์ (`xy_palm`) | ลมปราณภูติอุดร (`bmzq`), มหาเวทดูดดาว (`bmsg`) |
+- Rank-up gold: →8: 50 · →7: 100 · →6: 175 · →5: 250 · →4: 350 · →3: 500 · →2: 700 · →1: 1000
+
+Martial line — every skill and art is taught only by its lineage quest or saga:
+
+| Rank | Kind | Skill / art | Quest |
+| --- | --- | --- | --- |
+| — | skill | ดาบอสูรน้อย (`xy_lesserdemon_blade`) | `ql_skill_xy_lesserdemon_blade` |
+| — | art | ลมปราณดอกเหมย (`t0_xy_plum`) | `ql_art_t0_xy_plum` |
+| 7 | skill | กระบี่ไร้วิถี (`xy_pathless_sword`) | `ql_skill_xy_pathless_sword` |
+| 7 | art | พลังไร้ลักษณ์น้อย (`t1_xy_formless_lesser`) | `ql_art_t1_xy_formless_lesser` |
+| 5 | skill | หมัดอสูรน้อย (`xy_lesserdemon_fist`) | `ql_skill_xy_lesserdemon_fist` |
+| 5 | skill | กระบี่ลมอสูร (`xy_demon_wind_sword`) | `ql_skill_xy_demon_wind_sword` |
+| 5 | skill | หมัดรากพิษ (`xy_root_poison_fist`) | `ql_skill_xy_root_poison_fist` |
+| 5 | art | พลังไร้ลักษณ์ใหญ่ (`t2_xy_formless_greater`) | `ql_art_t2_xy_formless_greater` |
+| 3 | skill | เพลงหมัดสราญรมย์ (`xy_punch`) | `ql_skill_xy_punch` |
+| 3 | skill | กระบี่ขลุ่ยหยก (`yxjf`) | `ql_skill_yxjf` |
+| 3 | art | ลมปราณรากพิษ (`t3_xy_root_poison_qi`) | `ql_art_t3_xy_root_poison_qi` |
+| 3 | art | วิชาดูพลัง (`t3_xy_seepower`) | `ql_art_t3_xy_seepower` |
+| 3 | art | ลมปราณภูติอุดร (`bmzq`) | `ql_art_bmzq` |
+| 3 | skill | ฝ่ามือสราญรมย์ (`xy_palm`) | saga `xiaoyao_mute_envoy` |
+| 3 | art | มหาเวทดูดดาว (`bmsg`) | saga `xiaoyao_northern_sea` |

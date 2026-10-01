@@ -210,4 +210,6 @@ export interface LineageSpec {
   foe?: string;
   /** The item to bring (picked by tier when omitted). */
   item?: string;
+  /** An extra gate on top of the tier's (e.g. a prologue trial done). */
+  require?: Condition;
 }

@@ -205,7 +205,7 @@ Two deliberate exceptions reach into stores:
 - **Bad actions** (`bad-actions.ts`). Steal, assassinate and kidnap use base stats. A failed steal is a non-fatal fight plus a mark; failed assassinations and kidnappings are fatal.
 - **Sects** (`data/sect-memberships.ts`, 15 joinable).
   - Ladders: 9 → 1 (eight sects), 5 → 1 (six) or 3 → 1 (Gumu).
-  - Each rank has a reward pool; a single-item pool auto-grants.
+  - Ranks grant no martial arts: a rank-up pays gold (`rankUpGold`, half its point cost) and opens lineage quests and sagas, the **only** way to any sect skill or art (`test:story` enforces it; no rank pool, manual, hall, dialog or other quest may teach one).
   - Sect quests are repeatable after a 30-day cooldown.
   - Membership status is `active | resigned | betrayed`. Only `active` counts for `sectMember` / `anySectMember`.
   - Joins go through each intro quest's `joinSect` **reward**, which does not check `joinRequirements`; the intro's `prereqs` are the real gate.
@@ -219,7 +219,7 @@ Two deliberate exceptions reach into stores:
 - **Lineage quests and sagas** (`lib/world/story/`, content in `lib/world/data/story/`). Compact specs compile into quests, dialogs and cutscenes ([docs/story-quests.md](docs/story-quests.md)).
   - Every sect T0–T3 skill / art has one lineage quest `ql_<skill|art>_<id>` (type `side`, `lineage`), gated and sized by tier (`LINEAGE_TIERS`).
   - Every sect T4 is the reward of a saga: 8–10 chapters `st_<arcId>_<nn>` (type `story`), chained on the previous chapter, with films (`DialogScene.cutscene`) and paged dialogs (`paged`).
-  - Seven old T4 art quests are now prologue trials (`SAGA_PROLOGUES`) that gate their saga and teach nothing.
+  - The old sect art quests teach nothing: seven T4 ones are saga prologue trials (`SAGA_PROLOGUES`), eight T3 ones lineage prologue trials (`LINEAGE_PROLOGUES`).
   - Story and lineage quests can't be abandoned and don't fail when their giver dies.
 - **Repair** (`validate.ts`). `validateAndRepair` runs on every load and drops dangling ids.
 

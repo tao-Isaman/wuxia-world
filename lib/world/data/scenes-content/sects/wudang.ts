@@ -143,10 +143,10 @@ export const SCENES_WUDANG: readonly Scene[] = [
     lines: [
       { t: "narration", text: "อาจารย์ชิงซวี่รับบัวหิมะและโค้งขอบคุณ" },
       { t: "dialogue", speaker: "ชิงซวี่", text: "ขอบคุณ... ลูกศิษย์ของข้าจะรอด" },
-      { t: "dialogue", speaker: "ชิงซวี่", text: "ตามสัญญา — ข้าจะสอนไทจี้เจี้ยนให้เจ้า" },
+      { t: "dialogue", speaker: "ชิงซวี่", text: "ตามสัญญา — รับรางวัลนี้ไป หากอยากเรียนไทจี้เจี้ยน จงเข้าอู่ตังแล้วขอรับการสืบทอดตามลำดับ" },
     ],
     choices: [
-      { text: "รับการสอนด้วยความยินดี", next: "sect_wudang" },
+      { text: "รับรางวัลด้วยความยินดี", next: "sect_wudang" },
     ],
   },
 

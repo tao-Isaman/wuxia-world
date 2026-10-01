@@ -27,7 +27,7 @@ This page covers the engine. How to *write* the content is in [story-writing.md]
 | Quest id | `ql_<skill\|art>_<id>` | `st_<arcId>_<nn>` |
 | `QuestDef.type` | `"side"`, with `lineage: { kind, id }` | `"story"`, with `story: { arcId, chapter }` |
 | Offered by | a sect NPC's card | the chapter's giver (often the master) |
-| Gate | not learned; tier-based rank, stat, outsider trait | chapter 1: the saga's `require` + not learned; then the previous chapter done (+ the chapter's own `require`) |
+| Gate | not learned; tier-based rank, stat, outsider trait; eight T3 arts also need their old art quest done (`LINEAGE_PROLOGUES`) | chapter 1: the saga's `require` + not learned; then the previous chapter done (+ the chapter's own `require`) |
 | Ends with | `learnSkill` / `learnArt` + w-exp + relationship + sect points | small rewards; the last chapter also teaches the T4 (arts at level 3 unless the spec sets one) |
 | Scenes | `qs_<id>_offer`, `qs_<id>_complete` | the same, plus a scene per visit / talk / duel step (`st_<id>_s<n>`, `…_win`, asides `…_a<k>`) |
 
@@ -138,6 +138,7 @@ A cutscene is registered under `cs_<sceneId>` and played by a dialog whose `cuts
 `bun run test:story` (`scripts/test-story-quests.ts`); `STORY_SECT=<sect label>` limits it to one sect.
 
 - **Coverage.** Every sect skill and art has exactly one source: a lineage quest (T0–T3) or a saga (T4).
+- **One way only.** No other quest, dialog, manual or hall teaches a sect skill or art (sect ranks have no skill pools).
 - **Lineage.** The teacher lives at the sect's grounds; the foe roams and is within one tier; the item is obtainable; 2–6 lines each way.
 - **Sagas:**
   - 8–10 chapters, with a T4 reward of the same sect;

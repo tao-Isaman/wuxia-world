@@ -39,8 +39,8 @@ Per tier: T0: 9 · T1: 36 · T2: 54 · T3: 37 · T4: 106. Per category: ฝ่�
 | `hunt_wild_dog` | สุนัขป่า | beast | — | 5 | hunt |
 | `hunt_boar` | หมูป่าฝูง | beast | 1× หมูป่าฝูง | 6 | hunt |
 | `hunt_jungle_cat` | เสือดาวป่า | beast | — | 6 | hunt |
-| `spar_shaolin_xuanji` | ศิษย์เซวียนจี้ | human | — | 7 | spar |
-| `spar_wudang_qingxin` | ศิษย์ชิงซิน | human | — | 6 | spar |
+| `spar_shaolin_xuanji` | ศิษย์เซวียนจี้ | human | — | 5 | spar |
+| `spar_wudang_qingxin` | ศิษย์ชิงซิน | human | — | 5 | spar |
 | `spar_huashan_xiaoyun` | ศิษย์เสี่ยวอวิ๋น | human | — | 5 | spar |
 | `spar_quanzhen_yangzi` | ศิษย์หยางจื่อ | human | — | 5 | spar |
 | `spar_songshan_disciple` | ศิษย์หลี่เฟิง | human | — | 7 | spar |
@@ -55,8 +55,8 @@ Per tier: T0: 9 · T1: 36 · T2: 54 · T3: 37 · T4: 106. Per category: ฝ่�
 | `spar_emei_yujie` | ศิษย์อวี้เจี๋ย | human | — | 5 | spar |
 | `spar_beggars_xiaomao` | ศิษย์เสี่ยวเหมา | human | — | 5 | spar |
 | `spar_xiaoyao_xiaolan` | ศิษย์เสี่ยวหลาน | human | — | 5 | spar |
-| `spar_spy_zhou` | โจวพ่อค้าเหล้า | human | — | 7 | spar |
-| `spar_spy_si` | ซื่อชาวนา | human | — | 7 | spar |
+| `spar_spy_zhou` | โจวพ่อค้าเหล้า | human | — | 5 | spar |
+| `spar_spy_si` | ซื่อชาวนา | human | — | 5 | spar |
 | `spar_sunmoon_xiaoyu` | ศิษย์เสี่ยวอวี้ | human | — | 5 | spar |
 | `spar_tang_tangxiu` | ศิษย์ถังซิ่ว | human | — | 5 | spar |
 | `law_constable` | เจ้าหน้าที่รัฐ | human | — | 5 | law |
@@ -82,12 +82,12 @@ Per tier: T0: 9 · T1: 36 · T2: 54 · T3: 37 · T4: 106. Per category: ฝ่�
 | `hunt_mountain_lynx` | เสือเขาเล็ก | beast | — | 7 | hunt |
 | `hunt_jungle_serpent` | งูยักษ์ป่า | beast | — | 7 | hunt |
 | `spar_swordsman_xiao` | เซียวจิ้งเทียน | human | — | 10 | spar, scene ×1 |
-| `spar_wudang_zhirong` | หัวหน้าศิษย์จื้อหรง | human | — | 9 | spar |
-| `spar_wudang_yujian` | ศิษย์อวี่เจี้ยน | human | — | 8 | spar |
+| `spar_wudang_zhirong` | หัวหน้าศิษย์จื้อหรง | human | — | 7 | spar |
+| `spar_wudang_yujian` | ศิษย์อวี่เจี้ยน | human | — | 6 | spar |
 | `spar_huashan_qingsong` | อาจารย์ดาบชิงซ่ง | human | — | 8 | spar |
 | `spar_huashan_zhongming` | หัวหน้าศิษย์จงหมิง | human | — | 7 | spar |
-| `spar_quanzhen_qiuchuji` | อาจารย์ดาบชิวฉู่จี้ | human | — | 9 | spar |
-| `spar_quanzhen_yaolan` | อาจารย์ปราณเหยาหลัน | human | — | 10 | spar |
+| `spar_quanzhen_qiuchuji` | อาจารย์ดาบชิวฉู่จี้ | human | — | 8 | spar |
+| `spar_quanzhen_yaolan` | อาจารย์ปราณเหยาหลัน | human | — | 9 | spar |
 | `spar_songshan_elder_dingmian` | อาจารย์อาวุโสติงเหมียน | human | — | 8 | spar |
 | `spar_taishan_chiyangzi` | อาจารย์อาวุโสฉื่อหยางจื่อ | human | — | 9 | spar |
 | `spar_hengshan_south_vice` | รองอาจารย์หลิวเจิ้งเฟิง | human | — | 9 | spar |
@@ -96,22 +96,22 @@ Per tier: T0: 9 · T1: 36 · T2: 54 · T3: 37 · T4: 106. Per category: ฝ่�
 | `spar_hengshan_north_yiqing` | ภิกษุณีอี๋ชิง | human | — | 9 | spar |
 | `spar_emei_zhihui` | หัวหน้าศิษย์จื้อฮุย | human | — | 8 | spar |
 | `spar_emei_xiaoyu` | ศิษย์เสี่ยวอวี้ | human | — | 7 | spar, scene ×1 |
-| `spar_wudang_disciple` | สาวกชิงเฟิง | human | — | 9 | spar |
+| `spar_wudang_disciple` | สาวกชิงเฟิง | human | — | 6 | spar |
 | `spar_emei_nun` | นักพรตชิงอวี้ | human | — | 9 | spar |
 | `spar_huashan_disciple` | ศิษย์เจี้ยนอี้ | human | — | 10 | spar |
 | `spar_lingjiu_lady` | หญิงสาวจื่อเสีย | human | — | 9 | spar |
-| `spar_beggars_brawler` | ยาจกจิ๊ว | human | — | 9 | spar |
+| `spar_beggars_brawler` | ยาจกจิ๊ว | human | — | 8 | spar |
 | `spar_beggars_renhua` | หัวหน้าศิษย์เหรินฮัว | human | — | 8 | spar |
 | `spar_beggars_dawei` | ศิษย์ต้าเหว่ย | human | — | 7 | spar |
 | `spar_beggars_xiaohu` | ศิษย์เสี่ยวฮู | human | — | 7 | spar |
-| `spar_xingxiu_disciple` | ศิษย์ตู๋โซ่ว | human | — | 9 | spar |
-| `spar_wudu_miao` | หมอพิษอาหมาน | human | — | 9 | spar |
-| `spar_quanzhen_disciple` | สาวกชงซวี | human | — | 9 | spar |
+| `spar_xingxiu_disciple` | ศิษย์ตู๋โซ่ว | human | — | 8 | spar |
+| `spar_wudu_miao` | หมอพิษอาหมาน | human | — | 8 | spar |
+| `spar_quanzhen_disciple` | สาวกชงซวี | human | — | 6 | spar |
 | `spar_xiaoyao_aliao` | หัวหน้าศิษย์อาเหลียว | human | — | 7 | spar |
 | `spar_xiaoyao_jiumozhi` | ศิษย์จิ่วม่อจื้อ | human | — | 6 | spar |
-| `spar_spy_feng` | เฟิงผู้ส่งข่าว | human | — | 8 | spar |
-| `spar_spy_xi` | ซีท่าเรือ | human | — | 8 | spar |
-| `spar_spy_mei` | เหมยพรานป่า | human | — | 8 | spar |
+| `spar_spy_feng` | เฟิงผู้ส่งข่าว | human | — | 6 | spar |
+| `spar_spy_xi` | ซีท่าเรือ | human | — | 6 | spar |
+| `spar_spy_mei` | เหมยพรานป่า | human | — | 6 | spar |
 | `spar_sunmoon_yilin` | หัวหน้าศิษย์อี้หลิน | human | — | 8 | spar |
 | `spar_sunmoon_lanfenghuang` | ศิษย์หลานเฟิงหวง | human | — | 7 | spar, scene ×1 |
 | `spar_tang_tanglin` | หัวหน้าศิษย์ถังหลิน | human | — | 8 | spar |
@@ -131,13 +131,13 @@ Per tier: T0: 9 · T1: 36 · T2: 54 · T3: 37 · T4: 106. Per category: ฝ่�
 | `wudang_disciple` | สาวกอู่ตัง | human | — | 7 | roams (city, frontier, isle, mansion, sect, temple, wild) |
 | `snow_demon` | ปีศาจหิมะ | supernatural | — | 8 | roams (sect, temple, wild) |
 | `sect_elder` | ผู้อาวุโสสำนัก | human | — | 7 | roams (city, frontier, isle, mansion, sect, temple, wild) |
-| `spar_shaolin_faming` | อาจารย์ฝาหมิง | human | — | 11 | spar |
-| `spar_shaolin_yuanquan` | หัวหน้าศิษย์หยวนเฉวียน | human | — | 11 | spar |
-| `spar_wudang_baochun` | อาจารย์ปราณเป่าชุน | human | — | 11 | spar |
+| `spar_shaolin_faming` | อาจารย์ฝาหมิง | human | — | 7 | spar |
+| `spar_shaolin_yuanquan` | หัวหน้าศิษย์หยวนเฉวียน | human | — | 7 | spar |
+| `spar_wudang_baochun` | อาจารย์ปราณเป่าชุน | human | — | 10 | spar |
 | `spar_huashan_master_yiqing` | อาจารย์ใหญ่อี้ชิง | human | — | 12 | spar |
 | `spar_huashan_zifeng` | รองอาจารย์จื่อเฟิง | human | — | 10 | spar |
-| `spar_quanzhen_master_chongyang` | อาจารย์ใหญ่ฉงหยาง | human | — | 15 | spar |
-| `spar_quanzhen_mayu` | รองอาจารย์หม่ายวี่ | human | — | 12 | spar |
+| `spar_quanzhen_master_chongyang` | อาจารย์ใหญ่ฉงหยาง | human | — | 13 | spar |
+| `spar_quanzhen_mayu` | รองอาจารย์หม่ายวี่ | human | — | 11 | spar |
 | `spar_songshan_master_zuolengchan` | อาจารย์ใหญ่จั่วเหลิงฉาน | human | — | 12 | spar |
 | `spar_songshan_vice_lubai` | รองอาจารย์ลู่ไป๋ | human | — | 10 | spar |
 | `spar_taishan_master_tianmen` | เจ้าสำนักเทียนเหมินเต้าเหริน | human | — | 12 | spar |
@@ -153,8 +153,8 @@ Per tier: T0: 9 · T1: 36 · T2: 54 · T3: 37 · T4: 106. Per category: ฝ่�
 | `spar_ming_envoy` | ผู้แทนหั่วจี้ | human | — | 9 | spar |
 | `spar_xuedao_blade` | ดาบเลือดเซียะลาง | human | — | 8 | spar, scene ×1 |
 | `spar_xueyu_master` | จอมยุทธฉือยิง | human | — | 8 | spar |
-| `spar_jinyiwei_qin` | องครักษ์ฉิน | human | — | 11 | spar |
-| `spar_jinyiwei_lu` | องครักษ์ลู่ | human | — | 11 | spar |
+| `spar_jinyiwei_qin` | องครักษ์ฉิน | human | — | 7 | spar |
+| `spar_jinyiwei_lu` | องครักษ์ลู่ | human | — | 7 | spar |
 | `spar_sunmoon_qudongfeng` | ผู้อาวุโสสมดุลฉวี่ตงเฟิง | human | — | 10 | spar |
 | `spar_tang_tangrong` | ผู้อาวุโสไล่ล่าถังหรง | human | — | 9 | spar |
 | `law_imperial_guard` | องครักษ์หลวง | human | — | 7 | law |
@@ -173,14 +173,14 @@ Per tier: T0: 9 · T1: 36 · T2: 54 · T3: 37 · T4: 106. Per category: ฝ่�
 | `dragon_phoenix_master` | ปรมาจารย์มังกร-หงส์ | supernatural | — | 8 | roams (sect, temple, wild) |
 | `heretical_grandmaster` | เจ้าสำนักอธรรม | human | — | 8 | roams (city, frontier, isle, mansion, sect, temple, wild) |
 | `immortal_warrior` | นักรบอมตะ | supernatural | — | 8 | roams (sect, temple, wild) |
-| `spar_shaolin_xianren` | หลวงพ่อเซียนเหริน | human | — | 14 | spar |
-| `spar_shaolin_juti` | หลวงพ่อจูตี้ | human | — | 13 | spar, scene ×2 |
-| `spar_shaolin_huimiao` | หลวงพี่ใหญ่ฮุยเหมียว | human | — | 15 | spar, scene ×2 |
-| `spar_shaolin_abbot_huiyuan` | เจ้าอาวาสฮุยหยวน | human | — | 19 | spar |
-| `spar_shaolin_luohan` | รองเจ้าอาวาสลั่วฮั่น | human | — | 18 | spar |
-| `spar_wudang_master_qingxu` | อาจารย์ชิงซวี่ | human | — | 17 | spar, scene ×1 |
-| `spar_wudang_xuancheng` | รองอาจารย์เสวียนเฉิง | human | — | 14 | spar |
-| `spar_wudang_lingyu` | อาจารย์ดาบหลิงอวี้ | human | — | 13 | spar, scene ×1 |
+| `spar_shaolin_xianren` | หลวงพ่อเซียนเหริน | human | — | 10 | spar |
+| `spar_shaolin_juti` | หลวงพ่อจูตี้ | human | — | 11 | spar, scene ×2 |
+| `spar_shaolin_huimiao` | หลวงพี่ใหญ่ฮุยเหมียว | human | — | 11 | spar, scene ×2 |
+| `spar_shaolin_abbot_huiyuan` | เจ้าอาวาสฮุยหยวน | human | — | 13 | spar |
+| `spar_shaolin_luohan` | รองเจ้าอาวาสลั่วฮั่น | human | — | 12 | spar |
+| `spar_wudang_master_qingxu` | อาจารย์ชิงซวี่ | human | — | 14 | spar, scene ×1 |
+| `spar_wudang_xuancheng` | รองอาจารย์เสวียนเฉิง | human | — | 12 | spar |
+| `spar_wudang_lingyu` | อาจารย์ดาบหลิงอวี้ | human | — | 11 | spar, scene ×1 |
 | `spar_emei_abbess_jingchan` | ท่านนิ้วห้วนจิงฉาน | human | — | 15 | spar |
 | `spar_emei_huimiao` | รองท่านนิ้วฮุยเหมียว | human | — | 13 | spar |
 | `spar_emei_qingxin` | ท่านนิ้วดาบชิงซิน | human | — | 11 | spar, scene ×1 |
@@ -195,7 +195,7 @@ Per tier: T0: 9 · T1: 36 · T2: 54 · T3: 37 · T4: 106. Per category: ฝ่�
 | `spar_xiaoyao_wuyazi` | ผู้อาวุโสกระบี่อู๋หยาจื่อ | human | — | 11 | spar |
 | `spar_xiaoyao_libai` | ผู้อาวุโสฝ่ามือหลี่ไป๋ | human | — | 11 | spar, scene ×1 |
 | `hunter_xiaoyao` | นักล่าพรรคสราญรมย์ | human | — | 10 | betrayal |
-| `spar_jinyiwei_leader` | ผู้บัญชาการจ้าวฝู่ | human | — | 12 | spar, scene ×2 |
+| `spar_jinyiwei_leader` | ผู้บัญชาการจ้าวฝู่ | human | — | 8 | spar, scene ×2 |
 | `elite_blood_rakshasa` | อสุรกายโลหิต | supernatural | 3× ค้างคาวดูดเลือด | 12 | — |
 | `elite_void_grandmaster` | ปรมาจารย์ความว่าง | human | 1× วิญญาณจอมกระบี่ | 12 | — |
 | `elite_iron_mountain` | ภูเขาเหล็ก | human | 2× นักเลงฝ่ามือเหล็ก | 13 | — |

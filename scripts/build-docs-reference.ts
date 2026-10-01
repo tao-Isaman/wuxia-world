@@ -20,7 +20,7 @@ import { artGrid, describeGrid, skillGrid } from "@/lib/game/grid";
 import {
   ARTISANS, ENEMY_CATEGORY_LABEL, ITEMS, ITEM_CATEGORIES, ITEM_CATEGORY_LABEL, LIFE_SKILL_ICON, LIFE_SKILL_KEYS,
   LIFE_SKILL_LABEL, LOCATION_MAPS, MASTERY_THRESHOLDS, NPCS, OPPONENTS, QUESTS, RECIPES, RESOURCES, SCENES,
-  SECT_HALLS, SECT_MEMBERSHIPS, SHOPS, START_SCENE_ID, TRAIT_LABEL,
+  SECT_HALLS, SECT_MEMBERSHIPS, SHOPS, START_SCENE_ID, TRAIT_LABEL, rankUpGold,
   canPracticeAt, getArtisansAt, getItem, getNpc, getNpcsAtLocation, getOpponent, getResource, getScene,
   getSectHallAt, getShopAt, recipesOfferedBy,
   type Condition, type LocationScene, type QuestDef, type QuestStage, type Scene, type SceneEffect,
@@ -29,6 +29,7 @@ import { AUTO_MAP_IDS } from "@/lib/world/data/auto-map-ids";
 import { LOCATION_ROUTES } from "@/lib/world/data/location-routes";
 import { regionOf } from "@/lib/world/data/regions";
 import { packMembers } from "@/lib/world/battle-looks";
+import { sectLineage } from "@/lib/world/story/registry";
 import { FIGHT_EVENTS, MEET_EVENTS, TREASURE_EVENTS, fightEventsForLocation, zoneOfLocation } from "@/lib/world/data/random-events";
 
 const OUT_DIR = fileURLToPath(new URL("../docs/reference/", import.meta.url));
@@ -200,7 +201,7 @@ const pages: Record<string, string> = {};
   const sectLocs = locations.filter((l) => l.id.startsWith("sect_"));
   const memberships = Object.values(SECT_MEMBERSHIPS);
   md += `${sectLocs.length} sect locations; ${memberships.length} of them run a membership (\`SECT_MEMBERSHIPS\` in \`lib/world/data/sect-memberships.ts\`). `;
-  md += "Lower rank numbers are more senior: a member starts at `startRank` and climbs toward `topRank` by spending sect points earned from sect quests. At each rank the member may pick one skill and one art from that rank's pool; single-option pools are granted automatically.\n\n";
+  md += "Lower rank numbers are more senior: a member starts at `startRank` and climbs toward `topRank` by spending sect points earned from sect quests; each rank-up pays gold (half the points it costs). Ranks grant no martial arts: every sect skill and art is taught only by its lineage quest (T0–T3) or story saga (T4), and rank gates those quests.\n\n";
   md += table(["Location", "Name", "Membership id", "Registrar", "Ranks", "Sect quests"], sectLocs.map((loc) => {
     const def = memberships.find((m) => m.hallLocationId === loc.id);
     const quests = def ? QUESTS.filter((q) => q.sectId === def.id) : [];
@@ -220,10 +221,11 @@ const pages: Record<string, string> = {};
     md += `- Sect quests: ${quests.length} (${quests.filter((q) => q.isArtQuest).length} art quests)` +
       (QUESTS.some((q) => q.id === `qst_${def.id}_redemption`) ? ` · redemption quest ${code(`qst_${def.id}_redemption`)}` : "") +
       (OPPONENTS.some((o) => o.id === `hunter_${def.id}`) ? ` · betrayal hunter ${code(`hunter_${def.id}`)}` : "") + "\n\n";
-    const ranks = [...new Set([...Object.keys(def.skillsByRank), ...Object.keys(def.artsByRank)].map(Number))].sort((a, b) => b - a);
-    md += table(["Rank", "Skill pool", "Art pool"], ranks.map((r) => [r,
-      esc((def.skillsByRank[r] ?? []).map((id) => `${skillName(id)} (${code(id)})`).join(", ") || "—"),
-      esc((def.artsByRank[r] ?? []).map((id) => `${artName(id)} (${code(id)})`).join(", ") || "—")]));
+    md += `- Rank-up gold: ${(() => { const g: string[] = []; for (let r = def.startRank - 1; r >= def.topRank; r--) g.push(`→${r}: ${rankUpGold(def, r)}`); return g.join(" · ") || "—"; })()}\n\n`;
+    md += "Martial line — every skill and art is taught only by its lineage quest or saga:\n\n";
+    md += table(["Rank", "Kind", "Skill / art", "Quest"], sectLineage(def.name).map((e) => [e.rank ?? "—", e.kind,
+      esc(`${e.kind === "skill" ? skillName(e.id) : artName(e.id)} (${code(e.id)})`),
+      e.arcId ? `saga ${code(e.arcId)}` : code(e.questId)]));
     md += "\n";
   }
   pages["sects.md"] = md;

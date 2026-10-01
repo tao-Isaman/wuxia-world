@@ -13,7 +13,7 @@ import { LINEAGE_SPECS, STORY_ARC_SPECS } from "../lib/world/data/story";
 import { CUTSCENES, STORY_ARCS, STORY_QUESTS, STORY_RESOLVERS } from "../lib/world/story/registry";
 import { lineageQuestId, storyQuestId, LINEAGE_TIERS } from "../lib/world/story/compile";
 import type { CutsceneSpec, StoryBeat, StoryLine, StoryStep } from "../lib/world/story/types";
-import { getNpc, getOpponent, getItem, getScene, getQuest, SHOPS, RESOURCES, RECIPES, OPPONENTS } from "../lib/world/data";
+import { getNpc, getOpponent, getItem, getScene, getQuest, SHOPS, RESOURCES, RECIPES, OPPONENTS, QUESTS, SCENES, ITEMS, SECT_HALLS } from "../lib/world/data";
 import { FIGHT_EVENTS } from "../lib/world/data/random-events";
 import { getLocationMap } from "../lib/world/data/location-maps";
 import { SECT_MEMBERSHIPS } from "../lib/world/data/sect-memberships";
@@ -55,6 +55,22 @@ check("coverage: every sect skill and art has exactly one way in — a lineage q
   }
   if (missing.length) err(`${missing.length} sect items with no quest:\n    ${missing.join("\n    ")}`);
   for (const l of LINEAGE_SPECS) if (!items.some((i) => i.kind === l.kind && i.id === l.id)) err(`lineage ${l.id}: not a sect ${l.kind}`);
+});
+
+check("one way only: no other quest, dialog, manual or hall teaches a sect skill or art", () => {
+  const sectItem = new Set([...SECT_SKILLS.map((x) => `skill:${x.id}`), ...SECT_ARTS.map((x) => `art:${x.id}`)]);
+  const teach = (where: string, node: unknown) => {
+    if (!node || typeof node !== "object") return;
+    if (Array.isArray(node)) { node.forEach((n) => teach(where, n)); return; }
+    const o = node as Record<string, unknown>;
+    const key = o.t === "learnSkill" || o.t === "manualLearnSkill" ? `skill:${o.skillId}` : o.t === "learnArt" || o.t === "manualLearnArt" ? `art:${o.artId}` : null;
+    if (key && sectItem.has(key)) err(`${where} teaches ${key} — sect items come only from their lineage quest or saga`);
+    for (const v of Object.values(o)) if (v && typeof v === "object") teach(where, v);
+  };
+  for (const q of QUESTS) if (!q.lineage && !q.story) teach(`quest ${q.id}`, q.rewards);
+  for (const sc of SCENES) teach(`scene ${sc.id}`, sc);
+  for (const it of ITEMS) teach(`item ${it.id}`, it);
+  for (const h of SECT_HALLS) for (const o of h.offers) if (sectItem.has(`${o.kind}:${o.id}`)) err(`hall ${h.locationId} sells ${o.kind} ${o.id}`);
 });
 
 check("lineage quests: a real teacher of that sect, a fitting foe and an obtainable gift, 2–6 lines each way", () => {
@@ -267,7 +283,7 @@ function satisfyQuestGates(c: Condition | undefined) {
 
 function play(def: QuestDef) {
   const where = def.id;
-  if (def.story?.chapter === 1) satisfyQuestGates(def.prereqs);
+  if (def.story?.chapter === 1 || def.lineage) satisfyQuestGates(def.prereqs);
   assert.ok(evaluateCondition(store(), def.prereqs ?? { t: "and", all: [] }), `${where}: offerable after the previous one`);
   const accepted = store().acceptQuest(def.id);
   assert.ok(accepted.ok, `${where}: accept`);

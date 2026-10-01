@@ -183,6 +183,7 @@ export function compileLineage(spec: LineageSpec, r: StoryResolvers): CompiledSt
     if (gate) gates.push(gate);
   }
   if (tier.stat) gates.push({ t: "statAtLeast", stat: info.stat, min: tier.stat });
+  if (spec.require) gates.push(spec.require);
 
   const foe = spec.foe ?? tier.foe;
   const item = spec.item ?? tier.item;

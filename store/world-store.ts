@@ -66,10 +66,7 @@ import { JAIL_SCENE_ID, getActivity, jailDiceChance, jailEscapeChance } from "@/
 import { maintainRumors, seedLoreRumors, RUMOR_SEEN_CAP } from "@/lib/world/rumor-engine";
 import { namedNpcIds } from "@/lib/world/data/named-npcs";
 import { toast } from "@/store/toast-store";
-import {
-  SECT_MEMBERSHIPS,
-  autoGrantableRewards,
-} from "@/lib/world/data/sect-memberships";
+import { SECT_MEMBERSHIPS, rankUpGold } from "@/lib/world/data/sect-memberships";
 import {
   ASSASSINATE_TRAIT_EVIL,
   KIDNAP_TRAIT_EVIL,
@@ -352,13 +349,6 @@ interface WorldStore extends WorldStateData {
   joinSect: (sectId: import("@/lib/world").SectId) => { ok: boolean; reason?: string };
   // Spend points to upgrade rank (one rank at a time).
   upgradeSectRank: (sectId: import("@/lib/world").SectId) => { ok: boolean; reason?: string };
-  // Pick a rank-tier reward (one skill OR one art per rank-tier).
-  pickSectReward: (
-    sectId: import("@/lib/world").SectId,
-    rank: number,
-    kind: "skill" | "art",
-    id: string,
-  ) => { ok: boolean; reason?: string };
   // Accept a sect quest (records lastQuestDay so the cooldown gate works).
   acceptSectQuest: (sectId: import("@/lib/world").SectId, questId: string) => { ok: boolean; reason?: string };
   // Leave a sect — formal resignation. Membership stays as a tombstone
@@ -652,21 +642,23 @@ function rollLukXp(state: WorldStateData): void {
 // arts retain their current level but never accumulate further XP —
 // the cost of formal resignation. Betrayed sects keep gaining XP (the
 // trade-off there is hunter ambushes elsewhere).
-function isSkillFrozen(state: WorldStateData, skillId: string): boolean {
-  for (const m of Object.values(state.sectMembership)) {
+function isFrozen(state: WorldStateData, id: string, sect: string | undefined): boolean {
+  for (const [sectId, m] of Object.entries(state.sectMembership)) {
     if (!m || m.status !== "resigned") continue;
-    for (const claimed of Object.values(m.rewardPicks)) {
-      if (claimed === skillId) return true;
-    }
+    // The resigned sect's own lineage (taught by its lineage quests and
+    // sagas), plus anything picked under the old rank pools (older saves).
+    if (sect && SECT_MEMBERSHIPS[sectId as import("@/lib/world").SectId]?.name === sect) return true;
+    if (Object.values(m.rewardPicks).includes(id)) return true;
   }
   return false;
 }
 
+function isSkillFrozen(state: WorldStateData, skillId: string): boolean {
+  return isFrozen(state, skillId, getSkill(skillId)?.sc);
+}
+
 function isArtFrozen(state: WorldStateData, artId: string): boolean {
-  // Same logic as isSkillFrozen — rewardPicks values store both skill
-  // and art ids (keyed by `${rank}-skill` vs `${rank}-art`), so a
-  // single id-equality check covers both.
-  return isSkillFrozen(state, artId);
+  return isFrozen(state, artId, getArt(artId)?.sc);
 }
 
 // Auto-level a move skill while its xp pool allows. Caps at SKILL_LEVEL_MAX
@@ -915,31 +907,6 @@ function takeChoice(state: WorldStateData, choice: Choice): boolean {
   return true;
 }
 
-// Auto-claim every single-option sect reward currently unlocked at the
-// player's rank or above (for Shaolin: rank 9 grants T0 art automatically;
-// reaching rank 7 grants T1 art automatically; etc.). Multi-option pools
-// still require the popup pick. Mutates `state` in place + logs each grant.
-function autoGrantSectRewards(state: WorldStateData, sectId: import("@/lib/world").SectId): void {
-  const m = state.sectMembership[sectId];
-  if (!m || !state.playerBuild) return;
-  const def = SECT_MEMBERSHIPS[sectId];
-  if (!def) return;
-  const grants = autoGrantableRewards(def, m.rank, m.rewardPicks);
-  for (const g of grants) {
-    if (g.kind === "skill") {
-      applyEffect(state, { t: "learnSkill", skillId: g.id });
-    } else {
-      applyEffect(state, { t: "learnArt", artId: g.id, level: 1 });
-    }
-    m.rewardPicks = { ...m.rewardPicks, [`${g.rank}-${g.kind}`]: g.id };
-    appendActionLog(
-      state,
-      "sect",
-      `${def.name} ขั้น ${g.rank} มอบ${g.kind === "skill" ? "วิชาฝีมือ" : "วิชาในกาย"}: ${g.id}`,
-    );
-  }
-}
-
 // Shallow-clone the data fields so the persisted slice picks up the change.
 function draftFrom(s: WorldStateData): WorldStateData {
   return {
@@ -1104,7 +1071,6 @@ export const useWorldStore = create<WorldStore>()(
         const draft = draftFrom(s);
         applyEffect(draft, { t: "joinSect", sectId });
         appendActionLog(draft, "sect", `เข้าร่วมสำนัก${def.name} · ขั้นที่ ${def.startRank}`);
-        autoGrantSectRewards(draft, sectId);
         // Liveness Layer: drop a player-echo rumor into the pool so
         // inn-goers in the player's region eventually hear about it.
         applyEffect(draft, { t: "firePlayerEcho", actionId: "sect_join" });
@@ -1129,12 +1095,15 @@ export const useWorldStore = create<WorldStore>()(
         if (!dm) return { ok: false, reason: "membership lost" };
         dm.points -= cost;
         dm.rank = target;
+        // Rank-ups pay gold; the sect's martial arts come from its lineage
+        // quests and sagas, which the new rank may open.
+        const gold = rankUpGold(def, target);
+        draft.gold += gold;
         appendActionLog(
           draft,
           "sect",
-          `เลื่อนขั้น${def.name} → ขั้นที่ ${target} (จ่าย ${cost} sect points)`,
+          `เลื่อนขั้น${def.name} → ขั้นที่ ${target} (จ่าย ${cost} sect points · ได้รับ ${gold} ตำลึง)`,
         );
-        autoGrantSectRewards(draft, sectId);
         // Liveness Layer: rank-up is a public milestone — player-echo
         // rumor lands in the pool for inn-goers to repeat.
         applyEffect(draft, { t: "firePlayerEcho", actionId: "sect_rank_up" });
@@ -1142,33 +1111,6 @@ export const useWorldStore = create<WorldStore>()(
         return { ok: true };
       },
 
-      pickSectReward: (sectId, rank, kind, id) => {
-        const s = get();
-        const m = s.sectMembership[sectId];
-        if (!m) return { ok: false, reason: "ยังไม่ได้เป็นศิษย์" };
-        const def = SECT_MEMBERSHIPS[sectId];
-        if (!def) return { ok: false, reason: "ไม่พบสำนัก" };
-        if (m.rank > rank) {
-          return { ok: false, reason: `ขั้นต่ำที่จะรับรางวัลนี้คือ ${rank}` };
-        }
-        const key = `${rank}-${kind}`;
-        if (m.rewardPicks[key]) return { ok: false, reason: "รับรางวัลขั้นนี้แล้ว" };
-        const pool = kind === "skill" ? def.skillsByRank[rank] : def.artsByRank[rank];
-        if (!pool || !pool.includes(id)) return { ok: false, reason: "ตัวเลือกไม่ถูกต้อง" };
-        const draft = draftFrom(s);
-        const dm = draft.sectMembership[sectId];
-        if (!dm) return { ok: false, reason: "membership lost" };
-        dm.rewardPicks = { ...dm.rewardPicks, [key]: id };
-        if (kind === "skill") applyEffect(draft, { t: "learnSkill", skillId: id });
-        else applyEffect(draft, { t: "learnArt", artId: id, level: 1 });
-        appendActionLog(
-          draft,
-          "sect",
-          `รับวิชา${kind === "skill" ? "ฝีมือ" : "ในกาย"}จากสำนัก${def.name} ขั้น ${rank}`,
-        );
-        set({ ...draft });
-        return { ok: true };
-      },
 
       acceptSectQuest: (sectId, questId) => {
         const s = get();

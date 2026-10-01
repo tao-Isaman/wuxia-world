@@ -109,9 +109,9 @@ export const QUESTS_XIAOYAO: readonly QuestDef[] = [
 
   {
     id: "qst_xiaoyao_art_seepower",
-    name: "ตำราวิชาดูพลัง",
-    description: "ปรมาจารย์ยอมเปิดตำราวิชาดูพลังให้ศิษย์ที่จิตใจเที่ยงตรง — ผ่านการประลองและการเก็บสมุนไพรหายาก",
-    briefSummary: "ฝึกวิชาดูพลัง — รับ T3 art ของพรรคสราญรมย์",
+    name: "บททดสอบก่อนสืบทอด: วิชาดูพลัง",
+    description: "ปรมาจารย์จะทดสอบก่อนเปิดตำราวิชาดูพลังให้ศิษย์ที่จิตใจเที่ยงตรง — ผ่านการประลองและการเก็บสมุนไพรหายาก (ผ่านแล้วจึงรับภารกิจสืบทอดวิชาดูพลังได้)",
+    briefSummary: "บททดสอบ — เปิดทางสู่การสืบทอดวิชาดูพลัง (ขั้น 3)",
     type: "side",
     sectId: "xiaoyao",
     isArtQuest: true,
@@ -127,11 +127,11 @@ export const QUESTS_XIAOYAO: readonly QuestDef[] = [
     stages: [
       { id: "trial_kill", description: "พิสูจน์ฝีมือ — ปราบหัวหน้าโจร 3 คน", autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 3 } },
       { id: "trial_meditate", description: "นั่งสมาธิ — เก็บโสม 8 ราก", autoAdvance: { t: "hasItem", itemId: "ginseng", count: 8 } },
-      { id: "return_art", description: "กลับไปรับตำราจากปรมาจารย์" },
+      { id: "return_art", description: "กลับไปรายงานผลต่อปรมาจารย์" },
     ],
     rewards: [
       { t: "wExp", amount: 250 },
-      { t: "learnArt", artId: "t3_xy_seepower", level: 4 },
+      { t: "gold", amount: 300 },
       { t: "trait", trait: "humility", amount: 4 },
       { t: "sectPoints", sectId: "xiaoyao", amount: 150 },
       { t: "npcRelationship", npcId: "sect_xiaoyao_master_yunxiao", amount: 12 },

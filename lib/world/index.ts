@@ -109,8 +109,7 @@ export {
 } from "./data/player-bodies";
 export {
   SECT_MEMBERSHIPS,
-  pendingRewardsAtRank,
-  autoGrantableRewards,
+  rankUpGold,
   type SectMembershipDef,
 } from "./data/sect-memberships";
 export { getQuestsForSect } from "./data";

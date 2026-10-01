@@ -295,10 +295,10 @@ There are 15 joinable sects and 5 more sect grounds you can only visit.
 
 - **Ranks** count down: 9 → 1 (eight sects), 5 → 1 (six sects) or 3 → 1 (กู่มู่). A lower number is higher.
   - Sect quests pay sect points, and a rank-up spends them: 6250 points in total on a 9-rank ladder, 1850 on a 5-rank ladder, 1600 for กู่มู่.
-  - Each rank unlocks a reward pool. A pool with one skill or art is granted at once; otherwise you pick one in 🎖 รางวัลขั้น.
-- **Sect quests** (📜 ภารกิจประจำ) can repeat, each 30 days after you last completed it. Some need a minimum rank, and each sect has one art quest (seven of them are now saga prologue trials).
+  - A rank-up pays gold (half the points it costs) and opens more of the sect's lineage quests and sagas. Ranks grant no martial arts: every sect skill and art comes **only** from its lineage quest or saga. The 🎖 ขั้นและวิชา tab lists them all with what each still needs.
+- **Sect quests** (📜 ภารกิจประจำ) can repeat, each 30 days after you last completed it. Some need a minimum rank, and each sect has one art quest. Art quests teach nothing now: seven are trials that open a saga, eight are trials that open the lineage quest of their tier-3 art.
 - **Leaving** (in the sect menu) — either way, you can never join that sect again:
-  - **ลาออกอย่างเป็นทางการ** (resign): you keep the skills, but those learned from the sect stop gaining xp in battle.
+  - **ลาออกอย่างเป็นทางการ** (resign): you keep the skills, but that sect's skills and arts stop gaining xp in battle.
   - **ทรยศสำนัก** (betray): evil +5, and the sect's hunter (a tier-4 foe) may ambush you on 30 % of walk ticks. The sect's redemption quest ends the hunt by turning the betrayal into a resignation. สำนักสราญรมย์ has no redemption quest.
 
 Full sect data: [reference/sects.md](reference/sects.md).

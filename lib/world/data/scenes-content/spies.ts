@@ -114,7 +114,7 @@ export const SCENES_SPIES: readonly Scene[] = [
     id: "qs_qst_spy_capital_seal_ledger_complete",
     lines: [
       { t: "narration", text: "เจ้าวางบัญชีตราลงบนเคาน์เตอร์อย่างเงียบ ๆ" },
-      { t: "dialogue", speaker: "เฟิง", text: "ดี... กรมจะจดบุญคุณนี้ · นี่ตำราเล็กของเราเอง ลองศึกษาดู" },
+      { t: "dialogue", speaker: "เฟิง", text: "ดี... กรมจะจดบุญคุณนี้ · นี่เบี้ยรางวัลของกรม รับไว้เถิด" },
     ],
     choices: [{ text: "รับรางวัลและกล่าวลา", next: "city_capital" }],
   },
@@ -424,7 +424,7 @@ export const SCENES_SPIES: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qst_spy_dali_poisoner_track_complete",
     lines: [
-      { t: "dialogue", speaker: "เหมย", text: "หลักฐานครบ · นี่ตำรากรงเล็บอินทรีของกรม ฝึกแล้วเก่งกว่ากำมือเดิมแน่" },
+      { t: "dialogue", speaker: "เหมย", text: "หลักฐานครบ · นี่เบี้ยรางวัลของกรม — วิชาของกรมต้องเข้ามาเป็นคนในก่อนจึงจะได้เรียน" },
     ],
     choices: [{ text: "รับรางวัล", next: "city_dali" }],
   },
@@ -603,7 +603,7 @@ export const SCENES_SPIES: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qst_spy_inn_wandering_blade_complete",
     lines: [
-      { t: "dialogue", speaker: "โจว", text: "ตามคาด · เขาเป็นมือดาบฝ่ายอธรรมจริง · นี่ตำราดาบราชสำนักสำหรับเจ้า" },
+      { t: "dialogue", speaker: "โจว", text: "ตามคาด · เขาเป็นมือดาบฝ่ายอธรรมจริง · นี่เงินรางวัลจากราชสำนักสำหรับเจ้า" },
     ],
     choices: [{ text: "รับรางวัล", next: "inn_yuelai" }],
   },
@@ -730,7 +730,7 @@ export const SCENES_SPIES: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qst_spy_village_missing_courier_complete",
     lines: [
-      { t: "dialogue", speaker: "ซื่อ", text: "พบแล้ว · นี่ตำรากรงเล็บคว้าจับของกรม ฝึกไว้กันรุ่นต่อไป" },
+      { t: "dialogue", speaker: "ซื่อ", text: "พบแล้ว · นี่เงินรางวัลของกรม เก็บไว้ใช้ยามจำเป็น" },
     ],
     choices: [{ text: "รับรางวัล", next: "village_qigu" }],
   },

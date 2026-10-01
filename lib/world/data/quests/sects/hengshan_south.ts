@@ -134,9 +134,9 @@ export const QUESTS_HENGSHAN_SOUTH: readonly QuestDef[] = [
 
   {
     id: "qst_hengshan_south_art_swiftblade",
-    name: "ตำรากระบี่ลมรวดเร็ว",
-    description: "อาจารย์โม่ต้ายอมเปิดตำรากระบี่ลมรวดเร็วให้ศิษย์ที่พิสูจน์ฝีมือกระบี่และหัวใจอันสงบ — ผ่านการประลองหัวหน้าโจรและรวบรวมแร่เทพ",
-    briefSummary: "ฝึกกระบี่ลมรวดเร็ว — รับ T3 art ลับของเฮิงซานใต้",
+    name: "บททดสอบก่อนสืบทอด: ลมรวดเร็ว",
+    description: "อาจารย์โม่ต้าจะทดสอบก่อนเปิดตำรากระบี่ลมรวดเร็วให้ศิษย์ที่พิสูจน์ฝีมือกระบี่และหัวใจอันสงบ — ผ่านการประลองหัวหน้าโจรและรวบรวมแร่เทพ (ผ่านแล้วจึงรับภารกิจสืบทอดลมรวดเร็วได้)",
+    briefSummary: "บททดสอบ — เปิดทางสู่การสืบทอดลมรวดเร็ว (ขั้น 3)",
     type: "side",
     sectId: "hengshan_south",
     isArtQuest: true,
@@ -162,12 +162,12 @@ export const QUESTS_HENGSHAN_SOUTH: readonly QuestDef[] = [
       },
       {
         id: "return_art",
-        description: "กลับไปรับตำราจากอาจารย์โม่ต้า",
+        description: "กลับไปรายงานผลต่ออาจารย์โม่ต้า",
       },
     ],
     rewards: [
       { t: "wExp", amount: 200 },
-      { t: "learnArt", artId: "t3_hgs_swift", level: 3 },
+      { t: "gold", amount: 300 },
       { t: "trait", trait: "humility", amount: 5 },
       { t: "sectPoints", sectId: "hengshan_south", amount: 100 },
       { t: "npcRelationship", npcId: "sect_hengshan_south_master_modaxiansheng", amount: 10 },
