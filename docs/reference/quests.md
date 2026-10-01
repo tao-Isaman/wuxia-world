@@ -2,7 +2,7 @@
 
 # Quests
 
-276 quests: 1 main, 178 side, 97 sect quests (15 of them art quests). 0 are marked `isMajor` (completing one spreads a rumor about the hero). 657 stages in total: 332 advance on their own (`autoAdvance`), 44 are hands-on objectives (`objective`), the rest are dialog beats or the final hand-in. 170 quests have an offer scene (`qs_<id>_offer`) and 167 a completion scene (`qs_<id>_complete`).
+770 quests: 1 main, 332 side, 97 sect quests (15 of them art quests). 0 are marked `isMajor` (completing one spreads a rumor about the hero). 2107 stages in total: 900 advance on their own (`autoAdvance`), 432 are hands-on objectives (`objective`), the rest are dialog beats or the final hand-in. 664 quests have an offer scene (`qs_<id>_offer`) and 661 a completion scene (`qs_<id>_complete`).
 
 Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assassinate** / **trait** / **flag** = `autoAdvance` condition types · **objective** = map spot, person or scene the hero uses in person (`stage.objective`, ×n = several spots) · **dialog** = advanced by an `advanceQuest` choice in a scene · **turn-in** = last stage, closed at the turn-in person or by the completion scene.
 
@@ -28,7 +28,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qst_shaolin_sect_herb_run` | ส่งสมุนไพรให้วัด | เจ้าอาวาสฮุยหยวน | item → turn-in | prereqs |
 | `qst_shaolin_sect_meditation` | ปฏิบัติธรรมที่ถ้ำลึก | เจ้าอาวาสฮุยหยวน | item → turn-in | rank ≤ 7, prereqs |
 | `qst_shaolin_art_zen_finger` | ตำราเอกนิ้วเซน | เจ้าอาวาสฮุยหยวน | kill → item → turn-in | art, rank ≤ 5, prereqs |
-| `qst_shaolin_art_legendary` | ตำราพลังเปลี่ยนเส้นเอ็น | เจ้าอาวาสฮุยหยวน | kill → trait → turn-in | art, rank ≤ 2, prereqs |
+| `qst_shaolin_art_legendary` | บททดสอบก่อนตำนาน: พลังเปลี่ยนเส้นเอ็น | เจ้าอาวาสฮุยหยวน | kill → trait → turn-in | art, rank ≤ 2, prereqs |
 | `qst_shaolin_redemption` | ไถ่บาปต่อเส้าหลิน | เจ้าอาวาสฮุยหยวน | kill → item → turn-in | prereqs |
 | `qst_shaolin_sect_protect_village` | ปกป้องชาวบ้านจากโจร | เจ้าอาวาสฮุยหยวน | kill → item → turn-in | prereqs |
 | `qst_shaolin_sect_sutra_paper` | กระดาษคัดลอกพระสูตร | เจ้าอาวาสฮุยหยวน | item → turn-in | prereqs |
@@ -52,7 +52,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | --- | --- | --- | --- | --- |
 | `qst_emei_sect_patrol` | ลาดตระเวนรอบวัดง้อไบ๊ | ท่านนิ้วห้วนจิงฉาน | kill → turn-in | prereqs |
 | `qst_emei_sect_herb` | เก็บสมุนไพรเขาง้อไบ๊ | ท่านนิ้วห้วนจิงฉาน | item → turn-in | prereqs |
-| `qst_emei_art_bodhi` | ตำราโพธิสัตว์ทรงพรต | ท่านนิ้วห้วนจิงฉาน | kill → trait → turn-in | art, rank ≤ 3, prereqs |
+| `qst_emei_art_bodhi` | บททดสอบก่อนตำนาน: โพธิสัตว์ทรงพรต | ท่านนิ้วห้วนจิงฉาน | kill → trait → turn-in | art, rank ≤ 3, prereqs |
 | `qst_emei_redemption` | ไถ่บาปต่อง้อไบ๊ | ท่านนิ้วห้วนจิงฉาน | kill → item → turn-in | prereqs |
 | `qst_emei_sect_lotus` | ส่งเม็ดบัวให้แม่ชี | ท่านนิ้วห้วนจิงฉาน | item → turn-in | prereqs |
 | `qst_emei_sect_bandit_clear` | กวาดล้างโจรเชิงเขาง้อไบ๊ | ท่านนิ้วห้วนจิงฉาน | kill → item → turn-in | prereqs |
@@ -65,7 +65,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | --- | --- | --- | --- | --- |
 | `qst_huashan_sect_patrol` | ลาดตระเวนเชิงเขาหัวซาน | อาจารย์ใหญ่อี้ชิง | kill → turn-in | prereqs |
 | `qst_huashan_sect_iron` | ส่งเหล็กให้โรงตีดาบ | อาจารย์ใหญ่อี้ชิง | item → turn-in | prereqs |
-| `qst_huashan_art_purplecloud` | ตำราพลังเมฆม่วง | อาจารย์ใหญ่อี้ชิง | kill → item → turn-in | art, rank ≤ 3, prereqs |
+| `qst_huashan_art_purplecloud` | บททดสอบก่อนตำนาน: พลังเมฆม่วง | อาจารย์ใหญ่อี้ชิง | kill → item → turn-in | art, rank ≤ 3, prereqs |
 | `qst_huashan_redemption` | ไถ่บาปต่อหัวซาน | อาจารย์ใหญ่อี้ชิง | kill → item → turn-in | prereqs |
 | `qst_huashan_sect_wooden` | ส่งไม้ให้โรงดาบ | อาจารย์ใหญ่อี้ชิง | item → turn-in | prereqs |
 
@@ -134,7 +134,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | --- | --- | --- | --- | --- |
 | `qst_beggars_sect_patrol` | ลาดตระเวนตรอกเมือง | หัวหน้าหงเทียน | kill → turn-in | prereqs |
 | `qst_beggars_sect_alms` | แจกอาหารคนยากไร้ | หัวหน้าหงเทียน | item → turn-in | prereqs |
-| `qst_beggars_art_thousandcrowd` | ตำราหมื่นมวลชน | หัวหน้าหงเทียน | kill → item → turn-in | art, rank ≤ 3, prereqs |
+| `qst_beggars_art_thousandcrowd` | บททดสอบก่อนตำนาน: วิชาหมื่นมวลชน | หัวหน้าหงเทียน | kill → item → turn-in | art, rank ≤ 3, prereqs |
 | `qst_beggars_redemption` | ไถ่บาปต่อพรรคยาจก | หัวหน้าหงเทียน | kill → item → turn-in | prereqs |
 | `qst_beggars_sect_rice2` | เก็บข้าวห่อให้คนยาก | หัวหน้าหงเทียน | item → turn-in | prereqs |
 | `qst_beggars_sect_thug_road` | กำราบโจรริมทาง | หัวหน้าหงเทียน | kill → item → turn-in | prereqs |
@@ -159,7 +159,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | --- | --- | --- | --- | --- |
 | `qst_jinyiwei_sect_patrol` | ปราบโจรในเขตหลวง | ผู้บัญชาการจ้าวฝู่ | kill → turn-in | prereqs |
 | `qst_jinyiwei_sect_arms` | ส่งเหล็กให้โรงตีอาวุธ | ผู้บัญชาการจ้าวฝู่ | item → turn-in | prereqs |
-| `qst_jinyiwei_art_godslayer` | ตำราพลังประหารเทพ | ผู้บัญชาการจ้าวฝู่ | kill → trait → turn-in | art, rank ≤ 3, prereqs |
+| `qst_jinyiwei_art_godslayer` | บททดสอบก่อนตำนาน: พลังประหารเทพ | ผู้บัญชาการจ้าวฝู่ | kill → trait → turn-in | art, rank ≤ 3, prereqs |
 | `qst_jinyiwei_redemption` | ไถ่บาปต่อองครักษ์เสื้อแพร | ผู้บัญชาการจ้าวฝู่ | kill → item → turn-in | prereqs |
 | `qst_jinyiwei_sect_scroll` | ส่งกระดาษให้กรม | ผู้บัญชาการจ้าวฝู่ | item → turn-in | prereqs |
 | `qst_jinyiwei_sect_thugs` | กวาดล้างตลาดหลวง | ผู้บัญชาการจ้าวฝู่ | kill → turn-in | prereqs |
@@ -172,7 +172,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | --- | --- | --- | --- | --- |
 | `qst_tang_sect_patrol` | ลาดตระเวนป่าเสฉวน | เจ้าสำนักถังเหมิน | kill → turn-in | prereqs |
 | `qst_tang_sect_venom` | ส่งวัตถุดิบให้ห้องปรุงพิษ | เจ้าสำนักถังเหมิน | item → turn-in | prereqs |
-| `qst_tang_art_tenkpoisons` | ตำราพลังถังหมื่นพิษ | เจ้าสำนักถังเหมิน | kill → item → turn-in | art, rank ≤ 3, prereqs |
+| `qst_tang_art_tenkpoisons` | บททดสอบก่อนตำนาน: พลังถังหมื่นพิษ | เจ้าสำนักถังเหมิน | kill → item → turn-in | art, rank ≤ 3, prereqs |
 | `qst_tang_redemption` | ไถ่บาปต่อสำนักสุลถัง | เจ้าสำนักถังเหมิน | kill → item → turn-in | prereqs |
 | `qst_tang_sect_venom2` | เก็บพิษเพิ่ม | เจ้าสำนักถังเหมิน | item → turn-in | prereqs |
 | `qst_tang_sect_herbgather` | เก็บสมุนไพรปรุงพิษ | เจ้าสำนักถังเหมิน | item → turn-in | prereqs |
@@ -185,7 +185,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | --- | --- | --- | --- | --- |
 | `qst_sunmoon_sect_patrol` | ลาดตระเวนหุบเขา | อาจารย์ใหญ่หยินอวี้ | kill → turn-in | prereqs |
 | `qst_sunmoon_sect_scripture` | เก็บคัมภีร์เก่าจากซากเมือง | อาจารย์ใหญ่หยินอวี้ | item → turn-in | prereqs |
-| `qst_sunmoon_art_qiankun` | ตำราเฉียนคุนต้าหนัวอี | อาจารย์ใหญ่หยินอวี้ | kill → trait → turn-in | art, rank ≤ 3, prereqs |
+| `qst_sunmoon_art_qiankun` | บททดสอบก่อนตำนาน: เฉียนคุนต้าหนัวอี | อาจารย์ใหญ่หยินอวี้ | kill → trait → turn-in | art, rank ≤ 3, prereqs |
 | `qst_sunmoon_redemption` | ไถ่บาปต่อพรรคตะวันจันทรา | อาจารย์ใหญ่หยินอวี้ | kill → item → turn-in | prereqs |
 | `qst_sunmoon_sect_patrol2` | ลาดตระเวนยอดเขา | อาจารย์ใหญ่หยินอวี้ | kill → turn-in | prereqs |
 | `qst_sunmoon_sect_suntalisman` | วัสดุยันต์ตะวัน | อาจารย์ใหญ่หยินอวี้ | item → turn-in | prereqs |
@@ -199,6 +199,9 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | Id | Name | Giver | Stages | Notes |
 | --- | --- | --- | --- | --- |
 | `qst_gumu_disciple_intro` | เส้นทางสู่สุสานโบราณ | หญิงปริศนาในสุสาน | kill → item → turn-in | prereqs |
+| `ql_skill_gm_sword` | สืบทอดกระบี่สุสานโบราณ | ศิษย์เลิ่งเยว่ | kill → item → kill → turn-in | prereqs |
+| `ql_skill_ynss` | สืบทอดเพลงกระบี่สุรางคนางค์ใจพิสุทธิ์ | ศิษย์เลิ่งเยว่ | kill → item → kill → turn-in | prereqs |
+| `ql_art_ynxj` | สืบทอดคัมภีร์สาวหยก | ศิษย์เลิ่งเยว่ | kill → item → kill → turn-in | prereqs |
 
 ### เกาะดอกท้อ (`isle_taohua`)
 
@@ -260,6 +263,19 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qst_emei_disciple_intro` | ขอเข้าเป็นศิษย์ง้อไบ๊ | ท่านนิ้วห้วนจิงฉาน | item → turn-in | prereqs |
 | `qst_emei_kidnapped_novice` | สาวกถูกลักพาตัว | ท่านนิ้วห้วนจิงฉาน | objective (spot) → kill → turn-in |  |
 | `qst_emei_poison_antidote` | ยาต้านพิษอสุรา | ท่านนิ้วห้วนจิงฉาน | item → turn-in | prereqs |
+| `ql_skill_em_graceful_sword` | สืบทอดกระบี่อ่อนช้อย | ศิษย์อวี้เจี๋ย | kill → turn-in | prereqs |
+| `ql_art_t0_em_meditation` | สืบทอดสมาธิเยือกเย็น | ศิษย์หลิงซิน | kill → turn-in | prereqs |
+| `ql_skill_em_blossom_sword` | สืบทอดกระบี่ดอกบุปผา | หัวหน้าศิษย์จื้อฮุย | kill → item → turn-in | prereqs |
+| `ql_art_t1_em_lotus` | สืบทอดบัวบานภายใน | ศิษย์เสี่ยวอวี้ | kill → item → turn-in | prereqs |
+| `ql_skill_em_heart_sword` | สืบทอดกระบี่รักษาใจ | หมอนิ้วอวี้ซิน | kill → item → kill → turn-in | prereqs |
+| `ql_skill_em_heart_palm` | สืบทอดฝ่ามือรักษาใจ | นักพรตชิงอวี้ | kill → item → kill → turn-in | prereqs |
+| `ql_skill_em_lotus_palm` | สืบทอดฝ่ามือดอกบัวบาน | ศิษย์เสี่ยวอวี้ | kill → item → kill → turn-in | prereqs |
+| `ql_art_t2_em_garland` | สืบทอดบุปผาร้อยมาลัย | หมอนิ้วอวี้ซิน | kill → item → kill → turn-in | prereqs |
+| `ql_skill_em_buddha_sword` | สืบทอดกระบี่วิธีพุทธ | ท่านนิ้วดาบชิงซิน | kill → item → kill → turn-in | prereqs |
+| `ql_art_t3_em_grace` | สืบทอดพลังกายาพริ้วไหว | ท่านนิ้วดาบชิงซิน | kill → item → kill → turn-in | prereqs |
+| `ql_skill_em_plum_sword` | สืบทอดกระบี่ดอกเหมย | รองท่านนิ้วฮุยเหมียว | kill → item → kill → turn-in | prereqs |
+| `ql_art_t3_em_ice` | สืบทอดลมหายใจน้ำแข็ง | รองท่านนิ้วฮุยเหมียว | kill → item → kill → turn-in | prereqs |
+| `ql_art_t3_em_heart` | สืบทอดพลังรักษาใจ | ท่านนิ้วฝ่ามือฮุยอวี้ | kill → item → kill → turn-in | prereqs |
 
 ### จินหลิง (`city_jinling`)
 
@@ -274,6 +290,17 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | Id | Name | Giver | Stages | Notes |
 | --- | --- | --- | --- | --- |
 | `qst_quanzhen_disciple_intro` | ขอเข้าเป็นศิษย์ฉวนเจิน | อาจารย์ใหญ่ฉงหยาง | item → turn-in | prereqs |
+| `ql_skill_qz_heavy_sword` | สืบทอดกระบี่หนักชวนจิน | ศิษย์หยางจื่อ | kill → turn-in | prereqs |
+| `ql_art_t0_qz_speed` | สืบทอดวิชาเร่งพลัง | ศิษย์หยางจื่อ | kill → turn-in | prereqs |
+| `ql_skill_qz_hot_sword` | สืบทอดกระบี่ร้อนชวนจิน | สาวกชงซวี | kill → item → turn-in | prereqs |
+| `ql_art_t1_qz_horse` | สืบทอดท่วงท่าถอยม้า | สาวกชงซวี | kill → item → turn-in | prereqs |
+| `ql_skill_qzjf` | สืบทอดกระบี่ชวนจินก่า | อาจารย์ดาบชิวฉู่จี้ | kill → item → kill → turn-in | prereqs |
+| `ql_skill_qz_punch` | สืบทอดหมัดชวนจินก่า | อาจารย์ปราณเหยาหลัน | kill → item → kill → turn-in | prereqs |
+| `ql_art_qzzq` | สืบทอดลมปราณชวนจินก่า | อาจารย์ปราณเหยาหลัน | kill → item → kill → turn-in | prereqs |
+| `ql_skill_qz_sun_fist` | สืบทอดหมัดสุริยัน | รองอาจารย์หม่ายวี่ | kill → item → kill → turn-in | prereqs |
+| `ql_skill_qz_sun_sword` | สืบทอดกระบี่สะกดสุริยันต์ | อาจารย์ดาบชิวฉู่จี้ | kill → item → kill → turn-in | prereqs |
+| `ql_art_t3_qz_sun` | สืบทอดหนึ่งพลังสุริยันต์ | รองอาจารย์หม่ายวี่ | kill → item → kill → turn-in | prereqs |
+| `ql_art_t3_qz_dragon` | สืบทอดหยังทะเลพิฆาตมังกร | อาจารย์ปราณเหยาหลัน | kill → item → kill → turn-in | prereqs |
 
 ### ฉางอัน (`city_changan`)
 
@@ -294,6 +321,14 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | Id | Name | Giver | Stages | Notes |
 | --- | --- | --- | --- | --- |
 | `qst_songshan_disciple_intro` | ขอเข้าเป็นศิษย์ซงซาน | อาจารย์ใหญ่จั่วเหลิงฉาน | item+goldAtLeast → turn-in | prereqs |
+| `ql_skill_ssh_basic_sword` | สืบทอดกระบี่เหล็กซงซาน | ศิษย์หยางจง | kill → turn-in | prereqs |
+| `ql_art_t0_ssh_qi` | สืบทอดกำลังภายในซงซาน | ศิษย์หยางจง | kill → turn-in | prereqs |
+| `ql_skill_ssh_iron_strike` | สืบทอดเพลงกระบี่ตีเหล็ก | ศิษย์หลี่เฟิง | kill → item → turn-in | prereqs |
+| `ql_art_t1_ssh_iron` | สืบทอดวิชาเหล็กหนัก | ศิษย์หลี่เฟิง | kill → item → turn-in | prereqs |
+| `ql_skill_ssh_central_blade` | สืบทอดกระบี่ยอดเขากลาง | อาจารย์อาวุโสติงเหมียน | kill → item → kill → turn-in | prereqs |
+| `ql_art_t2_ssh_root` | สืบทอดพลังรากภูผา | อาจารย์อาวุโสติงเหมียน | kill → item → kill → turn-in | prereqs |
+| `ql_skill_ssh_song_pillar` | สืบทอดกระบี่เสาภูผาซงซาน | รองอาจารย์ลู่ไป๋ | kill → item → kill → turn-in | prereqs |
+| `ql_art_t3_ssh_pillar` | สืบทอดพลังเสาภูผา | รองอาจารย์ลู่ไป๋ | kill → item → kill → turn-in | prereqs |
 
 ### ซีเซี่ย (`city_xixia`)
 
@@ -370,6 +405,14 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | Id | Name | Giver | Stages | Notes |
 | --- | --- | --- | --- | --- |
 | `qst_taishan_disciple_intro` | ขอเข้าเป็นศิษย์ไท่ซาน | เจ้าสำนักเทียนเหมินเต้าเหริน | item+goldAtLeast → turn-in | prereqs |
+| `ql_skill_tsh_basic_sword` | สืบทอดกระบี่ไท่ซาน | ศิษย์จิ้งหยาง | kill → turn-in | prereqs |
+| `ql_art_t0_tsh_qi` | สืบทอดกำลังภายในไท่ซาน | ศิษย์จิ้งหยาง | kill → turn-in | prereqs |
+| `ql_skill_tsh_dawn_strike` | สืบทอดกระบี่อรุณรุ่ง | ศิษย์คุนหวู่ | kill → item → turn-in | prereqs |
+| `ql_art_t1_tsh_dawn` | สืบทอดวิชาตวัดอรุณ | ศิษย์คุนหวู่ | kill → item → turn-in | prereqs |
+| `ql_skill_tsh_east_blade` | สืบทอดกระบี่บูรพาส่อง | อาจารย์อาวุโสฉื่อหยางจื่อ | kill → item → kill → turn-in | prereqs |
+| `ql_art_t2_tsh_peak` | สืบทอดพลังยอดเขาบูรพา | อาจารย์อาวุโสฉื่อหยางจื่อ | kill → item → kill → turn-in | prereqs |
+| `ql_skill_tsh_sun_pierce` | สืบทอดกระบี่ทะลวงสุริยัน | รองเจ้าสำนักอวี้หยางจื่อ | kill → item → kill → turn-in | prereqs |
+| `ql_art_t3_tsh_sun` | สืบทอดหนึ่งกระบี่บูชาตะวัน | รองเจ้าสำนักอวี้หยางจื่อ | kill → item → kill → turn-in | prereqs |
 
 ### นครหลวง (`city_capital`)
 
@@ -407,6 +450,15 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qst_ming_spy_mission` | จดหมายลับแห่งพรรค | ผู้อาวุโสจูอิง | objective (person) → visit → objective (spot) → turn-in |  |
 | `qst_ming_defector_choice` | ผู้แปรพักตร์ | ผู้อาวุโสจูอิง | objective (spot) → objective (spot) → turn-in | prereqs |
 | `qst_sunmoon_disciple_intro` | ขอเข้าเป็นศิษย์พรรคตะวันจันทรา | อาจารย์ใหญ่หยินอวี้ | assassinate → turn-in | prereqs |
+| `ql_art_t0_sm_dual` | สืบทอดพลังสองขั้ว | ศิษย์เสี่ยวอวี้ | kill → turn-in | prereqs |
+| `ql_art_t1_sm_sunfire` | สืบทอดพลังเพลิงตะวัน | ศิษย์หลานเฟิงหวง | kill → item → turn-in | prereqs |
+| `ql_art_t1_sm_moonweave` | สืบทอดพลังร้อยจันทรา | หัวหน้าศิษย์อี้หลิน | kill → item → turn-in | prereqs |
+| `ql_art_t2_sm_sunbody` | สืบทอดพลังกายสุริยัน | หัวหน้าศิษย์อี้หลิน | kill → item → kill → turn-in | prereqs |
+| `ql_art_t2_sm_moonbody` | สืบทอดพลังกายจันทรา | ผู้อาวุโสสมดุลฉวี่ตงเฟิง | kill → item → kill → turn-in | prereqs |
+| `ql_skill_mi_firepalm` | สืบทอดฝ่ามือเพลิง | ผู้แทนหั่วจี้ | kill → item → kill → turn-in | prereqs |
+| `ql_art_t3_sm_dualfusion` | สืบทอดพลังสองขั้วผสาน | ผู้อาวุโสสมดุลฉวี่ตงเฟิง | kill → item → kill → turn-in | prereqs |
+| `ql_art_t3_sm_sunmoon` | สืบทอดพลังสุริยันจันทรา | รองเจ้าสำนักเหรินหวัวสิง | kill → item → kill → turn-in | prereqs |
+| `ql_art_t3_sm_sunscript` | สืบทอดคัมภีร์ทานตะวัน (ฉบับย่อ) | ผู้อาวุโสตะวันจั่วเหลิงฉัน | kill → item → kill → turn-in | prereqs |
 
 ### พรรคเบญจพิษ (`sect_wudu`)
 
@@ -417,6 +469,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qe_wudu_steal_antidote` | ขโมยสูตรถอนพิษ | ผู้อาวุโสตู๋ซื่อ | steal → turn-in |  |
 | `qe_wudu_assassinate_emei` | ลอบสังหารนิ้วน้ำหวาน | ผู้อาวุโสตู๋ซื่อ | assassinate → turn-in |  |
 | `qe_wudu_clear_rival_sect` | กวาดล้างยอดยุทธอธรรม | ผู้อาวุโสตู๋ซื่อ | kill → turn-in |  |
+| `ql_art_t2_snakeform` | สืบทอดงูพิษเจ็ดสี | หมอพิษอาหมาน | kill → item → kill → turn-in | prereqs |
 
 ### พรรคยาจก (`sect_beggars`)
 
@@ -425,12 +478,43 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qst_beggars_disciple_intro` | ขอเข้าเป็นศิษย์พรรคยาจก | หัวหน้าหงเทียน | item+goldAtLeast → turn-in | prereqs |
 | `qst_beggars_spy_report` | รายงานสายลับยุทธภพ | หัวหน้าหงเทียน | objective×3 → kill → turn-in |  |
 | `qst_beggars_hungry_children` | อาหารเพื่อเด็กยาจก | หัวหน้าหงเทียน | item → turn-in |  |
+| `ql_skill_nc1` | สืบทอดประกาศิตพรรคยาจก | ศิษย์เสี่ยวเหมา | kill → turn-in | prereqs |
+| `ql_skill_nc2` | สืบทอดไม้เท้าขอทาน | ศิษย์เสี่ยวเหมา | kill → turn-in | prereqs |
+| `ql_art_t0_bg_survival` | สืบทอดวิชาเอาชีวิตรอดพื้นฐาน | ยาจกจิ๊ว | kill → turn-in | prereqs |
+| `ql_skill_bg_snake_fist` | สืบทอดเพลงหมัดอสรพิษคนจร | ศิษย์เสี่ยวฮู | kill → item → turn-in | prereqs |
+| `ql_skill_bg_snake_staff` | สืบทอดไม้เท้าอสรพิษคนจร | ศิษย์ต้าเหว่ย | kill → item → turn-in | prereqs |
+| `ql_art_t1_bg_sunshadow` | สืบทอดพลังคล้อยตะวัน | หัวหน้าศิษย์เหรินฮัว | kill → item → turn-in | prereqs |
+| `ql_skill_bg_drift_staff` | สืบทอดไม้เท้าล่องลอย | หัวหน้าศิษย์เหรินฮัว | kill → item → kill → turn-in | prereqs |
+| `ql_skill_bg_drift_fist` | สืบทอดเพลงหมัดล่องลอย | ศิษย์เสี่ยวฮู | kill → item → kill → turn-in | prereqs |
+| `ql_art_t2_bg_nineshadow` | สืบทอดวิชาเก้าไร้เงา | อาจารย์ข่าวสารยุนซือ | kill → item → kill → turn-in | prereqs |
+| `ql_skill_bg_wander_staff` | สืบทอดไม้เท้าพเนจร | อาจารย์ไม้เท้าฉีเฉิง | kill → item → kill → turn-in | prereqs |
+| `ql_skill_ng3` | สืบทอดฝ่ามือจับมังกร | อาจารย์หมัดอู่เต้า | kill → item → kill → turn-in | prereqs |
+| `ql_art_t3_bg_sunrenew` | สืบทอดพลังฟื้นตะวัน | อาจารย์ข่าวสารยุนซือ | kill → item → kill → turn-in | prereqs |
 
 ### พรรคสราญรมย์ (เซียวหยาว) (`sect_xiaoyao`)
 
 | Id | Name | Giver | Stages | Notes |
 | --- | --- | --- | --- | --- |
 | `qst_xiaoyao_disciple_intro` | ขอเข้าเป็นศิษย์พรรคสราญรมย์ | ปรมาจารย์ยุนเซียว | item → turn-in | prereqs |
+| `ql_skill_xy_lesserdemon_blade` | สืบทอดดาบอสูรน้อย | ศิษย์เสี่ยวหลาน | kill → turn-in | prereqs |
+| `ql_art_t0_xy_plum` | สืบทอดลมปราณดอกเหมย | ศิษย์เสี่ยวหลาน | kill → turn-in | prereqs |
+| `ql_skill_xy_pathless_sword` | สืบทอดกระบี่ไร้วิถี | หัวหน้าศิษย์อาเหลียว | kill → item → turn-in | prereqs |
+| `ql_art_t1_xy_formless_lesser` | สืบทอดพลังไร้ลักษณ์น้อย | ศิษย์จิ่วม่อจื้อ | kill → item → turn-in | prereqs |
+| `ql_skill_xy_lesserdemon_fist` | สืบทอดหมัดอสูรน้อย | ผู้อาวุโสดาบเสี่ยวหรง | kill → item → kill → turn-in | prereqs |
+| `ql_skill_xy_demon_wind_sword` | สืบทอดกระบี่ลมอสูร | ผู้อาวุโสดาบเสี่ยวหรง | kill → item → kill → turn-in | prereqs |
+| `ql_skill_xy_root_poison_fist` | สืบทอดหมัดรากพิษ | ผู้อาวุโสดาบเสี่ยวหรง | kill → item → kill → turn-in | prereqs |
+| `ql_art_t2_xy_formless_greater` | สืบทอดพลังไร้ลักษณ์ใหญ่ | ศิษย์จิ่วม่อจื้อ | kill → item → kill → turn-in | prereqs |
+| `ql_skill_xy_punch` | สืบทอดเพลงหมัดสราญรมย์ | ผู้อาวุโสฝ่ามือหลี่ไป๋ | kill → item → kill → turn-in | prereqs |
+| `ql_skill_yxjf` | สืบทอดกระบี่ขลุ่ยหยก | ผู้อาวุโสกระบี่อู๋หยาจื่อ | kill → item → kill → turn-in | prereqs |
+| `ql_art_t3_xy_root_poison_qi` | สืบทอดลมปราณรากพิษ | ผู้อาวุโสฝ่ามือหลี่ไป๋ | kill → item → kill → turn-in | prereqs |
+| `ql_art_t3_xy_seepower` | สืบทอดวิชาดูพลัง | รองอาจารย์เทียนซาน | kill → item → kill → turn-in | prereqs |
+| `ql_art_bmzq` | สืบทอดลมปราณภูติอุดร | รองอาจารย์เทียนซาน | kill → item → kill → turn-in | prereqs |
+
+### พรรคอสูรโลหิต (`sect_xuedao`)
+
+| Id | Name | Giver | Stages | Notes |
+| --- | --- | --- | --- | --- |
+| `ql_skill_bs` | สืบทอดดาบอสุรี | ดาบเลือดเซียะลาง | kill → item → kill → turn-in | prereqs |
 
 ### พระราชวังจงหยาง (`palace_zhongyang`)
 
@@ -491,6 +575,21 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qst_shaolin_proof_of_heart` | บทพิสูจน์แห่งจิตใจ | เจ้าอาวาสฮุยหยวน | dialog → turn-in | prereqs |
 | `qst_shaolin_iron_training` | วัตถุดิบฝึกเหล็ก | อาจารย์ฝาหมิง | item → turn-in |  |
 | `qst_shaolin_wudang_joint` | ความลับใต้ผืนดิน | เจ้าอาวาสฮุยหยวน | dialog → dialog → kill → turn-in | prereqs |
+| `ql_skill_sf` | สืบทอดหมัดเส้าหลิน | ศิษย์เซวียนจี้ | kill → turn-in | prereqs |
+| `ql_skill_sl_long_dharma` | สืบทอดหมัดยาวพุทธธรรม | ศิษย์เซวียนจี้ | kill → turn-in | prereqs |
+| `ql_art_t0_lohan` | สืบทอดลมปราณอรหันต์ | ศิษย์เซวียนจี้ | kill → turn-in | prereqs |
+| `ql_skill_nd5` | สืบทอดหมัดอรหันต์ | หัวหน้าศิษย์หยวนเฉวียน | kill → item → turn-in | prereqs |
+| `ql_skill_sl_staff_dharma` | สืบทอดไม้พลองพุทธธรรม | หัวหน้าศิษย์หยวนเฉวียน | kill → item → turn-in | prereqs |
+| `ql_skill_sl_staff_shaolin` | สืบทอดไม้พลองเส้าหลิน | หัวหน้าศิษย์หยวนเฉวียน | kill → item → turn-in | prereqs |
+| `ql_art_t1_goldenbell` | สืบทอดกระดิ่งทองพื้นฐาน | หัวหน้าศิษย์หยวนเฉวียน | kill → item → turn-in | prereqs |
+| `ql_skill_ne1` | สืบทอดวิชากรงเล็บมังกร | หัวหน้าศิษย์หยวนเฉวียน | kill → item → kill → turn-in | prereqs |
+| `ql_skill_ne2` | สืบทอดดาบอรหันต์เส้าหลิน | อาจารย์ฝาหมิง | kill → item → kill → turn-in | prereqs |
+| `ql_skill_sl_zen_sword` | สืบทอดกระบี่วิธีเซน | อาจารย์ฝาหมิง | kill → item → kill → turn-in | prereqs |
+| `ql_art_t2_dharma` | สืบทอดลมปราณพุทธธรรม | อาจารย์ฝาหมิง | kill → item → kill → turn-in | prereqs |
+| `ql_skill_sl_bodhi_palm` | สืบทอดฝ่ามือโพธิสัตว์ | รองเจ้าอาวาสลั่วฮั่น | kill → item → kill → turn-in | prereqs |
+| `ql_skill_sl_petal_finger` | สืบทอดดัชนีเด็ดบุปผา | รองเจ้าอาวาสลั่วฮั่น | kill → item → kill → turn-in | prereqs |
+| `ql_skill_sl_rock_punch` | สืบทอดหมัดทลายผา | หลวงพ่อจูตี้ | kill → item → kill → turn-in | prereqs |
+| `ql_art_t3_onefinger` | สืบทอดเอกนิ้วเซน | หลวงพ่อเซียนเหริน | kill → item → kill → turn-in | prereqs |
 
 ### วิหารล้อลม (`temple_dalun`)
 
@@ -519,12 +618,31 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qe_xueyu_steal_sutra` | ขโมยพระสูตรต้องห้าม | ทูตเซี่ยแห่งสำนักดาบโลหิต | steal → turn-in |  |
 | `qe_xueyu_silence_traitor` | ปิดปากคนทรยศ | ทูตเซี่ยแห่งสำนักดาบโลหิต | kill → turn-in |  |
 | `qe_xueyu_purge_village` | กวาดล้างหมู่บ้านพยาน | ทูตเซี่ยแห่งสำนักดาบโลหิต | kill → turn-in | prereqs |
+| `ql_skill_nf6` | สืบทอดดาบยาวสีเลือด | จอมยุทธฉือยิง | kill → item → kill → turn-in | prereqs |
+
+### สำนักดาวดึงส์ (เห็งซัว) (`sect_xingxiu`)
+
+| Id | Name | Giver | Stages | Notes |
+| --- | --- | --- | --- | --- |
+| `ql_skill_xx_palm` | สืบทอดฝ่ามือพิษสลายพลัง | ศิษย์ตู๋โซ่ว | kill → item → kill → turn-in | prereqs |
+| `ql_art_hgdf` | สืบทอดวิชาสลายพลัง | ศิษย์ตู๋โซ่ว | kill → item → kill → turn-in | prereqs |
 
 ### สำนักสุลถัง (`sect_tang`)
 
 | Id | Name | Giver | Stages | Notes |
 | --- | --- | --- | --- | --- |
 | `qst_tang_disciple_intro` | ขอเข้าเป็นศิษย์สำนักสุลถัง | เจ้าสำนักถังเหมิน | item → turn-in | prereqs |
+| `ql_skill_tang_basic_knife` | สืบทอดมีดบินพื้นฐาน | ศิษย์ถังซิ่ว | kill → turn-in | prereqs |
+| `ql_art_t0_tang_sharp` | สืบทอดสมาธิเฉียบคม | ศิษย์ถังเทา | kill → turn-in | prereqs |
+| `ql_skill_tang_poison_knife` | สืบทอดมีดบินเคลือบพิษ | ศิษย์ถังเทา | kill → item → turn-in | prereqs |
+| `ql_art_t1_tang_venombody` | สืบทอดกายาร้อยพิษ | หัวหน้าศิษย์ถังหลิน | kill → item → turn-in | prereqs |
+| `ql_skill_tang_starscatter` | สืบทอดดารากระจายฟ้า | ผู้อาวุโสไล่ล่าถังหรง | kill → item → kill → turn-in | prereqs |
+| `ql_art_t2_tang_wavewind` | สืบทอดท่าร่างคลื่นลม | ผู้อาวุโสไล่ล่าถังหรง | kill → item → kill → turn-in | prereqs |
+| `ql_skill_tang_meteorpierce` | สืบทอดดาวตกแหวกฟ้า | รองเจ้าสำนักถังซานหู | kill → item → kill → turn-in | prereqs |
+| `ql_skill_tang_viperblade` | สืบทอดมีดสั้นร้อยอสรพิษ | ผู้อาวุโสมีดถังซือปี้ | kill → item → kill → turn-in | prereqs |
+| `ql_skill_tang_goldsnake` | สืบทอดมีดสั้นงูทอง | ผู้อาวุโสมีดถังซือปี้ | kill → item → kill → turn-in | prereqs |
+| `ql_art_t3_tang_viperpower` | สืบทอดพลังอสรพิษ | ผู้อาวุโสพิษถังจงเทียน | kill → item → kill → turn-in | prereqs |
+| `ql_art_t3_tang_chase` | สืบทอดท่าเท้าไล่ล่า | ผู้อาวุโสไล่ล่าถังหรง | kill → item → kill → turn-in | prereqs |
 
 ### หมู่บ้านชีกู่ (`village_qigu`)
 
@@ -582,6 +700,12 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | Id | Name | Giver | Stages | Notes |
 | --- | --- | --- | --- | --- |
 | `qst_huashan_disciple_intro` | ขอเข้าเป็นศิษย์หัวซาน | อาจารย์ใหญ่อี้ชิง | item+goldAtLeast → turn-in | prereqs |
+| `ql_skill_hs_basic_sword` | สืบทอดกระบี่หัวซาน | ศิษย์เสี่ยวอวิ๋น | kill → turn-in | prereqs |
+| `ql_art_t0_huashan_qi` | สืบทอดกำลังภายในหัวซาน | ศิษย์เจี้ยนอี้ | kill → turn-in | prereqs |
+| `ql_skill_hs_floating_cloud` | สืบทอดกระบี่เมฆาล่องลอย | หัวหน้าศิษย์จงหมิง | kill → item → turn-in | prereqs |
+| `ql_art_t1_huashan_light` | สืบทอดวิชาตัวเบาหัวซาน | หัวหน้าศิษย์จงหมิง | kill → item → turn-in | prereqs |
+| `ql_art_t2_huashan_cloud` | สืบทอดพลังเมฆคล้อย | อาจารย์ดาบชิงซ่ง | kill → item → kill → turn-in | prereqs |
+| `ql_skill_hs_purple_cloud` | สืบทอดกระบี่เมฆาม่วง | รองอาจารย์จื่อเฟิง | kill → item → kill → turn-in | prereqs |
 
 ### หุบเขาตัดใจ (`valley_jueqing`)
 
@@ -595,12 +719,32 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | Id | Name | Giver | Stages | Notes |
 | --- | --- | --- | --- | --- |
 | `qst_hengshan_north_disciple_intro` | ขอเข้าเป็นศิษย์เหิงซานเหนือ | ภิกษุณีติ่งอี้ | item+goldAtLeast → turn-in | prereqs |
+| `ql_skill_hgn_basic_sword` | สืบทอดกระบี่ธรรมเหิงซาน | นักพรตอี๋หลิน | kill → turn-in | prereqs |
+| `ql_art_t0_hgn_zen` | สืบทอดลมปราณนิ่งสงบ | นักพรตอี๋หลิน | kill → turn-in | prereqs |
+| `ql_skill_hgn_dharma_guard` | สืบทอดกระบี่อารักษ์ธรรม | นักพรตจิงซิน | kill → item → turn-in | prereqs |
+| `ql_art_t1_hgn_shield` | สืบทอดโล่ธรรมจักรวาล | นักพรตจิงซิน | kill → item → turn-in | prereqs |
+| `ql_skill_hgn_iron_robe` | สืบทอดกระบี่จีวรเหล็ก | ภิกษุณีอี๋ชิง | kill → item → kill → turn-in | prereqs |
+| `ql_art_t2_hgn_bell` | สืบทอดระฆังพระธรรม | ภิกษุณีอี๋ชิง | kill → item → kill → turn-in | prereqs |
+| `ql_skill_hgn_mirror_blade` | สืบทอดกระบี่กระจกธรรม | ภิกษุณีอี๋เหอ | kill → item → kill → turn-in | prereqs |
+| `ql_art_t3_hgn_mirror` | สืบทอดพลังกระจกธรรม | ภิกษุณีอี๋เหอ | kill → item → kill → turn-in | prereqs |
 
 ### องครักษ์เสื้อแพร (`sect_jinyiwei`)
 
 | Id | Name | Giver | Stages | Notes |
 | --- | --- | --- | --- | --- |
 | `qst_jinyiwei_disciple_intro` | ขอเข้าเป็นศิษย์องครักษ์ | ผู้บัญชาการจ้าวฝู่ | kidnap → turn-in | prereqs |
+| `ql_skill_jy_chain` | สืบทอดโซ่กรงเล็บฝึกหัด | องครักษ์ลู่ | kill → turn-in | prereqs |
+| `ql_art_jy_a0_brocade` | สืบทอดลมปราณเสื้อแพร | องครักษ์ฉิน | kill → turn-in | prereqs |
+| `ql_skill_jy_blade` | สืบทอดดาบราชสำนัก | องครักษ์ฉิน | kill → item → turn-in | prereqs |
+| `ql_art_jy_a1_silktread` | สืบทอดฝีก้าวเส้นไหม | องครักษ์ลู่ | kill → item → turn-in | prereqs |
+| `ql_skill_jy_eagleclaw` | สืบทอดกรงเล็บอินทรี | องครักษ์ลู่ | kill → item → kill → turn-in | prereqs |
+| `ql_skill_jy_grapple` | สืบทอดกรงเล็บคว้าจับ | องครักษ์ลู่ | kill → item → kill → turn-in | prereqs |
+| `ql_art_jy_a2_goldarmor` | สืบทอดเกราะทองอนุรักษ์ | องครักษ์ฉิน | kill → item → kill → turn-in | prereqs |
+| `ql_skill_jy_sword` | สืบทอดกระบี่จารบุรุษ | องครักษ์ฉิน | kill → item → kill → turn-in | prereqs |
+| `ql_skill_jy_chainmaster` | สืบทอดโซ่ทองเก้ามังกร | องครักษ์ลู่ | kill → item → kill → turn-in | prereqs |
+| `ql_skill_jy_blade_king` | สืบทอดดาบเจ้าพระยา | องครักษ์ฉิน | kill → item → kill → turn-in | prereqs |
+| `ql_art_jy_a3_thunderstride` | สืบทอดฟ้าผ่าก้าวเดิน | องครักษ์ลู่ | kill → item → kill → turn-in | prereqs |
+| `ql_art_t3_jy_shadow` | สืบทอดเงาสังหาร | องครักษ์ฉิน | kill → item → kill → turn-in | prereqs |
 
 ### อู่ตัง / บู๊ตึ๊ง (`sect_wudang`)
 
@@ -610,9 +754,29 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qst_wudang_sacred_herb` | บัวหิมะศักดิ์สิทธิ์ | อาจารย์ชิงซวี่ | item → turn-in |  |
 | `qst_wudang_traitor_disciple` | ลูกศิษย์ผู้ทรยศ | อาจารย์ชิงซวี่ | dialog → turn-in | prereqs |
 | `qst_wudang_mountain_seal` | ตราประทับภูเขา | อาจารย์ชิงซวี่ | visit → objective (person) → turn-in |  |
+| `ql_skill_tj` | สืบทอดไทจี้เจี้ยน | ศิษย์ชิงซิน | kill → turn-in | prereqs |
+| `ql_art_t0_meditation` | สืบทอดสมาธิพื้นฐาน | สาวกชิงเฟิง | kill → turn-in | prereqs |
+| `ql_skill_rf` | สืบทอดสะท้อนพลัง | หัวหน้าศิษย์จื้อหรง | kill → item → turn-in | prereqs |
+| `ql_skill_cs` | สืบทอดก้าวเมฆหมอก | สาวกชิงเฟิง | kill → item → turn-in | prereqs |
+| `ql_skill_wd_taiji_sword` | สืบทอดกระบี่ไทเก๊ก | หัวหน้าศิษย์จื้อหรง | kill → item → turn-in | prereqs |
+| `ql_art_t1_naturalqi` | สืบทอดพลังธรรมชาติ | อาจารย์ปราณเป่าชุน | kill → item → turn-in | prereqs |
+| `ql_skill_yy` | สืบทอดหยิน-หยางฝ่า | อาจารย์ปราณเป่าชุน | kill → item → kill → turn-in | prereqs |
+| `ql_skill_wd_yinyang_sword` | สืบทอดกระบี่หยินหยาง | ศิษย์อวี่เจี้ยน | kill → item → kill → turn-in | prereqs |
+| `ql_art_t2_mindbody` | สืบทอดจิตกายนวมเป็นหนึ่ง | อาจารย์ปราณเป่าชุน | kill → item → kill → turn-in | prereqs |
+| `ql_skill_wd_cloud_palm` | สืบทอดหมัดเคลื่อนเมฆา | รองอาจารย์เสวียนเฉิง | kill → item → kill → turn-in | prereqs |
+| `ql_skill_wd_cloud_sword` | สืบทอดกระบี่เคลื่อนเมฆา | อาจารย์ดาบหลิงอวี้ | kill → item → kill → turn-in | prereqs |
+| `ql_art_t3_yinyang` | สืบทอดหยินหยางสมดุล | รองอาจารย์เสวียนเฉิง | kill → item → kill → turn-in | prereqs |
 
 ### เฮิงซาน (`sect_hengshan_south`)
 
 | Id | Name | Giver | Stages | Notes |
 | --- | --- | --- | --- | --- |
 | `qst_hengshan_south_disciple_intro` | ขอเข้าเป็นศิษย์เฮิงซานใต้ | อาจารย์ใหญ่โม่ต้า | item+goldAtLeast → turn-in | prereqs |
+| `ql_skill_hgs_basic_sword` | สืบทอดกระบี่เฮิงซาน | ศิษย์เยว่ผาน | kill → turn-in | prereqs |
+| `ql_art_t0_hgs_breath` | สืบทอดลมหายใจห้ายอด | ศิษย์ชิงเฟิง | kill → turn-in | prereqs |
+| `ql_skill_hgs_dancing_step` | สืบทอดกระบี่ระบำเริงรำ | ศิษย์เยว่ผาน | kill → item → turn-in | prereqs |
+| `ql_art_t1_hgs_step` | สืบทอดตัวเบาเฮิงซาน | ศิษย์ชิงเฟิง | kill → item → turn-in | prereqs |
+| `ql_skill_hgs_five_peaks` | สืบทอดกระบี่ห้ายอด | อาจารย์กระบี่ลู่เก๋อ | kill → item → kill → turn-in | prereqs |
+| `ql_art_t2_hgs_cloud` | สืบทอดระบำเมฆาห้ายอด | อาจารย์กระบี่ลู่เก๋อ | kill → item → kill → turn-in | prereqs |
+| `ql_skill_hgs_swift_blade` | สืบทอดกระบี่ลมรวดเร็ว | รองอาจารย์หลิวเจิ้งเฟิง | kill → item → kill → turn-in | prereqs |
+| `ql_art_t3_hgs_swift` | สืบทอดลมรวดเร็ว | รองอาจารย์หลิวเจิ้งเฟิง | kill → item → kill → turn-in | prereqs |

@@ -14,7 +14,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **What the player does:**
 
 - Explores 102 places (101 painted maps) joined by 128 roads.
-- Meets 157 NPCs and takes 276 quests.
+- Meets 157 NPCs and takes 770 quests: 276 hand-written, 154 sect lineage quests and 38 story sagas (340 chapters) with 292 cutscenes.
 - Joins one of 15 sects and learns 178 move skills and 122 inner arts.
 - Gathers and crafts (19 life skills).
 - Steals and gets jailed.
@@ -66,6 +66,7 @@ bun run test:grid-ai
 bun run test:grid-skills
 bun run test:grid-store
 bun run test:npcs
+bun run test:story          # every sect skill/art has a quest; lineage + sagas + cutscenes well formed; all play through
 bun run test:quests         # campaign audit + dead ends + every item/kill/objective quest + guidance + bad-action stages
 bun run test:docs           # generated reference is current + docs links/paths/commands resolve
 bun run test:e2e            # Playwright (Chromium) on :3017 — start a production server first
@@ -177,7 +178,7 @@ Two deliberate exceptions reach into stores:
 - **Scenes** (`kind`: `dialog | location | route`).
   - A dialog with `next` and no `choices` **auto-advances without showing its lines**. For narration, use one confirmation choice (`{ text: "ก้าวต่อไป", next }`).
   - A terminal dialog (no choices, no next) shows "ปิด", which returns to `lastLocationId`.
-- **`SceneEffect`** (26 kinds) and **`Condition`** (24 kinds) live in `types.ts`, dispatched by `effects.ts` / `conditions.ts`.
+- **`SceneEffect`** (26 kinds) and **`Condition`** (26 kinds) live in `types.ts`, dispatched by `effects.ts` / `conditions.ts`.
   - **The `applyEffect` switch has no exhaustiveness guard**: a new variant without a case compiles and does nothing.
   - Counted conditions also need `describeQuestCondition` and the quest guide's `unmetLeaf`.
 - **Quest progress.**
@@ -215,6 +216,11 @@ Two deliberate exceptions reach into stores:
   - maintains rumors (caps 200 / 500, archive after 365 days).
 
   Rumors stay in their region. See [docs/liveness.md](docs/liveness.md).
+- **Lineage quests and sagas** (`lib/world/story/`, content in `lib/world/data/story/`). Compact specs compile into quests, dialogs and cutscenes ([docs/story-quests.md](docs/story-quests.md)).
+  - Every sect T0–T3 skill / art has one lineage quest `ql_<skill|art>_<id>` (type `side`, `lineage`), gated and sized by tier (`LINEAGE_TIERS`).
+  - Every sect T4 is the reward of a saga: 8–10 chapters `st_<arcId>_<nn>` (type `story`), chained on the previous chapter, with films (`DialogScene.cutscene`) and paged dialogs (`paged`).
+  - Seven old T4 art quests are now prologue trials (`SAGA_PROLOGUES`) that gate their saga and teach nothing.
+  - Story and lineage quests can't be abandoned and don't fail when their giver dies.
 - **Repair** (`validate.ts`). `validateAndRepair` runs on every load and drops dangling ids.
 
 ## Stores (`store/`)
@@ -274,8 +280,8 @@ Two deliberate exceptions reach into stores:
 - **Field names.** Combat tables in `lib/game/data/` keep **short field names** (`n`, `sc`, `ti`, `w`, `mg`, `st`, `at`, `bp`, `p`, `f`, `dm`, `dr`, `se`, `ee`, `types`), matching `demo.html`. World tables use readable names (`name`, `description`, `price`).
 - **Ids** are lowercase snake case with conventional prefixes:
   - places: `city_`, `village_`, `sect_`, `cave_`, `inn_`…;
-  - quests: `qc_`, `qv_`, `qw_`, `qe_`, `qst_`;
-  - opponents: `spar_`, `hunt_`, `hunter_`, `law_`, `elite_`;
+  - quests: `qc_`, `qv_`, `qw_`, `qe_`, `qst_`; compiled `ql_` (lineage) and `st_` (saga chapters);
+  - opponents: `spar_`, `hunt_`, `hunter_`, `law_`, `elite_`, `st_` (saga foes);
   - manuals: `man_`.
 
   **A location's prefix decides** its categories (practice, bonus), encounter zone, rest options and auto-map spots.
@@ -296,7 +302,7 @@ Most additions are data only. Follow [docs/content-authoring.md](docs/content-au
 | an NPC | a regional `npcs/` file (+ talk dialog, spar opponent, art ids) |
 | a quest | a regional `quests/` file (+ `qs_` scenes); stages need an `autoAdvance`, an `objective` or reachable dialog beats |
 | an item, shop, hall, recipe, artisan, node or opponent | its table in `lib/world/data/` |
-| a skill or art | `lib/game/data/`; then sort, icon, battle range, and a way to learn it |
+| a skill or art | `lib/game/data/`; then sort, icon, battle range, and a way to learn it (a sect one also needs a lineage quest or saga — `test:story`) |
 | a joinable sect | the long checklist in the guide |
 
 New engine variants (effects, conditions, combat effects) are code changes. Update every dispatcher; for combat, see [docs/combat.md](docs/combat.md#changing-combat-safely).

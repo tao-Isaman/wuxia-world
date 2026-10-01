@@ -225,7 +225,7 @@ Walk up to a person and talk. The NPC card offers what that person supports:
 
 ## Quests and tracking
 
-There are 276 quests: one main quest and 275 side quests, 97 of them sect quests.
+There are 770 quests: one main quest, 429 side quests (97 sect quests and 154 lineage quests) and 340 story chapters in 38 sagas — see [Lineage quests and sagas](#lineage-quests-and-sagas).
 
 - **Accepting.** Most quests are offered by a person (the **!** mark). Sect quests are taken in the สำนัก menu.
 - **Stages.** A quest has 1–4 stages. The quest log (ภารกิจ) shows each one with ✓ done, ▸ current and ○ still ahead.
@@ -246,7 +246,29 @@ There are 276 quests: one main quest and 275 side quests, 97 of them sect quests
 
   On the map a jade arrow bobs over the target, or over the exit toward it. An edge pointer shows the way when the target is off screen. **➤ นำทาง** in the log points the arrow at a quest.
 - **Abandoning** (ละทิ้งภารกิจ) fails the quest for good. It can never be taken again.
-- **Losing the giver.** A quest fails when its giver, one of the simulated masters, dies.
+- **Losing the giver.** A quest fails when its giver, one of the simulated masters, dies. Lineage quests and saga chapters don't.
+
+### Lineage quests and sagas
+
+Every sect skill and art can be earned from a sect NPC ([story-quests.md](story-quests.md)):
+
+- **Lineage quests** (สืบทอดวิชา) teach a tier 0–3 skill or art. The higher the tier, the harder:
+
+  | Tier | Needs | Task | Rewards |
+  | --- | --- | --- | --- |
+  | 0 | membership | beat 2 foes | the skill, w-exp 60, 20 sect points |
+  | 1 | ¼ up the rank ladder, stat 10 | 3 foes, bring 2 items | w-exp 120, 40 points |
+  | 2 | ½ up, stat 15 | 3 foes, 3 items, beat the teacher in a spar | w-exp 200, 60 points |
+  | 3 | ¾ up, stat 25 | 4 foes, 2 items, spar | w-exp 320, 100 points |
+
+  The stat is the item's strongest, counted without gear. The three outsider sects, which can't be joined, ask for a way of life instead: evil for ดาวดึงส์ and ดาบโลหิต, the venom life skill for เบญจพิษ.
+- **Story sagas** (ตำนาน, 📜) lead to a tier-4 skill or art. Each is 8–10 chapters that retell a legend of มังกรหยก ภาค 3 — set over a hundred years later, with the old heroes in sepia flashbacks — and pay small rewards along the way; the last chapter teaches the technique.
+  - Chapter 1 needs a high rank and a stat of 40 (or a way of life for the outsiders); each later chapter opens when the previous one is done.
+  - Seven sects' old art quests are now **prologue trials** (บททดสอบก่อนตำนาน) that must be passed before the saga starts.
+  - Chapters send you between places to visit, talk, hunt, gather and duel. A duel is never fatal; lose it and try again.
+  - Many scenes open with a **film** on the painted map: subtitles, title cards and moods. Tap to go on, ▶ อัตโนมัติ to play hands-free, ข้าม to skip. Long talks show a page at a time (ต่อ ▶).
+  - The quest log's **ตำนาน** tab lists every saga with its progress and who gives the next chapter, and replays films already seen (🎬).
+- Neither kind can be abandoned.
 
 The quest list per giver and location is in [reference/quests.md](reference/quests.md).
 
@@ -274,7 +296,7 @@ There are 15 joinable sects and 5 more sect grounds you can only visit.
 - **Ranks** count down: 9 → 1 (eight sects), 5 → 1 (six sects) or 3 → 1 (กู่มู่). A lower number is higher.
   - Sect quests pay sect points, and a rank-up spends them: 6250 points in total on a 9-rank ladder, 1850 on a 5-rank ladder, 1600 for กู่มู่.
   - Each rank unlocks a reward pool. A pool with one skill or art is granted at once; otherwise you pick one in 🎖 รางวัลขั้น.
-- **Sect quests** (📜 ภารกิจประจำ) can repeat, each 30 days after you last completed it. Some need a minimum rank, and each sect has one art quest.
+- **Sect quests** (📜 ภารกิจประจำ) can repeat, each 30 days after you last completed it. Some need a minimum rank, and each sect has one art quest (seven of them are now saga prologue trials).
 - **Leaving** (in the sect menu) — either way, you can never join that sect again:
   - **ลาออกอย่างเป็นทางการ** (resign): you keep the skills, but those learned from the sect stop gaining xp in battle.
   - **ทรยศสำนัก** (betray): evil +5, and the sect's hunter (a tier-4 foe) may ambush you on 30 % of walk ticks. The sect's redemption quest ends the hunt by turning the betrayal into a resignation. สำนักสราญรมย์ has no redemption quest.

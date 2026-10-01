@@ -28,7 +28,7 @@ A new game starts at the hero's home (`home_player`), next door to the capital (
 | `bun run build` / `bun start` | production build / serve it |
 | `bun run typecheck` | `tsc --noEmit` |
 | `bun run lint` | ESLint (app, components, lib) |
-| `bun run test:<suite>` | unit suites — `runtime`, `combat`, `opening`, `navigation`, `battle-background`, `rumors`, `investigation`, `audio`, `law`, `walk`, `grid`, `grid-ai`, `grid-skills`, `grid-store`, `quests`, `docs` |
+| `bun run test:<suite>` | unit suites — `runtime`, `combat`, `opening`, `navigation`, `battle-background`, `rumors`, `investigation`, `audio`, `law`, `walk`, `grid`, `grid-ai`, `grid-skills`, `grid-store`, `npcs`, `story`, `quests`, `docs` |
 | `bun run test:e2e` | Playwright browser tests on :3017 — run `bun run build` and `bun run start -p 3017` first |
 | `bun scripts/audit-content.ts` | check every content reference resolves |
 | `bun scripts/build-docs-reference.ts` | regenerate the content reference in `docs/reference/` |
@@ -41,7 +41,8 @@ What each suite covers and how to run e2e: [docs/testing.md](docs/testing.md). E
 | --- | --- |
 | **World** | 102 places (97 on the world map), joined by 128 hand-named roads; 101 painted maps with collision; day and night on a 12-ชั่วยาม clock |
 | **People** | 157 NPCs with portraits and sprites; 20 of them (the sect masters) age, train, feud and die in a weekly background simulation |
-| **Quests** | 276 quests (1 main, 275 side, 97 of them sect quests), with item, kill, visit, objective and dialog stages; any quest can be tracked, with a HUD tracker and a map arrow |
+| **Quests** | 770 quests: 1 main, 429 side (97 sect quests and 154 lineage quests that pass on every sect skill and art up to tier 3) and 340 story chapters, with item, kill, visit, objective and dialog stages; any quest can be tracked, with a HUD tracker and a map arrow |
+| **Story sagas** | 38 sagas of 8–10 chapters, one per tier-4 sect skill or art, retelling legends of มังกรหยก ภาค 3 with 292 cutscenes played on the painted maps |
 | **Sects** | 20 sect grounds; 15 are joinable, each with an intro quest, a rank ladder, rank rewards, repeatable sect quests, and hunters for betrayers |
 | **Combat** | turn-based tactics on a 10 × 7 board, up to 15 × 10 for big gangs. Per-unit turn order by speed; move and cast with ranges and areas; enemy packs; retreat; auto-play |
 | **Martial arts** | 178 move skills and 122 inner arts in tiers 0–4 (three tier-5 arts). Levels 1–10, weapon mastery, type conflict; 76 pieces of gear |

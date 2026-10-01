@@ -25,7 +25,7 @@ The wave-by-wave history that used to live in this file has moved to [docs/chang
 A Thai wuxia RPG in the browser: Next.js 15, React 19, TypeScript, Phaser 4, Zustand.
 
 - **Exploring.** The hero walks painted maps: 102 places, 128 roads.
-- **Doing.** They talk to 157 NPCs, take 276 quests, join one of 15 sects, gather, craft, steal, and land in jail.
+- **Doing.** They talk to 157 NPCs, take 770 quests (154 sect lineage quests and 38 story sagas among them), join one of 15 sects, gather, craft, steal, and land in jail.
 - **Fighting.** Battles are turn-based tactics on a 10 × 7 board that grows to 15 × 10 for big gangs (up to 6 pack members plus the leader).
 - **Code.** Two pure engines (`lib/game`, `lib/world`) sit under Zustand stores and React / Phaser views. The world saves to `localStorage` (version 21).
 
@@ -69,16 +69,17 @@ Checked on 2026-10-01 for wave 27 (animated, wandering NPCs and villain bosses):
 | `test:grid-skills` | 7 checks pass |
 | `test:grid-store` | 13 checks pass |
 | `test:npcs` | 7 checks pass |
-| `test:quests` | the campaign audit passes (276 quests, 102 reachable locations); 213 item / kill / objective quests hand in through the real store; guidance covers 650 of 657 stages; all 39 steal / assassinate / kidnap stages offer the action and advance |
+| `test:story` | 6 checks pass: 154 lineage quests, 38 sagas (340 chapters), 292 cutscenes; every quest and chapter plays through in the real store |
+| `test:quests` | the campaign audit passes (770 quests, 102 reachable locations); 213 item / kill / objective quests hand in through the real store; guidance covers 650 of 657 stages; all 39 steal / assassinate / kidnap stages offer the action and advance |
 | `test:docs` | the generated reference is current; every link, repo path and command in the docs resolves |
-| `bun scripts/audit-content.ts` | 157 NPCs · 276 quests · 996 scenes, all references resolve |
-| `bun run build` | passes; `/` first-load JS 508 kB |
-| `bun run test:e2e` | all 20 Playwright tests pass against the production build on :3017 (about 10 minutes, Chromium 141 via the container shim) |
+| `bun scripts/audit-content.ts` | 157 NPCs · 770 quests · 2529 scenes, all references resolve |
+| `bun run build` | passes; `/` first-load JS 984 kB (was 508 kB; the saga text is about 2.9 MB of source, ~500 kB gzipped) |
+| `bun run test:e2e` | all 21 Playwright tests pass against the production build on :3017 (about 10 minutes, Chromium 141 via the container shim) |
 
 Not verified:
 
 - **Browsers.** Only Chromium has run the browser tests, and only with emulated phone viewports, never physical phones.
-- **Quests by hand.** No one has played all 276 quests by hand; the quest audits stand in.
+- **Quests by hand.** No one has played all 770 quests by hand; the quest audits and `test:story` stand in. The 38 sagas' writing has been checked by the validator, not proofread line by line.
 - **Balance.** No systematic balance pass has been done since the grid battle.
 
 ## Known issues
@@ -170,6 +171,14 @@ Real behaviour today, found during the docs audit. Each is small and self-contai
 33. **Approximate side and back views.** The 30 rigged sheets are puppet poses of front-facing paintings: limbs bend as whole parts (sleeves and robes swing with the leg or torso they sit on), the side walk is a narrower, leaning front view, and the back view only repaints the head (a beard below the neck stays). New side and back art per NPC would replace `public/art/characters/npc/` one for one.
 34. **Villain bosses and their NPCs coexist.** A villain met on the road is the same person who stands at their base; beating them on the road changes nothing there. Only killing, kidnapping or a death in the simulation removes them from the encounter pool.
 
+### Story quests
+
+35. **Saga foes and their NPCs coexist.** A saga boss that borrows an NPC's sheet (`st_outsider_sixfold_dushi` uses ตู๋ซื่อ) still fights even if that NPC was killed or kidnapped earlier.
+36. **Cutscene actors are the map sprites.** Films stage the same rigged sheets and archetypes, so side and back views are approximate (see 33), and novel heroes in flashbacks borrow archetype bodies.
+37. **Thai name renderings.** Novel names follow the Thai translation (เตียบ่อกี้, เจียซุ่น, เอี้ยก้วย…), but transliterations of new characters vary between writers.
+38. **Bundle size.** The story content is bundled with the rest of the world data, nearly doubling `/`'s first load (508 → 984 kB). Loading `lib/world/data/story/` lazily would need the quest and scene tables to become async.
+39. **Lineage teachers are fixed.** If a lineage teacher dies in the simulation, the quest can still be accepted and handed in on their card (dead NPCs stay on the map), which reads oddly.
+
 ## Suggested next steps
 
 In rough priority order:
@@ -200,6 +209,10 @@ In rough priority order:
    - Wire `test-world-vignettes.ts`.
    - Move off `next lint`.
    - Add a CI workflow that runs typecheck, lint and the `test:*` suites.
+8. **Story content:**
+   - Load `lib/world/data/story/` lazily to win back the ~480 kB of first load (issue 38).
+   - Proofread the 38 sagas in play, and unify transliterations of new names.
+   - Give saga bosses that borrow an NPC's sheet their own sprite, or skip them once that NPC is gone (issue 35).
 
 ## Environment notes
 
