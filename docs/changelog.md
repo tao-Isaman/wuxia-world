@@ -6,6 +6,14 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-01
 
+### One way to every sect skill: its quest
+
+- **Sect ranks no longer grant martial arts.** The skill and art pools (`skillsByRank` / `artsByRank`), the reward picker and the auto-grants are gone. A rank-up now pays gold (`rankUpGold`, half its point cost) and opens more lineage quests and sagas. The sect window's tab is now 🎖 ขั้นและวิชา: rank-up, then every sect skill and art with its quest and what it still needs.
+- **Old quests stop teaching sect skills.** The eight T3 sect art quests are now lineage prologue trials (`LINEAGE_PROLOGUES`) that open their art's lineage quest. Six other quests pay gold instead: `qst_shaolin_proof_of_heart`, `qst_shaolin_iron_training`, `qst_shaolin_wudang_joint`, `qst_wudang_sacred_herb`, `qw_kunlun_exile_truth` and `qe_xueyu_sect_initiation` (which taught the T4 `blood` and skipped its saga). Their lines were rewritten to match.
+- **25 sect manuals removed** (`man_sf`, `man_tj`, `man_jy_*`…), with their drops; seven spy quests pay 400 gold instead. Saves drop them on load. The dangling `man_ne2` drop went too.
+- **Resigning** freezes the xp of every skill and art of that sect, not only the old rank picks.
+- `test:story` checks that nothing but the lineage quest or saga teaches a sect skill or art.
+
 ### Sect lineage quests, story sagas and cutscenes
 
 - **Every sect skill and art now has a quest.** 154 lineage quests (สืบทอดวิชา, `ql_*`) pass on each tier 0–3 sect skill and art from an NPC at the sect's grounds. Difficulty follows the tier: rank and gearless-stat gates, more foes, items, and a spar with the teacher from T2. The outsider sects gate on evil or the venom life skill.

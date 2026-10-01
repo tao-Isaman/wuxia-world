@@ -27,7 +27,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qst_shaolin_sect_patrol` | ตรวจตราเขตวัด | เจ้าอาวาสฮุยหยวน | kill → turn-in | prereqs |
 | `qst_shaolin_sect_herb_run` | ส่งสมุนไพรให้วัด | เจ้าอาวาสฮุยหยวน | item → turn-in | prereqs |
 | `qst_shaolin_sect_meditation` | ปฏิบัติธรรมที่ถ้ำลึก | เจ้าอาวาสฮุยหยวน | item → turn-in | rank ≤ 7, prereqs |
-| `qst_shaolin_art_zen_finger` | ตำราเอกนิ้วเซน | เจ้าอาวาสฮุยหยวน | kill → item → turn-in | art, rank ≤ 5, prereqs |
+| `qst_shaolin_art_zen_finger` | บททดสอบก่อนสืบทอด: เอกนิ้วเซน | เจ้าอาวาสฮุยหยวน | kill → item → turn-in | art, rank ≤ 5, prereqs |
 | `qst_shaolin_art_legendary` | บททดสอบก่อนตำนาน: พลังเปลี่ยนเส้นเอ็น | เจ้าอาวาสฮุยหยวน | kill → trait → turn-in | art, rank ≤ 2, prereqs |
 | `qst_shaolin_redemption` | ไถ่บาปต่อเส้าหลิน | เจ้าอาวาสฮุยหยวน | kill → item → turn-in | prereqs |
 | `qst_shaolin_sect_protect_village` | ปกป้องชาวบ้านจากโจร | เจ้าอาวาสฮุยหยวน | kill → item → turn-in | prereqs |
@@ -39,7 +39,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | --- | --- | --- | --- | --- |
 | `qst_wudang_sect_patrol` | ตรวจตรารอบเขาอู่ตัง | อาจารย์ชิงซวี่ | kill → turn-in | prereqs |
 | `qst_wudang_sect_herb_run` | เก็บสมุนไพรเขาอู่ตัง | อาจารย์ชิงซวี่ | item → turn-in | prereqs |
-| `qst_wudang_art_yinyang` | ตำราหยินหยางสมดุล | อาจารย์ชิงซวี่ | kill → item → turn-in | art, rank ≤ 5, prereqs |
+| `qst_wudang_art_yinyang` | บททดสอบก่อนสืบทอด: หยินหยางสมดุล | อาจารย์ชิงซวี่ | kill → item → turn-in | art, rank ≤ 5, prereqs |
 | `qst_wudang_redemption` | ไถ่บาปต่ออู่ตัง | อาจารย์ชิงซวี่ | kill → item → turn-in | prereqs |
 | `qst_wudang_sect_kindling` | ทำความสะอาดศาลา | อาจารย์ชิงซวี่ | item → turn-in | prereqs |
 | `qst_wudang_sect_ginseng_run` | เก็บโสมเทพในป่าเขา | อาจารย์ชิงซวี่ | item → turn-in | prereqs |
@@ -76,7 +76,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qst_songshan_sect_patrol` | ลาดตระเวนเชิงเขาซงซาน | อาจารย์ใหญ่จั่วเหลิงฉาน | kill → turn-in | prereqs |
 | `qst_songshan_sect_iron` | ส่งเหล็กดิบให้โรงตีดาบ | อาจารย์ใหญ่จั่วเหลิงฉาน | item → turn-in | prereqs |
 | `qst_songshan_sect_wooden` | ส่งไม้แข็งให้โรงดาบ | อาจารย์ใหญ่จั่วเหลิงฉาน | item → turn-in | prereqs |
-| `qst_songshan_art_pillar` | ตำราพลังเสาภูผา | อาจารย์ใหญ่จั่วเหลิงฉาน | kill → item → turn-in | art, rank ≤ 3, prereqs |
+| `qst_songshan_art_pillar` | บททดสอบก่อนสืบทอด: พลังเสาภูผา | อาจารย์ใหญ่จั่วเหลิงฉาน | kill → item → turn-in | art, rank ≤ 3, prereqs |
 | `qst_songshan_redemption` | ไถ่บาปต่อซงซาน | อาจารย์ใหญ่จั่วเหลิงฉาน | kill → item → turn-in | prereqs |
 
 ### ไท่ซาน (`taishan`)
@@ -86,7 +86,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qst_taishan_sect_patrol` | ลาดตระเวนเชิงเขาบูรพา | เจ้าสำนักเทียนเหมินเต้าเหริน | kill → turn-in | prereqs |
 | `qst_taishan_sect_jade` | ส่งหยกบูชาเทพสุริยัน | เจ้าสำนักเทียนเหมินเต้าเหริน | item → turn-in | prereqs |
 | `qst_taishan_sect_dawn_offering` | เครื่องบูชาแสงแรก | เจ้าสำนักเทียนเหมินเต้าเหริน | item → turn-in | prereqs |
-| `qst_taishan_art_sun` | ตำราหนึ่งพลังสุริยัน | เจ้าสำนักเทียนเหมินเต้าเหริน | kill → item → turn-in | art, rank ≤ 3, prereqs |
+| `qst_taishan_art_sun` | บททดสอบก่อนสืบทอด: หนึ่งกระบี่บูชาตะวัน | เจ้าสำนักเทียนเหมินเต้าเหริน | kill → item → turn-in | art, rank ≤ 3, prereqs |
 | `qst_taishan_redemption` | ไถ่บาปต่อไท่ซาน | เจ้าสำนักเทียนเหมินเต้าเหริน | kill → item → turn-in | prereqs |
 
 ### เฮิงซาน (`hengshan_south`)
@@ -96,7 +96,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qst_hengshan_south_sect_patrol` | ลาดตระเวนรอบห้ายอด | อาจารย์ใหญ่โม่ต้า | kill → turn-in | prereqs |
 | `qst_hengshan_south_sect_silk` | ส่งผ้าไหมให้ห้องเครื่องแต่งกาย | อาจารย์ใหญ่โม่ต้า | item → turn-in | prereqs |
 | `qst_hengshan_south_sect_herb` | ปราบเสือภูเขารบกวนนักดนตรี | อาจารย์ใหญ่โม่ต้า | kill → turn-in | prereqs |
-| `qst_hengshan_south_art_swiftblade` | ตำรากระบี่ลมรวดเร็ว | อาจารย์ใหญ่โม่ต้า | kill → item → turn-in | art, rank ≤ 3, prereqs |
+| `qst_hengshan_south_art_swiftblade` | บททดสอบก่อนสืบทอด: ลมรวดเร็ว | อาจารย์ใหญ่โม่ต้า | kill → item → turn-in | art, rank ≤ 3, prereqs |
 | `qst_hengshan_south_redemption` | ไถ่บาปต่อเฮิงซานใต้ | อาจารย์ใหญ่โม่ต้า | kill → item → turn-in | prereqs |
 
 ### เหิงซาน (`hengshan_north`)
@@ -106,7 +106,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qst_hengshan_north_sect_offering` | เตรียมเครื่องถวายปลายเดือน | ภิกษุณีติ่งอี้ | item → turn-in | prereqs |
 | `qst_hengshan_north_sect_thugs` | ปราบโจรริมเขาเหิงซาน | ภิกษุณีติ่งอี้ | kill → turn-in | prereqs |
 | `qst_hengshan_north_sect_amulet` | ถวายหยกประทับพระ | ภิกษุณีติ่งอี้ | item → turn-in | prereqs |
-| `qst_hengshan_north_art_mirror` | ตำราดาบกระจกธรรม | ภิกษุณีติ่งอี้ | kill → item → turn-in | art, rank ≤ 3, prereqs |
+| `qst_hengshan_north_art_mirror` | บททดสอบก่อนสืบทอด: พลังกระจกธรรม | ภิกษุณีติ่งอี้ | kill → item → turn-in | art, rank ≤ 3, prereqs |
 | `qst_hengshan_north_redemption` | ไถ่บาปต่อเหิงซานเหนือ | ภิกษุณีติ่งอี้ | kill → item → turn-in | prereqs |
 
 ### ฉวนเจิน (`quanzhen`)
@@ -115,7 +115,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | --- | --- | --- | --- | --- |
 | `qst_quanzhen_sect_patrol` | ลาดตระเวนรอบพระราชวังจงหยาง | อาจารย์ใหญ่ฉงหยาง | kill → turn-in | prereqs |
 | `qst_quanzhen_sect_scripture` | คัดลอกตำราเต๋า | อาจารย์ใหญ่ฉงหยาง | item → turn-in | prereqs |
-| `qst_quanzhen_art_sun` | ตำราหนึ่งพลังสุริยันต์ | อาจารย์ใหญ่ฉงหยาง | kill → item → turn-in | art, rank ≤ 3, prereqs |
+| `qst_quanzhen_art_sun` | บททดสอบก่อนสืบทอด: หนึ่งพลังสุริยันต์ | อาจารย์ใหญ่ฉงหยาง | kill → item → turn-in | art, rank ≤ 3, prereqs |
 | `qst_quanzhen_redemption` | ไถ่บาปต่อฉวนเจิน | อาจารย์ใหญ่ฉงหยาง | kill → item → turn-in | prereqs |
 | `qst_quanzhen_sect_patrol2` | ลาดตระเวนภูเขา | อาจารย์ใหญ่ฉงหยาง | kill → turn-in | prereqs |
 
@@ -148,7 +148,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qst_xiaoyao_sect_patrol` | ลาดตระเวนหุบเขาเซียวหยาว | ปรมาจารย์ยุนเซียว | kill → turn-in | prereqs |
 | `qst_xiaoyao_sect_herb` | เก็บสมุนไพรหุบเขาเซียวหยาว | ปรมาจารย์ยุนเซียว | item → turn-in | prereqs |
 | `qst_xiaoyao_sect_music` | ส่งเครื่องเขียนให้นักดนตรี | ปรมาจารย์ยุนเซียว | item → turn-in | prereqs |
-| `qst_xiaoyao_art_seepower` | ตำราวิชาดูพลัง | ปรมาจารย์ยุนเซียว | kill → item → turn-in | art, rank ≤ 4, prereqs |
+| `qst_xiaoyao_art_seepower` | บททดสอบก่อนสืบทอด: วิชาดูพลัง | ปรมาจารย์ยุนเซียว | kill → item → turn-in | art, rank ≤ 4, prereqs |
 | `qst_xiaoyao_sect_instrument` | วัสดุสร้างเครื่องดนตรี | ปรมาจารย์ยุนเซียว | item → turn-in | prereqs |
 | `qst_xiaoyao_sect_intruders` | ขับไล่ผู้บุกรุกหุบเขา | ปรมาจารย์ยุนเซียว | kill → item → turn-in | prereqs |
 | `qst_xiaoyao_sect_ritual` | เตรียมพิธีบูชาเทพเซียน | ปรมาจารย์ยุนเซียว | item → item → turn-in | prereqs |

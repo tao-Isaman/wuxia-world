@@ -151,10 +151,10 @@ export const QUESTS_HENGSHAN_NORTH: readonly QuestDef[] = [
 
   {
     id: "qst_hengshan_north_art_mirror",
-    name: "ตำราดาบกระจกธรรม",
+    name: "บททดสอบก่อนสืบทอด: พลังกระจกธรรม",
     description:
       "ภิกษุณีติ่งอี้ยอมเปิดตำราดาบกระจกธรรมให้ศิษย์ที่พิสูจน์ได้ทั้งดาบและจิตใจ — ต้องผ่านการประลองหัวหน้าโจรและรวบรวมหยกบริสุทธิ์เพื่อขัดกระจกพระธรรม",
-    briefSummary: "ฝึกดาบกระจกธรรม — รับ T3 art ลับของเหิงซานเหนือ",
+    briefSummary: "บททดสอบ — เปิดทางสู่การสืบทอดพลังกระจกธรรม (ขั้น 3)",
     type: "side",
     sectId: "hengshan_north",
     isArtQuest: true,
@@ -170,7 +170,7 @@ export const QUESTS_HENGSHAN_NORTH: readonly QuestDef[] = [
     stages: [
       {
         id: "trial_kill",
-        description: "พิสูจน์ดาบ — ปราบหัวหน้าโจร (bandit_chief) 2 คน",
+        description: "พิสูจน์ดาบ — ปราบหัวหน้าโจร (bandit_chief) 2 คน (ผ่านแล้วจึงรับภารกิจสืบทอดพลังกระจกธรรมได้)",
         autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 2 },
       },
       {
@@ -180,12 +180,12 @@ export const QUESTS_HENGSHAN_NORTH: readonly QuestDef[] = [
       },
       {
         id: "return_art",
-        description: "กลับไปรับตำราจากภิกษุณีติ่งอี้",
+        description: "กลับไปรายงานผลต่อภิกษุณีติ่งอี้",
       },
     ],
     rewards: [
       { t: "wExp", amount: 200 },
-      { t: "learnArt", artId: "t3_hgn_mirror", level: 3 },
+      { t: "gold", amount: 300 },
       { t: "trait", trait: "humility", amount: 5 },
       { t: "sectPoints", sectId: "hengshan_north", amount: 100 },
       { t: "npcRelationship", npcId: "sect_hengshan_north_abbess_dingyi", amount: 10 },

@@ -146,9 +146,9 @@ export const QUESTS_SHAOLIN: readonly QuestDef[] = [
 
   {
     id: "qst_shaolin_art_zen_finger",
-    name: "ตำราเอกนิ้วเซน",
-    description: "เจ้าอาวาสยอมเปิดตำราเอกนิ้วเซน (一指禅) ให้ศิษย์ผู้มีจิตใจสูงสุดได้ฝึก — ผ่านการนั่งวิปัสนาที่ถ้ำซงซานและพิสูจน์ฝีมือ",
-    briefSummary: "ฝึกเอกนิ้วเซน — รับ T3 art ของเส้าหลิน",
+    name: "บททดสอบก่อนสืบทอด: เอกนิ้วเซน",
+    description: "เจ้าอาวาสจะทดสอบก่อนเปิดตำราเอกนิ้วเซน (一指禅) ให้ศิษย์ผู้มีจิตใจสูงสุดได้ฝึก — ผ่านการนั่งวิปัสนาที่ถ้ำซงซานและพิสูจน์ฝีมือ (ผ่านแล้วจึงรับภารกิจสืบทอดเอกนิ้วเซนได้)",
+    briefSummary: "บททดสอบ — เปิดทางสู่การสืบทอดเอกนิ้วเซน (ขั้น 3)",
     type: "side",
     sectId: "shaolin",
     isArtQuest: true,
@@ -174,12 +174,12 @@ export const QUESTS_SHAOLIN: readonly QuestDef[] = [
       },
       {
         id: "return_art",
-        description: "กลับไปรับตำราจากเจ้าอาวาสฮุยหยวน",
+        description: "กลับไปรายงานผลต่อเจ้าอาวาสฮุยหยวน",
       },
     ],
     rewards: [
       { t: "wExp", amount: 200 },
-      { t: "learnArt", artId: "t3_onefinger", level: 3 },
+      { t: "gold", amount: 300 },
       { t: "trait", trait: "humility", amount: 5 },
       { t: "sectPoints", sectId: "shaolin", amount: 100 },
       { t: "npcRelationship", npcId: "sect_shaolin_abbot_huiyuan", amount: 10 },
@@ -330,8 +330,8 @@ export const QUESTS_SHAOLIN: readonly QuestDef[] = [
       },
     ],
     rewards: [
+      { t: "gold", amount: 300 },
       { t: "wExp", amount: 150 },
-      { t: "learnSkill", skillId: "sf" },
       { t: "npcRelationship", npcId: "sect_shaolin_abbot_huiyuan", amount: 20 },
       { t: "trait", trait: "humility", amount: 5 },
       { t: "sectPoints", sectId: "shaolin", amount: 120 },
@@ -357,9 +357,8 @@ export const QUESTS_SHAOLIN: readonly QuestDef[] = [
       },
     ],
     rewards: [
-      { t: "gold", amount: 800 },
+      { t: "gold", amount: 1300 },
       { t: "wExp", amount: 100 },
-      { t: "learnArt", artId: "t1_goldenbell", level: 1 },
       { t: "npcRelationship", npcId: "sect_shaolin_elder_faming", amount: 15 },
       { t: "sectPoints", sectId: "shaolin", amount: 70 },
     ],
@@ -399,11 +398,10 @@ export const QUESTS_SHAOLIN: readonly QuestDef[] = [
       },
     ],
     rewards: [
-      { t: "gold", amount: 1500 },
+      { t: "gold", amount: 2300 },
       { t: "wExp", amount: 200 },
       { t: "trait", trait: "fame", amount: 10 },
       { t: "trait", trait: "good", amount: 5 },
-      { t: "learnArt", artId: "t3_yinyang", level: 1 },
       { t: "npcRelationship", npcId: "sect_shaolin_abbot_huiyuan", amount: 25 },
       { t: "npcRelationship", npcId: "sect_wudang_master_qingxu", amount: 25 },
       { t: "sectPoints", sectId: "shaolin", amount: 200 },

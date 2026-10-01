@@ -1,7 +1,7 @@
 import type { Condition, SectId } from "../types";
 
 // ─── Sect membership definitions ─────────────────────────────────────
-// Per-sect rank table + reward unlock pools. Indexed by SectId — 15 joinable
+// Per-sect rank table. Indexed by SectId — 15 joinable
 // sects, ladders 9 → 1 (8 sects), 5 → 1 (6 sects) or 3 → 1 (gumu).
 //
 // Rank semantics:
@@ -12,12 +12,11 @@ import type { Condition, SectId } from "../types";
 //     the rank just below `targetRank` TO `targetRank`. e.g. for Shaolin
 //     rankUpCost(8) = points needed to go from rank 9 → rank 8.
 //
-// Reward pools:
-//   - `skillsByRank[rank]` — skill ids the player may pick ONE of when they
-//     reach this rank. Empty array = no skill reward at this rank.
-//   - `artsByRank[rank]` — art ids, same rule.
-//   - The player picks at most one skill + one art per rank, tracked in
-//     `SectMembership.rewardPicks`.
+// Martial arts are not rank rewards: every sect skill and art is taught by
+// exactly one quest — a lineage quest (T0–T3) or a story saga (T4), see
+// lib/world/story/ and docs/story-quests.md. Rank gates those quests, and
+// each rank-up pays `rankUpGold` in gold. `SectMembership.rewardPicks`
+// survives in older saves only (skills picked under the old pools).
 
 export interface SectMembershipDef {
   id: SectId;
@@ -35,24 +34,13 @@ export interface SectMembershipDef {
   topRank: number;
   // Cost (sect points) to upgrade INTO this rank from the rank just below.
   rankUpCost: (targetRank: number) => number;
-  // Per-rank reward pools (player picks one of each per qualifying rank).
-  skillsByRank: Record<number, readonly string[]>;
-  artsByRank: Record<number, readonly string[]>;
   // Days between sect-quest re-offers. Used by sect-quest gating in the NPC
   // popup (offer hidden when day - lastQuestDay[questId] < cooldownDays).
   questCooldownDays: number;
 }
 
 // Shaolin disciple ranks. Climbing from rank 9 (entry, novice) to rank 1
-// (abbot's right hand). Rewards mirror docs/specs/shaolin-sheet.md:
-//   rank 9 → choose one T1 move skill + receive T0 art
-//   rank 8 → choose one T2 move skill
-//   rank 7 → receive T1 art
-//   rank 6 → receive T2 art
-//   rank 5 → choose one T3 move skill
-//   rank 4 → receive T3 art
-//   rank 3 → choose one T4 move skill
-//   rank 2 → choose one T4 art
+// (abbot's right hand).
 const SHAOLIN: SectMembershipDef = {
   id: "shaolin",
   name: "เส้าหลิน",
@@ -83,43 +71,13 @@ const SHAOLIN: SectMembershipDef = {
     };
     return table[targetRank] ?? Infinity;
   },
-  skillsByRank: {
-    // T1 — pick one of the staff/fist intermediate options
-    9: ["nd5", "sl_staff_dharma", "sl_staff_shaolin"],
-    // T2 — pick one of the fist/sword intermediate options
-    8: ["ne1", "ne2", "sl_zen_sword"],
-    // T3 — pick one of the master moves
-    5: ["sl_bodhi_palm", "sl_petal_finger", "sl_rock_punch"],
-    // T4 — pick one of the capstone signatures
-    3: ["sl_thousand_arms", "sl_truth_staff"],
-  },
-  artsByRank: {
-    // T0 — gifted on registration
-    9: ["t0_lohan"],
-    // T1 — given when reaching rank 7
-    7: ["t1_goldenbell"],
-    // T2 — given when reaching rank 6
-    6: ["t2_dharma"],
-    // T3 — given when reaching rank 4
-    4: ["t3_onefinger"],
-    // T4 — pick one of the three legendary breaths
-    2: ["tendon", "diamond", "t4_demonsubduer"],
-  },
   questCooldownDays: 30,
 };
 
 // Wudang disciple ranks. Same 9→1 climb as Shaolin, but no gender gate
 // (men and women alike train under Master Qingxu) and a balance / soft /
-// internal reward pool. The Wudang line emphasises sword + fist taiji
-// styles paired with meditation arts; the rank rewards mirror that:
-//   rank 9 → choose one T1 sword/soft (gifted T0 art)
-//   rank 8 → choose one T2 sword/soft
-//   rank 7 → receive T1 art (balance)
-//   rank 6 → receive T2 art (balance)
-//   rank 5 → choose one T3 cloud-style move
-//   rank 4 → receive T3 art (balance / yinyang)
-//   rank 3 → choose one T4 capstone (sword above heaven OR taiji fist song)
-//   rank 2 → choose one T4 art — taiji vs zixia (the two iconic Wudang breaths)
+// internal martial line built on sword + fist taiji styles paired with
+// meditation arts.
 const WUDANG: SectMembershipDef = {
   id: "wudang",
   name: "อู่ตัง",
@@ -143,28 +101,6 @@ const WUDANG: SectMembershipDef = {
     };
     return table[targetRank] ?? Infinity;
   },
-  skillsByRank: {
-    // T1 — pick one of the disciple-line sword OR existing wind-step / reflect
-    9: ["wd_taiji_sword", "rf", "cs"],
-    // T2 — pick one of the intermediate sword or yin-yang palm
-    8: ["wd_yinyang_sword", "yy"],
-    // T3 — pick one of the cloud-style master moves
-    5: ["wd_cloud_palm", "wd_cloud_sword"],
-    // T4 — capstone signature
-    3: ["wd_heaven_sword", "wd_taiji_fist"],
-  },
-  artsByRank: {
-    // T0 — gifted on registration
-    9: ["t0_meditation"],
-    // T1 — given when reaching rank 7
-    7: ["t1_naturalqi"],
-    // T2 — given when reaching rank 6
-    6: ["t2_mindbody"],
-    // T3 — given when reaching rank 4
-    4: ["t3_yinyang"],
-    // T4 — choose ONE of the two iconic Wudang breaths
-    2: ["taiji", "zixia"],
-  },
   questCooldownDays: 30,
 };
 
@@ -173,14 +109,6 @@ const WUDANG: SectMembershipDef = {
 // climb is shorter than the legendary T4 sects (Shaolin / Wudang / etc).
 // Open to anyone who can pay the entry fee — no gender gate, no trait
 // gate beyond a not-evil floor.
-//
-// Reward layout (T0/T1/T2/T3 + T4 art capstone):
-//   rank 5 → T0 sword + T0 art (gifted on registration)
-//   rank 4 → T1 sword + T1 art (auto)
-//   rank 3 → T2 art (auto — sect's only T2 entry)
-//   rank 2 → T3 sword (auto)
-//   rank 1 → choose ONE of two T4 arts — the disciple-line "purple cloud"
-//            OR the older balanced "huashan-shengong" capstone.
 const HUASHAN: SectMembershipDef = {
   id: "huashan",
   name: "หัวซาน",
@@ -198,27 +126,11 @@ const HUASHAN: SectMembershipDef = {
     };
     return table[targetRank] ?? Infinity;
   },
-  skillsByRank: {
-    5: ["hs_basic_sword"],     // T0 sword — auto-grant on join
-    4: ["hs_floating_cloud"],  // T1 sword — auto on rank-up
-    2: ["hs_purple_cloud"],    // T3 sword — auto on rank-up
-  },
-  artsByRank: {
-    5: ["t0_huashan_qi"],      // T0 art — auto on join
-    4: ["t1_huashan_light"],   // T1 art — auto
-    3: ["t2_huashan_cloud"],   // T2 art — auto
-    1: ["t4_huashan_purple", "huashan"], // T4 capstone — pick one
-  },
   questCooldownDays: 30,
 };
 
 // Songshan disciple ranks. T3 sect — central peak iron-sword. Compressed
-// 5-rank ladder. Reward layout:
-//   rank 5 → T0 sword + T0 art (auto on join)
-//   rank 4 → T1 sword + T1 art (auto)
-//   rank 3 → T2 sword + T2 art (auto)
-//   rank 2 → T3 sword (auto)
-//   rank 1 → T3 art capstone (auto, paired with art quest early-grant)
+// 5-rank ladder.
 const SONGSHAN: SectMembershipDef = {
   id: "songshan",
   name: "ซงซาน",
@@ -232,18 +144,6 @@ const SONGSHAN: SectMembershipDef = {
       4: 100, 3: 250, 2: 500, 1: 1000,
     };
     return table[targetRank] ?? Infinity;
-  },
-  skillsByRank: {
-    5: ["ssh_basic_sword"],
-    4: ["ssh_iron_strike"],
-    3: ["ssh_central_blade"],
-    2: ["ssh_song_pillar"],
-  },
-  artsByRank: {
-    5: ["t0_ssh_qi"],
-    4: ["t1_ssh_iron"],
-    3: ["t2_ssh_root"],
-    1: ["t3_ssh_pillar"],
   },
   questCooldownDays: 30,
 };
@@ -264,18 +164,6 @@ const TAISHAN: SectMembershipDef = {
     };
     return table[targetRank] ?? Infinity;
   },
-  skillsByRank: {
-    5: ["tsh_basic_sword"],
-    4: ["tsh_dawn_strike"],
-    3: ["tsh_east_blade"],
-    2: ["tsh_sun_pierce"],
-  },
-  artsByRank: {
-    5: ["t0_tsh_qi"],
-    4: ["t1_tsh_dawn"],
-    3: ["t2_tsh_peak"],
-    1: ["t3_tsh_sun"],
-  },
   questCooldownDays: 30,
 };
 
@@ -294,18 +182,6 @@ const HENGSHAN_SOUTH: SectMembershipDef = {
       4: 100, 3: 250, 2: 500, 1: 1000,
     };
     return table[targetRank] ?? Infinity;
-  },
-  skillsByRank: {
-    5: ["hgs_basic_sword"],
-    4: ["hgs_dancing_step"],
-    3: ["hgs_five_peaks"],
-    2: ["hgs_swift_blade"],
-  },
-  artsByRank: {
-    5: ["t0_hgs_breath"],
-    4: ["t1_hgs_step"],
-    3: ["t2_hgs_cloud"],
-    1: ["t3_hgs_swift"],
   },
   questCooldownDays: 30,
 };
@@ -326,47 +202,20 @@ const HENGSHAN_NORTH: SectMembershipDef = {
     };
     return table[targetRank] ?? Infinity;
   },
-  skillsByRank: {
-    5: ["hgn_basic_sword"],
-    4: ["hgn_dharma_guard"],
-    3: ["hgn_iron_robe"],
-    2: ["hgn_mirror_blade"],
-  },
-  artsByRank: {
-    5: ["t0_hgn_zen"],
-    4: ["t1_hgn_shield"],
-    3: ["t2_hgn_bell"],
-    1: ["t3_hgn_mirror"],
-  },
   questCooldownDays: 30,
 };
 
 // Quanzhen disciple ranks. Like Huashan, leadership caps at T3 — strong
 // but not on the legendary Shaolin/Wudang tier. Open to anyone (no
 // gender gate, no money) — Quanzhen Daoists are ascetics: the only fee
-// is sincere effort. Rank rewards mix new yang/hard sword + fist line
-// with the existing T2 entries (qzjf / qz_punch / qzzq).
-//
-// Reward layout:
-//   rank 9 → T0 sword + T0 art (gifted on registration)
-//   rank 8 → T1 sword (auto)
-//   rank 7 → T1 art (auto)
-//   rank 6 → T2 art `qzzq` (auto — uses existing breath)
-//   rank 5 → choose T3 weapon — sun fist OR sun sword
-//   rank 2 → choose T3 art — sun power OR ocean-of-yang dragon-slayer
-//            (Quanzhen tops out at T3 — no T4 capstone art)
+// is sincere effort.
 const QUANZHEN: SectMembershipDef = {
   id: "quanzhen",
   name: "ฉวนเจิน",
   hallLocationId: "sect_quanzhen",
   registrarNpcId: "sect_quanzhen_master_chongyang",
   joinRequirements: { t: "trait", trait: "evil", max: 10 },
-  // T3 sect — compressed 5-rank ladder. Reward layout:
-  //   rank 5 → T0 sword + T0 art (auto on join)
-  //   rank 4 → T1 sword + T1 art (auto)
-  //   rank 3 → T2 art qzzq (auto — sect's only T2 entry)
-  //   rank 2 → choose T3 weapon (sun fist OR sun sword)
-  //   rank 1 → choose T3 art (sun power OR ocean-yang dragon-slayer)
+  // T3 sect — compressed 5-rank ladder.
   startRank: 5,
   topRank: 1,
   rankUpCost: (targetRank) => {
@@ -378,17 +227,6 @@ const QUANZHEN: SectMembershipDef = {
     };
     return table[targetRank] ?? Infinity;
   },
-  skillsByRank: {
-    5: ["qz_heavy_sword"],     // T0 — auto on join
-    4: ["qz_hot_sword"],       // T1 — auto on rank-up
-    2: ["qz_sun_fist", "qz_sun_sword"], // T3 — choice
-  },
-  artsByRank: {
-    5: ["t0_qz_speed"],        // T0 — auto on join
-    4: ["t1_qz_horse"],        // T1 — auto
-    3: ["qzzq"],               // T2 — auto (existing breath)
-    1: ["t3_qz_sun", "t3_qz_dragon"], // T3 — choice (Quanzhen has no T4 art)
-  },
   questCooldownDays: 30,
 };
 
@@ -397,16 +235,6 @@ const QUANZHEN: SectMembershipDef = {
 // at the gate. Yin / internal sword + fist combat identity, with the
 // bodhisattva-line palm + sword as the T4 capstones and a healing-art
 // focus throughout (heart / lotus / ice breath).
-//
-// Reward layout:
-//   rank 9 → T0 sword + T0 art (gifted on registration)
-//   rank 8 → T1 sword (auto)
-//   rank 7 → T1 art (auto)
-//   rank 6 → T2 art (auto)
-//   rank 5 → choose T3 sword (Buddha-method vs plum-blossom)
-//   rank 4 → choose T3 art (heart vs grace vs ice breath)
-//   rank 3 → choose T4 weapon (bodhi palm vs bodhi-guardian sword)
-//   rank 2 → choose T4 art — ascetic bodhisattva OR the older shengong
 const EMEI: SectMembershipDef = {
   id: "emei",
   name: "ง้อไบ๊",
@@ -436,19 +264,6 @@ const EMEI: SectMembershipDef = {
     };
     return table[targetRank] ?? Infinity;
   },
-  skillsByRank: {
-    9: ["em_graceful_sword"],   // T0 sword — auto on join
-    8: ["em_blossom_sword"],    // T1 sword — auto
-    5: ["em_buddha_sword", "em_plum_sword"], // T3 sword — choice
-    3: ["em_bodhi_palm", "em_bodhi_sword"],  // T4 capstone — choice
-  },
-  artsByRank: {
-    9: ["t0_em_meditation"],    // T0 art — auto on join
-    7: ["t1_em_lotus"],         // T1 art — auto
-    6: ["t2_em_garland"],       // T2 art — auto
-    4: ["t3_em_heart", "t3_em_grace", "t3_em_ice"], // T3 — choice
-    2: ["t4_em_bodhi", "emei"], // T4 capstone — choice (ascetic vs older)
-  },
   questCooldownDays: 30,
 };
 
@@ -461,11 +276,6 @@ const EMEI: SectMembershipDef = {
 //
 // `joinRequirements` here only matter for the membership-check helper
 // (e.g. /sect popups). The real gate lives in the intro quest's prereq.
-//
-// Reward layout:
-//   rank 3 → ynxj T3 art (gifted on registration — the entry breath)
-//   rank 2 → t4_gm_iceweave T4 art (auto on rank-up)
-//   rank 1 → choose T4 capstone — winterstep art OR ansh skill
 const GUMU: SectMembershipDef = {
   id: "gumu",
   name: "กู่มู่",
@@ -477,22 +287,13 @@ const GUMU: SectMembershipDef = {
   joinRequirements: { t: "trait", trait: "evil", max: 10 },
   startRank: 3,
   topRank: 1,
-  // Only 3 ranks total. Steeper costs since the climb is short and the
-  // rewards are all T3-T4 disciple-line.
+  // Only 3 ranks total. Steeper costs since the climb is short.
   rankUpCost: (targetRank) => {
     const table: Record<number, number> = {
       2: 400,
       1: 1200,
     };
     return table[targetRank] ?? Infinity;
-  },
-  skillsByRank: {
-    1: ["ansh"], // T4 ansh as alternate top reward
-  },
-  artsByRank: {
-    3: ["ynxj"],            // T3 — gifted on registration (entry breath)
-    2: ["t4_gm_iceweave"],  // T4 — auto on rank-up
-    1: ["t4_gm_winterstep"], // T4 — auto on rank 1 (paired with ansh skill pick)
   },
   questCooldownDays: 30,
 };
@@ -503,17 +304,6 @@ const GUMU: SectMembershipDef = {
 // must have learned the begging life skill to lv 2 first (proves they
 // understand the way of the road). Combat identity: fist + staff,
 // external / hard. The "wanderer / dragon palm" arts cap the line.
-//
-// Reward layout:
-//   rank 9 → T0 fist nc1 + T0 art (gifted on registration)
-//   rank 8 → choose T1 weapon (snake fist OR snake staff)
-//   rank 7 → T1 art (sun-shadow, auto)
-//   rank 6 → T2 art (nine-shadow, auto)
-//   rank 5 → choose T2 weapon (drift staff OR drift fist)
-//   rank 4 → T3 art (sun-renew, auto)
-//   rank 3 → choose T3 weapon (wander staff OR existing ng3 dragon palm)
-//   rank 2 → choose T4 art (thousand-crowd OR existing wanderer breath)
-//          + the rank itself unlocks T4 weapon picks via the art quest.
 const BEGGARS: SectMembershipDef = {
   id: "beggars",
   name: "พรรคยาจก",
@@ -543,19 +333,6 @@ const BEGGARS: SectMembershipDef = {
     };
     return table[targetRank] ?? Infinity;
   },
-  skillsByRank: {
-    9: ["nc1"],                                  // T0 fist auto
-    8: ["bg_snake_fist", "bg_snake_staff"],     // T1 — choice
-    5: ["bg_drift_staff", "bg_drift_fist"],     // T2 — choice
-    3: ["bg_wander_staff", "ng3"],              // T3 — choice (new staff vs old palm)
-  },
-  artsByRank: {
-    9: ["t0_bg_survival"],                       // T0 art auto
-    7: ["t1_bg_sunshadow"],                      // T1 art auto
-    6: ["t2_bg_nineshadow"],                     // T2 art auto
-    4: ["t3_bg_sunrenew"],                       // T3 art auto
-    2: ["t4_bg_thousandcrowd", "wanderer"],     // T4 art — choice
-  },
   questCooldownDays: 30,
 };
 
@@ -566,19 +343,6 @@ const BEGGARS: SectMembershipDef = {
 // The disciple intro is a kidnap mission, mirroring the sect's role as
 // the emperor's interrogation arm — recruits earn membership by proving
 // they can apprehend a person of interest cleanly.
-//
-// Reward layout (rich pool — sect already had a full T0-T3 disciple
-// line authored, plus a T4 art `jy_a4_brocadelord`. New T4 skills +
-// arts slot in at the top):
-//   rank 9 → T0 chain skill jy_chain + T0 art jy_a0_brocade (auto)
-//   rank 8 → T1 blade jy_blade auto
-//   rank 7 → T1 art jy_a1_silktread auto
-//   rank 6 → T2 art jy_a2_goldarmor auto
-//   rank 5 → choose T2 fist (jy_eagleclaw vs jy_grapple)
-//   rank 4 → choose T3 art (jy_a3_thunderstride vs new t3_jy_shadow)
-//   rank 3 → choose T3 weapon (jy_sword vs jy_chainmaster vs jy_blade_king)
-//   rank 2 → choose T4 art (jy_a4_brocadelord vs new t4_jy_godslayer)
-//          + choose T4 weapon (sword vs blade vs chain)
 const JINYIWEI: SectMembershipDef = {
   id: "jinyiwei",
   name: "องครักษ์เสื้อแพร",
@@ -604,20 +368,6 @@ const JINYIWEI: SectMembershipDef = {
     };
     return table[targetRank] ?? Infinity;
   },
-  skillsByRank: {
-    9: ["jy_chain"],     // T0 chain auto on join
-    8: ["jy_blade"],     // T1 blade auto
-    5: ["jy_eagleclaw", "jy_grapple"], // T2 fist — choice
-    3: ["jy_sword", "jy_chainmaster", "jy_blade_king"], // T3 — 3-way choice
-    2: ["jy_execution_sword", "jy_execution_blade", "jy_chain_assassin"], // T4 — 3-way choice
-  },
-  artsByRank: {
-    9: ["jy_a0_brocade"],       // T0 art auto on join
-    7: ["jy_a1_silktread"],     // T1 art auto
-    6: ["jy_a2_goldarmor"],     // T2 art auto
-    4: ["jy_a3_thunderstride", "t3_jy_shadow"], // T3 art — choice
-    2: ["jy_a4_brocadelord", "t4_jy_godslayer"], // T4 art — choice
-  },
   questCooldownDays: 30,
 };
 
@@ -631,17 +381,6 @@ const JINYIWEI: SectMembershipDef = {
 // by ordering them to eliminate a hostile imperial guard. Trait gate is
 // looser than other sects (evil ≤ 30) since the bad-action mechanic
 // nudges the player's evil score up.
-//
-// Reward layout (8 new arts + existing qiankun + yxhd + mi_firepalm
-// fist skill):
-//   rank 9 → mi_firepalm fist + T0 art (auto)
-//   rank 8 → choose T1 art (sun OR moon)
-//   rank 7 → choose T2 art (sun-body OR moon-body)
-//   rank 6 → no reward (art-line takes a breath)
-//   rank 5 → T3 art (sun-script auto — yin/external defensive)
-//   rank 4 → choose T3 art (dual-fusion vs sun-moon)
-//   rank 3 → no reward (rank up only)
-//   rank 2 → choose T4 capstone art (qiankun OR yxhd)
 const SUNMOON: SectMembershipDef = {
   id: "sunmoon",
   name: "พรรคตะวันจันทรา",
@@ -663,17 +402,6 @@ const SUNMOON: SectMembershipDef = {
     };
     return table[targetRank] ?? Infinity;
   },
-  skillsByRank: {
-    9: ["mi_firepalm"], // T3 fist auto on join — sect's only move skill
-  },
-  artsByRank: {
-    9: ["t0_sm_dual"],                            // T0 auto on join
-    8: ["t1_sm_sunfire", "t1_sm_moonweave"],     // T1 — choice
-    7: ["t2_sm_sunbody", "t2_sm_moonbody"],      // T2 — choice
-    5: ["t3_sm_sunscript"],                       // T3 defensive auto
-    4: ["t3_sm_dualfusion", "t3_sm_sunmoon"],    // T3 offensive — choice
-    2: ["qiankun", "yxhd"],                       // T4 capstone — choice
-  },
   questCooldownDays: 30,
 };
 
@@ -686,17 +414,6 @@ const SUNMOON: SectMembershipDef = {
 // can navigate the venomous corners of the world (where Tang gets
 // their materials). Hint dialog points players at specific gather
 // locations.
-//
-// Reward layout (8 skills + 7 arts in the sect line):
-//   rank 9 → T0 knife + T0 art (auto on join)
-//   rank 8 → T1 knife (auto)
-//   rank 7 → T1 art auto
-//   rank 6 → T2 art auto
-//   rank 5 → choose T2 hidden vs T3 short (sect leans on knives)
-//   rank 4 → choose T3 art (viper-power vs chase-step)
-//   rank 3 → choose T3 short blade (viper vs gold-snake)
-//   rank 2 → choose T4 art (10000-poisons vs sky-cleaver)
-//          + choose T4 weapon (rain-of-stars vs heart-piercer)
 const TANG: SectMembershipDef = {
   id: "tang",
   name: "สำนักสุลถัง",
@@ -718,20 +435,6 @@ const TANG: SectMembershipDef = {
     };
     return table[targetRank] ?? Infinity;
   },
-  skillsByRank: {
-    9: ["tang_basic_knife"],                                 // T0 hidden auto
-    8: ["tang_poison_knife"],                                // T1 hidden auto
-    5: ["tang_starscatter"],                                 // T2 hidden auto
-    3: ["tang_meteorpierce", "tang_viperblade", "tang_goldsnake"], // T3 — choice
-    2: ["tang_starrain", "tang_heartpierce"],                // T4 — choice
-  },
-  artsByRank: {
-    9: ["t0_tang_sharp"],                                    // T0 art auto
-    7: ["t1_tang_venombody"],                                // T1 auto
-    6: ["t2_tang_wavewind"],                                 // T2 auto
-    4: ["t3_tang_viperpower", "t3_tang_chase"],              // T3 art — choice
-    2: ["t4_tang_tenkpoisons", "t4_tang_skycleaver"],        // T4 art — choice
-  },
   questCooldownDays: 30,
 };
 
@@ -739,17 +442,6 @@ const TANG: SectMembershipDef = {
 // heavy line with sword + blade + fist split. Leadership tier matches
 // Shaolin / Wudang / etc (T4 master). Disciple intro mirrors the
 // herb-gathering pattern of other public sects.
-//
-// Reward layout:
-//   rank 9 → T0 blade + T0 art (auto)
-//   rank 8 → T1 sword (auto)
-//   rank 7 → T1 art (auto)
-//   rank 6 → T2 art "formless greater" (auto)
-//   rank 5 → choose T2 weapon (lesser-demon fist OR demon-wind sword
-//            OR root-poison fist)
-//   rank 4 → choose T3 art (root-poison qi vs see-power)
-//   rank 3 → choose T3 weapon (xy_punch vs yxjf)
-//   rank 2 → choose T4 capstone art (bmzq vs bmsg) + xy_palm T4 fist auto
 const XIAOYAO: SectMembershipDef = {
   id: "xiaoyao",
   name: "พรรคสราญรมย์",
@@ -770,20 +462,6 @@ const XIAOYAO: SectMembershipDef = {
       1: 2000,
     };
     return table[targetRank] ?? Infinity;
-  },
-  skillsByRank: {
-    9: ["xy_lesserdemon_blade"],                                  // T0 blade auto
-    8: ["xy_pathless_sword"],                                     // T1 sword auto
-    5: ["xy_lesserdemon_fist", "xy_demon_wind_sword", "xy_root_poison_fist"], // T2 — choice
-    3: ["xy_punch", "yxjf"],                                      // T3 — choice
-    2: ["xy_palm"],                                               // T4 fist auto
-  },
-  artsByRank: {
-    9: ["t0_xy_plum"],                                            // T0 auto
-    7: ["t1_xy_formless_lesser"],                                 // T1 auto
-    6: ["t2_xy_formless_greater"],                                // T2 auto
-    4: ["t3_xy_root_poison_qi", "t3_xy_seepower"],                // T3 — choice
-    2: ["bmzq", "bmsg"],                                          // T4 — choice
   },
   questCooldownDays: 30,
 };
@@ -806,48 +484,8 @@ export const SECT_MEMBERSHIPS: Record<SectId, SectMembershipDef> = {
   xiaoyao: XIAOYAO,
 };
 
-// Helper: rewards (skill + art ids) the player is *eligible* to pick at a
-// given rank but hasn't claimed yet. Returns the full pools when the rank
-// hasn't been visited; empty arrays when already claimed.
-export function pendingRewardsAtRank(
-  def: SectMembershipDef,
-  rank: number,
-  claimed: Record<string, string>,
-): { skills: readonly string[]; arts: readonly string[] } {
-  const skillKey = `${rank}-skill`;
-  const artKey = `${rank}-art`;
-  return {
-    skills: claimed[skillKey] ? [] : (def.skillsByRank[rank] ?? []),
-    arts: claimed[artKey] ? [] : (def.artsByRank[rank] ?? []),
-  };
-}
-
-// Yield `{ rank, kind, id }` for every reward pool the player is eligible
-// for (rank ≥ currentRank, since lower number = higher prestige) that has
-// exactly one option AND hasn't been claimed yet. The store consumes
-// these to auto-claim sect rewards on join / rank-up so the player
-// doesn't have to click through one-option pickers.
-//
-// IMPORTANT iteration direction: the player has *reached* every rank in
-// [currentRank, startRank] (inclusive) — startRank is the entry tier,
-// currentRank decreases as they climb. So iterate UPWARD from currentRank
-// to startRank. Going below currentRank (toward topRank) would grant
-// rewards from ranks the player hasn't earned yet.
-export function autoGrantableRewards(
-  def: SectMembershipDef,
-  currentRank: number,
-  claimed: Record<string, string>,
-): { rank: number; kind: "skill" | "art"; id: string }[] {
-  const out: { rank: number; kind: "skill" | "art"; id: string }[] = [];
-  for (let r = currentRank; r <= def.startRank; r++) {
-    const skills = def.skillsByRank[r] ?? [];
-    if (skills.length === 1 && !claimed[`${r}-skill`]) {
-      out.push({ rank: r, kind: "skill", id: skills[0]! });
-    }
-    const arts = def.artsByRank[r] ?? [];
-    if (arts.length === 1 && !claimed[`${r}-art`]) {
-      out.push({ rank: r, kind: "art", id: arts[0]! });
-    }
-  }
-  return out;
+// Gold paid on reaching `targetRank` — half the sect points the step costs.
+export function rankUpGold(def: SectMembershipDef, targetRank: number): number {
+  const cost = def.rankUpCost(targetRank);
+  return Number.isFinite(cost) ? Math.round(cost / 2) : 0;
 }

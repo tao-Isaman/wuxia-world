@@ -110,9 +110,9 @@ export const QUESTS_WUDANG: readonly QuestDef[] = [
 
   {
     id: "qst_wudang_art_yinyang",
-    name: "ตำราหยินหยางสมดุล",
-    description: "อาจารย์ชิงซวี่ยอมเปิดตำราหยินหยางสมดุล (阴阳平衡) ให้ศิษย์ที่มีจิตเที่ยงตรง — ผ่านการทดสอบหมัดและจิต",
-    briefSummary: "ฝึกหยินหยางสมดุล — รับ T3 art ของอู่ตัง",
+    name: "บททดสอบก่อนสืบทอด: หยินหยางสมดุล",
+    description: "อาจารย์ชิงซวี่จะทดสอบก่อนเปิดตำราหยินหยางสมดุล (阴阳平衡) ให้ศิษย์ที่มีจิตเที่ยงตรง — ผ่านการทดสอบหมัดและจิต (ผ่านแล้วจึงรับภารกิจสืบทอดหยินหยางสมดุลได้)",
+    briefSummary: "บททดสอบ — เปิดทางสู่การสืบทอดหยินหยางสมดุล (ขั้น 3)",
     type: "side",
     sectId: "wudang",
     isArtQuest: true,
@@ -138,12 +138,12 @@ export const QUESTS_WUDANG: readonly QuestDef[] = [
       },
       {
         id: "return_art",
-        description: "กลับไปรับตำราจากอาจารย์ชิงซวี่",
+        description: "กลับไปรายงานผลต่ออาจารย์ชิงซวี่",
       },
     ],
     rewards: [
       { t: "wExp", amount: 200 },
-      { t: "learnArt", artId: "t3_yinyang", level: 3 },
+      { t: "gold", amount: 300 },
       { t: "trait", trait: "humility", amount: 5 },
       { t: "sectPoints", sectId: "wudang", amount: 100 },
       { t: "npcRelationship", npcId: "sect_wudang_master_qingxu", amount: 10 },
@@ -169,9 +169,8 @@ export const QUESTS_WUDANG: readonly QuestDef[] = [
       },
     ],
     rewards: [
-      { t: "gold", amount: 600 },
+      { t: "gold", amount: 900 },
       { t: "wExp", amount: 80 },
-      { t: "learnSkill", skillId: "tj" },
       { t: "npcRelationship", npcId: "sect_wudang_master_qingxu", amount: 15 },
     ],
   },

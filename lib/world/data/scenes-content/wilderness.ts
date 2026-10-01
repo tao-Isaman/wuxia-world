@@ -326,11 +326,11 @@ export const SCENES_WILDERNESS: readonly Scene[] = [
     lines: [
       { t: "dialogue", speaker: "ชิวเฉียน", text: "เจ้านำหลักฐานมาได้... ข้าไม่รู้ว่าจะรู้สึกยินดีหรือเศร้า" },
       { t: "narration", text: "ฤๅษีแก่รับม้วนหนังสือด้วยมือสั่นเครือ น้ำตาคลอแต่ไม่ยอมหลั่ง" },
-      { t: "dialogue", speaker: "ชิวเฉียน", text: "ขอบคุณ ข้าจะสอนวิชาที่เรียนมาทั้งชีวิตให้เจ้าสักส่วนหนึ่ง" },
+      { t: "dialogue", speaker: "ชิวเฉียน", text: "ขอบคุณ ข้าไม่มีสิทธิ์ถ่ายทอดวิชาอู่ตังอีกแล้ว แต่ของที่เก็บไว้ทั้งชีวิตนี้ รับไปเถิด" },
     ],
     choices: [
       {
-        text: "รับคำสอนด้วยความยินดี",
+        text: "รับด้วยความยินดี",
         next: "mt_kunlun",
         effects: [
           { t: "takeItem", itemId: "qst_kunlun_evidence", count: 1 },

@@ -129,9 +129,9 @@ export const QUESTS_SONGSHAN: readonly QuestDef[] = [
 
   {
     id: "qst_songshan_art_pillar",
-    name: "ตำราพลังเสาภูผา",
-    description: "อาจารย์ใหญ่จั่วเหลิงฉานยอมเปิดตำราพลังเสาภูผาให้ศิษย์ที่พิสูจน์ทั้งดาบและจิตใจอย่างหนักแน่น — ผ่านการประลองกับหัวหน้าโจรชั้นสูงและการรวบรวมเหล็กพิเศษ",
-    briefSummary: "ฝึกพลังเสาภูผา — รับ T3 art ลับของซงซาน",
+    name: "บททดสอบก่อนสืบทอด: พลังเสาภูผา",
+    description: "อาจารย์ใหญ่จั่วเหลิงฉานจะทดสอบก่อนเปิดตำราพลังเสาภูผาให้ศิษย์ที่พิสูจน์ทั้งดาบและจิตใจอย่างหนักแน่น — ผ่านการประลองกับหัวหน้าโจรชั้นสูงและการรวบรวมเหล็กพิเศษ (ผ่านแล้วจึงรับภารกิจสืบทอดพลังเสาภูผาได้)",
+    briefSummary: "บททดสอบ — เปิดทางสู่การสืบทอดพลังเสาภูผา (ขั้น 3)",
     type: "side",
     sectId: "songshan",
     isArtQuest: true,
@@ -157,12 +157,12 @@ export const QUESTS_SONGSHAN: readonly QuestDef[] = [
       },
       {
         id: "return_art",
-        description: "กลับไปรับตำราจากอาจารย์ใหญ่จั่วเหลิงฉาน",
+        description: "กลับไปรายงานผลต่ออาจารย์ใหญ่จั่วเหลิงฉาน",
       },
     ],
     rewards: [
       { t: "wExp", amount: 200 },
-      { t: "learnArt", artId: "t3_ssh_pillar", level: 3 },
+      { t: "gold", amount: 300 },
       { t: "trait", trait: "humility", amount: 5 },
       { t: "sectPoints", sectId: "songshan", amount: 100 },
       { t: "npcRelationship", npcId: "sect_songshan_master_zuolengchan", amount: 10 },

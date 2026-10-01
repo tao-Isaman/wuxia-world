@@ -348,9 +348,7 @@ export const OPPONENTS: readonly OpponentDef[] = [
   // Two arts: t1_goldenbell (primary, lv 6) + t0_lohan (lv 8) — defensive
   // breath rotation typical of an elder monk.
   { id: "spar_shaolin_faming", name: "อาจารย์ฝาหมิง", ti: 3, category: "human",
-    drops: [...DROPS_T3,
-      { itemId: "man_sf", weight: 1 }, { itemId: "man_nd5", weight: 1 },
-      { itemId: "man_ne1", weight: 1 }, { itemId: "man_t1_goldenbell", weight: 1 }],
+    drops: [...DROPS_T3],
     build: () => build("อาจารย์ฝาหมิง", 3, {
       stats: { STR: 8, VIT: 8, DEF: 7, POW: 5 },
       artId: "t1_goldenbell", artLevel: 6,
@@ -361,8 +359,7 @@ export const OPPONENTS: readonly OpponentDef[] = [
 
   // ศิษย์เซวียนจี้ (sect_shaolin) — gatekeeper disciple. Light fist work.
   { id: "spar_shaolin_xuanji", name: "ศิษย์เซวียนจี้", ti: 1, category: "human",
-    drops: [...DROPS_T1,
-      { itemId: "man_sf", weight: 1 }, { itemId: "man_t0_lohan", weight: 1 }],
+    drops: [...DROPS_T1],
     build: () => build("ศิษย์เซวียนจี้", 1, {
       stats: { STR: 4, VIT: 4 },
       artId: "t0_lohan", artLevel: 3,
@@ -377,9 +374,7 @@ export const OPPONENTS: readonly OpponentDef[] = [
   // Two arts: t1_goldenbell (primary, lv 8) + t0_lohan (lv 6) — both
   // defensive breaths layered for sustain.
   { id: "spar_shaolin_yuanquan", name: "หัวหน้าศิษย์หยวนเฉวียน", ti: 3, category: "human",
-    drops: [...DROPS_T3,
-      { itemId: "man_sf", weight: 1 }, { itemId: "man_nd5", weight: 1 },
-      { itemId: "man_ne1", weight: 1 }, { itemId: "man_t1_goldenbell", weight: 1 }],
+    drops: [...DROPS_T3],
     build: () => build("หัวหน้าศิษย์หยวนเฉวียน", 3, {
       stats: { STR: 10, VIT: 10, DEF: 8, POW: 7, DEX: 7 },
       artId: "t1_goldenbell", artLevel: 8,
@@ -394,8 +389,6 @@ export const OPPONENTS: readonly OpponentDef[] = [
   // buffs, AND fire 一指禅 nukes in the same fight.
   { id: "spar_shaolin_xianren", name: "หลวงพ่อเซียนเหริน", ti: 4, category: "human",
     drops: [...DROPS_T4,
-      { itemId: "man_sf", weight: 1 }, { itemId: "man_nd5", weight: 1 },
-      { itemId: "man_ne1", weight: 1 }, { itemId: "man_ne2", weight: 1 },
       { itemId: "ginseng", weight: 2 }, { itemId: "jade", weight: 1 }],
     build: () => build("หลวงพ่อเซียนเหริน", 4, {
       stats: { POW: 18, INT: 18, DEX: 15, AGI: 12, VIT: 10 },
@@ -412,7 +405,6 @@ export const OPPONENTS: readonly OpponentDef[] = [
   // on damage reduction or HP recovery.
   { id: "spar_shaolin_juti", name: "หลวงพ่อจูตี้", ti: 4, category: "human",
     drops: [...DROPS_T4,
-      { itemId: "man_sf", weight: 1 }, { itemId: "man_t1_goldenbell", weight: 1 },
       { itemId: "wood_hard", weight: 3 }, { itemId: "iron_ingot", weight: 2 },
       { itemId: "jade", weight: 1 }],
     build: () => build("หลวงพ่อจูตี้", 4, {
@@ -430,8 +422,6 @@ export const OPPONENTS: readonly OpponentDef[] = [
   // damage-reduction layers — this monk does not die quietly.
   { id: "spar_shaolin_huimiao", name: "หลวงพี่ใหญ่ฮุยเหมียว", ti: 4, category: "human",
     drops: [...DROPS_T4,
-      { itemId: "man_sf", weight: 1 }, { itemId: "man_nd5", weight: 1 },
-      { itemId: "man_ne1", weight: 1 }, { itemId: "man_t1_goldenbell", weight: 1 },
       { itemId: "ginseng", weight: 2 }, { itemId: "jade", weight: 2 },
       { itemId: "wood_sacred", weight: 1 }],
     build: () => build("หลวงพี่ใหญ่ฮุยเหมียว", 4, {
@@ -454,9 +444,6 @@ export const OPPONENTS: readonly OpponentDef[] = [
   // is the highest in the game.
   { id: "spar_shaolin_abbot_huiyuan", name: "เจ้าอาวาสฮุยหยวน", ti: 4, category: "human",
     drops: [...DROPS_T4,
-      { itemId: "man_sf", weight: 1 }, { itemId: "man_nd5", weight: 1 },
-      { itemId: "man_ne1", weight: 1 }, { itemId: "man_ne2", weight: 1 },
-      { itemId: "man_t0_lohan", weight: 1 }, { itemId: "man_t1_goldenbell", weight: 1 },
       { itemId: "ginseng", weight: 4 }, { itemId: "jade", weight: 4 },
       { itemId: "ancient_coin", weight: 3 }, { itemId: "wood_sacred", weight: 2 },
       { itemId: "mithril_ore", weight: 2 }],
@@ -483,9 +470,6 @@ export const OPPONENTS: readonly OpponentDef[] = [
   // active fires use_act stack_atk so his damage spirals fast.
   { id: "spar_shaolin_luohan", name: "รองเจ้าอาวาสลั่วฮั่น", ti: 4, category: "human",
     drops: [...DROPS_T4,
-      { itemId: "man_sf", weight: 1 }, { itemId: "man_nd5", weight: 1 },
-      { itemId: "man_ne1", weight: 1 }, { itemId: "man_ne2", weight: 1 },
-      { itemId: "man_t0_lohan", weight: 1 }, { itemId: "man_t1_goldenbell", weight: 1 },
       { itemId: "ginseng", weight: 3 }, { itemId: "jade", weight: 3 },
       { itemId: "ancient_coin", weight: 2 }, { itemId: "mithril_ore", weight: 1 }],
     build: () => build("รองเจ้าอาวาสลั่วฮั่น", 4, {
@@ -504,8 +488,6 @@ export const OPPONENTS: readonly OpponentDef[] = [
   // palm). Mirrors Shaolin abbot's role for the Wudang path.
   { id: "spar_wudang_master_qingxu", name: "อาจารย์ชิงซวี่", ti: 4, category: "human",
     drops: [...DROPS_T4,
-      { itemId: "man_tj", weight: 1 }, { itemId: "man_rf", weight: 1 },
-      { itemId: "man_cs", weight: 1 },
       { itemId: "ginseng", weight: 4 }, { itemId: "snow_lotus", weight: 2 },
       { itemId: "jade", weight: 4 }, { itemId: "ancient_coin", weight: 3 },
       { itemId: "wood_sacred", weight: 2 }, { itemId: "mithril_ore", weight: 1 }],
@@ -522,7 +504,6 @@ export const OPPONENTS: readonly OpponentDef[] = [
   // Sword-leaning kit with reflect + cloud sword pressure.
   { id: "spar_wudang_xuancheng", name: "รองอาจารย์เสวียนเฉิง", ti: 4, category: "human",
     drops: [...DROPS_T4,
-      { itemId: "man_tj", weight: 1 }, { itemId: "man_rf", weight: 1 },
       { itemId: "ginseng", weight: 3 }, { itemId: "jade", weight: 3 },
       { itemId: "ancient_coin", weight: 2 }, { itemId: "wood_sacred", weight: 2 }],
     build: () => build("รองอาจารย์เสวียนเฉิง", 4, {
@@ -536,7 +517,6 @@ export const OPPONENTS: readonly OpponentDef[] = [
   // อาจารย์ดาบหลิงอวี้ (T4) — sword elder. Pure swordmaster kit.
   { id: "spar_wudang_lingyu", name: "อาจารย์ดาบหลิงอวี้", ti: 4, category: "human",
     drops: [...DROPS_T4,
-      { itemId: "man_tj", weight: 1 }, { itemId: "man_cs", weight: 1 },
       { itemId: "jade", weight: 3 }, { itemId: "iron_ore", weight: 2 },
       { itemId: "ancient_coin", weight: 2 }],
     build: () => build("อาจารย์ดาบหลิงอวี้", 4, {
@@ -550,7 +530,7 @@ export const OPPONENTS: readonly OpponentDef[] = [
   // อาจารย์ปราณเป่าชุน (T3) — internal-art elder. Soft / yin support skills.
   { id: "spar_wudang_baochun", name: "อาจารย์ปราณเป่าชุน", ti: 3, category: "human",
     drops: [...DROPS_T3,
-      { itemId: "man_tj", weight: 1 }, { itemId: "ginseng", weight: 4 },
+      { itemId: "ginseng", weight: 4 },
       { itemId: "herb", weight: 3 }, { itemId: "paper", weight: 2 }],
     build: () => build("อาจารย์ปราณเป่าชุน", 3, {
       stats: { POW: 14, INT: 14, VIT: 10, DEF: 8 },
@@ -563,7 +543,6 @@ export const OPPONENTS: readonly OpponentDef[] = [
   // หัวหน้าศิษย์จื้อหรง (T2) — head disciple. Solid mid-tier mix.
   { id: "spar_wudang_zhirong", name: "หัวหน้าศิษย์จื้อหรง", ti: 2, category: "human",
     drops: [...DROPS_T2,
-      { itemId: "man_tj", weight: 1 }, { itemId: "man_rf", weight: 1 },
       { itemId: "ginseng", weight: 2 }],
     build: () => build("หัวหน้าศิษย์จื้อหรง", 2, {
       stats: { POW: 9, INT: 7, AGI: 6, DEX: 5 },
@@ -575,8 +554,7 @@ export const OPPONENTS: readonly OpponentDef[] = [
 
   // ศิษย์อวี่เจี้ยน (T2) — sword disciple, mid-tier sparring.
   { id: "spar_wudang_yujian", name: "ศิษย์อวี่เจี้ยน", ti: 2, category: "human",
-    drops: [...DROPS_T2,
-      { itemId: "man_tj", weight: 1 }, { itemId: "man_cs", weight: 1 }],
+    drops: [...DROPS_T2],
     build: () => build("ศิษย์อวี่เจี้ยน", 2, {
       stats: { POW: 7, AGI: 6, DEX: 5 },
       artId: "t1_naturalqi", artLevel: 5,
@@ -585,8 +563,7 @@ export const OPPONENTS: readonly OpponentDef[] = [
 
   // ศิษย์ชิงซิน (T1) — gatekeeper disciple, novice sparring.
   { id: "spar_wudang_qingxin", name: "ศิษย์ชิงซิน", ti: 1, category: "human",
-    drops: [...DROPS_T1,
-      { itemId: "man_tj", weight: 1 }],
+    drops: [...DROPS_T1],
     build: () => build("ศิษย์ชิงซิน", 1, {
       stats: { POW: 5, AGI: 4 },
       artId: "t0_meditation", artLevel: 4,
@@ -659,7 +636,6 @@ export const OPPONENTS: readonly OpponentDef[] = [
   // The "sun" sub-line drives crit/stack ATK pressure.
   { id: "spar_quanzhen_master_chongyang", name: "อาจารย์ใหญ่ฉงหยาง", ti: 3, category: "human",
     drops: [...DROPS_T3,
-      { itemId: "man_qzjf", weight: 1 }, { itemId: "man_qz_punch", weight: 1 },
       { itemId: "paper", weight: 4 }, { itemId: "ink", weight: 4 },
       { itemId: "ginseng", weight: 3 }, { itemId: "jade", weight: 3 },
       { itemId: "ancient_coin", weight: 2 }, { itemId: "wood_sacred", weight: 2 }],
@@ -674,7 +650,6 @@ export const OPPONENTS: readonly OpponentDef[] = [
 
   { id: "spar_quanzhen_mayu", name: "รองอาจารย์หม่ายวี่", ti: 3, category: "human",
     drops: [...DROPS_T3,
-      { itemId: "man_qzjf", weight: 1 },
       { itemId: "paper", weight: 3 }, { itemId: "ink", weight: 3 },
       { itemId: "jade", weight: 2 }, { itemId: "ancient_coin", weight: 2 }],
     build: () => build("รองอาจารย์หม่ายวี่", 3, {
@@ -687,7 +662,6 @@ export const OPPONENTS: readonly OpponentDef[] = [
 
   { id: "spar_quanzhen_qiuchuji", name: "อาจารย์ดาบชิวฉู่จี้", ti: 2, category: "human",
     drops: [...DROPS_T2,
-      { itemId: "man_qzjf", weight: 1 },
       { itemId: "iron_ore", weight: 2 }, { itemId: "paper", weight: 2 }],
     build: () => build("อาจารย์ดาบชิวฉู่จี้", 2, {
       stats: { STR: 9, POW: 7, DEX: 6 },
@@ -699,7 +673,6 @@ export const OPPONENTS: readonly OpponentDef[] = [
 
   { id: "spar_quanzhen_yaolan", name: "อาจารย์ปราณเหยาหลัน", ti: 2, category: "human",
     drops: [...DROPS_T2,
-      { itemId: "man_qz_punch", weight: 1 },
       { itemId: "paper", weight: 3 }, { itemId: "ink", weight: 3 },
       { itemId: "ginseng", weight: 2 }],
     build: () => build("อาจารย์ปราณเหยาหลัน", 2, {
@@ -1100,9 +1073,7 @@ export const OPPONENTS: readonly OpponentDef[] = [
 
   // T2 — mid sparring (sect signature styles)
   { id: "spar_wudang_disciple", name: "สาวกชิงเฟิง", ti: 2, category: "human",
-    drops: [...DROPS_T2,
-      { itemId: "man_tj", weight: 1 }, { itemId: "man_rf", weight: 1 },
-      { itemId: "man_cs", weight: 1 }],
+    drops: [...DROPS_T2],
     build: () => build("สาวกชิงเฟิง", 2, {
       stats: { POW: 6, AGI: 5, DEX: 4 },
       artId: "t3_yinyang", artLevel: 4,
@@ -1137,7 +1108,7 @@ export const OPPONENTS: readonly OpponentDef[] = [
     }) },
   { id: "spar_beggars_brawler", name: "ยาจกจิ๊ว", ti: 2, category: "human",
     drops: [...DROPS_T2,
-      { itemId: "man_nc1", weight: 1 }, { itemId: "man_ne8", weight: 1 },
+      { itemId: "man_ne8", weight: 1 },
       { itemId: "man_t1_eagleclaw", weight: 1 }],
     build: () => build("ยาจกจิ๊ว", 2, {
       stats: { STR: 6, AGI: 6, VIT: 4 },
@@ -1249,8 +1220,7 @@ export const OPPONENTS: readonly OpponentDef[] = [
     }) },
   { id: "spar_xingxiu_disciple", name: "ศิษย์ตู๋โซ่ว", ti: 2, category: "human",
     drops: [...DROPS_T2,
-      { itemId: "man_pn", weight: 1 }, { itemId: "man_nd9", weight: 1 },
-      { itemId: "man_t2_snakeform", weight: 1 }],
+      { itemId: "man_pn", weight: 1 }, { itemId: "man_nd9", weight: 1 }],
     build: () => build("ศิษย์ตู๋โซ่ว", 2, {
       stats: { DEX: 7, LUK: 5 },
       artId: "t2_snakeform", artLevel: 4,
@@ -1258,17 +1228,14 @@ export const OPPONENTS: readonly OpponentDef[] = [
     }) },
   { id: "spar_wudu_miao", name: "หมอพิษอาหมาน", ti: 2, category: "human",
     drops: [...DROPS_T2,
-      { itemId: "man_pn", weight: 1 }, { itemId: "man_nd9", weight: 1 },
-      { itemId: "man_t2_snakeform", weight: 1 }],
+      { itemId: "man_pn", weight: 1 }, { itemId: "man_nd9", weight: 1 }],
     build: () => build("หมอพิษอาหมาน", 2, {
       stats: { DEX: 6, LUK: 6, POW: 3 },
       artId: "t2_snakeform", artLevel: 5,
       skillIds: ["pn", "nd9"],
     }) },
   { id: "spar_quanzhen_disciple", name: "สาวกชงซวี", ti: 2, category: "human",
-    drops: [...DROPS_T2,
-      { itemId: "man_qzjf", weight: 1 }, { itemId: "man_qz_punch", weight: 1 },
-      { itemId: "man_qzzq", weight: 1 }],
+    drops: [...DROPS_T2],
     build: () => build("สาวกชงซวี", 2, {
       stats: { POW: 6, INT: 6, DEX: 4 },
       artId: "qzzq", artLevel: 4,
@@ -1448,9 +1415,7 @@ export const OPPONENTS: readonly OpponentDef[] = [
   // arts + the 3 new T4 weapon skills (execution sword + blade + chain
   // assassin) + the T3 chainmaster.
   { id: "spar_jinyiwei_leader", name: "ผู้บัญชาการจ้าวฝู่", ti: 4, category: "human",
-    drops: [...DROPS_T4,
-      { itemId: "man_jy_blade_king", weight: 1 }, { itemId: "man_jy_chainmaster", weight: 1 },
-      { itemId: "man_jy_a4_brocadelord", weight: 1 }, { itemId: "man_jy_a3_thunderstride", weight: 1 }],
+    drops: [...DROPS_T4],
     build: () => build("ผู้บัญชาการจ้าวฝู่", 4, {
       stats: { STR: 22, AGI: 16, DEX: 16, VIT: 18, DEF: 14, POW: 8 },
       artId: "t4_jy_godslayer", artLevel: 10,
@@ -1462,9 +1427,7 @@ export const OPPONENTS: readonly OpponentDef[] = [
 
   // องครักษ์ฉิน (sect_jinyiwei) — T3 saber soldier.
   { id: "spar_jinyiwei_qin", name: "องครักษ์ฉิน", ti: 3, category: "human",
-    drops: [...DROPS_T3,
-      { itemId: "man_jy_blade", weight: 1 }, { itemId: "man_jy_eagleclaw", weight: 1 },
-      { itemId: "man_jy_a3_thunderstride", weight: 1 }, { itemId: "man_jy_a2_goldarmor", weight: 1 }],
+    drops: [...DROPS_T3],
     build: () => build("องครักษ์ฉิน", 3, {
       stats: { STR: 10, DEX: 9, AGI: 7, VIT: 6 },
       artId: "jy_a3_thunderstride", artLevel: 6,
@@ -1473,9 +1436,7 @@ export const OPPONENTS: readonly OpponentDef[] = [
 
   // องครักษ์ลู่ (sect_jinyiwei) — T3 chain specialist, grappler.
   { id: "spar_jinyiwei_lu", name: "องครักษ์ลู่", ti: 3, category: "human",
-    drops: [...DROPS_T3,
-      { itemId: "man_jy_chain", weight: 1 }, { itemId: "man_jy_grapple", weight: 1 },
-      { itemId: "man_jy_a2_goldarmor", weight: 1 }, { itemId: "man_jy_a1_silktread", weight: 1 }],
+    drops: [...DROPS_T3],
     build: () => build("องครักษ์ลู่", 3, {
       stats: { STR: 9, DEX: 10, AGI: 7, VIT: 7 },
       artId: "jy_a2_goldarmor", artLevel: 7,
@@ -1488,8 +1449,7 @@ export const OPPONENTS: readonly OpponentDef[] = [
 
   // สายลับเฟิงในนครหลวง (city_capital) — T2 chief informant.
   { id: "spar_spy_feng", name: "เฟิงผู้ส่งข่าว", ti: 2, category: "human",
-    drops: [...DROPS_T2,
-      { itemId: "man_jy_chain", weight: 1 }, { itemId: "man_jy_a0_brocade", weight: 1 }],
+    drops: [...DROPS_T2],
     build: () => build("เฟิงผู้ส่งข่าว", 2, {
       stats: { STR: 5, DEX: 8, AGI: 7, LUK: 5 },
       artId: "jy_a1_silktread", artLevel: 4,
@@ -1498,8 +1458,7 @@ export const OPPONENTS: readonly OpponentDef[] = [
 
   // สายลับซีในหยางโจว (city_yangzhou) — T2 port watcher, sword.
   { id: "spar_spy_xi", name: "ซีท่าเรือ", ti: 2, category: "human",
-    drops: [...DROPS_T2,
-      { itemId: "man_jy_blade", weight: 1 }, { itemId: "man_jy_a1_silktread", weight: 1 }],
+    drops: [...DROPS_T2],
     build: () => build("ซีท่าเรือ", 2, {
       stats: { STR: 7, AGI: 7, DEX: 6 },
       artId: "jy_a1_silktread", artLevel: 5,
@@ -1508,8 +1467,7 @@ export const OPPONENTS: readonly OpponentDef[] = [
 
   // สายลับเหมยในต้าหลี่ (city_dali) — T2 southwest border ear.
   { id: "spar_spy_mei", name: "เหมยพรานป่า", ti: 2, category: "human",
-    drops: [...DROPS_T2,
-      { itemId: "man_jy_eagleclaw", weight: 1 }, { itemId: "man_jy_a0_brocade", weight: 1 }],
+    drops: [...DROPS_T2],
     build: () => build("เหมยพรานป่า", 2, {
       stats: { STR: 6, DEX: 8, AGI: 6, VIT: 4 },
       artId: "jy_a0_brocade", artLevel: 6,
@@ -1518,8 +1476,7 @@ export const OPPONENTS: readonly OpponentDef[] = [
 
   // สายลับโจวในโรงเตี๊ยมยั่วไหล (inn_yuelai) — T1 listening post.
   { id: "spar_spy_zhou", name: "โจวพ่อค้าเหล้า", ti: 1, category: "human",
-    drops: [...DROPS_T1,
-      { itemId: "man_jy_chain", weight: 1 }, { itemId: "man_jy_a0_brocade", weight: 1 }],
+    drops: [...DROPS_T1],
     build: () => build("โจวพ่อค้าเหล้า", 1, {
       stats: { STR: 4, DEX: 6, AGI: 5 },
       artId: "jy_a0_brocade", artLevel: 3,
@@ -1528,8 +1485,7 @@ export const OPPONENTS: readonly OpponentDef[] = [
 
   // สายลับซื่อในชีกู่ (village_qigu) — T1 rural agent posing as farmer.
   { id: "spar_spy_si", name: "ซื่อชาวนา", ti: 1, category: "human",
-    drops: [...DROPS_T1,
-      { itemId: "man_jy_grapple", weight: 1 }, { itemId: "man_jy_a0_brocade", weight: 1 }],
+    drops: [...DROPS_T1],
     build: () => build("ซื่อชาวนา", 1, {
       stats: { STR: 6, VIT: 5, DEX: 5 },
       artId: "jy_a0_brocade", artLevel: 4,

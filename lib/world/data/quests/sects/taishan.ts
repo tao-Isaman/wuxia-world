@@ -134,9 +134,9 @@ export const QUESTS_TAISHAN: readonly QuestDef[] = [
 
   {
     id: "qst_taishan_art_sun",
-    name: "ตำราหนึ่งพลังสุริยัน",
-    description: "เทียนเหมินเต้าเหรินยอมเปิดตำราหนึ่งพลังสุริยันให้ศิษย์ที่พิสูจน์ใจ — ผ่านการประลองกับหัวหน้าโจรชั้นสูงและเก็บแร่เทพสำหรับหลอมกระบี่บูชาตะวัน",
-    briefSummary: "ฝึกหนึ่งพลังสุริยัน — รับ T3 art ลับของไท่ซาน",
+    name: "บททดสอบก่อนสืบทอด: หนึ่งกระบี่บูชาตะวัน",
+    description: "เทียนเหมินเต้าเหรินจะทดสอบก่อนเปิดตำราหนึ่งพลังสุริยันให้ศิษย์ที่พิสูจน์ใจ — ผ่านการประลองกับหัวหน้าโจรชั้นสูงและเก็บแร่เทพสำหรับหลอมกระบี่บูชาตะวัน (ผ่านแล้วจึงรับภารกิจสืบทอดหนึ่งกระบี่บูชาตะวันได้)",
+    briefSummary: "บททดสอบ — เปิดทางสู่การสืบทอดหนึ่งกระบี่บูชาตะวัน (ขั้น 3)",
     type: "side",
     sectId: "taishan",
     isArtQuest: true,
@@ -162,12 +162,12 @@ export const QUESTS_TAISHAN: readonly QuestDef[] = [
       },
       {
         id: "return_art",
-        description: "กลับไปรับตำราจากเทียนเหมินเต้าเหริน",
+        description: "กลับไปรายงานผลต่อเทียนเหมินเต้าเหริน",
       },
     ],
     rewards: [
       { t: "wExp", amount: 200 },
-      { t: "learnArt", artId: "t3_tsh_sun", level: 3 },
+      { t: "gold", amount: 300 },
       { t: "trait", trait: "humility", amount: 5 },
       { t: "sectPoints", sectId: "taishan", amount: 100 },
       { t: "npcRelationship", npcId: "sect_taishan_master_tianmen", amount: 10 },

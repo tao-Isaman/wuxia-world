@@ -210,11 +210,11 @@ export const SCENES_SHAOLIN: readonly Scene[] = [
     id: "qs_qst_shaolin_proof_of_heart_complete_mercy",
     lines: [
       { t: "dialogue", speaker: "ฮุยหยวน", text: "ดี... นั่นคือหัวใจของพุทธ จิตใจเจ้าผ่านแล้ว" },
-      { t: "narration", text: "ท่านยื่นมอบคัมภีร์เส้าหลินให้เจ้าด้วยรอยยิ้ม" },
+      { t: "narration", text: "ท่านพยักหน้าด้วยรอยยิ้ม — ประตูเส้าหลินเปิดรอผู้มีใจเช่นเจ้าแล้ว" },
     ],
     choices: [
       {
-        text: "รับคัมภีร์ด้วยความนอบน้อม",
+        text: "น้อมรับพรด้วยความนอบน้อม",
         next: "sect_shaolin",
         effects: [{ t: "finishQuest", questId: "qst_shaolin_proof_of_heart", success: true }],
       },
@@ -230,7 +230,7 @@ export const SCENES_SHAOLIN: readonly Scene[] = [
     ],
     choices: [
       {
-        text: "รับคัมภีร์ด้วยความนอบน้อม",
+        text: "น้อมรับพรด้วยความนอบน้อม",
         next: "sect_shaolin",
         effects: [{ t: "finishQuest", questId: "qst_shaolin_proof_of_heart", success: true }],
       },
@@ -243,7 +243,7 @@ export const SCENES_SHAOLIN: readonly Scene[] = [
     lines: [
       { t: "narration", text: "อาจารย์ฝาหมิงยืนในลานฝึกอย่างสงบ จ้องมองลูกศิษย์อย่างใส่ใจ" },
       { t: "dialogue", speaker: "ฝาหมิง", text: "วิชากระดิ่งทองต้องการแร่เทพเป็นตัวช่วยในการฝึก" },
-      { t: "dialogue", speaker: "ฝาหมิง", text: "หากเจ้าหามาได้ ข้าจะสอนวิชานั้นให้เจ้า" },
+      { t: "dialogue", speaker: "ฝาหมิง", text: "หากเจ้าหามาได้ ข้าจะตอบแทนให้สมน้ำใจ" },
     ],
     choices: [
       {
@@ -279,11 +279,11 @@ export const SCENES_SHAOLIN: readonly Scene[] = [
     lines: [
       { t: "narration", text: "อาจารย์ฝาหมิงรับแร่เทพไปพิจารณาด้วยสายตานักรู้" },
       { t: "dialogue", speaker: "ฝาหมิง", text: "ดีมาก — แร่นี้จะพาวิชากระดิ่งทองไปสู่ระดับใหม่" },
-      { t: "dialogue", speaker: "ฝาหมิง", text: "นั่งฟัง ข้าจะสอนเจ้าตั้งแต่ต้น" },
+      { t: "dialogue", speaker: "ฝาหมิง", text: "วิชานี้ถ่ายทอดตามลำดับขั้นในสำนัก — ถึงเวลาเจ้าจะได้เรียน ส่วนนี่คือคำขอบคุณของข้า" },
     ],
     choices: [
       {
-        text: "รับการสอนด้วยความขอบคุณ",
+        text: "รับรางวัลด้วยความขอบคุณ",
         next: "sect_shaolin",
         effects: [
           { t: "takeItem", itemId: "mithril_ore", count: 1 },

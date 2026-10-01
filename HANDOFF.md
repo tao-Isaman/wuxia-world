@@ -69,12 +69,12 @@ Checked on 2026-10-01 for wave 27 (animated, wandering NPCs and villain bosses):
 | `test:grid-skills` | 7 checks pass |
 | `test:grid-store` | 13 checks pass |
 | `test:npcs` | 7 checks pass |
-| `test:story` | 6 checks pass: 154 lineage quests, 38 sagas (340 chapters), 292 cutscenes; every quest and chapter plays through in the real store |
+| `test:story` | 7 checks pass: 154 lineage quests, 38 sagas (340 chapters), 292 cutscenes; every quest and chapter plays through in the real store |
 | `test:quests` | the campaign audit passes (770 quests, 102 reachable locations); 213 item / kill / objective quests hand in through the real store; guidance covers 650 of 657 stages; all 39 steal / assassinate / kidnap stages offer the action and advance |
 | `test:docs` | the generated reference is current; every link, repo path and command in the docs resolves |
 | `bun scripts/audit-content.ts` | 157 NPCs · 770 quests · 2529 scenes, all references resolve |
 | `bun run build` | passes; `/` first-load JS 984 kB (was 508 kB; the saga text is about 2.9 MB of source, ~500 kB gzipped) |
-| `bun run test:e2e` | all 21 Playwright tests pass against the production build on :3017 (about 10 minutes, Chromium 141 via the container shim) |
+| `bun run test:e2e` | all 22 Playwright tests pass against the production build on :3017 (about 10 minutes, Chromium 141 via the container shim) |
 
 Not verified:
 
@@ -102,17 +102,17 @@ Real behaviour today, found during the docs audit. Each is small and self-contai
 
    Resign or betray through quest rewards also skip the echo, the log line and betrayal's evil +5.
 6. **Resigning freezes only battle xp** for that sect's skills. Practice, w-exp level-ups and quest `skillExp` still raise them.
-7. **Store sect actions don't check status.** `upgradeSectRank`, `pickSectReward` and `acceptSectQuest` ignore it; only the UI hides inactive memberships.
+7. **Store sect actions don't check status.** `upgradeSectRank` and `acceptSectQuest` ignore it; only the UI hides inactive memberships.
 
 ### Content data
 
 8. **Twelve non-artisan recipes have no crafting button** (drawing, writing, mining, hunting, fishing, herbalism, venom, woodcutting). The store could craft them anywhere, but only the artisan popup calls `craftRecipe`.
-9. **A dangling drop.** `spar_shaolin_xianren`, `spar_shaolin_abbot_huiyuan` and `spar_shaolin_luohan` drop `man_ne2`, which is not an item. `audit-content.ts` does not check drop tables.
+9. ~~A dangling drop (`man_ne2`).~~ Fixed: the sect manuals and their drops were removed. `audit-content.ts` still does not check drop tables.
 10. **Unused content:**
     - `spar_xiaoyao_master` is referenced by nothing.
     - Six gathering nodes are placed nowhere: `mine_rock`, `mine_silver`, `mine_gold`, `hunt_legendary`, `herb_rare`, `venom_scorpion`.
     - Three recipes are sold nowhere: `tailor_leather`, `chef_stew`, `accessory_jade_pendant`.
-11. **No way to learn `sl_long_dharma`.** It sits in no rank pool, hall, manual or reward.
+11. ~~No way to learn `sl_long_dharma`.~~ Fixed: its lineage quest teaches it.
 12. **Unread or orphaned fields:**
     - `NpcDef.questIds` is never read by code.
     - The `village_to_world` road is orphaned.
@@ -185,7 +185,6 @@ In rough priority order:
 
 1. **Quest and sect dead ends** (issues 1–3): allow re-accepting an abandoned side quest (or hide abandon for one-shot story quests), allow rejoining a resigned sect or say clearly that it is final, and add `qst_xiaoyao_redemption`.
 2. **Data fixes:**
-   - Replace `man_ne2` with a real manual, or add the item.
    - Place or delete the six unused nodes.
    - Sell or delete the three orphan recipes.
    - Make `audit-content.ts` check drop tables.

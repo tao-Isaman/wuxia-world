@@ -110,9 +110,9 @@ export const QUESTS_QUANZHEN: readonly QuestDef[] = [
 
   {
     id: "qst_quanzhen_art_sun",
-    name: "ตำราหนึ่งพลังสุริยันต์",
-    description: "อาจารย์ฉงหยางยอมเปิดตำราหนึ่งพลังสุริยันต์ให้ศิษย์ที่จิตใจเที่ยงตรง — ผ่านการประลองและการนั่งสมาธิที่หน้าผา",
-    briefSummary: "ฝึกหนึ่งพลังสุริยันต์ — รับ T3 art ของฉวนเจิน",
+    name: "บททดสอบก่อนสืบทอด: หนึ่งพลังสุริยันต์",
+    description: "อาจารย์ฉงหยางจะทดสอบก่อนเปิดตำราหนึ่งพลังสุริยันต์ให้ศิษย์ที่จิตใจเที่ยงตรง — ผ่านการประลองและการนั่งสมาธิที่หน้าผา (ผ่านแล้วจึงรับภารกิจสืบทอดหนึ่งพลังสุริยันต์ได้)",
+    briefSummary: "บททดสอบ — เปิดทางสู่การสืบทอดหนึ่งพลังสุริยันต์ (ขั้น 3)",
     type: "side",
     sectId: "quanzhen",
     isArtQuest: true,
@@ -138,12 +138,12 @@ export const QUESTS_QUANZHEN: readonly QuestDef[] = [
       },
       {
         id: "return_art",
-        description: "กลับไปรับตำราจากอาจารย์ฉงหยาง",
+        description: "กลับไปรายงานผลต่ออาจารย์ฉงหยาง",
       },
     ],
     rewards: [
       { t: "wExp", amount: 200 },
-      { t: "learnArt", artId: "t3_qz_sun", level: 3 },
+      { t: "gold", amount: 300 },
       { t: "trait", trait: "humility", amount: 5 },
       { t: "sectPoints", sectId: "quanzhen", amount: 100 },
       { t: "npcRelationship", npcId: "sect_quanzhen_master_chongyang", amount: 10 },
