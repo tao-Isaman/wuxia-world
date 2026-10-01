@@ -6,6 +6,16 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-01
 
+### Living villages, towns and homes
+
+- **People everywhere.** The 20 places that had no one now have 68 new NPCs: villagers, court eunuchs and maids, Hui herders, the masters of the famous homes (ฮูเฝย์, หนานเสียน, อิดเต็งไต้ซือ, เถียนป๋อกวง, เหมียวเหรินเฟิง, เฉิงอิ๋ง, หยานจี, เป่ยฉิว, the Plum Manor four, the Lin family) and their households, and the hero's own housekeeper and neighbours. 35 of them stroll around their spot (`NpcDef.look`); shopkeepers, elders and masters stand at their post.
+- **97 new quests**, 26 of them for NPCs who were already in the game. 69 of them teach every ยุทธจักร T0–T3 move and inner art that had no quest, gated by rarity: T0 a chore, T1 a stat and a few foes, T2 also the giver's trust and a spar, T3 a long story with a twist, a tier-3 foe and an earlier quest of the giver.
+- **37 place activities** (dice, chores, drills, tea, prayers…) with a cooldown in days, and **28 place meetings** that happen while walking there; the hero's home rolls only its own (no fights).
+- **Gifts.** Every NPC card has ให้ของขวัญ: an item from the bag or 100–5000 gold, once a month per person. Liked gifts count double, a favourite item more, a disliked one costs trust.
+- **Assassinated NPCs are gone for good; kidnapped ones are away for 180 days**, then back at their spot.
+- **The viewpoint is gone** (`viewpoint`, its two roads and painting).
+- Save version 22 (`kidnappedUntil`, `giftDays`, `activityDays`). New `lib/world/data/places/`, `lib/world/gifts.ts`, `lib/world/npc-presence.ts` and `bun run test:places`.
+
 ### Location maps repainted to match their exits
 
 - **77 auto-map paintings repainted** (gpt-image-2, from the old painting as reference, then a targeted second pass on 49) so their paths lead to the exits the compass now puts them at. Buildings and layouts stayed put.

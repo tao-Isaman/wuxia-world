@@ -13,8 +13,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **What the player does:**
 
-- Explores 102 places (101 painted maps) joined by 128 roads.
-- Meets 157 NPCs and takes 770 quests: 276 hand-written, 154 sect lineage quests and 38 story sagas (340 chapters) with 292 cutscenes.
+- Explores 101 places (100 painted maps) joined by 128 roads.
+- Meets 225 NPCs and takes 867 quests: 373 hand-written, 154 sect lineage quests and 38 story sagas (340 chapters) with 292 cutscenes.
 - Joins one of 15 sects and learns 178 move skills and 122 inner arts.
 - Gathers and crafts (19 life skills).
 - Steals and gets jailed.
@@ -68,6 +68,7 @@ bun run test:grid-store
 bun run test:npcs
 bun run test:story          # every sect skill/art has a quest; lineage + sagas + cutscenes well formed; all play through
 bun run test:routes         # compass exits, 8-way road paintings and arrival sides; world coords current
+bun run test:places         # place NPCs / quests / activities; every ยุทธจักร T0–T3 move is a quest reward; gifts; presence
 bun run test:quests         # campaign audit + dead ends + every item/kill/objective quest + guidance + bad-action stages
 bun run test:docs           # generated reference is current + docs links/paths/commands resolve
 bun run test:e2e            # Playwright (Chromium) on :3017 — start a production server first
@@ -110,7 +111,7 @@ bun scripts/build-route-variants.ts --from <dir>   # import the 56 directional r
 ```
 app/, components/         React: screens, HUD, menus, popups, battle UI
    ↓
-store/                    Zustand: world (saved, v21), battle, character (/debug, v3), loading, toast, confirm
+store/                    Zustand: world (saved, v22), battle, character (/debug, v3), loading, toast, confirm
    ↓
 lib/world/  ──────►  lib/game/          pure engines — no React, no DOM, no I/O
    └ battle-bridge.ts: the one place the world and battle stores meet
@@ -224,11 +225,17 @@ Two deliberate exceptions reach into stores:
   - Every sect T4 is the reward of a saga: 8–10 chapters `st_<arcId>_<nn>` (type `story`), chained on the previous chapter, with films (`DialogScene.cutscene`) and paged dialogs (`paged`).
   - The old sect art quests teach nothing: seven T4 ones are saga prologue trials (`SAGA_PROLOGUES`), eight T3 ones lineage prologue trials (`LINEAGE_PROLOGUES`).
   - Story and lineage quests can't be abandoned and don't fail when their giver dies.
+- **Living places** (`data/places/<group>.ts`, one `PlaceContent` each, merged into every registry). Villages, towns and homes have people, quests, activities and meetings; every ยุทธจักร T0–T3 move and art is a quest reward, gated by rarity (`test:places`).
+  - **Place activities** are `ActivityDef`s with `place` (locations, cooldown in days, cost, rewards), run by `doActivity`; auto maps place their spots (`ACTIVITY_SLOTS`), hand maps need `place.spot`.
+  - **Place meetings** are `MeetEventDef`s with `locationIds` / `condition` / `once` (flag `meet:<id>`). Safe ground (`home_player`) rolls only its own meetings (`rollPlaceMeeting`).
+  - **NPC looks:** `NpcDef.look.body` picks a sheet (`registerNpcBodies`); `look.wander` makes them stroll — only bodies m1–m4 / f1–f4 can.
+- **Presence** (`npc-presence.ts`). An assassinated NPC is gone for good; a kidnapped one is away until `kidnappedUntil` (day + 180) and then stands at their spot again. Maps and the location card filter with `npcPresent`.
+- **Gifts** (`gifts.ts`, store `giveGift`). One gift per NPC every 30 days (`giftDays`), an item or 100 / 500 / 1000 / 5000 gold. Worth 1–5 by price; liked ×2 (+2 for a favourite item id), disliked −2. Tastes are `NpcDef.likes` / `dislikes` (item ids, categories, `"gold"`) or follow the NPC's tags.
 - **Repair** (`validate.ts`). `validateAndRepair` runs on every load and drops dangling ids.
 
 ## Stores (`store/`)
 
-- **`world-store.ts`** is saved as `wusia-world-v1`, **version 21**.
+- **`world-store.ts`** is saved as `wusia-world-v1`, **version 22**.
   - Actions draft a copy (`draftFrom`, **one level deep** — nested quest, sect and NPC entries are shared), call engine functions, then `set`.
   - Time goes through `advanceTime` (12 ชั่วยาม = 1 day). The player-visible log uses `appendActionLog` (newest 100).
 - **`battle-store.ts`** is not saved.
@@ -264,12 +271,12 @@ Two deliberate exceptions reach into stores:
   - It publishes `data-*` attributes (`data-ready`, `data-player-x/y/frame/motion/facing`, `data-nearby-marker`, `data-guide-marker`, `data-visible-props`…) for tests.
 - **Battle runtime.** `grid-battle-runtime.ts` draws the board in 2.5D and plays `state.events`: walk 180 ms per tile, casts with VFX and SFX, damage numbers. It calls `battleStore.step()` about 350 ms after playback idles. Skill VFX come from `cast-vfx.ts` (pure) and `battle-vfx.ts`; skill sounds from `lib/audio/cast-sfx.ts`, using the same profile.
 - **Directions.** Travel follows the world-map compass (`lib/world/compass.ts`, `data/world-coords.ts`). Exits sit on the map edge facing their destination (`assignSlotsByBearing`); a road runs the way its exit faces (`routeDirection`, 8 ways, painting `/maps/routes/<type>-<dir>.webp`, region graded at load by `lib/stage/route-grade.ts`); arriving puts the hero beside the exit back (`setArrivalFrom` hints in `lib/stage/types.ts`).
-- **Collision.** `world-navigation.ts` (+ `world-footprints-data.ts`) covers all 101 painted maps; `test:navigation` probes every map.
+- **Collision.** `world-navigation.ts` (+ `world-footprints-data.ts`) covers all 100 painted maps; `test:navigation` probes every map.
 - **Rules.** Never put Phaser objects in stores or saves. Don't enable Phaser input. Respect `prefers-reduced-motion`. New popups are `Modal`s, so the map pauses by itself.
 
 ## UI and theme
 
-- **Root.** `components/world/world-screen.tsx` picks a view: start → game over → battle → encounter → mapped location (+ dialog over the same canvas) → dialog over a painting → road map → the classic card layout (only `world_journey` and 16 unpainted roads).
+- **Root.** `components/world/world-screen.tsx` picks a view: start → game over → battle → encounter → mapped location (+ dialog over the same canvas) → dialog over a painting → road map → the classic card layout (only `world_journey` and 14 unpainted roads).
 - **HUD** (mobile first):
   - the icon grid at the top left: 1 โปรไฟล์ 2 ย่าม 3 วิชา 4 อาชีพ 5 ภารกิจ 6 สำนัก 7 บันทึก, then ♪ and install;
   - purse, sundial and day at the top right, with the quest tracker below;
@@ -315,7 +322,7 @@ Content changes need **no save version bump**. Removed ids are dropped on load.
 
 ## Saves
 
-- **Keys.** The world save is `localStorage["wusia-world-v1"]`, **version 21**. The "wusia" spelling is historical — never rename it.
+- **Keys.** The world save is `localStorage["wusia-world-v1"]`, **version 22**. The "wusia" spelling is historical — never rename it.
 - **Migration.** `migrate` is one idempotent normalizer (it ignores `fromVersion`). The persist `merge` also back-fills lore rumors on every load, and `onRehydrateStorage` runs `validateAndRepair`.
 - **Adding a persisted field:**
   1. `WorldStateData` + `emptyData()`;

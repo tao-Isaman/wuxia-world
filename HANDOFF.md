@@ -24,10 +24,10 @@ The wave-by-wave history that used to live in this file has moved to [docs/chang
 
 A Thai wuxia RPG in the browser: Next.js 15, React 19, TypeScript, Phaser 4, Zustand.
 
-- **Exploring.** The hero walks painted maps: 102 places, 128 roads.
-- **Doing.** They talk to 157 NPCs, take 770 quests (154 sect lineage quests and 38 story sagas among them), join one of 15 sects, gather, craft, steal, and land in jail.
+- **Exploring.** The hero walks painted maps: 101 places, 128 roads; villages, towns and homes have their own people, activities and meetings.
+- **Doing.** They talk to 225 NPCs (and give them gifts), take 867 quests (154 sect lineage quests and 38 story sagas among them), join one of 15 sects, gather, craft, steal, and land in jail.
 - **Fighting.** Battles are turn-based tactics on a 10 × 7 board that grows to 15 × 10 for big gangs (up to 6 pack members plus the leader).
-- **Code.** Two pure engines (`lib/game`, `lib/world`) sit under Zustand stores and React / Phaser views. The world saves to `localStorage` (version 21).
+- **Code.** Two pure engines (`lib/game`, `lib/world`) sit under Zustand stores and React / Phaser views. The world saves to `localStorage` (version 22).
 
 Start with [README.md](README.md), then [docs/README.md](docs/README.md).
 
@@ -71,16 +71,16 @@ Checked on 2026-10-01 for wave 27 (animated, wandering NPCs and villain bosses):
 | `test:npcs` | 7 checks pass |
 | `test:routes` | 8 checks pass: 255 exits on 98 maps (246 within 45° of their bearing), 258 roads on 54 of the 56 paintings, 254/256 arrivals on the side the road came from |
 | `test:story` | 7 checks pass: 154 lineage quests, 38 sagas (340 chapters), 292 cutscenes; every quest and chapter plays through in the real store |
-| `test:quests` | the campaign audit passes (770 quests, 102 reachable locations); 213 item / kill / objective quests hand in through the real store; guidance covers 650 of 657 stages; all 39 steal / assassinate / kidnap stages offer the action and advance |
+| `test:quests` | the campaign audit passes (867 quests, 101 reachable locations); 213 item / kill / objective quests hand in through the real store; guidance covers 650 of 657 stages; all 39 steal / assassinate / kidnap stages offer the action and advance |
 | `test:docs` | the generated reference is current; every link, repo path and command in the docs resolves |
-| `bun scripts/audit-content.ts` | 157 NPCs · 770 quests · 2529 scenes, all references resolve |
+| `bun scripts/audit-content.ts` | 225 NPCs · 867 quests · 3038 scenes, all references resolve |
 | `bun run build` | passes; `/` first-load JS 984 kB (was 508 kB; the saga text is about 2.9 MB of source, ~500 kB gzipped) |
 | `bun run test:e2e` | all 23 Playwright tests pass against the production build on :3017 (about 10 minutes, Chromium 141 via the container shim) |
 
 Not verified:
 
 - **Browsers.** Only Chromium has run the browser tests, and only with emulated phone viewports, never physical phones.
-- **Quests by hand.** No one has played all 770 quests by hand; the quest audits and `test:story` stand in. The 38 sagas' writing has been checked by the validator, not proofread line by line.
+- **Quests by hand.** No one has played all 867 quests by hand; the quest audits and `test:story` stand in. The 38 sagas' writing has been checked by the validator, not proofread line by line.
 - **Balance.** No systematic balance pass has been done since the grid battle.
 
 ## Known issues

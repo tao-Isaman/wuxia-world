@@ -293,7 +293,7 @@ Channels used by the templates:
 - **Region.** Each rumor is heard only in its own region, or everywhere when its region is `"global"` (no rumor is ever made global in play).
   - The region comes from `regionOf(locationId)`.
   - `LOCATION_REGION` maps all 97 world-map leaves: heartland 10, north 15, south 14, west 13, east 18, jianghu_wild 27.
-  - Any other id falls back to `jianghu_wild`: the tutorial foothill (`village`, `tavern`, `viewpoint`), `jail`, `world_journey` and every route id.
+  - Any other id falls back to `jianghu_wild`: the tutorial foothill (`village`, `tavern`), `jail`, `world_journey` and every route id.
   - `REGION_NEIGHBORS` exists but nothing reads it, so rumors never spread to other regions.
 - **Channel.** A place listens on one channel, and `CHANNEL_ADMITS` says which rumor channels that includes:
 
