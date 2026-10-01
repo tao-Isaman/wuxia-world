@@ -6,6 +6,13 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-01
 
+### Location maps repainted to match their exits
+
+- **77 auto-map paintings repainted** (gpt-image-2, from the old painting as reference, then a targeted second pass on 49) so their paths lead to the exits the compass now puts them at. Buildings and layouts stayed put.
+- **New collision** for all 77, re-authored against the new paintings and checked with `map-collision-tool.ts` (every marker reachable).
+- **Exits sit on their paths.** `lib/world/data/auto-map-exits.ts` snaps each exit marker onto the point where its painted path meets the border; `map-collision-tool.ts` gains `--exits` and `--image`.
+- About 20 paintings still show an extra dead-end path off an edge, and four exits have no painted path (see HANDOFF).
+
 ### Directional roads
 
 - **Exits face where they go.** Every place has a spot on a world map (`lib/world/data/world-coords.ts`, built by `scripts/build-world-coords.ts`). Exits on a location map sit on the edge facing their destination: a place to the east is reached by the right-hand edge. Auto maps prefer their painted paths when one points within ~43°; hand maps keep their gates and reassign destinations.

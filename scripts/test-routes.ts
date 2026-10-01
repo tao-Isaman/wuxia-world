@@ -8,6 +8,7 @@ import { getLocationMap } from "../lib/world/data/location-maps";
 import { getRouteMap, routeDirection, routeGeometry } from "../lib/world/data/route-maps";
 import { WORLD_COORDS } from "../lib/world/data/world-coords";
 import { LOCATION_ROUTES } from "../lib/world/data/location-routes";
+import { AUTO_MAP_EXIT_POINTS } from "../lib/world/data/auto-map-exits";
 import { DIR8, angleGap, dir8Of, dirVector, mapPointAngle, mapPointDir, oppositeDir, worldBearing } from "../lib/world/compass";
 import { setArrivalFrom, peekArrivalFrom, clearArrivalFrom, clearMapPositions } from "../lib/stage/types";
 import { initialWorldPlacement } from "../lib/stage/world-placement";
@@ -83,6 +84,20 @@ check("regional grades: heartland untouched, others shift the colours, results s
     assert.notDeepEqual([...p], [...px()], `${region} changes the colours`);
     assert.equal(p[3], 255, "alpha untouched");
   }
+});
+
+check("snapped exit points sit at the border on a real exit of their map", () => {
+  let n = 0;
+  for (const [id, points] of Object.entries(AUTO_MAP_EXIT_POINTS)) {
+    const exits = getLocationMap(id)?.exits ?? [];
+    for (const [to, p] of Object.entries(points)) {
+      n++;
+      assert.ok(exits.some((e) => e.to === to && e.x === p.x && e.y === p.y), `${id} → ${to}: an exit of the map`);
+      const edge = Math.min(p.x, 100 - p.x, p.y, 100 - p.y);
+      assert.ok(edge <= 13, `${id} → ${to}: (${p.x}, ${p.y}) is ${edge}% from the border`);
+    }
+  }
+  console.log(`  ${n} exit points on ${Object.keys(AUTO_MAP_EXIT_POINTS).length} repainted maps`);
 });
 
 check("road geometry stays on the painting for all eight directions", () => {
