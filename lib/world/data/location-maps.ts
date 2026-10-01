@@ -61,6 +61,11 @@ export const LOCATION_MAPS: Record<string, LocationMapDef> = {
     image: "/maps/home_player.png",
     zoom: 2.2,
     spawn: { x: 46, y: 48 }, // courtyard, between the porch steps and the well
+    npcSpots: {
+      home_player_housekeeper_liu: { x: 60, y: 31 }, // under the laundry line
+      home_player_gatekeeper_zhou: { x: 57, y: 66 }, // inside the fence, beside the gate
+      home_player_neighbor_niu: { x: 82, y: 55 },    // on the hedge road to the neighbour's
+    },
     exits: [
       // main gate + dirt path running off the bottom edge → the capital
       { to: "city_capital", x: 47, y: 87, icon: "🚶" },
