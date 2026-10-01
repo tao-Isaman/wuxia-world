@@ -111,9 +111,9 @@ export const QUESTS_EMEI: readonly QuestDef[] = [
 
   {
     id: "qst_emei_art_bodhi",
-    name: "ตำราโพธิสัตว์ทรงพรต",
-    description: "ท่านนิ้วจิงฉานยอมเปิดตำราโพธิสัตว์ทรงพรตให้ศิษย์ที่ผ่านการพิสูจน์ทั้งดาบและจิตใจ — เป็นวิชาลับสุดยอดของง้อไบ๊",
-    briefSummary: "ฝึกโพธิสัตว์ทรงพรต — รับ T4 art ลับของง้อไบ๊",
+    name: "บททดสอบก่อนตำนาน: โพธิสัตว์ทรงพรต",
+    description: "ท่านนิ้วจิงฉานจะเล่าตำนานของโพธิสัตว์ทรงพรตให้ศิษย์ที่ผ่านการพิสูจน์ทั้งดาบและจิตใจ — เป็นวิชาลับสุดยอดของง้อไบ๊ (เมื่อผ่าน ดูแท็บตำนานในบันทึกภารกิจ)",
+    briefSummary: "บททดสอบ — เปิดทางสู่ตำนานของโพธิสัตว์ทรงพรต (ขั้นเฉพาะ)",
     type: "side",
     sectId: "emei",
     isArtQuest: true,
@@ -139,12 +139,11 @@ export const QUESTS_EMEI: readonly QuestDef[] = [
       },
       {
         id: "return_art",
-        description: "กลับไปรับตำราจากท่านนิ้วจิงฉาน",
+        description: "กลับไปรายงานผลต่อท่านนิ้วจิงฉาน",
       },
     ],
     rewards: [
       { t: "wExp", amount: 400 },
-      { t: "learnArt", artId: "t4_em_bodhi", level: 5 },
       { t: "trait", trait: "humility", amount: 10 },
       { t: "sectPoints", sectId: "emei", amount: 200 },
       { t: "npcRelationship", npcId: "sect_emei_abbess_jingchan", amount: 20 },

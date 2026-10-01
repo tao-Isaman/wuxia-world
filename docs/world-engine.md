@@ -113,7 +113,8 @@ Not in the barrel (import by path): `rollWalkEvent`, `releaseFromJail`, `consume
 | `sectStatus` | a membership has that status |
 | `sectRankAtLeast` | rank ≤ `maxRank` (lower is more senior) |
 | `goldAtLeast` | gold ≥ amount |
-| `learnedArt` | in `learnedArtIds` |
+| `learnedArt` / `learnedSkill` | in `learnedArtIds` / `learnedSkillIds` |
+| `statAtLeast` | the hero's gearless stat (`gearlessStat`: base + arts + skills, no equipment) ≥ `min` — what manuals check too |
 | `lifeSkillLevel` | mastery level ≥ min |
 | `heardRumor` / `heardRumorAbout` / `npcStatus` | Liveness state (unused by content today) |
 | `and` / `or` / `not` | combinators (`or` is unused by content) |
@@ -122,11 +123,11 @@ Not in the barrel (import by path): `rollWalkEvent`, `releaseFromJail`, `consume
 
 ### Definition
 
-- `QuestDef`: `id`, `name`, `description`, `briefSummary?`, `type?` (`"main"` / `"side"`, default main), `giverNpcId?`, `turnInNpcId?` (defaults to the giver), `prereqs?` (a condition), `stages`, `rewards?`, and for sects `sectId?`, `isArtQuest?`, `minSectRank?`; `isMajor?` fires a rumor about the hero on completion.
+- `QuestDef`: `id`, `name`, `description`, `briefSummary?`, `type?` (`"main"` / `"side"` / `"story"`, default main), `giverNpcId?`, `turnInNpcId?` (defaults to the giver), `prereqs?` (a condition), `stages`, `rewards?`, and for sects `sectId?`, `isArtQuest?`, `minSectRank?`; `isMajor?` fires a rumor about the hero on completion. Compiled sect quests also carry `lineage?: { kind, id }` (a lineage quest teaching that skill or art) or `story?: { arcId, chapter }` (a saga chapter) — see [story-quests.md](story-quests.md).
 - There is no `repeatable` field: a quest with a `sectId` that isn't an art quest is repeatable, with the sect's `questCooldownDays` (30 for every sect).
 - `QuestStage`: `id`, `description`, and at most one of `autoAdvance?` (a condition that advances the stage on its own) or `objective?` (see [Quest objectives](#quest-objectives)). A stage with neither is advanced by a dialog beat (`advanceQuest`) or, on the last stage, by the hand-in.
 - `QuestState` (in the save): `{ id, status: "active" | "done" | "failed", stage, acceptedDefeatedAt?, acceptedHasItemAt? }`.
-- Quest ids use prefixes by source file: `qc_` (cities), `qv_` (villages), `qw_` (wilderness), `qe_` (evil), `qst_` (sects, temples, spies). Their dialog scenes are `qs_<questId>_offer` and `qs_<questId>_complete`.
+- Quest ids use prefixes by source file: `qc_` (cities), `qv_` (villages), `qw_` (wilderness), `qe_` (evil), `qst_` (sects, temples, spies), and the compiled `ql_` (lineage) and `st_` (saga chapters). Their dialog scenes are `qs_<questId>_offer` and `qs_<questId>_complete`.
 
 ### Lifecycle
 
@@ -142,7 +143,7 @@ Not in the barrel (import by path): `rollWalkEvent`, `releaseFromJail`, `consume
    - `advanceQuest` past the last stage → done with rewards (no item consumption);
    - `finishQuest` → rewards on success, `failed` otherwise.
 5. **Hand-in at a person.** `isQuestTurnInForNpc` is true when the quest is active, on its **last** stage, and the NPC is `turnInNpcId ?? giverNpcId`. The popup opens `qs_<id>_complete` if it exists (and closes the quest itself if that scene doesn't), else calls `finishQuestNow` (consume items + finish).
-6. **Abandon.** `abandonQuest` marks the quest `failed` with no rewards. It can never be offered or accepted again (sect quests excepted, which the sect popup re-offers after the cooldown).
+6. **Abandon.** `abandonQuest` marks the quest `failed` with no rewards. It can never be offered or accepted again (sect quests excepted, which the sect popup re-offers after the cooldown). Story and lineage quests refuse (`reason: "keep"`): they are the only way to their skill or art.
 
 `consumeQuestAutoItems` removes `min(count, held)` for every `hasItem` leaf in every stage (including inside `not`). Scene-driven completions use explicit `takeItem` effects instead, so nothing is taken twice.
 
@@ -154,7 +155,7 @@ Not in the barrel (import by path): `rollWalkEvent`, `releaseFromJail`, `consume
 
 ### When a quest giver dies
 
-When the NPC simulation kills a named NPC, every active quest whose `giverNpcId` is that NPC fails, with an action-log line and a warning toast "ผู้ให้ภารกิจ … เสียชีวิต — ภารกิจ '…' หยุดลง" (`failQuestsForDeadGivers` in `store/world-store.ts`). 123 quests have one of the 15 simulated sect chiefs as giver. Dead NPCs stay visible and keep offering new quests (see [liveness.md](liveness.md#known-gaps)).
+When the NPC simulation kills a named NPC, every active quest whose `giverNpcId` is that NPC fails, with an action-log line and a warning toast "ผู้ให้ภารกิจ … เสียชีวิต — ภารกิจ '…' หยุดลง" (`failQuestsForDeadGivers` in `store/world-store.ts`). 123 quests have one of the 15 simulated sect chiefs as giver. Story and lineage quests are skipped: they outlive their giver. Dead NPCs stay visible and keep offering new quests (see [liveness.md](liveness.md#known-gaps)).
 
 ## Quest objectives
 

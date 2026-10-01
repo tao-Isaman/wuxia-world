@@ -6,6 +6,16 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-01
 
+### Sect lineage quests, story sagas and cutscenes
+
+- **Every sect skill and art now has a quest.** 154 lineage quests (สืบทอดวิชา, `ql_*`) pass on each tier 0–3 sect skill and art from an NPC at the sect's grounds. Difficulty follows the tier: rank and gearless-stat gates, more foes, items, and a spar with the teacher from T2. The outsider sects gate on evil or the venom life skill.
+- **38 story sagas** (ตำนาน, `st_*`, quest type `"story"`), one per T4 sect skill or art: 8–10 chapters each (340 in all) that retell legends of มังกรหยก ภาค 3 a century later, with funny present-day casts, flashbacks, twists, small rewards per chapter and the technique at the end. 38 new saga bosses (`st_*` opponents).
+- **Cutscenes.** 292 films staged on the painted maps (`lib/stage/cutscene-runtime.ts`, `components/world/cutscene-player.tsx`): actors walk and fight with their sheets, Phaser effects, moods (the sepia `past` flashback, night, dusk, snow, rain), letterbox, subtitles with a typewriter, title cards, auto-play and skip.
+- **Dialogs** play a film first (`DialogScene.cutscene`), page long talks (`paged`, "ต่อ ▶"), and replace `{hero}` with the player's name.
+- **Quest log.** A ตำนาน tab with saga progress, the next chapter's giver and gates, and 🎬 replays; 📜 / "ตำนาน" and "สืบทอดวิชา" badges.
+- **Rules.** Story and lineage quests can't be abandoned and don't fail when their giver dies. The seven old T4 art quests became prologue trials that open their saga. New conditions `learnedSkill` and `statAtLeast` (26 kinds).
+- New `bun run test:story` and `tests/browser/story.spec.ts`; docs [story-quests.md](story-quests.md) and [story-writing.md](story-writing.md).
+
 ### Inner arts: คัมภีร์เก้าอิม replaces เก้าหยินจิงชี่ and เก้าหยางเซินกง
 
 - **Removed** the T4 arts `jiuyin` เก้าหยินจิงชี่ and `jiuyang` เก้าหยางเซินกง (122 arts now). Saves that held them drop them on load (`validateAndRepair`).

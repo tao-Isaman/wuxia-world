@@ -106,9 +106,9 @@ export const QUESTS_HUASHAN: readonly QuestDef[] = [
 
   {
     id: "qst_huashan_art_purplecloud",
-    name: "ตำราพลังเมฆม่วง",
-    description: "อาจารย์อี้ชิงยอมเปิดตำราพลังเมฆม่วงให้ศิษย์ที่พิสูจน์ได้ทั้งดาบและจิตใจ — ผ่านการประลองกับโจรชั้นสูงและการเก็บเหล็กพิเศษ",
-    briefSummary: "ฝึกพลังเมฆม่วง — รับ T4 art ลับของหัวซาน",
+    name: "บททดสอบก่อนตำนาน: พลังเมฆม่วง",
+    description: "อาจารย์อี้ชิงจะเล่าตำนานของพลังเมฆม่วงให้ศิษย์ที่พิสูจน์ได้ทั้งดาบและจิตใจ — ผ่านการประลองกับโจรชั้นสูงและการเก็บเหล็กพิเศษ (เมื่อผ่าน ดูแท็บตำนานในบันทึกภารกิจ)",
+    briefSummary: "บททดสอบ — เปิดทางสู่ตำนานของพลังเมฆม่วง (ขั้นเฉพาะ)",
     type: "side",
     sectId: "huashan",
     isArtQuest: true,
@@ -134,12 +134,11 @@ export const QUESTS_HUASHAN: readonly QuestDef[] = [
       },
       {
         id: "return_art",
-        description: "กลับไปรับตำราจากอาจารย์อี้ชิง",
+        description: "กลับไปรายงานผลต่ออาจารย์อี้ชิง",
       },
     ],
     rewards: [
       { t: "wExp", amount: 200 },
-      { t: "learnArt", artId: "t4_huashan_purple", level: 3 },
       { t: "trait", trait: "humility", amount: 5 },
       { t: "sectPoints", sectId: "huashan", amount: 100 },
       { t: "npcRelationship", npcId: "sect_huashan_master_yiqing", amount: 10 },

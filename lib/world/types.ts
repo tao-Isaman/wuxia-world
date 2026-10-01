@@ -32,6 +32,17 @@ export interface DialogScene {
   choices?: Choice[];
   next?: string;
   onEnter?: SceneEffect[];
+  /**
+   * A cutscene (lib/world/data/cutscenes registry) played full screen when
+   * the dialog opens, before its lines and choices show. Dialogs with a
+   * cutscene always carry choices, so nothing auto-advances past the film.
+   */
+  cutscene?: string;
+  /**
+   * Show the lines a page at a time ("ต่อ ▶"), choices after the last page —
+   * for long story conversations that would not fit one screen.
+   */
+  paged?: boolean;
 }
 
 export interface LocationScene {
@@ -261,6 +272,12 @@ export type Condition =
   // player to have absorbed the Quanzhen sun art before the secret-sect
   // gate appears.
   | { t: "learnedArt"; artId: string }
+  // Player has learned this move skill (playerBuild.learnedSkillIds).
+  | { t: "learnedSkill"; skillId: string }
+  // A stat as the profile shows it without gear: base + learned skills and
+  // arts (level-scaled), the same number manuals check (combinedStats with
+  // excludeEquipment). Gates the harder lineage and story quests.
+  | { t: "statAtLeast"; stat: StatKey; min: number }
   // Player's mastery in a life skill (begging / mining / herbalism / …)
   // is at least `min`. Backed by lifeSkillXp + masteryLevel(). Used by
   // the Beggars intro to require begging≥2 before the join quest opens.
@@ -368,7 +385,9 @@ export interface NpcStateEntry {
 //          a side quest never appears on offer again (the NPC popup hides
 //          the offer when status !== "none"). Designed so players can fill
 //          spare time without polluting the main story flow.
-export type QuestType = "main" | "side";
+// "story" — a chapter of a story saga (lib/world/story): one of 8–10
+// linked quests that tell a legend and end in a T4 sect skill or art.
+export type QuestType = "main" | "side" | "story";
 
 // Per-stage optional auto-advance. When `autoAdvance` evaluates true while
 // a quest is on this stage, the engine advances stage automatically — no
@@ -466,6 +485,10 @@ export interface QuestDef {
   // archetype-flavored phrasing in the player's current region (Liveness
   // Layer §3.2.2). Default false.
   isMajor?: boolean;
+  /** Story saga chapter (type "story"): which saga, and its 1-based number. */
+  story?: { arcId: string; chapter: number };
+  /** Lineage quest: the sect skill or art it passes on (lib/world/story/lineage). */
+  lineage?: { kind: "skill" | "art"; id: string };
 }
 
 export interface QuestState {

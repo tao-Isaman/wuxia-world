@@ -30,6 +30,7 @@ How the game is drawn and operated: the Phaser stage, the world map runtime, col
 | World runtime | `lib/stage/world-runtime.ts` (`createWorldRuntime`); host React component `components/game/world-canvas.tsx` |
 | Pure world helpers | `lib/stage/types.ts` (markers, `WALK_TICK_UNITS`, session map positions), `world-navigation.ts`, `world-footprints-data.ts`, `world-placement.ts`, `world-map-probe.ts`, `world-occlusion.ts`, `world-lighting.ts`, `world-vignettes.ts`, `world-style.ts` |
 | Battle renderer | `lib/stage/grid-battle-runtime.ts`, `battle-vfx.ts`, `cast-vfx.ts` (pure), `battle-background.ts` (pure); host `components/game/battle-canvas.tsx` |
+| Cutscenes | `lib/stage/cutscene-runtime.ts` (`createCutsceneRuntime`); host `components/world/cutscene-player.tsx` (+ `.module.css`) — see [story-quests.md](story-quests.md#cutscenes) |
 | Characters | `lib/characters/catalog.ts`, `sheet.ts`, `walk-cycle.ts`; `components/game/character-preview.tsx` |
 | World UI | `components/world/` — `world-screen.tsx` (root), `location-view.tsx`, `location-map.tsx`, `route-map-view.tsx`, `route-view.tsx`, `dialog-stage.tsx`, `choice-panel.tsx`, `encounter-screen.tsx`, `map-hud.tsx`, `menu-bar.tsx`, `quest-tracker.tsx`, `quest-log.tsx`, `rest-quick-action.tsx`, `quest-completion-receipt.tsx`, `confirm-dialog.tsx`, `loading-overlay.tsx`, `toast-stack.tsx`, rumor components, `popups/` |
 | Touch | `components/game/touch-stick.tsx` |
@@ -340,6 +341,11 @@ A menu section opens as a full-screen **menu shell** (`components/ui/modal.tsx` 
 - **Confirm** (`confirm-dialog.tsx`, `store/confirm-store.ts`): `await confirmDialog({ title, message, confirmText, cancelText, variant })`.
   - Variants: default, warn, danger. Enter confirms and Esc cancels.
   - A new confirm resolves the open one as `false`.
+- **Cutscene player** (`cutscene-player.tsx`): a full-screen film for a dialog whose `cutscene` field names one ([story-quests.md](story-quests.md#cutscenes)).
+  - Its own Phaser game on the location's painting, letterboxed, with subtitles, title cards, fades and a CSS mood grade.
+  - Portalled to `<body>` at z-index 300, because a transformed ancestor (a menu `Modal`) would trap its fixed layer.
+  - The runtime is imported dynamically: a static Phaser import breaks server rendering.
+  - It is `role="dialog"`, so the map pauses underneath.
 - **Quest receipt** (`quest-completion-receipt.tsx` + `-data.ts`) appears on a real active → done change.
   - It never replays after a reload.
   - It shows the giver, a thank-you line from the complete scene, and the rewards (capped at what the quest grants).

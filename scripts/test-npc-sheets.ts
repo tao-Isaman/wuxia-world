@@ -97,7 +97,8 @@ await check("catalog: rigged NPCs are character ids with directions, and replace
 });
 
 await check("villains: every rigged villain is a power-gated boss with a gang in the encounter pool", () => {
-  const villains = OPPONENTS.filter((o) => o.look?.npc);
+  // Story-saga foes (st_*) may borrow a villain's sheet; the encounter bosses are the elite_ ones.
+  const villains = OPPONENTS.filter((o) => o.look?.npc && !o.id.startsWith("st_"));
   assert.equal(villains.length, 10);
   for (const o of villains) {
     assert.ok(hasAnimatedSheet(o.look!.npc), `${o.id} → ${o.look!.npc} has a sheet`);

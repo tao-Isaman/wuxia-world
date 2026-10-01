@@ -105,9 +105,9 @@ export const QUESTS_BEGGARS: readonly QuestDef[] = [
 
   {
     id: "qst_beggars_art_thousandcrowd",
-    name: "ตำราหมื่นมวลชน",
-    description: "หัวหน้าหงเทียนยอมเปิดตำราวิชาหมื่นมวลชนให้ศิษย์ที่พิสูจน์ได้ทั้งฝีมือและน้ำใจ — เป็นวิชาลับสุดยอดของพรรคยาจก",
-    briefSummary: "ฝึกหมื่นมวลชน — รับ T4 art ลับของพรรคยาจก",
+    name: "บททดสอบก่อนตำนาน: วิชาหมื่นมวลชน",
+    description: "หัวหน้าหงเทียนจะเล่าตำนานของวิชาหมื่นมวลชนให้ศิษย์ที่พิสูจน์ได้ทั้งฝีมือและน้ำใจ — เป็นวิชาลับสุดยอดของพรรคยาจก (เมื่อผ่าน ดูแท็บตำนานในบันทึกภารกิจ)",
+    briefSummary: "บททดสอบ — เปิดทางสู่ตำนานของวิชาหมื่นมวลชน (ขั้นเฉพาะ)",
     type: "side",
     sectId: "beggars",
     isArtQuest: true,
@@ -133,12 +133,11 @@ export const QUESTS_BEGGARS: readonly QuestDef[] = [
       },
       {
         id: "return_art",
-        description: "กลับไปรับตำราจากหัวหน้าหงเทียน",
+        description: "กลับไปรายงานผลต่อหัวหน้าหงเทียน",
       },
     ],
     rewards: [
       { t: "wExp", amount: 400 },
-      { t: "learnArt", artId: "t4_bg_thousandcrowd", level: 5 },
       { t: "trait", trait: "good", amount: 5 },
       { t: "sectPoints", sectId: "beggars", amount: 200 },
       { t: "npcRelationship", npcId: "sect_beggars_chief_hongtian", amount: 20 },

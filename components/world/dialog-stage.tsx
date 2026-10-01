@@ -8,6 +8,22 @@ import { CharacterPreview } from "@/components/game/character-preview";
 import { npcCharacterId } from "@/lib/characters/catalog";
 import { DialogDisplay } from "./dialog-display";
 import { ChoicePanel } from "./choice-panel";
+import { CutscenePlayer } from "./cutscene-player";
+import type { SceneLine } from "@/lib/world";
+
+/** Lines per page of a paged story dialog (about one screen on a phone). */
+const PAGE_CHARS = 260;
+const PAGE_LINES = 4;
+export function pageLines(lines: readonly SceneLine[]): SceneLine[][] {
+  const pages: SceneLine[][] = [];
+  let page: SceneLine[] = [], chars = 0;
+  for (const line of lines) {
+    if (page.length && (page.length >= PAGE_LINES || chars + line.text.length > PAGE_CHARS)) { pages.push(page); page = []; chars = 0; }
+    page.push(line); chars += line.text.length;
+  }
+  if (page.length) pages.push(page);
+  return pages;
+}
 import styles from "./dialog-stage.module.css";
 
 export interface DialogSpeaker { id: string; name: string }
@@ -22,6 +38,14 @@ export function DialogStage({ scene, speaker, title, locationName }: {
 }) {
   const state = useWorldStore();
   const headingId = useId();
+  // A dialog with a film plays it first (once per visit), then shows its lines.
+  const [filmDone, setFilmDone] = useState<string | null>(null);
+  const filmPending = !!scene.cutscene && filmDone !== scene.id;
+  // Paged story dialogs: one page at a time, choices after the last page.
+  const pages = scene.paged ? pageLines(scene.lines) : [scene.lines];
+  const [page, setPage] = useState(0);
+  useLayoutEffect(() => { setPage(0); }, [scene.id]);
+  const lastPage = page >= pages.length - 1;
   const heading = useRef<HTMLHeadingElement>(null);
   const content = useRef<HTMLDivElement>(null);
   const [moreBelow, setMoreBelow] = useState(false);
@@ -78,8 +102,15 @@ export function DialogStage({ scene, speaker, title, locationName }: {
     return () => { observer.disconnect(); node.removeEventListener("scroll", measure); };
   }, [scene.id]);
 
+  if (filmPending) {
+    return <CutscenePlayer key={scene.id} cutsceneId={scene.cutscene!} onDone={() => {
+      useWorldStore.getState()._setFlag(`seen-cutscene:${scene.cutscene}`, true);
+      setFilmDone(scene.id);
+    }} />;
+  }
+
   return (
-    <div className={styles.stage} data-testid="dialog-stage" data-dialog-scale={scale}
+    <div className={styles.stage} data-testid="dialog-stage" data-dialog-scale={scale} data-page={page} data-pages={pages.length}
       style={{ "--dialog-scale": scale } as React.CSSProperties}>
       <section
         className={styles.panel}
@@ -129,8 +160,13 @@ export function DialogStage({ scene, speaker, title, locationName }: {
             </button>}
           </header>
           <div ref={content} className={styles.content} tabIndex={0} role="region" aria-label="บทสนทนาและตัวเลือก">
-            <div className={styles.lines}><DialogDisplay scene={scene} speakerName={speaker?.name} /></div>
-            <div className={styles.choices}><ChoicePanel scene={scene} /></div>
+            <div className={styles.lines}><DialogDisplay scene={scene} speakerName={speaker?.name} lines={pages[Math.min(page, pages.length - 1)]} /></div>
+            <div className={styles.choices}>{lastPage ? <ChoicePanel scene={scene} /> : (
+              <div className="bg-ink/85 text-paper shadow-pixel p-3">
+                <button type="button" data-testid="dialog-next-page" className="w-full rounded-md border border-paper/40 bg-paper/10 py-2 text-base hover:bg-paper/25"
+                  onClick={() => setPage((p) => p + 1)} autoFocus>ต่อ ▶ <span className="text-paper/50 text-sm">({page + 1}/{pages.length})</span></button>
+              </div>
+            )}</div>
           </div>
           {moreBelow && <div className={styles.scrollHint} aria-hidden="true">เลื่อนลงเพื่ออ่านต่อและดูตัวเลือก ↓</div>}
         </div>

@@ -20,10 +20,10 @@ import {
   playerPowerIndex,
   pickWeighted,
 } from "./data/random-events";
-import { evaluateCondition } from "./conditions";
+import { evaluateCondition, gearlessStat } from "./conditions";
 import { JAIL_BRIBE_GOLD, JAIL_HOURS_PER_DAY, absoluteHours, jailCityFor, jailDays, lawChance, pickLawPursuer, sentenceLeft } from "./law";
 import { JAIL_SCENE_ID } from "./data/activities";
-import { deriveAll } from "../game";
+import { STAT_LABEL, deriveAll, getArt, getSkill } from "../game";
 import { generatePlayerEcho } from "./rumor-engine";
 
 // Pure mutation: applies a single effect to the world state in place.
@@ -964,6 +964,16 @@ export function describeQuestCondition(
         required: 1,
         done: ok,
       }];
+    }
+    case "statAtLeast": {
+      const v = gearlessStat(state, c.stat);
+      return [{ label: `${STAT_LABEL[c.stat] ?? c.stat} ≥ ${c.min}`, current: v, required: c.min, done: v >= c.min }];
+    }
+    case "learnedSkill":
+    case "learnedArt": {
+      const done = evaluateCondition(state, c);
+      const name = c.t === "learnedSkill" ? getSkill(c.skillId)?.n ?? c.skillId : getArt(c.artId).n;
+      return [{ label: `เรียน ${name}`, current: done ? 1 : 0, required: 1, done }];
     }
     case "assassinatedNpc":
     case "kidnappedNpc": {

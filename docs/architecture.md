@@ -99,7 +99,7 @@ Two deliberate exceptions reach up into stores:
 
 **`lib/world/` — story** (details in [world-engine.md](world-engine.md) and [liveness.md](liveness.md)):
 
-- **Types:** `types.ts` holds the scene union, `SceneEffect` (26 kinds), `Condition` (24 kinds), quests, items, NPCs, opponents and `WorldStateData`.
+- **Types:** `types.ts` holds the scene union, `SceneEffect` (26 kinds), `Condition` (26 kinds), quests, items, NPCs, opponents and `WorldStateData`.
 - **Rules:** `effects.ts` (the effect dispatcher, quest progress and rewards, walk-tick encounters), `conditions.ts`, `validate.ts` (save repair).
 - **Systems:** `quest-objectives.ts` and `quest-guide.ts`; `law.ts`, `bad-actions.ts`, `stat-progression.ts`, `location-categories.ts`; `npc-tick.ts` and `rumor-engine.ts`.
 - **Seam to battle:** `battle-looks.ts` and `battle-bridge.ts`.

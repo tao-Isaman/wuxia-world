@@ -2,11 +2,11 @@
 
 # Opponents
 
-204 opponents (`lib/world/data/opponents.ts`). Random encounters draw from 64 fight events (plus 4 treasure and 3 meeting events) filtered by zone (`lib/world/data/random-events.ts`).
+242 opponents (`lib/world/data/opponents.ts`). Random encounters draw from 64 fight events (plus 4 treasure and 3 meeting events) filtered by zone (`lib/world/data/random-events.ts`).
 
 Met via: **roams** = random walk encounters in the listed zones · **hunt** = a hunting node · **spar** = an NPC's practice bout · **scene** = a quest or story battle (count of scene choices) · **law** = pursuers after wanted marks · **betrayal** = hunters after betraying a sect.
 
-Per tier: T0: 9 · T1: 36 · T2: 54 · T3: 37 · T4: 68. Per category: ฝ่ายมนุษย์ (human): 171 · สัตว์ป่า (beast): 27 · ผู้พิเศษ (supernatural): 6.
+Per tier: T0: 9 · T1: 36 · T2: 54 · T3: 37 · T4: 106. Per category: ฝ่ายมนุษย์ (human): 209 · สัตว์ป่า (beast): 27 · ผู้พิเศษ (supernatural): 6.
 
 ## Tier 0 (9)
 
@@ -81,7 +81,7 @@ Per tier: T0: 9 · T1: 36 · T2: 54 · T3: 37 · T4: 68. Per category: ฝ่า
 | `hunt_giant_bear` | หมีหิน | beast | — | 7 | hunt |
 | `hunt_mountain_lynx` | เสือเขาเล็ก | beast | — | 7 | hunt |
 | `hunt_jungle_serpent` | งูยักษ์ป่า | beast | — | 7 | hunt |
-| `spar_swordsman_xiao` | เซียวจิ้งเทียน | human | — | 10 | spar |
+| `spar_swordsman_xiao` | เซียวจิ้งเทียน | human | — | 10 | spar, scene ×1 |
 | `spar_wudang_zhirong` | หัวหน้าศิษย์จื้อหรง | human | — | 9 | spar |
 | `spar_wudang_yujian` | ศิษย์อวี่เจี้ยน | human | — | 8 | spar |
 | `spar_huashan_qingsong` | อาจารย์ดาบชิงซ่ง | human | — | 8 | spar |
@@ -95,7 +95,7 @@ Per tier: T0: 9 · T1: 36 · T2: 54 · T3: 37 · T4: 68. Per category: ฝ่า
 | `spar_hengshan_north_yihe` | ภิกษุณีอี๋เหอ | human | — | 9 | spar |
 | `spar_hengshan_north_yiqing` | ภิกษุณีอี๋ชิง | human | — | 9 | spar |
 | `spar_emei_zhihui` | หัวหน้าศิษย์จื้อฮุย | human | — | 8 | spar |
-| `spar_emei_xiaoyu` | ศิษย์เสี่ยวอวี้ | human | — | 7 | spar |
+| `spar_emei_xiaoyu` | ศิษย์เสี่ยวอวี้ | human | — | 7 | spar, scene ×1 |
 | `spar_wudang_disciple` | สาวกชิงเฟิง | human | — | 9 | spar |
 | `spar_emei_nun` | นักพรตชิงอวี้ | human | — | 9 | spar |
 | `spar_huashan_disciple` | ศิษย์เจี้ยนอี้ | human | — | 10 | spar |
@@ -113,21 +113,21 @@ Per tier: T0: 9 · T1: 36 · T2: 54 · T3: 37 · T4: 68. Per category: ฝ่า
 | `spar_spy_xi` | ซีท่าเรือ | human | — | 8 | spar |
 | `spar_spy_mei` | เหมยพรานป่า | human | — | 8 | spar |
 | `spar_sunmoon_yilin` | หัวหน้าศิษย์อี้หลิน | human | — | 8 | spar |
-| `spar_sunmoon_lanfenghuang` | ศิษย์หลานเฟิงหวง | human | — | 7 | spar |
+| `spar_sunmoon_lanfenghuang` | ศิษย์หลานเฟิงหวง | human | — | 7 | spar, scene ×1 |
 | `spar_tang_tanglin` | หัวหน้าศิษย์ถังหลิน | human | — | 8 | spar |
 | `spar_tang_tangtao` | ศิษย์ถังเทา | human | — | 7 | spar |
 | `frost_wolf` | หมาป่าหิมะ | beast | 2× หมาป่า | 7 | roams (frontier, isle, wild) |
 | `blood_boar` | หมูป่าเลือดคลั่ง | beast | 1× หมูป่า | 6 | roams (frontier, isle, wild) |
-| `bandit_lieutenant` | รองหัวหน้าโจร | human | 1× โจรป่า + 1× มือเข็มโจรป่า | 6 | roams (city, frontier, isle, mansion, sect, temple, wild) |
-| `night_blade` | มือมีดราตรี | human | — | 6 | roams (city, frontier, isle, mansion, sect, temple, wild) |
+| `bandit_lieutenant` | รองหัวหน้าโจร | human | 1× โจรป่า + 1× มือเข็มโจรป่า | 6 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×1 |
+| `night_blade` | มือมีดราตรี | human | — | 6 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×2 |
 | `demon_cult_zealot` | สาวกลัทธิมาร | human | 2× สาวกลัทธิมาร | 6 | roams (city, frontier, isle, mansion, sect, temple, wild) |
 
 ## Tier 3 (37)
 
 | Id | Name | Category | Pack | Drops | Met via |
 | --- | --- | --- | --- | --- | --- |
-| `blade_master` | อาจารย์ดาบ | human | 1× กระบี่พเนจร | 7 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×1 |
-| `shadow_assassin` | นักฆ่าเงา | human | 2× มือมีดราตรี | 7 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×1 |
+| `blade_master` | อาจารย์ดาบ | human | 1× กระบี่พเนจร | 7 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×2 |
+| `shadow_assassin` | นักฆ่าเงา | human | 2× มือมีดราตรี | 7 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×2 |
 | `wudang_disciple` | สาวกอู่ตัง | human | — | 7 | roams (city, frontier, isle, mansion, sect, temple, wild) |
 | `snow_demon` | ปีศาจหิมะ | supernatural | — | 8 | roams (sect, temple, wild) |
 | `sect_elder` | ผู้อาวุโสสำนัก | human | — | 7 | roams (city, frontier, isle, mansion, sect, temple, wild) |
@@ -145,13 +145,13 @@ Per tier: T0: 9 · T1: 36 · T2: 54 · T3: 37 · T4: 68. Per category: ฝ่า
 | `spar_hengshan_south_master` | อาจารย์ใหญ่โม่ต้า | human | — | 12 | spar |
 | `spar_hengshan_north_dingyi` | ภิกษุณีติ่งอี้ | human | — | 12 | spar |
 | `spar_emei_yuxin` | หมอนิ้วอวี้ซิน | human | — | 11 | spar |
-| `spar_kunlun_qiu` | ชิวเฉียน | human | — | 10 | spar |
+| `spar_kunlun_qiu` | ชิวเฉียน | human | — | 10 | spar, scene ×1 |
 | `spar_beggars_yunsi` | อาจารย์ข่าวสารยุนซือ | human | — | 10 | spar |
 | `spar_gumu_disciple` | ศิษย์เลิ่งเยว่ | human | — | 8 | spar |
 | `spar_xiaoyao_master` | ปรมาจารย์ยุนเซียว | human | — | 8 | — |
 | `spar_xiaoyao_xiaorang` | ผู้อาวุโสดาบเสี่ยวหรง | human | — | 9 | spar |
 | `spar_ming_envoy` | ผู้แทนหั่วจี้ | human | — | 9 | spar |
-| `spar_xuedao_blade` | ดาบเลือดเซียะลาง | human | — | 8 | spar |
+| `spar_xuedao_blade` | ดาบเลือดเซียะลาง | human | — | 8 | spar, scene ×1 |
 | `spar_xueyu_master` | จอมยุทธฉือยิง | human | — | 8 | spar |
 | `spar_jinyiwei_qin` | องครักษ์ฉิน | human | — | 11 | spar |
 | `spar_jinyiwei_lu` | องครักษ์ลู่ | human | — | 11 | spar |
@@ -164,7 +164,7 @@ Per tier: T0: 9 · T1: 36 · T2: 54 · T3: 37 · T4: 68. Per category: ฝ่า
 | `thunder_eagle` | อินทรีสายฟ้า | beast | — | 7 | roams (frontier, isle, wild) |
 | `ghost_swordsman` | วิญญาณจอมกระบี่ | supernatural | — | 7 | roams (sect, temple, wild) |
 
-## Tier 4 (68)
+## Tier 4 (106)
 
 | Id | Name | Category | Pack | Drops | Met via |
 | --- | --- | --- | --- | --- | --- |
@@ -174,28 +174,28 @@ Per tier: T0: 9 · T1: 36 · T2: 54 · T3: 37 · T4: 68. Per category: ฝ่า
 | `heretical_grandmaster` | เจ้าสำนักอธรรม | human | — | 8 | roams (city, frontier, isle, mansion, sect, temple, wild) |
 | `immortal_warrior` | นักรบอมตะ | supernatural | — | 8 | roams (sect, temple, wild) |
 | `spar_shaolin_xianren` | หลวงพ่อเซียนเหริน | human | — | 14 | spar |
-| `spar_shaolin_juti` | หลวงพ่อจูตี้ | human | — | 13 | spar |
-| `spar_shaolin_huimiao` | หลวงพี่ใหญ่ฮุยเหมียว | human | — | 15 | spar |
+| `spar_shaolin_juti` | หลวงพ่อจูตี้ | human | — | 13 | spar, scene ×2 |
+| `spar_shaolin_huimiao` | หลวงพี่ใหญ่ฮุยเหมียว | human | — | 15 | spar, scene ×2 |
 | `spar_shaolin_abbot_huiyuan` | เจ้าอาวาสฮุยหยวน | human | — | 19 | spar |
 | `spar_shaolin_luohan` | รองเจ้าอาวาสลั่วฮั่น | human | — | 18 | spar |
-| `spar_wudang_master_qingxu` | อาจารย์ชิงซวี่ | human | — | 17 | spar |
+| `spar_wudang_master_qingxu` | อาจารย์ชิงซวี่ | human | — | 17 | spar, scene ×1 |
 | `spar_wudang_xuancheng` | รองอาจารย์เสวียนเฉิง | human | — | 14 | spar |
-| `spar_wudang_lingyu` | อาจารย์ดาบหลิงอวี้ | human | — | 13 | spar |
+| `spar_wudang_lingyu` | อาจารย์ดาบหลิงอวี้ | human | — | 13 | spar, scene ×1 |
 | `spar_emei_abbess_jingchan` | ท่านนิ้วห้วนจิงฉาน | human | — | 15 | spar |
 | `spar_emei_huimiao` | รองท่านนิ้วฮุยเหมียว | human | — | 13 | spar |
-| `spar_emei_qingxin` | ท่านนิ้วดาบชิงซิน | human | — | 11 | spar |
+| `spar_emei_qingxin` | ท่านนิ้วดาบชิงซิน | human | — | 11 | spar, scene ×1 |
 | `spar_emei_huiyu` | ท่านนิ้วฝ่ามือฮุยอวี้ | human | — | 11 | spar |
-| `spar_beggars_chief_hongtian` | หัวหน้าหงเทียน | human | — | 14 | spar |
+| `spar_beggars_chief_hongtian` | หัวหน้าหงเทียน | human | — | 14 | spar, scene ×1 |
 | `spar_beggars_lifang` | รองหัวหน้าหลี่ฟาง | human | — | 12 | spar |
-| `spar_beggars_qicheng` | อาจารย์ไม้เท้าฉีเฉิง | human | — | 11 | spar |
+| `spar_beggars_qicheng` | อาจารย์ไม้เท้าฉีเฉิง | human | — | 11 | spar, scene ×1 |
 | `spar_beggars_wudao` | อาจารย์หมัดอู่เต้า | human | — | 11 | spar |
 | `spar_gumu_mystery_woman` | หญิงปริศนาในสุสาน | human | — | 14 | spar |
 | `spar_xiaoyao_master_yunxiao` | ปรมาจารย์ยุนเซียว | human | — | 14 | spar |
 | `spar_xiaoyao_tianshan` | รองอาจารย์เทียนซาน | human | — | 11 | spar |
 | `spar_xiaoyao_wuyazi` | ผู้อาวุโสกระบี่อู๋หยาจื่อ | human | — | 11 | spar |
-| `spar_xiaoyao_libai` | ผู้อาวุโสฝ่ามือหลี่ไป๋ | human | — | 11 | spar |
+| `spar_xiaoyao_libai` | ผู้อาวุโสฝ่ามือหลี่ไป๋ | human | — | 11 | spar, scene ×1 |
 | `hunter_xiaoyao` | นักล่าพรรคสราญรมย์ | human | — | 10 | betrayal |
-| `spar_jinyiwei_leader` | ผู้บัญชาการจ้าวฝู่ | human | — | 12 | spar |
+| `spar_jinyiwei_leader` | ผู้บัญชาการจ้าวฝู่ | human | — | 12 | spar, scene ×2 |
 | `elite_blood_rakshasa` | อสุรกายโลหิต | supernatural | 3× ค้างคาวดูดเลือด | 12 | — |
 | `elite_void_grandmaster` | ปรมาจารย์ความว่าง | human | 1× วิญญาณจอมกระบี่ | 12 | — |
 | `elite_iron_mountain` | ภูเขาเหล็ก | human | 2× นักเลงฝ่ามือเหล็ก | 13 | — |
@@ -204,7 +204,7 @@ Per tier: T0: 9 · T1: 36 · T2: 54 · T3: 37 · T4: 68. Per category: ฝ่า
 | `spar_sunmoon_chief_dongfang` | อาจารย์ใหญ่หยินอวี้ | human | — | 14 | spar |
 | `spar_sunmoon_renwoxing` | รองเจ้าสำนักเหรินหวัวสิง | human | — | 11 | spar |
 | `spar_sunmoon_zuolengchan` | ผู้อาวุโสตะวันจั่วเหลิงฉัน | human | — | 10 | spar |
-| `spar_sunmoon_xianggwentian` | ผู้อาวุโสจันทราเสี่ยงเหวินเทียน | human | — | 11 | spar |
+| `spar_sunmoon_xianggwentian` | ผู้อาวุโสจันทราเสี่ยงเหวินเทียน | human | — | 11 | spar, scene ×1 |
 | `spar_tang_chief_tangmen` | เจ้าสำนักถังเหมิน | human | — | 14 | spar |
 | `spar_tang_tangshanhu` | รองเจ้าสำนักถังซานหู | human | — | 11 | spar |
 | `spar_tang_tangzhongtian` | ผู้อาวุโสพิษถังจงเทียน | human | — | 12 | spar |
@@ -236,3 +236,41 @@ Per tier: T0: 9 · T1: 36 · T2: 54 · T3: 37 · T4: 68. Per category: ฝ่า
 | `elite_villain_huibao` | พระอเถระนอกรีตฮุยเป้า | human | 1× สาวกลัทธิมาร + 2× นักเลงฝ่ามือเหล็ก | 9 | — |
 | `elite_villain_xuelang` | ดาบเลือดเซียะลาง | human | 1× มือมีดราตรี | 8 | — |
 | `elite_villain_dushou` | ศิษย์ตู๋โซ่ว | human | 2× สาวกลัทธิมาร | 9 | — |
+| `st_vajra_finger_heir` | ทายาทนิ้ววัชระ | human | — | 8 | scene ×1 |
+| `st_wudang_hundred_swords` | ไป่เจี้ยน ผู้สะสมกระบี่ร้อยเล่ม | human | — | 8 | scene ×1 |
+| `st_wudang_pure_white_blade` | ฉุนเจิ้ง กระบี่ขาวบริสุทธิ์ | human | — | 8 | scene ×1 |
+| `st_wudang_silver_tongue` | ซือหม่าเหยียน ลิ้นเงิน | human | — | 8 | scene ×1 |
+| `st_shaolin_thirteen_fists` | เหลยเจิ้น จอมหมัดสิบสาม | human | — | 8 | scene ×1 |
+| `st_shaolin_lion_mourner` | หลิวอู๋ฮุ่ย ผู้สวมขนราชสีห์ | human | — | 8 | scene ×1 |
+| `st_shaolinarts_white_ape` | วานรขาวไป๋หยวน | human | — | 8 | scene ×1 |
+| `st_shaolinarts_patron_seng` | คหบดีเซ่ง | human | — | 8 | scene ×1 |
+| `st_shaolinarts_whip_breaker` | หานเยี่ย ผู้ทำลายวงล้อม | human | — | 8 | scene ×1 |
+| `st_emei_huiniang` | ฮุ้ยเหนียง | human | — | 8 | scene ×1 |
+| `st_emei_black_iron` | ขุนเหล็กดำ | human | — | 8 | scene ×1 |
+| `st_emeiarts_golden_needle` | อาเหิงเข็มทอง | human | — | 8 | scene ×1 |
+| `st_emeiarts_white_bone` | ซูอวิ๋นหัตถ์กระดูกขาว | human | — | 8 | scene ×1 |
+| `st_huashan_gold_fan` | บัณฑิตพัดทอง | human | — | 8 | scene ×1 |
+| `st_huashan_two_faced_blade` | ดาบสองหน้า | human | — | 8 | scene ×1 |
+| `st_gumu_jueqing_lord` | กงซุนเหลียง เจ้าหุบเขาตัดใจ | human | — | 8 | scene ×1 |
+| `st_gumu_bone_claw` | เหยียนซวง นางกรงเล็บกระดูกขาว | human | — | 8 | scene ×1 |
+| `st_gumu_xuanming_heir` | หานเฉิงอวี้ ทายาทฝ่ามือเฮี้ยนเม้ง | human | — | 8 | scene ×1 |
+| `st_beggars_false_chief` | ตั้งกิมเหลียง หัวหน้าเก้าถุงครึ่ง | human | — | 8 | scene ×1 |
+| `st_beggars_iron_staff` | เกาไม้เท้าเหล็ก | human | — | 8 | scene ×1 |
+| `st_beggarsarts_silver_tongue` | ลิ้นเงินซือฉวน | human | — | 8 | scene ×1 |
+| `st_beggarsarts_redplum_heir` | นายน้อยคฤหาสน์เหมยแดง | human | — | 8 | scene ×1 |
+| `st_sunmoon_forced_ninth` | ฉีเหยียนผู้ฝืนขั้นเก้า | human | — | 8 | scene ×1 |
+| `st_sunmoon_radiant_envoy` | ทูตจันทร์ฉาย | human | — | 8 | scene ×1 |
+| `st_xiaoyao_hawk_steward` | พ่อบ้านใหญ่ตาเหยี่ยว | human | — | 8 | scene ×1 |
+| `st_xiaoyao_snow_bat` | ค้างคาวหิมะเหมยเสวี่ย | human | — | 8 | scene ×1 |
+| `st_outsider_sixfold_dushi` | ตู๋ซื่อ มือพิษหกธาตุ | human | — | 8 | scene ×1 |
+| `st_outsider_black_pot` | ลุงหม้อดำ | human | — | 8 | scene ×1 |
+| `st_outsider_lion_mask` | หน้ากากราชสีห์ทอง | human | — | 8 | scene ×1 |
+| `st_jinyiwei_eunuch_liang` | ขันทีใหญ่เหลียง | human | — | 8 | scene ×1 |
+| `st_jinyiwei_helian` | ขุนดาบเฮ่อเหลียนป้า | human | — | 8 | scene ×1 |
+| `st_jinyiweiarts_leng_suo` | เหลิงซั่ว ฝ่ามือเฮี้ยนเม้ง | human | — | 8 | scene ×1 |
+| `st_jinyiweiarts_sun_yu` | เจ้ากรมเงาไหมซุนอวี้ | human | — | 8 | scene ×1 |
+| `st_jinyiweiarts_gu_chang` | ราชครูกู่ฉาง ผู้คุมหอเจดีย์ | human | — | 8 | scene ×1 |
+| `st_tang_peng_canghai` | จอมโจรสลัดเผิงชางไห่ | human | — | 8 | scene ×1 |
+| `st_tang_heartless_liang` | หมอไร้ใจเหลียงอู๋ซิน | human | — | 8 | scene ×1 |
+| `st_tangarts_seven_star` | ถังเชวียน เจ้าหอพิษเจ็ดดาว | human | — | 8 | scene ×1 |
+| `st_tangarts_black_iron_lord` | ประมุขเหล็กดำ | human | — | 8 | scene ×1 |

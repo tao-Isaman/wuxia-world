@@ -276,7 +276,7 @@ export type SparResult =
 
 // Result of attempting to accept / abandon a quest from the NPC popup.
 export type QuestActionResult =
-  | { ok: false; reason: "unknown" | "already-active" | "already-done" | "prereq" }
+  | { ok: false; reason: "unknown" | "already-active" | "already-done" | "prereq" | "keep" }
   | { ok: true; questId: string };
 
 // Result of a bad-action attempt (ขโมย / ลอบทำร้าย / ลักพาตัว). All three
@@ -788,6 +788,9 @@ function failQuestsForDeadGivers(
     if (q.status !== "active") continue;
     const def = getQuest(q.id);
     if (!def?.giverNpcId) continue;
+    // A saga chapter or lineage quest is the only way to its skill or art:
+    // it outlives its giver (the legend carries on; the hand-in still works).
+    if (def.story || def.lineage) continue;
     const giverId = def.giverNpcId;
     if (!wasAlive.has(giverId)) continue;
     const ext = state.npcExt[giverId];
@@ -2732,6 +2735,9 @@ export const useWorldStore = create<WorldStore>()(
         if (!def) return { ok: false, reason: "unknown" };
         const cur = s.quests[questId];
         if (!cur || cur.status !== "active") return { ok: false, reason: "already-done" };
+        // Saga chapters and lineage quests are the only way to their skill or
+        // art; failing one for good would lock it away, so they can't be dropped.
+        if (def.story || def.lineage) return { ok: false, reason: "keep" };
         const draft = draftFrom(s);
         // Mark failed without granting rewards — finishQuest's success=false
         // path skips the reward dispatcher.

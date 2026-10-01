@@ -352,6 +352,8 @@ Then run `bun run test:navigation`: every painted map must keep its spawn open a
    - a manual item (`man_…` with `manualLearnSkill` / `manualLearnArt`; check with `bun scripts/audit-manual-names.ts`);
    - a quest reward `learnSkill` / `learnArt`;
    - an opponent's build, which shows it in battle only.
+
+   **A sect skill or art also needs exactly one quest source** (`bun run test:story` fails otherwise): a `LineageSpec` for T0–T3, or a whole `StoryArcSpec` saga for T4, in `lib/world/data/story/<sect>.ts`. See [story-writing.md](story-writing.md).
 7. **Check it.** Run `bun run typecheck` and `bun run test:grid-skills`, then regenerate the reference ([reference/martial-arts.md](reference/martial-arts.md)).
 
 New **effect** kinds (a new `se` / `ee` / passive / art-active type) are engine changes: see [combat.md](combat.md#changing-combat-safely).
@@ -396,8 +398,9 @@ This touches many files. In order:
 8. **Betrayal.**
    - A `hunter_<sectId>` opponent (tier 4).
    - A redemption quest `qst_<sectId>_redemption`, gated by `{ t: "sectStatus", sectId, status: "betrayed" }`, whose rewards include `resignSect`.
-9. **Optional.** Add the chief to the Liveness roster.
-10. **Check.** Run `bun scripts/audit-content.ts`, `bun run test:quests`, `bun run typecheck`, and regenerate the reference ([reference/sects.md](reference/sects.md)).
+9. **Lineage and sagas.** A lineage quest for each of the sect's T0–T3 skills and arts, and a saga for each T4, in `lib/world/data/story/<sect>.ts` (registered in `story/index.ts`). See [story-writing.md](story-writing.md).
+10. **Optional.** Add the chief to the Liveness roster.
+11. **Check.** Run `bun scripts/audit-content.ts`, `bun run test:quests`, `bun run test:story`, `bun run typecheck`, and regenerate the reference ([reference/sects.md](reference/sects.md)).
 
 ## Named NPCs and rumors
 

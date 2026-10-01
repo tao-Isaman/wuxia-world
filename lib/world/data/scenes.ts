@@ -6,6 +6,7 @@ import { SCENES_SECTS_TEMPLES } from "./scenes-content/sects-temples";
 import { SCENES_WILDERNESS } from "./scenes-content/wilderness";
 import { SCENES_EVIL } from "./scenes-content/evil";
 import { SCENES_SPIES } from "./scenes-content/spies";
+import { STORY_SCENES } from "../story/registry";
 
 // Scene table — three kinds (dialog / location / route) discriminated by `kind`.
 //
@@ -521,6 +522,7 @@ export const SCENES: readonly Scene[] = [
   ...SCENES_WILDERNESS,
   ...SCENES_EVIL,
   ...SCENES_SPIES,
+  ...STORY_SCENES,
 ];
 
 export const SCENES_BY_ID = new Map<string, Scene>(SCENES.map((s) => [s.id, s]));
