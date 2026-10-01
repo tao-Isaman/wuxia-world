@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import type { ArtisanDef, LocationMapDef, LocationScene, MapSpot, NpcDef } from "@/lib/world";
-import { activeGuide, evaluateCondition, guideMarkerId, objectiveMarkerId, objectiveSpotsAt, objectiveSpotsForNpc, getArtisan, getQuestsForNpc, isQuestOfferable, isQuestTurnInForNpc, getNpcsAtLocation, getResource, getScene, getSectHallAt, getShopAt, npcBodySprite, npcPixelSprite, playerBodySprite } from "@/lib/world";
+import { npcPresent, activeGuide, evaluateCondition, guideMarkerId, objectiveMarkerId, objectiveSpotsAt, objectiveSpotsForNpc, getArtisan, getQuestsForNpc, isQuestOfferable, isQuestTurnInForNpc, getNpcsAtLocation, getResource, getScene, getSectHallAt, getShopAt, npcBodySprite, npcPixelSprite, playerBodySprite } from "@/lib/world";
 import { useWorldStore, TRAVEL_STAMINA_COST } from "@/store/world-store";
 import { getActivity } from "@/lib/world/data/activities";
 import { toast } from "@/store/toast-store";
@@ -55,7 +55,7 @@ export function LocationMap({ scene, map, handlers, readOnly = false, dialogueSp
   useEffect(() => () => { clearArrivalFrom(scene.id); }, [scene.id]);
   const markers: WorldMarker[] = [];
   const spots = map.npcSpots ?? {};
-  const registry = getNpcsAtLocation(scene.id).filter((n) => spots[n.id] && (!n.visibleIf || evaluateCondition(state, n.visibleIf)));
+  const registry = getNpcsAtLocation(scene.id).filter((n) => spots[n.id] && npcPresent(state, n.id) && (!n.visibleIf || evaluateCondition(state, n.visibleIf)));
   const registryIds = new Set(registry.map((n) => n.id));
   for (const npc of scene.npcs) {
     if (!spots[npc.id] || registryIds.has(npc.id) || (npc.visibleIf && !evaluateCondition(state, npc.visibleIf))) continue;
@@ -70,7 +70,7 @@ export function LocationMap({ scene, map, handlers, readOnly = false, dialogueSp
     const quest = quests.some((q) => isQuestTurnInForNpc(state, q, npc.id)) || objectiveSpotsForNpc(state, npc.id).length ? "turnin" as const
       : quests.some((q) => isQuestOfferable(state, q)) ? "offer" as const : undefined;
     markers.push({ id: "npc-" + npc.id, ...spots[npc.id], kind: "npc", label: npc.name, quest,
-      image: npcBodySprite(npc.id), sprite: npcPixelSprite(npc.id), onActivate: () => handlers.onRegistryNpc(npc) });
+      image: npcBodySprite(npc.id), sprite: npcPixelSprite(npc.id), wander: npc.look?.wander, onActivate: () => handlers.onRegistryNpc(npc) });
   }
   type Service = { label: string; badge: string; category: "place" | "activity"; action: () => void };
   function service(spot: MapSpot): Service | null {

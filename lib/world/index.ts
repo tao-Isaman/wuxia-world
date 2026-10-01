@@ -69,6 +69,7 @@ export {
   describeBonusForLocation,
 } from "./location-categories";
 export { evaluateCondition, getQuestStatus } from "./conditions";
+export { KIDNAP_RETURN_DAYS, npcAwayDays, npcPresent } from "./npc-presence";
 export { TRACK_NONE, activeGuide, guideForQuest, guideMarkerId, pathBetween, stageTargetNpc, trackedQuestId, type GuideKind, type QuestGuide } from "./quest-guide";
 export {
   completeObjectiveSpot, objectiveMarkerId, objectiveProgress, objectiveSpotsAt, objectiveSpotsFor, objectiveSpotsForNpc,

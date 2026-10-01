@@ -2,7 +2,7 @@
 
 # Quests
 
-770 quests: 1 main, 332 side, 97 sect quests (15 of them art quests). 0 are marked `isMajor` (completing one spreads a rumor about the hero). 2107 stages in total: 900 advance on their own (`autoAdvance`), 432 are hands-on objectives (`objective`), the rest are dialog beats or the final hand-in. 664 quests have an offer scene (`qs_<id>_offer`) and 661 a completion scene (`qs_<id>_complete`).
+867 quests: 1 main, 429 side, 97 sect quests (15 of them art quests). 0 are marked `isMajor` (completing one spreads a rumor about the hero). 2382 stages in total: 988 advance on their own (`autoAdvance`), 522 are hands-on objectives (`objective`), the rest are dialog beats or the final hand-in. 761 quests have an offer scene (`qs_<id>_offer`) and 758 a completion scene (`qs_<id>_complete`).
 
 Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assassinate** / **trait** / **flag** = `autoAdvance` condition types · **objective** = map spot, person or scene the hero uses in person (`stage.objective`, ×n = several spots) · **dialog** = advanced by an `advanceQuest` choice in a scene · **turn-in** = last stage, closed at the turn-in person or by the completion scene.
 
@@ -210,6 +210,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qw_taohua_codex_fragments` | แผ่นตำราหายของปรมาจารย์ | ฮ่วงเอี้ยะซือ (ปรมาจารย์ฤาษี) | item → turn-in | prereqs |
 | `qw_taohua_peach_wine` | ขนมไหว้พระจันทร์สำหรับฤๅษี | ฮ่วงเอี้ยะซือ (ปรมาจารย์ฤาษี) | visit+item → turn-in |  |
 | `qw_taohua_duel_proof` | พิสูจน์ฝีมือต่อหน้าผู้แอบอ้าง | ฮ่วงเอี้ยะซือ (ปรมาจารย์ฤาษี) | kill → turn-in | prereqs |
+| `qw_taohua_water_running_sword` | กระบี่วิ่งบนน้ำ | ฮ่วงเอี้ยะซือ (ปรมาจารย์ฤาษี) | objective (spot) → objective (scene) → turn-in | prereqs |
 
 ### เกาะมังกรเทพ (`isle_shenlong`)
 
@@ -229,6 +230,14 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qw_kunlun_exile_truth` | ความจริงของฤๅษีเนรเทศ | ชิวเฉียน (ฤๅษีเนรเทศ) | visit → item → turn-in |  |
 | `qw_kunlun_snow_lotus` | บัวหิมะยอดนิรันดร์ | ชิวเฉียน (ฤๅษีเนรเทศ) | visit → kill → item → turn-in | prereqs |
 
+### คฤหาสน์ตนเอง (`home_player`)
+
+| Id | Name | Giver | Stages | Notes |
+| --- | --- | --- | --- | --- |
+| `qw_home_player_knee_balm` | ยาทาเข่าของป้าหลิว | ป้าหลิว | item → objective (spot) → turn-in |  |
+| `qw_home_player_cudgel` | กระบองของคนเฝ้าประตู | ลุงโจว | objective×2 → turn-in |  |
+| `qw_home_player_iron_shirt` | หลังที่ทุบไม่เจ็บ | อาหนิว | kill → turn-in |  |
+
 ### คลังสมบัติลับ (`cave_treasure`)
 
 | Id | Name | Giver | Stages | Notes |
@@ -239,6 +248,12 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qe_treasure_kidnap_lord` | จับตัวเจ้าบ้านเรียกค่าไถ่ | หัวหน้าโจรชิง | kidnap → turn-in |  |
 | `qe_treasure_kill_lawman` | สังหารเจ้าหน้าที่กฎหมาย | หัวหน้าโจรชิง | kill → turn-in |  |
 | `qe_treasure_clear_competitor` | กวาดล้างสำนักโจรคู่แข่ง | หัวหน้าโจรชิง | kill → turn-in | prereqs |
+
+### คุกหลวง (`jail`)
+
+| Id | Name | Giver | Stages | Notes |
+| --- | --- | --- | --- | --- |
+| `qw_jail_old_liu_letter` | จดหมายจากหลังลูกกรง | ตาเฒ่าหลิวนักโทษ | turn-in |  |
 
 ### คุ้มนกนางแอ่น (`villa_yanzi`)
 
@@ -316,6 +331,15 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qe_changan_smuggling_run` | ขนสินค้าต้องห้ามผ่านด่าน | ขุนนางหยานทุจริต | steal → turn-in |  |
 | `qe_changan_intimidate_judge` | ปิดปากที่ปรึกษาคดี | ขุนนางหยานทุจริต | assassinate → turn-in | prereqs |
 
+### ชนเผ่าหุยซู (`tribe_huizu`)
+
+| Id | Name | Giver | Stages | Notes |
+| --- | --- | --- | --- | --- |
+| `qc_tribe_huizu_black_iron` | ลมหายใจของเตาหลอม | ช่างไห่ | item → objective (spot) → turn-in | prereqs |
+| `qc_tribe_huizu_tiger_palm` | ฝ่ามือเสือหน้ากระโจม | หม่าต้าหลี่ | kill → turn-in | prereqs |
+| `qc_tribe_huizu_lion_claw` | กรงเล็บสิงห์แห่งเส้นทางคาราวาน | นาซีร์ | kill → kill → turn-in | prereqs |
+| `qc_tribe_huizu_lost_lambs` | ลูกแกะสามตัว | อาอีซา | objective×3 → turn-in |  |
+
 ### ซงซาน (`sect_songshan`)
 
 | Id | Name | Giver | Stages | Notes |
@@ -337,6 +361,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qc_xixia_iron_supply` | แร่เหล็กสำหรับตีเหล็ก | ช่างดูกู | item → turn-in |  |
 | `qc_xixia_legendary_blade` | ดาบในตำนาน | ช่างดูกู | kill → item → turn-in | prereqs |
 | `qc_xixia_bandit_ore` | โจรปล้นกองคาราวานแร่ | ช่างดูกู | kill → turn-in |  |
+| `qc_xixia_anvil_palm` | ฝ่ามือบนทั่งเหล็ก | ช่างดูกู | item → objective (spot) → turn-in | prereqs |
 
 ### ซูโจว (`city_suzhou`)
 
@@ -345,6 +370,18 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qc_suzhou_silk_shipment` | ส่งผ้าไหมสำหรับราชสำนัก | ช่างทอเหมย | item → item → turn-in |  |
 | `qc_suzhou_dye_ingredient` | เม็ดบัวสำหรับสีย้อม | ช่างทอเหมย | item → turn-in |  |
 | `qc_suzhou_copycat_guild` | กลุ่มช่างปลอม | ช่างทอเหมย | objective (spot) → kill → turn-in |  |
+| `qc_suzhou_mildewed_books` | ตำราขึ้นรา | พ่อค้าหนังสือลี่ | objective×2 → turn-in |  |
+| `qc_suzhou_star_chart_sword` | กระบี่ใต้แผนที่ดาว | พ่อค้าหนังสือลี่ | kill → objective (spot) → turn-in | prereqs |
+| `qc_suzhou_guqin_heart` | พิณที่ทอเป็นลายผ้า | ช่างทอเหมย | item → objective (scene) → item → turn-in | prereqs |
+
+### ดงดอกท้อ (`villa_meizhuang`)
+
+| Id | Name | Giver | Stages | Notes |
+| --- | --- | --- | --- | --- |
+| `qw_meizhuang_guangling` | เพลงพิณที่หายสาบสูญ | หวงจงกง | item → objective (scene) → turn-in | prereqs |
+| `qw_meizhuang_go_manual` | ตำราหมากของเฮยไป๋จื่อ | เฮยไป๋จื่อ | item → objective (person) → turn-in |  |
+| `qw_meizhuang_one_finger` | คุกใต้ทะเลสาบ | เฮยไป๋จื่อ | objective (scene) → objective (scene) → item → turn-in | prereqs |
+| `qw_meizhuang_drunk_painter` | ภาพเหมือนของคนเมา | ตันชิงเซิง | item → objective (spot) → turn-in |  |
 
 ### ตลาดชาวเมี่ยว (`market_miao`)
 
@@ -353,6 +390,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qw_miao_tribal_remedy` | ยารักษาของเผ่าเมี่ยว | อาเป้า (หัวหน้าเผ่าเมี่ยว) | visit+item → turn-in |  |
 | `qw_miao_spirit_beast` | สัตว์ศักดิ์สิทธิ์ของเผ่า | อาเป้า (หัวหน้าเผ่าเมี่ยว) | objective (spot) → objective (spot) → turn-in | prereqs |
 | `qw_miao_offering_cave` | ของถวายในถ้ำบทกวี | อาเป้า (หัวหน้าเผ่าเมี่ยว) | visit → objective (spot) → turn-in |  |
+| `qw_miao_iron_skin_bath` | น้ำยาหนังเหล็กของเผ่าเมี่ยว | อาเป้า (หัวหน้าเผ่าเมี่ยว) | item → objective (spot) → turn-in | prereqs |
 
 ### ต้าหลี่ (`city_dali`)
 
@@ -366,6 +404,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qst_spy_dali_poisoner_track` | ตามรอยพ่อค้าพิษ | เหมยพรานป่า | kill → turn-in |  |
 | `qst_spy_dali_southern_envoy` | ทูตใต้ | เหมยพรานป่า | kill → turn-in | prereqs |
 | `qe_spy_dali_steal_antidote` | ลักยาแก้พิษหายาก | เหมยพรานป่า | steal → turn-in |  |
+| `qc_dali_nine_jewel_lotus` | ดอกบัวเก้าเม็ด | หมอยาไป๋ | item → kill → turn-in | prereqs |
 
 ### ถ้ำงูทอง (`cave_jinshe`)
 
@@ -373,6 +412,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | --- | --- | --- | --- | --- |
 | `qw_jinshe_venom_rare` | พิษตะขาบยักษ์แห่งคลังสมบัติลับ | ซวีเหลิงชิง (ผู้ฝึกงู) | item → turn-in |  |
 | `qw_jinshe_lost_serpent` | งูทองหาย | ซวีเหลิงชิง (ผู้ฝึกงู) | visit → item → turn-in |  |
+| `qw_jinshe_winter_feed` | งูหิวหน้าหนาว | ซวีเหลิงชิง (ผู้ฝึกงู) | item → turn-in |  |
 
 ### ถ้ำน้ำแข็งไหม (`cave_bingcan`)
 
@@ -380,6 +420,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | --- | --- | --- | --- | --- |
 | `qw_bingcan_silk_scroll` | ไหมน้ำแข็งลึกถ้ำ | เว่ยชิงเหวิน (บัณฑิตถ้ำ) | visit → kill → turn-in |  |
 | `qw_bingcan_ice_fever` | โสมรักษาไข้น้ำแข็ง | เว่ยชิงเหวิน (บัณฑิตถ้ำ) | item → turn-in |  |
+| `qw_bingcan_fire_fist` | ไฟที่ซ่อนในถ้ำน้ำแข็ง | เว่ยชิงเหวิน (บัณฑิตถ้ำ) | kill → item → objective (scene) → turn-in | prereqs |
 
 ### ถ้ำแมงมุม (`cave_zhizhu`)
 
@@ -434,6 +475,101 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qst_spy_capital_seal_ledger` | บัญชีตราพระราชา | เฟิงเจ้าของร้านบะหมี่ | visit → kill → turn-in |  |
 | `qst_spy_capital_court_traitor` | คนทรยศในราชสำนัก | เฟิงเจ้าของร้านบะหมี่ | visit → kill → turn-in | prereqs |
 | `qe_spy_capital_frame_merchant` | ปลูกหลักฐานใส่พ่อค้า | เฟิงเจ้าของร้านบะหมี่ | steal → turn-in |  |
+| `qc_capital_clerk_night_sword` | กระบี่ของเสมียนยามดึก | เสมียนนายฉิง | kill → turn-in | prereqs |
+| `qc_capital_soaked_ledgers` | ทะเบียนเปียกฝน | เสมียนนายฉิง | item → objective (person) → turn-in |  |
+
+### บ้านค้าขายโฝวเวย (`villa_fuwei`)
+
+| Id | Name | Giver | Stages | Notes |
+| --- | --- | --- | --- | --- |
+| `qw_fuwei_riding_whip` | แส้ม้าของคุณชายหลิน | หลินผิงจือ | item → turn-in |  |
+| `qw_fuwei_white_horse` | ลมปราณม้าขาวแห่งฝูเวย | หลินเจิ้นหนาน | kill → objective (spot) → turn-in | prereqs |
+| `qw_fuwei_escort_run` | หีบผ้าไปหยางโจว | สื่อเปียวโถว | objective (spot) → kill → turn-in |  |
+| `qw_fuwei_dragon_spear` | ทวนประทับมังกรกับรอยเลือดในคอกม้า | สื่อเปียวโถว | objective (spot) → objective (scene) → item → turn-in | prereqs |
+
+### บ้านเฉิงคุน (`home_chengkun`)
+
+| Id | Name | Giver | Stages | Notes |
+| --- | --- | --- | --- | --- |
+| `qw_home_chengkun_mend_robe` | เสื้อคลุมที่ห้ามขาด | เสี่ยวชุ่ย | item → objective (person) → turn-in |  |
+| `qw_home_chengkun_eagle_claw` | จดหมายที่ไม่ควรถึงมือใคร | เฉินโหย่วเลี่ยง | kill → turn-in | prereqs |
+| `qw_home_chengkun_nine_heavens` | คนสวนผู้ไม่ใช่คนสวน | ลุงอู๋คนสวน | objective (scene) → kill → turn-in | prereqs |
+
+### บ้านเฉิงอิ๋ง (`home_chengying`)
+
+| Id | Name | Giver | Stages | Notes |
+| --- | --- | --- | --- | --- |
+| `qw_chengying_peacock_fan` | พัดนกยูงของเฉิงอิ๋ง | เฉิงอิ๋ง | item → objective (person) → turn-in | prereqs |
+| `qw_chengying_dew_blade` | ดาบน้ำค้างของสาวขากะเผลก | ลู่อู๋ซวง | kill → objective (spot) → turn-in | prereqs |
+| `qw_chengying_lost_geese` | ห่านแปดตัวหายไปห้า | อาถงเด็กเลี้ยงห่าน | objective×2 → turn-in |  |
+
+### บ้านนักรบชายแดน (`home_tianboguang`)
+
+| Id | Name | Giver | Stages | Notes |
+| --- | --- | --- | --- | --- |
+| `qw_home_tianboguang_horse_thieves` | ขโมยม้าตัวจิ๋ว | ทหารแก่เฉิน | kill → turn-in |  |
+| `qw_home_tianboguang_vow` | ของที่ขโมยมา ต้องคืนเจ้าของ | เถียนป๋อกวง | objective (spot) → turn-in |  |
+| `qw_home_tianboguang_dragon_blade` | ดาบไวกว่าปาก | เถียนป๋อกวง | kill → objective (scene) → turn-in | prereqs |
+
+### บ้านเป่ยฉิว (`home_beichou`)
+
+| Id | Name | Giver | Stages | Notes |
+| --- | --- | --- | --- | --- |
+| `qw_beichou_spinning_spear` | ทวนหมุนฟ้ากับปริศนาสามข้อ | เป่ยฉิว | objective (scene) → objective (scene) → turn-in | prereqs |
+| `qw_beichou_lost_goats` | แพะหนีโจร | เสี่ยวเฉ่าเด็กเลี้ยงแพะ | kill → objective (spot) → turn-in |  |
+| `qw_beichou_mute_picture` | ภาพวาดของคนใบ้ | อาหมู่คนใบ้ | item → objective (person) → turn-in |  |
+
+### บ้านแพทย์น้ำจืด (`home_xuemuhua`)
+
+| Id | Name | Giver | Stages | Notes |
+| --- | --- | --- | --- | --- |
+| `qw_home_xuemuhua_herb_store` | ตู้ยาที่ว่างเปล่า | หมอเซวี่ยมู่หัว | item → item → turn-in |  |
+| `qw_home_xuemuhua_lost_score` | โน้ตเพลงที่ลมพัดหาย | คังกว่างหลิง | objective×2 → item → turn-in |  |
+| `qw_home_xuemuhua_killing_qin` | เพลงพิณที่ไม่ควรมีใครได้ยิน | คังกว่างหลิง | objective (person) → objective (scene) → item → turn-in | prereqs |
+| `qw_home_xuemuhua_opera_sword` | ดาบไม้ของคณะงิ้ว | หลี่ขุยเหล่ย | item → objective (person) → turn-in | prereqs |
+| `qw_home_xuemuhua_monkey_staff` | เห้งเจียบุกบ้านหมอ | หลี่ขุยเหล่ย | objective (spot) → objective (scene) → item → turn-in | prereqs |
+
+### บ้านมยง (`home_miaoren`)
+
+| Id | Name | Giver | Stages | Notes |
+| --- | --- | --- | --- | --- |
+| `qw_home_miaoren_tiger` | เสือกินคนแห่งตรอกชายแดน | เหมียวเหรินเฟิง | kill → turn-in |  |
+| `qw_home_miaoren_new_shaft` | ด้ามทวนใหม่ของนายกองจง | ทหารทวนเฒ่าจง | item → objective (scene) → turn-in | prereqs |
+| `qw_home_miaoren_poisoned_cure` | ยาตาของพระพุทธหน้าทอง | เหมียวเหรินเฟิง | objective (spot) → item → objective (scene) → turn-in | prereqs |
+
+### บ้านหนานเสียน (`home_nanxian`)
+
+| Id | Name | Giver | Stages | Notes |
+| --- | --- | --- | --- | --- |
+| `qw_home_nanxian_carrying_pole` | ไม้คานของลุงไป๋ | ลุงไป๋ | item → turn-in |  |
+| `qw_home_nanxian_red_lotus` | บัวแดงในสระหน้าบ้าน | ท่านหนานเสียน | item → objective (spot) → turn-in | prereqs |
+| `qw_home_nanxian_lonely_sword` | กระบี่ที่ไร้เพื่อน | ท่านหนานเสียน | objective (spot) → item → objective (scene) → turn-in | prereqs |
+
+### บ้านหยานจี (`home_yanji`)
+
+| Id | Name | Giver | Stages | Notes |
+| --- | --- | --- | --- | --- |
+| `qw_yanji_golden_needle` | เข็มทองของหมอจัดกระดูก | หยานจี | item → turn-in |  |
+| `qw_yanji_fire_staff` | กระบองไหม้ไฟ | หลิวกระบองไหม้ | item → objective (scene) → turn-in | prereqs |
+| `qw_yanji_maid_letter` | จดหมายถึงแม่ที่ชีกู่ | ชุนเถาสาวใช้ | objective (spot) → turn-in |  |
+
+### บ้านอีตัง (`home_yideng`)
+
+| Id | Name | Giver | Stages | Notes |
+| --- | --- | --- | --- | --- |
+| `qw_home_yideng_one_lamp` | ตะเกียงดวงเดียว | อิดเต็งไต้ซือ | item → objective (spot) → turn-in |  |
+| `qw_home_yideng_terrace_wall` | กำแพงนาขั้นบันได | ชาวนาเกิง | item → kill → turn-in | prereqs |
+| `qw_home_yideng_brush_point` | พู่กันจิ้มจุด | บัณฑิตจูจื่อหลิว | item → objective (spot) → turn-in | prereqs |
+| `qw_home_yideng_fishhook` | ตะขอเบ็ดเฝ้าทาง | ฤๅษีประมงเตี่ยมชง | item → objective (scene) → turn-in | prereqs |
+
+### บ้านฮูเฝย์ (`home_hufei`)
+
+| Id | Name | Giver | Stages | Notes |
+| --- | --- | --- | --- | --- |
+| `qw_home_hufei_memorial` | ธูปหน้าป้ายวิญญาณ | ผิงอาสี่ | item → objective (spot) → turn-in |  |
+| `qw_home_hufei_iron_whip` | แส้ม่วงกับระฆังลม | เอวี๋ยนจื่ออี | objective (spot) → kill → turn-in | prereqs |
+| `qw_home_hufei_drunken_fist` | กับแกล้มของเหล่าจิ่ว | เหล่าจิ่ว | item → kill → turn-in | prereqs |
+| `qw_home_hufei_tiger_roar` | เสียงคำรามของตระกูลฮู | ฮูเฝย์ | kill → objective (scene) → turn-in | prereqs |
 
 ### บ้านโฮ่งชีก๋ง (`home_hong`)
 
@@ -524,6 +660,15 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qst_zhongyang_noble_intrigue` | วังวนขุนนาง | ทูตหลิวอิง | objective (spot) → objective (spot) → objective (spot) → turn-in | prereqs |
 | `qst_zhongyang_ceremony_guard` | คุ้มกันพิธีพระราชา | ทูตหลิวอิง | visit → kill → turn-in | prereqs |
 
+### พระราชวังหลวง (`palace_royal`)
+
+| Id | Name | Giver | Stages | Notes |
+| --- | --- | --- | --- | --- |
+| `qc_palace_royal_spear_patrol` | เวรยามแทนจ้าวเทีย | จ้าวเทีย | objective×2 → turn-in |  |
+| `qc_palace_royal_rat_store` | หนูในคลังหลวง | ขันทีเกา | item → objective×2 → turn-in |  |
+| `qc_palace_royal_plum_garden` | ดอกเหมยในตำหนักเย็น | ชุ่ยเอ๋อ | item → objective (scene) → turn-in | prereqs |
+| `qc_palace_royal_void_step` | เงาไร้รอยสองรุ่น | ขันทีเกา | objective×2 → item → objective (scene) → turn-in | prereqs |
+
 ### มังกรดำสระน้ำ (`pool_heilong`)
 
 | Id | Name | Giver | Stages | Notes |
@@ -531,6 +676,17 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qw_heilong_dragon_pearl` | ความลับก้นสระมังกรดำ | ต่านเหลาตู (ชาวประมงแก่) | objective (spot) → turn-in |  |
 | `qw_heilong_missing_fisher` | ชาวประมงที่หายตัวไป | ต่านเหลาตู (ชาวประมงแก่) | objective (spot) → kill → turn-in |  |
 | `qw_heilong_depths_secret` | แสงแดงจากก้นสระ | ต่านเหลาตู (ชาวประมงแก่) | objective (spot) → item → turn-in | prereqs |
+| `qw_heilong_hook_lesson` | เบ็ดของคนแก่ริมสระ | ต่านเหลาตู (ชาวประมงแก่) | kill → turn-in |  |
+
+### เมืองลิ้งเซียว (`city_lingxiao`)
+
+| Id | Name | Giver | Stages | Notes |
+| --- | --- | --- | --- | --- |
+| `qc_city_lingxiao_snow_sweep` | ไม้กวาดห้าธาตุ | ลุงไป๋ | objective×2 → turn-in |  |
+| `qc_city_lingxiao_brazier` | เตาไฟสามมุมเมือง | หูเตาถ่าน | item → objective×3 → turn-in | prereqs |
+| `qc_city_lingxiao_ice_palm` | ฝ่ามือใต้ลมหนาว | เฝิงหานเหมย | objective (spot) → kill → turn-in | prereqs |
+| `qc_city_lingxiao_poem_ink` | หมึกแข็งตัวในเมืองหิมะ | ซือหม่าเหยียน | item → objective (spot) → turn-in |  |
+| `qc_city_lingxiao_heaven_fan` | พัดเพลิงกลางหิมะ | ซือหม่าเหยียน | item → objective (scene) → objective (scene) → turn-in | prereqs |
 
 ### ยอดเขามรณะ (`cliff_motian`)
 
@@ -546,6 +702,16 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qv_inn_special_ingredient` | วัตถุดิบพิเศษ | เฉาอ้วน | item → turn-in |  |
 | `qv_inn_rival_inn` | โรงเตี๊ยมคู่แข่ง | เฉาอ้วน | visit → turn-in |  |
 | `qv_inn_drunk_warrior` | นักรบที่เศร้าโศก | เฉาอ้วน | objective (scene) → turn-in |  |
+| `qc_gaosheng_dragon_palm` | ฝ่ามือนวดแป้งมังกร | เฉาอ้วน | kill → item → turn-in | prereqs |
+
+### โรงเตี๊ยมมีหว่าง (`inn_youjian`)
+
+| Id | Name | Giver | Stages | Notes |
+| --- | --- | --- | --- | --- |
+| `qv_youjian_cloud_palm` | ซาลาเปาร้อยลูก | ปาวซาลาเปา | objective (spot) → turn-in |  |
+| `qv_youjian_special_menu` | เมนูพิเศษของมีหว่าง | เหมยเหนียง | item → objective (person) → turn-in |  |
+| `qv_youjian_eight_gates` | แปดประตูของซินแสกว้า | ซินแสกว้า | objective×3 → objective (scene) → turn-in | prereqs |
+| `qv_youjian_heart_mind` | แขกห้องฟ้า | เหมยเหนียง | item → objective (spot) → objective (scene) → turn-in | prereqs |
 
 ### โรงเตี๊ยมยั่วไหล (`inn_yuelai`)
 
@@ -557,6 +723,8 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qst_spy_inn_drunk_confession` | คำสารภาพของขี้เมา | โจวพ่อค้าเหล้าในโรงเตี๊ยม | kill → turn-in |  |
 | `qst_spy_inn_wandering_blade` | ดาบพเนจรในโรงเตี๊ยม | โจวพ่อค้าเหล้าในโรงเตี๊ยม | kill → turn-in | prereqs |
 | `qe_spy_inn_intimidate_drunk` | ม้วนกลยุทธ์ของขุนพล | โจวพ่อค้าเหล้าในโรงเตี๊ยม | steal → turn-in |  |
+| `qc_yuelai_woodpile_sword` | กระบี่จากกองฟืน | เซียวจิ้งเทียน | objective×2 → turn-in |  |
+| `qc_yuelai_letter_to_gaosheng` | จดหมายถึงเพื่อนเก่า | เซียวจิ้งเทียน | objective (person) → turn-in |  |
 
 ### โรงเตี๊ยมห้วอลั่ว (`inn_heluo`)
 
@@ -564,6 +732,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | --- | --- | --- | --- | --- |
 | `qv_inn_legend_verify` | ตำนานถ้ำโบราณ | โปผู้เล่าเรื่อง | visit → turn-in |  |
 | `qv_inn_missing_traveler` | ผู้เดินทางที่หายไป | โปผู้เล่าเรื่อง | objective (scene) → turn-in |  |
+| `qc_heluo_envoy_palm` | นิทานเรื่องยมฑูต | โปผู้เล่าเรื่อง | objective (scene) → kill → item → turn-in | prereqs |
 
 ### วัดเส้าหลิน (`sect_shaolin`)
 
@@ -597,6 +766,8 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | --- | --- | --- | --- | --- |
 | `qst_dalun_stolen_relic` | พระธาตุวัดตาหลุน | พระกงซิน | visit → objective (spot) → kill → turn-in |  |
 | `qst_dalun_pilgrim_mission` | ทางแสวงบุญแห่งสี่วัด | พระกงซิน | visit → turn-in | prereqs |
+| `qw_dalun_prayer_flags` | ธงมนตร์ที่ขาดวิ่น | พระกงซิน | item → objective (spot) → turn-in |  |
+| `qw_dalun_dragon_elephant` | จารึกใต้ฐานช้างศิลา | พระกงซิน | item → objective (scene) → objective (scene) → turn-in | prereqs |
 
 ### สมบัติราชาโจร (`cave_chuangwang`)
 
@@ -656,6 +827,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qst_spy_village_missing_courier` | ผู้ส่งสารหายตัว | ซื่อชาวนาในชีกู่ | kill → turn-in |  |
 | `qst_spy_village_iron_caravan` | คาราวานเหล็กชายแดน | ซื่อชาวนาในชีกู่ | kill → turn-in | prereqs |
 | `qe_spy_village_kidnap_witness` | ลักพาตัวพ่อค้าใหญ่ | ซื่อชาวนาในชีกู่ | kidnap → turn-in |  |
+| `qv_qigu_old_farmer_fist` | หมัดที่ซ่อนอยู่ใต้จอบ | ลาวหนาน | kill → objective (scene) → turn-in | prereqs |
 
 ### หมู่บ้านดอกเหมย (`village_meihua`)
 
@@ -666,6 +838,31 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qv_meihua_plum_festival` | เครื่องประดับเทศกาลดอกเหมย | เฉินเยว่ | item → turn-in |  |
 | `qv_meihua_boar_hunt` | ล่าหมูป่าดุ | เปาเหล็กก้าน | kill → turn-in |  |
 | `qv_meihua_tiger_track` | รอยเสือภูเขา | เปาเหล็กก้าน | visit → turn-in |  |
+| `qv_meihua_wind_spear` | ทวนของทหารเก่า | เปาเหล็กก้าน | kill → item → turn-in | prereqs |
+
+### หมู่บ้านไท่ซาน (`village_taishan`)
+
+| Id | Name | Giver | Stages | Notes |
+| --- | --- | --- | --- | --- |
+| `qv_taishan_butterfly_breath` | ลมหายใจผีเสื้อ | ยายเตี๋ย | item → turn-in |  |
+| `qv_taishan_porter_load` | หาบแทนสือเปียนตาน | สือเปียนตาน | objective×2 → turn-in |  |
+| `qv_taishan_wind_staff` | พลองลมบนไม้คาน | สือเปียนตาน | objective (scene) → objective (scene) → turn-in | prereqs |
+
+### หมู่บ้านไร้นาม (`village_noname`)
+
+| Id | Name | Giver | Stages | Notes |
+| --- | --- | --- | --- | --- |
+| `qv_noname_eight_lash` | แส้แปดทิศของคนขับเกวียน | ลู่เกวียน | kill → item → turn-in | prereqs |
+| `qv_noname_rampart_whip` | แส้ทะลุปราการ | ยายเฉียว | objective (spot) → objective (scene) → turn-in | prereqs |
+| `qv_noname_nine_tails` | แส้เก้าหัวใต้ซากหอคอย | ยายเฉียว | item → objective (spot) → objective (scene) → turn-in | prereqs |
+
+### หมู่บ้านหัวซาน (`village_huashan`)
+
+| Id | Name | Giver | Stages | Notes |
+| --- | --- | --- | --- | --- |
+| `qv_huashan_clear_wind` | ดาบไม้ของลานดิน | ครูหลิง | item → turn-in |  |
+| `qv_huashan_yang_sword` | กระบี่รับอรุณ | หยางซื่อ | objective (spot) → kill → turn-in | prereqs |
+| `qv_huashan_forge_ore` | เหล็กเล่มแรกของเถี่ยตัน | เถี่ยตัน | item → turn-in |  |
 
 ### หมู่บ้านอวู่เซี่ย (`village_wuxia`)
 
@@ -674,6 +871,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qv_wuxia_missing_boat` | เรือหายและลูกชายหาย | เติ้งลองหาง | visit → turn-in |  |
 | `qv_wuxia_river_ghost` | เสียงประหลาดจากแม่น้ำ | เติ้งลองหาง | objective (spot) → turn-in |  |
 | `qv_wuxia_pirate_cache` | สมบัติโจรสลัด | เติ้งลองหาง | visit → kill | prereqs |
+| `qv_wuxia_river_sword` | กระบี่ที่เรียนจากกระแสน้ำ | เติ้งลองหาง | objective×2 → turn-in |  |
 
 ### หมู่บ้านฮิงซาน (`village_hengshan`)
 
@@ -682,6 +880,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qv_hengshan_song_scroll` | ม้วนเพลงโบราณ | ผู้อาวุโสอู๋ | visit → turn-in |  |
 | `qv_hengshan_dispute_land` | ข้อพิพาทที่ดิน | ผู้อาวุโสอู๋ | objective (scene) → turn-in |  |
 | `qv_hengshan_winter_aid` | ช่วยเหลือฤดูหนาว | ผู้อาวุโสอู๋ | item → turn-in |  |
+| `qv_hengshan_crane_meditation` | ระบำกระเรียนของผู้เฒ่า | ผู้อาวุโสอู๋ | objective (spot) → objective (scene) → turn-in | prereqs |
 
 ### หยางโจว (`city_yangzhou`)
 
@@ -694,6 +893,9 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qst_spy_yangzhou_smuggler_ship` | เรือลักลอบขนสินค้า | ซีคนยกของท่าเรือ | visit → kill → turn-in |  |
 | `qst_spy_yangzhou_silk_seal` | ตราผ้าไหมหลวง | ซีคนยกของท่าเรือ | kill → turn-in |  |
 | `qe_spy_yangzhou_silence_witness` | ปิดปากผู้พิพากษา | ซีคนยกของท่าเรือ | assassinate → turn-in |  |
+| `qc_yangzhou_hook_and_line` | ขอเกี่ยวกับสายเบ็ด | ชาวประมงเฉิน | item → turn-in |  |
+| `qc_yangzhou_mend_the_net` | อวนขาดกลางแม่น้ำ | ชาวประมงเฉิน | item → objective (person) → turn-in |  |
+| `qc_yangzhou_twin_cleavers` | มีดคู่ของพ่อครัว | พ่อครัวซู | kill → objective (scene) → turn-in | prereqs |
 
 ### หัวซาน (`sect_huashan`)
 

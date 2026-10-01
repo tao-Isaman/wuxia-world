@@ -17,10 +17,18 @@
 // Adding new events is additive: append a record to one of the pool arrays,
 // and (for meet/treasure) define the matching scene id in scenes.ts.
 
+import { PLACE_MEET_EVENTS } from "./place-events";
+
 export interface MeetEventDef {
   id: string;
   weight: number;
   dialogSceneId: string;
+  /** Only while walking at these places (a place event); omitted = anywhere. */
+  locationIds?: readonly string[];
+  /** Only while this holds. */
+  condition?: import("../types").Condition;
+  /** Happens once per game (flag `meet:<id>`). */
+  once?: boolean;
 }
 
 export interface FightEventDef {
@@ -62,6 +70,7 @@ export const MEET_EVENTS: readonly MeetEventDef[] = [
   { id: "wanderer",  weight: 2, dialogSceneId: "evt_meet_wanderer" },
   { id: "monk",      weight: 2, dialogSceneId: "evt_meet_monk" },
   { id: "merchant",  weight: 1, dialogSceneId: "evt_meet_merchant" },
+  ...PLACE_MEET_EVENTS,
 ];
 
 // Static base weight per tier — used at power 0 (early game). The

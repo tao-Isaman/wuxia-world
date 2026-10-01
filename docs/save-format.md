@@ -137,6 +137,7 @@ What each version added. v1–v13 and v17→v18 are described in the comment abo
 | v18 → v19 | `playerBodyId` |
 | v19 → v20 | `wanted`, `wantedDay`, `jailCityId` |
 | v20 → v21 | `jailUntil` |
+| v21 → v22 | `kidnappedUntil`, `giftDays`, `activityDays` |
 
 ## Repair on load
 
@@ -238,6 +239,6 @@ Content-only changes (a new quest, item or scene) need no version bump: missing 
 
 ## Tests
 
-- **Browser.** `tests/browser/game.spec.ts` loads a hand-written version-18 save and checks that it is upgraded to version 21 and plays.
+- **Browser.** `tests/browser/game.spec.ts` loads a hand-written version-18 save and checks that it is upgraded to version 22 and plays.
 - **Rumors.** `scripts/test-lore-rumors.ts` (in `bun run test:rumors`) rehydrates v18 / v19 saves and checks the version, lore seeding and repair.
 - **Everything else.** Most `scripts/test-*.ts` files import the real store with an in-memory `localStorage`, so they exercise `persist` as well.

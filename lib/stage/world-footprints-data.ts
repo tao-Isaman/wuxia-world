@@ -1396,12 +1396,6 @@ export const PAINTED_MAP_FOOTPRINTS: Readonly<Record<string, readonly WorldFootp
     { kind: "rect", left: 0, top: 280, right: 50, bottom: 420 },
     { kind: "rect", left: 495, top: 520, right: 960, bottom: 640 },
   ],
-  viewpoint: [
-    { kind: "rect", left: 205, top: 70, right: 300, bottom: 118 },
-    { kind: "ellipse", x: 200, y: 475, radiusX: 44, radiusY: 58 },
-    { kind: "ellipse", x: 610, y: 448, radiusX: 55, radiusY: 38 },
-    { kind: "ellipse", x: 405, y: 548, radiusX: 62, radiusY: 44 },
-  ],
   villa_fuwei: [
     { kind: "rect", left: 432, top: 140, right: 588, bottom: 222 },
     { kind: "rect", left: 590, top: 170, right: 750, bottom: 240 },

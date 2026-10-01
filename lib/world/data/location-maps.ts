@@ -14,6 +14,7 @@
 
 import { buildAutoMap } from "./auto-maps";
 import { assignSlotsByBearing } from "../compass";
+import { placeActivitiesAt } from "./activities";
 
 export interface MapPoint {
   x: number;
@@ -60,6 +61,11 @@ export const LOCATION_MAPS: Record<string, LocationMapDef> = {
     image: "/maps/home_player.png",
     zoom: 2.2,
     spawn: { x: 46, y: 48 }, // courtyard, between the porch steps and the well
+    npcSpots: {
+      home_player_housekeeper_liu: { x: 60, y: 31 }, // under the laundry line
+      home_player_gatekeeper_zhou: { x: 57, y: 66 }, // inside the fence, beside the gate
+      home_player_neighbor_niu: { x: 82, y: 55 },    // on the hedge road to the neighbour's
+    },
     exits: [
       // main gate + dirt path running off the bottom edge → the capital
       { to: "city_capital", x: 47, y: 87, icon: "🚶" },
@@ -161,7 +167,14 @@ export function getLocationMap(id: string): LocationMapDef | undefined {
   const hand = LOCATION_MAPS[id];
   if (!hand) return buildAutoMap(id);
   let def = compassed.get(id);
-  if (!def) { def = withCompassExits(id, hand); compassed.set(id, def); }
+  if (!def) {
+    def = withCompassExits(id, hand);
+    // Place activities authored for a hand-painted map must name their spot.
+    const extra = placeActivitiesAt(id).filter((a) => a.place?.spot)
+      .map((a) => ({ kind: "activity" as const, activityId: a.id, ...a.place!.spot!, icon: a.icon, label: a.label }));
+    if (extra.length) def = { ...def, spots: [...(def.spots ?? []), ...extra] };
+    compassed.set(id, def);
+  }
   return def;
 }
 

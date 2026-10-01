@@ -88,7 +88,6 @@ export const AUTO_MAP_IDS: ReadonlySet<string> = new Set([
   "valley_hudie",
   "valley_jueqing",
   "valley_jueqing_bottom",
-  "viewpoint",
   "villa_fuwei",
   "villa_meizhuang",
   "villa_yanzi",

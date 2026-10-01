@@ -42,12 +42,12 @@ export interface RouteMapDef {
 // rock beats road. Sects sit on mountains (see world-map lore).
 const WATER = ["isle_", "sea_"];
 const ROCK = ["cave_", "valley_", "pool_", "desert_"];
-const MOUNT = ["mt_", "peak_", "cliff_", "sect_", "viewpoint"];
+const MOUNT = ["mt_", "peak_", "cliff_", "sect_"];
 const CITYLIKE = ["city_", "palace_"];
 const RURAL = ["village", "tribe_", "market_", "villa_", "inn_", "tavern"];
 const HOMEY = ["home_"];
 
-const PEAKS = ["mt_", "peak_", "cliff_", "viewpoint"];
+const PEAKS = ["mt_", "peak_", "cliff_"];
 function highland(id: string): boolean {
   if (PEAKS.some((p) => id.startsWith(p))) return true;
   if (!id.startsWith("sect_")) return false;

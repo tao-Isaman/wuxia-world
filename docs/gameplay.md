@@ -221,12 +221,15 @@ Walk up to a person and talk. The NPC card offers what that person supports:
 | ขโมย | something to steal (94 NPCs), or a quest asks for it | see [Bad actions](#bad-actions) |
 | ลอบทำร้าย / 🪢 ลักพาตัว | an active quest stage that names them | see [Bad actions](#bad-actions) |
 
+- **Gifts.** Every card has 🎁 ให้ของขวัญ: an item from the bag (not quest items or manuals) or 100 / 500 / 1000 / 5000 gold, once every 30 days per person. A gift is worth 1–5 trust by its price; something the person likes counts double (their favourite item +2 more), something they dislike costs 2. Tastes follow the person (a monk likes herbs and books, dislikes meat and venom; merchants like valuables and gold). Trust gates the T2–T3 teaching quests.
+- **Gone and back.** An assassinated person is gone for the rest of the game. A kidnapped one disappears and returns to their spot after 180 days.
+- **Strollers.** Some people (farmers, children, guards, servants) wander around their spot; shopkeepers, elders and masters stand still.
 - **Quest marks.** A gold **!** over a person means a quest to offer; **?** means something to hand in.
 - **Named masters.** The 20 named masters (sect chiefs and seconds) live, age and can die (see [liveness.md](liveness.md)). A dead or secluded master shows a badge on their card.
 
 ## Quests and tracking
 
-There are 770 quests: one main quest, 429 side quests (97 sect quests and 154 lineage quests) and 340 story chapters in 38 sagas — see [Lineage quests and sagas](#lineage-quests-and-sagas).
+There are 867 quests: one main quest, 526 side quests (97 sect quests, 154 lineage quests and 97 place quests) and 340 story chapters in 38 sagas — see [Lineage quests and sagas](#lineage-quests-and-sagas).
 
 - **Accepting.** Most quests are offered by a person (the **!** mark). Sect quests are taken in the สำนัก menu.
 - **Stages.** A quest has 1–4 stages. The quest log (ภารกิจ) shows each one with ✓ done, ▸ current and ○ still ahead.

@@ -312,6 +312,16 @@ Which actions grant which stat: [gameplay.md](gameplay.md#stats).
 4. If the audit should understand it, extend `scripts/audit-quest-completion.ts`.
 5. Run `bun run typecheck` and `bun run test:quests`.
 
+## Living places
+
+Content for villages, towns, homes and new quests for old NPCs lives in `lib/world/data/places/<group>.ts` (`villages`, `towns`, `homes_a`–`homes_c`, `elders_a`, `elders_b`), each exporting one `PlaceContent` (`npcs`, `quests`, `scenes`, `activities`, `events`, `opponents`). `places/index.ts` merges them into the NPC, quest, scene, opponent, activity and meet-event registries.
+
+- **Place activities.** An `ActivityDef` with `place: { locationIds, cooldownDays, costGold?, reward, doneText, spot? }`. `doActivity` checks the place, the cooldown (`activityDays[id]`), stamina and gold, then pays gold (a range), w-exp, stat xp, a trait, an item (with a chance), stamina, heal or relationship, and logs `activity`. Auto maps put the spot on `ACTIVITY_SLOTS`; hand maps add the ones with `spot`.
+- **Place meetings.** `MeetEventDef.locationIds` limits a meeting to those places, `condition` gates it and `once` sets `meet:<id>`. Walk ticks join them to the anywhere-meetings. Safe ground (`home_player`) runs `rollPlaceMeeting` at 4 % per tick instead: only its own meetings, no fights, no law.
+- **Presence** (`npc-presence.ts`). `npcPresent(state, id)` is false for `assassinatedNpcIds` and while `day < kidnappedUntil[id]` (set to day + `KIDNAP_RETURN_DAYS` = 180 on a successful kidnapping). The location map and card hide absent NPCs; `kidnappedNpcIds` stays for quest conditions, so the same NPC can't be kidnapped twice.
+- **Gifts** (`gifts.ts`, store `giveGift(npcId, { itemId } | { gold })`). Refused while absent, within 30 days of the last gift (`giftDays`), or for quest items and manuals. `giftOutcome` = worth (1–5 by gold value: 120 / 400 / 1000 / 3000) — ×2 when liked, +2 more for a favourite item id, −2 when disliked. Tastes come from `NpcDef.likes` / `dislikes` (item ids, categories, `"gold"`), else from `TAG_TASTES` by the NPC's tags, else food.
+- **Skill quests.** Every ยุทธจักร T0–T3 skill and art (except `basic_punch`) is the reward of a quest; the 69 that had none are taught by exactly one place quest. T1+ quests gate on `statAtLeast`, T2+ also on `npcRelationship` with the giver; `test:places` checks both, and that no teacher can be assassinated or kidnapped. Manuals and city school halls may still sell the commoner ones.
+
 ## Known gaps
 
 - `sect_join` and `quest_major_complete` rumors never fire in play (joins happen through quest rewards; no quest sets `isMajor`).

@@ -59,9 +59,17 @@ export function hasDirectionalSheet(id: CharacterId): boolean {
   return (PLAYER_CHARACTER_IDS as readonly string[]).includes(id) || hasAnimatedSheet(id);
 }
 
+// Bodies authored on NPC data (NpcDef.look.body), registered by lib/world/data/npcs.ts.
+const NPC_BODIES = new Map<string, CharacterId>();
+export function registerNpcBodies(bodies: Readonly<Record<string, string>>): void {
+  for (const [npc, body] of Object.entries(bodies)) NPC_BODIES.set(npc, characterId(body));
+}
+
 /** NPCs share costume archetypes; authored portraits and dialogue art stay unique. */
 export function npcCharacterId(id: string): CharacterId {
   id = id.replace(/^npc-/, "");
+  const authored = NPC_BODIES.get(id);
+  if (authored) return authored;
   // NPCs with their own rigged sheet use it everywhere.
   if (hasAnimatedSheet(id)) return id;
   // Match the opening NPCs' authored portraits: young ivory/jade healer,

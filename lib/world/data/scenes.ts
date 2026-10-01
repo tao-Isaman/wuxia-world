@@ -7,6 +7,7 @@ import { SCENES_WILDERNESS } from "./scenes-content/wilderness";
 import { SCENES_EVIL } from "./scenes-content/evil";
 import { SCENES_SPIES } from "./scenes-content/spies";
 import { STORY_SCENES } from "../story/registry";
+import { PLACE_SCENES } from "./places";
 
 // Scene table — three kinds (dialog / location / route) discriminated by `kind`.
 //
@@ -69,32 +70,12 @@ const CORE_SCENES: readonly Scene[] = [
         hint: "เส้นทางลัดเลาะไปยังโรงเตี๊ยมในหมู่บ้าน",
       },
       {
-        routeSceneId: "mountain_road",
-        label: "ทางเหนือสู่ภูผา",
-        hint: "เส้นทางขึ้นเขาสำหรับชมทิวทัศน์",
-      },
-      {
         // Two-way link with home_player (the reverse is appended to the
         // home leaf in world-map.ts). The old village_to_world connector led
         // to the retired random-teleport hub and left this area orphaned.
         routeSceneId: "route_village__to__home_player",
         label: "ทางลงเขาสู่บ้าน",
         hint: "เส้นทางกลับบ้านของเจ้าและออกสู่ยุทธภพ",
-      },
-    ],
-  },
-
-  {
-    kind: "location",
-    id: "viewpoint",
-    name: "จุดชมวิวบนภูผา",
-    description: "บนยอดเขาที่มองเห็นหมู่บ้านเบื้องล่าง สายลมหนาวพัดพาเสียงห่างไกล",
-    npcs: [],
-    routes: [
-      {
-        routeSceneId: "viewpoint_road",
-        label: "ทางลงเขากลับหมู่บ้าน",
-        hint: "ทางเดิมที่ขึ้นมา",
       },
     ],
   },
@@ -154,26 +135,6 @@ const CORE_SCENES: readonly Scene[] = [
     description: "เส้นทางเดิมที่เจ้าเคยผ่านมา",
     destinations: [
       { locationId: "village", label: "หมู่บ้านบนเชิงเขา", hint: "กลับไปยังหมู่บ้าน" },
-    ],
-  },
-
-  {
-    kind: "route",
-    id: "mountain_road",
-    label: "ทางเหนือสู่ภูผา",
-    description: "เส้นทางคดเคี้ยวสูงชัน ลมแรงขึ้นเรื่อย ๆ ตามความสูง",
-    destinations: [
-      { locationId: "viewpoint", label: "จุดชมวิวบนภูผา", hint: "ขึ้นเขาต่อไป" },
-    ],
-  },
-
-  {
-    kind: "route",
-    id: "viewpoint_road",
-    label: "ทางลงเขา",
-    description: "เส้นทางลงเขาเดียวกันที่ขึ้นมา",
-    destinations: [
-      { locationId: "village", label: "หมู่บ้านบนเชิงเขา", hint: "กลับลงไป" },
     ],
   },
 
@@ -523,6 +484,7 @@ export const SCENES: readonly Scene[] = [
   ...SCENES_EVIL,
   ...SCENES_SPIES,
   ...STORY_SCENES,
+  ...PLACE_SCENES,
 ];
 
 export const SCENES_BY_ID = new Map<string, Scene>(SCENES.map((s) => [s.id, s]));

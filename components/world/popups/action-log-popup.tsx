@@ -25,6 +25,11 @@ const KIND_LABEL: Record<string, string> = {
   quest:   "ภารกิจ",
   sect:    "สำนัก",
   law:     "ทางการ",
+  gift:    "ของขวัญ",
+  activity: "กิจกรรม",
+  steal:   "ขโมย",
+  assassinate: "ลอบสังหาร",
+  kidnap:  "ลักพาตัว",
 };
 
 const KIND_COLOR: Record<string, string> = {
@@ -40,6 +45,8 @@ const KIND_COLOR: Record<string, string> = {
   quest:   "border-yellow-600/60 text-yellow-800",
   sect:    "border-vermilion/60 text-vermilion",
   law:     "border-stone-500/60 text-stone-700",
+  gift:    "border-pink-500/60 text-pink-700",
+  activity: "border-teal-500/60 text-teal-700",
 };
 
 export function ActionLogPopup({ open, onClose }: Props) {

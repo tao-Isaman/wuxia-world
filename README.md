@@ -39,9 +39,9 @@ What each suite covers and how to run e2e: [docs/testing.md](docs/testing.md). E
 
 | | |
 | --- | --- |
-| **World** | 102 places (97 on the world map), joined by 128 hand-named roads; 101 painted maps with collision; day and night on a 12-ชั่วยาม clock |
-| **People** | 157 NPCs with portraits and sprites; 20 of them (the sect masters) age, train, feud and die in a weekly background simulation |
-| **Quests** | 770 quests: 1 main, 429 side (97 sect quests and 154 lineage quests that pass on every sect skill and art up to tier 3) and 340 story chapters, with item, kill, visit, objective and dialog stages; any quest can be tracked, with a HUD tracker and a map arrow |
+| **World** | 101 places (96 on the world map), joined by 128 hand-named roads; 100 painted maps with collision; day and night on a 12-ชั่วยาม clock |
+| **People** | 225 NPCs with portraits and sprites, some strolling about their spot, each with gift tastes; 20 of them (the sect masters) age, train, feud and die in a weekly background simulation |
+| **Quests** | 867 quests: 1 main, 526 side (97 sect quests and 154 lineage quests that pass on every sect skill and art up to tier 3) and 340 story chapters, with item, kill, visit, objective and dialog stages; any quest can be tracked, with a HUD tracker and a map arrow |
 | **Story sagas** | 38 sagas of 8–10 chapters, one per tier-4 sect skill or art, retelling legends of มังกรหยก ภาค 3 with 292 cutscenes played on the painted maps |
 | **Sects** | 20 sect grounds; 15 are joinable, each with an intro quest, a rank ladder (rank-ups pay gold and open the sect's lineage quests), repeatable sect quests, and hunters for betrayers |
 | **Combat** | turn-based tactics on a 10 × 7 board, up to 15 × 10 for big gangs. Per-unit turn order by speed; move and cast with ranges and areas; enemy packs; retreat; auto-play |
@@ -69,7 +69,7 @@ tests/browser/           Playwright specs
 docs/                    guides, generated reference, specs, changelog
 ```
 
-The engines are plain TypeScript with no React or I/O. Stores wrap them, and components read the stores. The world state saves to `localStorage` (save version 21). Details: [docs/architecture.md](docs/architecture.md).
+The engines are plain TypeScript with no React or I/O. Stores wrap them, and components read the stores. The world state saves to `localStorage` (save version 22). Details: [docs/architecture.md](docs/architecture.md).
 
 ## Documentation
 

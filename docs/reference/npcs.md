@@ -2,7 +2,7 @@
 
 # People (NPCs)
 
-157 registry NPCs (`lib/world/data/npcs/`). Capabilities: 💬 talk (`dialogSceneId`) · ⚔ spar (`sparOpponentId`, non-fatal) · 🤏 can be robbed (`stealLoot`) · 📜 quests offered or turned in. An NPC listed at several places is shown under each.
+225 registry NPCs (`lib/world/data/npcs/`). Capabilities: 💬 talk (`dialogSceneId`) · ⚔ spar (`sparOpponentId`, non-fatal) · 🤏 can be robbed (`stealLoot`) · 📜 quests offered or turned in. An NPC listed at several places is shown under each.
 
 ## Cities
 
@@ -11,7 +11,7 @@
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
 | `merchant_wang` | เถ้าแก่หวาง | 💬 🤏 | — |
-| `city_capital_clerk_qing` | เสมียนนายฉิง | 💬 | — |
+| `city_capital_clerk_qing` | เสมียนนายฉิง | 💬 | 2 |
 | `city_capital_magistrate_wu` | นายอำเภอหวู่ | 💬 🤏 | 4 |
 | `city_capital_physician_lin` | หมอหลิน | 💬 🤏 | 3 |
 | `city_capital_merchant_wang` | พ่อค้าหวัง | 💬 🤏 | — |
@@ -22,30 +22,30 @@
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `city_xixia_blacksmith_dugu` | ช่างดูกู | 💬 | 5 |
+| `city_xixia_blacksmith_dugu` | ช่างดูกู | 💬 | 6 |
 
 ### ต้าหลี่ (`city_dali`)
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
 | `city_dali_scholar_duan` | บัณฑิตต้วน | 💬 🤏 | 3 |
-| `city_dali_herbalist_bai` | หมอยาไป๋ | 💬 🤏 | 2 |
+| `city_dali_herbalist_bai` | หมอยาไป๋ | 💬 🤏 | 3 |
 | `spy_dali_mei` | เหมยพรานป่า | 💬 ⚔ 🤏 | 3 |
 
 ### หยางโจว (`city_yangzhou`)
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `city_yangzhou_chef_su` | พ่อครัวซู | 💬 🤏 | 2 |
-| `city_yangzhou_fisherman_chen` | ชาวประมงเฉิน | 💬 | 2 |
+| `city_yangzhou_chef_su` | พ่อครัวซู | 💬 🤏 | 3 |
+| `city_yangzhou_fisherman_chen` | ชาวประมงเฉิน | 💬 | 4 |
 | `spy_yangzhou_xi` | ซีคนยกของท่าเรือ | 💬 ⚔ 🤏 | 3 |
 
 ### ซูโจว (`city_suzhou`)
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `city_suzhou_book_merchant_li` | พ่อค้าหนังสือลี่ | 💬 | — |
-| `city_suzhou_weaver_mei` | ช่างทอเหมย | 💬 | 3 |
+| `city_suzhou_book_merchant_li` | พ่อค้าหนังสือลี่ | 💬 | 2 |
+| `city_suzhou_weaver_mei` | ช่างทอเหมย | 💬 | 4 |
 
 ### จินหลิง (`city_jinling`)
 
@@ -60,40 +60,83 @@
 | `city_changan_guard_yan` | ยามหยาน | 💬 🤏 | 3 |
 | `evil_changan_corrupt_official_yan` | ขุนนางหยานทุจริต | 💬 🤏 | 6 |
 
+### เมืองลิ้งเซียว (`city_lingxiao`)
+
+| Id | Name | Can | Quests |
+| --- | --- | --- | --- |
+| `city_lingxiao_sweeper_bai` | ลุงไป๋ | 💬 | 1 |
+| `city_lingxiao_coal_hu` | หูเตาถ่าน | 💬 🤏 | 1 |
+| `city_lingxiao_guard_feng` | เฝิงหานเหมย | 💬 ⚔ | 1 |
+| `city_lingxiao_scholar_sima` | ซือหม่าเหยียน | 💬 🤏 | 2 |
+| `city_lingxiao_child_xue` | เสี่ยวเสวี่ย | 💬 | — |
+
 ## Villages, markets and the foothill tutorial area
 
 ### หมู่บ้านชีกู่ (`village_qigu`)
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `vil_qigu_farmer_lao` | ลาวหนาน | 💬 | 3 |
+| `vil_qigu_farmer_lao` | ลาวหนาน | 💬 | 5 |
 | `vil_qigu_herbalist_mei` | นางเหมย | 💬 | 3 |
 | `spy_village_si` | ซื่อชาวนาในชีกู่ | 💬 ⚔ 🤏 | 3 |
+
+### หมู่บ้านไร้นาม (`village_noname`)
+
+| Id | Name | Can | Quests |
+| --- | --- | --- | --- |
+| `village_noname_whip_qiao` | ยายเฉียว | 💬 ⚔ | 2 |
+| `village_noname_carter_lu` | ลู่เกวียน | 💬 ⚔ 🤏 | 1 |
+| `village_noname_child_xiaowu` | เสี่ยวอู๋ | 💬 | — |
 
 ### หมู่บ้านดอกเหมย (`village_meihua`)
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
 | `vil_meihua_musician_chen` | เฉินเยว่ | 💬 | 4 |
-| `vil_meihua_hunter_bao` | เปาเหล็กก้าน | 💬 | 2 |
+| `vil_meihua_hunter_bao` | เปาเหล็กก้าน | 💬 | 3 |
+
+### หมู่บ้านหัวซาน (`village_huashan`)
+
+| Id | Name | Can | Quests |
+| --- | --- | --- | --- |
+| `village_huashan_teacher_ling` | ครูหลิง | 💬 | 1 |
+| `village_huashan_dreamer_yang` | หยางซื่อ | 💬 ⚔ | 1 |
+| `village_huashan_apprentice_tie` | เถี่ยตัน | 💬 🤏 | 1 |
+
+### หมู่บ้านไท่ซาน (`village_taishan`)
+
+| Id | Name | Can | Quests |
+| --- | --- | --- | --- |
+| `village_taishan_porter_shi` | สือเปียนตาน | 💬 ⚔ | 2 |
+| `village_taishan_granny_die` | ยายเตี๋ย | 💬 | 1 |
+| `village_taishan_pilgrim_chen` | บัณฑิตเฉิน | 💬 🤏 | — |
 
 ### หมู่บ้านฮิงซาน (`village_hengshan`)
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `vil_hengshan_elder_wu` | ผู้อาวุโสอู๋ | 💬 | 3 |
+| `vil_hengshan_elder_wu` | ผู้อาวุโสอู๋ | 💬 | 4 |
 
 ### หมู่บ้านอวู่เซี่ย (`village_wuxia`)
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `vil_wuxia_fisherman_deng` | เติ้งลองหาง | 💬 | 3 |
+| `vil_wuxia_fisherman_deng` | เติ้งลองหาง | 💬 | 4 |
+
+### ชนเผ่าหุยซู (`tribe_huizu`)
+
+| Id | Name | Can | Quests |
+| --- | --- | --- | --- |
+| `tribe_huizu_smith_hai` | ช่างไห่ | 💬 🤏 | 1 |
+| `tribe_huizu_wrestler_ma` | หม่าต้าหลี่ | 💬 ⚔ | 1 |
+| `tribe_huizu_caravan_nasir` | นาซีร์ | 💬 ⚔ 🤏 | 1 |
+| `tribe_huizu_herder_aisha` | อาอีซา | 💬 | 1 |
 
 ### ตลาดชาวเมี่ยว (`market_miao`)
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `wld_miao_tribaleldr_abao` | อาเป้า (หัวหน้าเผ่าเมี่ยว) | 💬 | 3 |
+| `wld_miao_tribaleldr_abao` | อาเป้า (หัวหน้าเผ่าเมี่ยว) | 💬 | 4 |
 
 ## Sects
 
@@ -309,13 +352,22 @@
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `temple_dalun_monk_kongxin` | พระกงซิน | 💬 🤏 | 2 |
+| `temple_dalun_monk_kongxin` | พระกงซิน | 💬 🤏 | 4 |
 
 ### พระราชวังจงหยาง (`palace_zhongyang`)
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
 | `palace_zhongyang_envoy_liuying` | ทูตหลิวอิง | 💬 🤏 | 3 |
+
+### พระราชวังหลวง (`palace_royal`)
+
+| Id | Name | Can | Quests |
+| --- | --- | --- | --- |
+| `palace_royal_eunuch_gao` | ขันทีเกา | 💬 🤏 | 2 |
+| `palace_royal_guard_zhao` | จ้าวเทีย | 💬 ⚔ | 1 |
+| `palace_royal_maid_cui` | ชุ่ยเอ๋อ | 💬 | 1 |
+| `palace_royal_official_qian` | ขุนนางเฉียน | 💬 🤏 | — |
 
 ## Villas and mansions
 
@@ -331,27 +383,52 @@
 | --- | --- | --- | --- |
 | `villa_yaowang_doctor_shennong` | หมอเสินหนง | 💬 🤏 | 8 |
 
+### ดงดอกท้อ (`villa_meizhuang`)
+
+| Id | Name | Can | Quests |
+| --- | --- | --- | --- |
+| `villa_meizhuang_master_huang` | หวงจงกง | 💬 ⚔ | 1 |
+| `villa_meizhuang_master_heibai` | เฮยไป๋จื่อ | 💬 | 2 |
+| `villa_meizhuang_painter_danqing` | ตันชิงเซิง | 💬 | 1 |
+| `villa_meizhuang_steward_ding` | พ่อบ้านติงเจียน | 💬 | — |
+
+### บ้านค้าขายโฝวเวย (`villa_fuwei`)
+
+| Id | Name | Can | Quests |
+| --- | --- | --- | --- |
+| `villa_fuwei_chief_lin` | หลินเจิ้นหนาน | 💬 🤏 | 1 |
+| `villa_fuwei_young_lin` | หลินผิงจือ | 💬 | 1 |
+| `villa_fuwei_escort_shi` | สื่อเปียวโถว | 💬 ⚔ | 2 |
+
 ## Inns
 
 ### โรงเตี๊ยมยั่วไหล (`inn_yuelai`)
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `swordsman_xiao` | เซียวจิ้งเทียน | 💬 ⚔ | 1 |
+| `swordsman_xiao` | เซียวจิ้งเทียน | 💬 ⚔ | 3 |
 | `inn_yuelai_server_xiu` | นางสาวซิ่ว | 💬 🤏 | 3 |
 | `spy_inn_zhou` | โจวพ่อค้าเหล้าในโรงเตี๊ยม | 💬 ⚔ 🤏 | 3 |
+
+### โรงเตี๊ยมมีหว่าง (`inn_youjian`)
+
+| Id | Name | Can | Quests |
+| --- | --- | --- | --- |
+| `inn_youjian_keeper_mei` | เหมยเหนียง | 💬 🤏 | 2 |
+| `inn_youjian_cook_bao` | ปาวซาลาเปา | 💬 | 1 |
+| `inn_youjian_diviner_gua` | ซินแสกว้า | 💬 🤏 | 1 |
 
 ### โรงเตี๊ยมเก้าอี้สูง (`inn_gaosheng`)
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `inn_gaosheng_keeper_fat` | เฉาอ้วน | 💬 🤏 | 4 |
+| `inn_gaosheng_keeper_fat` | เฉาอ้วน | 💬 🤏 | 5 |
 
 ### โรงเตี๊ยมห้วอลั่ว (`inn_heluo`)
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `inn_heluo_storyteller_po` | โปผู้เล่าเรื่อง | 💬 | 4 |
+| `inn_heluo_storyteller_po` | โปผู้เล่าเรื่อง | 💬 | 5 |
 
 ## Homes
 
@@ -360,6 +437,97 @@
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
 | `wld_hong_adventurer_luo` | หลัวเฟย์หาว (นักผจญภัย) | 💬 | 3 |
+
+### บ้านฮูเฝย์ (`home_hufei`)
+
+| Id | Name | Can | Quests |
+| --- | --- | --- | --- |
+| `home_hufei_master_hufei` | ฮูเฝย์ | 💬 ⚔ | 1 |
+| `home_hufei_servant_ping` | ผิงอาสี่ | 💬 | 1 |
+| `home_hufei_guest_yuan` | เอวี๋ยนจื่ออี | 💬 ⚔ | 1 |
+| `home_hufei_guest_jiu` | เหล่าจิ่ว | 💬 ⚔ | 1 |
+
+### บ้านเฉิงคุน (`home_chengkun`)
+
+| Id | Name | Can | Quests |
+| --- | --- | --- | --- |
+| `home_chengkun_disciple_chen` | เฉินโหย่วเลี่ยง | 💬 ⚔ 🤏 | 1 |
+| `home_chengkun_gardener_wu` | ลุงอู๋คนสวน | 💬 | 1 |
+| `home_chengkun_maid_cui` | เสี่ยวชุ่ย | 💬 | 1 |
+
+### บ้านแพทย์น้ำจืด (`home_xuemuhua`)
+
+| Id | Name | Can | Quests |
+| --- | --- | --- | --- |
+| `home_xuemuhua_doctor_xue` | หมอเซวี่ยมู่หัว | 💬 🤏 | 1 |
+| `home_xuemuhua_guest_kang` | คังกว่างหลิง | 💬 | 2 |
+| `home_xuemuhua_guest_li` | หลี่ขุยเหล่ย | 💬 ⚔ | 2 |
+| `home_xuemuhua_apprentice_dan` | เสี่ยวตัน | 💬 | — |
+
+### บ้านหนานเสียน (`home_nanxian`)
+
+| Id | Name | Can | Quests |
+| --- | --- | --- | --- |
+| `home_nanxian_sage_nanxian` | ท่านหนานเสียน | 💬 ⚔ 🤏 | 2 |
+| `home_nanxian_servant_ashu` | อาซู | 💬 | — |
+| `home_nanxian_woodcutter_bai` | ลุงไป๋ | 💬 | 1 |
+
+### บ้านอีตัง (`home_yideng`)
+
+| Id | Name | Can | Quests |
+| --- | --- | --- | --- |
+| `home_yideng_monk_yideng` | อิดเต็งไต้ซือ | 💬 ⚔ | 1 |
+| `home_yideng_fisher_diancang` | ฤๅษีประมงเตี่ยมชง | 💬 ⚔ | 1 |
+| `home_yideng_farmer_geng` | ชาวนาเกิง | 💬 | 1 |
+| `home_yideng_scholar_zhu` | บัณฑิตจูจื่อหลิว | 💬 🤏 | 1 |
+
+### บ้านนักรบชายแดน (`home_tianboguang`)
+
+| Id | Name | Can | Quests |
+| --- | --- | --- | --- |
+| `home_tianboguang_blade_tian` | เถียนป๋อกวง | 💬 ⚔ 🤏 | 2 |
+| `home_tianboguang_cook_luo` | ป้าหลัว | 💬 | — |
+| `home_tianboguang_soldier_chen` | ทหารแก่เฉิน | 💬 | 1 |
+
+### บ้านมยง (`home_miaoren`)
+
+| Id | Name | Can | Quests |
+| --- | --- | --- | --- |
+| `home_miaoren_master_miao` | เหมียวเหรินเฟิง | 💬 ⚔ | 2 |
+| `home_miaoren_daughter_ruolan` | เหมียวรั่วหลัน | 💬 | — |
+| `home_miaoren_spearman_zhong` | ทหารทวนเฒ่าจง | 💬 ⚔ | 1 |
+
+### บ้านเฉิงอิ๋ง (`home_chengying`)
+
+| Id | Name | Can | Quests |
+| --- | --- | --- | --- |
+| `home_chengying_mistress_cheng` | เฉิงอิ๋ง | 💬 | 1 |
+| `home_chengying_cousin_lu` | ลู่อู๋ซวง | 💬 ⚔ | 1 |
+| `home_chengying_gooseboy_tong` | อาถงเด็กเลี้ยงห่าน | 💬 | 1 |
+
+### บ้านหยานจี (`home_yanji`)
+
+| Id | Name | Can | Quests |
+| --- | --- | --- | --- |
+| `home_yanji_bonesetter_yan` | หยานจี | 💬 🤏 | 1 |
+| `home_yanji_guard_liu` | หลิวกระบองไหม้ | 💬 ⚔ | 1 |
+| `home_yanji_maid_chun` | ชุนเถาสาวใช้ | 💬 | 1 |
+
+### บ้านเป่ยฉิว (`home_beichou`)
+
+| Id | Name | Can | Quests |
+| --- | --- | --- | --- |
+| `home_beichou_hermit_bei` | เป่ยฉิว | 💬 ⚔ | 1 |
+| `home_beichou_servant_amu` | อาหมู่คนใบ้ | 💬 | 1 |
+| `home_beichou_herder_cao` | เสี่ยวเฉ่าเด็กเลี้ยงแพะ | 💬 | 1 |
+
+### คฤหาสน์ตนเอง (`home_player`)
+
+| Id | Name | Can | Quests |
+| --- | --- | --- | --- |
+| `home_player_housekeeper_liu` | ป้าหลิว | 💬 | 1 |
+| `home_player_gatekeeper_zhou` | ลุงโจว | 💬 | 1 |
+| `home_player_neighbor_niu` | อาหนิว | 💬 | 1 |
 
 ## Mountains, cliffs and peaks
 
@@ -387,13 +555,13 @@
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `wld_bingcan_scholar_wei` | เว่ยชิงเหวิน (บัณฑิตถ้ำ) | 💬 | 4 |
+| `wld_bingcan_scholar_wei` | เว่ยชิงเหวิน (บัณฑิตถ้ำ) | 💬 | 5 |
 
 ### ถ้ำงูทอง (`cave_jinshe`)
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `wld_jinshe_beasttamer_xu` | ซวีเหลิงชิง (ผู้ฝึกงู) | 💬 | 3 |
+| `wld_jinshe_beasttamer_xu` | ซวีเหลิงชิง (ผู้ฝึกงู) | 💬 | 4 |
 
 ### ถ้ำแมงมุม (`cave_zhizhu`)
 
@@ -419,7 +587,7 @@
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `wld_taohua_hermit_huang` | ฮ่วงเอี้ยะซือ (ปรมาจารย์ฤาษี) | 💬 | 3 |
+| `wld_taohua_hermit_huang` | ฮ่วงเอี้ยะซือ (ปรมาจารย์ฤาษี) | 💬 | 4 |
 
 ### เกาะมังกรเทพ (`isle_shenlong`)
 
@@ -431,7 +599,7 @@
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `wld_heilong_fisherman_tan` | ต่านเหลาตู (ชาวประมงแก่) | 💬 | 4 |
+| `wld_heilong_fisherman_tan` | ต่านเหลาตู (ชาวประมงแก่) | 💬 | 5 |
 
 ## Frontier and special places
 
@@ -439,7 +607,7 @@
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `jail_elder_prisoner` | ตาเฒ่าหลิวนักโทษ | 💬 | — |
+| `jail_elder_prisoner` | ตาเฒ่าหลิวนักโทษ | 💬 | 1 |
 | `jail_guard_zhang` | ผู้คุมจาง | 💬 | — |
 
 ### ทะเลทรายร้าง (`desert_ruins`)
