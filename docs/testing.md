@@ -106,7 +106,7 @@ Read-only scripts, not wired into `package.json`:
 
 Many specs replace `Math.random` in the page to make rolls predictable.
 
-23 tests in 13 spec files:
+24 tests in 14 spec files:
 
 | Spec | Tests | Covers |
 | --- | --- | --- |
@@ -114,7 +114,7 @@ Many specs replace `Math.random` in the page to make rolls predictable.
 | `battle-setting.spec.ts` | 1 | a capital encounter keeps its street background through a reload and phone rotation |
 | `characters.spec.ts` | 2 | all eight heroes animate idle and four walk directions in Phaser; reduced motion; WebGL context loss and "ลองใหม่" recovery |
 | `dialogue.spec.ts` | 2 | local replies keep the same world canvas; quest offers away from a map fit on screen without scrolling at three sizes |
-| `game.spec.ts` | 6 | exploration, menu pause, travel, NPC card, reload; grid battle by tap and auto; unit info by touch; phone rotation; a version-18 save migrates to 21; rigged NPCs wander in the capital and wait for the hero |
+| `game.spec.ts` | 6 | exploration, menu pause, travel, NPC card, reload; grid battle by tap and auto; unit info by touch; phone rotation; a version-18 save migrates to 22; rigged NPCs wander in the capital and wait for the hero |
 | `investigation.spec.ts` | 1 | capital rumors and the ledger investigation survive a mid-dialog reload and pay once |
 | `law-guide.spec.ts` | 3 | walking while wanted draws the law; jail days per mark; retreat gives no rewards; the quest guide and the busy overlay |
 | `mobile-controls.spec.ts` | 1 | phone HUD: icon bar, joystick, action button, rest bubble, profile |
@@ -122,6 +122,7 @@ Many specs replace `Math.random` in the page to make rolls predictable.
 | `pwa.spec.ts` | 1 | manifest and icons, an active service worker, an offline reload — **needs a production server** |
 | `quest-tracking.spec.ts` | 1 | pinning a quest, the HUD tracker, and the ฉางอัน spy objective advancing in person |
 | `routes.spec.ts` | 1 | home → capital: the road map's direction, the hero starting at its near end, and arriving beside the exit back home |
+| `places.spec.ts` | 1 | a village has its new people; a 500-gold gift raises trust and starts the 30-day wait; a kidnapped NPC leaves the map and is back after 180 days |
 | `story.spec.ts` | 2 | a saga chapter's film plays (title card, tap, skip), the long briefing pages, and the quest log's ตำนาน tab replays the film; the sect window's ขั้นและวิชา tab lists the sect's skills with their quests, and a rank-up pays gold and teaches nothing |
 
 Screenshots from specs go to `test-results/screenshots/`; failure traces go to `test-results/<test>/`. Both are git-ignored.
