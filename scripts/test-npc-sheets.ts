@@ -23,9 +23,9 @@ async function check(name: string, fn: () => void | Promise<void>) {
   console.log(`PASS ${name}`);
 }
 
-await check("65 rigged NPCs: 20 people + 10 villains + 35 strolling townsfolk, unique, each a registry NPC placed on a map", () => {
-  assert.equal(ANIMATED_NPC_IDS.length, 65);
-  assert.equal(new Set(ANIMATED_NPC_IDS).size, 65);
+await check("48 rigged NPCs: 20 people + 10 villains + 18 strolling townsfolk, unique, each a registry NPC placed on a map", () => {
+  assert.equal(ANIMATED_NPC_IDS.length, 48);
+  assert.equal(new Set(ANIMATED_NPC_IDS).size, 48);
   for (const id of ANIMATED_NPC_IDS) {
     const npc = getNpc(id);
     assert.ok(npc, `${id} is a registry NPC`);
