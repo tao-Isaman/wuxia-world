@@ -62,7 +62,7 @@ import { evaluateCondition } from "@/lib/world/conditions";
 import { KIDNAP_RETURN_DAYS, npcPresent } from "@/lib/world/npc-presence";
 import { GIFT_REACTION_LINE, giftOutcome, giftWaitDays, giftable, type GiftReaction } from "@/lib/world/gifts";
 import { tickAllNamedNpcs } from "@/lib/world/npc-tick";
-import { releaseFromJail, rollWalkEvent } from "@/lib/world/effects";
+import { releaseFromJail, rollPlaceMeeting, rollWalkEvent } from "@/lib/world/effects";
 import { WANTED_DECAY_DAYS, WANTED_MAX, describeSentence, isLawOpponent, sentenceLeft } from "@/lib/world/law";
 import { JAIL_SCENE_ID, getActivity, jailDiceChance, jailEscapeChance } from "@/lib/world/data/activities";
 import { maintainRumors, seedLoreRumors, RUMOR_SEEN_CAP } from "@/lib/world/rumor-engine";
@@ -579,6 +579,7 @@ function encounterBattle(opponentId: string, returnSceneId: string): NonNullable
 // can happen anywhere along the way. The player's home is safe ground.
 const WALK_TICK_CHANCE = 0.4;
 const SAFE_SCENES = new Set(["home_player", JAIL_SCENE_ID]);
+const PLACE_MEET_CHANCE = 0.04;
 /** Test/QA switch: localStorage["wuxia-random-events"] = "off" disables walk events. */
 function walkEventsDisabled(): boolean {
   try { return typeof localStorage !== "undefined" && localStorage.getItem("wuxia-random-events") === "off"; } catch { return false; }
@@ -2324,8 +2325,15 @@ export const useWorldStore = create<WorldStore>()(
         const s = get();
         if (!s.hasGame || s.gameOver || s.pendingBattle || s.pendingEncounter || walkEventsDisabled()) return;
         const scene = getScene(s.currentSceneId);
-        if (!scene || (scene.kind !== "location" && scene.kind !== "route") || SAFE_SCENES.has(scene.id)) return;
+        if (!scene || (scene.kind !== "location" && scene.kind !== "route")) return;
         const draft = draftFrom(s);
+        if (SAFE_SCENES.has(scene.id)) {
+          // Safe ground: only the place's own meetings (no fights, no law).
+          if (scene.id === JAIL_SCENE_ID) return;
+          rollPlaceMeeting(draft, PLACE_MEET_CHANCE);
+          if (draft.currentSceneId !== s.currentSceneId) set({ ...draft });
+          return;
+        }
         rollWalkEvent(draft, WALK_TICK_CHANCE);
         if (draft.pendingEncounter && isLawOpponent(draft.pendingEncounter.opponentId)) {
           appendActionLog(draft, "encounter", `ถูกตามจับ! หมายจับ ${draft.wanted}/${WANTED_MAX}`);

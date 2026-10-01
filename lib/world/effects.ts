@@ -497,22 +497,34 @@ export function rollWalkEvent(state: WorldStateData, chanceScale: number): void 
     return;
   }
   if (r < fightP + treasureP + meetP) {
-    // Place events of where the hero walks join the anywhere-events; once-only
-    // events and conditions filter the pool.
-    const here = state.currentSceneId;
-    const pool = MEET_EVENTS.filter((e) => (!e.locationIds || e.locationIds.includes(here)) &&
-      (!e.once || !state.flags[`meet:${e.id}`]) && (!e.condition || evaluateCondition(state, e.condition)));
-    const ev = pickWeighted(pool, Math.random());
-    if (!ev) return;
-    if (ev.once) state.flags[`meet:${ev.id}`] = true;
-    state.flags._skipEventRoll = true;
-    state.currentSceneId = ev.dialogSceneId;
-    const dest = getScene(ev.dialogSceneId);
-    if (dest?.onEnter) applyEffects(state, dest.onEnter);
+    startMeeting(state, false);
     return;
   }
   // r ≥ all bands → nothing happens; player just sees the location.
   return;
+}
+
+// Place events of where the hero walks join the anywhere-events (unless
+// `placeOnly`); once-only events and conditions filter the pool.
+function startMeeting(state: WorldStateData, placeOnly: boolean): boolean {
+  const here = state.currentSceneId;
+  const pool = MEET_EVENTS.filter((e) => (e.locationIds ? e.locationIds.includes(here) : !placeOnly) &&
+    (!e.once || !state.flags[`meet:${e.id}`]) && (!e.condition || evaluateCondition(state, e.condition)));
+  const ev = pickWeighted(pool, Math.random());
+  if (!ev) return false;
+  state.lastLocationId = here;
+  if (ev.once) state.flags[`meet:${ev.id}`] = true;
+  state.flags._skipEventRoll = true;
+  state.currentSceneId = ev.dialogSceneId;
+  const dest = getScene(ev.dialogSceneId);
+  if (dest?.onEnter) applyEffects(state, dest.onEnter);
+  return true;
+}
+
+/** Safe ground (the hero's home): no fights or treasure, only the place's own meetings. */
+export function rollPlaceMeeting(state: WorldStateData, chance: number): void {
+  if (!state.playerBuild || Math.random() >= chance) return;
+  startMeeting(state, true);
 }
 
 // Convenience: apply an array in order. After the batch runs, we tick the

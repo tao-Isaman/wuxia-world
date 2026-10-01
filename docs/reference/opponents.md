@@ -2,11 +2,11 @@
 
 # Opponents
 
-242 opponents (`lib/world/data/opponents.ts`). Random encounters draw from 64 fight events (plus 4 treasure and 3 meeting events) filtered by zone (`lib/world/data/random-events.ts`).
+286 opponents (`lib/world/data/opponents.ts`). Random encounters draw from 64 fight events (plus 4 treasure and 31 meeting events) filtered by zone (`lib/world/data/random-events.ts`).
 
 Met via: **roams** = random walk encounters in the listed zones · **hunt** = a hunting node · **spar** = an NPC's practice bout · **scene** = a quest or story battle (count of scene choices) · **law** = pursuers after wanted marks · **betrayal** = hunters after betraying a sect.
 
-Per tier: T0: 9 · T1: 36 · T2: 54 · T3: 37 · T4: 106. Per category: ฝ่ายมนุษย์ (human): 209 · สัตว์ป่า (beast): 27 · ผู้พิเศษ (supernatural): 6.
+Per tier: T0: 9 · T1: 43 · T2: 73 · T3: 53 · T4: 108. Per category: ฝ่ายมนุษย์ (human): 253 · สัตว์ป่า (beast): 27 · ผู้พิเศษ (supernatural): 6.
 
 ## Tier 0 (9)
 
@@ -14,7 +14,7 @@ Per tier: T0: 9 · T1: 36 · T2: 54 · T3: 37 · T4: 106. Per category: ฝ่�
 | --- | --- | --- | --- | --- | --- |
 | `training_capital_apprentice` | ศิษย์ฝึกหัดอาเฉิง | human | — | 0 | scene ×1 |
 | `petty_thief` | ขโมยน้อย | human | — | 3 | roams (city, frontier, isle, mansion, sect, temple, wild) |
-| `drunk_brawler` | ชายเมาก่อเรื่อง | human | — | 3 | roams (city, frontier, isle, mansion, sect, temple, wild) |
+| `drunk_brawler` | ชายเมาก่อเรื่อง | human | — | 3 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×1 |
 | `wild_dog` | หมาป่าเล็ก | beast | — | 3 | roams (frontier, isle, wild) |
 | `wild_chicken` | ไก่ป่า | beast | — | 3 | roams (frontier, isle, wild) |
 | `small_snake` | งูเล็ก | beast | — | 3 | roams (frontier, isle, wild) |
@@ -22,13 +22,13 @@ Per tier: T0: 9 · T1: 36 · T2: 54 · T3: 37 · T4: 106. Per category: ฝ่�
 | `hunt_pheasant` | ไก่ฟ้า | beast | — | 3 | hunt |
 | `hunt_squirrel` | กระรอกแก้ม | beast | — | 3 | hunt |
 
-## Tier 1 (36)
+## Tier 1 (43)
 
 | Id | Name | Category | Pack | Drops | Met via |
 | --- | --- | --- | --- | --- | --- |
-| `thug` | โจรเร่ร่อน | human | — | 5 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×1 |
+| `thug` | โจรเร่ร่อน | human | — | 5 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×2 |
 | `bandit` | โจรป่า | human | — | 5 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×1 |
-| `ruffian` | คนร้าย | human | — | 5 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×1 |
+| `ruffian` | คนร้าย | human | — | 5 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×2 |
 | `wild_beast` | สัตว์ป่าดุร้าย | beast | — | 5 | roams (frontier, isle, wild) |
 | `wild_boar` | หมูป่า | beast | — | 5 | roams (frontier, isle, wild) |
 | `wild_wolf` | หมาป่า | beast | 1× หมาป่าเล็ก | 5 | roams (frontier, isle, wild) |
@@ -62,8 +62,15 @@ Per tier: T0: 9 · T1: 36 · T2: 54 · T3: 37 · T4: 106. Per category: ฝ่�
 | `law_constable` | เจ้าหน้าที่รัฐ | human | — | 5 | law |
 | `vampire_bat` | ค้างคาวดูดเลือด | beast | 2× ค้างคาวดูดเลือด | 5 | roams (frontier, isle, wild) |
 | `bandit_archer` | มือเข็มโจรป่า | human | — | 5 | roams (city, frontier, isle, mansion, sect, temple, wild) |
+| `spar_village_noname_carter_lu` | ลู่เกวียน | human | — | 5 | spar |
+| `spar_village_huashan_dreamer_yang` | หยางซื่อ | human | — | 5 | spar |
+| `spar_palace_royal_zhao` | จ้าวเทีย | human | — | 5 | spar |
+| `spar_tribe_huizu_ma` | หม่าต้าหลี่ | human | — | 5 | spar |
+| `spar_home_hufei_yuan` | เอวี๋ยนจื่ออี | human | — | 5 | spar |
+| `spar_home_chengkun_chen` | เฉินโหย่วเลี่ยง | human | — | 5 | spar |
+| `spar_chengying_lu` | ลู่อู๋ซวง | human | — | 5 | spar |
 
-## Tier 2 (54)
+## Tier 2 (73)
 
 | Id | Name | Category | Pack | Drops | Met via |
 | --- | --- | --- | --- | --- | --- |
@@ -75,7 +82,7 @@ Per tier: T0: 9 · T1: 36 · T2: 54 · T3: 37 · T4: 106. Per category: ฝ่�
 | `iron_palm_thug` | นักเลงฝ่ามือเหล็ก | human | — | 6 | roams (city, frontier, isle, mansion, sect, temple, wild) |
 | `flying_swallow` | นกนางแอ่นบิน | human | — | 6 | roams (city, frontier, isle, mansion, sect, temple, wild) |
 | `poison_practitioner` | ผู้ฝึกพิษ | human | — | 7 | roams (city, frontier, isle, mansion, sect, temple, wild) |
-| `wandering_swordsman` | กระบี่พเนจร | human | — | 6 | roams (city, frontier, isle, mansion, sect, temple, wild) |
+| `wandering_swordsman` | กระบี่พเนจร | human | — | 6 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×1 |
 | `sect_disciple` | ลูกศิษย์สำนัก | human | — | 6 | roams (city, frontier, isle, mansion, sect, temple, wild) |
 | `hunt_alpha_wolf` | หมาป่าจ่าฝูง | beast | 2× สุนัขป่า | 6 | hunt |
 | `hunt_giant_bear` | หมีหิน | beast | — | 7 | hunt |
@@ -119,10 +126,29 @@ Per tier: T0: 9 · T1: 36 · T2: 54 · T3: 37 · T4: 106. Per category: ฝ่�
 | `frost_wolf` | หมาป่าหิมะ | beast | 2× หมาป่า | 7 | roams (frontier, isle, wild) |
 | `blood_boar` | หมูป่าเลือดคลั่ง | beast | 1× หมูป่า | 6 | roams (frontier, isle, wild) |
 | `bandit_lieutenant` | รองหัวหน้าโจร | human | 1× โจรป่า + 1× มือเข็มโจรป่า | 6 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×1 |
-| `night_blade` | มือมีดราตรี | human | — | 6 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×2 |
+| `night_blade` | มือมีดราตรี | human | — | 6 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×4 |
 | `demon_cult_zealot` | สาวกลัทธิมาร | human | 2× สาวกลัทธิมาร | 6 | roams (city, frontier, isle, mansion, sect, temple, wild) |
+| `spar_village_noname_whip_qiao` | ยายเฉียว | human | — | 6 | spar, scene ×1 |
+| `spar_village_taishan_porter_shi` | สือเปียนตาน | human | — | 6 | spar, scene ×1 |
+| `foe_taishan_toll_chief` | หัวหน้าโจรเก็บค่าผ่านทาง | human | — | 6 | scene ×1 |
+| `foe_youjian_shadow_diviner` | หมอดูเงา | human | — | 6 | scene ×1 |
+| `spar_city_lingxiao_feng` | เฝิงหานเหมย | human | — | 6 | spar |
+| `spar_tribe_huizu_nasir` | นาซีร์ | human | — | 6 | spar |
+| `spar_home_hufei_hufei` | ฮูเฝย์ | human | — | 6 | spar, scene ×1 |
+| `spar_home_hufei_jiu` | เหล่าจิ่ว | human | — | 6 | spar |
+| `spar_home_yideng_fisher` | ฤๅษีประมงเตี่ยมชง | human | — | 6 | spar, scene ×1 |
+| `foe_home_tianboguang_holding_back` | เถียนป๋อกวง (ออมมือ) | human | — | 6 | scene ×1 |
+| `spar_home_miaoren_spearman` | ทหารทวนเฒ่าจง | human | — | 6 | spar, scene ×1 |
+| `spar_yanji_liu` | หลิวกระบองไหม้ | human | — | 6 | spar, scene ×1 |
+| `spar_beichou_bei` | เป่ยฉิว | human | — | 6 | spar, scene ×1 |
+| `spar_meizhuang_huang` | หวงจงกง | human | — | 6 | spar, scene ×1 |
+| `spar_fuwei_shi` | สื่อเปียวโถว | human | — | 6 | spar |
+| `spar_chef_su_twin` | พ่อครัวซู (มีดคู่) | human | — | 6 | scene ×1 |
+| `spar_hengshan_elder_wu` | ผู้อาวุโสอู๋ | human | — | 6 | scene ×1 |
+| `spar_qigu_farmer_lao` | ลาวหนาน | human | — | 6 | scene ×1 |
+| `spar_taohua_huang_waterstep` | ฮ่วงเอี้ยะซือ (สามส่วนฝีมือ) | human | — | 6 | scene ×1 |
 
-## Tier 3 (37)
+## Tier 3 (53)
 
 | Id | Name | Category | Pack | Drops | Met via |
 | --- | --- | --- | --- | --- | --- |
@@ -163,8 +189,24 @@ Per tier: T0: 9 · T1: 36 · T2: 54 · T3: 37 · T4: 106. Per category: ฝ่�
 | `jade_python` | งูเหลือมหยก | beast | — | 9 | roams (frontier, isle, wild) |
 | `thunder_eagle` | อินทรีสายฟ้า | beast | — | 7 | roams (frontier, isle, wild) |
 | `ghost_swordsman` | วิญญาณจอมกระบี่ | supernatural | — | 7 | roams (sect, temple, wild) |
+| `foe_noname_masked_disciple` | ซือหลางหน้ากากเหล็ก | human | — | 7 | scene ×1 |
+| `foe_youjian_sky_room_guest` | หลี่เซียวเฟิง | human | — | 7 | scene ×1 |
+| `opp_city_lingxiao_red_veil` | หญิงผ้าคลุมแดง | human | — | 7 | scene ×1 |
+| `opp_palace_royal_shadow` | เงาไร้รอยรุ่นสอง | human | — | 7 | scene ×1 |
+| `spar_home_xuemuhua_li` | เห้งเจีย (หลี่ขุยเหล่ย) | human | — | 7 | spar, scene ×1 |
+| `qfoe_home_xuemuhua_traitor` | ศิษย์ทรยศพิณมาร | human | — | 7 | scene ×1 |
+| `spar_home_nanxian_sage` | ท่านหนานเสียน | human | — | 7 | spar |
+| `foe_home_nanxian_masked_sword` | กระบี่สวมหน้ากาก | human | — | 7 | scene ×1 |
+| `spar_home_tianboguang` | เถียนป๋อกวง | human | — | 7 | spar |
+| `foe_home_miaoren_poison_doctor` | หมอปลอมมือสังหาร | human | — | 7 | scene ×1 |
+| `foe_meizhuang_sunmoon_envoy` | ทูตเงาแห่งลัทธิตะวันจันทรา | human | — | 7 | scene ×1 |
+| `foe_fuwei_qingcheng_luo` | ลั่วเหรินเจี๋ยแห่งชิงเฉิง | human | — | 7 | scene ×1 |
+| `qf_suzhou_lanying` | หลานอิงนักพิณพิษเพลง | human | — | 7 | scene ×1 |
+| `qfoe_dalun_shadow_lama` | ลามะเงาไร้นาม | human | — | 7 | scene ×1 |
+| `spar_dalun_kongxin` | พระกงซิน | human | — | 7 | scene ×1 |
+| `spar_bingcan_wei_firefist` | เว่ยชิงเหวิน (หมัดเพลิง) | human | — | 7 | scene ×1 |
 
-## Tier 4 (106)
+## Tier 4 (108)
 
 | Id | Name | Category | Pack | Drops | Met via |
 | --- | --- | --- | --- | --- | --- |
@@ -274,3 +316,5 @@ Per tier: T0: 9 · T1: 36 · T2: 54 · T3: 37 · T4: 106. Per category: ฝ่�
 | `st_tang_heartless_liang` | หมอไร้ใจเหลียงอู๋ซิน | human | — | 8 | scene ×1 |
 | `st_tangarts_seven_star` | ถังเชวียน เจ้าหอพิษเจ็ดดาว | human | — | 8 | scene ×1 |
 | `st_tangarts_black_iron_lord` | ประมุขเหล็กดำ | human | — | 8 | scene ×1 |
+| `spar_home_yideng_monk` | อิดเต็งไต้ซือ | human | — | 8 | spar |
+| `spar_home_miaoren_master` | เหมียวเหรินเฟิง | human | — | 8 | spar |

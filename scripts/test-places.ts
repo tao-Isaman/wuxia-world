@@ -15,6 +15,7 @@ import { KIDNAP_RETURN_DAYS, npcPresent } from "../lib/world/npc-presence";
 import { GIFT_COOLDOWN_DAYS, giftOutcome, giftWorth, npcTastes } from "../lib/world/gifts";
 import { npcCharacterId } from "../lib/characters/catalog";
 import type { Condition } from "../lib/world/types";
+import { rollPlaceMeeting } from "../lib/world/effects";
 import { useWorldStore } from "../store/world-store";
 
 let passed = 0;
@@ -188,6 +189,18 @@ check("store: a place activity pays out once per cooldown, only at its place", (
   assert.ok(done.ok, JSON.stringify(done));
   const twice = useWorldStore.getState().doActivity(act.id);
   assert.ok(!twice.ok && twice.reason === "cooldown");
+});
+
+check("safe ground: the hero's home rolls only its own meetings", () => {
+  useWorldStore.getState().startNewGame({ name: "ทดสอบ", gender: "male" } as never);
+  const state = JSON.parse(JSON.stringify(useWorldStore.getState()));
+  state.currentSceneId = "home_player";
+  const r = Math.random; Math.random = () => 0;
+  try { rollPlaceMeeting(state, 1); } finally { Math.random = r; }
+  const ev = MEET_EVENTS.find((e) => e.dialogSceneId === state.currentSceneId);
+  assert.ok(ev?.locationIds?.includes("home_player"), `a home meeting, got ${state.currentSceneId}`);
+  assert.equal(state.lastLocationId, "home_player");
+  assert.equal(state.pendingEncounter, null);
 });
 
 check("scenes referenced by place content exist", () => {

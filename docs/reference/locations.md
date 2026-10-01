@@ -2,14 +2,14 @@
 
 # Locations
 
-102 locations, 274 route scenes and 128 hand-authored connections (`lib/world/data/location-routes.ts`). The game starts at `home_player`. Map column: *painted (hand-placed markers)* = an entry in `LOCATION_MAPS` (`lib/world/data/location-maps.ts`); *painted (auto layout)* = listed in `AUTO_MAP_IDS` and laid out by `lib/world/data/auto-maps.ts`; *cards only* = no painting, the classic card view.
+101 locations, 272 route scenes and 128 hand-authored connections (`lib/world/data/location-routes.ts`). The game starts at `home_player`. Map column: *painted (hand-placed markers)* = an entry in `LOCATION_MAPS` (`lib/world/data/location-maps.ts`); *painted (auto layout)* = listed in `AUTO_MAP_IDS` and laid out by `lib/world/data/auto-maps.ts`; *cards only* = no painting, the classic card view.
 
 Services: 🏪 shop · 🏯 martial hall · 🔨 artisans (professions) · 🧘 practice allowed · ⛏ gathering / hunting nodes.
 
 ## Contents
 
 - [Cities](#cities) (8)
-- [Villages, markets and the foothill tutorial area](#villages-markets-and-the-foothill-tutorial-area) (12)
+- [Villages, markets and the foothill tutorial area](#villages-markets-and-the-foothill-tutorial-area) (11)
 - [Sects](#sects) (20)
 - [Temples and palaces](#temples-and-palaces) (4)
 - [Villas and mansions](#villas-and-mansions) (4)
@@ -31,23 +31,22 @@ Services: 🏪 shop · 🏯 martial hall · 🔨 artisans (professions) · 🧘 
 | `city_suzhou` | ซูโจว | east | painted (auto layout) | 2 | 🏪 · 🏯 · 🔨 forge, alchemy, tailoring, chef, jewelry, accessory · ⛏ ขุดแร่เหล็ก, ตัดไม้เนื้ออ่อน, เล่นหมากรุกกับชาวบ้าน, เล่นหมากรุกกับเซียนตัวจริง, ขอเงินคนผ่านไปมา, ขอเงินในตลาด | หยางโจว, จินหลิง, เกาะดอกท้อ, คุ้มนกนางแอ่น, โรงเตี๊ยมมีหว่าง, หมู่บ้านอวู่เซี่ย |
 | `city_jinling` | จินหลิง | heartland | painted (auto layout) | 1 | 🏪 · 🏯 · 🔨 forge, alchemy, tailoring, chef, jewelry, accessory · ⛏ ขุดแร่เหล็ก, ตัดไม้เนื้ออ่อน, เล่นหมากรุกกับชาวบ้าน, ขอเงินคนผ่านไปมา, ขอเงินในตลาด | ซูโจว, โรงเตี๊ยมห้วอลั่ว, หยางโจว, ดงดอกท้อ |
 | `city_changan` | ฉางอัน | heartland | painted (auto layout) | 2 | 🏪 · 🏯 · 🔨 forge, alchemy, tailoring, chef, jewelry, accessory · ⛏ ขุดแร่เหล็ก, ตัดไม้เนื้ออ่อน, เล่นหมากรุกกับชาวบ้าน, ขอเงินคนผ่านไปมา, ขอเงินในตลาด | ฉวนเจิน / ชวนจิน, นครหลวง, กู่มู่ / โบราณสุสาน, พระราชวังจงหยาง, หน้าผาหินอาถรรพ์, ป้อมหลำกู่, หัวซาน, หมู่บ้านหัวซาน |
-| `city_lingxiao` | เมืองลิ้งเซียว | wild | painted (auto layout) | 0 | ⛏ เก็บสมุนไพรทั่วไป | ภูเขาขาวอูต |
+| `city_lingxiao` | เมืองลิ้งเซียว | wild | painted (auto layout) | 5 | ⛏ เก็บสมุนไพรทั่วไป | ภูเขาขาวอูต |
 
 ## Villages, markets and the foothill tutorial area
 
 | Id | Name | Region | Map | People | Services | Connects to |
 | --- | --- | --- | --- | --- | --- | --- |
-| `village` | หมู่บ้านบนเชิงเขา | wild | painted (auto layout) | 2 | 🏪 | โรงเตี๊ยมเก่า, จุดชมวิวบนภูผา, คฤหาสน์ตนเอง |
-| `viewpoint` | จุดชมวิวบนภูผา | wild | painted (auto layout) | 0 |  | หมู่บ้านบนเชิงเขา |
+| `village` | หมู่บ้านบนเชิงเขา | wild | painted (auto layout) | 2 | 🏪 | โรงเตี๊ยมเก่า, คฤหาสน์ตนเอง |
 | `tavern` | โรงเตี๊ยมเก่า | wild | painted (auto layout) | 2 |  | หมู่บ้านบนเชิงเขา |
 | `village_qigu` | หมู่บ้านชีกู่ | heartland | painted (auto layout) | 3 | 🏪 · 🔨 alchemy · ⛏ เก็บสมุนไพรทั่วไป, เล่นหมากรุกกับชาวบ้าน, ขอเงินคนผ่านไปมา | หมู่บ้านไร้นาม, บ้านหยานจี, นครหลวง |
-| `village_noname` | หมู่บ้านไร้นาม | heartland | painted (auto layout) | 0 | 🏪 · ⛏ เก็บสมุนไพรทั่วไป, เล่นหมากรุกกับชาวบ้าน, ขอเงินคนผ่านไปมา | หมู่บ้านชีกู่, ทะเลทรายร้าง |
+| `village_noname` | หมู่บ้านไร้นาม | heartland | painted (auto layout) | 3 | 🏪 · ⛏ เก็บสมุนไพรทั่วไป, เล่นหมากรุกกับชาวบ้าน, ขอเงินคนผ่านไปมา | หมู่บ้านชีกู่, ทะเลทรายร้าง |
 | `village_meihua` | หมู่บ้านดอกเหมย | south | painted (auto layout) | 2 | 🏪 · 🔨 chef · ⛏ เก็บสมุนไพรทั่วไป, เล่นหมากรุกกับชาวบ้าน, ขอเงินคนผ่านไปมา | ง้อไบ๊, ต้าหลี่ |
-| `village_huashan` | หมู่บ้านหัวซาน | west | painted (auto layout) | 0 | 🏪 · 🔨 forge · ⛏ เก็บสมุนไพรทั่วไป, เล่นหมากรุกกับชาวบ้าน, ขอเงินคนผ่านไปมา | หัวซาน, ฉางอัน |
-| `village_taishan` | หมู่บ้านไท่ซาน | north | painted (auto layout) | 0 | 🏪 · ⛏ เก็บสมุนไพรทั่วไป, เล่นหมากรุกกับชาวบ้าน, ขอเงินคนผ่านไปมา | ไท่ซาน, ซงซาน |
+| `village_huashan` | หมู่บ้านหัวซาน | west | painted (auto layout) | 3 | 🏪 · 🔨 forge · ⛏ เก็บสมุนไพรทั่วไป, เล่นหมากรุกกับชาวบ้าน, ขอเงินคนผ่านไปมา | หัวซาน, ฉางอัน |
+| `village_taishan` | หมู่บ้านไท่ซาน | north | painted (auto layout) | 3 | 🏪 · ⛏ เก็บสมุนไพรทั่วไป, เล่นหมากรุกกับชาวบ้าน, ขอเงินคนผ่านไปมา | ไท่ซาน, ซงซาน |
 | `village_hengshan` | หมู่บ้านฮิงซาน | south | painted (auto layout) | 1 | 🏪 · ⛏ เก็บสมุนไพรทั่วไป, เล่นหมากรุกกับชาวบ้าน, ขอเงินคนผ่านไปมา | เฮิงซาน |
 | `village_wuxia` | หมู่บ้านอวู่เซี่ย | east | painted (auto layout) | 1 | 🏪 · 🔨 tailoring · ⛏ เก็บสมุนไพรทั่วไป, เล่นหมากรุกกับชาวบ้าน, ขอเงินคนผ่านไปมา | ซูโจว, หยางโจว |
-| `tribe_huizu` | ชนเผ่าหุยซู | west | painted (auto layout) | 0 | ⛏ ล่าสัตว์ในป่า | ทะเลทรายร้าง, ภูเขาขาวอูต, ซีเซี่ย |
+| `tribe_huizu` | ชนเผ่าหุยซู | west | painted (auto layout) | 4 | ⛏ ล่าสัตว์ในป่า | ทะเลทรายร้าง, ภูเขาขาวอูต, ซีเซี่ย |
 | `market_miao` | ตลาดชาวเมี่ยว | wild | painted (auto layout) | 1 | ⛏ ล่าสัตว์ในป่า | พรรคเบญจพิษ, ต้าหลี่ |
 
 ## Sects
@@ -82,7 +81,7 @@ Services: 🏪 shop · 🏯 martial hall · 🔨 artisans (professions) · 🧘 
 | `temple_dalun` | วิหารล้อลม | south | painted (auto layout) | 1 | 🧘 · ⛏ เก็บสมุนไพรทั่วไป | ต้าหลี่, เขาคุนหลุน |
 | `temple_tianning` | วิหารหลวงจีนสวรรค์ | south | painted (auto layout) | 0 | 🧘 · ⛏ เก็บสมุนไพรทั่วไป | พระราชวังหลวง |
 | `palace_zhongyang` | พระราชวังจงหยาง | north | painted (auto layout) | 1 | 🧘 · ⛏ เก็บสมุนไพรทั่วไป | ฉางอัน, ฉวนเจิน / ชวนจิน, กู่มู่ / โบราณสุสาน |
-| `palace_royal` | พระราชวังหลวง | heartland | painted (auto layout) | 0 | 🧘 · ⛏ เก็บสมุนไพรทั่วไป | องครักษ์เสื้อแพร, โรงเตี๊ยมยั่วไหล, นครหลวง, วิหารหลวงจีนสวรรค์ |
+| `palace_royal` | พระราชวังหลวง | heartland | painted (auto layout) | 4 | 🧘 · ⛏ เก็บสมุนไพรทั่วไป | องครักษ์เสื้อแพร, โรงเตี๊ยมยั่วไหล, นครหลวง, วิหารหลวงจีนสวรรค์ |
 
 ## Villas and mansions
 
@@ -90,15 +89,15 @@ Services: 🏪 shop · 🏯 martial hall · 🔨 artisans (professions) · 🧘 
 | --- | --- | --- | --- | --- | --- | --- |
 | `villa_yanzi` | คุ้มนกนางแอ่น | east | painted (auto layout) | 1 | ⛏ ตัดไม้เนื้อแข็ง, เก็บสมุนไพรทั่วไป | ซูโจว, พรรคสราญรมย์ (เซียวหยาว) |
 | `villa_yaowang` | คุ้มสมุนไพร | south | painted (auto layout) | 1 | ⛏ ตัดไม้เนื้อแข็ง, เก็บสมุนไพรทั่วไป | บ้านแพทย์น้ำจืด, ถ้ำหุบเขาผีเสื้อ |
-| `villa_meizhuang` | ดงดอกท้อ | west | painted (auto layout) | 0 | ⛏ ตัดไม้เนื้อแข็ง, เก็บสมุนไพรทั่วไป | จินหลิง, หยางโจว |
-| `villa_fuwei` | บ้านค้าขายโฝวเวย | east | painted (auto layout) | 0 | ⛏ ตัดไม้เนื้อแข็ง, เก็บสมุนไพรทั่วไป | หยางโจว |
+| `villa_meizhuang` | ดงดอกท้อ | west | painted (auto layout) | 4 | ⛏ ตัดไม้เนื้อแข็ง, เก็บสมุนไพรทั่วไป | จินหลิง, หยางโจว |
+| `villa_fuwei` | บ้านค้าขายโฝวเวย | east | painted (auto layout) | 3 | ⛏ ตัดไม้เนื้อแข็ง, เก็บสมุนไพรทั่วไป | หยางโจว |
 
 ## Inns
 
 | Id | Name | Region | Map | People | Services | Connects to |
 | --- | --- | --- | --- | --- | --- | --- |
 | `inn_yuelai` | โรงเตี๊ยมยั่วไหล | heartland | painted (auto layout) | 3 | 🏪 · ⛏ ตกปลาในลำธาร, เก็บสมุนไพรทั่วไป | พระราชวังหลวง, นครหลวง |
-| `inn_youjian` | โรงเตี๊ยมมีหว่าง | heartland | painted (auto layout) | 0 | 🏪 · ⛏ ตกปลาในลำธาร, เก็บสมุนไพรทั่วไป | ซูโจว |
+| `inn_youjian` | โรงเตี๊ยมมีหว่าง | heartland | painted (auto layout) | 3 | 🏪 · ⛏ ตกปลาในลำธาร, เก็บสมุนไพรทั่วไป | ซูโจว |
 | `inn_gaosheng` | โรงเตี๊ยมเก้าอี้สูง | north | painted (auto layout) | 1 | 🏪 · ⛏ ตกปลาในลำธาร, เก็บสมุนไพรทั่วไป | พรรคยาจก, หยางโจว |
 | `inn_heluo` | โรงเตี๊ยมห้วอลั่ว | east | painted (auto layout) | 1 | 🏪 · ⛏ ตกปลาในลำธาร, เก็บสมุนไพรทั่วไป | จินหลิง, ฉวนเจิน / ชวนจิน |
 
@@ -107,17 +106,17 @@ Services: 🏪 shop · 🏯 martial hall · 🔨 artisans (professions) · 🧘 
 | Id | Name | Region | Map | People | Services | Connects to |
 | --- | --- | --- | --- | --- | --- | --- |
 | `home_hong` | บ้านโฮ่งชีก๋ง | north | painted (auto layout) | 1 | ⛏ เก็บสมุนไพรทั่วไป | พรรคยาจก, คฤหาสน์ตนเอง |
-| `home_hufei` | บ้านฮูเฝย์ | wild | painted (auto layout) | 0 | ⛏ เก็บสมุนไพรทั่วไป | ซีเซี่ย |
-| `home_chengkun` | บ้านเฉิงคุน | north | painted (auto layout) | 0 | ⛏ เก็บสมุนไพรทั่วไป | พรรคตะวันจันทรา, ยอดแสงสว่าง |
-| `home_xuemuhua` | บ้านแพทย์น้ำจืด | south | painted (auto layout) | 0 | ⛏ เก็บสมุนไพรทั่วไป | ถ้ำหุบเขาผีเสื้อ, คุ้มสมุนไพร |
-| `home_nanxian` | บ้านหนานเสียน | wild | painted (auto layout) | 0 | ⛏ เก็บสมุนไพรทั่วไป | ฉวนเจิน / ชวนจิน |
-| `home_yideng` | บ้านอีตัง | south | painted (auto layout) | 0 | ⛏ เก็บสมุนไพรทั่วไป | ง้อไบ๊, ต้าหลี่ |
-| `home_tianboguang` | บ้านนักรบชายแดน | wild | painted (auto layout) | 0 | ⛏ เก็บสมุนไพรทั่วไป | ซีเซี่ย, ทะเลทรายร้าง |
-| `home_miaoren` | บ้านมยง | wild | painted (auto layout) | 0 | ⛏ เก็บสมุนไพรทั่วไป | ซีเซี่ย |
-| `home_chengying` | บ้านเฉิงอิ๋ง | east | painted (auto layout) | 0 | ⛏ เก็บสมุนไพรทั่วไป | อู่ตัง / บู๊ตึ๊ง, ถ้ำหยางกั้ว |
-| `home_yanji` | บ้านหยานจี | wild | painted (auto layout) | 0 | ⛏ เก็บสมุนไพรทั่วไป | หมู่บ้านชีกู่, พรรคยาจก |
-| `home_beichou` | บ้านเป่ยฉิว | wild | painted (auto layout) | 0 | ⛏ เก็บสมุนไพรทั่วไป | ยอดเขามรณะ, หน้าผาหมู่ก้อน |
-| `home_player` | คฤหาสน์ตนเอง | heartland | painted (hand-placed markers) | 0 | ⛏ ล่าสัตว์ในป่า | บ้านโฮ่งชีก๋ง, นครหลวง, หมู่บ้านบนเชิงเขา |
+| `home_hufei` | บ้านฮูเฝย์ | wild | painted (auto layout) | 4 | ⛏ เก็บสมุนไพรทั่วไป | ซีเซี่ย |
+| `home_chengkun` | บ้านเฉิงคุน | north | painted (auto layout) | 3 | ⛏ เก็บสมุนไพรทั่วไป | พรรคตะวันจันทรา, ยอดแสงสว่าง |
+| `home_xuemuhua` | บ้านแพทย์น้ำจืด | south | painted (auto layout) | 4 | ⛏ เก็บสมุนไพรทั่วไป | ถ้ำหุบเขาผีเสื้อ, คุ้มสมุนไพร |
+| `home_nanxian` | บ้านหนานเสียน | wild | painted (auto layout) | 3 | ⛏ เก็บสมุนไพรทั่วไป | ฉวนเจิน / ชวนจิน |
+| `home_yideng` | บ้านอีตัง | south | painted (auto layout) | 4 | ⛏ เก็บสมุนไพรทั่วไป | ง้อไบ๊, ต้าหลี่ |
+| `home_tianboguang` | บ้านนักรบชายแดน | wild | painted (auto layout) | 3 | ⛏ เก็บสมุนไพรทั่วไป | ซีเซี่ย, ทะเลทรายร้าง |
+| `home_miaoren` | บ้านมยง | wild | painted (auto layout) | 3 | ⛏ เก็บสมุนไพรทั่วไป | ซีเซี่ย |
+| `home_chengying` | บ้านเฉิงอิ๋ง | east | painted (auto layout) | 3 | ⛏ เก็บสมุนไพรทั่วไป | อู่ตัง / บู๊ตึ๊ง, ถ้ำหยางกั้ว |
+| `home_yanji` | บ้านหยานจี | wild | painted (auto layout) | 3 | ⛏ เก็บสมุนไพรทั่วไป | หมู่บ้านชีกู่, พรรคยาจก |
+| `home_beichou` | บ้านเป่ยฉิว | wild | painted (auto layout) | 3 | ⛏ เก็บสมุนไพรทั่วไป | ยอดเขามรณะ, หน้าผาหมู่ก้อน |
+| `home_player` | คฤหาสน์ตนเอง | heartland | painted (hand-placed markers) | 3 | ⛏ ล่าสัตว์ในป่า | บ้านโฮ่งชีก๋ง, นครหลวง, หมู่บ้านบนเชิงเขา |
 
 ## Mountains, cliffs and peaks
 
