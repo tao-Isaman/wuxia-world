@@ -6,6 +6,12 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-01
 
+### Every new NPC has their own face
+
+- **68 new portraits and painted bodies** (gpt-image-2, in the style of the existing NPC art) for the people of the villages, towns and homes.
+- **The 35 strollers play their own rigged sheets** (walk, idle, attack, hurt…) on the map and in battle, instead of a shared m/f body; the 33 who stand still have their own pixel sprite. `ANIMATED_NPC_IDS` grows from 30 to 65.
+- New `scripts/import-npc-art.ts` cuts painted bodies out of a flat background, fits them to the body frame and registers the ids. `npcCharacterId` now prefers an NPC's own sheet over its authored fallback body, and so does a spar's battle look.
+
 ### Living villages, towns and homes
 
 - **People everywhere.** The 20 places that had no one now have 68 new NPCs: villagers, court eunuchs and maids, Hui herders, the masters of the famous homes (ฮูเฝย์, หนานเสียน, อิดเต็งไต้ซือ, เถียนป๋อกวง, เหมียวเหรินเฟิง, เฉิงอิ๋ง, หยานจี, เป่ยฉิว, the Plum Manor four, the Lin family) and their households, and the hero's own housekeeper and neighbours. 35 of them stroll around their spot (`NpcDef.look`); shopkeepers, elders and masters stand at their post.

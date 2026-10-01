@@ -176,7 +176,7 @@ Real behaviour today, found during the docs audit. Each is small and self-contai
 
 ### Rigged NPCs
 
-33. **Approximate side and back views.** The 30 rigged sheets are puppet poses of front-facing paintings: limbs bend as whole parts (sleeves and robes swing with the leg or torso they sit on), the side walk is a narrower, leaning front view, and the back view only repaints the head (a beard below the neck stays). New side and back art per NPC would replace `public/art/characters/npc/` one for one.
+33. **Approximate side and back views.** The 65 rigged sheets are puppet poses of front-facing paintings: limbs bend as whole parts (sleeves and robes swing with the leg or torso they sit on), the side walk is a narrower, leaning front view, and the back view only repaints the head (a beard below the neck stays). New side and back art per NPC would replace `public/art/characters/npc/` one for one.
 34. **Villain bosses and their NPCs coexist.** A villain met on the road is the same person who stands at their base; beating them on the road changes nothing there. Only killing, kidnapping or a death in the simulation removes them from the encounter pool.
 
 ### Roads and directions

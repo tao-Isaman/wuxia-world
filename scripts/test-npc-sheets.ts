@@ -23,9 +23,9 @@ async function check(name: string, fn: () => void | Promise<void>) {
   console.log(`PASS ${name}`);
 }
 
-await check("30 rigged NPCs: 20 people + 10 villains, unique, each a registry NPC placed on a map", () => {
-  assert.equal(ANIMATED_NPC_IDS.length, 30);
-  assert.equal(new Set(ANIMATED_NPC_IDS).size, 30);
+await check("65 rigged NPCs: 20 people + 10 villains + 35 strolling townsfolk, unique, each a registry NPC placed on a map", () => {
+  assert.equal(ANIMATED_NPC_IDS.length, 65);
+  assert.equal(new Set(ANIMATED_NPC_IDS).size, 65);
   for (const id of ANIMATED_NPC_IDS) {
     const npc = getNpc(id);
     assert.ok(npc, `${id} is a registry NPC`);
@@ -108,7 +108,7 @@ await check("villains: every rigged villain is a power-gated boss with a gang in
     const event = FIGHT_EVENTS.find((e) => e.opponentId === o.id);
     assert.ok(event && (event.share ?? 1) < 1, `${o.id} is a rarer encounter`);
   }
-  assert.deepEqual(new Set(villains.map((o) => o.look!.npc)), new Set(ANIMATED_NPC_IDS.slice(20)));
+  assert.deepEqual(new Set(villains.map((o) => o.look!.npc)), new Set(ANIMATED_NPC_IDS.slice(20, 30)));
   const alive = { npcExt: {}, assassinatedNpcIds: [], kidnappedNpcIds: [] };
   assert.ok(encounterFoeAvailable(alive, "elite_villain_zhou"));
   assert.ok(encounterFoeAvailable(alive, "bandit"), "ordinary foes are always available");

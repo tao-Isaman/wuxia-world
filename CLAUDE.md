@@ -78,7 +78,8 @@ bun scripts/sort-by-sect.ts             # re-sort skills.ts + arts.ts by sect, t
 bun scripts/normalize-t3-stats.ts       # rewrite move-skill stat sums to 10/15/20/25/30 (review the diff)
 bun scripts/map-collision-tool.ts <id> [json] [png]   # check / draw a painted map's collision
 bun scripts/build-npc-sprites.ts        # NPC pixel sprites from public/npcs/body/
-bun scripts/build-npc-sheets.ts         # rigged animation sheets for the 30 NPCs in lib/characters/npc-sheets.ts
+bun scripts/import-npc-art.ts --from <dir>   # cut out painted NPC bodies + portraits into public/npcs/, register ids
+bun scripts/build-npc-sheets.ts         # rigged animation sheets for the 65 NPCs in lib/characters/npc-sheets.ts
 bun scripts/smoke-liveness.ts           # 90-day NPC simulation smoke test
 bun scripts/build-world-coords.ts       # each place's world-map spot (exit / road directions); rerun after adding a place or road
 bun scripts/build-route-variants.ts --from <dir>   # import the 56 directional road paintings (<type>-<dir8>.png)
@@ -228,7 +229,7 @@ Two deliberate exceptions reach into stores:
 - **Living places** (`data/places/<group>.ts`, one `PlaceContent` each, merged into every registry). Villages, towns and homes have people, quests, activities and meetings; every ยุทธจักร T0–T3 move and art is a quest reward, gated by rarity (`test:places`).
   - **Place activities** are `ActivityDef`s with `place` (locations, cooldown in days, cost, rewards), run by `doActivity`; auto maps place their spots (`ACTIVITY_SLOTS`), hand maps need `place.spot`.
   - **Place meetings** are `MeetEventDef`s with `locationIds` / `condition` / `once` (flag `meet:<id>`). Safe ground (`home_player`) rolls only its own meetings (`rollPlaceMeeting`).
-  - **NPC looks:** `NpcDef.look.body` picks a sheet (`registerNpcBodies`); `look.wander` makes them stroll — only bodies m1–m4 / f1–f4 can.
+  - **NPC looks:** every place NPC has its own painted portrait and body. Strollers (`look.wander`) are rigged (`ANIMATED_NPC_IDS`); the rest stand as a unique pixel sprite. `look.body` (`registerNpcBodies`) is only the fallback sheet for art-less NPCs.
 - **Presence** (`npc-presence.ts`). An assassinated NPC is gone for good; a kidnapped one is away until `kidnappedUntil` (day + 180) and then stands at their spot again. Maps and the location card filter with `npcPresent`.
 - **Gifts** (`gifts.ts`, store `giveGift`). One gift per NPC every 30 days (`giftDays`), an item or 100 / 500 / 1000 / 5000 gold. Worth 1–5 by price; liked ×2 (+2 for a favourite item id), disliked −2. Tastes are `NpcDef.likes` / `dislikes` (item ids, categories, `"gold"`) or follow the NPC's tags.
 - **Repair** (`validate.ts`). `validateAndRepair` runs on every load and drops dangling ids.
@@ -266,7 +267,7 @@ Two deliberate exceptions reach into stores:
   - Cover-fit camera; WASD, tap-to-walk and a joystick.
   - The action target is the nearest marker within 95 units; E reaches 100.
   - Walk ticks every 220 units; a guide arrow; name tags and quest marks.
-  - The 30 rigged NPCs (`ANIMATED_NPC_IDS`, own 4 × 6 sheets) wander near their spot (`npc-wander.ts`) and freeze when the hero is near or coming to them; picking uses `markerPoint` (their current spot).
+  - The 65 rigged NPCs (`ANIMATED_NPC_IDS`, own 4 × 6 sheets) wander near their spot (`npc-wander.ts`) and freeze when the hero is near or coming to them; picking uses `markerPoint` (their current spot).
   - It pauses while any `[role="dialog"]`, `[role="alertdialog"]` or `[data-world-busy]` exists (`worldInputBlocked`).
   - It publishes `data-*` attributes (`data-ready`, `data-player-x/y/frame/motion/facing`, `data-nearby-marker`, `data-guide-marker`, `data-visible-props`…) for tests.
 - **Battle runtime.** `grid-battle-runtime.ts` draws the board in 2.5D and plays `state.events`: walk 180 ms per tile, casts with VFX and SFX, damage numbers. It calls `battleStore.step()` about 350 ms after playback idles. Skill VFX come from `cast-vfx.ts` (pure) and `battle-vfx.ts`; skill sounds from `lib/audio/cast-sfx.ts`, using the same profile.

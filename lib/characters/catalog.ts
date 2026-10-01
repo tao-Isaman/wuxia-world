@@ -68,10 +68,10 @@ export function registerNpcBodies(bodies: Readonly<Record<string, string>>): voi
 /** NPCs share costume archetypes; authored portraits and dialogue art stay unique. */
 export function npcCharacterId(id: string): CharacterId {
   id = id.replace(/^npc-/, "");
-  const authored = NPC_BODIES.get(id);
-  if (authored) return authored;
   // NPCs with their own rigged sheet use it everywhere.
   if (hasAnimatedSheet(id)) return id;
+  const authored = NPC_BODIES.get(id);
+  if (authored) return authored;
   // Match the opening NPCs' authored portraits: young ivory/jade healer,
   // bearded dark-robed magistrate. Do not cast Lin as the elderly archetype.
   if (id === "city_capital_physician_lin") return "m3";

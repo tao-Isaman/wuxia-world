@@ -151,6 +151,7 @@ export const NPC_BODY_IDS: ReadonlySet<string> = new Set([
   "vil_wuxia_fisherman_deng",
   "villa_yanzi_lord_yanfeng",
   "villa_yaowang_doctor_shennong",
+  "village_noname_whip_qiao",
   "wld_bingcan_scholar_wei",
   "wld_desert_collector_mo",
   "wld_heilong_fisherman_tan",
