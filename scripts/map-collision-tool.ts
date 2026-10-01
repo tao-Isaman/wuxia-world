@@ -1,6 +1,8 @@
 /**
  * Author and check world-map collision footprints.
- *   bun scripts/map-collision-tool.ts <locationId> [footprints.json] [overlay.png]
+ *   bun scripts/map-collision-tool.ts <locationId> [footprints.json] [overlay.png] [--exits exits.json]
+ * --exits takes {"<destination id>": {"x": worldX, "y": worldY}} (960×640) and
+ * tries exit markers there instead of their current spots.
  * Prints marker world coordinates (960×640) and, with a footprint JSON array
  * (same shape as WorldFootprint), checks every marker is reachable from spawn
  * and renders the map with footprints (red) and markers (green ok / magenta fail).
@@ -12,14 +14,18 @@ import { getLocationMap } from "../lib/world/data/location-maps";
 import { worldFootprints, type WorldFootprint } from "../lib/stage/world-navigation";
 import { probeWorldMap, type ProbeMarker } from "../lib/stage/world-map-probe";
 
-const [id, jsonPath, overlayPath] = process.argv.slice(2);
+const argv = process.argv.slice(2);
+const exitsAt = argv.indexOf("--exits");
+const exitOverride: Record<string, { x: number; y: number }> = exitsAt >= 0 ? JSON.parse(readFileSync(argv[exitsAt + 1], "utf8")) : {};
+if (exitsAt >= 0) argv.splice(exitsAt, 2);
+const [id, jsonPath, overlayPath] = argv;
 if (!id) throw new Error("usage: bun scripts/map-collision-tool.ts <locationId> [footprints.json] [overlay.png]");
 const map = getLocationMap(id);
 if (!map) throw new Error(`${id} has no painted map`);
 const w = (p: { x: number; y: number }) => ({ x: p.x * 9.6, y: p.y * 6.4 });
 const markers: ProbeMarker[] = [
   ...Object.entries(map.npcSpots ?? {}).map(([npc, p]) => ({ id: `npc:${npc}`, kind: "npc" as const, ...w(p) })),
-  ...(map.exits ?? []).map((e) => ({ id: `exit:${e.to}`, kind: "exit" as const, ...w(e) })),
+  ...(map.exits ?? []).map((e) => ({ id: `exit:${e.to}`, kind: "exit" as const, ...(exitOverride[e.to] ?? w(e)) })),
   ...(map.spots ?? []).map((s, i) => ({ id: `${s.kind}:${i}`, kind: "service" as const, ...w(s) })),
 ];
 const footprints: WorldFootprint[] = jsonPath ? JSON.parse(readFileSync(jsonPath, "utf8")) : [...worldFootprints(id, map.image)];
