@@ -22,6 +22,7 @@ import { RESOURCES_BY_ID } from "./resources";
 import { LIFE_SKILL_ICON } from "./life-skills";
 import { canPracticeAt } from "../location-categories";
 import { assignSlotsByBearing } from "../compass";
+import { AUTO_MAP_EXIT_POINTS } from "./auto-map-exits";
 
 // Edge slots for exits, in assignment order. The prompt generator
 // describes "a path leaving at the <label> edge" for each used slot.
@@ -116,7 +117,7 @@ function build(id: string): LocationMapDef | undefined {
     .map((to, i) => ({ to, slot: slotOf[i] }))
     .filter((e) => e.slot >= 0)
     .sort((a, b) => a.slot - b.slot)
-    .map(({ to, slot }) => ({ to, x: EXIT_SLOTS[slot].x, y: EXIT_SLOTS[slot].y }));
+    .map(({ to, slot }) => ({ to, ...(AUTO_MAP_EXIT_POINTS[id]?.[to] ?? { x: EXIT_SLOTS[slot].x, y: EXIT_SLOTS[slot].y }) }));
 
   // NPCs: registry NPCs at this location + scene NPCs, sorted by id.
   const npcIds = [

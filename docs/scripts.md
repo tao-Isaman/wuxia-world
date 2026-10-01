@@ -59,7 +59,7 @@ Every file in `scripts/`, what it does, and whether it is safe to run. Run them 
 
 | Script | Usage | Does |
 | --- | --- | --- |
-| `map-collision-tool.ts` | `bun scripts/map-collision-tool.ts <locationId> [footprints.json] [overlay.png]` | prints marker coordinates, checks every NPC / exit / service is reachable from the spawn, and optionally draws footprints (red) and markers (green / magenta) over the map |
+| `map-collision-tool.ts` | `bun scripts/map-collision-tool.ts <locationId> [footprints.json] [overlay.png] [--exits exits.json] [--image file]` (`--exits` tries exit positions, `--image` draws on a candidate painting) | prints marker coordinates, checks every NPC / exit / service is reachable from the spawn, and optionally draws footprints (red) and markers (green / magenta) over the map |
 | `repack-character-sheet.ts` | `bun scripts/repack-character-sheet.ts <in.png> <out.png> [rows=4]` | re-packs a generated sprite sheet with uneven gutters onto an equal grid (no resampling); used for every "readability v2" sheet |
 | `measure-sheet-gutters.ts` | `bun scripts/measure-sheet-gutters.ts <png> [rows=4]` | proposes a per-sheet layout from transparent gutters (older approach; layouts remain only for wang, feng, qing and m4's directions) |
 | `render-character-atlas-audit.ts` | `node --experimental-strip-types scripts/render-character-atlas-audit.ts` | renders every character atlas in Chromium against a running app (`ATLAS_AUDIT_URL`, default http://127.0.0.1:3017) and checks for clipping; writes `review/character-atlas-audit/` |

@@ -69,7 +69,7 @@ Checked on 2026-10-01 for wave 27 (animated, wandering NPCs and villain bosses):
 | `test:grid-skills` | 7 checks pass |
 | `test:grid-store` | 13 checks pass |
 | `test:npcs` | 7 checks pass |
-| `test:routes` | 7 checks pass: 255 exits on 98 maps (246 within 45° of their bearing), 258 roads on 54 of the 56 paintings, 254/256 arrivals on the side the road came from |
+| `test:routes` | 8 checks pass: 255 exits on 98 maps (246 within 45° of their bearing), 258 roads on 54 of the 56 paintings, 254/256 arrivals on the side the road came from |
 | `test:story` | 7 checks pass: 154 lineage quests, 38 sagas (340 chapters), 292 cutscenes; every quest and chapter plays through in the real store |
 | `test:quests` | the campaign audit passes (770 quests, 102 reachable locations); 213 item / kill / objective quests hand in through the real store; guidance covers 650 of 657 stages; all 39 steal / assassinate / kidnap stages offer the action and advance |
 | `test:docs` | the generated reference is current; every link, repo path and command in the docs resolves |
@@ -174,7 +174,7 @@ Real behaviour today, found during the docs audit. Each is small and self-contai
 
 ### Roads and directions
 
-40. **Exits off their painted path.** Auto-map paintings have paths at the first N edge slots (in the old destination-id order). An exit now goes to the edge facing its destination, so on some maps it stands where no path is painted and a painted path leads nowhere. Repainting those maps (and their collision footprints) would fix it.
+40. **Leftover painted paths.** 77 auto maps were repainted so their paths lead to their exits, and every exit marker sits on its painted path (`auto-map-exits.ts`). About 20 paintings still show an extra path running off an edge with no exit (often the old main-gate road off the bottom: `cave_bingcan`, `mt_baituo`, `valley_baihua`, `cliff_siguo`, `mt_tiezhang`, `desert_ruins`, `temple_tianning`, `inn_yuelai`, `pool_heilong`…), and a few exits have no painted path (`city_jinling` → villa_meizhuang, `sect_xingxiu` → sea_xingxiu, `sect_quanzhen` → sect_gumu, `valley_jueqing_bottom` → valley_jueqing). Collision blocks those dead ends where it can; another repaint pass would clear them.
 41. **The world map is a layout, not geography.** `world-coords.ts` is a force layout seeded from regions; a few wild places are pinned by hand. Directions follow it, so a road's direction can differ from the real-world one.
 
 ### Story quests
