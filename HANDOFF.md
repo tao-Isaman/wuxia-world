@@ -68,7 +68,7 @@ Checked on 2026-10-01 for wave 27 (animated, wandering NPCs and villain bosses):
 | `test:grid-ai` | 13 checks pass |
 | `test:grid-skills` | 7 checks pass |
 | `test:grid-store` | 13 checks pass |
-| `test:npcs` | 6 checks pass |
+| `test:npcs` | 7 checks pass |
 | `test:quests` | the campaign audit passes (276 quests, 102 reachable locations); 213 item / kill / objective quests hand in through the real store; guidance covers 650 of 657 stages; all 39 steal / assassinate / kidnap stages offer the action and advance |
 | `test:docs` | the generated reference is current; every link, repo path and command in the docs resolves |
 | `bun scripts/audit-content.ts` | 157 NPCs · 276 quests · 996 scenes, all references resolve |
@@ -167,7 +167,7 @@ Real behaviour today, found during the docs audit. Each is small and self-contai
 
 ### Rigged NPCs
 
-33. **Approximate side and back views.** The 30 rigged sheets come from front-facing paintings: the side walk is a narrower, leaning front view, and the back view only repaints the head (a beard below the neck stays). New side and back art per NPC would replace `public/art/characters/npc/` one for one.
+33. **Approximate side and back views.** The 30 rigged sheets are puppet poses of front-facing paintings: limbs bend as whole parts (sleeves and robes swing with the leg or torso they sit on), the side walk is a narrower, leaning front view, and the back view only repaints the head (a beard below the neck stays). New side and back art per NPC would replace `public/art/characters/npc/` one for one.
 34. **Villain bosses and their NPCs coexist.** A villain met on the road is the same person who stands at their base; beating them on the road changes nothing there. Only killing, kidnapping or a death in the simulation removes them from the encounter pool.
 
 ## Suggested next steps
