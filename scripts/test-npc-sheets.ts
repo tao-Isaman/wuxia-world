@@ -51,6 +51,38 @@ await check("sheets: 512×512 base + 512×256 directions, every one of the 24 ce
   }
 });
 
+await check("sheets: every frame is its own pose — no two cells of a clip alike, no repeats anywhere", async () => {
+  const CLIPS = [["idle", 0, 4], ["walk", 4, 8], ["attack", 8, 12], ["hurt/guard/victory/defeat", 12, 16], ["walk north", 16, 20], ["walk south", 20, 24]] as const;
+  for (const id of ANIMATED_NPC_IDS) {
+    const cells: Int32Array[] = [];
+    for (const [file, rows] of [[`public${characterSheet(id)}`, 4], [`public${characterDirectionSheet(id)}`, 2]] as const) {
+      const { data } = await sharp(file).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+      for (let cell = 0; cell < rows * 4; cell++) {
+        const ox = (cell % 4) * 128, oy = Math.floor(cell / 4) * 128, px = new Int32Array(128 * 128);
+        for (let y = 0; y < 128; y++) for (let x = 0; x < 128; x++) {
+          const i = ((oy + y) * 512 + ox + x) * 4;
+          px[y * 128 + x] = data[i + 3] < 128 ? -1 : (data[i] << 16) | (data[i + 1] << 8) | data[i + 2];
+        }
+        cells.push(px);
+      }
+    }
+    const difference = (a: Int32Array, b: Int32Array) => {
+      let changed = 0, union = 0;
+      for (let i = 0; i < a.length; i++) if (a[i] >= 0 || b[i] >= 0) { union++; if (a[i] !== b[i]) changed++; }
+      return changed / union;
+    };
+    for (const [clip, from, to] of CLIPS) {
+      for (let i = from; i < to; i++) for (let j = i + 1; j < to; j++) {
+        const d = difference(cells[i], cells[j]);
+        assert.ok(d >= 0.15, `${id} ${clip}: cells ${i} and ${j} differ by only ${(d * 100).toFixed(0)}%`);
+      }
+    }
+    for (let i = 0; i < 24; i++) for (let j = i + 1; j < 24; j++) {
+      assert.ok(difference(cells[i], cells[j]) >= 0.1, `${id}: cells ${i} and ${j} repeat`);
+    }
+  }
+});
+
 await check("catalog: rigged NPCs are character ids with directions, and replace the single-pose stills", () => {
   for (const id of ANIMATED_NPC_IDS) {
     assert.ok((CHARACTER_IDS as readonly string[]).includes(id));

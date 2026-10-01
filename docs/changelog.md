@@ -6,6 +6,12 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-01
 
+### Rigged NPC sheets: a distinct pose in every frame
+
+- The first sheets warped the whole painting, so many frames repeated: idle 1 = 3, walk 4 = 6 and 5 = 7, and all eight north / south walk frames were the same picture.
+- `scripts/build-npc-sheets.ts` now cuts each figure into back leg, front leg, torso and head and poses them separately. The result: real strides, a coiled wind-up, a lunge with a qi arc, a knocked-back and flushed hurt pose, a crouched guard, and a victory with glints.
+- `test:npcs` now fails when two frames of a clip are too alike.
+
 ### Wave 27 — animated, wandering NPCs and named villains
 
 - **30 NPCs walk like the hero.** The 15 sect heads, หมอหลิน, นายอำเภอหวู่, เถ้าแก่หวาง, ทูตหลิวอิง, นักยุทธศาสตร์กง and 10 villains now have full animation sheets in the hero layout: idle, walk, attack, hurt, guard, victory, defeat, walk north and walk south. `scripts/build-npc-sheets.ts` rigs them from each NPC's painting into `public/art/characters/npc/`; the list is `lib/characters/npc-sheets.ts`.
