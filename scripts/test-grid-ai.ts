@@ -141,8 +141,11 @@ check("long attrition battles (tanky sampled builds: cooldowns, MP, arts, buffs)
     ];
     if (seed % 2) specs.push({ id: "a2", team: "ally", build: tank(seed * 3 + 2), look }, { id: "e2", team: "enemy", build: tank(seed * 3 + 100), look });
     const s = createGridBattle(specs);
-    // VIT 160 tanks grind: allow a longer cap than ordinary fights (seed 5 runs ~330).
-    const r = withRandom(rng, () => runAiBattle(s, 600));
+    // VIT 160 tanks grind: allow a far longer cap than ordinary fights. The sampled
+    // builds index into ARTS, so adding or removing an art reshuffles them; seed 6
+    // currently pits a life-draining tank (โลหิตอสุรา) against one that barely dents
+    // it and runs ~1700 turns. The point is that such grinds stay legal and end.
+    const r = withRandom(rng, () => runAiBattle(s, 2500));
     assert.ok(isOver(s) && s.winner, `tank seed ${seed}: finished (${r.turns} turns)`);
     total += r.turns; longest = Math.max(longest, r.turns); casts += r.skills; waits += r.waits;
   }

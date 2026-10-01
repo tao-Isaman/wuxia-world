@@ -279,7 +279,7 @@ export const OPPONENTS: readonly OpponentDef[] = [
   { id: "immortal_warrior", name: "นักรบอมตะ", ti: 4, category: "supernatural", drops: DROPS_T4,
     build: () => build("นักรบอมตะ", 4, {
       stats: { STR: 12, VIT: 12, DEF: 10 },
-      artId: "jiuyang", artLevel: 9,
+      artId: "diamond", artLevel: 9,
       skillIds: ["ep", "ng3", "nu1", "ng2"],
     }) },
 
@@ -1575,10 +1575,10 @@ export const OPPONENTS: readonly OpponentDef[] = [
       { itemId: "ancient_coin", weight: 2 }],
     build: () => build("ภูเขาเหล็ก", 4, {
       stats: { STR: 24, VIT: 26, DEF: 22, POW: 12, AGI: 8, DEX: 10 },
-      artId: "jiuyang", artLevel: 10,
+      artId: "kuyt", artLevel: 10,
       skillIds: ["sl_truth_staff", "sl_thousand_arms", "sl_rock_punch", "ne1"],
-      extraArtSlots: ["jiuyang", "tendon", "diamond"],
-      artLevels: { jiuyang: 10, tendon: 10, diamond: 10 },
+      extraArtSlots: ["kuyt", "tendon", "diamond"],
+      artLevels: { kuyt: 10, tendon: 10, diamond: 10 },
     }) },
 
   { id: "elite_phoenix_empress", name: "จักรพรรดินีหงส์เพลิง", ti: 4, category: "human",
@@ -1603,10 +1603,10 @@ export const OPPONENTS: readonly OpponentDef[] = [
       { itemId: "mithril_ore", weight: 2 }],
     build: () => build("จักรพรรดิมาร", 4, {
       stats: { STR: 20, POW: 22, INT: 20, VIT: 22, DEF: 18, DEX: 16, AGI: 16, LUK: 10 },
-      artId: "jiuyin", artLevel: 10,
+      artId: "kgim", artLevel: 10,
       skillIds: ["dgjj", "ansh", "sl_truth_staff", "sl_thousand_arms", "wd_palm"],
-      extraArtSlots: ["jiuyin", "shadow", "heaven"],
-      artLevels: { jiuyin: 10, shadow: 10, heaven: 10 },
+      extraArtSlots: ["kgim", "shadow", "heaven"],
+      artLevels: { kgim: 10, shadow: 10, heaven: 10 },
     }) },
 
   // ─── พรรคตะวันจันทรา — sect leadership (T1-T4) ─────────────────────

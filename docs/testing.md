@@ -46,7 +46,7 @@ Each suite is a Bun script (or `bun test` file) wired as `test:*` in `package.js
 | `test:walk` | `scripts/test-walk-cycle.ts` | 1 | the walk cycle alternates feet and bobs 1 px |
 | `test:grid` | `scripts/test-grid-engine.ts` | 14 | the grid engine: layout, movement rules, turn order, ranges and areas, arts, damage over time, stun, victory, flee, full battles against real opponents, packs |
 | `test:grid-ai` | `scripts/test-grid-ai.ts` | 13 | AI legality and behaviour over dozens of seeded battles; average planning time under 15 ms |
-| `test:grid-skills` | `scripts/test-grid-skills.ts` | 7 | every skill (178) and art (123) has a valid battle range; the 18 overrides exist; Thai range labels |
+| `test:grid-skills` | `scripts/test-grid-skills.ts` | 7 | every skill (178) and art (122) has a valid battle range; the 18 overrides exist; Thai range labels |
 | `test:grid-store` | `scripts/test-grid-store.ts` | 13 | battle store + bridge + looks + the world hand-off: HP carry-over, packs and board sizes, spar sprites, rigged NPC sheets, flee, auto mode, win / loss / escape results |
 | `test:npcs` | `scripts/test-npc-sheets.ts` | 7 | the 30 rigged NPCs: art, placement, complete sheets, every frame a distinct pose, catalog wiring, the 10 villain bosses in the encounter pool; wandering stays near home, off blocked ground and still when frozen |
 | `test:quests` | 5 scripts | — | the campaign audit, dead-end regressions, playing **every** item / kill / objective quest (213) through the real store, guidance for all 657 stages, and every steal / assassinate / kidnap quest stage (39) |

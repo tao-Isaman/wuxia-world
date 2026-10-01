@@ -6,6 +6,15 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-01
 
+### Inner arts: คัมภีร์เก้าอิม replaces เก้าหยินจิงชี่ and เก้าหยางเซินกง
+
+- **Removed** the T4 arts `jiuyin` เก้าหยินจิงชี่ and `jiuyang` เก้าหยางเซินกง (122 arts now). Saves that held them drop them on load (`validateAndRepair`).
+- **New T5 art `kgim` คัมภีร์เก้าอิม** (ยุทธจักร, หยิน · ภายใน): INT +30, POW +30, DEX +20, HP / MP growth 20 / 60, MP regen 5 %.
+  - Active กรงเล็บกระดูกขาวเก้าอิม: Int ×1.8, pierces 50 % IDef, 55 MP, cooldown 5.
+  - Passive: every Int skill gives the foe PDef −15 for 2 turns.
+  - It takes over the nine-yin icon.
+- **Opponents moved over:** จักรพรรดิมาร now uses `kgim`, ภูเขาเหล็ก uses `kuyt` วิชาเก้าเอี้ยง, and นักรบอมตะ uses `diamond`. The nine-yin lore rumor names the new manual.
+
 ### Rigged NPC sheets: a distinct pose in every frame
 
 - The first sheets warped the whole painting, so many frames repeated: idle 1 = 3, walk 4 = 6 and 5 = 7, and all eight north / south walk frames were the same picture.

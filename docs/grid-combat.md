@@ -133,7 +133,7 @@ Then 18 hand-set exceptions (`SKILL_GRID_OVERRIDES`) apply, for example `ep` 18 
 
 `describeGrid(profile)` gives the Thai label shown on skill cards and tooltips: `ตนเอง`, `แนวตรง N ช่อง`, or `ระยะ N` / `ระยะ min–max` followed by `เป้าเดียว`, `วงรัศมี N`, `พื้นที่ 3×3`, `กากบาท N` or `ฟันกวาด 3 ช่อง`.
 
-Every skill's and art's profile is listed in [reference/martial-arts.md](reference/martial-arts.md). Today: of 123 arts, 71 are self, 27 are 1–2 single, 20 are 1–3 diamond 1 and 5 are 1–3 single.
+Every skill's and art's profile is listed in [reference/martial-arts.md](reference/martial-arts.md). Today: of 122 arts, 71 are self, 26 are 1–2 single, 20 are 1–3 diamond 1 and 5 are 1–3 single.
 
 ## Resolving a cast: the duel view
 
@@ -303,7 +303,7 @@ Details of the rewards: [gameplay.md](gameplay.md#progression).
 | Suite | What it pins |
 | --- | --- |
 | `bun run test:grid` (`scripts/test-grid-engine.ts`, 14 checks) | layout, name suffixes, move range, walking rules, turn-order ratios and forecast, reach, areas, cooldowns, art MP, own-turn ticks, stun skips, poison deaths, compat mirrors, hero-only flee, full battles ending within 300 turns |
-| `bun run test:grid-ai` (13) | legal plans across 36 seeded battles, attrition up to 600 turns, attacks when adjacent, walk-and-strike, ranged units keep distance, areas aim for 2+ foes, heals only when low, plan time < 15 ms, a 1 v 7 plan on 15 × 10 < 25 ms |
+| `bun run test:grid-ai` (13) | legal plans across 36 seeded battles, attrition up to 2500 turns, attacks when adjacent, walk-and-strike, ranged units keep distance, areas aim for 2+ foes, heals only when low, plan time < 15 ms, a 1 v 7 plan on 15 × 10 < 25 ms |
 | `bun run test:grid-skills` (7) | every skill and art profile is valid, the self / enemy rule, the 18 overrides, `slotGrid`, `describeGrid` labels |
 | `bun run test:grid-store` (13) | bridge start with HP / MP and looks, packs (mixed gangs, power reinforcements, the 6 cap), board size per unit count, variant tint / size, rigged NPC sheets for spars and villains, spar sprites, step pacing, refused input, flee, auto, win rewards including pack kills, fatal vs non-fatal loss, escape without rewards |
 | `bun run test:combat` (15) | legacy 1v1 checks plus grid store turns, ties, cooldown timing and flee odds |

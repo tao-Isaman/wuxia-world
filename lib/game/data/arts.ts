@@ -516,14 +516,6 @@ export const ARTS: readonly Art[] = [
     stats: { DEX: 20, LUK: 20, INT: 10 }, hL: 20, mL: 50,
     act: { n: "ตีจุดมรณะ", c: 35, cd: 4, t: "drain_acc", m: 1.2, h: 40, adv: -15, d: "Int×1.2 + ดูด 40% + Acc-15 CD4" },
     pas: { tr: "on_crit", ch: 100, d: "Crit → ศัตรู PDef-15 (2ตา)", e: { t: "debuff_def", n: "บาดแผล", v: -15, u: 5 } } },
-  { id: "jiuyin", n: "เก้าหยินจิงชี่", sc: "ยุทธจักร", tp: "หยิน·ภายใน", types: ["yin", "internal"], ti: 4,
-    stats: { POW: 20, INT: 20, DEX: 10 }, hL: 10, mL: 60,
-    act: { n: "เก้าหยินขาวกระดูก", c: 40, cd: 4, t: "atk_int_pen", m: 1.5, pen: 40, d: "Int×1.5 ทะลุ IDef 40% CD4" },
-    pas: { tr: "use_int", ch: 100, d: "Int skill → ศัตรู PDef-10 (2ตา)", e: { t: "debuff_def", n: "กระดูกร้าว", v: -10, u: 5 } } },
-  { id: "jiuyang", n: "เก้าหยางเซินกง", sc: "ยุทธจักร", tp: "หยาง·แข็ง", types: ["yang", "hard"], ti: 4,
-    stats: { STR: 15, VIT: 20, DEF: 15 }, hL: 60, mL: 10,
-    act: { n: "เพลิงบริสุทธิ์", c: 25, cd: 3, t: "atk_phy_pen", m: 1.5, pen: 25, d: "ทางกาย×1.5 ทะลุ DEF 25% CD3" },
-    pas: { tr: "hit_recv", ch: 30, d: "ถูกโจมตี 30% → ฟื้น 10% HP", e: { t: "heal_pct", v: 10 } } },
   { id: "shenzhao", n: "เซินจ้าวจิง", sc: "ยุทธจักร", tp: "สมดุล·ภายใน", types: ["internal"], ti: 4,
     stats: { INT: 25, POW: 15, DEX: 10 }, hL: 20, mL: 50,
     act: { n: "ดวงตาจิต", c: 30, cd: 3, t: "debuff_acc_dmg", ad: -25, u: 5, dm: 0.7, d: "Acc-25 + Int×0.7 CD3" },
@@ -549,6 +541,11 @@ export const ARTS: readonly Art[] = [
     hpRegenPct: 5, mpRegenPct: 5,
     act: { n: "ฟื้นพลังเก้าเอี้ยง", c: 50, cd: 6, t: "heal_full_cleanse", h: 50, mh: 50, d: "ฟื้น 50% HP/MP + ลบดีบัฟทุกระดับ CD6" },
     pas: { tr: "hit_recv", ch: 100, d: "ถูกโจมตี 100% → สะท้อน 20% (5ตา) — เก้าเอี้ยงสะท้อนกลับ", e: { t: "buff_reflect", n: "เก้าเอี้ยง", v: 20, u: 5 } } },
+  { id: "kgim", n: "คัมภีร์เก้าอิม", sc: "ยุทธจักร", tp: "หยิน·ภายใน", types: ["yin", "internal"], ti: 5,
+    stats: { INT: 30, POW: 30, DEX: 20 }, hL: 20, mL: 60,
+    mpRegenPct: 5,
+    act: { n: "กรงเล็บกระดูกขาวเก้าอิม", c: 55, cd: 5, t: "atk_int_pen", m: 1.8, pen: 50, d: "Int×1.8 ทะลุ IDef 50% — 九阴真经 CD5" },
+    pas: { tr: "use_int", ch: 100, d: "Int skill → ศัตรู PDef-15 (2ตา) — เย็นยะเยือกถึงกระดูก", e: { t: "debuff_def", n: "กระดูกเก้าอิม", v: -15, u: 5 } } },
 ];
 
 export const ARTS_BY_ID: Map<string, Art> = new Map(ARTS.map((a) => [a.id, a]));

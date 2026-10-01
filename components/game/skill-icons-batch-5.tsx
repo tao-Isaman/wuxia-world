@@ -1480,8 +1480,8 @@ const ART_BATCH: Record<string, IconRenderer> = {
     </g>
   ),
 
-  // 68. jiuyin เก้าหยินจิงชี่ — nine-yin classic qi with bone
-  jiuyin: ({ ink, accent }) => (
+  // 68. kgim คัมภีร์เก้าอิม (T5) — the nine-yin manual: dark moon and white bone
+  kgim: ({ ink, accent }) => (
     <g>
       {/* dark moon background */}
       <circle cx={32} cy={28} r={18} fill={ink} stroke={ink} strokeWidth={2} />
@@ -1502,25 +1502,6 @@ const ART_BATCH: Record<string, IconRenderer> = {
       <circle cx={50} cy={58} r={2.5} fill={accent} stroke={ink} strokeWidth={1.5} />
       <circle cx={50} cy={48} r={2.5} fill={accent} stroke={ink} strokeWidth={1.5} />
       <circle cx={14} cy={58} r={2.5} fill={accent} stroke={ink} strokeWidth={1.5} />
-    </g>
-  ),
-
-  // 69. jiuyang เก้าหยางเซินกง — nine-yang divine art with sun
-  jiuyang: ({ ink, accent }) => (
-    <g>
-      {/* radiant sun */}
-      <circle cx={32} cy={32} r={14} fill={accent} stroke={ink} strokeWidth={2} />
-      {/* sun rays — 12 */}
-      {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((deg) => {
-        const r = (deg * Math.PI) / 180;
-        const x1 = 32 + Math.cos(r) * 16;
-        const y1 = 32 + Math.sin(r) * 16;
-        const x2 = 32 + Math.cos(r) * 26;
-        const y2 = 32 + Math.sin(r) * 26;
-        return <line key={deg} x1={x1} y1={y1} x2={x2} y2={y2} stroke={ink} strokeWidth={2.5} strokeLinecap="round" />;
-      })}
-      {/* "九" character on sun */}
-      <text x={32} y={37} textAnchor="middle" fontSize={14} fontWeight="bold" fill={ink}>九</text>
     </g>
   ),
 
@@ -1786,12 +1767,11 @@ Object.assign(ART_ICON_RASTER, {
   fire: "/icons/arts/fire.png", // เพลิงสวรรค์
   sand: "/icons/arts/sand.png", // พายุทราย
   shadow: "/icons/arts/shadow.png", // เงาสังหาร
-  jiuyin: "/icons/arts/jiuyin.png", // เก้าหยินจิงชี่
-  jiuyang: "/icons/arts/jiuyang.png", // เก้าหยางเซินกง
   shenzhao: "/icons/arts/shenzhao.png", // เซินจ้าวจิง
   taiyin: "/icons/arts/taiyin.png", // ไต้อินเจิ้นชี่
   huoxue: "/icons/arts/huoxue.png", // ฮั่วเสวียสินฝ่า
   dongxuan: "/icons/arts/dongxuan.png", // ตงซวนเซินกง
   khbt: "/icons/arts/khbt.png", // คัมภีร์ทานตะวัน
   kuyt: "/icons/arts/kuyt.png", // วิชาเก้าเอี้ยง
+  kgim: "/icons/arts/kgim.png", // คัมภีร์เก้าอิม
 });

@@ -15,7 +15,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - Explores 102 places (101 painted maps) joined by 128 roads.
 - Meets 157 NPCs and takes 276 quests.
-- Joins one of 15 sects and learns 178 move skills and 123 inner arts.
+- Joins one of 15 sects and learns 178 move skills and 122 inner arts.
 - Gathers and crafts (19 life skills).
 - Steals and gets jailed.
 - Fights **turn-based tactics on a 10 × 7 to 15 × 10 board**.
@@ -142,7 +142,7 @@ Two deliberate exceptions reach into stores:
   - `ArtPassiveEffect`, `EquipEffect`, 14 art-active types;
   - `SkillType` (yin / yang / balance / hard / soft / internal / external);
   - `SKILL_SLOT_COUNT = 10`.
-- **Data tables** (`data/`): `TIERS`, `STAT_KEYS`, weapon families, `SECT_ORDER` / `JIANGHU_SECT` (`sects.ts`), `SKILLS` (178, incl. `bst_*` beast moves), `ARTS` (123 + the `none` placeholder), `EQUIPMENT` (76).
+- **Data tables** (`data/`): `TIERS`, `STAT_KEYS`, weapon families, `SECT_ORDER` / `JIANGHU_SECT` (`sects.ts`), `SKILLS` (178, incl. `bst_*` beast moves), `ARTS` (122 + the `none` placeholder; T5: `khbt`, `kuyt`, `kgim`), `EQUIPMENT` (76).
 - **Stats.** `derive.ts` (`derive`, `combinedStats`, `deriveAll`, `getMasteryMap`).
   - `combinedStats` merges base + arts + slotted / learned skills with conflict and level scaling.
   - Equipment is **not** in `combinedStats`; `deriveAll` adds it.

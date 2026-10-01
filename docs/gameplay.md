@@ -339,7 +339,7 @@ Mastery levels 1–5 need 0 / 100 / 300 / 700 / 1500 xp.
 
 ### Skills and inner arts
 
-Move skills (178) and inner arts (123) level from 1 to 10. A move skill's power, its stat bonuses and its weapon mastery grow with level; an art's bonuses scale by level / 10.
+Move skills (178) and inner arts (122) level from 1 to 10. A move skill's power, its stat bonuses and its weapon mastery grow with level; an art's bonuses scale by level / 10.
 
 | Xp to the next level | Formula | Tier 0, lv 1 → 2 | Tier 4, lv 9 → 10 |
 | --- | --- | --- | --- |

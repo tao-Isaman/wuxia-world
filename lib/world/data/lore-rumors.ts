@@ -175,7 +175,7 @@ export const LORE_RUMORS: readonly LoreRumorTemplate[] = [
   },
   {
     idSuffix: "history_jiuyin_manuscript",
-    text: "ใครๆว่า คัมภีร์เก้าหยินจิงชี่เคยตกอยู่ในมือยอดยุทธ์หลายรุ่น — แต่ละรุ่นมักจบลงด้วยการตายหรือคลั่ง",
+    text: "ใครๆว่า คัมภีร์เก้าอิมเคยตกอยู่ในมือยอดยุทธ์หลายรุ่น — แต่ละรุ่นมักจบลงด้วยการตายหรือคลั่ง",
     source: "lore",
     truth: "true",
     region: "heartland",
