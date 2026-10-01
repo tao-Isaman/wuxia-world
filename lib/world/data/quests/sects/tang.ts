@@ -111,9 +111,9 @@ export const QUESTS_TANG: readonly QuestDef[] = [
 
   {
     id: "qst_tang_art_tenkpoisons",
-    name: "ตำราพลังถังหมื่นพิษ",
-    description: "เจ้าสำนักถังเหมินยอมเปิดตำราพลังถังหมื่นพิษให้ศิษย์ที่พิสูจน์ทั้งฝีมือและความใจกล้า — เป็นวิชาลับสุดยอดของสำนัก",
-    briefSummary: "ฝึกพลังถังหมื่นพิษ — รับ T4 art ลับของถังเหมิน",
+    name: "บททดสอบก่อนตำนาน: พลังถังหมื่นพิษ",
+    description: "เจ้าสำนักถังเหมินจะเล่าตำนานของพลังถังหมื่นพิษให้ศิษย์ที่พิสูจน์ทั้งฝีมือและความใจกล้า — เป็นวิชาลับสุดยอดของสำนัก (เมื่อผ่าน ดูแท็บตำนานในบันทึกภารกิจ)",
+    briefSummary: "บททดสอบ — เปิดทางสู่ตำนานของพลังถังหมื่นพิษ (ขั้นเฉพาะ)",
     type: "side",
     sectId: "tang",
     isArtQuest: true,
@@ -139,12 +139,11 @@ export const QUESTS_TANG: readonly QuestDef[] = [
       },
       {
         id: "return_art",
-        description: "กลับไปรับตำราจากเจ้าสำนัก",
+        description: "กลับไปรายงานผลต่อเจ้าสำนัก",
       },
     ],
     rewards: [
       { t: "wExp", amount: 400 },
-      { t: "learnArt", artId: "t4_tang_tenkpoisons", level: 5 },
       { t: "trait", trait: "humility", amount: 3 },
       { t: "sectPoints", sectId: "tang", amount: 200 },
       { t: "npcRelationship", npcId: "sect_tang_chief_tangmen", amount: 20 },

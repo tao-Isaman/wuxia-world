@@ -18,6 +18,7 @@ import { useWorldStore } from "@/store/world-store";
 import { toast } from "@/store/toast-store";
 import { confirmDialog } from "@/store/confirm-store";
 import { cn } from "@/lib/utils";
+import { SagaList } from "./saga-list";
 
 // Quest log. Tabbed list view:
 //   - กำลังทำ   (active)  — ongoing quests; player can cancel from here
@@ -35,30 +36,33 @@ import { cn } from "@/lib/utils";
 //   - "popup"           — bare body for use inside the menu-bar Modal
 
 type QuestStatus = "active" | "done" | "failed";
+type QuestTab = QuestStatus | "story";
 
 interface QuestLogProps {
   variant?: "card" | "popup";
 }
 
-const TAB_LABEL: Record<QuestStatus, string> = {
+const TAB_LABEL: Record<QuestTab, string> = {
   active: "กำลังทำ",
   done: "สำเร็จ",
   failed: "ละทิ้ง",
+  story: "ตำนาน",
 };
 
 export function QuestLog({ variant = "card" }: QuestLogProps = {}) {
   const quests = useWorldStore((s) => s.quests);
-  const [tab, setTab] = useState<QuestStatus>("active");
+  const [tab, setTab] = useState<QuestTab>("active");
   // Track which quest rows are expanded — Set so independent rows toggle
   // freely without forcing an accordion-of-one. Cleared per-tab so the
   // expansion state doesn't leak across status filters.
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
 
   const entries = Object.values(quests);
-  const counts: Record<QuestStatus, number> = {
+  const counts: Record<QuestTab, number> = {
     active: entries.filter((q) => q.status === "active").length,
     done: entries.filter((q) => q.status === "done").length,
     failed: entries.filter((q) => q.status === "failed").length,
+    story: entries.filter((q) => q.id.startsWith("st_")).length,
   };
   const list = entries.filter((q) => q.status === tab);
 
@@ -70,7 +74,7 @@ export function QuestLog({ variant = "card" }: QuestLogProps = {}) {
       return next;
     });
   };
-  const onSwitchTab = (next: QuestStatus) => {
+  const onSwitchTab = (next: QuestTab) => {
     if (next === tab) return;
     setTab(next);
     setExpanded(new Set());
@@ -79,7 +83,7 @@ export function QuestLog({ variant = "card" }: QuestLogProps = {}) {
   const body = (
     <div className="space-y-3">
       <TabBar tab={tab} counts={counts} onSelect={onSwitchTab} />
-      {list.length === 0 ? (
+      {tab === "story" ? <SagaList /> : list.length === 0 ? (
         <div className="menu-empty" data-glyph="令">
           <strong>{tab === "active"
             ? "ยังไม่มีภารกิจที่กำลังทำ"
@@ -94,7 +98,7 @@ export function QuestLog({ variant = "card" }: QuestLogProps = {}) {
             <QuestRow
               key={q.id}
               questId={q.id}
-              status={q.status}
+              status={q.status as QuestStatus}
               stage={q.stage}
               expanded={expanded.has(q.id)}
               onToggle={() => onToggle(q.id)}
@@ -122,13 +126,13 @@ export function QuestLog({ variant = "card" }: QuestLogProps = {}) {
 // ─── Tab bar ─────────────────────────────────────────────────────────
 
 interface TabBarProps {
-  tab: QuestStatus;
-  counts: Record<QuestStatus, number>;
-  onSelect: (t: QuestStatus) => void;
+  tab: QuestTab;
+  counts: Record<QuestTab, number>;
+  onSelect: (t: QuestTab) => void;
 }
 
 function TabBar({ tab, counts, onSelect }: TabBarProps) {
-  const order: QuestStatus[] = ["active", "done", "failed"];
+  const order: QuestTab[] = ["active", "done", "failed", "story"];
   return (
     <div className="flex gap-1 border-b pb-2">
       {order.map((t) => {
@@ -219,11 +223,11 @@ function QuestRow({
         aria-expanded={expanded}
       >
         <span className="flex items-center gap-2 min-w-0 flex-wrap">
-          <span className="shrink-0 text-vermilion">{isSide ? "✦" : "★"}</span>
+          <span className="shrink-0 text-vermilion">{def.type === "story" ? "📜" : isSide ? "✦" : "★"}</span>
           <strong className="text-sm font-display truncate">{def.name}</strong>
-          {isSide && (
+          {(isSide || def.type === "story") && (
             <Badge variant="outline" className="text-[9px] opacity-70">
-              รอง
+              {def.type === "story" ? "ตำนาน" : def.lineage ? "สืบทอดวิชา" : "รอง"}
             </Badge>
           )}
         </span>
@@ -384,7 +388,7 @@ function QuestRow({
             </li>
           </ul>
 
-          {status === "active" && (
+          {status === "active" && !def.story && !def.lineage && (
             <div className="flex justify-end pt-1">
               <Button
                 size="sm"

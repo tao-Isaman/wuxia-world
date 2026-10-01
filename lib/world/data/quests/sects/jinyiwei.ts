@@ -103,9 +103,9 @@ export const QUESTS_JINYIWEI: readonly QuestDef[] = [
 
   {
     id: "qst_jinyiwei_art_godslayer",
-    name: "ตำราพลังประหารเทพ",
-    description: "ผู้บัญชาการจ้าวฝู่ยอมเปิดตำราพลังประหารเทพให้ศิษย์ที่พิสูจน์ทั้งฝีมือและความภักดี — เป็นวิชาลับสุดยอดของกรมราช",
-    briefSummary: "ฝึกพลังประหารเทพ — รับ T4 art ลับขององครักษ์เสื้อแพร",
+    name: "บททดสอบก่อนตำนาน: พลังประหารเทพ",
+    description: "ผู้บัญชาการจ้าวฝู่จะเล่าตำนานของพลังประหารเทพให้ศิษย์ที่พิสูจน์ทั้งฝีมือและความภักดี — เป็นวิชาลับสุดยอดของกรมราช (เมื่อผ่าน ดูแท็บตำนานในบันทึกภารกิจ)",
+    briefSummary: "บททดสอบ — เปิดทางสู่ตำนานของพลังประหารเทพ (ขั้นเฉพาะ)",
     type: "side",
     sectId: "jinyiwei",
     isArtQuest: true,
@@ -131,12 +131,11 @@ export const QUESTS_JINYIWEI: readonly QuestDef[] = [
       },
       {
         id: "return_art",
-        description: "กลับไปรับตำราจากผู้บัญชาการ",
+        description: "กลับไปรายงานผลต่อผู้บัญชาการ",
       },
     ],
     rewards: [
       { t: "wExp", amount: 400 },
-      { t: "learnArt", artId: "t4_jy_godslayer", level: 5 },
       { t: "trait", trait: "arrogance", amount: 5 },
       { t: "sectPoints", sectId: "jinyiwei", amount: 200 },
       { t: "npcRelationship", npcId: "sect_jinyiwei_leader_zhao", amount: 20 },

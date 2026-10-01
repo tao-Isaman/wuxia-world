@@ -103,9 +103,9 @@ export const QUESTS_SUNMOON: readonly QuestDef[] = [
 
   {
     id: "qst_sunmoon_art_qiankun",
-    name: "ตำราเฉียนคุนต้าหนัวอี",
-    description: "เจ้าสำนักหยินอวี้ยอมเปิดตำราเฉียนคุนต้าหนัวอีให้ศิษย์ที่พิสูจน์ทั้งฝีมือและความภักดี — เป็นวิชาลับสุดยอดของพรรคตะวันจันทรา",
-    briefSummary: "ฝึกเฉียนคุนต้าหนัวอี — รับ T4 art ลับของพรรคตะวันจันทรา",
+    name: "บททดสอบก่อนตำนาน: เฉียนคุนต้าหนัวอี",
+    description: "เจ้าสำนักหยินอวี้จะเล่าตำนานของเฉียนคุนต้าหนัวอีให้ศิษย์ที่พิสูจน์ทั้งฝีมือและความภักดี — เป็นวิชาลับสุดยอดของพรรคตะวันจันทรา (เมื่อผ่าน ดูแท็บตำนานในบันทึกภารกิจ)",
+    briefSummary: "บททดสอบ — เปิดทางสู่ตำนานของเฉียนคุนต้าหนัวอี (ขั้นเฉพาะ)",
     type: "side",
     sectId: "sunmoon",
     isArtQuest: true,
@@ -131,12 +131,11 @@ export const QUESTS_SUNMOON: readonly QuestDef[] = [
       },
       {
         id: "return_art",
-        description: "กลับไปรับตำราจากเจ้าสำนัก",
+        description: "กลับไปรายงานผลต่อเจ้าสำนัก",
       },
     ],
     rewards: [
       { t: "wExp", amount: 400 },
-      { t: "learnArt", artId: "qiankun", level: 5 },
       { t: "trait", trait: "arrogance", amount: 5 },
       { t: "sectPoints", sectId: "sunmoon", amount: 200 },
       { t: "npcRelationship", npcId: "sect_sunmoon_chief_dongfang", amount: 20 },

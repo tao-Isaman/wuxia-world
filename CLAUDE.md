@@ -31,6 +31,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | Stats, damage, effects, levels, type conflict | [docs/combat.md](docs/combat.md) |
 | The tactics battle: board, turns, ranges, AI, store, renderer, UI | [docs/grid-combat.md](docs/grid-combat.md) |
 | Scenes, effects, conditions, quests, objectives, guide, encounters, law, bad actions | [docs/world-engine.md](docs/world-engine.md) |
+| Sect lineage quests, story sagas (มังกรหยก ภาค 3), cutscenes | [docs/story-quests.md](docs/story-quests.md) · writing: [docs/story-writing.md](docs/story-writing.md) |
 | NPC simulation and rumors | [docs/liveness.md](docs/liveness.md) |
 | Adding content (places, NPCs, quests, items, skills, sects…) | [docs/content-authoring.md](docs/content-authoring.md) |
 | Map runtime, collision, characters, HUD, menus, CSS | [docs/rendering.md](docs/rendering.md) |

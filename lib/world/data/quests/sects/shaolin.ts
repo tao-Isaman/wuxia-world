@@ -188,9 +188,9 @@ export const QUESTS_SHAOLIN: readonly QuestDef[] = [
 
   {
     id: "qst_shaolin_art_legendary",
-    name: "ตำราพลังเปลี่ยนเส้นเอ็น",
-    description: "ตำนานสุดยอดของเส้าหลิน — 易筋经. เปิดให้ศิษย์ที่ได้รับความไว้วางใจสูงสุดเท่านั้น พิสูจน์ทั้งกายและจิตใจ",
-    briefSummary: "ฝึกเปลี่ยนเส้นเอ็น — รับ T4 art ลับของเส้าหลิน",
+    name: "บททดสอบก่อนตำนาน: พลังเปลี่ยนเส้นเอ็น",
+    description: "ตำนานสุดยอดของเส้าหลิน — 易筋经. เปิดให้ศิษย์ที่ได้รับความไว้วางใจสูงสุดเท่านั้น พิสูจน์ทั้งกายและจิตใจ ผ่านบททดสอบนี้แล้ว อาจารย์จะเล่าตำนานที่นำไปสู่วิชานี้ (ดูแท็บตำนานในบันทึกภารกิจ)",
+    briefSummary: "บททดสอบ — เปิดทางสู่ตำนานของพลังเปลี่ยนเส้นเอ็น (ขั้นเฉพาะ)",
     type: "side",
     sectId: "shaolin",
     isArtQuest: true,
@@ -216,12 +216,11 @@ export const QUESTS_SHAOLIN: readonly QuestDef[] = [
       },
       {
         id: "return_legend",
-        description: "กลับไปรับตำราจากเจ้าอาวาสฮุยหยวน",
+        description: "กลับไปรายงานผลต่อเจ้าอาวาสฮุยหยวน",
       },
     ],
     rewards: [
       { t: "wExp", amount: 400 },
-      { t: "learnArt", artId: "tendon", level: 5 },
       { t: "trait", trait: "humility", amount: 10 },
       { t: "sectPoints", sectId: "shaolin", amount: 200 },
       { t: "npcRelationship", npcId: "sect_shaolin_abbot_huiyuan", amount: 20 },

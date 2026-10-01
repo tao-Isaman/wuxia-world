@@ -1,5 +1,13 @@
 import type { Condition, QuestStatus, WorldStateData } from "./types";
 import { masteryLevel } from "./data/life-skills";
+import { combinedStats } from "@/lib/game/derive";
+import type { StatKey } from "@/lib/game";
+
+/** A stat without gear (base + skills + arts), as manuals and statAtLeast check it. */
+export function gearlessStat(state: Pick<WorldStateData, "playerBuild">, stat: StatKey): number {
+  if (!state.playerBuild) return 0;
+  return Math.floor(combinedStats(state.playerBuild, undefined, { excludeEquipment: true })[stat] ?? 0);
+}
 
 // Pure: read-only check against world state. No mutations.
 export function evaluateCondition(state: WorldStateData, c: Condition): boolean {
@@ -71,6 +79,10 @@ export function evaluateCondition(state: WorldStateData, c: Condition): boolean 
       return state.gold >= c.amount;
     case "learnedArt":
       return (state.playerBuild?.learnedArtIds ?? []).includes(c.artId);
+    case "learnedSkill":
+      return (state.playerBuild?.learnedSkillIds ?? []).includes(c.skillId);
+    case "statAtLeast":
+      return gearlessStat(state, c.stat) >= c.min;
     case "lifeSkillLevel":
       return masteryLevel(state.lifeSkillXp[c.skill] ?? 0) >= c.min;
     case "heardRumor":
