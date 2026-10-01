@@ -47,7 +47,8 @@ Each suite is a Bun script (or `bun test` file) wired as `test:*` in `package.js
 | `test:grid` | `scripts/test-grid-engine.ts` | 14 | the grid engine: layout, movement rules, turn order, ranges and areas, arts, damage over time, stun, victory, flee, full battles against real opponents, packs |
 | `test:grid-ai` | `scripts/test-grid-ai.ts` | 13 | AI legality and behaviour over dozens of seeded battles; average planning time under 15 ms |
 | `test:grid-skills` | `scripts/test-grid-skills.ts` | 7 | every skill (178) and art (123) has a valid battle range; the 18 overrides exist; Thai range labels |
-| `test:grid-store` | `scripts/test-grid-store.ts` | 10 | battle store + bridge + looks + the world hand-off: HP carry-over, packs, spar sprites, flee, auto mode, win / loss / escape results |
+| `test:grid-store` | `scripts/test-grid-store.ts` | 13 | battle store + bridge + looks + the world hand-off: HP carry-over, packs and board sizes, spar sprites, rigged NPC sheets, flee, auto mode, win / loss / escape results |
+| `test:npcs` | `scripts/test-npc-sheets.ts` | 6 | the 30 rigged NPCs: art, placement, complete sheets, catalog wiring, the 10 villain bosses in the encounter pool; wandering stays near home, off blocked ground and still when frozen |
 | `test:quests` | 5 scripts | — | the campaign audit, dead-end regressions, playing **every** item / kill / objective quest (213) through the real store, guidance for all 657 stages, and every steal / assassinate / kidnap quest stage (39) |
 | `test:docs` | `scripts/build-docs-reference.ts --check`, `scripts/check-docs.ts` | — | the generated reference is current; links, repo paths and commands in the docs resolve |
 
@@ -102,7 +103,7 @@ Read-only scripts, not wired into `package.json`:
 
 Many specs replace `Math.random` in the page to make rolls predictable.
 
-19 tests in 11 spec files:
+20 tests in 11 spec files:
 
 | Spec | Tests | Covers |
 | --- | --- | --- |
@@ -110,7 +111,7 @@ Many specs replace `Math.random` in the page to make rolls predictable.
 | `battle-setting.spec.ts` | 1 | a capital encounter keeps its street background through a reload and phone rotation |
 | `characters.spec.ts` | 2 | all eight heroes animate idle and four walk directions in Phaser; reduced motion; WebGL context loss and "ลองใหม่" recovery |
 | `dialogue.spec.ts` | 2 | local replies keep the same world canvas; quest offers away from a map fit on screen without scrolling at three sizes |
-| `game.spec.ts` | 5 | exploration, menu pause, travel, NPC card, reload; grid battle by tap and auto; unit info by touch; phone rotation; a version-18 save migrates to 21 |
+| `game.spec.ts` | 6 | exploration, menu pause, travel, NPC card, reload; grid battle by tap and auto; unit info by touch; phone rotation; a version-18 save migrates to 21; rigged NPCs wander in the capital and wait for the hero |
 | `investigation.spec.ts` | 1 | capital rumors and the ledger investigation survive a mid-dialog reload and pay once |
 | `law-guide.spec.ts` | 3 | walking while wanted draws the law; jail days per mark; retreat gives no rewards; the quest guide and the busy overlay |
 | `mobile-controls.spec.ts` | 1 | phone HUD: icon bar, joystick, action button, rest bubble, profile |

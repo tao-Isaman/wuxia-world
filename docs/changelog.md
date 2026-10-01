@@ -6,11 +6,19 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-01
 
+### Wave 27 — animated, wandering NPCs and named villains
+
+- **30 NPCs walk like the hero.** The 15 sect heads, หมอหลิน, นายอำเภอหวู่, เถ้าแก่หวาง, ทูตหลิวอิง, นักยุทธศาสตร์กง and 10 villains now have full animation sheets in the hero layout: idle, walk, attack, hurt, guard, victory, defeat, walk north and walk south. `scripts/build-npc-sheets.ts` rigs them from each NPC's painting into `public/art/characters/npc/`; the list is `lib/characters/npc-sheets.ts`.
+- **They wander.** On the map these NPCs stroll around their spot with the walk clip for the way they head, and stand still when the hero comes near, walks to them or hovers them (`lib/stage/npc-wander.ts`). Picking, the action button and the guide follow where they stand.
+- **They fight with real clips.** Sparring a sect head now plays that NPC's own walk and attack frames instead of a single still.
+- **10 villain bosses.** `elite_villain_*` opponents are the villains themselves (`look.npc`): เถ้าแก่โจวตลาดมืด, ทูตเซี่ย, ขุนนางหยาน, หัวหน้าโจรชิง, นักฆ่าเงาหยิง, เจ้าลัทธิจ้าวมังกรเทพ, ผู้อาวุโสตู๋ซื่อ, ฮุยเป้า, ดาบเลือดเซียะลาง and ตู๋โซ่ว, each with a gang. They join the encounter pool once the hero is strong, rarer than other bosses (`share`), and never after the hero has killed or kidnapped them.
+- New `bun run test:npcs`; `test:grid-store` and the e2e suite check the new looks and the wandering.
+
 ### Wave 26 — enemy variety, bigger battles, bottom skill strip, bad-action quests
 
 - **More enemies.** 14 new foes in `opponents.ts`: variants of existing beasts and people (vampire bat, frost wolf, blood boar, bandit archer and lieutenant, night blade, cult zealot), stronger tier-3 foes (golden tiger, jade python, thunder eagle, ghost swordsman) and three tier-4 bosses with their gangs (`elite_bandit_king`, `elite_cult_elder`, `elite_bear_king`). All roll in random encounters; the bosses only once the hero is strong.
 - **Sprite variants.** `UnitLook` and `OpponentDef.look` take `tint` and `size`, so one sprite makes several foes and bosses stand taller than their gang.
-- **Bigger packs.** `pack` can be a mixed list; 23 foes bring companions, the first kind gains +1 / +2 as the hero grows stronger, capped at 6.
+- **Bigger packs.** `pack` can be a mixed list; 25 foes bring companions, the first kind gains +1 / +2 as the hero grows stronger, capped at 6.
 - **Bigger boards.** The board grows with the number of units — 10 × 7, 12 × 8, 13 × 9, up to 15 × 10 (`boardSizeFor`) — and fits a landscape phone.
 - **Skill strip.** The battle skill bar is now a horizontal strip of icon tiles along the bottom, like Wandering Sword, with the controls at its right end.
 - **Bad-action quests.** One rule (`badActionOffered`) now decides the steal / assassinate / kidnap buttons. Fixed เถ้าแก่หวาง (both copies), whom a spy quest asks the hero to rob but who had nothing to steal, so no steal button appeared. New `scripts/test-bad-action-quests.ts` (in `test:quests`) checks all 39 such stages.

@@ -27,6 +27,8 @@ export interface FightEventDef {
   id: string;
   weight: number;
   opponentId: string;
+  /** Multiplies the power-shaped weight (default 1): a rarer encounter. */
+  share?: number;
 }
 
 export interface TreasureEventDef {
@@ -224,6 +226,17 @@ export const FIGHT_EVENTS: readonly FightEventDef[] = [
   { id: "fight_elite_bandit_king", weight: 0, opponentId: "elite_bandit_king" },
   { id: "fight_elite_cult_elder",  weight: 0, opponentId: "elite_cult_elder" },
   { id: "fight_elite_bear_king",   weight: 0, opponentId: "elite_bear_king" },
+  // Named villains (rigged NPC sheets): rarer than the other elites (`share`).
+  { id: "fight_elite_villain_zhou", weight: 0, opponentId: "elite_villain_zhou", share: 0.35 },
+  { id: "fight_elite_villain_xie", weight: 0, opponentId: "elite_villain_xie", share: 0.35 },
+  { id: "fight_elite_villain_yan", weight: 0, opponentId: "elite_villain_yan", share: 0.35 },
+  { id: "fight_elite_villain_qing", weight: 0, opponentId: "elite_villain_qing", share: 0.35 },
+  { id: "fight_elite_villain_ying", weight: 0, opponentId: "elite_villain_ying", share: 0.35 },
+  { id: "fight_elite_villain_zhao", weight: 0, opponentId: "elite_villain_zhao", share: 0.35 },
+  { id: "fight_elite_villain_dushi", weight: 0, opponentId: "elite_villain_dushi", share: 0.35 },
+  { id: "fight_elite_villain_huibao", weight: 0, opponentId: "elite_villain_huibao", share: 0.35 },
+  { id: "fight_elite_villain_xuelang", weight: 0, opponentId: "elite_villain_xuelang", share: 0.35 },
+  { id: "fight_elite_villain_dushou", weight: 0, opponentId: "elite_villain_dushou", share: 0.35 },
 ];
 
 export const TREASURE_EVENTS: readonly TreasureEventDef[] = [
@@ -260,7 +273,7 @@ export function fightEventsForLocation(
       opp.id.startsWith("elite_") ? "elite" : ((opp.ti ?? 0) as 0 | 1 | 2 | 3 | 4);
     const tierWeight = tierWeightForPower(tierKey, power);
     if (tierWeight <= 0) continue;
-    out.push({ ...ev, weight: tierWeight * w });
+    out.push({ ...ev, weight: tierWeight * w * (ev.share ?? 1) });
   }
   return out;
 }

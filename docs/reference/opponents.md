@@ -2,11 +2,11 @@
 
 # Opponents
 
-194 opponents (`lib/world/data/opponents.ts`). Random encounters draw from 54 fight events (plus 4 treasure and 3 meeting events) filtered by zone (`lib/world/data/random-events.ts`).
+204 opponents (`lib/world/data/opponents.ts`). Random encounters draw from 64 fight events (plus 4 treasure and 3 meeting events) filtered by zone (`lib/world/data/random-events.ts`).
 
 Met via: **roams** = random walk encounters in the listed zones · **hunt** = a hunting node · **spar** = an NPC's practice bout · **scene** = a quest or story battle (count of scene choices) · **law** = pursuers after wanted marks · **betrayal** = hunters after betraying a sect.
 
-Per tier: T0: 9 · T1: 36 · T2: 54 · T3: 37 · T4: 58. Per category: ฝ่ายมนุษย์ (human): 161 · สัตว์ป่า (beast): 27 · ผู้พิเศษ (supernatural): 6.
+Per tier: T0: 9 · T1: 36 · T2: 54 · T3: 37 · T4: 68. Per category: ฝ่ายมนุษย์ (human): 171 · สัตว์ป่า (beast): 27 · ผู้พิเศษ (supernatural): 6.
 
 ## Tier 0 (9)
 
@@ -164,7 +164,7 @@ Per tier: T0: 9 · T1: 36 · T2: 54 · T3: 37 · T4: 58. Per category: ฝ่า
 | `thunder_eagle` | อินทรีสายฟ้า | beast | — | 7 | roams (frontier, isle, wild) |
 | `ghost_swordsman` | วิญญาณจอมกระบี่ | supernatural | — | 7 | roams (sect, temple, wild) |
 
-## Tier 4 (58)
+## Tier 4 (68)
 
 | Id | Name | Category | Pack | Drops | Met via |
 | --- | --- | --- | --- | --- | --- |
@@ -226,3 +226,13 @@ Per tier: T0: 9 · T1: 36 · T2: 54 · T3: 37 · T4: 58. Per category: ฝ่า
 | `elite_bandit_king` | ราชาโจรภูเขา | human | 1× รองหัวหน้าโจร + 2× มือเข็มโจรป่า + 2× โจรป่า | 10 | — |
 | `elite_cult_elder` | ผู้อาวุโสลัทธิมาร | human | 3× สาวกลัทธิมาร | 10 | — |
 | `elite_bear_king` | ราชาหมีพันปี | beast | 1× หมีสีน้ำตาล | 9 | — |
+| `elite_villain_zhou` | เถ้าแก่โจวตลาดมืด | human | 2× โจรเร่ร่อน + 1× มือมีดราตรี | 10 | — |
+| `elite_villain_xie` | ทูตเซี่ยแห่งสำนักดาบโลหิต | human | 2× มือมีดราตรี | 8 | — |
+| `elite_villain_yan` | ขุนนางหยานทุจริต | human | 1× รองหัวหน้าโจร + 2× มือเข็มโจรป่า | 9 | — |
+| `elite_villain_qing` | หัวหน้าโจรชิง | human | 1× รองหัวหน้าโจร + 3× โจรป่า | 10 | — |
+| `elite_villain_ying` | นักฆ่าเงาหยิง | human | 2× มือมีดราตรี | 9 | — |
+| `elite_villain_zhao` | เจ้าลัทธิจ้าวมังกรเทพ | human | 3× สาวกลัทธิมาร | 9 | — |
+| `elite_villain_dushi` | ผู้อาวุโสตู๋ซื่อ | human | 2× สาวกลัทธิมาร | 9 | — |
+| `elite_villain_huibao` | พระอเถระนอกรีตฮุยเป้า | human | 1× สาวกลัทธิมาร + 2× นักเลงฝ่ามือเหล็ก | 9 | — |
+| `elite_villain_xuelang` | ดาบเลือดเซียะลาง | human | 1× มือมีดราตรี | 8 | — |
+| `elite_villain_dushou` | ศิษย์ตู๋โซ่ว | human | 2× สาวกลัทธิมาร | 9 | — |

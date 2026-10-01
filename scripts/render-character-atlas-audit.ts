@@ -12,7 +12,7 @@ const bundle = resolve(output, "atlas-bundle.js");
 // This diagnostic imports the actual engine loader; no alternate normalization.
 writeFileSync(entry, `
 import { loadCharacterAtlas } from "../../lib/characters/sheet";
-import { CHARACTER_IDS, hasDirectionalSheet, characterSheet } from "../../lib/characters/catalog";
+import { CHARACTER_IDS, hasDirectionalSheet, characterSheet, characterDirectionSheet } from "../../lib/characters/catalog";
 document.body.innerHTML = '<h1>Source artwork and engine atlases</h1><p>Original PNGs at left; actual loadCharacterAtlas output at right. Frame order: idle, walk, attack, hurt/guard/victory/defeat, then north/south for heroes.</p>';
 document.head.insertAdjacentHTML('beforeend', '<style>body{margin:24px;background:#192c29;color:#eee6c9;font:16px system-ui}h1{font-size:24px}section{width:1080px;padding:18px;margin:24px 0;background:#233d32;border:1px solid #a38d5d;box-sizing:border-box}h2{margin:0 0 12px}article{display:grid;grid-template-columns:512px 512px;gap:18px;align-items:start}figure{margin:0}figcaption{margin:8px 0 12px;color:#d0c8a4}img,canvas{display:block;max-width:512px;image-rendering:pixelated;background:#132923}img{width:512px;height:auto}canvas{outline:1px solid #5b735f}.atlas{background-image:linear-gradient(#69795c33 1px,transparent 1px),linear-gradient(90deg,#69795c33 1px,transparent 1px);background-size:128px 128px}</style>');
 const report = [];
@@ -41,7 +41,7 @@ for (const id of CHARACTER_IDS) {
   section.id = 'atlas-' + id;
   section.innerHTML = '<h2>' + id.toUpperCase() + '</h2><article><figure class="sources"><figcaption>Original source PNG(s), unchanged</figcaption></figure><figure class="normalized"><figcaption>Actual normalized engine atlas · 128 px cells</figcaption></figure></article>';
   const sources = section.querySelector('.sources');
-  for (const src of [characterSheet(id), ...(hasDirectionalSheet(id) ? ['/art/characters/' + id + '-directions.png'] : [])]) {
+  for (const src of [characterSheet(id), ...(hasDirectionalSheet(id) ? [characterDirectionSheet(id)] : [])]) {
     const original = new Image(); original.src = src; await original.decode(); sources.append(original);
   }
   atlas.image.className = 'atlas';

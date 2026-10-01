@@ -1,4 +1,4 @@
-import { CHARACTER_FEET_Y, CHARACTER_FRAME_SIZE, CHARACTER_GRID, CHARACTER_SHEET_LAYOUTS, CHARACTER_DIRECTION_LAYOUTS, characterSheet, hasDirectionalSheet, type CharacterId, type CharacterSheetLayout } from "./catalog";
+import { CHARACTER_FEET_Y, CHARACTER_FRAME_SIZE, CHARACTER_GRID, CHARACTER_SHEET_LAYOUTS, CHARACTER_DIRECTION_LAYOUTS, characterDirectionSheet, characterSheet, hasDirectionalSheet, type CharacterId, type CharacterSheetLayout } from "./catalog";
 import { applyWalkBeat, WALK_BEATS } from "./walk-cycle";
 
 export interface CharacterAtlas {
@@ -62,7 +62,7 @@ function median(values: number[]) { const sorted = [...values].sort((a, b) => a 
 async function prepareAtlas(id: CharacterId, directional: boolean): Promise<CharacterAtlas> {
   const [source, directionSource] = await Promise.all([
     loadImage(characterSheet(id)),
-    directional ? loadImage(`/art/characters/${id}-directions.png`) : Promise.resolve(null),
+    directional ? loadImage(characterDirectionSheet(id)) : Promise.resolve(null),
   ]);
   const base = measureFrames(source, 4, CHARACTER_SHEET_LAYOUTS[id]);
   const directions = directionSource ? measureFrames(directionSource, 2, CHARACTER_DIRECTION_LAYOUTS[id]) : [];

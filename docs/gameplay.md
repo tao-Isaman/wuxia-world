@@ -158,7 +158,7 @@ Treasure and meetings stop while you are hunting.
 
 It shows the foe, its tier and its kind (human, beast, supernatural). You choose:
 
-- **⚔ ต่อสู้** — fight. Many foes bring weaker companions — wolves, bats, cultists, bandit gangs — and more of them as the hero grows stronger (up to six). The strongest bosses (the bandit king, the cult elder, the bear king) come with their whole gang.
+- **⚔ ต่อสู้** — fight. Many foes bring weaker companions — wolves, bats, cultists, bandit gangs — and more of them as the hero grows stronger (up to six). The strongest bosses (the bandit king, the cult elder, the bear king) come with their whole gang. Once the hero is strong, the ten named villains — เถ้าแก่โจวตลาดมืด, ทูตเซี่ย, ขุนนางหยาน, หัวหน้าโจรชิง, นักฆ่าเงาหยิง, เจ้าลัทธิจ้าวมังกรเทพ, ผู้อาวุโสตู๋ซื่อ, ฮุยเป้า, ดาบเลือดเซียะลาง and ตู๋โซ่ว — can also cross the hero's path with their followers (rarer than the other bosses).
 - **🏃 หนี** — leave. Free against ordinary foes.
 
   Against a **sect hunter** or a **law pursuer** it is a check of `min(90 %, 30 % + (AGI + LUK) / 2)` on base stats (31 % at the start). A failed check forces the fight.

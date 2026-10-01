@@ -4,10 +4,12 @@ import {
   type CharacterId,
 } from "../characters/catalog";
 import { loadCharacterAtlas } from "../characters/sheet";
+import { hasAnimatedSheet } from "../characters/npc-sheets";
+import { WANDER_FREEZE_DISTANCE, createWanderer, stepWanderer, type Wanderer } from "./npc-wander";
 import { worldForeground } from "./world-occlusion";
 import { createWorldLighting } from "./world-lighting";
 import { drawWorldBadge, warmWorldCharacter } from "./world-style";
-import { moveOnWorldGround, planWorldPath, worldFootprints } from "./world-navigation";
+import { moveOnWorldGround, planWorldPath, worldFootprints, worldPointBlocked } from "./world-navigation";
 import { initialWorldPlacement } from "./world-placement";
 import { addGridFrames, canvasTexture, createStage, drawCanvas, stagePixelRatio, type Stage } from "./phaser-stage";
 import {
@@ -81,6 +83,10 @@ export function createWorldRuntime(
   const markers = new Map<string, MarkerVisual>();
   const props = new Map<string, Phaser.GameObjects.Image>();
   const bystanders = new Map<string, { shadow: Phaser.GameObjects.Image; character: CharacterVisual }>();
+  /** Rigged NPCs stroll around their spot; keyed by marker id. */
+  const wanderers = new Map<string, Wanderer>();
+  /** Where a marker stands now: a wandering NPC's current spot, else its authored point. */
+  const markerPoint = (marker: WorldMarker): Point => wanderers.get(marker.id)?.pos ?? toWorld(marker);
   const keys = new Set<string>();
   const abort = new AbortController();
   const particles: { image: Phaser.GameObjects.Image; x: number; y: number }[] = [];
@@ -331,7 +337,7 @@ export function createWorldRuntime(
     if (!marker) return;
     // Disabled actions retain their original explanatory toast.
     if (marker.disabled) { marker.onActivate(); return; }
-    const point = toWorld(marker);
+    const point = markerPoint(marker);
     // Stand beside people and below service signs instead of overlapping their art.
     const approach = marker.kind === "npc" ? { x: point.x + (point.x > WIDTH - 60 ? -38 : 38), y: point.y + 4 }
       : { x: point.x, y: point.y + (marker.kind === "service" ? 34 : 10) };
@@ -383,7 +389,7 @@ export function createWorldRuntime(
     let best: { id: string; y: number } | null = null;
     for (const marker of read().markers) {
       if (!markers.has(marker.id)) continue;
-      const at = toWorld(marker);
+      const at = markerPoint(marker);
       const width = marker.kind === "npc" ? 50 : 44;
       const height = marker.kind === "npc" ? 76 : 52;
       if (Math.abs(point.x - at.x) > width / 2 || point.y > at.y + 8 || point.y < at.y + 8 - height) continue;
@@ -434,7 +440,8 @@ export function createWorldRuntime(
       loadImage(initial.image),
       // Only the controlled hero walks north/south. Stationary NPCs sharing a
       // hero costume need its base poses, not the large direction supplement.
-      Promise.all([...ids].map(async (id) => [id, await loadAtlas(id, id === playerId)] as const)),
+      // Rigged NPCs walk in every direction, so they load it too.
+      Promise.all([...ids].map(async (id) => [id, await loadAtlas(id, id === playerId || hasAnimatedSheet(id))] as const)),
       Promise.all((initial.props ?? []).map(async (prop) => [prop.id, await loadImage(prop.image)] as const)),
     ]);
     if (disposed || failed || !scene) return;
@@ -519,6 +526,7 @@ export function createWorldRuntime(
         const id = npcCharacterId(marker.id);
         character = unique ? makeCharacter(`unique:${marker.id}`, unique, UNIQUE_NPC_SIZE) : makeCharacter(`char:${id}`, atlases.get(id)!, 54);
         character.image.setPosition(point.x, point.y).setDepth(100 + point.y * 10);
+        if (!unique && hasAnimatedSheet(id) && character.directional) wanderers.set(marker.id, createWanderer(marker.id, point));
       } else {
         const key = marker.kind === "exit" ? exitBadge : texture(markerBadge(marker.kind, marker.badge ?? marker.icon), "badge");
         markerIcon = image(key, 8000, 24, 27).setOrigin(0.5, 1).setPosition(point.x, point.y - 5);
@@ -571,7 +579,7 @@ export function createWorldRuntime(
     parent.dataset.playerScreenHeight = String(56 * viewScale);
     const nearbyBounds: { left: number; top: number; width: number; height: number }[] = [];
     for (const marker of read().markers) {
-      const point = toWorld(marker);
+      const point = markerPoint(marker);
       if (Math.hypot(position.x - point.x, position.y - point.y) > 105) continue;
       const visual = markers.get(marker.id);
       if (!visual) continue;
@@ -588,6 +596,7 @@ export function createWorldRuntime(
       }
     }
     parent.dataset.nearbyScreenBounds = JSON.stringify(nearbyBounds);
+    parent.dataset.wanderingNpcs = JSON.stringify(Object.fromEntries([...wanderers].map(([id, w]) => [id, [Math.round(w.pos.x), Math.round(w.pos.y)]])));
     parent.dataset.playerX = position.x.toFixed(1);
     parent.dataset.playerY = position.y.toFixed(1);
     parent.dataset.playerMotion = playerMotion;
@@ -625,12 +634,12 @@ export function createWorldRuntime(
     let nearest: string | null = null;
     let nearestDistance = 105;
     for (const marker of currentMarkers) {
-      const point = toWorld(marker);
+      const point = markerPoint(marker);
       const distance = Math.hypot(position.x - point.x, position.y - point.y);
       if (distance < nearestDistance) { nearest = marker.id; nearestDistance = distance; }
     }
     const lastMarker = currentMarkers.find((marker) => marker.id === lastInteraction);
-    if (!lastMarker || Math.hypot(position.x - toWorld(lastMarker).x, position.y - toWorld(lastMarker).y) > 90) lastInteraction = null;
+    if (!lastMarker || Math.hypot(position.x - markerPoint(lastMarker).x, position.y - markerPoint(lastMarker).y) > 90) lastInteraction = null;
     const focusedMarker = hovered ?? interaction ?? lastInteraction ?? nearest;
     // The action button offers whatever the hero is standing next to.
     const reachable = nearestDistance <= 95 ? nearest : null;
@@ -644,7 +653,14 @@ export function createWorldRuntime(
     for (const marker of currentMarkers) {
       const visual = markers.get(marker.id);
       if (!visual) continue;
-      const point = toWorld(marker);
+      const wanderer = wanderers.get(marker.id);
+      if (wanderer) {
+        const frozen = dt === 0 || reducedMotion || !!presentation.readOnly || marker.id === interaction || marker.id === hovered ||
+          Math.hypot(position.x - wanderer.pos.x, position.y - wanderer.pos.y) < WANDER_FREEZE_DISTANCE;
+        stepWanderer(wanderer, dt, frozen, (spot) => spot.x > 16 && spot.x < WIDTH - 16 && spot.y > 40 && spot.y < HEIGHT - 12 &&
+          !worldPointBlocked(spot, footprints) && Math.hypot(spot.x - position.x, spot.y - position.y) > 36);
+      }
+      const point = markerPoint(marker);
       visual.point = point;
       const distance = Math.hypot(position.x - point.x, position.y - point.y);
       const selected = hovered === marker.id || interaction === marker.id;
@@ -685,9 +701,17 @@ export function createWorldRuntime(
       }
       visual.halo.setVisible(selected || (marker.kind === "npc" && distance < 80));
       if (visual.character) {
-        const idle = CHARACTER_CLIPS.idle;
-        const idleFrame = reducedMotion ? idle.frames[0] : idle.frames[Math.floor((animationTime + visual.phase) * idle.fps) % idle.frames.length];
-        setCharacterFrame(visual.character, idleFrame, distance < 90 ? position.x < point.x : visual.character.facingLeft);
+        if (wanderer?.moving) {
+          // Strolling: the walk clip for the way it heads (north / south on the directional rows).
+          const vertical = wanderer.facing === "north" || wanderer.facing === "south";
+          const clip = CHARACTER_CLIPS[vertical ? (wanderer.facing === "north" ? "walkNorth" : "walkSouth") : "walk"];
+          const frame = clip.frames[Math.floor((animationTime + visual.phase) * clip.fps) % clip.frames.length];
+          setCharacterFrame(visual.character, frame, vertical ? visual.character.facingLeft : wanderer.facing === "west");
+        } else {
+          const idle = CHARACTER_CLIPS.idle;
+          const idleFrame = reducedMotion ? idle.frames[0] : idle.frames[Math.floor((animationTime + visual.phase) * idle.fps) % idle.frames.length];
+          setCharacterFrame(visual.character, idleFrame, distance < 90 ? position.x < point.x : visual.character.facingLeft);
+        }
         visual.character.image.setPosition(point.x, point.y).setDepth(100 + point.y * 10);
       }
       const opacity = marker.disabled ? 0.5 : 1;
@@ -716,7 +740,7 @@ export function createWorldRuntime(
     parent.dataset.guideMarker = target?.id ?? "";
     if (!target) { guideArrow.setVisible(false); guideEdge.setVisible(false); return; }
     const visual = markers.get(target.id);
-    const point = toWorld(target);
+    const point = markerPoint(target);
     const bob = reducedMotion ? 0 : Math.abs(Math.sin(animationTime * 3.4)) * 7;
     const lift = (visual?.character ? 64 + (visual.questMark?.visible ? 30 : 0) : 40) + bob;
     guideArrow.setDisplaySize(26 / viewScale, 28 / viewScale).setPosition(point.x, point.y - lift).setVisible(true);
@@ -784,7 +808,7 @@ export function createWorldRuntime(
               lastInteraction = id;
               const marker = read().markers.find((entry) => entry.id === id);
               if (marker?.kind === "npc") {
-                const point = toWorld(marker);
+                const point = markerPoint(marker);
                 faceMovement(point.x - position.x, point.y - position.y);
               }
               marker?.onActivate();
@@ -803,7 +827,7 @@ export function createWorldRuntime(
         if (interactPressed) {
           interactPressed = false;
           const preferred = read().markers.find((marker) => marker.id === lastInteraction);
-          const nearest = preferred ? { marker: preferred, point: toWorld(preferred) } : read().markers.map((marker) => ({ marker, point: toWorld(marker) }))
+          const nearest = preferred ? { marker: preferred, point: markerPoint(preferred) } : read().markers.map((marker) => ({ marker, point: markerPoint(marker) }))
             .sort((a, b) => Math.hypot(position.x - a.point.x, position.y - a.point.y) - Math.hypot(position.x - b.point.x, position.y - b.point.y))[0];
           if (nearest && Math.hypot(position.x - nearest.point.x, position.y - nearest.point.y) < 100) moveToMarker(nearest.marker.id);
         }
@@ -858,6 +882,7 @@ export function createWorldRuntime(
       delete parent.dataset.playerFrame;
       delete parent.dataset.playerFacing;
       delete parent.dataset.nearbyScreenBounds;
+      delete parent.dataset.wanderingNpcs;
       delete parent.dataset.visibleProps;
       delete parent.dataset.nearbyMarker;
     },

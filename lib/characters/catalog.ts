@@ -1,6 +1,11 @@
 /** Serializable artwork metadata; safe to import in React and pure tests. */
+import { ANIMATED_NPC_IDS, hasAnimatedSheet } from "./npc-sheets";
+
 export const PLAYER_CHARACTER_IDS = ["m1", "m2", "m3", "m4", "f1", "f2", "f3", "f4"] as const;
-export const CHARACTER_IDS = [...PLAYER_CHARACTER_IDS, "elder", "monk", "merchant", "bandit", "feng", "wang", "qing"] as const;
+/** Shared costume sheets: the hero bodies and the NPC archetypes. */
+export const ARCHETYPE_CHARACTER_IDS = [...PLAYER_CHARACTER_IDS, "elder", "monk", "merchant", "bandit", "feng", "wang", "qing"] as const;
+/** Every sheet: the archetypes plus one rigged sheet per animated NPC (its id is the NPC id). */
+export const CHARACTER_IDS = [...ARCHETYPE_CHARACTER_IDS, ...ANIMATED_NPC_IDS] as const;
 export type CharacterId = typeof CHARACTER_IDS[number];
 export type CharacterMotion = "idle" | "walk" | "walkNorth" | "walkSouth" | "attack" | "hurt" | "guard" | "victory" | "defeat";
 export const CHARACTER_GRID = 4;
@@ -45,12 +50,20 @@ export const CHARACTER_CLIPS: Record<CharacterMotion, { frames: readonly number[
 export function characterId(value: string): CharacterId {
   return CHARACTER_IDS.includes(value as CharacterId) ? value as CharacterId : "m1";
 }
-export function characterSheet(id: string): string { return `/art/characters/${characterId(id)}.png`; }
-export function hasDirectionalSheet(id: CharacterId): boolean { return (PLAYER_CHARACTER_IDS as readonly string[]).includes(id); }
+export function characterSheet(id: string): string {
+  const sheet = characterId(id);
+  return hasAnimatedSheet(sheet) ? `/art/characters/npc/${sheet}.png` : `/art/characters/${sheet}.png`;
+}
+export function characterDirectionSheet(id: string): string { return characterSheet(id).replace(/\.png$/, "-directions.png"); }
+export function hasDirectionalSheet(id: CharacterId): boolean {
+  return (PLAYER_CHARACTER_IDS as readonly string[]).includes(id) || hasAnimatedSheet(id);
+}
 
 /** NPCs share costume archetypes; authored portraits and dialogue art stay unique. */
 export function npcCharacterId(id: string): CharacterId {
   id = id.replace(/^npc-/, "");
+  // NPCs with their own rigged sheet use it everywhere.
+  if (hasAnimatedSheet(id)) return id;
   // Match the opening NPCs' authored portraits: young ivory/jade healer,
   // bearded dark-robed magistrate. Do not cast Lin as the elderly archetype.
   if (id === "city_capital_physician_lin") return "m3";

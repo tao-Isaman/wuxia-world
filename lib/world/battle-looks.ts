@@ -42,8 +42,10 @@ export function creatureFrameFor(opponentId: string | null | undefined): number 
   return 0;
 }
 
-/** The NPC an opponent stands for (sparring partners), matched by spar id or build name. */
+/** The NPC an opponent stands for: `look.npc`, else a sparring partner matched by spar id or build name. */
 export function findOpponentNpc(opponentId: string | null | undefined, buildName?: string): NpcDef | undefined {
+  const linked = getOpponent(opponentId)?.look?.npc;
+  if (linked) return NPCS.find((n) => n.id === linked);
   return NPCS.find((n) => (!!opponentId && n.sparOpponentId === opponentId) || (!!buildName && n.name === buildName));
 }
 
@@ -60,8 +62,10 @@ export function opponentLook(opponentId: string | null | undefined, npc?: NpcDef
   const frame = creatureFrameFor(opponentId);
   if (frame !== null) return { kind: "creature", frame, ...variant };
   const sheet = opp?.look?.sheet;
-  const look: UnitLook = { kind: "character", characterId: sheet ? characterId(sheet) : npcCharacterId(npc?.id ?? opponentId ?? "thug"), ...variant };
-  const still = npc ? npcBattleSprite(npc.id) : undefined;
+  // A rigged NPC (its own sheet) plays full clips; other named NPCs keep their still.
+  const npcId = npc?.id ?? opp?.look?.npc;
+  const look: UnitLook = { kind: "character", characterId: sheet ? characterId(sheet) : npcCharacterId(npcId ?? opponentId ?? "thug"), ...variant };
+  const still = npcId ? npcBattleSprite(npcId) : undefined;
   return still ? { ...look, still } : look;
 }
 
