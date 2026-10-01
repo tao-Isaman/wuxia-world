@@ -176,7 +176,7 @@ const npcs: NpcDef[] = [
     likes: ["image_master", "image_inter", "ink", "cooked_meat"], dislikes: ["book_basic"] },
   { id: DING, name: DING_N, locationIds: [MZ], dialogSceneId: `npc_${DING}_talk`,
     description: "พ่อบ้านเฝ้าประตูคฤหาสน์ อดีตจอมยุทธ \"สายฟ้าซ้ายมือ\" ที่บัดนี้เก่งที่สุดเรื่องไล่แขกไม่ได้รับเชิญ",
-    tags: ["servant", "guard"], look: { body: "m1", wander: true }, defenseTier: 2,
+    tags: ["servant", "guard"], look: { body: "m1" }, defenseTier: 2,
     likes: ["spicy_stew", "warrior_belt", "gold"] },
 
   // villa_fuwei
@@ -191,7 +191,7 @@ const npcs: NpcDef[] = [
     likes: ["fur_pelt", "tiger_claw", "silk_fan"], dislikes: ["rock"] },
   { id: SHI, name: SHI_N, locationIds: [FW], dialogSceneId: `npc_${SHI}_talk`, sparOpponentId: SPAR_SHI, sparFameReward: 6,
     description: "หัวหน้าคุ้มกันอาวุโส หนวดเครารก เสียงดังเหมือนฆ้อง คุมเกวียนมายี่สิบปีไม่เคยเสียหีบสักใบ",
-    tags: ["guard", "escort", "martial_artist"], look: { body: "m3", wander: true }, defenseTier: 2,
+    tags: ["guard", "escort", "martial_artist"], look: { body: "m3" }, defenseTier: 2,
     likes: ["cooked_meat", "spicy_stew", "warrior_belt"], dislikes: ["silk_fan"] },
 ];
 
