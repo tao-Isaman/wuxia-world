@@ -6,6 +6,10 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-01
 
+### The last 32 new NPCs painted
+
+- Portraits and bodies for the households of หนานเสียน, อิดเต็ง, เถียนป๋อกวง, เหมียวเหรินเฟิง, เฉิงอิ๋ง, หยานจี and เป่ยฉิว, the Plum Manor, Fuwei, หูเตาถ่าน and หมอเซวี่ย's last two guests. All 68 place NPCs now have their own art: the 35 strollers play their own rigged sheets (`ANIMATED_NPC_IDS` 48 → 65), the 33 who stand have their own sprites.
+
 ### Every new NPC has their own face
 
 - **36 new portraits and painted bodies** (gpt-image-2, in the style of the existing NPC art) for the people of the villages, towns, the palace, the Hui tribe and four homes. The other 32 (the later homes) wait for more image credits and keep their archetype body.

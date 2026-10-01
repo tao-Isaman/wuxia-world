@@ -61,6 +61,23 @@ export const ANIMATED_NPC_IDS = [
   "home_hufei_guest_jiu",
   "home_chengkun_gardener_wu",
   "home_chengkun_maid_cui",
+  "city_lingxiao_coal_hu",
+  "home_xuemuhua_guest_li",
+  "home_xuemuhua_apprentice_dan",
+  "home_nanxian_servant_ashu",
+  "home_nanxian_woodcutter_bai",
+  "home_yideng_farmer_geng",
+  "home_tianboguang_cook_luo",
+  "home_tianboguang_soldier_chen",
+  "home_miaoren_daughter_ruolan",
+  "home_chengying_cousin_lu",
+  "home_chengying_gooseboy_tong",
+  "home_yanji_guard_liu",
+  "home_yanji_maid_chun",
+  "home_beichou_servant_amu",
+  "home_beichou_herder_cao",
+  "villa_meizhuang_painter_danqing",
+  "villa_fuwei_young_lin",
 ] as const;
 export type AnimatedNpcId = typeof ANIMATED_NPC_IDS[number];
 const ANIMATED: ReadonlySet<string> = new Set(ANIMATED_NPC_IDS);
