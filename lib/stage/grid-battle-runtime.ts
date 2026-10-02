@@ -13,6 +13,7 @@ import {
   type UnitLook,
 } from "@/lib/game/grid";
 import { CHARACTER_CLIPS, CHARACTER_FEET_Y, CHARACTER_FRAME_SIZE, characterId, type CharacterMotion } from "@/lib/characters/catalog";
+import { WALK8_FPS, dir8FromVector, walk8Frame, walk8Source, type Dir8 } from "@/lib/characters/walk8";
 import { loadCharacterAtlas } from "@/lib/characters/sheet";
 import { BATTLE_BACKGROUNDS, type BattleBackground } from "./battle-background";
 import { addGridFrames, canvasTexture, createStage, type Stage } from "./phaser-stage";
@@ -88,6 +89,10 @@ interface Actor {
   tint?: number;
   kind: ActorKind;
   directional: boolean;
+  /** Painted eight-way walk cells (heroes, lib/characters/walk8.ts). */
+  walk8: boolean;
+  /** Heading of the current walk step, for walk8 actors. */
+  walkDir: Dir8;
   image: Phaser.GameObjects.Image;
   shadow: Phaser.GameObjects.Ellipse;
   ring: Phaser.GameObjects.Ellipse;
@@ -464,7 +469,7 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
   const lookKey = (look: UnitLook) => look.kind === "creature" ? "creature"
     : look.still ? `still:${look.still}` : `char:${characterId(look.characterId)}`;
 
-  interface LookTexture { key: string; kind: ActorKind; feet: number[]; directional: boolean; w: number; h: number }
+  interface LookTexture { key: string; kind: ActorKind; feet: number[]; directional: boolean; walk8?: boolean; w: number; h: number }
   const textures = new Map<string, Promise<LookTexture>>();
   function textureFor(look: UnitLook): Promise<LookTexture> {
     const key = lookKey(look);
@@ -496,7 +501,7 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
       const atlas = await loadCharacterAtlas(characterId(look.characterId));
       const texture = canvasTexture(scene!, `gb:${key}`, atlas.image);
       addGridFrames(texture, atlas.frameSize, atlas.columns, atlas.rows);
-      return { key: `gb:${key}`, kind: "sheet" as const, feet: [atlas.feetY / atlas.frameSize], directional: atlas.directional,
+      return { key: `gb:${key}`, kind: "sheet" as const, feet: [atlas.feetY / atlas.frameSize], directional: atlas.directional, walk8: atlas.walk8,
         w: atlas.frameSize, h: atlas.frameSize };
     })();
     textures.set(key, pending);
@@ -521,7 +526,7 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
     tagInfo.item.setDepth(31);
     const bars = scene!.add.graphics().setDepth(30);
     const actor: Actor = {
-      id: unit.id, team: unit.team, index, kind: tex.kind, directional: tex.directional,
+      id: unit.id, team: unit.team, index, kind: tex.kind, directional: tex.directional, walk8: !!tex.walk8, walkDir: "E",
       image, shadow, ring, tag: tagInfo.item, tagW: tagInfo.width, tagH: tagInfo.height, bars, barsKey: "",
       dispW, dispH, head,
       u: unit.pos.x + 0.5, v: unit.pos.y + 0.5, hFacing: unit.facing === "left" ? -1 : 1,
@@ -590,6 +595,7 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
         actor.u = a.x + 0.5 + (b.x - a.x) * k;
         actor.v = a.y + 0.5 + (b.y - a.y) * k;
         if (b.x !== a.x) actor.hFacing = b.x > a.x ? 1 : -1;
+        actor.walkDir = dir8FromVector(b.x - a.x, b.y - a.y, actor.walkDir);
         motion = b.y < a.y && actor.directional ? "walkNorth" : b.y > a.y && actor.directional ? "walkSouth" : "walk";
         if (actor.kind !== "sheet" && !reduced) hop = Math.abs(Math.sin(k * Math.PI)) * 9;
       }
@@ -636,6 +642,8 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
       if (motion === "attack" && actor.attack) {
         const a = elapsed - actor.attack.start;
         frame = reduced ? 10 : a < 135 ? 8 : a < HIT_DELAY ? 9 : a < actor.attack.lastImpact + 100 ? 10 + (Math.floor((a - HIT_DELAY) / HIT_GAP) % 2) : 11;
+      } else if (actor.walk8 && motion.startsWith("walk")) {
+        frame = walk8Frame(actor.walkDir, reduced ? null : Math.floor(Math.max(0, age) * WALK8_FPS / 1000) % 4).frame;
       } else {
         const clip = CHARACTER_CLIPS[motion];
         const progress = reduced && motion === "idle" ? 0 : Math.floor(Math.max(0, age) * clip.fps / 1000);
@@ -662,7 +670,8 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
     const walkingVertical = motion === "walkNorth" || motion === "walkSouth";
     actor.image.setPosition(Math.round(x), y - hop * s)
       .setDisplaySize(actor.dispW * s * sx, actor.dispH * s * sy)
-      .setFlipX(walkingVertical ? false : creature ? actor.hFacing > 0 : actor.hFacing < 0)
+      .setFlipX(actor.walk8 && motion.startsWith("walk") ? walk8Source(actor.walkDir).mirror
+        : walkingVertical ? false : creature ? actor.hFacing > 0 : actor.hFacing < 0)
       .setRotation(rotation).setAlpha(alpha)
       .setDepth(5 + actor.v * 2 + actor.index * 0.001 + (actor.attack ? 0.5 : 0));
     if (actor.flashUntil > elapsed) actor.image.setTint(0xffffff).setTintMode(Phaser.TintModes.FILL);
