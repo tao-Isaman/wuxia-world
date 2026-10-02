@@ -38,11 +38,22 @@ test("walking brings foes onto the map; walking into one opens its encounter wit
   expect((await save(page)).pendingEncounter).toBeNull();
   await page.screenshot({ path: "test-results/screenshots/roaming-foe.png" });
 
-  // Tap the foe: the hero walks over and, on contact, the encounter opens.
+  // Tap the foe: the hero walks over and, on contact, the encounter opens. A
+  // foe can stand beyond the zoomed-in view, so first walk toward it until it
+  // is on screen.
   const [[fx, fy]] = JSON.parse((await world.getAttribute("data-foes-at"))!) as [number, number][];
-  const point = await world.evaluate((host: Host, at) => host.worldScreenPoint!(at[0], at[1]), [fx, fy] as [number, number]);
-  await page.mouse.click(point.x, point.y);
+  const box = (await world.boundingBox())!;
   const encounter = page.getByTestId("encounter-screen");
+  for (let i = 0; i < 8; i++) {
+    const point = await world.evaluate((host: Host, at) => host.worldScreenPoint!(at[0], at[1]), [fx, fy] as [number, number]);
+    const margin = 60;
+    const inside = point.x > box.x + margin && point.x < box.x + box.width - margin && point.y > box.y + margin && point.y < box.y + box.height - margin;
+    const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
+    await page.mouse.click(clamp(point.x, box.x + margin, box.x + box.width - margin), clamp(point.y, box.y + margin, box.y + box.height - margin));
+    if (inside) break;
+    await page.waitForTimeout(1_500);
+    if (await encounter.isVisible()) break;
+  }
   await expect(encounter).toBeVisible({ timeout: 20_000 });
   await expect(encounter.getByTestId("power-readout")).toBeVisible();
   expect((await save(page)).pendingEncounter?.returnSceneId).toBe("city_capital");
