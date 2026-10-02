@@ -102,3 +102,7 @@ export {
   type InitialStateOpts,
 } from "./battle";
 export { runAITurn } from "./ai";
+export {
+  POWER_TIERS, powerBreakdown, powerScore, powerTier, powerTierOf, powerOutlook,
+  type PowerTier, type PowerBreakdown, type PowerOutlook,
+} from "./power-tier";

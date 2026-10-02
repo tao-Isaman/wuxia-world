@@ -88,6 +88,13 @@ test("grid battle: tap a tile to move, auto plays to the result, back to the wor
     localStorage.setItem("wusia-world-v1", JSON.stringify(persisted));
   });
   await page.reload();
+  // Before the fight: the foe's power tier and the hero's, then in.
+  const briefing = page.getByTestId("battle-briefing");
+  await expect(briefing).toBeVisible({ timeout: 60_000 });
+  await expect(briefing).toContainText("ระดับพลังของเจ้า");
+  await expect(briefing.getByTestId("power-readout")).toHaveAttribute("data-foe-tier", /^([1-9]|1[0-2])$/);
+  await expect(page.getByTestId("battle-canvas")).toHaveCount(0);
+  await page.getByRole("button", { name: /เข้าต่อสู้/ }).click();
   const battle = page.getByTestId("battle-canvas");
   await expect(battle).toHaveAttribute("data-ready", "true", { timeout: 60_000 });
   // Hero and thief stand on the tactics board; the turn order is shown.
@@ -128,6 +135,7 @@ test("grid battle: unit info by touch, skill bar readable after rotation, no pag
     localStorage.setItem("wusia-world-v1", JSON.stringify(persisted));
   });
   await page.reload();
+  await page.getByRole("button", { name: /เข้าต่อสู้/ }).click();
   const battle = page.getByTestId("battle-canvas");
   await expect(battle).toHaveAttribute("data-ready", "true");
   await page.getByTestId("turn-timeline").getByRole("button", { name: "ดู จอมยุทธ์" }).first().tap();
@@ -185,6 +193,7 @@ test("version 18 saves migrate and beast battles load the creature atlas", async
     localStorage.setItem("wusia-world-v1", JSON.stringify(persisted));
   });
   await page.reload();
+  await page.getByRole("button", { name: /เข้าต่อสู้/ }).click();
   await expect(page.getByTestId("battle-canvas")).toHaveAttribute("data-ready", "true", { timeout: 60_000 });
   await page.screenshot({ path: "test-results/screenshots/beast-battle-desktop.png" });
   const state = await save(page);

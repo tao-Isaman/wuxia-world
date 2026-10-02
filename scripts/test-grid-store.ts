@@ -16,7 +16,8 @@ Object.defineProperty(globalThis, "localStorage", { configurable: true, value: {
 Object.defineProperty(globalThis, "window", { configurable: true, value: { localStorage: globalThis.localStorage } });
 const { useBattleStore, isPlayerTurn } = await import("../store/battle-store");
 const { useWorldStore } = await import("../store/world-store");
-const { ensureBattleStarted } = await import("../lib/world/battle-bridge");
+const { ensureBattleStarted, battleBriefing, previewBriefing } = await import("../lib/world/battle-bridge");
+const { powerScore } = await import("../lib/game/power-tier");
 const { NPCS } = await import("../lib/world/data/npcs");
 const { npcBattleSprite } = await import("../lib/world/data/npc-portraits");
 const { OPPONENTS, getOpponent } = await import("../lib/world/data/opponents");
@@ -86,6 +87,28 @@ function playOut(maxTurns = 400): void {
 }
 
 // ─── Bridge start ─────────────────────────────────────────────────────
+check("a staged fight waits on its briefing: the foe's power tier is the fight's own, and gear does not count", () => {
+  newGame();
+  useWorldStore.setState({ pendingBattle: { opponentId: "bandit_chief", onWin: "city_capital", onLose: "city_capital", withPack: true } });
+  assert.equal(bs().state, null, "nothing starts until the player goes in");
+  const hero = useWorldStore.getState().playerBuild;
+  const briefing = battleBriefing(hero)!;
+  assert.ok(briefing, "the pending fight is briefed");
+  assert.equal(briefing.hero.score, powerScore(hero!));
+  assert.ok(briefing.foe.tier.tier >= 1 && briefing.foe.tier.tier <= 12);
+  // The encounter screen's preview reads the same fight.
+  assert.deepEqual(previewBriefing(hero, "bandit_chief")!.foe, briefing.foe);
+  // Equipment never raises the hero's tier.
+  const geared = { ...hero!, equipment: { ...hero!.equipment, W: "W3" } };
+  assert.equal(battleBriefing(geared)!.hero.score, briefing.hero.score);
+  ensureBattleStarted();
+  const foe = st().units.find((u) => u.id === "B")!;
+  assert.equal(powerScore(foe.build), briefing.foe.score, "the briefed foe is the one fought");
+  assert.equal(st().units.filter((u) => u.team === "enemy").length, 1 + briefing.pack.length);
+  bs().reset();
+  useWorldStore.setState({ pendingBattle: null });
+});
+
 check("bridge: pendingBattle starts a 1v1 grid battle with world HP/MP and looks", () => {
   newGame({ playerBodyId: "f2", currentHp: 30, currentMp: 5 });
   fight("thug");

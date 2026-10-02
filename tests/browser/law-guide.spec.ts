@@ -83,6 +83,7 @@ test("retreat: ถอยหนี leaves a fight with no winner and no rewards",
   await page.addInitScript(() => { Math.random = () => 0; });
   await patch(page, { currentSceneId: "city_capital", lastLocationId: "city_capital",
     pendingBattle: { opponentId: "petty_thief", onWin: "city_capital", onLose: "city_capital" } }, false);
+  await page.getByRole("button", { name: /เข้าต่อสู้/ }).click();
   const battle = page.getByTestId("battle-canvas");
   await expect(battle).toHaveAttribute("data-ready", "true", { timeout: 60_000 });
   await expect(page.getByRole("button", { name: "ตั้งรับ", exact: true })).toHaveCount(0);

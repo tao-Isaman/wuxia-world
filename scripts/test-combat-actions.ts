@@ -1,10 +1,13 @@
 import assert from "node:assert/strict";
 import { makeContext, makeInitialState, calcSkillDamage, resolveSkill, resolveArtActive, predictTurnOrder, getNextTurn } from "../lib/game/battle";
 import { tickEffects } from "../lib/game/effects";
-import { SKILLS, ARTS, getSkill } from "../lib/game/data";
+import { SKILLS, ARTS, getSkill, getArt } from "../lib/game/data";
 import { resolveCombatAction, recoveryAmount, GUARD_MP_COST, fleeChance } from "../lib/game/combat-actions";
 import { useBattleStore } from "../store/battle-store";
 import type { CharacterBuild } from "../lib/game/types";
+import { combinedStats } from "../lib/game/derive";
+import { computeConflictFactors } from "../lib/game/skill-conflict";
+import { POWER_TIERS, powerBreakdown, powerScore, powerTierOf, powerOutlook } from "../lib/game/power-tier";
 
 const attack = SKILLS.find((skill) => skill.ti === 0 && skill.at === "phy")!;
 const build: CharacterBuild = {
@@ -241,6 +244,32 @@ check("retreat: odds follow Spd; success ends the fight with no winner, failure 
     assert.equal(lost.lastCast?.name, "ถอยหนี");
     assert.equal(resolveCombatAction(won, ctx, "flee", 5000), false, "no actions after escaping");
   } finally { Math.random = random; }
+});
+
+check("power tiers: twelve named steps from stats, inner arts and moves; equipment never counts", () => {
+  assert.equal(POWER_TIERS.length, 12);
+  assert.deepEqual(POWER_TIERS.map((t) => t.tier), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  for (let i = 1; i < POWER_TIERS.length; i++) assert.ok(POWER_TIERS[i].min > POWER_TIERS[i - 1].min, "thresholds rise");
+  assert.equal(new Set(POWER_TIERS.map((t) => t.name)).size, 12, "every tier has its own name");
+  assert.equal(powerTierOf(0).tier, 1);
+  assert.equal(powerTierOf(POWER_TIERS[4].min).tier, 5);
+  assert.equal(powerTierOf(POWER_TIERS[4].min - 1).tier, 4);
+  assert.equal(powerTierOf(1e9).tier, 12);
+  const parts = powerBreakdown(build);
+  const combined = combinedStats(build, computeConflictFactors(build, { getSkill, getArt }));
+  assert.equal(parts.stats, Object.values(combined).reduce((a, b) => a + b, 0), "base stats plus the move's own bonus");
+  assert.equal(parts.moves, Math.round(attack.bp * 0.5 / 2), "half the slotted move's level-1 power");
+  assert.equal(parts.arts, 0);
+  // Gear changes nothing.
+  const geared: CharacterBuild = { ...build, equipment: { ...build.equipment, W: "W3" } };
+  assert.equal(powerScore(geared), powerScore(build));
+  // Training does: stats, a higher move level, an inner art.
+  assert.ok(powerScore({ ...build, stats: { ...build.stats, STR: 20 } }) > powerScore(build));
+  assert.ok(powerScore({ ...build, skillLevels: { [attack.id]: 10 } }) > powerScore(build));
+  const art = ARTS.find((a) => a.id !== "none" && a.ti === 2)!;
+  assert.equal(powerBreakdown({ ...build, artId: art.id, artLevel: 4, learnedArtIds: [art.id], artLevels: { [art.id]: 4 } }).arts, 12);
+  assert.deepEqual([powerOutlook(3, 6), powerOutlook(3, 4), powerOutlook(3, 3), powerOutlook(3, 2), powerOutlook(5, 1)],
+    ["deadly", "stronger", "even", "weaker", "trivial"]);
 });
 
 console.log(`${checks} combat action checks passed`);

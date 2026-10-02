@@ -92,6 +92,7 @@ test("first errand leads to safe training, recovery, and an earned skill upgrade
   await expect(page.getByRole("dialog")).toContainText("ศิษย์ฝึกหัดอาเฉิง");
   await expect(page.getByRole("dialog")).toContainText("แพ้ไม่เสียชีวิต");
   await page.getByRole("button", { name: "ฝึกประลองฟรี", exact: true }).click();
+  await page.getByRole("button", { name: /เข้าต่อสู้/ }).click();
   await expect(page.getByTestId("battle-canvas")).toHaveAttribute("data-ready", "true");
   await expect(page.getByTestId("battle-canvas")).toHaveAttribute("data-battle-background", "capital-training");
   await expect(page.getByTestId("battle-canvas")).toHaveAttribute("data-background-image", "/art/battle-capital-training.png");

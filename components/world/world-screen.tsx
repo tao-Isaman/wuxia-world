@@ -14,7 +14,6 @@ import {
   getScene,
   type LocationScene,
 } from "@/lib/world";
-import { ensureBattleStarted } from "@/lib/world/battle-bridge";
 import { StartScreen } from "./start-screen";
 import { DialogStage, type DialogSpeaker } from "./dialog-stage";
 import { LocationView } from "./location-view";
@@ -25,6 +24,7 @@ import { MenuBar } from "./menu-bar";
 import { MapHud } from "./map-hud";
 import { GameOverScreen } from "./game-over-screen";
 import { EncounterScreen } from "./encounter-screen";
+import { BattleBriefingScreen } from "./battle-briefing";
 import { LoadingOverlay } from "./loading-overlay";
 import { ToastStack } from "./toast-stack";
 import { ConfirmDialog } from "./confirm-dialog";
@@ -134,12 +134,6 @@ export function WorldScreen() {
       : null;
   }, [hydrated, hasGame, gameOver, pendingBattle, pendingEncounter, mappedLocation, scene, stagedSpeaker]);
 
-  // Defensive: if pendingBattle is set but the (unpersisted) battle store
-  // isn't running yet, kick it off from React's lifecycle.
-  useEffect(() => {
-    if (pendingBattle && !battleStateExists) ensureBattleStarted();
-  }, [pendingBattle, battleStateExists]);
-
   if (!hydrated) {
     return (
       <Panel padding="p-8" className="text-center">
@@ -161,8 +155,15 @@ export function WorldScreen() {
     body = <StartScreen />;
   } else if (gameOver) {
     body = <GameOverScreen />;
+  } else if (pendingBattle && !battleStateExists) {
+    // A staged fight waits on the briefing (foe and power tiers); a reload
+    // mid-fight lands here too and restarts from the saved HP / MP.
+    body = (
+      <MapBackdrop bottom hud="status">
+        <BattleBriefingScreen />
+      </MapBackdrop>
+    );
   } else if (pendingBattle) {
-    void battleStateExists; // re-render when battle state flips
     body = (
       <MapBackdrop>
         <BattleArena mode="world" onContinue={acknowledge} />
