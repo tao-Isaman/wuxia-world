@@ -3,10 +3,8 @@
 // who fit them (a river fisherman's water sword, a Tibetan temple's
 // dragon-elephant art, an ice-cave scholar's secret fire fist…), plus a few
 // side quests for people who had little to do, two place activities and two
-// place meetings. See lib/world/data/places/types.ts.
 import type { DialogScene, QuestDef, SceneLine, Condition } from "../../types";
 import type { ActivityDef } from "../activities";
-import type { MeetEventDef } from "../random-events";
 import type { StoryOpponentSpec } from "../../story/types";
 import type { PlaceContent } from "./types";
 
@@ -829,62 +827,8 @@ const ACTIVITIES: ActivityDef[] = [
 // ═══════════════════════════════════════════════════════════════════════
 // PLACE MEETINGS
 // ═══════════════════════════════════════════════════════════════════════
-const EVENTS: MeetEventDef[] = [
-  { id: "pev_heilong_glinting_hook", weight: 2, dialogSceneId: "pev_heilong_glinting_hook", locationIds: ["pool_heilong"], once: true },
-  { id: "pev_meihua_dawn_spear", weight: 2, dialogSceneId: "pev_meihua_dawn_spear", locationIds: ["village_meihua"], once: true },
-];
 
 const EVENT_SCENES: DialogScene[] = [
-  {
-    kind: "dialog",
-    id: "pev_heilong_glinting_hook",
-    lines: [
-      narr("บางอย่างสะท้อนแสงอยู่ในน้ำตื้นริมสระมังกรดำ เป็นขอเกี่ยวทองเหลืองเก่าที่ยังผูกถุงผ้าเปื่อย ๆ ติดอยู่"),
-      narr("ในถุงมีเหรียญเก่าสองสามเหรียญ คงเป็นของชาวประมงที่ทำหล่นไว้นานแล้ว"),
-    ],
-    choices: [
-      { text: "เก็บไว้เอง", next: "pool_heilong", effects: [{ t: "addGold", amount: 40 }] },
-      {
-        text: "นำไปคืนต่านเหลาตู",
-        next: "pev_heilong_glinting_hook_return",
-        effects: [{ t: "addNpcRelationship", npcId: TAN, amount: 3 }, { t: "addTrait", trait: "good", amount: 1 }],
-      },
-    ],
-  },
-  {
-    kind: "dialog",
-    id: "pev_heilong_glinting_hook_return",
-    lines: [
-      say("ต่านเหลาตู", "เบ็ดของพ่อข้า! ทำหล่นไว้ตั้งแต่ข้ายังเด็ก ข้านึกว่ามังกรเอาไปแล้ว"),
-      say("ต่านเหลาตู", "เหรียญเจ้าเก็บไว้เถอะ เบ็ดนี่สำคัญกว่าเยอะ"),
-    ],
-    choices: [{ text: "ยิ้มรับ", next: "pool_heilong", effects: [{ t: "addGold", amount: 40 }] }],
-  },
-  {
-    kind: "dialog",
-    id: "pev_meihua_dawn_spear",
-    lines: [
-      narr("รุ่งสาง หมอกยังไม่จาง เจ้าเห็นเปาเหล็กก้านยืนอยู่หลังบ้านคนเดียว มือกำไม้คานหาบน้ำแทนทวน"),
-      narr("เขาแทงไม้ออกไปครั้งเดียว หมอกตรงหน้าแหวกเป็นช่อง แล้วเขาก็ยืนนิ่งอยู่อย่างนั้นนาน"),
-    ],
-    choices: [
-      {
-        text: "ทักทายแล้วชมฝีมือ",
-        next: "pev_meihua_dawn_spear_talk",
-        effects: [{ t: "addNpcRelationship", npcId: BAO, amount: 2 }],
-      },
-      { text: "เดินผ่านไปเงียบ ๆ", next: "village_meihua" },
-    ],
-  },
-  {
-    kind: "dialog",
-    id: "pev_meihua_dawn_spear_talk",
-    lines: [
-      say("เปาเหล็กก้าน", "เห็นด้วยรึ... ไม่ได้ฝึกหรอก มือมันขยับเอง ทหารเก่าก็อย่างนี้"),
-      say("เปาเหล็กก้าน", "อย่าบอกใครนะ ชาวบ้านจะหาว่าข้าบ้าแทงหมอก"),
-    ],
-    choices: [{ text: "รับปากเก็บเป็นความลับ", next: "village_meihua" }],
-  },
 ];
 
 export const CONTENT: PlaceContent = {
@@ -892,6 +836,5 @@ export const CONTENT: PlaceContent = {
   quests: QUESTS,
   scenes: [...SCENES, ...EVENT_SCENES],
   activities: ACTIVITIES,
-  events: EVENTS,
   opponents: OPPONENTS,
 };

@@ -62,7 +62,7 @@ import { evaluateCondition } from "@/lib/world/conditions";
 import { KIDNAP_RETURN_DAYS, npcPresent } from "@/lib/world/npc-presence";
 import { GIFT_REACTION_LINE, giftOutcome, giftWaitDays, giftable, type GiftReaction } from "@/lib/world/gifts";
 import { tickAllNamedNpcs } from "@/lib/world/npc-tick";
-import { releaseFromJail, rollPlaceMeeting, rollWalkEvent } from "@/lib/world/effects";
+import { releaseFromJail, rollFoeSpawn, rollWalkEvent } from "@/lib/world/effects";
 import { WANTED_DECAY_DAYS, WANTED_MAX, describeSentence, isLawOpponent, sentenceLeft } from "@/lib/world/law";
 import { JAIL_SCENE_ID, getActivity, jailDiceChance, jailEscapeChance } from "@/lib/world/data/activities";
 import { maintainRumors, seedLoreRumors, RUMOR_SEEN_CAP } from "@/lib/world/rumor-engine";
@@ -476,7 +476,13 @@ interface WorldStore extends WorldStateData {
   // offer and stays put.
   acceptEncounter: () => void;
   // One walk tick (the map runtime calls this every WALK_TICK_UNITS walked).
-  walkTick: () => void;
+  // `pickSpot` gives a free, reachable spot (map percentages) for a foe to
+  // appear at; without it no foe spawns.
+  walkTick: (pickSpot?: () => { x: number; y: number } | null) => void;
+  // Foes waiting on the map (lib/world/data/random-events.ts FOE_SPAWN): not
+  // saved, so a reload clears them. Touching one opens its encounter.
+  roamingFoes: RoamingFoe[];
+  engageFoe: (foeId: string) => void;
   // Map activities (see lib/world/data/activities.ts) — the jail's labour,
   // dice, meditation, gate and escape. Returns a message for the toast.
   doActivity: (id: string) => ActivityResult;
@@ -579,7 +585,9 @@ function encounterBattle(opponentId: string, returnSceneId: string): NonNullable
 // can happen anywhere along the way. The player's home is safe ground.
 const WALK_TICK_CHANCE = 0.4;
 const SAFE_SCENES = new Set(["home_player", JAIL_SCENE_ID]);
-const PLACE_MEET_CHANCE = 0.04;
+let foeSerial = 0;
+/** A foe standing on a map (percentages of the map), waiting for the hero. */
+export interface RoamingFoe { id: string; opponentId: string; locationId: string; x: number; y: number }
 /** Test/QA switch: localStorage["wuxia-random-events"] = "off" disables walk events. */
 function walkEventsDisabled(): boolean {
   try { return typeof localStorage !== "undefined" && localStorage.getItem("wuxia-random-events") === "off"; } catch { return false; }
@@ -2321,24 +2329,45 @@ export const useWorldStore = create<WorldStore>()(
         });
       },
 
-      walkTick: () => {
+      walkTick: (pickSpot) => {
         const s = get();
         if (!s.hasGame || s.gameOver || s.pendingBattle || s.pendingEncounter || walkEventsDisabled()) return;
         const scene = getScene(s.currentSceneId);
         if (!scene || (scene.kind !== "location" && scene.kind !== "route")) return;
+        // Safe ground: no foes, no law.
+        if (SAFE_SCENES.has(scene.id)) return;
+        // Foes only wait on the map they appeared on.
+        const here = s.roamingFoes.filter((foe) => foe.locationId === scene.id);
         const draft = draftFrom(s);
-        if (SAFE_SCENES.has(scene.id)) {
-          // Safe ground: only the place's own meetings (no fights, no law).
-          if (scene.id === JAIL_SCENE_ID) return;
-          rollPlaceMeeting(draft, PLACE_MEET_CHANCE);
-          if (draft.currentSceneId !== s.currentSceneId) set({ ...draft });
+        rollWalkEvent(draft, WALK_TICK_CHANCE);
+        if (draft.pendingEncounter) {
+          if (isLawOpponent(draft.pendingEncounter.opponentId)) {
+            appendActionLog(draft, "encounter", `ถูกตามจับ! หมายจับ ${draft.wanted}/${WANTED_MAX}`);
+          }
+          set({ ...draft, roamingFoes: here });
           return;
         }
-        rollWalkEvent(draft, WALK_TICK_CHANCE);
-        if (draft.pendingEncounter && isLawOpponent(draft.pendingEncounter.opponentId)) {
-          appendActionLog(draft, "encounter", `ถูกตามจับ! หมายจับ ${draft.wanted}/${WANTED_MAX}`);
+        const opponentId = pickSpot ? rollFoeSpawn(draft, here.length) : null;
+        const spot = opponentId ? pickSpot!() : null;
+        if (opponentId && spot) {
+          set({ roamingFoes: [...here, { id: `foe${++foeSerial}`, opponentId, locationId: scene.id, x: spot.x, y: spot.y }] });
+        } else if (here.length !== s.roamingFoes.length) {
+          set({ roamingFoes: here });
         }
-        if (draft.pendingEncounter || draft.currentSceneId !== s.currentSceneId || draft.jailCityId !== s.jailCityId) set({ ...draft });
+      },
+
+      roamingFoes: [],
+      engageFoe: (foeId) => {
+        const s = get();
+        const foe = s.roamingFoes.find((f) => f.id === foeId);
+        if (!foe) return;
+        const roamingFoes = s.roamingFoes.filter((f) => f.id !== foeId);
+        if (s.pendingBattle || s.pendingEncounter || foe.locationId !== s.currentSceneId) { set({ roamingFoes }); return; }
+        // Face it on the fight-or-flee screen; either way it is gone from the map.
+        const draft = draftFrom(s);
+        draft.lastLocationId = s.currentSceneId;
+        draft.pendingEncounter = { opponentId: foe.opponentId, returnSceneId: s.currentSceneId };
+        set({ ...draft, roamingFoes });
       },
 
       doActivity: (id) => {

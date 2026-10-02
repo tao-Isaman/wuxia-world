@@ -9,12 +9,9 @@ import type {
 import { TRAIT_LABEL } from "./types";
 import { getItem, getNpc, getOpponent } from "./data";
 import { getQuest } from "./data/quests";
-import { getScene } from "./data/scenes";
 import { SECT_MEMBERSHIPS } from "./data/sect-memberships";
 import {
-  EVENT_PROBABILITY,
-  MEET_EVENTS,
-  TREASURE_EVENTS,
+  FOE_SPAWN,
   applyOpponentStatScale,
   fightEventsForLocation,
   playerPowerIndex,
@@ -383,9 +380,10 @@ export function releaseFromJail(state: WorldStateData): void {
 
 // ─── Walk ticks ────────────────────────────────────────────────────────
 // Called by the world store for every stretch the player walks on a map
-// (see WALK_TICK_UNITS). Rolls, in order: the law (if wanted), a sect
-// hunter (if betrayed), then fight / treasure / meet bands. `chanceScale`
-// shrinks the per-trip probabilities to per-stretch ones.
+// (see WALK_TICK_UNITS). The law (if wanted) and a sect hunter (if betrayed)
+// may catch up at once; otherwise `rollFoeSpawn` may put a foe on the map,
+// which waits there until the hero touches it (lib/world/roaming-foes in the
+// store, drawn by the map runtime).
 /** A named villain (`look.npc`) the hero has killed or carried off, or who died, never ambushes again. */
 export function encounterFoeAvailable(state: Pick<WorldStateData, "npcExt" | "assassinatedNpcIds" | "kidnappedNpcIds">, opponentId: string): boolean {
   const npcId = getOpponent(opponentId)?.look?.npc;
@@ -394,11 +392,12 @@ export function encounterFoeAvailable(state: Pick<WorldStateData, "npcExt" | "as
     !(state.assassinatedNpcIds ?? []).includes(npcId) && !(state.kidnappedNpcIds ?? []).includes(npcId);
 }
 
+/** The law or a sect hunter catching up: sets `pendingEncounter` when one does. */
 export function rollWalkEvent(state: WorldStateData, chanceScale: number): void {
+  void chanceScale; // the law and hunters roll at full odds per tick
   if (!state.playerBuild) return;
 
-  // Pin the map as lastLocationId so the upcoming event dialog's "ปิด"
-  // returns here even though we are about to redirect away from it.
+  // Pin the map as lastLocationId so the encounter returns here.
   state.lastLocationId = state.currentSceneId;
 
   // Wanted players: the law may catch up first (lib/world/law.ts).
@@ -412,119 +411,38 @@ export function rollWalkEvent(state: WorldStateData, chanceScale: number): void 
     return;
   }
 
-  // Hunt boost — when the player has an active kill-quest stage AND
-  // the target opponent spawns in this zone, the encounter rate jumps
-  // to EVENT_PROBABILITY.fightHunting (default 0.80) and the
-  // encounter pool is restricted to those targets. Treasure / meet
-  // bands are suppressed during the hunt so the player isn't pulled
-  // off the trail by flavor events. Falls back to the normal 0.15 +
-  // full pool when no target fits the current zone.
-  const huntTargets = collectActiveHuntTargets(state);
-  // Apply player-power-driven scaling + tier reshape to upcoming
-  // random encounters. The scale multiplier is module-level state
-  // in opponents.ts — set it BEFORE the bridge constructs the
-  // opponent's CharacterBuild so stats are scaled at build time.
-  const power = playerPowerIndex(state);
-  applyOpponentStatScale(state);
-  const zonePool = fightEventsForLocation(state.lastLocationId, power).filter((ev) => encounterFoeAvailable(state, ev.opponentId));
-  const huntPool =
-    huntTargets.size > 0
-      ? zonePool.filter((ev) => huntTargets.has(ev.opponentId))
-      : [];
-  const huntActive = huntPool.length > 0;
-
-  const luk = state.playerBuild.stats.LUK;
-  const fightP = (huntActive
-    ? EVENT_PROBABILITY.fightHunting
-    : EVENT_PROBABILITY.fight) * chanceScale;
-  const treasureP = huntActive
-    ? 0
-    : chanceScale * Math.min(
-        EVENT_PROBABILITY.treasureCap,
-        EVENT_PROBABILITY.treasureBase + luk / EVENT_PROBABILITY.treasureLukDivisor,
-      );
-  const meetP = huntActive
-    ? 0
-    : chanceScale * Math.min(
-        EVENT_PROBABILITY.meetCap,
-        EVENT_PROBABILITY.meetBase + luk / EVENT_PROBABILITY.meetLukDivisor,
-      );
-
-  // Sect-hunter ambush — 30% chance per random-event roll if the
-  // player has any "betrayed" sect membership. Picks one betrayed
-  // sect at random and spawns its `hunter_<sectId>` opponent.
-  // Overrides the normal fight roll entirely (treasure / meet are
-  // also skipped — a hunter doesn't care about flowers and herbs).
+  // Sect-hunter ambush — 30% chance per tick if the player has any
+  // "betrayed" sect membership. Picks one betrayed sect at random and
+  // spawns its `hunter_<sectId>` opponent.
   const betrayedSects: string[] = [];
   for (const [sid, m] of Object.entries(state.sectMembership)) {
     if (m && m.status === "betrayed") betrayedSects.push(sid);
   }
   if (betrayedSects.length > 0 && Math.random() < 0.3) {
     const sid = betrayedSects[Math.floor(Math.random() * betrayedSects.length)]!;
-    state.flags._skipEventRoll = true;
+    applyOpponentStatScale(state);
     state.pendingEncounter = {
       opponentId: `hunter_${sid}`,
       returnSceneId: state.lastLocationId,
     };
-    return;
   }
-
-  const r = Math.random();
-
-  if (r < fightP) {
-    // During a hunt, restrict the pool to the quest target(s) so the
-    // boosted rate actually advances the quest instead of spinning
-    // up unrelated tier-1 humans.
-    const pool = huntActive ? huntPool : zonePool;
-    const ev = pickWeighted(pool, Math.random());
-    if (!ev) return;
-    state.flags._skipEventRoll = true;
-    // Stage as a pending encounter — the encounter screen offers
-    // fight / flee. Only "fight" promotes this to pendingBattle.
-    state.pendingEncounter = {
-      opponentId: ev.opponentId,
-      returnSceneId: state.lastLocationId,
-    };
-    return;
-  }
-  if (r < fightP + treasureP) {
-    const ev = pickWeighted(TREASURE_EVENTS, Math.random());
-    if (!ev) return;
-    state.flags._skipEventRoll = true;
-    state.currentSceneId = ev.dialogSceneId;
-    const dest = getScene(ev.dialogSceneId);
-    if (dest?.onEnter) applyEffects(state, dest.onEnter);
-    return;
-  }
-  if (r < fightP + treasureP + meetP) {
-    startMeeting(state, false);
-    return;
-  }
-  // r ≥ all bands → nothing happens; player just sees the location.
-  return;
 }
 
-// Place events of where the hero walks join the anywhere-events (unless
-// `placeOnly`); once-only events and conditions filter the pool.
-function startMeeting(state: WorldStateData, placeOnly: boolean): boolean {
-  const here = state.currentSceneId;
-  const pool = MEET_EVENTS.filter((e) => (e.locationIds ? e.locationIds.includes(here) : !placeOnly) &&
-    (!e.once || !state.flags[`meet:${e.id}`]) && (!e.condition || evaluateCondition(state, e.condition)));
-  const ev = pickWeighted(pool, Math.random());
-  if (!ev) return false;
-  state.lastLocationId = here;
-  if (ev.once) state.flags[`meet:${ev.id}`] = true;
-  state.flags._skipEventRoll = true;
-  state.currentSceneId = ev.dialogSceneId;
-  const dest = getScene(ev.dialogSceneId);
-  if (dest?.onEnter) applyEffects(state, dest.onEnter);
-  return true;
-}
-
-/** Safe ground (the hero's home): no fights or treasure, only the place's own meetings. */
-export function rollPlaceMeeting(state: WorldStateData, chance: number): void {
-  if (!state.playerBuild || Math.random() >= chance) return;
-  startMeeting(state, true);
+/**
+ * Which foe (if any) turns up on the map this walk tick. Foes come from the
+ * zone's pool (cities: people; the wilds: mostly beasts; sects and temples:
+ * spirits too), shaped by the hero's power. While the hero hunts a kill-quest
+ * target that lives here, spawns are likelier and only those targets appear.
+ */
+export function rollFoeSpawn(state: WorldStateData, present: number): string | null {
+  if (!state.playerBuild || present >= FOE_SPAWN.maxPerMap) return null;
+  const power = playerPowerIndex(state);
+  const pool = fightEventsForLocation(state.currentSceneId, power).filter((ev) => encounterFoeAvailable(state, ev.opponentId));
+  const hunt = collectActiveHuntTargets(state);
+  const huntPool = hunt.size ? pool.filter((ev) => hunt.has(ev.opponentId)) : [];
+  const hunting = huntPool.length > 0;
+  if (Math.random() >= (hunting ? FOE_SPAWN.huntChance : FOE_SPAWN.chance)) return null;
+  return pickWeighted(hunting ? huntPool : pool, Math.random())?.opponentId ?? null;
 }
 
 // Convenience: apply an array in order. After the batch runs, we tick the

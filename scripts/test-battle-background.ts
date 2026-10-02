@@ -49,12 +49,14 @@ try {
   useWorldStore.getState().startNewGame({ name: "Battle origin test" });
   useWorldStore.getState().gotoScene("route_home_player__to__city_capital");
   assert.equal(useWorldStore.getState().pendingEncounter, null, "the road scene itself has no random arrival roll");
-  // Arrival itself never rolls; a walk tick in the city does. No saved origin
+  // Arrival itself never rolls; a foe met while walking in the city does. No saved origin
   // fields are invented or edited. Then accept through the real encounter action.
   Math.random = () => 0;
   useWorldStore.getState().travelRoute("city_capital");
   assert.equal(useWorldStore.getState().pendingEncounter, null, "arriving is not an encounter roll");
-  useWorldStore.getState().walkTick();
+  // Walking spawns a foe on the map; walking into it opens the encounter.
+  useWorldStore.getState().walkTick(() => ({ x: 40, y: 60 }));
+  useWorldStore.getState().engageFoe(useWorldStore.getState().roamingFoes[0]!.id);
   const arrival = useWorldStore.getState();
   assert.equal(arrival.currentSceneId, "city_capital");
   assert.equal(arrival.lastLocationId, "city_capital");

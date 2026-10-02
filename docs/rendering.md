@@ -29,7 +29,7 @@ How the game is drawn and operated: the Phaser stage, the world map runtime, col
 | Stage | `lib/stage/phaser-stage.ts` (`createStage`, `canvasTexture`, `addGridFrames`, `drawCanvas`, `stagePixelRatio`) |
 | World runtime | `lib/stage/world-runtime.ts` (`createWorldRuntime`); host React component `components/game/world-canvas.tsx` |
 | Pure world helpers | `lib/stage/types.ts` (markers, `WALK_TICK_UNITS`, session map positions), `world-navigation.ts`, `world-footprints-data.ts`, `world-placement.ts`, `world-map-probe.ts`, `world-occlusion.ts`, `world-lighting.ts`, `world-vignettes.ts`, `world-style.ts` |
-| Battle renderer | `lib/stage/grid-battle-runtime.ts`, `battle-vfx.ts`, `cast-vfx.ts` (pure), `battle-background.ts` (pure); host `components/game/battle-canvas.tsx` |
+| Battle renderer | `lib/stage/grid-battle-runtime.ts`, `battle-vfx.ts`, `cast-vfx.ts` (pure), `hero-motion.ts` (pure), `battle-background.ts` (pure); host `components/game/battle-canvas.tsx` |
 | Cutscenes | `lib/stage/cutscene-runtime.ts` (`createCutsceneRuntime`); host `components/world/cutscene-player.tsx` (+ `.module.css`) — see [story-quests.md](story-quests.md#cutscenes) |
 | Characters | `lib/characters/catalog.ts`, `sheet.ts`, `walk-cycle.ts`; `components/game/character-preview.tsx` |
 | World UI | `components/world/` — `world-screen.tsx` (root), `location-view.tsx`, `location-map.tsx`, `route-map-view.tsx`, `route-view.tsx`, `dialog-stage.tsx`, `choice-panel.tsx`, `encounter-screen.tsx`, `map-hud.tsx`, `menu-bar.tsx`, `quest-tracker.tsx`, `quest-log.tsx`, `rest-quick-action.tsx`, `quest-completion-receipt.tsx`, `confirm-dialog.tsx`, `loading-overlay.tsx`, `toast-stack.tsx`, rumor components, `popups/` |
@@ -113,6 +113,7 @@ Both runtimes are loaded with a dynamic `import()` in the browser only. The host
   - One boxed caption at 10000: hovered, else the walk target, else the last used, else the nearest within 105.
   - The hero's ivory chevron at 10001; the off-screen guide pointer at 12000.
 - **Sizes.** Hero 56 units tall; archetype NPCs 54; bystanders 51; unique NPC sprites 50.
+- **Roaming foes.** `presentation.foes` (the store's `roamingFoes` for this map) is read every frame, so foes appear and vanish without a rebuild. Each is drawn from its `opponentLook`: a character sheet idling and turning to watch the hero, or a creature-atlas frame breathing, tinted and sized by the look, with a red ⚔ name tag at 9020. Within 30 units of the hero (`FOE_TOUCH`) it calls `onEngage` once. The runtime also picks their spots for the store (`pickFoeSpot`: 150–320 units away, unblocked, reachable, clear of markers and other foes) through the walk-tick callback.
 - **Guide arrow.** A jade arrow bobs over the marker flagged `guide` (the tracked quest's target). When that marker is off screen, a pulsing edge pointer turns toward it. Published as `data-guide-marker`.
 - **Occluders.** Foreground cut-outs from the painting, sorted against feet (`world-occlusion.ts`). Only `home_player` and `city_capital` have them.
 - **Lighting.** A flat veil over the scene (`world-lighting.ts`). Night fades in from ชั่วยาม 8 and is full from 9. Lantern pools exist only on `home_player` and `city_capital`; they flicker at about 10 fps, except under reduced motion.
@@ -138,6 +139,7 @@ Both runtimes are loaded with a dynamic `import()` in the browser only. The host
 | `data-visible-props` | the story props currently shown |
 | `data-nearby-marker` | the marker the action button targets |
 | `data-guide-marker` | the marker the guide arrow points at |
+| `data-foes`, `data-foe-ids`, `data-foes-at` | roaming foes drawn: count, ids, map positions (JSON); test hook `host.worldScreenPoint(x, y)` gives a map point's viewport point |
 | `data-player-screen-*`, `data-nearby-screen-bounds` | screen coordinates; no reader remains |
 
   Position fields refresh every 150 ms. The e2e suite reads these attributes.

@@ -7,7 +7,6 @@
 // Teaches (one quest each): dg, nc7, t1_redlotus, nd12, nd9, ch, ne13, ne9, nf2, nh2.
 import type { Choice, DialogScene, NpcDef, QuestDef, SceneLine } from "../../types";
 import type { ActivityDef } from "../activities";
-import type { MeetEventDef } from "../random-events";
 import type { StoryOpponentSpec } from "../../story/types";
 import type { PlaceContent } from "./types";
 
@@ -749,65 +748,6 @@ const scenes: DialogScene[] = [
     say(MIAO, "ยานี้ข้าเก็บไว้ใช้ยามจำเป็น บัดนี้เจ้าน่าจะจำเป็นกว่าข้า"),
   ], "รับกระบี่วิเศษ"),
 
-  // ── place meetings ──
-  dialog("pev_home_nanxian_debate", [
-    nar("นักพรตหนุ่มจากฉวนเจินยืนหน้าแดงริมลำธาร ถือม้วนตำราแน่น"),
-    say("นักพรตหนุ่ม", "ท่านผู้เดินทาง! ช่วยตัดสินที อาจารย์หนานเสียนว่าน้ำไม่มีรูป ข้าว่าน้ำมีรูปตามภาชนะ ใครถูก"),
-    say(ASHU, "(กระซิบ) ตอบอะไรก็ได้ เขามาถามแบบนี้ทุกเดือน"),
-  ], [
-    { text: "\"น้ำไม่มีรูป จึงเป็นได้ทุกรูป\"", effects: [{ t: "addTrait", trait: "humility", amount: 1 },
-      { t: "addNpcRelationship", npcId: "home_nanxian_sage_nanxian", amount: 2 }], next: "pev_home_nanxian_debate_end" },
-    { text: "\"ข้าว่าน้ำเปียก\"", effects: [{ t: "addTrait", trait: "fame", amount: 1 }], next: "pev_home_nanxian_debate_end" },
-  ]),
-  aside("pev_home_nanxian_debate_end", [
-    say("นักพรตหนุ่ม", "...ข้าต้องกลับไปคิดอีกเดือนหนึ่ง"),
-    nar("นักพรตเดินกลับขึ้นเขา อาซูหัวเราะจนตกหิน"),
-  ]),
-  dialog("pev_home_yideng_courtier", [
-    nar("ชายชราชุดขุนนางต้าหลี่เก่าซีดเดินกระย่องกระแย่งขึ้นทางลำธาร แบกห่อของหนัก"),
-    say("ขุนนางชราต้าหลี่", "ข้ามาถวายของแด่ฝ่าบาท... อ๊ะ ไม่ใช่ ท่านอิดเต็งไต้ซือ ข้าเรียกผิดทุกปี"),
-    say("ขุนนางชราต้าหลี่", "ช่วยข้าแบกขึ้นไปหน่อยเถิด ขาข้าไม่ไหวแล้ว"),
-  ], [
-    { text: "แบกห่อของให้", effects: [{ t: "addGold", amount: 40 }, { t: "addTrait", trait: "good", amount: 1 },
-      { t: "addNpcRelationship", npcId: "home_yideng_monk_yideng", amount: 2 }], next: "pev_home_yideng_courtier_end" },
-    { text: "ชี้ทางแล้วเดินต่อ", next: YD },
-  ]),
-  aside("pev_home_yideng_courtier_end", [
-    say("ขุนนางชราต้าหลี่", "ขอบใจ ขอบใจ รับไว้ค่าน้ำชา ฝ่าบา... ท่านไต้ซือไม่รับเงินอยู่แล้ว"),
-    nar("ในห่อมีแต่ใบชาต้าหลี่กับผ้าห่มขนแกะ อิดเต็งไต้ซือยิ้มแล้วแจกให้ชาวบ้านทั้งหมด"),
-  ]),
-  dialog("pev_home_tianboguang_angry_father", [
-    nar("ชายวัยกลางคนถือคราดวิ่งเข้ามาที่ลาน ตะโกนลั่น"),
-    say("ชาวนาโกรธจัด", "เถียนป๋อกวงอยู่ไหน! ข้าได้ยินว่ามันมาซ่อนตัวแถวนี้! มันทำให้ข้าเสียหน้าเมื่อสิบปีก่อน!"),
-    say(TIAN, "(จากหลังกองฟืน) ...ช่วยข้าที ข้าปฏิญาณไม่ชักดาบใส่ชาวบ้านแล้ว"),
-  ], [
-    { text: "ขวางไว้แล้วสู้ (ไม่ถึงตาย)", effects: [{ t: "triggerBattle", opponentId: "thug", onWin: "pev_home_tianboguang_angry_father_won", onLose: TBG, nonFatal: true }],
-      next: "pev_home_tianboguang_angry_father_won" },
-    { text: "ใจเย็นลงก่อน ให้เถียนออกมาขอโทษ", effects: [{ t: "addTrait", trait: "good", amount: 1 },
-      { t: "addNpcRelationship", npcId: "home_tianboguang_blade_tian", amount: 2 }], next: "pev_home_tianboguang_angry_father_talk" },
-  ]),
-  aside("pev_home_tianboguang_angry_father_won", [
-    say("ชาวนาโกรธจัด", "โอย... ก็ได้ ๆ ข้ากลับก็ได้"),
-    say(TIAN, "ขอบใจ! แต่เจ้าตีเขาแรงไปหน่อยนะ เขามีเหตุผลที่จะโกรธ"),
-  ]),
-  aside("pev_home_tianboguang_angry_father_talk", [
-    nar("เถียนป๋อกวงคลานออกมาคุกเข่าโขกหัวสามที ชาวนาอ้าปากค้าง ไม่เคยเห็นโจรขอโทษมาก่อน"),
-    say("ชาวนาโกรธจัด", "...เอาเถอะ อย่าให้เห็นแถวหมู่บ้านข้าอีก"),
-    say(LUO, "เห็นไหม ขอโทษง่ายกว่าฟันดาบเยอะ"),
-  ]),
-  dialog("pev_home_miaoren_challenger", [
-    nar("นักกระบี่หนุ่มยืนเท้าสะเอวหน้าประตูบ้านเหมียว ตะโกนจนนกบินหนี"),
-    say("นักกระบี่หนุ่มอวดดี", "เหมียวเหรินเฟิง! ออกมา! ข้าจะล้มฉายาไร้เทียมทานของเจ้า!"),
-    say(ZHONG, "ท่านเหมียวกำลังกินข้าว... ผู้มาเยือน ช่วยไล่เจ้าเด็กนี่ไปที ข้าขี้เกียจ"),
-  ], [
-    { text: "\"ผ่านข้าไปก่อน\"", effects: [{ t: "triggerBattle", opponentId: "wandering_swordsman", onWin: "pev_home_miaoren_challenger_won", onLose: MR, nonFatal: true }],
-      next: "pev_home_miaoren_challenger_won" },
-    { text: "ปล่อยให้นายกองจงจัดการ", next: MR },
-  ]),
-  aside("pev_home_miaoren_challenger_won", [
-    say("นักกระบี่หนุ่มอวดดี", "แค่คนเฝ้าหน้าบ้านยังเก่งขนาดนี้... ข้าขอไปฝึกใหม่สิบปี"),
-    say(MIAO, "(จากในบ้าน) ...ข้าวยังไม่หมดชาม ขอบใจ"),
-  ]),
 ];
 
 // ─── activities ────────────────────────────────────────────────────────
@@ -848,12 +788,5 @@ const activities: ActivityDef[] = [
       doneText: "เพลงจบ ลมชายแดนพัดเบาลง รั่วหลันยิ้มอาย ๆ" } },
 ];
 
-// ─── place meetings ────────────────────────────────────────────────────
-const events: MeetEventDef[] = [
-  { id: "pev_home_nanxian_debate", weight: 2, dialogSceneId: "pev_home_nanxian_debate", locationIds: [NX] },
-  { id: "pev_home_yideng_courtier", weight: 2, dialogSceneId: "pev_home_yideng_courtier", locationIds: [YD] },
-  { id: "pev_home_tianboguang_angry_father", weight: 2, dialogSceneId: "pev_home_tianboguang_angry_father", locationIds: [TBG] },
-  { id: "pev_home_miaoren_challenger", weight: 2, dialogSceneId: "pev_home_miaoren_challenger", locationIds: [MR] },
-];
 
-export const CONTENT: PlaceContent = { npcs, quests, scenes, activities, events, opponents };
+export const CONTENT: PlaceContent = { npcs, quests, scenes, activities, opponents };

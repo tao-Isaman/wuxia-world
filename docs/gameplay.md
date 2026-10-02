@@ -140,24 +140,23 @@ There is no passive regeneration. HP and MP carry from fight to fight. Other way
 
 ## Random encounters
 
-Arriving somewhere never triggers anything. Encounters come while you **walk**: every 220 map units walked on a location or route map is one *walk tick*. Home and the jail are safe.
+Arriving somewhere never triggers anything. Foes turn up while you **walk**: every 220 map units walked on a location or route map is one *walk tick*. Home and the jail are safe.
 
-Each tick, in order:
+- **Foes on the map.** A tick may put a foe on the map (30 %, at most three waiting at once), a short walk away. It stands there with a red ⚔ name tag and watches you. Walk (or tap) into it to face it; walk around it to avoid it. It is gone once you have faced it, and foes stay behind when you leave the map.
+- **Who turns up** depends on the place: people in towns, villages and homes; mostly beasts in the wilds; spirits too around sects and temples. Stronger foes, and elites, come as the hero grows (by day and sect rank).
+- **Hunting.** While a kill quest wants a foe that lives here, foes turn up more often (80 % a tick) and they are the quest's targets.
+- **The law and sect hunters** still catch up at once:
 
 | Check | Chance per tick |
 | --- | --- |
 | **Law** — only with wanted marks | 13 / 21 / 29 / 37 / 45 % for 1–5 marks |
 | **Sect hunter** — only after betraying a sect | 30 % |
-| **Fight** | 6 % |
-| **Fight while hunting** a kill-quest target that lives in this zone | 32 %, and only quest targets appear |
-| **Treasure** (a short dialog) | 2 % at LUK 1, up to 10 % |
-| **Meeting** (a short dialog) | about 4 % at LUK 1, up to 14 % |
 
-Treasure and meetings stop while you are hunting.
+There are no treasure or meeting events.
 
 ### The encounter screen
 
-It shows the foe, its tier and its kind (human, beast, supernatural), and the **power tiers** of the foe, its strongest companion and the hero, with a verdict (see [Battles](#battles)). You choose:
+Walking into a foe (or being caught by the law or a hunter) opens it. It shows the foe, its tier and its kind (human, beast, supernatural), and the **power tiers** of the foe, its strongest companion and the hero, with a verdict (see [Battles](#battles)). You choose:
 
 - **⚔ ต่อสู้** — fight. Many foes bring weaker companions — wolves, bats, cultists, bandit gangs — and more of them as the hero grows stronger (up to six). The strongest bosses (the bandit king, the cult elder, the bear king) come with their whole gang. Once the hero is strong, the ten named villains — เถ้าแก่โจวตลาดมืด, ทูตเซี่ย, ขุนนางหยาน, หัวหน้าโจรชิง, นักฆ่าเงาหยิง, เจ้าลัทธิจ้าวมังกรเทพ, ผู้อาวุโสตู๋ซื่อ, ฮุยเป้า, ดาบเลือดเซียะลาง and ตู๋โซ่ว — can also cross the hero's path with their followers (rarer than the other bosses).
 - **🏃 หนี** — leave. Free against ordinary foes.

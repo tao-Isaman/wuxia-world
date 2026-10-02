@@ -33,7 +33,7 @@ export function WorldCanvas({ presentation }: { presentation: WorldPresentation 
         () => { if (!disposed) setReady(true); },
         (message) => { if (!disposed) { setReady(false); setError(message); } },
         (id) => { if (!disposed) setNearby(id); },
-        () => { if (!disposed) useWorldStore.getState().walkTick(); });
+        (pickSpot) => { if (!disposed) useWorldStore.getState().walkTick(pickSpot); });
       runtime.current = instance;
     }).catch((cause: unknown) => {
       // A chunk failed to download or Phaser could not boot — say so.

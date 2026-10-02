@@ -24,7 +24,7 @@ The wave-by-wave history that used to live in this file has moved to [docs/chang
 
 A Thai wuxia RPG in the browser: Next.js 15, React 19, TypeScript, Phaser 4, Zustand.
 
-- **Exploring.** The hero walks painted maps: 101 places, 128 roads; villages, towns and homes have their own people, activities and meetings.
+- **Exploring.** The hero walks painted maps: 101 places, 128 roads; villages, towns and homes have their own people and activities; foes turn up on the map as the hero walks.
 - **Doing.** They talk to 225 NPCs (and give them gifts), take 867 quests (154 sect lineage quests and 38 story sagas among them), join one of 15 sects, gather, craft, steal, and land in jail.
 - **Fighting.** Battles are turn-based tactics on a 10 × 7 board that grows to 15 × 10 for big gangs (up to 6 pack members plus the leader).
 - **Code.** Two pure engines (`lib/game`, `lib/world`) sit under Zustand stores and React / Phaser views. The world saves to `localStorage` (version 22).
@@ -87,6 +87,12 @@ Not verified:
 ## Known issues
 
 Real behaviour today, found during the docs audit. Each is small and self-contained unless noted.
+
+### Roaming foes
+
+- **Foes can stand on painted scenery.** A spawn spot only needs to be unblocked and reachable by the collision data, so on maps whose collision is loose (the capital's outer wall, for one) a foe can appear somewhere that looks out of bounds.
+- **Not saved.** A reload clears the foes on the map; they also go when the hero walks on another map.
+- **They don't move.** Foes wait where they appear; they don't patrol or give chase.
 
 ### Power tiers
 

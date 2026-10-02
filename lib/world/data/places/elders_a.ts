@@ -4,7 +4,6 @@
 // past fits the weapon; four plain side quests; two activities; two meetings.
 import type { Condition, DialogScene, QuestDef, SceneLine } from "../../types";
 import type { ActivityDef } from "../activities";
-import type { MeetEventDef } from "../random-events";
 import type { StoryOpponentSpec } from "../../story/types";
 import type { PlaceContent } from "./types";
 
@@ -672,54 +671,8 @@ const ACTIVITIES: ActivityDef[] = [
       doneText: "เพลงพิณจบลงพร้อมชาถ้วยที่สาม ช่างทอเหมยที่นั่งโต๊ะข้าง ๆ พยักหน้าทักเจ้าอย่างเป็นมิตร" } },
 ];
 
-const EVENTS: MeetEventDef[] = [
-  { id: "pev_yangzhou_drunk_sailor", weight: 2, dialogSceneId: "pev_yangzhou_drunk_sailor", locationIds: ["city_yangzhou"] },
-  { id: "pev_suzhou_lost_kite", weight: 2, dialogSceneId: "pev_suzhou_lost_kite", locationIds: ["city_suzhou"], once: true },
-];
 
 const EVENT_SCENES: DialogScene[] = [
-  {
-    kind: "dialog", id: "pev_yangzhou_drunk_sailor",
-    lines: [
-      nar("กะลาสีตัวโตเดินโซเซออกจากร้านเหล้า ชนไหล่เจ้าเข้าอย่างจัง"),
-      say("กะลาสีขี้เมา", "เฮ้ย! ชนข้าแล้วไม่ขอโทษ? มา ๆ ชกกันสักยก ใครแพ้จ่ายค่าเหล้า!"),
-    ],
-    choices: [
-      { text: "สนองให้สักยก", next: "pev_yangzhou_drunk_sailor_win", effects: [{ t: "triggerBattle", opponentId: "drunk_brawler", onWin: "pev_yangzhou_drunk_sailor_win", onLose: "pev_yangzhou_drunk_sailor_lose", nonFatal: true }] },
-      { text: "ขอโทษแล้วเดินเลี่ยง", next: "city_yangzhou", effects: [{ t: "addTrait", trait: "humility", amount: 1 }] },
-    ],
-  },
-  {
-    kind: "dialog", id: "pev_yangzhou_drunk_sailor_win",
-    lines: [
-      nar("กะลาสีนอนแผ่กลางท่าเรือ หัวเราะไปสะอึกไป"),
-      say("กะลาสีขี้เมา", "แพ้ก็จ่าย... คนท่าเรือหยางโจวไม่เบี้ยว"),
-    ],
-    onEnter: [{ t: "addGold", amount: 20 }],
-  },
-  {
-    kind: "dialog", id: "pev_yangzhou_drunk_sailor_lose",
-    lines: [nar("กะลาสีชูกำปั้นฉลองแล้วล้มหลับไปเอง เจ้าลุกขึ้นปัดฝุ่น ไม่มีใครจ่ายค่าเหล้าให้ใคร")],
-  },
-  {
-    kind: "dialog", id: "pev_suzhou_lost_kite",
-    lines: [
-      nar("เด็กหญิงคนหนึ่งยืนร้องไห้ใต้ต้นหลิว ว่าวรูปปลาทองติดอยู่บนกิ่งสูง"),
-      say("เด็กหญิง", "ว่าวที่แม่ทำให้... ติดอยู่บนนั้น ข้าปีนไม่ถึง"),
-    ],
-    choices: [
-      { text: "กระโดดขึ้นไปปลดว่าวให้", next: "pev_suzhou_lost_kite_done", effects: [{ t: "addTrait", trait: "good", amount: 1 }] },
-      { text: "ปลอบแล้วเดินต่อ", next: "city_suzhou" },
-    ],
-  },
-  {
-    kind: "dialog", id: "pev_suzhou_lost_kite_done",
-    lines: [
-      nar("เจ้าเหยียบกำแพงแล้วดีดตัวขึ้นกิ่งหลิว ปลดว่าวลงมาได้โดยไม่ขาดแม้แต่เส้นเดียว"),
-      say("เด็กหญิง", "ขอบคุณเจ้าค่ะ! ขนมไหว้พระจันทร์นี่แม่ให้ข้ามา แบ่งให้ท่านชิ้นหนึ่ง"),
-    ],
-    onEnter: [{ t: "giveItem", itemId: "moon_cake", count: 1 }],
-  },
 ];
 
 export const CONTENT: PlaceContent = {
@@ -727,6 +680,5 @@ export const CONTENT: PlaceContent = {
   quests: QUESTS,
   scenes: [...SCENES, ...EVENT_SCENES],
   activities: ACTIVITIES,
-  events: EVENTS,
   opponents: OPPONENTS,
 };

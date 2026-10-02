@@ -16,7 +16,7 @@ import { initialWorldPlacement } from "./world-placement";
 import { addGridFrames, canvasTexture, createStage, drawCanvas, stagePixelRatio, type Stage } from "./phaser-stage";
 import {
   WALK_TICK_UNITS, getRememberedMapPosition, rememberMapPosition, stepTowards,
-  type Point, type WorldMarker, type WorldPresentation, type WorldRuntime,
+  type Point, type WorldFoe, type WorldMarker, type WorldPresentation, type WorldRuntime,
 } from "./types";
 
 const WIDTH = 960;
@@ -30,6 +30,8 @@ const LOAD_TIMEOUT = 20_000;
 const UNIQUE_FRAME = 80;
 const UNIQUE_FEET = 78;
 const UNIQUE_NPC_SIZE = 50;
+/** How close (map units) the hero must come to a roaming foe to engage it. */
+const FOE_TOUCH = 30;
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 const toWorld = (point: Point): Point => ({ x: point.x * WIDTH / 100, y: point.y * HEIGHT / 100 });
 const toPercent = (point: Point): Point => ({ x: point.x / WIDTH * 100, y: point.y / HEIGHT * 100 });
@@ -74,8 +76,11 @@ export function createWorldRuntime(
   onError: (message: string) => void,
   /** The interactable marker the hero is standing next to changed (drives the action button). */
   onNearby?: (markerId: string | null) => void,
-  /** Called for every WALK_TICK_UNITS the hero walks (random-event ticks). */
-  onWalkTick?: () => void,
+  /**
+   * Called for every WALK_TICK_UNITS the hero walks. `pickSpot` finds a free
+   * spot the hero can reach, away from them (map percentages), for a foe.
+   */
+  onWalkTick?: (pickSpot: () => Point | null) => void,
 ): WorldRuntime {
   const initial = read();
   const footprints = worldFootprints(initial.key, initial.image);
@@ -100,6 +105,7 @@ export function createWorldRuntime(
   let ready = false;
   let lastTime = 0;
   let animationTime = 0;
+  let shadowTexture = "";
   let motionTime = 0;
   let lastPositionReport = 0;
   let playerMotion: "idle" | "walk" = "idle";
@@ -404,6 +410,11 @@ export function createWorldRuntime(
     const center = cameraCenter();
     return { x: (point.x - center.x + viewWidth / 2) * viewScale, y: (point.y - center.y + viewHeight / 2) * viewScale };
   }
+  // Tests: viewport point of a map point (to tap a foe, say).
+  (parent as HTMLElement & { worldScreenPoint?: (x: number, y: number) => Point }).worldScreenPoint = (x, y) => {
+    const bounds = parent.getBoundingClientRect(), p = toScreen({ x, y });
+    return { x: bounds.left + p.x, y: bounds.top + p.y };
+  };
   function markerAt(point: Point): string | null {
     let best: { id: string; y: number } | null = null;
     for (const marker of read().markers) {
@@ -513,7 +524,7 @@ export function createWorldRuntime(
       image(texture(cutout, "occluder"), 100 + foreground.depth * 10).setOrigin(0, 0).setPosition(left, top);
     }
 
-    const shadowKey = texture(drawCanvas(64, 24, (context) => {
+    const shadowKey = shadowTexture = texture(drawCanvas(64, 24, (context) => {
       context.fillStyle = "rgba(29, 28, 15, 0.38)";
       context.beginPath(); context.ellipse(32, 12, 24, 7, 0, 0, Math.PI * 2); context.fill();
       context.fillStyle = "rgba(22, 23, 15, 0.22)";
@@ -629,6 +640,139 @@ export function createWorldRuntime(
     parent.dataset.playerFrame = String(player?.frame ?? 0);
     parent.dataset.playerFacing = playerFacing;
   }
+  // ── Roaming foes ─────────────────────────────────────────────────────
+  // Foes come and go without rebuilding the map: each frame the visuals are
+  // synced to `read().foes`. They stand at their spot, turn to watch the hero
+  // and, when the hero walks into one, call its `onEngage` (the encounter).
+  interface FoeVisual {
+    body: Phaser.GameObjects.Image;
+    character?: CharacterVisual;
+    shadow: Phaser.GameObjects.Image;
+    tag: TextSprite;
+    phase: number;
+    engaged: boolean;
+  }
+  const foeVisuals = new Map<string, FoeVisual>();
+  const foeLoading = new Set<string>();
+  const creatureFrames = new Map<number, Promise<string>>();
+  let creatureSheet: Promise<HTMLImageElement> | null = null;
+  function creatureFrameTexture(frame: number): Promise<string> {
+    let pending = creatureFrames.get(frame);
+    if (!pending) {
+      creatureSheet ??= loadImage("/art/creature-atlas.png");
+      pending = creatureSheet.then((sheet) => {
+        const w = sheet.width / 4, h = sheet.height / 2;
+        return texture(drawCanvas(w, h, (context) => context.drawImage(sheet, (frame % 4) * w, Math.floor(frame / 4) * h, w, h, 0, 0, w, h)), "foe");
+      });
+      creatureFrames.set(frame, pending);
+    }
+    return pending;
+  }
+  function makeFoeTag(text: string): TextSprite {
+    const label = `⚔ ${text}`;
+    const width = Math.ceil(measure(label, "600 ")) + 14;
+    return textSprite(width, 22, (context) => {
+      context.fillStyle = "rgba(70, 12, 10, 0.88)";
+      context.fillRect(0, 1, width, 20);
+      context.font = `600 13px ${font}`;
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+      context.fillStyle = "#ffd9cf";
+      context.fillText(label, width / 2, 11);
+    }, 9_020);
+  }
+  async function addFoe(foe: WorldFoe) {
+    foeLoading.add(foe.id);
+    try {
+      const size = 54 * (foe.look.size ?? 1);
+      let body: Phaser.GameObjects.Image;
+      let character: CharacterVisual | undefined;
+      if (foe.look.kind === "creature") {
+        const key = await creatureFrameTexture(foe.look.frame);
+        if (disposed || !scene) return;
+        body = image(key, 100).setOrigin(0.5, 0.92);
+        const source = scene.textures.get(key).getSourceImage() as HTMLCanvasElement;
+        body.setDisplaySize(size * 1.25 * source.width / source.height, size * 1.25);
+      } else {
+        const atlas = await loadAtlas(characterId(foe.look.characterId), false);
+        if (disposed || !scene) return;
+        character = makeCharacter(`char:${foe.look.characterId}`, atlas, size);
+        body = character.image;
+      }
+      if (foe.look.tint !== undefined) body.setTint(foe.look.tint);
+      const shadow = image(shadowTexture, 1, 30, 11);
+      const tag = makeFoeTag(foe.name);
+      tag.image.setDisplaySize(tag.width / viewScale, tag.height / viewScale);
+      foeVisuals.set(foe.id, { body, character, shadow, tag, phase: Math.random() * 6, engaged: false });
+    } catch (error) {
+      console.warn("[world] foe could not be drawn:", error);
+    } finally {
+      foeLoading.delete(foe.id);
+    }
+  }
+  function removeFoe(id: string) {
+    const visual = foeVisuals.get(id);
+    if (!visual) return;
+    visual.body.destroy(); visual.shadow.destroy(); visual.tag.image.destroy();
+    foeVisuals.delete(id);
+  }
+  function updateFoes(paused: boolean) {
+    const foes = read().foes ?? [];
+    const ids = new Set(foes.map((foe) => foe.id));
+    for (const id of [...foeVisuals.keys()]) if (!ids.has(id)) removeFoe(id);
+    for (const foe of foes) {
+      if (!foeVisuals.has(foe.id) && !foeLoading.has(foe.id)) void addFoe(foe);
+      const visual = foeVisuals.get(foe.id);
+      if (!visual) continue;
+      const point = toWorld(foe);
+      const facingLeft = position.x < point.x;
+      if (visual.character) {
+        const idle = CHARACTER_CLIPS.idle;
+        const frame = reducedMotion ? idle.frames[0] : idle.frames[Math.floor((animationTime + visual.phase) * idle.fps) % idle.frames.length];
+        setCharacterFrame(visual.character, frame, facingLeft);
+        visual.body.setPosition(point.x, point.y);
+      } else {
+        // Beasts breathe and shift their weight.
+        const bob = reducedMotion ? 0 : Math.sin((animationTime + visual.phase) * 3.2) * 1.5;
+        visual.body.setFlipX(!facingLeft).setPosition(point.x, point.y - Math.max(0, bob));
+      }
+      visual.body.setDepth(100 + point.y * 10);
+      visual.shadow.setPosition(point.x, point.y);
+      visual.tag.image.setDisplaySize(visual.tag.width / viewScale, visual.tag.height / viewScale)
+        .setPosition(point.x, point.y - visual.body.displayHeight * 0.92 - 2);
+      // Walking into the foe starts the encounter (once).
+      if (!paused && !visual.engaged && Math.hypot(position.x - point.x, position.y - point.y) < FOE_TOUCH) {
+        visual.engaged = true;
+        cancelWalk();
+        foe.onEngage();
+      }
+    }
+    parent.dataset.foes = String(foeVisuals.size);
+    parent.dataset.foeIds = [...foeVisuals.keys()].join(" ");
+    parent.dataset.foesAt = JSON.stringify(foes.filter((foe) => foeVisuals.has(foe.id)).map((foe) => {
+      const p = toWorld(foe);
+      return [Math.round(p.x), Math.round(p.y)];
+    }));
+  }
+  /** A free, reachable spot for a foe: not under the hero's feet, nor on a marker or another foe. */
+  function pickFoeSpot(): Point | null {
+    const markers = read().markers.map((marker) => markerPoint(marker));
+    const others = (read().foes ?? []).map((foe) => toWorld(foe));
+    for (let attempt = 0; attempt < 24; attempt++) {
+      const angle = Math.random() * Math.PI * 2;
+      const distance = 150 + Math.random() * 170;
+      const spot = { x: position.x + Math.cos(angle) * distance, y: position.y + Math.sin(angle) * distance * 0.75 };
+      if (spot.x < 50 || spot.x > WIDTH - 50 || spot.y < 70 || spot.y > HEIGHT - 40) continue;
+      if (worldPointBlocked(spot, footprints)) continue;
+      if ([...markers, ...others].some((p) => Math.hypot(p.x - spot.x, p.y - spot.y) < 70)) continue;
+      const path = planWorldPath(position, spot, footprints);
+      const end = path[path.length - 1];
+      if (!end || Math.hypot(end.x - spot.x, end.y - spot.y) > 4) continue;
+      return toPercent(spot);
+    }
+    return null;
+  }
+
   function updatePresentation(dt: number, moving: boolean) {
     if (!actor || !player) return;
     actor.shadow.setPosition(position.x, position.y);
@@ -861,7 +1005,7 @@ export function createWorldRuntime(
         walked += step;
         if (walked >= WALK_TICK_UNITS) {
           walked -= WALK_TICK_UNITS;
-          onWalkTick?.();
+          onWalkTick?.(pickFoeSpot);
           if (disposed || failed) return;
         }
         if (interactPressed) {
@@ -873,6 +1017,8 @@ export function createWorldRuntime(
         }
       }
       updatePresentation(ambientActive ? dt : 0, moving);
+      updateFoes(paused);
+      if (disposed || failed) return;
       if (veil) {
         if (lighting.update(read().time ?? 0, animationTime, reducedMotion)) veil.texture.refresh();
         veil.image.setAlpha(lighting.opacity);

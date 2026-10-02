@@ -15,7 +15,6 @@
 //   nf1           qw_home_xuemuhua_killing_qin      คังกว่างหลิง (home_xuemuhua)
 import type { DialogScene, NpcDef, QuestDef, SceneLine } from "../../types";
 import type { ActivityDef } from "../activities";
-import type { MeetEventDef } from "../random-events";
 import type { StoryOpponentSpec } from "../../story/types";
 import type { PlaceContent } from "./types";
 
@@ -1193,83 +1192,9 @@ const ACTIVITIES: ActivityDef[] = [
 ];
 
 // ═══════════════════════════════════════════════════════════════════════
-// Place meetings
 // ═══════════════════════════════════════════════════════════════════════
-const EVENTS: MeetEventDef[] = [
-  // NOTE: home_player is a safe scene (store/world-store.ts SAFE_SCENES), so
-  // walk ticks never roll there and this meeting cannot fire yet.
-  { id: "pev_home_player_peddler", weight: 2, dialogSceneId: "pev_home_player_peddler", locationIds: ["home_player"] },
-  { id: "pev_home_hufei_tea", weight: 2, dialogSceneId: "pev_home_hufei_tea", locationIds: ["home_hufei"] },
-  { id: "pev_home_chengkun_shadow", weight: 2, dialogSceneId: "pev_home_chengkun_shadow", locationIds: ["home_chengkun"] },
-  { id: "pev_home_xuemuhua_patient", weight: 2, dialogSceneId: "pev_home_xuemuhua_patient", locationIds: ["home_xuemuhua"] },
-];
 
 const EVENT_SCENES: DialogScene[] = [
-  {
-    kind: "dialog", id: "pev_home_player_peddler",
-    lines: [
-      nar("พ่อค้าเร่แบกหาบผ่านหน้าบ้าน ร้องขายเสียงดัง ‘ขนมไหว้พระจันทร์ ไส้เม็ดบัว หวานเหมือนรักแรก!’"),
-      say(LIU, "หลานรัก ซื้อให้ป้าสักชิ้นสิ ป้าไม่ได้กินมาตั้งแต่นายท่านยังอยู่"),
-    ],
-    choices: [
-      { text: "ซื้อให้ป้าหลิว (10 ตำลึง)", visibleIf: { t: "goldAtLeast", amount: 10 },
-        effects: [{ t: "addGold", amount: -10 }, { t: "addNpcRelationship", npcId: N.liu, amount: 3 }, { t: "addTrait", trait: "good", amount: 1 }],
-        next: "home_player" },
-      { text: "ส่ายหน้าให้พ่อค้า", next: "home_player" },
-    ],
-  },
-  {
-    kind: "dialog", id: "pev_home_hufei_tea",
-    lines: [
-      nar("ผิงอาสี่เดินกะเผลกมาพร้อมถาดชาร้อน วางลงข้างเจ้าโดยไม่พูดอะไร"),
-      say(PING, "ลมชายแดนแรง ดื่มชาก่อน นายน้อยสั่งไว้ว่าแขกต้องไม่หนาว"),
-    ],
-    choices: [
-      { text: "ดื่มชาแล้วขอบคุณ",
-        effects: [{ t: "addNpcRelationship", npcId: N.ping, amount: 2 }, { t: "addNpcRelationship", npcId: N.hufei, amount: 1 }],
-        next: "home_hufei" },
-    ],
-  },
-  {
-    kind: "dialog", id: "pev_home_chengkun_shadow",
-    lines: [
-      nar("เงาดำวูบผ่านกำแพงบ้าน คนสวมหมวกปีกกว้างหย่อนห่อผ้าลงหน้าประตูแล้วหันหลังจะไป"),
-      nar("เมื่อเห็นเจ้า มันชักมีดสั้นออกมาทันที"),
-    ],
-    choices: [
-      { text: "ขวางทางมันไว้",
-        effects: [{ t: "triggerBattle", opponentId: "night_blade", nonFatal: true,
-          onWin: "pev_home_chengkun_shadow_won", onLose: "home_chengkun" }],
-        next: "home_chengkun" },
-      { text: "ปล่อยมันไป", next: "home_chengkun" },
-    ],
-  },
-  {
-    kind: "dialog", id: "pev_home_chengkun_shadow_won",
-    lines: [
-      nar("มือมีดหนีข้ามกำแพงไป ทิ้งห่อผ้าไว้ ข้างในมีเหรียญเงินกับจดหมายที่ถูกเผาจนอ่านไม่ออก"),
-      say(WU, "เก็บเหรียญไว้ เผาจดหมายทิ้ง อย่าให้ศิษย์เฉินเห็น"),
-    ],
-    choices: [
-      { text: "ทำตามที่ลุงอู๋บอก",
-        effects: [{ t: "addGold", amount: 40 }, { t: "addNpcRelationship", npcId: N.wu, amount: 2 }],
-        next: "home_chengkun" },
-    ],
-  },
-  {
-    kind: "dialog", id: "pev_home_xuemuhua_patient",
-    lines: [
-      nar("ชายคนหนึ่งแบกเพื่อนที่เท้าบวมเป่งเดินโซเซมาหน้าบ้านหมอ ล้มลงตรงหน้าเจ้า"),
-      say(DAN, "งูกัด! พี่ช่วยแบกเข้าไปในห้องยาหน่อย ข้าจะไปตามอาจารย์!"),
-    ],
-    choices: [
-      { text: "แบกคนเจ็บเข้าห้องยา",
-        effects: [{ t: "addTrait", trait: "good", amount: 1 }, { t: "addNpcRelationship", npcId: N.xue, amount: 2 },
-          { t: "giveItem", itemId: "potion", count: 1 }],
-        next: "home_xuemuhua" },
-      { text: "ปล่อยให้คนอื่นจัดการ", next: "home_xuemuhua" },
-    ],
-  },
 ];
 
 export const CONTENT: PlaceContent = {
@@ -1277,6 +1202,5 @@ export const CONTENT: PlaceContent = {
   quests: QUESTS,
   scenes: [...SCENES, ...EVENT_SCENES],
   activities: ACTIVITIES,
-  events: EVENTS,
   opponents: OPPONENTS,
 };

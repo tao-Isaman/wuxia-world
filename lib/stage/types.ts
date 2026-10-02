@@ -28,6 +28,15 @@ export interface WorldMarker extends Point {
   onActivate: () => void;
 }
 
+/** A foe waiting on the map (the world store's roamingFoes); walking into it calls `onEngage`. */
+export interface WorldFoe extends Point {
+  id: string;
+  name: string;
+  look: { kind: "character"; characterId: string; tint?: number; size?: number }
+    | { kind: "creature"; frame: number; tint?: number; size?: number };
+  onEngage: () => void;
+}
+
 export interface WorldPresentation {
   key: string;
   name: string;
@@ -48,6 +57,8 @@ export interface WorldPresentation {
   dialogueSpeakerId?: string;
   props?: (Point & { id: string; image: string; width: number; height: number; visible?: boolean })[];
   bystanders?: (Point & { id: string; characterId: string; size?: number; facingLeft?: boolean; visible?: boolean })[];
+  /** Foes standing on the map, read every frame (no rebuild when they come and go). */
+  foes?: WorldFoe[];
   worldDescription?: string;
   rememberPosition?: boolean;
 }

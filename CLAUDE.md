@@ -199,10 +199,10 @@ Two deliberate exceptions reach into stores:
 - **Guide and tracking** (`quest-guide.ts`). `guideForQuest` gives an action, an optional counter, a place and a path for every stage type.
   - `trackedQuestId` is `flags.trackedQuestId`, else the newest active quest.
   - It feeds the quest log, the HUD tracker and the map's guide arrow.
-- **Encounters roll while walking**, not on arrival.
-  - Every 220 map units walked, `walkTick()` calls `rollWalkEvent(state, 0.4)`; `home_player` and `jail` are safe.
-  - Per tick: fight 6 % (32 % while hunting a kill-quest target in this zone), treasure / meeting scaled by LUK.
-  - The **law** roll (`lawChance(marks)`, 13–45 %) and the **30 % sect-hunter roll** are **not** scaled.
+- **Encounters come while walking**, not on arrival.
+  - Every 220 map units walked, `walkTick(pickSpot)` runs; `home_player` and `jail` are safe. There are no treasure or meeting events.
+  - **Roaming foes:** per tick a 30 % chance (80 % while hunting a kill-quest target in this zone) puts a foe from the zone's pool on the map (`rollFoeSpawn`, at most 3; store `roamingFoes`, not saved). The runtime draws them (`presentation.foes`) and walking into one calls `engageFoe` → the encounter screen.
+  - The **law** (`lawChance(marks)`, 13–45 %) and the **30 % sect-hunter roll** still catch up at once (`rollWalkEvent`).
   - Foes are picked by zone and scaled by the hero's power (`max(day/200, (9 − best sect rank)/8)`): tier mix, elites, and opponent stats ×(1 + 0.6·power) for **every** battle.
   - `rollRandomEvent` is a no-op kept for old content.
 - **Law** (`law.ts`).
@@ -227,9 +227,8 @@ Two deliberate exceptions reach into stores:
   - Every sect T4 is the reward of a saga: 8–10 chapters `st_<arcId>_<nn>` (type `story`), chained on the previous chapter, with films (`DialogScene.cutscene`) and paged dialogs (`paged`).
   - The old sect art quests teach nothing: seven T4 ones are saga prologue trials (`SAGA_PROLOGUES`), eight T3 ones lineage prologue trials (`LINEAGE_PROLOGUES`).
   - Story and lineage quests can't be abandoned and don't fail when their giver dies.
-- **Living places** (`data/places/<group>.ts`, one `PlaceContent` each, merged into every registry). Villages, towns and homes have people, quests, activities and meetings; every ยุทธจักร T0–T3 move and art is a quest reward, gated by rarity (`test:places`).
+- **Living places** (`data/places/<group>.ts`, one `PlaceContent` each, merged into every registry). Villages, towns and homes have people, quests and activities; every ยุทธจักร T0–T3 move and art is a quest reward, gated by rarity (`test:places`).
   - **Place activities** are `ActivityDef`s with `place` (locations, cooldown in days, cost, rewards), run by `doActivity`; auto maps place their spots (`ACTIVITY_SLOTS`), hand maps need `place.spot`.
-  - **Place meetings** are `MeetEventDef`s with `locationIds` / `condition` / `once` (flag `meet:<id>`). Safe ground (`home_player`) rolls only its own meetings (`rollPlaceMeeting`).
   - **NPC looks:** all 68 place NPCs have their own painted portrait and body (`import-npc-art.ts`). Strollers (`look.wander`) are rigged (`ANIMATED_NPC_IDS`); the rest stand as a unique pixel sprite. `look.body` (`registerNpcBodies`) is only the fallback sheet for art-less NPCs.
 - **Presence** (`npc-presence.ts`). An assassinated NPC is gone for good; a kidnapped one is away until `kidnappedUntil` (day + 180) and then stands at their spot again. Maps and the location card filter with `npcPresent`.
 - **Gifts** (`gifts.ts`, store `giveGift`). One gift per NPC every 30 days (`giftDays`), an item or 100 / 500 / 1000 / 5000 gold. Worth 1–5 by price; liked ×2 (+2 for a favourite item id), disliked −2. Tastes are `NpcDef.likes` / `dislikes` (item ids, categories, `"gold"`) or follow the NPC's tags.

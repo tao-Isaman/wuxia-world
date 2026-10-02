@@ -6,7 +6,6 @@
 //   tribe_huizu   — t1_blackiron (ช่างไห่), nd7 (หม่าต้าหลี่), ne11 (นาซีร์)
 import type { DialogScene, NpcDef, QuestDef, SceneLine } from "../../types";
 import type { ActivityDef } from "../activities";
-import type { MeetEventDef } from "../random-events";
 import type { StoryOpponentSpec } from "../../story/types";
 import type { PlaceContent } from "./types";
 
@@ -1026,46 +1025,9 @@ const QUEST_SCENES: DialogScene[] = [
   ] },
 ];
 
-// ─── Place meetings ───────────────────────────────────────────────────
 const EVENT_SCENES: DialogScene[] = [
-  { kind: "dialog", id: "pev_city_lingxiao_snowball", lines: [
-    nar("ปุ! ลูกหิมะลูกโตกระทบท้ายทอยเจ้า ตามด้วยเสียงหัวเราะคิกคักจากหลังกองหิมะ"),
-    say(XUE, "โดนแล้ว! ท่านพี่หลบไม่ทันอีกแล้ว!"),
-  ], choices: [
-    { text: "ปั้นลูกหิมะยักษ์ไล่ปากลับ", effects: [{ t: "addNpcRelationship", npcId: "city_lingxiao_child_xue", amount: 3 }, { t: "addTrait", trait: "humility", amount: 1 }], next: "pev_city_lingxiao_snowball_play" },
-    { text: "ยิ้มแล้วเดินต่อ", next: LX },
-  ] },
-  { kind: "dialog", id: "pev_city_lingxiao_snowball_play", lines: [
-    nar("สงครามหิมะกินเวลาจนเด็กแถวนั้นมาร่วมกันเกือบสิบคน เจ้าแพ้ยับเยินอย่างมีเกียรติ"),
-    say(XUE, "ท่านพี่แพ้ แต่สนุกที่สุด! เอานี่ แม่ให้ข้ามาขายแต่ข้าขอแบ่งให้หนึ่งลูก"),
-  ], choices: [{ text: "รับขนมมา", effects: [{ t: "giveItem", itemId: "moon_cake", count: 1 }], next: LX }] },
 
-  { kind: "dialog", id: "pev_palace_royal_lost_maid", lines: [
-    nar("นางกำนัลตัวเล็กคนหนึ่งถือถาดน้ำชายืนร้องไห้อยู่ทางแยกระเบียง"),
-    say("นางกำนัลใหม่", "ข้าเพิ่งเข้าวังได้สามวัน ต้องเอาชาไปตำหนักพระสนมหลี่ แต่ระเบียงทุกทางหน้าตาเหมือนกันหมด"),
-    say("นางกำนัลใหม่", "ถ้าชาเย็น ข้าโดนตีแน่ ๆ"),
-  ], choices: [
-    { text: "พาไปส่งถึงหน้าตำหนัก", effects: [{ t: "addTrait", trait: "good", amount: 1 }, { t: "addNpcRelationship", npcId: "palace_royal_maid_cui", amount: 1 }], next: "pev_palace_royal_lost_maid_thanks" },
-    { text: "ชี้ทางให้แล้วเดินต่อ", next: PR },
-  ] },
-  { kind: "dialog", id: "pev_palace_royal_lost_maid_thanks", lines: [
-    nar("เจ้าพานางไปถึงทันชายังอุ่น ชุ่ยเอ๋อที่ยืนอยู่หน้าตำหนักโบกมือให้เจ้าอย่างรู้กัน"),
-    say("นางกำนัลใหม่", "ขอบคุณเจ้าค่ะ ข้าจะบอกพี่ชุ่ยเอ๋อว่ามีคนใจดีในวังนี้"),
-  ], choices: [back(PR, "เดินต่อ")] },
 
-  { kind: "dialog", id: "pev_tribe_huizu_caravan_tea", lines: [
-    nar("กองคาราวานเพิ่งมาถึง คนจูงอูฐกวักมือเรียกเจ้าเข้าไปนั่งในกระโจมพัก"),
-    say("คนจูงอูฐ", "แขกของเผ่าคือแขกของพระเจ้า นั่งก่อน ชานมร้อน ๆ เพิ่งต้มเสร็จ"),
-    say("คนจูงอูฐ", "ขนสัตว์จากเขาหิมะก็มีนะ ถ้าสนใจ ราคามิตรภาพ"),
-  ], choices: [
-    { text: "ดื่มชาและฟังเรื่องเส้นทางสายไหม", effects: [{ t: "addTrait", trait: "humility", amount: 1 }, { t: "giveItem", itemId: "cooked_meat", count: 1 }], next: "pev_tribe_huizu_caravan_tea_story" },
-    { text: "ซื้อหนังสัตว์ (30 ตำลึง)", visibleIf: { t: "goldAtLeast", amount: 30 }, effects: [{ t: "addGold", amount: -30 }, { t: "giveItem", itemId: "fur_pelt", count: 1 }], next: HZ },
-    { text: "ขอบคุณ แต่ต้องรีบไป", next: HZ },
-  ] },
-  { kind: "dialog", id: "pev_tribe_huizu_caravan_tea_story", lines: [
-    say("คนจูงอูฐ", "เส้นทางข้างหน้ามีทั้งพายุทราย โจร และหมาป่าหิมะ แต่คนที่ตายมากที่สุดคือคนที่เดินคนเดียว"),
-    say("คนจูงอูฐ", "เอาเนื้อแกะย่างนี่ไปด้วย อย่าเดินท้องว่าง"),
-  ], choices: [back(HZ, "ขอบคุณ")] },
 ];
 
 // ─── Activities ───────────────────────────────────────────────────────
@@ -1096,17 +1058,11 @@ const ACTIVITIES: ActivityDef[] = [
       doneText: "ชานมเค็มนิด ๆ อุ่นถึงท้อง เจ้ารู้สึกสดชื่นขึ้นมาก" } },
 ];
 
-const EVENTS: MeetEventDef[] = [
-  { id: "pev_city_lingxiao_snowball", weight: 2, dialogSceneId: "pev_city_lingxiao_snowball", locationIds: [LX] },
-  { id: "pev_palace_royal_lost_maid", weight: 2, dialogSceneId: "pev_palace_royal_lost_maid", locationIds: [PR] },
-  { id: "pev_tribe_huizu_caravan_tea", weight: 2, dialogSceneId: "pev_tribe_huizu_caravan_tea", locationIds: [HZ] },
-];
 
 export const CONTENT: PlaceContent = {
   npcs: NPCS,
   quests: QUESTS,
   scenes: [...TALK_SCENES, ...QUEST_SCENES, ...EVENT_SCENES],
   activities: ACTIVITIES,
-  events: EVENTS,
   opponents: OPPONENTS,
 };

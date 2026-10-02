@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { JAIL_BRIBE_GOLD, jailCityFor, jailDays, lawChance, pickLawPursuer, isLawOpponent, LAW_OPPONENTS } from "../lib/world/law";
-import { applyEffect, rollWalkEvent } from "../lib/world/effects";
+import { applyEffect, rollFoeSpawn, rollWalkEvent } from "../lib/world/effects";
+import { FOE_SPAWN } from "../lib/world/data/random-events";
 import { getLocationMap, getOpponent, getScene } from "../lib/world";
 import { JAIL_HOURS_PER_DAY, sentenceLeft } from "../lib/world/law";
 import { useWorldStore } from "../store/world-store";
@@ -137,6 +138,59 @@ check("dice, meditation and escape: costs, odds and consequences", () => {
   assert.equal(s.currentSceneId, "city_capital");
   assert.equal(s.jailUntil, null);
   assert.equal(s.wanted, 2, "escaping adds two marks");
+});
+
+check("walking spawns foes that wait on the map: by zone, at most three, likelier while hunting; touching one is its encounter", () => {
+  // No dice-roll fights any more: a clean walk tick never springs an encounter by itself.
+  const clean = freshState();
+  clean.currentSceneId = "city_capital";
+  withRandom(0, () => rollWalkEvent(clean, 0.4));
+  assert.equal(clean.pendingEncounter, null, "only the law and sect hunters still catch up on a roll");
+  // Cities send people; the wilds are mostly beasts.
+  const city = freshState(); city.currentSceneId = "city_capital";
+  const wild = freshState(); wild.currentSceneId = "cave_jinshe";
+  const kinds = (state: typeof city) => {
+    const seen = { human: 0, beast: 0, supernatural: 0 } as Record<string, number>;
+    for (let i = 0; i < 400; i++) {
+      const id = rollFoeSpawn(state, 0);
+      if (id) seen[getOpponent(id)?.category ?? "human"]++;
+    }
+    return seen;
+  };
+  const inCity = kinds(city), inWild = kinds(wild);
+  assert.ok(inCity.human > 0 && inCity.beast === 0, `city foes are people ${JSON.stringify(inCity)}`);
+  assert.ok(inWild.beast > inWild.human, `wild foes are mostly beasts ${JSON.stringify(inWild)}`);
+  const spawned = inCity.human + inCity.beast + inCity.supernatural;
+  assert.ok(Math.abs(spawned / 400 - FOE_SPAWN.chance) < 0.08, `about ${FOE_SPAWN.chance} per tick (${spawned / 400})`);
+  // A full map spawns nothing.
+  let full: string | null = "unset";
+  withRandom(0, () => { full = rollFoeSpawn(city, FOE_SPAWN.maxPerMap); });
+  assert.equal(full, null);
+  // The store keeps foes on their map, needs a spot, and turns contact into the encounter.
+  const store = useWorldStore.getState();
+  store.startNewGame({ name: "ทดสอบ", gender: "male" } as never);
+  useWorldStore.setState({ currentSceneId: "city_capital", lastLocationId: "city_capital", roamingFoes: [] });
+  withRandom(0, () => useWorldStore.getState().walkTick(() => null));
+  assert.equal(useWorldStore.getState().roamingFoes.length, 0, "no free spot, no foe");
+  withRandom(0, () => useWorldStore.getState().walkTick());
+  assert.equal(useWorldStore.getState().roamingFoes.length, 0, "no spot picker (tests, read-only maps), no foe");
+  for (let i = 0; i < 5; i++) withRandom(0, () => useWorldStore.getState().walkTick(() => ({ x: 20 + i * 10, y: 60 })));
+  const foes = useWorldStore.getState().roamingFoes;
+  assert.equal(foes.length, FOE_SPAWN.maxPerMap, "at most three wait at once");
+  assert.ok(foes.every((f) => f.locationId === "city_capital" && getOpponent(f.opponentId)));
+  assert.equal(useWorldStore.getState().pendingEncounter, null, "they wait for the hero");
+  useWorldStore.getState().engageFoe(foes[1].id);
+  assert.equal(useWorldStore.getState().pendingEncounter?.opponentId, foes[1].opponentId);
+  assert.equal(useWorldStore.getState().roamingFoes.length, FOE_SPAWN.maxPerMap - 1);
+  useWorldStore.getState().fleeEncounter();
+  // Leaving: a walk tick elsewhere drops the old map's foes.
+  useWorldStore.setState({ currentSceneId: "city_changan", lastLocationId: "city_changan" });
+  withRandom(0.999, () => useWorldStore.getState().walkTick(() => ({ x: 50, y: 50 })));
+  assert.equal(useWorldStore.getState().roamingFoes.length, 0);
+  // Safe ground: none at home.
+  useWorldStore.setState({ currentSceneId: "home_player", lastLocationId: "home_player" });
+  withRandom(0, () => useWorldStore.getState().walkTick(() => ({ x: 50, y: 50 })));
+  assert.equal(useWorldStore.getState().roamingFoes.length, 0);
 });
 
 console.log(`${checks} law checks passed`);

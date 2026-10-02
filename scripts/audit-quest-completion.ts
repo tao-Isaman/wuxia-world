@@ -21,7 +21,7 @@ import {
   QUESTS, SCENES, SCENES_BY_ID, START_SCENE_ID, NPCS, OPPONENTS_BY_ID, ITEMS_BY_ID, SHOPS, RESOURCES_BY_ID,
   RECIPES, getQuest, type Condition, type SceneEffect, type Scene, type QuestDef,
 } from "@/lib/world";
-import { FIGHT_EVENTS, MEET_EVENTS, TREASURE_EVENTS } from "@/lib/world/data/random-events";
+import { FIGHT_EVENTS } from "@/lib/world/data/random-events";
 import { SECT_MEMBERSHIPS } from "@/lib/world/data/sect-memberships";
 import { getLocationMap } from "@/lib/world/data/location-maps";
 
@@ -59,7 +59,7 @@ function childScenes(scene: Scene): string[] {
 const reachable = new Set<string>();
 // Losing to a law pursuer (a walk-tick encounter, see lib/world/law.ts) routes to
 // jail_cell, so the arrest scene and the jail map it leads to are reachable too.
-const queue = [START_SCENE_ID, "jail_cell", ...MEET_EVENTS.map((e) => e.dialogSceneId), ...TREASURE_EVENTS.map((e) => e.dialogSceneId)];
+const queue = [START_SCENE_ID, "jail_cell"];
 // Quest offer/complete scenes open from the NPC popup; they are reachable
 // whenever that NPC is (checked per quest below), so seed them too.
 for (const q of QUESTS) for (const s of [`qs_${q.id}_offer`, `qs_${q.id}_complete`]) if (SCENES_BY_ID.has(s)) queue.push(s);

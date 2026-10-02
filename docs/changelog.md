@@ -6,6 +6,14 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-02
 
+### Foes on the map, and the hero fights by skill
+
+- **No more dice-roll fights.** Walking now brings foes onto the map: each walk tick has a 30 % chance (80 % while hunting a kill-quest target here) to put one a short walk away, at most three at once. They stand with a red ⚔ tag and watch the hero; walk (or tap) into one to face it on the fight-or-flee screen, or walk around it. Who turns up still follows the place (people in towns, beasts in the wilds, spirits near sects and temples) and the hero's power.
+- **The law and sect hunters** still catch up at once, as before.
+- **Treasure and meeting events are gone**, with their scenes — the four treasures, the three wayside meetings and the 27 place meetings.
+- **The hero moves by skill in battle.** A sword sweeps, a sabre leaps and cleaves, fists dash and punch, a spear lunges through, daggers dart in a flurry, hidden weapons are thrown from a step back, music is played afloat, inner arts are channelled rising in qi, and support casts hold a guard — with afterimages and a qi aura (`lib/stage/hero-motion.ts`).
+- New `rollFoeSpawn`, store `roamingFoes` / `engageFoe`, `presentation.foes`, `roaming-foes.spec.ts`; `test:law` and `test:grid-skills` check the spawns and the moves.
+
 ### Power tiers get their own names and colours
 
 - **New tier names:** สามัญชน, ศิษย์ฝึกหัด, ศิษย์สำนัก, มือดีประจำถิ่น, ท่องเที่ยวทั่วหล้า, ผู้เชี่ยวชาญวรยุทธ์, ฝีมือล้ำลึกเหนือคน, วรยุทธโดดเด่นใต้หล้า, จอมยุทธไร้พ่าย, ปรมาจารย์ยุทธภพ, เป็นหนึ่งในยุทธจักร, ยอดคนใต้หล้า.

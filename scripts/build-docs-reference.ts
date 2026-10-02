@@ -30,7 +30,7 @@ import { LOCATION_ROUTES } from "@/lib/world/data/location-routes";
 import { regionOf } from "@/lib/world/data/regions";
 import { packMembers } from "@/lib/world/battle-looks";
 import { sectLineage } from "@/lib/world/story/registry";
-import { FIGHT_EVENTS, MEET_EVENTS, TREASURE_EVENTS, fightEventsForLocation, zoneOfLocation } from "@/lib/world/data/random-events";
+import { FIGHT_EVENTS, fightEventsForLocation, zoneOfLocation } from "@/lib/world/data/random-events";
 
 const OUT_DIR = fileURLToPath(new URL("../docs/reference/", import.meta.url));
 const CHECK = process.argv.includes("--check");
@@ -417,8 +417,8 @@ const pages: Record<string, string> = {};
     roaming.set(ev.opponentId, zones);
   }
   const questFights = count(ALL_EFFECTS.filter((e) => e.t === "triggerBattle"), (e) => (e as { opponentId: string }).opponentId);
-  md += `${OPPONENTS.length} opponents (\`lib/world/data/opponents.ts\`). Random encounters draw from ${FIGHT_EVENTS.length} fight events (plus ${TREASURE_EVENTS.length} treasure and ${MEET_EVENTS.length} meeting events) filtered by zone (\`lib/world/data/random-events.ts\`).\n\n`;
-  md += "Met via: **roams** = random walk encounters in the listed zones · **hunt** = a hunting node · **spar** = an NPC's practice bout · **scene** = a quest or story battle (count of scene choices) · **law** = pursuers after wanted marks · **betrayal** = hunters after betraying a sect.\n\n";
+  md += `${OPPONENTS.length} opponents (\`lib/world/data/opponents.ts\`). Foes that turn up on the map while the hero walks come from ${FIGHT_EVENTS.length} fight events filtered by zone (\`lib/world/data/random-events.ts\`).\n\n`;
+  md += "Met via: **roams** = turns up on the map in the listed zones while the hero walks · **hunt** = a hunting node · **spar** = an NPC's practice bout · **scene** = a quest or story battle (count of scene choices) · **law** = pursuers after wanted marks · **betrayal** = hunters after betraying a sect.\n\n";
   const byTier = count(OPPONENTS, (o) => `T${o.ti ?? 0}`);
   const byCat = count(OPPONENTS, (o) => o.category ?? "human");
   md += "Per tier: " + Object.entries(byTier).sort().map(([k, v]) => `${k}: ${v}`).join(" · ") + ". Per category: " +
@@ -467,7 +467,7 @@ const pages: Record<string, string> = {};
     ["Move skills / inner arts / equipment", `${SKILLS.length} / ${LEARNABLE_ARTS.length} / ${EQUIPMENT.length}`],
     ["Items", ITEMS.length], ["Shops / martial halls / artisans", `${SHOPS.length} / ${SECT_HALLS.length} / ${ARTISANS.length}`],
     ["Recipes", RECIPES.length], ["Gathering and hunting nodes", RESOURCES.length], ["Life skills", LIFE_SKILL_KEYS.length],
-    ["Opponents", OPPONENTS.length], ["Random fight / treasure / meeting events", `${FIGHT_EVENTS.length} / ${TREASURE_EVENTS.length} / ${MEET_EVENTS.length}`],
+    ["Opponents", OPPONENTS.length], ["Roaming foe events", FIGHT_EVENTS.length],
   ]);
   md += "\nRegenerate with `bun scripts/build-docs-reference.ts`; `--check` fails when a page is stale.\n";
   pages["README.md"] = md;

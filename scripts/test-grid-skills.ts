@@ -1,6 +1,8 @@
 // Grid geometry for every skill / art active (lib/game/grid/skill-grid.ts).
 // Run: bun run test:grid-skills
 import assert from "node:assert/strict";
+import { castVfx } from "../lib/stage/cast-vfx";
+import { heroMoveFor, heroPose, movesIn, type HeroMove } from "../lib/stage/hero-motion";
 import { SKILLS, ARTS } from "../lib/game/data";
 import { WEAPON_FAMILY_KEYS } from "../lib/game/types";
 import { skillGrid, artGrid, slotGrid, describeGrid, SKILL_GRID_OVERRIDES } from "../lib/game/grid/skill-grid";
@@ -119,6 +121,35 @@ for (const w of WEAPON_FAMILY_KEYS) {
   const row = [...counts].sort((a, b) => b[1] - a[1]).map(([k, n]) => `${k}×${n}`).join("  ");
   console.log(`${w.padEnd(6)} (${String(list.length).padStart(3)})  ${row}`);
 }
+check("hero combat motion: every skill and art has a body move, and the poses rest, rise and reach as drawn", () => {
+  const seen = new Set<HeroMove>();
+  const FAMILY: Record<string, HeroMove> = { sword: "sweep", blade: "cleave", fist: "strike", long: "lunge", short: "flurry", hidden: "throw", music: "play" };
+  for (const skill of SKILLS) {
+    const move = heroMoveFor(castVfx({ tier: skill.ti, source: { kind: "skill", id: skill.id } }), { support: false });
+    assert.equal(move, FAMILY[skill.w] ?? "strike", `${skill.id} (${skill.w})`);
+    seen.add(move);
+  }
+  for (const art of ARTS.filter((a) => a.id !== "none")) {
+    assert.equal(heroMoveFor(castVfx({ tier: art.ti, source: { kind: "art", id: art.id } }), { support: false }), "channel", art.id);
+  }
+  assert.equal(heroMoveFor(castVfx({ tier: 0, source: { kind: "skill", id: SKILLS[0].id } }), { support: true }), "guard");
+  assert.ok(seen.size >= 6, `skills use ${seen.size} different moves`);
+  const timing = { hitDelay: 300, lastImpact: 520 };
+  const all: HeroMove[] = ["sweep", "cleave", "strike", "lunge", "flurry", "throw", "play", "channel", "guard"];
+  for (const move of all) {
+    for (const age of [0, timing.lastImpact + 360]) {
+      const rest = heroPose(move, age, timing);
+      assert.deepEqual([rest.reach, rest.step, rest.lift, rest.lean, rest.aura], [0, 0, 0, 0, 0], `${move} rests at ${age}`);
+    }
+  }
+  assert.ok(heroPose("cleave", 150, timing).lift > 30, "the sabre leaps");
+  assert.ok(heroPose("throw", 290, timing).step < -10, "a thrower steps back");
+  assert.ok(heroPose("lunge", 400, timing).reach > 1, "a spear drives past");
+  assert.ok(heroPose("channel", 400, timing).aura > 0.5 && heroPose("channel", 400, timing).lift > 15, "an art rises in qi");
+  assert.ok(heroPose("sweep", 200, timing).ghost && heroPose("flurry", 400, timing).ghost, "fast moves leave afterimages");
+  assert.ok(movesIn("strike") && movesIn("flurry") && !movesIn("throw") && !movesIn("channel"));
+});
+
 const artCounts = new Map<string, number>();
 for (const a of activeArts) { const k = key(artGrid(a)!); artCounts.set(k, (artCounts.get(k) ?? 0) + 1); }
 console.log(`arts   (${String(activeArts.length).padStart(3)})  ${[...artCounts].sort((a, b) => b[1] - a[1]).map(([k, n]) => `${k}×${n}`).join("  ")}`);
