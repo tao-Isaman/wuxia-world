@@ -22,8 +22,8 @@ import {
 const WIDTH = 960;
 const HEIGHT = 640;
 const SPEED = 150;
-/** How far the camera zooms in past a cover fit: √10, so a tenth of the map's area is in view. */
-const MAP_ZOOM = Math.sqrt(10);
+/** How far the camera zooms in past a cover fit: √5, so a fifth of the map's area is in view. */
+const MAP_ZOOM = Math.sqrt(5);
 const LOAD_TIMEOUT = 20_000;
 // Unique NPC sprites are ~74 native px tall; this frame/size pair gives them the
 // same on-screen height as the archetype sheets (54 units × 108/128 of a frame).
@@ -382,7 +382,7 @@ export function createWorldRuntime(
     if (disposed) return;
     const width = Math.max(parent.clientWidth, 1);
     const height = Math.max(parent.clientHeight, 1);
-    // Cover the screen, then zoom in so the view holds a tenth of the map's
+    // Cover the screen, then zoom in so the view holds a fifth of the map's
     // area and the camera follows the hero.
     const scale = Math.max(width / WIDTH, height / HEIGHT) * MAP_ZOOM;
     viewScale = scale;
