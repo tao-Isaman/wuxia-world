@@ -246,11 +246,22 @@ check("retreat: odds follow Spd; success ends the fight with no winner, failure 
   } finally { Math.random = random; }
 });
 
-check("power tiers: twelve named steps from stats, inner arts and moves; equipment never counts", () => {
+check("power tiers: twelve named, coloured steps from stats, inner arts and moves; equipment never counts", () => {
   assert.equal(POWER_TIERS.length, 12);
   assert.deepEqual(POWER_TIERS.map((t) => t.tier), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
   for (let i = 1; i < POWER_TIERS.length; i++) assert.ok(POWER_TIERS[i].min > POWER_TIERS[i - 1].min, "thresholds rise");
   assert.equal(new Set(POWER_TIERS.map((t) => t.name)).size, 12, "every tier has its own name");
+  assert.equal(new Set(POWER_TIERS.map((t) => t.color)).size, 12, "every tier has its own colour");
+  // Each badge's text reads on its fill (WCAG contrast ≥ 4.5).
+  const lum = (hex: string) => {
+    const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255)
+      .map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4));
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+  for (const t of POWER_TIERS) {
+    const [hi, lo] = [lum(t.color), lum(t.ink)].sort((x, y) => y - x);
+    assert.ok((hi + 0.05) / (lo + 0.05) >= 4.5, `${t.name}: text contrast ${((hi + 0.05) / (lo + 0.05)).toFixed(2)}`);
+  }
   assert.equal(powerTierOf(0).tier, 1);
   assert.equal(powerTierOf(POWER_TIERS[4].min).tier, 5);
   assert.equal(powerTierOf(POWER_TIERS[4].min - 1).tier, 4);

@@ -292,26 +292,26 @@ score = Σ stats            (combinedStats: base + inner-art and move-skill bonu
       + Σ (tier + 1) × level   (every known inner art; the active one at artLevel)
 ```
 
-| Tier | Name | From |
-| --- | --- | --- |
-| 1 | ชาวบ้าน | 0 |
-| 2 | ผู้เริ่มฝึกวิชา | 25 |
-| 3 | ศิษย์ฝึกหัด | 45 |
-| 4 | นักสู้พเนจร | 75 |
-| 5 | จอมยุทธ์ | 120 |
-| 6 | ยอดฝีมือ | 180 |
-| 7 | ยอดฝีมือหาตัวจับยาก | 260 |
-| 8 | ผู้เจนจบวิชา | 370 |
-| 9 | อาจารย์ใหญ่ | 520 |
-| 10 | ปรมาจารย์ | 720 |
-| 11 | มหาปรมาจารย์ | 1000 |
-| 12 | ยอดคนใต้หล้า | 1400 |
+| Tier | Name | From | Colour |
+| --- | --- | --- | --- |
+| 1 | สามัญชน | 0 | grey #8b8d84 |
+| 2 | ศิษย์ฝึกหัด | 25 | parchment #d8cfb2 |
+| 3 | ศิษย์สำนัก | 45 | green #6cae55 |
+| 4 | มือดีประจำถิ่น | 75 | teal #1f7a6d |
+| 5 | ท่องเที่ยวทั่วหล้า | 120 | blue #2a6cbf |
+| 6 | ผู้เชี่ยวชาญวรยุทธ์ | 180 | indigo #5148c4 |
+| 7 | ฝีมือล้ำลึกเหนือคน | 260 | purple #8640bb |
+| 8 | วรยุทธโดดเด่นใต้หล้า | 370 | magenta #b3327f |
+| 9 | จอมยุทธไร้พ่าย | 520 | red #bf2f25 |
+| 10 | ปรมาจารย์ยุทธภพ | 720 | orange #e9802a |
+| 11 | เป็นหนึ่งในยุทธจักร | 1000 | gold #ecc338 |
+| 12 | ยอดคนใต้หล้า | 1400 | radiant gold, glowing |
 
 - **Calibration.** Each threshold is about 1.4× the last. The 286 opponents fall in tiers 1–10 (a fresh hero and the capital's trainee in 1, the median foe in 5, the strongest sect masters in 10). Tiers 11–12 are for a hero who trains past them.
 - **API.** `powerBreakdown(build)` (stats / moves / arts / total), `powerScore`, `powerTierOf(score)`, `powerTier(build)`, and `powerOutlook(heroTier, foeTier)`: `deadly` (foe 2+ tiers up), `stronger`, `even`, `weaker`, `trivial` (2+ down).
-- **Names only on screen.** Players see the tier's name, never its number or the score; the numbers stay internal (ordering, the verdict, `data-*` test attributes).
+- **Names and colours on screen.** Each tier has its own colour (`color`, with a text `ink` that reads on it at ≥ 4.5:1 contrast), shown as a badge (`components/world/power-tier-badge.tsx`); the top tier glows gold (`.power-tier-peak`; the pulse stops under reduced motion). Players see the tier's name, never its number or the score; the numbers stay internal (ordering, the verdict, `data-*` test attributes).
 - **Where it shows.** Before every fight (the briefing screen, or the random-encounter screen) with the foe's tier, its pack's strongest, the hero's tier and the outlook; and on the profile under the hero's name. Opponents are scored after the progression stat scale, so the warning matches the fight. See [architecture.md](architecture.md#the-battle-bridge).
-- **Tests.** `test:combat` checks the table, the formula and that gear does not count; `test:grid-store` checks the briefing.
+- **Tests.** `test:combat` checks the table (distinct names and colours, readable text), the formula and that gear does not count; `test:grid-store` checks the briefing.
 
 ## Turn-order gauge
 

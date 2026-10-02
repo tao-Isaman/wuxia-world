@@ -166,7 +166,15 @@
 .power-readout dl > div { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; }
 .power-readout dt { min-width: 9.5em; color: #b9b39a; font-size: 13px; }
 .power-readout dd { color: #f2ead2; font-size: 15px; }
-.power-tier-badge { display: inline-block; padding: 0 6px; border: 1px solid #c9a35a; color: #f3d48a; font-size: 13px; }
+.power-tier-badge { display: inline-block; padding: 1px 8px; border: 1px solid; border-radius: 3px; font-size: 13px; font-weight: 600;
+  box-shadow: inset 0 -2px 0 rgb(0 0 0 / .22), 0 1px 0 rgb(0 0 0 / .35); }
+/* The peak tier shines gold. */
+.power-tier-peak { background: linear-gradient(100deg, #f6d36a, #fff6d0 45%, #f0c24a) !important; border-color: #fff3c4 !important;
+  box-shadow: 0 0 8px rgb(255 214 110 / .85), inset 0 -2px 0 rgb(160 110 20 / .35); }
+@media (prefers-reduced-motion: no-preference) {
+  .power-tier-peak { animation: power-peak-glow 2.4s ease-in-out infinite; }
+  @keyframes power-peak-glow { 50% { box-shadow: 0 0 14px rgb(255 225 140 / 1), inset 0 -2px 0 rgb(160 110 20 / .35); } }
+}
 .power-outlook { margin-top: 6px; font-size: 14px; font-weight: 600; }
 .power-outlook-deadly { color: #ff8a73; }
 .power-outlook-stronger { color: #f3b26b; }
