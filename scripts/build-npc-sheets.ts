@@ -33,6 +33,7 @@
 import sharp from "sharp";
 import { mkdirSync } from "node:fs";
 import { ANIMATED_NPC_IDS } from "../lib/characters/npc-sheets";
+import { PLAYER_CHARACTER_IDS } from "../lib/characters/catalog";
 
 const SRC = "public/npcs/body";
 const OUT = "public/art/characters/npc";
@@ -47,8 +48,14 @@ interface Raster { w: number; h: number; data: Uint8ClampedArray }
 const blank = (w: number, h: number): Raster => ({ w, h, data: new Uint8ClampedArray(w * h * 4) });
 const opaque = (r: Raster, x: number, y: number) => x >= 0 && y >= 0 && x < r.w && y < r.h && r.data[(y * r.w + x) * 4 + 3] >= 128;
 
+// The eight selectable heroes are rigged the same way from their painted
+// bodies (public/player/body/), so they match the NPCs they walk among.
+const HERO_SRC = "public/player/body";
+const HERO_OUT = "public/art/characters";
+const isHero = (id: string) => (PLAYER_CHARACTER_IDS as readonly string[]).includes(id);
+
 async function figure(id: string, maxWidth?: number): Promise<Raster> {
-  const trimmed = await sharp(`${SRC}/${id}.png`).trim({ threshold: 8 }).toBuffer();
+  const trimmed = await sharp(`${isHero(id) ? HERO_SRC : SRC}/${id}.png`).trim({ threshold: 8 }).toBuffer();
   const reduced = await sharp(trimmed).resize({ height: FIGURE, ...(maxWidth ? { width: maxWidth, fit: "inside" as const } : {}), kernel: "lanczos3" })
     .png({ palette: true, colours: 40, dither: 0 }).toBuffer();
   const { data, info } = await sharp(reduced).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
@@ -328,7 +335,7 @@ function clipped(sheet: Raster, directions: Raster): string | null {
 }
 
 mkdirSync(OUT, { recursive: true });
-for (const id of ANIMATED_NPC_IDS) {
+for (const id of [...ANIMATED_NPC_IDS, ...PLAYER_CHARACTER_IDS]) {
   let { sheet, directions } = rig(await figure(id));
   // A wide prop (a carrying pole) can push a lunge out of its cell: narrow the
   // figure step by step until every pose fits.
@@ -337,7 +344,8 @@ for (const id of ANIMATED_NPC_IDS) {
   if (clip) throw new Error(`${id} ${clip} is clipped by its cell`);
   const png = (r: Raster) => sharp(Buffer.from(r.data.buffer), { raw: { width: r.w, height: r.h, channels: 4 } })
     .png({ compressionLevel: 9, palette: true, colours: 64, dither: 0 });
-  await png(sheet).toFile(`${OUT}/${id}.png`);
-  await png(directions).toFile(`${OUT}/${id}-directions.png`);
+  const out = isHero(id) ? HERO_OUT : OUT;
+  await png(sheet).toFile(`${out}/${id}.png`);
+  await png(directions).toFile(`${out}/${id}-directions.png`);
 }
-console.log(`wrote ${ANIMATED_NPC_IDS.length} NPC animation sheets to ${OUT}/`);
+console.log(`wrote ${ANIMATED_NPC_IDS.length} NPC animation sheets to ${OUT}/ and ${PLAYER_CHARACTER_IDS.length} hero sheets to ${HERO_OUT}/`);

@@ -13,9 +13,14 @@
  * y 188. Portraits are resized to 256 × 256. The ids are added to
  * npc-body-ids.ts and npc-portrait-ids.ts; then run
  * `bun scripts/build-npc-sprites.ts` (and `build-npc-sheets.ts` for rigged ones).
+ *
+ *   bun scripts/import-npc-art.ts --from <dir> --heroes
+ *
+ * Hero bodies instead: <dir>/body/<m1…f4>.png → public/player/body/<id>.png
+ * (no portraits, no id lists); `build-npc-sheets.ts` rigs the hero sheets from them.
  */
 import sharp from "sharp";
-import { existsSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 
 const from = process.argv[process.argv.indexOf("--from") + 1];
 if (!from || !existsSync(`${from}/body`)) throw new Error("usage: bun scripts/import-npc-art.ts --from <dir with body/ and portrait/>");
@@ -89,6 +94,14 @@ function register(file: string, ids: string[]) {
   const all = [...new Set([...have, ...ids])].sort();
   const head = src.slice(0, src.indexOf("new Set([") + "new Set([".length);
   writeFileSync(file, `${head}\n${all.map((id) => `  ${JSON.stringify(id)},`).join("\n")}\n]);\n`);
+}
+
+if (process.argv.includes("--heroes")) {
+  mkdirSync("public/player/body", { recursive: true });
+  const heroes = readdirSync(`${from}/body`).filter((f) => /^[mf][1-4]\.png$/.test(f));
+  for (const file of heroes) writeFileSync(`public/player/body/${file}`, await fitBody(await cutOut(`${from}/body/${file}`)));
+  console.log(`imported ${heroes.length} hero bodies`);
+  process.exit(0);
 }
 
 const ids: string[] = [];
