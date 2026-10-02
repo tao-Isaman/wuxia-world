@@ -6,7 +6,8 @@
 //         + ½ × Σ base power of the slotted move skills at their levels
 //         + Σ over known inner arts of (tier + 1) × level
 //
-// Twelve tiers, each about 1.4× the last. Calibrated on the opponent table:
+// Twelve tiers, each about 1.4× the last. Players see only the names (no
+// numbers); `tier` orders them and drives the warning's verdict. Calibrated on the opponent table:
 // a fresh hero and the capital's trainee sit in tier 1, the median foe in
 // tier 5, the strongest sect masters in tier 10; 11 and 12 are for a hero
 // who has trained far beyond them.
@@ -28,18 +29,18 @@ export interface PowerTier {
 }
 
 export const POWER_TIERS: readonly PowerTier[] = [
-  { tier: 1, name: "ปุถุชน", min: 0 },
-  { tier: 2, name: "ศิษย์ฝึกหัด", min: 25 },
-  { tier: 3, name: "นักยุทธ์ชั้นสาม", min: 45 },
-  { tier: 4, name: "นักยุทธ์ชั้นสอง", min: 75 },
-  { tier: 5, name: "ยอดฝีมือชั้นหนึ่ง", min: 120 },
-  { tier: 6, name: "ยอดฝีมือขั้นสุดยอด", min: 180 },
-  { tier: 7, name: "ยอดฝีมือไร้เทียมทาน", min: 260 },
-  { tier: 8, name: "ปรมาจารย์", min: 370 },
-  { tier: 9, name: "มหาปรมาจารย์", min: 520 },
-  { tier: 10, name: "ราชันยุทธภพ", min: 720 },
-  { tier: 11, name: "เซียนยุทธ์", min: 1000 },
-  { tier: 12, name: "เทพยุทธ์", min: 1400 },
+  { tier: 1, name: "ชาวบ้าน", min: 0 },
+  { tier: 2, name: "ผู้เริ่มฝึกวิชา", min: 25 },
+  { tier: 3, name: "ศิษย์ฝึกหัด", min: 45 },
+  { tier: 4, name: "นักสู้พเนจร", min: 75 },
+  { tier: 5, name: "จอมยุทธ์", min: 120 },
+  { tier: 6, name: "ยอดฝีมือ", min: 180 },
+  { tier: 7, name: "ยอดฝีมือหาตัวจับยาก", min: 260 },
+  { tier: 8, name: "ผู้เจนจบวิชา", min: 370 },
+  { tier: 9, name: "อาจารย์ใหญ่", min: 520 },
+  { tier: 10, name: "ปรมาจารย์", min: 720 },
+  { tier: 11, name: "มหาปรมาจารย์", min: 1000 },
+  { tier: 12, name: "ยอดคนใต้หล้า", min: 1400 },
 ];
 
 /** The parts of a fighter's power score, for display and tests. */

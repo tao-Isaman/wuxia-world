@@ -294,21 +294,22 @@ score = Σ stats            (combinedStats: base + inner-art and move-skill bonu
 
 | Tier | Name | From |
 | --- | --- | --- |
-| 1 | ปุถุชน | 0 |
-| 2 | ศิษย์ฝึกหัด | 25 |
-| 3 | นักยุทธ์ชั้นสาม | 45 |
-| 4 | นักยุทธ์ชั้นสอง | 75 |
-| 5 | ยอดฝีมือชั้นหนึ่ง | 120 |
-| 6 | ยอดฝีมือขั้นสุดยอด | 180 |
-| 7 | ยอดฝีมือไร้เทียมทาน | 260 |
-| 8 | ปรมาจารย์ | 370 |
-| 9 | มหาปรมาจารย์ | 520 |
-| 10 | ราชันยุทธภพ | 720 |
-| 11 | เซียนยุทธ์ | 1000 |
-| 12 | เทพยุทธ์ | 1400 |
+| 1 | ชาวบ้าน | 0 |
+| 2 | ผู้เริ่มฝึกวิชา | 25 |
+| 3 | ศิษย์ฝึกหัด | 45 |
+| 4 | นักสู้พเนจร | 75 |
+| 5 | จอมยุทธ์ | 120 |
+| 6 | ยอดฝีมือ | 180 |
+| 7 | ยอดฝีมือหาตัวจับยาก | 260 |
+| 8 | ผู้เจนจบวิชา | 370 |
+| 9 | อาจารย์ใหญ่ | 520 |
+| 10 | ปรมาจารย์ | 720 |
+| 11 | มหาปรมาจารย์ | 1000 |
+| 12 | ยอดคนใต้หล้า | 1400 |
 
 - **Calibration.** Each threshold is about 1.4× the last. The 286 opponents fall in tiers 1–10 (a fresh hero and the capital's trainee in 1, the median foe in 5, the strongest sect masters in 10). Tiers 11–12 are for a hero who trains past them.
 - **API.** `powerBreakdown(build)` (stats / moves / arts / total), `powerScore`, `powerTierOf(score)`, `powerTier(build)`, and `powerOutlook(heroTier, foeTier)`: `deadly` (foe 2+ tiers up), `stronger`, `even`, `weaker`, `trivial` (2+ down).
+- **Names only on screen.** Players see the tier's name, never its number or the score; the numbers stay internal (ordering, the verdict, `data-*` test attributes).
 - **Where it shows.** Before every fight (the briefing screen, or the random-encounter screen) with the foe's tier, its pack's strongest, the hero's tier and the outlook; and on the profile under the hero's name. Opponents are scored after the progression stat scale, so the warning matches the fight. See [architecture.md](architecture.md#the-battle-bridge).
 - **Tests.** `test:combat` checks the table, the formula and that gear does not count; `test:grid-store` checks the briefing.
 

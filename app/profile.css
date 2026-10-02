@@ -56,4 +56,3 @@
 /* Power tier line under the name (parchment: ink on paper, not the battle gold). */
 .profile-power { margin-top: 2px; }
 .profile-power .power-tier-badge { color: var(--scroll-ink); border-color: var(--scroll-ink-soft); font-weight: 600; }
-.profile-power small { color: var(--scroll-ink-soft); }

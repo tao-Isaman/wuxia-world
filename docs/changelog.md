@@ -8,8 +8,8 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ### Power tiers and a warning before every fight
 
-- **Twelve power tiers** (ระดับพลัง), from ปุถุชน to เทพยุทธ์, scored from a fighter's stats, inner arts and move skills — never equipment ([combat.md](combat.md#power-tiers)).
-- **Before every fight** the game now shows the foe, its pack, and both sides' tiers with a plain verdict (อันตรายยิ่ง … ด้อยกว่าเจ้าหลายขั้น), whether it is fatal, and a เข้าต่อสู้ button. Random encounters show the same reading on their fight-or-flee screen. Battles no longer start by themselves.
+- **Twelve power tiers** (ระดับพลัง), from ชาวบ้าน to ยอดคนใต้หล้า, shown by name only, scored from a fighter's stats, inner arts and move skills — never equipment ([combat.md](combat.md#power-tiers)).
+- **Before every fight** the game now shows the foe, its pack, and both sides' tiers with a plain verdict (อันตรายยิ่ง … ด้อยกว่าเจ้ามาก), whether it is fatal, and a เข้าต่อสู้ button. Random encounters show the same reading on their fight-or-flee screen. Battles no longer start by themselves.
 - **The profile** shows the hero's tier and score under their name.
 
 ### The camera eases back a little
