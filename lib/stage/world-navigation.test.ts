@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
-  moveOnWorldGround, nearestWorldGround, planWorldPath, worldFootprints, worldPointBlocked, worldSegmentClear,
+  moveOnWorldGround, nearestWorldGround, planWorldPath, worldBounds, worldFootprints, worldPointBlocked, worldSegmentClear,
 } from "./world-navigation";
 import { probeWorldMap, type ProbeMarker } from "./world-map-probe";
 import { getLocationMap } from "../world/data/location-maps";
@@ -112,14 +112,15 @@ test("every painted location keeps spawn open and every NPC, exit and service re
     const map = getLocationMap(id);
     if (!map) continue;
     const footprints = worldFootprints(id, map.image);
+    const bounds = worldBounds(map.image);
     if (footprints.length) solid++;
-    const w = (p: { x: number; y: number }) => ({ x: p.x * 9.6, y: p.y * 6.4 });
+    const w = (p: { x: number; y: number }) => ({ x: p.x * bounds.width / 100, y: p.y * bounds.height / 100 });
     const markers: ProbeMarker[] = [
       ...Object.entries(map.npcSpots ?? {}).map(([npc, p]) => ({ id: npc, kind: "npc" as const, ...w(p) })),
       ...(map.exits ?? []).map((exit) => ({ id: `exit ${exit.to}`, kind: "exit" as const, ...w(exit) })),
       ...(map.spots ?? []).map((spot, index) => ({ id: `${spot.kind} ${index}`, kind: "service" as const, ...w(spot) })),
     ];
-    const { spawnOk, results } = probeWorldMap(w(map.spawn), markers, footprints);
+    const { spawnOk, results } = probeWorldMap(w(map.spawn), markers, footprints, bounds);
     if (!spawnOk) failures.push(`${id}: spawn blocked`);
     for (const result of results) if (!result.ok) failures.push(`${id}: ${result.id} ${result.reason}`);
   }
