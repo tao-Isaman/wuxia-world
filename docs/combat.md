@@ -298,7 +298,7 @@ score = Σ stats            (combinedStats: base + inner-art and move-skill bonu
 | 2 | ศิษย์ฝึกหัด | 25 | parchment #d8cfb2 |
 | 3 | ศิษย์สำนัก | 45 | green #6cae55 |
 | 4 | มือดีประจำถิ่น | 75 | teal #1f7a6d |
-| 5 | ท่องเที่ยวทั่วล่า | 120 | blue #2a6cbf |
+| 5 | ท่องเที่ยวทั่วหล้า | 120 | blue #2a6cbf |
 | 6 | ผู้เชี่ยวชาญวรยุทธ์ | 180 | indigo #5148c4 |
 | 7 | ฝีมือล้ำลึกเหนือคน | 260 | purple #8640bb |
 | 8 | วรยุทธโดดเด่นใต้หล้า | 370 | magenta #b3327f |

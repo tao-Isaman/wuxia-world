@@ -38,7 +38,7 @@ export const POWER_TIERS: readonly PowerTier[] = [
   { tier: 2, name: "ศิษย์ฝึกหัด", min: 25, color: "#d8cfb2", ink: DARK },
   { tier: 3, name: "ศิษย์สำนัก", min: 45, color: "#6cae55", ink: DARK },
   { tier: 4, name: "มือดีประจำถิ่น", min: 75, color: "#1f7a6d", ink: LIGHT },
-  { tier: 5, name: "ท่องเที่ยวทั่วล่า", min: 120, color: "#2a6cbf", ink: LIGHT },
+  { tier: 5, name: "ท่องเที่ยวทั่วหล้า", min: 120, color: "#2a6cbf", ink: LIGHT },
   { tier: 6, name: "ผู้เชี่ยวชาญวรยุทธ์", min: 180, color: "#5148c4", ink: LIGHT },
   { tier: 7, name: "ฝีมือล้ำลึกเหนือคน", min: 260, color: "#8640bb", ink: LIGHT },
   { tier: 8, name: "วรยุทธโดดเด่นใต้หล้า", min: 370, color: "#b3327f", ink: LIGHT },

@@ -8,7 +8,7 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ### Power tiers get their own names and colours
 
-- **New tier names:** สามัญชน, ศิษย์ฝึกหัด, ศิษย์สำนัก, มือดีประจำถิ่น, ท่องเที่ยวทั่วล่า, ผู้เชี่ยวชาญวรยุทธ์, ฝีมือล้ำลึกเหนือคน, วรยุทธโดดเด่นใต้หล้า, จอมยุทธไร้พ่าย, ปรมาจารย์ยุทธภพ, เป็นหนึ่งในยุทธจักร, ยอดคนใต้หล้า.
+- **New tier names:** สามัญชน, ศิษย์ฝึกหัด, ศิษย์สำนัก, มือดีประจำถิ่น, ท่องเที่ยวทั่วหล้า, ผู้เชี่ยวชาญวรยุทธ์, ฝีมือล้ำลึกเหนือคน, วรยุทธโดดเด่นใต้หล้า, จอมยุทธไร้พ่าย, ปรมาจารย์ยุทธภพ, เป็นหนึ่งในยุทธจักร, ยอดคนใต้หล้า.
 - **Each tier has its own colour**, from grey through green, blue, purple and red to orange and gold; ยอดคนใต้หล้า glows. The badge colours show on the fight warning, the encounter screen and the profile.
 
 ### Power tiers and a warning before every fight
