@@ -28,28 +28,10 @@ export interface WorldMarker extends Point {
   onActivate: () => void;
 }
 
-/** A location built from assets instead of one painting (lib/world/data/composed). */
-export interface ComposedPresentation {
-  width: number;
-  height: number;
-  /** The isometric grid (tiles) and its projection: grid point → world point. */
-  columns: number;
-  rows: number;
-  toWorld: (u: number, v: number) => Point;
-  base: string;
-  ground: readonly { material: string; u: number; v: number; w: number; h: number; edge?: boolean }[];
-  sprites: readonly { src: string; left: number; top: number; width: number; height: number; depth: number; flip: boolean }[];
-  lamps: readonly (readonly [number, number])[];
-  /** Draw order for an actor at a point, given its plain feet-line order. */
-  actorDepth: (point: Point, base: number) => number;
-}
-
 export interface WorldPresentation {
   key: string;
   name: string;
   image: string;
-  /** Asset-built map: replaces the painting and sets the map's size (world units). */
-  composed?: ComposedPresentation;
   /** Draw the background painting mirrored left↔right (route variety). */
   mirrorImage?: boolean;
   /** Regional colour grade for the painting (route maps; lib/stage/route-grade.ts). */

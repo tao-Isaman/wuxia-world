@@ -143,28 +143,13 @@ Both runtimes are loaded with a dynamic `import()` in the browser only. The host
 
 ## Maps
 
-### Composed maps
-
-A composed map is built from separate pieces of isometric art instead of one painting (`lib/world/data/composed/`). Its `LocationMapDef.image` is `composed:<id>`, and its markers are percentages of its own size (`isoPercent` turns a grid point into one).
-
-- **The grid.** Everything is authored on a 2:1 isometric grid (`iso.ts`): `u` runs to the lower right of the screen, `v` to the lower left, and a tile is 64 × 32 units. `isoToWorld` / `worldToIso` convert; the map is the grid's bounding box plus `ISO_TOP_PAD` (160) above for tall roofs. The hero still walks in screen-space world units, so the runtime, markers and saves are unchanged. The capital is 64 × 64 tiles, 4096 × 2208 units.
-- **Camera.** Composed maps zoom in close: the camera keeps about 240 units in view vertically (never fewer than 200 across), so the hero is about a fifth of the screen tall. Paintings keep their cover fit. Diagonal key presses follow the streets (2:1) instead of 45°.
-- **Ground.** Grid rectangles of `paving`, `plaza`, `dirt`, `grass`, `water` or `cobble`. Each is one tile sprite laid out flat, turned 45° inside a container squashed to half height — the 2:1 projection — so the seamless 512 px texture stays anchored to the grid across neighbouring areas. `edge: true` draws a kerb along the diamond. A base material, squashed the same way, fills the corners outside the grid.
-- **Objects.** Every building, wall, tree, stall and prop is its own image (`/maps/composed/<asset>.webp`, 2 px per unit). An asset has a footprint of `tiles: [a, b]` (along u × v, for the art as painted, front to the lower left); a placed object puts the footprint's top corner on grid point (u, v), centres the sprite on it and sets the footprint's bottom corner at `ground` of the sprite's height. `flip` mirrors the art and swaps the footprint's sides; `shift` nudges a sprite whose base is off-centre (a lantern post on an arm).
-- **Draw order.** A sprite sorts on its footprint's centre (`100 + 10 × y`). An actor sorts on its feet, then `composedActorDepth` lifts it above every sprite its body overlaps that it stands in front of (past the footprint's far u or v edge) and below every one it stands behind, which feet-only sorting gets wrong beside long walls and deep halls.
-- **Solids.** Each footprint is a `poly` collision diamond (slightly inset), or the asset's `solid` parts as fractions of it: a gate keeps its passage open, bridges and docks are walk-through. `blocks` adds water, and the four corners outside the grid are solid. `worldFootprints("…", "composed:<id>")` returns them, and `worldBounds` the size.
-- **Pathing.** With more than 40 solids, `planWorldPath` and `nearestWorldGround` use an 8-unit walkability grid (A*, no corner cutting). A cell is solid if any part of it is; the search runs between open cells that see the real start and target, and the path is pulled taut with the swept segment test, so every hop is clear. Small maps keep the exact visibility graph. Footprint tests keep rectangles, ellipses and polygons in separate loops (`sets`): one mixed loop slowed every later map once a composed map had been walked.
-- **Light.** Lantern assets carry `lamps` (lantern posts, lantern lines, stone lanterns); the veil is drawn at a quarter resolution and stretched over the map.
-- **Elsewhere.** Dialog backdrops and cutscene stages use the map's 960 × 640 overview (`/maps/composed/<id>-overview.webp`, `mapBackdrop`, stretched to that size); cutscenes scale the solids to it.
-
 ### Location maps
 
 `getLocationMap(id)` (`lib/world/data/location-maps.ts`) returns a hand-authored `LocationMapDef` if one exists, else `buildAutoMap(id)` for ids in `AUTO_MAP_IDS`.
 
 | Kind | Maps | Image |
 | --- | --- | --- |
-| Hand-authored | `home_player`, `jail` | `/maps/<id>.png` |
-| Composed from assets | `city_capital` | `composed:<id>` (no single picture; see below) |
+| Hand-authored | `home_player`, `city_capital`, `jail` | `/maps/<id>.png` |
 | Auto layout | 97 ids, including the foothill `village` and `tavern` | `/maps/<id>.webp` |
 | None | `world_journey` | classic card layout |
 

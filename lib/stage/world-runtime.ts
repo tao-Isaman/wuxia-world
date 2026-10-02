@@ -13,18 +13,15 @@ import { createWorldLighting } from "./world-lighting";
 import { drawWorldBadge, warmWorldCharacter } from "./world-style";
 import { moveOnWorldGround, planWorldPath, worldFootprints, worldPointBlocked } from "./world-navigation";
 import { initialWorldPlacement } from "./world-placement";
-import { COMPOSED_GROUND_TILE_UNITS as GROUND_TILE_UNITS, ISO_TILE_W } from "../world/data/composed";
 import { addGridFrames, canvasTexture, createStage, drawCanvas, stagePixelRatio, type Stage } from "./phaser-stage";
 import {
   WALK_TICK_UNITS, getRememberedMapPosition, rememberMapPosition, stepTowards,
   type Point, type WorldMarker, type WorldPresentation, type WorldRuntime,
 } from "./types";
 
+const WIDTH = 960;
+const HEIGHT = 640;
 const SPEED = 150;
-/** Composed (asset-built) maps zoom in: about this many world units stay in view vertically… */
-const COMPOSED_VIEW_HEIGHT = 240;
-/** …but never fewer than this many across (portrait phones). */
-const COMPOSED_VIEW_WIDTH = 200;
 const LOAD_TIMEOUT = 20_000;
 // Unique NPC sprites are ~74 native px tall; this frame/size pair gives them the
 // same on-screen height as the archetype sheets (54 units × 108/128 of a frame).
@@ -32,8 +29,9 @@ const UNIQUE_FRAME = 80;
 const UNIQUE_FEET = 78;
 const UNIQUE_NPC_SIZE = 50;
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
-
-const groundSrc = (material: string) => `/maps/composed/ground/${material}.webp`;
+const toWorld = (point: Point): Point => ({ x: point.x * WIDTH / 100, y: point.y * HEIGHT / 100 });
+const toPercent = (point: Point): Point => ({ x: point.x / WIDTH * 100, y: point.y / HEIGHT * 100 });
+const clampPosition = (point: Point): Point => ({ x: clamp(point.x, 12, WIDTH - 12), y: clamp(point.y, 18, HEIGHT - 12) });
 
 export function worldInputBlocked(): boolean {
   const active = document.activeElement;
@@ -66,10 +64,7 @@ type MarkerVisual = {
   phase: number;
 };
 
-/**
- * A flat 2D world drawn by Phaser (WebGL, or Canvas on old devices): a 960×640
- * painting, or a larger map composed from assets (presentation.composed).
- */
+/** A flat 2D world in 960×640 map units, drawn by Phaser (WebGL, or Canvas on old devices). */
 export function createWorldRuntime(
   parent: HTMLElement,
   read: () => WorldPresentation,
@@ -81,23 +76,12 @@ export function createWorldRuntime(
   onWalkTick?: () => void,
 ): WorldRuntime {
   const initial = read();
-  const composed = initial.composed;
-  const WIDTH = composed?.width ?? 960;
-  const HEIGHT = composed?.height ?? 640;
-  const bounds = { width: WIDTH, height: HEIGHT };
-  const toWorld = (point: Point): Point => ({ x: point.x * WIDTH / 100, y: point.y * HEIGHT / 100 });
-  const toPercent = (point: Point): Point => ({ x: point.x / WIDTH * 100, y: point.y / HEIGHT * 100 });
-  /** Actors' draw order: their feet line, corrected for isometric footprints on composed maps. */
-  const actorDepth = (point: Point, base: number) => composed ? composed.actorDepth(point, base) : base;
-  const clampPosition = (point: Point): Point => ({ x: clamp(point.x, 12, WIDTH - 12), y: clamp(point.y, 18, HEIGHT - 12) });
   const footprints = worldFootprints(initial.key, initial.image);
   const placement = initialWorldPlacement(initial, getRememberedMapPosition(initial.key), footprints);
   const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
   let reducedMotion = motionQuery.matches;
   const font = getComputedStyle(document.body).fontFamily;
-  const lighting = composed
-    ? createWorldLighting(initial.key, { width: WIDTH, height: HEIGHT, lamps: composed.lamps, scale: 0.25 })
-    : createWorldLighting(initial.key);
+  const lighting = createWorldLighting(initial.key);
   const markers = new Map<string, MarkerVisual>();
   const props = new Map<string, Phaser.GameObjects.Image>();
   const bystanders = new Map<string, { shadow: Phaser.GameObjects.Image; character: CharacterVisual }>();
@@ -342,7 +326,7 @@ export function createWorldRuntime(
   }
   function walk(point: Point, marker?: string) {
     lastInteraction = null;
-    waypoints = planWorldPath(position, clampPosition(point), footprints, bounds);
+    waypoints = planWorldPath(position, clampPosition(point), footprints);
     destination = waypoints[waypoints.length - 1] ?? null;
     if (!destination) { cancelWalk(); return; }
     interaction = marker ?? null;
@@ -396,10 +380,8 @@ export function createWorldRuntime(
     if (disposed) return;
     const width = Math.max(parent.clientWidth, 1);
     const height = Math.max(parent.clientHeight, 1);
-    // Paintings keep the map's spatial context (cover, follow the narrower view);
-    // composed maps are far larger and zoom in close around the hero.
-    const scale = composed ? Math.max(width / WIDTH, height / HEIGHT, Math.min(height / COMPOSED_VIEW_HEIGHT, width / COMPOSED_VIEW_WIDTH))
-      : Math.max(width / WIDTH, height / HEIGHT);
+    // Keep the map's spatial context; portrait still covers and follows its narrower view.
+    const scale = Math.max(width / WIDTH, height / HEIGHT);
     viewScale = scale;
     viewWidth = width / scale;
     viewHeight = height / scale;
@@ -465,54 +447,6 @@ export function createWorldRuntime(
   function visibilityChanged() { if (document.hidden) loseFocus(); else lastTime = 0; }
   function motionChanged() { reducedMotion = motionQuery.matches; }
 
-  /**
-   * Isometric ground, then every asset as its own image. Each ground area is a
-   * tile sprite laid out on the grid unprojected, turned 45° inside a container
-   * squashed to half height, which is the 2:1 projection: the texture stays
-   * seamless and anchored to the grid across neighbouring areas.
-   */
-  function drawComposed(map: NonNullable<WorldPresentation["composed"]>, images: Map<string, HTMLImageElement>) {
-    const groundTexture = (material: string) => {
-      const key = `ground:${material}`;
-      if (!scene!.textures.exists(key)) {
-        const source = images.get(groundSrc(material));
-        if (source) canvasTexture(scene!, key, drawCanvas(source.width, source.height, (context) => context.drawImage(source, 0, 0)));
-      }
-      return key;
-    };
-    const texel = GROUND_TILE_UNITS / 512;
-    const base = scene!.add.tileSprite(0, 0, WIDTH, HEIGHT, groundTexture(map.base)).setOrigin(0, 0).setDepth(-3);
-    base.setTileScale(texel, texel * 0.5);
-    // One grid tile, unprojected, is a square ISO_TILE_W / √2 units on a side.
-    const side = ISO_TILE_W / Math.SQRT2;
-    const origin = map.toWorld(0, 0);
-    const plane = scene!.add.container(origin.x, origin.y).setScale(1, 0.5).setDepth(-2);
-    for (const area of map.ground) {
-      const x = area.u * side, y = area.v * side;
-      const tile = scene!.add.tileSprite((x - y) / Math.SQRT2, (x + y) / Math.SQRT2, area.w * side, area.h * side, groundTexture(area.material))
-        .setOrigin(0, 0).setRotation(Math.PI / 4);
-      tile.setTileScale(texel, texel);
-      tile.setTilePosition((x % GROUND_TILE_UNITS) / texel, (y % GROUND_TILE_UNITS) / texel);
-      plane.add(tile);
-    }
-    const kerbs = scene!.add.graphics().setDepth(-1);
-    for (const area of map.ground) {
-      if (!area.edge) continue;
-      const corners = [map.toWorld(area.u, area.v), map.toWorld(area.u + area.w, area.v), map.toWorld(area.u + area.w, area.v + area.h), map.toWorld(area.u, area.v + area.h)];
-      kerbs.lineStyle(3, 0x2b2318, 0.38).beginPath().moveTo(corners[0].x, corners[0].y);
-      for (const corner of corners.slice(1)) kerbs.lineTo(corner.x, corner.y);
-      kerbs.closePath().strokePath();
-    }
-    for (const sprite of map.sprites) {
-      const source = images.get(sprite.src);
-      if (!source) continue;
-      const key = `asset:${sprite.src}`;
-      if (!scene!.textures.exists(key)) canvasTexture(scene!, key, drawCanvas(source.width, source.height, (context) => context.drawImage(source, 0, 0)));
-      scene!.add.image(sprite.left, sprite.top, key).setOrigin(0, 0).setDisplaySize(sprite.width, sprite.height)
-        .setFlipX(sprite.flip).setDepth(sprite.depth);
-    }
-  }
-
   async function initialize() {
     const playerId = characterId(initial.playerImage.match(/(?:^|\/)([mf][1-4])(?:\.|\/|$)/)?.[1] ?? "m1");
     const ids = new Set<CharacterId>([playerId]);
@@ -520,17 +454,13 @@ export function createWorldRuntime(
     // Sheets that walk in four directions: the hero's, rigged NPCs', and wandering NPCs' bodies.
     const walkers = new Set<string>(initial.markers.filter((marker) => marker.kind === "npc" && marker.wander).map((marker) => npcCharacterId(marker.id)));
     initial.bystanders?.forEach((actor) => ids.add(characterId(actor.characterId)));
-    const [landscape, atlasEntries, propImages, composedImages] = await Promise.all([
-      composed ? Promise.resolve(null) : loadImage(initial.image),
+    const [landscape, atlasEntries, propImages] = await Promise.all([
+      loadImage(initial.image),
       // Only the controlled hero walks north/south. Stationary NPCs sharing a
       // hero costume need its base poses, not the large direction supplement.
       // Rigged NPCs walk in every direction, so they load it too.
       Promise.all([...ids].map(async (id) => [id, await loadAtlas(id, id === playerId || hasAnimatedSheet(id) || walkers.has(id))] as const)),
       Promise.all((initial.props ?? []).map(async (prop) => [prop.id, await loadImage(prop.image)] as const)),
-      // Composed maps: every distinct sprite and ground texture once.
-      composed ? Promise.all([...new Set([...composed.sprites.map((sprite) => sprite.src),
-        ...[composed.base, ...composed.ground.map((area) => area.material)].map(groundSrc)])]
-        .map(async (src) => [src, await loadImage(src)] as const)).then((entries) => new Map(entries)) : Promise.resolve(null),
     ]);
     if (disposed || failed || !scene) return;
     const atlases = new Map(atlasEntries);
@@ -549,38 +479,35 @@ export function createWorldRuntime(
       } catch { /* keep the archetype sheet for this NPC */ }
     }));
     if (disposed || failed || !scene) return;
-    if (composed && composedImages) drawComposed(composed, composedImages);
-    else if (landscape) {
-      const backgroundCanvas = drawCanvas(WIDTH, HEIGHT, (context) => {
-        if (initial.mirrorImage) { context.translate(WIDTH, 0); context.scale(-1, 1); }
-        context.drawImage(landscape, 0, 0, WIDTH, HEIGHT);
-        if (initial.imageGrade) {
-          const pixels = context.getImageData(0, 0, WIDTH, HEIGHT);
-          gradePixels(pixels.data, initial.imageGrade);
-          context.putImageData(pixels, 0, 0);
-        }
-      });
-      image(texture(backgroundCanvas, "map"), -1).setOrigin(0, 0);
-
-      for (const foreground of worldForeground(initial.key, initial.image)) {
-        const points = foreground.contours.flat();
-        const left = Math.floor(Math.min(...points.map((point) => point[0])));
-        const top = Math.floor(Math.min(...points.map((point) => point[1])));
-        const width = Math.ceil(Math.max(...points.map((point) => point[0]))) - left;
-        const height = Math.ceil(Math.max(...points.map((point) => point[1]))) - top;
-        const cutout = drawCanvas(width, height, (context) => {
-          context.beginPath();
-          foreground.contours.forEach((contour) => {
-            contour.forEach(([x, y], index) => {
-              if (!index) context.moveTo(x - left, y - top); else context.lineTo(x - left, y - top);
-            });
-            context.closePath();
-          });
-          context.clip();
-          context.drawImage(backgroundCanvas, -left, -top);
-        });
-        image(texture(cutout, "occluder"), 100 + foreground.depth * 10).setOrigin(0, 0).setPosition(left, top);
+    const backgroundCanvas = drawCanvas(WIDTH, HEIGHT, (context) => {
+      if (initial.mirrorImage) { context.translate(WIDTH, 0); context.scale(-1, 1); }
+      context.drawImage(landscape, 0, 0, WIDTH, HEIGHT);
+      if (initial.imageGrade) {
+        const pixels = context.getImageData(0, 0, WIDTH, HEIGHT);
+        gradePixels(pixels.data, initial.imageGrade);
+        context.putImageData(pixels, 0, 0);
       }
+    });
+    image(texture(backgroundCanvas, "map"), -1).setOrigin(0, 0);
+
+    for (const foreground of worldForeground(initial.key, initial.image)) {
+      const points = foreground.contours.flat();
+      const left = Math.floor(Math.min(...points.map((point) => point[0])));
+      const top = Math.floor(Math.min(...points.map((point) => point[1])));
+      const width = Math.ceil(Math.max(...points.map((point) => point[0]))) - left;
+      const height = Math.ceil(Math.max(...points.map((point) => point[1]))) - top;
+      const cutout = drawCanvas(width, height, (context) => {
+        context.beginPath();
+        foreground.contours.forEach((contour) => {
+          contour.forEach(([x, y], index) => {
+            if (!index) context.moveTo(x - left, y - top); else context.lineTo(x - left, y - top);
+          });
+          context.closePath();
+        });
+        context.clip();
+        context.drawImage(backgroundCanvas, -left, -top);
+      });
+      image(texture(cutout, "occluder"), 100 + foreground.depth * 10).setOrigin(0, 0).setPosition(left, top);
     }
 
     const shadowKey = texture(drawCanvas(64, 24, (context) => {
@@ -603,7 +530,7 @@ export function createWorldRuntime(
       const shadow = image(shadowKey, 1, 27, 10).setPosition(point.x, point.y);
       const id = characterId(bystander.characterId);
       const character = makeCharacter(`char:${id}`, atlases.get(id)!, bystander.size ?? 51);
-      character.image.setPosition(point.x, point.y).setDepth(actorDepth(point, 100 + point.y * 10));
+      character.image.setPosition(point.x, point.y).setDepth(100 + point.y * 10);
       shadow.setVisible(bystander.visible !== false);
       character.image.setVisible(bystander.visible !== false);
       bystanders.set(bystander.id, { shadow, character });
@@ -621,7 +548,7 @@ export function createWorldRuntime(
         const unique = uniqueAtlases.get(marker.id);
         const id = npcCharacterId(marker.id);
         character = unique ? makeCharacter(`unique:${marker.id}`, unique, UNIQUE_NPC_SIZE) : makeCharacter(`char:${id}`, atlases.get(id)!, 54);
-        character.image.setPosition(point.x, point.y).setDepth(actorDepth(point, 100 + point.y * 10));
+        character.image.setPosition(point.x, point.y).setDepth(100 + point.y * 10);
         if (!unique && (hasAnimatedSheet(id) || marker.wander) && character.directional) wanderers.set(marker.id, createWanderer(marker.id, point));
       } else {
         const key = marker.kind === "exit" ? exitBadge : texture(markerBadge(marker.kind, marker.badge ?? marker.icon), "badge");
@@ -654,7 +581,7 @@ export function createWorldRuntime(
 
     lighting.update(read().time ?? 0, 0, reducedMotion);
     const veilTexture = canvasTexture(scene, "veil", lighting.canvas);
-    veil = { image: image("veil", 8900).setOrigin(0, 0).setDisplaySize(WIDTH, HEIGHT).setAlpha(lighting.opacity), texture: veilTexture };
+    veil = { image: image("veil", 8900).setOrigin(0, 0).setAlpha(lighting.opacity), texture: veilTexture };
 
     const mote = texture(drawCanvas(4, 4, (context) => { context.fillStyle = "#f5e0ab"; context.fillRect(1, 0, 2, 4); }), "mote");
     for (let index = 0; index < 20; index++) {
@@ -704,7 +631,7 @@ export function createWorldRuntime(
     actor.shadow.setPosition(position.x, position.y);
     actor.ring.setPosition(position.x, position.y);
     actor.sign.setPosition(position.x, position.y - 57);
-    player.image.setPosition(position.x, position.y).setDepth(actorDepth(position, 101 + position.y * 10));
+    player.image.setPosition(position.x, position.y).setDepth(101 + position.y * 10);
     const nextMotion = moving ? "walk" : "idle";
     if (playerMotion !== nextMotion) { playerMotion = nextMotion; motionTime = 0; }
     let frame: number;
@@ -821,7 +748,7 @@ export function createWorldRuntime(
           const idleFrame = reducedMotion ? idle.frames[0] : idle.frames[Math.floor((animationTime + visual.phase) * idle.fps) % idle.frames.length];
           setCharacterFrame(visual.character, idleFrame, distance < 90 ? position.x < point.x : visual.character.facingLeft);
         }
-        visual.character.image.setPosition(point.x, point.y).setDepth(actorDepth(point, 100 + point.y * 10));
+        visual.character.image.setPosition(point.x, point.y).setDepth(100 + point.y * 10);
       }
       const opacity = marker.disabled ? 0.5 : 1;
       if (visual.opacity !== opacity) {
@@ -883,8 +810,6 @@ export function createWorldRuntime(
         const held = (key: string) => keys.has(key) ? 1 : 0;
         let dx = held("KeyD") + held("ArrowRight") - held("KeyA") - held("ArrowLeft");
         let dy = held("KeyS") + held("ArrowDown") - held("KeyW") - held("ArrowUp");
-        // On the isometric grid a diagonal key press follows the streets (2:1), not 45°.
-        if (composed && dx && dy) dy *= 0.5;
         // The joystick is analog: a small push walks slowly, a full push at full speed.
         let pace = 1;
         const push = stick ? Math.hypot(stick.x, stick.y) : 0;
@@ -897,7 +822,7 @@ export function createWorldRuntime(
           lastInteraction = null;
           cancelWalk();
           const length = Math.hypot(dx, dy);
-          Object.assign(position, moveOnWorldGround(position, { x: dx / length * SPEED * pace * dt, y: dy / length * SPEED * pace * dt }, footprints, bounds));
+          Object.assign(position, moveOnWorldGround(position, { x: dx / length * SPEED * pace * dt, y: dy / length * SPEED * pace * dt }, footprints));
           faceMovement(dx, dy);
           rememberPosition();
         } else if (destination) {
