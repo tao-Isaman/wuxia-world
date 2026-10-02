@@ -1,7 +1,7 @@
 import { gradePixels } from "./route-grade";
 import type * as Phaser from "phaser";
 import {
-  CHARACTER_CLIPS, characterId, npcCharacterId,
+  CHARACTER_CLIPS, CREATURE_ATLAS, characterId, creatureCell, npcCharacterId,
   type CharacterId,
 } from "../characters/catalog";
 import { loadCharacterAtlas } from "../characters/sheet";
@@ -445,6 +445,9 @@ export function createWorldRuntime(
     if (!ready || blocked()) return;
     parent.focus({ preventScroll: true });
     const point = toMap({ clientX, clientY } as PointerEvent);
+    // A foe drawn over a marker wins the tap: the hero walks into it.
+    const foe = foeAt(point);
+    if (foe) { walk(foe); return; }
     const marker = markerAt(point);
     if (marker) { moveToMarker(marker); return; }
     walk(point);
@@ -659,10 +662,10 @@ export function createWorldRuntime(
   function creatureFrameTexture(frame: number): Promise<string> {
     let pending = creatureFrames.get(frame);
     if (!pending) {
-      creatureSheet ??= loadImage("/art/creature-atlas.png");
+      creatureSheet ??= loadImage(CREATURE_ATLAS.url);
       pending = creatureSheet.then((sheet) => {
-        const w = sheet.width / 4, h = sheet.height / 2;
-        return texture(drawCanvas(w, h, (context) => context.drawImage(sheet, (frame % 4) * w, Math.floor(frame / 4) * h, w, h, 0, 0, w, h)), "foe");
+        const { left, top, width: w, height: h } = creatureCell(sheet.width, sheet.height, frame);
+        return texture(drawCanvas(w, h, (context) => context.drawImage(sheet, left, top, w, h, 0, 0, w, h)), "foe");
       });
       creatureFrames.set(frame, pending);
     }
@@ -753,6 +756,19 @@ export function createWorldRuntime(
       const p = toWorld(foe);
       return [Math.round(p.x), Math.round(p.y)];
     }));
+  }
+  /** The spot of the frontmost roaming foe whose sprite covers `point`, or null. */
+  function foeAt(point: Point): Point | null {
+    let best: Point | null = null;
+    for (const foe of read().foes ?? []) {
+      const visual = foeVisuals.get(foe.id);
+      if (!visual) continue;
+      const at = toWorld(foe);
+      const width = Math.max(28, visual.body.displayWidth * 0.6), height = visual.body.displayHeight * 0.95;
+      if (Math.abs(point.x - at.x) > width / 2 || point.y > at.y + 8 || point.y < at.y - height) continue;
+      if (!best || at.y > best.y) best = at;
+    }
+    return best;
   }
   /** A free, reachable spot for a foe: not under the hero's feet, nor on a marker or another foe. */
   function pickFoeSpot(): Point | null {

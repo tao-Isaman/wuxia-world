@@ -3,9 +3,28 @@ import { ANIMATED_NPC_IDS, hasAnimatedSheet } from "./npc-sheets";
 
 export const PLAYER_CHARACTER_IDS = ["m1", "m2", "m3", "m4", "f1", "f2", "f3", "f4"] as const;
 /** Shared costume sheets: the hero bodies and the NPC archetypes. */
-export const ARCHETYPE_CHARACTER_IDS = [...PLAYER_CHARACTER_IDS, "elder", "monk", "merchant", "bandit", "feng", "wang", "qing"] as const;
-/** Every sheet: the archetypes plus one rigged sheet per animated NPC (its id is the NPC id). */
-export const CHARACTER_IDS = [...ARCHETYPE_CHARACTER_IDS, ...ANIMATED_NPC_IDS] as const;
+/** The shared costume archetypes the NPCs, cutscenes and older foes fall back on. */
+export const COSTUME_CHARACTER_IDS = ["elder", "monk", "merchant", "bandit", "feng", "wang", "qing"] as const;
+export const ARCHETYPE_CHARACTER_IDS = [...PLAYER_CHARACTER_IDS, ...COSTUME_CHARACTER_IDS] as const;
+/**
+ * The enemy types: one painted, rigged body per kind of foe (a thief, a
+ * bandit chief, a river pirate, a cult master…). `foeCharacterFor` in
+ * lib/world/battle-looks.ts picks one for every opponent without its own NPC art.
+ */
+export const FOE_CHARACTER_IDS = [
+  "foe_thief", "foe_bandit", "foe_bandit_chief", "foe_brawler", "foe_archer", "foe_pirate", "foe_marauder",
+  "foe_assassin", "foe_assassin_f", "foe_poisoner", "foe_swordsman", "foe_swordswoman", "foe_ghost", "foe_cultist",
+  "foe_master", "foe_monk", "foe_constable", "foe_guard", "foe_enforcer", "foe_strategist", "foe_brute", "foe_empress",
+] as const;
+export type FoeCharacterId = typeof FOE_CHARACTER_IDS[number];
+/**
+ * Sheets rigged from a painted body by scripts/build-npc-sheets.ts into
+ * /art/characters/<id>.png (+ -directions.png): the heroes (public/player/body/),
+ * the costume archetypes and the enemy types (public/foes/body/).
+ */
+export const PAINTED_CHARACTER_IDS = [...ARCHETYPE_CHARACTER_IDS, ...FOE_CHARACTER_IDS] as const;
+/** Every sheet: the painted ones plus one rigged sheet per animated NPC (its id is the NPC id). */
+export const CHARACTER_IDS = [...PAINTED_CHARACTER_IDS, ...ANIMATED_NPC_IDS] as const;
 export type CharacterId = typeof CHARACTER_IDS[number];
 export type CharacterMotion = "idle" | "walk" | "walkNorth" | "walkSouth" | "attack" | "hurt" | "guard" | "victory" | "defeat";
 export const CHARACTER_GRID = 4;
@@ -21,18 +40,10 @@ export interface CharacterSheetLayout {
   regions?: Readonly<Record<number, readonly (readonly [x: number, y: number, width: number, height: number])[]>>;
 }
 
-// The hero sheets (m1–m4, f1–f4) are rigged from painted bodies like the NPCs.
-// The four "readability v2" archetype sheets (elder, monk, merchant, bandit) are re-packed onto exact equal 4×4 cells by
-// scripts/repack-character-sheet.ts and need no layout. These remaining exports
-// have uneven authored gutters. Edges sit inside transparent gaps between whole
-// poses (alpha threshold 32, matching atlas measurement).
-export const CHARACTER_SHEET_LAYOUTS: Partial<Record<CharacterId, CharacterSheetLayout>> = {
-  wang: { width: 1199, height: 1312, columns: [0, 324, 606, 933, 1199], rows: [0, 357, 667, 963, 1312] },
-  feng: { width: 1199, height: 1312, columns: [0, 319, 605, 918, 1199], rows: [0, 340, 661, 964, 1312] },
-  qing: { width: 1254, height: 1254, columns: [0, 314, 627, 941, 1254], rows: [0, 318, 631, 917, 1254] },
-};
-// The heroes are rigged onto exact equal grids (scripts/build-npc-sheets.ts),
-// so no sheet needs a separate direction layout any more.
+// Every sheet is rigged from a painted body onto exact equal 4×4 cells
+// (scripts/build-npc-sheets.ts), so none needs a layout any more; the hooks
+// stay for a hand-drawn sheet with uneven gutters.
+export const CHARACTER_SHEET_LAYOUTS: Partial<Record<CharacterId, CharacterSheetLayout>> = {};
 export const CHARACTER_DIRECTION_LAYOUTS: Partial<Record<CharacterId, CharacterSheetLayout>> = {};
 export const CHARACTER_CLIPS: Record<CharacterMotion, { frames: readonly number[]; fps: number; repeat: number }> = {
   idle: { frames: [0, 1, 2, 3], fps: 4, repeat: -1 },
@@ -57,7 +68,23 @@ export function characterDirectionSheet(id: string): string { return characterSh
 export function hasWalk8Sheet(id: string): boolean { return (PLAYER_CHARACTER_IDS as readonly string[]).includes(id); }
 export function characterWalk8Sheet(id: string): string { return `/art/characters/${characterId(id)}-walk8.png`; }
 export function hasDirectionalSheet(id: CharacterId): boolean {
-  return (PLAYER_CHARACTER_IDS as readonly string[]).includes(id) || hasAnimatedSheet(id);
+  return (PAINTED_CHARACTER_IDS as readonly string[]).includes(id) || hasAnimatedSheet(id);
+}
+
+/**
+ * The creature atlas (/art/creature-atlas.png): painted beasts on a 4 × 3 grid,
+ * all facing left — 0 wolf · 1 tiger · 2 bear · 3 boar · 4 snake · 5 fowl ·
+ * 6 raptor · 7 bat · 8 hare · 9 squirrel · 10 wild cat · 11 centipede.
+ * Built by scripts/build-creature-atlas.ts.
+ */
+export const CREATURE_ATLAS = { url: "/art/creature-atlas.png", columns: 4, rows: 3 } as const;
+export const CREATURE_FRAME_COUNT = CREATURE_ATLAS.columns * CREATURE_ATLAS.rows;
+/** Pixel rectangle of one creature cell in an atlas image of `width` × `height`. */
+export function creatureCell(width: number, height: number, frame: number) {
+  const { columns, rows } = CREATURE_ATLAS;
+  const column = frame % columns, row = Math.floor(frame / columns) % rows;
+  const left = Math.round(column * width / columns), top = Math.round(row * height / rows);
+  return { left, top, width: Math.round((column + 1) * width / columns) - left, height: Math.round((row + 1) * height / rows) - top };
 }
 
 // Bodies authored on NPC data (NpcDef.look.body), registered by lib/world/data/npcs.ts.

@@ -6,6 +6,14 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-02
 
+### Painted enemies and beasts
+
+- **Every foe is painted in the game's style.** Ordinary foes used to borrow the old hand-drawn costume sheets (a thief, a river pirate and a demon master could all be the same "merchant"). Now there are 22 enemy types — thief, bandit, bandit chief, brawler, archer, river pirate, desert marauder, two assassins, poisoner, swordsman, swordswoman, ghost, cult master, evil master, warrior monk, constable, palace guard, enforcer, schemer, brute and empress — each a painted body rigged into full clips (walk, attack, hurt, guard, victory, defeat, front and back walks) like the heroes and NPCs. `foeCharacterFor` picks one for every opponent without NPC art, on the map and in battle.
+- **The seven costume archetypes** (elder, monk, merchant, bandit, feng, wang, qing) are repainted and rigged the same way, so cutscene extras and art-less NPCs match too.
+- **Twelve painted beasts** replace the old eight-beast atlas: wolf, tiger, bear, boar, snake, rooster, eagle, bat, and new hare, squirrel, wild cat and centipede (hunt rabbits, squirrels, jungle cats, lynxes and centipedes no longer borrow the wolf or the snake). `bun scripts/build-creature-atlas.ts --from <dir>` builds the 4 × 3 atlas.
+- **Tapping a foe** walks into it even when it stands over a shop or NPC marker (the foe wins the tap).
+- `test:npcs` checks every enemy type is rigged and used, every foe without art draws as one, and every beast has a frame of its kind.
+
 ### Foes on the map, and the hero fights by skill
 
 - **No more dice-roll fights.** Walking now brings foes onto the map: each walk tick has a 30 % chance (80 % while hunting a kill-quest target here) to put one a short walk away, at most three at once. They stand with a red ⚔ tag and watch the hero; walk (or tap) into one to face it on the fight-or-flee screen, or walk around it. Who turns up still follows the place (people in towns, beasts in the wilds, spirits near sects and temples) and the hero's power.

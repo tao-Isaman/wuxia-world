@@ -1,5 +1,5 @@
 import type * as Phaser from "phaser";
-import { CHARACTER_CLIPS, characterId, type CharacterMotion } from "../characters/catalog";
+import { CHARACTER_CLIPS, characterId, CREATURE_ATLAS, CREATURE_FRAME_COUNT, creatureCell, type CharacterMotion } from "../characters/catalog";
 import { loadCharacterAtlas } from "../characters/sheet";
 import { getLocationMap } from "../world/data/location-maps";
 import type { CastMember, CutsceneBeat, CutsceneDef, CutsceneFx, CutsceneMood, StagePoint } from "../world/story/types";
@@ -137,14 +137,13 @@ export function createCutsceneRuntime(parent: HTMLElement, def: CutsceneDef, opt
     for (const member of Object.values(def.cast)) needs.add(lookKey(member.look));
     await Promise.all([...needs].map(async (key) => {
       if (key === "beast") {
-        const image = await loadImage("/art/creature-atlas.png");
+        const image = await loadImage(CREATURE_ATLAS.url);
         if (!scene || scene.textures.exists("cs:beast")) return;
         const texture = scene.textures.addImage("cs:beast", image);
         if (!texture) return;
-        for (let cell = 0; cell < 8; cell++) {
-          const column = cell % 4, row = Math.floor(cell / 4);
-          const left = Math.round(column * image.width / 4), top = Math.round(row * image.height / 2);
-          texture.add(cell, 0, left, top, Math.round((column + 1) * image.width / 4) - left, Math.round((row + 1) * image.height / 2) - top);
+        for (let cell = 0; cell < CREATURE_FRAME_COUNT; cell++) {
+          const { left, top, width, height } = creatureCell(image.width, image.height, cell);
+          texture.add(cell, 0, left, top, width, height);
         }
         return;
       }

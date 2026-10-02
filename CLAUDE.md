@@ -79,7 +79,8 @@ bun scripts/normalize-t3-stats.ts       # rewrite move-skill stat sums to 10/15/
 bun scripts/map-collision-tool.ts <id> [json] [png]   # check / draw a painted map's collision
 bun scripts/build-npc-sprites.ts        # NPC pixel sprites from public/npcs/body/
 bun scripts/import-npc-art.ts --from <dir>   # cut out painted NPC bodies + portraits into public/npcs/, register ids
-bun scripts/build-npc-sheets.ts         # rigged animation sheets for the 65 NPCs in lib/characters/npc-sheets.ts + the 8 heroes
+bun scripts/build-npc-sheets.ts         # rigged animation sheets for the 65 NPCs in lib/characters/npc-sheets.ts + the 8 heroes, 7 archetypes and 22 enemy types
+bun scripts/build-creature-atlas.ts --from <dir>   # the 12 painted beasts (b0…b11.png) → public/art/creature-atlas.png
 bun scripts/build-hero-walk8.ts --from <dir>   # the heroes' painted 8-direction walk sheets (<id>-walk8.png)
 bun scripts/smoke-liveness.ts           # 90-day NPC simulation smoke test
 bun scripts/build-world-coords.ts       # each place's world-map spot (exit / road directions); rerun after adding a place or road
@@ -268,6 +269,7 @@ Two deliberate exceptions reach into stores:
   - The action target is the nearest marker within 95 units; E reaches 100.
   - Walk ticks every 220 units; a guide arrow; name tags and quest marks.
   - The hero walks with painted eight-direction sprites (`<id>-walk8.png`, `lib/characters/walk8.ts`) and always faces the way they move.
+  - Foes without NPC art are one of 22 painted, rigged enemy types (`FOE_CHARACTER_IDS`, picked by `foeCharacterFor` in `lib/world/battle-looks.ts`); beasts are 12 painted cells of the 4 × 3 creature atlas (`CREATURE_ATLAS`).
   - The 65 rigged NPCs (`ANIMATED_NPC_IDS`, own 4 × 6 sheets) wander near their spot (`npc-wander.ts`) and freeze when the hero is near or coming to them; picking uses `markerPoint` (their current spot).
   - It pauses while any `[role="dialog"]`, `[role="alertdialog"]` or `[data-world-busy]` exists (`worldInputBlocked`).
   - It publishes `data-*` attributes (`data-ready`, `data-player-x/y/frame/motion/facing`, `data-nearby-marker`, `data-guide-marker`, `data-visible-props`…) for tests.

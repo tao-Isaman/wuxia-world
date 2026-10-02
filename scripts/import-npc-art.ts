@@ -18,6 +18,11 @@
  *
  * Hero bodies instead: <dir>/body/<m1…f4>.png → public/player/body/<id>.png
  * (no portraits, no id lists); `build-npc-sheets.ts` rigs the hero sheets from them.
+ *
+ *   bun scripts/import-npc-art.ts --from <dir> --foes
+ *
+ * Costume archetype and enemy-type bodies: <dir>/body/<elder|…|foe_*>.png →
+ * public/foes/body/<id>.png; `build-npc-sheets.ts` rigs them the same way.
  */
 import sharp from "sharp";
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
@@ -51,6 +56,16 @@ if (process.argv.includes("--heroes")) {
   const heroes = readdirSync(`${from}/body`).filter((f) => /^[mf][1-4]\.png$/.test(f));
   for (const file of heroes) writeFileSync(`public/player/body/${file}`, await fitBody(await cutOut(`${from}/body/${file}`)));
   console.log(`imported ${heroes.length} hero bodies`);
+  process.exit(0);
+}
+
+if (process.argv.includes("--foes")) {
+  const { COSTUME_CHARACTER_IDS, FOE_CHARACTER_IDS } = await import("../lib/characters/catalog");
+  const known = new Set<string>([...COSTUME_CHARACTER_IDS, ...FOE_CHARACTER_IDS]);
+  mkdirSync("public/foes/body", { recursive: true });
+  const files = readdirSync(`${from}/body`).filter((f) => known.has(f.replace(/\.png$/, "")));
+  for (const file of files) writeFileSync(`public/foes/body/${file}`, await fitBody(await cutOut(`${from}/body/${file}`)));
+  console.log(`imported ${files.length} archetype / enemy bodies`);
   process.exit(0);
 }
 

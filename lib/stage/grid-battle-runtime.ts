@@ -13,7 +13,7 @@ import {
   type UnitLook,
 } from "@/lib/game/grid";
 import { heroMoveFor, heroPose, movesIn, type HeroMove } from "./hero-motion";
-import { CHARACTER_CLIPS, CHARACTER_FEET_Y, CHARACTER_FRAME_SIZE, characterId, type CharacterMotion } from "@/lib/characters/catalog";
+import { CHARACTER_CLIPS, CHARACTER_FEET_Y, CHARACTER_FRAME_SIZE, characterId, CREATURE_ATLAS, CREATURE_FRAME_COUNT, creatureCell, type CharacterMotion } from "@/lib/characters/catalog";
 import { WALK8_FPS, dir8FromVector, walk8Frame, walk8Source, type Dir8 } from "@/lib/characters/walk8";
 import { loadCharacterAtlas } from "@/lib/characters/sheet";
 import { BATTLE_BACKGROUNDS, type BattleBackground } from "./battle-background";
@@ -487,17 +487,17 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
     if (cached) return cached;
     const pending = (async (): Promise<LookTexture> => {
       if (look.kind === "creature") {
-        const image = await loadImage("/art/creature-atlas.png");
+        const image = await loadImage(CREATURE_ATLAS.url);
         const texture = scene!.textures.addImage(`gb:${key}`, image);
         if (!texture) throw new Error("Battle creature texture is unavailable");
         const feet: number[] = [];
-        for (let cell = 0; cell < 8; cell++) {
-          const column = cell % 4, row = Math.floor(cell / 4);
-          const left = Math.round(column * image.width / 4), top = Math.round(row * image.height / 2);
-          texture.add(cell, 0, left, top, Math.round((column + 1) * image.width / 4) - left, Math.round((row + 1) * image.height / 2) - top);
+        for (let cell = 0; cell < CREATURE_FRAME_COUNT; cell++) {
+          const { left, top, width, height } = creatureCell(image.width, image.height, cell);
+          texture.add(cell, 0, left, top, width, height);
           feet.push(creatureFeet(image, cell));
         }
-        return { key: `gb:${key}`, kind: "creature" as const, feet, directional: false, w: image.width / 4, h: image.height / 2 };
+        return { key: `gb:${key}`, kind: "creature" as const, feet, directional: false,
+          w: image.width / CREATURE_ATLAS.columns, h: image.height / CREATURE_ATLAS.rows };
       }
       if (look.still) {
         try {
@@ -520,7 +520,7 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
 
   async function makeActor(unit: GridUnit, index: number): Promise<Actor> {
     const tex = await textureFor(unit.look);
-    const frame = tex.kind === "creature" && unit.look.kind === "creature" ? Math.max(0, Math.min(7, unit.look.frame)) : 0;
+    const frame = tex.kind === "creature" && unit.look.kind === "creature" ? Math.max(0, Math.min(CREATURE_FRAME_COUNT - 1, unit.look.frame)) : 0;
     const feet = tex.feet[tex.kind === "creature" ? frame : 0] ?? 0.94;
     const size = Math.max(0.6, Math.min(1.6, unit.look.size ?? 1));
     const dispH = (tex.kind === "creature" ? FRAME * 0.92 : FRAME) * size;
@@ -1165,12 +1165,7 @@ function loadImage(url: string): Promise<HTMLImageElement> {
 
 /** Visible feet line of one creature-atlas cell (0..1 of the cell height). */
 function creatureFeet(image: HTMLImageElement, frame: number): number {
-  const column = frame % 4;
-  const row = Math.floor(frame / 4);
-  const left = Math.round(column * image.width / 4);
-  const top = Math.round(row * image.height / 2);
-  const width = Math.round((column + 1) * image.width / 4) - left;
-  const height = Math.round((row + 1) * image.height / 2) - top;
+  const { left, top, width, height } = creatureCell(image.width, image.height, frame);
   const canvas = document.createElement("canvas");
   canvas.width = width;
   canvas.height = height;
