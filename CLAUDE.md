@@ -79,7 +79,7 @@ bun scripts/normalize-t3-stats.ts       # rewrite move-skill stat sums to 10/15/
 bun scripts/map-collision-tool.ts <id> [json] [png]   # check / draw a painted map's collision
 bun scripts/build-npc-sprites.ts        # NPC pixel sprites from public/npcs/body/
 bun scripts/import-npc-art.ts --from <dir>   # cut out painted NPC bodies + portraits into public/npcs/, register ids
-bun scripts/build-npc-sheets.ts         # rigged animation sheets for the 65 NPCs in lib/characters/npc-sheets.ts
+bun scripts/build-npc-sheets.ts         # rigged animation sheets for the 65 NPCs in lib/characters/npc-sheets.ts + the 8 heroes
 bun scripts/smoke-liveness.ts           # 90-day NPC simulation smoke test
 bun scripts/build-world-coords.ts       # each place's world-map spot (exit / road directions); rerun after adding a place or road
 bun scripts/build-route-variants.ts --from <dir>   # import the 56 directional road paintings (<type>-<dir8>.png)

@@ -21,8 +21,8 @@ export interface CharacterSheetLayout {
   regions?: Readonly<Record<number, readonly (readonly [x: number, y: number, width: number, height: number])[]>>;
 }
 
-// The twelve "readability v2" sheets (heroes m1–m4/f1–f4 and the elder, monk,
-// merchant and bandit archetypes) are re-packed onto exact equal 4×4 cells by
+// The hero sheets (m1–m4, f1–f4) are rigged from painted bodies like the NPCs.
+// The four "readability v2" archetype sheets (elder, monk, merchant, bandit) are re-packed onto exact equal 4×4 cells by
 // scripts/repack-character-sheet.ts and need no layout. These remaining exports
 // have uneven authored gutters. Edges sit inside transparent gaps between whole
 // poses (alpha threshold 32, matching atlas measurement).
@@ -31,11 +31,9 @@ export const CHARACTER_SHEET_LAYOUTS: Partial<Record<CharacterId, CharacterSheet
   feng: { width: 1199, height: 1312, columns: [0, 319, 605, 918, 1199], rows: [0, 340, 661, 964, 1312] },
   qing: { width: 1254, height: 1254, columns: [0, 314, 627, 941, 1254], rows: [0, 318, 631, 917, 1254] },
 };
-// m4/f2/f3/f4 still walk north/south on their v1 supplements (no v2 exists yet);
-// the loader calibrates them to the v2 standing height.
-export const CHARACTER_DIRECTION_LAYOUTS: Partial<Record<CharacterId, CharacterSheetLayout>> = {
-  m4: { width: 1536, height: 1024, columns: [0, 384, 768, 1152, 1536], rows: [0, 490, 1024] },
-};
+// The heroes are rigged onto exact equal grids (scripts/build-npc-sheets.ts),
+// so no sheet needs a separate direction layout any more.
+export const CHARACTER_DIRECTION_LAYOUTS: Partial<Record<CharacterId, CharacterSheetLayout>> = {};
 export const CHARACTER_CLIPS: Record<CharacterMotion, { frames: readonly number[]; fps: number; repeat: number }> = {
   idle: { frames: [0, 1, 2, 3], fps: 4, repeat: -1 },
   walk: { frames: [4, 5, 6, 7], fps: 8, repeat: -1 },

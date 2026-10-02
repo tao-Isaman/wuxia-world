@@ -263,7 +263,7 @@ Pure code in `lib/stage/world-navigation.ts`, in 960 × 640 map units.
   - The others use an archetype sheet chosen by `npcCharacterId(id)`: named overrides, then id patterns (women and nuns → f1 / f3, monks → monk, thieves → bandit, elders → elder, officials → m3, merchants → merchant, beggars → m2, guards → m4…).
   - Three registry NPCs have no art at all: `jail_elder_prisoner`, `jail_guard_zhang`, `city_capital_clerk_qing`.
 - **Portraits.** `/npcs/<id>.png` (256 × 256), used by the dialog bust, the NPC card and the quest receipt.
-- **Hero body.** `playerBodyId` picks the atlas `m1`…`f4`. `/player/*.png` and `/npcs/body/*.png` are build inputs; the game never fetches them.
+- **Hero body.** `playerBodyId` picks the atlas `m1`…`f4`. The eight hero sheets are rigged by `scripts/build-npc-sheets.ts` from painted bodies in `/player/body/<id>.png` (imported with `import-npc-art.ts --heroes`), the same way and in the same painted style as the NPCs, so the hero matches the people around them. `/player/*.png`, `/player/body/*.png` and `/npcs/body/*.png` are build inputs; the game never fetches them.
 - **`CharacterPreview`** (`components/game/character-preview.tsx`) is a 128 × 128 animated canvas, with an optional bust crop. It is used by the start screen, profile, busy overlay, dialog fallback, encounter screen, upgrade card and `/progress`.
 - **Creature atlas.** `/art/creature-atlas.png` has 4 × 2 beast frames, used in battle only (see [grid-combat.md](grid-combat.md#unit-looks)).
 
@@ -460,7 +460,7 @@ More styling details:
 | `public/fonts/jomyuth/` | a declared, unused font |
 | `public/sw.js`, `public/progress.json` | the service worker; the frozen journal data |
 
-`public/art/characters/` also ships 16 `-v1` rollback sheets and 16 `readability-v2` sources that nothing loads (about 50 MB).
+`public/art/characters/` also ships 16 `-v1` rollback sheets and 16 `readability-v2` sources that nothing loads (about 50 MB). The old chibi-style hero sheets can be rebuilt from their v2 sources with `repack-character-sheet.ts`.
 
 ## The /progress page
 
