@@ -6,6 +6,12 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-02
 
+### The hero walks in eight painted directions
+
+- **Real directional sprites for the eight heroes.** For each one, five painted strips (front, three-quarter front, profile, three-quarter back, back), each a standing pose and a four-step walk, replace the rigged puppet walk. The west-facing directions mirror the east ones, giving eight headings.
+- **The hero faces the way they walk**, by keys, joystick or tap-to-walk, and keeps that heading when they stop. On the battle board their steps use the same sprites.
+- New `scripts/build-hero-walk8.ts`, `lib/characters/walk8.ts` and `/art/characters/<id>-walk8.png`; the atlas loader appends the cells as frames 24–51. `test:npcs` checks the sheets and the heading rules.
+
 ### The hero matches the world
 
 - **The eight selectable heroes are repainted** (gpt-image-2) in the same semi-realistic painted style as the NPCs, keeping each one's costume, hair and colours, with realistic proportions instead of the big-headed "readability v2" look.

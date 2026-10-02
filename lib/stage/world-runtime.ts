@@ -6,6 +6,7 @@ import {
 } from "../characters/catalog";
 import { loadCharacterAtlas } from "../characters/sheet";
 import { hasAnimatedSheet } from "../characters/npc-sheets";
+import { WALK8_FIRST_FRAME, WALK8_FPS, WALK8_FRAMES, dir8FromVector, walk8Frame, type Dir8 } from "../characters/walk8";
 import { WANDER_FREEZE_DISTANCE, createWanderer, stepWanderer, type Wanderer } from "./npc-wander";
 import { worldForeground } from "./world-occlusion";
 import { createWorldLighting } from "./world-lighting";
@@ -101,6 +102,9 @@ export function createWorldRuntime(
   let lastPositionReport = 0;
   let playerMotion: "idle" | "walk" = "idle";
   let playerFacing: "east" | "west" | "north" | "south" = placement.facing;
+  // Eight-way heading for heroes with painted walk8 cells (lib/characters/walk8.ts).
+  let playerBaseScaleY: number | undefined;
+  let playerDir: Dir8 = ({ east: "E", west: "W", north: "N", south: "S" } as const)[placement.facing];
   let destination: Point | null = null;
   let waypoints: Point[] = [];
   let interaction: string | null = null;
@@ -328,7 +332,18 @@ export function createWorldRuntime(
     interaction = marker ?? null;
     targetRing?.setPosition(destination.x, destination.y).setVisible(true);
   }
-  function faceMovement(dx: number, dy: number) {
+  // A new heading must hold briefly before the hero turns, so letting go of a
+  // diagonal (two keys never come up on the same frame) doesn't snap them to
+  // the last key's direction. Starting from standing still turns at once.
+  let dirCandidate: Dir8 | null = null, dirCandidateSince = 0, lastMoveAt = -Infinity;
+  const TURN_HOLD_MS = 90;
+  function faceMovement(dx: number, dy: number, turnNow = false) {
+    const now = performance.now();
+    const next = dir8FromVector(dx, dy, playerDir);
+    if (turnNow || next === playerDir || now - lastMoveAt > 150) { playerDir = next; dirCandidate = null; }
+    else if (next !== dirCandidate) { dirCandidate = next; dirCandidateSince = now; }
+    else if (now - dirCandidateSince >= TURN_HOLD_MS) { playerDir = next; dirCandidate = null; }
+    lastMoveAt = now;
     if (Math.abs(dy) > Math.abs(dx)) playerFacing = dy < 0 ? "north" : "south";
     else if (Math.abs(dx) > 0.001) playerFacing = dx < 0 ? "west" : "east";
   }
@@ -619,10 +634,23 @@ export function createWorldRuntime(
     player.image.setPosition(position.x, position.y).setDepth(101 + position.y * 10);
     const nextMotion = moving ? "walk" : "idle";
     if (playerMotion !== nextMotion) { playerMotion = nextMotion; motionTime = 0; }
-    const vertical = player.directional && (playerFacing === "north" || playerFacing === "south");
-    const clip = vertical ? CHARACTER_CLIPS[playerFacing === "north" ? "walkNorth" : "walkSouth"] : CHARACTER_CLIPS[playerMotion];
-    const frame = clip.frames[!moving && (reducedMotion || vertical) ? 0 : Math.floor(motionTime * clip.fps) % clip.frames.length];
-    setCharacterFrame(player, frame, playerFacing === "west");
+    let frame: number;
+    if (player.frames >= WALK8_FIRST_FRAME + WALK8_FRAMES) {
+      // Painted eight-way walk: the hero always faces the way they move; standing keeps the last heading.
+      const step = moving && !reducedMotion ? Math.floor(motionTime * WALK8_FPS) % 4 : null;
+      const pose = walk8Frame(playerDir, step);
+      frame = pose.frame;
+      setCharacterFrame(player, frame, pose.mirror);
+      // Standing still, the painted pose breathes: a slow 1 % rise from the feet.
+      playerBaseScaleY ??= player.image.scaleY;
+      player.image.scaleY = playerBaseScaleY * (step === null && !reducedMotion ? 1 + 0.01 * Math.sin(animationTime * 2.2) : 1);
+    } else {
+      const vertical = player.directional && (playerFacing === "north" || playerFacing === "south");
+      const clip = vertical ? CHARACTER_CLIPS[playerFacing === "north" ? "walkNorth" : "walkSouth"] : CHARACTER_CLIPS[playerMotion];
+      frame = clip.frames[!moving && (reducedMotion || vertical) ? 0 : Math.floor(motionTime * clip.fps) % clip.frames.length];
+      setCharacterFrame(player, frame, playerFacing === "west");
+    }
+    parent.dataset.playerDir = playerDir;
     parent.dataset.playerMotion = playerMotion;
     parent.dataset.playerFrame = String(frame);
     parent.dataset.playerFacing = playerFacing;
@@ -817,7 +845,7 @@ export function createWorldRuntime(
               const marker = read().markers.find((entry) => entry.id === id);
               if (marker?.kind === "npc") {
                 const point = markerPoint(marker);
-                faceMovement(point.x - position.x, point.y - position.y);
+                faceMovement(point.x - position.x, point.y - position.y, true);
               }
               marker?.onActivate();
             }
@@ -889,6 +917,7 @@ export function createWorldRuntime(
       delete parent.dataset.playerMotion;
       delete parent.dataset.playerFrame;
       delete parent.dataset.playerFacing;
+      delete parent.dataset.playerDir;
       delete parent.dataset.nearbyScreenBounds;
       delete parent.dataset.wanderingNpcs;
       delete parent.dataset.visibleProps;

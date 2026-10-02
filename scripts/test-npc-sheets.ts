@@ -15,6 +15,8 @@ import { FIGHT_EVENTS } from "../lib/world/data/random-events";
 import { npcBattleSprite, npcPixelSprite } from "../lib/world/data/npc-portraits";
 import { WANDER_RADIUS, createWanderer, stepWanderer } from "../lib/stage/npc-wander";
 import { encounterFoeAvailable } from "../lib/world/effects";
+import { PLAYER_CHARACTER_IDS, characterWalk8Sheet, hasWalk8Sheet } from "../lib/characters/catalog";
+import { WALK8_FIRST_FRAME, dir8FromVector, walk8Frame } from "../lib/characters/walk8";
 
 let passed = 0;
 async function check(name: string, fn: () => void | Promise<void>) {
@@ -145,6 +147,60 @@ await check("wander: frozen means standing still; the same id strolls the same w
   for (let i = 0; i < 300; i++) stepWanderer(a, 1 / 30, true, () => true);
   assert.deepEqual(a.pos, at);
   assert.equal(a.moving, false);
+});
+
+await check("heroes: an eight-way walk sheet each — 28 drawn cells, every direction its own picture", async () => {
+  for (const id of PLAYER_CHARACTER_IDS) {
+    assert.ok(hasWalk8Sheet(id), id);
+    const file = `public${characterWalk8Sheet(id)}`;
+    assert.ok(existsSync(file), `${file} exists (bun scripts/build-hero-walk8.ts)`);
+    const { data, info } = await sharp(file).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+    assert.equal(info.width, 512, file);
+    assert.equal(info.height, 7 * 128, file);
+    const cells: Uint8Array[] = [];
+    for (let cell = 0; cell < 28; cell++) {
+      const ox = (cell % 4) * 128, oy = Math.floor(cell / 4) * 128;
+      const px = new Uint8Array(128 * 128 * 4);
+      let opaque = 0;
+      for (let y = 0; y < 128; y++) for (let x = 0; x < 128; x++) {
+        const i = ((oy + y) * 512 + ox + x) * 4;
+        if (data[i + 3] < 128) continue;
+        opaque++;
+        px.set([data[i], data[i + 1], data[i + 2], 255], (y * 128 + x) * 4);
+      }
+      assert.ok(opaque > 1200, `${file} cell ${cell} has a figure (${opaque} px)`);
+      cells.push(px);
+    }
+    // Share of the figures' pixels that differ (outline, shape or colour).
+    const differ = (a: Uint8Array, b: Uint8Array) => {
+      let d = 0, n = 0;
+      for (let i = 0; i < a.length; i += 4) {
+        if (!a[i + 3] && !b[i + 3]) continue;
+        n++;
+        if (a[i + 3] !== b[i + 3] || Math.abs(a[i] - b[i]) + Math.abs(a[i + 1] - b[i + 1]) + Math.abs(a[i + 2] - b[i + 2]) > 60) d++;
+      }
+      return d / Math.max(1, n);
+    };
+    // The five standing poses (S, SE, E, NE, N) are different views, and each walk has a real stride.
+    for (let i = 20; i < 25; i++) for (let j = i + 1; j < 25; j++) assert.ok(differ(cells[i], cells[j]) > 0.3, `${id}: standing ${i} and ${j} look alike (${differ(cells[i], cells[j]).toFixed(2)})`);
+    for (let row = 0; row < 5; row++) assert.ok(differ(cells[row * 4], cells[row * 4 + 2]) > 0.15, `${id}: walk row ${row} barely moves (${differ(cells[row * 4], cells[row * 4 + 2]).toFixed(2)})`);
+  }
+  assert.equal(hasWalk8Sheet("sect_wudang_master_qingxu"), false);
+});
+
+await check("walk8: the hero faces the way it moves — eight headings, west mirrored from east", () => {
+  assert.equal(dir8FromVector(1, 0, "S"), "E");
+  assert.equal(dir8FromVector(-1, 0, "S"), "W");
+  assert.equal(dir8FromVector(0, -1, "S"), "N");
+  assert.equal(dir8FromVector(0, 1, "N"), "S");
+  assert.equal(dir8FromVector(1, 1, "N"), "SE");
+  assert.equal(dir8FromVector(-1, -1, "S"), "NW");
+  assert.equal(dir8FromVector(0, 0, "NE"), "NE", "standing keeps the heading");
+  assert.equal(dir8FromVector(1, 0.42, "E"), "E", "a joystick near a boundary does not flicker");
+  assert.deepEqual(walk8Frame("E", 1), { frame: WALK8_FIRST_FRAME + 2 * 4 + 1, mirror: false });
+  assert.deepEqual(walk8Frame("W", 1), { frame: WALK8_FIRST_FRAME + 2 * 4 + 1, mirror: true });
+  assert.deepEqual(walk8Frame("SW", null), { frame: WALK8_FIRST_FRAME + 20 + 1, mirror: true });
+  assert.deepEqual(walk8Frame("N", null), { frame: WALK8_FIRST_FRAME + 24, mirror: false });
 });
 
 console.log(`${passed} NPC sheet and wander checks passed`);

@@ -53,6 +53,9 @@ export function characterSheet(id: string): string {
   return hasAnimatedSheet(sheet) ? `/art/characters/npc/${sheet}.png` : `/art/characters/${sheet}.png`;
 }
 export function characterDirectionSheet(id: string): string { return characterSheet(id).replace(/\.png$/, "-directions.png"); }
+/** The heroes also walk in eight painted directions (lib/characters/walk8.ts). */
+export function hasWalk8Sheet(id: string): boolean { return (PLAYER_CHARACTER_IDS as readonly string[]).includes(id); }
+export function characterWalk8Sheet(id: string): string { return `/art/characters/${characterId(id)}-walk8.png`; }
 export function hasDirectionalSheet(id: CharacterId): boolean {
   return (PLAYER_CHARACTER_IDS as readonly string[]).includes(id) || hasAnimatedSheet(id);
 }

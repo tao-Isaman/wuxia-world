@@ -80,6 +80,7 @@ bun scripts/map-collision-tool.ts <id> [json] [png]   # check / draw a painted m
 bun scripts/build-npc-sprites.ts        # NPC pixel sprites from public/npcs/body/
 bun scripts/import-npc-art.ts --from <dir>   # cut out painted NPC bodies + portraits into public/npcs/, register ids
 bun scripts/build-npc-sheets.ts         # rigged animation sheets for the 65 NPCs in lib/characters/npc-sheets.ts + the 8 heroes
+bun scripts/build-hero-walk8.ts --from <dir>   # the heroes' painted 8-direction walk sheets (<id>-walk8.png)
 bun scripts/smoke-liveness.ts           # 90-day NPC simulation smoke test
 bun scripts/build-world-coords.ts       # each place's world-map spot (exit / road directions); rerun after adding a place or road
 bun scripts/build-route-variants.ts --from <dir>   # import the 56 directional road paintings (<type>-<dir8>.png)
@@ -267,6 +268,7 @@ Two deliberate exceptions reach into stores:
   - Cover-fit camera; WASD, tap-to-walk and a joystick.
   - The action target is the nearest marker within 95 units; E reaches 100.
   - Walk ticks every 220 units; a guide arrow; name tags and quest marks.
+  - The hero walks with painted eight-direction sprites (`<id>-walk8.png`, `lib/characters/walk8.ts`) and always faces the way they move.
   - The 65 rigged NPCs (`ANIMATED_NPC_IDS`, own 4 × 6 sheets) wander near their spot (`npc-wander.ts`) and freeze when the hero is near or coming to them; picking uses `markerPoint` (their current spot).
   - It pauses while any `[role="dialog"]`, `[role="alertdialog"]` or `[data-world-busy]` exists (`worldInputBlocked`).
   - It publishes `data-*` attributes (`data-ready`, `data-player-x/y/frame/motion/facing`, `data-nearby-marker`, `data-guide-marker`, `data-visible-props`…) for tests.

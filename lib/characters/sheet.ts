@@ -1,9 +1,13 @@
-import { CHARACTER_FEET_Y, CHARACTER_FRAME_SIZE, CHARACTER_GRID, CHARACTER_SHEET_LAYOUTS, CHARACTER_DIRECTION_LAYOUTS, characterDirectionSheet, characterSheet, hasDirectionalSheet, type CharacterId, type CharacterSheetLayout } from "./catalog";
+import { CHARACTER_FEET_Y, CHARACTER_FRAME_SIZE, CHARACTER_GRID, CHARACTER_SHEET_LAYOUTS, CHARACTER_DIRECTION_LAYOUTS, characterDirectionSheet, characterSheet, characterWalk8Sheet, hasDirectionalSheet, hasWalk8Sheet, type CharacterId, type CharacterSheetLayout } from "./catalog";
 import { applyWalkBeat, WALK_BEATS } from "./walk-cycle";
 
 export interface CharacterAtlas {
   image: HTMLCanvasElement; frameSize: 128; feetY: 120; columns: 4; rows: number; directional: boolean;
+  /** The atlas carries the eight-direction walk cells (frames 24–51, lib/characters/walk8.ts). */
+  walk8: boolean;
 }
+/** Painted walk8 cells keep their authored placement: feet on this row of each 128 px cell. */
+const WALK8_SOURCE_FEET = 119;
 const atlases = new Map<string, Promise<CharacterAtlas>>();
 
 function loadImage(src: string): Promise<HTMLImageElement> {
@@ -60,9 +64,12 @@ function median(values: number[]) { const sorted = [...values].sort((a, b) => a 
 
 /** Normalize padding and scale per source sheet, preserving pose variation and original PNGs. */
 async function prepareAtlas(id: CharacterId, directional: boolean): Promise<CharacterAtlas> {
-  const [source, directionSource] = await Promise.all([
+  const walk8 = directional && hasWalk8Sheet(id);
+  const [source, directionSource, walk8Source] = await Promise.all([
     loadImage(characterSheet(id)),
     directional ? loadImage(characterDirectionSheet(id)) : Promise.resolve(null),
+    // A missing walk8 sheet only costs the eight-way walk, never the character.
+    walk8 ? loadImage(characterWalk8Sheet(id)).catch(() => null) : Promise.resolve(null),
   ]);
   const base = measureFrames(source, 4, CHARACTER_SHEET_LAYOUTS[id]);
   const directions = directionSource ? measureFrames(directionSource, 2, CHARACTER_DIRECTION_LAYOUTS[id]) : [];
@@ -70,13 +77,24 @@ async function prepareAtlas(id: CharacterId, directional: boolean): Promise<Char
   // Different exports can have different source resolution. Calibrate each sheet
   // once; never resize each pose separately, which makes walking visibly pulse.
   const directionRatio = directions.length ? baseHeight / median(directions.map((frame) => frame.height)) : 1;
-  const frames = [...base.map((frame) => ({ ...frame, ratio: 1 })),
-    ...directions.map((frame) => ({ ...frame, ratio: directionRatio }))];
+  // Walk8 cells are drawn whole (their figures are already placed on a shared
+  // foot line and centred on the torso); their bounds only calibrate the size.
+  const walk8Bounds = walk8Source ? measureFrames(walk8Source, 7) : [];
+  const walk8Ratio = walk8Bounds.length ? baseHeight / median(walk8Bounds.slice(20, 25).map((frame) => frame.height)) : 1;
+  const walk8Cells = walk8Bounds.map((_, index) => {
+    const x = index % CHARACTER_GRID * CHARACTER_FRAME_SIZE, y = Math.floor(index / CHARACTER_GRID) * CHARACTER_FRAME_SIZE;
+    const cell = { x, y, width: CHARACTER_FRAME_SIZE, height: CHARACTER_FRAME_SIZE };
+    return { source: walk8Source!, ...cell, regions: [cell], ratio: walk8Ratio, feet: y + WALK8_SOURCE_FEET };
+  });
+  const measured = [...base.map((frame) => ({ ...frame, ratio: 1 })),
+    ...directions.map((frame) => ({ ...frame, ratio: directionRatio })),
+    ...walk8Bounds.map((frame) => ({ ...frame, ratio: walk8Ratio }))];
+  const frames: (typeof measured[number] & { feet?: number })[] = [...measured.slice(0, base.length + directions.length), ...walk8Cells];
   const scale = Math.min(108 / baseHeight,
-    118 / Math.max(...frames.map((frame) => frame.width * frame.ratio)),
-    116 / Math.max(...frames.map((frame) => frame.height * frame.ratio)));
+    118 / Math.max(...measured.map((frame) => frame.width * frame.ratio)),
+    116 / Math.max(...measured.map((frame) => frame.height * frame.ratio)));
   const image = document.createElement("canvas");
-  const rows = directional ? 6 : 4;
+  const rows = directional ? (walk8Cells.length ? 13 : 6) : 4;
   image.width = CHARACTER_FRAME_SIZE * CHARACTER_GRID;
   image.height = CHARACTER_FRAME_SIZE * rows;
   const output = image.getContext("2d");
@@ -87,7 +105,9 @@ async function prepareAtlas(id: CharacterId, directional: boolean): Promise<Char
     const height = Math.round(frame.height * frame.ratio * scale);
     const x = index % CHARACTER_GRID * CHARACTER_FRAME_SIZE;
     const y = Math.floor(index / CHARACTER_GRID) * CHARACTER_FRAME_SIZE;
-    const targetX = x + Math.round((CHARACTER_FRAME_SIZE - width) / 2), targetY = y + CHARACTER_FEET_Y - height;
+    // The frame's foot row lands on the shared baseline (a measured pose's feet are its bottom edge).
+    const feet = (frame.feet ?? frame.y + frame.height) - frame.y;
+    const targetX = x + Math.round((CHARACTER_FRAME_SIZE - width) / 2), targetY = y + CHARACTER_FEET_Y - Math.round(feet * height / frame.height);
     // Several source gutters bend around a complete raised hand or extended
     // punch. Clip only to the authored regions, then draw once with one common
     // transform, so pieces retain their original alignment without raster seams.
@@ -114,7 +134,7 @@ async function prepareAtlas(id: CharacterId, directional: boolean): Promise<Char
     WALK_BEATS[index % 4]);
   }
   output.putImageData(pixels, 0, 0);
-  return { image, frameSize: CHARACTER_FRAME_SIZE, feetY: CHARACTER_FEET_Y, columns: CHARACTER_GRID, rows, directional };
+  return { image, frameSize: CHARACTER_FRAME_SIZE, feetY: CHARACTER_FEET_Y, columns: CHARACTER_GRID, rows, directional, walk8: walk8Cells.length > 0 };
 }
 
 export function loadCharacterAtlas(id: CharacterId, includeDirections = true): Promise<CharacterAtlas> {
