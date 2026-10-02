@@ -4,6 +4,13 @@ What changed, when, and in which pull request. Newest first. Each entry says wha
 
 Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-Isaman/wuxia-world/pulls?q=is%3Apr+is%3Amerged). The waves are the build → test → review rounds the agents worked in (see [HANDOFF.md](../HANDOFF.md)).
 
+## 2026-10-02
+
+### The hero matches the world
+
+- **The eight selectable heroes are repainted** (gpt-image-2) in the same semi-realistic painted style as the NPCs, keeping each one's costume, hair and colours, with realistic proportions instead of the big-headed "readability v2" look.
+- Their sheets are now rigged by `scripts/build-npc-sheets.ts` from `public/player/body/<id>.png` (new `import-npc-art.ts --heroes`), like the NPCs', so the hero walks, fights and falls the same way as the people around them. The m4 direction layout is gone; the v2 sources stay for rollback.
+
 ## 2026-10-01
 
 ### The last 32 new NPCs painted
