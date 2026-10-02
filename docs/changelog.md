@@ -6,6 +6,10 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-02
 
+### The capital stays a painting
+
+- **นครหลวง is back to its painted 960 × 640 map**, with its old camera, markers and collision. The asset-built isometric city merged in [#44](https://github.com/tao-Isaman/wuxia-world/pull/44) was reverted in full; its engine (composed maps, polygon collision, grid pathing) and art are in that pull request's history if they are wanted again.
+
 ### The hero walks in eight painted directions
 
 - **Real directional sprites for the eight heroes.** For each one, five painted strips (front, three-quarter front, profile, three-quarter back, back), each a standing pose and a four-step walk, replace the rigged puppet walk. The west-facing directions mirror the east ones, giving eight headings.
