@@ -148,10 +148,15 @@ try {
   useWorldStore.getState().travelRoute("city_capital");
   assert.equal(useWorldStore.getState().currentSceneId, "city_capital");
   assert.equal(useWorldStore.getState().pendingEncounter, null, "arrival no longer rolls; walking does");
-  useWorldStore.getState().walkTick();
-  assert.ok(useWorldStore.getState().pendingEncounter, "a walk tick in the capital rolls its encounter with the same RNG 0");
+  useWorldStore.getState().walkTick(() => ({ x: 40, y: 60 }));
+  assert.equal(useWorldStore.getState().pendingEncounter, null, "walking springs nothing: a foe appears on the map instead");
+  const [foe] = useWorldStore.getState().roamingFoes;
+  assert.ok(foe && foe.locationId === "city_capital" && foe.x === 40 && foe.y === 60, "a foe waits at the picked spot");
+  useWorldStore.getState().engageFoe(foe.id);
+  assert.equal(useWorldStore.getState().pendingEncounter!.opponentId, foe.opponentId, "walking into it opens its encounter");
   assert.equal(useWorldStore.getState().pendingEncounter!.returnSceneId, "city_capital");
-  console.log("PASS ordinary home→capital arrival is quiet; walking the capital rolls the encounter lottery");
+  assert.equal(useWorldStore.getState().roamingFoes.length, 0, "and it leaves the map");
+  console.log("PASS ordinary home→capital arrival is quiet; walking the capital spawns a foe that the hero walks into");
 } finally {
   Math.random = random;
 }

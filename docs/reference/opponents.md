@@ -2,9 +2,9 @@
 
 # Opponents
 
-286 opponents (`lib/world/data/opponents.ts`). Random encounters draw from 64 fight events (plus 4 treasure and 31 meeting events) filtered by zone (`lib/world/data/random-events.ts`).
+286 opponents (`lib/world/data/opponents.ts`). Foes that turn up on the map while the hero walks come from 64 fight events filtered by zone (`lib/world/data/random-events.ts`).
 
-Met via: **roams** = random walk encounters in the listed zones · **hunt** = a hunting node · **spar** = an NPC's practice bout · **scene** = a quest or story battle (count of scene choices) · **law** = pursuers after wanted marks · **betrayal** = hunters after betraying a sect.
+Met via: **roams** = turns up on the map in the listed zones while the hero walks · **hunt** = a hunting node · **spar** = an NPC's practice bout · **scene** = a quest or story battle (count of scene choices) · **law** = pursuers after wanted marks · **betrayal** = hunters after betraying a sect.
 
 Per tier: T0: 9 · T1: 43 · T2: 73 · T3: 53 · T4: 108. Per category: ฝ่ายมนุษย์ (human): 253 · สัตว์ป่า (beast): 27 · ผู้พิเศษ (supernatural): 6.
 
@@ -14,7 +14,7 @@ Per tier: T0: 9 · T1: 43 · T2: 73 · T3: 53 · T4: 108. Per category: ฝ่�
 | --- | --- | --- | --- | --- | --- |
 | `training_capital_apprentice` | ศิษย์ฝึกหัดอาเฉิง | human | — | 0 | scene ×1 |
 | `petty_thief` | ขโมยน้อย | human | — | 3 | roams (city, frontier, isle, mansion, sect, temple, wild) |
-| `drunk_brawler` | ชายเมาก่อเรื่อง | human | — | 3 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×1 |
+| `drunk_brawler` | ชายเมาก่อเรื่อง | human | — | 3 | roams (city, frontier, isle, mansion, sect, temple, wild) |
 | `wild_dog` | หมาป่าเล็ก | beast | — | 3 | roams (frontier, isle, wild) |
 | `wild_chicken` | ไก่ป่า | beast | — | 3 | roams (frontier, isle, wild) |
 | `small_snake` | งูเล็ก | beast | — | 3 | roams (frontier, isle, wild) |
@@ -26,9 +26,9 @@ Per tier: T0: 9 · T1: 43 · T2: 73 · T3: 53 · T4: 108. Per category: ฝ่�
 
 | Id | Name | Category | Pack | Drops | Met via |
 | --- | --- | --- | --- | --- | --- |
-| `thug` | โจรเร่ร่อน | human | — | 5 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×2 |
+| `thug` | โจรเร่ร่อน | human | — | 5 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×1 |
 | `bandit` | โจรป่า | human | — | 5 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×1 |
-| `ruffian` | คนร้าย | human | — | 5 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×2 |
+| `ruffian` | คนร้าย | human | — | 5 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×1 |
 | `wild_beast` | สัตว์ป่าดุร้าย | beast | — | 5 | roams (frontier, isle, wild) |
 | `wild_boar` | หมูป่า | beast | — | 5 | roams (frontier, isle, wild) |
 | `wild_wolf` | หมาป่า | beast | 1× หมาป่าเล็ก | 5 | roams (frontier, isle, wild) |
@@ -82,7 +82,7 @@ Per tier: T0: 9 · T1: 43 · T2: 73 · T3: 53 · T4: 108. Per category: ฝ่�
 | `iron_palm_thug` | นักเลงฝ่ามือเหล็ก | human | — | 6 | roams (city, frontier, isle, mansion, sect, temple, wild) |
 | `flying_swallow` | นกนางแอ่นบิน | human | — | 6 | roams (city, frontier, isle, mansion, sect, temple, wild) |
 | `poison_practitioner` | ผู้ฝึกพิษ | human | — | 7 | roams (city, frontier, isle, mansion, sect, temple, wild) |
-| `wandering_swordsman` | กระบี่พเนจร | human | — | 6 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×1 |
+| `wandering_swordsman` | กระบี่พเนจร | human | — | 6 | roams (city, frontier, isle, mansion, sect, temple, wild) |
 | `sect_disciple` | ลูกศิษย์สำนัก | human | — | 6 | roams (city, frontier, isle, mansion, sect, temple, wild) |
 | `hunt_alpha_wolf` | หมาป่าจ่าฝูง | beast | 2× สุนัขป่า | 6 | hunt |
 | `hunt_giant_bear` | หมีหิน | beast | — | 7 | hunt |
@@ -126,7 +126,7 @@ Per tier: T0: 9 · T1: 43 · T2: 73 · T3: 53 · T4: 108. Per category: ฝ่�
 | `frost_wolf` | หมาป่าหิมะ | beast | 2× หมาป่า | 7 | roams (frontier, isle, wild) |
 | `blood_boar` | หมูป่าเลือดคลั่ง | beast | 1× หมูป่า | 6 | roams (frontier, isle, wild) |
 | `bandit_lieutenant` | รองหัวหน้าโจร | human | 1× โจรป่า + 1× มือเข็มโจรป่า | 6 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×1 |
-| `night_blade` | มือมีดราตรี | human | — | 6 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×4 |
+| `night_blade` | มือมีดราตรี | human | — | 6 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×3 |
 | `demon_cult_zealot` | สาวกลัทธิมาร | human | 2× สาวกลัทธิมาร | 6 | roams (city, frontier, isle, mansion, sect, temple, wild) |
 | `spar_village_noname_whip_qiao` | ยายเฉียว | human | — | 6 | spar, scene ×1 |
 | `spar_village_taishan_porter_shi` | สือเปียนตาน | human | — | 6 | spar, scene ×1 |

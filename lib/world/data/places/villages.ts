@@ -8,7 +8,6 @@
 //   nc4 · art:t2_eighttri · art:t3_heartmind — inn_youjian
 import type { DialogScene, NpcDef, QuestDef, SceneLine } from "../../types";
 import type { ActivityDef } from "../activities";
-import type { MeetEventDef } from "../random-events";
 import type { StoryOpponentSpec } from "../../story/types";
 import type { PlaceContent } from "./types";
 
@@ -1301,90 +1300,6 @@ const SCENES: DialogScene[] = [
     say(MEI, "อ้อ ค่าห้องเดือนนี้ข้าไม่คิดเจ้า แต่เดือนหน้าคิดเต็มนะ"),
   ], "คารวะเหมยเหนียง"),
 
-  // ─── Place meetings ───────────────────────────────────────────────
-  {
-    kind: "dialog",
-    id: "pev_noname_nickname",
-    lines: [
-      narr("เสี่ยวอู๋วิ่งตามเจ้ามาเหนื่อยหอบ ยื่นก้อนหินกลมเกลี้ยงให้ก้อนหนึ่ง"),
-      say(XIAOWU, "ข้าตั้งชื่อหินก้อนนี้ว่า 'พี่ใจดี' เพราะมันเหมือนเจ้า เก็บไว้นะ!"),
-      say(XIAOWU, "แลกกับ... ถ้ามีขนมก็ดี ไม่มีก็ไม่เป็นไร ข้าจะตั้งชื่อให้ขนมที่เจ้าไม่มีด้วย"),
-    ],
-    choices: [
-      { text: "ให้เงินเด็กไปซื้อขนม (5 ตำลึง)",
-        visibleIf: { t: "goldAtLeast", amount: 5 },
-        effects: [{ t: "addGold", amount: -5 }, { t: "giveItem", itemId: "rock", count: 1 }, { t: "addTrait", trait: "good", amount: 1 }, { t: "addNpcRelationship", npcId: "village_noname_child_xiaowu", amount: 3 }],
-        next: "village_noname" },
-      { text: "รับหินไว้แล้วลูบหัวเด็ก",
-        effects: [{ t: "giveItem", itemId: "rock", count: 1 }, { t: "addNpcRelationship", npcId: "village_noname_child_xiaowu", amount: 1 }],
-        next: "village_noname" },
-    ],
-  },
-  {
-    kind: "dialog",
-    id: "pev_huashan_lost_disciple",
-    lines: [
-      narr("ศิษย์หัวซานหนุ่มน้อยในชุดเขียวยืนงงอยู่กลางทางแยก กระบี่ยังใหม่เอี่ยม"),
-      say("ศิษย์หัวซานฝึกหัด", "ขอโทษนะท่าน ร้านตีเหล็กของอาจารย์ถังไปทางไหน ข้าลงเขามาครั้งแรก"),
-      say("ศิษย์หัวซานฝึกหัด", "ศิษย์พี่ใช้ข้ามาซ่อมฝักกระบี่ ถ้ากลับช้าข้าโดนกวาดลานอีกเดือน"),
-    ],
-    choices: [
-      { text: "พาไปส่งถึงหน้าร้าน",
-        effects: [{ t: "giveItem", itemId: "potion", count: 1 }, { t: "addTrait", trait: "good", amount: 1 }],
-        next: "pev_huashan_lost_disciple_thanks" },
-      { text: "ชี้ทางให้แล้วเดินต่อ", next: "village_huashan" },
-    ],
-  },
-  aside("pev_huashan_lost_disciple_thanks", [
-    say("ศิษย์หัวซานฝึกหัด", "ขอบคุณมาก! ยานี่ศิษย์พี่ให้ข้าไว้ แต่ข้ายังไม่เคยเจ็บเลย ท่านเอาไปเถอะ"),
-    narr("เด็กหนุ่มวิ่งเข้าร้านตีเหล็กไป เสียงเถี่ยตันตะโกนว่า 'อาจารย์ไม่อยู่!' ดังออกมา"),
-  ]),
-  {
-    kind: "dialog",
-    id: "pev_taishan_runaway_load",
-    lines: [
-      narr("เสียงโครมครามจากบันไดหิน หีบผลไม้ของผู้แสวงบุญหลุดจากมือ กลิ้งลงมาทางเจ้า"),
-      say("ผู้แสวงบุญ", "ช่วยด้วย! ของเซ่นเทพไท่ซาน!"),
-    ],
-    choices: [
-      { text: "กระโดดรับหีบไว้",
-        effects: [{ t: "addGold", amount: 20 }, { t: "addTrait", trait: "good", amount: 1 }, { t: "addNpcRelationship", npcId: "village_taishan_porter_shi", amount: 2 }],
-        next: "pev_taishan_runaway_load_caught" },
-      { text: "หลบไปข้างทาง", next: "village_taishan" },
-    ],
-  },
-  aside("pev_taishan_runaway_load_caught", [
-    narr("เจ้ารับหีบไว้ได้ทันก่อนมันกระแทกหิน ผลท้อในหีบไม่ช้ำสักลูก"),
-    say("ผู้แสวงบุญ", "เทพไท่ซานส่งท่านมาแน่ ๆ รับเหรียญนี่ไปเป็นสินน้ำใจเถิด"),
-    say(SHI, "...รับดี"),
-    narr("สือเปียนตานพยักหน้าให้เจ้าจากบันไดขั้นบน แล้วหาบของเดินขึ้นต่อ"),
-  ]),
-  {
-    kind: "dialog",
-    id: "pev_youjian_couplet",
-    lines: [
-      narr("บัณฑิตเมาคนหนึ่งเดินเซมาขวางทาง ชูจอกเหล้าขึ้นสูง"),
-      say("บัณฑิตเมา", "กลอนคู่! ข้าว่าวรรคแรก เจ้าต่อวรรคหลัง ต่อได้ข้าเลี้ยง ต่อไม่ได้เจ้าเลี้ยง!"),
-      say("บัณฑิตเมา", "'โรงเตี๊ยมมีหว่าง มีห้องว่างทุกคืน'..."),
-    ],
-    choices: [
-      { text: "'แต่ใจคนพักแรม ไม่เคยว่างสักคืน'",
-        effects: [{ t: "addGold", amount: 30 }, { t: "addTrait", trait: "fame", amount: 1 }],
-        next: "pev_youjian_couplet_won" },
-      { text: "'มีเหล้าเต็มไห แต่เงินไม่เต็มถุง'",
-        effects: [{ t: "addTrait", trait: "humility", amount: 1 }],
-        next: "pev_youjian_couplet_laugh" },
-    ],
-  },
-  aside("pev_youjian_couplet_won", [
-    narr("บัณฑิตเมานิ่งไปครู่หนึ่ง แล้วร้องไห้โฮ"),
-    say("บัณฑิตเมา", "ลึกซึ้ง! ลึกซึ้งเกินไป! ข้าแพ้แล้ว เอาไปเลยค่าเหล้าข้าทั้งคืน!"),
-    narr("ซินแสกว้าที่โต๊ะริมหน้าต่างพยักหน้าเบา ๆ เหมือนทำนายไว้แล้ว"),
-  ]),
-  aside("pev_youjian_couplet_laugh", [
-    say("บัณฑิตเมา", "ฮ่า ๆ ๆ จริง! จริงที่สุด! กลอนนี้ไม่ไพเราะ แต่ซื่อสัตย์!"),
-    narr("ทั้งโรงเตี๊ยมหัวเราะครืน เหมยเหนียงเคาะลูกคิดหนึ่งที — ค่าเหล้าของบัณฑิตเมาเพิ่มขึ้นอีกไห"),
-  ]),
 ];
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1449,21 +1364,13 @@ const ACTIVITIES: ActivityDef[] = [
 ];
 
 // ═══════════════════════════════════════════════════════════════════
-// Place meetings
 // ═══════════════════════════════════════════════════════════════════
 
-const EVENTS: MeetEventDef[] = [
-  { id: "pev_noname_nickname", weight: 2, dialogSceneId: "pev_noname_nickname", locationIds: ["village_noname"] },
-  { id: "pev_huashan_lost_disciple", weight: 2, dialogSceneId: "pev_huashan_lost_disciple", locationIds: ["village_huashan"], once: true },
-  { id: "pev_taishan_runaway_load", weight: 2, dialogSceneId: "pev_taishan_runaway_load", locationIds: ["village_taishan"] },
-  { id: "pev_youjian_couplet", weight: 2, dialogSceneId: "pev_youjian_couplet", locationIds: ["inn_youjian"], once: true },
-];
 
 export const CONTENT: PlaceContent = {
   npcs: NPCS,
   quests: QUESTS,
   scenes: SCENES,
   activities: ACTIVITIES,
-  events: EVENTS,
   opponents: OPPONENTS,
 };

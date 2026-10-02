@@ -7,7 +7,6 @@
 // Teaches (one quest each): gn, nc8, t1_whitehorse, nd2, nm1, fs, ne3, sa, nf3, yyz.
 import type { Choice, Condition, DialogScene, NpcDef, QuestDef, SceneEffect, SceneLine } from "../../types";
 import type { ActivityDef } from "../activities";
-import type { MeetEventDef } from "../random-events";
 import type { StoryOpponentSpec } from "../../story/types";
 import type { PlaceContent } from "./types";
 
@@ -1015,72 +1014,6 @@ const scenes: DialogScene[] = [
     tell("เขายื่นเข็มขัดนักรบเส้นเก่าให้ — เข็มขัดที่เขาคาดตอนอยู่กองทัพ"),
   ], "รับวิชาทวนประทับมังกร"),
 
-  // ═══ Place meetings ═══════════════════════════════════════════════
-  dialog("pev_chengying_flute", [
-    tell("เสียงขลุ่ยแว่วมาจากริมลำธาร เพลงเศร้าแต่อบอุ่น เหมือนคนรอใครสักคนที่รู้ว่าไม่มา"),
-    tell("เจ้านั่งฟังจนจบเพลง ใจสงบลงอย่างประหลาด"),
-  ], [
-    { text: "ลุกเดินต่อ", next: CY, effects: [{ t: "addNpcRelationship", npcId: CHENG, amount: 1 }, { t: "addTrait", trait: "humility", amount: 1 }] },
-  ]),
-  dialog("pev_chengying_eagle", [
-    tell("เงานกยักษ์บินผ่านเหนือบ้านเฉิงอิ๋ง ขนสีน้ำตาลร่วงลงมาหนึ่งเส้น"),
-    say(LU_N, "นั่นมัน... อินทรีของเขา! พี่เฉิง! พี่เฉิง!"),
-    tell("เฉิงอิ๋งวิ่งออกมาถึงลาน แต่นกบินลับเขาไปแล้ว นางยืนนิ่งอยู่นาน แล้วยื่นเม็ดบัวให้เจ้ากำหนึ่งโดยไม่พูดอะไร"),
-  ], [{ text: "รับเม็ดบัวไว้", next: CY, effects: [{ t: "giveItem", itemId: "lotus_seed", count: 2 }] }]),
-  dialog("pev_yanji_patient", [
-    tell("ชายแก่คนหนึ่งเดินกะโผลกกะเผลกมาตามตรอก มือกุมหลัง"),
-    say("ชายแก่ปวดหลัง", "หมอหยานอยู่ไหม? เขาจัดกระดูกให้ข้าเมื่อปีก่อน แล้วกระเป๋าเงินข้าก็หายไปด้วย... แต่หลังข้าหายจริง ๆ นะ"),
-  ], [
-    { text: "พยุงเขาไปถึงประตูบ้านหมอ", next: YJ, effects: [{ t: "addTrait", trait: "good", amount: 1 }, { t: "addGold", amount: 10 }] },
-    { text: "ชี้ทางให้แล้วเดินต่อ", next: YJ },
-  ]),
-  dialog("pev_yanji_debt", [
-    tell("ชายหนุ่มท่าทางดุดันถือดาบเดินวนหน้าบ้านหยานจี"),
-    say("ชายถือดาบ", "หยานจีติดหนี้ตระกูลหูของข้า! เจ้าเป็นคนของมันใช่ไหม!"),
-  ], [
-    { text: "ข้าไม่ใช่ แต่ถ้าเจ้าอยากสู้ ก็มา", next: YJ,
-      effects: [{ t: "triggerBattle", opponentId: "ruffian", onWin: "pev_yanji_debt_won", onLose: YJ, nonFatal: true }] },
-    { text: "อธิบายว่าเป็นแค่คนผ่านทาง", next: YJ },
-  ]),
-  dialog("pev_yanji_debt_won", [
-    tell("ชายหนุ่มเก็บดาบ หายใจหอบ \"เอาเถอะ บอกหยานจีด้วยว่าหนี้นี้ยังไม่จบ\""),
-    tell("ในบ้าน ได้ยินเสียงประตูตู้ยาปิดดังปัง"),
-  ]),
-  dialog("pev_beichou_riddler", [
-    tell("บัณฑิตเร่ร่อนคนหนึ่งนั่งพักบนก้อนหินริมทาง เขาโบกมือเรียก"),
-    say("บัณฑิตเร่ร่อน", "ข้ามาท้าเป่ยฉิวตอบปริศนา แพ้มาสามรอบแล้ว ขอลองกับเจ้าบ้าง"),
-    say("บัณฑิตเร่ร่อน", "อะไรเอ่ย มีฟันแต่ไม่กิน?"),
-  ], [
-    { text: "หวี", next: BC, effects: [{ t: "giveItem", itemId: "paper", count: 2 }, { t: "addTrait", trait: "fame", amount: 1 }] },
-    { text: "เป่ยฉิว", next: "pev_beichou_riddler_wrong" },
-  ]),
-  dialog("pev_beichou_riddler_wrong", [
-    tell("เสียงหัวเราะลั่นดังมาจากกระท่อม"),
-    say(BEI_N, "ข้ามีฟันนะ! และข้ากินด้วย! ฮ่า ๆ ๆ"),
-  ]),
-  dialog("pev_meizhuang_chains", [
-    tell("ขณะเดินเลียบทะเลสาบ เจ้าได้ยินเสียงโซ่เหล็กกระทบหินดังมาจากใต้น้ำ"),
-    tell("พ่อบ้านติงเจียนปรากฏตัวข้างเจ้าอย่างเงียบเชียบ"),
-    say(DING_N, "เสียงปลาตัวใหญ่ขอรับ ทะเลสาบนี้ปลาตัวใหญ่มาก ใหญ่จนไม่ควรถาม"),
-  ], [{ text: "พยักหน้า แล้วเดินต่อ", next: MZ }]),
-  dialog("pev_meizhuang_wine", [
-    tell("ตันชิงเซิงเดินโซเซมาตามทาง ถือไหเหล้ามาสองไห"),
-    say(DANQING_N, "ไหนี้ไม่มีหมึก! ข้าสาบาน! ลองชิมดูสิ"),
-  ], [
-    { text: "ดื่มด้วย", next: MZ, effects: [{ t: "giveItem", itemId: "cooked_meat", count: 1 }, { t: "addNpcRelationship", npcId: DANQING, amount: 2 }] },
-    { text: "ปฏิเสธอย่างสุภาพ", next: MZ },
-  ]),
-  dialog("pev_fuwei_qingcheng", [
-    tell("ชายชุดเขียวสองคนยืนมองป้ายสำนักฝูเวยจากฝั่งถนน กระซิบกันแล้วหัวเราะ"),
-    tell("พอเห็นเจ้ามองอยู่ พวกเขาหันหลังเดินหายไปในตลาด"),
-    say(SHI_N, "เจ้าก็เห็นใช่ไหม... พวกนั้นมาสามวันแล้ว"),
-  ], [{ text: "บอกสื่อเปียวโถวว่าจะคอยระวัง", next: FW, effects: [{ t: "addNpcRelationship", npcId: SHI, amount: 2 }] }]),
-  dialog("pev_fuwei_horse", [
-    tell("ม้าตัวหนึ่งหลุดจากคอก วิ่งพล่านไปทั่วลานสำนัก หลินผิงจือวิ่งตามพลางตะโกน"),
-  ], [
-    { text: "คว้าบังเหียนไว้", next: FW, effects: [{ t: "addNpcRelationship", npcId: PING, amount: 2 }, { t: "addGold", amount: 20 }] },
-    { text: "ยืนดูคุณชายวิ่ง", next: FW },
-  ]),
 ];
 
 // ─── Activities ───────────────────────────────────────────────────────
@@ -1119,17 +1052,5 @@ const activities: ActivityDef[] = [
       doneText: "หีบหนักจนหลังแอ่น สื่อเปียวโถวตะโกนนับ \"สิบเจ็ด! สิบแปด!\" แล้วจ่ายค่าแรงเต็ม" } },
 ];
 
-// ─── Place meetings ───────────────────────────────────────────────────
-const events: MeetEventDef[] = [
-  { id: "pev_chengying_flute", weight: 2, dialogSceneId: "pev_chengying_flute", locationIds: [CY] },
-  { id: "pev_chengying_eagle", weight: 1, dialogSceneId: "pev_chengying_eagle", locationIds: [CY], once: true },
-  { id: "pev_yanji_patient", weight: 2, dialogSceneId: "pev_yanji_patient", locationIds: [YJ] },
-  { id: "pev_yanji_debt", weight: 1, dialogSceneId: "pev_yanji_debt", locationIds: [YJ], once: true },
-  { id: "pev_beichou_riddler", weight: 2, dialogSceneId: "pev_beichou_riddler", locationIds: [BC], once: true },
-  { id: "pev_meizhuang_chains", weight: 1, dialogSceneId: "pev_meizhuang_chains", locationIds: [MZ], once: true },
-  { id: "pev_meizhuang_wine", weight: 2, dialogSceneId: "pev_meizhuang_wine", locationIds: [MZ] },
-  { id: "pev_fuwei_qingcheng", weight: 1, dialogSceneId: "pev_fuwei_qingcheng", locationIds: [FW], once: true },
-  { id: "pev_fuwei_horse", weight: 2, dialogSceneId: "pev_fuwei_horse", locationIds: [FW] },
-];
 
-export const CONTENT: PlaceContent = { npcs, quests, scenes, activities, events, opponents };
+export const CONTENT: PlaceContent = { npcs, quests, scenes, activities, opponents };

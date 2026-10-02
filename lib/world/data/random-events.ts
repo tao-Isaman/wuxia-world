@@ -1,35 +1,9 @@
-// Random-event tables: probabilities, pools, zones and power scaling. The
-// roll itself is `rollWalkEvent` in lib/world/effects.ts, called by the store's
-// `walkTick` every WALK_TICK_UNITS walked, with these probabilities × 0.4
-// (entering a map rolls nothing; the `rollRandomEvent` effect is a no-op).
-//
-// On each walk tick the engine:
-//   1. Checks the law (wanted marks) and betrayed-sect hunters first.
-//   2. Computes per-type probabilities (fight is fixed, treasure/meet scale
-//      with the player's LUK stat).
-//   3. Rolls a single uniform [0, 1) — first fight, then treasure, then meet.
-//      Whatever doesn't fall in those bands is "nothing happens".
-//   4. Picks a specific event from the relevant pool by weight, then
-//      dispatches it: fight → a fight-or-flee `pendingEncounter`,
-//      treasure/meet → goto a small dialog scene whose own onEnter applies
-//      the loot / lore.
-//
-// Adding new events is additive: append a record to one of the pool arrays,
-// and (for meet/treasure) define the matching scene id in scenes.ts.
-
-import { PLACE_MEET_EVENTS } from "./place-events";
-
-export interface MeetEventDef {
-  id: string;
-  weight: number;
-  dialogSceneId: string;
-  /** Only while walking at these places (a place event); omitted = anywhere. */
-  locationIds?: readonly string[];
-  /** Only while this holds. */
-  condition?: import("../types").Condition;
-  /** Happens once per game (flag `meet:<id>`). */
-  once?: boolean;
-}
+// Walk-tick tables: zones, foe pools and power scaling. Fights are no longer
+// a dice roll that springs on the hero: a walk tick may *spawn* a foe on the
+// map (`rollFoeSpawn` in lib/world/effects.ts, by zone, power and any hunt),
+// it waits there, and touching it opens the fight-or-flee encounter. The law
+// and betrayed-sect hunters still catch up on a roll (`rollWalkEvent`).
+// Treasure and meeting events are gone.
 
 export interface FightEventDef {
   id: string;
@@ -39,39 +13,15 @@ export interface FightEventDef {
   share?: number;
 }
 
-export interface TreasureEventDef {
-  id: string;
-  weight: number;
-  dialogSceneId: string;
-}
-
-// Probability constants. Tunable here — the dispatcher reads them directly.
-export const EVENT_PROBABILITY = {
-  // Fight is fixed at 15 %. Random encounters now route through a
-  // fight-or-flee screen so the player can decline.
-  fight: 0.15,
-  // Hunt-boost fight chance — used by `rollWalkEvent` when the player
-  // has at least one active quest stage with a `defeatedOpponent`
-  // autoAdvance AND the target opponent spawns in the current zone.
-  // Treasure / meet bands are suppressed during a hunt (the player is
-  // focused; flavor events get out of the way).
-  fightHunting: 0.80,
-  // Treasure: 5 % base + LUK / 200, capped at 25 %.
-  treasureBase: 0.05,
-  treasureLukDivisor: 200,
-  treasureCap: 0.25,
-  // Meet: 10 % base + LUK / 300, capped at 35 %.
-  meetBase: 0.10,
-  meetLukDivisor: 300,
-  meetCap: 0.35,
+// How often foes turn up on a map while the hero walks. Tunable here.
+export const FOE_SPAWN = {
+  /** Chance per walk tick that a foe appears (while fewer than `maxPerMap` are about). */
+  chance: 0.3,
+  /** While hunting a kill-quest target that lives in this zone. */
+  huntChance: 0.8,
+  /** Most foes waiting on one map at once. */
+  maxPerMap: 3,
 } as const;
-
-export const MEET_EVENTS: readonly MeetEventDef[] = [
-  { id: "wanderer",  weight: 2, dialogSceneId: "evt_meet_wanderer" },
-  { id: "monk",      weight: 2, dialogSceneId: "evt_meet_monk" },
-  { id: "merchant",  weight: 1, dialogSceneId: "evt_meet_merchant" },
-  ...PLACE_MEET_EVENTS,
-];
 
 // Static base weight per tier — used at power 0 (early game). The
 // dynamic helper `tierWeightForPower` reshapes these as the player's
@@ -248,12 +198,6 @@ export const FIGHT_EVENTS: readonly FightEventDef[] = [
   { id: "fight_elite_villain_dushou", weight: 0, opponentId: "elite_villain_dushou", share: 0.35 },
 ];
 
-export const TREASURE_EVENTS: readonly TreasureEventDef[] = [
-  { id: "gold_pouch",   weight: 3, dialogSceneId: "evt_treasure_gold" },
-  { id: "potion_find",  weight: 3, dialogSceneId: "evt_treasure_potion" },
-  { id: "herb_find",    weight: 2, dialogSceneId: "evt_treasure_herb" },
-  { id: "jade_find",    weight: 1, dialogSceneId: "evt_treasure_jade" },
-];
 
 // Build the FIGHT_EVENTS subset that's appropriate for `locationId` —
 // each event's `weight` is multiplied by the zone's category weight

@@ -42,16 +42,16 @@ Each suite is a Bun script (or `bun test` file) wired as `test:*` in `package.js
 | `test:rumors` | `scripts/test-lore-rumors.ts`, `scripts/test-rumor-formatting.ts` | 5 + 4 | lore seeding (new game and v18 / v19 hydration), caps, selection rules; 104 template × truth combinations render without stray `{tokens}` |
 | `test:investigation` | `scripts/test-capital-investigation.ts` | 5 | the capital ledger and corrupt-clerk quests end to end, legacy stages, the one-time reward |
 | `test:audio` | `scripts/test-audio.ts` | 4 | the note data in `lib/audio/songs.ts`: timing, ranges, pentatonic modes, the battle drums |
-| `test:law` | `scripts/test-law.ts` | 8 | wanted marks, pursuers, jail sentence, bribe, theft marks, the jail map and its activities |
+| `test:law` | `scripts/test-law.ts` | 9 | wanted marks, pursuers, jail sentence, bribe, theft marks, the jail map and its activities; roaming foes (by zone, the 30 % rate, at most three, spot needed, contact → encounter, dropped on leaving, none at home) |
 | `test:walk` | `scripts/test-walk-cycle.ts` | 1 | the walk cycle alternates feet and bobs 1 px |
 | `test:grid` | `scripts/test-grid-engine.ts` | 14 | the grid engine: layout, movement rules, turn order, ranges and areas, arts, damage over time, stun, victory, flee, full battles against real opponents, packs |
 | `test:grid-ai` | `scripts/test-grid-ai.ts` | 13 | AI legality and behaviour over dozens of seeded battles; average planning time under 15 ms |
-| `test:grid-skills` | `scripts/test-grid-skills.ts` | 7 | every skill (178) and art (122) has a valid battle range; the 18 overrides exist; Thai range labels |
+| `test:grid-skills` | `scripts/test-grid-skills.ts` | 8 | every skill (178) and art (122) has a valid battle range; the 18 overrides exist; Thai range labels; the hero's body move per skill (`hero-motion.ts`) |
 | `test:grid-store` | `scripts/test-grid-store.ts` | 14 | battle store + bridge + the pre-fight briefing + looks + the world hand-off: HP carry-over, packs and board sizes, spar sprites, rigged NPC sheets, flee, auto mode, win / loss / escape results |
 | `test:npcs` | `scripts/test-npc-sheets.ts` | 9 | the 65 rigged NPCs: art, placement, complete sheets, every frame a distinct pose, catalog wiring, the 10 villain bosses in the encounter pool; wandering stays near home, off blocked ground and still when frozen; every hero's eight-way walk sheet (28 drawn cells, distinct views, a real stride) and the heading / mirroring rules |
 | `test:story` | `scripts/test-story-quests.ts` | — | every sect skill and art has exactly one quest source and nothing else (rank, manual, hall, dialog, other quest) teaches it; lineage quests (teacher, foe, item, spar tier, lines) and sagas (8–10 chapters, lines, cutscenes, small rewards) are well formed; every cutscene's stage, cast and beats resolve; **every** lineage quest and saga chapter plays through in the real store to the learned skill or art; difficulty gates by tier. `STORY_SECT=<label>` limits it to one sect |
 | `test:routes` | `scripts/test-routes.ts` | 8 | world coords are current; compass helpers; one exit per slot and every exit within 90° of its destination's bearing; every road runs its exit's way and has its painting; snapped exit points on a real exit at the border; road geometry on the painting for all 8 directions; regional grades; arrivals land beside the exit back |
-| `test:places` | `scripts/test-places.ts` | 12 | every ยุทธจักร T0–T3 move and art is a quest reward (the 69 new ones from one place quest) gated by rarity; each of the 20 villages / towns / homes has NPCs, an activity and quests on its map; new NPCs have a dialog, a look (only m/f bodies wander) and gift tastes; activities and meetings registered; no teacher is an assassination / kidnap target; presence (assassinated / 180-day kidnap); gift worth and tastes; the store's `giveGift` cooldown and gold; activity cooldowns; home meetings on safe ground |
+| `test:places` | `scripts/test-places.ts` | 11 | every ยุทธจักร T0–T3 move and art is a quest reward (the 69 new ones from one place quest) gated by rarity; each of the 20 villages / towns / homes has NPCs, an activity and quests on its map; new NPCs have a dialog, a look (only m/f bodies wander) and gift tastes; activities registered; no teacher is an assassination / kidnap target; presence (assassinated / 180-day kidnap); gift worth and tastes; the store's `giveGift` cooldown and gold; activity cooldowns |
 | `test:quests` | 5 scripts | — | the campaign audit, dead-end regressions, playing **every** item / kill / objective quest (213) through the real store, guidance for all 657 stages, and every steal / assassinate / kidnap quest stage (39) |
 | `test:docs` | `scripts/build-docs-reference.ts --check`, `scripts/check-docs.ts` | — | the generated reference is current; links, repo paths and commands in the docs resolve |
 
@@ -101,12 +101,12 @@ Read-only scripts, not wired into `package.json`:
 - Test timeout 90 s; `expect` timeout 15 s.
 - Base URL `http://127.0.0.1:3017`, viewport 1440 × 900.
 - Traces are kept on failure.
-- **`storageState` seeds `localStorage["wuxia-random-events"] = "off"`** so walk ticks never ambush a test. Only `law-guide.spec.ts` removes the key, and it restores it afterwards.
+- **`storageState` seeds `localStorage["wuxia-random-events"] = "off"`** so walk ticks never ambush a test. Only `law-guide.spec.ts` and `roaming-foes.spec.ts` remove the key.
 - `webServer` starts **`next dev`** on :3017 when nothing is listening there (`reuseExistingServer` unless `CI` is set).
 
 Many specs replace `Math.random` in the page to make rolls predictable.
 
-24 tests in 14 spec files:
+25 tests in 15 spec files:
 
 | Spec | Tests | Covers |
 | --- | --- | --- |
@@ -122,6 +122,7 @@ Many specs replace `Math.random` in the page to make rolls predictable.
 | `pwa.spec.ts` | 1 | manifest and icons, an active service worker, an offline reload — **needs a production server** |
 | `quest-tracking.spec.ts` | 1 | pinning a quest, the HUD tracker, and the ฉางอัน spy objective advancing in person |
 | `routes.spec.ts` | 1 | home → capital: the road map's direction, the hero starting at its near end, and arriving beside the exit back home |
+| `roaming-foes.spec.ts` | 1 | walking brings a foe onto the capital map; tapping it walks the hero into it and opens the encounter with power tiers; fleeing returns to the map |
 | `places.spec.ts` | 1 | a village has its new people; a 500-gold gift raises trust and starts the 30-day wait; a kidnapped NPC leaves the map and is back after 180 days |
 | `story.spec.ts` | 2 | a saga chapter's film plays (title card, tap, skip), the long briefing pages, and the quest log's ตำนาน tab replays the film; the sect window's ขั้นและวิชา tab lists the sect's skills with their quests, and a rank-up pays gold and teaches nothing |
 

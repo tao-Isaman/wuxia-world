@@ -271,7 +271,7 @@ Details of the rewards: [gameplay.md](gameplay.md#progression).
 - **Pause**: nothing advances while the tab is hidden or any dialog is open.
 - **Reduced motion**: no VFX or shake, shorter timings, the idle frame held (sounds still play).
 - **Failure**: on a lost WebGL context or a boot error, the canvas shows **โหลดฉากใหม่**, and the arena keeps the battle moving without animation by calling `step()` every 350 ms.
-- **Host attributes** on `[data-testid="battle-canvas"]`: `data-renderer`, `data-renderer-backend` (`webgl` / `canvas`), `data-ready`, `data-battle-background`, `data-background-image`, `data-reduced-motion`, `data-anim` (`idle` / `playing`), `data-event-seq`, `data-units` (JSON id, team, x, y, hp, alive), `data-phase`, `data-active-unit`, `data-highlight` (`move` / `aim` / `none`), `data-zoom`, `data-paused`, `data-vfx-tier`, `data-vfx-shape`, `data-vfx-element`, `data-impact-count`. Test hook: `host.gridCellPoint(x, y)` returns the viewport point of a cell's centre.
+- **Host attributes** on `[data-testid="battle-canvas"]`: `data-renderer`, `data-renderer-backend` (`webgl` / `canvas`), `data-ready`, `data-battle-background`, `data-background-image`, `data-reduced-motion`, `data-anim` (`idle` / `playing`), `data-event-seq`, `data-units` (JSON id, team, x, y, hp, alive), `data-phase`, `data-active-unit`, `data-highlight` (`move` / `aim` / `none`), `data-zoom`, `data-paused`, `data-vfx-tier`, `data-vfx-shape`, `data-vfx-element`, `data-hero-move`, `data-impact-count`. Test hook: `host.gridCellPoint(x, y)` returns the viewport point of a cell's centre.
 
 ### Cast VFX and sound
 
@@ -281,6 +281,18 @@ Details of the rewards: [gameplay.md](gameplay.md#progression).
 - **Weapon family** sets the shape: sword crescent slash, blade heavy cleave, fist burst, long thrust, short flurry, hidden-weapon projectiles, music waves; inner arts are qi orbs. Ranged shapes travel to the first target and don't lunge.
 - **Element** comes from the effect or type tags: poison, fire, frost, thunder (stun), blood (drain), qi, shadow, holy (heals).
 - Misses get a whiff; support casts get an aura at the target's feet.
+- **The hero's body moves by skill** (`lib/stage/hero-motion.ts`, pure; allies on the hero's side, not enemies). `heroMoveFor` picks a move from the profile and `heroPose(move, age, { hitDelay, lastImpact })` gives the pose each frame — reach toward the target, steps, sideways sway, lift, lean, squash and stretch, afterimages and a qi aura:
+  - sword → **sweep** (dash in, a coiled lean that turns into the cut);
+  - blade → **cleave** (leap up over the foe and crash down);
+  - fist → **strike** (dash and a straight punch that snaps forward on each hit);
+  - long → **lunge** (a long thrust that drives past the guard);
+  - short → **flurry** (darting in and out, swaying across the target);
+  - hidden → **throw** (step back, wind up, release; stays at range);
+  - music → **play** (afloat, swaying, with an aura);
+  - inner arts → **channel** (rise in qi, swell as it releases, settle);
+  - support casts → **guard**.
+
+  Fast moves leave glow-tinted afterimages; channel, play and guard light an aura under the feet. Reduced motion keeps the plain pose. Enemies keep the simple lunge. `data-hero-move` on the host names the last move.
 - `lib/audio/cast-sfx.ts` plays matching sounds from the same profile: a cast-start swoosh, per-hit strikes (crit accents, bells and gongs at high tiers, element accents), a whiff when everything misses, and a pentatonic arpeggio for support casts.
 
 ### Backgrounds

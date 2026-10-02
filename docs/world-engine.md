@@ -27,7 +27,7 @@ The NPC simulation and rumors are in [liveness.md](liveness.md). The content tab
 | File | Role |
 | --- | --- |
 | `lib/world/types.ts` | Every world type: scenes, `SceneEffect`, `Condition`, quests, items, life skills, NPCs, opponents, `WorldStateData`, Liveness types, sect membership, `SectId` |
-| `lib/world/effects.ts` | `applyEffect` / `applyEffects`, quest progress and rewards, `rollWalkEvent`, `releaseFromJail`, `describeQuestCondition`, offer / turn-in checks |
+| `lib/world/effects.ts` | `applyEffect` / `applyEffects`, quest progress and rewards, `rollWalkEvent` (law, hunters), `rollFoeSpawn`, `releaseFromJail`, `describeQuestCondition`, offer / turn-in checks |
 | `lib/world/conditions.ts` | `evaluateCondition`, `getQuestStatus` |
 | `lib/world/quest-objectives.ts` | hands-on objective spots |
 | `lib/world/quest-guide.ts` | what to do next for a quest, where, and which way to walk; tracking |
@@ -42,7 +42,7 @@ The NPC simulation and rumors are in [liveness.md](liveness.md). The content tab
 | `lib/world/data/` | content tables, plus `random-events.ts`, `activities.ts`, `regions.ts`, `named-npcs.ts`, `rumor-templates.ts`, `lore-rumors.ts` |
 | `lib/world/index.ts` | public barrel |
 
-Not in the barrel (import by path): `rollWalkEvent`, `releaseFromJail`, `consumeQuestAutoItems`, and everything in `law.ts`, `bad-actions.ts`, `npc-tick.ts`, `rumor-engine.ts`, `stat-progression.ts`, `capital-training.ts`, `clinic-preparation.ts`, `data/activities.ts`, `data/regions.ts`. `initBattleBridge` is deliberately excluded (it imports the stores; import it from `@/lib/world/battle-bridge`).
+Not in the barrel (import by path): `rollWalkEvent`, `rollFoeSpawn`, `releaseFromJail`, `consumeQuestAutoItems`, and everything in `law.ts`, `bad-actions.ts`, `npc-tick.ts`, `rumor-engine.ts`, `stat-progression.ts`, `capital-training.ts`, `clinic-preparation.ts`, `data/activities.ts`, `data/regions.ts`. `initBattleBridge` is deliberately excluded (it imports the stores; import it from `@/lib/world/battle-bridge`).
 
 ## Scenes
 
@@ -67,7 +67,6 @@ Not in the barrel (import by path): `rollWalkEvent`, `releaseFromJail`, `consume
 - **`takeChoice`**: refuses the whole choice (effects included) if its travel is unaffordable; applies the effects; if a battle was set, stops there (the battle's `onWin` / `onLose` take over); otherwise charges travel, moves, applies the target's `onEnter`, and auto-advances.
 - **Travel** is charged only for location → route (10 stamina, 1 ชั่วยาม) and route → location (10 stamina, 2 ชั่วยาม). Every other transition is a free "story warp". Each charged step also gives +10 AGI xp and a LUK roll.
 - The `goto` effect only sets `currentSceneId`; it does not run the target's `onEnter`.
-- Random treasure / meeting events set the scene and run its `onEnter` without auto-advancing.
 
 ## Scene effects
 
@@ -204,40 +203,40 @@ Coverage today: 650 of 657 quest stages point to a place (`bun scripts/test-ques
 
 ## Random encounters
 
-Nothing rolls on arrival. While the hero walks on a location or route map, the world runtime calls `worldStore.walkTick()` every 220 map units (`WALK_TICK_UNITS`), which calls `rollWalkEvent(state, 0.4)`.
+Nothing rolls on arrival. While the hero walks on a location or route map, the world runtime calls `worldStore.walkTick(pickSpot)` every 220 map units (`WALK_TICK_UNITS`). `pickSpot` is the runtime's `pickFoeSpot`: a free spot 150–320 units from the hero that the hero can reach, away from markers and other foes (map percentages), or null.
 
-`walkTick` does nothing when there is no game, the game is over, a battle or encounter is pending, the scene is `home_player` or `jail` (`SAFE_SCENES`), or `localStorage["wuxia-random-events"] === "off"` (the switch the browser tests use).
+`walkTick` does nothing when there is no game, the game is over, a battle or encounter is pending, the scene is `home_player` or `jail` (`SAFE_SCENES`), or `localStorage["wuxia-random-events"] === "off"` (the switch the browser tests use). Otherwise:
 
-`rollWalkEvent` (`lib/world/effects.ts`), in order:
+1. **`rollWalkEvent(state)`** (`lib/world/effects.ts`): the law, then sect hunters, each setting `pendingEncounter` at once.
+   - **The law.** With wanted marks, `lawChance(marks)` spawns a law pursuer; the city whose jail would hold the hero is remembered (`jailCityId`).
+   - **Sect hunters.** If any membership is `betrayed`, a 30 % roll spawns that sect's `hunter_<sectId>`.
+2. **`rollFoeSpawn(state, present)`**: if fewer than `FOE_SPAWN.maxPerMap` (3) foes wait on this map, a `FOE_SPAWN.chance` (30 %) roll picks a foe from the zone's pool. The store then asks `pickSpot` and adds a `RoamingFoe { id, opponentId, locationId, x, y }` to `roamingFoes`.
 
-1. **The law.** With wanted marks, `lawChance(marks)` (not scaled) spawns a law pursuer; the city whose jail would hold the hero is remembered (`jailCityId`).
-2. **Sect hunters.** If any membership is `betrayed`, a 30 % roll (not scaled) spawns that sect's `hunter_<sectId>`.
-3. **One roll** over the bands: fight, then treasure (a dialog), then meeting (a dialog), else nothing.
-
-| Band (per walk tick) | Chance |
+| Per walk tick | Chance |
 | --- | --- |
 | Law pursuer (1–5 marks) | 13 % / 21 % / 29 % / 37 % / 45 % |
 | Sect hunter (after a betrayal) | 30 % |
-| Fight | 0.15 × 0.4 = **6 %** |
-| Fight while hunting a quest target | 0.80 × 0.4 = **32 %** |
-| Treasure | 0.4 × min(25 %, 5 % + LUK/200) — 2 % at LUK 1; 0 while hunting |
-| Meeting | 0.4 × min(35 %, 10 % + LUK/300) — about 4 % at LUK 1; 0 while hunting |
+| A foe appears (fewer than 3 about) | 30 % |
+| A foe appears while hunting a quest target | 80 % |
 
-A fight sets `pendingEncounter`; the encounter screen then offers ⚔ ต่อสู้ (`acceptEncounter` → a battle with the opponent's pack) or 🏃 หนี (`fleeEncounter`: free, except against sect hunters and law pursuers, where it succeeds with `min(90, 30 + (AGI + LUK)/2)` % using base stats — a failure forces the fight).
+**Roaming foes** live only in the store (`roamingFoes`, not saved: a reload clears them). A walk tick on another map drops the old map's foes. The location view passes this map's foes to the runtime as `presentation.foes`; the runtime draws them without a rebuild (a character sheet or a creature-atlas frame, tinted and sized by `opponentLook`, with a red ⚔ tag), and when the hero comes within 30 units of one it calls `engageFoe(id)`. That removes the foe and sets `pendingEncounter`, so the encounter screen offers ⚔ ต่อสู้ (`acceptEncounter` → a battle with the opponent's pack) or 🏃 หนี (`fleeEncounter`: free, except against sect hunters and law pursuers, where it succeeds with `min(90, 30 + (AGI + LUK)/2)` % using base stats — a failure forces the fight).
 
-### Who you meet
+There are no treasure or meeting events (removed with their scenes).
+
+### Who turns up
 
 `lib/world/data/random-events.ts`:
 
-- **Pools**: 40 fight events (5 per tier T0–T4 in the base roster plus 5 `elite_*`), 4 treasure events, 3 meetings.
+- **Pool**: 64 fight events (the base roster T0–T4, beasts, gangs, elites and ten named villains at `share` 0.35).
 - **Zones** (`zoneOfLocation`): `city_` / `village_` / `inn_` / `home_` → city; `sect_` → sect; `temple_` / `palace_` → temple; `villa_` → mansion; `isle_` → isle; `tribe_` / `market_` / `desert_` → frontier; everything else (mountains, caves, valleys, route maps, the tutorial foothill) → wild.
 - **Category weights by zone** (human / beast / supernatural): city 1/0/0 · mansion 1/0/0 · sect 4/0/1 · temple 2/0/1 · wild 1/4/0.5 · isle 2/3/0 · frontier 3/2/0. Cities never spawn beasts.
 - **Tier weights follow the hero's power.** `playerPowerIndex(state)` = the larger of `day / 200` and `(9 − rank) / 8` for any sect membership (clamped 0–1). `tierWeightForPower`: T0 `max(0.5, 8 − 7p)`, T1 `max(0.5, 5 − 3p)`, T2 `3 + p`, T3 `1.5 + 4.5p`, T4 `0.5 + 4.5p`, elites `3p` (absent at power 0).
-- **Opponent stats scale too.** `applyOpponentStatScale` multiplies every opponent's stats by `1 + 0.6p` (up to ×1.6). It runs on every walk tick and before **every** battle the bridge starts. Joining a sect that starts at rank 5 sets power to 0.5 at once. The capital training apprentice has a hand-written build and is never scaled.
+- **Opponent stats scale too.** `applyOpponentStatScale` multiplies every opponent's stats by `1 + 0.6p` (up to ×1.6) before every battle the bridge starts. Joining a sect that starts at rank 5 sets power to 0.5 at once. The capital training apprentice has a hand-written build and is never scaled.
+- Named villains the hero has killed, assassinated or kidnapped never turn up again (`encounterFoeAvailable`).
 
 ### Hunt boost
 
-When the current stage of an active quest is a top-level `defeatedOpponent` (`collectActiveHuntTargets`) and one of those foes can appear in this zone, the fight chance rises to 32 % per tick, the pool is limited to the targets, and treasure and meetings stop. It ends by itself when the stage moves on.
+When the current stage of an active quest is a top-level `defeatedOpponent` (`collectActiveHuntTargets`) and one of those foes can appear in this zone, a foe appears with 80 % per tick and only the targets appear. It ends by itself when the stage moves on.
 
 ## Law and jail
 
@@ -314,10 +313,9 @@ Which actions grant which stat: [gameplay.md](gameplay.md#stats).
 
 ## Living places
 
-Content for villages, towns, homes and new quests for old NPCs lives in `lib/world/data/places/<group>.ts` (`villages`, `towns`, `homes_a`–`homes_c`, `elders_a`, `elders_b`), each exporting one `PlaceContent` (`npcs`, `quests`, `scenes`, `activities`, `events`, `opponents`). `places/index.ts` merges them into the NPC, quest, scene, opponent, activity and meet-event registries.
+Content for villages, towns, homes and new quests for old NPCs lives in `lib/world/data/places/<group>.ts` (`villages`, `towns`, `homes_a`–`homes_c`, `elders_a`, `elders_b`), each exporting one `PlaceContent` (`npcs`, `quests`, `scenes`, `activities`, `opponents`). `places/index.ts` merges them into the NPC, quest, scene, opponent and activity registries.
 
 - **Place activities.** An `ActivityDef` with `place: { locationIds, cooldownDays, costGold?, reward, doneText, spot? }`. `doActivity` checks the place, the cooldown (`activityDays[id]`), stamina and gold, then pays gold (a range), w-exp, stat xp, a trait, an item (with a chance), stamina, heal or relationship, and logs `activity`. Auto maps put the spot on `ACTIVITY_SLOTS`; hand maps add the ones with `spot`.
-- **Place meetings.** `MeetEventDef.locationIds` limits a meeting to those places, `condition` gates it and `once` sets `meet:<id>`. Walk ticks join them to the anywhere-meetings. Safe ground (`home_player`) runs `rollPlaceMeeting` at 4 % per tick instead: only its own meetings, no fights, no law.
 - **Presence** (`npc-presence.ts`). `npcPresent(state, id)` is false for `assassinatedNpcIds` and while `day < kidnappedUntil[id]` (set to day + `KIDNAP_RETURN_DAYS` = 180 on a successful kidnapping). The location map and card hide absent NPCs; `kidnappedNpcIds` stays for quest conditions, so the same NPC can't be kidnapped twice.
 - **Gifts** (`gifts.ts`, store `giveGift(npcId, { itemId } | { gold })`). Refused while absent, within 30 days of the last gift (`giftDays`), or for quest items and manuals. `giftOutcome` = worth (1–5 by gold value: 120 / 400 / 1000 / 3000) — ×2 when liked, +2 more for a favourite item id, −2 when disliked. Tastes come from `NpcDef.likes` / `dislikes` (item ids, categories, `"gold"`), else from `TAG_TASTES` by the NPC's tags, else food.
 - **Skill quests.** Every ยุทธจักร T0–T3 skill and art (except `basic_punch`) is the reward of a quest; the 69 that had none are taught by exactly one place quest. T1+ quests gate on `statAtLeast`, T2+ also on `npcRelationship` with the giver; `test:places` checks both, and that no teacher can be assassinated or kidnapped. Manuals and city school halls may still sell the commoner ones.

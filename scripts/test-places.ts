@@ -8,8 +8,7 @@ import { ARTS } from "../lib/game/data/arts";
 import { getItem, getNpc, getQuest, getScene, QUESTS, NPCS, SCENES } from "../lib/world/data";
 import { getNpcsAtLocation } from "../lib/world/data/npcs";
 import { ACTIVITIES, placeActivitiesAt } from "../lib/world/data/activities";
-import { MEET_EVENTS } from "../lib/world/data/random-events";
-import { PLACE_NPCS, PLACE_QUESTS, PLACE_EVENTS, PLACE_ACTIVITY_DEFS } from "../lib/world/data/places";
+import { PLACE_NPCS, PLACE_QUESTS, PLACE_ACTIVITY_DEFS } from "../lib/world/data/places";
 import { getLocationMap } from "../lib/world/data/location-maps";
 import { KIDNAP_RETURN_DAYS, npcPresent } from "../lib/world/npc-presence";
 import { GIFT_COOLDOWN_DAYS, giftOutcome, giftWorth, npcTastes } from "../lib/world/gifts";
@@ -17,7 +16,6 @@ import { npcCharacterId } from "../lib/characters/catalog";
 import { hasAnimatedSheet } from "../lib/characters/npc-sheets";
 import { npcBattleSprite, npcBodySprite, npcPixelSprite, npcPortrait } from "../lib/world/data/npc-portraits";
 import type { Condition } from "../lib/world/types";
-import { rollPlaceMeeting } from "../lib/world/effects";
 import { useWorldStore } from "../store/world-store";
 
 const WALKER_BODIES = new Set(["m1", "m2", "m3", "m4", "f1", "f2", "f3", "f4"]);
@@ -120,16 +118,11 @@ check("new NPCs: a talk dialog, their own art (strollers rigged, the rest a uniq
   assert.ok(wander > 0 && wander < PLACE_NPCS.length, "some wander, some stand");
 });
 
-check("place activities and meetings are well formed", () => {
+check("place activities are well formed", () => {
   for (const a of PLACE_ACTIVITY_DEFS) {
     assert.ok(a.place?.locationIds.length, a.id);
     assert.ok(ACTIVITIES.some((x) => x.id === a.id), `${a.id} registered`);
     for (const loc of a.place!.locationIds) assert.equal(getScene(loc)?.kind, "location", `${a.id} at ${loc}`);
-  }
-  for (const e of PLACE_EVENTS) {
-    assert.ok(MEET_EVENTS.includes(e), `${e.id} registered`);
-    assert.equal(getScene(e.dialogSceneId)?.kind, "dialog", `${e.id} dialog`);
-    assert.ok(e.locationIds?.length, `${e.id} has places`);
   }
 });
 
@@ -205,18 +198,6 @@ check("store: a place activity pays out once per cooldown, only at its place", (
   assert.ok(done.ok, JSON.stringify(done));
   const twice = useWorldStore.getState().doActivity(act.id);
   assert.ok(!twice.ok && twice.reason === "cooldown");
-});
-
-check("safe ground: the hero's home rolls only its own meetings", () => {
-  useWorldStore.getState().startNewGame({ name: "ทดสอบ", gender: "male" } as never);
-  const state = JSON.parse(JSON.stringify(useWorldStore.getState()));
-  state.currentSceneId = "home_player";
-  const r = Math.random; Math.random = () => 0;
-  try { rollPlaceMeeting(state, 1); } finally { Math.random = r; }
-  const ev = MEET_EVENTS.find((e) => e.dialogSceneId === state.currentSceneId);
-  assert.ok(ev?.locationIds?.includes("home_player"), `a home meeting, got ${state.currentSceneId}`);
-  assert.equal(state.lastLocationId, "home_player");
-  assert.equal(state.pendingEncounter, null);
 });
 
 check("scenes referenced by place content exist", () => {

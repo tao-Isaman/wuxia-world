@@ -142,7 +142,7 @@ Save format, migration and repair are in [save-format.md](save-format.md).
 
 **Walking into a fight:**
 
-1. **Roll.** The runtime reports 220 walked units → `walkTick()` → `rollWalkEvent(draft, 0.4)`, which may set `pendingEncounter`.
+1. **Spawn.** The runtime reports 220 walked units → `walkTick(pickSpot)`: `rollWalkEvent` may set `pendingEncounter` (the law, a sect hunter); otherwise `rollFoeSpawn` may add a foe to `roamingFoes`, which the map draws. Walking into it calls `engageFoe`, which sets `pendingEncounter`.
 2. **Choose.** `WorldScreen` shows `EncounterScreen`, with both sides' power tiers (`previewBriefing`). ⚔ calls `acceptEncounter()`, which sets `pendingBattle`, then `ensureBattleStarted()` at once.
 3. **Start.** `ensureBattleStarted()` scales the opponent, builds the units and looks, and runs `battleStore.start(...)`. Fights staged any other way (quests, sparring, the law, sagas) first show `BattleBriefingScreen` and start when the player presses เข้าต่อสู้.
 4. **Fight.** `BattleArena` and `grid-battle-runtime.ts` play the battle. Player input calls `move` / `act`; AI turns advance through `step()`.

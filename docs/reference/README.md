@@ -20,8 +20,8 @@ Generated lists of everything in the game, taken straight from the data tables. 
 | --- | --- |
 | Locations | 101 |
 | Route scenes | 272 |
-| Dialog scenes | 2665 |
-| All scenes | 3038 |
+| Dialog scenes | 2610 |
+| All scenes | 2983 |
 | Location connections (`LOCATION_ROUTES`) | 128 |
 | Painted maps (hand-placed / auto layout) | 3 / 97 |
 | Sect locations / memberships | 20 / 15 |
@@ -35,6 +35,6 @@ Generated lists of everything in the game, taken straight from the data tables. 
 | Gathering and hunting nodes | 25 |
 | Life skills | 19 |
 | Opponents | 286 |
-| Random fight / treasure / meeting events | 64 / 4 / 31 |
+| Roaming foe events | 64 |
 
 Regenerate with `bun scripts/build-docs-reference.ts`; `--check` fails when a page is stale.

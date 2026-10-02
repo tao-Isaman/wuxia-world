@@ -12,6 +12,7 @@ import {
   type Team,
   type UnitLook,
 } from "@/lib/game/grid";
+import { heroMoveFor, heroPose, movesIn, type HeroMove } from "./hero-motion";
 import { CHARACTER_CLIPS, CHARACTER_FEET_Y, CHARACTER_FRAME_SIZE, characterId, type CharacterMotion } from "@/lib/characters/catalog";
 import { WALK8_FPS, dir8FromVector, walk8Frame, walk8Source, type Dir8 } from "@/lib/characters/walk8";
 import { loadCharacterAtlas } from "@/lib/characters/sheet";
@@ -114,7 +115,16 @@ interface Actor {
   motionStart: number;
   frame: number;
   walk: { path: Cell[]; start: number; step: number } | null;
-  attack: { start: number; lastImpact: number; dx: number; dy: number; travel: number; support: boolean } | null;
+  attack: {
+    start: number; lastImpact: number; hitDelay: number; dx: number; dy: number; travel: number; support: boolean;
+    /** The hero side's body move for this cast (lib/stage/hero-motion.ts); enemies keep the plain lunge. */
+    move?: HeroMove;
+    /** The cast's glow colour, for afterimages and the qi aura. */
+    glow: number;
+  } | null;
+  /** When the last afterimage was left, and the qi aura under the feet (made on first use). */
+  lastGhost: number;
+  aura: Phaser.GameObjects.Ellipse | null;
   hurtUntil: number;
   flashUntil: number;
   knockUntil: number;
@@ -531,7 +541,7 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
       dispW, dispH, head,
       u: unit.pos.x + 0.5, v: unit.pos.y + 0.5, hFacing: unit.facing === "left" ? -1 : 1,
       motion: "idle", motionStart: -index * 170, frame,
-      walk: null, attack: null, hurtUntil: 0, flashUntil: 0, knockUntil: 0, knockX: 0, knockY: 0,
+      walk: null, attack: null, lastGhost: 0, aura: null, hurtUntil: 0, flashUntil: 0, knockUntil: 0, knockX: 0, knockY: 0,
       dead: !unit.alive, deadAt: -10_000, fledAt: -1,
       hp: unit.hp, mp: unit.mp, maxHp: unit.derived.HP, maxMp: unit.derived.MP,
       x: 0, y: 0, s: 1,
@@ -576,6 +586,24 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
   const chest = (actor: Actor): Point => ({ x: actor.x, y: actor.y - actor.head * actor.s * 0.52 });
   const cellPoint = (c: Cell): Point => ({ x: boardX(c.x + 0.5, c.y + 0.5), y: rowY(c.y + 0.5) });
 
+  // Afterimages: a fading, glow-tinted copy of the sprite where the hero just was.
+  const ghosts: { item: Phaser.GameObjects.Image; born: number }[] = [];
+  function leaveGhost(actor: Actor) {
+    const source = actor.image;
+    const ghost = scene!.add.image(source.x, source.y, source.texture.key, source.frame.name)
+      .setOrigin(source.originX, source.originY).setDisplaySize(source.displayWidth, source.displayHeight)
+      .setFlipX(source.flipX).setRotation(source.rotation).setTint(actor.attack?.glow ?? 0xffffff)
+      .setAlpha(0.42).setDepth(source.depth - 0.05);
+    ghosts.push({ item: ghost, born: elapsed });
+  }
+  function updateGhosts() {
+    for (let i = ghosts.length - 1; i >= 0; i--) {
+      const age = elapsed - ghosts[i].born;
+      if (age >= 240) { ghosts[i].item.destroy(); ghosts.splice(i, 1); continue; }
+      ghosts[i].item.setAlpha(0.42 * (1 - age / 240));
+    }
+  }
+
   function updateActor(actor: Actor, activeId: string | null) {
     // Board position (walking interpolates tile to tile).
     let hop = 0;
@@ -603,6 +631,7 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
     const s = rowScale(actor.v);
     let x = boardX(actor.u, actor.v), y = rowY(actor.v);
     let sx = 1, sy = 1, rotation = 0, alpha = 1;
+    let ghostNow = false, auraNow = 0;
 
     // Attack lunge / support pose.
     if (actor.attack) {
@@ -610,7 +639,18 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
       if (age > actor.attack.lastImpact + 360) actor.attack = null;
       else {
         motion = actor.attack.support ? "guard" : "attack";
-        if (actor.attack.travel > 0 && !reduced) {
+        if (actor.attack.move && !reduced) {
+          // The hero side moves by skill: sweep, cleave, strike, lunge, flurry, throw, play, channel or guard.
+          const pose = heroPose(actor.attack.move, age, { hitDelay: actor.attack.hitDelay, lastImpact: actor.attack.lastImpact });
+          const along = actor.attack.travel * pose.reach + pose.step * s;
+          x += actor.attack.dx * along - actor.attack.dy * pose.side * s;
+          y += actor.attack.dy * along + actor.attack.dx * pose.side * s;
+          hop += pose.lift;
+          rotation += pose.lean * actor.hFacing;
+          sx *= pose.sx; sy *= pose.sy;
+          ghostNow = pose.ghost;
+          auraNow = pose.aura;
+        } else if (actor.attack.travel > 0 && !reduced) {
           const approach = Math.min(1, Math.max(0, (age - 70) / 200));
           const retreat = Math.min(1, Math.max(0, (age - actor.attack.lastImpact - 65) / 220));
           const lunge = Math.sin(approach * Math.PI / 2) * (1 - retreat) * actor.attack.travel;
@@ -677,6 +717,12 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
     if (actor.flashUntil > elapsed) actor.image.setTint(0xffffff).setTintMode(Phaser.TintModes.FILL);
     else if (actor.tint !== undefined) actor.image.setTint(actor.tint).setTintMode(Phaser.TintModes.MULTIPLY);
     else actor.image.clearTint().setTintMode(Phaser.TintModes.MULTIPLY);
+    if (ghostNow && elapsed - actor.lastGhost > 45) { actor.lastGhost = elapsed; leaveGhost(actor); }
+    if (auraNow > 0 || actor.aura) {
+      actor.aura ??= scene!.add.ellipse(0, 0, TW * 0.95, TW * 0.36, actor.attack?.glow ?? 0xbfeaff, 1);
+      actor.aura.setPosition(x, y + 2 * s).setScale(s * (1 + 0.08 * auraNow)).setFillStyle(actor.attack?.glow ?? 0xbfeaff, 0.5 * auraNow)
+        .setVisible(auraNow > 0).setDepth(5 + actor.v * 2 - 0.2);
+    }
     actor.shadow.setPosition(x, y + 2 * s).setScale(s * (creature ? 1.3 : 1)).setAlpha(actor.dead ? 0.15 : 0.4 * alpha);
     const active = activeId === actor.id && !actor.dead;
     actor.ring.setPosition(x, y + 2 * s).setScale(s).setVisible(!actor.dead && actor.fledAt < 0);
@@ -742,9 +788,12 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
           const dx = aim.x - actor.x, dy = aim.y - actor.y;
           const dist = Math.hypot(dx, dy);
           const tiles = Math.abs(actor.u - 0.5 - ev.aimed.x) + Math.abs(actor.v - 0.5 - ev.aimed.y);
-          const melee = !support && !ranged && !ownCell && tiles <= 2;
+          const move = actor.team === "ally" ? heroMoveFor(profile, { support }) : undefined;
+          const melee = !support && !ownCell && tiles <= 2 && (move ? movesIn(move) : !ranged);
           const travel = melee ? Math.max(0, dist - TW * 0.55 * actor.s) : 0;
-          actor.attack = { start: elapsed, lastImpact, dx: dist ? dx / dist : 0, dy: dist ? dy / dist : 0, travel, support };
+          actor.attack = { start: elapsed, lastImpact, hitDelay: delay, dx: dist ? dx / dist : 0, dy: dist ? dy / dist : 0, travel, support,
+            move, glow: profile.glow };
+          parent.dataset.heroMove = move ?? parent.dataset.heroMove ?? "";
           if (!support) castStartSfx(profile);
           if (!reduced && !support && vfx) {
             const firstTarget = ev.results.map((r) => actorById.get(r.unitId)).find((a) => a && a !== actor);
@@ -943,6 +992,7 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
       activeRing?.setVisible(false);
       activeMark?.setVisible(false);
       for (let i = 0; i < actors.length; i++) updateActor(actors[i], activeId);
+      updateGhosts();
 
       for (let i = effects.length - 1; i >= 0; i--) {
         const effect = effects[i];

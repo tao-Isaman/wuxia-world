@@ -402,13 +402,12 @@ This touches many files. In order:
 10. **Optional.** Add the chief to the Liveness roster.
 11. **Check.** Run `bun scripts/audit-content.ts`, `bun run test:quests`, `bun run test:story`, `bun run typecheck`, and regenerate the reference ([reference/sects.md](reference/sects.md)).
 
-## Places: people, activities and meetings
+## Places: people and activities
 
-New life for a village, town or home goes in a group file under `lib/world/data/places/` (one `PlaceContent`; add a new group to `places/index.ts`). Ids: NPCs `<place>_<role>_<name>`, activities `act_<place>_<slug>`, meetings `pev_<place>_<slug>`.
+New life for a village, town or home goes in a group file under `lib/world/data/places/` (one `PlaceContent`; add a new group to `places/index.ts`). Ids: NPCs `<place>_<role>_<name>`, activities `act_<place>_<slug>`.
 
 - **An NPC** also takes `look: { body, wander }` (body `m1`–`m4`, `f1`–`f4`, `elder`, `monk`, `merchant`, `bandit`…; only m/f bodies can wander) and `likes` / `dislikes` for gifts. On an auto map it gets an `NPC_SLOTS` spot; on a hand map add an `npcSpots` entry.
 - **An activity** is an `ActivityDef` with `place` (see [world-engine.md](world-engine.md#living-places)). Hand maps need `place.spot`.
-- **A meeting** is a `MeetEventDef` with `locationIds` and a dialog; `once: true` for one-offs.
 - **A skill quest** follows the rarity table: T0 a chore, T1 `statAtLeast 10`, T2 `statAtLeast 15` + `npcRelationship ≥ 5`, T3 `statAtLeast 25` + `npcRelationship ≥ 15` + an earlier quest of the giver. Never make a teacher an assassination or kidnap target.
 - Run `bun run test:places` as well as the usual checks.
 
