@@ -200,7 +200,7 @@ check("looks: enemy variants carry their tint and size", () => {
   fight("elite_cult_elder");
   const look = unitById(st(), "B")!.look;
   assert.equal(look.kind, "character");
-  assert.equal(look.kind === "character" && look.characterId, "elder");
+  assert.equal(look.kind === "character" && look.characterId, "foe_cultist", "drawn as its painted enemy type");
   assert.equal(look.size, 1.2);
   useBattleStore.getState().reset();
 });

@@ -147,6 +147,7 @@ cutscene: {
   - `hero`;
   - hero bodies `m1`–`m4`, `f1`–`f4`;
   - archetypes `elder`, `monk`, `merchant`, `bandit`, `feng`, `wang`, `qing`;
+  - enemy types `foe_bandit`, `foe_cultist`, `foe_constable`… (`FOE_CHARACTER_IDS` in `lib/characters/catalog.ts`);
   - any rigged NPC id (the sect heads and villains marked ANIMATED in the brief);
   - `beast:0`–`beast:7` (wolf, tiger, bear, boar, snake, rooster, eagle, bat).
 

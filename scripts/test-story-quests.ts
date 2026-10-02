@@ -8,7 +8,7 @@
 import assert from "node:assert/strict";
 import { SKILLS } from "../lib/game/data/skills";
 import { ARTS } from "../lib/game/data/arts";
-import { CHARACTER_IDS } from "../lib/characters/catalog";
+import { CHARACTER_IDS, CREATURE_FRAME_COUNT } from "../lib/characters/catalog";
 import { LINEAGE_SPECS, STORY_ARC_SPECS } from "../lib/world/data/story";
 import { CUTSCENES, STORY_ARCS, STORY_QUESTS, STORY_RESOLVERS } from "../lib/world/story/registry";
 import { lineageQuestId, storyQuestId, LINEAGE_TIERS } from "../lib/world/story/compile";
@@ -126,7 +126,7 @@ function checkCutscene(where: string, c: CutsceneSpec) {
   if (!cast.length) err(`${w}: empty cast`);
   for (const [key, m] of cast) {
     const look = m.look;
-    const ok = look === "hero" || (CHARACTER_IDS as readonly string[]).includes(look) || /^beast:[0-7]$/.test(look);
+    const ok = look === "hero" || (CHARACTER_IDS as readonly string[]).includes(look) || (/^beast:(\d+)$/.test(look) && Number(look.slice(6)) < CREATURE_FRAME_COUNT);
     if (!ok) err(`${w}: ${key} look "${look}" is not a sheet`);
     if (Math.abs(m.at[0]) > 6 || Math.abs(m.at[1]) > 3) err(`${w}: ${key} at ${m.at} is off stage (x −6…6, y −3…3)`);
     if (m.tint && !/^#[0-9a-f]{6}$/i.test(m.tint)) err(`${w}: ${key} tint ${m.tint}`);

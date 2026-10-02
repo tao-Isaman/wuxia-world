@@ -50,8 +50,9 @@ export interface CastMember {
   /**
    * Sheet: "hero" (the player's body), a hero body m1–m4 / f1–f4, an
    * archetype (elder, monk, merchant, bandit, feng, wang, qing), a rigged NPC
-   * id (ANIMATED_NPC_IDS), or "beast:<frame>" (0 wolf, 1 tiger, 2 bear,
-   * 3 boar, 4 snake, 5 rooster, 6 eagle, 7 bat).
+   * id (ANIMATED_NPC_IDS), an enemy type (foe_bandit, foe_cultist… FOE_CHARACTER_IDS), or
+   * "beast:<frame>" (0 wolf, 1 tiger, 2 bear, 3 boar, 4 snake, 5 rooster,
+   * 6 eagle, 7 bat, 8 hare, 9 squirrel, 10 wild cat, 11 centipede).
    */
   look: string;
   /**

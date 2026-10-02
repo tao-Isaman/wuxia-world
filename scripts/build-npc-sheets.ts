@@ -28,12 +28,16 @@
  *     20–23 walk south   the front, legs and shoulders alternating
  *
  * Every frame gets the same 1 px dark outline as the single-pose sprites.
+ * The heroes (public/player/body/), the costume archetypes and the enemy
+ * types (public/foes/body/, FOE_CHARACTER_IDS) are rigged the same way into
+ * public/art/characters/<id>.png. Pass ids to rebuild only those.
+ *
  * Output is deterministic; rerun after adding ids or changing a painting.
  */
 import sharp from "sharp";
 import { mkdirSync } from "node:fs";
 import { ANIMATED_NPC_IDS } from "../lib/characters/npc-sheets";
-import { PLAYER_CHARACTER_IDS } from "../lib/characters/catalog";
+import { COSTUME_CHARACTER_IDS, FOE_CHARACTER_IDS, PLAYER_CHARACTER_IDS } from "../lib/characters/catalog";
 
 const SRC = "public/npcs/body";
 const OUT = "public/art/characters/npc";
@@ -53,9 +57,15 @@ const opaque = (r: Raster, x: number, y: number) => x >= 0 && y >= 0 && x < r.w 
 const HERO_SRC = "public/player/body";
 const HERO_OUT = "public/art/characters";
 const isHero = (id: string) => (PLAYER_CHARACTER_IDS as readonly string[]).includes(id);
+// The costume archetypes (elder, monk, bandit…) and the enemy types (foe_*) are
+// painted bodies too (public/foes/body/), rigged next to the heroes.
+const FOE_SRC = "public/foes/body";
+const SHARED_IDS: readonly string[] = [...COSTUME_CHARACTER_IDS, ...FOE_CHARACTER_IDS];
+const isShared = (id: string) => SHARED_IDS.includes(id);
+const sourceDir = (id: string) => isHero(id) ? HERO_SRC : isShared(id) ? FOE_SRC : SRC;
 
 async function figure(id: string, maxWidth?: number): Promise<Raster> {
-  const trimmed = await sharp(`${isHero(id) ? HERO_SRC : SRC}/${id}.png`).trim({ threshold: 8 }).toBuffer();
+  const trimmed = await sharp(`${sourceDir(id)}/${id}.png`).trim({ threshold: 8 }).toBuffer();
   const reduced = await sharp(trimmed).resize({ height: FIGURE, ...(maxWidth ? { width: maxWidth, fit: "inside" as const } : {}), kernel: "lanczos3" })
     .png({ palette: true, colours: 40, dither: 0 }).toBuffer();
   const { data, info } = await sharp(reduced).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
@@ -335,7 +345,8 @@ function clipped(sheet: Raster, directions: Raster): string | null {
 }
 
 mkdirSync(OUT, { recursive: true });
-for (const id of [...ANIMATED_NPC_IDS, ...PLAYER_CHARACTER_IDS]) {
+const only = process.argv.slice(2);
+for (const id of [...ANIMATED_NPC_IDS, ...PLAYER_CHARACTER_IDS, ...SHARED_IDS].filter((id) => !only.length || only.includes(id))) {
   let { sheet, directions } = rig(await figure(id));
   // A wide prop (a carrying pole) can push a lunge out of its cell: narrow the
   // figure step by step until every pose fits.
@@ -344,8 +355,9 @@ for (const id of [...ANIMATED_NPC_IDS, ...PLAYER_CHARACTER_IDS]) {
   if (clip) throw new Error(`${id} ${clip} is clipped by its cell`);
   const png = (r: Raster) => sharp(Buffer.from(r.data.buffer), { raw: { width: r.w, height: r.h, channels: 4 } })
     .png({ compressionLevel: 9, palette: true, colours: 64, dither: 0 });
-  const out = isHero(id) ? HERO_OUT : OUT;
+  const out = isHero(id) || isShared(id) ? HERO_OUT : OUT;
   await png(sheet).toFile(`${out}/${id}.png`);
   await png(directions).toFile(`${out}/${id}-directions.png`);
 }
-console.log(`wrote ${ANIMATED_NPC_IDS.length} NPC animation sheets to ${OUT}/ and ${PLAYER_CHARACTER_IDS.length} hero sheets to ${HERO_OUT}/`);
+console.log(only.length ? `wrote ${only.join(", ")}` :
+  `wrote ${ANIMATED_NPC_IDS.length} NPC animation sheets to ${OUT}/ and ${PLAYER_CHARACTER_IDS.length + SHARED_IDS.length} hero, archetype and enemy sheets to ${HERO_OUT}/`);

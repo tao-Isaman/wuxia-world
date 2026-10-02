@@ -252,12 +252,12 @@ Details of the rewards: [gameplay.md](gameplay.md#progression).
 
 ## Unit looks
 
-`UnitLook` is `{ kind: "character", characterId, still? }` (a character atlas, optionally with a unique still sprite) or `{ kind: "creature", frame }` (a cell of `/art/creature-atlas.png`, 8 frames). Both take an optional `tint` (a colour multiplied over the sprite) and `size` (a scale, clamped 0.6–1.6) so one sprite can make several variants — a pale frost wolf, a purple vampire bat, a boss drawn larger than its gang.
+`UnitLook` is `{ kind: "character", characterId, still? }` (a character atlas, optionally with a unique still sprite) or `{ kind: "creature", frame }` (a cell of `/art/creature-atlas.png`, 12 painted beasts on a 4 × 3 grid, `CREATURE_ATLAS`). Both take an optional `tint` (a colour multiplied over the sprite) and `size` (a scale, clamped 0.6–1.6) so one sprite can make several variants — a pale frost wolf, a purple vampire bat, a boss drawn larger than its gang.
 
 - `playerLook(bodyId)` — the hero's chosen body.
-- `opponentLook(opponentId, npc?)` — `OpponentDef.look = { sheet?, frame?, tint?, size?, npc? }` overrides the defaults below. `npc` names the NPC the foe is (the 10 villain bosses); a rigged NPC (the sect heads' spars, the villains) fights with its own sheet and real clips, never a still. Beasts otherwise use `creatureFrameFor(id)` (tiger 1, bear 2, boar 3, snakes / spiders / scorpions 4, chickens 5, birds 6, bats 7, else 0); people use an archetype sheet picked from the id, plus their own battle sprite (`/npcs/pixel-battle/<npcId>.png`) when the opponent is a known NPC.
-- `worldBattleSetup` returns `{ opponent, build, looks, enemies }`. Pack members get their archetype look, never a still.
-- /debug battles use the default looks (hero m1 vs the bandit archetype).
+- `opponentLook(opponentId, npc?)` — `OpponentDef.look = { sheet?, frame?, tint?, size?, npc? }` overrides the defaults below. `npc` names the NPC the foe is (the 10 villain bosses); a rigged NPC (the sect heads' spars, the villains) fights with its own sheet and real clips, never a still. Beasts otherwise use `creatureFrameFor(id)` (wolf 0, tiger 1, bear 2, boar 3, snakes 4, fowl 5, birds 6, bats 7, hares 8, squirrels 9, wild cats 10, centipedes / spiders / scorpions 11); a known NPC with art fights as its own battle sprite (`/npcs/pixel-battle/<npcId>.png`); everyone else is one of the 22 painted, rigged enemy types (`foeCharacterFor`: keywords in the id, then the authored `sheet`, then the category).
+- `worldBattleSetup` returns `{ opponent, build, looks, enemies }`. Pack members get their enemy-type look, never a still.
+- /debug battles use the default looks (hero m1 vs the bandit enemy type).
 
 ## Renderer
 

@@ -1,7 +1,7 @@
 import { gradePixels } from "./route-grade";
 import type * as Phaser from "phaser";
 import {
-  CHARACTER_CLIPS, characterId, npcCharacterId,
+  CHARACTER_CLIPS, CREATURE_ATLAS, characterId, creatureCell, npcCharacterId,
   type CharacterId,
 } from "../characters/catalog";
 import { loadCharacterAtlas } from "../characters/sheet";
@@ -659,10 +659,10 @@ export function createWorldRuntime(
   function creatureFrameTexture(frame: number): Promise<string> {
     let pending = creatureFrames.get(frame);
     if (!pending) {
-      creatureSheet ??= loadImage("/art/creature-atlas.png");
+      creatureSheet ??= loadImage(CREATURE_ATLAS.url);
       pending = creatureSheet.then((sheet) => {
-        const w = sheet.width / 4, h = sheet.height / 2;
-        return texture(drawCanvas(w, h, (context) => context.drawImage(sheet, (frame % 4) * w, Math.floor(frame / 4) * h, w, h, 0, 0, w, h)), "foe");
+        const { left, top, width: w, height: h } = creatureCell(sheet.width, sheet.height, frame);
+        return texture(drawCanvas(w, h, (context) => context.drawImage(sheet, left, top, w, h, 0, 0, w, h)), "foe");
       });
       creatureFrames.set(frame, pending);
     }

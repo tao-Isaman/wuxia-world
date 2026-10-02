@@ -1,6 +1,22 @@
 # Animated character sheets
 
-## Active art: readability v2 (adopted 2026-09-29)
+## Current art: rigged from painted bodies
+
+Every sheet in this folder is now rigged by `bun scripts/build-npc-sheets.ts`
+from one painted, front-facing body (gpt-image-2, the style of the NPC art):
+
+- the eight heroes `m1`–`f4` from `public/player/body/`;
+- the seven costume archetypes `elder`, `monk`, `merchant`, `bandit`, `feng`,
+  `wang`, `qing` and the 22 enemy types `foe_*` (`FOE_CHARACTER_IDS` in
+  `lib/characters/catalog.ts`) from `public/foes/body/`
+  (`bun scripts/import-npc-art.ts --from <dir> --foes`).
+
+Each is a 512 × 512 sheet of 4 × 4 cells plus a 512 × 256 `-directions.png`, on
+exact equal grids, so no catalog layout is needed. The `*-v1*` and
+`*-readability-v2*` files below are the older hand-drawn generations, kept for
+reference only; the game no longer loads them.
+
+## Older art: readability v2 (adopted 2026-09-29, replaced)
 
 Hero's Adventure: Road to Passion is the benchmark: faces, hands and action
 silhouettes must read when a character is only 60–70 screen pixels tall. The

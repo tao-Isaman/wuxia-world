@@ -1,13 +1,16 @@
 // Rigged NPC sheets (lib/characters/npc-sheets.ts, scripts/build-npc-sheets.ts)
 // and map wandering (lib/stage/npc-wander.ts): every listed NPC has a painting,
-// a complete sheet in the hero layout and a place on a map; every villain is a
-// reachable boss; wanderers stay near home, off blocked ground and still when
+// a complete sheet in the hero layout and a place on a map; so does every
+// painted hero, costume archetype and enemy type; every villain is a reachable
+// boss; every foe without its own art is drawn as a painted enemy type and
+// every beast as a painted creature; wanderers stay near home, off blocked ground and still when
 // frozen.
 import assert from "node:assert/strict";
 import { existsSync } from "node:fs";
 import sharp from "sharp";
 import { ANIMATED_NPC_IDS, hasAnimatedSheet } from "../lib/characters/npc-sheets";
-import { CHARACTER_IDS, characterDirectionSheet, characterSheet, hasDirectionalSheet, npcCharacterId } from "../lib/characters/catalog";
+import { CHARACTER_IDS, CREATURE_ATLAS, CREATURE_FRAME_COUNT, FOE_CHARACTER_IDS, PAINTED_CHARACTER_IDS, characterDirectionSheet, characterSheet, creatureCell, hasDirectionalSheet, npcCharacterId } from "../lib/characters/catalog";
+import { creatureFrameFor, findOpponentNpc, foeCharacterFor, opponentLook } from "../lib/world/battle-looks";
 import { getNpc } from "../lib/world/data/npcs";
 import { getLocationMap } from "../lib/world/data/location-maps";
 import { OPPONENTS } from "../lib/world/data/opponents";
@@ -36,8 +39,10 @@ await check("65 rigged NPCs: 20 people + 10 villains + 35 strolling townsfolk, u
   }
 });
 
+const RIGGED = [...ANIMATED_NPC_IDS, ...PAINTED_CHARACTER_IDS];
+
 await check("sheets: 512×512 base + 512×256 directions, every one of the 24 cells drawn", async () => {
-  for (const id of ANIMATED_NPC_IDS) {
+  for (const id of RIGGED) {
     for (const [file, rows] of [[`public${characterSheet(id)}`, 4], [`public${characterDirectionSheet(id)}`, 2]] as const) {
       assert.ok(existsSync(file), `${file} exists (run bun scripts/build-npc-sheets.ts)`);
       const { data, info } = await sharp(file).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
@@ -55,7 +60,7 @@ await check("sheets: 512×512 base + 512×256 directions, every one of the 24 ce
 
 await check("sheets: every frame is its own pose — no two cells of a clip alike, no repeats anywhere", async () => {
   const CLIPS = [["idle", 0, 4], ["walk", 4, 8], ["attack", 8, 12], ["hurt/guard/victory/defeat", 12, 16], ["walk north", 16, 20], ["walk south", 20, 24]] as const;
-  for (const id of ANIMATED_NPC_IDS) {
+  for (const id of RIGGED) {
     const cells: Int32Array[] = [];
     for (const [file, rows] of [[`public${characterSheet(id)}`, 4], [`public${characterDirectionSheet(id)}`, 2]] as const) {
       const { data } = await sharp(file).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
@@ -96,6 +101,41 @@ await check("catalog: rigged NPCs are character ids with directions, and replace
   assert.ok(!hasAnimatedSheet("thug"));
   assert.equal(characterSheet("m1"), "/art/characters/m1.png");
   assert.equal(characterDirectionSheet("m1"), "/art/characters/m1-directions.png");
+});
+
+await check("enemy types: every foe without its own art is a painted, rigged enemy type, and every type is used", () => {
+  const used = new Set<string>();
+  for (const o of OPPONENTS) {
+    const look = opponentLook(o.id, findOpponentNpc(o.id));
+    if (look.kind === "creature" || look.still) continue;
+    if (hasAnimatedSheet(look.characterId)) continue;
+    assert.ok((FOE_CHARACTER_IDS as readonly string[]).includes(look.characterId), `${o.id} is drawn as ${look.characterId}, not an enemy type`);
+    assert.equal(look.characterId, foeCharacterFor(o.id, o));
+    used.add(look.characterId);
+  }
+  for (const id of FOE_CHARACTER_IDS) {
+    assert.ok(used.has(id), `${id} is drawn for some foe`);
+    assert.ok(hasDirectionalSheet(id) && existsSync(`public/foes/body/${id}.png`), `${id} has a painted body and directions`);
+  }
+  assert.equal(foeCharacterFor("river_pirate"), "foe_pirate");
+  assert.equal(foeCharacterFor("law_constable"), "foe_constable");
+  assert.equal(foeCharacterFor("night_blade", OPPONENTS.find((o) => o.id === "night_blade")), "foe_assassin_f");
+});
+
+await check("creatures: a 4 × 3 painted atlas, every cell drawn, every beast on a frame of its kind", async () => {
+  const file = `public${CREATURE_ATLAS.url}`;
+  const { data, info } = await sharp(file).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+  assert.equal(info.width / CREATURE_ATLAS.columns, info.height / CREATURE_ATLAS.rows, "square cells");
+  for (let frame = 0; frame < CREATURE_FRAME_COUNT; frame++) {
+    const { left, top, width, height } = creatureCell(info.width, info.height, frame);
+    let opaque = 0;
+    for (let y = top; y < top + height; y++) for (let x = left; x < left + width; x++) if (data[(y * info.width + x) * 4 + 3] >= 128) opaque++;
+    assert.ok(opaque > 1500, `creature ${frame} is drawn (${opaque} px)`);
+  }
+  const expect: Record<string, number> = { wild_wolf: 0, mountain_tiger: 1, brown_bear: 2, wild_boar: 3, viper_snake: 4, wild_chicken: 5, hunt_pheasant: 5,
+    thunder_eagle: 6, vampire_bat: 7, hunt_rabbit: 8, hunt_squirrel: 9, hunt_jungle_cat: 10, hunt_mountain_lynx: 10, giant_centipede: 11 };
+  for (const [id, frame] of Object.entries(expect)) assert.equal(creatureFrameFor(id), frame, id);
+  for (const o of OPPONENTS.filter((o) => o.category === "beast")) assert.ok(creatureFrameFor(o.id)! < CREATURE_FRAME_COUNT, o.id);
 });
 
 await check("villains: every rigged villain is a power-gated boss with a gang in the encounter pool", () => {
