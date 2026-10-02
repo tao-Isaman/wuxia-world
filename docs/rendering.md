@@ -46,7 +46,7 @@ How the game is drawn and operated: the Phaser stage, the world map runtime, col
 1. **Not hydrated yet** — a "กำลังโหลด..." panel.
 2. **`!hasGame`** — `StartScreen`: name, gender, four bodies per gender with a large animated preview, install and sound buttons.
 3. **`gameOver`** — `GameOverScreen`: days survived, "เริ่มต้นใหม่" (confirm → `resetGame`).
-4. **`pendingBattle`** — `MapBackdrop` + `<BattleArena mode="world" onContinue={acknowledgeBattleResult} />`. It calls `ensureBattleStarted()` if the battle store is empty.
+4. **`pendingBattle`** — while the battle store is empty, `MapBackdrop` + `<BattleBriefingScreen />` (the foe and both sides' power tiers; เข้าต่อสู้ / F / Enter calls `ensureBattleStarted()`); once it runs, `MapBackdrop` + `<BattleArena mode="world" onContinue={acknowledgeBattleResult} />`.
 5. **`pendingEncounter`** — `MapBackdrop` (status HUD only) + `EncounterScreen`: portrait, tier chip coloured by rarity, ⚔ ต่อสู้ (F / Enter) and 🏃 หนี (Esc).
 6. **Unknown scene** — "ไม่พบฉาก …" + a restart button.
 7. **A location with a painted map** — `LocationView` over the Phaser canvas. A dialog that continues a conversation at that place keeps the **same keyed canvas** mounted, read-only, with `DialogStage` on top.

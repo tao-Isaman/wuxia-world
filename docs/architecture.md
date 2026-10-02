@@ -59,7 +59,7 @@ The import rules:
 
 Two deliberate exceptions reach up into stores:
 
-- **`lib/world/battle-bridge.ts`** subscribes to the world store and starts battles in the battle store.
+- **`lib/world/battle-bridge.ts`** reads the world store to brief and start battles in the battle store.
 - **`lib/stage/grid-battle-runtime.ts`** reads the battle store every frame and calls `step()` to pace AI turns.
 
 `lib/world/index.ts` does not export `initBattleBridge`, so importing the engine barrel never pulls in the stores.
@@ -143,8 +143,8 @@ Save format, migration and repair are in [save-format.md](save-format.md).
 **Walking into a fight:**
 
 1. **Roll.** The runtime reports 220 walked units → `walkTick()` → `rollWalkEvent(draft, 0.4)`, which may set `pendingEncounter`.
-2. **Choose.** `WorldScreen` shows `EncounterScreen`. ⚔ calls `acceptEncounter()`, which sets `pendingBattle`.
-3. **Start.** The bridge sees `pendingBattle` and calls `ensureBattleStarted()`: it scales the opponent, builds the units and looks, and runs `battleStore.start(...)`.
+2. **Choose.** `WorldScreen` shows `EncounterScreen`, with both sides' power tiers (`previewBriefing`). ⚔ calls `acceptEncounter()`, which sets `pendingBattle`, then `ensureBattleStarted()` at once.
+3. **Start.** `ensureBattleStarted()` scales the opponent, builds the units and looks, and runs `battleStore.start(...)`. Fights staged any other way (quests, sparring, the law, sagas) first show `BattleBriefingScreen` and start when the player presses เข้าต่อสู้.
 4. **Fight.** `BattleArena` and `grid-battle-runtime.ts` play the battle. Player input calls `move` / `act`; AI turns advance through `step()`.
 5. **Return.** At the end the player presses ดำเนินเรื่อง → `acknowledgeBattleResult()`, which applies stamina, time, HP / MP, rewards, kill counts and quest progress, clears `pendingBattle` and goes to `onWin` / `onLose`.
 
@@ -152,12 +152,12 @@ Save format, migration and repair are in [save-format.md](save-format.md).
 
 `initBattleBridge()` (`lib/world/battle-bridge.ts`) is called once from `app/page.tsx`. It is idempotent and does nothing during server rendering.
 
-- **World → battle, automatic.** A subscription on `pendingBattle` calls `ensureBattleStarted()`. That function:
+- **World → battle, after a warning.** Nothing starts by itself. While `pendingBattle` is set and the battle store is empty, `WorldScreen` shows `BattleBriefingScreen`: the foe, its pack, and their power tiers against the hero's (`battleBriefing(hero)`, see [combat.md](combat.md#power-tiers)). เข้าต่อสู้ calls `ensureBattleStarted()`, which:
   1. applies the power-based opponent stat scale;
-  2. calls `worldBattleSetup(opponentId, { bodyId, withPack })`;
+  2. calls `worldBattleSetup(opponentId, { bodyId, withPack })` (the same setup the briefing showed — it is built once per `pendingBattle`);
   3. starts the battle store with the hero's build and current HP / MP, the looks and the pack.
 
-  It also runs at start-up and from `WorldScreen`, so a reload during a battle restarts it (the battle store is not saved).
+  A reload during a battle shows the briefing again and restarts the fight (the battle store is not saved). `initBattleBridge()` is kept as the module's entry point but subscribes to nothing.
 - **Battle → world, by the player.** Nothing flows back until the player acknowledges the result. `acknowledgeBattleResult` reads the finished battle state once.
 
 ## The render boundary

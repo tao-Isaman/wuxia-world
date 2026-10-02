@@ -128,7 +128,7 @@ lib/stage/ (Phaser, browser only) · lib/characters/ · lib/audio/
 
 Two deliberate exceptions reach into stores:
 
-- `lib/world/battle-bridge.ts` watches `pendingBattle` and starts the battle store.
+- `lib/world/battle-bridge.ts` briefs a `pendingBattle` and starts the battle store when the player goes in.
 - `lib/stage/grid-battle-runtime.ts` reads the battle store each frame and calls `step()` for AI turns.
 
 `initBattleBridge` is not in the `lib/world` barrel; import it from `@/lib/world/battle-bridge`. `app/page.tsx` calls it once.
@@ -252,7 +252,7 @@ Two deliberate exceptions reach into stores:
 
 **Battle ↔ world:**
 
-1. `pendingBattle` makes the bridge call `ensureBattleStarted()`: scale the foe, run `worldBattleSetup` (looks and pack), then `battleStore.start` with the hero's HP / MP.
+1. `pendingBattle` shows `BattleBriefingScreen` first: the foe, its pack and both sides' **power tiers** (`battleBriefing`; random encounters show it on the encounter screen). Going in calls `ensureBattleStarted()`: scale the foe, run `worldBattleSetup` (looks and pack, built once per `pendingBattle`), then `battleStore.start` with the hero's HP / MP.
 2. At the end, the player's ดำเนินเรื่อง → `acknowledgeBattleResult()`. It applies:
    - stamina −5 and 0.5 ชั่วยาม;
    - HP / MP carry-over;

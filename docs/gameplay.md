@@ -157,7 +157,7 @@ Treasure and meetings stop while you are hunting.
 
 ### The encounter screen
 
-It shows the foe, its tier and its kind (human, beast, supernatural). You choose:
+It shows the foe, its tier and its kind (human, beast, supernatural), and the **power tiers** of the foe, its strongest companion and the hero, with a verdict (see [Battles](#battles)). You choose:
 
 - **⚔ ต่อสู้** — fight. Many foes bring weaker companions — wolves, bats, cultists, bandit gangs — and more of them as the hero grows stronger (up to six). The strongest bosses (the bandit king, the cult elder, the bear king) come with their whole gang. Once the hero is strong, the ten named villains — เถ้าแก่โจวตลาดมืด, ทูตเซี่ย, ขุนนางหยาน, หัวหน้าโจรชิง, นักฆ่าเงาหยิง, เจ้าลัทธิจ้าวมังกรเทพ, ผู้อาวุโสตู๋ซื่อ, ฮุยเป้า, ดาบเลือดเซียะลาง and ตู๋โซ่ว — can also cross the hero's path with their followers (rarer than the other bosses).
 - **🏃 หนี** — leave. Free against ordinary foes.
@@ -196,6 +196,8 @@ Joining a sect that starts at rank 5 sets power to 0.5 at once. The capital appr
 ## Battles
 
 Battles are turn-based tactics on a board of 10 × 7 tiles, growing to 15 × 10 when many foes join. The full rules are in [grid-combat.md](grid-combat.md).
+
+- **The warning first.** Every fight opens with a briefing before the board: the foe, its companions, and both sides' **power tier** — twelve steps from ปุถุชน (1) to เทพยุทธ์ (12), scored from stats, inner arts and move skills, never equipment ([combat.md](combat.md#power-tiers)). The verdict reads อันตรายยิ่ง (foe 2+ tiers up), เหนือกว่าหนึ่งขั้น, สูสี, ด้อยกว่าหนึ่งขั้น or ด้อยกว่าหลายขั้น, and the note says whether a loss can kill. เข้าต่อสู้ (F / Enter) starts the fight; retreating is still possible inside it. The hero's own tier is on the profile.
 
 - **Units.** You are one unit. An accepted encounter can add the foe's companions (up to six); quest fights, spars and hunts are one against one.
 - **Your turn.** Move, then use one of the (up to 10) skills or inner arts in your slots, or รอ (wait), or ถอยหนี (retreat).

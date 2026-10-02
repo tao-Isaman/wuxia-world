@@ -236,7 +236,7 @@ Everything sets `worldStore.pendingBattle = { opponentId, onWin, onLose, nonFata
 
 ### Starting a battle
 
-`lib/world/battle-bridge.ts`: `initBattleBridge()` (called once from `app/page.tsx`) subscribes to `pendingBattle`. `ensureBattleStarted()` then applies the opponent stat scale for the hero's progress (`applyOpponentStatScale`, ×1 to ×3), builds the setup with `worldBattleSetup(opponentId, { bodyId, withPack })`, and calls `battleStore.start(playerBuild, setup.build, { hpA, mpA, looks, enemies })`. It also runs at start-up, so a save with a `pendingBattle` restarts that fight. An unknown opponent clears the pending battle.
+`lib/world/battle-bridge.ts`: a `pendingBattle` is first briefed (`battleBriefing(hero)`: the foe, its pack and both sides' power tiers, shown by `BattleBriefingScreen`; the encounter screen uses `previewBriefing`). `ensureBattleStarted()`, called when the player goes in, then applies the opponent stat scale for the hero's progress (`applyOpponentStatScale`, ×1 to ×3), builds the setup with `worldBattleSetup(opponentId, { bodyId, withPack })`, and calls `battleStore.start(playerBuild, setup.build, { hpA, mpA, looks, enemies })`. The setup is built once per `pendingBattle`, so the fight is exactly the one briefed. A save with a `pendingBattle` shows the briefing again and restarts that fight. An unknown opponent clears the pending battle.
 
 ### Ending a battle
 
@@ -305,7 +305,7 @@ Details of the rewards: [gameplay.md](gameplay.md#progression).
 | `bun run test:grid` (`scripts/test-grid-engine.ts`, 14 checks) | layout, name suffixes, move range, walking rules, turn-order ratios and forecast, reach, areas, cooldowns, art MP, own-turn ticks, stun skips, poison deaths, compat mirrors, hero-only flee, full battles ending within 300 turns |
 | `bun run test:grid-ai` (13) | legal plans across 36 seeded battles, attrition up to 2500 turns, attacks when adjacent, walk-and-strike, ranged units keep distance, areas aim for 2+ foes, heals only when low, plan time < 15 ms, a 1 v 7 plan on 15 × 10 < 25 ms |
 | `bun run test:grid-skills` (7) | every skill and art profile is valid, the self / enemy rule, the 18 overrides, `slotGrid`, `describeGrid` labels |
-| `bun run test:grid-store` (13) | bridge start with HP / MP and looks, packs (mixed gangs, power reinforcements, the 6 cap), board size per unit count, variant tint / size, rigged NPC sheets for spars and villains, spar sprites, step pacing, refused input, flee, auto, win rewards including pack kills, fatal vs non-fatal loss, escape without rewards |
+| `bun run test:grid-store` (14) | the briefing (no auto-start, the briefed foe is the one fought, gear doesn't count), bridge start with HP / MP and looks, packs (mixed gangs, power reinforcements, the 6 cap), board size per unit count, variant tint / size, rigged NPC sheets for spars and villains, spar sprites, step pacing, refused input, flee, auto, win rewards including pack kills, fatal vs non-fatal loss, escape without rewards |
 | `bun run test:combat` (15) | legacy 1v1 checks plus grid store turns, ties, cooldown timing and flee odds |
 | `bun run test:battle-background` | background choice |
 
