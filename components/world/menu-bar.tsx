@@ -13,6 +13,8 @@ import { ActionLogPopup } from "./popups/action-log-popup";
 import { QuestLogPopup } from "./popups/quest-log-popup";
 import { QuestTracker } from "./quest-tracker";
 import { SectMembershipPopup } from "./popups/sect-membership-popup";
+import { LettersPopup } from "./popups/letters-popup";
+import { toast } from "@/store/toast-store";
 import { RestQuickAction } from "./rest-quick-action";
 import { GameMenuContext } from "@/components/ui/game-menu-context";
 import { InstallGameButton } from "@/components/pwa";
@@ -32,6 +34,7 @@ type PopupId =
   | "quests"
   | "sect"
   | "log"
+  | "letters"
   | null;
 
 // Main-screen menu bar — popup buttons, one popup at a time. The bar
@@ -80,6 +83,17 @@ export function MenuBar({ hud }: { hud?: boolean } = {}) {
     return count;
   });
 
+  // Letters: an unread badge, and a toast when a new one arrives.
+  const unread = useWorldStore((s) => s.letters.filter((l) => !l.read).length);
+  const newest = useWorldStore((s) => s.letters[s.letters.length - 1]?.id);
+  const [seenNewest, setSeenNewest] = useState(newest);
+  useEffect(() => {
+    if (!hud || newest === seenNewest) return;
+    setSeenNewest(newest);
+    const letter = useWorldStore.getState().letters.find((l) => l.id === newest);
+    if (letter && !letter.read) toast("info", "✉ มีจดหมายฉบับใหม่ — เปิดดูที่ จดหมาย");
+  }, [hud, newest, seenNewest]);
+
   const tabs: {
     id: Exclude<PopupId, null>;
     icon: string;
@@ -103,6 +117,7 @@ export function MenuBar({ hud }: { hud?: boolean } = {}) {
       badge: sectActions > 0 ? sectActions : undefined,
     },
     { id: "log", icon: "/icons/ui/log.png", label: "บันทึก" },
+    { id: "letters", icon: "/icons/ui/letter.png", label: "จดหมาย", badge: unread > 0 ? unread : undefined },
   ];
 
   // Hero's Adventure-style unified menu: the open popup renders inside one
@@ -121,6 +136,7 @@ export function MenuBar({ hud }: { hud?: boolean } = {}) {
       <QuestLogPopup open={open === "quests"} onClose={close} />
       <SectMembershipPopup open={open === "sect"} onClose={close} />
       <ActionLogPopup open={open === "log"} onClose={close} />
+      <LettersPopup open={open === "letters"} onClose={close} />
     </GameMenuContext.Provider>
   );
 

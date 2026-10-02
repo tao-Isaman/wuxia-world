@@ -839,9 +839,60 @@ export interface PendingBattle {
   // When true, defeat does NOT trigger gameOver — the player is routed to
   // `onLose` and the world resumes. Used for sparring / friendly fights.
   nonFatal?: boolean;
+  // A bout of the sword tournament (lib/world/tournament.ts): the result
+  // advances the bracket instead of dropping loot.
+  tournament?: boolean;
   // Random roadside encounters bring the opponent's pack (OpponentDef.pack);
   // quest / spar fights with the same opponent stay one-on-one.
   withPack?: boolean;
+}
+
+// ─── Letters (lib/world/letters.ts) ──────────────────────────────────
+// A friend's letter in the hero's inbox, with a gift (an item or gold) the
+// hero takes when they open it.
+export interface Letter {
+  id: string;
+  day: number;
+  npcId: string;
+  text: string;
+  /** Gift rarity 1–4 (ทั่วไป / ดี / หายาก / ล้ำค่า). */
+  rarity: number;
+  itemId?: string;
+  count?: number;
+  gold?: number;
+  read: boolean;
+  claimed: boolean;
+}
+
+// ─── Sword tournament (lib/world/tournament.ts) ───────────────────────
+// One year's ชุมนุมวิจารณ์กระบี่: a 32-entrant single-elimination bracket.
+// Entrant ids are NPC ids, or "player" for the hero.
+export interface TournamentState {
+  year: number;
+  status: "registered" | "running" | "finished";
+  /** rounds[0] is the 32 seeds in bracket order; rounds[r] the winners of round r − 1. */
+  rounds: string[][];
+  /** The round being fought (0 = the last 32 … 4 = the final). */
+  round: number;
+  /** The hero lost (or withdrew); the rest of the bracket is simulated. */
+  playerOut: boolean;
+  /** The hero's final place (1, 2, 3, 5, 9 or 17), once out or champion. */
+  playerPlace?: number;
+  champion?: string;
+  /** Moves / arts (slot ids) the champion may pick from: every entrant's. */
+  pickOptions?: string[];
+  /** What the champion picked (slot id), once picked. */
+  championPick?: string;
+  /** Gold and w-exp won so far this tournament. */
+  gold: number;
+  wExp: number;
+}
+
+export interface TournamentRecord {
+  year: number;
+  champion: string;
+  championPick?: string;
+  playerPlace?: number;
 }
 
 // A random-event fight that the player has been offered but not accepted
@@ -1105,6 +1156,12 @@ export interface WorldStateData {
   kidnappedUntil: Record<string, number>;
   // Day each NPC last received a gift (one gift per 30 days; lib/world/gifts.ts).
   giftDays: Record<string, number>;
+  // Letters from friends (lib/world/letters.ts) and the day each NPC last wrote.
+  letters: Letter[];
+  letterDays: Record<string, number>;
+  // This year's sword tournament (null outside it) and past champions.
+  tournament: TournamentState | null;
+  tournamentHistory: TournamentRecord[];
   // Day each place activity was last done (its own cooldown; data/activities.ts).
   activityDays: Record<string, number>;
 

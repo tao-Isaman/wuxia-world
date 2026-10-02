@@ -69,6 +69,7 @@ bun run test:npcs
 bun run test:story          # every sect skill/art has a quest; lineage + sagas + cutscenes well formed; all play through
 bun run test:routes         # compass exits, 8-way road paintings and arrival sides; world coords current
 bun run test:places         # place NPCs / quests / activities; every ยุทธจักร T0–T3 move is a quest reward; gifts; presence
+bun run test:systems        # practice xp, letters, horse stations, the sword tournament
 bun run test:quests         # campaign audit + dead ends + every item/kill/objective quest + guidance + bad-action stages
 bun run test:docs           # generated reference is current + docs links/paths/commands resolve
 bun run test:e2e            # Playwright (Chromium) on :3017 — start a production server first
@@ -114,7 +115,7 @@ bun scripts/build-route-variants.ts --from <dir>   # import the 56 directional r
 ```
 app/, components/         React: screens, HUD, menus, popups, battle UI
    ↓
-store/                    Zustand: world (saved, v22), battle, character (/debug, v3), loading, toast, confirm
+store/                    Zustand: world (saved, v23), battle, character (/debug, v3), loading, toast, confirm
    ↓
 lib/world/  ──────►  lib/game/          pure engines — no React, no DOM, no I/O
    └ battle-bridge.ts: the one place the world and battle stores meet
@@ -212,7 +213,7 @@ Two deliberate exceptions reach into stores:
 - **Bad actions** (`bad-actions.ts`). Steal, assassinate and kidnap use base stats. A failed steal is a non-fatal fight plus a mark; failed assassinations and kidnappings are fatal.
 - **Sects** (`data/sect-memberships.ts`, 15 joinable).
   - Ladders: 9 → 1 (eight sects), 5 → 1 (six) or 3 → 1 (Gumu).
-  - Ranks grant no martial arts: a rank-up pays gold (`rankUpGold`, half its point cost) and opens lineage quests and sagas, the **only** way to any sect skill or art (`test:story` enforces it; no rank pool, manual, hall, dialog or other quest may teach one).
+  - Ranks grant no martial arts: a rank-up pays gold (`rankUpGold`, half its point cost) and opens lineage quests and sagas, the **only** way to any sect skill or art (`test:story` enforces it; no rank pool, manual, hall, dialog or other quest may teach one). The one exception is the sword tournament champion's prize pick (below).
   - Sect quests are repeatable after a 30-day cooldown.
   - Membership status is `active | resigned | betrayed`. Only `active` counts for `sectMember` / `anySectMember`.
   - Joins go through each intro quest's `joinSect` **reward**, which does not check `joinRequirements`; the intro's `prereqs` are the real gate.
@@ -231,13 +232,18 @@ Two deliberate exceptions reach into stores:
 - **Living places** (`data/places/<group>.ts`, one `PlaceContent` each, merged into every registry). Villages, towns and homes have people, quests and activities; every ยุทธจักร T0–T3 move and art is a quest reward, gated by rarity (`test:places`).
   - **Place activities** are `ActivityDef`s with `place` (locations, cooldown in days, cost, rewards), run by `doActivity`; auto maps place their spots (`ACTIVITY_SLOTS`), hand maps need `place.spot`.
   - **NPC looks:** all 68 place NPCs have their own painted portrait and body (`import-npc-art.ts`). Strollers (`look.wander`) are rigged (`ANIMATED_NPC_IDS`); the rest stand as a unique pixel sprite. `look.body` (`registerNpcBodies`) is only the fallback sheet for art-less NPCs.
+- **Letters, stations, tournament.**
+  - **Letters** (`letters.ts`): each new day an NPC with relationship ≥ 20 may write (one letter a day, 15 days per NPC; odds from relationship, fame, LUK; gift rarity from LUK). Inbox `state.letters`; `openLetter` takes the gift.
+  - **Horse stations** (`stations.ts`): cities, villages and joinable sects' grounds; ride to a visited station place for gold + time by world-map distance (`stationTravel`).
+  - **Sword tournament** (`tournament.ts`): a 360-day year; register at the capital (days 60–89, 100 gold), fight on day 90–92. 32 entrants (hero + the liveness roster + sparring fighters); the hero's bouts are real non-fatal battles (`pendingBattle.tournament`), the rest simulated by power. Bout and place rewards; the champion (hero or NPC) picks one entrant's move or art.
+  - **Practice xp** is 30 + 5 % of the xp to the next level, 50 + 6 % at a fitting place (`practiceXpGain`).
 - **Presence** (`npc-presence.ts`). An assassinated NPC is gone for good; a kidnapped one is away until `kidnappedUntil` (day + 180) and then stands at their spot again. Maps and the location card filter with `npcPresent`.
 - **Gifts** (`gifts.ts`, store `giveGift`). One gift per NPC every 30 days (`giftDays`), an item or 100 / 500 / 1000 / 5000 gold. Worth 1–5 by price; liked ×2 (+2 for a favourite item id), disliked −2. Tastes are `NpcDef.likes` / `dislikes` (item ids, categories, `"gold"`) or follow the NPC's tags.
 - **Repair** (`validate.ts`). `validateAndRepair` runs on every load and drops dangling ids.
 
 ## Stores (`store/`)
 
-- **`world-store.ts`** is saved as `wusia-world-v1`, **version 22**.
+- **`world-store.ts`** is saved as `wusia-world-v1`, **version 23**.
   - Actions draft a copy (`draftFrom`, **one level deep** — nested quest, sect and NPC entries are shared), call engine functions, then `set`.
   - Time goes through `advanceTime` (12 ชั่วยาม = 1 day). The player-visible log uses `appendActionLog` (newest 100).
 - **`battle-store.ts`** is not saved.
@@ -282,7 +288,7 @@ Two deliberate exceptions reach into stores:
 
 - **Root.** `components/world/world-screen.tsx` picks a view: start → game over → battle → encounter → mapped location (+ dialog over the same canvas) → dialog over a painting → road map → the classic card layout (only `world_journey` and 14 unpainted roads).
 - **HUD** (mobile first):
-  - the icon grid at the top left: 1 โปรไฟล์ 2 ย่าม 3 วิชา 4 อาชีพ 5 ภารกิจ 6 สำนัก 7 บันทึก, then ♪ and install;
+  - the icon grid at the top left: 1 โปรไฟล์ 2 ย่าม 3 วิชา 4 อาชีพ 5 ภารกิจ 6 สำนัก 7 บันทึก 8 จดหมาย (unread badge), then ♪ and install;
   - purse, sundial and day at the top right, with the quest tracker below;
   - law chips at the top centre;
   - พัก and the action button at the bottom right;
@@ -326,7 +332,7 @@ Content changes need **no save version bump**. Removed ids are dropped on load.
 
 ## Saves
 
-- **Keys.** The world save is `localStorage["wusia-world-v1"]`, **version 22**. The "wusia" spelling is historical — never rename it.
+- **Keys.** The world save is `localStorage["wusia-world-v1"]`, **version 23**. The "wusia" spelling is historical — never rename it.
 - **Migration.** `migrate` is one idempotent normalizer (it ignores `fromVersion`). The persist `merge` also back-fills lore rumors on every load, and `onRehydrateStorage` runs `validateAndRepair`.
 - **Adding a persisted field:**
   1. `WorldStateData` + `emptyData()`;

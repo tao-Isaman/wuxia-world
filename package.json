@@ -26,6 +26,7 @@
     "test:story": "bun scripts/test-story-quests.ts",
     "test:routes": "bun scripts/test-routes.ts",
     "test:places": "bun scripts/test-places.ts",
+    "test:systems": "bun scripts/test-systems.ts",
     "test:quests": "bun scripts/audit-quest-completion.ts && bun scripts/test-quest-dead-ends.ts && bun scripts/test-quest-turnins.ts && bun scripts/test-quest-guide.ts && bun scripts/test-bad-action-quests.ts",
     "test:docs": "bun scripts/build-docs-reference.ts --check && bun scripts/check-docs.ts",
     "test:e2e": "playwright test"

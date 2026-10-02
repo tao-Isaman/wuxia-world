@@ -26,6 +26,12 @@ import {
   STAT_XP_PER_ACTION,
   xpToNextStatLevel,
 } from "@/lib/world/stat-progression";
+import { letterGiftLabel, rollLetters } from "@/lib/world/letters";
+import { hasStation, stationTrips } from "@/lib/world/stations";
+import {
+  TOURNAMENT, currentTournament, entrantName, entrantOpponentId, finishTournament, pickPrize, playerOpponent, prizeName,
+  registerForTournament, resolveRound, settleTournaments, startBlock, startTournament, ROUND_LABEL, PLACE_LABEL,
+} from "@/lib/world/tournament";
 import { useBattleStore } from "@/store/battle-store";
 import { packOpponentIdOf } from "@/lib/world/battle-looks";
 import {
@@ -44,7 +50,8 @@ import {
   LIFE_SKILL_KEYS,
   masteryLevel,
   pickWeighted,
-  practiceXpBonus,
+  practiceMatches,
+  practiceXpGain,
   START_SCENE_ID,
   TRAIT_KEYS,
   validateAndRepair,
@@ -248,7 +255,8 @@ export type PracticeResult =
       kind: "skill" | "art";
       id: string;
       xpGained: number;
-      bonusMult: number;
+      /** The place suits the skill's types (the larger practice rule). */
+      matched: boolean;
       leveledUp: boolean;
       newLevel: number;
     };
@@ -325,7 +333,6 @@ const ART_USE_XP = 20;
 // bonus (forest/cave/mountain/river — see lib/world/location-categories.ts).
 export const PRACTICE_STAMINA_COST = 30;
 export const PRACTICE_HOURS = 6;
-const PRACTICE_BASE_XP = 30;
 const W_EXP_PRACTICE = 5;
 
 // Crafting professions that require an artisan + learned recipe to
@@ -378,6 +385,16 @@ interface WorldStore extends WorldStateData {
   // pendingBattle, and resets the battle store. If a hunt was in flight,
   // the spoils are dropped here on win.
   acknowledgeBattleResult: () => void;
+  /** Open a letter: mark it read and take its gift. */
+  openLetter: (letterId: string) => { ok: boolean; gift?: string };
+  /** Ride from this place's horse station to a visited station place. */
+  stationTravel: (to: string) => { ok: boolean; reason?: "no-station" | "unknown" | "gold" };
+  /** Pay the fee and register for this year's sword tournament. */
+  registerTournament: () => boolean;
+  /** Start the tournament (on its day) or the hero's next bout: queues the battle. */
+  fightTournamentBout: () => boolean;
+  /** The champion hero takes one move or art from the entrants'. */
+  pickTournamentPrize: (slotId: string) => boolean;
   resetGame: () => void;
 
   // Activity actions
@@ -546,6 +563,10 @@ const emptyData = (): WorldStateData => ({
   kidnappedNpcIds: [],
   kidnappedUntil: {},
   giftDays: {},
+  letters: [],
+  letterDays: {},
+  tournament: null,
+  tournamentHistory: [],
   activityDays: {},
   day: 1,
   time: 0,
@@ -742,6 +763,7 @@ function applyArtLevelUps(state: WorldStateData, artId: string): void {
 // increments `day`. Negative deltas are not supported (game time is one-way).
 function advanceTime(state: WorldStateData, hours: number): void {
   if (hours <= 0) return;
+  const dayBefore = state.day;
   let total = state.time + hours;
   let day = state.day;
   while (total >= HOURS_PER_DAY) {
@@ -767,6 +789,42 @@ function advanceTime(state: WorldStateData, hours: number): void {
     tickAllNamedNpcs(state, { currentDay: state.day });
   });
   maintainRumors(state, state.day);
+  // A new day: friends may write (lib/world/letters.ts), and a tournament
+  // whose days have passed is settled (lib/world/tournament.ts).
+  if (state.day > dayBefore) {
+    for (const letter of rollLetters(state, dayBefore)) {
+      appendActionLog(state, "letter", `ได้รับจดหมายจาก${getNpc(letter.npcId)?.name ?? "สหาย"}`);
+    }
+    const before = state.tournamentHistory.length;
+    settleTournaments(state);
+    const record = state.tournamentHistory[state.tournamentHistory.length - 1];
+    if (state.tournamentHistory.length > before && record) {
+      appendActionLog(state, "tournament", `ชุมนุมวิจารณ์กระบี่ปีที่ ${record.year} จบลง · ผู้ชนะเลิศ ${entrantName(record.champion, state.playerBuild?.name)}`);
+    }
+  }
+}
+
+// Settle the hero's tournament bout: advance the bracket, log the result and
+// pay out; once the hero is out the rest of the bracket is simulated.
+function settleTournamentBout(state: WorldStateData, won: boolean): void {
+  const t = currentTournament(state);
+  if (!t) return;
+  const round = t.round;
+  const outcome = resolveRound(state, won);
+  const heroName = state.playerBuild?.name;
+  appendActionLog(state, "tournament", won
+    ? `ชุมนุมวิจารณ์กระบี่ · ชนะ${ROUND_LABEL[round] ?? ""} · +${outcome.gold} ตำลึง · +${outcome.wExp} w-exp`
+    : `ชุมนุมวิจารณ์กระบี่ · ตกรอบ${ROUND_LABEL[round] ?? ""}`);
+  const after = currentTournament(state);
+  if (after?.playerOut && after.status === "running") finishTournament(state);
+  const done = currentTournament(state);
+  if (done?.status === "finished") {
+    const place = done.playerPlace;
+    appendActionLog(state, "tournament",
+      `ชุมนุมวิจารณ์กระบี่จบลง · ผู้ชนะเลิศ ${entrantName(done.champion!, heroName)}` +
+      (place ? ` · ท่านได้${PLACE_LABEL[place] ?? `อันดับ ${place}`}` : "") +
+      (done.champion !== "player" && done.championPick ? ` · เลือกวิชา ${prizeName(done.championPick)}` : ""));
+  }
 }
 
 // Run `tickFn` (the NPC tick) and afterwards diff the npcExt status map
@@ -956,6 +1014,10 @@ function draftFrom(s: WorldStateData): WorldStateData {
     kidnappedNpcIds: [...s.kidnappedNpcIds],
     kidnappedUntil: { ...s.kidnappedUntil },
     giftDays: { ...s.giftDays },
+    letters: [...s.letters],
+    letterDays: { ...s.letterDays },
+    tournament: s.tournament,
+    tournamentHistory: [...s.tournamentHistory],
     activityDays: { ...s.activityDays },
     day: s.day,
     time: s.time,
@@ -1254,6 +1316,77 @@ export const useWorldStore = create<WorldStore>()(
 
       canTravelTo: (sceneId) => canAffordTravelTo(get(), sceneId),
 
+      openLetter: (letterId) => {
+        const s = get();
+        const letter = s.letters.find((l) => l.id === letterId);
+        if (!letter) return { ok: false };
+        const draft = draftFrom(s);
+        let gift: string | undefined;
+        if (!letter.claimed) {
+          if (letter.gold) draft.gold += letter.gold;
+          else if (letter.itemId && getItem(letter.itemId)) {
+            draft.inventory[letter.itemId] = (draft.inventory[letter.itemId] ?? 0) + (letter.count ?? 1);
+          }
+          gift = letterGiftLabel(letter);
+          appendActionLog(draft, "letter", `เปิดจดหมายจาก${getNpc(letter.npcId)?.name ?? "สหาย"} · ได้ ${gift}`);
+        }
+        draft.letters = draft.letters.map((l) => l.id === letterId ? { ...l, read: true, claimed: true } : l);
+        set({ ...draft });
+        return { ok: true, gift };
+      },
+
+      stationTravel: (to) => {
+        const s = get();
+        if (!hasStation(s.currentSceneId)) return { ok: false, reason: "no-station" };
+        const trip = stationTrips(s, s.currentSceneId).find((t) => t.to === to);
+        if (!trip) return { ok: false, reason: "unknown" };
+        if (s.gold < trip.gold) return { ok: false, reason: "gold" };
+        const draft = draftFrom(s);
+        draft.gold -= trip.gold;
+        advanceTime(draft, trip.hours);
+        appendActionLog(draft, "travel", `ขี่ม้าจากสถานีพักม้าไป${(getScene(to) as { name?: string } | null)?.name ?? to} · ${trip.gold} ตำลึง`);
+        draft.currentSceneId = to;
+        const sc = getScene(to);
+        if (sc?.onEnter) applyEffects(draft, sc.onEnter);
+        followAutoAdvance(draft);
+        set({ ...draft, roamingFoes: [] });
+        return { ok: true };
+      },
+
+      registerTournament: () => {
+        const draft = draftFrom(get());
+        if (!registerForTournament(draft)) return false;
+        appendActionLog(draft, "tournament", `ลงชื่อเข้าร่วมชุมนุมวิจารณ์กระบี่ · ค่าสมัคร ${TOURNAMENT.fee} ตำลึง`);
+        set({ ...draft });
+        return true;
+      },
+
+      fightTournamentBout: () => {
+        const s = get();
+        if (s.pendingBattle) return false;
+        const draft = draftFrom(s);
+        if (currentTournament(draft)?.status === "registered") {
+          if (startBlock(draft) || !startTournament(draft)) return false;
+          appendActionLog(draft, "tournament", "ชุมนุมวิจารณ์กระบี่เริ่มขึ้น — จับสลากสายการแข่งขันแล้ว");
+        }
+        const foe = playerOpponent(currentTournament(draft));
+        const opponentId = foe ? entrantOpponentId(foe) : null;
+        if (!opponentId) { set({ ...draft }); return false; }
+        draft.pendingBattle = { opponentId, onWin: TOURNAMENT.locationId, onLose: TOURNAMENT.locationId, nonFatal: true, tournament: true };
+        set({ ...draft });
+        return true;
+      },
+
+      pickTournamentPrize: (slotId) => {
+        const draft = draftFrom(get());
+        const prize = pickPrize(draft, slotId);
+        if (!prize) return false;
+        applyEffect(draft, prize.kind === "skill" ? { t: "learnSkill", skillId: prize.id } : { t: "learnArt", artId: prize.id });
+        appendActionLog(draft, "tournament", `รางวัลแชมป์ชุมนุมวิจารณ์กระบี่ · ได้เรียน ${prizeName(slotId)}`);
+        set({ ...draft });
+        return true;
+      },
+
       clearPendingBattle: () =>
         set({
           pendingBattle: null,
@@ -1281,6 +1414,14 @@ export const useWorldStore = create<WorldStore>()(
           draft.currentMp = Math.max(0, battleState.mpA);
           if (isLawOpponent(pb.opponentId)) draft.jailCityId = null;
           const opponent = getOpponent(pb.opponentId);
+          if (pb.tournament) {
+            // Leaving the ring forfeits the bout.
+            draft.currentHp = Math.max(1, draft.currentHp ?? 1);
+            settleTournamentBout(draft, false);
+            set({ ...draft });
+            useBattleStore.getState().reset();
+            return;
+          }
           appendActionLog(draft, "battle", `ถอยหนีจาก${opponent?.name ?? "ศัตรู"}สำเร็จ`);
           const back = getScene(draft.currentSceneId)?.kind === "dialog" ? draft.lastLocationId : null;
           set({ ...draft });
@@ -1307,6 +1448,15 @@ export const useWorldStore = create<WorldStore>()(
         // Non-fatal battles (sparring) → route to onLose, world resumes.
         if (winner !== "A") {
           draft.pendingHuntYield = null;
+          if (pb.tournament) {
+            draft.currentHp = Math.max(1, draft.currentHp ?? 1);
+            draft.pendingSpar = null;
+            settleTournamentBout(draft, false);
+            set({ ...draft });
+            useBattleStore.getState().reset();
+            get().gotoScene(pb.onLose);
+            return;
+          }
           if (pb.nonFatal) {
             draft.currentHp = Math.max(1, draft.currentHp ?? 1);
             appendActionLog(draft, "battle", "พ่ายแพ้ในการประลอง แต่ยังมีชีวิต — พักผ่อนก่อนสู้ครั้งต่อไป");
@@ -1440,7 +1590,8 @@ export const useWorldStore = create<WorldStore>()(
         // covers gathering kicks; these are the random-encounter loot).
         const oppDef = getOpponent(pb.opponentId);
         const lootSummary: string[] = [];
-        if (oppDef?.drops && oppDef.drops.length > 0) {
+        if (pb.tournament) settleTournamentBout(draft, true);
+        else if (oppDef?.drops && oppDef.drops.length > 0) {
           const lootRolls = rollOpponentLoot(oppDef.drops, oppDef.ti ?? 0);
           for (const it of lootRolls) {
             draft.inventory[it.itemId] = (draft.inventory[it.itemId] ?? 0) + it.count;
@@ -2006,19 +2157,18 @@ export const useWorldStore = create<WorldStore>()(
 
         if (info.kind === "skill") {
           const sk = info.skill;
-          const types = effectiveTypes(sk);
-          const mult = practiceXpBonus(locScene, types);
-          const xpGained = Math.floor(PRACTICE_BASE_XP * mult);
-          draft.skillExp[sk.id] = (draft.skillExp[sk.id] ?? 0) + xpGained;
+          const matched = practiceMatches(locScene, effectiveTypes(sk));
           if (!(sk.id in draft.skillLevel)) draft.skillLevel[sk.id] = 1;
           const beforeLv = draft.skillLevel[sk.id]!;
+          const xpGained = practiceXpGain(matched, xpToNextLevel(sk, beforeLv));
+          draft.skillExp[sk.id] = (draft.skillExp[sk.id] ?? 0) + xpGained;
           applySkillLevelUps(draft, sk.id);
           const afterLv = draft.skillLevel[sk.id]!;
           const leveledUp = afterLv > beforeLv;
           appendActionLog(
             draft,
             "learn",
-            `ฝึก ${sk.n} · +${xpGained} xp${mult > 1 ? ` (×${mult.toFixed(2)})` : ""}` +
+            `ฝึก ${sk.n} · +${xpGained} xp${matched ? " (สถานที่เหมาะ)" : ""}` +
               (leveledUp ? ` · ขึ้น Lv.${afterLv}` : ""),
           );
           set({ ...draft });
@@ -2027,7 +2177,7 @@ export const useWorldStore = create<WorldStore>()(
             kind: "skill",
             id: sk.id,
             xpGained,
-            bonusMult: mult,
+            matched,
             leveledUp,
             newLevel: afterLv,
           };
@@ -2035,11 +2185,10 @@ export const useWorldStore = create<WorldStore>()(
 
         // Art branch
         const art = info.art;
-        const types = effectiveTypes(art);
-        const mult = practiceXpBonus(locScene, types);
-        const xpGained = Math.floor(PRACTICE_BASE_XP * mult);
-        draft.artExp[art.id] = (draft.artExp[art.id] ?? 0) + xpGained;
+        const matched = practiceMatches(locScene, effectiveTypes(art));
         const beforeLv = draft.playerBuild!.artLevels?.[art.id] ?? 1;
+        const xpGained = practiceXpGain(matched, xpToNextArtLevel(art, beforeLv));
+        draft.artExp[art.id] = (draft.artExp[art.id] ?? 0) + xpGained;
         // Make sure artLevels has an entry so applyArtLevelUps starts from 1.
         if (typeof draft.playerBuild!.artLevels?.[art.id] !== "number") {
           draft.playerBuild = {
@@ -2056,7 +2205,7 @@ export const useWorldStore = create<WorldStore>()(
         appendActionLog(
           draft,
           "learn",
-          `ฝึก ${art.n} · +${xpGained} xp${mult > 1 ? ` (×${mult.toFixed(2)})` : ""}` +
+          `ฝึก ${art.n} · +${xpGained} xp${matched ? " (สถานที่เหมาะ)" : ""}` +
             (leveledUp ? ` · ขึ้นขั้น ${afterLv}` : ""),
         );
         set({ ...draft });
@@ -2065,7 +2214,7 @@ export const useWorldStore = create<WorldStore>()(
           kind: "art",
           id: art.id,
           xpGained,
-          bonusMult: mult,
+          matched,
           leveledUp,
           newLevel: afterLv,
         };
@@ -2859,7 +3008,7 @@ export const useWorldStore = create<WorldStore>()(
     }),
     {
       name: "wusia-world-v1",
-      version: 22,
+      version: 23,
       // Content backfill also runs for current-version saves (migrate does
       // not). Keep the standard shallow merge and add only missing lore.
       merge: (persisted, current) => {
@@ -2901,6 +3050,10 @@ export const useWorldStore = create<WorldStore>()(
         kidnappedNpcIds: s.kidnappedNpcIds,
         kidnappedUntil: s.kidnappedUntil,
         giftDays: s.giftDays,
+        letters: s.letters,
+        letterDays: s.letterDays,
+        tournament: s.tournament,
+        tournamentHistory: s.tournamentHistory,
         activityDays: s.activityDays,
         day: s.day,
         time: s.time,
@@ -3064,6 +3217,11 @@ export const useWorldStore = create<WorldStore>()(
             : [],
           kidnappedUntil: p.kidnappedUntil && typeof p.kidnappedUntil === "object" ? { ...p.kidnappedUntil } : {},
           giftDays: p.giftDays && typeof p.giftDays === "object" ? { ...p.giftDays } : {},
+          // v23: letters from friends and the yearly sword tournament.
+          letters: Array.isArray(p.letters) ? [...p.letters] : [],
+          letterDays: p.letterDays && typeof p.letterDays === "object" ? { ...p.letterDays } : {},
+          tournament: p.tournament && typeof p.tournament === "object" ? p.tournament : null,
+          tournamentHistory: Array.isArray(p.tournamentHistory) ? [...p.tournamentHistory] : [],
           activityDays: p.activityDays && typeof p.activityDays === "object" ? { ...p.activityDays } : {},
           day: typeof p.day === "number" && p.day >= 1 ? p.day : 1,
           time: typeof p.time === "number" && p.time >= 0 ? p.time : 0,

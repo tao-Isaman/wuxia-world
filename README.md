@@ -69,7 +69,7 @@ tests/browser/           Playwright specs
 docs/                    guides, generated reference, specs, changelog
 ```
 
-The engines are plain TypeScript with no React or I/O. Stores wrap them, and components read the stores. The world state saves to `localStorage` (save version 22). Details: [docs/architecture.md](docs/architecture.md).
+The engines are plain TypeScript with no React or I/O. Stores wrap them, and components read the stores. The world state saves to `localStorage` (save version 23). Details: [docs/architecture.md](docs/architecture.md).
 
 ## Documentation
 

@@ -6,6 +6,14 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-02
 
+### Letters, horse stations, the sword tournament, faster practice
+
+- **Letters (จดหมาย).** Friends (relationship 20+) write with gifts: at most one letter a day and one per person every 15 days; the odds rise with relationship, fame and LUK, and LUK lifts the gift's rarity (ทั่วไป / ดี / หายาก / ล้ำค่า). A toast announces each one; the new 8th HUD tab ✉ จดหมาย shows the unread count, and opening a letter takes its gift.
+- **Horse stations (สถานีพักม้า).** Cities, villages and the 15 joinable sects' grounds have one: ride to any station place you have visited for gold and a few ชั่วยาม by distance, with no encounters.
+- **ชุมนุมวิจารณ์กระบี่.** A yearly 32-fighter tournament at the capital (register days 60–89 for 100 gold, fought on day 90). Your bouts are real non-fatal battles, the rest simulated by power; each win pays gold and w-exp, your place pays w-exp and fame, and the champion picks any one move or art from the entrants (an NPC champion picks too). Years you miss are fought among the NPCs.
+- **Practice** gives 30 xp + 5 % of the next level, or 50 + 6 % at a fitting place (was a flat 30 / 39).
+- Save version 23 (`letters`, `letterDays`, `tournament`, `tournamentHistory`). New `bun run test:systems` (17 checks) and `tests/browser/systems.spec.ts` (3 tests).
+
 ### Painted enemies and beasts
 
 - **Every foe is painted in the game's style.** Ordinary foes used to borrow the old hand-drawn costume sheets (a thief, a river pirate and a demon master could all be the same "merchant"). Now there are 22 enemy types — thief, bandit, bandit chief, brawler, archer, river pirate, desert marauder, two assassins, poisoner, swordsman, swordswoman, ghost, cult master, evil master, warrior monk, constable, palace guard, enforcer, schemer, brute and empress — each a painted body rigged into full clips (walk, attack, hurt, guard, victory, defeat, front and back walks) like the heroes and NPCs. `foeCharacterFor` picks one for every opponent without NPC art, on the map and in battle.

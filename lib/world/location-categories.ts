@@ -9,10 +9,21 @@ import type { LocationCategory, LocationScene } from "./types";
 //   river    → internal
 //
 // Locations in any of `PRACTICE_CATEGORIES` allow the player to use the
-// "ฝึกฝน" action; the practice XP gets the `PRACTICE_BONUS_MULT` boost when
-// the practiced skill / art's `types` overlap with the category's tag list.
+// "ฝึกฝน" action. A session gives a flat xp plus a share of what the skill /
+// art needs for its next level (`practiceXpGain`), larger when the practiced
+// skill / art's `types` overlap with the category's tag list (`practiceMatches`).
 
-export const PRACTICE_BONUS_MULT = 1.3; // 30 % bonus
+/** Practice xp: flat + pct % of the xp to the next level; `matched` when the place suits the skill. */
+export const PRACTICE_XP = {
+  normal: { flat: 30, pct: 5 },
+  matched: { flat: 50, pct: 6 },
+} as const;
+
+/** Xp one practice session gives, from the xp the skill / art needs for its next level (Infinity at max). */
+export function practiceXpGain(matched: boolean, toNext: number): number {
+  const rule = matched ? PRACTICE_XP.matched : PRACTICE_XP.normal;
+  return Math.floor(rule.flat + (Number.isFinite(toNext) ? toNext * rule.pct / 100 : 0));
+}
 
 export const PRACTICE_CATEGORIES: readonly LocationCategory[] = [
   "sect",
@@ -97,9 +108,9 @@ export function canPracticeAt(
   return cats.some((c) => PRACTICE_CATEGORIES.includes(c));
 }
 
-// Returns 1.0 when no category-type pair matches, PRACTICE_BONUS_MULT
-// otherwise. The bonus does not stack across categories — a skill that
-// matches both forest (yang) and mountain (hard) still gets a single 1.3×.
+// True when a category-type pair matches (the larger practice rule). The
+// bonus does not stack across categories — a skill that matches both forest
+// (yang) and mountain (hard) still gets the one matched rule.
 //
 // `bonusTypesFor` expands the input to include `"balance"` when the
 // entry has no explicit yin/yang/balance tag. This honors the data
@@ -117,18 +128,18 @@ function bonusTypesFor(types: readonly SkillType[]): readonly SkillType[] {
   return [...types, "balance"];
 }
 
-export function practiceXpBonus(
+export function practiceMatches(
   scene: Pick<LocationScene, "id" | "categories"> | null | undefined,
   types: readonly SkillType[],
-): number {
+): boolean {
   const expanded = bonusTypesFor(types);
   const cats = getLocationCategories(scene);
   for (const c of cats) {
     const matchTypes = CATEGORY_TYPE_BONUS[c];
     if (!matchTypes) continue;
-    if (expanded.some((t) => matchTypes.includes(t))) return PRACTICE_BONUS_MULT;
+    if (expanded.some((t) => matchTypes.includes(t))) return true;
   }
-  return 1.0;
+  return false;
 }
 
 // Compact human-readable summary like "ป่า · ภูเขา (+30% หยาง / ภายนอก / สมดุล / แข็ง)".

@@ -84,6 +84,10 @@ const GLYPHS: Record<string, (c: Pen) => void> = {
   gate: (c) => { c.rect(8, 7, 16, 19); line(c, 12, 7, 12, 26); line(c, 16, 7, 16, 26); line(c, 20, 7, 20, 26); line(c, 8, 16, 24, 16); },
   labor: (c) => { circle(c, 11, 21, 5); line(c, 18, 8, 25, 15); line(c, 21, 11, 14, 18); },
   dice: (c) => { c.rect(8, 8, 16, 16); circle(c, 12, 12, 1.2); circle(c, 16, 16, 1.2); circle(c, 20, 20, 1.2); },
+  // Horseshoe: a horse station (fast travel).
+  station: (c) => { c.moveTo(10, 25); c.lineTo(10, 15); c.arc(16, 15, 6, Math.PI, 0); c.lineTo(22, 25); line(c, 8, 25, 12, 25); line(c, 20, 25, 24, 25); },
+  // Crossed swords under a pennant: the sword tournament.
+  tournament: (c) => { line(c, 8, 26, 22, 12); line(c, 24, 26, 10, 12); line(c, 16, 5, 16, 12); line(c, 16, 5, 23, 7, 16, 9); },
   escape: (c) => { line(c, 9, 26, 9, 8, 23, 8, 23, 26); line(c, 14, 17, 26, 17); line(c, 22, 13, 26, 17, 22, 21); },
 };
 

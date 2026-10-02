@@ -27,7 +27,7 @@ A Thai wuxia RPG in the browser: Next.js 15, React 19, TypeScript, Phaser 4, Zus
 - **Exploring.** The hero walks painted maps: 101 places, 128 roads; villages, towns and homes have their own people and activities; foes turn up on the map as the hero walks.
 - **Doing.** They talk to 225 NPCs (and give them gifts), take 867 quests (154 sect lineage quests and 38 story sagas among them), join one of 15 sects, gather, craft, steal, and land in jail.
 - **Fighting.** Battles are turn-based tactics on a 10 × 7 board that grows to 15 × 10 for big gangs (up to 6 pack members plus the leader).
-- **Code.** Two pure engines (`lib/game`, `lib/world`) sit under Zustand stores and React / Phaser views. The world saves to `localStorage` (version 22).
+- **Code.** Two pure engines (`lib/game`, `lib/world`) sit under Zustand stores and React / Phaser views. The world saves to `localStorage` (version 23).
 
 Start with [README.md](README.md), then [docs/README.md](docs/README.md).
 
@@ -93,6 +93,14 @@ Real behaviour today, found during the docs audit. Each is small and self-contai
 - **Foes can stand on painted scenery.** A spawn spot only needs to be unblocked and reachable by the collision data, so on maps whose collision is loose (the capital's outer wall, for one) a foe can appear somewhere that looks out of bounds.
 - **Not saved.** A reload clears the foes on the map; they also go when the hero walks on another map.
 - **They don't move.** Foes wait where they appear; they don't patrol or give chase.
+
+### Letters, horse stations and the tournament
+
+- **The tournament is a grandmasters' event.** Its entrants are the 20 named sect masters plus sparring fighters, so a young hero is usually out in the first round; it pays by the round, but is tuned for the late game. Opponents are also scaled by the hero's power, like every battle.
+- **The champion's pick bypasses the lineage rule.** Any entrant's sect move or art can be taken (by design, the one exception); `test:story` checks quest and dialog data, not this runtime prize.
+- **NPC champions only record their pick.** Their "learning" is +2 liveness power for a named NPC; their sparring build does not change.
+- **Letters only from NPCs with a registry entry and relationship ≥ 20.** Nothing else (quest thanks, summons) sends letters yet. A long rest only rolls the last 7 days.
+- **No station on unplaced places.** A place without a world-map spot (`world-coords.ts`) has no station, and the fare is by straight-line distance, not road length.
 
 ### Power tiers
 
