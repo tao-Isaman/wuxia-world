@@ -6,6 +6,10 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-02
 
+### The camera eases back a little
+
+- **The world camera now zooms in about 2.2× (√5)** instead of 3.2×: a fifth of the map is in view, so more of the place shows around the hero and the paintings are less pixelated.
+
 ### A closer camera on every map
 
 - **The world camera zooms in about 3.2× (√10)** past its old cover fit on every location map, so a tenth of the map is in view and the hero is about a quarter of the screen tall. Labels, name tags, quest marks, the guide arrow and service / exit badges keep their on-screen size.

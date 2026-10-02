@@ -265,7 +265,7 @@ Two deliberate exceptions reach into stores:
 
 - **Stage.** `phaser-stage.ts` makes one `Phaser.Game` per view: `AUTO` (WebGL, Canvas fallback), `pixelArt`, DPR cap 2. **Phaser input is off** — the runtimes use DOM listeners.
 - **World runtime.** `world-runtime.ts` works in 960 × 640 map units (y down).
-  - Camera: cover fit zoomed in √10 (`MAP_ZOOM`, a tenth of the map in view), following the hero; WASD, tap-to-walk and a joystick.
+  - Camera: cover fit zoomed in √5 (`MAP_ZOOM`, a fifth of the map in view), following the hero; WASD, tap-to-walk and a joystick.
   - The action target is the nearest marker within 95 units; E reaches 100.
   - Walk ticks every 220 units; a guide arrow; name tags and quest marks.
   - The hero walks with painted eight-direction sprites (`<id>-walk8.png`, `lib/characters/walk8.ts`) and always faces the way they move.
