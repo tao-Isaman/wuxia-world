@@ -1,6 +1,7 @@
 "use client";
 
 import type { BattleBriefing } from "@/lib/world/battle-bridge";
+import { PowerTierBadge } from "./power-tier-badge";
 
 const OUTLOOK_TEXT: Record<BattleBriefing["outlook"], string> = {
   deadly: "อันตรายยิ่ง — ศัตรูเหนือกว่าเจ้ามาก",
@@ -20,16 +21,16 @@ export function PowerReadout({ briefing }: { briefing: BattleBriefing }) {
       <dl>
         <div>
           <dt>ระดับพลังของเจ้า</dt>
-          <dd><span className="power-tier-badge">{hero.tier.name}</span></dd>
+          <dd><PowerTierBadge tier={hero.tier} /></dd>
         </div>
         <div>
           <dt>ระดับพลังของ{foe.name}</dt>
-          <dd><span className="power-tier-badge">{foe.tier.name}</span></dd>
+          <dd><PowerTierBadge tier={foe.tier} /></dd>
         </div>
         {packTop && (
           <div>
             <dt>พรรคพวกที่ติดตามมา</dt>
-            <dd>เก่งสุดระดับ <span className="power-tier-badge">{packTop.tier.name}</span></dd>
+            <dd>เก่งสุดระดับ <PowerTierBadge tier={packTop.tier} /></dd>
           </div>
         )}
       </dl>

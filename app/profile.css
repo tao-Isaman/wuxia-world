@@ -53,6 +53,5 @@
   .profile-derived { grid-template-columns: 1fr; }
   .profile-tabs button { font-size: 14px; }
 }
-/* Power tier line under the name (parchment: ink on paper, not the battle gold). */
+/* Power tier line under the name; the badge carries its tier's colour. */
 .profile-power { margin-top: 2px; }
-.profile-power .power-tier-badge { color: var(--scroll-ink); border-color: var(--scroll-ink-soft); font-weight: 600; }

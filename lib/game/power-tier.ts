@@ -26,21 +26,26 @@ export interface PowerTier {
   name: string;
   /** Lowest score in this tier. */
   min: number;
+  /** The tier's own colour (badge fill), from dull grey up to radiant gold. */
+  color: string;
+  /** Text colour that reads on `color`. */
+  ink: string;
 }
 
+const DARK = "#1b130c", LIGHT = "#fff8ea";
 export const POWER_TIERS: readonly PowerTier[] = [
-  { tier: 1, name: "ชาวบ้าน", min: 0 },
-  { tier: 2, name: "ผู้เริ่มฝึกวิชา", min: 25 },
-  { tier: 3, name: "ศิษย์ฝึกหัด", min: 45 },
-  { tier: 4, name: "นักสู้พเนจร", min: 75 },
-  { tier: 5, name: "จอมยุทธ์", min: 120 },
-  { tier: 6, name: "ยอดฝีมือ", min: 180 },
-  { tier: 7, name: "ยอดฝีมือหาตัวจับยาก", min: 260 },
-  { tier: 8, name: "ผู้เจนจบวิชา", min: 370 },
-  { tier: 9, name: "อาจารย์ใหญ่", min: 520 },
-  { tier: 10, name: "ปรมาจารย์", min: 720 },
-  { tier: 11, name: "มหาปรมาจารย์", min: 1000 },
-  { tier: 12, name: "ยอดคนใต้หล้า", min: 1400 },
+  { tier: 1, name: "สามัญชน", min: 0, color: "#8b8d84", ink: DARK },
+  { tier: 2, name: "ศิษย์ฝึกหัด", min: 25, color: "#d8cfb2", ink: DARK },
+  { tier: 3, name: "ศิษย์สำนัก", min: 45, color: "#6cae55", ink: DARK },
+  { tier: 4, name: "มือดีประจำถิ่น", min: 75, color: "#1f7a6d", ink: LIGHT },
+  { tier: 5, name: "ท่องเที่ยวทั่วล่า", min: 120, color: "#2a6cbf", ink: LIGHT },
+  { tier: 6, name: "ผู้เชี่ยวชาญวรยุทธ์", min: 180, color: "#5148c4", ink: LIGHT },
+  { tier: 7, name: "ฝีมือล้ำลึกเหนือคน", min: 260, color: "#8640bb", ink: LIGHT },
+  { tier: 8, name: "วรยุทธโดดเด่นใต้หล้า", min: 370, color: "#b3327f", ink: LIGHT },
+  { tier: 9, name: "จอมยุทธไร้พ่าย", min: 520, color: "#bf2f25", ink: LIGHT },
+  { tier: 10, name: "ปรมาจารย์ยุทธภพ", min: 720, color: "#e9802a", ink: DARK },
+  { tier: 11, name: "เป็นหนึ่งในยุทธจักร", min: 1000, color: "#ecc338", ink: DARK },
+  { tier: 12, name: "ยอดคนใต้หล้า", min: 1400, color: "#fff0b0", ink: DARK },
 ];
 
 /** The parts of a fighter's power score, for display and tests. */

@@ -29,6 +29,7 @@ import {
 import { InfoPopover } from "@/components/ui/wuxia/info-popover";
 import type { EquipSlotType, Skill, StatKey, WeaponFamily } from "@/lib/game";
 import { useWorldStore } from "@/store/world-store";
+import { PowerTierBadge } from "@/components/world/power-tier-badge";
 import { xpToNextStatLevel } from "@/lib/world/stat-progression";
 import { GENDER_LABEL, SECT_MEMBERSHIPS, TRAIT_KEYS, TRAIT_LABEL } from "@/lib/world";
 import { ArtTooltip, SkillTooltip } from "../skill-tooltip";
@@ -185,7 +186,7 @@ export function ProfilePopup({ open, onClose }: Props) {
             <h3>{player.name}</h3>
             <p>{GENDER_LABEL[gender]} · ทอง <strong>{gold.toLocaleString()}</strong> ตำลึง</p>
             <p className="profile-power" data-testid="profile-power" data-tier={powerTier.tier}>
-              ระดับพลัง <span className="power-tier-badge">{powerTier.name}</span>
+              ระดับพลัง <PowerTierBadge tier={powerTier} />
             </p>
             <div className="profile-bars">
               <VitalBar label="HP" tone="hp" value={hpNow} max={derivedAll.HP} />
