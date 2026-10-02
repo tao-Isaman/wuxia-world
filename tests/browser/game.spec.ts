@@ -222,5 +222,6 @@ test("rigged NPCs stroll around their spot and stand still when the hero comes t
   await page.getByRole("button", { name: /จุดหมาย/ }).click();
   await page.locator(`[data-places-tab="${await page.locator('[data-marker-id="npc-city_capital_physician_lin"]').getAttribute("data-category")}"]`).click();
   await page.locator('[data-marker-id="npc-city_capital_physician_lin"]').click();
-  await expect(page.getByRole("dialog")).toBeVisible({ timeout: 15_000 });
+  // The capital is a big city: the walk across it takes a while.
+  await expect(page.getByRole("dialog")).toBeVisible({ timeout: 45_000 });
 });

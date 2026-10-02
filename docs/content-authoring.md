@@ -127,6 +127,18 @@ Append to `LOCATION_ROUTES` in `lib/world/data/location-routes.ts`:
 - **After adding a place or a road,** run `bun scripts/build-world-coords.ts` (the world-map spot that sets exit directions); `bun run test:routes` fails while it is stale.
 - An auto-laid map shows at most **8 exits**, each on the edge facing its destination. With more roads, the worst-fitting one is listed only in the "อื่น ๆ" drawer.
 
+## A composed map
+
+A location built from isometric assets (see [rendering.md](rendering.md#composed-maps)).
+
+1. **Art.** Paint each new piece on a flat white background in isometric (2:1) pixel art, one object per image, front to the lower left; long pieces (walls, bridges, fences) run from the upper left to the lower right. Ground textures are square, top-down and seamless (`g_<material>.png`).
+2. **Footprint.** Add the piece to `COMPOSED_ASSETS` in `lib/world/data/composed/assets.ts`. `bun scripts/build-composed-assets.ts --from <dir> --measure` prints where each piece's lowest point sits across its width; for a footprint of `a × b` tiles that is `a / (a + b)`, so pick `tiles` to match (a stall at 0.64 is about 2 × 1.2). Give `solid` parts for gates and openings, `[]` for things to walk over, `width` for thin props and `lamps` for lights.
+3. **Process.** `bun scripts/build-composed-assets.ts --from <dir>` cuts them out, sizes them to 2 px per unit and writes `asset-pixels.ts`; ground textures are made seamless.
+4. **Layout.** Write `lib/world/data/composed/<id>.ts`: grid size, base ground, ground areas and objects on the grid (an object's (u, v) is its footprint's top corner), and extra `blocks` (water). Register it in `COMPOSED_MAPS`.
+5. **Check.** `bun scripts/render-composed-map.ts <id> out.png --bases --markers` draws the map with its solids and markers; `bun run test:navigation` proves every marker is reachable.
+6. **Overview.** `bun scripts/render-composed-map.ts <id> x --overview` writes the 960 × 640 picture for dialog backdrops and cutscenes.
+7. **Map def.** Set the location's `LocationMapDef.image` to `composed:<id>` and place spawn, NPCs, exits and spots with `isoPercent` (the capital's `capitalAt`). Exits go just inside the gate facing their destination (`test:routes`).
+
 ## A painted map
 
 Two kinds:

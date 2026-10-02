@@ -1,11 +1,8 @@
 // Positions follow the painted lanterns, in the same 960x640 ground coordinates.
 const LANTERNS: Record<string, readonly [number, number][]> = {
   home_player: [[270, 151], [313, 143], [390, 122], [420, 112], [448, 106]],
-  city_capital: [[713, 196], [739, 206], [772, 210], [802, 202], [236, 171]],
 };
 
-const WIDTH = 960;
-const HEIGHT = 640;
 const DAY = [0.69, 0.40, 0.16] as const;
 const NIGHT = [0.035, 0.075, 0.18] as const;
 const LAMP = [1, 0.64, 0.22] as const;
@@ -20,8 +17,17 @@ const smoothstep = (edge0: number, edge1: number, x: number) => {
  * stay above it. The caller shows `canvas` at `opacity` and re-uploads it
  * whenever `update` reports a change.
  */
-export function createWorldLighting(location: string) {
-  const lamps = LANTERNS[location] ?? [];
+export function createWorldLighting(location: string, options: {
+  /** Map size in world units (default the 960 × 640 paintings). */
+  width?: number; height?: number;
+  /** Lantern positions in world units (default: the painted lanterns of this location). */
+  lamps?: readonly (readonly [number, number])[];
+  /** Canvas pixels per world unit: big composed maps light a coarser veil (it is soft anyway). */
+  scale?: number;
+} = {}) {
+  const k = options.scale ?? 1;
+  const WIDTH = Math.round((options.width ?? 960) * k), HEIGHT = Math.round((options.height ?? 640) * k);
+  const lamps = (options.lamps ?? LANTERNS[location] ?? []).map(([x, y]) => [x * k, y * k] as const);
   const canvas = document.createElement("canvas");
   canvas.width = WIDTH;
   canvas.height = HEIGHT;
@@ -38,16 +44,18 @@ export function createWorldLighting(location: string) {
     context.fillRect(0, 0, WIDTH, HEIGHT);
     if (!night || !lamps.length) return;
     for (const [lampX, lampY] of lamps) {
-      const left = Math.max(0, lampX - 48), top = Math.max(0, lampY - 32);
-      const width = Math.min(WIDTH, lampX + 48) - left, height = Math.min(HEIGHT, lampY + 68) - top;
+      const left = Math.max(0, Math.floor(lampX - 48 * k)), top = Math.max(0, Math.floor(lampY - 32 * k));
+      const width = Math.min(WIDTH, Math.ceil(lampX + 48 * k)) - left, height = Math.min(HEIGHT, Math.ceil(lampY + 68 * k)) - top;
+      if (width <= 0 || height <= 0) continue;
       const image = context.getImageData(left, top, width, height);
       for (let y = 0; y < height; y++) {
         for (let x = 0; x < width; x++) {
           const px = left + x + 0.5, py = top + y + 0.5;
           let light = 0;
           for (const [lx, ly] of lamps) {
-            const glow = 1 - smoothstep(2, 31, Math.hypot(px - lx, py - ly));
-            const pool = 1 - smoothstep(2, 47, Math.hypot(px - lx, (py - ly - 42) / 0.52));
+            if (Math.abs(px - lx) > 50 * k || py - ly > 70 * k || ly - py > 34 * k) continue;
+            const glow = 1 - smoothstep(2 * k, 31 * k, Math.hypot(px - lx, py - ly));
+            const pool = 1 - smoothstep(2 * k, 47 * k, Math.hypot(px - lx, (py - ly - 42 * k) / 0.52));
             light = Math.max(light, glow * 0.94, pool * 0.55);
           }
           light = Math.floor(light * 12) / 12 * night * flicker;

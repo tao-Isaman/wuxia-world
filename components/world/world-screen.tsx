@@ -6,6 +6,7 @@ import { WuxiaButton } from "@/components/ui/wuxia/button";
 import { useWorldStore } from "@/store/world-store";
 import { useBattleStore } from "@/store/battle-store";
 import { confirmDialog } from "@/store/confirm-store";
+import { mapBackdrop } from "@/lib/world/data/composed";
 import {
   NPCS,
   getLocationMap,
@@ -48,10 +49,11 @@ function MapBackdrop({
 }) {
   const currentSceneId = useWorldStore((s) => s.currentSceneId);
   const lastLocationId = useWorldStore((s) => s.lastLocationId);
-  const img =
-    getLocationMap(currentSceneId)?.image ??
-    getRouteMap(currentSceneId)?.image ??
-    (lastLocationId ? getLocationMap(lastLocationId)?.image : undefined);
+  const locationImage = getLocationMap(currentSceneId)?.image ?? undefined;
+  const lastImage = lastLocationId ? getLocationMap(lastLocationId)?.image : undefined;
+  const raw = locationImage ?? getRouteMap(currentSceneId)?.image ?? lastImage;
+  // Composed (asset-built) maps show their overview picture behind dialogs.
+  const img = raw ? mapBackdrop(raw) : undefined;
 
   if (!img) return <div className="space-y-3">{children}</div>;
 

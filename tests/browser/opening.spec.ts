@@ -89,7 +89,8 @@ test("first errand leads to safe training, recovery, and an earned skill upgrade
   await expect(receipt).toHaveCount(0);
 
   await visit(page, "service-1");
-  await expect(page.getByRole("dialog")).toContainText("ศิษย์ฝึกหัดอาเฉิง");
+  // The capital is a big city: the walk to the hall takes a while.
+  await expect(page.getByRole("dialog")).toContainText("ศิษย์ฝึกหัดอาเฉิง", { timeout: 45_000 });
   await expect(page.getByRole("dialog")).toContainText("แพ้ไม่เสียชีวิต");
   await page.getByRole("button", { name: "ฝึกประลองฟรี", exact: true }).click();
   await expect(page.getByTestId("battle-canvas")).toHaveAttribute("data-ready", "true");
@@ -168,7 +169,7 @@ test("first errand leads to safe training, recovery, and an earned skill upgrade
   await expect(payoff).toHaveCount(0);
   await page.getByRole("button", { name: "ปิด", exact: true }).click();
   await visit(page, "service-1");
-  await expect(page.getByRole("dialog")).toContainText("ผ่านบทฝึกประลองแล้ว");
+  await expect(page.getByRole("dialog")).toContainText("ผ่านบทฝึกประลองแล้ว", { timeout: 45_000 });
   await expect(page.getByRole("button", { name: "ฝึกประลองฟรี", exact: true })).toHaveCount(0);
   await page.getByRole("button", { name: "ปิด", exact: true }).click();
   await page.reload();
