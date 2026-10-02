@@ -112,7 +112,7 @@ Many specs replace `Math.random` in the page to make rolls predictable.
 | --- | --- | --- |
 | `audio.spec.ts` | 1 | music follows title → world → battle; the ♪ bubble; settings persist |
 | `battle-setting.spec.ts` | 1 | a capital encounter keeps its street background through a reload and phone rotation |
-| `characters.spec.ts` | 2 | all eight heroes animate idle and four walk directions in Phaser; reduced motion; WebGL context loss and "ลองใหม่" recovery |
+| `characters.spec.ts` | 2 | all eight heroes walk on their painted eight-way frames (E, N, S, W), face where they go and stand in that heading; reduced motion; WebGL context loss and "ลองใหม่" recovery |
 | `dialogue.spec.ts` | 2 | local replies keep the same world canvas; quest offers away from a map fit on screen without scrolling at three sizes |
 | `game.spec.ts` | 6 | exploration, menu pause, travel, NPC card, reload; grid battle by tap and auto; unit info by touch; phone rotation; a version-18 save migrates to 22; rigged NPCs wander in the capital and wait for the hero |
 | `investigation.spec.ts` | 1 | capital rumors and the ledger investigation survive a mid-dialog reload and pay once |

@@ -103,6 +103,7 @@ export function createWorldRuntime(
   let playerMotion: "idle" | "walk" = "idle";
   let playerFacing: "east" | "west" | "north" | "south" = placement.facing;
   // Eight-way heading for heroes with painted walk8 cells (lib/characters/walk8.ts).
+  let playerBaseScaleY: number | undefined;
   let playerDir: Dir8 = ({ east: "E", west: "W", north: "N", south: "S" } as const)[placement.facing];
   let destination: Point | null = null;
   let waypoints: Point[] = [];
@@ -640,6 +641,9 @@ export function createWorldRuntime(
       const pose = walk8Frame(playerDir, step);
       frame = pose.frame;
       setCharacterFrame(player, frame, pose.mirror);
+      // Standing still, the painted pose breathes: a slow 1 % rise from the feet.
+      playerBaseScaleY ??= player.image.scaleY;
+      player.image.scaleY = playerBaseScaleY * (step === null && !reducedMotion ? 1 + 0.01 * Math.sin(animationTime * 2.2) : 1);
     } else {
       const vertical = player.directional && (playerFacing === "north" || playerFacing === "south");
       const clip = vertical ? CHARACTER_CLIPS[playerFacing === "north" ? "walkNorth" : "walkSouth"] : CHARACTER_CLIPS[playerMotion];
