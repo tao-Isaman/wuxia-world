@@ -80,7 +80,8 @@ Both runtimes are loaded with a dynamic `import()` in the browser only. The host
 
 - **Map space.** 960 × 640 units, y down. The hero walks 150 units/s; walkable bounds are x 12–948, y 18–628.
 - **Camera.**
-  - Cover-fit (`scale = max(w/960, h/640)`), following the hero, clamped to the map.
+  - Cover-fit and then zoomed in by `MAP_ZOOM` (√10): `scale = max(w/960, h/640) × √10`, so about a tenth of the map's area is in view. It follows the hero, clamped to the map.
+  - Labels, name tags, quest marks, the guide arrow and marker badges divide by the scale, so they keep their on-screen size.
   - Smoothing `1 − e^(−8·dt)`; it snaps under reduced motion.
   - The authored `zoom` on map definitions is **not** used.
 - **Pause.** Input stops while `readOnly`, the tab is hidden, or `worldInputBlocked()` is true: any `[role="dialog"]`, `[role="alertdialog"]` or `[data-world-busy]` element is present, or a text field has focus. Queued walks are cancelled.

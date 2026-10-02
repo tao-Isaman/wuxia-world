@@ -6,6 +6,10 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-02
 
+### A closer camera on every map
+
+- **The world camera zooms in about 3.2× (√10)** past its old cover fit on every location map, so a tenth of the map is in view and the hero is about a quarter of the screen tall. Labels, name tags, quest marks, the guide arrow and service / exit badges keep their on-screen size.
+
 ### The capital stays a painting
 
 - **นครหลวง is back to its painted 960 × 640 map**, with its old camera, markers and collision. The asset-built isometric city merged in [#44](https://github.com/tao-Isaman/wuxia-world/pull/44) was reverted in full; its engine (composed maps, polygon collision, grid pathing) and art are in that pull request's history if they are wanted again.
