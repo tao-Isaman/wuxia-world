@@ -35,6 +35,8 @@ import { ShopPopup } from "./popups/shop-popup";
 import { SectHallPopup } from "./popups/sect-hall-popup";
 import { ArtisanPopup } from "./popups/artisan-popup";
 import { PracticePopup } from "./popups/practice-popup";
+import { StationPopup } from "./popups/station-popup";
+import { TournamentPopup } from "./popups/tournament-popup";
 import { RumorBanner } from "./rumor-banner";
 import { RumorListenButton } from "./rumor-listen-button";
 import { NpcStatusBadge } from "./npc-status-badge";
@@ -73,6 +75,8 @@ export function LocationView({ scene, readOnly = false, dialogueSpeakerId }: Pro
   const [shopOpen, setShopOpen] = useState(false);
   const [hallOpen, setHallOpen] = useState(false);
   const [practiceOpen, setPracticeOpen] = useState(false);
+  const [stationOpen, setStationOpen] = useState(false);
+  const [tournamentOpen, setTournamentOpen] = useState(false);
   const [activeArtisan, setActiveArtisan] = useState<ArtisanDef | null>(null);
   // Map-spot popups: rest + rumor objects on the painted map.
   const [rumorOpen, setRumorOpen] = useState(false);
@@ -501,6 +505,8 @@ export function LocationView({ scene, readOnly = false, dialogueSpeakerId }: Pro
         artisan={activeArtisan}
         onClose={() => setActiveArtisan(null)}
       />
+      <StationPopup open={stationOpen} onClose={() => setStationOpen(false)} />
+      <TournamentPopup open={tournamentOpen} onClose={() => setTournamentOpen(false)} />
       <PracticePopup
         open={practiceOpen}
         scene={canPractice ? scene : null}
@@ -539,6 +545,8 @@ export function LocationView({ scene, readOnly = false, dialogueSpeakerId }: Pro
             onResource: runGather,
             onActivity: (id) => void runActivity(id),
             onObjective: runObjective,
+            onStation: () => setStationOpen(true),
+            onTournament: () => setTournamentOpen(true),
           }}
         />
         {!readOnly && <>

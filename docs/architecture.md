@@ -111,7 +111,7 @@ Both engines are plain functions over plain data. World functions take the state
 
 | Store | Saved | Holds | Key actions |
 | --- | --- | --- | --- |
-| `store/world-store.ts` | `wusia-world-v1`, v22 | the whole run (`WorldStateData`, 50 fields) | new game, travel, choices, rest, gather, craft, practice, shop, quests, sects, bad actions, law, encounters, `acknowledgeBattleResult`, `walkTick` |
+| `store/world-store.ts` | `wusia-world-v1`, v23 | the whole run (`WorldStateData`, 50 fields) | new game, travel, choices, rest, gather, craft, practice, shop, quests, sects, bad actions, law, encounters, `acknowledgeBattleResult`, `walkTick` |
 | `store/battle-store.ts` | no | the current grid battle (`state: GridBattleState`), `auto` | `start`, `move`, `act`, `wait`, `flee`, `setAuto`, `step`, `stepAll`, `reset` |
 | `store/character-store.ts` | `wusia-character-v1`, v3 | two /debug builds | slot, stat and gear editing for /debug |
 | `store/loading-store.ts` | no | the busy overlay | `flashLoading(message, ms = 1000, kind)` |

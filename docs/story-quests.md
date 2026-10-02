@@ -126,7 +126,7 @@ A cutscene is registered under `cs_<sceneId>` and played by a dialog whose `cuts
 
 ## Safety rules
 
-- **Can't be abandoned.** The store's `abandonQuest` refuses (`reason: "keep"`) and the log hides the button. They are the only way to their skill or art, and an abandoned quest never comes back.
+- **Can't be abandoned.** The store's `abandonQuest` refuses (`reason: "keep"`) and the log hides the button. They are the only way to their skill or art (save the sword tournament champion's prize pick — see [gameplay.md](gameplay.md#the-sword-tournament-ชุมนุมวิจารณ์กระบี่)), and an abandoned quest never comes back.
 - **Outlive their giver.** When the NPC simulation kills a giver, `failQuestsForDeadGivers` skips story and lineage quests. Dead masters stay on their map, so the hand-in still works.
 - **New conditions.**
   - `learnedSkill` is the counterpart of `learnedArt`.

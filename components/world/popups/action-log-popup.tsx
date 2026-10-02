@@ -30,6 +30,8 @@ const KIND_LABEL: Record<string, string> = {
   steal:   "ขโมย",
   assassinate: "ลอบสังหาร",
   kidnap:  "ลักพาตัว",
+  letter:  "จดหมาย",
+  tournament: "ประลองยุทธ",
 };
 
 const KIND_COLOR: Record<string, string> = {
@@ -47,6 +49,8 @@ const KIND_COLOR: Record<string, string> = {
   law:     "border-stone-500/60 text-stone-700",
   gift:    "border-pink-500/60 text-pink-700",
   activity: "border-teal-500/60 text-teal-700",
+  letter:  "border-pink-500/60 text-pink-700",
+  tournament: "border-red-600/60 text-red-700",
 };
 
 export function ActionLogPopup({ open, onClose }: Props) {

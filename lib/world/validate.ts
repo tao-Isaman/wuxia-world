@@ -313,7 +313,15 @@ export function validateAndRepair(state: WorldStateData): void {
       new Set(state.assassinatedNpcIds.filter((id) => NPCS_BY_ID.has(id))),
     );
   }
-  for (const key of ["kidnappedUntil", "giftDays"] as const) {
+  // Letters and the tournament name NPCs: drop entries for removed ones.
+  state.letters = Array.isArray(state.letters) ? state.letters.filter((l) => l && NPCS_BY_ID.has(l.npcId)) : [];
+  if (!Array.isArray(state.tournamentHistory)) state.tournamentHistory = [];
+  state.tournamentHistory = state.tournamentHistory.filter((r) => r && (r.champion === "player" || NPCS_BY_ID.has(r.champion)));
+  if (state.tournament) {
+    const ids = state.tournament.rounds?.flat() ?? [];
+    if (!Array.isArray(state.tournament.rounds) || ids.some((id) => id !== "player" && !NPCS_BY_ID.has(id))) state.tournament = null;
+  } else state.tournament = null;
+  for (const key of ["kidnappedUntil", "giftDays", "letterDays"] as const) {
     const table = state[key];
     if (!table || typeof table !== "object") { state[key] = {}; continue; }
     for (const [id, day] of Object.entries(table)) if (!NPCS_BY_ID.has(id) || typeof day !== "number") delete table[id];

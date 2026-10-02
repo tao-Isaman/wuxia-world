@@ -21,7 +21,9 @@ import {
   describeBonusForLocation,
   getLocationCategories,
   LOCATION_CATEGORY_LABEL,
-  practiceXpBonus,
+  practiceMatches,
+  practiceXpGain,
+  PRACTICE_XP,
   type LocationScene,
 } from "@/lib/world";
 import {
@@ -102,12 +104,12 @@ export function PracticePopup({ open, scene, onClose }: Props) {
         </div>
         {hasBonus ? (
           <div className="text-[10px] text-emerald-700">
-            +30% xp สำหรับวิชาประเภท:{" "}
+            ฝึกได้ {PRACTICE_XP.matched.flat} xp + {PRACTICE_XP.matched.pct}% ของขั้นถัดไป (ปกติ {PRACTICE_XP.normal.flat} + {PRACTICE_XP.normal.pct}%) สำหรับวิชาประเภท:{" "}
             {matchedTypes.map((t) => SKILL_TYPE_LABEL[t]).join(" / ")}
           </div>
         ) : (
           <div className="text-[10px] text-muted-foreground">
-            สถานที่นี้ไม่ให้โบนัสประสบการณ์เพิ่ม
+            ฝึกได้ {PRACTICE_XP.normal.flat} xp + {PRACTICE_XP.normal.pct}% ของขั้นถัดไปต่อครั้ง
           </div>
         )}
         <div className="text-[10px] text-muted-foreground">
@@ -143,8 +145,8 @@ export function PracticePopup({ open, scene, onClose }: Props) {
               const xpPct = maxed
                 ? 100
                 : Math.min(100, Math.round((xp / cost) * 100));
-              const types = effectiveTypes(sk);
-              const mult = practiceXpBonus(scene, types);
+              const matched = practiceMatches(scene, effectiveTypes(sk));
+              const gain = practiceXpGain(matched, cost);
               return (
                 <div key={sid} className="rounded bg-muted/30 px-2 py-1.5 space-y-1">
                   <div className="flex items-center justify-between gap-2 flex-wrap">
@@ -167,9 +169,9 @@ export function PracticePopup({ open, scene, onClose }: Props) {
                       <Badge variant="outline" className="text-[9px]">
                         {WEAPON_FAMILY_LABEL[sk.w]}
                       </Badge>
-                      {mult > 1 && (
-                        <Badge variant="outline" className="text-[9px] border-emerald-400 text-emerald-700">
-                          +30% xp
+                      {!maxed && (
+                        <Badge variant="outline" className={`text-[9px] ${matched ? "border-emerald-400 text-emerald-700" : ""}`}>
+                          +{gain} xp{matched ? " · เหมาะ" : ""}
                         </Badge>
                       )}
                     </div>
@@ -217,8 +219,8 @@ export function PracticePopup({ open, scene, onClose }: Props) {
               const xpPct = maxed
                 ? 100
                 : Math.min(100, Math.round((xp / cost) * 100));
-              const types = effectiveTypes(art);
-              const mult = practiceXpBonus(scene, types);
+              const matched = practiceMatches(scene, effectiveTypes(art));
+              const gain = practiceXpGain(matched, cost);
               const raw = encodeArtSlot(aid);
               return (
                 <div key={aid} className="rounded bg-muted/30 px-2 py-1.5 space-y-1">
@@ -240,9 +242,9 @@ export function PracticePopup({ open, scene, onClose }: Props) {
                       <Badge variant="outline" className="text-[9px]">
                         {art.tp}
                       </Badge>
-                      {mult > 1 && (
-                        <Badge variant="outline" className="text-[9px] border-emerald-400 text-emerald-700">
-                          +30% xp
+                      {!maxed && (
+                        <Badge variant="outline" className={`text-[9px] ${matched ? "border-emerald-400 text-emerald-700" : ""}`}>
+                          +{gain} xp{matched ? " · เหมาะ" : ""}
                         </Badge>
                       )}
                     </div>
@@ -287,8 +289,7 @@ function practiceToast(r: PracticeResult): ToastTuple {
   const def =
     r.kind === "skill" ? getSkill(r.id) : getArt(r.id);
   const name = def && "n" in def ? def.n : r.id;
-  const bonusPart =
-    r.bonusMult > 1 ? ` (×${r.bonusMult.toFixed(2)} โบนัสสถานที่)` : "";
+  const bonusPart = r.matched ? " (สถานที่เหมาะ)" : "";
   if (r.leveledUp) {
     const lvLabel = r.kind === "skill" ? `Lv.${r.newLevel}` : `ขั้น ${r.newLevel}`;
     return [

@@ -10,6 +10,8 @@ import { clearArrivalFrom, forgetMapPosition, peekArrivalFrom, type WorldMarker,
 import { capitalVignette } from "@/lib/stage/world-vignettes";
 import { getOpponent } from "@/lib/world/data/opponents";
 import { opponentLook } from "@/lib/world/battle-looks";
+import { hasStation } from "@/lib/world/stations";
+import { TOURNAMENT } from "@/lib/world/tournament";
 import type { WorldFoe } from "@/lib/stage/types";
 export { clearMapPositions } from "@/lib/stage/types";
 
@@ -24,6 +26,8 @@ export interface MapSpotHandlers {
   onResource: (resourceId: string) => void;
   onActivity: (activityId: string) => void;
   onObjective: (questId: string, spotIndex: number) => void;
+  onStation: () => void;
+  onTournament: () => void;
 }
 
 /** A free spot for a quest objective marker: near the arrival point, clear of other markers. */
@@ -120,6 +124,18 @@ export function LocationMap({ scene, map, handlers, readOnly = false, dialogueSp
     markers.push({ id: objectiveMarkerId(entry.questId, entry.spotIndex), ...point, kind: "service", label: entry.spot.label,
       badge: "investigate", glyph: "🔍", category: "activity", quest: "turnin",
       onActivate: () => handlers.onObjective(entry.questId, entry.spotIndex) });
+  }
+  // A horse station (fast travel) in cities, villages and the big sects' grounds.
+  if (hasStation(scene.id)) {
+    const point = freeSpot(map.spawn, markers);
+    markers.push({ id: "station", ...point, kind: "service", label: "สถานีพักม้า", badge: "station", category: "place",
+      onActivate: handlers.onStation });
+  }
+  // The sword tournament's ring at the capital.
+  if (scene.id === TOURNAMENT.locationId) {
+    const point = freeSpot(map.spawn, markers);
+    markers.push({ id: "tournament", ...point, kind: "service", label: "ชุมนุมวิจารณ์กระบี่", badge: "tournament", category: "activity",
+      onActivate: handlers.onTournament });
   }
   for (const exit of map.exits ?? []) {
     const routeId = "route_" + scene.id + "__to__" + exit.to;
