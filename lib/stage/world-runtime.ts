@@ -22,6 +22,8 @@ import {
 const WIDTH = 960;
 const HEIGHT = 640;
 const SPEED = 150;
+/** How far the camera zooms in past a cover fit: √10, so a tenth of the map's area is in view. */
+const MAP_ZOOM = Math.sqrt(10);
 const LOAD_TIMEOUT = 20_000;
 // Unique NPC sprites are ~74 native px tall; this frame/size pair gives them the
 // same on-screen height as the archetype sheets (54 units × 108/128 of a frame).
@@ -380,8 +382,9 @@ export function createWorldRuntime(
     if (disposed) return;
     const width = Math.max(parent.clientWidth, 1);
     const height = Math.max(parent.clientHeight, 1);
-    // Keep the map's spatial context; portrait still covers and follows its narrower view.
-    const scale = Math.max(width / WIDTH, height / HEIGHT);
+    // Cover the screen, then zoom in so the view holds a tenth of the map's
+    // area and the camera follows the hero.
+    const scale = Math.max(width / WIDTH, height / HEIGHT) * MAP_ZOOM;
     viewScale = scale;
     viewWidth = width / scale;
     viewHeight = height / scale;
@@ -702,7 +705,8 @@ export function createWorldRuntime(
       const selected = hovered === marker.id || interaction === marker.id;
       visual.halo.setPosition(point.x, point.y);
       visual.shadow?.setPosition(point.x, point.y);
-      visual.icon?.setPosition(point.x, point.y - 5);
+      // Service and exit badges keep a fixed on-screen size whatever the zoom.
+      visual.icon?.setDisplaySize(34 / viewScale, 38 / viewScale).setPosition(point.x, point.y - 5);
       if (visual.labelText !== marker.label) {
         const old = visual.label.image;
         const oldKey = old.texture.key;
