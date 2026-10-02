@@ -157,19 +157,33 @@ await check("heroes: an eight-way walk sheet each — 28 drawn cells, every dire
     const { data, info } = await sharp(file).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
     assert.equal(info.width, 512, file);
     assert.equal(info.height, 7 * 128, file);
-    const cells: Int32Array[] = [];
+    const cells: Uint8Array[] = [];
     for (let cell = 0; cell < 28; cell++) {
       const ox = (cell % 4) * 128, oy = Math.floor(cell / 4) * 128;
-      const mask = new Int32Array(128 * 128);
+      const px = new Uint8Array(128 * 128 * 4);
       let opaque = 0;
-      for (let y = 0; y < 128; y++) for (let x = 0; x < 128; x++) if (data[((oy + y) * 512 + ox + x) * 4 + 3] >= 128) { mask[y * 128 + x] = 1; opaque++; }
+      for (let y = 0; y < 128; y++) for (let x = 0; x < 128; x++) {
+        const i = ((oy + y) * 512 + ox + x) * 4;
+        if (data[i + 3] < 128) continue;
+        opaque++;
+        px.set([data[i], data[i + 1], data[i + 2], 255], (y * 128 + x) * 4);
+      }
       assert.ok(opaque > 1200, `${file} cell ${cell} has a figure (${opaque} px)`);
-      cells.push(mask);
+      cells.push(px);
     }
-    const differ = (a: Int32Array, b: Int32Array) => { let d = 0, n = 0; for (let i = 0; i < a.length; i++) { if (a[i] || b[i]) n++; if (a[i] !== b[i]) d++; } return d / Math.max(1, n); };
+    // Share of the figures' pixels that differ (outline, shape or colour).
+    const differ = (a: Uint8Array, b: Uint8Array) => {
+      let d = 0, n = 0;
+      for (let i = 0; i < a.length; i += 4) {
+        if (!a[i + 3] && !b[i + 3]) continue;
+        n++;
+        if (a[i + 3] !== b[i + 3] || Math.abs(a[i] - b[i]) + Math.abs(a[i + 1] - b[i + 1]) + Math.abs(a[i + 2] - b[i + 2]) > 60) d++;
+      }
+      return d / Math.max(1, n);
+    };
     // The five standing poses (S, SE, E, NE, N) are different views, and each walk has a real stride.
-    for (let i = 20; i < 25; i++) for (let j = i + 1; j < 25; j++) assert.ok(differ(cells[i], cells[j]) > 0.12, `${id}: standing ${i} and ${j} look alike`);
-    for (let row = 0; row < 5; row++) assert.ok(differ(cells[row * 4], cells[row * 4 + 2]) > 0.08, `${id}: walk row ${row} barely moves`);
+    for (let i = 20; i < 25; i++) for (let j = i + 1; j < 25; j++) assert.ok(differ(cells[i], cells[j]) > 0.3, `${id}: standing ${i} and ${j} look alike (${differ(cells[i], cells[j]).toFixed(2)})`);
+    for (let row = 0; row < 5; row++) assert.ok(differ(cells[row * 4], cells[row * 4 + 2]) > 0.15, `${id}: walk row ${row} barely moves (${differ(cells[row * 4], cells[row * 4 + 2]).toFixed(2)})`);
   }
   assert.equal(hasWalk8Sheet("sect_wudang_master_qingxu"), false);
 });

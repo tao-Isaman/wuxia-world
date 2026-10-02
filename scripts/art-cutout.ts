@@ -9,7 +9,15 @@ const TOLERANCE = 34, POCKET_TOLERANCE = 10;
  * enclosed by the figure (40+ px of near-exact background) go too, and the
  * outermost ring of the figure is softened. Returns a PNG with alpha.
  */
-export async function cutOut(path: string): Promise<Buffer> {
+export interface CutOutOptions {
+  /** Max colour distance (0–255) for an enclosed pocket to count as background; 0 keeps every pocket. */
+  pocketTolerance?: number;
+  /** Smallest pocket (in pixels) that is removed. */
+  pocketMin?: number;
+}
+
+export async function cutOut(path: string, options: CutOutOptions = {}): Promise<Buffer> {
+  const pocketTolerance = options.pocketTolerance ?? POCKET_TOLERANCE, pocketMin = options.pocketMin ?? 40;
   const { data, info } = await sharp(path).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
   const { width: w, height: h } = info;
   // Background colour: the median of the border pixels.
@@ -36,7 +44,7 @@ export async function cutOut(path: string): Promise<Buffer> {
   // body, inside a coiled whip): near-exact background colour, 40+ pixels.
   const seen = new Uint8Array(w * h);
   for (let start = 0; start < w * h; start++) {
-    if (isBg[start] || seen[start] || dist(start * 4) > POCKET_TOLERANCE) continue;
+    if (isBg[start] || seen[start] || dist(start * 4) > pocketTolerance) continue;
     const pocket: number[] = [];
     stack.push(start); seen[start] = 1;
     while (stack.length) {
@@ -44,10 +52,10 @@ export async function cutOut(path: string): Promise<Buffer> {
       pocket.push(p);
       const x = p % w, y = (p / w) | 0;
       for (const q of [x > 0 ? p - 1 : -1, x < w - 1 ? p + 1 : -1, y > 0 ? p - w : -1, y < h - 1 ? p + w : -1]) {
-        if (q >= 0 && !seen[q] && !isBg[q] && dist(q * 4) <= POCKET_TOLERANCE) { seen[q] = 1; stack.push(q); }
+        if (q >= 0 && !seen[q] && !isBg[q] && dist(q * 4) <= pocketTolerance) { seen[q] = 1; stack.push(q); }
       }
     }
-    if (pocket.length >= 40) for (const p of pocket) isBg[p] = 1;
+    if (pocketTolerance > 0 && pocket.length >= pocketMin) for (const p of pocket) isBg[p] = 1;
   }
   for (let p = 0; p < w * h; p++) {
     if (isBg[p]) { data[p * 4 + 3] = 0; continue; }

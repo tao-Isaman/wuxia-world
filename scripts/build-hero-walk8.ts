@@ -43,7 +43,9 @@ const alphaAt = (r: Raster, x: number, y: number) => r.data[(y * r.w + x) * 4 + 
 
 /** Split a strip into figures at runs of empty columns; tiny slivers (a stray ribbon) join their neighbour. */
 function splitFigures(r: Raster, expected: number): { x0: number; x1: number }[] {
-  const filled = Array.from({ length: r.w }, (_, x) => { for (let y = 0; y < r.h; y++) if (alphaAt(r, x, y) > 40) return true; return false; });
+  // A column belongs to a figure when it has more than a few solid pixels: stray
+  // ribbon wisps and soft edges must not bridge the gap between two figures.
+  const filled = Array.from({ length: r.w }, (_, x) => { let n = 0; for (let y = 0; y < r.h; y++) if (alphaAt(r, x, y) > 110) n++; return n > 6; });
   let spans: { x0: number; x1: number }[] = [];
   for (let x = 0; x < r.w; x++) {
     if (!filled[x]) continue;
@@ -86,7 +88,21 @@ async function cell(f: Figure, scale: number): Promise<Raster> {
   const src = await raster(reduced);
   const out: Raster = { w: CELL, h: CELL, data: new Uint8ClampedArray(CELL * CELL * 4) };
   const left = Math.round(CELL / 2 - f.anchor * scale), top = FEET - h;
-  const solid = (x: number, y: number) => x >= 0 && y >= 0 && x < src.w && y < src.h && alphaAt(src, x, y) >= 110;
+  // Specks cut loose from a ribbon tip (under 24 px) are dropped.
+  const keep = new Uint8Array(src.w * src.h);
+  const seen = new Uint8Array(src.w * src.h);
+  for (let start = 0; start < src.w * src.h; start++) {
+    if (seen[start] || src.data[start * 4 + 3] < 110) continue;
+    const part = [start]; seen[start] = 1;
+    for (let k = 0; k < part.length; k++) {
+      const p = part[k], x = p % src.w, y = (p / src.w) | 0;
+      for (const q of [x > 0 ? p - 1 : -1, x < src.w - 1 ? p + 1 : -1, y > 0 ? p - src.w : -1, y < src.h - 1 ? p + src.w : -1]) {
+        if (q >= 0 && !seen[q] && src.data[q * 4 + 3] >= 110) { seen[q] = 1; part.push(q); }
+      }
+    }
+    if (part.length >= 24) for (const p of part) keep[p] = 1;
+  }
+  const solid = (x: number, y: number) => x >= 0 && y >= 0 && x < src.w && y < src.h && keep[y * src.w + x] === 1;
   for (let y = 0; y < CELL; y++) for (let x = 0; x < CELL; x++) {
     const sx = x - left, sy = y - top, o = (y * CELL + x) * 4;
     if (solid(sx, sy)) {
@@ -107,9 +123,12 @@ for (const hero of PLAYER_CHARACTER_IDS) {
     for (let y = 0; y < CELL; y++) sheet.data.set(c.data.subarray(y * CELL * 4, (y + 1) * CELL * 4), ((oy + y) * sheet.w + ox) * 4);
   };
   for (const [row, dir] of WALK8_DIRECTIONS.entries()) {
-    const strip = await cutOut(`${from}/${hero}/${dir}.png`);
+    // White and pale robes have flat near-white folds: only large, pure-background pockets (between the legs) go.
+    const strip = await cutOut(`${from}/${hero}/${dir}.png`, { pocketTolerance: 4, pocketMin: 400 });
     const r = await raster(strip);
-    const figures = await Promise.all(splitFigures(r, 5).map((span) => figure(strip, r, span)));
+    let spans;
+    try { spans = splitFigures(r, 5); } catch (error) { throw new Error(`${hero}/${dir}.png: ${(error as Error).message} (repaint this strip)`); }
+    const figures = await Promise.all(spans.map((span) => figure(strip, r, span)));
     // One scale per strip: the standing figure is FIGURE px tall, and no pose is wider than the cell allows.
     const scale = Math.min(FIGURE / figures[0].h, ...figures.map((f) => MAX_W / f.w), ...figures.map((f) => (FEET - 2) / f.h));
     const cells = await Promise.all(figures.map((f) => cell(f, scale)));

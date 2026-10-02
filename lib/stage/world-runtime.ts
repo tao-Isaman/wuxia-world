@@ -331,8 +331,18 @@ export function createWorldRuntime(
     interaction = marker ?? null;
     targetRing?.setPosition(destination.x, destination.y).setVisible(true);
   }
-  function faceMovement(dx: number, dy: number) {
-    playerDir = dir8FromVector(dx, dy, playerDir);
+  // A new heading must hold briefly before the hero turns, so letting go of a
+  // diagonal (two keys never come up on the same frame) doesn't snap them to
+  // the last key's direction. Starting from standing still turns at once.
+  let dirCandidate: Dir8 | null = null, dirCandidateSince = 0, lastMoveAt = -Infinity;
+  const TURN_HOLD_MS = 90;
+  function faceMovement(dx: number, dy: number, turnNow = false) {
+    const now = performance.now();
+    const next = dir8FromVector(dx, dy, playerDir);
+    if (turnNow || next === playerDir || now - lastMoveAt > 150) { playerDir = next; dirCandidate = null; }
+    else if (next !== dirCandidate) { dirCandidate = next; dirCandidateSince = now; }
+    else if (now - dirCandidateSince >= TURN_HOLD_MS) { playerDir = next; dirCandidate = null; }
+    lastMoveAt = now;
     if (Math.abs(dy) > Math.abs(dx)) playerFacing = dy < 0 ? "north" : "south";
     else if (Math.abs(dx) > 0.001) playerFacing = dx < 0 ? "west" : "east";
   }
@@ -831,7 +841,7 @@ export function createWorldRuntime(
               const marker = read().markers.find((entry) => entry.id === id);
               if (marker?.kind === "npc") {
                 const point = markerPoint(marker);
-                faceMovement(point.x - position.x, point.y - position.y);
+                faceMovement(point.x - position.x, point.y - position.y, true);
               }
               marker?.onActivate();
             }
