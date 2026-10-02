@@ -30,6 +30,7 @@ test("music follows the game: title → world → battle, with a sound settings 
     localStorage.setItem("wusia-world-v1", JSON.stringify(save));
   });
   await page.reload();
+  await page.getByRole("button", { name: /เข้าต่อสู้/ }).click();
   await expect(page.getByTestId("battle-canvas")).toHaveAttribute("data-ready", "true", { timeout: 60_000 });
   await page.getByRole("button", { name: "เสียง", exact: true }).click(); // a gesture after reload
   await expect(html).toHaveAttribute("data-music", "battle");

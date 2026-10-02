@@ -34,7 +34,7 @@ An installed PWA asks the browser to keep its storage (`navigator.storage.persis
 
 | Not saved | Why |
 | --- | --- |
-| `store/battle-store.ts` | a battle is rebuilt from `pendingBattle` after a reload (`ensureBattleStarted` in `lib/world/battle-bridge.ts`) |
+| `store/battle-store.ts` | a battle is rebuilt from `pendingBattle` after a reload: the briefing shows again and `ensureBattleStarted` (`lib/world/battle-bridge.ts`) restarts it |
 | `store/loading-store.ts`, `toast-store.ts`, `confirm-store.ts` | transient UI |
 | where the hero stands on each map | an in-memory map in `lib/stage/types.ts`, cleared on a new game |
 | Phaser objects, textures, GPU state | never enter a store |

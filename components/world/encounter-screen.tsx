@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { TIERS } from "@/lib/game";
 import { ENEMY_CATEGORY_LABEL, getOpponent, type EnemyCategory } from "@/lib/world";
 import { npcCharacterId } from "@/lib/characters/catalog";
 import { rarityColor } from "@/lib/ui/rarity";
 import { CharacterPreview } from "@/components/game/character-preview";
 import { useWorldStore } from "@/store/world-store";
+import { ensureBattleStarted, previewBriefing } from "@/lib/world/battle-bridge";
+import { PowerReadout } from "./power-readout";
 
 // Random-encounter confrontation. `acceptEncounter` promotes the offer to a
 // real battle; `fleeEncounter` clears it (hunters may still force the fight).
@@ -14,9 +16,13 @@ import { useWorldStore } from "@/store/world-store";
 // read before any text, with F / Enter to fight and Esc to flee.
 export function EncounterScreen() {
   const enc = useWorldStore((s) => s.pendingEncounter);
-  const accept = useWorldStore((s) => s.acceptEncounter);
+  const acceptEncounter = useWorldStore((s) => s.acceptEncounter);
+  const playerBuild = useWorldStore((s) => s.playerBuild);
+  // The power reading is shown here, so going in starts the fight at once.
+  const accept = useCallback(() => { acceptEncounter(); ensureBattleStarted(); }, [acceptEncounter]);
   const flee = useWorldStore((s) => s.fleeEncounter);
   const opp = enc ? getOpponent(enc.opponentId) : null;
+  const briefing = useMemo(() => (enc ? previewBriefing(playerBuild, enc.opponentId) : null), [enc, playerBuild]);
 
   useEffect(() => {
     if (!enc) return;
@@ -60,6 +66,7 @@ export function EncounterScreen() {
           <h2 id="encounter-name" style={{ color }}>{opp.name}</h2>
           {tierName && <span className="encounter-tier" style={{ color, borderColor: color }}>ขั้น{tierName}</span>}
           <p className="encounter-flavor">{flavor}</p>
+          {briefing && <PowerReadout briefing={briefing} />}
         </div>
       </div>
       <div className="encounter-actions">

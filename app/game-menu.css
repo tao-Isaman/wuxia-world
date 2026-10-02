@@ -159,6 +159,19 @@
 .encounter-flee { padding: 12px 18px; font-size: 16px; color: #e8dfc2; background: #1f3029; border: 2px solid #6f7a5c; }
 .encounter-flee:hover { background: #2a3d34; }
 .encounter-note { margin-top: 10px; text-align: center; color: #9fa591; font-size: 12px; }
+.encounter-actions-single { grid-template-columns: 1fr; }
+/* Power tiers before a fight (power-readout.tsx). */
+.power-readout { margin-top: 8px; }
+.power-readout dl { display: grid; gap: 3px; }
+.power-readout dl > div { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; }
+.power-readout dt { min-width: 9.5em; color: #b9b39a; font-size: 13px; }
+.power-readout dd { color: #f2ead2; font-size: 15px; }
+.power-tier-badge { display: inline-block; padding: 0 6px; border: 1px solid #c9a35a; color: #f3d48a; font-size: 13px; }
+.power-outlook { margin-top: 6px; font-size: 14px; font-weight: 600; }
+.power-outlook-deadly { color: #ff8a73; }
+.power-outlook-stronger { color: #f3b26b; }
+.power-outlook-even { color: #e8dfc2; }
+.power-outlook-weaker, .power-outlook-trivial { color: #9fd39a; }
 @media (max-width: 480px) {
   .encounter-body { grid-template-columns: 84px 1fr; gap: 12px; }
   .encounter-portrait { height: 92px; }

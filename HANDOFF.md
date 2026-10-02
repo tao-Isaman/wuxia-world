@@ -88,6 +88,11 @@ Not verified:
 
 Real behaviour today, found during the docs audit. Each is small and self-contained unless noted.
 
+### Power tiers
+
+- **Calibrated on opponents only.** The twelve thresholds fit the opponent table (tiers 1–10). How fast a real hero climbs them has not been played through; tune `POWER_TIERS` in `lib/game/power-tier.ts` if the hero outruns or lags the foes.
+- **A score, not a forecast.** The tier ignores equipment by design, and type conflict, skill effects and weapon mastery only partly, so a geared hero can beat a foe a tier above.
+
 ### Places
 
 - **New place content is unplayed by hand.** The 97 place quests pass the store play-through and audits; their writing was checked by the agents that wrote it, not proofread.

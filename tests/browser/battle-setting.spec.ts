@@ -16,6 +16,7 @@ test("capital encounter keeps its street setting through reload and phone rotati
     localStorage.setItem("wusia-world-v1", JSON.stringify(save));
   });
   await page.reload();
+  await page.getByRole("button", { name: /เข้าต่อสู้/ }).click();
   const battle = page.getByTestId("battle-canvas");
   await expect(battle).toHaveAttribute("data-ready", "true");
   await expect(battle).toHaveAttribute("data-battle-background", "capital-street");

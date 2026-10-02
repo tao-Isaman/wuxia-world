@@ -21,6 +21,8 @@ import {
   getMasteryMap,
   getSkill,
   parseSlotId,
+  powerBreakdown,
+  powerTierOf,
   statBreakdown,
   totalStatPoints,
 } from "@/lib/game";
@@ -132,6 +134,8 @@ export function ProfilePopup({ open, onClose }: Props) {
   const breakdown = statBreakdown(player);
   const derivedAll = deriveAll(player);
   const derivedBase = derive(base);
+  // Power tier: stats + inner arts + moves, never equipment (lib/game/power-tier.ts).
+  const powerTier = powerTierOf(powerBreakdown(player).total);
 
   const totalSpent = totalStatPoints(base);
 
@@ -180,6 +184,9 @@ export function ProfilePopup({ open, onClose }: Props) {
           <div className="profile-identity">
             <h3>{player.name}</h3>
             <p>{GENDER_LABEL[gender]} · ทอง <strong>{gold.toLocaleString()}</strong> ตำลึง</p>
+            <p className="profile-power" data-testid="profile-power" data-tier={powerTier.tier}>
+              ระดับพลัง <span className="power-tier-badge">{powerTier.name}</span>
+            </p>
             <div className="profile-bars">
               <VitalBar label="HP" tone="hp" value={hpNow} max={derivedAll.HP} />
               <VitalBar label="MP" tone="mp" value={mpNow} max={derivedAll.MP} />
