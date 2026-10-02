@@ -1,72 +1,98 @@
-import type { AssetBase, ComposedAssetDef } from "./types";
+import type { ComposedAssetDef, GridRect } from "./types";
 import { COMPOSED_ASSET_PIXELS } from "./asset-pixels";
+import { ISO_TILE_W } from "./iso";
 
-// World sizes and solid bases of the composed-map art (public/maps/composed/).
-// The hero is about 56 units tall; a shophouse is ~220 units wide. Bases are
-// the footprint of the walls on the ground in the three-quarter view, as
-// fractions of the trimmed sprite (see scripts/render-composed-map.ts --bases).
-const BUILDING = { left: 0.07, right: 0.93, top: 0.56, bottom: 0.93 } as const;
-const STALL = { left: 0.12, right: 0.88, top: 0.62, bottom: 0.94 } as const;
-const TRUNK = { left: 0.42, right: 0.58, top: 0.86, bottom: 0.97, shape: "ellipse" } as const;
+// Footprints and sizes of the isometric composed-map art (public/maps/composed/).
+// A tile is 64 × 32 world units; the hero is about 56 units tall, so a 3 × 3
+// shophouse is a 192-unit diamond. `tiles` follow each painting's base: its
+// bottom corner sits a / (a + b) across the art (scripts/build-composed-assets.ts
+// --measure), and scripts/render-composed-map.ts --bases draws the solids.
+const WALK: readonly GridRect[] = [];
+const TRUNK: readonly GridRect[] = [[0.3, 0.3, 0.7, 0.7]];
+const TREE = { tiles: [1, 1], solid: TRUNK, ground: 0.96 } as const;
 
 export const COMPOSED_ASSETS: Record<string, ComposedAssetDef> = {
-  palace_gate: { width: 620, base: { left: 0.05, right: 0.95, top: 0.5, bottom: 0.86 } },
-  yamen: { width: 440, base: BUILDING },
-  inn: { width: 460, base: BUILDING },
-  shop_apothecary: { width: 230, base: BUILDING },
-  shop_cloth: { width: 230, base: BUILDING },
-  shop_general: { width: 230, base: BUILDING },
-  smithy: { width: 250, base: BUILDING },
-  house_a: { width: 210, base: BUILDING },
-  house_b: { width: 230, base: { left: 0.04, right: 0.96, top: 0.6, bottom: 0.94 } },
-  house_c: { width: 210, base: BUILDING },
-  temple: { width: 400, base: BUILDING },
-  pagoda: { width: 200, base: { left: 0.14, right: 0.86, top: 0.84, bottom: 0.97 } },
-  // Two piers either side of the arch: the hero walks into the gateway to leave.
-  gate_tower: { width: 460, base: [{ left: 0.02, right: 0.4, top: 0.74, bottom: 0.97 }, { left: 0.6, right: 0.98, top: 0.74, bottom: 0.97 }], ground: 0.97 },
-  wall_segment: { width: 460, base: { left: 0, right: 1, top: 0.74, bottom: 0.95 } },
-  granary: { width: 220, base: BUILDING },
-  stall_fruit: { width: 130, base: STALL },
-  stall_food: { width: 130, base: STALL },
-  stall_pottery: { width: 130, base: STALL },
-  stall_cloth: { width: 130, base: STALL },
-  tree_willow: { width: 170, base: TRUNK },
-  tree_pine: { width: 150, base: TRUNK },
-  tree_plum: { width: 150, base: TRUNK },
-  tree_maple: { width: 160, base: TRUNK },
-  well: { width: 70, base: { left: 0.18, right: 0.82, top: 0.58, bottom: 0.95, shape: "ellipse" } },
-  cart: { width: 90, base: { left: 0.1, right: 0.9, top: 0.5, bottom: 0.95 } },
-  crates: { width: 80, base: { left: 0.08, right: 0.92, top: 0.45, bottom: 0.95 } },
-  lantern_post: { width: 36 },
-  stone_lion: { width: 46, base: { left: 0.15, right: 0.85, top: 0.7, bottom: 0.97 } },
-  bridge: { width: 240, ground: 0.92 },
-  notice_board: { width: 80, base: { left: 0.2, right: 0.8, top: 0.86, bottom: 0.97 } },
-  flower_bed: { width: 120, base: { left: 0.04, right: 0.96, top: 0.35, bottom: 0.96 } },
-  rock_garden: { width: 120, base: { left: 0.12, right: 0.88, top: 0.62, bottom: 0.96 } },
-  // Walls running north–south on the city's sides: the whole piece is solid.
-  wall_side: { width: 96, base: { left: 0.06, right: 0.94, top: 0.04, bottom: 0.98 } },
-  corner_tower: { width: 210, base: { left: 0.08, right: 0.92, top: 0.55, bottom: 0.96 } },
-  dock: { width: 280 },
-  boat: { width: 210 },
-  bamboo: { width: 140, base: { left: 0.25, right: 0.75, top: 0.84, bottom: 0.97, shape: "ellipse" } },
-  // A garden wall with a moon gate: solid either side of the round opening.
-  garden_wall: { width: 320, base: [{ left: 0, right: 0.38, top: 0.62, bottom: 0.95 }, { left: 0.62, right: 1, top: 0.62, bottom: 0.95 }], ground: 0.95 },
-  pavilion: { width: 200, base: { left: 0.15, right: 0.85, top: 0.62, bottom: 0.95 } },
-  mansion: { width: 500, base: BUILDING },
-  ruined_temple: { width: 400, base: BUILDING },
-  escort_agency: { width: 440, base: BUILDING },
-  pawnshop: { width: 230, base: BUILDING },
-  teahouse: { width: 420, base: BUILDING },
-  bench: { width: 90, base: { left: 0.05, right: 0.95, top: 0.5, bottom: 0.95 } },
-  // A bridge seen end-on, its walkway running north across an east–west river (walkable).
-  bridge_ns: { width: 130, ground: 0.98 },
+  // Shops and houses.
+  shop_a: { tiles: [3, 3] },
+  shop_cloth: { tiles: [3.5, 2.2] },
+  apothecary: { tiles: [3, 3] },
+  smithy: { tiles: [3, 3] },
+  pawnshop: { tiles: [3, 3] },
+  house_a: { tiles: [3, 3] },
+  house_b: { tiles: [3, 3] },
+  house_c: { tiles: [4, 4] },
+  granary: { tiles: [3, 3] },
+  // Halls.
+  inn: { tiles: [6.5, 3.5] },
+  teahouse: { tiles: [6.5, 3.3] },
+  yamen: { tiles: [5.5, 4] },
+  palace: { tiles: [7, 6] },
+  temple: { tiles: [6, 5] },
+  pagoda: { tiles: [3, 3] },
+  mansion: { tiles: [6, 5] },
+  escort: { tiles: [6, 5] },
+  ruined_temple: { tiles: [5, 4] },
+  pavilion: { tiles: [2, 2] },
+  // The city wall: straight pieces along u, a gate with a passage, corner towers.
+  wall: { tiles: [6, 0.85] },
+  // The passage runs through the gate along v, under the arch in the middle of its u side.
+  gate: { tiles: [4, 2], solid: [[0, 0, 0.3, 1], [0.7, 0, 1, 1]] },
+  tower: { tiles: [2, 2] },
+  // Water.
+  bridge: { tiles: [4.5, 1.5], solid: WALK },
+  dock: { tiles: [4, 2], solid: WALK },
+  // Bow to the lower left: lies along v (flip it for water running along u).
+  boat: { tiles: [1.2, 3] },
+  pond: { tiles: [3, 2] },
+  // Market.
+  stall_fruit: { tiles: [2, 1.2] },
+  stall_food: { tiles: [2, 1.3] },
+  stall_pottery: { tiles: [1.4, 1.8] },
+  stall_cloth: { tiles: [1.6, 1.7] },
+  umbrella_table: { tiles: [1.2, 1.2] },
+  well: { tiles: [1, 1] },
+  bench: { tiles: [0.5, 2] },
+  cart: { tiles: [1, 1.6] },
+  barrels: { tiles: [1, 1] },
+  haystack: { tiles: [1, 1] },
+  notice_board: { tiles: [1, 0.3] },
+  // Fences and garden walls.
+  fence: { tiles: [2.5, 0.25] },
+  garden_wall: { tiles: [5, 0.7], solid: [[0, 0, 0.4, 1], [0.6, 0, 1, 1]] },
+  // Lights and decoration.
+  // The post stands at 0.3 of the art; its lantern hangs on the arm to the right.
+  lantern_post: { tiles: [0.4, 0.4], width: 44, shift: 0.2, solid: WALK, lamps: [[0.75, 0.35]] },
+  // Strung along v (flip it to run along u).
+  lantern_line: { tiles: [0.3, 3], solid: WALK, lamps: [[0.3, 0.45], [0.5, 0.4], [0.7, 0.3]] },
+  flag_line: { tiles: [3, 0.3], solid: WALK },
+  banner_pole: { tiles: [0.4, 0.4], width: 48, shift: 0.17 },
+  stone_lantern: { tiles: [0.6, 0.6], width: 44, lamps: [[0.5, 0.35]] },
+  stone_lion: { tiles: [0.7, 0.7], width: 52 },
+  flower_pots: { tiles: [1, 1] },
+  laundry: { tiles: [2, 0.4], solid: WALK },
+  rocks: { tiles: [1.5, 1.5] },
+  planter_tree: { tiles: [1, 1], width: 80 },
+  // Trees (shared with the earlier three-quarter set: they read the same from any side).
+  tree_pine: { ...TREE, width: 150 },
+  tree_willow: { ...TREE, width: 170 },
+  tree_plum: { ...TREE, width: 150 },
+  tree_maple: { ...TREE, width: 160 },
+  bamboo: { ...TREE, width: 140 },
 };
+
+/** Processed images are this many pixels per world unit. */
+export const COMPOSED_PX_PER_UNIT = 2;
+/** A 512 px ground texture covers this many (unprojected) world units. */
+export const COMPOSED_GROUND_TILE_UNITS = 64;
+
+/** Sprite width in world units: as defined, else the footprint diamond plus a little eave overhang. */
+export const assetWidth = (def: ComposedAssetDef) => def.width ?? (def.tiles[0] + def.tiles[1]) * ISO_TILE_W / 2 * 1.08;
 
 export interface ComposedAssetGeometry extends ComposedAssetDef {
   id: string;
-  bases: readonly AssetBase[];
+  width: number;
   height: number;
-  /** Ground line as a fraction of the height. */
+  /** Where the footprint's bottom corner sits, as a fraction of the height. */
   groundAt: number;
 }
 
@@ -75,13 +101,6 @@ export function composedAsset(id: string): ComposedAssetGeometry | undefined {
   const def = COMPOSED_ASSETS[id];
   const pixels = COMPOSED_ASSET_PIXELS[id];
   if (!def || !pixels) return undefined;
-  const height = def.width * pixels[1] / pixels[0];
-  const bases = def.base === undefined ? [] : Array.isArray(def.base) ? def.base : [def.base as AssetBase];
-  return { ...def, id, height, bases, groundAt: def.ground ?? (bases.length ? Math.max(...bases.map((b) => b.bottom)) : 0.95) };
+  const width = assetWidth(def);
+  return { ...def, id, width, height: width * pixels[1] / pixels[0], groundAt: def.ground ?? 0.98 };
 }
-
-/** World units covered by one 512 px ground texture tile. */
-export const COMPOSED_GROUND_TILE_UNITS = 64;
-
-/** Processed art density: image pixels per world unit. */
-export const COMPOSED_PX_PER_UNIT = 2;

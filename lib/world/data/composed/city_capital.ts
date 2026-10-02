@@ -1,182 +1,188 @@
-import type { ComposedMap, ComposedObject, GroundArea } from "./types";
-import { composedAsset } from "./assets";
+import type { ComposedMap, ComposedObject, GridRect, GroundArea, GroundMaterial } from "./types";
+import { isoPercent } from "./iso";
 
-// นครหลวง, built from assets: 3072 × 2048 units (ten times the old painting's
-// area), walled on every side like a real city. North is up. The plan keeps
-// the old map's anchors — the palace forecourt, the market plaza, the
-// craftsmen's row and the south gate — so its exits (location-maps.ts) still
-// face their destinations, and adds the districts of a capital:
+// นครหลวง, built from isometric assets on a 64 × 64 grid (4096 × 2208 world
+// units). A walled city after the Lin'an plan: the wall's four sides face NW,
+// NE, SE and SW on screen; a river crosses the middle along u, a canal leaves
+// it south-west for Yangzhou. Gates sit where each road leaves, so every exit
+// (location-maps.ts) still faces its destination.
 //
-//   y  300       north wall: gates to the Songshan trail, the fields and the palace walk
-//   y  300–380   north lane inside the wall
-//   y  380–780   temple and government hall (west) · palace forecourt · flower garden, pagoda, mansion (east)
-//   y  780–880   the great avenue, out through the west gate to Chang'an
-//   y  880–1330  escort agency (west) · market plaza · teahouse, pawnshop, inn (east)
-//   y 1230–1310  the old alley east to the Yuelai inn
-//   y 1440–1640  craftsmen's street, shops on its north side
-//   y 1690–1790  the river, from the east water gate to the docks
-//   y 1790–2040  canal landing and the ruined temple (south-west) · houses and the quarry across the river
-//   y 2040       south wall and the main gate
+//   v  3            NE wall: gates to the fields (u 10), the palace walk (u 34), the guard post (u 50)
+//   v  4–15         bamboo grove · Yunlin temple, ruined temple · pagoda · houses
+//   v 15–17         north street, out through the SE wall to the Yuelai inn
+//   v 17–27         houses · yamen, martial school · Prince Kang's mansion · flower garden
+//   v 27–29         Songshan lane, in from the NW wall
+//   v 29–37         houses · market and the docks · the flower house (teahouse) · a mansion
+//   v 38–41         the river
+//   v 41–47         escort agency · shops, the inn · granary
+//   v 47–49         south street, in through the NW wall from Chang'an
+//   v 49–61         pawnshop, treasure house · canal landing · craftsmen's row · quarry
+//   v 61            SW wall: the main gate (u 50) home
+//   u 9–11, 33–35, 49–51   the three long streets along v, one per NE gate
 
-const W = 3072, H = 2048;
-const NORTH_WALL = 300, SOUTH_WALL = 2040, WEST_WALL = 60, EAST_WALL = 3012;
-const NORTH_GATES = [307, 860, 2396];
+const COLUMNS = 64, ROWS = 64;
+const WALL_NEAR = 3, WALL_FAR = 61, WALL_THICK = 0.85;
+const RIVER: GridRect = [0, 38, COLUMNS, 41];
+const CANAL: GridRect = [26, 41, 29, ROWS];
+const STREETS_U = [10, 34, 50]; // streets along v, at these u
+const NE_GATES = STREETS_U, SW_GATE = 50, NW_GATES = [28, 48], SE_GATE = 16;
 
-const ground: GroundArea[] = [
-  // Lanes inside the walls, and the short roads out through the north gates.
-  { material: "cobble", x: 140, y: NORTH_WALL, w: 2800, h: 80, edge: true },
-  ...NORTH_GATES.map((x): GroundArea => ({ material: "cobble", x: x - 45, y: 0, w: 90, h: NORTH_WALL })),
-  { material: "cobble", x: 0, y: 780, w: W, h: 100, edge: true },                // the great avenue
-  { material: "cobble", x: 2600, y: 540, w: W - 2600, h: 80 },                   // east lane to the guard gate
-  { material: "paving", x: 1180, y: 380, w: 720, h: 400, edge: true },          // palace forecourt
-  { material: "paving", x: 1100, y: 880, w: 880, h: 450, edge: true },          // market plaza
-  { material: "cobble", x: 1440, y: 880, w: 192, h: SOUTH_WALL - 880 },         // south avenue to the gate
-  { material: "cobble", x: 1980, y: 1230, w: W - 1980, h: 80 },                 // old alley east
-  { material: "paving", x: 140, y: 1440, w: 2800, h: 200, edge: true },         // craftsmen's street
-  { material: "dirt", x: 1760, y: 1640, w: 1180, h: 50 },                        // the river's north bank (docks)
-  { material: "water", x: 1760, y: 1690, w: W - 1760, h: 100, edge: true },     // the river
-  { material: "dirt", x: 140, y: 1640, w: 240, h: 300 },                         // canal landing
-  { material: "water", x: 380, y: 1100, w: 100, h: H - 1100, edge: true },      // the grand canal
-  { material: "dirt", x: 2440, y: 1790, w: 500, h: 220 },                        // quarry yard
-  { material: "grass", x: 1990, y: 400, w: 340, h: 330 },                        // inside the flower garden
-];
-
+const ground: GroundArea[] = [];
+const area = (material: GroundMaterial, u: number, v: number, w: number, h: number, edge = false) => ground.push({ material, u, v, w, h, edge });
 const objects: ComposedObject[] = [];
-const put = (asset: string, x: number, y: number, extra: Partial<ComposedObject> = {}) => objects.push({ asset, x, y, ...extra });
-/** Fill a stretch of horizontal wall exactly, with pieces scaled to fit. */
-const wallRun = (from: number, to: number, y: number) => {
-  const span = to - from, pieces = Math.max(1, Math.round(span / 440)), width = span / pieces;
-  for (let i = 0; i < pieces; i++) put("wall_segment", from + width * (i + 0.5), y, { scale: width / 460 });
-};
+const put = (asset: string, u: number, v: number, extra: Partial<ComposedObject> = {}) => objects.push({ asset, u, v, ...extra });
+const size = ([u0, v0, u1, v1]: GridRect): [number, number, number, number] => [u0, v0, u1 - u0, v1 - v0];
+
+// ── Ground ─────────────────────────────────────────────────────────────
+area("dirt", WALL_NEAR, WALL_NEAR, WALL_FAR - WALL_NEAR + WALL_THICK, WALL_FAR - WALL_NEAR + WALL_THICK); // inside the walls
+area("grass", 52, 18, 8, 8);                                      // the flower garden
+area("grass", 4, 5, 5, 9);                                        // the bamboo grove
+area("grass", 12, 5, 21, 9);                                      // temple grounds
+for (const u of STREETS_U) area("cobble", u - 1, 0, 2, ROWS, true); // the three long streets, out through the gates
+area("cobble", 0, 15, WALL_FAR + 1, 2, true);                    // north street → SE gate
+area("cobble", 0, 47, COLUMNS, 2, true);                          // south street ← NW gate
+area("cobble", 0, 27, 34, 2, true);                               // Songshan lane ← NW gate
+area("paving", 12, 29, 21, 8, true);                              // the market
+area("paving", 36, 25, 12, 2);                                    // the mansion's forecourt
+area("paving", 13, 23.5, 12, 1.5);                                // before the yamen and the school
+area("dirt", 12, 36, 21, 2);                                      // the quay
+area("dirt", 22, 54, 4, 7);                                       // canal landing
+area("dirt", 53, 53, 8, 8);                                       // the quarry yard
+area("water", ...size(RIVER), true);
+area("water", ...size(CANAL), true);
 
 // ── The walls ──────────────────────────────────────────────────────────
-// North wall, open at the three gates.
-const gateHalf = 128;
-wallRun(160, NORTH_GATES[0] - gateHalf, NORTH_WALL);
-wallRun(NORTH_GATES[0] + gateHalf, NORTH_GATES[1] - gateHalf, NORTH_WALL);
-wallRun(NORTH_GATES[1] + gateHalf, NORTH_GATES[2] - gateHalf, NORTH_WALL);
-wallRun(NORTH_GATES[2] + gateHalf, 2930, NORTH_WALL);
-for (const x of NORTH_GATES) put("gate_tower", x, NORTH_WALL + 6, { scale: 0.55 });
-// South wall, the main gate, and the canal's water gate.
-put("gate_tower", 1536, SOUTH_WALL + 4, { scale: 0.62 });
-wallRun(160, 380, SOUTH_WALL); wallRun(480, 1448, SOUTH_WALL); wallRun(1624, 2930, SOUTH_WALL);
-// Side walls: vertical pieces stretched to fill each run exactly, open at the
-// west gate, the east lane, the alley and the river.
-const sideHeight = (composedAsset("wall_side")?.height ?? 400) * 0.98;
-const wallColumn = (x: number, from: number, to: number) => {
-  const span = to - from, pieces = Math.max(1, Math.round(span / sideHeight)), each = span / pieces;
-  for (let i = 1; i <= pieces; i++) put("wall_side", x, from + each * i, { stretch: each / sideHeight });
-};
-wallColumn(WEST_WALL, NORTH_WALL, 740); wallColumn(WEST_WALL, 920, SOUTH_WALL);
-wallColumn(EAST_WALL, NORTH_WALL, 520); wallColumn(EAST_WALL, 640, 1210); wallColumn(EAST_WALL, 1330, 1680); wallColumn(EAST_WALL, 1800, SOUTH_WALL);
-// Corner towers, and towers either side of the west gate.
-for (const [x, y] of [[WEST_WALL, NORTH_WALL], [EAST_WALL, NORTH_WALL], [WEST_WALL, SOUTH_WALL], [EAST_WALL, SOUTH_WALL]]) put("corner_tower", x, y, { scale: 0.75 });
-put("corner_tower", WEST_WALL, 750, { scale: 0.6 }); put("corner_tower", WEST_WALL, 960, { scale: 0.6 });
-for (const y of [500, 700]) put("lantern_post", EAST_WALL - 70, y);
+// Pieces 6 tiles long; the last one of a run is pulled back to end exactly
+// at the run's end (overlapping its neighbour) rather than shrunk.
+const WALL_LEN = 6;
+function wallRun(along: "u" | "v", fixed: number, from: number, to: number) {
+  if (to - from < 0.5) return;
+  for (let s = from; s < to - 0.01; s += WALL_LEN) {
+    const start = Math.max(from, Math.min(s, to - WALL_LEN));
+    if (along === "u") put("wall", start, fixed);
+    else put("wall", fixed, start, { flip: true });
+  }
+}
+/** A side of the wall: runs between its gates (4 tiles wide) and gaps such as the river. */
+function wallSide(along: "u" | "v", fixed: number, gates: number[], gaps: [number, number][]) {
+  const cuts = [...gates.map((g): [number, number] => [g - 2, g + 2]), ...gaps].sort((a, b) => a[0] - b[0]);
+  let at = WALL_NEAR + 1.4;
+  for (const [a, b] of cuts) { wallRun(along, fixed, at, a); at = b; }
+  wallRun(along, fixed, at, WALL_FAR - 0.6);
+  // Gates sit across the wall line, centred on it.
+  for (const g of gates) {
+    if (along === "u") put("gate", g - 2, fixed + WALL_THICK / 2 - 1);
+    else put("gate", fixed + WALL_THICK / 2 - 1, g - 2, { flip: true });
+  }
+}
+wallSide("u", WALL_NEAR, NE_GATES, []);
+wallSide("u", WALL_FAR, [SW_GATE], [[CANAL[0], CANAL[2]]]);
+wallSide("v", WALL_NEAR, NW_GATES, [[RIVER[1], RIVER[3]]]);
+wallSide("v", WALL_FAR, [SE_GATE], [[RIVER[1], RIVER[3]]]);
+for (const [u, v] of [[WALL_NEAR, WALL_NEAR], [WALL_FAR, WALL_NEAR], [WALL_NEAR, WALL_FAR], [WALL_FAR, WALL_FAR]]) put("tower", u - 0.6, v - 0.6);
 
-// ── North-west: the Yunlin temple and the government hall ─────────────
-put("temple", 470, 640);
-put("pavilion", 760, 520, { scale: 0.8 });
-put("bamboo", 200, 480); put("bamboo", 290, 540, { scale: 0.85 }); put("bamboo", 200, 680, { scale: 0.9 });
-put("tree_pine", 780, 700, { scale: 0.85 });
-put("yamen", 990, 700, { scale: 0.85 });
-put("stone_lion", 880, 740, { scale: 0.9 }); put("stone_lion", 1100, 740, { scale: 0.9, flip: true });
+// ── Bridges over the river and the canal ──────────────────────────────
+for (const u of STREETS_U) put("bridge", u - 0.75, RIVER[1] - 0.75, { flip: true });
+put("bridge", CANAL[0] - 0.75, 47.25);
 
-// ── North centre: the palace gate and its forecourt ───────────────────
-put("palace_gate", 1540, 560);
-put("stone_lion", 1330, 600); put("stone_lion", 1750, 600, { flip: true });
-put("flower_bed", 1215, 580); put("flower_bed", 1865, 580);
-for (const x of [1220, 1860]) put("lantern_post", x, 770);
-put("tree_willow", 1240, 470, { scale: 0.85 }); put("tree_willow", 1840, 470, { scale: 0.85 });
+// ── North: bamboo grove, the temples, the pagoda, houses ──────────────
+for (const [u, v] of [[4.5, 5.5], [6.5, 6], [5, 8], [7.2, 8.6], [4.6, 10.6], [6.6, 11.2], [5.4, 13]]) put("bamboo", u, v);
+put("temple", 13, 5.5);                                           // วัดหยุนหลิน
+put("stone_lantern", 14, 11.6); put("stone_lantern", 18, 11.6);
+put("tree_pine", 20, 5.4); put("tree_pine", 20.5, 9);
+put("ruined_temple", 24, 5.5);                                     // วัดร้าง
+put("tree_maple", 30, 6); put("rocks", 30.5, 10);
+put("pagoda", 39.5, 5.5);                                          // หอคอย
+put("rocks", 37, 6); put("tree_pine", 43.6, 6); put("stone_lion", 40, 9.2); put("stone_lion", 42, 9.2);
+put("house_a", 36, 11.2); put("house_b", 44.5, 11.2);
+put("house_c", 52, 5.2); put("granary", 57, 5.5);
+put("haystack", 57.5, 10); put("tree_plum", 53, 11.5); put("cart", 59, 12);
 
-// ── North-east: the flower garden, the pagoda, a mansion ──────────────
-put("garden_wall", 2160, 742);
-put("pavilion", 2160, 560);
-put("rock_garden", 2060, 690, { scale: 0.8 });
-put("tree_plum", 2030, 470, { scale: 0.85 }); put("tree_plum", 2290, 480, { scale: 0.8 });
-put("flower_bed", 2270, 690, { scale: 0.8 });
-put("bamboo", 2320, 600, { scale: 0.7 });
-put("pagoda", 2480, 520, { scale: 0.72 });
-put("mansion", 2750, 470, { scale: 0.78 });
-put("stone_lion", 2650, 500, { scale: 0.8 }); put("stone_lion", 2850, 500, { scale: 0.8, flip: true });
-put("house_c", 2650, 760, { scale: 0.8 }); put("house_a", 2860, 760, { scale: 0.8, flip: true });
+// ── Houses, yamen, school, Prince Kang's mansion, the flower garden ───
+put("house_a", 4.5, 18.5); put("house_b", 4.6, 23);
+put("yamen", 12.5, 18.5);                                          // ศาลาว่าการ
+put("house_c", 20.5, 18.6); put("banner_pole", 20.6, 23.4); put("banner_pole", 24.4, 23.4); // สำนักยุทธ์
+put("notice_board", 26.5, 23.5); put("tree_willow", 29.5, 19.5); put("tree_plum", 27.5, 20);
+put("palace", 37.5, 18.3);                                         // จวนคังอ๋อง
+put("stone_lion", 38, 25.4); put("stone_lion", 43.6, 25.4);
+put("lantern_post", 36.4, 26.4); put("lantern_post", 47.4, 26.4);
+put("garden_wall", 52.5, 25.3);                                    // สวนดอกไม้
+put("pavilion", 55, 19); put("pond", 52.5, 21.5); put("rocks", 58.2, 21.8);
+put("tree_plum", 53, 18.4); put("tree_plum", 58.6, 18.6); put("flower_pots", 57.6, 24); put("flower_pots", 52.8, 24.4);
 
-// ── The great avenue ──────────────────────────────────────────────────
-for (const x of [300, 640, 1000, 1300, 1780, 2100, 2500, 2820]) { put("lantern_post", x, 776); put("lantern_post", x, 900); }
-put("shop_general", 640, 740, { scale: 0.9 });
-put("house_b", 380, 760, { scale: 0.85 });
+// ── Market, quay and docks; the flower house; a mansion ───────────────
+put("house_b", 4.5, 29.5); put("laundry", 4.4, 34.3); put("house_a", 4.6, 35);
+put("stall_fruit", 13, 30); put("stall_food", 17, 30); put("stall_cloth", 21, 30); put("stall_pottery", 25, 30.2);  // ตลาด
+put("stall_cloth", 13.4, 33.4); put("stall_fruit", 29.2, 30.4, { flip: true });
+put("well", 21.6, 33.6); put("umbrella_table", 25.6, 33.4); put("umbrella_table", 29.4, 34.2);
+put("lantern_line", 17.5, 30.6, { flip: true }); put("flag_line", 13, 35.2);
+put("barrels", 31.2, 36.2); put("barrels", 12.4, 36.4); put("cart", 26.4, 36.2);
+put("dock", 15, 37.4); put("dock", 22, 37.4);                     // ท่าเรือ
+put("boat", 18, 38.8, { flip: true }); put("boat", 41, 39.2, { flip: true }); put("boat", 55, 38.6, { flip: true });
+put("teahouse", 36.2, 29.4);                                       // หอหมู่บุปผา
+put("umbrella_table", 44.6, 34); put("umbrella_table", 46.8, 31.6); put("tree_willow", 47, 29);
+put("mansion", 53, 29.6);
+put("tree_willow", 36, 36.2); put("tree_willow", 52, 36.2);
 
-// ── West: the escort agency ───────────────────────────────────────────
-put("escort_agency", 560, 1140);
-put("lantern_post", 330, 1180); put("lantern_post", 790, 1180);
-put("cart", 470, 1230); put("crates", 680, 1240);
-for (const [x, y] of [[180, 1000], [200, 1290], [260, 1360]]) put("tree_pine", x, y, { scale: 0.85 });
-put("tree_maple", 900, 980, { scale: 0.8 });
-put("house_c", 950, 1360, { scale: 0.75 });
-put("notice_board", 1060, 930);
+// ── South bank: the escort agency, shops, the inn, the granary ────────
+put("house_c", 4.4, 41.6);
+put("escort", 12, 41.4);                                           // สำนักคุ้มภัย
+put("cart", 19.2, 45.4); put("barrels", 23.6, 42.4);
+put("shop_a", 29.5, 41.6);
+put("inn", 35.6, 42.2);                                            // โรงเตี๊ยม
+put("lantern_post", 42.6, 46.4);
+put("shop_cloth", 44.6, 43.4);
+put("granary", 52, 41.8); put("barrels", 56, 42.4); put("house_b", 57.6, 41.8);
 
-// ── Market plaza ──────────────────────────────────────────────────────
-put("well", 1250, 1130);
-put("stall_fruit", 1720, 960); put("stall_cloth", 1860, 980); put("stall_pottery", 1700, 1070);
-put("stall_food", 1905, 1150);
-put("stall_fruit", 1200, 1000, { flip: true }); put("stall_pottery", 1330, 960);
-put("cart", 1360, 1250); put("crates", 1790, 1270);
-put("bench", 1180, 1290); put("bench", 1900, 1290);
-put("lantern_post", 1110, 1320); put("lantern_post", 1970, 1320);
+// ── South: pawnshop and treasure house, canal landing, craftsmen, quarry ──
+put("pawnshop", 12, 50);                                           // โรงจำนำ
+put("shop_a", 16, 50, { flip: true });                             // หอของล้ำค่า
+put("house_a", 20.6, 50); put("house_b", 12.2, 55.2); put("house_a", 16.6, 55.6, { flip: true });
+put("barrels", 22.4, 55); put("barrels", 23.6, 58.6); put("boat", 26.9, 55.2);
+put("smithy", 30, 50.4);
+put("smithy", 36, 50);                                             // ร้านช่างตีเหล็ก
+put("apothecary", 40, 50);
+put("shop_cloth", 44, 50);
+put("house_c", 36.2, 55.6); put("house_a", 41.6, 56); put("house_b", 45.4, 56);
+put("house_a", 52, 49.6); put("house_b", 56.6, 49.6);
+put("rocks", 55, 55); put("rocks", 58, 57.8); put("rocks", 54.4, 58.6); put("cart", 58, 54);
 
-// ── East: teahouse, pawnshop, inn ─────────────────────────────────────
-put("teahouse", 2150, 1000, { scale: 0.75 });
-put("bench", 2060, 1110); put("bench", 2250, 1110);
-put("inn", 2560, 1180, { scale: 0.85 });
-put("pawnshop", 2860, 960, { scale: 0.8 });
-put("crates", 2920, 1100); put("tree_plum", 2860, 1190, { scale: 0.75 });
+// ── Lamps along the streets ───────────────────────────────────────────
+for (const v of [8, 20, 30, 44, 54]) for (const u of STREETS_U) put("lantern_post", u + 1.1, v);
+for (const u of [6, 20, 28, 40, 46, 56]) { put("lantern_post", u, 14.6); put("lantern_post", u, 49.4); }
 
-// ── Craftsmen's row (north side of the street, doors facing south) ────
-put("smithy", 645, 1440);
-put("shop_apothecary", 1014, 1440);
-put("shop_cloth", 1260, 1440);
-put("shop_general", 1843, 1440, { flip: true });
-put("shop_cloth", 2150, 1440, { flip: true });
-put("shop_apothecary", 2458, 1440, { flip: true });
-put("house_a", 2720, 1440, { scale: 0.85 });
-put("house_c", 260, 1440, { scale: 0.8 });
-for (const x of [800, 1360, 1720, 2600]) put("lantern_post", x, 1636);
+// ── Outside the walls: trees in the fields ────────────────────────────
+for (let i = 0; i < 56; i++) {
+  const tree = ["tree_pine", "tree_maple", "tree_willow", "tree_plum"][i % 4];
+  const side = i % 4;
+  const along = 2 + ((i * 1.17 + 4) * 7.3) % 58, depth = 0.4 + (i * 0.37) % 1.4;
+  const [u, v] = side === 0 ? [along, depth] : side === 1 ? [depth, along] : side === 2 ? [along, 62.2 + depth * 0.6] : [62.2 + depth * 0.6, along];
+  // Keep the roads and water clear.
+  const onRoad = STREETS_U.some((s) => Math.abs(u + 0.5 - s) < 3.6) || [16, 28, 48].some((s) => Math.abs(v + 0.5 - s) < 3.6)
+    || (v > RIVER[1] - 1.5 && v < RIVER[3] + 0.5) || (u > CANAL[0] - 1.5 && u < CANAL[2] + 0.5 && v > 50);
+  if (!onRoad) put(tree, u, v);
+}
 
-// ── The river: docks and boats on the north bank, a bridge south ──────
-put("dock", 2050, 1700, { scale: 0.8 }); put("dock", 2750, 1700, { scale: 0.8 });
-put("boat", 2240, 1770, { scale: 0.55 }); put("boat", 2600, 1780, { scale: 0.5, flip: true });
-put("bridge_ns", 2400, 1830);
-put("crates", 1900, 1670); put("crates", 2900, 1665);
-
-// ── South-west: canal landing and the south quarter ───────────────────
-put("bridge", 430, 1580);
-put("dock", 250, 1760, { scale: 0.55 });
-put("boat", 430, 1880, { scale: 0.42 });
-put("crates", 200, 1660); put("cart", 300, 1920);
-put("tree_willow", 600, 1840);
-put("house_a", 760, 1830, { scale: 0.85 });
-put("ruined_temple", 1150, 1880, { scale: 0.7 });
-put("tree_plum", 1340, 1900, { scale: 0.8 }); put("tree_plum", 1740, 1900, { scale: 0.8 });
-put("crates", 1700, 1700);
-
-// ── Across the river: houses and the quarry ───────────────────────────
-put("house_b", 2000, 1930, { scale: 0.8 }); put("house_c", 2230, 1930, { scale: 0.75, flip: true });
-put("rock_garden", 2780, 1850); put("crates", 2640, 1880); put("crates", 2560, 1960);
-put("tree_pine", 2900, 1990, { scale: 0.8 });
+const BRIDGE_GAP = 0.8;
+const riverBlocks: GridRect[] = [];
+let riverFrom = RIVER[0];
+for (const u of STREETS_U) { riverBlocks.push([riverFrom, RIVER[1], u - BRIDGE_GAP, RIVER[3]]); riverFrom = u + BRIDGE_GAP; }
+riverBlocks.push([riverFrom, RIVER[1], RIVER[2], RIVER[3]]);
 
 export const CITY_CAPITAL_MAP: ComposedMap = {
   id: "city_capital",
-  width: W,
-  height: H,
+  columns: COLUMNS,
+  rows: ROWS,
   base: "grass",
   ground,
   objects,
   blocks: [
-    // The canal, except where the bridge crosses the craftsmen's street.
-    { left: 380, top: 1100, right: 480, bottom: 1520 },
-    { left: 380, top: 1630, right: 480, bottom: H },
-    // The river, except under the bridge.
-    { left: 1760, top: 1690, right: 2360, bottom: 1790 },
-    { left: 2440, top: 1690, right: W, bottom: 1790 },
+    ...riverBlocks,
+    // The canal, except under the south street's bridge.
+    [CANAL[0], CANAL[1], CANAL[2], 47.2],
+    [CANAL[0], 48.8, CANAL[2], CANAL[3]],
   ],
 };
+
+/** A spot on the capital's grid as a location-map percentage. */
+export const capitalAt = (u: number, v: number) => isoPercent(CITY_CAPITAL_MAP, u, v);

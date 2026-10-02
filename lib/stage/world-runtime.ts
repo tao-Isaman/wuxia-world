@@ -13,7 +13,7 @@ import { createWorldLighting } from "./world-lighting";
 import { drawWorldBadge, warmWorldCharacter } from "./world-style";
 import { moveOnWorldGround, planWorldPath, worldFootprints, worldPointBlocked } from "./world-navigation";
 import { initialWorldPlacement } from "./world-placement";
-import { COMPOSED_GROUND_TILE_UNITS as GROUND_TILE_UNITS } from "../world/data/composed";
+import { COMPOSED_GROUND_TILE_UNITS as GROUND_TILE_UNITS, ISO_TILE_W } from "../world/data/composed";
 import { addGridFrames, canvasTexture, createStage, drawCanvas, stagePixelRatio, type Stage } from "./phaser-stage";
 import {
   WALK_TICK_UNITS, getRememberedMapPosition, rememberMapPosition, stepTowards,
@@ -87,6 +87,8 @@ export function createWorldRuntime(
   const bounds = { width: WIDTH, height: HEIGHT };
   const toWorld = (point: Point): Point => ({ x: point.x * WIDTH / 100, y: point.y * HEIGHT / 100 });
   const toPercent = (point: Point): Point => ({ x: point.x / WIDTH * 100, y: point.y / HEIGHT * 100 });
+  /** Actors' draw order: their feet line, corrected for isometric footprints on composed maps. */
+  const actorDepth = (point: Point, base: number) => composed ? composed.actorDepth(point, base) : base;
   const clampPosition = (point: Point): Point => ({ x: clamp(point.x, 12, WIDTH - 12), y: clamp(point.y, 18, HEIGHT - 12) });
   const footprints = worldFootprints(initial.key, initial.image);
   const placement = initialWorldPlacement(initial, getRememberedMapPosition(initial.key), footprints);
@@ -463,7 +465,12 @@ export function createWorldRuntime(
   function visibilityChanged() { if (document.hidden) loseFocus(); else lastTime = 0; }
   function motionChanged() { reducedMotion = motionQuery.matches; }
 
-  /** Tiled ground areas, then every asset as its own image, depth-sorted on its ground line like the actors. */
+  /**
+   * Isometric ground, then every asset as its own image. Each ground area is a
+   * tile sprite laid out on the grid unprojected, turned 45° inside a container
+   * squashed to half height, which is the 2:1 projection: the texture stays
+   * seamless and anchored to the grid across neighbouring areas.
+   */
   function drawComposed(map: NonNullable<WorldPresentation["composed"]>, images: Map<string, HTMLImageElement>) {
     const groundTexture = (material: string) => {
       const key = `ground:${material}`;
@@ -473,28 +480,36 @@ export function createWorldRuntime(
       }
       return key;
     };
-    const area = (material: string, x: number, y: number, w: number, h: number, depth: number) => {
-      // A 512 px texture covers GROUND_TILE_UNITS; the pattern is anchored to the world so neighbours line up.
-      const tile = scene!.add.tileSprite(x, y, w, h, groundTexture(material)).setOrigin(0, 0).setDepth(depth);
-      tile.setTileScale(GROUND_TILE_UNITS / 512, GROUND_TILE_UNITS / 512);
-      tile.setTilePosition((x % GROUND_TILE_UNITS) * 512 / GROUND_TILE_UNITS, (y % GROUND_TILE_UNITS) * 512 / GROUND_TILE_UNITS);
-    };
-    area(map.base, 0, 0, map.width, map.height, -3);
+    const texel = GROUND_TILE_UNITS / 512;
+    const base = scene!.add.tileSprite(0, 0, WIDTH, HEIGHT, groundTexture(map.base)).setOrigin(0, 0).setDepth(-3);
+    base.setTileScale(texel, texel * 0.5);
+    // One grid tile, unprojected, is a square ISO_TILE_W / √2 units on a side.
+    const side = ISO_TILE_W / Math.SQRT2;
+    const origin = map.toWorld(0, 0);
+    const plane = scene!.add.container(origin.x, origin.y).setScale(1, 0.5).setDepth(-2);
+    for (const area of map.ground) {
+      const x = area.u * side, y = area.v * side;
+      const tile = scene!.add.tileSprite((x - y) / Math.SQRT2, (x + y) / Math.SQRT2, area.w * side, area.h * side, groundTexture(area.material))
+        .setOrigin(0, 0).setRotation(Math.PI / 4);
+      tile.setTileScale(texel, texel);
+      tile.setTilePosition((x % GROUND_TILE_UNITS) / texel, (y % GROUND_TILE_UNITS) / texel);
+      plane.add(tile);
+    }
     const kerbs = scene!.add.graphics().setDepth(-1);
-    map.ground.forEach((ground, index) => {
-      area(ground.material, ground.x, ground.y, ground.w, ground.h, -2 + index * 0.001);
-      if (ground.edge) {
-        kerbs.lineStyle(3, 0x2b2318, 0.42).strokeRect(ground.x + 1.5, ground.y + 1.5, ground.w - 3, ground.h - 3);
-        kerbs.lineStyle(1, 0xe8d8b0, 0.18).strokeRect(ground.x + 4, ground.y + 4, ground.w - 8, ground.h - 8);
-      }
-    });
+    for (const area of map.ground) {
+      if (!area.edge) continue;
+      const corners = [map.toWorld(area.u, area.v), map.toWorld(area.u + area.w, area.v), map.toWorld(area.u + area.w, area.v + area.h), map.toWorld(area.u, area.v + area.h)];
+      kerbs.lineStyle(3, 0x2b2318, 0.38).beginPath().moveTo(corners[0].x, corners[0].y);
+      for (const corner of corners.slice(1)) kerbs.lineTo(corner.x, corner.y);
+      kerbs.closePath().strokePath();
+    }
     for (const sprite of map.sprites) {
       const source = images.get(sprite.src);
       if (!source) continue;
       const key = `asset:${sprite.src}`;
       if (!scene!.textures.exists(key)) canvasTexture(scene!, key, drawCanvas(source.width, source.height, (context) => context.drawImage(source, 0, 0)));
       scene!.add.image(sprite.left, sprite.top, key).setOrigin(0, 0).setDisplaySize(sprite.width, sprite.height)
-        .setFlipX(sprite.flip).setDepth(100 + sprite.depthY * 10);
+        .setFlipX(sprite.flip).setDepth(sprite.depth);
     }
   }
 
@@ -588,7 +603,7 @@ export function createWorldRuntime(
       const shadow = image(shadowKey, 1, 27, 10).setPosition(point.x, point.y);
       const id = characterId(bystander.characterId);
       const character = makeCharacter(`char:${id}`, atlases.get(id)!, bystander.size ?? 51);
-      character.image.setPosition(point.x, point.y).setDepth(100 + point.y * 10);
+      character.image.setPosition(point.x, point.y).setDepth(actorDepth(point, 100 + point.y * 10));
       shadow.setVisible(bystander.visible !== false);
       character.image.setVisible(bystander.visible !== false);
       bystanders.set(bystander.id, { shadow, character });
@@ -606,7 +621,7 @@ export function createWorldRuntime(
         const unique = uniqueAtlases.get(marker.id);
         const id = npcCharacterId(marker.id);
         character = unique ? makeCharacter(`unique:${marker.id}`, unique, UNIQUE_NPC_SIZE) : makeCharacter(`char:${id}`, atlases.get(id)!, 54);
-        character.image.setPosition(point.x, point.y).setDepth(100 + point.y * 10);
+        character.image.setPosition(point.x, point.y).setDepth(actorDepth(point, 100 + point.y * 10));
         if (!unique && (hasAnimatedSheet(id) || marker.wander) && character.directional) wanderers.set(marker.id, createWanderer(marker.id, point));
       } else {
         const key = marker.kind === "exit" ? exitBadge : texture(markerBadge(marker.kind, marker.badge ?? marker.icon), "badge");
@@ -689,7 +704,7 @@ export function createWorldRuntime(
     actor.shadow.setPosition(position.x, position.y);
     actor.ring.setPosition(position.x, position.y);
     actor.sign.setPosition(position.x, position.y - 57);
-    player.image.setPosition(position.x, position.y).setDepth(101 + position.y * 10);
+    player.image.setPosition(position.x, position.y).setDepth(actorDepth(position, 101 + position.y * 10));
     const nextMotion = moving ? "walk" : "idle";
     if (playerMotion !== nextMotion) { playerMotion = nextMotion; motionTime = 0; }
     let frame: number;
@@ -806,7 +821,7 @@ export function createWorldRuntime(
           const idleFrame = reducedMotion ? idle.frames[0] : idle.frames[Math.floor((animationTime + visual.phase) * idle.fps) % idle.frames.length];
           setCharacterFrame(visual.character, idleFrame, distance < 90 ? position.x < point.x : visual.character.facingLeft);
         }
-        visual.character.image.setPosition(point.x, point.y).setDepth(100 + point.y * 10);
+        visual.character.image.setPosition(point.x, point.y).setDepth(actorDepth(point, 100 + point.y * 10));
       }
       const opacity = marker.disabled ? 0.5 : 1;
       if (visual.opacity !== opacity) {
@@ -868,6 +883,8 @@ export function createWorldRuntime(
         const held = (key: string) => keys.has(key) ? 1 : 0;
         let dx = held("KeyD") + held("ArrowRight") - held("KeyA") - held("ArrowLeft");
         let dy = held("KeyS") + held("ArrowDown") - held("KeyW") - held("ArrowUp");
+        // On the isometric grid a diagonal key press follows the streets (2:1), not 45°.
+        if (composed && dx && dy) dy *= 0.5;
         // The joystick is analog: a small push walks slowly, a full push at full speed.
         let pace = 1;
         const push = stick ? Math.hypot(stick.x, stick.y) : 0;

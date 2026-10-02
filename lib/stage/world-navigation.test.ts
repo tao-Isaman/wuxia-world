@@ -6,6 +6,7 @@ import {
 import { probeWorldMap, type ProbeMarker } from "./world-map-probe";
 import { getLocationMap } from "../world/data/location-maps";
 import { AUTO_MAP_IDS } from "../world/data/auto-map-ids";
+import { composedMapFor, isoToWorld, worldToIso } from "../world/data/composed";
 
 const home = worldFootprints("home_player", "/maps/home_player.png");
 const capitalComposed = worldFootprints("city_capital", "composed:city_capital");
@@ -50,27 +51,36 @@ test("the authored home exit approaches through the opening between its posts", 
   assert.deepEqual(path.at(-1), { x: 451.2, y: 566.8 });
 });
 
+// Capital spots are authored on its isometric grid.
+const capital = composedMapFor("composed:city_capital")!;
+const at = (u: number, v: number) => isoToWorld(capital, u, v);
+const walk = (from: [number, number], to: [number, number]) => {
+  const a = at(...from), b = at(...to);
+  const end = moveOnWorldGround(a, { x: b.x - a.x, y: b.y - a.y }, capitalComposed, capitalBounds);
+  return worldToIso(capital, end.x, end.y);
+};
+
 test("the composed capital: walls, the river and buildings block; gates, bridges and streets stay open", () => {
-  // Shop fronts on the craftsmen's street stop a walk north; the south avenue between them is open.
-  const shopWall = moveOnWorldGround({ x: 1260, y: 1520 }, { x: 0, y: -260 }, capitalComposed, capitalBounds);
-  assert.ok(shopWall.y > 1400 && shopWall.y < 1520);
-  const avenue = moveOnWorldGround({ x: 1536, y: 1520 }, { x: 0, y: -400 }, capitalComposed, capitalBounds);
-  assert.ok(Math.abs(avenue.y - 1120) < 0.001);
-  // The river blocks a walk south except on the bridge.
-  const river = moveOnWorldGround({ x: 2600, y: 1660 }, { x: 0, y: 200 }, capitalComposed, capitalBounds);
-  assert.ok(river.y < 1690);
-  const bridge = moveOnWorldGround({ x: 2400, y: 1660 }, { x: 0, y: 200 }, capitalComposed, capitalBounds);
-  assert.ok(bridge.y > 1790);
-  // The north wall stops a walk out, except through a gate's arch.
-  const wall = moveOnWorldGround({ x: 600, y: 360 }, { x: 0, y: -300 }, capitalComposed, capitalBounds);
-  assert.ok(wall.y > 260);
-  const gate = moveOnWorldGround({ x: 860, y: 360 }, { x: 0, y: -300 }, capitalComposed, capitalBounds);
-  assert.ok(gate.y < 100);
+  // The river stops a walk along v from the market quay, but the street's bridge crosses it.
+  const river = walk([20, 36.5], [20, 44]);
+  assert.ok(river.v < 38);
+  const bridge = walk([10, 36.5], [10, 44]);
+  assert.ok(bridge.v > 43.5);
+  // The NE wall stops a walk out of the city, except through a gate's passage.
+  const wall = walk([20, 6], [20, 0.5]);
+  assert.ok(wall.v > 3);
+  const gate = walk([34, 6], [34, 0.5]);
+  assert.ok(gate.v < 1);
+  // The inn's walls stop a walk off the south street into it; its street stays open.
+  const inn = walk([38, 48], [38, 41.5]);
+  assert.ok(inn.v > 45.5);
+  const street = walk([34, 48], [34, 42]);
+  assert.ok(street.v < 42.5);
 });
 
 test("the composed capital: long walks across the city find clear routes quickly", () => {
-  const spawn = { x: 1536, y: 1597 };
-  const destinations = [{ x: 860, y: 123 }, { x: 123, y: 819 }, { x: 2918, y: 1270 }, { x: 2857, y: 1840 }, { x: 307, y: 1802 }, { x: 1536, y: 1966 }];
+  const spawn = at(50, 57.5);
+  const destinations = [at(10, 5.4), at(5.4, 28), at(5.4, 48), at(59.6, 16), at(24, 59), at(34, 5.4), at(15.5, 24.2)];
   const started = performance.now();
   for (const destination of destinations) {
     const path = planWorldPath(spawn, destination, capitalComposed, capitalBounds);

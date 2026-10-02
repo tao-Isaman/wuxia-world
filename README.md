@@ -39,7 +39,7 @@ What each suite covers and how to run e2e: [docs/testing.md](docs/testing.md). E
 
 | | |
 | --- | --- |
-| **World** | 101 places (96 on the world map), joined by 128 hand-named roads; 99 painted maps and a walled capital built from assets, all with collision; day and night on a 12-ชั่วยาม clock |
+| **World** | 101 places (96 on the world map), joined by 128 hand-named roads; 99 painted maps and an isometric walled capital built from assets, all with collision; day and night on a 12-ชั่วยาม clock |
 | **People** | 225 NPCs with portraits and sprites, some strolling about their spot, each with gift tastes; 20 of them (the sect masters) age, train, feud and die in a weekly background simulation |
 | **Quests** | 867 quests: 1 main, 526 side (97 sect quests and 154 lineage quests that pass on every sect skill and art up to tier 3) and 340 story chapters, with item, kill, visit, objective and dialog stages; any quest can be tracked, with a HUD tracker and a map arrow |
 | **Story sagas** | 38 sagas of 8–10 chapters, one per tier-4 sect skill or art, retelling legends of มังกรหยก ภาค 3 with 292 cutscenes played on the painted maps |

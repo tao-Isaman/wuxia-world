@@ -84,8 +84,8 @@ bun scripts/build-hero-walk8.ts --from <dir>   # the heroes' painted 8-direction
 bun scripts/smoke-liveness.ts           # 90-day NPC simulation smoke test
 bun scripts/build-world-coords.ts       # each place's world-map spot (exit / road directions); rerun after adding a place or road
 bun scripts/build-route-variants.ts --from <dir>   # import the 56 directional road paintings (<type>-<dir8>.png)
-bun scripts/build-composed-assets.ts --from <dir>  # cut out composed-map art + seamless ground textures (public/maps/composed/)
-bun scripts/render-composed-map.ts <id> <out> [--bases] [--markers]   # picture of a composed map (also its overview)
+bun scripts/build-composed-assets.ts --from <dir> [--measure]  # cut out isometric composed-map art + seamless ground textures (public/maps/composed/)
+bun scripts/render-composed-map.ts <id> <out> [--bases] [--markers] [--overview]   # picture of a composed map (or its overview)
 ```
 
 **Do not run:**
@@ -276,7 +276,7 @@ Two deliberate exceptions reach into stores:
   - It publishes `data-*` attributes (`data-ready`, `data-player-x/y/frame/motion/facing`, `data-nearby-marker`, `data-guide-marker`, `data-visible-props`…) for tests.
 - **Battle runtime.** `grid-battle-runtime.ts` draws the board in 2.5D and plays `state.events`: walk 180 ms per tile, casts with VFX and SFX, damage numbers. It calls `battleStore.step()` about 350 ms after playback idles. Skill VFX come from `cast-vfx.ts` (pure) and `battle-vfx.ts`; skill sounds from `lib/audio/cast-sfx.ts`, using the same profile.
 - **Directions.** Travel follows the world-map compass (`lib/world/compass.ts`, `data/world-coords.ts`). Exits sit on the map edge facing their destination (`assignSlotsByBearing`); a road runs the way its exit faces (`routeDirection`, 8 ways, painting `/maps/routes/<type>-<dir>.webp`, region graded at load by `lib/stage/route-grade.ts`); arriving puts the hero beside the exit back (`setArrivalFrom` hints in `lib/stage/types.ts`).
-- **Composed maps.** The capital is built from assets (`lib/world/data/composed/`, image `composed:city_capital`): 3072 × 2048 units, walled, with tiled ground and depth-sorted buildings the hero walks behind. The camera zooms in close (about 240 units tall); big maps path on a grid. Dialog backdrops and cutscenes use its overview picture (`mapBackdrop`). See [docs/rendering.md](docs/rendering.md#composed-maps).
+- **Composed maps.** The capital is built from isometric assets (`lib/world/data/composed/`, image `composed:city_capital`): a 64 × 64 tile grid (2:1, tile 64 × 32 units; `isoToWorld`, `isoPercent`), 4096 × 2208 units, walled after the Lin'an plan. Assets have tile footprints that become `poly` collision; actors sort past the footprints they stand in front of (`composedActorDepth`). The camera zooms in close (about 240 units tall); big maps path on a grid. Dialog backdrops and cutscenes use its overview picture (`mapBackdrop`). See [docs/rendering.md](docs/rendering.md#composed-maps).
 - **Collision.** `world-navigation.ts` (+ `world-footprints-data.ts`) covers all 99 painted maps and the composed capital; `test:navigation` probes every map.
 - **Rules.** Never put Phaser objects in stores or saves. Don't enable Phaser input. Respect `prefers-reduced-motion`. New popups are `Modal`s, so the map pauses by itself.
 

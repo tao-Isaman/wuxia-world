@@ -90,9 +90,10 @@ Real behaviour today, found during the docs audit. Each is small and self-contai
 
 ### The composed capital
 
-- **Three planned pieces are missing** (the image credits ran out): `flag_pole`, `pond` and `haystack` (lantern posts, a rock garden and crates stand in). The cobble texture is a grey derivative of the paving. Generate them, rerun `build-composed-assets.ts`, and swap them into `city_capital.ts`.
-- **Three-quarter, not isometric.** The reference game's streets run diagonally (isometric); every map here, the capital included, keeps the straight three-quarter view of the existing art.
-- **One city so far.** The other 99 locations are still 960 × 640 paintings with the old cover-fit camera.
+- **One city so far.** The other 99 locations are still 960 × 640 paintings with the old cover-fit camera and three-quarter view; only the capital is isometric.
+- **Footprints are eyeballed.** Each asset's `tiles` come from `--measure` plus a look at `render-composed-map.ts --bases`; a few roofs overhang their solids or stand a little off them, and stairs or statues in front of a hall are inside its footprint.
+- **Ground edges are straight.** Ground areas meet along hard diamond edges with a kerb line; there is no blending between materials.
+- **The overview is stretched** from the map's 1.86:1 to 960 × 640 for dialog backdrops and cutscenes.
 
 ### Places
 

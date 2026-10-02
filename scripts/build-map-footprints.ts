@@ -8,11 +8,13 @@ import type { WorldFootprint } from "../lib/stage/world-navigation";
 
 const dir = process.argv[2];
 if (!dir) throw new Error("usage: bun scripts/build-map-footprints.ts <dir>");
-const round = (f: WorldFootprint): WorldFootprint => f.kind === "rect"
+/** Painted maps use rectangles and ellipses only. */
+type PaintedFootprint = Exclude<WorldFootprint, { kind: "poly" }>;
+const round = (f: PaintedFootprint): PaintedFootprint => f.kind === "rect"
   ? { kind: "rect", left: Math.round(f.left), top: Math.round(f.top), right: Math.round(f.right), bottom: Math.round(f.bottom) }
   : { kind: "ellipse", x: Math.round(f.x), y: Math.round(f.y), radiusX: Math.round(f.radiusX), radiusY: Math.round(f.radiusY) };
 const entries = readdirSync(dir).filter((f) => f.endsWith(".json")).sort().map((file) => {
-  const shapes = (JSON.parse(readFileSync(`${dir}/${file}`, "utf8")) as WorldFootprint[]).map(round);
+  const shapes = (JSON.parse(readFileSync(`${dir}/${file}`, "utf8")) as PaintedFootprint[]).map(round);
   for (const s of shapes) if (s.kind === "rect" ? !(s.right > s.left && s.bottom > s.top) : !(s.radiusX > 0 && s.radiusY > 0)) throw new Error(`${file}: degenerate shape`);
   const body = shapes.map((s) => s.kind === "rect"
     ? `    { kind: "rect", left: ${s.left}, top: ${s.top}, right: ${s.right}, bottom: ${s.bottom} },`

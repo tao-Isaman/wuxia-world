@@ -5,7 +5,7 @@ import { getLocationMap } from "../world/data/location-maps";
 import type { CastMember, CutsceneBeat, CutsceneDef, CutsceneFx, CutsceneMood, StagePoint } from "../world/story/types";
 import { addGridFrames, canvasTexture, createStage, drawCanvas, type Stage } from "./phaser-stage";
 import { nearestWorldGround, worldFootprints, type WorldFootprint } from "./world-navigation";
-import { composedFootprints, composedMapFor, mapBackdrop } from "../world/data/composed";
+import { composedFootprints, composedMapFor, isoSize, mapBackdrop } from "../world/data/composed";
 import { warmWorldCharacter } from "./world-style";
 
 /**
@@ -24,6 +24,7 @@ const HEIGHT = 640;
 function scaleFootprints(footprints: readonly WorldFootprint[], sx: number, sy: number): WorldFootprint[] {
   return footprints.map((f) => f.kind === "rect"
     ? { kind: "rect", left: f.left * sx, right: f.right * sx, top: f.top * sy, bottom: f.bottom * sy }
+    : f.kind === "poly" ? { kind: "poly", points: f.points.map((p) => ({ x: p.x * sx, y: p.y * sy })) }
     : { kind: "ellipse", x: f.x * sx, y: f.y * sy, radiusX: f.radiusX * sx, radiusY: f.radiusY * sy });
 }
 const STEP_X = 26;
@@ -95,7 +96,7 @@ export function createCutsceneRuntime(parent: HTMLElement, def: CutsceneDef, opt
   // A composed (asset-built) stage plays on its 960 × 640 overview picture, its solids scaled to match.
   const composed = map ? composedMapFor(map.image) : undefined;
   const footprints = !map ? [] : composed
-    ? scaleFootprints(composedFootprints(composed), WIDTH / composed.width, HEIGHT / composed.height)
+    ? scaleFootprints(composedFootprints(composed), WIDTH / isoSize(composed).width, HEIGHT / isoSize(composed).height)
     : worldFootprints(def.stage, map.image);
   const anchorPct = (def.around && map?.npcSpots?.[def.around]) || map?.spawn || { x: 50, y: 55 };
   const anchor = { x: anchorPct.x * WIDTH / 100, y: anchorPct.y * HEIGHT / 100 };

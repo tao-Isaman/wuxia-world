@@ -1,5 +1,5 @@
 import type { ComposedPresentation } from "./types";
-import { composedLamps, composedMapFor, composedSprites } from "../world/data/composed";
+import { composedActorDepth, composedLamps, composedMapFor, composedSprites, isoSize, isoToWorld } from "../world/data/composed";
 
 const cache = new Map<string, ComposedPresentation>();
 
@@ -10,12 +10,15 @@ export function composedPresentation(image: string): ComposedPresentation | unde
   const cached = cache.get(map.id);
   if (cached) return cached;
   const presentation: ComposedPresentation = {
-    width: map.width,
-    height: map.height,
+    ...isoSize(map),
+    columns: map.columns,
+    rows: map.rows,
+    toWorld: (u, v) => isoToWorld(map, u, v),
     base: map.base,
     ground: map.ground,
-    sprites: composedSprites(map).map(({ src, left, top, width, height, depthY, flip }) => ({ src, left, top, width, height, depthY, flip })),
+    sprites: composedSprites(map).map(({ src, left, top, width, height, depth, flip }) => ({ src, left, top, width, height, depth, flip })),
     lamps: composedLamps(map),
+    actorDepth: composedActorDepth(map),
   };
   cache.set(map.id, presentation);
   return presentation;

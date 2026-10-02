@@ -32,10 +32,16 @@ export interface WorldMarker extends Point {
 export interface ComposedPresentation {
   width: number;
   height: number;
+  /** The isometric grid (tiles) and its projection: grid point → world point. */
+  columns: number;
+  rows: number;
+  toWorld: (u: number, v: number) => Point;
   base: string;
-  ground: readonly { material: string; x: number; y: number; w: number; h: number; edge?: boolean }[];
-  sprites: readonly { src: string; left: number; top: number; width: number; height: number; depthY: number; flip: boolean }[];
+  ground: readonly { material: string; u: number; v: number; w: number; h: number; edge?: boolean }[];
+  sprites: readonly { src: string; left: number; top: number; width: number; height: number; depth: number; flip: boolean }[];
   lamps: readonly (readonly [number, number])[];
+  /** Draw order for an actor at a point, given its plain feet-line order. */
+  actorDepth: (point: Point, base: number) => number;
 }
 
 export interface WorldPresentation {
