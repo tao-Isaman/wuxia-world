@@ -13,7 +13,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **What the player does:**
 
-- Explores 101 places (100 painted maps) joined by 128 roads.
+- Explores 101 places (99 painted maps and a walled capital built from assets) joined by 128 roads.
 - Meets 225 NPCs and takes 867 quests: 373 hand-written, 154 sect lineage quests and 38 story sagas (340 chapters) with 292 cutscenes.
 - Joins one of 15 sects and learns 178 move skills and 122 inner arts.
 - Gathers and crafts (19 life skills).
@@ -84,6 +84,8 @@ bun scripts/build-hero-walk8.ts --from <dir>   # the heroes' painted 8-direction
 bun scripts/smoke-liveness.ts           # 90-day NPC simulation smoke test
 bun scripts/build-world-coords.ts       # each place's world-map spot (exit / road directions); rerun after adding a place or road
 bun scripts/build-route-variants.ts --from <dir>   # import the 56 directional road paintings (<type>-<dir8>.png)
+bun scripts/build-composed-assets.ts --from <dir>  # cut out composed-map art + seamless ground textures (public/maps/composed/)
+bun scripts/render-composed-map.ts <id> <out> [--bases] [--markers]   # picture of a composed map (also its overview)
 ```
 
 **Do not run:**
@@ -274,7 +276,8 @@ Two deliberate exceptions reach into stores:
   - It publishes `data-*` attributes (`data-ready`, `data-player-x/y/frame/motion/facing`, `data-nearby-marker`, `data-guide-marker`, `data-visible-props`…) for tests.
 - **Battle runtime.** `grid-battle-runtime.ts` draws the board in 2.5D and plays `state.events`: walk 180 ms per tile, casts with VFX and SFX, damage numbers. It calls `battleStore.step()` about 350 ms after playback idles. Skill VFX come from `cast-vfx.ts` (pure) and `battle-vfx.ts`; skill sounds from `lib/audio/cast-sfx.ts`, using the same profile.
 - **Directions.** Travel follows the world-map compass (`lib/world/compass.ts`, `data/world-coords.ts`). Exits sit on the map edge facing their destination (`assignSlotsByBearing`); a road runs the way its exit faces (`routeDirection`, 8 ways, painting `/maps/routes/<type>-<dir>.webp`, region graded at load by `lib/stage/route-grade.ts`); arriving puts the hero beside the exit back (`setArrivalFrom` hints in `lib/stage/types.ts`).
-- **Collision.** `world-navigation.ts` (+ `world-footprints-data.ts`) covers all 100 painted maps; `test:navigation` probes every map.
+- **Composed maps.** The capital is built from assets (`lib/world/data/composed/`, image `composed:city_capital`): 3072 × 2048 units, walled, with tiled ground and depth-sorted buildings the hero walks behind. The camera zooms in close (about 240 units tall); big maps path on a grid. Dialog backdrops and cutscenes use its overview picture (`mapBackdrop`). See [docs/rendering.md](docs/rendering.md#composed-maps).
+- **Collision.** `world-navigation.ts` (+ `world-footprints-data.ts`) covers all 99 painted maps and the composed capital; `test:navigation` probes every map.
 - **Rules.** Never put Phaser objects in stores or saves. Don't enable Phaser input. Respect `prefers-reduced-motion`. New popups are `Modal`s, so the map pauses by itself.
 
 ## UI and theme

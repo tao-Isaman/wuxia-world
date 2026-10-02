@@ -24,20 +24,6 @@ export function worldFootprints(key: string, image: string): readonly WorldFootp
     { kind: "rect", left: 432, top: 493, right: 448, bottom: 546 },
     { kind: "rect", left: 508, top: 478, right: 529, bottom: 530 },
   ];
-  if (key === "city_capital" && image === "/maps/city_capital.png") return [
-    // Wall footprints, not roof overhangs: narrow authored alleys remain passable.
-    { kind: "rect", left: 151, top: 415, right: 260, bottom: 483 },
-    { kind: "rect", left: 280, top: 415, right: 380, bottom: 480 },
-    { kind: "rect", left: 404, top: 414, right: 506, bottom: 480 },
-    { kind: "rect", left: 529, top: 415, right: 630, bottom: 481 },
-    { kind: "rect", left: 650, top: 417, right: 730, bottom: 481 },
-    { kind: "rect", left: 755, top: 418, right: 850, bottom: 482 },
-    { kind: "ellipse", x: 477, y: 315, radiusX: 15, radiusY: 11 },
-    { kind: "rect", left: 286, top: 319, right: 400, bottom: 352 },
-    { kind: "rect", left: 548, top: 319, right: 654, bottom: 354 },
-    { kind: "rect", left: 363, top: 245, right: 450, bottom: 283 },
-    { kind: "rect", left: 517, top: 239, right: 610, bottom: 274 },
-  ];
   if (key === "jail" && image === "/maps/jail.png") return [
     // Cell block, side walls and the south wall either side of the gate.
     { kind: "rect", left: 0, top: 0, right: 960, bottom: 196 },

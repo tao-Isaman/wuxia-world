@@ -11,7 +11,7 @@
  * public/maps/composed/<asset>.webp; their pixel sizes go to
  * lib/world/data/composed/asset-pixels.ts. Ground textures are made seamless
  * (blended with a half-wrapped copy of themselves so every edge continues the
- * opposite one) → public/maps/composed/ground/<material>.webp, 512 px for 256 units.
+ * opposite one) → public/maps/composed/ground/<material>.webp, 512 px per COMPOSED_GROUND_TILE_UNITS.
  * The painted sources are not kept in the repo.
  */
 import sharp from "sharp";
@@ -50,7 +50,7 @@ ${Object.keys(pixels).sort().map((id) => `  "${id}": [${pixels[id][0]}, ${pixels
 
 let grounds = 0;
 const TILE = 512;
-for (const material of ["paving", "plaza", "dirt", "grass", "water"]) {
+for (const material of ["paving", "plaza", "dirt", "grass", "water", "cobble"]) {
   const source = `${from}/g_${material}.png`;
   if (!existsSync(source)) continue;
   const { data } = await sharp(source).resize(TILE, TILE, { fit: "cover" }).removeAlpha().raw().toBuffer({ resolveWithObject: true });

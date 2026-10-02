@@ -13,6 +13,7 @@ import { createWorldLighting } from "./world-lighting";
 import { drawWorldBadge, warmWorldCharacter } from "./world-style";
 import { moveOnWorldGround, planWorldPath, worldFootprints, worldPointBlocked } from "./world-navigation";
 import { initialWorldPlacement } from "./world-placement";
+import { COMPOSED_GROUND_TILE_UNITS as GROUND_TILE_UNITS } from "../world/data/composed";
 import { addGridFrames, canvasTexture, createStage, drawCanvas, stagePixelRatio, type Stage } from "./phaser-stage";
 import {
   WALK_TICK_UNITS, getRememberedMapPosition, rememberMapPosition, stepTowards,
@@ -21,9 +22,9 @@ import {
 
 const SPEED = 150;
 /** Composed (asset-built) maps zoom in: about this many world units stay in view vertically… */
-const COMPOSED_VIEW_HEIGHT = 420;
+const COMPOSED_VIEW_HEIGHT = 240;
 /** …but never fewer than this many across (portrait phones). */
-const COMPOSED_VIEW_WIDTH = 300;
+const COMPOSED_VIEW_WIDTH = 200;
 const LOAD_TIMEOUT = 20_000;
 // Unique NPC sprites are ~74 native px tall; this frame/size pair gives them the
 // same on-screen height as the archetype sheets (54 units × 108/128 of a frame).
@@ -32,8 +33,6 @@ const UNIQUE_FEET = 78;
 const UNIQUE_NPC_SIZE = 50;
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
-/** World units covered by one 512 px ground texture tile on composed maps. */
-const GROUND_TILE_UNITS = 256;
 const groundSrc = (material: string) => `/maps/composed/ground/${material}.webp`;
 
 export function worldInputBlocked(): boolean {
@@ -475,7 +474,7 @@ export function createWorldRuntime(
       return key;
     };
     const area = (material: string, x: number, y: number, w: number, h: number, depth: number) => {
-      // 512 px textures cover 256 units; the pattern is anchored to the world so neighbours line up.
+      // A 512 px texture covers GROUND_TILE_UNITS; the pattern is anchored to the world so neighbours line up.
       const tile = scene!.add.tileSprite(x, y, w, h, groundTexture(material)).setOrigin(0, 0).setDepth(depth);
       tile.setTileScale(GROUND_TILE_UNITS / 512, GROUND_TILE_UNITS / 512);
       tile.setTilePosition((x % GROUND_TILE_UNITS) * 512 / GROUND_TILE_UNITS, (y % GROUND_TILE_UNITS) * 512 / GROUND_TILE_UNITS);

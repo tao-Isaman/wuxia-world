@@ -5,15 +5,18 @@
  * walks in; a composed map can be much larger than the 960 × 640 paintings.
  */
 
+/** A solid footprint as fractions of the sprite box (0 = left / top, 1 = right / bottom). */
+export interface AssetBase { left: number; right: number; top: number; bottom: number; shape?: "rect" | "ellipse" }
+
 /** One reusable piece of art (public/maps/composed/<id>.webp). */
 export interface ComposedAssetDef {
   /** World width of the sprite; its height follows the image's aspect. */
   width: number;
   /**
-   * The solid base, as fractions of the sprite box (0 = left / top, 1 = right / bottom).
-   * Omitted: the asset is walk-through (flowers, lanterns in a row…).
+   * The solid base (one footprint, or several — a gate's two piers either side
+   * of its arch). Omitted: the asset is walk-through (lanterns…).
    */
-  base?: { left: number; right: number; top: number; bottom: number; shape?: "rect" | "ellipse" };
+  base?: AssetBase | readonly AssetBase[];
   /** Where the asset meets the ground, as a fraction of its height (default: the base's bottom, else 0.95). */
   ground?: number;
 }
@@ -27,6 +30,8 @@ export interface ComposedObject {
   scale?: number;
   /** Mirror left↔right. */
   flip?: boolean;
+  /** Extra vertical stretch (a north–south wall piece fitted to its run). */
+  stretch?: number;
 }
 
 /** A rectangle of tiled ground (drawn in order, later areas on top). */
@@ -40,7 +45,7 @@ export interface GroundArea {
   edge?: boolean;
 }
 
-export type GroundMaterial = "paving" | "plaza" | "dirt" | "grass" | "water";
+export type GroundMaterial = "paving" | "plaza" | "dirt" | "grass" | "water" | "cobble";
 
 export interface ComposedMap {
   id: string;

@@ -8,7 +8,8 @@ import { getLocationMap } from "../world/data/location-maps";
 import { AUTO_MAP_IDS } from "../world/data/auto-map-ids";
 
 const home = worldFootprints("home_player", "/maps/home_player.png");
-const capital = worldFootprints("city_capital", "/maps/city_capital.png");
+const capitalComposed = worldFootprints("city_capital", "composed:city_capital");
+const capitalBounds = worldBounds("composed:city_capital");
 
 test("walking straight through the home well stops at its footprint", () => {
   const result = moveOnWorldGround({ x: 440, y: 337 }, { x: 160, y: 0 }, home);
@@ -49,51 +50,35 @@ test("the authored home exit approaches through the opening between its posts", 
   assert.deepEqual(path.at(-1), { x: 451.2, y: 566.8 });
 });
 
-test("capital storefront walls block north input and leave authored alleys accessible", () => {
-  const blocked = moveOnWorldGround({ x: 480, y: 499 }, { x: 0, y: -220 }, capital);
-  assert.ok(blocked.y >= 486 && blocked.y < 499);
-  const alley = moveOnWorldGround({ x: 392, y: 499 }, { x: 0, y: -130 }, capital);
-  assert.ok(Math.abs(alley.y - 369) < 0.001);
+test("the composed capital: walls, the river and buildings block; gates, bridges and streets stay open", () => {
+  // Shop fronts on the craftsmen's street stop a walk north; the south avenue between them is open.
+  const shopWall = moveOnWorldGround({ x: 1260, y: 1520 }, { x: 0, y: -260 }, capitalComposed, capitalBounds);
+  assert.ok(shopWall.y > 1400 && shopWall.y < 1520);
+  const avenue = moveOnWorldGround({ x: 1536, y: 1520 }, { x: 0, y: -400 }, capitalComposed, capitalBounds);
+  assert.ok(Math.abs(avenue.y - 1120) < 0.001);
+  // The river blocks a walk south except on the bridge.
+  const river = moveOnWorldGround({ x: 2600, y: 1660 }, { x: 0, y: 200 }, capitalComposed, capitalBounds);
+  assert.ok(river.y < 1690);
+  const bridge = moveOnWorldGround({ x: 2400, y: 1660 }, { x: 0, y: 200 }, capitalComposed, capitalBounds);
+  assert.ok(bridge.y > 1790);
+  // The north wall stops a walk out, except through a gate's arch.
+  const wall = moveOnWorldGround({ x: 600, y: 360 }, { x: 0, y: -300 }, capitalComposed, capitalBounds);
+  assert.ok(wall.y > 260);
+  const gate = moveOnWorldGround({ x: 860, y: 360 }, { x: 0, y: -300 }, capitalComposed, capitalBounds);
+  assert.ok(gate.y < 100);
 });
 
-test("NPC interaction can detour from the south gate through an alley", () => {
-  const start = { x: 480, y: 499.2 };
-  const physician = { x: 336, y: 381.2 };
-  const path = planWorldPath(start, physician, capital);
-  assert.ok(path.length > 1);
-  assert.deepEqual(path.at(-1), physician);
-  let previous = start;
-  for (const point of path) { assert.equal(worldSegmentClear(previous, point, capital), true); previous = point; }
-});
-
-test("service points painted on shop walls resolve to reachable ground by the entrance", () => {
-  const start = { x: 480, y: 499.2 };
-  for (const x of [201.6, 336, 451.2, 576, 691.2, 796.8]) {
-    const path = planWorldPath(start, { x, y: 470.8 }, capital);
-    assert.ok(path.length > 0);
-    assert.ok(path.at(-1)!.y >= 486);
-    assert.equal(worldPointBlocked(path.at(-1)!, capital), false);
+test("the composed capital: long walks across the city find clear routes quickly", () => {
+  const spawn = { x: 1536, y: 1597 };
+  const destinations = [{ x: 860, y: 123 }, { x: 123, y: 819 }, { x: 2918, y: 1270 }, { x: 2857, y: 1840 }, { x: 307, y: 1802 }, { x: 1536, y: 1966 }];
+  const started = performance.now();
+  for (const destination of destinations) {
+    const path = planWorldPath(spawn, destination, capitalComposed, capitalBounds);
+    assert.ok(path.length > 0, `a route to ${destination.x},${destination.y}`);
+    for (const point of path) assert.equal(worldPointBlocked(point, capitalComposed), false);
+    assert.ok(Math.hypot(path.at(-1)!.x - destination.x, path.at(-1)!.y - destination.y) < 40);
   }
-});
-
-test("both lower market stalls block movement through their tables", () => {
-  for (const x of [336, 595]) {
-    const result = moveOnWorldGround({ x, y: 380 }, { x: 0, y: -100 }, capital);
-    assert.ok(result.y >= 358);
-    assert.equal(worldPointBlocked(result, capital), false);
-  }
-});
-
-test("a circuit around the capital well, stalls, and shop row has clear connected routes", () => {
-  const circuit = [{ x: 480, y: 499.2 }, { x: 392, y: 390 }, { x: 425, y: 355 },
-    { x: 425, y: 295 }, { x: 500, y: 290 }, { x: 665, y: 325 }, { x: 665, y: 390 }, { x: 480, y: 499.2 }];
-  for (let index = 1; index < circuit.length; index++) {
-    const path = planWorldPath(circuit[index - 1], circuit[index], capital);
-    assert.ok(path.length > 0);
-    assert.deepEqual(path.at(-1), circuit[index]);
-    let previous = circuit[index - 1];
-    for (const point of path) { assert.equal(worldSegmentClear(previous, point, capital), true); previous = point; }
-  }
+  assert.ok(performance.now() - started < 2000, "routes across the city stay fast");
 });
 
 test("old positions inside authored objects recover to free ground; unmapped worlds stay open", () => {

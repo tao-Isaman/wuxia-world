@@ -8,7 +8,7 @@
  * NPCs (blue), exits (green) and services (yellow) and the spawn (white).
  */
 import sharp from "sharp";
-import { COMPOSED_MAPS, COMPOSED_PREFIX, composedFootprints, composedSprites } from "../lib/world/data/composed";
+import { COMPOSED_GROUND_TILE_UNITS, COMPOSED_MAPS, COMPOSED_PREFIX, composedFootprints, composedSprites } from "../lib/world/data/composed";
 import { getLocationMap } from "../lib/world/data/location-maps";
 
 const [id, outFile] = process.argv.slice(2);
@@ -19,14 +19,18 @@ const S = scaleArg > 0 ? Number(process.argv[scaleArg + 1]) : 0.5;
 const W = Math.round(map.width * S), H = Math.round(map.height * S);
 
 const tile = async (material: string) => {
-  const size = Math.max(1, Math.round(256 * S));
+  const size = Math.max(1, Math.round(COMPOSED_GROUND_TILE_UNITS * S));
   return sharp(`public/maps/composed/ground/${material}.webp`).resize(size, size).png().toBuffer();
 };
 const layers: sharp.OverlayOptions[] = [];
 const fill = async (material: string, x: number, y: number, w: number, h: number) => {
   const t = await tile(material);
-  const area = await sharp({ create: { width: Math.max(1, Math.round(w * S)), height: Math.max(1, Math.round(h * S)), channels: 4, background: "#0000" } })
+  const size = Math.max(1, Math.round(COMPOSED_GROUND_TILE_UNITS * S));
+  const aw = Math.max(1, Math.round(w * S)), ah = Math.max(1, Math.round(h * S));
+  // Tile a canvas of whole tiles, then crop it to the area.
+  const full = await sharp({ create: { width: Math.ceil(aw / size) * size, height: Math.ceil(ah / size) * size, channels: 4, background: "#0000" } })
     .composite([{ input: t, tile: true, left: 0, top: 0 }]).png().toBuffer();
+  const area = await sharp(full).extract({ left: 0, top: 0, width: aw, height: ah }).png().toBuffer();
   layers.push({ input: area, left: Math.round(x * S), top: Math.round(y * S) });
 };
 await fill(map.base, 0, 0, map.width, map.height);
@@ -34,7 +38,16 @@ for (const area of map.ground) await fill(area.material, area.x, area.y, area.w,
 for (const sprite of composedSprites(map).sort((a, b) => a.depthY - b.depthY)) {
   let img = sharp(`public${sprite.src}`).resize(Math.max(1, Math.round(sprite.width * S)), Math.max(1, Math.round(sprite.height * S)));
   if (sprite.flip) img = img.flop();
-  layers.push({ input: await img.png().toBuffer(), left: Math.round(sprite.left * S), top: Math.round(sprite.top * S) });
+  // Clip sprites that hang over the map's edge.
+  let buffer = await img.png().toBuffer();
+  let left = Math.round(sprite.left * S), top = Math.round(sprite.top * S);
+  const meta = await sharp(buffer).metadata();
+  const cl = Math.max(0, -left), ct = Math.max(0, -top);
+  const cw = Math.min(meta.width! - cl, W - Math.max(0, left)), ch = Math.min(meta.height! - ct, H - Math.max(0, top));
+  if (cw <= 0 || ch <= 0) continue;
+  if (cl || ct || cw < meta.width! || ch < meta.height!) buffer = await sharp(buffer).extract({ left: cl, top: ct, width: cw, height: ch }).png().toBuffer();
+  left = Math.max(0, left); top = Math.max(0, top);
+  layers.push({ input: buffer, left, top });
 }
 const svg: string[] = [];
 if (process.argv.includes("--bases")) {

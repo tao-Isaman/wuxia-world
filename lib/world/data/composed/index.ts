@@ -3,7 +3,7 @@ import { composedAsset } from "./assets";
 import { CITY_CAPITAL_MAP } from "./city_capital";
 
 export type { ComposedMap, ComposedObject, GroundArea, GroundMaterial, ComposedAssetDef } from "./types";
-export { COMPOSED_ASSETS, composedAsset, COMPOSED_PX_PER_UNIT } from "./assets";
+export { COMPOSED_ASSETS, composedAsset, COMPOSED_PX_PER_UNIT, COMPOSED_GROUND_TILE_UNITS } from "./assets";
 
 export const COMPOSED_MAPS: Record<string, ComposedMap> = {
   city_capital: CITY_CAPITAL_MAP,
@@ -13,6 +13,14 @@ export const COMPOSED_MAPS: Record<string, ComposedMap> = {
 export const COMPOSED_PREFIX = "composed:";
 export function composedMapFor(image: string | undefined): ComposedMap | undefined {
   return image?.startsWith(COMPOSED_PREFIX) ? COMPOSED_MAPS[image.slice(COMPOSED_PREFIX.length)] : undefined;
+}
+
+/** A 960 × 640 picture of a composed map (scripts/render-composed-map.ts), for dialog backdrops and cutscene stages. */
+export const composedOverview = (id: string) => `/maps/composed/${id}-overview.webp`;
+/** The still picture behind a location: its painting, or a composed map's overview. */
+export function mapBackdrop(image: string): string {
+  const map = composedMapFor(image);
+  return map ? composedOverview(map.id) : image;
 }
 
 /** A placed sprite, resolved to world units: its box, its ground (depth) line and its solid base. */
@@ -26,8 +34,8 @@ export interface ComposedSprite {
   /** World y where it meets the ground: actors above this line are drawn behind it. */
   depthY: number;
   flip: boolean;
-  base?: { kind: "rect"; left: number; top: number; right: number; bottom: number }
-    | { kind: "ellipse"; x: number; y: number; radiusX: number; radiusY: number };
+  bases: ({ kind: "rect"; left: number; top: number; right: number; bottom: number }
+    | { kind: "ellipse"; x: number; y: number; radiusX: number; radiusY: number })[];
 }
 
 export function composedSprites(map: ComposedMap): ComposedSprite[] {
@@ -36,18 +44,17 @@ export function composedSprites(map: ComposedMap): ComposedSprite[] {
     const asset = composedAsset(object.asset);
     if (!asset) continue;
     const scale = object.scale ?? 1;
-    const width = asset.width * scale, height = asset.height * scale;
+    const width = asset.width * scale, height = asset.height * scale * (object.stretch ?? 1);
     const top = object.y - asset.groundAt * height, left = object.x - width / 2;
     const flip = !!object.flip;
-    let base: ComposedSprite["base"];
-    if (asset.base) {
-      const l = flip ? 1 - asset.base.right : asset.base.left, r = flip ? 1 - asset.base.left : asset.base.right;
-      const box = { left: left + l * width, right: left + r * width, top: top + asset.base.top * height, bottom: top + asset.base.bottom * height };
-      base = asset.base.shape === "ellipse"
-        ? { kind: "ellipse", x: (box.left + box.right) / 2, y: (box.top + box.bottom) / 2, radiusX: (box.right - box.left) / 2, radiusY: (box.bottom - box.top) / 2 }
-        : { kind: "rect", ...box };
-    }
-    out.push({ asset: object.asset, src: `/maps/composed/${object.asset}.webp`, left, top, width, height, depthY: object.y, flip, base });
+    const bases: NonNullable<ComposedSprite["bases"]> = asset.bases.map((b) => {
+      const l = flip ? 1 - b.right : b.left, r = flip ? 1 - b.left : b.right;
+      const box = { left: left + l * width, right: left + r * width, top: top + b.top * height, bottom: top + b.bottom * height };
+      return b.shape === "ellipse"
+        ? { kind: "ellipse" as const, x: (box.left + box.right) / 2, y: (box.top + box.bottom) / 2, radiusX: (box.right - box.left) / 2, radiusY: (box.bottom - box.top) / 2 }
+        : { kind: "rect" as const, ...box };
+    });
+    out.push({ asset: object.asset, src: `/maps/composed/${object.asset}.webp`, left, top, width, height, depthY: object.y, flip, bases });
   }
   return out;
 }
@@ -55,7 +62,7 @@ export function composedSprites(map: ComposedMap): ComposedSprite[] {
 /** Everything solid on the map: the sprites' bases plus the authored blocks. */
 export function composedFootprints(map: ComposedMap) {
   return [
-    ...composedSprites(map).flatMap((sprite) => sprite.base ? [sprite.base] : []),
+    ...composedSprites(map).flatMap((sprite) => sprite.bases),
     ...(map.blocks ?? []).map((block) => ({ kind: "rect" as const, ...block })),
   ];
 }

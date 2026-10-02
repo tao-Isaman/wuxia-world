@@ -127,6 +127,17 @@ Append to `LOCATION_ROUTES` in `lib/world/data/location-routes.ts`:
 - **After adding a place or a road,** run `bun scripts/build-world-coords.ts` (the world-map spot that sets exit directions); `bun run test:routes` fails while it is stale.
 - An auto-laid map shows at most **8 exits**, each on the edge facing its destination. With more roads, the worst-fitting one is listed only in the "อื่น ๆ" drawer.
 
+## A composed map
+
+A location built from assets (see [rendering.md](rendering.md#composed-maps)).
+
+1. **Art.** Paint each new piece on a flat white background in the maps' three-quarter pixel-art style, one object per image, and square seamless ground textures (`g_<material>.png`). Add the piece to `COMPOSED_ASSETS` in `lib/world/data/composed/assets.ts` with its world `width` and solid `base`.
+2. **Process.** `bun scripts/build-composed-assets.ts --from <dir>` cuts them out, sizes them to 2 px per unit and writes `asset-pixels.ts`; ground textures are made seamless.
+3. **Layout.** Write `lib/world/data/composed/<id>.ts` (size, base ground, ground areas, objects by their ground point, extra `blocks`) and register it in `COMPOSED_MAPS`.
+4. **Check.** `bun scripts/render-composed-map.ts <id> out.png --bases --markers` draws the map with its solids and markers; `bun run test:navigation` proves every marker is reachable.
+5. **Overview.** `bun scripts/render-composed-map.ts <id> public/maps/composed/<id>-overview.webp --scale <960 / width>` for dialog backdrops and cutscenes.
+6. **Map def.** Set the location's `LocationMapDef.image` to `composed:<id>` and place spawn, NPCs, exits and spots as percentages of the new size (exits on the side facing their destination — `test:routes`).
+
 ## A painted map
 
 Two kinds:

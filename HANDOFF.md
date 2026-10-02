@@ -88,6 +88,12 @@ Not verified:
 
 Real behaviour today, found during the docs audit. Each is small and self-contained unless noted.
 
+### The composed capital
+
+- **Three planned pieces are missing** (the image credits ran out): `flag_pole`, `pond` and `haystack` (lantern posts, a rock garden and crates stand in). The cobble texture is a grey derivative of the paving. Generate them, rerun `build-composed-assets.ts`, and swap them into `city_capital.ts`.
+- **Three-quarter, not isometric.** The reference game's streets run diagonally (isometric); every map here, the capital included, keeps the straight three-quarter view of the existing art.
+- **One city so far.** The other 99 locations are still 960 × 640 paintings with the old cover-fit camera.
+
 ### Places
 
 - **New place content is unplayed by hand.** The 97 place quests pass the store play-through and audits; their writing was checked by the agents that wrote it, not proofread.

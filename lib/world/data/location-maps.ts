@@ -80,8 +80,8 @@ export const LOCATION_MAPS: Record<string, LocationMapDef> = {
     ],
   },
 
-  // Built from assets (lib/world/data/composed/city_capital.ts): 3072 × 2048
-  // units. Percentages are of that size.
+  // Built from assets (lib/world/data/composed/city_capital.ts): a walled city
+  // of 3072 × 2048 units. Percentages are of that size.
   city_capital: {
     image: "composed:city_capital",
     spawn: { x: 50, y: 78 }, // on the avenue just inside the south gate
@@ -91,24 +91,24 @@ export const LOCATION_MAPS: Record<string, LocationMapDef> = {
       city_capital_physician_lin: { x: 35, y: 58 },   // west edge of the market plaza
       city_capital_merchant_wang: { x: 58, y: 44 },   // among the plaza stalls
       spy_capital_feng: { x: 62, y: 58 },             // at the bun stall
-      evil_capital_blackmarket_zhou: { x: 90, y: 47 },// between the carts in the east yard
+      evil_capital_blackmarket_zhou: { x: 93, y: 47 },// in front of the pawnshop by the east wall
       merchant_wang: { x: 27, y: 42 },                // on the avenue by the general store
     },
     exits: [
-      { to: "home_player", x: 50, y: 88, icon: "🏠" },   // the south gate
-      { to: "village_qigu", x: 28, y: 6, icon: "🌾" },    // north ring road, the field lane
-      { to: "palace_royal", x: 78, y: 5, icon: "🏯" },    // north ring road, the palace walk
-      { to: "sect_songshan", x: 8, y: 8, icon: "⛰" },    // north ring road, the mountain trail
-      { to: "city_changan", x: 4, y: 40, icon: "🚶" },    // the great avenue, west
+      { to: "home_player", x: 50, y: 96, icon: "🏠" },   // in the arch of the south gate
+      { to: "village_qigu", x: 28, y: 6, icon: "🌾" },    // through the north gate to the fields
+      { to: "palace_royal", x: 78, y: 5, icon: "🏯" },    // through the north-east gate to the palace walk
+      { to: "sect_songshan", x: 10, y: 5, icon: "⛰" },   // through the north-west gate to the mountain trail
+      { to: "city_changan", x: 4, y: 40, icon: "🚶" },    // the west gate on the great avenue
       { to: "city_yangzhou", x: 10, y: 88, icon: "⛵" },  // canal landing, south-west
-      { to: "sect_jinyiwei", x: 93, y: 28, icon: "🎽" },  // east lane to the guard gate
-      { to: "inn_yuelai", x: 95, y: 62, icon: "🏮" },     // old alley east
+      { to: "sect_jinyiwei", x: 93, y: 28, icon: "🎽" },  // east lane through the wall to the guard gate
+      { to: "inn_yuelai", x: 95, y: 62, icon: "🏮" },     // old alley out through the east wall
     ],
     spots: [
-      { kind: "shop", x: 25, y: 38, icon: "🏪", label: "ตลาดนครหลวง" },
+      { kind: "shop", x: 21, y: 38, icon: "🏪", label: "ตลาดนครหลวง" },
       { kind: "sectHall", x: 52, y: 33, icon: "🏯", label: "สำนักยุทธิ์" },
-      { kind: "rest", x: 75, y: 40, icon: "🍵", label: "โรงเตี๊ยม" },
-      { kind: "rumor", x: 72, y: 47, icon: "🍶", label: "ฟังข่าวลือ" },
+      { kind: "rest", x: 83, y: 59, icon: "🍵", label: "โรงเตี๊ยม" },
+      { kind: "rumor", x: 72, y: 50, icon: "🍶", label: "ฟังข่าวลือ" },
       { kind: "artisan", artisanId: "artisan_city_capital_forge", x: 21, y: 72, icon: "🔨", label: "ตีเหล็ก" },
       { kind: "artisan", artisanId: "artisan_city_capital_alchemy", x: 33, y: 72, icon: "⚗️", label: "ปรุงยา" },
       { kind: "artisan", artisanId: "artisan_city_capital_tailoring", x: 41, y: 72, icon: "🧵", label: "ตัดเย็บ" },
@@ -117,7 +117,7 @@ export const LOCATION_MAPS: Record<string, LocationMapDef> = {
       { kind: "artisan", artisanId: "artisan_city_capital_accessory", x: 80, y: 72, icon: "🧿", label: "เครื่องราง" },
       { kind: "resource", resourceId: "mine_iron", x: 93, y: 88, icon: "⛏", label: "ขุดแร่" },
       { kind: "resource", resourceId: "wood_soft", x: 6, y: 55, icon: "🪓", label: "ตัดไม้" },
-      { kind: "resource", resourceId: "chess_basic", x: 85, y: 52, icon: "♟", label: "เล่นหมากรุก" },
+      { kind: "resource", resourceId: "chess_basic", x: 67, y: 53, icon: "♟", label: "เล่นหมากรุก" },
       { kind: "resource", resourceId: "beg_street", x: 45, y: 50, icon: "🥣", label: "ขอเงินคนผ่านไปมา" },
       { kind: "resource", resourceId: "beg_market", x: 31, y: 50, icon: "🥣", label: "ขอเงินในตลาด" },
     ],

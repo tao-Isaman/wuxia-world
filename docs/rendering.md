@@ -143,13 +143,26 @@ Both runtimes are loaded with a dynamic `import()` in the browser only. The host
 
 ## Maps
 
+### Composed maps
+
+A composed map is built from separate pieces of art instead of one painting (`lib/world/data/composed/`). Its `LocationMapDef.image` is `composed:<id>`, and its markers are percentages of its own size.
+
+- **Size and camera.** The capital is 3072 × 2048 units, ten times the area of a painting. Composed maps zoom in close: the camera keeps about 240 units in view vertically (never fewer than 200 across), so the hero is about a fifth of the screen tall. Paintings keep their cover fit.
+- **Ground.** Rectangles of tiled ground (`paving`, `plaza`, `dirt`, `grass`, `water`, `cobble`) are Phaser tile sprites over a base material. A 512 px seamless texture covers `COMPOSED_GROUND_TILE_UNITS` (64), anchored to the world so neighbouring areas line up; `edge: true` draws a kerb.
+- **Objects.** Every building, wall, tree, stall and prop is its own image (`/maps/composed/<asset>.webp`, 2 px per unit), placed by its ground point and depth-sorted on that line like the actors, so the hero walks behind roofs and in front of steps. `flip` mirrors and `stretch` lengthens a north–south wall piece.
+- **Solids.** Each asset's `base` (one or more rects or ellipses, as fractions of the sprite) becomes collision; a gate has two piers with its arch open. `blocks` adds water. `worldFootprints("…", "composed:<id>")` returns them, and `worldBounds` the size.
+- **Pathing.** With more than 40 solids, `planWorldPath` and `nearestWorldGround` use an 8-unit walkability grid (A*, no corner cutting) and pull the path taut with the swept segment test; small maps keep the exact visibility graph.
+- **Light.** Lantern posts light the night; the veil is drawn at a quarter resolution and stretched over the map.
+- **Elsewhere.** Dialog backdrops and cutscene stages use the map's 960 × 640 overview (`/maps/composed/<id>-overview.webp`, `mapBackdrop`); cutscenes scale the solids to it.
+
 ### Location maps
 
 `getLocationMap(id)` (`lib/world/data/location-maps.ts`) returns a hand-authored `LocationMapDef` if one exists, else `buildAutoMap(id)` for ids in `AUTO_MAP_IDS`.
 
 | Kind | Maps | Image |
 | --- | --- | --- |
-| Hand-authored | `home_player`, `city_capital`, `jail` | `/maps/<id>.png` |
+| Hand-authored | `home_player`, `jail` | `/maps/<id>.png` |
+| Composed from assets | `city_capital` | `composed:<id>` (no single picture; see below) |
 | Auto layout | 97 ids, including the foothill `village` and `tavern` | `/maps/<id>.webp` |
 | None | `world_journey` | classic card layout |
 

@@ -6,6 +6,17 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-02
 
+### The capital, built from assets
+
+- **นครหลวง is now a walled city ten times the old map's area** (3072 × 2048 units), composed from 46 painted pieces instead of one painting:
+  - walls on every side with corner towers, three north gates, a west gate and the main south gate;
+  - the palace forecourt, the temple and government hall, a flower garden behind a moon-gate wall, the pagoda and a mansion;
+  - the escort agency, the market plaza, the teahouse, pawnshop and inn, and the craftsmen's row;
+  - a river with docks, boats and a bridge, the canal landing and a ruined temple.
+- **A much closer camera.** About 240 units stay in view, so the hero is about a fifth of the screen tall. The hero walks behind roofs and in front of steps (depth-sorted pieces), and stone, brick and props read at human scale.
+- **Every NPC, exit and service is reachable** (`test:navigation`), and the exits still face their destinations (`test:routes`). Big maps path on a walkability grid (A*), and the night veil scales to the map.
+- **Under the hood.** New `lib/world/data/composed/`, `scripts/build-composed-assets.ts`, `scripts/render-composed-map.ts` and `scripts/art-cutout.ts`. Dialog backdrops and cutscenes use the city's overview picture. The old `city_capital.png` painting and its hand-traced collision are gone.
+
 ### The hero walks in eight painted directions
 
 - **Real directional sprites for the eight heroes.** For each one, five painted strips (front, three-quarter front, profile, three-quarter back, back), each a standing pose and a four-step walk, replace the rigged puppet walk. The west-facing directions mirror the east ones, giving eight headings.

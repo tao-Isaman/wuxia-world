@@ -1,7 +1,6 @@
 // Positions follow the painted lanterns, in the same 960x640 ground coordinates.
 const LANTERNS: Record<string, readonly [number, number][]> = {
   home_player: [[270, 151], [313, 143], [390, 122], [420, 112], [448, 106]],
-  city_capital: [[713, 196], [739, 206], [772, 210], [802, 202], [236, 171]],
 };
 
 const DAY = [0.69, 0.40, 0.16] as const;
