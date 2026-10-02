@@ -15,7 +15,6 @@
 import { buildAutoMap } from "./auto-maps";
 import { assignSlotsByBearing } from "../compass";
 import { placeActivitiesAt } from "./activities";
-import { capitalAt } from "./composed/city_capital";
 
 export interface MapPoint {
   x: number;
@@ -81,49 +80,48 @@ export const LOCATION_MAPS: Record<string, LocationMapDef> = {
     ],
   },
 
-  // Built from isometric assets (lib/world/data/composed/city_capital.ts):
-  // spots are grid points (u, v) turned into percentages by capitalAt.
   city_capital: {
-    image: "composed:city_capital",
-    spawn: capitalAt(50, 57.5), // on the street just inside the main gate
+    image: "/maps/city_capital.png",
+    zoom: 2.6,
+    spawn: { x: 50, y: 78 }, // just inside the main south gate
     npcSpots: {
-      city_capital_magistrate_wu: capitalAt(15.5, 24.2),     // before the yamen
-      city_capital_clerk_qing: capitalAt(19.6, 24.3),        // between the yamen and the school
-      city_capital_physician_lin: capitalAt(12.5, 32.3),     // west edge of the market
-      city_capital_merchant_wang: capitalAt(23, 32.2),       // among the market stalls
-      spy_capital_feng: capitalAt(17.8, 32),                 // at the bun stall
-      evil_capital_blackmarket_zhou: capitalAt(59.6, 46),    // in the lane by the east wall
-      merchant_wang: capitalAt(31, 45.6),                    // before the general store
+      city_capital_magistrate_wu: { x: 49, y: 35 }, // paved courtyard below the north gate
+      city_capital_clerk_qing: { x: 41, y: 31 }, // government frontage above the left market awning; lateral approach stays clear of Wu
+      city_capital_physician_lin: { x: 35, y: 58 }, // in front of the apothecary
+      city_capital_merchant_wang: { x: 58, y: 44 }, // among the market stalls
+      spy_capital_feng: { x: 62, y: 58 },           // noodle stand by the kitchen row
+      evil_capital_blackmarket_zhou: { x: 90, y: 47 }, // shadowy corner below the east gate
+      merchant_wang: { x: 27, y: 42 },              // เถ้าแก่หวาง, by the general store
     },
     exits: [
-      { to: "home_player", ...capitalAt(50, 59.6), icon: "🏠" },    // inside the main gate (SW wall)
-      { to: "village_qigu", ...capitalAt(10, 5.4), icon: "🌾" },    // the north-west gate of the NE wall, to the fields
-      { to: "palace_royal", ...capitalAt(34, 5.4), icon: "🏯" },    // the middle NE gate, to the palace walk
-      { to: "sect_songshan", ...capitalAt(5.4, 28), icon: "⛰" },    // the NW gate on Songshan lane
-      { to: "city_changan", ...capitalAt(5.4, 48), icon: "🚶" },    // the NW gate on the south street
-      { to: "city_yangzhou", ...capitalAt(24, 59), icon: "⛵" },    // the canal landing
-      { to: "sect_jinyiwei", ...capitalAt(50, 5.4), icon: "🎽" },   // the eastern NE gate, to the guard post
-      { to: "inn_yuelai", ...capitalAt(59.6, 16), icon: "🏮" },     // the SE gate on the north street
+      { to: "home_player", x: 50, y: 88, icon: "🏠" },   // main south gate
+      { to: "village_qigu", x: 28, y: 6, icon: "🌾" },    // north fields
+      { to: "palace_royal", x: 78, y: 5, icon: "🏯" },    // palace walkway, north-east
+      { to: "sect_songshan", x: 8, y: 8, icon: "⛰" },    // mountain trail, north-west
+      { to: "city_changan", x: 4, y: 40, icon: "🚶" },    // royal highway, west
+      { to: "city_yangzhou", x: 10, y: 88, icon: "⛵" },  // grand canal, south-west
+      { to: "sect_jinyiwei", x: 93, y: 28, icon: "🎽" },  // guard gate, east
+      { to: "inn_yuelai", x: 95, y: 62, icon: "🏮" },     // old alley, east
     ],
     spots: [
-      { kind: "shop", ...capitalAt(24, 35.5), icon: "🏪", label: "ตลาดนครหลวง" },
-      { kind: "sectHall", ...capitalAt(22.5, 24.2), icon: "🏯", label: "สำนักยุทธิ์" },
-      { kind: "rest", ...capitalAt(38.5, 46.4), icon: "🍵", label: "โรงเตี๊ยม" },
-      { kind: "rumor", ...capitalAt(39.5, 33.6), icon: "🍶", label: "ฟังข่าวลือ" },
-      { kind: "artisan", artisanId: "artisan_city_capital_forge", ...capitalAt(37.5, 53.8), icon: "🔨", label: "ตีเหล็ก" },
-      { kind: "artisan", artisanId: "artisan_city_capital_alchemy", ...capitalAt(41.5, 53.8), icon: "⚗️", label: "ปรุงยา" },
-      { kind: "artisan", artisanId: "artisan_city_capital_tailoring", ...capitalAt(45.7, 53), icon: "🧵", label: "ตัดเย็บ" },
-      { kind: "artisan", artisanId: "artisan_city_capital_chef", ...capitalAt(44, 46.3), icon: "🍜", label: "ครัว" },
-      { kind: "artisan", artisanId: "artisan_city_capital_jewelry", ...capitalAt(17.5, 53.6), icon: "💍", label: "อัญมณี" },
-      { kind: "artisan", artisanId: "artisan_city_capital_accessory", ...capitalAt(13.5, 53.6), icon: "🧿", label: "เครื่องราง" },
-      { kind: "resource", resourceId: "mine_iron", ...capitalAt(56.6, 53.6), icon: "⛏", label: "ขุดแร่" },
-      { kind: "resource", resourceId: "wood_soft", ...capitalAt(8.4, 12.5), icon: "🪓", label: "ตัดไม้" },
-      { kind: "resource", resourceId: "chess_basic", ...capitalAt(44.2, 35.8), icon: "♟", label: "เล่นหมากรุก" },
-      { kind: "resource", resourceId: "beg_street", ...capitalAt(30, 16), icon: "🥣", label: "ขอเงินคนผ่านไปมา" },
-      { kind: "resource", resourceId: "beg_market", ...capitalAt(27, 32.3), icon: "🥣", label: "ขอเงินในตลาด" },
+      { kind: "shop", x: 25, y: 38, icon: "🏪", label: "ตลาดนครหลวง" },
+      { kind: "sectHall", x: 52, y: 33, icon: "🏯", label: "สำนักยุทธิ์" }, // courtyard entrance, below the gate roof
+      { kind: "rest", x: 78, y: 40, icon: "🍵", label: "โรงเตี๊ยม" },
+      { kind: "rumor", x: 72, y: 47, icon: "🍶", label: "ฟังข่าวลือ" },
+      { kind: "artisan", artisanId: "artisan_city_capital_forge", x: 21, y: 72, icon: "🔨", label: "ตีเหล็ก" },
+      { kind: "artisan", artisanId: "artisan_city_capital_alchemy", x: 35, y: 72, icon: "⚗️", label: "ปรุงยา" },
+      { kind: "artisan", artisanId: "artisan_city_capital_tailoring", x: 47, y: 72, icon: "🧵", label: "ตัดเย็บ" },
+      { kind: "artisan", artisanId: "artisan_city_capital_chef", x: 60, y: 72, icon: "🍜", label: "ครัว" },
+      { kind: "artisan", artisanId: "artisan_city_capital_jewelry", x: 72, y: 72, icon: "💍", label: "อัญมณี" },
+      { kind: "artisan", artisanId: "artisan_city_capital_accessory", x: 83, y: 72, icon: "🧿", label: "เครื่องราง" },
+      { kind: "resource", resourceId: "mine_iron", x: 93, y: 90, icon: "⛏", label: "ขุดแร่" },
+      { kind: "resource", resourceId: "wood_soft", x: 6, y: 55, icon: "🪓", label: "ตัดไม้" },
+      // Street life: chess by the tea house, begging along the market street.
+      { kind: "resource", resourceId: "chess_basic", x: 85, y: 52, icon: "♟", label: "เล่นหมากรุก" },
+      { kind: "resource", resourceId: "beg_street", x: 45, y: 50, icon: "🥣", label: "ขอเงินคนผ่านไปมา" },
+      { kind: "resource", resourceId: "beg_market", x: 31, y: 50, icon: "🥣", label: "ขอเงินในตลาด" },
     ],
   },
-
 };
 
 // The prison courtyard (painted by scripts/build-jail-map.ts). No exits:

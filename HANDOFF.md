@@ -88,13 +88,6 @@ Not verified:
 
 Real behaviour today, found during the docs audit. Each is small and self-contained unless noted.
 
-### The composed capital
-
-- **One city so far.** The other 99 locations are still 960 × 640 paintings with the old cover-fit camera and three-quarter view; only the capital is isometric.
-- **Footprints are eyeballed.** Each asset's `tiles` come from `--measure` plus a look at `render-composed-map.ts --bases`; a few roofs overhang their solids or stand a little off them, and stairs or statues in front of a hall are inside its footprint.
-- **Ground edges are straight.** Ground areas meet along hard diamond edges with a kerb line; there is no blending between materials.
-- **The overview is stretched** from the map's 1.86:1 to 960 × 640 for dialog backdrops and cutscenes.
-
 ### Places
 
 - **New place content is unplayed by hand.** The 97 place quests pass the store play-through and audits; their writing was checked by the agents that wrote it, not proofread.

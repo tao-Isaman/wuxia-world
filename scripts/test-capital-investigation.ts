@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { evaluateCondition, getNpc, getNpcsAtLocation, getQuest, getScene, isQuestTurnInForNpc } from "../lib/world";
 import { LOCATION_MAPS } from "../lib/world/data/location-maps";
-import { planWorldPath, worldBounds, worldFootprints, worldPointBlocked, worldSegmentClear } from "../lib/stage/world-navigation";
+import { planWorldPath, worldFootprints, worldPointBlocked, worldSegmentClear } from "../lib/stage/world-navigation";
 import { observeQuestReceipts, type QuestReceipt } from "../components/world/quest-completion-receipt-data";
 import type { DialogScene, WorldStateData } from "../lib/world/types";
 
@@ -83,16 +83,13 @@ try {
   assert.ok(spot, "Qing is placed on the live capital map");
   assert.ok(getNpcsAtLocation("city_capital").some(npc => npc.id === clerk && npc.name === "เสมียนนายฉิง"));
   const footprints = worldFootprints("city_capital", map.image);
-  // The capital is composed: its percentages are of its own size.
-  const bounds = worldBounds(map.image);
-  const toWorld = (p: { x: number; y: number }) => ({ x: p.x * bounds.width / 100, y: p.y * bounds.height / 100 });
-  const feet = toWorld(spot);
+  const feet = { x: spot.x * 9.6, y: spot.y * 6.4 };
   const approach = { x: feet.x + 38, y: feet.y + 4 }; // actual runtime NPC approach
   assert.equal(worldPointBlocked(feet, footprints), false);
   assert.equal(worldPointBlocked(approach, footprints), false);
   for (const point of [map.spawn, map.npcSpots![wu]]) {
-    let previous = toWorld(point);
-    const path = planWorldPath(previous, approach, footprints, bounds);
+    let previous = { x: point.x * 9.6, y: point.y * 6.4 };
+    const path = planWorldPath(previous, approach, footprints);
     assert.deepEqual(path.at(-1), approach);
     for (const step of path) {
       assert.equal(worldSegmentClear(previous, step, footprints), true);

@@ -8,7 +8,6 @@ import { toast } from "@/store/toast-store";
 import { WorldCanvas } from "@/components/game/world-canvas";
 import { clearArrivalFrom, forgetMapPosition, peekArrivalFrom, type WorldMarker, type WorldPresentation } from "@/lib/stage/types";
 import { capitalVignette } from "@/lib/stage/world-vignettes";
-import { composedPresentation } from "@/lib/stage/composed-presentation";
 export { clearMapPositions } from "@/lib/stage/types";
 
 export interface MapSpotHandlers {
@@ -37,13 +36,11 @@ function freeSpot(spawn: { x: number; y: number }, taken: readonly { x: number; 
 function arrivalSpawn(map: LocationMapDef, from: string | undefined) {
   const exit = from ? map.exits?.find((e) => e.to === from) : undefined;
   if (!exit) return null;
-  // 70 map units in from the exit, toward the middle: within reach of the way
-  // back, clear of the edge (map units: 960 × 640 paintings, larger composed maps).
-  const size = composedPresentation(map.image) ?? { width: 960, height: 640 };
-  const ux = size.width / 100, uy = size.height / 100;
+  // 70 map units (of 960 × 640) in from the exit, toward the middle: within
+  // reach of the way back, clear of the edge.
   const centre = { x: 50, y: 56 };
-  const dx = (centre.x - exit.x) * ux, dy = (centre.y - exit.y) * uy, length = Math.hypot(dx, dy) || 1;
-  const spawn = { x: exit.x + dx / length * 70 / ux, y: exit.y + dy / length * 70 / uy };
+  const dx = (centre.x - exit.x) * 9.6, dy = (centre.y - exit.y) * 6.4, length = Math.hypot(dx, dy) || 1;
+  const spawn = { x: exit.x + dx / length * 70 / 9.6, y: exit.y + dy / length * 70 / 6.4 };
   const facing: "east" | "west" | "north" | "south" = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? "east" : "west") : (dy > 0 ? "south" : "north");
   return { spawn, facing };
 }
@@ -142,7 +139,7 @@ export function LocationMap({ scene, map, handlers, readOnly = false, dialogueSp
   const guideId = guide ? guideMarkerId(state, guide) : null;
   const guidedMarkers = guideId ? markers.map((marker) => marker.id === guideId ? { ...marker, guide: true } : marker) : markers;
   const arrival = arrivalSpawn(map, arrivedFrom);
-  const presentation: WorldPresentation = { key: scene.id, name: scene.name, image: map.image, composed: composedPresentation(map.image),
+  const presentation: WorldPresentation = { key: scene.id, name: scene.name, image: map.image,
     time: state.time, spawn: arrival?.spawn ?? map.spawn, spawnFacing: arrival?.facing, playerImage: playerBodySprite(state.playerBodyId), markers: guidedMarkers,
     ...capitalVignette(scene.id, state.quests.qc_capital_clinic_supplies?.status === "done",
       state.flags.capital_ledger_recovered === true) };

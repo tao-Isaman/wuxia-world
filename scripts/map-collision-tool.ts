@@ -12,7 +12,7 @@
 import sharp from "sharp";
 import { readFileSync } from "node:fs";
 import { getLocationMap } from "../lib/world/data/location-maps";
-import { worldBounds, worldFootprints, type WorldFootprint } from "../lib/stage/world-navigation";
+import { worldFootprints, type WorldFootprint } from "../lib/stage/world-navigation";
 import { probeWorldMap, type ProbeMarker } from "../lib/stage/world-map-probe";
 
 const argv = process.argv.slice(2);
@@ -26,8 +26,7 @@ const [id, jsonPath, overlayPath] = argv;
 if (!id) throw new Error("usage: bun scripts/map-collision-tool.ts <locationId> [footprints.json] [overlay.png]");
 const map = getLocationMap(id);
 if (!map) throw new Error(`${id} has no painted map`);
-const bounds = worldBounds(map.image);
-const w = (p: { x: number; y: number }) => ({ x: p.x * bounds.width / 100, y: p.y * bounds.height / 100 });
+const w = (p: { x: number; y: number }) => ({ x: p.x * 9.6, y: p.y * 6.4 });
 const markers: ProbeMarker[] = [
   ...Object.entries(map.npcSpots ?? {}).map(([npc, p]) => ({ id: `npc:${npc}`, kind: "npc" as const, ...w(p) })),
   ...(map.exits ?? []).map((e) => ({ id: `exit:${e.to}`, kind: "exit" as const, ...(exitOverride[e.to] ?? w(e)) })),
@@ -35,16 +34,14 @@ const markers: ProbeMarker[] = [
 ];
 const footprints: WorldFootprint[] = jsonPath ? JSON.parse(readFileSync(jsonPath, "utf8")) : [...worldFootprints(id, map.image)];
 const spawn = w(map.spawn);
-const { spawnOk, results } = probeWorldMap(spawn, markers, footprints, bounds);
+const { spawnOk, results } = probeWorldMap(spawn, markers, footprints);
 console.log(`${id}  image=${map.image}  spawn=(${spawn.x.toFixed(0)},${spawn.y.toFixed(0)}) ${spawnOk ? "ok" : "BLOCKED"}  footprints=${footprints.length}`);
 for (const m of markers) {
   const r = results.find((x) => x.id === m.id)!;
   console.log(`  ${r.ok ? "ok  " : "FAIL"} ${m.id.padEnd(46)} (${m.x.toFixed(0)},${m.y.toFixed(0)})${r.reason ? "  " + r.reason : ""}`);
 }
 if (overlayPath) {
-  const shapes = footprints.map((f) => f.kind === "poly"
-    ? `<polygon points="${f.points.map((p) => `${p.x},${p.y}`).join(" ")}" fill="#ff000055" stroke="#ff2020" stroke-width="1.5"/>`
-    : f.kind === "rect"
+  const shapes = footprints.map((f) => f.kind === "rect"
     ? `<rect x="${f.left}" y="${f.top}" width="${f.right - f.left}" height="${f.bottom - f.top}" fill="#ff000055" stroke="#ff2020" stroke-width="1.5"/>`
     : `<ellipse cx="${f.x}" cy="${f.y}" rx="${f.radiusX}" ry="${f.radiusY}" fill="#ff000055" stroke="#ff2020" stroke-width="1.5"/>`).join("");
   const dots = markers.map((m) => {

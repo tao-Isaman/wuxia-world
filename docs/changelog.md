@@ -6,16 +6,9 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-02
 
-### The capital, an isometric city built from assets
+### The capital stays a painting
 
-- **นครหลวง is now an isometric walled city after the Lin'an plan**, 64 × 64 tiles (4096 × 2208 units, about fourteen times the old map's area), built from 54 painted pieces instead of one painting:
-  - a wall on all four sides with corner towers and six gates, one where each road leaves;
-  - the Yunlin temple, the ruined temple and the pagoda in the north, the yamen, a martial school and Prince Kang's mansion, and a flower garden behind a moon-gate wall;
-  - the market and its docks on a river that crosses the city, the flower house (teahouse), the escort agency, the inn and shops;
-  - the pawnshop and treasure house, the craftsmen's row, a canal landing for Yangzhou, a quarry, and fields and trees outside the walls.
-- **A much closer camera.** About 240 units stay in view, so the hero is about a fifth of the screen tall. Streets run diagonally; diagonal keys follow them. The hero walks behind halls and walls and in front of them, sorted against each building's footprint.
-- **Every NPC, exit and service is reachable** (`test:navigation`), and the exits still face their destinations (`test:routes`). Big maps path on a walkability grid (A*), and the night veil scales to the map.
-- **Under the hood.** New `lib/world/data/composed/` (isometric grid, tile footprints, `poly` collision, actor sorting), `scripts/build-composed-assets.ts`, `scripts/render-composed-map.ts` and `scripts/art-cutout.ts`. Dialog backdrops and cutscenes use the city's overview picture. The old `city_capital.png` painting and its hand-traced collision are gone.
+- **นครหลวง is back to its painted 960 × 640 map**, with its old camera, markers and collision. The asset-built isometric city merged in [#44](https://github.com/tao-Isaman/wuxia-world/pull/44) was reverted in full; its engine (composed maps, polygon collision, grid pathing) and art are in that pull request's history if they are wanted again.
 
 ### The hero walks in eight painted directions
 
