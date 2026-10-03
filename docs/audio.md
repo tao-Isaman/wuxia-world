@@ -1,6 +1,6 @@
 # Audio
 
-All music and sound is **generated in the browser** with the Web Audio API — the repo contains no audio files. Songs are note data, instruments are synthesized, and skill sounds are derived from the same profile as the skill's visual effect.
+The background music is **recorded** (four MP3s in `public/audio/`); everything else — jingles, UI sounds and skill sounds — is **generated in the browser** with the Web Audio API. Each recorded track also has a synthesized stand-in, so the game still has music when a recording can't load (offline, say). Synth songs are note data, instruments are synthesized, and skill sounds are derived from the same profile as the skill's visual effect.
 
 ## Contents
 
@@ -17,6 +17,8 @@ All music and sound is **generated in the browser** with the Web Audio API — t
 
 | File | Role |
 | --- | --- |
+| `public/audio/*.mp3` | the recordings: `theme-1` and `theme-2` (two versions of the main theme), `battle`, `desert` |
+| `lib/audio/recordings.ts` | `RECORDINGS` (track → files) and `isDesertPlace` |
 | `lib/audio/songs.ts` | pure note data: `SONGS`, `TrackId`, `Instrument`, `phrase`, `phraseBeats`, `midiOf`, helpers |
 | `lib/audio/engine.ts` | the Web Audio graph, instruments, the sequencer, SFX primitives, `uiSound`, settings, `unlockAudio`, `renderTrack` |
 | `lib/audio/cast-sfx.ts` | skill sounds: `castStartSfx`, `impactSfx`, `whiffSfx`, `supportSfx` |
@@ -38,6 +40,26 @@ Every tune is pentatonic. Tracks (`TrackId`) and their shape:
 A `Song` is `{ id, bpm, beats, loop, events: NoteEvent[] }`, and a `NoteEvent` is `{ at, len, instrument, midi, vel }` (times in beats).
 
 The melody shorthand `phrase("A4:2 D5:2 E5:3 F#5:1 | …", instrument, startBeat, vel)` counts in **eighth notes**: `:2` is a quarter note, `.` is a rest, and `|` is ignored. `midiOf("F#5")` gives 78.
+
+## Recordings
+
+The main tracks stream recorded songs (made with Suno from the prompts in the 2026-10-03 changelog entry):
+
+| Track | Files | Length |
+| --- | --- | --- |
+| `title`, `world`, `night` | `theme-1.mp3`, `theme-2.mp3` — the main theme ถือกระบี่ท่องยุทธภพ, two versions | 3:40, 3:23 |
+| `battle` | `battle.mp3` | 2:55 |
+| `desert` | `desert.mp3` — the desert / trade song | 3:04 |
+
+- **Size.** The 150 MB of WAV masters were encoded to MP3 (libmp3lame VBR `-q:a 6`, ~110 kb/s, 44.1 kHz stereo), loudness-normalised to −16 LUFS (`loudnorm=I=-16:TP=-1.5`) with leading and trailing silence trimmed: 10.8 MB for all four. MP3 because every browser (Chromium builds without AAC included) decodes it. `test:audio` fails if a file grows past 4.5 MB.
+
+  ```bash
+  ffmpeg -i in.wav -af "silenceremove=start_periods=1:start_threshold=-55dB,areverse,silenceremove=start_periods=1:start_threshold=-55dB,areverse,loudnorm=I=-16:TP=-1.5:LRA=11" -ar 44100 -ac 2 -c:a libmp3lame -q:a 6 out.mp3
+  ```
+
+- **Playback.** A recording streams through an `<audio>` element routed into the music bus (`createMediaElementSource`), so the ♪ volume and mute apply. One file loops; several play one after another, starting on a random version. Switching to `world` ↔ `night` keeps the same recording playing. A jingle pauses the recording and the music resumes where it left off.
+- **Fallback.** If a file fails to load, that track plays its synthesized song instead. The service worker does not cache media (the browser fetches it in ranges), so offline play uses the synth music. `<html data-music-source>` is `recording` or `synth`.
+- **Desert places.** `isDesertPlace`: `desert_*`, `tribe_*`, `city_xixia`, `mt_baituo` and `sect_xingxiu` (the place the hero is in, or last stood in on a road or in a dialog).
 
 ## The engine
 
@@ -80,6 +102,7 @@ The melody shorthand `phrase("A4:2 D5:2 E5:3 F#5:1 | …", instrument, startBeat
 | no game (title screen) | `title` |
 | game over | none |
 | a battle without a winner yet | `battle` |
+| exploring a desert place | `desert` |
 | exploring, `time % 12 < 8` | `world` |
 | exploring, `time % 12 ≥ 8` | `night` |
 
@@ -143,6 +166,10 @@ It also plays cues when the store changes:
 - **`tests/browser/audio.spec.ts`** checks that music follows title → world → battle, that the context runs after the first gesture, and that the ♪ bubble's switches persist.
 
 ## Adding or changing music
+
+**A recording:** encode it with the command in [Recordings](#recordings), put it in `public/audio/`, and list it under its track in `RECORDINGS` (a new track also needs a `TrackId`, a synth stand-in in `SONGS` and a rule in `SoundDirector`).
+
+**A synth song:**
 
 1. Write the notes in `lib/audio/songs.ts` with `phrase(...)`. Keep to the song's pentatonic mode; the test checks the leads.
 2. Add the id to `TrackId` and an entry to `SONGS`, with `loop: true` for background music.

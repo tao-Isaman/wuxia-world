@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { playJingle, playMusic, stopMusic, uiSound, unlockAudio } from "@/lib/audio/engine";
 import type { TrackId } from "@/lib/audio/songs";
+import { isDesertPlace } from "@/lib/audio/recordings";
 import { getScene } from "@/lib/world";
 import { useWorldStore } from "@/store/world-store";
 import { useBattleStore } from "@/store/battle-store";
@@ -20,6 +21,8 @@ export function SoundDirector() {
   const inBattle = useWorldStore((s) => !!s.pendingBattle);
   const night = useWorldStore((s) => nightTime(s.time));
   const winner = useBattleStore((s) => s.state?.winner ?? null);
+  // The place the hero is in (or last stood in, on a road or in a dialog).
+  const desert = useWorldStore((s) => isDesertPlace(getScene(s.currentSceneId)?.kind === "location" ? s.currentSceneId : s.lastLocationId));
 
   // Sound may only start from a user gesture: the first tap or key unlocks it.
   useEffect(() => {
@@ -41,7 +44,7 @@ export function SoundDirector() {
     };
   }, []);
 
-  const exploring: TrackId = night ? "night" : "world";
+  const exploring: TrackId = desert ? "desert" : night ? "night" : "world";
   useEffect(() => {
     if (!hasGame) playMusic("title");
     else if (gameOver) stopMusic();

@@ -1,3 +1,5 @@
+import { existsSync, statSync } from "node:fs";
+import { RECORDINGS, isDesertPlace } from "../lib/audio/recordings";
 import assert from "node:assert/strict";
 import { SONGS, midiOf, phrase, phraseBeats, type TrackId } from "../lib/audio/songs";
 
@@ -29,7 +31,7 @@ check("every track is well-formed", () => {
 
 check("lead melodies stay in their pentatonic mode", () => {
   const modes: Record<TrackId, number[]> = {
-    title: [2, 4, 6, 9, 11], world: [2, 4, 6, 9, 11], night: [2, 4, 6, 9, 11], victory: [2, 4, 6, 9, 11], quest: [2, 4, 6, 9, 11], levelup: [2, 4, 6, 9, 11],
+    title: [2, 4, 6, 9, 11], world: [2, 4, 6, 9, 11], night: [2, 4, 6, 9, 11], desert: [2, 4, 6, 9, 11], victory: [2, 4, 6, 9, 11], quest: [2, 4, 6, 9, 11], levelup: [2, 4, 6, 9, 11],
     battle: [4, 7, 9, 11, 2], defeat: [4, 7, 9, 11, 2], encounter: [4, 7, 9, 11, 2],
   };
   for (const [id, song] of Object.entries(SONGS) as [TrackId, typeof SONGS[TrackId]][]) {
@@ -46,6 +48,24 @@ check("loops have a lead line and a pulse", () => {
     assert.ok(instruments.has("bass"), `${id} bass`);
   }
   assert.ok(SONGS.battle.events.filter((e) => e.instrument === "taiko").length >= 64, "battle drums drive every bar");
+});
+
+check("recordings: the main theme, battle and desert songs exist, are MP3 and stay small", () => {
+  const files = new Set(Object.values(RECORDINGS).flat());
+  assert.ok(files.size >= 4);
+  for (const url of files) {
+    const path = `public${url}`;
+    assert.ok(existsSync(path), `${path} exists`);
+    assert.ok(url.endsWith(".mp3"), `${url} is MP3 (every browser decodes it)`);
+    const size = statSync(path).size;
+    assert.ok(size < 4_500_000, `${url} is ${(size / 1e6).toFixed(1)} MB — compress it (~110 kb/s)`);
+  }
+  for (const track of Object.keys(RECORDINGS) as TrackId[]) assert.ok(SONGS[track].loop, `${track} is background music with a synth stand-in`);
+});
+
+check("desert places pick the desert song; the rest the main theme", () => {
+  for (const id of ["desert_ruins", "tribe_huizu", "city_xixia", "mt_baituo", "sect_xingxiu"]) assert.ok(isDesertPlace(id), id);
+  for (const id of ["city_capital", "village_noname", "sect_shaolin", null]) assert.ok(!isDesertPlace(id), String(id));
 });
 
 console.log(`${checks} audio checks passed`);

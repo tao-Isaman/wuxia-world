@@ -4,6 +4,13 @@ What changed, when, and in which pull request. Newest first. Each entry says wha
 
 Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-Isaman/wuxia-world/pulls?q=is%3Apr+is%3Amerged). The waves are the build → test → review rounds the agents worked in (see [HANDOFF.md](../HANDOFF.md)).
 
+## 2026-10-03
+
+### Recorded music
+
+- The main theme (two versions), the battle song and the desert / trade song are real recordings now (`public/audio/`, made with Suno). The 150 MB of WAV masters became 10.8 MB of MP3 (~110 kb/s, loudness-normalised, silence trimmed). Desert places (`desert_*`, `tribe_*`, `city_xixia`, `mt_baituo`, `sect_xingxiu`) play the desert song.
+- The synthesized songs remain as the fallback when a recording can't load (offline). Jingles, UI and skill sounds are still synthesized.
+
 ## 2026-10-02
 
 ### Letters, horse stations, the sword tournament, faster practice
