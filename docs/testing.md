@@ -118,7 +118,7 @@ Many specs replace `Math.random` in the page to make rolls predictable.
 | `game.spec.ts` | 6 | exploration, menu pause, travel, NPC card, reload; grid battle by tap and auto; unit info by touch; phone rotation; a version-18 save migrates to 23; rigged NPCs wander in the capital and wait for the hero |
 | `investigation.spec.ts` | 1 | capital rumors and the ledger investigation survive a mid-dialog reload and pay once |
 | `law-guide.spec.ts` | 3 | walking while wanted draws the law; jail days per mark; retreat gives no rewards; the quest guide and the busy overlay |
-| `mobile-controls.spec.ts` | 1 | phone HUD: icon bar, joystick, action button, rest bubble, profile |
+| `mobile-controls.spec.ts` | 1 | phone HUD: the vitals card top-left with the icon bar under it, joystick, action button, rest bubble, profile |
 | `opening.spec.ts` | 1 | the first session: clinic errand, a bought potion, the free duel on auto, rests, a w-exp upgrade |
 | `pwa.spec.ts` | 1 | manifest and icons, an active service worker, an offline reload — **needs a production server** |
 | `quest-tracking.spec.ts` | 1 | pinning a quest, the HUD tracker, and the ฉางอัน spy objective advancing in person |
