@@ -49,7 +49,7 @@ What each suite covers and how to run e2e: [docs/testing.md](docs/testing.md). E
 | **Life** | 19 life skills, 25 gathering nodes, 49 artisans with 32 recipes, 19 shops, 7 city halls, 126 items |
 | **Danger** | random encounters while walking, scaled to your progress; stealing, assassination and kidnapping; wanted marks, law pursuers and a jail map |
 | **Rumors** | inns carry news of the masters' deeds, the hero's own echoes, and old lore |
-| **Sound** | procedural pentatonic music and synthesized skill sounds — no audio files |
+| **Sound** | recorded main theme, battle and desert songs (MP3, ~11 MB) over procedural pentatonic music, jingles and synthesized skill sounds |
 
 How all of it plays, with the numbers: [docs/gameplay.md](docs/gameplay.md). Every place, person, quest, skill, item and foe: [docs/reference/](docs/reference/README.md).
 

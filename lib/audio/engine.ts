@@ -1,8 +1,11 @@
 import { SONGS, beatSeconds, type Instrument, type NoteEvent, type Song, type TrackId } from "./songs";
+import { RECORDINGS } from "./recordings";
 
 /**
  * Procedural audio: every instrument and sound effect is synthesized with
- * the Web Audio API, so the game ships no audio files and plays offline.
+ * the Web Audio API. The main background tracks also have recordings
+ * (lib/audio/recordings.ts) streamed through the same music bus; the
+ * synthesized songs stand in when a recording can't load (offline, say).
  * The context starts on the first tap / key press (browser autoplay rules)
  * and sleeps while the tab is hidden.
  */
@@ -36,6 +39,7 @@ export function setAudioSettings(next: Partial<AudioSettings>) {
 }
 function applyVolumes() {
   if (!graph) return;
+  recorded.sync();
   const now = graph.ctx.currentTime;
   graph.music.gain.setTargetAtTime(settings.music ? settings.musicVolume * 0.5 : 0, now, 0.15);
   graph.sfx.gain.setTargetAtTime(settings.sfx ? settings.sfxVolume * 0.7 : 0, now, 0.05);
@@ -54,6 +58,7 @@ export function unlockAudio(): boolean {
         if (!graph) return;
         const live = graph.ctx as AudioContext;
         if (document.hidden) void live.suspend(); else void live.resume();
+        recorded.sync();
       });
     } catch { return false; }
   }
@@ -253,6 +258,68 @@ function playInstrument(instrument: Instrument, midi: number, at: number, len: n
   }
 }
 
+// ── Recorded music: streamed <audio> elements routed into the music bus ──
+const recorded = (() => {
+  const elements = new Map<string, HTMLAudioElement>();
+  const broken = new Set<string>();
+  let urls: readonly string[] = [];
+  let index = 0;
+  let active: HTMLAudioElement | null = null;
+  let onFail: (() => void) | null = null;
+
+  function element(url: string): HTMLAudioElement | null {
+    if (!graph || typeof Audio === "undefined") return null;
+    let el = elements.get(url);
+    if (!el) {
+      el = new Audio(url);
+      el.preload = "auto";
+      try { (graph.ctx as AudioContext).createMediaElementSource(el).connect(graph.music); } catch { return null; }
+      el.addEventListener("error", () => {
+        broken.add(url);
+        if (active === el) { active = null; const fail = onFail; onFail = null; fail?.(); }
+      });
+      // Versions follow one another; a single recording loops.
+      el.addEventListener("ended", () => { if (active === el && urls.length > 1) playIndex((index + 1) % urls.length); });
+      elements.set(url, el);
+    }
+    return el;
+  }
+  function playIndex(i: number) {
+    const el = element(urls[i]);
+    if (!el) { const fail = onFail; onFail = null; active = null; fail?.(); return; }
+    index = i;
+    active = el;
+    el.loop = urls.length === 1;
+    el.currentTime = 0;
+    sync();
+  }
+  /** Play or pause the active recording to match the settings and the tab. */
+  function sync() {
+    if (!active) return;
+    const audible = settings.music && !(typeof document !== "undefined" && document.hidden);
+    if (audible && active.paused) void active.play().catch(() => { /* waits for the next gesture */ });
+    else if (!audible && !active.paused) active.pause();
+  }
+  return {
+    /** Whether `track` has a recording that hasn't failed. */
+    has(track: TrackId) { return (RECORDINGS[track] ?? []).some((url) => !broken.has(url)); },
+    /** Start (or resume) the track's recording; `fail` falls back if it can't load. */
+    play(track: TrackId, fail: () => void) {
+      const next = (RECORDINGS[track] ?? []).filter((url) => !broken.has(url));
+      onFail = fail;
+      if (active && next.join("|") === urls.join("|")) { sync(); return; }
+      active?.pause();
+      urls = next;
+      // Several versions: start on a random one so each session sounds a little different.
+      playIndex(Math.floor(Math.random() * urls.length));
+    },
+    /** Hold the recording (a jingle is playing); `play` with the same track resumes it. */
+    pause() { active?.pause(); },
+    stop() { active?.pause(); active = null; urls = []; onFail = null; },
+    sync,
+  };
+})();
+
 // ── Sequencer: look-ahead scheduling so timing survives busy frames ────
 const sequencer = (() => {
   let song: Song | null = null;
@@ -263,14 +330,31 @@ const sequencer = (() => {
   let events: NoteEvent[] = [];
   let after: TrackId | null = null;
 
+  let playing: TrackId | null = null;
   function start(track: TrackId) {
+    if (!graph) return;
+    playing = track;
+    document.documentElement.dataset.music = track;
+    graph.music.gain.cancelScheduledValues(graph.ctx.currentTime);
+    if (SONGS[track].loop && recorded.has(track)) {
+      // A recording plays instead of the synth song; the synth takes over if it fails.
+      song = null; events = [];
+      document.documentElement.dataset.musicSource = "recording";
+      recorded.play(track, () => { if (playing === track) startSynth(track); });
+      applyVolumes();
+      return;
+    }
+    // A jingle holds the recording where it is; another synth track ends it.
+    if (SONGS[track].loop) recorded.stop(); else recorded.pause();
+    startSynth(track);
+  }
+  function startSynth(track: TrackId) {
     if (!graph) return;
     song = SONGS[track];
     events = [...song.events].sort((a, b) => a.at - b.at);
     loopStart = graph.ctx.currentTime + 0.12;
     cursor = 0;
-    document.documentElement.dataset.music = track;
-    graph.music.gain.cancelScheduledValues(graph.ctx.currentTime);
+    if (song.loop) document.documentElement.dataset.musicSource = "synth";
     applyVolumes();
   }
   function tick() {
@@ -305,7 +389,7 @@ const sequencer = (() => {
         after = returnTo === undefined ? wanted : returnTo;
         if (returnTo !== undefined) wanted = returnTo;
       } else {
-        if (wanted === track && (song?.id === track || !graph)) return;
+        if (wanted === track && (playing === track || !graph)) return;
         wanted = track; after = null;
       }
       if (!graph) { document.documentElement.dataset.music = track; return; }
@@ -317,13 +401,14 @@ const sequencer = (() => {
     },
     current: () => wanted,
     stop() {
-      wanted = null; after = null; song = null; events = [];
+      wanted = null; after = null; song = null; events = []; playing = null;
+      recorded.stop();
       delete document.documentElement.dataset.music;
       if (graph) graph.music.gain.setTargetAtTime(0.0001, graph.ctx.currentTime, 0.3);
     },
     kick() {
       if (!timer) timer = setInterval(tick, 40);
-      if (wanted && (!song || song.id !== wanted) && !after) start(wanted);
+      if (wanted && playing !== wanted && !after) start(wanted);
     },
   };
 })();

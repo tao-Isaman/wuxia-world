@@ -13,6 +13,10 @@ test("music follows the game: title → world → battle, with a sound settings 
   await page.getByRole("button", { name: "เริ่มเกมใหม่" }).click();
   await expect(page.getByTestId("world-canvas")).toHaveAttribute("data-ready", "true", { timeout: 60_000 });
   await expect(html).toHaveAttribute("data-music", /^(world|night)$/);
+  // The main theme is a recording (public/audio/), streamed once sound is running.
+  await expect(html).toHaveAttribute("data-music-source", "recording");
+  await expect.poll(() => page.evaluate(() => performance.getEntriesByType("resource").some((e) => /\/audio\/theme-[12]\.mp3/.test(e.name))),
+    { timeout: 15_000 }).toBe(true);
 
   // Settings live in a small bubble: switching music off persists.
   const icons = page.getByRole("navigation", { name: "เมนูเกม" });
@@ -34,5 +38,6 @@ test("music follows the game: title → world → battle, with a sound settings 
   await expect(page.getByTestId("battle-canvas")).toHaveAttribute("data-ready", "true", { timeout: 60_000 });
   await page.getByRole("button", { name: "เสียง", exact: true }).click(); // a gesture after reload
   await expect(html).toHaveAttribute("data-music", "battle");
+  await expect(html).toHaveAttribute("data-music-source", "recording");
   expect(errors).toEqual([]);
 });
