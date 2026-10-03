@@ -491,6 +491,39 @@ Five traits start at 0 and never drop below 0: good, evil, arrogance, humility, 
 
 **Relationship** with each NPC rises with spars (+1), quests and dialog. Some quests need a minimum.
 
+### ฉายา
+
+The profile shows the name the jianghu gives you, read off your record each time (`lib/world/epithet.ts`). The first rule that fits wins:
+
+1. **A tournament crown:** twice or more → ราชันกระบี่ใต้หล้า; once → ยอดกระบี่แห่งชุมนุมวิจารณ์กระบี่.
+2. **A mix of traits, every one at 60 or more** (more traits beat fewer; among equals the higher total wins):
+
+   | Traits | ฉายา |
+   | --- | --- |
+   | all five | เทพเซียนผู้ข้ามพ้นดีชั่ว |
+   | good · evil · fame | ตำนานที่ไม่มีใครหยั่งถึง |
+   | evil · arrogance · fame | ราชาปีศาจครองยุทธภพ |
+   | good · humility · fame | ปรมาจารย์ผู้ค้ำจุนแผ่นดิน |
+   | good · arrogance · fame | ราชันธรรมผู้ไม่ก้มหัวให้ใคร |
+   | evil · humility · fame | มารในคราบนักบวช |
+   | good · evil · arrogance | คนบ้าผู้ไม่แยแสฟ้าดิน |
+   | good · evil · humility | ฤๅษีผู้หลงทางระหว่างธรรมกับมาร |
+   | arrogance · humility · fame | ยอดคนผู้เป็นปริศนา |
+   | good · evil | คนบ้าแปลกประหลาด |
+   | evil · arrogance | จอมมารโดยเนื้อแท้ |
+   | evil · humility | หน้าเนื้อใจเสือ |
+   | evil · fame | มารร้ายที่ทั้งแผ่นดินหวาดกลัว |
+   | good · humility | พระโพธิสัตว์เดินดิน |
+   | good · fame | วีรชนแห่งแผ่นดิน |
+   | good · arrogance | ผู้ทรงธรรมผู้ทะนงตน |
+   | arrogance · humility | คนสองหน้าแห่งยุทธภพ |
+   | arrogance · fame | ยอดฝีมือผู้หยิ่งผยอง |
+   | humility · fame | ผู้ยิ่งใหญ่ที่ไม่เคยโอ้อวด |
+3. **Wanted marks 3+** → ผู้ต้องหาที่ทางการตามล่า.
+4. **The top rank of a sect you belong to** → ประมุขแห่ง<sect>.
+5. **Your strongest single trait:** good 60 / 25 / 8 → ผู้พิทักษ์ธรรมแห่งยุทธภพ / จอมยุทธ์ผู้ทรงธรรม / ผู้มีน้ำใจ; evil 60 / 25 / 8 → มารร้ายแห่งยุทธภพ / จอมยุทธ์ทางมาร / คนพาลแห่งแดนเถื่อน; arrogance 40 / 15 → ผู้ไม่เห็นใครในสายตา / ผู้ทะนงตน; humility 40 / 15 → ยอดคนผู้ไร้นาม / ผู้ถ่อมตน; fame 60 / 25 / 8 → ผู้มีชื่อก้องยุทธภพ / ดาวรุ่งแห่งยุทธภพ / ผู้เริ่มมีชื่อ.
+6. Otherwise → ผู้มาใหม่ในยุทธภพ.
+
 ## Bad actions
 
 From an NPC's card; every attempt takes 0.2 ชั่วยาม and uses base stats:

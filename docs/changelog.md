@@ -6,6 +6,10 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-03
 
+### ฉายา for mixes of traits
+
+- 19 new titles for traits that are all at 60 or more together: all five (เทพเซียนผู้ข้ามพ้นดีชั่ว), nine triples (ราชาปีศาจครองยุทธภพ, ปรมาจารย์ผู้ค้ำจุนแผ่นดิน…) and all ten pairs (คนบ้าแปลกประหลาด for good + evil, จอมมารโดยเนื้อแท้ for evil + arrogance…). A wider mix beats a narrower one, then the higher total; mixes rank under a tournament crown and above wanted marks, sect rank and single traits (`COMBO_EPITHETS`). The full list is in [gameplay.md](gameplay.md#ฉายา).
+
 ### Landscape only; menus in columns, no scrolling; rumors fade
 
 - **The game is landscape only.** A portrait viewport (a phone held upright) shows the game turned 90° (`app/globals.css` turns the `body`; manifest `orientation: "landscape"`). Every viewport unit goes through `--vw/--vh/--dvw/--dvh`, every media query (and Tailwind's breakpoints) is written for both orientations, and pointer code maps screen coordinates back through `lib/ui/landscape.ts` (map taps, joystick, battle board, HUD occluders, test hooks).
