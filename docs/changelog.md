@@ -6,6 +6,12 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-03
 
+### Regions follow the map
+
+- A place's region (ภาคกลาง / เหนือ / ใต้ / ออก / ตก) now comes from where it sits on the world map: within 170 units of the capital is the heartland, beyond it the compass quarter from the capital. The old hand table had 27 places in a catch-all "wild" region and some on the wrong side (Shaolin "south" though west of the capital). Now: heartland 20, north 16, south 9, east 21, west 31.
+- It drives rumor regions and road colour grades. The hand table stays only as the world-map layout seed (`LAYOUT_REGION`).
+- Jail: a hero caught outside a city goes to the nearest city's jail (was one city per region).
+
 ### Recorded music
 
 - The main theme (two versions), the battle song and the desert / trade song are real recordings now (`public/audio/`, made with Suno). The 150 MB of WAV masters became 10.8 MB of MP3 (~110 kb/s, loudness-normalised, silence trimmed). Desert places (`desert_*`, `tribe_*`, `city_xixia`, `mt_baituo`, `sect_xingxiu`) play the desert song.

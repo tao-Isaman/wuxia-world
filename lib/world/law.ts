@@ -1,4 +1,4 @@
-import { regionOf } from "./data/regions";
+import { WORLD_COORDS } from "./data/world-coords";
 
 /**
  * หมายจับ (wanted marks). A failed theft adds a mark (max 5). While wanted,
@@ -55,18 +55,16 @@ export function describeSentence(hours: number): string {
 
 export const jailDays = (marks: number) => Math.max(1, Math.min(WANTED_MAX, marks)) * JAIL_DAYS_PER_MARK;
 
-// Region → the city whose jail takes the prisoner.
-const REGION_JAIL: Record<string, string> = {
-  heartland: "city_capital",
-  south: "city_dali",
-  west: "city_xixia",
-  east: "city_suzhou",
-  north: "city_changan",
-  jianghu_wild: "city_capital",
-};
-
-/** The city whose jail holds a player caught at `sceneId`. */
+/** The city whose jail holds a player caught at `sceneId`: that city, else the nearest city on the world map. */
 export function jailCityFor(sceneId: string | null | undefined): string {
   if (sceneId?.startsWith("city_")) return sceneId;
-  return REGION_JAIL[regionOf(sceneId)] ?? "city_capital";
+  const here = sceneId ? WORLD_COORDS[sceneId] : undefined;
+  if (!here) return "city_capital";
+  let best = "city_capital", bestDistance = Infinity;
+  for (const [id, point] of Object.entries(WORLD_COORDS)) {
+    if (!id.startsWith("city_")) continue;
+    const distance = Math.hypot(point.x - here.x, point.y - here.y);
+    if (distance < bestDistance) { best = id; bestDistance = distance; }
+  }
+  return best;
 }

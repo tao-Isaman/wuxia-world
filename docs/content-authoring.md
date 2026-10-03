@@ -48,7 +48,7 @@ Engine semantics (scene kinds, every effect and condition, how quests advance) a
 | random encounters | `lib/world/data/random-events.ts` | `fightEventsForLocation` |
 | sects | `lib/world/data/sect-memberships.ts`, `lib/game/data/sects.ts`, `SectId` in `lib/world/types.ts` | `SECT_MEMBERSHIPS` |
 | move skills, inner arts, gear | `lib/game/data/skills.ts`, `arts.ts`, `equipment.ts` | `SKILLS_BY_ID`, `getArt`, `getEquip` |
-| regions (rumors, jail city) | `lib/world/data/regions.ts` | `regionOf` |
+| regions (rumors, road colours) | `lib/world/data/regions.ts` | `regionOf` (from the world map) |
 | simulated NPCs, rumor text, lore | `lib/world/data/named-npcs.ts`, `rumor-templates.ts`, `lore-rumors.ts` | see [liveness.md](liveness.md) |
 
 The per-sect files are mostly named after the **location** suffix, not the `SectId`:
@@ -105,7 +105,7 @@ These are **advisory** — they fail today for known, harmless reasons, so read 
 
    `leaf()` cannot set `categories`. To override the inferred set, add `categories: [...]` to the object by hand.
 3. Add at least one road in `location-routes.ts` (below). A leaf with no road is attached to the lowest-degree leaf, with a console warning.
-4. Add the id to `LOCATION_REGION` in `lib/world/data/regions.ts`. Otherwise it counts as `jianghu_wild`, which affects rumors and which city's jail holds the hero.
+4. Optionally add the id to `LAYOUT_REGION` in `lib/world/data/regions.ts` to pull it toward a side of the world map, then rerun `bun scripts/build-world-coords.ts`. Its live region (rumors, road colours, music) is read from where it lands: the heartland near the capital, else its compass quarter.
 5. Optional:
    - a painting (below);
    - a shop, hall or artisans keyed by `locationId`;

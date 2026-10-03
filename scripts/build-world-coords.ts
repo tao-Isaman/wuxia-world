@@ -12,7 +12,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { SCENES } from "../lib/world/data/scenes";
 import { LOCATION_ROUTES } from "../lib/world/data/location-routes";
-import { LOCATION_REGION } from "../lib/world/data/regions";
+import { LAYOUT_REGION } from "../lib/world/data/regions";
 
 const OUT = "lib/world/data/world-coords.ts";
 export const WORLD_W = 1500, WORLD_H = 1000;
@@ -44,7 +44,7 @@ export function layoutWorld(): Record<string, { x: number; y: number }> {
   const linked = [...new Set(roads.flatMap((r) => [r.a, r.b]))].sort();
   const index = new Map(linked.map((id, i) => [id, i]));
   const edges = roads.map((r) => [index.get(r.a)!, index.get(r.b)!] as const);
-  const anchor = (id: string) => HINT[id] ?? ANCHOR[LOCATION_REGION[id] ?? ""];
+  const anchor = (id: string) => HINT[id] ?? ANCHOR[LAYOUT_REGION[id] ?? ""];
   const pos = linked.map((id) => {
     const a = anchor(id) ?? [rand() * 2 - 1, rand() * 2 - 1];
     return [a[0] + (rand() - 0.5) * 0.5, a[1] + (rand() - 0.5) * 0.5];

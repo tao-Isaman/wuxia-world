@@ -248,7 +248,7 @@ When the current stage of an active quest is a top-level `defeatedOpponent` (`co
 - **`jail_cell`** offers two choices: accept arrest (`imprison` → the `jail` map), or, with 300 gold, bribe (`bribeJail` → released, 2 marks removed).
 - **`imprison`**: sentence = `jailDays(marks) = max(1, min(5, marks)) × 2` days (2 days even with no marks) × 12 ชั่วยาม; marks reset to 0; `jailUntil` = the absolute ชั่วยาม the sentence ends (`day × 12 + time`); HP at least 1.
 - **The jail map** has no exits. While `jailUntil` is set, travel to any other place is refused (`jailBlocks`) and walk ticks don't fire there. Any time that passes serves the sentence. Two people live there: ตาเฒ่าหลิว (tips) and ผู้คุมจาง (bribe).
-- **Release** (`releaseFromJail`): to the jail city — a `city_*` stays itself, else by region: heartland → นครหลวง, south → ต้าหลี่, west → ซีเซี่ย, east → ซูโจว, north → ฉางอัน, wild → นครหลวง. HP and MP are raised to at least 60 %.
+- **Release** (`releaseFromJail`): to the jail city — a `city_*` stays itself, else the nearest city on the world map (`jailCityFor`; unplaced places → นครหลวง). HP and MP are raised to at least 60 %.
 
 Jail activities (`doActivity`, only in `jail`):
 
