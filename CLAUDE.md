@@ -13,7 +13,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **What the player does:**
 
-- Explores 101 places (100 painted maps) joined by 128 roads.
+- Explores 101 places (100 painted maps) joined by 129 roads.
 - Meets 225 NPCs and takes 867 quests: 373 hand-written, 154 sect lineage quests and 38 story sagas (340 chapters) with 292 cutscenes.
 - Joins one of 15 sects and learns 178 move skills and 122 inner arts.
 - Gathers and crafts (19 life skills).

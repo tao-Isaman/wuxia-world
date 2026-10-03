@@ -136,6 +136,15 @@ check("arriving: a hint puts the hero just inside the exit back, facing into the
   assert.ok(facing / paired > 0.85);
 });
 
+check("every place on the world map can be reached by road from the hero's home", () => {
+  const adj: Record<string, string[]> = {};
+  for (const r of LOCATION_ROUTES) { (adj[r.a] ??= []).push(r.b); (adj[r.b] ??= []).push(r.a); }
+  const seen = new Set(["home_player"]), queue = ["home_player"];
+  while (queue.length) for (const next of adj[queue.pop()!] ?? []) if (!seen.has(next)) { seen.add(next); queue.push(next); }
+  const cut = Object.keys(WORLD_COORDS).filter((id) => !seen.has(id));
+  assert.deepEqual(cut, [], `cut off from the road network: ${cut.join(", ")}`);
+});
+
 check("regions follow the map: the heartland around the capital, the compass quarters beyond, no wild catch-all", () => {
   const capital = WORLD_COORDS.city_capital;
   const counts: Record<string, number> = {};

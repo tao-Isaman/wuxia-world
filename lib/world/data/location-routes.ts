@@ -174,6 +174,9 @@ export const LOCATION_ROUTES: readonly LocationRoute[] = [
 
   // ─── Mansions / villas ──────────────────────────────────────────
   { a: "villa_yaowang", b: "home_xuemuhua",   fromA: "สวนสมุนไพรใหญ่", fromB: "สวนสมุนไพรใหญ่" },
+  // The herb-garden south (villa_yaowang, home_xuemuhua, valley_hudie,
+  // cave_zhizhu) joins the rest of the world through the temple's pilgrim road.
+  { a: "temple_tianning", b: "villa_yaowang", fromA: "ทางผู้แสวงบุญสายใต้", fromB: "ทางขึ้นวิหาร", hintA: "ลงใต้สู่สวนสมุนไพร" },
 
   // ─── Cliffs ─────────────────────────────────────────────────────
   { a: "cliff_motian", b: "home_beichou",     fromA: "ทางลงเชิงเขา",   fromB: "ทางขึ้นยอด" },
