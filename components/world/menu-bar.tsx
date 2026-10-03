@@ -162,7 +162,7 @@ export function MenuBar({ hud }: { hud?: boolean } = {}) {
   if (hud) {
     return (
       <>
-        <div className="hud-topleft">
+        <div className="hud-topleft" data-hud-occluder>
         <HudVitals />
         <nav className="hud-iconbar" aria-label="เมนูเกม">
           {tabs.map((t, i) => (

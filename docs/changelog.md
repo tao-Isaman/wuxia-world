@@ -6,6 +6,10 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-03
 
+### The guide arrow no longer hides under the HUD
+
+- The quest guide's edge pointer used to sit on the very edge of the screen, so toward the top-left (vitals + menu), top-right (purse, sundial, quest tracker) or bottom-right (rest / action / places) it hid under the HUD. HUD boxes now carry `data-hud-occluder`; the pointer slides in along its ray until it is clear of them, still pointing the right way, and an arrow over a marker the HUD covers turns into that pointer. `guide-hud.spec.ts` walks a phone and a desktop view around and checks the pointer is never under a HUD box.
+
 ### Turn down or drop a sect move quest; vitals on the HUD
 
 - **Offers can be turned down.** Lineage quests and saga chapters open their offer before accepting; besides รับคำ it now has **ขอปฏิเสธไว้ก่อน**, which leaves the quest on offer. The sect art trials, which have no offer scene, ask in a confirm box (รับภารกิจ / ขอปฏิเสธไว้ก่อน).

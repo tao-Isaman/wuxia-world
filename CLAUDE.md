@@ -275,7 +275,7 @@ Two deliberate exceptions reach into stores:
 - **World runtime.** `world-runtime.ts` works in 960 × 640 map units (y down).
   - Camera: cover fit zoomed in √5 (`MAP_ZOOM`, a fifth of the map in view), following the hero; WASD, tap-to-walk and a joystick.
   - The action target is the nearest marker within 95 units; E reaches 100.
-  - Walk ticks every 220 units; a guide arrow; name tags and quest marks.
+  - Walk ticks every 220 units; a guide arrow (its edge pointer slides clear of every `[data-hud-occluder]` HUD box — tag new HUD boxes); name tags and quest marks.
   - The hero walks with painted eight-direction sprites (`<id>-walk8.png`, `lib/characters/walk8.ts`) and always faces the way they move.
   - Foes without NPC art are one of 22 painted, rigged enemy types (`FOE_CHARACTER_IDS`, picked by `foeCharacterFor` in `lib/world/battle-looks.ts`); beasts are 12 painted cells of the 4 × 3 creature atlas (`CREATURE_ATLAS`).
   - The 65 rigged NPCs (`ANIMATED_NPC_IDS`, own 4 × 6 sheets) wander near their spot (`npc-wander.ts`) and freeze when the hero is near or coming to them; picking uses `markerPoint` (their current spot).

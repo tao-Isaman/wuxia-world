@@ -33,13 +33,13 @@ export function MapHud() {
   const hour = ((Math.floor(time) % 12) + 12) % 12;
   return <>
     {/* No party card: the map stays clear. Law status floats top-centre. */}
-    {(wanted > 0 || sentence != null) && <div className="hud-law" role="status">
+    {(wanted > 0 || sentence != null) && <div className="hud-law" role="status" data-hud-occluder>
       {wanted > 0 && <span className="hud-wanted" title={`หมายจับ ${wanted}/5 — ระวังเจ้าหน้าที่ตามล่า`} aria-label={`หมายจับ ${wanted} จาก 5`}>
         ⛓ หมายจับ {"●".repeat(wanted)}<i>{"○".repeat(5 - wanted)}</i></span>}
       {sentence != null && <span className="hud-sentence">
         {sentence > 0 ? `⛓ เหลือโทษ ${describeSentence(sentence)}` : "🔓 พ้นโทษแล้ว · ไปที่ประตูคุก"}</span>}
     </div>}
-    <section className="location-hud" aria-label="สถานที่และเวลา">
+    <section className="location-hud" aria-label="สถานที่และเวลา" data-hud-occluder>
       <div className="hud-purse">
         <PurseDelta value={gold} />
         <span title="เงิน"><b>{gold.toLocaleString()}</b> <i>ตำลึง</i></span>

@@ -945,29 +945,67 @@ export function createWorldRuntime(
       particle.image.setAlpha(0.10 + Math.sin(animationTime * 0.7 + index) ** 2 * 0.10);
     });
   }
-  /** Quest guide: an arrow bobbing over the guided marker, or a pointer on the view's edge toward it. */
+  /**
+   * HUD boxes drawn over the map (`[data-hud-occluder]`: the vitals + menu
+   * stack, purse and sundial, quest tracker, law chips, rest / action / places
+   * column), in host pixels with a little padding. Re-measured a few times a
+   * second rather than every frame.
+   */
+  let occluders: { left: number; top: number; right: number; bottom: number }[] = [];
+  let occludersAt = -Infinity;
+  function hudOccluders() {
+    const now = performance.now();
+    if (now - occludersAt < 250) return occluders;
+    occludersAt = now;
+    const host = parent.getBoundingClientRect();
+    const pad = 6;
+    occluders = [...document.querySelectorAll<HTMLElement>("[data-hud-occluder]")]
+      .map((element) => element.getBoundingClientRect())
+      .filter((r) => r.width > 0 && r.height > 0)
+      .map((r) => ({ left: r.left - host.left - pad, top: r.top - host.top - pad, right: r.right - host.left + pad, bottom: r.bottom - host.top + pad }));
+    return occluders;
+  }
+  /** True when a host-pixel point, grown by `radius`, touches a HUD box. */
+  function underHud(x: number, y: number, radius: number) {
+    return hudOccluders().some((r) => x + radius > r.left && x - radius < r.right && y + radius > r.top && y - radius < r.bottom);
+  }
+  /**
+   * Quest guide: an arrow bobbing over the guided marker, or a pointer on the
+   * view's edge toward it. Neither hides under the HUD: an arrow the HUD would
+   * cover becomes the pointer, and the pointer slides in along its ray (so it
+   * still points the right way) until it is clear of every HUD box.
+   */
   function updateGuide(currentMarkers: WorldMarker[], center: Point) {
     if (!guideArrow || !guideEdge) return;
     const target = currentMarkers.find((marker) => marker.guide);
     parent.dataset.guideMarker = target?.id ?? "";
-    if (!target) { guideArrow.setVisible(false); guideEdge.setVisible(false); return; }
+    if (!target) { guideArrow.setVisible(false); guideEdge.setVisible(false); delete parent.dataset.guideEdge; return; }
     const visual = markers.get(target.id);
     const point = markerPoint(target);
     const bob = reducedMotion ? 0 : Math.abs(Math.sin(animationTime * 3.4)) * 7;
     const lift = (visual?.character ? 64 + (visual.questMark?.visible ? 30 : 0) : 40) + bob;
-    guideArrow.setDisplaySize(26 / viewScale, 28 / viewScale).setPosition(point.x, point.y - lift).setVisible(true);
     const halfW = viewWidth / 2, halfH = viewHeight / 2;
+    // Host pixels: the view's centre and a map point's place on screen.
+    const screenX = (x: number) => (x - center.x + halfW) * viewScale;
+    const screenY = (y: number) => (y - center.y + halfH) * viewScale;
     const margin = 26 / viewScale;
     const dx = point.x - center.x, dy = point.y - 30 - center.y;
     const offscreen = Math.abs(dx) > halfW - margin || Math.abs(dy) > halfH - margin;
-    guideEdge.setVisible(offscreen);
-    if (offscreen) {
-      const scale = Math.min((halfW - margin) / Math.max(Math.abs(dx), 1), (halfH - margin) / Math.max(Math.abs(dy), 1));
-      const pulse = reducedMotion ? 1 : 1 + Math.sin(animationTime * 5) * 0.08;
-      guideEdge.setDisplaySize(30 * pulse / viewScale, 32 * pulse / viewScale)
-        .setPosition(center.x + dx * scale, center.y + dy * scale)
-        .setRotation(Math.atan2(dy, dx) - Math.PI / 2);
-    }
+    const arrowHidden = !offscreen && underHud(screenX(point.x), screenY(point.y - lift) - 14, 13);
+    guideArrow.setDisplaySize(26 / viewScale, 28 / viewScale).setPosition(point.x, point.y - lift).setVisible(!arrowHidden);
+    const showEdge = offscreen || arrowHidden;
+    guideEdge.setVisible(showEdge);
+    if (!showEdge) { delete parent.dataset.guideEdge; return; }
+    // Start on the view's edge (or at the covered marker), then walk in toward the centre.
+    let scale = offscreen ? Math.min((halfW - margin) / Math.max(Math.abs(dx), 1), (halfH - margin) / Math.max(Math.abs(dy), 1)) : 1;
+    const step = 4 / viewScale / Math.max(Math.hypot(dx, dy), 1);
+    while (scale > 0.15 && underHud(screenX(center.x + dx * scale), screenY(center.y + dy * scale), 17)) scale -= step;
+    const pulse = reducedMotion ? 1 : 1 + Math.sin(animationTime * 5) * 0.08;
+    const x = center.x + dx * scale, y = center.y + dy * scale;
+    guideEdge.setDisplaySize(30 * pulse / viewScale, 32 * pulse / viewScale)
+      .setPosition(x, y)
+      .setRotation(Math.atan2(dy, dx) - Math.PI / 2);
+    parent.dataset.guideEdge = `${Math.round(screenX(x))},${Math.round(screenY(y))}`;
   }
   function tick(time: number) {
     if (disposed || failed || !ready || !player) return;
