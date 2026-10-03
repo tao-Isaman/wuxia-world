@@ -38,6 +38,12 @@ test("letters: a friend's letter waits in the inbox with a badge; opening it tak
   const after = await save(page);
   expect(after.inventory.potion).toBeGreaterThanOrEqual(2);
   expect(after.letters[0].read).toBe(true);
+  // The gift shows as an icon; the letter can be thrown away.
+  await expect(page.getByTestId("letter-open").locator(".letter-gift .item-tile")).toBeVisible();
+  await page.getByTestId("letter-delete").click();
+  await page.getByRole("dialog").filter({ hasText: "ลบจดหมายฉบับนี้" }).getByRole("button", { name: "ลบ", exact: true }).click();
+  await expect.poll(async () => (await save(page)).letters.length).toBe(0);
+  await expect(page.getByTestId("letters-empty")).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(tab.locator(".hud-icon-badge")).toHaveCount(0);
 });

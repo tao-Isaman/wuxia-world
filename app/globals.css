@@ -168,3 +168,20 @@
     image-rendering: pixelated;
   }
 }
+
+/* ── Landscape only ───────────────────────────────────────────────────────
+ * The game is laid out for a landscape screen. When the viewport is portrait
+ * (a phone held upright), the whole page is turned 90° clockwise so it still
+ * shows landscape. Every size in the app reads the viewport through these
+ * variables (never raw vw / vh), and media queries are written for both
+ * orientations, so "width" always means the long side the player sees.
+ * Pointer code maps client coordinates back with lib/ui/landscape.ts. */
+:root { --vw: 1vw; --vh: 1vh; --dvw: 1dvw; --dvh: 1dvh; }
+@media (orientation: portrait) {
+  :root { --vw: 1vh; --vh: 1vw; --dvw: 1dvh; --dvh: 1dvw; }
+  html, body { overflow: hidden; }
+  body {
+    position: fixed; top: 0; left: 0; width: 100dvh; height: 100dvw;
+    transform-origin: 0 0; transform: rotate(90deg) translateY(-100%);
+  }
+}

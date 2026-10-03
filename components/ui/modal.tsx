@@ -12,6 +12,9 @@ interface Props {
   children: React.ReactNode;
   // Optional max-width override; defaults to a comfortable popup size.
   maxWidth?: string;
+  // In the menu shell: take the whole stage, no inner scroll — the content
+  // lays itself out in columns that fit (see `.menu-cols` in menu-layout.css).
+  fill?: boolean;
 }
 
 /** System emoji clash with the pixel icon set; titles lose any leading emoji. */
@@ -23,7 +26,7 @@ const typing = (target: EventTarget | null) =>
 // Lightweight modal — backdrop click + Escape close, scrolls inside the card
 // if the content overflows the viewport. Opened from the HUD menu bar it
 // becomes the full-screen tabbed menu shell (see game-menu-context.tsx).
-export function Modal({ open, onClose, title, children, maxWidth = "max-w-2xl" }: Props) {
+export function Modal({ open, onClose, title, children, maxWidth = "max-w-2xl", fill = false }: Props) {
   const menu = useGameMenu();
   const nested = useInsideMenuShell();
   const shell = !!menu?.active && !nested;
@@ -63,7 +66,7 @@ export function Modal({ open, onClose, title, children, maxWidth = "max-w-2xl" }
           <button type="button" className="hud-menu-close" onClick={onClose} aria-label="ปิด">✕</button>
         </header>
         <div className="hud-menu-stage" onClick={onClose}>
-          <section className="hud-menu-panel game-modal-card" onClick={(e) => e.stopPropagation()}>
+          <section className={`hud-menu-panel game-modal-card${fill ? " hud-menu-panel--fill" : ""}`} onClick={(e) => e.stopPropagation()}>
             {title && <h2 className="hud-menu-title">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               {activeTab && <img src={activeTab.icon} alt="" className="pixel" draggable={false} />}
@@ -102,7 +105,7 @@ export function Modal({ open, onClose, title, children, maxWidth = "max-w-2xl" }
               ✕
             </Button>
           </div>
-          <div className="game-modal-body max-h-[70vh] overflow-y-auto pr-1">
+          <div className="game-modal-body max-h-[calc(70*var(--vh))] overflow-y-auto pr-1">
             <InsideMenuShellContext.Provider value>{children}</InsideMenuShellContext.Provider>
           </div>
         </CardContent>

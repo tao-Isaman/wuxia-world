@@ -3,8 +3,8 @@
   z-index: 45;
   right: 20px;
   bottom: 120px;
-  width: min(420px, calc(100vw - 24px));
-  max-height: calc(100dvh - 230px);
+  width: min(420px, calc(calc(100 * var(--vw)) - 24px));
+  max-height: calc(calc(100 * var(--dvh)) - 230px);
   display: flex;
   flex-direction: column;
   color: #efe5c8;
@@ -36,16 +36,16 @@
 .quest-receipt button:hover { filter: brightness(1.13); }
 .quest-receipt button:focus-visible { outline: 2px solid #ffdf97; outline-offset: 3px; }
 @keyframes quest-receipt-arrive { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-@media (max-width: 600px) {
-  .quest-receipt { right: 12px; bottom: 144px; max-height: calc(100dvh - 320px); }
+@media (orientation: landscape) and (max-width: 600px), (orientation: portrait) and (max-height: 600px) {
+  .quest-receipt { right: 12px; bottom: 144px; max-height: calc(calc(100 * var(--dvh)) - 320px); }
   .quest-receipt-body { padding: 12px; }
   .quest-receipt h2 { font-size: 18px; margin-bottom: 10px; }
   .quest-receipt-portrait { flex-basis: 64px; width: 64px; height: 64px; }
   .quest-receipt-character { gap: 10px; }
   .quest-receipt-character blockquote { font-size: 12px; line-height: 1.8; }
 }
-@media (max-height: 480px) and (min-width: 601px) {
-  .quest-receipt { right: 12px; bottom: 78px; width: 390px; max-height: calc(100dvh - 158px); }
+@media (orientation: landscape) and (max-height: 480px) and (min-width: 601px), (orientation: portrait) and (max-width: 480px) and (min-height: 601px) {
+  .quest-receipt { right: 12px; bottom: 78px; width: 390px; max-height: calc(calc(100 * var(--dvh)) - 158px); }
   .quest-receipt-heading { padding-top: 0; padding-bottom: 0; }
   .quest-receipt-body { padding: 8px 12px 10px; }
   .quest-receipt h2 { font-size: 16px; margin-bottom: 7px; }

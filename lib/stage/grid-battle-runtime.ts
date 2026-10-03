@@ -1,4 +1,5 @@
 import * as Phaser from "phaser";
+import { pageRect, toClientPoint, toPagePoint } from "@/lib/ui/landscape";
 import { isPlayerTurn, useBattleStore } from "@/store/battle-store";
 import {
   aimableFor,
@@ -224,8 +225,9 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
     return { x: Math.floor(u), y: Math.floor(v) };
   }
   function toWorld(clientX: number, clientY: number): Point {
-    const rect = parent.getBoundingClientRect();
-    return { x: camX + (clientX - rect.left - cssW / 2) / zoom, y: camY + (clientY - rect.top - cssH / 2) / zoom };
+    const rect = pageRect(parent);
+    const at = toPagePoint(clientX, clientY);
+    return { x: camX + (at.x - rect.left - cssW / 2) / zoom, y: camY + (at.y - rect.top - cssH / 2) / zoom };
   }
 
   function fail(cause?: unknown) {
@@ -1070,9 +1072,9 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
   // Test / tooling hook: viewport coordinates of a cell's centre (null before the stage is ready).
   (parent as GridBattleHost).gridCellPoint = (x: number, y: number) => {
     if (!ready) return null;
-    const rect = parent.getBoundingClientRect();
+    const rect = pageRect(parent);
     const p = cellPoint({ x, y });
-    return { x: rect.left + cssW / 2 + (p.x - camX) * zoom, y: rect.top + cssH / 2 + (p.y - camY) * zoom };
+    return toClientPoint(rect.left + cssW / 2 + (p.x - camX) * zoom, rect.top + cssH / 2 + (p.y - camY) * zoom);
   };
   parent.addEventListener("pointerdown", pointerDown);
   parent.addEventListener("pointerup", pointerUp);

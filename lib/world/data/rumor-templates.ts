@@ -22,7 +22,7 @@ export interface RumorTemplate {
   // never matches — the named roster uses 10 for the top rank.)
   weight: number;
   // Informational only: the engine ignores this and uses
-  // DEFAULT_LIFESPAN_DAYS (60) or BIG_NEWS_LIFESPAN_DAYS (120) below.
+  // DEFAULT_LIFESPAN_DAYS (20) or BIG_NEWS_LIFESPAN_DAYS (40) below.
   lifespan: number;
   channel: RumorChannel;
   // Optional distorted version of the same news (engine rolls 15%).
@@ -386,8 +386,8 @@ export const WARNING_TEMPLATES: Record<string, readonly RumorTemplate[]> = {
   ],
 };
 
-export const DEFAULT_LIFESPAN_DAYS = 60;
-export const BIG_NEWS_LIFESPAN_DAYS = 120;
+export const DEFAULT_LIFESPAN_DAYS = 20;
+export const BIG_NEWS_LIFESPAN_DAYS = 40;
 
 // Helper: render a template by substituting tokens. Unknown tokens
 // stay literal (warns to console in dev) so authoring typos surface.

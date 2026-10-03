@@ -93,7 +93,7 @@ export function InfoPopover({
         align={align}
         sideOffset={6}
         className={cn(
-          "w-80 max-w-[90vw] p-3 text-xs leading-relaxed",
+          "w-80 max-w-[calc(90*var(--vw))] p-3 text-xs leading-relaxed",
           contentClassName,
         )}
         onMouseEnter={() => onEnter("content")}

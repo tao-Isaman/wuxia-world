@@ -43,9 +43,18 @@ export const RUMOR_POOL_HARD_CAP = 500;
 export const RUMOR_SEEN_CAP = 50;
 export const RUMOR_ARCHIVE_DAYS = 365;
 
-// JSON turns Infinity into null. A finite sentinel keeps static lore alive
-// across saves while retaining the same numeric expiry/filter semantics.
+// Rumors fade. News lives DEFAULT / BIG_NEWS_LIFESPAN_DAYS; once the hero
+// has heard one it lasts at most RUMOR_HEARD_DAYS more (a treasure lead
+// RUMOR_LEAD_HEARD_DAYS, time to go and look). Authored lore is talk of the
+// day the hero sets out: it fades by LORE_FLAVOUR_LAST_DAY, while lore that
+// leads somewhere stays until heard.
+export const RUMOR_HEARD_DAYS = 15;
+export const RUMOR_LEAD_HEARD_DAYS = 30;
+export const LORE_FLAVOUR_LAST_DAY = 60;
+// JSON turns Infinity into null. A finite sentinel keeps unheard lore leads
+// alive across saves while retaining the same numeric expiry/filter semantics.
 const LORE_EXPIRES_DAY = Number.MAX_SAFE_INTEGER;
+const loreExpiry = (rumor: { leadsTo: unknown }) => (rumor.leadsTo ? LORE_EXPIRES_DAY : LORE_FLAVOUR_LAST_DAY);
 const loreId = (suffix: string): string => suffix.startsWith("lore_") ? suffix : `lore_${suffix}`;
 const LORE_IDS = new Set(LORE_RUMORS.map((lore) => loreId(lore.idSuffix)));
 
@@ -53,17 +62,18 @@ const LORE_IDS = new Set(LORE_RUMORS.map((lore) => loreId(lore.idSuffix)));
 export function seedLoreRumors(state: WorldStateData): void {
   ensureRumorArrays(state);
   const ids = new Set(state.rumorPool.map((rumor) => rumor.id));
-  // Repair pre-seeded lore whose non-expiring deadline became null in JSON.
-  // Replace entries rather than mutating a caller's previous snapshot.
-  const pool = state.rumorPool.map((rumor) =>
-    rumor.source === "lore" && LORE_IDS.has(rumor.id) && rumor.expiresDay !== LORE_EXPIRES_DAY
-      ? { ...rumor, expiresDay: LORE_EXPIRES_DAY }
-      : rumor,
-  );
+  // Repair pre-seeded lore whose deadline became null in JSON (or was the
+  // old "never" sentinel on flavour lore). Replace entries rather than
+  // mutating a caller's previous snapshot.
+  const pool = state.rumorPool.map((rumor) => {
+    if (rumor.source !== "lore" || !LORE_IDS.has(rumor.id)) return rumor;
+    const broken = typeof rumor.expiresDay !== "number" || (rumor.expiresDay === LORE_EXPIRES_DAY && !rumor.leadsTo);
+    return broken ? { ...rumor, expiresDay: loreExpiry(rumor) } : rumor;
+  });
   for (const { idSuffix, ...lore } of LORE_RUMORS) {
     const id = loreId(idSuffix);
     if (ids.has(id)) continue;
-    pool.push({ ...lore, prerequisites: [...lore.prerequisites], id, createdDay: 1, expiresDay: LORE_EXPIRES_DAY });
+    pool.push({ ...lore, prerequisites: [...lore.prerequisites], id, createdDay: 1, expiresDay: loreExpiry(lore) });
     ids.add(id);
   }
   state.rumorPool = pool;
@@ -254,13 +264,16 @@ function applyCaps(state: WorldStateData, currentDay: number): void {
   // Hard cap: blunt eviction. Sort by (expiresDay asc, weight asc) and
   // drop until under cap. Doesn't archive — these rumors are already
   // crowding out fresher ones, no need to preserve them.
+  // Authored lore is never evicted (dropping it would let a load re-seed it).
   if (state.rumorPool.length > RUMOR_POOL_HARD_CAP) {
-    state.rumorPool.sort((a, b) => {
+    const isLore = (r: Rumor) => r.source === "lore" && LORE_IDS.has(r.id);
+    const lore = state.rumorPool.filter(isLore);
+    const news = state.rumorPool.filter((r) => !isLore(r)).sort((a, b) => {
       if (a.expiresDay !== b.expiresDay) return a.expiresDay - b.expiresDay;
       return a.weight - b.weight;
     });
-    const drop = state.rumorPool.length - RUMOR_POOL_HARD_CAP;
-    state.rumorPool.splice(0, drop);
+    news.splice(0, Math.max(0, state.rumorPool.length - RUMOR_POOL_HARD_CAP));
+    state.rumorPool = [...lore, ...news];
   }
 }
 
@@ -515,6 +528,22 @@ export function selectRumorsForScene(
   return filtered.slice(0, limit);
 }
 
+/**
+ * The hero has heard a rumor: from now it lasts at most RUMOR_HEARD_DAYS
+ * (RUMOR_LEAD_HEARD_DAYS for a lead). Returns the pool with that rumor's
+ * expiry pulled in (the same array when nothing changes).
+ */
+export function fadeHeardRumor(pool: readonly Rumor[], rumorId: string, day: number): Rumor[] {
+  const index = pool.findIndex((r) => r.id === rumorId);
+  if (index < 0) return pool as Rumor[];
+  const rumor = pool[index]!;
+  const last = day + (rumor.leadsTo ? RUMOR_LEAD_HEARD_DAYS : RUMOR_HEARD_DAYS);
+  if (rumor.expiresDay <= last) return pool as Rumor[];
+  const next = [...pool];
+  next[index] = { ...rumor, expiresDay: last };
+  return next;
+}
+
 // ─── 3.3 + 3.4 — Maintenance ───────────────────────────────────────────
 // Per-tick housekeeping. Caller (typically world-store advanceTime hook)
 // drives the cadence.
@@ -528,10 +557,11 @@ export function selectRumorsForScene(
 export function maintainRumors(state: WorldStateData, currentDay: number): void {
   ensureRumorArrays(state);
 
-  // 1. Move expired rumors → archive.
+  // 1. Move expired rumors → archive. Expired lore stays in the pool (and so
+  //    out of selection) — archiving it would let the next load re-seed it.
   const stillActive: Rumor[] = [];
   for (const r of state.rumorPool) {
-    if (r.expiresDay <= currentDay) {
+    if (r.expiresDay <= currentDay && !(r.source === "lore" && LORE_IDS.has(r.id))) {
       state.rumorArchive.push(compress(r, currentDay));
     } else {
       stillActive.push(r);

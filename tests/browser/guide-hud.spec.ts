@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 // The quest guide's edge pointer never hides under the HUD (vitals + menu,
 // purse and sundial, quest tracker, rest / action / places column).
-for (const [width, height, name] of [[390, 844, "phone"], [1280, 800, "desktop"]] as const) {
+for (const [width, height, name] of [[844, 390, "phone"], [390, 844, "phone held upright"], [1280, 800, "desktop"]] as const) {
   test(`guide pointer stays clear of the HUD (${name})`, async ({ page }) => {
     test.setTimeout(120_000);
     await page.setViewportSize({ width, height });
@@ -31,11 +31,20 @@ for (const [width, height, name] of [[390, 844, "phone"], [1280, 800, "desktop"]
           const host = document.querySelector("[data-guide-marker]") as HTMLElement | null;
           if (!host?.dataset.guideEdge) return null;
           const [x, y] = host.dataset.guideEdge.split(",").map(Number);
-          const b = host.getBoundingClientRect();
-          return [...document.querySelectorAll("[data-hud-occluder]")].some((el) => {
+          // Page coordinates (a portrait screen shows the page turned 90°, lib/ui/landscape.ts).
+          const turned = matchMedia("(orientation: portrait)").matches;
+          const page = (el: Element) => {
             const r = el.getBoundingClientRect();
+            if (!turned) return r;
+            const h = document.body.offsetHeight;
+            return { left: r.top, top: h - r.right, right: r.bottom, bottom: h - r.left, width: r.height };
+          };
+          const b = page(host);
+          const over = [...document.querySelectorAll("[data-hud-occluder]")].filter((el) => {
+            const r = page(el);
             return r.width > 0 && b.left + x > r.left && b.left + x < r.right && b.top + y > r.top && b.top + y < r.bottom;
           });
+          return over.length > 0;
         });
         if (hit === null) continue;
         samples++;

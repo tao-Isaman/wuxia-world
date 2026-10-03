@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { evaluateCondition } from "../lib/world/conditions";
 import { LORE_RUMORS } from "../lib/world/data/lore-rumors";
 import { regionOf } from "../lib/world/data/regions";
-import { generatePlayerEcho, maintainRumors, RUMOR_POOL_HARD_CAP, seedLoreRumors, selectRumorsForScene } from "../lib/world/rumor-engine";
+import { generatePlayerEcho, LORE_FLAVOUR_LAST_DAY, maintainRumors, RUMOR_HEARD_DAYS, RUMOR_POOL_HARD_CAP, seedLoreRumors, selectRumorsForScene } from "../lib/world/rumor-engine";
 import type { Rumor, WorldStateData } from "../lib/world/types";
 
 const memory = new Map<string, string>();
@@ -22,7 +22,14 @@ function assertLore(state: WorldStateData) {
   const lore = state.rumorPool.filter(rumor => loreIds.includes(rumor.id));
   assert.equal(lore.length, LORE_RUMORS.length);
   assert.equal(new Set(lore.map(rumor => rumor.id)).size, LORE_RUMORS.length);
-  assert.ok(lore.every(rumor => Number.isSafeInteger(rumor.expiresDay) && rumor.expiresDay > state.day));
+  assert.ok(lore.every(rumor => Number.isSafeInteger(rumor.expiresDay)));
+  // Talk of the day: unheard flavour lore fades by LORE_FLAVOUR_LAST_DAY; unheard leads stay.
+  const heard = new Set(state.rumorSeenLog.map(entry => entry.rumorId));
+  for (const rumor of lore) {
+    if (heard.has(rumor.id)) continue;
+    if (rumor.leadsTo) assert.ok(rumor.expiresDay > state.day, `${rumor.id}: an unheard lead stays`);
+    else assert.equal(rumor.expiresDay, LORE_FLAVOUR_LAST_DAY, `${rumor.id}: flavour lore fades by day ${LORE_FLAVOUR_LAST_DAY}`);
+  }
   assert.ok(lore.every(rumor => rumor.source === "lore" && rumor.refersToEvent === null));
 }
 async function load(state: WorldStateData, version = 21) {
@@ -84,6 +91,7 @@ try {
   const heard = snapshot();
   assert.equal(evaluateCondition(heard, { t: "heardRumor", rumorId: unheard.id }), true);
   assert.equal(heard.rumorSeenLog.length, legacy.rumorSeenLog.length + 1);
+  assert.ok(heard.rumorPool.find(rumor => rumor.id === unheard.id)!.expiresDay <= heard.day + RUMOR_HEARD_DAYS, "heard news fades within RUMOR_HEARD_DAYS");
   assert.notEqual(inCapital(heard)[0].id, unheard.id, "remaining unseen stories sort ahead of heard stories");
   useWorldStore.getState().recordRumorHeard(unheard.id);
   assert.deepEqual(useWorldStore.getState().rumorSeenLog, heard.rumorSeenLog, "repeated hearing is idempotent");
@@ -122,12 +130,15 @@ try {
   assert.equal(crowded.rumorPool.length, RUMOR_POOL_HARD_CAP);
   assert.ok(crowded.rumorArchive.some(rumor => rumor.id === "expired_news"));
   maintainRumors(crowded, 1000);
+  crowded.day = 1000;
   assertLore(crowded);
   assert.equal(crowded.rumorPool.length, LORE_RUMORS.length);
+  // Long after the start, the flavour lore has faded: only unheard leads can still be heard.
+  assert.ok(selectRumorsForScene(crowded, "heartland", "inn", 50).every(rumor => rumor.source !== "lore" || rumor.leadsTo));
   const seeded = clone(crowded);
   seedLoreRumors(crowded);
   assert.deepEqual(crowded, seeded, "repeat seeding does not change history or IDs");
-  console.log("PASS maintenance: static lore survives age/soft cap; generated news expires and hard cap remains enforced");
+  console.log("PASS maintenance: lore is never evicted but flavour lore fades; generated news expires and hard cap remains enforced");
 
   // The same selector handles authored lore and generated news. A lore
   // prerequisite must not become optional just because its source is static.

@@ -8,7 +8,6 @@ import {
   STAT_BUDGET,
   STAT_KEYS,
   STAT_LABEL,
-  TIERS,
   WEAPON_FAMILY_HINT,
   WEAPON_FAMILY_LABEL,
   bpMultiplier,
@@ -20,19 +19,18 @@ import {
   getEquipStatBonus,
   getMasteryMap,
   getSkill,
-  parseSlotId,
   powerBreakdown,
   powerTierOf,
   statBreakdown,
   totalStatPoints,
 } from "@/lib/game";
 import { InfoPopover } from "@/components/ui/wuxia/info-popover";
-import type { EquipSlotType, Skill, StatKey, WeaponFamily } from "@/lib/game";
+import type { EquipSlotType, WeaponFamily } from "@/lib/game";
 import { useWorldStore } from "@/store/world-store";
 import { PowerTierBadge } from "@/components/world/power-tier-badge";
 import { xpToNextStatLevel } from "@/lib/world/stat-progression";
 import { GENDER_LABEL, SECT_MEMBERSHIPS, TRAIT_KEYS, TRAIT_LABEL } from "@/lib/world";
-import { ArtTooltip, SkillTooltip } from "../skill-tooltip";
+import { heroEpithet } from "@/lib/world/epithet";
 import { CharacterPreview } from "@/components/game/character-preview";
 
 interface Props {
@@ -74,13 +72,6 @@ const EQUIP_ROWS: readonly EquipSlotRow[] = [
   { type: "C",  label: `🎖 ${SLOT_LABELS.C} 2`,  index: 1 },
 ];
 
-function skillKindIcon(sk: Skill | null): string {
-  if (!sk) return "";
-  if (sk.at === "phy") return "⚔";
-  if (sk.at === "int") return "💜";
-  return sk.se ? "⟳" : "💥";
-}
-
 function describeEquip(id: string | null): string {
   if (!id) return "";
   const e = getEquip(id);
@@ -104,14 +95,10 @@ function describeEquip(id: string | null): string {
   return parts.join(" ");
 }
 
-// Profile popup — read-only character sheet that mirrors the /debug
-// CharacterCard layout: stat budget, base stats, derived stats, inner art
-// summary, move-skill slots with mastery + bonus rollup, and full equipment
-// list with the same bonus summary the /debug page surfaces.
-//
-// Because the world player is currently locked to STARTER_BUILD with no
-// editor UI, every section here is display-only; once an in-world progression
-// editor exists, this popup is the natural "current state" snapshot.
+// Profile — a read-only character sheet in three landscape columns:
+//   1. who: name and ฉายา, HP / MP / stamina, sect, power tier, reputation;
+//   2. tabs: base stats (training bars, tap for sources) | equipment;
+//   3. detailed status: combat numbers, weapon mastery, move bonuses.
 export function ProfilePopup({ open, onClose }: Props) {
   const player = useWorldStore((s) => s.playerBuild);
   const gold = useWorldStore((s) => s.gold);
@@ -119,6 +106,8 @@ export function ProfilePopup({ open, onClose }: Props) {
   const traits = useWorldStore((s) => s.traits);
   const gender = useWorldStore((s) => s.gender);
   const sectMembership = useWorldStore((s) => s.sectMembership);
+  const tournamentHistory = useWorldStore((s) => s.tournamentHistory);
+  const wanted = useWorldStore((s) => s.wanted);
   const bodyId = useWorldStore((s) => s.playerBodyId);
   const currentHp = useWorldStore((s) => s.currentHp);
   const currentMp = useWorldStore((s) => s.currentMp);
@@ -175,60 +164,54 @@ export function ProfilePopup({ open, onClose }: Props) {
 
   const staminaPct = staminaMax > 0 ? Math.min(100, (stamina / staminaMax) * 100) : 0;
   const hpNow = Math.min(currentHp, derivedAll.HP), mpNow = Math.min(currentMp, derivedAll.MP);
+  const sects = Object.entries(sectMembership).filter(([, m]) => m);
+  const epithet = heroEpithet({ traits, tournamentHistory, sectMembership, wanted });
 
   return (
-    <Modal open={open} onClose={onClose} title={`👤 โปรไฟล์ — ${player.name}`} maxWidth="max-w-3xl">
-      <div className="profile">
-        {/* ─── Header: who, and how they are right now ─────────────── */}
-        <section className="profile-hero">
-          <div className="profile-figure" aria-hidden="true"><CharacterPreview id={bodyId} animate /></div>
-          <div className="profile-identity">
-            <h3>{player.name}</h3>
-            <p>{GENDER_LABEL[gender]} · ทอง <strong>{gold.toLocaleString()}</strong> ตำลึง</p>
-            <p className="profile-power" data-testid="profile-power" data-tier={powerTier.tier}>
-              ระดับพลัง <PowerTierBadge tier={powerTier} />
-            </p>
-            <div className="profile-bars">
-              <VitalBar label="HP" tone="hp" value={hpNow} max={derivedAll.HP} />
-              <VitalBar label="MP" tone="mp" value={mpNow} max={derivedAll.MP} />
-              <VitalBar label="พลัง" tone="st" value={stamina} max={staminaMax} pct={staminaPct} />
+    <Modal open={open} onClose={onClose} title={`👤 โปรไฟล์ — ${player.name}`} fill>
+      <div className="menu-cols profile-cols">
+        {/* ─── 1. Who: name, ฉายา, vitals, sect, power, reputation ───── */}
+        <section className="menu-col profile-who" aria-label="ข้อมูลทั่วไป" data-testid="profile-general">
+          <div className="profile-id">
+            <div className="profile-figure" aria-hidden="true"><CharacterPreview id={bodyId} animate /></div>
+            <div className="min-w-0">
+              <h3 className="profile-name">{player.name}</h3>
+              <p className="profile-epithet" data-testid="profile-epithet">“{epithet}”</p>
+              <p className="profile-meta">{GENDER_LABEL[gender]} · ทอง <strong>{gold.toLocaleString()}</strong></p>
             </div>
           </div>
-          {/* Sect memberships — one row per joined sect. */}
-          {Object.entries(sectMembership).filter(([, m]) => m).length > 0 && (
-            <div className="mt-2 space-y-0.5">
-              {Object.entries(sectMembership).map(([sid, m]) => {
-                if (!m) return null;
+          <div className="profile-bars">
+            <VitalBar label="HP" tone="hp" value={hpNow} max={derivedAll.HP} />
+            <VitalBar label="MP" tone="mp" value={mpNow} max={derivedAll.MP} />
+            <VitalBar label="พลัง" tone="st" value={stamina} max={staminaMax} pct={staminaPct} />
+          </div>
+          <dl className="profile-facts">
+            <div><dt>ระดับพลัง</dt><dd className="profile-power" data-testid="profile-power" data-tier={powerTier.tier}><PowerTierBadge tier={powerTier} /></dd></div>
+            <div><dt>สำนัก</dt><dd>
+              {sects.length === 0 ? <span className="text-muted-foreground">ยังไม่สังกัด</span> : sects.map(([sid, m]) => {
                 const def = SECT_MEMBERSHIPS[sid as keyof typeof SECT_MEMBERSHIPS];
-                if (!def) return null;
-                return (
-                  <div key={sid} className="text-xs flex items-center gap-2">
-                    <Badge variant="seal">{def.name}</Badge>
-                    <span className="text-muted-foreground">
-                      ขั้นที่ <strong className="text-foreground">{m.rank}</strong>
-                      <span className="mx-1">·</span>
-                      <span className="text-vermilion">{m.points}</span> sect points
-                    </span>
-                  </div>
-                );
+                return def && m ? <span key={sid} className="profile-sect"><Badge variant="seal">{def.name}</Badge> ขั้น {m.rank}</span> : null;
               })}
-            </div>
-          )}
+            </dd></div>
+          </dl>
+          <div className="profile-fame" aria-label="ชื่อเสียงและคุณธรรม">
+            {TRAIT_KEYS.map((k) => (
+              <span key={k} className={`profile-trait profile-trait--${k}`} title={TRAIT_LABEL[k]}><small>{TRAIT_SHORT[k]}</small><b>{traits[k] ?? 0}</b></span>
+            ))}
+          </div>
         </section>
 
-        <div className="profile-tabs" role="tablist" aria-label="ข้อมูลตัวละคร">
-          {PROFILE_TABS.map((entry) => (
-            <button key={entry.id} type="button" role="tab" aria-selected={tab === entry.id} onClick={() => setTab(entry.id)}>
-              {entry.label}
-            </button>
-          ))}
-        </div>
-
-        {tab === "stats" && <>
-          {/* ─── Base stats: name, value, training progress ─────────── */}
-          <section className="profile-panel">
-            <div className="profile-heading">พลังพื้นฐาน <small>แตะเพื่อดูที่มา</small></div>
-            <div className="profile-stats">
+        {/* ─── 2. Stats / equipment ────────────────────────────────── */}
+        <section className="menu-col profile-mid">
+          <div className="menu-tabs" role="tablist" aria-label="ข้อมูลตัวละคร">
+            {PROFILE_TABS.map((entry) => (
+              <button key={entry.id} type="button" role="tab" aria-selected={tab === entry.id} onClick={() => setTab(entry.id)}>
+                {entry.label}
+              </button>
+            ))}
+          </div>
+          {tab === "stats" && (
+            <div className="profile-stats" role="tabpanel" aria-label="ค่าพลัง">
               {STAT_KEYS.map((k) => {
                 const b = base[k];
                 const c = combined[k];
@@ -247,7 +230,7 @@ export function ProfilePopup({ open, onClose }: Props) {
                     <b className="profile-stat-value">{c}{d > 0 && <em>+{d}</em>}</b>
                     <span className="profile-stat-train" aria-label={`ฝึก ${xp} จาก ${cost}`}>
                       <i><span style={{ width: `${xpPct}%` }} /></i>
-                      <small>ฝึก {xp}/{cost}</small>
+                      <small>{xp}/{cost}</small>
                     </span>
                   </div>
                 );
@@ -276,220 +259,66 @@ export function ProfilePopup({ open, onClose }: Props) {
                 );
               })}
             </div>
-          </section>
+          )}
+          {tab === "gear" && (
+            <div className="profile-gear" role="tabpanel" aria-label="อุปกรณ์">
+              <ul>
+                {EQUIP_ROWS.map((row) => {
+                  const slot = player.equipment[row.type];
+                  const id = Array.isArray(slot) ? slot[row.index ?? 0] : slot;
+                  const e = getEquip(id);
+                  return (
+                    <li key={`${row.type}-${row.index ?? "x"}`}>
+                      <span className="profile-gear-slot">{row.label}</span>
+                      <span className="profile-gear-name">{e ? e.n : <i>— ว่าง —</i>}</span>
+                      {e && <small>{describeEquip(id)}</small>}
+                    </li>
+                  );
+                })}
+              </ul>
+              <p className="profile-gear-total">รวม: {equipSummary.length > 0 ? equipSummary.join(" · ") : "ไม่มีโบนัส"}</p>
+            </div>
+          )}
+        </section>
 
-          {/* ─── Combat numbers ──────────────────────────────────────── */}
-          <section className="profile-panel">
-            <div className="profile-heading">ค่าต่อสู้</div>
-            <dl className="profile-derived">
-              {DERIVED_ROWS.map(({ label, thai, key }) => {
-                const cv = derivedAll[key];
-                const bv = derivedBase[key as keyof typeof derivedBase] ?? cv;
-                const diff = cv - bv;
-                return (
-                  <div key={label}>
-                    <dt>{thai}<small>{label}</small></dt>
-                    <dd>{cv}{diff > 0 && <em>+{diff}</em>}</dd>
-                  </div>
-                );
-              })}
-            </dl>
-            <p className="profile-budget">คะแนนพลังรวม {totalSpent}/{STAT_BUDGET}</p>
-          </section>
-        </>}
-
-        {tab === "skills" && <>
-        {/* ─── Equipped skills (both move skills + inner arts) ──────── */}
-        <section className="profile-panel">
-          <div className="profile-heading">
-            วิชาที่ติดตั้ง ({player.skillIds.length} ช่อง)
-          </div>
-          <div className="space-y-1.5">
-            {player.skillIds.map((sid, i) => {
-              const info = sid ? parseSlotId(sid) : null;
-              if (!info) {
-                return (
-                  <div key={i} className="flex items-center gap-1.5">
-                    <span className="text-[13px] text-muted-foreground w-4 text-center shrink-0">{i + 1}</span>
-                    <span className="flex-1 text-[13px] text-muted-foreground italic px-2">— ว่าง —</span>
-                  </div>
-                );
-              }
-              if (info.kind === "art") {
-                const a = info.art;
-                const aLv = player.artLevels?.[a.id] ?? 1;
-                const artStatRow = (Object.entries(a.stats) as [StatKey, number][])
-                  .map(([k, v]) => `${k}+${Math.floor((v * aLv) / 10)}`)
-                  .join(" ");
-                return (
-                  <div key={i} className="rounded bg-muted/30 px-2 py-1.5">
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-1.5 flex-wrap min-w-0">
-                        <span className="text-[13px] text-muted-foreground shrink-0">{i + 1}</span>
-                        <Badge variant="default" className="text-sm">☯</Badge>
-                        <ArtTooltip art={a} level={aLv}>
-                          <strong className="text-sm cursor-help underline decoration-dotted underline-offset-2">
-                            {a.n}
-                          </strong>
-                        </ArtTooltip>
-                        <Badge variant="outline" className="text-sm">{a.sc}</Badge>
-                        <Badge variant="outline" className="text-sm">{a.tp}</Badge>
-                        <Badge variant="outline" className="text-sm">ขั้น {aLv}</Badge>
-                      </div>
-                      {a.act && (
-                        <span className="text-sm bg-primary/10 text-primary px-1.5 py-0.5 rounded shrink-0 whitespace-nowrap">
-                          ⚡ MP{a.act.c} CD{a.act.cd}
-                        </span>
-                      )}
-                    </div>
-                    {(artStatRow || a.hL || a.mL) && (
-                      <div className="text-[13px] text-emerald-700 mt-0.5">
-                        โบนัส:{artStatRow ? ` ${artStatRow}` : ""}
-                        {a.hL ? ` HP+${a.hL * aLv}` : ""}
-                        {a.mL ? ` MP+${a.mL * aLv}` : ""}
-                      </div>
-                    )}
-                    {a.act && (
-                      <div className="text-[13px] text-muted-foreground">
-                        ⚡ <strong>{a.act.n}</strong>: {a.act.d}
-                      </div>
-                    )}
-                    {a.pas && (
-                      <div className="text-[13px] text-muted-foreground">◆ {a.pas.d}</div>
-                    )}
-                  </div>
-                );
-              }
-              const sk = info.skill;
-              const tier = TIERS[sk.ti];
-              const skLv = player.skillLevels?.[sk.id] ?? 1;
-              const skMul = bpMultiplier(skLv);
-              const skStatRow = (Object.entries(sk.st) as [StatKey, number][])
-                .map(([k, v]) => `${k}+${Math.floor(v * skMul)}`)
-                .join(" ");
+        {/* ─── 3. Detailed status ──────────────────────────────────── */}
+        <section className="menu-col profile-status" aria-label="สถานะละเอียด">
+          <div className="menu-col-head"><span className="menu-col-title">สถานะละเอียด</span><small className="profile-budget">คะแนนพลัง {totalSpent}/{STAT_BUDGET}</small></div>
+          <dl className="profile-derived">
+            {DERIVED_ROWS.map(({ label, thai, key }) => {
+              const cv = derivedAll[key];
+              const bv = derivedBase[key as keyof typeof derivedBase] ?? cv;
+              const diff = cv - bv;
               return (
-                <div key={i} className="rounded bg-muted/30 px-2 py-1.5">
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-1.5 flex-wrap min-w-0">
-                      <span className="text-[13px] text-muted-foreground shrink-0">{i + 1}</span>
-                      <Badge variant="default" className="text-sm">⚔</Badge>
-                      <SkillTooltip skill={sk} level={skLv}>
-                        <strong className="text-sm cursor-help underline decoration-dotted underline-offset-2">
-                          {sk.n}
-                        </strong>
-                      </SkillTooltip>
-                      <Badge variant="default" className="text-sm">Lv.{skLv}</Badge>
-                      <Badge variant="outline" className="text-sm">{tier?.n}</Badge>
-                      <Badge
-                        variant="outline"
-                        className="text-sm"
-                        title={WEAPON_FAMILY_HINT[sk.w]}
-                      >
-                        {WEAPON_FAMILY_LABEL[sk.w]}
-                      </Badge>
-                    </div>
-                    <span className="text-sm bg-primary/10 text-primary px-1.5 py-0.5 rounded shrink-0 whitespace-nowrap">
-                      {skillKindIcon(sk)} CD{tier?.cd ?? 0}
-                    </span>
-                  </div>
-                  {skStatRow && (
-                    <div className="text-[13px] text-emerald-700 mt-0.5">
-                      โบนัส: {skStatRow}
-                      <span className="opacity-60"> (×{Math.round(skMul * 100)}% ของ Lv.10)</span>
-                    </div>
-                  )}
-                  <div className="text-[13px] text-muted-foreground">{sk.d}</div>
+                <div key={label}>
+                  <dt>{thai}<small>{label}</small></dt>
+                  <dd>{cv}{diff > 0 && <em>+{diff}</em>}</dd>
                 </div>
               );
             })}
+          </dl>
+          <div className="profile-mastery">
+            <span className="profile-mastery-label">ความชำนาญ</span>
+            {Object.keys(mastery).length === 0 ? <span className="text-muted-foreground">ยังไม่มี</span> : Object.entries(mastery).map(([w, v]) => (
+              <span key={w} className="profile-chip" title={WEAPON_FAMILY_HINT[w as WeaponFamily]}>
+                {WEAPON_FAMILY_LABEL[w as WeaponFamily]} <b>{Math.floor(v ?? 0)}</b> <small>×{(1 + ((v ?? 0) / 200) * 0.5).toFixed(2)}</small>
+              </span>
+            ))}
           </div>
-
-          <div className="flex flex-wrap gap-1 mt-2">
-            {Object.entries(mastery).map(([w, v]) => {
-              const pts = Math.floor(v ?? 0);
-              const mult = (1 + ((v ?? 0) / 200) * 0.5).toFixed(2);
-              return (
-                <span
-                  key={w}
-                  className="text-[13px] bg-muted/40 px-2 py-0.5 rounded"
-                  title={WEAPON_FAMILY_HINT[w as WeaponFamily]}
-                >
-                  <strong className="text-primary">{pts}</strong>
-                  <span className="opacity-70"> pt</span>{" "}
-                  <span className="opacity-70">×{mult}</span>{" "}
-                  {WEAPON_FAMILY_LABEL[w as WeaponFamily]}
-                </span>
-              );
-            })}
-            {Object.keys(mastery).length === 0 && (
-              <span className="text-[13px] text-muted-foreground">ยังไม่มีความเชี่ยวชาญ</span>
-            )}
-          </div>
-
-          <div className="text-[13px] text-muted-foreground mt-1">
-            โบนัสจากวิชา:{" "}
-            {Object.entries(skillStatBonus).length > 0
-              ? Object.entries(skillStatBonus).map(([k, v]) => `${k}+${v}`).join(" ")
-              : "—"}
-          </div>
+          <p className="profile-bonus">โบนัสจากวิชา: {Object.entries(skillStatBonus).length > 0 ? Object.entries(skillStatBonus).map(([k, v]) => `${k}+${v}`).join(" ") : "—"}</p>
         </section>
-
-        </>}
-
-        {tab === "gear" && <>
-        {/* ─── Equipment ───────────────────────────────────────────── */}
-        <section className="profile-panel">
-          <div className="profile-heading">
-            อุปกรณ์ ({EQUIP_ROWS.length} ช่อง)
-          </div>
-          <div className="space-y-1">
-            {EQUIP_ROWS.map((row) => {
-              const slot = player.equipment[row.type];
-              const id = Array.isArray(slot) ? slot[row.index ?? 0] : slot;
-              const e = getEquip(id);
-              const key = `${row.type}-${row.index ?? "x"}`;
-              return (
-                <div key={key} className="flex items-center gap-1.5 text-xs">
-                  <span className="text-[13px] text-muted-foreground w-28 shrink-0">{row.label}</span>
-                  <div className="flex-1 min-w-0">
-                    {e ? <strong>{e.n}</strong> : <span className="text-[13px] text-muted-foreground italic">— ว่าง —</span>}
-                  </div>
-                  {e && (
-                    <span className="text-sm bg-primary/10 text-primary px-1.5 py-0.5 rounded shrink-0 whitespace-nowrap">
-                      {describeEquip(id)}
-                    </span>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="mt-2 rounded-md bg-muted/40 p-2 border-l-2 border-orange-500 text-[13px] leading-relaxed">
-            รวม: {equipSummary.length > 0 ? equipSummary.join(" · ") : "ไม่มีโบนัส"}
-          </div>
-        </section>
-        </>}
-
-        {tab === "fame" && (
-          <section className="profile-panel">
-            <div className="profile-heading">ชื่อเสียงและคุณธรรม</div>
-            <dl className="profile-derived">
-              {TRAIT_KEYS.map((k) => (
-                <div key={k}><dt>{TRAIT_LABEL[k]}</dt><dd>{traits[k] ?? 0}</dd></div>
-              ))}
-            </dl>
-          </section>
-        )}
       </div>
     </Modal>
   );
 }
 
+// Trait names short enough for one chip each.
+const TRAIT_SHORT: Record<(typeof TRAIT_KEYS)[number], string> = { good: "ความดี", evil: "ความเลว", arrogance: "ทะนง", humility: "ถ่อมตน", fame: "ชื่อเสียง" };
+
+// Moves live in the วิชา section, reputation in the first column.
 const PROFILE_TABS = [
   { id: "stats", label: "ค่าพลัง" },
-  { id: "skills", label: "วิชาที่ใช้" },
   { id: "gear", label: "อุปกรณ์" },
-  { id: "fame", label: "ชื่อเสียง" },
 ] as const;
 type ProfileTab = (typeof PROFILE_TABS)[number]["id"];
 

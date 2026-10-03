@@ -6,6 +6,17 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-03
 
+### Landscape only; menus in columns, no scrolling; rumors fade
+
+- **The game is landscape only.** A portrait viewport (a phone held upright) shows the game turned 90° (`app/globals.css` turns the `body`; manifest `orientation: "landscape"`). Every viewport unit goes through `--vw/--vh/--dvw/--dvh`, every media query (and Tailwind's breakpoints) is written for both orientations, and pointer code maps screen coordinates back through `lib/ui/landscape.ts` (map taps, joystick, battle board, HUD occluders, test hooks).
+- **Menus are landscape columns with tabs, not scrolling.** `<Modal fill>` + `.menu-cols` (`app/menu-layout.css`); long lists page with `PagedGrid` (◀ n/m ▶).
+  - **โปรไฟล์:** three columns — who you are (name, a **ฉายา** read off your record by `lib/world/epithet.ts`, HP / MP / พลัง, sect, power tier, reputation) · tabs ค่าพลัง / อุปกรณ์ · detailed status. Moves moved to วิชา, reputation to the first column.
+  - **ย่าม:** worn gear laid out around the hero (paper doll) · the bag as a paged grid with category tabs; picking a thing opens a small window with its details and actions, tapping outside goes back.
+  - **วิชา:** status and the 10 slots · the library · the picked move with its actions first.
+  - **อาชีพ:** tiles instead of a list, same three tabs.
+  - **จดหมาย:** inbox and the open letter side by side; gifts show as icons; letters can be deleted (one, or all read ones; an unclaimed gift goes to the bag first — `deleteLetters`).
+- **Rumors fade.** News lasts 20 days (big news 40, was 60 / 120); a heard rumor fades within 15 days (a lead 30, `fadeHeardRumor`); flavour lore fades by day 60 instead of never; treasure leads stay until heard. The arrival rumor banner now shows on painted maps and fades after 12 seconds (it used to hide itself the moment it appeared).
+
 ### The guide arrow no longer hides under the HUD
 
 - The quest guide's edge pointer used to sit on the very edge of the screen, so toward the top-left (vitals + menu), top-right (purse, sundial, quest tracker) or bottom-right (rest / action / places) it hid under the HUD. HUD boxes now carry `data-hud-occluder`; the pointer slides in along its ray until it is clear of them, still pointing the right way, and an arrow over a marker the HUD covers turns into that pointer. `guide-hud.spec.ts` walks a phone and a desktop view around and checks the pointer is never under a HUD box.

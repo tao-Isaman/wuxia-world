@@ -115,7 +115,7 @@ Both runtimes are loaded with a dynamic `import()` in the browser only. The host
 - **Sizes.** Hero 56 units tall; archetype NPCs 54; bystanders 51; unique NPC sprites 50.
 - **Roaming foes.** `presentation.foes` (the store's `roamingFoes` for this map) is read every frame, so foes appear and vanish without a rebuild. Each is drawn from its `opponentLook`: a character sheet idling and turning to watch the hero, or a creature-atlas frame breathing, tinted and sized by the look, with a red ⚔ name tag at 9020. Within 30 units of the hero (`FOE_TOUCH`) it calls `onEngage` once. The runtime also picks their spots for the store (`pickFoeSpot`: 150–320 units away, unblocked, reachable, clear of markers and other foes) through the walk-tick callback. A tap on a foe's sprite walks the hero into it, ahead of any marker under it (`foeAt`). They wait on roads too (`RouteMapView`, via `roamingFoesOn` in `components/world/roaming-foes.ts`). A beast is cropped to its painted pixels at its atlas cell's scale.
 - **Guide arrow.** A jade arrow bobs over the marker flagged `guide` (the tracked quest's target). When that marker is off screen, a pulsing edge pointer turns toward it. Published as `data-guide-marker`.
-  - **Never under the HUD.** HUD boxes over the map carry `data-hud-occluder` (the vitals + menu stack, purse and sundial, quest tracker, law chips, rest button, action button, places control, the extras button); the runtime re-measures them every 250 ms (`hudOccluders`). An arrow they would cover turns into the edge pointer, and the pointer slides in along its ray toward the screen centre — still pointing the same way — until it clears every box. Its host-pixel spot is published as `data-guide-edge` (`x,y`). Give any new HUD box over the map `data-hud-occluder`.
+  - **Never under the HUD.** HUD boxes over the map carry `data-hud-occluder` (the vitals + menu stack, purse and sundial, quest tracker, law chips, rest button, action button, places control, the extras button); the runtime measures them once a frame while the guide needs them (`hudOccluders`; boxes come and go — the action button appears beside a marker). An arrow they would cover turns into the edge pointer, and the pointer slides in along its ray toward the screen centre — still pointing the same way — until it clears every box. Its host-pixel spot is published as `data-guide-edge` (`x,y`). Give any new HUD box over the map `data-hud-occluder`.
 - **Occluders.** Foreground cut-outs from the painting, sorted against feet (`world-occlusion.ts`). Only `home_player` and `city_capital` have them.
 - **Lighting.** A flat veil over the scene (`world-lighting.ts`). Night fades in from ชั่วยาม 8 and is full from 9. Lantern pools exist only on `home_player` and `city_capital`; they flicker at about 10 fps, except under reduced motion.
 - **Vignettes.** `capitalVignette` (`world-vignettes.ts`) adds story props on `city_capital` only:
@@ -326,9 +326,21 @@ On a map (`MapHud` in `components/world/map-hud.tsx` + `MenuBar hud`):
 
 There is no portrait, status strip or minimap on maps; HP, MP and พลัง are the slim vitals card top-left.
 
+## Landscape only
+
+The game is laid out for a landscape screen. A portrait viewport (a phone held upright) shows it turned on its side:
+
+- **The turn.** `app/globals.css`: under `@media (orientation: portrait)` the `body` is `position: fixed`, `100dvh × 100dvw`, `transform: rotate(90deg) translateY(-100%)` about its top-left. Fixed descendants (menus, toasts, portals) turn with it. The PWA manifest asks for `orientation: "landscape"`.
+- **Viewport units.** Nothing uses raw `vw` / `vh`: every size goes through `--vw`, `--vh`, `--dvw`, `--dvh` (`calc(70 * var(--vh))`), which swap in portrait so "height" is always the short side the player sees.
+- **Media queries** are written for both orientations: `(orientation: landscape) and (max-height: 500px), (orientation: portrait) and (max-width: 500px)`. Tailwind's `sm` / `md` / `lg` / `xl` / `2xl` are raw queries of the same shape (`tailwind.config.ts`). Write new ones the same way.
+- **Pointers.** Client coordinates are screen coordinates. Code that maps a pointer onto the page (the map runtime's `toMap` / `tapAt`, the battle board's `toWorld`, the joystick, the HUD occluders) goes through `lib/ui/landscape.ts`: `toPagePoint`, `toClientPoint`, `pageRect`. Test hooks (`worldScreenPoint`, `gridCellPoint`) return client coordinates.
+- **Not handled:** `env(safe-area-inset-*)` still names the physical edges, so a notch is padded on the wrong side when turned; Radix popovers place themselves in client space and may sit off their trigger when turned.
+
 ## Menus and popups
 
 A menu section opens as a full-screen **menu shell** (`components/ui/modal.tsx` + `game-menu-context.tsx`).
+
+- **No scrolling, landscape columns.** A section opened with `<Modal fill>` takes the whole stage (`.hud-menu-panel--fill`, at most 700 px tall; on short screens its title hides — the tab names it). Its content is `.menu-cols > .menu-col` framed columns (`app/menu-layout.css`) with `.menu-tabs` for switching inside a column. Long collections use `PagedGrid` (`components/ui/paged-grid.tsx`): it measures its box, shows the cells that fit and pages the rest (◀ n/m ▶). `useShortScreen()` picks smaller cells on a phone. `.menu-col--scroll` is the last resort (the skill detail with its upgrade card).
 
 - The shell has a tab strip, a red ✕ and a titled parchment panel. Digits switch tabs and Esc closes.
 - A modal opened inside the shell (a confirm) floats as a card.
@@ -336,10 +348,11 @@ A menu section opens as a full-screen **menu shell** (`components/ui/modal.tsx` 
 
 | Popup (`components/world/popups/`) | Shows |
 | --- | --- |
-| `profile-popup.tsx` | the hero, gold, HP / MP / power bars, memberships; tabs ค่าพลัง (base stats with training bars and derived stats) · วิชาที่ใช้ · อุปกรณ์ · ชื่อเสียง |
-| `inventory-popup.tsx` | 10 worn gear slots, the bag grid (gear first, then items) with category filters, a detail pane (ใช้ / ติดตั้ง / ถอด) |
-| `move-skills-popup.tsx` | the 10-slot loadout, weapon mastery, conflict warning; below, the learned library on the left (icon + name, filters) and the picked move on the right (`SkillDetail`: numbers, xp, equip / replace / remove, เร่งด้วย w-exp with the `upgrade-payoff.tsx` card, ลืม); styles `.skills-*` in `game-menu.css` / `dq-theme.css` |
-| `life-skills-popup.tsx` | mastery for all 19 life skills · training items and music · learned recipes (read-only) |
+| `profile-popup.tsx` | three columns (`fill`): who (figure, name, ฉายา from `lib/world/epithet.ts`, gold, HP / MP / พลัง bars, power tier, sects, the five traits) · tabs ค่าพลัง (base stats with training bars; tap for sources) / อุปกรณ์ · detailed status (combat numbers, weapon mastery, move bonuses); styles `app/profile.css` |
+| `inventory-popup.tsx` | two columns: worn gear as a paper doll around the hero (`DOLL_AREA` grid areas) · category tabs over a `PagedGrid` of the bag (gear first, then items). Picking anything opens a small window (`.bag-popup`: details, ใช้ / ติดตั้ง / ถอด); tapping outside it goes back to the bag |
+| `move-skills-popup.tsx` | three columns: counts, weapon mastery, conflicts and the 10 loadout slots · the learned library (`PagedGrid`, filters) · the picked move (`SkillDetail`: actions first — equip / replace / remove, เร่งด้วย w-exp with the `upgrade-payoff.tsx` card, ลืม — then numbers and xp) |
+| `life-skills-popup.tsx` | tabs มาสเตอร์รี่ / ฝึกฝน / สูตรที่เรียน, each a `PagedGrid` of tiles: the 19 life skills · music practice and training items · learned recipes (read-only) |
+| `letters-popup.tsx` | two columns: the inbox (`PagedGrid`; the gift as an item tile, ● unread, ลบที่อ่านแล้ว) · the open letter (portrait, text, the gift tile and rarity, ลบ). Deleting takes an unclaimed gift first (`deleteLetters`) |
 | `quest-log-popup.tsx` → `components/world/quest-log.tsx` | กำลังทำ / สำเร็จ / ละทิ้ง; each row expands to the stage checklist, the guide box (🎯 / 📍 / ➤ นำทาง), objective spots, 📌 ติดตาม, ละทิ้งภารกิจ |
 | `sect-membership-popup.tsx` | the sect, rank-up, 🎖 rewards, 📜 sect quests, ☯ arts, leaving (resign or betray) |
 | `action-log-popup.tsx` | the last 100 actions, newest first |
@@ -488,7 +501,9 @@ The data in `public/progress.json` is **frozen at wave 11** (2026-09-29), so tre
 ## Known issues
 
 - **Drawer button.** The quest tracker may cover the "อื่น ๆ" drawer button (both sit at the top right) on the six maps that show the drawer, including `home_player`.
-- **Rumor banner.** It is mounted only in the classic layout, so it never shows. Market and sect-internal rumors are reachable only through that drawer.
+- **Market and sect-internal rumors** are reachable only through the drawer.
+- **Menus still scrolling.** ภารกิจ, สำนัก and บันทึก (and shop / artisan / hall popups) keep their old scrolling layouts; only โปรไฟล์, ย่าม, วิชา, อาชีพ and จดหมาย are landscape columns.
+- **Turned portrait** (see [Landscape only](#landscape-only)): safe-area insets name the physical edges, and Radix popovers (the stat tooltips, comboboxes) may sit off their trigger.
 - **Action log.** Kinds `battle`, `encounter`, `steal`, `assassinate` and `kidnap` show their raw English names, and `travel` is labelled but never logged.
 - **`/progress` and the cache.** With the service worker active, each 5-second poll of `/progress.json?t=…` adds a cache entry and eventually pushes real art out of the 900-entry cache.
 - **Night.** The sundial styles 戌–丑 (7–10) as night; the veil and the night music run from 8 to 11.

@@ -103,7 +103,7 @@
 }
 .hud-menu-body { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 16px 20px 22px; scrollbar-color: #8f7a4f #13231f; }
 
-@media (max-width: 760px) {
+@media (orientation: landscape) and (max-width: 760px), (orientation: portrait) and (max-height: 760px) {
   .hud-menu-bar { gap: 4px; padding-left: 6px; padding-right: 4px; }
   .hud-menu-tabs { justify-content: flex-start; gap: 3px; }
   .hud-menu-tab { flex-direction: column; gap: 1px; min-height: 54px; padding: 5px 8px 6px; font-size: 11px; }
@@ -114,7 +114,7 @@
   .hud-menu-title { font-size: 18px; padding: 8px 12px; }
   .hud-menu-body { padding: 12px 12px 18px; }
 }
-@media (max-height: 500px) and (orientation: landscape) {
+@media (max-height: 500px) and (orientation: landscape), (orientation: portrait) and (max-width: 500px) {
   .hud-menu-bar { padding-top: 4px; }
   .hud-menu-tab { min-height: 40px; padding: 3px 9px 4px; font-size: 12px; }
   .hud-menu-tab img { width: 20px; height: 20px; }
@@ -132,7 +132,7 @@
 .game-modal-body :is(.text-\[9px\], .text-\[10px\]) { font-size: 11.5px; }
 .game-modal-body .text-xs { font-size: 13px; }
 
-@media (max-width: 480px) {
+@media (orientation: landscape) and (max-width: 480px), (orientation: portrait) and (max-height: 480px) {
   /* Two rows of four so every label stays whole and legible. */
   .hud-menu-bar { align-items: center; padding-bottom: 6px; }
   .hud-menu-tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; overflow: visible; }
@@ -180,7 +180,7 @@
 .power-outlook-stronger { color: #f3b26b; }
 .power-outlook-even { color: #e8dfc2; }
 .power-outlook-weaker, .power-outlook-trivial { color: #9fd39a; }
-@media (max-width: 480px) {
+@media (orientation: landscape) and (max-width: 480px), (orientation: portrait) and (max-height: 480px) {
   .encounter-body { grid-template-columns: 84px 1fr; gap: 12px; }
   .encounter-portrait { height: 92px; }
   .encounter-copy h2 { font-size: 24px; }
@@ -203,10 +203,8 @@ button.item-tile:hover { transform: translateY(-2px); box-shadow: inset 0 0 0 2p
 .item-tile-count { position: absolute; right: 3px; bottom: 1px; font: 700 12px ui-monospace, monospace; color: #fff3cf; text-shadow: 1px 1px 0 #000, -1px -1px 0 #000; }
 
 /* ── Bag ────────────────────────────────────────────────────────────── */
-.bag-layout { display: grid; grid-template-columns: 236px minmax(0, 1fr) 280px; gap: 16px; align-items: start; }
 .bag-heading { margin-bottom: 8px; font-size: 14px; color: #d8c48f; }
 .bag-gear, .bag-detail { padding: 12px; background: #0f1c19; border: 1px solid #3f4a3a; }
-.bag-gear-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 8px; }
 .bag-gear-slot { display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 0; }
 .bag-gear-label { max-width: 100%; font-size: 12px; color: #c6c1a8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .bag-toolbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 10px; }
@@ -216,7 +214,6 @@ button.item-tile:hover { transform: translateY(-2px); box-shadow: inset 0 0 0 2p
 .bag-gold { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: #c6c1a8; }
 .bag-gold strong { color: #f2d998; font-family: ui-monospace, monospace; }
 .bag-notice { margin-bottom: 10px; padding: 6px 10px; font-size: 14px; color: #bfe7c4; background: #1f4a3a55; border-left: 3px solid #7fcfa0; }
-.bag-grid { display: grid; grid-template-columns: repeat(auto-fill, 76px); gap: 10px 6px; }
 .bag-cell { display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 0; }
 .bag-cell > span { max-width: 100%; font-size: 12px; line-height: 1.35; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .bag-empty { padding: 28px 0; text-align: center; color: #9fa591; font-size: 14px; }
@@ -230,23 +227,6 @@ button.item-tile:hover { transform: translateY(-2px); box-shadow: inset 0 0 0 2p
 .bag-detail-action { margin-top: auto; min-height: 44px; }
 .bag-detail-secondary { padding: 10px; color: #f0c9b8; background: #3a1f1a; border: 2px solid #8f5244; }
 .bag-detail-secondary:hover { background: #4a2821; }
-
-@media (max-width: 1000px) {
-  .bag-layout { grid-template-columns: minmax(0, 1fr) 260px; }
-  .bag-gear { grid-column: 1 / -1; }
-  .bag-gear-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
-}
-@media (max-width: 640px) {
-  .bag-layout { grid-template-columns: minmax(0, 1fr); gap: 10px; }
-  .bag-gear { padding: 8px; }
-  .bag-gear-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px 4px; }
-  .bag-gear .item-tile { width: 50px; height: 50px; }
-  .bag-gear-label { font-size: 10.5px; }
-  .bag-grid { grid-template-columns: repeat(auto-fill, 66px); gap: 8px 4px; }
-  .bag-cell > span { font-size: 11px; }
-  .bag-grid .item-tile { width: 54px; height: 54px; }
-  .bag-detail { min-height: 0; }
-}
 
 /* ── Skill loadout strip ─────────────────────────────────────────────── */
 .skill-loadout { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 8px; margin-bottom: 14px; padding: 12px 10px 10px; background: #0f1c19; border: 1px solid #3f4a3a; }
@@ -268,57 +248,9 @@ button.item-tile:hover { transform: translateY(-2px); box-shadow: inset 0 0 0 2p
 .skill-slot[aria-selected=true] .skill-slot-name { color: #f6e3a9; font-weight: 700; }
 .skill-slot:focus-visible { outline: none; }
 .skill-slot:focus-visible .skill-slot-medal { outline: 2px solid #f2d790; outline-offset: 5px; }
-@media (max-width: 760px) {
+@media (orientation: landscape) and (max-width: 760px), (orientation: portrait) and (max-height: 760px) {
   .skill-loadout { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px 4px; padding: 10px 6px; }
   .skill-slot-medal { width: 50px; height: 50px; }
-}
-
-/* ── Skills: library on the left, the picked skill on the right ───────── */
-.skills-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 12px; align-items: start; }
-.skills-library, .skills-detail { min-width: 0; padding: 10px; background: #0f1c19; border: 1px solid #3f4a3a; }
-.skills-library-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 8px; }
-.skills-library-head .bag-filters { display: flex; gap: 4px; }
-.skills-library-head .bag-filters button { padding: 2px 7px; font-size: 11px; }
-.skills-library-list { display: grid; gap: 4px; max-height: min(52vh, 460px); overflow-y: auto; padding-right: 2px; }
-.skills-library-item {
-  display: flex; align-items: center; gap: 8px; width: 100%; min-height: 44px; padding: 4px 6px; text-align: left;
-  color: #e7dcba; background: #ffffff08; border: 1px solid transparent; border-radius: 4px; transition: background 100ms, border-color 100ms;
-}
-.skills-library-item:hover { background: #ffffff14; }
-.skills-library-item[aria-pressed=true] { border-color: var(--rarity); background: #f4dc9c1f; box-shadow: inset 3px 0 0 var(--rarity); }
-.skills-library-icon { display: grid; place-items: center; flex: none; width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--rarity); background: radial-gradient(circle at 50% 36%, #3a5343, #111f1a 72%); }
-.skills-library-name { display: grid; min-width: 0; flex: 1; line-height: 1.25; }
-.skills-library-name > span { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.skills-library-name > small { font-size: 11px; opacity: .72; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.skills-library-slot { flex: none; min-width: 20px; height: 20px; padding: 0 4px; display: grid; place-items: center; font: 700 11px ui-monospace, monospace; color: #1b1a12; background: #e9cf8c; border: 1px solid #7a5e2a; border-radius: 10px; }
-.skills-detail { color: #e7dcba; position: sticky; top: 0; }
-.skills-detail-head { display: flex; align-items: center; gap: 10px; }
-.skills-detail-actions { display: flex; flex-wrap: wrap; gap: 6px; padding-top: 6px; border-top: 1px dashed #3f4a3a; }
-@media (max-width: 560px) {
-  .skills-layout { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 6px; }
-  .skills-library, .skills-detail { padding: 6px; }
-  .skills-library-item { gap: 5px; padding: 3px 4px; }
-  .skills-library-icon { width: 32px; height: 32px; }
-  .skills-library-name > span { font-size: 12px; }
-  .skills-library-name > small { font-size: 10px; }
-  .skills-library-head .bag-filters button { padding: 2px 5px; font-size: 10px; }
-}
-
-/* ── Profile hero block ──────────────────────────────────────────────── */
-.profile-hero { display: grid; grid-template-columns: 150px 1fr; gap: 6px 18px; align-items: center; padding: 10px 14px; background: linear-gradient(90deg, #1b2c26, #0f1c19); border: 1px solid #3f4a3a; }
-.profile-hero > :not(.profile-figure):not(.profile-identity) { grid-column: 2; }
-.profile-figure { grid-row: span 2; height: 160px; background: radial-gradient(ellipse at 50% 92%, #0006 0 26%, transparent 27%), radial-gradient(circle at 50% 42%, #2c4238, transparent 70%); }
-.profile-identity h3 { font: 30px/1.35 var(--font-display); color: #f6e3a9; text-shadow: 2px 2px 0 #07120f; }
-.profile-identity p { font-size: 14px; color: #b9bfa6; }
-.profile-vitals { display: grid; grid-template-columns: repeat(4, minmax(0, auto)); justify-content: start; gap: 4px 20px; margin-top: 8px; }
-.profile-vitals dt { font-size: 12px; color: #9fa591; }
-.profile-vitals dd { font: 700 17px ui-monospace, monospace; color: #f2e6c4; }
-@media (max-width: 640px) {
-  .profile-hero { grid-template-columns: 96px 1fr; gap: 4px 10px; padding: 8px; }
-  .profile-figure { height: 112px; }
-  .profile-identity h3 { font-size: 22px; }
-  .profile-vitals { grid-template-columns: repeat(2, minmax(0, auto)); gap: 2px 14px; }
-  .profile-vitals dd { font-size: 14px; }
 }
 
 /* ── List rows (shop / artisan / hall / quest): dark bars like the reference ── */
@@ -336,7 +268,7 @@ button.item-tile:hover { transform: translateY(-2px); box-shadow: inset 0 0 0 2p
 .shop-name { font-size: 15px; }
 .shop-price { display: inline-flex; align-items: center; gap: 5px; font: 700 14px ui-monospace, monospace; color: #f2d998; }
 .game-modal-card .shop-row + .shop-row { margin-top: 0; }
-@media (max-width: 480px) { .shop-row { gap: 8px; padding: 6px; } .shop-row .item-tile { width: 42px; height: 42px; } }
+@media (orientation: landscape) and (max-width: 480px), (orientation: portrait) and (max-height: 480px) { .shop-row { gap: 8px; padding: 6px; } .shop-row .item-tile { width: 42px; height: 42px; } }
 
 /* ── NPC card: portrait band like the reference's speaker framing ─────── */
 .npc-card-portrait {
@@ -352,14 +284,14 @@ button.item-tile:hover { transform: translateY(-2px); box-shadow: inset 0 0 0 2p
   position: absolute; left: 176px; right: 12px; bottom: 16px; font: 28px/1.35 var(--font-display); color: #f6e3a9;
   text-shadow: 2px 2px 0 #07120f;
 }
-@media (max-width: 480px) {
+@media (orientation: landscape) and (max-width: 480px), (orientation: portrait) and (max-height: 480px) {
   .npc-card-portrait { height: 128px; }
   .npc-card-portrait img, .npc-card-portrait canvas { width: 128px; }
   .npc-card-name { left: 134px; font-size: 22px; bottom: 10px; }
 }
 /* Charm is for ≥16px names only; small section headings use the body face. */
 .bag-heading, .hud-menu-body h4 { font-family: var(--font-body), system-ui, sans-serif; font-weight: 700; }
-@media (max-height: 500px) and (orientation: landscape) {
+@media (max-height: 500px) and (orientation: landscape), (orientation: portrait) and (max-width: 500px) {
   .bag-gear-grid { grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 4px; }
   .bag-gear .item-tile { width: 42px; height: 42px; }
   .bag-gear .item-tile-glyph { font-size: 20px; }
@@ -372,7 +304,7 @@ button.item-tile:hover { transform: translateY(-2px); box-shadow: inset 0 0 0 2p
 
 /* Encounter keeps clear of the top HUD and fits short landscape screens. */
 .backdrop-focus { padding-top: 120px; padding-bottom: 16px; }
-@media (max-height: 500px) and (orientation: landscape) {
+@media (max-height: 500px) and (orientation: landscape), (orientation: portrait) and (max-width: 500px) {
   .backdrop-focus { padding-top: 64px; padding-bottom: 6px; }
   .encounter-panel { padding: 10px 14px 8px; width: min(640px, 100%); }
   .encounter-body { grid-template-columns: 80px 1fr; gap: 12px; margin-top: 4px; }
@@ -416,7 +348,7 @@ body:has(.hud-menu, .game-modal) [data-radix-popper-content-wrapper] > * {
 .hud-menu-body button[role=combobox] { min-height: 40px; font-size: 15px; background: #0f1c19; border-color: #6f5f3d; }
 .hud-menu-body button[role=combobox]:hover { border-color: #c9a55c; background: #15241f; }
 
-@media (max-width: 480px) {
+@media (orientation: landscape) and (max-width: 480px), (orientation: portrait) and (max-height: 480px) {
   .bag-toolbar .bag-filters { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; max-width: 100%; }
   .bag-toolbar .bag-filters::-webkit-scrollbar { display: none; }
   .bag-filters button { flex: 0 0 auto; }
