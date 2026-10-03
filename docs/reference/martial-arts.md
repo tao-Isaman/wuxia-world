@@ -138,8 +138,8 @@ Grid column: the skill's range and area on the tactics board (`skillGrid` / `art
 | `bg_drift_fist` | เพลงหมัดล่องลอย | T2 ขั้นสูง | fist | physical | 70 | 3 | ระยะ 1 · เป้าเดียว | external, hard |
 | `bg_wander_staff` | ไม้เท้าพเนจร | T3 ลับ | long | physical | 85 | 1 | แนวตรง 3 ช่อง | external, hard |
 | `ng3` | ฝ่ามือจับมังกร | T3 ลับ | fist | physical | 95 | 1 | ระยะ 1 · เป้าเดียว | yang, hard |
-| `ep` | 18 ฝ่ามือมังกร | T4 เฉพาะ | fist | physical | 90 | 1 | แนวตรง 3 ช่อง | yang, hard, external |
-| `bg_lucky_staff` | เพลงไม้เท้าตีสุข | T4 เฉพาะ | long | physical | 95 | 4 | ระยะ 1–3 · เป้าเดียว | external, hard |
+| `ep` | 18 ฝ่ามือพิชิตมังกร | T4 เฉพาะ | fist | physical | 90 | 1 | แนวตรง 3 ช่อง | yang, hard, external |
+| `bg_lucky_staff` | เพลงไม้เท้าตีสุนัข | T4 เฉพาะ | long | physical | 95 | 4 | ระยะ 1–3 · เป้าเดียว | external, hard |
 
 ### พรรคตะวันจันทรา (1)
 

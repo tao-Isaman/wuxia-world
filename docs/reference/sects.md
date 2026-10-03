@@ -313,8 +313,8 @@ Martial line — every skill and art is taught only by its lineage quest or saga
 | 3 | skill | ไม้เท้าพเนจร (`bg_wander_staff`) | `ql_skill_bg_wander_staff` |
 | 3 | skill | ฝ่ามือจับมังกร (`ng3`) | `ql_skill_ng3` |
 | 3 | art | พลังฟื้นตะวัน (`t3_bg_sunrenew`) | `ql_art_t3_bg_sunrenew` |
-| 3 | skill | 18 ฝ่ามือมังกร (`ep`) | saga `beggars_dragon_palms` |
-| 3 | skill | เพลงไม้เท้าตีสุข (`bg_lucky_staff`) | saga `beggars_lucky_staff` |
+| 3 | skill | 18 ฝ่ามือพิชิตมังกร (`ep`) | saga `beggars_dragon_palms` |
+| 3 | skill | เพลงไม้เท้าตีสุนัข (`bg_lucky_staff`) | saga `beggars_lucky_staff` |
 | 3 | art | วิชาหมื่นมวลชน (`t4_bg_thousandcrowd`) | saga `beggars_thousand_crowd` |
 | 3 | art | เจียงหูชี่ (`wanderer`) | saga `beggars_wanderer` |
 

@@ -151,7 +151,7 @@ const BATCH: Record<string, IconRenderer> = {
     </g>
   ),
 
-  // 7. 18 ฝ่ามือมังกร — dragon palm — open hand with curling dragon body
+  // 7. 18 ฝ่ามือพิชิตมังกร — dragon palm — open hand with curling dragon body
   ep: ({ ink, accent }) => (
     <g stroke={ink} strokeWidth="2" strokeLinejoin="round">
       {/* curling dragon body around the back */}

@@ -6,6 +6,11 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-03
 
+### Beggars' skill names
+
+- `ep` is now **18 ฝ่ามือพิชิตมังกร** (was "18 ฝ่ามือมังกร") and `bg_lucky_staff` **เพลงไม้เท้าตีสุนัข** (was "เพลงไม้เท้าตีสุข"), with every saga, NPC, rumor and dialog line that names them.
+- The staff saga "ตีสุนัข ตีให้สุข" keeps its misheard-name story, but now ends with the true name: the chief says the manual's name is ตีสุนัข and its heart is ตีสุข.
+
 ### Foes on roads; beasts drawn right
 
 - **Roads now show their foes.** Walking a road already spawned foes, but the road view never drew them, so they were invisible and could not be fought — kill quests whose target lives in the wilds (สืบทอดไม้เท้าขอทาน's wild dogs, say) could stall on the road. `RouteMapView` passes the road's foes like the location view (`components/world/roaming-foes.ts`).
