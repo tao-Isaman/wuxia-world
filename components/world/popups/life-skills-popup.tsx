@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { PagedGrid } from "@/components/ui/paged-grid";
+import { useShortScreen } from "@/components/ui/use-short-screen";
 import { Modal } from "@/components/ui/modal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -29,231 +31,135 @@ interface Props {
 
 type Tab = "skills" | "practice" | "recipes";
 
-// Combined popup for the menu's "🌾 วิชาชีพ" button. Three tabs:
-//   • มาสเตอร์รี่    — progress bar for each of the 19 life skills
-//   • ฝึกฝน          — consumable training items + เล่นเพลง button
-//   • สูตรที่เรียน    — read-only list of learned recipes; the player
-//                      crafts at artisan NPCs (city / village / sect),
-//                      not from this popup. The list is a quick
-//                      reference for what's available where.
+// Combined popup for the menu's "🌾 อาชีพ" button: three tabs, each a paged
+// grid of tiles (no scrolling, landscape):
+//   • มาสเตอร์รี่    — one tile per life skill: icon, level, progress
+//   • ฝึกฝน          — the music practice + every training item in the bag
+//   • สูตรที่เรียน    — learned recipes (crafting happens at artisans)
 export function LifeSkillsPopup({ open, onClose }: Props) {
   const [tab, setTab] = useState<Tab>("skills");
   return (
-    <Modal open={open} onClose={onClose} title="🌾 วิชาชีพและการฝึกฝน" maxWidth="max-w-2xl">
-      <div className="flex gap-1 mb-3 border-b pb-2">
-        <Button variant={tab === "skills" ? "default" : "ghost"} size="sm" className="text-xs" onClick={() => setTab("skills")}>
-          มาสเตอร์รี่
-        </Button>
-        <Button variant={tab === "practice" ? "default" : "ghost"} size="sm" className="text-xs" onClick={() => setTab("practice")}>
-          ฝึกฝน
-        </Button>
-        <Button variant={tab === "recipes" ? "default" : "ghost"} size="sm" className="text-xs" onClick={() => setTab("recipes")}>
-          สูตรที่เรียน
-        </Button>
+    <Modal open={open} onClose={onClose} title="🌾 วิชาชีพและการฝึกฝน" fill>
+      <div className="life-wrap">
+        <div className="menu-tabs" role="tablist" aria-label="หมวดอาชีพ">
+          {TABS.map((t) => (
+            <button key={t.id} type="button" role="tab" aria-selected={tab === t.id} onClick={() => setTab(t.id)}>{t.label}</button>
+          ))}
+        </div>
+        {tab === "skills" && <SkillsTab />}
+        {tab === "practice" && <PracticeTab />}
+        {tab === "recipes" && <RecipesTab />}
       </div>
-
-      {tab === "skills" && <SkillsTab />}
-      {tab === "practice" && <PracticeTab />}
-      {tab === "recipes" && <RecipesTab />}
     </Modal>
   );
 }
 
+const TABS: { id: Tab; label: string }[] = [
+  { id: "skills", label: "มาสเตอร์รี่" },
+  { id: "practice", label: "ฝึกฝน" },
+  { id: "recipes", label: "สูตรที่เรียน" },
+];
+
 // ─── Mastery tab ────────────────────────────────────────────────────
 function SkillsTab() {
   const xpMap = useWorldStore((s) => s.lifeSkillXp);
+  const short = useShortScreen();
   return (
-    <div className="space-y-2">
-      {LIFE_SKILL_KEYS.map((k) => (
-        <SkillRow key={k} skill={k} xp={xpMap[k] ?? 0} />
-      ))}
-    </div>
+    <PagedGrid items={LIFE_SKILL_KEYS} itemKey={(k) => k} cellWidth={short ? 118 : 150} cellHeight={short ? 66 : 92} gap={6}
+      label="มาสเตอร์รี่" render={(k) => <SkillTile skill={k} xp={xpMap[k] ?? 0} />} />
   );
 }
 
-function SkillRow({ skill, xp }: { skill: LifeSkill; xp: number }) {
+function SkillTile({ skill, xp }: { skill: LifeSkill; xp: number }) {
   const { lvl, cur, need } = masteryProgress(xp);
   const pct = need === 0 ? 100 : (cur / need) * 100;
   const atCap = lvl >= MAX_MASTERY;
   return (
-    <div className="rounded bg-muted/30 px-3 py-2 space-y-1">
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <span className="text-base">{LIFE_SKILL_ICON[skill]}</span>
-          <strong className="text-sm">{LIFE_SKILL_LABEL[skill]}</strong>
-        </div>
-        <Badge variant="outline" className="text-[9px]">
-          ระดับ {lvl} / {MAX_MASTERY}
-        </Badge>
+    <div className="life-tile" data-life-skill={skill} title={atCap ? "ถึงระดับสูงสุดแล้ว" : `xp ${xp} · อีก ${Math.max(0, need - cur)} เพื่อระดับถัดไป`}>
+      <div className="life-tile-head">
+        <span className="life-tile-icon" aria-hidden="true">{LIFE_SKILL_ICON[skill]}</span>
+        <strong>{LIFE_SKILL_LABEL[skill]}</strong>
       </div>
+      <div className="life-tile-level">ระดับ <b>{lvl}</b>/{MAX_MASTERY}</div>
       <Progress value={pct} className="h-1.5" />
-      <div className="flex justify-between text-[10px] text-muted-foreground">
-        <span>xp {xp}</span>
-        <span>{atCap ? "ถึงระดับสูงสุดแล้ว" : `อีก ${Math.max(0, need - cur)} เพื่อระดับถัดไป`}</span>
-      </div>
+      <small>{atCap ? "สูงสุด" : `${cur}/${need}`}</small>
     </div>
   );
 }
 
-// ─── Practice tab — consumables + เล่นเพลง ──────────────────────────
+// ─── Practice tab — เล่นเพลง + training items ─────────────────────────
+type PracticeCell = { kind: "music" } | { kind: "item"; id: string };
+
 function PracticeTab() {
   const inventory = useWorldStore((s) => s.inventory);
   const consumeItem = useWorldStore((s) => s.useItem);
   const practiceMusic = useWorldStore((s) => s.practiceMusic);
   const playerBuild = useWorldStore((s) => s.playerBuild);
+  const short = useShortScreen();
 
   const trainable = ITEMS
-    .filter((it) => it.use && (inventory[it.id] ?? 0) > 0)
+    .filter((it) => it.use?.t === "trainSkill" && (inventory[it.id] ?? 0) > 0)
     .sort((a, b) => {
       const sa = a.use?.t === "trainSkill" ? a.use.skill : "";
       const sb = b.use?.t === "trainSkill" ? b.use.skill : "";
       return sa.localeCompare(sb);
     });
-
   const equippedW = getEquip(playerBuild?.equipment.W);
   const hasInstrument = !!equippedW?.instrument;
+  const cells: PracticeCell[] = [{ kind: "music" }, ...trainable.map((it): PracticeCell => ({ kind: "item", id: it.id }))];
 
   return (
-    <div className="space-y-3">
-      {/* Music practice button */}
-      <div className="rounded bg-muted/30 px-3 py-2 space-y-1">
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <span className="text-base">🎵</span>
-            <strong className="text-sm">เล่นเพลงในใจ</strong>
+    <PagedGrid items={cells} itemKey={(c) => (c.kind === "music" ? "music" : c.id)} cellWidth={short ? 150 : 180} cellHeight={short ? 84 : 104} gap={6}
+      label="ไอเทมฝึกฝน" render={(c) => {
+        if (c.kind === "music") return (
+          <div className="life-tile">
+            <div className="life-tile-head"><span className="life-tile-icon" aria-hidden="true">🎵</span><strong>เล่นเพลงในใจ</strong></div>
+            <small>{hasInstrument ? `ใช้ ${equippedW?.n}` : "ต้องสวมเครื่องดนตรีในช่องอาวุธ"}</small>
+            <Button size="sm" variant="outline" className="h-7 text-[12px] mt-auto" disabled={!hasInstrument}
+              onClick={() => {
+                const r = practiceMusic();
+                if (!r.ok) { toast("error", r.reason === "no-instrument" ? "ต้องสวมเครื่องดนตรีในช่องอาวุธก่อน" : "เล่นเพลงไม่ได้ตอนนี้"); return; }
+                toast("success", `บรรเลงเพลงสั้น ๆ · +${r.xpGained} xp ดนตรี`);
+              }}>เล่นเพลง</Button>
           </div>
-          <Button
-            size="sm"
-            variant="outline"
-            className="h-7 text-[11px]"
-            disabled={!hasInstrument}
-            onClick={() => {
-              const r = practiceMusic();
-              if (!r.ok) {
-                toast(
-                  "error",
-                  r.reason === "no-instrument"
-                    ? "ต้องสวมเครื่องดนตรีในช่องอาวุธก่อน"
-                    : "เล่นเพลงไม่ได้ตอนนี้",
-                );
-                return;
-              }
-              toast("success", `บรรเลงเพลงสั้น ๆ · +${r.xpGained} xp ดนตรี`);
-            }}
-          >
-            เล่นเพลง
-          </Button>
-        </div>
-        <div className="text-[10px] text-muted-foreground">
-          {hasInstrument
-            ? `ติดตั้ง ${equippedW?.n} อยู่ในช่องอาวุธ`
-            : "ต้องสวมขลุ่ย พิณ หรือเครื่องดนตรีอื่นในช่องอาวุธ"}
-        </div>
-      </div>
-
-      <div>
-        <div className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground mb-1">
-          ไอเทมฝึกฝน
-        </div>
-        {trainable.length === 0 ? (
-          <p className="text-xs text-muted-foreground italic py-2 text-center">
-            ยังไม่มีไอเทมฝึกฝนในย่าม
-          </p>
-        ) : (
-          <div className="space-y-1.5">
-            {trainable.map((it) => {
-              const eff = it.use!;
-              if (eff.t !== "trainSkill") return null;
-              const count = inventory[it.id] ?? 0;
-              return (
-                <div key={it.id} className="rounded bg-muted/30 px-3 py-2">
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex flex-col items-start gap-0.5 min-w-0">
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <strong className="text-sm">{it.name}</strong>
-                        <Badge variant="outline" className="text-[9px]">
-                          {LIFE_SKILL_ICON[eff.skill]} {LIFE_SKILL_LABEL[eff.skill]}
-                        </Badge>
-                        <Badge variant="outline" className="text-[9px]">
-                          +{eff.xp} xp
-                        </Badge>
-                        <Badge variant="outline" className="text-[9px]">×{count}</Badge>
-                      </div>
-                      {it.description && (
-                        <span className="text-[10px] text-muted-foreground">{it.description}</span>
-                      )}
-                    </div>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="h-7 text-[11px] shrink-0"
-                      onClick={() => {
-                        const r = consumeItem(it.id);
-                        if (!r.ok) {
-                          toast("error", "ใช้ไม่สำเร็จ");
-                          return;
-                        }
-                        if (r.kind === "trainSkill") {
-                          toast("success", `ฝึก ${LIFE_SKILL_LABEL[r.skill]} · +${r.xpGained} xp`);
-                        }
-                      }}
-                    >
-                      ใช้
-                    </Button>
-                  </div>
-                </div>
-              );
-            })}
+        );
+        const it = getItem(c.id)!;
+        const eff = it.use!;
+        if (eff.t !== "trainSkill") return null;
+        return (
+          <div className="life-tile" title={it.description}>
+            <div className="life-tile-head"><span className="life-tile-icon" aria-hidden="true">{LIFE_SKILL_ICON[eff.skill]}</span><strong>{it.name}</strong></div>
+            <small>{LIFE_SKILL_LABEL[eff.skill]} · +{eff.xp} xp · ×{inventory[it.id] ?? 0}</small>
+            <Button size="sm" variant="outline" className="h-7 text-[12px] mt-auto"
+              onClick={() => {
+                const r = consumeItem(it.id);
+                if (!r.ok) { toast("error", "ใช้ไม่สำเร็จ"); return; }
+                if (r.kind === "trainSkill") toast("success", `ฝึก ${LIFE_SKILL_LABEL[r.skill]} · +${r.xpGained} xp`);
+              }}>ใช้</Button>
           </div>
-        )}
-      </div>
-    </div>
+        );
+      }} />
   );
 }
 
 // ─── Recipes tab — read-only "what have I learned" reference ─────────
-//
-// Crafting moved to the artisan popups (city / village / sect). This tab
-// just lists the recipes the player has learned + what they need to
-// craft them, with a hint to visit a matching artisan. Rather than
-// silently swallow the craft button (which used to live here), the row
-// states the profession + tells the player where to go.
+// Crafting happens at the artisan popups (city / village / sect); each tile
+// says what the recipe needs and which artisan to visit.
 function RecipesTab() {
   const learnedRecipeIds = useWorldStore((s) => s.learnedRecipeIds);
   const inventory = useWorldStore((s) => s.inventory);
   const xpMap = useWorldStore((s) => s.lifeSkillXp);
+  const short = useShortScreen();
 
   const recipes: RecipeDef[] = learnedRecipeIds
     .map((id) => RECIPES_BY_ID.get(id))
     .filter((r): r is RecipeDef => !!r);
 
-  if (recipes.length === 0) {
-    return (
-      <div className="space-y-2">
-        <p className="text-xs text-muted-foreground italic py-3 text-center">
-          ท่านยังไม่ได้เรียนสูตรใด
-        </p>
-        <p className="text-[10px] text-muted-foreground text-center">
-          ไปพบช่างฝีมือในเมือง · หมู่บ้าน · สำนัก เพื่อซื้อสูตรและฝึกประดิษฐ์
-        </p>
-      </div>
-    );
-  }
-
   return (
-    <div className="space-y-2">
-      <p className="text-[10px] text-muted-foreground">
-        ประดิษฐ์ได้ที่ร้านช่างฝีมือ — เลือกร้านในเมืองหรือหมู่บ้านที่สาขาตรงกับสูตร
-      </p>
-      {recipes.map((r) => (
-        <RecipeRow
-          key={r.id}
-          recipe={r}
-          inventory={inventory}
-          masteryLv={r.skill ? masteryLevel(xpMap[r.skill] ?? 0) : MAX_MASTERY}
-        />
-      ))}
-    </div>
+    <PagedGrid items={recipes} itemKey={(r) => r.id} cellWidth={short ? 210 : 250} cellHeight={short ? 92 : 112} gap={6}
+      label="สูตรที่เรียน"
+      empty={<p className="text-xs text-muted-foreground italic py-3 text-center">ท่านยังไม่ได้เรียนสูตรใด — ไปพบช่างฝีมือในเมือง · หมู่บ้าน · สำนัก เพื่อซื้อสูตร</p>}
+      render={(r) => <RecipeRow recipe={r} inventory={inventory} masteryLv={r.skill ? masteryLevel(xpMap[r.skill] ?? 0) : MAX_MASTERY} />} />
   );
 }
 
@@ -276,7 +182,7 @@ function RecipeRow({
     : null;
 
   return (
-    <div className="rounded bg-muted/30 px-3 py-2 space-y-1">
+    <div className="life-tile life-tile--recipe" title={recipe.description}>
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <div className="flex items-center gap-1.5 flex-wrap">
           <strong className="text-sm">{recipe.name}</strong>
@@ -303,9 +209,6 @@ function RecipeRow({
           </span>
         )}
       </div>
-      {recipe.description && (
-        <div className="text-[10px] text-muted-foreground">{recipe.description}</div>
-      )}
       <div className="flex flex-wrap gap-1 text-[10px]">
         {recipe.inputs.map((inp) => {
           const have = inventory[inp.itemId] ?? 0;

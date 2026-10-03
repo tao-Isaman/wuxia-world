@@ -105,17 +105,10 @@ body:has(.hud-menu, .game-modal) [data-radix-popper-content-wrapper] > * {
 .skill-slot--empty .skill-slot-name { color: var(--scroll-ink-soft); }
 .skill-slot[aria-selected=true] .skill-slot-medal { box-shadow: 0 0 0 2px #1a0e07, inset 0 0 0 2px #4a2f1a, 0 0 0 5px var(--ribbon), 0 0 14px #c99a4599; }
 .skill-slot[aria-selected=true] .skill-slot-name { color: var(--ribbon-deep); }
-.skills-library, .skills-detail { color: var(--scroll-ink); background: #e7d3a2aa; border: 1px solid var(--scroll-line); border-radius: 4px; }
 .skills-library-item { color: var(--scroll-ink); background: #f3e6c255; }
 .skills-library-item:hover { background: #f3e6c2; }
 .skills-library-item[aria-pressed=true] { background: #fff4d6; }
 .skills-library-icon { background: radial-gradient(circle at 50% 36%, #6b4a2c, #2e1c10 72%); }
-.skills-detail-actions { border-top-color: var(--scroll-line); }
-.profile-hero { background: linear-gradient(90deg, #e7d3a2, #f0e2bf00); border: 1px solid var(--scroll-line); border-radius: 4px; }
-.profile-figure { background: radial-gradient(ellipse at 50% 92%, #3a261640 0 26%, transparent 27%), radial-gradient(circle at 50% 42%, #fff4d6, transparent 70%); }
-.profile-identity h3 { color: var(--ribbon-deep); text-shadow: none; }
-.profile-identity p, .profile-vitals dt { color: var(--scroll-ink-soft); }
-.profile-vitals dd { color: var(--scroll-ink); }
 
 /* NPC card: character on the scroll, name in cinnabar. */
 .npc-card-portrait { background: radial-gradient(ellipse at 28% 40%, #fff3d4, #e2c992 75%); border-bottom: 2px solid var(--scroll-line); }
@@ -175,7 +168,7 @@ body:has(.hud-menu, .game-modal) [data-radix-popper-content-wrapper] > * { borde
 /* Rarity colours were tuned for dark slots; on paper, text versions are inked darker. */
 :is(.game-modal-card, .hud-menu-panel) :is(.shop-name, .bag-detail-name, .bag-cell > span) { filter: brightness(.55) saturate(1.7); text-shadow: none; }
 .hud-coin { display: inline-block; width: 14px; height: 14px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #ffe7a0, #c98f2a 70%); box-shadow: inset 0 0 0 3px #a8741f, inset 0 0 0 4px #f5d180; vertical-align: -2px; }
-@media (max-width: 480px) {
+@media (orientation: landscape) and (max-width: 480px), (orientation: portrait) and (max-height: 480px) {
   .hud-menu-title { margin: 8px 8px 2px; padding: 6px 18px; font-size: 16px; gap: 6px; }
   .hud-menu-title img { width: 22px; height: 22px; }
   .hud-menu-title::before, .hud-menu-title::after { font-size: 10px; }

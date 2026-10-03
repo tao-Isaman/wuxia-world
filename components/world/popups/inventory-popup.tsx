@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Modal } from "@/components/ui/modal";
 import { SLOT_LABELS, getEquip } from "@/lib/game";
 import type { EquipSlotType, Equipment } from "@/lib/game";
@@ -10,6 +10,9 @@ import { toast } from "@/store/toast-store";
 import { ItemEffects } from "@/components/world/item-effects";
 import { CATEGORY_GLYPH, ItemTile } from "@/components/ui/wuxia/item-tile";
 import { equipRarity, itemRarity, rarityColor } from "@/lib/ui/rarity";
+import { PagedGrid } from "@/components/ui/paged-grid";
+import { useShortScreen } from "@/components/ui/use-short-screen";
+import { CharacterPreview } from "@/components/game/character-preview";
 
 interface Props {
   open: boolean;
@@ -49,10 +52,12 @@ function equipStats(eq: Equipment): string[] {
   return out;
 }
 
-// Hero's Adventure-style bag: worn equipment on the left, an item grid framed
-// in rarity colours in the middle, and the selected entry's details + actions
-// on the right. Equipment lookups go through getEquip(); bag items use the
-// world item table.
+// The bag, in two landscape columns: worn equipment laid out around the hero
+// (a paper doll) on the left, and the bag's items on the right — category
+// tabs over a paged grid framed in rarity colours. Picking anything opens a
+// small window with its details and actions; tapping outside it goes back to
+// the bag. Equipment lookups go through getEquip(); bag items use the world
+// item table.
 export function InventoryPopup({ open, onClose }: Props) {
   const player = useWorldStore((s) => s.playerBuild);
   const inventory = useWorldStore((s) => s.inventory);
@@ -64,6 +69,10 @@ export function InventoryPopup({ open, onClose }: Props) {
   const [lastUsed, setLastUsed] = useState<string | null>(null);
   const [filter, setFilter] = useState<Filter>("all");
   const [selection, setSelection] = useState<Selection | null>(null);
+  const bodyId = useWorldStore((s) => s.playerBodyId);
+  const short = useShortScreen();
+  useEffect(() => { if (!open) setSelection(null); }, [open]);
+  useEffect(() => { setLastUsed(null); }, [selection]);
   if (!player) return null;
 
   const items = Object.entries(inventory).filter(([, n]) => n > 0);
@@ -86,14 +95,20 @@ export function InventoryPopup({ open, onClose }: Props) {
       else setLastUsed("ใช้ไม่ได้");
       return;
     }
-    if (r.kind === "trainSkill") setLastUsed(`ฝึก ${LIFE_SKILL_LABEL[r.skill]} · +${r.xpGained} xp`);
+    let message = "";
+    if (r.kind === "trainSkill") message = `ฝึก ${LIFE_SKILL_LABEL[r.skill]} · +${r.xpGained} xp`;
     else if (r.kind === "heal") {
       const parts: string[] = [];
       if (r.hpHealed > 0) parts.push(`HP +${r.hpHealed}`);
       if (r.mpHealed > 0) parts.push(`MP +${r.mpHealed}`);
-      setLastUsed(parts.length > 0 ? `ฟื้นพลัง: ${parts.join(" · ")}` : "ไม่มีพลังให้ฟื้น");
-    } else if (r.kind === "manualLearnSkill") setLastUsed("เรียนวิชาฝีมือสำเร็จ · พร้อมใช้ทันที");
-    else if (r.kind === "manualLearnArt") setLastUsed(`เรียนวิชาในกายสำเร็จ · เริ่มที่ระดับ ${r.level}`);
+      message = parts.length > 0 ? `ฟื้นพลัง: ${parts.join(" · ")}` : "ไม่มีพลังให้ฟื้น";
+    } else if (r.kind === "manualLearnSkill") message = "เรียนวิชาฝีมือสำเร็จ · พร้อมใช้ทันที";
+    else if (r.kind === "manualLearnArt") message = `เรียนวิชาในกายสำเร็จ · เริ่มที่ระดับ ${r.level}`;
+    // The last one used: back to the bag, the result as a toast.
+    if ((useWorldStore.getState().inventory[id] ?? 0) <= 0) {
+      if (message) toast("success", message);
+      setSelection(null);
+    } else setLastUsed(message);
   };
   const equip = (id: string, eq: Equipment) => {
     const r = equipFromBag(id);
@@ -109,25 +124,28 @@ export function InventoryPopup({ open, onClose }: Props) {
     setSelection(null);
   };
 
-  // Nothing picked yet → show the first visible entry, so the detail pane is never blank.
-  const firstGear = shownGear.find(([id]) => getEquip(id));
-  const current: Selection | null = selection ?? (firstGear ? { kind: "bagEquip", id: firstGear[0] }
-    : shownItems[0] ? { kind: "item", id: shownItems[0][0] } : null);
-  const isSelected = (candidate: Selection) => !!current && current.kind === candidate.kind &&
+  const isSelected = (candidate: Selection) => !!selection && selection.kind === candidate.kind &&
     (candidate.kind === "slot"
-      ? current.kind === "slot" && current.row.type === candidate.row.type && current.row.index === candidate.row.index
-      : current.kind !== "slot" && current.id === candidate.id);
+      ? selection.kind === "slot" && selection.row.type === candidate.row.type && selection.row.index === candidate.row.index
+      : selection.kind !== "slot" && selection.id === candidate.id);
+  const filters = ["all", ...(bagEquipment.length ? ["gear" as const] : []), ...categories] as Filter[];
+  const cells: BagCell[] = [
+    ...shownGear.filter(([id]) => getEquip(id)).map(([id, n]): BagCell => ({ kind: "bagEquip", id, n })),
+    ...shownItems.map(([id, n]): BagCell => ({ kind: "item", id, n })),
+  ];
 
   return (
-    <Modal open={open} onClose={onClose} title="🎒 ของในย่ามและเครื่องประดับ">
-      <div className="bag-layout">
-        <section className="bag-gear" aria-label="อุปกรณ์สวมใส่">
-          <h3 className="bag-heading">อุปกรณ์สวมใส่</h3>
-          <div className="bag-gear-grid">
+    <Modal open={open} onClose={onClose} title="🎒 ของในย่ามและเครื่องประดับ" fill>
+      <div className="menu-cols bag-cols">
+        {/* ─── Worn gear, laid out around the hero ─────────────────── */}
+        <section className="menu-col bag-doll" aria-label="อุปกรณ์สวมใส่">
+          <div className="menu-col-head"><span className="menu-col-title">อุปกรณ์สวมใส่</span></div>
+          <div className="bag-doll-grid">
+            <div className="bag-doll-figure" aria-hidden="true"><CharacterPreview id={bodyId} animate /></div>
             {SLOT_ROWS.map((row) => {
               const eq = equipped(row);
               const key = `${row.type}-${row.index ?? "x"}`;
-              return <div key={key} className="bag-gear-slot">
+              return <div key={key} className="bag-doll-slot" style={{ gridArea: DOLL_AREA[key] }} data-slot={key}>
                 <ItemTile glyph={CATEGORY_GLYPH[row.type]} rarity={eq ? equipRarity(eq) : 0} dim={!eq}
                   label={eq ? `${row.label}: ${eq.n}` : `${row.label}: ว่าง`}
                   selected={isSelected({ kind: "slot", row })}
@@ -138,10 +156,11 @@ export function InventoryPopup({ open, onClose }: Props) {
           </div>
         </section>
 
-        <section className="bag-items" aria-label="ของในย่าม">
+        {/* ─── The bag: category tabs, a paged grid of items ─────────── */}
+        <section className="menu-col bag-items" aria-label="ของในย่าม">
           <div className="bag-toolbar">
-            <div className="bag-filters" role="tablist" aria-label="หมวดของ">
-              {(["all", ...(bagEquipment.length ? ["gear" as const] : []), ...categories] as Filter[]).map((f) => (
+            <div className="menu-tabs menu-tabs--wrap" role="tablist" aria-label="หมวดของ">
+              {filters.map((f) => (
                 <button key={f} type="button" role="tab" aria-selected={filter === f} onClick={() => setFilter(f)}>
                   {f === "all" ? "ทั้งหมด" : f === "gear" ? "อุปกรณ์" : ITEM_CATEGORY_LABEL[f]}
                 </button>
@@ -149,47 +168,60 @@ export function InventoryPopup({ open, onClose }: Props) {
             </div>
             <span className="bag-gold"><i className="hud-coin" aria-hidden="true" /> ทอง <strong>{gold.toLocaleString()}</strong></span>
           </div>
-          {lastUsed && <p className="bag-notice" role="status">{lastUsed}</p>}
-          {shownItems.length + shownGear.length === 0 ? (
-            <p className="bag-empty">{items.length + bagEquipment.length === 0 ? "ย่ามว่างเปล่า" : "ไม่มีของในหมวดนี้"}</p>
-          ) : (
-            <div className="bag-grid">
-              {shownGear.map(([id, n]) => {
-                const eq = getEquip(id);
-                if (!eq) return null;
+          <PagedGrid items={cells} itemKey={(c) => `${c.kind}:${c.id}`} cellWidth={short ? 58 : 68} cellHeight={short ? 64 : 80} gap={short ? 4 : 6} resetKey={filter}
+            label="ช่องของในย่าม"
+            empty={<p className="bag-empty">{items.length + bagEquipment.length === 0 ? "ย่ามว่างเปล่า" : "ไม่มีของในหมวดนี้"}</p>}
+            render={(c) => {
+              if (c.kind === "bagEquip") {
+                const eq = getEquip(c.id)!;
                 const rarity = equipRarity(eq);
-                return <div key={`eq-${id}`} className="bag-cell">
-                  <ItemTile glyph={CATEGORY_GLYPH[eq.ty]} rarity={rarity} count={n}
-                    label={`${eq.n} ×${n}`} selected={isSelected({ kind: "bagEquip", id })}
-                    onClick={() => setSelection({ kind: "bagEquip", id })} />
+                return <div className="bag-cell">
+                  <ItemTile glyph={CATEGORY_GLYPH[eq.ty]} rarity={rarity} count={c.n}
+                    label={`${eq.n} ×${c.n}`} selected={isSelected({ kind: "bagEquip", id: c.id })}
+                    onClick={() => setSelection({ kind: "bagEquip", id: c.id })} />
                   <span style={{ color: rarityColor(rarity) }} aria-hidden="true">{eq.n}</span>
                 </div>;
-              })}
-              {shownItems.map(([id, n]) => {
-                const def = getItem(id);
-                const rarity = itemRarity(def?.price);
-                return <div key={id} className="bag-cell">
-                  <ItemTile glyph={CATEGORY_GLYPH[def?.category ?? "misc"]} rarity={rarity}
-                    count={n} label={`${def?.name ?? id} ×${n}`} selected={isSelected({ kind: "item", id })}
-                    onClick={() => setSelection({ kind: "item", id })} />
-                  <span style={{ color: rarityColor(rarity) }} aria-hidden="true">{def?.name ?? id}</span>
-                </div>;
-              })}
-            </div>
-          )}
+              }
+              const def = getItem(c.id);
+              const rarity = itemRarity(def?.price);
+              return <div className="bag-cell">
+                <ItemTile glyph={CATEGORY_GLYPH[def?.category ?? "misc"]} rarity={rarity}
+                  count={c.n} label={`${def?.name ?? c.id} ×${c.n}`} selected={isSelected({ kind: "item", id: c.id })}
+                  onClick={() => setSelection({ kind: "item", id: c.id })} />
+                <span style={{ color: rarityColor(rarity) }} aria-hidden="true">{def?.name ?? c.id}</span>
+              </div>;
+            }} />
         </section>
-
-        <aside className="bag-detail" aria-live="polite">
-          <BagDetail selection={current} inventory={inventory} inventoryEquipment={inventoryEquipment}
-            equipped={equipped} onUse={use} onEquip={equip} onUnequip={unequip} />
-        </aside>
       </div>
+
+      {/* ─── The picked thing: a small window over the bag ──────────── */}
+      {selection && (
+        <div className="bag-popup-backdrop" onClick={() => setSelection(null)} data-testid="bag-popup-backdrop">
+          <div className="bag-popup" role="dialog" aria-label="รายละเอียดของ" onClick={(e) => e.stopPropagation()} aria-live="polite">
+            <button type="button" className="bag-popup-close" aria-label="กลับไปที่ย่าม" onClick={() => setSelection(null)}>✕</button>
+            <BagDetail selection={selection} inventory={inventory} inventoryEquipment={inventoryEquipment}
+              equipped={equipped} onUse={use} onEquip={equip} onUnequip={unequip} notice={lastUsed} />
+          </div>
+        </div>
+      )}
     </Modal>
   );
 }
 
-function BagDetail({ selection, inventory, inventoryEquipment, equipped, onUse, onEquip, onUnequip }: {
+type BagCell = { kind: "item" | "bagEquip"; id: string; n: number };
+
+// Paper doll: rings and charms at the corners, the hat on top, arm guards and
+// weapon / robe at the sides, boots below the figure.
+const DOLL_AREA: Record<string, string> = {
+  "R-0": "r1", "H-x": "h", "R-1": "r2",
+  "BR-0": "br1", "BR-1": "br2",
+  "W-x": "w", "A-x": "a",
+  "C-0": "c1", "B-x": "b", "C-1": "c2",
+};
+
+function BagDetail({ selection, inventory, inventoryEquipment, equipped, onUse, onEquip, onUnequip, notice }: {
   selection: Selection | null;
+  notice: string | null;
   inventory: Record<string, number>;
   inventoryEquipment: Record<string, number>;
   equipped: (row: SlotRow) => Equipment | null | undefined;
@@ -208,6 +240,7 @@ function BagDetail({ selection, inventory, inventoryEquipment, equipped, onUse, 
       <p className="bag-detail-meta">{ITEM_CATEGORY_LABEL[def?.category ?? "misc"]} · มี {n} ชิ้น{def?.price ? ` · ราคา ${def.price}` : ""}</p>
       {def?.description && <p className="bag-detail-text">{def.description}</p>}
       <div className="bag-detail-effects"><ItemEffects effect={def?.use} /></div>
+      {notice && <p className="bag-notice" role="status">{notice}</p>}
       {def?.use && <button type="button" className="pixel-action bag-detail-action" onClick={() => onUse(selection.id)}>ใช้</button>}
     </>;
   }

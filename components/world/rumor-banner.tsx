@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { regionOf } from "@/lib/world/data/regions";
 import { selectRumorsForScene } from "@/lib/world/rumor-engine";
 import { useWorldStore } from "@/store/world-store";
@@ -9,12 +9,16 @@ interface Props {
   // Current scene's location id. The banner only shows when this id
   // looks city-like — see `isCityishLocation` below.
   locationId: string;
+  // Over the painted map (bottom centre) instead of above the location card.
+  floating?: boolean;
 }
 
 // Internal flag used to throttle the banner to once per 7 world days.
 // Underscore-prefixed so it stays out of the player-visible flag list.
 const FLAG_LAST_BANNER_DAY = "_lastBannerDay";
 const BANNER_COOLDOWN_DAYS = 7;
+// How long the overheard rumor stays on screen before it fades.
+const BANNER_SHOW_MS = 12_000;
 
 // Rough city-detection. The spec asks the banner to appear when the
 // player enters a city (or city-like commercial leaf) for the first
@@ -37,14 +41,15 @@ function isCityishLocation(locationId: string): boolean {
 //   2. The single highest-weight rumor from the inn pool is shown as
 //      flavour text above the location view: "ขณะเดินเข้าเมือง ได้ยิน
 //      คนพูดกันว่า: {rumor.text}".
-//   3. The banner is purely passive — no buttons, no action cost.
+//   3. The banner is purely passive — no buttons, no action cost. It
+//      fades after BANNER_SHOW_MS (talk in the street passes).
 //   4. Internal cooldown flag `_lastBannerDay` is set when the banner
 //      decides to show, so re-entering the same city within 7 days
 //      doesn't spam.
 //
 // When no eligible rumor exists, or the cooldown hasn't elapsed, or the
 // scene isn't city-like, the component renders nothing.
-export function RumorBanner({ locationId }: Props) {
+export function RumorBanner({ locationId, floating = false }: Props) {
   const day = useWorldStore((s) => s.day);
   const rumorPool = useWorldStore((s) => s.rumorPool);
   const flags = useWorldStore((s) => s.flags);
@@ -53,6 +58,9 @@ export function RumorBanner({ locationId }: Props) {
   // rumorPool + rumorSeenLog + day off the snapshot so the memo only
   // re-runs when those slices change.
   const state = useWorldStore();
+  // The rumor on show. Kept here so starting the cooldown (which makes the
+  // scene ineligible) does not hide it; it fades after BANNER_SHOW_MS.
+  const [shown, setShown] = useState<{ id: string; text: string; at: string } | null>(null);
 
   const cityish = isCityishLocation(locationId);
   const region = useMemo(() => regionOf(locationId), [locationId]);
@@ -76,26 +84,33 @@ export function RumorBanner({ locationId }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [eligible, region, day, rumorPool, state.rumorSeenLog]);
 
-  // Mark the cooldown flag once the banner actually renders. Doing this
-  // in an effect (rather than during render) keeps the render pure and
-  // avoids a "set during render" warning.
+  // Show it and start the cooldown, in an effect (not during render).
   useEffect(() => {
-    if (top) setFlag(FLAG_LAST_BANNER_DAY, day);
-    // We intentionally only run this when a banner has been chosen —
-    // if `top` is null we're not displaying anything, so no cooldown.
-  }, [top, day, setFlag]);
+    if (!top) return;
+    setShown({ id: top.id, text: top.text, at: locationId });
+    setFlag(FLAG_LAST_BANNER_DAY, day);
+  }, [top, day, setFlag, locationId]);
 
-  if (!top) return null;
+  // Talk in the street passes: the banner fades after a while, or on leaving.
+  useEffect(() => {
+    if (!shown) return;
+    const timer = window.setTimeout(() => setShown(null), BANNER_SHOW_MS);
+    return () => window.clearTimeout(timer);
+  }, [shown]);
+
+  if (!shown || shown.at !== locationId) return null;
 
   return (
     <div
       role="note"
-      className="rounded-sm bg-paper border-l-2 border-vermilion px-3 py-2 text-sm italic leading-relaxed text-ink"
+      data-testid="rumor-banner"
+      className={floating ? "rumor-banner rumor-banner--floating" : "rumor-banner rounded-sm bg-paper border-l-2 border-vermilion px-3 py-2 text-sm italic leading-relaxed text-ink"}
+      style={{ animationDuration: `${BANNER_SHOW_MS}ms` }}
     >
       <span className="text-[11px] not-italic font-display tracking-wide text-vermilion">
         ข่าวลือในเมือง ·{" "}
       </span>
-      ขณะเดินเข้าเมือง ได้ยินคนพูดกันว่า: &ldquo;{top.text}&rdquo;
+      ขณะเดินเข้าเมือง ได้ยินคนพูดกันว่า: &ldquo;{shown.text}&rdquo;
     </div>
   );
 }

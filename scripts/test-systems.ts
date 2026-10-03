@@ -14,6 +14,7 @@ import {
   prizeOptions, registerBlock, resolveRound, roundPairs, settleTournaments, startBlock, tournamentDay, tournamentPhase, yearOf,
 } from "../lib/world/tournament";
 import { namedNpcIds } from "../lib/world/data/named-npcs";
+import { NEWCOMER_EPITHET, heroEpithet } from "../lib/world/epithet";
 import { useWorldStore } from "../store/world-store";
 import { useBattleStore } from "../store/battle-store";
 
@@ -257,6 +258,36 @@ check("tournament: a year without the hero is fought among the NPCs; a skipped r
   assert.equal(s.tournamentHistory.filter((r) => r.year === 1).length, 1, "settled once");
   assert.equal(playerOpponent(s.tournament), null);
   assert.equal(roundPairs(s.tournament!, 0).length, 16);
+});
+
+check("letters: deleting one first takes a gift not yet claimed; read ones go in one sweep", () => {
+  store().startNewGame({ name: "ผู้ทดสอบ", gender: "female" } as never);
+  const before = store().inventory.potion ?? 0;
+  useWorldStore.setState({ letters: [
+    { id: "keep_gift", day: 1, npcId: "sect_shaolin_abbot_huiyuan", text: "x", rarity: 2, itemId: "potion", count: 2, read: false, claimed: false },
+    { id: "read_one", day: 2, npcId: "sect_shaolin_abbot_huiyuan", text: "y", rarity: 1, gold: 100, read: true, claimed: true },
+  ] });
+  const gold = store().gold;
+  const r = store().deleteLetters(["keep_gift"]);
+  assert.equal(r.deleted, 1);
+  assert.equal(r.gifts.length, 1, "the unclaimed gift was taken");
+  assert.equal(store().inventory.potion, before + 2);
+  assert.deepEqual(store().letters.map((l) => l.id), ["read_one"]);
+  assert.equal(store().deleteLetters(["read_one"]).deleted, 1);
+  assert.equal(store().gold, gold, "a claimed letter's gold is not paid twice");
+  assert.equal(store().letters.length, 0);
+  assert.equal(store().deleteLetters(["nope"]).ok, false);
+});
+
+check("ฉายา: a crown, a price on the head, the top of a sect, then the strongest trait", () => {
+  const base = { traits: { good: 0, evil: 0, arrogance: 0, humility: 0, fame: 0 }, tournamentHistory: [], sectMembership: {}, wanted: 0 };
+  assert.equal(heroEpithet(base), NEWCOMER_EPITHET);
+  assert.equal(heroEpithet({ ...base, traits: { ...base.traits, good: 30, fame: 10 } }), "จอมยุทธ์ผู้ทรงธรรม");
+  assert.equal(heroEpithet({ ...base, traits: { ...base.traits, evil: 70, good: 20 } }), "มารร้ายแห่งยุทธภพ");
+  const top = SECT_MEMBERSHIPS.wudang;
+  assert.equal(heroEpithet({ ...base, sectMembership: { wudang: { rank: top.topRank, points: 0, lastQuestDay: {}, artQuestsDone: [], rewardPicks: {}, joinedDay: 0, status: "active" } } } as never), `ประมุขแห่ง${top.name}`);
+  assert.equal(heroEpithet({ ...base, wanted: 3, traits: { ...base.traits, good: 90 } }), "ผู้ต้องหาที่ทางการตามล่า");
+  assert.equal(heroEpithet({ ...base, wanted: 5, tournamentHistory: [{ year: 1, champion: PLAYER }] }), "ยอดกระบี่แห่งชุมนุมวิจารณ์กระบี่");
 });
 
 console.log(`\n${passed} systems checks passed.`);

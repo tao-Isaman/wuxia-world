@@ -50,7 +50,7 @@
   position: absolute;
   left: 0;
   right: 0;
-  height: 11vh;
+  height: calc(11 * var(--vh));
   background: #050302;
   pointer-events: none;
   animation: barIn 700ms ease-out both;
@@ -89,7 +89,7 @@
 }
 .card h2 {
   font-family: var(--font-display), serif;
-  font-size: clamp(2rem, 6vw, 3.6rem);
+  font-size: clamp(2rem, calc(6 * var(--vw)), 3.6rem);
   color: #f4e3b5;
   letter-spacing: 0.04em;
   text-shadow: 0 2px 0 #3a1d10, 0 0 24px rgba(240, 190, 90, 0.45);
@@ -97,7 +97,7 @@
 }
 .card p {
   font-family: var(--font-body), sans-serif;
-  font-size: clamp(0.95rem, 2.2vw, 1.15rem);
+  font-size: clamp(0.95rem, calc(2.2 * var(--vw)), 1.15rem);
   color: #f1e4c6;
   letter-spacing: 0.08em;
   text-shadow: 0 1px 2px #000;
@@ -110,9 +110,9 @@
 .subtitle {
   position: absolute;
   left: 50%;
-  bottom: calc(11vh + 0.75rem);
+  bottom: calc(calc(11 * var(--vh)) + 0.75rem);
   transform: translateX(-50%);
-  width: min(52rem, calc(100vw - 2rem));
+  width: min(52rem, calc(calc(100 * var(--vw)) - 2rem));
   min-height: 4.6rem;
   padding: 0.85rem 1.25rem 1rem;
   background: linear-gradient(180deg, rgba(28, 16, 11, 0.9), rgba(16, 9, 6, 0.94));
@@ -125,7 +125,7 @@
 }
 .subtitle p {
   margin: 0;
-  font-size: clamp(1rem, 2.4vw, 1.2rem);
+  font-size: clamp(1rem, calc(2.4 * var(--vw)), 1.2rem);
   line-height: 1.6;
 }
 .speaker {
@@ -181,8 +181,8 @@
   .stage { transition: none; }
 }
 
-@media (max-height: 520px) {
-  .bar { height: 8vh; }
-  .subtitle { bottom: calc(8vh + 0.4rem); min-height: 3.6rem; padding: 0.55rem 1rem 0.7rem; }
+@media (orientation: landscape) and (max-height: 520px), (orientation: portrait) and (max-width: 520px) {
+  .bar { height: calc(8 * var(--vh)); }
+  .subtitle { bottom: calc(calc(8 * var(--vh)) + 0.4rem); min-height: 3.6rem; padding: 0.55rem 1rem 0.7rem; }
   .subtitle p { font-size: 1rem; line-height: 1.45; }
 }

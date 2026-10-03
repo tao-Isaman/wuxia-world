@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type RefObject } from "react";
 import type { WorldRuntime } from "@/lib/stage/types";
+import { pageRect, toPagePoint } from "@/lib/ui/landscape";
 
 const RADIUS = 56;   // knob travel, CSS px
 const DEAD_ZONE = 10; // a touch that moves less than this is a tap
@@ -17,7 +18,7 @@ export function TouchStick({ host, runtime }: {
   runtime: RefObject<WorldRuntime | null>;
 }) {
   const [stick, setStick] = useState<{ x: number; y: number; dx: number; dy: number } | null>(null);
-  const active = useRef<{ id: number; x: number; y: number; dragged: boolean } | null>(null);
+  const active = useRef<{ id: number; x: number; y: number; px: number; py: number; dragged: boolean } | null>(null);
 
   useEffect(() => {
     const element = host.current;
@@ -32,20 +33,23 @@ export function TouchStick({ host, runtime }: {
     };
     const down = (event: PointerEvent) => {
       if (event.pointerType === "mouse" || active.current || !(event.target instanceof HTMLCanvasElement)) return;
-      const bounds = element.getBoundingClientRect();
-      if (event.clientX - bounds.left > bounds.width / 2) return;
+      // Page coordinates: the page may be turned (landscape-only, lib/ui/landscape.ts).
+      const bounds = pageRect(element);
+      const at = toPagePoint(event.clientX, event.clientY);
+      if (at.x - bounds.left > bounds.width / 2) return;
       // Ours now: keep the map's own tap-to-walk from firing underneath.
       event.stopPropagation();
       event.preventDefault();
       try { element.setPointerCapture(event.pointerId); } catch { /* synthetic or already-released pointer */ }
-      active.current = { id: event.pointerId, x: event.clientX, y: event.clientY, dragged: false };
-      setStick({ x: event.clientX - bounds.left, y: event.clientY - bounds.top, dx: 0, dy: 0 });
+      active.current = { id: event.pointerId, x: event.clientX, y: event.clientY, px: at.x, py: at.y, dragged: false };
+      setStick({ x: at.x - bounds.left, y: at.y - bounds.top, dx: 0, dy: 0 });
     };
     const move = (event: PointerEvent) => {
       const current = active.current;
       if (!current || current.id !== event.pointerId) return;
       event.preventDefault();
-      const dx = event.clientX - current.x, dy = event.clientY - current.y;
+      const at = toPagePoint(event.clientX, event.clientY);
+      const dx = at.x - current.px, dy = at.y - current.py;
       const distance = Math.hypot(dx, dy);
       if (!current.dragged && distance < DEAD_ZONE) return;
       current.dragged = true;

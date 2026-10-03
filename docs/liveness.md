@@ -35,13 +35,13 @@ The code differs from both in many places; [Spec versus code](#spec-versus-code)
 | `lib/world/rumor-engine.ts` | making rumors (`generateNpcEventEcho`, `generatePlayerEcho`, `generateWarning`, `seedLoreRumors`), choosing them (`selectRumorsForScene`) and housekeeping (`maintainRumors`) |
 | `lib/world/data/named-npcs.ts` | `NAMED_NPC_DEFAULTS` — the 20 simulated NPCs and their starting state |
 | `lib/world/data/rumor-templates.ts` | text templates for NPC events, player echoes and warnings; `renderTemplate`; lifespans |
-| `lib/world/data/lore-rumors.ts` | `LORE_RUMORS` — 30 hand-written rumors that never expire |
+| `lib/world/data/lore-rumors.ts` | `LORE_RUMORS` — 30 hand-written rumors (flavour fades by day 60; leads stay until heard) |
 | `lib/world/data/regions.ts` | `regionOf` / `regionAt` (from the world map), `LAYOUT_REGION` (layout seed), `CHANNEL_ADMITS`, `REGION_NEIGHBORS` (unused) |
 | `lib/world/types.ts` | `NpcExtState`, `NpcGoal`, `NpcEventKind`, `NpcSimStatus`, `Rumor`, `RumorSummary`, `RumorSeenEntry`, `Region`, `RumorChannel`, `RumorTruth`, `RumorSource` |
 | `store/world-store.ts` | calls the engines from `advanceTime`; `failQuestsForDeadGivers`; `recordRumorHeard`; the five player-echo call sites |
 | `components/world/popups/rumor-popup.tsx` | the rumor list |
 | `components/world/rumor-listen-button.tsx` | `resolveRumorChannel` + `RumorListenSection` (a listen button for places without a rumor spot) |
-| `components/world/rumor-banner.tsx` | a passive entry banner (effectively never shown, see [Known gaps](#known-gaps)) |
+| `components/world/rumor-banner.tsx` | a passive entry banner: the top rumor on reaching a city, inn or market, shown 12 s over the map |
 | `components/world/npc-status-badge.tsx` | the dead / secluded / missing chip next to an NPC's name |
 
 None of these engine modules is in the `lib/world/index.ts` barrel; import them by path.
@@ -92,7 +92,7 @@ A `Rumor`:
 | `id` | `rumor_event_<npc>_<kind>_<day>_<rand>`, `rumor_player_<action>_<day>_<rand>`, `rumor_warn_<kind>_<day>_<rand>` or `lore_<suffix>` |
 | `text` | the rendered Thai sentence |
 | `source` | `npc_event` · `player_echo` · `lore` · `warning` |
-| `createdDay`, `expiresDay` | lifetime; lore expires at `Number.MAX_SAFE_INTEGER` |
+| `createdDay`, `expiresDay` | lifetime; flavour lore expires on `LORE_FLAVOUR_LAST_DAY` (60), an unheard lead at `Number.MAX_SAFE_INTEGER`; hearing a rumor pulls it in (`fadeHeardRumor`) |
 | `truth` | `true` · `distorted` · `false` — never shown to the player |
 | `region` | where it can be heard |
 | `channel` | `inn` · `market` · `sect_internal` · `wilderness` |
@@ -246,14 +246,15 @@ On average an NPC gains only 0.54 years of age in the first year.
 
 | Source | Made by | Lifespan | Truth roll | Weight |
 | --- | --- | --- | --- | --- |
-| `npc_event` | `generateNpcEventEcho`, from every simulated event | 60 days; 120 for big news | 80 % true · 15 % distorted · 5 % false | template weight, ×2 for big news |
-| `player_echo` | `generatePlayerEcho`, from five hero actions | 60 days | 65 % true · 25 % distorted · 10 % false | template weight |
-| `lore` | `seedLoreRumors` | never expires | fixed per entry (23 true, 6 distorted, 1 false) | fixed per entry |
+| `npc_event` | `generateNpcEventEcho`, from every simulated event | 20 days; 40 for big news | 80 % true · 15 % distorted · 5 % false | template weight, ×2 for big news |
+| `player_echo` | `generatePlayerEcho`, from five hero actions | 20 days | 65 % true · 25 % distorted · 10 % false | template weight |
+| `lore` | `seedLoreRumors` | flavour: until day 60; leads: until heard | fixed per entry (23 true, 6 distorted, 1 false) | fixed per entry |
 | `warning` | `generateWarning` — only called by tests | until the day after the event | always true | template weight |
 
 - **Truth variants.** A distorted or false rumor uses the template's `distorted` / `fake` text. When a template has no such text, it falls back to the true text, so the truth is not visible from the wording either.
 - **Big news** is `death_combat`, `master_art` or `betray_sect`. The rule "or the actor's `sectRank ≤ 3`" in `isBigNews` never matches: the roster uses 10 for the top rank, so ranks run 7–10.
-- **Template `lifespan`** fields are ignored; the engine uses `DEFAULT_LIFESPAN_DAYS` (60) and `BIG_NEWS_LIFESPAN_DAYS` (120) from `rumor-templates.ts`.
+- **Template `lifespan`** fields are ignored; the engine uses `DEFAULT_LIFESPAN_DAYS` (20) and `BIG_NEWS_LIFESPAN_DAYS` (40) from `rumor-templates.ts`.
+- **Heard news fades.** `recordRumorHeard` calls `fadeHeardRumor`: once the hero has heard a rumor it lasts at most `RUMOR_HEARD_DAYS` (15) more, a lead `RUMOR_LEAD_HEARD_DAYS` (30). So talk passes with time and the same story is not told for months.
 
 ### Templates
 
@@ -313,7 +314,7 @@ Channels used by the templates:
 - **Channels:** 26 inn and 4 wilderness.
 - **Regions:** south 3, north 6, west 8, east 8 and heartland 5 (the five that were `jianghu_wild` follow the place they name).
 
-Their ids are `lore_<idSuffix>` and `createdDay` is 1. Seeding also repairs lore whose `expiresDay` became `null` after a JSON round trip.
+Their ids are `lore_<idSuffix>` and `createdDay` is 1. Flavour lore (no `leadsTo`) is talk of the day the hero sets out and expires on day 60 (`LORE_FLAVOUR_LAST_DAY`); a lead stays until heard, then lasts 30 days. Seeding also repairs lore whose `expiresDay` became `null` after a JSON round trip (and old saves' "never" deadline on flavour lore). Expired lore stays in the pool (filtered out by `selectRumorsForScene`) and is never evicted, so a reload cannot re-seed it.
 
 ### Deduplication
 
@@ -334,12 +335,12 @@ It sorts them unseen first, then by weight (highest first), then newest first, a
 
 `maintainRumors(state, day)` runs after every NPC tick call:
 
-1. Expired rumors move to `rumorArchive` as `RumorSummary`.
+1. Expired rumors move to `rumorArchive` as `RumorSummary` (lore excepted: it stays, expired, in the pool).
 2. Archive entries older than 365 days are dropped.
 3. `rumorSeenLog` is trimmed to the newest 50.
 4. `applyCaps` runs (it also runs after every new NPC-event rumor):
    - **Soft cap 200:** non-lore rumors at least 90 days old are archived early until the pool is back to 200.
-   - **Hard cap 500:** the excess is dropped without archiving, soonest-to-expire and lowest-weight first (lore sorts last).
+   - **Hard cap 500:** the excess is dropped without archiving, soonest-to-expire and lowest-weight first; lore is never dropped.
 
 Region propagation is a documented TODO at the end of `maintainRumors`.
 
@@ -382,7 +383,7 @@ Five actions have templates. Only three can fire in normal play:
   - Truth is never shown.
   - "ฟังต่อ" calls `recordRumorHeard`, which adds the rumor to `rumorSeenLog` (no duplicates, newest 50).
   - Listening costs no time.
-- **Banner.** `RumorBanner` would show the top rumor on entering a city, inn or market (7-day cooldown in `flags._lastBannerDay`). It is only mounted in the card layout that `world_journey` uses, so in practice it never appears.
+- **Banner.** `RumorBanner` shows the top rumor on entering a city, inn or market (7-day cooldown in `flags._lastBannerDay`): over the painted map at the bottom centre (`floating`), or above the card layout. It keeps the rumor it chose (starting the cooldown no longer hides it) and fades after 12 seconds (`BANNER_SHOW_MS`).
 - **Status badge.** `NpcStatusBadge` shows a chip for dead, secluded or missing NPCs, in the NPC popup header and in card-layout NPC lists. Living NPCs get no chip.
 
 ## Hooks for content
@@ -434,7 +435,7 @@ Scene effects and conditions from the Liveness Layer (full semantics in [world-e
 | false `leadsTo` still gives a partial reward | not built | `leadsTo` is never read |
 | seen log cap 50 | built | |
 | listening costs 2 h / 1 h | not built | free |
-| passive banner | built, effectively unmounted | |
+| passive banner | shown on maps, fades after 12 s | |
 | NPC status + location + rank + death day in the UI | partly | badge only |
 | Liveness effects and conditions | built | unused by content |
 | plan: dedup, quest auto-fail + toast, five action ids, lazy v17 → v18 fill | built | |
@@ -456,8 +457,7 @@ Each item below is real behaviour today; the fix belongs in code, not in these d
 5. **Two player echoes never fire:** `sect_join` (joining happens through the quest reward) and `quest_major_complete` (no `isMajor` quests).
 6. **`find_treasure` rerolls point at `cave_heimu`,** which does not exist; the rumor then names the raw id.
 7. **Leftover days are dropped** on every tick, and batches beyond four lose their goal progress.
-8. **The banner is not mounted** on painted maps.
-9. **No save repair.** `validateAndRepair` does not validate `npcExt` or the rumor arrays.
+8. **No save repair.** `validateAndRepair` does not validate `npcExt` or the rumor arrays.
 
 ## Changing it safely
 

@@ -113,6 +113,12 @@ Real behaviour today, found during the docs audit. Each is small and self-contai
 - **Two systems teach some ยุทธจักร moves.** 35 of the 69 moves that got a quest can also be bought from city school halls or read from a manual; that is intended (quests are the way for every move), but the hall prices weren't retuned.
 - **Kidnapped NPCs can't be kidnapped again** after they return (`kidnappedNpcIds` stays for quest conditions).
 
+### Landscape and menus
+
+- **Turned portrait is lightly tested.** A phone held upright turns the page 90°; map taps, the joystick and menus are covered by e2e on an emulated phone, but `env(safe-area-inset-*)` still names the physical edges (a notch is padded on the wrong side) and Radix popovers (stat tooltips, comboboxes) may sit off their trigger. No physical phone has run it.
+- **Three menus still scroll.** ภารกิจ, สำนัก and บันทึก (and the shop / artisan / hall popups) keep their old layouts; only โปรไฟล์, ย่าม, วิชา, อาชีพ and จดหมาย are column layouts that fit without scrolling.
+- **ฉายา is derived, not earned.** `heroEpithet` reads the record each time (crown, wanted marks, top sect rank, strongest trait); there is no title the player picks or keeps.
+
 ### Quests and sects
 
 - **Some writing still names the move.** Quest names, summaries, rewards and the sect window say วิชาลึกลับ, but the hand-written offer / hand-in lines of lineage quests and saga chapters, and saga titles, were not rewritten and can name or hint at the move.

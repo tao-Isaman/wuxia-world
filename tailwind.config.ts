@@ -14,6 +14,15 @@ const config: Config = {
     "./lib/**/*.{ts,tsx}",
   ],
   theme: {
+    // Landscape only (app/globals.css): a portrait viewport is the page turned
+    // on its side, so a breakpoint's "width" is the viewport's height there.
+    screens: {
+      sm: { raw: "(orientation: landscape) and (min-width: 640px), (orientation: portrait) and (min-height: 640px)" },
+      md: { raw: "(orientation: landscape) and (min-width: 768px), (orientation: portrait) and (min-height: 768px)" },
+      lg: { raw: "(orientation: landscape) and (min-width: 1024px), (orientation: portrait) and (min-height: 1024px)" },
+      xl: { raw: "(orientation: landscape) and (min-width: 1280px), (orientation: portrait) and (min-height: 1280px)" },
+      "2xl": { raw: "(orientation: landscape) and (min-width: 1536px), (orientation: portrait) and (min-height: 1536px)" },
+    },
     container: {
       center: true,
       padding: "1rem",

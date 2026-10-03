@@ -552,6 +552,7 @@ export function LocationView({ scene, readOnly = false, dialogueSpeakerId }: Pro
         {!readOnly && <>
         <MapHud />
         <MenuBar hud />
+        <RumorBanner locationId={scene.id} floating />
         {hasLeftovers && (
           <button
             type="button"

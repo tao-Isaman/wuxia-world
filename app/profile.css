@@ -1,57 +1,99 @@
-/* Profile sheet: readable on a phone. Big numbers, dark ink on parchment,
-   one topic per tab instead of one long scroll. */
-.profile { display: grid; gap: 12px; color: var(--scroll-ink); }
-.profile-hero { grid-template-columns: 120px 1fr; }
-.profile-identity p { font-size: 15px; color: var(--scroll-ink-soft); }
-.profile-identity p strong { color: #8a5a12; }
-.profile-bars { display: grid; gap: 5px; margin-top: 8px; max-width: 360px; }
+/* Profile: three landscape columns (who · stats|gear · detailed status),
+   dark ink on parchment, no scrolling. */
+.profile-cols { grid-template-columns: minmax(0, .95fr) minmax(0, 1.25fr) minmax(0, 1fr); grid-auto-flow: row; color: var(--scroll-ink); }
+
+/* 1 · Who */
+.profile-id { display: flex; align-items: center; gap: 10px; }
+.profile-figure { flex: 0 0 auto; width: 72px; height: 88px; background: radial-gradient(ellipse at 50% 92%, #3a261640 0 26%, transparent 27%), radial-gradient(circle at 50% 42%, #fff4d6, transparent 70%); }
+.profile-name { font: 700 22px/1.25 var(--font-display); color: var(--ribbon-deep); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.profile-epithet { font-size: 14px; font-weight: 600; color: #8a5a12; }
+.profile-meta { font-size: 13px; color: var(--scroll-ink-soft); } .profile-meta strong { color: #8a5a12; }
+.profile-bars { display: grid; gap: 4px; }
 .profile-bar { display: grid; grid-template-columns: 38px 1fr auto; align-items: center; gap: 8px; }
-.profile-bar > span { display: grid; place-items: center; height: 18px; font-size: 12px; font-weight: 700; color: #1a0f0a; border-radius: 9px; }
+.profile-bar > span { display: grid; place-items: center; height: 17px; font-size: 12px; font-weight: 700; color: #1a0f0a; border-radius: 9px; }
 .profile-bar--hp > span { background: #8fd66b; } .profile-bar--mp > span { background: #7fb9f0; } .profile-bar--st > span { background: #e7c46a; }
-.profile-bar i { height: 10px; overflow: hidden; background: #3a2616; border-radius: 6px; }
+.profile-bar i { height: 9px; overflow: hidden; background: #3a2616; border-radius: 6px; }
 .profile-bar i > span { display: block; height: 100%; border-radius: 5px; }
 .profile-bar--hp i > span { background: linear-gradient(#a8ec7c, #4fa83a); }
 .profile-bar--mp i > span { background: linear-gradient(#a6d4ff, #3a7ec9); }
 .profile-bar--st i > span { background: linear-gradient(#f6dc8a, #c7962e); }
-.profile-bar b { font: 700 16px/1 var(--font-body); font-variant-numeric: tabular-nums; min-width: 64px; text-align: right; }
-.profile-bar b small { font-size: 12px; font-weight: 500; color: var(--scroll-ink-soft); }
+.profile-bar b { font: 700 15px/1 var(--font-body); font-variant-numeric: tabular-nums; min-width: 58px; text-align: right; }
+.profile-bar b small { font-size: 11px; font-weight: 500; color: var(--scroll-ink-soft); }
+.profile-facts { display: grid; gap: 4px; }
+.profile-facts > div { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 13.5px; }
+.profile-facts dt { color: var(--scroll-ink-soft); flex: 0 0 auto; }
+.profile-facts dd { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 4px; min-width: 0; text-align: right; }
+.profile-sect { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+.profile-fame { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 3px; margin-top: auto; }
+.profile-trait { display: grid; justify-items: center; padding: 3px 2px; background: #fff8e6aa; border: 1px solid var(--scroll-line); border-radius: 6px; }
+.profile-trait small { font-size: 10.5px; line-height: 1.2; color: var(--scroll-ink-soft); white-space: nowrap; }
+.profile-trait b { font: 700 16px/1.2 var(--font-body); font-variant-numeric: tabular-nums; }
+.profile-trait--fame b { color: #8a5a12; } .profile-trait--good b { color: #2c6a37; } .profile-trait--evil b { color: #a02f27; }
 
-.profile-tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; padding: 3px; background: #3a261618; border-radius: 10px; }
-.profile-tabs button { min-height: 40px; font-size: 15px; font-weight: 600; color: var(--scroll-ink-soft); border-radius: 8px; }
-.profile-tabs button[aria-selected=true] { color: #fff4d6; background: linear-gradient(var(--ribbon), var(--ribbon-deep)); box-shadow: 0 2px 0 #3a1008; }
-
-.profile-panel { display: grid; gap: 8px; }
-.profile-heading { display: flex; align-items: baseline; gap: 8px; font-size: 16px; font-weight: 700; color: var(--ribbon-deep); border-bottom: 1px solid var(--scroll-line); padding-bottom: 3px; }
-.profile-heading small { font-size: 12px; font-weight: 400; color: var(--scroll-ink-soft); }
-
-.profile-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
-.profile-stats > * { width: 100%; text-align: left; }
+/* 2 · Stats | gear */
+.profile-stats { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: minmax(0, 1fr); gap: 6px; }
+.profile-stats > * { display: flex !important; width: 100%; min-height: 0; text-align: left; }
+.profile-stats > * > .profile-stat { flex: 1; }
 .profile-stat {
-  display: grid; grid-template-columns: 1fr auto; grid-template-rows: auto auto; align-items: center; gap: 4px 8px; width: 100%;
-  padding: 8px 10px; background: #fff8e6aa; border: 1px solid var(--scroll-line); border-radius: 8px; cursor: help;
+  display: grid; grid-template-columns: 1fr auto; grid-template-rows: auto auto; align-content: center; align-items: center; gap: 3px 8px; height: 100%;
+  padding: 4px 10px; background: #fff8e6aa; border: 1px solid var(--scroll-line); border-radius: 8px; cursor: help;
 }
-.profile-stat-name { font-size: 16px; font-weight: 600; } .profile-stat-name small { margin-left: 6px; font-size: 11px; color: var(--scroll-ink-soft); letter-spacing: .04em; }
-.profile-stat-value { font: 700 22px/1 var(--font-body); font-variant-numeric: tabular-nums; text-align: right; }
-.profile-stat-value em, .profile-derived dd em { margin-left: 4px; font-size: 13px; font-style: normal; color: #2f7d32; }
+.profile-stat-name { font-size: 15px; font-weight: 600; } .profile-stat-name small { margin-left: 6px; font-size: 11px; color: var(--scroll-ink-soft); letter-spacing: .04em; }
+.profile-stat-value { font: 700 20px/1 var(--font-body); font-variant-numeric: tabular-nums; text-align: right; }
+.profile-stat-value em, .profile-derived dd em { margin-left: 4px; font-size: 12px; font-style: normal; color: #2f7d32; }
 .profile-stat-train { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 8px; }
 .profile-stat-train i { height: 5px; overflow: hidden; background: #3a261626; border-radius: 3px; }
 .profile-stat-train i > span { display: block; height: 100%; background: var(--ribbon); }
-.profile-stat-train small { font-size: 12px; color: var(--scroll-ink-soft); font-variant-numeric: tabular-nums; }
+.profile-stat-train small { font-size: 11px; color: var(--scroll-ink-soft); font-variant-numeric: tabular-nums; }
+.profile-gear { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 6px; }
+.profile-gear ul { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: minmax(0, 1fr); gap: 4px; }
+.profile-gear li { display: grid; align-content: center; min-width: 0; padding: 2px 8px; background: #fff8e6aa; border: 1px solid var(--scroll-line); border-radius: 6px; }
+.profile-gear-slot { font-size: 11px; color: var(--scroll-ink-soft); }
+.profile-gear-name { font-size: 13.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.profile-gear-name i { font-weight: 400; color: var(--scroll-ink-soft); }
+.profile-gear li small { font-size: 11px; color: #2c6a37; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.profile-gear-total { flex: 0 0 auto; font-size: 12.5px; padding: 4px 8px; background: #b0802a1f; border-left: 3px solid #b0802a; border-radius: 4px; }
 
-.profile-derived { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 18px; }
-.profile-derived > div { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding: 7px 2px; border-bottom: 1px dashed var(--scroll-line); }
-.profile-derived dt { font-size: 15px; } .profile-derived dt small { margin-left: 6px; font-size: 11px; color: var(--scroll-ink-soft); }
-.profile-derived dd { font: 700 18px/1 var(--font-body); font-variant-numeric: tabular-nums; }
-.profile-budget { font-size: 12px; color: var(--scroll-ink-soft); text-align: right; }
+/* 3 · Detailed status */
+.profile-derived { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: minmax(0, 1fr); gap: 0 14px; }
+.profile-derived > div { display: flex; justify-content: space-between; align-items: center; gap: 6px; padding: 0 2px; border-bottom: 1px dashed var(--scroll-line); min-height: 0; }
+.profile-derived dt { font-size: 13.5px; white-space: nowrap; } .profile-derived dt small { margin-left: 5px; font-size: 10.5px; color: var(--scroll-ink-soft); }
+.profile-derived dd { font: 700 16px/1 var(--font-body); font-variant-numeric: tabular-nums; }
+.profile-budget { font-size: 12px; color: var(--scroll-ink-soft); }
+.profile-mastery { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; font-size: 12.5px; }
+.profile-mastery-label { font-weight: 700; color: var(--ribbon-deep); margin-right: 2px; }
+.profile-chip { padding: 1px 7px; background: #fff8e6aa; border: 1px solid var(--scroll-line); border-radius: 10px; white-space: nowrap; }
+.profile-chip small { color: var(--scroll-ink-soft); }
+.profile-bonus { font-size: 12.5px; color: var(--scroll-ink-soft); }
 
-@media (max-width: 640px) {
-  .profile-hero { grid-template-columns: 84px 1fr; }
-  .profile-figure { height: 104px; }
-  .profile-stat { padding: 7px 8px; }
-  .profile-stat-name { font-size: 15px; }
-  .profile-stat-value { font-size: 20px; }
-  .profile-derived { grid-template-columns: 1fr; }
-  .profile-tabs button { font-size: 14px; }
+/* Short screens (a phone on its side): tighter type, smaller figure. */
+@media (orientation: landscape) and (max-height: 500px), (orientation: portrait) and (max-width: 500px) {
+  .profile-cols { gap: 6px; }
+  .profile-figure { width: 48px; height: 58px; }
+  .profile-name { font-size: 18px; }
+  .profile-epithet { font-size: 12.5px; }
+  .profile-meta, .profile-facts > div { font-size: 12px; }
+  .profile-bar { grid-template-columns: 32px 1fr auto; gap: 5px; }
+  .profile-bar > span { height: 14px; font-size: 10.5px; }
+  .profile-bar i { height: 7px; }
+  .profile-bar b { font-size: 13px; min-width: 48px; }
+  .profile-trait small { font-size: 9.5px; }
+  .profile-trait b { font-size: 13px; }
+  .profile-stat { padding: 2px 8px; gap: 1px 6px; }
+  .profile-stat-name { font-size: 13px; }
+  .profile-stat-value { font-size: 18px; }
+  .profile-stat-train small { font-size: 10px; }
+  .profile-cols { grid-template-columns: minmax(0, .9fr) minmax(0, 1.15fr) minmax(0, 1.05fr); }
+  .profile-derived { gap: 0 8px; }
+  .profile-derived dt { font-size: 12px; }
+  .profile-derived dt small, .profile-derived dd em { display: none; }
+  .profile-derived dd { font-size: 14px; }
+  .profile-gear-name { font-size: 12px; }
+  .profile-gear-slot, .profile-gear li small { font-size: 10px; }
+  .profile-mastery, .profile-bonus, .profile-gear-total { font-size: 11px; }
 }
-/* Power tier line under the name; the badge carries its tier's colour. */
-.profile-power { margin-top: 2px; }
+/* Tall screens: a bigger figure fills the first column. */
+@media (orientation: landscape) and (min-height: 700px), (orientation: portrait) and (min-width: 700px) {
+  .profile-id { flex-direction: column; align-items: flex-start; }
+  .profile-figure { width: 100%; height: 170px; }
+}

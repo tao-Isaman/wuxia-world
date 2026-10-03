@@ -223,7 +223,7 @@ Two deliberate exceptions reach into stores:
   - fails active quests whose giver just died;
   - maintains rumors (caps 200 / 500, archive after 365 days).
 
-  Rumors stay in their region. See [docs/liveness.md](docs/liveness.md).
+  Rumors stay in their region and fade: news 20 days (big 40), 15 days once heard (`fadeHeardRumor`), flavour lore by day 60. See [docs/liveness.md](docs/liveness.md).
 - **Lineage quests and sagas** (`lib/world/story/`, content in `lib/world/data/story/`). Compact specs compile into quests, dialogs and cutscenes ([docs/story-quests.md](docs/story-quests.md)).
   - Every sect T0–T3 skill / art has one lineage quest `ql_<skill|art>_<id>` (type `side`, `lineage`), gated and sized by tier (`LINEAGE_TIERS`).
   - Every sect T4 is the reward of a saga: 8–10 chapters `st_<arcId>_<nn>` (type `story`), chained on the previous chapter, with films (`DialogScene.cutscene`) and paged dialogs (`paged`).
@@ -235,7 +235,7 @@ Two deliberate exceptions reach into stores:
   - **Place activities** are `ActivityDef`s with `place` (locations, cooldown in days, cost, rewards), run by `doActivity`; auto maps place their spots (`ACTIVITY_SLOTS`), hand maps need `place.spot`.
   - **NPC looks:** all 68 place NPCs have their own painted portrait and body (`import-npc-art.ts`). Strollers (`look.wander`) are rigged (`ANIMATED_NPC_IDS`); the rest stand as a unique pixel sprite. `look.body` (`registerNpcBodies`) is only the fallback sheet for art-less NPCs.
 - **Letters, stations, tournament.**
-  - **Letters** (`letters.ts`): each new day an NPC with relationship ≥ 20 may write (one letter a day, 15 days per NPC; odds from relationship, fame, LUK; gift rarity from LUK). Inbox `state.letters`; `openLetter` takes the gift.
+  - **Letters** (`letters.ts`): each new day an NPC with relationship ≥ 20 may write (one letter a day, 15 days per NPC; odds from relationship, fame, LUK; gift rarity from LUK). Inbox `state.letters`; `openLetter` takes the gift; `deleteLetters` throws letters away (taking an unclaimed gift first).
   - **Horse stations** (`stations.ts`): cities, villages and joinable sects' grounds; ride to a visited station place for gold + time by world-map distance (`stationTravel`).
   - **Sword tournament** (`tournament.ts`): a 360-day year; register at the capital (days 60–89, 100 gold), fight on day 90–92. 32 entrants (hero + the liveness roster + sparring fighters); the hero's bouts are real non-fatal battles (`pendingBattle.tournament`), the rest simulated by power. Bout and place rewards; the champion (hero or NPC) picks one entrant's move or art.
   - **Practice xp** is 30 + 5 % of the xp to the next level, 50 + 6 % at a fitting place (`practiceXpGain`).
@@ -295,7 +295,12 @@ Two deliberate exceptions reach into stores:
   - law chips at the top centre;
   - พัก and the action button at the bottom right;
   - the จุดหมาย list of markers in tabs.
-- **Look.** It comes from `app/game-hud.css`, `app/mobile-hud.css`, `app/game-menu.css` and `app/dq-theme.css` (parchment menus), loaded after `app/globals.css`. The cream / ink / vermilion root tokens show only in fallback layouts, toasts and `/debug`.
+- **Landscape only.** A portrait viewport turns the whole `body` 90° (`app/globals.css`). So:
+  - never use raw `vw` / `vh` — use `calc(N * var(--vh))` (`--vw`, `--vh`, `--dvw`, `--dvh` swap in portrait);
+  - write media queries for both orientations (`(orientation: landscape) and (max-height: 500px), (orientation: portrait) and (max-width: 500px)`); Tailwind breakpoints are already raw queries of that shape;
+  - map pointer client coordinates through `lib/ui/landscape.ts` (`toPagePoint`, `toClientPoint`, `pageRect`).
+- **Menus don't scroll.** A menu section is `<Modal fill>` with `.menu-cols > .menu-col` columns and `.menu-tabs` (`app/menu-layout.css`); long collections page with `PagedGrid` (`components/ui/paged-grid.tsx`, `useShortScreen` for phone cell sizes). Done for โปรไฟล์ (ฉายา: `lib/world/epithet.ts`), ย่าม (paper doll + item window), วิชา, อาชีพ, จดหมาย; ภารกิจ / สำนัก / บันทึก still scroll.
+- **Look.** It comes from `app/game-hud.css`, `app/mobile-hud.css`, `app/game-menu.css`, `app/dq-theme.css` (parchment menus), `app/profile.css` and `app/menu-layout.css`, loaded after `app/globals.css`. The cream / ink / vermilion root tokens show only in fallback layouts, toasts and `/debug`.
 - **Fonts.** Charm (`--font-display`) for headings of 16 px or more; Sarabun (`--font-body`) for everything else — Thai tone marks blur in Charm below 16 px.
 
 ## Conventions

@@ -1,5 +1,5 @@
 /* Detailed 32-bit scenery, lacquer HUD, parchment dialogs. */
-.game-shell { min-height: 100dvh; }
+.game-shell { min-height: calc(100 * var(--dvh)); }
 .game-shell button:focus-visible, .stage-host:focus-visible {
   outline: 2px solid #f2d790; outline-offset: 4px;
 }
@@ -18,11 +18,11 @@
 .title-screen { position: fixed; inset: 0; z-index: 40; overflow-y: auto; background: #172923; margin: 0 !important; }
 .title-landscape { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; image-rendering: pixelated; }
 .title-shade { position: fixed; inset: 0; background: linear-gradient(90deg, #0c201c99, #10211d1a 60%, #0b1b2459); }
-.title-content { position: relative; min-height: 100dvh; max-width: 1320px; margin: auto; padding: 48px 60px; display: grid; grid-template-columns: 1fr 390px; align-items: center; gap: 60px; }
+.title-content { position: relative; min-height: calc(100 * var(--dvh)); max-width: 1320px; margin: auto; padding: 48px 60px; display: grid; grid-template-columns: 1fr 390px; align-items: center; gap: 60px; }
 .title-intro { color: #f6ebc9; text-shadow: 3px 3px 0 #192d28; padding-bottom: 36px; }
 .title-seal { display: inline-grid; place-items: center; background: #9f3d31; border: 2px solid #dca17b; width: 52px; height: 64px; font: 36px serif; margin-bottom: 28px; box-shadow: 3px 3px 0 #172823; }
 .title-kicker { font-family: var(--font-display); font-size: 25px; margin-bottom: 8px; }
-.title-intro h1 { font-family: var(--font-display); color: #fff0ca; font-size: clamp(46px, 5.5vw, 82px); line-height: 1.4; }
+.title-intro h1 { font-family: var(--font-display); color: #fff0ca; font-size: clamp(46px, calc(5.5 * var(--vw)), 82px); line-height: 1.4; }
 .title-description { color: #f2ecd6; font-size: 18px; line-height: 1.9; margin-top: 20px; }
 .title-rule { height: 2px; background: #c8b185; width: 90px; margin: 24px 0 18px; box-shadow: 0 2px #173126; }
 .title-footnote { font-size: 14px; color: #e4d9b7; }
@@ -51,7 +51,7 @@
 .canvas-loading { position: absolute; inset: 0; z-index: 5; display: grid; place-items: center; background: #142b27; color: #e4d4af; }
 .world-controls { position: absolute; bottom: 96px; left: 50%; transform: translateX(-50%); z-index: 10; display: flex; gap: 14px; align-items: center; font-size: 12px; color: #efe8cf; text-shadow: 1px 1px #0b1e19; white-space: nowrap; padding: 5px 12px; background: #132923cf; border: 1px solid #d4c69855; }
 .world-controls button { min-height: 32px; color: #f0d396; padding: 0 6px; }
-.world-places { position: absolute; z-index: 35; left: 50%; transform: translateX(-50%); bottom: 144px; width: min(90vw, 370px); max-height: 45dvh; overflow-y: auto; padding: 8px; }
+.world-places { position: absolute; z-index: 35; left: 50%; transform: translateX(-50%); bottom: 144px; width: min(calc(90 * var(--vw)), 370px); max-height: calc(45 * var(--dvh)); overflow-y: auto; padding: 8px; }
 .world-places-list button { display: block; text-align: left; width: 100%; padding: 11px; font-size: 14px; }
 .world-places-tabs { position: sticky; top: -8px; z-index: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin: -8px -8px 6px; padding: 8px 8px 6px; background: inherit; border-bottom: 1px solid #e2bd6a44; }
 .world-places-tabs button { padding: 6px 2px; font-size: 12px; text-align: center; border: 1px solid transparent; border-radius: 4px; white-space: nowrap; }
@@ -70,11 +70,11 @@
 .battle-fighter { box-shadow: none; }
 .battle-arena [role=progressbar] { border-radius: 0; }
 .battle-arena .text-\[10px\] { font-size: 11px; }
-@media (max-width: 900px) {
+@media (orientation: landscape) and (max-width: 900px), (orientation: portrait) and (max-height: 900px) {
   .title-content { padding: 30px; gap: 30px; grid-template-columns: 1fr 340px; }
   .hero-creation { padding: 20px; }
 }
-@media (max-width: 640px) {
+@media (orientation: landscape) and (max-width: 640px), (orientation: portrait) and (max-height: 640px) {
   .title-content { display: flex; flex-direction: column; padding: 28px 22px; gap: 20px; }
   .title-intro { width: 100%; padding: 0; text-align: center; }
   .title-seal, .title-rule, .title-footnote { display: none; }
@@ -87,7 +87,7 @@
   .world-controls { bottom: 87px; }
   .world-places { bottom: 138px; }
 }
-@media (max-height: 560px) and (min-width: 641px) {
+@media (orientation: landscape) and (max-height: 560px) and (min-width: 641px), (orientation: portrait) and (max-width: 560px) and (min-height: 641px) {
   /* A shallow status strip leaves market conversations visible on short screens. */
   .title-content { padding: 18px 32px; }
   .hero-creation { padding: 15px 20px; }
@@ -110,8 +110,8 @@
 .game-modal-heading h3 { font-size: 20px; }
 .game-modal-heading button { min-width: 44px; min-height: 44px; color: #efdfb8; }
 .game-modal-heading button:hover { background: #43533c; color: #fff3cc; }
-.game-modal-body { max-height: min(68dvh, calc(100dvh - 130px)); overscroll-behavior: contain; }
-@media (pointer: coarse), (max-width: 639px) {
+.game-modal-body { max-height: min(calc(68 * var(--dvh)), calc(calc(100 * var(--dvh)) - 130px)); overscroll-behavior: contain; }
+@media (pointer: coarse), (orientation: landscape) and (max-width: 639px), (orientation: portrait) and (max-height: 639px) {
   .world-keyboard-hint { display: none; }
   .world-touch-hint { display: inline; }
 }

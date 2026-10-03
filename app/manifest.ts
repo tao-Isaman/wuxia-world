@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 
 // Installable game: full screen on Android, standalone on iOS (which ignores
-// "fullscreen"). Either orientation works; the HUD adapts to both.
+// "fullscreen"). Landscape only: a phone held upright shows the game turned on its side.
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: "/",
@@ -14,7 +14,7 @@ export default function manifest(): MetadataRoute.Manifest {
     scope: "/",
     display: "fullscreen",
     display_override: ["fullscreen", "standalone"],
-    orientation: "any",
+    orientation: "landscape",
     background_color: "#10201b",
     theme_color: "#140a07",
     categories: ["games", "entertainment"],

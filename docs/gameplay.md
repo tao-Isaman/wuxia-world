@@ -83,6 +83,7 @@ A typical first session in the capital:
 
 **HUD:**
 
+- **Landscape only.** The game is played on its side: a phone held upright shows it turned 90°, and the menus are laid out in columns and tabs so nothing scrolls.
 - **Top left:** a slim card with HP, MP and พลัง (stamina) gauges, and under it the icon bar — 1 โปรไฟล์, 2 ย่าม (bag), 3 วิชา (skills), 4 อาชีพ (life skills and crafts), 5 ภารกิจ (quests), 6 สำนัก (sect), 7 บันทึก (action log), ♪ sound, and the install button.
 - **Top right:** gold (ตำลึง), w-exp (悟), the sundial, the day, and the tracked quest (📌).
 - **Top centre:** wanted marks and the jail sentence, when you have any.
@@ -237,7 +238,7 @@ Walk up to a person and talk. The NPC card offers what that person supports:
 - **Gone and back.** An assassinated person is gone for the rest of the game. A kidnapped one disappears and returns to their spot after 180 days.
 - **Strollers.** Some people (farmers, children, guards, servants) wander around their spot; shopkeepers, elders and masters stand still.
 - **Quest marks.** A gold **!** over a person means a quest to offer; **?** means something to hand in.
-- **Letters (จดหมาย).** A person whose relationship with you is **20 or more** may write to you with a gift — at most one letter a day, and one from each person every 15 days. Each new day every such friend has a chance of `1 % + 0.15 % per relationship point above 20 + 0.02 % per fame + 0.05 % per LUK` (at most 15 %). The gift's rarity (ทั่วไป / ดี / หายาก / ล้ำค่า, by item price) also rises with LUK (and a little with fame); people who like gold may send gold instead. A toast announces a new letter, and the ✉ จดหมาย tab (the 8th HUD icon) shows an unread count; opening a letter puts the gift in your bag. Code: `lib/world/letters.ts`.
+- **Letters (จดหมาย).** A person whose relationship with you is **20 or more** may write to you with a gift — at most one letter a day, and one from each person every 15 days. Each new day every such friend has a chance of `1 % + 0.15 % per relationship point above 20 + 0.02 % per fame + 0.05 % per LUK` (at most 15 %). The gift's rarity (ทั่วไป / ดี / หายาก / ล้ำค่า, by item price) also rises with LUK (and a little with fame); people who like gold may send gold instead. A toast announces a new letter, and the ✉ จดหมาย tab (the 8th HUD icon) shows an unread count; opening a letter puts the gift in your bag. The inbox shows each gift as an icon; letters can be deleted one at a time or all read ones at once (an unclaimed gift goes to the bag first). Code: `lib/world/letters.ts`.
 - **Named masters.** The 20 named masters (sect chiefs and seconds) live, age and can die (see [liveness.md](liveness.md)). A dead or secluded master shows a badge on their card.
 
 ## Quests and tracking
@@ -532,7 +533,9 @@ At the 🍶 ฟังข่าวลือ spot in a city or inn, you hear up to
 - 📜 old lore and treasure hints;
 - ⚠ warnings.
 
-Some rumors are exaggerated or false, and the game never says which. Details: [liveness.md](liveness.md).
+Some rumors are exaggerated or false, and the game never says which.
+
+Talk passes with time: news lasts 20 days (big news 40), and once you have heard a rumor it fades within 15 days (a treasure lead 30). The old lore is talk of the days when you set out and fades by day 60; treasure leads stay until you hear them. Arriving in a city, inn or market may also bring a passing word at the bottom of the screen, which fades after a few seconds. Details: [liveness.md](liveness.md).
 
 ## Saving, game over and starting again
 

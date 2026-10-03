@@ -1,4 +1,5 @@
 import { gradePixels } from "./route-grade";
+import { pageRect, toClientPoint, toPagePoint } from "@/lib/ui/landscape";
 import type * as Phaser from "phaser";
 import {
   CHARACTER_CLIPS, CREATURE_ATLAS, characterId, creatureCell, npcCharacterId,
@@ -399,11 +400,12 @@ export function createWorldRuntime(
   }
   /** CSS pixel inside the host → map units. */
   function toMap(event: PointerEvent): Point {
-    const bounds = parent.getBoundingClientRect();
+    const bounds = pageRect(parent);
+    const at = toPagePoint(event.clientX, event.clientY);
     const center = cameraCenter();
     return {
-      x: center.x - viewWidth / 2 + (event.clientX - bounds.left) / viewScale,
-      y: center.y - viewHeight / 2 + (event.clientY - bounds.top) / viewScale,
+      x: center.x - viewWidth / 2 + (at.x - bounds.left) / viewScale,
+      y: center.y - viewHeight / 2 + (at.y - bounds.top) / viewScale,
     };
   }
   function toScreen(point: Point): Point {
@@ -412,8 +414,8 @@ export function createWorldRuntime(
   }
   // Tests: viewport point of a map point (to tap a foe, say).
   (parent as HTMLElement & { worldScreenPoint?: (x: number, y: number) => Point }).worldScreenPoint = (x, y) => {
-    const bounds = parent.getBoundingClientRect(), p = toScreen({ x, y });
-    return { x: bounds.left + p.x, y: bounds.top + p.y };
+    const bounds = pageRect(parent), p = toScreen({ x, y });
+    return toClientPoint(bounds.left + p.x, bounds.top + p.y);
   };
   function markerAt(point: Point): string | null {
     let best: { id: string; y: number } | null = null;
@@ -957,10 +959,10 @@ export function createWorldRuntime(
     const now = performance.now();
     if (now - occludersAt < 250) return occluders;
     occludersAt = now;
-    const host = parent.getBoundingClientRect();
+    const host = pageRect(parent);
     const pad = 6;
     occluders = [...document.querySelectorAll<HTMLElement>("[data-hud-occluder]")]
-      .map((element) => element.getBoundingClientRect())
+      .map((element) => pageRect(element))
       .filter((r) => r.width > 0 && r.height > 0)
       .map((r) => ({ left: r.left - host.left - pad, top: r.top - host.top - pad, right: r.right - host.left + pad, bottom: r.bottom - host.top + pad }));
     return occluders;

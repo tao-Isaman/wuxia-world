@@ -38,5 +38,5 @@
 .progress-character-gallery figure { background: #21392f; padding: 16px; }
 .progress-character-gallery canvas { width: 100%; height: 180px; image-rendering: pixelated; object-fit: contain; }
 .progress-character-gallery figcaption { text-align: center; font-size: 11px; letter-spacing: .1em; color: #d8c597; }
-@media(max-width:760px) { .progress-character-gallery { grid-template-columns: 1fr 1fr; }.progress-character-gallery canvas { height: 140px; } }
-@media(max-width:760px) { .progress-page { padding: 24px 18px; }.progress-page header { align-items: start; }.progress-page h1 { font-size: 30px; }.progress-columns { grid-template-columns: 1fr; }.progress-pieces { grid-template-columns: 1fr; }.progress-page header a { max-width: 110px; } }
+@media (orientation: landscape) and (max-width:760px), (orientation: portrait) and (max-height: 760px) { .progress-character-gallery { grid-template-columns: 1fr 1fr; }.progress-character-gallery canvas { height: 140px; } }
+@media (orientation: landscape) and (max-width:760px), (orientation: portrait) and (max-height: 760px) { .progress-page { padding: 24px 18px; }.progress-page header { align-items: start; }.progress-page h1 { font-size: 30px; }.progress-columns { grid-template-columns: 1fr; }.progress-pieces { grid-template-columns: 1fr; }.progress-page header a { max-width: 110px; } }

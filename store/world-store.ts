@@ -72,7 +72,7 @@ import { tickAllNamedNpcs } from "@/lib/world/npc-tick";
 import { releaseFromJail, rollFoeSpawn, rollWalkEvent } from "@/lib/world/effects";
 import { WANTED_DECAY_DAYS, WANTED_MAX, describeSentence, isLawOpponent, sentenceLeft } from "@/lib/world/law";
 import { JAIL_SCENE_ID, getActivity, jailDiceChance, jailEscapeChance } from "@/lib/world/data/activities";
-import { maintainRumors, seedLoreRumors, RUMOR_SEEN_CAP } from "@/lib/world/rumor-engine";
+import { fadeHeardRumor, maintainRumors, seedLoreRumors, RUMOR_SEEN_CAP } from "@/lib/world/rumor-engine";
 import { namedNpcIds } from "@/lib/world/data/named-npcs";
 import { toast } from "@/store/toast-store";
 import { SECT_MEMBERSHIPS, rankUpGold } from "@/lib/world/data/sect-memberships";
@@ -387,6 +387,8 @@ interface WorldStore extends WorldStateData {
   acknowledgeBattleResult: () => void;
   /** Open a letter: mark it read and take its gift. */
   openLetter: (letterId: string) => { ok: boolean; gift?: string };
+  /** Throw letters away; a gift not yet taken goes to the bag first. */
+  deleteLetters: (letterIds: string[]) => { ok: boolean; deleted: number; gifts: string[] };
   /** Ride from this place's horse station to a visited station place. */
   stationTravel: (to: string) => { ok: boolean; reason?: "no-station" | "unknown" | "gold" };
   /** Pay the fee and register for this year's sword tournament. */
@@ -1333,6 +1335,26 @@ export const useWorldStore = create<WorldStore>()(
         draft.letters = draft.letters.map((l) => l.id === letterId ? { ...l, read: true, claimed: true } : l);
         set({ ...draft });
         return { ok: true, gift };
+      },
+
+      deleteLetters: (letterIds) => {
+        const ids = new Set(letterIds);
+        const gifts: string[] = [];
+        // Never lose a gift: open (and claim) any unclaimed one first.
+        for (const letter of get().letters) {
+          if (ids.has(letter.id) && !letter.claimed) {
+            const gift = get().openLetter(letter.id).gift;
+            if (gift) gifts.push(gift);
+          }
+        }
+        const s = get();
+        const kept = s.letters.filter((l) => !ids.has(l.id));
+        const deleted = s.letters.length - kept.length;
+        if (!deleted) return { ok: false, deleted: 0, gifts };
+        const draft = draftFrom(s);
+        draft.letters = kept;
+        set({ ...draft });
+        return { ok: true, deleted, gifts };
       },
 
       stationTravel: (to) => {
@@ -3011,7 +3033,8 @@ export const useWorldStore = create<WorldStore>()(
         });
         // Cap matches RUMOR_SEEN_CAP — drop oldest first (FIFO).
         while (log.length > RUMOR_SEEN_CAP) log.shift();
-        set({ rumorSeenLog: log });
+        // Heard news fades: it lasts at most RUMOR_HEARD_DAYS more.
+        set({ rumorSeenLog: log, rumorPool: fadeHeardRumor(s.rumorPool ?? [], rumorId, s.day) });
       },
 
       _setFlag: (flag, value) =>

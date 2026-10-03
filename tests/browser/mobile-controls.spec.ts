@@ -1,6 +1,7 @@
 import { test, expect, type Page } from "@playwright/test";
 
-test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+// The game is landscape only: a phone on its side is the phone layout.
+test.use({ viewport: { width: 844, height: 390 }, hasTouch: true, isMobile: true });
 
 async function start(page: Page) {
   await page.goto("/");
@@ -52,12 +53,12 @@ test("mobile HUD: top icons, left-thumb joystick and a context action button", a
 
   // Left half: the stick appears under the thumb and drags the hero.
   const before = Number(await world.getAttribute("data-player-x"));
-  await touch(page, "pointerdown", 80, 620);
+  await touch(page, "pointerdown", 120, 300);
   await expect(page.locator(".touch-stick:not(.touch-stick--idle)")).toBeVisible();
-  await touch(page, "pointermove", 150, 620);
+  await touch(page, "pointermove", 190, 300);
   await expect(world).toHaveAttribute("data-player-motion", "walk");
   await expect.poll(async () => Number(await world.getAttribute("data-player-x"))).toBeGreaterThan(before + 15);
-  await touch(page, "pointerup", 150, 620);
+  await touch(page, "pointerup", 190, 300);
   await expect(page.locator(".touch-stick:not(.touch-stick--idle)")).toHaveCount(0);
   await expect(world).toHaveAttribute("data-player-motion", "idle");
   await page.screenshot({ path: "test-results/screenshots/mobile-hud.png" });
@@ -84,14 +85,48 @@ test("mobile HUD: top icons, left-thumb joystick and a context action button", a
   await expect(page.getByRole("dialog")).toBeVisible();
   await page.getByRole("button", { name: "ปิด", exact: true }).click();
 
-  // Profile: tabs of large readable rows.
+  // Profile: three columns with readable numbers and nothing to scroll.
   await page.getByRole("navigation", { name: "เมนูเกม" }).getByRole("button", { name: "โปรไฟล์", exact: true }).click();
+  await expect(page.getByTestId("profile-general")).toContainText("จอมยุทธ์");
+  await expect(page.getByTestId("profile-epithet")).toBeVisible();
   const profileTabs = page.getByRole("tablist", { name: "ข้อมูลตัวละคร" });
   await expect(profileTabs.getByRole("tab", { name: "ค่าพลัง" })).toHaveAttribute("aria-selected", "true");
   const fontSize = await page.locator(".profile-stat-value").first().evaluate((node) => parseFloat(getComputedStyle(node).fontSize));
   expect(fontSize).toBeGreaterThanOrEqual(18);
   await page.screenshot({ path: "test-results/screenshots/mobile-profile.png" });
-  await profileTabs.getByRole("tab", { name: "วิชาที่ใช้" }).click();
-  await expect(page.getByText("หมัดตรง").first()).toBeVisible();
+  await profileTabs.getByRole("tab", { name: "อุปกรณ์" }).click();
+  await expect(page.getByRole("tabpanel", { name: "อุปกรณ์" })).toContainText("อาวุธ");
+  // Every menu section fits: no column scrolls.
+  for (const section of ["โปรไฟล์", "ย่าม", "วิชา", "อาชีพ", "จดหมาย"]) {
+    await page.getByRole("dialog").getByRole("tab", { name: section, exact: true }).click();
+    await expect(page.locator(".hud-menu-panel--fill")).toBeVisible();
+    const overflow = await page.locator(".menu-col:not(.menu-col--scroll), .hud-menu-panel--fill .hud-menu-body").evaluateAll((nodes) =>
+      nodes.filter((node) => node.scrollHeight > node.clientHeight + 2).map((node) => node.className));
+    expect(overflow, `${section} overflows`).toEqual([]);
+  }
   expect(errors).toEqual([]);
+});
+
+test.describe("a phone held upright", () => {
+  test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+
+  test("shows the game turned to landscape; the joystick still walks the right way", async ({ page }) => {
+    await start(page);
+    const world = page.getByTestId("world-canvas");
+    // The body is turned 90°: the page's top-left corner is the screen's top-right.
+    expect(await page.evaluate(() => getComputedStyle(document.body).transform)).not.toBe("none");
+    const vitals = (await page.getByTestId("hud-vitals").boundingBox())!;
+    expect(vitals.x + vitals.width).toBeGreaterThan(390 - 20);
+    expect(vitals.y).toBeLessThan(20);
+    expect(vitals.height).toBeGreaterThan(vitals.width);
+    // Page (120, 300) is screen (390 − 300, 120); dragging right on the page is down on the screen.
+    const before = Number(await world.getAttribute("data-player-x"));
+    await touch(page, "pointerdown", 90, 120);
+    await expect(page.locator(".touch-stick:not(.touch-stick--idle)")).toBeVisible();
+    await touch(page, "pointermove", 90, 190);
+    await expect(world).toHaveAttribute("data-player-motion", "walk");
+    await expect.poll(async () => Number(await world.getAttribute("data-player-x"))).toBeGreaterThan(before + 15);
+    await touch(page, "pointerup", 90, 190);
+    await page.screenshot({ path: "test-results/screenshots/mobile-portrait-turned.png" });
+  });
 });
