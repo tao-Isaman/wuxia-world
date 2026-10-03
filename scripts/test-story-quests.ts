@@ -12,7 +12,7 @@ import { CHARACTER_IDS, CREATURE_FRAME_COUNT } from "../lib/characters/catalog";
 import { LINEAGE_SPECS, SAGA_PROLOGUES, STORY_ARC_SPECS } from "../lib/world/data/story";
 import { isQuestOfferable, isSecretSectQuest } from "../lib/world/effects";
 import { CUTSCENES, STORY_ARCS, STORY_QUESTS, STORY_RESOLVERS } from "../lib/world/story/registry";
-import { lineageQuestId, storyQuestId, LINEAGE_TIERS } from "../lib/world/story/compile";
+import { DECLINE_TEXT, lineageQuestId, storyQuestId, LINEAGE_TIERS } from "../lib/world/story/compile";
 import type { CutsceneSpec, StoryBeat, StoryLine, StoryStep } from "../lib/world/story/types";
 import { getNpc, getOpponent, getItem, getScene, getQuest, SHOPS, RESOURCES, RECIPES, OPPONENTS, QUESTS, SCENES, ITEMS, SECT_HALLS, SCROLL_PREFIX, scrollItemId } from "../lib/world/data";
 import { FIGHT_EVENTS } from "../lib/world/data/random-events";
@@ -353,6 +353,25 @@ check("play-through: every lineage quest and every saga chapter, accept → step
     } catch (e) { err(e instanceof Error ? e.message : String(e)); }
   }
   console.log(`  played ${lineages} lineage quests and ${chapters} saga chapters`);
+});
+
+check("decline and drop: every lineage / saga offer can be turned down, and an accepted one dropped and taken again", () => {
+  for (const q of STORY_QUESTS) {
+    const offer = getScene(`qs_${q.id}_offer`);
+    if (!offer || offer.kind !== "dialog") { err(`${q.id}: no offer scene`); continue; }
+    const starts = (c: { effects?: readonly { t: string }[] }) => (c.effects ?? []).some((e) => e.t === "startQuest");
+    if (!(offer.choices ?? []).some((c) => c.text === DECLINE_TEXT && !starts(c))) err(`${q.id}: offer has no ${DECLINE_TEXT}`);
+    if (!(offer.choices ?? []).some(starts)) err(`${q.id}: offer cannot be accepted`);
+  }
+  const l = LINEAGE_SPECS.find((x) => inScope(STORY_RESOLVERS.martial(x.kind, x.id)!.sc))!;
+  const def = getQuest(lineageQuestId(l))!;
+  store().startNewGame({ name: "ผู้ทดสอบ", gender: "female" } as never);
+  empower(STORY_RESOLVERS.martial(l.kind, l.id)!.sc);
+  assert.ok(isQuestOfferable(store(), def), `${def.id}: offered`);
+  assert.ok(store().acceptQuest(def.id).ok, `${def.id}: accepted`);
+  assert.ok(store().abandonQuest(def.id).ok, `${def.id}: dropped`);
+  assert.equal(store().quests[def.id], undefined, `${def.id}: forgotten after dropping`);
+  assert.ok(isQuestOfferable(store(), def), `${def.id}: offered again after dropping`);
 });
 
 check("secret trials: the T4 saga trials are off the sect window and offered by their giver", () => {

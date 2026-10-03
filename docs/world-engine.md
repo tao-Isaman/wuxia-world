@@ -142,7 +142,7 @@ Not in the barrel (import by path): `rollWalkEvent`, `rollFoeSpawn`, `releaseFro
    - `advanceQuest` past the last stage → done with rewards (no item consumption);
    - `finishQuest` → rewards on success, `failed` otherwise.
 5. **Hand-in at a person.** `isQuestTurnInForNpc` is true when the quest is active, on its **last** stage, and the NPC is `turnInNpcId ?? giverNpcId`. The popup opens `qs_<id>_complete` if it exists (and closes the quest itself if that scene doesn't), else calls `finishQuestNow` (consume items + finish).
-6. **Abandon.** `abandonQuest` marks the quest `failed` with no rewards. It can never be offered or accepted again (sect quests excepted, which the sect popup re-offers after the cooldown). Story and lineage quests refuse (`reason: "keep"`): they are the only way to their skill or art.
+6. **Abandon.** `abandonQuest` marks the quest `failed` with no rewards. It can never be offered or accepted again (sect quests excepted, which the sect popup re-offers after the cooldown). Lineage quests, saga chapters and sect art trials are instead **forgotten** (entry, `qobj:` flags and tracking pin removed), so they are offered again: they are the only way to their skill or art.
 
 `consumeQuestAutoItems` removes `min(count, held)` for every `hasItem` leaf in every stage (including inside `not`). Scene-driven completions use explicit `takeItem` effects instead, so nothing is taken twice.
 

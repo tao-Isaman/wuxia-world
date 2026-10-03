@@ -2952,10 +2952,23 @@ export const useWorldStore = create<WorldStore>()(
         if (!def) return { ok: false, reason: "unknown" };
         const cur = s.quests[questId];
         if (!cur || cur.status !== "active") return { ok: false, reason: "already-done" };
-        // Saga chapters and lineage quests are the only way to their skill or
-        // art; failing one for good would lock it away, so they can't be dropped.
-        if (def.story || def.lineage) return { ok: false, reason: "keep" };
         const draft = draftFrom(s);
+        // Saga chapters, lineage quests and the sect art trials are the only
+        // way to their skill or art; failing one for good would lock it away,
+        // so dropping one just forgets it (and its objective progress) — it is
+        // offered again.
+        if (def.story || def.lineage || def.isArtQuest) {
+          const quests = { ...draft.quests };
+          delete quests[questId];
+          draft.quests = quests;
+          const flags = { ...draft.flags };
+          for (const key of Object.keys(flags)) if (key.startsWith(`qobj:${questId}:`)) delete flags[key];
+          if (flags.trackedQuestId === questId) delete flags.trackedQuestId;
+          draft.flags = flags;
+          appendActionLog(draft, "quest", `ละทิ้งภารกิจ: ${def.name} (รับใหม่ได้ภายหลัง)`);
+          set({ ...draft });
+          return { ok: true, questId };
+        }
         // Mark failed without granting rewards — finishQuest's success=false
         // path skips the reward dispatcher.
         applyEffects(draft, [{ t: "finishQuest", questId, success: false }]);

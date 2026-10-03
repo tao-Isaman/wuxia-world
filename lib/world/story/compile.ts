@@ -40,14 +40,19 @@ export function toSceneLines(lines: readonly StoryLine[]): SceneLine[] {
  * Emit the dialog for a beat. `effects` and `next` are what moving on does;
  * asides branch to a one-line reaction that then does the same.
  */
-function beatScenes(id: string, beat: StoryBeat, effects: SceneEffect[], next: string, out: CompiledStory, cutsceneId: string, label: string, arcId?: string): void {
+// The offer's way out: the hero walks off and the quest stays on offer.
+export const DECLINE_TEXT = "ขอปฏิเสธไว้ก่อน";
+
+function beatScenes(id: string, beat: StoryBeat, effects: SceneEffect[], next: string, out: CompiledStory, cutsceneId: string, label: string, arcId?: string, declinable = false): void {
   const go: Choice = { text: beat.go ?? DEFAULT_GO, next, ...(effects.length ? { effects } : {}) };
+  const decline: Choice[] = declinable ? [{ text: DECLINE_TEXT, next }] : [];
   const choices: Choice[] = [go];
   (beat.asides ?? []).forEach((aside, index) => {
     const asideId = `${id}_a${index + 1}`;
     choices.push({ text: aside.say, next: asideId });
-    out.scenes.push({ kind: "dialog", id: asideId, lines: toSceneLines(aside.reply), choices: [{ ...go }], paged: aside.reply.length > PAGE_THRESHOLD });
+    out.scenes.push({ kind: "dialog", id: asideId, lines: toSceneLines(aside.reply), choices: [{ ...go }, ...decline], paged: aside.reply.length > PAGE_THRESHOLD });
   });
+  choices.push(...decline);
   const scene: DialogScene = { kind: "dialog", id, lines: toSceneLines(beat.lines), choices, paged: beat.lines.length > PAGE_THRESHOLD };
   if (beat.cutscene) {
     scene.cutscene = cutsceneId;
@@ -106,7 +111,7 @@ export function compileArc(arc: StoryArcSpec, r: StoryResolvers): CompiledStory 
       stages,
       rewards,
     });
-    beatScenes(`qs_${qid}_offer`, chapter.offer, [{ t: "startQuest", questId: qid }], home, out, `cs_${qid}_offer`, `${label} — ${chapter.title}`, arc.id);
+    beatScenes(`qs_${qid}_offer`, chapter.offer, [{ t: "startQuest", questId: qid }], home, out, `cs_${qid}_offer`, `${label} — ${chapter.title}`, arc.id, true);
     beatScenes(`qs_${qid}_complete`, chapter.complete, [{ t: "finishQuest", questId: qid, success: true }], home, out, `cs_${qid}_complete`, `${label} — ปิดบท`, arc.id);
   });
   const info: StoryArcInfo = {
@@ -220,7 +225,7 @@ export function compileLineage(spec: LineageSpec, r: StoryResolvers, seq = 1): C
     stages,
     rewards,
   });
-  beatScenes(`qs_${qid}_offer`, { lines: spec.offer, go: "รับคำ" }, [{ t: "startQuest", questId: qid }], home, out, `cs_${qid}`, "วิชาลึกลับ");
+  beatScenes(`qs_${qid}_offer`, { lines: spec.offer, go: "รับคำ" }, [{ t: "startQuest", questId: qid }], home, out, `cs_${qid}`, "วิชาลึกลับ", undefined, true);
   beatScenes(`qs_${qid}_complete`, { lines: spec.complete, go: "คารวะอาจารย์" }, [{ t: "finishQuest", questId: qid, success: true }], home, out, `cs_${qid}_done`, info.name);
   return out;
 }

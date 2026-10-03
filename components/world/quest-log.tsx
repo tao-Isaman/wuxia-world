@@ -199,7 +199,9 @@ function QuestRow({
   const onCancel = async () => {
     const ok = await confirmDialog({
       title: "ละทิ้งภารกิจ",
-      message: `ยืนยันละทิ้งภารกิจ "${def.name}"?\nภารกิจรองที่ล้มเหลวจะไม่กลับมาให้รับอีก`,
+      message: def.story || def.lineage || def.isArtQuest
+        ? `ยืนยันละทิ้งภารกิจ "${def.name}"?\nความคืบหน้าจะหายไป แต่กลับไปรับใหม่กับผู้มอบภารกิจได้ภายหลัง`
+        : `ยืนยันละทิ้งภารกิจ "${def.name}"?\nภารกิจรองที่ล้มเหลวจะไม่กลับมาให้รับอีก`,
       confirmText: "ละทิ้ง",
       variant: "danger",
     });
@@ -389,7 +391,7 @@ function QuestRow({
             </li>
           </ul>
 
-          {status === "active" && !def.story && !def.lineage && (
+          {status === "active" && (
             <div className="flex justify-end pt-1">
               <Button
                 size="sm"

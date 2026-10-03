@@ -30,11 +30,16 @@ test("mobile HUD: top icons, left-thumb joystick and a context action button", a
   }
   await expect(page.getByRole("button", { name: "เมนู", exact: true })).toHaveCount(0);
   await expect(page.locator(".minimap, .journey-guide")).toHaveCount(0);
-  // No character card any more: the icon grid itself sits in the top-left corner.
+  // No character card with a portrait: a slim HP / MP / พลัง card sits in the
+  // top-left corner, the icon grid right under it.
   await expect(page.getByRole("region", { name: "สถานะตัวละคร" })).toHaveCount(0);
+  const vitals = await page.getByTestId("hud-vitals").boundingBox();
+  expect(vitals!.x).toBeLessThan(20);
+  expect(vitals!.y).toBeLessThan(20);
   const grid = await icons.boundingBox();
   expect(grid!.x).toBeLessThan(20);
-  expect(grid!.y).toBeLessThan(20);
+  expect(grid!.y).toBeGreaterThanOrEqual(vitals!.y + vitals!.height);
+  expect(grid!.y).toBeLessThan(vitals!.y + vitals!.height + 12);
 
   // Rest is a quick bubble, not a page: pick a choice right there.
   await page.getByRole("button", { name: "พักผ่อน", exact: true }).click();
