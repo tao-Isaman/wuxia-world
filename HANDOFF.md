@@ -76,7 +76,7 @@ Checked on 2026-10-01 for wave 27 (animated, wandering NPCs and villain bosses):
 | `test:docs` | the generated reference is current; every link, repo path and command in the docs resolves |
 | `bun scripts/audit-content.ts` | 225 NPCs · 867 quests · 3038 scenes, all references resolve |
 | `bun run build` | passes; `/` first-load JS 1.12 MB (was 508 kB before the sagas; the saga text is about 2.9 MB of source, ~500 kB gzipped) |
-| `bun run test:e2e` | all 24 Playwright tests pass against the production build on :3017 (about 12 minutes, Chromium 141 via the container shim) |
+| `bun run test:e2e` | all 31 Playwright tests pass against the production build on :3017 (about 13 minutes, Chromium 141 via the container shim) |
 
 Not verified:
 
