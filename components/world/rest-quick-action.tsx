@@ -79,7 +79,7 @@ export function RestQuickAction() {
   };
 
   return (
-    <div ref={root} className="rest-quick">
+    <div ref={root} className="rest-quick" data-hud-occluder>
       {open && (
         <div className="rest-bubble" role="group" aria-label="เลือกวิธีพักผ่อน">
           <p className="rest-bubble-title">พักผ่อน <small>· 12 ชั่วยาม</small></p>

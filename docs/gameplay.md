@@ -261,7 +261,7 @@ There are 867 quests: one main quest, 526 side quests (97 sect quests, 154 linea
   - the current stage and what to do (🎯 with a counter);
   - where to go (📍 with the number of roads left).
 
-  On the map a jade arrow bobs over the target, or over the exit toward it. An edge pointer shows the way when the target is off screen. **➤ นำทาง** in the log points the arrow at a quest.
+  On the map a jade arrow bobs over the target, or over the exit toward it. An edge pointer shows the way when the target is off screen (or behind the HUD); it never hides under the HUD. **➤ นำทาง** in the log points the arrow at a quest.
 - **Abandoning** (ละทิ้งภารกิจ) fails the quest for good. It can never be taken again.
 - **Losing the giver.** A quest fails when its giver, one of the simulated masters, dies. Lineage quests and saga chapters don't.
 

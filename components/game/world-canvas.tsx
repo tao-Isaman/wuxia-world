@@ -59,7 +59,7 @@ export function WorldCanvas({ presentation }: { presentation: WorldPresentation 
           </div>
         </div>
       )}
-      {!presentation.readOnly && <div className="world-controls">
+      {!presentation.readOnly && <div className="world-controls" data-hud-occluder>
         <span className="world-keyboard-hint">WASD / ลูกศร เดิน · E โต้ตอบ</span>
         <span className="world-touch-hint">ลากจอซ้ายเพื่อเดิน · แตะเพื่อไปที่นั่น</span>
         <button type="button" aria-expanded={showPlaces} onClick={() => setShowPlaces((v) => !v)}>
@@ -120,7 +120,7 @@ function ActionPrompt({ marker, onAct }: { marker?: WorldMarker; onAct: (id: str
   if (!marker) return null;
   const text = `${ACTION_VERB[marker.kind]} ${marker.label}`;
   return (
-    <button key={marker.id} type="button" className={`action-prompt action-prompt--${marker.kind}`} data-action-marker={marker.id}
+    <button key={marker.id} type="button" className={`action-prompt action-prompt--${marker.kind}`} data-action-marker={marker.id} data-hud-occluder
       aria-label={text} aria-disabled={marker.disabled} aria-keyshortcuts="E" onClick={() => onAct(marker.id)}>
       <span className="action-prompt-glyph" aria-hidden="true">{marker.kind === "service" && marker.glyph ? marker.glyph : ACTION_GLYPH[marker.kind]}</span>
       <span className="action-prompt-text"><small>{ACTION_VERB[marker.kind]}</small>{marker.label}</span>

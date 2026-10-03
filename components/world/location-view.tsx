@@ -558,6 +558,7 @@ export function LocationView({ scene, readOnly = false, dialogueSpeakerId }: Pro
             title="อื่น ๆ ในบริเวณนี้"
             onClick={() => setDrawerOpen(true)}
             aria-label="อื่น ๆ ในบริเวณนี้"
+            data-hud-occluder
             className="journey-extras absolute top-40 right-3 z-30 w-11 h-11 pixel-panel hover:brightness-125"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
