@@ -150,7 +150,7 @@ function deriveSkill(s: Skill): GridSkillProfile {
  * Merged over the derived default (then normalised).
  */
 export const SKILL_GRID_OVERRIDES: Record<string, Partial<GridSkillProfile>> = {
-  // 18 ฝ่ามือมังกร — the dragon-palm wave rolls forward through a line.
+  // 18 ฝ่ามือพิชิตมังกร — the dragon-palm wave rolls forward through a line.
   ep: { range: { min: 1, max: 3 }, area: { kind: "line", size: 3 } },
   // หมัดยาวพุทธธรรม — "Phy reach": the long fist lands from two tiles.
   sl_long_dharma: { range: { min: 1, max: 2 } },

@@ -470,8 +470,8 @@ Object.assign(SKILL_ICON_RASTER, {
   bg_drift_fist: "/icons/skills/bg_drift_fist.png", // เพลงหมัดล่องลอย
   bg_wander_staff: "/icons/skills/bg_wander_staff.png", // ไม้เท้าพเนจร
   ng3: "/icons/skills/ng3.png", // ฝ่ามือจับมังกร
-  ep: "/icons/skills/ep.png", // 18 ฝ่ามือมังกร
-  bg_lucky_staff: "/icons/skills/bg_lucky_staff.png", // เพลงไม้เท้าตีสุข
+  ep: "/icons/skills/ep.png", // 18 ฝ่ามือพิชิตมังกร
+  bg_lucky_staff: "/icons/skills/bg_lucky_staff.png", // เพลงไม้เท้าตีสุนัข
   mi_firepalm: "/icons/skills/mi_firepalm.png", // ฝ่ามือเพลิง
   xy_lesserdemon_blade: "/icons/skills/xy_lesserdemon_blade.png", // ดาบอสูรน้อย
   xy_pathless_sword: "/icons/skills/xy_pathless_sword.png", // กระบี่ไร้วิถี

@@ -127,7 +127,7 @@ A cast hits every living unit of the target team inside the area and is refused 
 4. Internal blade / long / short skills reach 1 further (and lines 1 longer).
 5. Melee skills with 4+ hits collapse to single-target.
 
-Then 18 hand-set exceptions (`SKILL_GRID_OVERRIDES`) apply, for example `ep` 18 ฝ่ามือมังกร (1–3 line 3), `lmsj` กระบี่ 6 ชีพจร (1–4 single), `ng5` ดาบยาวเทพสังหาร (3×3 square), `tang_starrain` ดาราพิรุณโปรย (2–4 diamond 2) and `ng6` ขลุ่ยพลิกโลก (2–5 diamond 2). Finally `normalise` caps range at 5, lines at 4 and areas at 2.
+Then 18 hand-set exceptions (`SKILL_GRID_OVERRIDES`) apply, for example `ep` 18 ฝ่ามือพิชิตมังกร (1–3 line 3), `lmsj` กระบี่ 6 ชีพจร (1–4 single), `ng5` ดาบยาวเทพสังหาร (3×3 square), `tang_starrain` ดาราพิรุณโปรย (2–4 diamond 2) and `ng6` ขลุ่ยพลิกโลก (2–5 diamond 2). Finally `normalise` caps range at 5, lines at 4 and areas at 2.
 
 `artGrid(art)`: an art with no active has no profile. Heals and buffs (`heal`, `heal_cleanse`, `heal_full_cleanse`, `buff_reflect`, `buff_reduce`, `buff_spd`, `buff_eva_debuff_eva`) are self; `atk_phy_pen` and `drain_phy` are 1–2 single; `debuff_poison` is 1–3 diamond 1; `atk_int_pen`, `drain`, `drain_acc` and `debuff_acc_dmg` are 1–3 diamond 1 at T3+, else 1–3 single.
 

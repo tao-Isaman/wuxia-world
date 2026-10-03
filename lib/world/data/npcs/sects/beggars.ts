@@ -8,7 +8,7 @@ export const NPCS_BEGGARS: readonly NpcDef[] = [
   {
     id: "sect_beggars_chief_hongtian",
     name: "หัวหน้าหงเทียน",
-    description: "หัวหน้าแห่งพรรคยาจก · ผู้ถือไม้เท้าเก้าข้อ · ฝีมือเทียบเท่าตำนานยุทธจักร · ดูเหมือนยาจกแต่รู้เรื่องราวทั่วยุทธภพ ผู้สืบทอด ๑๘ ฝ่ามือมังกรและเพลงไม้เท้าตีสุข",
+    description: "หัวหน้าแห่งพรรคยาจก · ผู้ถือไม้เท้าเก้าข้อ · ฝีมือเทียบเท่าตำนานยุทธจักร · ดูเหมือนยาจกแต่รู้เรื่องราวทั่วยุทธภพ ผู้สืบทอด ๑๘ ฝ่ามือพิชิตมังกรและเพลงไม้เท้าตีสุนัข",
     locationIds: ["sect_beggars"],
     dialogSceneId: "npc_sect_beggars_chief_hongtian_talk",
     sparOpponentId: "spar_beggars_chief_hongtian",
@@ -54,7 +54,7 @@ export const NPCS_BEGGARS: readonly NpcDef[] = [
   {
     id: "sect_beggars_staff_elder_qicheng",
     name: "อาจารย์ไม้เท้าฉีเฉิง",
-    description: "ปรมาจารย์ไม้เท้าของพรรคยาจก · ผู้สืบทอดเพลงไม้เท้าตีสุขและไม้เท้าพเนจร · พูดน้อยแต่ตีหนัก",
+    description: "ปรมาจารย์ไม้เท้าของพรรคยาจก · ผู้สืบทอดเพลงไม้เท้าตีสุนัขและไม้เท้าพเนจร · พูดน้อยแต่ตีหนัก",
     locationIds: ["sect_beggars"],
     dialogSceneId: "npc_sect_beggars_staff_elder_qicheng_talk",
     sparOpponentId: "spar_beggars_qicheng",
@@ -71,7 +71,7 @@ export const NPCS_BEGGARS: readonly NpcDef[] = [
   {
     id: "sect_beggars_fist_elder_wudao",
     name: "อาจารย์หมัดอู่เต้า",
-    description: "ปรมาจารย์ฝ่ามือของพรรคยาจก · เชี่ยวชาญฝ่ามือจับมังกรและ ๑๘ ฝ่ามือมังกร · ใจบุญต่อคนยาก",
+    description: "ปรมาจารย์ฝ่ามือของพรรคยาจก · เชี่ยวชาญฝ่ามือจับมังกรและ ๑๘ ฝ่ามือพิชิตมังกร · ใจบุญต่อคนยาก",
     locationIds: ["sect_beggars"],
     sparOpponentId: "spar_beggars_wudao",
     sparFameReward: 12,
