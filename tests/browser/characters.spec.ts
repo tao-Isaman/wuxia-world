@@ -1,8 +1,8 @@
 import { test, expect } from "@playwright/test";
 
-test("all eight heroes walk on their painted eight-way frames and face where they go", async ({ page }) => {
-  // Eight reloads with walks in four of the eight painted directions: ~11 s per character.
-  test.setTimeout(150_000);
+test("both heroes walk on their painted eight-way frames and face where they go", async ({ page }) => {
+  // Two reloads with walks in four of the eight painted directions: ~11 s per character.
+  test.setTimeout(90_000);
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/");
@@ -10,7 +10,7 @@ test("all eight heroes walk on their painted eight-way frames and face where the
   await page.getByRole("button", { name: "เริ่มเกมใหม่" }).click();
   const world = page.getByTestId("world-canvas");
   await expect(world).toHaveAttribute("data-ready", "true", { timeout: 60_000 });
-  for (const id of ["m1", "m2", "m3", "m4", "f1", "f2", "f3", "f4"]) {
+  for (const id of ["m1", "f1"]) {
     await page.evaluate((bodyId) => {
       const save = JSON.parse(localStorage.getItem("wusia-world-v1")!);
       save.state.playerBodyId = bodyId;

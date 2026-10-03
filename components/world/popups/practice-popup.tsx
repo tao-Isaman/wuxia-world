@@ -14,6 +14,7 @@ import {
   encodeArtSlot,
   getArt,
   getSkill,
+  parseSlotId,
   xpToNextArtLevel,
   xpToNextLevel,
 } from "@/lib/game";
@@ -33,6 +34,7 @@ import {
   type PracticeResult,
 } from "@/store/world-store";
 import { flashLoading } from "@/store/loading-store";
+import { practicePose } from "@/lib/characters/hero-actions";
 import { toast } from "@/store/toast-store";
 import { ArtTooltip, SkillTooltip } from "../skill-tooltip";
 
@@ -72,7 +74,8 @@ export function PracticePopup({ open, scene, onClose }: Props) {
       return;
     }
     setPendingId(rawId);
-    flashLoading("กำลังฝึกฝน...", 1000);
+    const slot = parseSlotId(rawId);
+    flashLoading("กำลังฝึกฝน...", 1000, "work", practicePose(slot?.kind === "art", slot?.kind === "skill" ? slot.skill.w : undefined));
     // Defer the actual mutation a tick so the loading overlay paints first.
     window.setTimeout(() => {
       const r = practiceSkill(rawId);

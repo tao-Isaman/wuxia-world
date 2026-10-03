@@ -48,7 +48,7 @@ Each suite is a Bun script (or `bun test` file) wired as `test:*` in `package.js
 | `test:grid-ai` | `scripts/test-grid-ai.ts` | 13 | AI legality and behaviour over dozens of seeded battles; average planning time under 15 ms |
 | `test:grid-skills` | `scripts/test-grid-skills.ts` | 8 | every skill (178) and art (122) has a valid battle range; the 18 overrides exist; Thai range labels; the hero's body move per skill (`hero-motion.ts`) |
 | `test:grid-store` | `scripts/test-grid-store.ts` | 14 | battle store + bridge + the pre-fight briefing + looks + the world hand-off: HP carry-over, packs and board sizes, spar sprites, rigged NPC sheets, flee, auto mode, win / loss / escape results |
-| `test:npcs` | `scripts/test-npc-sheets.ts` | 9 | the 65 rigged NPCs: art, placement, complete sheets, every frame a distinct pose, catalog wiring, the 10 villain bosses in the encounter pool; wandering stays near home, off blocked ground and still when frozen; every hero's eight-way walk sheet (28 drawn cells, distinct views, a real stride) and the heading / mirroring rules |
+| `test:npcs` | `scripts/test-npc-sheets.ts` | 14 | the 65 rigged NPCs: art, placement, complete sheets, every frame a distinct pose, catalog wiring, the 10 villain bosses in the encounter pool; wandering stays near home, off blocked ground and still when frozen; every hero's eight-way walk sheet (28 drawn cells, distinct views, a real stride) and the heading / mirroring rules; one hero body per gender (older ones fall back); the hero action sheets (a row per weapon family + combat poses, a loop per activity, every cell on the foot line, unpainted rows exactly `HERO_WORK_GAPS`) and the pose rules |
 | `test:story` | `scripts/test-story-quests.ts` | — | every sect skill and art has exactly one quest source and nothing else (rank, manual, hall, dialog, other quest) teaches it; lineage quests (teacher, foe, item, spar tier, lines) and sagas (8–10 chapters, lines, cutscenes, small rewards) are well formed; every cutscene's stage, cast and beats resolve; **every** lineage quest and saga chapter plays through in the real store to the move's scroll, which is read to learn it; every lineage / saga offer has ขอปฏิเสธไว้ก่อน and a dropped lineage quest is offered again; the T4 saga trials are secret (off the sect window, offered by their giver); no quest names the move it teaches, or a tier, in its name, summary or description; difficulty gates by tier. `STORY_SECT=<label>` limits it to one sect |
 | `test:routes` | `scripts/test-routes.ts` | 8 | world coords are current; compass helpers; one exit per slot and every exit within 90° of its destination's bearing; every road runs its exit's way and has its painting; snapped exit points on a real exit at the border; road geometry on the painting for all 8 directions; regional grades; arrivals land beside the exit back |
 | `test:places` | `scripts/test-places.ts` | 11 | every ยุทธจักร T0–T3 move and art is a quest reward (the 69 new ones from one place quest) gated by rarity; each of the 20 villages / towns / homes has NPCs, an activity and quests on its map; new NPCs have a dialog, a look (only m/f bodies wander) and gift tastes; activities registered; no teacher is an assassination / kidnap target; presence (assassinated / 180-day kidnap); gift worth and tastes; the store's `giveGift` cooldown and gold; activity cooldowns |
@@ -107,18 +107,19 @@ Read-only scripts, not wired into `package.json`:
 
 Many specs replace `Math.random` in the page to make rolls predictable.
 
-36 tests in 18 spec files:
+38 tests in 19 spec files:
 
 | Spec | Tests | Covers |
 | --- | --- | --- |
 | `audio.spec.ts` | 1 | music follows title → world → battle; the ♪ bubble; settings persist |
 | `battle-setting.spec.ts` | 1 | a capital encounter keeps its street background through a reload and phone rotation |
-| `characters.spec.ts` | 2 | all eight heroes walk on their painted eight-way frames (E, N, S, W), face where they go and stand in that heading; reduced motion; WebGL context loss and "ลองใหม่" recovery |
+| `characters.spec.ts` | 2 | both heroes (m1, f1) walk on their painted eight-way frames (E, N, S, W), face where they go and stand in that heading; reduced motion; WebGL context loss and "ลองใหม่" recovery |
 | `dialogue.spec.ts` | 2 | local replies keep the same world canvas; quest offers away from a map fit on screen without scrolling at three sizes |
 | `game.spec.ts` | 6 | exploration, menu pause, travel, NPC card, reload; grid battle by tap and auto; unit info by touch; phone rotation; a version-18 save migrates to 23; rigged NPCs wander in the capital and wait for the hero |
 | `investigation.spec.ts` | 1 | capital rumors and the ledger investigation survive a mid-dialog reload and pay once |
 | `law-guide.spec.ts` | 3 | walking while wanted draws the law; jail days per mark; retreat gives no rewards; the quest guide and the busy overlay |
 | `mobile-controls.spec.ts` | 2 | a phone on its side: the vitals card top-left with the icon bar under it, joystick, action button, rest bubble, profile; the five column menus fit without scrolling. A phone held upright: the page is turned 90° and the joystick still walks the right way |
+| `hero-actions.spec.ts` | 2 | the creation screen sets the body by gender; a save with a retired body plays as m1 and the hero fights with the fist row's painted frames (`data-hero-poses`); resting plays the sleep loop in the work overlay |
 | `guide-hud.spec.ts` | 3 | on a phone on its side, a phone held upright (the page turned) and a desktop view, walking around with a tracked quest, the guide's edge pointer is never under a HUD box (`data-guide-edge` vs `[data-hud-occluder]`) |
 | `opening.spec.ts` | 1 | the first session: clinic errand, a bought potion, the free duel on auto, rests, a w-exp upgrade |
 | `pwa.spec.ts` | 1 | manifest and icons, an active service worker, an offline reload — **needs a production server** |

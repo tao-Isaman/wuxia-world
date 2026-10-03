@@ -27,7 +27,8 @@ for (const [width, height, name] of [[844, 390, "phone"], [390, 844, "phone held
       await page.keyboard.down(key);
       for (let i = 0; i < 8; i++) {
         await page.waitForTimeout(120);
-        const hit = await page.evaluate(() => {
+        // A HUD box can change between two frames; a covered sample counts only if it is still covered two frames later.
+        const probe = () => page.evaluate(() => {
           const host = document.querySelector("[data-guide-marker]") as HTMLElement | null;
           if (!host?.dataset.guideEdge) return null;
           const [x, y] = host.dataset.guideEdge.split(",").map(Number);
@@ -46,6 +47,11 @@ for (const [width, height, name] of [[844, 390, "phone"], [390, 844, "phone held
           });
           return over.length > 0;
         });
+        let hit = await probe();
+        if (hit) {
+          await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
+          hit = await probe();
+        }
         if (hit === null) continue;
         samples++;
         if (hit) covered++;

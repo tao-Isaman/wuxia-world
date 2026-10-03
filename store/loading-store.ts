@@ -1,6 +1,7 @@
 "use client";
 
 import { create } from "zustand";
+import type { HeroPose } from "@/lib/characters/hero-actions";
 
 // ─── Action "working" overlay ──────────────────────────────────────────
 // While the hero gathers / crafts / rests / practises, a progress bar
@@ -19,7 +20,9 @@ interface LoadingStore {
   duration: number;
   /** Increments per job so the bar restarts when a new job begins. */
   job: number;
-  show: (message: string, duration?: number, kind?: WorkKind) => void;
+  /** The painted loop the hero plays (mining, a sword form…); null shows the plain preview. */
+  pose: HeroPose | null;
+  show: (message: string, duration?: number, kind?: WorkKind, pose?: HeroPose | null) => void;
   hide: () => void;
 }
 
@@ -33,12 +36,13 @@ export const useLoadingStore = create<LoadingStore>((set, get) => ({
   kind: "work",
   duration: ACTION_LOADING_DURATION_MS,
   job: 0,
-  show: (message, duration = ACTION_LOADING_DURATION_MS, kind = "work") => {
+  pose: null,
+  show: (message, duration = ACTION_LOADING_DURATION_MS, kind = "work", pose = null) => {
     if (activeTimer) {
       clearTimeout(activeTimer);
       activeTimer = null;
     }
-    set({ active: true, message, kind, duration, job: get().job + 1 });
+    set({ active: true, message, kind, duration, pose, job: get().job + 1 });
     if (typeof window !== "undefined") {
       activeTimer = setTimeout(() => {
         set({ active: false, message: "" });
@@ -57,6 +61,6 @@ export const useLoadingStore = create<LoadingStore>((set, get) => ({
 
 // Convenience: import once where you trigger an action so call sites stay
 // short — `flashLoading("เก็บของ")` instead of three lines of store work.
-export function flashLoading(message: string, duration?: number, kind?: WorkKind): void {
-  useLoadingStore.getState().show(message, duration, kind);
+export function flashLoading(message: string, duration?: number, kind?: WorkKind, pose?: HeroPose | null): void {
+  useLoadingStore.getState().show(message, duration, kind, pose);
 }

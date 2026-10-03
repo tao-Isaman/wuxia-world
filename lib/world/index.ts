@@ -112,6 +112,7 @@ export {
   PLAYER_BODIES,
   PLAYER_BODY_LABEL,
   defaultBodyFor,
+  heroBodyFor,
   playerBodySprite,
 } from "./data/player-bodies";
 export {

@@ -48,7 +48,7 @@ Deploys are implied to be on Vercel (`VERCEL_GIT_COMMIT_SHA` sets the service-wo
 
 ## Verified state
 
-Checked on 2026-10-01 for wave 27 (animated, wandering NPCs and villain bosses):
+Checked on 2026-10-03 for the hero action wave (painted weapon forms and work loops; one hero per gender):
 
 | Check | Result |
 | --- | --- |
@@ -68,7 +68,7 @@ Checked on 2026-10-01 for wave 27 (animated, wandering NPCs and villain bosses):
 | `test:grid-ai` | 13 checks pass |
 | `test:grid-skills` | 7 checks pass |
 | `test:grid-store` | 13 checks pass |
-| `test:npcs` | 7 checks pass |
+| `test:npcs` | 14 checks pass |
 | `test:places` | 12 checks pass: 68 new NPCs (35 wander), 97 place quests; all 72 ยุทธจักร T0–T3 moves and arts are quest rewards |
 | `test:routes` | 8 checks pass: 255 exits on 98 maps (243 within 45° of their bearing), 258 roads on 54 of the 56 paintings, 253/256 arrivals on the side the road came from |
 | `test:story` | 10 checks pass (incl. decline / drop, secret trials, scroll hand-over and no move named in quest text): 154 lineage quests, 38 sagas (340 chapters), 292 cutscenes; every quest and chapter plays through in the real store |
@@ -76,7 +76,7 @@ Checked on 2026-10-01 for wave 27 (animated, wandering NPCs and villain bosses):
 | `test:docs` | the generated reference is current; every link, repo path and command in the docs resolves |
 | `bun scripts/audit-content.ts` | 225 NPCs · 867 quests · 3038 scenes, all references resolve |
 | `bun run build` | passes; `/` first-load JS 1.12 MB (was 508 kB before the sagas; the saga text is about 2.9 MB of source, ~500 kB gzipped) |
-| `bun run test:e2e` | all 36 Playwright tests pass against the production build on :3017 (about 13 minutes, Chromium 141 via the container shim) |
+| `bun run test:e2e` | all 38 Playwright tests pass against the production build on :3017 (about 13 minutes, Chromium 141 via the container shim) |
 
 Not verified:
 
@@ -117,7 +117,9 @@ Real behaviour today, found during the docs audit. Each is small and self-contai
 
 - **Turned portrait is lightly tested.** A phone held upright turns the page 90°; map taps, the joystick and menus are covered by e2e on an emulated phone, but `env(safe-area-inset-*)` still names the physical edges (a notch is padded on the wrong side) and Radix popovers (stat tooltips, comboboxes) may sit off their trigger. No physical phone has run it.
 - **Three menus still scroll.** ภารกิจ, สำนัก and บันทึก (and the shop / artisan / hall popups) keep their old layouts; only โปรไฟล์, ย่าม, วิชา, อาชีพ and จดหมาย are column layouts that fit without scrolling.
-- **`characters.spec` is flaky.** "all eight heroes walk" sometimes times out waiting for the walk motion in a full run; it passes when run alone.
+- **f1 lacks six work loops.** Alchemy, needlework, meditation, reading, zither and sleep were not painted for f1 (the image API credits ran out); the work overlay keeps the plain preview for them (`HERO_WORK_GAPS`). Paint with `scripts/paint-hero-actions.py`, rebuild with `scripts/build-hero-actions.ts`, empty the list.
+- **A few painted attack frames carry a stray weapon tip.** Where a strip's figures touched (m1 sword strike / follow-through, f1 spear recover and sabre follow-through), the split leaves a bit of the neighbour's weapon in the cell; repaint those strips to clean them.
+- **`characters.spec` is flaky.** "both heroes walk" sometimes times out waiting for the walk motion in a full run; it passes when run alone.
 - **ฉายา is derived, not earned.** `heroEpithet` reads the record each time (crown, wanted marks, top sect rank, strongest trait); there is no title the player picks or keeps.
 
 ### Quests and sects

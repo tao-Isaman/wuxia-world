@@ -236,3 +236,11 @@
 .rumor-banner--floating .text-vermilion { color: var(--dq-gold); }
 @keyframes rumor-fade { 0% { opacity: 0; } 5% { opacity: 1; } 85% { opacity: 1; } 100% { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .rumor-banner--floating { animation: none; } }
+
+/* The hero's painted activity or weapon loop (components/game/hero-action-sprite.tsx). */
+.hero-action-sprite { image-rendering: pixelated; background-repeat: no-repeat; background-position-x: 0;
+  animation-name: hero-action; animation-iteration-count: infinite; }
+@keyframes hero-action { from { background-position-x: 0; } to { background-position-x: var(--hero-action-end); } }
+@media (prefers-reduced-motion: reduce) { .hero-action-sprite { animation: none; } }
+.work-hero--action { width: 154px; height: 96px; border-radius: 10px; display: flex; align-items: flex-end; justify-content: center;
+  background: radial-gradient(ellipse at 50% 92%, #0006 0 26%, transparent 27%), radial-gradient(circle at 50% 40%, #6a4a30, #2a1611 75%); }

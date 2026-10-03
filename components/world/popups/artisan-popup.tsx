@@ -23,6 +23,7 @@ import {
 import { SLOT_LABELS, getEquip } from "@/lib/game";
 import { useWorldStore } from "@/store/world-store";
 import { flashLoading } from "@/store/loading-store";
+import { lifeSkillPose } from "@/lib/characters/hero-actions";
 import { toast } from "@/store/toast-store";
 
 interface Props {
@@ -219,7 +220,7 @@ function CraftTab({ artisan }: { artisan: ArtisanDef }) {
           inventory={inventory}
           masteryLv={r.skill ? masteryLevel(lifeSkillXp[r.skill] ?? 0) : MAX_MASTERY}
           onCraft={() => {
-            flashLoading("กำลังประดิษฐ์...");
+            flashLoading("กำลังประดิษฐ์...", undefined, "work", lifeSkillPose(r.skill));
             const res = craftRecipe(r.id);
             if (!res.ok) {
               toast(

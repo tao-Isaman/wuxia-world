@@ -5,6 +5,8 @@ export interface CharacterAtlas {
   image: HTMLCanvasElement; frameSize: 128; feetY: 120; columns: 4; rows: number; directional: boolean;
   /** The atlas carries the eight-direction walk cells (frames 24–51, lib/characters/walk8.ts). */
   walk8: boolean;
+  /** A standing figure's height in atlas px (the hero action cells scale to it, lib/characters/hero-actions.ts). */
+  figure: number;
 }
 /** Painted walk8 cells keep their authored placement: feet on this row of each 128 px cell. */
 const WALK8_SOURCE_FEET = 119;
@@ -134,7 +136,8 @@ async function prepareAtlas(id: CharacterId, directional: boolean): Promise<Char
     WALK_BEATS[index % 4]);
   }
   output.putImageData(pixels, 0, 0);
-  return { image, frameSize: CHARACTER_FRAME_SIZE, feetY: CHARACTER_FEET_Y, columns: CHARACTER_GRID, rows, directional, walk8: walk8Cells.length > 0 };
+  return { image, frameSize: CHARACTER_FRAME_SIZE, feetY: CHARACTER_FEET_Y, columns: CHARACTER_GRID, rows, directional, walk8: walk8Cells.length > 0,
+    figure: baseHeight * scale };
 }
 
 export function loadCharacterAtlas(id: CharacterId, includeDirections = true): Promise<CharacterAtlas> {

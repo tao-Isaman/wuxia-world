@@ -14,10 +14,13 @@ export interface CutOutOptions {
   pocketTolerance?: number;
   /** Smallest pocket (in pixels) that is removed. */
   pocketMin?: number;
+  /** Max colour distance for the border flood fill (default 34); lower keeps pale steel on a white ground. */
+  tolerance?: number;
 }
 
 export async function cutOut(path: string, options: CutOutOptions = {}): Promise<Buffer> {
   const pocketTolerance = options.pocketTolerance ?? POCKET_TOLERANCE, pocketMin = options.pocketMin ?? 40;
+  const tolerance = options.tolerance ?? TOLERANCE;
   const { data, info } = await sharp(path).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
   const { width: w, height: h } = info;
   // Background colour: the median of the border pixels.
@@ -32,7 +35,7 @@ export async function cutOut(path: string, options: CutOutOptions = {}): Promise
   for (let y = 0; y < h; y++) stack.push(y * w, y * w + w - 1);
   while (stack.length) {
     const p = stack.pop()!;
-    if (isBg[p] || dist(p * 4) > TOLERANCE) continue;
+    if (isBg[p] || dist(p * 4) > tolerance) continue;
     isBg[p] = 1;
     const x = p % w, y = (p / w) | 0;
     if (x > 0) stack.push(p - 1);

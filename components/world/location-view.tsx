@@ -50,6 +50,7 @@ import { flashLoading } from "@/store/loading-store";
 import { toast } from "@/store/toast-store";
 import { confirmDialog } from "@/store/confirm-store";
 import { getActivity } from "@/lib/world/data/activities";
+import { badgePose, lifeSkillPose } from "@/lib/characters/hero-actions";
 
 interface Props {
   scene: LocationScene;
@@ -158,7 +159,7 @@ export function LocationView({ scene, readOnly = false, dialogueSpeakerId }: Pro
     const last = store.activityDays[id];
     const cooling = !!activity.place && last !== undefined && store.day - last < (activity.place.cooldownDays ?? 1);
     if (activity.hours > 0 && store.stamina >= activity.stamina && !cooling) {
-      flashLoading(`${activity.label}...`, 1200, activity.id === "jail_meditate" ? "rest" : "work");
+      flashLoading(`${activity.label}...`, 1200, activity.id === "jail_meditate" ? "rest" : "work", badgePose(activity.badge));
     }
     const result = store.doActivity(id);
     if (result.ok) { toast("success", result.message); return; }
@@ -166,7 +167,7 @@ export function LocationView({ scene, readOnly = false, dialogueSpeakerId }: Pro
       const ok = await confirmDialog({ title: "ประตูคุก", message: `${result.message}\nนั่งนับวันจนพ้นโทษเลยหรือไม่?`,
         confirmText: "นั่งนับวัน", cancelText: "ยังก่อน" });
       if (!ok) return;
-      flashLoading("นับวันในห้องขัง...", 1600, "rest");
+      flashLoading("นับวันในห้องขัง...", 1600, "rest", { sheet: "work", row: "meditate" });
       useWorldStore.getState().serveSentence();
       toast("success", "พ้นโทษแล้ว · ผู้คุมไขประตูปล่อยตัว");
       return;
@@ -196,7 +197,7 @@ export function LocationView({ scene, readOnly = false, dialogueSpeakerId }: Pro
     // BattleArena mounts. Skip it so the transition feels snappy.
     const isHunt =
       res.skill === "hunting" && res.opponentIds && res.opponentIds.length > 0;
-    if (!isHunt) flashLoading("กำลังเก็บของ...");
+    if (!isHunt) flashLoading("กำลังเก็บของ...", undefined, "work", lifeSkillPose(res.skill));
     const r = gatherResource(resourceId);
     toast(...gatherToast(r));
   }
