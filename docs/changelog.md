@@ -6,6 +6,20 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-03
 
+### Foes on roads; beasts drawn right
+
+- **Roads now show their foes.** Walking a road already spawned foes, but the road view never drew them, so they were invisible and could not be fought — kill quests whose target lives in the wilds (สืบทอดไม้เท้าขอทาน's wild dogs, say) could stall on the road. `RouteMapView` passes the road's foes like the location view (`components/world/roaming-foes.ts`).
+- **Beasts and repainted archetypes no longer come from a stale cache.** The creature atlas and the seven costume sheets were repainted under the same file names, so a browser (or the service worker's stale-while-revalidate) could keep the old pictures and cut them on the new grid — wrong or empty beasts. Their URLs now carry `?v=ART_VERSION` (`lib/characters/catalog.ts`); bump it when art is repainted in place.
+- A beast on the map is cropped to its painted pixels (keeping its cell's scale), so its ⚔ tag sits just above it.
+
+### Regions follow the map
+
+- A place's region (ภาคกลาง / เหนือ / ใต้ / ออก / ตก) now comes from where it sits on the world map: within 170 units of the capital is the heartland, beyond it the compass quarter from the capital. The old hand table had 27 places in a catch-all "wild" region and some on the wrong side (Shaolin "south" though west of the capital). Now: heartland 20, north 16, south 9, east 21, west 31.
+- It drives rumor regions and road colour grades. The hand table stays only as the world-map layout seed (`LAYOUT_REGION`).
+- Jail: a hero caught outside a city goes to the nearest city's jail (was one city per region).
+- **The herb-garden south was cut off.** คุ้มสมุนไพร, บ้านแพทย์น้ำจืด, ถ้ำหุบเขาผีเสื้อ and ถ้ำแมงมุม were joined only to each other, so their people and quests could not be reached on foot. A new road links คุ้มสมุนไพร to สำนักสุลถัง (129 roads), and `test:routes` now fails if any place can't be reached by road from the hero's home.
+- `build-world-coords.ts` keeps every existing spot and lays out only new places (a full relayout moved dozens of places and broke the painted exits); `--relayout` still recomputes everything.
+
 ### Recorded music
 
 - The main theme (two versions), the battle song and the desert / trade song are real recordings now (`public/audio/`, made with Suno). The 150 MB of WAV masters became 10.8 MB of MP3 (~110 kb/s, loudness-normalised, silence trimmed). Desert places (`desert_*`, `tribe_*`, `city_xixia`, `mt_baituo`, `sect_xingxiu`) play the desert song.

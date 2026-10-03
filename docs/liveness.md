@@ -36,7 +36,7 @@ The code differs from both in many places; [Spec versus code](#spec-versus-code)
 | `lib/world/data/named-npcs.ts` | `NAMED_NPC_DEFAULTS` — the 20 simulated NPCs and their starting state |
 | `lib/world/data/rumor-templates.ts` | text templates for NPC events, player echoes and warnings; `renderTemplate`; lifespans |
 | `lib/world/data/lore-rumors.ts` | `LORE_RUMORS` — 30 hand-written rumors that never expire |
-| `lib/world/data/regions.ts` | `LOCATION_REGION`, `regionOf`, `CHANNEL_ADMITS`, `REGION_NEIGHBORS` (unused) |
+| `lib/world/data/regions.ts` | `regionOf` / `regionAt` (from the world map), `LAYOUT_REGION` (layout seed), `CHANNEL_ADMITS`, `REGION_NEIGHBORS` (unused) |
 | `lib/world/types.ts` | `NpcExtState`, `NpcGoal`, `NpcEventKind`, `NpcSimStatus`, `Rumor`, `RumorSummary`, `RumorSeenEntry`, `Region`, `RumorChannel`, `RumorTruth`, `RumorSource` |
 | `store/world-store.ts` | calls the engines from `advanceTime`; `failQuestsForDeadGivers`; `recordRumorHeard`; the five player-echo call sites |
 | `components/world/popups/rumor-popup.tsx` | the rumor list |
@@ -292,8 +292,9 @@ Channels used by the templates:
 
 - **Region.** Each rumor is heard only in its own region, or everywhere when its region is `"global"` (no rumor is ever made global in play).
   - The region comes from `regionOf(locationId)`.
-  - `LOCATION_REGION` maps all 97 world-map leaves: heartland 10, north 15, south 14, west 13, east 18, jianghu_wild 27.
-  - Any other id falls back to `jianghu_wild`: the tutorial foothill (`village`, `tavern`), `jail`, `world_journey` and every route id.
+  - It follows the world map (`regionAt`): a place within `CENTRAL_RADIUS` (170 map units) of the capital is the heartland (ภาคกลาง); beyond it, north / south / east / west by its compass quarter from the capital. All 97 world-map leaves: heartland 20, north 16, south 9, east 21, west 31. No place is `jianghu_wild` any more (the region stays for old saved rumors).
+  - Any other id counts as the heartland: the tutorial foothill (`village`, `tavern`), `jail`, `world_journey` and every route id.
+  - `LAYOUT_REGION` is the old hand-authored table, now only the seed anchors of `scripts/build-world-coords.ts`.
   - `REGION_NEIGHBORS` exists but nothing reads it, so rumors never spread to other regions.
 - **Channel.** A place listens on one channel, and `CHANNEL_ADMITS` says which rumor channels that includes:
 
@@ -310,7 +311,7 @@ Channels used by the templates:
 
 - **Categories:** 10 sect legends, 6 jianghu history, 6 old heroes and 8 treasure / secret-art leads (with `leadsTo`).
 - **Channels:** 26 inn and 4 wilderness.
-- **Regions:** south 3, north 4, west 7, east 7, jianghu_wild 5 and heartland 4.
+- **Regions:** south 3, north 6, west 8, east 8 and heartland 5 (the five that were `jianghu_wild` follow the place they name).
 
 Their ids are `lore_<idSuffix>` and `createdDay` is 1. Seeding also repairs lore whose `expiresDay` became `null` after a JSON round trip.
 
@@ -471,7 +472,7 @@ Each item below is real behaviour today; the fix belongs in code, not in these d
   - a `generatePlayerEcho` / `firePlayerEcho` call at the store action that should trigger it.
 - A new named NPC needs:
   - an entry in `NAMED_NPC_DEFAULTS` whose id exists in the NPC registry;
-  - a location in `LOCATION_REGION`.
+  - a home location with a world-map spot (its region comes from there).
 
   Existing saves pick it up on their next tick, because `ensureSeeded` fills in any missing roster id.
 - After a change, run `bun run test:rumors` and `bun scripts/smoke-liveness.ts`.

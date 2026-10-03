@@ -25,7 +25,7 @@ test("capital rumors and the ledger investigation survive a mid-dialogue reload 
 
   await visit(page, "service-3");
   await expect(page.getByRole("dialog")).not.toContainText("วันนี้เงียบเป็นพิเศษ");
-  await expect(page.getByRole("button", { name: "ฟังต่อ" })).toHaveCount(4);
+  await expect(page.getByRole("button", { name: "ฟังต่อ" })).toHaveCount(5);
   await page.getByRole("button", { name: "ฟังต่อ" }).first().click();
   const heard = (await state(page)).rumorSeenLog;
   expect(Object.keys(heard)).toHaveLength(1);

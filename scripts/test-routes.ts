@@ -13,6 +13,7 @@ import { DIR8, angleGap, dir8Of, dirVector, mapPointAngle, mapPointDir, opposite
 import { setArrivalFrom, peekArrivalFrom, clearArrivalFrom, clearMapPositions } from "../lib/stage/types";
 import { initialWorldPlacement } from "../lib/stage/world-placement";
 import { ROUTE_GRADES, gradePixels } from "../lib/stage/route-grade";
+import { CENTRAL_RADIUS, regionAt, regionOf } from "../lib/world/data/regions";
 
 let passed = 0;
 function check(name: string, fn: () => void) {
@@ -133,6 +134,37 @@ check("arriving: a hint puts the hero just inside the exit back, facing into the
   }
   console.log(`  ${facing}/${paired} arrivals enter on the side the road came from`);
   assert.ok(facing / paired > 0.85);
+});
+
+check("every place on the world map can be reached by road from the hero's home", () => {
+  const adj: Record<string, string[]> = {};
+  for (const r of LOCATION_ROUTES) { (adj[r.a] ??= []).push(r.b); (adj[r.b] ??= []).push(r.a); }
+  const seen = new Set(["home_player"]), queue = ["home_player"];
+  while (queue.length) for (const next of adj[queue.pop()!] ?? []) if (!seen.has(next)) { seen.add(next); queue.push(next); }
+  const cut = Object.keys(WORLD_COORDS).filter((id) => !seen.has(id));
+  assert.deepEqual(cut, [], `cut off from the road network: ${cut.join(", ")}`);
+});
+
+check("regions follow the map: the heartland around the capital, the compass quarters beyond, no wild catch-all", () => {
+  const capital = WORLD_COORDS.city_capital;
+  const counts: Record<string, number> = {};
+  for (const [id, point] of Object.entries(WORLD_COORDS)) {
+    const region = regionOf(id);
+    assert.equal(region, regionAt(point), id);
+    assert.notEqual(region, "jianghu_wild", id);
+    counts[region] = (counts[region] ?? 0) + 1;
+    const dx = point.x - capital.x, dy = point.y - capital.y;
+    if (Math.hypot(dx, dy) > CENTRAL_RADIUS) {
+      // East of the capital is +x, north is −y on the world map.
+      if (region === "east") assert.ok(dx > Math.abs(dy) - 1e-9, id);
+      if (region === "west") assert.ok(-dx >= Math.abs(dy) - 1e-9, id);
+      if (region === "north") assert.ok(-dy > Math.abs(dx) - 1e-9, id);
+      if (region === "south") assert.ok(dy >= Math.abs(dx) - 1e-9, id);
+    }
+  }
+  assert.equal(regionOf("city_capital"), "heartland");
+  assert.equal(regionOf("village"), "heartland", "unplaced places count as the heartland");
+  for (const region of ["heartland", "north", "south", "east", "west"]) assert.ok((counts[region] ?? 0) >= 5, `${region} has places (${counts[region] ?? 0})`);
 });
 
 console.log(`${passed} route checks passed`);

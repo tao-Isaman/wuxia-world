@@ -1,12 +1,48 @@
 // Liveness Layer §3.4 — region taxonomy + channel mapping.
-// Filled by Phase 1 Agent C. Each location id is hand-assigned to one of
-// 6 regions; rumor distribution + channel filters use this map.
+//
+// A place's region follows where it sits on the world map (world-coords.ts):
+// within CENTRAL_RADIUS of the capital it is the heartland (ภาคกลาง), else
+// north / south / east / west by its compass direction from the capital
+// (`regionAt`). Rumor spread, road colour grades, music and the map use it.
+// Places without a map spot (the opening village, the jail…) count as the
+// heartland.
 
 import type { Region, RumorChannel } from "../types";
+import { WORLD_COORDS } from "./world-coords";
 
-// LocationId → Region. Authored map. Locations not in the map default to
-// JIANGHU_DEFAULT_REGION at lookup time.
-export const LOCATION_REGION: Record<string, Region> = {
+/** Map units around the capital that count as the heartland (ภาคกลาง). */
+export const CENTRAL_RADIUS = 170;
+const CAPITAL = WORLD_COORDS.city_capital;
+
+/** The region of a world-map point: the heartland near the capital, else its compass quarter (y grows south). */
+export function regionAt(point: { x: number; y: number }): Region {
+  const dx = point.x - CAPITAL.x, dy = point.y - CAPITAL.y;
+  if (Math.hypot(dx, dy) <= CENTRAL_RADIUS) return "heartland";
+  const angle = Math.atan2(-dy, dx) * 180 / Math.PI;
+  if (angle >= -45 && angle < 45) return "east";
+  if (angle >= 45 && angle < 135) return "north";
+  if (angle >= -135 && angle < -45) return "south";
+  return "west";
+}
+
+const REGION_BY_PLACE: Readonly<Record<string, Region>> = Object.fromEntries(
+  Object.entries(WORLD_COORDS).map(([id, point]) => [id, regionAt(point)]),
+);
+/** Where unplaced locations belong. */
+export const UNPLACED_REGION: Region = "heartland";
+
+export function regionOf(locationId: string | null | undefined): Region {
+  if (!locationId) return UNPLACED_REGION;
+  return REGION_BY_PLACE[locationId] ?? UNPLACED_REGION;
+}
+
+/**
+ * The hand-authored regions the world map was first laid out from: the seed
+ * anchors of scripts/build-world-coords.ts (and nothing else). Places end up
+ * where the roads pull them, so the live region is `regionOf`, read back
+ * from the finished map.
+ */
+export const LAYOUT_REGION: Record<string, Region> = {
   // ─── Heartland (capital + central plains) ───────────────────────────
   // Capital and the largest cities of the central plains, plus the royal
   // palace and the player's starter home. Generic central inns also live
@@ -133,13 +169,6 @@ export const LOCATION_REGION: Record<string, Region> = {
   home_beichou: "jianghu_wild", // 北丑
 };
 
-export const JIANGHU_DEFAULT_REGION: Region = "jianghu_wild";
-
-export function regionOf(locationId: string | null | undefined): Region {
-  if (!locationId) return JIANGHU_DEFAULT_REGION;
-  return LOCATION_REGION[locationId] ?? JIANGHU_DEFAULT_REGION;
-}
-
 // Adjacency graph for region propagation. Used by rumor-engine to
 // expand a rumor outward over time. "global" sits at the center and
 // connects to every region.
@@ -149,6 +178,7 @@ export const REGION_NEIGHBORS: Record<Region, readonly Region[]> = {
   south: ["heartland", "west", "east"],
   west: ["heartland", "north", "south"],
   east: ["heartland", "north", "south"],
+  // No place is in the old wild region any more; kept for saved rumors.
   jianghu_wild: ["heartland"],
   global: ["heartland", "north", "south", "west", "east", "jianghu_wild"],
 };

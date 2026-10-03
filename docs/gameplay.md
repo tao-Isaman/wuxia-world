@@ -136,7 +136,7 @@ There is no passive regeneration. HP and MP carry from fight to fight. Other way
 - **Cost.** A full hop from place to place costs 20 stamina and 3 ชั่วยาม, and trains AGI (see [Stats](#stats)).
 - **Tired.** Below 10 stamina, exits are disabled until you rest.
 - **Free warps.** Story warps (a dialog that sends you somewhere) and "ปิด" back to the last place are free.
-- **The map.** 102 locations and 128 two-way roads; see [reference/locations.md](reference/locations.md).
+- **The map.** 102 locations and 129 two-way roads; see [reference/locations.md](reference/locations.md).
 - **Positions.** Where you stood on each map is remembered for the session only.
 
 ### Horse stations (สถานีพักม้า)

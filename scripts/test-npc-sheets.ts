@@ -43,7 +43,7 @@ const RIGGED = [...ANIMATED_NPC_IDS, ...PAINTED_CHARACTER_IDS];
 
 await check("sheets: 512×512 base + 512×256 directions, every one of the 24 cells drawn", async () => {
   for (const id of RIGGED) {
-    for (const [file, rows] of [[`public${characterSheet(id)}`, 4], [`public${characterDirectionSheet(id)}`, 2]] as const) {
+    for (const [file, rows] of [[`public${characterSheet(id).split("?")[0]}`, 4], [`public${characterDirectionSheet(id).split("?")[0]}`, 2]] as const) {
       assert.ok(existsSync(file), `${file} exists (run bun scripts/build-npc-sheets.ts)`);
       const { data, info } = await sharp(file).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
       assert.equal(info.width, 512, file);
@@ -62,7 +62,7 @@ await check("sheets: every frame is its own pose — no two cells of a clip alik
   const CLIPS = [["idle", 0, 4], ["walk", 4, 8], ["attack", 8, 12], ["hurt/guard/victory/defeat", 12, 16], ["walk north", 16, 20], ["walk south", 20, 24]] as const;
   for (const id of RIGGED) {
     const cells: Int32Array[] = [];
-    for (const [file, rows] of [[`public${characterSheet(id)}`, 4], [`public${characterDirectionSheet(id)}`, 2]] as const) {
+    for (const [file, rows] of [[`public${characterSheet(id).split("?")[0]}`, 4], [`public${characterDirectionSheet(id).split("?")[0]}`, 2]] as const) {
       const { data } = await sharp(file).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
       for (let cell = 0; cell < rows * 4; cell++) {
         const ox = (cell % 4) * 128, oy = Math.floor(cell / 4) * 128, px = new Int32Array(128 * 128);
@@ -123,7 +123,7 @@ await check("enemy types: every foe without its own art is a painted, rigged ene
 });
 
 await check("creatures: a 4 × 3 painted atlas, every cell drawn, every beast on a frame of its kind", async () => {
-  const file = `public${CREATURE_ATLAS.url}`;
+  const file = `public${CREATURE_ATLAS.url.split("?")[0]}`;
   const { data, info } = await sharp(file).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
   assert.equal(info.width / CREATURE_ATLAS.columns, info.height / CREATURE_ATLAS.rows, "square cells");
   for (let frame = 0; frame < CREATURE_FRAME_COUNT; frame++) {
