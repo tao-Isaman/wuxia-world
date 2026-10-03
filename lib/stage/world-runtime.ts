@@ -950,15 +950,16 @@ export function createWorldRuntime(
   /**
    * HUD boxes drawn over the map (`[data-hud-occluder]`: the vitals + menu
    * stack, purse and sundial, quest tracker, law chips, rest / action / places
-   * column), in host pixels with a little padding. Re-measured a few times a
-   * second rather than every frame.
+   * column), in host pixels with a little padding. Measured once a frame,
+   * only while the guide needs it — HUD boxes come and go (the action button
+   * appears beside a marker), so a cached set would let the pointer slip under one.
    */
   let occluders: { left: number; top: number; right: number; bottom: number }[] = [];
-  let occludersAt = -Infinity;
+  let occludersFrame = -1;
+  let frameCount = 0;
   function hudOccluders() {
-    const now = performance.now();
-    if (now - occludersAt < 250) return occluders;
-    occludersAt = now;
+    if (occludersFrame === frameCount) return occluders;
+    occludersFrame = frameCount;
     const host = pageRect(parent);
     const pad = 6;
     occluders = [...document.querySelectorAll<HTMLElement>("[data-hud-occluder]")]
@@ -1011,6 +1012,7 @@ export function createWorldRuntime(
   }
   function tick(time: number) {
     if (disposed || failed || !ready || !player) return;
+    frameCount++;
     try {
       const dt = lastTime ? Math.min(Math.max(time - lastTime, 0), 50) / 1000 : 0;
       lastTime = time;
