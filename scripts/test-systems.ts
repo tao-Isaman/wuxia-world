@@ -14,7 +14,7 @@ import {
   prizeOptions, registerBlock, resolveRound, roundPairs, settleTournaments, startBlock, tournamentDay, tournamentPhase, yearOf,
 } from "../lib/world/tournament";
 import { namedNpcIds } from "../lib/world/data/named-npcs";
-import { NEWCOMER_EPITHET, heroEpithet } from "../lib/world/epithet";
+import { COMBO_EPITHETS, NEWCOMER_EPITHET, heroEpithet } from "../lib/world/epithet";
 import { useWorldStore } from "../store/world-store";
 import { useBattleStore } from "../store/battle-store";
 
@@ -288,6 +288,27 @@ check("ฉายา: a crown, a price on the head, the top of a sect, then the s
   assert.equal(heroEpithet({ ...base, sectMembership: { wudang: { rank: top.topRank, points: 0, lastQuestDay: {}, artQuestsDone: [], rewardPicks: {}, joinedDay: 0, status: "active" } } } as never), `ประมุขแห่ง${top.name}`);
   assert.equal(heroEpithet({ ...base, wanted: 3, traits: { ...base.traits, good: 90 } }), "ผู้ต้องหาที่ทางการตามล่า");
   assert.equal(heroEpithet({ ...base, wanted: 5, tournamentHistory: [{ year: 1, champion: PLAYER }] }), "ยอดกระบี่แห่งชุมนุมวิจารณ์กระบี่");
+});
+
+check("ฉายา: mixes of traits at 60+ — the widest mix, then the higher total; above wanted and sect rank", () => {
+  const base = { traits: { good: 0, evil: 0, arrogance: 0, humility: 0, fame: 0 }, tournamentHistory: [], sectMembership: {}, wanted: 0 };
+  const t = (traits: Partial<typeof base.traits>) => heroEpithet({ ...base, traits: { ...base.traits, ...traits } });
+  assert.equal(t({ good: 61, evil: 61 }), "คนบ้าแปลกประหลาด");
+  assert.equal(t({ evil: 70, arrogance: 65 }), "จอมมารโดยเนื้อแท้");
+  assert.equal(t({ good: 59, evil: 80 }), "มารร้ายแห่งยุทธภพ", "every trait of a mix must reach 60");
+  assert.equal(t({ evil: 70, arrogance: 65, fame: 60 }), "ราชาปีศาจครองยุทธภพ", "three traits beat two");
+  assert.equal(t({ good: 60, evil: 60, arrogance: 60, humility: 60, fame: 60 }), "เทพเซียนผู้ข้ามพ้นดีชั่ว");
+  assert.equal(t({ good: 90, humility: 61, fame: 60, evil: 0 }), "ปรมาจารย์ผู้ค้ำจุนแผ่นดิน");
+  // Two pairs at once: the higher total wins (good+fame 190 over good+humility 160).
+  assert.equal(t({ good: 100, fame: 90, humility: 60 }), "ปรมาจารย์ผู้ค้ำจุนแผ่นดิน");
+  assert.equal(t({ good: 100, fame: 90, humility: 59 }), "วีรชนแห่งแผ่นดิน");
+  assert.equal(heroEpithet({ ...base, wanted: 4, traits: { ...base.traits, evil: 60, arrogance: 60 } }), "จอมมารโดยเนื้อแท้");
+  assert.equal(heroEpithet({ ...base, tournamentHistory: [{ year: 1, champion: PLAYER }], traits: { ...base.traits, evil: 60, arrogance: 60 } }), "ยอดกระบี่แห่งชุมนุมวิจารณ์กระบี่", "a crown still wins");
+  // Every mix is a distinct set of traits with its own name.
+  const keys = COMBO_EPITHETS.map((c) => [...c.traits].sort().join("+"));
+  assert.equal(new Set(keys).size, keys.length);
+  assert.equal(new Set(COMBO_EPITHETS.map((c) => c.name)).size, COMBO_EPITHETS.length);
+  assert.equal(COMBO_EPITHETS.filter((c) => c.traits.length === 2).length, 10, "every pair of the five traits has a name");
 });
 
 console.log(`\n${passed} systems checks passed.`);
