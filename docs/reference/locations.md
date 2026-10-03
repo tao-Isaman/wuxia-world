@@ -71,7 +71,7 @@ Services: 🏪 shop · 🏯 martial hall · 🔨 artisans (professions) · 🧘 
 | `sect_xuedao` | พรรคอสูรโลหิต | west | painted (auto layout) | 1 | 🧘 · ⛏ ตัดไม้เนื้อแข็ง, ล่าสัตว์ในป่า | สำนักดาบโลหิต, ทะเลทรายร้าง |
 | `sect_wudu` | พรรคเบญจพิษ | west | painted (auto layout) | 2 | 🔨 alchemy · 🧘 · ⛏ ตัดไม้เนื้อแข็ง, ล่าสัตว์ในป่า | ตลาดชาวเมี่ยว, ต้าหลี่, มังกรดำสระน้ำ, ภูเขาวุ่นเหลียน |
 | `sect_jinyiwei` | องครักษ์เสื้อแพร | heartland | painted (auto layout) | 3 | 🧘 · ⛏ ตัดไม้เนื้อแข็ง, ล่าสัตว์ในป่า | พระราชวังหลวง, นครหลวง |
-| `sect_tang` | สำนักสุลถัง | south | painted (auto layout) | 8 | 🧘 · ⛏ ตัดไม้เนื้อแข็ง, ล่าสัตว์ในป่า | ต้าหลี่ |
+| `sect_tang` | สำนักสุลถัง | south | painted (auto layout) | 8 | 🧘 · ⛏ ตัดไม้เนื้อแข็ง, ล่าสัตว์ในป่า | คุ้มสมุนไพร, ต้าหลี่ |
 | `sect_xueyu` | สำนักดาบโลหิต | west | painted (auto layout) | 2 | 🧘 · ⛏ ล่าสัตว์ในป่า | พรรคอสูรโลหิต, ทะเลทรายร้าง |
 
 ## Temples and palaces
@@ -79,7 +79,7 @@ Services: 🏪 shop · 🏯 martial hall · 🔨 artisans (professions) · 🧘 
 | Id | Name | Region | Map | People | Services | Connects to |
 | --- | --- | --- | --- | --- | --- | --- |
 | `temple_dalun` | วิหารล้อลม | west | painted (auto layout) | 1 | 🧘 · ⛏ เก็บสมุนไพรทั่วไป | ต้าหลี่, เขาคุนหลุน |
-| `temple_tianning` | วิหารหลวงจีนสวรรค์ | south | painted (auto layout) | 0 | 🧘 · ⛏ เก็บสมุนไพรทั่วไป | พระราชวังหลวง, คุ้มสมุนไพร |
+| `temple_tianning` | วิหารหลวงจีนสวรรค์ | south | painted (auto layout) | 0 | 🧘 · ⛏ เก็บสมุนไพรทั่วไป | พระราชวังหลวง |
 | `palace_zhongyang` | พระราชวังจงหยาง | north | painted (auto layout) | 1 | 🧘 · ⛏ เก็บสมุนไพรทั่วไป | ฉางอัน, ฉวนเจิน / ชวนจิน, กู่มู่ / โบราณสุสาน |
 | `palace_royal` | พระราชวังหลวง | heartland | painted (auto layout) | 4 | 🧘 · ⛏ เก็บสมุนไพรทั่วไป | องครักษ์เสื้อแพร, โรงเตี๊ยมยั่วไหล, นครหลวง, วิหารหลวงจีนสวรรค์ |
 
@@ -88,7 +88,7 @@ Services: 🏪 shop · 🏯 martial hall · 🔨 artisans (professions) · 🧘 
 | Id | Name | Region | Map | People | Services | Connects to |
 | --- | --- | --- | --- | --- | --- | --- |
 | `villa_yanzi` | คุ้มนกนางแอ่น | east | painted (auto layout) | 1 | ⛏ ตัดไม้เนื้อแข็ง, เก็บสมุนไพรทั่วไป | ซูโจว, พรรคสราญรมย์ (เซียวหยาว) |
-| `villa_yaowang` | คุ้มสมุนไพร | south | painted (auto layout) | 1 | ⛏ ตัดไม้เนื้อแข็ง, เก็บสมุนไพรทั่วไป | บ้านแพทย์น้ำจืด, ถ้ำหุบเขาผีเสื้อ, วิหารหลวงจีนสวรรค์ |
+| `villa_yaowang` | คุ้มสมุนไพร | south | painted (auto layout) | 1 | ⛏ ตัดไม้เนื้อแข็ง, เก็บสมุนไพรทั่วไป | บ้านแพทย์น้ำจืด, ถ้ำหุบเขาผีเสื้อ, สำนักสุลถัง |
 | `villa_meizhuang` | ดงดอกท้อ | heartland | painted (auto layout) | 4 | ⛏ ตัดไม้เนื้อแข็ง, เก็บสมุนไพรทั่วไป | จินหลิง, หยางโจว |
 | `villa_fuwei` | บ้านค้าขายโฝวเวย | east | painted (auto layout) | 3 | ⛏ ตัดไม้เนื้อแข็ง, เก็บสมุนไพรทั่วไป | หยางโจว |
 

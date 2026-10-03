@@ -17,7 +17,7 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 - A place's region (ภาคกลาง / เหนือ / ใต้ / ออก / ตก) now comes from where it sits on the world map: within 170 units of the capital is the heartland, beyond it the compass quarter from the capital. The old hand table had 27 places in a catch-all "wild" region and some on the wrong side (Shaolin "south" though west of the capital). Now: heartland 20, north 16, south 9, east 21, west 31.
 - It drives rumor regions and road colour grades. The hand table stays only as the world-map layout seed (`LAYOUT_REGION`).
 - Jail: a hero caught outside a city goes to the nearest city's jail (was one city per region).
-- **The herb-garden south was cut off.** คุ้มสมุนไพร, บ้านแพทย์น้ำจืด, ถ้ำหุบเขาผีเสื้อ and ถ้ำแมงมุม were joined only to each other, so their people and quests could not be reached on foot. A new road links คุ้มสมุนไพร to วิหารหลวงจีนสวรรค์ (129 roads), and `test:routes` now fails if any place can't be reached by road from the hero's home.
+- **The herb-garden south was cut off.** คุ้มสมุนไพร, บ้านแพทย์น้ำจืด, ถ้ำหุบเขาผีเสื้อ and ถ้ำแมงมุม were joined only to each other, so their people and quests could not be reached on foot. A new road links คุ้มสมุนไพร to สำนักสุลถัง (129 roads), and `test:routes` now fails if any place can't be reached by road from the hero's home.
 - `build-world-coords.ts` keeps every existing spot and lays out only new places (a full relayout moved dozens of places and broke the painted exits); `--relayout` still recomputes everything.
 
 ### Recorded music
