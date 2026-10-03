@@ -59,11 +59,21 @@ export const CHARACTER_CLIPS: Record<CharacterMotion, { frames: readonly number[
 export function characterId(value: string): CharacterId {
   return CHARACTER_IDS.includes(value as CharacterId) ? value as CharacterId : "m1";
 }
-export function characterSheet(id: string): string {
+/**
+ * Art version: bump it when a sheet is repainted under the same file name,
+ * so browsers and the service worker (stale-while-revalidate) can't keep
+ * serving the old picture cut on the new grid.
+ */
+export const ART_VERSION = 2;
+const COSTUME_SET: ReadonlySet<string> = new Set(COSTUME_CHARACTER_IDS);
+function sheetPath(id: string, suffix: string): string {
   const sheet = characterId(id);
-  return hasAnimatedSheet(sheet) ? `/art/characters/npc/${sheet}.png` : `/art/characters/${sheet}.png`;
+  const base = hasAnimatedSheet(sheet) ? `/art/characters/npc/${sheet}${suffix}.png` : `/art/characters/${sheet}${suffix}.png`;
+  // The costume archetypes were repainted in place (the foe_* sheets are new files).
+  return COSTUME_SET.has(sheet) ? `${base}?v=${ART_VERSION}` : base;
 }
-export function characterDirectionSheet(id: string): string { return characterSheet(id).replace(/\.png$/, "-directions.png"); }
+export function characterSheet(id: string): string { return sheetPath(id, ""); }
+export function characterDirectionSheet(id: string): string { return sheetPath(id, "-directions"); }
 /** The heroes also walk in eight painted directions (lib/characters/walk8.ts). */
 export function hasWalk8Sheet(id: string): boolean { return (PLAYER_CHARACTER_IDS as readonly string[]).includes(id); }
 export function characterWalk8Sheet(id: string): string { return `/art/characters/${characterId(id)}-walk8.png`; }
@@ -77,7 +87,7 @@ export function hasDirectionalSheet(id: CharacterId): boolean {
  * 6 raptor · 7 bat · 8 hare · 9 squirrel · 10 wild cat · 11 centipede.
  * Built by scripts/build-creature-atlas.ts.
  */
-export const CREATURE_ATLAS = { url: "/art/creature-atlas.png", columns: 4, rows: 3 } as const;
+export const CREATURE_ATLAS = { url: `/art/creature-atlas.png?v=${ART_VERSION}`, columns: 4, rows: 3 } as const;
 export const CREATURE_FRAME_COUNT = CREATURE_ATLAS.columns * CREATURE_ATLAS.rows;
 /** Pixel rectangle of one creature cell in an atlas image of `width` × `height`. */
 export function creatureCell(width: number, height: number, frame: number) {

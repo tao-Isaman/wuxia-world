@@ -8,11 +8,9 @@ import { toast } from "@/store/toast-store";
 import { WorldCanvas } from "@/components/game/world-canvas";
 import { clearArrivalFrom, forgetMapPosition, peekArrivalFrom, type WorldMarker, type WorldPresentation } from "@/lib/stage/types";
 import { capitalVignette } from "@/lib/stage/world-vignettes";
-import { getOpponent } from "@/lib/world/data/opponents";
-import { opponentLook } from "@/lib/world/battle-looks";
+import { roamingFoesOn } from "./roaming-foes";
 import { hasStation } from "@/lib/world/stations";
 import { TOURNAMENT } from "@/lib/world/tournament";
-import type { WorldFoe } from "@/lib/stage/types";
 export { clearMapPositions } from "@/lib/stage/types";
 
 export interface MapSpotHandlers {
@@ -159,13 +157,7 @@ export function LocationMap({ scene, map, handlers, readOnly = false, dialogueSp
   const guidedMarkers = guideId ? markers.map((marker) => marker.id === guideId ? { ...marker, guide: true } : marker) : markers;
   const arrival = arrivalSpawn(map, arrivedFrom);
   // Foes that turned up here while the hero walked; walking into one engages it.
-  const foes: WorldFoe[] = state.roamingFoes.filter((foe) => foe.locationId === scene.id).map((foe) => {
-    const look = opponentLook(foe.opponentId);
-    return { id: foe.id, x: foe.x, y: foe.y, name: getOpponent(foe.opponentId)?.name ?? foe.opponentId,
-      look: look.kind === "creature" ? { kind: "creature", frame: look.frame, tint: look.tint, size: look.size }
-        : { kind: "character", characterId: look.characterId, tint: look.tint, size: look.size },
-      onEngage: () => useWorldStore.getState().engageFoe(foe.id) };
-  });
+  const foes = roamingFoesOn(state.roamingFoes, scene.id);
   const presentation: WorldPresentation = { key: scene.id, name: scene.name, image: map.image,
     time: state.time, spawn: arrival?.spawn ?? map.spawn, spawnFacing: arrival?.facing, playerImage: playerBodySprite(state.playerBodyId), markers: guidedMarkers, foes,
     ...capitalVignette(scene.id, state.quests.qc_capital_clinic_supplies?.status === "done",

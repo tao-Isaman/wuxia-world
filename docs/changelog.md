@@ -6,6 +6,12 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-03
 
+### Foes on roads; beasts drawn right
+
+- **Roads now show their foes.** Walking a road already spawned foes, but the road view never drew them, so they were invisible and could not be fought — kill quests whose target lives in the wilds (สืบทอดไม้เท้าขอทาน's wild dogs, say) could stall on the road. `RouteMapView` passes the road's foes like the location view (`components/world/roaming-foes.ts`).
+- **Beasts and repainted archetypes no longer come from a stale cache.** The creature atlas and the seven costume sheets were repainted under the same file names, so a browser (or the service worker's stale-while-revalidate) could keep the old pictures and cut them on the new grid — wrong or empty beasts. Their URLs now carry `?v=ART_VERSION` (`lib/characters/catalog.ts`); bump it when art is repainted in place.
+- A beast on the map is cropped to its painted pixels (keeping its cell's scale), so its ⚔ tag sits just above it.
+
 ### Regions follow the map
 
 - A place's region (ภาคกลาง / เหนือ / ใต้ / ออก / ตก) now comes from where it sits on the world map: within 170 units of the capital is the heartland, beyond it the compass quarter from the capital. The old hand table had 27 places in a catch-all "wild" region and some on the wrong side (Shaolin "south" though west of the capital). Now: heartland 20, north 16, south 9, east 21, west 31.

@@ -62,3 +62,33 @@ test("walking brings foes onto the map; walking into one opens its encounter wit
   await expect(world).toHaveAttribute("data-ready", "true", { timeout: 60_000 });
   expect((await save(page)).pendingEncounter).toBeNull();
 });
+
+test("foes turn up on roads too, beasts drawn from the creature atlas", async ({ page }) => {
+  test.setTimeout(180_000);
+  await page.addInitScript(() => {
+    localStorage.removeItem("wuxia-random-events");
+    let seed = 11;
+    Math.random = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+  });
+  await page.goto("/");
+  await page.locator("#hero-name").fill("จอมยุทธ์");
+  await page.getByRole("button", { name: "เริ่มเกมใหม่" }).click();
+  const world = page.getByTestId("world-canvas");
+  await expect(world).toHaveAttribute("data-ready", "true", { timeout: 60_000 });
+  await page.evaluate(() => {
+    const raw = JSON.parse(localStorage.getItem("wusia-world-v1")!);
+    Object.assign(raw.state, { currentSceneId: "route_city_changan__to__sect_huashan", lastLocationId: "city_changan", day: 61 });
+    localStorage.setItem("wusia-world-v1", JSON.stringify(raw));
+  });
+  await page.reload();
+  await expect(world).toHaveAttribute("data-ready", "true", { timeout: 60_000 });
+  await world.focus();
+  for (let i = 0; i < 30 && Number(await world.getAttribute("data-foes") ?? 0) === 0; i++) {
+    const key = i % 2 ? "w" : "s";
+    await page.keyboard.down(key);
+    await page.waitForTimeout(900);
+    await page.keyboard.up(key);
+  }
+  await expect.poll(async () => Number(await world.getAttribute("data-foes") ?? 0), { timeout: 5_000 }).toBeGreaterThan(0);
+  await page.screenshot({ path: "test-results/screenshots/road-foe.png" });
+});

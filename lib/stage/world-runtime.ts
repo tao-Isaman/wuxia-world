@@ -657,15 +657,26 @@ export function createWorldRuntime(
   }
   const foeVisuals = new Map<string, FoeVisual>();
   const foeLoading = new Set<string>();
-  const creatureFrames = new Map<number, Promise<string>>();
+  // A beast is cropped to its painted pixels (so its name tag sits just above
+  // it), keeping its atlas cell's scale (so a hare stays smaller than a bear).
+  const creatureFrames = new Map<number, Promise<{ key: string; cellHeight: number }>>();
   let creatureSheet: Promise<HTMLImageElement> | null = null;
-  function creatureFrameTexture(frame: number): Promise<string> {
+  function creatureFrameTexture(frame: number): Promise<{ key: string; cellHeight: number }> {
     let pending = creatureFrames.get(frame);
     if (!pending) {
       creatureSheet ??= loadImage(CREATURE_ATLAS.url);
       pending = creatureSheet.then((sheet) => {
         const { left, top, width: w, height: h } = creatureCell(sheet.width, sheet.height, frame);
-        return texture(drawCanvas(w, h, (context) => context.drawImage(sheet, left, top, w, h, 0, 0, w, h)), "foe");
+        const cell = drawCanvas(w, h, (context) => context.drawImage(sheet, left, top, w, h, 0, 0, w, h));
+        const pixels = cell.getContext("2d")!.getImageData(0, 0, w, h).data;
+        let x0 = w, y0 = h, x1 = -1, y1 = -1;
+        for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+          if (pixels[(y * w + x) * 4 + 3] < 32) continue;
+          if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+        }
+        if (x1 < 0) return { key: texture(cell, "foe"), cellHeight: h };
+        const cw = x1 - x0 + 1, ch = y1 - y0 + 1;
+        return { key: texture(drawCanvas(cw, ch, (context) => context.drawImage(cell, x0, y0, cw, ch, 0, 0, cw, ch)), "foe"), cellHeight: h };
       });
       creatureFrames.set(frame, pending);
     }
@@ -691,11 +702,12 @@ export function createWorldRuntime(
       let body: Phaser.GameObjects.Image;
       let character: CharacterVisual | undefined;
       if (foe.look.kind === "creature") {
-        const key = await creatureFrameTexture(foe.look.frame);
+        const { key, cellHeight } = await creatureFrameTexture(foe.look.frame);
         if (disposed || !scene) return;
-        body = image(key, 100).setOrigin(0.5, 0.92);
+        body = image(key, 100).setOrigin(0.5, 1);
         const source = scene.textures.get(key).getSourceImage() as HTMLCanvasElement;
-        body.setDisplaySize(size * 1.25 * source.width / source.height, size * 1.25);
+        const scale = size * 1.25 / cellHeight;
+        body.setDisplaySize(source.width * scale, source.height * scale);
       } else {
         const atlas = await loadAtlas(characterId(foe.look.characterId), false);
         if (disposed || !scene) return;
