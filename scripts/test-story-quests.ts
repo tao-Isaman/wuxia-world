@@ -9,11 +9,12 @@ import assert from "node:assert/strict";
 import { SKILLS } from "../lib/game/data/skills";
 import { ARTS } from "../lib/game/data/arts";
 import { CHARACTER_IDS, CREATURE_FRAME_COUNT } from "../lib/characters/catalog";
-import { LINEAGE_SPECS, STORY_ARC_SPECS } from "../lib/world/data/story";
+import { LINEAGE_SPECS, SAGA_PROLOGUES, STORY_ARC_SPECS } from "../lib/world/data/story";
+import { isQuestOfferable, isSecretSectQuest } from "../lib/world/effects";
 import { CUTSCENES, STORY_ARCS, STORY_QUESTS, STORY_RESOLVERS } from "../lib/world/story/registry";
 import { lineageQuestId, storyQuestId, LINEAGE_TIERS } from "../lib/world/story/compile";
 import type { CutsceneSpec, StoryBeat, StoryLine, StoryStep } from "../lib/world/story/types";
-import { getNpc, getOpponent, getItem, getScene, getQuest, SHOPS, RESOURCES, RECIPES, OPPONENTS, QUESTS, SCENES, ITEMS, SECT_HALLS } from "../lib/world/data";
+import { getNpc, getOpponent, getItem, getScene, getQuest, SHOPS, RESOURCES, RECIPES, OPPONENTS, QUESTS, SCENES, ITEMS, SECT_HALLS, SCROLL_PREFIX, scrollItemId } from "../lib/world/data";
 import { FIGHT_EVENTS } from "../lib/world/data/random-events";
 import { getLocationMap } from "../lib/world/data/location-maps";
 import { SECT_MEMBERSHIPS } from "../lib/world/data/sect-memberships";
@@ -69,7 +70,10 @@ check("one way only: no other quest, dialog, manual or hall teaches a sect skill
   };
   for (const q of QUESTS) if (!q.lineage && !q.story) teach(`quest ${q.id}`, q.rewards);
   for (const sc of SCENES) teach(`scene ${sc.id}`, sc);
-  for (const it of ITEMS) teach(`item ${it.id}`, it);
+  // A quest's คัมภีร์ is how its own reward arrives; nothing else may hand one out.
+  for (const it of ITEMS) if (!it.id.startsWith(SCROLL_PREFIX)) teach(`item ${it.id}`, it);
+  const scrollRefs = JSON.stringify([QUESTS.map((q) => q.rewards), SCENES, SHOPS, RESOURCES, RECIPES, OPPONENTS, SECT_HALLS]).match(new RegExp(`"${SCROLL_PREFIX}[a-z0-9_]+"`, "g")) ?? [];
+  if (scrollRefs.length) err(`scroll items handed out directly: ${[...new Set(scrollRefs)].join(", ")}`);
   for (const h of SECT_HALLS) for (const o of h.offers) if (sectItem.has(`${o.kind}:${o.id}`)) err(`hall ${h.locationId} sells ${o.kind} ${o.id}`);
 });
 
@@ -309,6 +313,15 @@ function play(def: QuestDef) {
   assert.equal(store().quests[def.id]?.status, "done", `${where}: handed in`);
 }
 
+// The quest hands over the move's คัมภีร์; reading it from the bag teaches it.
+function readScroll(kind: "skill" | "art", id: string, where: string) {
+  const scroll = scrollItemId(kind, id);
+  assert.equal(store().inventory[scroll] ?? 0, 1, `${where}: got ${scroll}`);
+  const r = store().useItem(scroll);
+  assert.ok(r.ok, `${where}: read ${scroll} (${r.ok ? "" : r.reason})`);
+  assert.equal(store().inventory[scroll] ?? 0, 0, `${where}: scroll used up`);
+}
+
 check("play-through: every lineage quest and every saga chapter, accept → steps → hand-in, through the real store", () => {
   let lineages = 0, chapters = 0;
   for (const l of LINEAGE_SPECS) {
@@ -318,6 +331,9 @@ check("play-through: every lineage quest and every saga chapter, accept → step
     empower(info.sc);
     try {
       play(getQuest(lineageQuestId(l))!);
+      const pre = store().playerBuild!;
+      assert.ok(!(l.kind === "skill" ? pre.learnedSkillIds : pre.learnedArtIds)?.includes(l.id), `lineage ${l.id}: not learned before reading the scroll`);
+      readScroll(l.kind, l.id, `lineage ${l.id}`);
       const b = store().playerBuild!;
       assert.ok(l.kind === "skill" ? b.learnedSkillIds?.includes(l.id) : b.learnedArtIds?.includes(l.id), `lineage ${l.id}: learned`);
       lineages++;
@@ -329,12 +345,41 @@ check("play-through: every lineage quest and every saga chapter, accept → step
     empower(arc.sc);
     try {
       arc.chapters.forEach((_, i) => { play(getQuest(storyQuestId(arc.id, i + 1))!); chapters++; });
+      assert.ok(!evaluateCondition(store(), getQuest(storyQuestId(arc.id, 1))!.prereqs!), `saga ${arc.id}: not offered again while the scroll is unread`);
+      readScroll(arc.reward.kind, arc.reward.id, `saga ${arc.id}`);
       const b = store().playerBuild!;
       assert.ok(arc.reward.kind === "skill" ? b.learnedSkillIds?.includes(arc.reward.id) : b.learnedArtIds?.includes(arc.reward.id), `saga ${arc.id}: taught ${arc.reward.id}`);
       assert.ok(!evaluateCondition(store(), getQuest(storyQuestId(arc.id, 1))!.prereqs!), `saga ${arc.id}: not offered again once learned`);
     } catch (e) { err(e instanceof Error ? e.message : String(e)); }
   }
   console.log(`  played ${lineages} lineage quests and ${chapters} saga chapters`);
+});
+
+check("secret trials: the T4 saga trials are off the sect window and offered by their giver", () => {
+  for (const [reward, qid] of Object.entries(SAGA_PROLOGUES)) {
+    const def = getQuest(qid);
+    if (!def?.sectId) { err(`trial ${qid} (${reward}): not a sect quest`); continue; }
+    if (!isSecretSectQuest(qid)) err(`trial ${qid}: not secret`);
+    if (!def.giverNpcId || !getNpc(def.giverNpcId)?.locationIds.some((loc) => getLocationMap(loc)?.npcSpots?.[def.giverNpcId!])) err(`trial ${qid}: giver stands on no map`);
+    const rank = def.minSectRank ?? 1;
+    const member = (r: number, status: "active" | "resigned") => ({ ...store(), sectMembership: { [def.sectId!]: { rank: r, points: 0, lastQuestDay: {}, artQuestsDone: [], rewardPicks: {}, joinedDay: 0, status } } }) as unknown as WorldStateData;
+    const open = { ...def, prereqs: undefined };
+    if (!isQuestOfferable(member(rank, "active"), open)) err(`trial ${qid}: giver does not offer it at rank ${rank}`);
+    if (isQuestOfferable(member(rank + 1, "active"), open)) err(`trial ${qid}: offered below rank ${rank}`);
+    if (isQuestOfferable(member(rank, "resigned"), open)) err(`trial ${qid}: offered to a former member`);
+  }
+  for (const q of QUESTS) if (q.sectId && !isSecretSectQuest(q.id) && isQuestOfferable(store(), { ...q, prereqs: undefined })) err(`sect quest ${q.id} offered by an NPC`);
+});
+
+check("mystery: no quest that teaches a move names it or its tier in its name, summary or description", () => {
+  for (const q of QUESTS) for (const r of q.rewards ?? []) {
+    if (r.t !== "learnSkill" && r.t !== "learnArt") continue;
+    const name = r.t === "learnSkill" ? SKILLS.find((x) => x.id === r.skillId)?.n : ARTS.find((x) => x.id === r.artId)?.n;
+    for (const text of [q.name, q.description, q.briefSummary ?? ""]) {
+      if (name && text.includes(name)) err(`${q.id}: names its reward "${name}" — say วิชาลึกลับ`);
+      if (/\(ขั้น|\bT[0-5]\b/.test(text)) err(`${q.id}: names a tier — "${text.slice(0, 60)}"`);
+    }
+  }
 });
 
 check("difficulty grows with the tier: higher tiers gate on rank and stats and ask for more", () => {

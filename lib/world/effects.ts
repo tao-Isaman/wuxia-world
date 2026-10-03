@@ -7,9 +7,10 @@ import type {
   WorldStateData,
 } from "./types";
 import { TRAIT_LABEL } from "./types";
-import { getItem, getNpc, getOpponent } from "./data";
+import { getItem, getNpc, getOpponent, scrollItemId } from "./data";
 import { getQuest } from "./data/quests";
 import { SECT_MEMBERSHIPS } from "./data/sect-memberships";
+import { SAGA_PROLOGUES } from "./data/story";
 import {
   FOE_SPAWN,
   applyOpponentStatScale,
@@ -454,6 +455,12 @@ export function applyEffects(state: WorldStateData, effects: readonly SceneEffec
   tickQuestProgress(state);
 }
 
+function grantScroll(state: WorldStateData, kind: "skill" | "art", id: string, known: boolean): void {
+  const itemId = scrollItemId(kind, id);
+  if (known || !getItem(itemId) || (state.inventory[itemId] ?? 0) > 0) return;
+  state.inventory[itemId] = 1;
+}
+
 // ─── Quest reward dispatcher ───────────────────────────────────────────
 // Negative numbers are clamped to 0 — a reward never punishes. Unknown ids
 // are silently dropped so a quest reward referencing a renamed/removed
@@ -492,11 +499,13 @@ function applyQuestRewards(state: WorldStateData, rewards: readonly QuestReward[
         state.npcStates[r.npcId] = { ...entry, relationship: cur + r.amount };
         break;
       }
+      // A quest never teaches outright: it hands over the move's คัมภีร์,
+      // which the hero reads from the bag (nothing if already known or held).
       case "learnSkill":
-        applyEffect(state, { t: "learnSkill", skillId: r.skillId });
+        grantScroll(state, "skill", r.skillId, (state.playerBuild?.learnedSkillIds ?? []).includes(r.skillId));
         break;
       case "learnArt":
-        applyEffect(state, { t: "learnArt", artId: r.artId, level: r.level });
+        grantScroll(state, "art", r.artId, (state.playerBuild?.learnedArtIds ?? []).includes(r.artId));
         break;
       case "joinSect":
         applyEffect(state, { t: "joinSect", sectId: r.sectId });
@@ -669,11 +678,25 @@ function recordMajorQuestCompletion(state: WorldStateData, def: QuestDef): void 
 // with their terminal status — so the absence-check below blocks re-offers
 // without any extra side-quest plumbing.
 export function isQuestOfferable(state: WorldStateData, def: QuestDef): boolean {
-  // Sect quests (repeatable + art) live in the sect popup, not the NPC popup.
-  if (def.sectId) return false;
+  // Sect quests (repeatable + art) live in the sect popup, not the NPC popup —
+  // except the T4 saga trials, which the sect window keeps secret: only their
+  // giver offers them, to an active member of high enough rank.
+  if (def.sectId) {
+    if (!isSecretSectQuest(def.id)) return false;
+    const m = state.sectMembership[def.sectId];
+    if (!m || m.status !== "active") return false;
+    if (def.minSectRank != null && m.rank > def.minSectRank) return false;
+  }
   if (state.quests[def.id]) return false;
   if (def.prereqs && !evaluateCondition(state, def.prereqs)) return false;
   return true;
+}
+
+// The T4 saga trials (SAGA_PROLOGUES): hidden from the sect window, offered by
+// their giver in person.
+const SECRET_SECT_QUESTS: ReadonlySet<string> = new Set(Object.values(SAGA_PROLOGUES));
+export function isSecretSectQuest(questId: string): boolean {
+  return SECRET_SECT_QUESTS.has(questId);
 }
 
 // Sect-quest offerable check — used by SectMembershipPopup. Honors:

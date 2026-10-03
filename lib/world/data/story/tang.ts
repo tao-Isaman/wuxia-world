@@ -644,7 +644,7 @@ const STAR_RAIN: StoryArcSpec = {
       reward: [{ t: "gold", amount: 250 }, { t: "wExp", amount: 220 }, { t: "trait", trait: "fame", amount: 5 }],
     },
     {
-      title: "ดาราพิรุณโปรย",
+      title: "วิชาลึกลับ",
       summary: "ป้ายวิญญาณที่หายไปร้อยปีถูกตั้งขึ้นในหอบรรพชน — และฝนมีดสิบห้าเล่มตกลงบนเทียนสิบห้าดวงอีกครั้ง",
       giver: CHIEF,
       offer: {
@@ -680,7 +680,7 @@ const STAR_RAIN: StoryArcSpec = {
       complete: {
         cutscene: {
           stage: "sect_tang", around: CHIEF, mood: "dusk",
-          title: "ดาราพิรุณโปรย", subtitle: "บทสุดท้าย",
+          title: "วิชาลึกลับ", subtitle: "บทสุดท้าย",
           cast: {
             chief: { name: N_CHIEF, look: CHIEF, at: [2, -1], facing: "left" },
             vice: { name: N_VICE, look: "m4", at: [4, 0], facing: "left", tint: "#5a6b5a" },
@@ -1183,7 +1183,7 @@ const HEART_PIERCE: StoryArcSpec = {
       reward: [{ t: "gold", amount: 250 }, { t: "wExp", amount: 220 }, { t: "trait", trait: "good", amount: 5 }],
     },
     {
-      title: "มีดสั้นทะลวงใจ",
+      title: "วิชาลึกลับ",
       summary: "ชื่อถังเหมินกลับคืนในต้าหลี่ ส่วนอาจารย์กับศิษย์ที่ไม่ได้คุยกันสิบปี ต้องมีใครสักคนพูดก่อน",
       giver: CHIEF,
       offer: {
@@ -1220,7 +1220,7 @@ const HEART_PIERCE: StoryArcSpec = {
       complete: {
         cutscene: {
           stage: "sect_tang", around: CHIEF, mood: "dusk",
-          title: "มีดสั้นทะลวงใจ", subtitle: "บทสุดท้าย",
+          title: "วิชาลึกลับ", subtitle: "บทสุดท้าย",
           cast: {
             chief: { name: N_CHIEF, look: CHIEF, at: [3, -1], facing: "left" },
             blade: { name: N_BLADE, look: "m3", at: [0, 0], facing: "left", tint: "#3f4a55" },

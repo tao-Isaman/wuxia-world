@@ -1329,7 +1329,7 @@ const BODHI_SWORD: StoryArcSpec = {
       reward: [{ t: "gold", amount: 250 }, { t: "wExp", amount: 220 }, { t: "trait", trait: "fame", amount: 5 }],
     },
     {
-      title: "กระบี่พิทักษ์โพธิสัตว์",
+      title: "วิชาลึกลับ",
       summary: "ท่านนิ้วดาบชิงซินเก็บคำไว้ทั้งวันเพื่อบทเรียนสุดท้าย: นางจะฟัน เจ้าจะรับ",
       giver: SWORD,
       offer: {
@@ -1361,7 +1361,7 @@ const BODHI_SWORD: StoryArcSpec = {
       complete: {
         cutscene: {
           stage: "sect_emei", mood: "dusk",
-          title: "กระบี่พิทักษ์โพธิสัตว์", subtitle: "บทสุดท้าย",
+          title: "วิชาลึกลับ", subtitle: "บทสุดท้าย",
           cast: {
             qingxin: { name: N_SWORD, look: "f4", at: [1, -1], facing: "left", tint: "#dcd6e8" },
             huimiao: { name: N_VICE, look: "f4", at: [3, 0], facing: "left", tint: "#efe9dc" },

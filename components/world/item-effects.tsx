@@ -13,10 +13,10 @@ export function ItemEffects({ effect }: { effect?: ItemUseEffect }) {
     labels.push(`${LIFE_SKILL_LABEL[effect.skill]} +${effect.xp} XP`);
   } else if (effect.t === "manualLearnSkill") {
     labels.push(`เรียน ${getSkill(effect.skillId)?.n ?? "วิชาฝีมือ"}`);
-    labels.push(`ต้องการ ${effect.reqStat} ${effect.reqValue}`);
+    if (effect.reqValue > 0) labels.push(`ต้องการ ${effect.reqStat} ${effect.reqValue}`);
   } else if (effect.t === "manualLearnArt") {
     labels.push(`เรียน ${getArt(effect.artId)?.n ?? "วิชาในกาย"} ระดับ ${effect.level ?? 1}`);
-    labels.push(`ต้องการ ${effect.reqStat} ${effect.reqValue}`);
+    if (effect.reqValue > 0) labels.push(`ต้องการ ${effect.reqStat} ${effect.reqValue}`);
   }
   return <>{labels.map((label) => <Badge key={label} variant="outline"
     className="text-[10px] border-emerald-700/30 text-emerald-900 bg-emerald-100/40">{label}</Badge>)}</>;

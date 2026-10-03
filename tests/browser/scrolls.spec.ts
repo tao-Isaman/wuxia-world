@@ -1,0 +1,58 @@
+import { test, expect, type Page } from "@playwright/test";
+
+async function save(page: Page) {
+  return page.evaluate(() => JSON.parse(localStorage.getItem("wusia-world-v1")!).state);
+}
+async function newGame(page: Page, patch: (state: Record<string, unknown>) => void) {
+  await page.goto("/");
+  await page.locator("#hero-name").fill("จอมยุทธ์");
+  await page.getByRole("button", { name: "เริ่มเกมใหม่" }).click();
+  await expect(page.getByTestId("world-canvas")).toHaveAttribute("data-ready", "true", { timeout: 60_000 });
+  await page.evaluate(`(() => {
+    const raw = JSON.parse(localStorage.getItem("wusia-world-v1"));
+    (${patch.toString()})(raw.state);
+    localStorage.setItem("wusia-world-v1", JSON.stringify(raw));
+  })()`);
+  await page.reload();
+  await expect(page.getByTestId("world-canvas")).toHaveAttribute("data-ready", "true", { timeout: 60_000 });
+}
+const menu = (page: Page, name: string) =>
+  page.getByRole("navigation", { name: "เมนูเกม" }).getByRole("button", { name, exact: true }).click();
+
+test("sect window: T4 moves stay off the list, the rest are วิชาลึกลับ until learned", async ({ page }) => {
+  test.setTimeout(120_000);
+  await newGame(page, (s) => {
+    s.sectMembership = { wudang: { rank: 9, points: 0, lastQuestDay: {}, artQuestsDone: [], rewardPicks: {}, joinedDay: 0, status: "active" } };
+  });
+  await menu(page, "สำนัก");
+  await page.getByRole("button", { name: /ขั้นและวิชา/ }).click();
+  const line = page.getByTestId("sect-lineage");
+  await expect(line.locator('[data-lineage-id="tj"]')).toContainText("วิชาลึกลับ");
+  await expect(line.locator('[data-lineage-id="tj"]')).not.toContainText("ไทจี้เจี้ยน");
+  await expect(line.locator('[data-lineage-id="taiji"]')).toHaveCount(0);
+});
+
+test("a quest's scroll: read it from the bag, then pick and equip the move in the skills window", async ({ page }) => {
+  test.setTimeout(120_000);
+  await newGame(page, (s) => {
+    (s.inventory as Record<string, number>)["scroll_skill_tj"] = 1;
+  });
+  await menu(page, "ย่าม");
+  await page.getByRole("button", { name: "คัมภีร์ไทจี้เจี้ยน ×1" }).click();
+  await page.getByRole("button", { name: "ใช้", exact: true }).click();
+  await expect.poll(async () => (await save(page)).playerBuild.learnedSkillIds).toContain("tj");
+  expect((await save(page)).inventory.scroll_skill_tj ?? 0).toBe(0);
+  await page.getByRole("button", { name: "ปิด", exact: true }).click();
+
+  // Reading auto-slots the move; take it off, then put it back from the library.
+  await menu(page, "วิชา");
+  const library = page.getByTestId("skill-library");
+  await expect(library).toContainText("ไทจี้เจี้ยน");
+  await library.locator('[data-library-id="tj"]').click();
+  const detail = page.getByTestId("skill-detail");
+  await expect(detail).toContainText("ไทจี้เจี้ยน");
+  await detail.getByRole("button", { name: /ถอดออกจากช่อง/ }).click();
+  await expect.poll(async () => (await save(page)).playerBuild.skillIds).not.toContain("tj");
+  await detail.getByTestId("skill-equip").click();
+  await expect.poll(async () => (await save(page)).playerBuild.skillIds).toContain("tj");
+});

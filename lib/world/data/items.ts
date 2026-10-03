@@ -1,4 +1,20 @@
+import { ARTS, SKILLS, TIERS } from "@/lib/game";
 import type { ItemDef } from "../types";
+
+// คัมภีร์ — what a quest that teaches a move or art hands over instead. The
+// quest log only calls its reward "วิชาลึกลับ"; the scroll names the move
+// once it is in the bag, and reading it teaches it (no stat gate — the
+// quest was the gate). Unsellable, and nothing but a quest reward gives one.
+export const SCROLL_PREFIX = "scroll_";
+// How a quest names a move or art it rewards, before the scroll is in hand.
+export const MYSTERY_MOVE_LABEL = "📜 วิชาลึกลับ";
+export function scrollItemId(kind: "skill" | "art", id: string): string {
+  return `${SCROLL_PREFIX}${kind}_${id}`;
+}
+// Sagas teach a T4+ art at level 3, everything else at level 1.
+export function scrollArtLevel(ti: number): number {
+  return ti >= 4 ? 3 : 1;
+}
 
 // Items table — every entry has an explicit `category` and a base `price`
 // in gold. Shops use these for buy/sell; inns may restrict acceptance to
@@ -317,7 +333,27 @@ export const ITEMS: readonly ItemDef[] = [
   // ─── องครักษ์เสื้อแพร — move-skill manuals (7) ─────────────────────
 
   // ─── องครักษ์เสื้อแพร — inner-art manuals (5) ──────────────────────
+
+  // ─── คัมภีร์วิชา — one per move skill and inner art (generated) ──────
+  ...scrollItems(),
 ];
+
+function scrollItems(): ItemDef[] {
+  const tier = (ti: number) => TIERS[ti]?.n ?? `T${ti}`;
+  const where = (sc: string) => (sc ? `${sc} · ` : "");
+  return [
+    ...SKILLS.filter((s) => !s.id.startsWith("bst_")).map((s): ItemDef => ({
+      id: scrollItemId("skill", s.id), name: `คัมภีร์${s.n}`, category: "manual", price: 0,
+      description: `คัมภีร์ลับบันทึกวิชา${s.n} (${where(s.sc)}${tier(s.ti)}) — อ่านแล้วจะเรียนวิชานี้ได้ทันที`,
+      use: { t: "manualLearnSkill", skillId: s.id, reqStat: "STR", reqValue: 0 },
+    })),
+    ...ARTS.filter((a) => a.id !== "none").map((a): ItemDef => ({
+      id: scrollItemId("art", a.id), name: `คัมภีร์${a.n}`, category: "manual", price: 0,
+      description: `คัมภีร์ลับบันทึกลมปราณ${a.n} (${where(a.sc)}${tier(a.ti)}) — อ่านแล้วจะเรียนวิชาในกายนี้ได้ทันที`,
+      use: { t: "manualLearnArt", artId: a.id, reqStat: "STR", reqValue: 0, level: scrollArtLevel(a.ti) },
+    })),
+  ];
+}
 
 export const ITEMS_BY_ID = new Map<string, ItemDef>(ITEMS.map((i) => [i.id, i]));
 

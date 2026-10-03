@@ -667,7 +667,7 @@ const THOUSAND_ARMS: StoryArcSpec = {
       reward: [{ t: "gold", amount: 250 }, { t: "wExp", amount: 250 }, { t: "trait", trait: "fame", amount: 5 }],
     },
     {
-      title: "อรหันต์พันกร",
+      title: "วิชาลึกลับ",
       summary: "ส่งเหลยเจิ้นไปพักฟื้นกับนางเหมย แล้วประลองครั้งสุดท้ายกับฮุยเหมียว — พันแขนที่รับ กับห้าหมัดที่ช่วย",
       giver: HUIMIAO,
       offer: {
@@ -710,7 +710,7 @@ const THOUSAND_ARMS: StoryArcSpec = {
       complete: {
         cutscene: {
           stage: "sect_shaolin", around: ABBOT, mood: "dusk",
-          title: "อรหันต์พันกร", subtitle: "บทสุดท้าย",
+          title: "วิชาลึกลับ", subtitle: "บทสุดท้าย",
           cast: {
             abbot: { name: "เจ้าอาวาสฮุยหยวน", look: ABBOT, at: [2, -1], facing: "left" },
             huimiao: { name: "หลวงพี่ใหญ่ฮุยเหมียว", look: "monk", at: [3, 1], facing: "left", size: 1.15 },
@@ -1249,7 +1249,7 @@ const TRUTH_STAFF: StoryArcSpec = {
       reward: [{ t: "gold", amount: 250 }, { t: "wExp", amount: 250 }, { t: "trait", trait: "fame", amount: 5 }],
     },
     {
-      title: "ไม้เท้าสัจธรรม",
+      title: "วิชาลึกลับ",
       summary: "นำจดหมายของเจ้าอาวาสไปบอกความจริงถึงศาลตระกูลหลิว แล้วประลองครั้งสุดท้ายกับหลวงพ่อจูตี้",
       giver: JUTI,
       offer: {
@@ -1292,7 +1292,7 @@ const TRUTH_STAFF: StoryArcSpec = {
       complete: {
         cutscene: {
           stage: "sect_shaolin", around: JUTI, mood: "dusk",
-          title: "ไม้เท้าสัจธรรม", subtitle: "บทสุดท้าย",
+          title: "วิชาลึกลับ", subtitle: "บทสุดท้าย",
           cast: {
             juti: { name: "หลวงพ่อจูตี้", look: "monk", at: [2, -1], facing: "left", size: 1.1 },
             abbot: { name: "เจ้าอาวาสฮุยหยวน", look: ABBOT, at: [4, 1], facing: "left" },

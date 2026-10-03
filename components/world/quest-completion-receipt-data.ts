@@ -1,5 +1,5 @@
-import { getArt, getSkill } from "@/lib/game";
-import { getItem, getNpc, getQuest, getScene, TRAIT_LABEL, type QuestDef, type WorldStateData } from "@/lib/world";
+import { getSkill } from "@/lib/game";
+import { getItem, getNpc, getQuest, getScene, scrollItemId, TRAIT_LABEL, type QuestDef, type WorldStateData } from "@/lib/world";
 
 export interface GrantedReward {
   id: string;
@@ -93,15 +93,13 @@ export function questCompletionReceipt(def: QuestDef, before: ReceiptState, afte
       case "npcRelationship": amount(`relationship:${reward.npcId}`, "relationship", `ความสัมพันธ์ · ${getNpc(reward.npcId)?.name ?? "สหาย"}`,
         reward.amount, (after.npcStates[reward.npcId]?.relationship ?? 0) - (before.npcStates[reward.npcId]?.relationship ?? 0)); break;
       case "learnSkill":
-        if (!(before.playerBuild?.learnedSkillIds ?? []).includes(reward.skillId) && after.playerBuild?.learnedSkillIds?.includes(reward.skillId)) {
-          rewards.push({ id: `learn:${reward.skillId}`, kind: "other", label: getSkill(reward.skillId)?.n ?? "วิชาใหม่", value: "เรียนรู้แล้ว" });
+      case "learnArt": {
+        const scroll = reward.t === "learnSkill" ? scrollItemId("skill", reward.skillId) : scrollItemId("art", reward.artId);
+        if ((after.inventory[scroll] ?? 0) > (before.inventory[scroll] ?? 0)) {
+          rewards.push({ id: `item:${scroll}`, kind: "item", label: getItem(scroll)?.name ?? "คัมภีร์วิชา", value: "อ่านได้ในย่าม" });
         }
         break;
-      case "learnArt":
-        if (!(before.playerBuild?.learnedArtIds ?? []).includes(reward.artId) && after.playerBuild?.learnedArtIds?.includes(reward.artId)) {
-          rewards.push({ id: `art:${reward.artId}`, kind: "other", label: getArt(reward.artId).n, value: "เรียนรู้แล้ว" });
-        }
-        break;
+      }
     }
   }
   for (const [id, entry] of numeric) {

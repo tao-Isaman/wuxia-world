@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Modal } from "@/components/ui/modal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Combobox, type ComboOption } from "@/components/ui/combobox";
 import {
   ART_LEVEL_MAX,
   SKILL_LEVEL_MAX,
@@ -42,11 +41,13 @@ interface Props {
   onClose: () => void;
 }
 
-// Move-skills popup — the unified "skill tab". Each of the 10 slots can
-// hold either a learned move skill or a learned inner art. The Combobox
-// per slot lists everything the player has learned so they can switch
-// loadout in place. The lower section shows the library of learned things
-// for reference (and to spot something that's not yet slotted).
+type LibraryFilter = "all" | "skill" | "art";
+const FILTER_LABEL: Record<LibraryFilter, string> = { all: "ทั้งหมด", skill: "⚔ ฝีมือ", art: "☯ ในกาย" };
+
+// Move-skills popup — the unified "skill tab". The 10 round slots across the
+// top are the loadout (each holds a learned move skill or inner art). Below,
+// the library of everything learned sits on the left as icon + name; the
+// right shows the picked one in full, with equip / remove / level / forget.
 export function MoveSkillsPopup({ open, onClose }: Props) {
   const player = useWorldStore((s) => s.playerBuild);
   const skillLevel = useWorldStore((s) => s.skillLevel);
@@ -59,8 +60,11 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
   const forgetArt = useWorldStore((s) => s.forgetArt);
   const equipSlot = useWorldStore((s) => s.equipSlot);
   const [upgradeReceipt, setUpgradeReceipt] = useState<UpgradeReceipt | null>(null);
-  // Hero's Adventure-style loadout: a row of round slots, one selected at a time.
+  // Hero's Adventure-style loadout: a row of round slots, one targeted at a
+  // time; the library on the left picks what the right-hand panel shows.
   const [selectedSlot, setSelectedSlot] = useState(0);
+  const [picked, setPicked] = useState<string | null>(null);
+  const [filter, setFilter] = useState<LibraryFilter>("all");
 
   useEffect(() => {
     if (!open) setUpgradeReceipt(null);
@@ -123,34 +127,6 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
   const learnedSkillIds = player?.learnedSkillIds ?? [];
   const learnedArtIds = player?.learnedArtIds ?? [];
 
-  // Build the picker option list once per build — grouped so move skills
-  // and inner arts stay visually separate inside the dropdown.
-  const options: ComboOption[] = useMemo(() => {
-    const out: ComboOption[] = [];
-    for (const sid of learnedSkillIds) {
-      const sk = getSkill(sid);
-      if (!sk) continue;
-      const tier = TIERS[sk.ti];
-      out.push({
-        value: sid,
-        label: sk.n,
-        group: "วิชาฝีมือ",
-        hint: `${WEAPON_FAMILY_LABEL[sk.w]} · ${tier?.n ?? ""}`,
-      });
-    }
-    for (const aid of learnedArtIds) {
-      const art = getArt(aid);
-      if (!art || art.id === "none") continue;
-      out.push({
-        value: encodeArtSlot(aid),
-        label: `☯ ${art.n}`,
-        group: "วิชาในกาย",
-        hint: art.tp,
-      });
-    }
-    return out;
-  }, [learnedSkillIds, learnedArtIds]);
-
   if (!player) return null;
 
   const slots = player.skillIds;
@@ -166,11 +142,6 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
     const raw = slots[i];
     if (raw) slotForRaw.set(raw, i);
   }
-
-  // Already-slotted ids — disabled in other slots' pickers so the player
-  // doesn't accidentally double-slot the same id (the action would move
-  // it anyway, but this is clearer UI).
-  const equippedSet = new Set(slots.filter((s): s is string => !!s));
 
   // Aggregate "what have I gained on this tab" — counts, total levels,
   // mastery points by weapon, currently-equipped art level.
@@ -190,8 +161,38 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
   }
   const mastery = getMasteryMap(player.skillIds, player.skillLevels);
 
+  // What the right-hand panel shows: the picked library entry, else the
+  // targeted slot's, else the first thing learned.
+  const library: string[] = [
+    ...learnedSkillIds.filter((sid) => getSkill(sid)),
+    ...learnedArtIds.filter((aid) => aid !== "none" && getArt(aid)).map(encodeArtSlot),
+  ];
+  const shownRaw = (picked && library.includes(picked) ? picked : null) ?? slots[selectedSlot] ?? library[0] ?? null;
+  const shown = parseSlotId(shownRaw);
+  const visible = library.filter((raw) => filter === "all" || (filter === "art") === raw.startsWith("art:"));
+  const freeSlot = slots.findIndex((x) => x === null);
+  // Equip into the targeted slot when it is empty, else the first free one,
+  // else replace the targeted slot.
+  const equipTarget = slots[selectedSlot] === null ? selectedSlot : freeSlot >= 0 ? freeSlot : selectedSlot;
+
+  const forget = async (raw: string) => {
+    const info = parseSlotId(raw);
+    if (!info) return;
+    const name = info.kind === "art" ? info.art.n : info.skill.n;
+    const ok = await confirmDialog({
+      title: info.kind === "art" ? "ลืมวิชาในกาย" : "ลืมวิชา",
+      message: `ลืมวิชา "${name}"?\nระดับและค่าประสบการณ์ของวิชานี้จะถูกล้าง และต้องเรียนใหม่จากตำราอีกครั้ง`,
+      confirmText: "ลืมวิชา",
+      variant: "warn",
+    });
+    if (!ok) return;
+    if (info.kind === "art") forgetArt(info.art.id);
+    else forgetSkill(info.skill.id);
+    setPicked(null);
+  };
+
   return (
-    <Modal open={open} onClose={onClose} title={`🥋 วิชาฝีมือ (${slots.length} ช่อง)`}>
+    <Modal open={open} onClose={onClose} title={`🥋 วิชาฝีมือ (${slots.length} ช่อง)`} maxWidth="max-w-4xl">
       {/* ─── Tab status — what's been gained ───────────────────────── */}
       <div className="mb-3 rounded bg-muted/30 px-3 py-2 space-y-1.5 text-xs">
         <div className="flex items-center gap-3 flex-wrap">
@@ -239,7 +240,7 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
           const lv = info ? (info.kind === "art" ? player.artLevels?.[info.art.id] ?? 1 : skillLevel[info.skill.id] ?? 1) : 0;
           const tierIndex = info ? (info.kind === "art" ? info.art.ti : info.skill.ti) : 0;
           return <button key={i} type="button" role="tab" aria-selected={selectedSlot === i}
-            className={`skill-slot${info ? "" : " skill-slot--empty"}`} onClick={() => setSelectedSlot(i)}
+            className={`skill-slot${info ? "" : " skill-slot--empty"}`} onClick={() => { setSelectedSlot(i); setPicked(raw); }}
             style={{ "--rarity": rarityColor(tierIndex) } as React.CSSProperties} title={`ช่อง ${i + 1}: ${name}`}>
             <span className="skill-slot-medal">
               {info ? (info.kind === "art" ? <ArtIcon art={info.art} size={34} /> : <SkillIcon skill={info.skill} size={34} />) : <span aria-hidden="true">+</span>}
@@ -250,409 +251,224 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
         })}
       </div>
 
-      <div className="space-y-2">
-        {slots.map((raw, i) => {
-          if (i !== selectedSlot) return null;
-          const info = parseSlotId(raw);
-          const disabled = new Set(equippedSet);
-          if (raw) disabled.delete(raw);
-
-          // Slot header — Combobox + clear button.
-          const slotHeader = (
-            <div className="flex items-center gap-1.5">
-              <span className="text-[10px] text-muted-foreground w-6 text-right shrink-0">
-                #{i + 1}
-              </span>
-              <div className="flex-1 min-w-0">
-                <Combobox
-                  options={options}
-                  value={raw ?? null}
-                  onChange={(v) => equipSlot(i, v)}
-                  placeholder="— ว่าง —"
-                  searchPlaceholder="ค้นหาวิชา…"
-                  disabledValues={disabled}
-                />
-              </div>
-              {raw && (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="h-7 px-2 text-[10px] text-muted-foreground"
-                  onClick={() => equipSlot(i, null)}
-                  title="ถอดออก"
-                >
-                  ถอด
-                </Button>
-              )}
+      <div className="skills-layout">
+        {/* ─── Left: the library ───────────────────────────────────── */}
+        <section className="skills-library" aria-label="คลังวิชา" data-testid="skill-library">
+          <div className="skills-library-head">
+            <strong className="bag-heading">คลังวิชา ({library.length})</strong>
+            <div className="bag-filters" role="tablist" aria-label="กรองคลังวิชา">
+              {(Object.keys(FILTER_LABEL) as LibraryFilter[]).map((f) => (
+                <button key={f} type="button" role="tab" aria-selected={filter === f} onClick={() => setFilter(f)}>{FILTER_LABEL[f]}</button>
+              ))}
             </div>
-          );
-
-          if (!info) {
-            return (
-              <div key={i} className="rounded border border-dashed border-muted-foreground/30 px-2 py-2 space-y-1.5">
-                {slotHeader}
-                <p className="text-[10px] text-muted-foreground italic text-center pl-7">
-                  ช่องว่าง — เลือกวิชาที่เรียนรู้แล้วมาติดตั้ง
-                </p>
-              </div>
-            );
-          }
-
-          if (info.kind === "art") {
-            const art = info.art;
-            const lv = player.artLevels?.[art.id] ?? 1;
-            const types = effectiveTypes(art);
-            const cFactor = getStatusFactor(art, conflict);
-            const artStatRow = Object.entries(art.stats)
-              .map(([k, v]) => `${k}+${Math.floor((v * lv) / 10)}`)
-              .join(" ");
-            const artMaxed = lv >= ART_LEVEL_MAX;
-            const aXp = artExp[art.id] ?? 0;
-            const aCost = artMaxed ? Infinity : xpToNextArtLevel(art, lv);
-            const aXpCapped = artMaxed ? 1 : Math.min(aXp, aCost);
-            const aXpPct = artMaxed
-              ? 100
-              : Math.min(100, Math.round((aXp / aCost) * 100));
-            const aWExpCost = artMaxed
-              ? Infinity
-              : Math.max(0, aCost - Math.min(aXp, aCost));
-            const canArtWExp = !artMaxed && wExp >= aWExpCost;
-            return (
-              <div key={i} className="rounded bg-muted/30 px-2 py-2 space-y-1.5">
-                {slotHeader}
-                <div className="pl-7 space-y-1">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <Badge variant="default" className="text-[10px]">☯ วิชาในกาย</Badge>
-                    <ArtTooltip art={art} level={lv}>
-                      <strong className="text-sm cursor-help underline decoration-dotted underline-offset-2">
-                        {art.n}
-                      </strong>
-                    </ArtTooltip>
-                    <Badge variant="default" className="text-[10px]">
-                      ขั้น {lv}{artMaxed ? " (สูงสุด)" : ""}
-                    </Badge>
-                    <Badge variant="outline" className="text-[9px]">{art.sc}</Badge>
-                    <Badge variant="outline" className="text-[9px]">{art.tp}</Badge>
-                    {types.map((t) => (
-                      <Badge key={t} variant="outline" className="text-[9px] opacity-80">
-                        {SKILL_TYPE_LABEL[t]}
-                      </Badge>
-                    ))}
-                    {cFactor < 1 && (
-                      <Badge variant="outline" className="text-[9px] border-rose-400 text-rose-600">
-                        ขัดแย้ง ×{cFactor.toFixed(1)}
-                      </Badge>
-                    )}
-                  </div>
-                  {(artStatRow || art.hL || art.mL) && (
-                    <div className="text-[10px] text-emerald-700">
-                      โบนัส:{artStatRow ? ` ${artStatRow}` : ""}
-                      {art.hL ? ` HP+${art.hL * lv}` : ""}
-                      {art.mL ? ` MP+${art.mL * lv}` : ""}
-                    </div>
-                  )}
-                  {art.act && (
-                    <div className="text-[11px] text-muted-foreground">
-                      ⚡ <strong>{art.act.n}</strong> · MP {art.act.c} · CD {art.act.cd} · {art.act.d}
-                    </div>
-                  )}
-                  {art.pas && (
-                    <div className="text-[10px] text-muted-foreground">◆ {art.pas.d}</div>
-                  )}
-                  <div className="space-y-1">
-                    <div className="flex items-center justify-between text-[10px]">
-                      <span className="text-muted-foreground">
-                        {artMaxed
-                          ? "ขั้นสูงสุดแล้ว"
-                          : `xp ${aXpCapped}/${aCost} (ตี-${art.ti + 1} · 2× ของวิชาฝีมือ)`}
+          </div>
+          {visible.length === 0 ? (
+            <p className="bag-empty text-xs italic py-2">ยังไม่ได้เรียนรู้วิชาใด — ทำภารกิจเพื่อรับคัมภีร์วิชา แล้วอ่านจากย่าม</p>
+          ) : (
+            <ul className="skills-library-list">
+              {visible.map((raw) => {
+                const info = parseSlotId(raw)!;
+                const def = info.kind === "art" ? info.art : info.skill;
+                const lv = info.kind === "art" ? player.artLevels?.[info.art.id] ?? 1 : skillLevel[info.skill.id] ?? 1;
+                const slotIdx = slotForRaw.get(raw);
+                return (
+                  <li key={raw}>
+                    <button type="button" className="skills-library-item" aria-pressed={shownRaw === raw}
+                      data-library-id={raw} onClick={() => setPicked(raw)}
+                      style={{ "--rarity": rarityColor(def.ti) } as React.CSSProperties}>
+                      <span className="skills-library-icon">
+                        {info.kind === "art" ? <ArtIcon art={info.art} size={30} /> : <SkillIcon skill={info.skill} size={30} />}
                       </span>
-                    </div>
-                    <div className="h-1.5 bg-muted rounded overflow-hidden">
-                      <div
-                        className={`h-full ${artMaxed ? "bg-amber-500" : "bg-primary"}`}
-                        style={{ width: `${aXpPct}%` }}
-                      />
-                    </div>
-                  </div>
-                  {!artMaxed && (
-                    <div className="flex items-center justify-between gap-2 pt-1">
-                      <span className="text-[10px] text-muted-foreground italic">
-                        เลื่อนขั้นเองเมื่อ xp เต็ม
+                      <span className="skills-library-name">
+                        <span>{def.n}</span>
+                        <small>{info.kind === "art" ? "☯ ในกาย" : `⚔ ${WEAPON_FAMILY_LABEL[info.skill.w]}`} · Lv.{lv}</small>
                       </span>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="text-[11px] h-7"
-                        disabled={!canArtWExp}
-                        onClick={() => upgrade(encodeArtSlot(art.id))}
-                        title={
-                          canArtWExp
-                            ? `ใช้ ${aWExpCost} w-exp (xp ${aXpCapped}/${aCost})`
-                            : `ต้องการ ${aWExpCost} w-exp`
-                        }
-                      >
-                        เร่งด้วย w-exp ({aWExpCost})
-                      </Button>
-                    </div>
-                  )}
-                </div>
-                {upgradeReceipt?.rawId === raw && (
-                  <UpgradePayoff
-                    key={`${raw}-${upgradeReceipt.level}`}
-                    receipt={upgradeReceipt}
-                    onDismiss={() => setUpgradeReceipt(null)}
-                  />
-                )}
-              </div>
-            );
-          }
+                      {typeof slotIdx === "number" && <b className="skills-library-slot" title={`ติดตั้งช่อง ${slotIdx + 1}`}>{slotIdx + 1}</b>}
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </section>
 
-          // Move skill slot
-          const sk = info.skill;
-          const tier = TIERS[sk.ti];
-          const lv = skillLevel[sk.id] ?? 1;
-          const xp = skillExp[sk.id] ?? 0;
-          const maxed = lv >= SKILL_LEVEL_MAX;
-          const cost = maxed ? Infinity : xpToNextLevel(sk, lv);
-          const xpCapped = maxed ? 1 : Math.min(xp, cost);
-          const xpPct = maxed ? 100 : Math.min(100, Math.round((xp / cost) * 100));
-          const eBp = Math.round(effectiveBp(sk, lv));
-          const eMg = Math.round(effectiveMg(sk, lv));
-          const bpMul = Math.round(bpMultiplier(lv) * 100);
-          const mgMul = Math.round(mgMultiplier(lv) * 100);
-          const wExpCost = maxed
-            ? Infinity
-            : Math.max(0, cost - Math.min(xp, cost));
-          const canWExp = !maxed && wExp >= wExpCost;
-          const skillTypes = effectiveTypes(sk);
-          const cFactor = getStatusFactor(sk, conflict);
-          return (
-            <div key={i} className="rounded bg-muted/30 px-2 py-2 space-y-1.5">
-              {slotHeader}
-              <div className="pl-7 space-y-1">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <Badge variant="default" className="text-[10px]">⚔ วิชาฝีมือ</Badge>
-                  <SkillTooltip skill={sk} level={lv}>
-                    <strong className="text-sm cursor-help underline decoration-dotted underline-offset-2">
-                      {sk.n}
-                    </strong>
-                  </SkillTooltip>
-                  <Badge variant="default" className="text-[10px]">Lv.{lv}{maxed ? " (สูงสุด)" : ""}</Badge>
-                  {tier && (
-                    <Badge variant="outline" className="text-[9px]">{tier.n}</Badge>
-                  )}
-                  <Badge variant="outline" className="text-[9px]" title={WEAPON_FAMILY_HINT[sk.w]}>
-                    {WEAPON_FAMILY_LABEL[sk.w]}
-                  </Badge>
-                  {sk.at && (
-                    <Badge variant="outline" className="text-[9px]">
-                      {sk.at === "phy" ? "ทางกาย" : "ทางใน"}
-                    </Badge>
-                  )}
-                  {skillTypes.map((t) => (
-                    <Badge key={t} variant="outline" className="text-[9px] opacity-80">
-                      {SKILL_TYPE_LABEL[t]}
-                    </Badge>
-                  ))}
-                  {cFactor < 1 && (
-                    <Badge variant="outline" className="text-[9px] border-rose-400 text-rose-600">
-                      ขัดแย้ง ×{cFactor.toFixed(1)}
-                    </Badge>
-                  )}
-                </div>
-                {Object.keys(sk.st).length > 0 && (
-                  <div className="text-[10px] text-emerald-700">
-                    โบนัส:{" "}
-                    {Object.entries(sk.st)
-                      .map(([k, v]) => `${k}+${Math.floor((v as number) * bpMultiplier(lv))}`)
-                      .join(" ")}
-                    <span className="opacity-60"> ({bpMul}% ของ Lv.10)</span>
-                  </div>
-                )}
-                <div className="text-[11px] text-muted-foreground">{sk.d}</div>
-                <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-[10px] text-muted-foreground">
-                  <span>BP {eBp} <span className="opacity-60">({bpMul}% ของ {sk.bp})</span></span>
-                  {sk.p > 0 && <span>+{sk.p}%</span>}
-                  {sk.f > 0 && <span>+{sk.f} flat</span>}
-                  {sk.dm !== 1 && <span>×{sk.dm}</span>}
-                  {sk.dr ? <span>ดูด {sk.dr}%</span> : null}
-                  <span>ฝีมือ +{eMg} <span className="opacity-60">({mgMul}% ของ {sk.mg})</span></span>
-                </div>
-                <div className="space-y-1">
-                  <div className="flex items-center justify-between text-[10px]">
-                    <span className="text-muted-foreground">
-                      {maxed ? "ระดับสูงสุดแล้ว" : `xp ${xpCapped}/${cost} (ตี-${sk.ti + 1})`}
-                    </span>
-                  </div>
-                  <div className="h-1.5 bg-muted rounded overflow-hidden">
-                    <div
-                      className={`h-full ${maxed ? "bg-amber-500" : "bg-primary"}`}
-                      style={{ width: `${xpPct}%` }}
-                    />
-                  </div>
-                </div>
-                {!maxed && (
-                  <div className="flex items-center justify-between gap-2 pt-1">
-                    <span className="text-[10px] text-muted-foreground italic">
-                      เลื่อนขั้นเองเมื่อ xp เต็ม
-                    </span>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="text-[11px] h-7"
-                      disabled={!canWExp}
-                      onClick={() => upgrade(sk.id)}
-                      title={
-                        canWExp
-                          ? `ใช้ ${wExpCost} w-exp (xp ${xpCapped}/${cost})`
-                          : `ต้องการ ${wExpCost} w-exp`
-                      }
-                    >
-                      เร่งด้วย w-exp ({wExpCost})
-                    </Button>
-                  </div>
-                )}
-              </div>
-              {upgradeReceipt?.rawId === raw && (
-                <UpgradePayoff
-                  key={`${raw}-${upgradeReceipt.level}`}
-                  receipt={upgradeReceipt}
-                  onDismiss={() => setUpgradeReceipt(null)}
-                />
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      {/* ─── Library section ─────────────────────────────────────────── */}
-      <div className="mt-4 border-t pt-3 space-y-1.5">
-        <div className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">
-          วิชาที่เรียนรู้แล้ว ({learnedSkillIds.length + learnedArtIds.length})
-        </div>
-        {learnedSkillIds.length === 0 && learnedArtIds.length === 0 ? (
-          <p className="text-xs text-muted-foreground italic py-1">
-            ยังไม่ได้เรียนรู้วิชาใด
-          </p>
-        ) : (
-          <ul className="space-y-1">
-            {learnedSkillIds.map((sid) => {
-              const sk = getSkill(sid);
-              if (!sk) return null;
-              const slotIdx = slotForRaw.get(sid);
-              return (
-                <li
-                  key={sid}
-                  className="flex items-center justify-between gap-2 text-xs px-2 py-1 rounded hover:bg-muted/40"
-                >
-                  <span className="flex items-center gap-1.5 flex-wrap">
-                    <Badge variant="outline" className="text-[9px]">⚔</Badge>
-                    <SkillTooltip skill={sk} level={skillLevel[sid] ?? 1}>
-                      <strong className="cursor-help underline decoration-dotted underline-offset-2">
-                        {sk.n}
-                      </strong>
-                    </SkillTooltip>
-                    <span className="text-[10px] text-muted-foreground">{WEAPON_FAMILY_LABEL[sk.w]}</span>
-                  </span>
-                  <span className="flex items-center gap-1">
-                    {typeof slotIdx === "number" ? (
-                      <Badge variant="outline" className="text-[9px]">ติดตั้งช่อง {slotIdx + 1}</Badge>
-                    ) : (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="h-6 px-2 text-[10px]"
-                        onClick={() => {
-                          const free = slots.findIndex((s) => s === null);
-                          if (free >= 0) equipSlot(free, sid);
-                        }}
-                        disabled={!slots.some((s) => s === null)}
-                      >
-                        ติดตั้ง
-                      </Button>
-                    )}
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="h-6 px-2 text-[10px] text-destructive hover:bg-destructive/10"
-                      title="ลบออกจากตำราที่เรียนแล้ว — ลดการขัดแย้งของวิชา"
-                      onClick={async () => {
-                        const ok = await confirmDialog({
-                          title: "ลืมวิชา",
-                          message: `ลืมวิชา "${sk.n}"?\nค่าประสบการณ์และระดับของวิชานี้จะถูกล้าง และต้องเรียนใหม่จากตำราอีกครั้ง`,
-                          confirmText: "ลืมวิชา",
-                          variant: "warn",
-                        });
-                        if (ok) forgetSkill(sid);
-                      }}
-                    >
-                      ลืม
-                    </Button>
-                  </span>
-                </li>
-              );
-            })}
-            {learnedArtIds.map((aid) => {
-              const art = getArt(aid);
-              if (!art || art.id === "none") return null;
-              const raw = encodeArtSlot(aid);
-              const slotIdx = slotForRaw.get(raw);
-              return (
-                <li
-                  key={aid}
-                  className="flex items-center justify-between gap-2 text-xs px-2 py-1 rounded hover:bg-muted/40"
-                >
-                  <span className="flex items-center gap-1.5 flex-wrap">
-                    <Badge variant="outline" className="text-[9px]">☯</Badge>
-                    <ArtTooltip art={art} level={player.artLevels?.[aid] ?? 1}>
-                      <strong className="cursor-help underline decoration-dotted underline-offset-2">
-                        {art.n}
-                      </strong>
-                    </ArtTooltip>
-                    <span className="text-[10px] text-muted-foreground">{art.sc}</span>
-                  </span>
-                  <span className="flex items-center gap-1">
-                    {typeof slotIdx === "number" ? (
-                      <Badge variant="outline" className="text-[9px]">ติดตั้งช่อง {slotIdx + 1}</Badge>
-                    ) : (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="h-6 px-2 text-[10px]"
-                        onClick={() => {
-                          const free = slots.findIndex((s) => s === null);
-                          if (free >= 0) equipSlot(free, raw);
-                        }}
-                        disabled={!slots.some((s) => s === null)}
-                      >
-                        ติดตั้ง
-                      </Button>
-                    )}
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="h-6 px-2 text-[10px] text-destructive hover:bg-destructive/10"
-                      title="ลบออกจากตำราที่เรียนแล้ว — ลดการขัดแย้งของวิชา"
-                      onClick={async () => {
-                        const ok = await confirmDialog({
-                          title: "ลืมวิชาในกาย",
-                          message: `ลืมวิชา "${art.n}"?\nระดับและค่าประสบการณ์ของวิชานี้จะถูกล้าง และต้องเรียนใหม่จากตำราอีกครั้ง`,
-                          confirmText: "ลืมวิชา",
-                          variant: "warn",
-                        });
-                        if (ok) forgetArt(aid);
-                      }}
-                    >
-                      ลืม
-                    </Button>
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-        )}
+        {/* ─── Right: the picked skill ─────────────────────────────── */}
+        <section className="skills-detail" aria-label="รายละเอียดวิชา" data-testid="skill-detail">
+          {!shown || !shownRaw ? (
+            <p className="bag-detail-hint text-xs italic">เลือกวิชาจากคลังด้านซ้ายเพื่อดูรายละเอียด</p>
+          ) : (
+            <SkillDetail
+              raw={shownRaw}
+              info={shown}
+              level={shown.kind === "art" ? player.artLevels?.[shown.art.id] ?? 1 : skillLevel[shown.skill.id] ?? 1}
+              xp={shown.kind === "art" ? artExp[shown.art.id] ?? 0 : skillExp[shown.skill.id] ?? 0}
+              wExp={wExp}
+              conflict={conflict}
+              slot={slotForRaw.get(shownRaw)}
+              equipLabel={slots[equipTarget] ? `แทนที่ช่อง ${equipTarget + 1}` : `ติดตั้งลงช่อง ${equipTarget + 1}`}
+              onEquip={() => { equipSlot(equipTarget, shownRaw); setSelectedSlot(equipTarget); }}
+              onUnequip={(slot) => equipSlot(slot, null)}
+              onForget={() => forget(shownRaw)}
+              onUpgrade={() => upgrade(shownRaw)}
+              receipt={upgradeReceipt?.rawId === shownRaw ? upgradeReceipt : null}
+              onDismissReceipt={() => setUpgradeReceipt(null)}
+            />
+          )}
+        </section>
       </div>
     </Modal>
+  );
+}
+
+interface SkillDetailProps {
+  raw: string;
+  info: NonNullable<ReturnType<typeof parseSlotId>>;
+  level: number;
+  xp: number;
+  wExp: number;
+  conflict: ReturnType<typeof computeConflictFactors>;
+  /** The loadout slot holding it, if any. */
+  slot: number | undefined;
+  equipLabel: string;
+  onEquip: () => void;
+  onUnequip: (slot: number) => void;
+  onForget: () => void;
+  onUpgrade: () => void;
+  receipt: UpgradeReceipt | null;
+  onDismissReceipt: () => void;
+}
+
+// The right-hand panel: one move skill or inner art in full — badges, bonus,
+// numbers, xp bar, the w-exp top-up, and equip / remove / forget.
+function SkillDetail({ raw, info, level: lv, xp, wExp, conflict, slot, equipLabel, onEquip, onUnequip, onForget, onUpgrade, receipt, onDismissReceipt }: SkillDetailProps) {
+  const def = info.kind === "art" ? info.art : info.skill;
+  const types = effectiveTypes(def);
+  const cFactor = getStatusFactor(def, conflict);
+  const maxed = lv >= (info.kind === "art" ? ART_LEVEL_MAX : SKILL_LEVEL_MAX);
+  const cost = maxed ? Infinity : info.kind === "art" ? xpToNextArtLevel(info.art, lv) : xpToNextLevel(info.skill, lv);
+  const xpCapped = maxed ? 1 : Math.min(xp, cost);
+  const xpPct = maxed ? 100 : Math.min(100, Math.round((xp / cost) * 100));
+  const wExpCost = maxed ? Infinity : Math.max(0, cost - Math.min(xp, cost));
+  const canWExp = !maxed && wExp >= wExpCost;
+  const tier = TIERS[def.ti];
+
+  return (
+    <div className="space-y-2" data-detail-id={raw}>
+      <div className="skills-detail-head">
+        {info.kind === "art" ? <ArtIcon art={info.art} size={44} /> : <SkillIcon skill={info.skill} size={44} />}
+        <div className="min-w-0 flex-1">
+          {info.kind === "art" ? (
+            <ArtTooltip art={info.art} level={lv}>
+              <strong className="text-base cursor-help underline decoration-dotted underline-offset-2">{def.n}</strong>
+            </ArtTooltip>
+          ) : (
+            <SkillTooltip skill={info.skill} level={lv}>
+              <strong className="text-base cursor-help underline decoration-dotted underline-offset-2">{def.n}</strong>
+            </SkillTooltip>
+          )}
+          <div className="text-[11px] text-muted-foreground">
+            {info.kind === "art" ? "☯ วิชาในกาย" : "⚔ วิชาฝีมือ"} · {info.kind === "art" ? "ขั้น" : "Lv."}{lv}{maxed ? " (สูงสุด)" : ""}
+            {typeof slot === "number" ? ` · ติดตั้งช่อง ${slot + 1}` : ""}
+          </div>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-1.5 flex-wrap">
+        {tier && <Badge variant="outline" className="text-[9px]">{tier.n}</Badge>}
+        {def.sc && <Badge variant="outline" className="text-[9px]">{def.sc}</Badge>}
+        {info.kind === "art" ? (
+          <Badge variant="outline" className="text-[9px]">{info.art.tp}</Badge>
+        ) : (
+          <>
+            <Badge variant="outline" className="text-[9px]" title={WEAPON_FAMILY_HINT[info.skill.w]}>{WEAPON_FAMILY_LABEL[info.skill.w]}</Badge>
+            {info.skill.at && <Badge variant="outline" className="text-[9px]">{info.skill.at === "phy" ? "ทางกาย" : "ทางใน"}</Badge>}
+          </>
+        )}
+        {types.map((t) => (
+          <Badge key={t} variant="outline" className="text-[9px] opacity-80">{SKILL_TYPE_LABEL[t]}</Badge>
+        ))}
+        {cFactor < 1 && (
+          <Badge variant="outline" className="text-[9px] border-rose-400 text-rose-600">ขัดแย้ง ×{cFactor.toFixed(1)}</Badge>
+        )}
+      </div>
+
+      {info.kind === "art" ? <ArtNumbers art={info.art} lv={lv} /> : <SkillNumbers skill={info.skill} lv={lv} />}
+
+      <div className="space-y-1">
+        <div className="text-[10px] text-muted-foreground">
+          {maxed
+            ? "ขั้นสูงสุดแล้ว"
+            : info.kind === "art"
+              ? `xp ${xpCapped}/${cost} (ตี-${def.ti + 1} · 2× ของวิชาฝีมือ)`
+              : `xp ${xpCapped}/${cost} (ตี-${def.ti + 1})`}
+        </div>
+        <div className="h-1.5 bg-muted rounded overflow-hidden">
+          <div className={`h-full ${maxed ? "bg-amber-500" : "bg-primary"}`} style={{ width: `${xpPct}%` }} />
+        </div>
+      </div>
+      {!maxed && (
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-[10px] text-muted-foreground italic">เลื่อนขั้นเองเมื่อ xp เต็ม</span>
+          <Button size="sm" variant="outline" className="text-[11px] h-7" disabled={!canWExp} onClick={onUpgrade}
+            title={canWExp ? `ใช้ ${wExpCost} w-exp (xp ${xpCapped}/${cost})` : `ต้องการ ${wExpCost} w-exp`}>
+            เร่งด้วย w-exp ({wExpCost})
+          </Button>
+        </div>
+      )}
+
+      <div className="skills-detail-actions">
+        {typeof slot === "number" ? (
+          <Button size="sm" variant="outline" className="h-8 text-[12px]" onClick={() => onUnequip(slot)}>ถอดออกจากช่อง {slot + 1}</Button>
+        ) : (
+          <Button size="sm" className="h-8 text-[12px]" data-testid="skill-equip" onClick={onEquip}>{equipLabel}</Button>
+        )}
+        <Button size="sm" variant="ghost" className="h-8 px-2 text-[12px] text-destructive hover:bg-destructive/10"
+          title="ลบออกจากวิชาที่เรียนแล้ว — ลดการขัดแย้งของวิชา" onClick={onForget}>
+          ลืมวิชา
+        </Button>
+      </div>
+
+      {receipt && <UpgradePayoff key={`${raw}-${receipt.level}`} receipt={receipt} onDismiss={onDismissReceipt} />}
+    </div>
+  );
+}
+
+function ArtNumbers({ art, lv }: { art: ReturnType<typeof getArt>; lv: number }) {
+  const statRow = Object.entries(art.stats).map(([k, v]) => `${k}+${Math.floor((v * lv) / 10)}`).join(" ");
+  return (
+    <>
+      {(statRow || art.hL || art.mL) && (
+        <div className="text-[11px] text-emerald-700">
+          โบนัส:{statRow ? ` ${statRow}` : ""}{art.hL ? ` HP+${art.hL * lv}` : ""}{art.mL ? ` MP+${art.mL * lv}` : ""}
+        </div>
+      )}
+      {art.act && <div className="text-[11px] text-muted-foreground">⚡ <strong>{art.act.n}</strong> · MP {art.act.c} · CD {art.act.cd} · {art.act.d}</div>}
+      {art.pas && <div className="text-[11px] text-muted-foreground">◆ {art.pas.d}</div>}
+    </>
+  );
+}
+
+function SkillNumbers({ skill: sk, lv }: { skill: NonNullable<ReturnType<typeof getSkill>>; lv: number }) {
+  const bpMul = Math.round(bpMultiplier(lv) * 100);
+  const mgMul = Math.round(mgMultiplier(lv) * 100);
+  return (
+    <>
+      {Object.keys(sk.st).length > 0 && (
+        <div className="text-[11px] text-emerald-700">
+          โบนัส: {Object.entries(sk.st).map(([k, v]) => `${k}+${Math.floor((v as number) * bpMultiplier(lv))}`).join(" ")}
+          <span className="opacity-60"> ({bpMul}% ของ Lv.10)</span>
+        </div>
+      )}
+      <div className="text-[11px] text-muted-foreground">{sk.d}</div>
+      <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-[10px] text-muted-foreground">
+        <span>BP {Math.round(effectiveBp(sk, lv))} <span className="opacity-60">({bpMul}% ของ {sk.bp})</span></span>
+        {sk.p > 0 && <span>+{sk.p}%</span>}
+        {sk.f > 0 && <span>+{sk.f} flat</span>}
+        {sk.dm !== 1 && <span>×{sk.dm}</span>}
+        {sk.dr ? <span>ดูด {sk.dr}%</span> : null}
+        <span>ฝีมือ +{Math.round(effectiveMg(sk, lv))} <span className="opacity-60">({mgMul}% ของ {sk.mg})</span></span>
+      </div>
+    </>
   );
 }
 

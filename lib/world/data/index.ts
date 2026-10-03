@@ -1,6 +1,6 @@
 export { SCENES, SCENES_BY_ID, getScene, START_SCENE_ID } from "./scenes";
 export { QUESTS, QUESTS_BY_ID, getQuest, getQuestsForNpc, getQuestsForSect } from "./quests";
-export { ITEMS, ITEMS_BY_ID, getItem } from "./items";
+export { ITEMS, ITEMS_BY_ID, MYSTERY_MOVE_LABEL, SCROLL_PREFIX, getItem, scrollArtLevel, scrollItemId } from "./items";
 export { OPPONENTS, OPPONENTS_BY_ID, getOpponent } from "./opponents";
 export { NPCS, NPCS_BY_ID, getNpc, getNpcsAtLocation } from "./npcs";
 export { SHOPS, SHOPS_BY_LOCATION, getShopAt, type ShopDef } from "./shops";

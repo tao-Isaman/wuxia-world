@@ -45,12 +45,15 @@ const quests: QuestDef[] = [];
 const scenes: DialogScene[] = [];
 const cutscenes: CutsceneDef[] = [];
 const arcs: StoryArcInfo[] = [];
+const lessonsBy = new Map<string, number>();
 for (const raw of LINEAGE_SPECS) {
   // A lineage quest with a prologue trial (an older sect art quest) opens only after it.
   const trial = LINEAGE_PROLOGUES[raw.id];
   const done: Condition | undefined = trial ? { t: "questStatus", questId: trial, status: "done" } : undefined;
   const spec = done ? { ...raw, require: raw.require ? { t: "and" as const, all: [raw.require, done] } : done } : raw;
-  const c = compileLineage(spec, STORY_RESOLVERS);
+  const seq = (lessonsBy.get(raw.giver) ?? 0) + 1;
+  lessonsBy.set(raw.giver, seq);
+  const c = compileLineage(spec, STORY_RESOLVERS, seq);
   quests.push(...c.quests); scenes.push(...c.scenes); cutscenes.push(...c.cutscenes);
 }
 for (const raw of STORY_ARC_SPECS) {

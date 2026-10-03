@@ -269,7 +269,8 @@ There are 867 quests: one main quest, 526 side quests (97 sect quests, 154 linea
 
 Every sect skill and art can be earned from a sect NPC ([story-quests.md](story-quests.md)):
 
-- **Lineage quests** (สืบทอดวิชา) teach a tier 0–3 skill or art. The higher the tier, the harder:
+- **The reward is a mystery, then a scroll.** No quest says which move it teaches or its tier — offers, the quest log and the sect window call it **📜 วิชาลึกลับ**. Finishing the quest puts the move's **คัมภีร์** in the bag (it names the move); read it (ใช้) to learn the move. Scrolls can't be sold, and the quest isn't offered again while its scroll is unread.
+- **Lineage quests** (สืบทอดวิชา, named after the teacher: สืบทอดวิชาลึกลับของ<teacher>) teach a tier 0–3 skill or art. The higher the tier, the harder:
 
   | Tier | Needs | Task | Rewards |
   | --- | --- | --- | --- |
@@ -281,7 +282,7 @@ Every sect skill and art can be earned from a sect NPC ([story-quests.md](story-
   The stat is the item's strongest, counted without gear. The three outsider sects, which can't be joined, ask for a way of life instead: evil for ดาวดึงส์ and ดาบโลหิต, the venom life skill for เบญจพิษ.
 - **Story sagas** (ตำนาน, 📜) lead to a tier-4 skill or art. Each is 8–10 chapters that retell a legend of มังกรหยก ภาค 3 — set over a hundred years later, with the old heroes in sepia flashbacks — and pay small rewards along the way; the last chapter teaches the technique.
   - Chapter 1 needs a high rank and a stat of 40 (or a way of life for the outsiders); each later chapter opens when the previous one is done.
-  - Seven sects' old art quests are now **prologue trials** (บททดสอบก่อนตำนาน) that must be passed before the saga starts.
+  - Seven sects' old art quests are now **prologue trials** (บททดสอบก่อนตำนาน) that must be passed before the saga starts. They are secret: not in the sect window — their giver offers them in person to an active member of high enough rank.
   - Chapters send you between places to visit, talk, hunt, gather and duel. A duel is never fatal; lose it and try again.
   - Many scenes open with a **film** on the painted map: subtitles, title cards and moods. Tap to go on, ▶ อัตโนมัติ to play hands-free, ข้าม to skip. Long talks show a page at a time (ต่อ ▶).
   - The quest log's **ตำนาน** tab lists every saga with its progress and who gives the next chapter, and replays films already seen (🎬).
@@ -326,8 +327,8 @@ There are 15 joinable sects and 5 more sect grounds you can only visit.
 
 - **Ranks** count down: 9 → 1 (eight sects), 5 → 1 (six sects) or 3 → 1 (กู่มู่). A lower number is higher.
   - Sect quests pay sect points, and a rank-up spends them: 6250 points in total on a 9-rank ladder, 1850 on a 5-rank ladder, 1600 for กู่มู่.
-  - A rank-up pays gold (half the points it costs) and opens more of the sect's lineage quests and sagas. Ranks grant no martial arts: every sect skill and art comes **only** from its lineage quest or saga. The 🎖 ขั้นและวิชา tab lists them all with what each still needs.
-- **Sect quests** (📜 ภารกิจประจำ) can repeat, each 30 days after you last completed it. Some need a minimum rank, and each sect has one art quest. Art quests teach nothing now: seven are trials that open a saga, eight are trials that open the lineage quest of their tier-3 art.
+  - A rank-up pays gold (half the points it costs) and opens more of the sect's lineage quests and sagas. Ranks grant no martial arts: every sect skill and art comes **only** from its lineage quest or saga. The 🎖 ขั้นและวิชา tab lists the tier 0–3 ones (as วิชาลึกลับ until learned) with what each still needs; tier-4 moves stay off the list.
+- **Sect quests** (📜 ภารกิจประจำ) can repeat, each 30 days after you last completed it. Some need a minimum rank, and each sect has one art quest. Art quests teach nothing now: eight are trials that open the lineage quest of their tier-3 art (in the sect window), and seven are secret trials that open a saga (offered only by their giver).
 - **Leaving** (in the sect menu) — either way, you can never join that sect again:
   - **ลาออกอย่างเป็นทางการ** (resign): you keep the skills, but that sect's skills and arts stop gaining xp in battle.
   - **ทรยศสำนัก** (betray): evil +5, and the sect's hunter (a tier-4 foe) may ambush you on 30 % of walk ticks. The sect's redemption quest ends the hunt by turning the betrayal into a resignation. สำนักสราญรมย์ has no redemption quest.
@@ -391,6 +392,8 @@ Mastery levels 1–5 need 0 / 100 / 300 / 700 / 1500 xp.
 ## Progression
 
 ### Skills and inner arts
+
+The 🥋 วิชา window: the 10 slots across the top; below, the **library** of everything learned on the left (icon and name, filter ทั้งหมด / ฝีมือ / ในกาย) and the picked move on the right — its numbers and xp, ติดตั้งลงช่อง (the targeted slot if empty, else the first free one, else แทนที่ the targeted slot), ถอดออก, เร่งด้วย w-exp and ลืมวิชา. Tap a slot to target it and show its move.
 
 Move skills (178) and inner arts (122) level from 1 to 10. A move skill's power, its stat bonuses and its weapon mastery grow with level; an art's bonuses scale by level / 10.
 

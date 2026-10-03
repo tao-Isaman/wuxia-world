@@ -1185,7 +1185,7 @@ const ASCETIC: StoryArcSpec = {
     },
     // ── 9 ──
     {
-      title: "โพธิสัตว์ทรงพรต",
+      title: "วิชาลึกลับ",
       summary: "ในบั้นปลายชีวิต จิวจี้เยียกเผาบทกรงเล็บทิ้งด้วยมือตัวเอง เหลือไว้เพียงบทที่ช้าที่สุด — วันนี้บทนั้นถูกส่งต่อ ขณะที่ประตูง้อไบ๊เปิดรับคนที่เคยถูกปิดใส่",
       giver: HUIYU,
       offer: {
@@ -1236,7 +1236,7 @@ const ASCETIC: StoryArcSpec = {
       complete: {
         cutscene: {
           stage: "sect_emei", around: ABBESS, mood: "day",
-          title: "โพธิสัตว์ทรงพรต", subtitle: "บทสุดท้าย",
+          title: "วิชาลึกลับ", subtitle: "บทสุดท้าย",
           cast: {
             huiyu: { name: "ท่านนิ้วฝ่ามือฮุยอวี้", look: "f4", at: [2, -1], facing: "left", tint: "#c9c4b8" },
             hero: { name: "{hero}", look: "hero", at: [-1, 0], facing: "right" },

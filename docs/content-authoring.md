@@ -252,7 +252,7 @@ Then run `bun run test:navigation`: every painted map must keep its spawn open a
 5. **Rewards** (`QuestReward`):
    - `gold`, `item`, `wExp`, `skillExp`
    - `trait`, `npcRelationship`
-   - `learnSkill`, `learnArt`
+   - `learnSkill`, `learnArt` — handed over as the move's scroll (`scroll_skill_<id>` / `scroll_art_<id>`, generated for every move and art); the UI calls it 📜 วิชาลึกลับ, so don't name the move in the quest's name or summary
    - `joinSect`, `sectPoints`, `leaveSect`, `resignSect`, `betraySect`
 6. **Sect quests.** Set `sectId` and the quest moves from the NPC card to the sect menu.
    - It repeats 30 days after each completion.
@@ -351,7 +351,7 @@ Then run `bun run test:navigation`: every painted map must keep its spawn open a
 6. **Make it learnable.** A **sect** skill or art has exactly one source, its lineage quest or saga (below); nothing else may teach it. An unaffiliated (ยุทธจักร) one uses one or more of:
    - a city hall offer (tier 0–1 only);
    - a manual item (`man_…` with `manualLearnSkill` / `manualLearnArt`; check with `bun scripts/audit-manual-names.ts`);
-   - a quest reward `learnSkill` / `learnArt`;
+   - a quest reward `learnSkill` / `learnArt` (arrives as its scroll);
    - an opponent's build, which shows it in battle only.
 
    **A sect skill or art needs exactly one quest source, and no other** (`bun run test:story` fails otherwise): a `LineageSpec` for T0–T3, or a whole `StoryArcSpec` saga for T4, in `lib/world/data/story/<sect>.ts`. See [story-writing.md](story-writing.md).
