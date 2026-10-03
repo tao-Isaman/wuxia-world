@@ -6,6 +6,12 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-03
 
+### Turn down or drop a sect move quest; vitals on the HUD
+
+- **Offers can be turned down.** Lineage quests and saga chapters open their offer before accepting; besides รับคำ it now has **ขอปฏิเสธไว้ก่อน**, which leaves the quest on offer. The sect art trials, which have no offer scene, ask in a confirm box (รับภารกิจ / ขอปฏิเสธไว้ก่อน).
+- **They can be dropped.** ละทิ้งภารกิจ now works on lineage quests, saga chapters and sect art trials: the quest and its progress are forgotten, not failed, so the giver offers it again (they are the only way to their move).
+- **HP / MP / พลัง on the map HUD.** A slim lacquer card with the three gauges sits top-left above the icon menu, no portrait (`hud-vitals.tsx`).
+
 ### Quests give scrolls; the move stays a mystery; a new skills window
 
 - **A quest that teaches a move hands over its คัมภีร์ instead.** Every `learnSkill` / `learnArt` quest reward (lineage quests, saga finales, place quests) now puts a scroll in the bag — `scroll_skill_<id>` / `scroll_art_<id>`, one generated per move and art (`lib/world/data/items.ts`), unsellable, no stat gate. Reading it (ใช้) teaches the move, as before auto-slotted; a T4+ art starts at level 3, the rest at 1. Nothing else hands out scrolls (`test:story`). A lineage quest or saga isn't offered again while its scroll sits unread.

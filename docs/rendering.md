@@ -303,7 +303,7 @@ Pure code in `lib/stage/world-navigation.ts`, in 960 × 640 map units.
 
 On a map (`MapHud` in `components/world/map-hud.tsx` + `MenuBar hud`):
 
-- **Top left:** the icon bar (`nav.hud-iconbar[aria-label="เมนูเกม"]`).
+- **Top left:** `.hud-topleft` stacks the vitals card (`components/world/hud-vitals.tsx`, `[data-testid="hud-vitals"]`: HP / MP / พลัง gauges as `role="meter"`, no portrait) over the icon bar (`nav.hud-iconbar[aria-label="เมนูเกม"]`).
   - Seven section icons: 1 โปรไฟล์, 2 ย่าม, 3 วิชา, 4 อาชีพ, 5 ภารกิจ (badge = active quests), 6 สำนัก (badge = things to do), 7 บันทึก.
   - Then ♪ and the install icon.
   - Layout: two rows on desktop and landscape; on phones, rows of four.
@@ -322,7 +322,7 @@ On a map (`MapHud` in `components/world/map-hud.tsx` + `MenuBar hud`):
   - above it, the action button (`.action-prompt[data-action-marker]`: คุยกับ / ไปที่ / ใช้ + glyph + label + an E badge on desktop);
   - above that, the controls pill with the จุดหมาย toggle.
 
-There is no party card, status strip or minimap on maps. HP, MP and พลัง appear in the profile and in battle.
+There is no portrait, status strip or minimap on maps; HP, MP and พลัง are the slim vitals card top-left.
 
 ## Menus and popups
 
@@ -402,7 +402,7 @@ The places list (`PlacesPanel`, `nav.world-places`) has four tabs: บุคค�
 | `app/game-hud.css` | the Dragon Quest XI style HUD: `--dq-*` tokens, purse, sundial, day pill, arrival banner, drawer button |
 | `app/dq-theme.css` | the final skin: **parchment scrolls** for menus and popups (cinnabar ribbon titles), lacquer panels, encounter and battle tokens |
 | `app/pwa.css` | install button and hint, standalone overscroll, notch margins |
-| `app/mobile-hud.css` | icon bar, rest button and bubble, action button, thumb column, joystick, sound bubble, busy overlay, law chips, quest tracker, breakpoints |
+| `app/mobile-hud.css` | top-left stack (vitals card + icon bar), rest button and bubble, action button, thumb column, joystick, sound bubble, busy overlay, law chips, quest tracker, breakpoints |
 | `app/profile.css` | the profile sheet |
 | `app/grid-battle.css` | the battle (imported by `battle-arena.tsx`) |
 | `app/quest-completion-receipt.css` | the receipt card |

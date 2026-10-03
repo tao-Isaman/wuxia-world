@@ -228,7 +228,7 @@ Two deliberate exceptions reach into stores:
   - Every sect T0–T3 skill / art has one lineage quest `ql_<skill|art>_<id>` (type `side`, `lineage`), gated and sized by tier (`LINEAGE_TIERS`).
   - Every sect T4 is the reward of a saga: 8–10 chapters `st_<arcId>_<nn>` (type `story`), chained on the previous chapter, with films (`DialogScene.cutscene`) and paged dialogs (`paged`).
   - The old sect art quests teach nothing: seven T4 ones are saga prologue trials (`SAGA_PROLOGUES`), eight T3 ones lineage prologue trials (`LINEAGE_PROLOGUES`).
-  - Story and lineage quests can't be abandoned and don't fail when their giver dies.
+  - Story and lineage quests don't fail when their giver dies. Their offers (and the sect art trials') can be turned down (`DECLINE_TEXT`; the NPC card opens a compiled offer **before** accepting), and dropping one (`abandonQuest`) forgets it instead of failing it, so it is offered again.
   - **Moves arrive as scrolls.** A `learnSkill` / `learnArt` quest reward gives the move's คัมภีร์ (`scroll_skill_<id>` / `scroll_art_<id>`, generated in `items.ts`); reading it teaches the move. Quests show the reward as 📜 วิชาลึกลับ (`MYSTERY_MOVE_LABEL`) and lineage quests are named after their teacher.
   - **T4 stays secret in the sect window**: saga moves are off its list and the seven T4 saga trials are offered only by their giver (`isSecretSectQuest`).
 - **Living places** (`data/places/<group>.ts`, one `PlaceContent` each, merged into every registry). Villages, towns and homes have people, quests and activities; every ยุทธจักร T0–T3 move and art is a quest reward, gated by rarity (`test:places`).
@@ -290,7 +290,7 @@ Two deliberate exceptions reach into stores:
 
 - **Root.** `components/world/world-screen.tsx` picks a view: start → game over → battle → encounter → mapped location (+ dialog over the same canvas) → dialog over a painting → road map → the classic card layout (only `world_journey` and 14 unpainted roads).
 - **HUD** (mobile first):
-  - the icon grid at the top left: 1 โปรไฟล์ 2 ย่าม 3 วิชา 4 อาชีพ 5 ภารกิจ 6 สำนัก 7 บันทึก 8 จดหมาย (unread badge), then ♪ and install;
+  - top left, stacked: the vitals card (HP / MP / พลัง gauges, no portrait; `hud-vitals.tsx`) over the icon grid: 1 โปรไฟล์ 2 ย่าม 3 วิชา 4 อาชีพ 5 ภารกิจ 6 สำนัก 7 บันทึก 8 จดหมาย (unread badge), then ♪ and install;
   - purse, sundial and day at the top right, with the quest tracker below;
   - law chips at the top centre;
   - พัก and the action button at the bottom right;
@@ -348,7 +348,7 @@ Content changes need **no save version bump**. Removed ids are dropped on load.
 ## Gotchas
 
 - **Store warnings.** `test:law`, `test:grid`, `test:grid-ai` and `test:quests` print harmless `[zustand persist middleware] Unable to update item` warnings.
-- **Quests are one-shot.** `abandonQuest` fails a quest for good (it can't be re-accepted). Leaving a sect blocks rejoining it.
+- **Quests are one-shot.** `abandonQuest` fails a quest for good (it can't be re-accepted) — except lineage quests, saga chapters and sect art trials, which it forgets so they come back. Leaving a sect blocks rejoining it.
 - **`_setFlag` looks dev-only but isn't.** The quest-log pin (`trackedQuestId`) and the rumor banner use it.
 - **Two rumors never fire.** `sect_join` and `quest_major_complete` player echoes can't happen in play — joins come from quest rewards, and no quest sets `isMajor`.
 - **Advisory audits fail by design.** `audit-quest-counts.ts`, `audit-complete-scenes.ts` and `audit-quest-flow.ts` report known false positives.

@@ -83,7 +83,7 @@ A typical first session in the capital:
 
 **HUD:**
 
-- **Top left:** the icon bar — 1 โปรไฟล์, 2 ย่าม (bag), 3 วิชา (skills), 4 อาชีพ (life skills and crafts), 5 ภารกิจ (quests), 6 สำนัก (sect), 7 บันทึก (action log), ♪ sound, and the install button.
+- **Top left:** a slim card with HP, MP and พลัง (stamina) gauges, and under it the icon bar — 1 โปรไฟล์, 2 ย่าม (bag), 3 วิชา (skills), 4 อาชีพ (life skills and crafts), 5 ภารกิจ (quests), 6 สำนัก (sect), 7 บันทึก (action log), ♪ sound, and the install button.
 - **Top right:** gold (ตำลึง), w-exp (悟), the sundial, the day, and the tracked quest (📌).
 - **Top centre:** wanted marks and the jail sentence, when you have any.
 - **Bottom right:** พัก (rest), and above it the action button (คุยกับ / ไปที่ / ใช้ + the target's name).
@@ -286,7 +286,7 @@ Every sect skill and art can be earned from a sect NPC ([story-quests.md](story-
   - Chapters send you between places to visit, talk, hunt, gather and duel. A duel is never fatal; lose it and try again.
   - Many scenes open with a **film** on the painted map: subtitles, title cards and moods. Tap to go on, ▶ อัตโนมัติ to play hands-free, ข้าม to skip. Long talks show a page at a time (ต่อ ▶).
   - The quest log's **ตำนาน** tab lists every saga with its progress and who gives the next chapter, and replays films already seen (🎬).
-- Neither kind can be abandoned.
+- **Turning down and dropping.** Picking one on a sect NPC's card opens the offer first; รับคำ takes it, **ขอปฏิเสธไว้ก่อน** walks away and leaves it on offer. A taken one can be dropped from the quest log (ละทิ้งภารกิจ): its progress is lost, but it is not failed — the giver offers it again. The sect art trials work the same way (a confirm box stands in for the offer scene).
 
 The quest list per giver and location is in [reference/quests.md](reference/quests.md).
 

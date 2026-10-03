@@ -37,6 +37,7 @@ import { getSkill } from "@/lib/game";
 import { CharacterPreview } from "@/components/game/character-preview";
 import { npcCharacterId } from "@/lib/characters/catalog";
 import { GiftPicker } from "./gift-picker";
+import { DECLINE_TEXT } from "@/lib/world/story/compile";
 
 const NPC_ROLE_LABEL: Record<string, string> = {
   healer: "แพทย์", scholar: "บัณฑิต", official: "ขุนนาง", authority: "ฝ่ายราชการ",
@@ -104,7 +105,25 @@ export function NpcInteractionPopup({ open, npc, onClose }: Props) {
     return entry?.status === "active" && !isQuestTurnInForNpc(worldState, q, npc.id);
   });
 
-  const onAcceptQuest = (def: QuestDef) => {
+  const onAcceptQuest = async (def: QuestDef) => {
+    // A sect move quest can be turned down. A compiled one's offer scene
+    // carries รับคำ / ปฏิเสธ itself, so open it before accepting; a trial
+    // without one asks first.
+    const offerScene = getScene(`qs_${def.id}_offer`);
+    if (isSectMoveQuest(def)) {
+      if (offerScene && sceneStartsQuest(offerScene, def.id)) {
+        onClose();
+        gotoScene(offerScene.id);
+        return;
+      }
+      const ok = await confirmDialog({
+        title: def.name,
+        message: `${def.briefSummary ?? def.description}\n\nรับภารกิจนี้หรือไม่?`,
+        confirmText: "รับภารกิจ",
+        cancelText: DECLINE_TEXT,
+      });
+      if (!ok) return;
+    }
     // Always start the quest engine-side first — guarantees `quests[id]`
     // becomes "active" even if the offer scene is missing or doesn't emit
     // `startQuest` itself. The startQuest dispatcher is idempotent, so
@@ -511,6 +530,19 @@ function summarizeRewards(rewards: readonly QuestReward[]): string {
 // this to greys-out when prereqs flicker between renders. (In practice the
 // outer filter has already excluded ineligible quests, so this is a
 // belt-and-braces guard.)
+// Lineage quests, saga chapters and the sect art trials: the ways to a sect
+// move, which the hero may turn down and drop.
+function isSectMoveQuest(q: QuestDef): boolean {
+  return !!(q.lineage || q.story || q.isArtQuest);
+}
+
+// True when the scene (or one of its choices) runs `startQuest` for the quest.
+function sceneStartsQuest(sc: Scene, questId: string): boolean {
+  if (sc.kind !== "dialog") return false;
+  const starts = (effects?: readonly { t: string; questId?: string }[]) => (effects ?? []).some((e) => e.t === "startQuest" && e.questId === questId);
+  return starts(sc.onEnter) || (sc.choices ?? []).some((c) => starts(c.effects));
+}
+
 function isOfferableNow(state: ReturnType<typeof useWorldStore.getState>, q: QuestDef): boolean {
   if (state.quests[q.id]) return false;
   if (q.prereqs && !evaluateCondition(state, q.prereqs)) return false;

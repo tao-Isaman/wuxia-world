@@ -128,7 +128,7 @@ A cutscene is registered under `cs_<sceneId>` and played by a dialog whose `cuts
 
 ## Safety rules
 
-- **Can't be abandoned.** The store's `abandonQuest` refuses (`reason: "keep"`) and the log hides the button. They are the only way to their skill or art (save the sword tournament champion's prize pick — see [gameplay.md](gameplay.md#the-sword-tournament-ชุมนุมวิจารณ์กระบี่)), and an abandoned quest never comes back.
+- **Declinable and droppable, never lost.** Every compiled offer scene (and its asides) carries a `DECLINE_TEXT` choice ("ขอปฏิเสธไว้ก่อน") back to the giver's place; the NPC card opens an offer scene that starts its quest **before** accepting, so declining leaves nothing behind. The sect art trials (no offer scene) ask in a confirm box. `abandonQuest` on a lineage quest, saga chapter or art trial deletes its entry, its `qobj:` flags and the tracking pin instead of failing it: they are the only way to their skill or art (save the sword tournament champion's prize pick — see [gameplay.md](gameplay.md#the-sword-tournament-ชุมนุมวิจารณ์กระบี่)), so they must come back.
 - **Outlive their giver.** When the NPC simulation kills a giver, `failQuestsForDeadGivers` skips story and lineage quests. Dead masters stay on their map, so the hand-in still works.
 - **New conditions.**
   - `learnedSkill` is the counterpart of `learnedArt`.

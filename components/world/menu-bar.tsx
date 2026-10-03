@@ -16,6 +16,7 @@ import { SectMembershipPopup } from "./popups/sect-membership-popup";
 import { LettersPopup } from "./popups/letters-popup";
 import { toast } from "@/store/toast-store";
 import { RestQuickAction } from "./rest-quick-action";
+import { HudVitals } from "./hud-vitals";
 import { GameMenuContext } from "@/components/ui/game-menu-context";
 import { InstallGameButton } from "@/components/pwa";
 import { SoundButton } from "@/components/sound-button";
@@ -156,10 +157,13 @@ export function MenuBar({ hud }: { hud?: boolean } = {}) {
     return () => window.removeEventListener("keydown", onKey);
   });
 
-  // Mobile-first HUD: every section is one tap away as an icon along the top.
+  // Mobile-first HUD: HP / MP / stamina, then every section one tap away as
+  // an icon, stacked top-left.
   if (hud) {
     return (
       <>
+        <div className="hud-topleft">
+        <HudVitals />
         <nav className="hud-iconbar" aria-label="เมนูเกม">
           {tabs.map((t, i) => (
             <button key={t.id} type="button" title={`${t.label} (${i + 1})`} aria-label={t.label} aria-keyshortcuts={String(i + 1)}
@@ -173,6 +177,7 @@ export function MenuBar({ hud }: { hud?: boolean } = {}) {
           <SoundButton />
           <InstallGameButton variant="icon" />
         </nav>
+        </div>
         <QuestTracker onOpen={() => setOpen("quests")} />
         <RestQuickAction />
         {popups}
