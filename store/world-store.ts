@@ -62,6 +62,7 @@ import {
   type SceneEffect,
   type TraitKey,
   type WorldStateData,
+  heroBodyFor,
 } from "@/lib/world";
 import { completeObjectiveSpot, type ObjectiveResult } from "@/lib/world/quest-objectives";
 import { applyEffect, consumeQuestAutoItems, isSectQuestOfferable, tickQuestProgress } from "@/lib/world/effects";
@@ -1118,8 +1119,7 @@ export const useWorldStore = create<WorldStore>()(
         if (opts?.name && opts.name.trim()) build.name = opts.name.trim();
         fresh.playerBuild = build;
         fresh.gender = opts?.gender ?? "male";
-        fresh.playerBodyId =
-          opts?.bodyId ?? (fresh.gender === "female" ? "f1" : "m1");
+        fresh.playerBodyId = heroBodyFor(opts?.bodyId, fresh.gender);
         fresh.currentSceneId = START_SCENE_ID;
         // Seed level 1 for the starter skill so the UI has an entry to
         // display from turn one.

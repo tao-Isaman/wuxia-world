@@ -20,6 +20,11 @@ import { WANDER_RADIUS, createWanderer, stepWanderer } from "../lib/stage/npc-wa
 import { encounterFoeAvailable } from "../lib/world/effects";
 import { PLAYER_CHARACTER_IDS, characterWalk8Sheet, hasWalk8Sheet } from "../lib/characters/catalog";
 import { WALK8_FIRST_FRAME, dir8FromVector, walk8Frame } from "../lib/characters/walk8";
+import { HERO_ACTION_CELL, HERO_ACTION_IDS, HERO_ACTIVITIES, HERO_ATTACK_FRAMES, HERO_COMBAT_COLUMNS, HERO_COMBAT_ROWS, HERO_WORK_COLUMNS,
+  HERO_WORK_GAPS, activityForBadge, activityForLifeSkill, hasHeroActions, heroHasPose, heroAttackColumn, heroAttackRow, heroCombatSheet, heroWorkSheet, practicePose } from "../lib/characters/hero-actions";
+import { PLAYER_BODIES, heroBodyFor } from "../lib/world/data/player-bodies";
+import { LIFE_SKILL_KEYS } from "../lib/world/types";
+import { WEAPON_FAMILY_KEYS } from "../lib/game/types";
 
 let passed = 0;
 async function check(name: string, fn: () => void | Promise<void>) {
@@ -187,6 +192,64 @@ await check("wander: frozen means standing still; the same id strolls the same w
   for (let i = 0; i < 300; i++) stepWanderer(a, 1 / 30, true, () => true);
   assert.deepEqual(a.pos, at);
   assert.equal(a.moving, false);
+});
+
+await check("heroes: one body per gender (m1, f1), older bodies fall back to their gender's", () => {
+  assert.deepEqual(PLAYER_BODIES, { male: ["m1"], female: ["f1"] });
+  assert.equal(heroBodyFor("m3", "male"), "m1");
+  assert.equal(heroBodyFor("f4", "female"), "f1");
+  assert.equal(heroBodyFor(undefined, "female"), "f1");
+  assert.equal(heroBodyFor("f1", "female"), "f1");
+  for (const id of [...PLAYER_BODIES.male, ...PLAYER_BODIES.female]) assert.ok(hasHeroActions(id), `${id} has painted action sheets`);
+});
+
+await check("hero action sheets: a weapon row per family + combat poses, a four-frame loop per activity, every cell drawn", async () => {
+  assert.deepEqual([...HERO_COMBAT_ROWS.slice(0, 7)].sort(), [...WEAPON_FAMILY_KEYS].sort());
+  const { width: CW, height: CH } = HERO_ACTION_CELL;
+  for (const id of HERO_ACTION_IDS) {
+    for (const [file, columns, rows, used] of [
+      [`public${heroCombatSheet(id)}`, HERO_COMBAT_COLUMNS, HERO_COMBAT_ROWS.length, (row: number, col: number) => row === HERO_COMBAT_ROWS.length - 1 || col < HERO_ATTACK_FRAMES],
+      [`public${heroWorkSheet(id)}`, HERO_WORK_COLUMNS, HERO_ACTIVITIES.length, (row: number) => !(HERO_WORK_GAPS[id] ?? []).includes(HERO_ACTIVITIES[row])],
+    ] as const) {
+      assert.ok(existsSync(file), `${file} exists (bun scripts/build-hero-actions.ts)`);
+      const { data, info } = await sharp(file).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+      assert.equal(info.width, CW * columns, file);
+      assert.equal(info.height, CH * rows, file);
+      for (let row = 0; row < rows; row++) for (let col = 0; col < columns; col++) {
+        let opaque = 0, feet = 0;
+        for (let y = 0; y < CH; y++) for (let x = 0; x < CW; x++) {
+          if (data[(((row * CH + y) * info.width) + col * CW + x) * 4 + 3] < 128) continue;
+          opaque++;
+          feet = Math.max(feet, y);
+        }
+        if (!used(row, col)) { assert.equal(opaque, 0, `${file} row ${row} col ${col} is listed as unpainted but has a figure`); continue; }
+        assert.ok(opaque > 1500, `${file} row ${row} col ${col} has a figure (${opaque} px)`);
+        assert.ok(feet >= HERO_ACTION_CELL.feet - 2 && feet <= HERO_ACTION_CELL.feet + 1, `${file} row ${row} col ${col} stands on the foot line (${feet})`);
+      }
+    }
+  }
+});
+
+await check("hero actions: attacks follow the weapon, work follows the life skill", () => {
+  for (const family of WEAPON_FAMILY_KEYS) assert.equal(heroAttackRow(family), family);
+  assert.equal(heroAttackRow(undefined), "fist");
+  const timing = { hitDelay: 300, lastImpact: 520, gap: 110 };
+  const columns = [0, 120, 300, 520, 700, 860].map((age) => heroAttackColumn(age, timing));
+  assert.deepEqual([columns[0], columns[1], columns[2]], [0, 1, 2], "stance, wind-up, strike");
+  assert.equal(columns[5], 4, "recovers at the end");
+  assert.ok(columns.slice(2, 5).includes(3), "follows through");
+  const mapped = LIFE_SKILL_KEYS.map((skill) => [skill, activityForLifeSkill(skill)] as const);
+  for (const [skill, row] of mapped) if (row) assert.ok(HERO_ACTIVITIES.includes(row), skill);
+  assert.deepEqual(["mining", "woodcutting", "fishing", "herbalism", "hunting", "venom", "forge", "chef", "alchemy", "tailoring", "reading", "music"]
+    .map(activityForLifeSkill), ["mine", "chop", "fish", "herb", "hunt", "venom", "forge", "cook", "alchemy", "craft", "read", "music"]);
+  assert.equal(activityForBadge("labor"), "mine");
+  assert.equal(activityForBadge("rest"), "sleep");
+  assert.deepEqual(practicePose(false, "sword"), { sheet: "combat", row: "sword" });
+  assert.deepEqual(practicePose(true, undefined), { sheet: "work", row: "meditate" });
+  assert.equal(heroHasPose("m1", { sheet: "work", row: "sleep" }), true);
+  assert.equal(heroHasPose("f1", { sheet: "work", row: "mine" }), true);
+  assert.equal(heroHasPose("f1", { sheet: "work", row: "sleep" }), (HERO_WORK_GAPS.f1 ?? []).includes("sleep") === false);
+  assert.equal(heroHasPose("m2", { sheet: "combat", row: "sword" }), false);
 });
 
 await check("heroes: an eight-way walk sheet each — 28 drawn cells, every direction its own picture", async () => {

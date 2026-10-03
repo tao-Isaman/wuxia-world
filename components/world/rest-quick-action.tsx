@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import type { RestKind } from "@/store/world-store";
 import { useWorldStore } from "@/store/world-store";
 import { flashLoading } from "@/store/loading-store";
+import { HERO_SLEEP_POSE } from "@/lib/characters/hero-actions";
 import { toast } from "@/store/toast-store";
 import { deriveAll } from "@/lib/game";
 
@@ -71,7 +72,7 @@ export function RestQuickAction() {
   }));
 
   const choose = (kind: RestKind) => {
-    flashLoading("กำลังพักผ่อน...", 1400, "rest");
+    flashLoading("กำลังพักผ่อน...", 1400, "rest", HERO_SLEEP_POSE);
     const result = rest(kind);
     if (!result.ok) { toast("error", "ทองไม่พอจะพักโรงเตี๊ยม"); return; }
     toast("success", `พักผ่อนแล้ว · ฟื้น ${result.restored} แรง · เวลาเดินไป 12 ชั่วยาม`);

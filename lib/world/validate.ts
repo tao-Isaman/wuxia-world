@@ -11,6 +11,7 @@ import { SKILLS_BY_ID } from "@/lib/game/data/skills";
 import { ARTS_BY_ID } from "@/lib/game/data/arts";
 import { EQUIPMENT_BY_ID } from "@/lib/game/data/equipment";
 import { SECT_MEMBERSHIPS } from "./data/sect-memberships";
+import { heroBodyFor } from "./data/player-bodies";
 import {
   deriveAll,
   SKILL_LEVEL_MAX,
@@ -48,6 +49,10 @@ export function validateAndRepair(state: WorldStateData): void {
       state.lastLocationId = null;
     }
   }
+
+  // Only m1 (male) and f1 (female) are hero bodies now; an older save's
+  // m2–m4 / f2–f4 hero takes the one of their gender.
+  state.playerBodyId = heroBodyFor(state.playerBodyId, state.gender);
 
   // Transient engine flags must never survive a reload. `_skipEventRoll` is
   // still written by walk events and hunting (rollWalkEvent), though nothing

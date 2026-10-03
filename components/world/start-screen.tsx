@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useWorldStore } from "@/store/world-store";
 import { clearMapPositions } from "@/lib/stage/types";
 import type { Gender } from "@/lib/world";
-import { GENDER_LABEL, PLAYER_BODIES, PLAYER_BODY_LABEL, defaultBodyFor } from "@/lib/world";
+import { GENDER_LABEL, PLAYER_BODY_LABEL, defaultBodyFor } from "@/lib/world";
 import { CharacterPreview } from "@/components/game/character-preview";
 import { InstallGameButton } from "@/components/pwa";
 import { SoundButton } from "@/components/sound-button";
@@ -12,7 +12,8 @@ export function StartScreen() {
   const startNewGame = useWorldStore((s) => s.startNewGame);
   const [name, setName] = useState("");
   const [gender, setGender] = useState<Gender>("male");
-  const [bodyId, setBodyId] = useState<string>(defaultBodyFor("male"));
+  // One hero body per gender (m1 / f1), the ones with the painted action sprites.
+  const bodyId = defaultBodyFor(gender);
   const trimmed = name.trim();
   const canStart = trimmed.length > 0 && trimmed.length <= 24;
   return (
@@ -46,7 +47,7 @@ export function StartScreen() {
             <div className="gender-options">
               {(["male", "female"] as const).map((value) => (
                 <button type="button" key={value} aria-pressed={gender === value}
-                  onClick={() => { setGender(value); setBodyId(defaultBodyFor(value)); }}>
+                  onClick={() => setGender(value)}>
                   {GENDER_LABEL[value]}
                 </button>
               ))}
@@ -56,18 +57,6 @@ export function StartScreen() {
             <CharacterPreview key={bodyId} id={bodyId} animate />
             <span>{PLAYER_BODY_LABEL[bodyId] ?? ""}</span>
           </div>
-          <fieldset className="mt-3">
-            <legend className="creation-label">รูปร่าง</legend>
-            <div className="body-options">
-              {PLAYER_BODIES[gender].map((id) => (
-                <button type="button" key={id} aria-label={PLAYER_BODY_LABEL[id]} aria-pressed={bodyId === id}
-                  onClick={() => setBodyId(id)}>
-                  <CharacterPreview id={id} animate={bodyId === id} />
-                  <span aria-hidden="true">{bodyId === id ? "◆" : "◇"}</span>
-                </button>
-              ))}
-            </div>
-          </fieldset>
           <p className="creation-note">เริ่มต้นด้วยพลังพื้นฐาน 1 ทุกค่า และวิชาหมัดตรง<br />บางสำนักรับศิษย์ตามเพศที่กำหนด</p>
           <button type="submit" className="pixel-action start-adventure" disabled={!canStart}>เริ่มเกมใหม่ <span aria-hidden="true">↗</span></button>
           <p className="creation-save-note">บันทึกความคืบหน้าอัตโนมัติในเบราว์เซอร์นี้</p>

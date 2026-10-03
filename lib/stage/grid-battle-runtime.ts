@@ -17,6 +17,9 @@ import { heroMoveFor, heroPose, movesIn, type HeroMove } from "./hero-motion";
 import { CHARACTER_CLIPS, CHARACTER_FEET_Y, CHARACTER_FRAME_SIZE, characterId, CREATURE_ATLAS, CREATURE_FRAME_COUNT, creatureCell, type CharacterMotion } from "@/lib/characters/catalog";
 import { WALK8_FPS, dir8FromVector, walk8Frame, walk8Source, type Dir8 } from "@/lib/characters/walk8";
 import { loadCharacterAtlas } from "@/lib/characters/sheet";
+import { HERO_ACTION_CELL, HERO_COMBAT_COLUMNS, HERO_COMBAT_ROWS, hasHeroActions, heroAttackColumn, heroAttackRow, heroCombatFrame,
+  heroCombatPoseFrame, heroCombatSheet, type HeroCombatRow } from "@/lib/characters/hero-actions";
+import { getSkill } from "@/lib/game";
 import { BATTLE_BACKGROUNDS, type BattleBackground } from "./battle-background";
 import { addGridFrames, canvasTexture, createStage, type Stage } from "./phaser-stage";
 import { castVfx, type CastVfx } from "./cast-vfx";
@@ -93,6 +96,13 @@ interface Actor {
   directional: boolean;
   /** Painted eight-way walk cells (heroes, lib/characters/walk8.ts). */
   walk8: boolean;
+  /** The hero's painted combat sheet (lib/characters/hero-actions.ts): its texture and atlas px per cell px. */
+  actions?: { key: string; scale: number };
+  /** The combat-sheet frame on show, or null while the base sheet is drawn. */
+  actionFrame: number | null;
+  /** The base sheet's texture and feet origin, to switch back to. */
+  baseKey: string;
+  baseFeet: number;
   /** Heading of the current walk step, for walk8 actors. */
   walkDir: Dir8;
   image: Phaser.GameObjects.Image;
@@ -122,6 +132,8 @@ interface Actor {
     move?: HeroMove;
     /** The cast's glow colour, for afterimages and the qi aura. */
     glow: number;
+    /** The weapon row of the painted combat sheet; null channels an art with the cast pose. */
+    row: HeroCombatRow | null;
   } | null;
   /** When the last afterimage was left, and the qi aura under the feet (made on first use). */
   lastGhost: number;
@@ -481,7 +493,8 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
   const lookKey = (look: UnitLook) => look.kind === "creature" ? "creature"
     : look.still ? `still:${look.still}` : `char:${characterId(look.characterId)}`;
 
-  interface LookTexture { key: string; kind: ActorKind; feet: number[]; directional: boolean; walk8?: boolean; w: number; h: number }
+  interface LookTexture { key: string; kind: ActorKind; feet: number[]; directional: boolean; walk8?: boolean; w: number; h: number;
+    actions?: { key: string; scale: number } }
   const textures = new Map<string, Promise<LookTexture>>();
   function textureFor(look: UnitLook): Promise<LookTexture> {
     const key = lookKey(look);
@@ -510,11 +523,22 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
           return textureFor({ kind: "character", characterId: look.characterId });
         }
       }
-      const atlas = await loadCharacterAtlas(characterId(look.characterId));
+      const id = characterId(look.characterId);
+      const [atlas, combat] = await Promise.all([loadCharacterAtlas(id),
+        // A missing combat sheet only costs the painted poses, never the character.
+        hasHeroActions(id) ? loadImage(heroCombatSheet(id)).catch(() => null) : Promise.resolve(null)]);
       const texture = canvasTexture(scene!, `gb:${key}`, atlas.image);
       addGridFrames(texture, atlas.frameSize, atlas.columns, atlas.rows);
+      let actions: LookTexture["actions"];
+      if (combat) {
+        const actionTexture = scene!.textures.addImage(`gb:${key}:combat`, combat);
+        if (actionTexture) {
+          addGridFrames(actionTexture, HERO_ACTION_CELL.width, HERO_COMBAT_COLUMNS, HERO_COMBAT_ROWS.length, HERO_ACTION_CELL.height);
+          actions = { key: `gb:${key}:combat`, scale: atlas.figure / HERO_ACTION_CELL.figure };
+        }
+      }
       return { key: `gb:${key}`, kind: "sheet" as const, feet: [atlas.feetY / atlas.frameSize], directional: atlas.directional, walk8: atlas.walk8,
-        w: atlas.frameSize, h: atlas.frameSize };
+        w: atlas.frameSize, h: atlas.frameSize, actions };
     })();
     textures.set(key, pending);
     return pending;
@@ -539,6 +563,7 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
     const bars = scene!.add.graphics().setDepth(30);
     const actor: Actor = {
       id: unit.id, team: unit.team, index, kind: tex.kind, directional: tex.directional, walk8: !!tex.walk8, walkDir: "E",
+      actions: tex.actions, actionFrame: null, baseKey: tex.key, baseFeet: feet,
       image, shadow, ring, tag: tagInfo.item, tagW: tagInfo.width, tagH: tagInfo.height, bars, barsKey: "",
       dispW, dispH, head,
       u: unit.pos.x + 0.5, v: unit.pos.y + 0.5, hFacing: unit.facing === "left" ? -1 : 1,
@@ -561,6 +586,32 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
     if (actor.motion === motion) return;
     actor.motion = motion;
     actor.motionStart = elapsed;
+  }
+  /** The painted combat-sheet frame for this beat, or null for the base sheet (idle and walking). */
+  function actionFrameFor(actor: Actor, motion: CharacterMotion): number | null {
+    if (motion === "attack" && actor.attack) {
+      const age = elapsed - actor.attack.start;
+      if (!actor.attack.row) return heroCombatPoseFrame(age < 90 && !reduced ? "stance" : "cast");
+      const column = reduced ? 2 : heroAttackColumn(age, { hitDelay: actor.attack.hitDelay, lastImpact: actor.attack.lastImpact, gap: HIT_GAP });
+      return heroCombatFrame(actor.attack.row, column);
+    }
+    if (motion === "guard") return heroCombatPoseFrame("guard");
+    if (motion === "hurt") return heroCombatPoseFrame("hurt");
+    if (motion === "victory") return heroCombatPoseFrame("victory");
+    if (motion === "defeat") return heroCombatPoseFrame("defeat");
+    return null;
+  }
+  function showActionFrame(actor: Actor, frame: number | null) {
+    if (frame === actor.actionFrame) return;
+    if (frame === null) actor.image.setTexture(actor.baseKey, actor.frame).setOrigin(0.5, actor.baseFeet);
+    else if (actor.actionFrame === null) actor.image.setTexture(actor.actions!.key, frame).setOrigin(0.5, HERO_ACTION_CELL.feet / HERO_ACTION_CELL.height);
+    else actor.image.setFrame(frame, false, false);
+    actor.actionFrame = frame;
+    // Tests read the hero's painted pose: a combat-sheet frame, its highest seen, or "base".
+    if (actor.id === "A") {
+      parent.dataset.heroPose = frame === null ? "base" : String(frame);
+      if (frame !== null) parent.dataset.heroPoses = [...new Set([...(parent.dataset.heroPoses ?? "").split(",").filter(Boolean), String(frame)])].join(",");
+    }
   }
   function drawBars(actor: Actor) {
     const key = `${actor.hp}|${actor.mp}|${actor.dead}`;
@@ -691,7 +742,10 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
         const progress = reduced && motion === "idle" ? 0 : Math.floor(Math.max(0, age) * clip.fps / 1000);
         frame = clip.frames[clip.repeat === -1 ? progress % clip.frames.length : Math.min(progress, clip.frames.length - 1)];
       }
-      if (frame !== actor.frame) { actor.image.setFrame(frame, false, false); actor.frame = frame; }
+      const actionFrame = actor.actions ? actionFrameFor(actor, motion) : null;
+      if (actionFrame !== null) { actor.frame = frame; showActionFrame(actor, actionFrame); }
+      else if (actor.actionFrame !== null) { actor.frame = frame; showActionFrame(actor, null); }
+      else if (frame !== actor.frame) { actor.image.setFrame(frame, false, false); actor.frame = frame; }
       if (motion === "defeat") alpha = 0.78;
     } else {
       // Procedural motion for single-pose stills and creature-atlas beasts.
@@ -710,8 +764,11 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
     actor.x = x; actor.y = y; actor.s = s;
     const creature = actor.kind === "creature";
     const walkingVertical = motion === "walkNorth" || motion === "walkSouth";
+    // A painted combat pose is a wider, taller cell at the same anchor and scale.
+    const cellW = actor.actionFrame === null ? actor.dispW : actor.dispH * HERO_ACTION_CELL.width * actor.actions!.scale / CHARACTER_FRAME_SIZE;
+    const cellH = actor.actionFrame === null ? actor.dispH : actor.dispH * HERO_ACTION_CELL.height * actor.actions!.scale / CHARACTER_FRAME_SIZE;
     actor.image.setPosition(Math.round(x), y - hop * s)
-      .setDisplaySize(actor.dispW * s * sx, actor.dispH * s * sy)
+      .setDisplaySize(cellW * s * sx, cellH * s * sy)
       .setFlipX(actor.walk8 && motion.startsWith("walk") ? walk8Source(actor.walkDir).mirror
         : walkingVertical ? false : creature ? actor.hFacing > 0 : actor.hFacing < 0)
       .setRotation(rotation).setAlpha(alpha)
@@ -794,7 +851,7 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
           const melee = !support && !ownCell && tiles <= 2 && (move ? movesIn(move) : !ranged);
           const travel = melee ? Math.max(0, dist - TW * 0.55 * actor.s) : 0;
           actor.attack = { start: elapsed, lastImpact, hitDelay: delay, dx: dist ? dx / dist : 0, dy: dist ? dy / dist : 0, travel, support,
-            move, glow: profile.glow };
+            move, glow: profile.glow, row: ev.source.kind === "skill" ? heroAttackRow(getSkill(ev.source.id)?.w) : null };
           parent.dataset.heroMove = move ?? parent.dataset.heroMove ?? "";
           if (!support) castStartSfx(profile);
           if (!reduced && !support && vfx) {

@@ -6,6 +6,13 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-03
 
+### Painted fighting and work poses; one hero per gender
+
+- **The hero fights with the weapon of the move.** Each of the seven weapon families (fist, spear, sword, sabre, fan, darts, flute) has its own painted five-frame form — stance, wind-up, strike, follow-through, recovery — held with that weapon; a cast plays the form of its skill's family over the body tweens, an inner art the qi-cast pose. Being hit, guarding, winning and falling are painted poses too (`lib/characters/hero-actions.ts`, `<id>-combat.png`).
+- **Work has its own animation.** Gathering, crafting, practising and resting show the hero at it in the work overlay: mining, woodcutting, fishing, herb gathering, archery, snake catching, smithing, cooking, alchemy, needlework, meditation, reading, the zither and sleep (`<id>-work.png`, a four-frame loop each). Practising a move plays its weapon form; an inner art, meditation.
+- **One hero per gender.** The character screen sets the body by gender — m1 (blue-robed swordsman) or f1 (white and pale-green robes); the other six bodies stay for NPCs. A save with one of them plays as the hero of its gender (`heroBodyFor`, repaired on load).
+- f1's alchemy, needlework, meditation, reading, zither and sleep loops are not painted yet (the image credits ran out); those keep the old preview (`HERO_WORK_GAPS`). `scripts/paint-hero-actions.py` paints the missing strips with an `OPENAI_API_KEY`, `scripts/build-hero-actions.ts` builds the sheets.
+
 ### ฉายา for mixes of traits
 
 - 19 new titles for traits that are all at 60 or more together: all five (เทพเซียนผู้ข้ามพ้นดีชั่ว), nine triples (ราชาปีศาจครองยุทธภพ, ปรมาจารย์ผู้ค้ำจุนแผ่นดิน…) and all ten pairs (คนบ้าแปลกประหลาด for good + evil, จอมมารโดยเนื้อแท้ for evil + arrogance…). A wider mix beats a narrower one, then the higher total; mixes rank under a tournament crown and above wanted marks, sect rank and single traits (`COMBO_EPITHETS`). The full list is in [gameplay.md](gameplay.md#ฉายา).

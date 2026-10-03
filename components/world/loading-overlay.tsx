@@ -3,6 +3,8 @@
 import { useLoadingStore } from "@/store/loading-store";
 import { useWorldStore } from "@/store/world-store";
 import { CharacterPreview } from "@/components/game/character-preview";
+import { HeroActionSprite } from "@/components/game/hero-action-sprite";
+import { heroHasPose } from "@/lib/characters/hero-actions";
 
 // While an action runs, the hero is shown at work over a progress bar and
 // the screen takes no input (the layer catches taps, and `data-world-busy`
@@ -13,6 +15,7 @@ export function LoadingOverlay() {
   const kind = useLoadingStore((s) => s.kind);
   const duration = useLoadingStore((s) => s.duration);
   const job = useLoadingStore((s) => s.job);
+  const pose = useLoadingStore((s) => s.pose);
   const bodyId = useWorldStore((s) => s.playerBodyId);
 
   if (!active) return null;
@@ -20,9 +23,15 @@ export function LoadingOverlay() {
   return (
     <div className="work-overlay" data-world-busy="" aria-busy="true" onPointerDown={(event) => event.preventDefault()}>
       <div className="work-card" role="status" aria-live="polite">
-        <div className={`work-hero work-hero--${kind}`} aria-hidden="true">
-          <CharacterPreview id={bodyId} animate motion={kind === "rest" ? "idle" : "attack"} />
-        </div>
+        {pose && heroHasPose(bodyId, pose) ? (
+          <div className={`work-hero work-hero--action work-hero--${kind}`} aria-hidden="true">
+            <HeroActionSprite id={bodyId} pose={pose} />
+          </div>
+        ) : (
+          <div className={`work-hero work-hero--${kind}`} aria-hidden="true">
+            <CharacterPreview id={bodyId} animate motion={kind === "rest" ? "idle" : "attack"} />
+          </div>
+        )}
         <div className="work-body">
           <span className="work-label">{message || "กำลังทำงาน..."}</span>
           <div className="work-track" role="progressbar" aria-label={message || "กำลังทำงาน"}>
