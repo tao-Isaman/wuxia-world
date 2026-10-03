@@ -553,7 +553,7 @@ const SORROW_PALM: StoryArcSpec = {
       reward: [{ t: "gold", amount: 250 }, { t: "wExp", amount: 220 }, { t: "trait", trait: "fame", amount: 5 }],
     },
     {
-      title: "ฝ่ามือกำสรดวิญญาณสลาย",
+      title: "วิชาลึกลับ",
       summary: "ถ้วยชาใบที่สองถูกหงายในที่สุด และท่านหญิงในสุสานส่งมอบฝ่ามือของคนที่ไม่ยอมเลิกรอ",
       giver: LADY,
       offer: {
@@ -602,7 +602,7 @@ const SORROW_PALM: StoryArcSpec = {
       complete: {
         cutscene: {
           stage: "sect_gumu", around: LADY, mood: "dusk",
-          title: "ฝ่ามือกำสรดวิญญาณสลาย", subtitle: "บทสุดท้าย",
+          title: "วิชาลึกลับ", subtitle: "บทสุดท้าย",
           cast: {
             lady: { name: "หญิงปริศนาในสุสาน", look: LADY, at: [1, 0], facing: "left" },
             hero: { name: "{hero}", look: "hero", at: [-2, 0], facing: "right" },
@@ -1718,7 +1718,7 @@ const ICE_WEAVE: StoryArcSpec = {
     },
     {
       title: "เย็นที่ไม่ใจดำ",
-      summary: "เตียงหยกเย็นรักษาได้ครั้งละคน ท่านหญิงยกมันให้คนที่เคยเกือบฆ่านาง — และวิชาไหมน้ำแข็งถูกส่งต่อ ทีละเส้น",
+      summary: "เตียงหยกเย็นรักษาได้ครั้งละคน ท่านหญิงยกมันให้คนที่เคยเกือบฆ่านาง — และวิชาลึกลับถูกส่งต่อ ทีละเส้น",
       giver: LADY,
       offer: {
         lines: [

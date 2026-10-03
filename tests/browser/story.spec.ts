@@ -74,7 +74,8 @@ test("sect window: ranks grant no skills; the ขั้นและวิชา 
   const line = page.getByTestId("sect-lineage");
   await expect(line).toContainText("วิชาของสำนัก");
   await expect(line.locator('[data-lineage-id="tj"]')).toContainText(/รับได้จาก|ต้องการ/);
-  await expect(line.locator('[data-lineage-id="taiji"]')).toContainText("ต้องขั้น");
+  // T4 moves come from sagas the sect window keeps secret.
+  await expect(line.locator('[data-lineage-id="taiji"]')).toHaveCount(0);
 
   // A rank-up pays gold and teaches nothing.
   await page.getByRole("button", { name: /เลื่อนเป็นขั้น 8/ }).click();

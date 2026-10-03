@@ -10,6 +10,7 @@ import {
   TRAIT_LABEL,
   getQuest,
   getQuestsForNpc,
+  MYSTERY_MOVE_LABEL,
   getScene,
   isQuestOfferable,
   isQuestTurnInForNpc,
@@ -32,7 +33,7 @@ import { toast } from "@/store/toast-store";
 import { confirmDialog } from "@/store/confirm-store";
 import { flashLoading } from "@/store/loading-store";
 import { NpcStatusBadge } from "../npc-status-badge";
-import { getSkill, getArt } from "@/lib/game";
+import { getSkill } from "@/lib/game";
 import { CharacterPreview } from "@/components/game/character-preview";
 import { npcCharacterId } from "@/lib/characters/catalog";
 import { GiftPicker } from "./gift-picker";
@@ -497,10 +498,8 @@ function summarizeRewards(rewards: readonly QuestReward[]): string {
         parts.push(`สัมพันธ์ ${getNpc(r.npcId)?.name ?? "สหาย"} ${r.amount > 0 ? "+" : ""}${r.amount}`);
         break;
       case "learnSkill":
-        parts.push(`วิชา ${getSkill(r.skillId)?.n ?? "ใหม่"}`);
-        break;
       case "learnArt":
-        parts.push(`วิชาในกาย ${getArt(r.artId)?.n ?? "ใหม่"}`);
+        parts.push(MYSTERY_MOVE_LABEL);
         break;
     }
   }

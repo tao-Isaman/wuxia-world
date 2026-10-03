@@ -11,6 +11,7 @@ import {
   trackedQuestId,
   guideForQuest,
   getItem,
+  MYSTERY_MOVE_LABEL,
   getQuest,
   type QuestReward,
 } from "@/lib/world";
@@ -446,10 +447,8 @@ function summarizeRewards(rewards: readonly QuestReward[]): string {
         parts.push(`สัมพันธ์ ${r.amount > 0 ? "+" : ""}${r.amount}`);
         break;
       case "learnSkill":
-        parts.push(`วิชา ${r.skillId}`);
-        break;
       case "learnArt":
-        parts.push(`วิชาในกาย ${r.artId}`);
+        parts.push(MYSTERY_MOVE_LABEL);
         break;
     }
   }

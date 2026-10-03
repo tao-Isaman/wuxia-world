@@ -53,7 +53,7 @@ Checked on 2026-10-01 for wave 27 (animated, wandering NPCs and villain bosses):
 | Check | Result |
 | --- | --- |
 | `bun run typecheck` | passes |
-| `bun run lint` | passes: 0 errors, 5 known warnings |
+| `bun run lint` | passes: 0 errors, 3 known warnings |
 | `test:runtime` | 9 checks pass |
 | `test:combat` | 15 checks pass |
 | `test:opening` | 12 checks pass |
@@ -71,12 +71,12 @@ Checked on 2026-10-01 for wave 27 (animated, wandering NPCs and villain bosses):
 | `test:npcs` | 7 checks pass |
 | `test:places` | 12 checks pass: 68 new NPCs (35 wander), 97 place quests; all 72 ยุทธจักร T0–T3 moves and arts are quest rewards |
 | `test:routes` | 8 checks pass: 255 exits on 98 maps (243 within 45° of their bearing), 258 roads on 54 of the 56 paintings, 253/256 arrivals on the side the road came from |
-| `test:story` | 7 checks pass: 154 lineage quests, 38 sagas (340 chapters), 292 cutscenes; every quest and chapter plays through in the real store |
+| `test:story` | 9 checks pass (incl. secret trials, scroll hand-over and no move named in quest text): 154 lineage quests, 38 sagas (340 chapters), 292 cutscenes; every quest and chapter plays through in the real store |
 | `test:quests` | the campaign audit passes (867 quests, 101 reachable locations); 439 item / kill / objective quests hand in through the real store; guidance covers 2358 of 2382 stages; all 39 steal / assassinate / kidnap stages offer the action and advance |
 | `test:docs` | the generated reference is current; every link, repo path and command in the docs resolves |
 | `bun scripts/audit-content.ts` | 225 NPCs · 867 quests · 3038 scenes, all references resolve |
 | `bun run build` | passes; `/` first-load JS 1.12 MB (was 508 kB before the sagas; the saga text is about 2.9 MB of source, ~500 kB gzipped) |
-| `bun run test:e2e` | all 24 Playwright tests pass against the production build on :3017 (about 12 minutes, Chromium 141 via the container shim) |
+| `bun run test:e2e` | all 31 Playwright tests pass against the production build on :3017 (about 13 minutes, Chromium 141 via the container shim) |
 
 Not verified:
 
@@ -114,6 +114,9 @@ Real behaviour today, found during the docs audit. Each is small and self-contai
 - **Kidnapped NPCs can't be kidnapped again** after they return (`kidnappedNpcIds` stays for quest conditions).
 
 ### Quests and sects
+
+- **Some writing still names the move.** Quest names, summaries, rewards and the sect window say วิชาลึกลับ, but the hand-written offer / hand-in lines of lineage quests and saga chapters, and saga titles, were not rewritten and can name or hint at the move.
+- **Old saves keep their moves.** Moves learned before scrolls existed stay learned; a quest in progress hands over a scroll when it ends.
 
 1. **Abandoned quests can never be taken again.**
    - `abandonQuest` marks the quest `failed`.

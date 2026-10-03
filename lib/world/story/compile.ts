@@ -4,6 +4,7 @@
 
 import type { StatKey } from "@/lib/game";
 import type { Choice, Condition, DialogScene, QuestDef, QuestReward, QuestStage, SceneEffect, SceneLine, SectId } from "../types";
+import { scrollItemId } from "../data/items";
 import type {
   CutsceneDef, CutsceneSpec, LineageSpec, StoryArcInfo, StoryArcSpec, StoryBeat, StoryLine, StoryStep,
 } from "./types";
@@ -59,6 +60,9 @@ function cutscene(id: string, spec: CutsceneSpec, label: string, arcId?: string)
   return { ...spec, id, label, ...(arcId ? { arcId } : {}) };
 }
 
+// Not offered while the hero still carries the move's unread คัมภีร์.
+const notHolding = (kind: "skill" | "art", id: string): Condition => ({ t: "not", of: { t: "hasItem", itemId: scrollItemId(kind, id), count: 1 } });
+
 const pad = (n: number) => String(n).padStart(2, "0");
 
 // ─── Story sagas ──────────────────────────────────────────────────────
@@ -82,7 +86,7 @@ export function compileArc(arc: StoryArcSpec, r: StoryResolvers): CompiledStory 
     });
     stages.push({ id: "return", description: `กลับไปหา${r.npcName(chapter.giver)}` });
 
-    const gates: Condition[] = n === 1 ? [arc.require, { t: "not", of: learned }] : [{ t: "questStatus", questId: storyQuestId(arc.id, n - 1), status: "done" }];
+    const gates: Condition[] = n === 1 ? [arc.require, { t: "not", of: learned }, notHolding(arc.reward.kind, arc.reward.id)] : [{ t: "questStatus", questId: storyQuestId(arc.id, n - 1), status: "done" }];
     if (chapter.require) gates.push(chapter.require);
     const rewards: QuestReward[] = [...chapter.reward];
     if (n === total) {
@@ -163,7 +167,7 @@ const OUTSIDER_GATES: Record<string, (tier: number) => Condition | null> = {
 
 export function lineageQuestId(spec: Pick<LineageSpec, "kind" | "id">): string { return `ql_${spec.kind}_${spec.id}`; }
 
-export function compileLineage(spec: LineageSpec, r: StoryResolvers): CompiledStory {
+export function compileLineage(spec: LineageSpec, r: StoryResolvers, seq = 1): CompiledStory {
   const out: CompiledStory = { quests: [], scenes: [], cutscenes: [] };
   const info = r.martial(spec.kind, spec.id);
   if (!info) throw new Error(`lineage: unknown ${spec.kind} ${spec.id}`);
@@ -172,7 +176,7 @@ export function compileLineage(spec: LineageSpec, r: StoryResolvers): CompiledSt
   const qid = lineageQuestId(spec);
   const home = r.npcHome(spec.giver);
   const learned: Condition = spec.kind === "skill" ? { t: "learnedSkill", skillId: spec.id } : { t: "learnedArt", artId: spec.id };
-  const gates: Condition[] = [{ t: "not", of: learned }];
+  const gates: Condition[] = [{ t: "not", of: learned }, notHolding(spec.kind, spec.id)];
   const sect = r.sectByLabel(info.sc);
   if (sect) {
     gates.push({ t: "sectMember", sectId: sect.id }, { t: "sectStatus", sectId: sect.id, status: "active" });
@@ -204,9 +208,11 @@ export function compileLineage(spec: LineageSpec, r: StoryResolvers): CompiledSt
   const kindLabel = spec.kind === "skill" ? "วิชา" : "ลมปราณ";
   out.quests.push({
     id: qid,
-    name: spec.title ?? `สืบทอด${info.name}`,
-    description: `${r.npcName(spec.giver)}ยินดีถ่ายทอด${kindLabel}${info.name} (${TIER_LABEL[info.ti]}) ให้ผู้ที่พิสูจน์ตนได้`,
-    briefSummary: `สืบทอด${kindLabel} · ${TIER_LABEL[info.ti]} — ${info.name}`,
+    // The quest never names the move or its tier — only "วิชาลึกลับ"; the
+    // scroll it hands over names it. `seq` tells one teacher's quests apart.
+    name: spec.title ?? `สืบทอดวิชาลึกลับของ${r.npcName(spec.giver)}${seq > 1 ? ` · ม้วนที่ ${seq}` : ""}`,
+    description: `${r.npcName(spec.giver)}ยินดีถ่ายทอด${kindLabel}ลึกลับให้ผู้ที่พิสูจน์ตนได้ — สำเร็จแล้วจะได้รับคัมภีร์ของวิชานั้น`,
+    briefSummary: `สืบทอด${kindLabel}ลึกลับ — ${r.npcName(spec.giver)}`,
     type: "side",
     lineage: { kind: spec.kind, id: spec.id },
     giverNpcId: spec.giver,
@@ -214,7 +220,7 @@ export function compileLineage(spec: LineageSpec, r: StoryResolvers): CompiledSt
     stages,
     rewards,
   });
-  beatScenes(`qs_${qid}_offer`, { lines: spec.offer, go: "รับคำ" }, [{ t: "startQuest", questId: qid }], home, out, `cs_${qid}`, info.name);
+  beatScenes(`qs_${qid}_offer`, { lines: spec.offer, go: "รับคำ" }, [{ t: "startQuest", questId: qid }], home, out, `cs_${qid}`, "วิชาลึกลับ");
   beatScenes(`qs_${qid}_complete`, { lines: spec.complete, go: "คารวะอาจารย์" }, [{ t: "finishQuest", questId: qid, success: true }], home, out, `cs_${qid}_done`, info.name);
   return out;
 }

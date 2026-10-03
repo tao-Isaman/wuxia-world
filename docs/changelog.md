@@ -6,6 +6,14 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-03
 
+### Quests give scrolls; the move stays a mystery; a new skills window
+
+- **A quest that teaches a move hands over its คัมภีร์ instead.** Every `learnSkill` / `learnArt` quest reward (lineage quests, saga finales, place quests) now puts a scroll in the bag — `scroll_skill_<id>` / `scroll_art_<id>`, one generated per move and art (`lib/world/data/items.ts`), unsellable, no stat gate. Reading it (ใช้) teaches the move, as before auto-slotted; a T4+ art starts at level 3, the rest at 1. Nothing else hands out scrolls (`test:story`). A lineage quest or saga isn't offered again while its scroll sits unread.
+- **Quests no longer say which move or what tier.** Quest offers, the quest log and the saga list show the reward as **📜 วิชาลึกลับ**; lineage quests are named after their teacher (สืบทอดวิชาลึกลับของ<teacher>, ม้วนที่ 2… when a teacher has several), and the 15 sect trial quests no longer name their art; 60-odd hand-written place quests and nine saga finales had the move's name taken out of their title, summary and description (`test:story` now fails on any quest that names its move or a tier there). The hand-in receipt names the scroll.
+- **The sect window keeps T4 secret.** The ขั้นและวิชา list drops the saga (T4) moves and shows the rest as วิชาลึกลับ until learned; the seven T4 saga trials (บททดสอบก่อนตำนาน) leave the วิชาในกาย tab — their giver now offers them on the NPC card to an active member of high enough rank (`isSecretSectQuest`).
+- **The skills window is two panes.** The 10 slots stay on top; below, the library of everything learned sits on the left (icon, name, kind, level, slot number; filter ทั้งหมด / ฝีมือ / ในกาย) and the picked move on the right, in full, with ติดตั้งลงช่อง / แทนที่ช่อง / ถอดออก, เร่งด้วย w-exp and ลืมวิชา. The per-slot dropdown is gone.
+- Lint is down to 3 known warnings (the old skills window's two hook warnings went with it).
+
 ### Beggars' skill names
 
 - `ep` is now **18 ฝ่ามือพิชิตมังกร** (was "18 ฝ่ามือมังกร") and `bg_lucky_staff` **เพลงไม้เท้าตีสุนัข** (was "เพลงไม้เท้าตีสุข"), with every saga, NPC, rumor and dialog line that names them.

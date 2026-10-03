@@ -273,6 +273,37 @@ button.item-tile:hover { transform: translateY(-2px); box-shadow: inset 0 0 0 2p
   .skill-slot-medal { width: 50px; height: 50px; }
 }
 
+/* ── Skills: library on the left, the picked skill on the right ───────── */
+.skills-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 12px; align-items: start; }
+.skills-library, .skills-detail { min-width: 0; padding: 10px; background: #0f1c19; border: 1px solid #3f4a3a; }
+.skills-library-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 8px; }
+.skills-library-head .bag-filters { display: flex; gap: 4px; }
+.skills-library-head .bag-filters button { padding: 2px 7px; font-size: 11px; }
+.skills-library-list { display: grid; gap: 4px; max-height: min(52vh, 460px); overflow-y: auto; padding-right: 2px; }
+.skills-library-item {
+  display: flex; align-items: center; gap: 8px; width: 100%; min-height: 44px; padding: 4px 6px; text-align: left;
+  color: #e7dcba; background: #ffffff08; border: 1px solid transparent; border-radius: 4px; transition: background 100ms, border-color 100ms;
+}
+.skills-library-item:hover { background: #ffffff14; }
+.skills-library-item[aria-pressed=true] { border-color: var(--rarity); background: #f4dc9c1f; box-shadow: inset 3px 0 0 var(--rarity); }
+.skills-library-icon { display: grid; place-items: center; flex: none; width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--rarity); background: radial-gradient(circle at 50% 36%, #3a5343, #111f1a 72%); }
+.skills-library-name { display: grid; min-width: 0; flex: 1; line-height: 1.25; }
+.skills-library-name > span { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.skills-library-name > small { font-size: 11px; opacity: .72; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.skills-library-slot { flex: none; min-width: 20px; height: 20px; padding: 0 4px; display: grid; place-items: center; font: 700 11px ui-monospace, monospace; color: #1b1a12; background: #e9cf8c; border: 1px solid #7a5e2a; border-radius: 10px; }
+.skills-detail { color: #e7dcba; position: sticky; top: 0; }
+.skills-detail-head { display: flex; align-items: center; gap: 10px; }
+.skills-detail-actions { display: flex; flex-wrap: wrap; gap: 6px; padding-top: 6px; border-top: 1px dashed #3f4a3a; }
+@media (max-width: 560px) {
+  .skills-layout { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 6px; }
+  .skills-library, .skills-detail { padding: 6px; }
+  .skills-library-item { gap: 5px; padding: 3px 4px; }
+  .skills-library-icon { width: 32px; height: 32px; }
+  .skills-library-name > span { font-size: 12px; }
+  .skills-library-name > small { font-size: 10px; }
+  .skills-library-head .bag-filters button { padding: 2px 5px; font-size: 10px; }
+}
+
 /* ── Profile hero block ──────────────────────────────────────────────── */
 .profile-hero { display: grid; grid-template-columns: 150px 1fr; gap: 6px 18px; align-items: center; padding: 10px 14px; background: linear-gradient(90deg, #1b2c26, #0f1c19); border: 1px solid #3f4a3a; }
 .profile-hero > :not(.profile-figure):not(.profile-identity) { grid-column: 2; }

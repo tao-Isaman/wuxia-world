@@ -187,7 +187,7 @@ const quests: QuestDef[] = [
   {
     id: "qw_home_nanxian_carrying_pole", type: "side", name: "ไม้คานของลุงไป๋",
     description: "ลุงไป๋คนตัดฟืนเจ็บหลังหาบฟืนไม่ไหว ถ้าเจ้าหาไม้มาให้ห้ามัด แกจะสอนวิธีใช้ไม้คานตีคนให้",
-    briefSummary: "หาไม้เนื้ออ่อนให้ลุงไป๋ แลกกับวิชาดามอกุน",
+    briefSummary: "หาไม้เนื้ออ่อนให้ลุงไป๋ แลกกับวิชาลึกลับ",
     giverNpcId: "home_nanxian_woodcutter_bai",
     stages: [
       { id: "wood", description: "หาไม้เนื้ออ่อน 5 ท่อนให้ลุงไป๋", autoAdvance: { t: "hasItem", itemId: "wood_soft", count: 5 } },
@@ -197,8 +197,8 @@ const quests: QuestDef[] = [
   },
   {
     id: "qw_home_nanxian_red_lotus", type: "side", name: "บัวแดงในสระหน้าบ้าน",
-    description: "ท่านหนานเสียนเห็นปราณในตัวเจ้าพอจะจุดไฟได้ จึงให้ไปเก็บเม็ดบัวและนั่งสมาธิริมสระ เพื่อเรียนลมปราณบัวแดงเพลิงน้อย",
-    briefSummary: "เก็บเม็ดบัว นั่งสมาธิริมสระ แล้วรับลมปราณบัวแดงเพลิงน้อย",
+    description: "ท่านหนานเสียนเห็นปราณในตัวเจ้าพอจะจุดไฟได้ จึงให้ไปเก็บเม็ดบัวและนั่งสมาธิริมสระ เพื่อเรียนลมปราณลึกลับ",
+    briefSummary: "เก็บเม็ดบัว นั่งสมาธิริมสระ แล้วรับลมปราณลึกลับ",
     giverNpcId: "home_nanxian_sage_nanxian",
     prereqs: { t: "statAtLeast", stat: "POW", min: 10 },
     stages: [
@@ -214,7 +214,7 @@ const quests: QuestDef[] = [
   {
     id: "qw_home_nanxian_lonely_sword", type: "side", name: "กระบี่ที่ไร้เพื่อน",
     description: "ท่านหนานเสียนเล่าถึงพี่น้องร่วมสาบานที่ตายไปเมื่อยี่สิบปีก่อน และกระบี่ที่ตนคิดขึ้นในความเหงานับแต่นั้น ก่อนสอนจะขอให้เจ้าไปเคารพหลุมศพเขาที่ฉวนเจิน",
-    briefSummary: "ตามรอยพี่น้องร่วมสาบานของท่านหนานเสียน แลกกับดาบโดดเดี่ยว",
+    briefSummary: "ตามรอยพี่น้องร่วมสาบานของท่านหนานเสียน แลกกับวิชาลึกลับ",
     giverNpcId: "home_nanxian_sage_nanxian",
     prereqs: { t: "and", all: [
       { t: "statAtLeast", stat: "POW", min: 25 },
@@ -253,7 +253,7 @@ const quests: QuestDef[] = [
   {
     id: "qw_home_yideng_terrace_wall", type: "side", name: "กำแพงนาขั้นบันได",
     description: "ฝนถล่มกำแพงหินนาขั้นบันไดของชาวนาเกิง หมูป่ายังลงมาขุดกล้าซ้ำ เขาจะสอนฝ่ามือที่ใช้ยันดินถล่มให้ ถ้าเจ้าช่วยซ่อม",
-    briefSummary: "ขนหินซ่อมกำแพงนาและไล่หมูป่า แลกกับฝ่ามือสร้างกำแพง",
+    briefSummary: "ขนหินซ่อมกำแพงนาและไล่หมูป่า แลกกับวิชาลึกลับ",
     giverNpcId: "home_yideng_farmer_geng",
     prereqs: { t: "statAtLeast", stat: "DEF", min: 10 },
     stages: [
@@ -267,7 +267,7 @@ const quests: QuestDef[] = [
   {
     id: "qw_home_yideng_brush_point", type: "side", name: "พู่กันจิ้มจุด",
     description: "บัณฑิตจูจื่อหลิวหมึกหมด กลอนค้างครึ่งบท ถ้าเจ้าหาหมึกมาให้ เขาจะสอนวิธีปาเข็มให้ตรงจุดเหมือนจุดพู่กัน",
-    briefSummary: "หาหมึกให้บัณฑิตจู ฝึกจิ้มจุดบนลำไผ่ แลกกับเข็มตีจุด",
+    briefSummary: "หาหมึกให้บัณฑิตจู ฝึกจิ้มจุดบนลำไผ่ แลกกับวิชาลึกลับ",
     giverNpcId: "home_yideng_scholar_zhu",
     prereqs: { t: "statAtLeast", stat: "DEX", min: 10 },
     stages: [
@@ -283,7 +283,7 @@ const quests: QuestDef[] = [
   {
     id: "qw_home_yideng_fishhook", type: "side", name: "ตะขอเบ็ดเฝ้าทาง",
     description: "ฤๅษีประมงเตี่ยมชงไม่ยอมให้ใครผ่านง่าย ๆ ถ้าอยากได้วิชาโซ่เกี่ยวของเขา ต้องหาปลามาเลี้ยงและรับตะขอของเขาให้ได้หนึ่งยก",
-    briefSummary: "หาปลาคาร์ปให้ฤๅษีประมง แล้วประลองกับเขา แลกกับโซ่เกี่ยวสังหาร",
+    briefSummary: "หาปลาคาร์ปให้ฤๅษีประมง แล้วประลองกับเขา แลกกับวิชาลึกลับ",
     giverNpcId: "home_yideng_fisher_diancang",
     prereqs: { t: "and", all: [
       { t: "statAtLeast", stat: "STR", min: 15 },
@@ -304,7 +304,7 @@ const quests: QuestDef[] = [
   {
     id: "qw_home_tianboguang_horse_thieves", type: "side", name: "ขโมยม้าตัวจิ๋ว",
     description: "มีขโมยมาแอบแก้เชือกม้าในคอกทุกคืน ทหารแก่เฉินขี้เกียจวิ่งไล่ เลยขอให้เจ้าจัดการ แลกกับดาบยาวท่าพื้นฐานของทหารชายแดน",
-    briefSummary: "ปราบขโมยน้อย 2 คน แลกกับดาบยาวพื้นฐาน",
+    briefSummary: "ปราบขโมยน้อย 2 คน แลกกับวิชาลึกลับ",
     giverNpcId: "home_tianboguang_soldier_chen",
     stages: [
       { id: "thieves", description: "ปราบขโมยน้อย 2 คน", autoAdvance: { t: "defeatedOpponent", opponentId: "petty_thief", count: 2 } },
@@ -330,7 +330,7 @@ const quests: QuestDef[] = [
   {
     id: "qw_home_tianboguang_dragon_blade", type: "side", name: "ดาบไวกว่าปาก",
     description: "เถียนป๋อกวงอยากพิสูจน์ว่าคนกลับตัวก็สอนวิชาได้ เขาให้เจ้าไปปราบหัวหน้าโจรที่ใช้ชื่อเขาไปปล้น แล้วรับดาบเขา (แบบออมมือ) ให้ได้",
-    briefSummary: "ปราบหัวหน้าโจรแอบอ้าง แล้วประลองกับเถียนป๋อกวง แลกกับดาบยาวมังกร",
+    briefSummary: "ปราบหัวหน้าโจรแอบอ้าง แล้วประลองกับเถียนป๋อกวง แลกกับวิชาลึกลับ",
     giverNpcId: "home_tianboguang_blade_tian",
     prereqs: { t: "and", all: [
       { t: "statAtLeast", stat: "STR", min: 15 },
@@ -362,8 +362,8 @@ const quests: QuestDef[] = [
   },
   {
     id: "qw_home_miaoren_new_shaft", type: "side", name: "ด้ามทวนใหม่ของนายกองจง",
-    description: "ด้ามทวนของทหารทวนเฒ่าจงหักตอนไล่โจร เขาอยากได้ด้ามใหม่ และอยากรู้ว่าเจ้าคู่ควรกับทวนหยินหยางหรือไม่",
-    briefSummary: "หาไม้เนื้อแข็งทำด้ามทวน แล้วประลองกับนายกองจง แลกกับทวนหยินหยาง",
+    description: "ด้ามทวนของทหารทวนเฒ่าจงหักตอนไล่โจร เขาอยากได้ด้ามใหม่ และอยากรู้ว่าเจ้าคู่ควรกับวิชาลึกลับหรือไม่",
+    briefSummary: "หาไม้เนื้อแข็งทำด้ามทวน แล้วประลองกับนายกองจง แลกกับวิชาลึกลับ",
     giverNpcId: "home_miaoren_spearman_zhong",
     prereqs: { t: "and", all: [
       { t: "statAtLeast", stat: "STR", min: 15 },
@@ -382,7 +382,7 @@ const quests: QuestDef[] = [
   {
     id: "qw_home_miaoren_poisoned_cure", type: "side", name: "ยาตาของพระพุทธหน้าทอง",
     description: "ตาของเหมียวเหรินเฟิงพร่ามัวมาตั้งแต่ศึกกับตระกูลหู มีหมอแปลกหน้าในซีเซี่ยอ้างว่ารักษาได้ ก่อนสอนกระบี่ เขาขอให้เจ้าช่วยตามเรื่องนี้",
-    briefSummary: "ช่วยหายาตาให้เหมียวเหรินเฟิง แลกกับกระบี่วิเศษ",
+    briefSummary: "ช่วยหายาตาให้เหมียวเหรินเฟิง แลกกับวิชาลึกลับ",
     giverNpcId: "home_miaoren_master_miao",
     prereqs: { t: "and", all: [
       { t: "statAtLeast", stat: "AGI", min: 25 },

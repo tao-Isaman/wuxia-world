@@ -150,7 +150,9 @@ Not in the barrel (import by path): `rollWalkEvent`, `rollFoeSpawn`, `releaseFro
 
 ### Rewards
 
-`QuestReward` (applied in order by `applyQuestRewards`): `gold`, `item`, `wExp`, `skillExp` (no immediate level-up), `trait`, `npcRelationship`, `learnSkill`, `learnArt`, `joinSect`, `sectPoints`, `leaveSect`, `resignSect`, `betraySect`. Gold, w-exp and skill xp ignore non-positive amounts; traits, relationships and sect points may be negative (traits and points floor at 0).
+`QuestReward` (applied in order by `applyQuestRewards`): `gold`, `item`, `wExp`, `skillExp` (no immediate level-up), `trait`, `npcRelationship`, `learnSkill` / `learnArt` (**give the move's scroll**, `scroll_<skill|art>_<id>`, not the move — read from the bag to learn it; nothing if known or already held), `joinSect`, `sectPoints`, `leaveSect`, `resignSect`, `betraySect`. Gold, w-exp and skill xp ignore non-positive amounts; traits, relationships and sect points may be negative (traits and points floor at 0).
+
+`isQuestOfferable` keeps sect quests (`sectId`) off the NPC card, except the T4 saga trials (`isSecretSectQuest`: the `SAGA_PROLOGUES` quests), which their giver offers to an active member at `minSectRank` or better; the sect window hides them.
 
 ### When a quest giver dies
 

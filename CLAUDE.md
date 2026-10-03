@@ -50,7 +50,7 @@ bun dev                     # http://localhost:3000
 bun run build               # next build
 bun run start -p 3017       # serve the production build (the e2e port)
 bun run typecheck           # tsc --noEmit — must be clean
-bun run lint                # next lint — 0 errors, 5 known warnings
+bun run lint                # next lint — 0 errors, 3 known warnings
 bun run test:runtime        # the unit suites, one per line:
 bun run test:combat
 bun run test:opening
@@ -229,6 +229,8 @@ Two deliberate exceptions reach into stores:
   - Every sect T4 is the reward of a saga: 8–10 chapters `st_<arcId>_<nn>` (type `story`), chained on the previous chapter, with films (`DialogScene.cutscene`) and paged dialogs (`paged`).
   - The old sect art quests teach nothing: seven T4 ones are saga prologue trials (`SAGA_PROLOGUES`), eight T3 ones lineage prologue trials (`LINEAGE_PROLOGUES`).
   - Story and lineage quests can't be abandoned and don't fail when their giver dies.
+  - **Moves arrive as scrolls.** A `learnSkill` / `learnArt` quest reward gives the move's คัมภีร์ (`scroll_skill_<id>` / `scroll_art_<id>`, generated in `items.ts`); reading it teaches the move. Quests show the reward as 📜 วิชาลึกลับ (`MYSTERY_MOVE_LABEL`) and lineage quests are named after their teacher.
+  - **T4 stays secret in the sect window**: saga moves are off its list and the seven T4 saga trials are offered only by their giver (`isSecretSectQuest`).
 - **Living places** (`data/places/<group>.ts`, one `PlaceContent` each, merged into every registry). Villages, towns and homes have people, quests and activities; every ยุทธจักร T0–T3 move and art is a quest reward, gated by rarity (`test:places`).
   - **Place activities** are `ActivityDef`s with `place` (locations, cooldown in days, cost, rewards), run by `doActivity`; auto maps place their spots (`ACTIVITY_SLOTS`), hand maps need `place.spot`.
   - **NPC looks:** all 68 place NPCs have their own painted portrait and body (`import-npc-art.ts`). Strollers (`look.wander`) are rigged (`ANIMATED_NPC_IDS`); the rest stand as a unique pixel sprite. `look.body` (`registerNpcBodies`) is only the fallback sheet for art-less NPCs.

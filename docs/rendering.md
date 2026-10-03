@@ -336,7 +336,7 @@ A menu section opens as a full-screen **menu shell** (`components/ui/modal.tsx` 
 | --- | --- |
 | `profile-popup.tsx` | the hero, gold, HP / MP / power bars, memberships; tabs ค่าพลัง (base stats with training bars and derived stats) · วิชาที่ใช้ · อุปกรณ์ · ชื่อเสียง |
 | `inventory-popup.tsx` | 10 worn gear slots, the bag grid (gear first, then items) with category filters, a detail pane (ใช้ / ติดตั้ง / ถอด) |
-| `move-skills-popup.tsx` | the 10-slot loadout, weapon mastery, conflict warning, per-slot picker, เร่งด้วย w-exp (with the `upgrade-payoff.tsx` card), the learned library with ลืม |
+| `move-skills-popup.tsx` | the 10-slot loadout, weapon mastery, conflict warning; below, the learned library on the left (icon + name, filters) and the picked move on the right (`SkillDetail`: numbers, xp, equip / replace / remove, เร่งด้วย w-exp with the `upgrade-payoff.tsx` card, ลืม); styles `.skills-*` in `game-menu.css` / `dq-theme.css` |
 | `life-skills-popup.tsx` | mastery for all 19 life skills · training items and music · learned recipes (read-only) |
 | `quest-log-popup.tsx` → `components/world/quest-log.tsx` | กำลังทำ / สำเร็จ / ละทิ้ง; each row expands to the stage checklist, the guide box (🎯 / 📍 / ➤ นำทาง), objective spots, 📌 ติดตาม, ละทิ้งภารกิจ |
 | `sect-membership-popup.tsx` | the sect, rank-up, 🎖 rewards, 📜 sect quests, ☯ arts, leaving (resign or betray) |

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { getArt, getSkill } from "@/lib/game";
-import { describeQuestCondition, getNpc, getQuest } from "@/lib/world";
+import { MYSTERY_MOVE_LABEL, describeQuestCondition, getNpc, getQuest } from "@/lib/world";
 import { STORY_ARCS, getCutscene } from "@/lib/world/story/registry";
 import type { StoryArcInfo } from "@/lib/world/story/types";
 import { useWorldStore } from "@/store/world-store";
@@ -25,13 +25,14 @@ export function SagaList() {
   if (!arcs.length) return <div className="menu-empty" data-glyph="傳"><strong>ยังไม่มีตำนาน</strong></div>;
   return (
     <>
-      <p className="text-xs text-muted-foreground">ตำนานแห่งยุทธภพ — เรื่องเล่ายาวหลายบทที่นำไปสู่วิชาขั้นเฉพาะของแต่ละสำนัก</p>
+      <p className="text-xs text-muted-foreground">ตำนานแห่งยุทธภพ — เรื่องเล่ายาวหลายบทที่นำไปสู่วิชาลึกลับของแต่ละสำนัก</p>
       <ul className="space-y-1.5" data-testid="saga-list">
         {arcs.map((arc) => {
           const done = progress(arc);
-          const reward = arc.reward.kind === "skill" ? getSkill(arc.reward.id)?.n : getArt(arc.reward.id).n;
           const expanded = open === arc.id;
           const finished = done === arc.questIds.length;
+          // The move stays a mystery until the last chapter hands over its scroll.
+          const reward = finished ? (arc.reward.kind === "skill" ? getSkill(arc.reward.id)?.n : getArt(arc.reward.id).n) : MYSTERY_MOVE_LABEL;
           const next = arc.questIds.find((id) => state.quests[id]?.status !== "done");
           const nextDef = next ? getQuest(next) : null;
           const nextState = next ? state.quests[next] : undefined;

@@ -27,9 +27,11 @@ This page covers the engine. How to *write* the content is in [story-writing.md]
 | Quest id | `ql_<skill\|art>_<id>` | `st_<arcId>_<nn>` |
 | `QuestDef.type` | `"side"`, with `lineage: { kind, id }` | `"story"`, with `story: { arcId, chapter }` |
 | Offered by | a sect NPC's card | the chapter's giver (often the master) |
-| Gate | not learned; tier-based rank, stat, outsider trait; eight T3 arts also need their old art quest done (`LINEAGE_PROLOGUES`) | chapter 1: the saga's `require` + not learned; then the previous chapter done (+ the chapter's own `require`) |
-| Ends with | `learnSkill` / `learnArt` + w-exp + relationship + sect points | small rewards; the last chapter also teaches the T4 (arts at level 3 unless the spec sets one) |
+| Gate | not learned, scroll not held; tier-based rank, stat, outsider trait; eight T3 arts also need their old art quest done (`LINEAGE_PROLOGUES`) | chapter 1: the saga's `require` + not learned + scroll not held; then the previous chapter done (+ the chapter's own `require`) |
+| Ends with | `learnSkill` / `learnArt` (handed over as the move's scroll) + w-exp + relationship + sect points | small rewards; the last chapter also hands over the T4's scroll (arts read at level 3) |
 | Scenes | `qs_<id>_offer`, `qs_<id>_complete` | the same, plus a scene per visit / talk / duel step (`st_<id>_s<n>`, `…_win`, asides `…_a<k>`) |
+
+**Mystery rewards.** `applyQuestRewards` turns `learnSkill` / `learnArt` into the move's scroll item (`scrollItemId(kind, id)`; nothing if known or already held), and the UI shows the reward as `MYSTERY_MOVE_LABEL` (📜 วิชาลึกลับ). Compiled lineage quests are named `สืบทอดวิชาลึกลับของ<teacher>` (`· ม้วนที่ <n>` from a teacher's second lesson on, numbered in `LINEAGE_SPECS` order) and their description and summary name neither move nor tier; `spec.title` still overrides the name. The sect window lists only T0–T3 lineage moves (unlearned ones as วิชาลึกลับ); the T4 saga trials (`SAGA_PROLOGUES`) are `isSecretSectQuest` — off the sect window, offered on their giver's card.
 
 Both reuse the ordinary quest engine: stages, `autoAdvance`, objective spots, NPC-card accept / hand-in, the guide arrow and the HUD tracker.
 
@@ -138,7 +140,10 @@ A cutscene is registered under `cs_<sceneId>` and played by a dialog whose `cuts
 `bun run test:story` (`scripts/test-story-quests.ts`); `STORY_SECT=<sect label>` limits it to one sect.
 
 - **Coverage.** Every sect skill and art has exactly one source: a lineage quest (T0–T3) or a saga (T4).
-- **One way only.** No other quest, dialog, manual or hall teaches a sect skill or art (sect ranks have no skill pools).
+- **One way only.** No other quest, dialog, manual or hall teaches a sect skill or art (sect ranks have no skill pools); scroll items are exempt as the quests' own rewards, and nothing may hand one out directly.
+- **Secret trials.** Each T4 saga trial is off the sect window, its giver stands on a map, and the card offers it only to an active member at its rank.
+- **Mystery.** No quest that teaches a move names it (or a tier) in its name, summary or description.
+- **Scrolls.** The play-through checks each quest hands over exactly its scroll, that reading it teaches the move, and that the saga isn't re-offered while the scroll is unread.
 - **Lineage.** The teacher lives at the sect's grounds; the foe roams and is within one tier; the item is obtainable; 2–6 lines each way.
 - **Sagas:**
   - 8–10 chapters, with a T4 reward of the same sect;

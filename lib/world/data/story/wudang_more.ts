@@ -571,7 +571,7 @@ const HEAVEN_SWORD: StoryArcSpec = {
     },
     // ── 9 ──
     {
-      title: "กระบี่เหนือฟ้า",
+      title: "วิชาลึกลับ",
       summary: "กระบี่ทุกเล่มกลับสู่เจ้าของ หีบแก้วในหอกระบี่ต้องการของชิ้นใหม่ — และอาจารย์ชิงซวี่มีเพลงกระบี่จะมอบให้",
       giver: MASTER,
       offer: {
@@ -600,7 +600,7 @@ const HEAVEN_SWORD: StoryArcSpec = {
       complete: {
         cutscene: {
           stage: "sect_wudang", around: MASTER, mood: "dusk",
-          title: "กระบี่เหนือฟ้า", subtitle: "บทสุดท้าย",
+          title: "วิชาลึกลับ", subtitle: "บทสุดท้าย",
           cast: {
             master: { name: "อาจารย์ชิงซวี่", look: MASTER, at: [2, -1], facing: "left" },
             hero: { name: "{hero}", look: "hero", at: [-1, 0], facing: "right" },

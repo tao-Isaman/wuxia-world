@@ -10,6 +10,8 @@ import {
   getQuestsForSect,
   isSectQuestOfferable,
   isQuestOfferable,
+  isSecretSectQuest,
+  MYSTERY_MOVE_LABEL,
   describeQuestCondition,
   getNpc,
   getQuest,
@@ -89,7 +91,8 @@ export function SectMembershipPopup({ open, onClose }: Props) {
   const canRankUp = !atTop && m.points >= nextCost;
   const sectQuests = getQuestsForSect(current);
   const repeatable = sectQuests.filter((q) => !q.isArtQuest);
-  const artQuests = sectQuests.filter((q) => q.isArtQuest);
+  // The T4 saga trials stay secret: their giver offers them in person.
+  const artQuests = sectQuests.filter((q) => q.isArtQuest && !isSecretSectQuest(q.id));
 
   return (
     <Modal open={open} onClose={onClose} title={`🪷 ศิษย์${def.name}`} maxWidth="max-w-2xl">
@@ -296,7 +299,9 @@ interface RewardsTabProps {
 function RewardsTab({ def, rank, atTop, nextRank, nextCost, canRankUp, worldState, onUpgrade }: RewardsTabProps) {
   const learnedSkills = worldState.playerBuild?.learnedSkillIds ?? [];
   const learnedArts = worldState.playerBuild?.learnedArtIds ?? [];
-  const lineage = sectLineage(def.name);
+  // T4 moves come from sagas the sect window never lists; the rest show as
+  // "วิชาลึกลับ" until learned.
+  const lineage = sectLineage(def.name).filter((e) => !e.arcId);
   return (
     <>
       {/* ─── Rank-up ─────────────────────────────────────────────── */}
@@ -348,7 +353,8 @@ function RewardsTab({ def, rank, atTop, nextRank, nextCost, canRankUp, worldStat
           return (
             <div key={`${e.kind}:${e.id}`} className="flex items-baseline justify-between gap-2 text-xs" data-lineage-id={e.id}>
               <span className="min-w-0 truncate">
-                {item?.n ?? e.id} <span className="text-muted-foreground text-[10px]">T{item?.ti} · {e.kind === "skill" ? "วิชาฝีมือ" : "วิชาในกาย"}{arc ? ` · 📜 ${arc.title}` : ""}</span>
+                {learned ? item?.n ?? e.id : MYSTERY_MOVE_LABEL}{" "}
+                <span className="text-muted-foreground text-[10px]">{learned ? `T${item?.ti} · ` : ""}{e.kind === "skill" ? "วิชาฝีมือ" : "วิชาในกาย"}</span>
               </span>
               <span className={`shrink-0 ${learned ? "text-jade" : "text-muted-foreground"}`}>{status}</span>
             </div>
