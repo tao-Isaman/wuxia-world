@@ -17,6 +17,7 @@ Start with the [project README](../README.md) for what the game is and how to ru
 | Add a location, NPC, quest, item, recipe, skill, opponent or a whole sect | [Content authoring](content-authoring.md) |
 | Look up any location, sect, quest, NPC, skill, item or opponent | [Reference (generated)](reference/README.md) |
 | Change the map view, characters, HUD, menus, VFX or styling | [Rendering and UI](rendering.md) |
+| Find, add or regenerate a library asset (buildings, props, sect sets, nature, tiles, icons, characters, monsters) | [Asset library](assets.md) |
 | Change music or sound effects | [Audio](audio.md) |
 | Change install / offline behaviour | [PWA](pwa.md) |
 | Change what is saved, or bump the save version | [Save format](save-format.md) |
@@ -41,6 +42,7 @@ Start with the [project README](../README.md) for what the game is and how to ru
 - [liveness.md](liveness.md) — NPC simulation and rumors as built, and how they differ from the spec.
 - [content-authoring.md](content-authoring.md) — step-by-step recipes for adding content, with the checks to run.
 - [rendering.md](rendering.md) — Phaser stage, world runtime, maps and collision, characters, HUD and menus, VFX, styling.
+- [assets.md](assets.md) — the PixelLab asset library: categories, folder layout, manifest fields, the generate / curate / import pipeline, budget.
 - [audio.md](audio.md) — procedural music and sound.
 - [pwa.md](pwa.md) — manifest, service worker, install button.
 - [save-format.md](save-format.md) — persisted keys, version history, migrations, repair on load.

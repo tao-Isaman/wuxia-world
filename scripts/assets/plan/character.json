@@ -4855,7 +4855,7 @@
     "h": 64
    },
    "template": "mannequin",
-   "prompt": "old woman with grey hair, a maidservant in a simple pink and white dress; ancient China wuxia character, muted colours"
+   "prompt": "old woman with grey hair, a Chinese palace maid in a pale pink hanfu robe with her hair in two buns; ancient China wuxia character, muted colours"
   },
   {
    "id": "chr_heartland_palace_royal_official_qian",
@@ -5255,7 +5255,7 @@
     "h": 64
    },
    "template": "mannequin",
-   "prompt": "woman, a maidservant in a simple pink and white dress; ancient China wuxia character, muted colours"
+   "prompt": "woman, a Chinese palace maid in a pale pink hanfu robe with her hair in two buns; ancient China wuxia character, muted colours"
   },
   {
    "id": "chr_south_home_xuemuhua_doctor_xue",

@@ -35,6 +35,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | NPC simulation and rumors | [docs/liveness.md](docs/liveness.md) |
 | Adding content (places, NPCs, quests, items, skills, sects…) | [docs/content-authoring.md](docs/content-authoring.md) |
 | Map runtime, collision, characters, HUD, menus, CSS | [docs/rendering.md](docs/rendering.md) |
+| The PixelLab asset library (public/assets/, manifest, pipeline) | [docs/assets.md](docs/assets.md) |
 | Music and sound · install and offline | [docs/audio.md](docs/audio.md) · [docs/pwa.md](docs/pwa.md) |
 | Saves, migration, repair | [docs/save-format.md](docs/save-format.md) |
 | Tests and scripts | [docs/testing.md](docs/testing.md) · [docs/scripts.md](docs/scripts.md) |
@@ -72,6 +73,7 @@ bun run test:places         # place NPCs / quests / activities; every ยุท�
 bun run test:systems        # practice xp, letters, horse stations, the sword tournament
 bun run test:quests         # campaign audit + dead ends + every item/kill/objective quest + guidance + bad-action stages
 bun run test:docs           # generated reference is current + docs links/paths/commands resolve
+bun run test:assets         # asset library: manifest contract, files and sizes, footprints, ≥ 3,000 approved
 bun run test:e2e            # Playwright (Chromium) on :3017 — start a production server first
 bun scripts/audit-content.ts            # every NPC / quest / scene reference resolves
 bun scripts/build-docs-reference.ts     # regenerate docs/reference/ after data changes
@@ -88,6 +90,7 @@ bun scripts/build-hero-work-loops.ts --from <dir>   # m1's PixelLab-animated wor
 bun scripts/smoke-liveness.ts           # 90-day NPC simulation smoke test
 bun scripts/build-world-coords.ts       # each place's world-map spot (exit / road directions); rerun after adding a place or road
 bun scripts/build-route-variants.ts --from <dir>   # import the 56 directional road paintings (<type>-<dir8>.png)
+bun scripts/assets/build-asset-plan.ts && python3 scripts/assets/generate.py run <raw> scripts/assets/plan/*.json && bun scripts/assets/import.ts --raw <raw>   # the PixelLab asset library (docs/assets.md; PIXELLAB_API_TOKEN from the env)
 ```
 
 **Do not run:**

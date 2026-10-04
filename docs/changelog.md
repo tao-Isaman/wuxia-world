@@ -6,6 +6,11 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-04
 
+### A PixelLab asset library: 3,194 pixel-art assets for the map editor
+
+- **`public/assets/`** now holds 3,194 approved assets in one style (high top-down 3/4 view, muted painterly palette, dark outline), listed in `public/assets/manifest.json`: 224 buildings (10 kinds × 5 regions + landmarks), 966 props (town, village, interior), 305 sect signature pieces for the 20 sects, 359 nature pieces over six biomes, 480 Wang ground tiles (30 sets), 417 item icons, 225 NPC characters and 120 monsters in 8 directions, 60 effects and 38 UI pieces. Each entry has its Thai name, tags, anchor, footprint, map size and the prompt it came from ([assets.md](assets.md)).
+- Pipeline in `scripts/assets/`: plan → PixelLab runner with a hard budget → automatic and hand curation → import; `bun run test:assets` checks the manifest (contract, files, sizes, footprints inside the drawn image, ≥ 3,000 approved). `AssetEntry` gains an optional `tile` field (Wang corners). 6,983 generations used.
+
 ### The male hero works for real: PixelLab work loops, played on the map
 
 - m1's 14 work loops are now 8-frame animations made with PixelLab from his painted poses (`animate-with-text-v3`): a full pickaxe swing that sends chips flying, an axe biting into the stump, a rod jerking up on a bite, a bow drawn to the cheek and loosed, a hammer ringing on a glowing blade… (`HERO_WORK_LAYOUT.m1`: 8 × 14 cells of 128 px, 8 fps). f1 keeps her painted 4-frame loops.

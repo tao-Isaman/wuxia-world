@@ -1218,7 +1218,7 @@
     "h": 88
    },
    "template": "dog",
-   "prompt": "a giant shore crab; pixel art game monster, ancient China wuxia fantasy, muted colours"
+   "prompt": "a giant shore crab, the animal only, with big claws; pixel art game monster, ancient China wuxia fantasy, muted colours"
   },
   {
    "id": "mon_beast_sea_turtle",
@@ -1241,7 +1241,7 @@
     "h": 88
    },
    "template": "dog",
-   "prompt": "a giant old turtle with a mossy shell; pixel art game monster, ancient China wuxia fantasy, muted colours"
+   "prompt": "a giant old sea turtle, the animal only, with a mossy shell; pixel art game monster, ancient China wuxia fantasy, muted colours"
   },
   {
    "id": "mon_beast_water_snake",
