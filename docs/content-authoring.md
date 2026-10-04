@@ -38,7 +38,7 @@ Engine semantics (scene kinds, every effect and condition, how quests advance) a
 | NPCs | `lib/world/data/npcs.ts` (core), `npcs/{cities,villages,wilderness,evil,spies}.ts`, `npcs/sects/<file>.ts` | `NPCS`, `getNpc`, `getNpcsAtLocation` |
 | NPC art | `public/npcs/`; id sets in `npc-portrait-ids.ts`, `npc-body-ids.ts`, `npc-pixel-ids.ts` | `npcPortrait`, `npcBodySprite`, `npcPixelSprite`, `npcBattleSprite` |
 | quests | `lib/world/data/quests.ts` (core), `quests/{cities,villages,wilderness,evil,spies}.ts`, `quests/sects/<file>.ts` | `QUESTS`, `getQuest`, `getQuestsForNpc`, `getQuestsForSect` |
-| items | `lib/world/data/items.ts` | `ITEMS`, `getItem` |
+| items | `lib/world/data/items.ts`; icons in `item-icons.ts` | `ITEMS`, `getItem`, `itemIconUrl` |
 | shops | `lib/world/data/shops.ts` | `getShopAt` |
 | city sect halls | `lib/world/data/sect-halls.ts` | `getSectHallAt` |
 | artisans | `lib/world/data/artisans.ts` | `getArtisansAt`, `recipesOfferedBy`, `equipmentOfferedBy` |
@@ -368,6 +368,7 @@ Append to `EQUIPMENT` in `lib/game/data/equipment.ts`:
 - `st` is ignored; keep `{}`.
 - `eff` is an equipment effect or `null`.
 - `instrument: true` marks a music weapon.
+- Give it an icon in `EQUIPMENT_ICONS` (`lib/world/data/item-icons.ts`); a new item likewise needs one in `ITEM_ICONS`. `test:assets` fails otherwise ([assets.md](assets.md#item-icons)).
 
 Sell it through artisans (`equipmentOfferedBy`) or give it as a quest item.
 

@@ -14,6 +14,7 @@ import { useWorldStore } from "@/store/world-store";
 import { toast } from "@/store/toast-store";
 import { ItemEffects } from "@/components/world/item-effects";
 import { CATEGORY_GLYPH, ItemTile } from "@/components/ui/wuxia/item-tile";
+import { itemIconUrl } from "@/lib/world/data/item-icons";
 import { itemRarity, rarityColor } from "@/lib/ui/rarity";
 
 interface Props {
@@ -92,7 +93,7 @@ export function ShopPopup({ open, shop, onClose }: Props) {
                   key={id}
                   className="shop-row"
                 >
-                  <ItemTile glyph={CATEGORY_GLYPH[def.category ?? "misc"]} rarity={itemRarity(def.price)} label={def.name} />
+                  <ItemTile glyph={CATEGORY_GLYPH[def.category ?? "misc"]} icon={itemIconUrl(def.id)} rarity={itemRarity(def.price)} label={def.name} />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <strong className="shop-name" style={{ color: rarityColor(itemRarity(def.price)) }}>{def.name}</strong>
@@ -153,7 +154,7 @@ export function ShopPopup({ open, shop, onClose }: Props) {
                   key={id}
                   className="shop-row"
                 >
-                  <ItemTile glyph={CATEGORY_GLYPH[def.category ?? "misc"]} rarity={itemRarity(def.price)} count={n} label={`${def.name} ×${n}`} />
+                  <ItemTile glyph={CATEGORY_GLYPH[def.category ?? "misc"]} icon={itemIconUrl(def.id)} rarity={itemRarity(def.price)} count={n} label={`${def.name} ×${n}`} />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <strong className="shop-name" style={{ color: rarityColor(itemRarity(def.price)) }}>{def.name}</strong>

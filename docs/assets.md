@@ -22,7 +22,7 @@ A library of pixel-art assets made with [PixelLab](https://pixellab.ai) for the 
 | `sect` | 305 | 64–128 | `create-image-pixen` | 16 per sect × 20 sects: gate, banner, training dummy, weapon rack, altar, lantern + 10 signature objects |
 | `nature` | 359 | 40–84 | `generate-image-v2` | 7 kinds × 6 biomes (temperate, bamboo, desert, snow, swamp, coast) |
 | `tile` | 480 | 32 | `create-tileset` | 6 Wang tilesets × 5 regions, 16 tiles each |
-| `icon` | 417 | 40 | `generate-image-v2` | weapons, armour, accessories, potions, herbs, ores, food, books, valuables, tools, venoms |
+| `icon` | 417 | 40 | `generate-image-v2` | weapons, armour, accessories, potions, herbs, ores, food, books, valuables, tools, venoms; every game item and equipment piece uses one ([item icons](#item-icons)) |
 | `character` | 225 | 64 | `create-character-v3` | one per NPC in the game data, 8 directions |
 | `monster` | 120 | 88 | `create-character-v3` | beasts, spirits, demons, undead and human foe archetypes, 8 directions |
 | `fx` | 60 | 64 | `generate-image-v2` | flame, lightning, ice, sword qi, palm wave, poison, smoke, sparks, healing, blood |
@@ -31,6 +31,11 @@ A library of pixel-art assets made with [PixelLab](https://pixellab.ai) for the 
 | **total** | **4,122** | | | |
 
 By region: heartland 607, east 500, south 523, north 544, west 508, any 976 (icons, fx, ui, monsters, interior furniture, landmarks, the region-free kits).
+
+
+### Item icons
+
+Every item and equipment piece shows an icon from this library in the bag, shops and letters (`ItemTile`'s `icon`). The table is static — `lib/world/data/item-icons.ts`: `ITEM_ICONS` (item id → icon id), `EQUIPMENT_IDS` / `EQUIPMENT_ICONS`, and `itemIconId` / `equipmentIconId` / `itemIconUrl` / `equipmentIconUrl` (URL `/assets/icon/<group>/<id>.png`), so the bag needs no manifest fetch. Scroll items (`scroll_skill_*`, `scroll_art_*`) and manuals take their move's tier: `ico_book_scroll_*` for move skills, `ico_book_book_*` for inner arts. A new item or equipment id needs an entry here, else it shows its category glyph and `test:assets` fails.
 
 ## Folder layout and ids
 

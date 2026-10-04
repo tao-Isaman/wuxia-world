@@ -77,7 +77,7 @@ bun run test:systems        # practice xp, letters, horse stations, the sword to
 bun run test:quests         # campaign audit + dead ends + every item/kill/objective quest + guidance + bad-action stages
 bun run test:engine         # text overrides over SKILLS / ARTS, the engine's filters / edits / validation, the save route whitelist
 bun run test:docs           # generated reference is current + docs links/paths/commands resolve
-bun run test:assets         # asset library: manifest contract, files and sizes, footprints, ≥ 3,000 approved
+bun run test:assets         # asset library: manifest contract, files and sizes, footprints, ≥ 3,000 approved; every item / equipment icon
 bun run test:e2e            # Playwright (Chromium) on :3017 — start a production server first
 bun scripts/audit-content.ts            # every NPC / quest / scene reference resolves
 bun scripts/build-docs-reference.ts     # regenerate docs/reference/ after data changes
@@ -345,7 +345,7 @@ Most additions are data only. Follow [docs/content-authoring.md](docs/content-au
 | a place | a `leaf()` in `world-map.ts` + a road in `location-routes.ts` + a region in `regions.ts` (+ a painting) |
 | an NPC | a regional `npcs/` file (+ talk dialog, spar opponent, art ids) |
 | a quest | a regional `quests/` file (+ `qs_` scenes); stages need an `autoAdvance`, an `objective` or reachable dialog beats |
-| an item, shop, hall, recipe, artisan, node or opponent | its table in `lib/world/data/` |
+| an item, shop, hall, recipe, artisan, node or opponent | its table in `lib/world/data/` (an item or equipment piece also gets an icon in `item-icons.ts`) |
 | a skill or art | `lib/game/data/`; then sort, icon, battle range, and a way to learn it (a sect one also needs a lineage quest or saga — `test:story`) |
 | a joinable sect | the long checklist in the guide |
 

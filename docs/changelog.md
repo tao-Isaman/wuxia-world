@@ -6,6 +6,10 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-04
 
+### Every item and piece of equipment has a painted icon
+
+- **The bag, the shops and letter gifts show library icons** instead of the category glyph: all 101 items, the 291 move scrolls and 76 equipment pieces map to one of the 417 PixelLab icons (`lib/world/data/item-icons.ts`; `ItemTile` takes an `icon` URL). Scrolls and manuals follow their move's tier: move skills are rolled scrolls, inner arts bound books, one look per tier; a letter's gold is a pile of ingots. An empty gear slot keeps its glyph (兵 衣 冠…). `test:assets` checks every item and equipment id has an approved icon at the URL the bag builds.
+
 ### The capital rebuilt in the engine: diagonal kits, map grounds, a packed walled city
 
 - **นครหลวง no longer uses its painting.** It is built from the asset library in the engine's format: a packed-earth ground, slab streets and plazas, a walled city with five gates and about 40 buildings lining the streets, market stalls and outskirts (`public/assets/placements.json`). Every NPC and service now stands in front of the building it belongs to (the physician and the alchemist at the apothecary, the forge at the smithy, rest and chess at the tea house…); the spawn is the crossing south of the market, so the horse station, the tournament and quest spots gather there. The clinic and archive quest props follow their NPCs.

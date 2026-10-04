@@ -2,12 +2,16 @@
  * The asset library is well formed (docs/assets.md): every manifest entry
  * matches the contract in lib/assets/types.ts, ids are unique and well formed,
  * every image exists at its stated size (none over 512 px), footprints lie
- * inside the drawn image, and the library holds at least 3,000 approved assets.
+ * inside the drawn image, the library holds at least 3,000 approved assets,
+ * and every item and equipment piece has an approved icon at its URL
+ * (lib/world/data/item-icons.ts).
  *
  *   bun run test:assets
  */
 import { existsSync, readdirSync, readFileSync, statSync } from "fs";
 import { join } from "path";
+import { EQUIPMENT_IDS, GOLD_ICON_URL, equipmentIconId, equipmentIconUrl, itemIconId, itemIconUrl } from "@/lib/world/data/item-icons";
+import { ITEMS } from "@/lib/world/data/items";
 import { ASSET_CATEGORIES, ASSET_DIRECTIONS, ASSET_REGIONS, type AssetEntry, type AssetManifest } from "@/lib/assets/types";
 
 const MIN_APPROVED = 3000;
@@ -102,10 +106,22 @@ for (const category of ASSET_CATEGORIES) {
   for (const file of walk(dir)) if (file.endsWith(".png") && !files.has(file)) fail(file, "image not in the manifest");
 }
 
+// Every item (scrolls and manuals included) and every equipment piece shows
+// an approved icon, at the URL the bag builds for it.
+const iconImage = new Map(manifest.assets.filter((a) => a.category === "icon" && a.status === "approved").map((a) => [a.id, a.image]));
+const checkIcon = (owner: string, iconId: string | null, url: string | undefined) => {
+  if (!iconId) return fail(owner, "no item icon");
+  if (!iconImage.has(iconId)) return fail(owner, `icon ${iconId} is not an approved icon asset`);
+  if (iconImage.get(iconId) !== url) fail(owner, `icon url ${url} is not the manifest's ${iconImage.get(iconId)}`);
+};
+for (const item of ITEMS) checkIcon(`item ${item.id}`, itemIconId(item.id), itemIconUrl(item.id));
+for (const id of EQUIPMENT_IDS) checkIcon(`equipment ${id}`, equipmentIconId(id), equipmentIconUrl(id));
+if (![...iconImage.values()].includes(GOLD_ICON_URL)) fail("gold", `gold icon ${GOLD_ICON_URL} is not an approved icon`);
+
 if (approved < MIN_APPROVED) fail("library", `${approved} approved assets, want at least ${MIN_APPROVED}`);
 for (const category of ASSET_CATEGORIES) if (!counts[category]) fail("library", `no approved ${category} assets`);
 
-console.log(`assets: ${manifest.assets.length} entries, ${approved} approved`);
+console.log(`assets: ${manifest.assets.length} entries, ${approved} approved; icons for ${ITEMS.length} items + ${EQUIPMENT_IDS.length} equipment`);
 console.log(`  by category: ${ASSET_CATEGORIES.map((c) => `${c} ${counts[c] ?? 0}`).join(", ")}`);
 console.log(`  by region:   ${ASSET_REGIONS.map((r) => `${r} ${regions[r] ?? 0}`).join(", ")}`);
 if (failures.length) {

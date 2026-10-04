@@ -488,7 +488,7 @@ More styling details:
 
 - **Primitives.**
   - `components/ui/`: Badge (with a `seal` variant), Button (`pixel`), Card, Combobox, Command, Input, Modal (menu-shell aware), Popover, Progress (`variant` hp / qi / exp / stamina, `pixel`), Slider, Table, Tabs.
-  - `components/ui/wuxia/`: `Panel` (default / quiet / flat), `WuxiaButton`, `InfoPopover`, `ItemTile` (rarity frame + category glyph 材 草 毒 藥 食 書 譜 工 寶 令 雜 or slot glyph 兵 衣 冠 靴 腕 戒 飾), `OrnamentDivider` (unused).
+  - `components/ui/wuxia/`: `Panel` (default / quiet / flat), `WuxiaButton`, `InfoPopover`, `ItemTile` (rarity frame + the item's library icon (`icon`, `lib/world/data/item-icons.ts`), else a category glyph 材 草 毒 藥 食 書 譜 工 寶 令 雜 or slot glyph 兵 衣 冠 靴 腕 戒 飾), `OrnamentDivider` (unused).
 - **Rarity** (`lib/ui/rarity.ts`): grey, green, blue, purple, orange, red-gold.
   - Items by price: 40 / 120 / 300 / 800 / 2000.
   - Gear by stat budget: 8 / 20 / 38 / 60 / 90.
