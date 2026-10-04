@@ -8,6 +8,7 @@ import {
   blockingRects, byDepth, characterDepth, heroDepth, placementGeometry, placementsGeometry,
 } from "../assets/placement-geometry";
 import { indexAssets } from "../assets/catalog";
+import { KIT_E, KIT_N, KIT_S, KIT_W, cellLine, kitAnchor, kitCellOf, kitSets, maskAt, kitCells, paintKit, placeKitSpecial, snapToKit } from "../assets/kits";
 import type { AssetEntry, AssetManifest, Placement, PlacementsFile } from "../assets/types";
 import { mapAnchors, placementIssues } from "./map-anchors";
 import {
@@ -144,4 +145,111 @@ test("public/assets/placements.json: known maps and assets, unique ids, nothing 
     }
   }
   assert.deepEqual(problems, []);
+});
+
+// ── Kits (lib/assets/kits.ts): pieces that join on a grid ──
+
+/** A test wall set: one 32-unit piece per mask, plus a 3-cell gate joining east and west. */
+function kitAssets(): AssetEntry[] {
+  const pieces = Array.from({ length: 16 }, (_, mask) => asset({
+    id: `kit_any_wall_test_${mask}`, category: "kit", width: 32, height: 90, mapWidth: 32, mapHeight: 90, anchorX: 16, anchorY: 90,
+    footprint: { x: -12, y: -28, w: 24, h: 24 }, kit: { set: "kit_any_wall_test", kind: "wall", cell: 32, mask },
+  }));
+  const gate = asset({
+    id: "kit_any_wall_test_gate", category: "kit", width: 96, height: 90, mapWidth: 96, mapHeight: 90, anchorX: 48, anchorY: 90,
+    footprint: { x: -48, y: -28, w: 96, h: 24 }, solids: [{ x: -48, y: -28, w: 33, h: 24 }, { x: 15, y: -28, w: 33, h: 24 }],
+    kit: { set: "kit_any_wall_test", kind: "wall", cell: 32, mask: KIT_E | KIT_W, span: { w: 3, h: 1 }, special: "gate" },
+  });
+  return [...pieces, gate];
+}
+
+test("kit grid: anchors are the bottom centre of the cells a piece covers", () => {
+  assert.deepEqual(kitAnchor({ cell: 32 }, 2, 3), { x: 80, y: 128 });
+  assert.deepEqual(kitAnchor({ cell: 32, span: { w: 3, h: 1 } }, 2, 3), { x: 112, y: 128 });
+  assert.deepEqual(kitCellOf({ cell: 32, span: { w: 3, h: 1 } }, 112, 128), { col: 2, row: 3 });
+  assert.deepEqual(snapToKit({ set: "s", kind: "road", cell: 48, mask: 0 }, 100, 100), { x: 120, y: 144 });
+  // A dragged line steps one side at a time, so every cell touches the last.
+  const line = cellLine({ col: 0, row: 0 }, { col: 3, row: 2 });
+  assert.equal(line.length, 6);
+  for (let i = 1; i < line.length; i++) assert.equal(Math.abs(line[i].col - line[i - 1].col) + Math.abs(line[i].row - line[i - 1].row), 1);
+});
+
+test("kit brush: painted cells join their neighbours, erasing re-joins the rest", () => {
+  const assets = kitAssets();
+  const index = indexAssets(assets);
+  const set = kitSets(assets).get("kit_any_wall_test")!;
+  assert.equal(set.pieces.size, 16);
+  assert.equal(set.specials.length, 1);
+  let n = 0;
+  const nextId = () => `p_${String(++n).padStart(6, "0")}`;
+  // An L: three cells east, then two south.
+  let list = paintKit([], index, set, [...cellLine({ col: 1, row: 1 }, { col: 3, row: 1 }), ...cellLine({ col: 3, row: 2 }, { col: 3, row: 3 })], false, nextId).placements;
+  const maskOf = (col: number, row: number) => {
+    const occupant = kitCells(list, index, set.set).get(`${col},${row}`);
+    return occupant ? occupant.kit.mask : -1;
+  };
+  assert.equal(list.length, 5);
+  assert.equal(maskOf(1, 1), KIT_E);
+  assert.equal(maskOf(2, 1), KIT_E | KIT_W);
+  assert.equal(maskOf(3, 1), KIT_W | KIT_S);
+  assert.equal(maskOf(3, 2), KIT_N | KIT_S);
+  assert.equal(maskOf(3, 3), KIT_N);
+  // Every piece stands where its cell says.
+  for (const p of list) { const kit = index.get(p.asset)!.kit!; const c = kitCellOf(kit, p.x, p.y); assert.deepEqual(kitAnchor(kit, c.col, c.row), { x: p.x, y: p.y }); }
+  // Painting over a held cell changes nothing; a branch makes a T.
+  assert.equal(paintKit(list, index, set, [{ col: 2, row: 1 }], false, nextId).placements.length, 5);
+  list = paintKit(list, index, set, [{ col: 2, row: 0 }], false, nextId).placements;
+  assert.equal(maskOf(2, 1), KIT_E | KIT_W | KIT_N);
+  assert.equal(maskOf(2, 0), KIT_S);
+  // Erasing the corner leaves two ends.
+  list = paintKit(list, index, set, [{ col: 3, row: 1 }], true, nextId).placements;
+  assert.equal(maskOf(3, 1), -1);
+  assert.equal(maskOf(2, 1), KIT_W | KIT_N);
+  assert.equal(maskOf(3, 2), KIT_S);
+  // Off the map: nothing.
+  assert.equal(paintKit(list, index, set, [{ col: -1, row: 0 }, { col: 30, row: 0 }, { col: 0, row: 20 }], false, nextId).placements.length, list.length);
+});
+
+test("kit gates replace the run under them, the run joins them, and their passage stays open", () => {
+  const assets = kitAssets();
+  const index = indexAssets(assets);
+  const set = kitSets(assets).get("kit_any_wall_test")!;
+  let n = 0;
+  const nextId = () => `p_${String(++n).padStart(6, "0")}`;
+  let list = paintKit([], index, set, cellLine({ col: 2, row: 10 }, { col: 10, row: 10 }), false, nextId).placements;
+  assert.equal(list.length, 9);
+  list = placeKitSpecial(list, index, set, set.specials[0], 5, 10, "p_gate").placements;
+  assert.equal(list.length, 7);
+  const cells = kitCells(list, index, set.set);
+  assert.equal(cells.get("6,10")!.placement.id, "p_gate");
+  assert.equal(maskAt(cells, 4, 10), KIT_E | KIT_W);
+  assert.equal(index.get(list.find((p) => p.x === kitAnchor({ cell: 32 }, 4, 10).x)!.asset)!.kit!.mask, KIT_E | KIT_W);
+  // The brush leaves the gate alone.
+  assert.equal(paintKit(list, index, set, [{ col: 6, row: 10 }], true, nextId).placements.length, 7);
+  // Its two piers block; the middle cell lets the hero through.
+  const gate = placementGeometry(list.find((p) => p.id === "p_gate")!, index.get("kit_any_wall_test_gate")!);
+  assert.equal(gate.solids.length, 2);
+  const solids = blockingRects([gate]);
+  const middle = { x: 6.5 * 32, y: 10.5 * 32 };
+  assert.ok(!solids.some((r) => middle.x >= r.left && middle.x < r.right && middle.y >= r.top && middle.y < r.bottom));
+  assert.ok(solids.some((r) => 5.2 * 32 >= r.left && 5.2 * 32 < r.right && middle.y >= r.top && middle.y < r.bottom));
+});
+
+test("public/assets kits: every set has a piece for all 16 joins, on its grid", () => {
+  const manifest = JSON.parse(readFileSync(join(import.meta.dirname, "../../public/assets/manifest.json"), "utf8")) as AssetManifest;
+  const sets = kitSets(manifest.assets);
+  assert.ok(sets.size >= 20, `${sets.size} kit sets`);
+  const kinds = new Set<string>([...sets.values()].map((s) => s.set.includes("_wall_city_") ? "city" : s.kind));
+  for (const kind of ["road", "city", "wall", "fence"]) assert.ok(kinds.has(kind), `no ${kind} kit`);
+  for (const set of sets.values()) {
+    for (let mask = 0; mask < 16; mask++) assert.ok(set.pieces.get(mask)?.length, `${set.set}: no piece for ${mask}`);
+    for (const list of set.pieces.values()) for (const a of list) {
+      assert.equal(a.kit!.cell, set.cell, a.id);
+      assert.equal(a.mapWidth, set.cell, `${a.id}: one cell wide`);
+      assert.equal(a.anchorX, a.width / 2, a.id);
+      assert.equal(a.anchorY, a.height, a.id);
+      assert.equal(a.layer, set.kind === "road" ? "ground" : "object", a.id);
+    }
+    if (set.kind !== "road") assert.ok(set.specials.some((s) => s.kit!.special === "gate"), `${set.set}: no gate`);
+  }
 });

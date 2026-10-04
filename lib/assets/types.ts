@@ -25,6 +25,7 @@ export const ASSET_CATEGORIES = [
   "monster",    // beasts, demons, ghosts and foe types (8 directions, optional attack)
   "fx",         // effect sprites
   "ui",         // frames, buttons, badges
+  "kit",        // modular pieces that join on a grid: roads, city walls, house walls (AssetEntry.kit, lib/assets/kits.ts)
 ] as const;
 export type AssetCategory = typeof ASSET_CATEGORIES[number];
 
@@ -66,6 +67,12 @@ export interface AssetEntry {
   anchorY: number;
   /** Ground the hero cannot walk through, or null for walk-through decoration. */
   footprint: Footprint | null;
+  /**
+   * Optional exact blocking boxes (same frame as `footprint`) when one box is
+   * too coarse: a wall corner's L, a gate's two piers with the passage open.
+   * When present they block instead of `footprint`, which stays their bounds.
+   */
+  solids?: Footprint[];
   /** Default layer when placed: "ground" (always under characters), "object" (depth-sorted), "overhead" (always over). */
   layer: "ground" | "object" | "overhead";
   /** Whether a left-right mirror still looks right (most props: yes; signs with text: no). */
@@ -82,9 +89,26 @@ export interface AssetEntry {
    * corner vertices; adjacent tiles of one set then join seamlessly.
    */
   tile?: { set: string; corners: Record<"NW" | "NE" | "SW" | "SE", "lower" | "upper"> };
+  /** Kit pieces (category "kit") only: the set, grid and joins (lib/assets/kits.ts). */
+  kit?: KitInfo;
   /** How it was made, so it can be regenerated. */
   source: { tool: string; prompt: string; seed?: number; jobId?: string; size: number };
   status: AssetStatus;
+}
+
+/** A modular piece's place in its kit (lib/assets/kits.ts). */
+export interface KitInfo {
+  /** Kit set id: every piece of one road or wall style shares it. */
+  set: string;
+  kind: "road" | "wall" | "fence";
+  /** Grid cell size in map units (the grid starts at the map's top-left). */
+  cell: number;
+  /** Sides the piece joins across: N 1, E 2, S 4, W 8. */
+  mask: number;
+  /** Cells covered (default 1 × 1); the anchor is the bottom centre of the span. */
+  span?: { w: number; h: number };
+  /** A hand-placed piece (gate, tower, end post): the brush never picks or erases it. */
+  special?: string;
 }
 
 export interface AssetManifest {

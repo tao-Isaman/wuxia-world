@@ -1,0 +1,238 @@
+{
+ "generatedBy": "scripts/assets/build-kits.ts plan",
+ "jobs": [
+  {
+   "id": "kit_textures_01",
+   "category": "kit",
+   "method": "tilespro",
+   "size": {
+    "w": 32,
+    "h": 32
+   },
+   "estimate": 20,
+   "prompt": "1). grey brick city wall face, ancient Chinese, seamless 2). grey stone paving of a wall walk, seamless 3). dark grey clay roof tiles rows, seamless 4). white lime plaster wall with faint stains, seamless 5). yellow rammed earth wall layers, seamless 6). red sandstone blocks wall, seamless 7). tan adobe mud brick wall, seamless 8). vermilion red palace wall plaster, seamless 9). yellow glazed roof tiles rows, seamless 10). weathered wooden planks fence, vertical boards, seamless 11). bamboo poles fence, vertical, seamless 12). rough grey fieldstone wall, seamless 13). green glazed roof tiles rows, seamless 14). dark brick wall with moss, seamless 15). sand-coloured flagstone paving, seamless 16). light grey granite blocks, seamless",
+   "params": {
+    "tile_type": "square_topdown",
+    "tile_view": "top-down",
+    "tile_size": 32,
+    "outline_mode": "segmentation"
+   }
+  },
+  {
+   "id": "kit_road_dirt",
+   "category": "kit",
+   "method": "tilespro",
+   "size": {
+    "w": 32,
+    "h": 32
+   },
+   "estimate": 40,
+   "prompt": "green grass meadow with a packed brown dirt road, ancient Chinese countryside",
+   "params": {
+    "tile_feature": "roads",
+    "tile_type": "square_topdown",
+    "tile_size": 32,
+    "tile_view_angle": 90,
+    "outline_mode": "outline"
+   }
+  },
+  {
+   "id": "kit_road_cobble",
+   "category": "kit",
+   "method": "tilespro",
+   "size": {
+    "w": 32,
+    "h": 32
+   },
+   "estimate": 40,
+   "prompt": "plain flat green grass meadow with a grey cobblestone road, ancient Chinese town",
+   "params": {
+    "tile_feature": "roads",
+    "tile_type": "square_topdown",
+    "tile_size": 32,
+    "tile_view_angle": 90,
+    "outline_mode": "outline"
+   }
+  },
+  {
+   "id": "kit_road_flagstone",
+   "category": "kit",
+   "method": "tilespro",
+   "size": {
+    "w": 32,
+    "h": 32
+   },
+   "estimate": 40,
+   "prompt": "plain flat green grass meadow with a narrow road of square grey stone slabs",
+   "params": {
+    "tile_feature": "roads",
+    "tile_type": "square_topdown",
+    "tile_size": 32,
+    "tile_view_angle": 90,
+    "outline_mode": "outline"
+   }
+  },
+  {
+   "id": "kit_road_brick",
+   "category": "kit",
+   "method": "tilespro",
+   "size": {
+    "w": 32,
+    "h": 32
+   },
+   "estimate": 40,
+   "prompt": "plain flat green grass meadow with a narrow road paved with small grey bricks",
+   "params": {
+    "tile_feature": "roads",
+    "tile_type": "square_topdown",
+    "tile_size": 32,
+    "tile_view_angle": 90,
+    "outline_mode": "outline"
+   }
+  },
+  {
+   "id": "kit_road_bluestone",
+   "category": "kit",
+   "method": "tilespro",
+   "size": {
+    "w": 32,
+    "h": 32
+   },
+   "estimate": 40,
+   "prompt": "plain flat green grass meadow with a road of worn blue-grey bluestone slabs, Jiangnan water town",
+   "params": {
+    "tile_feature": "roads",
+    "tile_type": "square_topdown",
+    "tile_size": 32,
+    "tile_view_angle": 90,
+    "outline_mode": "outline"
+   }
+  },
+  {
+   "id": "kit_road_redclay",
+   "category": "kit",
+   "method": "tilespro",
+   "size": {
+    "w": 32,
+    "h": 32
+   },
+   "estimate": 40,
+   "prompt": "plain flat green grass meadow with a red laterite clay dirt path, southern jungle village",
+   "params": {
+    "tile_feature": "roads",
+    "tile_type": "square_topdown",
+    "tile_size": 32,
+    "tile_view_angle": 90,
+    "outline_mode": "outline"
+   }
+  },
+  {
+   "id": "kit_road_boardwalk",
+   "category": "kit",
+   "method": "tilespro",
+   "size": {
+    "w": 32,
+    "h": 32
+   },
+   "estimate": 40,
+   "prompt": "plain flat green grass meadow with a wooden plank boardwalk path",
+   "params": {
+    "tile_feature": "roads",
+    "tile_type": "square_topdown",
+    "tile_size": 32,
+    "tile_view_angle": 90,
+    "outline_mode": "outline"
+   }
+  },
+  {
+   "id": "kit_road_gravel",
+   "category": "kit",
+   "method": "tilespro",
+   "size": {
+    "w": 32,
+    "h": 32
+   },
+   "estimate": 40,
+   "prompt": "plain flat green grass meadow with a light grey gravel and pebble mountain path",
+   "params": {
+    "tile_feature": "roads",
+    "tile_type": "square_topdown",
+    "tile_size": 32,
+    "tile_view_angle": 90,
+    "outline_mode": "outline"
+   }
+  },
+  {
+   "id": "kit_road_steps",
+   "category": "kit",
+   "method": "tilespro",
+   "size": {
+    "w": 32,
+    "h": 32
+   },
+   "estimate": 40,
+   "prompt": "plain flat green grass meadow with a narrow path of round grey stepping stones",
+   "params": {
+    "tile_feature": "roads",
+    "tile_type": "square_topdown",
+    "tile_size": 32,
+    "tile_view_angle": 90,
+    "outline_mode": "outline"
+   }
+  },
+  {
+   "id": "kit_road_sand",
+   "category": "kit",
+   "method": "tilespro",
+   "size": {
+    "w": 32,
+    "h": 32
+   },
+   "estimate": 40,
+   "prompt": "plain flat green grass meadow with a pale yellow desert sand track",
+   "params": {
+    "tile_feature": "roads",
+    "tile_type": "square_topdown",
+    "tile_size": 32,
+    "tile_view_angle": 90,
+    "outline_mode": "outline"
+   }
+  },
+  {
+   "id": "kit_road_loess",
+   "category": "kit",
+   "method": "tilespro",
+   "size": {
+    "w": 32,
+    "h": 32
+   },
+   "estimate": 40,
+   "prompt": "plain flat green grass meadow with a yellow loess earth cart road with wheel ruts",
+   "params": {
+    "tile_feature": "roads",
+    "tile_type": "square_topdown",
+    "tile_size": 32,
+    "tile_view_angle": 90,
+    "outline_mode": "outline"
+   }
+  },
+  {
+   "id": "kit_road_snow",
+   "category": "kit",
+   "method": "tilespro",
+   "size": {
+    "w": 32,
+    "h": 32
+   },
+   "estimate": 40,
+   "prompt": "plain flat green grass meadow with a packed white snow trail",
+   "params": {
+    "tile_feature": "roads",
+    "tile_type": "square_topdown",
+    "tile_size": 32,
+    "tile_view_angle": 90,
+    "outline_mode": "outline"
+   }
+  }
+ ]
+}

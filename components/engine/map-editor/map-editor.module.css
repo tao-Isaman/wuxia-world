@@ -80,7 +80,8 @@
 }
 .panelBody { padding: 6px 8px; overflow: auto; min-height: 0; }
 .side { display: flex; flex-direction: column; gap: 8px; min-height: 0; }
-.side > .panel:first-child { flex: 1 1 55%; }
+.side > .kitPanel { flex: none; }
+.side > .panel:nth-child(2) { flex: 1 1 55%; }
 .side > .panel:last-child { flex: 1 1 45%; }
 
 /* Map list */
@@ -220,3 +221,18 @@
 }
 .ok { color: var(--ed-ok); margin-top: 8px; }
 .kbd { color: var(--ed-dim); font-size: 11px; margin-top: 8px; }
+
+/* The kit brush (ชิ้นต่อกัน). */
+.kitTabs { display: flex; gap: 4px; padding: 0 6px 6px; }
+.kitTabs button[aria-selected="true"] { border-color: var(--ed-accent); color: var(--ed-accent); }
+.kitSets { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; padding: 0 6px 6px; max-height: 168px; overflow: auto; }
+.kitSet { display: flex !important; align-items: center; gap: 6px; text-align: left; padding: 3px 5px !important; }
+.kitSet[aria-pressed="true"] { border-color: var(--ed-accent) !important; background: #3a2c1c !important; }
+.kitSet img { width: 30px; height: 30px; object-fit: contain; image-rendering: pixelated; flex: none; }
+.kitSet span { display: flex; flex-direction: column; min-width: 0; font-size: 12px; line-height: 1.2; }
+.kitSet small { color: var(--ed-dim); font-size: 11px; }
+.kitTools { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; padding: 0 6px 8px; }
+.kitTools button[aria-pressed="true"] { border-color: var(--ed-accent); color: var(--ed-accent); }
+.kitHint { color: var(--ed-dim); width: 100%; }
+.brushCell { fill: rgba(226, 189, 106, 0.18); stroke: var(--ed-accent); }
+.brushCellErase { fill: rgba(224, 96, 74, 0.22); stroke: var(--ed-danger); }

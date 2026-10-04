@@ -6,6 +6,12 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-04
 
+### Roads, city walls and house walls that join: kits and a kit brush
+
+- **464 modular pieces in 28 sets** (new asset category `kit`): 12 road styles (dirt, cobble, flagstone, brick, gravel, stepping stones, east bluestone, south red clay and boardwalk, west sand, north loess and snow), 6 city walls (grey brick, granite, red sandstone, rammed earth, adobe, mountain fieldstone) with an arched 3-cell gate, 8 house / courtyard walls (white Jiangnan wall with a moon gate, grey brick, red palace wall, green-tiled temple wall, mossy brick, rammed earth, adobe, fieldstone) and 2 fences, each with a gate. Every set has a piece for all 16 ways a cell can join its neighbours (ends, straights, corners, T-junctions, crossing) on its own grid ([assets.md](assets.md#kits-roads-and-walls-that-join)).
+- **Roads** are PixelLab road sets with the grass keyed out, so they lie on any painting; **walls** are assembled by `scripts/assets/build-kits.ts` from PixelLab textures so all pieces of a style match and join without seams; their footprints block only the wall itself (a corner's L, a gate's piers — new optional `AssetEntry.solids`).
+- **Kit brush in the map editor** (ชิ้นต่อกัน): pick a set, click or drag on the map and the pieces join by themselves; Shift-drag or ⌫ erases and the rest re-join; a set's gate snaps to the grid and replaces the wall under it ([engine.md](engine.md#ชิ้นต่อกัน-kit-brush)). `lib/assets/kits.ts` (pure); tests in `test:placements`, `test:assets` and `placements.spec.ts`. About 680 PixelLab generations.
+
 ### The engine at `/game/engine`: asset library, map tab, skill and art texts
 
 - **A browser editor for the game's data**, not linked from the game and `noindex` ([engine.md](engine.md)). Three tabs: คลังภาพ (the asset library), แผนที่ (the map editor's place) and วิชา (skill / art texts). A chip says whether saving writes into the repo (`bun dev`, or `ENGINE_WRITE=1`) or downloads the JSON (the deployed, read-only site); unsaved edits stay as a local draft until saved or discarded.

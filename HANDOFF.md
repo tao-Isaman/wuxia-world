@@ -49,7 +49,7 @@ Deploys are implied to be on Vercel (`VERCEL_GIT_COMMIT_SHA` sets the service-wo
 
 ## Verified state
 
-Checked on 2026-10-04 for the PixelLab asset library (3,194 assets), the engine at `/game/engine` (asset library, map editor, skill / art text overrides) and objects placed on maps:
+Checked on 2026-10-04 for the PixelLab asset library (3,194 assets + 464 kit pieces: roads, city walls, house walls, fences that join on a grid), the engine at `/game/engine` (asset library, map editor, skill / art text overrides) and objects placed on maps:
 
 | Check | Result |
 | --- | --- |
@@ -59,7 +59,7 @@ Checked on 2026-10-04 for the PixelLab asset library (3,194 assets), the engine 
 | `test:combat` | 16 checks pass |
 | `test:opening` | 12 checks pass |
 | `test:navigation` | 19 tests pass |
-| `test:placements` | 8 tests pass (the committed `placements.json` is empty) |
+| `test:placements` | 12 tests pass (the committed `placements.json` is empty), incl. the kit grid, brush, gates and every kit set's 16 joins |
 | `test:battle-background` | 2 checks pass |
 | `test:rumors` | 5 + 4 checks pass |
 | `test:investigation` | 5 checks pass |
@@ -77,11 +77,11 @@ Checked on 2026-10-04 for the PixelLab asset library (3,194 assets), the engine 
 | `test:quests` | the campaign audit passes (867 quests, 101 reachable locations); 439 item / kill / objective quests hand in through the real store; guidance covers 2358 of 2382 stages; all 39 steal / assassinate / kidnap stages offer the action and advance |
 | `test:systems` | 20 checks pass |
 | `test:engine` | 12 checks pass: text overrides, the engine's draft / validation / filters / edits, the save route's whitelist |
-| `test:assets` | passes: 3,194 approved assets (224 buildings, 966 props, 305 sect pieces, 359 nature, 480 tiles, 417 icons, 225 NPC characters and 120 monsters in 8 directions, 60 fx, 38 ui), every file present at its stated size, footprints inside the drawn image; 27 MB under `public/assets/` |
+| `test:assets` | passes: 3,658 approved assets — 464 kit pieces in 28 sets, plus (224 buildings, 966 props, 305 sect pieces, 359 nature, 480 tiles, 417 icons, 225 NPC characters and 120 monsters in 8 directions, 60 fx, 38 ui), every file present at its stated size, footprints inside the drawn image; 27 MB under `public/assets/` |
 | `test:docs` | the generated reference is current; every link, repo path and command in the docs resolves |
 | `bun scripts/audit-content.ts` | 225 NPCs · 867 quests · 3038 scenes, all references resolve |
 | `bun run build` | passes; `/` first-load JS 1.12 MB (was 508 kB before the sagas; the saga text is about 2.9 MB of source, ~500 kB gzipped) |
-| `bun run test:e2e` | all 44 Playwright tests pass against the production build (11.5 minutes, Chromium 141 via the container shim), including the map editor on `/game/engine` |
+| `bun run test:e2e` | all 45 Playwright tests pass against the production build (11.9 minutes, Chromium 141 via the container shim), including the map editor and its kit brush on `/game/engine` |
 
 Not verified:
 
@@ -95,7 +95,6 @@ Real behaviour today, found during the docs audit. Each is small and self-contai
 
 ### Engine (`/game/engine`)
 
-- **The asset library has only been run on a three-entry fixture**; `public/assets/manifest.json` is still empty in this branch. Paging keeps the DOM small, but the 3,500-entry load has not been timed in a browser.
 - **A saved text override does not regenerate the reference.** After saving `text-overrides.json`, run `bun scripts/build-docs-reference.ts` and `bun run test:story` by hand (see [docs/engine.md](docs/engine.md#text-overrides-in-the-game)). `bun scripts/audit-manual-names.ts` may flag a renamed move whose manual keeps the old name.
 
 ### The asset library
@@ -103,7 +102,14 @@ Real behaviour today, found during the docs audit. Each is small and self-contai
 - **Short of a few targets.** 224 of 260 buildings (128 px designs that touched the frame edge were rejected and the budget left no rerolls), 305 of 320 sect pieces, 38 ui pieces (fx + ui were cut to 98). The total, 3,194, is over the 3,000 goal.
 - **Uneven pieces.** Sect pieces (made with Pixen) are a little more saturated and some sit on small ground plates; some tilesets (river, pond) are weak; the 40 px wildflower / forest-floor clumps are rough. Re-roll through `scripts/assets/` ([assets.md](docs/assets.md)).
 - **Not used in play yet.** The 225 NPC characters and 120 monsters are library assets only; the game still draws its painted NPCs and foes. Nothing is placed on a map until someone uses the map editor.
-- **PixelLab balance.** About 2,969 of the 10,000 generations are left after this run.
+- **PixelLab balance.** About 2,289 of the 10,000 generations are left (the kits used ~680; the allowance resets 2026-11-04).
+
+### Kits (roads and walls)
+
+- **Walls are assembled, not painted.** The 16 wall / fence sets are drawn by `scripts/assets/build-kits.ts` from 16 PixelLab texture tiles, so they are flatter than the painted maps and the library's buildings; there are no wall towers or gatehouses (place a library gate building over a kit gate). North–south walls show only their top strip, the usual 3/4 convention.
+- **Roads are narrow** (the path is about a third of its 48-unit cell) and lie as overlays on the painting; there is no wide plaza piece apart from each set's lone piece.
+- **Grids differ.** Roads use 48-unit cells, walls 32; sets only join their own pieces. The brush paints whole cells only (roads stop 16 units short of the map's bottom edge).
+- **No horizontal-only gates.** Gates are east–west pieces only; a gap in a north–south wall is made by erasing.
 
 ### Placed objects and the map editor
 
