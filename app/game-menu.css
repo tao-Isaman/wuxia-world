@@ -190,7 +190,7 @@
 
 /* ── Item tiles (rarity-framed squares) ───────────────────────────────── */
 .item-tile {
-  position: relative; display: grid; place-items: center; width: 58px; height: 58px; flex: 0 0 auto;
+  position: relative; display: grid; place-items: center; width: 58px; height: 58px; flex: 0 0 auto; overflow: hidden;
   background: radial-gradient(circle at 50% 38%, #26372f, #0e1a16 75%);
   border: 2px solid var(--rarity); box-shadow: inset 0 0 0 2px #0b1512, 0 0 0 1px #0b1512;
   transition: transform 100ms, box-shadow 100ms;
@@ -200,7 +200,7 @@ button.item-tile:hover { transform: translateY(-2px); box-shadow: inset 0 0 0 2p
 .item-tile--dim { border-style: dashed; opacity: .55; }
 .item-tile:focus-visible { outline: 2px solid #f2d790; outline-offset: 2px; }
 .item-tile-glyph { font: 700 27px/1 serif; text-shadow: 2px 2px 0 #050b09; }
-.item-tile-icon { position: absolute; inset: 11%; width: 78%; height: 78%; object-fit: contain; image-rendering: pixelated; filter: drop-shadow(1px 2px 0 #050b09); pointer-events: none; user-select: none; }
+.item-tile-icon { position: absolute; top: 12%; left: 12%; width: 76%; height: 76%; max-width: 76%; max-height: 76%; object-fit: contain; object-position: center; image-rendering: pixelated; filter: drop-shadow(1px 2px 0 #050b09); pointer-events: none; user-select: none; }
 .item-tile--dim .item-tile-icon { filter: grayscale(.6) drop-shadow(1px 2px 0 #050b09); }
 .item-tile-count { position: absolute; right: 3px; bottom: 1px; font: 700 12px ui-monospace, monospace; color: #fff3cf; text-shadow: 1px 1px 0 #000, -1px -1px 0 #000; }
 
