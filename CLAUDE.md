@@ -36,6 +36,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | Adding content (places, NPCs, quests, items, skills, sects…) | [docs/content-authoring.md](docs/content-authoring.md) |
 | Map runtime, collision, characters, HUD, menus, CSS | [docs/rendering.md](docs/rendering.md) |
 | Objects placed on maps; the map editor (`/game/engine`, แผนที่) | [docs/rendering.md](docs/rendering.md#placed-objects) · [docs/engine.md](docs/engine.md#แผนที่--map-editor) |
+| The PixelLab asset library (public/assets/, manifest, pipeline) | [docs/assets.md](docs/assets.md) |
 | Music and sound · install and offline | [docs/audio.md](docs/audio.md) · [docs/pwa.md](docs/pwa.md) |
 | The editor at `/game/engine`: asset library, maps, skill / art texts | [docs/engine.md](docs/engine.md) |
 | Saves, migration, repair | [docs/save-format.md](docs/save-format.md) |
@@ -76,6 +77,7 @@ bun run test:systems        # practice xp, letters, horse stations, the sword to
 bun run test:quests         # campaign audit + dead ends + every item/kill/objective quest + guidance + bad-action stages
 bun run test:engine         # text overrides over SKILLS / ARTS, the engine's filters / edits / validation, the save route whitelist
 bun run test:docs           # generated reference is current + docs links/paths/commands resolve
+bun run test:assets         # asset library: manifest contract, files and sizes, footprints, ≥ 3,000 approved
 bun run test:e2e            # Playwright (Chromium) on :3017 — start a production server first
 bun scripts/audit-content.ts            # every NPC / quest / scene reference resolves
 bun scripts/build-docs-reference.ts     # regenerate docs/reference/ after data changes
@@ -92,6 +94,7 @@ bun scripts/build-hero-work-loops.ts --from <dir>   # m1's PixelLab-animated wor
 bun scripts/smoke-liveness.ts           # 90-day NPC simulation smoke test
 bun scripts/build-world-coords.ts       # each place's world-map spot (exit / road directions); rerun after adding a place or road
 bun scripts/build-route-variants.ts --from <dir>   # import the 56 directional road paintings (<type>-<dir8>.png)
+bun scripts/assets/build-asset-plan.ts && python3 scripts/assets/generate.py run <raw> scripts/assets/plan/*.json && bun scripts/assets/import.ts --raw <raw>   # the PixelLab asset library (docs/assets.md; PIXELLAB_API_TOKEN from the env)
 ```
 
 **Do not run:**

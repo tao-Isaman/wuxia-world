@@ -1,0 +1,755 @@
+{
+ "category": "icon",
+ "jobs": [
+  {
+   "id": "ico_weapon_jian_sword",
+   "category": "icon",
+   "subcategory": "weapon",
+   "region": "any",
+   "group": "weapon",
+   "name": "กระบี่",
+   "tags": [
+    "กระบี่",
+    "jian sword",
+    "weapon",
+    "icon",
+    "ไอคอน"
+   ],
+   "kind": "icon",
+   "mapWidth": 24,
+   "keep": 14,
+   "method": "v2",
+   "size": {
+    "w": 40,
+    "h": 40
+   },
+   "style": "icon",
+   "prompt": "pixel art inventory item icon: a Chinese straight double-edged sword (jian), ancient China wuxia, muted painterly palette, dark outline, centered, transparent background, no text."
+  },
+  {
+   "id": "ico_weapon_dao_sabre",
+   "category": "icon",
+   "subcategory": "weapon",
+   "region": "any",
+   "group": "weapon",
+   "name": "ดาบ",
+   "tags": [
+    "ดาบ",
+    "dao sabre",
+    "weapon",
+    "icon",
+    "ไอคอน"
+   ],
+   "kind": "icon",
+   "mapWidth": 24,
+   "keep": 14,
+   "method": "v2",
+   "size": {
+    "w": 40,
+    "h": 40
+   },
+   "style": "icon",
+   "prompt": "pixel art inventory item icon: a Chinese curved sabre (dao), ancient China wuxia, muted painterly palette, dark outline, centered, transparent background, no text."
+  },
+  {
+   "id": "ico_weapon_spear",
+   "category": "icon",
+   "subcategory": "weapon",
+   "region": "any",
+   "group": "weapon",
+   "name": "ทวน",
+   "tags": [
+    "ทวน",
+    "spear",
+    "weapon",
+    "icon",
+    "ไอคอน"
+   ],
+   "kind": "icon",
+   "mapWidth": 24,
+   "keep": 14,
+   "method": "v2",
+   "size": {
+    "w": 40,
+    "h": 40
+   },
+   "style": "icon",
+   "prompt": "pixel art inventory item icon: a Chinese spear or polearm with a red tassel, ancient China wuxia, muted painterly palette, dark outline, centered, transparent background, no text."
+  },
+  {
+   "id": "ico_weapon_staff",
+   "category": "icon",
+   "subcategory": "weapon",
+   "region": "any",
+   "group": "weapon",
+   "name": "ไม้พลอง",
+   "tags": [
+    "ไม้พลอง",
+    "staff",
+    "weapon",
+    "icon",
+    "ไอคอน"
+   ],
+   "kind": "icon",
+   "mapWidth": 24,
+   "keep": 14,
+   "method": "v2",
+   "size": {
+    "w": 40,
+    "h": 40
+   },
+   "style": "icon",
+   "prompt": "pixel art inventory item icon: a fighting staff or bamboo staff, ancient China wuxia, muted painterly palette, dark outline, centered, transparent background, no text."
+  },
+  {
+   "id": "ico_weapon_fan_weapon",
+   "category": "icon",
+   "subcategory": "weapon",
+   "region": "any",
+   "group": "weapon",
+   "name": "พัด",
+   "tags": [
+    "พัด",
+    "fan weapon",
+    "weapon",
+    "icon",
+    "ไอคอน"
+   ],
+   "kind": "icon",
+   "mapWidth": 24,
+   "keep": 14,
+   "method": "v2",
+   "size": {
+    "w": 40,
+    "h": 40
+   },
+   "style": "icon",
+   "prompt": "pixel art inventory item icon: a steel-ribbed folding fan, ancient China wuxia, muted painterly palette, dark outline, centered, transparent background, no text."
+  },
+  {
+   "id": "ico_weapon_hidden_weapons",
+   "category": "icon",
+   "subcategory": "weapon",
+   "region": "any",
+   "group": "weapon",
+   "name": "อาวุธลับ",
+   "tags": [
+    "อาวุธลับ",
+    "hidden weapons",
+    "weapon",
+    "icon",
+    "ไอคอน"
+   ],
+   "kind": "icon",
+   "mapWidth": 24,
+   "keep": 14,
+   "method": "v2",
+   "size": {
+    "w": 40,
+    "h": 40
+   },
+   "style": "icon",
+   "prompt": "pixel art inventory item icon: throwing darts, flying knives or poison needles, ancient China wuxia, muted painterly palette, dark outline, centered, transparent background, no text."
+  },
+  {
+   "id": "ico_weapon_whip_chain",
+   "category": "icon",
+   "subcategory": "weapon",
+   "region": "any",
+   "group": "weapon",
+   "name": "แส้และโซ่",
+   "tags": [
+    "แส้และโซ่",
+    "whip chain",
+    "weapon",
+    "icon",
+    "ไอคอน"
+   ],
+   "kind": "icon",
+   "mapWidth": 24,
+   "keep": 14,
+   "method": "v2",
+   "size": {
+    "w": 40,
+    "h": 40
+   },
+   "style": "icon",
+   "prompt": "pixel art inventory item icon: a whip or a chain weapon with a dart, ancient China wuxia, muted painterly palette, dark outline, centered, transparent background, no text."
+  },
+  {
+   "id": "ico_armor_robe_armor",
+   "category": "icon",
+   "subcategory": "armor",
+   "region": "any",
+   "group": "armor",
+   "name": "เสื้อเกราะ",
+   "tags": [
+    "เสื้อเกราะ",
+    "robe armor",
+    "armor",
+    "icon",
+    "ไอคอน"
+   ],
+   "kind": "icon",
+   "mapWidth": 24,
+   "keep": 14,
+   "method": "v2",
+   "size": {
+    "w": 40,
+    "h": 40
+   },
+   "style": "icon",
+   "prompt": "pixel art inventory item icon: a martial artist's robe or light armour, ancient China wuxia, muted painterly palette, dark outline, centered, transparent background, no text."
+  },
+  {
+   "id": "ico_armor_helmet_hat",
+   "category": "icon",
+   "subcategory": "armor",
+   "region": "any",
+   "group": "armor",
+   "name": "หมวก",
+   "tags": [
+    "หมวก",
+    "helmet hat",
+    "armor",
+    "icon",
+    "ไอคอน"
+   ],
+   "kind": "icon",
+   "mapWidth": 24,
+   "keep": 14,
+   "method": "v2",
+   "size": {
+    "w": 40,
+    "h": 40
+   },
+   "style": "icon",
+   "prompt": "pixel art inventory item icon: a hat, helmet or headband, ancient China wuxia, muted painterly palette, dark outline, centered, transparent background, no text."
+  },
+  {
+   "id": "ico_armor_boots",
+   "category": "icon",
+   "subcategory": "armor",
+   "region": "any",
+   "group": "armor",
+   "name": "รองเท้า",
+   "tags": [
+    "รองเท้า",
+    "boots",
+    "armor",
+    "icon",
+    "ไอคอน"
+   ],
+   "kind": "icon",
+   "mapWidth": 24,
+   "keep": 14,
+   "method": "v2",
+   "size": {
+    "w": 40,
+    "h": 40
+   },
+   "style": "icon",
+   "prompt": "pixel art inventory item icon: a pair of cloth or leather boots, ancient China wuxia, muted painterly palette, dark outline, centered, transparent background, no text."
+  },
+  {
+   "id": "ico_armor_bracers_belt",
+   "category": "icon",
+   "subcategory": "armor",
+   "region": "any",
+   "group": "armor",
+   "name": "สนับแขนและเข็มขัด",
+   "tags": [
+    "สนับแขนและเข็มขัด",
+    "bracers belt",
+    "armor",
+    "icon",
+    "ไอคอน"
+   ],
+   "kind": "icon",
+   "mapWidth": 24,
+   "keep": 14,
+   "method": "v2",
+   "size": {
+    "w": 40,
+    "h": 40
+   },
+   "style": "icon",
+   "prompt": "pixel art inventory item icon: leather bracers or a martial belt, ancient China wuxia, muted painterly palette, dark outline, centered, transparent background, no text."
+  },
+  {
+   "id": "ico_accessory_ring",
+   "category": "icon",
+   "subcategory": "accessory",
+   "region": "any",
+   "group": "accessory",
+   "name": "แหวน",
+   "tags": [
+    "แหวน",
+    "ring",
+    "accessory",
+    "icon",
+    "ไอคอน"
+   ],
+   "kind": "icon",
+   "mapWidth": 24,
+   "keep": 14,
+   "method": "v2",
+   "size": {
+    "w": 40,
+    "h": 40
+   },
+   "style": "icon",
+   "prompt": "pixel art inventory item icon: a ring with a gem, ancient China wuxia, muted painterly palette, dark outline, centered, transparent background, no text."
+  },
+  {
+   "id": "ico_accessory_amulet",
+   "category": "icon",
+   "subcategory": "accessory",
+   "region": "any",
+   "group": "accessory",
+   "name": "เครื่องราง",
+   "tags": [
+    "เครื่องราง",
+    "amulet",
+    "accessory",
+    "icon",
+    "ไอคอน"
+   ],
+   "kind": "icon",
+   "mapWidth": 24,
+   "keep": 14,
+   "method": "v2",
+   "size": {
+    "w": 40,
+    "h": 40
+   },
+   "style": "icon",
+   "prompt": "pixel art inventory item icon: a jade pendant or amulet on a cord, ancient China wuxia, muted painterly palette, dark outline, centered, transparent background, no text."
+  },
+  {
+   "id": "ico_potion_potion",
+   "category": "icon",
+   "subcategory": "potion",
+   "region": "any",
+   "group": "potion",
+   "name": "ยาเลือด",
+   "tags": [
+    "ยาเลือด",
+    "potion",
+    "potion",
+    "icon",
+    "ไอคอน"
+   ],
+   "kind": "icon",
+   "mapWidth": 24,
+   "keep": 14,
+   "method": "v2",
+   "size": {
+    "w": 40,
+    "h": 40
+   },
+   "style": "icon",
+   "prompt": "pixel art inventory item icon: a medicine bottle or gourd of healing elixir, ancient China wuxia, muted painterly palette, dark outline, centered, transparent background, no text."
+  },
+  {
+   "id": "ico_potion_pills",
+   "category": "icon",
+   "subcategory": "potion",
+   "region": "any",
+   "group": "potion",
+   "name": "ยาเม็ด",
+   "tags": [
+    "ยาเม็ด",
+    "pills",
+    "potion",
+    "icon",
+    "ไอคอน"
+   ],
+   "kind": "icon",
+   "mapWidth": 24,
+   "keep": 14,
+   "method": "v2",
+   "size": {
+    "w": 40,
+    "h": 40
+   },
+   "style": "icon",
+   "prompt": "pixel art inventory item icon: a box or jar of medicinal pills, ancient China wuxia, muted painterly palette, dark outline, centered, transparent background, no text."
+  },
+  {
+   "id": "ico_herb_herb",
+   "category": "icon",
+   "subcategory": "herb",
+   "region": "any",
+   "group": "herb",
+   "name": "สมุนไพร",
+   "tags": [
+    "สมุนไพร",
+    "herb",
+    "herb",
+    "icon",
+    "ไอคอน"
+   ],
+   "kind": "icon",
+   "mapWidth": 24,
+   "keep": 14,
+   "method": "v2",
+   "size": {
+    "w": 40,
+    "h": 40
+   },
+   "style": "icon",
+   "prompt": "pixel art inventory item icon: a medicinal herb or root (ginseng, lingzhi mushroom), ancient China wuxia, muted painterly palette, dark outline, centered, transparent background, no text."
+  },
+  {
+   "id": "ico_material_ore",
+   "category": "icon",
+   "subcategory": "material",
+   "region": "any",
+   "group": "material",
+   "name": "แร่",
+   "tags": [
+    "แร่",
+    "ore",
+    "material",
+    "icon",
+    "ไอคอน"
+   ],
+   "kind": "icon",
+   "mapWidth": 24,
+   "keep": 14,
+   "method": "v2",
+   "size": {
+    "w": 40,
+    "h": 40
+   },
+   "style": "icon",
+   "prompt": "pixel art inventory item icon: a chunk of raw ore (iron, copper, silver, gold), ancient China wuxia, muted painterly palette, dark outline, centered, transparent background, no text."
+  },
+  {
+   "id": "ico_material_ingot",
+   "category": "icon",
+   "subcategory": "material",
+   "region": "any",
+   "group": "material",
+   "name": "แท่งโลหะ",
+   "tags": [
+    "แท่งโลหะ",
+    "ingot",
+    "material",
+    "icon",
+    "ไอคอน"
+   ],
+   "kind": "icon",
+   "mapWidth": 24,
+   "keep": 14,
+   "method": "v2",
+   "size": {
+    "w": 40,
+    "h": 40
+   },
+   "style": "icon",
+   "prompt": "pixel art inventory item icon: a metal ingot or bar, ancient China wuxia, muted painterly palette, dark outline, centered, transparent background, no text."
+  },
+  {
+   "id": "ico_material_wood",
+   "category": "icon",
+   "subcategory": "material",
+   "region": "any",
+   "group": "material",
+   "name": "ไม้",
+   "tags": [
+    "ไม้",
+    "wood",
+    "material",
+    "icon",
+    "ไอคอน"
+   ],
+   "kind": "icon",
+   "mapWidth": 24,
+   "keep": 14,
+   "method": "v2",
+   "size": {
+    "w": 40,
+    "h": 40
+   },
+   "style": "icon",
+   "prompt": "pixel art inventory item icon: a bundle of wood or a log section, ancient China wuxia, muted painterly palette, dark outline, centered, transparent background, no text."
+  },
+  {
+   "id": "ico_material_animal_part",
+   "category": "icon",
+   "subcategory": "material",
+   "region": "any",
+   "group": "material",
+   "name": "ชิ้นส่วนสัตว์",
+   "tags": [
+    "ชิ้นส่วนสัตว์",
+    "animal part",
+    "material",
+    "icon",
+    "ไอคอน"
+   ],
+   "kind": "icon",
+   "mapWidth": 24,
+   "keep": 14,
+   "method": "v2",
+   "size": {
+    "w": 40,
+    "h": 40
+   },
+   "style": "icon",
+   "prompt": "pixel art inventory item icon: an animal part: claw, fang, pelt or snake skin, ancient China wuxia, muted painterly palette, dark outline, centered, transparent background, no text."
+  },
+  {
+   "id": "ico_food_fish",
+   "category": "icon",
+   "subcategory": "food",
+   "region": "any",
+   "group": "food",
+   "name": "ปลา",
+   "tags": [
+    "ปลา",
+    "fish",
+    "food",
+    "icon",
+    "ไอคอน"
+   ],
+   "kind": "icon",
+   "mapWidth": 24,
+   "keep": 14,
+   "method": "v2",
+   "size": {
+    "w": 40,
+    "h": 40
+   },
+   "style": "icon",
+   "prompt": "pixel art inventory item icon: a fish (carp, eel, dragon fish), ancient China wuxia, muted painterly palette, dark outline, centered, transparent background, no text."
+  },
+  {
+   "id": "ico_food_dish",
+   "category": "icon",
+   "subcategory": "food",
+   "region": "any",
+   "group": "food",
+   "name": "อาหาร",
+   "tags": [
+    "อาหาร",
+    "dish",
+    "food",
+    "icon",
+    "ไอคอน"
+   ],
+   "kind": "icon",
+   "mapWidth": 24,
+   "keep": 14,
+   "method": "v2",
+   "size": {
+    "w": 40,
+    "h": 40
+   },
+   "style": "icon",
+   "prompt": "pixel art inventory item icon: a bowl or plate of Chinese food, ancient China wuxia, muted painterly palette, dark outline, centered, transparent background, no text."
+  },
+  {
+   "id": "ico_book_scroll",
+   "category": "icon",
+   "subcategory": "book",
+   "region": "any",
+   "group": "book",
+   "name": "คัมภีร์",
+   "tags": [
+    "คัมภีร์",
+    "scroll",
+    "book",
+    "icon",
+    "ไอคอน"
+   ],
+   "kind": "icon",
+   "mapWidth": 24,
+   "keep": 14,
+   "method": "v2",
+   "size": {
+    "w": 40,
+    "h": 40
+   },
+   "style": "icon",
+   "prompt": "pixel art inventory item icon: a rolled martial arts scroll with a ribbon, ancient China wuxia, muted painterly palette, dark outline, centered, transparent background, no text."
+  },
+  {
+   "id": "ico_book_book",
+   "category": "icon",
+   "subcategory": "book",
+   "region": "any",
+   "group": "book",
+   "name": "ตำรา",
+   "tags": [
+    "ตำรา",
+    "book",
+    "book",
+    "icon",
+    "ไอคอน"
+   ],
+   "kind": "icon",
+   "mapWidth": 24,
+   "keep": 14,
+   "method": "v2",
+   "size": {
+    "w": 40,
+    "h": 40
+   },
+   "style": "icon",
+   "prompt": "pixel art inventory item icon: a thread-bound martial arts manual, ancient China wuxia, muted painterly palette, dark outline, centered, transparent background, no text."
+  },
+  {
+   "id": "ico_valuable_valuable",
+   "category": "icon",
+   "subcategory": "valuable",
+   "region": "any",
+   "group": "valuable",
+   "name": "ของมีค่า",
+   "tags": [
+    "ของมีค่า",
+    "valuable",
+    "valuable",
+    "icon",
+    "ไอคอน"
+   ],
+   "kind": "icon",
+   "mapWidth": 24,
+   "keep": 14,
+   "method": "v2",
+   "size": {
+    "w": 40,
+    "h": 40
+   },
+   "style": "icon",
+   "prompt": "pixel art inventory item icon: a treasure: jade piece, gold ingot or ancient coin, ancient China wuxia, muted painterly palette, dark outline, centered, transparent background, no text."
+  },
+  {
+   "id": "ico_quest_key_token",
+   "category": "icon",
+   "subcategory": "quest",
+   "region": "any",
+   "group": "quest",
+   "name": "กุญแจและป้ายคำสั่ง",
+   "tags": [
+    "กุญแจและป้ายคำสั่ง",
+    "key token",
+    "quest",
+    "icon",
+    "ไอคอน"
+   ],
+   "kind": "icon",
+   "mapWidth": 24,
+   "keep": 14,
+   "method": "v2",
+   "size": {
+    "w": 40,
+    "h": 40
+   },
+   "style": "icon",
+   "prompt": "pixel art inventory item icon: an old key or a command token plaque, ancient China wuxia, muted painterly palette, dark outline, centered, transparent background, no text."
+  },
+  {
+   "id": "ico_tool_instrument",
+   "category": "icon",
+   "subcategory": "tool",
+   "region": "any",
+   "group": "tool",
+   "name": "เครื่องดนตรี",
+   "tags": [
+    "เครื่องดนตรี",
+    "instrument",
+    "tool",
+    "icon",
+    "ไอคอน"
+   ],
+   "kind": "icon",
+   "mapWidth": 24,
+   "keep": 14,
+   "method": "v2",
+   "size": {
+    "w": 40,
+    "h": 40
+   },
+   "style": "icon",
+   "prompt": "pixel art inventory item icon: a musical instrument: flute, pipa or small zither, ancient China wuxia, muted painterly palette, dark outline, centered, transparent background, no text."
+  },
+  {
+   "id": "ico_tool_tool",
+   "category": "icon",
+   "subcategory": "tool",
+   "region": "any",
+   "group": "tool",
+   "name": "เครื่องมือ",
+   "tags": [
+    "เครื่องมือ",
+    "tool",
+    "tool",
+    "icon",
+    "ไอคอน"
+   ],
+   "kind": "icon",
+   "mapWidth": 24,
+   "keep": 14,
+   "method": "v2",
+   "size": {
+    "w": 40,
+    "h": 40
+   },
+   "style": "icon",
+   "prompt": "pixel art inventory item icon: a tool: pickaxe, axe, sickle or fishing rod, ancient China wuxia, muted painterly palette, dark outline, centered, transparent background, no text."
+  },
+  {
+   "id": "ico_venom_venom",
+   "category": "icon",
+   "subcategory": "venom",
+   "region": "any",
+   "group": "venom",
+   "name": "พิษ",
+   "tags": [
+    "พิษ",
+    "venom",
+    "venom",
+    "icon",
+    "ไอคอน"
+   ],
+   "kind": "icon",
+   "mapWidth": 24,
+   "keep": 14,
+   "method": "v2",
+   "size": {
+    "w": 40,
+    "h": 40
+   },
+   "style": "icon",
+   "prompt": "pixel art inventory item icon: a poison vial or venom jar with a skull mark, ancient China wuxia, muted painterly palette, dark outline, centered, transparent background, no text."
+  },
+  {
+   "id": "ico_material_cloth",
+   "category": "icon",
+   "subcategory": "material",
+   "region": "any",
+   "group": "material",
+   "name": "ผ้า",
+   "tags": [
+    "ผ้า",
+    "cloth",
+    "material",
+    "icon",
+    "ไอคอน"
+   ],
+   "kind": "icon",
+   "mapWidth": 24,
+   "keep": 14,
+   "method": "v2",
+   "size": {
+    "w": 40,
+    "h": 40
+   },
+   "style": "icon",
+   "prompt": "pixel art inventory item icon: a bolt of silk, a spool of thread or leather, ancient China wuxia, muted painterly palette, dark outline, centered, transparent background, no text."
+  }
+ ]
+}

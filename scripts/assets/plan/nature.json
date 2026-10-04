@@ -1,0 +1,1055 @@
+{
+ "category": "nature",
+ "jobs": [
+  {
+   "id": "nat_temperate_pine",
+   "category": "nature",
+   "subcategory": "tree",
+   "region": "heartland",
+   "group": "temperate",
+   "name": "ต้นสน",
+   "tags": [
+    "ต้นสน",
+    "pine",
+    "tree",
+    "temperate",
+    "ป่าเขตอบอุ่น"
+   ],
+   "kind": "tree",
+   "mapWidth": 110,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 84,
+    "h": 84
+   },
+   "style": "biome-temperate",
+   "prompt": "pixel art game asset: a gnarled Chinese pine tree. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single plant or object centered."
+  },
+  {
+   "id": "nat_temperate_willow",
+   "category": "nature",
+   "subcategory": "tree",
+   "region": "heartland",
+   "group": "temperate",
+   "name": "ต้นหลิว",
+   "tags": [
+    "ต้นหลิว",
+    "willow",
+    "tree",
+    "temperate",
+    "ป่าเขตอบอุ่น"
+   ],
+   "kind": "tree",
+   "mapWidth": 110,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 84,
+    "h": 84
+   },
+   "style": "biome-temperate",
+   "prompt": "pixel art game asset: a weeping willow tree. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single plant or object centered."
+  },
+  {
+   "id": "nat_temperate_blossom_tree",
+   "category": "nature",
+   "subcategory": "tree",
+   "region": "heartland",
+   "group": "temperate",
+   "name": "ต้นท้อ/เหมย",
+   "tags": [
+    "ต้นท้อ/เหมย",
+    "blossom tree",
+    "tree",
+    "temperate",
+    "ป่าเขตอบอุ่น"
+   ],
+   "kind": "tree",
+   "mapWidth": 100,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 84,
+    "h": 84
+   },
+   "style": "biome-temperate",
+   "prompt": "pixel art game asset: a plum or peach blossom tree in flower. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single plant or object centered."
+  },
+  {
+   "id": "nat_temperate_maple",
+   "category": "nature",
+   "subcategory": "tree",
+   "region": "heartland",
+   "group": "temperate",
+   "name": "ต้นเมเปิล",
+   "tags": [
+    "ต้นเมเปิล",
+    "maple",
+    "tree",
+    "temperate",
+    "ป่าเขตอบอุ่น"
+   ],
+   "kind": "tree",
+   "mapWidth": 100,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 84,
+    "h": 84
+   },
+   "style": "biome-temperate",
+   "prompt": "pixel art game asset: a maple tree with red and golden leaves. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single plant or object centered."
+  },
+  {
+   "id": "nat_temperate_bush",
+   "category": "nature",
+   "subcategory": "bush",
+   "region": "heartland",
+   "group": "temperate",
+   "name": "พุ่มไม้",
+   "tags": [
+    "พุ่มไม้",
+    "bush",
+    "bush",
+    "temperate",
+    "ป่าเขตอบอุ่น"
+   ],
+   "kind": "low",
+   "mapWidth": 40,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "biome-temperate",
+   "prompt": "pixel art game asset: a leafy green bush. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single plant or object centered."
+  },
+  {
+   "id": "nat_temperate_boulder",
+   "category": "nature",
+   "subcategory": "rock",
+   "region": "heartland",
+   "group": "temperate",
+   "name": "ก้อนหินใหญ่",
+   "tags": [
+    "ก้อนหินใหญ่",
+    "boulder",
+    "rock",
+    "temperate",
+    "ป่าเขตอบอุ่น"
+   ],
+   "kind": "solid",
+   "mapWidth": 45,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "biome-temperate",
+   "prompt": "pixel art game asset: a mossy grey boulder. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single plant or object centered."
+  },
+  {
+   "id": "nat_temperate_wildflowers",
+   "category": "nature",
+   "subcategory": "flower",
+   "region": "heartland",
+   "group": "temperate",
+   "name": "ดอกไม้ป่า",
+   "tags": [
+    "ดอกไม้ป่า",
+    "wildflowers",
+    "flower",
+    "temperate",
+    "ป่าเขตอบอุ่น"
+   ],
+   "kind": "flat",
+   "mapWidth": 20,
+   "keep": 12,
+   "method": "v2",
+   "size": {
+    "w": 40,
+    "h": 40
+   },
+   "style": "biome-temperate",
+   "prompt": "pixel art game asset: a small clump of wildflowers. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single plant or object centered."
+  },
+  {
+   "id": "nat_bamboo_bamboo_clump",
+   "category": "nature",
+   "subcategory": "bamboo",
+   "region": "east",
+   "group": "bamboo",
+   "name": "กอไผ่",
+   "tags": [
+    "กอไผ่",
+    "bamboo clump",
+    "bamboo",
+    "bamboo",
+    "ป่าไผ่"
+   ],
+   "kind": "tree",
+   "mapWidth": 70,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 84,
+    "h": 84
+   },
+   "style": "biome-bamboo",
+   "prompt": "pixel art game asset: a tall clump of green bamboo. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single plant or object centered."
+  },
+  {
+   "id": "nat_bamboo_bamboo_grove",
+   "category": "nature",
+   "subcategory": "bamboo",
+   "region": "east",
+   "group": "bamboo",
+   "name": "ดงไผ่",
+   "tags": [
+    "ดงไผ่",
+    "bamboo grove",
+    "bamboo",
+    "bamboo",
+    "ป่าไผ่"
+   ],
+   "kind": "tree",
+   "mapWidth": 100,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 84,
+    "h": 84
+   },
+   "style": "biome-bamboo",
+   "prompt": "pixel art game asset: a dense cluster of bamboo stalks with leaves. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single plant or object centered."
+  },
+  {
+   "id": "nat_bamboo_bamboo_young",
+   "category": "nature",
+   "subcategory": "bamboo",
+   "region": "east",
+   "group": "bamboo",
+   "name": "หน่อไผ่และไผ่อ่อน",
+   "tags": [
+    "หน่อไผ่และไผ่อ่อน",
+    "bamboo young",
+    "bamboo",
+    "bamboo",
+    "ป่าไผ่"
+   ],
+   "kind": "low",
+   "mapWidth": 30,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "biome-bamboo",
+   "prompt": "pixel art game asset: young bamboo shoots and small bamboo. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single plant or object centered."
+  },
+  {
+   "id": "nat_bamboo_fern",
+   "category": "nature",
+   "subcategory": "bush",
+   "region": "east",
+   "group": "bamboo",
+   "name": "เฟิร์น",
+   "tags": [
+    "เฟิร์น",
+    "fern",
+    "bush",
+    "bamboo",
+    "ป่าไผ่"
+   ],
+   "kind": "low",
+   "mapWidth": 35,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "biome-bamboo",
+   "prompt": "pixel art game asset: a lush fern plant. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single plant or object centered."
+  },
+  {
+   "id": "nat_bamboo_mossy_rock",
+   "category": "nature",
+   "subcategory": "rock",
+   "region": "east",
+   "group": "bamboo",
+   "name": "หินมอส",
+   "tags": [
+    "หินมอส",
+    "mossy rock",
+    "rock",
+    "bamboo",
+    "ป่าไผ่"
+   ],
+   "kind": "solid",
+   "mapWidth": 40,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "biome-bamboo",
+   "prompt": "pixel art game asset: a moss-covered rock. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single plant or object centered."
+  },
+  {
+   "id": "nat_bamboo_fallen_log",
+   "category": "nature",
+   "subcategory": "log",
+   "region": "east",
+   "group": "bamboo",
+   "name": "ขอนไม้ล้ม",
+   "tags": [
+    "ขอนไม้ล้ม",
+    "fallen log",
+    "log",
+    "bamboo",
+    "ป่าไผ่"
+   ],
+   "kind": "solid",
+   "mapWidth": 60,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "biome-bamboo",
+   "prompt": "pixel art game asset: a fallen mossy log with mushrooms. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single plant or object centered."
+  },
+  {
+   "id": "nat_bamboo_forest_floor",
+   "category": "nature",
+   "subcategory": "ground",
+   "region": "east",
+   "group": "bamboo",
+   "name": "พืชคลุมดินป่าไผ่",
+   "tags": [
+    "พืชคลุมดินป่าไผ่",
+    "forest floor",
+    "ground",
+    "bamboo",
+    "ป่าไผ่"
+   ],
+   "kind": "flat",
+   "mapWidth": 25,
+   "keep": 12,
+   "method": "v2",
+   "size": {
+    "w": 40,
+    "h": 40
+   },
+   "style": "biome-bamboo",
+   "prompt": "pixel art game asset: a small patch of bamboo leaves, mushrooms and pebbles on the forest floor. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single plant or object centered."
+  },
+  {
+   "id": "nat_desert_poplar",
+   "category": "nature",
+   "subcategory": "tree",
+   "region": "west",
+   "group": "desert",
+   "name": "ต้นป็อปลาร์ทะเลทราย",
+   "tags": [
+    "ต้นป็อปลาร์ทะเลทราย",
+    "poplar",
+    "tree",
+    "desert",
+    "ทะเลทราย"
+   ],
+   "kind": "tree",
+   "mapWidth": 100,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 84,
+    "h": 84
+   },
+   "style": "biome-desert",
+   "prompt": "pixel art game asset: a desert poplar (huyang) tree with a twisted trunk. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single plant or object centered."
+  },
+  {
+   "id": "nat_desert_dead_tree",
+   "category": "nature",
+   "subcategory": "tree",
+   "region": "west",
+   "group": "desert",
+   "name": "ต้นไม้ตาย",
+   "tags": [
+    "ต้นไม้ตาย",
+    "dead tree",
+    "tree",
+    "desert",
+    "ทะเลทราย"
+   ],
+   "kind": "tree",
+   "mapWidth": 90,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 84,
+    "h": 84
+   },
+   "style": "biome-desert",
+   "prompt": "pixel art game asset: a dead bleached desert tree. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single plant or object centered."
+  },
+  {
+   "id": "nat_desert_saxaul_shrub",
+   "category": "nature",
+   "subcategory": "bush",
+   "region": "west",
+   "group": "desert",
+   "name": "พุ่มไม้ทะเลทราย",
+   "tags": [
+    "พุ่มไม้ทะเลทราย",
+    "saxaul shrub",
+    "bush",
+    "desert",
+    "ทะเลทราย"
+   ],
+   "kind": "low",
+   "mapWidth": 40,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "biome-desert",
+   "prompt": "pixel art game asset: a dry desert shrub (saxaul or tamarisk). High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single plant or object centered."
+  },
+  {
+   "id": "nat_desert_sandstone",
+   "category": "nature",
+   "subcategory": "rock",
+   "region": "west",
+   "group": "desert",
+   "name": "หินทราย",
+   "tags": [
+    "หินทราย",
+    "sandstone",
+    "rock",
+    "desert",
+    "ทะเลทราย"
+   ],
+   "kind": "solid",
+   "mapWidth": 50,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "biome-desert",
+   "prompt": "pixel art game asset: a weathered red sandstone rock. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single plant or object centered."
+  },
+  {
+   "id": "nat_desert_bones",
+   "category": "nature",
+   "subcategory": "bones",
+   "region": "west",
+   "group": "desert",
+   "name": "โครงกระดูก",
+   "tags": [
+    "โครงกระดูก",
+    "bones",
+    "bones",
+    "desert",
+    "ทะเลทราย"
+   ],
+   "kind": "flat",
+   "mapWidth": 40,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "biome-desert",
+   "prompt": "pixel art game asset: bleached animal bones and a skull half buried in sand. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single plant or object centered."
+  },
+  {
+   "id": "nat_desert_oasis_reeds",
+   "category": "nature",
+   "subcategory": "bush",
+   "region": "west",
+   "group": "desert",
+   "name": "พงอ้อโอเอซิส",
+   "tags": [
+    "พงอ้อโอเอซิส",
+    "oasis reeds",
+    "bush",
+    "desert",
+    "ทะเลทราย"
+   ],
+   "kind": "low",
+   "mapWidth": 35,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "biome-desert",
+   "prompt": "pixel art game asset: a clump of oasis reeds and grass. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single plant or object centered."
+  },
+  {
+   "id": "nat_desert_desert_pebbles",
+   "category": "nature",
+   "subcategory": "ground",
+   "region": "west",
+   "group": "desert",
+   "name": "ก้อนกรวดทะเลทราย",
+   "tags": [
+    "ก้อนกรวดทะเลทราย",
+    "desert pebbles",
+    "ground",
+    "desert",
+    "ทะเลทราย"
+   ],
+   "kind": "flat",
+   "mapWidth": 20,
+   "keep": 12,
+   "method": "v2",
+   "size": {
+    "w": 40,
+    "h": 40
+   },
+   "style": "biome-desert",
+   "prompt": "pixel art game asset: a few small desert stones and a tuft of dry grass. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single plant or object centered."
+  },
+  {
+   "id": "nat_snow_snow_pine",
+   "category": "nature",
+   "subcategory": "tree",
+   "region": "north",
+   "group": "snow",
+   "name": "สนหิมะ",
+   "tags": [
+    "สนหิมะ",
+    "snow pine",
+    "tree",
+    "snow",
+    "หิมะ"
+   ],
+   "kind": "tree",
+   "mapWidth": 90,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 84,
+    "h": 84
+   },
+   "style": "biome-snow",
+   "prompt": "pixel art game asset: a snow-covered fir tree. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single plant or object centered."
+  },
+  {
+   "id": "nat_snow_frozen_tree",
+   "category": "nature",
+   "subcategory": "tree",
+   "region": "north",
+   "group": "snow",
+   "name": "ต้นไม้น้ำแข็ง",
+   "tags": [
+    "ต้นไม้น้ำแข็ง",
+    "frozen tree",
+    "tree",
+    "snow",
+    "หิมะ"
+   ],
+   "kind": "tree",
+   "mapWidth": 90,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 84,
+    "h": 84
+   },
+   "style": "biome-snow",
+   "prompt": "pixel art game asset: a bare tree coated with frost and icicles. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single plant or object centered."
+  },
+  {
+   "id": "nat_snow_snow_rock",
+   "category": "nature",
+   "subcategory": "rock",
+   "region": "north",
+   "group": "snow",
+   "name": "หินหิมะ",
+   "tags": [
+    "หินหิมะ",
+    "snow rock",
+    "rock",
+    "snow",
+    "หิมะ"
+   ],
+   "kind": "solid",
+   "mapWidth": 45,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "biome-snow",
+   "prompt": "pixel art game asset: a rock capped with snow. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single plant or object centered."
+  },
+  {
+   "id": "nat_snow_ice_crystal",
+   "category": "nature",
+   "subcategory": "crystal",
+   "region": "north",
+   "group": "snow",
+   "name": "ผลึกน้ำแข็ง",
+   "tags": [
+    "ผลึกน้ำแข็ง",
+    "ice crystal",
+    "crystal",
+    "snow",
+    "หิมะ"
+   ],
+   "kind": "solid",
+   "mapWidth": 35,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "biome-snow",
+   "prompt": "pixel art game asset: a cluster of blue ice crystals. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single plant or object centered."
+  },
+  {
+   "id": "nat_snow_snow_bush",
+   "category": "nature",
+   "subcategory": "bush",
+   "region": "north",
+   "group": "snow",
+   "name": "พุ่มไม้หิมะ",
+   "tags": [
+    "พุ่มไม้หิมะ",
+    "snow bush",
+    "bush",
+    "snow",
+    "หิมะ"
+   ],
+   "kind": "low",
+   "mapWidth": 35,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "biome-snow",
+   "prompt": "pixel art game asset: a small bush under snow. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single plant or object centered."
+  },
+  {
+   "id": "nat_snow_snow_mound",
+   "category": "nature",
+   "subcategory": "ground",
+   "region": "north",
+   "group": "snow",
+   "name": "กองหิมะ",
+   "tags": [
+    "กองหิมะ",
+    "snow mound",
+    "ground",
+    "snow",
+    "หิมะ"
+   ],
+   "kind": "low",
+   "mapWidth": 50,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "biome-snow",
+   "prompt": "pixel art game asset: a snow drift mound. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single plant or object centered."
+  },
+  {
+   "id": "nat_snow_snow_lotus",
+   "category": "nature",
+   "subcategory": "flower",
+   "region": "north",
+   "group": "snow",
+   "name": "บัวหิมะ",
+   "tags": [
+    "บัวหิมะ",
+    "snow lotus",
+    "flower",
+    "snow",
+    "หิมะ"
+   ],
+   "kind": "flat",
+   "mapWidth": 20,
+   "keep": 12,
+   "method": "v2",
+   "size": {
+    "w": 40,
+    "h": 40
+   },
+   "style": "biome-snow",
+   "prompt": "pixel art game asset: a snow lotus flower among rocks. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single plant or object centered."
+  },
+  {
+   "id": "nat_swamp_banana_tree",
+   "category": "nature",
+   "subcategory": "tree",
+   "region": "south",
+   "group": "swamp",
+   "name": "ต้นกล้วย",
+   "tags": [
+    "ต้นกล้วย",
+    "banana tree",
+    "tree",
+    "swamp",
+    "หนองน้ำ/ป่าร้อนชื้น"
+   ],
+   "kind": "tree",
+   "mapWidth": 80,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 84,
+    "h": 84
+   },
+   "style": "biome-swamp",
+   "prompt": "pixel art game asset: a banana plant with big leaves. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single plant or object centered."
+  },
+  {
+   "id": "nat_swamp_palm",
+   "category": "nature",
+   "subcategory": "tree",
+   "region": "south",
+   "group": "swamp",
+   "name": "ต้นปาล์ม",
+   "tags": [
+    "ต้นปาล์ม",
+    "palm",
+    "tree",
+    "swamp",
+    "หนองน้ำ/ป่าร้อนชื้น"
+   ],
+   "kind": "tree",
+   "mapWidth": 90,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 84,
+    "h": 84
+   },
+   "style": "biome-swamp",
+   "prompt": "pixel art game asset: a tropical palm tree. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single plant or object centered."
+  },
+  {
+   "id": "nat_swamp_swamp_tree",
+   "category": "nature",
+   "subcategory": "tree",
+   "region": "south",
+   "group": "swamp",
+   "name": "ต้นไม้หนองน้ำ",
+   "tags": [
+    "ต้นไม้หนองน้ำ",
+    "swamp tree",
+    "tree",
+    "swamp",
+    "หนองน้ำ/ป่าร้อนชื้น"
+   ],
+   "kind": "tree",
+   "mapWidth": 100,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 84,
+    "h": 84
+   },
+   "style": "biome-swamp",
+   "prompt": "pixel art game asset: a gnarled swamp tree with hanging moss and roots in water. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single plant or object centered."
+  },
+  {
+   "id": "nat_swamp_giant_fern",
+   "category": "nature",
+   "subcategory": "bush",
+   "region": "south",
+   "group": "swamp",
+   "name": "เฟิร์นยักษ์",
+   "tags": [
+    "เฟิร์นยักษ์",
+    "giant fern",
+    "bush",
+    "swamp",
+    "หนองน้ำ/ป่าร้อนชื้น"
+   ],
+   "kind": "low",
+   "mapWidth": 50,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "biome-swamp",
+   "prompt": "pixel art game asset: a giant tropical fern. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single plant or object centered."
+  },
+  {
+   "id": "nat_swamp_reeds",
+   "category": "nature",
+   "subcategory": "bush",
+   "region": "south",
+   "group": "swamp",
+   "name": "ต้นกก",
+   "tags": [
+    "ต้นกก",
+    "reeds",
+    "bush",
+    "swamp",
+    "หนองน้ำ/ป่าร้อนชื้น"
+   ],
+   "kind": "low",
+   "mapWidth": 35,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "biome-swamp",
+   "prompt": "pixel art game asset: a clump of swamp reeds and cattails. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single plant or object centered."
+  },
+  {
+   "id": "nat_swamp_lotus_pads",
+   "category": "nature",
+   "subcategory": "water_plant",
+   "region": "south",
+   "group": "swamp",
+   "name": "ใบบัว",
+   "tags": [
+    "ใบบัว",
+    "lotus pads",
+    "water_plant",
+    "swamp",
+    "หนองน้ำ/ป่าร้อนชื้น"
+   ],
+   "kind": "flat",
+   "mapWidth": 40,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "biome-swamp",
+   "prompt": "pixel art game asset: floating lotus pads with a pink lotus flower. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single plant or object centered."
+  },
+  {
+   "id": "nat_swamp_tropical_flowers",
+   "category": "nature",
+   "subcategory": "flower",
+   "region": "south",
+   "group": "swamp",
+   "name": "ดอกไม้ป่าร้อนชื้น",
+   "tags": [
+    "ดอกไม้ป่าร้อนชื้น",
+    "tropical flowers",
+    "flower",
+    "swamp",
+    "หนองน้ำ/ป่าร้อนชื้น"
+   ],
+   "kind": "flat",
+   "mapWidth": 20,
+   "keep": 12,
+   "method": "v2",
+   "size": {
+    "w": 40,
+    "h": 40
+   },
+   "style": "biome-swamp",
+   "prompt": "pixel art game asset: a small clump of bright tropical flowers. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single plant or object centered."
+  },
+  {
+   "id": "nat_coast_coast_pine",
+   "category": "nature",
+   "subcategory": "tree",
+   "region": "east",
+   "group": "coast",
+   "name": "สนชายฝั่ง",
+   "tags": [
+    "สนชายฝั่ง",
+    "coast pine",
+    "tree",
+    "coast",
+    "ชายฝั่ง"
+   ],
+   "kind": "tree",
+   "mapWidth": 100,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 84,
+    "h": 84
+   },
+   "style": "biome-coast",
+   "prompt": "pixel art game asset: a windswept coastal pine tree. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single plant or object centered."
+  },
+  {
+   "id": "nat_coast_coco_palm",
+   "category": "nature",
+   "subcategory": "tree",
+   "region": "east",
+   "group": "coast",
+   "name": "ต้นมะพร้าว",
+   "tags": [
+    "ต้นมะพร้าว",
+    "coco palm",
+    "tree",
+    "coast",
+    "ชายฝั่ง"
+   ],
+   "kind": "tree",
+   "mapWidth": 90,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 84,
+    "h": 84
+   },
+   "style": "biome-coast",
+   "prompt": "pixel art game asset: a leaning coconut palm. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single plant or object centered."
+  },
+  {
+   "id": "nat_coast_sea_rock",
+   "category": "nature",
+   "subcategory": "rock",
+   "region": "east",
+   "group": "coast",
+   "name": "หินชายทะเล",
+   "tags": [
+    "หินชายทะเล",
+    "sea rock",
+    "rock",
+    "coast",
+    "ชายฝั่ง"
+   ],
+   "kind": "solid",
+   "mapWidth": 50,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "biome-coast",
+   "prompt": "pixel art game asset: a dark sea rock with barnacles. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single plant or object centered."
+  },
+  {
+   "id": "nat_coast_driftwood",
+   "category": "nature",
+   "subcategory": "log",
+   "region": "east",
+   "group": "coast",
+   "name": "ขอนไม้ลอยน้ำ",
+   "tags": [
+    "ขอนไม้ลอยน้ำ",
+    "driftwood",
+    "log",
+    "coast",
+    "ชายฝั่ง"
+   ],
+   "kind": "flat",
+   "mapWidth": 50,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "biome-coast",
+   "prompt": "pixel art game asset: a piece of bleached driftwood. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single plant or object centered."
+  },
+  {
+   "id": "nat_coast_beach_grass",
+   "category": "nature",
+   "subcategory": "bush",
+   "region": "east",
+   "group": "coast",
+   "name": "หญ้าชายหาด",
+   "tags": [
+    "หญ้าชายหาด",
+    "beach grass",
+    "bush",
+    "coast",
+    "ชายฝั่ง"
+   ],
+   "kind": "low",
+   "mapWidth": 30,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "biome-coast",
+   "prompt": "pixel art game asset: a tuft of beach grass. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single plant or object centered."
+  },
+  {
+   "id": "nat_coast_tide_pool",
+   "category": "nature",
+   "subcategory": "water",
+   "region": "east",
+   "group": "coast",
+   "name": "แอ่งน้ำทะเล",
+   "tags": [
+    "แอ่งน้ำทะเล",
+    "tide pool",
+    "water",
+    "coast",
+    "ชายฝั่ง"
+   ],
+   "kind": "flat",
+   "mapWidth": 50,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "biome-coast",
+   "prompt": "pixel art game asset: a small tide pool among rocks. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single plant or object centered."
+  },
+  {
+   "id": "nat_coast_shells",
+   "category": "nature",
+   "subcategory": "ground",
+   "region": "east",
+   "group": "coast",
+   "name": "เปลือกหอย",
+   "tags": [
+    "เปลือกหอย",
+    "shells",
+    "ground",
+    "coast",
+    "ชายฝั่ง"
+   ],
+   "kind": "flat",
+   "mapWidth": 15,
+   "keep": 12,
+   "method": "v2",
+   "size": {
+    "w": 40,
+    "h": 40
+   },
+   "style": "biome-coast",
+   "prompt": "pixel art game asset: a seashell, starfish or small coral on sand. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single plant or object centered."
+  }
+ ]
+}

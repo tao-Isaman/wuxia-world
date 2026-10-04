@@ -18,6 +18,7 @@ Start with the [project README](../README.md) for what the game is and how to ru
 | Look up any location, sect, quest, NPC, skill, item or opponent | [Reference (generated)](reference/README.md) |
 | Change the map view, characters, HUD, menus, VFX or styling | [Rendering and UI](rendering.md) |
 | Place objects on maps with the map editor | [Engine — แผนที่](engine.md#แผนที่--map-editor) |
+| Find, add or regenerate a library asset (buildings, props, sect sets, nature, tiles, icons, characters, monsters) | [Asset library](assets.md) |
 | Change music or sound effects | [Audio](audio.md) |
 | Edit the asset library, map placements or skill / art texts in the browser (`/game/engine`) | [Engine](engine.md) |
 | Change install / offline behaviour | [PWA](pwa.md) |
@@ -44,6 +45,7 @@ Start with the [project README](../README.md) for what the game is and how to ru
 - [content-authoring.md](content-authoring.md) — step-by-step recipes for adding content, with the checks to run.
 - [rendering.md](rendering.md) — Phaser stage, world runtime, maps and collision, placed objects, characters, HUD and menus, VFX, styling.
 - [engine.md](engine.md) — the `/game/engine` tool; its แผนที่ tab is the map editor.
+- [assets.md](assets.md) — the PixelLab asset library: categories, folder layout, manifest fields, the generate / curate / import pipeline, budget.
 - [audio.md](audio.md) — procedural music and sound.
 - [engine.md](engine.md) — the `/game/engine` editor: asset library, map editor, skill / art text overrides, saving in dev vs deployed.
 - [pwa.md](pwa.md) — manifest, service worker, install button.
