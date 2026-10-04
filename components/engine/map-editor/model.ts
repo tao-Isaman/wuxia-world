@@ -86,10 +86,20 @@ export function newPlacement(file: PlacementsFile, asset: AssetEntry, x: number,
   return { id: nextPlacementId(file), asset: asset.id, ...clampToMap(x, y), ...(asset.views?.S ? { dir: "S" as const } : {}) };
 }
 
-/** The file as saved: maps sorted by id, empty maps dropped, every placement cleaned. */
+/** The file as saved: maps sorted by id, empty maps dropped, every placement cleaned; grounds sorted (none: no field). */
 export function normalizeFile(file: PlacementsFile): PlacementsFile {
   const maps: Record<string, Placement[]> = {};
   for (const id of Object.keys(file.maps).sort()) if (file.maps[id]?.length) maps[id] = file.maps[id].map(clean);
-  return { version: 1, maps };
+  const grounds: NonNullable<PlacementsFile["grounds"]> = {};
+  for (const id of Object.keys(file.grounds ?? {}).sort()) if (file.grounds![id]?.tile) grounds[id] = { tile: file.grounds![id].tile };
+  return Object.keys(grounds).length ? { version: 1, maps, grounds } : { version: 1, maps };
+}
+
+/** Replace a map's painting with a tiled ground (or bring the painting back with null). */
+export function setGround(file: PlacementsFile, mapId: string, tile: string | null): PlacementsFile {
+  if ((file.grounds?.[mapId]?.tile ?? null) === tile) return file;
+  const grounds = { ...file.grounds };
+  if (tile) grounds[mapId] = { tile }; else delete grounds[mapId];
+  return { ...file, grounds };
 }
 export const sameFile = (a: PlacementsFile, b: PlacementsFile) => JSON.stringify(normalizeFile(a)) === JSON.stringify(normalizeFile(b));

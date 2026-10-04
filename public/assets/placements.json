@@ -1,4 +1,1978 @@
 {
-  "version": 1,
-  "maps": {}
+ "version": 1,
+ "maps": {
+  "city_capital": [
+   {
+    "id": "p_000001",
+    "asset": "kit_heartland_isoplaza_slab_es",
+    "x": 480,
+    "y": 144
+   },
+   {
+    "id": "p_000002",
+    "asset": "kit_heartland_isoplaza_slab_nes",
+    "x": 448,
+    "y": 160
+   },
+   {
+    "id": "p_000003",
+    "asset": "kit_heartland_isoplaza_slab_nes",
+    "x": 416,
+    "y": 176
+   },
+   {
+    "id": "p_000004",
+    "asset": "kit_heartland_isoplaza_slab_nes",
+    "x": 384,
+    "y": 192
+   },
+   {
+    "id": "p_000005",
+    "asset": "kit_heartland_isoplaza_slab_ne",
+    "x": 352,
+    "y": 208
+   },
+   {
+    "id": "p_000006",
+    "asset": "kit_heartland_isoplaza_slab_esw",
+    "x": 512,
+    "y": 160
+   },
+   {
+    "id": "p_000007",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 480,
+    "y": 176
+   },
+   {
+    "id": "p_000008",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 448,
+    "y": 192
+   },
+   {
+    "id": "p_000009",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 416,
+    "y": 208
+   },
+   {
+    "id": "p_000010",
+    "asset": "kit_heartland_isoplaza_slab_new",
+    "x": 384,
+    "y": 224
+   },
+   {
+    "id": "p_000011",
+    "asset": "kit_heartland_isoplaza_slab_esw",
+    "x": 544,
+    "y": 176
+   },
+   {
+    "id": "p_000012",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 512,
+    "y": 192
+   },
+   {
+    "id": "p_000013",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 480,
+    "y": 208
+   },
+   {
+    "id": "p_000014",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 448,
+    "y": 224
+   },
+   {
+    "id": "p_000015",
+    "asset": "kit_heartland_isoplaza_slab_new",
+    "x": 416,
+    "y": 240
+   },
+   {
+    "id": "p_000016",
+    "asset": "kit_heartland_isoplaza_slab_esw",
+    "x": 576,
+    "y": 192
+   },
+   {
+    "id": "p_000017",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 544,
+    "y": 208
+   },
+   {
+    "id": "p_000018",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 512,
+    "y": 224
+   },
+   {
+    "id": "p_000019",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 480,
+    "y": 240
+   },
+   {
+    "id": "p_000020",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 448,
+    "y": 256
+   },
+   {
+    "id": "p_000021",
+    "asset": "kit_heartland_isoplaza_slab_nes",
+    "x": 416,
+    "y": 272
+   },
+   {
+    "id": "p_000022",
+    "asset": "kit_heartland_isoplaza_slab_nes",
+    "x": 384,
+    "y": 288
+   },
+   {
+    "id": "p_000023",
+    "asset": "kit_heartland_isoplaza_slab_ne",
+    "x": 352,
+    "y": 304
+   },
+   {
+    "id": "p_000024",
+    "asset": "kit_heartland_isoplaza_slab_sw",
+    "x": 608,
+    "y": 208
+   },
+   {
+    "id": "p_000025",
+    "asset": "kit_heartland_isoplaza_slab_nsw",
+    "x": 576,
+    "y": 224
+   },
+   {
+    "id": "p_000026",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 544,
+    "y": 240
+   },
+   {
+    "id": "p_000027",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 512,
+    "y": 256
+   },
+   {
+    "id": "p_000028",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 480,
+    "y": 272
+   },
+   {
+    "id": "p_000029",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 448,
+    "y": 288
+   },
+   {
+    "id": "p_000030",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 416,
+    "y": 304
+   },
+   {
+    "id": "p_000031",
+    "asset": "kit_heartland_isoplaza_slab_new",
+    "x": 384,
+    "y": 320
+   },
+   {
+    "id": "p_000032",
+    "asset": "kit_heartland_isoplaza_slab_e",
+    "x": 64,
+    "y": 480
+   },
+   {
+    "id": "p_000033",
+    "asset": "kit_heartland_isoplaza_slab_esw",
+    "x": 576,
+    "y": 256
+   },
+   {
+    "id": "p_000034",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 544,
+    "y": 272
+   },
+   {
+    "id": "p_000035",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 512,
+    "y": 288
+   },
+   {
+    "id": "p_000036",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 480,
+    "y": 304
+   },
+   {
+    "id": "p_000037",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 448,
+    "y": 320
+   },
+   {
+    "id": "p_000038",
+    "asset": "kit_heartland_isoplaza_slab_new",
+    "x": 416,
+    "y": 336
+   },
+   {
+    "id": "p_000039",
+    "asset": "kit_heartland_isoplaza_slab_es",
+    "x": 128,
+    "y": 480
+   },
+   {
+    "id": "p_000040",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 96,
+    "y": 496
+   },
+   {
+    "id": "p_000041",
+    "asset": "kit_heartland_isoplaza_slab_n",
+    "x": 64,
+    "y": 512
+   },
+   {
+    "id": "p_000042",
+    "asset": "kit_heartland_isoplaza_slab_esw",
+    "x": 608,
+    "y": 272
+   },
+   {
+    "id": "p_000043",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 576,
+    "y": 288
+   },
+   {
+    "id": "p_000044",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 544,
+    "y": 304
+   },
+   {
+    "id": "p_000045",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 512,
+    "y": 320
+   },
+   {
+    "id": "p_000046",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 480,
+    "y": 336
+   },
+   {
+    "id": "p_000047",
+    "asset": "kit_heartland_isoplaza_slab_new",
+    "x": 448,
+    "y": 352
+   },
+   {
+    "id": "p_000048",
+    "asset": "kit_heartland_isoplaza_slab_es",
+    "x": 192,
+    "y": 480
+   },
+   {
+    "id": "p_000049",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 160,
+    "y": 496
+   },
+   {
+    "id": "p_000050",
+    "asset": "kit_heartland_isoplaza_slab_nw",
+    "x": 128,
+    "y": 512
+   },
+   {
+    "id": "p_000051",
+    "asset": "kit_heartland_isoplaza_slab_esw",
+    "x": 640,
+    "y": 288
+   },
+   {
+    "id": "p_000052",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 608,
+    "y": 304
+   },
+   {
+    "id": "p_000053",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 576,
+    "y": 320
+   },
+   {
+    "id": "p_000054",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 544,
+    "y": 336
+   },
+   {
+    "id": "p_000055",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 512,
+    "y": 352
+   },
+   {
+    "id": "p_000056",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 480,
+    "y": 368
+   },
+   {
+    "id": "p_000057",
+    "asset": "kit_heartland_isoplaza_slab_ne",
+    "x": 448,
+    "y": 384
+   },
+   {
+    "id": "p_000058",
+    "asset": "kit_heartland_isoplaza_slab_es",
+    "x": 256,
+    "y": 480
+   },
+   {
+    "id": "p_000059",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 224,
+    "y": 496
+   },
+   {
+    "id": "p_000060",
+    "asset": "kit_heartland_isoplaza_slab_nw",
+    "x": 192,
+    "y": 512
+   },
+   {
+    "id": "p_000061",
+    "asset": "kit_heartland_isoplaza_slab_esw",
+    "x": 672,
+    "y": 304
+   },
+   {
+    "id": "p_000062",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 640,
+    "y": 320
+   },
+   {
+    "id": "p_000063",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 608,
+    "y": 336
+   },
+   {
+    "id": "p_000064",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 576,
+    "y": 352
+   },
+   {
+    "id": "p_000065",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 544,
+    "y": 368
+   },
+   {
+    "id": "p_000066",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 512,
+    "y": 384
+   },
+   {
+    "id": "p_000067",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 480,
+    "y": 400
+   },
+   {
+    "id": "p_000068",
+    "asset": "kit_heartland_isoplaza_slab_ne",
+    "x": 448,
+    "y": 416
+   },
+   {
+    "id": "p_000069",
+    "asset": "kit_heartland_isoplaza_slab_es",
+    "x": 320,
+    "y": 480
+   },
+   {
+    "id": "p_000070",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 288,
+    "y": 496
+   },
+   {
+    "id": "p_000071",
+    "asset": "kit_heartland_isoplaza_slab_nw",
+    "x": 256,
+    "y": 512
+   },
+   {
+    "id": "p_000072",
+    "asset": "kit_heartland_isoplaza_slab_sw",
+    "x": 704,
+    "y": 320
+   },
+   {
+    "id": "p_000073",
+    "asset": "kit_heartland_isoplaza_slab_nsw",
+    "x": 672,
+    "y": 336
+   },
+   {
+    "id": "p_000074",
+    "asset": "kit_heartland_isoplaza_slab_nsw",
+    "x": 640,
+    "y": 352
+   },
+   {
+    "id": "p_000075",
+    "asset": "kit_heartland_isoplaza_slab_nsw",
+    "x": 608,
+    "y": 368
+   },
+   {
+    "id": "p_000076",
+    "asset": "kit_heartland_isoplaza_slab_nsw",
+    "x": 576,
+    "y": 384
+   },
+   {
+    "id": "p_000077",
+    "asset": "kit_heartland_isoplaza_slab_nsw",
+    "x": 544,
+    "y": 400
+   },
+   {
+    "id": "p_000078",
+    "asset": "kit_heartland_isoplaza_slab_nsw",
+    "x": 512,
+    "y": 416
+   },
+   {
+    "id": "p_000079",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 480,
+    "y": 432
+   },
+   {
+    "id": "p_000080",
+    "asset": "kit_heartland_isoplaza_slab_ne",
+    "x": 448,
+    "y": 448
+   },
+   {
+    "id": "p_000081",
+    "asset": "kit_heartland_isoplaza_slab_es",
+    "x": 384,
+    "y": 480
+   },
+   {
+    "id": "p_000082",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 352,
+    "y": 496
+   },
+   {
+    "id": "p_000083",
+    "asset": "kit_heartland_isoplaza_slab_nw",
+    "x": 320,
+    "y": 512
+   },
+   {
+    "id": "p_000084",
+    "asset": "kit_heartland_isoplaza_slab_sw",
+    "x": 512,
+    "y": 448
+   },
+   {
+    "id": "p_000085",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 480,
+    "y": 464
+   },
+   {
+    "id": "p_000086",
+    "asset": "kit_heartland_isoplaza_slab_nes",
+    "x": 448,
+    "y": 480
+   },
+   {
+    "id": "p_000087",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 416,
+    "y": 496
+   },
+   {
+    "id": "p_000088",
+    "asset": "kit_heartland_isoplaza_slab_nw",
+    "x": 384,
+    "y": 512
+   },
+   {
+    "id": "p_000089",
+    "asset": "kit_heartland_isoplaza_slab_esw",
+    "x": 512,
+    "y": 480
+   },
+   {
+    "id": "p_000090",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 480,
+    "y": 496
+   },
+   {
+    "id": "p_000091",
+    "asset": "kit_heartland_isoplaza_slab_new",
+    "x": 448,
+    "y": 512
+   },
+   {
+    "id": "p_000092",
+    "asset": "kit_heartland_isoplaza_slab_es",
+    "x": 576,
+    "y": 480
+   },
+   {
+    "id": "p_000093",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 544,
+    "y": 496
+   },
+   {
+    "id": "p_000094",
+    "asset": "kit_heartland_isoplaza_slab_nsw",
+    "x": 512,
+    "y": 512
+   },
+   {
+    "id": "p_000095",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 480,
+    "y": 528
+   },
+   {
+    "id": "p_000096",
+    "asset": "kit_heartland_isoplaza_slab_ne",
+    "x": 448,
+    "y": 544
+   },
+   {
+    "id": "p_000097",
+    "asset": "kit_heartland_isoplaza_slab_es",
+    "x": 640,
+    "y": 480
+   },
+   {
+    "id": "p_000098",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 608,
+    "y": 496
+   },
+   {
+    "id": "p_000099",
+    "asset": "kit_heartland_isoplaza_slab_nw",
+    "x": 576,
+    "y": 512
+   },
+   {
+    "id": "p_000100",
+    "asset": "kit_heartland_isoplaza_slab_sw",
+    "x": 512,
+    "y": 544
+   },
+   {
+    "id": "p_000101",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 480,
+    "y": 560
+   },
+   {
+    "id": "p_000102",
+    "asset": "kit_heartland_isoplaza_slab_ne",
+    "x": 448,
+    "y": 576
+   },
+   {
+    "id": "p_000103",
+    "asset": "kit_heartland_isoplaza_slab_es",
+    "x": 704,
+    "y": 480
+   },
+   {
+    "id": "p_000104",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 672,
+    "y": 496
+   },
+   {
+    "id": "p_000105",
+    "asset": "kit_heartland_isoplaza_slab_nw",
+    "x": 640,
+    "y": 512
+   },
+   {
+    "id": "p_000106",
+    "asset": "kit_heartland_isoplaza_slab_sw",
+    "x": 512,
+    "y": 576
+   },
+   {
+    "id": "p_000107",
+    "asset": "kit_heartland_isoplaza_slab_nw",
+    "x": 480,
+    "y": 592
+   },
+   {
+    "id": "p_000108",
+    "asset": "kit_heartland_isoplaza_slab_es",
+    "x": 768,
+    "y": 480
+   },
+   {
+    "id": "p_000109",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 736,
+    "y": 496
+   },
+   {
+    "id": "p_000110",
+    "asset": "kit_heartland_isoplaza_slab_nw",
+    "x": 704,
+    "y": 512
+   },
+   {
+    "id": "p_000111",
+    "asset": "kit_heartland_isoplaza_slab_es",
+    "x": 832,
+    "y": 480
+   },
+   {
+    "id": "p_000112",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 800,
+    "y": 496
+   },
+   {
+    "id": "p_000113",
+    "asset": "kit_heartland_isoplaza_slab_nw",
+    "x": 768,
+    "y": 512
+   },
+   {
+    "id": "p_000114",
+    "asset": "kit_heartland_isoplaza_slab_s",
+    "x": 896,
+    "y": 480
+   },
+   {
+    "id": "p_000115",
+    "asset": "kit_heartland_isoplaza_slab_nesw",
+    "x": 864,
+    "y": 496
+   },
+   {
+    "id": "p_000116",
+    "asset": "kit_heartland_isoplaza_slab_nw",
+    "x": 832,
+    "y": 512
+   },
+   {
+    "id": "p_000117",
+    "asset": "kit_heartland_isoplaza_slab_w",
+    "x": 896,
+    "y": 512
+   },
+   {
+    "id": "p_000118",
+    "asset": "kit_heartland_isoroad_slab_s",
+    "x": 736,
+    "y": 48
+   },
+   {
+    "id": "p_000119",
+    "asset": "kit_heartland_isoroad_slab_ns",
+    "x": 704,
+    "y": 64
+   },
+   {
+    "id": "p_000120",
+    "asset": "kit_heartland_isoroad_slab_ns",
+    "x": 672,
+    "y": 80
+   },
+   {
+    "id": "p_000121",
+    "asset": "kit_heartland_isoroad_slab_ns",
+    "x": 640,
+    "y": 96
+   },
+   {
+    "id": "p_000122",
+    "asset": "kit_heartland_isoroad_slab_ns",
+    "x": 608,
+    "y": 112
+   },
+   {
+    "id": "p_000123",
+    "asset": "kit_heartland_isoroad_slab_ns",
+    "x": 576,
+    "y": 128
+   },
+   {
+    "id": "p_000124",
+    "asset": "kit_heartland_isoroad_slab_ns",
+    "x": 544,
+    "y": 144
+   },
+   {
+    "id": "p_000125",
+    "asset": "kit_heartland_isoroad_slab_ns",
+    "x": 512,
+    "y": 160
+   },
+   {
+    "id": "p_000126",
+    "asset": "kit_heartland_isoroad_slab_ns",
+    "x": 480,
+    "y": 176
+   },
+   {
+    "id": "p_000127",
+    "asset": "kit_heartland_isoroad_slab_s",
+    "x": 896,
+    "y": 160
+   },
+   {
+    "id": "p_000128",
+    "asset": "kit_heartland_isoroad_slab_ns",
+    "x": 864,
+    "y": 176
+   },
+   {
+    "id": "p_000129",
+    "asset": "kit_heartland_isoroad_slab_ns",
+    "x": 832,
+    "y": 192
+   },
+   {
+    "id": "p_000130",
+    "asset": "kit_heartland_isoroad_slab_ns",
+    "x": 800,
+    "y": 208
+   },
+   {
+    "id": "p_000131",
+    "asset": "kit_heartland_isoroad_slab_ns",
+    "x": 768,
+    "y": 224
+   },
+   {
+    "id": "p_000132",
+    "asset": "kit_heartland_isoroad_slab_ns",
+    "x": 736,
+    "y": 240
+   },
+   {
+    "id": "p_000133",
+    "asset": "kit_heartland_isoroad_slab_ns",
+    "x": 704,
+    "y": 256
+   },
+   {
+    "id": "p_000134",
+    "asset": "kit_heartland_isoroad_slab_nes",
+    "x": 672,
+    "y": 272
+   },
+   {
+    "id": "p_000135",
+    "asset": "kit_heartland_isoroad_slab_ns",
+    "x": 640,
+    "y": 288
+   },
+   {
+    "id": "p_000136",
+    "asset": "kit_heartland_isoroad_slab_n",
+    "x": 608,
+    "y": 304
+   },
+   {
+    "id": "p_000137",
+    "asset": "kit_heartland_isoroad_slab_e",
+    "x": 192,
+    "y": 64
+   },
+   {
+    "id": "p_000138",
+    "asset": "kit_heartland_isoroad_slab_ew",
+    "x": 224,
+    "y": 80
+   },
+   {
+    "id": "p_000139",
+    "asset": "kit_heartland_isoroad_slab_ew",
+    "x": 256,
+    "y": 96
+   },
+   {
+    "id": "p_000140",
+    "asset": "kit_heartland_isoroad_slab_ew",
+    "x": 288,
+    "y": 112
+   },
+   {
+    "id": "p_000141",
+    "asset": "kit_heartland_isoroad_slab_ew",
+    "x": 320,
+    "y": 128
+   },
+   {
+    "id": "p_000142",
+    "asset": "kit_heartland_isoroad_slab_ew",
+    "x": 352,
+    "y": 144
+   },
+   {
+    "id": "p_000143",
+    "asset": "kit_heartland_isoroad_slab_ew",
+    "x": 384,
+    "y": 160
+   },
+   {
+    "id": "p_000144",
+    "asset": "kit_heartland_isoroad_slab_ew",
+    "x": 416,
+    "y": 176
+   },
+   {
+    "id": "p_000145",
+    "asset": "kit_heartland_isoroad_slab_nw",
+    "x": 448,
+    "y": 192
+   },
+   {
+    "id": "p_000146",
+    "asset": "kit_heartland_isoroad_slab_s",
+    "x": 288,
+    "y": 464
+   },
+   {
+    "id": "p_000147",
+    "asset": "kit_heartland_isoroad_slab_ns",
+    "x": 256,
+    "y": 480
+   },
+   {
+    "id": "p_000148",
+    "asset": "kit_heartland_isoroad_slab_ns",
+    "x": 224,
+    "y": 496
+   },
+   {
+    "id": "p_000149",
+    "asset": "kit_heartland_isoroad_slab_ns",
+    "x": 192,
+    "y": 512
+   },
+   {
+    "id": "p_000150",
+    "asset": "kit_heartland_isoroad_slab_ns",
+    "x": 160,
+    "y": 528
+   },
+   {
+    "id": "p_000151",
+    "asset": "kit_heartland_isoroad_slab_ns",
+    "x": 128,
+    "y": 544
+   },
+   {
+    "id": "p_000152",
+    "asset": "kit_heartland_isoroad_slab_ns",
+    "x": 96,
+    "y": 560
+   },
+   {
+    "id": "p_000153",
+    "asset": "kit_heartland_isoroad_slab_n",
+    "x": 64,
+    "y": 576
+   },
+   {
+    "id": "p_000154",
+    "asset": "kit_heartland_isoroad_slab_e",
+    "x": 640,
+    "y": 448
+   },
+   {
+    "id": "p_000155",
+    "asset": "kit_heartland_isoroad_slab_ew",
+    "x": 672,
+    "y": 464
+   },
+   {
+    "id": "p_000156",
+    "asset": "kit_heartland_isoroad_slab_ew",
+    "x": 704,
+    "y": 480
+   },
+   {
+    "id": "p_000157",
+    "asset": "kit_heartland_isoroad_slab_ew",
+    "x": 736,
+    "y": 496
+   },
+   {
+    "id": "p_000158",
+    "asset": "kit_heartland_isoroad_slab_ew",
+    "x": 768,
+    "y": 512
+   },
+   {
+    "id": "p_000159",
+    "asset": "kit_heartland_isoroad_slab_ew",
+    "x": 800,
+    "y": 528
+   },
+   {
+    "id": "p_000160",
+    "asset": "kit_heartland_isoroad_slab_ew",
+    "x": 832,
+    "y": 544
+   },
+   {
+    "id": "p_000161",
+    "asset": "kit_heartland_isoroad_slab_ew",
+    "x": 864,
+    "y": 560
+   },
+   {
+    "id": "p_000162",
+    "asset": "kit_heartland_isoroad_slab_ew",
+    "x": 896,
+    "y": 576
+   },
+   {
+    "id": "p_000163",
+    "asset": "kit_heartland_isoroad_slab_w",
+    "x": 928,
+    "y": 592
+   },
+   {
+    "id": "p_000164",
+    "asset": "kit_heartland_isoroad_slab_e",
+    "x": 0,
+    "y": 224
+   },
+   {
+    "id": "p_000165",
+    "asset": "kit_heartland_isoroad_slab_ew",
+    "x": 32,
+    "y": 240
+   },
+   {
+    "id": "p_000166",
+    "asset": "kit_heartland_isoroad_slab_ew",
+    "x": 64,
+    "y": 256
+   },
+   {
+    "id": "p_000167",
+    "asset": "kit_heartland_isoroad_slab_ew",
+    "x": 96,
+    "y": 272
+   },
+   {
+    "id": "p_000168",
+    "asset": "kit_heartland_isoroad_slab_ew",
+    "x": 128,
+    "y": 288
+   },
+   {
+    "id": "p_000169",
+    "asset": "kit_heartland_isoroad_slab_ew",
+    "x": 160,
+    "y": 304
+   },
+   {
+    "id": "p_000170",
+    "asset": "kit_heartland_isoroad_slab_ew",
+    "x": 192,
+    "y": 320
+   },
+   {
+    "id": "p_000171",
+    "asset": "kit_heartland_isoroad_slab_ew",
+    "x": 224,
+    "y": 336
+   },
+   {
+    "id": "p_000172",
+    "asset": "kit_heartland_isoroad_slab_ew",
+    "x": 256,
+    "y": 352
+   },
+   {
+    "id": "p_000173",
+    "asset": "kit_heartland_isoroad_slab_ew",
+    "x": 288,
+    "y": 368
+   },
+   {
+    "id": "p_000174",
+    "asset": "kit_heartland_isoroad_slab_ew",
+    "x": 320,
+    "y": 384
+   },
+   {
+    "id": "p_000175",
+    "asset": "kit_heartland_isoroad_slab_ew",
+    "x": 352,
+    "y": 400
+   },
+   {
+    "id": "p_000176",
+    "asset": "kit_heartland_isoroad_slab_ew",
+    "x": 384,
+    "y": 416
+   },
+   {
+    "id": "p_000177",
+    "asset": "kit_heartland_isoroad_slab_ew",
+    "x": 416,
+    "y": 432
+   },
+   {
+    "id": "p_000178",
+    "asset": "kit_heartland_isoroad_slab_w",
+    "x": 448,
+    "y": 448
+   },
+   {
+    "id": "p_000179",
+    "asset": "kit_heartland_isoroad_slab_ew",
+    "x": 704,
+    "y": 288
+   },
+   {
+    "id": "p_000180",
+    "asset": "kit_heartland_isoroad_slab_ew",
+    "x": 736,
+    "y": 304
+   },
+   {
+    "id": "p_000181",
+    "asset": "kit_heartland_isoroad_slab_ew",
+    "x": 768,
+    "y": 320
+   },
+   {
+    "id": "p_000182",
+    "asset": "kit_heartland_isoroad_slab_ew",
+    "x": 800,
+    "y": 336
+   },
+   {
+    "id": "p_000183",
+    "asset": "kit_heartland_isoroad_slab_ew",
+    "x": 832,
+    "y": 352
+   },
+   {
+    "id": "p_000184",
+    "asset": "kit_heartland_isoroad_slab_ew",
+    "x": 864,
+    "y": 368
+   },
+   {
+    "id": "p_000185",
+    "asset": "kit_heartland_isoroad_slab_ew",
+    "x": 896,
+    "y": 384
+   },
+   {
+    "id": "p_000186",
+    "asset": "kit_heartland_isoroad_slab_ew",
+    "x": 928,
+    "y": 400
+   },
+   {
+    "id": "p_000187",
+    "asset": "kit_heartland_isoroad_slab_w",
+    "x": 960,
+    "y": 416
+   },
+   {
+    "id": "p_000188",
+    "asset": "kit_heartland_isowall_city_greybrick_s",
+    "x": 448,
+    "y": 0
+   },
+   {
+    "id": "p_000189",
+    "asset": "kit_heartland_isowall_city_greybrick_ns",
+    "x": 416,
+    "y": 16
+   },
+   {
+    "id": "p_000190",
+    "asset": "kit_heartland_isowall_city_greybrick_ns",
+    "x": 384,
+    "y": 32
+   },
+   {
+    "id": "p_000191",
+    "asset": "kit_heartland_isowall_city_greybrick_ns",
+    "x": 352,
+    "y": 48
+   },
+   {
+    "id": "p_000192",
+    "asset": "kit_heartland_isowall_city_greybrick_ns",
+    "x": 320,
+    "y": 64
+   },
+   {
+    "id": "p_000196",
+    "asset": "kit_heartland_isowall_city_greybrick_ns",
+    "x": 192,
+    "y": 128
+   },
+   {
+    "id": "p_000197",
+    "asset": "kit_heartland_isowall_city_greybrick_ns",
+    "x": 160,
+    "y": 144
+   },
+   {
+    "id": "p_000198",
+    "asset": "kit_heartland_isowall_city_greybrick_ns",
+    "x": 128,
+    "y": 160
+   },
+   {
+    "id": "p_000199",
+    "asset": "kit_heartland_isowall_city_greybrick_ns",
+    "x": 96,
+    "y": 176
+   },
+   {
+    "id": "p_000200",
+    "asset": "kit_heartland_isowall_city_greybrick_ns",
+    "x": 64,
+    "y": 192
+   },
+   {
+    "id": "p_000201",
+    "asset": "kit_heartland_isowall_city_greybrick_ns",
+    "x": 32,
+    "y": 208
+   },
+   {
+    "id": "p_000202",
+    "asset": "kit_heartland_isowall_city_greybrick_n",
+    "x": 0,
+    "y": 224
+   },
+   {
+    "id": "p_000203",
+    "asset": "kit_heartland_isowall_city_greybrick_e",
+    "x": 576,
+    "y": 0
+   },
+   {
+    "id": "p_000204",
+    "asset": "kit_heartland_isowall_city_greybrick_ew",
+    "x": 608,
+    "y": 16
+   },
+   {
+    "id": "p_000205",
+    "asset": "kit_heartland_isowall_city_greybrick_ew",
+    "x": 640,
+    "y": 32
+   },
+   {
+    "id": "p_000209",
+    "asset": "kit_heartland_isowall_city_greybrick_ew",
+    "x": 768,
+    "y": 96
+   },
+   {
+    "id": "p_000210",
+    "asset": "kit_heartland_isowall_city_greybrick_ew",
+    "x": 800,
+    "y": 112
+   },
+   {
+    "id": "p_000211",
+    "asset": "kit_heartland_isowall_city_greybrick_ew",
+    "x": 832,
+    "y": 128
+   },
+   {
+    "id": "p_000212",
+    "asset": "kit_heartland_isowall_city_greybrick_ew",
+    "x": 864,
+    "y": 144
+   },
+   {
+    "id": "p_000213",
+    "asset": "kit_heartland_isowall_city_greybrick_ew",
+    "x": 896,
+    "y": 160
+   },
+   {
+    "id": "p_000214",
+    "asset": "kit_heartland_isowall_city_greybrick_ew",
+    "x": 928,
+    "y": 176
+   },
+   {
+    "id": "p_000215",
+    "asset": "kit_heartland_isowall_city_greybrick_w",
+    "x": 960,
+    "y": 192
+   },
+   {
+    "id": "p_000216",
+    "asset": "kit_heartland_isowall_city_greybrick_s",
+    "x": 960,
+    "y": 448
+   },
+   {
+    "id": "p_000217",
+    "asset": "kit_heartland_isowall_city_greybrick_ns",
+    "x": 928,
+    "y": 464
+   },
+   {
+    "id": "p_000218",
+    "asset": "kit_heartland_isowall_city_greybrick_ns",
+    "x": 896,
+    "y": 480
+   },
+   {
+    "id": "p_000219",
+    "asset": "kit_heartland_isowall_city_greybrick_ns",
+    "x": 864,
+    "y": 496
+   },
+   {
+    "id": "p_000223",
+    "asset": "kit_heartland_isowall_city_greybrick_ns",
+    "x": 736,
+    "y": 560
+   },
+   {
+    "id": "p_000224",
+    "asset": "kit_heartland_isowall_city_greybrick_ns",
+    "x": 704,
+    "y": 576
+   },
+   {
+    "id": "p_000225",
+    "asset": "kit_heartland_isowall_city_greybrick_ns",
+    "x": 672,
+    "y": 592
+   },
+   {
+    "id": "p_000226",
+    "asset": "kit_heartland_isowall_city_greybrick_ns",
+    "x": 640,
+    "y": 608
+   },
+   {
+    "id": "p_000227",
+    "asset": "kit_heartland_isowall_city_greybrick_ns",
+    "x": 608,
+    "y": 624
+   },
+   {
+    "id": "p_000228",
+    "asset": "kit_heartland_isowall_city_greybrick_n",
+    "x": 576,
+    "y": 640
+   },
+   {
+    "id": "p_000229",
+    "asset": "kit_heartland_isowall_city_greybrick_e",
+    "x": 0,
+    "y": 416
+   },
+   {
+    "id": "p_000230",
+    "asset": "kit_heartland_isowall_city_greybrick_ew",
+    "x": 32,
+    "y": 432
+   },
+   {
+    "id": "p_000231",
+    "asset": "kit_heartland_isowall_city_greybrick_ew",
+    "x": 64,
+    "y": 448
+   },
+   {
+    "id": "p_000232",
+    "asset": "kit_heartland_isowall_city_greybrick_ew",
+    "x": 96,
+    "y": 464
+   },
+   {
+    "id": "p_000233",
+    "asset": "kit_heartland_isowall_city_greybrick_ew",
+    "x": 128,
+    "y": 480
+   },
+   {
+    "id": "p_000237",
+    "asset": "kit_heartland_isowall_city_greybrick_ew",
+    "x": 256,
+    "y": 544
+   },
+   {
+    "id": "p_000238",
+    "asset": "kit_heartland_isowall_city_greybrick_ew",
+    "x": 288,
+    "y": 560
+   },
+   {
+    "id": "p_000239",
+    "asset": "kit_heartland_isowall_city_greybrick_ew",
+    "x": 320,
+    "y": 576
+   },
+   {
+    "id": "p_000240",
+    "asset": "kit_heartland_isowall_city_greybrick_ew",
+    "x": 352,
+    "y": 592
+   },
+   {
+    "id": "p_000241",
+    "asset": "kit_heartland_isowall_city_greybrick_ew",
+    "x": 384,
+    "y": 608
+   },
+   {
+    "id": "p_000242",
+    "asset": "kit_heartland_isowall_city_greybrick_ew",
+    "x": 416,
+    "y": 624
+   },
+   {
+    "id": "p_000243",
+    "asset": "kit_heartland_isowall_city_greybrick_w",
+    "x": 448,
+    "y": 640
+   },
+   {
+    "id": "p_000244",
+    "asset": "kit_heartland_isowall_city_greybrick_gate_sw",
+    "x": 256,
+    "y": 96
+   },
+   {
+    "id": "p_000245",
+    "asset": "kit_heartland_isowall_city_greybrick_gate_se",
+    "x": 704,
+    "y": 64
+   },
+   {
+    "id": "p_000246",
+    "asset": "kit_heartland_isowall_city_greybrick_gate_se",
+    "x": 192,
+    "y": 512
+   },
+   {
+    "id": "p_000247",
+    "asset": "kit_heartland_isowall_city_greybrick_gate_sw",
+    "x": 800,
+    "y": 528
+   },
+   {
+    "id": "p_000248",
+    "asset": "bld_heartland_yamen_01",
+    "x": 470,
+    "y": 180
+   },
+   {
+    "id": "p_000249",
+    "asset": "bld_heartland_wine_shop_01",
+    "x": 640,
+    "y": 168,
+    "scale": 0.75
+   },
+   {
+    "id": "p_000250",
+    "asset": "bld_heartland_teahouse_02",
+    "x": 175,
+    "y": 226,
+    "scale": 0.8
+   },
+   {
+    "id": "p_000251",
+    "asset": "bld_heartland_teahouse_01",
+    "x": 735,
+    "y": 236,
+    "scale": 0.85
+   },
+   {
+    "id": "p_000252",
+    "asset": "bld_heartland_smithy_01",
+    "x": 200,
+    "y": 448,
+    "scale": 0.75
+   },
+   {
+    "id": "p_000253",
+    "asset": "prp_heartland_incense_burner_02",
+    "x": 330,
+    "y": 176,
+    "scale": 0.9
+   },
+   {
+    "id": "p_000254",
+    "asset": "prp_interior_dining_table_03",
+    "x": 650,
+    "y": 292,
+    "scale": 0.75
+   },
+   {
+    "id": "p_000255",
+    "asset": "prp_interior_guqin_table_02",
+    "x": 790,
+    "y": 330,
+    "scale": 0.8
+   },
+   {
+    "id": "p_000256",
+    "asset": "prp_heartland_crates_sacks_05",
+    "x": 912,
+    "y": 278,
+    "scale": 0.9
+   },
+   {
+    "id": "p_000257",
+    "asset": "prp_heartland_barrels_02",
+    "x": 918,
+    "y": 352,
+    "scale": 0.8
+   },
+   {
+    "id": "p_000258",
+    "asset": "prp_heartland_market_stall_03",
+    "x": 602,
+    "y": 276,
+    "scale": 0.85
+   },
+   {
+    "id": "p_000259",
+    "asset": "prp_heartland_market_stall_06",
+    "x": 380,
+    "y": 302,
+    "scale": 0.85
+   },
+   {
+    "id": "p_000260",
+    "asset": "prp_heartland_market_stall_02",
+    "x": 640,
+    "y": 362,
+    "scale": 0.85
+   },
+   {
+    "id": "p_000261",
+    "asset": "prp_heartland_well_05",
+    "x": 480,
+    "y": 350,
+    "scale": 0.9
+   },
+   {
+    "id": "p_000262",
+    "asset": "prp_heartland_stone_lion_05",
+    "x": 424,
+    "y": 430,
+    "scale": 0.85
+   },
+   {
+    "id": "p_000263",
+    "asset": "prp_heartland_stone_lion_05",
+    "x": 536,
+    "y": 430,
+    "scale": 0.85,
+    "flip": true
+   },
+   {
+    "id": "p_000264",
+    "asset": "prp_heartland_market_stall_05",
+    "x": 336,
+    "y": 452,
+    "scale": 0.7
+   },
+   {
+    "id": "p_000265",
+    "asset": "prp_heartland_market_stall_07",
+    "x": 412,
+    "y": 452,
+    "scale": 0.7
+   },
+   {
+    "id": "p_000266",
+    "asset": "prp_heartland_market_stall_01",
+    "x": 584,
+    "y": 452,
+    "scale": 0.7
+   },
+   {
+    "id": "p_000267",
+    "asset": "prp_heartland_market_stall_08",
+    "x": 691,
+    "y": 452,
+    "scale": 0.7
+   },
+   {
+    "id": "p_000268",
+    "asset": "prp_heartland_market_stall_04",
+    "x": 797,
+    "y": 452,
+    "scale": 0.7
+   },
+   {
+    "id": "p_000269",
+    "asset": "prp_heartland_water_vat_03",
+    "x": 262,
+    "y": 450,
+    "scale": 0.8
+   },
+   {
+    "id": "p_000270",
+    "asset": "nat_temperate_willow_05",
+    "x": 70,
+    "y": 440,
+    "scale": 0.8
+   },
+   {
+    "id": "p_000271",
+    "asset": "nat_temperate_maple_02",
+    "x": 40,
+    "y": 330,
+    "scale": 0.75
+   },
+   {
+    "id": "p_000272",
+    "asset": "nat_temperate_maple_05",
+    "x": 115,
+    "y": 318,
+    "scale": 0.7
+   },
+   {
+    "id": "p_000273",
+    "asset": "nat_temperate_blossom_tree_04",
+    "x": 880,
+    "y": 440,
+    "scale": 0.8
+   },
+   {
+    "id": "p_000274",
+    "asset": "nat_temperate_willow_02",
+    "x": 880,
+    "y": 240,
+    "scale": 0.75
+   },
+   {
+    "id": "p_000275",
+    "asset": "prp_heartland_notice_board_01",
+    "x": 345,
+    "y": 548,
+    "scale": 0.9
+   },
+   {
+    "id": "p_000276",
+    "asset": "sct_songshan_alliance_flag",
+    "x": 422,
+    "y": 552,
+    "scale": 0.9
+   },
+   {
+    "id": "p_000277",
+    "asset": "sct_jinyiwei_horse_post",
+    "x": 620,
+    "y": 552
+   },
+   {
+    "id": "p_000278",
+    "asset": "prp_heartland_haystack_02",
+    "x": 660,
+    "y": 566,
+    "scale": 0.8
+   },
+   {
+    "id": "p_000279",
+    "asset": "prp_heartland_handcart_05",
+    "x": 535,
+    "y": 568,
+    "scale": 0.8
+   },
+   {
+    "id": "p_000280",
+    "asset": "nat_temperate_boulder_02",
+    "x": 850,
+    "y": 600,
+    "scale": 0.8
+   },
+   {
+    "id": "p_000281",
+    "asset": "nat_temperate_pine_05",
+    "x": 20,
+    "y": 440,
+    "scale": 0.7
+   },
+   {
+    "id": "p_000282",
+    "asset": "nat_temperate_pine_06",
+    "x": 130,
+    "y": 40,
+    "scale": 0.7
+   },
+   {
+    "id": "p_000283",
+    "asset": "nat_temperate_maple_06",
+    "x": 860,
+    "y": 60,
+    "scale": 0.7
+   },
+   {
+    "id": "p_000284",
+    "asset": "nat_temperate_pine_01",
+    "x": 40,
+    "y": 70,
+    "scale": 0.8
+   },
+   {
+    "id": "p_000285",
+    "asset": "nat_temperate_pine_07",
+    "x": 205,
+    "y": 30,
+    "scale": 0.7
+   },
+   {
+    "id": "p_000286",
+    "asset": "nat_temperate_maple_03",
+    "x": 330,
+    "y": 20,
+    "scale": 0.6
+   },
+   {
+    "id": "p_000287",
+    "asset": "nat_temperate_pine_04",
+    "x": 920,
+    "y": 120,
+    "scale": 0.7
+   },
+   {
+    "id": "p_000288",
+    "asset": "nat_temperate_willow_07",
+    "x": 640,
+    "y": 20,
+    "scale": 0.6
+   },
+   {
+    "id": "p_000289",
+    "asset": "prp_heartland_veg_plot_02",
+    "x": 60,
+    "y": 520,
+    "scale": 0.9
+   },
+   {
+    "id": "p_000290",
+    "asset": "prp_heartland_veg_plot_05",
+    "x": 150,
+    "y": 600,
+    "scale": 0.9
+   },
+   {
+    "id": "p_000291",
+    "asset": "prp_heartland_scarecrow_03",
+    "x": 40,
+    "y": 600,
+    "scale": 0.9
+   },
+   {
+    "id": "p_000292",
+    "asset": "nat_temperate_boulder_05",
+    "x": 925,
+    "y": 590,
+    "scale": 0.8
+   },
+   {
+    "id": "p_000293",
+    "asset": "nat_temperate_boulder_03",
+    "x": 800,
+    "y": 625,
+    "scale": 0.8
+   },
+   {
+    "id": "p_000294",
+    "asset": "nat_temperate_bush_04",
+    "x": 700,
+    "y": 615,
+    "scale": 1
+   },
+   {
+    "id": "p_000295",
+    "asset": "nat_temperate_bush_06",
+    "x": 280,
+    "y": 625,
+    "scale": 1
+   },
+   {
+    "id": "p_000296",
+    "asset": "nat_temperate_maple_08",
+    "x": 935,
+    "y": 500,
+    "scale": 0.7
+   },
+   {
+    "id": "p_000297",
+    "asset": "prp_heartland_street_lantern_07",
+    "x": 440,
+    "y": 250,
+    "scale": 0.8
+   },
+   {
+    "id": "p_000298",
+    "asset": "prp_heartland_street_lantern_07",
+    "x": 520,
+    "y": 250,
+    "scale": 0.8
+   },
+   {
+    "id": "p_000299",
+    "asset": "bld_heartland_pharmacy_03",
+    "x": 592,
+    "y": 72,
+    "scale": 0.56,
+    "flip": true
+   },
+   {
+    "id": "p_000300",
+    "asset": "bld_heartland_pharmacy_02",
+    "x": 368,
+    "y": 104,
+    "scale": 0.56
+   },
+   {
+    "id": "p_000301",
+    "asset": "bld_heartland_pharmacy_03",
+    "x": 528,
+    "y": 104,
+    "scale": 0.63,
+    "flip": true
+   },
+   {
+    "id": "p_000302",
+    "asset": "bld_heartland_smithy_04",
+    "x": 784,
+    "y": 168,
+    "scale": 0.57,
+    "flip": true
+   },
+   {
+    "id": "p_000303",
+    "asset": "bld_heartland_pharmacy_03",
+    "x": 160,
+    "y": 256,
+    "scale": 0.6
+   },
+   {
+    "id": "p_000304",
+    "asset": "bld_heartland_smithy_02",
+    "x": 672,
+    "y": 416,
+    "scale": 0.68
+   },
+   {
+    "id": "p_000305",
+    "asset": "bld_heartland_pharmacy_01",
+    "x": 288,
+    "y": 224,
+    "scale": 0.59
+   },
+   {
+    "id": "p_000306",
+    "asset": "bld_heartland_shrine_hall_03",
+    "x": 320,
+    "y": 256,
+    "scale": 0.59
+   },
+   {
+    "id": "p_000307",
+    "asset": "bld_heartland_pharmacy_02",
+    "x": 144,
+    "y": 360,
+    "scale": 0.58
+   },
+   {
+    "id": "p_000308",
+    "asset": "bld_heartland_shrine_hall_03",
+    "x": 736,
+    "y": 368,
+    "scale": 0.57
+   },
+   {
+    "id": "p_000309",
+    "asset": "bld_heartland_shrine_hall_03",
+    "x": 208,
+    "y": 392,
+    "scale": 0.59
+   },
+   {
+    "id": "p_000310",
+    "asset": "bld_heartland_wine_shop_04",
+    "x": 448,
+    "y": 80,
+    "scale": 0.57,
+    "flip": true
+   },
+   {
+    "id": "p_000311",
+    "asset": "bld_heartland_shrine_hall_04",
+    "x": 256,
+    "y": 176,
+    "scale": 0.69,
+    "flip": true
+   },
+   {
+    "id": "p_000313",
+    "asset": "bld_heartland_wine_shop_03",
+    "x": 784,
+    "y": 424,
+    "scale": 0.63
+   },
+   {
+    "id": "p_000314",
+    "asset": "prp_heartland_market_stall_02",
+    "x": 554,
+    "y": 230,
+    "scale": 0.68,
+    "flip": true
+   },
+   {
+    "id": "p_000315",
+    "asset": "prp_heartland_crates_sacks_02",
+    "x": 442,
+    "y": 302,
+    "scale": 0.85
+   },
+   {
+    "id": "p_000316",
+    "asset": "prp_heartland_crates_sacks_02",
+    "x": 624,
+    "y": 314,
+    "scale": 0.85
+   },
+   {
+    "id": "p_000317",
+    "asset": "prp_heartland_crates_sacks_02",
+    "x": 386,
+    "y": 326,
+    "scale": 0.85
+   },
+   {
+    "id": "p_000318",
+    "asset": "prp_heartland_market_stall_08",
+    "x": 554,
+    "y": 350,
+    "scale": 0.68,
+    "flip": true
+   },
+   {
+    "id": "p_000319",
+    "asset": "prp_heartland_street_lantern_02",
+    "x": 526,
+    "y": 374,
+    "scale": 0.85,
+    "flip": true
+   },
+   {
+    "id": "p_000320",
+    "asset": "prp_heartland_barrels_05",
+    "x": 554,
+    "y": 386,
+    "scale": 0.85,
+    "flip": true
+   },
+   {
+    "id": "p_000321",
+    "asset": "prp_heartland_pottery_03",
+    "x": 638,
+    "y": 470,
+    "scale": 0.85
+   },
+   {
+    "id": "p_000322",
+    "asset": "prp_heartland_crates_sacks_07",
+    "x": 372,
+    "y": 494,
+    "scale": 0.85
+   },
+   {
+    "id": "p_000323",
+    "asset": "prp_heartland_pottery_03",
+    "x": 624,
+    "y": 494,
+    "scale": 0.85,
+    "flip": true
+   },
+   {
+    "id": "p_000324",
+    "asset": "prp_heartland_water_vat_05",
+    "x": 414,
+    "y": 506,
+    "scale": 0.85
+   },
+   {
+    "id": "p_000326",
+    "asset": "prp_heartland_pottery_03",
+    "x": 330,
+    "y": 518,
+    "scale": 0.85
+   },
+   {
+    "id": "p_000327",
+    "asset": "prp_heartland_water_vat_05",
+    "x": 638,
+    "y": 518,
+    "scale": 0.85,
+    "flip": true
+   }
+  ]
+ },
+ "grounds": {
+  "city_capital": {
+   "tile": "til_heartland_brick_dirt_07"
+  }
+ }
 }

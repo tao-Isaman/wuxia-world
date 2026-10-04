@@ -8,7 +8,7 @@
  */
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import type { AssetEntry, Placement, PlacementsFile } from "@/lib/assets/types";
-import { indexAssets, loadPlacements, reloadAssetData } from "@/lib/assets/catalog";
+import { effectiveMapImage, indexAssets, loadPlacements, reloadAssetData } from "@/lib/assets/catalog";
 import { placementsGeometry } from "@/lib/assets/placement-geometry";
 import { saveEngineFile } from "@/lib/engine/save";
 import { engineStorageGet, engineStorageSet, prepareEnginePlaytest } from "@/lib/engine/goto";
@@ -19,7 +19,7 @@ import { worldFootprints } from "@/lib/stage/world-navigation";
 import { mapAnchors, placementIssues, type MapAnchor } from "@/lib/stage/map-anchors";
 import {
   DRAFT_KEY, EDITOR_MAP_IDS, EMPTY_FILE, clampToMap, commit, editPlacements, initHistory, newPlacement, nextPlacementId,
-  normalizeFile, redo, sameFile, setMap, snap, undo, type History,
+  normalizeFile, redo, sameFile, setGround, setMap, snap, undo, type History,
 } from "./map-editor/model";
 import { MapStage, movedPoint, type LabelledAnchor } from "./map-editor/map-stage";
 import { AssetPalette } from "./map-editor/asset-palette";
@@ -81,7 +81,7 @@ export function MapEditor({ assets }: { assets: AssetEntry[] }) {
     reloadAssetData();
     void loadPlacements().then((file) => {
       if (!live) return;
-      const saved: PlacementsFile = file?.maps ? { version: 1, maps: file.maps } : EMPTY_FILE;
+      const saved: PlacementsFile = file?.maps ? normalizeFile(file) : EMPTY_FILE;
       let start = saved;
       const raw = engineStorageGet(() => localStorage, DRAFT_KEY);
       if (raw) {
@@ -120,10 +120,17 @@ export function MapEditor({ assets }: { assets: AssetEntry[] }) {
   const selected = useMemo(() => new Set([...selectedIds].filter((id) => existing.has(id))), [selectedIds, existing]);
   const selection = useMemo(() => placements.filter((p) => selected.has(p.id)), [placements, selected]);
   const geometry = useMemo(() => placementsGeometry(placements, index), [placements, index]);
-  const collision = useMemo(() => worldFootprints(mapId, map.image), [mapId, map.image]);
+  // A map whose painting is replaced by a ground keeps none of its painted collision.
+  const mapImage = effectiveMapImage(present, mapId, map.image);
+  const collision = useMemo(() => worldFootprints(mapId, mapImage), [mapId, mapImage]);
+  const groundTile = present.grounds?.[mapId]?.tile ?? "";
+  const groundAsset = groundTile ? index.get(groundTile) : undefined;
+  // Ground fills: the library's solid tiles (all four corners one terrain).
+  const fills = useMemo(() => assets.filter((a) => a.status === "approved" && a.tile && new Set(Object.values(a.tile.corners)).size === 1), [assets]);
   // The reachability check can take a moment on a crowded map: let edits paint first.
   const checked = useDeferredValue(geometry);
-  const found = useMemo(() => placementIssues(mapId, map, checked), [mapId, map, checked]);
+  const checkedMap = useMemo(() => ({ ...map, image: mapImage }), [map, mapImage]);
+  const found = useMemo(() => placementIssues(mapId, checkedMap, checked), [mapId, checkedMap, checked]);
 
   const anchors: LabelledAnchor[] = useMemo(() => {
     const byAnchor = new Map(found.map((issue) => [issue.anchor.id, issue]));
@@ -285,6 +292,11 @@ export function MapEditor({ assets }: { assets: AssetEntry[] }) {
           <button type="button" onClick={stepUndo} disabled={!history.past.length} title="Ctrl+Z">↶ ย้อน</button>
           <button type="button" onClick={stepRedo} disabled={!history.future.length} title="Ctrl+Shift+Z">↷ ทำซ้ำ</button>
         </span>
+        <label>พื้น <select aria-label="พื้นแผนที่" value={groundTile} data-testid="map-ground"
+          onChange={(e) => update((file) => setGround(file, mapId, e.target.value || null))}>
+          <option value="">ภาพวาดเดิม</option>
+          {fills.map((a) => <option key={a.id} value={a.id}>{a.name} ({a.id})</option>)}
+        </select></label>
         <label><input type="checkbox" checked={snapOn} onChange={(e) => setSnapOn(e.target.checked)} /> สแนปกริด</label>
         <select aria-label="ขนาดกริด" value={gridSize} onChange={(e) => setGridSize(Number(e.target.value))} disabled={!snapOn}>
           {GRID_SIZES.map((size) => <option key={size} value={size}>{size}</option>)}
@@ -318,9 +330,9 @@ export function MapEditor({ assets }: { assets: AssetEntry[] }) {
         </ul>
       </section>
 
-      <MapStage image={map.image} placements={placements} assets={index} selected={selected} anchors={anchors}
+      <MapStage image={map.image} ground={groundAsset ? { image: groundAsset.image, size: groundAsset.mapWidth } : null} placements={placements} assets={index} selected={selected} anchors={anchors}
         collision={collision} flagged={flagged} show={show} grid={grid} armed={armed}
-        brush={kit && !armed ? { cell: kit.cell, erase: kitErase } : null} onBrush={brushCells}
+        brush={kit && !armed ? { cell: kit.cell, grid: kit.grid, erase: kitErase } : null} onBrush={brushCells}
         onSelect={select} onMove={moveBy} onPlace={place}
         onDropAsset={(id, x, y) => { const asset = index.get(id); if (asset) place(asset, x, y); }} />
 

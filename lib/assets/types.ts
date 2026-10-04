@@ -101,8 +101,14 @@ export interface KitInfo {
   /** Kit set id: every piece of one road or wall style shares it. */
   set: string;
   kind: "road" | "wall" | "fence";
-  /** Grid cell size in map units (the grid starts at the map's top-left). */
+  /**
+   * Grid cell size in map units. Square grid: a `cell`-wide square (the grid
+   * starts at the map's top-left). Iso grid: a diamond `cell` wide and
+   * `cell / 2` tall, matching the library's isometric buildings.
+   */
   cell: number;
+  /** "iso" for the diamond grid (lib/assets/kits.ts); square when absent. */
+  grid?: "iso";
   /** Sides the piece joins across: N 1, E 2, S 4, W 8. */
   mask: number;
   /** Cells covered (default 1 × 1); the anchor is the bottom centre of the span. */
@@ -138,10 +144,22 @@ export interface Placement {
   collide?: boolean;
 }
 
+/**
+ * A map's ground when its painting is replaced: one tile asset repeated over
+ * the whole 960 × 640 map at the tile's map size. The painting, its collision
+ * and its foreground cut-outs are then gone; only placed objects stand on it.
+ */
+export interface MapGround {
+  /** AssetEntry.id of the fill (a ground tile). */
+  tile: string;
+}
+
 /** Every map's placed objects, keyed by location id (public/assets/placements.json). */
 export interface PlacementsFile {
   version: 1;
   maps: Record<string, Placement[]>;
+  /** Maps whose painting is replaced by a tiled ground, keyed by location id. */
+  grounds?: Record<string, MapGround>;
 }
 
 /** Engine-edited names and descriptions laid over the skill / art tables (lib/game/data/text-overrides.json). */

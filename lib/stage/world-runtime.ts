@@ -488,7 +488,7 @@ export function createWorldRuntime(
     initial.bystanders?.forEach((actor) => ids.add(characterId(actor.characterId)));
     const placedUrls = [...new Set(placed.map((item) => item.image))];
     const [landscape, atlasEntries, propImages, placedImages] = await Promise.all([
-      loadImage(initial.image),
+      loadImage(initial.ground?.image ?? initial.image),
       // Only the controlled hero walks north/south. Stationary NPCs sharing a
       // hero costume need its base poses, not the large direction supplement.
       // Rigged NPCs walk in every direction, so they load it too.
@@ -517,7 +517,15 @@ export function createWorldRuntime(
       } catch { /* keep the archetype sheet for this NPC */ }
     }));
     if (disposed || failed || !scene) return;
+    const ground = initial.ground;
     const backgroundCanvas = drawCanvas(WIDTH, HEIGHT, (context) => {
+      if (ground) {
+        // A replaced painting: the ground tile repeated over the map at its map size.
+        context.imageSmoothingEnabled = false;
+        const size = Math.max(4, ground.size);
+        for (let y = 0; y < HEIGHT; y += size) for (let x = 0; x < WIDTH; x += size) context.drawImage(landscape, x, y, size, size);
+        return;
+      }
       if (initial.mirrorImage) { context.translate(WIDTH, 0); context.scale(-1, 1); }
       context.drawImage(landscape, 0, 0, WIDTH, HEIGHT);
       if (initial.imageGrade) {

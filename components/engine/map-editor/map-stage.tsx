@@ -15,13 +15,15 @@ import {
 import type { WorldFootprint } from "@/lib/stage/world-navigation";
 import type { MapAnchor } from "@/lib/stage/map-anchors";
 import { clampToMap, snap } from "./model";
-import { cellAt, cellLine, snapToKit } from "@/lib/assets/kits";
+import { ISO_ORIGIN_X, cellAt, cellLine, cellOutline, snapToKit } from "@/lib/assets/kits";
 import styles from "./map-editor.module.css";
 
 export interface LabelledAnchor extends MapAnchor { label: string; issue?: string }
 
 export interface StageProps {
   image: string;
+  /** The map's painting replaced by a tile repeated at `size` map units. */
+  ground?: { image: string; size: number } | null;
   placements: readonly Placement[];
   assets: ReadonlyMap<string, AssetEntry>;
   selected: ReadonlySet<string>;
@@ -32,7 +34,7 @@ export interface StageProps {
   grid: number | null;
   armed: AssetEntry | null;
   /** The kit brush: paint (or erase) grid cells of `cell` map units. */
-  brush: { cell: number; erase: boolean } | null;
+  brush: { cell: number; grid?: "iso"; erase: boolean } | null;
   /** A brush stroke reached new cells; `start` is the first call of a stroke. */
   onBrush: (cells: { col: number; row: number }[], erase: boolean, start: boolean) => void;
   onSelect: (ids: string[], mode: "replace" | "add" | "toggle") => void;
@@ -148,7 +150,7 @@ export function MapStage(props: StageProps) {
       props.onPlace(armed, at.x, at.y, event.shiftKey);
       return;
     } else if (brush) {
-      const cell = cellAt(brush.cell, point.x, point.y);
+      const cell = cellAt(brush, point.x, point.y);
       const erase = brush.erase || event.shiftKey;
       drag.current = { kind: "brush", last: cell, erase };
       props.onBrush([cell], erase, true);
@@ -178,7 +180,7 @@ export function MapStage(props: StageProps) {
     const current = drag.current;
     if (!current) return;
     if (current.kind === "brush") {
-      const cell = cellAt(brush?.cell ?? 32, point.x, point.y);
+      const cell = cellAt(brush ?? 32, point.x, point.y);
       if (cell.col === current.last.col && cell.row === current.last.row) return;
       props.onBrush(cellLine(current.last, cell).slice(1), current.erase, false);
       current.last = cell;
@@ -255,16 +257,25 @@ export function MapStage(props: StageProps) {
         <div ref={layer} className={styles.layer} data-testid="map-editor-layer"
           style={{ width: MAP_WIDTH, height: MAP_HEIGHT, transform: `translate(${offset.x}px, ${offset.y}px) scale(${scale})`,
             ["--inverse-scale" as string]: String(1 / scale) }}>
-          <img className={styles.painting} src={image} alt="" draggable={false} />
+          {props.ground
+            ? <div className={styles.painting} data-testid="map-editor-ground"
+              style={{ backgroundImage: `url(${props.ground.image})`, backgroundSize: `${props.ground.size}px ${props.ground.size}px`, imageRendering: "pixelated" }} />
+            : <img className={styles.painting} src={image} alt="" draggable={false} />}
           {ordered.map((item) => item.node)}
           <svg className={styles.overlay} viewBox={`0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`} width={MAP_WIDTH} height={MAP_HEIGHT}>
             {brush && <>
-              <defs><pattern id="map-editor-kit-grid" width={brush.cell} height={brush.cell} patternUnits="userSpaceOnUse">
-                <path d={`M ${brush.cell} 0 L 0 0 0 ${brush.cell}`} fill="none" stroke="rgba(226,189,106,0.35)" strokeWidth={strokes} />
-              </pattern></defs>
+              <defs>{brush.grid === "iso"
+                ? <pattern id="map-editor-kit-grid" width={brush.cell} height={brush.cell / 2} patternUnits="userSpaceOnUse"
+                  x={(ISO_ORIGIN_X - brush.cell / 2) % brush.cell} y={0}>
+                  <path d={`M ${brush.cell / 2} 0 L ${brush.cell} ${brush.cell / 4} L ${brush.cell / 2} ${brush.cell / 2} L 0 ${brush.cell / 4} Z`}
+                    fill="none" stroke="rgba(226,189,106,0.35)" strokeWidth={strokes} />
+                </pattern>
+                : <pattern id="map-editor-kit-grid" width={brush.cell} height={brush.cell} patternUnits="userSpaceOnUse">
+                  <path d={`M ${brush.cell} 0 L 0 0 0 ${brush.cell}`} fill="none" stroke="rgba(226,189,106,0.35)" strokeWidth={strokes} />
+                </pattern>}</defs>
               <rect width={MAP_WIDTH} height={MAP_HEIGHT} fill="url(#map-editor-kit-grid)" />
-              {hover && (() => { const c = cellAt(brush.cell, hover.x, hover.y); return (
-                <rect x={c.col * brush.cell} y={c.row * brush.cell} width={brush.cell} height={brush.cell}
+              {hover && (() => { const c = cellAt(brush, hover.x, hover.y); return (
+                <polygon points={cellOutline(brush, c.col, c.row).map((p) => `${p.x},${p.y}`).join(" ")}
                   className={brush.erase ? styles.brushCellErase : styles.brushCell} strokeWidth={1.5 * strokes} data-testid="kit-brush-cell" />); })()}
             </>}
             {grid && !brush && <>

@@ -4,7 +4,7 @@
  * placements, the engine on open); the query helpers are pure. See
  * lib/assets/types.ts.
  */
-import type { AssetCategory, AssetEntry, AssetManifest, AssetRegion, Placement, PlacementsFile } from "./types";
+import type { AssetCategory, AssetEntry, AssetManifest, AssetRegion, MapGround, Placement, PlacementsFile } from "./types";
 
 export const ASSET_MANIFEST_URL = "/assets/manifest.json";
 export const PLACEMENTS_URL = "/assets/placements.json";
@@ -35,6 +35,20 @@ export function loadPlacements(): Promise<PlacementsFile> {
 export function reloadAssetData(): void { manifest = null; placements = null; }
 
 export function placementsFor(file: PlacementsFile, locationId: string): Placement[] { return file.maps[locationId] ?? []; }
+export function groundFor(file: PlacementsFile, locationId: string): MapGround | undefined { return file.grounds?.[locationId]; }
+
+/**
+ * The stand-in "image" of a map whose painting is replaced by a ground: no
+ * painted collision or foreground matches it (lib/stage/world-navigation.ts,
+ * world-occlusion.ts), so only placed objects block.
+ */
+export const groundImageKey = (tile: string) => `ground:${tile}`;
+/** The image a map is checked and drawn with: its ground's key when it has one, else its painting. */
+export function effectiveMapImage(file: PlacementsFile | null | undefined, locationId: string, painting: string): string {
+  const ground = file ? groundFor(file, locationId) : undefined;
+  return ground ? groundImageKey(ground.tile) : painting;
+}
+
 export function indexAssets(assets: readonly AssetEntry[]): Map<string, AssetEntry> { return new Map(assets.map((asset) => [asset.id, asset])); }
 
 export interface AssetQuery {

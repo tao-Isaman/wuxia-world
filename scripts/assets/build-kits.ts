@@ -22,6 +22,7 @@ import { join } from "path";
 import sharp from "sharp";
 import type { AssetEntry, AssetManifest, AssetRegion, Footprint, KitInfo } from "@/lib/assets/types";
 import { KIT_E, KIT_N, KIT_S, KIT_W, maskName } from "@/lib/assets/kits";
+import { renderIso, type IsoLook } from "./kits-iso";
 
 const PLAN = "scripts/assets/kits/plan.json";
 const PUBLIC = "public/assets";
@@ -90,6 +91,33 @@ const WALL_DIM: Record<WallKind, { cell: number; thick: number; height: number; 
   city: { cell: 32, thick: 24, height: 56, head: 6 },
   house: { cell: 32, thick: 10, height: 40, head: 4 },
   fence: { cell: 32, thick: 6, height: 26, head: 2 },
+};
+
+/**
+ * Isometric sets (`grid: "iso"`), drawn by kits-iso.ts so they lean the way
+ * of the library's buildings. Roads and plazas sample a library ground tile
+ * (seamless 32 px Wang fills); walls reuse WALLS with the texture set.
+ */
+interface IsoRoadSpec { style: string; region: AssetRegion; name: string; tile: string; tags: string[]; plaza?: boolean }
+const ISO_ROAD_CELL = 64;
+const ISO_WALL_CELL = 64;
+const ISO_ROADS: IsoRoadSpec[] = [
+  { style: "slab", region: "heartland", name: "ถนนแผ่นหิน", tile: "til_heartland_grass_paving_07", tags: ["แผ่นหิน", "flagstone", "เมือง"] },
+  { style: "brick", region: "heartland", name: "ถนนปูอิฐ", tile: "til_heartland_brick_dirt_13", tags: ["อิฐ", "brick", "วัง"] },
+  { style: "dirt", region: "any", name: "ถนนดิน", tile: "til_heartland_brick_dirt_07", tags: ["ดิน", "dirt", "ชนบท"] },
+  { style: "cobble", region: "any", name: "ถนนหินกรวด", tile: "til_east_pebble_lawn_13", tags: ["หินกรวด", "cobblestone"] },
+  { style: "bluestone", region: "east", name: "ถนนหินเขียวเจียงหนาน", tile: "til_east_bluestone_moss_07", tags: ["หินเขียว", "bluestone", "เจียงหนาน"] },
+  { style: "clay", region: "south", name: "ทางดินแดง", tile: "til_south_clay_path_07", tags: ["ดินแดง", "laterite"] },
+  { style: "sand", region: "west", name: "ทางทราย", tile: "til_east_beach_sea_13", tags: ["ทราย", "sand", "ทะเลทราย"] },
+  { style: "loess", region: "north", name: "ถนนดินเหลือง", tile: "til_north_steppe_13", tags: ["ดินเหลือง", "loess"] },
+  { style: "snow", region: "north", name: "ทางหิมะ", tile: "til_north_snow_dirt_13", tags: ["หิมะ", "snow"] },
+  { style: "slab", region: "heartland", name: "ลานปูแผ่นหิน", tile: "til_heartland_grass_paving_07", tags: ["ลาน", "plaza", "แผ่นหิน"], plaza: true },
+  { style: "brick", region: "heartland", name: "ลานปูอิฐ", tile: "til_heartland_brick_dirt_13", tags: ["ลาน", "plaza", "อิฐ"], plaza: true },
+];
+const ISO_WALL: Record<WallKind, { thick: number; height: number; parapet?: number; coping?: number; gateWidth: number; gateSpan: number }> = {
+  city: { thick: 0.28, height: 56, parapet: 6, gateWidth: 30, gateSpan: 3 },
+  house: { thick: 0.1, height: 40, coping: 7, gateWidth: 22, gateSpan: 1 },
+  fence: { thick: 0.06, height: 26, gateWidth: 20, gateSpan: 1 },
 };
 
 // ── plan ───────────────────────────────────────────────────────────────────
@@ -419,14 +447,75 @@ function entry(e: Omit<AssetEntry, "category" | "flippable" | "status"> & { name
   return { ...e, category: "kit", tags: [...new Set([...e.tags, region, REGION_TH[region]])], flippable: false, status: "approved" };
 }
 
+// ── Iso sets ───────────────────────────────────────────────────────────────
+
+async function addIso(set: string, kind: KitInfo["kind"], spec: { name: string; region: AssetRegion; tags: string[] }, suffix: string, name: string,
+  result: ReturnType<typeof renderIso>, kit: KitInfo, layer: "ground" | "object", source: AssetEntry["source"], extraTags: string[]) {
+  const id = `${set}_${suffix}`;
+  const url = `/assets/kit/${kind}/${id}.png`;
+  await save(result.img, join("public", url));
+  const boxes = result.solids;
+  const bounds = boxes.length ? {
+    x: Math.min(...boxes.map((b) => b.x)), y: Math.min(...boxes.map((b) => b.y)),
+    w: Math.max(...boxes.map((b) => b.x + b.w)) - Math.min(...boxes.map((b) => b.x)),
+    h: Math.max(...boxes.map((b) => b.y + b.h)) - Math.min(...boxes.map((b) => b.y)),
+  } : null;
+  entries.push(entry({
+    id, name: `${spec.name} (แนวทแยง) · ${name}`, subcategory: kind, region: spec.region,
+    tags: [...spec.tags, "แนวทแยง", "isometric", "kit", ...extraTags], image: url, width: result.img.w, height: result.img.h,
+    mapWidth: result.img.w, mapHeight: result.img.h, anchorX: result.anchorX, anchorY: result.anchorY,
+    footprint: bounds, ...(boxes.length > 1 ? { solids: boxes } : {}), layer, kit, source,
+  }));
+}
+
+async function buildIsoRoad(spec: IsoRoadSpec) {
+  const tile = await load(join("public/assets/tile", spec.tile.split("_")[1], `${spec.tile}.png`));
+  const look: IsoLook = { cell: ISO_ROAD_CELL, thick: spec.plaza ? 0.5 : 0.4, height: 0, face: tile, top: tile };
+  const set = `kit_${spec.region}_${spec.plaza ? "isoplaza" : "isoroad"}_${spec.style}`;
+  const source = { tool: "build-kits.ts iso (library ground tile)", prompt: `${spec.tile} on the iso grid`, size: 32 };
+  for (let mask = 0; mask < 16; mask++) {
+    await addIso(set, "road", spec, pieceSuffix(mask), PIECE_TH[mask], renderIso(look, { mask }),
+      { set, kind: "road", cell: ISO_ROAD_CELL, grid: "iso", mask }, "ground", source, [maskName(mask), spec.plaza ? "ลาน" : "ถนน"]);
+  }
+}
+
+async function buildIsoWall(spec: WallSpec, textures: Img[], texJob: { prompt: string; seed?: number; jobId?: string }) {
+  const dim = ISO_WALL[spec.kind];
+  const look: IsoLook = { cell: ISO_WALL_CELL, thick: dim.thick, height: dim.height, parapet: dim.parapet,
+    coping: spec.coping ? dim.coping : undefined, face: textures[spec.face], top: textures[spec.top], roof: textures[spec.top] };
+  const kind: KitInfo["kind"] = spec.kind === "fence" ? "fence" : "wall";
+  const set = `kit_${spec.region}_iso${kind}_${spec.style}`;
+  const label = spec.kind === "city" ? ["กำแพงเมือง", "city wall"] : spec.kind === "house" ? ["กำแพงบ้าน", "house wall"] : ["รั้ว", "fence"];
+  const source = { tool: "build-kits.ts iso (PixelLab create-tiles-pro textures)", prompt: `${TEXTURES[spec.face]} | ${TEXTURES[spec.top]} — ${texJob.prompt.slice(0, 60)}…`,
+    seed: texJob.seed, jobId: texJob.jobId, size: 32 };
+  const tagged = { ...spec, tags: [...spec.tags, ...label] };
+  for (let mask = 0; mask < 16; mask++) {
+    await addIso(set, kind, tagged, pieceSuffix(mask), PIECE_TH[mask], renderIso(look, { mask }),
+      { set, kind, cell: ISO_WALL_CELL, grid: "iso", mask }, "object", source, [maskName(mask)]);
+  }
+  if (!spec.gate) return;
+  const shape = spec.kind === "fence" ? "gap" : spec.gate;
+  const gateName = spec.gate === "arch" ? `ประตูเมืองโค้ง (${dim.gateSpan} ช่อง)` : spec.gate === "moon" ? "ประตูวงพระจันทร์" : spec.kind === "fence" ? "ช่องประตูรั้ว" : "ประตูกำแพง";
+  for (const axis of ["a", "b"] as const) {
+    const mask = axis === "a" ? KIT_E | KIT_W : KIT_N | KIT_S;
+    const span = dim.gateSpan;
+    await addIso(set, kind, tagged, `gate_${axis === "a" ? "se" : "sw"}`, `${gateName} แนว${axis === "a" ? "ขวาลง" : "ซ้ายลง"}`,
+      renderIso(look, { mask, span, gate: { axis, shape, width: dim.gateWidth } }),
+      { set, kind, cell: ISO_WALL_CELL, grid: "iso", mask, ...(span > 1 ? { span: axis === "a" ? { w: span, h: 1 } : { w: 1, h: span } } : {}), special: "gate" },
+      "object", source, ["ประตู", "gate"]);
+  }
+}
+
 // ── build ──────────────────────────────────────────────────────────────────
 
 for (const spec of ROADS) await buildRoad(spec);
+for (const spec of ISO_ROADS) await buildIsoRoad(spec);
 const texDir = rawJob("kit_textures_01");
 if (existsSync(join(texDir, "job.json"))) {
   const texJob = JSON.parse(readFileSync(join(texDir, "job.json"), "utf8"));
   const textures = await Promise.all(TEXTURES.map((_, i) => load(join(texDir, `${String(i).padStart(2, "0")}.png`))));
   for (const spec of WALLS) await buildWall(spec, textures, texJob);
+  for (const spec of WALLS) await buildIsoWall(spec, textures, texJob);
 } else console.warn("skip walls: no texture set");
 
 const manifestPath = join(PUBLIC, "manifest.json");
