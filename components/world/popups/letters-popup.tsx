@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { PagedGrid } from "@/components/ui/paged-grid";
 import { useShortScreen } from "@/components/ui/use-short-screen";
 import { CATEGORY_GLYPH, ItemTile } from "@/components/ui/wuxia/item-tile";
+import { GOLD_ICON_URL, itemIconUrl } from "@/lib/world/data/item-icons";
 import { getItem } from "@/lib/world";
 import { getNpc } from "@/lib/world/data/npcs";
 import { LETTER_RULES, RARITY_LABEL, letterGiftLabel, type GiftRarity } from "@/lib/world/letters";
@@ -21,13 +22,13 @@ interface Props {
   onClose: () => void;
 }
 
-/** The letter's gift as a bag-style tile: the item's glyph, or 金 for gold. */
+/** The letter's gift as a bag-style tile: the item's icon (glyph fallback), or gold ingots. */
 function GiftIcon({ letter, size }: { letter: Letter; size?: "sm" }) {
   const item = letter.itemId ? getItem(letter.itemId) : null;
   const glyph = letter.gold ? "金" : CATEGORY_GLYPH[item?.category ?? "misc"];
   return (
     <span className={`letter-gift${size === "sm" ? " letter-gift--sm" : ""}${letter.claimed ? " letter-gift--taken" : ""}`}>
-      <ItemTile glyph={glyph} rarity={letter.rarity} count={letter.count} label={letterGiftLabel(letter)} />
+      <ItemTile glyph={glyph} icon={letter.gold ? GOLD_ICON_URL : itemIconUrl(letter.itemId)} rarity={letter.rarity} count={letter.count} label={letterGiftLabel(letter)} />
     </span>
   );
 }

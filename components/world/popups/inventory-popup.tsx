@@ -9,6 +9,7 @@ import { useWorldStore } from "@/store/world-store";
 import { toast } from "@/store/toast-store";
 import { ItemEffects } from "@/components/world/item-effects";
 import { CATEGORY_GLYPH, ItemTile } from "@/components/ui/wuxia/item-tile";
+import { equipmentIconUrl, itemIconUrl } from "@/lib/world/data/item-icons";
 import { equipRarity, itemRarity, rarityColor } from "@/lib/ui/rarity";
 import { PagedGrid } from "@/components/ui/paged-grid";
 import { useShortScreen } from "@/components/ui/use-short-screen";
@@ -146,7 +147,7 @@ export function InventoryPopup({ open, onClose }: Props) {
               const eq = equipped(row);
               const key = `${row.type}-${row.index ?? "x"}`;
               return <div key={key} className="bag-doll-slot" style={{ gridArea: DOLL_AREA[key] }} data-slot={key}>
-                <ItemTile glyph={CATEGORY_GLYPH[row.type]} rarity={eq ? equipRarity(eq) : 0} dim={!eq}
+                <ItemTile glyph={CATEGORY_GLYPH[row.type]} icon={equipmentIconUrl(eq?.id)} rarity={eq ? equipRarity(eq) : 0} dim={!eq}
                   label={eq ? `${row.label}: ${eq.n}` : `${row.label}: ว่าง`}
                   selected={isSelected({ kind: "slot", row })}
                   onClick={() => setSelection({ kind: "slot", row })} />
@@ -176,7 +177,7 @@ export function InventoryPopup({ open, onClose }: Props) {
                 const eq = getEquip(c.id)!;
                 const rarity = equipRarity(eq);
                 return <div className="bag-cell">
-                  <ItemTile glyph={CATEGORY_GLYPH[eq.ty]} rarity={rarity} count={c.n}
+                  <ItemTile glyph={CATEGORY_GLYPH[eq.ty]} icon={equipmentIconUrl(eq.id)} rarity={rarity} count={c.n}
                     label={`${eq.n} ×${c.n}`} selected={isSelected({ kind: "bagEquip", id: c.id })}
                     onClick={() => setSelection({ kind: "bagEquip", id: c.id })} />
                   <span style={{ color: rarityColor(rarity) }} aria-hidden="true">{eq.n}</span>
@@ -185,7 +186,7 @@ export function InventoryPopup({ open, onClose }: Props) {
               const def = getItem(c.id);
               const rarity = itemRarity(def?.price);
               return <div className="bag-cell">
-                <ItemTile glyph={CATEGORY_GLYPH[def?.category ?? "misc"]} rarity={rarity}
+                <ItemTile glyph={CATEGORY_GLYPH[def?.category ?? "misc"]} icon={itemIconUrl(c.id)} rarity={rarity}
                   count={c.n} label={`${def?.name ?? c.id} ×${c.n}`} selected={isSelected({ kind: "item", id: c.id })}
                   onClick={() => setSelection({ kind: "item", id: c.id })} />
                 <span style={{ color: rarityColor(rarity) }} aria-hidden="true">{def?.name ?? c.id}</span>
