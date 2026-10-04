@@ -48,7 +48,7 @@ Deploys are implied to be on Vercel (`VERCEL_GIT_COMMIT_SHA` sets the service-wo
 
 ## Verified state
 
-Checked on 2026-10-04 for m1's PixelLab work loops, played on the map:
+Checked on 2026-10-04 for placed objects and the map editor (on the map-team branch, before merging the engine page):
 
 | Check | Result |
 | --- | --- |
@@ -58,6 +58,7 @@ Checked on 2026-10-04 for m1's PixelLab work loops, played on the map:
 | `test:combat` | 15 checks pass |
 | `test:opening` | 12 checks pass |
 | `test:navigation` | 19 tests pass |
+| `test:placements` | 8 tests pass (the committed `placements.json` is empty) |
 | `test:battle-background` | 2 checks pass |
 | `test:rumors` | 5 + 4 checks pass |
 | `test:investigation` | 5 checks pass |
@@ -76,7 +77,7 @@ Checked on 2026-10-04 for m1's PixelLab work loops, played on the map:
 | `test:docs` | the generated reference is current; every link, repo path and command in the docs resolves |
 | `bun scripts/audit-content.ts` | 225 NPCs · 867 quests · 3038 scenes, all references resolve |
 | `bun run build` | passes; `/` first-load JS 1.12 MB (was 508 kB before the sagas; the saga text is about 2.9 MB of source, ~500 kB gzipped) |
-| `bun run test:e2e` | all 38 Playwright tests pass against the production build on :3017 (about 13 minutes, Chromium 141 via the container shim) |
+| `bun run test:e2e` | all 41 Playwright tests pass against the production build (about 17 minutes, Chromium 141 via the container shim); the map-editor test ran against a temporary page and skips while `/game/engine` is missing |
 
 Not verified:
 
