@@ -7,7 +7,7 @@ import type { NpcDef } from "../../../types";
 export const NPCS_HENGSHAN_SOUTH: readonly NpcDef[] = [
   {
     id: "sect_hengshan_south_master_modaxiansheng",
-    name: "อาจารย์ใหญ่โม่ต้า",
+    name: "อาจารย์ใหญ่เซี่ยอวิ๋น",
     description: "อาจารย์ใหญ่แห่งเฮิงซานใต้ · ผู้สืบทอดเพลงกระบี่ห้ายอด · เคลื่อนไหวเหมือนระบำพริ้วไหว · บุคลิกสันโดษ ชอบสีซอเดี่ยวอยู่ใต้ต้นสน",
     locationIds: ["sect_hengshan_south"],
     dialogSceneId: "npc_sect_hengshan_south_master_modaxiansheng_talk",
@@ -34,7 +34,7 @@ export const NPCS_HENGSHAN_SOUTH: readonly NpcDef[] = [
 
   {
     id: "sect_hengshan_south_vice_liuzhengfeng",
-    name: "รองอาจารย์หลิวเจิ้งเฟิง",
+    name: "รองอาจารย์ไป๋หมิงหยวน",
     description: "รองอาจารย์ของเฮิงซานใต้ · ฝีมือกระบี่เปี่ยมไหวพริบ · ชอบบรรเลงพิณคู่กับเพื่อนรัก · ใจเปิดกว้างต่อจอมยุทธ์ทุกฝ่าย",
     locationIds: ["sect_hengshan_south"],
     dialogSceneId: "npc_sect_hengshan_south_vice_liuzhengfeng_talk",

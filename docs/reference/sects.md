@@ -10,11 +10,11 @@
 | `sect_wudang` | อู่ตัง / บู๊ตึ๊ง | `wudang` | อาจารย์ชิงซวี่ | 9 → 1 | 8 |
 | `sect_emei` | ง้อไบ๊ | `emei` | ท่านนิ้วห้วนจิงฉาน | 9 → 1 | 8 |
 | `sect_huashan` | หัวซาน | `huashan` | อาจารย์ใหญ่อี้ชิง | 5 → 1 | 5 |
-| `sect_hengshan_south` | เฮิงซาน | `hengshan_south` | อาจารย์ใหญ่โม่ต้า | 5 → 1 | 5 |
-| `sect_hengshan_north` | เหิงซาน | `hengshan_north` | ภิกษุณีติ่งอี้ | 5 → 1 | 5 |
-| `sect_songshan` | ซงซาน | `songshan` | อาจารย์ใหญ่จั่วเหลิงฉาน | 5 → 1 | 5 |
-| `sect_taishan` | ไท่ซาน | `taishan` | เจ้าสำนักเทียนเหมินเต้าเหริน | 5 → 1 | 5 |
-| `sect_quanzhen` | ฉวนเจิน / ชวนจิน | `quanzhen` | อาจารย์ใหญ่ฉงหยาง | 5 → 1 | 5 |
+| `sect_hengshan_south` | เฮิงซาน | `hengshan_south` | อาจารย์ใหญ่เซี่ยอวิ๋น | 5 → 1 | 5 |
+| `sect_hengshan_north` | เหิงซาน | `hengshan_north` | ภิกษุณีเสวียนเยว่ | 5 → 1 | 5 |
+| `sect_songshan` | ซงซาน | `songshan` | อาจารย์ใหญ่เกาซงเหยียน | 5 → 1 | 5 |
+| `sect_taishan` | ไท่ซาน | `taishan` | เจ้าสำนักชิงสือเต้าเหริน | 5 → 1 | 5 |
+| `sect_quanzhen` | ฉวนเจิน / ชวนจิน | `quanzhen` | อาจารย์ใหญ่หลิงเจิน | 5 → 1 | 5 |
 | `sect_gumu` | กู่มู่ / โบราณสุสาน | `gumu` | หญิงปริศนาในสุสาน | 3 → 1 | 4 |
 | `sect_lingjiu` | ลิ่งจิ้วกง | — (no membership) | — | — | — |
 | `sect_beggars` | พรรคยาจก | `beggars` | หัวหน้าหงเทียน | 9 → 1 | 8 |
@@ -118,7 +118,7 @@ Martial line — every skill and art is taught only by its lineage quest or saga
 
 ## ซงซาน (`songshan`)
 
-- Hall: ซงซาน (`sect_songshan`) · registrar: อาจารย์ใหญ่จั่วเหลิงฉาน (`sect_songshan_master_zuolengchan`)
+- Hall: ซงซาน (`sect_songshan`) · registrar: อาจารย์ใหญ่เกาซงเหยียน (`sect_songshan_master_zuolengchan`)
 - Join requirements: ความเลว ≤ 10
 - Ranks: start 5, top 1 · quest cooldown 30 days
 - Rank-up cost (sect points): →4: 100 · →3: 250 · →2: 500 · →1: 1000
@@ -141,7 +141,7 @@ Martial line — every skill and art is taught only by its lineage quest or saga
 
 ## ไท่ซาน (`taishan`)
 
-- Hall: ไท่ซาน (`sect_taishan`) · registrar: เจ้าสำนักเทียนเหมินเต้าเหริน (`sect_taishan_master_tianmen`)
+- Hall: ไท่ซาน (`sect_taishan`) · registrar: เจ้าสำนักชิงสือเต้าเหริน (`sect_taishan_master_tianmen`)
 - Join requirements: ความเลว ≤ 10
 - Ranks: start 5, top 1 · quest cooldown 30 days
 - Rank-up cost (sect points): →4: 100 · →3: 250 · →2: 500 · →1: 1000
@@ -164,7 +164,7 @@ Martial line — every skill and art is taught only by its lineage quest or saga
 
 ## เฮิงซาน (`hengshan_south`)
 
-- Hall: เฮิงซาน (`sect_hengshan_south`) · registrar: อาจารย์ใหญ่โม่ต้า (`sect_hengshan_south_master_modaxiansheng`)
+- Hall: เฮิงซาน (`sect_hengshan_south`) · registrar: อาจารย์ใหญ่เซี่ยอวิ๋น (`sect_hengshan_south_master_modaxiansheng`)
 - Join requirements: ความเลว ≤ 10
 - Ranks: start 5, top 1 · quest cooldown 30 days
 - Rank-up cost (sect points): →4: 100 · →3: 250 · →2: 500 · →1: 1000
@@ -187,7 +187,7 @@ Martial line — every skill and art is taught only by its lineage quest or saga
 
 ## เหิงซาน (`hengshan_north`)
 
-- Hall: เหิงซาน (`sect_hengshan_north`) · registrar: ภิกษุณีติ่งอี้ (`sect_hengshan_north_abbess_dingyi`)
+- Hall: เหิงซาน (`sect_hengshan_north`) · registrar: ภิกษุณีเสวียนเยว่ (`sect_hengshan_north_abbess_dingyi`)
 - Join requirements: ความเลว ≤ 10
 - Ranks: start 5, top 1 · quest cooldown 30 days
 - Rank-up cost (sect points): →4: 100 · →3: 250 · →2: 500 · →1: 1000
@@ -210,7 +210,7 @@ Martial line — every skill and art is taught only by its lineage quest or saga
 
 ## ฉวนเจิน (`quanzhen`)
 
-- Hall: ฉวนเจิน / ชวนจิน (`sect_quanzhen`) · registrar: อาจารย์ใหญ่ฉงหยาง (`sect_quanzhen_master_chongyang`)
+- Hall: ฉวนเจิน / ชวนจิน (`sect_quanzhen`) · registrar: อาจารย์ใหญ่หลิงเจิน (`sect_quanzhen_master_chongyang`)
 - Join requirements: ความเลว ≤ 10
 - Ranks: start 5, top 1 · quest cooldown 30 days
 - Rank-up cost (sect points): →4: 100 · →3: 250 · →2: 500 · →1: 1000

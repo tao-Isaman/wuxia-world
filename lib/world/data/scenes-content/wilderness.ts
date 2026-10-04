@@ -7,14 +7,14 @@ export const SCENES_WILDERNESS: readonly Scene[] = [
   // AMBIENT NPC TALK SCENES
   // ═══════════════════════════════════════════════════════════════════════
 
-  // ─── ฮ่วงเอี้ยะซือ (isle_taohua) ─────────────────────────────────────
+  // ─── หวงชิงเฉวียน (isle_taohua) ─────────────────────────────────────
   {
     kind: "dialog",
     id: "npc_wld_taohua_hermit_huang_talk",
     lines: [
       { t: "narration", text: "ชายชราในเสื้อคลุมขาดกำลังยืนรดน้ำต้นท้อ หันมามองเจ้าด้วยแววตาไม่พอใจ" },
-      { t: "dialogue", speaker: "ฮ่วงเอี้ยะซือ", text: "ใครให้เจ้าขึ้นมาบนเกาะข้า? มีธุระอะไรหรือ?" },
-      { t: "dialogue", speaker: "ฮ่วงเอี้ยะซือ", text: "เรื่องดาบนั้นข้าไม่สนแล้ว... แต่ถ้าเจ้าพิสูจน์ตัวได้ ก็อาจจะสอนอะไรให้บ้าง" },
+      { t: "dialogue", speaker: "หวงชิงเฉวียน", text: "ใครให้เจ้าขึ้นมาบนเกาะข้า? มีธุระอะไรหรือ?" },
+      { t: "dialogue", speaker: "หวงชิงเฉวียน", text: "เรื่องดาบนั้นข้าไม่สนแล้ว... แต่ถ้าเจ้าพิสูจน์ตัวได้ ก็อาจจะสอนอะไรให้บ้าง" },
     ],
   },
 
@@ -163,8 +163,8 @@ export const SCENES_WILDERNESS: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qw_taohua_codex_fragments_offer",
     lines: [
-      { t: "dialogue", speaker: "ฮ่วงเอี้ยะซือ", text: "ข้ามีตำรากระบี่โบราณ แต่หลายแผ่นถูกพัดหายไปทั่วเกาะตอนพายุ" },
-      { t: "dialogue", speaker: "ฮ่วงเอี้ยะซือ", text: "นำชิ้นส่วนตำรา 3 ชิ้นที่กระจัดกระจายบนเกาะมาคืนให้ข้า ถ้าทำได้ ก็อาจสอนบางอย่างให้เจ้า" },
+      { t: "dialogue", speaker: "หวงชิงเฉวียน", text: "ข้ามีตำรากระบี่โบราณ แต่หลายแผ่นถูกพัดหายไปทั่วเกาะตอนพายุ" },
+      { t: "dialogue", speaker: "หวงชิงเฉวียน", text: "นำชิ้นส่วนตำรา 3 ชิ้นที่กระจัดกระจายบนเกาะมาคืนให้ข้า ถ้าทำได้ ก็อาจสอนบางอย่างให้เจ้า" },
     ],
     choices: [
       {
@@ -179,15 +179,15 @@ export const SCENES_WILDERNESS: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qw_taohua_codex_fragments_progress",
     lines: [
-      { t: "dialogue", speaker: "ฮ่วงเอี้ยะซือ", text: "ยังหาไม่ครบ? แผ่นกระดาษมันไม่ได้หนีไปไหนหรอก — เจ้าแค่ไม่ตั้งใจ" },
+      { t: "dialogue", speaker: "หวงชิงเฉวียน", text: "ยังหาไม่ครบ? แผ่นกระดาษมันไม่ได้หนีไปไหนหรอก — เจ้าแค่ไม่ตั้งใจ" },
     ],
   },
   {
     kind: "dialog",
     id: "qs_qw_taohua_codex_fragments_complete",
     lines: [
-      { t: "dialogue", speaker: "ฮ่วงเอี้ยะซือ", text: "ฮ่า! นำมาครบแล้ว... ดีกว่าที่คาดไว้" },
-      { t: "dialogue", speaker: "ฮ่วงเอี้ยะซือ", text: "ข้าจะสอนท่าเคลื่อนไหวพื้นฐานที่เจ้าจะไม่ได้เรียนจากที่ไหนอีก" },
+      { t: "dialogue", speaker: "หวงชิงเฉวียน", text: "ฮ่า! นำมาครบแล้ว... ดีกว่าที่คาดไว้" },
+      { t: "dialogue", speaker: "หวงชิงเฉวียน", text: "ข้าจะสอนท่าเคลื่อนไหวพื้นฐานที่เจ้าจะไม่ได้เรียนจากที่ไหนอีก" },
       { t: "narration", text: "ปรมาจารย์หยิบพัดขึ้นมาและสาธิตท่าที่ดูเรียบง่ายแต่ลึกซึ้ง" },
     ],
     choices: [
@@ -206,8 +206,8 @@ export const SCENES_WILDERNESS: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qw_taohua_peach_wine_offer",
     lines: [
-      { t: "dialogue", speaker: "ฮ่วงเอี้ยะซือ", text: "ข้าต้องการเหล้าท้อสำรองสำหรับฤดูหนาว ไปหาที่ตลาดชาวเมี่ยวให้ข้าได้ไหม?" },
-      { t: "dialogue", speaker: "ฮ่วงเอี้ยะซือ", text: "บอกว่าข้าส่งมา เขาจะรู้ว่าต้องการของคุณภาพอะไร" },
+      { t: "dialogue", speaker: "หวงชิงเฉวียน", text: "ข้าต้องการเหล้าท้อสำรองสำหรับฤดูหนาว ไปหาที่ตลาดชาวเมี่ยวให้ข้าได้ไหม?" },
+      { t: "dialogue", speaker: "หวงชิงเฉวียน", text: "บอกว่าข้าส่งมา เขาจะรู้ว่าต้องการของคุณภาพอะไร" },
     ],
     choices: [
       {
@@ -222,9 +222,9 @@ export const SCENES_WILDERNESS: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qw_taohua_peach_wine_complete",
     lines: [
-      { t: "dialogue", speaker: "ฮ่วงเอี้ยะซือ", text: "ฮ่า! ได้มาแล้ว ดีใจเหมือนกัน..." },
+      { t: "dialogue", speaker: "หวงชิงเฉวียน", text: "ฮ่า! ได้มาแล้ว ดีใจเหมือนกัน..." },
       { t: "narration", text: "ปรมาจารย์เปิดขวดดมกลิ่น และพยักหน้าอย่างพอใจ" },
-      { t: "dialogue", speaker: "ฮ่วงเอี้ยะซือ", text: "รับทองไป ข้าไม่อยากติดค้างใคร" },
+      { t: "dialogue", speaker: "หวงชิงเฉวียน", text: "รับทองไป ข้าไม่อยากติดค้างใคร" },
     ],
     choices: [
       {
@@ -242,8 +242,8 @@ export const SCENES_WILDERNESS: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qw_taohua_duel_proof_offer",
     lines: [
-      { t: "dialogue", speaker: "ฮ่วงเอี้ยะซือ", text: "มีนักรบอ้างตัวว่าเป็นศิษย์ข้าไปทั่ว สร้างความเสียหายให้คนอื่น" },
-      { t: "dialogue", speaker: "ฮ่วงเอี้ยะซือ", text: "ไปพิสูจน์ว่าเจ้าแกร่งกว่าเขา แล้วบอกให้หยุดอ้างชื่อข้า" },
+      { t: "dialogue", speaker: "หวงชิงเฉวียน", text: "มีนักรบอ้างตัวว่าเป็นศิษย์ข้าไปทั่ว สร้างความเสียหายให้คนอื่น" },
+      { t: "dialogue", speaker: "หวงชิงเฉวียน", text: "ไปพิสูจน์ว่าเจ้าแกร่งกว่าเขา แล้วบอกให้หยุดอ้างชื่อข้า" },
       { t: "narration", text: "ปรมาจารย์ส่งแผนที่ตำแหน่งให้เจ้า" },
     ],
     choices: [
@@ -259,8 +259,8 @@ export const SCENES_WILDERNESS: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qw_taohua_duel_proof_complete",
     lines: [
-      { t: "dialogue", speaker: "ฮ่วงเอี้ยะซือ", text: "ปราบได้แล้ว? ดี ชื่อข้าก็จะกลับมาบริสุทธิ์" },
-      { t: "dialogue", speaker: "ฮ่วงเอี้ยะซือ", text: "เจ้ามีแววดี สอนวิชาเพิ่มให้สักนิดก็คุ้ม" },
+      { t: "dialogue", speaker: "หวงชิงเฉวียน", text: "ปราบได้แล้ว? ดี ชื่อข้าก็จะกลับมาบริสุทธิ์" },
+      { t: "dialogue", speaker: "หวงชิงเฉวียน", text: "เจ้ามีแววดี สอนวิชาเพิ่มให้สักนิดก็คุ้ม" },
     ],
     choices: [
       {

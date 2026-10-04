@@ -91,6 +91,8 @@ Not verified:
 
 ## Known issues
 
+- **Saga framing predates the timeline.** The game is set about 20 years after มังกรหยก ภาค 3, but the 38 sagas still say the legend happened "ร้อยกว่าปีก่อน" (~300 lines in `lib/world/data/story/`) and treat its people as long gone. NPC names already fit the timeline ([story-writing.md](docs/story-writing.md#timeline-and-novel-characters)).
+
 Real behaviour today, found during the docs audit. Each is small and self-contained unless noted.
 
 ### Engine (`/game/engine`)

@@ -5,13 +5,13 @@ import type { QuestDef } from "../../types";
 // lib/world/data/npcs/wilderness.ts and
 // lib/world/data/scenes-content/wilderness.ts.
 export const QUESTS_WILDERNESS: readonly QuestDef[] = [
-  // ─── ฮ่วงเอี้ยะซือ (isle_taohua) ─────────────────────────────────────
+  // ─── หวงชิงเฉวียน (isle_taohua) ─────────────────────────────────────
 
   // 1. Fetch — 3 codex fragments scattered on the island
   {
     id: "qw_taohua_codex_fragments",
     name: "แผ่นตำราหายของปรมาจารย์",
-    description: "ปรมาจารย์ฮ่วงเอี้ยะซือต้องการชิ้นส่วนตำรากระบี่ 3 ชิ้นที่กระจัดกระจายหลังพายุ",
+    description: "ปรมาจารย์หวงชิงเฉวียนต้องการชิ้นส่วนตำรากระบี่ 3 ชิ้นที่กระจัดกระจายหลังพายุ",
     briefSummary: "หาแผ่นตำราที่กระจัดกระจายบนเกาะดอกท้อ",
     type: "side",
     giverNpcId: "wld_taohua_hermit_huang",
@@ -22,7 +22,7 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
         description: "หาแผ่นตำรา 3 ชิ้นบนเกาะดอกท้อ (พบได้ตามต้นท้อและชายหาด)",
         autoAdvance: { t: "hasItem", itemId: "book_advanced", count: 1 },
       },
-      { id: "return", description: "คืนตำราให้ฮ่วงเอี้ยะซือ" },
+      { id: "return", description: "คืนตำราให้หวงชิงเฉวียน" },
     ],
     rewards: [
       { t: "wExp", amount: 60 },
@@ -39,7 +39,7 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
     id: "qw_taohua_peach_wine",
     name: "ขนมไหว้พระจันทร์สำหรับฤๅษี",
     description: "ปรมาจารย์ต้องการขนมไหว้พระจันทร์จากตลาดชาวเมี่ยวเพื่อพิธีไหว้กลางฤดูใบไม้ร่วง",
-    briefSummary: "นำขนมไหว้พระจันทร์จากตลาดเมี่ยวมาให้ฮ่วงเอี้ยะซือ",
+    briefSummary: "นำขนมไหว้พระจันทร์จากตลาดเมี่ยวมาให้หวงชิงเฉวียน",
     type: "side",
     giverNpcId: "wld_taohua_hermit_huang",
     stages: [
@@ -54,7 +54,7 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
           ],
         },
       },
-      { id: "deliver", description: "นำขนมไหว้พระจันทร์มาส่งให้ฮ่วงเอี้ยะซือ" },
+      { id: "deliver", description: "นำขนมไหว้พระจันทร์มาส่งให้หวงชิงเฉวียน" },
     ],
     rewards: [
       { t: "gold", amount: 200 },
@@ -67,7 +67,7 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
   {
     id: "qw_taohua_duel_proof",
     name: "พิสูจน์ฝีมือต่อหน้าผู้แอบอ้าง",
-    description: "นักรบปลอมอ้างตัวว่าเป็นศิษย์ฮ่วงเอี้ยะซือ ต้องปราบและบอกให้หยุดอ้างชื่อ",
+    description: "นักรบปลอมอ้างตัวว่าเป็นศิษย์หวงชิงเฉวียน ต้องปราบและบอกให้หยุดอ้างชื่อ",
     briefSummary: "ปราบนักรบที่แอบอ้างชื่อปรมาจารย์",
     type: "side",
     giverNpcId: "wld_taohua_hermit_huang",
@@ -78,7 +78,7 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
         description: "ค้นหาและปราบนักรบที่แอบอ้างชื่อปรมาจารย์",
         autoAdvance: { t: "defeatedOpponent", opponentId: "wandering_swordsman", count: 1 },
       },
-      { id: "report", description: "กลับมารายงานผลให้ฮ่วงเอี้ยะซือ" },
+      { id: "report", description: "กลับมารายงานผลให้หวงชิงเฉวียน" },
     ],
     rewards: [
       { t: "wExp", amount: 80 },

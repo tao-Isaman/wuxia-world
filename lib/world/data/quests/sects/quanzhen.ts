@@ -8,7 +8,7 @@ export const QUESTS_QUANZHEN: readonly QuestDef[] = [
   {
     id: "qst_quanzhen_disciple_intro",
     name: "ขอเข้าเป็นศิษย์ฉวนเจิน",
-    description: "อาจารย์ฉงหยางรับศิษย์ใหม่ที่ใจสะอาดและพากเพียร — เก็บสมุนไพรประจำเขาเทียนซานให้ครบสามชนิดเพื่อพิสูจน์ตน · สมุนไพรหายาก 10 · โสม 10 · เม็ดบัว 10",
+    description: "อาจารย์หลิงเจินรับศิษย์ใหม่ที่ใจสะอาดและพากเพียร — เก็บสมุนไพรประจำเขาเทียนซานให้ครบสามชนิดเพื่อพิสูจน์ตน · สมุนไพรหายาก 10 · โสม 10 · เม็ดบัว 10",
     briefSummary: "ส่งสมุนไพรหายาก 10 + โสม 10 + เม็ดบัว 10 เข้าเป็นศิษย์ฉวนเจินขั้นที่ 9",
     type: "side",
     giverNpcId: "sect_quanzhen_master_chongyang",
@@ -34,7 +34,7 @@ export const QUESTS_QUANZHEN: readonly QuestDef[] = [
       },
       {
         id: "return_to_master",
-        description: "นำสมุนไพรกลับไปถวายอาจารย์ฉงหยาง",
+        description: "นำสมุนไพรกลับไปถวายอาจารย์หลิงเจิน",
       },
     ],
     rewards: [
@@ -63,7 +63,7 @@ export const QUESTS_QUANZHEN: readonly QuestDef[] = [
       },
       {
         id: "report",
-        description: "กลับไปรายงานอาจารย์ฉงหยาง",
+        description: "กลับไปรายงานอาจารย์หลิงเจิน",
       },
     ],
     rewards: [
@@ -97,7 +97,7 @@ export const QUESTS_QUANZHEN: readonly QuestDef[] = [
       },
       {
         id: "deliver",
-        description: "ส่งวัสดุให้อาจารย์ฉงหยาง",
+        description: "ส่งวัสดุให้อาจารย์หลิงเจิน",
       },
     ],
     rewards: [
@@ -111,7 +111,7 @@ export const QUESTS_QUANZHEN: readonly QuestDef[] = [
   {
     id: "qst_quanzhen_art_sun",
     name: "บททดสอบก่อนสืบทอด: วิชาลึกลับ",
-    description: "อาจารย์ฉงหยางจะทดสอบก่อนเปิดตำราวิชาลึกลับให้ศิษย์ที่จิตใจเที่ยงตรง — ผ่านการประลองและการนั่งสมาธิที่หน้าผา (ผ่านแล้วจึงรับภารกิจสืบทอดวิชาลึกลับได้)",
+    description: "อาจารย์หลิงเจินจะทดสอบก่อนเปิดตำราวิชาลึกลับให้ศิษย์ที่จิตใจเที่ยงตรง — ผ่านการประลองและการนั่งสมาธิที่หน้าผา (ผ่านแล้วจึงรับภารกิจสืบทอดวิชาลึกลับได้)",
     briefSummary: "บททดสอบ — เปิดทางสู่การสืบทอดวิชาลึกลับ",
     type: "side",
     sectId: "quanzhen",
@@ -138,7 +138,7 @@ export const QUESTS_QUANZHEN: readonly QuestDef[] = [
       },
       {
         id: "return_art",
-        description: "กลับไปรายงานผลต่ออาจารย์ฉงหยาง",
+        description: "กลับไปรายงานผลต่ออาจารย์หลิงเจิน",
       },
     ],
     rewards: [

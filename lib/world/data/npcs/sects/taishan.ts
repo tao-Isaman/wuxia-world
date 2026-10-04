@@ -7,7 +7,7 @@ import type { NpcDef } from "../../../types";
 export const NPCS_TAISHAN: readonly NpcDef[] = [
   {
     id: "sect_taishan_master_tianmen",
-    name: "เจ้าสำนักเทียนเหมินเต้าเหริน",
+    name: "เจ้าสำนักชิงสือเต้าเหริน",
     description: "เจ้าสำนักไท่ซาน · นักพรตเต๋าผู้รับแสงอรุณบนยอดเขาบูรพา · เพลงกระบี่สุริยอุทัยของเขาขึ้นชื่อว่าตวัดดาบครั้งใดไม่เคยพลาด · พูดน้อย ตรงไปตรงมา · รับศิษย์ที่ใจสะอาดและฝีมือมั่นคง",
     locationIds: ["sect_taishan"],
     dialogSceneId: "npc_sect_taishan_master_tianmen_talk",
@@ -35,7 +35,7 @@ export const NPCS_TAISHAN: readonly NpcDef[] = [
   {
     id: "sect_taishan_vice_yuyangzi",
     name: "รองเจ้าสำนักอวี้หยางจื่อ",
-    description: "รองเจ้าสำนักไท่ซาน · นักพรตเต๋าวัยกลาง · กระบี่ของท่านตรงไปตรงมา ไม่มีลีลาฟุ่มเฟือย · เป็นมือขวาของเทียนเหมินเต้าเหรินมาเกือบสองสิบปี",
+    description: "รองเจ้าสำนักไท่ซาน · นักพรตเต๋าวัยกลาง · กระบี่ของท่านตรงไปตรงมา ไม่มีลีลาฟุ่มเฟือย · เป็นมือขวาของชิงสือเต้าเหรินมาเกือบสองสิบปี",
     locationIds: ["sect_taishan"],
     dialogSceneId: "npc_sect_taishan_vice_yuyangzi_talk",
     sparOpponentId: "spar_taishan_yuyangzi",

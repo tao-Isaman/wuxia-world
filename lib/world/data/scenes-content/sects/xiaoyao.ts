@@ -66,8 +66,8 @@ export const SCENES_XIAOYAO: readonly Scene[] = [
     kind: "dialog",
     id: "npc_sect_xiaoyao_sword_elder_wuyazi_talk",
     lines: [
-      { t: "narration", text: "อู๋หยาจื่อกำลังเล่นกระบี่ขลุ่ยหยกเป็นทำนอง · เสียงเหล็กดังเหมือนดนตรี" },
-      { t: "dialogue", speaker: "อู๋หยาจื่อ", text: "กระบี่ของเราเป็นเพลง · ผู้ฟังที่ตั้งใจจะรับรู้ทำนองและตาย" },
+      { t: "narration", text: "ซวีเฟิงจื่อกำลังเล่นกระบี่ขลุ่ยหยกเป็นทำนอง · เสียงเหล็กดังเหมือนดนตรี" },
+      { t: "dialogue", speaker: "ซวีเฟิงจื่อ", text: "กระบี่ของเราเป็นเพลง · ผู้ฟังที่ตั้งใจจะรับรู้ทำนองและตาย" },
     ],
   },
 ];

@@ -9,9 +9,9 @@ export const SCENES_QUANZHEN: readonly Scene[] = [
     kind: "dialog",
     id: "npc_sect_quanzhen_master_chongyang_talk",
     lines: [
-      { t: "narration", text: "อาจารย์ใหญ่ฉงหยางนั่งขัดสมาธิอยู่หน้าศาลาเก่า มือกุมตำราเต๋าโบราณ" },
-      { t: "dialogue", speaker: "ฉงหยาง", text: "ฉวนเจินไม่ได้สอนวิชาเพื่อชัยชนะ — เราฝึกเพื่อเข้าใจตัวเอง" },
-      { t: "dialogue", speaker: "ฉงหยาง", text: "เจ้ามาด้วยความตั้งใจอันใด?" },
+      { t: "narration", text: "อาจารย์ใหญ่หลิงเจินนั่งขัดสมาธิอยู่หน้าศาลาเก่า มือกุมตำราเต๋าโบราณ" },
+      { t: "dialogue", speaker: "หลิงเจิน", text: "ฉวนเจินไม่ได้สอนวิชาเพื่อชัยชนะ — เราฝึกเพื่อเข้าใจตัวเอง" },
+      { t: "dialogue", speaker: "หลิงเจิน", text: "เจ้ามาด้วยความตั้งใจอันใด?" },
     ],
     choices: [
       // Hidden hint — only visible to a Quanzhen disciple who has
@@ -38,10 +38,10 @@ export const SCENES_QUANZHEN: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qst_quanzhen_disciple_intro_offer",
     lines: [
-      { t: "narration", text: "อาจารย์ฉงหยางวางตำราลงและจ้องมองเจ้าด้วยสายตาสงบใส" },
-      { t: "dialogue", speaker: "ฉงหยาง", text: "เจ้าต้องการเป็นศิษย์ฉวนเจิน? ดี — แต่นักพรตของเราไม่รับเงินทอง เพียงรับความเพียรเท่านั้น" },
-      { t: "dialogue", speaker: "ฉงหยาง", text: "ห้องยาของพระราชวังจงหยางต้องการสมุนไพรหลากชนิด — สมุนไพรหายาก ๑๐, โสม ๑๐, เม็ดบัว ๑๐" },
-      { t: "dialogue", speaker: "ฉงหยาง", text: "เก็บมาให้ครบแล้วกลับมา ข้าจะรับเจ้าเป็นศิษย์ขั้นที่ ๙" },
+      { t: "narration", text: "อาจารย์หลิงเจินวางตำราลงและจ้องมองเจ้าด้วยสายตาสงบใส" },
+      { t: "dialogue", speaker: "หลิงเจิน", text: "เจ้าต้องการเป็นศิษย์ฉวนเจิน? ดี — แต่นักพรตของเราไม่รับเงินทอง เพียงรับความเพียรเท่านั้น" },
+      { t: "dialogue", speaker: "หลิงเจิน", text: "ห้องยาของพระราชวังจงหยางต้องการสมุนไพรหลากชนิด — สมุนไพรหายาก ๑๐, โสม ๑๐, เม็ดบัว ๑๐" },
+      { t: "dialogue", speaker: "หลิงเจิน", text: "เก็บมาให้ครบแล้วกลับมา ข้าจะรับเจ้าเป็นศิษย์ขั้นที่ ๙" },
     ],
     choices: [
       { text: "ข้าจะไปทำตามคำสั่ง", next: "sect_quanzhen" },
@@ -53,9 +53,9 @@ export const SCENES_QUANZHEN: readonly Scene[] = [
     id: "qs_qst_quanzhen_disciple_intro_complete",
     lines: [
       { t: "narration", text: "เจ้าวางสมุนไพรหลากชนิดลงบนแท่นไม้หน้าศาลา" },
-      { t: "dialogue", speaker: "ฉงหยาง", text: "เจ้ากลับมา และครบจำนวนทุกชนิด — ความเพียรของเจ้าเป็นเครื่องพิสูจน์ที่ดี" },
+      { t: "dialogue", speaker: "หลิงเจิน", text: "เจ้ากลับมา และครบจำนวนทุกชนิด — ความเพียรของเจ้าเป็นเครื่องพิสูจน์ที่ดี" },
       { t: "narration", text: "ท่านพยักหน้าและประสานมือ" },
-      { t: "dialogue", speaker: "ฉงหยาง", text: "ตั้งแต่บัดนี้ เจ้าคือศิษย์ฉวนเจินขั้นที่ ๙ — รับวิชาเร่งพลังและกระบี่หนักเป็นปฐมเถิด" },
+      { t: "dialogue", speaker: "หลิงเจิน", text: "ตั้งแต่บัดนี้ เจ้าคือศิษย์ฉวนเจินขั้นที่ ๙ — รับวิชาเร่งพลังและกระบี่หนักเป็นปฐมเถิด" },
     ],
     choices: [
       {
@@ -75,9 +75,9 @@ export const SCENES_QUANZHEN: readonly Scene[] = [
     kind: "dialog",
     id: "npc_sect_quanzhen_vice_master_mayu_talk",
     lines: [
-      { t: "narration", text: "รองอาจารย์หม่ายวี่ยืนนิ่งอยู่ข้างเสา ใบหน้าสงบเงียบ" },
-      { t: "dialogue", speaker: "หม่ายวี่", text: "ดาบของฉวนเจินหนัก — เพราะใจของเจ้าต้องหนักแน่นกว่านั้น" },
-      { t: "dialogue", speaker: "หม่ายวี่", text: "ฝึกซ้อมไม่ขาด แล้วเจ้าจะเข้าใจ" },
+      { t: "narration", text: "รองอาจารย์เติ้งหยวนเจินยืนนิ่งอยู่ข้างเสา ใบหน้าสงบเงียบ" },
+      { t: "dialogue", speaker: "เติ้งหยวนเจิน", text: "ดาบของฉวนเจินหนัก — เพราะใจของเจ้าต้องหนักแน่นกว่านั้น" },
+      { t: "dialogue", speaker: "เติ้งหยวนเจิน", text: "ฝึกซ้อมไม่ขาด แล้วเจ้าจะเข้าใจ" },
     ],
     choices: [
       // Secondary hint — only after the player has the sun art. Mayu's
@@ -102,9 +102,9 @@ export const SCENES_QUANZHEN: readonly Scene[] = [
     kind: "dialog",
     id: "npc_sect_quanzhen_sword_elder_qiuchuji_talk",
     lines: [
-      { t: "narration", text: "อาจารย์ดาบชิวฉู่จี้กำลังสาธิตท่ากระบี่สะกดสุริยันต์ในลานฝึก" },
-      { t: "dialogue", speaker: "ชิวฉู่จี้", text: "กระบี่สะกดสุริยันต์ต้องขังเเสงไว้ในใจ แล้วระเบิดออกในจังหวะเดียว" },
-      { t: "dialogue", speaker: "ชิวฉู่จี้", text: "อยากลองดูฝีมือของเจ้าไหม? มาประลองกันก็ได้" },
+      { t: "narration", text: "อาจารย์ดาบกู่จื้อชิงกำลังสาธิตท่ากระบี่สะกดสุริยันต์ในลานฝึก" },
+      { t: "dialogue", speaker: "กู่จื้อชิง", text: "กระบี่สะกดสุริยันต์ต้องขังเเสงไว้ในใจ แล้วระเบิดออกในจังหวะเดียว" },
+      { t: "dialogue", speaker: "กู่จื้อชิง", text: "อยากลองดูฝีมือของเจ้าไหม? มาประลองกันก็ได้" },
     ],
   },
 

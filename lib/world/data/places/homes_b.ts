@@ -2,7 +2,7 @@
 //   home_nanxian      南贤 — the hermit sage by the Quanzhen valley stream
 //   home_yideng       一燈 — the monk who was once the Southern Emperor, and his
 //                            fisher / farmer / scholar disciples
-//   home_tianboguang  田伯光 — the "thousand-li lone traveller" trying to go straight
+//   home_tianboguang  韩飞狼 (หานเฟยหลาง) — a reformed lone blade trying to go straight
 //   home_miaoren      苗人鳳 — the frontier swordsman and his daughter
 // Teaches (one quest each): dg, nc7, t1_redlotus, nd12, nd9, ch, ne13, ne9, nf2, nh2.
 import type { Choice, DialogScene, NpcDef, QuestDef, SceneLine } from "../../types";
@@ -79,16 +79,16 @@ const npcs: NpcDef[] = [
   },
   // home_yideng
   {
-    id: "home_yideng_monk_yideng", name: "อิดเต็งไต้ซือ",
-    description: "พระชราผู้เคยเป็นจักรพรรดิแห่งต้าหลี่ (หนานตี้) สละราชบัลลังก์มาจุดตะเกียงดวงเดียวในกระท่อม ใจดีและรักษาคนไม่เลือกหน้า",
+    id: "home_yideng_monk_yideng", name: "อู๋เฉินไต้ซือ",
+    description: "พระชราเชื้อสายตระกูลต้วนแห่งต้าหลี่ (สายเดียวกับหนานตี้ในตำนาน) สละยศศักดิ์มาจุดตะเกียงดวงเดียวในกระท่อม ใจดีและรักษาคนไม่เลือกหน้า",
     locationIds: [YD], dialogSceneId: "npc_home_yideng_monk_yideng_talk",
     sparOpponentId: "spar_home_yideng_monk", sparFameReward: 8,
     tags: ["monk", "healer", "elder", "master"], defenseTier: 4,
     look: { body: "monk" }, likes: ["herb", "lotus_seed", "book"], dislikes: ["venom", "raw_meat"],
   },
   {
-    id: "home_yideng_fisher_diancang", name: "ฤๅษีประมงเตี่ยมชง",
-    description: "ศิษย์คนโตของอิดเต็ง เคยเป็นแม่ทัพเรือแห่งต้าหลี่ บัดนี้นั่งตกปลาเฝ้าทางขึ้นกระท่อม ตะขอเบ็ดของเขาไม่เคยพลาดทั้งปลาและคน",
+    id: "home_yideng_fisher_diancang", name: "ฤๅษีประมงชิงเจียง",
+    description: "ศิษย์คนโตของอู๋เฉิน เคยเป็นแม่ทัพเรือแห่งต้าหลี่ บัดนี้นั่งตกปลาเฝ้าทางขึ้นกระท่อม ตะขอเบ็ดของเขาไม่เคยพลาดทั้งปลาและคน",
     locationIds: [YD], dialogSceneId: "npc_home_yideng_fisher_diancang_talk",
     sparOpponentId: "spar_home_yideng_fisher", sparFameReward: 4,
     tags: ["fisher", "disciple", "guard"], defenseTier: 2,
@@ -102,8 +102,8 @@ const npcs: NpcDef[] = [
     likes: ["rice_dish", "cooked_meat", "food"], dislikes: ["book"],
   },
   {
-    id: "home_yideng_scholar_zhu", name: "บัณฑิตจูจื่อหลิว",
-    description: "ศิษย์บัณฑิตของอิดเต็ง อดีตอัครเสนาบดีต้าหลี่ ใช้พู่กันจิ้มจุดได้แม่นกว่าเข็ม แต่ชอบท่องกลอนจนคนฟังหลับ",
+    id: "home_yideng_scholar_zhu", name: "บัณฑิตเยี่ยจื่อหลาน",
+    description: "ศิษย์บัณฑิตของอู๋เฉิน อดีตอัครเสนาบดีต้าหลี่ ใช้พู่กันจิ้มจุดได้แม่นกว่าเข็ม แต่ชอบท่องกลอนจนคนฟังหลับ",
     locationIds: [YD], dialogSceneId: "npc_home_yideng_scholar_zhu_talk",
     tags: ["scholar", "disciple", "official"], defenseTier: 1,
     stealLoot: [{ itemId: "paper", weight: 4 }, { itemId: "ink", weight: 4 }, { itemId: "alpha_inter", weight: 1 }],
@@ -111,7 +111,7 @@ const npcs: NpcDef[] = [
   },
   // home_tianboguang
   {
-    id: "home_tianboguang_blade_tian", name: "เถียนป๋อกวง",
+    id: "home_tianboguang_blade_tian", name: "หานเฟยหลาง",
     description: "\"ผู้เดินทางหมื่นลี้เพียงลำพัง\" จอมดาบไวที่ชื่อเสียงเคยเหม็นทั่วยุทธภพ บัดนี้ปฏิญาณกลับตัว แต่ปากยังเร็วกว่าดาบ",
     locationIds: [TBG], dialogSceneId: "npc_home_tianboguang_blade_tian_talk",
     sparOpponentId: "spar_home_tianboguang", sparFameReward: 6,
@@ -121,7 +121,7 @@ const npcs: NpcDef[] = [
   },
   {
     id: "home_tianboguang_cook_luo", name: "ป้าหลัว",
-    description: "แม่ครัวชายแดนที่เถียนป๋อกวงกลัวที่สุดในโลก ทัพพีของนางเคาะหัวจอมดาบมาแล้วนับไม่ถ้วน",
+    description: "แม่ครัวชายแดนที่หานเฟยหลางกลัวที่สุดในโลก ทัพพีของนางเคาะหัวจอมดาบมาแล้วนับไม่ถ้วน",
     locationIds: [TBG], dialogSceneId: "npc_home_tianboguang_cook_luo_talk",
     tags: ["cook", "servant"], look: { body: "f4", wander: true },
     likes: ["raw_meat", "herb", "silk"], dislikes: ["venom"],
@@ -135,7 +135,7 @@ const npcs: NpcDef[] = [
   },
   // home_miaoren
   {
-    id: "home_miaoren_master_miao", name: "เหมียวเหรินเฟิง",
+    id: "home_miaoren_master_miao", name: "เยวี่ยเหรินซาน",
     description: "\"พระพุทธหน้าทอง\" นักกระบี่ชายแดนผู้ได้ฉายาไร้เทียมทานใต้หล้า เงียบขรึม ซื่อตรง และรักลูกสาวยิ่งกว่าชื่อเสียง",
     locationIds: [MR], dialogSceneId: "npc_home_miaoren_master_miao_talk",
     sparOpponentId: "spar_home_miaoren_master", sparFameReward: 8,
@@ -143,15 +143,15 @@ const npcs: NpcDef[] = [
     look: { body: "m4" }, likes: ["tiger_claw", "steel_sword", "cooked_meat"], dislikes: ["poison_vial", "venom"],
   },
   {
-    id: "home_miaoren_daughter_ruolan", name: "เหมียวรั่วหลัน",
-    description: "ลูกสาวคนเดียวของเหมียวเหรินเฟิง อ่อนโยนแต่หัวแข็ง ชอบเล่นพิณใต้ต้นหลิวและแอบซ้อมกระบี่ตอนพ่อไม่อยู่",
+    id: "home_miaoren_daughter_ruolan", name: "เยวี่ยรั่วหลิง",
+    description: "ลูกสาวคนเดียวของเยวี่ยเหรินซาน อ่อนโยนแต่หัวแข็ง ชอบเล่นพิณใต้ต้นหลิวและแอบซ้อมกระบี่ตอนพ่อไม่อยู่",
     locationIds: [MR], dialogSceneId: "npc_home_miaoren_daughter_ruolan_talk",
     tags: ["daughter", "musician"], look: { body: "f1", wander: true },
     likes: ["silk", "jade_pendant", "silk_fan", "song_basic"], dislikes: ["raw_meat"],
   },
   {
     id: "home_miaoren_spearman_zhong", name: "ทหารทวนเฒ่าจง",
-    description: "อดีตนายกองทวนแห่งด่านชายแดน เพื่อนบ้านและคนเฝ้าประตูของตระกูลเหมียว ยืนตรงเหมือนด้ามทวนแม้หลังจะค่อมแล้ว",
+    description: "อดีตนายกองทวนแห่งด่านชายแดน เพื่อนบ้านและคนเฝ้าประตูของตระกูลเยวี่ย ยืนตรงเหมือนด้ามทวนแม้หลังจะค่อมแล้ว",
     locationIds: [MR], dialogSceneId: "npc_home_miaoren_spearman_zhong_talk",
     sparOpponentId: "spar_home_miaoren_spearman", sparFameReward: 4,
     tags: ["guard", "soldier", "elder"], defenseTier: 2,
@@ -165,15 +165,15 @@ const opponents: StoryOpponentSpec[] = [
     stats: { POW: 9, INT: 9, AGI: 6 }, skillIds: ["nf2", "nc3"], artId: "t3_heartmind", artLevel: 5 },
   { id: "foe_home_nanxian_masked_sword", name: "กระบี่สวมหน้ากาก", ti: 3, look: { sheet: "m4", tint: 0x6f7682 },
     stats: { POW: 8, INT: 7, AGI: 8 }, skillIds: ["nf2", "nh2"], artId: "t1_blackiron", artLevel: 6 },
-  { id: "spar_home_yideng_monk", name: "อิดเต็งไต้ซือ", ti: 4, look: { sheet: "monk" },
+  { id: "spar_home_yideng_monk", name: "อู๋เฉินไต้ซือ", ti: 4, look: { sheet: "monk" },
     stats: { POW: 12, DEX: 11, DEF: 10 }, skillIds: ["nd9", "nd12"], artId: "t3_dragonelephant", artLevel: 6 },
-  { id: "spar_home_yideng_fisher", name: "ฤๅษีประมงเตี่ยมชง", ti: 2, look: { sheet: "m4" },
+  { id: "spar_home_yideng_fisher", name: "ฤๅษีประมงชิงเจียง", ti: 2, look: { sheet: "m4" },
     stats: { STR: 6, DEX: 6 }, skillIds: ["ch", "nd9"], artId: "t1_blackiron", artLevel: 4 },
-  { id: "spar_home_tianboguang", name: "เถียนป๋อกวง", ti: 3, look: { sheet: "bandit" },
+  { id: "spar_home_tianboguang", name: "หานเฟยหลาง", ti: 3, look: { sheet: "bandit" },
     stats: { STR: 8, AGI: 10, DEX: 6 }, skillIds: ["ne9", "nc7"], artId: "t2_tigerroar", artLevel: 5 },
-  { id: "foe_home_tianboguang_holding_back", name: "เถียนป๋อกวง (ออมมือ)", ti: 2, look: { sheet: "bandit" },
+  { id: "foe_home_tianboguang_holding_back", name: "หานเฟยหลาง (ออมมือ)", ti: 2, look: { sheet: "bandit" },
     stats: { STR: 6, AGI: 7 }, skillIds: ["ne9", "nc7"] },
-  { id: "spar_home_miaoren_master", name: "เหมียวเหรินเฟิง", ti: 4, look: { sheet: "m4" },
+  { id: "spar_home_miaoren_master", name: "เยวี่ยเหรินซาน", ti: 4, look: { sheet: "m4" },
     stats: { STR: 12, AGI: 12, DEX: 9 }, skillIds: ["nh2", "nf2"], artId: "t3_voidstep", artLevel: 6 },
   { id: "spar_home_miaoren_spearman", name: "ทหารทวนเฒ่าจง", ti: 2, look: { sheet: "elder" },
     stats: { STR: 7, POW: 5 }, skillIds: ["ne13", "dg"], artId: "t2_craneform", artLevel: 3 },
@@ -237,15 +237,15 @@ const quests: QuestDef[] = [
   // ── home_yideng ──
   {
     id: "qw_home_yideng_one_lamp", type: "side", name: "ตะเกียงดวงเดียว",
-    description: "ชาวเขาคนหนึ่งตกหน้าผามาสลบหน้ากระท่อม อิดเต็งไต้ซือขอให้เจ้าช่วยหาสมุนไพรและป้อนยาตลอดคืน",
-    briefSummary: "หาสมุนไพรและดูแลคนเจ็บกับอิดเต็งไต้ซือ",
+    description: "ชาวเขาคนหนึ่งตกหน้าผามาสลบหน้ากระท่อม อู๋เฉินไต้ซือขอให้เจ้าช่วยหาสมุนไพรและป้อนยาตลอดคืน",
+    briefSummary: "หาสมุนไพรและดูแลคนเจ็บกับอู๋เฉินไต้ซือ",
     giverNpcId: "home_yideng_monk_yideng",
     stages: [
-      { id: "herbs", description: "หาสมุนไพรหายาก 3 ต้นให้อิดเต็งไต้ซือ", autoAdvance: { t: "hasItem", itemId: "herb", count: 3 } },
-      { id: "nurse", description: "เฝ้าป้อนยาคนเจ็บในกระท่อมอิดเต็ง",
+      { id: "herbs", description: "หาสมุนไพรหายาก 3 ต้นให้อู๋เฉินไต้ซือ", autoAdvance: { t: "hasItem", itemId: "herb", count: 3 } },
+      { id: "nurse", description: "เฝ้าป้อนยาคนเจ็บในกระท่อมอู๋เฉิน",
         objective: { spots: [{ locationId: YD, label: "เฝ้าไข้คนเจ็บ",
           text: "เจ้าเปลี่ยนผ้าเย็นทั้งคืน ใต้แสงตะเกียงดวงเดียว รุ่งเช้าคนเจ็บลืมตาและร้องเรียกหาแม่" }], hours: 4 } },
-      { id: "return", description: "กลับไปแจ้งอิดเต็งไต้ซือว่าคนเจ็บฟื้นแล้ว" },
+      { id: "return", description: "กลับไปแจ้งอู๋เฉินไต้ซือว่าคนเจ็บฟื้นแล้ว" },
     ],
     rewards: [{ t: "gold", amount: 120 }, { t: "wExp", amount: 60 }, { t: "item", itemId: "potion_mid" },
       { t: "trait", trait: "good", amount: 3 }, { t: "npcRelationship", npcId: "home_yideng_monk_yideng", amount: 10 }],
@@ -259,30 +259,30 @@ const quests: QuestDef[] = [
     stages: [
       { id: "rocks", description: "หาก้อนหิน 5 ก้อนให้ชาวนาเกิง", autoAdvance: { t: "hasItem", itemId: "rock", count: 5 } },
       { id: "boars", description: "ปราบหมูป่า 3 ตัวที่ลงมาทำลายนา", autoAdvance: { t: "defeatedOpponent", opponentId: "wild_boar", count: 3 } },
-      { id: "return", description: "กลับไปหาชาวนาเกิงที่บ้านอีตัง" },
+      { id: "return", description: "กลับไปหาชาวนาเกิงที่บ้านอู๋เฉิน" },
     ],
     rewards: [{ t: "learnSkill", skillId: "nd12" }, { t: "wExp", amount: 100 }, { t: "gold", amount: 200 },
       { t: "npcRelationship", npcId: "home_yideng_farmer_geng", amount: 5 }],
   },
   {
     id: "qw_home_yideng_brush_point", type: "side", name: "พู่กันจิ้มจุด",
-    description: "บัณฑิตจูจื่อหลิวหมึกหมด กลอนค้างครึ่งบท ถ้าเจ้าหาหมึกมาให้ เขาจะสอนวิธีปาเข็มให้ตรงจุดเหมือนจุดพู่กัน",
+    description: "บัณฑิตเยี่ยจื่อหลานหมึกหมด กลอนค้างครึ่งบท ถ้าเจ้าหาหมึกมาให้ เขาจะสอนวิธีปาเข็มให้ตรงจุดเหมือนจุดพู่กัน",
     briefSummary: "หาหมึกให้บัณฑิตจู ฝึกจิ้มจุดบนลำไผ่ แลกกับวิชาลึกลับ",
     giverNpcId: "home_yideng_scholar_zhu",
     prereqs: { t: "statAtLeast", stat: "DEX", min: 10 },
     stages: [
-      { id: "ink", description: "หาหมึกเข้ม 2 แท่งให้บัณฑิตจูจื่อหลิว", autoAdvance: { t: "hasItem", itemId: "ink", count: 2 } },
-      { id: "bamboo", description: "ฝึกปาเข็มใส่ข้อไผ่ที่บ้านอีตัง",
+      { id: "ink", description: "หาหมึกเข้ม 2 แท่งให้บัณฑิตเยี่ยจื่อหลาน", autoAdvance: { t: "hasItem", itemId: "ink", count: 2 } },
+      { id: "bamboo", description: "ฝึกปาเข็มใส่ข้อไผ่ที่บ้านอู๋เฉิน",
         objective: { spots: [{ locationId: YD, label: "ปาเข็มใส่ข้อไผ่",
           text: "เข็มแรกพลาด เข็มที่ร้อยตรงข้อไผ่พอดี ไผ่ทั้งลำสั่นแต่ไม่แตก" }], hours: 2 } },
-      { id: "return", description: "กลับไปให้บัณฑิตจูจื่อหลิวตรวจฝีมือ" },
+      { id: "return", description: "กลับไปให้บัณฑิตเยี่ยจื่อหลานตรวจฝีมือ" },
     ],
     rewards: [{ t: "learnSkill", skillId: "nd9" }, { t: "wExp", amount: 100 }, { t: "gold", amount: 200 },
       { t: "npcRelationship", npcId: "home_yideng_scholar_zhu", amount: 5 }],
   },
   {
     id: "qw_home_yideng_fishhook", type: "side", name: "ตะขอเบ็ดเฝ้าทาง",
-    description: "ฤๅษีประมงเตี่ยมชงไม่ยอมให้ใครผ่านง่าย ๆ ถ้าอยากได้วิชาโซ่เกี่ยวของเขา ต้องหาปลามาเลี้ยงและรับตะขอของเขาให้ได้หนึ่งยก",
+    description: "ฤๅษีประมงชิงเจียงไม่ยอมให้ใครผ่านง่าย ๆ ถ้าอยากได้วิชาโซ่เกี่ยวของเขา ต้องหาปลามาเลี้ยงและรับตะขอของเขาให้ได้หนึ่งยก",
     briefSummary: "หาปลาคาร์ปให้ฤๅษีประมง แล้วประลองกับเขา แลกกับวิชาลึกลับ",
     giverNpcId: "home_yideng_fisher_diancang",
     prereqs: { t: "and", all: [
@@ -290,11 +290,11 @@ const quests: QuestDef[] = [
       { t: "npcRelationship", npcId: "home_yideng_fisher_diancang", min: 5 },
     ] },
     stages: [
-      { id: "fish", description: "หาปลาคาร์ป 3 ตัวให้ฤๅษีประมงเตี่ยมชง", autoAdvance: { t: "hasItem", itemId: "fish_carp", count: 3 } },
-      { id: "spar", description: "ประลองกับฤๅษีประมงเตี่ยมชงริมลำธาร",
+      { id: "fish", description: "หาปลาคาร์ป 3 ตัวให้ฤๅษีประมงชิงเจียง", autoAdvance: { t: "hasItem", itemId: "fish_carp", count: 3 } },
+      { id: "spar", description: "ประลองกับฤๅษีประมงชิงเจียงริมลำธาร",
         objective: { spots: [{ locationId: YD, label: "รับตะขอฤๅษีประมง", npcId: "home_yideng_fisher_diancang",
           sceneId: "qd_qw_home_yideng_fishhook_spar" }] } },
-      { id: "return", description: "คุยกับฤๅษีประมงเตี่ยมชงหลังการประลอง" },
+      { id: "return", description: "คุยกับฤๅษีประมงชิงเจียงหลังการประลอง" },
     ],
     rewards: [{ t: "learnSkill", skillId: "ch" }, { t: "wExp", amount: 200 },
       { t: "npcRelationship", npcId: "home_yideng_fisher_diancang", amount: 5 }],
@@ -315,33 +315,33 @@ const quests: QuestDef[] = [
   },
   {
     id: "qw_home_tianboguang_vow", type: "side", name: "ของที่ขโมยมา ต้องคืนเจ้าของ",
-    description: "เถียนป๋อกวงปฏิญาณกลับตัว แต่หีบของเขายังมีของโจรเก่าอยู่ใบหนึ่ง เขาไม่กล้าเข้าเมืองซีเซี่ยเอง จึงขอให้เจ้าแอบเอาไปคืนร้านเครื่องประดับ",
-    briefSummary: "แอบคืนของที่เถียนป๋อกวงเคยขโมยให้ร้านในซีเซี่ย",
+    description: "หานเฟยหลางปฏิญาณกลับตัว แต่หีบของเขายังมีของโจรเก่าอยู่ใบหนึ่ง เขาไม่กล้าเข้าเมืองซีเซี่ยเอง จึงขอให้เจ้าแอบเอาไปคืนร้านเครื่องประดับ",
+    briefSummary: "แอบคืนของที่หานเฟยหลางเคยขโมยให้ร้านในซีเซี่ย",
     giverNpcId: "home_tianboguang_blade_tian",
     stages: [
       { id: "return_goods", description: "แอบคืนห่อเครื่องประดับที่หน้าร้านในเมืองซีเซี่ย",
         objective: { spots: [{ locationId: "city_xixia", label: "แอบวางห่อคืนหน้าร้านเครื่องประดับ",
           text: "เจ้าวางห่อผ้าไว้หน้าประตู เถ้าแก่เปิดดูแล้วร้องไห้ — ปิ่นทองของแม่เขาหายไปเจ็ดปี" }] } },
-      { id: "return", description: "กลับไปบอกเถียนป๋อกวงว่าของถึงมือเจ้าของแล้ว" },
+      { id: "return", description: "กลับไปบอกหานเฟยหลางว่าของถึงมือเจ้าของแล้ว" },
     ],
     rewards: [{ t: "gold", amount: 150 }, { t: "wExp", amount: 60 }, { t: "trait", trait: "good", amount: 3 },
       { t: "npcRelationship", npcId: "home_tianboguang_blade_tian", amount: 8 }],
   },
   {
     id: "qw_home_tianboguang_dragon_blade", type: "side", name: "ดาบไวกว่าปาก",
-    description: "เถียนป๋อกวงอยากพิสูจน์ว่าคนกลับตัวก็สอนวิชาได้ เขาให้เจ้าไปปราบหัวหน้าโจรที่ใช้ชื่อเขาไปปล้น แล้วรับดาบเขา (แบบออมมือ) ให้ได้",
-    briefSummary: "ปราบหัวหน้าโจรแอบอ้าง แล้วประลองกับเถียนป๋อกวง แลกกับวิชาลึกลับ",
+    description: "หานเฟยหลางอยากพิสูจน์ว่าคนกลับตัวก็สอนวิชาได้ เขาให้เจ้าไปปราบหัวหน้าโจรที่ใช้ชื่อเขาไปปล้น แล้วรับดาบเขา (แบบออมมือ) ให้ได้",
+    briefSummary: "ปราบหัวหน้าโจรแอบอ้าง แล้วประลองกับหานเฟยหลาง แลกกับวิชาลึกลับ",
     giverNpcId: "home_tianboguang_blade_tian",
     prereqs: { t: "and", all: [
       { t: "statAtLeast", stat: "STR", min: 15 },
       { t: "npcRelationship", npcId: "home_tianboguang_blade_tian", min: 5 },
     ] },
     stages: [
-      { id: "impostor", description: "ปราบหัวหน้าโจรที่แอบอ้างชื่อเถียนป๋อกวง", autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 1 } },
-      { id: "spar", description: "ประลองกับเถียนป๋อกวงที่บ้านนักรบชายแดน",
-        objective: { spots: [{ locationId: TBG, label: "รับดาบเถียนป๋อกวง", npcId: "home_tianboguang_blade_tian",
+      { id: "impostor", description: "ปราบหัวหน้าโจรที่แอบอ้างชื่อหานเฟยหลาง", autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 1 } },
+      { id: "spar", description: "ประลองกับหานเฟยหลางที่บ้านนักรบชายแดน",
+        objective: { spots: [{ locationId: TBG, label: "รับดาบหานเฟยหลาง", npcId: "home_tianboguang_blade_tian",
           sceneId: "qd_qw_home_tianboguang_dragon_blade_spar" }] } },
-      { id: "return", description: "ฟังเถียนป๋อกวงอธิบายเคล็ดดาบยาวมังกร" },
+      { id: "return", description: "ฟังหานเฟยหลางอธิบายเคล็ดดาบยาวมังกร" },
     ],
     rewards: [{ t: "learnSkill", skillId: "ne9" }, { t: "wExp", amount: 200 },
       { t: "npcRelationship", npcId: "home_tianboguang_blade_tian", amount: 5 }],
@@ -350,12 +350,12 @@ const quests: QuestDef[] = [
   // ── home_miaoren ──
   {
     id: "qw_home_miaoren_tiger", type: "side", name: "เสือกินคนแห่งตรอกชายแดน",
-    description: "เสือภูเขาตัวหนึ่งลงมาคาบแพะของชาวบ้าน เหมียวเหรินเฟิงไม่อยากทิ้งลูกสาวไว้ลำพัง จึงขอให้เจ้าไปจัดการแทน",
-    briefSummary: "ปราบเสือภูเขาแทนเหมียวเหรินเฟิง",
+    description: "เสือภูเขาตัวหนึ่งลงมาคาบแพะของชาวบ้าน เยวี่ยเหรินซานไม่อยากทิ้งลูกสาวไว้ลำพัง จึงขอให้เจ้าไปจัดการแทน",
+    briefSummary: "ปราบเสือภูเขาแทนเยวี่ยเหรินซาน",
     giverNpcId: "home_miaoren_master_miao",
     stages: [
       { id: "tiger", description: "ปราบเสือภูเขา 1 ตัว", autoAdvance: { t: "defeatedOpponent", opponentId: "mountain_tiger", count: 1 } },
-      { id: "return", description: "กลับไปบอกเหมียวเหรินเฟิงว่าเสือถูกปราบแล้ว" },
+      { id: "return", description: "กลับไปบอกเยวี่ยเหรินซานว่าเสือถูกปราบแล้ว" },
     ],
     rewards: [{ t: "gold", amount: 150 }, { t: "wExp", amount: 80 }, { t: "trait", trait: "fame", amount: 2 },
       { t: "npcRelationship", npcId: "home_miaoren_master_miao", amount: 10 }],
@@ -371,7 +371,7 @@ const quests: QuestDef[] = [
     ] },
     stages: [
       { id: "wood", description: "หาไม้เนื้อแข็ง 2 ท่อนให้ทหารทวนเฒ่าจง", autoAdvance: { t: "hasItem", itemId: "wood_hard", count: 2 } },
-      { id: "spar", description: "ประลองกับทหารทวนเฒ่าจงหน้าประตูบ้านเหมียว",
+      { id: "spar", description: "ประลองกับทหารทวนเฒ่าจงหน้าประตูบ้านเยวี่ย",
         objective: { spots: [{ locationId: MR, label: "ลองทวนใหม่กับนายกองจง", npcId: "home_miaoren_spearman_zhong",
           sceneId: "qd_qw_home_miaoren_new_shaft_spar" }] } },
       { id: "return", description: "ฟังทหารทวนเฒ่าจงสอนเคล็ดทวนหยินหยาง" },
@@ -381,8 +381,8 @@ const quests: QuestDef[] = [
   },
   {
     id: "qw_home_miaoren_poisoned_cure", type: "side", name: "ยาตาของพระพุทธหน้าทอง",
-    description: "ตาของเหมียวเหรินเฟิงพร่ามัวมาตั้งแต่ศึกกับตระกูลหู มีหมอแปลกหน้าในซีเซี่ยอ้างว่ารักษาได้ ก่อนสอนกระบี่ เขาขอให้เจ้าช่วยตามเรื่องนี้",
-    briefSummary: "ช่วยหายาตาให้เหมียวเหรินเฟิง แลกกับวิชาลึกลับ",
+    description: "ตาของเยวี่ยเหรินซานพร่ามัวมาตั้งแต่ศึกกับตระกูลหู มีหมอแปลกหน้าในซีเซี่ยอ้างว่ารักษาได้ ก่อนสอนกระบี่ เขาขอให้เจ้าช่วยตามเรื่องนี้",
+    briefSummary: "ช่วยหายาตาให้เยวี่ยเหรินซาน แลกกับวิชาลึกลับ",
     giverNpcId: "home_miaoren_master_miao",
     prereqs: { t: "and", all: [
       { t: "statAtLeast", stat: "AGI", min: 25 },
@@ -392,11 +392,11 @@ const quests: QuestDef[] = [
     stages: [
       { id: "rumor", description: "สืบเรื่องหมอแปลกหน้าในเมืองซีเซี่ย",
         objective: { spots: [{ locationId: "city_xixia", label: "สืบเรื่องหมอแปลกหน้า",
-          text: "คนในตลาดว่าหมอคนนั้นไม่เคยรักษาใคร แต่ถามทางไปบ้านเหมียวทุกวัน และจ่ายด้วยเงินจากเมืองหลวง" }] } },
-      { id: "ginseng", description: "หาโสม 2 รากให้เหมียวรั่วหลันต้มยาจริงสำรองไว้", autoAdvance: { t: "hasItem", itemId: "ginseng", count: 2 } },
-      { id: "doctor", description: "เฝ้าดูตอนหมอแปลกหน้ามาถึงบ้านเหมียว",
+          text: "คนในตลาดว่าหมอคนนั้นไม่เคยรักษาใคร แต่ถามทางไปบ้านเยวี่ยทุกวัน และจ่ายด้วยเงินจากเมืองหลวง" }] } },
+      { id: "ginseng", description: "หาโสม 2 รากให้เยวี่ยรั่วหลิงต้มยาจริงสำรองไว้", autoAdvance: { t: "hasItem", itemId: "ginseng", count: 2 } },
+      { id: "doctor", description: "เฝ้าดูตอนหมอแปลกหน้ามาถึงบ้านเยวี่ย",
         objective: { spots: [{ locationId: MR, label: "จับตาหมอแปลกหน้า", sceneId: "qd_qw_home_miaoren_poisoned_cure_doctor" }] } },
-      { id: "return", description: "กลับไปหาเหมียวเหรินเฟิง" },
+      { id: "return", description: "กลับไปหาเยวี่ยเหรินซาน" },
     ],
     rewards: [{ t: "learnSkill", skillId: "nh2" }, { t: "wExp", amount: 320 }, { t: "item", itemId: "potion_big" },
       { t: "npcRelationship", npcId: "home_miaoren_master_miao", amount: 10 }],
@@ -405,9 +405,9 @@ const quests: QuestDef[] = [
 
 // ─── dialogs ───────────────────────────────────────────────────────────
 const SAGE = "ท่านหนานเสียน", ASHU = "อาซู", BAI = "ลุงไป๋";
-const YIDENG = "อิดเต็งไต้ซือ", FISHER = "ฤๅษีประมงเตี่ยมชง", GENG = "ชาวนาเกิง", ZHU = "บัณฑิตจูจื่อหลิว";
-const TIAN = "เถียนป๋อกวง", LUO = "ป้าหลัว", CHEN = "ทหารแก่เฉิน";
-const MIAO = "เหมียวเหรินเฟิง", RUOLAN = "เหมียวรั่วหลัน", ZHONG = "ทหารทวนเฒ่าจง";
+const YIDENG = "อู๋เฉินไต้ซือ", FISHER = "ฤๅษีประมงชิงเจียง", GENG = "ชาวนาเกิง", ZHU = "บัณฑิตเยี่ยจื่อหลาน";
+const TIAN = "หานเฟยหลาง", LUO = "ป้าหลัว", CHEN = "ทหารแก่เฉิน";
+const MIAO = "เยวี่ยเหรินซาน", RUOLAN = "เยวี่ยรั่วหลิง", ZHONG = "ทหารทวนเฒ่าจง";
 
 const scenes: DialogScene[] = [
   // ── talk: home_nanxian ──
@@ -494,7 +494,7 @@ const scenes: DialogScene[] = [
   // ── talk: home_tianboguang ──
   ...talk("home_tianboguang_blade_tian", TBG, [
     nar("ชายหนวดเฟิ้มนั่งเหยียดขาบนม้านั่ง ดาบพาดตัก กำลังแทะขาไก่"),
-    say(TIAN, "อ้าว! มาหาเถียนป๋อกวงผู้เดินทางหมื่นลี้เพียงลำพังหรือ... ตอนนี้เดินแค่ร้อยก้าวไปครัวป้าหลัว"),
+    say(TIAN, "อ้าว! มาหาหานเฟยหลางผู้เดินทางหมื่นลี้เพียงลำพังหรือ... ตอนนี้เดินแค่ร้อยก้าวไปครัวป้าหลัว"),
     say(TIAN, "ข้ากลับตัวแล้วนะ! ปฏิญาณต่อหน้าฟ้าดิน ต่อหน้าป้าหลัว ซึ่งน่ากลัวกว่าฟ้าดิน"),
     say(TIAN, "ดาบข้ายังเร็วเหมือนเดิม เร็วจนแมลงวันที่บินผ่านกลายเป็นแมลงวันสองตัว"),
   ], { label: "ถามข่าวชายแดน", lines: [
@@ -506,7 +506,7 @@ const scenes: DialogScene[] = [
   ] }),
   ...talk("home_tianboguang_cook_luo", TBG, [
     say(LUO, "จะมาขอข้าวหรือ นั่งลง ล้างมือก่อน! ที่นี่ใครไม่ล้างมือไม่ได้กิน รวมถึงจอมดาบหมื่นลี้นั่นด้วย"),
-    say(LUO, "ไอ้เถียนมันกินเหมือนหมาป่าสามตัว แต่ก็ผ่าฟืน แบกน้ำ ไม่บ่น นับว่าดีขึ้น"),
+    say(LUO, "ไอ้หานมันกินเหมือนหมาป่าสามตัว แต่ก็ผ่าฟืน แบกน้ำ ไม่บ่น นับว่าดีขึ้น"),
     say(LUO, "ถ้ามันทำตัวไม่ดีอีก ทัพพีข้ายังอยู่"),
   ], { label: "ถามเรื่องในบ้าน", lines: [
     say(LUO, "ทหารแก่เฉินบ่นเรื่องขโมยม้าทุกเช้า แต่ไม่เคยลุกไปไล่สักที ข้าว่าเขาชอบมีเรื่องให้บ่น"),
@@ -523,13 +523,13 @@ const scenes: DialogScene[] = [
   // ── talk: home_miaoren ──
   ...talk("home_miaoren_master_miao", MR, [
     nar("ชายร่างสูงหน้าคล้ำยืนนิ่งใต้ชายคา กระบี่พิงผนัง ตาหรี่มองมาอย่างระวัง"),
-    say(MIAO, "เหมียวเหรินเฟิง ข้าเอง ถ้ามาท้าประลองก็ว่ามา ถ้ามาเป็นแขกก็นั่ง"),
+    say(MIAO, "เยวี่ยเหรินซาน ข้าเอง ถ้ามาท้าประลองก็ว่ามา ถ้ามาเป็นแขกก็นั่ง"),
     say(MIAO, "คนเรียกข้าว่าไร้เทียมทานใต้หล้า ข้าไม่เคยตั้งชื่อนั้นเอง และไม่ชอบมันนัก"),
     say(MIAO, "ศัตรูตระกูลข้ายังไม่หมด ข้าจึงไม่ห่างลูกสาวไปไหน"),
   ], { label: "ถามข่าวชายแดน", lines: [
     say(MIAO, "เสือภูเขาตัวหนึ่งลงมาถึงตรอกชายแดน คาบแพะไปสามตัวแล้ว ข้าไปไม่ได้เพราะต้องเฝ้าบ้าน"),
     say(MIAO, "ถ้าเจ้าได้ยินใครถามทางมาบ้านข้าในซีเซี่ย จำหน้าเขาไว้ให้ดี"),
-  ] }, { label: "ขอเรียนกระบี่ตระกูลเหมียว", lines: [
+  ] }, { label: "ขอเรียนกระบี่ตระกูลเยวี่ย", lines: [
     say(MIAO, "กระบี่ข้าไม่สอนคนที่ข้ายังไม่รู้จักใจ"),
     say(MIAO, "ช่วยข้าสักเรื่อง ให้ข้าเห็นว่าเจ้าไว้ใจได้ และให้ขาเจ้าไวพอจะตามกระบี่ทัน แล้วค่อยว่ากัน"),
   ] }),
@@ -545,7 +545,7 @@ const scenes: DialogScene[] = [
   ...talk("home_miaoren_spearman_zhong", MR, [
     say(ZHONG, "หยุดหน้าประตู! บอกชื่อ บอกธุระ... ขาข้าค่อม แต่ทวนข้ายังตรง"),
     say(ZHONG, "ข้าเคยคุมกองทวนสามร้อยคนที่ด่านนอก ตอนนี้คุมประตูบานเดียว งานเบาลง ใจไม่เบา"),
-    say(ZHONG, "ท่านเหมียวช่วยชีวิตข้าไว้ครั้งหนึ่ง ข้าจึงเฝ้าประตูให้ท่านไปจนตาย"),
+    say(ZHONG, "ท่านเยวี่ยช่วยชีวิตข้าไว้ครั้งหนึ่ง ข้าจึงเฝ้าประตูให้ท่านไปจนตาย"),
   ], { label: "ถามเรื่องชายแดน", lines: [
     say(ZHONG, "นักรบทะเลทรายเคลื่อนไหวแปลก ๆ แถวซากเมืองเก่า สมัยข้ายังรับราชการ เขาไม่กล้าเข้าใกล้เมืองขนาดนี้"),
     say(ZHONG, "ไม้เนื้อแข็งดี ๆ ต้องตัดจากป่าเขา ไม้ชายแดนแห้งเปราะ ทำด้ามทวนไม่ได้"),
@@ -671,19 +671,19 @@ const scenes: DialogScene[] = [
   ], "รับห่อผ้าไว้"),
   complete("qw_home_tianboguang_vow", TBG, [
     say(TIAN, "เถ้าแก่ร้องไห้หรือ... ปิ่นของแม่เขา... ข้าไม่รู้เลย"),
-    nar("เถียนป๋อกวงเงียบไปนาน แล้วยกมือขยี้ตา อ้างว่าฝุ่นทะเลทรายเข้าตา"),
+    nar("หานเฟยหลางเงียบไปนาน แล้วยกมือขยี้ตา อ้างว่าฝุ่นทะเลทรายเข้าตา"),
     say(TIAN, "รับนี่ไป เงินที่ข้าหามาด้วยการแบกน้ำให้ป้าหลัว สะอาดทุกเหรียญ"),
     say(LUO, "ฮึ! ในที่สุดก็ทำเรื่องดีเป็น คืนนี้ให้กินขาไก่สองขา"),
   ]),
   offer("qw_home_tianboguang_dragon_blade", TBG, [
-    say(TIAN, "มีไอ้หัวหน้าโจรตัวหนึ่งปล้นคาราวานแล้วตะโกนว่า \"ข้าคือเถียนป๋อกวง!\" ข้าไม่เคยตะโกนชื่อตัวเองตอนปล้น ข้าไม่โง่ขนาดนั้น"),
+    say(TIAN, "มีไอ้หัวหน้าโจรตัวหนึ่งปล้นคาราวานแล้วตะโกนว่า \"ข้าคือหานเฟยหลาง!\" ข้าไม่เคยตะโกนชื่อตัวเองตอนปล้น ข้าไม่โง่ขนาดนั้น"),
     say(TIAN, "เจ้าไปจัดการมัน แล้วกลับมารับดาบข้าสักยก ข้าจะออมมือ... ส่วนหนึ่ง"),
     say(TIAN, "ผ่านได้ ข้าสอนดาบยาวมังกร ดาบที่ทำให้ข้าเดินคนเดียวได้หมื่นลี้"),
   ]),
   ...fightBeat("qw_home_tianboguang_dragon_blade", "spar", TBG, "foe_home_tianboguang_holding_back", [
-    say(TIAN, "ได้ข่าวแล้ว หัวหน้าโจรนั่นตอนนี้ร้องว่า \"ข้าไม่ใช่เถียนป๋อกวง!\" ฮ่า ๆ ดีมาก"),
+    say(TIAN, "ได้ข่าวแล้ว หัวหน้าโจรนั่นตอนนี้ร้องว่า \"ข้าไม่ใช่หานเฟยหลาง!\" ฮ่า ๆ ดีมาก"),
     say(TIAN, "ทีนี้ตาข้า ดาบข้าเร็ว อย่ากะพริบตา"),
-    say(LUO, "ไอ้เถียน! ถ้าแขกเลือดออกสักหยด เย็นนี้แกอด!"),
+    say(LUO, "ไอ้หาน! ถ้าแขกเลือดออกสักหยด เย็นนี้แกอด!"),
     say(TIAN, "...ได้ยินแล้ว ป้า ข้าออมมือมากขึ้นอีกนิด"),
   ], "ชักอาวุธรับดาบ", [
     say(TIAN, "ฮ่า! รับได้ตั้งหลายดาบ ข้าออมมือแค่ครึ่งเดียวนะ จริง ๆ"),
@@ -715,7 +715,7 @@ const scenes: DialogScene[] = [
     nar("ทหารทวนเฒ่าจงหมุนทวนด้ามใหม่สองรอบ เสียงลมหวีด หลังที่ค่อมยืดตรงขึ้นทันที"),
     say(ZHONG, "ด้ามดี! ทีนี้ระวัง แทงหนึ่งหลอก แทงหนึ่งจริง"),
   ], "ตั้งท่ารับทวน", [
-    say(ZHONG, "ฮ่า! สามสิบปีแล้วไม่มีใครรับทวนข้าได้ครบยก ยกเว้นท่านเหมียว"),
+    say(ZHONG, "ฮ่า! สามสิบปีแล้วไม่มีใครรับทวนข้าได้ครบยก ยกเว้นท่านเยวี่ย"),
     say(ZHONG, "เจ้าคู่ควรแล้ว มาฟังเคล็ด"),
   ]),
   complete("qw_home_miaoren_new_shaft", MR, [
@@ -727,23 +727,23 @@ const scenes: DialogScene[] = [
     say(MIAO, "ตาข้าพร่ามาตั้งแต่ศึกกับหูอีเตา ข้าไม่เคยบอกใคร แต่รั่วหลันรู้"),
     say(MIAO, "มีหมอคนหนึ่งในซีเซี่ยส่งข่าวว่ารักษาได้ จะมาที่บ้านเร็ว ๆ นี้"),
     say(MIAO, "ข้าไม่ไว้ใจคนที่มาเสนอตัวเอง ไปสืบให้ข้าในเมือง แล้วหาโสมให้รั่วหลันต้มยาจริงสำรองไว้"),
-    say(MIAO, "ถ้าเรื่องนี้จบด้วยดี กระบี่ตระกูลเหมียวท่าหนึ่งจะเป็นของเจ้า"),
+    say(MIAO, "ถ้าเรื่องนี้จบด้วยดี กระบี่ตระกูลเยวี่ยท่าหนึ่งจะเป็นของเจ้า"),
   ], "รับปากจะช่วย"),
   ...fightBeat("qw_home_miaoren_poisoned_cure", "doctor", MR, "foe_home_miaoren_poison_doctor", [
     nar("หมอในชุดผ้าฝ้ายสะอาดเกินคนเดินทางไกลมาถึงประตู ถือกล่องยาไม้หอม ยิ้มไม่ถึงตา"),
-    say("หมอปลอมมือสังหาร", "ข้ามารักษาตาท่านเหมียว ยานี้หยอดสามหยดก็หาย"),
+    say("หมอปลอมมือสังหาร", "ข้ามารักษาตาท่านเยวี่ย ยานี้หยอดสามหยดก็หาย"),
     say(RUOLAN, "ท่านหมอ ยาของท่านกลิ่นเหมือนดอกเมฆดำ... ท่านแม่เคยบอกว่าดอกนี้ทำให้ตาบอด"),
     nar("รอยยิ้มของหมอหายวับ มือหนึ่งล้วงเข็มพิษออกจากแขนเสื้อ"),
-    say("หมอปลอมมือสังหาร", "เด็กปากดี! เถียนกุยหนงจ่ายข้าให้เอาตาเหมียวเหรินเฟิง ข้าจะเอาชีวิตพวกเจ้าแถมไปด้วย"),
+    say("หมอปลอมมือสังหาร", "เด็กปากดี! ซุนกุยหลงจ่ายข้าให้เอาตาเยวี่ยเหรินซาน ข้าจะเอาชีวิตพวกเจ้าแถมไปด้วย"),
   ], "ขวางหน้าก่อนเข็มพิษถึงตัวรั่วหลัน", [
     nar("มือสังหารล้มลง กล่องยาไม้หอมแตกกระจาย ผงสีดำหกเต็มพื้น หญ้ารอบ ๆ เหี่ยวทันที"),
     say(RUOLAN, "ท่านช่วยท่านพ่อไว้... ช่วยข้าไว้ด้วย"),
-    say(MIAO, "เถียนกุยหนง... ยังไม่เลิกอีก ไปข้างในเถิด ข้ามีเรื่องจะคุย"),
+    say(MIAO, "ซุนกุยหลง... ยังไม่เลิกอีก ไปข้างในเถิด ข้ามีเรื่องจะคุย"),
   ]),
   complete("qw_home_miaoren_poisoned_cure", MR, [
     say(MIAO, "ถ้าข้าหยอดยานั่น ข้าคงไม่ได้เห็นหน้ารั่วหลันอีกเลย"),
     say(RUOLAN, "ยาโสมที่ท่านหามา ข้าต้มให้ท่านพ่อแล้ว ท่านพ่อบอกว่าเห็นชัดขึ้นนิดหนึ่ง"),
-    say(MIAO, "กระบี่วิเศษ ตระกูลเหมียวสืบมาสามชั่วคน ฟันศัตรูแล้วดึงลมปราณเขามาซ่อมบาดแผลตัวเอง"),
+    say(MIAO, "กระบี่วิเศษ ตระกูลเยวี่ยสืบมาสามชั่วคน ฟันศัตรูแล้วดึงลมปราณเขามาซ่อมบาดแผลตัวเอง"),
     say(MIAO, "ขาต้องไวกว่ากระบี่ กระบี่ถึงจะฟังเจ้า เจ้าไวพอแล้ว"),
     say(MIAO, "ยานี้ข้าเก็บไว้ใช้ยามจำเป็น บัดนี้เจ้าน่าจะจำเป็นกว่าข้า"),
   ], "รับกระบี่วิเศษ"),
@@ -761,7 +761,7 @@ const activities: ActivityDef[] = [
     description: "ผ่าฟืนกองโตให้บ้านหนานเสียน · ได้ค่าแรงเล็กน้อยและฝึกพละกำลัง",
     place: { locationIds: [NX], cooldownDays: 1, reward: { gold: [20, 40], statXp: "STR" },
       doneText: "ฟืนกองสูงท่วมหัว ลุงไป๋ยกนิ้วโป้งให้" } },
-  { id: "act_home_yideng_chant", label: "สวดมนต์เย็นกับอิดเต็งไต้ซือ", badge: "rest", icon: "🪷", hours: 2, stamina: 0,
+  { id: "act_home_yideng_chant", label: "สวดมนต์เย็นกับอู๋เฉินไต้ซือ", badge: "rest", icon: "🪷", hours: 2, stamina: 0,
     description: "นั่งสวดมนต์ใต้แสงตะเกียงดวงเดียว · ฟื้นบาดแผลและใจ",
     place: { locationIds: [YD], cooldownDays: 2, reward: { heal: 0.3, stamina: 15, trait: { trait: "humility", amount: 1 } },
       doneText: "เสียงสวดเงียบลง ความเหนื่อยล้าหายไปพร้อมควันธูป" } },
@@ -773,16 +773,16 @@ const activities: ActivityDef[] = [
     description: "ขนหญ้า ตักน้ำ แปรงขนม้าให้ทหารแก่เฉิน · ได้ค่าแรงและฝึกความทรหด",
     place: { locationIds: [TBG], cooldownDays: 1, reward: { gold: [25, 45], statXp: "VIT" },
       doneText: "ม้าศึกเอาจมูกดุนไหล่เจ้า ทหารแก่เฉินบอกว่ามันไม่เคยทำแบบนี้กับใคร" } },
-  { id: "act_home_tianboguang_quickdraw", label: "ฝึกชักดาบเร็วกับเถียนป๋อกวง", badge: "practice", icon: "⚔️", hours: 2, stamina: 12,
+  { id: "act_home_tianboguang_quickdraw", label: "ฝึกชักดาบเร็วกับหานเฟยหลาง", badge: "practice", icon: "⚔️", hours: 2, stamina: 12,
     description: "ฟันเทียนให้ดับโดยไม่ให้ล้ม · ฝึกความว่องไว",
     place: { locationIds: [TBG], cooldownDays: 2, reward: { statXp: "AGI", wExp: 15 },
-      doneText: "เทียนเล่มสุดท้ายดับ ไส้ขาดแต่ตัวเทียนยังตั้งอยู่ เถียนป๋อกวงผิวปากยาว" } },
-  { id: "act_home_miaoren_stance", label: "ยืนม้าซ้อมกระบี่ตามท่านเหมียว", badge: "practice", icon: "🗡️", hours: 3, stamina: 15,
-    description: "ยืนม้าข้างเหมียวเหรินเฟิงยามเช้า เลียนท่ากระบี่ช้า ๆ · ฝึกความว่องไว",
+      doneText: "เทียนเล่มสุดท้ายดับ ไส้ขาดแต่ตัวเทียนยังตั้งอยู่ หานเฟยหลางผิวปากยาว" } },
+  { id: "act_home_miaoren_stance", label: "ยืนม้าซ้อมกระบี่ตามท่านเยวี่ย", badge: "practice", icon: "🗡️", hours: 3, stamina: 15,
+    description: "ยืนม้าข้างเยวี่ยเหรินซานยามเช้า เลียนท่ากระบี่ช้า ๆ · ฝึกความว่องไว",
     place: { locationIds: [MR], cooldownDays: 2, reward: { statXp: "AGI", wExp: 15,
       relationship: { npcId: "home_miaoren_master_miao", amount: 1 } },
-      doneText: "ขาสั่นจนเดินไม่ตรง เหมียวเหรินเฟิงพยักหน้าครั้งเดียว ซึ่งนับว่าเป็นคำชม" } },
-  { id: "act_home_miaoren_zither", label: "ฟังเหมียวรั่วหลันดีดพิณ", badge: "rest", icon: "🎵", hours: 1, stamina: 0,
+      doneText: "ขาสั่นจนเดินไม่ตรง เยวี่ยเหรินซานพยักหน้าครั้งเดียว ซึ่งนับว่าเป็นคำชม" } },
+  { id: "act_home_miaoren_zither", label: "ฟังเยวี่ยรั่วหลิงดีดพิณ", badge: "rest", icon: "🎵", hours: 1, stamina: 0,
     description: "นั่งใต้ต้นหลิวฟังเพลงพิณยามเย็น · ฟื้นพลังเล็กน้อย",
     place: { locationIds: [MR], cooldownDays: 1, reward: { stamina: 10, relationship: { npcId: "home_miaoren_daughter_ruolan", amount: 1 } },
       doneText: "เพลงจบ ลมชายแดนพัดเบาลง รั่วหลันยิ้มอาย ๆ" } },

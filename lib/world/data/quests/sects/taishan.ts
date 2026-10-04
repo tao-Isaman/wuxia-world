@@ -8,7 +8,7 @@ export const QUESTS_TAISHAN: readonly QuestDef[] = [
   {
     id: "qst_taishan_disciple_intro",
     name: "ขอเข้าเป็นศิษย์ไท่ซาน",
-    description: "เทียนเหมินเต้าเหรินรับศิษย์ใหม่ที่ใจสะอาดและพร้อมต้อนรับแสงแรกของฟ้า — ต้องนำหยกบูชาตะวัน 3 ก้อนมาถวายเทพสุริยันบนยอดบูรพา และค่าเข้าสำนัก 500 เหรียญทอง",
+    description: "ชิงสือเต้าเหรินรับศิษย์ใหม่ที่ใจสะอาดและพร้อมต้อนรับแสงแรกของฟ้า — ต้องนำหยกบูชาตะวัน 3 ก้อนมาถวายเทพสุริยันบนยอดบูรพา และค่าเข้าสำนัก 500 เหรียญทอง",
     briefSummary: "จ่ายค่าเข้าสำนัก 500 ทอง + ส่งหยก 3 ก้อน เข้าเป็นศิษย์ไท่ซานขั้นที่ 9",
     type: "side",
     giverNpcId: "sect_taishan_master_tianmen",
@@ -33,7 +33,7 @@ export const QUESTS_TAISHAN: readonly QuestDef[] = [
       },
       {
         id: "return_to_master",
-        description: "นำหยกและเงินค่าเข้าสำนักไปถวายเทียนเหมินเต้าเหริน",
+        description: "นำหยกและเงินค่าเข้าสำนักไปถวายชิงสือเต้าเหริน",
       },
     ],
     // Gold + jade deduction happens at the complete-scene's choice
@@ -65,7 +65,7 @@ export const QUESTS_TAISHAN: readonly QuestDef[] = [
       },
       {
         id: "report",
-        description: "กลับไปรายงานเทียนเหมินเต้าเหริน",
+        description: "กลับไปรายงานชิงสือเต้าเหริน",
       },
     ],
     rewards: [
@@ -93,7 +93,7 @@ export const QUESTS_TAISHAN: readonly QuestDef[] = [
       },
       {
         id: "deliver",
-        description: "ส่งหยกให้เทียนเหมินเต้าเหริน",
+        description: "ส่งหยกให้ชิงสือเต้าเหริน",
       },
     ],
     rewards: [
@@ -135,7 +135,7 @@ export const QUESTS_TAISHAN: readonly QuestDef[] = [
   {
     id: "qst_taishan_art_sun",
     name: "บททดสอบก่อนสืบทอด: วิชาลึกลับ",
-    description: "เทียนเหมินเต้าเหรินจะทดสอบก่อนเปิดตำราวิชาลึกลับให้ศิษย์ที่พิสูจน์ใจ — ผ่านการประลองกับหัวหน้าโจรชั้นสูงและเก็บแร่เทพสำหรับหลอมกระบี่บูชาตะวัน (ผ่านแล้วจึงรับภารกิจสืบทอดวิชาลึกลับได้)",
+    description: "ชิงสือเต้าเหรินจะทดสอบก่อนเปิดตำราวิชาลึกลับให้ศิษย์ที่พิสูจน์ใจ — ผ่านการประลองกับหัวหน้าโจรชั้นสูงและเก็บแร่เทพสำหรับหลอมกระบี่บูชาตะวัน (ผ่านแล้วจึงรับภารกิจสืบทอดวิชาลึกลับได้)",
     briefSummary: "บททดสอบ — เปิดทางสู่การสืบทอดวิชาลึกลับ",
     type: "side",
     sectId: "taishan",
@@ -162,7 +162,7 @@ export const QUESTS_TAISHAN: readonly QuestDef[] = [
       },
       {
         id: "return_art",
-        description: "กลับไปรายงานผลต่อเทียนเหมินเต้าเหริน",
+        description: "กลับไปรายงานผลต่อชิงสือเต้าเหริน",
       },
     ],
     rewards: [
@@ -177,7 +177,7 @@ export const QUESTS_TAISHAN: readonly QuestDef[] = [
   {
     id: "qst_taishan_redemption",
     name: "ไถ่บาปต่อไท่ซาน",
-    description: "เจ้าผู้ทรยศกลับมาขออภัย — เทียนเหมินเต้าเหรินทดสอบความจริงใจเจ้าด้วยภารกิจหนัก ปราบหัวหน้าโจร 5 คนและนำหยกบูชาตะวันมาถวาย หากผ่าน ความเป็นทรยศจะถูกล้างเป็น \"ลาออก\" — นักล่าจะหยุดตามล่า แต่วิชาจะถูกแช่แข็ง",
+    description: "เจ้าผู้ทรยศกลับมาขออภัย — ชิงสือเต้าเหรินทดสอบความจริงใจเจ้าด้วยภารกิจหนัก ปราบหัวหน้าโจร 5 คนและนำหยกบูชาตะวันมาถวาย หากผ่าน ความเป็นทรยศจะถูกล้างเป็น \"ลาออก\" — นักล่าจะหยุดตามล่า แต่วิชาจะถูกแช่แข็ง",
     briefSummary: "ไถ่บาปต่อไท่ซาน — ปราบหัวหน้าโจร 5 + ส่งหยก 5 ก้อน",
     type: "side",
     sectId: "taishan",
@@ -186,7 +186,7 @@ export const QUESTS_TAISHAN: readonly QuestDef[] = [
     stages: [
       { id: "trial_kill", description: "ปราบหัวหน้าโจร (bandit_chief) 5 คน เพื่อพิสูจน์ใจ", autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 5 } },
       { id: "trial_offering", description: "นำหยกบูชาตะวัน — jade 5 ก้อน", autoAdvance: { t: "hasItem", itemId: "jade", count: 5 } },
-      { id: "return_to_master", description: "กลับไปขออภัยต่อเทียนเหมินเต้าเหริน" },
+      { id: "return_to_master", description: "กลับไปขออภัยต่อชิงสือเต้าเหริน" },
     ],
     rewards: [
       { t: "wExp", amount: 300 },

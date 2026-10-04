@@ -56,8 +56,8 @@ export const SCENES_SUNMOON: readonly Scene[] = [
     kind: "dialog",
     id: "npc_sect_sunmoon_vice_renwoxing_talk",
     lines: [
-      { t: "narration", text: "เหรินหวัวสิงยืนหลังเสาดำ เสื้อสีดำสะท้อนแสงเทียน" },
-      { t: "dialogue", speaker: "เหรินหวัวสิง", text: "พลังดูดดาวของข้าเรียกพลังของศัตรูได้ — เจ้าอยากเห็นไหม?" },
+      { t: "narration", text: "ตู้เทียนหานยืนหลังเสาดำ เสื้อสีดำสะท้อนแสงเทียน" },
+      { t: "dialogue", speaker: "ตู้เทียนหาน", text: "พลังดูดดาวของข้าเรียกพลังของศัตรูได้ — เจ้าอยากเห็นไหม?" },
     ],
   },
 
@@ -65,8 +65,8 @@ export const SCENES_SUNMOON: readonly Scene[] = [
     kind: "dialog",
     id: "npc_sect_sunmoon_sun_elder_zuolengchan_talk",
     lines: [
-      { t: "narration", text: "จั่วเหลิงฉันยืนนิ่งหน้ากระจกแสง เปลวเพลิงน้อยล้อมรอบฝ่ามือ" },
-      { t: "dialogue", speaker: "จั่วเหลิงฉัน", text: "พลังตะวันคือไฟที่จุดในกาย — ลงมือฝึกหรือถอยไป" },
+      { t: "narration", text: "ซางเหยียนเลี่ยยืนนิ่งหน้ากระจกแสง เปลวเพลิงน้อยล้อมรอบฝ่ามือ" },
+      { t: "dialogue", speaker: "ซางเหยียนเลี่ย", text: "พลังตะวันคือไฟที่จุดในกาย — ลงมือฝึกหรือถอยไป" },
     ],
   },
 ];

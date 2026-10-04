@@ -113,21 +113,21 @@ A `Rumor`:
 | `sect_wudang_master_qingxu` | อาจารย์ชิงซวี่ | wudang | 10 | 94 | 72 | north | master_art |
 | `sect_wudang_vice_master_xuancheng` | รองอาจารย์เสวียนเฉิง | wudang | 9 | 75 | 54 | north | climb_sect, master_art |
 | `sect_huashan_master_yiqing` | อาจารย์ใหญ่อี้ชิง | huashan | 10 | 82 | 62 | west | master_art, find_treasure |
-| `sect_quanzhen_master_chongyang` | อาจารย์ใหญ่ฉงหยาง | quanzhen | 10 | 88 | 70 | north | master_art, seek_wisdom |
-| `sect_quanzhen_sword_elder_qiuchuji` | อาจารย์ดาบชิวฉู่จี้ | quanzhen | 7 | 65 | 52 | north | master_art, climb_sect |
+| `sect_quanzhen_master_chongyang` | อาจารย์ใหญ่หลิงเจิน | quanzhen | 10 | 88 | 70 | north | master_art, seek_wisdom |
+| `sect_quanzhen_sword_elder_qiuchuji` | อาจารย์ดาบกู่จื้อชิง | quanzhen | 7 | 65 | 52 | north | master_art, climb_sect |
 | `sect_emei_abbess_jingchan` | ท่านนิ้วห้วนจิงฉาน | emei | 10 | 90 | 68 | south | master_art |
 | `sect_emei_vice_abbess_huimiao` | รองท่านนิ้วฮุยเหมียว | emei | 9 | 73 | 50 | south | climb_sect, master_art |
 | `sect_gumu_mystery_woman` | หญิงปริศนาในสุสาน | gumu | 10 | 96 | 65 | west | find_treasure, seek_wisdom |
 | `sect_beggars_chief_hongtian` | หัวหน้าหงเทียน | beggars | 10 | 92 | 64 | jianghu_wild | master_art, seek_wisdom |
 | `sect_jinyiwei_leader_zhao` | ผู้บัญชาการจ้าวฝู่ | jinyiwei | 10 | 91 | 55 | east | avenge (Dongfang), master_art |
 | `sect_sunmoon_chief_dongfang` | อาจารย์ใหญ่หยินอวี้ | sunmoon | 10 | 93 | 60 | east | master_art, avenge (Huiyuan) |
-| `sect_sunmoon_vice_renwoxing` | รองเจ้าสำนักเหรินหวัวสิง | sunmoon | 9 | 80 | 52 | east | climb_sect, avenge (Luohan) |
+| `sect_sunmoon_vice_renwoxing` | รองเจ้าสำนักตู้เทียนหาน | sunmoon | 9 | 80 | 52 | east | climb_sect, avenge (Luohan) |
 | `sect_tang_chief_tangmen` | เจ้าสำนักถังเหมิน | tang | 10 | 89 | 67 | east | master_art, find_treasure |
 | `sect_xiaoyao_master_yunxiao` | ปรมาจารย์ยุนเซียว | xiaoyao | 10 | 87 | 66 | east | master_art, find_treasure |
-| `sect_songshan_master_zuolengchan` | อาจารย์ใหญ่จั่วเหลิงฉาน | songshan | 10 | 84 | 64 | north | climb_sect, master_art |
-| `sect_taishan_master_tianmen` | เจ้าสำนักเทียนเหมินเต้าเหริน | taishan | 10 | 80 | 67 | north | master_art, seek_wisdom |
-| `sect_hengshan_south_master_modaxiansheng` | อาจารย์ใหญ่โม่ต้า | hengshan_south | 10 | 81 | 65 | south | master_art, seek_wisdom |
-| `sect_hengshan_north_abbess_dingyi` | ภิกษุณีติ่งอี้ | hengshan_north | 10 | 79 | 63 | south | master_art |
+| `sect_songshan_master_zuolengchan` | อาจารย์ใหญ่เกาซงเหยียน | songshan | 10 | 84 | 64 | north | climb_sect, master_art |
+| `sect_taishan_master_tianmen` | เจ้าสำนักชิงสือเต้าเหริน | taishan | 10 | 80 | 67 | north | master_art, seek_wisdom |
+| `sect_hengshan_south_master_modaxiansheng` | อาจารย์ใหญ่เซี่ยอวิ๋น | hengshan_south | 10 | 81 | 65 | south | master_art, seek_wisdom |
+| `sect_hengshan_north_abbess_dingyi` | ภิกษุณีเสวียนเยว่ | hengshan_north | 10 | 79 | 63 | south | master_art |
 
 Rivals and allies are authored in the same file. Rivals feed `avenge` goals; allies make `marry` events possible. No named NPC lives in the **heartland** region.
 

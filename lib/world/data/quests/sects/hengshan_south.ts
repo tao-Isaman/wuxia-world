@@ -8,7 +8,7 @@ export const QUESTS_HENGSHAN_SOUTH: readonly QuestDef[] = [
   {
     id: "qst_hengshan_south_disciple_intro",
     name: "ขอเข้าเป็นศิษย์เฮิงซานใต้",
-    description: "อาจารย์โม่ต้ารับศิษย์ใหม่ที่มีใจรักกระบี่ลีลาห้ายอด — ต้องเตรียมค่าเข้าสำนัก ๕๐๐ เหรียญทอง และเหล็กดิบ ๓ ก้อนสำหรับตีกระบี่ฝึก",
+    description: "อาจารย์เซี่ยอวิ๋นรับศิษย์ใหม่ที่มีใจรักกระบี่ลีลาห้ายอด — ต้องเตรียมค่าเข้าสำนัก ๕๐๐ เหรียญทอง และเหล็กดิบ ๓ ก้อนสำหรับตีกระบี่ฝึก",
     briefSummary: "จ่ายค่าเข้าสำนัก 500 ทอง + ส่งเหล็กดิบ 3 ก้อน เข้าเป็นศิษย์เฮิงซานใต้ขั้นที่ 9",
     type: "side",
     giverNpcId: "sect_hengshan_south_master_modaxiansheng",
@@ -33,7 +33,7 @@ export const QUESTS_HENGSHAN_SOUTH: readonly QuestDef[] = [
       },
       {
         id: "return_to_master",
-        description: "นำของและเงินค่าเข้าสำนักไปถวายอาจารย์โม่ต้า",
+        description: "นำของและเงินค่าเข้าสำนักไปถวายอาจารย์เซี่ยอวิ๋น",
       },
     ],
     // Gold/item deduction happens at the complete-scene's choice
@@ -65,7 +65,7 @@ export const QUESTS_HENGSHAN_SOUTH: readonly QuestDef[] = [
       },
       {
         id: "report",
-        description: "กลับไปรายงานอาจารย์โม่ต้า",
+        description: "กลับไปรายงานอาจารย์เซี่ยอวิ๋น",
       },
     ],
     rewards: [
@@ -93,7 +93,7 @@ export const QUESTS_HENGSHAN_SOUTH: readonly QuestDef[] = [
       },
       {
         id: "deliver",
-        description: "ส่งผ้าไหมให้อาจารย์โม่ต้า",
+        description: "ส่งผ้าไหมให้อาจารย์เซี่ยอวิ๋น",
       },
     ],
     rewards: [
@@ -121,7 +121,7 @@ export const QUESTS_HENGSHAN_SOUTH: readonly QuestDef[] = [
       },
       {
         id: "report",
-        description: "กลับไปรายงานอาจารย์โม่ต้า",
+        description: "กลับไปรายงานอาจารย์เซี่ยอวิ๋น",
       },
     ],
     rewards: [
@@ -135,7 +135,7 @@ export const QUESTS_HENGSHAN_SOUTH: readonly QuestDef[] = [
   {
     id: "qst_hengshan_south_art_swiftblade",
     name: "บททดสอบก่อนสืบทอด: วิชาลึกลับ",
-    description: "อาจารย์โม่ต้าจะทดสอบก่อนเปิดตำราวิชาลึกลับให้ศิษย์ที่พิสูจน์ฝีมือกระบี่และหัวใจอันสงบ — ผ่านการประลองหัวหน้าโจรและรวบรวมแร่เทพ (ผ่านแล้วจึงรับภารกิจสืบทอดวิชาลึกลับได้)",
+    description: "อาจารย์เซี่ยอวิ๋นจะทดสอบก่อนเปิดตำราวิชาลึกลับให้ศิษย์ที่พิสูจน์ฝีมือกระบี่และหัวใจอันสงบ — ผ่านการประลองหัวหน้าโจรและรวบรวมแร่เทพ (ผ่านแล้วจึงรับภารกิจสืบทอดวิชาลึกลับได้)",
     briefSummary: "บททดสอบ — เปิดทางสู่การสืบทอดวิชาลึกลับ",
     type: "side",
     sectId: "hengshan_south",
@@ -162,7 +162,7 @@ export const QUESTS_HENGSHAN_SOUTH: readonly QuestDef[] = [
       },
       {
         id: "return_art",
-        description: "กลับไปรายงานผลต่ออาจารย์โม่ต้า",
+        description: "กลับไปรายงานผลต่ออาจารย์เซี่ยอวิ๋น",
       },
     ],
     rewards: [
@@ -177,7 +177,7 @@ export const QUESTS_HENGSHAN_SOUTH: readonly QuestDef[] = [
   {
     id: "qst_hengshan_south_redemption",
     name: "ไถ่บาปต่อเฮิงซานใต้",
-    description: "เจ้าผู้ทรยศกลับมาขออภัย — อาจารย์โม่ต้าทดสอบความจริงใจเจ้าด้วยภารกิจหนัก ปราบหัวหน้าโจร 5 คนและนำของล้ำค่าของสำนักมาถวาย หากผ่าน ความเป็นทรยศจะถูกล้างเป็น \"ลาออก\" — นักล่าจะหยุดตามล่า แต่วิชาจะถูกแช่แข็ง",
+    description: "เจ้าผู้ทรยศกลับมาขออภัย — อาจารย์เซี่ยอวิ๋นทดสอบความจริงใจเจ้าด้วยภารกิจหนัก ปราบหัวหน้าโจร 5 คนและนำของล้ำค่าของสำนักมาถวาย หากผ่าน ความเป็นทรยศจะถูกล้างเป็น \"ลาออก\" — นักล่าจะหยุดตามล่า แต่วิชาจะถูกแช่แข็ง",
     briefSummary: "ไถ่บาปต่อเฮิงซานใต้ — ปราบหัวหน้าโจร 5 + ส่งของถวาย 5 ชิ้น",
     type: "side",
     sectId: "hengshan_south",
@@ -186,7 +186,7 @@ export const QUESTS_HENGSHAN_SOUTH: readonly QuestDef[] = [
     stages: [
       { id: "trial_kill", description: "ปราบหัวหน้าโจร (bandit_chief) 5 คน เพื่อพิสูจน์ใจ", autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 5 } },
       { id: "trial_offering", description: "นำของถวาย — iron_ore 5 ชิ้น", autoAdvance: { t: "hasItem", itemId: "iron_ore", count: 5 } },
-      { id: "return_to_master", description: "กลับไปขออภัยต่ออาจารย์โม่ต้า" },
+      { id: "return_to_master", description: "กลับไปขออภัยต่ออาจารย์เซี่ยอวิ๋น" },
     ],
     rewards: [
       { t: "wExp", amount: 300 },

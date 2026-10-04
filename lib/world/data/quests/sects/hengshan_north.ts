@@ -9,7 +9,7 @@ export const QUESTS_HENGSHAN_NORTH: readonly QuestDef[] = [
     id: "qst_hengshan_north_disciple_intro",
     name: "ขอเข้าเป็นศิษย์เหิงซานเหนือ",
     description:
-      "ภิกษุณีติ่งอี้รับศิษย์ใหม่ที่ใจสงบและเคารพพระธรรม — แต่ตามประเพณีเหิงซานเหนือ ผู้ใหม่ต้องถวายค่าจดทะเบียน ๕๐๐ ทอง พร้อมกระดาษคัดพระสูตร ๓ แผ่นเป็นเครื่องถวายธรรม",
+      "ภิกษุณีเสวียนเยว่รับศิษย์ใหม่ที่ใจสงบและเคารพพระธรรม — แต่ตามประเพณีเหิงซานเหนือ ผู้ใหม่ต้องถวายค่าจดทะเบียน ๕๐๐ ทอง พร้อมกระดาษคัดพระสูตร ๓ แผ่นเป็นเครื่องถวายธรรม",
     briefSummary: "จ่ายค่าเข้าสำนัก 500 ทอง + ส่งกระดาษคัดสูตร 3 แผ่น เข้าเป็นศิษย์ขั้นที่ 9",
     type: "side",
     giverNpcId: "sect_hengshan_north_abbess_dingyi",
@@ -34,7 +34,7 @@ export const QUESTS_HENGSHAN_NORTH: readonly QuestDef[] = [
       },
       {
         id: "return_to_abbess",
-        description: "นำของและเงินค่าเข้าสำนักไปถวายภิกษุณีติ่งอี้",
+        description: "นำของและเงินค่าเข้าสำนักไปถวายภิกษุณีเสวียนเยว่",
       },
     ],
     // Gold + paper deduction happens at the complete-scene's choice
@@ -73,7 +73,7 @@ export const QUESTS_HENGSHAN_NORTH: readonly QuestDef[] = [
       },
       {
         id: "deliver",
-        description: "ส่งของถวายให้ภิกษุณีติ่งอี้",
+        description: "ส่งของถวายให้ภิกษุณีเสวียนเยว่",
       },
     ],
     rewards: [
@@ -89,7 +89,7 @@ export const QUESTS_HENGSHAN_NORTH: readonly QuestDef[] = [
     id: "qst_hengshan_north_sect_thugs",
     name: "ปราบโจรริมเขาเหิงซาน",
     description:
-      "พ่อค้าผู้แสวงบุญถูกโจรเร่ร่อนปล้นริมเชิงเขา — ภิกษุณีติ่งอี้ขอให้ศิษย์ออกไปกำราบโจรเพื่อรักษาความสงบในละแวกวัด",
+      "พ่อค้าผู้แสวงบุญถูกโจรเร่ร่อนปล้นริมเชิงเขา — ภิกษุณีเสวียนเยว่ขอให้ศิษย์ออกไปกำราบโจรเพื่อรักษาความสงบในละแวกวัด",
     briefSummary: "ปราบโจรเร่ร่อน 3 คน · sect points +60",
     type: "side",
     sectId: "hengshan_north",
@@ -103,7 +103,7 @@ export const QUESTS_HENGSHAN_NORTH: readonly QuestDef[] = [
       },
       {
         id: "report",
-        description: "กลับไปรายงานภิกษุณีติ่งอี้",
+        description: "กลับไปรายงานภิกษุณีเสวียนเยว่",
       },
     ],
     rewards: [
@@ -138,7 +138,7 @@ export const QUESTS_HENGSHAN_NORTH: readonly QuestDef[] = [
       },
       {
         id: "deliver",
-        description: "ส่งของให้ภิกษุณีติ่งอี้",
+        description: "ส่งของให้ภิกษุณีเสวียนเยว่",
       },
     ],
     rewards: [
@@ -153,7 +153,7 @@ export const QUESTS_HENGSHAN_NORTH: readonly QuestDef[] = [
     id: "qst_hengshan_north_art_mirror",
     name: "บททดสอบก่อนสืบทอด: พลังกระจกธรรม",
     description:
-      "ภิกษุณีติ่งอี้ยอมเปิดตำราดาบกระจกธรรมให้ศิษย์ที่พิสูจน์ได้ทั้งดาบและจิตใจ — ต้องผ่านการประลองหัวหน้าโจรและรวบรวมหยกบริสุทธิ์เพื่อขัดกระจกพระธรรม",
+      "ภิกษุณีเสวียนเยว่ยอมเปิดตำราดาบกระจกธรรมให้ศิษย์ที่พิสูจน์ได้ทั้งดาบและจิตใจ — ต้องผ่านการประลองหัวหน้าโจรและรวบรวมหยกบริสุทธิ์เพื่อขัดกระจกพระธรรม",
     briefSummary: "บททดสอบ — เปิดทางสู่การสืบทอดพลังกระจกธรรม (ขั้น 3)",
     type: "side",
     sectId: "hengshan_north",
@@ -180,7 +180,7 @@ export const QUESTS_HENGSHAN_NORTH: readonly QuestDef[] = [
       },
       {
         id: "return_art",
-        description: "กลับไปรายงานผลต่อภิกษุณีติ่งอี้",
+        description: "กลับไปรายงานผลต่อภิกษุณีเสวียนเยว่",
       },
     ],
     rewards: [
@@ -196,7 +196,7 @@ export const QUESTS_HENGSHAN_NORTH: readonly QuestDef[] = [
     id: "qst_hengshan_north_redemption",
     name: "ไถ่บาปต่อเหิงซานเหนือ",
     description:
-      "เจ้าผู้ทรยศกลับมาขออภัย — ภิกษุณีติ่งอี้ทดสอบความจริงใจเจ้าด้วยภารกิจหนัก ปราบหัวหน้าโจร 5 คน + ถวายหยก 5 ก้อนเพื่อหล่อกระจกใหม่ หากผ่าน ความเป็นทรยศจะถูกล้างเป็น \"ลาออก\" — นักล่าจะหยุดตามล่า แต่วิชาจะถูกแช่แข็ง",
+      "เจ้าผู้ทรยศกลับมาขออภัย — ภิกษุณีเสวียนเยว่ทดสอบความจริงใจเจ้าด้วยภารกิจหนัก ปราบหัวหน้าโจร 5 คน + ถวายหยก 5 ก้อนเพื่อหล่อกระจกใหม่ หากผ่าน ความเป็นทรยศจะถูกล้างเป็น \"ลาออก\" — นักล่าจะหยุดตามล่า แต่วิชาจะถูกแช่แข็ง",
     briefSummary: "ไถ่บาปต่อเหิงซานเหนือ — ปราบหัวหน้าโจร 5 + ส่งหยกถวาย 5 ชิ้น",
     type: "side",
     sectId: "hengshan_north",
@@ -205,7 +205,7 @@ export const QUESTS_HENGSHAN_NORTH: readonly QuestDef[] = [
     stages: [
       { id: "trial_kill", description: "ปราบหัวหน้าโจร (bandit_chief) 5 คน เพื่อพิสูจน์ใจ", autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 5 } },
       { id: "trial_offering", description: "นำของถวาย — หยก 5 ก้อนเพื่อหล่อกระจกใหม่", autoAdvance: { t: "hasItem", itemId: "jade", count: 5 } },
-      { id: "return_to_abbess", description: "กลับไปขออภัยต่อภิกษุณีติ่งอี้" },
+      { id: "return_to_abbess", description: "กลับไปขออภัยต่อภิกษุณีเสวียนเยว่" },
     ],
     rewards: [
       { t: "wExp", amount: 300 },

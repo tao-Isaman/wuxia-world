@@ -51,7 +51,7 @@ export const NPCS_XIAOYAO: readonly NpcDef[] = [
 
   {
     id: "sect_xiaoyao_sword_elder_wuyazi",
-    name: "ผู้อาวุโสกระบี่อู๋หยาจื่อ",
+    name: "ผู้อาวุโสกระบี่ซวีเฟิงจื่อ",
     description: "ผู้อาวุโสฝ่ายกระบี่ของเซียวหยาว · เชี่ยวชาญกระบี่ขลุ่ยหยก · ตัวเงียบแต่ดาบฉับ",
     locationIds: ["sect_xiaoyao"],
     dialogSceneId: "npc_sect_xiaoyao_sword_elder_wuyazi_talk",
@@ -114,7 +114,7 @@ export const NPCS_XIAOYAO: readonly NpcDef[] = [
 
   {
     id: "sect_xiaoyao_disciple_jiumozhi",
-    name: "ศิษย์จิ่วม่อจื้อ",
+    name: "ศิษย์ฉีม่อหยาง",
     description: "ศิษย์เซียวหยาวผู้ฝึกหมัดรากพิษ · นิสัยลึกลับ · ใช้พิษเป็นทางออก",
     locationIds: ["sect_xiaoyao"],
     sparOpponentId: "spar_xiaoyao_jiumozhi",

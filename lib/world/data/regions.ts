@@ -75,7 +75,7 @@ export const LAYOUT_REGION: Record<string, Region> = {
   isle_binghuo: "north", // 冰火岛 — far-north ice/fire isle
   inn_gaosheng: "north", // 高升客栈 — northern road inn
   home_hong: "north", // 洪七公 — wandered north often, but central; place north for variety
-  home_chengkun: "north", // 成昆 — antagonist tied to Mingjiao schemes (north→west axis)
+  home_chengkun: "north", // 司徒昆 — antagonist tied to Mingjiao schemes (north→west axis)
 
   // ─── South (Shaolin + Emei + southern temples) ──────────────────────
   // Shaolin sits on Songshan technically but its narrative weight is
@@ -91,8 +91,8 @@ export const LAYOUT_REGION: Record<string, Region> = {
   city_dali: "south", // 大理 — Yunnan, classic south
   temple_dalun: "south", // 大轮寺 — southern temple
   temple_tianning: "south", // 天宁寺 — southern temple
-  home_yideng: "south", // 一灯 (南帝) — the Southern Emperor
-  home_xuemuhua: "south", // 薛慕华 — physician of Hudie Valley (southern)
+  home_yideng: "south", // 无尘 — a monk of the Dali Duan line
+  home_xuemuhua: "south", // 凌慕山 — physician of Hudie Valley (southern)
   valley_hudie: "south", // 蝴蝶谷 — southern healing valley
   villa_yaowang: "south", // 药王庄 — southern herbalist mansion
 
@@ -123,7 +123,7 @@ export const LAYOUT_REGION: Record<string, Region> = {
   sect_xiaoyao: "east", // 逍遥派 — eastern ranges
   city_suzhou: "east", // 苏州 — eastern Jiangnan
   villa_yanzi: "east", // 燕子坞 — Murong mansion, eastern Jiangnan
-  villa_fuwei: "east", // 福威镖局 — eastern escort agency
+  villa_fuwei: "east", // 镇威镖局 — eastern escort agency
   isle_taohua: "east", // 桃花岛 — east of the Yellow Sea coast
   isle_xiake: "east", // 侠客岛 — far east mystery isle
   isle_yuanyang: "east", // 鸳鸯岛
@@ -133,7 +133,7 @@ export const LAYOUT_REGION: Record<string, Region> = {
   inn_heluo: "east", // 河洛客栈 — Heluo river-road inn (eastern)
   cave_jinshe: "east", // 金蛇洞 — golden snake cave (east coast Jin Yong lore)
   peak_guangming: "east", // 光明顶 — Mingjiao HQ
-  home_chengying: "east", // 程瑛 — eastern lyric
+  home_chengying: "east", // 苏英月 — eastern lyric
   village_wuxia: "east", // riverside village near eastern delta
 
   // ─── Jianghu wild (catch-all wilderness, generic anchors) ───────────
@@ -161,11 +161,11 @@ export const LAYOUT_REGION: Record<string, Region> = {
   isle_wane: "jianghu_wild", // 万鳄岛 — crocodile isle
   isle_boni: "jianghu_wild", // 渤泥岛
   isle_wuming: "jianghu_wild", // 无名岛 — nameless isle
-  home_hufei: "jianghu_wild", // 胡斐 — wandering swordsman
+  home_hufei: "jianghu_wild", // 白飞扬 — wandering swordsman
   home_nanxian: "jianghu_wild",
-  home_tianboguang: "jianghu_wild", // 田伯光 — frontier brigand
-  home_miaoren: "jianghu_wild", // 苗人凤 — frontier hero
-  home_yanji: "jianghu_wild", // 阎基
+  home_tianboguang: "jianghu_wild", // 韩飞狼 — frontier brigand
+  home_miaoren: "jianghu_wild", // 岳人山 — frontier hero
+  home_yanji: "jianghu_wild", // 戚良
   home_beichou: "jianghu_wild", // 北丑
 };
 

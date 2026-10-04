@@ -12,7 +12,7 @@ export const NPCS_WILDERNESS: readonly NpcDef[] = [
   // ─── เกาะดอกท้อ (isle_taohua) ────────────────────────────────────────
   {
     id: "wld_taohua_hermit_huang",
-    name: "ฮ่วงเอี้ยะซือ (ปรมาจารย์ฤาษี)",
+    name: "หวงชิงเฉวียน (ปรมาจารย์ฤาษี)",
     description: "ปรมาจารย์แห่งเกาะดอกท้อ ผู้อยู่อาศัยเพียงลำพังมาหลายสิบปี สติปัญญาเฉียบแหลมแต่อัธยาศัยหยาบคาย",
     locationIds: ["isle_taohua"],
     dialogSceneId: "npc_wld_taohua_hermit_huang_talk",

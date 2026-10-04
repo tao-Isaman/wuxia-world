@@ -196,8 +196,8 @@
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `sect_hengshan_south_master_modaxiansheng` | อาจารย์ใหญ่โม่ต้า | 💬 ⚔ 🤏 | 6 |
-| `sect_hengshan_south_vice_liuzhengfeng` | รองอาจารย์หลิวเจิ้งเฟิง | 💬 ⚔ 🤏 | 2 |
+| `sect_hengshan_south_master_modaxiansheng` | อาจารย์ใหญ่เซี่ยอวิ๋น | 💬 ⚔ 🤏 | 6 |
+| `sect_hengshan_south_vice_liuzhengfeng` | รองอาจารย์ไป๋หมิงหยวน | 💬 ⚔ 🤏 | 2 |
 | `sect_hengshan_south_elder_luge` | อาจารย์กระบี่ลู่เก๋อ | 💬 ⚔ 🤏 | 2 |
 | `sect_hengshan_south_disciple_yuepan` | ศิษย์เยว่ผาน | 💬 ⚔ | 2 |
 | `sect_hengshan_south_disciple2_qingfeng` | ศิษย์ชิงเฟิง | 💬 ⚔ | 2 |
@@ -206,19 +206,19 @@
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `sect_hengshan_north_abbess_dingyi` | ภิกษุณีติ่งอี้ | 💬 ⚔ 🤏 | 6 |
+| `sect_hengshan_north_abbess_dingyi` | ภิกษุณีเสวียนเยว่ | 💬 ⚔ 🤏 | 6 |
 | `sect_hengshan_north_vice_yihe` | ภิกษุณีอี๋เหอ | 💬 ⚔ 🤏 | 2 |
 | `sect_hengshan_north_elder_yiqing` | ภิกษุณีอี๋ชิง | 💬 ⚔ 🤏 | 2 |
 | `sect_hengshan_north_nun_jingxin` | นักพรตจิงซิน | 💬 ⚔ | 2 |
-| `sect_hengshan_north_nun2_yilin` | นักพรตอี๋หลิน | 💬 ⚔ | 2 |
+| `sect_hengshan_north_nun2_yilin` | นักพรตหลิงซู่ | 💬 ⚔ | 2 |
 
 ### ซงซาน (`sect_songshan`)
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `sect_songshan_master_zuolengchan` | อาจารย์ใหญ่จั่วเหลิงฉาน | 💬 ⚔ 🤏 | 6 |
-| `sect_songshan_vice_lubai` | รองอาจารย์ลู่ไป๋ | 💬 ⚔ 🤏 | 2 |
-| `sect_songshan_elder_dingmian` | อาจารย์อาวุโสติงเหมียน | 💬 ⚔ 🤏 | 2 |
+| `sect_songshan_master_zuolengchan` | อาจารย์ใหญ่เกาซงเหยียน | 💬 ⚔ 🤏 | 6 |
+| `sect_songshan_vice_lubai` | รองอาจารย์เผิงอวิ๋นไห่ | 💬 ⚔ 🤏 | 2 |
+| `sect_songshan_elder_dingmian` | อาจารย์อาวุโสเจิ้งซือหราน | 💬 ⚔ 🤏 | 2 |
 | `sect_songshan_disciple_lifeng` | ศิษย์หลี่เฟิง | 💬 ⚔ | 2 |
 | `sect_songshan_disciple2_yangzhong` | ศิษย์หยางจง | 💬 ⚔ | 2 |
 
@@ -226,7 +226,7 @@
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `sect_taishan_master_tianmen` | เจ้าสำนักเทียนเหมินเต้าเหริน | 💬 ⚔ 🤏 | 6 |
+| `sect_taishan_master_tianmen` | เจ้าสำนักชิงสือเต้าเหริน | 💬 ⚔ 🤏 | 6 |
 | `sect_taishan_vice_yuyangzi` | รองเจ้าสำนักอวี้หยางจื่อ | 💬 ⚔ 🤏 | 2 |
 | `sect_taishan_elder_chiyangzi` | อาจารย์อาวุโสฉื่อหยางจื่อ | 💬 ⚔ 🤏 | 2 |
 | `sect_taishan_disciple_kunwu` | ศิษย์คุนหวู่ | 💬 ⚔ | 2 |
@@ -236,9 +236,9 @@
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `sect_quanzhen_master_chongyang` | อาจารย์ใหญ่ฉงหยาง | 💬 ⚔ 🤏 | 6 |
-| `sect_quanzhen_vice_master_mayu` | รองอาจารย์หม่ายวี่ | 💬 ⚔ 🤏 | 2 |
-| `sect_quanzhen_sword_elder_qiuchuji` | อาจารย์ดาบชิวฉู่จี้ | 💬 ⚔ 🤏 | 2 |
+| `sect_quanzhen_master_chongyang` | อาจารย์ใหญ่หลิงเจิน | 💬 ⚔ 🤏 | 6 |
+| `sect_quanzhen_vice_master_mayu` | รองอาจารย์เติ้งหยวนเจิน | 💬 ⚔ 🤏 | 2 |
+| `sect_quanzhen_sword_elder_qiuchuji` | อาจารย์ดาบกู่จื้อชิง | 💬 ⚔ 🤏 | 2 |
 | `sect_quanzhen_inner_elder_yaolan` | อาจารย์ปราณเหยาหลัน | ⚔ 🤏 | 3 |
 | `sect_quanzhen_disciple_yangzi` | ศิษย์หยางจื่อ | ⚔ | 2 |
 | `sect_quanzhen_disciple_chongxu` | สาวกชงซวี | 💬 ⚔ | 2 |
@@ -276,12 +276,12 @@
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
 | `sect_sunmoon_chief_dongfang` | อาจารย์ใหญ่หยินอวี้ | 💬 ⚔ 🤏 | 13 |
-| `sect_sunmoon_vice_renwoxing` | รองเจ้าสำนักเหรินหวัวสิง | 💬 ⚔ 🤏 | 3 |
-| `sect_sunmoon_sun_elder_zuolengchan` | ผู้อาวุโสตะวันจั่วเหลิงฉัน | 💬 ⚔ 🤏 | 1 |
-| `sect_sunmoon_moon_elder_xianggwentian` | ผู้อาวุโสจันทราเสี่ยงเหวินเทียน | ⚔ 🤏 | 6 |
+| `sect_sunmoon_vice_renwoxing` | รองเจ้าสำนักตู้เทียนหาน | 💬 ⚔ 🤏 | 3 |
+| `sect_sunmoon_sun_elder_zuolengchan` | ผู้อาวุโสตะวันซางเหยียนเลี่ย | 💬 ⚔ 🤏 | 1 |
+| `sect_sunmoon_moon_elder_xianggwentian` | ผู้อาวุโสจันทราฉินเยว่หลิง | ⚔ 🤏 | 6 |
 | `sect_sunmoon_balance_elder_qudongfeng` | ผู้อาวุโสสมดุลฉวี่ตงเฟิง | ⚔ 🤏 | 3 |
-| `sect_sunmoon_head_disciple_yilin` | หัวหน้าศิษย์อี้หลิน | ⚔ 🤏 | 2 |
-| `sect_sunmoon_disciple_lanfenghuang` | ศิษย์หลานเฟิงหวง | ⚔ | 2 |
+| `sect_sunmoon_head_disciple_yilin` | หัวหน้าศิษย์เยี่ยนชิว | ⚔ 🤏 | 2 |
+| `sect_sunmoon_disciple_lanfenghuang` | ศิษย์ไต้ซิ่วเหอ | ⚔ | 2 |
 | `sect_sunmoon_junior_xiaoyu` | ศิษย์เสี่ยวอวี้ | ⚔ | 1 |
 | `sect_ming_elder_zhuying` | ผู้อาวุโสจูอิง | 💬 🤏 | 5 |
 | `sect_ming_envoy_huozhi` | ผู้แทนหั่วจี้ | 💬 ⚔ | 8 |
@@ -292,11 +292,11 @@
 | --- | --- | --- | --- |
 | `sect_xiaoyao_master_yunxiao` | ปรมาจารย์ยุนเซียว | 💬 ⚔ 🤏 | 14 |
 | `sect_xiaoyao_vice_tianshan` | รองอาจารย์เทียนซาน | 💬 ⚔ 🤏 | 7 |
-| `sect_xiaoyao_sword_elder_wuyazi` | ผู้อาวุโสกระบี่อู๋หยาจื่อ | 💬 ⚔ 🤏 | 2 |
+| `sect_xiaoyao_sword_elder_wuyazi` | ผู้อาวุโสกระบี่ซวีเฟิงจื่อ | 💬 ⚔ 🤏 | 2 |
 | `sect_xiaoyao_palm_elder_libai` | ผู้อาวุโสฝ่ามือหลี่ไป๋ | ⚔ 🤏 | 6 |
 | `sect_xiaoyao_blade_elder_xiaorang` | ผู้อาวุโสดาบเสี่ยวหรง | ⚔ 🤏 | 3 |
 | `sect_xiaoyao_head_disciple_aliao` | หัวหน้าศิษย์อาเหลียว | ⚔ 🤏 | 2 |
-| `sect_xiaoyao_disciple_jiumozhi` | ศิษย์จิ่วม่อจื้อ | ⚔ | 3 |
+| `sect_xiaoyao_disciple_jiumozhi` | ศิษย์ฉีม่อหยาง | ⚔ | 3 |
 | `sect_xiaoyao_junior_xiaolan` | ศิษย์เสี่ยวหลาน | ⚔ | 2 |
 
 ### สำนักดาวดึงส์ (เห็งซัว) (`sect_xingxiu`)
@@ -387,17 +387,17 @@
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `villa_meizhuang_master_huang` | หวงจงกง | 💬 ⚔ | 1 |
-| `villa_meizhuang_master_heibai` | เฮยไป๋จื่อ | 💬 | 2 |
-| `villa_meizhuang_painter_danqing` | ตันชิงเซิง | 💬 | 1 |
-| `villa_meizhuang_steward_ding` | พ่อบ้านติงเจียน | 💬 | — |
+| `villa_meizhuang_master_huang` | เหลียงอิ้นกง | 💬 ⚔ | 1 |
+| `villa_meizhuang_master_heibai` | ชิวผิงจื่อ | 💬 | 2 |
+| `villa_meizhuang_painter_danqing` | ชุยหลานเซิง | 💬 | 1 |
+| `villa_meizhuang_steward_ding` | พ่อบ้านเกิ่งหลี่ | 💬 | — |
 
-### บ้านค้าขายโฝวเวย (`villa_fuwei`)
+### บ้านค้าขายเจิ้นเวย (`villa_fuwei`)
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `villa_fuwei_chief_lin` | หลินเจิ้นหนาน | 💬 🤏 | 1 |
-| `villa_fuwei_young_lin` | หลินผิงจือ | 💬 | 1 |
+| `villa_fuwei_chief_lin` | เฉาหย่งอัน | 💬 🤏 | 1 |
+| `villa_fuwei_young_lin` | เฉาเหวินจือ | 💬 | 1 |
 | `villa_fuwei_escort_shi` | สื่อเปียวโถว | 💬 ⚔ | 2 |
 
 ## Inns
@@ -438,20 +438,20 @@
 | --- | --- | --- | --- |
 | `wld_hong_adventurer_luo` | หลัวเฟย์หาว (นักผจญภัย) | 💬 | 3 |
 
-### บ้านฮูเฝย์ (`home_hufei`)
+### บ้านไป๋เฝยหยาง (`home_hufei`)
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `home_hufei_master_hufei` | ฮูเฝย์ | 💬 ⚔ | 1 |
+| `home_hufei_master_hufei` | ไป๋เฝยหยาง | 💬 ⚔ | 1 |
 | `home_hufei_servant_ping` | ผิงอาสี่ | 💬 | 1 |
-| `home_hufei_guest_yuan` | เอวี๋ยนจื่ออี | 💬 ⚔ | 1 |
+| `home_hufei_guest_yuan` | จิ่งจื่ออิง | 💬 ⚔ | 1 |
 | `home_hufei_guest_jiu` | เหล่าจิ่ว | 💬 ⚔ | 1 |
 
-### บ้านเฉิงคุน (`home_chengkun`)
+### บ้านซือถูคุน (`home_chengkun`)
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `home_chengkun_disciple_chen` | เฉินโหย่วเลี่ยง | 💬 ⚔ 🤏 | 1 |
+| `home_chengkun_disciple_chen` | เฉินเหวินฮ่าว | 💬 ⚔ 🤏 | 1 |
 | `home_chengkun_gardener_wu` | ลุงอู๋คนสวน | 💬 | 1 |
 | `home_chengkun_maid_cui` | เสี่ยวชุ่ย | 💬 | 1 |
 
@@ -459,9 +459,9 @@
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `home_xuemuhua_doctor_xue` | หมอเซวี่ยมู่หัว | 💬 🤏 | 1 |
-| `home_xuemuhua_guest_kang` | คังกว่างหลิง | 💬 | 2 |
-| `home_xuemuhua_guest_li` | หลี่ขุยเหล่ย | 💬 ⚔ | 2 |
+| `home_xuemuhua_doctor_xue` | หมอหลิงมู่ซาน | 💬 🤏 | 1 |
+| `home_xuemuhua_guest_kang` | เจียงอวิ๋นหลิง | 💬 | 2 |
+| `home_xuemuhua_guest_li` | เหยาซือเหมิง | 💬 ⚔ | 2 |
 | `home_xuemuhua_apprentice_dan` | เสี่ยวตัน | 💬 | — |
 
 ### บ้านหนานเสียน (`home_nanxian`)
@@ -472,44 +472,44 @@
 | `home_nanxian_servant_ashu` | อาซู | 💬 | — |
 | `home_nanxian_woodcutter_bai` | ลุงไป๋ | 💬 | 1 |
 
-### บ้านอีตัง (`home_yideng`)
+### บ้านอู๋เฉิน (`home_yideng`)
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `home_yideng_monk_yideng` | อิดเต็งไต้ซือ | 💬 ⚔ | 1 |
-| `home_yideng_fisher_diancang` | ฤๅษีประมงเตี่ยมชง | 💬 ⚔ | 1 |
+| `home_yideng_monk_yideng` | อู๋เฉินไต้ซือ | 💬 ⚔ | 1 |
+| `home_yideng_fisher_diancang` | ฤๅษีประมงชิงเจียง | 💬 ⚔ | 1 |
 | `home_yideng_farmer_geng` | ชาวนาเกิง | 💬 | 1 |
-| `home_yideng_scholar_zhu` | บัณฑิตจูจื่อหลิว | 💬 🤏 | 1 |
+| `home_yideng_scholar_zhu` | บัณฑิตเยี่ยจื่อหลาน | 💬 🤏 | 1 |
 
 ### บ้านนักรบชายแดน (`home_tianboguang`)
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `home_tianboguang_blade_tian` | เถียนป๋อกวง | 💬 ⚔ 🤏 | 2 |
+| `home_tianboguang_blade_tian` | หานเฟยหลาง | 💬 ⚔ 🤏 | 2 |
 | `home_tianboguang_cook_luo` | ป้าหลัว | 💬 | — |
 | `home_tianboguang_soldier_chen` | ทหารแก่เฉิน | 💬 | 1 |
 
-### บ้านมยง (`home_miaoren`)
+### บ้านเยวี่ย (`home_miaoren`)
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `home_miaoren_master_miao` | เหมียวเหรินเฟิง | 💬 ⚔ | 2 |
-| `home_miaoren_daughter_ruolan` | เหมียวรั่วหลัน | 💬 | — |
+| `home_miaoren_master_miao` | เยวี่ยเหรินซาน | 💬 ⚔ | 2 |
+| `home_miaoren_daughter_ruolan` | เยวี่ยรั่วหลิง | 💬 | — |
 | `home_miaoren_spearman_zhong` | ทหารทวนเฒ่าจง | 💬 ⚔ | 1 |
 
-### บ้านเฉิงอิ๋ง (`home_chengying`)
+### บ้านซูอิ๋งเยว่ (`home_chengying`)
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `home_chengying_mistress_cheng` | เฉิงอิ๋ง | 💬 | 1 |
-| `home_chengying_cousin_lu` | ลู่อู๋ซวง | 💬 ⚔ | 1 |
+| `home_chengying_mistress_cheng` | ซูอิ๋งเยว่ | 💬 | 1 |
+| `home_chengying_cousin_lu` | เหอชิงหลาน | 💬 ⚔ | 1 |
 | `home_chengying_gooseboy_tong` | อาถงเด็กเลี้ยงห่าน | 💬 | 1 |
 
-### บ้านหยานจี (`home_yanji`)
+### บ้านฉีเหลียง (`home_yanji`)
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `home_yanji_bonesetter_yan` | หยานจี | 💬 🤏 | 1 |
+| `home_yanji_bonesetter_yan` | ฉีเหลียง | 💬 🤏 | 1 |
 | `home_yanji_guard_liu` | หลิวกระบองไหม้ | 💬 ⚔ | 1 |
 | `home_yanji_maid_chun` | ชุนเถาสาวใช้ | 💬 | 1 |
 
@@ -587,7 +587,7 @@
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `wld_taohua_hermit_huang` | ฮ่วงเอี้ยะซือ (ปรมาจารย์ฤาษี) | 💬 | 4 |
+| `wld_taohua_hermit_huang` | หวงชิงเฉวียน (ปรมาจารย์ฤาษี) | 💬 | 4 |
 
 ### เกาะมังกรเทพ (`isle_shenlong`)
 
