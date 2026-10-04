@@ -21,7 +21,7 @@ import { encounterFoeAvailable } from "../lib/world/effects";
 import { PLAYER_CHARACTER_IDS, characterWalk8Sheet, hasWalk8Sheet } from "../lib/characters/catalog";
 import { WALK8_FIRST_FRAME, dir8FromVector, walk8Frame } from "../lib/characters/walk8";
 import { HERO_ACTION_CELL, HERO_ACTION_IDS, HERO_ACTIVITIES, HERO_ATTACK_FRAMES, HERO_COMBAT_COLUMNS, HERO_COMBAT_ROWS, HERO_WORK_COLUMNS,
-  HERO_WORK_GAPS, activityForBadge, activityForLifeSkill, hasHeroActions, heroHasPose, heroAttackColumn, heroAttackRow, heroCombatSheet, heroWorkSheet, practicePose } from "../lib/characters/hero-actions";
+  HERO_WORK_GAPS, activityForBadge, heroWorkLayout, activityForLifeSkill, hasHeroActions, heroHasPose, heroAttackColumn, heroAttackRow, heroCombatSheet, heroWorkSheet, practicePose } from "../lib/characters/hero-actions";
 import { PLAYER_BODIES, heroBodyFor } from "../lib/world/data/player-bodies";
 import { LIFE_SKILL_KEYS } from "../lib/world/types";
 import { WEAPON_FAMILY_KEYS } from "../lib/game/types";
@@ -203,15 +203,20 @@ await check("heroes: one body per gender (m1, f1), older bodies fall back to the
   for (const id of [...PLAYER_BODIES.male, ...PLAYER_BODIES.female]) assert.ok(hasHeroActions(id), `${id} has painted action sheets`);
 });
 
-await check("hero action sheets: a weapon row per family + combat poses, a four-frame loop per activity, every cell drawn", async () => {
+await check("hero action sheets: a weapon row per family + combat poses, a loop per activity, every cell drawn on the foot line", async () => {
   assert.deepEqual([...HERO_COMBAT_ROWS.slice(0, 7)].sort(), [...WEAPON_FAMILY_KEYS].sort());
-  const { width: CW, height: CH } = HERO_ACTION_CELL;
   for (const id of HERO_ACTION_IDS) {
-    for (const [file, columns, rows, used] of [
-      [`public${heroCombatSheet(id)}`, HERO_COMBAT_COLUMNS, HERO_COMBAT_ROWS.length, (row: number, col: number) => row === HERO_COMBAT_ROWS.length - 1 || col < HERO_ATTACK_FRAMES],
-      [`public${heroWorkSheet(id)}`, HERO_WORK_COLUMNS, HERO_ACTIVITIES.length, (row: number) => !(HERO_WORK_GAPS[id] ?? []).includes(HERO_ACTIVITIES[row])],
-    ] as const) {
-      assert.ok(existsSync(file), `${file} exists (bun scripts/build-hero-actions.ts)`);
+    const work = heroWorkLayout(id);
+    // Painted cells sit exactly on the foot line; animated loops (m1, PixelLab) may shift a few px as the body moves.
+    const animated = work.width !== HERO_ACTION_CELL.width;
+    for (const sheet of [
+      { file: `public${heroCombatSheet(id)}`, ...HERO_ACTION_CELL, columns: HERO_COMBAT_COLUMNS, rows: HERO_COMBAT_ROWS.length, slack: 1, least: 1500,
+        used: (row: number, col: number) => row === HERO_COMBAT_ROWS.length - 1 || col < HERO_ATTACK_FRAMES },
+      { file: `public${heroWorkSheet(id)}`, ...work, rows: HERO_ACTIVITIES.length, slack: animated ? 6 : 1, least: animated ? 500 : 1500,
+        used: (row: number) => !(HERO_WORK_GAPS[id] ?? []).includes(HERO_ACTIVITIES[row]) },
+    ]) {
+      const { file, width: CW, height: CH, columns, rows } = sheet;
+      assert.ok(existsSync(file), `${file} exists (bun scripts/build-hero-actions.ts / build-hero-work-loops.ts)`);
       const { data, info } = await sharp(file).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
       assert.equal(info.width, CW * columns, file);
       assert.equal(info.height, CH * rows, file);
@@ -222,9 +227,9 @@ await check("hero action sheets: a weapon row per family + combat poses, a four-
           opaque++;
           feet = Math.max(feet, y);
         }
-        if (!used(row, col)) { assert.equal(opaque, 0, `${file} row ${row} col ${col} is listed as unpainted but has a figure`); continue; }
-        assert.ok(opaque > 1500, `${file} row ${row} col ${col} has a figure (${opaque} px)`);
-        assert.ok(feet >= HERO_ACTION_CELL.feet - 2 && feet <= HERO_ACTION_CELL.feet + 1, `${file} row ${row} col ${col} stands on the foot line (${feet})`);
+        if (!sheet.used(row, col)) { assert.equal(opaque, 0, `${file} row ${row} col ${col} is listed as unpainted but has a figure`); continue; }
+        assert.ok(opaque > sheet.least, `${file} row ${row} col ${col} has a figure (${opaque} px)`);
+        assert.ok(feet >= sheet.feet - sheet.slack && feet <= sheet.feet + sheet.slack, `${file} row ${row} col ${col} stands on the foot line (${feet} vs ${sheet.feet})`);
       }
     }
   }

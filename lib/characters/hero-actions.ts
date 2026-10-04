@@ -37,6 +37,20 @@ export type HeroActivity = typeof HERO_ACTIVITIES[number];
 export const HERO_WORK_COLUMNS = 4;
 export const HERO_WORK_FPS = 5;
 
+/**
+ * Each hero's work sheet grid. f1's loops are cut from paintings
+ * (scripts/build-hero-actions.ts: 4 frames in HERO_ACTION_CELL cells); m1's
+ * are animated by PixelLab from his painted poses (scripts/build-hero-work-loops.ts:
+ * 8 frames in 128 px cells). `feet` is the foot row of a cell, `figure` the
+ * height of a standing figure in it, `anchor` the column the body stands on.
+ */
+export interface HeroWorkLayout { width: number; height: number; feet: number; figure: number; anchor: number; columns: number; frames: number; fps: number }
+export const HERO_WORK_LAYOUT: Readonly<Record<string, HeroWorkLayout>> = {
+  m1: { width: 128, height: 128, feet: 122, figure: 83, anchor: 52, columns: 8, frames: 8, fps: 8 },
+  f1: { ...HERO_ACTION_CELL, anchor: HERO_ACTION_CELL.width / 2, columns: HERO_WORK_COLUMNS, frames: HERO_WORK_COLUMNS, fps: HERO_WORK_FPS },
+};
+export const heroWorkLayout = (id: string): HeroWorkLayout => HERO_WORK_LAYOUT[id] ?? HERO_WORK_LAYOUT.f1;
+
 export const HERO_ACTIVITY_LABEL: Record<HeroActivity, string> = {
   mine: "ขุดแร่", chop: "ตัดไม้", fish: "ตกปลา", herb: "เก็บสมุนไพร", hunt: "ล่าสัตว์", venom: "จับงูเก็บพิษ",
   forge: "ตีเหล็ก", cook: "ทำอาหาร", alchemy: "ปรุงยา", craft: "เย็บปักและเจียระไน",
@@ -110,13 +124,15 @@ export function activityForBadge(badge: string | undefined): HeroActivity | null
 /** A painted loop to show the hero in (the work overlay): an activity, or a weapon row's attack. */
 export type HeroPose = { sheet: "work"; row: HeroActivity } | { sheet: "combat"; row: HeroCombatRow };
 
-/** Sheet geometry of a pose: its url, grid, row and frame count. */
-export function heroPoseStrip(id: string, pose: HeroPose) {
+/** Sheet geometry of a pose: its url, cell size, foot row, standing height and body column, grid, row and frame count. */
+export interface HeroPoseStrip { url: string; width: number; height: number; feet: number; figure: number; anchor: number; columns: number; rows: number; row: number; frames: number; fps: number }
+export function heroPoseStrip(id: string, pose: HeroPose): HeroPoseStrip {
   if (pose.sheet === "work") {
-    return { url: heroWorkSheet(id), columns: HERO_WORK_COLUMNS, rows: HERO_ACTIVITIES.length,
-      row: HERO_ACTIVITIES.indexOf(pose.row), frames: HERO_WORK_COLUMNS, fps: HERO_WORK_FPS };
+    const layout = heroWorkLayout(id);
+    return { url: heroWorkSheet(id), width: layout.width, height: layout.height, feet: layout.feet, figure: layout.figure, anchor: layout.anchor,
+      columns: layout.columns, rows: HERO_ACTIVITIES.length, row: HERO_ACTIVITIES.indexOf(pose.row), frames: layout.frames, fps: layout.fps };
   }
-  return { url: heroCombatSheet(id), columns: HERO_COMBAT_COLUMNS, rows: HERO_COMBAT_ROWS.length,
+  return { url: heroCombatSheet(id), ...HERO_ACTION_CELL, anchor: HERO_ACTION_CELL.width / 2, columns: HERO_COMBAT_COLUMNS, rows: HERO_COMBAT_ROWS.length,
     row: HERO_COMBAT_ROWS.indexOf(pose.row), frames: pose.row === "combat" ? HERO_COMBAT_COLUMNS : HERO_ATTACK_FRAMES, fps: 7 };
 }
 

@@ -1,3 +1,4 @@
+import type { HeroPoseStrip } from "@/lib/characters/hero-actions";
 export interface Point { x: number; y: number }
 
 export type WorldMarkerCategory = "npc" | "route" | "place" | "activity";
@@ -61,6 +62,11 @@ export interface WorldPresentation {
   foes?: WorldFoe[];
   worldDescription?: string;
   rememberPosition?: boolean;
+  /**
+   * The hero's painted work loop (lib/characters/hero-actions.ts, heroPoseStrip),
+   * played in place of the walking sprite while set; read every frame.
+   */
+  heroAction?: HeroPoseStrip | null;
 }
 
 /** Map distance (960×640 units) per random-event walk tick. */

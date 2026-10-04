@@ -48,7 +48,7 @@ Deploys are implied to be on Vercel (`VERCEL_GIT_COMMIT_SHA` sets the service-wo
 
 ## Verified state
 
-Checked on 2026-10-03 for the hero action wave (painted weapon forms and work loops; one hero per gender):
+Checked on 2026-10-04 for m1's PixelLab work loops, played on the map:
 
 | Check | Result |
 | --- | --- |
@@ -117,6 +117,8 @@ Real behaviour today, found during the docs audit. Each is small and self-contai
 
 - **Turned portrait is lightly tested.** A phone held upright turns the page 90°; map taps, the joystick and menus are covered by e2e on an emulated phone, but `env(safe-area-inset-*)` still names the physical edges (a notch is padded on the wrong side) and Radix popovers (stat tooltips, comboboxes) may sit off their trigger. No physical phone has run it.
 - **Three menus still scroll.** ภารกิจ, สำนัก and บันทึก (and the shop / artisan / hall popups) keep their old layouts; only โปรไฟล์, ย่าม, วิชา, อาชีพ and จดหมาย are column layouts that fit without scrolling.
+- **Two of m1's PixelLab loops have a seam.** The herb loop ends with him standing and jumps back to the crouch; the woodcutting loop's chips pile up and vanish on the wrap. Re-animate them (`scripts/animate-hero-work.py`, 2 generations each; the PixelLab trial account had 12 of 40 left after this wave) with an action that returns to the start pose.
+- **The PixelLab MCP server is configured per container.** It was added with `claude mcp add` (local scope, `/root/.claude.json`), which a fresh cloud container does not have; the scripts call the REST API with `PIXELLAB_API_TOKEN` instead.
 - **f1 lacks six work loops.** Alchemy, needlework, meditation, reading, zither and sleep were not painted for f1 (the image API credits ran out); the work overlay keeps the plain preview for them (`HERO_WORK_GAPS`). Paint with `scripts/paint-hero-actions.py`, rebuild with `scripts/build-hero-actions.ts`, empty the list.
 - **A few painted attack frames carry a stray weapon tip.** Where a strip's figures touched (m1 sword strike / follow-through, f1 spear recover and sabre follow-through), the split leaves a bit of the neighbour's weapon in the cell; repaint those strips to clean them.
 - **`characters.spec` is flaky.** "both heroes walk" sometimes times out waiting for the walk motion in a full run; it passes when run alone.

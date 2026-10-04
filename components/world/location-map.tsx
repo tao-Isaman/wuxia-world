@@ -1,4 +1,6 @@
 "use client";
+import { useLoadingStore } from "@/store/loading-store";
+import { heroHasPose, heroPoseStrip } from "@/lib/characters/hero-actions";
 import { useEffect, useRef, useState } from "react";
 import type { ArtisanDef, LocationMapDef, LocationScene, MapSpot, NpcDef } from "@/lib/world";
 import { npcPresent, activeGuide, evaluateCondition, guideMarkerId, objectiveMarkerId, objectiveSpotsAt, objectiveSpotsForNpc, getArtisan, getQuestsForNpc, isQuestOfferable, isQuestTurnInForNpc, getNpcsAtLocation, getResource, getScene, getSectHallAt, getShopAt, npcBodySprite, npcPixelSprite, playerBodySprite } from "@/lib/world";
@@ -54,6 +56,7 @@ export function LocationMap({ scene, map, handlers, readOnly = false, dialogueSp
   scene: LocationScene; map: LocationMapDef; handlers: MapSpotHandlers; readOnly?: boolean; dialogueSpeakerId?: string;
 }) {
   const state = useWorldStore();
+  const workPose = useLoadingStore((s) => s.active ? s.pose : null);
   const lastInteractivePresentation = useRef<WorldPresentation | null>(null);
   // Walked in from a road: start beside the exit that leads back there.
   const [arrivedFrom] = useState(() => peekArrivalFrom(scene.id));
@@ -158,7 +161,9 @@ export function LocationMap({ scene, map, handlers, readOnly = false, dialogueSp
   const arrival = arrivalSpawn(map, arrivedFrom);
   // Foes that turned up here while the hero walked; walking into one engages it.
   const foes = roamingFoesOn(state.roamingFoes, scene.id);
-  const presentation: WorldPresentation = { key: scene.id, name: scene.name, image: map.image,
+  // While the hero works, they play the activity's painted loop on the map.
+  const heroAction = workPose && heroHasPose(state.playerBodyId, workPose) ? heroPoseStrip(state.playerBodyId, workPose) : null;
+  const presentation: WorldPresentation = { key: scene.id, name: scene.name, image: map.image, heroAction,
     time: state.time, spawn: arrival?.spawn ?? map.spawn, spawnFacing: arrival?.facing, playerImage: playerBodySprite(state.playerBodyId), markers: guidedMarkers, foes,
     ...capitalVignette(scene.id, state.quests.qc_capital_clinic_supplies?.status === "done",
       state.flags.capital_ledger_recovered === true) };

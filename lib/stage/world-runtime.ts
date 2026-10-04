@@ -2,10 +2,11 @@ import { gradePixels } from "./route-grade";
 import { pageRect, toClientPoint, toPagePoint } from "@/lib/ui/landscape";
 import type * as Phaser from "phaser";
 import {
-  CHARACTER_CLIPS, CREATURE_ATLAS, characterId, creatureCell, npcCharacterId,
+  CHARACTER_CLIPS, CHARACTER_FRAME_SIZE, CREATURE_ATLAS, characterId, creatureCell, npcCharacterId,
   type CharacterId,
 } from "../characters/catalog";
 import { loadCharacterAtlas } from "../characters/sheet";
+import type { HeroPoseStrip } from "../characters/hero-actions";
 import { hasAnimatedSheet } from "../characters/npc-sheets";
 import { WALK8_FIRST_FRAME, WALK8_FPS, WALK8_FRAMES, dir8FromVector, walk8Frame, type Dir8 } from "../characters/walk8";
 import { WANDER_FREEZE_DISTANCE, createWanderer, stepWanderer, type Wanderer } from "./npc-wander";
@@ -26,6 +27,8 @@ const SPEED = 150;
 /** How far the camera zooms in past a cover fit: √5, so a fifth of the map's area is in view. */
 const MAP_ZOOM = Math.sqrt(5);
 const LOAD_TIMEOUT = 20_000;
+/** The hero sprite's display size (a 128 px atlas cell). */
+const PLAYER_SIZE = 56;
 // Unique NPC sprites are ~74 native px tall; this frame/size pair gives them the
 // same on-screen height as the archetype sheets (54 units × 108/128 of a frame).
 const UNIQUE_FRAME = 80;
@@ -44,7 +47,7 @@ export function worldInputBlocked(): boolean {
     !!active?.matches('input, textarea, select, [contenteditable="true"]');
 }
 
-type Atlas = { image: HTMLCanvasElement; frameSize: number; feetY: number };
+type Atlas = { image: HTMLCanvasElement; frameSize: number; feetY: number; figure?: number };
 type CharacterVisual = {
   image: Phaser.GameObjects.Image;
   frame: number;
@@ -129,6 +132,11 @@ export function createWorldRuntime(
   let viewScale = 1;
   let textureSerial = 0;
   let player: CharacterVisual | undefined;
+  /** A standing hero's height in their atlas px (scales the work loops to match). */
+  let playerFigure = 104;
+  /** Work-loop sheets by url, loaded on first use, and the sprite that plays them. */
+  const actionSheets = new Map<string, string | null>();
+  let actionImage: Phaser.GameObjects.Image | undefined;
   let actor: { shadow: Phaser.GameObjects.Image; ring: Phaser.GameObjects.Image; sign: Phaser.GameObjects.Image } | undefined;
   let targetRing: Phaser.GameObjects.Image | undefined;
   let veil: { image: Phaser.GameObjects.Image; texture: Phaser.Textures.CanvasTexture } | undefined;
@@ -590,7 +598,8 @@ export function createWorldRuntime(
 
     const playerShadow = image(shadowKey, 1, 30, 11);
     const playerRing = image(texture(groundRing("rgba(225, 199, 139, 0.55)"), "ring"), 2, 28, 10);
-    player = makeCharacter(`char:${playerId}`, atlases.get(playerId)!, 56);
+    player = makeCharacter(`char:${playerId}`, atlases.get(playerId)!, PLAYER_SIZE);
+    playerFigure = atlases.get(playerId)!.figure ?? playerFigure;
     const playerSign = image(texture(drawCanvas(9, 7, (context) => {
       context.fillStyle = "#172b26"; context.fillRect(0, 0, 9, 3); context.fillRect(2, 3, 5, 2); context.fillRect(4, 5, 1, 2);
       context.fillStyle = "#fff0bd"; context.fillRect(1, 1, 7, 1); context.fillRect(2, 2, 5, 1); context.fillRect(3, 3, 3, 1); context.fillRect(4, 4, 1, 1);
@@ -803,6 +812,51 @@ export function createWorldRuntime(
     return null;
   }
 
+  /** The texture key of a work-loop sheet, or null while it loads (or if it failed). */
+  function heroActionSheet(strip: HeroPoseStrip): string | null {
+    if (actionSheets.has(strip.url)) return actionSheets.get(strip.url) ?? null;
+    actionSheets.set(strip.url, null);
+    const source = new Image();
+    source.onload = () => {
+      if (disposed || !scene) return;
+      const key = `hero-action:${strip.url}`;
+      const sheet = scene.textures.exists(key) ? scene.textures.get(key) : scene.textures.addImage(key, source);
+      if (!sheet) return;
+      addGridFrames(sheet, strip.width, strip.columns, Math.round(source.height / strip.height), strip.height);
+      actionSheets.set(strip.url, key);
+    };
+    source.src = strip.url;
+    return null;
+  }
+  /**
+   * While the hero works (gathering, crafting, practice, rest), they play the
+   * painted loop on the spot instead of standing: same feet, same size, facing
+   * the way they last walked. It runs on the clock, since the map is paused then.
+   */
+  function updateHeroAction() {
+    if (!player) return;
+    const strip = read().heroAction;
+    const key = strip ? heroActionSheet(strip) : null;
+    if (!strip || !key) {
+      actionImage?.setVisible(false);
+      player.image.setVisible(true);
+      parent.dataset.playerAction = "";
+      return;
+    }
+    actionImage ??= scene!.add.image(0, 0, key, 0);
+    if (actionImage.texture.key !== key) actionImage.setTexture(key, 0);
+    const step = reducedMotion ? 0 : Math.floor(performance.now() * strip.fps / 1000) % strip.frames;
+    // Display px per sheet px: the loop's standing figure as tall as the walking one.
+    const unit = PLAYER_SIZE / CHARACTER_FRAME_SIZE * playerFigure / strip.figure;
+    const west = playerDir === "W" || playerDir === "SW" || playerDir === "NW";
+    actionImage.setFrame(strip.row * strip.columns + step, false, false)
+      .setOrigin(west ? 1 - strip.anchor / strip.width : strip.anchor / strip.width, strip.feet / strip.height)
+      .setDisplaySize(strip.width * unit, strip.height * unit).setFlipX(west)
+      .setPosition(position.x, position.y).setDepth(player.image.depth).setVisible(true);
+    player.image.setVisible(false);
+    parent.dataset.playerAction = `${strip.row}:${step}`;
+  }
+
   function updatePresentation(dt: number, moving: boolean) {
     if (!actor || !player) return;
     actor.shadow.setPosition(position.x, position.y);
@@ -827,6 +881,7 @@ export function createWorldRuntime(
       frame = clip.frames[!moving && (reducedMotion || vertical) ? 0 : Math.floor(motionTime * clip.fps) % clip.frames.length];
       setCharacterFrame(player, frame, playerFacing === "west");
     }
+    updateHeroAction();
     parent.dataset.playerDir = playerDir;
     parent.dataset.playerMotion = playerMotion;
     parent.dataset.playerFrame = String(frame);
