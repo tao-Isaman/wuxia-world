@@ -17,6 +17,7 @@ Start with the [project README](../README.md) for what the game is and how to ru
 | Add a location, NPC, quest, item, recipe, skill, opponent or a whole sect | [Content authoring](content-authoring.md) |
 | Look up any location, sect, quest, NPC, skill, item or opponent | [Reference (generated)](reference/README.md) |
 | Change the map view, characters, HUD, menus, VFX or styling | [Rendering and UI](rendering.md) |
+| Place objects on maps with the map editor | [Engine — แผนที่](engine.md#แผนที่--map-editor) |
 | Change music or sound effects | [Audio](audio.md) |
 | Edit the asset library, map placements or skill / art texts in the browser (`/game/engine`) | [Engine](engine.md) |
 | Change install / offline behaviour | [PWA](pwa.md) |
@@ -41,7 +42,8 @@ Start with the [project README](../README.md) for what the game is and how to ru
 - [world-engine.md](world-engine.md) — scenes, conditions, effects, quests, objectives, guide, random events, law, bad actions.
 - [liveness.md](liveness.md) — NPC simulation and rumors as built, and how they differ from the spec.
 - [content-authoring.md](content-authoring.md) — step-by-step recipes for adding content, with the checks to run.
-- [rendering.md](rendering.md) — Phaser stage, world runtime, maps and collision, characters, HUD and menus, VFX, styling.
+- [rendering.md](rendering.md) — Phaser stage, world runtime, maps and collision, placed objects, characters, HUD and menus, VFX, styling.
+- [engine.md](engine.md) — the `/game/engine` tool; its แผนที่ tab is the map editor.
 - [audio.md](audio.md) — procedural music and sound.
 - [engine.md](engine.md) — the `/game/engine` editor: asset library, map editor, skill / art text overrides, saving in dev vs deployed.
 - [pwa.md](pwa.md) — manifest, service worker, install button.

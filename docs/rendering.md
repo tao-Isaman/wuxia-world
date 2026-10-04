@@ -10,6 +10,7 @@ How the game is drawn and operated: the Phaser stage, the world map runtime, col
 - [The world runtime](#the-world-runtime)
 - [Maps](#maps)
 - [Navigation and collision](#navigation-and-collision)
+- [Placed objects](#placed-objects)
 - [Characters](#characters)
 - [Map signs and markers](#map-signs-and-markers)
 - [HUD](#hud)
@@ -28,7 +29,8 @@ How the game is drawn and operated: the Phaser stage, the world map runtime, col
 | --- | --- |
 | Stage | `lib/stage/phaser-stage.ts` (`createStage`, `canvasTexture`, `addGridFrames`, `drawCanvas`, `stagePixelRatio`) |
 | World runtime | `lib/stage/world-runtime.ts` (`createWorldRuntime`); host React component `components/game/world-canvas.tsx` |
-| Pure world helpers | `lib/stage/types.ts` (markers, `WALK_TICK_UNITS`, session map positions), `world-navigation.ts`, `world-footprints-data.ts`, `world-placement.ts`, `world-map-probe.ts`, `world-occlusion.ts`, `world-lighting.ts`, `world-vignettes.ts`, `world-style.ts` |
+| Pure world helpers | `lib/stage/types.ts` (markers, `WALK_TICK_UNITS`, session map positions), `world-navigation.ts`, `world-footprints-data.ts`, `world-placement.ts`, `world-map-probe.ts`, `map-anchors.ts`, `world-occlusion.ts`, `world-lighting.ts`, `world-vignettes.ts`, `world-style.ts` |
+| Placed objects | `lib/assets/placement-geometry.ts` (pure, shared with the map editor), `lib/assets/map-placements.ts` (loader), `components/world/use-map-placements.ts` — see [Placed objects](#placed-objects) |
 | Battle renderer | `lib/stage/grid-battle-runtime.ts`, `battle-vfx.ts`, `cast-vfx.ts` (pure), `hero-motion.ts` (pure), `battle-background.ts` (pure); host `components/game/battle-canvas.tsx` |
 | Cutscenes | `lib/stage/cutscene-runtime.ts` (`createCutsceneRuntime`); host `components/world/cutscene-player.tsx` (+ `.module.css`) — see [story-quests.md](story-quests.md#cutscenes) |
 | Characters | `lib/characters/catalog.ts`, `sheet.ts`, `walk-cycle.ts`; `components/game/character-preview.tsx` |
@@ -107,7 +109,7 @@ Both runtimes are loaded with a dynamic `import()` in the browser only. The host
   - After a reload inside a conversation, `initialWorldPlacement` puts the hero 28–64 units beside the speaker, facing them.
 - **Depth.**
   - Map painting at −1; shadows, halos (selected or near NPCs) and the target ring below.
-  - Characters, props and bystanders by foot y (`100 + y·10`).
+  - Characters, props and bystanders by foot y (`100 + y·10`; the hero `101 + y·10`), and placed objects of the "object" layer by their base y on the same scale; "ground" placements at −0.9…−0.1, "overhead" ones at 7000–7064 (see [Placed objects](#placed-objects)).
   - Signs at 8000, the night veil at 8900, dust motes at 9000.
   - Always-on green NPC name tags at 9010; quest marks (gold **!**, white **?**) at 9011; the guide arrow at 9012.
   - One boxed caption at 10000: hovered, else the walk target, else the last used, else the nearest within 105.
@@ -141,6 +143,7 @@ Both runtimes are loaded with a dynamic `import()` in the browser only. The host
 | `data-nearby-marker` | the marker the action button targets |
 | `data-guide-marker` | the marker the guide arrow points at |
 | `data-guide-edge` | `x,y` host pixels of the edge pointer while it shows (clear of every `data-hud-occluder` box) |
+| `data-placements`, `data-placement-ids` | placed objects drawn on this map: count, ids (space separated) |
 | `data-foes`, `data-foe-ids`, `data-foes-at` | roaming foes drawn: count, ids, map positions (JSON); test hook `host.worldScreenPoint(x, y)` gives a map point's viewport point |
 | `data-player-screen-*`, `data-nearby-screen-bounds` | screen coordinates; no reader remains |
 
@@ -228,9 +231,25 @@ Pure code in `lib/stage/world-navigation.ts`, in 960 × 640 map units.
   - `worldSegmentClear` (a swept test, so the hero can't tunnel through);
   - `nearestWorldGround`;
   - `moveOnWorldGround` (sub-steps of 4 units or less, sliding along walls);
-  - `planWorldPath` (Dijkstra over a visibility graph of rect corners and 20-gon ellipses; `[]` when unreachable, which cancels the walk).
+  - `planWorldPath` (A* over a visibility graph of rect corners and 20-gon ellipses, the straight-line distance as the heuristic and the swept test only for an edge that would improve a route; `[]` when unreachable, which cancels the walk). About 1 ms on a painted map, ~25 ms with 120 placed objects.
 - **Probe.** `probeWorldMap` (`world-map-probe.ts`) checks that the spawn is free and that every marker can be reached within 100 units. `bun run test:navigation` runs it over every painted map.
 - **Tools.** `bun scripts/map-collision-tool.ts <id> [json] [png]` prints and draws a map's markers and shapes. `bun scripts/build-map-footprints.ts <dir>` regenerates the data file, but the per-map JSON sources are not in the repo (see [scripts.md](scripts.md#generators-write-files)).
+
+## Placed objects
+
+Objects placed on a location map with the engine's map editor (`/game/engine`, แผนที่ — see [engine.md](engine.md#แผนที่--map-editor)) are drawn by the world runtime and block like the painting's own solids. The data is `public/assets/placements.json` (`{ version: 1, maps: { <locationId>: Placement[] } }`) and the asset library `public/assets/manifest.json`; the types are in `lib/assets/types.ts`.
+
+- **Loading.** `useMapPlacements(locationId)` (`components/world/use-map-placements.ts`) → `loadMapPlacements` (`lib/assets/map-placements.ts`). `placements.json` is fetched once per page (8 s timeout, then treated as empty); the manifest only when the map being opened has placements. Results are cached per map, so a map is resolved once and later visits are synchronous. `LocationMap` passes the result as `WorldPresentation.placements`; while it is `null` (still loading) `WorldCanvas` waits, so the map is built once with its solids. A map without placements behaves exactly as before. A placement whose asset id is not in the manifest is skipped (with a console warning).
+- **Geometry** (`placementGeometry` in `lib/assets/placement-geometry.ts`, pure; the editor draws with the same function):
+  - `x, y` is the asset's anchor (`anchorX, anchorY` in image px — its base centre) in map units;
+  - the image is drawn `mapWidth × mapHeight × scale` map units; `flip` mirrors it about the anchor (Phaser mirrors a frame in place, so the runtime mirrors the origin too);
+  - `dir` picks the 8-direction view (`views[dir]`), falling back to `image`;
+  - `footprint {x, y, w, h}` is a box in map units **relative to the anchor** (top-left at `x + f.x, y + f.y`), scaled and mirrored with the image. It blocks when `collide ?? true` (and the asset has a footprint).
+- **Layers and depth.** "ground" (−0.9…−0.1 by y) lies on the painting, under shadows and every character; "object" sorts with the characters by its base y (`100 + y·10`, so the hero on the same line stands in front and a hero further up is behind); "overhead" (7000–7064) is over every character but under signs (8000), the night veil (8900) and the labels. The painting's own occluders (`world-occlusion.ts`) use the same scale, so they sort against placed objects too. While the hero's body is inside an overhead object's picture, or behind a standing object (inside its picture, feet above its base), that object fades to 45 % (instantly under reduced motion).
+- **Collision.** `withPlacedSolids(worldFootprints(…), blockingRects(geometry))` (`world-navigation.ts`) adds each blocking footprint as a rect; everything else — `moveOnWorldGround`, `planWorldPath`, the spawn fix-up, wandering NPCs and roaming-foe spots — just sees more solids. Without placements it returns the map's own list unchanged.
+- **Never sealing a marker.** `placementIssues` (`lib/stage/map-anchors.ts`) lists placements whose footprint covers a map anchor (the spawn, the arrival spot by each exit, every NPC spot, exit and service, the horse station and tournament ring where `freeSpot` puts them with every NPC present, or the spot the hero walks to for one), and markers that the spawn could reach before but not after. The map editor shows them as warnings; `bun run test:placements` fails on any in `placements.json`, and on placements naming an unknown map or (once the manifest is filled) an unknown asset.
+- **Images** load in parallel with the rest of the scene; one that fails is skipped (its footprint still blocks), never failing the map. Each image URL is one texture.
+- **Not yet:** asset `animations` are not played (a placement shows its still image); road maps take no placements; the service worker does not cache `/assets/`, so placements are missing offline.
 
 ## Characters
 

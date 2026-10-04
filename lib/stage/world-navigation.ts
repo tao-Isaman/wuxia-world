@@ -1,4 +1,5 @@
 import type { Point } from "./types";
+import type { MapRect } from "../assets/placement-geometry";
 import { PAINTED_MAP_FOOTPRINTS } from "./world-footprints-data";
 
 export type WorldFootprint =
@@ -49,6 +50,16 @@ export function worldFootprints(key: string, image: string): readonly WorldFootp
   ];
   if (image === `/maps/${key}.webp`) return PAINTED_MAP_FOOTPRINTS[key] ?? [];
   return [];
+}
+
+/**
+ * A map's solids plus the blocking footprints of objects placed on it by the
+ * engine's map editor (`blockingRects` in lib/assets/placement-geometry.ts).
+ * Without placements it returns the map's own list unchanged.
+ */
+export function withPlacedSolids(base: readonly WorldFootprint[], placed: readonly MapRect[] = []): readonly WorldFootprint[] {
+  if (!placed.length) return base;
+  return [...base, ...placed.map((rect): WorldFootprint => ({ kind: "rect", ...rect }))];
 }
 
 export function worldPointBlocked(point: Point, footprints: readonly WorldFootprint[]): boolean {
@@ -166,13 +177,18 @@ export function planWorldPath(from: Point, destination: Point, footprints: reado
   const costs = nodes.map(() => Infinity);
   const previous = nodes.map(() => -1);
   const visited = new Set<number>();
+  // A*: the straight-line distance to the target never overestimates, so the
+  // route is still the shortest, but far fewer corners are expanded (and
+  // swept) once a map has many solids (placed objects).
+  const remaining = nodes.map((node) => distance(node, target));
   costs[0] = 0;
   while (visited.size < nodes.length) {
     let current = -1;
     for (let index = 0; index < nodes.length; index++) {
-      if (!visited.has(index) && (current < 0 || costs[index] < costs[current])) current = index;
+      if (!visited.has(index) && Number.isFinite(costs[index]) &&
+        (current < 0 || costs[index] + remaining[index] < costs[current] + remaining[current])) current = index;
     }
-    if (current < 0 || !Number.isFinite(costs[current])) return [];
+    if (current < 0) return [];
     if (current === 1) {
       const path: Point[] = [];
       for (let index = 1; index !== 0; index = previous[index]) path.unshift(nodes[index]);
@@ -180,9 +196,11 @@ export function planWorldPath(from: Point, destination: Point, footprints: reado
     }
     visited.add(current);
     for (let next = 0; next < nodes.length; next++) {
-      if (visited.has(next) || !worldSegmentClear(nodes[current], nodes[next], footprints)) continue;
+      if (visited.has(next)) continue;
+      // The cheap length test first: only an improving edge needs the swept collision test.
       const cost = costs[current] + distance(nodes[current], nodes[next]);
-      if (cost < costs[next]) { costs[next] = cost; previous[next] = current; }
+      if (cost >= costs[next] || !worldSegmentClear(nodes[current], nodes[next], footprints)) continue;
+      costs[next] = cost; previous[next] = current;
     }
   }
   return [];

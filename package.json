@@ -12,6 +12,7 @@
     "test:combat": "bun scripts/test-combat-actions.ts",
     "test:opening": "bun scripts/test-clinic-errand.ts && bun scripts/test-clinic-preparation.ts && bun scripts/test-capital-training.ts && bun scripts/test-quest-completion-receipt.ts && bun scripts/test-spy-greeting-exits.ts && bun scripts/test-lin-herb-dialogue.ts",
     "test:navigation": "bun test lib/stage/world-navigation.test.ts lib/stage/world-placement.test.ts",
+    "test:placements": "bun test lib/stage/placements.test.ts",
     "test:battle-background": "bun scripts/test-battle-background.ts",
     "test:rumors": "bun scripts/test-lore-rumors.ts && bun scripts/test-rumor-formatting.ts",
     "test:investigation": "bun scripts/test-capital-investigation.ts",

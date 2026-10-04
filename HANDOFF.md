@@ -49,7 +49,7 @@ Deploys are implied to be on Vercel (`VERCEL_GIT_COMMIT_SHA` sets the service-wo
 
 ## Verified state
 
-Checked on 2026-10-04 for the engine at `/game/engine` (asset library, skill / art text overrides):
+Checked on 2026-10-04 for the engine at `/game/engine` (asset library, map editor, skill / art text overrides) and objects placed on maps:
 
 | Check | Result |
 | --- | --- |
@@ -59,6 +59,7 @@ Checked on 2026-10-04 for the engine at `/game/engine` (asset library, skill / a
 | `test:combat` | 16 checks pass |
 | `test:opening` | 12 checks pass |
 | `test:navigation` | 19 tests pass |
+| `test:placements` | 8 tests pass (the committed `placements.json` is empty) |
 | `test:battle-background` | 2 checks pass |
 | `test:rumors` | 5 + 4 checks pass |
 | `test:investigation` | 5 checks pass |
@@ -79,7 +80,7 @@ Checked on 2026-10-04 for the engine at `/game/engine` (asset library, skill / a
 | `test:docs` | the generated reference is current; every link, repo path and command in the docs resolves |
 | `bun scripts/audit-content.ts` | 225 NPCs · 867 quests · 3038 scenes, all references resolve |
 | `bun run build` | passes; `/` first-load JS 1.12 MB (was 508 kB before the sagas; the saga text is about 2.9 MB of source, ~500 kB gzipped) |
-| `bun run test:e2e` | 41 Playwright tests against the production build (about 16 minutes, Chromium 141 via the container shim): 40 pass in one run; `hero-actions.spec.ts` › resting is flaky under CPU load (it failed once, and also fails 1 in 3 on the commit before the engine), then passes 3 × 3 together with `engine.spec.ts` |
+| `bun run test:e2e` | E2E_PENDING |
 
 Not verified:
 
@@ -93,9 +94,16 @@ Real behaviour today, found during the docs audit. Each is small and self-contai
 
 ### Engine (`/game/engine`)
 
-- **The map tab is a placeholder** until the map team's `components/engine/map-editor.tsx` lands.
 - **The asset library has only been run on a three-entry fixture**; `public/assets/manifest.json` is still empty in this branch. Paging keeps the DOM small, but the 3,500-entry load has not been timed in a browser.
 - **A saved text override does not regenerate the reference.** After saving `text-overrides.json`, run `bun scripts/build-docs-reference.ts` and `bun run test:story` by hand (see [docs/engine.md](docs/engine.md#text-overrides-in-the-game)). `bun scripts/audit-manual-names.ts` may flag a renamed move whose manual keeps the old name.
+
+### Placed objects and the map editor
+
+- **No objects placed yet.** `public/assets/placements.json` is empty until someone uses the editor; the asset library (`public/assets/manifest.json`) is filled by a separate pipeline.
+- **Footprint convention.** `AssetEntry.footprint` is read as a box relative to the anchor (top-left at anchor + `{x, y}`) — see [docs/rendering.md](docs/rendering.md#placed-objects). Asset tooling must write it that way.
+- **Still images only.** Asset `animations` are not played on maps; road maps take no placements; `/assets/` is not cached by the service worker, so placed objects are missing offline.
+- **Unchecked markers.** The editor's checker covers the spawn, arrivals, NPC spots, exits, services, the horse station and the tournament ring, but not quest objective spots (🔍), which the map places near the spawn at run time.
+- **Play-test hook.** `/?engineGoto=<id>` runs under `bun dev` or with `localStorage["wuxia-engine-goto"] = "on"` (set by the editor's เล่นทดสอบ on the same origin). It moves the hero without travel cost and keeps the previous save under `wusia-world-v1:before-engine-goto`; restoring it is manual.
 
 ### Roaming foes
 
