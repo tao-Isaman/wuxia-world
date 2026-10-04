@@ -19,13 +19,15 @@
  * a sitting or lying hero stays the size of a standing one.
  *
  * Output: public/art/characters/<hero>-combat.png (6 × 8 cells) and
- * <hero>-work.png (4 × 14 cells), cells of HERO_ACTION_CELL.
+ * <hero>-work.png (4 × 14 cells), cells of HERO_ACTION_CELL. m1's work loops are
+ * PixelLab animations instead (scripts/build-hero-work-loops.ts); his painted cut
+ * goes to <dir>/m1-work-painted.png as their start frames' source.
  * The painted sources are not kept in the repo.
  */
 import sharp from "sharp";
 import { existsSync } from "node:fs";
 import { cutOut } from "./art-cutout";
-import { HERO_ACTION_CELL, HERO_ACTION_IDS, HERO_ACTIVITIES, HERO_COMBAT_COLUMNS, HERO_COMBAT_ROWS, HERO_WORK_COLUMNS } from "../lib/characters/hero-actions";
+import { HERO_ACTION_CELL, HERO_ACTION_IDS, HERO_WORK_LAYOUT, HERO_ACTIVITIES, HERO_COMBAT_COLUMNS, HERO_COMBAT_ROWS, HERO_WORK_COLUMNS } from "../lib/characters/hero-actions";
 
 const args = process.argv.slice(2);
 const from = args[args.indexOf("--from") + 1];
@@ -234,5 +236,8 @@ for (const hero of HERO_ACTION_IDS.filter((id) => !only.length || only.includes(
     if (!existsSync(`${from}/${hero}/${WORK[activity].file}.png`)) { console.warn(`${hero}: no ${activity} strip, row left empty`); work.push(null, null, null, null); continue; }
     work.push(...await stripCells(hero, WORK[activity]));
   }
-  await writeSheet(work, HERO_WORK_COLUMNS, `public/art/characters/${hero}-work.png`);
+  // A hero whose work loops come from elsewhere (m1: PixelLab, scripts/build-hero-work-loops.ts) keeps
+  // the painted cut beside the strips, as the start frames' source (PAINTED_SHEET).
+  const painted = HERO_WORK_LAYOUT[hero]?.width === HERO_ACTION_CELL.width;
+  await writeSheet(work, HERO_WORK_COLUMNS, painted ? `public/art/characters/${hero}-work.png` : `${from}/${hero}-work-painted.png`);
 }

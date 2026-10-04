@@ -49,7 +49,7 @@ test("one body per gender; the hero fights with painted weapon frames", async ({
   expect(errors).toEqual([]);
 });
 
-test("resting shows the hero asleep in the work overlay", async ({ page }) => {
+test("resting shows the hero asleep, on the map and in the work overlay", async ({ page }) => {
   await start(page);
   // Tired, so resting is offered.
   await page.evaluate(() => {
@@ -63,7 +63,10 @@ test("resting shows the hero asleep in the work overlay", async ({ page }) => {
   await page.getByRole("group", { name: "เลือกวิธีพักผ่อน" }).getByRole("button", { name: /พักริมทาง/ }).click();
   const sprite = page.locator('.work-overlay .hero-action-sprite[data-hero-pose="work:sleep"]');
   await expect(sprite).toBeVisible();
-  await expect.poll(() => sprite.evaluate((node) => getComputedStyle(node).backgroundImage)).toContain("/art/characters/m1-work.png");
+  expect(await sprite.evaluate((node) => getComputedStyle(node).backgroundImage)).toContain("/art/characters/m1-work.png");
+  // On the map too: the hero plays the sleep loop (row 13) in place of standing.
+  await expect(page.getByTestId("world-canvas")).toHaveAttribute("data-player-action", /^13:/);
   await page.screenshot({ path: "test-results/screenshots/hero-sleep-pose.png" });
   await expect(page.locator(".work-overlay")).toHaveCount(0, { timeout: 5_000 });
+  await expect(page.getByTestId("world-canvas")).toHaveAttribute("data-player-action", "");
 });

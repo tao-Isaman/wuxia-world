@@ -83,7 +83,8 @@ bun scripts/import-npc-art.ts --from <dir>   # cut out painted NPC bodies + port
 bun scripts/build-npc-sheets.ts         # rigged animation sheets for the 65 NPCs in lib/characters/npc-sheets.ts + the 8 heroes, 7 archetypes and 22 enemy types
 bun scripts/build-creature-atlas.ts --from <dir>   # the 12 painted beasts (b0…b11.png) → public/art/creature-atlas.png
 bun scripts/build-hero-walk8.ts --from <dir>   # the heroes' painted 8-direction walk sheets (<id>-walk8.png)
-bun scripts/build-hero-actions.ts --from <dir>   # m1 / f1 painted weapon forms + combat poses (<id>-combat.png) and work loops (<id>-work.png)
+bun scripts/build-hero-actions.ts --from <dir>   # m1 / f1 painted weapon forms + combat poses (<id>-combat.png) and f1's work loops (<id>-work.png)
+bun scripts/build-hero-work-loops.ts --from <dir>   # m1's PixelLab-animated work loops (m1-work.png, 8 frames × 14)
 bun scripts/smoke-liveness.ts           # 90-day NPC simulation smoke test
 bun scripts/build-world-coords.ts       # each place's world-map spot (exit / road directions); rerun after adding a place or road
 bun scripts/build-route-variants.ts --from <dir>   # import the 56 directional road paintings (<type>-<dir8>.png)
@@ -278,7 +279,7 @@ Two deliberate exceptions reach into stores:
   - The action target is the nearest marker within 95 units; E reaches 100.
   - Walk ticks every 220 units; a guide arrow (its edge pointer slides clear of every `[data-hud-occluder]` HUD box — tag new HUD boxes); name tags and quest marks.
   - The hero walks with painted eight-direction sprites (`<id>-walk8.png`, `lib/characters/walk8.ts`) and always faces the way they move.
-  - Only m1 (male) and f1 (female) are heroes (`PLAYER_BODIES`; older saves fall back by gender, `heroBodyFor`). They have painted action sheets (`lib/characters/hero-actions.ts`): a weapon-family form per cast plus hurt / guard / victory / defeat in battle (`<id>-combat.png`), and a work loop per activity in the work overlay (`<id>-work.png`, `flashLoading(…, pose)`); unpainted loops are listed in `HERO_WORK_GAPS`.
+  - Only m1 (male) and f1 (female) are heroes (`PLAYER_BODIES`; older saves fall back by gender, `heroBodyFor`). They have painted action sheets (`lib/characters/hero-actions.ts`): a weapon-family form per cast plus hurt / guard / victory / defeat in battle (`<id>-combat.png`), and a work loop per activity (`<id>-work.png`, grid per hero in `HERO_WORK_LAYOUT`; m1's are 8-frame PixelLab animations) that plays in the work overlay and on the hero on the map while they work (`flashLoading(…, pose)` → `WorldPresentation.heroAction`); unpainted loops are listed in `HERO_WORK_GAPS`.
   - Foes without NPC art are one of 22 painted, rigged enemy types (`FOE_CHARACTER_IDS`, picked by `foeCharacterFor` in `lib/world/battle-looks.ts`); beasts are 12 painted cells of the 4 × 3 creature atlas (`CREATURE_ATLAS`).
   - The 65 rigged NPCs (`ANIMATED_NPC_IDS`, own 4 × 6 sheets) wander near their spot (`npc-wander.ts`) and freeze when the hero is near or coming to them; picking uses `markerPoint` (their current spot).
   - It pauses while any `[role="dialog"]`, `[role="alertdialog"]` or `[data-world-busy]` exists (`worldInputBlocked`).

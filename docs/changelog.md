@@ -4,6 +4,14 @@ What changed, when, and in which pull request. Newest first. Each entry says wha
 
 Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-Isaman/wuxia-world/pulls?q=is%3Apr+is%3Amerged). The waves are the build → test → review rounds the agents worked in (see [HANDOFF.md](../HANDOFF.md)).
 
+## 2026-10-04
+
+### The male hero works for real: PixelLab work loops, played on the map
+
+- m1's 14 work loops are now 8-frame animations made with PixelLab from his painted poses (`animate-with-text-v3`): a full pickaxe swing that sends chips flying, an axe biting into the stump, a rod jerking up on a bite, a bow drawn to the cheek and loosed, a hammer ringing on a glowing blade… (`HERO_WORK_LAYOUT.m1`: 8 × 14 cells of 128 px, 8 fps). f1 keeps her painted 4-frame loops.
+- **The hero does the work on the map.** While gathering, crafting, practising or resting, the hero on the map plays the loop in place of standing, same feet and size, facing the way they last walked (`WorldPresentation.heroAction`, `data-player-action`); the work card still shows it too.
+- Tooling: `scripts/build-hero-work-loops.ts` (`--first` cuts the start frames, `--from` builds the sheet) and `scripts/animate-hero-work.py` (PixelLab, `PIXELLAB_API_TOKEN` from the environment).
+
 ## 2026-10-03
 
 ### Painted fighting and work poses; one hero per gender
