@@ -1,6 +1,8 @@
 /**
- * The game asset library (public/assets/, lib/assets/manifest.json) and the
- * objects placed on maps (lib/world/data/placements/<locationId>.json).
+ * The game asset library (images under public/assets/, listed in
+ * public/assets/manifest.json) and the objects placed on maps
+ * (public/assets/placements.json). Both are fetched at runtime (only when
+ * needed), never bundled: the library runs to thousands of entries.
  *
  * This file is the contract between the asset pipeline (scripts/assets/),
  * the engine (/game/engine) and the game runtime. Serializable data only:
@@ -106,10 +108,10 @@ export interface Placement {
   collide?: boolean;
 }
 
-export interface MapPlacements {
+/** Every map's placed objects, keyed by location id (public/assets/placements.json). */
+export interface PlacementsFile {
   version: 1;
-  locationId: string;
-  placements: Placement[];
+  maps: Record<string, Placement[]>;
 }
 
 /** Engine-edited names and descriptions laid over the skill / art tables (lib/game/data/text-overrides.json). */

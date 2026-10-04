@@ -1,15 +1,41 @@
 /**
- * Reading the asset library (lib/assets/manifest.json): lookups and queries
- * shared by the game runtime and the engine. Pure; see lib/assets/types.ts.
+ * Reading the asset library and the map placements. Both live under
+ * public/assets/ and are fetched once on demand (the game only when a map has
+ * placements, the engine on open); the query helpers are pure. See
+ * lib/assets/types.ts.
  */
-import manifestJson from "./manifest.json";
-import type { AssetCategory, AssetEntry, AssetManifest, AssetRegion } from "./types";
+import type { AssetCategory, AssetEntry, AssetManifest, AssetRegion, Placement, PlacementsFile } from "./types";
 
-export const ASSET_MANIFEST = manifestJson as AssetManifest;
-const BY_ID = new Map(ASSET_MANIFEST.assets.map((asset) => [asset.id, asset]));
+export const ASSET_MANIFEST_URL = "/assets/manifest.json";
+export const PLACEMENTS_URL = "/assets/placements.json";
 
-/** An asset by id (any status), or undefined. */
-export function getAsset(id: string): AssetEntry | undefined { return BY_ID.get(id); }
+let manifest: Promise<AssetManifest> | null = null;
+let placements: Promise<PlacementsFile> | null = null;
+
+async function fetchJson<T>(url: string, fallback: T): Promise<T> {
+  try {
+    const response = await fetch(url, { cache: "no-cache" });
+    return response.ok ? await response.json() as T : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+/** The asset manifest (cached; an empty one when it cannot load). */
+export function loadAssetManifest(): Promise<AssetManifest> {
+  manifest ??= fetchJson<AssetManifest>(ASSET_MANIFEST_URL, { version: 1, generatedAt: "", assets: [] });
+  return manifest;
+}
+/** Every map's placements (cached; empty when it cannot load). */
+export function loadPlacements(): Promise<PlacementsFile> {
+  placements ??= fetchJson<PlacementsFile>(PLACEMENTS_URL, { version: 1, maps: {} });
+  return placements;
+}
+/** Forget the cached files (the engine after it saves). */
+export function reloadAssetData(): void { manifest = null; placements = null; }
+
+export function placementsFor(file: PlacementsFile, locationId: string): Placement[] { return file.maps[locationId] ?? []; }
+export function indexAssets(assets: readonly AssetEntry[]): Map<string, AssetEntry> { return new Map(assets.map((asset) => [asset.id, asset])); }
 
 export interface AssetQuery {
   category?: AssetCategory;
@@ -23,7 +49,7 @@ export interface AssetQuery {
 }
 
 /** Assets matching every given filter, in manifest order. */
-export function queryAssets(query: AssetQuery = {}, assets: readonly AssetEntry[] = ASSET_MANIFEST.assets): AssetEntry[] {
+export function queryAssets(assets: readonly AssetEntry[], query: AssetQuery = {}): AssetEntry[] {
   const text = query.text?.trim().toLowerCase();
   const status = query.status ?? "approved";
   return assets.filter((asset) =>
@@ -35,9 +61,9 @@ export function queryAssets(query: AssetQuery = {}, assets: readonly AssetEntry[
     (!text || asset.name.toLowerCase().includes(text) || asset.id.includes(text) || asset.tags.some((tag) => tag.toLowerCase().includes(text))));
 }
 
-/** Counts per category (approved only unless `all`). */
-export function assetCounts(all = false): Record<string, number> {
+/** Counts per category. */
+export function assetCounts(assets: readonly AssetEntry[], status: AssetEntry["status"] | "all" = "approved"): Record<string, number> {
   const counts: Record<string, number> = {};
-  for (const asset of ASSET_MANIFEST.assets) if (all || asset.status === "approved") counts[asset.category] = (counts[asset.category] ?? 0) + 1;
+  for (const asset of assets) if (status === "all" || asset.status === status) counts[asset.category] = (counts[asset.category] ?? 0) + 1;
   return counts;
 }
