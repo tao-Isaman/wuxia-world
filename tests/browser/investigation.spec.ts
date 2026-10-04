@@ -52,8 +52,8 @@ test("capital rumors and the ledger investigation survive a mid-dialogue reload 
   await expect(page.getByTestId("world-canvas")).toHaveAttribute("data-visible-props", /archive-chest/);
   const world = page.getByTestId("world-canvas");
   await expect(world).toHaveAttribute("data-read-only", "true");
-  await expect.poll(async () => Number(await world.getAttribute("data-player-x"))).toBeCloseTo(431.6, 0);
-  await expect.poll(async () => Number(await world.getAttribute("data-player-y"))).toBeCloseTo(202.4, 0);
+  await expect.poll(async () => Number(await world.getAttribute("data-player-x"))).toBeCloseTo(536.2, 0);
+  await expect.poll(async () => Number(await world.getAttribute("data-player-y"))).toBeCloseTo(201.8, 0);
   await expect(world).toHaveAttribute("data-player-facing", "west");
   // Full-screen conversation: the lines and every choice fit without scrolling.
   await expect.poll(() => page.evaluate(() => {

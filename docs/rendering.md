@@ -237,8 +237,9 @@ Pure code in `lib/stage/world-navigation.ts`, in 960 × 640 map units.
 
 ## Placed objects
 
-Objects placed on a location map with the engine's map editor (`/game/engine`, แผนที่ — see [engine.md](engine.md#แผนที่--map-editor)) are drawn by the world runtime and block like the painting's own solids. The data is `public/assets/placements.json` (`{ version: 1, maps: { <locationId>: Placement[] } }`) and the asset library `public/assets/manifest.json`; the types are in `lib/assets/types.ts`.
+Objects placed on a location map with the engine's map editor (`/game/engine`, แผนที่ — see [engine.md](engine.md#แผนที่--map-editor)) are drawn by the world runtime and block like the painting's own solids. The data is `public/assets/placements.json` (`{ version: 1, maps: { <locationId>: Placement[] }, grounds?: { <locationId>: { tile } } }`) and the asset library `public/assets/manifest.json`; the types are in `lib/assets/types.ts`.
 
+- **Ground.** A map with a `grounds[locationId]` entry draws that tile repeated at its map size instead of its painting (`WorldPresentation.ground`, `peekMapGround`); its `image` becomes the stand-in `ground:<tile>`, so no painted collision (`worldFootprints`) or foreground (`worldForeground`) applies. `city_capital` is built this way.
 - **Loading.** `useMapPlacements(locationId)` (`components/world/use-map-placements.ts`) → `loadMapPlacements` (`lib/assets/map-placements.ts`). `placements.json` is fetched once per page (8 s timeout, then treated as empty); the manifest only when the map being opened has placements. Results are cached per map, so a map is resolved once and later visits are synchronous. `LocationMap` passes the result as `WorldPresentation.placements`; while it is `null` (still loading) `WorldCanvas` waits, so the map is built once with its solids. A map without placements behaves exactly as before. A placement whose asset id is not in the manifest is skipped (with a console warning).
 - **Geometry** (`placementGeometry` in `lib/assets/placement-geometry.ts`, pure; the editor draws with the same function):
   - `x, y` is the asset's anchor (`anchorX, anchorY` in image px — its base centre) in map units;

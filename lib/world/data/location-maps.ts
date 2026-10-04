@@ -81,17 +81,19 @@ export const LOCATION_MAPS: Record<string, LocationMapDef> = {
   },
 
   city_capital: {
+    // The painting is replaced in the engine (public/assets/placements.json: a tiled
+    // ground plus the placed city); these spots stand in front of its buildings.
     image: "/maps/city_capital.png",
     zoom: 2.6,
-    spawn: { x: 50, y: 78 }, // just inside the main south gate
+    spawn: { x: 50, y: 57.5 }, // the crossing south of the market (station, tournament and quest spots gather here)
     npcSpots: {
-      city_capital_magistrate_wu: { x: 49, y: 35 }, // paved courtyard below the north gate
-      city_capital_clerk_qing: { x: 41, y: 31 }, // government frontage above the left market awning; lateral approach stays clear of Wu
-      city_capital_physician_lin: { x: 35, y: 58 }, // in front of the apothecary
-      city_capital_merchant_wang: { x: 58, y: 44 }, // among the market stalls
-      spy_capital_feng: { x: 62, y: 58 },           // noodle stand by the kitchen row
-      evil_capital_blackmarket_zhou: { x: 90, y: 47 }, // shadowy corner below the east gate
-      merchant_wang: { x: 27, y: 42 },              // เถ้าแก่หวาง, by the general store
+      city_capital_magistrate_wu: { x: 64.7, y: 37.2 }, // before the yamen steps
+      city_capital_clerk_qing: { x: 51.9, y: 30.9 }, // along the yamen frontage
+      city_capital_physician_lin: { x: 26.5, y: 55.2 }, // in front of the apothecary
+      city_capital_merchant_wang: { x: 57.5, y: 56.2 }, // among the market stalls
+      spy_capital_feng: { x: 75.2, y: 71.2 }, // by the kitchen row
+      evil_capital_blackmarket_zhou: { x: 74.4, y: 44.6 }, // in the shadow of the tea house
+      merchant_wang: { x: 36.7, y: 18.5 }, // เถ้าแก่หวาง, by the general store
     },
     exits: [
       { to: "home_player", x: 50, y: 88, icon: "🏠" },   // main south gate
@@ -104,22 +106,22 @@ export const LOCATION_MAPS: Record<string, LocationMapDef> = {
       { to: "inn_yuelai", x: 95, y: 62, icon: "🏮" },     // old alley, east
     ],
     spots: [
-      { kind: "shop", x: 25, y: 38, icon: "🏪", label: "ตลาดนครหลวง" },
-      { kind: "sectHall", x: 52, y: 33, icon: "🏯", label: "สำนักยุทธิ์" }, // courtyard entrance, below the gate roof
-      { kind: "rest", x: 78, y: 40, icon: "🍵", label: "โรงเตี๊ยม" },
-      { kind: "rumor", x: 72, y: 47, icon: "🍶", label: "ฟังข่าวลือ" },
-      { kind: "artisan", artisanId: "artisan_city_capital_forge", x: 21, y: 72, icon: "🔨", label: "ตีเหล็ก" },
-      { kind: "artisan", artisanId: "artisan_city_capital_alchemy", x: 35, y: 72, icon: "⚗️", label: "ปรุงยา" },
-      { kind: "artisan", artisanId: "artisan_city_capital_tailoring", x: 47, y: 72, icon: "🧵", label: "ตัดเย็บ" },
-      { kind: "artisan", artisanId: "artisan_city_capital_chef", x: 60, y: 72, icon: "🍜", label: "ครัว" },
-      { kind: "artisan", artisanId: "artisan_city_capital_jewelry", x: 72, y: 72, icon: "💍", label: "อัญมณี" },
-      { kind: "artisan", artisanId: "artisan_city_capital_accessory", x: 83, y: 72, icon: "🧿", label: "เครื่องราง" },
-      { kind: "resource", resourceId: "mine_iron", x: 93, y: 90, icon: "⛏", label: "ขุดแร่" },
-      { kind: "resource", resourceId: "wood_soft", x: 6, y: 55, icon: "🪓", label: "ตัดไม้" },
+      { kind: "shop", x: 44.1, y: 22.7, icon: "🏪", label: "ตลาดนครหลวง" },
+      { kind: "sectHall", x: 69.9, y: 36.7, icon: "🏯", label: "สำนักยุทธิ์" }, // the yamen's east wing
+      { kind: "rest", x: 77.3, y: 47.2, icon: "🍵", label: "โรงเตี๊ยม" },
+      { kind: "rumor", x: 60.6, y: 58.1, icon: "🍶", label: "ฟังข่าวลือ" },
+      { kind: "artisan", artisanId: "artisan_city_capital_forge", x: 28.5, y: 33.1, icon: "🔨", label: "ตีเหล็ก" },
+      { kind: "artisan", artisanId: "artisan_city_capital_alchemy", x: 29.6, y: 68.3, icon: "⚗️", label: "ปรุงยา" },
+      { kind: "artisan", artisanId: "artisan_city_capital_tailoring", x: 52.8, y: 72.9, icon: "🧵", label: "ตัดเย็บ" },
+      { kind: "artisan", artisanId: "artisan_city_capital_chef", x: 73.3, y: 75.3, icon: "🍜", label: "ครัว" },
+      { kind: "artisan", artisanId: "artisan_city_capital_jewelry", x: 62.4, y: 83.1, icon: "💍", label: "อัญมณี" },
+      { kind: "artisan", artisanId: "artisan_city_capital_accessory", x: 59.8, y: 79.8, icon: "🧿", label: "เครื่องราง" },
+      { kind: "resource", resourceId: "mine_iron", x: 93, y: 91.4, icon: "⛏", label: "ขุดแร่" },
+      { kind: "resource", resourceId: "wood_soft", x: 6.3, y: 73.4, icon: "🪓", label: "ตัดไม้" },
       // Street life: chess by the tea house, begging along the market street.
-      { kind: "resource", resourceId: "chess_basic", x: 85, y: 52, icon: "♟", label: "เล่นหมากรุก" },
-      { kind: "resource", resourceId: "beg_street", x: 45, y: 50, icon: "🥣", label: "ขอเงินคนผ่านไปมา" },
-      { kind: "resource", resourceId: "beg_market", x: 31, y: 50, icon: "🥣", label: "ขอเงินในตลาด" },
+      { kind: "resource", resourceId: "chess_basic", x: 84.6, y: 52.2, icon: "♟", label: "เล่นหมากรุก" },
+      { kind: "resource", resourceId: "beg_street", x: 56, y: 75.3, icon: "🥣", label: "ขอเงินคนผ่านไปมา" },
+      { kind: "resource", resourceId: "beg_market", x: 23.5, y: 51.2, icon: "🥣", label: "ขอเงินในตลาด" },
     ],
   },
 };

@@ -104,6 +104,12 @@ Real behaviour today, found during the docs audit. Each is small and self-contai
 - **Not used in play yet.** The 225 NPC characters and 120 monsters are library assets only; the game still draws its painted NPCs and foes. Nothing is placed on a map until someone uses the map editor.
 - **PixelLab balance.** About 2,289 of the 10,000 generations are left (the kits used ~680; the allowance resets 2026-11-04).
 
+### The rebuilt capital and iso kits
+
+- **One map so far.** Only `city_capital` is built in the engine (ground + placements); every other map keeps its painting. Cutscenes staged on `city_capital` still draw the old painting (`cutscene-runtime.ts` reads the map's image).
+- **Depth on long diagonal walls.** Iso pieces sort by their diamond's centre, so a character right beside a wall cell can draw a few pixels in front of / behind its neighbour cell's end.
+- **The east of the capital is still airy** around the tea house; the quest props are offset from their NPCs and may overlap a stall.
+
 ### Kits (roads and walls)
 
 - **Walls are assembled, not painted.** The 16 wall / fence sets are drawn by `scripts/assets/build-kits.ts` from 16 PixelLab texture tiles, so they are flatter than the painted maps and the library's buildings; there are no wall towers or gatehouses (place a library gate building over a kit gate). North–south walls show only their top strip, the usual 3/4 convention.

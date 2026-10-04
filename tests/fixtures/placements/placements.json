@@ -2,7 +2,7 @@
   "version": 1,
   "maps": {
     "city_capital": [
-      { "id": "p_000001", "asset": "prop_test_crate", "x": 560, "y": 499 },
+      { "id": "p_000001", "asset": "prop_test_crate", "x": 560, "y": 368 },
       { "id": "p_000002", "asset": "nat_test_pine", "x": 700, "y": 600, "flip": true },
       { "id": "p_000003", "asset": "prop_test_arch", "x": 400, "y": 540 }
     ]

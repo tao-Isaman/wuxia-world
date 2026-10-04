@@ -115,11 +115,15 @@ The engine page renders `<MapEditor assets={manifest.assets} />` in its แผ�
 - **Depth preview** is the game's rule (`placementDepth`): the DOM draws back to front by the same depth values.
 - **Warnings.** A footprint over an anchor (spawn, arrival spot, NPC, exit, service, the horse station or tournament ring, or the spot the hero walks to for one) and a marker the spawn can no longer reach are listed under the inspector (click one to select the object) and marked red on the map. The check runs after each edit paints (`useDeferredValue`); the map's own probe is cached. Quest objective spots (🔍) are placed at run time near the spawn and are not checked; keep the ground around the spawn clear. Objects whose asset is missing from the manifest show as red dashed boxes.
 
+### พื้น (ground)
+
+The **พื้น** select in the toolbar replaces a map's painting with one ground tile repeated over the map (the library's solid Wang fills; `placements.json` `grounds`). With a ground, the painting's own collision and foreground cut-outs are gone in the editor and the game — only placed objects stand and block — so a map can be built entirely in the engine. ภาพวาดเดิม brings the painting back. The setting is part of the working file (undo, draft, save, play-test).
+
 ### ชิ้นต่อกัน (kit brush)
 
 The panel above the palette paints roads, city walls, house walls and fences from the library's kits ([assets.md](assets.md#kits-roads-and-walls-that-join)):
 
-- **Pick a set** under the ถนน / กำแพงเมือง / กำแพงบ้าน tabs (fences are with the house walls). The map shows the set's grid (48 for roads, 32 for walls) and the cell under the cursor.
+- **Pick a set** under the ถนน / กำแพงเมือง / กำแพงบ้าน tabs (fences are with the house walls; plazas with the roads). **แนวทแยง** (on by default) lists the iso sets that lean like the isometric buildings; off, the square-grid ones. The map shows the set's grid — diamonds for iso sets, squares (48 for roads, 32 for walls) otherwise — and the cell under the cursor.
 - **Paint.** Click a cell, or drag: the stroke fills the cells along the drag (each touching the last), and every piece picks itself from its neighbours — straights, corners, T-junctions, crossings and ends. One stroke is one undo step.
 - **Erase.** ⌫ ลบ, or hold Shift while dragging: pieces come out and the rest re-join (a corner becomes two ends).
 - **Gates.** ＋ ประตู… arms the set's gate; click the map and it snaps to the grid, replaces the wall pieces under it, and the run on each side joins it. Its passage stays walkable; the piers block. The brush never moves or erases a gate (select it and press Delete).

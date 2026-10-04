@@ -27,8 +27,8 @@ A library of pixel-art assets made with [PixelLab](https://pixellab.ai) for the 
 | `monster` | 120 | 88 | `create-character-v3` | beasts, spirits, demons, undead and human foe archetypes, 8 directions |
 | `fx` | 60 | 64 | `generate-image-v2` | flame, lightning, ice, sword qi, palm wave, poison, smoke, sparks, healing, blood |
 | `ui` | 38 | 42–64 | `generate-image-v2` | frames, buttons, medallions, scroll banners, seals, gauge orbs |
-| `kit` | 464 | 30–96 | `create-tiles-pro` | modular roads, city walls, house walls and fences that join on a grid ([Kits](#kits-roads-and-walls-that-join)) |
-| **total** | **3,658** | | | |
+| `kit` | 928 | 30–96 | `create-tiles-pro` | modular roads, city walls, house walls and fences that join on a grid ([Kits](#kits-roads-and-walls-that-join)) |
+| **total** | **4,122** | | | |
 
 By region: heartland 607, east 500, south 523, north 544, west 508, any 976 (icons, fx, ui, monsters, interior furniture, landmarks, the region-free kits).
 
@@ -121,6 +121,8 @@ Category `kit` holds modular pieces that snap to a grid and join their neighbour
 **Look.** All wall pieces of a set are drawn from the same two textures sampled in world space (texture period = cell), so runs join without seams and all 16 masks agree. Gates: a round arch in a city wall (the top runs across), a door or a moon gate in a house wall, a gap in a fence.
 
 **Rebuild.** `bun scripts/assets/build-kits.ts plan` writes `scripts/assets/kits/plan.json` (one texture set + the 12 road sets); run it through `generate.py` (method `tilespro`, ~20 generations for the textures, ~40 per road set), then `bun scripts/assets/build-kits.ts build --raw <raw>`: it rebuilds `public/assets/kit/` and replaces the manifest's `kit` entries only (`import.ts` never touches them). The kit plan is kept out of `scripts/assets/plan/` so `import.ts` doesn't import it.
+
+**Iso sets (diagonal).** The library's buildings are isometric (their walls lean 2:1), so every kit also comes on an **iso grid** (`kit.grid: "iso"`, set ids `kit_<region>_isoroad_`, `_isoplaza_`, `_isowall_`, `_isofence_`): 9 roads, 2 plazas (full cells) and iso versions of all 16 wall / fence styles, gates in both directions (`_gate_se` along a, `_gate_sw` along b). Cells are diamonds `cell` wide and `cell / 2` tall on one lattice for roads and walls (64): cell (a, b) has its centre at (480 + (a − b)·32, (a + b + 1)·16); a runs down-right, b down-left; N is up-right (b − 1), E down-right, S down-left, W up-left. An iso piece is anchored at its diamond's centre (a gate at the centre of its span) and blocks with a staircase of 4-unit boxes along its diagonal band (`solids`). They are drawn by `scripts/assets/kits-iso.ts`, which casts a ray per pixel through a small solid model (band, height, parapet or coping, gate passage) and samples a library ground tile (roads) or the texture set (walls) in grid space, so pieces join without seams and faces light like the buildings'. Iso cells count as on the map while their centre is.
 
 **In the editor.** The map editor's ชิ้นต่อกัน panel is the brush: [engine.md](engine.md#ชิ้นต่อกัน-kit-brush).
 
