@@ -95,6 +95,8 @@ Places objects from the asset library on the 100 painted location maps. The game
 | `components/engine/map-editor/map-stage.tsx` | the map view: painting, placed objects, overlays, markers, pointer gestures |
 | `components/engine/map-editor/asset-palette.tsx` | the approved assets: filters, thumbnails, arm / drag |
 | `components/engine/map-editor/inspector.tsx` | the selection's fields and the map's warnings |
+| `components/engine/map-editor/kit-brush.tsx` | ชิ้นต่อกัน: the road / wall kit sets, paint / erase, their gates |
+| `lib/assets/kits.ts` | pure: kit sets, the grid, joins (`paintKit`, `placeKitSpecial`) |
 | `components/engine/map-editor/map-editor.module.css` | the tool's styles |
 | `lib/assets/placement-geometry.ts` | where a placement draws and what it blocks; shared with the game |
 | `lib/stage/map-anchors.ts` | the map's fixed points and `placementIssues` |
@@ -113,6 +115,16 @@ The engine page renders `<MapEditor assets={manifest.assets} />` in its แผ�
 - **Depth preview** is the game's rule (`placementDepth`): the DOM draws back to front by the same depth values.
 - **Warnings.** A footprint over an anchor (spawn, arrival spot, NPC, exit, service, the horse station or tournament ring, or the spot the hero walks to for one) and a marker the spawn can no longer reach are listed under the inspector (click one to select the object) and marked red on the map. The check runs after each edit paints (`useDeferredValue`); the map's own probe is cached. Quest objective spots (🔍) are placed at run time near the spawn and are not checked; keep the ground around the spawn clear. Objects whose asset is missing from the manifest show as red dashed boxes.
 
+### ชิ้นต่อกัน (kit brush)
+
+The panel above the palette paints roads, city walls, house walls and fences from the library's kits ([assets.md](assets.md#kits-roads-and-walls-that-join)):
+
+- **Pick a set** under the ถนน / กำแพงเมือง / กำแพงบ้าน tabs (fences are with the house walls). The map shows the set's grid (48 for roads, 32 for walls) and the cell under the cursor.
+- **Paint.** Click a cell, or drag: the stroke fills the cells along the drag (each touching the last), and every piece picks itself from its neighbours — straights, corners, T-junctions, crossings and ends. One stroke is one undo step.
+- **Erase.** ⌫ ลบ, or hold Shift while dragging: pieces come out and the rest re-join (a corner becomes two ends).
+- **Gates.** ＋ ประตู… arms the set's gate; click the map and it snaps to the grid, replaces the wall pieces under it, and the run on each side joins it. Its passage stays walkable; the piers block. The brush never moves or erases a gate (select it and press Delete).
+- A kit piece armed from the palette also snaps to its grid. Pieces of different sets don't join each other, so a road can run under a gate. Esc leaves the brush.
+
 ### Shortcuts
 
 | Key | Does |
@@ -122,7 +134,7 @@ The engine page renders `<MapEditor assets={manifest.assets} />` in its แผ�
 | Arrow keys | nudge 1 unit (Shift: 10; with the grid on, one grid step) |
 | Ctrl+D | duplicate (+16, +16) |
 | Ctrl+A | select every object on the map |
-| Esc | disarm the palette, else clear the selection |
+| Esc | disarm the palette, else leave the kit brush, else clear the selection |
 
 Shortcuts are ignored while a text field has focus or the editor is hidden.
 

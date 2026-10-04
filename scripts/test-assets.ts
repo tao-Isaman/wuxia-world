@@ -11,7 +11,7 @@ import { join } from "path";
 import { ASSET_CATEGORIES, ASSET_DIRECTIONS, ASSET_REGIONS, type AssetEntry, type AssetManifest } from "@/lib/assets/types";
 
 const MIN_APPROVED = 3000;
-const PREFIX: Record<string, string> = { building: "bld", prop: "prp", sect: "sct", nature: "nat", tile: "til", icon: "ico", character: "chr", monster: "mon", fx: "fx", ui: "ui" };
+const PREFIX: Record<string, string> = { building: "bld", prop: "prp", sect: "sct", nature: "nat", tile: "til", icon: "ico", character: "chr", monster: "mon", fx: "fx", ui: "ui", kit: "kit" };
 const failures: string[] = [];
 const fail = (id: string, message: string) => { if (failures.length < 60) failures.push(`${id}: ${message}`); else failures.length === 60 && failures.push("…"); };
 
@@ -66,6 +66,14 @@ for (const a of manifest.assets) {
     if (f.x < -a.anchorX * sx - eps || f.x + f.w > (a.width - a.anchorX) * sx + eps || f.y < -a.anchorY * sy - eps || f.y + f.h > (a.height - a.anchorY) * sy + eps)
       fail(id, `footprint ${JSON.stringify(f)} lies outside the drawn image`);
   }
+  for (const f of a.solids ?? []) {
+    const sx = a.mapWidth / a.width, sy = a.mapHeight / a.height, eps = 0.6;
+    if (!a.footprint) fail(id, "solids without a footprint");
+    if (f.w <= 0 || f.h <= 0 || f.x < -a.anchorX * sx - eps || f.x + f.w > (a.width - a.anchorX) * sx + eps || f.y < -a.anchorY * sy - eps || f.y + f.h > (a.height - a.anchorY) * sy + eps)
+      fail(id, `solid ${JSON.stringify(f)} lies outside the drawn image`);
+  }
+  if ((a.category === "kit") !== !!a.kit) fail(id, a.kit ? "kit info on a non-kit asset" : "kit piece without its kit info");
+  if (a.kit && (!(a.kit.cell > 0) || !(a.kit.mask >= 0 && a.kit.mask < 16) || !a.kit.set)) fail(id, `bad kit ${JSON.stringify(a.kit)}`);
   if (a.category === "sect" && !a.sect) fail(id, "sect asset without a sect");
   if (a.category === "tile" && !a.tile) fail(id, "tile without its tileset corners");
   checkImage(id, a.image, { width: a.width, height: a.height });

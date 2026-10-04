@@ -23,6 +23,8 @@ import {
 } from "./map-editor/model";
 import { MapStage, movedPoint, type LabelledAnchor } from "./map-editor/map-stage";
 import { AssetPalette } from "./map-editor/asset-palette";
+import { KitBrush } from "./map-editor/kit-brush";
+import { kitCellOf, kitSets, paintKit, placeKitSpecial, type KitSet } from "@/lib/assets/kits";
 import { Inspector, type InspectorIssue } from "./map-editor/inspector";
 import styles from "./map-editor/map-editor.module.css";
 
@@ -61,6 +63,9 @@ export function MapEditor({ assets }: { assets: AssetEntry[] }) {
   });
   const [selectedIds, setSelectedIds] = useState<ReadonlySet<string>>(new Set());
   const [armed, setArmed] = useState<AssetEntry | null>(null);
+  const [kit, setKit] = useState<KitSet | null>(null);
+  const [kitErase, setKitErase] = useState(false);
+  const strokes = useRef(0);
   const [show, setShow] = useState({ collision: false, footprints: true, markers: true });
   const [snapOn, setSnapOn] = useState(false);
   const [gridSize, setGridSize] = useState<number>(16);
@@ -108,6 +113,7 @@ export function MapEditor({ assets }: { assets: AssetEntry[] }) {
   useEffect(() => { engineStorageSet(() => localStorage, LAST_MAP_KEY, mapId); }, [mapId]);
 
   const index = useMemo(() => indexAssets(assets), [assets]);
+  const sets = useMemo(() => kitSets(assets), [assets]);
   const map = getLocationMap(mapId)!;
   const placements = useMemo(() => present.maps[mapId] ?? [], [present, mapId]);
   const existing = useMemo(() => new Set(placements.map((p) => p.id)), [placements]);
@@ -160,10 +166,31 @@ export function MapEditor({ assets }: { assets: AssetEntry[] }) {
     });
   }, []);
   function place(asset: AssetEntry, x: number, y: number, keepArmed = false) {
+    const set = asset.kit?.special ? sets.get(asset.kit.set) : undefined;
+    if (set && asset.kit) {
+      // A gate: it replaces the set's pieces under it and its neighbours join it.
+      const { col, row } = kitCellOf(asset.kit, x, y);
+      const id = nextPlacementId(present);
+      update((file) => setMap(file, mapId, placeKitSpecial(file.maps[mapId] ?? [], index, set, asset, col, row, id).placements));
+      setSelectedIds(new Set([id]));
+      if (!keepArmed) setArmed(null);
+      return;
+    }
     const placement = newPlacement(present, asset, x, y);
     update((file) => setMap(file, mapId, [...(file.maps[mapId] ?? []), placement]));
     setSelectedIds(new Set([placement.id]));
     if (!keepArmed) setArmed(null);
+  }
+  /** A kit brush stroke: one undo step per stroke. */
+  function brushCells(cells: { col: number; row: number }[], erase: boolean, start: boolean) {
+    if (!kit) return;
+    if (start) strokes.current++;
+    update((file) => {
+      const taken = new Set<string>();
+      const nextId = () => { const id = nextPlacementId(file, taken); taken.add(id); return id; };
+      const result = paintKit(file.maps[mapId] ?? [], index, kit, cells, erase, nextId);
+      return result.placements.length === (file.maps[mapId] ?? []).length && !result.changed.length ? file : setMap(file, mapId, result.placements);
+    }, `brush:${strokes.current}`);
   }
   function moveBy(ids: ReadonlySet<string>, dx: number, dy: number) {
     update((file) => editPlacements(file, mapId, ids, (p) => ({ ...p, ...movedPoint(p, dx, dy, grid) })));
@@ -208,7 +235,7 @@ export function MapEditor({ assets }: { assets: AssetEntry[] }) {
     if (mod && key === "d") { event.preventDefault(); duplicate(); return; }
     if (mod && key === "a") { event.preventDefault(); setSelectedIds(new Set(placements.map((p) => p.id))); return; }
     if (key === "delete" || key === "backspace") { if (selected.size) { event.preventDefault(); remove(); } return; }
-    if (key === "escape") { if (armed) setArmed(null); else setSelectedIds(new Set()); return; }
+    if (key === "escape") { if (armed) setArmed(null); else if (kit) setKit(null); else setSelectedIds(new Set()); return; }
     const arrows: Record<string, [number, number]> = { arrowleft: [-1, 0], arrowright: [1, 0], arrowup: [0, -1], arrowdown: [0, 1] };
     if (arrows[key] && selected.size) {
       event.preventDefault();
@@ -293,11 +320,14 @@ export function MapEditor({ assets }: { assets: AssetEntry[] }) {
 
       <MapStage image={map.image} placements={placements} assets={index} selected={selected} anchors={anchors}
         collision={collision} flagged={flagged} show={show} grid={grid} armed={armed}
+        brush={kit && !armed ? { cell: kit.cell, erase: kitErase } : null} onBrush={brushCells}
         onSelect={select} onMove={moveBy} onPlace={place}
         onDropAsset={(id, x, y) => { const asset = index.get(id); if (asset) place(asset, x, y); }} />
 
       <div className={styles.side}>
-        <AssetPalette assets={assets} armed={armed} onArm={setArmed} />
+        <KitBrush sets={sets} active={kit} erase={kitErase} onPick={(set) => { setKit(set); setArmed(null); }} onErase={setKitErase}
+          onArmSpecial={setArmed} />
+        <AssetPalette assets={assets} armed={armed} onArm={(asset) => { setArmed(asset); if (asset) setKit(null); }} />
         <Inspector selection={selection} assets={index} issues={issues} onEdit={editSelection}
           onDuplicate={duplicate} onDelete={remove} onSelectIssue={(id) => setSelectedIds(new Set([id]))} />
       </div>

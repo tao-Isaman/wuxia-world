@@ -7,7 +7,7 @@ import styles from "./map-editor.module.css";
 
 export const CATEGORY_LABELS: Record<AssetCategory, string> = {
   building: "อาคาร", prop: "ของประกอบฉาก", sect: "ของสำนัก", nature: "ธรรมชาติ", tile: "พื้น",
-  icon: "ไอคอน", character: "ตัวละคร", monster: "สัตว์/ปีศาจ", fx: "เอฟเฟกต์", ui: "UI",
+  icon: "ไอคอน", character: "ตัวละคร", monster: "สัตว์/ปีศาจ", fx: "เอฟเฟกต์", ui: "UI", kit: "ถนน/กำแพง",
 };
 export const REGION_LABELS: Record<AssetRegion, string> = {
   heartland: "ภาคกลาง", east: "ตะวันออก", south: "ใต้", north: "เหนือ", west: "ตะวันตก", any: "ทุกภาค",

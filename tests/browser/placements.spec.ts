@@ -173,3 +173,79 @@ test("map editor: place, move, undo / redo, delete, warnings and save", async ({
   const file = JSON.parse(body.json);
   expect(file.maps.city_capital).toEqual([{ id, asset: "prop_test_crate", x: 300, y: 600 }]);
 });
+
+test("map editor kit brush: a dragged wall joins itself, erasing re-joins, a gate snaps in", async ({ page }) => {
+  test.setTimeout(120_000);
+  // A test wall set: one piece per join mask, plus a one-cell gate (lib/assets/kits.ts).
+  const piece = (id: string, mask: number, extra: Record<string, unknown> = {}) => ({
+    id, name: `กำแพงทดสอบ · ${mask}`, category: "kit", subcategory: "wall", region: "any", tags: ["kit"],
+    image: "/assets/test/crate.png", width: 96, height: 96, mapWidth: 32, mapHeight: 32, anchorX: 48, anchorY: 96,
+    footprint: { x: -12, y: -20, w: 24, h: 10 }, layer: "object", flippable: false, status: "approved",
+    source: { tool: "test", prompt: "", size: 32 }, kit: { set: "kit_any_wall_test", kind: "wall", cell: 32, mask, ...extra },
+  });
+  const kits = [...Array.from({ length: 16 }, (_, mask) => piece(`kit_any_wall_test_${mask}`, mask)),
+    piece("kit_any_wall_test_gate", 10, { special: "gate" })];
+  await page.route("**/assets/manifest.json", (route) => route.fulfill({ json: { ...MANIFEST, assets: [...MANIFEST.assets, ...kits] } }));
+  await page.route("**/assets/placements.json", (route) => route.fulfill({ json: EMPTY }));
+  await page.route("**/assets/test/*.png", (route) => route.fulfill({ path: join(FIXTURES, basename(new URL(route.request().url()).pathname)) }));
+  await page.addInitScript(() => { try { localStorage.removeItem("wuxia-engine-placements-draft"); } catch { /* */ } });
+  const response = await page.goto(EDITOR_URL);
+  test.skip(response?.status() === 404, `${EDITOR_URL} is not in this build (set MAP_EDITOR_URL)`);
+  const mapTab = page.getByRole("tab", { name: /แผนที่/ });
+  if (await mapTab.count()) await mapTab.first().click();
+  const editor = page.getByTestId("map-editor");
+  await expect(editor).toHaveAttribute("data-loaded", "true", { timeout: 30_000 });
+  await page.locator('[data-map-id="city_capital"]').click();
+
+  const brush = page.getByTestId("kit-brush");
+  await brush.getByRole("tab", { name: "กำแพงบ้าน" }).click();
+  await brush.locator('[data-kit-set="kit_any_wall_test"]').click();
+  const stage = page.getByTestId("map-editor-stage");
+  await expect(stage).toHaveAttribute("data-brush", "paint");
+  const layer = page.getByTestId("map-editor-layer");
+  const cell = async (col: number, row: number) => {
+    const box = (await layer.boundingBox())!;
+    return { x: box.x + (col + 0.5) * 32 / 960 * box.width, y: box.y + (row + 0.5) * 32 / 640 * box.height };
+  };
+  const drag = async (a: [number, number], b: [number, number], shift = false) => {
+    const from = await cell(...a), to = await cell(...b);
+    if (shift) await page.keyboard.down("Shift");
+    await page.mouse.move(from.x, from.y);
+    await page.mouse.down();
+    await page.mouse.move(to.x, to.y, { steps: 8 });
+    await page.mouse.up();
+    if (shift) await page.keyboard.up("Shift");
+  };
+  // The piece drawn in a cell: 32 × 32 map units, anchored at the cell's bottom centre.
+  const at = (col: number, row: number) => page.locator(`[data-placement-id][style*="left: ${col * 32}px;"][style*="top: ${row * 32}px;"]`);
+
+  // An L: five cells east along row 15, then three south down column 7.
+  await drag([3, 15], [7, 15]);
+  await expect(editor).toHaveAttribute("data-placement-count", "5");
+  await drag([7, 16], [7, 18]);
+  await expect(editor).toHaveAttribute("data-placement-count", "8");
+  await expect(at(3, 15)).toHaveAttribute("data-asset-id", "kit_any_wall_test_2");    // east end
+  await expect(at(5, 15)).toHaveAttribute("data-asset-id", "kit_any_wall_test_10");   // straight E-W
+  await expect(at(7, 15)).toHaveAttribute("data-asset-id", "kit_any_wall_test_12");   // corner S-W
+  await expect(at(7, 18)).toHaveAttribute("data-asset-id", "kit_any_wall_test_1");    // north end
+  // One stroke is one undo step.
+  await stage.focus();
+  await page.keyboard.press("Control+z");
+  await expect(editor).toHaveAttribute("data-placement-count", "5");
+  await expect(at(7, 15)).toHaveAttribute("data-asset-id", "kit_any_wall_test_8");
+  await page.keyboard.press("Control+Shift+z");
+  await expect(editor).toHaveAttribute("data-placement-count", "8");
+  // Shift-drag erases; the corner's neighbours become ends.
+  await drag([7, 15], [7, 15], true);
+  await expect(editor).toHaveAttribute("data-placement-count", "7");
+  await expect(at(6, 15)).toHaveAttribute("data-asset-id", "kit_any_wall_test_8");
+  await expect(at(7, 16)).toHaveAttribute("data-asset-id", "kit_any_wall_test_4");
+  // A gate snaps to the grid and replaces the run under it.
+  await brush.locator('[data-asset-id="kit_any_wall_test_gate"]').click();
+  const gateAt = await cell(5, 15);
+  await page.mouse.click(gateAt.x + 7, gateAt.y - 5);
+  await expect(editor).toHaveAttribute("data-placement-count", "7");
+  await expect(at(5, 15)).toHaveAttribute("data-asset-id", "kit_any_wall_test_gate");
+  await expect(at(4, 15)).toHaveAttribute("data-asset-id", "kit_any_wall_test_10");
+  await page.screenshot({ path: "test-results/screenshots/placements-kit-brush.png" });
+});

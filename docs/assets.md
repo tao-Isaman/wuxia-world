@@ -10,6 +10,7 @@ A library of pixel-art assets made with [PixelLab](https://pixellab.ai) for the 
 - [Art direction](#art-direction)
 - [The pipeline](#the-pipeline)
 - [Adding or regenerating assets](#adding-or-regenerating-assets)
+- [Kits: roads and walls that join](#kits-roads-and-walls-that-join)
 - [Budget used](#budget-used)
 
 ## What is in it
@@ -26,9 +27,10 @@ A library of pixel-art assets made with [PixelLab](https://pixellab.ai) for the 
 | `monster` | 120 | 88 | `create-character-v3` | beasts, spirits, demons, undead and human foe archetypes, 8 directions |
 | `fx` | 60 | 64 | `generate-image-v2` | flame, lightning, ice, sword qi, palm wave, poison, smoke, sparks, healing, blood |
 | `ui` | 38 | 42–64 | `generate-image-v2` | frames, buttons, medallions, scroll banners, seals, gauge orbs |
-| **total** | **3,194** | | | |
+| `kit` | 464 | 30–96 | `create-tiles-pro` | modular roads, city walls, house walls and fences that join on a grid ([Kits](#kits-roads-and-walls-that-join)) |
+| **total** | **3,658** | | | |
 
-By region: heartland 508, east 450, south 440, north 478, west 458, any 860 (icons, fx, ui, monsters, interior furniture, landmarks).
+By region: heartland 607, east 500, south 523, north 544, west 508, any 976 (icons, fx, ui, monsters, interior furniture, landmarks, the region-free kits).
 
 ## Folder layout and ids
 
@@ -39,7 +41,7 @@ public/assets/character/<region>/<id>.png        (the S view)
 public/assets/character/<region>/<id>_<dir>.png  (se, e, ne, n, nw, w, sw)
 ```
 
-Ids are `<prefix>_<region|sect|group>_<name>[_nn]`: `bld_`, `prp_`, `sct_`, `nat_`, `til_`, `ico_`, `chr_`, `mon_`, `fx_`, `ui_` (for example `bld_east_water_house_03`, `sct_wudang_zhenwu_statue`, `chr_south_sect_emei_abbess_jingchan`). A `_nn` suffix numbers the designs one prompt gave; they share `variantOf`. Characters keep the NPC id: `chr_<region>_<npc id>`.
+Ids are `<prefix>_<region|sect|group>_<name>[_nn]`: `bld_`, `prp_`, `sct_`, `nat_`, `til_`, `ico_`, `chr_`, `mon_`, `fx_`, `ui_`, `kit_` (for example `bld_east_water_house_03`, `sct_wudang_zhenwu_statue`, `chr_south_sect_emei_abbess_jingchan`). A `_nn` suffix numbers the designs one prompt gave; they share `variantOf`. Characters keep the NPC id: `chr_<region>_<npc id>`.
 
 Groups: buildings and props by region (`heartland`, `east`, `south`, `north`, `west`, plus `landmark` and `interior`); sect sets by sect id; nature by biome; icons by kind (`weapon`, `armor`, `potion`…); monsters by kind (`beast`, `demon`, `spirit`, `undead`, `construct`, `human`, `boss`); tiles by region (`subcategory` is the tileset).
 
@@ -55,6 +57,8 @@ See `lib/assets/types.ts` for the full contract. How the import fills it:
 - **flippable** is true except for tiles (their corners are directional) and 8-direction characters / monsters.
 - **views** (characters and monsters): `S, SE, E, NE, N, NW, W, SW`, all cropped to one shared box so the anchors line up.
 - **tile** (an additive optional field, tiles only): `{ set, corners: { NW, NE, SW, SE: "lower" | "upper" } }` — Wang corner autotiling: give every map vertex a terrain, and each cell takes the tile of its set whose corners match. The tags repeat it as `wang:<NW><NE><SW><SE>` (`l` / `u`).
+- **solids** (optional): several blocking boxes in the footprint's frame when one box is too coarse — a gate's two piers with the passage open. They block instead of `footprint`, which stays their bounds (`PlacementGeometry.solids`, `blockingRects`).
+- **kit** (category `kit` only): `{ set, kind, cell, mask, span?, special? }` — see [Kits](#kits-roads-and-walls-that-join).
 - **source** records the PixelLab tool, the exact prompt, the seed and the job / character / tileset id, so an asset can be regenerated.
 - **status** is `approved` for everything in the manifest: rejects are not imported.
 
@@ -96,6 +100,29 @@ All raw output and state live **outside the repo**, in a raw directory of your c
 - **A new NPC** gets a character job automatically on the next plan run.
 - **Replace one design:** reject it (`curate.ts reject …`) and import again; the next-best candidate of that job takes its id. For a one-image job (sect, character, monster) run a reroll.
 - Commit `scripts/assets/plan/`, `scripts/assets/curation/rejects.json`, `public/assets/**` and `manifest.json`; never the raw directory or a token.
+
+## Kits: roads and walls that join
+
+Category `kit` holds modular pieces that snap to a grid and join their neighbours, so a road network or a walled compound is painted, not assembled by hand. The logic is `lib/assets/kits.ts`; the pieces are built by `scripts/assets/build-kits.ts`.
+
+**Sets.** One style is one set (`kit.set`, e.g. `kit_heartland_road_cobble`, `kit_east_wall_house_whiteink`):
+
+| Kind | Sets | Cell | Pieces | Made from |
+| --- | --- | --- | --- | --- |
+| roads (`kind: "road"`, layer `ground`) | 12: dirt, cobble, flagstone, brick, bluestone (east), red clay and boardwalk (south), gravel, temple stepping stones, desert sand (west), loess cart road and snow (north) | 48 | 16 each | a PixelLab road set (`create-tiles-pro`, feature `roads`) over plain grass; the grass is keyed out so the road lies on any painting, the 1 px frame is cropped; the stamp-only plaza tile is the lone piece |
+| city walls (`kind: "wall"`, `_wall_city_`) | 6: grey brick (heartland), granite (east), red sandstone (south), rammed earth (north), adobe (west), mountain fieldstone fort (any) | 32 | 16 + a 3-cell arched gate | built here from PixelLab texture tiles: face 56 high, 24 thick, a walkway with crenellated parapets |
+| house walls (`kind: "wall"`, `_wall_house_`) | 8: white plaster with black tiles (east, moon gate), grey brick, red palace wall with yellow tiles, temple wall with green tiles, mossy brick (south), rammed earth (north), adobe (west), fieldstone | 32 | 16 + a gate | face 40 high, 10 thick, a tiled coping with a ridge (or a flat top) |
+| fences (`kind: "fence"`) | 2: planks, bamboo (south) | 32 | 16 + a gate | face 26 high, 6 thick |
+
+**Grid.** A set has one cell size and its grid starts at the map's top-left: cell (col, row) covers `[col·cell, (col+1)·cell) × [row·cell, (row+1)·cell)`. Every piece is one cell wide (`mapWidth = cell`) and anchored at the **bottom centre of its cell** — `((col + ½)·cell, (row + 1)·cell)`; a gate spanning 3 cells (`kit.span`) is anchored at the bottom centre of the span. Walls draw upward from their cell: the top sits `height` above the wall's ground band (the band is centred in the cell), with a face under every edge that looks south, so they depth-sort with characters like any object (a hero north of the wall walks behind it).
+
+**Joins.** `kit.mask` is the sides a piece joins across: N 1, E 2, S 4, W 8 (PixelLab's road bits). Every set has a piece for each of the 16 masks — lone, 4 ends, 2 straights, 4 corners, 4 T-junctions and the crossing. `paintKit` fills or erases cells and re-picks the pieces in and around them from which neighbours hold the same set (`maskAt`, `pieceFor`); special pieces (`kit.special`: the gates) are placed by hand, never picked or erased by the brush, and join the sides in their mask; `placeKitSpecial` drops the auto pieces under a gate and re-joins its neighbours. Walls block with their exact band: a corner's L (`solids`), a gate's two piers with its passage open.
+
+**Look.** All wall pieces of a set are drawn from the same two textures sampled in world space (texture period = cell), so runs join without seams and all 16 masks agree. Gates: a round arch in a city wall (the top runs across), a door or a moon gate in a house wall, a gap in a fence.
+
+**Rebuild.** `bun scripts/assets/build-kits.ts plan` writes `scripts/assets/kits/plan.json` (one texture set + the 12 road sets); run it through `generate.py` (method `tilespro`, ~20 generations for the textures, ~40 per road set), then `bun scripts/assets/build-kits.ts build --raw <raw>`: it rebuilds `public/assets/kit/` and replaces the manifest's `kit` entries only (`import.ts` never touches them). The kit plan is kept out of `scripts/assets/plan/` so `import.ts` doesn't import it.
+
+**In the editor.** The map editor's ชิ้นต่อกัน panel is the brush: [engine.md](engine.md#ชิ้นต่อกัน-kit-brush).
 
 ## Budget used
 

@@ -12,6 +12,8 @@ build-asset-plan.ts) and runs them in parallel against the PixelLab v2 API:
   pixen    POST /create-image-pixen (one image, sync)
   char3    POST /create-character-v3 (8 rotations), rotations downloaded
   tileset  POST /create-tileset (16 Wang tiles), polled
+  tilespro POST /create-tiles-pro (a road set's 18 joining tiles, or numbered texture tiles), polled;
+           the job's `params` go into the body as they are, the tile rules land in tiles.json
 
 Raw output goes OUTSIDE the repo, to <raw dir>/out/<category>/<job id>/ (images
 + job.json). A job with a job.json is done, so a rerun resumes. The budget is
@@ -87,6 +89,8 @@ def estimate(job):
         return 1 + math.ceil(s * s * 8 / 65536)
     if m == "tileset":
         return job.get("estimate", 4)
+    if m == "tilespro":
+        return job.get("estimate", 40)
     raise ValueError(m)
 
 
@@ -262,6 +266,18 @@ class Runner:
                     info.append({k: v for k, v in tile.items() if k != "image"})
                 json.dump(info, open(os.path.join(out, "tiles.json"), "w"), indent=1)
                 meta["images"] = len(tiles)
+            elif m == "tilespro":
+                body = {"description": job["prompt"], "seed": seed, **job.get("params", {})}
+                r = self.submit("/create-tiles-pro", body)
+                meta["jobId"] = r.get("background_job_id")
+                meta["tileId"] = r.get("tile_id")
+                self.poll(meta["jobId"], minutes=20)
+                t = http("GET", f"/tiles-pro/{meta['tileId']}")
+                urls = t.get("storage_urls") or {}
+                for name, url in urls.items():
+                    open(os.path.join(out, "%02d.png" % int(name.split("_")[-1])), "wb").write(download(url))
+                json.dump({k: t.get(k) for k in ("kind", "tile_rules", "usage")}, open(os.path.join(out, "tiles.json"), "w"), indent=1)
+                meta["images"] = len(urls)
             meta["secs"] = round(time.time() - t0)
             meta["finished"] = time.strftime("%Y-%m-%dT%H:%M:%S")
             json.dump(meta, open(os.path.join(out, "job.json"), "w"), ensure_ascii=False, indent=1)

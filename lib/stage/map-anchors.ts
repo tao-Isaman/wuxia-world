@@ -97,18 +97,18 @@ const insideRect = (point: Point, rect: MapRect) => worldPointBlocked(point, [{ 
  */
 export function placementIssues(key: string, map: LocationMapDef, geometry: readonly PlacementGeometry[],
   options: { reachability?: boolean } = {}): PlacementIssue[] {
-  const solids = geometry.filter((g) => g.blocks && g.footprint);
+  const solids = geometry.filter((g) => g.blocks && g.solids.length);
   if (!solids.length) return [];
   const issues: PlacementIssue[] = [];
   const anchors = mapAnchors(map, key);
   for (const anchor of anchors) {
     const points = anchor.kind === "spawn" || anchor.kind === "arrival" ? [anchor] : [anchor, markerApproach(anchor, anchor.kind)];
-    const cover = solids.find((g) => points.some((point) => insideRect(point, g.footprint!)));
+    const cover = solids.find((g) => g.solids.some((rect) => points.some((point) => insideRect(point, rect))));
     if (cover) issues.push({ anchor, placementId: cover.id, reason: "covered" });
   }
   if (options.reachability === false) return issues;
   const base = worldFootprints(key, map.image);
-  const placed = withPlacedSolids(base, solids.map((g) => g.footprint!));
+  const placed = withPlacedSolids(base, solids.flatMap((g) => g.solids));
   const covered = new Set(issues.map((issue) => issue.anchor.id));
   const probeMarkers: ProbeMarker[] = anchors.filter((a) => a.kind !== "spawn" && a.kind !== "arrival")
     .map((a) => ({ id: a.id, kind: a.kind as ProbeMarker["kind"], x: a.x, y: a.y }));

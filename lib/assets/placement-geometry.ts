@@ -12,14 +12,15 @@
  *   pinned to (x, y); `flip` mirrors it about the anchor.
  * - `AssetEntry.footprint` is a box `{ x, y, w, h }` in map units relative to
  *   the anchor: its top-left corner is (x + footprint.x, y + footprint.y).
- *   It scales with `scale` and mirrors with `flip`.
+ *   It scales with `scale` and mirrors with `flip`. An asset with `solids`
+ *   (several boxes in the same frame) blocks with those instead.
  * - Depth follows the world runtime: map −1, shadows 1–3, characters by foot
  *   y (`100 + y·10`, the hero `101 + y·10`), signs 8000, night veil 8900.
  *   "ground" sits on the painting under everything (−0.9…−0.1), "object"
  *   sorts with characters by its base y, "overhead" is over every character
  *   (7000…7064) but under signs, labels and the night veil.
  */
-import type { AssetDirection, AssetEntry, Placement } from "./types";
+import type { AssetDirection, AssetEntry, Footprint, Placement } from "./types";
 
 export const MAP_WIDTH = 960;
 export const MAP_HEIGHT = 640;
@@ -63,6 +64,8 @@ export interface PlacementGeometry {
   depth: number;
   /** The footprint in map units, or null when the asset has none. */
   footprint: MapRect | null;
+  /** The boxes that block: the asset's `solids` when it has them, else the footprint (empty when it has none). */
+  solids: MapRect[];
   /** Whether the footprint blocks walking (`collide ?? footprint !== null`). */
   blocks: boolean;
 }
@@ -83,19 +86,19 @@ export function placementGeometry(placement: Placement, asset: AssetEntry): Plac
   const left = placement.x - (flip ? 1 - originX : originX) * width;
   const top = placement.y - originY * height;
   const layer = placement.layer ?? asset.layer ?? "object";
-  let footprint: MapRect | null = null;
-  if (asset.footprint) {
-    const f = asset.footprint;
+  const box = (f: Footprint): MapRect => {
     const fx = flip ? -(f.x + f.w) : f.x;
-    footprint = {
+    return {
       left: placement.x + fx * scale, top: placement.y + f.y * scale,
       right: placement.x + (fx + f.w) * scale, bottom: placement.y + (f.y + f.h) * scale,
     };
-  }
+  };
+  const footprint = asset.footprint ? box(asset.footprint) : null;
+  const solids = footprint ? asset.solids?.length ? asset.solids.map(box) : [footprint] : [];
   return {
     id: placement.id, asset: asset.id, image: placementImage(asset, placement.dir), x: placement.x, y: placement.y,
     width, height, originX, originY, flip, box: { left, top, right: left + width, bottom: top + height },
-    layer, depth: placementDepth(layer, placement.y), footprint,
+    layer, depth: placementDepth(layer, placement.y), footprint, solids,
     blocks: !!footprint && (placement.collide ?? true),
   };
 }
@@ -112,7 +115,7 @@ export function placementsGeometry(placements: readonly Placement[], assets: Rea
 
 /** The blocking footprints of placed objects, as boxes in map units. */
 export function blockingRects(geometry: readonly PlacementGeometry[]): MapRect[] {
-  return geometry.flatMap((g) => g.blocks && g.footprint ? [g.footprint] : []);
+  return geometry.flatMap((g) => g.blocks ? g.solids : []);
 }
 
 /** Draw order for a renderer without depth (the editor's DOM): back to front. */

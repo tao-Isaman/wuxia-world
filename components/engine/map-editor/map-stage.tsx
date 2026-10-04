@@ -15,6 +15,7 @@ import {
 import type { WorldFootprint } from "@/lib/stage/world-navigation";
 import type { MapAnchor } from "@/lib/stage/map-anchors";
 import { clampToMap, snap } from "./model";
+import { cellAt, cellLine, snapToKit } from "@/lib/assets/kits";
 import styles from "./map-editor.module.css";
 
 export interface LabelledAnchor extends MapAnchor { label: string; issue?: string }
@@ -30,6 +31,10 @@ export interface StageProps {
   show: { collision: boolean; footprints: boolean; markers: boolean };
   grid: number | null;
   armed: AssetEntry | null;
+  /** The kit brush: paint (or erase) grid cells of `cell` map units. */
+  brush: { cell: number; erase: boolean } | null;
+  /** A brush stroke reached new cells; `start` is the first call of a stroke. */
+  onBrush: (cells: { col: number; row: number }[], erase: boolean, start: boolean) => void;
   onSelect: (ids: string[], mode: "replace" | "add" | "toggle") => void;
   onMove: (ids: ReadonlySet<string>, dx: number, dy: number) => void;
   onPlace: (asset: AssetEntry, x: number, y: number, keepArmed: boolean) => void;
@@ -39,7 +44,8 @@ export interface StageProps {
 type Drag =
   | { kind: "move"; start: { x: number; y: number }; ids: ReadonlySet<string>; moved: boolean }
   | { kind: "box"; start: { x: number; y: number }; additive: boolean }
-  | { kind: "pan"; start: { x: number; y: number }; pan: { x: number; y: number } };
+  | { kind: "pan"; start: { x: number; y: number }; pan: { x: number; y: number } }
+  | { kind: "brush"; last: { col: number; row: number }; erase: boolean };
 
 const MISSING_SIZE = 32;
 
@@ -49,7 +55,7 @@ export function movedPoint(p: { x: number; y: number }, dx: number, dy: number, 
 }
 
 export function MapStage(props: StageProps) {
-  const { image, placements, assets, selected, anchors, collision, flagged, show, grid, armed } = props;
+  const { image, placements, assets, selected, anchors, collision, flagged, show, grid, armed, brush } = props;
   const frame = useRef<HTMLDivElement>(null);
   const layer = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 960, height: 640 });
@@ -101,7 +107,7 @@ export function MapStage(props: StageProps) {
       const half = MISSING_SIZE / 2;
       items.push({ id: at.id, asset: at.asset, image: "", x: at.x, y: at.y, width: MISSING_SIZE, height: MISSING_SIZE,
         originX: 0.5, originY: 1, flip: false, box: { left: at.x - half, top: at.y - MISSING_SIZE, right: at.x + half, bottom: at.y },
-        layer: "object", depth: characterDepth(at.y), footprint: null, blocks: false, missing: true });
+        layer: "object", depth: characterDepth(at.y), footprint: null, solids: [], blocks: false, missing: true });
     }
     return items;
   }, [placements, assets, selected, delta, grid]);
@@ -137,8 +143,15 @@ export function MapStage(props: StageProps) {
     } else if (event.button !== 0) {
       return;
     } else if (armed) {
-      props.onPlace(armed, snap(point.x, grid), snap(point.y, grid), event.shiftKey);
+      // Kit pieces stand on their set's grid.
+      const at = armed.kit ? snapToKit(armed.kit, point.x, point.y) : { x: snap(point.x, grid), y: snap(point.y, grid) };
+      props.onPlace(armed, at.x, at.y, event.shiftKey);
       return;
+    } else if (brush) {
+      const cell = cellAt(brush.cell, point.x, point.y);
+      const erase = brush.erase || event.shiftKey;
+      drag.current = { kind: "brush", last: cell, erase };
+      props.onBrush([cell], erase, true);
     } else if (target) {
       const id = target.dataset.placementId!;
       const additive = event.shiftKey || event.ctrlKey || event.metaKey;
@@ -164,7 +177,12 @@ export function MapStage(props: StageProps) {
     setHover(point);
     const current = drag.current;
     if (!current) return;
-    if (current.kind === "pan") {
+    if (current.kind === "brush") {
+      const cell = cellAt(brush?.cell ?? 32, point.x, point.y);
+      if (cell.col === current.last.col && cell.row === current.last.row) return;
+      props.onBrush(cellLine(current.last, cell).slice(1), current.erase, false);
+      current.last = cell;
+    } else if (current.kind === "pan") {
       setPan({ x: current.pan.x + event.clientX - current.start.x, y: current.pan.y + event.clientY - current.start.y });
     } else if (current.kind === "move") {
       const dx = point.x - current.start.x, dy = point.y - current.start.y;
@@ -230,8 +248,8 @@ export function MapStage(props: StageProps) {
   const strokes = 1 / scale;
   return (
     <div className={styles.stageWrap}>
-      <div ref={frame} className={`${styles.stage} ${armed ? styles.armed : ""}`} tabIndex={0} data-testid="map-editor-stage"
-        data-zoom={zoom.toFixed(2)} onPointerDown={pointerDown} onPointerMove={pointerMove} onPointerUp={pointerUp}
+      <div ref={frame} className={`${styles.stage} ${armed || brush ? styles.armed : ""}`} tabIndex={0} data-testid="map-editor-stage"
+        data-zoom={zoom.toFixed(2)} data-brush={brush ? (brush.erase ? "erase" : "paint") : undefined} onPointerDown={pointerDown} onPointerMove={pointerMove} onPointerUp={pointerUp}
         onPointerCancel={pointerUp} onPointerLeave={() => setHover(null)}
         onDragOver={(event) => { if (event.dataTransfer.types.includes("application/x-asset-id")) event.preventDefault(); }} onDrop={drop}>
         <div ref={layer} className={styles.layer} data-testid="map-editor-layer"
@@ -240,7 +258,16 @@ export function MapStage(props: StageProps) {
           <img className={styles.painting} src={image} alt="" draggable={false} />
           {ordered.map((item) => item.node)}
           <svg className={styles.overlay} viewBox={`0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`} width={MAP_WIDTH} height={MAP_HEIGHT}>
-            {grid && <>
+            {brush && <>
+              <defs><pattern id="map-editor-kit-grid" width={brush.cell} height={brush.cell} patternUnits="userSpaceOnUse">
+                <path d={`M ${brush.cell} 0 L 0 0 0 ${brush.cell}`} fill="none" stroke="rgba(226,189,106,0.35)" strokeWidth={strokes} />
+              </pattern></defs>
+              <rect width={MAP_WIDTH} height={MAP_HEIGHT} fill="url(#map-editor-kit-grid)" />
+              {hover && (() => { const c = cellAt(brush.cell, hover.x, hover.y); return (
+                <rect x={c.col * brush.cell} y={c.row * brush.cell} width={brush.cell} height={brush.cell}
+                  className={brush.erase ? styles.brushCellErase : styles.brushCell} strokeWidth={1.5 * strokes} data-testid="kit-brush-cell" />); })()}
+            </>}
+            {grid && !brush && <>
               <defs><pattern id="map-editor-grid" width={grid} height={grid} patternUnits="userSpaceOnUse">
                 <path d={`M ${grid} 0 L 0 0 0 ${grid}`} fill="none" stroke="rgba(255,255,255,0.18)" strokeWidth={strokes} />
               </pattern></defs>
@@ -250,11 +277,11 @@ export function MapStage(props: StageProps) {
               ? <rect key={index} x={shape.left} y={shape.top} width={shape.right - shape.left} height={shape.bottom - shape.top}
                 className={styles.baseSolid} strokeWidth={strokes} />
               : <ellipse key={index} cx={shape.x} cy={shape.y} rx={shape.radiusX} ry={shape.radiusY} className={styles.baseSolid} strokeWidth={strokes} />)}
-            {show.footprints && drawn.map((g) => g.footprint && (
-              <rect key={g.id} data-footprint={g.id} x={g.footprint.left} y={g.footprint.top} width={g.footprint.right - g.footprint.left}
-                height={g.footprint.bottom - g.footprint.top} className={g.blocks ? styles.footprint : styles.footprintOpen}
+            {show.footprints && drawn.map((g) => g.solids.map((rect, i) => (
+              <rect key={`${g.id}:${i}`} data-footprint={g.id} x={rect.left} y={rect.top} width={rect.right - rect.left}
+                height={rect.bottom - rect.top} className={g.blocks ? styles.footprint : styles.footprintOpen}
                 strokeWidth={1.5 * strokes} />
-            ))}
+            )))}
             {drawn.filter((g) => selected.has(g.id)).map((g) => (
               <g key={g.id}>
                 <rect x={g.box.left} y={g.box.top} width={g.width} height={g.height} className={styles.selectBox} strokeWidth={1.5 * strokes} />
@@ -272,6 +299,7 @@ export function MapStage(props: StageProps) {
         <span>{Math.round(zoom * 100)}%</span>
         <span className={styles.coords}>{hover ? `x ${Math.round(hover.x)} · y ${Math.round(hover.y)}` : "—"}</span>
         <span className={styles.hint}>{armed ? `คลิกเพื่อวาง “${armed.name}” · Shift วางต่อ · Esc ยกเลิก`
+          : brush ? (brush.erase ? "แปรงลบ: คลิก/ลากบนช่องเพื่อเอาชิ้นออก · Esc เลิกใช้แปรง" : "แปรงต่อกัน: คลิก/ลากเพื่อวาง ชิ้นจะต่อกันเอง · Shift+ลาก ลบ · Esc เลิกใช้แปรง")
           : "ลากเพื่อเลือกหลายชิ้น · Space/Alt+ลาก หรือปุ่มกลางเพื่อเลื่อน · ล้อเมาส์ซูม"}</span>
       </div>
     </div>
