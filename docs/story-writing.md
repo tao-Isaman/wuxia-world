@@ -31,8 +31,8 @@ The sagas retell **มังกรหยก ภาค 3** (ดาบมังก
 
 **Framing — keep it this way:**
 
-- The saga texts were written with the legend **more than a century ago** ("ร้อยกว่าปีก่อน"); the game's timeline is now **about 20 years after** it ([Timeline](#timeline-and-novel-characters)) — new writing follows the timeline. Today's masters (our NPCs) are the legend's heirs and survivors.
-- Novel characters appear **only in flashback cutscenes** (`mood: "past"`) and in what elders tell. The hero never meets them.
+- The legend is **recent history**: the game is set about 20 years after it ([Timeline](#timeline-and-novel-characters)). Today's masters (our NPCs) were young disciples or witnesses then, or are its people's children and disciples.
+- Novel characters appear **only in flashback cutscenes** (`mood: "past"`) and in what elders tell. The hero never meets them: those still alive have withdrawn (below).
 - Each saga follows the hero in the **present day**, retracing one legend: an elder tells part of it, the hero goes somewhere, something from that legend echoes now (a descendant, a lost object, an old grudge, a misunderstanding), and the T4 skill or art is the lesson of that legend.
 - Use the game's sect names (เส้าหลิน, อู่ตัง, ง้อไบ๊, พรรคยาจก…). The old names (บู๊ตึ๊ง, เม้งก่า, ยอดกวงเม้ง) are fine inside the legend.
 - Paraphrase; write your own scenes and dialogue. Never copy passages from the novel or its translations. One famous line said in your own words is fine.
@@ -46,7 +46,19 @@ The sagas retell **มังกรหยก ภาค 3** (ดาบมังก
 - Every NPC has an invented name. Before naming one, check it is not a novel character's.
 - 2026-10 rename: 41 NPCs and family names from other novels became invented names — e.g. จั่วเหลิงฉาน → เกาซงเหยียน, เหรินหวัวสิง → ตู้เทียนหาน, ฮ่วงเอี้ยะซือ → หวงชิงเฉวียน, อิดเต็ง → อู๋เฉินไต้ซือ, ฮูเฝย์ → ไป๋เฝยหยาง, หลินผิงจือ → เฉาเหวินจือ. Their ids (`sect_songshan_master_zuolengchan`, `home_hufei`…) are unchanged so saves keep working.
 
-**Known gap:** the saga texts still frame the legend as "ร้อยกว่าปีก่อน" (about 300 lines across `lib/world/data/story/`) and keep its people in flashbacks. Under the 20-year timeline they need rewording (see [HANDOFF.md](../HANDOFF.md#known-issues)).
+**How long ago, now:**
+
+| Event | Distance |
+| --- | --- |
+| ก๊วยเซียง, หลวงจีนกักอ้วน, the founding of ง้อไบ๊, the Condor-era heroes, Xiangyang | ร้อยกว่าปีก่อน |
+| เตียซำฮง founding อู่ตัง's arts | about 80–100 years |
+| เตียชุ่ยซัว and ฮึงซ่อซ่อ, เกาะไฟน้ำแข็ง, the master's 100th birthday | สี่สิบกว่าปีก่อน |
+| young เตียบ่อกี้'s cold poison, หุบผีเสื้อ | สามสิบกว่าปีก่อน |
+| the siege of ยอดกวงเม้ง, วัดหมื่นสุข, the Shaolin hero gathering, the war against the Yuan | ยี่สิบกว่าปีก่อน |
+
+**Who is alive:** เตียซำฮง (about 140, in seclusion behind อู่ตัง; no one sees him — a master may relay a word); เตียบ่อกี้ and เตียบ้อ (left the jianghu, whereabouts unknown); จิวจี้เยียก (withdrawn; not the current ง้อไบ๊ head); เจียซุ่น (a monk at เส้าหลิน, very old); เอี้ยเซียว, ฮวมเอี๊ยว, อุ่ยอิดเซี้ยว (old men). Dead: ซือไท้เมียะเจ็ก, ฮึงเทียนเจ็ง, โอ้วแชงู and อ๋องหลันกู, เตียชุ่ยซัว and ฮึงซ่อซ่อ, ค่งเกี่ยน, ตั้งอิ้วเลี้ยง; เซ่งคุน was crippled and vanished. Family links to the legend are a child or grandchild at most.
+
+The 38 sagas and the place / lore texts were reworded to this timeline on 2026-10-04.
 
 ## Voice
 

@@ -49,7 +49,7 @@ Deploys are implied to be on Vercel (`VERCEL_GIT_COMMIT_SHA` sets the service-wo
 
 ## Verified state
 
-Checked on 2026-10-04 for the road fixes (the way back after a fight, the guide arrow turning back), item icons (every item, scroll and equipment piece shows a library icon), the PixelLab asset library (3,194 assets + 464 kit pieces: roads, city walls, house walls, fences that join on a grid), the engine at `/game/engine` (asset library, map editor, skill / art text overrides) and objects placed on maps:
+Checked on 2026-10-04 for the story timeline (NPC renames, sagas reworded to 20 years after มังกรหยก ภาค 3), the road fixes (the way back after a fight, the guide arrow turning back), item icons (every item, scroll and equipment piece shows a library icon), the PixelLab asset library (3,194 assets + 464 kit pieces: roads, city walls, house walls, fences that join on a grid), the engine at `/game/engine` (asset library, map editor, skill / art text overrides) and objects placed on maps:
 
 | Check | Result |
 | --- | --- |
@@ -91,7 +91,6 @@ Not verified:
 
 ## Known issues
 
-- **Saga framing predates the timeline.** The game is set about 20 years after มังกรหยก ภาค 3, but the 38 sagas still say the legend happened "ร้อยกว่าปีก่อน" (~300 lines in `lib/world/data/story/`) and treat its people as long gone. NPC names already fit the timeline ([story-writing.md](docs/story-writing.md#timeline-and-novel-characters)).
 
 Real behaviour today, found during the docs audit. Each is small and self-contained unless noted.
 
