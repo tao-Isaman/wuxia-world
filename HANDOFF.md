@@ -80,7 +80,7 @@ Checked on 2026-10-04 for the engine at `/game/engine` (asset library, map edito
 | `test:docs` | the generated reference is current; every link, repo path and command in the docs resolves |
 | `bun scripts/audit-content.ts` | 225 NPCs · 867 quests · 3038 scenes, all references resolve |
 | `bun run build` | passes; `/` first-load JS 1.12 MB (was 508 kB before the sagas; the saga text is about 2.9 MB of source, ~500 kB gzipped) |
-| `bun run test:e2e` | E2E_PENDING |
+| `bun run test:e2e` | all 44 Playwright tests pass against the production build (11.5 minutes, Chromium 141 via the container shim), including the map editor on `/game/engine` |
 
 Not verified:
 

@@ -109,7 +109,7 @@ Read-only scripts, not wired into `package.json`:
 
 Many specs replace `Math.random` in the page to make rolls predictable.
 
-41 tests in 20 spec files:
+44 tests in 21 spec files:
 
 | Spec | Tests | Covers |
 | --- | --- | --- |
@@ -117,6 +117,7 @@ Many specs replace `Math.random` in the page to make rolls predictable.
 | `battle-setting.spec.ts` | 1 | a capital encounter keeps its street background through a reload and phone rotation |
 | `characters.spec.ts` | 2 | both heroes (m1, f1) walk on their painted eight-way frames (E, N, S, W), face where they go and stand in that heading; reduced motion; WebGL context loss and "ลองใหม่" recovery |
 | `engine.spec.ts` | 3 | `/game/engine` on a fixture manifest (`tests/fixtures/engine/`): asset filters, the detail panel with anchor, footprint drag and views, the draft across a reload and discard, bulk reject, saving downloads `manifest.json` on a production server (read-only chip); the map tab; the skill editor's filters, live card preview, duplicate / empty name errors and the downloaded `text-overrides.json`; no portrait turn; no link from `/` |
+| `placements.spec.ts` | 3 | placed objects from a fixture library (`tests/fixtures/placements/`) are drawn on the map (`data-placements`) and block walking and tap-to-walk paths; `engineGoto` and the unsaved-preview play-test; the map editor on `/game/engine` places, drags, nudges, undoes / redoes, warns, deletes and saves |
 | `dialogue.spec.ts` | 2 | local replies keep the same world canvas; quest offers away from a map fit on screen without scrolling at three sizes |
 | `game.spec.ts` | 6 | exploration, menu pause, travel, NPC card, reload; grid battle by tap and auto; unit info by touch; phone rotation; a version-18 save migrates to 23; rigged NPCs wander in the capital and wait for the hero |
 | `investigation.spec.ts` | 1 | capital rumors and the ledger investigation survive a mid-dialog reload and pay once |
