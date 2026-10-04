@@ -13,7 +13,8 @@ import { WANDER_FREEZE_DISTANCE, createWanderer, stepWanderer, type Wanderer } f
 import { worldForeground } from "./world-occlusion";
 import { createWorldLighting } from "./world-lighting";
 import { drawWorldBadge, warmWorldCharacter } from "./world-style";
-import { moveOnWorldGround, planWorldPath, worldFootprints, worldPointBlocked } from "./world-navigation";
+import { moveOnWorldGround, planWorldPath, withPlacedSolids, worldFootprints, worldPointBlocked } from "./world-navigation";
+import { blockingRects, characterDepth, heroDepth, type PlacementGeometry } from "../assets/placement-geometry";
 import { initialWorldPlacement } from "./world-placement";
 import { addGridFrames, canvasTexture, createStage, drawCanvas, stagePixelRatio, type Stage } from "./phaser-stage";
 import {
@@ -87,7 +88,9 @@ export function createWorldRuntime(
   onWalkTick?: (pickSpot: () => Point | null) => void,
 ): WorldRuntime {
   const initial = read();
-  const footprints = worldFootprints(initial.key, initial.image);
+  // Objects placed by the engine's map editor block like the painting's own solids.
+  const placed = initial.placements ?? [];
+  const footprints = withPlacedSolids(worldFootprints(initial.key, initial.image), blockingRects(placed));
   const placement = initialWorldPlacement(initial, getRememberedMapPosition(initial.key), footprints);
   const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
   let reducedMotion = motionQuery.matches;
@@ -95,6 +98,8 @@ export function createWorldRuntime(
   const lighting = createWorldLighting(initial.key);
   const markers = new Map<string, MarkerVisual>();
   const props = new Map<string, Phaser.GameObjects.Image>();
+  /** Placed objects drawn (object / overhead ones fade while the hero is behind or under them). */
+  const placedVisuals: { geometry: PlacementGeometry; image: Phaser.GameObjects.Image; alpha: number }[] = [];
   const bystanders = new Map<string, { shadow: Phaser.GameObjects.Image; character: CharacterVisual }>();
   /** Rigged NPCs stroll around their spot; keyed by marker id. */
   const wanderers = new Map<string, Wanderer>();
@@ -481,13 +486,19 @@ export function createWorldRuntime(
     // Sheets that walk in four directions: the hero's, rigged NPCs', and wandering NPCs' bodies.
     const walkers = new Set<string>(initial.markers.filter((marker) => marker.kind === "npc" && marker.wander).map((marker) => npcCharacterId(marker.id)));
     initial.bystanders?.forEach((actor) => ids.add(characterId(actor.characterId)));
-    const [landscape, atlasEntries, propImages] = await Promise.all([
+    const placedUrls = [...new Set(placed.map((item) => item.image))];
+    const [landscape, atlasEntries, propImages, placedImages] = await Promise.all([
       loadImage(initial.image),
       // Only the controlled hero walks north/south. Stationary NPCs sharing a
       // hero costume need its base poses, not the large direction supplement.
       // Rigged NPCs walk in every direction, so they load it too.
       Promise.all([...ids].map(async (id) => [id, await loadAtlas(id, id === playerId || hasAnimatedSheet(id) || walkers.has(id))] as const)),
       Promise.all((initial.props ?? []).map(async (prop) => [prop.id, await loadImage(prop.image)] as const)),
+      // A placed object whose image fails is skipped (its footprint still blocks).
+      Promise.all(placedUrls.map(async (url) => [url, await loadImage(url).catch((error: unknown) => {
+        console.warn("[world] placed object image failed:", url, error);
+        return null;
+      })] as const)),
     ]);
     if (disposed || failed || !scene) return;
     const atlases = new Map(atlasEntries);
@@ -536,6 +547,8 @@ export function createWorldRuntime(
       });
       image(texture(cutout, "occluder"), 100 + foreground.depth * 10).setOrigin(0, 0).setPosition(left, top);
     }
+
+    drawPlacements(new Map(placedImages));
 
     const shadowKey = shadowTexture = texture(drawCanvas(64, 24, (context) => {
       context.fillStyle = "rgba(29, 28, 15, 0.38)";
@@ -623,6 +636,41 @@ export function createWorldRuntime(
     onReady();
   }
 
+  /** Draw the placed objects: anchor at (x, y), sized, mirrored, by layer depth (lib/assets/placement-geometry.ts). */
+  function drawPlacements(images: Map<string, HTMLImageElement | null>) {
+    for (const geometry of placed) {
+      const source = images.get(geometry.image);
+      if (!source) continue;
+      const key = `placement:${geometry.image}`;
+      if (!scene!.textures.exists(key)) scene!.textures.addImage(key, source);
+      // Phaser mirrors a flipped frame in place, so the origin mirrors too: the anchor stays on (x, y).
+      const visual = scene!.add.image(geometry.x, geometry.y, key)
+        .setOrigin(geometry.flip ? 1 - geometry.originX : geometry.originX, geometry.originY)
+        .setDisplaySize(geometry.width, geometry.height).setFlipX(geometry.flip).setDepth(geometry.depth);
+      placedVisuals.push({ geometry, image: visual, alpha: 1 });
+    }
+    parent.dataset.placements = String(placedVisuals.length);
+    parent.dataset.placementIds = placedVisuals.map((visual) => visual.geometry.id).join(" ");
+  }
+  /**
+   * An overhead object over the hero, or a standing object the hero walks
+   * behind (their body inside its picture, their feet above its base),
+   * fades so the hero stays visible.
+   */
+  function updatePlacementFade(dt: number) {
+    for (const visual of placedVisuals) {
+      const { box, layer, y } = visual.geometry;
+      if (layer === "ground") continue;
+      const body = { x: position.x, y: position.y - 26 };
+      const covers = body.x > box.left + 4 && body.x < box.right - 4 && body.y > box.top + 4 && body.y < box.bottom &&
+        (layer === "overhead" || position.y < y);
+      const target = covers ? 0.45 : 1;
+      if (visual.alpha === target) continue;
+      const step = reducedMotion || !dt ? 1 : Math.min(1, dt * 6);
+      visual.alpha = Math.abs(target - visual.alpha) < 0.02 ? target : visual.alpha + (target - visual.alpha) * step;
+      visual.image.setAlpha(visual.alpha);
+    }
+  }
   function reportPosition() {
     const screen = toScreen(position);
     parent.dataset.playerScreenX = String(screen.x);
@@ -862,7 +910,7 @@ export function createWorldRuntime(
     actor.shadow.setPosition(position.x, position.y);
     actor.ring.setPosition(position.x, position.y);
     actor.sign.setPosition(position.x, position.y - 57);
-    player.image.setPosition(position.x, position.y).setDepth(101 + position.y * 10);
+    player.image.setPosition(position.x, position.y).setDepth(heroDepth(position.y));
     const nextMotion = moving ? "walk" : "idle";
     if (playerMotion !== nextMotion) { playerMotion = nextMotion; motionTime = 0; }
     let frame: number;
@@ -981,7 +1029,7 @@ export function createWorldRuntime(
           const idleFrame = reducedMotion ? idle.frames[0] : idle.frames[Math.floor((animationTime + visual.phase) * idle.fps) % idle.frames.length];
           setCharacterFrame(visual.character, idleFrame, distance < 90 ? position.x < point.x : visual.character.facingLeft);
         }
-        visual.character.image.setPosition(point.x, point.y).setDepth(100 + point.y * 10);
+        visual.character.image.setPosition(point.x, point.y).setDepth(characterDepth(point.y));
       }
       const opacity = marker.disabled ? 0.5 : 1;
       if (visual.opacity !== opacity) {
@@ -1142,6 +1190,7 @@ export function createWorldRuntime(
         }
       }
       updatePresentation(ambientActive ? dt : 0, moving);
+      updatePlacementFade(dt);
       updateFoes(paused);
       if (disposed || failed) return;
       if (veil) {
@@ -1197,6 +1246,8 @@ export function createWorldRuntime(
       delete parent.dataset.wanderingNpcs;
       delete parent.dataset.visibleProps;
       delete parent.dataset.nearbyMarker;
+      delete parent.dataset.placements;
+      delete parent.dataset.placementIds;
     },
   };
 }
