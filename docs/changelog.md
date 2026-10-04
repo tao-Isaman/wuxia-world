@@ -6,6 +6,12 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-04
 
+### The capital rebuilt in the engine: diagonal kits, map grounds, a packed walled city
+
+- **นครหลวง no longer uses its painting.** It is built from the asset library in the engine's format: a packed-earth ground, slab streets and plazas, a walled city with five gates and about 40 buildings lining the streets, market stalls and outskirts (`public/assets/placements.json`). Every NPC and service now stands in front of the building it belongs to (the physician and the alchemist at the apothecary, the forge at the smithy, rest and chess at the tea house…); the spawn is the crossing south of the market, so the horse station, the tournament and quest spots gather there. The clinic and archive quest props follow their NPCs.
+- **Map grounds.** `placements.json` gains `grounds`: a map's painting replaced by a repeated ground tile, with no painted collision or foreground; the map editor's **พื้น** select sets it ([engine.md](engine.md#พื้น-ground)).
+- **Diagonal (iso) kits** to match the isometric buildings: 9 roads, 2 plazas and iso versions of all 16 wall / fence styles (464 more pieces), drawn by `scripts/assets/kits-iso.ts`; the kit grid and the editor brush work on diamonds (`kit.grid: "iso"`, แนวทแยง) ([assets.md](assets.md#kits-roads-and-walls-that-join)).
+
 ### Roads, city walls and house walls that join: kits and a kit brush
 
 - **464 modular pieces in 28 sets** (new asset category `kit`): 12 road styles (dirt, cobble, flagstone, brick, gravel, stepping stones, east bluestone, south red clay and boardwalk, west sand, north loess and snow), 6 city walls (grey brick, granite, red sandstone, rammed earth, adobe, mountain fieldstone) with an arched 3-cell gate, 8 house / courtyard walls (white Jiangnan wall with a moon gate, grey brick, red palace wall, green-tiled temple wall, mossy brick, rammed earth, adobe, fieldstone) and 2 fences, each with a gate. Every set has a piece for all 16 ways a cell can join its neighbours (ends, straights, corners, T-junctions, crossing) on its own grid ([assets.md](assets.md#kits-roads-and-walls-that-join)).

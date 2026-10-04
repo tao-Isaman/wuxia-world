@@ -44,7 +44,7 @@ test("placed objects are drawn on their map and the hero cannot walk through a b
   await goTo(page, "city_capital");
   await expect(world).toHaveAttribute("data-placements", "3");
   await expect(world).toHaveAttribute("data-placement-ids", "p_000001 p_000002 p_000003");
-  // The hero starts at the south gate (480, 499); the crate's footprint spans x 540–580 on that line.
+  // The hero starts at the crossing south of the market (480, 368); the crate's footprint spans x 540–580 on that line.
   expect(Number(await world.getAttribute("data-player-x"))).toBeCloseTo(480, 0);
   await world.focus();
   await page.keyboard.down("d");
@@ -58,7 +58,7 @@ test("placed objects are drawn on their map and the hero cannot walk through a b
 
   // Tap-to-walk past the crate takes a detour and arrives on the far side.
   const target = await world.evaluate((host: HTMLElement & { worldScreenPoint?: (x: number, y: number) => { x: number; y: number } }) =>
-    host.worldScreenPoint!(610, 499));
+    host.worldScreenPoint!(610, 368));
   await page.mouse.click(target.x, target.y);
   await expect.poll(async () => Number(await world.getAttribute("data-player-x")), { timeout: 8_000 }).toBeGreaterThan(600);
 });
@@ -149,7 +149,7 @@ test("map editor: place, move, undo / redo, delete, warnings and save", async ({
 
   // A crate on the physician's spot is flagged.
   await palette.locator('[data-asset-id="prop_test_crate"]').click();
-  point = await at(336 + 38, 371 + 4 + 10);
+  point = await at(254 + 38, 353 + 4 + 10);
   await page.mouse.click(point.x, point.y);
   await expect(editor).toHaveAttribute("data-placement-count", "2");
   await expect(page.getByTestId("map-editor-issues")).toContainText("ขวาง");
@@ -199,6 +199,8 @@ test("map editor kit brush: a dragged wall joins itself, erasing re-joins, a gat
 
   const brush = page.getByTestId("kit-brush");
   await brush.getByRole("tab", { name: "กำแพงบ้าน" }).click();
+  // The test set is on the square grid; the brush lists iso (diagonal) sets by default.
+  await brush.getByLabel("แนวทแยง").uncheck();
   await brush.locator('[data-kit-set="kit_any_wall_test"]').click();
   const stage = page.getByTestId("map-editor-stage");
   await expect(stage).toHaveAttribute("data-brush", "paint");

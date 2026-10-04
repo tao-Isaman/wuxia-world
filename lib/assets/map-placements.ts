@@ -7,7 +7,7 @@
  * reopening a map is synchronous (`peekMapPlacements`). A map without
  * placements costs nothing after the first fetch.
  */
-import { indexAssets, loadAssetManifest, loadPlacements, placementsFor } from "./catalog";
+import { groundFor, indexAssets, loadAssetManifest, loadPlacements, placementsFor } from "./catalog";
 import { placementsGeometry, type PlacementGeometry } from "./placement-geometry";
 import type { AssetEntry, PlacementsFile } from "./types";
 import { enginePreviewActive, enginePreviewPlacements } from "@/lib/engine/goto";
@@ -21,6 +21,10 @@ let filePending: Promise<PlacementsFile> | null = null;
 let assets: Map<string, AssetEntry> | null = null;
 let assetsPending: Promise<Map<string, AssetEntry>> | null = null;
 const byMap = new Map<string, readonly PlacementGeometry[]>();
+
+/** A map's replaced ground, resolved: the tile image and the map units it covers. */
+export interface ResolvedGround { tile: string; image: string; size: number }
+const groundByMap = new Map<string, ResolvedGround | null>();
 
 function withTimeout<T>(promise: Promise<T>, fallback: T): Promise<T> {
   return Promise.race([promise, new Promise<T>((resolve) => setTimeout(() => resolve(fallback), LOAD_TIMEOUT))]);
@@ -47,17 +51,26 @@ function assetIndex(): Promise<Map<string, AssetEntry>> {
 export function peekMapPlacements(locationId: string): readonly PlacementGeometry[] | undefined {
   const cached = byMap.get(locationId);
   if (cached) return cached;
-  if (file && !placementsFor(file, locationId).length) return NONE;
+  if (file && !placementsFor(file, locationId).length && !groundFor(file, locationId)) return NONE;
   return undefined;
+}
+/** The map's replaced ground once its placements are known (null: it keeps its painting). */
+export function peekMapGround(locationId: string): ResolvedGround | null {
+  return groundByMap.get(locationId) ?? null;
 }
 
 /** The map's placements, resolved (cached). Placements naming an unknown asset are skipped. */
 export async function loadMapPlacements(locationId: string): Promise<readonly PlacementGeometry[]> {
   const known = peekMapPlacements(locationId);
   if (known) return known;
-  const list = placementsFor(await placementsFile(), locationId);
-  if (!list.length) return NONE;
+  const loaded = await placementsFile();
+  const list = placementsFor(loaded, locationId);
+  const ground = groundFor(loaded, locationId);
+  if (!list.length && !ground) return NONE;
   const index = await assetIndex();
+  const tile = ground ? index.get(ground.tile) : undefined;
+  if (ground && !tile) console.warn(`[world] ${locationId}: ground tile ${ground.tile} is not in the manifest; keeping the painting`);
+  groundByMap.set(locationId, tile ? { tile: tile.id, image: tile.image, size: tile.mapWidth } : null);
   const geometry = placementsGeometry(list, index);
   if (geometry.length < list.length) {
     console.warn(`[world] ${list.length - geometry.length} placement(s) on ${locationId} name an unknown asset; skipped`);
@@ -68,5 +81,5 @@ export async function loadMapPlacements(locationId: string): Promise<readonly Pl
 
 /** Forget everything (tests). */
 export function resetMapPlacements(): void {
-  file = null; filePending = null; assets = null; assetsPending = null; byMap.clear();
+  file = null; filePending = null; assets = null; assetsPending = null; byMap.clear(); groundByMap.clear();
 }

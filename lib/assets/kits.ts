@@ -11,6 +11,15 @@
  * ((col + ½)·cell, (row + 1)·cell). Walls draw upward from there (their face and
  * top rise above the cell), roads lie flat in it.
  *
+ * Iso grid (`kit.grid: "iso"`): diamonds `cell` wide and `cell / 2` tall, so
+ * roads and walls run along the same 2:1 diagonals as the library's
+ * isometric buildings. Cell (a, b) has its centre at
+ * (ISO_ORIGIN_X + (a − b)·cell/2, (a + b + 1)·cell/4); a runs down-right, b
+ * down-left. N is the up-right neighbour (b − 1), E down-right (a + 1), S
+ * down-left (b + 1), W up-left (a − 1). An iso piece is anchored at the centre
+ * of the cells it covers (the bottom of its image is the diamond's lower tip
+ * plus nothing below).
+ *
  * Connections. `kit.mask` holds the sides a piece joins across: N = 1, E = 2,
  * S = 4, W = 8 (the bits of PixelLab's road sets). A set has one auto piece per
  * mask (plus optional variants); the brush picks each cell's piece from which
@@ -37,6 +46,7 @@ export interface KitSet {
   set: string;
   kind: KitInfo["kind"];
   cell: number;
+  grid?: "iso";
   /** Auto pieces by mask (each mask's variants, ordered by id). */
   pieces: Map<number, AssetEntry[]>;
   /** Hand-placed pieces (gates, towers…). */
@@ -52,7 +62,7 @@ export function kitSets(assets: readonly AssetEntry[]): Map<string, KitSet> {
     const kit = asset.kit;
     if (!kit || asset.status !== "approved") continue;
     let entry = sets.get(kit.set);
-    if (!entry) { entry = { set: kit.set, kind: kit.kind, cell: kit.cell, pieces: new Map(), specials: [], cover: asset }; sets.set(kit.set, entry); }
+    if (!entry) { entry = { set: kit.set, kind: kit.kind, cell: kit.cell, grid: kit.grid, pieces: new Map(), specials: [], cover: asset }; sets.set(kit.set, entry); }
     if (kit.special) entry.specials.push(asset);
     else {
       const list = entry.pieces.get(kit.mask) ?? [];
@@ -68,26 +78,55 @@ export function kitSets(assets: readonly AssetEntry[]): Map<string, KitSet> {
   return sets;
 }
 
-const spanOf = (kit: KitInfo) => ({ w: kit.span?.w ?? 1, h: kit.span?.h ?? 1 });
+const spanOf = (kit: Pick<KitInfo, "span">) => ({ w: kit.span?.w ?? 1, h: kit.span?.h ?? 1 });
+/** The grid a kit (or brush) works on. */
+export type KitGrid = Pick<KitInfo, "cell" | "grid" | "span">;
+export const ISO_ORIGIN_X = 480;
 
-/** The anchor of a piece whose top-left cell is (col, row). */
-export function kitAnchor(kit: Pick<KitInfo, "cell" | "span">, col: number, row: number): { x: number; y: number } {
-  const span = spanOf(kit as KitInfo);
+/** The centre of iso cell (a, b) (fractional cells allowed). */
+export function isoCenter(cell: number, a: number, b: number): { x: number; y: number } {
+  return { x: ISO_ORIGIN_X + (a - b) * cell / 2, y: (a + b + 1) * cell / 4 };
+}
+
+/** The anchor of a piece whose first cell is (col, row): square, the span's bottom centre; iso, the span's centre. */
+export function kitAnchor(kit: KitGrid, col: number, row: number): { x: number; y: number } {
+  const span = spanOf(kit);
+  if (kit.grid === "iso") return isoCenter(kit.cell, col + (span.w - 1) / 2, row + (span.h - 1) / 2);
   return { x: (col + span.w / 2) * kit.cell, y: (row + span.h) * kit.cell };
 }
-/** The top-left cell of a piece anchored at (x, y). */
-export function kitCellOf(kit: Pick<KitInfo, "cell" | "span">, x: number, y: number): { col: number; row: number } {
-  const span = spanOf(kit as KitInfo);
+/** The first cell of a piece anchored at (x, y). */
+export function kitCellOf(kit: KitGrid, x: number, y: number): { col: number; row: number } {
+  const span = spanOf(kit);
+  if (kit.grid === "iso") {
+    const { a, b } = isoCoords(kit.cell, x, y);
+    return { col: Math.round(a - (span.w - 1) / 2), row: Math.round(b - (span.h - 1) / 2) };
+  }
   return { col: Math.round(x / kit.cell - span.w / 2), row: Math.round(y / kit.cell - span.h) };
 }
-/** The cell under a map point. */
-export function cellAt(cell: number, x: number, y: number): { col: number; row: number } {
-  return { col: Math.floor(x / cell), row: Math.floor(y / cell) };
+/** Fractional iso cell coordinates of a map point (cell centres are whole numbers). */
+function isoCoords(cell: number, x: number, y: number): { a: number; b: number } {
+  const u = (x - ISO_ORIGIN_X) / (cell / 2), v = y / (cell / 4) - 1;
+  return { a: (u + v) / 2, b: (v - u) / 2 };
 }
-/** Snap a map point to where a piece would stand if its top-left cell were under the point. */
+/** The cell under a map point. */
+export function cellAt(grid: KitGrid | number, x: number, y: number): { col: number; row: number } {
+  const g = typeof grid === "number" ? { cell: grid } : grid;
+  if (g.grid === "iso") { const { a, b } = isoCoords(g.cell, x, y); return { col: Math.round(a), row: Math.round(b) }; }
+  return { col: Math.floor(x / g.cell), row: Math.floor(y / g.cell) };
+}
+/** Snap a map point to where a piece would stand if its first cell were under the point. */
 export function snapToKit(kit: KitInfo, x: number, y: number): { x: number; y: number } {
-  const { col, row } = cellAt(kit.cell, x, y);
+  const { col, row } = cellAt(kit, x, y);
   return kitAnchor(kit, col, row);
+}
+/** The outline of a cell in map units (a square or a diamond), for overlays. */
+export function cellOutline(grid: KitGrid, col: number, row: number): { x: number; y: number }[] {
+  if (grid.grid === "iso") {
+    const c = isoCenter(grid.cell, col, row), w = grid.cell / 2, h = grid.cell / 4;
+    return [{ x: c.x, y: c.y - h }, { x: c.x + w, y: c.y }, { x: c.x, y: c.y + h }, { x: c.x - w, y: c.y }];
+  }
+  const x = col * grid.cell, y = row * grid.cell;
+  return [{ x, y }, { x: x + grid.cell, y }, { x: x + grid.cell, y: y + grid.cell }, { x, y: y + grid.cell }];
 }
 
 const key = (col: number, row: number) => `${col},${row}`;
@@ -159,10 +198,8 @@ export function paintKit(placements: readonly Placement[], assets: ReadonlyMap<s
   const changed = new Set<string>();
   const cells = kitCells(list, assets, set.set);
   const touched: { col: number; row: number }[] = [];
-  // Whole cells only, so every anchor stays on the 960 × 640 map.
-  const cols = Math.floor(960 / set.cell), rows = Math.floor(640 / set.cell);
   for (const { col, row } of cellsToPaint) {
-    if (col < 0 || row < 0 || col >= cols || row >= rows) continue;
+    if (!cellOnMap(set, col, row)) continue;
     const occupant = cells.get(key(col, row));
     if (erase) {
       if (!occupant || occupant.kit.special) continue;
@@ -180,6 +217,16 @@ export function paintKit(placements: readonly Placement[], assets: ReadonlyMap<s
   }
   if (!touched.length) return { placements: list, changed: [] };
   return repiece(list, assets, set, touched, changed);
+}
+
+/** Whether a cell is on the 960 × 640 map: a square one wholly, an iso one by its centre (so a piece's anchor always is). */
+export function cellOnMap(grid: KitGrid, col: number, row: number): boolean {
+  if (grid.grid === "iso") {
+    // Diamonds tile the map's edges only partly: a cell counts while its centre is on the map.
+    const c = isoCenter(grid.cell, col, row);
+    return c.x >= 0 && c.x <= 960 && c.y >= 0 && c.y <= 640;
+  }
+  return col >= 0 && row >= 0 && col < Math.floor(960 / grid.cell) && row < Math.floor(640 / grid.cell);
 }
 
 /** Re-pick the auto pieces of `set` in and next to `cells` from their neighbours. */

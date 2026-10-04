@@ -7,7 +7,7 @@ import { AUTO_MAP_IDS } from "../world/data/auto-map-ids";
 import {
   blockingRects, byDepth, characterDepth, heroDepth, placementGeometry, placementsGeometry,
 } from "../assets/placement-geometry";
-import { indexAssets } from "../assets/catalog";
+import { effectiveMapImage, indexAssets } from "../assets/catalog";
 import { KIT_E, KIT_N, KIT_S, KIT_W, cellLine, kitAnchor, kitCellOf, kitSets, maskAt, kitCells, paintKit, placeKitSpecial, snapToKit } from "../assets/kits";
 import type { AssetEntry, AssetManifest, Placement, PlacementsFile } from "../assets/types";
 import { mapAnchors, placementIssues } from "./map-anchors";
@@ -129,7 +129,8 @@ test("public/assets/placements.json: known maps and assets, unique ids, nothing 
   assert.equal(file.version, 1);
   const assets = indexAssets(manifest.assets);
   const problems: string[] = [];
-  for (const [mapId, placements] of Object.entries(file.maps)) {
+  for (const mapId of new Set([...Object.keys(file.maps), ...Object.keys(file.grounds ?? {})])) {
+    const placements = file.maps[mapId] ?? [];
     const map = MAP_IDS.includes(mapId) ? getLocationMap(mapId) : undefined;
     if (!map) { problems.push(`${mapId}: not a painted location map`); continue; }
     const ids = new Set<string>();
@@ -140,7 +141,9 @@ test("public/assets/placements.json: known maps and assets, unique ids, nothing 
       // The asset library is filled in parallel; with an empty manifest only the shape is checked.
       if (manifest.assets.length && !assets.has(p.asset)) problems.push(`${mapId}/${p.id}: unknown asset ${p.asset}`);
     }
-    for (const issue of placementIssues(mapId, map, placementsGeometry(placements, assets))) {
+    if (file.grounds?.[mapId] && manifest.assets.length && !assets.has(file.grounds[mapId].tile)) problems.push(`${mapId}: unknown ground tile ${file.grounds[mapId].tile}`);
+    const checked = { ...map, image: effectiveMapImage(file, mapId, map.image) };
+    for (const issue of placementIssues(mapId, checked, placementsGeometry(placements, assets))) {
       problems.push(`${mapId}: ${issue.placementId ?? "placements"} ${issue.reason === "covered" ? "cover" : "cut off"} ${issue.anchor.id}`);
     }
   }
@@ -247,7 +250,8 @@ test("public/assets kits: every set has a piece for all 16 joins, on its grid", 
       assert.equal(a.kit!.cell, set.cell, a.id);
       assert.equal(a.mapWidth, set.cell, `${a.id}: one cell wide`);
       assert.equal(a.anchorX, a.width / 2, a.id);
-      assert.equal(a.anchorY, a.height, a.id);
+      // Square pieces stand on their cell's bottom edge, iso ones on the diamond's centre.
+      assert.equal(a.anchorY, set.grid === "iso" ? a.height - set.cell / 4 : a.height, a.id);
       assert.equal(a.layer, set.kind === "road" ? "ground" : "object", a.id);
     }
     if (set.kind !== "road") assert.ok(set.specials.some((s) => s.kit!.special === "gate"), `${set.set}: no gate`);

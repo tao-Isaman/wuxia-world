@@ -236,3 +236,4 @@
 .kitHint { color: var(--ed-dim); width: 100%; }
 .brushCell { fill: rgba(226, 189, 106, 0.18); stroke: var(--ed-accent); }
 .brushCellErase { fill: rgba(224, 96, 74, 0.22); stroke: var(--ed-danger); }
+.kitIso { margin-left: auto; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; }

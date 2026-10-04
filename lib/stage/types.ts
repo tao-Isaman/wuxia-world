@@ -75,6 +75,11 @@ export interface WorldPresentation {
    * still loading (the host waits); absent or empty for none.
    */
   placements?: readonly PlacementGeometry[] | null;
+  /**
+   * The map's painting replaced by a tiled ground (placements.json `grounds`):
+   * `image` is then its stand-in key, so no painted collision or foreground applies.
+   */
+  ground?: { image: string; size: number } | null;
 }
 
 /** Map distance (960×640 units) per random-event walk tick. */

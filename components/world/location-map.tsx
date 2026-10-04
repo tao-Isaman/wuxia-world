@@ -15,6 +15,8 @@ import { hasStation } from "@/lib/world/stations";
 import { TOURNAMENT } from "@/lib/world/tournament";
 import { arrivalSpawn, freeSpot } from "@/lib/stage/map-anchors";
 import { useMapPlacements } from "./use-map-placements";
+import { peekMapGround } from "@/lib/assets/map-placements";
+import { groundImageKey } from "@/lib/assets/catalog";
 export { clearMapPositions } from "@/lib/stage/types";
 
 export interface MapSpotHandlers {
@@ -145,7 +147,10 @@ export function LocationMap({ scene, map, handlers, readOnly = false, dialogueSp
   const foes = roamingFoesOn(state.roamingFoes, scene.id);
   // While the hero works, they play the activity's painted loop on the map.
   const heroAction = workPose && heroHasPose(state.playerBodyId, workPose) ? heroPoseStrip(state.playerBodyId, workPose) : null;
-  const presentation: WorldPresentation = { key: scene.id, name: scene.name, image: map.image, heroAction,
+  // A map whose painting the engine replaced draws its tiled ground instead.
+  const ground = placements ? peekMapGround(scene.id) : null;
+  const presentation: WorldPresentation = { key: scene.id, name: scene.name, image: ground ? groundImageKey(ground.tile) : map.image, heroAction,
+    ground: ground ? { image: ground.image, size: ground.size } : null,
     time: state.time, spawn: arrival?.spawn ?? map.spawn, spawnFacing: arrival?.facing, playerImage: playerBodySprite(state.playerBodyId), markers: guidedMarkers, foes, placements,
     ...capitalVignette(scene.id, state.quests.qc_capital_clinic_supplies?.status === "done",
       state.flags.capital_ledger_recovered === true) };
@@ -156,7 +161,7 @@ export function LocationMap({ scene, map, handlers, readOnly = false, dialogueSp
   // quest props/bystanders can still switch visibility without a canvas rebuild.
   return <WorldCanvas presentation={readOnly
     ? { ...(lastInteractivePresentation.current ?? presentation), readOnly: true,
-      placements: presentation.placements, props: presentation.props, bystanders: presentation.bystanders, foes: presentation.foes, worldDescription: presentation.worldDescription,
+      placements: presentation.placements, ground: presentation.ground, props: presentation.props, bystanders: presentation.bystanders, foes: presentation.foes, worldDescription: presentation.worldDescription,
       dialogueSpeakerId: dialogueSpeakerId ? "npc-" + dialogueSpeakerId : undefined }
     : presentation} />;
 }

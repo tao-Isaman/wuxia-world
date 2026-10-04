@@ -9,8 +9,8 @@ import styles from "./map-editor.module.css";
 const KIND_LABELS: Record<KitInfo["kind"] | "city" | "house", string> = {
   road: "ถนน", wall: "กำแพง", fence: "รั้ว", city: "กำแพงเมือง", house: "กำแพงบ้าน",
 };
-/** Which tab a set belongs to: roads, city walls, house walls (fences go with them). */
-const tabOf = (set: KitSet) => set.kind === "road" ? "road" : set.set.includes("_wall_city_") ? "city" : "house";
+/** Which tab a set belongs to: roads (and plazas), city walls, house walls (fences go with them). */
+const tabOf = (set: KitSet) => set.kind === "road" ? "road" : /_(iso)?wall_city_/.test(set.set) ? "city" : "house";
 const TABS = ["road", "city", "house"] as const;
 
 /**
@@ -28,8 +28,10 @@ export function KitBrush({ sets, active, erase, onPick, onErase, onArmSpecial }:
   onArmSpecial: (asset: AssetEntry) => void;
 }) {
   const [tab, setTab] = useState<(typeof TABS)[number]>("road");
-  const list = useMemo(() => [...sets.values()].filter((s) => tabOf(s) === tab)
-    .sort((a, b) => a.cover.region.localeCompare(b.cover.region) || a.set.localeCompare(b.set)), [sets, tab]);
+  // Iso (diagonal, matching the isometric buildings) or square-grid sets.
+  const [iso, setIso] = useState(true);
+  const list = useMemo(() => [...sets.values()].filter((s) => tabOf(s) === tab && (s.grid === "iso") === iso)
+    .sort((a, b) => a.cover.region.localeCompare(b.cover.region) || a.set.localeCompare(b.set)), [sets, tab, iso]);
   return (
     <section className={`${styles.panel} ${styles.kitPanel}`} aria-label="ชิ้นต่อกัน" data-testid="kit-brush">
       <div className={styles.panelTitle}>
@@ -40,11 +42,12 @@ export function KitBrush({ sets, active, erase, onPick, onErase, onArmSpecial }:
         {TABS.map((t) => (
           <button key={t} type="button" role="tab" aria-selected={tab === t} onClick={() => setTab(t)}>{KIND_LABELS[t]}</button>
         ))}
+        <label className={styles.kitIso}><input type="checkbox" checked={iso} onChange={(e) => setIso(e.target.checked)} /> แนวทแยง</label>
       </div>
       <div className={styles.kitSets}>
         {!list.length && <p className={styles.empty}>ยังไม่มีชุดในคลัง</p>}
         {list.map((set) => {
-          const name = set.cover.name.split(" · ")[0];
+          const name = set.cover.name.split(" · ")[0].replace(" (แนวทแยง)", "");
           return (
             <button key={set.set} type="button" className={styles.kitSet} aria-pressed={active?.set === set.set} data-kit-set={set.set}
               title={`${name} · ${REGION_LABELS[set.cover.region]} · ช่อง ${set.cell}`} onClick={() => onPick(active?.set === set.set ? null : set)}>
