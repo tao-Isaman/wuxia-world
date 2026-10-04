@@ -1,9 +1,9 @@
 // Homes C — five households of the jianghu:
-//   home_chengying  程英 (Cheng Ying) and her cousin Lu Wushuang
+//   home_chengying  苏英月 (ซูอิ๋งเยว่) and her cousin เหอชิงหลาน
 //   home_yanji      閻基 (Yan Ji), thief turned bone-setter
 //   home_beichou    北醜 (the Ugly One of the North), a scarred spear hermit
 //   villa_meizhuang 梅莊 (the Plum Manor of the four Jiangnan friends)
-//   villa_fuwei     福威鏢局 (the Lin family's escort agency)
+//   villa_fuwei     镇威鏢局 (the Cao family's escort agency)
 // Teaches (one quest each): gn, nc8, t1_whitehorse, nd2, nm1, fs, ne3, sa, nf3, yyz.
 import type { Choice, Condition, DialogScene, NpcDef, QuestDef, SceneEffect, SceneLine } from "../../types";
 import type { ActivityDef } from "../activities";
@@ -38,14 +38,14 @@ const FW = "villa_fuwei";
 
 // ─── NPC ids and names (speaker names must match NPC names exactly) ──
 const CHENG = "home_chengying_mistress_cheng";
-const CHENG_N = "เฉิงอิ๋ง";
+const CHENG_N = "ซูอิ๋งเยว่";
 const LU = "home_chengying_cousin_lu";
-const LU_N = "ลู่อู๋ซวง";
+const LU_N = "เหอชิงหลาน";
 const TONG = "home_chengying_gooseboy_tong";
 const TONG_N = "อาถงเด็กเลี้ยงห่าน";
 
 const YAN = "home_yanji_bonesetter_yan";
-const YAN_N = "หยานจี";
+const YAN_N = "ฉีเหลียง";
 const LIU = "home_yanji_guard_liu";
 const LIU_N = "หลิวกระบองไหม้";
 const CHUN = "home_yanji_maid_chun";
@@ -59,18 +59,18 @@ const CAO = "home_beichou_herder_cao";
 const CAO_N = "เสี่ยวเฉ่าเด็กเลี้ยงแพะ";
 
 const HUANG = "villa_meizhuang_master_huang";
-const HUANG_N = "หวงจงกง";
+const HUANG_N = "เหลียงอิ้นกง";
 const HEIBAI = "villa_meizhuang_master_heibai";
-const HEIBAI_N = "เฮยไป๋จื่อ";
+const HEIBAI_N = "ชิวผิงจื่อ";
 const DANQING = "villa_meizhuang_painter_danqing";
-const DANQING_N = "ตันชิงเซิง";
+const DANQING_N = "ชุยหลานเซิง";
 const DING = "villa_meizhuang_steward_ding";
-const DING_N = "พ่อบ้านติงเจียน";
+const DING_N = "พ่อบ้านเกิ่งหลี่";
 
 const LINZ = "villa_fuwei_chief_lin";
-const LINZ_N = "หลินเจิ้นหนาน";
+const LINZ_N = "เฉาหย่งอัน";
 const PING = "villa_fuwei_young_lin";
-const PING_N = "หลินผิงจือ";
+const PING_N = "เฉาเหวินจือ";
 const SHI = "villa_fuwei_escort_shi";
 const SHI_N = "สื่อเปียวโถว";
 
@@ -111,7 +111,7 @@ const opponents: StoryOpponentSpec[] = [
   { id: SPAR_SHI, name: SHI_N, ti: 2, look: { sheet: "m3" }, stats: { STR: 7, VIT: 6, AGI: 3 }, skillIds: ["nd4", "nc5"] },
   { id: FOE_ENVOY, name: "ทูตเงาแห่งลัทธิตะวันจันทรา", ti: 3, look: { sheet: "m4", tint: 0x6a4a7a, size: 1.1 },
     stats: { POW: 10, AGI: 8, DEX: 5 }, skillIds: ["nf4", "nd9", "nd8"], artId: "shadow", artLevel: 6 },
-  { id: FOE_LUO, name: "ลั่วเหรินเจี๋ยแห่งชิงเฉิง", ti: 3, look: { sheet: "m2", tint: 0x5a7a6a, size: 1.1 },
+  { id: FOE_LUO, name: "หยวนเหรินเจี๋ยแห่งชิงเฉิง", ti: 3, look: { sheet: "m2", tint: 0x5a7a6a, size: 1.1 },
     stats: { DEX: 9, AGI: 9, STR: 5 }, skillIds: ["nh2", "nf4", "nd11"] },
 ];
 
@@ -119,15 +119,15 @@ const opponents: StoryOpponentSpec[] = [
 const npcs: NpcDef[] = [
   // home_chengying
   { id: CHENG, name: CHENG_N, locationIds: [CY], dialogSceneId: `npc_${CHENG}_talk`,
-    description: "ศิษย์คนสุดท้ายของฮ่วงเอี้ยะซือ หญิงสาวอ่อนโยนผู้เป่าขลุ่ยหยก ปักผ้าได้งามที่สุดในแถบนี้ และไม่เคยพูดชื่อคนที่นางคิดถึง",
+    description: "ศิษย์คนสุดท้ายของหวงชิงเฉวียน หญิงสาวอ่อนโยนผู้เป่าขลุ่ยหยก ปักผ้าได้งามที่สุดในแถบนี้ และไม่เคยพูดชื่อคนที่นางคิดถึง",
     tags: ["scholar", "musician", "martial_artist"], look: { body: "f2" },
     likes: ["silk", "song_inter", "lotus_seed", "craft"], dislikes: ["venom"] },
   { id: LU, name: LU_N, locationIds: [CY], dialogSceneId: `npc_${LU}_talk`, sparOpponentId: SPAR_LU, sparFameReward: 4,
-    description: "ลูกพี่ลูกน้องของเฉิงอิ๋ง ขาข้างหนึ่งกะเผลก ปากร้ายเป็นไฟ แต่ใครรังแกคนในบ้านนางจะได้เจอดาบก่อนคำด่า",
+    description: "ลูกพี่ลูกน้องของซูอิ๋งเยว่ ขาข้างหนึ่งกะเผลก ปากร้ายเป็นไฟ แต่ใครรังแกคนในบ้านนางจะได้เจอดาบก่อนคำด่า",
     tags: ["martial_artist", "family"], look: { body: "f3", wander: true }, defenseTier: 1,
     likes: ["cooked_meat", "spicy_stew", "iron_blade"], dislikes: ["potion"] },
   { id: TONG, name: TONG_N, locationIds: [CY], dialogSceneId: `npc_${TONG}_talk`,
-    description: "เด็กกำพร้าที่เฉิงอิ๋งรับมาเลี้ยง ดูแลฝูงห่านแปดตัวที่เชื่อฟังเขาน้อยกว่าเชื่อฟังข้าวเปลือก",
+    description: "เด็กกำพร้าที่ซูอิ๋งเยว่รับมาเลี้ยง ดูแลฝูงห่านแปดตัวที่เชื่อฟังเขาน้อยกว่าเชื่อฟังข้าวเปลือก",
     tags: ["child", "servant"], look: { body: "m1", wander: true },
     likes: ["moon_cake", "rice_dish", "food"], dislikes: ["book"] },
 
@@ -138,7 +138,7 @@ const npcs: NpcDef[] = [
     likes: ["gold", "ginseng", "jade", "ancient_coin"], dislikes: ["poison_vial"],
     stealLoot: [{ itemId: "herb", weight: 5 }, { itemId: "ginseng", weight: 2 }, { itemId: "ancient_coin", weight: 2 }, { itemId: "jade", weight: 1 }] },
   { id: LIU, name: LIU_N, locationIds: [YJ], dialogSceneId: `npc_${LIU}_talk`, sparOpponentId: SPAR_LIU, sparFameReward: 6,
-    description: "อดีตศิษย์นอกพรรคกระยาจกที่โดนไล่ออกเพราะเมา บัดนี้เป็นผู้คุ้มกันบ้านหยานจี กระบองของเขาไหม้ดำจากการฝึกข้างกองไฟ",
+    description: "อดีตศิษย์นอกพรรคกระยาจกที่โดนไล่ออกเพราะเมา บัดนี้เป็นผู้คุ้มกันบ้านฉีเหลียง กระบองของเขาไหม้ดำจากการฝึกข้างกองไฟ",
     tags: ["guard", "martial_artist"], look: { body: "m3", wander: true }, defenseTier: 2,
     likes: ["cooked_meat", "spicy_stew", "food"], dislikes: ["herb"] },
   { id: CHUN, name: CHUN_N, locationIds: [YJ], dialogSceneId: `npc_${CHUN}_talk`,
@@ -180,12 +180,12 @@ const npcs: NpcDef[] = [
 
   // villa_fuwei
   { id: LINZ, name: LINZ_N, locationIds: [FW], dialogSceneId: `npc_${LINZ}_talk`, defenseTier: 2,
-    description: "เจ้าสำนักคุ้มกันฝูเวย ใจดี ยิ้มง่าย ค้าขายเก่งกว่าฟันดาบ และภูมิใจในธงสิงห์ของตระกูลยิ่งกว่าสิ่งใด",
+    description: "เจ้าสำนักคุ้มกันเจิ้นเวย ใจดี ยิ้มง่าย ค้าขายเก่งกว่าฟันดาบ และภูมิใจในธงสิงห์ของตระกูลยิ่งกว่าสิ่งใด",
     tags: ["merchant", "official", "master"], look: { body: "merchant" },
     likes: ["gold", "jade", "steel_sword", "ancient_coin"], dislikes: ["poison_vial"],
     stealLoot: [{ itemId: "silver_ring", weight: 4 }, { itemId: "ancient_coin", weight: 3 }, { itemId: "jade", weight: 1 }, { itemId: "gold_ring", weight: 1 }] },
   { id: PING, name: PING_N, locationIds: [FW], dialogSceneId: `npc_${PING}_talk`,
-    description: "บุตรชายคนเดียวของตระกูลหลิน หน้าตางามเกินชาย ชอบขี่ม้าล่าสัตว์ และยังไม่รู้ว่ายุทธภพโหดร้ายแค่ไหน",
+    description: "บุตรชายคนเดียวของตระกูลเฉา หน้าตางามเกินชาย ชอบขี่ม้าล่าสัตว์ และยังไม่รู้ว่ายุทธภพโหดร้ายแค่ไหน",
     tags: ["noble", "hunter"], look: { body: "m1", wander: true },
     likes: ["fur_pelt", "tiger_claw", "silk_fan"], dislikes: ["rock"] },
   { id: SHI, name: SHI_N, locationIds: [FW], dialogSceneId: `npc_${SHI}_talk`, sparOpponentId: SPAR_SHI, sparFameReward: 6,
@@ -199,33 +199,33 @@ const quests: QuestDef[] = [
   // ═══ home_chengying ═══════════════════════════════════════════════
   {
     id: Q_PEACOCK, type: "side", giverNpcId: CHENG,
-    name: "วิชาลึกลับของเฉิงอิ๋ง",
-    description: "เฉิงอิ๋งกำลังปักนกยูงลงบนพัดผืนใหม่ แต่ผ้าไหมกับด้ายหมดลงกลางทาง นางบอกว่าถ้าพัดเสร็จจะสอนท่าพัดที่ทำให้ตาศัตรูพร่ามัวให้",
-    briefSummary: "หาผ้าไหม 2 ผืนกับเส้นด้าย 3 ม้วนให้เฉิงอิ๋ง แล้วช่วยนางลองท่าพัด",
+    name: "วิชาลึกลับของซูอิ๋งเยว่",
+    description: "ซูอิ๋งเยว่กำลังปักนกยูงลงบนพัดผืนใหม่ แต่ผ้าไหมกับด้ายหมดลงกลางทาง นางบอกว่าถ้าพัดเสร็จจะสอนท่าพัดที่ทำให้ตาศัตรูพร่ามัวให้",
+    briefSummary: "หาผ้าไหม 2 ผืนกับเส้นด้าย 3 ม้วนให้ซูอิ๋งเยว่ แล้วช่วยนางลองท่าพัด",
     prereqs: { t: "statAtLeast", stat: "POW", min: 10 },
     stages: [
-      { id: "silk", description: "หาผ้าไหม 2 ผืนและเส้นด้าย 3 ม้วนให้เฉิงอิ๋ง",
+      { id: "silk", description: "หาผ้าไหม 2 ผืนและเส้นด้าย 3 ม้วนให้ซูอิ๋งเยว่",
         autoAdvance: { t: "and", all: [{ t: "hasItem", itemId: "silk", count: 2 }, { t: "hasItem", itemId: "thread", count: 3 }] } },
-      { id: "try_fan", description: "ช่วยเฉิงอิ๋งลองท่าพัดนกยูงกลางลานบ้าน",
-        objective: { hours: 2, spots: [{ locationId: CY, npcId: CHENG, label: "ยืนเป็นคู่ซ้อมพัดให้เฉิงอิ๋ง",
-          text: "พัดสีรุ้งกางออกตรงหน้า ตาเจ้าพร่าไปชั่วขณะ เฉิงอิ๋งหัวเราะเบา ๆ — \"เห็นไหม ศัตรูก็จะเป็นแบบนี้\"" }] } },
-      { id: "return", description: "กลับไปหาเฉิงอิ๋งเพื่อเรียนพัดนกยูง" },
+      { id: "try_fan", description: "ช่วยซูอิ๋งเยว่ลองท่าพัดนกยูงกลางลานบ้าน",
+        objective: { hours: 2, spots: [{ locationId: CY, npcId: CHENG, label: "ยืนเป็นคู่ซ้อมพัดให้ซูอิ๋งเยว่",
+          text: "พัดสีรุ้งกางออกตรงหน้า ตาเจ้าพร่าไปชั่วขณะ ซูอิ๋งเยว่หัวเราะเบา ๆ — \"เห็นไหม ศัตรูก็จะเป็นแบบนี้\"" }] } },
+      { id: "return", description: "กลับไปหาซูอิ๋งเยว่เพื่อเรียนพัดนกยูง" },
     ],
     rewards: [{ t: "learnSkill", skillId: "nd2" }, { t: "wExp", amount: 100 }, { t: "gold", amount: 200 }, { t: "npcRelationship", npcId: CHENG, amount: 10 }],
   },
   {
     id: Q_DEW, type: "side", giverNpcId: LU,
     name: "วิชาลึกลับของสาวขากะเผลก",
-    description: "พวกอันธพาลในตลาดล้อเลียนการเดินของลู่อู๋ซวง นางไม่อยากให้พี่สาวรู้ จึงขอให้เจ้าไปสั่งสอนแทน แลกกับดาบที่นางฝึกจากหยดน้ำค้างทุกเช้า",
-    briefSummary: "สั่งสอนโจรเร่ร่อน 3 คน แล้วฝึกฟันน้ำค้างยามรุ่งกับลู่อู๋ซวง",
+    description: "พวกอันธพาลในตลาดล้อเลียนการเดินของเหอชิงหลาน นางไม่อยากให้พี่สาวรู้ จึงขอให้เจ้าไปสั่งสอนแทน แลกกับดาบที่นางฝึกจากหยดน้ำค้างทุกเช้า",
+    briefSummary: "สั่งสอนโจรเร่ร่อน 3 คน แล้วฝึกฟันน้ำค้างยามรุ่งกับเหอชิงหลาน",
     prereqs: { t: "statAtLeast", stat: "POW", min: 10 },
     stages: [
-      { id: "thugs", description: "สั่งสอนโจรเร่ร่อน 3 คนที่ล้อเลียนลู่อู๋ซวง",
+      { id: "thugs", description: "สั่งสอนโจรเร่ร่อน 3 คนที่ล้อเลียนเหอชิงหลาน",
         autoAdvance: { t: "defeatedOpponent", opponentId: "thug", count: 3 } },
-      { id: "dawn", description: "ฝึกฟันหยดน้ำค้างยามรุ่งที่ลานหน้าบ้านเฉิงอิ๋ง",
+      { id: "dawn", description: "ฝึกฟันหยดน้ำค้างยามรุ่งที่ลานหน้าบ้านซูอิ๋งเยว่",
         objective: { hours: 2, spots: [{ locationId: CY, label: "ฟันหยดน้ำค้างยามรุ่ง",
-          text: "หยดน้ำค้างร่วงจากใบไผ่ เจ้าฟันมันแตกเป็นสองโดยใบไผ่ไม่ไหวติง — เหมือนที่ลู่อู๋ซวงบอกว่า \"ดาบต้องเบากว่าลมหายใจ\"" }] } },
-      { id: "return", description: "กลับไปหาลู่อู๋ซวง" },
+          text: "หยดน้ำค้างร่วงจากใบไผ่ เจ้าฟันมันแตกเป็นสองโดยใบไผ่ไม่ไหวติง — เหมือนที่เหอชิงหลานบอกว่า \"ดาบต้องเบากว่าลมหายใจ\"" }] } },
+      { id: "return", description: "กลับไปหาเหอชิงหลาน" },
     ],
     rewards: [{ t: "learnSkill", skillId: "nm1" }, { t: "wExp", amount: 100 }, { t: "gold", amount: 200 }, { t: "npcRelationship", npcId: LU, amount: 10 }],
   },
@@ -235,7 +235,7 @@ const quests: QuestDef[] = [
     description: "อาถงเผลอหลับใต้ต้นหลิว ตื่นมาห่านหายไปห้าตัว ถ้าคุณหนูเฉิงรู้ (ซึ่งนางจะไม่ดุ) เขาจะเสียใจมาก",
     briefSummary: "ตามหาห่านที่หนีไปริมลำธารและในพงไผ่หลังบ้าน",
     stages: [
-      { id: "search", description: "ต้อนห่านกลับจากริมลำธารและพงไผ่หลังบ้านเฉิงอิ๋ง",
+      { id: "search", description: "ต้อนห่านกลับจากริมลำธารและพงไผ่หลังบ้านซูอิ๋งเยว่",
         objective: { spots: [
           { locationId: CY, label: "ต้อนห่านริมลำธาร", text: "ห่านสามตัวกำลังไล่จิกปลาตัวเล็ก เจ้าโดนจิกไปสองที แต่ต้อนกลับมาได้" },
           { locationId: CY, label: "ค้นพงไผ่หลังบ้าน", text: "ห่านอีกสองตัวนอนกกไข่อยู่ในพงไผ่ — มีไข่ด้วย! อาถงต้องดีใจแน่" },
@@ -249,11 +249,11 @@ const quests: QuestDef[] = [
   {
     id: Q_NEEDLE, type: "side", giverNpcId: YAN,
     name: "วิชาลึกลับของหมอจัดกระดูก",
-    description: "คนไข้ของหยานจีมาก แต่สมุนไพรในตู้หมด เขาขอสมุนไพร 3 ต้น แลกกับวิชาลึกลับที่ \"เคยใช้ปาหมาเฝ้าบ้านคนอื่น\" สมัยยังเป็นขโมย",
-    briefSummary: "นำสมุนไพรหายาก 3 ต้นมาให้หยานจี",
+    description: "คนไข้ของฉีเหลียงมาก แต่สมุนไพรในตู้หมด เขาขอสมุนไพร 3 ต้น แลกกับวิชาลึกลับที่ \"เคยใช้ปาหมาเฝ้าบ้านคนอื่น\" สมัยยังเป็นขโมย",
+    briefSummary: "นำสมุนไพรหายาก 3 ต้นมาให้ฉีเหลียง",
     stages: [
-      { id: "herbs", description: "เก็บสมุนไพรหายาก 3 ต้นให้หยานจี", autoAdvance: { t: "hasItem", itemId: "herb", count: 3 } },
-      { id: "return", description: "นำสมุนไพรไปให้หยานจีที่บ้าน" },
+      { id: "herbs", description: "เก็บสมุนไพรหายาก 3 ต้นให้ฉีเหลียง", autoAdvance: { t: "hasItem", itemId: "herb", count: 3 } },
+      { id: "return", description: "นำสมุนไพรไปให้ฉีเหลียงที่บ้าน" },
     ],
     rewards: [{ t: "learnSkill", skillId: "gn" }, { t: "gold", amount: 100 }, { t: "npcRelationship", npcId: YAN, amount: 8 }],
   },
@@ -265,7 +265,7 @@ const quests: QuestDef[] = [
     prereqs: { t: "and", all: [{ t: "statAtLeast", stat: "STR", min: 15 }, rel(LIU, 5)] },
     stages: [
       { id: "wood", description: "หาไม้เนื้อแข็ง 2 ท่อนให้หลิวกระบองไหม้", autoAdvance: { t: "hasItem", itemId: "wood_hard", count: 2 } },
-      { id: "spar", description: "ประลองกับหลิวกระบองไหม้ที่ลานบ้านหยานจี",
+      { id: "spar", description: "ประลองกับหลิวกระบองไหม้ที่ลานบ้านฉีเหลียง",
         objective: { spots: [{ locationId: YJ, npcId: LIU, label: "รับกระบองเพลิงของหลิว", sceneId: `qd_${Q_FIRE}_spar` }] } },
       { id: "return", description: "กลับไปหาหลิวกระบองไหม้" },
     ],
@@ -280,7 +280,7 @@ const quests: QuestDef[] = [
       { id: "deliver", description: "นำจดหมายของชุนเถาไปส่งให้แม่นางที่หมู่บ้านชีกู่",
         objective: { spots: [{ locationId: "village_qigu", label: "ส่งจดหมายให้แม่ของชุนเถา",
           text: "หญิงชรากอดจดหมายแนบอก แล้วฝากบอกลูกว่า \"อย่าลืมกินข้าว และอย่าพูดมากเกินไป\"" }] } },
-      { id: "return", description: "กลับไปบอกชุนเถาที่บ้านหยานจี" },
+      { id: "return", description: "กลับไปบอกชุนเถาที่บ้านฉีเหลียง" },
     ],
     rewards: [{ t: "gold", amount: 80 }, { t: "item", itemId: "rice_dish", count: 1 }, { t: "trait", trait: "good", amount: 1 }, { t: "npcRelationship", npcId: CHUN, amount: 10 }],
   },
@@ -335,58 +335,58 @@ const quests: QuestDef[] = [
   {
     id: Q_GUANGLING, type: "side", giverNpcId: HUANG,
     name: "เพลงพิณที่หายสาบสูญ",
-    description: "หวงจงกงตามหาโน้ตเพลงโบราณมาครึ่งชีวิต ใครนำตำราเพลงขั้นกลางมาให้และฟังพิณของเขาจบโดยไม่ล้ม เขาจะสอนวิชาลึกลับให้",
-    briefSummary: "นำตำราเพลงขั้นกลางมาให้หวงจงกง แล้วประลองกับเสียงพิณของเขา",
+    description: "เหลียงอิ้นกงตามหาโน้ตเพลงโบราณมาครึ่งชีวิต ใครนำตำราเพลงขั้นกลางมาให้และฟังพิณของเขาจบโดยไม่ล้ม เขาจะสอนวิชาลึกลับให้",
+    briefSummary: "นำตำราเพลงขั้นกลางมาให้เหลียงอิ้นกง แล้วประลองกับเสียงพิณของเขา",
     prereqs: { t: "and", all: [{ t: "statAtLeast", stat: "POW", min: 15 }, rel(HUANG, 5)] },
     stages: [
-      { id: "score", description: "หาตำราเพลงขั้นกลาง 1 เล่มให้หวงจงกง", autoAdvance: { t: "hasItem", itemId: "song_inter", count: 1 } },
-      { id: "spar", description: "ประลองกับเสียงพิณเจ็ดสายของหวงจงกง",
+      { id: "score", description: "หาตำราเพลงขั้นกลาง 1 เล่มให้เหลียงอิ้นกง", autoAdvance: { t: "hasItem", itemId: "song_inter", count: 1 } },
+      { id: "spar", description: "ประลองกับเสียงพิณเจ็ดสายของเหลียงอิ้นกง",
         objective: { spots: [{ locationId: MZ, npcId: HUANG, label: "ฟังพิณเจ็ดสายไร้รูป", sceneId: `qd_${Q_GUANGLING}_spar` }] } },
-      { id: "return", description: "กลับไปหาหวงจงกงเพื่อเรียนคีตาอาคม" },
+      { id: "return", description: "กลับไปหาเหลียงอิ้นกงเพื่อเรียนคีตาอาคม" },
     ],
     rewards: [{ t: "learnSkill", skillId: "sa" }, { t: "wExp", amount: 200 }, { t: "npcRelationship", npcId: HUANG, amount: 10 }],
   },
   {
     id: Q_GO, type: "side", giverNpcId: HEIBAI,
-    name: "ตำราหมากของเฮยไป๋จื่อ",
-    description: "เฮยไป๋จื่อเล่นหมากกับตัวเองมาสามปีจนเบื่อ เขาอยากได้ตำราขั้นกลางเล่มหนึ่งไว้ศึกษา และคู่เล่นที่ไม่หนีกลางกระดาน",
-    briefSummary: "นำตำราขั้นกลางมาให้เฮยไป๋จื่อ แล้วเดินหมากกับเขาหนึ่งกระดาน",
+    name: "ตำราหมากของชิวผิงจื่อ",
+    description: "ชิวผิงจื่อเล่นหมากกับตัวเองมาสามปีจนเบื่อ เขาอยากได้ตำราขั้นกลางเล่มหนึ่งไว้ศึกษา และคู่เล่นที่ไม่หนีกลางกระดาน",
+    briefSummary: "นำตำราขั้นกลางมาให้ชิวผิงจื่อ แล้วเดินหมากกับเขาหนึ่งกระดาน",
     stages: [
-      { id: "book", description: "หาตำราขั้นกลาง 1 เล่มให้เฮยไป๋จื่อ", autoAdvance: { t: "hasItem", itemId: "book_inter", count: 1 } },
-      { id: "game", description: "เดินหมากกับเฮยไป๋จื่อในศาลาริมสระ",
-        objective: { hours: 3, spots: [{ locationId: MZ, npcId: HEIBAI, label: "เดินหมากกับเฮยไป๋จื่อ",
-          text: "สามชั่วยามผ่านไป เจ้าแพ้ยี่สิบเจ็ดเม็ด เฮยไป๋จื่อยิ้มเป็นครั้งแรก \"เจ้าแพ้อย่างมีมารยาท หาได้ยากนัก\"" }] } },
-      { id: "return", description: "กลับไปหาเฮยไป๋จื่อ" },
+      { id: "book", description: "หาตำราขั้นกลาง 1 เล่มให้ชิวผิงจื่อ", autoAdvance: { t: "hasItem", itemId: "book_inter", count: 1 } },
+      { id: "game", description: "เดินหมากกับชิวผิงจื่อในศาลาริมสระ",
+        objective: { hours: 3, spots: [{ locationId: MZ, npcId: HEIBAI, label: "เดินหมากกับชิวผิงจื่อ",
+          text: "สามชั่วยามผ่านไป เจ้าแพ้ยี่สิบเจ็ดเม็ด ชิวผิงจื่อยิ้มเป็นครั้งแรก \"เจ้าแพ้อย่างมีมารยาท หาได้ยากนัก\"" }] } },
+      { id: "return", description: "กลับไปหาชิวผิงจื่อ" },
     ],
     rewards: [{ t: "gold", amount: 150 }, { t: "wExp", amount: 40 }, { t: "npcRelationship", npcId: HEIBAI, amount: 10 }],
   },
   {
     id: Q_FINGER, type: "side", giverNpcId: HEIBAI,
     name: "คุกใต้ทะเลสาบ",
-    description: "เฮยไป๋จื่อขอให้เจ้าลงไปส่งยาให้ \"แขกชรา\" ที่ถูกขังใต้ทะเลสาบหลังคฤหาสน์ เขาไม่ยอมบอกว่าแขกผู้นั้นคือใคร และทำไมมือเขาจึงสั่น",
-    briefSummary: "ลงไปยังคุกใต้ทะเลสาบแทนเฮยไป๋จื่อ — แล้วค้นหาว่าเขาซ่อนอะไรไว้",
+    description: "ชิวผิงจื่อขอให้เจ้าลงไปส่งยาให้ \"แขกชรา\" ที่ถูกขังใต้ทะเลสาบหลังคฤหาสน์ เขาไม่ยอมบอกว่าแขกผู้นั้นคือใคร และทำไมมือเขาจึงสั่น",
+    briefSummary: "ลงไปยังคุกใต้ทะเลสาบแทนชิวผิงจื่อ — แล้วค้นหาว่าเขาซ่อนอะไรไว้",
     prereqs: { t: "and", all: [{ t: "statAtLeast", stat: "INT", min: 25 }, rel(HEIBAI, 15), { t: "questStatus", questId: Q_GO, status: "done" }] },
     stages: [
       { id: "cell", description: "ลงไปยังคุกใต้ทะเลสาบหลังคฤหาสน์ดงดอกท้อ",
         objective: { spots: [{ locationId: MZ, label: "ลงบันไดสู่คุกใต้ทะเลสาบ", sceneId: `qd_${Q_FINGER}_cell` }] } },
       { id: "envoy", description: "เผชิญหน้ากับทูตเงาที่ซุ่มอยู่ในดงเหมย",
         objective: { spots: [{ locationId: MZ, label: "ตามเงาในดงเหมย", sceneId: `qd_${Q_FINGER}_envoy` }] } },
-      { id: "lotus", description: "หาบัวหิมะ 1 ดอกมาถอนพิษฝ่ามือดำให้เฮยไป๋จื่อ", autoAdvance: { t: "hasItem", itemId: "snow_lotus", count: 1 } },
-      { id: "return", description: "กลับไปหาเฮยไป๋จื่อพร้อมบัวหิมะ" },
+      { id: "lotus", description: "หาบัวหิมะ 1 ดอกมาถอนพิษฝ่ามือดำให้ชิวผิงจื่อ", autoAdvance: { t: "hasItem", itemId: "snow_lotus", count: 1 } },
+      { id: "return", description: "กลับไปหาชิวผิงจื่อพร้อมบัวหิมะ" },
     ],
     rewards: [{ t: "learnSkill", skillId: "yyz" }, { t: "wExp", amount: 320 }, { t: "item", itemId: "jade", count: 1 }, { t: "npcRelationship", npcId: HEIBAI, amount: 10 }, { t: "trait", trait: "good", amount: 2 }],
   },
   {
     id: Q_PAINT, type: "side", giverNpcId: DANQING,
     name: "ภาพเหมือนของคนเมา",
-    description: "ตันชิงเซิงประกาศว่าจะวาด \"จอมยุทธผู้มาเยือนใต้ต้นเหมย\" แต่หมึกหมดเพราะเขาเผลอเทลงไปในไหสุรา",
-    briefSummary: "หาหมึกเข้ม 2 ก้อนให้ตันชิงเซิง แล้วนั่งเป็นแบบให้เขาวาด",
+    description: "ชุยหลานเซิงประกาศว่าจะวาด \"จอมยุทธผู้มาเยือนใต้ต้นเหมย\" แต่หมึกหมดเพราะเขาเผลอเทลงไปในไหสุรา",
+    briefSummary: "หาหมึกเข้ม 2 ก้อนให้ชุยหลานเซิง แล้วนั่งเป็นแบบให้เขาวาด",
     stages: [
-      { id: "ink", description: "หาหมึกเข้ม 2 ก้อนให้ตันชิงเซิง", autoAdvance: { t: "hasItem", itemId: "ink", count: 2 } },
-      { id: "pose", description: "นั่งเป็นแบบใต้ต้นเหมยให้ตันชิงเซิงวาด",
+      { id: "ink", description: "หาหมึกเข้ม 2 ก้อนให้ชุยหลานเซิง", autoAdvance: { t: "hasItem", itemId: "ink", count: 2 } },
+      { id: "pose", description: "นั่งเป็นแบบใต้ต้นเหมยให้ชุยหลานเซิงวาด",
         objective: { hours: 3, spots: [{ locationId: MZ, label: "นั่งเป็นแบบใต้ต้นเหมย",
-          text: "ตันชิงเซิงวาดไปดื่มไป พอเสร็จภาพ เจ้าในภาพหล่อกว่าตัวจริงสามเท่า และถือจอกสุราที่เจ้าไม่เคยถือ" }] } },
-      { id: "return", description: "กลับไปรับภาพจากตันชิงเซิง" },
+          text: "ชุยหลานเซิงวาดไปดื่มไป พอเสร็จภาพ เจ้าในภาพหล่อกว่าตัวจริงสามเท่า และถือจอกสุราที่เจ้าไม่เคยถือ" }] } },
+      { id: "return", description: "กลับไปรับภาพจากชุยหลานเซิง" },
     ],
     rewards: [{ t: "gold", amount: 120 }, { t: "item", itemId: "image_basic", count: 1 }, { t: "npcRelationship", npcId: DANQING, amount: 10 }],
   },
@@ -394,27 +394,27 @@ const quests: QuestDef[] = [
   // ═══ villa_fuwei ══════════════════════════════════════════════════
   {
     id: Q_WHIP, type: "side", giverNpcId: PING,
-    name: "แส้ม้าของคุณชายหลิน",
-    description: "สุนัขล่าเนื้อของหลินผิงจือหิวโซ เขาขี้เกียจไปตลาดเอง จึงขอเนื้อสด 2 ชิ้น แลกกับเคล็ดลับแส้ม้าที่ \"ปัดแมลงวันบนหูม้าโดยม้าไม่สะดุ้ง\"",
-    briefSummary: "นำเนื้อสด 2 ชิ้นมาให้หลินผิงจือ",
+    name: "แส้ม้าของคุณชายเฉา",
+    description: "สุนัขล่าเนื้อของเฉาเหวินจือหิวโซ เขาขี้เกียจไปตลาดเอง จึงขอเนื้อสด 2 ชิ้น แลกกับเคล็ดลับแส้ม้าที่ \"ปัดแมลงวันบนหูม้าโดยม้าไม่สะดุ้ง\"",
+    briefSummary: "นำเนื้อสด 2 ชิ้นมาให้เฉาเหวินจือ",
     stages: [
-      { id: "meat", description: "หาเนื้อสด 2 ชิ้นให้หลินผิงจือ", autoAdvance: { t: "hasItem", itemId: "raw_meat", count: 2 } },
-      { id: "return", description: "นำเนื้อไปให้หลินผิงจือที่สำนักคุ้มกันฝูเวย" },
+      { id: "meat", description: "หาเนื้อสด 2 ชิ้นให้เฉาเหวินจือ", autoAdvance: { t: "hasItem", itemId: "raw_meat", count: 2 } },
+      { id: "return", description: "นำเนื้อไปให้เฉาเหวินจือที่สำนักคุ้มกันเจิ้นเวย" },
     ],
     rewards: [{ t: "learnSkill", skillId: "nc8" }, { t: "gold", amount: 80 }, { t: "npcRelationship", npcId: PING, amount: 8 }],
   },
   {
     id: Q_HORSE, type: "side", giverNpcId: LINZ,
-    name: "วิชาลึกลับแห่งฝูเวย",
-    description: "โจรเส้นทางดักปล้นเกวียนของฝูเวยถึงสามครั้งในเดือนนี้ หลินเจิ้นหนานขอให้ไปกวาดล้าง แลกกับลมปราณที่ปู่ของเขาฝึกบนหลังม้าขาวตลอดเส้นทางคุ้มกัน",
+    name: "วิชาลึกลับแห่งเจิ้นเวย",
+    description: "โจรเส้นทางดักปล้นเกวียนของเจิ้นเวยถึงสามครั้งในเดือนนี้ เฉาหย่งอันขอให้ไปกวาดล้าง แลกกับลมปราณที่ปู่ของเขาฝึกบนหลังม้าขาวตลอดเส้นทางคุ้มกัน",
     briefSummary: "ปราบโจรเส้นทาง 3 คน แล้วปักธงสิงห์คืนหน้าประตูสำนัก",
     prereqs: { t: "statAtLeast", stat: "POW", min: 10 },
     stages: [
-      { id: "bandits", description: "ปราบโจรเส้นทาง 3 คนที่ดักปล้นเกวียนฝูเวย", autoAdvance: { t: "defeatedOpponent", opponentId: "road_bandit", count: 3 } },
-      { id: "banner", description: "ปักธงสิงห์ของฝูเวยคืนหน้าประตูสำนัก",
+      { id: "bandits", description: "ปราบโจรเส้นทาง 3 คนที่ดักปล้นเกวียนเจิ้นเวย", autoAdvance: { t: "defeatedOpponent", opponentId: "road_bandit", count: 3 } },
+      { id: "banner", description: "ปักธงสิงห์ของเจิ้นเวยคืนหน้าประตูสำนัก",
         objective: { spots: [{ locationId: FW, label: "ปักธงสิงห์หน้าประตู",
-          text: "ธงสิงห์สะบัดเหนือประตูอีกครั้ง คนคุ้มกันโห่ร้อง หลินผิงจือตะโกนว่าเขาก็ช่วย (เขาถือเชือกปลายเดียว)" }] } },
-      { id: "return", description: "กลับไปหาหลินเจิ้นหนาน" },
+          text: "ธงสิงห์สะบัดเหนือประตูอีกครั้ง คนคุ้มกันโห่ร้อง เฉาเหวินจือตะโกนว่าเขาก็ช่วย (เขาถือเชือกปลายเดียว)" }] } },
+      { id: "return", description: "กลับไปหาเฉาหย่งอัน" },
     ],
     rewards: [{ t: "learnArt", artId: "t1_whitehorse", level: 1 }, { t: "wExp", amount: 100 }, { t: "gold", amount: 200 }, { t: "npcRelationship", npcId: LINZ, amount: 10 }],
   },
@@ -425,7 +425,7 @@ const quests: QuestDef[] = [
     briefSummary: "ส่งหีบผ้าที่หยางโจว แล้วปราบโจรป่า 2 คนระหว่างทางกลับ",
     stages: [
       { id: "deliver", description: "ส่งหีบผ้าให้ร้านผ้าในเมืองหยางโจว",
-        objective: { spots: [{ locationId: "city_yangzhou", label: "ส่งหีบผ้าของฝูเวย",
+        objective: { spots: [{ locationId: "city_yangzhou", label: "ส่งหีบผ้าของเจิ้นเวย",
           text: "เถ้าแก่ร้านผ้าเปิดหีบตรวจนับ ครบทุกพับ เขาประทับตราใบรับให้พร้อมชาหนึ่งถ้วย" }] } },
       { id: "bandits", description: "ปราบโจรป่า 2 คนที่ตามมาระหว่างทางกลับ", autoAdvance: { t: "defeatedOpponent", opponentId: "bandit", count: 2 } },
       { id: "return", description: "กลับไปรายงานสื่อเปียวโถว" },
@@ -436,13 +436,13 @@ const quests: QuestDef[] = [
     id: Q_DRAGON, type: "side", giverNpcId: SHI,
     name: "วิชาลึกลับกับรอยเลือดในคอกม้า",
     description: "เช้านี้ม้าในคอกตายไปสามตัว ไม่มีบาดแผลนอก สื่อเปียวโถวหน้าเครียดเป็นครั้งแรก เขาว่าถ้าเจ้าช่วยสืบเรื่องนี้ได้ เขาจะสอนทวนที่เขาไม่เคยใช้ต่อหน้าใคร",
-    briefSummary: "สืบความตายในคอกม้า เผชิญศัตรูที่จ้องสำนักฝูเวย และหาไม้ศักดิ์สิทธิ์มาทำด้ามทวน",
+    briefSummary: "สืบความตายในคอกม้า เผชิญศัตรูที่จ้องสำนักเจิ้นเวย และหาไม้ศักดิ์สิทธิ์มาทำด้ามทวน",
     prereqs: { t: "and", all: [{ t: "statAtLeast", stat: "STR", min: 25 }, rel(SHI, 15), { t: "questStatus", questId: Q_ESCORT, status: "done" }] },
     stages: [
-      { id: "stable", description: "สืบรอยเลือดในคอกม้าของสำนักคุ้มกันฝูเวย",
+      { id: "stable", description: "สืบรอยเลือดในคอกม้าของสำนักคุ้มกันเจิ้นเวย",
         objective: { spots: [{ locationId: FW, label: "สืบรอยในคอกม้า",
           text: "ม้าทุกตัวหัวใจแหลก แต่ผิวหนังไม่ช้ำ — ฝ่ามือทำลายใจของสำนักชิงเฉิง ข้างรางหญ้ามีรอยเท้าคนใส่รองเท้าฟาง" }] } },
-      { id: "luo", description: "เผชิญหน้ากับคนของสำนักชิงเฉิงที่ซุ่มอยู่หลังกำแพงฝูเวย",
+      { id: "luo", description: "เผชิญหน้ากับคนของสำนักชิงเฉิงที่ซุ่มอยู่หลังกำแพงเจิ้นเวย",
         objective: { spots: [{ locationId: FW, label: "ตามรอยเท้าหลังกำแพง", sceneId: `qd_${Q_DRAGON}_luo` }] } },
       { id: "shaft", description: "หาไม้ศักดิ์สิทธิ์ 1 ท่อนมาทำด้ามทวนใหม่ให้สื่อเปียวโถว", autoAdvance: { t: "hasItem", itemId: "wood_sacred", count: 1 } },
       { id: "return", description: "กลับไปหาสื่อเปียวโถวพร้อมไม้ศักดิ์สิทธิ์" },
@@ -514,7 +514,7 @@ const scenes: DialogScene[] = [
     say(CHENG_N, "ถ้าเจ้าหาผ้าไหมสองผืนกับด้ายสามม้วนมาให้ได้ พัดเสร็จเมื่อไร ข้าจะสอนท่านี้ให้"),
   ], "ข้าจะหามาให้", "ไว้คราวหน้า"),
   complete(Q_PEACOCK, CY, [
-    tell("เฉิงอิ๋งปักขนนกยูงขนสุดท้ายเสร็จ พัดสีรุ้งกางออกในมือนาง"),
+    tell("ซูอิ๋งเยว่ปักขนนกยูงขนสุดท้ายเสร็จ พัดสีรุ้งกางออกในมือนาง"),
     say(CHENG_N, "จำไว้ พัดนกยูงไม่ได้ทำร้ายใคร มันแค่ทำให้ศัตรูมองไม่เห็นทางร้ายของตัวเอง"),
     say(CHENG_N, "สะบัดข้อมือ ไม่ใช่สะบัดแขน... ใช่ อย่างนั้นแหละ"),
     say(CHENG_N, "ขอบใจที่มาเป็นแขกนะ บ้านนี้ไม่ค่อยมีใครมาหัวเราะด้วย"),
@@ -544,7 +544,7 @@ const scenes: DialogScene[] = [
   // ═══ home_yanji ═══════════════════════════════════════════════════
   dialog(`npc_${YAN}_talk`, [
     tell("ชายวัยกลางคนในชุดผ้าไหมราคาแพงยิ้มกว้าง นิ้วมือเรียวยาวเกินกว่าจะเป็นมือหมอ"),
-    say(YAN_N, "อ้า ยินดีต้อนรับ ปวดหลัง? เคล็ดขัดยอก? กระดูกเคลื่อน? หยานจีรักษาได้หมด ราคากันเอง"),
+    say(YAN_N, "อ้า ยินดีต้อนรับ ปวดหลัง? เคล็ดขัดยอก? กระดูกเคลื่อน? ฉีเหลียงรักษาได้หมด ราคากันเอง"),
     say(YAN_N, "เรื่องเก่าข้าน่ะหรือ... ใครเล่าว่าข้าเคยเป็นขโมย? ข้าแค่ \"ยืมของถาวร\" เท่านั้น"),
     say(YAN_N, "เดี๋ยวนี้ข้ากลับใจแล้ว ครึ่งหนึ่ง อีกครึ่งยังคิดอยู่"),
   ], [
@@ -596,7 +596,7 @@ const scenes: DialogScene[] = [
   ], "ตกลง", "ข้าว่าเจ้าไม่ขาดทุนหรอก"),
   complete(Q_NEEDLE, YJ, [
     say(YAN_N, "สมุนไพรเกรดดี! ใบไม่ช้ำ รากครบ เจ้ามีแววเป็นขโมย... เอ้ย นักเก็บสมุนไพร"),
-    tell("หยานจีหยิบเข็มทองสามเล่มขึ้นมาหมุนระหว่างนิ้วจนเป็นประกาย"),
+    tell("ฉีเหลียงหยิบเข็มทองสามเล่มขึ้นมาหมุนระหว่างนิ้วจนเป็นประกาย"),
     say(YAN_N, "จับที่โคน ส่งด้วยข้อมือ อย่าส่งด้วยใจ ใจเรามันโลภ ปาเลยเป้าทุกที"),
     say(YAN_N, "เอาเงินไปด้วย ...ไม่ต้องนับ ข้านับให้แล้ว"),
   ], "รับวิชาเข็มทอง"),
@@ -754,7 +754,7 @@ const scenes: DialogScene[] = [
   // ═══ villa_meizhuang ══════════════════════════════════════════════
   dialog(`npc_${HUANG}_talk`, [
     tell("ชายชราผมขาวโพลนนั่งหน้าพิณเจ็ดสาย นิ้วแตะสายเบา ๆ เสียงก้องไปทั่วศาลา"),
-    say(HUANG_N, "ข้าคือหวงจงกง พี่ใหญ่ของสี่สหายแห่งคฤหาสน์นี้"),
+    say(HUANG_N, "ข้าคือเหลียงอิ้นกง พี่ใหญ่ของสี่สหายแห่งคฤหาสน์นี้"),
     say(HUANG_N, "น้องสองเล่นหมาก น้องสามเขียนพู่กัน น้องสี่วาดภาพกับดื่มเหล้า ส่วนข้า... ข้ามีแต่พิณ"),
     say(HUANG_N, "พวกเราถอนตัวจากยุทธภพมาอยู่ที่นี่ เพื่อเฝ้าสิ่งหนึ่ง แต่เรื่องนั้นไม่ใช่เรื่องที่แขกควรถาม"),
   ], [
@@ -774,7 +774,7 @@ const scenes: DialogScene[] = [
   dialog(`npc_${HEIBAI}_talk`, [
     tell("ชายผอมสูงผมดำครึ่งขาวครึ่งนั่งหน้ากระดานหมาก ไม่เงยหน้าขึ้นมอง"),
     say(HEIBAI_N, "ตาเดินของเจ้าบอกข้าว่าเจ้ากำลังจะถามว่าข้าเป็นใคร"),
-    say(HEIBAI_N, "เฮยไป๋จื่อ ดำกับขาว เหมือนหมาก เหมือนคน"),
+    say(HEIBAI_N, "ชิวผิงจื่อ ดำกับขาว เหมือนหมาก เหมือนคน"),
     say(HEIBAI_N, "ข้าเล่นกับตัวเองมาสามปี ชนะทุกครั้ง แพ้ทุกครั้ง น่าเบื่อทุกครั้ง"),
   ], [
     { text: "ทำไมมือท่านสั่น", next: `npc_${HEIBAI}_hands` },
@@ -788,7 +788,7 @@ const scenes: DialogScene[] = [
   dialog(`npc_${DANQING}_talk`, [
     tell("ชายหน้าแดงก่ำเดินโซเซเข้ามา จอกในมือหนึ่ง พู่กันในอีกมือ"),
     say(DANQING_N, "อ้า! หน้าตาเจ้าน่าวาดนัก! จมูกได้รูป คิ้วมีพลัง ส่วนหูนั่น... เอาไว้ก่อน"),
-    say(DANQING_N, "ข้าคือตันชิงเซิง หนึ่งวันข้าวาดสามภาพ ดื่มสามไห ไม่เคยผิดสัญญากับตัวเอง"),
+    say(DANQING_N, "ข้าคือชุยหลานเซิง หนึ่งวันข้าวาดสามภาพ ดื่มสามไห ไม่เคยผิดสัญญากับตัวเอง"),
     say(DANQING_N, "สุราดีทำให้ภาพมีชีวิต ภาพดีทำให้สุรามีรสชาติ เจ้าเข้าใจไหม? ไม่เข้าใจก็ดื่มก่อน"),
   ], [
     { text: "ดื่มด้วยหนึ่งจอก", next: `npc_${DANQING}_drink` },
@@ -814,7 +814,7 @@ const scenes: DialogScene[] = [
     say(HUANG_N, "ถ้าเจ้ายืนได้จนจบเพลง ข้าจะสอนคีตาอาคม เสียงที่ทำให้ศัตรูมองเห็นภาพลวง"),
   ], "ข้าจะหาตำรามาให้", "ข้ายังอยากตื่นอยู่"),
   dialog(`qd_${Q_GUANGLING}_spar`, [
-    tell("หวงจงกงเปิดตำราเพลง นิ้วสั่นเล็กน้อยด้วยความตื่นเต้น แล้วเริ่มดีด"),
+    tell("เหลียงอิ้นกงเปิดตำราเพลง นิ้วสั่นเล็กน้อยด้วยความตื่นเต้น แล้วเริ่มดีด"),
     say(HUANG_N, "พิณเจ็ดสายไร้รูป ตั้งสติให้ดี!"),
   ], [
     { text: "ตั้งรับเสียงพิณ", next: MZ,
@@ -822,15 +822,15 @@ const scenes: DialogScene[] = [
     { text: "ขอตั้งสติก่อน", next: MZ },
   ]),
   dialog(`qd_${Q_GUANGLING}_won`, [
-    tell("สายพิณเส้นที่เจ็ดขาดดังเปาะ หวงจงกงนิ่งไปครู่หนึ่ง แล้วหัวเราะเบา ๆ"),
+    tell("สายพิณเส้นที่เจ็ดขาดดังเปาะ เหลียงอิ้นกงนิ่งไปครู่หนึ่ง แล้วหัวเราะเบา ๆ"),
     say(HUANG_N, "สามสิบปีแล้วที่ไม่มีใครทำให้สายพิณข้าขาด"),
-  ], [{ text: "คารวะหวงจงกง", next: MZ, effects: [{ t: "advanceQuest", questId: Q_GUANGLING }] }]),
+  ], [{ text: "คารวะเหลียงอิ้นกง", next: MZ, effects: [{ t: "advanceQuest", questId: Q_GUANGLING }] }]),
   dialog(`qd_${Q_GUANGLING}_lost`, [
     tell("เจ้าตื่นขึ้นบนม้านั่งในศาลา มีผ้าห่มคลุมตัว"),
     say(HUANG_N, "หลับสบายไหม? พักให้หายแล้วค่อยมาฟังใหม่"),
   ]),
   complete(Q_GUANGLING, MZ, [
-    tell("หวงจงกงเปลี่ยนสายพิณ แล้วดีดโน้ตเดียวซ้ำ ๆ ให้เจ้าฟัง"),
+    tell("เหลียงอิ้นกงเปลี่ยนสายพิณ แล้วดีดโน้ตเดียวซ้ำ ๆ ให้เจ้าฟัง"),
     say(HUANG_N, "คีตาอาคมไม่ใช่เพลงที่ฟังด้วยหู มันฟังด้วยปราณ"),
     say(HUANG_N, "ส่งปราณไปกับเสียง ให้ศัตรูเห็นเจ้าอยู่ผิดที่ เล็งผิดทาง"),
     say(HUANG_N, "ตำราเล่มนี้... ข้าจะดีดเพลงนั้นทุกคืน ขอบใจเจ้า"),
@@ -848,21 +848,21 @@ const scenes: DialogScene[] = [
   offer(Q_FINGER, MZ, [
     say(HEIBAI_N, "ข้ามีงานหนึ่ง ต้องเป็นคนที่ข้าไว้ใจ และฉลาดพอจะไม่ถามมาก"),
     say(HEIBAI_N, "ใต้ทะเลสาบหลังคฤหาสน์มีคุกเหล็ก แขกชราคนหนึ่งถูกขังไว้ที่นั่นมาสิบสองปี"),
-    say(HEIBAI_N, "เอาห่อยานี้ลงไปให้เขา บอกว่า \"เฮยไป๋จื่อยังรอคำตอบ\""),
+    say(HEIBAI_N, "เอาห่อยานี้ลงไปให้เขา บอกว่า \"ชิวผิงจื่อยังรอคำตอบ\""),
     say(HEIBAI_N, "ถ้าเจ้าทำได้ ข้าจะสอนดัชนีเอกสุริยัน วิชาที่ข้าไม่เคยสอนใคร"),
   ], "รับห่อยามา", "ข้าไม่อยากลงไปใต้น้ำ"),
   dialog(`qd_${Q_FINGER}_cell`, [
     tell("บันไดหินเปียกชื้นพาลงไปลึกใต้ทะเลสาบ เสียงน้ำหยดก้องไปตามทางเดิน"),
     tell("ประตูคุกเหล็กเปิดอ้า โซ่ขาดกองอยู่บนพื้น คุกว่างเปล่า"),
     tell("บนผนังมีรอยมือสลักลึกเข้าไปในหิน และตัวอักษรขีดด้วยเล็บ: \"ข้าไปแล้ว — ร.\""),
-    tell("เจ้าแกะห่อยาดู ข้างในไม่ใช่ยา แต่เป็นผงยานอนหลับ กับจดหมายของเฮยไป๋จื่อที่ขอแลกอิสรภาพกับเคล็ดวิชาดูดพลัง"),
+    tell("เจ้าแกะห่อยาดู ข้างในไม่ใช่ยา แต่เป็นผงยานอนหลับ กับจดหมายของชิวผิงจื่อที่ขอแลกอิสรภาพกับเคล็ดวิชาดูดพลัง"),
   ], [
     { text: "เก็บจดหมายไว้ แล้วรีบขึ้นไป", next: MZ, effects: [{ t: "advanceQuest", questId: Q_FINGER }] },
     { text: "ยังไม่พร้อม ขึ้นไปก่อน", next: MZ },
   ]),
   dialog(`qd_${Q_FINGER}_envoy`, [
     tell("ในดงเหมย เงาคนในชุดม่วงยืนขวางทาง กลิ่นธูปลัทธิตะวันจันทราโชยมา"),
-    say("ทูตเงา", "นายท่านเหรินสั่งไว้ ใครรู้ว่าคุกว่าง ต้องปิดปากให้หมด"),
+    say("ทูตเงา", "นายท่านตู้สั่งไว้ ใครรู้ว่าคุกว่าง ต้องปิดปากให้หมด"),
     say("ทูตเงา", "ส่วนเจ้าคนเล่นหมาก ข้าฝากฝ่ามือดำไว้ที่ไหล่เขาแล้ว อีกสามวันก็จบ"),
   ], [
     { text: "สู้กับทูตเงา", next: MZ,
@@ -872,14 +872,14 @@ const scenes: DialogScene[] = [
   dialog(`qd_${Q_FINGER}_won`, [
     tell("ทูตเงาล้มลงในกองกลีบเหมย ก่อนหายใจเฮือกสุดท้ายเขาหัวเราะ"),
     say("ทูตเงา", "ฝ่ามือดำ... ต้องใช้บัวหิมะเท่านั้น... ขอให้หาทัน"),
-    tell("เจ้ารีบกลับไปที่ศาลา เฮยไป๋จื่อนั่งซีดเผือด ไหล่ดำเป็นรอยมือ เขาเห็นจดหมายในมือเจ้าแล้วก้มหน้า"),
+    tell("เจ้ารีบกลับไปที่ศาลา ชิวผิงจื่อนั่งซีดเผือด ไหล่ดำเป็นรอยมือ เขาเห็นจดหมายในมือเจ้าแล้วก้มหน้า"),
     say(HEIBAI_N, "ข้าโลภ ข้าอยากได้วิชาของเขาจนยอมหลอกเจ้า... แต่เจ้ายังกลับมาช่วยข้า"),
   ], [{ text: "ไปหาบัวหิมะ", next: MZ, effects: [{ t: "advanceQuest", questId: Q_FINGER }] }]),
   dialog(`qd_${Q_FINGER}_lost`, [
     tell("เจ้าหนีรอดออกมาจากดงเหมยได้อย่างหวุดหวิด เงาม่วงยังวนเวียนอยู่ในนั้น"),
   ]),
   complete(Q_FINGER, MZ, [
-    tell("บัวหิมะต้มจนน้ำใส รอยดำบนไหล่เฮยไป๋จื่อค่อย ๆ จางลง"),
+    tell("บัวหิมะต้มจนน้ำใส รอยดำบนไหล่ชิวผิงจื่อค่อย ๆ จางลง"),
     say(HEIBAI_N, "หมากทั้งชีวิตของข้า ข้ามองข้ามเม็ดเดียว คือใจคนที่ช่วยข้าโดยไม่หวังอะไร"),
     say(HEIBAI_N, "ดัชนีเอกสุริยัน รวมปราณทั้งร่างไว้ที่ปลายนิ้วเดียว จี้ให้ตรงจุด ศัตรูจะมองไม่เห็นทาง"),
     say(HEIBAI_N, "ใช้มันวางหมากที่ถูกต้อง อย่าใช้มันอย่างที่ข้าเกือบใช้"),
@@ -899,8 +899,8 @@ const scenes: DialogScene[] = [
   // ═══ villa_fuwei ══════════════════════════════════════════════════
   dialog(`npc_${LINZ}_talk`, [
     tell("ชายวัยกลางคนหน้าตาอิ่มเอิบยืนใต้ธงสิงห์ ยิ้มต้อนรับเหมือนต้อนรับลูกค้ารายใหญ่"),
-    say(LINZ_N, "ยินดีต้อนรับสู่สำนักคุ้มกันฝูเวย! ส่งของสิบเมือง ไม่เคยหายสักหีบ"),
-    say(LINZ_N, "ปู่ของข้า หลินเหยวียนถู ขี่ม้าขาวตัวเดียวสร้างชื่อนี้ขึ้นมา ข้าแค่รักษาไว้"),
+    say(LINZ_N, "ยินดีต้อนรับสู่สำนักคุ้มกันเจิ้นเวย! ส่งของสิบเมือง ไม่เคยหายสักหีบ"),
+    say(LINZ_N, "ปู่ของข้า เฉาเทียนถู ขี่ม้าขาวตัวเดียวสร้างชื่อนี้ขึ้นมา ข้าแค่รักษาไว้"),
     say(LINZ_N, "ความลับของการคุ้มกันคือ เพื่อนมากกว่าศัตรู ข้าจ่ายเงินให้โจรทุกสายจนพวกมันโค้งให้ธงข้า"),
   ], [
     { text: "แล้ววิชาประจำตระกูลล่ะ", next: `npc_${LINZ}_sword` },
@@ -908,7 +908,7 @@ const scenes: DialogScene[] = [
     { text: "ลาก่อน", next: FW },
   ]),
   dialog(`npc_${LINZ}_sword`, [
-    say(LINZ_N, "กระบี่ขับมารของตระกูลหลิน! ...ข้าฝึกมาทั้งชีวิต แต่ไม่รู้ทำไมมันไม่เคยเก่งเหมือนที่ปู่ใช้"),
+    say(LINZ_N, "กระบี่ขับมารของตระกูลเฉา! ...ข้าฝึกมาทั้งชีวิต แต่ไม่รู้ทำไมมันไม่เคยเก่งเหมือนที่ปู่ใช้"),
     say(LINZ_N, "มีคนจากเสฉวนมาถามถึงมันบ่อย ๆ ข้าก็ตอบตามจริงว่าไม่มีอะไรลับ"),
     tell("เขาหัวเราะ แต่ตาไม่หัวเราะด้วย"),
   ]),
@@ -955,20 +955,20 @@ const scenes: DialogScene[] = [
     say(PING_N, "แส้ของข้าสะบัดสองครั้งเร็วจนเหมือนครั้งเดียว ครูฝึกม้าของข้ายังทึ่ง"),
   ], "ได้ จะหาเนื้อมาให้", "ไปตลาดเองสิ"),
   complete(Q_WHIP, FW, [
-    tell("สุนัขสามตัวกระโจนใส่เนื้อ หลินผิงจือหัวเราะชอบใจ"),
+    tell("สุนัขสามตัวกระโจนใส่เนื้อ เฉาเหวินจือหัวเราะชอบใจ"),
     say(PING_N, "ดูนะ ข้อมือหลวม ๆ สะบัดออก แล้วดึงกลับก่อนปลายแส้จะสุด"),
     tell("เพียะ! เพียะ! ใบไม้สองใบขาดกลางอากาศ"),
     say(PING_N, "เห็นไหม! ข้าบอกแล้วว่าข้าเก่ง อย่าบอกพ่อนะว่าข้าสอนคนนอก"),
   ], "รับวิชาแส้เบื้องต้น"),
   offer(Q_HORSE, FW, [
     say(LINZ_N, "โจรเส้นทางกลุ่มนี้ไม่รับเงิน ไม่รับเหล้า ไม่รับมิตรภาพ รับแต่หีบของข้า"),
-    say(LINZ_N, "ช่วยกวาดล้างให้สักสามคน แล้วปักธงสิงห์คืนหน้าประตู ให้ทุกคนรู้ว่าฝูเวยยังอยู่"),
+    say(LINZ_N, "ช่วยกวาดล้างให้สักสามคน แล้วปักธงสิงห์คืนหน้าประตู ให้ทุกคนรู้ว่าเจิ้นเวยยังอยู่"),
     say(LINZ_N, "ปู่ของข้าขี่ม้าขาวคุ้มกันเกวียนพันลี้ ไม่เคยเหนื่อย เพราะเขาฝึกลมปราณม้าขาว"),
     say(LINZ_N, "ข้าจะสอนให้ ปราณนี้ช่วยให้ฟื้นตัวเองได้กลางศึก เหมาะกับคนที่ต้องเดินทางไกล"),
   ], "รับงานกวาดล้างโจร", "ข้ายังไม่ว่าง"),
   complete(Q_HORSE, FW, [
     say(LINZ_N, "ธงสิงห์โบกสะบัดอีกครั้ง! ขอบคุณ ขอบคุณจริง ๆ"),
-    tell("หลินเจิ้นหนานพาเจ้าไปที่คอกม้า ม้าขาวแก่ตัวหนึ่งยืนสงบอยู่ท้ายคอก"),
+    tell("เฉาหย่งอันพาเจ้าไปที่คอกม้า ม้าขาวแก่ตัวหนึ่งยืนสงบอยู่ท้ายคอก"),
     say(LINZ_N, "หายใจตามจังหวะม้าวิ่ง สี่ก้าวเข้า สี่ก้าวออก เวลาโดนตี ปราณจะไหลกลับมาเติมแผลเอง"),
     say(LINZ_N, "อย่างน้อยวิชานี้ข้าก็ฝึกสำเร็จ ไม่เหมือนกระบี่นั่น ฮ่า ๆ"),
   ], "รับลมปราณม้าขาว"),
@@ -990,21 +990,21 @@ const scenes: DialogScene[] = [
   ], "รับสืบเรื่องนี้", "เรื่องนี้ใหญ่เกินไป"),
   dialog(`qd_${Q_DRAGON}_luo`, [
     tell("รอยเท้ารองเท้าฟางพาไปหลังกำแพง ชายหนุ่มชุดเขียวคนหนึ่งยืนรออยู่อย่างไม่ทุกข์ร้อน"),
-    say("ลั่วเหรินเจี๋ย", "ข้าคือลั่วเหรินเจี๋ย หนึ่งในสี่ยอดฝีมือแห่งชิงเฉิง"),
-    say("ลั่วเหรินเจี๋ย", "อาจารย์ข้าอยากรู้ว่าตำรากระบี่ขับมารของตระกูลหลินซ่อนอยู่ที่ไหน ม้าสามตัวคือคำทักทาย คราวหน้าจะเป็นคน"),
+    say("หยวนเหรินเจี๋ย", "ข้าคือหยวนเหรินเจี๋ย หนึ่งในสี่ยอดฝีมือแห่งชิงเฉิง"),
+    say("หยวนเหรินเจี๋ย", "อาจารย์ข้าอยากรู้ว่าตำรากระบี่ขับมารของตระกูลเฉาซ่อนอยู่ที่ไหน ม้าสามตัวคือคำทักทาย คราวหน้าจะเป็นคน"),
   ], [
-    { text: "สู้กับลั่วเหรินเจี๋ย", next: FW,
+    { text: "สู้กับหยวนเหรินเจี๋ย", next: FW,
       effects: [{ t: "triggerBattle", opponentId: FOE_LUO, onWin: `qd_${Q_DRAGON}_won`, onLose: `qd_${Q_DRAGON}_lost` }] },
     { text: "ถอยไปตั้งหลัก", next: FW },
   ]),
   dialog(`qd_${Q_DRAGON}_won`, [
-    tell("ลั่วเหรินเจี๋ยกระโดดข้ามกำแพงหนีไปพร้อมบาดแผล ทิ้งไว้แต่คำขู่"),
+    tell("หยวนเหรินเจี๋ยกระโดดข้ามกำแพงหนีไปพร้อมบาดแผล ทิ้งไว้แต่คำขู่"),
     say(SHI_N, "ชิงเฉิง... ข้ากลัวว่าจะเป็นพวกมัน"),
     say(SHI_N, "นายท่านไม่ยอมเชื่อ แต่ข้าจะเตรียมตัว ทวนเก่าของข้าด้ามผุไปแล้ว หาไม้ศักดิ์สิทธิ์มาให้ข้าสักท่อน"),
     say(SHI_N, "ด้ามทวนประทับมังกรต้องเป็นไม้ที่ฟ้าผ่าไม่ตาย ทวนจึงจะไม่หักกลางศึก"),
   ], [{ text: "ไปหาไม้ศักดิ์สิทธิ์", next: FW, effects: [{ t: "advanceQuest", questId: Q_DRAGON }] }]),
   dialog(`qd_${Q_DRAGON}_lost`, [
-    tell("เจ้าล้มลงหลังกำแพง เมื่อลืมตา ลั่วเหรินเจี๋ยหายไปแล้ว เหลือแต่เสียงหัวเราะเย็นเยียบในสายลม"),
+    tell("เจ้าล้มลงหลังกำแพง เมื่อลืมตา หยวนเหรินเจี๋ยหายไปแล้ว เหลือแต่เสียงหัวเราะเย็นเยียบในสายลม"),
   ]),
   complete(Q_DRAGON, FW, [
     tell("สื่อเปียวโถวสวมหัวทวนเก่าเข้ากับด้ามไม้ศักดิ์สิทธิ์ ตรามังกรบนหัวทวนวาววับ"),
@@ -1019,17 +1019,17 @@ const scenes: DialogScene[] = [
 // ─── Activities ───────────────────────────────────────────────────────
 const activities: ActivityDef[] = [
   { id: "act_chengying_flute", label: "ฟังขลุ่ยหยกริมลำธาร", badge: "rest", icon: "🎶", hours: 2, stamina: 0,
-    description: "2 ชั่วยาม · ฟังเฉิงอิ๋งเป่าขลุ่ย · ฟื้นพลังและบาดแผลเล็กน้อย",
+    description: "2 ชั่วยาม · ฟังซูอิ๋งเยว่เป่าขลุ่ย · ฟื้นพลังและบาดแผลเล็กน้อย",
     place: { locationIds: [CY], cooldownDays: 2, reward: { stamina: 20, heal: 0.15, relationship: { npcId: CHENG, amount: 1 } },
       doneText: "เพลงขลุ่ยจบลงพร้อมแสงสุดท้ายของวัน ใจเจ้าเบาขึ้น" } },
-  { id: "act_chengying_embroider", label: "ช่วยเฉิงอิ๋งปักผ้า", badge: "labor", icon: "🪡", hours: 3, stamina: 10,
-    description: "3 ชั่วยาม · ร้อยด้ายให้เฉิงอิ๋ง · ได้ค่าแรงเล็กน้อย ฝึกความแม่นยำ",
+  { id: "act_chengying_embroider", label: "ช่วยซูอิ๋งเยว่ปักผ้า", badge: "labor", icon: "🪡", hours: 3, stamina: 10,
+    description: "3 ชั่วยาม · ร้อยด้ายให้ซูอิ๋งเยว่ · ได้ค่าแรงเล็กน้อย ฝึกความแม่นยำ",
     place: { locationIds: [CY], cooldownDays: 1, reward: { gold: [20, 40], statXp: "DEX" },
       doneText: "เข็มแทงนิ้วไปสามที แต่ดอกท้อบนผ้างามขึ้นทุกฝีเข็ม" } },
   { id: "act_yanji_grind", label: "บดยาที่ร้านหมอหยาน", badge: "labor", icon: "⚗️", hours: 3, stamina: 12,
-    description: "3 ชั่วยาม · บดสมุนไพรให้หยานจี · ค่าแรงและความรู้เรื่องยา",
+    description: "3 ชั่วยาม · บดสมุนไพรให้ฉีเหลียง · ค่าแรงและความรู้เรื่องยา",
     place: { locationIds: [YJ], cooldownDays: 1, reward: { gold: [25, 45], statXp: "INT", item: { itemId: "herb", count: 1, chance: 0.3 } },
-      doneText: "หยานจีนับเงินให้สองรอบ — เจ้านับเองอีกรอบ ครบพอดี" } },
+      doneText: "ฉีเหลียงนับเงินให้สองรอบ — เจ้านับเองอีกรอบ ครบพอดี" } },
   { id: "act_beichou_spear", label: "แทงทวนใส่หุ่นฟาง", badge: "practice", icon: "🔱", hours: 2, stamina: 15,
     description: "2 ชั่วยาม · ฝึกทวนตามที่เป่ยฉิวตะโกนสั่ง · ฝึกพละกำลัง",
     place: { locationIds: [BC], cooldownDays: 1, reward: { wExp: 15, statXp: "STR" },
@@ -1041,13 +1041,13 @@ const activities: ActivityDef[] = [
   { id: "act_meizhuang_tea", label: "จิบชาดอกเหมยในศาลา", badge: "rest", icon: "🍵", hours: 2, stamina: 0,
     description: "2 ชั่วยาม · 10 ตำลึง · ชาดอกเหมยกับเสียงพิณไกล ๆ · ฟื้นพลังและบาดแผล",
     place: { locationIds: [MZ], cooldownDays: 1, costGold: 10, reward: { stamina: 30, heal: 0.25 },
-      doneText: "ชากลิ่นเหมยอุ่นทั่วอก เสียงพิณของหวงจงกงลอยมาจากศาลาฝั่งตรงข้าม" } },
+      doneText: "ชากลิ่นเหมยอุ่นทั่วอก เสียงพิณของเหลียงอิ้นกงลอยมาจากศาลาฝั่งตรงข้าม" } },
   { id: "act_meizhuang_go", label: "เดินหมากกับพ่อบ้านติง", badge: "dice", icon: "⚫", hours: 2, stamina: 5,
     description: "2 ชั่วยาม · หมากล้อมหนึ่งกระดาน · ฝึกสติปัญญา",
     place: { locationIds: [MZ], cooldownDays: 1, reward: { wExp: 10, statXp: "INT", relationship: { npcId: DING, amount: 1 } },
       doneText: "พ่อบ้านติงแพ้อย่างสุภาพ — เจ้าสงสัยว่าเขาจงใจ" } },
   { id: "act_fuwei_cart", label: "ช่วยขนหีบขึ้นเกวียน", badge: "labor", icon: "📦", hours: 3, stamina: 18,
-    description: "3 ชั่วยาม · ขนหีบสินค้าให้สำนักคุ้มกันฝูเวย · ค่าแรงดี ฝึกพละกำลัง",
+    description: "3 ชั่วยาม · ขนหีบสินค้าให้สำนักคุ้มกันเจิ้นเวย · ค่าแรงดี ฝึกพละกำลัง",
     place: { locationIds: [FW], cooldownDays: 1, reward: { gold: [30, 55], statXp: "STR", relationship: { npcId: SHI, amount: 1 } },
       doneText: "หีบหนักจนหลังแอ่น สื่อเปียวโถวตะโกนนับ \"สิบเจ็ด! สิบแปด!\" แล้วจ่ายค่าแรงเต็ม" } },
 ];

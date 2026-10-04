@@ -10,7 +10,7 @@ export const QUESTS_SONGSHAN: readonly QuestDef[] = [
   {
     id: "qst_songshan_disciple_intro",
     name: "ขอเข้าเป็นศิษย์ซงซาน",
-    description: "อาจารย์ใหญ่จั่วเหลิงฉานปกครองซงซานด้วยกฎเหล็ก — ผู้ใดต้องการเข้าสำนักต้องถวายเหล็กดิบ ๓ ก้อนสำหรับหลอมดาบฝึก และค่าเข้าสำนัก ๕๐๐ ทอง",
+    description: "อาจารย์ใหญ่เกาซงเหยียนปกครองซงซานด้วยกฎเหล็ก — ผู้ใดต้องการเข้าสำนักต้องถวายเหล็กดิบ ๓ ก้อนสำหรับหลอมดาบฝึก และค่าเข้าสำนัก ๕๐๐ ทอง",
     briefSummary: "จ่ายค่าเข้าสำนัก 500 ทอง + ส่งเหล็กดิบ 3 ก้อน เข้าเป็นศิษย์ซงซานขั้นที่ 9",
     type: "side",
     giverNpcId: "sect_songshan_master_zuolengchan",
@@ -35,7 +35,7 @@ export const QUESTS_SONGSHAN: readonly QuestDef[] = [
       },
       {
         id: "return_to_master",
-        description: "นำของและเงินค่าเข้าสำนักไปถวายอาจารย์ใหญ่จั่วเหลิงฉาน",
+        description: "นำของและเงินค่าเข้าสำนักไปถวายอาจารย์ใหญ่เกาซงเหยียน",
       },
     ],
     // Gold deduction + iron deduction happen in the complete-scene's choice
@@ -67,7 +67,7 @@ export const QUESTS_SONGSHAN: readonly QuestDef[] = [
       },
       {
         id: "report",
-        description: "กลับไปรายงานอาจารย์ใหญ่จั่วเหลิงฉาน",
+        description: "กลับไปรายงานอาจารย์ใหญ่เกาซงเหยียน",
       },
     ],
     rewards: [
@@ -95,7 +95,7 @@ export const QUESTS_SONGSHAN: readonly QuestDef[] = [
       },
       {
         id: "deliver",
-        description: "ส่งเหล็กให้อาจารย์ใหญ่จั่วเหลิงฉาน",
+        description: "ส่งเหล็กให้อาจารย์ใหญ่เกาซงเหยียน",
       },
     ],
     rewards: [
@@ -130,7 +130,7 @@ export const QUESTS_SONGSHAN: readonly QuestDef[] = [
   {
     id: "qst_songshan_art_pillar",
     name: "บททดสอบก่อนสืบทอด: วิชาลึกลับ",
-    description: "อาจารย์ใหญ่จั่วเหลิงฉานจะทดสอบก่อนเปิดตำราวิชาลึกลับให้ศิษย์ที่พิสูจน์ทั้งดาบและจิตใจอย่างหนักแน่น — ผ่านการประลองกับหัวหน้าโจรชั้นสูงและการรวบรวมเหล็กพิเศษ (ผ่านแล้วจึงรับภารกิจสืบทอดวิชาลึกลับได้)",
+    description: "อาจารย์ใหญ่เกาซงเหยียนจะทดสอบก่อนเปิดตำราวิชาลึกลับให้ศิษย์ที่พิสูจน์ทั้งดาบและจิตใจอย่างหนักแน่น — ผ่านการประลองกับหัวหน้าโจรชั้นสูงและการรวบรวมเหล็กพิเศษ (ผ่านแล้วจึงรับภารกิจสืบทอดวิชาลึกลับได้)",
     briefSummary: "บททดสอบ — เปิดทางสู่การสืบทอดวิชาลึกลับ",
     type: "side",
     sectId: "songshan",
@@ -157,7 +157,7 @@ export const QUESTS_SONGSHAN: readonly QuestDef[] = [
       },
       {
         id: "return_art",
-        description: "กลับไปรายงานผลต่ออาจารย์ใหญ่จั่วเหลิงฉาน",
+        description: "กลับไปรายงานผลต่ออาจารย์ใหญ่เกาซงเหยียน",
       },
     ],
     rewards: [
@@ -172,7 +172,7 @@ export const QUESTS_SONGSHAN: readonly QuestDef[] = [
   {
     id: "qst_songshan_redemption",
     name: "ไถ่บาปต่อซงซาน",
-    description: "เจ้าทรยศซงซานกลับมาขออภัย — อาจารย์ใหญ่จั่วเหลิงฉานทดสอบความจริงใจเจ้าด้วยภารกิจหนัก ปราบหัวหน้าโจร 5 คนและนำเหล็กดิบ 5 ชิ้นถวาย หากผ่าน ความเป็นทรยศจะถูกล้างเป็น \"ลาออก\" — นักล่าจะหยุดตามล่า แต่วิชาจะถูกแช่แข็ง",
+    description: "เจ้าทรยศซงซานกลับมาขออภัย — อาจารย์ใหญ่เกาซงเหยียนทดสอบความจริงใจเจ้าด้วยภารกิจหนัก ปราบหัวหน้าโจร 5 คนและนำเหล็กดิบ 5 ชิ้นถวาย หากผ่าน ความเป็นทรยศจะถูกล้างเป็น \"ลาออก\" — นักล่าจะหยุดตามล่า แต่วิชาจะถูกแช่แข็ง",
     briefSummary: "ไถ่บาปต่อซงซาน — ปราบหัวหน้าโจร 5 + ส่งเหล็ก 5 ชิ้น",
     type: "side",
     sectId: "songshan",
@@ -181,7 +181,7 @@ export const QUESTS_SONGSHAN: readonly QuestDef[] = [
     stages: [
       { id: "trial_kill", description: "ปราบหัวหน้าโจร (bandit_chief) 5 คน เพื่อพิสูจน์ใจ", autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 5 } },
       { id: "trial_offering", description: "นำเหล็กดิบ 5 ชิ้นถวาย", autoAdvance: { t: "hasItem", itemId: "iron_ore", count: 5 } },
-      { id: "return_to_master", description: "กลับไปขออภัยต่ออาจารย์ใหญ่จั่วเหลิงฉาน" },
+      { id: "return_to_master", description: "กลับไปขออภัยต่ออาจารย์ใหญ่เกาซงเหยียน" },
     ],
     rewards: [
       { t: "wExp", amount: 300 },

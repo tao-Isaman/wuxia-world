@@ -7,7 +7,7 @@ import type { NpcDef } from "../../../types";
 export const NPCS_SONGSHAN: readonly NpcDef[] = [
   {
     id: "sect_songshan_master_zuolengchan",
-    name: "อาจารย์ใหญ่จั่วเหลิงฉาน",
+    name: "อาจารย์ใหญ่เกาซงเหยียน",
     description: "อาจารย์ใหญ่แห่งซงซาน · ผู้ปกครองศาสตร์ดาบยอดเขากลาง · ผู้คนเรียกขานว่า \"ดาบเหล็กเย็นแห่งซงซาน\" · ใจเย็นแต่หนักแน่น มืออาชีพในการปกครอง",
     locationIds: ["sect_songshan"],
     dialogSceneId: "npc_sect_songshan_master_zuolengchan_talk",
@@ -34,8 +34,8 @@ export const NPCS_SONGSHAN: readonly NpcDef[] = [
 
   {
     id: "sect_songshan_vice_lubai",
-    name: "รองอาจารย์ลู่ไป๋",
-    description: "รองอาจารย์แห่งซงซาน · มือขวาของอาจารย์จั่วเหลิงฉาน · ผู้บัญชาการห้าทวารปกติ · ดาบหนักหน่วงดั่งเสาเหล็ก",
+    name: "รองอาจารย์เผิงอวิ๋นไห่",
+    description: "รองอาจารย์แห่งซงซาน · มือขวาของอาจารย์เกาซงเหยียน · ผู้บัญชาการห้าทวารปกติ · ดาบหนักหน่วงดั่งเสาเหล็ก",
     locationIds: ["sect_songshan"],
     dialogSceneId: "npc_sect_songshan_vice_lubai_talk",
     sparOpponentId: "spar_songshan_vice_lubai",
@@ -51,7 +51,7 @@ export const NPCS_SONGSHAN: readonly NpcDef[] = [
 
   {
     id: "sect_songshan_elder_dingmian",
-    name: "อาจารย์อาวุโสติงเหมียน",
+    name: "อาจารย์อาวุโสเจิ้งซือหราน",
     description: "อาจารย์อาวุโสแห่งซงซาน · ผู้สอนเพลงดาบแกนหินเสาเขา · ดุดันและเข้มงวดต่อศิษย์ · นิยมประลองกับผู้กล้า",
     locationIds: ["sect_songshan"],
     dialogSceneId: "npc_sect_songshan_elder_dingmian_talk",

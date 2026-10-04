@@ -6,6 +6,14 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-04
 
+### The story reworded for the timeline (20 years after มังกรหยก ภาค 3)
+
+- **Every saga, lineage quest and lore text now places the legend in recent history**: the siege of ยอดกวงเม้ง and วัดหมื่นสุข "ยี่สิบกว่าปีก่อน", Ice-Fire Island and the master's 100th birthday "สี่สิบกว่าปีก่อน", the Condor-era past still "ร้อยกว่าปีก่อน". Great-grandchildren of the legend became children and grandchildren, elders became witnesses, relics lost "a century" were lost twenty years. เตียซำฮง lives in seclusion (อู่ตัง's yearly rite is now his birthday); เตียบ่อกี้, จิวจี้เยียก and เจียซุ่น are alive and withdrawn. A lore rumor naming a later novel's hero got an invented name. About 600 lines across 19 files; the timeline table is in [story-writing.md](story-writing.md#timeline-and-novel-characters).
+
+### NPCs renamed to fit the timeline (20 years after มังกรหยก ภาค 3)
+
+- **41 NPCs that were characters of other Jin Yong novels now have invented names**: the กระบี่เย้ยยุทธจักร cast (จั่วเหลิงฉาน, เหรินหวัวสิง, โม่ต้า, ติ่งอี้, เถียนป๋อกวง, the four masters of the plum manor, หลินผิงจือ…), the Condor and Demi-Gods characters shown alive (ฮ่วงเอี้ยะซือ, อิดเต็ง, หม่ายวี่, ชิวฉู่จี้, อู๋หยาจื่อ, จิ่วม่อจื้อ…), the Fox Volant households (ฮูเฝย์, เหมียวเหรินเฟิง…) and เฉิงคุน / เฉินโหย่วเลี่ยง. Their houses, family names, place labels and Chinese subtitles follow; the เกาะดอกท้อ master is now ฮ่วงเอี้ยะซือ's great-grandson. Ids are unchanged. Rule and list: [story-writing.md](story-writing.md#timeline-and-novel-characters).
+
 ### Fights on roads keep the way back; the guide arrow can turn back
 
 - **After a fight on a road the hero can walk back again.** A walk tick or a roaming foe pinned the road itself as `lastLocationId`, so the road's ย้อนกลับ exit vanished. They no longer do (the fight returns through `returnSceneId`), and the exit falls back to the road's origin for saves that were already pinned (`routeBackTarget`).

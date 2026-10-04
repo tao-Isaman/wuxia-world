@@ -33,7 +33,7 @@ export const NPCS_MING: readonly NpcDef[] = [
 
   {
     id: "sect_sunmoon_vice_renwoxing",
-    name: "รองเจ้าสำนักเหรินหวัวสิง",
+    name: "รองเจ้าสำนักตู้เทียนหาน",
     description: "รองเจ้าสำนักของพรรคตะวันจันทรา · ฝึกพลังดูดดาวจนเชี่ยวชาญ · นิสัยรุนแรงแต่ภักดี",
     locationIds: ["sect_ming"],
     dialogSceneId: "npc_sect_sunmoon_vice_renwoxing_talk",
@@ -50,7 +50,7 @@ export const NPCS_MING: readonly NpcDef[] = [
 
   {
     id: "sect_sunmoon_sun_elder_zuolengchan",
-    name: "ผู้อาวุโสตะวันจั่วเหลิงฉัน",
+    name: "ผู้อาวุโสตะวันซางเหยียนเลี่ย",
     description: "ผู้อาวุโสฝ่ายตะวัน (yang) ของพรรค · เชี่ยวชาญพลังกายสุริยันและเพลิงตะวัน · พูดกระชับและเด็ดขาด",
     locationIds: ["sect_ming"],
     dialogSceneId: "npc_sect_sunmoon_sun_elder_zuolengchan_talk",
@@ -66,7 +66,7 @@ export const NPCS_MING: readonly NpcDef[] = [
 
   {
     id: "sect_sunmoon_moon_elder_xianggwentian",
-    name: "ผู้อาวุโสจันทราเสี่ยงเหวินเทียน",
+    name: "ผู้อาวุโสจันทราฉินเยว่หลิง",
     description: "ผู้อาวุโสฝ่ายจันทรา (yin) ของพรรค · เชี่ยวชาญพลังกายจันทราและร้อยจันทรา · เงียบขรึมและลึกซึ้ง",
     locationIds: ["sect_ming"],
     sparOpponentId: "spar_sunmoon_xianggwentian",
@@ -98,7 +98,7 @@ export const NPCS_MING: readonly NpcDef[] = [
 
   {
     id: "sect_sunmoon_head_disciple_yilin",
-    name: "หัวหน้าศิษย์อี้หลิน",
+    name: "หัวหน้าศิษย์เยี่ยนชิว",
     description: "หัวหน้ารุ่นพี่ของศิษย์พรรค · เชี่ยวชาญพลังกายสุริยันและเพลิงตะวัน · นำคำสั่งจากเจ้าสำนัก",
     locationIds: ["sect_ming"],
     sparOpponentId: "spar_sunmoon_yilin",
@@ -113,7 +113,7 @@ export const NPCS_MING: readonly NpcDef[] = [
 
   {
     id: "sect_sunmoon_disciple_lanfenghuang",
-    name: "ศิษย์หลานเฟิงหวง",
+    name: "ศิษย์ไต้ซิ่วเหอ",
     description: "ศิษย์รุ่นใหม่ของพรรคตะวันจันทรา · ฝึกพลังเพลิงตะวันและเพลิงปรากฏการณ์ · ใจร้อนแต่ขยัน",
     locationIds: ["sect_ming"],
     sparOpponentId: "spar_sunmoon_lanfenghuang",

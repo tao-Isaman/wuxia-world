@@ -13,7 +13,7 @@ import type { NpcDef } from "../../../types";
 export const NPCS_HENGSHAN_NORTH: readonly NpcDef[] = [
   {
     id: "sect_hengshan_north_abbess_dingyi",
-    name: "ภิกษุณีติ่งอี้",
+    name: "ภิกษุณีเสวียนเยว่",
     description:
       "เจ้าสำนักเหิงซานเหนือ · ใจเย็นดั่งหิมะยอดเขา ดาบหนักดั่งระฆังธรรม · ผู้สืบทอดดาบกระจกธรรมและฝึกศิษย์หญิงทั่วยุทธจักร",
     locationIds: ["sect_hengshan_north"],
@@ -43,7 +43,7 @@ export const NPCS_HENGSHAN_NORTH: readonly NpcDef[] = [
     id: "sect_hengshan_north_vice_yihe",
     name: "ภิกษุณีอี๋เหอ",
     description:
-      "รองเจ้าสำนักเหิงซานเหนือ · เคียงคู่ภิกษุณีติ่งอี้นานนับสิบปี · กระบี่ปกครองธรรมหนักแน่น · เคร่งระเบียบ พูดน้อย",
+      "รองเจ้าสำนักเหิงซานเหนือ · เคียงคู่ภิกษุณีเสวียนเยว่นานนับสิบปี · กระบี่ปกครองธรรมหนักแน่น · เคร่งระเบียบ พูดน้อย",
     locationIds: ["sect_hengshan_north"],
     dialogSceneId: "npc_sect_hengshan_north_vice_yihe_talk",
     sparOpponentId: "spar_hengshan_north_yihe",
@@ -89,7 +89,7 @@ export const NPCS_HENGSHAN_NORTH: readonly NpcDef[] = [
 
   {
     id: "sect_hengshan_north_nun2_yilin",
-    name: "นักพรตอี๋หลิน",
+    name: "นักพรตหลิงซู่",
     description:
       "ภิกษุณีรุ่นเยาว์ของเหิงซานเหนือ · ใสซื่อ ใจดี ยังไม่เก่งดาบเท่ารุ่นพี่ · มักช่วยกวาดลานวัด",
     locationIds: ["sect_hengshan_north"],

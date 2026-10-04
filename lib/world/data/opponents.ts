@@ -635,12 +635,12 @@ export const OPPONENTS: readonly OpponentDef[] = [
   // Ascetic Daoist sect with yang/hard sword + fist identity. Master and
   // vice cap at T3 (matches Huashan tier — strong but not legendary).
   // The "sun" sub-line drives crit/stack ATK pressure.
-  { id: "spar_quanzhen_master_chongyang", name: "อาจารย์ใหญ่ฉงหยาง", ti: 3, category: "human",
+  { id: "spar_quanzhen_master_chongyang", name: "อาจารย์ใหญ่หลิงเจิน", ti: 3, category: "human",
     drops: [...DROPS_T3,
       { itemId: "paper", weight: 4 }, { itemId: "ink", weight: 4 },
       { itemId: "ginseng", weight: 3 }, { itemId: "jade", weight: 3 },
       { itemId: "ancient_coin", weight: 2 }, { itemId: "wood_sacred", weight: 2 }],
-    build: () => build("อาจารย์ใหญ่ฉงหยาง", 3, {
+    build: () => build("อาจารย์ใหญ่หลิงเจิน", 3, {
       stats: { STR: 14, POW: 14, INT: 10, VIT: 10, DEX: 8 },
       artId: "t3_qz_sun", artLevel: 8,
       skillIds: ["qz_sun_sword", "qz_sun_fist", "qzjf", "qz_punch"],
@@ -649,11 +649,11 @@ export const OPPONENTS: readonly OpponentDef[] = [
       learnedArtIds: ["t1_qz_horse"],
     }) },
 
-  { id: "spar_quanzhen_mayu", name: "รองอาจารย์หม่ายวี่", ti: 3, category: "human",
+  { id: "spar_quanzhen_mayu", name: "รองอาจารย์เติ้งหยวนเจิน", ti: 3, category: "human",
     drops: [...DROPS_T3,
       { itemId: "paper", weight: 3 }, { itemId: "ink", weight: 3 },
       { itemId: "jade", weight: 2 }, { itemId: "ancient_coin", weight: 2 }],
-    build: () => build("รองอาจารย์หม่ายวี่", 3, {
+    build: () => build("รองอาจารย์เติ้งหยวนเจิน", 3, {
       stats: { STR: 12, POW: 10, VIT: 10, DEX: 8 },
       artId: "qzzq", artLevel: 8,
       skillIds: ["qz_sun_sword", "qzjf", "qz_hot_sword", "qz_heavy_sword"],
@@ -661,10 +661,10 @@ export const OPPONENTS: readonly OpponentDef[] = [
       artLevels: { qzzq: 8, t1_qz_horse: 7 },
     }) },
 
-  { id: "spar_quanzhen_qiuchuji", name: "อาจารย์ดาบชิวฉู่จี้", ti: 2, category: "human",
+  { id: "spar_quanzhen_qiuchuji", name: "อาจารย์ดาบกู่จื้อชิง", ti: 2, category: "human",
     drops: [...DROPS_T2,
       { itemId: "iron_ore", weight: 2 }, { itemId: "paper", weight: 2 }],
-    build: () => build("อาจารย์ดาบชิวฉู่จี้", 2, {
+    build: () => build("อาจารย์ดาบกู่จื้อชิง", 2, {
       stats: { STR: 9, POW: 7, DEX: 6 },
       artId: "qzzq", artLevel: 6,
       skillIds: ["qz_sun_sword", "qz_hot_sword", "qzjf"],
@@ -695,12 +695,12 @@ export const OPPONENTS: readonly OpponentDef[] = [
   // ─── ซงซาน — sect leadership (T1-T3) ──────────────────────────────
   // Heavy iron-sword sect of the central peak. Master + vice cap at T3.
   // Kit leans on stack_atk + def-break — sustained crushing pressure.
-  { id: "spar_songshan_master_zuolengchan", name: "อาจารย์ใหญ่จั่วเหลิงฉาน", ti: 3, category: "human",
+  { id: "spar_songshan_master_zuolengchan", name: "อาจารย์ใหญ่เกาซงเหยียน", ti: 3, category: "human",
     drops: [...DROPS_T3,
       { itemId: "iron_ore", weight: 4 }, { itemId: "iron_ingot", weight: 3 },
       { itemId: "wood_hard", weight: 2 }, { itemId: "ancient_coin", weight: 2 },
       { itemId: "mithril_ore", weight: 1 }],
-    build: () => build("อาจารย์ใหญ่จั่วเหลิงฉาน", 3, {
+    build: () => build("อาจารย์ใหญ่เกาซงเหยียน", 3, {
       stats: { STR: 16, DEX: 12, POW: 10, VIT: 10, AGI: 8 },
       artId: "t3_ssh_pillar", artLevel: 8,
       skillIds: ["ssh_song_pillar", "ssh_central_blade", "ssh_basic_sword"],
@@ -709,11 +709,11 @@ export const OPPONENTS: readonly OpponentDef[] = [
       learnedArtIds: ["t1_ssh_iron"],
     }) },
 
-  { id: "spar_songshan_vice_lubai", name: "รองอาจารย์ลู่ไป๋", ti: 3, category: "human",
+  { id: "spar_songshan_vice_lubai", name: "รองอาจารย์เผิงอวิ๋นไห่", ti: 3, category: "human",
     drops: [...DROPS_T3,
       { itemId: "iron_ore", weight: 3 }, { itemId: "iron_ingot", weight: 2 },
       { itemId: "ancient_coin", weight: 2 }],
-    build: () => build("รองอาจารย์ลู่ไป๋", 3, {
+    build: () => build("รองอาจารย์เผิงอวิ๋นไห่", 3, {
       stats: { STR: 13, DEX: 10, POW: 8, VIT: 8 },
       artId: "t2_ssh_root", artLevel: 7,
       skillIds: ["ssh_song_pillar", "ssh_central_blade", "ssh_basic_sword"],
@@ -722,10 +722,10 @@ export const OPPONENTS: readonly OpponentDef[] = [
       learnedArtIds: ["t1_ssh_iron"],
     }) },
 
-  { id: "spar_songshan_elder_dingmian", name: "อาจารย์อาวุโสติงเหมียน", ti: 2, category: "human",
+  { id: "spar_songshan_elder_dingmian", name: "อาจารย์อาวุโสเจิ้งซือหราน", ti: 2, category: "human",
     drops: [...DROPS_T2,
       { itemId: "iron_ore", weight: 3 }, { itemId: "wood_hard", weight: 2 }],
-    build: () => build("อาจารย์อาวุโสติงเหมียน", 2, {
+    build: () => build("อาจารย์อาวุโสเจิ้งซือหราน", 2, {
       stats: { STR: 10, DEX: 8, POW: 6, VIT: 6 },
       artId: "t2_ssh_root", artLevel: 5,
       skillIds: ["ssh_central_blade", "ssh_iron_strike", "ssh_basic_sword"],
@@ -761,12 +761,12 @@ export const OPPONENTS: readonly OpponentDef[] = [
   // ─── ไท่ซาน — sect leadership (T1-T3) ─────────────────────────────
   // Eastern peak Daoist sect, yang/external sword styled around the
   // dawn-sun rising. Master Tianmen Daoren caps at T3.
-  { id: "spar_taishan_master_tianmen", name: "เจ้าสำนักเทียนเหมินเต้าเหริน", ti: 3, category: "human",
+  { id: "spar_taishan_master_tianmen", name: "เจ้าสำนักชิงสือเต้าเหริน", ti: 3, category: "human",
     drops: [...DROPS_T3,
       { itemId: "jade", weight: 4 }, { itemId: "iron_ore", weight: 3 },
       { itemId: "ancient_coin", weight: 2 }, { itemId: "wood_hard", weight: 2 },
       { itemId: "mithril_ore", weight: 1 }],
-    build: () => build("เจ้าสำนักเทียนเหมินเต้าเหริน", 3, {
+    build: () => build("เจ้าสำนักชิงสือเต้าเหริน", 3, {
       stats: { STR: 14, DEX: 14, AGI: 10, POW: 8, VIT: 8 },
       artId: "t3_tsh_sun", artLevel: 8,
       skillIds: ["tsh_sun_pierce", "tsh_east_blade", "tsh_basic_sword"],
@@ -829,12 +829,12 @@ export const OPPONENTS: readonly OpponentDef[] = [
   // Yin/soft sword sect themed around AGI + Spd + Eva. Master caps at T3.
   // Kit leans on the disciple-line swift_blade + the t3_hgs_swift art for
   // stacked Spd/Eva pressure.
-  { id: "spar_hengshan_south_master", name: "อาจารย์ใหญ่โม่ต้า", ti: 3, category: "human",
+  { id: "spar_hengshan_south_master", name: "อาจารย์ใหญ่เซี่ยอวิ๋น", ti: 3, category: "human",
     drops: [...DROPS_T3,
       { itemId: "iron_ore", weight: 4 }, { itemId: "wood_hard", weight: 3 },
       { itemId: "jade", weight: 3 }, { itemId: "ancient_coin", weight: 2 },
       { itemId: "mithril_ore", weight: 1 }],
-    build: () => build("อาจารย์ใหญ่โม่ต้า", 3, {
+    build: () => build("อาจารย์ใหญ่เซี่ยอวิ๋น", 3, {
       stats: { AGI: 16, DEX: 14, STR: 10, POW: 8, VIT: 8 },
       artId: "t3_hgs_swift", artLevel: 8,
       skillIds: ["hgs_swift_blade", "hgs_five_peaks", "hgs_basic_sword"],
@@ -843,11 +843,11 @@ export const OPPONENTS: readonly OpponentDef[] = [
       learnedArtIds: ["t1_hgs_step"],
     }) },
 
-  { id: "spar_hengshan_south_vice", name: "รองอาจารย์หลิวเจิ้งเฟิง", ti: 2, category: "human",
+  { id: "spar_hengshan_south_vice", name: "รองอาจารย์ไป๋หมิงหยวน", ti: 2, category: "human",
     drops: [...DROPS_T2,
       { itemId: "iron_ore", weight: 3 }, { itemId: "jade", weight: 2 },
       { itemId: "ancient_coin", weight: 2 }],
-    build: () => build("รองอาจารย์หลิวเจิ้งเฟิง", 2, {
+    build: () => build("รองอาจารย์ไป๋หมิงหยวน", 2, {
       stats: { AGI: 12, DEX: 9, STR: 7, POW: 5 },
       artId: "t2_hgs_cloud", artLevel: 7,
       skillIds: ["hgs_five_peaks", "hgs_dancing_step", "hgs_basic_sword"],
@@ -887,12 +887,12 @@ export const OPPONENTS: readonly OpponentDef[] = [
 
   // ─── เหิงซานเหนือ — Buddhist nun's order (defense + reflect) ───────
   // Abbess Dingyi caps at ti:3 with the T3 mirror art for reflect pressure.
-  { id: "spar_hengshan_north_dingyi", name: "ภิกษุณีติ่งอี้", ti: 3, category: "human",
+  { id: "spar_hengshan_north_dingyi", name: "ภิกษุณีเสวียนเยว่", ti: 3, category: "human",
     drops: [...DROPS_T3,
       { itemId: "paper", weight: 4 }, { itemId: "jade", weight: 3 },
       { itemId: "wood_soft", weight: 3 }, { itemId: "lotus_seed", weight: 2 },
       { itemId: "ancient_coin", weight: 2 }],
-    build: () => build("ภิกษุณีติ่งอี้", 3, {
+    build: () => build("ภิกษุณีเสวียนเยว่", 3, {
       stats: { POW: 12, VIT: 14, DEX: 10, AGI: 8, INT: 4 },
       artId: "t3_hgn_mirror", artLevel: 8,
       skillIds: ["hgn_mirror_blade", "hgn_iron_robe", "hgn_dharma_guard"],
@@ -938,10 +938,10 @@ export const OPPONENTS: readonly OpponentDef[] = [
       artLevels: { t1_hgn_shield: 3 },
     }) },
 
-  { id: "spar_hengshan_north_yilin", name: "นักพรตอี๋หลิน", ti: 1, category: "human",
+  { id: "spar_hengshan_north_yilin", name: "นักพรตหลิงซู่", ti: 1, category: "human",
     drops: [...DROPS_T1,
       { itemId: "paper", weight: 2 }, { itemId: "lotus_seed", weight: 2 }],
-    build: () => build("นักพรตอี๋หลิน", 1, {
+    build: () => build("นักพรตหลิงซู่", 1, {
       stats: { POW: 4, VIT: 5, DEX: 4 },
       artId: "t0_hgn_zen", artLevel: 4,
       skillIds: ["hgn_dharma_guard", "hgn_basic_sword"],
@@ -1308,11 +1308,11 @@ export const OPPONENTS: readonly OpponentDef[] = [
       artLevels: { bmzq: 10, t3_xy_root_poison_qi: 9 },
     }) },
 
-  { id: "spar_xiaoyao_wuyazi", name: "ผู้อาวุโสกระบี่อู๋หยาจื่อ", ti: 4, category: "human",
+  { id: "spar_xiaoyao_wuyazi", name: "ผู้อาวุโสกระบี่ซวีเฟิงจื่อ", ti: 4, category: "human",
     drops: [...DROPS_T4,
       { itemId: "jade", weight: 3 }, { itemId: "paper", weight: 2 },
       { itemId: "ancient_coin", weight: 2 }],
-    build: () => build("ผู้อาวุโสกระบี่อู๋หยาจื่อ", 4, {
+    build: () => build("ผู้อาวุโสกระบี่ซวีเฟิงจื่อ", 4, {
       stats: { POW: 18, INT: 14, DEX: 14, AGI: 12 },
       artId: "t3_xy_seepower", artLevel: 9,
       skillIds: ["yxjf", "xy_demon_wind_sword", "xy_pathless_sword"],
@@ -1354,9 +1354,9 @@ export const OPPONENTS: readonly OpponentDef[] = [
       artLevels: { t1_xy_formless_lesser: 6 },
     }) },
 
-  { id: "spar_xiaoyao_jiumozhi", name: "ศิษย์จิ่วม่อจื้อ", ti: 2, category: "human",
+  { id: "spar_xiaoyao_jiumozhi", name: "ศิษย์ฉีม่อหยาง", ti: 2, category: "human",
     drops: [...DROPS_T2],
-    build: () => build("ศิษย์จิ่วม่อจื้อ", 2, {
+    build: () => build("ศิษย์ฉีม่อหยาง", 2, {
       stats: { POW: 8, INT: 7, DEX: 5 },
       artId: "t1_xy_formless_lesser", artLevel: 5,
       skillIds: ["xy_root_poison_fist", "xy_pathless_sword"],
@@ -1586,11 +1586,11 @@ export const OPPONENTS: readonly OpponentDef[] = [
       learnedArtIds: ["t3_sm_sunscript"],
     }) },
 
-  { id: "spar_sunmoon_renwoxing", name: "รองเจ้าสำนักเหรินหวัวสิง", ti: 4, category: "human",
+  { id: "spar_sunmoon_renwoxing", name: "รองเจ้าสำนักตู้เทียนหาน", ti: 4, category: "human",
     drops: [...DROPS_T4,
       { itemId: "ancient_coin", weight: 4 }, { itemId: "jade", weight: 3 },
       { itemId: "viper_venom", weight: 2 }],
-    build: () => build("รองเจ้าสำนักเหรินหวัวสิง", 4, {
+    build: () => build("รองเจ้าสำนักตู้เทียนหาน", 4, {
       stats: { POW: 22, INT: 16, STR: 10, AGI: 14, VIT: 8 },
       artId: "yxhd", artLevel: 10,
       skillIds: ["mi_firepalm"],
@@ -1598,10 +1598,10 @@ export const OPPONENTS: readonly OpponentDef[] = [
       artLevels: { yxhd: 10, t3_sm_sunmoon: 9, t2_sm_sunbody: 9 },
     }) },
 
-  { id: "spar_sunmoon_zuolengchan", name: "ผู้อาวุโสตะวันจั่วเหลิงฉัน", ti: 4, category: "human",
+  { id: "spar_sunmoon_zuolengchan", name: "ผู้อาวุโสตะวันซางเหยียนเลี่ย", ti: 4, category: "human",
     drops: [...DROPS_T4,
       { itemId: "ancient_coin", weight: 3 }, { itemId: "potion_big", weight: 2 }],
-    build: () => build("ผู้อาวุโสตะวันจั่วเหลิงฉัน", 4, {
+    build: () => build("ผู้อาวุโสตะวันซางเหยียนเลี่ย", 4, {
       stats: { POW: 20, INT: 14, STR: 8, VIT: 10, AGI: 8 },
       artId: "t3_sm_sunmoon", artLevel: 9,
       skillIds: ["mi_firepalm"],
@@ -1609,11 +1609,11 @@ export const OPPONENTS: readonly OpponentDef[] = [
       artLevels: { t3_sm_sunmoon: 9, t2_sm_sunbody: 9, t1_sm_sunfire: 9 },
     }) },
 
-  { id: "spar_sunmoon_xianggwentian", name: "ผู้อาวุโสจันทราเสี่ยงเหวินเทียน", ti: 4, category: "human",
+  { id: "spar_sunmoon_xianggwentian", name: "ผู้อาวุโสจันทราฉินเยว่หลิง", ti: 4, category: "human",
     drops: [...DROPS_T4,
       { itemId: "ancient_coin", weight: 3 }, { itemId: "jade", weight: 2 },
       { itemId: "potion_big", weight: 2 }],
-    build: () => build("ผู้อาวุโสจันทราเสี่ยงเหวินเทียน", 4, {
+    build: () => build("ผู้อาวุโสจันทราฉินเยว่หลิง", 4, {
       stats: { POW: 20, INT: 16, AGI: 12, DEX: 10, VIT: 6 },
       artId: "t3_sm_dualfusion", artLevel: 9,
       skillIds: ["mi_firepalm"],
@@ -1633,10 +1633,10 @@ export const OPPONENTS: readonly OpponentDef[] = [
       artLevels: { t3_sm_dualfusion: 8, t2_sm_sunbody: 7, t2_sm_moonbody: 7 },
     }) },
 
-  { id: "spar_sunmoon_yilin", name: "หัวหน้าศิษย์อี้หลิน", ti: 2, category: "human",
+  { id: "spar_sunmoon_yilin", name: "หัวหน้าศิษย์เยี่ยนชิว", ti: 2, category: "human",
     drops: [...DROPS_T2,
       { itemId: "paper", weight: 3 }, { itemId: "ancient_coin", weight: 2 }],
-    build: () => build("หัวหน้าศิษย์อี้หลิน", 2, {
+    build: () => build("หัวหน้าศิษย์เยี่ยนชิว", 2, {
       stats: { POW: 9, INT: 7, AGI: 5 },
       artId: "t2_sm_sunbody", artLevel: 6,
       skillIds: ["mi_firepalm"],
@@ -1644,10 +1644,10 @@ export const OPPONENTS: readonly OpponentDef[] = [
       artLevels: { t2_sm_sunbody: 6 },
     }) },
 
-  { id: "spar_sunmoon_lanfenghuang", name: "ศิษย์หลานเฟิงหวง", ti: 2, category: "human",
+  { id: "spar_sunmoon_lanfenghuang", name: "ศิษย์ไต้ซิ่วเหอ", ti: 2, category: "human",
     drops: [...DROPS_T2,
       { itemId: "paper", weight: 2 }],
-    build: () => build("ศิษย์หลานเฟิงหวง", 2, {
+    build: () => build("ศิษย์ไต้ซิ่วเหอ", 2, {
       stats: { POW: 8, INT: 6, STR: 4 },
       artId: "t1_sm_sunfire", artLevel: 5,
       skillIds: ["mi_firepalm"],

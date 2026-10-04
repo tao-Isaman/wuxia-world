@@ -7,7 +7,7 @@ import type { NpcDef } from "../../../types";
 export const NPCS_QUANZHEN: readonly NpcDef[] = [
   {
     id: "sect_quanzhen_master_chongyang",
-    name: "อาจารย์ใหญ่ฉงหยาง",
+    name: "อาจารย์ใหญ่หลิงเจิน",
     description: "อาจารย์ใหญ่แห่งฉวนเจิน · ผู้สืบทอดวิชาสุริยันต์และดาบสะกดเเสง · ใจสะอาดและใช้ชีวิตอย่างนักพรต · บุคลิกเรียบง่ายแต่มากด้วยปัญญา",
     locationIds: ["sect_quanzhen"],
     dialogSceneId: "npc_sect_quanzhen_master_chongyang_talk",
@@ -33,8 +33,8 @@ export const NPCS_QUANZHEN: readonly NpcDef[] = [
 
   {
     id: "sect_quanzhen_vice_master_mayu",
-    name: "รองอาจารย์หม่ายวี่",
-    description: "รองอาจารย์ของฉวนเจิน · เคียงข้างอาจารย์ฉงหยางมานานนับสิบปี · ดาบหนักแต่แม่นยำ · พูดน้อยฟังมาก",
+    name: "รองอาจารย์เติ้งหยวนเจิน",
+    description: "รองอาจารย์ของฉวนเจิน · เคียงข้างอาจารย์หลิงเจินมานานนับสิบปี · ดาบหนักแต่แม่นยำ · พูดน้อยฟังมาก",
     locationIds: ["sect_quanzhen"],
     dialogSceneId: "npc_sect_quanzhen_vice_master_mayu_talk",
     sparOpponentId: "spar_quanzhen_mayu",
@@ -51,7 +51,7 @@ export const NPCS_QUANZHEN: readonly NpcDef[] = [
 
   {
     id: "sect_quanzhen_sword_elder_qiuchuji",
-    name: "อาจารย์ดาบชิวฉู่จี้",
+    name: "อาจารย์ดาบกู่จื้อชิง",
     description: "ปรมาจารย์ดาบของฉวนเจิน · ผู้สืบทอดกระบี่สะกดสุริยันต์ · บุคลิกเด็ดเดี่ยวและใจตรงไปตรงมา",
     locationIds: ["sect_quanzhen"],
     dialogSceneId: "npc_sect_quanzhen_sword_elder_qiuchuji_talk",
