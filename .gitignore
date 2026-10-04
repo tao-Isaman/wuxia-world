@@ -31,3 +31,6 @@ review/**/*.jpg
 review/**/*.webm
 review/**/*.zip
 .pterminal/
+
+# Sub-agent worktrees (Claude Code)
+.claude/worktrees/

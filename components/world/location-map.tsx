@@ -13,6 +13,8 @@ import { capitalVignette } from "@/lib/stage/world-vignettes";
 import { roamingFoesOn } from "./roaming-foes";
 import { hasStation } from "@/lib/world/stations";
 import { TOURNAMENT } from "@/lib/world/tournament";
+import { arrivalSpawn, freeSpot } from "@/lib/stage/map-anchors";
+import { useMapPlacements } from "./use-map-placements";
 export { clearMapPositions } from "@/lib/stage/types";
 
 export interface MapSpotHandlers {
@@ -30,34 +32,14 @@ export interface MapSpotHandlers {
   onTournament: () => void;
 }
 
-/** A free spot for a quest objective marker: near the arrival point, clear of other markers. */
-function freeSpot(spawn: { x: number; y: number }, taken: readonly { x: number; y: number }[]) {
-  const offsets = [[9, -5], [-9, -5], [10, 7], [-10, 7], [0, -11], [15, 0], [-15, 0], [0, 12], [18, -10], [-18, -10]];
-  for (const [dx, dy] of offsets) {
-    const point = { x: Math.min(92, Math.max(8, spawn.x + dx)), y: Math.min(90, Math.max(10, spawn.y + dy)) };
-    if (taken.every((other) => Math.hypot(other.x - point.x, other.y - point.y) >= 7)) return point;
-  }
-  return { x: spawn.x + 6, y: spawn.y - 4 };
-}
-/** Spawn just inside the exit back to `from`, facing into the map; null without one. */
-function arrivalSpawn(map: LocationMapDef, from: string | undefined) {
-  const exit = from ? map.exits?.find((e) => e.to === from) : undefined;
-  if (!exit) return null;
-  // 70 map units (of 960 × 640) in from the exit, toward the middle: within
-  // reach of the way back, clear of the edge.
-  const centre = { x: 50, y: 56 };
-  const dx = (centre.x - exit.x) * 9.6, dy = (centre.y - exit.y) * 6.4, length = Math.hypot(dx, dy) || 1;
-  const spawn = { x: exit.x + dx / length * 70 / 9.6, y: exit.y + dy / length * 70 / 6.4 };
-  const facing: "east" | "west" | "north" | "south" = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? "east" : "west") : (dy > 0 ? "south" : "north");
-  return { spawn, facing };
-}
-
 export function LocationMap({ scene, map, handlers, readOnly = false, dialogueSpeakerId }: {
   scene: LocationScene; map: LocationMapDef; handlers: MapSpotHandlers; readOnly?: boolean; dialogueSpeakerId?: string;
 }) {
   const state = useWorldStore();
   const workPose = useLoadingStore((s) => s.active ? s.pose : null);
   const lastInteractivePresentation = useRef<WorldPresentation | null>(null);
+  // Objects placed by the engine's map editor (null while they load).
+  const placements = useMapPlacements(scene.id);
   // Walked in from a road: start beside the exit that leads back there.
   const [arrivedFrom] = useState(() => peekArrivalFrom(scene.id));
   useEffect(() => () => { clearArrivalFrom(scene.id); }, [scene.id]);
@@ -164,7 +146,7 @@ export function LocationMap({ scene, map, handlers, readOnly = false, dialogueSp
   // While the hero works, they play the activity's painted loop on the map.
   const heroAction = workPose && heroHasPose(state.playerBodyId, workPose) ? heroPoseStrip(state.playerBodyId, workPose) : null;
   const presentation: WorldPresentation = { key: scene.id, name: scene.name, image: map.image, heroAction,
-    time: state.time, spawn: arrival?.spawn ?? map.spawn, spawnFacing: arrival?.facing, playerImage: playerBodySprite(state.playerBodyId), markers: guidedMarkers, foes,
+    time: state.time, spawn: arrival?.spawn ?? map.spawn, spawnFacing: arrival?.facing, playerImage: playerBodySprite(state.playerBodyId), markers: guidedMarkers, foes, placements,
     ...capitalVignette(scene.id, state.quests.qc_capital_clinic_supplies?.status === "done",
       state.flags.capital_ledger_recovered === true) };
   useEffect(() => {
@@ -174,7 +156,7 @@ export function LocationMap({ scene, map, handlers, readOnly = false, dialogueSp
   // quest props/bystanders can still switch visibility without a canvas rebuild.
   return <WorldCanvas presentation={readOnly
     ? { ...(lastInteractivePresentation.current ?? presentation), readOnly: true,
-      props: presentation.props, bystanders: presentation.bystanders, foes: presentation.foes, worldDescription: presentation.worldDescription,
+      placements: presentation.placements, props: presentation.props, bystanders: presentation.bystanders, foes: presentation.foes, worldDescription: presentation.worldDescription,
       dialogueSpeakerId: dialogueSpeakerId ? "npc-" + dialogueSpeakerId : undefined }
     : presentation} />;
 }

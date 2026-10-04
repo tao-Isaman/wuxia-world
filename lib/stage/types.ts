@@ -1,4 +1,5 @@
 import type { HeroPoseStrip } from "@/lib/characters/hero-actions";
+import type { PlacementGeometry } from "@/lib/assets/placement-geometry";
 export interface Point { x: number; y: number }
 
 export type WorldMarkerCategory = "npc" | "route" | "place" | "activity";
@@ -67,6 +68,13 @@ export interface WorldPresentation {
    * played in place of the walking sprite while set; read every frame.
    */
   heroAction?: HeroPoseStrip | null;
+  /**
+   * Objects placed on this map by the engine's map editor
+   * (lib/assets/placement-geometry.ts): drawn by layer and depth, their
+   * blocking footprints added to the map's collision. `null` while they are
+   * still loading (the host waits); absent or empty for none.
+   */
+  placements?: readonly PlacementGeometry[] | null;
 }
 
 /** Map distance (960×640 units) per random-event walk tick. */

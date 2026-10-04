@@ -20,7 +20,7 @@ How the game is checked: fast Bun unit suites, content audits, the docs check, a
 ```bash
 bun run typecheck
 bun run lint
-for s in runtime combat opening navigation battle-background rumors investigation audio law walk grid grid-ai grid-skills grid-store quests docs; do
+for s in runtime combat opening navigation battle-background rumors investigation audio law walk grid grid-ai grid-skills grid-store npcs story routes places systems quests engine docs; do
   bun run test:$s || break
 done
 bun run build && bun run test:e2e      # with a production server on :3017, see below
@@ -38,6 +38,7 @@ Each suite is a Bun script (or `bun test` file) wired as `test:*` in `package.js
 | `test:combat` | `scripts/test-combat-actions.ts` | 15 | mostly the **legacy** 1v1 action layer (guard, riposte, recover — no longer in the UI), the grid store's turn use, the 1v1 turn forecast, and `fleeChance` (the one live function there) |
 | `test:opening` | 6 scripts | 12 | the clinic errand and its exact rewards; the (unused) preparation advice; the capital training duel (fixed stats, non-fatal, once); the quest completion receipt fires once; spy greetings always have a free exit; Lin's and Wu's read-only replies |
 | `test:navigation` | `bun test lib/stage/world-navigation.test.ts lib/stage/world-placement.test.ts` | 19 | collision and path planning on the hand maps; **every painted map** keeps its spawn open and every NPC, exit and service reachable; placing the hero beside the speaker after a reload |
+| `test:placements` | `bun test lib/stage/placements.test.ts` | 8 | objects placed by the map editor: geometry (anchor, scale, flip, views, overrides), depth against characters, a footprint blocks movement and paths route around it, maps without placements unchanged, planning time with 40 objects, the marker checker, and the committed `public/assets/placements.json` (known maps and assets, unique ids, nothing covered or cut off) |
 | `test:battle-background` | `scripts/test-battle-background.ts` | 2 | which battle background a fight gets, and that it survives a save round trip |
 | `test:rumors` | `scripts/test-lore-rumors.ts`, `scripts/test-rumor-formatting.ts` | 5 + 4 | lore seeding (new game and v18 / v19 hydration), caps, selection rules; 104 template × truth combinations render without stray `{tokens}` |
 | `test:investigation` | `scripts/test-capital-investigation.ts` | 5 | the capital ledger and corrupt-clerk quests end to end, legacy stages, the one-time reward |
@@ -54,6 +55,8 @@ Each suite is a Bun script (or `bun test` file) wired as `test:*` in `package.js
 | `test:places` | `scripts/test-places.ts` | 11 | every ยุทธจักร T0–T3 move and art is a quest reward (the 69 new ones from one place quest) gated by rarity; each of the 20 villages / towns / homes has NPCs, an activity and quests on its map; new NPCs have a dialog, a look (only m/f bodies wander) and gift tastes; activities registered; no teacher is an assassination / kidnap target; presence (assassinated / 180-day kidnap); gift worth and tastes; the store's `giveGift` cooldown and gold; activity cooldowns |
 | `test:systems` | `scripts/test-systems.ts` | 20 | practice xp (30 + 5 % / 50 + 6 % of the next level); letters (who writes, odds, LUK rarity, gifts, once a day, the cooldown, opening one, time in the store delivers them, deleting one takes an unclaimed gift); the ฉายา rules (`heroEpithet`, mixes of traits); horse stations (which places, fares, visited-only, a ride); the tournament (calendar, entrants, odds, register → bouts → pay → place, the champion's pick, NPC-only years and forfeits) |
 | `test:quests` | 5 scripts | — | the campaign audit, dead-end regressions, playing **every** item / kill / objective quest (213) through the real store, guidance for all 657 stages, and every steal / assassinate / kidnap quest stage (39) |
+| `test:engine` | `scripts/test-engine.ts` | 12 | the `/game/engine` editor ([engine.md](engine.md)): text overrides change a skill's / art's name and description and ignore unknown ids, the committed overrides are applied at load, the text draft keeps only changes, name / description / quest-naming validation, text and asset filters, paging, asset edits and bulk changes, footprint geometry, the save route's writable rule and three-file whitelist |
+| `test:assets` | `scripts/test-assets.ts` | — | the asset library ([assets.md](assets.md)): every manifest entry matches `lib/assets/types.ts`, ids unique and well formed, every image exists at its stated size and none is over 512 px, every footprint lies inside the drawn image, nothing unlisted under `public/assets/`, at least 3,000 approved |
 | `test:docs` | `scripts/build-docs-reference.ts --check`, `scripts/check-docs.ts` | — | the generated reference is current; links, repo paths and commands in the docs resolve |
 
 ### `test:quests` in detail
@@ -107,13 +110,15 @@ Read-only scripts, not wired into `package.json`:
 
 Many specs replace `Math.random` in the page to make rolls predictable.
 
-38 tests in 19 spec files:
+44 tests in 21 spec files:
 
 | Spec | Tests | Covers |
 | --- | --- | --- |
 | `audio.spec.ts` | 1 | music follows title → world → battle; the ♪ bubble; settings persist |
 | `battle-setting.spec.ts` | 1 | a capital encounter keeps its street background through a reload and phone rotation |
 | `characters.spec.ts` | 2 | both heroes (m1, f1) walk on their painted eight-way frames (E, N, S, W), face where they go and stand in that heading; reduced motion; WebGL context loss and "ลองใหม่" recovery |
+| `engine.spec.ts` | 3 | `/game/engine` on a fixture manifest (`tests/fixtures/engine/`): asset filters, the detail panel with anchor, footprint drag and views, the draft across a reload and discard, bulk reject, saving downloads `manifest.json` on a production server (read-only chip); the map tab; the skill editor's filters, live card preview, duplicate / empty name errors and the downloaded `text-overrides.json`; no portrait turn; no link from `/` |
+| `placements.spec.ts` | 3 | placed objects from a fixture library (`tests/fixtures/placements/`) are drawn on the map (`data-placements`) and block walking and tap-to-walk paths; `engineGoto` and the unsaved-preview play-test; the map editor on `/game/engine` places, drags, nudges, undoes / redoes, warns, deletes and saves |
 | `dialogue.spec.ts` | 2 | local replies keep the same world canvas; quest offers away from a map fit on screen without scrolling at three sizes |
 | `game.spec.ts` | 6 | exploration, menu pause, travel, NPC card, reload; grid battle by tap and auto; unit info by touch; phone rotation; a version-18 save migrates to 23; rigged NPCs wander in the capital and wait for the hero |
 | `investigation.spec.ts` | 1 | capital rumors and the ledger investigation survive a mid-dialog reload and pay once |

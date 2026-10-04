@@ -1,0 +1,147 @@
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { test } from "node:test";
+import { getLocationMap } from "../world/data/location-maps";
+import { AUTO_MAP_IDS } from "../world/data/auto-map-ids";
+import {
+  blockingRects, byDepth, characterDepth, heroDepth, placementGeometry, placementsGeometry,
+} from "../assets/placement-geometry";
+import { indexAssets } from "../assets/catalog";
+import type { AssetEntry, AssetManifest, Placement, PlacementsFile } from "../assets/types";
+import { mapAnchors, placementIssues } from "./map-anchors";
+import {
+  moveOnWorldGround, planWorldPath, withPlacedSolids, worldFootprints, worldPointBlocked, worldSegmentClear,
+} from "./world-navigation";
+
+/** A 96 × 96 px crate drawn 48 × 48 map units, anchored at its base centre, with a 40 × 24 footprint. */
+function asset(overrides: Partial<AssetEntry> = {}): AssetEntry {
+  return {
+    id: "prop_any_crate", name: "ลังไม้", category: "prop", subcategory: "crate", region: "any", tags: [],
+    image: "/assets/prop/crate.png", width: 96, height: 96, mapWidth: 48, mapHeight: 48, anchorX: 48, anchorY: 90,
+    footprint: { x: -20, y: -24, w: 40, h: 24 }, layer: "object", flippable: true,
+    source: { tool: "test", prompt: "", size: 96 }, status: "approved", ...overrides,
+  };
+}
+const crate = asset();
+const place = (x: number, y: number, extra: Partial<Placement> = {}): Placement => ({ id: `p_${x}_${y}`, asset: crate.id, x, y, ...extra });
+const MAP_IDS = ["home_player", "city_capital", "jail", ...AUTO_MAP_IDS];
+
+test("a placement draws at its anchor, sized and mirrored about it", () => {
+  const g = placementGeometry(place(300, 400), crate);
+  assert.equal(g.width, 48);
+  assert.equal(g.height, 48);
+  assert.deepEqual(g.box, { left: 276, top: 355, right: 324, bottom: 403 });
+  const scaled = placementGeometry(place(300, 400, { scale: 2 }), crate);
+  assert.deepEqual(scaled.box, { left: 252, top: 310, right: 348, bottom: 406 });
+  // An off-centre anchor: the mirrored box swaps its sides about x.
+  const lopsided = asset({ anchorX: 24 });
+  assert.deepEqual(placementGeometry(place(300, 400), lopsided).box.left, 288);
+  assert.deepEqual(placementGeometry(place(300, 400, { flip: true }), lopsided).box.right, 312);
+  const footprint = asset({ footprint: { x: -30, y: -10, w: 20, h: 10 } });
+  assert.deepEqual(placementGeometry(place(300, 400, { flip: true }), footprint).footprint, { left: 310, top: 390, right: 330, bottom: 400 });
+  assert.deepEqual(placementGeometry(place(300, 400, { scale: 0.5 }), crate).footprint, { left: 290, top: 388, right: 310, bottom: 400 });
+});
+
+test("the 8-direction view, layer and collide overrides apply", () => {
+  const eight = asset({ views: { S: "/a/s.png", E: "/a/e.png" } });
+  assert.equal(placementGeometry(place(1, 1, { dir: "E" }), eight).image, "/a/e.png");
+  assert.equal(placementGeometry(place(1, 1, { dir: "NW" }), eight).image, crate.image);
+  assert.equal(placementGeometry(place(1, 1), crate).blocks, true);
+  assert.equal(placementGeometry(place(1, 1, { collide: false }), crate).blocks, false);
+  assert.equal(placementGeometry(place(1, 1, { collide: true }), asset({ footprint: null })).blocks, false);
+  assert.equal(placementGeometry(place(1, 1, { layer: "overhead" }), crate).layer, "overhead");
+});
+
+test("depth: ground under every character, objects sort with them by base y, overhead over all", () => {
+  const ground = placementGeometry(place(500, 639, { layer: "ground" }), crate);
+  const object = placementGeometry(place(500, 300), crate);
+  const overhead = placementGeometry(place(500, 0, { layer: "overhead" }), crate);
+  assert.ok(ground.depth > -1 && ground.depth < 1, "ground sits on the painting, under shadows");
+  assert.ok(object.depth > characterDepth(299) && object.depth < characterDepth(301));
+  assert.ok(object.depth < heroDepth(300), "the hero on the same line stands in front");
+  assert.ok(object.depth > heroDepth(299), "a hero further up the map is behind it");
+  assert.ok(overhead.depth > heroDepth(640) && overhead.depth < 8000, "over characters, under signs and the night veil");
+  assert.deepEqual(byDepth([overhead, ground, object]).map((g) => g.layer), ["ground", "object", "overhead"]);
+});
+
+test("a placed footprint blocks walking and paths route around it", () => {
+  const open = worldFootprints("other_map", "/maps/other.png");
+  const solids = withPlacedSolids(open, blockingRects([placementGeometry(place(500, 300), crate)]));
+  assert.equal(solids.length, 1);
+  // Straight east into the crate stops at its west face (minus the foot radius).
+  const stopped = moveOnWorldGround({ x: 400, y: 290 }, { x: 200, y: 0 }, solids);
+  assert.ok(stopped.x <= 474 && stopped.x > 470, `stopped at ${stopped.x}`);
+  assert.equal(worldPointBlocked(stopped, solids), false);
+  // A tap beyond it plans a detour whose every leg is clear.
+  const start = { x: 400, y: 290 }, end = { x: 600, y: 290 };
+  const path = planWorldPath(start, end, solids);
+  assert.ok(path.length > 1);
+  assert.deepEqual(path.at(-1), end);
+  let previous = start;
+  for (const point of path) { assert.equal(worldSegmentClear(previous, point, solids), true); previous = point; }
+  // Walk-through decoration (collide: false) never blocks.
+  const deco = withPlacedSolids(open, blockingRects([placementGeometry(place(500, 300, { collide: false }), crate)]));
+  assert.deepEqual(planWorldPath(start, end, deco), [end]);
+});
+
+test("a map without placements is unchanged", () => {
+  for (const id of ["home_player", "city_capital", "village"]) {
+    const map = getLocationMap(id)!;
+    const base = worldFootprints(id, map.image);
+    assert.equal(withPlacedSolids(base, []), base);
+    assert.equal(withPlacedSolids(base, blockingRects(placementsGeometry([], indexAssets([crate])))), base);
+  }
+});
+
+test("placed solids keep path planning fast", () => {
+  const map = getLocationMap("city_capital")!;
+  const rows = Array.from({ length: 40 }, (_, i) => place(120 + (i % 10) * 75, 140 + Math.floor(i / 10) * 40));
+  const solids = withPlacedSolids(worldFootprints("city_capital", map.image), blockingRects(placementsGeometry(rows, indexAssets([crate]))));
+  const started = performance.now();
+  for (let i = 0; i < 5; i++) planWorldPath({ x: 480, y: 499 }, { x: 100 + i * 150, y: 120 }, solids);
+  const each = (performance.now() - started) / 5;
+  assert.ok(each < 250, `a path took ${each.toFixed(1)} ms`);
+});
+
+test("the checker flags a placement covering an NPC spot or sealing an exit", () => {
+  const map = getLocationMap("city_capital")!;
+  const anchors = mapAnchors(map);
+  const npc = anchors.find((a) => a.id === "npc:city_capital_physician_lin")!;
+  const covering = placementsGeometry([place(npc.x, npc.y + 10)], indexAssets([crate]));
+  const issues = placementIssues("city_capital", map, covering, { reachability: false });
+  assert.deepEqual(issues.map((i) => [i.anchor.id, i.placementId, i.reason]), [["npc:city_capital_physician_lin", covering[0].id, "covered"]]);
+  // A wall of crates across the whole map south of the spawn cuts off the palace exit (y 88 %).
+  const wallAsset = asset({ id: "prop_any_wall", mapWidth: 120, footprint: { x: -60, y: -20, w: 120, h: 20 } });
+  const wall = placementsGeometry(Array.from({ length: 9 }, (_, i) => ({ id: `w${i}`, asset: wallAsset.id, x: 60 + i * 120, y: 540 })),
+    indexAssets([wallAsset]));
+  const cut = placementIssues("city_capital", map, wall);
+  assert.ok(cut.some((i) => i.anchor.id === "exit:palace_royal" && i.reason === "unreachable"), JSON.stringify(cut.map((i) => i.anchor.id)));
+  // Off to one side, nothing is flagged.
+  assert.deepEqual(placementIssues("city_capital", map, placementsGeometry([place(700, 560)], indexAssets([crate]))), []);
+});
+
+test("public/assets/placements.json: known maps and assets, unique ids, nothing sealed off", () => {
+  const root = join(import.meta.dirname, "../../public/assets");
+  const file = JSON.parse(readFileSync(join(root, "placements.json"), "utf8")) as PlacementsFile;
+  const manifest = JSON.parse(readFileSync(join(root, "manifest.json"), "utf8")) as AssetManifest;
+  assert.equal(file.version, 1);
+  const assets = indexAssets(manifest.assets);
+  const problems: string[] = [];
+  for (const [mapId, placements] of Object.entries(file.maps)) {
+    const map = MAP_IDS.includes(mapId) ? getLocationMap(mapId) : undefined;
+    if (!map) { problems.push(`${mapId}: not a painted location map`); continue; }
+    const ids = new Set<string>();
+    for (const p of placements) {
+      if (ids.has(p.id)) problems.push(`${mapId}: duplicate placement id ${p.id}`);
+      ids.add(p.id);
+      if (!(p.x >= 0 && p.x <= 960 && p.y >= 0 && p.y <= 640)) problems.push(`${mapId}/${p.id}: off the map`);
+      // The asset library is filled in parallel; with an empty manifest only the shape is checked.
+      if (manifest.assets.length && !assets.has(p.asset)) problems.push(`${mapId}/${p.id}: unknown asset ${p.asset}`);
+    }
+    for (const issue of placementIssues(mapId, map, placementsGeometry(placements, assets))) {
+      problems.push(`${mapId}: ${issue.placementId ?? "placements"} ${issue.reason === "covered" ? "cover" : "cut off"} ${issue.anchor.id}`);
+    }
+  }
+  assert.deepEqual(problems, []);
+});

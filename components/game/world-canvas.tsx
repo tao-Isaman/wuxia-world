@@ -17,7 +17,10 @@ export function WorldCanvas({ presentation }: { presentation: WorldPresentation 
   const [nearby, setNearby] = useState<string | null>(null);
   const signature = presentation.markers.map((m) => `${m.id}:${m.image ?? m.badge ?? m.icon ?? ""}`).join("|") +
     (presentation.props ?? []).map((prop) => `${prop.id}:${prop.image}`).join("|") +
-    (presentation.bystanders ?? []).map((actor) => `${actor.id}:${actor.characterId}`).join("|");
+    (presentation.bystanders ?? []).map((actor) => `${actor.id}:${actor.characterId}`).join("|") +
+    (presentation.placements ?? []).map((p) => `${p.id}:${p.image}:${p.x}:${p.y}:${p.width}:${p.height}:${p.flip}:${p.layer}:${p.blocks}`).join("|");
+  // Placed objects still loading: wait, so the map is built once with its solids.
+  const waiting = presentation.placements === null;
   useEffect(() => { if (presentation.readOnly) setShowPlaces(false); }, [presentation.readOnly]);
 
   useEffect(() => {
@@ -27,6 +30,7 @@ export function WorldCanvas({ presentation }: { presentation: WorldPresentation 
     setError(null);
     setShowPlaces(false);
     setNearby(null);
+    if (waiting) return;
     void import("@/lib/stage/world-runtime").then(({ createWorldRuntime }) => {
       if (disposed || !host.current) return;
       instance = createWorldRuntime(host.current, () => latest.current,
@@ -41,7 +45,7 @@ export function WorldCanvas({ presentation }: { presentation: WorldPresentation 
       if (!disposed) setError(`เริ่มฉากไม่ได้ กรุณาลองใหม่\n(${cause instanceof Error ? cause.message : String(cause)})`);
     });
     return () => { disposed = true; runtime.current = null; instance?.destroy(); };
-  }, [presentation.key, presentation.image, presentation.playerImage, signature, attempt]);
+  }, [presentation.key, presentation.image, presentation.playerImage, signature, attempt, waiting]);
 
   return (
     <div className="world-viewport">

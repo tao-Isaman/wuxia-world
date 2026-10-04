@@ -1,0 +1,6138 @@
+{
+ "category": "character",
+ "jobs": [
+  {
+   "id": "chr_heartland_swordsman_xiao",
+   "category": "character",
+   "subcategory": "sparring",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "เซียวจิ้งเทียน",
+   "tags": [
+    "เซียวจิ้งเทียน",
+    "swordsman_xiao",
+    "male",
+    "adult",
+    "sparring",
+    "wanderer"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a lean wandering swordsman in a travel-worn grey robe and bamboo hat, sword at his hip; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_jail_elder_prisoner",
+   "category": "character",
+   "subcategory": "prisoner",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "ตาเฒ่าหลิวนักโทษ",
+   "tags": [
+    "ตาเฒ่าหลิวนักโทษ",
+    "jail_elder_prisoner",
+    "male",
+    "elder",
+    "prisoner"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, an old prisoner in a ragged grey prison tunic with a long unkempt beard; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_jail_guard_zhang",
+   "category": "character",
+   "subcategory": "guard",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "ผู้คุมจาง",
+   "tags": [
+    "ผู้คุมจาง",
+    "jail_guard_zhang",
+    "male",
+    "adult",
+    "guard"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a guard in lamellar armour with a spear; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_merchant_wang",
+   "category": "character",
+   "subcategory": "merchant",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "เถ้าแก่หวาง",
+   "tags": [
+    "เถ้าแก่หวาง",
+    "merchant_wang",
+    "male",
+    "elder",
+    "merchant"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a merchant in a brown silk robe and cap; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_city_capital_clerk_qing",
+   "category": "character",
+   "subcategory": "official",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "เสมียนนายฉิง",
+   "tags": [
+    "เสมียนนายฉิง",
+    "city_capital_clerk_qing",
+    "male",
+    "adult",
+    "official"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, an official in a dark silk robe with a black gauze hat; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_city_capital_magistrate_wu",
+   "category": "character",
+   "subcategory": "official",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "นายอำเภอหวู่",
+   "tags": [
+    "นายอำเภอหวู่",
+    "city_capital_magistrate_wu",
+    "male",
+    "adult",
+    "official",
+    "authority"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, an official in a dark silk robe with a black gauze hat; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_city_capital_physician_lin",
+   "category": "character",
+   "subcategory": "healer",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "หมอหลิน",
+   "tags": [
+    "หมอหลิน",
+    "city_capital_physician_lin",
+    "male",
+    "adult",
+    "healer",
+    "scholar"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a herbalist doctor with a medicine box; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_city_capital_merchant_wang",
+   "category": "character",
+   "subcategory": "merchant",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "พ่อค้าหวัง",
+   "tags": [
+    "พ่อค้าหวัง",
+    "city_capital_merchant_wang",
+    "male",
+    "adult",
+    "merchant"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a merchant in a brown silk robe and cap; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_city_xixia_blacksmith_dugu",
+   "category": "character",
+   "subcategory": "craftsman",
+   "region": "west",
+   "group": "west",
+   "name": "ช่างดูกู",
+   "tags": [
+    "ช่างดูกู",
+    "city_xixia_blacksmith_dugu",
+    "male",
+    "elder",
+    "craftsman",
+    "forge"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a craftsman with a leather apron and a hammer; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_city_dali_scholar_duan",
+   "category": "character",
+   "subcategory": "scholar",
+   "region": "west",
+   "group": "west",
+   "name": "บัณฑิตต้วน",
+   "tags": [
+    "บัณฑิตต้วน",
+    "city_dali_scholar_duan",
+    "male",
+    "adult",
+    "scholar",
+    "historian"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a scholar in a pale robe holding a folding fan; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_city_dali_herbalist_bai",
+   "category": "character",
+   "subcategory": "healer",
+   "region": "west",
+   "group": "west",
+   "name": "หมอยาไป๋",
+   "tags": [
+    "หมอยาไป๋",
+    "city_dali_herbalist_bai",
+    "female",
+    "adult",
+    "healer",
+    "herbalist"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "woman, a herbalist doctor with a medicine box; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_east_city_yangzhou_chef_su",
+   "category": "character",
+   "subcategory": "chef",
+   "region": "east",
+   "group": "east",
+   "name": "พ่อครัวซู",
+   "tags": [
+    "พ่อครัวซู",
+    "city_yangzhou_chef_su",
+    "male",
+    "adult",
+    "chef",
+    "merchant"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a merchant in a brown silk robe and cap; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_east_city_yangzhou_fisherman_chen",
+   "category": "character",
+   "subcategory": "fisherman",
+   "region": "east",
+   "group": "east",
+   "name": "ชาวประมงเฉิน",
+   "tags": [
+    "ชาวประมงเฉิน",
+    "city_yangzhou_fisherman_chen",
+    "male",
+    "adult",
+    "fisherman",
+    "local"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a fisherman with a conical straw hat and a fishing rod; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_east_city_suzhou_book_merchant_li",
+   "category": "character",
+   "subcategory": "merchant",
+   "region": "east",
+   "group": "east",
+   "name": "พ่อค้าหนังสือลี่",
+   "tags": [
+    "พ่อค้าหนังสือลี่",
+    "city_suzhou_book_merchant_li",
+    "male",
+    "adult",
+    "merchant",
+    "scholar"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a merchant in a brown silk robe and cap; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_east_city_suzhou_weaver_mei",
+   "category": "character",
+   "subcategory": "craftsman",
+   "region": "east",
+   "group": "east",
+   "name": "ช่างทอเหมย",
+   "tags": [
+    "ช่างทอเหมย",
+    "city_suzhou_weaver_mei",
+    "female",
+    "adult",
+    "craftsman",
+    "merchant"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "woman, a merchant in a brown silk robe and cap; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_east_city_jinling_strategist_kong",
+   "category": "character",
+   "subcategory": "scholar",
+   "region": "east",
+   "group": "east",
+   "name": "นักยุทธศาสตร์กง",
+   "tags": [
+    "นักยุทธศาสตร์กง",
+    "city_jinling_strategist_kong",
+    "male",
+    "adult",
+    "scholar",
+    "official"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, an official in a dark silk robe with a black gauze hat; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_city_changan_guard_yan",
+   "category": "character",
+   "subcategory": "soldier",
+   "region": "west",
+   "group": "west",
+   "name": "ยามหยาน",
+   "tags": [
+    "ยามหยาน",
+    "city_changan_guard_yan",
+    "male",
+    "adult",
+    "soldier",
+    "authority"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, an official in a dark silk robe with a black gauze hat; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_vil_qigu_farmer_lao",
+   "category": "character",
+   "subcategory": "farmer",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "ลาวหนาน",
+   "tags": [
+    "ลาวหนาน",
+    "vil_qigu_farmer_lao",
+    "male",
+    "elder",
+    "farmer",
+    "elder"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a labourer in plain hemp clothes with a carrying pole; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_vil_qigu_herbalist_mei",
+   "category": "character",
+   "subcategory": "herbalist",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "นางเหมย",
+   "tags": [
+    "นางเหมย",
+    "vil_qigu_herbalist_mei",
+    "female",
+    "adult",
+    "herbalist",
+    "healer"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "woman, a herbalist doctor with a medicine box; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_south_vil_meihua_musician_chen",
+   "category": "character",
+   "subcategory": "musician",
+   "region": "south",
+   "group": "south",
+   "name": "เฉินเยว่",
+   "tags": [
+    "เฉินเยว่",
+    "vil_meihua_musician_chen",
+    "male",
+    "adult",
+    "musician",
+    "wanderer"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a musician carrying a guqin zither; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_south_vil_meihua_hunter_bao",
+   "category": "character",
+   "subcategory": "hunter",
+   "region": "south",
+   "group": "south",
+   "name": "เปาเหล็กก้าน",
+   "tags": [
+    "เปาเหล็กก้าน",
+    "vil_meihua_hunter_bao",
+    "male",
+    "adult",
+    "hunter",
+    "retired_warrior"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a hunter with a bow and a fur vest; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_vil_hengshan_elder_wu",
+   "category": "character",
+   "subcategory": "elder",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "ผู้อาวุโสอู๋",
+   "tags": [
+    "ผู้อาวุโสอู๋",
+    "vil_hengshan_elder_wu",
+    "male",
+    "elder",
+    "elder",
+    "musician"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a musician carrying a guqin zither; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_east_vil_wuxia_fisherman_deng",
+   "category": "character",
+   "subcategory": "fisherman",
+   "region": "east",
+   "group": "east",
+   "name": "เติ้งลองหาง",
+   "tags": [
+    "เติ้งลองหาง",
+    "vil_wuxia_fisherman_deng",
+    "male",
+    "adult",
+    "fisherman"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a fisherman with a conical straw hat and a fishing rod; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_inn_yuelai_server_xiu",
+   "category": "character",
+   "subcategory": "innkeeper",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "นางสาวซิ่ว",
+   "tags": [
+    "นางสาวซิ่ว",
+    "inn_yuelai_server_xiu",
+    "female",
+    "adult",
+    "innkeeper",
+    "gossip"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "woman, an innkeeper with an apron and a towel over the shoulder; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_inn_gaosheng_keeper_fat",
+   "category": "character",
+   "subcategory": "innkeeper",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "เฉาอ้วน",
+   "tags": [
+    "เฉาอ้วน",
+    "inn_gaosheng_keeper_fat",
+    "male",
+    "adult",
+    "innkeeper",
+    "retired_warrior",
+    "chef"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a cook in an apron holding a ladle; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_inn_heluo_storyteller_po",
+   "category": "character",
+   "subcategory": "storyteller",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "โปผู้เล่าเรื่อง",
+   "tags": [
+    "โปผู้เล่าเรื่อง",
+    "inn_heluo_storyteller_po",
+    "male",
+    "elder",
+    "storyteller",
+    "elder"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a commoner in plain hemp clothes; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_sect_shaolin_abbot_huiyuan",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "heartland",
+   "sect": "shaolin",
+   "group": "heartland",
+   "name": "เจ้าอาวาสฮุยหยวน",
+   "tags": [
+    "เจ้าอาวาสฮุยหยวน",
+    "sect_shaolin_abbot_huiyuan",
+    "male",
+    "adult",
+    "sect_master",
+    "monk",
+    "shaolin"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Shaolin monk with a shaved head in saffron and brown robes, a dignified sect leader in an ornate version of the robe; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_sect_shaolin_elder_faming",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "heartland",
+   "sect": "shaolin",
+   "group": "heartland",
+   "name": "อาจารย์ฝาหมิง",
+   "tags": [
+    "อาจารย์ฝาหมิง",
+    "sect_shaolin_elder_faming",
+    "female",
+    "elder",
+    "elder",
+    "monk",
+    "shaolin"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old woman with grey hair, a Shaolin monk with a shaved head in saffron and brown robes; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_sect_shaolin_disciple_xuanji",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "heartland",
+   "sect": "shaolin",
+   "group": "heartland",
+   "name": "ศิษย์เซวียนจี้",
+   "tags": [
+    "ศิษย์เซวียนจี้",
+    "sect_shaolin_disciple_xuanji",
+    "male",
+    "adult",
+    "disciple",
+    "monk",
+    "shaolin"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Shaolin monk with a shaved head in saffron and brown robes; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_sect_shaolin_head_disciple_yuanquan",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "heartland",
+   "sect": "shaolin",
+   "group": "heartland",
+   "name": "หัวหน้าศิษย์หยวนเฉวียน",
+   "tags": [
+    "หัวหน้าศิษย์หยวนเฉวียน",
+    "sect_shaolin_head_disciple_yuanquan",
+    "male",
+    "adult",
+    "head_disciple",
+    "monk",
+    "shaolin"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Shaolin monk with a shaved head in saffron and brown robes; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_sect_shaolin_zen_master_xianren",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "heartland",
+   "sect": "shaolin",
+   "group": "heartland",
+   "name": "หลวงพ่อเซียนเหริน",
+   "tags": [
+    "หลวงพ่อเซียนเหริน",
+    "sect_shaolin_zen_master_xianren",
+    "male",
+    "elder",
+    "elder",
+    "monk",
+    "shaolin",
+    "zen"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a Shaolin monk with a shaved head in saffron and brown robes; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_sect_shaolin_staff_master_juti",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "heartland",
+   "sect": "shaolin",
+   "group": "heartland",
+   "name": "หลวงพ่อจูตี้",
+   "tags": [
+    "หลวงพ่อจูตี้",
+    "sect_shaolin_staff_master_juti",
+    "male",
+    "elder",
+    "elder",
+    "monk",
+    "shaolin",
+    "staff_master"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a Shaolin monk with a shaved head in saffron and brown robes; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_sect_shaolin_dharma_guardian_huimiao",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "heartland",
+   "sect": "shaolin",
+   "group": "heartland",
+   "name": "หลวงพี่ใหญ่ฮุยเหมียว",
+   "tags": [
+    "หลวงพี่ใหญ่ฮุยเหมียว",
+    "sect_shaolin_dharma_guardian_huimiao",
+    "male",
+    "adult",
+    "guardian",
+    "monk",
+    "shaolin"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Shaolin monk with a shaved head in saffron and brown robes; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_sect_shaolin_vice_abbot_luohan",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "heartland",
+   "sect": "shaolin",
+   "group": "heartland",
+   "name": "รองเจ้าอาวาสลั่วฮั่น",
+   "tags": [
+    "รองเจ้าอาวาสลั่วฮั่น",
+    "sect_shaolin_vice_abbot_luohan",
+    "male",
+    "adult",
+    "vice_abbot",
+    "monk",
+    "shaolin"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Shaolin monk with a shaved head in saffron and brown robes, a senior master; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_north_sect_wudang_master_qingxu",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "north",
+   "sect": "wudang",
+   "group": "north",
+   "name": "อาจารย์ชิงซวี่",
+   "tags": [
+    "อาจารย์ชิงซวี่",
+    "sect_wudang_master_qingxu",
+    "male",
+    "adult",
+    "sect_master",
+    "taoist",
+    "wudang"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Wudang Taoist in a blue-grey Taoist robe with a topknot and hairpin, a dignified sect leader in an ornate version of the robe; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_north_sect_wudang_vice_master_xuancheng",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "north",
+   "sect": "wudang",
+   "group": "north",
+   "name": "รองอาจารย์เสวียนเฉิง",
+   "tags": [
+    "รองอาจารย์เสวียนเฉิง",
+    "sect_wudang_vice_master_xuancheng",
+    "male",
+    "elder",
+    "vice_master",
+    "taoist",
+    "wudang"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a Wudang Taoist in a blue-grey Taoist robe with a topknot and hairpin, a senior master; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_north_sect_wudang_sword_elder_lingyu",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "north",
+   "sect": "wudang",
+   "group": "north",
+   "name": "อาจารย์ดาบหลิงอวี้",
+   "tags": [
+    "อาจารย์ดาบหลิงอวี้",
+    "sect_wudang_sword_elder_lingyu",
+    "male",
+    "elder",
+    "elder",
+    "taoist",
+    "wudang",
+    "swordsman"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a Wudang Taoist in a blue-grey Taoist robe with a topknot and hairpin; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_north_sect_wudang_inner_elder_baochun",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "north",
+   "sect": "wudang",
+   "group": "north",
+   "name": "อาจารย์ปราณเป่าชุน",
+   "tags": [
+    "อาจารย์ปราณเป่าชุน",
+    "sect_wudang_inner_elder_baochun",
+    "male",
+    "elder",
+    "elder",
+    "taoist",
+    "wudang",
+    "internal"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a Wudang Taoist in a blue-grey Taoist robe with a topknot and hairpin; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_north_sect_wudang_head_disciple_zhirong",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "north",
+   "sect": "wudang",
+   "group": "north",
+   "name": "หัวหน้าศิษย์จื้อหรง",
+   "tags": [
+    "หัวหน้าศิษย์จื้อหรง",
+    "sect_wudang_head_disciple_zhirong",
+    "male",
+    "adult",
+    "head_disciple",
+    "taoist",
+    "wudang"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Wudang Taoist in a blue-grey Taoist robe with a topknot and hairpin; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_north_sect_wudang_disciple_yujian",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "north",
+   "sect": "wudang",
+   "group": "north",
+   "name": "ศิษย์อวี่เจี้ยน",
+   "tags": [
+    "ศิษย์อวี่เจี้ยน",
+    "sect_wudang_disciple_yujian",
+    "male",
+    "adult",
+    "disciple",
+    "taoist",
+    "wudang",
+    "sparring"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Wudang Taoist in a blue-grey Taoist robe with a topknot and hairpin; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_north_sect_wudang_disciple_qingxin",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "north",
+   "sect": "wudang",
+   "group": "north",
+   "name": "ศิษย์ชิงซิน",
+   "tags": [
+    "ศิษย์ชิงซิน",
+    "sect_wudang_disciple_qingxin",
+    "male",
+    "adult",
+    "disciple",
+    "taoist",
+    "wudang"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Wudang Taoist in a blue-grey Taoist robe with a topknot and hairpin; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_north_sect_wudang_disciple_qingfeng",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "north",
+   "sect": "wudang",
+   "group": "north",
+   "name": "สาวกชิงเฟิง",
+   "tags": [
+    "สาวกชิงเฟิง",
+    "sect_wudang_disciple_qingfeng",
+    "female",
+    "adult",
+    "disciple",
+    "taoist",
+    "wudang",
+    "sparring"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "woman, a Wudang Taoist in a blue-grey Taoist robe with a topknot and hairpin; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_south_sect_emei_abbess_jingchan",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "south",
+   "sect": "emei",
+   "group": "south",
+   "name": "ท่านนิ้วห้วนจิงฉาน",
+   "tags": [
+    "ท่านนิ้วห้วนจิงฉาน",
+    "sect_emei_abbess_jingchan",
+    "female",
+    "adult",
+    "sect_master",
+    "nun",
+    "emei"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "woman, an Emei Buddhist nun in a white and pale jade-green habit with a hood, a dignified sect leader in an ornate version of the robe; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_south_sect_emei_vice_abbess_huimiao",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "south",
+   "sect": "emei",
+   "group": "south",
+   "name": "รองท่านนิ้วฮุยเหมียว",
+   "tags": [
+    "รองท่านนิ้วฮุยเหมียว",
+    "sect_emei_vice_abbess_huimiao",
+    "female",
+    "adult",
+    "vice_master",
+    "nun",
+    "emei"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "woman, an Emei Buddhist nun in a white and pale jade-green habit with a hood, a senior master; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_south_sect_emei_sword_elder_qingxin",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "south",
+   "sect": "emei",
+   "group": "south",
+   "name": "ท่านนิ้วดาบชิงซิน",
+   "tags": [
+    "ท่านนิ้วดาบชิงซิน",
+    "sect_emei_sword_elder_qingxin",
+    "female",
+    "elder",
+    "elder",
+    "nun",
+    "emei",
+    "swordswoman"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old woman with grey hair, an Emei Buddhist nun in a white and pale jade-green habit with a hood; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_south_sect_emei_palm_elder_huiyu",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "south",
+   "sect": "emei",
+   "group": "south",
+   "name": "ท่านนิ้วฝ่ามือฮุยอวี้",
+   "tags": [
+    "ท่านนิ้วฝ่ามือฮุยอวี้",
+    "sect_emei_palm_elder_huiyu",
+    "female",
+    "elder",
+    "elder",
+    "nun",
+    "emei"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old woman with grey hair, an Emei Buddhist nun in a white and pale jade-green habit with a hood; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_south_sect_emei_healer_elder_yuxin",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "south",
+   "sect": "emei",
+   "group": "south",
+   "name": "หมอนิ้วอวี้ซิน",
+   "tags": [
+    "หมอนิ้วอวี้ซิน",
+    "sect_emei_healer_elder_yuxin",
+    "female",
+    "elder",
+    "elder",
+    "nun",
+    "emei",
+    "healer"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old woman with grey hair, an Emei Buddhist nun in a white and pale jade-green habit with a hood; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_south_sect_emei_head_disciple_zhihui",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "south",
+   "sect": "emei",
+   "group": "south",
+   "name": "หัวหน้าศิษย์จื้อฮุย",
+   "tags": [
+    "หัวหน้าศิษย์จื้อฮุย",
+    "sect_emei_head_disciple_zhihui",
+    "female",
+    "adult",
+    "head_disciple",
+    "nun",
+    "emei"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "woman, an Emei Buddhist nun in a white and pale jade-green habit with a hood; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_south_sect_emei_disciple_xiaoyu",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "south",
+   "sect": "emei",
+   "group": "south",
+   "name": "ศิษย์เสี่ยวอวี้",
+   "tags": [
+    "ศิษย์เสี่ยวอวี้",
+    "sect_emei_disciple_xiaoyu",
+    "female",
+    "adult",
+    "disciple",
+    "nun",
+    "emei",
+    "sparring"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "woman, an Emei Buddhist nun in a white and pale jade-green habit with a hood; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_south_sect_emei_gatekeeper_lingxin",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "south",
+   "sect": "emei",
+   "group": "south",
+   "name": "ศิษย์หลิงซิน",
+   "tags": [
+    "ศิษย์หลิงซิน",
+    "sect_emei_gatekeeper_lingxin",
+    "female",
+    "adult",
+    "disciple",
+    "nun",
+    "emei"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "woman, an Emei Buddhist nun in a white and pale jade-green habit with a hood; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_south_sect_emei_junior_disciple_yujie",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "south",
+   "sect": "emei",
+   "group": "south",
+   "name": "ศิษย์อวี้เจี๋ย",
+   "tags": [
+    "ศิษย์อวี้เจี๋ย",
+    "sect_emei_junior_disciple_yujie",
+    "female",
+    "adult",
+    "disciple",
+    "nun",
+    "emei"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "woman, an Emei Buddhist nun in a white and pale jade-green habit with a hood; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_south_sect_emei_nun_qingyu",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "south",
+   "sect": "emei",
+   "group": "south",
+   "name": "นักพรตชิงอวี้",
+   "tags": [
+    "นักพรตชิงอวี้",
+    "sect_emei_nun_qingyu",
+    "female",
+    "adult",
+    "nun",
+    "swordswoman",
+    "emei",
+    "sparring"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "woman, an Emei Buddhist nun in a white and pale jade-green habit with a hood; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_sect_huashan_master_yiqing",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "west",
+   "sect": "huashan",
+   "group": "west",
+   "name": "อาจารย์ใหญ่อี้ชิง",
+   "tags": [
+    "อาจารย์ใหญ่อี้ชิง",
+    "sect_huashan_master_yiqing",
+    "male",
+    "adult",
+    "sect_master",
+    "swordsman",
+    "huashan"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Huashan swordsman in a blue and white robe with a long sword, a dignified sect leader in an ornate version of the robe; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_sect_huashan_vice_master_zifeng",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "west",
+   "sect": "huashan",
+   "group": "west",
+   "name": "รองอาจารย์จื่อเฟิง",
+   "tags": [
+    "รองอาจารย์จื่อเฟิง",
+    "sect_huashan_vice_master_zifeng",
+    "male",
+    "elder",
+    "vice_master",
+    "swordsman",
+    "huashan"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a Huashan swordsman in a blue and white robe with a long sword, a senior master; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_sect_huashan_sword_elder_qingsong",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "west",
+   "sect": "huashan",
+   "group": "west",
+   "name": "อาจารย์ดาบชิงซ่ง",
+   "tags": [
+    "อาจารย์ดาบชิงซ่ง",
+    "sect_huashan_sword_elder_qingsong",
+    "male",
+    "elder",
+    "elder",
+    "swordsman",
+    "huashan"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a Huashan swordsman in a blue and white robe with a long sword; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_sect_huashan_head_disciple_zhongming",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "west",
+   "sect": "huashan",
+   "group": "west",
+   "name": "หัวหน้าศิษย์จงหมิง",
+   "tags": [
+    "หัวหน้าศิษย์จงหมิง",
+    "sect_huashan_head_disciple_zhongming",
+    "male",
+    "adult",
+    "head_disciple",
+    "swordsman",
+    "huashan"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Huashan swordsman in a blue and white robe with a long sword; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_sect_huashan_disciple_xiaoyun",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "west",
+   "sect": "huashan",
+   "group": "west",
+   "name": "ศิษย์เสี่ยวอวิ๋น",
+   "tags": [
+    "ศิษย์เสี่ยวอวิ๋น",
+    "sect_huashan_disciple_xiaoyun",
+    "male",
+    "adult",
+    "disciple",
+    "swordsman",
+    "huashan"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Huashan swordsman in a blue and white robe with a long sword; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_sect_huashan_disciple_jianyi",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "west",
+   "sect": "huashan",
+   "group": "west",
+   "name": "ศิษย์เจี้ยนอี้",
+   "tags": [
+    "ศิษย์เจี้ยนอี้",
+    "sect_huashan_disciple_jianyi",
+    "male",
+    "adult",
+    "disciple",
+    "swordsman",
+    "huashan",
+    "sparring"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Huashan swordsman in a blue and white robe with a long sword; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_sect_songshan_master_zuolengchan",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "heartland",
+   "sect": "songshan",
+   "group": "heartland",
+   "name": "อาจารย์ใหญ่จั่วเหลิงฉาน",
+   "tags": [
+    "อาจารย์ใหญ่จั่วเหลิงฉาน",
+    "sect_songshan_master_zuolengchan",
+    "male",
+    "adult",
+    "sect_master",
+    "swordsman",
+    "songshan"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Songshan swordsman in a dark green robe with a heavy broadsword, a dignified sect leader in an ornate version of the robe; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_sect_songshan_vice_lubai",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "heartland",
+   "sect": "songshan",
+   "group": "heartland",
+   "name": "รองอาจารย์ลู่ไป๋",
+   "tags": [
+    "รองอาจารย์ลู่ไป๋",
+    "sect_songshan_vice_lubai",
+    "male",
+    "adult",
+    "vice_master",
+    "swordsman",
+    "songshan"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Songshan swordsman in a dark green robe with a heavy broadsword, a senior master; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_sect_songshan_elder_dingmian",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "heartland",
+   "sect": "songshan",
+   "group": "heartland",
+   "name": "อาจารย์อาวุโสติงเหมียน",
+   "tags": [
+    "อาจารย์อาวุโสติงเหมียน",
+    "sect_songshan_elder_dingmian",
+    "male",
+    "elder",
+    "elder",
+    "swordsman",
+    "songshan"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a Songshan swordsman in a dark green robe with a heavy broadsword; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_sect_songshan_disciple_lifeng",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "heartland",
+   "sect": "songshan",
+   "group": "heartland",
+   "name": "ศิษย์หลี่เฟิง",
+   "tags": [
+    "ศิษย์หลี่เฟิง",
+    "sect_songshan_disciple_lifeng",
+    "male",
+    "adult",
+    "disciple",
+    "swordsman",
+    "songshan",
+    "sparring"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Songshan swordsman in a dark green robe with a heavy broadsword; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_sect_songshan_disciple2_yangzhong",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "heartland",
+   "sect": "songshan",
+   "group": "heartland",
+   "name": "ศิษย์หยางจง",
+   "tags": [
+    "ศิษย์หยางจง",
+    "sect_songshan_disciple2_yangzhong",
+    "male",
+    "adult",
+    "disciple",
+    "swordsman",
+    "songshan",
+    "sparring"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Songshan swordsman in a dark green robe with a heavy broadsword; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_sect_taishan_master_tianmen",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "heartland",
+   "sect": "taishan",
+   "group": "heartland",
+   "name": "เจ้าสำนักเทียนเหมินเต้าเหริน",
+   "tags": [
+    "เจ้าสำนักเทียนเหมินเต้าเหริน",
+    "sect_taishan_master_tianmen",
+    "male",
+    "adult",
+    "sect_master",
+    "swordsman",
+    "taishan"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Taishan Taoist swordsman in an ochre-yellow robe, a dignified sect leader in an ornate version of the robe; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_sect_taishan_vice_yuyangzi",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "heartland",
+   "sect": "taishan",
+   "group": "heartland",
+   "name": "รองเจ้าสำนักอวี้หยางจื่อ",
+   "tags": [
+    "รองเจ้าสำนักอวี้หยางจื่อ",
+    "sect_taishan_vice_yuyangzi",
+    "male",
+    "adult",
+    "vice_master",
+    "swordsman",
+    "taishan"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Taishan Taoist swordsman in an ochre-yellow robe, a senior master; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_sect_taishan_elder_chiyangzi",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "heartland",
+   "sect": "taishan",
+   "group": "heartland",
+   "name": "อาจารย์อาวุโสฉื่อหยางจื่อ",
+   "tags": [
+    "อาจารย์อาวุโสฉื่อหยางจื่อ",
+    "sect_taishan_elder_chiyangzi",
+    "male",
+    "elder",
+    "elder",
+    "swordsman",
+    "taishan"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a Taishan Taoist swordsman in an ochre-yellow robe; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_sect_taishan_disciple_kunwu",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "heartland",
+   "sect": "taishan",
+   "group": "heartland",
+   "name": "ศิษย์คุนหวู่",
+   "tags": [
+    "ศิษย์คุนหวู่",
+    "sect_taishan_disciple_kunwu",
+    "female",
+    "elder",
+    "disciple",
+    "swordsman",
+    "taishan",
+    "sparring"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old woman with grey hair, a Taishan Taoist swordsman in an ochre-yellow robe; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_sect_taishan_disciple2_jingyang",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "heartland",
+   "sect": "taishan",
+   "group": "heartland",
+   "name": "ศิษย์จิ้งหยาง",
+   "tags": [
+    "ศิษย์จิ้งหยาง",
+    "sect_taishan_disciple2_jingyang",
+    "male",
+    "adult",
+    "disciple",
+    "swordsman",
+    "taishan"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Taishan Taoist swordsman in an ochre-yellow robe; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_sect_hengshan_south_master_modaxiansheng",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "heartland",
+   "sect": "hengshan_south",
+   "group": "heartland",
+   "name": "อาจารย์ใหญ่โม่ต้า",
+   "tags": [
+    "อาจารย์ใหญ่โม่ต้า",
+    "sect_hengshan_south_master_modaxiansheng",
+    "male",
+    "adult",
+    "sect_master",
+    "swordsman",
+    "hengshan_south"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Southern Hengshan swordsman in a russet robe, a dignified sect leader in an ornate version of the robe; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_sect_hengshan_south_vice_liuzhengfeng",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "heartland",
+   "sect": "hengshan_south",
+   "group": "heartland",
+   "name": "รองอาจารย์หลิวเจิ้งเฟิง",
+   "tags": [
+    "รองอาจารย์หลิวเจิ้งเฟิง",
+    "sect_hengshan_south_vice_liuzhengfeng",
+    "male",
+    "adult",
+    "vice_master",
+    "swordsman",
+    "hengshan_south"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Southern Hengshan swordsman in a russet robe, a senior master; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_sect_hengshan_south_elder_luge",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "heartland",
+   "sect": "hengshan_south",
+   "group": "heartland",
+   "name": "อาจารย์กระบี่ลู่เก๋อ",
+   "tags": [
+    "อาจารย์กระบี่ลู่เก๋อ",
+    "sect_hengshan_south_elder_luge",
+    "male",
+    "elder",
+    "elder",
+    "swordsman",
+    "hengshan_south"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a Southern Hengshan swordsman in a russet robe; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_sect_hengshan_south_disciple_yuepan",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "heartland",
+   "sect": "hengshan_south",
+   "group": "heartland",
+   "name": "ศิษย์เยว่ผาน",
+   "tags": [
+    "ศิษย์เยว่ผาน",
+    "sect_hengshan_south_disciple_yuepan",
+    "male",
+    "adult",
+    "disciple",
+    "swordsman",
+    "hengshan_south",
+    "sparring"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Southern Hengshan swordsman in a russet robe; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_sect_hengshan_south_disciple2_qingfeng",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "heartland",
+   "sect": "hengshan_south",
+   "group": "heartland",
+   "name": "ศิษย์ชิงเฟิง",
+   "tags": [
+    "ศิษย์ชิงเฟิง",
+    "sect_hengshan_south_disciple2_qingfeng",
+    "male",
+    "adult",
+    "disciple",
+    "swordsman",
+    "hengshan_south",
+    "sparring"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Southern Hengshan swordsman in a russet robe; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_sect_hengshan_north_abbess_dingyi",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "heartland",
+   "sect": "hengshan_north",
+   "group": "heartland",
+   "name": "ภิกษุณีติ่งอี้",
+   "tags": [
+    "ภิกษุณีติ่งอี้",
+    "sect_hengshan_north_abbess_dingyi",
+    "female",
+    "adult",
+    "sect_master",
+    "nun",
+    "swordswoman",
+    "hengshan_north"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "woman, a Northern Hengshan Buddhist nun in a grey habit with a sword, a dignified sect leader in an ornate version of the robe; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_sect_hengshan_north_vice_yihe",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "heartland",
+   "sect": "hengshan_north",
+   "group": "heartland",
+   "name": "ภิกษุณีอี๋เหอ",
+   "tags": [
+    "ภิกษุณีอี๋เหอ",
+    "sect_hengshan_north_vice_yihe",
+    "female",
+    "adult",
+    "vice_master",
+    "nun",
+    "swordswoman",
+    "hengshan_north"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "woman, a Northern Hengshan Buddhist nun in a grey habit with a sword, a senior master; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_sect_hengshan_north_elder_yiqing",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "heartland",
+   "sect": "hengshan_north",
+   "group": "heartland",
+   "name": "ภิกษุณีอี๋ชิง",
+   "tags": [
+    "ภิกษุณีอี๋ชิง",
+    "sect_hengshan_north_elder_yiqing",
+    "female",
+    "elder",
+    "elder",
+    "nun",
+    "swordswoman",
+    "hengshan_north"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old woman with grey hair, a Northern Hengshan Buddhist nun in a grey habit with a sword; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_sect_hengshan_north_nun_jingxin",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "heartland",
+   "sect": "hengshan_north",
+   "group": "heartland",
+   "name": "นักพรตจิงซิน",
+   "tags": [
+    "นักพรตจิงซิน",
+    "sect_hengshan_north_nun_jingxin",
+    "female",
+    "adult",
+    "nun",
+    "musician",
+    "hengshan_north",
+    "sparring"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "woman, a Northern Hengshan Buddhist nun in a grey habit with a sword; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_sect_hengshan_north_nun2_yilin",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "heartland",
+   "sect": "hengshan_north",
+   "group": "heartland",
+   "name": "นักพรตอี๋หลิน",
+   "tags": [
+    "นักพรตอี๋หลิน",
+    "sect_hengshan_north_nun2_yilin",
+    "female",
+    "adult",
+    "disciple",
+    "nun",
+    "swordswoman",
+    "hengshan_north"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "woman, a Northern Hengshan Buddhist nun in a grey habit with a sword; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_north_sect_quanzhen_master_chongyang",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "north",
+   "sect": "quanzhen",
+   "group": "north",
+   "name": "อาจารย์ใหญ่ฉงหยาง",
+   "tags": [
+    "อาจารย์ใหญ่ฉงหยาง",
+    "sect_quanzhen_master_chongyang",
+    "male",
+    "adult",
+    "sect_master",
+    "taoist",
+    "quanzhen"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Quanzhen Taoist in a white robe with blue trim and a topknot, a dignified sect leader in an ornate version of the robe; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_north_sect_quanzhen_vice_master_mayu",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "north",
+   "sect": "quanzhen",
+   "group": "north",
+   "name": "รองอาจารย์หม่ายวี่",
+   "tags": [
+    "รองอาจารย์หม่ายวี่",
+    "sect_quanzhen_vice_master_mayu",
+    "male",
+    "elder",
+    "vice_master",
+    "taoist",
+    "quanzhen"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a Quanzhen Taoist in a white robe with blue trim and a topknot, a senior master; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_north_sect_quanzhen_sword_elder_qiuchuji",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "north",
+   "sect": "quanzhen",
+   "group": "north",
+   "name": "อาจารย์ดาบชิวฉู่จี้",
+   "tags": [
+    "อาจารย์ดาบชิวฉู่จี้",
+    "sect_quanzhen_sword_elder_qiuchuji",
+    "male",
+    "elder",
+    "elder",
+    "taoist",
+    "quanzhen",
+    "swordsman"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a Quanzhen Taoist in a white robe with blue trim and a topknot; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_north_sect_quanzhen_inner_elder_yaolan",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "north",
+   "sect": "quanzhen",
+   "group": "north",
+   "name": "อาจารย์ปราณเหยาหลัน",
+   "tags": [
+    "อาจารย์ปราณเหยาหลัน",
+    "sect_quanzhen_inner_elder_yaolan",
+    "male",
+    "elder",
+    "elder",
+    "taoist",
+    "quanzhen",
+    "internal"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a Quanzhen Taoist in a white robe with blue trim and a topknot; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_north_sect_quanzhen_disciple_yangzi",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "north",
+   "sect": "quanzhen",
+   "group": "north",
+   "name": "ศิษย์หยางจื่อ",
+   "tags": [
+    "ศิษย์หยางจื่อ",
+    "sect_quanzhen_disciple_yangzi",
+    "male",
+    "adult",
+    "disciple",
+    "taoist",
+    "quanzhen"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Quanzhen Taoist in a white robe with blue trim and a topknot; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_north_sect_quanzhen_disciple_chongxu",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "north",
+   "sect": "quanzhen",
+   "group": "north",
+   "name": "สาวกชงซวี",
+   "tags": [
+    "สาวกชงซวี",
+    "sect_quanzhen_disciple_chongxu",
+    "female",
+    "adult",
+    "disciple",
+    "taoist",
+    "quanzhen",
+    "sparring"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "woman, a Quanzhen Taoist in a white robe with blue trim and a topknot; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_sect_gumu_disciple_lengyue",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "west",
+   "sect": "gumu",
+   "group": "west",
+   "name": "ศิษย์เลิ่งเยว่",
+   "tags": [
+    "ศิษย์เลิ่งเยว่",
+    "sect_gumu_disciple_lengyue",
+    "female",
+    "adult",
+    "disciple",
+    "swordswoman",
+    "gumu",
+    "sparring"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "woman, an Ancient Tomb sect fighter in pure white silk; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_sect_gumu_mystery_woman",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "west",
+   "sect": "gumu",
+   "group": "west",
+   "name": "หญิงปริศนาในสุสาน",
+   "tags": [
+    "หญิงปริศนาในสุสาน",
+    "sect_gumu_mystery_woman",
+    "female",
+    "elder",
+    "sect_master",
+    "mystery",
+    "gumu",
+    "secret"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old woman with grey hair, a cold beautiful woman in pure white silk with a long white ribbon, a dignified sect leader in an ornate version of the robe; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_sect_lingjiu_lady_zixia",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "west",
+   "sect": "lingjiu",
+   "group": "west",
+   "name": "หญิงสาวจื่อเสีย",
+   "tags": [
+    "หญิงสาวจื่อเสีย",
+    "sect_lingjiu_lady_zixia",
+    "female",
+    "adult",
+    "lady_warrior",
+    "lingjiu",
+    "sparring"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "woman, a Lingjiu Palace warrior in lavender and white with a fur collar; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_sect_beggars_chief_hongtian",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "heartland",
+   "sect": "beggars",
+   "group": "heartland",
+   "name": "หัวหน้าหงเทียน",
+   "tags": [
+    "หัวหน้าหงเทียน",
+    "sect_beggars_chief_hongtian",
+    "male",
+    "adult",
+    "chief",
+    "beggars",
+    "intelligence"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Beggars' Gang fighter in patched ragged clothes with a wine gourd and a bamboo staff, a dignified sect leader in an ornate version of the robe; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_sect_beggars_vice_chief_lifang",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "heartland",
+   "sect": "beggars",
+   "group": "heartland",
+   "name": "รองหัวหน้าหลี่ฟาง",
+   "tags": [
+    "รองหัวหน้าหลี่ฟาง",
+    "sect_beggars_vice_chief_lifang",
+    "male",
+    "adult",
+    "vice_chief",
+    "beggars"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Beggars' Gang fighter in patched ragged clothes with a wine gourd and a bamboo staff, a senior master; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_sect_beggars_staff_elder_qicheng",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "heartland",
+   "sect": "beggars",
+   "group": "heartland",
+   "name": "อาจารย์ไม้เท้าฉีเฉิง",
+   "tags": [
+    "อาจารย์ไม้เท้าฉีเฉิง",
+    "sect_beggars_staff_elder_qicheng",
+    "male",
+    "elder",
+    "elder",
+    "beggars",
+    "staff_master"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a Beggars' Gang fighter in patched ragged clothes with a wine gourd and a bamboo staff; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_sect_beggars_fist_elder_wudao",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "heartland",
+   "sect": "beggars",
+   "group": "heartland",
+   "name": "อาจารย์หมัดอู่เต้า",
+   "tags": [
+    "อาจารย์หมัดอู่เต้า",
+    "sect_beggars_fist_elder_wudao",
+    "male",
+    "elder",
+    "elder",
+    "beggars",
+    "fist_master"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a Beggars' Gang fighter in patched ragged clothes with a wine gourd and a bamboo staff; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_sect_beggars_intel_elder_yunsi",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "heartland",
+   "sect": "beggars",
+   "group": "heartland",
+   "name": "อาจารย์ข่าวสารยุนซือ",
+   "tags": [
+    "อาจารย์ข่าวสารยุนซือ",
+    "sect_beggars_intel_elder_yunsi",
+    "male",
+    "elder",
+    "elder",
+    "beggars",
+    "intelligence"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a Beggars' Gang fighter in patched ragged clothes with a wine gourd and a bamboo staff; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_sect_beggars_head_disciple_renhua",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "heartland",
+   "sect": "beggars",
+   "group": "heartland",
+   "name": "หัวหน้าศิษย์เหรินฮัว",
+   "tags": [
+    "หัวหน้าศิษย์เหรินฮัว",
+    "sect_beggars_head_disciple_renhua",
+    "male",
+    "adult",
+    "head_disciple",
+    "beggars"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Beggars' Gang fighter in patched ragged clothes with a wine gourd and a bamboo staff; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_sect_beggars_disciple_dawei",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "heartland",
+   "sect": "beggars",
+   "group": "heartland",
+   "name": "ศิษย์ต้าเหว่ย",
+   "tags": [
+    "ศิษย์ต้าเหว่ย",
+    "sect_beggars_disciple_dawei",
+    "male",
+    "adult",
+    "disciple",
+    "beggars"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Beggars' Gang fighter in patched ragged clothes with a wine gourd and a bamboo staff; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_sect_beggars_disciple_xiaohu",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "heartland",
+   "sect": "beggars",
+   "group": "heartland",
+   "name": "ศิษย์เสี่ยวฮู",
+   "tags": [
+    "ศิษย์เสี่ยวฮู",
+    "sect_beggars_disciple_xiaohu",
+    "female",
+    "adult",
+    "disciple",
+    "beggars"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "woman, a Beggars' Gang fighter in patched ragged clothes with a wine gourd and a bamboo staff; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_sect_beggars_junior_xiaomao",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "heartland",
+   "sect": "beggars",
+   "group": "heartland",
+   "name": "ศิษย์เสี่ยวเหมา",
+   "tags": [
+    "ศิษย์เสี่ยวเหมา",
+    "sect_beggars_junior_xiaomao",
+    "male",
+    "adult",
+    "disciple",
+    "beggars"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Beggars' Gang fighter in patched ragged clothes with a wine gourd and a bamboo staff; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_sect_beggars_brawler_jiu",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "heartland",
+   "sect": "beggars",
+   "group": "heartland",
+   "name": "ยาจกจิ๊ว",
+   "tags": [
+    "ยาจกจิ๊ว",
+    "sect_beggars_brawler_jiu",
+    "male",
+    "elder",
+    "beggar",
+    "drunken_fist",
+    "beggars",
+    "sparring"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a Beggars' Gang fighter in patched ragged clothes with a wine gourd and a bamboo staff; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_east_sect_sunmoon_chief_dongfang",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "east",
+   "sect": "sunmoon",
+   "group": "east",
+   "name": "อาจารย์ใหญ่หยินอวี้",
+   "tags": [
+    "อาจารย์ใหญ่หยินอวี้",
+    "sect_sunmoon_chief_dongfang",
+    "male",
+    "adult",
+    "sect_master",
+    "sunmoon"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Sun Moon cult member in red and black robes with gold trim, a dignified sect leader in an ornate version of the robe; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_east_sect_sunmoon_vice_renwoxing",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "east",
+   "sect": "sunmoon",
+   "group": "east",
+   "name": "รองเจ้าสำนักเหรินหวัวสิง",
+   "tags": [
+    "รองเจ้าสำนักเหรินหวัวสิง",
+    "sect_sunmoon_vice_renwoxing",
+    "male",
+    "adult",
+    "vice_master",
+    "sunmoon"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Sun Moon cult member in red and black robes with gold trim, a senior master; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_east_sect_sunmoon_sun_elder_zuolengchan",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "east",
+   "sect": "sunmoon",
+   "group": "east",
+   "name": "ผู้อาวุโสตะวันจั่วเหลิงฉัน",
+   "tags": [
+    "ผู้อาวุโสตะวันจั่วเหลิงฉัน",
+    "sect_sunmoon_sun_elder_zuolengchan",
+    "male",
+    "elder",
+    "elder",
+    "sunmoon",
+    "yang"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a Sun Moon cult member in red and black robes with gold trim; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_east_sect_sunmoon_moon_elder_xianggwentian",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "east",
+   "sect": "sunmoon",
+   "group": "east",
+   "name": "ผู้อาวุโสจันทราเสี่ยงเหวินเทียน",
+   "tags": [
+    "ผู้อาวุโสจันทราเสี่ยงเหวินเทียน",
+    "sect_sunmoon_moon_elder_xianggwentian",
+    "male",
+    "elder",
+    "elder",
+    "sunmoon",
+    "yin"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a Sun Moon cult member in red and black robes with gold trim; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_east_sect_sunmoon_balance_elder_qudongfeng",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "east",
+   "sect": "sunmoon",
+   "group": "east",
+   "name": "ผู้อาวุโสสมดุลฉวี่ตงเฟิง",
+   "tags": [
+    "ผู้อาวุโสสมดุลฉวี่ตงเฟิง",
+    "sect_sunmoon_balance_elder_qudongfeng",
+    "male",
+    "elder",
+    "elder",
+    "sunmoon",
+    "balance"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a Sun Moon cult member in red and black robes with gold trim; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_east_sect_sunmoon_head_disciple_yilin",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "east",
+   "sect": "sunmoon",
+   "group": "east",
+   "name": "หัวหน้าศิษย์อี้หลิน",
+   "tags": [
+    "หัวหน้าศิษย์อี้หลิน",
+    "sect_sunmoon_head_disciple_yilin",
+    "female",
+    "adult",
+    "head_disciple",
+    "sunmoon"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "woman, a Sun Moon cult member in red and black robes with gold trim; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_east_sect_sunmoon_disciple_lanfenghuang",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "east",
+   "sect": "sunmoon",
+   "group": "east",
+   "name": "ศิษย์หลานเฟิงหวง",
+   "tags": [
+    "ศิษย์หลานเฟิงหวง",
+    "sect_sunmoon_disciple_lanfenghuang",
+    "female",
+    "adult",
+    "disciple",
+    "sunmoon"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "woman, a Sun Moon cult member in red and black robes with gold trim; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_east_sect_sunmoon_junior_xiaoyu",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "east",
+   "sect": "sunmoon",
+   "group": "east",
+   "name": "ศิษย์เสี่ยวอวี้",
+   "tags": [
+    "ศิษย์เสี่ยวอวี้",
+    "sect_sunmoon_junior_xiaoyu",
+    "male",
+    "adult",
+    "disciple",
+    "sunmoon"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Sun Moon cult member in red and black robes with gold trim; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_east_sect_ming_elder_zhuying",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "east",
+   "sect": "sunmoon",
+   "group": "east",
+   "name": "ผู้อาวุโสจูอิง",
+   "tags": [
+    "ผู้อาวุโสจูอิง",
+    "sect_ming_elder_zhuying",
+    "male",
+    "elder",
+    "elder",
+    "sunmoon",
+    "shadow"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a Sun Moon cult member in red and black robes with gold trim; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_east_sect_ming_envoy_huozhi",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "east",
+   "sect": "ming_sect",
+   "group": "east",
+   "name": "ผู้แทนหั่วจี้",
+   "tags": [
+    "ผู้แทนหั่วจี้",
+    "sect_ming_envoy_huozhi",
+    "male",
+    "adult",
+    "envoy",
+    "ming_sect",
+    "sparring"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Sun Moon cult member in red and black robes with gold trim; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_north_sect_xiaoyao_master_yunxiao",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "north",
+   "sect": "xiaoyao",
+   "group": "north",
+   "name": "ปรมาจารย์ยุนเซียว",
+   "tags": [
+    "ปรมาจารย์ยุนเซียว",
+    "sect_xiaoyao_master_yunxiao",
+    "male",
+    "adult",
+    "sect_master",
+    "xiaoyao"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Xiaoyao sect member in an elegant pale-blue silk robe, a dignified sect leader in an ornate version of the robe; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_north_sect_xiaoyao_vice_tianshan",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "north",
+   "sect": "xiaoyao",
+   "group": "north",
+   "name": "รองอาจารย์เทียนซาน",
+   "tags": [
+    "รองอาจารย์เทียนซาน",
+    "sect_xiaoyao_vice_tianshan",
+    "male",
+    "adult",
+    "vice_master",
+    "xiaoyao"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Xiaoyao sect member in an elegant pale-blue silk robe, a senior master; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_north_sect_xiaoyao_sword_elder_wuyazi",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "north",
+   "sect": "xiaoyao",
+   "group": "north",
+   "name": "ผู้อาวุโสกระบี่อู๋หยาจื่อ",
+   "tags": [
+    "ผู้อาวุโสกระบี่อู๋หยาจื่อ",
+    "sect_xiaoyao_sword_elder_wuyazi",
+    "male",
+    "elder",
+    "elder",
+    "xiaoyao",
+    "swordsman"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a Xiaoyao sect member in an elegant pale-blue silk robe; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_north_sect_xiaoyao_palm_elder_libai",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "north",
+   "sect": "xiaoyao",
+   "group": "north",
+   "name": "ผู้อาวุโสฝ่ามือหลี่ไป๋",
+   "tags": [
+    "ผู้อาวุโสฝ่ามือหลี่ไป๋",
+    "sect_xiaoyao_palm_elder_libai",
+    "male",
+    "elder",
+    "elder",
+    "xiaoyao",
+    "palm_master"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a Xiaoyao sect member in an elegant pale-blue silk robe; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_north_sect_xiaoyao_blade_elder_xiaorang",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "north",
+   "sect": "xiaoyao",
+   "group": "north",
+   "name": "ผู้อาวุโสดาบเสี่ยวหรง",
+   "tags": [
+    "ผู้อาวุโสดาบเสี่ยวหรง",
+    "sect_xiaoyao_blade_elder_xiaorang",
+    "male",
+    "elder",
+    "elder",
+    "xiaoyao",
+    "blade"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a Xiaoyao sect member in an elegant pale-blue silk robe; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_north_sect_xiaoyao_head_disciple_aliao",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "north",
+   "sect": "xiaoyao",
+   "group": "north",
+   "name": "หัวหน้าศิษย์อาเหลียว",
+   "tags": [
+    "หัวหน้าศิษย์อาเหลียว",
+    "sect_xiaoyao_head_disciple_aliao",
+    "male",
+    "adult",
+    "head_disciple",
+    "xiaoyao"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Xiaoyao sect member in an elegant pale-blue silk robe; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_north_sect_xiaoyao_disciple_jiumozhi",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "north",
+   "sect": "xiaoyao",
+   "group": "north",
+   "name": "ศิษย์จิ่วม่อจื้อ",
+   "tags": [
+    "ศิษย์จิ่วม่อจื้อ",
+    "sect_xiaoyao_disciple_jiumozhi",
+    "male",
+    "adult",
+    "disciple",
+    "xiaoyao",
+    "venom"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Xiaoyao sect member in an elegant pale-blue silk robe; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_north_sect_xiaoyao_junior_xiaolan",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "north",
+   "sect": "xiaoyao",
+   "group": "north",
+   "name": "ศิษย์เสี่ยวหลาน",
+   "tags": [
+    "ศิษย์เสี่ยวหลาน",
+    "sect_xiaoyao_junior_xiaolan",
+    "female",
+    "adult",
+    "disciple",
+    "xiaoyao"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "woman, a Xiaoyao sect member in an elegant pale-blue silk robe; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_sect_xingxiu_disciple_dushou",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "west",
+   "sect": "xingxiu",
+   "group": "west",
+   "name": "ศิษย์ตู๋โซ่ว",
+   "tags": [
+    "ศิษย์ตู๋โซ่ว",
+    "sect_xingxiu_disciple_dushou",
+    "male",
+    "adult",
+    "disciple",
+    "venom",
+    "xingxiu",
+    "sparring"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Xingxiu poison-sect disciple in a purple robe; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_sect_wudu_miao_aman",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "west",
+   "sect": "wudu",
+   "group": "west",
+   "name": "หมอพิษอาหมาน",
+   "tags": [
+    "หมอพิษอาหมาน",
+    "sect_wudu_miao_aman",
+    "female",
+    "adult",
+    "miao",
+    "venom",
+    "wudu",
+    "sparring"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "woman, a Miao Five Poisons cultist in indigo clothes with silver jewellery; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_sect_xuedao_blade_xuelang",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "west",
+   "sect": "xuedao",
+   "group": "west",
+   "name": "ดาบเลือดเซียะลาง",
+   "tags": [
+    "ดาบเลือดเซียะลาง",
+    "sect_xuedao_blade_xuelang",
+    "male",
+    "adult",
+    "blade",
+    "evil_sect",
+    "xuedao",
+    "sparring"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Blood Blade lama with red eyes in maroon robes holding a blood-red sabre; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_sect_jinyiwei_leader_zhao",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "heartland",
+   "sect": "jinyiwei",
+   "group": "heartland",
+   "name": "ผู้บัญชาการจ้าวฝู่",
+   "tags": [
+    "ผู้บัญชาการจ้าวฝู่",
+    "sect_jinyiwei_leader_zhao",
+    "male",
+    "adult",
+    "sect_master",
+    "imperial",
+    "jinyiwei"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, an imperial Embroidered Uniform Guard in a red-gold flying-fish robe, black gauze hat and slim sabre, a dignified sect leader in an ornate version of the robe; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_sect_jinyiwei_soldier_qin",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "heartland",
+   "sect": "jinyiwei",
+   "group": "heartland",
+   "name": "องครักษ์ฉิน",
+   "tags": [
+    "องครักษ์ฉิน",
+    "sect_jinyiwei_soldier_qin",
+    "male",
+    "adult",
+    "soldier",
+    "imperial",
+    "jinyiwei",
+    "blade"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, an imperial Embroidered Uniform Guard in a red-gold flying-fish robe, black gauze hat and slim sabre; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_sect_jinyiwei_soldier_lu",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "heartland",
+   "sect": "jinyiwei",
+   "group": "heartland",
+   "name": "องครักษ์ลู่",
+   "tags": [
+    "องครักษ์ลู่",
+    "sect_jinyiwei_soldier_lu",
+    "male",
+    "adult",
+    "soldier",
+    "imperial",
+    "jinyiwei",
+    "chain"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, an imperial Embroidered Uniform Guard in a red-gold flying-fish robe, black gauze hat and slim sabre; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_south_sect_tang_chief_tangmen",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "south",
+   "sect": "tang",
+   "group": "south",
+   "name": "เจ้าสำนักถังเหมิน",
+   "tags": [
+    "เจ้าสำนักถังเหมิน",
+    "sect_tang_chief_tangmen",
+    "male",
+    "adult",
+    "sect_master",
+    "tang",
+    "venom",
+    "hidden_weapon"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Tang clan hidden-weapon expert in dark green and black with dart pouches, a dignified sect leader in an ornate version of the robe; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_south_sect_tang_vice_tangshanhu",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "south",
+   "sect": "tang",
+   "group": "south",
+   "name": "รองเจ้าสำนักถังซานหู",
+   "tags": [
+    "รองเจ้าสำนักถังซานหู",
+    "sect_tang_vice_tangshanhu",
+    "male",
+    "adult",
+    "vice_master",
+    "tang",
+    "hidden_weapon"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Tang clan hidden-weapon expert in dark green and black with dart pouches, a senior master; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_south_sect_tang_venom_elder_tangzhongtian",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "south",
+   "sect": "tang",
+   "group": "south",
+   "name": "ผู้อาวุโสพิษถังจงเทียน",
+   "tags": [
+    "ผู้อาวุโสพิษถังจงเทียน",
+    "sect_tang_venom_elder_tangzhongtian",
+    "male",
+    "elder",
+    "elder",
+    "tang",
+    "venom"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a Tang clan hidden-weapon expert in dark green and black with dart pouches; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_south_sect_tang_blade_elder_tangshibi",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "south",
+   "sect": "tang",
+   "group": "south",
+   "name": "ผู้อาวุโสมีดถังซือปี้",
+   "tags": [
+    "ผู้อาวุโสมีดถังซือปี้",
+    "sect_tang_blade_elder_tangshibi",
+    "male",
+    "elder",
+    "elder",
+    "tang",
+    "blade"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a Tang clan hidden-weapon expert in dark green and black with dart pouches; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_south_sect_tang_chase_elder_tangrong",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "south",
+   "sect": "tang",
+   "group": "south",
+   "name": "ผู้อาวุโสไล่ล่าถังหรง",
+   "tags": [
+    "ผู้อาวุโสไล่ล่าถังหรง",
+    "sect_tang_chase_elder_tangrong",
+    "male",
+    "elder",
+    "elder",
+    "tang",
+    "scout"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a Tang clan hidden-weapon expert in dark green and black with dart pouches; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_south_sect_tang_head_disciple_tanglin",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "south",
+   "sect": "tang",
+   "group": "south",
+   "name": "หัวหน้าศิษย์ถังหลิน",
+   "tags": [
+    "หัวหน้าศิษย์ถังหลิน",
+    "sect_tang_head_disciple_tanglin",
+    "male",
+    "adult",
+    "head_disciple",
+    "tang"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Tang clan hidden-weapon expert in dark green and black with dart pouches; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_south_sect_tang_disciple_tangtao",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "south",
+   "sect": "tang",
+   "group": "south",
+   "name": "ศิษย์ถังเทา",
+   "tags": [
+    "ศิษย์ถังเทา",
+    "sect_tang_disciple_tangtao",
+    "male",
+    "adult",
+    "disciple",
+    "tang"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Tang clan hidden-weapon expert in dark green and black with dart pouches; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_south_sect_tang_junior_tangxiu",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "south",
+   "sect": "tang",
+   "group": "south",
+   "name": "ศิษย์ถังซิ่ว",
+   "tags": [
+    "ศิษย์ถังซิ่ว",
+    "sect_tang_junior_tangxiu",
+    "female",
+    "adult",
+    "disciple",
+    "tang"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "woman, a Tang clan hidden-weapon expert in dark green and black with dart pouches; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_sect_xueyu_master_chiying",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "west",
+   "sect": "xueyu",
+   "group": "west",
+   "name": "จอมยุทธฉือยิง",
+   "tags": [
+    "จอมยุทธฉือยิง",
+    "sect_xueyu_master_chiying",
+    "male",
+    "elder",
+    "master",
+    "evil_sect",
+    "xueyu",
+    "sparring"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a Blood Sword sect fighter in crimson and black; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_south_villa_yaowang_doctor_shennong",
+   "category": "character",
+   "subcategory": "doctor",
+   "region": "south",
+   "group": "south",
+   "name": "หมอเสินหนง",
+   "tags": [
+    "หมอเสินหนง",
+    "villa_yaowang_doctor_shennong",
+    "male",
+    "elder",
+    "doctor",
+    "herbalist",
+    "yaowang"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a herbalist doctor with a medicine box; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_temple_dalun_monk_kongxin",
+   "category": "character",
+   "subcategory": "monk",
+   "region": "west",
+   "group": "west",
+   "name": "พระกงซิน",
+   "tags": [
+    "พระกงซิน",
+    "temple_dalun_monk_kongxin",
+    "male",
+    "adult",
+    "monk",
+    "temple",
+    "dalun"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Buddhist monk with a shaved head in a brown robe; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_east_villa_yanzi_lord_yanfeng",
+   "category": "character",
+   "subcategory": "noble",
+   "region": "east",
+   "group": "east",
+   "name": "เจ้าบ้านเหยินเฟิง",
+   "tags": [
+    "เจ้าบ้านเหยินเฟิง",
+    "villa_yanzi_lord_yanfeng",
+    "female",
+    "adult",
+    "noble",
+    "lord",
+    "yanzi"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "woman, an official in a dark silk robe with a black gauze hat; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_north_palace_zhongyang_envoy_liuying",
+   "category": "character",
+   "subcategory": "envoy",
+   "region": "north",
+   "group": "north",
+   "name": "ทูตหลิวอิง",
+   "tags": [
+    "ทูตหลิวอิง",
+    "palace_zhongyang_envoy_liuying",
+    "male",
+    "adult",
+    "envoy",
+    "imperial",
+    "zhongyang"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a commoner in plain hemp clothes; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_east_wld_taohua_hermit_huang",
+   "category": "character",
+   "subcategory": "hermit",
+   "region": "east",
+   "group": "east",
+   "name": "ฮ่วงเอี้ยะซือ (ปรมาจารย์ฤาษี)",
+   "tags": [
+    "ฮ่วงเอี้ยะซือ (ปรมาจารย์ฤาษี)",
+    "wld_taohua_hermit_huang",
+    "male",
+    "adult",
+    "hermit",
+    "master",
+    "eccentric"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, the eccentric Peach Blossom Island master in a green scholar's robe with a jade flute; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_wld_kunlun_exile_qiu",
+   "category": "character",
+   "subcategory": "exile",
+   "region": "west",
+   "group": "west",
+   "name": "ชิวเฉียน (ฤๅษีเนรเทศ)",
+   "tags": [
+    "ชิวเฉียน (ฤๅษีเนรเทศ)",
+    "wld_kunlun_exile_qiu",
+    "male",
+    "adult",
+    "exile",
+    "master",
+    "mysterious"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, an exiled Kunlun elder in a frayed white robe with a long sword; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_wld_jueqing_elder_lin",
+   "category": "character",
+   "subcategory": "elder",
+   "region": "west",
+   "group": "west",
+   "name": "หลินชัวซัน (ผู้เฒ่าตัดใจ)",
+   "tags": [
+    "หลินชัวซัน (ผู้เฒ่าตัดใจ)",
+    "wld_jueqing_elder_lin",
+    "male",
+    "elder",
+    "elder",
+    "herbalist",
+    "recluse"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a herbalist doctor with a medicine box; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_east_wld_jinshe_beasttamer_xu",
+   "category": "character",
+   "subcategory": "beast_tamer",
+   "region": "east",
+   "group": "east",
+   "name": "ซวีเหลิงชิง (ผู้ฝึกงู)",
+   "tags": [
+    "ซวีเหลิงชิง (ผู้ฝึกงู)",
+    "wld_jinshe_beasttamer_xu",
+    "female",
+    "adult",
+    "beast_tamer",
+    "herbalist",
+    "mysterious"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "woman, a young woman snake tamer in a dark green dress with a golden snake around her arm; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_wld_desert_collector_mo",
+   "category": "character",
+   "subcategory": "collector",
+   "region": "west",
+   "group": "west",
+   "name": "โม่ฉิงเทียน (นักสะสมโบราณ)",
+   "tags": [
+    "โม่ฉิงเทียน (นักสะสมโบราณ)",
+    "wld_desert_collector_mo",
+    "male",
+    "elder",
+    "collector",
+    "scholar",
+    "wanderer"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, an old desert antique collector in a dusty robe and wide hat with a bag of relics; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_wld_miao_tribaleldr_abao",
+   "category": "character",
+   "subcategory": "tribal",
+   "region": "west",
+   "group": "west",
+   "name": "อาเป้า (หัวหน้าเผ่าเมี่ยว)",
+   "tags": [
+    "อาเป้า (หัวหน้าเผ่าเมี่ยว)",
+    "wld_miao_tribaleldr_abao",
+    "female",
+    "elder",
+    "tribal",
+    "elder",
+    "herbalist"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old woman with grey hair, an old Miao tribal chief in indigo clothes with a big silver neck ring and a staff; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_north_wld_motian_ghost_liang",
+   "category": "character",
+   "subcategory": "ghost",
+   "region": "north",
+   "group": "north",
+   "name": "เหลียงเก๋อ (วิญญาณนักรบ)",
+   "tags": [
+    "เหลียงเก๋อ (วิญญาณนักรบ)",
+    "wld_motian_ghost_liang",
+    "male",
+    "adult",
+    "ghost",
+    "spirit",
+    "warrior"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, the translucent pale-blue ghost of an ancient armoured warrior with a broken spear; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_east_wld_bingcan_scholar_wei",
+   "category": "character",
+   "subcategory": "scholar",
+   "region": "east",
+   "group": "east",
+   "name": "เว่ยชิงเหวิน (บัณฑิตถ้ำ)",
+   "tags": [
+    "เว่ยชิงเหวิน (บัณฑิตถ้ำ)",
+    "wld_bingcan_scholar_wei",
+    "male",
+    "elder",
+    "scholar",
+    "recluse"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a scholar in a pale robe holding a folding fan, wearing a warm fur-lined coat; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_wld_heilong_fisherman_tan",
+   "category": "character",
+   "subcategory": "fisherman",
+   "region": "west",
+   "group": "west",
+   "name": "ต่านเหลาตู (ชาวประมงแก่)",
+   "tags": [
+    "ต่านเหลาตู (ชาวประมงแก่)",
+    "wld_heilong_fisherman_tan",
+    "male",
+    "elder",
+    "fisherman",
+    "elder",
+    "witness"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a fisherman with a conical straw hat and a fishing rod; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_wld_hong_adventurer_luo",
+   "category": "character",
+   "subcategory": "adventurer",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "หลัวเฟย์หาว (นักผจญภัย)",
+   "tags": [
+    "หลัวเฟย์หาว (นักผจญภัย)",
+    "wld_hong_adventurer_luo",
+    "male",
+    "adult",
+    "adventurer",
+    "young_warrior"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a wandering martial artist with a sword on the back; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_evil_capital_blackmarket_zhou",
+   "category": "character",
+   "subcategory": "villain",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "เถ้าแก่โจวตลาดมืด",
+   "tags": [
+    "เถ้าแก่โจวตลาดมืด",
+    "evil_capital_blackmarket_zhou",
+    "male",
+    "elder",
+    "villain",
+    "merchant",
+    "underworld"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a merchant in a brown silk robe and cap; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_evil_changan_corrupt_official_yan",
+   "category": "character",
+   "subcategory": "villain",
+   "region": "west",
+   "group": "west",
+   "name": "ขุนนางหยานทุจริต",
+   "tags": [
+    "ขุนนางหยานทุจริต",
+    "evil_changan_corrupt_official_yan",
+    "female",
+    "adult",
+    "villain",
+    "official",
+    "noble"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "woman, an official in a dark silk robe with a black gauze hat; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_east_evil_treasure_bandit_chief_qing",
+   "category": "character",
+   "subcategory": "villain",
+   "region": "east",
+   "group": "east",
+   "name": "หัวหน้าโจรชิง",
+   "tags": [
+    "หัวหน้าโจรชิง",
+    "evil_treasure_bandit_chief_qing",
+    "male",
+    "adult",
+    "villain",
+    "bandit"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a bandit chief with a broad sabre and leather armour; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_evil_xueyu_envoy_xie",
+   "category": "character",
+   "subcategory": "villain",
+   "region": "west",
+   "group": "west",
+   "name": "ทูตเซี่ยแห่งสำนักดาบโลหิต",
+   "tags": [
+    "ทูตเซี่ยแห่งสำนักดาบโลหิต",
+    "evil_xueyu_envoy_xie",
+    "male",
+    "adult",
+    "villain",
+    "evil_sect",
+    "envoy"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a commoner in plain hemp clothes; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_evil_wudu_elder_dushi",
+   "category": "character",
+   "subcategory": "villain",
+   "region": "west",
+   "group": "west",
+   "name": "ผู้อาวุโสตู๋ซื่อ",
+   "tags": [
+    "ผู้อาวุโสตู๋ซื่อ",
+    "evil_wudu_elder_dushi",
+    "male",
+    "adult",
+    "villain",
+    "venom_master",
+    "evil_sect"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a poison master in dark green with venom gourds; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_south_evil_zhizhu_assassin_ying",
+   "category": "character",
+   "subcategory": "villain",
+   "region": "south",
+   "group": "south",
+   "name": "นักฆ่าเงาหยิง",
+   "tags": [
+    "นักฆ่าเงาหยิง",
+    "evil_zhizhu_assassin_ying",
+    "male",
+    "adult",
+    "villain",
+    "assassin",
+    "shadow"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a shadow assassin in black with a mask and spider-silk claws; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_north_evil_chuangwang_heretic_huibao",
+   "category": "character",
+   "subcategory": "villain",
+   "region": "north",
+   "group": "north",
+   "name": "พระอเถระนอกรีตฮุยเป้า",
+   "tags": [
+    "พระอเถระนอกรีตฮุยเป้า",
+    "evil_chuangwang_heretic_huibao",
+    "female",
+    "elder",
+    "villain",
+    "heretic",
+    "monk"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old woman with grey hair, a fallen Shaolin monk with wild eyes in torn dark robes; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_east_evil_shenlong_cult_leader_zhao",
+   "category": "character",
+   "subcategory": "villain",
+   "region": "east",
+   "group": "east",
+   "name": "เจ้าลัทธิจ้าวมังกรเทพ",
+   "tags": [
+    "เจ้าลัทธิจ้าวมังกรเทพ",
+    "evil_shenlong_cult_leader_zhao",
+    "female",
+    "elder",
+    "villain",
+    "cult_leader"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old woman with grey hair, a cult leader in a golden-black robe with a dragon emblem; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_spy_capital_feng",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "heartland",
+   "sect": "jinyiwei",
+   "group": "heartland",
+   "name": "เฟิงเจ้าของร้านบะหมี่",
+   "tags": [
+    "เฟิงเจ้าของร้านบะหมี่",
+    "spy_capital_feng",
+    "male",
+    "adult",
+    "spy",
+    "jinyiwei",
+    "informant"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, an imperial Embroidered Uniform Guard in a red-gold flying-fish robe, black gauze hat and slim sabre; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_east_spy_yangzhou_xi",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "east",
+   "sect": "jinyiwei",
+   "group": "east",
+   "name": "ซีคนยกของท่าเรือ",
+   "tags": [
+    "ซีคนยกของท่าเรือ",
+    "spy_yangzhou_xi",
+    "male",
+    "adult",
+    "spy",
+    "jinyiwei",
+    "informant"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, an imperial Embroidered Uniform Guard in a red-gold flying-fish robe, black gauze hat and slim sabre; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_spy_dali_mei",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "west",
+   "sect": "jinyiwei",
+   "group": "west",
+   "name": "เหมยพรานป่า",
+   "tags": [
+    "เหมยพรานป่า",
+    "spy_dali_mei",
+    "female",
+    "adult",
+    "spy",
+    "jinyiwei",
+    "informant"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "woman, an imperial Embroidered Uniform Guard in a red-gold flying-fish robe, black gauze hat and slim sabre; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_spy_inn_zhou",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "heartland",
+   "sect": "jinyiwei",
+   "group": "heartland",
+   "name": "โจวพ่อค้าเหล้าในโรงเตี๊ยม",
+   "tags": [
+    "โจวพ่อค้าเหล้าในโรงเตี๊ยม",
+    "spy_inn_zhou",
+    "male",
+    "adult",
+    "spy",
+    "jinyiwei",
+    "informant"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, an imperial Embroidered Uniform Guard in a red-gold flying-fish robe, black gauze hat and slim sabre; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_spy_village_si",
+   "category": "character",
+   "subcategory": "sect",
+   "region": "heartland",
+   "sect": "jinyiwei",
+   "group": "heartland",
+   "name": "ซื่อชาวนาในชีกู่",
+   "tags": [
+    "ซื่อชาวนาในชีกู่",
+    "spy_village_si",
+    "male",
+    "adult",
+    "spy",
+    "jinyiwei",
+    "informant"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, an imperial Embroidered Uniform Guard in a red-gold flying-fish robe, black gauze hat and slim sabre; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_village_noname_whip_qiao",
+   "category": "character",
+   "subcategory": "elder",
+   "region": "west",
+   "group": "west",
+   "name": "ยายเฉียว",
+   "tags": [
+    "ยายเฉียว",
+    "village_noname_whip_qiao",
+    "female",
+    "elder",
+    "elder",
+    "master",
+    "hidden_weapon",
+    "retired_warrior"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old woman with grey hair, an old woman goatherd with a long leather whip; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_village_noname_carter_lu",
+   "category": "character",
+   "subcategory": "carter",
+   "region": "west",
+   "group": "west",
+   "name": "ลู่เกวียน",
+   "tags": [
+    "ลู่เกวียน",
+    "village_noname_carter_lu",
+    "male",
+    "adult",
+    "carter",
+    "traveller",
+    "local"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a commoner in plain hemp clothes; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_village_noname_child_xiaowu",
+   "category": "character",
+   "subcategory": "child",
+   "region": "west",
+   "group": "west",
+   "name": "เสี่ยวอู๋",
+   "tags": [
+    "เสี่ยวอู๋",
+    "village_noname_child_xiaowu",
+    "male",
+    "child",
+    "child",
+    "local"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "little boy, a small child in simple clothes; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_village_huashan_teacher_ling",
+   "category": "character",
+   "subcategory": "elder",
+   "region": "west",
+   "group": "west",
+   "name": "ครูหลิง",
+   "tags": [
+    "ครูหลิง",
+    "village_huashan_teacher_ling",
+    "male",
+    "elder",
+    "elder",
+    "swordsman",
+    "teacher"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a scholar in a pale robe holding a folding fan; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_village_huashan_dreamer_yang",
+   "category": "character",
+   "subcategory": "swordsman",
+   "region": "west",
+   "group": "west",
+   "name": "หยางซื่อ",
+   "tags": [
+    "หยางซื่อ",
+    "village_huashan_dreamer_yang",
+    "male",
+    "adult",
+    "swordsman",
+    "sparring"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a wandering martial artist with a sword on the back; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_village_huashan_apprentice_tie",
+   "category": "character",
+   "subcategory": "craftsman",
+   "region": "west",
+   "group": "west",
+   "name": "เถี่ยตัน",
+   "tags": [
+    "เถี่ยตัน",
+    "village_huashan_apprentice_tie",
+    "male",
+    "adult",
+    "craftsman",
+    "forge",
+    "blacksmith"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a craftsman with a leather apron and a hammer; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_village_taishan_porter_shi",
+   "category": "character",
+   "subcategory": "porter",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "สือเปียนตาน",
+   "tags": [
+    "สือเปียนตาน",
+    "village_taishan_porter_shi",
+    "male",
+    "adult",
+    "porter",
+    "staff_master",
+    "local"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a labourer in plain hemp clothes with a carrying pole; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_village_taishan_granny_die",
+   "category": "character",
+   "subcategory": "elder",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "ยายเตี๋ย",
+   "tags": [
+    "ยายเตี๋ย",
+    "village_taishan_granny_die",
+    "female",
+    "elder",
+    "elder",
+    "herbalist"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old woman with grey hair, a herbalist doctor with a medicine box; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_village_taishan_pilgrim_chen",
+   "category": "character",
+   "subcategory": "scholar",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "บัณฑิตเฉิน",
+   "tags": [
+    "บัณฑิตเฉิน",
+    "village_taishan_pilgrim_chen",
+    "female",
+    "elder",
+    "scholar",
+    "pilgrim"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old woman with grey hair, a scholar in a pale robe holding a folding fan; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_east_inn_youjian_keeper_mei",
+   "category": "character",
+   "subcategory": "innkeeper",
+   "region": "east",
+   "group": "east",
+   "name": "เหมยเหนียง",
+   "tags": [
+    "เหมยเหนียง",
+    "inn_youjian_keeper_mei",
+    "female",
+    "elder",
+    "innkeeper",
+    "merchant"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old woman with grey hair, a merchant in a brown silk robe and cap; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_east_inn_youjian_cook_bao",
+   "category": "character",
+   "subcategory": "chef",
+   "region": "east",
+   "group": "east",
+   "name": "ปาวซาลาเปา",
+   "tags": [
+    "ปาวซาลาเปา",
+    "inn_youjian_cook_bao",
+    "male",
+    "adult",
+    "chef"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a cook in an apron holding a ladle; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_east_inn_youjian_diviner_gua",
+   "category": "character",
+   "subcategory": "scholar",
+   "region": "east",
+   "group": "east",
+   "name": "ซินแสกว้า",
+   "tags": [
+    "ซินแสกว้า",
+    "inn_youjian_diviner_gua",
+    "male",
+    "elder",
+    "scholar",
+    "diviner"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a scholar in a pale robe holding a folding fan; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_city_lingxiao_sweeper_bai",
+   "category": "character",
+   "subcategory": "elder",
+   "region": "west",
+   "group": "west",
+   "name": "ลุงไป๋",
+   "tags": [
+    "ลุงไป๋",
+    "city_lingxiao_sweeper_bai",
+    "male",
+    "elder",
+    "elder",
+    "laborer"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a labourer in plain hemp clothes with a carrying pole, wearing a warm fur-lined coat; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_city_lingxiao_coal_hu",
+   "category": "character",
+   "subcategory": "merchant",
+   "region": "west",
+   "group": "west",
+   "name": "หูเตาถ่าน",
+   "tags": [
+    "หูเตาถ่าน",
+    "city_lingxiao_coal_hu",
+    "male",
+    "adult",
+    "merchant",
+    "laborer"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a burly coal seller with a soot-black face and a basket of charcoal, wearing a warm fur-lined coat; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_city_lingxiao_guard_feng",
+   "category": "character",
+   "subcategory": "guard",
+   "region": "west",
+   "group": "west",
+   "name": "เฝิงหานเหมย",
+   "tags": [
+    "เฝิงหานเหมย",
+    "city_lingxiao_guard_feng",
+    "female",
+    "adult",
+    "guard",
+    "fighter"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "woman, a stern woman gate guard in a fur-lined coat with a spear, wearing a warm fur-lined coat; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_city_lingxiao_scholar_sima",
+   "category": "character",
+   "subcategory": "scholar",
+   "region": "west",
+   "group": "west",
+   "name": "ซือหม่าเหยียน",
+   "tags": [
+    "ซือหม่าเหยียน",
+    "city_lingxiao_scholar_sima",
+    "male",
+    "adult",
+    "scholar",
+    "poet"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a scholar in a pale robe holding a folding fan, wearing a warm fur-lined coat; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_city_lingxiao_child_xue",
+   "category": "character",
+   "subcategory": "child",
+   "region": "west",
+   "group": "west",
+   "name": "เสี่ยวเสวี่ย",
+   "tags": [
+    "เสี่ยวเสวี่ย",
+    "city_lingxiao_child_xue",
+    "female",
+    "child",
+    "child"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "little girl, a small child in simple clothes, wearing a warm fur-lined coat; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_palace_royal_eunuch_gao",
+   "category": "character",
+   "subcategory": "eunuch",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "ขันทีเกา",
+   "tags": [
+    "ขันทีเกา",
+    "palace_royal_eunuch_gao",
+    "male",
+    "adult",
+    "eunuch",
+    "servant",
+    "official"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a palace eunuch in a dark official robe and hat; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_palace_royal_guard_zhao",
+   "category": "character",
+   "subcategory": "guard",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "จ้าวเทีย",
+   "tags": [
+    "จ้าวเทีย",
+    "palace_royal_guard_zhao",
+    "male",
+    "adult",
+    "guard",
+    "soldier",
+    "fighter"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a young imperial palace guard in red-gold armour with a long spear; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_palace_royal_maid_cui",
+   "category": "character",
+   "subcategory": "servant",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "ชุ่ยเอ๋อ",
+   "tags": [
+    "ชุ่ยเอ๋อ",
+    "palace_royal_maid_cui",
+    "female",
+    "elder",
+    "servant",
+    "maid"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old woman with grey hair, a Chinese palace maid in a pale pink hanfu robe with her hair in two buns; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_palace_royal_official_qian",
+   "category": "character",
+   "subcategory": "official",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "ขุนนางเฉียน",
+   "tags": [
+    "ขุนนางเฉียน",
+    "palace_royal_official_qian",
+    "female",
+    "adult",
+    "official",
+    "noble"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "woman, a pot-bellied court official in a red robe and black winged hat; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_tribe_huizu_smith_hai",
+   "category": "character",
+   "subcategory": "smith",
+   "region": "west",
+   "group": "west",
+   "name": "ช่างไห่",
+   "tags": [
+    "ช่างไห่",
+    "tribe_huizu_smith_hai",
+    "male",
+    "elder",
+    "smith",
+    "elder",
+    "craftsman"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, an old Hui blacksmith with a white cap, leather apron and hammer; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_tribe_huizu_wrestler_ma",
+   "category": "character",
+   "subcategory": "fighter",
+   "region": "west",
+   "group": "west",
+   "name": "หม่าต้าหลี่",
+   "tags": [
+    "หม่าต้าหลี่",
+    "tribe_huizu_wrestler_ma",
+    "male",
+    "adult",
+    "fighter",
+    "herder"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a broad-shouldered Hui tribal wrestler in a sleeveless vest and white cap; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_tribe_huizu_caravan_nasir",
+   "category": "character",
+   "subcategory": "merchant",
+   "region": "west",
+   "group": "west",
+   "name": "นาซีร์",
+   "tags": [
+    "นาซีร์",
+    "tribe_huizu_caravan_nasir",
+    "male",
+    "adult",
+    "merchant",
+    "guard",
+    "fighter"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a desert caravan leader with a turban, scarred face and curved sword; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_tribe_huizu_herder_aisha",
+   "category": "character",
+   "subcategory": "child",
+   "region": "west",
+   "group": "west",
+   "name": "อาอีซา",
+   "tags": [
+    "อาอีซา",
+    "tribe_huizu_herder_aisha",
+    "female",
+    "child",
+    "child",
+    "herder"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "little girl, a small Hui herder girl with an orange headscarf and a crook; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_home_player_housekeeper_liu",
+   "category": "character",
+   "subcategory": "servant",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "ป้าหลิว",
+   "tags": [
+    "ป้าหลิว",
+    "home_player_housekeeper_liu",
+    "female",
+    "elder",
+    "servant",
+    "elder",
+    "cook"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old woman with grey hair, a cook in an apron holding a ladle; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_home_player_gatekeeper_zhou",
+   "category": "character",
+   "subcategory": "guard",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "ลุงโจว",
+   "tags": [
+    "ลุงโจว",
+    "home_player_gatekeeper_zhou",
+    "female",
+    "elder",
+    "guard",
+    "elder",
+    "fighter"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old woman with grey hair, a guard in lamellar armour with a spear; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_home_player_neighbor_niu",
+   "category": "character",
+   "subcategory": "woodcutter",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "อาหนิว",
+   "tags": [
+    "อาหนิว",
+    "home_player_neighbor_niu",
+    "male",
+    "adult",
+    "woodcutter",
+    "farmer",
+    "neighbor"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a labourer in plain hemp clothes with a carrying pole; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_home_hufei_master_hufei",
+   "category": "character",
+   "subcategory": "master",
+   "region": "west",
+   "group": "west",
+   "name": "ฮูเฝย์",
+   "tags": [
+    "ฮูเฝย์",
+    "home_hufei_master_hufei",
+    "male",
+    "adult",
+    "master",
+    "blademaster",
+    "hero"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a fierce bearded sabre hero in a dark brown fur-trimmed robe with a dao; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_home_hufei_servant_ping",
+   "category": "character",
+   "subcategory": "servant",
+   "region": "west",
+   "group": "west",
+   "name": "ผิงอาสี่",
+   "tags": [
+    "ผิงอาสี่",
+    "home_hufei_servant_ping",
+    "female",
+    "elder",
+    "servant",
+    "elder"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old woman with grey hair, a servant in plain grey clothes; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_home_hufei_guest_yuan",
+   "category": "character",
+   "subcategory": "guest",
+   "region": "west",
+   "group": "west",
+   "name": "เอวี๋ยนจื่ออี",
+   "tags": [
+    "เอวี๋ยนจื่ออี",
+    "home_hufei_guest_yuan",
+    "female",
+    "adult",
+    "guest",
+    "swordswoman",
+    "wanderer"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "woman, a mysterious young woman in a purple dress with a sword; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_home_hufei_guest_jiu",
+   "category": "character",
+   "subcategory": "guest",
+   "region": "west",
+   "group": "west",
+   "name": "เหล่าจิ่ว",
+   "tags": [
+    "เหล่าจิ่ว",
+    "home_hufei_guest_jiu",
+    "male",
+    "elder",
+    "guest",
+    "drunkard",
+    "fighter"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a staggering old drunkard with a wine gourd and red nose; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_north_home_chengkun_disciple_chen",
+   "category": "character",
+   "subcategory": "disciple",
+   "region": "north",
+   "group": "north",
+   "name": "เฉินโหย่วเลี่ยง",
+   "tags": [
+    "เฉินโหย่วเลี่ยง",
+    "home_chengkun_disciple_chen",
+    "male",
+    "adult",
+    "disciple",
+    "schemer",
+    "fighter"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a wandering martial artist with a sword on the back; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_north_home_chengkun_gardener_wu",
+   "category": "character",
+   "subcategory": "gardener",
+   "region": "north",
+   "group": "north",
+   "name": "ลุงอู๋คนสวน",
+   "tags": [
+    "ลุงอู๋คนสวน",
+    "home_chengkun_gardener_wu",
+    "male",
+    "elder",
+    "gardener",
+    "servant",
+    "secret"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a servant in plain grey clothes; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_north_home_chengkun_maid_cui",
+   "category": "character",
+   "subcategory": "servant",
+   "region": "north",
+   "group": "north",
+   "name": "เสี่ยวชุ่ย",
+   "tags": [
+    "เสี่ยวชุ่ย",
+    "home_chengkun_maid_cui",
+    "female",
+    "adult",
+    "servant",
+    "maid"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "woman, a Chinese palace maid in a pale pink hanfu robe with her hair in two buns; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_south_home_xuemuhua_doctor_xue",
+   "category": "character",
+   "subcategory": "healer",
+   "region": "south",
+   "group": "south",
+   "name": "หมอเซวี่ยมู่หัว",
+   "tags": [
+    "หมอเซวี่ยมู่หัว",
+    "home_xuemuhua_doctor_xue",
+    "male",
+    "adult",
+    "healer",
+    "master",
+    "scholar"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a famous physician in a white robe with a medicine box; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_south_home_xuemuhua_guest_kang",
+   "category": "character",
+   "subcategory": "musician",
+   "region": "south",
+   "group": "south",
+   "name": "คังกว่างหลิง",
+   "tags": [
+    "คังกว่างหลิง",
+    "home_xuemuhua_guest_kang",
+    "male",
+    "elder",
+    "musician",
+    "guest",
+    "scholar"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a musician carrying a guqin zither; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_south_home_xuemuhua_guest_li",
+   "category": "character",
+   "subcategory": "actor",
+   "region": "south",
+   "group": "south",
+   "name": "หลี่ขุยเหล่ย",
+   "tags": [
+    "หลี่ขุยเหล่ย",
+    "home_xuemuhua_guest_li",
+    "male",
+    "adult",
+    "actor",
+    "guest",
+    "fighter"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a Peking-opera actor in a bright painted costume and headdress; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_south_home_xuemuhua_apprentice_dan",
+   "category": "character",
+   "subcategory": "child",
+   "region": "south",
+   "group": "south",
+   "name": "เสี่ยวตัน",
+   "tags": [
+    "เสี่ยวตัน",
+    "home_xuemuhua_apprentice_dan",
+    "male",
+    "child",
+    "child",
+    "apprentice",
+    "healer"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "little boy, a herbalist doctor with a medicine box; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_home_nanxian_sage_nanxian",
+   "category": "character",
+   "subcategory": "elder",
+   "region": "west",
+   "group": "west",
+   "name": "ท่านหนานเสียน",
+   "tags": [
+    "ท่านหนานเสียน",
+    "home_nanxian_sage_nanxian",
+    "male",
+    "elder",
+    "elder",
+    "scholar",
+    "master"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a scholar in a pale robe holding a folding fan; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_home_nanxian_servant_ashu",
+   "category": "character",
+   "subcategory": "child",
+   "region": "west",
+   "group": "west",
+   "name": "อาซู",
+   "tags": [
+    "อาซู",
+    "home_nanxian_servant_ashu",
+    "male",
+    "child",
+    "child",
+    "servant"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "little boy, a servant in plain grey clothes; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_home_nanxian_woodcutter_bai",
+   "category": "character",
+   "subcategory": "woodcutter",
+   "region": "west",
+   "group": "west",
+   "name": "ลุงไป๋",
+   "tags": [
+    "ลุงไป๋",
+    "home_nanxian_woodcutter_bai",
+    "male",
+    "elder",
+    "woodcutter",
+    "laborer"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a labourer in plain hemp clothes with a carrying pole; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_south_home_yideng_monk_yideng",
+   "category": "character",
+   "subcategory": "monk",
+   "region": "south",
+   "group": "south",
+   "name": "อิดเต็งไต้ซือ",
+   "tags": [
+    "อิดเต็งไต้ซือ",
+    "home_yideng_monk_yideng",
+    "male",
+    "elder",
+    "monk",
+    "healer",
+    "elder",
+    "master"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, an old monk, a former emperor, in a plain brown robe with a gentle face; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_south_home_yideng_fisher_diancang",
+   "category": "character",
+   "subcategory": "fisher",
+   "region": "south",
+   "group": "south",
+   "name": "ฤๅษีประมงเตี่ยมชง",
+   "tags": [
+    "ฤๅษีประมงเตี่ยมชง",
+    "home_yideng_fisher_diancang",
+    "male",
+    "adult",
+    "fisher",
+    "disciple",
+    "guard"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a fisherman with a conical straw hat and a fishing rod; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_south_home_yideng_farmer_geng",
+   "category": "character",
+   "subcategory": "farmer",
+   "region": "south",
+   "group": "south",
+   "name": "ชาวนาเกิง",
+   "tags": [
+    "ชาวนาเกิง",
+    "home_yideng_farmer_geng",
+    "male",
+    "adult",
+    "farmer",
+    "disciple"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a labourer in plain hemp clothes with a carrying pole; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_south_home_yideng_scholar_zhu",
+   "category": "character",
+   "subcategory": "scholar",
+   "region": "south",
+   "group": "south",
+   "name": "บัณฑิตจูจื่อหลิว",
+   "tags": [
+    "บัณฑิตจูจื่อหลิว",
+    "home_yideng_scholar_zhu",
+    "male",
+    "adult",
+    "scholar",
+    "disciple",
+    "official"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, an official in a dark silk robe with a black gauze hat; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_home_tianboguang_blade_tian",
+   "category": "character",
+   "subcategory": "swordsman",
+   "region": "west",
+   "group": "west",
+   "name": "เถียนป๋อกวง",
+   "tags": [
+    "เถียนป๋อกวง",
+    "home_tianboguang_blade_tian",
+    "male",
+    "adult",
+    "swordsman",
+    "outlaw",
+    "reformed"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a roguish swift blade-fighter in a black robe with a sabre; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_home_tianboguang_cook_luo",
+   "category": "character",
+   "subcategory": "cook",
+   "region": "west",
+   "group": "west",
+   "name": "ป้าหลัว",
+   "tags": [
+    "ป้าหลัว",
+    "home_tianboguang_cook_luo",
+    "female",
+    "elder",
+    "cook",
+    "servant"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old woman with grey hair, a cook in an apron holding a ladle; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_home_tianboguang_soldier_chen",
+   "category": "character",
+   "subcategory": "guard",
+   "region": "west",
+   "group": "west",
+   "name": "ทหารแก่เฉิน",
+   "tags": [
+    "ทหารแก่เฉิน",
+    "home_tianboguang_soldier_chen",
+    "male",
+    "elder",
+    "guard",
+    "soldier",
+    "elder"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a guard in lamellar armour with a spear; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_home_miaoren_master_miao",
+   "category": "character",
+   "subcategory": "swordsman",
+   "region": "west",
+   "group": "west",
+   "name": "เหมียวเหรินเฟิง",
+   "tags": [
+    "เหมียวเหรินเฟิง",
+    "home_miaoren_master_miao",
+    "female",
+    "adult",
+    "swordsman",
+    "master",
+    "hero"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "woman, a tall stern frontier swordsman in a black robe with a long sword; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_home_miaoren_daughter_ruolan",
+   "category": "character",
+   "subcategory": "daughter",
+   "region": "west",
+   "group": "west",
+   "name": "เหมียวรั่วหลัน",
+   "tags": [
+    "เหมียวรั่วหลัน",
+    "home_miaoren_daughter_ruolan",
+    "female",
+    "adult",
+    "daughter",
+    "musician"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "woman, a gentle young woman in a pale blue dress holding a pipa lute; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_west_home_miaoren_spearman_zhong",
+   "category": "character",
+   "subcategory": "guard",
+   "region": "west",
+   "group": "west",
+   "name": "ทหารทวนเฒ่าจง",
+   "tags": [
+    "ทหารทวนเฒ่าจง",
+    "home_miaoren_spearman_zhong",
+    "male",
+    "elder",
+    "guard",
+    "soldier",
+    "elder"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a guard in lamellar armour with a spear; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_north_home_chengying_mistress_cheng",
+   "category": "character",
+   "subcategory": "scholar",
+   "region": "north",
+   "group": "north",
+   "name": "เฉิงอิ๋ง",
+   "tags": [
+    "เฉิงอิ๋ง",
+    "home_chengying_mistress_cheng",
+    "female",
+    "adult",
+    "scholar",
+    "musician",
+    "martial_artist"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "woman, a gentle young woman in a pale green dress with a jade flute; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_north_home_chengying_cousin_lu",
+   "category": "character",
+   "subcategory": "martial_artist",
+   "region": "north",
+   "group": "north",
+   "name": "ลู่อู๋ซวง",
+   "tags": [
+    "ลู่อู๋ซวง",
+    "home_chengying_cousin_lu",
+    "female",
+    "adult",
+    "martial_artist",
+    "family"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "woman, a wandering martial artist with a sword on the back; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_north_home_chengying_gooseboy_tong",
+   "category": "character",
+   "subcategory": "child",
+   "region": "north",
+   "group": "north",
+   "name": "อาถงเด็กเลี้ยงห่าน",
+   "tags": [
+    "อาถงเด็กเลี้ยงห่าน",
+    "home_chengying_gooseboy_tong",
+    "male",
+    "child",
+    "child",
+    "servant"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "little boy, a servant in plain grey clothes; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_home_yanji_bonesetter_yan",
+   "category": "character",
+   "subcategory": "healer",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "หยานจี",
+   "tags": [
+    "หยานจี",
+    "home_yanji_bonesetter_yan",
+    "male",
+    "elder",
+    "healer",
+    "merchant",
+    "elder"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a merchant in a brown silk robe and cap; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_home_yanji_guard_liu",
+   "category": "character",
+   "subcategory": "guard",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "หลิวกระบองไหม้",
+   "tags": [
+    "หลิวกระบองไหม้",
+    "home_yanji_guard_liu",
+    "male",
+    "adult",
+    "guard",
+    "martial_artist"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a guard in lamellar armour with a spear; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_home_yanji_maid_chun",
+   "category": "character",
+   "subcategory": "servant",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "ชุนเถาสาวใช้",
+   "tags": [
+    "ชุนเถาสาวใช้",
+    "home_yanji_maid_chun",
+    "female",
+    "adult",
+    "servant"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "woman, a servant in plain grey clothes; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_north_home_beichou_hermit_bei",
+   "category": "character",
+   "subcategory": "elder",
+   "region": "north",
+   "group": "north",
+   "name": "เป่ยฉิว",
+   "tags": [
+    "เป่ยฉิว",
+    "home_beichou_hermit_bei",
+    "male",
+    "elder",
+    "elder",
+    "martial_artist",
+    "hermit"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a hermit warrior with a burn-scarred face, a dark cloak and a long spear; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_north_home_beichou_servant_amu",
+   "category": "character",
+   "subcategory": "servant",
+   "region": "north",
+   "group": "north",
+   "name": "อาหมู่คนใบ้",
+   "tags": [
+    "อาหมู่คนใบ้",
+    "home_beichou_servant_amu",
+    "male",
+    "adult",
+    "servant",
+    "cook"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a cook in an apron holding a ladle; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_north_home_beichou_herder_cao",
+   "category": "character",
+   "subcategory": "child",
+   "region": "north",
+   "group": "north",
+   "name": "เสี่ยวเฉ่าเด็กเลี้ยงแพะ",
+   "tags": [
+    "เสี่ยวเฉ่าเด็กเลี้ยงแพะ",
+    "home_beichou_herder_cao",
+    "female",
+    "child",
+    "child",
+    "herder"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "little girl, a herder in a sheepskin coat with a crook; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_villa_meizhuang_master_huang",
+   "category": "character",
+   "subcategory": "elder",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "หวงจงกง",
+   "tags": [
+    "หวงจงกง",
+    "villa_meizhuang_master_huang",
+    "male",
+    "elder",
+    "elder",
+    "musician",
+    "master"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "old man with a white beard, a musician carrying a guqin zither; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_villa_meizhuang_master_heibai",
+   "category": "character",
+   "subcategory": "scholar",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "เฮยไป๋จื่อ",
+   "tags": [
+    "เฮยไป๋จื่อ",
+    "villa_meizhuang_master_heibai",
+    "male",
+    "adult",
+    "scholar",
+    "master"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a pale scholar with half-black half-white hair in a grey robe holding go stones; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_villa_meizhuang_painter_danqing",
+   "category": "character",
+   "subcategory": "painter",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "ตันชิงเซิง",
+   "tags": [
+    "ตันชิงเซิง",
+    "villa_meizhuang_painter_danqing",
+    "male",
+    "adult",
+    "painter",
+    "drunkard",
+    "master"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a red-faced drunken painter in a stained robe with a brush and a wine gourd; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_heartland_villa_meizhuang_steward_ding",
+   "category": "character",
+   "subcategory": "servant",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "พ่อบ้านติงเจียน",
+   "tags": [
+    "พ่อบ้านติงเจียน",
+    "villa_meizhuang_steward_ding",
+    "male",
+    "adult",
+    "servant",
+    "guard"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a servant in plain grey clothes; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_east_villa_fuwei_chief_lin",
+   "category": "character",
+   "subcategory": "merchant",
+   "region": "east",
+   "group": "east",
+   "name": "หลินเจิ้นหนาน",
+   "tags": [
+    "หลินเจิ้นหนาน",
+    "villa_fuwei_chief_lin",
+    "male",
+    "adult",
+    "merchant",
+    "official",
+    "master"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, an official in a dark silk robe with a black gauze hat; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_east_villa_fuwei_young_lin",
+   "category": "character",
+   "subcategory": "noble",
+   "region": "east",
+   "group": "east",
+   "name": "หลินผิงจือ",
+   "tags": [
+    "หลินผิงจือ",
+    "villa_fuwei_young_lin",
+    "male",
+    "adult",
+    "noble",
+    "hunter"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a handsome young nobleman in fine white silk with a hunting bow; ancient China wuxia character, muted colours"
+  },
+  {
+   "id": "chr_east_villa_fuwei_escort_shi",
+   "category": "character",
+   "subcategory": "guard",
+   "region": "east",
+   "group": "east",
+   "name": "สื่อเปียวโถว",
+   "tags": [
+    "สื่อเปียวโถว",
+    "villa_fuwei_escort_shi",
+    "male",
+    "adult",
+    "guard",
+    "escort",
+    "martial_artist"
+   ],
+   "kind": "actor",
+   "mapWidth": 48,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "template": "mannequin",
+   "prompt": "man, a guard in lamellar armour with a spear; ancient China wuxia character, muted colours"
+  }
+ ]
+}

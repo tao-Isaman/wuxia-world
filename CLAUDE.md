@@ -35,7 +35,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | NPC simulation and rumors | [docs/liveness.md](docs/liveness.md) |
 | Adding content (places, NPCs, quests, items, skills, sects…) | [docs/content-authoring.md](docs/content-authoring.md) |
 | Map runtime, collision, characters, HUD, menus, CSS | [docs/rendering.md](docs/rendering.md) |
+| Objects placed on maps; the map editor (`/game/engine`, แผนที่) | [docs/rendering.md](docs/rendering.md#placed-objects) · [docs/engine.md](docs/engine.md#แผนที่--map-editor) |
+| The PixelLab asset library (public/assets/, manifest, pipeline) | [docs/assets.md](docs/assets.md) |
 | Music and sound · install and offline | [docs/audio.md](docs/audio.md) · [docs/pwa.md](docs/pwa.md) |
+| The editor at `/game/engine`: asset library, maps, skill / art texts | [docs/engine.md](docs/engine.md) |
 | Saves, migration, repair | [docs/save-format.md](docs/save-format.md) |
 | Tests and scripts | [docs/testing.md](docs/testing.md) · [docs/scripts.md](docs/scripts.md) |
 | Every place / NPC / quest / skill / item / foe | [docs/reference/](docs/reference/README.md) (generated) |
@@ -55,6 +58,7 @@ bun run test:runtime        # the unit suites, one per line:
 bun run test:combat
 bun run test:opening
 bun run test:navigation
+bun run test:placements     # placed-object geometry, depth and collision; public/assets/placements.json covers no marker
 bun run test:battle-background
 bun run test:rumors
 bun run test:investigation
@@ -71,7 +75,9 @@ bun run test:routes         # compass exits, 8-way road paintings and arrival si
 bun run test:places         # place NPCs / quests / activities; every ยุทธจักร T0–T3 move is a quest reward; gifts; presence
 bun run test:systems        # practice xp, letters, horse stations, the sword tournament
 bun run test:quests         # campaign audit + dead ends + every item/kill/objective quest + guidance + bad-action stages
+bun run test:engine         # text overrides over SKILLS / ARTS, the engine's filters / edits / validation, the save route whitelist
 bun run test:docs           # generated reference is current + docs links/paths/commands resolve
+bun run test:assets         # asset library: manifest contract, files and sizes, footprints, ≥ 3,000 approved
 bun run test:e2e            # Playwright (Chromium) on :3017 — start a production server first
 bun scripts/audit-content.ts            # every NPC / quest / scene reference resolves
 bun scripts/build-docs-reference.ts     # regenerate docs/reference/ after data changes
@@ -88,6 +94,7 @@ bun scripts/build-hero-work-loops.ts --from <dir>   # m1's PixelLab-animated wor
 bun scripts/smoke-liveness.ts           # 90-day NPC simulation smoke test
 bun scripts/build-world-coords.ts       # each place's world-map spot (exit / road directions); rerun after adding a place or road
 bun scripts/build-route-variants.ts --from <dir>   # import the 56 directional road paintings (<type>-<dir8>.png)
+bun scripts/assets/build-asset-plan.ts && python3 scripts/assets/generate.py run <raw> scripts/assets/plan/*.json && bun scripts/assets/import.ts --raw <raw>   # the PixelLab asset library (docs/assets.md; PIXELLAB_API_TOKEN from the env)
 ```
 
 **Do not run:**
@@ -144,6 +151,7 @@ Two deliberate exceptions reach into stores:
 | `/` | the game |
 | `/debug` | combat sandbox with two builds from `character-store` and a free grid battle; independent of the world save |
 | `/progress` | old journal, data frozen at wave 11 |
+| `/game/engine` | the game's editor (asset library, maps, skill / art texts); not linked, `noindex`; writes files only under `bun dev` ([docs/engine.md](docs/engine.md)) |
 | `/manifest.webmanifest` | PWA manifest |
 
 ## Combat engine (`lib/game/`)
@@ -287,6 +295,7 @@ Two deliberate exceptions reach into stores:
 - **Battle runtime.** `grid-battle-runtime.ts` draws the board in 2.5D and plays `state.events`: walk 180 ms per tile, casts with VFX and SFX, damage numbers. It calls `battleStore.step()` about 350 ms after playback idles. Skill VFX come from `cast-vfx.ts` (pure) and `battle-vfx.ts`; skill sounds from `lib/audio/cast-sfx.ts`, using the same profile.
 - **Directions.** Travel follows the world-map compass (`lib/world/compass.ts`, `data/world-coords.ts`). Exits sit on the map edge facing their destination (`assignSlotsByBearing`); a road runs the way its exit faces (`routeDirection`, 8 ways, painting `/maps/routes/<type>-<dir>.webp`, region graded at load by `lib/stage/route-grade.ts`); arriving puts the hero beside the exit back (`setArrivalFrom` hints in `lib/stage/types.ts`).
 - **Collision.** `world-navigation.ts` (+ `world-footprints-data.ts`) covers all 100 painted maps; `test:navigation` probes every map.
+- **Placed objects.** The map editor's objects (`public/assets/placements.json`, fetched once, the manifest only for a map that has some) draw through `lib/assets/placement-geometry.ts` — the one geometry the editor shares: anchor at (x, y), `mapWidth × mapHeight × scale`, flip about the anchor, footprint relative to the anchor; "ground" under characters, "object" by base y (`100 + y·10`, hero `101 + y·10`), "overhead" at 7000+ under signs and the veil. Blocking footprints join the map's solids (`withPlacedSolids`); `placementIssues` (`lib/stage/map-anchors.ts`) and `test:placements` keep every marker reachable. Host: `data-placements`, `data-placement-ids`. Dev hook: `/?engineGoto=<id>` (`bun dev` or `localStorage["wuxia-engine-goto"]="on"`).
 - **Rules.** Never put Phaser objects in stores or saves. Don't enable Phaser input. Respect `prefers-reduced-motion`. New popups are `Modal`s, so the map pauses by itself.
 
 ## UI and theme
@@ -308,6 +317,7 @@ Two deliberate exceptions reach into stores:
 
 ## Conventions
 
+- **Skill / art text overrides.** `SKILLS` and `ARTS` are wrapped in `withTextOverrides` (`data/text-overrides.ts`), which lays `data/text-overrides.json` (written by `/game/engine`) over names and descriptions at load. Edit the literal rows as before; an override wins over them.
 - **Field names.** Combat tables in `lib/game/data/` keep **short field names** (`n`, `sc`, `ti`, `w`, `mg`, `st`, `at`, `bp`, `p`, `f`, `dm`, `dr`, `se`, `ee`, `types`), matching `demo.html`. World tables use readable names (`name`, `description`, `price`).
 - **Ids** are lowercase snake case with conventional prefixes:
   - places: `city_`, `village_`, `sect_`, `cave_`, `inn_`…;

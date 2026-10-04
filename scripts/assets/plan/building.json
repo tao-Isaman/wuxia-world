@@ -1,0 +1,1630 @@
+{
+ "category": "building",
+ "jobs": [
+  {
+   "id": "bld_heartland_courtyard_house",
+   "category": "building",
+   "subcategory": "house",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "บ้านสี่ประสาน",
+   "tags": [
+    "บ้านสี่ประสาน",
+    "courtyard house",
+    "house",
+    "heartland",
+    "ภาคกลาง"
+   ],
+   "kind": "building",
+   "mapWidth": 200,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-heartland",
+   "prompt": "pixel art game asset: a grey-brick courtyard house (siheyuan) with a tiled gate, imperial central-plains style: grey clay roof tiles, dark red lacquered pillars, grey brick, carved wooden lattice. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_heartland_teahouse",
+   "category": "building",
+   "subcategory": "shop",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "โรงน้ำชา",
+   "tags": [
+    "โรงน้ำชา",
+    "teahouse",
+    "shop",
+    "heartland",
+    "ภาคกลาง"
+   ],
+   "kind": "building",
+   "mapWidth": 190,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-heartland",
+   "prompt": "pixel art game asset: a two-storey teahouse with a balcony and paper lanterns, imperial central-plains style: grey clay roof tiles, dark red lacquered pillars, grey brick, carved wooden lattice. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_heartland_inn",
+   "category": "building",
+   "subcategory": "inn",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "โรงเตี๊ยม",
+   "tags": [
+    "โรงเตี๊ยม",
+    "inn",
+    "inn",
+    "heartland",
+    "ภาคกลาง"
+   ],
+   "kind": "building",
+   "mapWidth": 210,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-heartland",
+   "prompt": "pixel art game asset: a two-storey roadside inn with a hanging cloth sign (no letters) and a stable shed, imperial central-plains style: grey clay roof tiles, dark red lacquered pillars, grey brick, carved wooden lattice. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_heartland_wine_shop",
+   "category": "building",
+   "subcategory": "shop",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "ร้านสุรา",
+   "tags": [
+    "ร้านสุรา",
+    "wine shop",
+    "shop",
+    "heartland",
+    "ภาคกลาง"
+   ],
+   "kind": "building",
+   "mapWidth": 160,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-heartland",
+   "prompt": "pixel art game asset: a small tavern with wine jars stacked outside and a fluttering pennant, imperial central-plains style: grey clay roof tiles, dark red lacquered pillars, grey brick, carved wooden lattice. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_heartland_pharmacy",
+   "category": "building",
+   "subcategory": "shop",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "ร้านขายยา",
+   "tags": [
+    "ร้านขายยา",
+    "pharmacy",
+    "shop",
+    "heartland",
+    "ภาคกลาง"
+   ],
+   "kind": "building",
+   "mapWidth": 160,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-heartland",
+   "prompt": "pixel art game asset: a medicine shop with herb drawers visible through the open front, imperial central-plains style: grey clay roof tiles, dark red lacquered pillars, grey brick, carved wooden lattice. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_heartland_smithy",
+   "category": "building",
+   "subcategory": "workshop",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "โรงตีเหล็ก",
+   "tags": [
+    "โรงตีเหล็ก",
+    "smithy",
+    "workshop",
+    "heartland",
+    "ภาคกลาง"
+   ],
+   "kind": "building",
+   "mapWidth": 160,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-heartland",
+   "prompt": "pixel art game asset: a blacksmith's forge shed with a chimney, anvil and glowing furnace, imperial central-plains style: grey clay roof tiles, dark red lacquered pillars, grey brick, carved wooden lattice. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_heartland_yamen",
+   "category": "building",
+   "subcategory": "government",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "ศาลาว่าการ",
+   "tags": [
+    "ศาลาว่าการ",
+    "yamen",
+    "government",
+    "heartland",
+    "ภาคกลาง"
+   ],
+   "kind": "building",
+   "mapWidth": 230,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-heartland",
+   "prompt": "pixel art game asset: a magistrate's yamen hall with a red gate, drum stand and stone steps, imperial central-plains style: grey clay roof tiles, dark red lacquered pillars, grey brick, carved wooden lattice. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_heartland_shop_row",
+   "category": "building",
+   "subcategory": "shop",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "ร้านค้า",
+   "tags": [
+    "ร้านค้า",
+    "shop row",
+    "shop",
+    "heartland",
+    "ภาคกลาง"
+   ],
+   "kind": "building",
+   "mapWidth": 200,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-heartland",
+   "prompt": "pixel art game asset: a row of two small shopfronts with cloth awnings, imperial central-plains style: grey clay roof tiles, dark red lacquered pillars, grey brick, carved wooden lattice. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_heartland_shrine_hall",
+   "category": "building",
+   "subcategory": "temple",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "ศาลเจ้า",
+   "tags": [
+    "ศาลเจ้า",
+    "shrine hall",
+    "temple",
+    "heartland",
+    "ภาคกลาง"
+   ],
+   "kind": "building",
+   "mapWidth": 170,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-heartland",
+   "prompt": "pixel art game asset: a small Buddhist shrine hall with a red door and incense burner in front, imperial central-plains style: grey clay roof tiles, dark red lacquered pillars, grey brick, carved wooden lattice. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_heartland_granary",
+   "category": "building",
+   "subcategory": "storage",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "ยุ้งฉาง",
+   "tags": [
+    "ยุ้งฉาง",
+    "granary",
+    "storage",
+    "heartland",
+    "ภาคกลาง"
+   ],
+   "kind": "building",
+   "mapWidth": 160,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-heartland",
+   "prompt": "pixel art game asset: a raised wooden granary storehouse with a tiled roof, imperial central-plains style: grey clay roof tiles, dark red lacquered pillars, grey brick, carved wooden lattice. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_east_water_house",
+   "category": "building",
+   "subcategory": "house",
+   "region": "east",
+   "group": "east",
+   "name": "บ้านริมคลอง",
+   "tags": [
+    "บ้านริมคลอง",
+    "water house",
+    "house",
+    "east",
+    "ตะวันออก"
+   ],
+   "kind": "building",
+   "mapWidth": 190,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-east",
+   "prompt": "pixel art game asset: a whitewashed water-town house with horse-head gables and stone steps down to a canal, Jiangnan water-town style: whitewashed walls, black tile roofs with upturned eaves, dark timber, canal-side stone. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_east_canal_teahouse",
+   "category": "building",
+   "subcategory": "shop",
+   "region": "east",
+   "group": "east",
+   "name": "โรงน้ำชาริมน้ำ",
+   "tags": [
+    "โรงน้ำชาริมน้ำ",
+    "canal teahouse",
+    "shop",
+    "east",
+    "ตะวันออก"
+   ],
+   "kind": "building",
+   "mapWidth": 190,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-east",
+   "prompt": "pixel art game asset: a two-storey canal-side teahouse with wooden balconies over the water, Jiangnan water-town style: whitewashed walls, black tile roofs with upturned eaves, dark timber, canal-side stone. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_east_inn",
+   "category": "building",
+   "subcategory": "inn",
+   "region": "east",
+   "group": "east",
+   "name": "โรงเตี๊ยม",
+   "tags": [
+    "โรงเตี๊ยม",
+    "inn",
+    "inn",
+    "east",
+    "ตะวันออก"
+   ],
+   "kind": "building",
+   "mapWidth": 210,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-east",
+   "prompt": "pixel art game asset: a Jiangnan inn with white walls, black tiles and a courtyard gate, Jiangnan water-town style: whitewashed walls, black tile roofs with upturned eaves, dark timber, canal-side stone. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_east_silk_shop",
+   "category": "building",
+   "subcategory": "shop",
+   "region": "east",
+   "group": "east",
+   "name": "ร้านผ้าไหม",
+   "tags": [
+    "ร้านผ้าไหม",
+    "silk shop",
+    "shop",
+    "east",
+    "ตะวันออก"
+   ],
+   "kind": "building",
+   "mapWidth": 160,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-east",
+   "prompt": "pixel art game asset: a silk shop with bolts of coloured silk on racks at the open front, Jiangnan water-town style: whitewashed walls, black tile roofs with upturned eaves, dark timber, canal-side stone. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_east_garden_pavilion",
+   "category": "building",
+   "subcategory": "pavilion",
+   "region": "east",
+   "group": "east",
+   "name": "ศาลาสวน",
+   "tags": [
+    "ศาลาสวน",
+    "garden pavilion",
+    "pavilion",
+    "east",
+    "ตะวันออก"
+   ],
+   "kind": "building",
+   "mapWidth": 130,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-east",
+   "prompt": "pixel art game asset: a hexagonal garden pavilion with upturned eaves on a stone platform, Jiangnan water-town style: whitewashed walls, black tile roofs with upturned eaves, dark timber, canal-side stone. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_east_boathouse",
+   "category": "building",
+   "subcategory": "dock",
+   "region": "east",
+   "group": "east",
+   "name": "โรงเรือ",
+   "tags": [
+    "โรงเรือ",
+    "boathouse",
+    "dock",
+    "east",
+    "ตะวันออก"
+   ],
+   "kind": "building",
+   "mapWidth": 170,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-east",
+   "prompt": "pixel art game asset: a wooden boathouse on stilts over the water with a small boat moored, Jiangnan water-town style: whitewashed walls, black tile roofs with upturned eaves, dark timber, canal-side stone. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_east_arched_bridge",
+   "category": "building",
+   "subcategory": "bridge",
+   "region": "east",
+   "group": "east",
+   "name": "สะพานโค้ง",
+   "tags": [
+    "สะพานโค้ง",
+    "arched bridge",
+    "bridge",
+    "east",
+    "ตะวันออก"
+   ],
+   "kind": "building",
+   "mapWidth": 200,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-east",
+   "prompt": "pixel art game asset: an arched stone canal bridge with low railings, Jiangnan water-town style: whitewashed walls, black tile roofs with upturned eaves, dark timber, canal-side stone. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_east_paifang",
+   "category": "building",
+   "subcategory": "gate",
+   "region": "east",
+   "group": "east",
+   "name": "ซุ้มประตูเผ่ฟาง",
+   "tags": [
+    "ซุ้มประตูเผ่ฟาง",
+    "paifang",
+    "gate",
+    "east",
+    "ตะวันออก"
+   ],
+   "kind": "building",
+   "mapWidth": 180,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-east",
+   "prompt": "pixel art game asset: a carved stone memorial archway (paifang) with three openings, Jiangnan water-town style: whitewashed walls, black tile roofs with upturned eaves, dark timber, canal-side stone. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_east_water_mill",
+   "category": "building",
+   "subcategory": "workshop",
+   "region": "east",
+   "group": "east",
+   "name": "โรงสีน้ำ",
+   "tags": [
+    "โรงสีน้ำ",
+    "water mill",
+    "workshop",
+    "east",
+    "ตะวันออก"
+   ],
+   "kind": "building",
+   "mapWidth": 170,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-east",
+   "prompt": "pixel art game asset: a timber water mill with a big water wheel, Jiangnan water-town style: whitewashed walls, black tile roofs with upturned eaves, dark timber, canal-side stone. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_east_tea_house_small",
+   "category": "building",
+   "subcategory": "shop",
+   "region": "east",
+   "group": "east",
+   "name": "ร้านชาเล็ก",
+   "tags": [
+    "ร้านชาเล็ก",
+    "tea house small",
+    "shop",
+    "east",
+    "ตะวันออก"
+   ],
+   "kind": "building",
+   "mapWidth": 150,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-east",
+   "prompt": "pixel art game asset: a small one-storey teahouse with bamboo blinds and a black tile roof, Jiangnan water-town style: whitewashed walls, black tile roofs with upturned eaves, dark timber, canal-side stone. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_south_stilt_house",
+   "category": "building",
+   "subcategory": "house",
+   "region": "south",
+   "group": "south",
+   "name": "เรือนใต้ถุนสูง",
+   "tags": [
+    "เรือนใต้ถุนสูง",
+    "stilt house",
+    "house",
+    "south",
+    "ใต้"
+   ],
+   "kind": "building",
+   "mapWidth": 180,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-south",
+   "prompt": "pixel art game asset: a bamboo and timber stilt house with a thatched roof and a ladder, Dali and Miao southwest style: bamboo and timber stilt construction, Bai white walls with painted borders, tropical. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_south_bai_house",
+   "category": "building",
+   "subcategory": "house",
+   "region": "south",
+   "group": "south",
+   "name": "บ้านชาวไป๋",
+   "tags": [
+    "บ้านชาวไป๋",
+    "bai house",
+    "house",
+    "south",
+    "ใต้"
+   ],
+   "kind": "building",
+   "mapWidth": 190,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-south",
+   "prompt": "pixel art game asset: a Bai white-walled house with painted blue borders and a grey tile roof, Dali and Miao southwest style: bamboo and timber stilt construction, Bai white walls with painted borders, tropical. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_south_drum_tower",
+   "category": "building",
+   "subcategory": "tower",
+   "region": "south",
+   "group": "south",
+   "name": "หอกลองชาวเมี่ยว",
+   "tags": [
+    "หอกลองชาวเมี่ยว",
+    "drum tower",
+    "tower",
+    "south",
+    "ใต้"
+   ],
+   "kind": "building",
+   "mapWidth": 140,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-south",
+   "prompt": "pixel art game asset: a tall multi-eaved wooden Miao drum tower, Dali and Miao southwest style: bamboo and timber stilt construction, Bai white walls with painted borders, tropical. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_south_wind_rain_bridge",
+   "category": "building",
+   "subcategory": "bridge",
+   "region": "south",
+   "group": "south",
+   "name": "สะพานลมฝน",
+   "tags": [
+    "สะพานลมฝน",
+    "wind rain bridge",
+    "bridge",
+    "south",
+    "ใต้"
+   ],
+   "kind": "building",
+   "mapWidth": 220,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-south",
+   "prompt": "pixel art game asset: a covered wooden wind-and-rain bridge with small pavilions on top, Dali and Miao southwest style: bamboo and timber stilt construction, Bai white walls with painted borders, tropical. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_south_stilt_granary",
+   "category": "building",
+   "subcategory": "storage",
+   "region": "south",
+   "group": "south",
+   "name": "ยุ้งข้าวใต้ถุน",
+   "tags": [
+    "ยุ้งข้าวใต้ถุน",
+    "stilt granary",
+    "storage",
+    "south",
+    "ใต้"
+   ],
+   "kind": "building",
+   "mapWidth": 120,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-south",
+   "prompt": "pixel art game asset: a small granary raised on wooden stilts with a thatched roof, Dali and Miao southwest style: bamboo and timber stilt construction, Bai white walls with painted borders, tropical. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_south_dali_temple",
+   "category": "building",
+   "subcategory": "temple",
+   "region": "south",
+   "group": "south",
+   "name": "วัดต้าหลี่",
+   "tags": [
+    "วัดต้าหลี่",
+    "dali temple",
+    "temple",
+    "south",
+    "ใต้"
+   ],
+   "kind": "building",
+   "mapWidth": 200,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-south",
+   "prompt": "pixel art game asset: a southern Buddhist temple hall with a white pagoda behind it, Dali and Miao southwest style: bamboo and timber stilt construction, Bai white walls with painted borders, tropical. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_south_market_hut",
+   "category": "building",
+   "subcategory": "shop",
+   "region": "south",
+   "group": "south",
+   "name": "เพิงตลาด",
+   "tags": [
+    "เพิงตลาด",
+    "market hut",
+    "shop",
+    "south",
+    "ใต้"
+   ],
+   "kind": "building",
+   "mapWidth": 140,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-south",
+   "prompt": "pixel art game asset: an open-sided bamboo market hut with a palm-leaf roof, Dali and Miao southwest style: bamboo and timber stilt construction, Bai white walls with painted borders, tropical. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_south_bamboo_teahouse",
+   "category": "building",
+   "subcategory": "shop",
+   "region": "south",
+   "group": "south",
+   "name": "โรงน้ำชาไม้ไผ่",
+   "tags": [
+    "โรงน้ำชาไม้ไผ่",
+    "bamboo teahouse",
+    "shop",
+    "south",
+    "ใต้"
+   ],
+   "kind": "building",
+   "mapWidth": 170,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-south",
+   "prompt": "pixel art game asset: a bamboo teahouse on a raised deck with hanging lanterns, Dali and Miao southwest style: bamboo and timber stilt construction, Bai white walls with painted borders, tropical. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_south_herbalist_hut",
+   "category": "building",
+   "subcategory": "house",
+   "region": "south",
+   "group": "south",
+   "name": "กระท่อมหมอยา",
+   "tags": [
+    "กระท่อมหมอยา",
+    "herbalist hut",
+    "house",
+    "south",
+    "ใต้"
+   ],
+   "kind": "building",
+   "mapWidth": 150,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-south",
+   "prompt": "pixel art game asset: a herbalist's wooden hut with drying herbs hanging under the eaves, Dali and Miao southwest style: bamboo and timber stilt construction, Bai white walls with painted borders, tropical. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_south_hunter_lodge",
+   "category": "building",
+   "subcategory": "house",
+   "region": "south",
+   "group": "south",
+   "name": "กระท่อมพราน",
+   "tags": [
+    "กระท่อมพราน",
+    "hunter lodge",
+    "house",
+    "south",
+    "ใต้"
+   ],
+   "kind": "building",
+   "mapWidth": 150,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-south",
+   "prompt": "pixel art game asset: a jungle hunter's log lodge with animal hides and a palm roof, Dali and Miao southwest style: bamboo and timber stilt construction, Bai white walls with painted borders, tropical. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_north_earth_house",
+   "category": "building",
+   "subcategory": "house",
+   "region": "north",
+   "group": "north",
+   "name": "บ้านดินอัด",
+   "tags": [
+    "บ้านดินอัด",
+    "earth house",
+    "house",
+    "north",
+    "เหนือ"
+   ],
+   "kind": "building",
+   "mapWidth": 180,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-north",
+   "prompt": "pixel art game asset: a rammed-earth house with a flat timber roof and small windows, northern frontier and Xixia style: rammed-earth walls, rough weathered timber, felt and hide, dusty. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_north_watchtower",
+   "category": "building",
+   "subcategory": "tower",
+   "region": "north",
+   "group": "north",
+   "name": "หอสังเกตการณ์",
+   "tags": [
+    "หอสังเกตการณ์",
+    "watchtower",
+    "tower",
+    "north",
+    "เหนือ"
+   ],
+   "kind": "building",
+   "mapWidth": 110,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-north",
+   "prompt": "pixel art game asset: a timber frontier watchtower on a rammed-earth base, northern frontier and Xixia style: rammed-earth walls, rough weathered timber, felt and hide, dusty. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_north_yurt",
+   "category": "building",
+   "subcategory": "tent",
+   "region": "north",
+   "group": "north",
+   "name": "กระโจมสักหลาด",
+   "tags": [
+    "กระโจมสักหลาด",
+    "yurt",
+    "tent",
+    "north",
+    "เหนือ"
+   ],
+   "kind": "building",
+   "mapWidth": 130,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-north",
+   "prompt": "pixel art game asset: a round white felt yurt tent with a wooden door, northern frontier and Xixia style: rammed-earth walls, rough weathered timber, felt and hide, dusty. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_north_stable",
+   "category": "building",
+   "subcategory": "farm",
+   "region": "north",
+   "group": "north",
+   "name": "คอกม้า",
+   "tags": [
+    "คอกม้า",
+    "stable",
+    "farm",
+    "north",
+    "เหนือ"
+   ],
+   "kind": "building",
+   "mapWidth": 180,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-north",
+   "prompt": "pixel art game asset: an open timber stable with a hay loft and hitching rail, northern frontier and Xixia style: rammed-earth walls, rough weathered timber, felt and hide, dusty. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_north_fort_gate",
+   "category": "building",
+   "subcategory": "gate",
+   "region": "north",
+   "group": "north",
+   "name": "ประตูป้อมชายแดน",
+   "tags": [
+    "ประตูป้อมชายแดน",
+    "fort gate",
+    "gate",
+    "north",
+    "เหนือ"
+   ],
+   "kind": "building",
+   "mapWidth": 220,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-north",
+   "prompt": "pixel art game asset: a frontier fort gate in a rammed-earth wall with a wooden gatehouse, northern frontier and Xixia style: rammed-earth walls, rough weathered timber, felt and hide, dusty. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_north_caravanserai",
+   "category": "building",
+   "subcategory": "inn",
+   "region": "north",
+   "group": "north",
+   "name": "โรงเตี๊ยมกองคาราวาน",
+   "tags": [
+    "โรงเตี๊ยมกองคาราวาน",
+    "caravanserai",
+    "inn",
+    "north",
+    "เหนือ"
+   ],
+   "kind": "building",
+   "mapWidth": 230,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-north",
+   "prompt": "pixel art game asset: a fortified roadside caravan inn with an earthen courtyard wall, northern frontier and Xixia style: rammed-earth walls, rough weathered timber, felt and hide, dusty. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_north_barracks",
+   "category": "building",
+   "subcategory": "military",
+   "region": "north",
+   "group": "north",
+   "name": "ค่ายทหาร",
+   "tags": [
+    "ค่ายทหาร",
+    "barracks",
+    "military",
+    "north",
+    "เหนือ"
+   ],
+   "kind": "building",
+   "mapWidth": 220,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-north",
+   "prompt": "pixel art game asset: a long low timber barracks with weapon racks by the door, northern frontier and Xixia style: rammed-earth walls, rough weathered timber, felt and hide, dusty. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_north_forge",
+   "category": "building",
+   "subcategory": "workshop",
+   "region": "north",
+   "group": "north",
+   "name": "โรงตีเหล็กชายแดน",
+   "tags": [
+    "โรงตีเหล็กชายแดน",
+    "forge",
+    "workshop",
+    "north",
+    "เหนือ"
+   ],
+   "kind": "building",
+   "mapWidth": 160,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-north",
+   "prompt": "pixel art game asset: a frontier blacksmith shed of rough timber with a stone furnace, northern frontier and Xixia style: rammed-earth walls, rough weathered timber, felt and hide, dusty. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_north_log_cabin",
+   "category": "building",
+   "subcategory": "house",
+   "region": "north",
+   "group": "north",
+   "name": "กระท่อมไม้ซุงหิมะ",
+   "tags": [
+    "กระท่อมไม้ซุงหิมะ",
+    "log cabin",
+    "house",
+    "north",
+    "เหนือ"
+   ],
+   "kind": "building",
+   "mapWidth": 160,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-north",
+   "prompt": "pixel art game asset: a snow-covered log cabin with a smoking chimney, northern frontier and Xixia style: rammed-earth walls, rough weathered timber, felt and hide, dusty. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_north_storehouse",
+   "category": "building",
+   "subcategory": "storage",
+   "region": "north",
+   "group": "north",
+   "name": "โรงเก็บเสบียง",
+   "tags": [
+    "โรงเก็บเสบียง",
+    "storehouse",
+    "storage",
+    "north",
+    "เหนือ"
+   ],
+   "kind": "building",
+   "mapWidth": 160,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-north",
+   "prompt": "pixel art game asset: a sturdy timber storehouse with a sod roof, northern frontier and Xixia style: rammed-earth walls, rough weathered timber, felt and hide, dusty. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_west_stone_house",
+   "category": "building",
+   "subcategory": "house",
+   "region": "west",
+   "group": "west",
+   "name": "บ้านหินหลังคาเรียบ",
+   "tags": [
+    "บ้านหินหลังคาเรียบ",
+    "stone house",
+    "house",
+    "west",
+    "ตะวันตก"
+   ],
+   "kind": "building",
+   "mapWidth": 180,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-west",
+   "prompt": "pixel art game asset: a flat-roofed stone house with small windows and prayer flags on the roof, western desert and high-mountain style: flat-roofed stone and mud-brick, prayer flags, weathered sandstone. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_west_mudbrick_house",
+   "category": "building",
+   "subcategory": "house",
+   "region": "west",
+   "group": "west",
+   "name": "บ้านอิฐดิน",
+   "tags": [
+    "บ้านอิฐดิน",
+    "mudbrick house",
+    "house",
+    "west",
+    "ตะวันตก"
+   ],
+   "kind": "building",
+   "mapWidth": 170,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-west",
+   "prompt": "pixel art game asset: a mud-brick desert house with a flat roof and a wooden ladder to the roof, western desert and high-mountain style: flat-roofed stone and mud-brick, prayer flags, weathered sandstone. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_west_caravanserai",
+   "category": "building",
+   "subcategory": "inn",
+   "region": "west",
+   "group": "west",
+   "name": "คาราวานเซราย",
+   "tags": [
+    "คาราวานเซราย",
+    "caravanserai",
+    "inn",
+    "west",
+    "ตะวันตก"
+   ],
+   "kind": "building",
+   "mapWidth": 240,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-west",
+   "prompt": "pixel art game asset: a desert caravanserai with thick mud walls and an arched gate, western desert and high-mountain style: flat-roofed stone and mud-brick, prayer flags, weathered sandstone. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_west_monastery",
+   "category": "building",
+   "subcategory": "temple",
+   "region": "west",
+   "group": "west",
+   "name": "อารามหิมาลัย",
+   "tags": [
+    "อารามหิมาลัย",
+    "monastery",
+    "temple",
+    "west",
+    "ตะวันตก"
+   ],
+   "kind": "building",
+   "mapWidth": 230,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-west",
+   "prompt": "pixel art game asset: a whitewashed Himalayan monastery hall with a red-brown parapet, western desert and high-mountain style: flat-roofed stone and mud-brick, prayer flags, weathered sandstone. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_west_stupa",
+   "category": "building",
+   "subcategory": "temple",
+   "region": "west",
+   "group": "west",
+   "name": "สถูปขาว",
+   "tags": [
+    "สถูปขาว",
+    "stupa",
+    "temple",
+    "west",
+    "ตะวันตก"
+   ],
+   "kind": "building",
+   "mapWidth": 110,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-west",
+   "prompt": "pixel art game asset: a white chorten stupa on a square stone base, western desert and high-mountain style: flat-roofed stone and mud-brick, prayer flags, weathered sandstone. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_west_stone_tower",
+   "category": "building",
+   "subcategory": "tower",
+   "region": "west",
+   "group": "west",
+   "name": "หอหินเฝ้าระวัง",
+   "tags": [
+    "หอหินเฝ้าระวัง",
+    "stone tower",
+    "tower",
+    "west",
+    "ตะวันตก"
+   ],
+   "kind": "building",
+   "mapWidth": 110,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-west",
+   "prompt": "pixel art game asset: a tall square stone watchtower of stacked slate, western desert and high-mountain style: flat-roofed stone and mud-brick, prayer flags, weathered sandstone. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_west_nomad_tent",
+   "category": "building",
+   "subcategory": "tent",
+   "region": "west",
+   "group": "west",
+   "name": "กระโจมขนจามรี",
+   "tags": [
+    "กระโจมขนจามรี",
+    "nomad tent",
+    "tent",
+    "west",
+    "ตะวันตก"
+   ],
+   "kind": "building",
+   "mapWidth": 150,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-west",
+   "prompt": "pixel art game asset: a black yak-hair nomad tent with ropes and stakes, western desert and high-mountain style: flat-roofed stone and mud-brick, prayer flags, weathered sandstone. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_west_domed_hall",
+   "category": "building",
+   "subcategory": "temple",
+   "region": "west",
+   "group": "west",
+   "name": "หอโดมเผ่าหุย",
+   "tags": [
+    "หอโดมเผ่าหุย",
+    "domed hall",
+    "temple",
+    "west",
+    "ตะวันตก"
+   ],
+   "kind": "building",
+   "mapWidth": 170,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-west",
+   "prompt": "pixel art game asset: a small domed prayer hall of the Hui tribe with an arched door, western desert and high-mountain style: flat-roofed stone and mud-brick, prayer flags, weathered sandstone. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_west_oasis_well",
+   "category": "building",
+   "subcategory": "well",
+   "region": "west",
+   "group": "west",
+   "name": "ศาลาบ่อน้ำโอเอซิส",
+   "tags": [
+    "ศาลาบ่อน้ำโอเอซิส",
+    "oasis well",
+    "well",
+    "west",
+    "ตะวันตก"
+   ],
+   "kind": "building",
+   "mapWidth": 110,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-west",
+   "prompt": "pixel art game asset: an oasis well house with a wooden pulley under a small roof, western desert and high-mountain style: flat-roofed stone and mud-brick, prayer flags, weathered sandstone. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_west_trade_post",
+   "category": "building",
+   "subcategory": "shop",
+   "region": "west",
+   "group": "west",
+   "name": "สถานีการค้า",
+   "tags": [
+    "สถานีการค้า",
+    "trade post",
+    "shop",
+    "west",
+    "ตะวันตก"
+   ],
+   "kind": "building",
+   "mapWidth": 180,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 128,
+    "h": 128
+   },
+   "style": "region-west",
+   "prompt": "pixel art game asset: a desert trading post with a cloth awning over stacked goods, western desert and high-mountain style: flat-roofed stone and mud-brick, prayer flags, weathered sandstone. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_heartland_imperial_city_gate",
+   "category": "building",
+   "subcategory": "gate",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "ประตูเมืองหลวง",
+   "tags": [
+    "ประตูเมืองหลวง",
+    "imperial city gate",
+    "gate",
+    "landmark",
+    "สถานที่สำคัญ"
+   ],
+   "kind": "building",
+   "mapWidth": 320,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 160,
+    "h": 160
+   },
+   "style": "region-heartland",
+   "prompt": "pixel art game asset: a massive imperial city gate tower with a red gate, grey brick wall and a double-eaved gatehouse, imperial central-plains style: grey clay roof tiles, dark red lacquered pillars, grey brick, carved wooden lattice. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_north_frontier_city_gate",
+   "category": "building",
+   "subcategory": "gate",
+   "region": "north",
+   "group": "north",
+   "name": "ประตูเมืองชายแดน",
+   "tags": [
+    "ประตูเมืองชายแดน",
+    "frontier city gate",
+    "gate",
+    "landmark",
+    "สถานที่สำคัญ"
+   ],
+   "kind": "building",
+   "mapWidth": 300,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 160,
+    "h": 160
+   },
+   "style": "region-north",
+   "prompt": "pixel art game asset: a frontier city gate of rammed earth and stone with a timber gate tower, northern frontier and Xixia style: rammed-earth walls, rough weathered timber, felt and hide, dusty. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_heartland_palace_hall",
+   "category": "building",
+   "subcategory": "palace",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "ท้องพระโรง",
+   "tags": [
+    "ท้องพระโรง",
+    "palace hall",
+    "palace",
+    "landmark",
+    "สถานที่สำคัญ"
+   ],
+   "kind": "building",
+   "mapWidth": 360,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 160,
+    "h": 160
+   },
+   "style": "region-heartland",
+   "prompt": "pixel art game asset: a grand imperial palace hall with golden-yellow glazed roof tiles, red walls and white marble terrace, imperial central-plains style: grey clay roof tiles, dark red lacquered pillars, grey brick, carved wooden lattice. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_heartland_palace_gate",
+   "category": "building",
+   "subcategory": "palace",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "ประตูวัง",
+   "tags": [
+    "ประตูวัง",
+    "palace gate",
+    "palace",
+    "landmark",
+    "สถานที่สำคัญ"
+   ],
+   "kind": "building",
+   "mapWidth": 300,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 160,
+    "h": 160
+   },
+   "style": "region-heartland",
+   "prompt": "pixel art game asset: an imperial palace gate hall with golden roof tiles and five red doors, imperial central-plains style: grey clay roof tiles, dark red lacquered pillars, grey brick, carved wooden lattice. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_landmark_seven_storey_pagoda",
+   "category": "building",
+   "subcategory": "pagoda",
+   "region": "any",
+   "group": "landmark",
+   "name": "เจดีย์เจ็ดชั้น",
+   "tags": [
+    "เจดีย์เจ็ดชั้น",
+    "seven storey pagoda",
+    "pagoda",
+    "landmark",
+    "สถานที่สำคัญ"
+   ],
+   "kind": "building",
+   "mapWidth": 150,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 160,
+    "h": 160
+   },
+   "style": "region-heartland",
+   "prompt": "pixel art game asset: a seven-storey octagonal wooden pagoda with upturned eaves. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_landmark_brick_pagoda",
+   "category": "building",
+   "subcategory": "pagoda",
+   "region": "any",
+   "group": "landmark",
+   "name": "เจดีย์อิฐ",
+   "tags": [
+    "เจดีย์อิฐ",
+    "brick pagoda",
+    "pagoda",
+    "landmark",
+    "สถานที่สำคัญ"
+   ],
+   "kind": "building",
+   "mapWidth": 140,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 160,
+    "h": 160
+   },
+   "style": "region-heartland",
+   "prompt": "pixel art game asset: a tall square brick pagoda with many close eaves. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_landmark_sect_main_hall",
+   "category": "building",
+   "subcategory": "sect_hall",
+   "region": "any",
+   "group": "landmark",
+   "name": "หอใหญ่สำนัก",
+   "tags": [
+    "หอใหญ่สำนัก",
+    "sect main hall",
+    "sect_hall",
+    "landmark",
+    "สถานที่สำคัญ"
+   ],
+   "kind": "building",
+   "mapWidth": 300,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 160,
+    "h": 160
+   },
+   "style": "region-heartland",
+   "prompt": "pixel art game asset: a martial sect's main hall on a stone terrace with wide steps and incense burner. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_landmark_monastery_hall",
+   "category": "building",
+   "subcategory": "temple",
+   "region": "any",
+   "group": "landmark",
+   "name": "วิหารใหญ่",
+   "tags": [
+    "วิหารใหญ่",
+    "monastery hall",
+    "temple",
+    "landmark",
+    "สถานที่สำคัญ"
+   ],
+   "kind": "building",
+   "mapWidth": 300,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 160,
+    "h": 160
+   },
+   "style": "region-heartland",
+   "prompt": "pixel art game asset: a great Buddhist monastery hall with a double-eaved roof and yellow walls. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_landmark_taoist_temple",
+   "category": "building",
+   "subcategory": "temple",
+   "region": "any",
+   "group": "landmark",
+   "name": "อารามเต๋า",
+   "tags": [
+    "อารามเต๋า",
+    "taoist temple",
+    "temple",
+    "landmark",
+    "สถานที่สำคัญ"
+   ],
+   "kind": "building",
+   "mapWidth": 280,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 160,
+    "h": 160
+   },
+   "style": "region-heartland",
+   "prompt": "pixel art game asset: a Taoist temple hall with dark green glazed tiles on a mountain terrace. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_landmark_bell_tower",
+   "category": "building",
+   "subcategory": "tower",
+   "region": "any",
+   "group": "landmark",
+   "name": "หอระฆัง",
+   "tags": [
+    "หอระฆัง",
+    "bell tower",
+    "tower",
+    "landmark",
+    "สถานที่สำคัญ"
+   ],
+   "kind": "building",
+   "mapWidth": 170,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 160,
+    "h": 160
+   },
+   "style": "region-heartland",
+   "prompt": "pixel art game asset: a square bell tower with a big bronze bell inside, on a brick base. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_landmark_drum_tower",
+   "category": "building",
+   "subcategory": "tower",
+   "region": "any",
+   "group": "landmark",
+   "name": "หอกลอง",
+   "tags": [
+    "หอกลอง",
+    "drum tower",
+    "tower",
+    "landmark",
+    "สถานที่สำคัญ"
+   ],
+   "kind": "building",
+   "mapWidth": 170,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 160,
+    "h": 160
+   },
+   "style": "region-heartland",
+   "prompt": "pixel art game asset: a drum tower with a huge red drum, on a brick base. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_landmark_grand_paifang",
+   "category": "building",
+   "subcategory": "gate",
+   "region": "any",
+   "group": "landmark",
+   "name": "ซุ้มประตูใหญ่",
+   "tags": [
+    "ซุ้มประตูใหญ่",
+    "grand paifang",
+    "gate",
+    "landmark",
+    "สถานที่สำคัญ"
+   ],
+   "kind": "building",
+   "mapWidth": 260,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 160,
+    "h": 160
+   },
+   "style": "region-heartland",
+   "prompt": "pixel art game asset: a grand five-bay painted wooden memorial archway with glazed roofs. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_heartland_marble_bridge",
+   "category": "building",
+   "subcategory": "bridge",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "สะพานหินอ่อน",
+   "tags": [
+    "สะพานหินอ่อน",
+    "marble bridge",
+    "bridge",
+    "landmark",
+    "สถานที่สำคัญ"
+   ],
+   "kind": "building",
+   "mapWidth": 260,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 160,
+    "h": 160
+   },
+   "style": "region-heartland",
+   "prompt": "pixel art game asset: a white marble arched bridge with carved balustrades, imperial central-plains style: grey clay roof tiles, dark red lacquered pillars, grey brick, carved wooden lattice. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_landmark_fortress_wall",
+   "category": "building",
+   "subcategory": "wall",
+   "region": "any",
+   "group": "landmark",
+   "name": "กำแพงป้อม",
+   "tags": [
+    "กำแพงป้อม",
+    "fortress wall",
+    "wall",
+    "landmark",
+    "สถานที่สำคัญ"
+   ],
+   "kind": "building",
+   "mapWidth": 280,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 160,
+    "h": 160
+   },
+   "style": "region-heartland",
+   "prompt": "pixel art game asset: a section of crenellated fortress wall with a small corner tower. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  },
+  {
+   "id": "bld_landmark_arena_stage",
+   "category": "building",
+   "subcategory": "arena",
+   "region": "any",
+   "group": "landmark",
+   "name": "เวทีประลอง",
+   "tags": [
+    "เวทีประลอง",
+    "arena stage",
+    "arena",
+    "landmark",
+    "สถานที่สำคัญ"
+   ],
+   "kind": "building",
+   "mapWidth": 260,
+   "keep": 4,
+   "method": "v2",
+   "size": {
+    "w": 160,
+    "h": 160
+   },
+   "style": "region-heartland",
+   "prompt": "pixel art game asset: a raised wooden martial arts tournament stage (leitai) with flags at the corners. Isometric 3/4 view from above showing the roof and two walls, whole building in frame, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text."
+  }
+ ]
+}

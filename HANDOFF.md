@@ -43,40 +43,45 @@ Start with [README.md](README.md), then [docs/README.md](docs/README.md).
 | History | [docs/changelog.md](docs/changelog.md) |
 | Old review evidence | `review/` (history; see [review/README.md](review/README.md)) |
 | Old live journal | `/progress` — frozen at wave 11 |
+| Game editor | `/game/engine` — asset library, map tab, skill / art texts; writes files only under `bun dev` ([docs/engine.md](docs/engine.md)) |
 
 Deploys are implied to be on Vercel (`VERCEL_GIT_COMMIT_SHA` sets the service-worker build id). There is no CI workflow in the repo, so the checks below are run by hand.
 
 ## Verified state
 
-Checked on 2026-10-04 for m1's PixelLab work loops, played on the map:
+Checked on 2026-10-04 for the PixelLab asset library (3,194 assets), the engine at `/game/engine` (asset library, map editor, skill / art text overrides) and objects placed on maps:
 
 | Check | Result |
 | --- | --- |
 | `bun run typecheck` | passes |
 | `bun run lint` | passes: 0 errors, 3 known warnings |
 | `test:runtime` | 9 checks pass |
-| `test:combat` | 15 checks pass |
+| `test:combat` | 16 checks pass |
 | `test:opening` | 12 checks pass |
 | `test:navigation` | 19 tests pass |
+| `test:placements` | 8 tests pass (the committed `placements.json` is empty) |
 | `test:battle-background` | 2 checks pass |
 | `test:rumors` | 5 + 4 checks pass |
 | `test:investigation` | 5 checks pass |
-| `test:audio` | 4 checks pass |
-| `test:law` | 8 checks pass |
+| `test:audio` | 6 checks pass |
+| `test:law` | 9 checks pass |
 | `test:walk` | 1 check passes |
 | `test:grid` | 14 checks pass |
 | `test:grid-ai` | 13 checks pass |
-| `test:grid-skills` | 7 checks pass |
-| `test:grid-store` | 13 checks pass |
+| `test:grid-skills` | 8 checks pass |
+| `test:grid-store` | 14 checks pass |
 | `test:npcs` | 14 checks pass |
-| `test:places` | 12 checks pass: 68 new NPCs (35 wander), 97 place quests; all 72 ยุทธจักร T0–T3 moves and arts are quest rewards |
-| `test:routes` | 8 checks pass: 255 exits on 98 maps (243 within 45° of their bearing), 258 roads on 54 of the 56 paintings, 253/256 arrivals on the side the road came from |
+| `test:places` | 11 checks pass: 68 new NPCs (35 wander), 97 place quests; all 72 ยุทธจักร T0–T3 moves and arts are quest rewards |
+| `test:routes` | 10 checks pass: 255 exits on 98 maps (243 within 45° of their bearing), 258 roads on 54 of the 56 paintings, 253/256 arrivals on the side the road came from |
 | `test:story` | 10 checks pass (incl. decline / drop, secret trials, scroll hand-over and no move named in quest text): 154 lineage quests, 38 sagas (340 chapters), 292 cutscenes; every quest and chapter plays through in the real store |
 | `test:quests` | the campaign audit passes (867 quests, 101 reachable locations); 439 item / kill / objective quests hand in through the real store; guidance covers 2358 of 2382 stages; all 39 steal / assassinate / kidnap stages offer the action and advance |
+| `test:systems` | 20 checks pass |
+| `test:engine` | 12 checks pass: text overrides, the engine's draft / validation / filters / edits, the save route's whitelist |
+| `test:assets` | passes: 3,194 approved assets (224 buildings, 966 props, 305 sect pieces, 359 nature, 480 tiles, 417 icons, 225 NPC characters and 120 monsters in 8 directions, 60 fx, 38 ui), every file present at its stated size, footprints inside the drawn image; 27 MB under `public/assets/` |
 | `test:docs` | the generated reference is current; every link, repo path and command in the docs resolves |
 | `bun scripts/audit-content.ts` | 225 NPCs · 867 quests · 3038 scenes, all references resolve |
 | `bun run build` | passes; `/` first-load JS 1.12 MB (was 508 kB before the sagas; the saga text is about 2.9 MB of source, ~500 kB gzipped) |
-| `bun run test:e2e` | all 38 Playwright tests pass against the production build on :3017 (about 13 minutes, Chromium 141 via the container shim) |
+| `bun run test:e2e` | all 44 Playwright tests pass against the production build (11.5 minutes, Chromium 141 via the container shim), including the map editor on `/game/engine` |
 
 Not verified:
 
@@ -87,6 +92,26 @@ Not verified:
 ## Known issues
 
 Real behaviour today, found during the docs audit. Each is small and self-contained unless noted.
+
+### Engine (`/game/engine`)
+
+- **The asset library has only been run on a three-entry fixture**; `public/assets/manifest.json` is still empty in this branch. Paging keeps the DOM small, but the 3,500-entry load has not been timed in a browser.
+- **A saved text override does not regenerate the reference.** After saving `text-overrides.json`, run `bun scripts/build-docs-reference.ts` and `bun run test:story` by hand (see [docs/engine.md](docs/engine.md#text-overrides-in-the-game)). `bun scripts/audit-manual-names.ts` may flag a renamed move whose manual keeps the old name.
+
+### The asset library
+
+- **Short of a few targets.** 224 of 260 buildings (128 px designs that touched the frame edge were rejected and the budget left no rerolls), 305 of 320 sect pieces, 38 ui pieces (fx + ui were cut to 98). The total, 3,194, is over the 3,000 goal.
+- **Uneven pieces.** Sect pieces (made with Pixen) are a little more saturated and some sit on small ground plates; some tilesets (river, pond) are weak; the 40 px wildflower / forest-floor clumps are rough. Re-roll through `scripts/assets/` ([assets.md](docs/assets.md)).
+- **Not used in play yet.** The 225 NPC characters and 120 monsters are library assets only; the game still draws its painted NPCs and foes. Nothing is placed on a map until someone uses the map editor.
+- **PixelLab balance.** About 2,969 of the 10,000 generations are left after this run.
+
+### Placed objects and the map editor
+
+- **No objects placed yet.** `public/assets/placements.json` is empty until someone uses the editor; the asset library (`public/assets/manifest.json`) is filled by a separate pipeline.
+- **Footprint convention.** `AssetEntry.footprint` is read as a box relative to the anchor (top-left at anchor + `{x, y}`) — see [docs/rendering.md](docs/rendering.md#placed-objects). Asset tooling must write it that way.
+- **Still images only.** Asset `animations` are not played on maps; road maps take no placements; `/assets/` is not cached by the service worker, so placed objects are missing offline.
+- **Unchecked markers.** The editor's checker covers the spawn, arrivals, NPC spots, exits, services, the horse station and the tournament ring, but not quest objective spots (🔍), which the map places near the spawn at run time.
+- **Play-test hook.** `/?engineGoto=<id>` runs under `bun dev` or with `localStorage["wuxia-engine-goto"] = "on"` (set by the editor's เล่นทดสอบ on the same origin). It moves the hero without travel cost and keeps the previous save under `wusia-world-v1:before-engine-goto`; restoring it is manual.
 
 ### Roaming foes
 

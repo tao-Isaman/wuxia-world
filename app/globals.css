@@ -184,4 +184,10 @@
     position: fixed; top: 0; left: 0; width: 100dvh; height: 100dvw;
     transform-origin: 0 0; transform: rotate(90deg) translateY(-100%);
   }
+  /* The engine (/game/engine) is a desktop tool, not the game: never turned. */
+  :root:has([data-engine-root]) { --vw: 1vw; --vh: 1vh; --dvw: 1dvw; --dvh: 1dvh; }
+  html:has([data-engine-root]), body:has([data-engine-root]) { overflow: auto; }
+  body:has([data-engine-root]) {
+    position: static; width: auto; height: auto; transform: none;
+  }
 }
