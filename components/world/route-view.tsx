@@ -3,7 +3,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import type { RouteScene } from "@/lib/world";
-import { evaluateCondition } from "@/lib/world";
+import { evaluateCondition, routeBackTarget } from "@/lib/world";
 import { TRAVEL_STAMINA_COST, useWorldStore } from "@/store/world-store";
 
 interface Props {
@@ -11,10 +11,9 @@ interface Props {
 }
 
 // Route view: travel narration + destination list + back button.
-// The back target is `scene.back` if explicitly set, otherwise lastLocationId
-// (the location the player came from). If neither is available, the back
-// button is hidden — that should only happen if the route was reached via
-// goto and the player has never visited a location, which is unusual.
+// The back target is `routeBackTarget`: `scene.back` if explicitly set, else
+// lastLocationId (the location the player came from), else the road's origin.
+// If none is available, the back button is hidden.
 export function RouteView({ scene }: Props) {
   const state = useWorldStore();
   const gotoScene = useWorldStore((s) => s.gotoScene);
@@ -25,7 +24,7 @@ export function RouteView({ scene }: Props) {
     (d) => !d.visibleIf || evaluateCondition(state, d.visibleIf),
   );
 
-  const backTarget = scene.back ?? state.lastLocationId;
+  const backTarget = routeBackTarget(state, scene);
 
   const travel = useWorldStore((s) => s.travelRoute);
 

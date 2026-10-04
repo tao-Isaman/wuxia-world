@@ -6,6 +6,11 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-04
 
+### Fights on roads keep the way back; the guide arrow can turn back
+
+- **After a fight on a road the hero can walk back again.** A walk tick or a roaming foe pinned the road itself as `lastLocationId`, so the road's ย้อนกลับ exit vanished. They no longer do (the fight returns through `returnSceneId`), and the exit falls back to the road's origin for saves that were already pinned (`routeBackTarget`).
+- **The quest arrow on a road points back when the target is behind.** Once a kill quest's tally is done on a road, the "return to the giver" arrow sits on ย้อนกลับ instead of staying put (`guideMarkerId` → `back`). Covered in `test:quests` (test-quest-guide).
+
 ### Every item and piece of equipment has a painted icon
 
 - **The bag, the shops and letter gifts show library icons** instead of the category glyph: all 101 items, the 291 move scrolls and 76 equipment pieces map to one of the 417 PixelLab icons (`lib/world/data/item-icons.ts`; `ItemTile` takes an `icon` URL). Scrolls and manuals follow their move's tier: move skills are rolled scrolls, inner arts bound books, one look per tier; a letter's gold is a pile of ingots. An empty gear slot keeps its glyph (兵 衣 冠…). `test:assets` checks every item and equipment id has an approved icon at the URL the bag builds.

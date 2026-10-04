@@ -3,7 +3,7 @@
 // ฉางอัน at its "observe" stage. Run: bun scripts/test-quest-guide.ts
 import assert from "node:assert/strict";
 import { QUESTS } from "../lib/world/data/quests";
-import { TRACK_NONE, activeGuide, guideForQuest, guideMarkerId, objectiveMarkerId, trackedQuestId, type QuestGuide } from "../lib/world";
+import { TRACK_NONE, activeGuide, getScene, guideForQuest, guideMarkerId, objectiveMarkerId, routeBackTarget, trackedQuestId, type QuestGuide, type RouteScene } from "../lib/world";
 
 const { useWorldStore } = await import("../store/world-store");
 const store = () => useWorldStore.getState();
@@ -35,6 +35,30 @@ check("spy network: the observe stage points to ฉางอัน and a spot th
   assert.equal(guide.kind, "npc");
   assert.equal(guide.npcId, "city_jinling_strategist_kong");
   assert.equal(guide.locationId, "city_jinling");
+});
+
+check("on a road: a fight keeps the way back, and the guide turns back for a target behind", () => {
+  const road = "route_city_capital__to__city_changan";
+  const scene = getScene(road) as RouteScene;
+  assert.equal(scene?.kind, "route");
+  fresh({}, "city_capital");
+  useWorldStore.setState({ currentSceneId: road, lastLocationId: "city_capital",
+    roamingFoes: [{ id: "foe_t", opponentId: "thug", locationId: road, x: 400, y: 300 }] });
+  store().engageFoe("foe_t");
+  assert.equal(store().pendingEncounter?.returnSceneId, road, "the fight returns to the road");
+  assert.equal(store().lastLocationId, "city_capital", "the road is not pinned as the last place");
+  useWorldStore.setState({ pendingEncounter: null });
+  store().walkTick();
+  assert.equal(store().lastLocationId, "city_capital", "walk ticks don't pin the road either");
+  assert.equal(routeBackTarget(store(), scene), "city_capital");
+  // A save from before the fix (the road pinned) still has a way back: the road's origin.
+  assert.equal(routeBackTarget({ lastLocationId: road }, scene), "city_capital");
+  // A target in the city behind: the arrow is on ย้อนกลับ; one ahead: on the destination.
+  const at = (locationId: string) => ({ kind: "npc", action: "", locationId, path: [] }) as unknown as QuestGuide;
+  assert.equal(guideMarkerId(store(), at("city_capital")), "back");
+  assert.equal(guideMarkerId(store(), at("city_changan")), "destination-0");
+  useWorldStore.setState({ lastLocationId: road });
+  assert.equal(guideMarkerId(store(), at("city_capital")), "back", "also from a pinned save");
 });
 
 check("objective spots refuse to work from elsewhere", () => {
