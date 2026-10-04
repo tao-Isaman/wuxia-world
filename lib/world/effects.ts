@@ -398,8 +398,9 @@ export function rollWalkEvent(state: WorldStateData, chanceScale: number): void 
   void chanceScale; // the law and hunters roll at full odds per tick
   if (!state.playerBuild) return;
 
-  // Pin the map as lastLocationId so the encounter returns here.
-  state.lastLocationId = state.currentSceneId;
+  // The encounter returns to this map through its returnSceneId. Don't pin
+  // lastLocationId here: on a road it must stay the place the hero came
+  // from (the road's ย้อนกลับ exit and the quest guide route from it).
 
   // Wanted players: the law may catch up first (lib/world/law.ts).
   if (state.wanted > 0 && Math.random() < lawChance(state.wanted)) {
@@ -424,7 +425,7 @@ export function rollWalkEvent(state: WorldStateData, chanceScale: number): void 
     applyOpponentStatScale(state);
     state.pendingEncounter = {
       opponentId: `hunter_${sid}`,
-      returnSceneId: state.lastLocationId,
+      returnSceneId: state.currentSceneId,
     };
   }
 }

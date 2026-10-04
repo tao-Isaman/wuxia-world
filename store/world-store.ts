@@ -2536,7 +2536,6 @@ export const useWorldStore = create<WorldStore>()(
         if (s.pendingBattle || s.pendingEncounter || foe.locationId !== s.currentSceneId) { set({ roamingFoes }); return; }
         // Face it on the fight-or-flee screen; either way it is gone from the map.
         const draft = draftFrom(s);
-        draft.lastLocationId = s.currentSceneId;
         draft.pendingEncounter = { opponentId: foe.opponentId, returnSceneId: s.currentSceneId };
         set({ ...draft, roamingFoes });
       },

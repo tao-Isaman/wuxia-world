@@ -1,6 +1,6 @@
 "use client";
 import type { RouteMapDef, RouteScene } from "@/lib/world";
-import { activeGuide, evaluateCondition, guideMarkerId, playerBodySprite } from "@/lib/world";
+import { activeGuide, evaluateCondition, guideMarkerId, playerBodySprite, routeBackTarget } from "@/lib/world";
 import { useWorldStore, TRAVEL_STAMINA_COST } from "@/store/world-store";
 import { WorldCanvas } from "@/components/game/world-canvas";
 import { setArrivalFrom, type WorldMarker } from "@/lib/stage/types";
@@ -28,8 +28,8 @@ export function RouteMapView({ scene, map }: { scene: RouteScene; map: RouteMapD
       current.travelRoute(destination.locationId);
     },
   }));
-  const back = scene.back ?? state.lastLocationId;
-  if (back && back !== scene.id) markers.push({ id: "back", ...map.back, kind: "exit", label: "ย้อนกลับ", disabled: tired,
+  const back = routeBackTarget(state, scene);
+  if (back) markers.push({ id: "back", ...map.back, kind: "exit", label: "ย้อนกลับ", disabled: tired,
     onActivate: () => {
       const current = useWorldStore.getState();
       if (!current.canTravelTo(back)) { toast("warn", "พลังไม่พอสำหรับการเดินทาง"); return; }

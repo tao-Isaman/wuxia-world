@@ -1,4 +1,4 @@
-import type { Condition, NpcDef, QuestDef, WorldStateData } from "./types";
+import type { Condition, NpcDef, QuestDef, RouteScene, WorldStateData } from "./types";
 import { NPCS, getNpc } from "./data/npcs";
 import { getQuest } from "./data/quests";
 import { SCENES, getScene } from "./data/scenes";
@@ -131,10 +131,25 @@ export function pathBetween(from: string, to: string): string[] | null {
   return from === to ? [from] : pathIn(walkFrom(from), from, to);
 }
 
+/**
+ * Where a road's ย้อนกลับ exit leads: its explicit `back`, else the place the
+ * hero came from (`lastLocationId`), else the road's own origin
+ * (`route_<origin>__to__<destination>`) — a save from before walk events
+ * stopped pinning the road as lastLocationId still gets a way back.
+ */
+export function routeBackTarget(state: Pick<WorldStateData, "lastLocationId">, scene: RouteScene): string | null {
+  if (scene.back) return scene.back;
+  const last = state.lastLocationId;
+  if (last && last !== scene.id && getScene(last)?.kind === "location") return last;
+  const origin = scene.id.startsWith("route_") ? scene.id.slice("route_".length).split("__to__")[0] : null;
+  return origin && getScene(origin)?.kind === "location" ? origin : null;
+}
+
 /** Where the player stands for routing: a location, or the route's origin. */
 function currentLocation(state: WorldStateData): string | null {
   const scene = getScene(state.currentSceneId);
   if (scene?.kind === "location") return scene.id;
+  if (scene?.kind === "route") return routeBackTarget(state, scene) ?? state.lastLocationId;
   return state.lastLocationId;
 }
 
@@ -367,12 +382,16 @@ export function guideMarkerId(state: WorldStateData, guide: QuestGuide): string 
   if (scene?.kind === "route") {
     // Same filter + indexing as RouteMapView's destination markers.
     const visible = scene.destinations.filter((d) => !d.visibleIf || evaluateCondition(state, d.visibleIf));
-    let bestIndex = -1, bestLength = Infinity;
+    let best: string | null = null, bestLength = Infinity;
     visible.forEach((destination, index) => {
       const path = pathBetween(destination.locationId, guide.locationId!);
-      if (path && path.length < bestLength) { bestIndex = index; bestLength = path.length; }
+      if (path && path.length < bestLength) { best = "destination-" + index; bestLength = path.length; }
     });
-    return bestIndex >= 0 ? "destination-" + bestIndex : null;
+    // Turning back (RouteMapView's "back" marker) when the target lies behind.
+    const back = routeBackTarget(state, scene);
+    const behind = back ? pathBetween(back, guide.locationId) : null;
+    if (behind && behind.length < bestLength) best = "back";
+    return best;
   }
   return null;
 }
