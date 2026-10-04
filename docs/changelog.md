@@ -6,6 +6,12 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-04
 
+### Objects placed on maps, and the map editor
+
+- **The game draws placed objects.** Objects placed with the engine's map editor (`public/assets/placements.json`, images from the asset library) are drawn on their location map: "ground" ones under everyone, "object" ones sorted with the hero and NPCs by their base, "overhead" ones over everyone (fading while the hero is under or behind them). Their footprints block walking, tap-to-walk paths, wandering NPCs and roaming-foe spots. Maps without placements are unchanged ([rendering.md](rendering.md#placed-objects)).
+- **Map editor** (`/game/engine`, แผนที่): pick any of the 100 painted maps, place approved assets by click or drag, select / box-select, move, nudge, scale, flip, layer, collide, 8-direction view, duplicate, delete, snap to a grid, unlimited undo / redo, footprints and the map's own collision as overlays, NPC / exit / service / spawn markers, warnings when an object covers or cuts off one; saves through `saveEngineFile`, keeps a draft, and เล่นทดสอบ opens the game at the map with the unsaved objects (`/?engineGoto=<id>`, dev or a local flag) ([engine.md](engine.md#แผนที่--map-editor)).
+- Tests: `bun run test:placements`; `tests/browser/placements.spec.ts`.
+
 ### The male hero works for real: PixelLab work loops, played on the map
 
 - m1's 14 work loops are now 8-frame animations made with PixelLab from his painted poses (`animate-with-text-v3`): a full pickaxe swing that sends chips flying, an axe biting into the stump, a rod jerking up on a bite, a bow drawn to the cheek and loosed, a hammer ringing on a glowing blade… (`HERO_WORK_LAYOUT.m1`: 8 × 14 cells of 128 px, 8 fps). f1 keeps her painted 4-frame loops.

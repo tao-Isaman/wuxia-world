@@ -88,6 +88,14 @@ Not verified:
 
 Real behaviour today, found during the docs audit. Each is small and self-contained unless noted.
 
+### Placed objects and the map editor
+
+- **No objects placed yet.** `public/assets/placements.json` is empty until someone uses the editor; the asset library (`public/assets/manifest.json`) is filled by a separate pipeline.
+- **Footprint convention.** `AssetEntry.footprint` is read as a box relative to the anchor (top-left at anchor + `{x, y}`) — see [docs/rendering.md](docs/rendering.md#placed-objects). Asset tooling must write it that way.
+- **Still images only.** Asset `animations` are not played on maps; road maps take no placements; `/assets/` is not cached by the service worker, so placed objects are missing offline.
+- **Unchecked markers.** The editor's checker covers the spawn, arrivals, NPC spots, exits, services, the horse station and the tournament ring, but not quest objective spots (🔍), which the map places near the spawn at run time.
+- **Play-test hook.** `/?engineGoto=<id>` runs under `bun dev` or with `localStorage["wuxia-engine-goto"] = "on"` (set by the editor's เล่นทดสอบ on the same origin). It moves the hero without travel cost and keeps the previous save under `wusia-world-v1:before-engine-goto`; restoring it is manual.
+
 ### Roaming foes
 
 - **Foes can stand on painted scenery.** A spawn spot only needs to be unblocked and reachable by the collision data, so on maps whose collision is loose (the capital's outer wall, for one) a foe can appear somewhere that looks out of bounds.

@@ -35,6 +35,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | NPC simulation and rumors | [docs/liveness.md](docs/liveness.md) |
 | Adding content (places, NPCs, quests, items, skills, sects…) | [docs/content-authoring.md](docs/content-authoring.md) |
 | Map runtime, collision, characters, HUD, menus, CSS | [docs/rendering.md](docs/rendering.md) |
+| Objects placed on maps; the map editor (`/game/engine`, แผนที่) | [docs/rendering.md](docs/rendering.md#placed-objects) · [docs/engine.md](docs/engine.md#แผนที่--map-editor) |
 | Music and sound · install and offline | [docs/audio.md](docs/audio.md) · [docs/pwa.md](docs/pwa.md) |
 | Saves, migration, repair | [docs/save-format.md](docs/save-format.md) |
 | Tests and scripts | [docs/testing.md](docs/testing.md) · [docs/scripts.md](docs/scripts.md) |
@@ -55,6 +56,7 @@ bun run test:runtime        # the unit suites, one per line:
 bun run test:combat
 bun run test:opening
 bun run test:navigation
+bun run test:placements     # placed-object geometry, depth and collision; public/assets/placements.json covers no marker
 bun run test:battle-background
 bun run test:rumors
 bun run test:investigation
@@ -287,6 +289,7 @@ Two deliberate exceptions reach into stores:
 - **Battle runtime.** `grid-battle-runtime.ts` draws the board in 2.5D and plays `state.events`: walk 180 ms per tile, casts with VFX and SFX, damage numbers. It calls `battleStore.step()` about 350 ms after playback idles. Skill VFX come from `cast-vfx.ts` (pure) and `battle-vfx.ts`; skill sounds from `lib/audio/cast-sfx.ts`, using the same profile.
 - **Directions.** Travel follows the world-map compass (`lib/world/compass.ts`, `data/world-coords.ts`). Exits sit on the map edge facing their destination (`assignSlotsByBearing`); a road runs the way its exit faces (`routeDirection`, 8 ways, painting `/maps/routes/<type>-<dir>.webp`, region graded at load by `lib/stage/route-grade.ts`); arriving puts the hero beside the exit back (`setArrivalFrom` hints in `lib/stage/types.ts`).
 - **Collision.** `world-navigation.ts` (+ `world-footprints-data.ts`) covers all 100 painted maps; `test:navigation` probes every map.
+- **Placed objects.** The map editor's objects (`public/assets/placements.json`, fetched once, the manifest only for a map that has some) draw through `lib/assets/placement-geometry.ts` — the one geometry the editor shares: anchor at (x, y), `mapWidth × mapHeight × scale`, flip about the anchor, footprint relative to the anchor; "ground" under characters, "object" by base y (`100 + y·10`, hero `101 + y·10`), "overhead" at 7000+ under signs and the veil. Blocking footprints join the map's solids (`withPlacedSolids`); `placementIssues` (`lib/stage/map-anchors.ts`) and `test:placements` keep every marker reachable. Host: `data-placements`, `data-placement-ids`. Dev hook: `/?engineGoto=<id>` (`bun dev` or `localStorage["wuxia-engine-goto"]="on"`).
 - **Rules.** Never put Phaser objects in stores or saves. Don't enable Phaser input. Respect `prefers-reduced-motion`. New popups are `Modal`s, so the map pauses by itself.
 
 ## UI and theme

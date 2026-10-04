@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "generatedAt": "fixture",
+  "assets": [
+    {
+      "id": "prop_test_crate", "name": "ลังไม้ทดสอบ", "category": "prop", "subcategory": "crate", "region": "any",
+      "tags": ["ลัง", "crate"], "image": "/assets/test/crate.png", "width": 96, "height": 96,
+      "mapWidth": 48, "mapHeight": 48, "anchorX": 48, "anchorY": 90,
+      "footprint": { "x": -20, "y": -24, "w": 40, "h": 24 }, "layer": "object", "flippable": true,
+      "source": { "tool": "fixture", "prompt": "", "size": 96 }, "status": "approved"
+    },
+    {
+      "id": "nat_test_pine", "name": "สนทดสอบ", "category": "nature", "subcategory": "tree", "region": "heartland",
+      "tags": ["ต้นไม้", "pine"], "image": "/assets/test/tree.png", "width": 96, "height": 160,
+      "mapWidth": 60, "mapHeight": 100, "anchorX": 48, "anchorY": 154,
+      "footprint": { "x": -8, "y": -8, "w": 16, "h": 8 }, "layer": "object", "flippable": true,
+      "source": { "tool": "fixture", "prompt": "", "size": 160 }, "status": "approved"
+    },
+    {
+      "id": "prop_test_arch", "name": "ซุ้มโคมทดสอบ", "category": "prop", "subcategory": "lantern", "region": "any",
+      "tags": ["โคม"], "image": "/assets/test/arch.png", "width": 128, "height": 96,
+      "mapWidth": 96, "mapHeight": 72, "anchorX": 64, "anchorY": 96,
+      "footprint": null, "layer": "overhead", "flippable": false,
+      "source": { "tool": "fixture", "prompt": "", "size": 128 }, "status": "approved"
+    },
+    {
+      "id": "prop_test_draft", "name": "ร่างทดสอบ", "category": "prop", "subcategory": "crate", "region": "any",
+      "tags": [], "image": "/assets/test/crate.png", "width": 96, "height": 96,
+      "mapWidth": 48, "mapHeight": 48, "anchorX": 48, "anchorY": 90,
+      "footprint": null, "layer": "object", "flippable": true,
+      "source": { "tool": "fixture", "prompt": "", "size": 96 }, "status": "draft"
+    }
+  ]
+}

@@ -113,7 +113,7 @@ Already applied. Kept for history only.
 | `build-docs-reference.ts --check`, `check-docs.ts` | `test:docs` |
 | `test-world-vignettes.ts` | none — passes; run it by hand |
 
-`test:navigation` runs the `bun test` files `lib/stage/world-navigation.test.ts` and `lib/stage/world-placement.test.ts`.
+`test:navigation` runs the `bun test` files `lib/stage/world-navigation.test.ts` and `lib/stage/world-placement.test.ts`; `test:placements` runs `lib/stage/placements.test.ts`.
 
 ## Review drivers
 
