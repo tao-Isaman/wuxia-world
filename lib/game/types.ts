@@ -269,6 +269,9 @@ export interface Art {
   n: string;
   sc: string;
   tp: string;
+  // Optional description shown on the art card. No art ships one in the
+  // table; the engine's text overrides (data/text-overrides.json) set it.
+  d?: string;
   // Tier (พื้นฐาน → ปรมัตถ์, 0..5) — same axis as Skill; only `khbt`,
   // `kuyt` and `kgim` are tier 5. Drives the rough power budget: tier 0 inner skills
   // give ~30 HP+MP/level and ~10 stats, climbing to tier 4 = ~70 HP+MP/level

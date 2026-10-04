@@ -1,21 +1,20 @@
 import { writeFile } from "node:fs/promises";
 import path from "node:path";
-import { ENGINE_FILES, type EngineFileKey } from "@/lib/engine/save";
+import { checkSaveRequest, engineWritable } from "@/lib/engine/save-policy";
 
 // Writes an engine file into the repo. Only under `bun dev` or ENGINE_WRITE=1:
 // the deployed site is read-only and the engine downloads the JSON instead.
+// GET tells the engine which of the two it is (its status chip).
 export const dynamic = "force-dynamic";
 
-function engineWritable(): boolean {
-  return process.env.NODE_ENV === "development" || process.env.ENGINE_WRITE === "1";
+export function GET() {
+  return Response.json({ writable: engineWritable() });
 }
 
 export async function POST(request: Request) {
   if (!engineWritable()) return Response.json({ error: "บันทึกลงไฟล์ได้เฉพาะตอนรัน bun dev" }, { status: 403 });
-  const body = await request.json().catch(() => null) as { key?: string; json?: string } | null;
-  const key = body?.key as EngineFileKey | undefined;
-  if (!key || !(key in ENGINE_FILES) || typeof body?.json !== "string") return Response.json({ error: "bad request" }, { status: 400 });
-  try { JSON.parse(body.json); } catch { return Response.json({ error: "invalid JSON" }, { status: 400 }); }
-  await writeFile(path.join(process.cwd(), ENGINE_FILES[key]), body.json, "utf8");
-  return Response.json({ ok: true, written: ENGINE_FILES[key] });
+  const check = checkSaveRequest(await request.json().catch(() => null));
+  if (!check.ok) return Response.json({ error: check.error }, { status: check.status });
+  await writeFile(path.join(process.cwd(), check.path), check.json, "utf8");
+  return Response.json({ ok: true, written: check.path });
 }

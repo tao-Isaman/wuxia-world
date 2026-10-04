@@ -418,6 +418,7 @@ function ArtNumbers({ art, lv }: { art: ReturnType<typeof getArt>; lv: number })
   const statRow = Object.entries(art.stats).map(([k, v]) => `${k}+${Math.floor((v * lv) / 10)}`).join(" ");
   return (
     <>
+      {art.d && <div className="text-[11px] text-muted-foreground">{art.d}</div>}
       {(statRow || art.hL || art.mL) && (
         <div className="text-[11px] text-emerald-700">
           โบนัส:{statRow ? ` ${statRow}` : ""}{art.hL ? ` HP+${art.hL * lv}` : ""}{art.mL ? ` MP+${art.mL * lv}` : ""}

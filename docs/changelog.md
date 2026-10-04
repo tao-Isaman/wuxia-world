@@ -6,6 +6,14 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-04
 
+### The engine at `/game/engine`: asset library, map tab, skill and art texts
+
+- **A browser editor for the game's data**, not linked from the game and `noindex` ([engine.md](engine.md)). Three tabs: คลังภาพ (the asset library), แผนที่ (the map editor's place) and วิชา (skill / art texts). A chip says whether saving writes into the repo (`bun dev`, or `ENGINE_WRITE=1`) or downloads the JSON (the deployed, read-only site); unsaved edits stay as a local draft until saved or discarded.
+- **คลังภาพ** filters `public/assets/manifest.json` by category, subcategory, region, sect, status and Thai / English text, 60 thumbnails a page; the detail panel draws the anchor and the footprint over the image (drag to move or resize), shows all 8 views and edits name, tags, subcategory, layer, flip, map size, footprint and status; bulk approve / reject / tag.
+- **วิชา** edits the names and descriptions of the 178 skills and 122 arts with the game's own card as a live preview, checks empty / long / duplicate names, long descriptions and quests that would name the move they teach, and saves only the changes to `lib/game/data/text-overrides.json`.
+- **The game shows the overrides.** `SKILLS` / `ARTS` take `text-overrides.json` at load (`withTextOverrides`, unknown ids ignored); arts may now carry a description (`Art.d`), shown on the art card, the skills window and the sect hall.
+- The save route answers `GET` with whether it can write, and its whitelist now accepts only its three own keys. New suite `test:engine` (12 checks) and `engine.spec.ts` (3 browser tests).
+
 ### The male hero works for real: PixelLab work loops, played on the map
 
 - m1's 14 work loops are now 8-frame animations made with PixelLab from his painted poses (`animate-with-text-v3`): a full pickaxe swing that sends chips flying, an axe biting into the stump, a rod jerking up on a bite, a bow drawn to the cheek and loosed, a hammer ringing on a glowing blade… (`HERO_WORK_LAYOUT.m1`: 8 × 14 cells of 128 px, 8 fps). f1 keeps her painted 4-frame loops.

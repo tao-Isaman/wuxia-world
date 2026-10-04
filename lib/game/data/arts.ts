@@ -1,4 +1,5 @@
 import type { Art } from "../types";
+import { withTextOverrides } from "./text-overrides";
 
 // ─── Inner skills (วิชาในกาย / กำลังภายใน) ────────────────────────
 //
@@ -16,7 +17,7 @@ import type { Art } from "../types";
 //   ti 2  →  50 / 30
 //   ti 3  →  60 / 40
 //   ti 4  →  70 / 50  (the iconic wuxia / 9yin / JY arts)
-export const ARTS: readonly Art[] = [
+export const ARTS: readonly Art[] = withTextOverrides<Art>("arts", [
   { id: "none", n: "— ไม่มี —", sc: "", tp: "", ti: 0, stats: {}, hL: 0, mL: 0, act: null, pas: null },
 
   // ─── เส้าหลิน ───
@@ -546,7 +547,7 @@ export const ARTS: readonly Art[] = [
     mpRegenPct: 5,
     act: { n: "กรงเล็บกระดูกขาวเก้าอิม", c: 55, cd: 5, t: "atk_int_pen", m: 1.8, pen: 50, d: "Int×1.8 ทะลุ IDef 50% — 九阴真经 CD5" },
     pas: { tr: "use_int", ch: 100, d: "Int skill → ศัตรู PDef-15 (2ตา) — เย็นยะเยือกถึงกระดูก", e: { t: "debuff_def", n: "กระดูกเก้าอิม", v: -15, u: 5 } } },
-];
+]);
 
 export const ARTS_BY_ID: Map<string, Art> = new Map(ARTS.map((a) => [a.id, a]));
 
