@@ -36,6 +36,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | Adding content (places, NPCs, quests, items, skills, sects…) | [docs/content-authoring.md](docs/content-authoring.md) |
 | Map runtime, collision, characters, HUD, menus, CSS | [docs/rendering.md](docs/rendering.md) |
 | Music and sound · install and offline | [docs/audio.md](docs/audio.md) · [docs/pwa.md](docs/pwa.md) |
+| The editor at `/game/engine`: asset library, maps, skill / art texts | [docs/engine.md](docs/engine.md) |
 | Saves, migration, repair | [docs/save-format.md](docs/save-format.md) |
 | Tests and scripts | [docs/testing.md](docs/testing.md) · [docs/scripts.md](docs/scripts.md) |
 | Every place / NPC / quest / skill / item / foe | [docs/reference/](docs/reference/README.md) (generated) |
@@ -71,6 +72,7 @@ bun run test:routes         # compass exits, 8-way road paintings and arrival si
 bun run test:places         # place NPCs / quests / activities; every ยุทธจักร T0–T3 move is a quest reward; gifts; presence
 bun run test:systems        # practice xp, letters, horse stations, the sword tournament
 bun run test:quests         # campaign audit + dead ends + every item/kill/objective quest + guidance + bad-action stages
+bun run test:engine         # text overrides over SKILLS / ARTS, the engine's filters / edits / validation, the save route whitelist
 bun run test:docs           # generated reference is current + docs links/paths/commands resolve
 bun run test:e2e            # Playwright (Chromium) on :3017 — start a production server first
 bun scripts/audit-content.ts            # every NPC / quest / scene reference resolves
@@ -144,6 +146,7 @@ Two deliberate exceptions reach into stores:
 | `/` | the game |
 | `/debug` | combat sandbox with two builds from `character-store` and a free grid battle; independent of the world save |
 | `/progress` | old journal, data frozen at wave 11 |
+| `/game/engine` | the game's editor (asset library, maps, skill / art texts); not linked, `noindex`; writes files only under `bun dev` ([docs/engine.md](docs/engine.md)) |
 | `/manifest.webmanifest` | PWA manifest |
 
 ## Combat engine (`lib/game/`)
@@ -308,6 +311,7 @@ Two deliberate exceptions reach into stores:
 
 ## Conventions
 
+- **Skill / art text overrides.** `SKILLS` and `ARTS` are wrapped in `withTextOverrides` (`data/text-overrides.ts`), which lays `data/text-overrides.json` (written by `/game/engine`) over names and descriptions at load. Edit the literal rows as before; an override wins over them.
 - **Field names.** Combat tables in `lib/game/data/` keep **short field names** (`n`, `sc`, `ti`, `w`, `mg`, `st`, `at`, `bp`, `p`, `f`, `dm`, `dr`, `se`, `ee`, `types`), matching `demo.html`. World tables use readable names (`name`, `description`, `price`).
 - **Ids** are lowercase snake case with conventional prefixes:
   - places: `city_`, `village_`, `sect_`, `cave_`, `inn_`…;

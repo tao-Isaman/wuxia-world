@@ -110,6 +110,7 @@ Already applied. Kept for history only.
 | `test-grid-skills.ts` | `test:grid-skills` |
 | `test-grid-store.ts` | `test:grid-store` |
 | `audit-quest-completion.ts`, `test-quest-dead-ends.ts`, `test-quest-turnins.ts`, `test-quest-guide.ts` | `test:quests` |
+| `test-engine.ts` | `test:engine` |
 | `build-docs-reference.ts --check`, `check-docs.ts` | `test:docs` |
 | `test-world-vignettes.ts` | none — passes; run it by hand |
 

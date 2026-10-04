@@ -43,40 +43,43 @@ Start with [README.md](README.md), then [docs/README.md](docs/README.md).
 | History | [docs/changelog.md](docs/changelog.md) |
 | Old review evidence | `review/` (history; see [review/README.md](review/README.md)) |
 | Old live journal | `/progress` — frozen at wave 11 |
+| Game editor | `/game/engine` — asset library, map tab, skill / art texts; writes files only under `bun dev` ([docs/engine.md](docs/engine.md)) |
 
 Deploys are implied to be on Vercel (`VERCEL_GIT_COMMIT_SHA` sets the service-worker build id). There is no CI workflow in the repo, so the checks below are run by hand.
 
 ## Verified state
 
-Checked on 2026-10-04 for m1's PixelLab work loops, played on the map:
+Checked on 2026-10-04 for the engine at `/game/engine` (asset library, skill / art text overrides):
 
 | Check | Result |
 | --- | --- |
 | `bun run typecheck` | passes |
 | `bun run lint` | passes: 0 errors, 3 known warnings |
 | `test:runtime` | 9 checks pass |
-| `test:combat` | 15 checks pass |
+| `test:combat` | 16 checks pass |
 | `test:opening` | 12 checks pass |
 | `test:navigation` | 19 tests pass |
 | `test:battle-background` | 2 checks pass |
 | `test:rumors` | 5 + 4 checks pass |
 | `test:investigation` | 5 checks pass |
-| `test:audio` | 4 checks pass |
-| `test:law` | 8 checks pass |
+| `test:audio` | 6 checks pass |
+| `test:law` | 9 checks pass |
 | `test:walk` | 1 check passes |
 | `test:grid` | 14 checks pass |
 | `test:grid-ai` | 13 checks pass |
-| `test:grid-skills` | 7 checks pass |
-| `test:grid-store` | 13 checks pass |
+| `test:grid-skills` | 8 checks pass |
+| `test:grid-store` | 14 checks pass |
 | `test:npcs` | 14 checks pass |
-| `test:places` | 12 checks pass: 68 new NPCs (35 wander), 97 place quests; all 72 ยุทธจักร T0–T3 moves and arts are quest rewards |
-| `test:routes` | 8 checks pass: 255 exits on 98 maps (243 within 45° of their bearing), 258 roads on 54 of the 56 paintings, 253/256 arrivals on the side the road came from |
+| `test:places` | 11 checks pass: 68 new NPCs (35 wander), 97 place quests; all 72 ยุทธจักร T0–T3 moves and arts are quest rewards |
+| `test:routes` | 10 checks pass: 255 exits on 98 maps (243 within 45° of their bearing), 258 roads on 54 of the 56 paintings, 253/256 arrivals on the side the road came from |
 | `test:story` | 10 checks pass (incl. decline / drop, secret trials, scroll hand-over and no move named in quest text): 154 lineage quests, 38 sagas (340 chapters), 292 cutscenes; every quest and chapter plays through in the real store |
 | `test:quests` | the campaign audit passes (867 quests, 101 reachable locations); 439 item / kill / objective quests hand in through the real store; guidance covers 2358 of 2382 stages; all 39 steal / assassinate / kidnap stages offer the action and advance |
+| `test:systems` | 20 checks pass |
+| `test:engine` | 12 checks pass: text overrides, the engine's draft / validation / filters / edits, the save route's whitelist |
 | `test:docs` | the generated reference is current; every link, repo path and command in the docs resolves |
 | `bun scripts/audit-content.ts` | 225 NPCs · 867 quests · 3038 scenes, all references resolve |
 | `bun run build` | passes; `/` first-load JS 1.12 MB (was 508 kB before the sagas; the saga text is about 2.9 MB of source, ~500 kB gzipped) |
-| `bun run test:e2e` | all 38 Playwright tests pass against the production build on :3017 (about 13 minutes, Chromium 141 via the container shim) |
+| `bun run test:e2e` | 41 Playwright tests against the production build (about 16 minutes, Chromium 141 via the container shim): 40 pass in one run; `hero-actions.spec.ts` › resting is flaky under CPU load (it failed once, and also fails 1 in 3 on the commit before the engine), then passes 3 × 3 together with `engine.spec.ts` |
 
 Not verified:
 
@@ -87,6 +90,12 @@ Not verified:
 ## Known issues
 
 Real behaviour today, found during the docs audit. Each is small and self-contained unless noted.
+
+### Engine (`/game/engine`)
+
+- **The map tab is a placeholder** until the map team's `components/engine/map-editor.tsx` lands.
+- **The asset library has only been run on a three-entry fixture**; `public/assets/manifest.json` is still empty in this branch. Paging keeps the DOM small, but the 3,500-entry load has not been timed in a browser.
+- **A saved text override does not regenerate the reference.** After saving `text-overrides.json`, run `bun scripts/build-docs-reference.ts` and `bun run test:story` by hand (see [docs/engine.md](docs/engine.md#text-overrides-in-the-game)). `bun scripts/audit-manual-names.ts` may flag a renamed move whose manual keeps the old name.
 
 ### Roaming foes
 

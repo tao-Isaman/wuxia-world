@@ -49,7 +49,8 @@ export function SkillTooltip({ skill, level, children }: SkillTooltipProps) {
   );
 }
 
-function SkillCard({ skill, level }: { skill: Skill; level?: number }) {
+/** The full skill card (also the engine's preview). */
+export function SkillCard({ skill, level }: { skill: Skill; level?: number }) {
   const tier = TIERS[skill.ti];
   const lv = level ?? 1;
   const bpAtLv = Math.round(effectiveBp(skill, lv));
@@ -158,7 +159,8 @@ export function ArtTooltip({ art, level, children }: ArtTooltipProps) {
   );
 }
 
-function ArtCard({ art, level }: { art: Art; level?: number }) {
+/** The full art card (also the engine's preview). */
+export function ArtCard({ art, level }: { art: Art; level?: number }) {
   const lv = level ?? 1;
   const types = effectiveTypes(art);
   const statRow = (Object.entries(art.stats) as [StatKey, number][])
@@ -191,6 +193,8 @@ function ArtCard({ art, level }: { art: Art; level?: number }) {
           ))}
         </div>
       </div>
+
+      {art.d && <p className="text-[11px] text-muted-foreground">{art.d}</p>}
 
       {/* Stat scaling */}
       {(statRow || art.hL > 0 || art.mL > 0) && (

@@ -1,4 +1,5 @@
 import type { Skill } from "../types";
+import { withTextOverrides } from "./text-overrides";
 
 // ─── Move skills (วิชาฝีมือ) ─────────────────────────────────────────
 //
@@ -17,7 +18,7 @@ import type { Skill } from "../types";
 //   se  = effect on self,  ee = effect on enemy
 //   types = philosophical tags (yin / yang / hard / soft / internal /
 //           external / balance) feeding lib/game/skill-conflict.ts
-export const SKILLS: readonly Skill[] = [
+export const SKILLS: readonly Skill[] = withTextOverrides<Skill>("skills", [
 
   // ─── เส้าหลิน ───
   { id: "sf", n: "หมัดเส้าหลิน", sc: "เส้าหลิน", ti: 0, w: "fist", mg: 20, st: { STR: 5, VIT: 5 }, at: "phy", bp: 42, p: 0, f: 20, dm: 1, se: null, ee: null, d: "Phy+flat20", types: ["external", "hard"] },
@@ -234,7 +235,7 @@ export const SKILLS: readonly Skill[] = [
   { id: "ng4", n: "หมัดพระอินทร์", sc: "ยุทธจักร", ti: 4, w: "fist", mg: 100, st: { POW: 11, INT: 8, LUK: 3, DEX: 8 }, at: "int", bp: 85, p: 0, f: 0, dm: 1.2, se: null, ee: { t: "multi_debuff", av: -25, ev: -25, u: 5 }, d: "Int×120% + Acc-25 Eva-25 (3 ตา)", types: ["yang", "internal"] },
   { id: "ng5", n: "ดาบยาวเทพสังหาร", sc: "ยุทธจักร", ti: 4, w: "blade", mg: 100, st: { STR: 11, DEX: 7, AGI: 4, LUK: 8 }, at: "phy", bp: 100, p: 30, f: 0, dm: 1, se: null, ee: { t: "debuff_def", v: -25, u: 5 }, d: "Phy×130% + PDef-25 (3 ตา)", types: ["yang", "hard"] },
   { id: "ng6", n: "ขลุ่ยพลิกโลก", sc: "ยุทธจักร", ti: 4, w: "music", mg: 100, st: { POW: 10, INT: 9, DEX: 3, AGI: 8 }, at: "int", bp: 82, p: 25, f: 0, dm: 1, se: null, ee: { t: "poison_dmg", pp: 16, u: 5 }, d: "Int×125% + พิษ 16%HP/ตา (5ตา) — ขลุ่ยพลิกโลกหลอนพิษ", types: ["yin", "internal"] },
-];
+]);
 
 export const SKILLS_BY_ID: Map<string, Skill> = new Map(SKILLS.map((s) => [s.id, s]));
 

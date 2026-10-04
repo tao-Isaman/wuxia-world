@@ -18,6 +18,7 @@ Start with the [project README](../README.md) for what the game is and how to ru
 | Look up any location, sect, quest, NPC, skill, item or opponent | [Reference (generated)](reference/README.md) |
 | Change the map view, characters, HUD, menus, VFX or styling | [Rendering and UI](rendering.md) |
 | Change music or sound effects | [Audio](audio.md) |
+| Edit the asset library, map placements or skill / art texts in the browser (`/game/engine`) | [Engine](engine.md) |
 | Change install / offline behaviour | [PWA](pwa.md) |
 | Change what is saved, or bump the save version | [Save format](save-format.md) |
 | Run or write tests, audits and browser checks | [Testing](testing.md) |
@@ -42,6 +43,7 @@ Start with the [project README](../README.md) for what the game is and how to ru
 - [content-authoring.md](content-authoring.md) — step-by-step recipes for adding content, with the checks to run.
 - [rendering.md](rendering.md) — Phaser stage, world runtime, maps and collision, characters, HUD and menus, VFX, styling.
 - [audio.md](audio.md) — procedural music and sound.
+- [engine.md](engine.md) — the `/game/engine` editor: asset library, map editor, skill / art text overrides, saving in dev vs deployed.
 - [pwa.md](pwa.md) — manifest, service worker, install button.
 - [save-format.md](save-format.md) — persisted keys, version history, migrations, repair on load.
 - [testing.md](testing.md) — unit suites, audits, Playwright, how to verify a change.

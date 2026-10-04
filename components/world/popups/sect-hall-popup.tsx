@@ -116,9 +116,9 @@ export function SectHallPopup({ open, hall, onClose }: Props) {
                       </Badge>
                     )}
                   </div>
-                  {(sk?.d ?? art?.tp) && (
+                  {(sk?.d ?? art?.d ?? art?.tp) && (
                     <div className="text-[10px] text-muted-foreground">
-                      {sk?.d ?? art?.tp}
+                      {sk?.d ?? art?.d ?? art?.tp}
                     </div>
                   )}
                 </div>
