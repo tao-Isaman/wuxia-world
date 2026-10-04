@@ -79,7 +79,7 @@ Checked on 2026-10-04 for the engine at `/game/engine` (asset library, skill / a
 | `test:docs` | the generated reference is current; every link, repo path and command in the docs resolves |
 | `bun scripts/audit-content.ts` | 225 NPCs · 867 quests · 3038 scenes, all references resolve |
 | `bun run build` | passes; `/` first-load JS 1.12 MB (was 508 kB before the sagas; the saga text is about 2.9 MB of source, ~500 kB gzipped) |
-| `bun run test:e2e` | all 38 Playwright tests pass against the production build on :3017 (about 13 minutes, Chromium 141 via the container shim) |
+| `bun run test:e2e` | 41 Playwright tests against the production build (about 16 minutes, Chromium 141 via the container shim): 40 pass in one run; `hero-actions.spec.ts` › resting is flaky under CPU load (it failed once, and also fails 1 in 3 on the commit before the engine), then passes 3 × 3 together with `engine.spec.ts` |
 
 Not verified:
 
