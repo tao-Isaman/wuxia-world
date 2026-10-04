@@ -1,0 +1,235 @@
+{
+ "category": "fx",
+ "jobs": [
+  {
+   "id": "fx_effect_flame_burst",
+   "category": "fx",
+   "subcategory": "effect",
+   "region": "any",
+   "group": "effect",
+   "name": "เปลวเพลิง",
+   "tags": [
+    "เปลวเพลิง",
+    "flame burst",
+    "effect",
+    "เอฟเฟกต์"
+   ],
+   "kind": "fx",
+   "mapWidth": 48,
+   "keep": 6,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "prompt": "pixel art game effect sprite: a burst of orange flame, wuxia martial arts effect, dark outline where solid, centered, transparent background, no text."
+  },
+  {
+   "id": "fx_effect_lightning",
+   "category": "fx",
+   "subcategory": "effect",
+   "region": "any",
+   "group": "effect",
+   "name": "สายฟ้า",
+   "tags": [
+    "สายฟ้า",
+    "lightning",
+    "effect",
+    "เอฟเฟกต์"
+   ],
+   "kind": "fx",
+   "mapWidth": 48,
+   "keep": 6,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "prompt": "pixel art game effect sprite: a crackling blue-white lightning bolt, wuxia martial arts effect, dark outline where solid, centered, transparent background, no text."
+  },
+  {
+   "id": "fx_effect_ice_shards",
+   "category": "fx",
+   "subcategory": "effect",
+   "region": "any",
+   "group": "effect",
+   "name": "เกล็ดน้ำแข็ง",
+   "tags": [
+    "เกล็ดน้ำแข็ง",
+    "ice shards",
+    "effect",
+    "เอฟเฟกต์"
+   ],
+   "kind": "fx",
+   "mapWidth": 48,
+   "keep": 6,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "prompt": "pixel art game effect sprite: a spray of ice shards, wuxia martial arts effect, dark outline where solid, centered, transparent background, no text."
+  },
+  {
+   "id": "fx_effect_sword_qi",
+   "category": "fx",
+   "subcategory": "effect",
+   "region": "any",
+   "group": "effect",
+   "name": "ปราณกระบี่",
+   "tags": [
+    "ปราณกระบี่",
+    "sword qi",
+    "effect",
+    "เอฟเฟกต์"
+   ],
+   "kind": "fx",
+   "mapWidth": 48,
+   "keep": 6,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "prompt": "pixel art game effect sprite: a glowing crescent sword-qi slash arc, wuxia martial arts effect, dark outline where solid, centered, transparent background, no text."
+  },
+  {
+   "id": "fx_effect_palm_wave",
+   "category": "fx",
+   "subcategory": "effect",
+   "region": "any",
+   "group": "effect",
+   "name": "คลื่นฝ่ามือ",
+   "tags": [
+    "คลื่นฝ่ามือ",
+    "palm wave",
+    "effect",
+    "เอฟเฟกต์"
+   ],
+   "kind": "fx",
+   "mapWidth": 48,
+   "keep": 6,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "prompt": "pixel art game effect sprite: a golden palm-shaped wave of inner energy, wuxia martial arts effect, dark outline where solid, centered, transparent background, no text."
+  },
+  {
+   "id": "fx_effect_poison_cloud",
+   "category": "fx",
+   "subcategory": "effect",
+   "region": "any",
+   "group": "effect",
+   "name": "หมอกพิษ",
+   "tags": [
+    "หมอกพิษ",
+    "poison cloud",
+    "effect",
+    "เอฟเฟกต์"
+   ],
+   "kind": "fx",
+   "mapWidth": 48,
+   "keep": 6,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "prompt": "pixel art game effect sprite: a green poison mist cloud, wuxia martial arts effect, dark outline where solid, centered, transparent background, no text."
+  },
+  {
+   "id": "fx_effect_smoke_puff",
+   "category": "fx",
+   "subcategory": "effect",
+   "region": "any",
+   "group": "effect",
+   "name": "ควัน",
+   "tags": [
+    "ควัน",
+    "smoke puff",
+    "effect",
+    "เอฟเฟกต์"
+   ],
+   "kind": "fx",
+   "mapWidth": 48,
+   "keep": 6,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "prompt": "pixel art game effect sprite: a puff of grey smoke or dust, wuxia martial arts effect, dark outline where solid, centered, transparent background, no text."
+  },
+  {
+   "id": "fx_effect_hit_spark",
+   "category": "fx",
+   "subcategory": "effect",
+   "region": "any",
+   "group": "effect",
+   "name": "ประกายกระทบ",
+   "tags": [
+    "ประกายกระทบ",
+    "hit spark",
+    "effect",
+    "เอฟเฟกต์"
+   ],
+   "kind": "fx",
+   "mapWidth": 48,
+   "keep": 6,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "prompt": "pixel art game effect sprite: an impact spark star, wuxia martial arts effect, dark outline where solid, centered, transparent background, no text."
+  },
+  {
+   "id": "fx_effect_heal_aura",
+   "category": "fx",
+   "subcategory": "effect",
+   "region": "any",
+   "group": "effect",
+   "name": "รัศมีรักษา",
+   "tags": [
+    "รัศมีรักษา",
+    "heal aura",
+    "effect",
+    "เอฟเฟกต์"
+   ],
+   "kind": "fx",
+   "mapWidth": 48,
+   "keep": 6,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "prompt": "pixel art game effect sprite: a soft green healing aura of light motes, wuxia martial arts effect, dark outline where solid, centered, transparent background, no text."
+  },
+  {
+   "id": "fx_effect_blood_splash",
+   "category": "fx",
+   "subcategory": "effect",
+   "region": "any",
+   "group": "effect",
+   "name": "เลือดสาด",
+   "tags": [
+    "เลือดสาด",
+    "blood splash",
+    "effect",
+    "เอฟเฟกต์"
+   ],
+   "kind": "fx",
+   "mapWidth": 48,
+   "keep": 6,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "prompt": "pixel art game effect sprite: a small dark-red blood splash, wuxia martial arts effect, dark outline where solid, centered, transparent background, no text."
+  }
+ ]
+}

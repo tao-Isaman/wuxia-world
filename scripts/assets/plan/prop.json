@@ -1,0 +1,2830 @@
+{
+ "category": "prop",
+ "jobs": [
+  {
+   "id": "prp_heartland_market_stall",
+   "category": "prop",
+   "subcategory": "stall",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "แผงตลาด",
+   "tags": [
+    "แผงตลาด",
+    "market stall",
+    "stall",
+    "town",
+    "heartland"
+   ],
+   "kind": "solid",
+   "mapWidth": 90,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 84,
+    "h": 84
+   },
+   "style": "region-heartland",
+   "prompt": "pixel art game asset: a market stall with a cloth awning and goods on the counter, imperial central-plains style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_heartland_street_lantern",
+   "category": "prop",
+   "subcategory": "lantern",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "เสาโคมไฟ",
+   "tags": [
+    "เสาโคมไฟ",
+    "street lantern",
+    "lantern",
+    "town",
+    "heartland"
+   ],
+   "kind": "tall",
+   "mapWidth": 30,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-heartland",
+   "prompt": "pixel art game asset: a street lantern on a wooden post, imperial central-plains style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_heartland_barrels",
+   "category": "prop",
+   "subcategory": "container",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "ถังไม้",
+   "tags": [
+    "ถังไม้",
+    "barrels",
+    "container",
+    "town",
+    "heartland"
+   ],
+   "kind": "solid",
+   "mapWidth": 40,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-heartland",
+   "prompt": "pixel art game asset: wooden barrels, a small group, imperial central-plains style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_heartland_crates_sacks",
+   "category": "prop",
+   "subcategory": "container",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "ลังและกระสอบ",
+   "tags": [
+    "ลังและกระสอบ",
+    "crates sacks",
+    "container",
+    "town",
+    "heartland"
+   ],
+   "kind": "solid",
+   "mapWidth": 50,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-heartland",
+   "prompt": "pixel art game asset: a pile of wooden crates and grain sacks, imperial central-plains style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_heartland_handcart",
+   "category": "prop",
+   "subcategory": "vehicle",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "รถเข็น",
+   "tags": [
+    "รถเข็น",
+    "handcart",
+    "vehicle",
+    "town",
+    "heartland"
+   ],
+   "kind": "solid",
+   "mapWidth": 70,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-heartland",
+   "prompt": "pixel art game asset: a wooden two-wheeled handcart with cargo, imperial central-plains style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_heartland_well",
+   "category": "prop",
+   "subcategory": "well",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "บ่อน้ำ",
+   "tags": [
+    "บ่อน้ำ",
+    "well",
+    "well",
+    "town",
+    "heartland"
+   ],
+   "kind": "solid",
+   "mapWidth": 60,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-heartland",
+   "prompt": "pixel art game asset: a stone water well with a wooden pulley frame, imperial central-plains style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_heartland_notice_board",
+   "category": "prop",
+   "subcategory": "sign",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "ป้ายประกาศ",
+   "tags": [
+    "ป้ายประกาศ",
+    "notice board",
+    "sign",
+    "town",
+    "heartland"
+   ],
+   "kind": "tall",
+   "mapWidth": 50,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-heartland",
+   "prompt": "pixel art game asset: a wooden notice board with blank paper notices, imperial central-plains style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_heartland_water_vat",
+   "category": "prop",
+   "subcategory": "container",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "โอ่งน้ำ",
+   "tags": [
+    "โอ่งน้ำ",
+    "water vat",
+    "container",
+    "town",
+    "heartland"
+   ],
+   "kind": "solid",
+   "mapWidth": 35,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-heartland",
+   "prompt": "pixel art game asset: a large glazed water vat or urn, imperial central-plains style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_heartland_pottery",
+   "category": "prop",
+   "subcategory": "container",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "เครื่องปั้นดินเผา",
+   "tags": [
+    "เครื่องปั้นดินเผา",
+    "pottery",
+    "container",
+    "town",
+    "heartland"
+   ],
+   "kind": "solid",
+   "mapWidth": 40,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-heartland",
+   "prompt": "pixel art game asset: clay pottery jars and pots, a small group, imperial central-plains style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_heartland_stone_lion",
+   "category": "prop",
+   "subcategory": "statue",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "สิงโตหิน",
+   "tags": [
+    "สิงโตหิน",
+    "stone lion",
+    "statue",
+    "town",
+    "heartland"
+   ],
+   "kind": "tall",
+   "mapWidth": 45,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-heartland",
+   "prompt": "pixel art game asset: a carved stone guardian lion on a pedestal, imperial central-plains style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_heartland_sedan_chair",
+   "category": "prop",
+   "subcategory": "vehicle",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "เกี้ยว",
+   "tags": [
+    "เกี้ยว",
+    "sedan chair",
+    "vehicle",
+    "town",
+    "heartland"
+   ],
+   "kind": "solid",
+   "mapWidth": 60,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-heartland",
+   "prompt": "pixel art game asset: a red lacquered sedan chair with carrying poles, imperial central-plains style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_heartland_incense_burner",
+   "category": "prop",
+   "subcategory": "religious",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "กระถางธูป",
+   "tags": [
+    "กระถางธูป",
+    "incense burner",
+    "religious",
+    "town",
+    "heartland"
+   ],
+   "kind": "solid",
+   "mapWidth": 40,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-heartland",
+   "prompt": "pixel art game asset: a bronze incense burner cauldron on legs, imperial central-plains style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_heartland_haystack",
+   "category": "prop",
+   "subcategory": "farm",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "กองฟาง",
+   "tags": [
+    "กองฟาง",
+    "haystack",
+    "farm",
+    "village",
+    "heartland"
+   ],
+   "kind": "solid",
+   "mapWidth": 50,
+   "keep": 10,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-heartland",
+   "prompt": "pixel art game asset: a round haystack, imperial central-plains village. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_heartland_farm_tools",
+   "category": "prop",
+   "subcategory": "farm",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "เครื่องมือทำนา",
+   "tags": [
+    "เครื่องมือทำนา",
+    "farm tools",
+    "farm",
+    "village",
+    "heartland"
+   ],
+   "kind": "solid",
+   "mapWidth": 40,
+   "keep": 10,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-heartland",
+   "prompt": "pixel art game asset: farm tools leaning together: hoe, rake, sickle and a basket, imperial central-plains village. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_heartland_wood_fence",
+   "category": "prop",
+   "subcategory": "fence",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "รั้วไม้",
+   "tags": [
+    "รั้วไม้",
+    "wood fence",
+    "fence",
+    "village",
+    "heartland"
+   ],
+   "kind": "solid",
+   "mapWidth": 70,
+   "keep": 10,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-heartland",
+   "prompt": "pixel art game asset: a short section of rustic wooden fence, imperial central-plains village. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_heartland_chicken_coop",
+   "category": "prop",
+   "subcategory": "farm",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "เล้าไก่",
+   "tags": [
+    "เล้าไก่",
+    "chicken coop",
+    "farm",
+    "village",
+    "heartland"
+   ],
+   "kind": "solid",
+   "mapWidth": 50,
+   "keep": 10,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-heartland",
+   "prompt": "pixel art game asset: a small wooden chicken coop with chickens, imperial central-plains village. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_heartland_scarecrow",
+   "category": "prop",
+   "subcategory": "farm",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "หุ่นไล่กา",
+   "tags": [
+    "หุ่นไล่กา",
+    "scarecrow",
+    "farm",
+    "village",
+    "heartland"
+   ],
+   "kind": "tall",
+   "mapWidth": 35,
+   "keep": 10,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-heartland",
+   "prompt": "pixel art game asset: a scarecrow in a straw hat, imperial central-plains village. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_heartland_veg_plot",
+   "category": "prop",
+   "subcategory": "farm",
+   "region": "heartland",
+   "group": "heartland",
+   "name": "แปลงผัก",
+   "tags": [
+    "แปลงผัก",
+    "veg plot",
+    "farm",
+    "village",
+    "heartland"
+   ],
+   "kind": "flat",
+   "mapWidth": 70,
+   "keep": 10,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-heartland",
+   "prompt": "pixel art game asset: a small vegetable garden plot with rows of cabbages, imperial central-plains village. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_east_market_stall",
+   "category": "prop",
+   "subcategory": "stall",
+   "region": "east",
+   "group": "east",
+   "name": "แผงตลาด",
+   "tags": [
+    "แผงตลาด",
+    "market stall",
+    "stall",
+    "town",
+    "east"
+   ],
+   "kind": "solid",
+   "mapWidth": 90,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 84,
+    "h": 84
+   },
+   "style": "region-east",
+   "prompt": "pixel art game asset: a market stall with a cloth awning and goods on the counter, Jiangnan water-town style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_east_street_lantern",
+   "category": "prop",
+   "subcategory": "lantern",
+   "region": "east",
+   "group": "east",
+   "name": "เสาโคมไฟ",
+   "tags": [
+    "เสาโคมไฟ",
+    "street lantern",
+    "lantern",
+    "town",
+    "east"
+   ],
+   "kind": "tall",
+   "mapWidth": 30,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-east",
+   "prompt": "pixel art game asset: a street lantern on a wooden post, Jiangnan water-town style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_east_barrels",
+   "category": "prop",
+   "subcategory": "container",
+   "region": "east",
+   "group": "east",
+   "name": "ถังไม้",
+   "tags": [
+    "ถังไม้",
+    "barrels",
+    "container",
+    "town",
+    "east"
+   ],
+   "kind": "solid",
+   "mapWidth": 40,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-east",
+   "prompt": "pixel art game asset: wooden barrels, a small group, Jiangnan water-town style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_east_crates_sacks",
+   "category": "prop",
+   "subcategory": "container",
+   "region": "east",
+   "group": "east",
+   "name": "ลังและกระสอบ",
+   "tags": [
+    "ลังและกระสอบ",
+    "crates sacks",
+    "container",
+    "town",
+    "east"
+   ],
+   "kind": "solid",
+   "mapWidth": 50,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-east",
+   "prompt": "pixel art game asset: a pile of wooden crates and grain sacks, Jiangnan water-town style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_east_handcart",
+   "category": "prop",
+   "subcategory": "vehicle",
+   "region": "east",
+   "group": "east",
+   "name": "รถเข็น",
+   "tags": [
+    "รถเข็น",
+    "handcart",
+    "vehicle",
+    "town",
+    "east"
+   ],
+   "kind": "solid",
+   "mapWidth": 70,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-east",
+   "prompt": "pixel art game asset: a wooden two-wheeled handcart with cargo, Jiangnan water-town style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_east_well",
+   "category": "prop",
+   "subcategory": "well",
+   "region": "east",
+   "group": "east",
+   "name": "บ่อน้ำ",
+   "tags": [
+    "บ่อน้ำ",
+    "well",
+    "well",
+    "town",
+    "east"
+   ],
+   "kind": "solid",
+   "mapWidth": 60,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-east",
+   "prompt": "pixel art game asset: a stone water well with a wooden pulley frame, Jiangnan water-town style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_east_notice_board",
+   "category": "prop",
+   "subcategory": "sign",
+   "region": "east",
+   "group": "east",
+   "name": "ป้ายประกาศ",
+   "tags": [
+    "ป้ายประกาศ",
+    "notice board",
+    "sign",
+    "town",
+    "east"
+   ],
+   "kind": "tall",
+   "mapWidth": 50,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-east",
+   "prompt": "pixel art game asset: a wooden notice board with blank paper notices, Jiangnan water-town style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_east_water_vat",
+   "category": "prop",
+   "subcategory": "container",
+   "region": "east",
+   "group": "east",
+   "name": "โอ่งน้ำ",
+   "tags": [
+    "โอ่งน้ำ",
+    "water vat",
+    "container",
+    "town",
+    "east"
+   ],
+   "kind": "solid",
+   "mapWidth": 35,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-east",
+   "prompt": "pixel art game asset: a large glazed water vat or urn, Jiangnan water-town style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_east_pottery",
+   "category": "prop",
+   "subcategory": "container",
+   "region": "east",
+   "group": "east",
+   "name": "เครื่องปั้นดินเผา",
+   "tags": [
+    "เครื่องปั้นดินเผา",
+    "pottery",
+    "container",
+    "town",
+    "east"
+   ],
+   "kind": "solid",
+   "mapWidth": 40,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-east",
+   "prompt": "pixel art game asset: clay pottery jars and pots, a small group, Jiangnan water-town style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_east_rowboat",
+   "category": "prop",
+   "subcategory": "boat",
+   "region": "east",
+   "group": "east",
+   "name": "เรือพาย",
+   "tags": [
+    "เรือพาย",
+    "rowboat",
+    "boat",
+    "town",
+    "east"
+   ],
+   "kind": "solid",
+   "mapWidth": 90,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 84,
+    "h": 84
+   },
+   "style": "region-east",
+   "prompt": "pixel art game asset: a small wooden canal rowboat (wupeng boat) with a black awning, Jiangnan water-town style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_east_umbrella_stand",
+   "category": "prop",
+   "subcategory": "decor",
+   "region": "east",
+   "group": "east",
+   "name": "ร่มกระดาษ",
+   "tags": [
+    "ร่มกระดาษ",
+    "umbrella stand",
+    "decor",
+    "town",
+    "east"
+   ],
+   "kind": "solid",
+   "mapWidth": 35,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-east",
+   "prompt": "pixel art game asset: oiled-paper umbrellas, open and closed, on a stand, Jiangnan water-town style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_east_lotus_tub",
+   "category": "prop",
+   "subcategory": "plant",
+   "region": "east",
+   "group": "east",
+   "name": "อ่างบัว",
+   "tags": [
+    "อ่างบัว",
+    "lotus tub",
+    "plant",
+    "town",
+    "east"
+   ],
+   "kind": "solid",
+   "mapWidth": 40,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-east",
+   "prompt": "pixel art game asset: a stone tub with lotus leaves and flowers, Jiangnan water-town style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_east_rice_racks",
+   "category": "prop",
+   "subcategory": "farm",
+   "region": "east",
+   "group": "east",
+   "name": "ราวตากข้าว",
+   "tags": [
+    "ราวตากข้าว",
+    "rice racks",
+    "farm",
+    "village",
+    "east"
+   ],
+   "kind": "solid",
+   "mapWidth": 60,
+   "keep": 10,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-east",
+   "prompt": "pixel art game asset: a bamboo rice-drying rack with sheaves, Jiangnan water-town village. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_east_fishing_nets",
+   "category": "prop",
+   "subcategory": "fishing",
+   "region": "east",
+   "group": "east",
+   "name": "ตากอวน",
+   "tags": [
+    "ตากอวน",
+    "fishing nets",
+    "fishing",
+    "village",
+    "east"
+   ],
+   "kind": "solid",
+   "mapWidth": 60,
+   "keep": 10,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-east",
+   "prompt": "pixel art game asset: fishing nets drying on bamboo poles, Jiangnan water-town village. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_east_duck_pen",
+   "category": "prop",
+   "subcategory": "farm",
+   "region": "east",
+   "group": "east",
+   "name": "คอกเป็ด",
+   "tags": [
+    "คอกเป็ด",
+    "duck pen",
+    "farm",
+    "village",
+    "east"
+   ],
+   "kind": "solid",
+   "mapWidth": 55,
+   "keep": 10,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-east",
+   "prompt": "pixel art game asset: a little reed duck pen with ducks, Jiangnan water-town village. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_east_bamboo_fence",
+   "category": "prop",
+   "subcategory": "fence",
+   "region": "east",
+   "group": "east",
+   "name": "รั้วไผ่",
+   "tags": [
+    "รั้วไผ่",
+    "bamboo fence",
+    "fence",
+    "village",
+    "east"
+   ],
+   "kind": "solid",
+   "mapWidth": 70,
+   "keep": 10,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-east",
+   "prompt": "pixel art game asset: a short section of woven bamboo fence, Jiangnan water-town village. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_east_fish_baskets",
+   "category": "prop",
+   "subcategory": "fishing",
+   "region": "east",
+   "group": "east",
+   "name": "ข้องปลา",
+   "tags": [
+    "ข้องปลา",
+    "fish baskets",
+    "fishing",
+    "village",
+    "east"
+   ],
+   "kind": "solid",
+   "mapWidth": 35,
+   "keep": 10,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-east",
+   "prompt": "pixel art game asset: woven fish traps and baskets, Jiangnan water-town village. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_east_mulberry_basket",
+   "category": "prop",
+   "subcategory": "farm",
+   "region": "east",
+   "group": "east",
+   "name": "ตะกร้าเลี้ยงไหม",
+   "tags": [
+    "ตะกร้าเลี้ยงไหม",
+    "mulberry basket",
+    "farm",
+    "village",
+    "east"
+   ],
+   "kind": "solid",
+   "mapWidth": 50,
+   "keep": 10,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-east",
+   "prompt": "pixel art game asset: flat bamboo trays of silkworms on a stand, Jiangnan water-town village. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_south_market_stall",
+   "category": "prop",
+   "subcategory": "stall",
+   "region": "south",
+   "group": "south",
+   "name": "แผงตลาด",
+   "tags": [
+    "แผงตลาด",
+    "market stall",
+    "stall",
+    "town",
+    "south"
+   ],
+   "kind": "solid",
+   "mapWidth": 90,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 84,
+    "h": 84
+   },
+   "style": "region-south",
+   "prompt": "pixel art game asset: a market stall with a cloth awning and goods on the counter, Dali and Miao southwest style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_south_street_lantern",
+   "category": "prop",
+   "subcategory": "lantern",
+   "region": "south",
+   "group": "south",
+   "name": "เสาโคมไฟ",
+   "tags": [
+    "เสาโคมไฟ",
+    "street lantern",
+    "lantern",
+    "town",
+    "south"
+   ],
+   "kind": "tall",
+   "mapWidth": 30,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-south",
+   "prompt": "pixel art game asset: a street lantern on a wooden post, Dali and Miao southwest style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_south_barrels",
+   "category": "prop",
+   "subcategory": "container",
+   "region": "south",
+   "group": "south",
+   "name": "ถังไม้",
+   "tags": [
+    "ถังไม้",
+    "barrels",
+    "container",
+    "town",
+    "south"
+   ],
+   "kind": "solid",
+   "mapWidth": 40,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-south",
+   "prompt": "pixel art game asset: wooden barrels, a small group, Dali and Miao southwest style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_south_crates_sacks",
+   "category": "prop",
+   "subcategory": "container",
+   "region": "south",
+   "group": "south",
+   "name": "ลังและกระสอบ",
+   "tags": [
+    "ลังและกระสอบ",
+    "crates sacks",
+    "container",
+    "town",
+    "south"
+   ],
+   "kind": "solid",
+   "mapWidth": 50,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-south",
+   "prompt": "pixel art game asset: a pile of wooden crates and grain sacks, Dali and Miao southwest style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_south_handcart",
+   "category": "prop",
+   "subcategory": "vehicle",
+   "region": "south",
+   "group": "south",
+   "name": "รถเข็น",
+   "tags": [
+    "รถเข็น",
+    "handcart",
+    "vehicle",
+    "town",
+    "south"
+   ],
+   "kind": "solid",
+   "mapWidth": 70,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-south",
+   "prompt": "pixel art game asset: a wooden two-wheeled handcart with cargo, Dali and Miao southwest style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_south_well",
+   "category": "prop",
+   "subcategory": "well",
+   "region": "south",
+   "group": "south",
+   "name": "บ่อน้ำ",
+   "tags": [
+    "บ่อน้ำ",
+    "well",
+    "well",
+    "town",
+    "south"
+   ],
+   "kind": "solid",
+   "mapWidth": 60,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-south",
+   "prompt": "pixel art game asset: a stone water well with a wooden pulley frame, Dali and Miao southwest style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_south_notice_board",
+   "category": "prop",
+   "subcategory": "sign",
+   "region": "south",
+   "group": "south",
+   "name": "ป้ายประกาศ",
+   "tags": [
+    "ป้ายประกาศ",
+    "notice board",
+    "sign",
+    "town",
+    "south"
+   ],
+   "kind": "tall",
+   "mapWidth": 50,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-south",
+   "prompt": "pixel art game asset: a wooden notice board with blank paper notices, Dali and Miao southwest style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_south_water_vat",
+   "category": "prop",
+   "subcategory": "container",
+   "region": "south",
+   "group": "south",
+   "name": "โอ่งน้ำ",
+   "tags": [
+    "โอ่งน้ำ",
+    "water vat",
+    "container",
+    "town",
+    "south"
+   ],
+   "kind": "solid",
+   "mapWidth": 35,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-south",
+   "prompt": "pixel art game asset: a large glazed water vat or urn, Dali and Miao southwest style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_south_pottery",
+   "category": "prop",
+   "subcategory": "container",
+   "region": "south",
+   "group": "south",
+   "name": "เครื่องปั้นดินเผา",
+   "tags": [
+    "เครื่องปั้นดินเผา",
+    "pottery",
+    "container",
+    "town",
+    "south"
+   ],
+   "kind": "solid",
+   "mapWidth": 40,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-south",
+   "prompt": "pixel art game asset: clay pottery jars and pots, a small group, Dali and Miao southwest style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_south_bamboo_baskets",
+   "category": "prop",
+   "subcategory": "container",
+   "region": "south",
+   "group": "south",
+   "name": "ตะกร้าไม้ไผ่",
+   "tags": [
+    "ตะกร้าไม้ไผ่",
+    "bamboo baskets",
+    "container",
+    "town",
+    "south"
+   ],
+   "kind": "solid",
+   "mapWidth": 40,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-south",
+   "prompt": "pixel art game asset: woven bamboo baskets of tropical fruit, Dali and Miao southwest style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_south_silver_stall",
+   "category": "prop",
+   "subcategory": "stall",
+   "region": "south",
+   "group": "south",
+   "name": "แผงเครื่องเงินเมี่ยว",
+   "tags": [
+    "แผงเครื่องเงินเมี่ยว",
+    "silver stall",
+    "stall",
+    "town",
+    "south"
+   ],
+   "kind": "solid",
+   "mapWidth": 80,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 84,
+    "h": 84
+   },
+   "style": "region-south",
+   "prompt": "pixel art game asset: a Miao silver-jewellery stall with a palm-leaf awning, Dali and Miao southwest style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_south_buffalo_cart",
+   "category": "prop",
+   "subcategory": "vehicle",
+   "region": "south",
+   "group": "south",
+   "name": "เกวียนควาย",
+   "tags": [
+    "เกวียนควาย",
+    "buffalo cart",
+    "vehicle",
+    "town",
+    "south"
+   ],
+   "kind": "solid",
+   "mapWidth": 80,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-south",
+   "prompt": "pixel art game asset: a wooden buffalo cart without the animal, Dali and Miao southwest style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_south_rice_terrace_plot",
+   "category": "prop",
+   "subcategory": "farm",
+   "region": "south",
+   "group": "south",
+   "name": "แปลงนาขั้นบันได",
+   "tags": [
+    "แปลงนาขั้นบันได",
+    "rice terrace plot",
+    "farm",
+    "village",
+    "south"
+   ],
+   "kind": "flat",
+   "mapWidth": 80,
+   "keep": 10,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-south",
+   "prompt": "pixel art game asset: a small flooded rice paddy plot with green seedlings, Dali and Miao southwest village. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_south_bamboo_water_pipe",
+   "category": "prop",
+   "subcategory": "farm",
+   "region": "south",
+   "group": "south",
+   "name": "รางน้ำไม้ไผ่",
+   "tags": [
+    "รางน้ำไม้ไผ่",
+    "bamboo water pipe",
+    "farm",
+    "village",
+    "south"
+   ],
+   "kind": "solid",
+   "mapWidth": 60,
+   "keep": 10,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-south",
+   "prompt": "pixel art game asset: a bamboo water pipe on forked sticks, Dali and Miao southwest village. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_south_pig_pen",
+   "category": "prop",
+   "subcategory": "farm",
+   "region": "south",
+   "group": "south",
+   "name": "คอกหมู",
+   "tags": [
+    "คอกหมู",
+    "pig pen",
+    "farm",
+    "village",
+    "south"
+   ],
+   "kind": "solid",
+   "mapWidth": 60,
+   "keep": 10,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-south",
+   "prompt": "pixel art game asset: a bamboo pig pen with a pig, Dali and Miao southwest village. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_south_bamboo_fence",
+   "category": "prop",
+   "subcategory": "fence",
+   "region": "south",
+   "group": "south",
+   "name": "รั้วไผ่",
+   "tags": [
+    "รั้วไผ่",
+    "bamboo fence",
+    "fence",
+    "village",
+    "south"
+   ],
+   "kind": "solid",
+   "mapWidth": 70,
+   "keep": 10,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-south",
+   "prompt": "pixel art game asset: a short section of split-bamboo fence, Dali and Miao southwest village. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_south_beehive_logs",
+   "category": "prop",
+   "subcategory": "farm",
+   "region": "south",
+   "group": "south",
+   "name": "รังผึ้งท่อนไม้",
+   "tags": [
+    "รังผึ้งท่อนไม้",
+    "beehive logs",
+    "farm",
+    "village",
+    "south"
+   ],
+   "kind": "solid",
+   "mapWidth": 40,
+   "keep": 10,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-south",
+   "prompt": "pixel art game asset: log beehives on a wooden stand, Dali and Miao southwest village. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_south_drying_chilies",
+   "category": "prop",
+   "subcategory": "farm",
+   "region": "south",
+   "group": "south",
+   "name": "พริกตากแห้ง",
+   "tags": [
+    "พริกตากแห้ง",
+    "drying chilies",
+    "farm",
+    "village",
+    "south"
+   ],
+   "kind": "solid",
+   "mapWidth": 45,
+   "keep": 10,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-south",
+   "prompt": "pixel art game asset: strings of red chilies and corn drying on a rack, Dali and Miao southwest village. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_north_market_stall",
+   "category": "prop",
+   "subcategory": "stall",
+   "region": "north",
+   "group": "north",
+   "name": "แผงตลาด",
+   "tags": [
+    "แผงตลาด",
+    "market stall",
+    "stall",
+    "town",
+    "north"
+   ],
+   "kind": "solid",
+   "mapWidth": 90,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 84,
+    "h": 84
+   },
+   "style": "region-north",
+   "prompt": "pixel art game asset: a market stall with a cloth awning and goods on the counter, northern frontier and Xixia style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_north_street_lantern",
+   "category": "prop",
+   "subcategory": "lantern",
+   "region": "north",
+   "group": "north",
+   "name": "เสาโคมไฟ",
+   "tags": [
+    "เสาโคมไฟ",
+    "street lantern",
+    "lantern",
+    "town",
+    "north"
+   ],
+   "kind": "tall",
+   "mapWidth": 30,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-north",
+   "prompt": "pixel art game asset: a street lantern on a wooden post, northern frontier and Xixia style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_north_barrels",
+   "category": "prop",
+   "subcategory": "container",
+   "region": "north",
+   "group": "north",
+   "name": "ถังไม้",
+   "tags": [
+    "ถังไม้",
+    "barrels",
+    "container",
+    "town",
+    "north"
+   ],
+   "kind": "solid",
+   "mapWidth": 40,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-north",
+   "prompt": "pixel art game asset: wooden barrels, a small group, northern frontier and Xixia style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_north_crates_sacks",
+   "category": "prop",
+   "subcategory": "container",
+   "region": "north",
+   "group": "north",
+   "name": "ลังและกระสอบ",
+   "tags": [
+    "ลังและกระสอบ",
+    "crates sacks",
+    "container",
+    "town",
+    "north"
+   ],
+   "kind": "solid",
+   "mapWidth": 50,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-north",
+   "prompt": "pixel art game asset: a pile of wooden crates and grain sacks, northern frontier and Xixia style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_north_handcart",
+   "category": "prop",
+   "subcategory": "vehicle",
+   "region": "north",
+   "group": "north",
+   "name": "รถเข็น",
+   "tags": [
+    "รถเข็น",
+    "handcart",
+    "vehicle",
+    "town",
+    "north"
+   ],
+   "kind": "solid",
+   "mapWidth": 70,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-north",
+   "prompt": "pixel art game asset: a wooden two-wheeled handcart with cargo, northern frontier and Xixia style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_north_well",
+   "category": "prop",
+   "subcategory": "well",
+   "region": "north",
+   "group": "north",
+   "name": "บ่อน้ำ",
+   "tags": [
+    "บ่อน้ำ",
+    "well",
+    "well",
+    "town",
+    "north"
+   ],
+   "kind": "solid",
+   "mapWidth": 60,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-north",
+   "prompt": "pixel art game asset: a stone water well with a wooden pulley frame, northern frontier and Xixia style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_north_notice_board",
+   "category": "prop",
+   "subcategory": "sign",
+   "region": "north",
+   "group": "north",
+   "name": "ป้ายประกาศ",
+   "tags": [
+    "ป้ายประกาศ",
+    "notice board",
+    "sign",
+    "town",
+    "north"
+   ],
+   "kind": "tall",
+   "mapWidth": 50,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-north",
+   "prompt": "pixel art game asset: a wooden notice board with blank paper notices, northern frontier and Xixia style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_north_water_vat",
+   "category": "prop",
+   "subcategory": "container",
+   "region": "north",
+   "group": "north",
+   "name": "โอ่งน้ำ",
+   "tags": [
+    "โอ่งน้ำ",
+    "water vat",
+    "container",
+    "town",
+    "north"
+   ],
+   "kind": "solid",
+   "mapWidth": 35,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-north",
+   "prompt": "pixel art game asset: a large glazed water vat or urn, northern frontier and Xixia style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_north_pottery",
+   "category": "prop",
+   "subcategory": "container",
+   "region": "north",
+   "group": "north",
+   "name": "เครื่องปั้นดินเผา",
+   "tags": [
+    "เครื่องปั้นดินเผา",
+    "pottery",
+    "container",
+    "town",
+    "north"
+   ],
+   "kind": "solid",
+   "mapWidth": 40,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-north",
+   "prompt": "pixel art game asset: clay pottery jars and pots, a small group, northern frontier and Xixia style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_north_hitching_post",
+   "category": "prop",
+   "subcategory": "farm",
+   "region": "north",
+   "group": "north",
+   "name": "เสาผูกม้า",
+   "tags": [
+    "เสาผูกม้า",
+    "hitching post",
+    "farm",
+    "town",
+    "north"
+   ],
+   "kind": "tall",
+   "mapWidth": 45,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-north",
+   "prompt": "pixel art game asset: a hitching post with a saddle and bridle hung on it, northern frontier and Xixia style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_north_firewood_pile",
+   "category": "prop",
+   "subcategory": "material",
+   "region": "north",
+   "group": "north",
+   "name": "กองฟืน",
+   "tags": [
+    "กองฟืน",
+    "firewood pile",
+    "material",
+    "town",
+    "north"
+   ],
+   "kind": "solid",
+   "mapWidth": 50,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-north",
+   "prompt": "pixel art game asset: a stacked firewood pile under a little snow, northern frontier and Xixia style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_north_sledge",
+   "category": "prop",
+   "subcategory": "vehicle",
+   "region": "north",
+   "group": "north",
+   "name": "เลื่อนหิมะ",
+   "tags": [
+    "เลื่อนหิมะ",
+    "sledge",
+    "vehicle",
+    "town",
+    "north"
+   ],
+   "kind": "solid",
+   "mapWidth": 70,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-north",
+   "prompt": "pixel art game asset: a wooden sledge loaded with furs, northern frontier and Xixia style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_north_hay_bales",
+   "category": "prop",
+   "subcategory": "farm",
+   "region": "north",
+   "group": "north",
+   "name": "ฟางมัด",
+   "tags": [
+    "ฟางมัด",
+    "hay bales",
+    "farm",
+    "village",
+    "north"
+   ],
+   "kind": "solid",
+   "mapWidth": 50,
+   "keep": 10,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-north",
+   "prompt": "pixel art game asset: stacked hay bales, northern frontier and Xixia village. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_north_sheep_pen",
+   "category": "prop",
+   "subcategory": "farm",
+   "region": "north",
+   "group": "north",
+   "name": "คอกแกะ",
+   "tags": [
+    "คอกแกะ",
+    "sheep pen",
+    "farm",
+    "village",
+    "north"
+   ],
+   "kind": "solid",
+   "mapWidth": 70,
+   "keep": 10,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-north",
+   "prompt": "pixel art game asset: a wooden sheep pen with sheep, northern frontier and Xixia village. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_north_log_fence",
+   "category": "prop",
+   "subcategory": "fence",
+   "region": "north",
+   "group": "north",
+   "name": "รั้วซุง",
+   "tags": [
+    "รั้วซุง",
+    "log fence",
+    "fence",
+    "village",
+    "north"
+   ],
+   "kind": "solid",
+   "mapWidth": 70,
+   "keep": 10,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-north",
+   "prompt": "pixel art game asset: a short section of split-log fence, northern frontier and Xixia village. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_north_water_trough",
+   "category": "prop",
+   "subcategory": "farm",
+   "region": "north",
+   "group": "north",
+   "name": "รางน้ำสัตว์",
+   "tags": [
+    "รางน้ำสัตว์",
+    "water trough",
+    "farm",
+    "village",
+    "north"
+   ],
+   "kind": "solid",
+   "mapWidth": 50,
+   "keep": 10,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-north",
+   "prompt": "pixel art game asset: a wooden water trough for animals, northern frontier and Xixia village. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_north_drying_hides",
+   "category": "prop",
+   "subcategory": "farm",
+   "region": "north",
+   "group": "north",
+   "name": "ราวตากหนัง",
+   "tags": [
+    "ราวตากหนัง",
+    "drying hides",
+    "farm",
+    "village",
+    "north"
+   ],
+   "kind": "solid",
+   "mapWidth": 50,
+   "keep": 10,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-north",
+   "prompt": "pixel art game asset: animal hides stretched on a wooden frame, northern frontier and Xixia village. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_north_firewood_axe",
+   "category": "prop",
+   "subcategory": "farm",
+   "region": "north",
+   "group": "north",
+   "name": "ตอไม้ผ่าฟืน",
+   "tags": [
+    "ตอไม้ผ่าฟืน",
+    "firewood axe",
+    "farm",
+    "village",
+    "north"
+   ],
+   "kind": "solid",
+   "mapWidth": 40,
+   "keep": 10,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-north",
+   "prompt": "pixel art game asset: a chopping stump with an axe and split logs, northern frontier and Xixia village. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_west_market_stall",
+   "category": "prop",
+   "subcategory": "stall",
+   "region": "west",
+   "group": "west",
+   "name": "แผงตลาด",
+   "tags": [
+    "แผงตลาด",
+    "market stall",
+    "stall",
+    "town",
+    "west"
+   ],
+   "kind": "solid",
+   "mapWidth": 90,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 84,
+    "h": 84
+   },
+   "style": "region-west",
+   "prompt": "pixel art game asset: a market stall with a cloth awning and goods on the counter, western desert and high-mountain style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_west_street_lantern",
+   "category": "prop",
+   "subcategory": "lantern",
+   "region": "west",
+   "group": "west",
+   "name": "เสาโคมไฟ",
+   "tags": [
+    "เสาโคมไฟ",
+    "street lantern",
+    "lantern",
+    "town",
+    "west"
+   ],
+   "kind": "tall",
+   "mapWidth": 30,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-west",
+   "prompt": "pixel art game asset: a street lantern on a wooden post, western desert and high-mountain style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_west_barrels",
+   "category": "prop",
+   "subcategory": "container",
+   "region": "west",
+   "group": "west",
+   "name": "ถังไม้",
+   "tags": [
+    "ถังไม้",
+    "barrels",
+    "container",
+    "town",
+    "west"
+   ],
+   "kind": "solid",
+   "mapWidth": 40,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-west",
+   "prompt": "pixel art game asset: wooden barrels, a small group, western desert and high-mountain style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_west_crates_sacks",
+   "category": "prop",
+   "subcategory": "container",
+   "region": "west",
+   "group": "west",
+   "name": "ลังและกระสอบ",
+   "tags": [
+    "ลังและกระสอบ",
+    "crates sacks",
+    "container",
+    "town",
+    "west"
+   ],
+   "kind": "solid",
+   "mapWidth": 50,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-west",
+   "prompt": "pixel art game asset: a pile of wooden crates and grain sacks, western desert and high-mountain style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_west_handcart",
+   "category": "prop",
+   "subcategory": "vehicle",
+   "region": "west",
+   "group": "west",
+   "name": "รถเข็น",
+   "tags": [
+    "รถเข็น",
+    "handcart",
+    "vehicle",
+    "town",
+    "west"
+   ],
+   "kind": "solid",
+   "mapWidth": 70,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-west",
+   "prompt": "pixel art game asset: a wooden two-wheeled handcart with cargo, western desert and high-mountain style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_west_well",
+   "category": "prop",
+   "subcategory": "well",
+   "region": "west",
+   "group": "west",
+   "name": "บ่อน้ำ",
+   "tags": [
+    "บ่อน้ำ",
+    "well",
+    "well",
+    "town",
+    "west"
+   ],
+   "kind": "solid",
+   "mapWidth": 60,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-west",
+   "prompt": "pixel art game asset: a stone water well with a wooden pulley frame, western desert and high-mountain style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_west_notice_board",
+   "category": "prop",
+   "subcategory": "sign",
+   "region": "west",
+   "group": "west",
+   "name": "ป้ายประกาศ",
+   "tags": [
+    "ป้ายประกาศ",
+    "notice board",
+    "sign",
+    "town",
+    "west"
+   ],
+   "kind": "tall",
+   "mapWidth": 50,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-west",
+   "prompt": "pixel art game asset: a wooden notice board with blank paper notices, western desert and high-mountain style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_west_water_vat",
+   "category": "prop",
+   "subcategory": "container",
+   "region": "west",
+   "group": "west",
+   "name": "โอ่งน้ำ",
+   "tags": [
+    "โอ่งน้ำ",
+    "water vat",
+    "container",
+    "town",
+    "west"
+   ],
+   "kind": "solid",
+   "mapWidth": 35,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-west",
+   "prompt": "pixel art game asset: a large glazed water vat or urn, western desert and high-mountain style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_west_pottery",
+   "category": "prop",
+   "subcategory": "container",
+   "region": "west",
+   "group": "west",
+   "name": "เครื่องปั้นดินเผา",
+   "tags": [
+    "เครื่องปั้นดินเผา",
+    "pottery",
+    "container",
+    "town",
+    "west"
+   ],
+   "kind": "solid",
+   "mapWidth": 40,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-west",
+   "prompt": "pixel art game asset: clay pottery jars and pots, a small group, western desert and high-mountain style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_west_prayer_wheel",
+   "category": "prop",
+   "subcategory": "religious",
+   "region": "west",
+   "group": "west",
+   "name": "กงล้อมนตร์",
+   "tags": [
+    "กงล้อมนตร์",
+    "prayer wheel",
+    "religious",
+    "town",
+    "west"
+   ],
+   "kind": "solid",
+   "mapWidth": 40,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-west",
+   "prompt": "pixel art game asset: a large bronze prayer wheel in a small wooden frame, western desert and high-mountain style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_west_mani_stones",
+   "category": "prop",
+   "subcategory": "religious",
+   "region": "west",
+   "group": "west",
+   "name": "กองหินมณี",
+   "tags": [
+    "กองหินมณี",
+    "mani stones",
+    "religious",
+    "town",
+    "west"
+   ],
+   "kind": "solid",
+   "mapWidth": 50,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-west",
+   "prompt": "pixel art game asset: a pile of carved mani stones with a pole of prayer flags, western desert and high-mountain style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_west_camel_packs",
+   "category": "prop",
+   "subcategory": "container",
+   "region": "west",
+   "group": "west",
+   "name": "สัมภาระอูฐ",
+   "tags": [
+    "สัมภาระอูฐ",
+    "camel packs",
+    "container",
+    "town",
+    "west"
+   ],
+   "kind": "solid",
+   "mapWidth": 50,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-west",
+   "prompt": "pixel art game asset: camel saddle bags and bundled caravan goods on the ground, western desert and high-mountain style. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_west_yak_dung_wall",
+   "category": "prop",
+   "subcategory": "farm",
+   "region": "west",
+   "group": "west",
+   "name": "กองมูลจามรีตากแห้ง",
+   "tags": [
+    "กองมูลจามรีตากแห้ง",
+    "yak dung wall",
+    "farm",
+    "village",
+    "west"
+   ],
+   "kind": "solid",
+   "mapWidth": 60,
+   "keep": 10,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-west",
+   "prompt": "pixel art game asset: a low wall of drying yak-dung cakes, western desert and high-mountain village. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_west_goat_pen",
+   "category": "prop",
+   "subcategory": "farm",
+   "region": "west",
+   "group": "west",
+   "name": "คอกแพะ",
+   "tags": [
+    "คอกแพะ",
+    "goat pen",
+    "farm",
+    "village",
+    "west"
+   ],
+   "kind": "solid",
+   "mapWidth": 70,
+   "keep": 10,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-west",
+   "prompt": "pixel art game asset: a stone goat pen with goats, western desert and high-mountain village. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_west_stone_fence",
+   "category": "prop",
+   "subcategory": "fence",
+   "region": "west",
+   "group": "west",
+   "name": "รั้วหิน",
+   "tags": [
+    "รั้วหิน",
+    "stone fence",
+    "fence",
+    "village",
+    "west"
+   ],
+   "kind": "solid",
+   "mapWidth": 70,
+   "keep": 10,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-west",
+   "prompt": "pixel art game asset: a short dry-stone wall section, western desert and high-mountain village. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_west_clay_oven",
+   "category": "prop",
+   "subcategory": "farm",
+   "region": "west",
+   "group": "west",
+   "name": "เตาดินอบแป้ง",
+   "tags": [
+    "เตาดินอบแป้ง",
+    "clay oven",
+    "farm",
+    "village",
+    "west"
+   ],
+   "kind": "solid",
+   "mapWidth": 40,
+   "keep": 10,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-west",
+   "prompt": "pixel art game asset: a round clay bread oven, western desert and high-mountain village. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_west_loom",
+   "category": "prop",
+   "subcategory": "craft",
+   "region": "west",
+   "group": "west",
+   "name": "กี่ทอผ้า",
+   "tags": [
+    "กี่ทอผ้า",
+    "loom",
+    "craft",
+    "village",
+    "west"
+   ],
+   "kind": "solid",
+   "mapWidth": 50,
+   "keep": 10,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-west",
+   "prompt": "pixel art game asset: a simple wooden floor loom with a half-woven rug, western desert and high-mountain village. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_west_date_baskets",
+   "category": "prop",
+   "subcategory": "container",
+   "region": "west",
+   "group": "west",
+   "name": "ตะกร้าอินทผลัม",
+   "tags": [
+    "ตะกร้าอินทผลัม",
+    "date baskets",
+    "container",
+    "village",
+    "west"
+   ],
+   "kind": "solid",
+   "mapWidth": 40,
+   "keep": 10,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "region-west",
+   "prompt": "pixel art game asset: baskets of dried dates and apricots, western desert and high-mountain village. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_interior_bed",
+   "category": "prop",
+   "subcategory": "bed",
+   "region": "any",
+   "group": "interior",
+   "name": "เตียง",
+   "tags": [
+    "เตียง",
+    "bed",
+    "bed",
+    "interior",
+    "any"
+   ],
+   "kind": "solid",
+   "mapWidth": 90,
+   "keep": 9,
+   "method": "v2",
+   "size": {
+    "w": 84,
+    "h": 84
+   },
+   "style": "interior",
+   "prompt": "pixel art game asset: a canopy bed with curtains (seen from above at an angle), ancient Chinese interior furniture. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_interior_dining_table",
+   "category": "prop",
+   "subcategory": "table",
+   "region": "any",
+   "group": "interior",
+   "name": "โต๊ะอาหาร",
+   "tags": [
+    "โต๊ะอาหาร",
+    "dining table",
+    "table",
+    "interior",
+    "any"
+   ],
+   "kind": "solid",
+   "mapWidth": 70,
+   "keep": 9,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "interior",
+   "prompt": "pixel art game asset: a square wooden dining table with four stools, ancient Chinese interior furniture. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_interior_armchair",
+   "category": "prop",
+   "subcategory": "chair",
+   "region": "any",
+   "group": "interior",
+   "name": "เก้าอี้ไม้",
+   "tags": [
+    "เก้าอี้ไม้",
+    "armchair",
+    "chair",
+    "interior",
+    "any"
+   ],
+   "kind": "solid",
+   "mapWidth": 30,
+   "keep": 9,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "interior",
+   "prompt": "pixel art game asset: a carved rosewood armchair, ancient Chinese interior furniture. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_interior_cabinet",
+   "category": "prop",
+   "subcategory": "storage",
+   "region": "any",
+   "group": "interior",
+   "name": "ตู้ไม้",
+   "tags": [
+    "ตู้ไม้",
+    "cabinet",
+    "storage",
+    "interior",
+    "any"
+   ],
+   "kind": "solid",
+   "mapWidth": 45,
+   "keep": 9,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "interior",
+   "prompt": "pixel art game asset: a tall lacquered wooden cabinet, ancient Chinese interior furniture. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_interior_scroll_shelf",
+   "category": "prop",
+   "subcategory": "storage",
+   "region": "any",
+   "group": "interior",
+   "name": "ชั้นวางม้วนคัมภีร์",
+   "tags": [
+    "ชั้นวางม้วนคัมภีร์",
+    "scroll shelf",
+    "storage",
+    "interior",
+    "any"
+   ],
+   "kind": "solid",
+   "mapWidth": 55,
+   "keep": 9,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "interior",
+   "prompt": "pixel art game asset: a bookshelf with scrolls and bound books, ancient Chinese interior furniture. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_interior_folding_screen",
+   "category": "prop",
+   "subcategory": "decor",
+   "region": "any",
+   "group": "interior",
+   "name": "ฉากกั้น",
+   "tags": [
+    "ฉากกั้น",
+    "folding screen",
+    "decor",
+    "interior",
+    "any"
+   ],
+   "kind": "solid",
+   "mapWidth": 70,
+   "keep": 9,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "interior",
+   "prompt": "pixel art game asset: a painted folding screen with landscape paintings, ancient Chinese interior furniture. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_interior_writing_desk",
+   "category": "prop",
+   "subcategory": "table",
+   "region": "any",
+   "group": "interior",
+   "name": "โต๊ะเขียนหนังสือ",
+   "tags": [
+    "โต๊ะเขียนหนังสือ",
+    "writing desk",
+    "table",
+    "interior",
+    "any"
+   ],
+   "kind": "solid",
+   "mapWidth": 60,
+   "keep": 9,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "interior",
+   "prompt": "pixel art game asset: a writing desk with brushes, ink stone and paper, ancient Chinese interior furniture. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_interior_guqin_table",
+   "category": "prop",
+   "subcategory": "table",
+   "region": "any",
+   "group": "interior",
+   "name": "โต๊ะพิณ",
+   "tags": [
+    "โต๊ะพิณ",
+    "guqin table",
+    "table",
+    "interior",
+    "any"
+   ],
+   "kind": "solid",
+   "mapWidth": 55,
+   "keep": 9,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "interior",
+   "prompt": "pixel art game asset: a low table with a guqin zither on it, ancient Chinese interior furniture. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_interior_ancestral_altar",
+   "category": "prop",
+   "subcategory": "religious",
+   "region": "any",
+   "group": "interior",
+   "name": "แท่นบูชาบรรพชน",
+   "tags": [
+    "แท่นบูชาบรรพชน",
+    "ancestral altar",
+    "religious",
+    "interior",
+    "any"
+   ],
+   "kind": "solid",
+   "mapWidth": 60,
+   "keep": 9,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "interior",
+   "prompt": "pixel art game asset: an ancestral altar table with tablets, candles and offerings, ancient Chinese interior furniture. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_interior_chest",
+   "category": "prop",
+   "subcategory": "storage",
+   "region": "any",
+   "group": "interior",
+   "name": "หีบ",
+   "tags": [
+    "หีบ",
+    "chest",
+    "storage",
+    "interior",
+    "any"
+   ],
+   "kind": "solid",
+   "mapWidth": 40,
+   "keep": 9,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "interior",
+   "prompt": "pixel art game asset: a wooden storage chest with brass fittings, ancient Chinese interior furniture. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_interior_rug",
+   "category": "prop",
+   "subcategory": "rug",
+   "region": "any",
+   "group": "interior",
+   "name": "พรม",
+   "tags": [
+    "พรม",
+    "rug",
+    "rug",
+    "interior",
+    "any"
+   ],
+   "kind": "flat",
+   "mapWidth": 90,
+   "keep": 9,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "interior",
+   "prompt": "pixel art game asset: a patterned rug on the floor, ancient Chinese interior furniture. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_interior_floor_cushions",
+   "category": "prop",
+   "subcategory": "seat",
+   "region": "any",
+   "group": "interior",
+   "name": "เบาะรองนั่ง",
+   "tags": [
+    "เบาะรองนั่ง",
+    "floor cushions",
+    "seat",
+    "interior",
+    "any"
+   ],
+   "kind": "flat",
+   "mapWidth": 30,
+   "keep": 9,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "interior",
+   "prompt": "pixel art game asset: round meditation floor cushions, ancient Chinese interior furniture. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_interior_tea_table",
+   "category": "prop",
+   "subcategory": "table",
+   "region": "any",
+   "group": "interior",
+   "name": "โต๊ะน้ำชา",
+   "tags": [
+    "โต๊ะน้ำชา",
+    "tea table",
+    "table",
+    "interior",
+    "any"
+   ],
+   "kind": "solid",
+   "mapWidth": 45,
+   "keep": 9,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "interior",
+   "prompt": "pixel art game asset: a low tea table with a teapot and cups, ancient Chinese interior furniture. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_interior_brazier",
+   "category": "prop",
+   "subcategory": "heater",
+   "region": "any",
+   "group": "interior",
+   "name": "เตาถ่านผิงไฟ",
+   "tags": [
+    "เตาถ่านผิงไฟ",
+    "brazier",
+    "heater",
+    "interior",
+    "any"
+   ],
+   "kind": "solid",
+   "mapWidth": 30,
+   "keep": 9,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "interior",
+   "prompt": "pixel art game asset: a bronze charcoal brazier, ancient Chinese interior furniture. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_interior_dressing_table",
+   "category": "prop",
+   "subcategory": "table",
+   "region": "any",
+   "group": "interior",
+   "name": "โต๊ะเครื่องแป้ง",
+   "tags": [
+    "โต๊ะเครื่องแป้ง",
+    "dressing table",
+    "table",
+    "interior",
+    "any"
+   ],
+   "kind": "solid",
+   "mapWidth": 50,
+   "keep": 9,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "interior",
+   "prompt": "pixel art game asset: a dressing table with a bronze mirror, ancient Chinese interior furniture. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_interior_medicine_cabinet",
+   "category": "prop",
+   "subcategory": "storage",
+   "region": "any",
+   "group": "interior",
+   "name": "ตู้ยา",
+   "tags": [
+    "ตู้ยา",
+    "medicine cabinet",
+    "storage",
+    "interior",
+    "any"
+   ],
+   "kind": "solid",
+   "mapWidth": 55,
+   "keep": 9,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "interior",
+   "prompt": "pixel art game asset: a medicine cabinet with many small drawers, ancient Chinese interior furniture. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_interior_weapon_rack",
+   "category": "prop",
+   "subcategory": "weapon",
+   "region": "any",
+   "group": "interior",
+   "name": "ชั้นวางอาวุธ",
+   "tags": [
+    "ชั้นวางอาวุธ",
+    "weapon rack",
+    "weapon",
+    "interior",
+    "any"
+   ],
+   "kind": "solid",
+   "mapWidth": 55,
+   "keep": 9,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "interior",
+   "prompt": "pixel art game asset: an indoor weapon rack with swords and spears, ancient Chinese interior furniture. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_interior_vase",
+   "category": "prop",
+   "subcategory": "decor",
+   "region": "any",
+   "group": "interior",
+   "name": "แจกัน",
+   "tags": [
+    "แจกัน",
+    "vase",
+    "decor",
+    "interior",
+    "any"
+   ],
+   "kind": "solid",
+   "mapWidth": 20,
+   "keep": 9,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "interior",
+   "prompt": "pixel art game asset: a tall porcelain vase, ancient Chinese interior furniture. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_interior_potted_plant",
+   "category": "prop",
+   "subcategory": "plant",
+   "region": "any",
+   "group": "interior",
+   "name": "ไม้กระถาง",
+   "tags": [
+    "ไม้กระถาง",
+    "potted plant",
+    "plant",
+    "interior",
+    "any"
+   ],
+   "kind": "solid",
+   "mapWidth": 25,
+   "keep": 9,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "interior",
+   "prompt": "pixel art game asset: a potted plant or bonsai in a ceramic pot, ancient Chinese interior furniture. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_interior_candle_stand",
+   "category": "prop",
+   "subcategory": "light",
+   "region": "any",
+   "group": "interior",
+   "name": "เชิงเทียน",
+   "tags": [
+    "เชิงเทียน",
+    "candle stand",
+    "light",
+    "interior",
+    "any"
+   ],
+   "kind": "tall",
+   "mapWidth": 20,
+   "keep": 9,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "interior",
+   "prompt": "pixel art game asset: a standing candle lamp, ancient Chinese interior furniture. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_interior_bathtub",
+   "category": "prop",
+   "subcategory": "bath",
+   "region": "any",
+   "group": "interior",
+   "name": "อ่างอาบน้ำไม้",
+   "tags": [
+    "อ่างอาบน้ำไม้",
+    "bathtub",
+    "bath",
+    "interior",
+    "any"
+   ],
+   "kind": "solid",
+   "mapWidth": 50,
+   "keep": 9,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "interior",
+   "prompt": "pixel art game asset: a round wooden bathtub with a bucket, ancient Chinese interior furniture. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_interior_kitchen_stove",
+   "category": "prop",
+   "subcategory": "kitchen",
+   "region": "any",
+   "group": "interior",
+   "name": "เตาครัว",
+   "tags": [
+    "เตาครัว",
+    "kitchen stove",
+    "kitchen",
+    "interior",
+    "any"
+   ],
+   "kind": "solid",
+   "mapWidth": 70,
+   "keep": 9,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "interior",
+   "prompt": "pixel art game asset: a brick kitchen stove with a wok and steamer baskets, ancient Chinese interior furniture. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  },
+  {
+   "id": "prp_interior_hanging_scroll",
+   "category": "prop",
+   "subcategory": "decor",
+   "region": "any",
+   "group": "interior",
+   "name": "ภาพแขวน",
+   "tags": [
+    "ภาพแขวน",
+    "hanging scroll",
+    "decor",
+    "interior",
+    "any"
+   ],
+   "kind": "flat",
+   "mapWidth": 30,
+   "keep": 9,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "style": "interior",
+   "prompt": "pixel art game asset: a hanging scroll painting of mountains (no writing), ancient Chinese interior furniture. High top-down 3/4 RPG view from above, muted painterly palette, dark outline, ancient China wuxia setting, transparent background, no ground platform under it, no text, single object centered."
+  }
+ ]
+}

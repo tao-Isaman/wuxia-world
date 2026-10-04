@@ -1,0 +1,137 @@
+{
+ "category": "ui",
+ "jobs": [
+  {
+   "id": "ui_hud_frame",
+   "category": "ui",
+   "subcategory": "frame",
+   "region": "any",
+   "group": "hud",
+   "name": "กรอบ",
+   "tags": [
+    "กรอบ",
+    "frame",
+    "ui"
+   ],
+   "kind": "ui",
+   "mapWidth": 64,
+   "keep": 6,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "prompt": "pixel art game UI element: an ornate lacquered wooden frame border with gold corners, ancient Chinese lacquer, parchment and gold style, muted palette, centered, transparent background, no text, no letters."
+  },
+  {
+   "id": "ui_hud_button",
+   "category": "ui",
+   "subcategory": "button",
+   "region": "any",
+   "group": "hud",
+   "name": "ปุ่ม",
+   "tags": [
+    "ปุ่ม",
+    "button",
+    "ui"
+   ],
+   "kind": "ui",
+   "mapWidth": 64,
+   "keep": 6,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "prompt": "pixel art game UI element: a rectangular lacquer and gold game button (blank, no text), ancient Chinese lacquer, parchment and gold style, muted palette, centered, transparent background, no text, no letters."
+  },
+  {
+   "id": "ui_hud_medallion",
+   "category": "ui",
+   "subcategory": "medallion",
+   "region": "any",
+   "group": "hud",
+   "name": "เหรียญตรา",
+   "tags": [
+    "เหรียญตรา",
+    "medallion",
+    "ui"
+   ],
+   "kind": "ui",
+   "mapWidth": 42,
+   "keep": 8,
+   "method": "v2",
+   "size": {
+    "w": 42,
+    "h": 42
+   },
+   "prompt": "pixel art game UI element: a round bronze or jade medallion badge with a cloud motif, ancient Chinese lacquer, parchment and gold style, muted palette, centered, transparent background, no text, no letters."
+  },
+  {
+   "id": "ui_hud_scroll_banner",
+   "category": "ui",
+   "subcategory": "scroll_banner",
+   "region": "any",
+   "group": "hud",
+   "name": "แถบม้วนกระดาษ",
+   "tags": [
+    "แถบม้วนกระดาษ",
+    "scroll banner",
+    "ui"
+   ],
+   "kind": "ui",
+   "mapWidth": 64,
+   "keep": 6,
+   "method": "v2",
+   "size": {
+    "w": 64,
+    "h": 64
+   },
+   "prompt": "pixel art game UI element: a blank parchment scroll banner, ancient Chinese lacquer, parchment and gold style, muted palette, centered, transparent background, no text, no letters."
+  },
+  {
+   "id": "ui_hud_seal_stamp",
+   "category": "ui",
+   "subcategory": "seal_stamp",
+   "region": "any",
+   "group": "hud",
+   "name": "ตราประทับ",
+   "tags": [
+    "ตราประทับ",
+    "seal stamp",
+    "ui"
+   ],
+   "kind": "ui",
+   "mapWidth": 42,
+   "keep": 6,
+   "method": "v2",
+   "size": {
+    "w": 42,
+    "h": 42
+   },
+   "prompt": "pixel art game UI element: a red square seal stamp mark (no readable writing), ancient Chinese lacquer, parchment and gold style, muted palette, centered, transparent background, no text, no letters."
+  },
+  {
+   "id": "ui_hud_gauge_orb",
+   "category": "ui",
+   "subcategory": "gauge_orb",
+   "region": "any",
+   "group": "hud",
+   "name": "ลูกแก้วพลัง",
+   "tags": [
+    "ลูกแก้วพลัง",
+    "gauge orb",
+    "ui"
+   ],
+   "kind": "ui",
+   "mapWidth": 42,
+   "keep": 6,
+   "method": "v2",
+   "size": {
+    "w": 42,
+    "h": 42
+   },
+   "prompt": "pixel art game UI element: a glass orb gauge filled with red or blue liquid, ancient Chinese lacquer, parchment and gold style, muted palette, centered, transparent background, no text, no letters."
+  }
+ ]
+}

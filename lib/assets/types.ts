@@ -76,6 +76,12 @@ export interface AssetEntry {
   animations?: Record<string, { frames: string[]; fps: number; directions?: AssetDirection[] }>;
   /** Groups near-identical designs from one prompt. */
   variantOf?: string;
+  /**
+   * Tiles (category "tile") only: the Wang tileset the tile belongs to and the
+   * terrain at its four corners. Place the tile whose corners match the map's
+   * corner vertices; adjacent tiles of one set then join seamlessly.
+   */
+  tile?: { set: string; corners: Record<"NW" | "NE" | "SW" | "SE", "lower" | "upper"> };
   /** How it was made, so it can be regenerated. */
   source: { tool: string; prompt: string; seed?: number; jobId?: string; size: number };
   status: AssetStatus;

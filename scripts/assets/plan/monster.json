@@ -1,0 +1,2765 @@
+{
+ "category": "monster",
+ "jobs": [
+  {
+   "id": "mon_beast_wild_dog",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "หมาป่าเล็ก",
+   "tags": [
+    "หมาป่าเล็ก",
+    "wild dog",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "dog",
+   "prompt": "a scrawny wild dog; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_wild_chicken",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "ไก่ป่า",
+   "tags": [
+    "ไก่ป่า",
+    "wild chicken",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "dog",
+   "prompt": "a red jungle fowl rooster; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_small_snake",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "งูเล็ก",
+   "tags": [
+    "งูเล็ก",
+    "small snake",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "dog",
+   "prompt": "a small green snake coiled; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_wild_boar",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "หมูป่า",
+   "tags": [
+    "หมูป่า",
+    "wild boar",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "horse",
+   "prompt": "a bristly wild boar with tusks; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_wolf",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "หมาป่า",
+   "tags": [
+    "หมาป่า",
+    "wolf",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "dog",
+   "prompt": "a grey wolf; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_mountain_tiger",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "เสือภูเขา",
+   "tags": [
+    "เสือภูเขา",
+    "mountain tiger",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "lion",
+   "prompt": "a big striped mountain tiger; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_brown_bear",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "หมีสีน้ำตาล",
+   "tags": [
+    "หมีสีน้ำตาล",
+    "brown bear",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "bear",
+   "prompt": "a brown bear; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_giant_viper",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "งูเห่ายักษ์",
+   "tags": [
+    "งูเห่ายักษ์",
+    "giant viper",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "dog",
+   "prompt": "a giant hooded cobra rearing up; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_giant_centipede",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "ตะขาบยักษ์",
+   "tags": [
+    "ตะขาบยักษ์",
+    "giant centipede",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "dog",
+   "prompt": "a giant red centipede; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_demon_snow_demon",
+   "category": "monster",
+   "subcategory": "demon",
+   "region": "any",
+   "group": "demon",
+   "name": "ปีศาจหิมะ",
+   "tags": [
+    "ปีศาจหิมะ",
+    "snow demon",
+    "demon"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "bear",
+   "prompt": "a hulking white-furred snow demon with icy claws; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_rabbit",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "กระต่ายป่า",
+   "tags": [
+    "กระต่ายป่า",
+    "rabbit",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "cat",
+   "prompt": "a brown wild hare; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_pheasant",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "ไก่ฟ้า",
+   "tags": [
+    "ไก่ฟ้า",
+    "pheasant",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "dog",
+   "prompt": "a golden pheasant with a long tail; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_squirrel",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "กระรอก",
+   "tags": [
+    "กระรอก",
+    "squirrel",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "cat",
+   "prompt": "a red squirrel with a bushy tail; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_leopard",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "เสือดาวป่า",
+   "tags": [
+    "เสือดาวป่า",
+    "leopard",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "cat",
+   "prompt": "a spotted jungle leopard; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_alpha_wolf",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "หมาป่าจ่าฝูง",
+   "tags": [
+    "หมาป่าจ่าฝูง",
+    "alpha wolf",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "dog",
+   "prompt": "a huge scarred alpha wolf; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_stone_bear",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "หมีหิน",
+   "tags": [
+    "หมีหิน",
+    "stone bear",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "bear",
+   "prompt": "a giant bear with rocky grey hide; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_lynx",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "เสือเขาเล็ก",
+   "tags": [
+    "เสือเขาเล็ก",
+    "lynx",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "cat",
+   "prompt": "a mountain lynx; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_jungle_serpent",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "งูยักษ์ป่า",
+   "tags": [
+    "งูยักษ์ป่า",
+    "jungle serpent",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "dog",
+   "prompt": "a giant jungle python; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_vampire_bat",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "ค้างคาวดูดเลือด",
+   "tags": [
+    "ค้างคาวดูดเลือด",
+    "vampire bat",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a giant vampire bat with spread wings; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_frost_wolf",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "หมาป่าหิมะ",
+   "tags": [
+    "หมาป่าหิมะ",
+    "frost wolf",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "dog",
+   "prompt": "a white frost wolf with icy breath; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_blood_boar",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "หมูป่าเลือดคลั่ง",
+   "tags": [
+    "หมูป่าเลือดคลั่ง",
+    "blood boar",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "horse",
+   "prompt": "a berserk red-eyed blood boar; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_golden_tiger",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "เสือทองคำ",
+   "tags": [
+    "เสือทองคำ",
+    "golden tiger",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "lion",
+   "prompt": "a golden-furred tiger; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_jade_python",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "งูเหลือมหยก",
+   "tags": [
+    "งูเหลือมหยก",
+    "jade python",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "dog",
+   "prompt": "a jade-green giant python; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_thunder_eagle",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "อินทรีสายฟ้า",
+   "tags": [
+    "อินทรีสายฟ้า",
+    "thunder eagle",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a huge eagle crackling with lightning; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_bear_king",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "ราชาหมีพันปี",
+   "tags": [
+    "ราชาหมีพันปี",
+    "bear king",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "bear",
+   "prompt": "an enormous ancient bear king with grey fur; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_demon_blood_rakshasa",
+   "category": "monster",
+   "subcategory": "demon",
+   "region": "any",
+   "group": "demon",
+   "name": "อสุรกายโลหิต",
+   "tags": [
+    "อสุรกายโลหิต",
+    "blood rakshasa",
+    "demon"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a red-skinned rakshasa demon with fangs; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_demon_demon_emperor",
+   "category": "monster",
+   "subcategory": "demon",
+   "region": "any",
+   "group": "demon",
+   "name": "จักรพรรดิมาร",
+   "tags": [
+    "จักรพรรดิมาร",
+    "demon emperor",
+    "demon"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a demon emperor in black armour with horns and a dark aura; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_spirit_ghost_swordsman",
+   "category": "monster",
+   "subcategory": "spirit",
+   "region": "any",
+   "group": "spirit",
+   "name": "วิญญาณจอมกระบี่",
+   "tags": [
+    "วิญญาณจอมกระบี่",
+    "ghost swordsman",
+    "spirit"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "the ghost of a swordsman, translucent blue, holding a spectral sword; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_spirit_immortal_warrior",
+   "category": "monster",
+   "subcategory": "spirit",
+   "region": "any",
+   "group": "spirit",
+   "name": "นักรบอมตะ",
+   "tags": [
+    "นักรบอมตะ",
+    "immortal warrior",
+    "spirit"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "an undying armoured warrior with glowing eyes; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_boss_dragon_phoenix_master",
+   "category": "monster",
+   "subcategory": "boss",
+   "region": "any",
+   "group": "boss",
+   "name": "ปรมาจารย์มังกร-หงส์",
+   "tags": [
+    "ปรมาจารย์มังกร-หงส์",
+    "dragon phoenix master",
+    "boss"
+   ],
+   "kind": "actor",
+   "mapWidth": 80,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a legendary master with dragon and phoenix auras; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_monkey",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "ลิง",
+   "tags": [
+    "ลิง",
+    "monkey",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "cat",
+   "prompt": "a macaque monkey; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_white_ape",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "วานรเผือก",
+   "tags": [
+    "วานรเผือก",
+    "white ape",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a great white ape; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_deer",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "กวาง",
+   "tags": [
+    "กวาง",
+    "deer",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "horse",
+   "prompt": "a sika deer; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_stag",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "กวางเขาใหญ่",
+   "tags": [
+    "กวางเขาใหญ่",
+    "stag",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "horse",
+   "prompt": "a large stag with antlers; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_yak",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "จามรี",
+   "tags": [
+    "จามรี",
+    "yak",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "horse",
+   "prompt": "a shaggy black yak; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_camel",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "อูฐ",
+   "tags": [
+    "อูฐ",
+    "camel",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "horse",
+   "prompt": "a two-humped Bactrian camel; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_wild_horse",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "ม้าป่า",
+   "tags": [
+    "ม้าป่า",
+    "wild horse",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "horse",
+   "prompt": "a wild steppe horse; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_crocodile",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "จระเข้",
+   "tags": [
+    "จระเข้",
+    "crocodile",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "dog",
+   "prompt": "a crocodile; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_golden_toad",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "คางคกทอง",
+   "tags": [
+    "คางคกทอง",
+    "golden toad",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "dog",
+   "prompt": "a giant golden toad; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_giant_scorpion",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "แมงป่องยักษ์",
+   "tags": [
+    "แมงป่องยักษ์",
+    "giant scorpion",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "dog",
+   "prompt": "a giant black scorpion; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_giant_spider",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "แมงมุมยักษ์",
+   "tags": [
+    "แมงมุมยักษ์",
+    "giant spider",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "dog",
+   "prompt": "a giant hairy spider; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_red_crane",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "นกกระเรียนมงกุฎแดง",
+   "tags": [
+    "นกกระเรียนมงกุฎแดง",
+    "red crane",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a red-crowned crane; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_vulture",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "แร้ง",
+   "tags": [
+    "แร้ง",
+    "vulture",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a mountain vulture; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_golden_eagle",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "อินทรีทอง",
+   "tags": [
+    "อินทรีทอง",
+    "golden eagle",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a golden eagle; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_golden_snake",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "งูทอง",
+   "tags": [
+    "งูทอง",
+    "golden snake",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "dog",
+   "prompt": "a golden snake with glittering scales; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_black_bear",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "หมีดำ",
+   "tags": [
+    "หมีดำ",
+    "black bear",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "bear",
+   "prompt": "an Asian black bear with a white chest mark; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_panda",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "หมีแพนด้า",
+   "tags": [
+    "หมีแพนด้า",
+    "panda",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "bear",
+   "prompt": "a giant panda; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_snow_leopard",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "เสือดาวหิมะ",
+   "tags": [
+    "เสือดาวหิมะ",
+    "snow leopard",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "cat",
+   "prompt": "a snow leopard; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_red_fox",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "จิ้งจอกแดง",
+   "tags": [
+    "จิ้งจอกแดง",
+    "red fox",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "dog",
+   "prompt": "a red fox; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_giant_rat",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "หนูยักษ์",
+   "tags": [
+    "หนูยักษ์",
+    "giant rat",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "dog",
+   "prompt": "a giant sewer rat; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_jade_bee",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "ผึ้งหยก",
+   "tags": [
+    "ผึ้งหยก",
+    "jade bee",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a giant white jade bee; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_salamander",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "ซาลาแมนเดอร์ยักษ์",
+   "tags": [
+    "ซาลาแมนเดอร์ยักษ์",
+    "salamander",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "dog",
+   "prompt": "a giant Chinese salamander; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_giant_crab",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "ปูยักษ์",
+   "tags": [
+    "ปูยักษ์",
+    "giant crab",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "dog",
+   "prompt": "a giant shore crab; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_sea_turtle",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "เต่ายักษ์",
+   "tags": [
+    "เต่ายักษ์",
+    "sea turtle",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "dog",
+   "prompt": "a giant old turtle with a mossy shell; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_water_snake",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "งูน้ำ",
+   "tags": [
+    "งูน้ำ",
+    "water snake",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "dog",
+   "prompt": "a striped water snake; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_hornet_swarm",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "ฝูงแตน",
+   "tags": [
+    "ฝูงแตน",
+    "hornet swarm",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a swarm of giant hornets; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_war_horse",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "ม้าศึก",
+   "tags": [
+    "ม้าศึก",
+    "war horse",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "horse",
+   "prompt": "an armoured war horse; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_water_buffalo",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "ควายป่า",
+   "tags": [
+    "ควายป่า",
+    "water buffalo",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "horse",
+   "prompt": "a wild water buffalo; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_mountain_goat",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "แพะภูเขา",
+   "tags": [
+    "แพะภูเขา",
+    "mountain goat",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "horse",
+   "prompt": "a mountain goat with curved horns; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_tiger_cub",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "ลูกเสือ",
+   "tags": [
+    "ลูกเสือ",
+    "tiger cub",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "cat",
+   "prompt": "a tiger cub; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_undead_jiangshi",
+   "category": "monster",
+   "subcategory": "undead",
+   "region": "any",
+   "group": "undead",
+   "name": "ผีกระโดด",
+   "tags": [
+    "ผีกระโดด",
+    "jiangshi",
+    "undead"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a jiangshi hopping vampire in Qing official robes with a paper talisman on the forehead; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_undead_jiangshi_lady",
+   "category": "monster",
+   "subcategory": "undead",
+   "region": "any",
+   "group": "undead",
+   "name": "ผีกระโดดหญิง",
+   "tags": [
+    "ผีกระโดดหญิง",
+    "jiangshi lady",
+    "undead"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a female jiangshi in faded court robes with outstretched arms; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_spirit_white_ghost",
+   "category": "monster",
+   "subcategory": "spirit",
+   "region": "any",
+   "group": "spirit",
+   "name": "ผีหญิงชุดขาว",
+   "tags": [
+    "ผีหญิงชุดขาว",
+    "white ghost",
+    "spirit"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a female ghost in white with long black hair over her face; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_spirit_hungry_ghost",
+   "category": "monster",
+   "subcategory": "spirit",
+   "region": "any",
+   "group": "spirit",
+   "name": "เปรต",
+   "tags": [
+    "เปรต",
+    "hungry ghost",
+    "spirit"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "an emaciated hungry ghost with a huge belly and thin neck; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_undead_skeleton_warrior",
+   "category": "monster",
+   "subcategory": "undead",
+   "region": "any",
+   "group": "undead",
+   "name": "โครงกระดูกนักรบ",
+   "tags": [
+    "โครงกระดูกนักรบ",
+    "skeleton warrior",
+    "undead"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a skeleton warrior in rusted armour with a sabre; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_undead_zombie_bandit",
+   "category": "monster",
+   "subcategory": "undead",
+   "region": "any",
+   "group": "undead",
+   "name": "ศพโจรคืนชีพ",
+   "tags": [
+    "ศพโจรคืนชีพ",
+    "zombie bandit",
+    "undead"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a rotting zombie bandit; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_demon_ox_head",
+   "category": "monster",
+   "subcategory": "demon",
+   "region": "any",
+   "group": "demon",
+   "name": "หัววัว",
+   "tags": [
+    "หัววัว",
+    "ox head",
+    "demon"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "Ox-Head, the underworld guard with a bull's head and a trident; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_demon_horse_face",
+   "category": "monster",
+   "subcategory": "demon",
+   "region": "any",
+   "group": "demon",
+   "name": "หน้าม้า",
+   "tags": [
+    "หน้าม้า",
+    "horse face",
+    "demon"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "Horse-Face, the underworld guard with a horse's head and a halberd; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_spirit_fox_spirit",
+   "category": "monster",
+   "subcategory": "spirit",
+   "region": "any",
+   "group": "spirit",
+   "name": "ปีศาจจิ้งจอก",
+   "tags": [
+    "ปีศาจจิ้งจอก",
+    "fox spirit",
+    "spirit"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a nine-tailed fox spirit woman; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_spirit_nine_tail_fox",
+   "category": "monster",
+   "subcategory": "spirit",
+   "region": "any",
+   "group": "spirit",
+   "name": "จิ้งจอกเก้าหาง",
+   "tags": [
+    "จิ้งจอกเก้าหาง",
+    "nine tail fox",
+    "spirit"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "dog",
+   "prompt": "a white nine-tailed fox; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_demon_tree_demon",
+   "category": "monster",
+   "subcategory": "demon",
+   "region": "any",
+   "group": "demon",
+   "name": "ปีศาจต้นไม้",
+   "tags": [
+    "ปีศาจต้นไม้",
+    "tree demon",
+    "demon"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a gnarled tree demon with a twisted face; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_construct_stone_guardian",
+   "category": "monster",
+   "subcategory": "construct",
+   "region": "any",
+   "group": "construct",
+   "name": "ผู้พิทักษ์หิน",
+   "tags": [
+    "ผู้พิทักษ์หิน",
+    "stone guardian",
+    "construct"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "lion",
+   "prompt": "a living stone guardian lion; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_demon_fire_demon",
+   "category": "monster",
+   "subcategory": "demon",
+   "region": "any",
+   "group": "demon",
+   "name": "ปีศาจไฟ",
+   "tags": [
+    "ปีศาจไฟ",
+    "fire demon",
+    "demon"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a fire demon made of flames; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_demon_water_demon",
+   "category": "monster",
+   "subcategory": "demon",
+   "region": "any",
+   "group": "demon",
+   "name": "ผีน้ำ",
+   "tags": [
+    "ผีน้ำ",
+    "water demon",
+    "demon"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a drowned water ghoul dripping with weeds; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_demon_mountain_imp",
+   "category": "monster",
+   "subcategory": "demon",
+   "region": "any",
+   "group": "demon",
+   "name": "ภูตภูเขา",
+   "tags": [
+    "ภูตภูเขา",
+    "mountain imp",
+    "demon"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a one-legged mountain imp (shanxiao); pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_demon_bat_demon",
+   "category": "monster",
+   "subcategory": "demon",
+   "region": "any",
+   "group": "demon",
+   "name": "ปีศาจค้างคาว",
+   "tags": [
+    "ปีศาจค้างคาว",
+    "bat demon",
+    "demon"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a bat-winged demon; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_demon_spider_demoness",
+   "category": "monster",
+   "subcategory": "demon",
+   "region": "any",
+   "group": "demon",
+   "name": "ปีศาจแมงมุม",
+   "tags": [
+    "ปีศาจแมงมุม",
+    "spider demoness",
+    "demon"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a spider demoness with spider legs from her back; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_demon_scorpion_demoness",
+   "category": "monster",
+   "subcategory": "demon",
+   "region": "any",
+   "group": "demon",
+   "name": "ปีศาจแมงป่อง",
+   "tags": [
+    "ปีศาจแมงป่อง",
+    "scorpion demoness",
+    "demon"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a scorpion demoness with a stinger tail; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_demon_white_bone_demon",
+   "category": "monster",
+   "subcategory": "demon",
+   "region": "any",
+   "group": "demon",
+   "name": "ปีศาจกระดูกขาว",
+   "tags": [
+    "ปีศาจกระดูกขาว",
+    "white bone demon",
+    "demon"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "the white bone demon, a skeletal witch in white; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_demon_bear_demon",
+   "category": "monster",
+   "subcategory": "demon",
+   "region": "any",
+   "group": "demon",
+   "name": "ปีศาจหมีดำ",
+   "tags": [
+    "ปีศาจหมีดำ",
+    "bear demon",
+    "demon"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a black bear demon in armour; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_boss_bull_demon_king",
+   "category": "monster",
+   "subcategory": "boss",
+   "region": "any",
+   "group": "boss",
+   "name": "ราชาปีศาจกระทิง",
+   "tags": [
+    "ราชาปีศาจกระทิง",
+    "bull demon king",
+    "boss"
+   ],
+   "kind": "actor",
+   "mapWidth": 80,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a bull demon king with huge horns and an iron staff; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_demon_monkey_demon",
+   "category": "monster",
+   "subcategory": "demon",
+   "region": "any",
+   "group": "demon",
+   "name": "ปีศาจลิง",
+   "tags": [
+    "ปีศาจลิง",
+    "monkey demon",
+    "demon"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a six-eared monkey demon with a staff; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_beast_flood_dragon",
+   "category": "monster",
+   "subcategory": "beast",
+   "region": "any",
+   "group": "beast",
+   "name": "มังกรน้ำ",
+   "tags": [
+    "มังกรน้ำ",
+    "flood dragon",
+    "beast"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "dog",
+   "prompt": "a young flood dragon (jiao) serpent; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_spirit_qilin",
+   "category": "monster",
+   "subcategory": "spirit",
+   "region": "any",
+   "group": "spirit",
+   "name": "กิเลน",
+   "tags": [
+    "กิเลน",
+    "qilin",
+    "spirit"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "horse",
+   "prompt": "a qilin with scales, a single horn and flaming hooves; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_construct_mech_puppet",
+   "category": "monster",
+   "subcategory": "construct",
+   "region": "any",
+   "group": "construct",
+   "name": "หุ่นกลไก",
+   "tags": [
+    "หุ่นกลไก",
+    "mech puppet",
+    "construct"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a Tang clan mechanical wooden puppet warrior; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_construct_terracotta_warrior",
+   "category": "monster",
+   "subcategory": "construct",
+   "region": "any",
+   "group": "construct",
+   "name": "ทหารดินเผา",
+   "tags": [
+    "ทหารดินเผา",
+    "terracotta warrior",
+    "construct"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a terracotta warrior come to life; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_undead_blood_corpse",
+   "category": "monster",
+   "subcategory": "undead",
+   "region": "any",
+   "group": "undead",
+   "name": "ศพโลหิต",
+   "tags": [
+    "ศพโลหิต",
+    "blood corpse",
+    "undead"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a blood-soaked corpse fiend; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_spirit_shadow_wraith",
+   "category": "monster",
+   "subcategory": "spirit",
+   "region": "any",
+   "group": "spirit",
+   "name": "เงาวิญญาณ",
+   "tags": [
+    "เงาวิญญาณ",
+    "shadow wraith",
+    "spirit"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a shadow wraith made of black smoke; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_spirit_snake_spirit",
+   "category": "monster",
+   "subcategory": "spirit",
+   "region": "any",
+   "group": "spirit",
+   "name": "นางพญางูขาว",
+   "tags": [
+    "นางพญางูขาว",
+    "snake spirit",
+    "spirit"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a white snake spirit woman with a serpent tail; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_demon_toad_demon",
+   "category": "monster",
+   "subcategory": "demon",
+   "region": "any",
+   "group": "demon",
+   "name": "ปีศาจคางคก",
+   "tags": [
+    "ปีศาจคางคก",
+    "toad demon",
+    "demon"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "dog",
+   "prompt": "a bloated poison toad demon; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_human_bandit",
+   "category": "monster",
+   "subcategory": "human",
+   "region": "any",
+   "group": "human",
+   "name": "โจรป่า",
+   "tags": [
+    "โจรป่า",
+    "bandit",
+    "human"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a mountain bandit with a broad sabre and a headband; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_human_bandit_archer",
+   "category": "monster",
+   "subcategory": "human",
+   "region": "any",
+   "group": "human",
+   "name": "โจรธนู",
+   "tags": [
+    "โจรธนู",
+    "bandit archer",
+    "human"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a bandit archer with a short bow; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_human_bandit_chief",
+   "category": "monster",
+   "subcategory": "human",
+   "region": "any",
+   "group": "human",
+   "name": "หัวหน้าโจร",
+   "tags": [
+    "หัวหน้าโจร",
+    "bandit chief",
+    "human"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a burly bandit chief with a big axe; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_human_pirate",
+   "category": "monster",
+   "subcategory": "human",
+   "region": "any",
+   "group": "human",
+   "name": "โจรสลัด",
+   "tags": [
+    "โจรสลัด",
+    "pirate",
+    "human"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a coastal pirate with a cutlass and a red sash; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_human_night_assassin",
+   "category": "monster",
+   "subcategory": "human",
+   "region": "any",
+   "group": "human",
+   "name": "นักฆ่ายามราตรี",
+   "tags": [
+    "นักฆ่ายามราตรี",
+    "night assassin",
+    "human"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a night assassin in black with a mask and daggers; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_human_female_assassin",
+   "category": "monster",
+   "subcategory": "human",
+   "region": "any",
+   "group": "human",
+   "name": "นักฆ่าหญิง",
+   "tags": [
+    "นักฆ่าหญิง",
+    "female assassin",
+    "human"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a female assassin in dark red with throwing knives; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_human_poisoner",
+   "category": "monster",
+   "subcategory": "human",
+   "region": "any",
+   "group": "human",
+   "name": "นักปรุงพิษ",
+   "tags": [
+    "นักปรุงพิษ",
+    "poisoner",
+    "human"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a hunched poisoner with gourds of venom; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_human_cultist",
+   "category": "monster",
+   "subcategory": "human",
+   "region": "any",
+   "group": "human",
+   "name": "สาวกลัทธิ",
+   "tags": [
+    "สาวกลัทธิ",
+    "cultist",
+    "human"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a cultist in red and black robes; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_human_blood_monk",
+   "category": "monster",
+   "subcategory": "human",
+   "region": "any",
+   "group": "human",
+   "name": "พระโลหิต",
+   "tags": [
+    "พระโลหิต",
+    "blood monk",
+    "human"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "an evil lama monk with a blood-red sabre; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_human_imperial_spearman",
+   "category": "monster",
+   "subcategory": "human",
+   "region": "any",
+   "group": "human",
+   "name": "ทหารทวน",
+   "tags": [
+    "ทหารทวน",
+    "imperial spearman",
+    "human"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "an imperial soldier with a spear and lamellar armour; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_human_crossbowman",
+   "category": "monster",
+   "subcategory": "human",
+   "region": "any",
+   "group": "human",
+   "name": "ทหารหน้าไม้",
+   "tags": [
+    "ทหารหน้าไม้",
+    "crossbowman",
+    "human"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "an imperial crossbowman; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_human_frontier_raider",
+   "category": "monster",
+   "subcategory": "human",
+   "region": "any",
+   "group": "human",
+   "name": "โจรทุ่งหญ้า",
+   "tags": [
+    "โจรทุ่งหญ้า",
+    "frontier raider",
+    "human"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a steppe raider in fur with a curved sword; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_human_desert_raider",
+   "category": "monster",
+   "subcategory": "human",
+   "region": "any",
+   "group": "human",
+   "name": "โจรทะเลทราย",
+   "tags": [
+    "โจรทะเลทราย",
+    "desert raider",
+    "human"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a desert raider with a face veil and scimitar; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_human_jinyiwei_agent",
+   "category": "monster",
+   "subcategory": "human",
+   "region": "any",
+   "group": "human",
+   "name": "สายลับองครักษ์",
+   "tags": [
+    "สายลับองครักษ์",
+    "jinyiwei agent",
+    "human"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "an Embroidered Uniform Guard agent in red-gold with a slim sabre; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_human_eunuch_assassin",
+   "category": "monster",
+   "subcategory": "human",
+   "region": "any",
+   "group": "human",
+   "name": "ขันทีนักฆ่า",
+   "tags": [
+    "ขันทีนักฆ่า",
+    "eunuch assassin",
+    "human"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a sinister eunuch assassin with long needles; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_human_evil_monk",
+   "category": "monster",
+   "subcategory": "human",
+   "region": "any",
+   "group": "human",
+   "name": "พระนอกรีต",
+   "tags": [
+    "พระนอกรีต",
+    "evil monk",
+    "human"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "an evil monk with a heavy iron staff; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_human_drunken_brawler",
+   "category": "monster",
+   "subcategory": "human",
+   "region": "any",
+   "group": "human",
+   "name": "นักเลงเมา",
+   "tags": [
+    "นักเลงเมา",
+    "drunken brawler",
+    "human"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a drunken brawler with a wine jug; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_human_thief",
+   "category": "monster",
+   "subcategory": "human",
+   "region": "any",
+   "group": "human",
+   "name": "ขโมย",
+   "tags": [
+    "ขโมย",
+    "thief",
+    "human"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a sneaky thief with a sack; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_human_thug",
+   "category": "monster",
+   "subcategory": "human",
+   "region": "any",
+   "group": "human",
+   "name": "นักเลงกระบอง",
+   "tags": [
+    "นักเลงกระบอง",
+    "thug",
+    "human"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a thug with a wooden club; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_human_mercenary",
+   "category": "monster",
+   "subcategory": "human",
+   "region": "any",
+   "group": "human",
+   "name": "ทหารรับจ้าง",
+   "tags": [
+    "ทหารรับจ้าง",
+    "mercenary",
+    "human"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a mercenary swordsman in worn armour; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_human_executioner",
+   "category": "monster",
+   "subcategory": "human",
+   "region": "any",
+   "group": "human",
+   "name": "เพชฌฆาต",
+   "tags": [
+    "เพชฌฆาต",
+    "executioner",
+    "human"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a hulking executioner with a huge axe and red hood; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_human_guard_captain",
+   "category": "monster",
+   "subcategory": "human",
+   "region": "any",
+   "group": "human",
+   "name": "หัวหน้าองครักษ์",
+   "tags": [
+    "หัวหน้าองครักษ์",
+    "guard captain",
+    "human"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a guard captain with a halberd; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_human_shenlong_disciple",
+   "category": "monster",
+   "subcategory": "human",
+   "region": "any",
+   "group": "human",
+   "name": "สาวกเทพมังกร",
+   "tags": [
+    "สาวกเทพมังกร",
+    "shenlong disciple",
+    "human"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a Divine Dragon cult disciple with a dragon tattoo and spear; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_human_xingxiu_poisoner",
+   "category": "monster",
+   "subcategory": "human",
+   "region": "any",
+   "group": "human",
+   "name": "ศิษย์ดาวดึงส์",
+   "tags": [
+    "ศิษย์ดาวดึงส์",
+    "xingxiu poisoner",
+    "human"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a Xingxiu poison disciple in purple with needles; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_human_miao_warrior",
+   "category": "monster",
+   "subcategory": "human",
+   "region": "any",
+   "group": "human",
+   "name": "นักรบเมี่ยว",
+   "tags": [
+    "นักรบเมี่ยว",
+    "miao warrior",
+    "human"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a Miao warrior with a silver headdress and machete; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_human_sword_rogue",
+   "category": "monster",
+   "subcategory": "human",
+   "region": "any",
+   "group": "human",
+   "name": "จอมกระบี่นอกรีต",
+   "tags": [
+    "จอมกระบี่นอกรีต",
+    "sword rogue",
+    "human"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a rogue swordswoman in black and red; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_human_giant_brute",
+   "category": "monster",
+   "subcategory": "human",
+   "region": "any",
+   "group": "human",
+   "name": "ยักษ์ร่างใหญ่",
+   "tags": [
+    "ยักษ์ร่างใหญ่",
+    "giant brute",
+    "human"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a giant brute with iron knuckles; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_human_ninja_shadow",
+   "category": "monster",
+   "subcategory": "human",
+   "region": "any",
+   "group": "human",
+   "name": "เงานักฆ่าเกาะ",
+   "tags": [
+    "เงานักฆ่าเกาะ",
+    "ninja shadow",
+    "human"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "an island shadow warrior in dark grey with a short blade; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_human_prison_guard",
+   "category": "monster",
+   "subcategory": "human",
+   "region": "any",
+   "group": "human",
+   "name": "ผู้คุมคุก",
+   "tags": [
+    "ผู้คุมคุก",
+    "prison guard",
+    "human"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "a prison guard with a whip and keys; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  },
+  {
+   "id": "mon_human_blade_bodyguard",
+   "category": "monster",
+   "subcategory": "human",
+   "region": "any",
+   "group": "human",
+   "name": "ผู้คุ้มกันดาบ",
+   "tags": [
+    "ผู้คุ้มกันดาบ",
+    "blade bodyguard",
+    "human"
+   ],
+   "kind": "actor",
+   "mapWidth": 56,
+   "keep": 1,
+   "method": "char3",
+   "size": {
+    "w": 88,
+    "h": 88
+   },
+   "template": "mannequin",
+   "prompt": "an escort bodyguard with a big dao; pixel art game monster, ancient China wuxia fantasy, muted colours"
+  }
+ ]
+}
