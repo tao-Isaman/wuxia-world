@@ -6,7 +6,7 @@ import type { StatKey } from "@/lib/game";
 import type { Choice, Condition, DialogScene, QuestDef, QuestReward, QuestStage, SceneEffect, SceneLine, SectId } from "../types";
 import { scrollItemId } from "../data/items";
 import type {
-  CutsceneDef, CutsceneSpec, LineageSpec, StoryArcInfo, StoryArcSpec, StoryBeat, StoryLine, StoryStep,
+  CutsceneDef, CutsceneSpec, LineageSpec, MainArcSpec, StoryArcInfo, StoryArcSpec, StoryBeat, StoryLine, StoryStep,
 } from "./types";
 
 export interface StoryResolvers {
@@ -74,9 +74,12 @@ const pad = (n: number) => String(n).padStart(2, "0");
 
 export function storyQuestId(arcId: string, chapter: number): string { return `st_${arcId}_${pad(chapter)}`; }
 
-export function compileArc(arc: StoryArcSpec, r: StoryResolvers): CompiledStory & { info: StoryArcInfo } {
+/** The main story's label in the quest log (where a saga shows its sect). */
+export const MAIN_STORY_LABEL = "เนื้อเรื่องหลัก";
+
+export function compileArc(arc: StoryArcSpec | MainArcSpec, r: StoryResolvers): CompiledStory & { info: StoryArcInfo } {
   const out: CompiledStory = { quests: [], scenes: [], cutscenes: [] };
-  const learned: Condition = arc.reward.kind === "skill" ? { t: "learnedSkill", skillId: arc.reward.id } : { t: "learnedArt", artId: arc.reward.id };
+  const saga = "reward" in arc ? arc : null;
   const total = arc.chapters.length;
   arc.chapters.forEach((chapter, index) => {
     const n = index + 1;
@@ -91,20 +94,22 @@ export function compileArc(arc: StoryArcSpec, r: StoryResolvers): CompiledStory 
     });
     stages.push({ id: "return", description: `กลับไปหา${r.npcName(chapter.giver)}` });
 
-    const gates: Condition[] = n === 1 ? [arc.require, { t: "not", of: learned }, notHolding(arc.reward.kind, arc.reward.id)] : [{ t: "questStatus", questId: storyQuestId(arc.id, n - 1), status: "done" }];
+    const gates: Condition[] = n > 1 ? [{ t: "questStatus", questId: storyQuestId(arc.id, n - 1), status: "done" }]
+      : saga ? [saga.require, { t: "not", of: saga.reward.kind === "skill" ? { t: "learnedSkill", skillId: saga.reward.id } : { t: "learnedArt", artId: saga.reward.id } }, notHolding(saga.reward.kind, saga.reward.id)]
+      : [];
     if (chapter.require) gates.push(chapter.require);
     const rewards: QuestReward[] = [...chapter.reward];
-    if (n === total) {
-      rewards.push(arc.reward.kind === "skill"
-        ? { t: "learnSkill", skillId: arc.reward.id }
-        : { t: "learnArt", artId: arc.reward.id, level: arc.reward.level ?? 3 });
+    if (n === total && saga) {
+      rewards.push(saga.reward.kind === "skill"
+        ? { t: "learnSkill", skillId: saga.reward.id }
+        : { t: "learnArt", artId: saga.reward.id, level: saga.reward.level ?? 3 });
     }
     out.quests.push({
       id: qid,
       name: `${arc.title} · บทที่ ${n}: ${chapter.title}`,
       description: chapter.summary,
-      briefSummary: `ตำนาน ${n}/${total} — ${chapter.title}`,
-      type: "story",
+      briefSummary: `${saga ? "ตำนาน" : MAIN_STORY_LABEL} ${n}/${total} — ${chapter.title}`,
+      type: saga ? "story" : "main",
       story: { arcId: arc.id, chapter: n },
       giverNpcId: chapter.giver,
       prereqs: gates.length === 1 ? gates[0] : { t: "and", all: gates },
@@ -115,8 +120,8 @@ export function compileArc(arc: StoryArcSpec, r: StoryResolvers): CompiledStory 
     beatScenes(`qs_${qid}_complete`, chapter.complete, [{ t: "finishQuest", questId: qid, success: true }], home, out, `cs_${qid}_complete`, `${label} — ปิดบท`, arc.id);
   });
   const info: StoryArcInfo = {
-    id: arc.id, title: arc.title, tagline: arc.tagline, sc: arc.sc, ...(arc.sectId ? { sectId: arc.sectId } : {}),
-    reward: { kind: arc.reward.kind, id: arc.reward.id },
+    id: arc.id, title: arc.title, tagline: arc.tagline,
+    ...(saga ? { sc: saga.sc, reward: { kind: saga.reward.kind, id: saga.reward.id }, ...(saga.sectId ? { sectId: saga.sectId } : {}) } : { sc: MAIN_STORY_LABEL, main: true }),
     questIds: arc.chapters.map((_, i) => storyQuestId(arc.id, i + 1)),
     chapterTitles: arc.chapters.map((c) => c.title),
     cutsceneIds: out.cutscenes.map((c) => c.id),

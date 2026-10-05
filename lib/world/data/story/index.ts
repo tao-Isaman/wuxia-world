@@ -5,6 +5,7 @@
 // Add a sect file: export `LINEAGE` and `ARCS` from it, import it here and
 // spread both. `bun run test:story` checks coverage and every reference.
 import type { LineageSpec, StoryArcSpec, StoryOpponentSpec } from "../../story/types";
+import { MAIN_ARC } from "./main";
 import * as wudang from "./wudang";
 import * as wudang_more from "./wudang_more";
 import * as shaolin from "./shaolin";
@@ -86,4 +87,5 @@ export const LINEAGE_PROLOGUES: Readonly<Record<string, string>> = {
   t3_xy_seepower: "qst_xiaoyao_art_seepower",
 };
 
-export const STORY_OPPONENT_SPECS: readonly StoryOpponentSpec[] = STORY_ARC_SPECS.flatMap((a) => a.opponents ?? []);
+export { MAIN_ARC };
+export const STORY_OPPONENT_SPECS: readonly StoryOpponentSpec[] = [...(MAIN_ARC.opponents ?? []), ...STORY_ARC_SPECS.flatMap((a) => a.opponents ?? [])];

@@ -8,7 +8,7 @@ import { NPCS } from "../data/npcs";
 import { getItem } from "../data/items";
 import { OPPONENTS_BY_ID } from "../data/opponents";
 import { SECT_MEMBERSHIPS } from "../data/sect-memberships";
-import { LINEAGE_PROLOGUES, LINEAGE_SPECS, SAGA_PROLOGUES, STORY_ARC_SPECS } from "../data/story";
+import { LINEAGE_PROLOGUES, LINEAGE_SPECS, MAIN_ARC, SAGA_PROLOGUES, STORY_ARC_SPECS } from "../data/story";
 import { compileArc, compileLineage, type StoryResolvers } from "./compile";
 import type { CutsceneDef, StoryArcInfo } from "./types";
 
@@ -56,6 +56,11 @@ for (const raw of LINEAGE_SPECS) {
   const c = compileLineage(spec, STORY_RESOLVERS, seq);
   quests.push(...c.quests); scenes.push(...c.scenes); cutscenes.push(...c.cutscenes);
 }
+// The main story first: its chapters chain from a new game.
+if (MAIN_ARC.chapters.length) {
+  const c = compileArc(MAIN_ARC, STORY_RESOLVERS);
+  quests.push(...c.quests); scenes.push(...c.scenes); cutscenes.push(...c.cutscenes); arcs.push(c.info);
+}
 for (const raw of STORY_ARC_SPECS) {
   // A saga with a prologue trial (an older sect art quest) opens only after it.
   const trial = SAGA_PROLOGUES[raw.reward.id];
@@ -102,6 +107,7 @@ for (const q of quests) {
   LINEAGE_BY_SECT.set(info.sc, [...(LINEAGE_BY_SECT.get(info.sc) ?? []), { ...q.lineage, questId: q.id, rank: rankGate(q.prereqs) }]);
 }
 for (const a of arcs) {
+  if (!a.reward) continue; // the main story belongs to no sect
   const first = QUESTS_BY_ID.get(a.questIds[0]);
   LINEAGE_BY_SECT.set(a.sc, [...(LINEAGE_BY_SECT.get(a.sc) ?? []), { ...a.reward, questId: a.questIds[0], arcId: a.id, rank: rankGate(first?.prereqs) }]);
 }

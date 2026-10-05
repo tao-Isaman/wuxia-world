@@ -2,11 +2,11 @@
 
 # Opponents
 
-286 opponents (`lib/world/data/opponents.ts`). Foes that turn up on the map while the hero walks come from 64 fight events filtered by zone (`lib/world/data/random-events.ts`).
+289 opponents (`lib/world/data/opponents.ts`). Foes that turn up on the map while the hero walks come from 64 fight events filtered by zone (`lib/world/data/random-events.ts`).
 
 Met via: **roams** = turns up on the map in the listed zones while the hero walks · **hunt** = a hunting node · **spar** = an NPC's practice bout · **scene** = a quest or story battle (count of scene choices) · **law** = pursuers after wanted marks · **betrayal** = hunters after betraying a sect.
 
-Per tier: T0: 9 · T1: 43 · T2: 73 · T3: 53 · T4: 108. Per category: ฝ่ายมนุษย์ (human): 253 · สัตว์ป่า (beast): 27 · ผู้พิเศษ (supernatural): 6.
+Per tier: T0: 9 · T1: 44 · T2: 74 · T3: 54 · T4: 108. Per category: ฝ่ายมนุษย์ (human): 256 · สัตว์ป่า (beast): 27 · ผู้พิเศษ (supernatural): 6.
 
 ## Tier 0 (9)
 
@@ -22,7 +22,7 @@ Per tier: T0: 9 · T1: 43 · T2: 73 · T3: 53 · T4: 108. Per category: ฝ่�
 | `hunt_pheasant` | ไก่ฟ้า | beast | — | 3 | hunt |
 | `hunt_squirrel` | กระรอกแก้ม | beast | — | 3 | hunt |
 
-## Tier 1 (43)
+## Tier 1 (44)
 
 | Id | Name | Category | Pack | Drops | Met via |
 | --- | --- | --- | --- | --- | --- |
@@ -62,6 +62,7 @@ Per tier: T0: 9 · T1: 43 · T2: 73 · T3: 53 · T4: 108. Per category: ฝ่�
 | `law_constable` | เจ้าหน้าที่รัฐ | human | — | 5 | law |
 | `vampire_bat` | ค้างคาวดูดเลือด | beast | 2× ค้างคาวดูดเลือด | 5 | roams (frontier, isle, wild) |
 | `bandit_archer` | มือเข็มโจรป่า | human | — | 5 | roams (city, frontier, isle, mansion, sect, temple, wild) |
+| `st_main_ink_runner` | สมุนเงาหมึก | human | — | 5 | scene ×2 |
 | `spar_village_noname_carter_lu` | ลู่เกวียน | human | — | 5 | spar |
 | `spar_village_huashan_dreamer_yang` | หยางซื่อ | human | — | 5 | spar |
 | `spar_palace_royal_zhao` | จ้าวเทีย | human | — | 5 | spar |
@@ -70,7 +71,7 @@ Per tier: T0: 9 · T1: 43 · T2: 73 · T3: 53 · T4: 108. Per category: ฝ่�
 | `spar_home_chengkun_chen` | เฉินเหวินฮ่าว | human | — | 5 | spar |
 | `spar_chengying_lu` | เหอชิงหลาน | human | — | 5 | spar |
 
-## Tier 2 (73)
+## Tier 2 (74)
 
 | Id | Name | Category | Pack | Drops | Met via |
 | --- | --- | --- | --- | --- | --- |
@@ -128,6 +129,7 @@ Per tier: T0: 9 · T1: 43 · T2: 73 · T3: 53 · T4: 108. Per category: ฝ่�
 | `bandit_lieutenant` | รองหัวหน้าโจร | human | 1× โจรป่า + 1× มือเข็มโจรป่า | 6 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×1 |
 | `night_blade` | มือมีดราตรี | human | — | 6 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×3 |
 | `demon_cult_zealot` | สาวกลัทธิมาร | human | 2× สาวกลัทธิมาร | 6 | roams (city, frontier, isle, mansion, sect, temple, wild) |
+| `st_main_ink_captain` | หลัวเทียะผู้กองเงาหมึก | human | — | 6 | scene ×2 |
 | `spar_village_noname_whip_qiao` | ยายเฉียว | human | — | 6 | spar, scene ×1 |
 | `spar_village_taishan_porter_shi` | สือเปียนตาน | human | — | 6 | spar, scene ×1 |
 | `foe_taishan_toll_chief` | หัวหน้าโจรเก็บค่าผ่านทาง | human | — | 6 | scene ×1 |
@@ -148,7 +150,7 @@ Per tier: T0: 9 · T1: 43 · T2: 73 · T3: 53 · T4: 108. Per category: ฝ่�
 | `spar_qigu_farmer_lao` | ลาวหนาน | human | — | 6 | scene ×1 |
 | `spar_taohua_huang_waterstep` | หวงชิงเฉวียน (สามส่วนฝีมือ) | human | — | 6 | scene ×1 |
 
-## Tier 3 (53)
+## Tier 3 (54)
 
 | Id | Name | Category | Pack | Drops | Met via |
 | --- | --- | --- | --- | --- | --- |
@@ -189,6 +191,7 @@ Per tier: T0: 9 · T1: 43 · T2: 73 · T3: 53 · T4: 108. Per category: ฝ่�
 | `jade_python` | งูเหลือมหยก | beast | — | 9 | roams (frontier, isle, wild) |
 | `thunder_eagle` | อินทรีสายฟ้า | beast | — | 7 | roams (frontier, isle, wild) |
 | `ghost_swordsman` | วิญญาณจอมกระบี่ | supernatural | — | 7 | roams (sect, temple, wild) |
+| `st_main_ink_hand_meng` | เมิ่งมือหมึก | human | — | 7 | scene ×1 |
 | `foe_noname_masked_disciple` | ซือหลางหน้ากากเหล็ก | human | — | 7 | scene ×1 |
 | `foe_youjian_sky_room_guest` | หลี่เซียวเฟิง | human | — | 7 | scene ×1 |
 | `opp_city_lingxiao_red_veil` | หญิงผ้าคลุมแดง | human | — | 7 | scene ×1 |

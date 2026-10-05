@@ -180,14 +180,31 @@ export interface StoryArcSpec {
   opponents?: readonly StoryOpponentSpec[];
 }
 
-/** What the quest log shows for a saga. */
+/**
+ * The main story (เนื้อเรื่องหลัก): one long chain of chapters the hero
+ * follows from the first day — the world's history and the hero's own. Same
+ * chapters, steps and films as a saga, but no sect, no gate and no move at
+ * the end; its quests are type "main".
+ */
+export interface MainArcSpec {
+  /** Snake case; chapter quests become `st_<id>_<nn>`. */
+  id: string;
+  title: string;
+  tagline: string;
+  chapters: readonly StoryChapterSpec[];
+  opponents?: readonly StoryOpponentSpec[];
+}
+
+/** What the quest log shows for a saga (or the main story, `main`). */
 export interface StoryArcInfo {
   id: string;
   title: string;
   tagline: string;
   sc: string;
   sectId?: SectId;
-  reward: { kind: "skill" | "art"; id: string };
+  /** The move the last chapter teaches; none for the main story. */
+  reward?: { kind: "skill" | "art"; id: string };
+  main?: boolean;
   questIds: readonly string[];
   chapterTitles: readonly string[];
   cutsceneIds: readonly string[];

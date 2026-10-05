@@ -2,7 +2,7 @@
 
 # Quests
 
-867 quests: 1 main, 429 side, 97 sect quests (15 of them art quests). 0 are marked `isMajor` (completing one spreads a rumor about the hero). 2382 stages in total: 988 advance on their own (`autoAdvance`), 522 are hands-on objectives (`objective`), the rest are dialog beats or the final hand-in. 761 quests have an offer scene (`qs_<id>_offer`) and 758 a completion scene (`qs_<id>_complete`).
+882 quests: 16 main, 429 side, 97 sect quests (15 of them art quests). 0 are marked `isMajor` (completing one spreads a rumor about the hero). 2426 stages in total: 997 advance on their own (`autoAdvance`), 542 are hands-on objectives (`objective`), the rest are dialog beats or the final hand-in. 776 quests have an offer scene (`qs_<id>_offer`) and 773 a completion scene (`qs_<id>_complete`).
 
 Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assassinate** / **trait** / **flag** = `autoAdvance` condition types · **objective** = map spot, person or scene the hero uses in person (`stage.objective`, ×n = several spots) · **dialog** = advanced by an `advanceQuest` choice in a scene · **turn-in** = last stage, closed at the turn-in person or by the completion scene.
 
@@ -17,6 +17,21 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | Id | Name | Giver | Stages | Notes |
 | --- | --- | --- | --- | --- |
 | `first_steps` | ก้าวแรกสู่ยุทธภพ | — | dialog → dialog → turn-in |  |
+| `st_main_01` | คัมภีร์ที่หลุดจากวังหลวง · บทที่ 1: หีบที่มาช้าสองปี | ป้าหลิว | objective (scene) → objective (scene) → turn-in | prereqs |
+| `st_main_02` | คัมภีร์ที่หลุดจากวังหลวง · บทที่ 2: เงาที่แปลงผัก | อาหนิว | kill → objective (scene) → turn-in | prereqs |
+| `st_main_03` | คัมภีร์ที่หลุดจากวังหลวง · บทที่ 3: เสมียนผู้จดทุกม้วน | เสมียนนายฉิง | objective (scene) → objective (scene) → turn-in | prereqs |
+| `st_main_04` | คัมภีร์ที่หลุดจากวังหลวง · บทที่ 4: ตลาดมืดของคัมภีร์ | เถ้าแก่โจวตลาดมืด | kill → objective (scene) → turn-in | prereqs |
+| `st_main_05` | คัมภีร์ที่หลุดจากวังหลวง · บทที่ 5: นิทานคืนไฟไหม้ | โปผู้เล่าเรื่อง | kill → objective (scene) → turn-in | prereqs |
+| `st_main_06` | คัมภีร์ที่หลุดจากวังหลวง · บทที่ 6: ตาพันดวง | อาจารย์ข่าวสารยุนซือ | objective (scene) → kill → turn-in | prereqs |
+| `st_main_07` | คัมภีร์ที่หลุดจากวังหลวง · บทที่ 7: ของของภูเขา คืนสู่ภูเขา | อาจารย์ชิงซวี่ | kill → objective (scene) → turn-in | prereqs |
+| `st_main_08` | คัมภีร์ที่หลุดจากวังหลวง · บทที่ 8: พระผู้ไม่ถามชื่อ | เจ้าอาวาสฮุยหยวน | objective (scene) → objective (scene) → turn-in | prereqs |
+| `st_main_09` | คัมภีร์ที่หลุดจากวังหลวง · บทที่ 9: คนที่เคยใส่เสื้อแพรตัวเดียวกัน | เฟิงเจ้าของร้านบะหมี่ | objective (scene) → objective (scene) → turn-in | prereqs |
+| `st_main_10` | คัมภีร์ที่หลุดจากวังหลวง · บทที่ 10: คืนที่หอคัมภีร์ไหม้ | ขันทีเกา | kill → objective (scene) → turn-in | prereqs |
+| `st_main_11` | คัมภีร์ที่หลุดจากวังหลวง · บทที่ 11: บ้านที่มีคนเฝ้า | ลุงโจว | objective (scene) → kill → turn-in | prereqs |
+| `st_main_12` | คัมภีร์ที่หลุดจากวังหลวง · บทที่ 12: เส้นทางสู่ป้อมหลำกู่ | อาจารย์ข่าวสารยุนซือ | kill → objective (scene) → turn-in | prereqs |
+| `st_main_13` | คัมภีร์ที่หลุดจากวังหลวง · บทที่ 13: บัญชีที่ไม่มีหน้าสุดท้าย | เสมียนนายฉิง | objective (scene) → item → turn-in | prereqs |
+| `st_main_14` | คัมภีร์ที่หลุดจากวังหลวง · บทที่ 14: มือหมึก | ลุงโจว | objective (scene) → turn-in | prereqs |
+| `st_main_15` | คัมภีร์ที่หลุดจากวังหลวง · บทที่ 15: คัมภีร์คืนสู่ยุทธภพ | ป้าหลิว | objective (scene) → objective (scene) → turn-in | prereqs |
 
 ## Sect quests
 

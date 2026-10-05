@@ -20,21 +20,21 @@ Generated lists of everything in the game, taken straight from the data tables. 
 | --- | --- |
 | Locations | 101 |
 | Route scenes | 274 |
-| Dialog scenes | 2610 |
-| All scenes | 2985 |
+| Dialog scenes | 2673 |
+| All scenes | 3048 |
 | Location connections (`LOCATION_ROUTES`) | 129 |
 | Painted maps (hand-placed / auto layout) | 3 / 97 |
 | Sect locations / memberships | 20 / 15 |
 | NPCs | 225 |
-| Quests | 867 |
-| Quest stages | 2382 |
+| Quests | 882 |
+| Quest stages | 2426 |
 | Move skills / inner arts / equipment | 178 / 122 / 76 |
 | Items | 392 |
 | Shops / martial halls / artisans | 19 / 7 / 49 |
 | Recipes | 32 |
 | Gathering and hunting nodes | 25 |
 | Life skills | 19 |
-| Opponents | 286 |
+| Opponents | 289 |
 | Roaming foe events | 64 |
 
 Regenerate with `bun scripts/build-docs-reference.ts`; `--check` fails when a page is stale.

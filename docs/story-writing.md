@@ -7,6 +7,7 @@ How to write the content in `lib/world/data/story/`: the **lineage quests** that
 - [The two kinds](#the-two-kinds)
 - [The legend we tell](#the-legend-we-tell)
 - [Timeline and novel characters](#timeline-and-novel-characters)
+- [The main story](#the-main-story)
 - [Voice](#voice)
 - [Lineage quests](#lineage-quests)
 - [Story sagas](#story-sagas)
@@ -31,7 +32,7 @@ The sagas retell **มังกรหยก ภาค 3** (ดาบมังก
 
 **Framing — keep it this way:**
 
-- The legend is **recent history**: the game is set about 20 years after it ([Timeline](#timeline-and-novel-characters)). Today's masters (our NPCs) were young disciples or witnesses then, or are its people's children and disciples.
+- The legend is **living memory**: the game is set about 40 years after it ([Timeline](#timeline-and-novel-characters)). Today's elders (our NPCs) were young disciples or witnesses then, or are its people's children and disciples.
 - Novel characters appear **only in flashback cutscenes** (`mood: "past"`) and in what elders tell. The hero never meets them: those still alive have withdrawn (below).
 - Each saga follows the hero in the **present day**, retracing one legend: an elder tells part of it, the hero goes somewhere, something from that legend echoes now (a descendant, a lost object, an old grudge, a misunderstanding), and the T4 skill or art is the lesson of that legend.
 - Use the game's sect names (เส้าหลิน, อู่ตัง, ง้อไบ๊, พรรคยาจก…). The old names (บู๊ตึ๊ง, เม้งก่า, ยอดกวงเม้ง) are fine inside the legend.
@@ -39,26 +40,86 @@ The sagas retell **มังกรหยก ภาค 3** (ดาบมังก
 
 ## Timeline and novel characters
 
-**The game is set about 20 years after มังกรหยก ภาค 3** (ปรมาจารย์เตียซำฮง is about 140). So:
+**The present day is the 3rd year of Jianwen (ค.ศ. 1401), about 40 years after มังกรหยก ภาค 3.** ปรมาจารย์เตียซำฮง is alive at about 154.
 
-- **Characters of earlier novels** (the Condor trilogy, แปดเทพอสูรมังกรฟ้า: ก๊วยเจ๋ง, อึ้งย้ง, เอี้ยก้วย, ฮ่วงเอี้ยะซือ, หวังฉงหยาง, โฮ่งชีก๋ง…) are **history**: legends, ancestors, founders, old manuals. They never appear alive. A present-day heir may carry the family name (หวงชิงเฉวียน of เกาะดอกท้อ is ฮ่วงเอี้ยะซือ's great-grandson).
-- **Characters of later novels** (กระบี่เย้ยยุทธจักร, จิ้งจอกภูเขาหิมะ / จิ้งจอกอหังการ…) **don't exist yet**: never use their names, nor their family plots under the same names.
-- Every NPC has an invented name. Before naming one, check it is not a novel character's.
-- 2026-10 rename: 41 NPCs and family names from other novels became invented names — e.g. จั่วเหลิงฉาน → เกาซงเหยียน, เหรินหวัวสิง → ตู้เทียนหาน, ฮ่วงเอี้ยะซือ → หวงชิงเฉวียน, อิดเต็ง → อู๋เฉินไต้ซือ, ฮูเฝย์ → ไป๋เฝยหยาง, หลินผิงจือ → เฉาเหวินจือ. Their ids (`sect_songshan_master_zuolengchan`, `home_hufei`…) are unchanged so saves keep working.
+### The age we play in (the game's lore)
 
-**How long ago, now:**
+1. **The seizure (about 18–12 years ago).** ฮ่องเต้หงอู่ (จูหยวนจาง), first emperor of the Ming, founded the องครักษ์เสื้อแพร (1382). He set them on the jianghu and gathered the great sects' scriptures (คัมภีร์) into the court: copied, confiscated or taken by force. They went into the **หอคัมภีร์หลวง** in the capital. Sects kept only what their masters carried in their heads. Many arts thinned out in a generation.
+2. **The emperor's death (3 years ago, 1398).** His grandson, ฮ่องเต้เจี้ยนเหวิน, came to the throne and reined in the องครักษ์เสื้อแพร.
+3. **The scattering (the last two years).** His uncle, อ๋องเยียน (จูตี้), rose in revolt from เป่ยผิง (ศึกจิ้งหนาน, 1399–). In the chaos the หอคัมภีร์หลวง was emptied:
+   - some scrolls were stolen and sold by its guards;
+   - some were smuggled back to their sects;
+   - some were hunted by agents of both sides for their armies.
+4. **Now: an age of strife.** Sects great and small are gathering their lost scriptures and training again, and old rivalries flare. The war in the north drags on. That is why every master in the game hands the hero a **คัมภีร์**: the sect has just recovered it.
 
-| Event | Distance |
+### How long ago
+
+| Event | Distance now |
 | --- | --- |
-| ก๊วยเซียง, หลวงจีนกักอ้วน, the founding of ง้อไบ๊, the Condor-era heroes, Xiangyang | ร้อยกว่าปีก่อน |
-| เตียซำฮง founding อู่ตัง's arts | about 80–100 years |
-| เตียชุ่ยซัว and ฮึงซ่อซ่อ, เกาะไฟน้ำแข็ง, the master's 100th birthday | สี่สิบกว่าปีก่อน |
-| young เตียบ่อกี้'s cold poison, หุบผีเสื้อ | สามสิบกว่าปีก่อน |
-| the siege of ยอดกวงเม้ง, วัดหมื่นสุข, the Shaolin hero gathering, the war against the Yuan | ยี่สิบกว่าปีก่อน |
+| ก๊วยเซียง, หลวงจีนกักอ้วน, the founding of ง้อไบ๊, young เตียซำฮง leaving เส้าหลิน, the Condor-era heroes, Xiangyang | ร้อยกว่าปีก่อน (about 140) |
+| เตียซำฮง founding อู่ตัง's arts | about a hundred years and more |
+| เตียชุ่ยซัว meeting ฮึงซ่อซ่อ | หกสิบกว่าปีก่อน |
+| เกาะไฟน้ำแข็ง, the Dragon Saber's return, the master's 100th birthday (เตียชุ่ยซัว and ฮึงซ่อซ่อ die) | ห้าสิบกว่าปีก่อน |
+| young เตียบ่อกี้'s cold poison, หุบผีเสื้อ | ห้าสิบปีก่อน / เกือบห้าสิบปี |
+| the siege of ยอดกวงเม้ง, วัดหมื่นสุข, the Shaolin hero gathering, the war against the Yuan | สี่สิบกว่าปีก่อน / ราวสี่สิบปีก่อน |
+| the founding of the Ming (1368) | สามสิบกว่าปีก่อน |
+| the seizure of the scriptures | สิบกว่าปีก่อน |
+| ฮ่องเต้หงอู่'s death | สามปีก่อน |
+| the scattering, ศึกจิ้งหนาน | สองปีมานี้ |
 
-**Who is alive:** เตียซำฮง (about 140, in seclusion behind อู่ตัง; no one sees him — a master may relay a word); เตียบ่อกี้ and เตียบ้อ (left the jianghu, whereabouts unknown); จิวจี้เยียก (withdrawn; not the current ง้อไบ๊ head); เจียซุ่น (a monk at เส้าหลิน, very old); เอี้ยเซียว, ฮวมเอี๊ยว, อุ่ยอิดเซี้ยว (old men). Dead: ซือไท้เมียะเจ็ก, ฮึงเทียนเจ็ง, โอ้วแชงู and อ๋องหลันกู, เตียชุ่ยซัว and ฮึงซ่อซ่อ, ค่งเกี่ยน, ตั้งอิ้วเลี้ยง; เซ่งคุน was crippled and vanished. Family links to the legend are a child or grandchild at most.
+### Who is alive
 
-The 38 sagas and the place / lore texts were reworded to this timeline on 2026-10-04.
+- **เตียซำฮง** (about 154) lives in seclusion behind อู่ตัง. No one sees him; a master may relay a word.
+- **เตียบ่อกี้** (about 60) and **เตียบ้อ** left the jianghu long ago, whereabouts unknown.
+- **จิวจี้เยียก** (about 58) has withdrawn. She is not the current ง้อไบ๊ head.
+- **Dead:**
+  - **เจียซุ่น** died a monk at เส้าหลิน some years ago.
+  - **เอี้ยเซียว, ฮวมเอี๊ยว, อุ่ยอิดเซี้ยว** are dead or nearly all gone; stay vague.
+  - **ซือไท้เมียะเจ็ก, ฮึงเทียนเจ็ง, โอ้วแชงู and อ๋องหลันกู, เตียชุ่ยซัว and ฮึงซ่อซ่อ, ค่งเกี่ยน, ตั้งอิ้วเลี้ยง** died in the novel.
+- **เซ่งคุน** was crippled and vanished.
+- **Today's elders** (60–75) were young disciples or witnesses at ยอดกวงเม้ง. A family link to the legend is a child or a grandchild.
+
+### Novel characters
+
+- **Earlier novels** (the Condor trilogy, แปดเทพอสูรมังกรฟ้า: ก๊วยเจ๋ง, อึ้งย้ง, เอี้ยก้วย, ฮ่วงเอี้ยะซือ, หวังฉงหยาง, โฮ่งชีก๋ง…) are **history**. Their people never appear alive. A present-day heir may carry the family name: หวงชิงเฉวียน of เกาะดอกท้อ is ฮ่วงเอี้ยะซือ's great-grandson.
+- **Later novels** (กระบี่เย้ยยุทธจักร, จิ้งจอกภูเขาหิมะ / จิ้งจอกอหังการ…) **don't exist yet**. Never use their names, nor their family plots under the same names.
+- **Every NPC has an invented name.** Before naming one, check it is not a novel character's. The 2026-10 rename gave 41 NPCs invented names, for example:
+  - จั่วเหลิงฉาน → เกาซงเหยียน
+  - เหรินหวัวสิง → ตู้เทียนหาน
+  - ฮ่วงเอี้ยะซือ → หวงชิงเฉวียน
+  - อิดเต็ง → อู๋เฉินไต้ซือ
+  - ฮูเฝย์ → ไป๋เฝยหยาง
+  - หลินผิงจือ → เฉาเหวินจือ
+
+  Their ids are unchanged.
+
+## The main story
+
+`lib/world/data/story/main.ts` (`MAIN_ARC`, a `MainArcSpec`) holds **คัมภีร์ที่หลุดจากวังหลวง**: 15 chained chapters (`st_main_01`…`15`, quest type `main`) and 12 films. It has the same chapter / step / beat format as a saga, with these differences:
+
+- no sect, no gate on chapter 1, no move at the end;
+- chapter 1 is on offer from ป้าหลิว at home the moment a new game starts;
+- it leads the quest log's ตำนาน list.
+
+The story:
+
+- The hero is the child of the **นายหอคัมภีร์** (keeper of the หอคัมภีร์หลวง).
+- After ฮ่องเต้หงอู่'s death he sent the seized scrolls home in secret through the Beggars' network.
+- Two years ago a dismissed องครักษ์เสื้อแพร inspector, **เมิ่งมือหมึก** (selling himself to the northern army), killed him for the vault's ledger and burned the vault.
+- A box the father hid reaches the hero two years late. The trail runs:
+  - from the manor and the village to the capital (clerk ฉิง, หมอหลิน, the black market);
+  - through the Beggars, อู่ตัง and เส้าหลิน;
+  - to the burned vault in the palace and an empty fort in the north.
+- The hero tears the ledger into pages, and each sect gets back only its own. The free game then opens: sects, lineages and sagas.
+- Villains are the `st_main_*` opponents. The องครักษ์เสื้อแพร as a body stays grey.
+
+`test:story` checks it:
+
+- 14–16 chapters and at least 10 films;
+- real givers, places and foes;
+- small rewards and no move;
+- chapter 1 offered on a new game;
+- a full play-through.
 
 ## Voice
 
