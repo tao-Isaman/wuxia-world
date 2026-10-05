@@ -6,6 +6,10 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-05
 
+### Every conversation uses the cutscene layout
+
+- **NPC talks, quest offers, hand-ins and story beats look like the films now**: letterbox bars, the speaker's portrait standing at the left, the line as a subtitle at the bottom under the speaker's name tab, and the choices in a column beside it. The controls (ต่อ, ข้าม, จบบทสนทนา) sit in the top bar; tap anywhere, Enter or Space to go on. The map stays visible behind.
+
 ### Conversations play like films: one line at a time, key words coloured
 
 - **Every NPC talk, quest offer, hand-in and story beat now shows one line at a time**, typed out like a cutscene's subtitles.

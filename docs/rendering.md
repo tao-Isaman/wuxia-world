@@ -60,12 +60,12 @@ How the game is drawn and operated: the Phaser stage, the world map runtime, col
 
 ### Dialogs
 
-`DialogStage` is full screen: a portrait bust column (a 26 dvh top band on phones), with lines and choices side by side.
+`DialogStage` uses the cutscene layout over the live scene (`dialog-stage.module.css`): black letterbox bars top and bottom (11 vh, 8 vh on phones), the place name and the controls (**ต่อ**, **ข้าม**, **จบบทสนทนา ×**) in the top bar, the speaker's portrait standing at the left and fading into the scene, the speaker's name tab over a film subtitle box at the bottom, and the choices in a column beside the box (under it on narrow screens). The whole section is the tap target.
 
 - **The conversation standard.** Every NPC talk, quest offer, hand-in and story beat plays **one line at a time**, typed out like a film's subtitles: 2 characters every 22 ms, or at once under `prefers-reduced-motion`.
   - Lines longer than 140 characters are cut between words into more beats (`splitBeats`).
-  - Tapping the words (`dialog-lines`) finishes the typing, then moves on. **ต่อ ▶ (n/m)** (`dialog-next-page`) moves on at once. **ข้าม ⏭** (`dialog-skip`) jumps to the last line.
-  - The choices appear after the last line; it stays on screen above them.
+  - Tapping anywhere outside a button (the words are `dialog-lines`), Enter or Space finishes the typing, then moves on. **ต่อ ▶ (n/m)** (`dialog-next-page`) moves on at once. **ข้าม ⏭** (`dialog-skip`) jumps to the last line.
+  - The choices appear after the last line, which stays on screen beside them.
   - The host shows `data-page`, `data-pages` (beats) and `data-typing`.
   - `localStorage["wuxia-dialog-instant"] = "on"` shows all lines at once (fast text). `playwright.config.ts` seeds it for the suite; `dialogue.spec.ts` turns it off.
 - **Key words.** `RichText` (`components/world/rich-text.tsx`) colours the key words in dialogue lines, choices and film subtitles via `markText` (`lib/world/text-marks.ts`):
