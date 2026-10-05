@@ -6,6 +6,11 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-05
 
+### Foes roam roads and wilds, not towns
+
+- **Cities, villages, homes, inns, sects, temples and the palace no longer spawn foes** while you walk. Roads, caves, mountains, valleys, isles and deserts still do.
+- **Quests are the exception:** while a kill quest's target lives in the place's pool (the main story's hired thieves in the capital, say), that quarry still comes. The law and sect hunters still catch up anywhere but home and jail.
+
 ### Main story chapter 2 points to หมู่บ้านชีกู่
 
 - **บทที่ 2 (เงาที่แปลงผัก) had no guide arrow** at its "ask the foothill elder" step: it named the legacy tutorial location `village`, which is on no road. It now goes to `village_qigu` (north of the capital). `test:story` now requires every visit / duel step to name a place on the world map (or the jail).

@@ -110,7 +110,7 @@ Real behaviour today, found during the docs audit. Each is small and self-contai
 - **One map so far.** Only `city_capital` is built in the engine (ground + placements); every other map keeps its painting. Cutscenes staged on `city_capital` still draw the old painting (`cutscene-runtime.ts` reads the map's image).
 - **Depth on long diagonal walls.** Iso pieces sort by their diamond's centre, so a character right beside a wall cell can draw a few pixels in front of / behind its neighbour cell's end.
 - **The capital is generated.** `bun scripts/build-capital-layout.ts` writes it (avenue, plaza, walled yamen, market street, lanes, ~30 buildings, ~120 distinct props); edits made in the map editor are lost when it is rerun. Tall roofs still hide the lanes behind them (the hero fades them; NPCs and markers stand on the wide streets for that reason).
-- **Path planning cost.** The capital has ~520 solids; the longest probe (spawn → the north exit) takes ~0.6 s and `test:placements` ~3.4 s (the bun test timeout is 5 s). More blocking props there will need `collide: false` or a cheaper planner. The capital is big to cross: `investigation.spec.ts` walks from the arrival gate to the tea house and back and now takes ~2 min (timeout 240 s).
+- **Path planning cost.** The capital has ~520 solids; the longest probe (spawn → the north exit) takes ~0.6 s and `test:placements` ~3.4 s (the bun test timeout is 5 s). More blocking props there will need `collide: false` or a cheaper planner. The capital is big to cross: `investigation.spec.ts` walks from the arrival gate to the tea house and back and now takes ~2 min (timeout 240 s); `opening.spec.ts` ~3.3 min (timeout 300 s).
 
 ### Kits (roads and walls)
 
@@ -129,6 +129,7 @@ Real behaviour today, found during the docs audit. Each is small and self-contai
 
 ### Roaming foes
 
+- **Only roads and wilds.** Cities, villages, homes, inns, sects, temples and the palace get no stray foes; a kill quest's quarry can still come there (`isSettledPlace`).
 - **Foes can stand on painted scenery.** A spawn spot only needs to be unblocked and reachable by the collision data, so on maps whose collision is loose (the capital's outer wall, for one) a foe can appear somewhere that looks out of bounds.
 - **Not saved.** A reload clears the foes on the map; they also go when the hero walks on another map.
 - **They don't move.** Foes wait where they appear; they don't patrol or give chase.

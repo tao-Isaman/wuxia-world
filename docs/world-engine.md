@@ -212,7 +212,7 @@ Nothing rolls on arrival. While the hero walks on a location or route map, the w
 1. **`rollWalkEvent(state)`** (`lib/world/effects.ts`): the law, then sect hunters, each setting `pendingEncounter` at once.
    - **The law.** With wanted marks, `lawChance(marks)` spawns a law pursuer; the city whose jail would hold the hero is remembered (`jailCityId`).
    - **Sect hunters.** If any membership is `betrayed`, a 30 % roll spawns that sect's `hunter_<sectId>`.
-2. **`rollFoeSpawn(state, present)`**: if fewer than `FOE_SPAWN.maxPerMap` (3) foes wait on this map, a `FOE_SPAWN.chance` (30 %) roll picks a foe from the zone's pool. The store then asks `pickSpot` and adds a `RoamingFoe { id, opponentId, locationId, x, y }` to `roamingFoes`.
+2. **`rollFoeSpawn(state, present)`**: if fewer than `FOE_SPAWN.maxPerMap` (3) foes wait on this map, a `FOE_SPAWN.chance` (30 %) roll picks a foe from the zone's pool. In a settled place (`isSettledPlace` in `data/random-events.ts`: cities, villages, homes, inns, sects, temples, the palace, villas, markets, tribes) nothing spawns unless an active kill quest's target is in this zone's pool; then only that quarry comes (at `FOE_SPAWN.huntChance`). Roads and the wilds keep their foes. The store then asks `pickSpot` and adds a `RoamingFoe { id, opponentId, locationId, x, y }` to `roamingFoes`.
 
 | Per walk tick | Chance |
 | --- | --- |

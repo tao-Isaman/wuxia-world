@@ -216,7 +216,7 @@ Two deliberate exceptions reach into stores:
   - It feeds the quest log, the HUD tracker and the map's guide arrow.
 - **Encounters come while walking**, not on arrival.
   - Every 220 map units walked, `walkTick(pickSpot)` runs; `home_player` and `jail` are safe. There are no treasure or meeting events.
-  - **Roaming foes:** per tick a 30 % chance (80 % while hunting a kill-quest target in this zone) puts a foe from the zone's pool on the map (`rollFoeSpawn`, at most 3; store `roamingFoes`, not saved). The runtime draws them (`presentation.foes`) and walking into one calls `engageFoe` → the encounter screen.
+  - **Roaming foes:** on roads and in the wilds, per tick a 30 % chance (80 % while hunting a kill-quest target in this zone) puts a foe from the zone's pool on the map. Settled places (`isSettledPlace`: `city_`, `village_`, `home_`, `inn_`, `sect_`, `temple_`, `palace_`, `villa_`, `market_`, `tribe_`) get no stray foes, only an active kill quest's quarry (`rollFoeSpawn`, at most 3; store `roamingFoes`, not saved). The runtime draws them (`presentation.foes`) and walking into one calls `engageFoe` → the encounter screen.
   - The **law** (`lawChance(marks)`, 13–45 %) and the **30 % sect-hunter roll** still catch up at once (`rollWalkEvent`).
   - Foes are picked by zone and scaled by the hero's power (`max(day/200, (9 − best sect rank)/8)`): tier mix, elites, and opponent stats ×(1 + 0.6·power) for **every** battle.
   - `rollRandomEvent` is a no-op kept for old content.

@@ -15,6 +15,7 @@ import {
   FOE_SPAWN,
   applyOpponentStatScale,
   fightEventsForLocation,
+  isSettledPlace,
   playerPowerIndex,
   pickWeighted,
 } from "./data/random-events";
@@ -443,6 +444,8 @@ export function rollFoeSpawn(state: WorldStateData, present: number): string | n
   const hunt = collectActiveHuntTargets(state);
   const huntPool = hunt.size ? pool.filter((ev) => hunt.has(ev.opponentId)) : [];
   const hunting = huntPool.length > 0;
+  // Towns, villages, sects and homes: only a quest's quarry, never a stray foe.
+  if (!hunting && isSettledPlace(state.currentSceneId)) return null;
   if (Math.random() >= (hunting ? FOE_SPAWN.huntChance : FOE_SPAWN.chance)) return null;
   return pickWeighted(hunting ? huntPool : pool, Math.random())?.opponentId ?? null;
 }

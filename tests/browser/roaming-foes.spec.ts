@@ -21,6 +21,8 @@ test("walking brings foes onto the map; walking into one opens its encounter wit
   await page.evaluate(() => {
     const raw = JSON.parse(localStorage.getItem("wusia-world-v1")!);
     Object.assign(raw.state, { currentSceneId: "city_capital", lastLocationId: "city_capital" });
+    // Towns send no stray foes: only a kill quest's quarry (the main story's hired thieves).
+    raw.state.quests.st_main_02 = { id: "st_main_02", status: "active", stage: 0 };
     localStorage.setItem("wusia-world-v1", JSON.stringify(raw));
   });
   await page.reload();

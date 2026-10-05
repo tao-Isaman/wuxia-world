@@ -149,6 +149,10 @@ try {
   assert.equal(useWorldStore.getState().currentSceneId, "city_capital");
   assert.equal(useWorldStore.getState().pendingEncounter, null, "arrival no longer rolls; walking does");
   useWorldStore.getState().walkTick(() => ({ x: 40, y: 60 }));
+  assert.equal(useWorldStore.getState().roamingFoes.length, 0, "towns send no stray foes");
+  // A kill quest's quarry still comes to town: hunt the main story's hired thieves.
+  useWorldStore.setState((s) => ({ quests: { ...s.quests, st_main_02: { id: "st_main_02", status: "active", stage: 0 } } }));
+  useWorldStore.getState().walkTick(() => ({ x: 40, y: 60 }));
   assert.equal(useWorldStore.getState().pendingEncounter, null, "walking springs nothing: a foe appears on the map instead");
   const [foe] = useWorldStore.getState().roamingFoes;
   assert.ok(foe && foe.locationId === "city_capital" && foe.x === 40 && foe.y === 60, "a foe waits at the picked spot");
@@ -156,7 +160,7 @@ try {
   assert.equal(useWorldStore.getState().pendingEncounter!.opponentId, foe.opponentId, "walking into it opens its encounter");
   assert.equal(useWorldStore.getState().pendingEncounter!.returnSceneId, "city_capital");
   assert.equal(useWorldStore.getState().roamingFoes.length, 0, "and it leaves the map");
-  console.log("PASS ordinary home→capital arrival is quiet; walking the capital spawns a foe that the hero walks into");
+  console.log("PASS ordinary home→capital arrival is quiet; the capital spawns no stray foe, only a hunted quarry the hero walks into");
 } finally {
   Math.random = random;
 }
