@@ -6,6 +6,12 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-05
 
+### Jianghu T4 / T5: sixteen moves removed, two arts renamed
+
+- **Kept** (still no way to earn them yet): the moves กระบี่ 6 ชีพจร (`lmsj`), เก้ากระบี่เดียวดาย (`dgjj`), ทวนประจักษ์พยาน (`ng2`), ดาบยาวเทพสังหาร (`ng5`), หมัดสะท้านจักรวาล (`nu2`); the arts **เคล็ดวิชาภูผาทะลายทัพ** (`military`, was จวินเจิ้นชี่), **ตำราเพลิงสวรรค์** (`fire`, was เพลิงสวรรค์), คัมภีร์ทานตะวัน, วิชาเก้าเอี้ยง, คัมภีร์เก้าอิม.
+- **Removed:** the T4 moves `ft` ขลุ่ยสะท้านฟ้า, `nu1` มังกรฟ้า, `ng1` เก้าฟ้าหนึ่งกระบี่, `ng4` หมัดพระอินทร์, `ng6` ขลุ่ยพลิกโลก and the T4 arts `lotus`, `scholar`, `poison`, `heaven`, `snow`, `sand`, `shadow`, `shenzhao`, `taiyin`, `huoxue`, `dongxuan`. None could be earned. Foes that used them now fight with the nearest kept or sect move (`nu1`→`ng5`, `ng1`→`dgjj`, `ng4`→`lmsj`; arts → `qiankun`, `np`, `t4_huashan_purple`, `t4_tang_skycleaver`, `t4_tang_tenkpoisons`, `t4_em_bodhi`, `blood`). The `scholar` damage bonus in `battle.ts` / grid `ai.ts` and four grid overrides went with them. Saves drop the ids on load (`validateAndRepair`).
+- Now 173 move skills and 111 inner arts.
+
 ### Foes roam roads and wilds, not towns
 
 - **Cities, villages, homes, inns, sects, temples and the palace no longer spawn foes** while you walk. Roads, caves, mountains, valleys, isles and deserts still do.

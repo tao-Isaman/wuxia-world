@@ -119,7 +119,7 @@ const BLACK_PAGE: StoryArcSpec = {
     { id: "st_huashan_gold_fan", name: "บัณฑิตพัดทอง", ti: 4, category: "human",
       look: { sheet: "m3", tint: 0xd8c48a, size: 1.05 },
       stats: { DEX: 18, AGI: 16, STR: 12, POW: 14 },
-      skillIds: ["nf8", "nd2", "pn", "hs_purple_cloud"], artId: "poison", artLevel: 7 },
+      skillIds: ["nf8", "nd2", "pn", "hs_purple_cloud"], artId: "np", artLevel: 7 },
   ],
   chapters: [
     {

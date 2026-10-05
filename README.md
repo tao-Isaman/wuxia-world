@@ -45,7 +45,7 @@ What each suite covers and how to run e2e: [docs/testing.md](docs/testing.md). E
 | **Story sagas** | 38 sagas of 8–10 chapters, one per tier-4 sect skill or art, retelling legends of มังกรหยก ภาค 3 (304 cutscenes in all, with the main story's) played on the painted maps |
 | **Sects** | 20 sect grounds; 15 are joinable, each with an intro quest, a rank ladder (rank-ups pay gold and open the sect's lineage quests), repeatable sect quests, and hunters for betrayers |
 | **Combat** | turn-based tactics on a 10 × 7 board, up to 15 × 10 for big gangs. Per-unit turn order by speed; move and cast with ranges and areas; enemy packs; retreat; auto-play |
-| **Martial arts** | 178 move skills and 122 inner arts in tiers 0–4 (three tier-5 arts). Levels 1–10, weapon mastery, type conflict; 76 pieces of gear |
+| **Martial arts** | 173 move skills and 111 inner arts in tiers 0–4 (three tier-5 arts). Levels 1–10, weapon mastery, type conflict; 76 pieces of gear |
 | **Life** | 19 life skills, 25 gathering nodes, 49 artisans with 32 recipes, 19 shops, 7 city halls, 126 items |
 | **Danger** | random encounters while walking, scaled to your progress; stealing, assassination and kidnapping; wanted marks, law pursuers and a jail map |
 | **Rumors** | inns carry news of the masters' deeds, the hero's own echoes, and old lore |

@@ -178,7 +178,7 @@ const EXECUTION_SWORD: StoryArcSpec = {
     { id: "st_jinyiwei_eunuch_liang", name: "ขันทีใหญ่เหลียง", ti: 4, category: "human",
       look: { sheet: "elder", tint: 0x9a8fa8, size: 1.05 },
       stats: { DEX: 18, AGI: 16, INT: 14, VIT: 12 },
-      skillIds: ["xx_palm", "nd9", "pn", "nf7"], artId: "poison", artLevel: 7 },
+      skillIds: ["xx_palm", "nd9", "pn", "nf7"], artId: "np", artLevel: 7 },
   ],
   chapters: [
     {
@@ -734,7 +734,7 @@ const EXECUTION_BLADE: StoryArcSpec = {
     { id: "st_jinyiwei_helian", name: "ขุนดาบเฮ่อเหลียนป้า", ti: 4, category: "human",
       look: { sheet: "m4", tint: 0x8a8a8a, size: 1.2 },
       stats: { STR: 20, VIT: 16, DEX: 12, AGI: 10 },
-      skillIds: ["ng5", "nu1", "jy_blade_king", "jy_grapple"], artId: "military", artLevel: 7 },
+      skillIds: ["ng5", "jy_blade_king", "jy_grapple"], artId: "military", artLevel: 7 },
   ],
   chapters: [
     {

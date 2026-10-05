@@ -277,12 +277,8 @@ export function calcSkillDamage(
   for (const b of ast.buffs) if (b.t === "buff_iatk") iatkBuff += b.v;
 
   let im = 1 + iatkBuff / 100;
-  let ab = 1;
+  const ab = 1;
   if (aid === "taiji" && sk.at === "int") im = (1 + iatkBuff / 100) * 1.12;
-  if (aid === "scholar" && sk.at === "int") {
-    im = 1 + iatkBuff / 100;
-    ab = 1.10;
-  }
 
   // Stack ATK + equipment %ATK
   // debuff_atk on attacker reduces the multiplier (clamped ≥ 0).

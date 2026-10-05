@@ -16,7 +16,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Explores 101 places (100 painted maps) joined by 129 roads.
 - Meets 225 NPCs and takes 882 quests: a 15-chapter main story (เนื้อเรื่องหลัก), 373 hand-written, 154 sect lineage quests and 38 story sagas (340 chapters); 304 cutscenes.
 - Lives in the 3rd year of Jianwen (1401), about 40 years after มังกรหยก ภาค 3: the court's seized scriptures have just scattered back into the jianghu ([docs/story-writing.md](docs/story-writing.md#timeline-and-novel-characters)).
-- Joins one of 15 sects and learns 178 move skills and 122 inner arts.
+- Joins one of 15 sects and learns 173 move skills and 111 inner arts.
 - Gathers and crafts (19 life skills).
 - Steals and gets jailed.
 - Fights **turn-based tactics on a 10 × 7 to 15 × 10 board**.
@@ -165,7 +165,7 @@ Two deliberate exceptions reach into stores:
   - `ArtPassiveEffect`, `EquipEffect`, 14 art-active types;
   - `SkillType` (yin / yang / balance / hard / soft / internal / external);
   - `SKILL_SLOT_COUNT = 10`.
-- **Data tables** (`data/`): `TIERS`, `STAT_KEYS`, weapon families, `SECT_ORDER` / `JIANGHU_SECT` (`sects.ts`), `SKILLS` (178, incl. `bst_*` beast moves), `ARTS` (122 + the `none` placeholder; T5: `khbt`, `kuyt`, `kgim`), `EQUIPMENT` (76).
+- **Data tables** (`data/`): `TIERS`, `STAT_KEYS`, weapon families, `SECT_ORDER` / `JIANGHU_SECT` (`sects.ts`), `SKILLS` (173, incl. `bst_*` beast moves), `ARTS` (111 + the `none` placeholder; T5: `khbt`, `kuyt`, `kgim`), `EQUIPMENT` (76).
 - **Stats.** `derive.ts` (`derive`, `combinedStats`, `deriveAll`, `getMasteryMap`).
   - `combinedStats` merges base + arts + slotted / learned skills with conflict and level scaling.
   - Equipment is **not** in `combinedStats`; `deriveAll` adds it.
@@ -188,7 +188,7 @@ Two deliberate exceptions reach into stores:
 - **The grid** (`lib/game/grid/`) is the live battle system (board 10 × 7 up to 15 × 10 by unit count, `boardSizeFor`; packs up to 6, `MAX_PACK_SIZE`):
   - `engine.ts` handles per-unit gauges, move → act / wait / flee, and packs;
   - `duel.ts` reuses `battle.ts` per target;
-  - `skill-grid.ts` has range and area profiles plus 18 overrides;
+  - `skill-grid.ts` has range and area profiles plus 14 overrides;
   - `ai.ts` has `planTurn`.
   - Move range is `clamp(3 + floor(Spd/80), 3, 6)`. Buffs and cooldowns tick on the owner's turn.
   - Retreat odds are `fleeChance` (`combat-actions.ts`), 20–90 %.

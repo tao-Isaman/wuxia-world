@@ -50,7 +50,7 @@ Places library assets on the 100 painted maps and saves `public/assets/placement
 
 `components/engine/skill-text-editor.tsx`; pure helpers in `lib/engine/text-edit.ts`.
 
-- A table of all 178 skills and 122 arts (not the `none` placeholder), filtered by kind, sect (`sc`), tier (`ti`), weapon family (`w`, skills only), text, edited only, problems only.
+- A table of all 173 skills and 111 arts (not the `none` placeholder), filtered by kind, sect (`sc`), tier (`ti`), weapon family (`w`, skills only), text, edited only, problems only.
 - Only the **name** (`n`) and **description** (`d`) are editable. Numbers are shown read-only in short Thai (`skillNumbers`, `artNumbers`). Arts have no description in the table; one set here shows on the art card, the skills window and the sect hall.
 - The preview is the game's own card (`SkillCard` / `ArtCard` from `components/world/skill-tooltip.tsx`), updated as you type.
 - **Validation** (`validateTextRows`): a name must not be empty, longer than 32 characters (`NAME_MAX`) or the same as another move of its kind (an error when an edit causes it; the table's own `เงาสังหาร` pair is a warning); a description may be at most 140 characters (`DESC_MAX`). A warning comes when a quest that teaches the move names it in its name, summary or description — the game's rule is that quests say วิชาลึกลับ, and `test:story` fails on it ([story-quests.md](story-quests.md)). The detail panel also lists every quest whose text mentions the name (`questsMentioning`; the quest index loads lazily from `lib/engine/quest-text.ts`). Saving is blocked while there are errors.

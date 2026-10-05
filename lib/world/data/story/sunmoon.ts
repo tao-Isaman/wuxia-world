@@ -159,7 +159,7 @@ const QIANKUN: StoryArcSpec = {
     { id: "st_sunmoon_forced_ninth", name: "ฉีเหยียนผู้ฝืนขั้นเก้า", ti: 4, category: "human",
       look: { sheet: "feng", tint: 0xe8e8e8, size: 1.1 },
       stats: { POW: 20, INT: 16, VIT: 12, AGI: 10 },
-      skillIds: ["mi_firepalm", "nu2", "nf5", "ng4"], artId: "heaven", artLevel: 7 },
+      skillIds: ["mi_firepalm", "nu2", "nf5", "lmsj"], artId: "qiankun", artLevel: 7 },
   ],
   chapters: [
     {
@@ -730,7 +730,7 @@ const YXHD: StoryArcSpec = {
     { id: "st_sunmoon_radiant_envoy", name: "ทูตจันทร์ฉาย", ti: 4, category: "human",
       look: { sheet: "qing", tint: 0xe8dcc0, size: 1.1 },
       stats: { AGI: 20, DEX: 16, POW: 12, LUK: 10 },
-      skillIds: ["nf7", "ne6", "nf8", "ne11"], artId: "sand", artLevel: 7 },
+      skillIds: ["nf7", "ne6", "nf8", "ne11"], artId: "t4_tang_skycleaver", artLevel: 7 },
   ],
   chapters: [
     {

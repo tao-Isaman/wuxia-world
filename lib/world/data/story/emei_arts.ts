@@ -673,7 +673,7 @@ const ASCETIC: StoryArcSpec = {
     { id: "st_emeiarts_white_bone", name: "ซูอวิ๋นหัตถ์กระดูกขาว", ti: 4, category: "human",
       look: { sheet: "f3", tint: 0xe6ecf5, size: 1.05 },
       stats: { DEX: 18, INT: 16, AGI: 14, POW: 10 },
-      skillIds: ["ne11", "ne7", "nd10", "jy_grapple"], artId: "taiyin", artLevel: 8 },
+      skillIds: ["ne11", "ne7", "nd10", "jy_grapple"], artId: "t4_em_bodhi", artLevel: 8 },
   ],
   chapters: [
     // ── 1 ──

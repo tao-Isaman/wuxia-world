@@ -2,9 +2,9 @@
 
 # Martial arts and equipment
 
-178 move skills (`lib/game/data/skills.ts`), 122 inner arts (`lib/game/data/arts.ts`, not counting the `none` placeholder) and 76 pieces of equipment (`lib/game/data/equipment.ts`).
+173 move skills (`lib/game/data/skills.ts`), 111 inner arts (`lib/game/data/arts.ts`, not counting the `none` placeholder) and 76 pieces of equipment (`lib/game/data/equipment.ts`).
 
-Move skills per tier: T0 พื้นฐาน: 32 · T1 ขั้นกลาง: 37 · T2 ขั้นสูง: 42 · T3 ลับ: 41 · T4 เฉพาะ: 26.
+Move skills per tier: T0 พื้นฐาน: 32 · T1 ขั้นกลาง: 37 · T2 ขั้นสูง: 42 · T3 ลับ: 41 · T4 เฉพาะ: 21.
 
 Grid column: the skill's range and area on the tactics board (`skillGrid` / `artGrid` + `describeGrid` in `lib/game/grid/skill-grid.ts`). Weapon families: `fist` หมัด/ฝ่ามือ · `long` อาวุธยาว · `sword` กระบี่ · `blade` ดาบ · `short` อาวุธสั้น · `hidden` อาวุธลับ · `music` เครื่องดนตรี.
 
@@ -207,7 +207,7 @@ Grid column: the skill's range and area on the tactics board (`skillGrid` / `art
 | `tang_starrain` | ดาราพิรุณโปรย | T4 เฉพาะ | hidden | physical | 90 | 15 | ระยะ 2–4 · วงรัศมี 2 | yin, external |
 | `tang_heartpierce` | มีดสั้นทะลวงใจ | T4 เฉพาะ | short | physical | 100 | 1 | ระยะ 1 · เป้าเดียว | external |
 
-### ยุทธจักร (77)
+### ยุทธจักร (72)
 
 | Id | Name | Tier | Weapon | Attack | bp | Hits | Grid | Types |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -279,15 +279,10 @@ Grid column: the skill's range and area on the tactics board (`skillGrid` / `art
 | `nf7` | แส้เก้าหัว | T3 ลับ | hidden | physical | 75 | 9 | ระยะ 1–3 · ฟันกวาด 3 ช่อง | soft |
 | `nf8` | พัดเพลิงสวรรค์ | T3 ลับ | short | internal | 70 | 1 | ระยะ 1–2 · เป้าเดียว | yang, internal |
 | `lmsj` | กระบี่ 6 ชีพจร | T4 เฉพาะ | fist | internal | 100 | 6 | ระยะ 1–4 · เป้าเดียว | yang, internal |
-| `ft` | ขลุ่ยสะท้านฟ้า | T4 เฉพาะ | music | internal | 75 | 1 | ระยะ 2–4 · วงรัศมี 2 | yin, internal |
-| `nu1` | มังกรฟ้า | T4 เฉพาะ | blade | internal | 90 | 1 | แนวตรง 4 ช่อง | yang, internal |
 | `nu2` | หมัดสะท้านจักรวาล | T4 เฉพาะ | fist | physical | 95 | 1 | ระยะ 1–2 · วงรัศมี 1 | yang, external |
-| `ng1` | เก้าฟ้าหนึ่งกระบี่ | T4 เฉพาะ | sword | internal | 88 | 1 | แนวตรง 4 ช่อง | yang, internal |
 | `ng2` | ทวนประจักษ์พยาน | T4 เฉพาะ | long | physical | 98 | 1 | แนวตรง 4 ช่อง | yang, hard |
 | `dgjj` | เก้ากระบี่เดียวดาย | T4 เฉพาะ | sword | physical | 90 | 9 | ระยะ 1 · เป้าเดียว | yang |
-| `ng4` | หมัดพระอินทร์ | T4 เฉพาะ | fist | internal | 85 | 1 | ระยะ 1–3 · กากบาท 1 | yang, internal |
 | `ng5` | ดาบยาวเทพสังหาร | T4 เฉพาะ | blade | physical | 100 | 1 | ระยะ 1 · พื้นที่ 3×3 | yang, hard |
-| `ng6` | ขลุ่ยพลิกโลก | T4 เฉพาะ | music | internal | 82 | 1 | ระยะ 2–5 · วงรัศมี 2 | yin, internal |
 
 ## Inner arts by sect
 
@@ -472,7 +467,7 @@ Grid column: the skill's range and area on the tactics board (`skillGrid` / `art
 | `t4_tang_tenkpoisons` | พลังถังหมื่นพิษ | T4 เฉพาะ | หมื่นพิษ (atk_phy_pen, 32 MP, cd 4) | ระยะ 1–2 · เป้าเดียว | use_act 100% → stack_atk | 35 / 35 | yin, external |
 | `t4_tang_skycleaver` | พลังกรัดฟ้า | T4 เฉพาะ | กรัดฟ้า (atk_phy_pen, 35 MP, cd 4) | ระยะ 1–2 · เป้าเดียว | on_crit 100% → stack_atk | 40 / 30 | balance, external |
 
-### ยุทธจักร (31)
+### ยุทธจักร (20)
 
 | Id | Name | Tier | Active | Grid | Passive | HP/MP per level | Types |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -491,19 +486,8 @@ Grid column: the skill's range and area on the tactics board (`skillGrid` / `art
 | `t3_dragonelephant` | มังกร-ช้างปัญญา | T3 ลับ | ช้างเหยียบจักรวาล (atk_phy_pen, 35 MP, cd 4) | ระยะ 1–2 · เป้าเดียว | hit_recv 30% → heal_pct | 40 / 20 | yang, hard |
 | `t3_heartmind` | วิชากลใจเป็นจิต | T3 ลับ | ส่องใจ (debuff_acc_dmg, 30 MP, cd 3) | ระยะ 1–3 · วงรัศมี 1 | use_int 100% → mult_iatk | 20 / 40 | internal |
 | `t3_voidstep` | ก้าวว่างไร้รอย | T3 ลับ | พลิกฟ้าหายตัว (buff_eva_debuff_eva, 25 MP, cd 3) | ตนเอง | on_crit 100% → buff_eva | 30 / 30 | soft, external |
-| `military` | จวินเจิ้นชี่ | T4 เฉพาะ | สามก้าวสังหาร (atk_phy_pen, 30 MP, cd 4) | ระยะ 1–2 · เป้าเดียว | on_crit 100% → debuff_eva | 40 / 30 | yang, external |
-| `lotus` | เหลียนฮวาชี่ | T4 เฉพาะ | นิพพานบัว (heal_cleanse, 30 MP, cd 3) | ตนเอง | hit_recv 20% → heal_pct | 35 / 35 | soft |
-| `scholar` | เหวินชี่ | T4 เฉพาะ | คีตาอาคม (debuff_acc_dmg, 30 MP, cd 3) | ระยะ 1–3 · วงรัศมี 1 | use_int 100% → mult_atk | 25 / 45 | internal |
-| `poison` | อินตู๋ชี่ | T4 เฉพาะ | พิษสะสม (debuff_poison, 35 MP, cd 3) | ระยะ 1–3 · วงรัศมี 1 | on_crit 100% → debuff_acc | 15 / 55 | yin, soft |
-| `heaven` | เฉียนคุนต้าฝ่า | T4 เฉพาะ | กลืนฟ้าดิน (drain, 40 MP, cd 4) | ระยะ 1–3 · วงรัศมี 1 | use_act 100% → stack_atk | 15 / 55 | internal |
-| `snow` | กำแพงหิมะ | T4 เฉพาะ | กำแพงน้ำแข็ง (buff_reduce, 20 MP, cd 3) | ตนเอง | hit_recv 25% → debuff_acc | 50 / 20 | yin, hard |
-| `fire` | เพลิงสวรรค์ | T4 เฉพาะ | เพลิงฟ้า (atk_int_pen, 35 MP, cd 4) | ระยะ 1–3 · วงรัศมี 1 | use_int 50% → debuff_def | 30 / 40 | yang, internal |
-| `sand` | พายุทราย | T4 เฉพาะ | พายุทราย (buff_eva_debuff_eva, 25 MP, cd 3) | ตนเอง | on_crit 100% → debuff_acc | 35 / 35 | external |
-| `shadow` | เงาสังหาร | T4 เฉพาะ | ตีจุดมรณะ (drain_acc, 35 MP, cd 4) | ระยะ 1–3 · วงรัศมี 1 | on_crit 100% → debuff_def | 20 / 50 | yin, external |
-| `shenzhao` | เซินจ้าวจิง | T4 เฉพาะ | ดวงตาจิต (debuff_acc_dmg, 30 MP, cd 3) | ระยะ 1–3 · วงรัศมี 1 | use_int 100% → mult_atk | 20 / 50 | internal |
-| `taiyin` | ไต้อินเจิ้นชี่ | T4 เฉพาะ | มรณะเย็น (debuff_poison, 40 MP, cd 4) | ระยะ 1–3 · วงรัศมี 1 | on_crit 100% → debuff_acc | 10 / 60 | yin, soft |
-| `huoxue` | ฮั่วเสวียสินฝ่า | T4 เฉพาะ | โลหิตรักษา (heal, 25 MP, cd 3) | ตนเอง | hit_recv 20% → heal_pct | 50 / 20 | internal |
-| `dongxuan` | ตงซวนเซินกง | T4 เฉพาะ | กลืนชีพ (drain, 40 MP, cd 4) | ระยะ 1–3 · วงรัศมี 1 | use_act 100% → stack_atk | 15 / 55 | yin, internal |
+| `military` | เคล็ดวิชาภูผาทะลายทัพ | T4 เฉพาะ | สามก้าวสังหาร (atk_phy_pen, 30 MP, cd 4) | ระยะ 1–2 · เป้าเดียว | on_crit 100% → debuff_eva | 40 / 30 | yang, external |
+| `fire` | ตำราเพลิงสวรรค์ | T4 เฉพาะ | เพลิงฟ้า (atk_int_pen, 35 MP, cd 4) | ระยะ 1–3 · วงรัศมี 1 | use_int 50% → debuff_def | 30 / 40 | yang, internal |
 | `khbt` | คัมภีร์ทานตะวัน | T5 ปรมัตถ์ | ทานตะวันพลิกฟ้า (buff_spd, 60 MP, cd 6) | ตนเอง | on_crit 100% → buff_spd_cri | 30 / 50 | balance, soft |
 | `kuyt` | วิชาเก้าเอี้ยง | T5 ปรมัตถ์ | ฟื้นพลังเก้าเอี้ยง (heal_full_cleanse, 50 MP, cd 6) | ตนเอง | hit_recv 100% → buff_reflect | 40 / 40 | balance, internal |
 | `kgim` | คัมภีร์เก้าอิม | T5 ปรมัตถ์ | กรงเล็บกระดูกขาวเก้าอิม (atk_int_pen, 55 MP, cd 5) | ระยะ 1–3 · วงรัศมี 1 | use_int 100% → debuff_def | 20 / 60 | yin, internal |

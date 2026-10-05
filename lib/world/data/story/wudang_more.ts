@@ -56,7 +56,7 @@ const HEAVEN_SWORD: StoryArcSpec = {
     { id: "st_wudang_hundred_swords", name: "ไป่เจี้ยน ผู้สะสมกระบี่ร้อยเล่ม", ti: 4, category: "human",
       look: { sheet: "m3", tint: 0x6b7280, size: 1.1 },
       stats: { DEX: 18, AGI: 16, STR: 14, VIT: 12 },
-      skillIds: ["ng1", "dgjj", "hs_purple_cloud", "nh2"], artId: "t4_huashan_purple", artLevel: 7 },
+      skillIds: ["dgjj", "hs_purple_cloud", "nh2"], artId: "t4_huashan_purple", artLevel: 7 },
   ],
   chapters: [
     // ── 1 ──
@@ -665,7 +665,7 @@ const TAIJI_ART: StoryArcSpec = {
     { id: "st_wudang_pure_white_blade", name: "ฉุนเจิ้ง กระบี่ขาวบริสุทธิ์", ti: 4, category: "human",
       look: { sheet: "m4", tint: 0xf2efe6, size: 1.1 },
       stats: { DEX: 17, INT: 15, VIT: 14, AGI: 12 },
-      skillIds: ["tsh_sun_pierce", "ssh_song_pillar", "nf2", "ng1"], artId: "military", artLevel: 7 },
+      skillIds: ["tsh_sun_pierce", "ssh_song_pillar", "nf2", "dgjj"], artId: "military", artLevel: 7 },
   ],
   chapters: [
     // ── 1 ──
@@ -1217,7 +1217,7 @@ const ZIXIA_ART: StoryArcSpec = {
     { id: "st_wudang_silver_tongue", name: "ซือหม่าเหยียน ลิ้นเงิน", ti: 4, category: "human",
       look: { sheet: "merchant", tint: 0xb59ad6, size: 1.05 },
       stats: { AGI: 18, INT: 16, DEX: 14, LUK: 12 },
-      skillIds: ["nf8", "nf4", "xx_palm", "nf7"], artId: "poison", artLevel: 7 },
+      skillIds: ["nf8", "nf4", "xx_palm", "nf7"], artId: "np", artLevel: 7 },
   ],
   chapters: [
     // ── 1 ──

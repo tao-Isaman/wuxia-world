@@ -749,7 +749,7 @@ const HEART_PIERCE: StoryArcSpec = {
     { id: "st_tang_heartless_liang", name: "หมอไร้ใจเหลียงอู๋ซิน", ti: 4, category: "human",
       look: { sheet: "merchant", tint: 0x6b8e5a, size: 1.1 },
       stats: { DEX: 16, STR: 12, VIT: 12, AGI: 12, LUK: 8 },
-      skillIds: ["tang_viperblade", "tang_poison_knife", "pn", "ne4"], artId: "poison", artLevel: 8 },
+      skillIds: ["tang_viperblade", "tang_poison_knife", "pn", "ne4"], artId: "np", artLevel: 8 },
   ],
   chapters: [
     {

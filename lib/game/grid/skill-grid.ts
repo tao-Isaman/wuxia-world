@@ -160,12 +160,6 @@ export const SKILL_GRID_OVERRIDES: Record<string, Partial<GridSkillProfile>> = {
   yyz: { range: { min: 1, max: 3 } },
   // หมัดสะท้านจักรวาล — universe-shaking fist: a shockwave around the impact.
   nu2: { range: { min: 1, max: 2 }, area: { kind: "diamond", size: 1 } },
-  // หมัดพระอินทร์ — Indra's fist: thunder crashes in a cross.
-  ng4: { range: { min: 1, max: 3 }, area: { kind: "cross", size: 1 } },
-  // เก้าฟ้าหนึ่งกระบี่ — one sword from the ninth heaven: a full-length beam.
-  ng1: { range: { min: 1, max: 4 }, area: { kind: "line", size: 4 } },
-  // มังกรฟ้า — heaven-dragon blade qi: a long beam.
-  nu1: { range: { min: 1, max: 4 }, area: { kind: "line", size: 4 } },
   // ดาบยาวเทพสังหาร — god-slaying long blade: a cleave that fills a 3×3.
   ng5: { range: { min: 1, max: 1 }, area: { kind: "square", size: 1 } },
   // กระบี่ทะลวงสุริยัน — sun-piercing thrust: a short line.
@@ -182,8 +176,6 @@ export const SKILL_GRID_OVERRIDES: Record<string, Partial<GridSkillProfile>> = {
   tang_meteorpierce: { range: { min: 1, max: 4 }, area: { kind: "line", size: 4 } },
   // ดาราพิรุณโปรย — a rain of stars: a wide diamond.
   tang_starrain: { range: { min: 2, max: 4 }, area: { kind: "diamond", size: 2 } },
-  // ขลุ่ยพลิกโลก — world-overturning flute: the widest, farthest song.
-  ng6: { range: { min: 2, max: 5 }, area: { kind: "diamond", size: 2 } },
   // คำรามขู่ — a beast's roar shakes everyone around the tile in front.
   bst_roar: { range: { min: 1, max: 1 }, area: { kind: "diamond", size: 1 } },
 };

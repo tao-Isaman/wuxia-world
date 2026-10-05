@@ -191,7 +191,7 @@ const DRAGON_PALMS: StoryArcSpec = {
     { id: "st_beggars_false_chief", name: "ตั้งกิมเหลียง หัวหน้าเก้าถุงครึ่ง", ti: 4, category: "human",
       look: { sheet: "bandit", tint: 0x9a8f6a, size: 1.12 },
       stats: { STR: 18, DEX: 14, VIT: 15, AGI: 10 },
-      skillIds: ["ng4", "ng3", "nu2", "bg_snake_fist"], artId: "diamond", artLevel: 6 },
+      skillIds: ["lmsj", "ng3", "nu2", "bg_snake_fist"], artId: "diamond", artLevel: 6 },
   ],
   chapters: [
     {

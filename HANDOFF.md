@@ -91,6 +91,8 @@ Not verified:
 
 ## Known issues
 
+- **Ten jianghu T4 / T5 moves have no way in yet.** `lmsj`, `dgjj`, `ng2`, `ng5`, `nu2` and the arts `military` (เคล็ดวิชาภูผาทะลายทัพ), `fire` (ตำราเพลิงสวรรค์), `khbt`, `kuyt`, `kgim` are kept for future quests; only `military` can come as the sword tournament prize (when เป่ยฉิว enters). `test:places` checks jianghu T0–T3 only.
+
 
 Real behaviour today, found during the docs audit. Each is small and self-contained unless noted.
 

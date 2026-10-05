@@ -1261,7 +1261,7 @@ const ART_BATCH: Record<string, IconRenderer> = {
     </g>
   ),
 
-  // 59. military จวินเจิ้นชี่ — military true-qi with helmet/banner
+  // 59. military เคล็ดวิชาภูผาทะลายทัพ — military true-qi with helmet/banner
   military: ({ ink, accent }) => (
     <g>
       {/* helmet */}
@@ -1424,7 +1424,7 @@ const ART_BATCH: Record<string, IconRenderer> = {
     </g>
   ),
 
-  // 65. fire เพลิงสวรรค์ — heaven fire with phoenix flame
+  // 65. fire ตำราเพลิงสวรรค์ — heaven fire with phoenix flame
   fire: ({ ink, accent }) => (
     <g>
       {/* phoenix-shaped flame */}
@@ -1758,13 +1758,13 @@ Object.assign(ART_ICON_RASTER, {
   t3_dragonelephant: "/icons/arts/t3_dragonelephant.png", // มังกร-ช้างปัญญา
   t3_heartmind: "/icons/arts/t3_heartmind.png", // วิชากลใจเป็นจิต
   t3_voidstep: "/icons/arts/t3_voidstep.png", // ก้าวว่างไร้รอย
-  military: "/icons/arts/military.png", // จวินเจิ้นชี่
+  military: "/icons/arts/military.png", // เคล็ดวิชาภูผาทะลายทัพ
   lotus: "/icons/arts/lotus.png", // เหลียนฮวาชี่
   scholar: "/icons/arts/scholar.png", // เหวินชี่
   poison: "/icons/arts/poison.png", // อินตู๋ชี่
   heaven: "/icons/arts/heaven.png", // เฉียนคุนต้าฝ่า
   snow: "/icons/arts/snow.png", // กำแพงหิมะ
-  fire: "/icons/arts/fire.png", // เพลิงสวรรค์
+  fire: "/icons/arts/fire.png", // ตำราเพลิงสวรรค์
   sand: "/icons/arts/sand.png", // พายุทราย
   shadow: "/icons/arts/shadow.png", // เงาสังหาร
   shenzhao: "/icons/arts/shenzhao.png", // เซินจ้าวจิง

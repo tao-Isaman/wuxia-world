@@ -101,10 +101,9 @@ function estimateSkill(u: GridUnit, foe: GridUnit, sk: Skill): Estimate {
   let iatk = 0;
   for (const b of u.status.buffs) if (b.t === "buff_iatk") iatk += b.v;
   let im = 1 + iatk / 100;
-  let ab = 1;
+  const ab = 1;
   const aid = ctx.artIds.A;
   if (aid === "taiji" && sk.at === "int") im *= 1.12;
-  if (aid === "scholar" && sk.at === "int") ab = 1.1;
   let atkDebuff = 0;
   for (const d of u.status.debuffs) if (d.t === "debuff_atk" && d.v != null) atkDebuff += d.v;
   const sm = Math.max(0, 1 + (u.status.stk * u.status.stkV) / 100 + ctx.equipBonus.A.pct_atk / 100 + atkDebuff / 100);

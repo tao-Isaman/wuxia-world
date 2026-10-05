@@ -396,7 +396,7 @@ Mastery levels 1–5 need 0 / 100 / 300 / 700 / 1500 xp.
 
 The 🥋 วิชา window: the 10 slots across the top; below, the **library** of everything learned on the left (icon and name, filter ทั้งหมด / ฝีมือ / ในกาย) and the picked move on the right — its numbers and xp, ติดตั้งลงช่อง (the targeted slot if empty, else the first free one, else แทนที่ the targeted slot), ถอดออก, เร่งด้วย w-exp and ลืมวิชา. Tap a slot to target it and show its move.
 
-Move skills (178) and inner arts (122) level from 1 to 10. A move skill's power, its stat bonuses and its weapon mastery grow with level; an art's bonuses scale by level / 10.
+Move skills (173) and inner arts (111) level from 1 to 10. A move skill's power, its stat bonuses and its weapon mastery grow with level; an art's bonuses scale by level / 10.
 
 | Xp to the next level | Formula | Tier 0, lv 1 → 2 | Tier 4, lv 9 → 10 |
 | --- | --- | --- | --- |

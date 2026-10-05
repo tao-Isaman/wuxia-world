@@ -44,7 +44,7 @@ const TENDON: StoryArcSpec = {
     { id: "st_shaolinarts_white_ape", name: "วานรขาวไป๋หยวน", ti: 4, category: "human",
       look: { sheet: "bandit", tint: 0xe8e4d8, size: 1.1 },
       stats: { AGI: 18, DEX: 16, STR: 14, VIT: 10 },
-      skillIds: ["ne7", "ne1", "jy_grapple", "nu2"], artId: "snow", artLevel: 6 },
+      skillIds: ["ne7", "ne1", "jy_grapple", "nu2"], artId: "t4_huashan_purple", artLevel: 6 },
   ],
   chapters: [
     {
@@ -1233,7 +1233,7 @@ const DEMON_SUBDUER: StoryArcSpec = {
     { id: "st_shaolinarts_whip_breaker", name: "หานเยี่ย ผู้ทำลายวงล้อม", ti: 4, category: "human",
       look: { sheet: "m3", tint: 0x6a4a7a, size: 1.1 },
       stats: { AGI: 18, DEX: 16, POW: 14, STR: 12 },
-      skillIds: ["nf7", "ne6", "nf4", "ch"], artId: "shadow", artLevel: 6 },
+      skillIds: ["nf7", "ne6", "nf4", "ch"], artId: "t4_tang_tenkpoisons", artLevel: 6 },
   ],
   chapters: [
     {
