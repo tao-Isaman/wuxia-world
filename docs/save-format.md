@@ -74,7 +74,7 @@ This is Zustand 5 `persist` over synchronous `localStorage`, so it all happens w
 
 1. Read `{ state, version }` from `wusia-world-v1`.
 2. If `version !== 24`, run `migrate(state, version)`.
-3. Run `merge(persisted, current)`: `{ ...current, ...persisted }`, then `seedLoreRumors` if a game exists.
+3. Run `merge(persisted, current)`: `{ ...current, ...persisted }`, then `seedLoreRumors` if a game exists, and back-fill `playerBuild.baseHp` (`HERO_BASE_HP`, also added to `currentHp`) for saves made before the hero's flat base HP.
 
    This step runs for current-version saves too; it is how new lore reaches old saves.
 4. Replace the store state with the result.

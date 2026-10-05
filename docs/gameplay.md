@@ -48,7 +48,7 @@ A new hero starts at home (`home_player`, คฤหาสน์ตนเอง) 
 | | Start |
 | --- | --- |
 | Stats | 1 in each of the eight |
-| HP / MP | 36 / 10 |
+| HP / MP | 136 / 10 (100 of it the hero's flat base HP, so a ขโมยน้อย needs 6–7 hits, not 2) |
 | Stamina | 100 / 100 (the maximum never grows) |
 | Gold, w-exp | 0 |
 | Move skills | หมัดตรง (`basic_punch`), level 1, in slot 1 |

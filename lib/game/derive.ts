@@ -314,6 +314,8 @@ export function deriveAll(build: CharacterBuild): Derived {
     d.MP += Math.floor(art.mL * lv * f);
   }
 
+  d.HP += build.baseHp ?? 0;
+
   // Equipment + meridian combat fields.
   const eb = getBuildBonus(build);
   d.Atk += eb.atk;

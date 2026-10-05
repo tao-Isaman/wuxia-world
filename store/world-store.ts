@@ -97,8 +97,13 @@ import {
 // This is the world's standalone player template — completely independent
 // of the /debug setup-tab character. Future progression mutates this build
 // in the world store, not in character-store.
+// Flat max HP the world hero starts with (CharacterBuild.baseHp): stats of 1
+// give only 33 HP, two hits from a ขโมยน้อย. Back-filled on load.
+export const HERO_BASE_HP = 100;
+
 const STARTER_BUILD = (): CharacterBuild => ({
   name: "ผู้กล้า",
+  baseHp: HERO_BASE_HP,
   stats: { STR: 1, AGI: 1, POW: 1, VIT: 1, DEX: 1, LUK: 1, DEF: 1, INT: 1 },
   artId: "none",
   artLevel: 1,
@@ -3136,6 +3141,10 @@ export const useWorldStore = create<WorldStore>()(
       merge: (persisted, current) => {
         const merged = { ...current, ...(persisted as Partial<WorldStateData>) };
         if (merged.hasGame) seedLoreRumors(merged);
+        if (merged.playerBuild && merged.playerBuild.baseHp === undefined) {
+          merged.playerBuild = { ...merged.playerBuild, baseHp: HERO_BASE_HP };
+          if (typeof merged.currentHp === "number") merged.currentHp += HERO_BASE_HP;
+        }
         return merged;
       },
       // Only persist the data fields, not the action functions.
