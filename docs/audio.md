@@ -117,6 +117,7 @@ It also plays cues when the store changes:
 | gold goes up | `coin` |
 | stamina rises by 20 or more | `rest` |
 | the scene changes to a non-dialog | `step` |
+| a dialog or cutscene line types out | `chalkTick` — chalk strokes on a board (gritty noise grains, 2.5–7 kHz), self-throttled to a writing rhythm; silent with instant text or reduced motion |
 | any enabled button is clicked | `open` in the icon bar, `tap` elsewhere |
 
 ## Skill sounds
@@ -135,6 +136,7 @@ It also plays cues when the store changes:
 | wave | a zither sweep |
 | art | a qi orb |
 
+- **Every landed hit** goes through `punch(at, vel, crunch)` (`lib/audio/engine.ts`): a sub-bass drop (110 → 38 Hz), a driven low-pass noise smack, a 15 ms high crack, and on a critical a bone crunch of four tight clicks. Fists and palms (impact) hit hardest and add a second smack on the follow-through.
 - **Rarity** adds weight: tier 1+ gathers qi during the wind-up, tier 2+ adds layers, tier 3 a bell chime, tier 4 a gong swell.
 - **Element accents** follow the skill's effects: fire crackle, thunder, poison bubbles, frost bells, and so on.
 

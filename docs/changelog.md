@@ -6,6 +6,11 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-05
 
+### Chalk-written lines and heavier blows
+
+- **Dialog and cutscene lines are written in chalk**: while a line types out, a gritty chalk-on-board stroke plays at a hand-writing rhythm (`chalkTick`).
+- **Skill hits land like real blows**: every hit plays `punch` (sub-bass boom, driven body smack, contact crack; crits add a bone crunch) instead of the old soft thump. Fists and palms hit hardest.
+
 ### A tougher new hero
 
 - **The world hero has a flat 100 base HP** (`CharacterBuild.baseHp`, `HERO_BASE_HP`, added by `deriveAll`): a new hero starts at 136 HP instead of 36, so a ขโมยน้อย (about 20 a hit) needs 6–7 hits, not 2. Foes and /debug builds don't get it. Older saves are back-filled on load (and their current HP raised by the same 100); no save version bump.

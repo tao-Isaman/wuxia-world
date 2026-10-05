@@ -8,6 +8,7 @@ import { CharacterPreview } from "@/components/game/character-preview";
 import { npcCharacterId } from "@/lib/characters/catalog";
 import { DialogDisplay, useHeroNamer } from "./dialog-display";
 import { visibleLength } from "./rich-text";
+import { chalkTick } from "@/lib/audio/engine";
 import { ChoicePanel } from "./choice-panel";
 import { CutscenePlayer } from "./cutscene-player";
 import type { SceneLine } from "@/lib/world";
@@ -59,6 +60,7 @@ export function DialogStage({ scene, speaker, title, locationName }: {
   const showChoices = instant || lines.length === 0 || (lastBeat && !typing);
   useEffect(() => {
     if (!typing) return;
+    chalkTick(); // the line is written out in chalk (self-throttled)
     const timer = setTimeout(() => setShown((n) => Math.min(full, n + TYPE_STEP)), TYPE_MS);
     return () => clearTimeout(timer);
   }, [typing, shown, full]);
