@@ -25,7 +25,7 @@ The wave-by-wave history that used to live in this file has moved to [docs/chang
 A Thai wuxia RPG in the browser: Next.js 15, React 19, TypeScript, Phaser 4, Zustand.
 
 - **Exploring.** The hero walks painted maps: 101 places, 129 roads; villages, towns and homes have their own people and activities; foes turn up on the map as the hero walks.
-- **Doing.** They talk to 225 NPCs (and give them gifts), take 867 quests (154 sect lineage quests and 38 story sagas among them), join one of 15 sects, gather, craft, steal, and land in jail.
+- **Doing.** They talk to 225 NPCs (and give them gifts), take 882 quests (a 15-chapter main story, 154 sect lineage quests and 38 story sagas among them), join one of 15 sects, gather, craft, steal, and land in jail.
 - **Fighting.** Battles are turn-based tactics on a 10 × 7 board that grows to 15 × 10 for big gangs (up to 6 pack members plus the leader).
 - **Code.** Two pure engines (`lib/game`, `lib/world`) sit under Zustand stores and React / Phaser views. The world saves to `localStorage` (version 23).
 
@@ -49,7 +49,7 @@ Deploys are implied to be on Vercel (`VERCEL_GIT_COMMIT_SHA` sets the service-wo
 
 ## Verified state
 
-Checked on 2026-10-04 for the story timeline (NPC renames, sagas reworded to 20 years after มังกรหยก ภาค 3), the road fixes (the way back after a fight, the guide arrow turning back), item icons (every item, scroll and equipment piece shows a library icon), the PixelLab asset library (3,194 assets + 464 kit pieces: roads, city walls, house walls, fences that join on a grid), the engine at `/game/engine` (asset library, map editor, skill / art text overrides) and objects placed on maps:
+Checked on 2026-10-05 for the 1401 timeline and lore (sagas re-timed, the court's seized scriptures, the 15-chapter main story), the story timeline (NPC renames), the road fixes (the way back after a fight, the guide arrow turning back), item icons (every item, scroll and equipment piece shows a library icon), the PixelLab asset library (3,194 assets + 464 kit pieces: roads, city walls, house walls, fences that join on a grid), the engine at `/game/engine` (asset library, map editor, skill / art text overrides) and objects placed on maps:
 
 | Check | Result |
 | --- | --- |
@@ -73,20 +73,20 @@ Checked on 2026-10-04 for the story timeline (NPC renames, sagas reworded to 20 
 | `test:npcs` | 14 checks pass |
 | `test:places` | 11 checks pass: 68 new NPCs (35 wander), 97 place quests; all 72 ยุทธจักร T0–T3 moves and arts are quest rewards |
 | `test:routes` | 10 checks pass: 255 exits on 98 maps (243 within 45° of their bearing), 258 roads on 54 of the 56 paintings, 253/256 arrivals on the side the road came from |
-| `test:story` | 10 checks pass (incl. decline / drop, secret trials, scroll hand-over and no move named in quest text): 154 lineage quests, 38 sagas (340 chapters), 292 cutscenes; every quest and chapter plays through in the real store |
-| `test:quests` | the campaign audit passes (867 quests, 101 reachable locations); 439 item / kill / objective quests hand in through the real store; guidance covers 2358 of 2382 stages; all 39 steal / assassinate / kidnap stages offer the action and advance |
+| `test:story` | 12 checks pass (incl. the main story: 15 chapters, 12 films, offered on a new game, played through) (incl. decline / drop, secret trials, scroll hand-over and no move named in quest text): 154 lineage quests, 38 sagas (340 chapters), the main story (15), 304 cutscenes; every quest and chapter plays through in the real store |
+| `test:quests` | the campaign audit passes (882 quests, 101 reachable locations); 439 item / kill / objective quests hand in through the real store; guidance covers 2358 of 2382 stages; all 39 steal / assassinate / kidnap stages offer the action and advance |
 | `test:systems` | 20 checks pass |
 | `test:engine` | 12 checks pass: text overrides, the engine's draft / validation / filters / edits, the save route's whitelist |
 | `test:assets` | passes: 3,658 approved assets — 464 kit pieces in 28 sets, plus (224 buildings, 966 props, 305 sect pieces, 359 nature, 480 tiles, 417 icons, 225 NPC characters and 120 monsters in 8 directions, 60 fx, 38 ui), every file present at its stated size, footprints inside the drawn image; 27 MB under `public/assets/` |
 | `test:docs` | the generated reference is current; every link, repo path and command in the docs resolves |
-| `bun scripts/audit-content.ts` | 225 NPCs · 867 quests · 3038 scenes, all references resolve |
+| `bun scripts/audit-content.ts` | 225 NPCs · 882 quests · 3048 scenes, all references resolve |
 | `bun run build` | passes; `/` first-load JS 1.12 MB (was 508 kB before the sagas; the saga text is about 2.9 MB of source, ~500 kB gzipped) |
 | `bun run test:e2e` | all 45 Playwright tests pass against the production build (11.9 minutes, Chromium 141 via the container shim), including the map editor and its kit brush on `/game/engine` |
 
 Not verified:
 
 - **Browsers.** Only Chromium has run the browser tests, and only with emulated phone viewports, never physical phones.
-- **Quests by hand.** No one has played all 867 quests by hand; the quest audits and `test:story` stand in. The 38 sagas' writing has been checked by the validator, not proofread line by line.
+- **Quests by hand.** No one has played all 882 quests by hand; the quest audits and `test:story` stand in. The 38 sagas' writing has been checked by the validator, not proofread line by line.
 - **Balance.** No systematic balance pass has been done since the grid battle.
 
 ## Known issues

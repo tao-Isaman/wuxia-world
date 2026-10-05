@@ -14,7 +14,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **What the player does:**
 
 - Explores 101 places (100 painted maps) joined by 129 roads.
-- Meets 225 NPCs and takes 867 quests: 373 hand-written, 154 sect lineage quests and 38 story sagas (340 chapters) with 292 cutscenes.
+- Meets 225 NPCs and takes 882 quests: a 15-chapter main story (เนื้อเรื่องหลัก), 373 hand-written, 154 sect lineage quests and 38 story sagas (340 chapters); 304 cutscenes.
+- Lives in the 3rd year of Jianwen (1401), about 40 years after มังกรหยก ภาค 3: the court's seized scriptures have just scattered back into the jianghu ([docs/story-writing.md](docs/story-writing.md#timeline-and-novel-characters)).
 - Joins one of 15 sects and learns 178 move skills and 122 inner arts.
 - Gathers and crafts (19 life skills).
 - Steals and gets jailed.
@@ -236,6 +237,7 @@ Two deliberate exceptions reach into stores:
 
   Rumors stay in their region and fade: news 20 days (big 40), 15 days once heard (`fadeHeardRumor`), flavour lore by day 60. See [docs/liveness.md](docs/liveness.md).
 - **Lineage quests and sagas** (`lib/world/story/`, content in `lib/world/data/story/`). Compact specs compile into quests, dialogs and cutscenes ([docs/story-quests.md](docs/story-quests.md)).
+  - **The main story** (`data/story/main.ts`, a `MainArcSpec`): 15 chained chapters `st_main_<nn>` (type `main`, no move at the end), offered by ป้าหลิว at home from the first moment of a new game; 12 films tell the age and the hero's father.
   - Every sect T0–T3 skill / art has one lineage quest `ql_<skill|art>_<id>` (type `side`, `lineage`), gated and sized by tier (`LINEAGE_TIERS`).
   - Every sect T4 is the reward of a saga: 8–10 chapters `st_<arcId>_<nn>` (type `story`), chained on the previous chapter, with films (`DialogScene.cutscene`) and paged dialogs (`paged`).
   - The old sect art quests teach nothing: seven T4 ones are saga prologue trials (`SAGA_PROLOGUES`), eight T3 ones lineage prologue trials (`LINEAGE_PROLOGUES`).

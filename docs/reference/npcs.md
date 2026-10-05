@@ -11,12 +11,12 @@
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
 | `merchant_wang` | เถ้าแก่หวาง | 💬 🤏 | — |
-| `city_capital_clerk_qing` | เสมียนนายฉิง | 💬 | 2 |
+| `city_capital_clerk_qing` | เสมียนนายฉิง | 💬 | 4 |
 | `city_capital_magistrate_wu` | นายอำเภอหวู่ | 💬 🤏 | 4 |
 | `city_capital_physician_lin` | หมอหลิน | 💬 🤏 | 3 |
 | `city_capital_merchant_wang` | พ่อค้าหวัง | 💬 🤏 | — |
-| `evil_capital_blackmarket_zhou` | เถ้าแก่โจวตลาดมืด | 💬 🤏 | 7 |
-| `spy_capital_feng` | เฟิงเจ้าของร้านบะหมี่ | 💬 ⚔ 🤏 | 6 |
+| `evil_capital_blackmarket_zhou` | เถ้าแก่โจวตลาดมืด | 💬 🤏 | 8 |
+| `spy_capital_feng` | เฟิงเจ้าของร้านบะหมี่ | 💬 ⚔ 🤏 | 7 |
 
 ### ซีเซี่ย (`city_xixia`)
 
@@ -144,7 +144,7 @@
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `sect_shaolin_abbot_huiyuan` | เจ้าอาวาสฮุยหยวน | 💬 ⚔ 🤏 | 25 |
+| `sect_shaolin_abbot_huiyuan` | เจ้าอาวาสฮุยหยวน | 💬 ⚔ 🤏 | 26 |
 | `sect_shaolin_elder_faming` | อาจารย์ฝาหมิง | 💬 ⚔ | 8 |
 | `sect_shaolin_disciple_xuanji` | ศิษย์เซวียนจี้ | ⚔ | 5 |
 | `sect_shaolin_head_disciple_yuanquan` | หัวหน้าศิษย์หยวนเฉวียน | ⚔ 🤏 | 6 |
@@ -157,7 +157,7 @@
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `sect_wudang_master_qingxu` | อาจารย์ชิงซวี่ | 💬 ⚔ 🤏 | 25 |
+| `sect_wudang_master_qingxu` | อาจารย์ชิงซวี่ | 💬 ⚔ 🤏 | 26 |
 | `sect_wudang_vice_master_xuancheng` | รองอาจารย์เสวียนเฉิง | 💬 ⚔ 🤏 | 6 |
 | `sect_wudang_sword_elder_lingyu` | อาจารย์ดาบหลิงอวี้ | 💬 ⚔ 🤏 | 7 |
 | `sect_wudang_inner_elder_baochun` | อาจารย์ปราณเป่าชุน | ⚔ 🤏 | 8 |
@@ -264,7 +264,7 @@
 | `sect_beggars_vice_chief_lifang` | รองหัวหน้าหลี่ฟาง | 💬 ⚔ 🤏 | — |
 | `sect_beggars_staff_elder_qicheng` | อาจารย์ไม้เท้าฉีเฉิง | 💬 ⚔ 🤏 | 5 |
 | `sect_beggars_fist_elder_wudao` | อาจารย์หมัดอู่เต้า | ⚔ 🤏 | 3 |
-| `sect_beggars_intel_elder_yunsi` | อาจารย์ข่าวสารยุนซือ | ⚔ 🤏 | 11 |
+| `sect_beggars_intel_elder_yunsi` | อาจารย์ข่าวสารยุนซือ | ⚔ 🤏 | 13 |
 | `sect_beggars_head_disciple_renhua` | หัวหน้าศิษย์เหรินฮัว | ⚔ 🤏 | 5 |
 | `sect_beggars_disciple_dawei` | ศิษย์ต้าเหว่ย | ⚔ | 1 |
 | `sect_beggars_disciple_xiaohu` | ศิษย์เสี่ยวฮู | ⚔ | 2 |
@@ -364,7 +364,7 @@
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `palace_royal_eunuch_gao` | ขันทีเกา | 💬 🤏 | 2 |
+| `palace_royal_eunuch_gao` | ขันทีเกา | 💬 🤏 | 3 |
 | `palace_royal_guard_zhao` | จ้าวเทีย | 💬 ⚔ | 1 |
 | `palace_royal_maid_cui` | ชุ่ยเอ๋อ | 💬 | 1 |
 | `palace_royal_official_qian` | ขุนนางเฉียน | 💬 🤏 | — |
@@ -428,7 +428,7 @@
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `inn_heluo_storyteller_po` | โปผู้เล่าเรื่อง | 💬 | 5 |
+| `inn_heluo_storyteller_po` | โปผู้เล่าเรื่อง | 💬 | 6 |
 
 ## Homes
 
@@ -525,9 +525,9 @@
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `home_player_housekeeper_liu` | ป้าหลิว | 💬 | 1 |
-| `home_player_gatekeeper_zhou` | ลุงโจว | 💬 | 1 |
-| `home_player_neighbor_niu` | อาหนิว | 💬 | 1 |
+| `home_player_housekeeper_liu` | ป้าหลิว | 💬 | 3 |
+| `home_player_gatekeeper_zhou` | ลุงโจว | 💬 | 3 |
+| `home_player_neighbor_niu` | อาหนิว | 💬 | 2 |
 
 ## Mountains, cliffs and peaks
 

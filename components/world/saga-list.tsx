@@ -20,7 +20,8 @@ export function SagaList() {
   const [film, setFilm] = useState<string | null>(null);
   const progress = (arc: StoryArcInfo) => arc.questIds.filter((id) => state.quests[id]?.status === "done").length;
   const started = (arc: StoryArcInfo) => arc.questIds.some((id) => state.quests[id]);
-  const arcs = [...STORY_ARCS].sort((a, b) => Number(started(b)) - Number(started(a)) || progress(b) - progress(a));
+  // The main story always leads; then sagas under way.
+  const arcs = [...STORY_ARCS].sort((a, b) => Number(!!b.main) - Number(!!a.main) || Number(started(b)) - Number(started(a)) || progress(b) - progress(a));
 
   if (!arcs.length) return <div className="menu-empty" data-glyph="傳"><strong>ยังไม่มีตำนาน</strong></div>;
   return (
@@ -32,7 +33,7 @@ export function SagaList() {
           const expanded = open === arc.id;
           const finished = done === arc.questIds.length;
           // The move stays a mystery until the last chapter hands over its scroll.
-          const reward = finished ? (arc.reward.kind === "skill" ? getSkill(arc.reward.id)?.n : getArt(arc.reward.id).n) : MYSTERY_MOVE_LABEL;
+          const reward = !arc.reward ? "★" : finished ? (arc.reward.kind === "skill" ? getSkill(arc.reward.id)?.n : getArt(arc.reward.id).n) : MYSTERY_MOVE_LABEL;
           const next = arc.questIds.find((id) => state.quests[id]?.status !== "done");
           const nextDef = next ? getQuest(next) : null;
           const nextState = next ? state.quests[next] : undefined;
@@ -43,7 +44,7 @@ export function SagaList() {
               <button type="button" className="w-full flex items-center justify-between gap-2 px-3 py-2 text-left hover:bg-muted/40"
                 aria-expanded={expanded} onClick={() => setOpen(expanded ? null : arc.id)}>
                 <span className="min-w-0">
-                  <strong className="block text-sm font-display truncate">📜 {arc.title}</strong>
+                  <strong className="block text-sm font-display truncate">{arc.main ? "★" : "📜"} {arc.title}</strong>
                   <span className="block text-[11px] text-muted-foreground truncate">{arc.sc} · {reward}</span>
                 </span>
                 <span className="shrink-0 text-xs tabular-nums">{finished ? "✓ จบแล้ว" : `${done}/${arc.questIds.length}`}</span>

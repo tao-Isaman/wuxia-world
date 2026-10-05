@@ -4,6 +4,21 @@ What changed, when, and in which pull request. Newest first. Each entry says wha
 
 Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-Isaman/wuxia-world/pulls?q=is%3Apr+is%3Amerged). The waves are the build → test → review rounds the agents worked in (see [HANDOFF.md](../HANDOFF.md)).
 
+## 2026-10-05
+
+### The age of scattered scriptures: the timeline moves to 1401, and a 15-chapter main story
+
+- **The game is now set in the 3rd year of Jianwen (1401), about 40 years after มังกรหยก ภาค 3.**
+  - The lore: ฮ่องเต้หงอู่'s องครักษ์เสื้อแพร seized the sects' scriptures into the หอคัมภีร์หลวง. After his death (1398), in the chaos of อ๋องเยียน's revolt, the vault was emptied. The scrolls scattered back into the jianghu, and sects great and small are re-arming: an age of strife.
+  - Every saga, lineage quest and world text was re-timed: ยอดกวงเม้ง สี่สิบกว่าปีก่อน, เกาะไฟน้ำแข็ง ห้าสิบกว่า, เตียซำฮง about 154 and in seclusion, เจียซุ่น dead.
+  - The new lore is woven in: scrolls recovered or bought back from the vault, the องครักษ์เสื้อแพร as former confiscators, the war in the north.
+  - 8 new lore rumors, and talk lines for the capital, the inn storyteller, Jinyiwei and sect masters. About 700 lines across 30 files ([story-writing.md](story-writing.md#timeline-and-novel-characters)).
+- **The main story — คัมภีร์ที่หลุดจากวังหลวง** ([story-writing.md](story-writing.md#the-main-story)).
+  - 15 chained chapters from the first moment of a new game, offered by ป้าหลิว at home.
+  - 12 cutscenes on the age and on the hero's father, the keeper of the royal scripture vault.
+  - Three new villains (`st_main_ink_*`).
+  - Engine: `MainArcSpec` compiles like a saga but as type `main`, with no sect, gate or move; the ตำนาน list puts it first; `test:story` checks and plays it through.
+
 ## 2026-10-04
 
 ### The story reworded for the timeline (20 years after มังกรหยก ภาค 3)

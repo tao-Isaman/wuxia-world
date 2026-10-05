@@ -243,7 +243,7 @@ Walk up to a person and talk. The NPC card offers what that person supports:
 
 ## Quests and tracking
 
-There are 867 quests: one main quest, 526 side quests (97 sect quests, 154 lineage quests and 97 place quests) and 340 story chapters in 38 sagas — see [Lineage quests and sagas](#lineage-quests-and-sagas).
+There are 882 quests: the 15-chapter main story (เนื้อเรื่องหลัก, [story-writing.md](story-writing.md#the-main-story)), one older main quest, 526 side quests (97 sect quests, 154 lineage quests and 97 place quests) and 340 story chapters in 38 sagas — see [Lineage quests and sagas](#lineage-quests-and-sagas).
 
 - **Accepting.** Most quests are offered by a person (the **!** mark). Sect quests are taken in the สำนัก menu.
 - **Stages.** A quest has 1–4 stages. The quest log (ภารกิจ) shows each one with ✓ done, ▸ current and ○ still ahead.

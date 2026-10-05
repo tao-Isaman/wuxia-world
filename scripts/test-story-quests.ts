@@ -9,7 +9,7 @@ import assert from "node:assert/strict";
 import { SKILLS } from "../lib/game/data/skills";
 import { ARTS } from "../lib/game/data/arts";
 import { CHARACTER_IDS, CREATURE_FRAME_COUNT } from "../lib/characters/catalog";
-import { LINEAGE_SPECS, SAGA_PROLOGUES, STORY_ARC_SPECS } from "../lib/world/data/story";
+import { LINEAGE_SPECS, MAIN_ARC, SAGA_PROLOGUES, STORY_ARC_SPECS } from "../lib/world/data/story";
 import { isQuestOfferable, isSecretSectQuest } from "../lib/world/effects";
 import { CUTSCENES, STORY_ARCS, STORY_QUESTS, STORY_RESOLVERS } from "../lib/world/story/registry";
 import { DECLINE_TEXT, lineageQuestId, storyQuestId, LINEAGE_TIERS } from "../lib/world/story/compile";
@@ -219,6 +219,34 @@ check("story sagas: 8–10 chapters, T4 reward of that sect, rich dialogue, real
   }
 });
 
+check("main story: about 15 chained chapters from a new game, at least 10 films, real places, people and foes, small rewards, teaches nothing", () => {
+  if (ONLY) return;
+  const where = `main ${MAIN_ARC.id}`;
+  if (MAIN_ARC.chapters.length < 14 || MAIN_ARC.chapters.length > 16) err(`${where}: ${MAIN_ARC.chapters.length} chapters (14–16)`);
+  if (!MAIN_ARC.tagline.trim()) err(`${where}: tagline`);
+  let films = 0;
+  for (const [i, ch] of MAIN_ARC.chapters.entries()) {
+    const cw = `${where} ch${i + 1}`;
+    if (!getNpc(ch.giver) || !getNpc(ch.giver)!.locationIds.some((loc) => getLocationMap(loc)?.npcSpots?.[ch.giver])) err(`${cw}: giver ${ch.giver} is not on a map`);
+    if (!ch.title.trim() || !ch.summary.trim()) err(`${cw}: title / summary`);
+    if (ch.steps.length < 1 || ch.steps.length > 3) err(`${cw}: ${ch.steps.length} steps (1–3)`);
+    checkBeat(`${cw} offer`, ch.offer, 3);
+    checkBeat(`${cw} complete`, ch.complete, 2);
+    ch.steps.forEach((s, k) => checkStep(`${cw} step ${k + 1}`, s));
+    ch.reward.forEach((r) => checkReward(cw, r));
+    if (!ch.reward.length) err(`${cw}: no reward`);
+    const beats = [ch.offer, ch.complete, ...ch.steps.flatMap((s) => s.t === "visit" || s.t === "talk" ? [s.scene] : s.t === "duel" ? [s.before, s.after] : [])];
+    films += beats.filter((b) => b.cutscene).length;
+  }
+  if (films < 10) err(`${where}: ${films} cutscenes (at least 10)`);
+  if (MAIN_ARC.chapters.length && !MAIN_ARC.chapters[0].offer.cutscene) err(`${where}: the opening needs a cutscene`);
+  for (const o of MAIN_ARC.opponents ?? []) {
+    if (!o.id.startsWith("st_")) err(`${where}: new opponent ${o.id} must start with st_`);
+    for (const s of o.skillIds) if (!SKILLS.some((k) => k.id === s)) err(`${where}: opponent ${o.id} skill ${s}`);
+    if (o.artId && !ARTS.some((a) => a.id === o.artId)) err(`${where}: opponent ${o.id} art ${o.artId}`);
+  }
+});
+
 check("compiled: unique ids, every scene reachable, cutscenes registered, chapters chained", () => {
   const seen = new Set<string>();
   for (const q of STORY_QUESTS) { if (seen.has(q.id)) err(`duplicate quest ${q.id}`); seen.add(q.id); if (getQuest(q.id) !== q) err(`${q.id} not registered`); }
@@ -226,7 +254,7 @@ check("compiled: unique ids, every scene reachable, cutscenes registered, chapte
   for (const arc of STORY_ARCS) {
     arc.questIds.forEach((id, i) => {
       const q = getQuest(id);
-      if (!q || q.type !== "story" || q.story?.chapter !== i + 1) err(`${id}: not chapter ${i + 1}`);
+      if (!q || q.type !== (arc.main ? "main" : "story") || q.story?.chapter !== i + 1) err(`${id}: not chapter ${i + 1}`);
       if (!getScene(`qs_${id}_offer`) || !getScene(`qs_${id}_complete`)) err(`${id}: offer / complete scene missing`);
     });
   }
@@ -322,6 +350,14 @@ function readScroll(kind: "skill" | "art", id: string, where: string) {
   assert.equal(store().inventory[scroll] ?? 0, 0, `${where}: scroll used up`);
 }
 
+check("main story: chapter 1 is offered from the first moment of a new game", () => {
+  if (ONLY) return;
+  store().startNewGame({ name: "ผู้ทดสอบ", gender: "male" } as never);
+  const first = getQuest(storyQuestId(MAIN_ARC.id, 1));
+  if (!first || first.type !== "main") err("main: chapter 1 is not a main quest");
+  else if (!isQuestOfferable(store(), first) || !evaluateCondition(store(), first.prereqs ?? { t: "and", all: [] })) err("main: chapter 1 is not offered on a new game");
+});
+
 check("play-through: every lineage quest and every saga chapter, accept → steps → hand-in, through the real store", () => {
   let lineages = 0, chapters = 0;
   for (const l of LINEAGE_SPECS) {
@@ -352,7 +388,13 @@ check("play-through: every lineage quest and every saga chapter, accept → step
       assert.ok(!evaluateCondition(store(), getQuest(storyQuestId(arc.id, 1))!.prereqs!), `saga ${arc.id}: not offered again once learned`);
     } catch (e) { err(e instanceof Error ? e.message : String(e)); }
   }
-  console.log(`  played ${lineages} lineage quests and ${chapters} saga chapters`);
+  if (!ONLY && MAIN_ARC.chapters.length) {
+    store().startNewGame({ name: "ผู้ทดสอบ", gender: "male" } as never);
+    empower("");
+    try { MAIN_ARC.chapters.forEach((_, i) => { play(getQuest(storyQuestId(MAIN_ARC.id, i + 1))!); chapters++; }); }
+    catch (e) { err(e instanceof Error ? e.message : String(e)); }
+  }
+  console.log(`  played ${lineages} lineage quests and ${chapters} saga / main chapters`);
 });
 
 check("decline and drop: every lineage / saga offer can be turned down, and an accepted one dropped and taken again", () => {
