@@ -254,3 +254,17 @@
   .lines p { font-size: calc(15px * var(--dialog-scale, 1)); }
   .choices button { font-size: calc(13px * var(--dialog-scale, 1)); min-height: calc(36px * var(--dialog-scale, 1)); padding: 5px 10px; }
 }
+
+/* One line per beat: the words are the tap target, like a film's subtitles. */
+.beat { position: relative; cursor: pointer; }
+
+.nextMark {
+  position: absolute;
+  right: 12px;
+  bottom: 8px;
+  color: #f3d18b;
+  font-size: 12px;
+  animation: dialog-next 1s ease-in-out infinite;
+}
+@keyframes dialog-next { 50% { transform: translateY(3px); opacity: .55; } }
+@media (prefers-reduced-motion: reduce) { .nextMark { animation: none; } }

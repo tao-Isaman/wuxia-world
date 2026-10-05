@@ -156,3 +156,14 @@
 @media (orientation: landscape) and (max-width: 640px), (orientation: portrait) and (max-height: 640px) { .autosave-note { right: 10px; bottom: calc(max(8px, env(safe-area-inset-bottom)) + 84px); font-size: 12px; } }
 @media (orientation: landscape) and (max-height: 560px) and (min-width: 641px), (orientation: portrait) and (max-width: 560px) and (min-height: 641px) { .autosave-note { bottom: 76px; } }
 @media (prefers-reduced-motion: reduce) { .purse-delta, .autosave-note, .autosave-note span { animation-duration: .01ms; } }
+
+/* Key words in dialogue and film subtitles (components/world/rich-text.tsx). */
+.text-mark { font-weight: 700; font-style: normal; }
+.text-mark-key { color: #ffd77a; text-shadow: 0 0 6px #ffcf5c40; }
+.text-mark-person { color: #9be8b0; }
+.text-mark-place { color: #9fcdff; }
+.text-mark-item { color: #f4b871; }
+.text-mark-sect { color: #ff9f86; }
+.text-mark-move { color: #e7b3ff; }
+.text-mark-foe { color: #ff8f8f; }
+.text-mark-number { color: #ffe9a0; }

@@ -88,3 +88,36 @@ test("quest offers away from a staged map are full-screen and fit without scroll
   }
   expect(errors).toEqual([]);
 });
+
+test("conversations play one line at a time like a film, with key words marked; ข้าม jumps to the choices", async ({ page }) => {
+  test.setTimeout(120_000);
+  // The suite runs with fast text; this test uses the real conversation standard.
+  await page.addInitScript(() => { localStorage.removeItem("wuxia-dialog-instant"); });
+  await page.goto("/");
+  await page.locator("#hero-name").fill("ผู้ฟัง");
+  await page.getByRole("button", { name: "เริ่มเกมใหม่" }).click();
+  await visit(page, "npc-home_player_gatekeeper_zhou");
+  await page.getByRole("button", { name: /ทักทาย/ }).click();
+  const stage = page.getByTestId("dialog-stage");
+  const lines = page.getByTestId("dialog-lines");
+  await expect(stage).toHaveAttribute("data-page", "0");
+  const beats = Number(await stage.getAttribute("data-pages"));
+  expect(beats).toBeGreaterThanOrEqual(4);
+  // One line on screen; no choices until the last one.
+  await expect(lines.locator("[data-line-kind]")).toHaveCount(1);
+  await expect(stage.getByRole("button", { name: /ลาจาก|ปิด|กลับ/ })).toHaveCount(0);
+  // A tap on the words finishes the typing, the next tap moves on; ต่อ moves on at once.
+  await lines.click();
+  await expect(stage).not.toHaveAttribute("data-typing", /.*/);
+  await lines.click();
+  await expect(stage).toHaveAttribute("data-page", "1");
+  await page.getByTestId("dialog-next-page").click();
+  await expect(stage).toHaveAttribute("data-page", "2");
+  // ข้าม: the last line, then the choices.
+  await page.getByTestId("dialog-skip").click();
+  await expect(stage).toHaveAttribute("data-page", String(beats - 1));
+  await expect(page.getByTestId("dialog-next-page")).toHaveCount(0);
+  await expect(stage.locator("button").filter({ hasNotText: /จบบทสนทนา/ }).first()).toBeVisible();
+  await expect(lines.locator("[data-line-kind]")).toHaveCount(1);
+  await page.screenshot({ path: "test-results/screenshots/dialogue-beats.png" });
+});

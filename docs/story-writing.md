@@ -123,6 +123,12 @@ The story:
 
 ## Voice
 
+**The conversation standard** (every dialog, offer, hand-in, step scene and film) is described under [rendering.md → Dialogs](rendering.md#dialogs).
+
+- **One line per beat.** The player reads each line on its own, typed out. Write a line as one breath: about 140 characters at most. Longer lines are cut between words automatically, but a line that ends on its own beat reads better.
+- **Key words stand out by themselves.** People, places, items, sects, moves and arts, foes, numbers and the age's terms (คัมภีร์, หอคัมภีร์หลวง, องครักษ์เสื้อแพร…) are coloured.
+- **Mark anything else that matters with `**double stars**`**, such as a clue, a password or the thing to bring: `"จำคำนี้ไว้ — **ลมไม่มีเงา**"`. Use one or two per line at most; a line where everything is marked marks nothing. Always close the stars (`test:runtime` checks every line).
+
 - **Thai wuxia register:** ข้า / เจ้า / ท่าน, ขอรับ / เจ้าค่ะ, "ศิษย์", "อาจารย์". Natural Thai, no English.
 - **Meaningful:** every saga has a theme that *is* the skill or art. For example, Taiji fist is "ยอมลืม", and the hero learns the art by living its idea, not by grinding.
 - **Funny:** every chapter gets at least one light moment. Use dry masters, over-earnest disciples, bandits who regret everything, terrible tea, and `asides` (joke replies). Never mock the tragedy itself.

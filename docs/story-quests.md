@@ -46,7 +46,7 @@ Both reuse the ordinary quest engine: stages, `autoAdvance`, objective spots, NP
 | `lib/world/data/quests.ts`, `scenes.ts`, `opponents.ts` | append `STORY_QUESTS`, `STORY_SCENES` and the sagas' new foes (`st_*`, built from `StoryOpponentSpec`) |
 | `lib/stage/cutscene-runtime.ts` | the Phaser film player |
 | `components/world/cutscene-player.tsx` (+ `.module.css`) | the full-screen player UI |
-| `components/world/dialog-stage.tsx` | plays a dialog's film first; pages long dialogs |
+| `components/world/dialog-stage.tsx` | plays a dialog's film first, then its lines one beat at a time ([rendering.md](rendering.md#dialogs)) |
 | `components/world/saga-list.tsx` | the quest log's ตำนาน tab |
 | `scripts/test-story-quests.ts` | `bun run test:story` |
 
@@ -110,7 +110,7 @@ A cutscene is registered under `cs_<sceneId>` and played by a dialog whose `cuts
 ## Dialogs: films and pages
 
 - `DialogScene.cutscene` — `DialogStage` renders the `CutscenePlayer` first, once per visit to that scene, then the lines and choices.
-- `DialogScene.paged` — set by the compiler for dialogs of more than 4 lines.
+- `DialogScene.paged` — set by the compiler for dialogs of more than 4 lines; kept for old content, since every dialog now plays one line per beat.
   - The lines show a page at a time: up to 4 lines or 260 characters, with a "ต่อ ▶ (n/N)" button.
   - The choices appear after the last page.
   - Test hooks: `data-page` / `data-pages` on the dialog, `data-testid="dialog-next-page"` on the button.
