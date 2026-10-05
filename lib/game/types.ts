@@ -375,6 +375,9 @@ export interface CharacterBuild {
   // Per-art level (1..10). Mirrors `skillLevels`. Missing entries default
   // to the build's `artLevel` for the active art, or 1 for everything else.
   artLevels?: Record<string, number>;
+  // Meridian charts (ชีพจร): chart id → rank of each point (0–3). See
+  // lib/game/meridian-types.ts; their bonuses join combinedStats / deriveAll.
+  meridians?: Readonly<Record<string, readonly number[]>>;
 }
 
 // ─── Live battle state ─────────────────────────────────────────────────

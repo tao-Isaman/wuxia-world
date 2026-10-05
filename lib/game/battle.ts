@@ -8,7 +8,7 @@ import type {
 import {
   combinedStats,
   deriveAll,
-  getEquipBonus,
+  getBuildBonus,
   getMasteryMap,
   type EquipBonus,
   type MasteryMap,
@@ -22,6 +22,9 @@ import {
   type ConflictFactors,
 } from "./skill-conflict";
 import { firstArtSlotIndex, parseSlotId } from "./slots";
+
+/** The most damage a defender can shrug off, in % (buffs + gear + meridians). */
+export const PCT_REDUCE_CAP = 90;
 import {
   applyEnemyEffect,
   applySelfEffect,
@@ -76,7 +79,8 @@ export function makeContext(buildA: CharacterBuild, buildB: CharacterBuild): Bat
     names: { A: buildA.name, B: buildB.name },
     artIds: { A: primaryArtId(buildA), B: primaryArtId(buildB) },
     weaponEquipIds: { A: buildA.equipment.W, B: buildB.equipment.W },
-    equipBonus: { A: getEquipBonus(buildA.equipment), B: getEquipBonus(buildB.equipment) },
+    // Equipment + meridian (ชีพจร) pct_atk / pct_red / hp_regen and flats.
+    equipBonus: { A: getBuildBonus(buildA), B: getBuildBonus(buildB) },
     masteries: {
       A: getMasteryMap(buildA.skillIds, lvA, conflictA),
       B: getMasteryMap(buildB.skillIds, lvB, conflictB),
@@ -305,7 +309,8 @@ export function calcSkillDamage(
     if (b.t === "buff_reflect") ref = b.v;
   }
   for (const d of dst.debuffs) if (d.t === "debuff_def" && d.v != null) dR += Math.abs(d.v);
-  pR += ctx.equipBonus[ds].pct_red;
+  // Damage reduction from buffs, gear and meridians stops at PCT_REDUCE_CAP.
+  pR = Math.min(PCT_REDUCE_CAP, pR + ctx.equipBonus[ds].pct_red);
 
   // Mastery multiplier
   const mas = ctx.masteries[side][sk.w] ?? 0;

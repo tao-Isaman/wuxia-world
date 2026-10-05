@@ -2,7 +2,7 @@
 
 # Items, shops, crafting and gathering
 
-376 items (`lib/world/data/items.ts`), 19 shops, 7 martial halls, 49 artisans, 32 recipes and 25 gathering / hunting nodes.
+471 items (`lib/world/data/items.ts`), 19 shops, 7 martial halls, 49 artisans, 32 recipes and 25 gathering / hunting nodes.
 
 ## Contents
 
@@ -91,7 +91,7 @@
 | `alpha_inter` | อักษรงดงาม | 300 | train writing +80 xp |
 | `alpha_master` | อักษรเทพนิยม | 800 | train writing +180 xp |
 
-### ตำราวิชา (`manual`, 297)
+### ตำราวิชา (`manual`, 392)
 
 | Id | Name | Price | Use |
 | --- | --- | --- | --- |
@@ -392,6 +392,101 @@
 | `scroll_art_khbt` | คัมภีร์คัมภีร์ทานตะวัน | 0 | learn คัมภีร์ทานตะวัน (STR ≥ 0) |
 | `scroll_art_kuyt` | คัมภีร์วิชาเก้าเอี้ยง | 0 | learn วิชาเก้าเอี้ยง (STR ≥ 0) |
 | `scroll_art_kgim` | คัมภีร์คัมภีร์เก้าอิม | 0 | learn คัมภีร์เก้าอิม (STR ≥ 0) |
+| `chart_root_breath` | แผนภาพชีพจร-ชีพจรรากลมปราณ | 400 | learn meridian chart `root_breath` |
+| `chart_iron_sinew` | แผนภาพชีพจร-ชีพจรเอ็นเหล็กน้อย | 400 | learn meridian chart `iron_sinew` |
+| `chart_light_heel` | แผนภาพชีพจร-ชีพจรส้นเท้าเบา | 400 | learn meridian chart `light_heel` |
+| `chart_stone_skin` | แผนภาพชีพจร-ชีพจรผิวศิลา | 400 | learn meridian chart `stone_skin` |
+| `chart_clear_eye` | แผนภาพชีพจร-ชีพจรตาใส | 400 | learn meridian chart `clear_eye` |
+| `chart_lucky_cloud` | แผนภาพชีพจร-ชีพจรเมฆมงคล | 400 | learn meridian chart `lucky_cloud` |
+| `chart_scholar_lamp` | แผนภาพชีพจร-ชีพจรตะเกียงบัณฑิต | 400 | learn meridian chart `scholar_lamp` |
+| `chart_ox_back` | แผนภาพชีพจร-ชีพจรหลังวัวเหล็ก | 400 | learn meridian chart `ox_back` |
+| `chart_first_edge` | แผนภาพชีพจร-ชีพจรคมแรก | 400 | learn meridian chart `first_edge` |
+| `chart_turtle_shell` | แผนภาพชีพจร-ชีพจรกระดองเต่า | 400 | learn meridian chart `turtle_shell` |
+| `chart_blood_spring` | แผนภาพชีพจร-ชีพจรน้ำพุโลหิต | 400 | learn meridian chart `blood_spring` |
+| `chart_swift_step` | แผนภาพชีพจร-ชีพจรก้าวไว | 400 | learn meridian chart `swift_step` |
+| `chart_needle_eye` | แผนภาพชีพจร-ชีพจรรูเข็ม | 400 | learn meridian chart `needle_eye` |
+| `chart_inner_pool` | แผนภาพชีพจร-ชีพจรสระปราณ | 400 | learn meridian chart `inner_pool` |
+| `chart_tiger_mouth` | แผนภาพชีพจร-ชีพจรปากเสือ | 400 | learn meridian chart `tiger_mouth` |
+| `chart_still_water` | แผนภาพชีพจร-ชีพจรน้ำนิ่ง | 400 | learn meridian chart `still_water` |
+| `chart_dew_drop` | แผนภาพชีพจร-ชีพจรหยาดน้ำค้าง | 400 | learn meridian chart `dew_drop` |
+| `chart_wind_gate` | แผนภาพชีพจร-ชีพจรประตูลม | 400 | learn meridian chart `wind_gate` |
+| `chart_morning_sun` | แผนภาพชีพจร-ชีพจรตะวันแรก | 400 | learn meridian chart `morning_sun` |
+| `chart_plum_branch` | แผนภาพชีพจร-ชีพจรกิ่งเหมย | 400 | learn meridian chart `plum_branch` |
+| `chart_leopard_spine` | แผนภาพชีพจร-ชีพจรสันหลังเสือดาว | 1200 | learn meridian chart `leopard_spine` |
+| `chart_bronze_bell` | แผนภาพชีพจร-ชีพจรระฆังทองแดง | 1200 | learn meridian chart `bronze_bell` |
+| `chart_cloud_mind` | แผนภาพชีพจร-ชีพจรจิตเมฆา | 1200 | learn meridian chart `cloud_mind` |
+| `chart_river_arm` | แผนภาพชีพจร-ชีพจรแขนสายน้ำ | 1200 | learn meridian chart `river_arm` |
+| `chart_crane_leg` | แผนภาพชีพจร-ชีพจรขากระเรียน | 1200 | learn meridian chart `crane_leg` |
+| `chart_mountain_root` | แผนภาพชีพจร-ชีพจรรากภูผา | 1200 | learn meridian chart `mountain_root` |
+| `chart_fox_heart` | แผนภาพชีพจร-ชีพจรใจจิ้งจอก | 1200 | learn meridian chart `fox_heart` |
+| `chart_eagle_talon` | แผนภาพชีพจร-ชีพจรกรงเล็บอินทรี | 1200 | learn meridian chart `eagle_talon` |
+| `chart_white_horse` | แผนภาพชีพจร-ชีพจรม้าขาวทะยาน | 1200 | learn meridian chart `white_horse` |
+| `chart_black_iron_wall` | แผนภาพชีพจร-ชีพจรกำแพงเหล็กดำ | 1200 | learn meridian chart `black_iron_wall` |
+| `chart_red_lotus_flame` | แผนภาพชีพจร-ชีพจรเพลิงบัวแดง | 1200 | learn meridian chart `red_lotus_flame` |
+| `chart_north_star_edge` | แผนภาพชีพจร-ชีพจรคมดาวเหนือ | 1200 | learn meridian chart `north_star_edge` |
+| `chart_cloud_mist_step` | แผนภาพชีพจร-ชีพจรก้าวเมฆหมอก | 1200 | learn meridian chart `cloud_mist_step` |
+| `chart_hundred_poison_skin` | แผนภาพชีพจร-ชีพจรผิวร้อยพิษ | 1200 | learn meridian chart `hundred_poison_skin` |
+| `chart_little_dragon_palm` | แผนภาพชีพจร-ชีพจรฝ่ามือมังกรน้อย | 1200 | learn meridian chart `little_dragon_palm` |
+| `chart_spring_well` | แผนภาพชีพจร-ชีพจรบ่อน้ำพุ | 1200 | learn meridian chart `spring_well` |
+| `chart_vajra_knuckle` | แผนภาพชีพจร-ชีพจรข้อนิ้วเพชร | 1200 | learn meridian chart `vajra_knuckle` |
+| `chart_drunken_moon` | แผนภาพชีพจร-ชีพจรจันทร์เมามาย | 1200 | learn meridian chart `drunken_moon` |
+| `chart_silk_thread` | แผนภาพชีพจร-ชีพจรเส้นไหม | 1200 | learn meridian chart `silk_thread` |
+| `chart_beggar_bowl` | แผนภาพชีพจร-ชีพจรชามขอทาน | 1200 | learn meridian chart `beggar_bowl` |
+| `chart_five_peaks_breath` | แผนภาพชีพจร-ลมปราณห้ายอดเขา | 3000 | learn meridian chart `five_peaks_breath` |
+| `chart_bodhi_root` | แผนภาพชีพจร-ชีพจรรากโพธิ์ | 3000 | learn meridian chart `bodhi_root` |
+| `chart_tiger_roar_lung` | แผนภาพชีพจร-ชีพจรปอดเสือคำราม | 3000 | learn meridian chart `tiger_roar_lung` |
+| `chart_crane_stillness` | แผนภาพชีพจร-ชีพจรกระเรียนสงบ | 3000 | learn meridian chart `crane_stillness` |
+| `chart_mind_body_one` | แผนภาพชีพจร-ชีพจรจิตกายหนึ่งเดียว | 3000 | learn meridian chart `mind_body_one` |
+| `chart_eight_trigram_web` | แผนภาพชีพจร-ชีพจรใยแปดทิศ | 3000 | learn meridian chart `eight_trigram_web` |
+| `chart_five_petal_plum` | แผนภาพชีพจร-ชีพจรเหมยห้ากลีบ | 3000 | learn meridian chart `five_petal_plum` |
+| `chart_seven_color_serpent` | แผนภาพชีพจร-ชีพจรอสรพิษเจ็ดสี | 3000 | learn meridian chart `seven_color_serpent` |
+| `chart_golden_armor` | แผนภาพชีพจร-ชีพจรเกราะทอง | 3000 | learn meridian chart `golden_armor` |
+| `chart_ice_palm` | แผนภาพชีพจร-ชีพจรฝ่ามือน้ำแข็ง | 3000 | learn meridian chart `ice_palm` |
+| `chart_twin_wind_blades` | แผนภาพชีพจร-ชีพจรสองดาบล่องลม | 3000 | learn meridian chart `twin_wind_blades` |
+| `chart_garland_spring` | แผนภาพชีพจร-ชีพจรน้ำพุมาลัย | 3000 | learn meridian chart `garland_spring` |
+| `chart_rooted_peak` | แผนภาพชีพจร-ชีพจรภูผาหยั่งราก | 3000 | learn meridian chart `rooted_peak` |
+| `chart_drunken_immortal` | แผนภาพชีพจร-ชีพจรเซียนเมา | 3000 | learn meridian chart `drunken_immortal` |
+| `chart_sun_body` | แผนภาพชีพจร-ชีพจรกายสุริยัน | 3000 | learn meridian chart `sun_body` |
+| `chart_dragon_elephant` | แผนภาพชีพจร-ชีพจรมังกรช้างสาร | 6000 | learn meridian chart `dragon_elephant` |
+| `chart_heart_mind_lattice` | แผนภาพชีพจร-ชีพจรกลใจเป็นจิต | 6000 | learn meridian chart `heart_mind_lattice` |
+| `chart_jade_maiden` | แผนภาพชีพจร-ชีพจรสาวหยก | 6000 | learn meridian chart `jade_maiden` |
+| `chart_northern_ghost` | แผนภาพชีพจร-ชีพจรภูติอุดร | 6000 | learn meridian chart `northern_ghost` |
+| `chart_one_finger` | แผนภาพชีพจร-ชีพจรเอกดัชนี | 6000 | learn meridian chart `one_finger` |
+| `chart_void_step` | แผนภาพชีพจร-ชีพจรก้าวว่าง | 6000 | learn meridian chart `void_step` |
+| `chart_thunder_stride` | แผนภาพชีพจร-ชีพจรอัสนีก้าวย่าง | 6000 | learn meridian chart `thunder_stride` |
+| `chart_blood_blade` | แผนภาพชีพจร-ชีพจรดาบโลหิต | 6000 | learn meridian chart `blood_blade` |
+| `chart_dharma_mirror` | แผนภาพชีพจร-ชีพจรกระจกธรรม | 6000 | learn meridian chart `dharma_mirror` |
+| `chart_sun_renewal` | แผนภาพชีพจร-ชีพจรตะวันฟื้นคืน | 6000 | learn meridian chart `sun_renewal` |
+| `chart_sun_piercer` | แผนภาพชีพจร-ชีพจรทะลวงสุริยัน | 6000 | learn meridian chart `sun_piercer` |
+| `chart_viper_venom` | แผนภาพชีพจร-ชีพจรพิษอสรพิษ | 6000 | learn meridian chart `viper_venom` |
+| `chart_dual_fusion` | แผนภาพชีพจร-ชีพจรสองขั้วผสาน | 6000 | learn meridian chart `dual_fusion` |
+| `chart_dragon_slaying_tide` | แผนภาพชีพจร-ชีพจรคลื่นพิฆาตมังกร | 6000 | learn meridian chart `dragon_slaying_tide` |
+| `chart_purple_cloud` | แผนภาพชีพจร-ชีพจรเมฆาม่วง | 6000 | learn meridian chart `purple_cloud` |
+| `chart_tendon_change` | แผนภาพชีพจร-ชีพจรผลัดเส้นเอ็น | 12000 | learn meridian chart `tendon_change` |
+| `chart_taiji_cycle` | แผนภาพชีพจร-ชีพจรวงจรไทจี๋ | 12000 | learn meridian chart `taiji_cycle` |
+| `chart_star_devouring` | แผนภาพชีพจร-ชีพจรดาราดูดกลืน | 12000 | learn meridian chart `star_devouring` |
+| `chart_emei_frost_grace` | แผนภาพชีพจร-ชีพจรน้ำค้างแข็งง้อไบ๊ | 12000 | learn meridian chart `emei_frost_grace` |
+| `chart_army_breaker` | แผนภาพชีพจร-ชีพจรภูผาทะลายทัพ | 12000 | learn meridian chart `army_breaker` |
+| `chart_heaven_flame` | แผนภาพชีพจร-ชีพจรเพลิงสวรรค์ | 12000 | learn meridian chart `heaven_flame` |
+| `chart_six_meridian_sword` | แผนภาพชีพจร-ชีพจรกระบี่หกสาย | 12000 | learn meridian chart `six_meridian_sword` |
+| `chart_lonely_nine_swords` | แผนภาพชีพจร-ชีพจรเก้ากระบี่เดียวดาย | 12000 | learn meridian chart `lonely_nine_swords` |
+| `chart_dragon_subduing` | แผนภาพชีพจร-ชีพจรพิชิตมังกร | 12000 | learn meridian chart `dragon_subduing` |
+| `chart_vajra_body` | แผนภาพชีพจร-ชีพจรกายวัชระ | 12000 | learn meridian chart `vajra_body` |
+| `chart_cosmos_fist` | แผนภาพชีพจร-ชีพจรหมัดสะท้านจักรวาล | 12000 | learn meridian chart `cosmos_fist` |
+| `chart_universe_shift` | แผนภาพชีพจร-ชีพจรเฉียนคุนเคลื่อนย้าย | 12000 | learn meridian chart `universe_shift` |
+| `chart_witness_spear` | แผนภาพชีพจร-ชีพจรทวนประจักษ์ | 12000 | learn meridian chart `witness_spear` |
+| `chart_godslayer_blade` | แผนภาพชีพจร-ชีพจรดาบเทพสังหาร | 12000 | learn meridian chart `godslayer_blade` |
+| `chart_five_poison_body` | แผนภาพชีพจร-ชีพจรเบญจพิษรวมกาย | 12000 | learn meridian chart `five_poison_body` |
+| `chart_nine_yang` | แผนภาพชีพจร-ชีพจรเก้าสุริยะ | 25000 | learn meridian chart `nine_yang` |
+| `chart_nine_yin` | แผนภาพชีพจร-ชีพจรเก้ายิน | 25000 | learn meridian chart `nine_yin` |
+| `chart_eight_extraordinary` | แผนภาพชีพจร-ลมปราณแปดเส้นพิสดาร | 25000 | learn meridian chart `eight_extraordinary` |
+| `chart_sunflower_needle` | แผนภาพชีพจร-ชีพจรทานตะวันเข็มเดียว | 25000 | learn meridian chart `sunflower_needle` |
+| `chart_hidden_dragon` | แผนภาพชีพจร-ชีพจรมังกรซ่อน | 25000 | learn meridian chart `hidden_dragon` |
+| `chart_heaven_sword_heart` | แผนภาพชีพจร-ชีพจรใจกระบี่เหนือฟ้า | 25000 | learn meridian chart `heaven_sword_heart` |
+| `chart_deathless_vajra` | แผนภาพชีพจร-ชีพจรวัชระอมตะ | 25000 | learn meridian chart `deathless_vajra` |
+| `chart_heavenly_demon` | แผนภาพชีพจร-ชีพจรมารสวรรค์ | 25000 | learn meridian chart `heavenly_demon` |
+| `chart_starry_revolution` | แผนภาพชีพจร-ชีพจรดาราหมุนเวียน | 25000 | learn meridian chart `starry_revolution` |
+| `chart_grand_circuit` | แผนภาพชีพจร-มหาจักรวาลชีพจร | 25000 | learn meridian chart `grand_circuit` |
 
 ### ของช่างฝีมือ (`craft`, 13)
 
@@ -446,25 +541,25 @@
 
 | Location | Shop | Items for sale | Buys | Sell-back |
 | --- | --- | --- | --- | --- |
-| นครหลวง (`city_capital`) | 🏪 ตลาดนครหลวง | 23 | everything | ×0.5 |
-| ซีเซี่ย (`city_xixia`) | 🏪 ตลาดซีเซี่ย | 23 | everything | ×0.5 |
-| ต้าหลี่ (`city_dali`) | 🏪 ตลาดต้าหลี่ | 23 | everything | ×0.5 |
-| หยางโจว (`city_yangzhou`) | 🏪 ตลาดหยางโจว | 23 | everything | ×0.5 |
-| ซูโจว (`city_suzhou`) | 🏪 ตลาดซูโจว | 24 | everything | ×0.5 |
-| จินหลิง (`city_jinling`) | 🏪 ตลาดจินหลิง | 23 | everything | ×0.5 |
-| ฉางอัน (`city_changan`) | 🏪 ตลาดฉางอัน | 23 | everything | ×0.5 |
-| โรงเตี๊ยมยั่วไหล (`inn_yuelai`) | 🍵 ของกินที่ยั่วไหล | 5 | food, herb, material | ×0.4 |
-| โรงเตี๊ยมมีหว่าง (`inn_youjian`) | 🍵 ของกินที่มีหว่าง | 5 | food, herb, material | ×0.4 |
-| โรงเตี๊ยมเก้าอี้สูง (`inn_gaosheng`) | 🍵 ของกินที่เก้าอี้สูง | 5 | food, herb, material | ×0.4 |
-| โรงเตี๊ยมห้วอลั่ว (`inn_heluo`) | 🍵 ของกินที่ห้วอลั่ว | 5 | food, herb, material | ×0.4 |
-| หมู่บ้านบนเชิงเขา (`village`) | 🏪 ร้านในหมู่บ้าน | 4 | food, herb, material | ×0.35 |
-| หมู่บ้านชีกู่ (`village_qigu`) | 🏪 ร้านชีกู่ | 4 | food, herb, material | ×0.35 |
-| หมู่บ้านไร้นาม (`village_noname`) | 🏪 ร้านไร้นาม | 4 | food, herb, material | ×0.35 |
-| หมู่บ้านดอกเหมย (`village_meihua`) | 🏪 ร้านดอกเหมย | 4 | food, herb, material | ×0.35 |
-| หมู่บ้านหัวซาน (`village_huashan`) | 🏪 ร้านหัวซาน | 4 | food, herb, material | ×0.35 |
-| หมู่บ้านไท่ซาน (`village_taishan`) | 🏪 ร้านไท่ซาน | 4 | food, herb, material | ×0.35 |
-| หมู่บ้านฮิงซาน (`village_hengshan`) | 🏪 ร้านฮิงซาน | 4 | food, herb, material | ×0.35 |
-| หมู่บ้านอวู่เซี่ย (`village_wuxia`) | 🏪 ร้านอวู่เซี่ย | 4 | food, herb, material | ×0.35 |
+| นครหลวง (`city_capital`) | 🏪 ตลาดนครหลวง | 32 | everything | ×0.5 |
+| ซีเซี่ย (`city_xixia`) | 🏪 ตลาดซีเซี่ย | 31 | everything | ×0.5 |
+| ต้าหลี่ (`city_dali`) | 🏪 ตลาดต้าหลี่ | 31 | everything | ×0.5 |
+| หยางโจว (`city_yangzhou`) | 🏪 ตลาดหยางโจว | 32 | everything | ×0.5 |
+| ซูโจว (`city_suzhou`) | 🏪 ตลาดซูโจว | 33 | everything | ×0.5 |
+| จินหลิง (`city_jinling`) | 🏪 ตลาดจินหลิง | 32 | everything | ×0.5 |
+| ฉางอัน (`city_changan`) | 🏪 ตลาดฉางอัน | 31 | everything | ×0.5 |
+| โรงเตี๊ยมยั่วไหล (`inn_yuelai`) | 🍵 ของกินที่ยั่วไหล | 7 | food, herb, material | ×0.4 |
+| โรงเตี๊ยมมีหว่าง (`inn_youjian`) | 🍵 ของกินที่มีหว่าง | 7 | food, herb, material | ×0.4 |
+| โรงเตี๊ยมเก้าอี้สูง (`inn_gaosheng`) | 🍵 ของกินที่เก้าอี้สูง | 7 | food, herb, material | ×0.4 |
+| โรงเตี๊ยมห้วอลั่ว (`inn_heluo`) | 🍵 ของกินที่ห้วอลั่ว | 7 | food, herb, material | ×0.4 |
+| หมู่บ้านบนเชิงเขา (`village`) | 🏪 ร้านในหมู่บ้าน | 5 | food, herb, material | ×0.35 |
+| หมู่บ้านชีกู่ (`village_qigu`) | 🏪 ร้านชีกู่ | 6 | food, herb, material | ×0.35 |
+| หมู่บ้านไร้นาม (`village_noname`) | 🏪 ร้านไร้นาม | 6 | food, herb, material | ×0.35 |
+| หมู่บ้านดอกเหมย (`village_meihua`) | 🏪 ร้านดอกเหมย | 6 | food, herb, material | ×0.35 |
+| หมู่บ้านหัวซาน (`village_huashan`) | 🏪 ร้านหัวซาน | 6 | food, herb, material | ×0.35 |
+| หมู่บ้านไท่ซาน (`village_taishan`) | 🏪 ร้านไท่ซาน | 6 | food, herb, material | ×0.35 |
+| หมู่บ้านฮิงซาน (`village_hengshan`) | 🏪 ร้านฮิงซาน | 6 | food, herb, material | ×0.35 |
+| หมู่บ้านอวู่เซี่ย (`village_wuxia`) | 🏪 ร้านอวู่เซี่ย | 6 | food, herb, material | ×0.35 |
 
 ## Martial halls
 

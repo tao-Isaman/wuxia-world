@@ -32,6 +32,7 @@ function freshState(): WorldStateData {
     skillLevel: {},
     skillExp: {},
     artExp: {},
+    meridianPoints: 0,
     learnedRecipeIds: [],
     inventoryEquipment: {},
     statExp: {} as never,

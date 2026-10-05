@@ -356,6 +356,7 @@ const pages: Record<string, string> = {};
       case "trainSkill": return `train ${u.skill} +${u.xp} xp`;
       case "manualLearnSkill": return `learn ${esc(skillName(u.skillId))} (${u.reqStat} ≥ ${u.reqValue})`;
       case "manualLearnArt": return `learn ${esc(artName(u.artId))} (${u.reqStat} ≥ ${u.reqValue})`;
+      case "learnMeridian": return `learn meridian chart ${code(u.chartId)}`;
     }
   };
   for (const cat of ITEM_CATEGORIES) {

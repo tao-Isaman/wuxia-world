@@ -75,6 +75,8 @@ import { WANTED_DECAY_DAYS, WANTED_MAX, describeSentence, isLawOpponent, sentenc
 import { JAIL_SCENE_ID, getActivity, jailDiceChance, jailEscapeChance } from "@/lib/world/data/activities";
 import { fadeHeardRumor, maintainRumors, seedLoreRumors, RUMOR_SEEN_CAP } from "@/lib/world/rumor-engine";
 import { namedNpcIds } from "@/lib/world/data/named-npcs";
+import { checkOpenMeridianNode, getMeridianChart } from "@/lib/game";
+import { meridianReadBlock, rollMeridianLoot } from "@/lib/world/meridians";
 import { toast } from "@/store/toast-store";
 import { SECT_MEMBERSHIPS, rankUpGold } from "@/lib/world/data/sect-memberships";
 import {
@@ -205,6 +207,9 @@ export type UseItemResult =
   | { ok: false; reason: "unknown" | "missing" | "no-effect" | "no-build" | "full" }
   | { ok: false; reason: "stat-too-low"; stat: StatKey; needed: number; current: number }
   | { ok: false; reason: "already-learned"; itemId: string }
+  // แผนภาพชีพจร the hero can't read yet: `message` is the Thai reason
+  // (the missing skills / arts). The item is kept.
+  | { ok: false; reason: "meridian-locked"; itemId: string; message: string }
   | { ok: true; kind: "trainSkill"; itemId: string; skill: LifeSkill; xpGained: number }
   | {
       ok: true;
@@ -214,7 +219,11 @@ export type UseItemResult =
       mpHealed: number;
     }
   | { ok: true; kind: "manualLearnSkill"; itemId: string; skillId: string }
-  | { ok: true; kind: "manualLearnArt"; itemId: string; artId: string; level: number };
+  | { ok: true; kind: "manualLearnArt"; itemId: string; artId: string; level: number }
+  | { ok: true; kind: "learnMeridian"; itemId: string; chartId: string };
+
+// Result of opening / upgrading a meridian point (openMeridianNode).
+export type OpenMeridianNodeResult = { ok: true; rank: number } | { ok: false; reason: string };
 
 // Result of clicking the "เล่นเพลง" practice button.
 export type PracticeMusicResult =
@@ -404,6 +413,10 @@ interface WorldStore extends WorldStateData {
   gatherResource: (resourceId: string) => GatherResult;
   craftRecipe: (recipeId: string) => CraftResult;
   useItem: (itemId: string) => UseItemResult;
+  // ชีพจร: spend meridian points to raise point `index` of a learned chart
+  // one rank (costs meridianRankCost(chart.ti, rank); node i needs node i−1
+  // at rank ≥ 1). Fails with a Thai reason.
+  openMeridianNode: (chartId: string, index: number) => OpenMeridianNodeResult;
   practiceMusic: () => PracticeMusicResult;
   rest: (kind: RestKind) => RestResult;
 
@@ -554,6 +567,7 @@ const emptyData = (): WorldStateData => ({
   skillLevel: {},
   skillExp: {},
   artExp: {},
+  meridianPoints: 0,
   learnedRecipeIds: [],
   inventoryEquipment: {},
   statExp: emptyStatExp(),
@@ -725,6 +739,7 @@ function applySkillLevelUps(state: WorldStateData, skillId: string): void {
       "learn",
       `วิชาฝีมือ ${sk.n} เลื่อนขั้นเป็น Lv.${state.skillLevel[skillId]}`,
     );
+    grantMeridianPoints(state, levelsGained);
   }
   syncPlayerSkillLevels(state);
 }
@@ -759,7 +774,18 @@ function applyArtLevelUps(state: WorldStateData, artId: string): void {
       "learn",
       `วิชาในกาย ${art.n} เลื่อนขั้นเป็น ${newLv}`,
     );
+    grantMeridianPoints(state, levelsGained);
   }
+}
+
+// แต้มชีพจร: +1 per level a move skill or inner art gains, from every
+// source (battle xp, practice, w-exp). Logged as its own kind.
+export const MERIDIAN_POINTS_PER_LEVEL = 1;
+function grantMeridianPoints(state: WorldStateData, levels: number): void {
+  if (levels <= 0) return;
+  const gain = levels * MERIDIAN_POINTS_PER_LEVEL;
+  state.meridianPoints = Math.max(0, (state.meridianPoints ?? 0) + gain);
+  appendActionLog(state, "meridian", `ได้แต้มชีพจร +${gain} (มี ${state.meridianPoints})`);
 }
 
 // In-place time advance. Rolls `time` over each `HOURS_PER_DAY` and
@@ -1005,6 +1031,7 @@ function draftFrom(s: WorldStateData): WorldStateData {
     skillLevel: { ...s.skillLevel },
     skillExp: { ...s.skillExp },
     artExp: { ...s.artExp },
+    meridianPoints: s.meridianPoints,
     learnedRecipeIds: [...s.learnedRecipeIds],
     inventoryEquipment: { ...s.inventoryEquipment },
     statExp: { ...s.statExp },
@@ -1621,6 +1648,13 @@ export const useWorldStore = create<WorldStore>()(
             lootSummary.push(`${def?.name ?? it.itemId}×${it.count}`);
           }
         }
+        // Meridian charts (data/meridian-sources.ts loot) roll on their own.
+        if (!pb.tournament) {
+          for (const itemId of rollMeridianLoot(pb.opponentId)) {
+            draft.inventory[itemId] = (draft.inventory[itemId] ?? 0) + 1;
+            lootSummary.push(`${getItem(itemId)?.name ?? itemId}×1`);
+          }
+        }
         appendActionLog(
           draft,
           "combat",
@@ -1903,6 +1937,17 @@ export const useWorldStore = create<WorldStore>()(
           }
         }
 
+        // แผนภาพชีพจร: readable only once every required skill / art is
+        // learned, and only once. Refuses without consuming.
+        if (def.use.t === "learnMeridian") {
+          if (!s.playerBuild) return { ok: false, reason: "no-build" };
+          const chart = getMeridianChart(def.use.chartId);
+          if (!chart) return { ok: false, reason: "unknown" };
+          if (s.playerBuild.meridians?.[chart.id]) return { ok: false, reason: "already-learned", itemId };
+          const block = meridianReadBlock(chart, s.playerBuild);
+          if (block) return { ok: false, reason: "meridian-locked", itemId, message: block };
+        }
+
         const draft = draftFrom(s);
         advanceTime(draft, ACTION_HOURS);
         // Consume one count.
@@ -1962,9 +2007,49 @@ export const useWorldStore = create<WorldStore>()(
           set({ ...draft });
           return { ok: true, kind: "manualLearnArt", itemId, artId: eff.artId, level: lv };
         }
+        if (eff.t === "learnMeridian") {
+          // Pre-flight verified the chart exists, isn't learned and its
+          // requirements are met.
+          const chart = getMeridianChart(eff.chartId)!;
+          draft.playerBuild = {
+            ...draft.playerBuild!,
+            meridians: { ...(draft.playerBuild!.meridians ?? {}), [chart.id]: chart.nodes.map(() => 0) },
+          };
+          draft.wExp += W_EXP_USE_ITEM;
+          appendActionLog(draft, "meridian", `อ่าน ${def.name} · เรียนรู้ชีพจร${chart.name} (${chart.nodes.length} จุด)`);
+          set({ ...draft });
+          return { ok: true, kind: "learnMeridian", itemId, chartId: chart.id };
+        }
         // Unknown effect t — fall through; no xp granted but item consumed.
         set({ ...draft });
         return { ok: false, reason: "no-effect" };
+      },
+
+      openMeridianNode: (chartId, index) => {
+        const s = get();
+        if (!s.playerBuild) return { ok: false, reason: "ยังไม่มีตัวละคร" };
+        const chart = getMeridianChart(chartId);
+        if (!chart) return { ok: false, reason: "ไม่มีแผนภาพชีพจรนี้" };
+        const stored = s.playerBuild.meridians?.[chartId];
+        const ranks = stored ? chart.nodes.map((_, i) => stored[i] ?? 0) : undefined;
+        const check = checkOpenMeridianNode(chart, ranks, index, s.meridianPoints ?? 0);
+        if (!check.ok) return check;
+        const draft = draftFrom(s);
+        const next = [...ranks!];
+        next[index] = check.rank;
+        draft.meridianPoints = Math.max(0, (draft.meridianPoints ?? 0) - check.cost);
+        draft.playerBuild = {
+          ...draft.playerBuild!,
+          meridians: { ...(draft.playerBuild!.meridians ?? {}), [chartId]: next },
+        };
+        const node = chart.nodes[index]!;
+        appendActionLog(
+          draft,
+          "meridian",
+          `${check.rank === 1 ? "เปิด" : "เสริม"}${node.name.startsWith("จุด") ? node.name : `จุด${node.name}`} (ชีพจร${chart.name}) ขั้น ${check.rank} · -${check.cost} แต้ม`,
+        );
+        set({ ...draft });
+        return { ok: true, rank: check.rank };
       },
 
       practiceMusic: () => {
@@ -2048,6 +2133,7 @@ export const useWorldStore = create<WorldStore>()(
           "learn",
           `เร่งวิชาฝีมือ ${sk.n} → Lv.${lv + 1} (-${remaining} w-exp)`,
         );
+        grantMeridianPoints(draft, 1);
         set({ ...draft });
         return { ok: true, skillId, level: lv + 1, cost: remaining };
       },
@@ -2079,6 +2165,7 @@ export const useWorldStore = create<WorldStore>()(
           "learn",
           `เร่งวิชาในกาย ${art.n} → ขั้น ${lv + 1} (-${remaining} w-exp)`,
         );
+        grantMeridianPoints(draft, 1);
         set({ ...draft });
         return { ok: true, artId, level: lv + 1, cost: remaining };
       },
@@ -3043,7 +3130,7 @@ export const useWorldStore = create<WorldStore>()(
     }),
     {
       name: "wusia-world-v1",
-      version: 23,
+      version: 24,
       // Content backfill also runs for current-version saves (migrate does
       // not). Keep the standard shallow merge and add only missing lore.
       merge: (persisted, current) => {
@@ -3073,6 +3160,7 @@ export const useWorldStore = create<WorldStore>()(
         skillLevel: s.skillLevel,
         skillExp: s.skillExp,
         artExp: s.artExp,
+        meridianPoints: s.meridianPoints,
         learnedRecipeIds: s.learnedRecipeIds,
         inventoryEquipment: s.inventoryEquipment,
         statExp: s.statExp,
@@ -3160,6 +3248,7 @@ export const useWorldStore = create<WorldStore>()(
       //   v18 → v19 added playerBodyId (defaults by gender).
       //   v19 → v20 added wanted / wantedDay / jailCityId (law).
       //   v20 → v21 added jailUntil (the jail map sentence).
+      //   v23 → v24 added meridianPoints (ชีพจร) and playerBuild.meridians.
       // Despite the list, `migrate` is one idempotent normalizer: it ignores
       // fromVersion and fills every missing field. See docs/save-format.md.
       migrate: (persisted, fromVersion) => {
@@ -3223,6 +3312,11 @@ export const useWorldStore = create<WorldStore>()(
           skillLevel: p.skillLevel && typeof p.skillLevel === "object" ? { ...p.skillLevel } : {},
           skillExp: p.skillExp && typeof p.skillExp === "object" ? { ...p.skillExp } : {},
           artExp: p.artExp && typeof p.artExp === "object" ? { ...p.artExp } : {},
+          // v24: meridian points (charts live on playerBuild.meridians).
+          meridianPoints:
+            typeof p.meridianPoints === "number" && Number.isFinite(p.meridianPoints) && p.meridianPoints >= 0
+              ? Math.floor(p.meridianPoints)
+              : 0,
           learnedRecipeIds: Array.isArray(p.learnedRecipeIds)
             ? [...p.learnedRecipeIds]
             : [],

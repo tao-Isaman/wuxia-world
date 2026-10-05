@@ -27,6 +27,7 @@ export {
   combinedStats,
   statBreakdown,
   getEquipBonus,
+  getBuildBonus,
   getEquipStatBonus,
   getEquippedItems,
   getMasteryMap,
@@ -37,6 +38,28 @@ export {
   type MasteryMap,
   type StatBreakdown,
 } from "./derive";
+export * from "./meridian-types";
+export {
+  MERIDIAN_RANK_MAX,
+  MERIDIAN_KIND_LABEL,
+  getMeridianChart,
+  emptyMeridianCombat,
+  clampMeridianRank,
+  meridianRankBonus,
+  meridianChartBonus,
+  meridianBuildBonus,
+  meridianNodeState,
+  meridianNextCost,
+  meridianChartFullCost,
+  meridianChartSpent,
+  normalizeMeridianRanks,
+  missingMeridianRequirements,
+  checkOpenMeridianNode,
+  type MeridianBonus,
+  type MeridianNodeState,
+  type OpenMeridianCheck,
+} from "./meridians";
+export { MERIDIAN_CHARTS } from "./data/meridians";
 export { hitPct, critPct, hpColor, CRIT_MULTIPLIER } from "./damage";
 export {
   SKILL_LEVEL_MIN,

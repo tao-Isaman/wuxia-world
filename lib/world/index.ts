@@ -2,6 +2,7 @@
 // UI code should import from here rather than reaching into internal modules.
 
 export * from "./types";
+export * from "./meridians";
 export {
   SCENES,
   SCENES_BY_ID,

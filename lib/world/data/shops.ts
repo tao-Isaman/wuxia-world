@@ -1,4 +1,5 @@
 import type { ItemCategory } from "../types";
+import { meridianChartItemsSoldIn } from "../meridians";
 
 // ─── Shop / inn registry ──────────────────────────────────────────────
 // Each entry attaches a buy/sell shop to one location id. Shops inherit
@@ -48,7 +49,9 @@ const VILLAGE_SHOP: readonly string[] = [
 ];
 
 // ─── Shops attached to specific locations ────────────────────────────
-export const SHOPS: readonly ShopDef[] = [
+// Meridian charts (แผนภาพชีพจร) join the shops their source table names
+// (data/meridian-sources.ts) — see withMeridianCharts below.
+export const SHOPS: readonly ShopDef[] = ([
   // City general stores (wide inventory, sell-back any category at 50 %).
   { id: "shop_capital",  locationId: "city_capital",  label: "🏪 ตลาดนครหลวง",      inventory: COMMON_CITY_SHOP, sellMultiplier: 0.5 },
   { id: "shop_xixia",    locationId: "city_xixia",    label: "🏪 ตลาดซีเซี่ย",       inventory: COMMON_CITY_SHOP, sellMultiplier: 0.5 },
@@ -74,7 +77,12 @@ export const SHOPS: readonly ShopDef[] = [
   { id: "shop_village_taishan", locationId: "village_taishan", label: "🏪 ร้านไท่ซาน",      inventory: VILLAGE_SHOP, sellMultiplier: 0.35, acceptsCategories: ["food", "herb", "material"] },
   { id: "shop_village_hengshan",locationId: "village_hengshan",label: "🏪 ร้านฮิงซาน",      inventory: VILLAGE_SHOP, sellMultiplier: 0.35, acceptsCategories: ["food", "herb", "material"] },
   { id: "shop_village_wuxia",   locationId: "village_wuxia",   label: "🏪 ร้านอวู่เซี่ย",   inventory: VILLAGE_SHOP, sellMultiplier: 0.35, acceptsCategories: ["food", "herb", "material"] },
-];
+] satisfies readonly ShopDef[]).map(withMeridianCharts);
+
+function withMeridianCharts(shop: ShopDef): ShopDef {
+  const charts = meridianChartItemsSoldIn(shop.id).filter((id) => !shop.inventory.includes(id));
+  return charts.length > 0 ? { ...shop, inventory: [...shop.inventory, ...charts] } : shop;
+}
 
 export const SHOPS_BY_LOCATION = new Map<string, ShopDef>(
   SHOPS.map((s) => [s.locationId, s]),

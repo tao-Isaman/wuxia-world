@@ -15,6 +15,7 @@ import {
   type ConflictFactors,
 } from "./skill-conflict";
 import type { Equipment } from "./types";
+import { meridianBuildBonus } from "./meridians";
 
 // Pure: base stats → derived combat stats.
 //
@@ -135,6 +136,17 @@ export function getEquipBonus(loadout: EquipLoadout): EquipBonus {
   return b;
 }
 
+// Equipment + meridian (ชีพจร) combat bonuses for a build — what the battle
+// context and deriveAll overlay on the derived stats. Meridian combat fields
+// use the same keys as EquipBonus (lib/game/meridian-types.ts).
+export function getBuildBonus(build: Pick<CharacterBuild, "equipment" | "meridians">): EquipBonus {
+  const b = getEquipBonus(build.equipment);
+  if (!build.meridians) return b;
+  const m = meridianBuildBonus(build).combat;
+  for (const k of Object.keys(b) as (keyof EquipBonus)[]) b[k] += m[k];
+  return b;
+}
+
 function addScaledPartialStats(
   target: StatBlock,
   src: PartialStats,
@@ -153,7 +165,8 @@ function addScaledPartialStats(
 
 // Per-source stat contribution buckets. `base` is just the build's
 // innate stats; `fromArts` / `fromSkills` / `fromEquipment` are the
-// deltas each source contributes after conflict + level scaling.
+// deltas each source contributes after conflict + level scaling;
+// `fromMeridians` is what opened meridian points (ชีพจร) add.
 // Caller composes the buckets they need:
 //   - battle / damage     → base + arts + skills + equipment (all)
 //   - learn-skill gates   → base + arts + skills (no equipment)
@@ -163,6 +176,7 @@ export interface StatBreakdown {
   fromArts: StatBlock;
   fromSkills: StatBlock;
   fromEquipment: StatBlock;
+  fromMeridians: StatBlock;
 }
 
 const emptyStatBlock = (): StatBlock => ({
@@ -225,11 +239,16 @@ export function statBreakdown(
   const fromEquipment = emptyStatBlock();
   addPartialStats(fromEquipment, getEquipStatBonus(build.equipment));
 
+  // ── Meridians (ชีพจร) — flat, no conflict or level scaling ──
+  const fromMeridians = emptyStatBlock();
+  if (build.meridians) addPartialStats(fromMeridians, meridianBuildBonus(build).stats);
+
   return {
     base: { ...build.stats },
     fromArts,
     fromSkills,
     fromEquipment,
+    fromMeridians,
   };
 }
 
@@ -240,7 +259,8 @@ export interface CombinedStatsOpts {
   excludeEquipment?: boolean;
 }
 
-// Combine base stats + art-scaled stats + skill stat bonuses. Reads from
+// Combine base stats + art-scaled stats + skill stat bonuses + meridian
+// stats. Reads from
 // BOTH slotted skills and learned-but-unslotted skills (everyone
 // learned contributes their `st`). Same for arts. Conflict factors
 // halve / zero misaligned contributions per skill-conflict.ts.
@@ -265,7 +285,7 @@ export function combinedStats(
   const breakdown = statBreakdown(build, conflict);
   const out: StatBlock = { ...breakdown.base };
   for (const k of STAT_KEYS) {
-    out[k] += breakdown.fromArts[k] + breakdown.fromSkills[k];
+    out[k] += breakdown.fromArts[k] + breakdown.fromSkills[k] + breakdown.fromMeridians[k];
     // fromEquipment intentionally NOT added — see header comment.
   }
   return out;
@@ -294,7 +314,8 @@ export function deriveAll(build: CharacterBuild): Derived {
     d.MP += Math.floor(art.mL * lv * f);
   }
 
-  const eb = getEquipBonus(build.equipment);
+  // Equipment + meridian combat fields.
+  const eb = getBuildBonus(build);
   d.Atk += eb.atk;
   d.PD += eb.pd;
   d.ID += eb.id_;

@@ -14,6 +14,8 @@ import { SECT_MEMBERSHIPS } from "./data/sect-memberships";
 import { heroBodyFor } from "./data/player-bodies";
 import {
   deriveAll,
+  getMeridianChart,
+  normalizeMeridianRanks,
   SKILL_LEVEL_MAX,
   SKILL_LEVEL_MIN,
   STAT_KEYS,
@@ -370,14 +372,31 @@ export function validateAndRepair(state: WorldStateData): void {
       if (!ARTS_BY_ID.has(aid)) continue;
       cleanLevels[aid] = Math.max(1, Math.min(10, Math.floor(lv)));
     }
+    // Meridian charts (ชีพจร): drop unknown charts, clamp ranks to 0–3 and
+    // pad / trim each to the chart's node count.
+    const cleanMeridians: Record<string, number[]> = {};
+    if (b.meridians && typeof b.meridians === "object") {
+      for (const [cid, ranks] of Object.entries(b.meridians)) {
+        const chart = getMeridianChart(cid);
+        if (!chart) {
+          console.warn(`[world] dropping unknown meridian chart "${cid}"`);
+          continue;
+        }
+        cleanMeridians[cid] = normalizeMeridianRanks(chart, Array.isArray(ranks) ? ranks : []);
+      }
+    }
     state.playerBuild = {
       ...b,
       skillIds: slots,
       learnedSkillIds: dedupedSkills,
       learnedArtIds: dedupedArts,
       artLevels: cleanLevels,
+      meridians: cleanMeridians,
     };
   }
+  if (typeof state.meridianPoints !== "number" || !Number.isFinite(state.meridianPoints) || state.meridianPoints < 0) {
+    state.meridianPoints = 0;
+  } else state.meridianPoints = Math.floor(state.meridianPoints);
 
   // Sect membership rank clamp. The T3 sects (Huashan, Quanzhen, Songshan,
   // Taishan, Hengshan_south, Hengshan_north) were compressed from 9-rank

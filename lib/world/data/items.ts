@@ -1,5 +1,5 @@
 import { scaleMoveStat } from "./move-gates";
-import { ARTS, SKILLS, TIERS } from "@/lib/game";
+import { ARTS, SKILLS, TIERS, MERIDIAN_CHARTS, MERIDIAN_KIND_LABEL, meridianChartItemId, getSkill, getArt } from "@/lib/game";
 import type { ItemDef } from "../types";
 
 // คัมภีร์ — what a quest that teaches a move or art hands over instead. The
@@ -16,6 +16,9 @@ export function scrollItemId(kind: "skill" | "art", id: string): string {
 export function scrollArtLevel(ti: number): number {
   return ti >= 4 ? 3 : 1;
 }
+
+/** Shop price of a meridian chart by its tier (T0…T5). */
+export const MERIDIAN_CHART_PRICE: readonly number[] = [400, 1200, 3000, 6000, 12000, 25000];
 
 // Items table — every entry has an explicit `category` and a base `price`
 // in gold. Shops use these for buy/sell; inns may restrict acceptance to
@@ -337,6 +340,9 @@ export const ITEMS: readonly ItemDef[] = ([
 
   // ─── คัมภีร์วิชา — one per move skill and inner art (generated) ──────
   ...scrollItems(),
+
+  // ─── แผนภาพชีพจร — one per meridian chart (generated) ───────────────
+  ...meridianChartItems(),
 ] satisfies readonly ItemDef[]).map(scaleManualGate);
 
 /** Manuals ask half their authored stat (MOVE_STAT_GATE_SCALE). */
@@ -361,6 +367,28 @@ function scrollItems(): ItemDef[] {
       use: { t: "manualLearnArt", artId: a.id, reqStat: "STR", reqValue: 0, level: scrollArtLevel(a.ti) },
     })),
   ];
+}
+
+/** Thai list of what a chart asks to have learned ("หมัดพื้นฐาน, ลมปราณ…"). */
+export function meridianRequirementText(req: { skills?: readonly string[]; arts?: readonly string[] }): string {
+  const names = [
+    ...(req.skills ?? []).map((id) => getSkill(id)?.n ?? id),
+    ...(req.arts ?? []).map((id) => getArt(id)?.n ?? id),
+  ];
+  return names.join(", ");
+}
+
+function meridianChartItems(): ItemDef[] {
+  return MERIDIAN_CHARTS.map((c): ItemDef => ({
+    id: meridianChartItemId(c.id),
+    name: `แผนภาพชีพจร-${c.name}`,
+    category: "manual",
+    price: MERIDIAN_CHART_PRICE[c.ti] ?? 0,
+    description:
+      `แผนภาพชีพจร${c.name} (T${c.ti} · ${MERIDIAN_KIND_LABEL[c.kind]} · ${c.nodes.length} จุด) — ${c.description}` +
+      ` ต้องเรียน ${meridianRequirementText(c.requires) || "—"} ก่อนจึงอ่านได้`,
+    use: { t: "learnMeridian", chartId: c.id },
+  }));
 }
 
 export const ITEMS_BY_ID = new Map<string, ItemDef>(ITEMS.map((i) => [i.id, i]));

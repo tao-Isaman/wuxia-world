@@ -26,6 +26,7 @@ Time in this game is counted in **ชั่วยาม**: 12 of them make one d
 - [Life skills and gathering](#life-skills-and-gathering)
 - [Items and equipment](#items-and-equipment)
 - [Progression](#progression)
+- [Meridians (ชีพจร)](#meridians-ชีพจร)
 - [Stats](#stats)
 - [Traits and reputation](#traits-and-reputation)
 - [Bad actions](#bad-actions)
@@ -440,6 +441,15 @@ Practice:
 - **Slots.** Learned skills and arts go into 10 slots (the วิชา menu). The first slotted art is your primary art.
 - **Forgetting.** ลืม removes a skill or art with no refund.
 - **Type conflict** can weaken styles that fight each other — details in [combat.md](combat.md#type-conflict).
+
+## Meridians (ชีพจร)
+
+- **Meridian points (แต้มชีพจร).** Every level a move skill or inner art gains, from any source (battle xp, practice, w-exp), gives **+1** point.
+- **Charts.** A chart is learned by reading its item **แผนภาพชีพจร-<ชื่อ>** from the bag. It can be read only once the hero has learned every skill / art the chart asks for (the item stays in the bag otherwise), and only once.
+- **Points on a chart.** 95 charts by tier: T0 20 charts of 1–2 points, T1 20 of 3–4, T2 15 of 5–6, T3 15 of 7–8, T4 15 of 9–10, T5 10 of 12. A chart's tier is about its size, not its requirement.
+- **Opening.** Points open in order (a point needs the one before it at rank 1); each point has 3 ranks. Raising a point of a tier-`T` chart to rank r costs `(T + 1) × r` meridian points — a whole T0 point costs 6, a T5 point 36, a full T5 chart 432.
+- **What they give.** Each rank adds base stats (STR…INT), combat stats (Atk, PD, ID, HP, MP, PA, IA, Spd, Acc, Res, Cri, Eva) or always-on effects (% attack, % damage reduction, % HP regained per turn), by the chart's kind: ค่าสถานะพื้นฐาน, ค่าสถานะการต่อสู้, ความสามารถ, บัฟพิเศษ. Ranks add up; everything applies in every battle.
+- **Where charts come from.** T0–T1 mostly from book and town shops, T2–T3 from rarer shops and elite foes, T4–T5 as rare loot from strong foes; some are quest rewards. Shop prices by tier: 400, 1200, 3000, 6000, 12000, 25000 gold.
 
 ## Stats
 

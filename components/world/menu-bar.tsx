@@ -14,6 +14,7 @@ import { QuestLogPopup } from "./popups/quest-log-popup";
 import { QuestTracker } from "./quest-tracker";
 import { SectMembershipPopup } from "./popups/sect-membership-popup";
 import { LettersPopup } from "./popups/letters-popup";
+import { MeridianPopup, meridianActionable } from "./popups/meridian-popup";
 import { toast } from "@/store/toast-store";
 import { RestQuickAction } from "./rest-quick-action";
 import { HudVitals } from "./hud-vitals";
@@ -36,6 +37,7 @@ type PopupId =
   | "sect"
   | "log"
   | "letters"
+  | "meridians"
   | null;
 
 // Main-screen menu bar — popup buttons, one popup at a time. The bar
@@ -95,6 +97,10 @@ export function MenuBar({ hud }: { hud?: boolean } = {}) {
     if (letter && !letter.read) toast("info", "✉ มีจดหมายฉบับใหม่ — เปิดดูที่ จดหมาย");
   }, [hud, newest, seenNewest]);
 
+  // ชีพจร: the unspent points, shown only while a point can be opened with them.
+  const meridianPoints = useWorldStore((s) => s.meridianPoints ?? 0);
+  const meridianReady = useWorldStore((s) => meridianActionable(s.playerBuild?.meridians, s.meridianPoints ?? 0));
+
   const tabs: {
     id: Exclude<PopupId, null>;
     icon: string;
@@ -119,10 +125,11 @@ export function MenuBar({ hud }: { hud?: boolean } = {}) {
     },
     { id: "log", icon: "/icons/ui/log.png", label: "บันทึก" },
     { id: "letters", icon: "/icons/ui/letter.png", label: "จดหมาย", badge: unread > 0 ? unread : undefined },
+    { id: "meridians", icon: "/icons/ui/meridian.png", label: "ชีพจร", badge: meridianReady ? meridianPoints : undefined },
   ];
 
   // Hero's Adventure-style unified menu: the open popup renders inside one
-  // full-screen tabbed shell, and number keys 1-7 switch sections in place.
+  // full-screen tabbed shell, and number keys 1-9 switch sections in place.
   const menu = {
     tabs: tabs.map((t, i) => ({ ...t, hotkey: String(i + 1) })),
     active: open,
@@ -138,10 +145,11 @@ export function MenuBar({ hud }: { hud?: boolean } = {}) {
       <SectMembershipPopup open={open === "sect"} onClose={close} />
       <ActionLogPopup open={open === "log"} onClose={close} />
       <LettersPopup open={open === "letters"} onClose={close} />
+      <MeridianPopup open={open === "meridians"} onClose={close} />
     </GameMenuContext.Provider>
   );
 
-  // World hotkeys 1-7 open a section directly (desktop); inside the section
+  // World hotkeys 1-9 open a section directly (desktop); inside the section
   // shell the same digits switch tabs (see Modal).
   useEffect(() => {
     if (!hud || open) return;

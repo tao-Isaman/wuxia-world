@@ -352,7 +352,7 @@ Objects placed on a location map with the engine's map editor (`/game/engine`, �
 On a map (`MapHud` in `components/world/map-hud.tsx` + `MenuBar hud`):
 
 - **Top left:** `.hud-topleft` stacks the vitals card (`components/world/hud-vitals.tsx`, `[data-testid="hud-vitals"]`: HP / MP / พลัง gauges as `role="meter"`, no portrait) over the icon bar (`nav.hud-iconbar[aria-label="เมนูเกม"]`).
-  - Seven section icons: 1 โปรไฟล์, 2 ย่าม, 3 วิชา, 4 อาชีพ, 5 ภารกิจ (badge = active quests), 6 สำนัก (badge = things to do), 7 บันทึก.
+  - Nine section icons: 1 โปรไฟล์, 2 ย่าม, 3 วิชา, 4 อาชีพ, 5 ภารกิจ (badge = active quests), 6 สำนัก (badge = things to do), 7 บันทึก, 8 จดหมาย (badge = unread), 9 ชีพจร (badge = unspent meridian points, shown only while some point can be opened with them — `meridianActionable`).
   - Then ♪ and the install icon.
   - Layout: two rows on desktop and landscape; on phones, rows of four.
 - **Top right:** the purse and the day.
@@ -399,6 +399,7 @@ A menu section opens as a full-screen **menu shell** (`components/ui/modal.tsx` 
 | `move-skills-popup.tsx` | three columns: counts, weapon mastery, conflicts and the 10 loadout slots · the learned library (`PagedGrid`, filters) · the picked move (`SkillDetail`: actions first — equip / replace / remove, เร่งด้วย w-exp with the `upgrade-payoff.tsx` card, ลืม — then numbers and xp) |
 | `life-skills-popup.tsx` | tabs มาสเตอร์รี่ / ฝึกฝน / สูตรที่เรียน, each a `PagedGrid` of tiles: the 19 life skills · music practice and training items · learned recipes (read-only) |
 | `letters-popup.tsx` | two columns: the inbox (`PagedGrid`; the gift as an item tile, ● unread, ลบที่อ่านแล้ว) · the open letter (portrait, text, the gift tile and rarity, ลบ). Deleting takes an unclaimed gift first (`deleteLetters`) |
+| `meridian-popup.tsx` | ชีพจร, three columns (`app/meridian.css`): the learned charts (`PagedGrid`; tier badge, points opened, a rank bar in the kind's colour) and the unspent แต้มชีพจร · the chart on a black silhouette under a moon: one of five training poses (`components/world/popups/meridian-poses.ts`, picked by kind and chart id) drawn from a skeleton, every `MeridianBodyPoint` placed from the same joints (back points are dashed rings); points are buttons joined in node order (lit lines flow once opened), glowing by rank, the openable one breathing; hover (mouse) or tap shows a tooltip with each rank's bonus and the next cost; the bar under it opens / raises the picked point (`openMeridianNode`) · the chart's total bonus, points spent, description and requirements (✓ / ✗). No chart yet → an explanation of how to get one |
 | `quest-log-popup.tsx` → `components/world/quest-log.tsx` | กำลังทำ / สำเร็จ / ละทิ้ง; each row expands to the stage checklist, the guide box (🎯 / 📍 / ➤ นำทาง), objective spots, 📌 ติดตาม, ละทิ้งภารกิจ |
 | `sect-membership-popup.tsx` | the sect, rank-up, 🎖 rewards, 📜 sect quests, ☯ arts, leaving (resign or betray) |
 | `action-log-popup.tsx` | the last 100 actions, newest first |
@@ -548,7 +549,7 @@ The data in `public/progress.json` is **frozen at wave 11** (2026-09-29), so tre
 
 - **Drawer button.** The quest tracker may cover the "อื่น ๆ" drawer button (both sit at the top right) on the six maps that show the drawer, including `home_player`.
 - **Market and sect-internal rumors** are reachable only through the drawer.
-- **Menus still scrolling.** ภารกิจ, สำนัก and บันทึก (and shop / artisan / hall popups) keep their old scrolling layouts; only โปรไฟล์, ย่าม, วิชา, อาชีพ and จดหมาย are landscape columns.
+- **Menus still scrolling.** ภารกิจ, สำนัก and บันทึก (and shop / artisan / hall popups) keep their old scrolling layouts; only โปรไฟล์, ย่าม, วิชา, อาชีพ, จดหมาย and ชีพจร are landscape columns.
 - **Turned portrait** (see [Landscape only](#landscape-only)): safe-area insets name the physical edges, and Radix popovers (the stat tooltips, comboboxes) may sit off their trigger.
 - **Action log.** Kinds `battle`, `encounter`, `steal`, `assassinate` and `kidnap` show their raw English names, and `travel` is labelled but never logged.
 - **`/progress` and the cache.** With the service worker active, each 5-second poll of `/progress.json?t=…` adds a cache entry and eventually pushes real art out of the 900-entry cache.

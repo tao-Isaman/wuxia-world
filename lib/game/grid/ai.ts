@@ -22,6 +22,7 @@
 // touching state. Ties break on lower x, then y, then slot (deterministic).
 // The AI never flees — retreat is the player's decision.
 
+import { PCT_REDUCE_CAP } from "../battle";
 import { critPct, CRIT_MULTIPLIER, hitPct } from "../damage";
 import { effectiveBp } from "../leveling";
 import { getStatusFactor } from "../skill-conflict";
@@ -108,7 +109,7 @@ function estimateSkill(u: GridUnit, foe: GridUnit, sk: Skill): Estimate {
   for (const d of u.status.debuffs) if (d.t === "debuff_atk" && d.v != null) atkDebuff += d.v;
   const sm = Math.max(0, 1 + (u.status.stk * u.status.stkV) / 100 + ctx.equipBonus.A.pct_atk / 100 + atkDebuff / 100);
   const { fD, dR } = defenderMods(foe);
-  const pR = defenderMods(foe).pR + ctx.equipBonus.B.pct_red;
+  const pR = Math.min(PCT_REDUCE_CAP, defenderMods(foe).pR + ctx.equipBonus.B.pct_red);
   const mm = 1 + ((ctx.masteries.A[sk.w] ?? 0) / 200) * 0.5;
   const lv = ctx.skillLevels.A[sk.id];
   const eBp = effectiveBp(sk, typeof lv === "number" ? lv : 1) * getStatusFactor(sk, ctx.conflict.A);

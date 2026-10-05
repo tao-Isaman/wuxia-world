@@ -17,6 +17,8 @@ The NPC simulation and rumors are in [liveness.md](liveness.md). The content tab
 - [Law and jail](#law-and-jail)
 - [Bad actions](#bad-actions)
 - [Location categories and practice](#location-categories-and-practice)
+- [Letters, horse stations and the sword tournament](#letters-horse-stations-and-the-sword-tournament)
+- [Meridians (ชีพจร)](#meridians-ชีพจร)
 - [Stat progression](#stat-progression)
 - [Opening helpers](#opening-helpers)
 - [Adding a scene effect or condition](#adding-a-scene-effect-or-condition)
@@ -37,6 +39,7 @@ The NPC simulation and rumors are in [liveness.md](liveness.md). The content tab
 | `lib/world/stat-progression.ts` | stat xp constants and curves |
 | `lib/world/capital-training.ts`, `clinic-preparation.ts` | opening helpers |
 | `lib/world/npc-tick.ts`, `rumor-engine.ts` | the Liveness Layer ([liveness.md](liveness.md)) |
+| `lib/world/meridians.ts` | meridian chart sources (shops, loot, quest rewards from `data/meridian-sources.ts`) and the reading check `meridianReadBlock` |
 | `lib/world/validate.ts` | repair on load ([save-format.md](save-format.md#repair-on-load)) |
 | `lib/world/battle-bridge.ts`, `battle-looks.ts` | the battle seam ([grid-combat.md](grid-combat.md#world--battle)) |
 | `lib/world/data/` | content tables, plus `random-events.ts`, `activities.ts`, `regions.ts`, `named-npcs.ts`, `rumor-templates.ts`, `lore-rumors.ts` |
@@ -296,6 +299,20 @@ Three engines that hang off the clock and the map; numbers in [gameplay.md](game
 - **Letters** (`lib/world/letters.ts`). `advanceTime` calls `rollLetters(state, dayBefore)` when the day changes (at most the last 7 days). Writers (`letterWriters`): NPCs with relationship ≥ 20, present and alive, not written in 15 days. Each is asked in random order; the first to pass `letterChance(relationship, fame, LUK)` writes that day's one letter, with a gift from `pickLetterGift` at the rarity `giftRarity(roll, LUK, fame)` (giftable items only, the NPC's tastes first, gold for those who like it). `state.letters` (inbox, 40 kept) and `state.letterDays`. The store's `openLetter` takes the gift once.
 - **Horse stations** (`lib/world/stations.ts`). `hasStation`: `city_` / `village_` places and the joinable sects' `hallLocationId`s with a world-map spot. `stationTrips(state, from)` lists visited station places with `stationFare` (gold and ชั่วยาม by world-map distance). The store's `stationTravel` pays, advances time and moves the hero (through `onEnter` and auto-advance, like `gotoScene`, without the travel stamina charge). The map shows a `station` marker at a free spot.
 - **Sword tournament** (`lib/world/tournament.ts`). A 360-day year; `tournamentPhase(day)` is `registration` (days 60–89), `day` (90–92) or `closed`. `state.tournament` holds this year's `TournamentState` (rounds of seeds, `round`, the hero's place and winnings, the champion and their pick); `state.tournamentHistory` past records. `fightTournamentBout` starts the bracket (`startTournament`: the hero + `drawEntrants`, named roster first) and queues `pendingBattle` with `tournament: true` (non-fatal, no loot). `acknowledgeBattleResult` (win, loss or retreat) calls `resolveRound`, which settles the hero's bout, simulates the rest (`boutOdds` from `powerBreakdown` totals), pays out, and after the final records the year and the prize options (`prizeOptions`: every entrant's moves and art the hero lacks). `pickTournamentPrize` teaches one through `learnSkill` / `learnArt` — the one sanctioned way besides lineage quests and sagas to learn a sect move. `settleTournaments` (each new day) finishes a bracket the hero left and fights a year without the hero among the NPCs.
+
+## Meridians (ชีพจร)
+
+The engine (ranks, costs, bonuses) is in [combat.md](combat.md#meridians-ชีพจร); player view in [gameplay.md](gameplay.md#meridians-ชีพจร).
+
+- **Points.** `state.meridianPoints` (saved, v24). Every level a move skill or inner art gains gives +1 (`MERIDIAN_POINTS_PER_LEVEL`): `applySkillLevelUps` / `applyArtLevelUps` (battle xp, practice, any xp overflow) and `levelUpSkillFromWExp` / `levelUpArtFromWExp`. Each grant logs a `meridian` entry. Learning a move (at its starting level) gives nothing.
+- **Chart items.** `lib/world/data/items.ts` generates one item per chart: `chart_<id>` (`meridianChartItemId`), category `manual`, named `แผนภาพชีพจร-<name>`, priced by tier (`MERIDIAN_CHART_PRICE`: 400 / 1200 / 3000 / 6000 / 12000 / 25000), use `{ t: "learnMeridian", chartId }`; icons are book scrolls by tier (`item-icons.ts`).
+- **Reading** (`useItem`). Refused, item kept, while the hero lacks any of the chart's `requires` skills / arts (`reason: "meridian-locked"` with a Thai `message` from `meridianReadBlock`) or already knows the chart (`already-learned`). On success `playerBuild.meridians[chartId]` = zeros, +5 w-exp, an action-log line.
+- **Opening points.** `openMeridianNode(chartId, index)` → `{ ok: true, rank } | { ok: false, reason }` (Thai). It runs the pure `checkOpenMeridianNode` (learned, in order, below rank 3, enough points), spends `meridianRankCost(ti, rank)` and logs it.
+- **Sources** (`data/meridian-sources.ts`, `MERIDIAN_SOURCES[chartId]`):
+  - `shops` — the item joins those shops' stock (`SHOPS` maps `withMeridianCharts`);
+  - `loot` — `{ opponentId, chance }`: after a won battle (not a tournament bout) each matching entry rolls on its own, on top of the normal drops (`rollMeridianLoot`);
+  - `questRewards` — the item is added to those quests' `rewards` (`QUESTS` maps `withMeridianCharts`).
+- **Repair.** `validateAndRepair` drops unknown chart ids, clamps ranks to 0–3, pads / trims each chart to its point count, and resets a bad `meridianPoints` to 0.
 
 ## Stat progression
 

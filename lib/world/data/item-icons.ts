@@ -1,4 +1,4 @@
-import { ARTS, EQUIPMENT, SKILLS } from "@/lib/game";
+import { ARTS, EQUIPMENT, MERIDIAN_CHARTS, SKILLS } from "@/lib/game";
 import { getItem } from "./items";
 
 // Item and equipment icons — every bag item and gear piece shows a painted
@@ -141,6 +141,9 @@ export const EQUIPMENT_ICONS: Readonly<Record<string, string>> = {
 // scrolls, inner arts bound books, one look per tier (T0…T5).
 const SKILL_SCROLL_BY_TIER = ["06", "10", "02", "05", "03", "09"];
 const ART_BOOK_BY_TIER = ["01", "14", "04", "06", "12", "09"];
+// Meridian charts (แผนภาพชีพจร) are scrolls of their own, one per tier.
+const CHART_SCROLL_BY_TIER = ["07", "08", "11", "12", "13", "14"];
+const CHART_TIER = new Map(MERIDIAN_CHARTS.map((c) => [c.id, c.ti]));
 const SKILL_TIER = new Map(SKILLS.map((s) => [s.id, s.ti]));
 const ART_TIER = new Map(ARTS.map((a) => [a.id, a.ti]));
 const pick = (list: string[], ti: number) => list[Math.max(0, Math.min(list.length - 1, ti))];
@@ -152,6 +155,7 @@ export function itemIconId(itemId: string): string | null {
   const use = getItem(itemId)?.use;
   if (use?.t === "manualLearnSkill") return `ico_book_scroll_${pick(SKILL_SCROLL_BY_TIER, SKILL_TIER.get(use.skillId) ?? 0)}`;
   if (use?.t === "manualLearnArt") return `ico_book_book_${pick(ART_BOOK_BY_TIER, ART_TIER.get(use.artId) ?? 0)}`;
+  if (use?.t === "learnMeridian") return `ico_book_scroll_${pick(CHART_SCROLL_BY_TIER, CHART_TIER.get(use.chartId) ?? 0)}`;
   return null;
 }
 
