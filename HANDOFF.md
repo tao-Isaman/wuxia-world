@@ -91,6 +91,9 @@ Not verified:
 
 ## Known issues
 
+- **Meridian charts lean on the spine.** Many charts chain back points (tailbone → lower back → upper back → nape); the silhouette draws them as dashed rings on the centre line, which reads less well than charts along the limbs. The content is generated from routes in the content agent's spec (not in the repo); a pass spreading more charts over the limbs would help.
+- **Meridian stats count everywhere.** They join `combinedStats`, so they also count toward stat gates (`statAtLeast`, manuals) and power tiers. Damage reduction from buffs + gear + meridians is capped at 90 % (`PCT_REDUCE_CAP`).
+
 
 
 Real behaviour today, found during the docs audit. Each is small and self-contained unless noted.

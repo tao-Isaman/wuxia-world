@@ -45,12 +45,12 @@ export const MERIDIAN_POSES: Record<PoseId, MeridianPose> = {
       ran: [74, 274], lan: [166, 274], rft: [56, 286], lft: [184, 286],
     },
   },
-  // ท่านั่งสมาธิ — seated lotus, hands folded at the dantian.
+  // ท่านั่งสมาธิ — seated lotus, hands resting on the knees.
   lotus: {
     id: "lotus", name: "ท่านั่งสมาธิดอกบัว", seated: true, wind: -1,
     j: {
       head: [120, 82], neck: [120, 106],
-      rsh: [92, 116], lsh: [148, 116], rel: [70, 160], lel: [170, 160], rwr: [100, 192], lwr: [140, 192], rha: [111, 198], lha: [129, 198],
+      rsh: [92, 116], lsh: [148, 116], rel: [74, 164], lel: [166, 164], rwr: [66, 212], lwr: [174, 212], rha: [62, 228], lha: [178, 228],
       pelvis: [120, 214], rhip: [102, 216], lhip: [138, 216], rkn: [44, 256], lkn: [196, 256],
       ran: [142, 254], lan: [98, 264], rft: [164, 244], lft: [76, 256],
     },
@@ -123,20 +123,23 @@ export function poseBodyPoints(pose: MeridianPose): Record<MeridianBodyPoint, Pt
   const spine = (t: number): Pt => lerp(j.neck, j.pelvis, t);
   // The figure's left (viewer's right) side of the chest.
   const side = j.lsh[0] > j.rsh[0] ? 1 : -1;
+  const back = 11;
   const sole = (an: Pt, ft: Pt): Pt => pose.seated ? lerp(an, ft, 0.55) : add(lerp(an, ft, 0.45), [0, 6]);
   const points: Record<MeridianBodyPoint, Pt> = {
-    crown: add(j.head, [0, -15]),
-    brow: add(j.head, [0, -3]),
-    nape: lerp(j.head, j.neck, 0.62),
+    // Front points run down the centre line; the back points (hollow rings)
+    // sit a little to the side so they never hide a front one.
+    crown: add(j.head, [0, -17]),
+    brow: add(j.head, [0, -2]),
+    nape: add(lerp(j.head, j.neck, 0.55), [-back, 0]),
     throat: add(j.neck, [0, 1]),
-    upper_back: spine(0.1),
-    chest: spine(0.22),
-    heart: add(spine(0.33), [side * 9, 0]),
-    solar: spine(0.47),
-    lower_back: spine(0.58),
-    navel: spine(0.69),
+    upper_back: add(spine(0.09), [-back - 2, 0]),
+    chest: spine(0.21),
+    heart: add(spine(0.31), [side * 11, 0]),
+    solar: spine(0.44),
+    lower_back: add(spine(0.55), [-back - 2, 0]),
+    navel: spine(0.645),
     dantian: spine(0.82),
-    tailbone: add(j.pelvis, [0, 7]),
+    tailbone: add(j.pelvis, [-back + 4, 9]),
     r_shoulder: j.rsh, l_shoulder: j.lsh,
     r_elbow: j.rel, l_elbow: j.lel,
     r_wrist: lerp(j.rwr, j.rel, 0.12), l_wrist: lerp(j.lwr, j.lel, 0.12),
@@ -270,7 +273,8 @@ export function silhouetteParts(pose: MeridianPose): SilhouetteParts {
     }
     // Robe panels: coat tails falling from the waist past the knees, flaring out.
     for (const [hp, kn, sgn] of [[j.rhip, j.rkn, -1], [j.lhip, j.lkn, 1]] as const) {
-      const hem = lerp(hp, kn, 1.12);
+      // A raised knee (the crane) leaves its tail hanging from the hip.
+      const hem = kn[1] < hp[1] + 24 ? add(hp, [sgn * 6, 50]) : lerp(hp, kn, 1.12);
       const flare = sgn === wind ? 10 : 4;
       fills.push(blob([
         add(j.pelvis, [sgn * 4, -18]), add(hp, [sgn * 11, -16]), add(hp, [sgn * 14, 4]), add(hem, [sgn * (14 + flare), 4]),

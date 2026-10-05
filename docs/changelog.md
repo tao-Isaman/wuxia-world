@@ -6,6 +6,15 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-05
 
+### ชีพจร: meridian charts
+
+- **Every level a move skill or inner art gains earns 1 meridian point (แต้มชีพจร).**
+- **95 meridian charts** (T0 20, T1 20, T2 15, T3 15, T4 15, T5 10), each read from its item **แผนภาพชีพจร-<ชื่อ>** once the hero knows the chart's required moves. A chart has 1–2 points (T0) up to 12 (T5), opened in order; each point has 3 ranks costing (tier + 1) × rank points.
+- Points give base stats, combat stats or always-on effects (% attack, % damage reduction, HP per turn), by the chart's kind; they count in every battle. Damage reduction from all sources is capped at 90 %.
+- Charts are sold in city markets (T0–T1), rarer inns and villages (T2–T3) and drop from foes — T4–T5 only from strong foes and saga bosses.
+- **The ชีพจร screen** (HUD icon 9): learned charts on the left; a black-ink silhouette in one of five training poses before a full moon in the middle, its points joined in order, glowing by rank, with a tooltip per point and an open / raise button; the chart's total bonus, its description and requirements on the right. The profile's stat breakdown has a ชีพจร row.
+- Save version 24 (`meridianPoints`; charts live on the build as `meridians`). `test:meridians` and `meridians.spec.ts` cover it.
+
 ### Ten jianghu sagas: a way to every unsect T4 / T5 move
 
 - **Each of the ten jianghu (ยุทธจักร) T4 / T5 moves is now the reward of its own saga** in `lib/world/data/story/jianghu/`, written to twice the length and difficulty of a sect saga (T4) or four times (T5), with no sect to vouch for the hero: the main story must be finished and a stat met (authored 80 / 120, halved in play).

@@ -44,6 +44,7 @@ test("ชีพจร: the HUD badge, a locked point, opening a point and the ch
 
   // Unspent points with something to open: the HUD icon shows them.
   await expect(hudButton(page).locator(".hud-icon-badge")).toHaveText(String(POINTS));
+  await page.screenshot({ path: `${SHOTS}/meridians-hud-1280x720.png` });
   await hudButton(page).click();
   const screen = page.getByTestId("meridian-screen");
   await expect(screen).toBeVisible();
@@ -78,6 +79,7 @@ test("ชีพจร: the HUD badge, a locked point, opening a point and the ch
   expect((await save(page)).meridianPoints).toBe(POINTS - cost);
   await expect(figure.locator('[data-node-index="0"]')).toHaveAttribute("data-rank", "1");
   await expect(figure.locator('[data-node-index="1"]')).toHaveAttribute("data-state", "open");
+  await page.screenshot({ path: `${SHOTS}/meridians-opened-1280x720.png` });
 
   // The right column now totals rank 1 of point 1.
   const first = small.nodes[0].ranks[0];

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { Modal } from "@/components/ui/modal";
 import { PagedGrid } from "@/components/ui/paged-grid";
 import { useShortScreen } from "@/components/ui/use-short-screen";
@@ -27,6 +27,7 @@ import {
   type PartialStats,
 } from "@/lib/game";
 import { useWorldStore } from "@/store/world-store";
+import { pageRect } from "@/lib/ui/landscape";
 import { toast } from "@/store/toast-store";
 import { BACK_POINTS, MERIDIAN_POSES, poseBodyPoints, poseForChart } from "./meridian-poses";
 import { BODY_POINT_LABEL, MeridianSilhouette, POSE_VIEWBOX } from "./meridian-figure";
@@ -104,6 +105,12 @@ export function MeridianPopup({ open, onClose }: Props) {
   const [chartId, setChartId] = useState<string | null>(null);
   const current = charts.find((c) => c.chart.id === chartId) ?? charts[0] ?? null;
   useEffect(() => { if (!open) setChartId(null); }, [open]);
+  // ชีพจร is the last menu tab: on a phone the tab row scrolls, so bring it into view.
+  useEffect(() => {
+    if (!open) return;
+    const tab = document.querySelector<HTMLElement>('.hud-menu-tab[aria-selected="true"]');
+    tab?.scrollIntoView({ block: "nearest", inline: "nearest" });
+  }, [open]);
 
   return (
     <Modal open={open} onClose={onClose} title="☯ ชีพจร" fill>
@@ -206,7 +213,7 @@ function MeridianStage({ entry, points, onOpen }: { entry: LearnedChart; points:
   return (
     <section className="menu-col meridian-stage-col" aria-label="แผนภาพ" style={{ "--kind": color } as CSSProperties}>
       <div className="meridian-stage-head">
-        <h3 className="meridian-title" data-testid="meridian-chart-name">ชีพจร{chart.name}</h3>
+        <h3 className="meridian-title" data-testid="meridian-chart-name">{chart.name}</h3>
         <span className="meridian-stage-meta">
           <span className="meridian-tier" style={{ "--tier": TIER_COLOR[chart.ti] } as CSSProperties}>T{chart.ti}</span>
           <span>{MERIDIAN_KIND_LABEL[chart.kind]}</span>
@@ -251,11 +258,11 @@ function MeridianStage({ entry, points, onOpen }: { entry: LearnedChart; points:
               <span className="meridian-node-num" aria-hidden="true">{n.i + 1}</span>
             </button>
           ))}
-          {tipIndex !== null && nodes[tipIndex] && (
-            <NodeTip chart={chart} ranks={ranks} index={tipIndex} x={nodes[tipIndex].x} y={nodes[tipIndex].y} points={points} />
-          )}
         </div>
         <span className="meridian-pose-name">{pose.name}</span>
+        {tipIndex !== null && nodes[tipIndex] && (
+          <NodeTip key={tipIndex} chart={chart} ranks={ranks} index={tipIndex} points={points} />
+        )}
       </div>
       <div className="meridian-action" data-testid="meridian-action">
         <div className="meridian-action-text">
@@ -273,16 +280,32 @@ function MeridianStage({ entry, points, onOpen }: { entry: LearnedChart; points:
   );
 }
 
-function NodeTip({ chart, ranks, index, x, y, points }: { chart: MeridianChart; ranks: number[]; index: number; x: number; y: number; points: number }) {
+/** The point's card, placed beside the point and kept inside the stage. */
+function NodeTip({ chart, ranks, index, points }: { chart: MeridianChart; ranks: number[]; index: number; points: number }) {
   const node = chart.nodes[index];
   const rank = ranks[index] ?? 0;
   const state = meridianNodeState(chart, ranks, index);
   const cost = meridianNextCost(chart, ranks, index);
-  const right = x > 120;
-  const below = y < 110;
+  const ref = useRef<HTMLDivElement>(null);
+  const [pos, setPos] = useState<{ left: number; top: number } | null>(null);
+  useLayoutEffect(() => {
+    const tip = ref.current, stage = tip?.parentElement;
+    const dot = stage?.querySelector<HTMLElement>(`[data-node-index="${index}"]`);
+    if (!tip || !stage || !dot) return;
+    // Page-space rects: a portrait screen turns the whole body (lib/ui/landscape.ts).
+    const s = pageRect(stage), d = pageRect(dot);
+    const w = tip.offsetWidth, h = tip.offsetHeight, gap = 12, pad = 4;
+    const cx = d.left + d.width / 2 - s.left, cy = d.top + d.height / 2 - s.top, r = d.width / 2;
+    const W = stage.offsetWidth, H = stage.offsetHeight;
+    let left = cx + r + gap;
+    if (left + w > W - pad) left = cx - r - gap - w;
+    left = Math.max(pad, Math.min(W - w - pad, left));
+    const top = Math.max(pad, Math.min(H - h - pad, cy - h / 2));
+    setPos({ left, top });
+  }, [index, rank]);
   return (
-    <div className={`meridian-tip${right ? " meridian-tip--left" : ""}${below ? " meridian-tip--below" : ""}`} role="tooltip" data-testid="meridian-tip"
-      style={{ left: `${(x / 240) * 100}%`, top: `${(y / 320) * 100}%` }}>
+    <div ref={ref} className="meridian-tip" role="tooltip" data-testid="meridian-tip"
+      style={pos ? { left: pos.left, top: pos.top } : { left: 0, top: 0, visibility: "hidden" }}>
       <div className="meridian-tip-head">
         <strong>{pointName(node.name)}</strong>
         <small>จุดที่ {index + 1}/{chart.nodes.length} · {BODY_POINT_LABEL[node.at]}{BACK_POINTS.has(node.at) ? " (ด้านหลัง)" : ""}</small>
