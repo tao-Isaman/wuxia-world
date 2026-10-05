@@ -87,6 +87,8 @@ Chapters chain on `questStatus … done`. The saga's info (`StoryArcInfo`: title
 
 ## Jianghu sagas
 
+> **Stat gates are halved at load.** The numbers below (and in every spec, `LINEAGE_TIERS` and manual) are authored values; `QUESTS` and `ITEMS` apply `MOVE_STAT_GATE_SCALE = 0.5` (`lib/world/data/move-gates.ts`, rounded up) to every stat gate on the way to a move, and rewrite the number in a stat stage's hint. So a jianghu T4 opens at a stat of 40 in play, a T5 at 60.
+
 The ten jianghu (ยุทธจักร) T4 / T5 moves have no sect to vouch for the hero, so each is the reward of a longer, harder saga in `lib/world/data/story/jianghu/<file>.ts` (arc id `jh_<file>`, `sc: "ยุทธจักร"`, no `sectId`, registered in `index.ts`). `test:story` enforces the size and the gate (`sagaRule`):
 
 | | Chapters | Films | Duels | Arc gate |

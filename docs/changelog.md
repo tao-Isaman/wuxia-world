@@ -6,6 +6,10 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-05
 
+### Stat requirements for moves halved
+
+- **Every stat requirement on the way to a move is half what it was** (rounded up): lineage quests (T1–T3 now 5 / 8 / 13), sect saga gates (40 → 20), the new jianghu sagas (T4 80 → 40, T5 120 → 60, inner chapters likewise), sect trials, place quests that teach a move, and manuals. One knob: `MOVE_STAT_GATE_SCALE` in `lib/world/data/move-gates.ts`; content keeps its authored numbers.
+
 ### Jianghu T4 / T5: sixteen moves removed, two arts renamed
 
 - **Kept** (still no way to earn them yet): the moves กระบี่ 6 ชีพจร (`lmsj`), เก้ากระบี่เดียวดาย (`dgjj`), ทวนประจักษ์พยาน (`ng2`), ดาบยาวเทพสังหาร (`ng5`), หมัดสะท้านจักรวาล (`nu2`); the arts **เคล็ดวิชาภูผาทะลายทัพ** (`military`, was จวินเจิ้นชี่), **ตำราเพลิงสวรรค์** (`fire`, was เพลิงสวรรค์), คัมภีร์ทานตะวัน, วิชาเก้าเอี้ยง, คัมภีร์เก้าอิม.

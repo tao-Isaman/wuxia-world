@@ -239,6 +239,7 @@ Two deliberate exceptions reach into stores:
   Rumors stay in their region and fade: news 20 days (big 40), 15 days once heard (`fadeHeardRumor`), flavour lore by day 60. See [docs/liveness.md](docs/liveness.md).
 - **Lineage quests and sagas** (`lib/world/story/`, content in `lib/world/data/story/`). Compact specs compile into quests, dialogs and cutscenes ([docs/story-quests.md](docs/story-quests.md)).
   - **The main story** (`data/story/main.ts`, a `MainArcSpec`): 15 chained chapters `st_main_<nn>` (type `main`, no move at the end), offered by ป้าหลิว at home from the first moment of a new game; 12 films tell the age and the hero's father.
+  - **Stat gates on the way to a move are halved** (`MOVE_STAT_GATE_SCALE = 0.5`, `data/move-gates.ts`): lineage quests, saga chapters (not the main story), their sect trials, quests that teach a move and manuals' `reqValue` keep their authored numbers and are scaled at load (`QUESTS` / `ITEMS`).
   - Every sect T0–T3 skill / art has one lineage quest `ql_<skill|art>_<id>` (type `side`, `lineage`), gated and sized by tier (`LINEAGE_TIERS`).
   - Every sect T4 is the reward of a saga: 8–10 chapters `st_<arcId>_<nn>` (type `story`), chained on the previous chapter, with films (`DialogScene.cutscene`); every dialog plays one line per beat (`paged` is legacy).
   - The old sect art quests teach nothing: seven T4 ones are saga prologue trials (`SAGA_PROLOGUES`), eight T3 ones lineage prologue trials (`LINEAGE_PROLOGUES`).
