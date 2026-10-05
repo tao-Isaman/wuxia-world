@@ -5,12 +5,13 @@ import { test } from "node:test";
 import { blockingRects, placementsGeometry } from "../assets/placement-geometry";
 import { effectiveMapImage, indexAssets } from "../assets/catalog";
 import type { AssetManifest, PlacementsFile } from "../assets/types";
-import { LOCATION_MAPS } from "../world/data/location-maps";
+import { DRAFT_PLACED_MAPS } from "../world/data/location-maps";
 import { getRememberedMapPosition, type WorldPresentation } from "./types";
 import { initialWorldPlacement } from "./world-placement";
 import { planWorldPath, withPlacedSolids, worldFootprints, worldPointBlocked, worldSegmentClear } from "./world-navigation";
 
-const map = LOCATION_MAPS.city_capital;
+// The placed capital is a draft (the game shows the painting); this tests its placed layout.
+const map = DRAFT_PLACED_MAPS.city_capital;
 // The capital as the game walks it: its ground tile (the painting is replaced)
 // and the placed city's solids (public/assets/placements.json).
 const root = join(import.meta.dirname, "../../public/assets");

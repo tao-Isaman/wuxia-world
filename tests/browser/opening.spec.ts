@@ -134,7 +134,17 @@ test("first errand leads to safe training, recovery, and an earned skill upgrade
   expect(trained.skillExp.basic_punch).toBeGreaterThanOrEqual(20);
   expect(trained.skillExp.basic_punch).toBeLessThan(50);
   expect(trained.currentHp).toBeGreaterThan(0);
-  expect(trained.currentHp).toBeLessThanOrEqual(27);
+  // A new hero has 136 HP (36 from stats + the flat 100 base); the bout costs some.
+  const maxHp = 136, restHeal = maxHp / 4;
+  expect(trained.currentHp).toBeLessThan(maxHp);
+  // Wound the hero deeper so both rests below heal in full (a quarter of max HP each).
+  await page.evaluate(() => {
+    const raw = JSON.parse(localStorage.getItem("wusia-world-v1")!);
+    raw.state.currentHp = 30;
+    localStorage.setItem("wusia-world-v1", JSON.stringify(raw));
+  });
+  await page.reload();
+  await ready(page);
 
   async function restAtRoadside() {
     // Rest is a quick bubble on the right edge, not a menu page.
@@ -147,10 +157,10 @@ test("first errand leads to safe training, recovery, and an earned skill upgrade
   await restAtRoadside();
   const firstRest = await state(page);
   expect(firstRest.stamina).toBe(firstRest.staminaMax);
-  expect(firstRest.currentHp).toBe(Math.min(36, trained.currentHp + 9));
+  expect(firstRest.currentHp).toBe(30 + restHeal);
   // Full stamina must not block a second rest while HP is still injured.
   await restAtRoadside();
-  expect((await state(page)).currentHp).toBe(Math.min(36, firstRest.currentHp + 9));
+  expect((await state(page)).currentHp).toBe(30 + 2 * restHeal);
   expect((await state(page)).gold).toBe(30);
 
   await page.getByRole("navigation", { name: "เมนูเกม" }).getByRole("button", { name: "วิชา", exact: true }).click();

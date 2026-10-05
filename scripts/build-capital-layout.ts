@@ -33,7 +33,7 @@ import type { AssetManifest, Placement, PlacementsFile } from "../lib/assets/typ
 import { cellAt, cellOnMap, isoCenter, kitSets, paintKit, placeKitSpecial, type KitSet } from "../lib/assets/kits";
 import { indexAssets } from "../lib/assets/catalog";
 import { placementGeometry } from "../lib/assets/placement-geometry";
-import { getLocationMap } from "../lib/world/data/location-maps";
+import { getLocationMap, showDraftMaps } from "../lib/world/data/location-maps";
 import { mapAnchors } from "../lib/stage/map-anchors";
 import { markerApproach } from "../lib/stage/world-map-probe";
 
@@ -53,6 +53,8 @@ let placements: Placement[] = [];
 // The map's markers (lib/world/data/location-maps.ts) and the points the hero
 // walks to for them stay clear: props that would stand on one are left out,
 // and a building on one is an error.
+// The capital is a draft (DRAFT_PLACED_MAPS): lay out around its placed spots.
+showDraftMaps(true);
 const map = getLocationMap(MAP)!;
 const anchors = mapAnchors(map, MAP);
 const keepClear = anchors.flatMap((anchor) => anchor.kind === "spawn" || anchor.kind === "arrival"

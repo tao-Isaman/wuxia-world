@@ -118,7 +118,7 @@ export function MapEditor({ assets }: { assets: AssetEntry[] }) {
   const sets = useMemo(() => kitSets(assets), [assets]);
   // The map as authored, with the markers moved in this editor (saved or not).
   const spotEdits = present.spots?.[mapId];
-  const map = useMemo(() => applySpotEdits(getLocationMapBase(mapId)!, spotEdits), [mapId, spotEdits]);
+  const map = useMemo(() => applySpotEdits(getLocationMapBase(mapId, { draft: true })!, spotEdits), [mapId, spotEdits]);
   const movedSpots = movedSpotCount(present, mapId);
   const placements = useMemo(() => present.maps[mapId] ?? [], [present, mapId]);
   const existing = useMemo(() => new Set(placements.map((p) => p.id)), [placements]);

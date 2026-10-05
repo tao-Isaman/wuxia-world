@@ -11,6 +11,7 @@ import { groundFor, indexAssets, loadAssetManifest, loadPlacements, placementsFo
 import { placementsGeometry, type PlacementGeometry } from "./placement-geometry";
 import type { AssetEntry, PlacementsFile } from "./types";
 import { enginePreviewActive, enginePreviewPlacements } from "@/lib/engine/goto";
+import { DRAFT_PLACED_MAPS } from "@/lib/world/data/location-maps";
 
 /** A placements file that cannot load in this long counts as empty (the map must open). */
 const LOAD_TIMEOUT = 8_000;
@@ -34,10 +35,20 @@ function placementsFile(): Promise<PlacementsFile> {
   if (file) return Promise.resolve(file);
   filePending ??= (async () => {
     const preview = enginePreviewActive() ? enginePreviewPlacements() : null;
-    file = preview ?? await withTimeout(loadPlacements(), { version: 1, maps: {} });
+    const loaded = preview ?? await withTimeout(loadPlacements(), { version: 1, maps: {} });
+    file = preview ? loaded : withoutDrafts(loaded);
     return file;
   })();
   return filePending;
+}
+
+/** The game keeps a draft map's painting: its placements and ground wait for the editor (DRAFT_PLACED_MAPS). */
+function withoutDrafts(loaded: PlacementsFile): PlacementsFile {
+  const drafts = Object.keys(DRAFT_PLACED_MAPS);
+  if (!drafts.some((id) => loaded.maps[id] || loaded.grounds?.[id])) return loaded;
+  const maps = { ...loaded.maps }, grounds = { ...loaded.grounds };
+  for (const id of drafts) { delete maps[id]; delete grounds[id]; }
+  return { ...loaded, maps, grounds };
 }
 
 function assetIndex(): Promise<Map<string, AssetEntry>> {

@@ -1,11 +1,7 @@
 import assert from "node:assert/strict";
 import { evaluateCondition, getNpc, getNpcsAtLocation, getQuest, getScene, isQuestTurnInForNpc } from "../lib/world";
 import { LOCATION_MAPS } from "../lib/world/data/location-maps";
-import { readFileSync } from "node:fs";
-import { planWorldPath, withPlacedSolids, worldFootprints, worldPointBlocked, worldSegmentClear } from "../lib/stage/world-navigation";
-import { blockingRects, placementsGeometry } from "../lib/assets/placement-geometry";
-import { effectiveMapImage, indexAssets } from "../lib/assets/catalog";
-import type { AssetManifest, PlacementsFile } from "../lib/assets/types";
+import { planWorldPath, worldFootprints, worldPointBlocked, worldSegmentClear } from "../lib/stage/world-navigation";
 import { observeQuestReceipts, type QuestReceipt } from "../components/world/quest-completion-receipt-data";
 import type { DialogScene, WorldStateData } from "../lib/world/types";
 
@@ -86,11 +82,8 @@ try {
   const spot = map.npcSpots![clerk];
   assert.ok(spot, "Qing is placed on the live capital map");
   assert.ok(getNpcsAtLocation("city_capital").some(npc => npc.id === clerk && npc.name === "เสมียนนายฉิง"));
-  // The capital as the game walks it: the ground tile and the placed city's solids.
-  const placed = JSON.parse(readFileSync("public/assets/placements.json", "utf8")) as PlacementsFile;
-  const assets = indexAssets((JSON.parse(readFileSync("public/assets/manifest.json", "utf8")) as AssetManifest).assets);
-  const footprints = withPlacedSolids(worldFootprints("city_capital", effectiveMapImage(placed, "city_capital", map.image)),
-    blockingRects(placementsGeometry(placed.maps.city_capital ?? [], assets)));
+  // The capital as the game walks it: the painting (its placed city is a draft, DRAFT_PLACED_MAPS).
+  const footprints = worldFootprints("city_capital", map.image);
   const feet = { x: spot.x * 9.6, y: spot.y * 6.4 };
   const approach = { x: feet.x + 38, y: feet.y + 4 }; // actual runtime NPC approach
   assert.equal(worldPointBlocked(feet, footprints), false);
