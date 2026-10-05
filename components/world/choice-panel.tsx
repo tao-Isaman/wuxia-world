@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import type { DialogScene } from "@/lib/world";
 import { evaluateCondition } from "@/lib/world";
 import { useWorldStore } from "@/store/world-store";
+import { RichText } from "./rich-text";
 
 interface Props {
   scene: DialogScene;
@@ -90,7 +91,7 @@ export function ChoicePanel({ scene }: Props) {
           onClick={() => makeChoice(idx)}
         >
           <span className="text-paper/50 mr-2">{displayIndex + 1}.</span>
-          {choice.text}
+          <span><RichText text={choice.text} /></span>
         </Button>
       ))}
     </div>

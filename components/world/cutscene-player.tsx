@@ -7,6 +7,7 @@ import { getCutscene } from "@/lib/world/story/registry";
 import type { CutsceneMood } from "@/lib/world/story/types";
 import { useWorldStore } from "@/store/world-store";
 import styles from "./cutscene-player.module.css";
+import { RichText, visibleLength } from "./rich-text";
 
 /**
  * Full-screen film: letterbox, the Phaser stage (lib/stage/cutscene-runtime),
@@ -64,14 +65,15 @@ export function CutscenePlayer({ cutsceneId, onDone }: { cutsceneId: string; onD
 
   // Typewriter for the current line.
   const text = line?.text ?? "";
+  const full = visibleLength(text);
   useEffect(() => {
-    if (shown >= text.length) return;
-    const timer = setTimeout(() => setShown((n) => Math.min(text.length, n + 2)), 22);
+    if (shown >= full) return;
+    const timer = setTimeout(() => setShown((n) => Math.min(full, n + 2)), 22);
     return () => clearTimeout(timer);
-  }, [shown, text]);
+  }, [shown, full]);
 
   const advance = () => {
-    if (line && shown < text.length) { setShown(text.length); return; }
+    if (line && shown < full) { setShown(full); return; }
     runtime.current?.advance();
   };
 
@@ -108,8 +110,8 @@ export function CutscenePlayer({ cutsceneId, onDone }: { cutsceneId: string; onD
       {line && <div className={`${styles.subtitle} ${line.kind === "narrate" ? styles.narrate : ""} ${line.kind === "think" ? styles.think : ""}`}
         aria-live="polite">
         {line.speaker && line.kind !== "narrate" && <span className={styles.speaker}>{line.speaker}</span>}
-        <p>{line.kind === "say" ? `“${text.slice(0, shown)}”` : text.slice(0, shown)}</p>
-        {shown >= text.length && <span className={styles.next} aria-hidden="true">▼</span>}
+        <p>{line.kind === "say" ? <>“<RichText text={text} shown={shown} />”</> : <RichText text={text} shown={shown} />}</p>
+        {shown >= full && <span className={styles.next} aria-hidden="true">▼</span>}
       </div>}
       <div className={styles.controls} onClick={(event) => event.stopPropagation()}>
         <button type="button" aria-pressed={auto} onClick={() => setAuto((on) => !on)}>{auto ? "■ อัตโนมัติ" : "▶ อัตโนมัติ"}</button>

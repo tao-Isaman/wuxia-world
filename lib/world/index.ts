@@ -125,3 +125,4 @@ export { getQuestsForSect } from "./data";
 // it imports the world & battle stores, which would create a cycle when
 // world-store imports from this barrel. Import it directly from
 // "@/lib/world/battle-bridge" in app entry points instead.
+export { BEAT_CHARS, markText, plainText, sliceSegments, splitBeats, type MarkKind, type TextSegment } from "./text-marks";

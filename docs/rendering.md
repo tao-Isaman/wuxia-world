@@ -58,7 +58,28 @@ How the game is drawn and operated: the Phaser stage, the world map runtime, col
 
 `LoadingOverlay`, `ToastStack` and `ConfirmDialog` are mounted beside every branch.
 
-**Dialogs.** `DialogStage` is full screen: a portrait bust column (a 26 dvh top band on phones), with lines and choices side by side.
+### Dialogs
+
+`DialogStage` is full screen: a portrait bust column (a 26 dvh top band on phones), with lines and choices side by side.
+
+- **The conversation standard.** Every NPC talk, quest offer, hand-in and story beat plays **one line at a time**, typed out like a film's subtitles: 2 characters every 22 ms, or at once under `prefers-reduced-motion`.
+  - Lines longer than 140 characters are cut between words into more beats (`splitBeats`).
+  - Tapping the words (`dialog-lines`) finishes the typing, then moves on. **ต่อ ▶ (n/m)** (`dialog-next-page`) moves on at once. **ข้าม ⏭** (`dialog-skip`) jumps to the last line.
+  - The choices appear after the last line; it stays on screen above them.
+  - The host shows `data-page`, `data-pages` (beats) and `data-typing`.
+  - `localStorage["wuxia-dialog-instant"] = "on"` shows all lines at once (fast text). `playwright.config.ts` seeds it for the suite; `dialogue.spec.ts` turns it off.
+- **Key words.** `RichText` (`components/world/rich-text.tsx`) colours the key words in dialogue lines, choices and film subtitles via `markText` (`lib/world/text-marks.ts`):
+  - `**marked**` words: gold;
+  - people (NPCs): jade;
+  - places: sky blue;
+  - items: amber;
+  - sects: coral;
+  - moves and arts: violet;
+  - foes: red;
+  - numbers: pale gold;
+  - the age's terms (คัมภีร์, หอคัมภีร์หลวง, องครักษ์เสื้อแพร…), marked as key.
+
+  Classes are `.text-mark-<kind>` (`app/game-hud.css`). `{hero}` in a line is marked too.
 
 - Text shrinks in 0.06 steps to a floor of 0.62 until nothing scrolls, with a scroll hint if it still overflows.
 - "จบบทสนทนา ×" and Esc appear only when leaving is free: an effect-free choice back to the last place, or a terminal dialog.

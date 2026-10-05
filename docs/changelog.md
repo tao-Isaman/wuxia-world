@@ -6,6 +6,16 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-05
 
+### Conversations play like films: one line at a time, key words coloured
+
+- **Every NPC talk, quest offer, hand-in and story beat now shows one line at a time**, typed out like a cutscene's subtitles.
+  - Tap the words or **ต่อ ▶ (n/m)** to go on, or **ข้าม ⏭** to jump to the last line; the choices come after it.
+  - Lines over 140 characters are cut between words into more beats.
+  - Under reduced motion the text appears at once.
+- **Key words stand out** in dialogue, choices and film subtitles: people, places, items, sects, moves and arts, foes, numbers, the age's terms (คัมภีร์, หอคัมภีร์หลวง, องครักษ์เสื้อแพร…) and anything written as `**…**`. The writing standard is in [story-writing.md → Voice](story-writing.md#voice).
+- Fast text (`localStorage["wuxia-dialog-instant"]`) keeps the old all-at-once view; the e2e suite uses it, and `dialogue.spec.ts` tests the beats. `test:runtime` checks the marks, the beat cutting (no word lost) and that every `**` closes.
+
+
 ### Map editor: move NPCs, exits, the spawn and service spots
 
 - **ย้ายจุด.** In แผนที่ (`/game/engine`), drag an NPC, an exit, the spawn or a service spot to move it. Moves have undo / redo, the draft, warnings, play-test and save. **คืนจุดเดิม** resets a map's moved markers.

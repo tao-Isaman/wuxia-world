@@ -239,7 +239,7 @@ Two deliberate exceptions reach into stores:
 - **Lineage quests and sagas** (`lib/world/story/`, content in `lib/world/data/story/`). Compact specs compile into quests, dialogs and cutscenes ([docs/story-quests.md](docs/story-quests.md)).
   - **The main story** (`data/story/main.ts`, a `MainArcSpec`): 15 chained chapters `st_main_<nn>` (type `main`, no move at the end), offered by ป้าหลิว at home from the first moment of a new game; 12 films tell the age and the hero's father.
   - Every sect T0–T3 skill / art has one lineage quest `ql_<skill|art>_<id>` (type `side`, `lineage`), gated and sized by tier (`LINEAGE_TIERS`).
-  - Every sect T4 is the reward of a saga: 8–10 chapters `st_<arcId>_<nn>` (type `story`), chained on the previous chapter, with films (`DialogScene.cutscene`) and paged dialogs (`paged`).
+  - Every sect T4 is the reward of a saga: 8–10 chapters `st_<arcId>_<nn>` (type `story`), chained on the previous chapter, with films (`DialogScene.cutscene`); every dialog plays one line per beat (`paged` is legacy).
   - The old sect art quests teach nothing: seven T4 ones are saga prologue trials (`SAGA_PROLOGUES`), eight T3 ones lineage prologue trials (`LINEAGE_PROLOGUES`).
   - Story and lineage quests don't fail when their giver dies. Their offers (and the sect art trials') can be turned down (`DECLINE_TEXT`; the NPC card opens a compiled offer **before** accepting), and dropping one (`abandonQuest`) forgets it instead of failing it, so it is offered again.
   - **Moves arrive as scrolls.** A `learnSkill` / `learnArt` quest reward gives the move's คัมภีร์ (`scroll_skill_<id>` / `scroll_art_<id>`, generated in `items.ts`); reading it teaches the move. Quests show the reward as 📜 วิชาลึกลับ (`MYSTERY_MOVE_LABEL`) and lineage quests are named after their teacher.
@@ -319,6 +319,7 @@ Two deliberate exceptions reach into stores:
   - map pointer client coordinates through `lib/ui/landscape.ts` (`toPagePoint`, `toClientPoint`, `pageRect`).
 - **Menus don't scroll.** A menu section is `<Modal fill>` with `.menu-cols > .menu-col` columns and `.menu-tabs` (`app/menu-layout.css`); long collections page with `PagedGrid` (`components/ui/paged-grid.tsx`, `useShortScreen` for phone cell sizes). Done for โปรไฟล์ (ฉายา: `lib/world/epithet.ts`), ย่าม (paper doll + item window), วิชา, อาชีพ, จดหมาย; ภารกิจ / สำนัก / บันทึก still scroll.
 - **Look.** It comes from `app/game-hud.css`, `app/mobile-hud.css`, `app/game-menu.css`, `app/dq-theme.css` (parchment menus), `app/profile.css` and `app/menu-layout.css`, loaded after `app/globals.css`. The cream / ink / vermilion root tokens show only in fallback layouts, toasts and `/debug`.
+- **Conversations.** `DialogStage` plays every dialog **one line per beat**, typed out like a film's subtitles: tap or ต่อ to go on, ข้าม to skip; choices come after the last line, and long lines are cut by `splitBeats`. Key words are coloured by `RichText` / `markText` (`lib/world/text-marks.ts`): people, places, items, sects, moves, foes, numbers, the age's terms, and `**marked**` words. `localStorage["wuxia-dialog-instant"]="on"` shows all lines at once (the e2e suite seeds it).
 - **Fonts.** Charm (`--font-display`) for headings of 16 px or more; Sarabun (`--font-body`) for everything else — Thai tone marks blur in Charm below 16 px.
 
 ## Conventions

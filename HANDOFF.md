@@ -49,7 +49,7 @@ Deploys are implied to be on Vercel (`VERCEL_GIT_COMMIT_SHA` sets the service-wo
 
 ## Verified state
 
-Checked on 2026-10-05 for the map editor's moved markers (NPCs, exits, spawn, service spots), the 1401 timeline and lore (sagas re-timed, the court's seized scriptures, the 15-chapter main story), the story timeline (NPC renames), the road fixes (the way back after a fight, the guide arrow turning back), item icons (every item, scroll and equipment piece shows a library icon), the PixelLab asset library (3,194 assets + 464 kit pieces: roads, city walls, house walls, fences that join on a grid), the engine at `/game/engine` (asset library, map editor, skill / art text overrides) and objects placed on maps:
+Checked on 2026-10-05 for line-by-line conversations with coloured key words, the map editor's moved markers (NPCs, exits, spawn, service spots), the 1401 timeline and lore (sagas re-timed, the court's seized scriptures, the 15-chapter main story), the story timeline (NPC renames), the road fixes (the way back after a fight, the guide arrow turning back), item icons (every item, scroll and equipment piece shows a library icon), the PixelLab asset library (3,194 assets + 464 kit pieces: roads, city walls, house walls, fences that join on a grid), the engine at `/game/engine` (asset library, map editor, skill / art text overrides) and objects placed on maps:
 
 | Check | Result |
 | --- | --- |

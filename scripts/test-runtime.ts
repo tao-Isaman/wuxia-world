@@ -115,5 +115,43 @@ check("Three.js runtime objects never enter the version 22 save", () => {
 });
 SCENES_BY_ID.delete(route.id);
 SCENES_BY_ID.delete("__runtime_location");
+// The conversation standard: key words marked, long lines cut into beats.
+{
+  const { markText, plainText, sliceSegments, splitBeats, BEAT_CHARS } = await import("../lib/world/text-marks");
+  const { SCENES } = await import("../lib/world/data/scenes");
+  const marks = (text: string) => markText(text).filter((s) => s.mark).map((s) => `${s.mark}:${s.text}`);
+  assert.deepEqual(marks("ไปหา**ผู้เฒ่า**ที่นครหลวง ปราบโจรป่า 3 ตัว เอายาเลือดเล็กมา แล้วเรียนไทจี้เจี้ยนกับพรรคยาจก"),
+    ["key:ผู้เฒ่า", "place:นครหลวง", "foe:โจรป่า", "number:3", "item:ยาเลือดเล็ก", "move:ไทจี้เจี้ยน", "sect:พรรคยาจก"]);
+  assert.deepEqual(marks("องครักษ์เสื้อแพรยึดคัมภีร์ไปไว้ที่หอคัมภีร์หลวง"), ["key:องครักษ์เสื้อแพร", "key:คัมภีร์", "key:หอคัมภีร์หลวง"]);
+  assert.deepEqual(marks("ป้าหลิวรออยู่"), ["person:ป้าหลิว"], "people beat a foe with the same name");
+  assert.equal(markText("ไม่มีคำสำคัญเลย")[0].mark, undefined);
+  assert.equal(markText("ข้อความ **ไม่ปิด").map((s) => s.text).join(""), "ข้อความ **ไม่ปิด", "an unclosed mark stays as written");
+  assert.equal(plainText("ไปเอา**คัมภีร์**มา"), "ไปเอาคัมภีร์มา");
+  assert.equal(markText("ไปเอา**คัมภีร์**มา").map((s) => s.text).join(""), "ไปเอาคัมภีร์มา", "marks never change the words");
+  assert.equal(sliceSegments(markText("ไปหาป้าหลิวที่บ้าน"), 7).map((s) => s.text).join(""), "ไปหาป้า");
+  checks += 6;
+  // Beats: short lines stay whole; a long one is cut between words, never inside a mark, and keeps its speaker.
+  const long = { t: "dialogue" as const, speaker: "ป้าหลิว", text: "ฟังให้ดี ".repeat(25) + "**คำสำคัญ ที่มีช่องว่าง** จบ" };
+  const beats = splitBeats([{ t: "narration", text: "สั้น ๆ" }, long]);
+  assert.equal(beats[0].text, "สั้น ๆ");
+  assert.ok(beats.length >= 3, "a long line is cut");
+  for (const beat of beats.slice(1)) {
+    assert.equal(beat.t === "dialogue" && beat.speaker, "ป้าหลิว");
+    assert.ok(plainText(beat.text).length <= BEAT_CHARS + 20, `beat too long: ${beat.text.length}`);
+    assert.equal((beat.text.match(/\*\*/g)?.length ?? 0) % 2, 0, "a mark is never cut");
+  }
+  assert.equal(beats.slice(1).map((b) => b.text).join(" ").replace(/\s+/g, " "), long.text.trim().replace(/\s+/g, " "), "nothing lost");
+  // Every line in the game splits into beats that keep all their words.
+  let lines = 0;
+  for (const scene of SCENES) if (scene.kind === "dialog") for (const line of scene.lines) {
+    lines++;
+    const words = splitBeats([line]).map((b) => b.text).join(" ").replace(/\s+/g, " ");
+    assert.equal(words, line.text.trim().replace(/\s+/g, " "), `${scene.id}: words lost when cut into beats`);
+    assert.equal((line.text.match(/\*\*/g)?.length ?? 0) % 2, 0, `${scene.id}: an unclosed ** mark`);
+  }
+  assert.ok(lines > 5000);
+  checks += 3;
+}
+
 console.warn = originalWarn;
 console.log(checks + " runtime regression checks passed.");

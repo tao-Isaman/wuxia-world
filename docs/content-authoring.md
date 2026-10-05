@@ -359,6 +359,10 @@ Then run `bun run test:navigation`: every painted map must keep its spawn open a
 
 New **effect** kinds (a new `se` / `ee` / passive / art-active type) are engine changes: see [combat.md](combat.md#changing-combat-safely).
 
+## Dialogue lines
+
+Every dialog plays one line per beat, with its key words coloured. Write short lines, and mark extra key words with `**…**`. See [story-writing.md → Voice](story-writing.md#voice).
+
 ## Equipment
 
 Append to `EQUIPMENT` in `lib/game/data/equipment.ts`:
