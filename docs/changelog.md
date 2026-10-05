@@ -6,6 +6,11 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-05
 
+### Region music and two more themes
+
+- **Four themes** now take turns in random order (two new: Dawn Journey, Moonlit Remembrance), the same by day and night.
+- **Each region has its own song**: heartland (Prosperous Capital), north (Snow Peaks at Dawn), south (Dali Tea Hills), east (Peach Blossoms on the Canal) and the roads and wild places (The Road Goes On). Arriving in a region plays its song first, then the themes alternate with it. The west keeps the desert song in the sands and the themes elsewhere.
+
 ### Chalk-written lines and heavier blows
 
 - **Dialog and cutscene lines are written in chalk**: while a line types out, a gritty chalk-on-board stroke plays at a hand-writing rhythm (`chalkTick`).

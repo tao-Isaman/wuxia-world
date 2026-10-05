@@ -1,5 +1,6 @@
 import { existsSync, statSync } from "node:fs";
-import { RECORDINGS, isDesertPlace } from "../lib/audio/recordings";
+import { RECORDINGS, REGION_SONGS, STARTS_ON_FIRST, exploringTrack, isDesertPlace } from "../lib/audio/recordings";
+import { regionOf } from "../lib/world/data/regions";
 import assert from "node:assert/strict";
 import { SONGS, midiOf, phrase, phraseBeats, type TrackId } from "../lib/audio/songs";
 
@@ -31,7 +32,8 @@ check("every track is well-formed", () => {
 
 check("lead melodies stay in their pentatonic mode", () => {
   const modes: Record<TrackId, number[]> = {
-    title: [2, 4, 6, 9, 11], world: [2, 4, 6, 9, 11], night: [2, 4, 6, 9, 11], desert: [2, 4, 6, 9, 11], victory: [2, 4, 6, 9, 11], quest: [2, 4, 6, 9, 11], levelup: [2, 4, 6, 9, 11],
+    title: [2, 4, 6, 9, 11], world: [2, 4, 6, 9, 11], night: [2, 4, 6, 9, 11], desert: [2, 4, 6, 9, 11],
+    heartland: [2, 4, 6, 9, 11], north: [2, 4, 6, 9, 11], south: [2, 4, 6, 9, 11], east: [2, 4, 6, 9, 11], wilds: [2, 4, 6, 9, 11], victory: [2, 4, 6, 9, 11], quest: [2, 4, 6, 9, 11], levelup: [2, 4, 6, 9, 11],
     battle: [4, 7, 9, 11, 2], defeat: [4, 7, 9, 11, 2], encounter: [4, 7, 9, 11, 2],
   };
   for (const [id, song] of Object.entries(SONGS) as [TrackId, typeof SONGS[TrackId]][]) {
@@ -66,6 +68,27 @@ check("recordings: the main theme, battle and desert songs exist, are MP3 and st
 check("desert places pick the desert song; the rest the main theme", () => {
   for (const id of ["desert_ruins", "tribe_huizu", "city_xixia", "mt_baituo", "sect_xingxiu"]) assert.ok(isDesertPlace(id), id);
   for (const id of ["city_capital", "village_noname", "sect_shaolin", null]) assert.ok(!isDesertPlace(id), String(id));
+});
+
+check("themes play for day and night alike; each region opens on its song, then the themes", () => {
+  assert.equal(RECORDINGS.title!.length, 4);
+  assert.deepEqual(RECORDINGS.world, RECORDINGS.night);
+  for (const [track, song] of Object.entries(REGION_SONGS) as [keyof typeof REGION_SONGS, string][]) {
+    assert.equal(RECORDINGS[track]![0], song, `${track} starts on its song`);
+    assert.deepEqual(RECORDINGS[track]!.slice(1), RECORDINGS.world, `${track} then plays the themes`);
+    assert.ok(STARTS_ON_FIRST.has(track));
+  }
+});
+
+check("exploring music by place: desert, wilds on roads and wild places, else the region", () => {
+  assert.equal(exploringTrack("desert_ruins", false, regionOf("desert_ruins")), "desert");
+  assert.equal(exploringTrack("city_capital", true, regionOf("city_capital")), "wilds");
+  assert.equal(exploringTrack("cave_jinshe", false, regionOf("cave_jinshe")), "wilds");
+  assert.equal(exploringTrack("city_capital", false, regionOf("city_capital")), "heartland");
+  assert.equal(exploringTrack("home_player", false, regionOf("home_player")), "heartland");
+  const seen = new Set<string>();
+  for (const id of ["city_suzhou", "city_dali", "sect_wudang", "sect_quanzhen", "sect_huashan", "village_huashan", "sect_emei"]) seen.add(exploringTrack(id, false, regionOf(id)));
+  for (const track of ["east", "south", "north"]) assert.ok(seen.has(track), `some place plays ${track}`);
 });
 
 console.log(`${checks} audio checks passed`);
