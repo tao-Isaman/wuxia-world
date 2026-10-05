@@ -170,6 +170,7 @@ Two deliberate exceptions reach into stores:
 - **Stats.** `derive.ts` (`derive`, `combinedStats`, `deriveAll`, `getMasteryMap`).
   - `combinedStats` merges base + arts + slotted / learned skills with conflict and level scaling.
   - Equipment is **not** in `combinedStats`; `deriveAll` adds it.
+  - The world hero carries a flat `baseHp` (`HERO_BASE_HP` = 100, `store/world-store.ts`) that `deriveAll` adds to HP; foes have none.
 - **Damage.** `battle.ts` has `calcSkillDamage`, `resolveSkill` and `resolveArtActive`, which track `skillUses` / `artUses` / `hitsReceived`.
 
   ```

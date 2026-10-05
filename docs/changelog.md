@@ -6,6 +6,10 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-05
 
+### A tougher new hero
+
+- **The world hero has a flat 100 base HP** (`CharacterBuild.baseHp`, `HERO_BASE_HP`, added by `deriveAll`): a new hero starts at 136 HP instead of 36, so a ขโมยน้อย (about 20 a hit) needs 6–7 hits, not 2. Foes and /debug builds don't get it. Older saves are back-filled on load (and their current HP raised by the same 100); no save version bump.
+
 ### Meridian battle effects, drop-only charts, a look for every status
 
 - **Charts drop only** (no shops), at 1 % from their foes, every tier.

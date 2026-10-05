@@ -379,6 +379,9 @@ export interface CharacterBuild {
   // Meridian charts (ชีพจร): chart id → rank of each point (0–3). See
   // lib/game/meridian-types.ts; their bonuses join combinedStats / deriveAll.
   meridians?: Readonly<Record<string, readonly number[]>>;
+  // Flat max HP on top of the stats (deriveAll). The world hero carries
+  // HERO_BASE_HP so a new hero survives the first fights; foes have none.
+  baseHp?: number;
 }
 
 // ─── Live battle state ─────────────────────────────────────────────────
