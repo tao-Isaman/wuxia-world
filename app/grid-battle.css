@@ -71,10 +71,11 @@
 .gb-meter[data-kind=mp] i { background: #6fa8ff; }
 .gb-meter small { font-size: 11px; font-variant-numeric: tabular-nums; color: #eadfc4; }
 .gb-buffs { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 7px; }
-.gb-chip { display: inline-block; padding: 1px 5px; font-size: 10px; line-height: 16px; white-space: nowrap; border-radius: 3px; cursor: help; }
+.gb-chip { display: inline-flex; align-items: center; gap: 4px; padding: 1px 6px 1px 4px; font-size: 10px; line-height: 16px; white-space: nowrap; border-radius: 3px; cursor: help; }
 .gb-chip[data-kind=buff] { color: #0f3a22; background: #bfeccd; }
 .gb-chip[data-kind=debuff] { color: #5c1510; background: #ffd0c4; }
 .gb-chip[data-kind=stack] { color: #4d3208; background: #f6dc9c; }
+.gb-chip::before { content: ""; flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--st, currentColor); box-shadow: 0 0 0 1.5px #0006, 0 0 5px var(--st, transparent); }
 
 /* Log */
 .gb-log-drawer { position: absolute; z-index: 5; top: 8px; right: 8px; width: min(calc(100% - 16px), 560px); border: 1px solid #a59b6d; border-radius: 6px; background: #eee4ce; box-shadow: 0 6px 20px #0a0503c0; overflow: hidden; }

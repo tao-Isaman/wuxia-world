@@ -7,6 +7,7 @@ import type {
   ArtPassiveTrigger,
   BuffRecord,
   DebuffRecord,
+  MeridianProc,
 } from "./types";
 import { getArt } from "./data";
 
@@ -23,8 +24,20 @@ const STACKABLE_BUFF: ReadonlySet<BuffRecord["t"]> = new Set([
   "buff_def", "buff_eva", "buff_reduce", "buff_reflect", "buff_spd", "buff_iatk",
 ]);
 const STACKABLE_DEBUFF: ReadonlySet<DebuffRecord["t"]> = new Set([
-  "debuff_def", "debuff_eva", "debuff_acc", "debuff_atk",
+  "debuff_def", "debuff_eva", "debuff_acc", "debuff_atk", "debuff_spd",
 ]);
+// Meridian % statuses: every application is its own record with its own
+// timer (rage stacks, an opening next to a rage of the same stat).
+const SEPARATE_BUFF: ReadonlySet<BuffRecord["t"]> = new Set([
+  "buff_atk_pct", "buff_regen", "buff_spd_pct", "buff_def_pct", "buff_cri_rate", "buff_acc_pct",
+]);
+// Never tick down: they last until spent (shield HP, ward charges).
+const UNTIMED_BUFF: ReadonlySet<BuffRecord["t"]> = new Set(["buff_riposte", "shield", "ward"]);
+
+/** Record a meridian trigger on the view (the grid turns it into a "proc" event). */
+export function pushProc(state: BattleState, side: Side, kind: MeridianProc["kind"], label: string, el?: MeridianProc["el"]): void {
+  (state.procs ??= []).push(el ? { side, kind, label, el } : { side, kind, label });
+}
 const PCT_BUFF: ReadonlySet<BuffRecord["t"]> = new Set([
   "buff_reduce", "buff_reflect",
 ]);
@@ -44,6 +57,10 @@ function clampDebuffValue(v: number): number {
 // Same-`t` records are merged in place — list length stays bounded.
 export function addBuff(state: BattleState, side: Side, b: BuffRecord): void {
   const list = state.st[side].buffs;
+  if (SEPARATE_BUFF.has(b.t)) {
+    list.push({ ...b });
+    return;
+  }
   const existing = list.find((x) => x.t === b.t);
   if (existing && STACKABLE_BUFF.has(b.t)) {
     existing.v = clampBuffValue(b.t, existing.v + b.v);
@@ -56,6 +73,15 @@ export function addBuff(state: BattleState, side: Side, b: BuffRecord): void {
 }
 
 export function addDebuff(state: BattleState, side: Side, d: DebuffRecord): void {
+  // A meridian ward blocks the debuff and spends one charge.
+  const ward = state.st[side].buffs.find((b) => b.t === "ward" && b.v > 0);
+  if (ward) {
+    ward.v -= 1;
+    if (ward.v <= 0) state.st[side].buffs = state.st[side].buffs.filter((b) => b !== ward);
+    pushProc(state, side, "ward", ward.v > 0 ? `ผนึกกันดีบัฟ (เหลือ ${ward.v})` : "ผนึกกันดีบัฟ (หมด)");
+    logLine(state, "lS", `&nbsp;🛡 ผนึกชีพจรกัน${d.n ?? "ดีบัฟ"}${ward.v > 0 ? ` (เหลือ ${ward.v})` : ""}`);
+    return;
+  }
   const list = state.st[side].debuffs;
   const existing = list.find((x) => x.t === d.t);
   if (existing && STACKABLE_DEBUFF.has(d.t) && d.v != null && existing.v != null) {
@@ -394,7 +420,7 @@ function tickDots(state: BattleState, side: Side, names: Record<Side, string>): 
       logLine(state, "lS", `&nbsp;🔥 ${nameOf(side, names)} เผาไหม้ HP-${hpDmg} MP-${mpDmg}`);
   }
 
-  for (const b of st.buffs) if (b.u > 0 && b.t !== "buff_riposte") b.u--;
+  for (const b of st.buffs) if (b.u > 0 && !UNTIMED_BUFF.has(b.t)) b.u--;
   state.st[side].buffs = st.buffs.filter((b) => b.u > 0);
   for (const d of st.debuffs) if (d.u > 0) d.u--;
   state.st[side].debuffs = st.debuffs.filter((d) => d.u > 0);
@@ -408,6 +434,16 @@ function tickRegen(
   names: Record<Side, string>,
   artId?: string | null,
 ): void {
+  // Meridian water rage / regen statuses: v % of max HP each, after the tick.
+  let statusRegen = 0;
+  for (const b of state.st[side].buffs) if (b.t === "buff_regen") statusRegen += b.v;
+  if (statusRegen > 0) {
+    const cap = side === "A" ? state.dA.HP : state.dB.HP;
+    const heal = Math.round(cap * statusRegen / 100);
+    if (side === "A") state.hA = Math.min(cap, state.hA + heal);
+    else state.hB = Math.min(cap, state.hB + heal);
+    if (heal > 0) logLine(state, "lS", `&nbsp;💧 ${nameOf(side, names)} ฟื้น ${heal} (วารีพิสุทธิ์)`);
+  }
   if (regen > 0) {
     const cap = side === "A" ? state.dA.HP : state.dB.HP;
     const heal = Math.round(cap * regen / 100);

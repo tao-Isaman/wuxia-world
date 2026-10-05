@@ -1,3 +1,4 @@
+import type { MeridianElement } from "./meridian-types";
 // Core type system for the wuxia battle sim.
 // Discriminated unions on the `t` field mirror the original demo.html shape
 // so data tables stay readable and dispatchers can use exhaustive switch.
@@ -382,10 +383,32 @@ export interface CharacterBuild {
 
 // ─── Live battle state ─────────────────────────────────────────────────
 
+/** One meridian trigger inside a battle view (grid: → GridEvent "proc"). */
+export interface MeridianProc {
+  side: Side;
+  kind: "revive" | "shield" | "ward" | "rage" | "sap" | "opening" | "absorb";
+  label: string;
+  el?: MeridianElement;
+}
+
 export interface BuffRecord {
-  t: SelfEffect["t"] | "buff_iatk" | "buff_riposte";
+  t:
+    | SelfEffect["t"]
+    | "buff_iatk"
+    | "buff_riposte"
+    // ชีพจร (meridian) statuses — lib/game/meridian-battle.ts:
+    | "buff_atk_pct"   // attack +v %
+    | "buff_regen"     // regain v % of max HP at the start of each own turn
+    | "buff_spd_pct"   // battle speed (gauge fill) +v %
+    | "buff_def_pct"   // PD / ID +v %
+    | "buff_cri_rate"  // critical chance +v points
+    | "buff_acc_pct"   // accuracy +v % (opening "acc" only)
+    | "shield"         // v = HP points left to soak; never ticks down
+    | "ward";          // v = debuffs left to block; never ticks down
   n?: string;
   v: number;
+  /** Elemental rage (meridian "rage" effect) this stack belongs to. */
+  el?: MeridianElement;
   // For buff_riposte this is a one-use charge, consumed on the next physical
   // attempt; other buffs use the existing global-turn duration.
   u: number;
@@ -399,7 +422,9 @@ export interface DebuffRecord {
     | "debuff_atk"
     | "debuff_poison"
     | "burn_hp_mp"
-    | "stun";
+    | "stun"
+    // battle speed −|v| % (meridian "sap" on spd)
+    | "debuff_spd";
   n?: string;
   v?: number;
   pp?: number;
@@ -460,6 +485,9 @@ export interface BattleState {
   // hit by B's attacks, regardless of damage). Used to grant DEF stat xp
   // on battle end. Reflect damage does not count.
   hitsReceived: { A: number; B: number };
+  // Meridian (ชีพจร) triggers since the view was made — the grid engine
+  // turns them into "proc" events. Never persisted.
+  procs?: MeridianProc[];
   // Latest cast event — UI overlay reads this and renders a staggered
   // animation: skill name first (0.3s, large text), then each hit's
   // damage popping in turn (0.1s stagger). `seq` increments every time

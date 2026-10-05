@@ -18,6 +18,7 @@ import {
   meridianRankCost,
   type MeridianChart,
   type MeridianCombat,
+  type MeridianEffect,
   type MeridianKind,
   type MeridianNode,
 } from "./meridian-types";
@@ -104,6 +105,25 @@ export function meridianBuildBonus(
     const chart = lookup(id);
     if (!chart || !Array.isArray(ranks)) continue;
     addInto(out, meridianChartBonus(chart, ranks));
+  }
+  return out;
+}
+
+/**
+ * The battle effects a build's filled points switch on: every rank-3 node of
+ * every learned chart. Foes without `meridians` get none.
+ */
+export function meridianActiveEffects(
+  build: Pick<CharacterBuild, "meridians">,
+  lookup: (id: string) => MeridianChart | undefined = getMeridianChart,
+): MeridianEffect[] {
+  const out: MeridianEffect[] = [];
+  for (const [id, ranks] of Object.entries(build.meridians ?? {})) {
+    const chart = lookup(id);
+    if (!chart || !Array.isArray(ranks)) continue;
+    chart.nodes.forEach((node, i) => {
+      if (node.effects?.length && clampMeridianRank(ranks[i]) >= MERIDIAN_RANK_MAX) out.push(...node.effects);
+    });
   }
   return out;
 }

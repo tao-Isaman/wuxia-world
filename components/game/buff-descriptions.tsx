@@ -32,6 +32,15 @@ export function buffBadgeLabel(b: BuffRecord): string {
     case "buff_iatk": return "สะสมพลังโจมตีภายใน";
     case "buff_iatk_reduce": return "กร้างแกร่ง";
     case "buff_reflect_eva": return "ยืมหอกสนองคืน";
+    // ชีพจร (lib/game/meridian-battle.ts): rage stacks carry their element name in `n`.
+    case "buff_atk_pct": return b.n ?? "พลังโจมตี↑";
+    case "buff_regen": return b.n ?? "ฟื้นชีพจร";
+    case "buff_spd_pct": return b.n ?? "ความเร็ว↑";
+    case "buff_def_pct": return b.n ?? "พลังป้องกัน↑";
+    case "buff_cri_rate": return b.n ?? "คริติคอล↑";
+    case "buff_acc_pct": return b.n ?? "แม่นยำ↑";
+    case "shield": return `โล่ชีพจร ${b.v}`;
+    case "ward": return `ผนึกชีพจร ×${b.v}`;
   }
 }
 
@@ -44,6 +53,7 @@ export function debuffBadgeLabel(d: DebuffRecord): string {
     case "debuff_poison": return "พิษ";
     case "burn_hp_mp": return "เผาไหม้";
     case "stun": return "มึนงง";
+    case "debuff_spd": return "เชื่องช้า";
   }
 }
 
@@ -116,6 +126,22 @@ export function describeBuff(b: BuffRecord): BuffDescription {
         title: "ยืมหอกสนองคืน",
         detail: `สะท้อน ${b.v}% + เพิ่ม Eva (combo)`,
       };
+    case "buff_atk_pct":
+      return { title: b.n ?? "พลังโจมตี↑", detail: `พลังโจมตี +${b.v}% (ชีพจร)` };
+    case "buff_regen":
+      return { title: b.n ?? "ฟื้นชีพจร", detail: `ฟื้น HP ${b.v}% ของสูงสุด ทุกต้นตาของตน (ชีพจร)` };
+    case "buff_spd_pct":
+      return { title: b.n ?? "ความเร็ว↑", detail: `เกจเติมเร็วขึ้น ${b.v}% (ชีพจร)` };
+    case "buff_def_pct":
+      return { title: b.n ?? "พลังป้องกัน↑", detail: `PDef / IDef +${b.v}% (ชีพจร)` };
+    case "buff_cri_rate":
+      return { title: b.n ?? "คริติคอล↑", detail: `โอกาสคริติคอล +${b.v} (ชีพจร)` };
+    case "buff_acc_pct":
+      return { title: b.n ?? "แม่นยำ↑", detail: `Acc +${b.v}% (ชีพจร)` };
+    case "shield":
+      return { title: "โล่ชีพจร", detail: `ดูดซับความเสียหายได้อีก ${b.v} ก่อนถึง HP` };
+    case "ward":
+      return { title: "ผนึกชีพจร", detail: `กันดีบัฟได้อีก ${b.v} ครั้ง` };
   }
 }
 
@@ -156,5 +182,7 @@ export function describeDebuff(d: DebuffRecord): BuffDescription {
         title: "สตัน",
         detail: `ข้ามตา (skip turn) — ไม่สามารถโจมตี/ใช้สกิลได้`,
       };
+    case "debuff_spd":
+      return { title: "เชื่องช้า (ความเร็วลด)", detail: `เกจเติมช้าลง ${Math.abs(d.v ?? 0)}% (ถูกสกัดชีพจร)` };
   }
 }

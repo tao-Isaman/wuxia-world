@@ -541,25 +541,25 @@
 
 | Location | Shop | Items for sale | Buys | Sell-back |
 | --- | --- | --- | --- | --- |
-| นครหลวง (`city_capital`) | 🏪 ตลาดนครหลวง | 32 | everything | ×0.5 |
-| ซีเซี่ย (`city_xixia`) | 🏪 ตลาดซีเซี่ย | 31 | everything | ×0.5 |
-| ต้าหลี่ (`city_dali`) | 🏪 ตลาดต้าหลี่ | 31 | everything | ×0.5 |
-| หยางโจว (`city_yangzhou`) | 🏪 ตลาดหยางโจว | 32 | everything | ×0.5 |
-| ซูโจว (`city_suzhou`) | 🏪 ตลาดซูโจว | 33 | everything | ×0.5 |
-| จินหลิง (`city_jinling`) | 🏪 ตลาดจินหลิง | 32 | everything | ×0.5 |
-| ฉางอัน (`city_changan`) | 🏪 ตลาดฉางอัน | 31 | everything | ×0.5 |
-| โรงเตี๊ยมยั่วไหล (`inn_yuelai`) | 🍵 ของกินที่ยั่วไหล | 7 | food, herb, material | ×0.4 |
-| โรงเตี๊ยมมีหว่าง (`inn_youjian`) | 🍵 ของกินที่มีหว่าง | 7 | food, herb, material | ×0.4 |
-| โรงเตี๊ยมเก้าอี้สูง (`inn_gaosheng`) | 🍵 ของกินที่เก้าอี้สูง | 7 | food, herb, material | ×0.4 |
-| โรงเตี๊ยมห้วอลั่ว (`inn_heluo`) | 🍵 ของกินที่ห้วอลั่ว | 7 | food, herb, material | ×0.4 |
-| หมู่บ้านบนเชิงเขา (`village`) | 🏪 ร้านในหมู่บ้าน | 5 | food, herb, material | ×0.35 |
-| หมู่บ้านชีกู่ (`village_qigu`) | 🏪 ร้านชีกู่ | 6 | food, herb, material | ×0.35 |
-| หมู่บ้านไร้นาม (`village_noname`) | 🏪 ร้านไร้นาม | 6 | food, herb, material | ×0.35 |
-| หมู่บ้านดอกเหมย (`village_meihua`) | 🏪 ร้านดอกเหมย | 6 | food, herb, material | ×0.35 |
-| หมู่บ้านหัวซาน (`village_huashan`) | 🏪 ร้านหัวซาน | 6 | food, herb, material | ×0.35 |
-| หมู่บ้านไท่ซาน (`village_taishan`) | 🏪 ร้านไท่ซาน | 6 | food, herb, material | ×0.35 |
-| หมู่บ้านฮิงซาน (`village_hengshan`) | 🏪 ร้านฮิงซาน | 6 | food, herb, material | ×0.35 |
-| หมู่บ้านอวู่เซี่ย (`village_wuxia`) | 🏪 ร้านอวู่เซี่ย | 6 | food, herb, material | ×0.35 |
+| นครหลวง (`city_capital`) | 🏪 ตลาดนครหลวง | 23 | everything | ×0.5 |
+| ซีเซี่ย (`city_xixia`) | 🏪 ตลาดซีเซี่ย | 23 | everything | ×0.5 |
+| ต้าหลี่ (`city_dali`) | 🏪 ตลาดต้าหลี่ | 23 | everything | ×0.5 |
+| หยางโจว (`city_yangzhou`) | 🏪 ตลาดหยางโจว | 23 | everything | ×0.5 |
+| ซูโจว (`city_suzhou`) | 🏪 ตลาดซูโจว | 24 | everything | ×0.5 |
+| จินหลิง (`city_jinling`) | 🏪 ตลาดจินหลิง | 23 | everything | ×0.5 |
+| ฉางอัน (`city_changan`) | 🏪 ตลาดฉางอัน | 23 | everything | ×0.5 |
+| โรงเตี๊ยมยั่วไหล (`inn_yuelai`) | 🍵 ของกินที่ยั่วไหล | 5 | food, herb, material | ×0.4 |
+| โรงเตี๊ยมมีหว่าง (`inn_youjian`) | 🍵 ของกินที่มีหว่าง | 5 | food, herb, material | ×0.4 |
+| โรงเตี๊ยมเก้าอี้สูง (`inn_gaosheng`) | 🍵 ของกินที่เก้าอี้สูง | 5 | food, herb, material | ×0.4 |
+| โรงเตี๊ยมห้วอลั่ว (`inn_heluo`) | 🍵 ของกินที่ห้วอลั่ว | 5 | food, herb, material | ×0.4 |
+| หมู่บ้านบนเชิงเขา (`village`) | 🏪 ร้านในหมู่บ้าน | 4 | food, herb, material | ×0.35 |
+| หมู่บ้านชีกู่ (`village_qigu`) | 🏪 ร้านชีกู่ | 4 | food, herb, material | ×0.35 |
+| หมู่บ้านไร้นาม (`village_noname`) | 🏪 ร้านไร้นาม | 4 | food, herb, material | ×0.35 |
+| หมู่บ้านดอกเหมย (`village_meihua`) | 🏪 ร้านดอกเหมย | 4 | food, herb, material | ×0.35 |
+| หมู่บ้านหัวซาน (`village_huashan`) | 🏪 ร้านหัวซาน | 4 | food, herb, material | ×0.35 |
+| หมู่บ้านไท่ซาน (`village_taishan`) | 🏪 ร้านไท่ซาน | 4 | food, herb, material | ×0.35 |
+| หมู่บ้านฮิงซาน (`village_hengshan`) | 🏪 ร้านฮิงซาน | 4 | food, herb, material | ×0.35 |
+| หมู่บ้านอวู่เซี่ย (`village_wuxia`) | 🏪 ร้านอวู่เซี่ย | 4 | food, herb, material | ×0.35 |
 
 ## Martial halls
 

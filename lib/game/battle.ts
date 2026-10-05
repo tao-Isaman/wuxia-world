@@ -22,6 +22,9 @@ import {
   type ConflictFactors,
 } from "./skill-conflict";
 import { firstArtSlotIndex, parseSlotId } from "./slots";
+import { meridianActiveEffects } from "./meridians";
+import type { MeridianEffect } from "./meridian-types";
+import { accPctOf, atkPctOf, criRateOf, defPctOf, landDamage, rollRage, rollSaps, spdPctOf, spdWithPct } from "./meridian-battle";
 
 /** The most damage a defender can shrug off, in % (buffs + gear + meridians). */
 export const PCT_REDUCE_CAP = 90;
@@ -58,6 +61,9 @@ export interface BattleContext {
   // flat damage off a stat —
   // e.g. Skill.vitScale → `vitScale * stats[side].VIT` added to skillEffect.
   stats: Record<Side, StatBlock>;
+  // Battle effects of each side's filled meridian points (rage on being hit,
+  // sap on landing an attack; the start effects are applied by the grid).
+  meridian: Record<Side, readonly MeridianEffect[]>;
 }
 
 // Pick the "primary" art for a side: the first art slotted in slots wins,
@@ -91,6 +97,7 @@ export function makeContext(buildA: CharacterBuild, buildB: CharacterBuild): Bat
       A: combinedStats(buildA, conflictA),
       B: combinedStats(buildB, conflictB),
     },
+    meridian: { A: meridianActiveEffects(buildA), B: meridianActiveEffects(buildB) },
   };
 }
 
@@ -164,7 +171,8 @@ function effectiveSpd(state: BattleState, side: Side): number {
   for (const b of state.st[side].buffs) {
     if (b.t === "buff_spd") bonus += b.v;
   }
-  return Math.max(1, base + bonus);
+  // Meridian wind rage / opening / sapped speed scale the gauge fill.
+  return spdWithPct(Math.max(1, base + bonus), spdPctOf(state.st[side]));
 }
 
 // Effective Cri for damage rolls — base derived Cri plus any `buff_cri`
@@ -290,11 +298,11 @@ export function calcSkillDamage(
   for (const d of ast.debuffs) if (d.t === "debuff_atk" && d.v != null) atkDebuff += d.v;
   const sm = Math.max(
     0,
-    1 + (ast.stk * ast.stkV) / 100 + ctx.equipBonus[side].pct_atk / 100 + atkDebuff / 100,
+    1 + (ast.stk * ast.stkV) / 100 + ctx.equipBonus[side].pct_atk / 100 + atkDebuff / 100 + atkPctOf(ast) / 100,
   );
 
   // Effective Acc / Eva with debuffs/buffs
-  let ea = ad.Acc;
+  let ea = ad.Acc * (1 + accPctOf(ast) / 100);
   for (const d of ast.debuffs) if (d.t === "debuff_acc" && d.v != null) ea = Math.max(0, ea + d.v);
   let ee = dd.Eva;
   for (const d of dst.debuffs) if (d.t === "debuff_eva" && d.v != null) ee = Math.max(0, ee + d.v);
@@ -324,14 +332,15 @@ export function calcSkillDamage(
   const ta = sk.at === "phy" ? ad.PA : ad.IA * im;
   const vitBonus = sk.vitScale ? sk.vitScale * (ctx.stats[side].VIT ?? 0) : 0;
   const se = eBp * (1 + sk.p / 100) + sk.f + vitBonus;
-  const ed = Math.max(0, (sk.at === "phy" ? dd.PD : dd.ID) + fD - dR);
+  const defMul = 1 + defPctOf(dst) / 100;
+  const ed = Math.max(0, (sk.at === "phy" ? dd.PD : dd.ID) * defMul + fD - dR);
   const raw = Math.max(1, (ad.Atk * sm * ab + ta + se) * sk.dm * mm - ed) * (1 - pR / 100);
 
   const hp = hitPct(ea, ee);
   if (Math.random() * 100 >= hp) {
     return { hit: false, dmg: 0, crit: false, hpPct: Math.round(hp), critPct: 0, reflectDmg: 0 };
   }
-  const cp = critPct(effectiveCri(state, side, ad.Cri), dd.Res);
+  const cp = Math.min(100, critPct(effectiveCri(state, side, ad.Cri), dd.Res) + criRateOf(ast));
   const crit = Math.random() * 100 < cp;
   const dmg = Math.round(raw * riposte * (crit ? CRIT_MULTIPLIER : 1));
 
@@ -407,6 +416,7 @@ export function resolveSkill(
     const hitCrits: boolean[] = [];
     const hitMisses: boolean[] = [];
     let firstProbe = "";
+    let landed = false;
     for (let h = 0; h < hitCount; h++) {
       if (state.winner) break;
       const res = calcSkillDamage(state, side, skill, ctx);
@@ -427,12 +437,14 @@ export function resolveSkill(
         continue;
       }
 
-      hitDamages.push(perHitDmg);
+      // A meridian shield soaks first; what reaches HP is the hit shown.
+      const hpDmg = landDamage(state, ds, perHitDmg);
+      landed = true;
+      hitDamages.push(hpDmg);
       hitCrits.push(res.crit);
       hitMisses.push(false);
       state.hitsReceived[ds]++;
-      if (ds === "A") state.hA = Math.max(0, state.hA - perHitDmg);
-      else state.hB = Math.max(0, state.hB - perHitDmg);
+      if ((ds === "A" ? state.hA : state.hB) > 0) rollRage(state, ds, ctx.meridian[ds]);
 
       const dt = res.crit
         ? `<span class="lC">★CRIT! ${perHitDmg}</span>`
@@ -479,6 +491,8 @@ export function resolveSkill(
       checkWin(state, ctx.names);
     }
 
+    // Meridian saps roll once per target an attack landed on.
+    if (landed && !state.winner) rollSaps(state, side, ctx.meridian[side]);
     // Emit cast event for the UI overlay (skill name + per-hit damages).
     emitCast(state, side, skill.n, hitCount, hitDamages, hitCrits, hitMisses, skill.ti, { kind: "skill", id: skill.id });
     void firstProbe;
@@ -608,9 +622,15 @@ export function resolveArtActive(
   const cls = side === "A" ? "lA" : "lB";
   const nm = escapeBattleText(ctx.names[side]);
   const ds = opposite(side);
-  const ad = side === "A" ? state.dA : state.dB;
-  const dd = ds === "A" ? state.dA : state.dB;
+  const ad0 = side === "A" ? state.dA : state.dB;
+  const dd0 = ds === "A" ? state.dA : state.dB;
   const dst = state.st[ds];
+  // Meridian % statuses: the attacker's Atk +%, the defender's PD / ID +%.
+  const atkMul = 1 + atkPctOf(state.st[side]) / 100;
+  const defMul = 1 + defPctOf(dst) / 100;
+  const ad = atkMul === 1 ? ad0 : { ...ad0, Atk: ad0.Atk * atkMul };
+  const dd = defMul === 1 ? dd0 : { ...dd0, PD: dd0.PD * defMul, ID: dd0.ID * defMul };
+  let landed = false;
 
   let fD = 0, pR = 0, ref = 0;
   const riposte = act.t === "atk_phy_pen" || act.t === "drain_phy" ? consumeRiposte(state, side) : 1;
@@ -628,7 +648,7 @@ export function resolveArtActive(
   const probe = (hp: number, cp: number) => `<span class="lp">[hit${hp}% crit${cp}%]</span>`;
 
   const computeMissProbe = () => {
-    let ea = ad.Acc;
+    let ea = ad.Acc * (1 + accPctOf(state.st[side]) / 100);
     for (const d of state.st[side].debuffs) if (d.t === "debuff_acc" && d.v != null) ea = Math.max(0, ea + d.v);
     let ee = dd.Eva;
     for (const d of dst.debuffs) if (d.t === "debuff_eva" && d.v != null) ee = Math.max(0, ee + d.v);
@@ -636,17 +656,19 @@ export function resolveArtActive(
     return {
       ea, ee,
       hp: Math.round(hitPct(ea, ee)),
-      cp: Math.round(critPct(effectiveCri(state, side, ad.Cri), dd.Res)),
+      cp: Math.round(Math.min(100, critPct(effectiveCri(state, side, ad.Cri), dd.Res) + criRateOf(state.st[side]))),
     };
   };
 
   // doAtkHit applies damage, optional reflect; returns final dmg + crit flag.
   const doAtkHit = (rawDmg: number, hc: { cp: number }) => {
     const crit = Math.random() * 100 < hc.cp;
-    const dmg = Math.round(rawDmg * riposte * (crit ? CRIT_MULTIPLIER : 1));
+    const dealt = Math.round(rawDmg * riposte * (crit ? CRIT_MULTIPLIER : 1));
     state.hitsReceived[ds]++;
-    if (ds === "A") state.hA = Math.max(0, state.hA - dmg);
-    else state.hB = Math.max(0, state.hB - dmg);
+    // A meridian shield soaks first; then the defender's rages roll.
+    const dmg = landDamage(state, ds, dealt);
+    landed = true;
+    if ((ds === "A" ? state.hA : state.hB) > 0) rollRage(state, ds, ctx.meridian[ds]);
     if (ref > 0) {
       const rd = Math.round(dmg * ref / 100);
       if (side === "A") state.hA = Math.max(0, state.hA - rd);
@@ -821,6 +843,9 @@ export function resolveArtActive(
       break;
     }
   }
+
+  // Meridian saps: once, when the active's attack landed.
+  if (landed && !state.winner) rollSaps(state, side, ctx.meridian[side]);
 
   // Fire the use_act passive for the art that was just activated (not the
   // primary). If multiple arts are slotted, each uses its own passive set.

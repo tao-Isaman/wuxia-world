@@ -8,6 +8,8 @@ import { gaugeRate, resolveArtActive } from "../battle";
 import { fleeChance } from "../combat-actions";
 import { applySelfEffect, escapeBattleText } from "../effects";
 import { deriveAll } from "../derive";
+import { meridianActiveEffects } from "../meridians";
+import { REVIVE_LABEL, meridianStart, spdPctOf, spdWithPct } from "../meridian-battle";
 import { parseSlotId } from "../slots";
 import type { LogLine } from "../types";
 import { aimCells, areaCells, facingToward, manhattan, reachableCells, type Board } from "./geometry";
@@ -26,7 +28,8 @@ import {
   type TargetResult,
   type UnitSpec,
 } from "./types";
-import { commitDuelView, gridLogLines, makeDuelView, pairContext, resolveDuel, tickUnit } from "./duel";
+import { commitDuelView, gridLogLines, makeDuelView, pairContext, resolveDuel, tickUnit, viewProcs } from "./duel";
+import type { DuelView } from "./types";
 
 export const GRID_ATB_THRESHOLD = 100;
 const LOG_CAP = 100;
@@ -66,11 +69,28 @@ function pushEvent(state: GridBattleState, ev: EventInput): void {
   if (state.events.length > EVENT_CAP) state.events.splice(0, state.events.length - EVENT_CAP);
 }
 
-/** Effective ATB speed: derived Spd + active buff_spd, floor 1 (same rule as battle.ts). */
+/** Effective ATB speed: derived Spd + active buff_spd, floor 1, then meridian gauge-fill % (same rule as battle.ts). */
 export function unitSpd(u: GridUnit): number {
   let bonus = 0;
   for (const b of u.status.buffs) if (b.t === "buff_spd") bonus += b.v;
-  return Math.max(1, u.derived.Spd + bonus);
+  return spdWithPct(Math.max(1, u.derived.Spd + bonus), spdPctOf(u.status));
+}
+
+/** Turn a duel view's meridian triggers into "proc" events (A = `a`, B = `b`). */
+function flushProcs(state: GridBattleState, view: DuelView, a: GridUnit, b: GridUnit): void {
+  for (const p of viewProcs(view, a, b)) pushEvent(state, { t: "proc", ...p });
+  view.procs = [];
+}
+
+/** Units that fell with a meridian revive pending rise again (once). */
+function reviveFallen(state: GridBattleState): void {
+  for (const u of state.units) {
+    if (!u.alive || u.hp > 0 || !u.revive) continue;
+    u.hp = Math.max(1, Math.round(u.derived.HP * u.revive / 100));
+    u.revive = undefined;
+    pushLog(state, { cls: "lS", txt: `&nbsp;✺ ${nm(u)} ${REVIVE_LABEL}! (HP ${u.hp})` });
+    pushEvent(state, { t: "proc", unitId: u.id, kind: "revive", label: REVIVE_LABEL });
+  }
 }
 
 // ─── Creation ─────────────────────────────────────────────────────────
@@ -133,6 +153,18 @@ export function createGridBattle(specs: UnitSpec[], opts: GridBattleOptions = {}
     winner: null, hA: 0, mpA: 0, hB: 0, mpB: 0,
     skillUses: { A: {}, B: {} }, artUses: { A: {}, B: {} }, hitsReceived: { A: 0, B: 0 },
   };
+  // Meridian (ชีพจร) battle-start effects: openings, shield, ward, revive.
+  for (const u of units) {
+    const effects = meridianActiveEffects(u.build);
+    if (!effects.length) continue;
+    const start = meridianStart(effects, u.derived);
+    u.status.buffs.push(...start.buffs);
+    if (start.revive) u.revive = start.revive;
+    for (const p of start.procs) {
+      pushEvent(state, { t: "proc", unitId: u.id, kind: p.kind, label: p.label });
+      pushLog(state, { cls: "lS", txt: `&nbsp;✦ ${nm(u)}: ${escapeBattleText(p.label)}` });
+    }
+  }
   refreshCompat(state);
   return state;
 }
@@ -163,6 +195,7 @@ function refreshCompat(state: GridBattleState): void {
 
 /** Mark the fallen; end the battle (log + "end" event) when a team is wiped. Returns true when over. */
 function settle(state: GridBattleState): boolean {
+  reviveFallen(state);
   for (const u of state.units) {
     if (u.alive && u.hp <= 0) {
       u.alive = false; u.hp = 0;
@@ -243,7 +276,7 @@ export function beginNextTurn(state: GridBattleState): GridUnit | null {
     const u = next.u;
     u.gauge = Math.max(0, u.gauge - GRID_ATB_THRESHOLD);
 
-    pushLog(state, tickUnit(u, state.turn));
+    pushLog(state, tickUnit(u, state.turn, (p) => pushEvent(state, { t: "proc", ...p })));
     u.cd = u.cd.map((v) => Math.max(0, v - 1));
     u.iaCD = Math.max(0, u.iaCD - 1);
     if (settle(state)) { refreshCompat(state); return null; }
@@ -395,6 +428,7 @@ function doSkill(state: GridBattleState, u: GridUnit, slot: number, aimed: Cell)
       if (!u.alive || u.hp <= 0) return; // reflected to death mid-sweep
       const { view } = resolveDuel(u, t, turn, src, i > 0);
       pushLog(state, gridLogLines(view));
+      flushProcs(state, view, u, t);
       const lc = view.lastCast;
       if (lc) { const r = result(t); r.damages.push(...lc.hitDamages); r.crits.push(...lc.hitCrits); r.misses.push(...lc.hitMisses); }
     });
@@ -405,6 +439,7 @@ function doSkill(state: GridBattleState, u: GridUnit, slot: number, aimed: Cell)
     const { view } = resolveDuel(u, f, turn, src, false);
     f.hp = foeHp; f.hitsReceived = foeHits;
     pushLog(state, gridLogLines(view));
+    flushProcs(state, view, u, f);
     for (const t of targets) result(t);
     // Other allies in the area get the same support (no second cost).
     for (const t of targets) {
@@ -420,11 +455,13 @@ function doSkill(state: GridBattleState, u: GridUnit, slot: number, aimed: Cell)
         applySelfEffect(v, "A", se, ctx.names);
         commitDuelView(v, t, tFoe);
         pushLog(state, gridLogLines(v));
+        flushProcs(state, v, t, tFoe);
       } else {
         const v = makeDuelView(t, tFoe, turn);
         resolveArtActive(v, "A", pairContext(t, tFoe), { slotIdx: slot, artId: src.id, tick: false, secondary: true });
         commitDuelView(v, t, tFoe);
         pushLog(state, gridLogLines(v));
+        flushProcs(state, v, t, tFoe);
       }
       tFoe.hp = tFoeHp;
     }
@@ -439,7 +476,12 @@ function doSkill(state: GridBattleState, u: GridUnit, slot: number, aimed: Cell)
     }
   }
   if (!sameCell(aimed, u.pos)) u.facing = facingToward(u.pos, aimed, u.facing);
-  for (const r of results.values()) r.killed = unitById(state, r.unitId)!.hp <= 0;
+  // A pending meridian revive keeps a fallen unit up: not "killed"; settle()
+  // raises it right after the cast event, so its proc follows the hits.
+  for (const r of results.values()) {
+    const o = unitById(state, r.unitId)!;
+    r.killed = o.hp <= 0 && !o.revive;
+  }
   pushEvent(state, {
     t: "cast", unitId: u.id, name: src.name, tier: src.tier, source: { kind: src.kind, id: src.id },
     aimed: { ...aimed }, cells, results: [...results.values()],

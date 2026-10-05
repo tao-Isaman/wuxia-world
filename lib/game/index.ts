@@ -48,6 +48,7 @@ export {
   meridianRankBonus,
   meridianChartBonus,
   meridianBuildBonus,
+  meridianActiveEffects,
   meridianNodeState,
   meridianNextCost,
   meridianChartFullCost,
