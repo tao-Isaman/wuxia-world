@@ -6,6 +6,10 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-05
 
+### Main story chapter 2 points to หมู่บ้านชีกู่
+
+- **บทที่ 2 (เงาที่แปลงผัก) had no guide arrow** at its "ask the foothill elder" step: it named the legacy tutorial location `village`, which is on no road. It now goes to `village_qigu` (north of the capital). `test:story` now requires every visit / duel step to name a place on the world map (or the jail).
+
 ### The capital rebuilt: a grand avenue, packed shop rows, a walled yamen
 
 - **The imperial avenue**, three cells wide, runs straight from the south gate in the city wall to the plaza and on through the yamen's single gate to its court: the main hall and two wings, stone lions, the drum of grievance, banner poles. The market street crosses it at the plaza (bronze cauldron, stone lanterns, stalls, the lei-tai stage by the yamen wall); an open square lies south of it. Shops stand shoulder to shoulder on one- and two-cell lanes, with goods and sign poles at their doors, work yards behind the craft street, the bell tower at the north edge, fields and a cart outside the gate. The old orchard outside the east wall is gone: the city runs to the edge.

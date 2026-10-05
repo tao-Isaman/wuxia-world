@@ -17,6 +17,7 @@ import type { CutsceneSpec, StoryBeat, StoryLine, StoryStep } from "../lib/world
 import { getNpc, getOpponent, getItem, getScene, getQuest, SHOPS, RESOURCES, RECIPES, OPPONENTS, QUESTS, SCENES, ITEMS, SECT_HALLS, SCROLL_PREFIX, scrollItemId } from "../lib/world/data";
 import { FIGHT_EVENTS } from "../lib/world/data/random-events";
 import { getLocationMap } from "../lib/world/data/location-maps";
+import { WORLD_COORDS } from "../lib/world/data/world-coords";
 import { SECT_MEMBERSHIPS } from "../lib/world/data/sect-memberships";
 import { evaluateCondition } from "../lib/world/conditions";
 import type { Condition, QuestDef, QuestReward, WorldStateData } from "../lib/world/types";
@@ -38,7 +39,9 @@ const obtainable = (itemId: string) => ITEMS_TEXT.includes(`"${itemId}"`);
 const roaming = new Set([...FIGHT_EVENTS.map((e) => e.opponentId), ...RESOURCES.flatMap((r) => r.opponentIds ?? [])]);
 const inScope = (sc: string) => !ONLY || sc === ONLY;
 const lineOk = (line: StoryLine) => typeof line === "string" ? line.trim().length > 0 : line[0].trim().length > 0 && line[1].trim().length > 0;
-const standsAt = (npcId: string, locationId: string) => !!getLocationMap(locationId)?.npcSpots?.[npcId] && !!getNpc(npcId)?.locationIds.includes(locationId);
+/** A place on the world map, with a map of its own (the auto-map builder also answers off-world ids such as the legacy "village"); the jail is reached by arrest. */
+const placeMap = (id: string) => getScene(id)?.kind === "location" && (WORLD_COORDS[id] || id === "jail") ? getLocationMap(id) : undefined;
+const standsAt = (npcId: string, locationId: string) => !!placeMap(locationId)?.npcSpots?.[npcId] && !!getNpc(npcId)?.locationIds.includes(locationId);
 
 check("coverage: every sect skill and art has exactly one way in — a lineage quest (T0–T3) or a story saga (T4)", () => {
   const grants = new Map<string, string[]>();
@@ -160,10 +163,10 @@ function checkCutscene(where: string, c: CutsceneSpec) {
 
 function checkStep(where: string, step: StoryStep) {
   switch (step.t) {
-    case "visit": if (!getLocationMap(step.locationId)) err(`${where}: ${step.locationId} has no map`); checkBeat(where, step.scene, 3); break;
+    case "visit": if (!placeMap(step.locationId)) err(`${where}: ${step.locationId} has no map`); checkBeat(where, step.scene, 3); break;
     case "talk": if (!standsAt(step.npcId, step.locationId)) err(`${where}: ${step.npcId} does not stand at ${step.locationId}`); checkBeat(where, step.scene, 3); break;
     case "duel":
-      if (!getLocationMap(step.locationId)) err(`${where}: ${step.locationId} has no map`);
+      if (!placeMap(step.locationId)) err(`${where}: ${step.locationId} has no map`);
       if (!getOpponent(step.opponentId)) err(`${where}: opponent ${step.opponentId} missing`);
       checkBeat(`${where} before`, step.before, 2); checkBeat(`${where} after`, step.after, 2); break;
     case "hunt": if (!getOpponent(step.opponentId) || !roaming.has(step.opponentId)) err(`${where}: ${step.opponentId} does not roam`); if (step.count < 1 || step.count > 8) err(`${where}: count ${step.count}`); break;
