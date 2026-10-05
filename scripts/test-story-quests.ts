@@ -43,6 +43,42 @@ const lineOk = (line: StoryLine) => typeof line === "string" ? line.trim().lengt
 const placeMap = (id: string) => getScene(id)?.kind === "location" && (WORLD_COORDS[id] || id === "jail") ? getLocationMap(id) : undefined;
 const standsAt = (npcId: string, locationId: string) => !!placeMap(locationId)?.npcSpots?.[npcId] && !!getNpc(npcId)?.locationIds.includes(locationId);
 
+const JIANGHU = "ยุทธจักร";
+/** The main story's last chapter: every jianghu saga waits for it. */
+const MAIN_LAST = storyQuestId(MAIN_ARC.id, MAIN_ARC.chapters.length);
+/**
+ * Saga size and difficulty. A sect T4 saga: 8–10 chapters, 4 films. A jianghu
+ * saga has no sect to vouch for the hero, so it is twice as long and hard (T4:
+ * 16–20 chapters, 8 films, 8 duels, gate stat ≥ 80) and a jianghu T5 twice that
+ * again (32–40 chapters, 16 films, 16 duels, gate stat ≥ 120). Both need the
+ * main story finished.
+ */
+function sagaRule(arc: { sc: string }, ti: number) {
+  if (arc.sc !== JIANGHU) return { chapters: [8, 10], films: 4, duels: 0, stat: 0 } as const;
+  return ti >= 5 ? { chapters: [32, 40], films: 16, duels: 16, stat: 120 } as const : { chapters: [16, 20], films: 8, duels: 8, stat: 80 } as const;
+}
+function gateLeaves(c: Condition | undefined): Condition[] {
+  if (!c) return [];
+  return c.t === "and" ? c.all.flatMap(gateLeaves) : [c];
+}
+function checkJianghuGate(where: string, arc: { require: Condition }, rule: { stat: number }) {
+  const leaves = gateLeaves(arc.require);
+  if (leaves.some((l) => l.t === "sectMember" || l.t === "sectRankAtLeast" || l.t === "anySectMember")) err(`${where}: a jianghu saga asks for no sect`);
+  if (!leaves.some((l) => l.t === "questStatus" && l.questId === MAIN_LAST && l.status === "done")) err(`${where}: needs the main story finished (${MAIN_LAST} done)`);
+  const stat = Math.max(0, ...leaves.map((l) => l.t === "statAtLeast" ? l.min : 0));
+  if (stat < rule.stat) err(`${where}: gate stat ${stat} (at least ${rule.stat})`);
+}
+
+check("coverage: every jianghu T4 / T5 move has exactly one saga", () => {
+  if (ONLY && ONLY !== JIANGHU) return;
+  const moves = [...SKILLS.filter((x) => x.sc === JIANGHU && x.ti >= 4).map((x) => ({ kind: "skill", id: x.id, n: x.n })),
+    ...ARTS.filter((x) => x.sc === JIANGHU && x.ti >= 4).map((x) => ({ kind: "art", id: x.id, n: x.n }))];
+  for (const m of moves) {
+    const by = STORY_ARC_SPECS.filter((a) => a.reward.kind === m.kind && a.reward.id === m.id);
+    if (by.length !== 1) err(`jianghu ${m.kind} ${m.id} ${m.n}: ${by.length} sagas (needs exactly 1)`);
+  }
+});
+
 check("coverage: every sect skill and art has exactly one way in — a lineage quest (T0–T3) or a story saga (T4)", () => {
   const grants = new Map<string, string[]>();
   for (const l of LINEAGE_SPECS) grants.set(`${l.kind}:${l.id}`, [...(grants.get(`${l.kind}:${l.id}`) ?? []), lineageQuestId(l)]);
@@ -184,7 +220,7 @@ function checkReward(where: string, r: QuestReward) {
   if (r.t === "joinSect" || r.t === "leaveSect" || r.t === "resignSect" || r.t === "betraySect") err(`${where}: membership rewards are not allowed`);
 }
 
-check("story sagas: 8–10 chapters, T4 reward of that sect, rich dialogue, real places, people and foes, small rewards", () => {
+check("story sagas: 8–10 chapters for a sect T4 (jianghu: 16–20 for T4, 32–40 for T5, gated twice / four times as hard), T4 reward of that sect, rich dialogue, real places, people and foes, small rewards", () => {
   const ids = new Set<string>();
   for (const arc of STORY_ARC_SPECS) {
     if (!inScope(arc.sc)) continue;
@@ -192,9 +228,11 @@ check("story sagas: 8–10 chapters, T4 reward of that sect, rich dialogue, real
     if (ids.has(arc.id)) err(`${where}: duplicate id`); ids.add(arc.id);
     if (!/^[a-z0-9_]+$/.test(arc.id)) err(`${where}: id must be snake case`);
     const info = STORY_RESOLVERS.martial(arc.reward.kind, arc.reward.id);
-    if (!info || info.ti !== 4) err(`${where}: reward ${arc.reward.id} is not a T4 ${arc.reward.kind}`);
+    const rule = sagaRule(arc, info?.ti ?? 4);
+    if (!info || (info.ti !== 4 && !(arc.sc === JIANGHU && info.ti === 5))) err(`${where}: reward ${arc.reward.id} is not a T4 ${arc.reward.kind}${arc.sc === JIANGHU ? " (or a jianghu T5)" : ""}`);
     else if (info.sc !== arc.sc) err(`${where}: reward is ${info.sc}, saga says ${arc.sc}`);
-    if (arc.chapters.length < 8 || arc.chapters.length > 10) err(`${where}: ${arc.chapters.length} chapters (8–10)`);
+    if (arc.chapters.length < rule.chapters[0] || arc.chapters.length > rule.chapters[1]) err(`${where}: ${arc.chapters.length} chapters (${rule.chapters.join("–")})`);
+    if (arc.sc === JIANGHU) checkJianghuGate(where, arc, rule);
     let films = 0;
     for (const [i, ch] of arc.chapters.entries()) {
       const cw = `${where} ch${i + 1}`;
@@ -211,7 +249,9 @@ check("story sagas: 8–10 chapters, T4 reward of that sect, rich dialogue, real
       const words = beats.flatMap((b) => b.lines).length + beats.reduce((n, b) => n + (b.cutscene?.beats.filter((x) => x[0] === "say" || x[0] === "narrate" || x[0] === "think").length ?? 0), 0);
       if (words < 14) err(`${cw}: only ${words} lines of story (at least 14)`);
     }
-    if (films < 4) err(`${where}: ${films} cutscenes (at least 4: opening, two turns, finale)`);
+    if (films < rule.films) err(`${where}: ${films} cutscenes (at least ${rule.films}: opening, turns, finale)`);
+    const duels = arc.chapters.flatMap((ch) => ch.steps).filter((st) => st.t === "duel").length;
+    if (duels < rule.duels) err(`${where}: ${duels} duels (at least ${rule.duels})`);
     if (!arc.chapters[arc.chapters.length - 1].complete.cutscene) err(`${where}: the finale needs a cutscene`);
     if (!arc.chapters[0].offer.cutscene) err(`${where}: the opening needs a cutscene`);
     for (const o of arc.opponents ?? []) {

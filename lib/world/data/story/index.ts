@@ -28,6 +28,17 @@ import * as jinyiwei from "./jinyiwei";
 import * as jinyiwei_arts from "./jinyiwei_arts";
 import * as tang from "./tang";
 import * as tang_arts from "./tang_arts";
+// Jianghu sagas: the ten unsect T4 / T5 moves (twice / four times a sect saga).
+import * as jh_six_meridian from "./jianghu/six_meridian";
+import * as jh_lone_sword from "./jianghu/lone_sword";
+import * as jh_witness_spear from "./jianghu/witness_spear";
+import * as jh_godslayer_blade from "./jianghu/godslayer_blade";
+import * as jh_cosmos_fist from "./jianghu/cosmos_fist";
+import * as jh_mountain_army from "./jianghu/mountain_army";
+import * as jh_heaven_fire from "./jianghu/heaven_fire";
+import * as jh_sunflower from "./jianghu/sunflower";
+import * as jh_nine_yang from "./jianghu/nine_yang";
+import * as jh_nine_yin from "./jianghu/nine_yin";
 
 const SECT_FILES: readonly { LINEAGE: readonly LineageSpec[]; ARCS: readonly StoryArcSpec[] }[] = [
   wudang,
@@ -52,6 +63,16 @@ const SECT_FILES: readonly { LINEAGE: readonly LineageSpec[]; ARCS: readonly Sto
   jinyiwei_arts,
   tang,
   tang_arts,
+  jh_six_meridian,
+  jh_lone_sword,
+  jh_witness_spear,
+  jh_godslayer_blade,
+  jh_cosmos_fist,
+  jh_mountain_army,
+  jh_heaven_fire,
+  jh_sunflower,
+  jh_nine_yang,
+  jh_nine_yin,
 ];
 
 export const LINEAGE_SPECS: readonly LineageSpec[] = SECT_FILES.flatMap((f) => f.LINEAGE);
