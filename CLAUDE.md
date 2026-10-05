@@ -14,7 +14,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **What the player does:**
 
 - Explores 101 places (100 painted maps) joined by 129 roads.
-- Meets 225 NPCs and takes 882 quests: a 15-chapter main story (เนื้อเรื่องหลัก), 373 hand-written, 154 sect lineage quests and 38 story sagas (340 chapters); 304 cutscenes.
+- Meets 225 NPCs and takes 1,115 quests: a 15-chapter main story (เนื้อเรื่องหลัก), 373 hand-written, 154 sect lineage quests and 48 story sagas (573 chapters: 38 sect sagas and 10 long jianghu sagas for the unsect T4 / T5 moves); 511 cutscenes.
 - Lives in the 3rd year of Jianwen (1401), about 40 years after มังกรหยก ภาค 3: the court's seized scriptures have just scattered back into the jianghu ([docs/story-writing.md](docs/story-writing.md#timeline-and-novel-characters)).
 - Joins one of 15 sects and learns 173 move skills and 111 inner arts.
 - Gathers and crafts (19 life skills).

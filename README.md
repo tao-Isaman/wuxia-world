@@ -41,8 +41,8 @@ What each suite covers and how to run e2e: [docs/testing.md](docs/testing.md). E
 | --- | --- |
 | **World** | 101 places (96 on the world map), joined by 128 hand-named roads; 100 painted maps with collision; day and night on a 12-ชั่วยาม clock |
 | **People** | 225 NPCs with portraits and sprites, some strolling about their spot, each with gift tastes; 20 of them (the sect masters) age, train, feud and die in a weekly background simulation |
-| **Quests** | 882 quests: a 15-chapter main story plus 1 older main quest, 526 side (97 sect quests and 154 lineage quests that pass on every sect skill and art up to tier 3) and 340 story chapters, with item, kill, visit, objective and dialog stages; any quest can be tracked, with a HUD tracker and a map arrow |
-| **Story sagas** | 38 sagas of 8–10 chapters, one per tier-4 sect skill or art, retelling legends of มังกรหยก ภาค 3 (304 cutscenes in all, with the main story's) played on the painted maps |
+| **Quests** | 1,115 quests: a 15-chapter main story plus 1 older main quest, 526 side (97 sect quests and 154 lineage quests that pass on every sect skill and art up to tier 3) and 573 story chapters, with item, kill, visit, objective and dialog stages; any quest can be tracked, with a HUD tracker and a map arrow |
+| **Story sagas** | 38 sagas of 8–10 chapters, one per tier-4 sect skill or art, retelling legends of มังกรหยก ภาค 3, and 10 jianghu sagas for the unsect moves (16–20 chapters for a T4, 32–40 for the three T5 scriptures) — 511 cutscenes in all, with the main story's, played on the painted maps |
 | **Sects** | 20 sect grounds; 15 are joinable, each with an intro quest, a rank ladder (rank-ups pay gold and open the sect's lineage quests), repeatable sect quests, and hunters for betrayers |
 | **Combat** | turn-based tactics on a 10 × 7 board, up to 15 × 10 for big gangs. Per-unit turn order by speed; move and cast with ranges and areas; enemy packs; retreat; auto-play |
 | **Martial arts** | 173 move skills and 111 inner arts in tiers 0–4 (three tier-5 arts). Levels 1–10, weapon mastery, type conflict; 76 pieces of gear |
