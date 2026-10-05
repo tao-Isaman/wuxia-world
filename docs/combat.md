@@ -81,20 +81,32 @@ A new world hero starts with every stat at 1. The /debug sandbox gives a 200-poi
 
 ### Where the stats come from
 
-`statBreakdown(build)` splits a build's stats into four buckets; `combinedStats` = the first three.
+`statBreakdown(build)` splits a build's stats into five buckets; `combinedStats` = base + arts + skills + meridians (everything but equipment).
 
 1. **base** — `build.stats`.
 2. **fromArts** — the active art (`build.artId`) adds `floor(stat × artLevel/10 × conflict)` per stat; every other art in `learnedArtIds` adds the same with its own level (`artLevels[id] ?? 1`).
 3. **fromSkills** — every slotted skill and every learned skill (counted once) adds its `st` bonus × `bpMultiplier(level)` × conflict. A fresh level-1 skill gives half its listed stats; level 10 gives all.
 4. **fromEquipment** — the legacy `st` field of equipment. **Always zero**: every item has `st: {}` and `combinedStats` leaves equipment out on purpose.
+5. **fromMeridians** — the base stats of every opened meridian point (ชีพจร, [below](#meridians-ชีพจร)), flat: no level or conflict scaling.
 
 `deriveAll(build)` then:
 
 1. derives from `combinedStats`;
 2. adds art HP / MP: `floor(hL × level × conflict)` and `floor(mL × level × conflict)` for the active art and each learned art;
-3. adds equipment directly to the derived values (`getEquipBonus`): `Atk += atkb`, `PD += pdb`, `ID += idb`, `HP += hpb`, `MP += mpb`, `PA += pab`, `IA += iab`, `Spd += spdb`, `Acc += accb`, `Res += resb`, `Cri += crib + flat_cri`, `Eva += evab + flat_eva`.
+3. adds equipment and meridian combat fields directly to the derived values (`getBuildBonus` = `getEquipBonus` + the meridian `combat` bonus): `Atk += atkb`, `PD += pdb`, `ID += idb`, `HP += hpb`, `MP += mpb`, `PA += pab`, `IA += iab`, `Spd += spdb`, `Acc += accb`, `Res += resb`, `Cri += crib + flat_cri`, `Eva += evab + flat_eva`.
 
-Equipment `pct_atk`, `pct_reduce` and `hp_regen` are not folded into `Derived`; the battle reads them from `ctx.equipBonus`.
+`pct_atk`, `pct_reduce` / `pct_red` and `hp_regen` (equipment and meridians) are not folded into `Derived`; the battle reads them from `ctx.equipBonus`, which `makeContext` fills with `getBuildBonus(build)` — so 1v1, grid duels (`pairContext`) and the grid AI's damage estimate all see meridians.
+
+### Meridians (ชีพจร)
+
+`lib/game/meridians.ts` (pure; types and constants in `meridian-types.ts`, the 95 charts in `data/meridians.ts`).
+
+- A build's learned charts are `build.meridians`: chart id → one rank (0–3) per point. A learned chart with nothing opened is all zeros.
+- Points open in order: point i needs point i−1 at rank ≥ 1 (`meridianNodeState`: `locked | open | max`).
+- Raising a point of a tier-`ti` chart to rank r costs `(ti + 1) × r` meridian points (`meridianRankCost`, `meridianNextCost` → null at rank 3); a full chart costs `points × 6 × (ti + 1)` (`meridianChartFullCost`).
+- A point at rank r gives its ranks 1..r added together (`meridianRankBonus`); `meridianChartBonus` and `meridianBuildBonus` sum them into `{ stats, combat }`.
+- `stats` (STR…INT) join `combinedStats` as `fromMeridians`; `combat` (the `EquipBonus` keys: `atk pd id_ hp mp pa ia spd acc res cri eva pct_atk pct_red hp_regen`) join `deriveAll` and the battle context through `getBuildBonus`.
+- Charts per tier: T0 20 (1–2 points), T1 20 (3–4), T2 15 (5–6), T3 15 (7–8), T4 15 (9–10), T5 10 (12). The world side (points, chart items, sources) is in [world-engine.md](world-engine.md#meridians-ชีพจร).
 
 Consequences worth knowing:
 

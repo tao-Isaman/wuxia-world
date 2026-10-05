@@ -9,6 +9,7 @@ import "./pwa.css";
 import "./mobile-hud.css";
 import "./profile.css";
 import "./menu-layout.css";
+import "./meridian.css";
 import { PwaRegister } from "@/components/pwa";
 
 // Charm — calligraphic display font reserved for proper nouns, sect /

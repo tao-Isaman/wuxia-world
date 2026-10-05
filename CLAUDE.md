@@ -76,6 +76,7 @@ bun run test:routes         # compass exits, 8-way road paintings and arrival si
 bun run test:places         # place NPCs / quests / activities; every ยุทธจักร T0–T3 move is a quest reward; gifts; presence
 bun run test:systems        # practice xp, letters, horse stations, the sword tournament
 bun run test:quests         # campaign audit + dead ends + every item/kill/objective quest + guidance + bad-action stages
+bun run test:meridians      # meridian charts: engine, combat bonus, chart items / sources, points, store, repair, content counts
 bun run test:engine         # text overrides over SKILLS / ARTS, the engine's filters / edits / validation, the save route whitelist
 bun run test:docs           # generated reference is current + docs links/paths/commands resolve
 bun run test:assets         # asset library: manifest contract, files and sizes, footprints, ≥ 3,000 approved; every item / equipment icon
@@ -127,7 +128,7 @@ bun scripts/assets/build-kits.ts plan && python3 scripts/assets/generate.py run 
 ```
 app/, components/         React: screens, HUD, menus, popups, battle UI
    ↓
-store/                    Zustand: world (saved, v23), battle, character (/debug, v3), loading, toast, confirm
+store/                    Zustand: world (saved, v24), battle, character (/debug, v3), loading, toast, confirm
    ↓
 lib/world/  ──────►  lib/game/          pure engines — no React, no DOM, no I/O
    └ battle-bridge.ts: the one place the world and battle stores meet
@@ -256,11 +257,14 @@ Two deliberate exceptions reach into stores:
   - **Practice xp** is 30 + 5 % of the xp to the next level, 50 + 6 % at a fitting place (`practiceXpGain`).
 - **Presence** (`npc-presence.ts`). An assassinated NPC is gone for good; a kidnapped one is away until `kidnappedUntil` (day + 180) and then stands at their spot again. Maps and the location card filter with `npcPresent`.
 - **Gifts** (`gifts.ts`, store `giveGift`). One gift per NPC every 30 days (`giftDays`), an item or 100 / 500 / 1000 / 5000 gold. Worth 1–5 by price; liked ×2 (+2 for a favourite item id), disliked −2. Tastes are `NpcDef.likes` / `dislikes` (item ids, categories, `"gold"`) or follow the NPC's tags.
+- **Meridians (ชีพจร).** Pure engine `lib/game/meridians.ts` (95 charts in `lib/game/data/meridians.ts`, contract `meridian-types.ts`); sources `lib/world/data/meridian-sources.ts` (shops, loot, quest rewards → `lib/world/meridians.ts`).
+  - Every skill / art level gained gives +1 `meridianPoints` (saved). A chart is learned by reading its item `chart_<id>` (แผนภาพชีพจร-…) once its `requires` skills / arts are learned → `playerBuild.meridians[id]` = a rank 0–3 per point.
+  - `openMeridianNode` raises a point one rank for `(ti + 1) × rank` points, in order. Base stats join `combinedStats` (`fromMeridians`); combat fields join `deriveAll` and the battle context via `getBuildBonus`.
 - **Repair** (`validate.ts`). `validateAndRepair` runs on every load and drops dangling ids.
 
 ## Stores (`store/`)
 
-- **`world-store.ts`** is saved as `wusia-world-v1`, **version 23**.
+- **`world-store.ts`** is saved as `wusia-world-v1`, **version 24**.
   - Actions draft a copy (`draftFrom`, **one level deep** — nested quest, sect and NPC entries are shared), call engine functions, then `set`.
   - Time goes through `advanceTime` (12 ชั่วยาม = 1 day). The player-visible log uses `appendActionLog` (newest 100).
 - **`battle-store.ts`** is not saved.
@@ -361,7 +365,7 @@ Content changes need **no save version bump**. Removed ids are dropped on load.
 
 ## Saves
 
-- **Keys.** The world save is `localStorage["wusia-world-v1"]`, **version 23**. The "wusia" spelling is historical — never rename it.
+- **Keys.** The world save is `localStorage["wusia-world-v1"]`, **version 24**. The "wusia" spelling is historical — never rename it.
 - **Migration.** `migrate` is one idempotent normalizer (it ignores `fromVersion`). The persist `merge` also back-fills lore rumors on every load, and `onRehydrateStorage` runs `validateAndRepair`.
 - **Adding a persisted field:**
   1. `WorldStateData` + `emptyData()`;

@@ -93,6 +93,7 @@ export function InventoryPopup({ open, onClose }: Props) {
       if (r.reason === "full") setLastUsed("HP / MP เต็มแล้ว ไม่ต้องใช้");
       else if (r.reason === "stat-too-low") setLastUsed(`ฝีมือยังไม่ถึงขั้น · ต้องการ ${r.stat} ${r.needed} (ปัจจุบัน ${r.current})`);
       else if (r.reason === "already-learned") setLastUsed("เรียนวิชานี้แล้ว ไม่ต้องอ่านอีก");
+      else if (r.reason === "meridian-locked") setLastUsed(r.message);
       else setLastUsed("ใช้ไม่ได้");
       return;
     }
@@ -105,6 +106,7 @@ export function InventoryPopup({ open, onClose }: Props) {
       message = parts.length > 0 ? `ฟื้นพลัง: ${parts.join(" · ")}` : "ไม่มีพลังให้ฟื้น";
     } else if (r.kind === "manualLearnSkill") message = "เรียนวิชาฝีมือสำเร็จ · พร้อมใช้ทันที";
     else if (r.kind === "manualLearnArt") message = `เรียนวิชาในกายสำเร็จ · เริ่มที่ระดับ ${r.level}`;
+    else if (r.kind === "learnMeridian") message = "เรียนรู้แผนภาพชีพจรสำเร็จ · เปิดจุดชีพจรได้ที่เมนูชีพจร";
     // The last one used: back to the bag, the result as a toast.
     if ((useWorldStore.getState().inventory[id] ?? 0) <= 0) {
       if (message) toast("success", message);

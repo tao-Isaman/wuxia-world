@@ -200,7 +200,7 @@ test("version 18 saves migrate and beast battles load the creature atlas", async
   expect(state.playerBodyId).toBe("f1");
   expect(state.gold).toBe(321);
   expect(state.playerBuild.name).toBe("จอมยุทธ์");
-  expect(await page.evaluate(() => JSON.parse(localStorage.getItem("wusia-world-v1")!).version)).toBe(23);
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem("wusia-world-v1")!).version)).toBe(24);
   await expect(page.locator('[data-renderer="phaser"] canvas')).toHaveCount(1);
   await page.setViewportSize({ width: 390, height: 844 });
   await expect.poll(async () => (await page.locator('[data-renderer="phaser"] canvas').boundingBox())!.width).toBeLessThan(390);

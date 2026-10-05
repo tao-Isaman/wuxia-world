@@ -219,8 +219,9 @@ export function ProfilePopup({ open, onClose }: Props) {
                 const fromArts = breakdown.fromArts[k];
                 const fromSkills = breakdown.fromSkills[k];
                 const fromEquipment = breakdown.fromEquipment[k];
+                const fromMeridians = breakdown.fromMeridians[k];
                 // Sum used by learn-skill / learn-art gates (no equipment).
-                const learnable = b + fromArts + fromSkills;
+                const learnable = b + fromArts + fromSkills + fromMeridians;
                 const xp = statExp[k] ?? 0;
                 const cost = xpToNextStatLevel(b, k);
                 const xpPct = cost > 0 ? Math.min(100, Math.round((xp / cost) * 100)) : 0;
@@ -245,6 +246,7 @@ export function ProfilePopup({ open, onClose }: Props) {
                         <li className="flex justify-between"><span className="text-muted-foreground">พลังพื้นฐาน</span><span className="font-mono">{b}</span></li>
                         <li className="flex justify-between"><span className="text-muted-foreground">วิชาในกาย</span><span className="font-mono">{fromArts > 0 ? `+${fromArts}` : fromArts}</span></li>
                         <li className="flex justify-between"><span className="text-muted-foreground">วิชาฝีมือ</span><span className="font-mono">{fromSkills > 0 ? `+${fromSkills}` : fromSkills}</span></li>
+                        <li className="flex justify-between"><span className="text-muted-foreground">ชีพจร</span><span className="font-mono">{fromMeridians > 0 ? `+${fromMeridians}` : fromMeridians}</span></li>
                         <li className="flex justify-between"><span className="text-muted-foreground">อุปกรณ์</span><span className="font-mono">{fromEquipment > 0 ? `+${fromEquipment}` : fromEquipment}</span></li>
                       </ul>
                       <div className="border-t pt-1.5 space-y-0.5 text-xs">

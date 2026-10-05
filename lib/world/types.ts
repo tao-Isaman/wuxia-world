@@ -583,7 +583,11 @@ export type ItemUseEffect =
   | { t: "manualLearnSkill"; skillId: string; reqStat: StatKey; reqValue: number }
   // ตำราวิชา for an inner art. Same prereq + already-learned semantics.
   // `level` is the level the player learns the art at (default 1).
-  | { t: "manualLearnArt"; artId: string; reqStat: StatKey; reqValue: number; level?: number };
+  | { t: "manualLearnArt"; artId: string; reqStat: StatKey; reqValue: number; level?: number }
+  // แผนภาพชีพจร — learns a meridian chart (lib/game/meridians.ts). Refuses
+  // (item kept) unless every skill / art in the chart's `requires` is
+  // learned, or when the chart is already learned.
+  | { t: "learnMeridian"; chartId: string };
 
 // Stat threshold per skill / art tier when learning from a manual. T0
 // items have no stat gate; higher tiers escalate. Authors set the stat
@@ -1102,6 +1106,10 @@ export interface WorldStateData {
   // are stored on `playerBuild.artLevels` (unified with the engine's
   // `artLevels` field on CharacterBuild). Auto-levels on overflow.
   artExp: Record<string, number>;
+  // แต้มชีพจร — meridian points, +1 per level any move skill or inner art
+  // gains (every source). Spent opening meridian points (openMeridianNode);
+  // the charts themselves live on playerBuild.meridians.
+  meridianPoints: number;
 
   // Recipes the player has learned (by id). Crafting requires the
   // recipe to be in this list AND the player to be at an artisan whose

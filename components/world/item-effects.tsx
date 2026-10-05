@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import { getArt, getSkill } from "@/lib/game";
+import { getArt, getMeridianChart, getSkill } from "@/lib/game";
 import { LIFE_SKILL_LABEL, type ItemUseEffect } from "@/lib/world";
 
 // Shop and bag share the same effects, so purchases can be compared before paying.
@@ -17,6 +17,9 @@ export function ItemEffects({ effect }: { effect?: ItemUseEffect }) {
   } else if (effect.t === "manualLearnArt") {
     labels.push(`เรียน ${getArt(effect.artId)?.n ?? "วิชาในกาย"} ระดับ ${effect.level ?? 1}`);
     if (effect.reqValue > 0) labels.push(`ต้องการ ${effect.reqStat} ${effect.reqValue}`);
+  } else if (effect.t === "learnMeridian") {
+    const chart = getMeridianChart(effect.chartId);
+    labels.push(`ชีพจร T${chart?.ti ?? 0} · ${chart?.nodes.length ?? 0} จุด`);
   }
   return <>{labels.map((label) => <Badge key={label} variant="outline"
     className="text-[10px] border-emerald-700/30 text-emerald-900 bg-emerald-100/40">{label}</Badge>)}</>;

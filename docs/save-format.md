@@ -20,7 +20,7 @@ The game keeps everything in the browser's `localStorage` through Zustand's `per
 
 | Key | Holds | Version |
 | --- | --- | --- |
-| `localStorage["wusia-world-v1"]` | the world game (`store/world-store.ts`) | **21** |
+| `localStorage["wusia-world-v1"]` | the world game (`store/world-store.ts`) | **24** |
 | `localStorage["wusia-character-v1"]` | the two /debug builds (`store/character-store.ts`) | **3** |
 | `localStorage["wuxia-audio-v1"]` | sound switches and volumes (`lib/audio/engine.ts`) | — |
 | `localStorage["wuxia-random-events"] = "off"` | turns walk-tick encounters off (tests) | — |
@@ -43,16 +43,16 @@ A reload during a battle restarts that battle from the start with the hero's sav
 
 ## The world save
 
-`partialize` writes every data field of `WorldStateData` (`lib/world/types.ts`), 47 in all, and none of the action functions:
+`partialize` writes every data field of `WorldStateData` (`lib/world/types.ts`), 55 in all, and none of the action functions:
 
 | Group | Fields |
 | --- | --- |
 | Run | `hasGame`, `gameOver`, `gender`, `playerBodyId` |
-| Hero | `playerBuild` (stats, slots, gear, learned skills and arts, levels), `currentHp`, `currentMp`, `stamina`, `staminaMax` |
+| Hero | `playerBuild` (stats, slots, gear, learned skills and arts, levels, meridian charts `meridians`), `currentHp`, `currentMp`, `stamina`, `staminaMax` |
 | Where | `currentSceneId`, `lastLocationId`, `visitedLocationIds` |
 | Time | `day` (from 1), `time` (0 to below 12 ชั่วยาม) |
 | Money and bag | `gold`, `inventory` (item id → count), `inventoryEquipment` (gear id → count) |
-| Progress | `wExp`, `skillLevel`, `skillExp`, `artExp`, `statExp`, `lifeSkillXp` (19 keys), `learnedRecipeIds` |
+| Progress | `wExp`, `skillLevel`, `skillExp`, `artExp`, `meridianPoints`, `statExp`, `lifeSkillXp` (19 keys), `learnedRecipeIds` |
 | Story | `flags`, `quests` (id → `{ id, status, stage, acceptedDefeatedAt?, acceptedHasItemAt? }`), `traits`, `npcStates` |
 | Ledgers | `defeatedCounts`, `stoleFromCounts`, `assassinatedNpcIds`, `kidnappedNpcIds` |
 | Sects | `sectMembership` (sect id → `{ rank, points, lastQuestDay, artQuestsDone, rewardPicks, joinedDay, status? }`) |
@@ -64,6 +64,7 @@ A reload during a battle restarts that battle from the start with the hero's sav
 Notes:
 
 - **Levels.** Move-skill levels live in `skillLevel` and are mirrored into `playerBuild.skillLevels`. Art levels live only in `playerBuild.artLevels`.
+- **Meridians.** `meridianPoints` is the unspent point pool; the learned charts and their point ranks are `playerBuild.meridians` (chart id → rank 0–3 per point).
 - **Sect status.** A missing `status` on a membership reads as `"active"`; nothing ever writes the default.
 - **Jail time.** `jailUntil` is an absolute count of ชั่วยาม (`day × 12 + time`).
 
@@ -72,7 +73,7 @@ Notes:
 This is Zustand 5 `persist` over synchronous `localStorage`, so it all happens while the store is created:
 
 1. Read `{ state, version }` from `wusia-world-v1`.
-2. If `version !== 21`, run `migrate(state, version)`.
+2. If `version !== 24`, run `migrate(state, version)`.
 3. Run `merge(persisted, current)`: `{ ...current, ...persisted }`, then `seedLoreRumors` if a game exists.
 
    This step runs for current-version saves too; it is how new lore reaches old saves.
@@ -98,6 +99,7 @@ This is Zustand 5 `persist` over synchronous `localStorage`, so it all happens w
 | `currentHp`, `currentMp` | full (from `deriveAll`) when missing or negative |
 | `lifeSkillXp`, `statExp`, `traits` | merged over a full, zeroed key set |
 | `wExp` | 0 when negative or missing |
+| `meridianPoints` | 0 when not a non-negative number; floored |
 | `skillLevel`, `skillExp`, `artExp`, `npcStates`, `defeatedCounts`, `stoleFromCounts`, `inventoryEquipment`, `sectMembership`, `npcExt` | `{}` when not an object |
 | `learnedRecipeIds`, `visitedLocationIds`, `assassinatedNpcIds`, `kidnappedNpcIds`, `rumorPool`, `rumorArchive`, `rumorSeenLog` | `[]` when not an array |
 | `day` / `time` | at least 1 / at least 0 |
@@ -139,6 +141,7 @@ What each version added. v1–v13 and v17→v18 are described in the comment abo
 | v20 → v21 | `jailUntil` |
 | v21 → v22 | `kidnappedUntil`, `giftDays`, `activityDays` |
 | v22 → v23 | `letters`, `letterDays` (letters from friends); `tournament`, `tournamentHistory` (the sword tournament) |
+| v23 → v24 | `meridianPoints` and `playerBuild.meridians` (ชีพจร, meridian charts) |
 
 ## Repair on load
 
@@ -180,7 +183,9 @@ What each version added. v1–v13 and v17→v18 are described in the comment abo
 23. The build:
     - `skillIds` is padded to 10;
     - `learnedSkillIds` and `learnedArtIds` keep known ids only (never `"none"`), without duplicates;
-    - `artLevels` keeps known arts, clamped 1–10.
+    - `artLevels` keeps known arts, clamped 1–10;
+    - `meridians` keeps known charts only, each padded / trimmed to the chart's point count with ranks clamped 0–3.
+    - `meridianPoints` becomes a non-negative integer (else 0).
 
 **World ledgers and sects**
 
@@ -240,6 +245,7 @@ Content-only changes (a new quest, item or scene) need no version bump: missing 
 
 ## Tests
 
-- **Browser.** `tests/browser/game.spec.ts` loads a hand-written version-18 save and checks that it is upgraded to version 23 and plays.
+- **Browser.** `tests/browser/game.spec.ts` loads a hand-written version-18 save and checks that it is upgraded to version 24 and plays.
+- **Meridians.** `scripts/test-meridians.ts` (`bun run test:meridians`) checks `partialize`, the `migrate` default and the repair of `meridians` / `meridianPoints`.
 - **Rumors.** `scripts/test-lore-rumors.ts` (in `bun run test:rumors`) rehydrates v18 / v19 saves and checks the version, lore seeding and repair.
 - **Everything else.** Most `scripts/test-*.ts` files import the real store with an in-memory `localStorage`, so they exercise `persist` as well.
