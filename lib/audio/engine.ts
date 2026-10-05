@@ -455,6 +455,90 @@ export function thump(at: number, vel: number, pitch = 150) {
   osc.start(at); osc.stop(at + 0.3);
   swoosh(at, 0.05, 1200, 400, vel * 0.5, 0.8);
 }
+/**
+ * A landed blow that feels like it connects: a sub-bass boom (the weight),
+ * a driven low-mid smack (the body), a bright crack (the contact) and, for
+ * crits, a bone crunch. `vel` ≈ 0.4 (a jab) … 1.2 (a T4 crit).
+ */
+export function punch(at: number, vel: number, crunch = false) {
+  const bus = sfxBus(); if (!bus || !graph) return;
+  const ctx = graph.ctx;
+  // Weight: a sine dropping from 110 to 38 Hz.
+  const sub = ctx.createOscillator();
+  sub.frequency.setValueAtTime(110, at); sub.frequency.exponentialRampToValueAtTime(38, at + 0.22);
+  const subEnv = envelope(ctx, at, 0.004, vel * 0.9, 0.02, 0.3);
+  sub.connect(subEnv); out(subEnv, bus, 0.08);
+  sub.start(at); sub.stop(at + 0.4);
+  // Body: noise through a falling low-pass, driven for grit.
+  const body = ctx.createBufferSource(); body.buffer = noise(ctx);
+  const low = ctx.createBiquadFilter(); low.type = "lowpass"; low.Q.value = 2.2;
+  low.frequency.setValueAtTime(1400, at); low.frequency.exponentialRampToValueAtTime(180, at + 0.14);
+  const drive = ctx.createWaveShaper(); drive.curve = driveCurve(); drive.oversample = "2x";
+  const bodyEnv = envelope(ctx, at, 0.002, vel * 0.8, 0.015, 0.16);
+  body.connect(low).connect(drive).connect(bodyEnv); out(bodyEnv, bus, 0.18);
+  body.start(at, Math.random()); body.stop(at + 0.25);
+  // Contact: a 15 ms high crack.
+  const crack = ctx.createBufferSource(); crack.buffer = noise(ctx);
+  const high = ctx.createBiquadFilter(); high.type = "highpass"; high.frequency.value = 2600;
+  const crackEnv = envelope(ctx, at, 0.001, vel * 0.55, 0.004, 0.03);
+  crack.connect(high).connect(crackEnv); out(crackEnv, bus, 0.1);
+  crack.start(at, Math.random()); crack.stop(at + 0.06);
+  if (crunch) {
+    // Bone crunch: a few tight clicks right after contact.
+    for (let i = 0; i < 4; i++) {
+      const t = at + 0.012 + i * (0.011 + Math.random() * 0.01);
+      const c = ctx.createBufferSource(); c.buffer = noise(ctx);
+      const band = ctx.createBiquadFilter(); band.type = "bandpass"; band.Q.value = 3; band.frequency.value = 1500 + Math.random() * 1800;
+      const env = envelope(ctx, t, 0.001, vel * 0.5, 0.002, 0.018);
+      c.connect(band).connect(env); out(env, bus, 0.05);
+      c.start(t, Math.random()); c.stop(t + 0.04);
+    }
+  }
+}
+let driveTable: Float32Array<ArrayBuffer> | null = null;
+function driveCurve(): Float32Array<ArrayBuffer> {
+  if (driveTable) return driveTable;
+  driveTable = new Float32Array(1024);
+  for (let i = 0; i < driveTable.length; i++) { const x = (i / 511.5) - 1; driveTable[i] = Math.tanh(x * 3.2) / Math.tanh(3.2); }
+  return driveTable;
+}
+
+/**
+ * Chalk on a board while a line types out: short gritty strokes (grains of
+ * noise in the 2.5–7 kHz band) at a hand-writing rhythm. Call on every
+ * typing tick; it throttles itself, so a line sounds like a hand writing.
+ */
+let chalkNext = 0;
+export function chalkTick() {
+  const bus = sfxBus(); if (!bus || !graph) return;
+  const ctx = graph.ctx;
+  const t = ctx.currentTime;
+  if (t < chalkNext) return;
+  const len = 0.045 + Math.random() * 0.07;
+  chalkNext = t + len + 0.02 + Math.random() * 0.06;
+  const src = ctx.createBufferSource(); src.buffer = chalkGrain(ctx);
+  src.playbackRate.value = 0.85 + Math.random() * 0.35;
+  const band = ctx.createBiquadFilter(); band.type = "bandpass"; band.Q.value = 1.1;
+  const f = 3200 + Math.random() * 2200;
+  band.frequency.setValueAtTime(f, t); band.frequency.linearRampToValueAtTime(f * (0.8 + Math.random() * 0.4), t + len);
+  const env = envelope(ctx, t, 0.006, 0.16 + Math.random() * 0.08, len * 0.5, len * 0.5);
+  src.connect(band).connect(env); out(env, bus, 0.04);
+  src.start(t, Math.random() * 0.8); src.stop(t + len + 0.03);
+}
+let chalkBuffer: AudioBuffer | null = null;
+/** Noise broken into grains: chalk skipping over the board's grain. */
+function chalkGrain(ctx: Ctx): AudioBuffer {
+  if (chalkBuffer && chalkBuffer.sampleRate === ctx.sampleRate) return chalkBuffer;
+  chalkBuffer = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
+  const data = chalkBuffer.getChannelData(0);
+  let gate = 0;
+  for (let i = 0; i < data.length; i++) {
+    if (i % 48 === 0) gate = Math.random() < 0.55 ? 0.35 + Math.random() * 0.65 : 0.08;
+    data[i] = (Math.random() * 2 - 1) * gate;
+  }
+  return chalkBuffer;
+}
+
 /** One instrument note through the effects bus (bells, plucks, gongs as SFX). */
 export function note(instrument: Instrument, midi: number, at: number, vel: number, beats = 1) {
   const bus = sfxBus(); if (!bus) return;

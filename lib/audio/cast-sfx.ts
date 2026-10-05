@@ -1,10 +1,11 @@
 import type { CastVfx } from "../stage/cast-vfx";
-import { audioReady, note, now, swoosh, thump, tone } from "./engine";
+import { audioReady, note, now, punch, swoosh, tone } from "./engine";
 
 /**
  * Skill sounds follow the same profile as the VFX:
  *   weapon family → the strike (blade ring, heavy cleave, palm thump, spear
  *     hiss, needle whistles, zither waves, qi orb)
+ *   every landed hit → `punch` (sub boom + driven smack + crack; crits crunch)
  *   rarity → weight: T2+ adds a second layer, T3 a chime, T4 a gong swell
  *   element → an accent (crackle, thunder, bubbles, frost bells, …)
  */
@@ -35,35 +36,37 @@ export function impactSfx(vfx: CastVfx, index: number, critical: boolean) {
       swoosh(t - 0.04, 0.16, 2400 * pitch, 6200, weight * 0.8, 2);
       // The blade's ring.
       tone(t, 0.35, 2600 * pitch, 2450 * pitch, 0.08 + vfx.tier * 0.02, "triangle", 0.5);
-      thump(t, weight * 0.5, 130);
+      punch(t, weight * 0.75, critical);
       break;
     case "heavy":
       swoosh(t - 0.08, 0.26, 700, 2600, weight, 1.2);
-      thump(t, weight, 95);
+      punch(t, weight * 1.15, critical);
       tone(t, 0.5, 1300, 1150, 0.07, "triangle", 0.5);
       break;
     case "impact":
-      thump(t, weight * 1.1, 170 * pitch);
+      // Fists and palms: the heaviest body hit, a second smack on the follow-through.
+      punch(t, weight * 1.2, critical);
+      punch(t + 0.07 * pitch, weight * 0.35);
       swoosh(t, 0.08, 900, 300, weight * 0.6, 0.7);
       break;
     case "thrust":
       swoosh(t - 0.1, 0.14, 1800, 4200, weight * 0.8, 4);
-      thump(t, weight * 0.7, 140);
+      punch(t, weight * 0.85, critical);
       break;
     case "projectile":
       [0, 0.04, 0.08].slice(0, 1 + Math.floor(vfx.tier / 2)).forEach((d) => tone(t - 0.17 + d, 0.16, 3400, 1700, 0.07, "sine", 0.2));
       tone(t, 0.08, 2200, 1400, 0.1, "square", 0.1);
-      thump(t, weight * 0.5, 200);
+      punch(t, weight * 0.55, critical);
       break;
     case "wave": {
       // Zither strings sweep as the sound wave travels.
       PENTATONIC.slice(0, 3 + vfx.tier).forEach((step, i) => note("zheng", 69 + step, t - 0.24 + i * 0.04, 0.3));
-      thump(t, weight * 0.5, 180);
+      punch(t, weight * 0.6, critical);
       break;
     }
     case "orb":
       tone(t - 0.22, 0.24, 220, 880, 0.12, "sine", 0.5);
-      thump(t, weight * 0.9, 120);
+      punch(t, weight * 0.95, critical);
       swoosh(t, 0.3, 600, 180, weight * 0.5, 0.9);
       break;
   }
