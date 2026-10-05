@@ -6,7 +6,7 @@
 
 import { makeContext, resolveArtActive, resolveSkill, type BattleContext } from "../battle";
 import { tickSideEffects } from "../effects";
-import type { CharacterBuild, LogLine } from "../types";
+import type { CharacterBuild, LogLine, MeridianProc } from "../types";
 import type { DuelView, GridUnit } from "./types";
 
 // makeContext is costly (combined stats, masteries, conflict); cache per build pair.
@@ -83,11 +83,20 @@ export function resolveDuel(
   return { view, ok };
 }
 
+/** A view's meridian triggers with the unit each landed on (A = actor, B = target). */
+export function viewProcs(view: DuelView, a: GridUnit, b: GridUnit): (Omit<MeridianProc, "side"> & { unitId: string })[] {
+  return (view.procs ?? []).map(({ side, ...p }) => ({ ...p, unitId: side === "A" ? a.id : b.id }));
+}
+
 /** Tick one unit's own status (poison / burn / durations / regen). Returns the log lines. */
-export function tickUnit(u: GridUnit, turn: number): LogLine[] {
+export function tickUnit(
+  u: GridUnit, turn: number,
+  onProc?: (p: Omit<MeridianProc, "side"> & { unitId: string }) => void,
+): LogLine[] {
   const view = makeDuelView(u, u, turn);
   const ctx = pairContext(u, u);
   tickSideEffects(view, "A", ctx.equipBonus.A.hp_regen, ctx.names, ctx.artIds.A);
   commitDuelView(view, u, u);
+  if (onProc) for (const p of viewProcs(view, u, u)) onProc(p);
   return view.log;
 }

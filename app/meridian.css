@@ -109,6 +109,26 @@ path.meridian-line--next { opacity: .8; stroke-dasharray: 3 3; animation: meridi
   50% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--kind) 0%, transparent), 0 0 10px 2px color-mix(in srgb, var(--kind) 55%, transparent); }
 }
 
+/* A point that wakes a battle effect at rank 3: a gold diamond frame. */
+.meridian-node-gate {
+  position: absolute; inset: -6px; pointer-events: none; border: 1.5px solid #ffd36a; transform: rotate(45deg) scale(.86); border-radius: 3px;
+  box-shadow: 0 0 6px #ffcf5a88;
+}
+.meridian-node--locked .meridian-node-gate { border-color: #c9b07a; box-shadow: none; opacity: .8; }
+.meridian-node--r3 .meridian-node-gate { border-color: #fff4c0; box-shadow: 0 0 10px #ffd36a, inset 0 0 6px #ffd36a88; }
+
+/* Battle effects (tooltip + right column) */
+.meridian-effect { display: grid; gap: 1px; padding: 4px 7px 4px 9px; border-radius: 4px; background: #fff8e6aa; border: 1px solid #c6a86c66; box-shadow: inset 3px 0 0 var(--fx); font-size: 12px; line-height: 1.4; }
+.meridian-effect b { font-size: 12.5px; color: var(--ribbon-deep); }
+.meridian-effect small { font-size: 11px; color: #8a6a2a; }
+.meridian-effect.on { background: linear-gradient(90deg, color-mix(in srgb, var(--fx) 22%, #fff8e6), #fff8e6); border-color: color-mix(in srgb, var(--fx) 60%, #c6a86c); }
+.meridian-effect.on b { color: #2f5f3c; }
+.meridian-effects { display: grid; gap: 4px; }
+.meridian-tip-effects { display: grid; gap: 3px; margin-top: 5px; padding-top: 4px; border-top: 1px dashed var(--scroll-line); }
+.meridian-tip-effects-title { font-size: 11px; font-weight: 700; color: #8a6a2a; }
+.meridian-tip-effects.on .meridian-tip-effects-title { color: #2f6b47; }
+.meridian-tip-effects .meridian-effect { font-size: 11.5px; padding: 3px 6px 3px 8px; }
+
 /* Tooltip */
 .meridian-tip {
   position: absolute; z-index: 5; width: min(250px, 70%); pointer-events: none;
@@ -192,6 +212,10 @@ path.meridian-line--next { opacity: .8; stroke-dasharray: 3 3; animation: meridi
   .meridian-bonus dt { font-size: 11.5px; }
   .meridian-bonus dd { font-size: 12px; }
   .meridian-desc { font-size: 12px; line-height: 1.45; }
+  .meridian-effect { font-size: 11px; padding: 3px 6px 3px 8px; }
+  .meridian-effect b { font-size: 11.5px; }
+  .meridian-tip-effects .meridian-effect { font-size: 10.5px; }
+  .meridian-node-gate { inset: -4px; border-width: 1px; }
   .meridian-howto { font-size: 12.5px; gap: 5px; }
   .meridian-pose-name { font-size: 10.5px; }
 }

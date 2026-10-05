@@ -91,6 +91,8 @@ Not verified:
 
 ## Known issues
 
+- **Meridian balance not play-tested.** With charts filled, test fights ended in 1–3 turns (big stat totals plus opening attack %); T0 shields are tiny (a few HP). Start effects apply only in grid battles, not the legacy 1v1 loop. On a phone (844×390) an effect point's tooltip covers most of the figure.
+
 - **Meridian charts lean on the spine.** Many charts chain back points (tailbone → lower back → upper back → nape); the silhouette draws them as dashed rings on the centre line, which reads less well than charts along the limbs. The content is generated from routes in the content agent's spec (not in the repo); a pass spreading more charts over the limbs would help.
 - **Meridian stats count everywhere.** They join `combinedStats`, so they also count toward stat gates (`statAtLeast`, manuals) and power tiers. Damage reduction from buffs + gear + meridians is capped at 90 % (`PCT_REDUCE_CAP`).
 

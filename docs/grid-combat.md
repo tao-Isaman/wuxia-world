@@ -91,6 +91,14 @@ Phases (`GridPhase`): `start` (nobody holds the turn) → `turn` (may move or ac
 - A cast sets the slot's cooldown: `TIERS[tier].cd` for skills (T0 0, T1 2, T2 3, T3 4, T4 5, T5 6) or `act.cd` for arts. It drops by 1 at each of the owner's turns, so cooldown N leaves the slot unusable for N − 1 turns (a tier-1 skill works every other turn).
 - A slot is ready when the unit is alive, the slot has a profile, its cooldown is 0, and (for arts) it has an active and enough MP.
 
+### Meridian procs
+
+Units whose build has filled meridian points (`meridianActiveEffects`, [combat.md](combat.md#battle-effects-of-filled-points)) get their battle-start effects in `createGridBattle`: openings, `shield` and `ward` statuses and `GridUnit.revive`. Every trigger is an event `{ t: "proc", unitId, kind, label, el? }`, `kind` one of `opening | shield | ward | revive | rage | sap | absorb`:
+
+- start: `opening` (label `<stat> +v%`), `shield` (`โล่ชีพจร <HP>`), `ward` (`ผนึกชีพจร ×n`), on the unit, before any turn;
+- during a cast: `absorb` (`ดูดซับ n`, `· โล่แตก` when it breaks) and `rage` (`<element> ×stacks`, `el`) on the unit hit, `sap` (`<stat> −v%`) on the target, `ward` (`ผนึกกันดีบัฟ (เหลือ n)`) on the unit whose debuff was blocked — flushed from the duel view (`BattleState.procs`, `viewProcs`) after each view, so they follow that view's log but precede the `cast` event;
+- `revive` (`คืนชีพ`) after the `cast` event (or the turn-start tick) that dropped the unit; the cast's `results.killed` is false for a unit that will rise.
+
 ### End
 
 A team with no living units loses: `phase "over"`, `winnerTeam`, and the compat `winner` = `"A"` (allies) or `"B"` (enemies), log "━━ ฝ่ายเราชนะ! (N ตา) ━━". A successful retreat ends the battle with `escaped: true` and no winner. The log keeps 100 lines, the event list 200.
@@ -170,7 +178,7 @@ applyAction(state, unitId, action, rng = Math.random): boolean   // false (state
 ```
 
 - `GridAction` = `{ t: "move", to }` | `{ t: "skill", slot, target }` | `{ t: "wait" }` | `{ t: "flee" }`. A skill, wait or flee ends the turn; the next turn is **not** begun automatically.
-- `GridEvent` = `move {path}` · `cast {name, tier, source, aimed, cells, results}` · `wait` · `stunned` · `flee {success}` · `end {winner, escaped}`, each with a rising `seq`.
+- `GridEvent` = `move {path}` · `cast {name, tier, source, aimed, cells, results}` · `wait` · `stunned` · `flee {success}` · `end {winner, escaped}` · `proc {unitId, kind, label, el?}` (meridians, below), each with a rising `seq`.
 - Compat fields for the world (`winner`, `escaped`, `hA`, `mpA`, `skillUses.A`, `artUses.A`, `hitsReceived.A`) mirror the leader; the `B` fields mirror the first enemy. They refresh at turn start, turn end and battle end.
 - `geometry.ts`: `manhattan`, `chebyshev`, `inBounds`, `neighbours`, `facingToward`, `reachableCells`, `aimCells`, `areaCells`. `skill-grid.ts`: `skillGrid`, `artGrid`, `slotGrid(rawSlotId)`, `describeGrid`, `SKILL_GRID_OVERRIDES`. `duel.ts`: `pairContext`, `makeDuelView`, `commitDuelView`, `resolveDuel`, `tickUnit`. `ai.ts`: `planTurn`, `scoreAction`.
 
@@ -320,6 +328,7 @@ Details of the rewards: [gameplay.md](gameplay.md#progression).
 | `bun run test:grid-store` (14) | the briefing (no auto-start, the briefed foe is the one fought, gear doesn't count), bridge start with HP / MP and looks, packs (mixed gangs, power reinforcements, the 6 cap), board size per unit count, variant tint / size, rigged NPC sheets for spars and villains, spar sprites, step pacing, refused input, flee, auto, win rewards including pack kills, fatal vs non-fatal loss, escape without rewards |
 | `bun run test:combat` (15) | legacy 1v1 checks plus grid store turns, ties, cooldown timing and flee odds |
 | `bun run test:battle-background` | background choice |
+| `bun run test:meridians` (`scripts/test-meridian-battle.ts`, 10) | meridian battle effects on fixture charts: rank 3 only, battle-start statuses and procs, opening for 5 turns, the % math, shield, revive once, rage stacks / cap / expiry, ward, sap, a full AI battle |
 
 Browser specs: `tests/browser/game.spec.ts` (tap a tile with `gridCellPoint`, auto to the result, log drawer, beast battles), `battle-setting.spec.ts` (capital street background survives reload), `law-guide.spec.ts` (ถอยหนี, no rewards), `opening.spec.ts` (the training bout, no guard / recover buttons).
 

@@ -18,6 +18,7 @@ import type {
   SideBattleState,
   SkillTierIndex,
 } from "../types";
+import type { MeridianElement } from "../meridian-types";
 
 /** Board coordinate: x = column (0 = left), y = row (0 = top / far side). */
 export interface Cell { x: number; y: number }
@@ -111,6 +112,8 @@ export interface GridUnit {
   skillUses: Record<string, number>;
   artUses: Record<string, number>;
   hitsReceived: number;
+  /** Meridian revive pending: rise with this % of max HP on falling (cleared when used). */
+  revive?: number;
 }
 
 // ─── Actions (what the UI / AI submits) ────────────────────────────────
@@ -141,7 +144,11 @@ export type GridEvent =
   | { seq: number; t: "wait"; unitId: string }
   | { seq: number; t: "stunned"; unitId: string }
   | { seq: number; t: "flee"; unitId: string; success: boolean }
-  | { seq: number; t: "end"; winner: Team | null; escaped: boolean };
+  | { seq: number; t: "end"; winner: Team | null; escaped: boolean }
+  /** A meridian (ชีพจร) trigger on `unitId` — float `label`, burst by `kind` (rage: its element). */
+  | { seq: number; t: "proc"; unitId: string; kind: GridProcKind; label: string; el?: MeridianElement };
+
+export type GridProcKind = "revive" | "shield" | "ward" | "rage" | "sap" | "opening" | "absorb";
 
 // ─── Battle state ──────────────────────────────────────────────────────
 export type GridPhase =

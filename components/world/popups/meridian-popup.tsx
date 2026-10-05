@@ -31,6 +31,7 @@ import { pageRect } from "@/lib/ui/landscape";
 import { toast } from "@/store/toast-store";
 import { BACK_POINTS, MERIDIAN_POSES, poseBodyPoints, poseForChart } from "./meridian-poses";
 import { BODY_POINT_LABEL, MeridianSilhouette, POSE_VIEWBOX } from "./meridian-figure";
+import { meridianEffectView } from "./meridian-effects";
 
 interface Props {
   open: boolean;
@@ -245,16 +246,17 @@ function MeridianStage({ entry, points, onOpen }: { entry: LearnedChart; points:
           </svg>
           {nodes.map((n) => (
             <button key={n.i} type="button"
-              className={`meridian-node meridian-node--${n.state} meridian-node--r${n.rank}${n.back ? " meridian-node--back" : ""}`}
+              className={`meridian-node meridian-node--${n.state} meridian-node--r${n.rank}${n.back ? " meridian-node--back" : ""}${n.node.effects?.length ? " meridian-node--gate" : ""}`}
               style={{ left: `${(n.x / 240) * 100}%`, top: `${(n.y / 320) * 100}%` }}
               aria-pressed={n.i === sel.i}
               aria-label={`${pointName(n.node.name)} ขั้น ${n.rank}/${MERIDIAN_RANK_MAX}${n.state === "locked" ? " (ยังเปิดไม่ได้)" : ""}`}
-              data-node-index={n.i} data-rank={n.rank} data-state={n.state}
+              data-node-index={n.i} data-rank={n.rank} data-state={n.state} data-effects={n.node.effects?.length || undefined}
               onPointerEnter={(e) => { if (e.pointerType === "mouse") setHover(n.i); }}
               onPointerLeave={() => setHover(null)}
               onFocus={() => setHover(n.i)} onBlur={() => setHover(null)}
               onClick={(e) => { e.stopPropagation(); setSelected(n.i); setTipOpen(true); }}>
               <span className="meridian-node-core" />
+              {n.node.effects?.length ? <span className="meridian-node-gate" aria-hidden="true" /> : null}
               <span className="meridian-node-num" aria-hidden="true">{n.i + 1}</span>
             </button>
           ))}
@@ -317,6 +319,15 @@ function NodeTip({ chart, ranks, index, points }: { chart: MeridianChart; ranks:
           </li>
         ))}
       </ol>
+      {node.effects?.length ? (
+        <div className={`meridian-tip-effects${rank >= MERIDIAN_RANK_MAX ? " on" : ""}`} data-testid="meridian-tip-effects">
+          <span className="meridian-tip-effects-title">{rank >= MERIDIAN_RANK_MAX ? "พลังพิเศษ · ตื่นแล้ว" : "พลังพิเศษ · ปลุกเมื่อเปิดเต็มขั้น 3"}</span>
+          {node.effects.map((e, k) => {
+            const view = meridianEffectView(e);
+            return <div key={k} className="meridian-effect" style={{ "--fx": view.color } as CSSProperties}><b>{view.name}</b><span>{view.text}</span></div>;
+          })}
+        </div>
+      ) : null}
       <div className="meridian-tip-foot">
         {state === "max" ? "เปิดถึงขั้นสูงสุดแล้ว"
           : state === "locked" ? `ต้องเปิด${pointName(chart.nodes[index - 1].name)}ก่อน`
@@ -334,6 +345,7 @@ function MeridianSummary({ entry, points, build }: { entry: LearnedChart; points
   const combat = lines.filter((l) => l.group === "combat");
   const full = bonusLines(meridianChartBonus(chart, chart.nodes.map(() => MERIDIAN_RANK_MAX)));
   const spent = meridianChartSpent(chart, ranks), fullCost = meridianChartFullCost(chart);
+  const effects = chart.nodes.flatMap((node, index) => (node.effects ?? []).map((effect) => ({ effect, index, on: (ranks[index] ?? 0) >= MERIDIAN_RANK_MAX })));
   const learnedSkills = new Set(build?.learnedSkillIds ?? []), learnedArts = new Set(build?.learnedArtIds ?? []);
   const reqs = [
     ...(chart.requires.skills ?? []).map((id) => ({ id, name: getSkill(id)?.n ?? id, ok: learnedSkills.has(id), kind: "วิชา" })),
@@ -353,6 +365,21 @@ function MeridianSummary({ entry, points, build }: { entry: LearnedChart; points
           {stats.length > 0 && <BonusTable title="ค่าสถานะพื้นฐาน" lines={stats} testId="meridian-total-stats" />}
           {combat.length > 0 && <BonusTable title="ค่าการต่อสู้" lines={combat} testId="meridian-total-combat" />}
         </>
+      )}
+      {effects.length > 0 && (
+        <div className="meridian-effects" data-testid="meridian-effects">
+          <span className="meridian-bonus-title">พลังพิเศษในศึก</span>
+          {effects.map(({ effect, index, on }, k) => {
+            const view = meridianEffectView(effect);
+            return (
+              <div key={k} className={`meridian-effect${on ? " on" : ""}`} data-active={on} style={{ "--fx": view.color } as CSSProperties}>
+                <b>{view.name}{on ? " ✓" : ""}</b>
+                <span>{view.text}</span>
+                {!on && <small>เปิดเต็มขั้น{pointName(chart.nodes[index].name)}เพื่อปลุก</small>}
+              </div>
+            );
+          })}
+        </div>
       )}
       <p className="meridian-desc">{chart.description}</p>
       <div className="meridian-reqs">

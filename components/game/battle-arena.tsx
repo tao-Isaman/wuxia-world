@@ -29,6 +29,7 @@ import { BattleCanvas } from "./battle-canvas";
 import { CharacterPreview } from "./character-preview";
 import { InfoPopover } from "@/components/ui/wuxia/info-popover";
 import { buffBadgeLabel, debuffBadgeLabel, describeBuff, describeDebuff } from "./buff-descriptions";
+import { hexColor, statusKey, statusStyle } from "@/lib/ui/status-catalog";
 import { SkillIcon, ArtIcon } from "./skill-icon";
 import { SoundButton } from "@/components/sound-button";
 import type { GridBattleUi } from "@/lib/stage/grid-battle-runtime";
@@ -79,6 +80,17 @@ function Meter({ value, max, kind, label }: { value: number; max: number; kind: 
   </div>;
 }
 
+/** Records of one kind (rage stacks of one element) as one chip: the latest record, the count, the longest timer. */
+function groupStatus<T extends { t: string; el?: string; u: number }>(records: readonly T[]) {
+  const groups: { record: T; count: number; turns: number }[] = [];
+  for (const r of records) {
+    const found = groups.find((g) => statusKey(g.record) === statusKey(r));
+    if (found) { found.count++; found.turns = Math.max(found.turns, r.u); found.record = r; }
+    else groups.push({ record: r, count: 1, turns: r.u });
+  }
+  return groups;
+}
+
 function UnitCard({ unit, onClose }: { unit: GridUnit; onClose: () => void }) {
   const { buffs, debuffs, stk, stkV } = unit.status;
   return <section className="gb-unit-card" data-team={unit.team} aria-label={`ข้อมูล ${unit.name}`} data-testid="unit-card">
@@ -92,24 +104,29 @@ function UnitCard({ unit, onClose }: { unit: GridUnit; onClose: () => void }) {
     </header>
     <Meter value={unit.hp} max={unit.derived.HP} kind="hp" label={`พลังชีวิต ${unit.name}`} />
     {unit.derived.MP > 0 && <Meter value={unit.mp} max={unit.derived.MP} kind="mp" label={`พลังปราณ ${unit.name}`} />}
-    {(buffs.length > 0 || debuffs.length > 0 || stk > 0) && <div className="gb-buffs">
-      {buffs.map((b, i) => {
+    {(buffs.length > 0 || debuffs.length > 0 || stk > 0) && <div className="gb-buffs" data-testid="unit-statuses">
+      {groupStatus(buffs).map(({ record: b, count, turns }) => {
         const desc = describeBuff(b);
-        return <InfoPopover key={`b${i}`} contentClassName="max-w-[240px]"
-          trigger={<span className="gb-chip" data-kind="buff">{buffBadgeLabel(b)}{b.t === "buff_riposte" ? "" : `(${b.u})`}</span>}>
-          <div className="space-y-1 text-xs"><div className="font-bold text-emerald-700">{desc.title}</div>
+        const style = statusStyle(b, "buff");
+        const timed = b.t !== "buff_riposte" && b.t !== "shield" && b.t !== "ward";
+        return <InfoPopover key={statusKey(b)} contentClassName="max-w-[240px]"
+          trigger={<span className="gb-chip" data-kind="buff" data-status={statusKey(b)} style={{ "--st": hexColor(style.color) } as React.CSSProperties}>
+            {buffBadgeLabel(b)}{count > 1 ? ` ×${count}` : ""}{timed ? ` (${turns})` : ""}</span>}>
+          <div className="space-y-1 text-xs"><div className="font-bold text-emerald-700">{desc.title}{count > 1 ? ` ×${count}` : ""}</div>
             <div className="text-muted-foreground">{desc.detail}</div></div>
         </InfoPopover>;
       })}
-      {debuffs.map((d, i) => {
+      {groupStatus(debuffs).map(({ record: d, count, turns }) => {
         const desc = describeDebuff(d);
-        return <InfoPopover key={`d${i}`} contentClassName="max-w-[240px]"
-          trigger={<span className="gb-chip" data-kind="debuff">{debuffBadgeLabel(d)}({d.u})</span>}>
+        const style = statusStyle(d, "debuff");
+        return <InfoPopover key={statusKey(d)} contentClassName="max-w-[240px]"
+          trigger={<span className="gb-chip" data-kind="debuff" data-status={statusKey(d)} style={{ "--st": hexColor(style.color) } as React.CSSProperties}>
+            {debuffBadgeLabel(d)}{count > 1 ? ` ×${count}` : ""} ({turns})</span>}>
           <div className="space-y-1 text-xs"><div className="font-bold text-rose-700">{desc.title}</div>
             <div className="text-muted-foreground">{desc.detail}</div></div>
         </InfoPopover>;
       })}
-      {stk > 0 && <span className="gb-chip" data-kind="stack">ATK+{stk * stkV}%</span>}
+      {stk > 0 && <span className="gb-chip" data-kind="stack" style={{ "--st": hexColor(statusStyle({ t: "stack_atk" }, "buff").color) } as React.CSSProperties}>ATK+{stk * stkV}%</span>}
     </div>}
   </section>;
 }

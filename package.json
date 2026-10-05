@@ -30,7 +30,7 @@
     "test:systems": "bun scripts/test-systems.ts",
     "test:quests": "bun scripts/audit-quest-completion.ts && bun scripts/test-quest-dead-ends.ts && bun scripts/test-quest-turnins.ts && bun scripts/test-quest-guide.ts && bun scripts/test-bad-action-quests.ts",
     "test:engine": "bun scripts/test-engine.ts",
-    "test:meridians": "bun scripts/test-meridians.ts",
+    "test:meridians": "bun scripts/test-meridians.ts && bun scripts/test-meridian-battle.ts",
     "test:assets": "bun scripts/test-assets.ts",
     "test:docs": "bun scripts/build-docs-reference.ts --check && bun scripts/check-docs.ts",
     "test:e2e": "playwright test"

@@ -67,7 +67,46 @@ export interface MeridianNode {
   at: MeridianBodyPoint;
   /** Exactly three ranks. */
   ranks: readonly [MeridianRank, MeridianRank, MeridianRank];
+  /**
+   * Battle effects that switch on only when this point is filled (rank 3).
+   * A chart may carry several, on one point or spread over its points.
+   */
+  effects?: readonly MeridianEffect[];
 }
+
+// ─── Battle effects of filled points ───────────────────────────────────
+
+/** The five elemental rages a hit can wake (stack; each stack its own timer). */
+export type MeridianElement =
+  | "fire"     // เพลิงพิโรธ — attack +v %
+  | "water"    // วารีพิสุทธิ์ — regain v % of max HP at the start of each own turn
+  | "wind"     // วายุภักษ์ — battle speed (gauge fill) +v %
+  | "earth"    // ปัฐพีแกร่ง — physical and internal defence +v %
+  | "thunder"; // อัสนีคลัง — critical chance +v (percentage points)
+
+export const MERIDIAN_ELEMENT_LABEL: Readonly<Record<MeridianElement, string>> = {
+  fire: "เพลิงพิโรธ", water: "วารีพิสุทธิ์", wind: "วายุภักษ์", earth: "ปัฐพีแกร่ง", thunder: "อัสนีคลัง",
+};
+
+/** A combat status a battle-start effect raises, by v % for its turns. */
+export type MeridianOpeningStat = "atk" | "def" | "spd" | "cri" | "eva" | "acc" | "reduce";
+
+/** A stat an attack can lower on its target, by v % for its turns. */
+export type MeridianDebuffStat = "atk" | "def" | "spd" | "eva" | "acc";
+
+export type MeridianEffect =
+  /** Entering battle: `stat` +v % for the hero's first `turns` turns (5). */
+  | { t: "opening"; stat: MeridianOpeningStat; v: number; turns: number }
+  /** Once per battle: on falling, rise again with `hpPct` % of max HP. */
+  | { t: "revive"; hpPct: number }
+  /** When hit: `chance` % to gain an elemental rage (v, `turns` 3–5 turns), stacking up to `maxStacks`. */
+  | { t: "rage"; element: MeridianElement; v: number; turns: number; chance: number; maxStacks: number }
+  /** Entering battle: a shield worth `pct` % of max HP that soaks damage first. */
+  | { t: "shield"; pct: number }
+  /** Entering battle: ward off the next `count` debuffs. */
+  | { t: "ward"; count: number }
+  /** When the hero's attack lands: `chance` % to lower the target's `stat` by v % for `turns` turns. */
+  | { t: "sap"; stat: MeridianDebuffStat; v: number; turns: number; chance: number };
 
 export interface MeridianChart {
   /** Snake case, unique. Its item is `chart_<id>`. */

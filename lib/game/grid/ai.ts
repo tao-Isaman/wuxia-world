@@ -23,6 +23,7 @@
 // The AI never flees — retreat is the player's decision.
 
 import { PCT_REDUCE_CAP } from "../battle";
+import { accPctOf, atkPctOf, criRateOf, defPctOf } from "../meridian-battle";
 import { critPct, CRIT_MULTIPLIER, hitPct } from "../damage";
 import { effectiveBp } from "../leveling";
 import { getStatusFactor } from "../skill-conflict";
@@ -76,14 +77,14 @@ function evasion(foe: GridUnit): number {
   return ee;
 }
 function accuracy(u: GridUnit): number {
-  let ea = u.derived.Acc;
+  let ea = u.derived.Acc * (1 + accPctOf(u.status) / 100);
   for (const d of u.status.debuffs) if (d.t === "debuff_acc" && d.v != null) ea = Math.max(0, ea + d.v);
   return ea;
 }
 function critOf(u: GridUnit, foe: GridUnit): number {
   let bonus = 0;
   for (const b of u.status.buffs) if (b.t === "buff_cri") bonus += b.v;
-  return critPct(u.derived.Cri + bonus, foe.derived.Res) / 100;
+  return Math.min(100, critPct(u.derived.Cri + bonus, foe.derived.Res) + criRateOf(u.status)) / 100;
 }
 function defenderMods(foe: GridUnit) {
   let fD = 0, pR = 0, dR = 0, ref = 0;
@@ -107,7 +108,7 @@ function estimateSkill(u: GridUnit, foe: GridUnit, sk: Skill): Estimate {
   if (aid === "taiji" && sk.at === "int") im *= 1.12;
   let atkDebuff = 0;
   for (const d of u.status.debuffs) if (d.t === "debuff_atk" && d.v != null) atkDebuff += d.v;
-  const sm = Math.max(0, 1 + (u.status.stk * u.status.stkV) / 100 + ctx.equipBonus.A.pct_atk / 100 + atkDebuff / 100);
+  const sm = Math.max(0, 1 + (u.status.stk * u.status.stkV) / 100 + ctx.equipBonus.A.pct_atk / 100 + atkDebuff / 100 + atkPctOf(u.status) / 100);
   const { fD, dR } = defenderMods(foe);
   const pR = Math.min(PCT_REDUCE_CAP, defenderMods(foe).pR + ctx.equipBonus.B.pct_red);
   const mm = 1 + ((ctx.masteries.A[sk.w] ?? 0) / 200) * 0.5;
@@ -117,7 +118,7 @@ function estimateSkill(u: GridUnit, foe: GridUnit, sk: Skill): Estimate {
   const ta = sk.at === "phy" ? d.PA : d.IA * im;
   const vit = sk.vitScale ? sk.vitScale * (ctx.stats.A.VIT ?? 0) : 0;
   const se = eBp * (1 + sk.p / 100) + sk.f + vit;
-  const ed = Math.max(0, (sk.at === "phy" ? dd.PD : dd.ID) + fD - dR);
+  const ed = Math.max(0, (sk.at === "phy" ? dd.PD : dd.ID) * (1 + defPctOf(foe.status) / 100) + fD - dR);
   const raw = Math.max(1, (d.Atk * sm * ab + ta + se) * sk.dm * mm - ed) * (1 - pR / 100);
   const hit = hitPct(accuracy(u), evasion(foe)) / 100;
   const crit = critOf(u, foe);
@@ -129,7 +130,10 @@ function estimateArt(u: GridUnit, foe: GridUnit, art: Art): Estimate {
   const hit = hitPct(accuracy(u), evasion(foe)) / 100;
   const crit = critOf(u, foe);
   if (!act) return { expected: 0, onHit: 0, hit, crit };
-  const d = u.derived, dd = foe.derived;
+  // Meridian Atk +% / PD-ID +% (as resolveArtActive applies them).
+  const atkMul = 1 + atkPctOf(u.status) / 100, defMul = 1 + defPctOf(foe.status) / 100;
+  const d = { ...u.derived, Atk: u.derived.Atk * atkMul };
+  const dd = { ...foe.derived, PD: foe.derived.PD * defMul, ID: foe.derived.ID * defMul };
   const { fD, pR } = defenderMods(foe);
   let raw = 0;
   switch (act.t) {

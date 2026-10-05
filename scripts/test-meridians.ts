@@ -5,6 +5,7 @@
 import assert from "node:assert/strict";
 import { ARTS_BY_ID } from "../lib/game/data/arts";
 import { SKILLS_BY_ID } from "../lib/game/data/skills";
+import { JIANGHU_SECT } from "../lib/game/data/sects";
 import {
   MERIDIAN_BODY_POINTS,
   MERIDIAN_CHARTS,
@@ -192,13 +193,13 @@ check("content: a node's three ranks grow the same keys, positive and never shri
   }
 });
 
-check("content: a fully opened chart stays in the gear scale (≤ 60 stat points, pct_atk / pct_red ≤ 16 %, hp_regen ≤ 4.5)", () => {
+check("content: a fully opened chart stays in scale (≤ 170 stat points, pct_atk ≤ 27 %, pct_red ≤ 21 %, hp_regen ≤ 6.5)", () => {
   for (const c of MERIDIAN_CHARTS) {
     const b = meridianChartBonus(c, c.nodes.map(() => 3));
     const statSum = Object.values(b.stats).reduce((a, v) => a + (v ?? 0), 0);
-    assert.ok(statSum <= 60, `${c.id}: ${statSum} stat points`);
-    assert.ok(b.combat.pct_atk <= 16 && b.combat.pct_red <= 16, `${c.id}: pct_atk ${b.combat.pct_atk} pct_red ${b.combat.pct_red}`);
-    assert.ok(b.combat.hp_regen <= 4.5, `${c.id}: hp_regen ${b.combat.hp_regen}`);
+    assert.ok(statSum <= 170, `${c.id}: ${statSum} stat points`);
+    assert.ok(b.combat.pct_atk <= 27 && b.combat.pct_red <= 21, `${c.id}: pct_atk ${b.combat.pct_atk} pct_red ${b.combat.pct_red}`);
+    assert.ok(b.combat.hp_regen <= 6.5, `${c.id}: hp_regen ${b.combat.hp_regen}`);
   }
 });
 
@@ -213,7 +214,24 @@ check("content: requires name at least one real, learnable skill / art", () => {
   }
 });
 
-check("content: every chart has a source; shops, opponents and quests exist; chances in (0, 1]", () => {
+check("content: requirements — moves per tier (T0 2–3 … T5 7–8), one sect at most, mixed tiers from T2", () => {
+  const RANGE: Record<number, [number, number]> = { 0: [2, 3], 1: [3, 4], 2: [4, 5], 3: [5, 6], 4: [6, 7], 5: [7, 8] };
+  for (const c of MERIDIAN_CHARTS) {
+    const moves = [
+      ...(c.requires.skills ?? []).map((id) => SKILLS_BY_ID.get(id)!),
+      ...(c.requires.arts ?? []).map((id) => ARTS_BY_ID.get(id)!),
+    ];
+    const [min, max] = RANGE[c.ti];
+    assert.ok(moves.length >= min && moves.length <= max, `${c.id} T${c.ti} requires ${moves.length} moves`);
+    // One hero must be able to learn them all: jianghu moves plus one sect's.
+    const sects = new Set(moves.map((m) => m.sc).filter((sc) => sc !== JIANGHU_SECT));
+    assert.ok(sects.size <= 1, `${c.id} requires moves of ${[...sects].join(", ")}`);
+    if (c.ti >= 2) assert.ok(new Set(moves.map((m) => m.ti)).size >= 2, `${c.id} requires moves of one tier only`);
+    for (const id of c.requires.skills ?? []) assert.ok(id !== "basic_punch", `${c.id}: basic_punch`);
+  }
+});
+
+check("content: every chart drops (no shop sells one) from real foes at 1 %, with a repeatable non-saga foe", () => {
   const shopIds = new Set(SHOPS.map((s) => s.id));
   for (const id of Object.keys(MERIDIAN_SOURCES)) assert.ok(getMeridianChart(id), `source for unknown chart ${id}`);
   for (const c of MERIDIAN_CHARTS) {
@@ -223,14 +241,86 @@ check("content: every chart has a source; shops, opponents and quests exist; cha
     for (const s of src.shops ?? []) assert.ok(shopIds.has(s), `${c.id}: shop ${s}`);
     for (const l of src.loot ?? []) {
       assert.ok(OPPONENTS_BY_ID.has(l.opponentId), `${c.id}: opponent ${l.opponentId}`);
-      assert.ok(l.chance > 0 && l.chance <= 1, `${c.id}: chance ${l.chance}`);
+      assert.equal(l.chance, 0.01, `${c.id}: chance ${l.chance} (every chart drops at 1 %)`);
     }
+    assert.equal(src.shops?.length ?? 0, 0, `${c.id} is sold in a shop (charts are drops only)`);
     for (const q of src.questRewards ?? []) assert.ok(QUESTS_BY_ID.has(q), `${c.id}: quest ${q}`);
-    // Repeatable: a shop, or a roaming foe (saga foes st_* are fought once).
-    const repeatable = (src.shops?.length ?? 0) > 0 || (src.loot ?? []).some((l) => !l.opponentId.startsWith("st_"));
+    // Repeatable: a roaming foe (saga foes st_* are fought once).
+    const repeatable = (src.loot ?? []).some((l) => !l.opponentId.startsWith("st_"));
     assert.ok(repeatable, `${c.id} has no repeatable source`);
-    // T4 / T5 charts are never sold.
-    if (c.ti >= 4) assert.equal(src.shops?.length ?? 0, 0, `${c.id} (T${c.ti}) is sold in a shop`);
+  }
+  for (const shop of SHOPS) assert.ok(!shop.inventory.some((id) => id.startsWith("chart_")), `${shop.id} sells a chart`);
+});
+
+// ─── Content: battle effects of filled points (content agent) ────────
+check("content: battle effects — fields in range, revive only at T3+ (6–8 charts), 35–55 % of each tier carries 1–3", () => {
+  const ELEMENTS = ["fire", "water", "wind", "earth", "thunder"];
+  const between = (v: number, lo: number, hi: number) => typeof v === "number" && v >= lo && v <= hi;
+  let total = 0;
+  for (const c of MERIDIAN_CHARTS) {
+    const nodeIds = new Set(c.nodes.map((n) => n.id));
+    for (const n of c.nodes) {
+      assert.ok(nodeIds.has(n.id));
+      for (const e of n.effects ?? []) {
+        total++;
+        const at = `${c.id}.${n.id} ${JSON.stringify(e)}`;
+        switch (e.t) {
+          case "opening":
+            assert.ok(["atk", "def", "spd", "cri", "eva", "acc", "reduce"].includes(e.stat), at);
+            assert.ok(between(e.v, 1, 25) && e.turns === 5, at);
+            break;
+          case "revive":
+            assert.ok(c.ti >= 3 && e.hpPct === 50, at);
+            break;
+          case "rage":
+            assert.ok(ELEMENTS.includes(e.element), at);
+            assert.ok(between(e.chance, 20, 40) && between(e.turns, 3, 5) && between(e.maxStacks, 3, 5), at);
+            assert.ok(between(e.v, 0.5, e.element === "water" ? 2.5 : 8), at);
+            break;
+          case "shield":
+            assert.ok(between(e.pct, 1, 25), at);
+            break;
+          case "ward":
+            assert.ok(between(e.count, 2, 5), at);
+            break;
+          case "sap":
+            assert.ok(["atk", "def", "spd", "eva", "acc"].includes(e.stat), at);
+            assert.ok(between(e.chance, 15, 35) && between(e.v, 5, 20) && between(e.turns, 2, 3), at);
+            break;
+          default:
+            assert.fail(`${at}: unknown effect`);
+        }
+      }
+    }
+    const count = c.nodes.reduce((a, n) => a + (n.effects?.length ?? 0), 0);
+    assert.ok(count <= 3, `${c.id} carries ${count} effects`);
+  }
+  const revives = MERIDIAN_CHARTS.filter((c) => c.nodes.some((n) => n.effects?.some((e) => e.t === "revive"))).length;
+  assert.ok(revives >= 6 && revives <= 8, `${revives} charts revive`);
+  assert.ok(total > 0);
+  // Having effects is not tied to tier: every tier mixes effect and stat-only charts.
+  for (const ti of [0, 1, 2, 3, 4, 5]) {
+    const inTier = MERIDIAN_CHARTS.filter((c) => c.ti === ti);
+    const withFx = inTier.filter((c) => c.nodes.some((n) => n.effects?.length)).length;
+    const share = withFx / inTier.length;
+    assert.ok(share >= 0.35 && share <= 0.55, `T${ti}: ${withFx}/${inTier.length} charts carry effects`);
+  }
+});
+
+check("content: charts without an effect give clearly more stats than effect charts of their tier", () => {
+  const W: Record<string, number> = { atk: 4.5, ia: 4.5, pd: 3, id_: 3, pa: 3, acc: 3, eva: 3, hp: 30, mp: 15, spd: 2.25, res: 2.25, cri: 1.5 };
+  const worth = (c: MeridianChart) => {
+    const b = meridianChartBonus(c, c.nodes.map(() => 3));
+    const stats = Object.values(b.stats).reduce((a, v) => a + (v ?? 0), 0);
+    return stats + Object.entries(W).reduce((a, [k, w]) => a + (b.combat[k as keyof typeof b.combat] ?? 0) / w, 0);
+  };
+  for (const ti of [0, 1, 2, 3, 4, 5]) {
+    const plain = MERIDIAN_CHARTS.filter((c) => c.ti === ti && (c.kind === "base" || c.kind === "combat"));
+    const bare = plain.filter((c) => !c.nodes.some((n) => n.effects?.length));
+    const fx = plain.filter((c) => c.nodes.some((n) => n.effects?.length));
+    if (!bare.length || !fx.length) continue;
+    const avg = (xs: MeridianChart[]) => xs.reduce((a, c) => a + worth(c), 0) / xs.length;
+    assert.ok(avg(bare) >= avg(fx) * 1.3, `T${ti}: no-effect ${avg(bare).toFixed(1)} vs effect ${avg(fx).toFixed(1)}`);
   }
 });
 

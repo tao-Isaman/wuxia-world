@@ -108,6 +108,21 @@ A new world hero starts with every stat at 1. The /debug sandbox gives a 200-poi
 - `stats` (STR…INT) join `combinedStats` as `fromMeridians`; `combat` (the `EquipBonus` keys: `atk pd id_ hp mp pa ia spd acc res cri eva pct_atk pct_red hp_regen`) join `deriveAll` and the battle context through `getBuildBonus`.
 - Charts per tier: T0 20 (1–2 points), T1 20 (3–4), T2 15 (5–6), T3 15 (7–8), T4 15 (9–10), T5 10 (12). The world side (points, chart items, sources) is in [world-engine.md](world-engine.md#meridians-ชีพจร).
 
+#### Battle effects of filled points
+
+A point may carry `effects` (`MeridianEffect`), live only at rank 3: `meridianActiveEffects(build)` lists them, `makeContext` stores them as `ctx.meridian[side]`, and `lib/game/meridian-battle.ts` runs them. Durations count the owner's own turns (stored as `u = turns + 1`, since statuses tick at the start of the owner's turn).
+
+| Effect | When | What (status `t`) |
+| --- | --- | --- |
+| `opening {stat, v, turns}` | grid battle start (`meridianStart`) | atk → `buff_atk_pct`, def → `buff_def_pct`, spd → `buff_spd_pct`, cri → `buff_cri_rate`, acc → `buff_acc_pct`, reduce → `buff_reduce`, eva → `buff_eva` (flat: v % of Eva); `n` = `เปิดฉาก·<stat>` |
+| `shield {pct}` | battle start | `shield`, v = pct % of max HP; soaks attack hits before HP (`landDamage`), removed at 0; never ticks down |
+| `ward {count}` | battle start | `ward`, v = charges; `addDebuff` (every debuff path: skills, arts, passives, weapons, saps) blocks the debuff and spends one; never ticks down |
+| `revive {hpPct}` | battle start → `GridUnit.revive` | a unit at 0 HP rises with hpPct % of max HP, once (`settle` / after a cast; not reported `killed`) |
+| `rage {element, v, turns, chance, maxStacks}` | each landed hit on the unit (`rollRage`) | one record per stack, `el` set, own timer; at `maxStacks` the oldest renews. fire `buff_atk_pct`, water `buff_regen`, wind `buff_spd_pct`, earth `buff_def_pct`, thunder `buff_cri_rate`; `n` = `MERIDIAN_ELEMENT_LABEL` |
+| `sap {stat, v, turns, chance}` | once per target an attack landed on (`rollSaps`) | atk → `debuff_atk` −v %, spd → `debuff_spd` −v %, def / eva / acc → `debuff_def` / `debuff_eva` / `debuff_acc` of −v % of the target's (PD+ID)/2 / Eva / Acc |
+
+The math: `buff_atk_pct` adds to the move multiplier (like gear `pct_atk`) and scales Atk in art actives; `buff_def_pct` scales the defender's PD / ID; `buff_cri_rate` adds points after `critPct` (cap 100); `buff_acc_pct` scales Acc; `buff_spd_pct` − `debuff_spd` scale the gauge fill (`spdWithPct`: `(Spd + 60) × (1 + p/100) − 60`); `buff_regen` heals v % of max HP after the tick at the start of the owner's turn. The % buffs never merge (`addBuff` keeps each record). The grid AI's estimates mirror all of it. Foes have no meridians, so nothing changes for them. Triggers are collected on the view (`BattleState.procs`) and become grid `proc` events ([grid-combat.md](grid-combat.md#meridian-procs)).
+
 Consequences worth knowing:
 
 - An art that sits only in a skill slot (not `artId`, not in `learnedArtIds`) gives its active and passive but **no stats, HP or MP**. The world always adds learned arts to `learnedArtIds`, so this only bites in /debug.

@@ -260,6 +260,7 @@ Two deliberate exceptions reach into stores:
 - **Meridians (ชีพจร).** Pure engine `lib/game/meridians.ts` (95 charts in `lib/game/data/meridians.ts`, contract `meridian-types.ts`); sources `lib/world/data/meridian-sources.ts` (shops, loot, quest rewards → `lib/world/meridians.ts`).
   - Every skill / art level gained gives +1 `meridianPoints` (saved). A chart is learned by reading its item `chart_<id>` (แผนภาพชีพจร-…) once its `requires` skills / arts are learned → `playerBuild.meridians[id]` = a rank 0–3 per point.
   - `openMeridianNode` raises a point one rank for `(ti + 1) × rank` points, in order. Base stats join `combinedStats` (`fromMeridians`); combat fields join `deriveAll` and the battle context via `getBuildBonus`.
+  - Filled (rank 3) points' `effects` (opening / shield / ward / revive / rage / sap) run in battle via `lib/game/meridian-battle.ts` (statuses `buff_*_pct`, `buff_regen`, `buff_cri_rate`, `shield`, `ward`, `debuff_spd`; grid `proc` events).
 - **Repair** (`validate.ts`). `validateAndRepair` runs on every load and drops dangling ids.
 
 ## Stores (`store/`)
