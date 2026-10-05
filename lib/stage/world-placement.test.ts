@@ -1,18 +1,30 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { test } from "node:test";
+import { blockingRects, placementsGeometry } from "../assets/placement-geometry";
+import { effectiveMapImage, indexAssets } from "../assets/catalog";
+import type { AssetManifest, PlacementsFile } from "../assets/types";
 import { LOCATION_MAPS } from "../world/data/location-maps";
 import { getRememberedMapPosition, type WorldPresentation } from "./types";
 import { initialWorldPlacement } from "./world-placement";
-import { planWorldPath, worldFootprints, worldPointBlocked, worldSegmentClear } from "./world-navigation";
+import { planWorldPath, withPlacedSolids, worldFootprints, worldPointBlocked, worldSegmentClear } from "./world-navigation";
 
 const map = LOCATION_MAPS.city_capital;
+// The capital as the game walks it: its ground tile (the painting is replaced)
+// and the placed city's solids (public/assets/placements.json).
+const root = join(import.meta.dirname, "../../public/assets");
+const placed = JSON.parse(readFileSync(join(root, "placements.json"), "utf8")) as PlacementsFile;
+const assets = indexAssets((JSON.parse(readFileSync(join(root, "manifest.json"), "utf8")) as AssetManifest).assets);
+const image = effectiveMapImage(placed, "city_capital", map.image);
 const qing = map.npcSpots!.city_capital_clerk_qing;
 const presentation: WorldPresentation = {
-  key: "city_capital", name: "Capital", image: map.image, playerImage: "/art/characters/m1.png",
+  key: "city_capital", name: "Capital", image, playerImage: "/art/characters/m1.png",
   spawn: map.spawn, readOnly: true, dialogueSpeakerId: "npc-city_capital_clerk_qing",
   markers: [{ id: "npc-city_capital_clerk_qing", kind: "npc", label: "Qing", ...qing, onActivate: () => {} }],
 };
-const capital = worldFootprints(presentation.key, presentation.image);
+const capital = withPlacedSolids(worldFootprints(presentation.key, presentation.image),
+  blockingRects(placementsGeometry(placed.maps.city_capital ?? [], assets)));
 const spawn = { x: map.spawn.x * 960 / 100, y: map.spawn.y * 640 / 100 };
 
 test("a restored Qing conversation places the hero beside Qing, facing him on connected ground", () => {
@@ -33,11 +45,11 @@ test("a restored Qing conversation places the hero beside Qing, facing him on co
 });
 
 test("recreating a conversation with a remembered position preserves that session position", () => {
-  const remembered = { x: 45, y: 37 };
+  const remembered = { x: 67, y: 48 }; // open plaza paving east of the spawn
   const result = initialWorldPlacement(presentation, remembered, capital);
   assert.deepEqual(result.position, { x: remembered.x * 960 / 100, y: remembered.y * 640 / 100 });
   assert.equal(result.speakerMarkerId, undefined);
-  assert.deepEqual(remembered, { x: 45, y: 37 });
+  assert.deepEqual(remembered, { x: 67, y: 48 });
 });
 
 test("normal exploration uses the authored entry even when a speaker ID is present", () => {
