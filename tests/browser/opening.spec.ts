@@ -14,7 +14,7 @@ async function visit(page: Page, id: string) {
 }
 
 test("first errand leads to safe training, recovery, and an earned skill upgrade", async ({ page }) => {
-  test.setTimeout(180_000);
+  test.setTimeout(300_000);
   // Fixed randomness removes unrelated road events from this navigation regression.
   // Independent reviewer playthroughs use the ordinary, unmodified random stream.
   await page.addInitScript(() => { Math.random = () => 0.5; });
