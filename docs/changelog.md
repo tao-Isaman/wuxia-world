@@ -6,6 +6,10 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-05
 
+### The painted capital is back while the placed one is finished
+
+- The game shows the painted นครหลวง again, with its original NPC and service spots. The asset-built capital stays as a draft (`DRAFT_PLACED_MAPS`): the map editor and its playtest tab still show and edit it, and the placement tests keep checking it. Moving one entry switches it on when it's done.
+
 ### สำนักสกุลถัง spelled right
 
 - The Tang clan's sect was spelled สำนักสุลถัง everywhere (places, sect lists, moves, quests, films, rumors, docs); it now reads **สำนักสกุลถัง**. Ids (`tang`, `sect_tang`) are unchanged, so saves are unaffected.

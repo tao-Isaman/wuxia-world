@@ -2,7 +2,10 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
-import { getLocationMap } from "../world/data/location-maps";
+import { getLocationMap, showDraftMaps } from "../world/data/location-maps";
+
+// Placement checks cover the maps being built too, with their placed spots.
+showDraftMaps(true);
 import { AUTO_MAP_IDS } from "../world/data/auto-map-ids";
 import {
   blockingRects, byDepth, characterDepth, heroDepth, placementGeometry, placementsGeometry,
