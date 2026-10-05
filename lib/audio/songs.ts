@@ -32,7 +32,10 @@ export interface Song {
   events: NoteEvent[];
 }
 
-export type TrackId = "title" | "world" | "night" | "desert" | "battle" | "victory" | "defeat" | "encounter" | "quest" | "levelup";
+/** Exploring music of a region (recorded; lib/audio/recordings.ts). */
+export type RegionTrackId = "heartland" | "north" | "south" | "east" | "wilds";
+
+export type TrackId = "title" | "world" | "night" | "desert" | RegionTrackId | "battle" | "victory" | "defeat" | "encounter" | "quest" | "levelup";
 
 const NOTE: Record<string, number> = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
 
@@ -170,6 +173,12 @@ export const SONGS: Record<TrackId, Song> = {
   night: worldSong(true),
   // The synth stand-in for the recorded desert song (lib/audio/recordings.ts).
   desert: { ...worldSong(false), id: "desert" },
+  // …and for the recorded region songs.
+  heartland: { ...worldSong(false), id: "heartland" },
+  north: { ...worldSong(false), id: "north" },
+  south: { ...worldSong(false), id: "south" },
+  east: { ...worldSong(false), id: "east" },
+  wilds: { ...worldSong(true), id: "wilds" },
   battle: battleSong(),
   victory: jingle("victory", 120, [
     ...glissando(D_SCALE, midiOf("D4"), 1, 1, 0.45),

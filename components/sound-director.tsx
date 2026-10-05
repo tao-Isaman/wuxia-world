@@ -3,13 +3,11 @@
 import { useEffect } from "react";
 import { playJingle, playMusic, stopMusic, uiSound, unlockAudio } from "@/lib/audio/engine";
 import type { TrackId } from "@/lib/audio/songs";
-import { isDesertPlace } from "@/lib/audio/recordings";
+import { exploringTrack } from "@/lib/audio/recordings";
 import { getScene } from "@/lib/world";
+import { regionOf } from "@/lib/world/data/regions";
 import { useWorldStore } from "@/store/world-store";
 import { useBattleStore } from "@/store/battle-store";
-
-/** Night by the game clock, matching the world's lighting veil (hours 8–11 of 12). */
-const nightTime = (time: number) => ((time % 12) + 12) % 12 >= 8;
 
 /**
  * Chooses the music for what is on screen and plays the event jingles
@@ -19,10 +17,13 @@ export function SoundDirector() {
   const hasGame = useWorldStore((s) => s.hasGame);
   const gameOver = useWorldStore((s) => s.gameOver);
   const inBattle = useWorldStore((s) => !!s.pendingBattle);
-  const night = useWorldStore((s) => nightTime(s.time));
   const winner = useBattleStore((s) => s.state?.winner ?? null);
-  // The place the hero is in (or last stood in, on a road or in a dialog).
-  const desert = useWorldStore((s) => isDesertPlace(getScene(s.currentSceneId)?.kind === "location" ? s.currentSceneId : s.lastLocationId));
+  // The place the hero is in (or last stood in, in a dialog); roads play the wilds song.
+  const exploring: TrackId = useWorldStore((s) => {
+    const kind = getScene(s.currentSceneId)?.kind;
+    const place = kind === "location" ? s.currentSceneId : s.lastLocationId;
+    return exploringTrack(place, kind === "route", regionOf(place));
+  });
 
   // Sound may only start from a user gesture: the first tap or key unlocks it.
   useEffect(() => {
@@ -44,7 +45,6 @@ export function SoundDirector() {
     };
   }, []);
 
-  const exploring: TrackId = desert ? "desert" : night ? "night" : "world";
   useEffect(() => {
     if (!hasGame) playMusic("title");
     else if (gameOver) stopMusic();

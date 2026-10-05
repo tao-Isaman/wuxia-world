@@ -1,5 +1,5 @@
 import { SONGS, beatSeconds, type Instrument, type NoteEvent, type Song, type TrackId } from "./songs";
-import { RECORDINGS } from "./recordings";
+import { RECORDINGS, STARTS_ON_FIRST } from "./recordings";
 
 /**
  * Procedural audio: every instrument and sound effect is synthesized with
@@ -278,11 +278,16 @@ const recorded = (() => {
         broken.add(url);
         if (active === el) { active = null; const fail = onFail; onFail = null; fail?.(); }
       });
-      // Versions follow one another; a single recording loops.
-      el.addEventListener("ended", () => { if (active === el && urls.length > 1) playIndex((index + 1) % urls.length); });
+      // A playlist moves on to a random other song; a single recording loops.
+      el.addEventListener("ended", () => { if (active === el && urls.length > 1) playIndex(nextIndex()); });
       elements.set(url, el);
     }
     return el;
+  }
+  /** A random song of the playlist other than the one that just played. */
+  function nextIndex() {
+    const pick = Math.floor(Math.random() * (urls.length - 1));
+    return pick >= index ? pick + 1 : pick;
   }
   function playIndex(i: number) {
     const el = element(urls[i]);
@@ -310,8 +315,8 @@ const recorded = (() => {
       if (active && next.join("|") === urls.join("|")) { sync(); return; }
       active?.pause();
       urls = next;
-      // Several versions: start on a random one so each session sounds a little different.
-      playIndex(Math.floor(Math.random() * urls.length));
+      // A region opens on its own song; other playlists start on a random one.
+      playIndex(STARTS_ON_FIRST.has(track) && !broken.has(RECORDINGS[track]![0]) ? 0 : Math.floor(Math.random() * urls.length));
     },
     /** Hold the recording (a jingle is playing); `play` with the same track resumes it. */
     pause() { active?.pause(); },

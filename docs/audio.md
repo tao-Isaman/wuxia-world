@@ -17,7 +17,7 @@ The background music is **recorded** (four MP3s in `public/audio/`); everything 
 
 | File | Role |
 | --- | --- |
-| `public/audio/*.mp3` | the recordings: `theme-1` and `theme-2` (two versions of the main theme), `battle`, `desert` |
+| `public/audio/*.mp3` | the recordings: `theme-1` … `theme-4` (the themes), `region-heartland`, `region-north`, `region-south`, `region-east`, `region-wilds`, `battle`, `desert` |
 | `lib/audio/recordings.ts` | `RECORDINGS` (track → files) and `isDesertPlace` |
 | `lib/audio/songs.ts` | pure note data: `SONGS`, `TrackId`, `Instrument`, `phrase`, `phraseBeats`, `midiOf`, helpers |
 | `lib/audio/engine.ts` | the Web Audio graph, instruments, the sequencer, SFX primitives, `uiSound`, settings, `unlockAudio`, `renderTrack` |
@@ -47,7 +47,12 @@ The main tracks stream recorded songs (made with Suno from the prompts in the 20
 
 | Track | Files | Length |
 | --- | --- | --- |
-| `title`, `world`, `night` | `theme-1.mp3`, `theme-2.mp3` — the main theme ถือกระบี่ท่องยุทธภพ, two versions | 3:40, 3:23 |
+| `title`, `world`, `night` | the four themes: `theme-1.mp3`, `theme-2.mp3` (ถือกระบี่ท่องยุทธภพ, two versions), `theme-3.mp3` (Dawn Journey), `theme-4.mp3` (Moonlit Remembrance) | 3:40, 3:23, 3:15, 3:12 |
+| `heartland` | `region-heartland.mp3` (Prosperous Capital), then the themes | 2:53 |
+| `north` | `region-north.mp3` (Snow Peaks at Dawn), then the themes | 3:28 |
+| `south` | `region-south.mp3` (Dali Tea Hills), then the themes | 3:18 |
+| `east` | `region-east.mp3` (Peach Blossoms on the Canal), then the themes | 3:00 |
+| `wilds` | `region-wilds.mp3` (The Road Goes On), then the themes | 3:25 |
 | `battle` | `battle.mp3` | 2:55 |
 | `desert` | `desert.mp3` — the desert / trade song | 3:04 |
 
@@ -57,7 +62,7 @@ The main tracks stream recorded songs (made with Suno from the prompts in the 20
   ffmpeg -i in.wav -af "silenceremove=start_periods=1:start_threshold=-55dB,areverse,silenceremove=start_periods=1:start_threshold=-55dB,areverse,loudnorm=I=-16:TP=-1.5:LRA=11" -ar 44100 -ac 2 -c:a libmp3lame -q:a 6 out.mp3
   ```
 
-- **Playback.** A recording streams through an `<audio>` element routed into the music bus (`createMediaElementSource`), so the ♪ volume and mute apply. One file loops; several play one after another, starting on a random version. Switching to `world` ↔ `night` keeps the same recording playing. A jingle pauses the recording and the music resumes where it left off.
+- **Playback.** A recording streams through an `<audio>` element routed into the music bus (`createMediaElementSource`), so the ♪ volume and mute apply. One file loops; a playlist moves on to a random other song when one ends. The theme playlists start on a random theme; a region's playlist starts on its own song (`STARTS_ON_FIRST`), then the themes take turns with it. Day and night share the themes. A jingle pauses the recording and the music resumes where it left off.
 - **Fallback.** If a file fails to load, that track plays its synthesized song instead. The service worker does not cache media (the browser fetches it in ranges), so offline play uses the synth music. `<html data-music-source>` is `recording` or `synth`.
 - **Desert places.** `isDesertPlace`: `desert_*`, `tribe_*`, `city_xixia`, `mt_baituo` and `sect_xingxiu` (the place the hero is in, or last stood in on a road or in a dialog).
 
@@ -103,8 +108,10 @@ The main tracks stream recorded songs (made with Suno from the prompts in the 20
 | game over | none |
 | a battle without a winner yet | `battle` |
 | exploring a desert place | `desert` |
-| exploring, `time % 12 < 8` | `world` |
-| exploring, `time % 12 ≥ 8` | `night` |
+| on a road, or in a wild place (`cave_`, `cliff_`, `mt_`, `valley_`, `peak_`…) | `wilds` |
+| exploring elsewhere | the place's region (`regionOf`): `heartland`, `north`, `south`, `east`; the west's non-desert places play `world` (the themes) |
+
+`exploringTrack(place, onRoad, region)` in `lib/audio/recordings.ts` makes the choice. The 7 new files were Suno MP3s, re-encoded with the command above (−16 LUFS, ~110 kb/s); 2.5–3 MB each.
 
 It also plays cues when the store changes:
 
