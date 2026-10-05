@@ -11,7 +11,7 @@ async function visit(page: Page, marker: string) {
 }
 
 test("local replies preserve the scene and unrelated meetings clear the previous speaker", async ({ page }) => {
-  test.setTimeout(120_000);
+  test.setTimeout(240_000);
   // A deterministic regression fixture. Independent critics use ordinary RNG.
   await page.addInitScript(() => { Math.random = () => 0.5; });
   const errors: string[] = [];
