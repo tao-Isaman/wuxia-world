@@ -181,14 +181,14 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qst_jinyiwei_sect_intel` | รวบรวมข่าวกรอง | ผู้บัญชาการจ้าวฝู่ | item → item → turn-in | prereqs |
 | `qst_jinyiwei_sect_fugitive` | ตามจับโจรหนีหมายจับ | ผู้บัญชาการจ้าวฝู่ | kill → item → turn-in | prereqs |
 
-### สำนักสุลถัง (`tang`)
+### สำนักสกุลถัง (`tang`)
 
 | Id | Name | Giver | Stages | Notes |
 | --- | --- | --- | --- | --- |
 | `qst_tang_sect_patrol` | ลาดตระเวนป่าเสฉวน | เจ้าสำนักถังเหมิน | kill → turn-in | prereqs |
 | `qst_tang_sect_venom` | ส่งวัตถุดิบให้ห้องปรุงพิษ | เจ้าสำนักถังเหมิน | item → turn-in | prereqs |
 | `qst_tang_art_tenkpoisons` | บททดสอบก่อนตำนาน: วิชาลึกลับ | เจ้าสำนักถังเหมิน | kill → item → turn-in | art, rank ≤ 3, prereqs |
-| `qst_tang_redemption` | ไถ่บาปต่อสำนักสุลถัง | เจ้าสำนักถังเหมิน | kill → item → turn-in | prereqs |
+| `qst_tang_redemption` | ไถ่บาปต่อสำนักสกุลถัง | เจ้าสำนักถังเหมิน | kill → item → turn-in | prereqs |
 | `qst_tang_sect_venom2` | เก็บพิษเพิ่ม | เจ้าสำนักถังเหมิน | item → turn-in | prereqs |
 | `qst_tang_sect_herbgather` | เก็บสมุนไพรปรุงพิษ | เจ้าสำนักถังเหมิน | item → turn-in | prereqs |
 | `qst_tang_sect_eliminate` | กำจัดศัตรูตระกูล | เจ้าสำนักถังเหมิน | kill → item → turn-in | prereqs |
@@ -813,11 +813,11 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `ql_skill_xx_palm` | สืบทอดวิชาลึกลับของศิษย์ตู๋โซ่ว | ศิษย์ตู๋โซ่ว | kill → item → kill → turn-in | prereqs |
 | `ql_art_hgdf` | สืบทอดวิชาลึกลับของศิษย์ตู๋โซ่ว · ม้วนที่ 2 | ศิษย์ตู๋โซ่ว | kill → item → kill → turn-in | prereqs |
 
-### สำนักสุลถัง (`sect_tang`)
+### สำนักสกุลถัง (`sect_tang`)
 
 | Id | Name | Giver | Stages | Notes |
 | --- | --- | --- | --- | --- |
-| `qst_tang_disciple_intro` | ขอเข้าเป็นศิษย์สำนักสุลถัง | เจ้าสำนักถังเหมิน | item → turn-in | prereqs |
+| `qst_tang_disciple_intro` | ขอเข้าเป็นศิษย์สำนักสกุลถัง | เจ้าสำนักถังเหมิน | item → turn-in | prereqs |
 | `ql_skill_tang_basic_knife` | สืบทอดวิชาลึกลับของศิษย์ถังซิ่ว | ศิษย์ถังซิ่ว | kill → turn-in | prereqs |
 | `ql_art_t0_tang_sharp` | สืบทอดวิชาลึกลับของศิษย์ถังเทา | ศิษย์ถังเทา | kill → turn-in | prereqs |
 | `ql_skill_tang_poison_knife` | สืบทอดวิชาลึกลับของศิษย์ถังเทา · ม้วนที่ 2 | ศิษย์ถังเทา | kill → item → turn-in | prereqs |

@@ -24,7 +24,7 @@
 | `sect_xuedao` | พรรคอสูรโลหิต | — (no membership) | — | — | — |
 | `sect_wudu` | พรรคเบญจพิษ | — (no membership) | — | — | — |
 | `sect_jinyiwei` | องครักษ์เสื้อแพร | `jinyiwei` | ผู้บัญชาการจ้าวฝู่ | 9 → 1 | 8 |
-| `sect_tang` | สำนักสุลถัง | `tang` | เจ้าสำนักถังเหมิน | 9 → 1 | 8 |
+| `sect_tang` | สำนักสกุลถัง | `tang` | เจ้าสำนักถังเหมิน | 9 → 1 | 8 |
 | `sect_xueyu` | สำนักดาบโลหิต | — (no membership) | — | — | — |
 
 ## เส้าหลิน (`shaolin`)
@@ -376,9 +376,9 @@ Martial line — every skill and art is taught only by its lineage quest or saga
 | 3 | art | เฉียนคุนต้าหนัวอี (`qiankun`) | saga `sunmoon_qiankun_tunnel` |
 | 3 | art | ดาวเคลื่อนดาราคล้อย (`yxhd`) | saga `sunmoon_holy_fire_tokens` |
 
-## สำนักสุลถัง (`tang`)
+## สำนักสกุลถัง (`tang`)
 
-- Hall: สำนักสุลถัง (`sect_tang`) · registrar: เจ้าสำนักถังเหมิน (`sect_tang_chief_tangmen`)
+- Hall: สำนักสกุลถัง (`sect_tang`) · registrar: เจ้าสำนักถังเหมิน (`sect_tang_chief_tangmen`)
 - Join requirements: ความเลว ≤ 30
 - Ranks: start 9, top 1 · quest cooldown 30 days
 - Rank-up cost (sect points): →8: 100 · →7: 200 · →6: 350 · →5: 500 · →4: 700 · →3: 1000 · →2: 1400 · →1: 2000

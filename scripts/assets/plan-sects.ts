@@ -277,7 +277,7 @@ export const SECTS: SectArt[] = [
       ["horse_post", "เสาผูกม้าองครักษ์", "a hitching post with a fine black horse saddle", "farm", "tall", 35, 64],
       ["arrow_target", "เป้าธนู", "an archery target on a stand", "training", "solid", 35, 64],
     ] },
-  { id: "tang", thai: "สำนักสุลถัง", thaiEn: "Tang Clan", region: "south", look: "Sichuan clan of hidden weapons, dark green and black, bamboo and iron", weapon: "throwing knives, darts and repeating crossbows", emblem: "a black lotus of hidden blades",
+  { id: "tang", thai: "สำนักสกุลถัง", thaiEn: "Tang Clan", region: "south", look: "Sichuan clan of hidden weapons, dark green and black, bamboo and iron", weapon: "throwing knives, darts and repeating crossbows", emblem: "a black lotus of hidden blades",
     items: [
       ["crossbow_rack", "ชั้นหน้าไม้กล", "a rack of repeating crossbows", "weapon", "solid", 45, 64],
       ["dart_board", "เป้าอาวุธลับ", "a wooden target bristling with darts and knives", "training", "solid", 35, 64],

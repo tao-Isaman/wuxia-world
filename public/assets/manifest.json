@@ -151531,14 +151531,14 @@
   },
   {
    "id": "sct_tang_altar",
-   "name": "แท่นบูชาสำนักสุลถัง",
+   "name": "แท่นบูชาสำนักสกุลถัง",
    "category": "sect",
    "subcategory": "religious",
    "region": "south",
    "sect": "tang",
    "tags": [
     "แท่นบูชา",
-    "สำนักสุลถัง",
+    "สำนักสกุลถัง",
     "Tang Clan",
     "altar",
     "religious"
@@ -151575,7 +151575,7 @@
    "sect": "tang",
    "tags": [
     "กับดักไผ่",
-    "สำนักสุลถัง",
+    "สำนักสกุลถัง",
     "Tang Clan",
     "bamboo trap",
     "decor"
@@ -151605,14 +151605,14 @@
   },
   {
    "id": "sct_tang_banner",
-   "name": "ธงสำนักสำนักสุลถัง",
+   "name": "ธงสำนักสำนักสกุลถัง",
    "category": "sect",
    "subcategory": "banner",
    "region": "south",
    "sect": "tang",
    "tags": [
     "ธงสำนัก",
-    "สำนักสุลถัง",
+    "สำนักสกุลถัง",
     "Tang Clan",
     "banner"
    ],
@@ -151648,7 +151648,7 @@
    "sect": "tang",
    "tags": [
     "ตะเกียงบัวดำ",
-    "สำนักสุลถัง",
+    "สำนักสกุลถัง",
     "Tang Clan",
     "black lotus lamp",
     "lantern"
@@ -151685,7 +151685,7 @@
    "sect": "tang",
    "tags": [
     "ศาลบรรพชนตระกูลถัง",
-    "สำนักสุลถัง",
+    "สำนักสกุลถัง",
     "Tang Clan",
     "clan shrine",
     "religious"
@@ -151722,7 +151722,7 @@
    "sect": "tang",
    "tags": [
     "ชั้นหน้าไม้กล",
-    "สำนักสุลถัง",
+    "สำนักสกุลถัง",
     "Tang Clan",
     "crossbow rack",
     "weapon"
@@ -151759,7 +151759,7 @@
    "sect": "tang",
    "tags": [
     "เป้าอาวุธลับ",
-    "สำนักสุลถัง",
+    "สำนักสกุลถัง",
     "Tang Clan",
     "dart board",
     "training"
@@ -151789,14 +151789,14 @@
   },
   {
    "id": "sct_tang_dummy",
-   "name": "หุ่นฝึกสำนักสุลถัง",
+   "name": "หุ่นฝึกสำนักสกุลถัง",
    "category": "sect",
    "subcategory": "training",
    "region": "south",
    "sect": "tang",
    "tags": [
     "หุ่นฝึก",
-    "สำนักสุลถัง",
+    "สำนักสกุลถัง",
     "Tang Clan",
     "dummy",
     "training"
@@ -151826,14 +151826,14 @@
   },
   {
    "id": "sct_tang_gate",
-   "name": "ประตูสำนักสำนักสุลถัง",
+   "name": "ประตูสำนักสำนักสกุลถัง",
    "category": "sect",
    "subcategory": "gate",
    "region": "south",
    "sect": "tang",
    "tags": [
     "ประตูสำนัก",
-    "สำนักสุลถัง",
+    "สำนักสกุลถัง",
     "Tang Clan",
     "gate"
    ],
@@ -151869,7 +151869,7 @@
    "sect": "tang",
    "tags": [
     "หีบอาวุธลับ",
-    "สำนักสุลถัง",
+    "สำนักสกุลถัง",
     "Tang Clan",
     "hidden weapon chest",
     "storage"
@@ -151906,7 +151906,7 @@
    "sect": "tang",
    "tags": [
     "หุ่นเหล็กกลไก",
-    "สำนักสุลถัง",
+    "สำนักสกุลถัง",
     "Tang Clan",
     "iron puppet",
     "training"
@@ -151936,14 +151936,14 @@
   },
   {
    "id": "sct_tang_lantern",
-   "name": "โคมสำนักสำนักสุลถัง",
+   "name": "โคมสำนักสำนักสกุลถัง",
    "category": "sect",
    "subcategory": "lantern",
    "region": "south",
    "sect": "tang",
    "tags": [
     "โคมสำนัก",
-    "สำนักสุลถัง",
+    "สำนักสกุลถัง",
     "Tang Clan",
     "lantern"
    ],
@@ -151979,7 +151979,7 @@
    "sect": "tang",
    "tags": [
     "หีบกลไก",
-    "สำนักสุลถัง",
+    "สำนักสกุลถัง",
     "Tang Clan",
     "mechanism box",
     "craft"
@@ -152016,7 +152016,7 @@
    "sect": "tang",
    "tags": [
     "โต๊ะผสมพิษ",
-    "สำนักสุลถัง",
+    "สำนักสกุลถัง",
     "Tang Clan",
     "poison workbench",
     "craft"
@@ -152053,7 +152053,7 @@
    "sect": "tang",
    "tags": [
     "ร้านชาเสฉวน",
-    "สำนักสุลถัง",
+    "สำนักสกุลถัง",
     "Tang Clan",
     "tea house sichuan",
     "shop"
@@ -152083,14 +152083,14 @@
   },
   {
    "id": "sct_tang_weapon_rack",
-   "name": "ชั้นวางอาวุธสำนักสุลถัง",
+   "name": "ชั้นวางอาวุธสำนักสกุลถัง",
    "category": "sect",
    "subcategory": "weapon",
    "region": "south",
    "sect": "tang",
    "tags": [
     "ชั้นวางอาวุธ",
-    "สำนักสุลถัง",
+    "สำนักสกุลถัง",
     "Tang Clan",
     "weapon rack",
     "weapon"

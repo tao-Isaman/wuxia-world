@@ -1,4 +1,4 @@
-// สำนักสุลถัง — story sagas for the two T4 arts (พลังถังหมื่นพิษ, พลังกรัดฟ้า).
+// สำนักสกุลถัง — story sagas for the two T4 arts (พลังถังหมื่นพิษ, พลังกรัดฟ้า).
 // Sagas retell legends of มังกรหยก ภาค 3 (ดาบมังกรหยก): some fifty years
 // ago a Tang girl was healed at หุบผีเสื้อ by a boy full of cold poison, and
 // more than a century ago a Tang thief stood beside the forge where one black-iron blade became the
@@ -38,7 +38,7 @@ const TEN_THOUSAND_POISONS: StoryArcSpec = {
   id: "tang_ten_thousand_poisons",
   title: "หมื่นพิษ หมื่นยา",
   tagline: "ตำราหมื่นพิษของถังเหมินขาดไปครึ่งเล่ม — ครึ่งที่หายไปคือยาแก้ทุกขนาน",
-  sc: "สำนักสุลถัง",
+  sc: "สำนักสกุลถัง",
   sectId: "tang",
   reward: { kind: "art", id: "t4_tang_tenkpoisons" },
   require: { t: "and", all: [
@@ -619,7 +619,7 @@ const SKY_CLEAVER: StoryArcSpec = {
   id: "tang_sky_cleaver",
   title: "เส้นลายในเหล็กดำ",
   tagline: "ร้อยกว่าปีก่อน เหล็กดำก้อนเดียวถูกตีเป็นดาบและกระบี่ — และมีโจรตระกูลถังคนหนึ่งยืนอยู่ข้างเตา",
-  sc: "สำนักสุลถัง",
+  sc: "สำนักสกุลถัง",
   sectId: "tang",
   reward: { kind: "art", id: "t4_tang_skycleaver" },
   require: { t: "and", all: [

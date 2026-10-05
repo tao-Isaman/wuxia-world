@@ -405,7 +405,7 @@ const SUNMOON: SectMembershipDef = {
   questCooldownDays: 30,
 };
 
-// Tang sect (สำนักสุลถัง / 唐门). Big Sichuan family — known throughout
+// Tang sect (สำนักสกุลถัง / 唐门). Big Sichuan family — known throughout
 // the world but rarely seen in public, focused on hidden weapons +
 // poisons. Leadership tier matches Shaolin/Wudang. Combat identity:
 // yin / external — short blades + thrown knives + venom-coated darts.
@@ -416,7 +416,7 @@ const SUNMOON: SectMembershipDef = {
 // locations.
 const TANG: SectMembershipDef = {
   id: "tang",
-  name: "สำนักสุลถัง",
+  name: "สำนักสกุลถัง",
   hallLocationId: "sect_tang",
   registrarNpcId: "sect_tang_chief_tangmen",
   joinRequirements: { t: "trait", trait: "evil", max: 30 },

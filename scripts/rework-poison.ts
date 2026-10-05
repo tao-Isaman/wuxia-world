@@ -1,5 +1,5 @@
 // One-shot poison-rework. Converts the 3 jianghu (sc:"ยุทธจักร") +
-// 3 Tang (sc:"สำนักสุลถัง") poison skills from the legacy
+// 3 Tang (sc:"สำนักสกุลถัง") poison skills from the legacy
 // `debuff_poison` / `heavy_poison` enemy effects to the new clean
 // `poison_dmg` (pure HP DoT, no Eva/Acc bundled). Stronger pp values
 // since poison sacrifices side debuffs for raw HP pressure.

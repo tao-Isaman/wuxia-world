@@ -326,7 +326,7 @@
 | `sect_jinyiwei_soldier_qin` | องครักษ์ฉิน | 💬 ⚔ 🤏 | 12 |
 | `sect_jinyiwei_soldier_lu` | องครักษ์ลู่ | 💬 ⚔ 🤏 | 16 |
 
-### สำนักสุลถัง (`sect_tang`)
+### สำนักสกุลถัง (`sect_tang`)
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |

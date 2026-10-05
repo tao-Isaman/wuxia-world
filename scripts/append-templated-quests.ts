@@ -19,7 +19,7 @@ const SECT_DISPLAY: Record<string, string> = {
   beggars: "พรรคยาจก",
   jinyiwei: "องครักษ์เสื้อแพร",
   sunmoon: "พรรคตะวันจันทรา",
-  tang: "สำนักสุลถัง",
+  tang: "สำนักสกุลถัง",
 };
 const ITEM_DISPLAY: Record<string, string> = {
   wood_hard: "ไม้แข็ง",
@@ -40,7 +40,7 @@ const REDEMPTIONS: Array<[string, string, string, string]> = [
   ["beggars",   "sect_beggars_chief_hongtian",    "พรรคยาจก",         "rice_dish"],
   ["jinyiwei",  "sect_jinyiwei_leader_zhao",      "องครักษ์เสื้อแพร",  "iron_ingot"],
   ["sunmoon",   "sect_sunmoon_chief_dongfang",    "พรรคตะวันจันทรา",   "ancient_coin"],
-  ["tang",      "sect_tang_chief_tangmen",        "สำนักสุลถัง",       "centipede_venom"],
+  ["tang",      "sect_tang_chief_tangmen",        "สำนักสกุลถัง",       "centipede_venom"],
 ];
 
 // 9 backfill 3rd-sect quests — one per non-Shaolin sect (Shaolin already had 3).

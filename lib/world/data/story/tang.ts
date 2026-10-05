@@ -1,4 +1,4 @@
-// สำนักสุลถัง (ถังเหมิน) — lineage quests (T0–T3) and story sagas (T4 skills).
+// สำนักสกุลถัง (ถังเหมิน) — lineage quests (T0–T3) and story sagas (T4 skills).
 // Sagas retell legends of มังกรหยก ภาค 3 (ดาบมังกรหยก): some sixty years
 // ago a Tang woman sat at the Dragon-Saber feast on เกาะหวังพ่าน, and some
 // fifty years ago a poisoner granny with golden-flower needles saved a Tang
@@ -158,7 +158,7 @@ const STAR_RAIN: StoryArcSpec = {
   id: "tang_star_rain",
   title: "ทุกดาวมีชื่อ",
   tagline: "หกสิบปีที่ตระกูลถังเรียกนางว่าคนขลาดที่มุดใต้โต๊ะ — จนหีบมีดสิบสี่เล่มลอยมาจากเกาะหวังพ่าน",
-  sc: "สำนักสุลถัง",
+  sc: "สำนักสกุลถัง",
   sectId: "tang",
   reward: { kind: "skill", id: "tang_starrain" },
   require: { t: "and", all: [
@@ -737,7 +737,7 @@ const HEART_PIERCE: StoryArcSpec = {
   id: "tang_heart_pierce",
   title: "หัวใจอยู่ตรงไหน",
   tagline: "ที่ต้าหลี่ มีศพสามศพที่อกมีรอยเข็มรูปดอกไม้ทอง — และศพหนึ่งยังอุ่นอยู่",
-  sc: "สำนักสุลถัง",
+  sc: "สำนักสกุลถัง",
   sectId: "tang",
   reward: { kind: "skill", id: "tang_heartpierce" },
   require: { t: "and", all: [

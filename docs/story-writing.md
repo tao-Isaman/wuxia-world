@@ -366,7 +366,7 @@ Starting points; invent freely within the legend's spirit.
   - the two Xuanming elders and their cold palm;
   - the tower where six sects' masters were drugged and caged;
   - duty vs conscience, and a princess who chose love over the court.
-- **สำนักสุลถัง**
+- **สำนักสกุลถัง**
   - the saber feast on Wangpan island, where hidden weapons rained;
   - the forging of the saber and the sword from one black-iron blade (sky-cleaver);
   - a poisoner granny's needles;

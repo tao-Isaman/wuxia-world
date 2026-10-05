@@ -322,7 +322,7 @@ There are 15 joinable sects and 5 more sect grounds you can only visit.
 | เหิงซาน | evil ≤ 10 | 3 paper and 500 gold |
 | พรรคยาจก | evil ≤ 10, begging mastery ≥ 2 (ผู้เฒ่ายาจก at the Beggars' grounds teaches begging) | 5 rice dishes and 100 gold |
 | พรรคสราญรมย์ | evil ≤ 15 | 10 herbs, 10 ginseng, 2 snow lotus |
-| สำนักสุลถัง | evil ≤ 30 | 5 viper, 3 scorpion and 1 centipede venom, 5 herbs |
+| สำนักสกุลถัง | evil ≤ 30 | 5 viper, 3 scorpion and 1 centipede venom, 5 herbs |
 | องครักษ์เสื้อแพร | evil ≤ 30 | kidnap ทูตหลิวอิง |
 | พรรคตะวันจันทรา | evil ≤ 30 | assassinate องครักษ์ฉิน |
 | กู่มู่ | a ฉวนเจิน disciple who knows หนึ่งพลังสุริยันต์ (`t3_qz_sun`), evil ≤ 10 | defeat 3 bandit chiefs, then 3 snow lotus and 1 mithril ore; you leave ฉวนเจิน and join กู่มู่ |

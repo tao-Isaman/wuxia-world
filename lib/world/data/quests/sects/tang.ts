@@ -7,9 +7,9 @@ import type { QuestDef } from "../../../types";
 export const QUESTS_TANG: readonly QuestDef[] = [
   {
     id: "qst_tang_disciple_intro",
-    name: "ขอเข้าเป็นศิษย์สำนักสุลถัง",
+    name: "ขอเข้าเป็นศิษย์สำนักสกุลถัง",
     description: "เจ้าสำนักถังเหมินขอให้พิสูจน์ความสามารถในการหาวัตถุดิบของสำนัก — เก็บพิษงู ๕ + พิษแมงป่อง ๓ + พิษตะขาบ ๑ + สมุนไพรหายาก ๕. พิษงู/แมงป่องหาได้จากการสู้กับ bst_viper / bst_scorpion ในป่า ส่วนพิษตะขาบหาที่ป่ามืด · สมุนไพรหายากขุดได้ทั่วป่าเขา",
-    briefSummary: "ส่งพิษงู 5 + พิษแมงป่อง 3 + พิษตะขาบ 1 + สมุนไพรหายาก 5 เพื่อเข้าเป็นศิษย์สำนักสุลถัง",
+    briefSummary: "ส่งพิษงู 5 + พิษแมงป่อง 3 + พิษตะขาบ 1 + สมุนไพรหายาก 5 เพื่อเข้าเป็นศิษย์สำนักสกุลถัง",
     type: "side",
     giverNpcId: "sect_tang_chief_tangmen",
     prereqs: {
@@ -152,9 +152,9 @@ export const QUESTS_TANG: readonly QuestDef[] = [
 
   {
     id: "qst_tang_redemption",
-    name: "ไถ่บาปต่อสำนักสุลถัง",
-    description: "เจ้าผู้ทรยศกลับมาขออภัย — เจ้าสำนักสำนักสุลถังทดสอบความจริงใจเจ้าด้วยภารกิจหนัก ปราบหัวหน้าโจร 5 คนและนำของล้ำค่าของสำนักมาถวาย หากผ่าน ความเป็นทรยศจะถูกล้างเป็น \"ลาออก\" — นักล่าจะหยุดตามล่า แต่วิชาจะถูกแช่แข็ง",
-    briefSummary: "ไถ่บาปต่อสำนักสุลถัง — ปราบหัวหน้าโจร 5 + ส่งของถวาย 5 ชิ้น",
+    name: "ไถ่บาปต่อสำนักสกุลถัง",
+    description: "เจ้าผู้ทรยศกลับมาขออภัย — เจ้าสำนักสำนักสกุลถังทดสอบความจริงใจเจ้าด้วยภารกิจหนัก ปราบหัวหน้าโจร 5 คนและนำของล้ำค่าของสำนักมาถวาย หากผ่าน ความเป็นทรยศจะถูกล้างเป็น \"ลาออก\" — นักล่าจะหยุดตามล่า แต่วิชาจะถูกแช่แข็ง",
+    briefSummary: "ไถ่บาปต่อสำนักสกุลถัง — ปราบหัวหน้าโจร 5 + ส่งของถวาย 5 ชิ้น",
     type: "side",
     sectId: "tang",
     giverNpcId: "sect_tang_chief_tangmen",
@@ -162,7 +162,7 @@ export const QUESTS_TANG: readonly QuestDef[] = [
     stages: [
       { id: "trial_kill", description: "ปราบหัวหน้าโจร (bandit_chief) 5 คน เพื่อพิสูจน์ใจ", autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 5 } },
       { id: "trial_offering", description: "นำของถวาย — centipede_venom 5 ชิ้น", autoAdvance: { t: "hasItem", itemId: "centipede_venom", count: 5 } },
-      { id: "return_to_master", description: "กลับไปขออภัยต่อเจ้าสำนักสำนักสุลถัง" },
+      { id: "return_to_master", description: "กลับไปขออภัยต่อเจ้าสำนักสำนักสกุลถัง" },
     ],
     rewards: [
       { t: "wExp", amount: 300 },
@@ -175,7 +175,7 @@ export const QUESTS_TANG: readonly QuestDef[] = [
   {
     id: "qst_tang_sect_venom2",
     name: "เก็บพิษเพิ่ม",
-    description: "ภารกิจประจำของศิษย์สำนักสุลถัง — เก็บพิษงู 6 ชิ้น",
+    description: "ภารกิจประจำของศิษย์สำนักสกุลถัง — เก็บพิษงู 6 ชิ้น",
     briefSummary: "ส่งพิษงู 6 ชิ้น · sect points +50",
     type: "side",
     sectId: "tang",

@@ -194,7 +194,7 @@ Grid column: the skill's range and area on the tactics board (`skillGrid` / `art
 | `jy_execution_blade` | ดาบประหารชีพ | T4 เฉพาะ | blade | physical | 100 | 1 | ระยะ 1 · ฟันกวาด 3 ช่อง | yang, external, hard |
 | `jy_chain_assassin` | โซ่ล่าสังหาร | T4 เฉพาะ | hidden | physical | 90 | 12 | ระยะ 1–3 · วงรัศมี 1 | yang, external, hard |
 
-### สำนักสุลถัง (8)
+### สำนักสกุลถัง (8)
 
 | Id | Name | Tier | Weapon | Attack | bp | Hits | Grid | Types |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -455,7 +455,7 @@ Grid column: the skill's range and area on the tactics board (`skillGrid` / `art
 | `jy_a4_brocadelord` | เจ้านายเสื้อแพร | T4 เฉพาะ | ยุทธวิธีล่าโจร (atk_phy_pen, 35 MP, cd 4) | ระยะ 1–2 · เป้าเดียว | on_crit 100% → debuff_def | 40 / 30 | yang, external |
 | `t4_jy_godslayer` | พลังประหารเทพ | T4 เฉพาะ | ประหารเทพ (atk_phy_pen, 35 MP, cd 4) | ระยะ 1–2 · เป้าเดียว | use_act 100% → stack_atk | 45 / 35 | yang, external |
 
-### สำนักสุลถัง (7)
+### สำนักสกุลถัง (7)
 
 | Id | Name | Tier | Active | Grid | Passive | HP/MP per level | Types |
 | --- | --- | --- | --- | --- | --- | --- | --- |
