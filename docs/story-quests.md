@@ -14,6 +14,7 @@ This page covers the engine. How to *write* the content is in [story-writing.md]
 - [Files](#files)
 - [Lineage quests](#lineage-quests)
 - [Story sagas](#story-sagas)
+- [Jianghu sagas](#jianghu-sagas)
 - [Cutscenes](#cutscenes)
 - [Dialogs: films and pages](#dialogs-films-and-pages)
 - [Quest log and NPC card](#quest-log-and-npc-card)
@@ -83,6 +84,33 @@ Both reuse the ordinary quest engine: stages, `autoAdvance`, objective spots, NP
 | `trait` / `stat` | `trait` / `statAtLeast` |
 
 Chapters chain on `questStatus … done`. The saga's info (`StoryArcInfo`: titles, quest ids, cutscene ids) drives the quest log.
+
+## Jianghu sagas
+
+> **Stat gates are halved at load.** The numbers below (and in every spec, `LINEAGE_TIERS` and manual) are authored values; `QUESTS` and `ITEMS` apply `MOVE_STAT_GATE_SCALE = 0.5` (`lib/world/data/move-gates.ts`, rounded up) to every stat gate on the way to a move, and rewrite the number in a stat stage's hint. So a jianghu T4 opens at a stat of 40 in play, a T5 at 60.
+
+The ten jianghu (ยุทธจักร) T4 / T5 moves have no sect to vouch for the hero, so each is the reward of a longer, harder saga in `lib/world/data/story/jianghu/<file>.ts` (arc id `jh_<file>`, `sc: "ยุทธจักร"`, no `sectId`, registered in `index.ts`). `test:story` enforces the size and the gate (`sagaRule`):
+
+| | Chapters | Films | Duels | Arc gate |
+| --- | --- | --- | --- | --- |
+| Sect T4 saga | 8–10 | ≥ 4 | — | sect member, rank, a stat ≥ 40 |
+| Jianghu T4 | 16–20 | ≥ 8 | ≥ 8 | main story done (`st_main_15`), a stat ≥ 80, no sect condition |
+| Jianghu T5 | 32–40 | ≥ 16 | ≥ 16 | main story done, a stat ≥ 120, no sect condition |
+
+Their duel foes (`st_jh_*`) are about twice as strong as sect-saga foes, and inner chapters raise stat gates further. Every jianghu T4 / T5 move has exactly one saga (`coverage: every jianghu T4 / T5 move has exactly one saga`).
+
+| File | Reward | Tier |
+| --- | --- | --- |
+| `six_meridian` | `lmsj` กระบี่ 6 ชีพจร | T4 |
+| `lone_sword` | `dgjj` เก้ากระบี่เดียวดาย | T4 |
+| `witness_spear` | `ng2` ทวนประจักษ์พยาน | T4 |
+| `godslayer_blade` | `ng5` ดาบยาวเทพสังหาร | T4 |
+| `cosmos_fist` | `nu2` หมัดสะท้านจักรวาล | T4 |
+| `mountain_army` | `military` เคล็ดวิชาภูผาทะลายทัพ | T4 |
+| `heaven_fire` | `fire` ตำราเพลิงสวรรค์ | T4 |
+| `sunflower` | `khbt` คัมภีร์ทานตะวัน | T5 |
+| `nine_yang` | `kuyt` วิชาเก้าเอี้ยง | T5 |
+| `nine_yin` | `kgim` คัมภีร์เก้าอิม | T5 |
 
 ## Cutscenes
 

@@ -110,7 +110,7 @@ const opponents: StoryOpponentSpec[] = [
   { id: SPAR_HUANG, name: HUANG_N, ti: 2, look: { sheet: "elder" }, stats: { POW: 8, INT: 6, DEX: 3 }, skillIds: ["sa", "nc9"] },
   { id: SPAR_SHI, name: SHI_N, ti: 2, look: { sheet: "m3" }, stats: { STR: 7, VIT: 6, AGI: 3 }, skillIds: ["nd4", "nc5"] },
   { id: FOE_ENVOY, name: "ทูตเงาแห่งลัทธิตะวันจันทรา", ti: 3, look: { sheet: "m4", tint: 0x6a4a7a, size: 1.1 },
-    stats: { POW: 10, AGI: 8, DEX: 5 }, skillIds: ["nf4", "nd9", "nd8"], artId: "shadow", artLevel: 6 },
+    stats: { POW: 10, AGI: 8, DEX: 5 }, skillIds: ["nf4", "nd9", "nd8"], artId: "t4_tang_tenkpoisons", artLevel: 6 },
   { id: FOE_LUO, name: "หยวนเหรินเจี๋ยแห่งชิงเฉิง", ti: 3, look: { sheet: "m2", tint: 0x5a7a6a, size: 1.1 },
     stats: { DEX: 9, AGI: 9, STR: 5 }, skillIds: ["nh2", "nf4", "nd11"] },
 ];

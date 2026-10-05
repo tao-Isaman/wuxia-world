@@ -243,7 +243,7 @@ Walk up to a person and talk. The NPC card offers what that person supports:
 
 ## Quests and tracking
 
-There are 882 quests: the 15-chapter main story (เนื้อเรื่องหลัก, [story-writing.md](story-writing.md#the-main-story)), one older main quest, 526 side quests (97 sect quests, 154 lineage quests and 97 place quests) and 340 story chapters in 38 sagas — see [Lineage quests and sagas](#lineage-quests-and-sagas).
+There are 1,115 quests: the 15-chapter main story (เนื้อเรื่องหลัก, [story-writing.md](story-writing.md#the-main-story)), one older main quest, 526 side quests (97 sect quests, 154 lineage quests and 97 place quests) and 573 story chapters in 48 sagas (38 sect sagas, 10 [jianghu sagas](story-quests.md#jianghu-sagas)) — see [Lineage quests and sagas](#lineage-quests-and-sagas).
 
 - **Accepting.** Most quests are offered by a person (the **!** mark). Sect quests are taken in the สำนัก menu.
 - **Stages.** A quest has 1–4 stages. The quest log (ภารกิจ) shows each one with ✓ done, ▸ current and ○ still ahead.
@@ -396,7 +396,7 @@ Mastery levels 1–5 need 0 / 100 / 300 / 700 / 1500 xp.
 
 The 🥋 วิชา window: the 10 slots across the top; below, the **library** of everything learned on the left (icon and name, filter ทั้งหมด / ฝีมือ / ในกาย) and the picked move on the right — its numbers and xp, ติดตั้งลงช่อง (the targeted slot if empty, else the first free one, else แทนที่ the targeted slot), ถอดออก, เร่งด้วย w-exp and ลืมวิชา. Tap a slot to target it and show its move.
 
-Move skills (178) and inner arts (122) level from 1 to 10. A move skill's power, its stat bonuses and its weapon mastery grow with level; an art's bonuses scale by level / 10.
+Move skills (173) and inner arts (111) level from 1 to 10. A move skill's power, its stat bonuses and its weapon mastery grow with level; an art's bonuses scale by level / 10.
 
 | Xp to the next level | Formula | Tier 0, lv 1 → 2 | Tier 4, lv 9 → 10 |
 | --- | --- | --- | --- |

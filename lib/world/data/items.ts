@@ -1,3 +1,4 @@
+import { scaleMoveStat } from "./move-gates";
 import { ARTS, SKILLS, TIERS } from "@/lib/game";
 import type { ItemDef } from "../types";
 
@@ -20,7 +21,7 @@ export function scrollArtLevel(ti: number): number {
 // in gold. Shops use these for buy/sell; inns may restrict acceptance to
 // specific categories. Items without a price (or price 0) are unsellable
 // (quest items / story items).
-export const ITEMS: readonly ItemDef[] = [
+export const ITEMS: readonly ItemDef[] = ([
   // ─── Quest / story items ───────────────────────────────────────────
   // Quest items use price: 0 so shops won't sell them and players can't
   // dispose of them by accident — they're consumed via `takeItem` effects
@@ -336,7 +337,14 @@ export const ITEMS: readonly ItemDef[] = [
 
   // ─── คัมภีร์วิชา — one per move skill and inner art (generated) ──────
   ...scrollItems(),
-];
+] satisfies readonly ItemDef[]).map(scaleManualGate);
+
+/** Manuals ask half their authored stat (MOVE_STAT_GATE_SCALE). */
+function scaleManualGate(item: ItemDef): ItemDef {
+  const u = item.use;
+  if (!u || (u.t !== "manualLearnSkill" && u.t !== "manualLearnArt") || !u.reqValue) return item;
+  return { ...item, use: { ...u, reqValue: scaleMoveStat(u.reqValue) } };
+}
 
 function scrollItems(): ItemDef[] {
   const tier = (ti: number) => TIERS[ti]?.n ?? `T${ti}`;

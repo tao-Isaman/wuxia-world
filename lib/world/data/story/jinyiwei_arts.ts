@@ -51,7 +51,7 @@ const CHAIN_ASSASSIN: StoryArcSpec = {
     { id: "st_jinyiweiarts_leng_suo", name: "เหลิงซั่ว ฝ่ามือเฮี้ยนเม้ง", ti: 4, category: "human",
       look: { sheet: "m4", tint: 0x9fc3ff, size: 1.1 },
       stats: { STR: 16, DEX: 18, AGI: 14, VIT: 12 },
-      skillIds: ["ne7", "jy_chainmaster", "jy_grapple", "nf4"], artId: "snow", artLevel: 7 },
+      skillIds: ["ne7", "jy_chainmaster", "jy_grapple", "nf4"], artId: "t4_huashan_purple", artLevel: 7 },
   ],
   chapters: [
     {
@@ -652,7 +652,7 @@ const BROCADE_LORD: StoryArcSpec = {
     { id: "st_jinyiweiarts_sun_yu", name: "เจ้ากรมเงาไหมซุนอวี้", ti: 4, category: "human",
       look: { sheet: "m3", tint: 0x7a6a8a, size: 1.05 },
       stats: { DEX: 18, AGI: 18, STR: 14, INT: 12 },
-      skillIds: ["jy_sword", "jy_eagleclaw", "nd9", "pn"], artId: "shadow", artLevel: 7 },
+      skillIds: ["jy_sword", "jy_eagleclaw", "nd9", "pn"], artId: "t4_tang_tenkpoisons", artLevel: 7 },
   ],
   chapters: [
     {

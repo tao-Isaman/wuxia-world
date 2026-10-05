@@ -91,7 +91,7 @@ Two deliberate exceptions reach up into stores:
 
 **`lib/game/` — combat** (details in [combat.md](combat.md) and [grid-combat.md](grid-combat.md)):
 
-- **Data:** `types.ts` and `data/` (tiers, stats, weapons, sects, 178 skills, 122 arts, 76 gear).
+- **Data:** `types.ts` and `data/` (tiers, stats, weapons, sects, 173 skills, 111 arts, 76 gear).
 - **Numbers:** `derive.ts` (stats → HP, attack, speed…), `damage.ts`, `leveling.ts`, `skill-conflict.ts`, `slots.ts`, `effects.ts`.
 - **One duel:** `battle.ts` resolves one skill or art between two sides (`resolveSkill`, `resolveArtActive`).
 - **The live battle:** `grid/` drives it on a 10 × 7 to 15 × 10 board. It **reuses `battle.ts`** for every hit by building a two-sided "duel view" per target.

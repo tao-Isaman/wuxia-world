@@ -6,6 +6,24 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-05
 
+### Ten jianghu sagas: a way to every unsect T4 / T5 move
+
+- **Each of the ten jianghu (ยุทธจักร) T4 / T5 moves is now the reward of its own saga** in `lib/world/data/story/jianghu/`, written to twice the length and difficulty of a sect saga (T4) or four times (T5), with no sect to vouch for the hero: the main story must be finished and a stat met (authored 80 / 120, halved in play).
+  - T4 (18 chapters each): ทวนที่ไม่ยอมล้ม (ทวนประจักษ์พยาน), ผาของผู้แสวงหาความพ่ายแพ้ (เก้ากระบี่เดียวดาย), ตะเกียงหกชีพจร (กระบี่ 6 ชีพจร), รอยบากที่หนึ่งพัน (ดาบยาวเทพสังหาร), สังเวียนสายน้ำ (หมัดสะท้านจักรวาล), ภูผาที่ปากหุบ (เคล็ดวิชาภูผาทะลายทัพ), คดีเพลิงสวรรค์ (ตำราเพลิงสวรรค์).
+  - T5: ทานตะวันในวังเย็น (คัมภีร์ทานตะวัน, 35 chapters), เก้าตะวัน (วิชาเก้าเอี้ยง, 36), the nine-shard saga of คัมภีร์เก้าอิม (36).
+  - 233 new chapters, 207 new cutscenes, about 100 new saga foes (`st_jh_*`). Now 1,115 quests, 48 sagas, 511 cutscenes.
+- `test:story` enforces the sizes, films, duels and gates (`sagaRule`) and that every jianghu T4 / T5 move has exactly one saga.
+
+### Stat requirements for moves halved
+
+- **Every stat requirement on the way to a move is half what it was** (rounded up): lineage quests (T1–T3 now 5 / 8 / 13), sect saga gates (40 → 20), the new jianghu sagas (T4 80 → 40, T5 120 → 60, inner chapters likewise), sect trials, place quests that teach a move, and manuals. One knob: `MOVE_STAT_GATE_SCALE` in `lib/world/data/move-gates.ts`; content keeps its authored numbers.
+
+### Jianghu T4 / T5: sixteen moves removed, two arts renamed
+
+- **Kept** (still no way to earn them yet): the moves กระบี่ 6 ชีพจร (`lmsj`), เก้ากระบี่เดียวดาย (`dgjj`), ทวนประจักษ์พยาน (`ng2`), ดาบยาวเทพสังหาร (`ng5`), หมัดสะท้านจักรวาล (`nu2`); the arts **เคล็ดวิชาภูผาทะลายทัพ** (`military`, was จวินเจิ้นชี่), **ตำราเพลิงสวรรค์** (`fire`, was เพลิงสวรรค์), คัมภีร์ทานตะวัน, วิชาเก้าเอี้ยง, คัมภีร์เก้าอิม.
+- **Removed:** the T4 moves `ft` ขลุ่ยสะท้านฟ้า, `nu1` มังกรฟ้า, `ng1` เก้าฟ้าหนึ่งกระบี่, `ng4` หมัดพระอินทร์, `ng6` ขลุ่ยพลิกโลก and the T4 arts `lotus`, `scholar`, `poison`, `heaven`, `snow`, `sand`, `shadow`, `shenzhao`, `taiyin`, `huoxue`, `dongxuan`. None could be earned. Foes that used them now fight with the nearest kept or sect move (`nu1`→`ng5`, `ng1`→`dgjj`, `ng4`→`lmsj`; arts → `qiankun`, `np`, `t4_huashan_purple`, `t4_tang_skycleaver`, `t4_tang_tenkpoisons`, `t4_em_bodhi`, `blood`). The `scholar` damage bonus in `battle.ts` / grid `ai.ts` and four grid overrides went with them. Saves drop the ids on load (`validateAndRepair`).
+- Now 173 move skills and 111 inner arts.
+
 ### Foes roam roads and wilds, not towns
 
 - **Cities, villages, homes, inns, sects, temples and the palace no longer spawn foes** while you walk. Roads, caves, mountains, valleys, isles and deserts still do.

@@ -2,7 +2,7 @@
 
 # Quests
 
-882 quests: 16 main, 429 side, 97 sect quests (15 of them art quests). 0 are marked `isMajor` (completing one spreads a rumor about the hero). 2426 stages in total: 997 advance on their own (`autoAdvance`), 542 are hands-on objectives (`objective`), the rest are dialog beats or the final hand-in. 776 quests have an offer scene (`qs_<id>_offer`) and 773 a completion scene (`qs_<id>_complete`).
+1115 quests: 16 main, 429 side, 97 sect quests (15 of them art quests). 0 are marked `isMajor` (completing one spreads a rumor about the hero). 3075 stages in total: 1140 advance on their own (`autoAdvance`), 815 are hands-on objectives (`objective`), the rest are dialog beats or the final hand-in. 1009 quests have an offer scene (`qs_<id>_offer`) and 1006 a completion scene (`qs_<id>_complete`).
 
 Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assassinate** / **trait** / **flag** = `autoAdvance` condition types · **objective** = map spot, person or scene the hero uses in person (`stage.objective`, ×n = several spots) · **dialog** = advanced by an `advanceQuest` choice in a scene · **turn-in** = last stage, closed at the turn-in person or by the completion scene.
 

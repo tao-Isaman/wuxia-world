@@ -160,7 +160,7 @@ const TAIJI_FIST: StoryArcSpec = {
     { id: "st_vajra_finger_heir", name: "ทายาทนิ้ววัชระ", ti: 4, category: "human",
       look: { sheet: "bandit", tint: 0xd9a066, size: 1.15 },
       stats: { STR: 18, DEX: 16, VIT: 14, AGI: 10 },
-      skillIds: ["ng4", "nu2", "jy_grapple", "sl_rock_punch"], artId: "diamond", artLevel: 7 },
+      skillIds: ["lmsj", "nu2", "jy_grapple", "sl_rock_punch"], artId: "diamond", artLevel: 7 },
   ],
   chapters: [
     {

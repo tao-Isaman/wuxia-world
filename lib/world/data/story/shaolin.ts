@@ -210,7 +210,7 @@ const THOUSAND_ARMS: StoryArcSpec = {
     { id: "st_shaolin_thirteen_fists", name: "เหลยเจิ้น จอมหมัดสิบสาม", ti: 4, category: "human",
       look: { sheet: "bandit", tint: 0xb87a5a, size: 1.1 },
       stats: { STR: 20, VIT: 12, AGI: 12, DEX: 10 },
-      skillIds: ["nu2", "ng4", "nf5", "na2"], artId: "blood", artLevel: 6 },
+      skillIds: ["nu2", "lmsj", "nf5", "na2"], artId: "blood", artLevel: 6 },
   ],
   chapters: [
     {
@@ -780,7 +780,7 @@ const TRUTH_STAFF: StoryArcSpec = {
     { id: "st_shaolin_lion_mourner", name: "หลิวอู๋ฮุ่ย ผู้สวมขนราชสีห์", ti: 4, category: "human",
       look: { sheet: "m4", tint: 0xe0b040, size: 1.1 },
       stats: { STR: 16, POW: 14, VIT: 14, AGI: 10 },
-      skillIds: ["ng2", "ne11", "nh1", "nf3"], artId: "huoxue", artLevel: 6 },
+      skillIds: ["ng2", "ne11", "nh1", "nf3"], artId: "blood", artLevel: 6 },
   ],
   chapters: [
     {

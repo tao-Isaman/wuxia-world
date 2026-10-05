@@ -3,7 +3,7 @@ import { withTextOverrides } from "./text-overrides";
 
 // ─── Move skills (วิชาฝีมือ) ─────────────────────────────────────────
 //
-// 178 skills across 5 tiers (incl. 9 bst_* beast moves), organised by sect
+// 173 skills across 5 tiers (incl. 9 bst_* beast moves), organised by sect
 // first, then by tier.
 // Sect names follow SECT_ORDER (lib/game/data/sects.ts); unaffiliated / generic
 // techniques live under "ยุทธจักร" (JIANGHU_SECT) at the bottom.
@@ -226,15 +226,10 @@ export const SKILLS: readonly Skill[] = withTextOverrides<Skill>("skills", [
   { id: "nf7", n: "แส้เก้าหัว", sc: "ยุทธจักร", ti: 3, w: "hidden", mg: 80, st: { DEX: 12, AGI: 10, LUK: 2, VIT: 1 }, at: "phy", bp: 75, p: 0, f: 0, dm: 1, hits: 9, se: null, ee: { t: "multi_debuff", av: -18, ev: -18, u: 5 }, d: "Phy แส้เก้าหัว ฟาด 9 ครั้ง + Acc-18 Eva-18 (3 ตา)", types: ["soft"] },
   { id: "nf8", n: "พัดเพลิงสวรรค์", sc: "ยุทธจักร", ti: 3, w: "short", mg: 80, st: { POW: 11, INT: 11, DEX: 2, AGI: 1 }, at: "int", bp: 70, p: 0, f: 0, dm: 1.1, se: null, ee: { t: "debuff_acc", v: -20, u: 5 }, d: "Int×1.1 + Acc-20 (2 ตา)", types: ["yang", "internal"] },
   { id: "lmsj", n: "กระบี่ 6 ชีพจร", sc: "ยุทธจักร", ti: 4, w: "fist", mg: 100, st: { POW: 10, INT: 9, DEX: 3, AGI: 8 }, at: "int", bp: 100, p: 40, f: 0, dm: 1.2, hits: 6, se: { t: "stack_atk", v: 10, mx: 2 }, ee: null, d: "Int×120% bp×140% · ตี 6 ชีพจร + ATK+10% (≤2 ซ้อน) — 六脉神剑 ตำนานยุทธจักรไม่ผูกสำนัก", types: ["yang", "internal"] },
-  { id: "ft", n: "ขลุ่ยสะท้านฟ้า", sc: "ยุทธจักร", ti: 4, w: "music", mg: 100, st: { POW: 9, INT: 8, AGI: 5, DEX: 8 }, at: "int", bp: 75, p: 30, f: 0, dm: 1, se: { t: "buff_reduce", v: 20, u: 5 }, ee: null, d: "Int×130% + ลด dmg 20% (2 ตา)", types: ["yin", "internal"] },
-  { id: "nu1", n: "มังกรฟ้า", sc: "ยุทธจักร", ti: 4, w: "blade", mg: 100, st: { POW: 11, INT: 8, AGI: 3, DEX: 8 }, at: "int", bp: 90, p: 30, f: 0, dm: 1, se: { t: "stack_atk", v: 8, mx: 3 }, ee: null, d: "Int×130% + ATK+8% (≤3 ซ้อน)", types: ["yang", "internal"] },
   { id: "nu2", n: "หมัดสะท้านจักรวาล", sc: "ยุทธจักร", ti: 4, w: "fist", mg: 100, st: { STR: 11, VIT: 7, POW: 4, DEX: 8 }, at: "phy", bp: 95, p: 30, f: 0, dm: 1, se: null, ee: { t: "multi_debuff", av: -20, ev: -20, u: 5 }, d: "Phy×130% + Acc-20 Eva-20 (3 ตา)", types: ["yang", "external"] },
-  { id: "ng1", n: "เก้าฟ้าหนึ่งกระบี่", sc: "ยุทธจักร", ti: 4, w: "sword", mg: 100, st: { POW: 10, INT: 9, AGI: 3, DEX: 8 }, at: "int", bp: 88, p: 30, f: 0, dm: 1, se: { t: "buff_reduce", v: 25, u: 5 }, ee: null, d: "Int×130% + ลดdmg 25% (2 ตา)", types: ["yang", "internal"] },
   { id: "ng2", n: "ทวนประจักษ์พยาน", sc: "ยุทธจักร", ti: 4, w: "long", mg: 100, st: { STR: 10, VIT: 8, AGI: 4, DEX: 8 }, at: "phy", bp: 98, p: 30, f: 0, dm: 1, se: null, ee: { t: "debuff_eva", v: -25, u: 5 }, d: "Phy×130% + Eva-25 (3 ตา)", types: ["yang", "hard"] },
   { id: "dgjj", n: "เก้ากระบี่เดียวดาย", sc: "ยุทธจักร", ti: 4, w: "sword", mg: 100, st: { STR: 7, AGI: 9, DEX: 6, LUK: 8 }, at: "phy", bp: 90, p: 30, f: 0, dm: 1.2, hits: 9, se: { t: "buff_spd", v: 60, u: 5 }, ee: { t: "debuff_eva", v: -20, u: 5 }, d: "Phy×130% · ตี 9 กระบี่ + SPD+60(2ตา) + Eva-20(2ตา) — 独孤九剑 ตำนานยุทธจักรไม่ผูกสำนัก", types: ["yang"] },
-  { id: "ng4", n: "หมัดพระอินทร์", sc: "ยุทธจักร", ti: 4, w: "fist", mg: 100, st: { POW: 11, INT: 8, LUK: 3, DEX: 8 }, at: "int", bp: 85, p: 0, f: 0, dm: 1.2, se: null, ee: { t: "multi_debuff", av: -25, ev: -25, u: 5 }, d: "Int×120% + Acc-25 Eva-25 (3 ตา)", types: ["yang", "internal"] },
   { id: "ng5", n: "ดาบยาวเทพสังหาร", sc: "ยุทธจักร", ti: 4, w: "blade", mg: 100, st: { STR: 11, DEX: 7, AGI: 4, LUK: 8 }, at: "phy", bp: 100, p: 30, f: 0, dm: 1, se: null, ee: { t: "debuff_def", v: -25, u: 5 }, d: "Phy×130% + PDef-25 (3 ตา)", types: ["yang", "hard"] },
-  { id: "ng6", n: "ขลุ่ยพลิกโลก", sc: "ยุทธจักร", ti: 4, w: "music", mg: 100, st: { POW: 10, INT: 9, DEX: 3, AGI: 8 }, at: "int", bp: 82, p: 25, f: 0, dm: 1, se: null, ee: { t: "poison_dmg", pp: 16, u: 5 }, d: "Int×125% + พิษ 16%HP/ตา (5ตา) — ขลุ่ยพลิกโลกหลอนพิษ", types: ["yin", "internal"] },
 ]);
 
 export const SKILLS_BY_ID: Map<string, Skill> = new Map(SKILLS.map((s) => [s.id, s]));

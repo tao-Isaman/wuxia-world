@@ -100,7 +100,7 @@ const FIVE_PALM: StoryArcSpec = {
     { id: "st_outsider_sixfold_dushi", name: "ตู๋ซื่อ มือพิษหกธาตุ", ti: 4, category: "human",
       look: { npc: DUSHI, size: 1.12 },
       stats: { DEX: 18, POW: 16, VIT: 14, AGI: 12 },
-      skillIds: ["xx_palm", "tang_viperblade", "bst_venom", "xy_root_poison_fist"], artId: "poison", artLevel: 7 },
+      skillIds: ["xx_palm", "tang_viperblade", "bst_venom", "xy_root_poison_fist"], artId: "np", artLevel: 7 },
   ],
   chapters: [
     {

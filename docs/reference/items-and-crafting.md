@@ -2,7 +2,7 @@
 
 # Items, shops, crafting and gathering
 
-392 items (`lib/world/data/items.ts`), 19 shops, 7 martial halls, 49 artisans, 32 recipes and 25 gathering / hunting nodes.
+376 items (`lib/world/data/items.ts`), 19 shops, 7 martial halls, 49 artisans, 32 recipes and 25 gathering / hunting nodes.
 
 ## Contents
 
@@ -91,7 +91,7 @@
 | `alpha_inter` | อักษรงดงาม | 300 | train writing +80 xp |
 | `alpha_master` | อักษรเทพนิยม | 800 | train writing +180 xp |
 
-### ตำราวิชา (`manual`, 313)
+### ตำราวิชา (`manual`, 297)
 
 | Id | Name | Price | Use |
 | --- | --- | --- | --- |
@@ -100,23 +100,23 @@
 | `man_nc3` | ตำรากระบี่น้ำ | 200 | learn กระบี่น้ำ (POW ≥ 0) |
 | `man_nc7` | ตำราดาบยาวพื้นฐาน | 200 | learn ดาบยาวพื้นฐาน (STR ≥ 0) |
 | `man_nc9` | ตำราพัดพื้นฐาน | 200 | learn พัดพื้นฐาน (POW ≥ 0) |
-| `man_nd3` | ตำราดาบดาวเหนือ | 800 | learn ดาบดาวเหนือ (STR ≥ 10) |
-| `man_nm1` | ตำราดาบน้ำค้าง | 800 | learn ดาบน้ำค้าง (POW ≥ 10) |
-| `man_nm2` | ตำราฝ่ามือเกราะ | 800 | learn ฝ่ามือเกราะ (STR ≥ 10) |
-| `man_nd9` | ตำราเข็มตีจุด | 800 | learn เข็มตีจุด (DEX ≥ 10) |
-| `man_nd10` | ตำรากรงเล็บเพลิง | 800 | learn กรงเล็บเพลิง (STR ≥ 10) |
-| `man_nd11` | ตำรากระบี่ลม | 800 | learn กระบี่ลม (AGI ≥ 10) |
-| `man_pn` | ตำราเข็มพิษ | 800 | learn เข็มพิษ (DEX ≥ 10) |
-| `man_ne8` | ตำราหมัดเมา | 2000 | learn หมัดเมา (AGI ≥ 15) |
+| `man_nd3` | ตำราดาบดาวเหนือ | 800 | learn ดาบดาวเหนือ (STR ≥ 5) |
+| `man_nm1` | ตำราดาบน้ำค้าง | 800 | learn ดาบน้ำค้าง (POW ≥ 5) |
+| `man_nm2` | ตำราฝ่ามือเกราะ | 800 | learn ฝ่ามือเกราะ (STR ≥ 5) |
+| `man_nd9` | ตำราเข็มตีจุด | 800 | learn เข็มตีจุด (DEX ≥ 5) |
+| `man_nd10` | ตำรากรงเล็บเพลิง | 800 | learn กรงเล็บเพลิง (STR ≥ 5) |
+| `man_nd11` | ตำรากระบี่ลม | 800 | learn กระบี่ลม (AGI ≥ 5) |
+| `man_pn` | ตำราเข็มพิษ | 800 | learn เข็มพิษ (DEX ≥ 5) |
+| `man_ne8` | ตำราหมัดเมา | 2000 | learn หมัดเมา (AGI ≥ 8) |
 | `man_t0_sevenstar` | ตำราคัมภีร์เจ็ดดาวเหนือ | 300 | learn เจ็ดดาวเหนือ (AGI ≥ 0) |
 | `man_t0_fiveyuan` | ตำราคัมภีร์ห้าธาตุพื้นฐาน | 300 | learn ห้าธาตุพื้นฐาน (VIT ≥ 0) |
 | `man_t0_ironshirt` | ตำราคัมภีร์เกราะผ้าเหล็กพื้น | 300 | learn เกราะผ้าเหล็กพื้น (VIT ≥ 0) |
-| `man_t1_redlotus` | ตำราคัมภีร์บัวแดงเพลิงน้อย | 1000 | learn บัวแดงเพลิงน้อย (POW ≥ 10) |
-| `man_t1_blackiron` | ตำราคัมภีร์ลมปราณเหล็กดำ | 1000 | learn ลมปราณเหล็กดำ (POW ≥ 10) |
-| `man_t1_eagleclaw` | ตำราคัมภีร์ลมปราณกรงเล็บอินทรี | 1000 | learn ลมปราณกรงเล็บอินทรี (STR ≥ 10) |
-| `man_t1_whitehorse` | ตำราคัมภีร์ลมปราณม้าขาว | 1000 | learn ลมปราณม้าขาว (AGI ≥ 10) |
-| `man_t2_plumblossom` | ตำราคัมภีร์ลมปราณเหมยห้ากลีบ | 2500 | learn ลมปราณเหมยห้ากลีบ (POW ≥ 15) |
-| `man_t2_eighttri` | ตำราคัมภีร์แปดทิศมหาเวท | 2500 | learn แปดทิศมหาเวท (DEX ≥ 15) |
+| `man_t1_redlotus` | ตำราคัมภีร์บัวแดงเพลิงน้อย | 1000 | learn บัวแดงเพลิงน้อย (POW ≥ 5) |
+| `man_t1_blackiron` | ตำราคัมภีร์ลมปราณเหล็กดำ | 1000 | learn ลมปราณเหล็กดำ (POW ≥ 5) |
+| `man_t1_eagleclaw` | ตำราคัมภีร์ลมปราณกรงเล็บอินทรี | 1000 | learn ลมปราณกรงเล็บอินทรี (STR ≥ 5) |
+| `man_t1_whitehorse` | ตำราคัมภีร์ลมปราณม้าขาว | 1000 | learn ลมปราณม้าขาว (AGI ≥ 5) |
+| `man_t2_plumblossom` | ตำราคัมภีร์ลมปราณเหมยห้ากลีบ | 2500 | learn ลมปราณเหมยห้ากลีบ (POW ≥ 8) |
+| `man_t2_eighttri` | ตำราคัมภีร์แปดทิศมหาเวท | 2500 | learn แปดทิศมหาเวท (DEX ≥ 8) |
 | `scroll_skill_sf` | คัมภีร์หมัดเส้าหลิน | 0 | learn หมัดเส้าหลิน (STR ≥ 0) |
 | `scroll_skill_sl_long_dharma` | คัมภีร์หมัดยาวพุทธธรรม | 0 | learn หมัดยาวพุทธธรรม (STR ≥ 0) |
 | `scroll_skill_nd5` | คัมภีร์หมัดอรหันต์ | 0 | learn หมัดอรหันต์ (STR ≥ 0) |
@@ -277,15 +277,10 @@
 | `scroll_skill_nf7` | คัมภีร์แส้เก้าหัว | 0 | learn แส้เก้าหัว (STR ≥ 0) |
 | `scroll_skill_nf8` | คัมภีร์พัดเพลิงสวรรค์ | 0 | learn พัดเพลิงสวรรค์ (STR ≥ 0) |
 | `scroll_skill_lmsj` | คัมภีร์กระบี่ 6 ชีพจร | 0 | learn กระบี่ 6 ชีพจร (STR ≥ 0) |
-| `scroll_skill_ft` | คัมภีร์ขลุ่ยสะท้านฟ้า | 0 | learn ขลุ่ยสะท้านฟ้า (STR ≥ 0) |
-| `scroll_skill_nu1` | คัมภีร์มังกรฟ้า | 0 | learn มังกรฟ้า (STR ≥ 0) |
 | `scroll_skill_nu2` | คัมภีร์หมัดสะท้านจักรวาล | 0 | learn หมัดสะท้านจักรวาล (STR ≥ 0) |
-| `scroll_skill_ng1` | คัมภีร์เก้าฟ้าหนึ่งกระบี่ | 0 | learn เก้าฟ้าหนึ่งกระบี่ (STR ≥ 0) |
 | `scroll_skill_ng2` | คัมภีร์ทวนประจักษ์พยาน | 0 | learn ทวนประจักษ์พยาน (STR ≥ 0) |
 | `scroll_skill_dgjj` | คัมภีร์เก้ากระบี่เดียวดาย | 0 | learn เก้ากระบี่เดียวดาย (STR ≥ 0) |
-| `scroll_skill_ng4` | คัมภีร์หมัดพระอินทร์ | 0 | learn หมัดพระอินทร์ (STR ≥ 0) |
 | `scroll_skill_ng5` | คัมภีร์ดาบยาวเทพสังหาร | 0 | learn ดาบยาวเทพสังหาร (STR ≥ 0) |
-| `scroll_skill_ng6` | คัมภีร์ขลุ่ยพลิกโลก | 0 | learn ขลุ่ยพลิกโลก (STR ≥ 0) |
 | `scroll_art_t0_lohan` | คัมภีร์ลมปราณอรหันต์ | 0 | learn ลมปราณอรหันต์ (STR ≥ 0) |
 | `scroll_art_t1_goldenbell` | คัมภีร์กระดิ่งทองพื้นฐาน | 0 | learn กระดิ่งทองพื้นฐาน (STR ≥ 0) |
 | `scroll_art_t2_dharma` | คัมภีร์ลมปราณพุทธธรรม | 0 | learn ลมปราณพุทธธรรม (STR ≥ 0) |
@@ -392,19 +387,8 @@
 | `scroll_art_t3_dragonelephant` | คัมภีร์มังกร-ช้างปัญญา | 0 | learn มังกร-ช้างปัญญา (STR ≥ 0) |
 | `scroll_art_t3_heartmind` | คัมภีร์วิชากลใจเป็นจิต | 0 | learn วิชากลใจเป็นจิต (STR ≥ 0) |
 | `scroll_art_t3_voidstep` | คัมภีร์ก้าวว่างไร้รอย | 0 | learn ก้าวว่างไร้รอย (STR ≥ 0) |
-| `scroll_art_military` | คัมภีร์จวินเจิ้นชี่ | 0 | learn จวินเจิ้นชี่ (STR ≥ 0) |
-| `scroll_art_lotus` | คัมภีร์เหลียนฮวาชี่ | 0 | learn เหลียนฮวาชี่ (STR ≥ 0) |
-| `scroll_art_scholar` | คัมภีร์เหวินชี่ | 0 | learn เหวินชี่ (STR ≥ 0) |
-| `scroll_art_poison` | คัมภีร์อินตู๋ชี่ | 0 | learn อินตู๋ชี่ (STR ≥ 0) |
-| `scroll_art_heaven` | คัมภีร์เฉียนคุนต้าฝ่า | 0 | learn เฉียนคุนต้าฝ่า (STR ≥ 0) |
-| `scroll_art_snow` | คัมภีร์กำแพงหิมะ | 0 | learn กำแพงหิมะ (STR ≥ 0) |
-| `scroll_art_fire` | คัมภีร์เพลิงสวรรค์ | 0 | learn เพลิงสวรรค์ (STR ≥ 0) |
-| `scroll_art_sand` | คัมภีร์พายุทราย | 0 | learn พายุทราย (STR ≥ 0) |
-| `scroll_art_shadow` | คัมภีร์เงาสังหาร | 0 | learn เงาสังหาร (STR ≥ 0) |
-| `scroll_art_shenzhao` | คัมภีร์เซินจ้าวจิง | 0 | learn เซินจ้าวจิง (STR ≥ 0) |
-| `scroll_art_taiyin` | คัมภีร์ไต้อินเจิ้นชี่ | 0 | learn ไต้อินเจิ้นชี่ (STR ≥ 0) |
-| `scroll_art_huoxue` | คัมภีร์ฮั่วเสวียสินฝ่า | 0 | learn ฮั่วเสวียสินฝ่า (STR ≥ 0) |
-| `scroll_art_dongxuan` | คัมภีร์ตงซวนเซินกง | 0 | learn ตงซวนเซินกง (STR ≥ 0) |
+| `scroll_art_military` | คัมภีร์เคล็ดวิชาภูผาทะลายทัพ | 0 | learn เคล็ดวิชาภูผาทะลายทัพ (STR ≥ 0) |
+| `scroll_art_fire` | คัมภีร์ตำราเพลิงสวรรค์ | 0 | learn ตำราเพลิงสวรรค์ (STR ≥ 0) |
 | `scroll_art_khbt` | คัมภีร์คัมภีร์ทานตะวัน | 0 | learn คัมภีร์ทานตะวัน (STR ≥ 0) |
 | `scroll_art_kuyt` | คัมภีร์วิชาเก้าเอี้ยง | 0 | learn วิชาเก้าเอี้ยง (STR ≥ 0) |
 | `scroll_art_kgim` | คัมภีร์คัมภีร์เก้าอิม | 0 | learn คัมภีร์เก้าอิม (STR ≥ 0) |

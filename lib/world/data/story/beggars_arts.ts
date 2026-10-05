@@ -733,7 +733,7 @@ const WANDERER: StoryArcSpec = {
     { id: "st_beggarsarts_redplum_heir", name: "นายน้อยคฤหาสน์เหมยแดง", ti: 4, category: "human",
       look: { sheet: "m3", tint: 0xd46a6a, size: 1.05 },
       stats: { STR: 14, DEX: 18, AGI: 16, VIT: 12, INT: 10 },
-      skillIds: ["ne12", "nh2", "ng1", "pn"], artId: "snow", artLevel: 7 },
+      skillIds: ["ne12", "nh2", "dgjj", "pn"], artId: "t4_huashan_purple", artLevel: 7 },
   ],
   chapters: [
     // ── 1 ──

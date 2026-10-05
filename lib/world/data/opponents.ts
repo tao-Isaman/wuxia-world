@@ -244,7 +244,7 @@ export const OPPONENTS: readonly OpponentDef[] = [
     drops: [...DROPS_T3, { itemId: "snow_lotus", weight: 1 }],
     build: () => build("ปีศาจหิมะ", 3, {
       stats: { POW: 7, INT: 5, VIT: 7 },
-      artId: "snow", artLevel: 4,
+      artId: "t4_huashan_purple", artLevel: 4,
       skillIds: ["nm1", "ne7"],
     }) },
   { id: "sect_elder", name: "ผู้อาวุโสสำนัก", ti: 3, category: "human", drops: DROPS_T3,
@@ -275,14 +275,14 @@ export const OPPONENTS: readonly OpponentDef[] = [
   { id: "heretical_grandmaster", name: "เจ้าสำนักอธรรม", ti: 4, category: "human", drops: DROPS_T4,
     build: () => build("เจ้าสำนักอธรรม", 4, {
       stats: { POW: 10, INT: 9, DEX: 8 },
-      artId: "shadow", artLevel: 8,
+      artId: "t4_tang_tenkpoisons", artLevel: 8,
       skillIds: ["nf6", "wd_palm", "nf7", "nf8"],
     }) },
   { id: "immortal_warrior", name: "นักรบอมตะ", ti: 4, category: "supernatural", drops: DROPS_T4,
     build: () => build("นักรบอมตะ", 4, {
       stats: { STR: 12, VIT: 12, DEF: 10 },
       artId: "diamond", artLevel: 9,
-      skillIds: ["ep", "ng3", "nu1", "ng2"],
+      skillIds: ["ep", "ng3", "ng5", "ng2"],
     }) },
 
   // ─── Hunt-only beasts (tier 0–2) ───────────────────────────────
@@ -1549,7 +1549,7 @@ export const OPPONENTS: readonly OpponentDef[] = [
       stats: { POW: 22, INT: 20, AGI: 18, DEX: 18, VIT: 16, DEF: 14, LUK: 12 },
       artId: "fire", artLevel: 10,
       skillIds: ["sl_petal_finger", "ynss", "qzjf", "yxjf"],
-      extraArtSlots: ["fire", "zixia", "scholar"],
+      extraArtSlots: ["fire", "zixia", "qiankun"],
       artLevels: { fire: 10, zixia: 10, scholar: 10 },
     }) },
 
@@ -1563,7 +1563,7 @@ export const OPPONENTS: readonly OpponentDef[] = [
       stats: { STR: 20, POW: 22, INT: 20, VIT: 22, DEF: 18, DEX: 16, AGI: 16, LUK: 10 },
       artId: "kgim", artLevel: 10,
       skillIds: ["dgjj", "ansh", "sl_truth_staff", "sl_thousand_arms", "wd_palm"],
-      extraArtSlots: ["kgim", "shadow", "heaven"],
+      extraArtSlots: ["kgim", "t4_tang_tenkpoisons", "qiankun"],
       artLevels: { kgim: 10, shadow: 10, heaven: 10 },
     }) },
 
@@ -1976,7 +1976,7 @@ export const OPPONENTS: readonly OpponentDef[] = [
     look: { sheet: "m1", tint: 0xa8c8ff },
     build: () => build("วิญญาณจอมกระบี่", 3, {
       stats: { DEX: 9, AGI: 9, POW: 7 },
-      artId: "shadow", artLevel: 4,
+      artId: "t4_tang_tenkpoisons", artLevel: 4,
       skillIds: ["nh2", "nf2", "ne12"],
     }) },
   { id: "elite_bandit_king", name: "ราชาโจรภูเขา", ti: 4, category: "human",
@@ -1995,9 +1995,9 @@ export const OPPONENTS: readonly OpponentDef[] = [
     pack: { opponentId: "demon_cult_zealot", count: 3 },
     build: () => build("ผู้อาวุโสลัทธิมาร", 4, {
       stats: { POW: 18, INT: 14, DEX: 14, VIT: 12, AGI: 10 },
-      artId: "huoxue", artLevel: 8,
-      skillIds: ["nf7", "nf4", "ng4"],
-      extraArtSlots: ["huoxue"],
+      artId: "blood", artLevel: 8,
+      skillIds: ["nf7", "nf4", "lmsj"],
+      extraArtSlots: ["blood"],
     }) },
   { id: "elite_bear_king", name: "ราชาหมีพันปี", ti: 4, category: "beast",
     drops: [...DROPS_T4, { itemId: "bear_claw", weight: 4 }],
@@ -2015,9 +2015,9 @@ export const OPPONENTS: readonly OpponentDef[] = [
     pack: [{ opponentId: "thug", count: 2 }, { opponentId: "night_blade", count: 1 }],
     build: () => build("เถ้าแก่โจวตลาดมืด", 4, {
       stats: { STR: 12, DEX: 16, AGI: 14, LUK: 14, VIT: 12 },
-      artId: "shadow", artLevel: 8,
+      artId: "t4_tang_tenkpoisons", artLevel: 8,
       skillIds: ["ch", "nf8", "ne4", "jy_grapple"],
-      extraArtSlots: ["shadow"],
+      extraArtSlots: ["t4_tang_tenkpoisons"],
     }) },
   { id: "elite_villain_xie", name: "ทูตเซี่ยแห่งสำนักดาบโลหิต", ti: 4, category: "human",
     drops: DROPS_T4,
@@ -2035,9 +2035,9 @@ export const OPPONENTS: readonly OpponentDef[] = [
     pack: [{ opponentId: "bandit_lieutenant", count: 1 }, { opponentId: "bandit_archer", count: 2 }],
     build: () => build("ขุนนางหยานทุจริต", 4, {
       stats: { INT: 18, POW: 14, DEX: 12, VIT: 12 },
-      artId: "scholar", artLevel: 8,
+      artId: "qiankun", artLevel: 8,
       skillIds: ["jy_execution_sword", "jy_chainmaster", "zs", "nf2"],
-      extraArtSlots: ["scholar"],
+      extraArtSlots: ["qiankun"],
     }) },
   { id: "elite_villain_qing", name: "หัวหน้าโจรชิง", ti: 4, category: "human",
     drops: [...DROPS_T4, { itemId: "ancient_coin", weight: 4 }, { itemId: "jade", weight: 2 }],
@@ -2055,9 +2055,9 @@ export const OPPONENTS: readonly OpponentDef[] = [
     pack: { opponentId: "night_blade", count: 2 },
     build: () => build("นักฆ่าเงาหยิง", 4, {
       stats: { DEX: 20, AGI: 18, LUK: 12, STR: 10 },
-      artId: "shadow", artLevel: 8,
+      artId: "t4_tang_tenkpoisons", artLevel: 8,
       skillIds: ["tang_heartpierce", "jy_chain_assassin", "tang_viperblade", "nf8"],
-      extraArtSlots: ["shadow"],
+      extraArtSlots: ["t4_tang_tenkpoisons"],
     }) },
   { id: "elite_villain_zhao", name: "เจ้าลัทธิจ้าวมังกรเทพ", ti: 4, category: "human",
     drops: [...DROPS_T4, { itemId: "ginseng", weight: 3 }],
@@ -2065,9 +2065,9 @@ export const OPPONENTS: readonly OpponentDef[] = [
     pack: { opponentId: "demon_cult_zealot", count: 3 },
     build: () => build("เจ้าลัทธิจ้าวมังกรเทพ", 4, {
       stats: { POW: 18, INT: 14, VIT: 14, STR: 12 },
-      artId: "huoxue", artLevel: 8,
-      skillIds: ["nu2", "ng4", "nf4", "mi_firepalm"],
-      extraArtSlots: ["huoxue"],
+      artId: "blood", artLevel: 8,
+      skillIds: ["nu2", "lmsj", "nf4", "mi_firepalm"],
+      extraArtSlots: ["blood"],
     }) },
   { id: "elite_villain_dushi", name: "ผู้อาวุโสตู๋ซื่อ", ti: 4, category: "human",
     drops: [...DROPS_T4, { itemId: "scorpion_venom", weight: 4 }],
@@ -2096,7 +2096,7 @@ export const OPPONENTS: readonly OpponentDef[] = [
     build: () => build("ดาบเลือดเซียะลาง", 4, {
       stats: { STR: 20, AGI: 14, DEX: 12, VIT: 12 },
       artId: "blood", artLevel: 8,
-      skillIds: ["bs", "nf6", "ng5", "nu1"],
+      skillIds: ["bs", "nf6", "ng5", "ng2"],
       extraArtSlots: ["blood"],
     }) },
   { id: "elite_villain_dushou", name: "ศิษย์ตู๋โซ่ว", ti: 4, category: "human",
@@ -2105,9 +2105,9 @@ export const OPPONENTS: readonly OpponentDef[] = [
     pack: { opponentId: "demon_cult_zealot", count: 2 },
     build: () => build("ศิษย์ตู๋โซ่ว", 4, {
       stats: { DEX: 18, POW: 14, INT: 12, AGI: 12 },
-      artId: "poison", artLevel: 8,
+      artId: "np", artLevel: 8,
       skillIds: ["xx_palm", "pn", "nd9", "tang_starrain"],
-      extraArtSlots: ["poison"],
+      extraArtSlots: ["np"],
     }) },
 ];
 
