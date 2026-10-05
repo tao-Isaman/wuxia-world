@@ -448,7 +448,9 @@ check("decline and drop: every lineage / saga offer can be turned down, and an a
     if (!(offer.choices ?? []).some((c) => c.text === DECLINE_TEXT && !starts(c))) err(`${q.id}: offer has no ${DECLINE_TEXT}`);
     if (!(offer.choices ?? []).some(starts)) err(`${q.id}: offer cannot be accepted`);
   }
-  const l = LINEAGE_SPECS.find((x) => inScope(STORY_RESOLVERS.martial(x.kind, x.id)!.sc))!;
+  // The jianghu sagas have no lineage quests: then the drop check below has nothing to drop.
+  const l = LINEAGE_SPECS.find((x) => inScope(STORY_RESOLVERS.martial(x.kind, x.id)!.sc));
+  if (!l) return;
   const def = getQuest(lineageQuestId(l))!;
   store().startNewGame({ name: "ผู้ทดสอบ", gender: "female" } as never);
   empower(STORY_RESOLVERS.martial(l.kind, l.id)!.sc);
