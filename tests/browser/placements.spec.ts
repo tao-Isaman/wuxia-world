@@ -35,35 +35,46 @@ async function goTo(page: Page, locationId: string) {
 }
 
 test("placed objects are drawn on their map and the hero cannot walk through a blocking one", async ({ page }) => {
-  // The capital walks as in the game: a tiled ground replaces its painting (and the painting's collision).
+  // Chang'an walks as a placed map would: a tiled ground replaces its painting (and the painting's collision).
+  // The fixture's capital placements stay: the capital is a draft (DRAFT_PLACED_MAPS), so the game ignores them.
   const tile = { ...MANIFEST.assets[0], id: "til_test_ground", category: "tile", subcategory: "ground", footprint: null,
     layer: "ground", mapWidth: 32, mapHeight: 32 };
-  await serve(page, { ...PLACEMENTS, grounds: { city_capital: { tile: tile.id } } }, { ...MANIFEST, assets: [...MANIFEST.assets, tile] });
+  const changan = [
+    { id: "p_000011", asset: "prop_test_crate", x: 560, y: 384 },
+    { id: "p_000012", asset: "nat_test_pine", x: 624, y: 600, flip: true },
+    { id: "p_000013", asset: "prop_test_arch", x: 324, y: 582 },
+  ];
+  await serve(page, { ...PLACEMENTS, maps: { ...PLACEMENTS.maps, city_changan: changan },
+    grounds: { city_changan: { tile: tile.id }, city_capital: { tile: tile.id } } }, { ...MANIFEST, assets: [...MANIFEST.assets, tile] });
   await startGame(page);
   const world = page.getByTestId("world-canvas");
   // The opening map has no placements: nothing drawn, nothing changed.
   await expect(world).toHaveAttribute("data-placements", "0");
 
+  // The draft capital keeps its painting: no placements, no ground.
   await goTo(page, "city_capital");
+  await expect(world).toHaveAttribute("data-placements", "0");
+
+  await goTo(page, "city_changan");
   await expect(world).toHaveAttribute("data-placements", "3");
-  await expect(world).toHaveAttribute("data-placement-ids", "p_000001 p_000002 p_000003");
-  // The hero starts on the plaza (555.8, 341.8); the crate's footprint spans x 616–656 on that line.
-  expect(Number(await world.getAttribute("data-player-x"))).toBeCloseTo(555.8, 0);
+  await expect(world).toHaveAttribute("data-placement-ids", "p_000011 p_000012 p_000013");
+  // The hero starts at the spawn (480, 384); the crate's footprint spans x 540–580 on that line.
+  expect(Number(await world.getAttribute("data-player-x"))).toBeCloseTo(480, 0);
   await world.focus();
   await page.keyboard.down("d");
   await page.waitForTimeout(1_200);
   await page.keyboard.up("d");
   await page.waitForTimeout(300);
   const x = Number(await world.getAttribute("data-player-x"));
-  expect(x).toBeGreaterThan(586);
-  expect(x).toBeLessThanOrEqual(610.5);
+  expect(x).toBeGreaterThan(510.2);
+  expect(x).toBeLessThanOrEqual(534.7);
   await page.screenshot({ path: "test-results/screenshots/placements-game.png" });
 
   // Tap-to-walk past the crate takes a detour and arrives on the far side.
   const target = await world.evaluate((host: HTMLElement & { worldScreenPoint?: (x: number, y: number) => { x: number; y: number } }) =>
-    host.worldScreenPoint!(686, 342));
+    host.worldScreenPoint!(610, 384));
   await page.mouse.click(target.x, target.y);
-  await expect.poll(async () => Number(await world.getAttribute("data-player-x")), { timeout: 8_000 }).toBeGreaterThan(676);
+  await expect.poll(async () => Number(await world.getAttribute("data-player-x")), { timeout: 8_000 }).toBeGreaterThan(600);
 });
 
 test("engineGoto (dev hook, local flag) moves the hero to a map and previews the editor's placements", async ({ page }) => {
