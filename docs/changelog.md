@@ -6,6 +6,11 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-05
 
+### Meridian charts ask more and give more
+
+- **Every chart now needs more moves, mixed across tiers** (from T0 2–3 moves up to T5 7–8; e.g. a T2 chart asks two T2 and two T1 moves), all from the jianghu plus at most one sect so one hero can learn them.
+- **Bonuses about doubled**: a fully opened chart gives ≈ 8–12 stat points at T0 up to ≈ 100–112 at T5; ability charts up to +25.5 % attack, 16.5 % damage reduction or 4.75 % HP per turn. `test:meridians` checks the requirement counts, the one-sect rule, mixed tiers from T2 up and the new caps.
+
 ### ชีพจร: meridian charts
 
 - **Every level a move skill or inner art gains earns 1 meridian point (แต้มชีพจร).**

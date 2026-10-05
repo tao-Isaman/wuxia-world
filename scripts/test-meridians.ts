@@ -5,6 +5,7 @@
 import assert from "node:assert/strict";
 import { ARTS_BY_ID } from "../lib/game/data/arts";
 import { SKILLS_BY_ID } from "../lib/game/data/skills";
+import { JIANGHU_SECT } from "../lib/game/data/sects";
 import {
   MERIDIAN_BODY_POINTS,
   MERIDIAN_CHARTS,
@@ -192,13 +193,13 @@ check("content: a node's three ranks grow the same keys, positive and never shri
   }
 });
 
-check("content: a fully opened chart stays in the gear scale (≤ 60 stat points, pct_atk / pct_red ≤ 16 %, hp_regen ≤ 4.5)", () => {
+check("content: a fully opened chart stays in scale (≤ 120 stat points, pct_atk ≤ 27 %, pct_red ≤ 21 %, hp_regen ≤ 6.5)", () => {
   for (const c of MERIDIAN_CHARTS) {
     const b = meridianChartBonus(c, c.nodes.map(() => 3));
     const statSum = Object.values(b.stats).reduce((a, v) => a + (v ?? 0), 0);
-    assert.ok(statSum <= 60, `${c.id}: ${statSum} stat points`);
-    assert.ok(b.combat.pct_atk <= 16 && b.combat.pct_red <= 16, `${c.id}: pct_atk ${b.combat.pct_atk} pct_red ${b.combat.pct_red}`);
-    assert.ok(b.combat.hp_regen <= 4.5, `${c.id}: hp_regen ${b.combat.hp_regen}`);
+    assert.ok(statSum <= 120, `${c.id}: ${statSum} stat points`);
+    assert.ok(b.combat.pct_atk <= 27 && b.combat.pct_red <= 21, `${c.id}: pct_atk ${b.combat.pct_atk} pct_red ${b.combat.pct_red}`);
+    assert.ok(b.combat.hp_regen <= 6.5, `${c.id}: hp_regen ${b.combat.hp_regen}`);
   }
 });
 
@@ -210,6 +211,23 @@ check("content: requires name at least one real, learnable skill / art", () => {
     for (const id of arts) assert.ok(ARTS_BY_ID.has(id) && id !== "none", `${c.id}: art ${id}`);
     assert.equal(new Set(skills).size, skills.length, `${c.id}: repeated skill`);
     assert.equal(new Set(arts).size, arts.length, `${c.id}: repeated art`);
+  }
+});
+
+check("content: requirements — moves per tier (T0 2–3 … T5 7–8), one sect at most, mixed tiers from T2", () => {
+  const RANGE: Record<number, [number, number]> = { 0: [2, 3], 1: [3, 4], 2: [4, 5], 3: [5, 6], 4: [6, 7], 5: [7, 8] };
+  for (const c of MERIDIAN_CHARTS) {
+    const moves = [
+      ...(c.requires.skills ?? []).map((id) => SKILLS_BY_ID.get(id)!),
+      ...(c.requires.arts ?? []).map((id) => ARTS_BY_ID.get(id)!),
+    ];
+    const [min, max] = RANGE[c.ti];
+    assert.ok(moves.length >= min && moves.length <= max, `${c.id} T${c.ti} requires ${moves.length} moves`);
+    // One hero must be able to learn them all: jianghu moves plus one sect's.
+    const sects = new Set(moves.map((m) => m.sc).filter((sc) => sc !== JIANGHU_SECT));
+    assert.ok(sects.size <= 1, `${c.id} requires moves of ${[...sects].join(", ")}`);
+    if (c.ti >= 2) assert.ok(new Set(moves.map((m) => m.ti)).size >= 2, `${c.id} requires moves of one tier only`);
+    for (const id of c.requires.skills ?? []) assert.ok(id !== "basic_punch", `${c.id}: basic_punch`);
   }
 });
 
