@@ -292,7 +292,7 @@ check("main story: about 15 chained chapters from a new game, at least 10 films,
 
 check("compiled: unique ids, every scene reachable, cutscenes registered, chapters chained", () => {
   const seen = new Set<string>();
-  for (const q of STORY_QUESTS) { if (seen.has(q.id)) err(`duplicate quest ${q.id}`); seen.add(q.id); if (getQuest(q.id) !== q) err(`${q.id} not registered`); }
+  for (const q of STORY_QUESTS) { if (seen.has(q.id)) err(`duplicate quest ${q.id}`); seen.add(q.id); if (getQuest(q.id)?.id !== q.id) err(`${q.id} not registered`); }
   for (const c of CUTSCENES) if (!c.beats.length) err(`cutscene ${c.id} empty`);
   for (const arc of STORY_ARCS) {
     arc.questIds.forEach((id, i) => {
