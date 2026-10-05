@@ -11,7 +11,7 @@ async function visit(page: Page, marker: string) {
 }
 
 test("capital rumors and the ledger investigation survive a mid-dialogue reload and pay once", async ({ page }) => {
-  test.setTimeout(120_000);
+  test.setTimeout(240_000);
   await page.addInitScript(() => { Math.random = () => 0.5; });
   const errors: string[] = [];
   page.on("pageerror", error => errors.push(error.message));
@@ -24,6 +24,8 @@ test("capital rumors and the ledger investigation survive a mid-dialogue reload 
   await expect.poll(async () => (await state(page)).currentSceneId).toBe("city_capital");
 
   await visit(page, "service-3");
+  // The tea house is across the city from the arrival gate: a long walk.
+  await expect(page.getByRole("dialog")).toBeVisible({ timeout: 60_000 });
   await expect(page.getByRole("dialog")).not.toContainText("วันนี้เงียบเป็นพิเศษ");
   await expect(page.getByRole("button", { name: "ฟังต่อ" })).toHaveCount(5);
   await page.getByRole("button", { name: "ฟังต่อ" }).first().click();
@@ -52,8 +54,8 @@ test("capital rumors and the ledger investigation survive a mid-dialogue reload 
   await expect(page.getByTestId("world-canvas")).toHaveAttribute("data-visible-props", /archive-chest/);
   const world = page.getByTestId("world-canvas");
   await expect(world).toHaveAttribute("data-read-only", "true");
-  await expect.poll(async () => Number(await world.getAttribute("data-player-x"))).toBeCloseTo(536.2, 0);
-  await expect.poll(async () => Number(await world.getAttribute("data-player-y"))).toBeCloseTo(201.8, 0);
+  await expect.poll(async () => Number(await world.getAttribute("data-player-x"))).toBeCloseTo(652.4, 0);
+  await expect.poll(async () => Number(await world.getAttribute("data-player-y"))).toBeCloseTo(202.4, 0);
   await expect(world).toHaveAttribute("data-player-facing", "west");
   // Full-screen conversation: the lines and every choice fit without scrolling.
   await expect.poll(() => page.evaluate(() => {

@@ -161,7 +161,9 @@ export function LocationMap({ scene, map, handlers, readOnly = false, dialogueSp
   // quest props/bystanders can still switch visibility without a canvas rebuild.
   return <WorldCanvas presentation={readOnly
     ? { ...(lastInteractivePresentation.current ?? presentation), readOnly: true,
-      placements: presentation.placements, ground: presentation.ground, props: presentation.props, bystanders: presentation.bystanders, foes: presentation.foes, worldDescription: presentation.worldDescription,
+      // The image follows the ground too: a dialogue restored on reload froze the
+      // presentation before the placements loaded, with the painting (and its collision).
+      image: presentation.image, placements: presentation.placements, ground: presentation.ground, props: presentation.props, bystanders: presentation.bystanders, foes: presentation.foes, worldDescription: presentation.worldDescription,
       dialogueSpeakerId: dialogueSpeakerId ? "npc-" + dialogueSpeakerId : undefined }
     : presentation} />;
 }

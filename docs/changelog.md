@@ -6,6 +6,17 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-05
 
+### The capital rebuilt: a grand avenue, packed shop rows, a walled yamen
+
+- **The imperial avenue**, three cells wide, runs straight from the south gate in the city wall to the plaza and on through the yamen's single gate to its court: the main hall and two wings, stone lions, the drum of grievance, banner poles. The market street crosses it at the plaza (bronze cauldron, stone lanterns, stalls, the lei-tai stage by the yamen wall); an open square lies south of it. Shops stand shoulder to shoulder on one- and two-cell lanes, with goods and sign poles at their doors, work yards behind the craft street, the bell tower at the north edge, fields and a cart outside the gate. The old orchard outside the east wall is gone: the city runs to the edge.
+- **Generated.** `bun scripts/build-capital-layout.ts` writes it deterministically into `public/assets/placements.json`; the capital's markers moved to stand before their buildings (`location-maps.ts`), and the east exit moved to the lane beside the yamen.
+- **Buildings block with their base diamond**, not their footprint box, so lanes one cell wide stay open (`baseDiamond` in `placement-geometry.ts`); a conversation restored on reload walks the capital's real ground instead of the old painting's collision.
+- **Tests.** `world-placement.test.ts`, `test-capital-investigation.ts` and `placements.spec.ts` check the capital with its placed city; `investigation.spec.ts` follows Qing's new spot.
+
+### Every conversation uses the cutscene layout
+
+- **NPC talks, quest offers, hand-ins and story beats look like the films now**: letterbox bars, the speaker's portrait standing at the left, the line as a subtitle at the bottom under the speaker's name tab, and the choices in a column beside it. The controls (ต่อ, ข้าม, จบบทสนทนา) sit in the top bar; tap anywhere, Enter or Space to go on. The map stays visible behind.
+
 ### Conversations play like films: one line at a time, key words coloured
 
 - **Every NPC talk, quest offer, hand-in and story beat now shows one line at a time**, typed out like a cutscene's subtitles.

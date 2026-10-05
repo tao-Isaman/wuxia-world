@@ -13,8 +13,8 @@ const EMPTY = { version: 1, maps: {} };
 /** The editor's page; MAP_EDITOR_URL points it elsewhere (a branch without the engine page). */
 const EDITOR_URL = process.env.MAP_EDITOR_URL ?? "/game/engine";
 
-async function serve(page: Page, placements: unknown = PLACEMENTS) {
-  await page.route("**/assets/manifest.json", (route) => route.fulfill({ json: MANIFEST }));
+async function serve(page: Page, placements: unknown = PLACEMENTS, manifest: unknown = MANIFEST) {
+  await page.route("**/assets/manifest.json", (route) => route.fulfill({ json: manifest }));
   await page.route("**/assets/placements.json", (route) => route.fulfill({ json: placements }));
   await page.route("**/assets/test/*.png", (route) => route.fulfill({ path: join(FIXTURES, basename(new URL(route.request().url()).pathname)) }));
 }
@@ -35,7 +35,10 @@ async function goTo(page: Page, locationId: string) {
 }
 
 test("placed objects are drawn on their map and the hero cannot walk through a blocking one", async ({ page }) => {
-  await serve(page);
+  // The capital walks as in the game: a tiled ground replaces its painting (and the painting's collision).
+  const tile = { ...MANIFEST.assets[0], id: "til_test_ground", category: "tile", subcategory: "ground", footprint: null,
+    layer: "ground", mapWidth: 32, mapHeight: 32 };
+  await serve(page, { ...PLACEMENTS, grounds: { city_capital: { tile: tile.id } } }, { ...MANIFEST, assets: [...MANIFEST.assets, tile] });
   await startGame(page);
   const world = page.getByTestId("world-canvas");
   // The opening map has no placements: nothing drawn, nothing changed.
@@ -44,23 +47,23 @@ test("placed objects are drawn on their map and the hero cannot walk through a b
   await goTo(page, "city_capital");
   await expect(world).toHaveAttribute("data-placements", "3");
   await expect(world).toHaveAttribute("data-placement-ids", "p_000001 p_000002 p_000003");
-  // The hero starts at the crossing south of the market (480, 368); the crate's footprint spans x 540–580 on that line.
-  expect(Number(await world.getAttribute("data-player-x"))).toBeCloseTo(480, 0);
+  // The hero starts on the plaza (555.8, 341.8); the crate's footprint spans x 616–656 on that line.
+  expect(Number(await world.getAttribute("data-player-x"))).toBeCloseTo(555.8, 0);
   await world.focus();
   await page.keyboard.down("d");
   await page.waitForTimeout(1_200);
   await page.keyboard.up("d");
   await page.waitForTimeout(300);
   const x = Number(await world.getAttribute("data-player-x"));
-  expect(x).toBeGreaterThan(510);
-  expect(x).toBeLessThanOrEqual(534.5);
+  expect(x).toBeGreaterThan(586);
+  expect(x).toBeLessThanOrEqual(610.5);
   await page.screenshot({ path: "test-results/screenshots/placements-game.png" });
 
   // Tap-to-walk past the crate takes a detour and arrives on the far side.
   const target = await world.evaluate((host: HTMLElement & { worldScreenPoint?: (x: number, y: number) => { x: number; y: number } }) =>
-    host.worldScreenPoint!(610, 368));
+    host.worldScreenPoint!(686, 342));
   await page.mouse.click(target.x, target.y);
-  await expect.poll(async () => Number(await world.getAttribute("data-player-x")), { timeout: 8_000 }).toBeGreaterThan(600);
+  await expect.poll(async () => Number(await world.getAttribute("data-player-x")), { timeout: 8_000 }).toBeGreaterThan(676);
 });
 
 test("engineGoto (dev hook, local flag) moves the hero to a map and previews the editor's placements", async ({ page }) => {
@@ -149,7 +152,7 @@ test("map editor: place, move, undo / redo, delete, warnings and save", async ({
 
   // A crate on the physician's spot is flagged.
   await palette.locator('[data-asset-id="prop_test_crate"]').click();
-  point = await at(254 + 38, 353 + 4 + 10);
+  point = await at(237 + 38, 202 + 4 + 10);
   await page.mouse.click(point.x, point.y);
   await expect(editor).toHaveAttribute("data-placement-count", "2");
   await expect(page.getByTestId("map-editor-issues")).toContainText("ขวาง");

@@ -13,7 +13,8 @@
  * - `AssetEntry.footprint` is a box `{ x, y, w, h }` in map units relative to
  *   the anchor: its top-left corner is (x + footprint.x, y + footprint.y).
  *   It scales with `scale` and mirrors with `flip`. An asset with `solids`
- *   (several boxes in the same frame) blocks with those instead.
+ *   (several boxes in the same frame) blocks with those instead; a building
+ *   without them blocks with its base diamond (`baseDiamond`), not the box.
  * - Depth follows the world runtime: map −1, shadows 1–3, characters by foot
  *   y (`100 + y·10`, the hero `101 + y·10`), signs 8000, night veil 8900.
  *   "ground" sits on the painting under everything (−0.9…−0.1), "object"
@@ -34,6 +35,25 @@ export interface MapRect { left: number; top: number; right: number; bottom: num
 export const characterDepth = (y: number) => 100 + y * 10;
 /** The hero draws just in front of a character on the same line. */
 export const heroDepth = (y: number) => 101 + y * 10;
+
+/**
+ * The ground an isometric building stands on: its base diamond (2:1, as wide
+ * as the footprint, bottom corner at the footprint's bottom centre), cut to the
+ * footprint's depth, as a staircase of 8-unit bands (few boxes keep path planning fast).
+ * The box's lower corners lie outside the walls on the street, so blocking with
+ * the whole box would close a lane one cell wide between two rows of houses.
+ */
+export function baseDiamond(f: Footprint): Footprint[] {
+  const STEP = 8, centre = f.x + f.w / 2, bottom = f.y + f.h;
+  const out: Footprint[] = [];
+  for (let top = f.y; top < bottom - 0.01; top += STEP) {
+    const low = Math.min(bottom, top + STEP);
+    // Half-width at a height d above the bottom corner: min(2d, w − 2d); the band keeps its widest.
+    const half = Math.min(2 * (bottom - top), f.w - 2 * (bottom - low), f.w / 2);
+    if (half > 0.5) out.push({ x: centre - half, y: top, w: 2 * half, h: low - top });
+  }
+  return out;
+}
 
 /** Depth of a placed object by layer and base (anchor) y. */
 export function placementDepth(layer: PlacementLayer, y: number): number {
@@ -64,7 +84,7 @@ export interface PlacementGeometry {
   depth: number;
   /** The footprint in map units, or null when the asset has none. */
   footprint: MapRect | null;
-  /** The boxes that block: the asset's `solids` when it has them, else the footprint (empty when it has none). */
+  /** The boxes that block: the asset's `solids` when it has them, a building's base diamond, else the footprint (empty when it has none). */
   solids: MapRect[];
   /** Whether the footprint blocks walking (`collide ?? footprint !== null`). */
   blocks: boolean;
@@ -94,7 +114,9 @@ export function placementGeometry(placement: Placement, asset: AssetEntry): Plac
     };
   };
   const footprint = asset.footprint ? box(asset.footprint) : null;
-  const solids = footprint ? asset.solids?.length ? asset.solids.map(box) : [footprint] : [];
+  const shape = asset.solids?.length ? asset.solids
+    : asset.category === "building" && asset.footprint ? baseDiamond(asset.footprint) : null;
+  const solids = footprint ? shape?.length ? shape.map(box) : [footprint] : [];
   return {
     id: placement.id, asset: asset.id, image: placementImage(asset, placement.dir), x: placement.x, y: placement.y,
     width, height, originX, originY, flip, box: { left, top, right: left + width, bottom: top + height },

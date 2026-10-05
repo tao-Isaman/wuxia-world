@@ -16,9 +16,10 @@ import styles from "./dialog-stage.module.css";
 
 /**
  * The conversation standard (every NPC talk, quest offer, hand-in and story
- * beat): one line at a time, typed out like a film's subtitles; tap the words
- * or ต่อ to go on, ข้าม to jump to the end; the choices come after the last
- * line. Key words are coloured (RichText).
+ * beat), laid out like a cutscene: letterbox bars, the speaker standing at the
+ * left, one line at a time typed out as a subtitle; tap anywhere (Enter,
+ * Space) or ต่อ to go on, ข้าม to jump to the end; the choices come beside the
+ * last line. Key words are coloured (RichText).
  */
 const TYPE_STEP = 2;
 const TYPE_MS = 22;
@@ -71,7 +72,6 @@ export function DialogStage({ scene, speaker, title, locationName }: {
   const skip = () => { setAt(beats - 1); setShown(Number.MAX_SAFE_INTEGER); };
   const heading = useRef<HTMLHeadingElement>(null);
   const content = useRef<HTMLDivElement>(null);
-  const [moreBelow, setMoreBelow] = useState(false);
   const portrait = speaker ? npcPortrait(speaker.id) : undefined;
   const visibleChoices = (scene.choices ?? []).map((choice, index) => ({ choice, index }))
     .filter(({ choice }) => !choice.visibleIf || evaluateCondition(state, choice.visibleIf));
@@ -116,7 +116,7 @@ export function DialogStage({ scene, speaker, title, locationName }: {
   useEffect(() => {
     const node = content.current;
     if (!node) return;
-    const measure = () => { setMoreBelow(node.scrollHeight - node.clientHeight - node.scrollTop > 4); shrinkToFit(); };
+    const measure = () => shrinkToFit();
     const observer = new ResizeObserver(measure);
     observer.observe(node);
     for (const child of node.children) observer.observe(child);
@@ -132,20 +132,34 @@ export function DialogStage({ scene, speaker, title, locationName }: {
     }} />;
   }
 
+  const tapToAdvance = (event: React.MouseEvent) => {
+    if (instant || (event.target as Element).closest("button, a")) return;
+    advance();
+  };
+  const name = speaker?.name ?? title ?? "บทสนทนา";
+
+  // Film layout (the cutscene standard): letterbox bars, the speaker standing
+  // at the left, the line as a subtitle at the bottom, choices beside it.
   return (
     <div className={styles.stage} data-testid="dialog-stage" data-dialog-scale={scale} data-page={Math.min(at, beats - 1)} data-pages={beats}
       data-typing={typing || undefined}
       style={{ "--dialog-scale": scale } as React.CSSProperties}>
       <section
-        className={styles.panel}
+        className={`${styles.panel} ${portrait || speaker ? styles.withBust : ""}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby={headingId}
+        onClick={tapToAdvance}
         onKeyDown={(event) => {
           if (event.key === "Escape" && close) {
             event.preventDefault();
             event.stopPropagation();
             close();
+            return;
+          }
+          if ((event.key === "Enter" || event.key === " ") && !instant && !(event.target as Element).closest("button, a")) {
+            event.preventDefault();
+            advance();
             return;
           }
           if (event.key !== "Tab") return;
@@ -165,6 +179,19 @@ export function DialogStage({ scene, speaker, title, locationName }: {
           }
         }}
       >
+        <div className={styles.vignette} aria-hidden="true" />
+        <div className={`${styles.bar} ${styles.top}`}>
+          {locationName && <p className={styles.place}>{locationName}</p>}
+          <div className={styles.controls}>
+            {!showChoices && <button key={at} type="button" data-testid="dialog-next-page" onClick={next} autoFocus>
+              ต่อ ▶ <span className={styles.count}>({Math.min(at, beats - 1) + 1}/{beats})</span>
+            </button>}
+            {!showChoices && !lastBeat && <button type="button" data-testid="dialog-skip" onClick={skip}>ข้าม ⏭</button>}
+            {close && <button type="button" className={styles.close} onClick={close} title={leave?.choice.text}>
+              จบบทสนทนา <span aria-hidden="true">×</span>
+            </button>}
+          </div>
+        </div>
         {(portrait || speaker) && <div className={styles.bust} aria-hidden="true">
           {portrait ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -173,34 +200,18 @@ export function DialogStage({ scene, speaker, title, locationName }: {
             <CharacterPreview id={npcCharacterId(speaker.id)} animate framing="bust" />
           </div>}
         </div>}
-        <div className={styles.main}>
-          <header className={styles.heading}>
-            <div className={styles.identity}>
-              <h2 ref={heading} id={headingId} tabIndex={-1}>{speaker?.name ?? title ?? "บทสนทนา"}</h2>
-              {locationName && <p>{locationName}</p>}
-            </div>
-            {close && <button type="button" className={styles.close} onClick={close} title={leave?.choice.text}>
-              จบบทสนทนา <span aria-hidden="true">×</span>
-            </button>}
-          </header>
-          <div ref={content} className={styles.content} tabIndex={0} role="region" aria-label="บทสนทนาและตัวเลือก">
-            {(instant || lines.length > 0) && <div className={`${styles.lines} ${instant ? "" : styles.beat}`} data-testid="dialog-lines"
-              onClick={instant ? undefined : advance}>
-              <DialogDisplay key={instant ? "all" : at} scene={scene} speakerName={speaker?.name}
-                lines={instant ? lines : current ? [current] : []} shown={typing ? shown : undefined} />
+        <div ref={content} className={`${styles.content} ${showChoices ? styles.hasChoices : ""}`} tabIndex={0} role="region" aria-label="บทสนทนาและตัวเลือก">
+          <div className={styles.talk}>
+            <h2 ref={heading} id={headingId} tabIndex={-1} className={styles.speaker}>{name}</h2>
+            <div className={`${styles.subtitle} ${instant ? "" : styles.beat}`} data-testid="dialog-lines">
+              {(instant || lines.length > 0) && <DialogDisplay key={instant ? "all" : at} scene={scene} speakerName={speaker?.name ?? title}
+                lines={instant ? lines : current ? [current] : []} shown={typing ? shown : undefined} />}
               {!instant && !typing && !lastBeat && <span className={styles.nextMark} aria-hidden="true">▼</span>}
-            </div>}
-            <div className={styles.choices}>{showChoices ? <ChoicePanel scene={scene} /> : (
-              <div className="bg-ink/85 text-paper shadow-pixel p-3 flex gap-2">
-                <button key={at} type="button" data-testid="dialog-next-page" className="flex-1 rounded-md border border-paper/40 bg-paper/10 py-2 text-base hover:bg-paper/25"
-                  onClick={next} autoFocus>ต่อ ▶ <span className="text-paper/50 text-sm">({Math.min(at, beats - 1) + 1}/{beats})</span></button>
-                {!lastBeat && <button type="button" data-testid="dialog-skip" className="rounded-md border border-paper/30 px-3 py-2 text-sm text-paper/80 hover:bg-paper/15"
-                  onClick={skip}>ข้าม ⏭</button>}
-              </div>
-            )}</div>
+            </div>
           </div>
-          {moreBelow && <div className={styles.scrollHint} aria-hidden="true">เลื่อนลงเพื่ออ่านต่อและดูตัวเลือก ↓</div>}
+          {showChoices && <div className={styles.choices}><ChoicePanel scene={scene} /></div>}
         </div>
+        <div className={`${styles.bar} ${styles.bottom}`} aria-hidden="true" />
       </section>
     </div>
   );
