@@ -54,7 +54,9 @@ try {
   Math.random = () => 0;
   useWorldStore.getState().travelRoute("city_capital");
   assert.equal(useWorldStore.getState().pendingEncounter, null, "arriving is not an encounter roll");
-  // Walking spawns a foe on the map; walking into it opens the encounter.
+  // Walking spawns a foe on the map; walking into it opens the encounter. Towns send
+  // no stray foes, so hunt the main story's hired thieves here.
+  useWorldStore.setState((s) => ({ quests: { ...s.quests, st_main_02: { id: "st_main_02", status: "active", stage: 0 } } }));
   useWorldStore.getState().walkTick(() => ({ x: 40, y: 60 }));
   useWorldStore.getState().engageFoe(useWorldStore.getState().roamingFoes[0]!.id);
   const arrival = useWorldStore.getState();

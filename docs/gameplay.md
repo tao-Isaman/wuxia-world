@@ -154,9 +154,9 @@ Code: `lib/world/stations.ts`; the store's `stationTravel`.
 
 Arriving somewhere never triggers anything. Foes turn up while you **walk**: every 220 map units walked on a location or route map is one *walk tick*. Home and the jail are safe.
 
-- **Foes on the map.** A tick may put a foe on the map (30 %, at most three waiting at once), a short walk away. It stands there with a red ⚔ name tag and watches you. Walk (or tap) into it to face it; walk around it to avoid it. It is gone once you have faced it, and foes stay behind when you leave the map.
-- **Who turns up** depends on the place: people in towns, villages and homes; mostly beasts in the wilds; spirits too around sects and temples. Stronger foes, and elites, come as the hero grows (by day and sect rank).
-- **Hunting.** While a kill quest wants a foe that lives here, foes turn up more often (80 % a tick) and they are the quest's targets.
+- **Foes on the map.** On roads and in the wilds a tick may put a foe on the map (30 %, at most three waiting at once), a short walk away. It stands there with a red ⚔ name tag and watches you. Walk (or tap) into it to face it; walk around it to avoid it. It is gone once you have faced it, and foes stay behind when you leave the map.
+- **Who turns up** depends on the place: mostly beasts in the wilds, people too on roads, frontiers and isles. **Towns, villages, homes, inns, sects, temples and the palace send no stray foes** — only a kill quest's quarry (below). Stronger foes, and elites, come as the hero grows (by day and sect rank).
+- **Hunting.** While a kill quest wants a foe that lives here, foes turn up more often (80 % a tick) and they are the quest's targets — in towns as well (the zone table below says who lives where).
 - **The law and sect hunters** still catch up at once:
 
 | Check | Chance per tick |
@@ -177,7 +177,7 @@ Walking into a foe (or being caught by the law or a hunter) opens it. It shows t
 
 ### Who you meet
 
-The zone decides the kind of foe:
+The zone decides the kind of foe. In the city, mansion, sect and temple zones (and tribes and markets) only a kill quest's quarry comes; the table is who that can be.
 
 | Zone | Places | Humans / beasts / supernatural |
 | --- | --- | --- |

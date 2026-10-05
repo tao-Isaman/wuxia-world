@@ -121,6 +121,16 @@ export function zoneOfLocation(locationId: string): EnemyZone {
   return "wild";
 }
 
+/** Places where people live — cities, villages, homes, inns, sects, temples,
+ *  the palace, villas, markets and tribes. No foe roams there on its own;
+ *  only the target of an active kill quest can show up (`rollFoeSpawn`).
+ *  Roads and the wilds (caves, mountains, cliffs, valleys, isles, deserts…)
+ *  keep their roaming foes. */
+const SETTLED_PREFIXES = ["city_", "village_", "home_", "inn_", "sect_", "temple_", "palace_", "villa_", "market_", "tribe_"] as const;
+export function isSettledPlace(locationId: string): boolean {
+  return SETTLED_PREFIXES.some((p) => locationId.startsWith(p));
+}
+
 export const FIGHT_EVENTS: readonly FightEventDef[] = [
   // ─── Tier 0 ────────
   { id: "fight_petty_thief",   weight: TIER_SPAWN_WEIGHT[0], opponentId: "petty_thief" },

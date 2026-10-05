@@ -129,6 +129,7 @@ Real behaviour today, found during the docs audit. Each is small and self-contai
 
 ### Roaming foes
 
+- **Only roads and wilds.** Cities, villages, homes, inns, sects, temples and the palace get no stray foes; a kill quest's quarry can still come there (`isSettledPlace`).
 - **Foes can stand on painted scenery.** A spawn spot only needs to be unblocked and reachable by the collision data, so on maps whose collision is loose (the capital's outer wall, for one) a foe can appear somewhere that looks out of bounds.
 - **Not saved.** A reload clears the foes on the map; they also go when the hero walks on another map.
 - **They don't move.** Foes wait where they appear; they don't patrol or give chase.
