@@ -449,7 +449,14 @@ Practice:
 - **Points on a chart.** 95 charts by tier: T0 20 charts of 1–2 points, T1 20 of 3–4, T2 15 of 5–6, T3 15 of 7–8, T4 15 of 9–10, T5 10 of 12. A chart's tier is about its size, not its requirement.
 - **Opening.** Points open in order (a point needs the one before it at rank 1); each point has 3 ranks. Raising a point of a tier-`T` chart to rank r costs `(T + 1) × r` meridian points — a whole T0 point costs 6, a T5 point 36, a full T5 chart 432.
 - **What they give.** Each rank adds base stats (STR…INT), combat stats (Atk, PD, ID, HP, MP, PA, IA, Spd, Acc, Res, Cri, Eva) or always-on effects (% attack, % damage reduction, % HP regained per turn), by the chart's kind: ค่าสถานะพื้นฐาน, ค่าสถานะการต่อสู้, ความสามารถ, บัฟพิเศษ. Ranks add up; everything applies in every battle.
-- **Where charts come from.** T0–T1 mostly from book and town shops, T2–T3 from rarer shops and elite foes, T4–T5 as rare loot from strong foes; some are quest rewards. Shop prices by tier: 400, 1200, 3000, 6000, 12000, 25000 gold.
+- **Battle effects.** Some points carry an effect that wakes only when the point is filled (rank 3); a chart may have several:
+  - **เปิดฉาก** — entering battle, a stat (attack, defence, speed, crit, evasion, accuracy or damage reduction) +v % for the hero's first 5 turns;
+  - **โล่ชีพจร** — entering battle, a shield worth a % of max HP that takes hits before HP;
+  - **ผนึกชีพจร** — entering battle, the next N debuffs are warded off;
+  - **คืนชีพ** — once per battle, rise again with 50 % HP;
+  - **rages** — when hit, a chance for a stacking buff for a few turns: เพลิงพิโรธ (attack %), วารีพิสุทธิ์ (HP % back each turn), วายุภักษ์ (battle speed %), ปัฐพีแกร่ง (defence %), อัสนีคลัง (crit chance);
+  - **สกัดชีพจร** — when the hero's attack lands, a chance to lower the target's attack, defence, speed, evasion or accuracy for a few turns.
+- **Where charts come from.** Only as loot: no shop sells a chart. Each chart has foes that may drop it, at 1 % a win. A chart in the bag still sells back by its tier price (400, 1200, 3000, 6000, 12000, 25000 gold).
 
 ## Stats
 
