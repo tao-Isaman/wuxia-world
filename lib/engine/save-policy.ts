@@ -1,7 +1,7 @@
 /**
  * The save route's rules (app/game/engine/api/save/route.ts), kept pure so
  * scripts/test-engine.ts can check them: when the server may write, and which
- * request bodies it accepts (only the three whitelisted engine files).
+ * request bodies it accepts (only the whitelisted engine files).
  */
 import { ENGINE_FILES, type EngineFileKey } from "./save";
 

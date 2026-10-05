@@ -153,7 +153,7 @@ Two deliberate exceptions reach into stores:
 | `/` | the game |
 | `/debug` | combat sandbox with two builds from `character-store` and a free grid battle; independent of the world save |
 | `/progress` | old journal, data frozen at wave 11 |
-| `/game/engine` | the game's editor (asset library, maps, skill / art texts); not linked, `noindex`; writes files only under `bun dev` ([docs/engine.md](docs/engine.md)) |
+| `/game/engine` | the game's editor (asset library, maps — objects and moved NPC / exit / spawn markers — skill / art texts); not linked, `noindex`; writes files only under `bun dev` ([docs/engine.md](docs/engine.md)) |
 | `/manifest.webmanifest` | PWA manifest |
 
 ## Combat engine (`lib/game/`)
@@ -300,6 +300,7 @@ Two deliberate exceptions reach into stores:
 - **Collision.** `world-navigation.ts` (+ `world-footprints-data.ts`) covers all 100 painted maps; `test:navigation` probes every map.
 - **Kits.** Roads, city walls, house walls and fences (asset category `kit`, `AssetEntry.kit`) join on their set's grid: N 1 / E 2 / S 4 / W 8 masks, a piece per mask, anchored at the bottom centre of its cell (iso sets, `grid: "iso"`, on 64-wide diamonds matching the isometric buildings: at the diamond's centre); `lib/assets/kits.ts` (`paintKit`, `placeKitSpecial`) drives the editor's kit brush ([docs/assets.md](docs/assets.md#kits-roads-and-walls-that-join)).
 - **Map grounds.** `placements.json` `grounds[locationId]` replaces a map's painting with a repeated ground tile (no painted collision or foreground; image key `ground:<tile>`). `city_capital` is built this way; its NPC / service spots stand in front of its placed buildings.
+- **Moved markers.** The map editor can drag a map's NPCs, exits, spawn and service spots; `lib/world/data/map-spot-overrides.json` (map %) is laid over every map by `getLocationMap` (`getLocationMapBase` = as authored), so runtime, guide and tests see the moved points.
 - **Placed objects.** The map editor's objects (`public/assets/placements.json`, fetched once, the manifest only for a map that has some) draw through `lib/assets/placement-geometry.ts` — the one geometry the editor shares: anchor at (x, y), `mapWidth × mapHeight × scale`, flip about the anchor, footprint relative to the anchor; "ground" under characters, "object" by base y (`100 + y·10`, hero `101 + y·10`), "overhead" at 7000+ under signs and the veil. Blocking footprints (or an asset's `solids` boxes) join the map's solids (`withPlacedSolids`); `placementIssues` (`lib/stage/map-anchors.ts`) and `test:placements` keep every marker reachable. Host: `data-placements`, `data-placement-ids`. Dev hook: `/?engineGoto=<id>` (`bun dev` or `localStorage["wuxia-engine-goto"]="on"`).
 - **Rules.** Never put Phaser objects in stores or saves. Don't enable Phaser input. Respect `prefers-reduced-motion`. New popups are `Modal`s, so the map pauses by itself.
 

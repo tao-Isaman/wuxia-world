@@ -3,7 +3,8 @@ import { useEffect } from "react";
 import { useWorldStore } from "@/store/world-store";
 import { getLocationMap, getScene } from "@/lib/world";
 import { forgetMapPosition } from "@/lib/stage/types";
-import { ENGINE_SAVE_BACKUP_KEY, engineGotoTarget, engineStorageGet, engineStorageSet } from "@/lib/engine/goto";
+import { ENGINE_SAVE_BACKUP_KEY, engineGotoTarget, enginePreviewActive, enginePreviewPlacements, engineStorageGet, engineStorageSet } from "@/lib/engine/goto";
+import { previewSpotEdits } from "@/lib/world/data/location-maps";
 import { toast } from "@/store/toast-store";
 
 /**
@@ -15,6 +16,8 @@ import { toast } from "@/store/toast-store";
  */
 export function EngineGoto() {
   useEffect(() => {
+    // A preview tab also shows the editor's unsaved moved markers (ย้ายจุด).
+    if (enginePreviewActive()) previewSpotEdits(enginePreviewPlacements()?.spots);
     const target = engineGotoTarget();
     if (!target) return;
     const apply = () => {

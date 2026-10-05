@@ -168,10 +168,81 @@ test("map editor: place, move, undo / redo, delete, warnings and save", async ({
   // Save writes the whole file through the engine save route.
   await page.getByRole("button", { name: "บันทึก", exact: true }).click();
   await expect(page.getByTestId("map-editor-status")).toContainText("บันทึกแล้ว");
-  const body = JSON.parse(saved.at(-1)!) as { key: string; json: string };
-  expect(body.key).toBe("placements");
+  const bodies = saved.filter(Boolean).map((raw) => JSON.parse(raw) as { key: string; json: string });
+  const body = bodies.find((b) => b.key === "placements")!;
   const file = JSON.parse(body.json);
   expect(file.maps.city_capital).toEqual([{ id, asset: "prop_test_crate", x: 300, y: 600 }]);
+  expect(file.spots, "moved markers never go into placements.json").toBeUndefined();
+  // The moved markers go to their own file (none moved here).
+  expect(JSON.parse(bodies.find((b) => b.key === "mapSpots")!.json)).toEqual({ version: 1, maps: {} });
+});
+
+test("map editor: drag an NPC, an exit and the spawn to move them; undo, reset and save to map-spot-overrides.json", async ({ page }) => {
+  test.setTimeout(120_000);
+  await serve(page, EMPTY);
+  const saved: string[] = [];
+  await page.route("**/game/engine/api/save", async (route) => {
+    saved.push(route.request().postData() ?? "");
+    await route.fulfill({ json: { ok: true, written: "file" } });
+  });
+  await page.addInitScript(() => { try { localStorage.removeItem("wuxia-engine-placements-draft"); } catch { /* */ } });
+  const response = await page.goto(EDITOR_URL);
+  test.skip(response?.status() === 404, `${EDITOR_URL} is not in this build (set MAP_EDITOR_URL)`);
+  const mapTab = page.getByRole("tab", { name: /แผนที่/ });
+  if (await mapTab.count()) await mapTab.first().click();
+  const editor = page.getByTestId("map-editor");
+  await expect(editor).toHaveAttribute("data-loaded", "true", { timeout: 30_000 });
+  await page.locator('[data-map-id="home_player"]').click();
+  await expect(editor).toHaveAttribute("data-moved-spots", "0");
+  const layer = page.getByTestId("map-editor-layer");
+  const scale = async () => (await layer.boundingBox())!.width / 960;
+  /** Drag a marker by its figure / pin by (dx, dy) map units. */
+  const dragMarker = async (anchorId: string, dx: number, dy: number) => {
+    const handle = page.locator(`[data-anchor-id="${anchorId}"][data-movable] span`).first();
+    const box = (await handle.boundingBox())!;
+    const s = await scale();
+    const from = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+    await page.mouse.move(from.x, from.y);
+    await page.mouse.down();
+    await page.mouse.move(from.x + dx * s / 2, from.y + dy * s / 2, { steps: 4 });
+    await page.mouse.move(from.x + dx * s, from.y + dy * s, { steps: 4 });
+    await page.mouse.up();
+  };
+  const left = async (anchorId: string) => parseFloat((await page.locator(`[data-anchor-id="${anchorId}"]`).getAttribute("style"))!.match(/left:\s*([\d.]+)px/)![1]);
+
+  // ป้าหลิว stands at (60 %, 31 %) = (576, 198.4); drag her 96 map units right (10 %).
+  const liu = "npc:home_player_housekeeper_liu";
+  expect(await left(liu)).toBeCloseTo(576, 0);
+  await dragMarker(liu, 96, 0);
+  await expect(editor).toHaveAttribute("data-moved-spots", "1");
+  await expect.poll(() => left(liu)).toBeGreaterThan(660);
+  await expect(page.getByTestId("map-editor-status")).toContainText("ยังไม่บันทึก");
+  // The exit and the spawn move too; an arrival point (derived from its exit) does not.
+  await dragMarker("exit:city_capital", -48, 0);
+  await dragMarker("spawn", 0, -32);
+  await expect(editor).toHaveAttribute("data-moved-spots", "3");
+  await expect(page.locator('[data-anchor-id^="arrival:"][data-movable]')).toHaveCount(0);
+  // Undo takes back the spawn; คืนจุดเดิม clears the map; undo brings them back.
+  await page.getByTestId("map-editor-stage").focus();
+  await page.keyboard.press("Control+z");
+  await expect(editor).toHaveAttribute("data-moved-spots", "2");
+  await page.getByTestId("map-spots-reset").click();
+  await expect(editor).toHaveAttribute("data-moved-spots", "0");
+  expect(await left(liu)).toBeCloseTo(576, 0);
+  await page.keyboard.press("Control+z");
+  await expect(editor).toHaveAttribute("data-moved-spots", "2");
+
+  // Save: the markers go to map-spot-overrides.json in map percentages.
+  await page.getByRole("button", { name: "บันทึก", exact: true }).click();
+  await expect(page.getByTestId("map-editor-status")).toContainText("บันทึกแล้ว");
+  const bodies = saved.filter(Boolean).map((raw) => JSON.parse(raw) as { key: string; json: string });
+  const spots = JSON.parse(bodies.find((b) => b.key === "mapSpots")!.json);
+  expect(Object.keys(spots.maps)).toEqual(["home_player"]);
+  expect(spots.maps.home_player.npcs.home_player_housekeeper_liu.x).toBeGreaterThan(68);
+  expect(spots.maps.home_player.npcs.home_player_housekeeper_liu.y).toBeCloseTo(31, 0);
+  expect(spots.maps.home_player.exits.city_capital.x).toBeLessThan(43);
+  expect(spots.maps.home_player.spawn).toBeUndefined();
+  expect(JSON.parse(bodies.find((b) => b.key === "placements")!.json).spots).toBeUndefined();
 });
 
 test("map editor kit brush: a dragged wall joins itself, erasing re-joins, a gate snaps in", async ({ page }) => {

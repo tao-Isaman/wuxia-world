@@ -2,7 +2,7 @@
  * The map editor's data model: the whole PlacementsFile under edit, an
  * unlimited undo / redo history of it, and the pure edits. No React.
  */
-import type { AssetEntry, Placement, PlacementsFile } from "@/lib/assets/types";
+import type { AssetEntry, MapSpotEditsData, Placement, PlacementsFile } from "@/lib/assets/types";
 import { MAP_HEIGHT, MAP_WIDTH } from "@/lib/assets/placement-geometry";
 import { AUTO_MAP_IDS } from "@/lib/world/data/auto-map-ids";
 
@@ -86,13 +86,68 @@ export function newPlacement(file: PlacementsFile, asset: AssetEntry, x: number,
   return { id: nextPlacementId(file), asset: asset.id, ...clampToMap(x, y), ...(asset.views?.S ? { dir: "S" as const } : {}) };
 }
 
-/** The file as saved: maps sorted by id, empty maps dropped, every placement cleaned; grounds sorted (none: no field). */
+/** The file as saved: maps sorted by id, empty maps dropped, every placement cleaned; grounds and moved markers sorted (none: no field). */
 export function normalizeFile(file: PlacementsFile): PlacementsFile {
   const maps: Record<string, Placement[]> = {};
   for (const id of Object.keys(file.maps).sort()) if (file.maps[id]?.length) maps[id] = file.maps[id].map(clean);
   const grounds: NonNullable<PlacementsFile["grounds"]> = {};
   for (const id of Object.keys(file.grounds ?? {}).sort()) if (file.grounds![id]?.tile) grounds[id] = { tile: file.grounds![id].tile };
-  return Object.keys(grounds).length ? { version: 1, maps, grounds } : { version: 1, maps };
+  const spots = normalizeSpots(file.spots);
+  return { version: 1, maps, ...(Object.keys(grounds).length ? { grounds } : {}), ...(Object.keys(spots).length ? { spots } : {}) };
+}
+
+const pct = (p: { x: number; y: number }) => ({ x: Math.round(Math.min(100, Math.max(0, p.x)) * 10) / 10, y: Math.round(Math.min(100, Math.max(0, p.y)) * 10) / 10 });
+function sortedPoints(points: Record<string, { x: number; y: number }> | undefined) {
+  const out: Record<string, { x: number; y: number }> = {};
+  for (const key of Object.keys(points ?? {}).sort()) out[key] = pct(points![key]);
+  return out;
+}
+/** Moved markers as saved: maps and keys sorted, points rounded to 0.1 %, empty groups dropped. */
+export function normalizeSpots(spots: PlacementsFile["spots"]): Record<string, MapSpotEditsData> {
+  const out: Record<string, MapSpotEditsData> = {};
+  for (const id of Object.keys(spots ?? {}).sort()) {
+    const edit = spots![id], next: MapSpotEditsData = {};
+    if (edit.spawn) next.spawn = pct(edit.spawn);
+    for (const group of ["npcs", "exits", "spots"] as const) {
+      const points = sortedPoints(edit[group]);
+      if (Object.keys(points).length) next[group] = points;
+    }
+    if (Object.keys(next).length) out[id] = next;
+  }
+  return out;
+}
+
+/** Which marker an anchor id names: spawn, an NPC, an exit or a numbered service spot (others don't move). */
+export function movableAnchor(anchorId: string): { group: "spawn" } | { group: "npcs" | "exits" | "spots"; key: string } | null {
+  if (anchorId === "spawn") return { group: "spawn" };
+  const [kind, key] = [anchorId.slice(0, anchorId.indexOf(":")), anchorId.slice(anchorId.indexOf(":") + 1)];
+  if (kind === "npc") return { group: "npcs", key };
+  if (kind === "exit") return { group: "exits", key };
+  if (kind === "service" && /^\d+$/.test(key)) return { group: "spots", key };
+  return null;
+}
+
+/** Move a marker of a map to a point in map units (stored as map percentages). */
+export function moveSpot(file: PlacementsFile, mapId: string, anchorId: string, x: number, y: number): PlacementsFile {
+  const target = movableAnchor(anchorId);
+  if (!target) return file;
+  const point = pct({ x: x / MAP_WIDTH * 100, y: y / MAP_HEIGHT * 100 });
+  const edit: MapSpotEditsData = { ...file.spots?.[mapId] };
+  if (target.group === "spawn") edit.spawn = point;
+  else edit[target.group] = { ...edit[target.group], [target.key]: point };
+  return { ...file, spots: { ...file.spots, [mapId]: edit } };
+}
+/** Forget every moved marker of a map (back to the authored positions). */
+export function resetSpots(file: PlacementsFile, mapId: string): PlacementsFile {
+  if (!file.spots?.[mapId]) return file;
+  const spots = { ...file.spots };
+  delete spots[mapId];
+  return { ...file, spots };
+}
+/** How many markers of a map are moved. */
+export function movedSpotCount(file: PlacementsFile, mapId: string): number {
+  const edit = file.spots?.[mapId];
+  return edit ? (edit.spawn ? 1 : 0) + Object.keys(edit.npcs ?? {}).length + Object.keys(edit.exits ?? {}).length + Object.keys(edit.spots ?? {}).length : 0;
 }
 
 /** Replace a map's painting with a tiled ground (or bring the painting back with null). */

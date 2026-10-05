@@ -41,13 +41,18 @@ export interface StageProps {
   onMove: (ids: ReadonlySet<string>, dx: number, dy: number) => void;
   onPlace: (asset: AssetEntry, x: number, y: number, keepArmed: boolean) => void;
   onDropAsset: (assetId: string, x: number, y: number) => void;
+  /** Markers the editor may move (ย้ายจุด): spawn, NPCs, exits, numbered service spots. */
+  movable?: (anchorId: string) => boolean;
+  /** A marker was dragged to (x, y) in map units. */
+  onMoveAnchor?: (anchorId: string, x: number, y: number) => void;
 }
 
 type Drag =
   | { kind: "move"; start: { x: number; y: number }; ids: ReadonlySet<string>; moved: boolean }
   | { kind: "box"; start: { x: number; y: number }; additive: boolean }
   | { kind: "pan"; start: { x: number; y: number }; pan: { x: number; y: number } }
-  | { kind: "brush"; last: { col: number; row: number }; erase: boolean };
+  | { kind: "brush"; last: { col: number; row: number }; erase: boolean }
+  | { kind: "anchor"; id: string; start: { x: number; y: number }; origin: { x: number; y: number }; moved: boolean };
 
 const MISSING_SIZE = 32;
 
@@ -66,6 +71,7 @@ export function MapStage(props: StageProps) {
   const [delta, setDelta] = useState<{ dx: number; dy: number } | null>(null);
   const [box, setBox] = useState<MapRect | null>(null);
   const [hover, setHover] = useState<{ x: number; y: number } | null>(null);
+  const [anchorDrag, setAnchorDrag] = useState<{ id: string; x: number; y: number } | null>(null);
   const drag = useRef<Drag | null>(null);
   const spaceHeld = useRef(false);
 
@@ -123,12 +129,15 @@ export function MapStage(props: StageProps) {
       title={g.missing ? `ไม่พบภาพ ${g.asset}` : `${assets.get(g.asset)?.name ?? g.asset} · ${g.id}`}>
       {g.missing ? <span>?</span> : <img src={g.image} alt="" draggable={false} style={g.flip ? { transform: "scaleX(-1)" } : undefined} />}
     </div>) }));
-  if (show.markers) for (const anchor of anchors) {
+  if (show.markers) for (const raw of anchors) {
+    const anchor = anchorDrag?.id === raw.id ? { ...raw, x: anchorDrag.x, y: anchorDrag.y } : raw;
     const person = anchor.kind === "npc" || anchor.kind === "spawn";
+    const canMove = !!props.movable?.(anchor.id) && !armed && !brush;
     items.push({ key: anchor.id, depth: anchor.kind === "npc" ? characterDepth(anchor.y) : anchor.kind === "spawn" ? heroDepth(anchor.y) : 8000,
       node: (
-        <div key={anchor.id} className={`${styles.anchor} ${styles[`anchor_${anchor.kind}`]} ${anchor.issue ? styles.anchorIssue : ""}`}
-          data-anchor-id={anchor.id} style={{ left: anchor.x, top: anchor.y }} title={anchor.issue ?? anchor.label}>
+        <div key={anchor.id} className={`${styles.anchor} ${styles[`anchor_${anchor.kind}`]} ${anchor.issue ? styles.anchorIssue : ""} ${canMove ? styles.anchorMovable : ""} ${anchorDrag?.id === anchor.id ? styles.anchorDragging : ""}`}
+          data-anchor-id={anchor.id} data-movable={canMove || undefined} style={{ left: anchor.x, top: anchor.y }}
+          title={canMove ? `${anchor.issue ?? anchor.label} — ลากเพื่อย้าย` : anchor.issue ?? anchor.label}>
           {person ? <span className={styles.figure} /> : <span className={styles.pin} />}
           <span className={styles.anchorLabel}>{anchor.issue ? "⚠ " : ""}{anchor.label}</span>
         </div>) });
@@ -139,6 +148,7 @@ export function MapStage(props: StageProps) {
     if (!layer.current) return;
     const point = toMap(event.clientX, event.clientY);
     const target = (event.target as HTMLElement).closest<HTMLElement>("[data-placement-id]");
+    const marker = (event.target as HTMLElement).closest<HTMLElement>("[data-anchor-id][data-movable]");
     frame.current?.focus({ preventScroll: true });
     if (event.button === 1 || (event.button === 0 && (spaceHeld.current || event.altKey))) {
       drag.current = { kind: "pan", start: { x: event.clientX, y: event.clientY }, pan };
@@ -154,6 +164,10 @@ export function MapStage(props: StageProps) {
       const erase = brush.erase || event.shiftKey;
       drag.current = { kind: "brush", last: cell, erase };
       props.onBrush([cell], erase, true);
+    } else if (marker && props.movable?.(marker.dataset.anchorId!)) {
+      const anchor = anchors.find((a) => a.id === marker.dataset.anchorId);
+      if (!anchor) return;
+      drag.current = { kind: "anchor", id: anchor.id, start: point, origin: { x: anchor.x, y: anchor.y }, moved: false };
     } else if (target) {
       const id = target.dataset.placementId!;
       const additive = event.shiftKey || event.ctrlKey || event.metaKey;
@@ -186,6 +200,11 @@ export function MapStage(props: StageProps) {
       current.last = cell;
     } else if (current.kind === "pan") {
       setPan({ x: current.pan.x + event.clientX - current.start.x, y: current.pan.y + event.clientY - current.start.y });
+    } else if (current.kind === "anchor") {
+      const dx = point.x - current.start.x, dy = point.y - current.start.y;
+      if (!current.moved && Math.hypot(dx, dy) * scale < 3) return;
+      current.moved = true;
+      setAnchorDrag({ id: current.id, ...movedPoint(current.origin, dx, dy, grid) });
     } else if (current.kind === "move") {
       const dx = point.x - current.start.x, dy = point.y - current.start.y;
       if (!current.moved && Math.hypot(dx, dy) * scale < 3) return;
@@ -201,7 +220,10 @@ export function MapStage(props: StageProps) {
     drag.current = null;
     if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
     if (!current) return;
-    if (current.kind === "move") {
+    if (current.kind === "anchor") {
+      if (current.moved && anchorDrag) props.onMoveAnchor?.(current.id, anchorDrag.x, anchorDrag.y);
+      setAnchorDrag(null);
+    } else if (current.kind === "move") {
       if (current.moved && delta) props.onMove(current.ids, delta.dx, delta.dy);
       setDelta(null);
     } else if (current.kind === "box") {
@@ -311,7 +333,7 @@ export function MapStage(props: StageProps) {
         <span className={styles.coords}>{hover ? `x ${Math.round(hover.x)} · y ${Math.round(hover.y)}` : "—"}</span>
         <span className={styles.hint}>{armed ? `คลิกเพื่อวาง “${armed.name}” · Shift วางต่อ · Esc ยกเลิก`
           : brush ? (brush.erase ? "แปรงลบ: คลิก/ลากบนช่องเพื่อเอาชิ้นออก · Esc เลิกใช้แปรง" : "แปรงต่อกัน: คลิก/ลากเพื่อวาง ชิ้นจะต่อกันเอง · Shift+ลาก ลบ · Esc เลิกใช้แปรง")
-          : "ลากเพื่อเลือกหลายชิ้น · Space/Alt+ลาก หรือปุ่มกลางเพื่อเลื่อน · ล้อเมาส์ซูม"}</span>
+          : "ลากจุด NPC / ทางออก / จุดเกิด / จุดบริการ เพื่อย้าย · ลากพื้นเพื่อเลือกหลายชิ้น · Space/Alt+ลาก หรือปุ่มกลางเพื่อเลื่อน · ล้อเมาส์ซูม"}</span>
       </div>
     </div>
   );
