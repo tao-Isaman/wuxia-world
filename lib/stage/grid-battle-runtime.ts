@@ -820,7 +820,7 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
       anchor.depth = actor.image.depth;
       anchor.hidden = actor.dead || actor.fledAt >= 0;
       statusFx.sync(actor.id, shownStatus.get(actor.id) ?? null, anchor, elapsed);
-      iconRow = !anchor.hidden && statusFx.iconCount(actor.id) > 0 ? 19 : 0;
+      iconRow = !anchor.hidden && statusFx.iconCount(actor.id) > 0 ? 22 : 0;
     }
     if (active && activeRing && activeMark) {
       const pulse = reduced ? 0 : Math.sin(elapsed / 220) * 0.06;
@@ -851,28 +851,57 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
     }
     parent.dataset.statuses = JSON.stringify(shown);
   }
+  /** Labels that fire close together on one unit stack upward instead of overlapping. */
+  const labelStack = new Map<string, { at: number; slot: number }>();
+  function labelLift(id: string): number {
+    const last = labelStack.get(id);
+    const slot = last && elapsed - last.at < 650 ? last.slot + 1 : 0;
+    labelStack.set(id, { at: elapsed, slot });
+    return (slot % 4) * 19 * uiScale;
+  }
+  /** Cast-time procs (absorb, rage, sap) wait for the cast's first impact. */
+  const pendingProcs: ProcEvent[] = [];
   function startProc(ev: ProcEvent, state: GridBattleState) {
+    if (ev.kind === "absorb" || ev.kind === "rage" || ev.kind === "sap") {
+      const next = state.events.find((e) => e.seq > ev.seq && !isProc(e));
+      if (next?.t === "cast") {
+        pendingProcs.push(ev);
+        current = { ev: ev as unknown as GridEvent, start: elapsed, duration: 0, cast: null };
+        setPlaying(true);
+        return;
+      }
+    }
+    fireProc(ev, state);
+    const duration = reduced ? 220 : ev.kind === "revive" ? 1100 : ev.kind === "opening" ? 700 : ev.kind === "absorb" ? 260 : 460;
+    current = { ev: ev as unknown as GridEvent, start: elapsed, duration, cast: null };
+    setPlaying(true);
+  }
+  function flushProcs(state: GridBattleState) {
+    if (!pendingProcs.length) return;
+    for (const ev of pendingProcs) fireProc(ev, state);
+    pendingProcs.length = 0;
+  }
+  function fireProc(ev: ProcEvent, state: GridBattleState) {
     const actor = actorById.get(ev.unitId);
     if (actor) {
+      // Battle-start procs can fire before the first frame has placed the actor.
+      if (!actor.walk && !actor.attack) { actor.s = rowScale(actor.v); actor.x = boardX(actor.u, actor.v); actor.y = rowY(actor.v); }
       anchor.x = actor.x; anchor.y = actor.y; anchor.s = actor.s; anchor.head = actor.head;
       anchor.top = actor.y - actor.head * actor.s - 26 * uiScale; anchor.depth = actor.image.depth; anchor.hidden = actor.fledAt >= 0;
       if (ev.kind === "revive") { actor.dead = false; actor.hurtUntil = 0; setMotion(actor, "idle"); }
       statusFx?.proc(ev.unitId, ev.kind, ev.el, anchor, elapsed);
       const color = ev.kind === "rage" && ev.el ? RAGE_TEXT[ev.el] : PROC_COLOR[ev.kind] ?? "#f7eedb";
       const big = ev.kind === "revive" || ev.kind === "opening";
-      floatText(ev.label, color, big ? 22 : 16, actor.x, actor.y - actor.head * actor.s - (big ? 46 : 34) * uiScale, big ? 1400 : 1000, big ? 0.1 : 0);
+      floatText(ev.label, color, big ? 22 : 16, actor.x, actor.y - actor.head * actor.s - (big ? 46 : 34) * uiScale - labelLift(ev.unitId), big ? 1400 : 1000, big ? 0.1 : 0);
       if (ev.kind === "revive") {
         const unit = state.units.find((o) => o.id === ev.unitId);
         if (unit) { actor.hp = unit.hp; actor.maxHp = unit.derived.HP; }
         shakeAmp = 2; shakeUntil = elapsed + 160;
       }
     }
-    // A shield / ward / rage shows as it fires; the rest catch up with the state.
-    presentStatuses(state);
+    // Battle-start and revive procs show their statuses now; cast-time ones when the cast's hits are done.
+    if (ev.kind === "opening" || ev.kind === "shield" || ev.kind === "ward" || ev.kind === "revive") presentStatuses(state);
     parent.dataset.procs = [...(parent.dataset.procs ?? "").split(",").filter(Boolean), ev.kind].slice(-24).join(",");
-    const duration = reduced ? 220 : ev.kind === "revive" ? 1100 : ev.kind === "opening" ? 700 : ev.kind === "absorb" ? 260 : 460;
-    current = { ev: ev as unknown as GridEvent, start: elapsed, duration, cast: null };
-    setPlaying(true);
   }
   function startEvent(ev: GridEvent, state: GridBattleState) {
     if (isProc(ev)) { startProc(ev, state); return; }
@@ -958,7 +987,8 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
     current = { ev, start: elapsed, duration, cast };
     setPlaying(true);
   }
-  function castHit(play: CastPlay, index: number) {
+  function castHit(play: CastPlay, index: number, state: GridBattleState) {
+    if (index === 0) flushProcs(state);
     const caster = actorById.get(play.ev.unitId);
     let anyHit = false, anyMiss = false, anyCrit = false;
     for (const r of play.ev.results) {
@@ -1012,7 +1042,7 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
     const cast = play.cast;
     if (cast) {
       const delay = reduced ? 150 : HIT_DELAY, gap = reduced ? 80 : HIT_GAP;
-      while (cast.nextHit < cast.hits && age >= delay + cast.nextHit * gap) castHit(cast, cast.nextHit++);
+      while (cast.nextHit < cast.hits && age >= delay + cast.nextHit * gap) castHit(cast, cast.nextHit++, state);
       if (!cast.healed && age >= cast.lastImpact + 120) {
         cast.healed = true;
         presentStatuses(state);
@@ -1032,6 +1062,7 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
       }
     }
     if (age >= play.duration) {
+      if (play.cast) flushProcs(state);
       lastSeq = play.ev.seq;
       parent.dataset.eventSeq = String(lastSeq);
       options.onPlayed?.(lastSeq);
@@ -1231,7 +1262,7 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
     if (destroyed || failed) return;
     for (const actor of made) { actors.push(actor); actorById.set(actor.id, actor); }
     vfx = createBattleVfx(scene, view);
-    statusFx = createStatusVfx(scene, { label: (text, color, x, y) => floatText(text, color, 13, x, y, 1100) });
+    statusFx = createStatusVfx(scene, { label: (id, text, color, x, y) => floatText(text, color, 13, x, y - labelLift(id), 1100) });
     statusFx.setReduced(reduced);
     // Join mid-battle (remount / retry): history is not replayed — except the
     // battle-start procs (opening, shield, ward) of a fight nobody has moved in yet.

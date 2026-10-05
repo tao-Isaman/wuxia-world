@@ -57,10 +57,10 @@ export interface StatusVfx {
 
 export interface StatusVfxOptions {
   /** A floating label (status applied / ended). */
-  label: (text: string, color: string, x: number, y: number) => void;
+  label: (id: string, text: string, color: string, x: number, y: number) => void;
 }
 
-interface Group { key: string; style: StatusStyle; stacks: number; v: number; u: number; t: string; icon?: string }
+interface Group { key: string; style: StatusStyle; stacks: number; v: number; u: number; t: string; icon?: string; meridian?: boolean }
 
 interface UnitFx {
   icons: { bg: Phaser.GameObjects.Image; count: Phaser.GameObjects.Image }[];
@@ -90,7 +90,7 @@ interface Bit {
   a0: number; spin: number;
 }
 
-const ICON_PX = 16;      // CSS px per status icon
+const ICON_PX = 19;      // CSS px per status icon
 const MAX_ICONS = 6;
 const MOTES = 8;
 const BITS = 96;
@@ -308,7 +308,7 @@ export function createStatusVfx(scene: Phaser.Scene, options: StatusVfxOptions):
         break;
       }
       case "absorb": {
-        spawn(bubbleTex(0x7fd8ff), now, 380, a.x, chestY, { w0: 84 * a.s, w1: 96 * a.s, a0: 1 }, a.depth + 0.35);
+        spawn(ringTex(0x9fe6ff), now, 360, a.x, chestY, { w0: 50 * a.s, w1: 100 * a.s, h0: 70 * a.s, h1: 130 * a.s, a0: 0.9 }, a.depth + 0.35);
         if (!reduced) sparks(0xbfefff, a, now, 6, -1, 1.4);
         break;
       }
@@ -358,7 +358,9 @@ export function createStatusVfx(scene: Phaser.Scene, options: StatusVfxOptions):
       const key = statusKey(r);
       const found = fx.groups.find((g) => g.key === key);
       if (found) { found.stacks++; found.v += r.v ?? 0; found.u = Math.max(found.u, r.u ?? 0); return; }
-      fx.groups.push({ key, style: statusStyle(r, kind), stacks: 1, v: r.v ?? 0, u: r.u ?? 0, t: r.t });
+      // Meridian statuses (rages, the opening, shield, ward) already float their proc label.
+      const meridian = !!r.el || r.t === "shield" || r.t === "ward" || (r.n ?? "").startsWith("เปิดฉาก");
+      fx.groups.push({ key, style: statusStyle(r, kind), stacks: 1, v: r.v ?? 0, u: r.u ?? 0, t: r.t, meridian });
     };
     for (const b of status.buffs) add(b, "buff");
     if ((status.stk ?? 0) > 0) fx.groups.push({ key: "stack_atk", style: statusStyle({ t: "stack_atk" }, "buff"), stacks: status.stk!, v: (status.stk ?? 0) * (status.stkV ?? 0), u: 0, t: "stack_atk" });
@@ -377,7 +379,7 @@ export function createStatusVfx(scene: Phaser.Scene, options: StatusVfxOptions):
       if (fx.primed && !a.hidden) {
         for (const g of fx.groups) if (!fx.keys.has(g.key)) {
           applyBurst(g, a, now);
-          options.label(`${g.style.kind === "buff" ? "▲" : "▼"} ${g.style.label}`, g.style.kind === "buff" ? "#bff5cf" : "#ffb4a6",
+          if (!g.meridian) options.label(id, `${g.style.kind === "buff" ? "▲" : "▼"} ${g.style.label}`, g.style.kind === "buff" ? "#bff5cf" : "#ffb4a6",
             a.x, a.top - 34 * ui);
         }
         for (const key of fx.keys) if (!next.has(key)) {
@@ -399,7 +401,6 @@ export function createStatusVfx(scene: Phaser.Scene, options: StatusVfxOptions):
             { vx: Math.cos(ang) * 120 * a.s, vy: Math.sin(ang) * 90 * a.s, ay: 160 * a.s, w0: 12 * a.s, w1: 3 * a.s }, a.depth + 0.4);
         }
         ring(0x7fd8ff, a, now, true, 420);
-        options.label("โล่แตก", "#bfefff", a.x, a.top - 34 * ui);
       }
       fx.shieldV = v;
       // Ward: a broken rune flashes away.

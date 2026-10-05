@@ -126,3 +126,58 @@ test("ชีพจร: the empty screen explains how to get a chart; the phone l
   expect(fig.height).toBeGreaterThan(150);
   await page.screenshot({ path: `${SHOTS}/meridians-844x390.png` });
 });
+
+// Charts with battle effects: a shield + ward one for the battle, and one with an effect point for the tooltip.
+const guard = MERIDIAN_CHARTS.find((c) => {
+  const kinds = c.nodes.flatMap((n) => n.effects ?? []).map((e) => e.t);
+  return kinds.includes("shield") && kinds.includes("ward");
+});
+const gated = MERIDIAN_CHARTS.find((c) => c.ti >= 1 && c.nodes.some((n) => n.effects?.length));
+
+test("ชีพจร: a point's battle effect shows in its tooltip and in the chart's column", async ({ page }) => {
+  test.skip(!gated, "no chart carries a battle effect");
+  test.setTimeout(150_000);
+  await page.setViewportSize({ width: 1280, height: 720 });
+  const index = gated!.nodes.findIndex((n) => n.effects?.length);
+  // Everything up to the effect point filled; the effect wakes at rank 3.
+  await newGame(page, seed(0, { [gated!.id]: gated!.nodes.map((_, i) => (i <= index ? 3 : 0)) }));
+  await hudButton(page).click();
+  const node = page.getByTestId("meridian-figure").locator(`[data-node-index="${index}"]`);
+  await expect(node).toHaveAttribute("data-effects", /\d/);
+  await node.hover();
+  await expect(page.getByTestId("meridian-tip-effects")).toContainText("ตื่นแล้ว");
+  await expect(page.getByTestId("meridian-effects").locator('[data-active="true"]').first()).toBeVisible();
+  await page.screenshot({ path: `${SHOTS}/meridians-effects-1280x720.png` });
+});
+
+for (const viewport of [{ width: 1280, height: 720 }, { width: 844, height: 390 }]) test(`ชีพจร in battle (${viewport.width}×${viewport.height}): a filled shield / ward chart raises both statuses on the hero`, async ({ page }) => {
+  test.skip(!guard, "no chart carries both a shield and a ward");
+  test.setTimeout(150_000);
+  {
+    await page.setViewportSize(viewport);
+    // Like newGame, but the reload lands on the battle briefing, not the map.
+    await page.goto("/");
+    await page.locator("#hero-name").fill("จอมยุทธ์");
+    await page.getByRole("button", { name: "เริ่มเกมใหม่" }).click();
+    await expect(page.getByTestId("world-canvas")).toHaveAttribute("data-ready", "true", { timeout: 60_000 });
+    await page.evaluate((meridians) => {
+      const raw = JSON.parse(localStorage.getItem("wusia-world-v1")!);
+      const s = raw.state;
+      s.playerBuild.meridians = meridians;
+      s.pendingBattle = { opponentId: "petty_thief", onWin: s.currentSceneId, onLose: s.currentSceneId, nonFatal: true };
+      localStorage.setItem("wusia-world-v1", JSON.stringify(raw));
+    }, { [guard!.id]: guard!.nodes.map(() => 3) });
+    await page.reload();
+    await page.getByRole("button", { name: /เข้าต่อสู้/ }).click();
+    const battle = page.getByTestId("battle-canvas");
+    await expect(battle).toHaveAttribute("data-ready", "true", { timeout: 60_000 });
+    // The battle-start procs play, and the hero carries both statuses.
+    await expect.poll(async () => (await battle.getAttribute("data-procs")) ?? "").toContain("shield");
+    await expect.poll(async () => JSON.parse((await battle.getAttribute("data-statuses")) ?? "{}").A ?? []).toEqual(expect.arrayContaining(["shield", "ward"]));
+    await page.getByRole("button", { name: /^ดู จอมยุทธ์/ }).first().click();
+    const statuses = page.getByTestId("unit-statuses");
+    await expect(statuses.locator('[data-status="shield"]')).toBeVisible();
+    await expect(statuses.locator('[data-status="ward"]')).toBeVisible();
+    await page.screenshot({ path: `${SHOTS}/meridians-battle-${viewport.width}x${viewport.height}.png` });
+  }
+});

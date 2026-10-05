@@ -6,6 +6,13 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-05
 
+### Meridian battle effects, drop-only charts, a look for every status
+
+- **Charts drop only** (no shops), at 1 % from their foes, every tier.
+- **Filled points (rank 3) can wake battle effects**: an opening buff for the first 5 turns, revive once at 50 % HP (T3+, 7 charts), elemental rages when hit (เพลิงพิโรธ attack %, วารีพิสุทธิ์ HP regen, วายุภักษ์ speed %, ปัฐพีแกร่ง defence %, อัสนีคลัง crit; stacking, 3–5 turns), a shield of % max HP, a debuff ward, and saps that lower the target's stats. About 45–50 % of the charts in every tier carry 1–3 effects; the rest give 1.4× the stats instead. Effect strength grows with tier.
+- **Every buff and debuff in the game has a look in battle**: an icon row above each unit, auras (motes, drips, embers, stars), a shield bubble that shrinks and shatters, orbiting ward runes, element glows, apply bursts, expire fades, a revive pillar and floating Thai labels for every proc. The battle unit card groups status chips; the meridian screen shows each point's effects.
+- Grid event `proc`; new statuses `buff_atk_pct`, `buff_regen`, `buff_spd_pct`, `buff_def_pct`, `buff_cri_rate`, `buff_acc_pct`, `shield`, `ward`, `debuff_spd`. `test:meridians` adds 10 battle checks (`scripts/test-meridian-battle.ts`).
+
 ### Meridian charts ask more and give more
 
 - **Every chart now needs more moves, mixed across tiers** (from T0 2–3 moves up to T5 7–8; e.g. a T2 chart asks two T2 and two T1 moves), all from the jianghu plus at most one sect so one hero can learn them.
