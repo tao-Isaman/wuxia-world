@@ -7,6 +7,7 @@ export const ENGINE_FILES = {
   manifest: "public/assets/manifest.json",
   placements: "public/assets/placements.json",
   textOverrides: "lib/game/data/text-overrides.json",
+  mapSpots: "lib/world/data/map-spot-overrides.json",
 } as const;
 export type EngineFileKey = keyof typeof ENGINE_FILES;
 

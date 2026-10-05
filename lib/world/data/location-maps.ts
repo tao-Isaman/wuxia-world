@@ -15,6 +15,7 @@
 import { buildAutoMap } from "./auto-maps";
 import { assignSlotsByBearing } from "../compass";
 import { placeActivitiesAt } from "./activities";
+import { MAP_SPOT_OVERRIDES, applySpotEdits } from "./map-spot-overrides";
 
 export interface MapPoint {
   x: number;
@@ -162,7 +163,26 @@ function withCompassExits(id: string, def: LocationMapDef): LocationMapDef {
   return { ...def, exits: exits.map((e, i) => ({ ...exits[slotOf[i]], to: e.to, icon: e.icon })) };
 }
 
+const edited = new Map<string, LocationMapDef | null>();
+let spotEdits = MAP_SPOT_OVERRIDES.maps;
+
+/** The editor's playtest tab: use its unsaved moved markers instead of the saved file. */
+export function previewSpotEdits(maps: typeof MAP_SPOT_OVERRIDES.maps | undefined): void {
+  spotEdits = maps ?? MAP_SPOT_OVERRIDES.maps;
+  edited.clear();
+}
+
+/** A location's map with the markers moved in the engine's map editor (map-spot-overrides.json). */
 export function getLocationMap(id: string): LocationMapDef | undefined {
+  if (edited.has(id)) return edited.get(id) ?? undefined;
+  const base = getLocationMapBase(id);
+  const def = base ? applySpotEdits(base, spotEdits[id]) : null;
+  edited.set(id, def);
+  return def ?? undefined;
+}
+
+/** A location's map as authored (hand or automatic), before the engine's moved markers. */
+export function getLocationMapBase(id: string): LocationMapDef | undefined {
   // Hand-authored entries win; every other painted location falls back
   // to the convention-based auto builder (see auto-maps.ts, which
   // imports only types from this module — no runtime cycle).

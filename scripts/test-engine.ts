@@ -1,6 +1,7 @@
 // The engine (/game/engine): text overrides over the skill / art tables, the
 // text editor's draft and validation, the asset library's filters and edits,
-// and the save route's whitelist.
+// the map editor's moved markers (map-spot-overrides.json), and the save
+// route's whitelist.
 //
 //   bun run test:engine
 import assert from "node:assert/strict";
@@ -17,7 +18,10 @@ import {
 } from "../lib/engine/asset-edit";
 import { checkSaveRequest, engineWritable, isEngineFileKey } from "../lib/engine/save-policy";
 import { questTexts } from "../lib/engine/quest-text";
-import type { AssetEntry, AssetManifest } from "../lib/assets/types";
+import type { AssetEntry, AssetManifest, PlacementsFile } from "../lib/assets/types";
+import { MAP_SPOT_OVERRIDES, applySpotEdits } from "../lib/world/data/map-spot-overrides";
+import { getLocationMap, getLocationMapBase } from "../lib/world/data/location-maps";
+import { movableAnchor, moveSpot, movedSpotCount, normalizeFile, resetSpots } from "../components/engine/map-editor/model";
 
 let passed = 0;
 function check(name: string, fn: () => void) {
@@ -185,11 +189,54 @@ check("footprint geometry: map units ↔ image px round-trips; a default sits on
   assert.ok(fp.w > 0 && fp.h > 0 && fp.x + fp.w / 2 === 0 && fp.y + fp.h === 0);
 });
 
-check("save route: writes only in dev or with ENGINE_WRITE=1; whitelist of three files; JSON checked", () => {
+check("moved markers: spawn, NPCs, exits and numbered spots move; arrivals, stations and the ring don't; the saved file stays tidy", () => {
+  assert.deepEqual(movableAnchor("spawn"), { group: "spawn" });
+  assert.deepEqual(movableAnchor("npc:home_player_housekeeper_liu"), { group: "npcs", key: "home_player_housekeeper_liu" });
+  assert.deepEqual(movableAnchor("exit:city_capital"), { group: "exits", key: "city_capital" });
+  assert.deepEqual(movableAnchor("service:2"), { group: "spots", key: "2" });
+  for (const id of ["arrival:city_capital", "service:station", "service:tournament", "npc"]) assert.equal(movableAnchor(id), null, id);
+  const empty: PlacementsFile = { version: 1, maps: {} };
+  // 480 × 320 map units = the map's middle (50 %, 50 %).
+  let file = moveSpot(empty, "home_player", "npc:home_player_housekeeper_liu", 480, 320);
+  file = moveSpot(file, "home_player", "exit:city_capital", 96, 64);
+  file = moveSpot(file, "home_player", "spawn", 9999, -5);
+  file = moveSpot(file, "home_player", "arrival:city_capital", 1, 1);
+  assert.deepEqual(file.spots?.home_player, { npcs: { home_player_housekeeper_liu: { x: 50, y: 50 } }, exits: { city_capital: { x: 10, y: 10 } }, spawn: { x: 100, y: 0 } });
+  assert.equal(movedSpotCount(file, "home_player"), 3);
+  assert.deepEqual(Object.keys(normalizeFile(file).spots!.home_player), ["spawn", "npcs", "exits"]);
+  assert.equal(resetSpots(file, "home_player").spots?.home_player, undefined);
+  assert.equal(normalizeFile(resetSpots(file, "home_player")).spots, undefined, "no edits: no spots field");
+  const base = getLocationMapBase("home_player")!;
+  const moved = applySpotEdits(base, file.spots!.home_player);
+  assert.deepEqual(moved.npcSpots!.home_player_housekeeper_liu, { x: 50, y: 50 });
+  assert.deepEqual({ x: moved.exits!.find((e) => e.to === "city_capital")!.x, y: moved.exits!.find((e) => e.to === "city_capital")!.y }, { x: 10, y: 10 });
+  assert.equal(moved.exits!.find((e) => e.to === "city_capital")!.icon, base.exits!.find((e) => e.to === "city_capital")!.icon, "an exit keeps its icon");
+  assert.deepEqual(moved.spawn, { x: 100, y: 0 });
+  assert.deepEqual(moved.npcSpots!.home_player_gatekeeper_zhou, base.npcSpots!.home_player_gatekeeper_zhou, "others stay");
+  // A marker that isn't on the map is ignored, not added.
+  assert.equal(applySpotEdits(base, { npcs: { nobody: { x: 1, y: 1 } } }).npcSpots!.nobody, undefined);
+});
+
+check("the saved moved-markers file names real maps, NPCs on them, real exits and spots, inside the map", () => {
+  assert.equal(MAP_SPOT_OVERRIDES.version, 1);
+  const inside = (p: { x: number; y: number }) => p.x >= 0 && p.x <= 100 && p.y >= 0 && p.y <= 100;
+  for (const [id, edit] of Object.entries(MAP_SPOT_OVERRIDES.maps)) {
+    const base = getLocationMapBase(id);
+    assert.ok(base, `${id}: no such map`);
+    if (edit.spawn) assert.ok(inside(edit.spawn), `${id}: spawn`);
+    for (const [npc, p] of Object.entries(edit.npcs ?? {})) { assert.ok(base!.npcSpots?.[npc], `${id}: npc ${npc} not on the map`); assert.ok(inside(p), `${id}: npc ${npc}`); }
+    for (const [to, p] of Object.entries(edit.exits ?? {})) { assert.ok(base!.exits?.some((e) => e.to === to), `${id}: exit ${to} not on the map`); assert.ok(inside(p), `${id}: exit ${to}`); }
+    for (const [i, p] of Object.entries(edit.spots ?? {})) { assert.ok(base!.spots?.[Number(i)], `${id}: spot ${i} not on the map`); assert.ok(inside(p), `${id}: spot ${i}`); }
+    assert.deepEqual(getLocationMap(id), applySpotEdits(base!, edit), `${id}: the game's map carries the edits`);
+  }
+});
+
+check("save route: writes only in dev or with ENGINE_WRITE=1; whitelist of four files; JSON checked", () => {
   assert.equal(engineWritable({ NODE_ENV: "development" }), true);
   assert.equal(engineWritable({ NODE_ENV: "production" }), false);
   assert.equal(engineWritable({ NODE_ENV: "production", ENGINE_WRITE: "1" }), true);
-  for (const key of ["manifest", "placements", "textOverrides"]) assert.ok(isEngineFileKey(key), key);
+  for (const key of ["manifest", "placements", "textOverrides", "mapSpots"]) assert.ok(isEngineFileKey(key), key);
+  assert.deepEqual(checkSaveRequest({ key: "mapSpots", json: "{}" }), { ok: true, key: "mapSpots", json: "{}", path: "lib/world/data/map-spot-overrides.json" });
   for (const key of ["toString", "__proto__", "constructor", "../package", "", 3, null]) assert.ok(!isEngineFileKey(key), String(key));
   assert.deepEqual(checkSaveRequest({ key: "textOverrides", json: "{}" }), { ok: true, key: "textOverrides", json: "{}", path: "lib/game/data/text-overrides.json" });
   assert.equal(checkSaveRequest({ key: "toString", json: "{}" }).ok, false);

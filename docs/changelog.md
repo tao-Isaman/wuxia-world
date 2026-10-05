@@ -6,6 +6,13 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-05
 
+### Map editor: move NPCs, exits, the spawn and service spots
+
+- **ย้ายจุด.** In แผนที่ (`/game/engine`), drag an NPC, an exit, the spawn or a service spot to move it. Moves have undo / redo, the draft, warnings, play-test and save. **คืนจุดเดิม** resets a map's moved markers.
+- **Where they're saved.** Moved markers save to `lib/world/data/map-spot-overrides.json`, and `getLocationMap` lays it over the hand-authored or automatic map, so the game, the quest guide and the tests use the new points ([engine.md](engine.md#แผนที่--map-editor)).
+- **Tests.** `test:engine` checks the edits, the file's references and the save whitelist (now four files). `placements.spec.ts` drags ป้าหลิว, an exit and the spawn.
+
+
 ### The age of scattered scriptures: the timeline moves to 1401, and a 15-chapter main story
 
 - **The game is now set in the 3rd year of Jianwen (1401), about 40 years after มังกรหยก ภาค 3.**

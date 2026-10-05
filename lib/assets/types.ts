@@ -160,6 +160,21 @@ export interface PlacementsFile {
   maps: Record<string, Placement[]>;
   /** Maps whose painting is replaced by a tiled ground, keyed by location id. */
   grounds?: Record<string, MapGround>;
+  /**
+   * Editor-only: markers moved in the map editor (ย้ายจุด), keyed by location
+   * id, in map percentages. Saved apart, to lib/world/data/map-spot-overrides.json
+   * (MapSpotEdits there), never into placements.json.
+   */
+  spots?: Record<string, MapSpotEditsData>;
+}
+
+type MapPct = { x: number; y: number };
+/** Same shape as lib/world/data/map-spot-overrides.ts `MapSpotEdits`. */
+export interface MapSpotEditsData {
+  spawn?: MapPct;
+  npcs?: Record<string, MapPct>;
+  exits?: Record<string, MapPct>;
+  spots?: Record<string, MapPct>;
 }
 
 /** Engine-edited names and descriptions laid over the skill / art tables (lib/game/data/text-overrides.json). */

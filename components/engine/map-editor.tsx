@@ -12,14 +12,15 @@ import { effectiveMapImage, indexAssets, loadPlacements, reloadAssetData } from 
 import { placementsGeometry } from "@/lib/assets/placement-geometry";
 import { saveEngineFile } from "@/lib/engine/save";
 import { engineStorageGet, engineStorageSet, prepareEnginePlaytest } from "@/lib/engine/goto";
-import { getLocationMap } from "@/lib/world/data/location-maps";
+import { getLocationMapBase } from "@/lib/world/data/location-maps";
+import { MAP_SPOT_OVERRIDES, applySpotEdits } from "@/lib/world/data/map-spot-overrides";
 import { getNpc } from "@/lib/world/data/npcs";
 import { getScene } from "@/lib/world";
 import { worldFootprints } from "@/lib/stage/world-navigation";
 import { mapAnchors, placementIssues, type MapAnchor } from "@/lib/stage/map-anchors";
 import {
-  DRAFT_KEY, EDITOR_MAP_IDS, EMPTY_FILE, clampToMap, commit, editPlacements, initHistory, newPlacement, nextPlacementId,
-  normalizeFile, redo, sameFile, setGround, setMap, snap, undo, type History,
+  DRAFT_KEY, EDITOR_MAP_IDS, EMPTY_FILE, clampToMap, commit, editPlacements, initHistory, movableAnchor, moveSpot, movedSpotCount,
+  newPlacement, nextPlacementId, normalizeFile, normalizeSpots, redo, resetSpots, sameFile, setGround, setMap, snap, undo, type History,
 } from "./map-editor/model";
 import { MapStage, movedPoint, type LabelledAnchor } from "./map-editor/map-stage";
 import { AssetPalette } from "./map-editor/asset-palette";
@@ -81,7 +82,8 @@ export function MapEditor({ assets }: { assets: AssetEntry[] }) {
     reloadAssetData();
     void loadPlacements().then((file) => {
       if (!live) return;
-      const saved: PlacementsFile = file?.maps ? normalizeFile(file) : EMPTY_FILE;
+      // Moved markers live in their own file (lib/world/data/map-spot-overrides.json); the editor works on both as one.
+      const saved: PlacementsFile = normalizeFile({ ...(file?.maps ? file : EMPTY_FILE), spots: MAP_SPOT_OVERRIDES.maps });
       let start = saved;
       const raw = engineStorageGet(() => localStorage, DRAFT_KEY);
       if (raw) {
@@ -114,7 +116,10 @@ export function MapEditor({ assets }: { assets: AssetEntry[] }) {
 
   const index = useMemo(() => indexAssets(assets), [assets]);
   const sets = useMemo(() => kitSets(assets), [assets]);
-  const map = getLocationMap(mapId)!;
+  // The map as authored, with the markers moved in this editor (saved or not).
+  const spotEdits = present.spots?.[mapId];
+  const map = useMemo(() => applySpotEdits(getLocationMapBase(mapId)!, spotEdits), [mapId, spotEdits]);
+  const movedSpots = movedSpotCount(present, mapId);
   const placements = useMemo(() => present.maps[mapId] ?? [], [present, mapId]);
   const existing = useMemo(() => new Set(placements.map((p) => p.id)), [placements]);
   const selected = useMemo(() => new Set([...selectedIds].filter((id) => existing.has(id))), [selectedIds, existing]);
@@ -259,15 +264,22 @@ export function MapEditor({ assets }: { assets: AssetEntry[] }) {
   async function save() {
     setSaving(true);
     const file = normalizeFile(present);
-    const result = await saveEngineFile("placements", file);
+    // Two files: the placed objects (fetched by the game) and the moved markers (read by the world data).
+    const { spots, ...objects } = file;
+    const placed = await saveEngineFile("placements", objects);
+    const markers = await saveEngineFile("mapSpots", { version: 1, maps: normalizeSpots(spots) });
     setSaving(false);
-    if (result.ok) {
+    if (placed.ok && markers.ok) {
       setBaseline(file);
       reloadAssetData();
-      setMessage(`บันทึกลง ${result.written} แล้ว`);
+      setMessage(`บันทึกลง ${placed.written} และ ${markers.written} แล้ว`);
     } else {
-      setMessage(`บันทึกลงไฟล์ไม่ได้ (${result.reason})${result.downloaded ? " — ดาวน์โหลด placements.json แทนแล้ว" : ""}`);
+      const failed = [placed, markers].find((r) => !r.ok) as Extract<typeof placed, { ok: false }>;
+      setMessage(`บันทึกลงไฟล์ไม่ได้ (${failed.reason})${failed.downloaded ? " — ดาวน์โหลดไฟล์ JSON แทนแล้ว" : ""}`);
     }
+  }
+  function moveAnchor(anchorId: string, x: number, y: number) {
+    update((file) => moveSpot(file, mapId, anchorId, x, y));
   }
   function revert() {
     if (!baseline || !window.confirm("ทิ้งการแก้ไขที่ยังไม่บันทึกทั้งหมด?")) return;
@@ -285,7 +297,7 @@ export function MapEditor({ assets }: { assets: AssetEntry[] }) {
   return (
     <div ref={root} className={styles.root} data-testid="map-editor" data-map={mapId} data-dirty={dirty}
       data-loaded={!!baseline} data-placement-count={placements.length} data-selected={[...selected].join(" ")}
-      data-undo={history.past.length} data-redo={history.future.length}>
+      data-undo={history.past.length} data-redo={history.future.length} data-moved-spots={movedSpots}>
       <div className={styles.toolbar} role="toolbar" aria-label="เครื่องมือแผนที่">
         <span className={styles.mapTitle}>{placeName(mapId)} <small>({mapId})</small></span>
         <span className={styles.toolbarGroup}>
@@ -304,6 +316,8 @@ export function MapEditor({ assets }: { assets: AssetEntry[] }) {
         <label><input type="checkbox" checked={show.footprints} onChange={(e) => setShow((s) => ({ ...s, footprints: e.target.checked }))} /> ฐานวัตถุ</label>
         <label><input type="checkbox" checked={show.collision} onChange={(e) => setShow((s) => ({ ...s, collision: e.target.checked }))} /> เส้นชนของแผนที่</label>
         <label><input type="checkbox" checked={show.markers} onChange={(e) => setShow((s) => ({ ...s, markers: e.target.checked }))} /> จุดสำคัญ</label>
+        <button type="button" data-testid="map-spots-reset" disabled={!movedSpots} title="คืนตำแหน่ง NPC / ทางออก / จุดเกิด / จุดบริการ ที่ย้ายไว้บนแผนที่นี้"
+          onClick={() => update((file) => resetSpots(file, mapId))}>คืนจุดเดิม{movedSpots ? ` (${movedSpots})` : ""}</button>
         <span className={styles.toolbarGroup} style={{ marginLeft: "auto" }}>
           <span className={dirty ? styles.dirty : styles.clean} data-testid="map-editor-status">{!baseline ? "กำลังโหลด…" : dirty ? "● ยังไม่บันทึก" : "✓ บันทึกแล้ว"}</span>
           {message && <span className={styles.message} title={message}>{message}</span>}
@@ -334,6 +348,7 @@ export function MapEditor({ assets }: { assets: AssetEntry[] }) {
         collision={collision} flagged={flagged} show={show} grid={grid} armed={armed}
         brush={kit && !armed ? { cell: kit.cell, grid: kit.grid, erase: kitErase } : null} onBrush={brushCells}
         onSelect={select} onMove={moveBy} onPlace={place}
+        movable={(id) => !!movableAnchor(id)} onMoveAnchor={moveAnchor}
         onDropAsset={(id, x, y) => { const asset = index.get(id); if (asset) place(asset, x, y); }} />
 
       <div className={styles.side}>
