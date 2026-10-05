@@ -267,7 +267,7 @@ Per tier: T0: 9 · T1: 44 · T2: 74 · T3: 54 · T4: 207. Per category: ฝ่�
 | `hunter_beggars` | นักล่าพรรคยาจก | human | — | 10 | betrayal |
 | `hunter_jinyiwei` | นักล่าองครักษ์เสื้อแพร | human | — | 10 | betrayal |
 | `hunter_sunmoon` | นักล่าพรรคตะวันจันทรา | human | — | 10 | betrayal |
-| `hunter_tang` | นักล่าสำนักสุลถัง | human | — | 10 | betrayal |
+| `hunter_tang` | นักล่าสำนักสกุลถัง | human | — | 10 | betrayal |
 | `elite_bandit_king` | ราชาโจรภูเขา | human | 1× รองหัวหน้าโจร + 2× มือเข็มโจรป่า + 2× โจรป่า | 10 | — |
 | `elite_cult_elder` | ผู้อาวุโสลัทธิมาร | human | 3× สาวกลัทธิมาร | 10 | scene ×2 |
 | `elite_bear_king` | ราชาหมีพันปี | beast | 1× หมีสีน้ำตาล | 9 | — |

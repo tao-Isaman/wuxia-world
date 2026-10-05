@@ -1661,7 +1661,7 @@ export const OPPONENTS: readonly OpponentDef[] = [
       skillIds: ["mi_firepalm"],
     }) },
 
-  // ─── สำนักสุลถัง — sect leadership (T1-T4) ──────────────────────────
+  // ─── สำนักสกุลถัง — sect leadership (T1-T4) ──────────────────────────
   // Tang sect leadership. Hidden weapon + poison kits — high DEX/AGI,
   // multi-hit dart volleys, heavy poison riders. Chief carries the
   // full T4 disciple line.
@@ -1906,10 +1906,10 @@ export const OPPONENTS: readonly OpponentDef[] = [
       artLevels: { qiankun: 9, yxhd: 9, t3_sm_sunmoon: 9 },
     }) },
 
-  { id: "hunter_tang", name: "นักล่าสำนักสุลถัง", ti: 4, category: "human",
+  { id: "hunter_tang", name: "นักล่าสำนักสกุลถัง", ti: 4, category: "human",
     drops: [...DROPS_T4,
       { itemId: "viper_venom", weight: 3 }, { itemId: "centipede_venom", weight: 2 }],
-    build: () => build("นักล่าสำนักสุลถัง", 4, {
+    build: () => build("นักล่าสำนักสกุลถัง", 4, {
       stats: { DEX: 22, AGI: 16, STR: 10, LUK: 6, VIT: 6 },
       artId: "t4_tang_tenkpoisons", artLevel: 9,
       skillIds: ["tang_heartpierce", "tang_starrain", "tang_meteorpierce"],
