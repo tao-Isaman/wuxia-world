@@ -29,7 +29,8 @@ The NPC simulation and rumors are in [liveness.md](liveness.md). The content tab
 | File | Role |
 | --- | --- |
 | `lib/world/types.ts` | Every world type: scenes, `SceneEffect`, `Condition`, quests, items, life skills, NPCs, opponents, `WorldStateData`, Liveness types, sect membership, `SectId` |
-| `lib/world/effects.ts` | `applyEffect` / `applyEffects`, quest progress and rewards, `rollWalkEvent` (law, hunters), `rollFoeSpawn`, `releaseFromJail`, `describeQuestCondition`, offer / turn-in checks |
+| `lib/world/effects.ts` | `applyEffect` / `applyEffects`, quest progress and rewards, `releaseFromJail`, `describeQuestCondition`, offer / turn-in checks |
+| `lib/world/encounters.ts` | walk-tick encounters: `rollWalkEvent` (law, ambushers, hunters), `rollFoeSpawn`, `encounterFoeAvailable`, `collectActiveHuntTargets` (re-exported from `effects.ts`) |
 | `lib/world/conditions.ts` | `evaluateCondition`, `getQuestStatus` |
 | `lib/world/quest-objectives.ts` | hands-on objective spots |
 | `lib/world/quest-guide.ts` | what to do next for a quest, where, and which way to walk; tracking |
@@ -212,7 +213,7 @@ Nothing rolls on arrival. While the hero walks on a location or route map, the w
 
 `walkTick` does nothing when there is no game, the game is over, a battle or encounter is pending, the scene is `home_player` or `jail` (`SAFE_SCENES`), or `localStorage["wuxia-random-events"] === "off"` (the switch the browser tests use). Otherwise:
 
-1. **`rollWalkEvent(state)`** (`lib/world/effects.ts`): the law, then sect hunters, each setting `pendingEncounter` at once.
+1. **`rollWalkEvent(state)`** (`lib/world/encounters.ts`): the law, then sect hunters, each setting `pendingEncounter` at once.
    - **The law.** With wanted marks, `lawChance(marks)` spawns a law pursuer; the city whose jail would hold the hero is remembered (`jailCityId`).
    - **Sect hunters.** If any membership is `betrayed`, a 30 % roll spawns that sect's `hunter_<sectId>`.
 2. **`rollFoeSpawn(state, present)`**: if fewer than `FOE_SPAWN.maxPerMap` (3) foes wait on this map, a `FOE_SPAWN.chance` (30 %) roll picks a foe from the zone's pool. In a settled place (`isSettledPlace` in `data/random-events.ts`: cities, villages, homes, inns, sects, temples, the palace, villas, markets, tribes) nothing spawns unless an active kill quest's target is in this zone's pool; then only that quarry comes (at `FOE_SPAWN.huntChance`). Roads and the wilds keep their foes. The store then asks `pickSpot` and adds a `RoamingFoe { id, opponentId, locationId, x, y }` to `roamingFoes`.
