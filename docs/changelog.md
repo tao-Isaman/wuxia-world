@@ -4,6 +4,17 @@ What changed, when, and in which pull request. Newest first. Each entry says wha
 
 Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-Isaman/wuxia-world/pulls?q=is%3Apr+is%3Amerged). The waves are the build → test → review rounds the agents worked in (see [HANDOFF.md](../HANDOFF.md)).
 
+## 2026-10-07
+
+### Names that match, sagas read to the end, quests that work
+
+- **Place names match the story:** โรงเตี๊ยมเฮ่อลั่ว, โรงเตี๊ยมเกาเซิ่ง, วัดต้าหลุน, สระมังกรดำ, ผาสำนึกผิด (and stray spellings of คุ้มสมุนไพร, คุ้มนกนางแอ่น, โรงเตี๊ยมยั่วไหล) — in the map and every line.
+- **No two NPCs share a name:** the Nanxian woodcutter is ลุงฉาย, the Sun-Moon disciple ศิษย์เสี่ยวเยว่, the Hui wrestler หม่าต้าหู่; Emei's nuns are ซือไท้ (ซือไท้จิงฉาน, ซือไท้ชิงซิน, ซือไท้ฮุยอวี้, รองเจ้าสำนักฮุยเหมียว, หมอชีอวี้ซิน), not the garbled ท่านนิ้ว.
+- **Spy quests** pay their gold once (the extra 400 added when they stopped teaching manuals is gone).
+- **Every saga read from chapter 3 to the end:** next-giver pointers at chapter ends, continuity (counts, who is alive, where things are), hints that name the stage's real foe / item / place, `{hero}` out of quest-log summaries, Thai stat names, no loanwords, long lines split (~640 lines).
+- **Quests:** hand-written offers with their own accept choice open before accepting, so ปฏิเสธ works; 27 dialogs nothing opened are wired into play (Motian's keep-or-return choice now ends the quest); 💬 ถามความคืบหน้า on the NPC card; real hand-ins for the Hengshan winter aid, the desert relic and หมอหลิน's stolen formula (a quest item, no 800-gold book); the Shaolin–Wudang joint quest has a place and a way on at every stage; dialog speakers find their NPC portrait (`lib/world/speaker.ts`); `scripts/test-quest-dialogs.ts` (in `test:quests`) keeps every `qs_*` dialog reachable.
+- **Guide:** matches an NPC's short name before a bracketed title.
+
 ## 2026-10-06
 
 ### Overnight pass: maintainability, speed, and quest text a newcomer can follow

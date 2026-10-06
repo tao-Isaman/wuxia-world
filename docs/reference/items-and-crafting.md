@@ -2,7 +2,7 @@
 
 # Items, shops, crafting and gathering
 
-478 items (`lib/world/data/items.ts`), 19 shops, 7 martial halls, 49 artisans, 36 recipes and 25 gathering / hunting nodes.
+479 items (`lib/world/data/items.ts`), 19 shops, 7 martial halls, 49 artisans, 36 recipes and 25 gathering / hunting nodes.
 
 ## Contents
 
@@ -526,7 +526,7 @@
 | `bear_claw` | อุ้งหมี | 150 | — |
 | `fish_dragon` | ปลามังกร | 1500 | — |
 
-### ของภารกิจ (`quest`, 13)
+### ของภารกิจ (`quest`, 14)
 
 | Id | Name | Price | Use |
 | --- | --- | --- | --- |
@@ -542,6 +542,7 @@
 | `qst_kunlun_evidence` | ม้วนหนังสือพิสูจน์ฤๅษี | 0 | — |
 | `qst_kunlun_snow_ginseng` | โสมหิมะคุนหลุน | 0 | — |
 | `qst_jinshe_golden_snake` | งูทองของซวีเหลิงชิง | 0 | — |
+| `qst_lin_formula` | ตำรับยาลับของหมอหลิน | 0 | — |
 | `qst_motian_ancient_sword` | ดาบโบราณของเหลียงเก๋อ | 0 | — |
 
 ## Shops

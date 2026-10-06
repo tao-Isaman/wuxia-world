@@ -35,7 +35,7 @@ Per tier: T0: 9 · T1: 44 · T2: 74 · T3: 55 · T4: 208. Per category: ฝ่�
 | `road_bandit` | โจรเส้นทาง | human | 1× โจรเร่ร่อน | 5 | roams (city, frontier, isle, mansion, sect, temple, wild) |
 | `river_pirate` | โจรสลัดน้ำ | human | 1× โจรเร่ร่อน | 6 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×2 |
 | `desert_marauder` | นักรบทะเลทราย | human | — | 5 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×1 |
-| `fortune_thief` | หมอดูปลอม | human | — | 5 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×3 |
+| `fortune_thief` | หมอดูปลอม | human | — | 5 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×4 |
 | `hunt_wild_dog` | สุนัขป่า | beast | — | 5 | hunt |
 | `hunt_boar` | หมูป่าฝูง | beast | 1× หมูป่าฝูง | 6 | hunt |
 | `hunt_jungle_cat` | เสือดาวป่า | beast | — | 6 | hunt |
