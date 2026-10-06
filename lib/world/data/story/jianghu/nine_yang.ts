@@ -142,7 +142,7 @@ const ACT1: readonly StoryChapterSpec[] = [
       ],
     },
     steps: [
-      { t: "visit", locationId: "valley_hudie", label: "สำรวจกระท่อมหมอเทวดาในหุบผีเสื้อ", hint: "ไปหุบผีเสื้อ สำรวจกระท่อมเก่าของหมอเทวดาโอ้วแชงู",
+      { t: "visit", locationId: "valley_hudie", label: "สำรวจกระท่อมหมอเทวดาในหุบผีเสื้อ", hint: "ไปถ้ำหุบเขาผีเสื้อ สำรวจกระท่อมเก่าของหมอเทวดาโอ้วแชงู",
         scene: {
           cutscene: {
             stage: "valley_hudie", mood: "past",
@@ -203,7 +203,7 @@ const ACT1: readonly StoryChapterSpec[] = [
       go: "ไปดักคนที่หุบผีเสื้อ",
     },
     steps: [
-      { t: "duel", locationId: "valley_hudie", label: "ดักมือหิมะที่หุบผีเสื้อ", hint: "ไปหุบผีเสื้อ ดักชายที่ทิ้งรอยเท้าน้ำแข็ง", opponentId: FROST_HAND,
+      { t: "duel", locationId: "valley_hudie", label: "ดักมือหิมะที่หุบผีเสื้อ", hint: "ไปถ้ำหุบเขาผีเสื้อ ดักชายที่ทิ้งรอยเท้าน้ำแข็ง", opponentId: FROST_HAND,
         before: {
           lines: [
             "ตอนพลบค่ำ ชายชุดฟ้าซีดคนหนึ่งเดินเข้าหุบ ทุกก้าวของเขาทิ้งไอเย็นบนหญ้าเป็นวง",
@@ -1626,7 +1626,7 @@ const ACT4: readonly StoryChapterSpec[] = [
           ],
           go: "วิ่งเข้าศาลาเพลิง",
         } },
-      { t: "visit", locationId: "desert_ruins", label: "หยุดพิธีเผาหน้าผนังเก้าตะวัน", hint: "หยุดพิธีเผาทหารแก่เฉินหน้าผนังเก้าตะวัน",
+      { t: "visit", locationId: "desert_ruins", label: "หยุดพิธีเผาหน้าผนังเก้าตะวัน", hint: "หยุดพิธีเผาทหารแก่เฉินหน้าผนังเก้าตะวันในทะเลทรายร้าง",
         scene: {
           cutscene: {
             stage: "desert_ruins", mood: "night",
@@ -1979,7 +1979,7 @@ const ACT5: readonly StoryChapterSpec[] = [
           ],
           go: "ตามวานรเฒ่าไป",
         } },
-      { t: "visit", locationId: "mt_kunlun_immortal", label: "ดูต้นไม้ใหญ่ที่สุดในหุบ", hint: "ตามวานรเผือกเฒ่าไปดูต้นไม้ใหญ่ที่สุดในหุบเหว",
+      { t: "visit", locationId: "mt_kunlun_immortal", label: "ดูต้นไม้ใหญ่ที่สุดในหุบ", hint: "ตามวานรเผือกเฒ่าไปดูต้นไม้ใหญ่ที่สุดในหุบเหวนิรันดร์คุนหลุน",
         scene: {
           cutscene: {
             stage: "mt_kunlun_immortal", mood: "past",
@@ -2107,7 +2107,7 @@ const ACT5: readonly StoryChapterSpec[] = [
       go: "ไถลลงไปในหุบที่ถูกกลบ",
     },
     steps: [
-      { t: "duel", locationId: "mt_kunlun_immortal", label: "ฝ่าผู้อาวุโสลัทธิที่เฝ้าสันหิมะ", hint: "ฝ่าผู้อาวุโสลัทธิมารที่เผยทิ้งไว้เฝ้าสันหิมะเหนือหุบเหว", opponentId: "elite_cult_elder",
+      { t: "duel", locationId: "mt_kunlun_immortal", label: "ฝ่าผู้อาวุโสลัทธิที่เฝ้าสันหิมะ", hint: "ฝ่าผู้อาวุโสลัทธิมารที่เผยทิ้งไว้เฝ้าสันหิมะเหนือหุบเหวนิรันดร์คุนหลุน", opponentId: "elite_cult_elder",
         before: {
           lines: [
             "บนสันหิมะ ชายชราในชุดขาวขาดวิ่นยืนขวางทาง ป้ายคบเพลิงดับห้อยคอ ดวงตาว่างเปล่า",
@@ -2123,7 +2123,7 @@ const ACT5: readonly StoryChapterSpec[] = [
           ],
           go: "ไถลลงหุบ",
         } },
-      { t: "visit", locationId: "mt_kunlun_immortal", label: "ขุดหุบเหวที่ถูกหิมะกลบ", hint: "ขุดวานรและต้นท้อในหุบเหวที่ถูกหิมะกลบ",
+      { t: "visit", locationId: "mt_kunlun_immortal", label: "ขุดหุบเหวที่ถูกหิมะกลบ", hint: "ขุดวานรและต้นท้อในหุบเหวนิรันดร์คุนหลุนที่ถูกหิมะกลบ",
         scene: {
           lines: [
             "ทั้งหุบขาวโพลนและเงียบ ท่านกับตู้หานซวงขุดด้วยมือ เหล่าจิ่วขุดด้วยไหเหล้า ผู้อาวุโสลัทธิขุดด้วยพลั่ว",

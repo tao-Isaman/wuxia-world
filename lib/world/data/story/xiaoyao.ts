@@ -395,7 +395,7 @@ const MUTE_ENVOY: StoryArcSpec = {
               ] },
             ],
           } },
-        { t: "visit", locationId: "city_capital", label: "พบคนสวนใบ้ยามค่ำ", hint: "ตามหาคนสวนใบ้หน้าบากในสวนหลังจวนยามค่ำคืน",
+        { t: "visit", locationId: "city_capital", label: "พบคนสวนใบ้ยามค่ำ", hint: "ตามหาคนสวนใบ้หน้าบากในสวนหลังจวนเสนาบดีในนครหลวงยามค่ำคืน",
           scene: {
             cutscene: {
               stage: "city_capital", mood: "night",
@@ -472,7 +472,7 @@ const MUTE_ENVOY: StoryArcSpec = {
         go: "ท่องรหัสเคาะหลังทั้งคืน แล้วกลับเข้าจวน",
       },
       steps: [
-        { t: "visit", locationId: "city_capital", label: "ฟังข้อความบนหลัง", hint: "กลับเข้าจวนเสนาบดี ให้คนสวนใบ้เคาะข้อความบนหลังอีกครั้ง",
+        { t: "visit", locationId: "city_capital", label: "ฟังข้อความบนหลัง", hint: "กลับเข้าจวนเสนาบดีในนครหลวง ให้คนสวนใบ้เคาะข้อความบนหลังอีกครั้ง",
           scene: {
             lines: [
               "คืนนั้นท่านนั่งถอนหญ้าข้างชายชรา เขาไม่หันมามอง แต่ฝ่ามือวางลงกลางหลังท่านนานกว่าครั้งก่อน",
@@ -574,7 +574,7 @@ const MUTE_ENVOY: StoryArcSpec = {
         go: "รีบไปนครหลวง",
       },
       steps: [
-        { t: "visit", locationId: "city_capital", label: "ลานสอบสวนยามดึก", hint: "แอบเข้าจวนเสนาบดียามดึก ไปที่ลานที่หลิวชิงถูกสอบสวน",
+        { t: "visit", locationId: "city_capital", label: "ลานสอบสวนยามดึก", hint: "แอบเข้าจวนเสนาบดีในนครหลวงยามดึก ไปที่ลานที่หลิวชิงถูกสอบสวน",
           scene: {
             cutscene: {
               stage: "city_capital", mood: "night",
@@ -631,7 +631,7 @@ const MUTE_ENVOY: StoryArcSpec = {
         go: "ไปนครหลวงก่อนรุ่งสาง",
       },
       steps: [
-        { t: "duel", locationId: "city_capital", label: "ขวางพ่อบ้านใหญ่ก่อนรุ่งสาง", hint: "เอาชนะพ่อบ้านใหญ่ตาเหยี่ยวที่ลานจวนเสนาบดีก่อนรุ่งสาง", opponentId: STEWARD,
+        { t: "duel", locationId: "city_capital", label: "ขวางพ่อบ้านใหญ่ก่อนรุ่งสาง", hint: "เอาชนะพ่อบ้านใหญ่ตาเหยี่ยวที่ลานจวนเสนาบดีในนครหลวงก่อนรุ่งสาง", opponentId: STEWARD,
           before: {
             cutscene: {
               stage: "city_capital", mood: "night",

@@ -430,7 +430,7 @@ const TENDON: StoryArcSpec = {
         go: "ยกคานขึ้นบ่า",
       },
       steps: [
-        { t: "stat", stat: "VIT", min: 50, hint: "แบกน้ำทุกเช้าจนร่างกายแกร่งขึ้น (VIT ≥ 50)" },
+        { t: "stat", stat: "VIT", min: 50, hint: "แบกน้ำทุกเช้าจนร่างกายแกร่งขึ้น (ร่างกาย ≥ 50)" },
         { t: "trait", trait: "humility", min: 25, hint: "แบกจนใจต่ำพอจะไม่บ่น (ความถ่อมตน ≥ 25)" },
         { t: "talk", npcId: HEAD, locationId: "sect_shaolin", label: "แบกน้ำคู่กับหยวนเฉวียน", hint: "แบกถังน้ำขึ้นบันไดคู่กับหัวหน้าศิษย์หยวนเฉวียน",
           scene: {
@@ -1087,7 +1087,7 @@ const DIAMOND: StoryArcSpec = {
         go: "ไปสระมังกรดำ",
       },
       steps: [
-        { t: "talk", npcId: "wld_heilong_fisherman_tan", locationId: "pool_heilong", label: "ถามต่านเหลาตูเรื่องชายใส่แหวนหยก", hint: "ไปสระมังกรดำ ถามต่านเหลาตูว่าเห็นคหบดีเซ่งไหม",
+        { t: "talk", npcId: "wld_heilong_fisherman_tan", locationId: "pool_heilong", label: "ถามต่านเหลาตูเรื่องชายใส่แหวนหยก", hint: "ไปมังกรดำสระน้ำ ถามชาวประมงต่านเหลาตูว่าเห็นคหบดีเซ่งไหม",
           scene: {
             lines: [
               ["ต่านเหลาตู (ชาวประมงแก่)", "ชายใส่แหวนหยกหรือ วิ่งผ่านมาเมื่อเช้า ถามข้าว่าตรงไหนลึกที่สุด ข้าบอกว่าตรงที่เจ้ายืนแหละ ลึกที่สุดแล้ว — ในใจคน"],
@@ -1097,7 +1097,7 @@ const DIAMOND: StoryArcSpec = {
             ],
             go: "ไปที่โขดหินปลายสระ",
           } },
-        { t: "duel", locationId: "pool_heilong", label: "เผชิญคหบดีเซ่งที่โขดหินปลายสระ", hint: "เอาชนะคหบดีเซ่งที่สระมังกรดำ", opponentId: "st_shaolinarts_patron_seng",
+        { t: "duel", locationId: "pool_heilong", label: "เผชิญคหบดีเซ่งที่โขดหินปลายสระ", hint: "เอาชนะคหบดีเซ่งที่มังกรดำสระน้ำ", opponentId: "st_shaolinarts_patron_seng",
           before: {
             cutscene: {
               stage: "pool_heilong", mood: "dusk",
@@ -1446,7 +1446,7 @@ const DEMON_SUBDUER: StoryArcSpec = {
         go: "ไปหารองเจ้าอาวาส",
       },
       steps: [
-        { t: "stat", stat: "STR", min: 50, hint: "ฝึกถือเชือกดำจนข้อมือแกร่งพอจะถือได้ทั้งคืน (STR ≥ 50)" },
+        { t: "stat", stat: "STR", min: 50, hint: "ฝึกถือเชือกดำจนข้อมือแกร่งพอจะถือได้ทั้งคืน (กำลัง ≥ 50)" },
         { t: "talk", npcId: VICE, locationId: "sect_shaolin", label: "ฝึกถือเชือกกับรองเจ้าอาวาสลั่วฮั่น", hint: "ฝึกถือเชือกดำกับรองเจ้าอาวาสลั่วฮั่น",
           scene: {
             lines: [

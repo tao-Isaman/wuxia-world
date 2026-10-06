@@ -356,7 +356,7 @@ const QIANKUN: StoryArcSpec = {
         go: "ออกเดินทางไปเส้าหลินและง้อไบ๊",
       },
       steps: [
-        { t: "talk", npcId: SHAOLIN_ABBOT, locationId: "sect_shaolin", label: "ขอพบเจ้าอาวาสฮุยหยวน", hint: "ขอดูจดหมายไร้ชื่อจากเจ้าอาวาสฮุยหยวนแห่งเส้าหลิน",
+        { t: "talk", npcId: SHAOLIN_ABBOT, locationId: "sect_shaolin", label: "ขอพบเจ้าอาวาสฮุยหยวน", hint: "ไปวัดเส้าหลิน ขอดูจดหมายไร้ชื่อจากเจ้าอาวาสฮุยหยวน",
           scene: {
             lines: [
               ["เจ้าอาวาสฮุยหยวน", "อมิตตาพุทธ ศิษย์พรรคตะวันจันทรามาถึงเส้าหลินโดยไม่พกคบไฟ อาตมาถือว่าเป็นนิมิตดี"],
@@ -367,7 +367,7 @@ const QIANKUN: StoryArcSpec = {
             ],
             go: "คารวะแล้วไปง้อไบ๊",
           } },
-        { t: "talk", npcId: EMEI_ABBESS, locationId: "sect_emei", label: "ขอพบเจ้าสำนักง้อไบ๊", hint: "ขอดูจดหมายไร้ชื่อจากเจ้าสำนักง้อไบ๊",
+        { t: "talk", npcId: EMEI_ABBESS, locationId: "sect_emei", label: "ขอพบเจ้าสำนักง้อไบ๊", hint: "ไปง้อไบ๊ ขอดูจดหมายไร้ชื่อจากท่านนิ้วห้วนจิงฉาน",
           scene: {
             lines: [
               ["ท่านเจ้าสำนักจิงฉาน", "คนของพรรคมาร! สี่สิบกว่าปีก่อนศิษย์ง้อไบ๊หลายคนตายบนยอดกวงเม้ง เจ้ากล้ามาที่นี่หรือ"],
@@ -433,7 +433,7 @@ const QIANKUN: StoryArcSpec = {
         go: "ไปหาไต้ซิ่วเหอที่ลานฝึก",
       },
       steps: [
-        { t: "stat", stat: "POW", min: 45, hint: "ฝึกลมปราณจนพลังภายในหนักแน่นพอจะรับแรงคนอื่นไว้ได้ (POW ≥ 45)" },
+        { t: "stat", stat: "POW", min: 45, hint: "ฝึกลมปราณจนพลังภายในหนักแน่นพอจะรับแรงคนอื่นไว้ได้ (ภายใน ≥ 45)" },
         { t: "duel", locationId: "sect_ming", label: "ซ้อมย้ายแรงกับไต้ซิ่วเหอ", hint: "ซ้อมย้ายแรงกับศิษย์ไต้ซิ่วเหอที่ลานฝึกของพรรค", opponentId: "spar_sunmoon_lanfenghuang",
           before: {
             lines: [
@@ -525,8 +525,8 @@ const QIANKUN: StoryArcSpec = {
         go: "เตรียมตัวขึ้นคุนหลุน",
       },
       steps: [
-        { t: "stat", stat: "POW", min: 50, hint: "ฝึกลมปราณให้หนักแน่นพอจะรับเจ็ดขั้นในคืนเดียว (POW ≥ 50)" },
-        { t: "visit", locationId: "mt_kunlun", label: "ฝึกในอุโมงค์ตลอดคืน", hint: "ฝึกเฉียนคุนต้าหนัวอีกับเจ้าสำนักในอุโมงค์ใต้ยอดกวงเม้งตลอดคืน",
+        { t: "stat", stat: "POW", min: 50, hint: "ฝึกลมปราณให้หนักแน่นพอจะรับเจ็ดขั้นในคืนเดียว (ภายใน ≥ 50)" },
+        { t: "visit", locationId: "mt_kunlun", label: "ฝึกในอุโมงค์ตลอดคืน", hint: "ฝึกเฉียนคุนต้าหนัวอีกับเจ้าสำนักในอุโมงค์ใต้ซากยอดกวงเม้งบนเขาคุนหลุนตลอดคืน",
           scene: {
             cutscene: {
               stage: "mt_kunlun", mood: "night",
@@ -580,7 +580,7 @@ const QIANKUN: StoryArcSpec = {
         go: "ขึ้นซากยอดกวงเม้งในคืนเพ็ญ",
       },
       steps: [
-        { t: "duel", locationId: "mt_kunlun", label: "รับขั้นที่เก้าของฉีเหยียน", hint: "เผชิญฉีเหยียนผู้ฝืนขั้นเก้าบนซากยอดกวงเม้งในคืนเพ็ญ", opponentId: "st_sunmoon_forced_ninth",
+        { t: "duel", locationId: "mt_kunlun", label: "รับขั้นที่เก้าของฉีเหยียน", hint: "เผชิญฉีเหยียนผู้ฝืนขั้นเก้าบนซากยอดกวงเม้ง เขาคุนหลุน ในคืนเพ็ญ", opponentId: "st_sunmoon_forced_ninth",
           before: {
             cutscene: {
               stage: "mt_kunlun", mood: "night",
@@ -883,7 +883,7 @@ const YXHD: StoryArcSpec = {
         ],
       },
       steps: [
-        { t: "stat", stat: "AGI", min: 45, hint: "ฝึกท่าเท้าจนว่องไวพอจะเปลี่ยนที่ยืนได้ทันใจ (AGI ≥ 45)" },
+        { t: "stat", stat: "AGI", min: 45, hint: "ฝึกท่าเท้าจนว่องไวพอจะเปลี่ยนที่ยืนได้ทันใจ (ความเร็ว ≥ 45)" },
         { t: "talk", npcId: XIAOYU, locationId: "sect_ming", label: "เล่นหมากกับเสี่ยวอวี้", hint: "ไปเล่นหมากกับศิษย์เสี่ยวอวี้ที่พรรค",
           scene: {
             lines: [
@@ -969,7 +969,7 @@ const YXHD: StoryArcSpec = {
         go: "ไปขอไห่เหลียน",
       },
       steps: [
-        { t: "talk", npcId: FISHER, locationId: "city_yangzhou", label: "ขอให้ไห่เหลียนนำป้ายไปที่พรรค", hint: "ขอให้ไห่เหลียนยอมนำป้ายไปให้ผู้อาวุโสจูอิงดู",
+        { t: "talk", npcId: FISHER, locationId: "city_yangzhou", label: "ขอให้ไห่เหลียนนำป้ายไปที่พรรค", hint: "ไปหยางโจว ขอให้ไห่เหลียนยอมนำป้ายไปให้ผู้อาวุโสจูอิงดู",
           scene: {
             lines: [
               ["ไห่เหลียน", "เจ้าหาคำตอบมาได้หรือยังว่า 'คุณชายบนฝั่ง' คือใคร"],
@@ -1126,7 +1126,7 @@ const YXHD: StoryArcSpec = {
         go: "ขึ้นเกาะ",
       },
       steps: [
-        { t: "duel", locationId: "isle_shenlong", label: "เผชิญทูตจันทร์ฉายบนเกาะ", hint: "เผชิญทูตจันทร์ฉายบนเกาะกลางทะเลในคืนจันทร์เต็มดวง", opponentId: "st_sunmoon_radiant_envoy",
+        { t: "duel", locationId: "isle_shenlong", label: "เผชิญทูตจันทร์ฉายบนเกาะ", hint: "เผชิญทูตจันทร์ฉายบนเกาะมังกรเทพในคืนจันทร์เต็มดวง", opponentId: "st_sunmoon_radiant_envoy",
           before: {
             cutscene: {
               stage: "isle_shenlong", mood: "night",
@@ -1190,7 +1190,7 @@ const YXHD: StoryArcSpec = {
       },
       steps: [
         { t: "gather", itemId: "moon_cake", count: 2, hint: "หาขนมไหว้พระจันทร์ 2 ชิ้นให้ไห่เหลียนพกไปทางตะวันตก" },
-        { t: "visit", locationId: "isle_shenlong", label: "ส่งไห่เหลียนขึ้นเรือ", hint: "ไปส่งไห่เหลียนขึ้นเรือที่เกาะกลางทะเล",
+        { t: "visit", locationId: "isle_shenlong", label: "ส่งไห่เหลียนขึ้นเรือ", hint: "ไปส่งไห่เหลียนขึ้นเรือที่เกาะมังกรเทพ",
           scene: {
             cutscene: {
               stage: "isle_shenlong", mood: "dusk",

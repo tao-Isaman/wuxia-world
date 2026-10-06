@@ -327,7 +327,7 @@ const ACT1: readonly StoryChapterSpec[] = [
           ],
           go: "ไปนั่งใต้น้ำตก",
         } },
-      { t: "stat", stat: "POW", min: 60, hint: "ฝึกลมหายใจใต้น้ำตกจนภายใน (POW) ถึง 60" },
+      { t: "stat", stat: "POW", min: 60, hint: "ฝึกลมหายใจใต้น้ำตกจนค่าภายในถึง 60" },
     ],
     complete: {
       lines: [
@@ -1007,7 +1007,7 @@ const ACT3: readonly StoryChapterSpec[] = [
       go: "เลิกชี้หิน ไปช่วยงานไร่",
     },
     steps: [
-      { t: "stat", stat: "AGI", min: 60, hint: "วิ่งขนดินขึ้นลงไร่ขั้นบันไดจนความเร็ว (AGI) ถึง 60" },
+      { t: "stat", stat: "AGI", min: 60, hint: "วิ่งขนดินขึ้นลงไร่ขั้นบันไดจนค่าความเร็วถึง 60" },
       { t: "trait", trait: "humility", min: 30, hint: "เลิกนับชัยชนะ — ฝึกความถ่อมตนจนถึง 30" },
     ],
     complete: {

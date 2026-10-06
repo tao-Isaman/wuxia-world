@@ -564,7 +564,7 @@ const BODHI_PALM: StoryArcSpec = {
             ],
             go: "คารวะเสี่ยวอวี้",
           } },
-        { t: "stat", stat: "INT", min: 45, hint: "ฝึกปัญญาให้ใจนิ่งพอจะเลือกเมตตาได้ทันลมหายใจ (INT ≥ 45)" },
+        { t: "stat", stat: "INT", min: 45, hint: "ฝึกปัญญาให้ใจนิ่งพอจะเลือกเมตตาได้ทันลมหายใจ (ฉลาด ≥ 45)" },
       ],
       complete: {
         lines: [
@@ -678,7 +678,7 @@ const BODHI_PALM: StoryArcSpec = {
             ],
             go: "นั่งลงข้างนาง",
           } },
-        { t: "visit", locationId: "village_meihua", label: "เปิดจดหมายของกี่เฮี้ยวฮู้", hint: "อยู่กับฮุ้ยเหนียงใต้ต้นเหมย ขณะนางเปิดจดหมายฉบับสุดท้าย",
+        { t: "visit", locationId: "village_meihua", label: "เปิดจดหมายของกี่เฮี้ยวฮู้", hint: "อยู่กับฮุ้ยเหนียงใต้ต้นเหมยที่หมู่บ้านดอกเหมย ขณะนางเปิดจดหมายฉบับสุดท้าย",
           scene: {
             cutscene: {
               stage: "village_meihua", mood: "past",
@@ -1063,7 +1063,7 @@ const BODHI_SWORD: StoryArcSpec = {
             ],
             go: "ลงจากหอเจดีย์",
           } },
-        { t: "duel", locationId: "city_capital", label: "นักฆ่าเงาที่เชิงหอเจดีย์", hint: "เผชิญหน้ากับนักฆ่าเงาที่ขุนเหล็กดำทิ้งไว้เฝ้าหอเจดีย์", opponentId: "shadow_assassin",
+        { t: "duel", locationId: "city_capital", label: "นักฆ่าเงาที่เชิงหอเจดีย์", hint: "เผชิญหน้ากับนักฆ่าเงาที่ขุนเหล็กดำทิ้งไว้เฝ้าหอเจดีย์ในนครหลวง", opponentId: "shadow_assassin",
           before: {
             lines: [
               ["นักฆ่าเงา", "นายท่านสั่งว่า ถ้าศิษย์ง้อไบ๊ขึ้นหอมา ให้ส่งข้อความหนึ่งประโยค แล้วส่งศิษย์คนนั้นกลับบ้าน — แบบหามกลับ"],

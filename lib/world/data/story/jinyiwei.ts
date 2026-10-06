@@ -282,7 +282,7 @@ const EXECUTION_SWORD: StoryArcSpec = {
             ],
             go: "จ่ายสิบอีแปะ แล้วไปวังจงหยาง",
           } },
-        { t: "visit", locationId: "palace_zhongyang", label: "ดมบ่อน้ำในวังจงหยาง", hint: "ไปตรวจบ่อน้ำที่วังจงหยาง",
+        { t: "visit", locationId: "palace_zhongyang", label: "ดมบ่อน้ำในวังจงหยาง", hint: "ไปตรวจบ่อน้ำที่พระราชวังจงหยาง",
           scene: {
             lines: [
               "บ่อน้ำหินอ่อนกลางลานถูกปิดด้วยตะแกรงเหล็ก ทหารยามคนหนึ่งยังนั่งพิงเสา แขนห้อยไร้แรง",
@@ -563,7 +563,7 @@ const EXECUTION_SWORD: StoryArcSpec = {
       },
       steps: [
         { t: "hunt", opponentId: "night_blade", count: 3, hint: "จับมือมีดราตรีที่ขันทีส่งมาปิดปากผู้เฒ่าเกา 3 คน" },
-        { t: "stat", stat: "STR", min: 50, hint: "ฝึกกำลังแขนให้พอยกกระบี่สำเร็จโทษได้ครบสามกระบี่ (STR ≥ 50)" },
+        { t: "stat", stat: "STR", min: 50, hint: "ฝึกกำลังแขนให้พอยกกระบี่สำเร็จโทษได้ครบสามกระบี่ (กำลัง ≥ 50)" },
       ],
       complete: {
         lines: [
@@ -589,7 +589,7 @@ const EXECUTION_SWORD: StoryArcSpec = {
         go: "ถือกาน้ำชา เดินเข้าวัง",
       },
       steps: [
-        { t: "duel", locationId: "palace_zhongyang", label: "เผชิญขันทีเหลียงในงานเลี้ยง", hint: "เอาชนะขันทีใหญ่เหลียงในงานเลี้ยงที่วังจงหยาง", opponentId: "st_jinyiwei_eunuch_liang",
+        { t: "duel", locationId: "palace_zhongyang", label: "เผชิญขันทีเหลียงในงานเลี้ยง", hint: "เอาชนะขันทีใหญ่เหลียงในงานเลี้ยงที่พระราชวังจงหยาง", opponentId: "st_jinyiwei_eunuch_liang",
           before: {
             cutscene: {
               stage: "palace_zhongyang", mood: "day",
@@ -1060,7 +1060,7 @@ const EXECUTION_BLADE: StoryArcSpec = {
       },
       steps: [
         { t: "hunt", opponentId: "bandit_lieutenant", count: 3, hint: "ปราบหัวหน้าทหารรับจ้าง (รองหัวหน้าโจร) 3 คนที่เผาหมู่บ้านรอบเขาพรรคตะวันจันทรา" },
-        { t: "stat", stat: "STR", min: 50, hint: "ฝึกแขนให้หนักแน่นพอจะถือดาบประหารชีพได้ทั้งวัน (STR ≥ 50)" },
+        { t: "stat", stat: "STR", min: 50, hint: "ฝึกแขนให้หนักแน่นพอจะถือดาบประหารชีพได้ทั้งวัน (กำลัง ≥ 50)" },
       ],
       complete: {
         lines: [

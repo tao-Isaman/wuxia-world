@@ -934,7 +934,7 @@ const SKY_CLEAVER: StoryArcSpec = {
         go: "ยืนมองหิน",
       },
       steps: [
-        { t: "stat", stat: "STR", min: 55, hint: "ฝึกกำลังแขนจนส่งแรงทั้งตัวผ่านมีดเล่มเล็กได้ (STR ≥ 55)" },
+        { t: "stat", stat: "STR", min: 55, hint: "ฝึกกำลังแขนจนส่งแรงทั้งตัวผ่านมีดเล่มเล็กได้ (กำลัง ≥ 55)" },
         { t: "visit", locationId: "sect_tang", label: "ผ่าหินกลางลานตามเส้นลาย", hint: "ผ่าหินกลางลานถังเหมินตามเส้นลายด้วยมีดเล่มเดียว",
           scene: {
             cutscene: {
@@ -1028,7 +1028,7 @@ const SKY_CLEAVER: StoryArcSpec = {
             ],
             go: "เดินไปที่เวที",
           } },
-        { t: "duel", locationId: "isle_shenlong", label: "ประลองกับนักดาบผู้ท้าชิงบนเวที", hint: "เอาชนะอาจารย์ดาบผู้ท้าชิงบนเวทีงานเลี้ยงดาบ", opponentId: "blade_master",
+        { t: "duel", locationId: "isle_shenlong", label: "ประลองกับนักดาบผู้ท้าชิงบนเวที", hint: "เอาชนะอาจารย์ดาบผู้ท้าชิงบนเวทีงานเลี้ยงดาบที่เกาะมังกรเทพ", opponentId: "blade_master",
           before: {
             lines: [
               ["อาจารย์ดาบ", "ข้าไม่สนเรื่องถังเหมิน ข้าสนแค่เหล็กดำ ใครขวางทาง ข้าฟันหมด"],
