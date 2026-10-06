@@ -34,7 +34,10 @@ test("capital rumors and the ledger investigation survive a mid-dialogue reload 
 
   await visit(page, "npc-city_capital_magistrate_wu");
   await page.getByRole("button", { name: /บัญชีคลังหลวงที่หายไป/ }).click();
-  await page.getByRole("button", { name: "ข้าจะไปพบเสมียนนายฉิง" }).click();
+  // The offer opens before accepting: its accept choice takes the case.
+  expect((await state(page)).quests.qc_capital_lost_ledger).toBeUndefined();
+  await page.getByRole("button", { name: "รับสืบสวนคดีบัญชีหาย" }).click();
+  await expect.poll(async () => (await state(page)).quests.qc_capital_lost_ledger?.status).toBe("active");
   await page.getByRole("button", { name: "รับทราบ" }).click();
   await visit(page, "npc-city_capital_clerk_qing");
   await page.getByRole("button", { name: /ทักทาย/ }).click();
