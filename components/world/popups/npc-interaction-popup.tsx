@@ -9,7 +9,6 @@ import {
   getNpc,
   TRAIT_LABEL,
   getQuest,
-  getQuestsForNpc,
   MYSTERY_MOVE_LABEL,
   getScene,
   isQuestOfferable,
@@ -38,6 +37,23 @@ import { CharacterPreview } from "@/components/game/character-preview";
 import { npcCharacterId } from "@/lib/characters/catalog";
 import { GiftPicker } from "./gift-picker";
 import { DECLINE_TEXT } from "@/lib/world/story/compile";
+import { POWER_TIER_LABEL, heldQuests, npcPower, npcTitle, powerTier } from "@/lib/world/npc-life";
+import { WANTED_MAX } from "@/lib/world/law";
+
+/** What the jianghu knows of a simulated person now: journey, wounds, seclusion, family. */
+function lifeLines(state: ReturnType<typeof useWorldStore.getState>, npcId: string): string[] {
+  const ext = state.npcExt[npcId];
+  if (!ext) return [];
+  const place = (id: string) => getScene(id)?.kind === "location" ? (getScene(id) as { name: string }).name : id;
+  const lines: string[] = [];
+  if (ext.plan && ext.plan.path.length) lines.push(`กำลังเดินทางไป${place(ext.plan.to)}`);
+  if (ext.status === "secluded") lines.push("กำลังปิดด่านฝึกวิชา ไม่รับคำท้าประลอง");
+  if ((ext.woundedUntil ?? 0) > state.day) lines.push("บาดเจ็บจากการประลอง กำลังพักรักษาตัว");
+  if (ext.masterId) lines.push(`ศิษย์ของ${getNpc(ext.masterId)?.name ?? "อาจารย์ผู้ล่วงลับ"}`);
+  if (ext.spouseId) lines.push(`คู่ครอง: ${getNpc(ext.spouseId)?.name ?? "—"}`);
+  if (ext.formerSect && !ext.sect) lines.push("เคยเป็นศิษย์สำนักอื่นมาก่อน");
+  return lines;
+}
 
 const NPC_ROLE_LABEL: Record<string, string> = {
   healer: "แพทย์", scholar: "บัณฑิต", official: "ขุนนาง", authority: "ฝ่ายราชการ",
@@ -63,6 +79,7 @@ interface Props {
 export function NpcInteractionPopup({ open, npc, onClose }: Props) {
   const gotoScene = useWorldStore((s) => s.gotoScene);
   const startSparWith = useWorldStore((s) => s.startSparWith);
+  const startKillDuel = useWorldStore((s) => s.startKillDuel);
   const meetNpc = useWorldStore((s) => s.meetNpc);
   const acceptQuest = useWorldStore((s) => s.acceptQuest);
   const finishQuestNow = useWorldStore((s) => s.finishQuestNow);
@@ -86,16 +103,44 @@ export function NpcInteractionPopup({ open, npc, onClose }: Props) {
   };
 
   const onSpar = () => {
-    if (!npc.sparOpponentId) return;
     const r = startSparWith(npc.id);
-    if (!r.ok) return;
+    if (!r.ok) {
+      toast("warn", r.reason === "secluded" ? `${npc.name}กำลังปิดด่าน ไม่รับคำท้า` : "ประลองไม่ได้ในตอนนี้");
+      return;
+    }
+    onClose();
+  };
+
+  const power = npcPower(worldState, npc.id);
+  const tierLabel = POWER_TIER_LABEL[powerTier(power)];
+  const title = npcTitle(worldState, npc.id);
+  const secluded = worldState.npcExt[npc.id]?.status === "secluded";
+
+  const onKill = async () => {
+    const charges = heldQuests(worldState, npc.id).filter((q) => worldState.quests[q.id]?.status === "active");
+    const ok = await confirmDialog({
+      title: "⚔ สังหาร",
+      message: [
+        `ชักอาวุธเข้าใส่${npc.name}และสู้กันถึงตาย?`,
+        `ฝีมือของอีกฝ่าย: ${tierLabel}`,
+        `ถ้าสังหารได้ ทางการจะออกหมายจับ ${WANTED_MAX} ดาวทันที · ถ้าพลาดหรือหนี หมายจับ +2`,
+        charges.length ? `ภารกิจที่ค้างกับผู้นี้ ${charges.length} อย่างอาจล้มเหลว` : "",
+        "ถ้าแพ้ เจ้าจะสลบและฟื้นที่บ้านพร้อมสูญเสียทรัพย์",
+      ].filter(Boolean).join("\n"),
+      confirmText: "ลงมือ",
+      variant: "danger",
+    });
+    if (!ok) return;
+    const r = startKillDuel(npc.id);
+    if (!r.ok) { toast("warn", "ลงมือไม่ได้ในตอนนี้"); return; }
     onClose();
   };
 
   // Quest offers anchored to this NPC. Non-offerable quests (already
   // started, done, failed, or prereqs unmet) are filtered out so the player
   // only sees what they can actually accept right now.
-  const npcQuests = getQuestsForNpc(npc.id);
+  // Their own quests, and those of the dead whose charges they now hold.
+  const npcQuests = heldQuests(worldState, npc.id);
   const offerable = npcQuests.filter((q) => isQuestOfferable(worldState, q));
   const turnIns = npcQuests.filter((q) => isQuestTurnInForNpc(worldState, q, npc.id));
   // Hands-on objectives done with this person (hand over a letter, ask for a seal).
@@ -213,6 +258,13 @@ export function NpcInteractionPopup({ open, npc, onClose }: Props) {
           ))}
         </div>
 
+        {title && (
+          <p className="text-xs font-semibold" data-testid="npc-life-title">{title}</p>
+        )}
+        {lifeLines(worldState, npc.id).map((line) => (
+          <p key={line} className="text-[11px] text-muted-foreground">· {line}</p>
+        ))}
+
         {npc.description && (
           <p className="text-xs text-muted-foreground italic leading-relaxed">
             {npc.description}
@@ -234,20 +286,19 @@ export function NpcInteractionPopup({ open, npc, onClose }: Props) {
               </span>
             </Button>
           )}
-          {npc.sparOpponentId && (
-            <Button
-              variant="outline"
-              onClick={onSpar}
-              className="w-full justify-start text-left h-auto py-2 whitespace-normal"
-            >
-              <span className="flex flex-col items-start gap-0.5">
-                <span className="font-semibold text-sm npc-action-label">ขอประลอง</span>
-                <span className="text-[10px] text-muted-foreground">
-                  ฝีมือต่อฝีมือ — ชนะได้ชื่อเสียง +{npc.sparFameReward ?? 0}
-                </span>
+          <Button
+            variant="outline"
+            onClick={onSpar}
+            disabled={secluded}
+            className="w-full justify-start text-left h-auto py-2 whitespace-normal"
+          >
+            <span className="flex flex-col items-start gap-0.5">
+              <span className="font-semibold text-sm npc-action-label">ขอประลอง</span>
+              <span className="text-[10px] text-muted-foreground">
+                ฝีมือต่อฝีมือ ({tierLabel}) — ชนะได้ชื่อเสียง +{npc.sparFameReward ?? 1 + powerTier(power) * 3}
               </span>
-            </Button>
-          )}
+            </span>
+          </Button>
 
           <GiftPicker npc={npc} />
 
@@ -380,6 +431,20 @@ export function NpcInteractionPopup({ open, npc, onClose }: Props) {
               </span>
             </Button>
           )}
+
+          <Button
+            variant="outline"
+            onClick={onKill}
+            data-testid="npc-kill"
+            className="w-full justify-start text-left h-auto py-2 whitespace-normal border-rose-700 bg-rose-50/40"
+          >
+            <span className="flex flex-col items-start gap-0.5">
+              <span className="font-semibold text-sm text-rose-800 npc-action-label">⚔ สังหาร</span>
+              <span className="text-[10px] text-muted-foreground">
+                สู้กันถึงตาย · สำเร็จแล้วหมายจับ {WANTED_MAX} ดาวทันที
+              </span>
+            </span>
+          </Button>
 
           {objectives.length > 0 && (
             <div className="pt-2 space-y-1.5">

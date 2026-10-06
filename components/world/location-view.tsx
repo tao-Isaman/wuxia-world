@@ -17,13 +17,13 @@ import { npcPresent,
   getLocationMap,
   getQuest,
   objectiveSpotsFor,
-  getNpcsAtLocation,
   getResource,
   getScene,
   getShopAt,
   getSectHallAt,
   masteryLevel,
 } from "@/lib/world";
+import { npcsAt, predecessorsOf } from "@/lib/world/npc-life";
 import { LocationMap } from "./location-map";
 import { MapHud } from "./map-hud";
 import { MenuBar } from "./menu-bar";
@@ -106,7 +106,8 @@ export function LocationView({ scene, readOnly = false, dialogueSpeakerId }: Pro
     (n) => !n.visibleIf || evaluateCondition(state, n.visibleIf),
   );
   // Registry NPCs at this location, also filtered by their visibleIf.
-  const registryNpcs: NpcDef[] = getNpcsAtLocation(scene.id).filter(
+  // Residents who are home and travellers who are here (lib/world/npc-life.ts).
+  const registryNpcs: NpcDef[] = npcsAt(state, scene.id).filter(
     (n) => npcPresent(state, n.id) && (!n.visibleIf || evaluateCondition(state, n.visibleIf)),
   );
   const visibleRoutes = scene.routes.filter(
@@ -121,7 +122,10 @@ export function LocationView({ scene, readOnly = false, dialogueSpeakerId }: Pro
   // map doesn't place (or locations with no map at all) keeps the
   // classic card UI.
   const map = getLocationMap(scene.id);
-  const onMap = (npcId: string) => !!map?.npcSpots?.[npcId];
+  // On a painted map: their own spot, the seat they inherited, or — for a
+  // simulated traveller — a free spot near the way in (location-map.tsx).
+  const onMap = (npcId: string) => !!map && (!!map.npcSpots?.[npcId] || !!state.npcExt[npcId]
+    || predecessorsOf(state, npcId).some((p) => !!map.npcSpots?.[p]));
   const onMapRoute = (routeSceneId: string) =>
     !!map?.exits?.some((e) => `route_${scene.id}__to__${e.to}` === routeSceneId);
   const cardNpcs = map ? visibleNpcs.filter((n) => !onMap(n.id)) : visibleNpcs;

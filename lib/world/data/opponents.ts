@@ -3,6 +3,9 @@ import type { OpponentDef, ResourceYield } from "../types";
 import { CAPITAL_TRAINING_OPPONENT } from "./capital-training";
 import { STORY_OPPONENT_SPECS } from "./story";
 import { PLACE_OPPONENT_SPECS } from "./places";
+import { SKILLS } from "@/lib/game/data/skills";
+import { ARTS } from "@/lib/game/data/arts";
+import { powerTier } from "./liveness-roster";
 
 // ─── Opponent roster: 180 entries in named blocks ──────────────────
 // The random-event roster below has 35 entries, organised by tier; later
@@ -2132,5 +2135,67 @@ export const OPPONENTS_BY_ID = new Map<string, OpponentDef>(
 
 export function getOpponent(id: string | null | undefined): OpponentDef | null {
   if (!id) return null;
-  return OPPONENTS_BY_ID.get(id) ?? null;
+  return OPPONENTS_BY_ID.get(id) ?? npcFoe(id);
+}
+
+// ─── Any person as a foe (Liveness 2.0) ──────────────────────────────
+// Every NPC can be challenged (ขอประลอง) or fought to the death (สังหาร).
+// Those without an authored sparring build fight as `npc@<id>@<power>@<sect>`:
+// a build made from their strength (power 0–100) and their sect's own moves
+// (or the jianghu's), drawn as the NPC themselves (`look.npc`). The id carries
+// everything, so it survives a reload mid-fight.
+const NPC_FOE_PREFIX = "npc@";
+let npcNameOf: (npcId: string) => string | null = () => null;
+/** lib/world/npc-life.ts registers how to name a person (it knows generated ones too). */
+export function registerNpcFoeNames(fn: (npcId: string) => string | null): void {
+  npcNameOf = fn;
+}
+export function npcFoeId(npcId: string, power: number, sectName: string | null): string {
+  return `${NPC_FOE_PREFIX}${npcId}@${Math.round(power)}@${sectName ?? "-"}`;
+}
+export function parseNpcFoeId(id: string): { npcId: string; power: number; sectName: string | null } | null {
+  if (!id.startsWith(NPC_FOE_PREFIX)) return null;
+  const [npcId, power, sect] = id.slice(NPC_FOE_PREFIX.length).split("@");
+  if (!npcId || !power) return null;
+  return { npcId, power: Number(power) || 1, sectName: sect && sect !== "-" ? sect : null };
+}
+const NPC_FOE_DROPS = [DROPS_T0, DROPS_T1, DROPS_T2, DROPS_T3, DROPS_T4] as const;
+const NPC_FOE_CACHE = new Map<string, OpponentDef>();
+
+function npcFoe(id: string): OpponentDef | null {
+  const cached = NPC_FOE_CACHE.get(id);
+  if (cached) return cached;
+  const parsed = parseNpcFoeId(id);
+  if (!parsed) return null;
+  const { npcId, power, sectName } = parsed;
+  const name = npcNameOf(npcId) ?? npcId;
+  const tier = powerTier(power);
+  const school = sectName ?? "ยุทธจักร";
+  // The weak know a move or two; masters carry four and an inner art.
+  // Townsfolk (power under 10) just throw punches.
+  const known = power < 10 ? 0 : Math.min(4, tier + 1);
+  const moves = SKILLS.filter((sk) => sk.sc === school && sk.ti <= tier && !sk.id.startsWith("bst_"))
+    .sort((a, b) => b.ti - a.ti).slice(0, known).map((sk) => sk.id);
+  if (!moves.length) moves.push("basic_punch");
+  const art = power >= 20
+    ? ARTS.filter((a) => a.id !== "none" && a.sc === school && a.ti <= tier).sort((a, b) => b.ti - a.ti)[0]
+    : undefined;
+  const stat = (weight: number) => Math.max(1, Math.round(1 + (power / 9) * weight));
+  const def: OpponentDef = {
+    id,
+    name,
+    ti: tier,
+    category: "human",
+    drops: NPC_FOE_DROPS[tier],
+    look: { npc: npcId },
+    build: () => build(name, tier, {
+      stats: { STR: stat(1), AGI: stat(0.95), POW: stat(0.9), VIT: stat(1), DEX: stat(0.9), LUK: stat(0.5), DEF: stat(0.9), INT: stat(0.7) },
+      artId: art?.id,
+      artLevel: Math.max(1, Math.min(10, Math.round(power / 10))),
+      skillIds: moves,
+      extraArtSlots: art ? [art.id] : [],
+    }),
+  };
+  NPC_FOE_CACHE.set(id, def);
+  return def;
 }

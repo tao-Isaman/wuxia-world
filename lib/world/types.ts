@@ -853,6 +853,9 @@ export interface PendingBattle {
   // Random roadside encounters bring the opponent's pack (OpponentDef.pack);
   // quest / spar fights with the same opponent stay one-on-one.
   withPack?: boolean;
+  // ⚔ สังหาร: an open fight to the death with this NPC. A win kills them
+  // (lib/world/npc-life.ts) and puts the hero at the top of the wanted list.
+  killNpcId?: string;
 }
 
 // ─── Letters (lib/world/letters.ts) ──────────────────────────────────
@@ -949,7 +952,15 @@ export type NpcEventKind =
   | "marry"
   | "betray_sect"
   | "take_disciple"
-  | "defeated_by_player";
+  | "defeated_by_player"
+  // Liveness 2.0 — every one of these is a real change in the world.
+  | "journey"          // set out for a named place (payload: to, purpose)
+  | "join_sect"        // a sectless NPC entered a sect at its gate
+  | "leave_seclusion"  // came out of closed-door training, stronger
+  | "new_chief"        // took the sect's seat after the chief died
+  | "duel"             // fought a rival; the loser was wounded, not killed
+  | "killed_by_player" // the hero killed them in an open fight
+  | "newcomer";        // a new face appeared in the jianghu
 
 export interface NpcEventLog {
   kind: NpcEventKind;
@@ -978,6 +989,54 @@ export interface NpcExtState {
   allies: string[];          // NpcId list
   lastTickDay: number;
   eventHistory: NpcEventLog[]; // last 10 entries, most recent first
+
+  // ─── Liveness 2.0 (all optional; filled lazily for older saves) ─────
+  /** Generated NPCs (disciples, new chiefs, newcomers) carry their own identity. */
+  dynamic?: boolean;
+  name?: string;
+  gender?: "male" | "female";
+  /** Costume archetype for generated NPCs (m1–m4, f1–f4). */
+  body?: string;
+  /** How they choose (lib/world/npc-mind.ts). */
+  temper?: NpcTemper;
+  /** Day of the year (0–364) they turn a year older. */
+  birthday?: number;
+  /** A journey under way: the places still ahead, and why. */
+  plan?: NpcPlan | null;
+  /** Closed-door training ends on this day (status "secluded" until then). */
+  secludedUntil?: number;
+  /** Wounded in a duel: no travelling or duelling until this day. */
+  woundedUntil?: number;
+  deathDay?: number;
+  /** "player", an NPC id, or absent for old age. */
+  killedBy?: string;
+  /** Who took over this NPC's seat and charges (quests) after they died. */
+  heirId?: string;
+  masterId?: string;
+  spouseId?: string;
+  formerSect?: SectId;
+}
+
+/** Personality, each 0..1 except `righteous` (-1 wicked … 1 upright). */
+export interface NpcTemper {
+  righteous: number;
+  ambition: number;
+  wanderlust: number;
+  loyalty: number;
+}
+
+export type NpcPlanPurpose = "wander" | "visit" | "join" | "duel" | "treasure" | "home" | "defect";
+export interface NpcPlan {
+  purpose: NpcPlanPurpose;
+  /** Places still to walk through, the destination last. */
+  path: string[];
+  to: string;
+  targetNpcId?: string;
+  sect?: SectId;
+  itemId?: string;
+  /** Days to stay once there before deciding again. */
+  stayDays?: number;
+  arrivedDay?: number;
 }
 
 // Region taxonomy. Hand-assigned per location in

@@ -40,37 +40,46 @@ try {
   baseline.rumorArchive = [{ id: "earlier_news", about: npcId, truth: "true", expiredDay: baseline.day }];
   let variants = 0;
 
-  // Force every authored template and every truth branch, with the same
-  // payload field names the live tick engine actually supplies.
+  // Force every authored template, with the payload field names the live
+  // tick engine supplies and the circumstances its `when` asks for. NPC
+  // events really happened (Liveness 2.0): their rumors are always true.
   for (const [kind, templates] of Object.entries(NPC_EVENT_TEMPLATES)) {
     for (let index = 0; index < templates.length; index++) {
-      for (const truthRoll of [0.01, 0.1, 0.9]) {
-        const state = clone(baseline);
-        state.npcExt[npcId] = clone(getNamedDefault(npcId)!);
-        let payload: Record<string, string | number | boolean> | undefined;
-        if (kind === "master_art") payload = { artId: "diamond" };
-        if (kind === "found_treasure") payload = { itemId: "jade", locationId: "city_capital" };
-        if (kind === "sect_promotion") payload = { sect: "shaolin", rank: 9 };
-        if (kind === "betray_sect") {
-          state.npcExt[npcId].sect = null; // live tick clears membership before echo
-          payload = { formerSect: "huashan" };
-        }
-        sequence((index + 0.25) / templates.length, truthRoll);
-        const id = generateNpcEventEcho({ state, kind: kind as NpcEventKind, npcId,
-          partnerNpcId: "sect_wudang_master_qingxu", locationId: "city_capital", payload });
-        assert.ok(id);
-        const rumor = state.rumorPool.at(-1)!;
-        readable(rumor);
-        assert.equal(rumor.channel, templates[index].channel);
-        assert.equal(rumor.source, "npc_event");
-        assert.equal(rumor.about, npcId);
-        assert.equal(rumor.refersToEvent?.eventKind, kind);
-        if (kind === "master_art") assert.ok(rumor.text.includes(ARTS_BY_ID.get("diamond")!.n));
-        assert.deepEqual(state.rumorPool.slice(0, -1), baseline.rumorPool, "new formatting does not rewrite saved rumors");
-        assert.deepEqual(state.rumorSeenLog, baseline.rumorSeenLog);
-        assert.deepEqual(state.rumorArchive, baseline.rumorArchive);
-        variants++;
+      const tpl = templates[index];
+      const state = clone(baseline);
+      state.npcExt[npcId] = clone(getNamedDefault(npcId)!);
+      let payload: Record<string, string | number | boolean> = {};
+      if (kind === "master_art" && tpl.when?.art !== false) payload = { artId: "diamond" };
+      if (kind === "found_treasure") payload = { itemId: "jade", locationId: "city_capital" };
+      if (kind === "sect_promotion") payload = { sect: "shaolin", rank: 9 };
+      if (kind === "journey") payload = { purpose: tpl.when?.purpose ?? "wander", dest: "sect_wudang", sect: "wudang" };
+      if (kind === "betray_sect") {
+        state.npcExt[npcId].sect = null; // live tick clears membership before echo
+        payload = { formerSect: "huashan" };
       }
+      if (tpl.when?.sect === false) state.npcExt[npcId].sect = null;
+      // Pick exactly this template among those its circumstances allow.
+      const allowed = templates.filter((t) => (!t.when?.purpose || t.when.purpose === payload.purpose)
+        && (t.when?.sect === undefined || t.when.sect === !!(state.npcExt[npcId].sect ?? payload.sect ?? payload.formerSect))
+        && (t.when?.art === undefined || t.when.art === !!payload.artId));
+      const at = allowed.indexOf(tpl);
+      assert.ok(at >= 0, `${kind}[${index}] is reachable`);
+      sequence((at + 0.25) / allowed.length);
+      const id = generateNpcEventEcho({ state, kind: kind as NpcEventKind, npcId,
+        partnerNpcId: "sect_wudang_master_qingxu", locationId: "city_capital", payload });
+      assert.ok(id, `${kind}[${index}] made a rumor`);
+      const rumor = state.rumorPool.at(-1)!;
+      readable(rumor);
+      assert.equal(rumor.channel, tpl.channel);
+      assert.equal(rumor.truth, "true", "NPC news tells what happened");
+      assert.equal(rumor.source, "npc_event");
+      assert.equal(rumor.about, npcId);
+      assert.equal(rumor.refersToEvent?.eventKind, kind);
+      if (kind === "master_art" && payload.artId) assert.ok(rumor.text.includes(ARTS_BY_ID.get("diamond")!.n));
+      assert.deepEqual(state.rumorPool.slice(0, -1), baseline.rumorPool, "new formatting does not rewrite saved rumors");
+      assert.deepEqual(state.rumorSeenLog, baseline.rumorSeenLog);
+      assert.deepEqual(state.rumorArchive, baseline.rumorArchive);
+      variants++;
     }
   }
   for (const [actionId, templates] of Object.entries(PLAYER_ECHO_TEMPLATES)) {

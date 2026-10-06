@@ -1,11 +1,16 @@
-// Who is standing where. An assassinated NPC is gone from the world for good;
-// a kidnapped one is away for KIDNAP_RETURN_DAYS, then back at their spot.
+// Who is standing where. A dead NPC — killed by the hero, in a duel, or of
+// old age (npcExt status "dead") — is gone from the world for good; a
+// kidnapped one is away for KIDNAP_RETURN_DAYS, then back at their spot.
 import type { WorldStateData } from "./types";
 
 export const KIDNAP_RETURN_DAYS = 180;
 
-export function npcPresent(state: Pick<WorldStateData, "assassinatedNpcIds" | "kidnappedUntil" | "day">, npcId: string): boolean {
+export function npcPresent(
+  state: Pick<WorldStateData, "assassinatedNpcIds" | "kidnappedUntil" | "day"> & Partial<Pick<WorldStateData, "npcExt">>,
+  npcId: string,
+): boolean {
   if (state.assassinatedNpcIds?.includes(npcId)) return false;
+  if (state.npcExt?.[npcId]?.status === "dead") return false;
   const until = state.kidnappedUntil?.[npcId];
   return until === undefined || state.day >= until;
 }

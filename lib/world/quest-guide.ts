@@ -11,6 +11,7 @@ import { getLocationMap, type MapSpot } from "./data/location-maps";
 import { evaluateCondition } from "./conditions";
 import { describeQuestCondition, type QuestProgressLine } from "./effects";
 import { objectiveMarkerId, objectiveSpotsFor } from "./quest-objectives";
+import { npcPlaces, questHolder } from "./npc-life";
 
 /**
  * Quest guidance for every kind of stage: what to do next for a quest, where
@@ -62,7 +63,8 @@ export function stageTargetNpc(state: WorldStateData, quest: QuestDef): NpcDef |
   if (!stage) return null;
   const named = namedNpcIn(stage.description);
   if (named) return named;
-  if (progress.stage === quest.stages.length - 1) return getNpc(quest.turnInNpcId ?? quest.giverNpcId) ?? null;
+  // A dead giver's hand-in passes to their heir.
+  if (progress.stage === quest.stages.length - 1) return getNpc(questHolder(state, quest.turnInNpcId ?? quest.giverNpcId)) ?? null;
   return null;
 }
 
@@ -259,10 +261,12 @@ function nearest(sources: Source[], here: string | null, previous: Map<string, s
   return best;
 }
 
-function npcTarget(npc: NpcDef, action: string, here: string | null, previous: Map<string, string> | null): Target {
-  const pick = nearest(npc.locationIds.map((locationId) => ({ locationId, kind: "shop" as const, cost: 0 })), here, previous);
+function npcTarget(state: WorldStateData, npc: NpcDef, action: string, here: string | null, previous: Map<string, string> | null): Target {
+  // Where they stand now: a travelling person's road, a resident's home.
+  const places = npcPlaces(state, npc);
+  const pick = nearest(places.map((locationId) => ({ locationId, kind: "shop" as const, cost: 0 })), here, previous);
   return { kind: "npc", action, npcId: npc.id, npcName: npc.name, markerId: "npc-" + npc.id,
-    locationId: pick?.source.locationId ?? npc.locationIds[0] ?? null, path: pick?.path };
+    locationId: pick?.source.locationId ?? places[0] ?? null, path: pick?.path };
 }
 
 /** Guide for one active quest's current stage (null when not active). */
@@ -297,7 +301,7 @@ export function guideForQuest(state: WorldStateData, questId: string): QuestGuid
     if (leaf?.t === "stoleFromNpc" || leaf?.t === "kidnappedNpc" || leaf?.t === "assassinatedNpc") {
       const npc = getNpc(leaf.npcId);
       const verb = leaf.t === "stoleFromNpc" ? "ขโมยจาก" : leaf.t === "kidnappedNpc" ? "ลักพาตัว" : "ลอบสังหาร";
-      if (npc) target = npcTarget(npc, verb + npc.name, here, previous);
+      if (npc) target = npcTarget(state, npc, verb + npc.name, here, previous);
     } else if (leaf?.t === "visitedLocation") {
       target = { kind: "place", action: `เดินทางไป${locationName(leaf.locationId)}`, locationId: leaf.locationId };
     } else if (leaf?.t === "hasItem" || leaf?.t === "defeatedOpponent") {
@@ -317,7 +321,7 @@ export function guideForQuest(state: WorldStateData, questId: string): QuestGuid
       } else {
         // No world source (a letter someone hands over): fall back to the named person.
         const npc = namedNpcIn(stage.description);
-        if (npc) target = { ...npcTarget(npc, `พบ${npc.name}`, here, previous), progress: counter };
+        if (npc) target = { ...npcTarget(state, npc, `พบ${npc.name}`, here, previous), progress: counter };
         else pending = { action: leaf.t === "hasItem" ? `หา${itemName}` : `ปราบ${foeName}`, progress: counter };
       }
     }
@@ -326,7 +330,7 @@ export function guideForQuest(state: WorldStateData, questId: string): QuestGuid
   // 3. The person the stage names, or the turn-in person at the end.
   if (!target) {
     const npc = stageTargetNpc(state, quest);
-    if (npc) target = npcTarget(npc, last ? `ส่งภารกิจที่${npc.name}` : `พบ${npc.name}`, here, previous);
+    if (npc) target = npcTarget(state, npc, last ? `ส่งภารกิจที่${npc.name}` : `พบ${npc.name}`, here, previous);
   }
   // 4. A place the stage names, else the quest giver (dialog-driven beats
   //    continue with them). Trait goals ("สะสมความถ่อมตน") have no place.
@@ -335,8 +339,8 @@ export function guideForQuest(state: WorldStateData, questId: string): QuestGuid
     if (place) target = { kind: "place", action: pending?.action ?? stage.description, locationId: place };
   }
   if (!target && stage.autoAdvance?.t !== "trait") {
-    const giver = getNpc(quest.giverNpcId);
-    if (giver) target = npcTarget(giver, `พบ${giver.name}`, here, previous);
+    const giver = getNpc(questHolder(state, quest.giverNpcId));
+    if (giver) target = npcTarget(state, giver, `พบ${giver.name}`, here, previous);
   }
   target ??= { kind: "none", action: pending?.action ?? stage.description, locationId: null };
   if (pending && !target.progress) target.progress = pending.progress;

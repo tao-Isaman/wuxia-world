@@ -44,7 +44,10 @@ try {
   useWorldStore.getState().startNewGame({ name: "Rumor integration test" });
   assertLore(useWorldStore.getState());
   assert.deepEqual(useWorldStore.getState().rumorSeenLog, [], "seeding never counts as hearing");
-  assert.deepEqual(useWorldStore.getState().npcExt, {}, "static lore does not manufacture NPC events");
+  // Liveness 2.0: the thirty simulated people are seeded on a new game, with no events yet.
+  const people = Object.values(useWorldStore.getState().npcExt);
+  assert.equal(people.length, 30, "the thirty simulated people are seeded");
+  assert.ok(people.every((ext) => ext.eventHistory.length === 0), "static lore does not manufacture NPC events");
   useWorldStore.getState().gotoScene("route_home_player__to__city_capital");
   useWorldStore.getState().travelRoute("city_capital");
   assert.equal(useWorldStore.getState().currentSceneId, "city_capital");

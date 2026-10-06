@@ -6,6 +6,15 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-06
 
+### The living jianghu (Liveness 2.0)
+
+- **People age for real** — a year on each one's birthday — and die of age by a yearly risk that rises with age and falls with inner strength, or in duels.
+- **The dead are gone.** Anyone dead (old age, a duel, the hero) leaves every map. When a chief dies the senior elder takes the seat (or an elder steps forward), stands in the old seat, and takes over the old chief's quests; a dead member's quests pass to the chief, a sectless giver's fail.
+- **Thirty people, and more.** Ten wanderers join the twenty sect masters — a swordsman hunting an assassin, a girl looking for a sect, a merchant, a healer, a Daoist, a gentleman thief, an old sword with a grudge… Masters take real disciples (generated people with their own names), seats go to heirs, and newcomers appear on the roads.
+- **They decide for themselves.** Each week, by temper: wander, knock on a sect gate (which may or may not open), go after a rival, enter closed-door training, take a disciple, leave their sect, marry. They walk the real roads, two or three places a week — you meet them wherever they are, and their card says who they are now and where they are going.
+- **Spar with or kill anyone.** Every card has ขอประลอง and ⚔ สังหาร. Kill someone and the law has you at 5 wanted marks at once (an attempt that fails adds 2); their seat and quests pass on, and killing a sect-mate is betrayal.
+- **Talk tells the truth and travels.** NPC news is always what happened; it reaches the heartland in days and big news reaches every region. Markets and your own sect grounds have a place to listen (Sun-Moon's too), and joining a sect and finishing a milestone quest are finally talked about.
+
 ### Battle items, poisons at the apothecary, food for stamina
 
 - **ใช้ของ in battle.** A new control opens the hero's battle items on their turn: potions heal at once, poisons and hidden weapons are thrown at a foe in range (no miss; poison ticks a % of max HP). Using one ends the turn; what was used leaves the bag after the fight, whatever the outcome.

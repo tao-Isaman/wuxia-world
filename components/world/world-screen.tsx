@@ -5,13 +5,13 @@ import { Panel } from "@/components/ui/wuxia/panel";
 import { VictorySpoils } from "./victory-spoils";
 import { DeathReport } from "./death-report";
 import { WuxiaButton } from "@/components/ui/wuxia/button";
+import { npcsAt } from "@/lib/world/npc-life";
 import { useWorldStore } from "@/store/world-store";
 import { useBattleStore } from "@/store/battle-store";
 import { confirmDialog } from "@/store/confirm-store";
 import {
   NPCS,
   getLocationMap,
-  getNpcsAtLocation,
   getRouteMap,
   getScene,
   type LocationScene,
@@ -109,7 +109,8 @@ export function WorldScreen() {
   const lastLocation = lastLocationId ? getScene(lastLocationId) : undefined;
   const candidate = source.current?.location ??
     (!hasRenderedScene.current && lastLocation?.kind === "location" ? lastLocation : undefined);
-  const localNpcs = candidate ? [...getNpcsAtLocation(candidate.id), ...candidate.npcs] : [];
+  // Who stands here now, travellers included (lib/world/npc-life.ts).
+  const localNpcs = candidate ? [...npcsAt(useWorldStore.getState(), candidate.id), ...candidate.npcs] : [];
   const speaker = scene?.kind === "dialog"
     ? [...localNpcs, ...NPCS].find((npc) => npc.dialogSceneId === scene.id) ??
       scene.lines.flatMap((line) => line.t === "dialogue"

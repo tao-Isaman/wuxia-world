@@ -2,7 +2,7 @@
 
 # People (NPCs)
 
-225 registry NPCs (`lib/world/data/npcs/`). Capabilities: 💬 talk (`dialogSceneId`) · ⚔ spar (`sparOpponentId`, non-fatal) · 🤏 can be robbed (`stealLoot`) · 📜 quests offered or turned in. An NPC listed at several places is shown under each.
+235 registry NPCs (`lib/world/data/npcs/`). Capabilities: 💬 talk (`dialogSceneId`) · ⚔ spar (`sparOpponentId`, non-fatal) · 🤏 can be robbed (`stealLoot`) · 📜 quests offered or turned in. An NPC listed at several places is shown under each.
 
 ## Cities
 
@@ -615,3 +615,18 @@
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
 | `wld_desert_collector_mo` | โม่ฉิงเทียน (นักสะสมโบราณ) | 💬 | 9 |
+
+## Not placed on the map
+
+| Id | Name |
+| --- | --- |
+| `wander_li_changfeng` | หลี่ฉางเฟิง |
+| `wander_su_linger` | ซูหลิงเอ๋อ |
+| `wander_chen_dafu` | เฉินต้าฟู่ |
+| `wander_sun_yao` | ซุนเหยา |
+| `wander_yunhe` | นักพรตอวิ๋นเหอจื่อ |
+| `wander_hei_ying` | เฮยอิ่ง |
+| `wander_wang_xiaohu` | หวังเสี่ยวหู่ |
+| `wander_bai_yutang` | ไป๋อวี้ถัง |
+| `wander_huo_tianlong` | ฮั่วเทียนหลง |
+| `wander_liu_wenxin` | หลิวเหวินซิน |

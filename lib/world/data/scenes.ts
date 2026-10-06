@@ -4,6 +4,7 @@ import { SCENES_CITIES } from "./scenes-content/cities";
 import { SCENES_VILLAGES } from "./scenes-content/villages";
 import { SCENES_SECTS_TEMPLES } from "./scenes-content/sects-temples";
 import { SCENES_WILDERNESS } from "./scenes-content/wilderness";
+import { SCENES_WANDERERS } from "./scenes-content/wanderers";
 import { SCENES_EVIL } from "./scenes-content/evil";
 import { SCENES_SPIES } from "./scenes-content/spies";
 import { STORY_SCENES } from "../story/registry";
@@ -403,6 +404,7 @@ export const SCENES: readonly Scene[] = [
   ...SCENES_VILLAGES,
   ...SCENES_SECTS_TEMPLES,
   ...SCENES_WILDERNESS,
+  ...SCENES_WANDERERS,
   ...SCENES_EVIL,
   ...SCENES_SPIES,
   ...STORY_SCENES,

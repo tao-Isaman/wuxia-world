@@ -276,12 +276,14 @@ Jail activities (`doActivity`, only in `jail`):
 | Score | DEX + 0.5 LUK + 3 × steal mastery (1–5) | STR + DEX + 0.5 LUK | STR + VIT + 0.5 LUK |
 | Penalty | 5 × `defenseTier` | 8 × tier | 7 × tier |
 | Offered | NPCs with `stealLoot` (94 of 157) or a quest stage that needs the steal, repeatable | when an active quest stage names the NPC; once per NPC | same |
-| Success | 1 loot pick (+1 with 30 %), steal xp +25, evil +2, DEX xp +10 | evil +8, fame +2, DEX xp +10 | evil +6, arrogance +1, STR xp +10 |
+| Success | 1 loot pick (+1 with 30 %), steal xp +25, evil +2, DEX xp +10 | the target dies (`heroKills`: wanted 5/5, quests pass on or fail), evil +8 (+10), fame +2 (+3), DEX xp +10 | evil +6, arrogance +1, STR xp +10 |
 | Failure | steal xp +8, **+1 wanted mark**, a **non-fatal** fight with the NPC's own spar build (or a tier guard) | a **fatal** fight with a tier guard | a **fatal** fight with a tier guard |
 
 `badActionOffered(state, npc, kind)` is the one rule for which buttons the NPC card shows; `attemptSteal` uses it too. `scripts/test-bad-action-quests.ts` (in `test:quests`) checks that every quest stage needing a steal, assassination or kidnapping offers it on the target's card and advances when done.
 
 Tier guards (`TIER_TO_BAD_ACTION_OPPONENT`): 0 `thug`, 1 `ruffian`, 2 `iron_palm_thug`, 3 `blade_master`, 4 `demonic_master`.
+
+**Open fights with anyone** (Liveness 2.0, [liveness.md](liveness.md#the-hero-and-the-living)). Every card offers ขอประลอง (`startSparWith`) and ⚔ สังหาร (`startKillDuel`). A person without `sparOpponentId` fights as `npc@<id>@<power>@<sect>` (`npcFoeFor`; `getOpponent` builds it from their strength and their sect's moves). A won สังหาร (`pendingBattle.killNpcId`) runs `heroKills`: `killNpc` (seat and quests pass on via `withChargesOfDead`), `assassinatedNpcIds`, **`wanted = WANTED_MAX`**, evil +10, fame +3, the `kill_npc` echo, and betrayal when the dead was a sect-mate. A lost or fled one adds 2 marks.
 
 ## Location categories and practice
 
@@ -343,13 +345,12 @@ Which actions grant which stat: [gameplay.md](gameplay.md#stats).
 Content for villages, towns, homes and new quests for old NPCs lives in `lib/world/data/places/<group>.ts` (`villages`, `towns`, `homes_a`–`homes_c`, `elders_a`, `elders_b`), each exporting one `PlaceContent` (`npcs`, `quests`, `scenes`, `activities`, `opponents`). `places/index.ts` merges them into the NPC, quest, scene, opponent and activity registries.
 
 - **Place activities.** An `ActivityDef` with `place: { locationIds, cooldownDays, costGold?, reward, doneText, spot? }`. `doActivity` checks the place, the cooldown (`activityDays[id]`), stamina and gold, then pays gold (a range), w-exp, stat xp, a trait, an item (with a chance), stamina, heal or relationship, and logs `activity`. Auto maps put the spot on `ACTIVITY_SLOTS`; hand maps add the ones with `spot`.
-- **Presence** (`npc-presence.ts`). `npcPresent(state, id)` is false for `assassinatedNpcIds` and while `day < kidnappedUntil[id]` (set to day + `KIDNAP_RETURN_DAYS` = 180 on a successful kidnapping). The location map and card hide absent NPCs; `kidnappedNpcIds` stays for quest conditions, so the same NPC can't be kidnapped twice.
+- **Presence** (`npc-presence.ts`). `npcPresent(state, id)` is false for `assassinatedNpcIds`, for anyone whose `npcExt` status is `dead`, and while `day < kidnappedUntil[id]` (set to day + `KIDNAP_RETURN_DAYS` = 180 on a successful kidnapping). The location map and card hide absent NPCs; `kidnappedNpcIds` stays for quest conditions, so the same NPC can't be kidnapped twice.
 - **Gifts** (`gifts.ts`, store `giveGift(npcId, { itemId } | { gold })`). Refused while absent, within 30 days of the last gift (`giftDays`), or for quest items and manuals. `giftOutcome` = worth (1–5 by gold value: 120 / 400 / 1000 / 3000) — ×2 when liked, +2 more for a favourite item id, −2 when disliked. Tastes come from `NpcDef.likes` / `dislikes` (item ids, categories, `"gold"`), else from `TAG_TASTES` by the NPC's tags, else food.
 - **Skill quests.** Every ยุทธจักร T0–T3 skill and art (except `basic_punch`) is the reward of a quest; the 69 that had none are taught by exactly one place quest. T1+ quests gate on `statAtLeast`, T2+ also on `npcRelationship` with the giver; `test:places` checks both, and that no teacher can be assassinated or kidnapped. Manuals and city school halls may still sell the commoner ones.
 
 ## Known gaps
 
-- `sect_join` and `quest_major_complete` rumors never fire in play (joins happen through quest rewards; no quest sets `isMajor`).
 - Quest-reward `joinSect` doesn't check the sect's `joinRequirements` (only the unused store action does); the effective gate is the intro quest's `prereqs`.
 - An abandoned quest can never be accepted again; a sect the hero left can never be rejoined.
 - The `_skipEventRoll` flag is still written but nothing reads it.

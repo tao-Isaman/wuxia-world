@@ -10,7 +10,8 @@ import { LORE_RUMORS } from "./data/lore-rumors";
 import { SECT_MEMBERSHIPS } from "./data/sect-memberships";
 import { CHANNEL_ADMITS, regionOf } from "./data/regions";
 import { getNamedDefault } from "./data/named-npcs";
-import { NPCS_BY_ID } from "./data/npcs";
+import { getNpc } from "./data/npcs";
+import { POWER_TIER_LABEL, powerTier, rankTitle } from "./data/liveness-roster";
 import {
   BIG_NEWS_LIFESPAN_DAYS,
   DEFAULT_LIFESPAN_DAYS,
@@ -84,11 +85,15 @@ const BIG_EVENT_KINDS: ReadonlySet<NpcEventKind> = new Set([
   "death_combat",
   "master_art",
   "betray_sect",
+  "new_chief",
+  "killed_by_player",
 ]);
+/** Player deeds loud enough to cross the land like big news. */
+const BIG_PLAYER_ACTIONS: ReadonlySet<string> = new Set(["kill_npc", "sect_leave_or_betray", "quest_major_complete"]);
 
 // Player-echo distortion is heavier than the standard split (spec §3.2.2).
 const PLAYER_ECHO_DISTORT_PCT = 0.25;
-const PLAYER_ECHO_FAKE_PCT = 0.10;
+const PLAYER_ECHO_FAKE_PCT = 0;
 
 // Dedup window: bump weight on a matching rumor created in the last N days
 // instead of pushing a new entry (spec §3.2 + docs/specs/liveness-plan.md decision #2).
@@ -155,8 +160,8 @@ function rngTag(): string {
 
 function npcDisplayName(npcId: string | undefined | null): string {
   if (!npcId) return "ผู้ใดไม่ทราบ";
-  // Prefer the NPC registry name (covers both named + generic NPCs).
-  const def = NPCS_BY_ID.get(npcId);
+  // Prefer the NPC registry name (authored, and generated people once registered).
+  const def = getNpc(npcId);
   if (def?.name) return def.name;
   // Fall back to npcId — better than crashing the rumor pipeline.
   return npcId;
@@ -199,17 +204,11 @@ function ensureRumorArrays(state: WorldStateData): void {
   if (!Array.isArray(state.rumorSeenLog)) state.rumorSeenLog = [];
 }
 
-// Sect rank lookup for the big-news booster. Returns Infinity when the
-// NPC has no authored ext default — those NPCs never qualify for the
-// rank-based boost.
-function sectRankOf(npcId: string): number {
-  const def = getNamedDefault(npcId);
-  return def?.sectRank ?? Infinity;
-}
-
-function isBigNews(kind: NpcEventKind, npcId: string): boolean {
+// Big news: a death in battle, a mastery, a betrayal, a new chief — and
+// anything that befalls a sect's chief.
+function isBigNews(state: WorldStateData, kind: NpcEventKind, npcId: string): boolean {
   if (BIG_EVENT_KINDS.has(kind)) return true;
-  return sectRankOf(npcId) <= 3;
+  return (state.npcExt?.[npcId]?.sectRank ?? 0) >= 10 && kind !== "journey" && kind !== "travel";
 }
 
 // Spec §3.2.2 — archetype label table. Order matters: more specific
@@ -292,8 +291,17 @@ export function generateNpcEventEcho(args: NpcEventEchoArgs): string | null {
   const { state, kind, npcId, partnerNpcId, locationId, payload } = args;
   ensureRumorArrays(state);
 
-  const pool = NPC_EVENT_TEMPLATES[kind];
-  if (!pool || pool.length === 0) return null;
+  const npc = state.npcExt?.[npcId] ?? getNamedDefault(npcId);
+  const hasSect = !!(npc?.sect ?? payload?.sect ?? payload?.formerSect);
+  const pool = (NPC_EVENT_TEMPLATES[kind] ?? []).filter((tpl) => {
+    const when = tpl.when;
+    if (!when) return true;
+    if (when.purpose !== undefined && when.purpose !== payload?.purpose) return false;
+    if (when.sect !== undefined && when.sect !== hasSect) return false;
+    if (when.art !== undefined && when.art !== !!payload?.artId) return false;
+    return true;
+  });
+  if (pool.length === 0) return null;
 
   const tpl = pickRandom(pool);
   if (!tpl) return null;
@@ -317,14 +325,17 @@ export function generateNpcEventEcho(args: NpcEventEchoArgs): string | null {
       if (vars[k] === undefined || vars[k] === "") vars[k] = String(v);
     }
   }
-  const npc = state.npcExt[npcId] ?? getNamedDefault(npcId);
   resolveDetailNames(vars, npc?.sect);
+  vars.dest = locationDisplayName(vars.dest ?? locationId);
+  vars.title = npc ? rankTitle(npc.sectRank, npc.sect ? SECT_MEMBERSHIPS[npc.sect]?.name ?? null : null) : "จอมยุทธ์";
+  vars.tier = npc ? POWER_TIER_LABEL[powerTier(npc.power)] : "ยอดฝีมือ";
 
-  const truth = rollDistortion();
-  const text = renderTemplate(variantText(tpl, truth), vars);
+  // Liveness 2.0: NPC events really happened, so the talk tells them as they were.
+  const truth: RumorTruth = "true";
+  const text = renderTemplate(tpl.text, vars);
 
   // Big-news weight boost (×2) per spec §3.2.1 + plan decision #7.
-  const big = isBigNews(kind, npcId);
+  const big = isBigNews(state, kind, npcId);
   const weight = big ? tpl.weight * 2 : tpl.weight;
   const lifespan = big ? BIG_NEWS_LIFESPAN_DAYS : DEFAULT_LIFESPAN_DAYS;
 
@@ -422,7 +433,7 @@ export function generatePlayerEcho(args: PlayerEchoArgs): string | null {
     refersToEvent: null,
     leadsTo: null,
     prerequisites: [],
-    weight: tpl.weight,
+    weight: BIG_PLAYER_ACTIONS.has(actionId) ? tpl.weight + 4 : tpl.weight,
   };
   state.rumorPool.push(rumor);
   applyCaps(state, currentDay);
@@ -483,6 +494,33 @@ export function generateWarning(args: WarningArgs): string | null {
   return id;
 }
 
+// ─── 3.4 — Spread ──────────────────────────────────────────────────────
+// Talk travels. Every rumor starts in its own region; the capital's
+// heartland, where all roads meet, hears it after a while (big news after
+// 3 days, the rest after 10); big news reaches every region after 10 days,
+// and what starts in the heartland goes out to every region after 10 days.
+// Computed from the rumor's age, so nothing extra is saved.
+export const SPREAD_HEARTLAND_DAYS = 10;
+export const SPREAD_BIG_DAYS = 3;
+export const SPREAD_ALL_DAYS = 10;
+
+export function isLoudRumor(r: Rumor): boolean {
+  if (r.source === "npc_event") return !!r.refersToEvent && BIG_EVENT_KINDS.has(r.refersToEvent.eventKind) || r.weight >= 12;
+  if (r.source === "player_echo") return r.weight >= 10;
+  return false;
+}
+
+/** Can a rumor be heard in `region` on `day`? */
+export function rumorReaches(r: Rumor, region: Region, day: number): boolean {
+  if (r.region === region || r.region === "global") return true;
+  if (r.source === "lore" || r.source === "warning") return false;
+  const age = day - r.createdDay;
+  const loud = isLoudRumor(r);
+  if (region === "heartland" && age >= (loud ? SPREAD_BIG_DAYS : SPREAD_HEARTLAND_DAYS)) return true;
+  if (age >= SPREAD_ALL_DAYS && (loud || r.region === "heartland")) return true;
+  return false;
+}
+
 // ─── 3.5 — Selection ───────────────────────────────────────────────────
 
 export function selectRumorsForScene(
@@ -505,7 +543,7 @@ export function selectRumorsForScene(
 
   const filtered = state.rumorPool.filter((r) => {
     if (r.expiresDay <= state.day) return false;
-    if (r.region !== region && r.region !== "global") return false;
+    if (!rumorReaches(r, region, state.day)) return false;
     if (!admittedChannels.has(r.channel)) return false;
     // Prereqs: every condition must pass.
     for (const pre of r.prerequisites) {

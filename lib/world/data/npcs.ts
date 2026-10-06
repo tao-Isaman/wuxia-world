@@ -7,6 +7,7 @@ import { NPCS_SECTS_TEMPLES } from "./npcs/sects-temples";
 import { NPCS_WILDERNESS } from "./npcs/wilderness";
 import { NPCS_EVIL } from "./npcs/evil";
 import { NPCS_SPIES } from "./npcs/spies";
+import { NPCS_WANDERERS } from "./npcs/wanderers";
 
 // ─── NPC registry ──────────────────────────────────────────────────────
 // Each entry plants an NPC at one or more locations. Authors fill in the
@@ -78,15 +79,28 @@ export const NPCS: readonly NpcDef[] = [
   ...NPCS_WILDERNESS,
   ...NPCS_EVIL,
   ...NPCS_SPIES,
+  ...NPCS_WANDERERS,
   ...PLACE_NPCS,
 ];
 
 export const NPCS_BY_ID = new Map<string, NpcDef>(NPCS.map((n) => [n.id, n]));
 registerNpcBodies(Object.fromEntries(NPCS.filter((n) => n.look?.body).map((n) => [n.id, n.look!.body!])));
 
+// Generated people (Liveness 2.0: disciples, newcomers, heirs) live in the
+// save (npcExt with `dynamic: true`); lib/world/npc-life.ts registers them
+// here so every lookup by id finds them like an authored NPC.
+const DYNAMIC_NPCS = new Map<string, NpcDef>();
+export function registerDynamicNpc(def: NpcDef): void {
+  DYNAMIC_NPCS.set(def.id, def);
+  if (def.look?.body) registerNpcBodies({ [def.id]: def.look.body });
+}
+export function isDynamicNpc(id: string): boolean {
+  return DYNAMIC_NPCS.has(id) && !NPCS_BY_ID.has(id);
+}
+
 export function getNpc(id: string | null | undefined): NpcDef | null {
   if (!id) return null;
-  return NPCS_BY_ID.get(id) ?? null;
+  return NPCS_BY_ID.get(id) ?? DYNAMIC_NPCS.get(id) ?? null;
 }
 
 // All registry NPCs whose locationIds include `locationId`. LocationView
