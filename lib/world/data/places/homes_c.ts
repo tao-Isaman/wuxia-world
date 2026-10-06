@@ -280,7 +280,7 @@ const quests: QuestDef[] = [
       { id: "deliver", description: "นำจดหมายของชุนเถาไปส่งให้แม่นางที่หมู่บ้านชีกู่",
         objective: { spots: [{ locationId: "village_qigu", label: "ส่งจดหมายให้แม่ของชุนเถา",
           text: "หญิงชรากอดจดหมายแนบอก แล้วฝากบอกลูกว่า \"อย่าลืมกินข้าว และอย่าพูดมากเกินไป\"" }] } },
-      { id: "return", description: "กลับไปบอกชุนเถาที่บ้านฉีเหลียง" },
+      { id: "return", description: "กลับไปบอกชุนเถาสาวใช้ที่บ้านฉีเหลียง" },
     ],
     rewards: [{ t: "gold", amount: 80 }, { t: "item", itemId: "rice_dish", count: 1 }, { t: "trait", trait: "good", amount: 1 }, { t: "npcRelationship", npcId: CHUN, amount: 10 }],
   },

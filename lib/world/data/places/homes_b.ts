@@ -191,7 +191,7 @@ const quests: QuestDef[] = [
     giverNpcId: "home_nanxian_woodcutter_bai",
     stages: [
       { id: "wood", description: "หาไม้เนื้ออ่อน 5 ท่อนให้ลุงไป๋", autoAdvance: { t: "hasItem", itemId: "wood_soft", count: 5 } },
-      { id: "return", description: "นำไม้กลับไปให้ลุงไป๋ที่บ้านหนานเสียน" },
+      { id: "return", description: "นำไม้กลับไปให้ลุงคนตัดฟืนที่บ้านหนานเสียน" },
     ],
     rewards: [{ t: "learnSkill", skillId: "dg" }, { t: "gold", amount: 80 }, { t: "npcRelationship", npcId: "home_nanxian_woodcutter_bai", amount: 5 }],
   },
