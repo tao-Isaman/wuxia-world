@@ -349,7 +349,7 @@ const THOUSAND_ARMS: StoryArcSpec = {
         go: "เริ่มแบกถังน้ำ",
       },
       steps: [
-        { t: "stat", stat: "VIT", min: 45, hint: "ฝึกร่างกายจนพลังกายถึง 45 — แบกน้ำ ยืนใต้ระฆัง" },
+        { t: "stat", stat: "VIT", min: 45, hint: "แบกน้ำ ยืนใต้ระฆัง ฝึกร่างกายให้แกร่งพอรับหมัด (ร่างกาย ≥ 45)" },
         { t: "talk", npcId: HEAD, locationId: "sect_shaolin", label: "ยืนรับหมัดหยวนเฉวียน", hint: "ให้หัวหน้าศิษย์หยวนเฉวียนทดสอบว่ารับหมัดได้หรือยัง",
           scene: {
             lines: [
@@ -980,7 +980,7 @@ const TRUTH_STAFF: StoryArcSpec = {
       },
       steps: [
         { t: "gather", itemId: "wood_hard", count: 3, hint: "หาไม้เนื้อแข็ง 3 ท่อน ให้หลวงพ่อจูตี้เหลาไม้เท้า" },
-        { t: "stat", stat: "POW", min: 45, hint: "แบกไม้เท้าไปทุกที่โดยไม่ตีใคร จนพลังภายในถึง 45" },
+        { t: "stat", stat: "POW", min: 45, hint: "แบกไม้เท้าไปทุกที่โดยไม่ตีใคร จนลมปราณหนักแน่น (ภายใน ≥ 45)" },
       ],
       complete: {
         lines: [
