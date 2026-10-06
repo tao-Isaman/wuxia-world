@@ -102,7 +102,7 @@ try {
   const overview = scene("npc_city_capital_magistrate_wu_jobs").lines.map(line => line.text).join(" ");
   assert.ok(overview.includes(getNpc(clerk)!.name));
   assert.match(overview, /กุญแจเก่า/);
-  assert.match(overview, /นักเลง 2 คน/);
+  assert.match(overview, /โจรเร่ร่อน 2 คน/);
   assert.match(overview, /ด้านซ้าย/);
   console.log("PASS clerk registration/map: real NPC, resolvable greeting, clear feet and lateral approach with connected paths from spawn and Wu; stage IDs preserved");
 

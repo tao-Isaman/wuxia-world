@@ -31,7 +31,7 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
       },
       {
         id: "return",
-        description: "นำบัญชีที่หยิบจากหีบข้างเสมียนนายฉิงไปส่งนายอำเภอหวู่ที่นครหลวง แล้วรับรางวัล",
+        description: "ส่งบัญชีให้นายอำเภอหวู่ที่นครหลวง (บัญชีที่หยิบจากหีบเอกสารข้างเสมียน) แล้วรับรางวัล",
       },
     ],
     rewards: [
@@ -45,8 +45,8 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
   {
     id: "qc_capital_corrupt_clerk",
     name: "เสมียนฉ้อฉล",
-    description: "สืบสวนเสมียนในสำนักงานนายอำเภอที่ต้องสงสัยว่ารับสินบนจากพ่อค้า",
-    briefSummary: "รวบรวมหลักฐานการรับสินบนของเสมียนในสำนักงาน",
+    description: "นายอำเภอหวู่แห่งนครหลวงสงสัยว่าเสมียนคนหนึ่งในที่ว่าการรับสินบนจากพ่อค้า ถามเบาะแสจากเสมียนนายฉิง แล้วยึดใบรับเงินจากโจรเร่ร่อนที่เป็นคนเดินเงินมาเป็นหลักฐาน",
+    briefSummary: "ถามเสมียนนายฉิง · ปราบโจรเร่ร่อน 2 คนเอาหลักฐาน · รายงานนายอำเภอหวู่",
     type: "side",
     giverNpcId: "city_capital_magistrate_wu",
     stages: [
@@ -57,12 +57,12 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
       },
       {
         id: "confront",
-        description: "ปราบนักเลง 2 คนที่พบระหว่างเดินทางหลังรับงาน เพื่อรวบรวมหลักฐาน หากยังไม่พร้อมให้พักและฝึกฝีมือก่อน",
+        description: "ปราบโจรเร่ร่อน 2 คน (พบได้ระหว่างเดินทาง) แล้วเก็บใบรับเงินสินบนจากตัวพวกมัน",
         autoAdvance: { t: "defeatedOpponent", opponentId: "thug", count: 2 },
       },
       {
         id: "report",
-        description: "รายงานหลักฐานต่อนายอำเภอหวู่",
+        description: "นำหลักฐานไปรายงานนายอำเภอหวู่ที่นครหลวง",
       },
     ],
     rewards: [
@@ -77,7 +77,7 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
   {
     id: "qc_capital_royal_pardon",
     name: "หนังสือนิรโทษกรรม",
-    description: "นายอำเภอหวู่ขอให้นำหนังสือสำคัญไปส่งให้นักยุทธศาสตร์กงที่จินหลิง แล้วนำใบรับกลับมา",
+    description: "นักโทษคนหนึ่งถูกตัดสินอย่างไม่เป็นธรรม นายอำเภอหวู่ฝากหนังสือนิรโทษกรรมไปให้นักยุทธศาสตร์กงที่จินหลิง ผู้คุ้มครองพยานคนสำคัญ แล้วให้นำใบรับกลับมา",
     briefSummary: "ส่งหนังสือนิรโทษกรรมให้กงที่จินหลิง · นำใบรับกลับนครหลวง",
     type: "side",
     giverNpcId: "city_capital_magistrate_wu",
@@ -89,7 +89,7 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
       },
       {
         id: "deliver_jinling",
-        description: "ไปจินหลิง · ส่งหนังสือให้นักยุทธศาสตร์กงและรับใบรับกลับ",
+        description: "ไปจินหลิง ส่งหนังสือให้นักยุทธศาสตร์กง แล้วรับใบรับกลับมา",
         autoAdvance: { t: "hasItem", itemId: "qst_amnesty_receipt", count: 1 },
       },
       {
@@ -139,7 +139,7 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
   {
     id: "qc_capital_rare_herb",
     name: "บัวหิมะเพื่อผู้ป่วย",
-    description: "หมอหลินต้องการบัวหิมะจากก้นหุบเขาตัดใจสำหรับปรุงยาให้ผู้ป่วยหนัก ต้องมีทักษะเก็บสมุนไพรระดับ 5 จึงเก็บได้",
+    description: "หมอหลินแห่งนครหลวงต้องการบัวหิมะจากก้นหุบเขาตัดใจ มาปรุงยาให้ผู้ป่วยหนัก ต้องมีทักษะเก็บสมุนไพรระดับ 5 จึงเก็บได้",
     briefSummary: "เก็บบัวหิมะที่ก้นหุบเขาตัดใจ · เก็บสมุนไพรระดับ 5 · ส่งให้หมอหลินในนครหลวง",
     type: "side",
     giverNpcId: "city_capital_physician_lin",
@@ -166,15 +166,15 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
   {
     id: "qc_capital_stolen_formula",
     name: "ตำรับยาที่ถูกขโมย",
-    description: "ตำรับยาลับของหมอหลินถูกขโมยไป ต้องสืบและนำมันกลับคืน",
-    briefSummary: "สืบหาและนำตำรับยาลับของหมอหลินกลับคืน",
+    description: "ตำรับยาลับของหมอหลินถูกขโมยไปจากร้านในนครหลวง สืบรอยคนร้าย ปราบมัน แล้วช่วยหมอหลินเรียบเรียงตำรับขึ้นใหม่",
+    briefSummary: "สืบรอยหลังร้าน · ปราบหมอดูปลอม · หาตำราขั้นสูงให้หมอหลิน",
     type: "side",
     giverNpcId: "city_capital_physician_lin",
     prereqs: { t: "npcRelationship", npcId: "city_capital_physician_lin", min: 5 },
     stages: [
       {
         id: "investigate",
-        description: "สืบสวนว่าใครขโมยตำรับยาจากคลินิก",
+        description: "สืบร่องรอยหลังร้านยาของหมอหลินในนครหลวง",
         objective: {
           spots: [
             { locationId: "city_capital", label: "สืบร่องรอยหลังคลินิก", text: "รอยเท้าเปื้อนผงยาพาไปถึงตรอกหลังตลาด — คนร้ายเป็นหัวขโมยเร่ร่อนที่ชอบดักคนตามทาง" },
@@ -183,12 +183,12 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
       },
       {
         id: "find_thief",
-        description: "ปราบโจรที่ขโมยตำรับยาและนำมันกลับคืน",
+        description: "ปราบหมอดูปลอม หัวขโมยที่ฉกตำรับยาไป (พบได้ระหว่างเดินทาง)",
         autoAdvance: { t: "defeatedOpponent", opponentId: "fortune_thief", count: 1 },
       },
       {
         id: "return_formula",
-        description: "นำตำรับยาคืนให้หมอหลิน — ต้องมีตำราขั้นสูงอยู่ในครอบครอง",
+        description: "ตำรับที่ได้คืนขาดไปหลายหน้า หาตำราขั้นสูง 1 เล่ม (ขายที่ตลาดนครหลวง) ให้หมอหลินใช้เทียบเขียนส่วนที่หายขึ้นใหม่",
         autoAdvance: { t: "hasItem", itemId: "book_advanced", count: 1 },
       },
     ],
@@ -208,14 +208,14 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
   {
     id: "qc_xixia_iron_supply",
     name: "แร่เหล็กสำหรับตีเหล็ก",
-    description: "ช่างดูกูต้องการแร่เหล็กสิบก้อนสำหรับงานตีอาวุธที่ค้างอยู่",
-    briefSummary: "จัดหาแร่เหล็กสิบก้อนให้ช่างดูกู",
+    description: "ช่างดูกู ช่างตีเหล็กแห่งซีเซี่ย ขาดแร่เหล็กเพราะโจรปล้นกองคาราวาน เขาต้องการแร่เหล็ก 10 ก้อนไปตีอาวุธที่ค้างอยู่",
+    briefSummary: "หาแร่เหล็ก 10 ก้อนให้ช่างดูกูที่ซีเซี่ย",
     type: "side",
     giverNpcId: "city_xixia_blacksmith_dugu",
     stages: [
       {
         id: "gather_ore",
-        description: "รวบรวมแร่เหล็กสิบก้อน",
+        description: "หาแร่เหล็ก 10 ก้อน",
         autoAdvance: { t: "hasItem", itemId: "iron_ore", count: 10 },
       },
       {
@@ -235,25 +235,25 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
   {
     id: "qc_xixia_legendary_blade",
     name: "ดาบในตำนาน",
-    description: "ช่างดูกูฝันอยากตีดาบในตำนาน ต้องการแร่เทพสองก้อนจากถ้ำอันตราย",
-    briefSummary: "นำแร่เทพสองก้อนให้ช่างดูกูตีดาบในตำนาน",
+    description: "ช่างดูกูแห่งซีเซี่ยฝันอยากตีดาบในตำนานสักเล่มก่อนตาย ต้องการแร่เทพ 2 ก้อน แร่ที่มักอยู่ในถิ่นของสัตว์ดุร้าย",
+    briefSummary: "ปราบเสือภูเขา 2 ตัว · หาแร่เทพ 2 ก้อนให้ช่างดูกู",
     type: "side",
     giverNpcId: "city_xixia_blacksmith_dugu",
     prereqs: { t: "npcRelationship", npcId: "city_xixia_blacksmith_dugu", min: 5 },
     stages: [
       {
         id: "defeat_guardian",
-        description: "ปราบผู้พิทักษ์ถ้ำเพื่อเข้าถึงแร่เทพ",
+        description: "ปราบเสือภูเขา 2 ตัวที่เฝ้าถิ่นแร่เทพ",
         autoAdvance: { t: "defeatedOpponent", opponentId: "mountain_tiger", count: 2 },
       },
       {
         id: "gather_mithril",
-        description: "เก็บแร่เทพสองก้อนจากถ้ำ",
+        description: "หาแร่เทพ 2 ก้อน",
         autoAdvance: { t: "hasItem", itemId: "mithril_ore", count: 2 },
       },
       {
         id: "deliver_mithril",
-        description: "นำแร่เทพส่งช่างดูกูและรับดาบ",
+        description: "นำแร่เทพไปส่งช่างดูกูที่ซีเซี่ย แล้วรับดาบ",
       },
     ],
     rewards: [
@@ -269,19 +269,19 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
   {
     id: "qc_xixia_bandit_ore",
     name: "โจรปล้นกองคาราวานแร่",
-    description: "ช่างดูกูต้องการให้จัดการหัวหน้าโจรที่ขัดขวางการขนส่งแร่เหล็ก",
+    description: "หัวหน้าโจรคนหนึ่งคอยดักปล้นกองคาราวานแร่เหล็กที่จะไปซีเซี่ย ช่างดูกูขอให้ปราบเขาจนต้องหนีไป",
     briefSummary: "ปราบหัวหน้าโจรที่ปล้นกองคาราวานแร่เหล็ก",
     type: "side",
     giverNpcId: "city_xixia_blacksmith_dugu",
     stages: [
       {
         id: "defeat_chief",
-        description: "ปราบหัวหน้าโจรแห่งชายป่า",
+        description: "ปราบหัวหน้าโจร (พบได้ระหว่างเดินทาง)",
         autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 1 },
       },
       {
         id: "report",
-        description: "กลับไปรายงานให้ช่างดูกูทราบ",
+        description: "กลับไปบอกช่างดูกูที่ซีเซี่ย",
       },
     ],
     rewards: [
@@ -300,19 +300,19 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
   {
     id: "qc_dali_ancient_scroll",
     name: "คัมภีร์โบราณในวัดร้าง",
-    description: "บัณฑิตต้วนต้องการคัมภีร์โบราณจากวัดร้างที่มีสัตว์ป่าอาศัยอยู่",
-    briefSummary: "นำคัมภีร์โบราณจากวัดร้างมาให้บัณฑิตต้วน",
+    description: "บัณฑิตต้วนแห่งต้าหลี่ตามหาตำราเบื้องต้นฉบับเก่าจากวัดร้างที่สัตว์ป่ายึดไว้ ไล่สัตว์ป่าออกไป แล้วหาตำราเบื้องต้นมาให้เขา",
+    briefSummary: "ปราบสัตว์ป่าดุร้าย 2 ตัว · หาตำราเบื้องต้นให้บัณฑิตต้วน",
     type: "side",
     giverNpcId: "city_dali_scholar_duan",
     stages: [
       {
         id: "clear_beasts",
-        description: "ปราบสัตว์ป่าที่ยึดวัดร้าง",
+        description: "ปราบสัตว์ป่าดุร้าย 2 ตัวที่ยึดวัดร้าง",
         autoAdvance: { t: "defeatedOpponent", opponentId: "wild_beast", count: 2 },
       },
       {
         id: "find_scroll",
-        description: "หาคัมภีร์ในห้องสมุดเก่าของวัด — ต้องมีตำราเบื้องต้น",
+        description: "หาตำราเบื้องต้น 1 เล่ม — ฉบับในวัดเปื่อยจนอ่านไม่ออก ฉบับคัดลอกจากร้านค้าก็ใช้ได้",
         autoAdvance: { t: "hasItem", itemId: "book_basic", count: 1 },
       },
       {
@@ -332,14 +332,14 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
   {
     id: "qc_dali_history_route",
     name: "แผนที่ประวัติศาสตร์",
-    description: "บัณฑิตต้วนต้องการข้อมูลเกี่ยวกับสภาพปัจจุบันของซูโจวเพื่อจัดทำแผนที่ประวัติศาสตร์",
+    description: "บัณฑิตต้วนแห่งต้าหลี่กำลังทำแผนที่ประวัติศาสตร์ และอยากรู้สภาพของซูโจวในวันนี้ เดินทางไปซูโจวสักครั้ง แล้วกลับมาเล่าให้เขาฟัง",
     briefSummary: "ไปเยี่ยมซูโจวและกลับมารายงานบัณฑิตต้วน",
     type: "side",
     giverNpcId: "city_dali_scholar_duan",
     stages: [
       {
         id: "visit_suzhou",
-        description: "เดินทางไปยังซูโจวและสำรวจเมือง",
+        description: "เดินทางไปซูโจว",
         autoAdvance: { t: "visitedLocation", locationId: "city_suzhou" },
       },
       {
@@ -358,14 +358,14 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
   {
     id: "qc_dali_missing_page",
     name: "หน้าหนังสือที่หายไป",
-    description: "บัณฑิตต้วนต้องการให้ไปคุยพ่อค้าหนังสือลี่ที่ซูโจวเพื่อขอหน้าหนังสือที่หายกลับคืน",
+    description: "หนังสือประวัติศาสตร์ของบัณฑิตต้วนขาดหน้าไป พ่อค้าหนังสือลี่ที่ซูโจวเก็บหน้านั้นไว้ ไปรับมาแล้วนำกลับไปให้บัณฑิตต้วนที่ต้าหลี่",
     briefSummary: "ไปขอหน้าหนังสือคืนจากพ่อค้าหนังสือลี่ที่ซูโจว แล้วนำกลับต้าหลี่",
     type: "side",
     giverNpcId: "city_dali_scholar_duan",
     stages: [
       {
         id: "pickup_at_suzhou",
-        description: "ไปซูโจว · คุยพ่อค้าหนังสือลี่เพื่อขอหน้าหนังสือคืน",
+        description: "ไปซูโจว ขอหน้าหนังสือคืนจากพ่อค้าหนังสือลี่",
         autoAdvance: { t: "hasItem", itemId: "qst_dali_book_pages", count: 1 },
       },
       {
@@ -389,19 +389,19 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
   {
     id: "qc_dali_herb_collection",
     name: "เก็บโสมห้าหัว",
-    description: "หมอยาไป๋ต้องการโสมห้าหัวสำหรับยาล็อตส่งออก พื้นที่เก็บโสมมีสัตว์ป่าชุม",
-    briefSummary: "เก็บโสมห้าหัวและส่งให้หมอยาไป๋",
+    description: "หมอยาไป๋แห่งต้าหลี่ต้องการโสม 5 หัวไปปรุงยาล็อตใหญ่ แต่ถิ่นโสมมีหมาป่าชุม ไล่หมาป่าก่อน แล้วหาโสมมาให้เขา",
+    briefSummary: "ปราบหมาป่า 1 ตัว · หาโสม 5 หัวให้หมอยาไป๋",
     type: "side",
     giverNpcId: "city_dali_herbalist_bai",
     stages: [
       {
         id: "clear_area",
-        description: "ปราบสัตว์ป่าในพื้นที่เก็บโสม",
+        description: "ปราบหมาป่า 1 ตัวในถิ่นที่เก็บโสม",
         autoAdvance: { t: "defeatedOpponent", opponentId: "wild_wolf", count: 1 },
       },
       {
         id: "gather_ginseng",
-        description: "เก็บโสมห้าหัวจากชายป่าชื้น",
+        description: "หาโสม 5 หัว",
         autoAdvance: { t: "hasItem", itemId: "ginseng", count: 5 },
       },
       {
@@ -428,12 +428,12 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
     stages: [
       {
         id: "defeat_viper",
-        description: "ปราบงูเห่ายักษ์ที่ป่าชายเขาทางตะวันออก",
+        description: "ปราบงูเห่ายักษ์ที่กัดชาวบ้านแถวต้าหลี่",
         autoAdvance: { t: "defeatedOpponent", opponentId: "viper_snake", count: 1 },
       },
       {
         id: "collect_venom",
-        description: "เก็บพิษงูเห่า — ต้องมีพิษงูอยู่ในครอบครอง",
+        description: "หาพิษงูเห่า 1 ขวด (งูเห่ายักษ์มักทิ้งไว้เมื่อพ่ายแพ้)",
         autoAdvance: { t: "hasItem", itemId: "viper_venom", count: 1 },
       },
       {
@@ -465,12 +465,12 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
     stages: [
       {
         id: "find_fish",
-        description: "เดินทางไปเกาะมังกรเทพและตามรอยปลามังกร",
+        description: "หาปลามังกร 1 ตัว (จับได้ที่เกาะมังกรเทพ)",
         autoAdvance: { t: "hasItem", itemId: "fish_dragon", count: 1 },
       },
       {
         id: "deliver_fish",
-        description: "ส่งปลามังกรให้พ่อครัวซู",
+        description: "นำปลามังกรไปให้พ่อครัวซูที่หยางโจว",
       },
     ],
     rewards: [
@@ -494,7 +494,7 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
     stages: [
       {
         id: "pickup_at_capital",
-        description: "ไปนครหลวง · คุยพ่อค้าหวังเพื่อรับเครื่องเทศพิเศษ",
+        description: "ไปนครหลวง รับเครื่องเทศพิเศษจากพ่อค้าหวัง",
         autoAdvance: { t: "hasItem", itemId: "qst_capital_spice", count: 1 },
       },
       {
@@ -518,19 +518,19 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
   {
     id: "qc_yangzhou_river_pirates",
     name: "โจรสลัดแม่น้ำ",
-    description: "ชาวประมงเฉินต้องการให้ปราบโจรสลัดที่ยึดท่าเรือทางเหนือของหยางโจว",
+    description: "โจรสลัดน้ำยึดท่าเรือทางเหนือของหยางโจวมาหลายเดือน ชาวประมงเฉินขอให้ปราบพวกมันสัก 3 คน ให้กลุ่มโจรถอยไป",
     briefSummary: "ปราบโจรสลัดสามคนเพื่อปลดปล่อยท่าเรือ",
     type: "side",
     giverNpcId: "city_yangzhou_fisherman_chen",
     stages: [
       {
         id: "defeat_pirates",
-        description: "ปราบโจรสลัดแม่น้ำอย่างน้อยสามคน",
+        description: "ปราบโจรสลัดน้ำ 3 คน",
         autoAdvance: { t: "defeatedOpponent", opponentId: "river_pirate", count: 3 },
       },
       {
         id: "report",
-        description: "กลับมารายงานชาวประมงเฉิน",
+        description: "กลับไปบอกชาวประมงเฉินที่หยางโจว",
       },
     ],
     rewards: [
@@ -546,25 +546,25 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
   {
     id: "qc_yangzhou_sunken_cargo",
     name: "สินค้าจมน้ำ",
-    description: "เรือสินค้าของชาวประมงเฉินจมตอนโจรสลัดโจมตี มีหีบทองแดงอยู่ในนั้น ต้องการคนช่วยกู้",
-    briefSummary: "กู้หีบทองแดงจากเรือที่จมในแม่น้ำหยางโจว",
+    description: "เรือสินค้าของชาวประมงเฉินจมตอนโจรสลัดบุก พร้อมแร่ทองแดงทั้งลำ ปราบโจรที่ยังเฝ้าซากเรือ แล้วหาแร่ทองแดงมาคืนเขา",
+    briefSummary: "ปราบโจรสลัดน้ำ · หาแร่ทองแดง 5 ก้อนให้ชาวประมงเฉิน",
     type: "side",
     giverNpcId: "city_yangzhou_fisherman_chen",
     prereqs: { t: "questStatus", questId: "qc_yangzhou_river_pirates", status: "done" },
     stages: [
       {
         id: "defeat_guard",
-        description: "ปราบโจรสลัดที่ยังเฝ้าซากเรืออยู่",
+        description: "ปราบโจรสลัดน้ำที่ยังเฝ้าซากเรืออยู่",
         autoAdvance: { t: "defeatedOpponent", opponentId: "river_pirate", count: 1 },
       },
       {
         id: "collect_cargo",
-        description: "กู้แร่ทองแดงจากซากเรือ",
+        description: "หาแร่ทองแดง 5 ก้อน แทนสินค้าที่จมไปกับเรือ",
         autoAdvance: { t: "hasItem", itemId: "copper_ore", count: 5 },
       },
       {
         id: "return_cargo",
-        description: "ส่งสินค้าคืนชาวประมงเฉิน",
+        description: "นำแร่ทองแดงไปคืนชาวประมงเฉินที่หยางโจว",
       },
     ],
     rewards: [
@@ -595,7 +595,7 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
       },
       {
         id: "deliver_capital",
-        description: "ไปนครหลวง · ส่งผ้าไหมให้พ่อค้าหวังและรับใบรับกลับ",
+        description: "ไปนครหลวง ส่งผ้าไหมให้พ่อค้าหวัง แล้วรับใบรับกลับมา",
         autoAdvance: { t: "hasItem", itemId: "qst_capital_silk_receipt", count: 1 },
       },
       {
@@ -615,19 +615,19 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
   {
     id: "qc_suzhou_dye_ingredient",
     name: "เม็ดบัวสำหรับสีย้อม",
-    description: "ช่างทอเหมยต้องการเม็ดบัวห้าหัวสำหรับสีย้อมพิเศษที่ทำให้ผ้าไหมโดดเด่น",
-    briefSummary: "เก็บเม็ดบัวห้าหัวจากป่าชุ่มน้ำทางใต้ของซูโจว",
+    description: "ช่างทอเหมยแห่งซูโจวต้องการเม็ดบัว 5 เม็ด ไปทำสีย้อมพิเศษที่ทำให้ผ้าไหมของนางไม่เหมือนใคร",
+    briefSummary: "หาเม็ดบัว 5 เม็ดให้ช่างทอเหมยที่ซูโจว",
     type: "side",
     giverNpcId: "city_suzhou_weaver_mei",
     stages: [
       {
         id: "gather_lotus",
-        description: "เก็บเม็ดบัวห้าหัวจากป่าชุ่มน้ำ",
+        description: "หาเม็ดบัว 5 เม็ด",
         autoAdvance: { t: "hasItem", itemId: "lotus_seed", count: 5 },
       },
       {
         id: "deliver_lotus",
-        description: "ส่งเม็ดบัวให้ช่างทอเหมย",
+        description: "นำเม็ดบัวไปให้ช่างทอเหมยที่ซูโจว",
       },
     ],
     rewards: [
@@ -642,14 +642,14 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
   {
     id: "qc_suzhou_copycat_guild",
     name: "กลุ่มช่างปลอม",
-    description: "กลุ่มช่างปลอมลอกลวดลายผ้าไหมของช่างทอเหมย ต้องสืบที่ซ่องและรายงาน",
+    description: "กลุ่มช่างปลอมลอกลวดลายผ้าไหมของช่างทอเหมยไปขายถูก ๆ สืบที่ตลาดริมน้ำของซูโจว ปราบคนร้ายที่คุ้มกันพวกมัน แล้วกลับไปบอกนาง",
     briefSummary: "สืบที่ซ่องของกลุ่มช่างปลอมในซูโจวและรายงานช่างทอเหมย",
     type: "side",
     giverNpcId: "city_suzhou_weaver_mei",
     stages: [
       {
         id: "surveil_market",
-        description: "สังเกตตลาดริมน้ำหาพ่อค้าที่ขายผ้าลอกลวดลาย",
+        description: "สังเกตแผงผ้าในตลาดริมน้ำของซูโจว หาคนขายผ้าลอกลาย",
         objective: {
           spots: [
             { locationId: "city_suzhou", label: "สังเกตแผงผ้าริมน้ำ", text: "พ่อค้าแผงหนึ่งขายผ้าลายเดียวกับของช่างทอเหมย มีนักเลงคอยคุ้มกันอยู่ไม่ห่าง" },
@@ -658,7 +658,7 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
       },
       {
         id: "confront_guild",
-        description: "ปราบนักเลงที่คุ้มครองกลุ่มช่างปลอม",
+        description: "ปราบคนร้าย 2 คนที่คุ้มกันกลุ่มช่างปลอม",
         autoAdvance: { t: "defeatedOpponent", opponentId: "ruffian", count: 2 },
       },
       {
@@ -682,7 +682,7 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
   {
     id: "qc_jinling_spy_network",
     name: "เครือข่ายสายลับ",
-    description: "นักยุทธศาสตร์กงต้องการข้อมูลเกี่ยวกับสายลับที่แทรกซึมสำนักในฉางอัน",
+    description: "นักยุทธศาสตร์กงแห่งจินหลิงได้ข่าวว่ามีสายลับแทรกซึมเข้ามาในฉางอัน ไปเฝ้าดูประตูเมืองและตลาด แล้วกลับมาเล่าสิ่งที่เห็น",
     briefSummary: "ไปสืบข้อมูลที่ฉางอันแล้วกลับมารายงานนักยุทธศาสตร์กง",
     type: "side",
     giverNpcId: "city_jinling_strategist_kong",
@@ -694,7 +694,7 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
       },
       {
         id: "observe",
-        description: "สังเกตสถานการณ์ที่ประตูเมืองและตลาด",
+        description: "เฝ้าสังเกตประตูเมืองและตลาดของฉางอัน",
         objective: {
           hours: 2,
           spots: [
@@ -730,7 +730,7 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
       },
       {
         id: "get_translation",
-        description: "ไปต้าหลี่ · ให้บัณฑิตต้วนแปลจดหมายและรับคำแปลกลับ",
+        description: "ไปต้าหลี่ ให้บัณฑิตต้วนแปลจดหมาย แล้วรับคำแปลกลับมา",
         autoAdvance: { t: "hasItem", itemId: "qst_dali_decoded", count: 1 },
       },
       {
@@ -749,7 +749,7 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
   {
     id: "qc_jinling_defector",
     name: "คุ้มครองผู้แปรพักตร์",
-    description: "นักยุทธศาสตร์กงต้องการให้พาผู้แปรพักตร์จากสำนักหนึ่งออกมาจากฉางอันอย่างปลอดภัย",
+    description: "ศิษย์สำนักหนึ่งอยากแปรพักตร์ออกมาพร้อมข้อมูลสำคัญ แต่กลัวถูกตามล่า นักยุทธศาสตร์กงขอให้ไปรับเขาที่ฉางอัน แล้วพามาส่งที่จินหลิงอย่างปลอดภัย",
     briefSummary: "ไปรับผู้แปรพักตร์ที่ฉางอันและพาปลอดภัยมาจินหลิง",
     type: "side",
     giverNpcId: "city_jinling_strategist_kong",
@@ -762,12 +762,12 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
       },
       {
         id: "defeat_pursuers",
-        description: "ปราบผู้ไล่ตามที่ขัดขวางการเดินทาง",
+        description: "ปราบลูกศิษย์สำนัก 2 คนที่ไล่ตามผู้แปรพักตร์มา",
         autoAdvance: { t: "defeatedOpponent", opponentId: "sect_disciple", count: 2 },
       },
       {
         id: "escort_complete",
-        description: "พาผู้แปรพักตร์มาถึงจินหลิงปลอดภัย",
+        description: "พาผู้แปรพักตร์กลับไปหานักยุทธศาสตร์กงที่จินหลิง",
       },
     ],
     rewards: [
@@ -787,14 +787,14 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
   {
     id: "qc_changan_gate_intruder",
     name: "ผู้บุกรุกประตูเมือง",
-    description: "ยามหยานพบว่ามีคนแอบผ่านประตูเมืองฉางอันโดยไม่มีใบอนุญาต ต้องตามหาว่าหนีไปไหน",
+    description: "เมื่อคืนมีคนแอบผ่านประตูเมืองฉางอันโดยไม่มีใบผ่านทาง ยามหยานขอให้ตามรอยว่าหนีไปไหน แล้วจับตัวมาให้ได้",
     briefSummary: "สืบหาผู้บุกรุกที่แอบผ่านประตูเมืองฉางอัน",
     type: "side",
     giverNpcId: "city_changan_guard_yan",
     stages: [
       {
         id: "investigate",
-        description: "ติดตามรอยเท้าจากประตูเมืองไปยังตลาดตะวันออก",
+        description: "ตามรอยเท้าจากประตูเมืองฉางอันไปถึงตลาดตะวันออก",
         objective: {
           spots: [
             { locationId: "city_changan", label: "ตามรอยเท้าจากประตูเมือง", text: "รอยเท้าลากไปถึงตลาดตะวันออก ผู้บุกรุกยังวนเวียนอยู่แถวนอกเมือง" },
@@ -803,12 +803,12 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
       },
       {
         id: "confront",
-        description: "ปราบผู้บุกรุกและส่งตัวให้ทางการ",
+        description: "ปราบขโมยน้อยผู้บุกรุกที่ยังวนอยู่นอกเมือง",
         autoAdvance: { t: "defeatedOpponent", opponentId: "petty_thief", count: 1 },
       },
       {
         id: "report",
-        description: "รายงานผลต่อยามหยาน",
+        description: "กลับไปบอกยามหยานที่ฉางอัน",
       },
     ],
     rewards: [
@@ -822,14 +822,14 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
   {
     id: "qc_changan_missing_soldier",
     name: "ทหารที่หายไป",
-    description: "ทหารในหน่วยของยามหยานหายตัวไปสามวัน ต้องตามหาให้พบ",
+    description: "ทหารในหน่วยของยามหยานแห่งฉางอันหายไปสามวันแล้ว ค้นชายเมืองด้านใต้ ที่เขาเดินลาดตระเวนครั้งสุดท้าย แล้วช่วยเขาออกมา",
     briefSummary: "ตามหาทหารที่หายไปของยามหยาน",
     type: "side",
     giverNpcId: "city_changan_guard_yan",
     stages: [
       {
         id: "search",
-        description: "ค้นหาทหารที่หายไปบริเวณชายเมืองด้านใต้",
+        description: "ค้นชายเมืองด้านใต้ของฉางอันหาทหารที่หายไป",
         objective: {
           spots: [
             { locationId: "city_changan", label: "ค้นชายเมืองด้านใต้", text: "พบป้ายประจำตัวทหารตกอยู่หน้าโกดังร้าง — มีโจรปล้นทางซุ่มอยู่แถวนั้น" },
@@ -838,12 +838,12 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
       },
       {
         id: "defeat_captors",
-        description: "ปราบผู้จับกุมทหารที่ซ่อนอยู่ในโกดัง",
+        description: "ปราบโจรเส้นทาง 2 คนที่จับทหารขังไว้ในโกดัง",
         autoAdvance: { t: "defeatedOpponent", opponentId: "road_bandit", count: 2 },
       },
       {
         id: "rescue",
-        description: "ช่วยทหารออกมาและพากลับรายงานยามหยาน",
+        description: "พาทหารกลับไปหายามหยานที่ฉางอัน",
       },
     ],
     rewards: [
@@ -867,7 +867,7 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
     stages: [
       {
         id: "investigate",
-        description: "สืบสวนเครือข่ายลักลอบขนอาวุธในเมืองฉางอัน",
+        description: "สืบโกดังที่ซ่อนอาวุธเถื่อนในฉางอัน",
         objective: {
           spots: [
             { locationId: "city_changan", label: "สืบโกดังลักลอบขนอาวุธ", text: "ลังไม้ในโกดังซ่อนดาบไว้ใต้ฟาง อันธพาลกลุ่มหนึ่งคอยขนของออกไปยามค่ำ" },
@@ -876,12 +876,12 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
       },
       {
         id: "defeat_smugglers",
-        description: "ปราบผู้ลักลอบขนอาวุธเพื่อหาข้อมูลเพิ่มเติม",
+        description: "ปราบโจรเร่ร่อน 3 คนที่ขนอาวุธเถื่อน เพื่อเค้นว่าใครเป็นผู้รับ",
         autoAdvance: { t: "defeatedOpponent", opponentId: "thug", count: 3 },
       },
       {
         id: "decide",
-        description: "ตัดสินใจว่าจะรายงานหรือนิ่งเฉย — กลับมาหารือกับยามหยาน",
+        description: "กลับไปหายามหยานที่ฉางอัน แล้วตัดสินใจว่าจะรายงานทางการหรือนิ่งเฉย",
       },
     ],
     rewards: [
