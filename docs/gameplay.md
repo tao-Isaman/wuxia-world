@@ -218,10 +218,13 @@ Battles are turn-based tactics on a board of 10 × 7 tiles, growing to 15 × 10 
 - **อัตโนมัติ** lets the AI play for you.
 - **Winning** pays:
   - 50 w-exp;
+  - gold from a hostile foe's purse by tier: T0 5–15, T1 15–40, T2 40–90, T3 90–180, T4 180–350 (spars, tournament bouts and the law pay none);
   - loot (2–4 picks from the foe's drop table);
   - 20 xp per use for each skill and art you used;
   - stat xp (see [Stats](#stats));
   - a kill counted for every fallen foe, companions included.
+
+  The result panel shows the spoils as icons before you go on (gold, w-exp, each item, each move's xp); tap one to read it.
 - **Every finished battle** costs 5 stamina and 0.5 ชั่วยาม.
 
 ## NPCs

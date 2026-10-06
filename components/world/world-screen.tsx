@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Panel } from "@/components/ui/wuxia/panel";
+import { VictorySpoils } from "./victory-spoils";
 import { DeathReport } from "./death-report";
 import { WuxiaButton } from "@/components/ui/wuxia/button";
 import { useWorldStore } from "@/store/world-store";
@@ -167,7 +168,7 @@ export function WorldScreen() {
   } else if (pendingBattle) {
     body = (
       <MapBackdrop>
-        <BattleArena mode="world" onContinue={acknowledge} />
+        <BattleArena mode="world" onContinue={acknowledge} winExtra={<VictorySpoils />} />
       </MapBackdrop>
     );
   } else if (pendingEncounter) {
