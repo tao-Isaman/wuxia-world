@@ -125,7 +125,8 @@ test("the checker flags a placement covering an NPC spot or sealing an exit", ()
   assert.deepEqual(placementIssues("city_capital", map, placementsGeometry([place(700, 560)], indexAssets([crate]))), []);
 });
 
-test("public/assets/placements.json: known maps and assets, unique ids, nothing sealed off", () => {
+// Walks every map's reachability, the placed capital included: a few seconds.
+test("public/assets/placements.json: known maps and assets, unique ids, nothing sealed off", { timeout: 30_000 }, () => {
   const root = join(import.meta.dirname, "../../public/assets");
   const file = JSON.parse(readFileSync(join(root, "placements.json"), "utf8")) as PlacementsFile;
   const manifest = JSON.parse(readFileSync(join(root, "manifest.json"), "utf8")) as AssetManifest;

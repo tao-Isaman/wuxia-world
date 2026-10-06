@@ -32,7 +32,7 @@ Time in this game is counted in **ชั่วยาม**: 12 of them make one d
 - [Bad actions](#bad-actions)
 - [The law and the jail](#the-law-and-the-jail)
 - [Rumors](#rumors)
-- [Saving, game over and starting again](#saving-game-over-and-starting-again)
+- [Saving, falling and starting again](#saving-falling-and-starting-again)
 - [Known gameplay gaps](#known-gameplay-gaps)
 
 ## Starting a game
@@ -202,7 +202,7 @@ Joining a sect that starts at rank 5 sets power to 0.5 at once. The capital appr
 
 | Fight | If you lose |
 | --- | --- |
-| random encounters, sect hunters, hunting, failed assassination or kidnapping | **game over** |
+| random encounters, sect hunters, hunting, failed assassination or kidnapping | **you fall**: carried home, you wake a day later with 30 % HP / MP, minus half your gold and half the stack of 1–3 random carried item kinds (quest items, scrolls, manuals, books and worn gear are kept) |
 | spars, the capital duel, a failed steal, the law | you survive with at least 1 HP (the law takes you to jail) |
 
 ## Battles
@@ -375,7 +375,7 @@ Mastery levels 1–5 need 0 / 100 / 300 / 700 / 1500 xp.
 - **Success:** 1–3 picks from the node, more when your mastery exceeds its level; chess and begging also pay gold.
 - **xp:** 5 × node level, halved on a failure; plus w-exp +10 and stat xp.
 - **Begging** appears only after ผู้เฒ่ายาจก at the Beggars' grounds teaches you. A failed beg costs extra stamina.
-- **Hunting** starts a one-against-one fight with a hunt beast. Lose and it is game over; win and you get the spoils and 8 × node level xp.
+- **Hunting** starts a one-against-one fight with a hunt beast. Lose and you fall (see [Life and death](#life-and-death)); win and you get the spoils and 8 × node level xp.
 - **Other ways to train:**
   - reading, music, drawing and writing items (ใช้ in the bag);
   - playing music in the อาชีพ menu, which needs an instrument weapon.
@@ -587,10 +587,10 @@ Some rumors are exaggerated or false, and the game never says which.
 
 Talk passes with time: news lasts 20 days (big news 40), and once you have heard a rumor it fades within 15 days (a treasure lead 30). The old lore is talk of the days when you set out and fades by day 60; treasure leads stay until you hear them. Arriving in a city, inn or market may also bring a passing word at the bottom of the screen, which fades after a few seconds. Details: [liveness.md](liveness.md).
 
-## Saving, game over and starting again
+## Saving, falling and starting again
 
 - **Saving.** The game saves itself to this browser (`localStorage`) after every change; there is no save slot. The format and upgrades of old saves are in [save-format.md](save-format.md).
-- **Game over** comes from losing a fatal fight. The game-over screen shows the days survived and starts a new run.
+- **There is no game over.** Losing a fatal fight costs gold and items and sends the hero home (`lib/world/death.ts`); a ฟื้นคืนสติ window lists the losses. Saves from before this rule that ended on the game-over screen wake the same way on load.
 - **Clearing a run.** A new run clears the world save only; the /debug builds and sound settings stay.
 
 ## Known gameplay gaps

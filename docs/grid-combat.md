@@ -254,7 +254,7 @@ The result panel's **ดำเนินเรื่อง →** calls `worldStor
 - **Escape**: no rewards; a law escape clears the pending jail city; the hero stays where they are (a dialog scene returns to the last location).
 - **Win**: +50 w-exp; +1 kill for the opponent and each fallen pack member; skill xp 20 × uses and art xp 20 × uses (auto-level; skills from a sect the hero resigned from get no battle xp); STR xp for physical skill uses, POW xp for internal ones, DEF xp for hits taken, LUK rolls; sparring fame and +1 relationship; a rumor when the foe is a named NPC; the primary's drop table; quest progress; hunt spoils; then `onWin`.
 - **Loss, non-fatal**: HP floored at 1, then `onLose`.
-- **Loss, fatal**: game over.
+- **Loss, fatal**: the hero falls and wakes at home a day later (`reviveFromDeath` with `lib/world/death.ts`): half the gold and half of 1–3 random losable item stacks gone, 30 % HP / MP, a `lastDeath` report (not saved) for the ฟื้นคืนสติ window.
 
 Details of the rewards: [gameplay.md](gameplay.md#progression).
 

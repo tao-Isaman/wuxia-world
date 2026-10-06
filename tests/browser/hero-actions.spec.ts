@@ -61,11 +61,15 @@ test("resting shows the hero asleep, on the map and in the work overlay", async 
   await expect(page.getByTestId("world-canvas")).toHaveAttribute("data-ready", "true", { timeout: 60_000 });
   await page.getByRole("button", { name: "พักผ่อน", exact: true }).click();
   await page.getByRole("group", { name: "เลือกวิธีพักผ่อน" }).getByRole("button", { name: /พักริมทาง/ }).click();
-  const sprite = page.locator('.work-overlay .hero-action-sprite[data-hero-pose="work:sleep"]');
-  await expect(sprite).toBeVisible();
-  expect(await sprite.evaluate((node) => getComputedStyle(node).backgroundImage)).toContain("/art/characters/m1-work.png");
-  // On the map too: the hero plays the sleep loop (row 13) in place of standing.
-  await expect(page.getByTestId("world-canvas")).toHaveAttribute("data-player-action", /^13:/);
+  // The overlay lasts 1.4 s: read the work sprite and the map in the same frame
+  // (a slow page can otherwise see it close between two checks).
+  const seen = await page.waitForFunction(() => {
+    const sprite = document.querySelector('.work-overlay .hero-action-sprite[data-hero-pose="work:sleep"]');
+    const action = document.querySelector('[data-testid="world-canvas"]')?.getAttribute("data-player-action") ?? "";
+    // On the map too: the hero plays the sleep loop (row 13) in place of standing.
+    return sprite && /^13:/.test(action) ? getComputedStyle(sprite).backgroundImage : null;
+  }, undefined, { polling: "raf" });
+  expect(await seen.jsonValue()).toContain("/art/characters/m1-work.png");
   await page.screenshot({ path: "test-results/screenshots/hero-sleep-pose.png" });
   await expect(page.locator(".work-overlay")).toHaveCount(0, { timeout: 5_000 });
   await expect(page.getByTestId("world-canvas")).toHaveAttribute("data-player-action", "");

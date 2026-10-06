@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Panel } from "@/components/ui/wuxia/panel";
+import { DeathReport } from "./death-report";
 import { WuxiaButton } from "@/components/ui/wuxia/button";
 import { useWorldStore } from "@/store/world-store";
 import { useBattleStore } from "@/store/battle-store";
@@ -199,6 +200,7 @@ export function WorldScreen() {
             <LoadingOverlay key="loading" />
             <ToastStack key="toasts" />
             <ConfirmDialog key="confirm" />
+            <DeathReport />
           </>
         );
       }
@@ -214,6 +216,7 @@ export function WorldScreen() {
             <LoadingOverlay />
             <ToastStack />
             <ConfirmDialog />
+            <DeathReport />
           </>
         );
       }
@@ -241,6 +244,7 @@ export function WorldScreen() {
             <LoadingOverlay />
             <ToastStack />
             <ConfirmDialog />
+            <DeathReport />
           </>
         );
       }
@@ -278,6 +282,7 @@ export function WorldScreen() {
       <LoadingOverlay />
       <ToastStack />
       <ConfirmDialog />
+      <DeathReport />
     </>
   );
 }

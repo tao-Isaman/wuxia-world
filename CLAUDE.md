@@ -225,7 +225,7 @@ Two deliberate exceptions reach into stores:
 - **Law** (`law.ts`).
   - Wanted marks (max 5) come from failed steals (+1) and jail escapes (+2); one fades every 10 quiet days.
   - Law fights are non-fatal. A loss goes to `jail_cell`: arrest (the `jail` map, `jailUntil`, 2 days per mark) or a 300-gold bribe.
-- **Bad actions** (`bad-actions.ts`). Steal, assassinate and kidnap use base stats. A failed steal is a non-fatal fight plus a mark; failed assassinations and kidnappings are fatal.
+- **Bad actions** (`bad-actions.ts`). Steal, assassinate and kidnap use base stats. A failed steal is a non-fatal fight plus a mark; failed assassinations and kidnappings are fatal fights (the hero falls and wakes at home, poorer).
 - **Sects** (`data/sect-memberships.ts`, 15 joinable).
   - Ladders: 9 → 1 (eight sects), 5 → 1 (six) or 3 → 1 (Gumu).
   - Ranks grant no martial arts: a rank-up pays gold (`rankUpGold`, half its point cost) and opens lineage quests and sagas, the **only** way to any sect skill or art (`test:story` enforces it; no rank pool, manual, hall, dialog or other quest may teach one). The one exception is the sword tournament champion's prize pick (below).
@@ -287,7 +287,7 @@ Two deliberate exceptions reach into stores:
    - HP / MP carry-over;
    - on a win: loot, 50 w-exp, 20 xp per skill / art use, stat xp and kill counts (pack members included), then quest progress and `onWin`;
    - on a non-fatal loss: `onLose` with at least 1 HP;
-   - on a fatal loss: `gameOver`;
+   - on a fatal loss: no game over — `reviveFromDeath` (`lib/world/death.ts`): wake at `home_player` a day later with 30 % HP / MP, −50 % gold, half of 1–3 random losable item stacks (quest items, scrolls, manuals, books kept), and the `lastDeath` report (`DeathReport`, not saved);
    - on an escape: no rewards.
 
 ## Rendering (`lib/stage/`)

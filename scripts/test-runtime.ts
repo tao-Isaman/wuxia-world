@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { applyDeathPenalty, deathLosableItems, describeDeathPenalty, rollDeathPenalty } from "../lib/world/death";
 import { stepTowards, clearMapPositions, getMapPosition, rememberMapPosition } from "../lib/stage/types";
 import type { RouteScene } from "../lib/world/types";
 import { makeContext, makeInitialState, resolveSkill } from "../lib/game/battle";
@@ -66,20 +67,55 @@ check("a waiting player turn cannot be skipped by stepping", () => {
   useBattleStore.getState().reset();
 });
 
+check("death penalty: half the gold, 1–3 losable kinds halved, quest items / scrolls / books kept", () => {
+  const inv = { ginseng: 4, rock: 9, potion: 1, jade: 2, old_key: 1, book_basic: 1, man_qf: 1, scroll_skill_basic_punch: 1, chart_x: 1 };
+  assert.deepEqual(deathLosableItems(inv), ["ginseng", "jade", "potion", "rock"]);
+  for (const r of [0, 0.5, 0.999]) {
+    const p = rollDeathPenalty({ gold: 999, inventory: inv }, () => r);
+    assert.equal(p.goldLost, 499);
+    assert.ok(p.itemsLost.length >= 1 && p.itemsLost.length <= 3);
+    for (const { itemId, count } of p.itemsLost) assert.equal(count, Math.ceil(inv[itemId as keyof typeof inv] / 2));
+    const state = { gold: 999, inventory: { ...inv } as Record<string, number> };
+    applyDeathPenalty(state, p);
+    assert.equal(state.gold, 500);
+    assert.equal(state.inventory.old_key, 1);
+  }
+  const broke = rollDeathPenalty({ gold: 0, inventory: { old_key: 1 } });
+  assert.deepEqual(broke, { goldLost: 0, itemsLost: [] });
+  assert.deepEqual(describeDeathPenalty(broke), ["ไม่มีสิ่งใดติดตัวให้สูญเสีย"]);
+});
+
 const route: RouteScene = { id: "__runtime_route", kind: "route", label: "Test route", destinations: [
   { locationId: "__runtime_location", label: "Test destination", effects: [{ t: "addTrait", trait: "good", amount: 7 }, { t: "addGold", amount: 13 }] },
 ] };
-check("non-fatal defeat leaves one HP and a recoverable world; fatal defeat still ends the game", () => {
+check("non-fatal defeat leaves one HP; a fatal one wakes the hero at home poorer", () => {
   for (const nonFatal of [true, false]) {
     useWorldStore.getState().startNewGame({ name: "Defeat test" });
-    useWorldStore.setState({ pendingBattle: { opponentId: "petty_thief", onWin: "home_player", onLose: "home_player", nonFatal } });
+    useWorldStore.setState({ gold: 101, inventory: { ginseng: 5, old_key: 1, scroll_skill_basic_punch: 1 },
+      pendingBattle: { opponentId: "petty_thief", onWin: "home_player", onLose: "home_player", nonFatal } });
     useBattleStore.getState().start(build, build);
     useBattleStore.setState({ state: { ...useBattleStore.getState().state!, hA: 0, winner: "B", phase: "over" } });
+    const dayBefore = useWorldStore.getState().day;
     useWorldStore.getState().acknowledgeBattleResult();
-    assert.equal(useWorldStore.getState().currentHp, nonFatal ? 1 : 0);
-    assert.equal(useWorldStore.getState().gameOver, !nonFatal);
-    assert.equal(useWorldStore.getState().pendingBattle, null);
-    assert.equal(useWorldStore.getState().stamina, 95);
+    const w = useWorldStore.getState();
+    assert.equal(w.gameOver, false, "death never ends the game");
+    assert.equal(w.pendingBattle, null);
+    assert.equal(w.stamina, 95);
+    if (nonFatal) {
+      assert.equal(w.currentHp, 1);
+      assert.equal(w.gold, 101);
+      assert.equal(w.lastDeath, null);
+    } else {
+      assert.equal(w.currentSceneId, "home_player");
+      assert.equal(w.gold, 51, "half the gold is gone");
+      assert.equal(w.inventory.ginseng, 2, "the one losable stack lost half (rounded up)");
+      assert.equal(w.inventory.old_key, 1, "quest items are kept");
+      assert.equal(w.inventory.scroll_skill_basic_punch, 1, "move scrolls are kept");
+      assert.ok(w.currentHp >= 1 && w.day > dayBefore, "wakes a day later");
+      assert.ok(w.lastDeath && w.lastDeath.lines.length >= 1);
+      useWorldStore.getState().dismissDeath();
+      assert.equal(useWorldStore.getState().lastDeath, null);
+    }
   }
   useWorldStore.getState().startNewGame({ name: "Runtime test" });
 });
