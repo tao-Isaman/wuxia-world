@@ -350,7 +350,7 @@ const BLACK_PAGE: StoryArcSpec = {
       reward: [{ t: "gold", amount: 150 }, { t: "trait", trait: "good", amount: 3 }],
     },
     {
-      title: "คืนเดือนแรมที่เฮ่อลั่ว",
+      title: "คืนเดือนแรมที่ห้วอลั่ว",
       summary: "นักเล่าเรื่องชราไม่ยอมงดเล่า และคนที่มาฟังแถวหน้าคืนนี้ไม่ได้มาเพื่อฟัง",
       giver: VICE,
       offer: {
