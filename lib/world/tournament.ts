@@ -14,9 +14,10 @@
 // If the day passes without the hero, the year is fought without them.
 
 import { getArt, parseSlotId, powerBreakdown, type CharacterBuild } from "@/lib/game";
-import { namedNpcIds } from "./data/named-npcs";
+import { getNamedDefault, namedNpcIds } from "./data/named-npcs";
+import { SECT_MEMBERSHIPS } from "./data/sect-memberships";
 import { NPCS, getNpc } from "./data/npcs";
-import { getOpponent } from "./data/opponents";
+import { getOpponent, npcFoeId } from "./data/opponents";
 import { npcPresent } from "./npc-presence";
 import type { TournamentRecord, TournamentState, WorldStateData } from "./types";
 
@@ -100,13 +101,18 @@ export function registerForTournament(state: TState): boolean {
 
 // ─── Entrants ─────────────────────────────────────────────────────────
 
-/** The battle build an entrant fights with: their sparring opponent's build. */
+/** The opponent id an NPC entrant fights the hero as: their sparring build, else (a wanderer) one made from their strength and school. */
+export function entrantOpponentId(id: string): string | null {
+  const authored = getNpc(id)?.sparOpponentId;
+  if (authored) return authored;
+  const ext = getNamedDefault(id);
+  return ext ? npcFoeId(id, ext.power, ext.sect ? SECT_MEMBERSHIPS[ext.sect]?.name ?? null : null) : null;
+}
+/** The battle build an entrant fights with. */
 export function entrantBuild(id: string): CharacterBuild | null {
-  const opp = getOpponent(getNpc(id)?.sparOpponentId);
+  const opp = getOpponent(entrantOpponentId(id));
   return opp ? opp.build() : null;
 }
-/** The opponent id an NPC entrant fights the hero as. */
-export const entrantOpponentId = (id: string) => getNpc(id)?.sparOpponentId ?? null;
 
 function canEnter(state: TState, id: string): boolean {
   if (!getNpc(id) || !entrantBuild(id) || !npcPresent(state, id)) return false;

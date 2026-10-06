@@ -14,7 +14,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **What the player does:**
 
 - Explores 101 places (100 painted maps) joined by 129 roads.
-- Meets 225 NPCs and takes 1,115 quests: a 15-chapter main story (เนื้อเรื่องหลัก), 373 hand-written, 154 sect lineage quests and 48 story sagas (573 chapters: 38 sect sagas and 10 long jianghu sagas for the unsect T4 / T5 moves); 511 cutscenes.
+- Meets 235 NPCs (30 of them, plus the disciples, heirs and newcomers they bring, live their own lives) and takes 1,115 quests: a 15-chapter main story (เนื้อเรื่องหลัก), 373 hand-written, 154 sect lineage quests and 48 story sagas (573 chapters: 38 sect sagas and 10 long jianghu sagas for the unsect T4 / T5 moves); 511 cutscenes.
 - Lives in the 3rd year of Jianwen (1401), about 40 years after มังกรหยก ภาค 3: the court's seized scriptures have just scattered back into the jianghu ([docs/story-writing.md](docs/story-writing.md#timeline-and-novel-characters)).
 - Joins one of 15 sects and learns 173 move skills and 111 inner arts.
 - Gathers and crafts (19 life skills).
@@ -62,6 +62,7 @@ bun run test:navigation
 bun run test:placements     # placed-object geometry, depth and collision; public/assets/placements.json covers no marker
 bun run test:battle-background
 bun run test:rumors
+bun run test:liveness       # aging, death odds, roads, succession + quest transfer, generated people, 5 seeded years, spar / kill anyone, echoes, rumor spread
 bun run test:investigation
 bun run test:audio
 bun run test:law
@@ -233,12 +234,13 @@ Two deliberate exceptions reach into stores:
   - Membership status is `active | resigned | betrayed`. Only `active` counts for `sectMember` / `anySectMember`.
   - Joins go through each intro quest's `joinSect` **reward**, which does not check `joinRequirements`; the intro's `prereqs` are the real gate.
   - Betrayal brings `hunter_<sectId>`; `qst_<sectId>_redemption` (14 sects; not xiaoyao) turns betrayed into resigned.
-- **Liveness** (`npc-tick.ts`, `rumor-engine.ts`). Every `advanceTime` call:
-  - runs the weekly tick of 20 named NPCs (up to 4 batches; leftover days are dropped);
-  - fails active quests whose giver just died;
+- **Liveness** (`npc-tick.ts`, `npc-life.ts`, `rumor-engine.ts`; [docs/liveness.md](docs/liveness.md)). Thirty people (15 chiefs, 5 seconds, 10 wanderers in `npcs/wanderers.ts`) plus generated ones (`dynamic`, ≤ 48: disciples, heirs, newcomers; registered with `registerDynamicNpc`) live in `npcExt`. Every `advanceTime`:
+  - runs each whole week since `lastNpcTickDay` (8 in full, the rest only age; leftover days carry over): a year on each `birthday`, death odds by age and strength (`deathChance`), training, goals, a journey leg on the real roads (`roadPath`), else a choice from their `temper` (`decide`: wander, join a sect, duel a rival, seclusion, take a disciple, leave a sect, marry; people with an active hero quest stay put);
+  - fills empty seats (`fillEmptySeats`: an elder, else a generated one) — the dead chief's map spot and quests pass to the heir (`heirId`, `questHolder`, `heldQuests`); `withChargesOfDead` moves or fails active quests of the newly dead;
   - maintains rumors (caps 200 / 500, archive after 365 days).
 
-  Rumors stay in their region and fade: news 20 days (big 40), 15 days once heard (`fadeHeardRumor`), flavour lore by day 60. See [docs/liveness.md](docs/liveness.md).
+  The dead are on no map (`npcPresent`); anyone else stands where `npcsAt` says (travellers on a free spot). NPC-event rumors are always true; talk spreads by age (`rumorReaches`: heartland after 10 days, big news everywhere after 10). Rumors fade: news 20 days (big 40), 15 once heard, flavour lore by day 60.
+- **Anyone can be fought.** ขอประลอง works on every NPC (`startSparWith`; without `sparOpponentId` they fight as `npc@<id>@<power>@<sect>`, built in `opponents.ts`), and ⚔ สังหาร (`startKillDuel`, `pendingBattle.killNpcId`) is a fight to the death: a win kills them (`heroKills`: dead for good, quests pass on or fail, `wanted = 5`, `kill_npc` echo; killing a sect-mate is betrayal), a loss or flight adds 2 marks.
 - **Lineage quests and sagas** (`lib/world/story/`, content in `lib/world/data/story/`). Compact specs compile into quests, dialogs and cutscenes ([docs/story-quests.md](docs/story-quests.md)).
   - **The main story** (`data/story/main.ts`, a `MainArcSpec`): 15 chained chapters `st_main_<nn>` (type `main`, no move at the end), offered by ป้าหลิว at home from the first moment of a new game; 12 films tell the age and the hero's father.
   - **Stat gates on the way to a move are halved** (`MOVE_STAT_GATE_SCALE = 0.5`, `data/move-gates.ts`): lineage quests, saga chapters (not the main story), their sect trials, quests that teach a move and manuals' `reqValue` keep their authored numbers and are scaled at load (`QUESTS` / `ITEMS`).
@@ -256,7 +258,7 @@ Two deliberate exceptions reach into stores:
   - **Horse stations** (`stations.ts`): cities, villages and joinable sects' grounds; ride to a visited station place for gold + time by world-map distance (`stationTravel`).
   - **Sword tournament** (`tournament.ts`): a 360-day year; register at the capital (days 60–89, 100 gold), fight on day 90–92. 32 entrants (hero + the liveness roster + sparring fighters); the hero's bouts are real non-fatal battles (`pendingBattle.tournament`), the rest simulated by power. Bout and place rewards; the champion (hero or NPC) picks one entrant's move or art.
   - **Practice xp** is 30 + 5 % of the xp to the next level, 50 + 6 % at a fitting place (`practiceXpGain`).
-- **Presence** (`npc-presence.ts`). An assassinated NPC is gone for good; a kidnapped one is away until `kidnappedUntil` (day + 180) and then stands at their spot again. Maps and the location card filter with `npcPresent`.
+- **Presence** (`npc-presence.ts`). A dead NPC (assassinated, killed, or `npcExt` status `dead`) is gone for good; a kidnapped one is away until `kidnappedUntil` (day + 180) and then stands at their spot again. Maps and the location card filter with `npcPresent`.
 - **Gifts** (`gifts.ts`, store `giveGift`). One gift per NPC every 30 days (`giftDays`), an item or 100 / 500 / 1000 / 5000 gold. Worth 1–5 by price; liked ×2 (+2 for a favourite item id), disliked −2. Tastes are `NpcDef.likes` / `dislikes` (item ids, categories, `"gold"`) or follow the NPC's tags.
 - **Meridians (ชีพจร).** Pure engine `lib/game/meridians.ts` (95 charts in `lib/game/data/meridians.ts`, contract `meridian-types.ts`); sources `lib/world/data/meridian-sources.ts` (shops, loot, quest rewards → `lib/world/meridians.ts`).
   - Every skill / art level gained gives +1 `meridianPoints` (saved). A chart is learned by reading its item `chart_<id>` (แผนภาพชีพจร-…) once its `requires` skills / arts are learned → `playerBuild.meridians[id]` = a rank 0–3 per point.
@@ -384,7 +386,6 @@ Content changes need **no save version bump**. Removed ids are dropped on load.
 - **Store warnings.** `test:law`, `test:grid`, `test:grid-ai` and `test:quests` print harmless `[zustand persist middleware] Unable to update item` warnings.
 - **Quests are one-shot.** `abandonQuest` fails a quest for good (it can't be re-accepted) — except lineage quests, saga chapters and sect art trials, which it forgets so they come back. Leaving a sect blocks rejoining it.
 - **`_setFlag` looks dev-only but isn't.** The quest-log pin (`trackedQuestId`) and the rumor banner use it.
-- **Two rumors never fire.** `sect_join` and `quest_major_complete` player echoes can't happen in play — joins come from quest rewards, and no quest sets `isMajor`.
 - **Advisory audits fail by design.** `audit-quest-counts.ts`, `audit-complete-scenes.ts` and `audit-quest-flow.ts` report known false positives.
 - **`sharp`** is used by the image scripts but comes in through Next; it is not in `package.json`.
 - **More.** [HANDOFF.md](HANDOFF.md#known-issues) lists every known issue.

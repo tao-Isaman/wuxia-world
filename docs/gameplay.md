@@ -235,17 +235,18 @@ Walk up to a person and talk. The NPC card offers what that person supports:
 | Action | Needs | Does |
 | --- | --- | --- |
 | 💬 ทักทาย | a dialog | their conversation |
-| ⚔ ขอประลอง | a spar build (110 NPCs) | a non-fatal duel; a win gives fame (3–22 by their strength) and +1 relationship |
+| ⚔ ขอประลอง | anyone not in closed-door training | a non-fatal duel against them; a win gives fame (their authored value, else 1–13 by their strength) and +1 relationship |
+| ⚔ สังหาร | anyone | a fight to the death: win and they are dead for good, the law marks you **wanted 5/5 at once**; lose or flee and it is attempted murder, +2 marks |
 | quests | they give or receive one | offer, progress and turn-in sections |
 | ขโมย | something to steal (94 NPCs), or a quest asks for it | see [Bad actions](#bad-actions) |
 | ลอบทำร้าย / 🪢 ลักพาตัว | an active quest stage that names them | see [Bad actions](#bad-actions) |
 
 - **Gifts.** Every card has 🎁 ให้ของขวัญ: an item from the bag (not quest items or manuals) or 100 / 500 / 1000 / 5000 gold, once every 30 days per person. A gift is worth 1–5 trust by its price; something the person likes counts double (their favourite item +2 more), something they dislike costs 2. Tastes follow the person (a monk likes herbs and books, dislikes meat and venom; merchants like valuables and gold). Trust gates the T2–T3 teaching quests.
-- **Gone and back.** An assassinated person is gone for the rest of the game. A kidnapped one disappears and returns to their spot after 180 days.
+- **Gone and back.** Someone dead — killed by you, in a duel, or of old age — is gone for the rest of the game. A kidnapped one disappears and returns to their spot after 180 days.
 - **Strollers.** Some people (farmers, children, guards, servants) wander around their spot; shopkeepers, elders and masters stand still.
 - **Quest marks.** A gold **!** over a person means a quest to offer; **?** means something to hand in.
 - **Letters (จดหมาย).** A person whose relationship with you is **20 or more** may write to you with a gift — at most one letter a day, and one from each person every 15 days. Each new day every such friend has a chance of `1 % + 0.15 % per relationship point above 20 + 0.02 % per fame + 0.05 % per LUK` (at most 15 %). The gift's rarity (ทั่วไป / ดี / หายาก / ล้ำค่า, by item price) also rises with LUK (and a little with fame); people who like gold may send gold instead. A toast announces a new letter, and the ✉ จดหมาย tab (the 8th HUD icon) shows an unread count; opening a letter puts the gift in your bag. The inbox shows each gift as an icon; letters can be deleted one at a time or all read ones at once (an unclaimed gift goes to the bag first). Code: `lib/world/letters.ts`.
-- **Named masters.** The 20 named masters (sect chiefs and seconds) live, age and can die (see [liveness.md](liveness.md)). A dead or secluded master shows a badge on their card.
+- **The living jianghu.** Thirty people — the 15 sect chiefs, five seconds and ten wanderers — and the disciples, heirs and newcomers they bring live their own lives (see [liveness.md](liveness.md)): a year older on each birthday, death by age (rarer for the strong) or in a duel, journeys on the real roads (you meet them wherever they are), joining and leaving sects, taking disciples, marrying, closed-door training. Their card shows who they are now (`เจ้าสำนักง้อไบ๊ · อายุ 68 · ปรมาจารย์`) and what they are doing. When a chief dies the senior member takes the seat — and the old chief's quests; a dead member's quests pass to the chief.
 
 ## Quests and tracking
 
@@ -303,7 +304,7 @@ Once a year (a year is 360 days) the capital hosts a 32-fighter single-eliminati
 
 - **Calendar:** registration opens on day 60 of each year; the tournament is on day 90, and can still be started on the two days after. The first one is on day 90.
 - **Registering:** at the capital, for 100 gold.
-- **Entrants:** you and 31 NPCs — every living, present master of the liveness roster (the 20 named NPCs), topped up with other fighters who spar. The bracket is drawn at random.
+- **Entrants:** you and 31 NPCs — every living, present member of the liveness roster (the 30 named people; the wanderers fight as themselves), topped up with other fighters who spar. The bracket is drawn at random.
 - **Your bouts** are real, non-fatal battles (leaving the ring forfeits). Every other bout is simulated: the stronger fighter (by power score) usually, but not always, wins.
 - **Rewards** for each bout you win: 100 / 200 / 400 / 800 / 1600 gold and 50 / 100 / 150 / 250 / 400 w-exp (last 32 → final). Your final place adds w-exp and fame: champion 1500 / +40, runner-up 800 / +25, last 4 500 / +15, last 8 300 / +8, last 16 150 / +4, last 32 60 / +1.
 - **The champion's prize:** pick any one move or inner art known by the 32 entrants, sect ones included — the one exception to "sect moves come only from lineage quests and sagas". An NPC champion picks one too and grows a little stronger.
@@ -556,14 +557,14 @@ From an NPC's card; every attempt takes 0.2 ชั่วยาม and uses base 
 | --- | --- | --- | --- |
 | Offered | any NPC with loot, repeatable | only when a quest asks, once per NPC | only when a quest asks, once per NPC |
 | Chance | 50 + DEX + ½ LUK + 3 × steal mastery − 5 × guard tier | 50 + STR + DEX + ½ LUK − 8 × tier | 50 + STR + VIT + ½ LUK − 7 × tier |
-| On success | loot, steal xp +25 | quest progress | quest progress |
+| On success | loot, steal xp +25 | quest progress; the target is dead — **wanted 5/5** | quest progress |
 | On failure | **+1 wanted mark** and a non-fatal fight | a **fatal** fight | a **fatal** fight |
 
 Chances are clamped to 5–95 %. Formulas: [world-engine.md](world-engine.md#bad-actions).
 
 ## The law and the jail
 
-- **Wanted marks** (หมายจับ ●○○○○, up to 5) come from failed steals (+1) and jail escapes (+2). One fades every 10 days without a new crime.
+- **Wanted marks** (หมายจับ ●○○○○, up to 5) come from failed steals (+1), jail escapes (+2) and failed attempts on a life (+2); **killing anyone puts you at 5 at once**. One fades every 10 days without a new crime.
 - **Pursuers.** While wanted, walk ticks can bring the law: a constable at 1 mark, then imperial guards and a bounty hunter (with a constable) as marks grow. Fleeing uses the AGI + LUK check.
 - **Law fights** are not fatal. Win and you walk on (the marks stay); lose and you are taken to a cell, where you either:
   - **accept arrest** — you go to the **jail map** for 2 days per mark (at least 2, at most 10), and your marks are cleared; or

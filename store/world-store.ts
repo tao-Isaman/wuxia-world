@@ -71,11 +71,11 @@ import { evaluateCondition } from "@/lib/world/conditions";
 import { KIDNAP_RETURN_DAYS, npcPresent } from "@/lib/world/npc-presence";
 import { GIFT_REACTION_LINE, giftOutcome, giftWaitDays, giftable, type GiftReaction } from "@/lib/world/gifts";
 import { tickAllNamedNpcs } from "@/lib/world/npc-tick";
+import { deadIds, killNpc, npcFoeFor, npcIsDead, npcPower, powerTier, seedLiveness, settleChargesOfDead, type ChargeChange } from "@/lib/world/npc-life";
 import { releaseFromJail, rollFoeSpawn, rollWalkEvent } from "@/lib/world/effects";
 import { WANTED_DECAY_DAYS, WANTED_MAX, describeSentence, isLawOpponent, sentenceLeft } from "@/lib/world/law";
 import { JAIL_SCENE_ID, getActivity, jailDiceChance, jailEscapeChance } from "@/lib/world/data/activities";
 import { fadeHeardRumor, maintainRumors, seedLoreRumors, RUMOR_SEEN_CAP } from "@/lib/world/rumor-engine";
-import { namedNpcIds } from "@/lib/world/data/named-npcs";
 import { checkOpenMeridianNode, getMeridianChart } from "@/lib/game";
 import { meridianReadBlock, rollMeridianLoot } from "@/lib/world/meridians";
 import { toast } from "@/store/toast-store";
@@ -320,7 +320,7 @@ export type BuyOfferResult =
 // `unsupported` means the NPC has no `sparOpponentId` configured; `pending`
 // means the player already has a battle queued.
 export type SparResult =
-  | { ok: false; reason: "unknown" | "unsupported" | "pending" }
+  | { ok: false; reason: "unknown" | "unsupported" | "pending" | "absent" | "secluded" }
   | { ok: true; npcId: string; opponentId: string };
 
 // Result of attempting to accept / abandon a quest from the NPC popup.
@@ -531,6 +531,12 @@ interface WorldStore extends WorldStateData {
   // pushing logic into the component.
   meetNpc: (npcId: string) => void;
   startSparWith: (npcId: string) => SparResult;
+  /**
+   * ⚔ สังหาร: an open fight to the death with anyone. Winning kills them for
+   * good (their quests pass to an heir or fail) and the hero is at once wanted
+   * at the top of the list (WANTED_MAX); a failed attempt adds two marks.
+   */
+  startKillDuel: (npcId: string) => SparResult;
 
   // Bad-action attempts. Each runs a stat check; on pass, applies the
   // outcome (items / quest counter / trait delta) inline. On fail, queues
@@ -871,7 +877,7 @@ function advanceTime(state: WorldStateData, hours: number): void {
   // when the player advances by 90+ days at once. After ticking, scan
   // for any active quest whose `giverNpcId` died this batch and auto-
   // fail it — see decision §3 in docs/specs/liveness-plan.md.
-  failQuestsForDeadGivers(state, () => {
+  withChargesOfDead(state, () => {
     tickAllNamedNpcs(state, { currentDay: state.day });
   });
   maintainRumors(state, state.day);
@@ -913,55 +919,58 @@ function settleTournamentBout(state: WorldStateData, won: boolean): void {
   }
 }
 
-// Run `tickFn` (the NPC tick) and afterwards diff the npcExt status map
-// against its pre-tick snapshot. Any quest whose `giverNpcId` is in the
-// named roster AND just transitioned to "dead" is failed with an
-// action-log entry + warn toast. Generic-NPC givers (not in
-// namedNpcIds) are skipped — those NPCs aren't simulated, so they
-// can't die from sim ticks.
-function failQuestsForDeadGivers(
-  state: WorldStateData,
-  tickFn: () => void,
-): void {
-  // Snapshot which named NPCs were alive *before* the tick. We diff
-  // against this after the tick so we only fail quests whose giver
-  // newly died — pre-existing dead NPCs (e.g., killed in a prior
-  // tick whose quest the player has since accepted anyway) don't
-  // re-fire the toast.
-  const wasAlive = new Set<string>();
-  const ids = namedNpcIds();
-  for (const id of ids) {
-    const ext = state.npcExt[id];
-    // Treat "no ext yet" (lazy-seeded on first tick) the same as alive —
-    // the NPC simply hasn't been simulated yet.
-    if (!ext || ext.status === "alive") wasAlive.add(id);
+/** Marks for an attempt on someone's life that did not end in their death. */
+const ATTEMPTED_MURDER_MARKS = 2;
+function markAttemptedMurder(state: WorldStateData, npcId: string): void {
+  state.wanted = Math.min(WANTED_MAX, (state.wanted ?? 0) + ATTEMPTED_MURDER_MARKS);
+  state.wantedDay = state.day;
+  appendActionLog(state, "law", `ลงมือหมายเอาชีวิต${getNpc(npcId)?.name ?? "ผู้คน"}แต่ไม่สำเร็จ · หมายจับ ${state.wanted}/${WANTED_MAX}`);
+}
+
+/**
+ * The hero has killed someone (an open fight or an assassination): they are
+ * dead for good (their seat and quests pass on), the hero is wanted at the
+ * top of the list at once, and the jianghu talks. Killing one's own
+ * sect-mates is betrayal.
+ */
+function heroKills(state: WorldStateData, npcId: string): void {
+  const npc = getNpc(npcId);
+  const sect = state.npcExt[npcId]?.sect ?? null;
+  withChargesOfDead(state, () => {
+    killNpc(state, npcId, state.day, { by: "player", kind: "killed_by_player", locationId: state.currentSceneId });
+  });
+  if (!state.assassinatedNpcIds.includes(npcId)) state.assassinatedNpcIds = [...state.assassinatedNpcIds, npcId];
+  state.wanted = WANTED_MAX;
+  state.wantedDay = state.day;
+  state.traits.evil = (state.traits.evil ?? 0) + 10;
+  state.traits.fame = (state.traits.fame ?? 0) + 3;
+  appendActionLog(state, "law", `สังหาร${npc?.name ?? "ผู้คน"} — ทางการออกหมายจับ ${WANTED_MAX}/${WANTED_MAX} ทั่วแผ่นดิน`);
+  applyEffect(state, { t: "firePlayerEcho", actionId: "kill_npc", targetNpcId: npcId });
+  const own = sect ? state.sectMembership[sect] : undefined;
+  if (sect && own && (own.status ?? "active") === "active") {
+    applyEffect(state, { t: "betraySect", sectId: sect });
+    appendActionLog(state, "sect", `สังหารคนในสำนัก${SECT_MEMBERSHIPS[sect].name} — นับเป็นการทรยศสำนัก`);
   }
-  tickFn();
-  for (const q of Object.values(state.quests)) {
-    if (q.status !== "active") continue;
-    const def = getQuest(q.id);
-    if (!def?.giverNpcId) continue;
-    // A saga chapter or lineage quest is the only way to its skill or art:
-    // it outlives its giver (the legend carries on; the hand-in still works).
-    if (def.story || def.lineage) continue;
-    const giverId = def.giverNpcId;
-    if (!wasAlive.has(giverId)) continue;
-    const ext = state.npcExt[giverId];
-    if (!ext || ext.status !== "dead") continue;
-    // Giver was alive before the tick + is dead now → fail the quest.
-    q.status = "failed";
-    const giverDef = getNpc(giverId);
-    const giverName = giverDef?.name ?? giverId;
-    appendActionLog(
-      state,
-      "quest",
-      `ผู้ให้ภารกิจ ${giverName} เสียชีวิต — ภารกิจ '${def.name}' หยุดลง`,
-    );
-    toast(
-      "warn",
-      `ผู้ให้ภารกิจ ${giverName} เสียชีวิต — ภารกิจ '${def.name}' หยุดลง`,
-    );
+}
+
+// Run `change` (the NPC tick, or the hero's own killing) and then settle the
+// quests of everyone who died in it: a dead giver's charges pass to their heir
+// or their sect's chief (lib/world/npc-life.ts), else the quest fails. The
+// player is told either way.
+function withChargesOfDead(state: WorldStateData, change: () => void): ChargeChange[] {
+  const before = deadIds(state);
+  change();
+  const newly = new Set([...deadIds(state)].filter((id) => !before.has(id)));
+  const changes = settleChargesOfDead(state, newly, getQuest);
+  for (const c of changes) {
+    const dead = getNpc(c.deadId)?.name ?? c.deadId;
+    const line = c.holderId
+      ? `${dead} เสียชีวิต — ภารกิจ '${c.questName}' ตกเป็นหน้าที่ของ${getNpc(c.holderId)?.name ?? "ผู้สืบทอด"}`
+      : `${dead} เสียชีวิต — ภารกิจ '${c.questName}' หยุดลง`;
+    appendActionLog(state, "quest", line);
+    toast(c.holderId ? "info" : "warn", line);
   }
+  return changes;
 }
 
 // Returns true when the move is either free (story warp / same scene) or
@@ -1266,6 +1275,8 @@ export const useWorldStore = create<WorldStore>()(
         fresh.currentHp = d.HP;
         fresh.currentMp = d.MP;
         seedLoreRumors(fresh);
+        // The thirty simulated people start the game where they live.
+        seedLiveness(fresh);
         set({ ...fresh });
         // Run start scene's onEnter + auto-advance through any chained scenes.
         const draft = draftFrom(get());
@@ -1286,10 +1297,8 @@ export const useWorldStore = create<WorldStore>()(
         }
         const draft = draftFrom(s);
         applyEffect(draft, { t: "joinSect", sectId });
+        // The joinSect effect also tells the jianghu (a sect_join echo).
         appendActionLog(draft, "sect", `เข้าร่วมสำนัก${def.name} · ขั้นที่ ${def.startRank}`);
-        // Liveness Layer: drop a player-echo rumor into the pool so
-        // inn-goers in the player's region eventually hear about it.
-        applyEffect(draft, { t: "firePlayerEcho", actionId: "sect_join" });
         set({ ...draft });
         return { ok: true };
       },
@@ -1570,6 +1579,7 @@ export const useWorldStore = create<WorldStore>()(
           draft.currentHp = Math.max(1, battleState.hA);
           draft.currentMp = Math.max(0, battleState.mpA);
           if (isLawOpponent(pb.opponentId)) draft.jailCityId = null;
+          if (pb.killNpcId) markAttemptedMurder(draft, pb.killNpcId);
           const opponent = getOpponent(pb.opponentId);
           if (pb.tournament) {
             // Leaving the ring forfeits the bout.
@@ -1624,6 +1634,7 @@ export const useWorldStore = create<WorldStore>()(
             get().gotoScene(pb.onLose);
             return;
           }
+          if (pb.killNpcId) markAttemptedMurder(draft, pb.killNpcId);
           // A fatal loss is not the end: the hero wakes at home a day later,
           // poorer (lib/world/death.ts).
           const lines = reviveFromDeath(draft);
@@ -1734,11 +1745,11 @@ export const useWorldStore = create<WorldStore>()(
         // pendingBattle.opponentId itself happens to match a named-NPC
         // id) also count. Generic mob fights are skipped — no rumor
         // for "ชนะ thug ที่ตลาด".
-        const namedSet = new Set(namedNpcIds());
+        // Anyone the simulation tracks counts (the thirty, and generated people).
         const echoTargetNpcId =
-          spar && namedSet.has(spar.npcId)
+          spar && draft.npcExt[spar.npcId]
             ? spar.npcId
-            : namedSet.has(pb.opponentId)
+            : draft.npcExt[pb.opponentId]
               ? pb.opponentId
               : null;
         if (echoTargetNpcId) {
@@ -1748,6 +1759,9 @@ export const useWorldStore = create<WorldStore>()(
             targetNpcId: echoTargetNpcId,
           });
         }
+
+        // ⚔ สังหาร won: the person is dead for good, and the law knows who did it.
+        if (pb.killNpcId) heroKills(draft, pb.killNpcId);
 
         // Roll the opponent's drop table (separate from hunt-yield, which
         // covers gathering kicks; these are the random-encounter loot).
@@ -2939,9 +2953,12 @@ export const useWorldStore = create<WorldStore>()(
         if (s.pendingBattle) return { ok: false, reason: "pending" };
         const npc = getNpc(npcId);
         if (!npc) return { ok: false, reason: "unknown" };
-        if (!npc.sparOpponentId) return { ok: false, reason: "unsupported" };
-
-        const fameReward = Math.max(0, npc.sparFameReward ?? 0);
+        if (!npcPresent(s, npcId)) return { ok: false, reason: "absent" };
+        if (s.npcExt[npcId]?.status === "secluded") return { ok: false, reason: "secluded" };
+        // Anyone can be challenged: an authored sparring build, else one made
+        // from their strength and school (lib/world/npc-life.ts npcFoeFor).
+        const opponentId = npcFoeFor(s, npcId);
+        const fameReward = Math.max(0, npc.sparFameReward ?? 1 + powerTier(npcPower(s, npcId)) * 3);
         const draft = draftFrom(s);
         // Mark the player as having met this NPC even if they back out — a
         // sparring offer counts as an introduction.
@@ -2949,13 +2966,32 @@ export const useWorldStore = create<WorldStore>()(
         draft.npcStates[npcId] = { ...entry, met: true };
         draft.pendingSpar = { npcId, fameReward };
         draft.pendingBattle = {
-          opponentId: npc.sparOpponentId,
+          opponentId,
           onWin: SPAR_WIN_SCENE_ID,
           onLose: SPAR_LOSE_SCENE_ID,
           nonFatal: true,
         };
         set({ ...draft });
-        return { ok: true, npcId, opponentId: npc.sparOpponentId };
+        return { ok: true, npcId, opponentId };
+      },
+
+      startKillDuel: (npcId) => {
+        const s = get();
+        if (s.pendingBattle) return { ok: false, reason: "pending" };
+        const npc = getNpc(npcId);
+        if (!npc) return { ok: false, reason: "unknown" };
+        if (!npcPresent(s, npcId) || npcIsDead(s, npcId)) return { ok: false, reason: "absent" };
+        const opponentId = npcFoeFor(s, npcId);
+        const draft = draftFrom(s);
+        draft.pendingBattle = {
+          opponentId,
+          onWin: draft.currentSceneId,
+          onLose: draft.currentSceneId,
+          killNpcId: npcId,
+        };
+        appendActionLog(draft, "combat", `ชักอาวุธเข้าใส่${npc.name} — สู้กันถึงตาย`);
+        set({ ...draft });
+        return { ok: true, npcId, opponentId };
       },
 
       giveGift: (npcId, gift) => {
@@ -3072,7 +3108,7 @@ export const useWorldStore = create<WorldStore>()(
         const draft = draftFrom(s);
         advanceTime(draft, ACTION_HOURS);
         if (passed) {
-          draft.assassinatedNpcIds.push(npcId);
+          heroKills(draft, npcId);
           draft.traits.evil = (draft.traits.evil ?? 0) + ASSASSINATE_TRAIT_EVIL;
           draft.traits.fame = (draft.traits.fame ?? 0) + 2;
           grantStatXp(draft, "DEX", STAT_XP_PER_ACTION);
@@ -3250,6 +3286,8 @@ export const useWorldStore = create<WorldStore>()(
       merge: (persisted, current) => {
         const merged = { ...current, ...(persisted as Partial<WorldStateData>) };
         if (merged.hasGame) seedLoreRumors(merged);
+        // Liveness 2.0: complete older saves' people and register generated ones.
+        if (merged.hasGame) seedLiveness(merged);
         // Saves from when death ended the game: the hero wakes at home instead.
         if (merged.hasGame && merged.gameOver) merged.lastDeath = { lines: reviveFromDeath(merged) };
         if (merged.playerBuild && merged.playerBuild.baseHp === undefined) {

@@ -5,7 +5,7 @@ import { ITEMS_BY_ID } from "./data/items";
 import { QUESTS_BY_ID, getQuest } from "./data/quests";
 import { OPPONENTS_BY_ID } from "./data/opponents";
 import { RESOURCES_BY_ID } from "./data/resources";
-import { NPCS_BY_ID } from "./data/npcs";
+import { getNpc } from "./data/npcs";
 import { RECIPES_BY_ID } from "./data/recipes";
 import { SKILLS_BY_ID } from "@/lib/game/data/skills";
 import { ARTS_BY_ID } from "@/lib/game/data/arts";
@@ -254,7 +254,7 @@ export function validateAndRepair(state: WorldStateData): void {
     state.npcStates = {};
   } else {
     for (const id of Object.keys(state.npcStates)) {
-      if (!NPCS_BY_ID.has(id)) {
+      if (!getNpc(id)) {
         console.warn(`[world] dropping unknown npc state "${id}"`);
         delete state.npcStates[id];
         continue;
@@ -267,7 +267,7 @@ export function validateAndRepair(state: WorldStateData): void {
   }
 
   // pendingSpar — clear if the NPC was removed from the registry.
-  if (state.pendingSpar && !NPCS_BY_ID.has(state.pendingSpar.npcId)) {
+  if (state.pendingSpar && !getNpc(state.pendingSpar.npcId)) {
     console.warn(`[world] clearing dangling pendingSpar for unknown npc "${state.pendingSpar.npcId}"`);
     state.pendingSpar = null;
   }
@@ -305,7 +305,7 @@ export function validateAndRepair(state: WorldStateData): void {
     state.stoleFromCounts = {};
   } else {
     for (const id of Object.keys(state.stoleFromCounts)) {
-      if (!NPCS_BY_ID.has(id)) {
+      if (!getNpc(id)) {
         delete state.stoleFromCounts[id];
         continue;
       }
@@ -317,28 +317,28 @@ export function validateAndRepair(state: WorldStateData): void {
     state.assassinatedNpcIds = [];
   } else {
     state.assassinatedNpcIds = Array.from(
-      new Set(state.assassinatedNpcIds.filter((id) => NPCS_BY_ID.has(id))),
+      new Set(state.assassinatedNpcIds.filter((id) => !!getNpc(id))),
     );
   }
   // Letters and the tournament name NPCs: drop entries for removed ones.
-  state.letters = Array.isArray(state.letters) ? state.letters.filter((l) => l && NPCS_BY_ID.has(l.npcId)) : [];
+  state.letters = Array.isArray(state.letters) ? state.letters.filter((l) => l && !!getNpc(l.npcId)) : [];
   if (!Array.isArray(state.tournamentHistory)) state.tournamentHistory = [];
-  state.tournamentHistory = state.tournamentHistory.filter((r) => r && (r.champion === "player" || NPCS_BY_ID.has(r.champion)));
+  state.tournamentHistory = state.tournamentHistory.filter((r) => r && (r.champion === "player" || !!getNpc(r.champion)));
   if (state.tournament) {
     const ids = state.tournament.rounds?.flat() ?? [];
-    if (!Array.isArray(state.tournament.rounds) || ids.some((id) => id !== "player" && !NPCS_BY_ID.has(id))) state.tournament = null;
+    if (!Array.isArray(state.tournament.rounds) || ids.some((id) => id !== "player" && !getNpc(id))) state.tournament = null;
   } else state.tournament = null;
   for (const key of ["kidnappedUntil", "giftDays", "letterDays"] as const) {
     const table = state[key];
     if (!table || typeof table !== "object") { state[key] = {}; continue; }
-    for (const [id, day] of Object.entries(table)) if (!NPCS_BY_ID.has(id) || typeof day !== "number") delete table[id];
+    for (const [id, day] of Object.entries(table)) if (!getNpc(id) || typeof day !== "number") delete table[id];
   }
   if (!state.activityDays || typeof state.activityDays !== "object") state.activityDays = {};
   if (!Array.isArray(state.kidnappedNpcIds)) {
     state.kidnappedNpcIds = [];
   } else {
     state.kidnappedNpcIds = Array.from(
-      new Set(state.kidnappedNpcIds.filter((id) => NPCS_BY_ID.has(id))),
+      new Set(state.kidnappedNpcIds.filter((id) => !!getNpc(id))),
     );
   }
 

@@ -124,6 +124,11 @@ export function opponentLook(opponentId: string | null | undefined, npc?: NpcDef
   if (npcId && hasAnimatedSheet(npcId)) return { kind: "character", characterId: npcId, ...variant };
   const still = npcId ? npcBattleSprite(npcId) : undefined;
   if (still) return { kind: "character", characterId: npcCharacterId(npcId!), still, ...variant };
+  // Anyone fought as themselves (npc@…, lib/world/data/opponents.ts) without
+  // art of their own: the enemy type of their costume (a woman stays a woman).
+  if (npcId && opp && opponentId?.startsWith("npc@")) {
+    return { kind: "character", characterId: foeCharacterFor(opponentId, { ...opp, look: { ...opp.look, sheet: npcCharacterId(npcId) } }), ...variant };
+  }
   return { kind: "character", characterId: foeCharacterFor(opponentId, opp), ...variant };
 }
 

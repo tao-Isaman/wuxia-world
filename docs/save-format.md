@@ -59,7 +59,7 @@ A reload during a battle restarts that battle from the start with the hero's sav
 | Pending | `pendingBattle`, `pendingEncounter`, `pendingHuntYield`, `pendingSpar` |
 | Log | `actionLog` (newest 100) |
 | Law | `wanted`, `wantedDay`, `jailCityId`, `jailUntil` |
-| Liveness | `npcExt`, `rumorPool`, `rumorArchive`, `rumorSeenLog`, `lastNpcTickDay` |
+| Liveness | `npcExt`, `rumorPool`, `rumorArchive`, `rumorSeenLog`, `lastNpcTickDay` (Liveness 2.0 added only optional fields inside `npcExt` entries — temper, birthday, journey `plan`, `heirId`, generated people's identity — filled by `seedLiveness` on load, and `pendingBattle.killNpcId`; no version bump) |
 
 Notes:
 

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { RumorPopup } from "./popups/rumor-popup";
 import { useWorldStore } from "@/store/world-store";
-import type { SectId } from "@/lib/world";
+import { sectOfHall } from "@/lib/world/npc-life";
 
 interface Props {
   // Current scene id used to decide which channel to listen on.
@@ -54,13 +54,12 @@ export function resolveRumorChannel(
       hint:  "ข่าวสารบ้านเมืองหลากหลาย",
     };
   }
-  if (locationId.startsWith("sect_")) {
-    // Treat the whole sect-hall id as <sect_<sectId>>. Only show the
-    // internal-news option if the player is an active disciple of that
-    // sect — outsiders shouldn't have access to the rumor mill.
-    const sectId = locationId.slice("sect_".length) as SectId;
+  // A sect's grounds (by its hall id — Sun-Moon's is sect_ming): only an
+  // active disciple of that sect hears its inside news.
+  const sectId = sectOfHall(locationId);
+  if (sectId) {
     const m = membership[sectId];
-    if (m && m.status === "active") {
+    if (m && (m.status ?? "active") === "active") {
       return {
         channel: "sect_internal",
         label: "⛩ ฟังข่าวภายในสำนัก",

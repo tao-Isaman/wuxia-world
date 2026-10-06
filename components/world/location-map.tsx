@@ -3,7 +3,8 @@ import { useLoadingStore } from "@/store/loading-store";
 import { heroHasPose, heroPoseStrip } from "@/lib/characters/hero-actions";
 import { useEffect, useRef, useState } from "react";
 import type { ArtisanDef, LocationMapDef, LocationScene, MapSpot, NpcDef } from "@/lib/world";
-import { npcPresent, activeGuide, evaluateCondition, guideMarkerId, objectiveMarkerId, objectiveSpotsAt, objectiveSpotsForNpc, getArtisan, getQuestsForNpc, isQuestOfferable, isQuestTurnInForNpc, getNpcsAtLocation, getResource, getScene, getSectHallAt, getShopAt, npcBodySprite, npcPixelSprite, playerBodySprite } from "@/lib/world";
+import { npcPresent, activeGuide, evaluateCondition, guideMarkerId, objectiveMarkerId, objectiveSpotsAt, objectiveSpotsForNpc, getArtisan, isQuestOfferable, isQuestTurnInForNpc, getResource, getScene, getSectHallAt, getShopAt, npcBodySprite, npcPixelSprite, playerBodySprite } from "@/lib/world";
+import { heldQuests, npcsAt, predecessorsOf } from "@/lib/world/npc-life";
 import { useWorldStore, TRAVEL_STAMINA_COST } from "@/store/world-store";
 import { getActivity } from "@/lib/world/data/activities";
 import { toast } from "@/store/toast-store";
@@ -11,6 +12,7 @@ import { WorldCanvas } from "@/components/game/world-canvas";
 import { clearArrivalFrom, forgetMapPosition, peekArrivalFrom, type WorldMarker, type WorldPresentation } from "@/lib/stage/types";
 import { capitalVignette } from "@/lib/stage/world-vignettes";
 import { roamingFoesOn } from "./roaming-foes";
+import { resolveRumorChannel } from "./rumor-listen-button";
 import { hasStation } from "@/lib/world/stations";
 import { TOURNAMENT } from "@/lib/world/tournament";
 import { arrivalSpawn, freeSpot } from "@/lib/stage/map-anchors";
@@ -47,8 +49,14 @@ export function LocationMap({ scene, map, handlers, readOnly = false, dialogueSp
   useEffect(() => () => { clearArrivalFrom(scene.id); }, [scene.id]);
   const markers: WorldMarker[] = [];
   const spots = map.npcSpots ?? {};
-  const registry = getNpcsAtLocation(scene.id).filter((n) => spots[n.id] && npcPresent(state, n.id) && (!n.visibleIf || evaluateCondition(state, n.visibleIf)));
-  const registryIds = new Set(registry.map((n) => n.id));
+  // Liveness 2.0: residents who are home, plus whoever the simulation has
+  // brought here (a traveller, a new chief in the old chief's seat, a
+  // generated disciple). The dead are nowhere.
+  const spotFor = (id: string) => spots[id] ?? predecessorsOf(state, id).map((p) => spots[p]).find(Boolean);
+  const here = npcsAt(state, scene.id).filter((n) => npcPresent(state, n.id) && (!n.visibleIf || evaluateCondition(state, n.visibleIf)));
+  const registry = here.filter((n) => spotFor(n.id));
+  const visitors = here.filter((n) => !spotFor(n.id) && state.npcExt[n.id]);
+  const registryIds = new Set(here.map((n) => n.id));
   for (const npc of scene.npcs) {
     if (!spots[npc.id] || registryIds.has(npc.id) || (npc.visibleIf && !evaluateCondition(state, npc.visibleIf))) continue;
     markers.push({ id: "npc-" + npc.id, ...spots[npc.id], kind: "npc", label: npc.name,
@@ -56,12 +64,14 @@ export function LocationMap({ scene, map, handlers, readOnly = false, dialogueSp
         if (getScene(npc.dialogSceneId)?.kind === "dialog") useWorldStore.getState().gotoScene(npc.dialogSceneId);
       } });
   }
-  for (const npc of registry) {
+  const questMark = (npc: NpcDef) => {
     // Same filters as the NPC popup: a turn-in outranks a fresh offer.
-    const quests = getQuestsForNpc(npc.id);
-    const quest = quests.some((q) => isQuestTurnInForNpc(state, q, npc.id)) || objectiveSpotsForNpc(state, npc.id).length ? "turnin" as const
+    const quests = heldQuests(state, npc.id);
+    return quests.some((q) => isQuestTurnInForNpc(state, q, npc.id)) || objectiveSpotsForNpc(state, npc.id).length ? "turnin" as const
       : quests.some((q) => isQuestOfferable(state, q)) ? "offer" as const : undefined;
-    markers.push({ id: "npc-" + npc.id, ...spots[npc.id], kind: "npc", label: npc.name, quest,
+  };
+  for (const npc of registry) {
+    markers.push({ id: "npc-" + npc.id, ...spotFor(npc.id)!, kind: "npc", label: npc.name, quest: questMark(npc),
       image: npcBodySprite(npc.id), sprite: npcPixelSprite(npc.id), wander: npc.look?.wander, onActivate: () => handlers.onRegistryNpc(npc) });
   }
   type Service = { label: string; badge: string; category: "place" | "activity"; action: () => void };
@@ -110,6 +120,14 @@ export function LocationMap({ scene, map, handlers, readOnly = false, dialogueSp
       badge: "investigate", glyph: "🔍", category: "activity", quest: "turnin",
       onActivate: () => handlers.onObjective(entry.questId, entry.spotIndex) });
   }
+  // Markets and one's own sect grounds have talk worth hearing too, painted
+  // spot or not (inns and cities carry a 🍶 spot on their maps).
+  const listen = resolveRumorChannel(scene.id, state.sectMembership);
+  if (listen && !(map.spots ?? []).some((spot) => spot.kind === "rumor")) {
+    const point = freeSpot(map.spawn, markers);
+    markers.push({ id: "rumor-listen", ...point, kind: "service", label: listen.channel === "sect_internal" ? "ข่าวภายในสำนัก" : "ฟังพ่อค้าคุยกัน",
+      badge: "rumor", category: "place", onActivate: handlers.onRumor });
+  }
   // A horse station (fast travel) in cities, villages and the big sects' grounds.
   if (hasStation(scene.id)) {
     const point = freeSpot(map.spawn, markers);
@@ -121,6 +139,12 @@ export function LocationMap({ scene, map, handlers, readOnly = false, dialogueSp
     const point = freeSpot(map.spawn, markers);
     markers.push({ id: "tournament", ...point, kind: "service", label: "ชุมนุมวิจารณ์กระบี่", badge: "tournament", category: "activity",
       onActivate: handlers.onTournament });
+  }
+  // Travellers stand near where people come in, and stroll about.
+  for (const npc of visitors) {
+    const point = freeSpot(map.spawn, markers);
+    markers.push({ id: "npc-" + npc.id, ...point, kind: "npc", label: npc.name, quest: questMark(npc),
+      image: npcBodySprite(npc.id), sprite: npcPixelSprite(npc.id), wander: true, onActivate: () => handlers.onRegistryNpc(npc) });
   }
   for (const exit of map.exits ?? []) {
     const routeId = "route_" + scene.id + "__to__" + exit.to;

@@ -20,12 +20,12 @@ Generated lists of everything in the game, taken straight from the data tables. 
 | --- | --- |
 | Locations | 101 |
 | Route scenes | 274 |
-| Dialog scenes | 3672 |
-| All scenes | 4047 |
+| Dialog scenes | 3682 |
+| All scenes | 4057 |
 | Location connections (`LOCATION_ROUTES`) | 129 |
 | Painted maps (hand-placed / auto layout) | 3 / 97 |
 | Sect locations / memberships | 20 / 15 |
-| NPCs | 225 |
+| NPCs | 235 |
 | Quests | 1115 |
 | Quest stages | 3075 |
 | Move skills / inner arts / equipment | 173 / 111 / 76 |

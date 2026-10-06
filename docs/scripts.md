@@ -107,6 +107,7 @@ Already applied. Kept for history only.
 | `test-clinic-errand.ts`, `test-clinic-preparation.ts`, `test-capital-training.ts`, `test-quest-completion-receipt.ts`, `test-spy-greeting-exits.ts`, `test-lin-herb-dialogue.ts` | `test:opening` |
 | `test-battle-background.ts` | `test:battle-background` |
 | `test-lore-rumors.ts`, `test-rumor-formatting.ts` | `test:rumors` |
+| `test-liveness.ts` | `test:liveness` |
 | `test-capital-investigation.ts` | `test:investigation` |
 | `test-audio.ts` | `test:audio` |
 | `test-law.ts` | `test:law` |

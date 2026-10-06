@@ -25,7 +25,7 @@ The wave-by-wave history that used to live in this file has moved to [docs/chang
 A Thai wuxia RPG in the browser: Next.js 15, React 19, TypeScript, Phaser 4, Zustand.
 
 - **Exploring.** The hero walks painted maps: 101 places, 129 roads; villages, towns and homes have their own people and activities; foes turn up on the map as the hero walks.
-- **Doing.** They talk to 225 NPCs (and give them gifts), take 882 quests (a 15-chapter main story, 154 sect lineage quests and 38 story sagas among them), join one of 15 sects, gather, craft, steal, and land in jail.
+- **Doing.** They talk to 235 NPCs (30 of whom, with their disciples and heirs, live their own lives) (and give them gifts), take 882 quests (a 15-chapter main story, 154 sect lineage quests and 38 story sagas among them), join one of 15 sects, gather, craft, steal, and land in jail.
 - **Fighting.** Battles are turn-based tactics on a 10 × 7 board that grows to 15 × 10 for big gangs (up to 6 pack members plus the leader).
 - **Code.** Two pure engines (`lib/game`, `lib/world`) sit under Zustand stores and React / Phaser views. The world saves to `localStorage` (version 24).
 
@@ -62,6 +62,7 @@ Checked on 2026-10-05 for the hero's flat base HP (a new hero starts at 136 HP),
 | `test:placements` | 12 tests pass (the committed `placements.json` is empty), incl. the kit grid, brush, gates and every kit set's 16 joins |
 | `test:battle-background` | 2 checks pass |
 | `test:rumors` | 5 + 4 checks pass |
+| `test:liveness` | 14 checks pass: the 30-person roster, birthdays, death odds, roads, succession and quest transfer, five seeded years, spar / kill anyone |
 | `test:investigation` | 5 checks pass |
 | `test:audio` | 6 checks pass |
 | `test:law` | 9 checks pass |
@@ -79,7 +80,7 @@ Checked on 2026-10-05 for the hero's flat base HP (a new hero starts at 136 HP),
 | `test:engine` | 12 checks pass: text overrides, the engine's draft / validation / filters / edits, the save route's whitelist |
 | `test:assets` | passes: 3,658 approved assets — 464 kit pieces in 28 sets, plus (224 buildings, 966 props, 305 sect pieces, 359 nature, 480 tiles, 417 icons, 225 NPC characters and 120 monsters in 8 directions, 60 fx, 38 ui), every file present at its stated size, footprints inside the drawn image; 27 MB under `public/assets/` |
 | `test:docs` | the generated reference is current; every link, repo path and command in the docs resolves |
-| `bun scripts/audit-content.ts` | 225 NPCs · 882 quests · 3048 scenes, all references resolve |
+| `bun scripts/audit-content.ts` | 235 NPCs · 1115 quests · 4057 scenes, all references resolve |
 | `bun run build` | passes; `/` first-load JS 1.12 MB (was 508 kB before the sagas; the saga text is about 2.9 MB of source, ~500 kB gzipped) |
 | `bun run test:e2e` | all 45 Playwright tests pass against the production build (11.9 minutes, Chromium 141 via the container shim), including the map editor and its kit brush on `/game/engine` |
 
@@ -142,7 +143,7 @@ Real behaviour today, found during the docs audit. Each is small and self-contai
 
 ### Letters, horse stations and the tournament
 
-- **The tournament is a grandmasters' event.** Its entrants are the 20 named sect masters plus sparring fighters, so a young hero is usually out in the first round; it pays by the round, but is tuned for the late game. Opponents are also scaled by the hero's power, like every battle.
+- **The tournament is a grandmasters' event.** Its entrants are the 30 simulated people (the sect masters and the ten wanderers) plus sparring fighters, so a young hero is usually out in the first round; it pays by the round, but is tuned for the late game. Opponents are also scaled by the hero's power, like every battle.
 - **The champion's pick bypasses the lineage rule.** Any entrant's sect move or art can be taken (by design, the one exception); `test:story` checks quest and dialog data, not this runtime prize.
 - **NPC champions only record their pick.** Their "learning" is +2 liveness power for a named NPC; their sparring build does not change.
 - **Letters only from NPCs with a registry entry and relationship ≥ 20.** Nothing else (quest thanks, summons) sends letters yet. A long rest only rolls the last 7 days.
@@ -183,11 +184,7 @@ Real behaviour today, found during the docs audit. Each is small and self-contai
 4. **`joinRequirements` is only read by the store `joinSect` action, which no UI calls.** Real joins go through the intro quest's `joinSect` reward, which does not check it.
 
    The intro quests' `prereqs` carry the same gates today, so nothing is broken yet, but the two can drift apart.
-5. **Two player echoes never fire.**
-   - `sect_join`, because joins go through the quest reward, which does not echo.
-   - `quest_major_complete`, because no quest sets `isMajor`.
-
-   Resign or betray through quest rewards also skip the echo, the log line and betrayal's evil +5.
+5. **Resign or betray through quest rewards skip the echo**, the log line and betrayal's evil +5. (Joining by the reward now echoes, and milestone quests — main-story chapters, saga finales — fire `quest_major_complete`.)
 6. **Resigning freezes only battle xp** for that sect's skills. Practice, w-exp level-ups and quest `skillExp` still raise them.
 7. **Store sect actions don't check status.** `upgradeSectRank` and `acceptSectQuest` ignore it; only the UI hides inactive memberships.
 
@@ -204,18 +201,16 @@ Real behaviour today, found during the docs audit. Each is small and self-contai
     - `NpcDef.questIds` is never read by code.
     - The `village_to_world` road is orphaned.
     - `world_journey` is reachable only from two tutorial dialogs.
-13. **A missing location.** The Liveness `find_treasure` reroll points at `cave_heimu`, which does not exist.
+13. ~~A missing location (`cave_heimu`).~~ Fixed: treasure journeys go to real caves, cliffs, mountains and valleys.
 
 ### Liveness (NPC simulation and rumors)
 
-14. **Birthdays stop after year one.** Aging checks `simDay % 365` on a 7-day grid.
-15. **Dead masters keep working.** They stay on their map and keep offering quests.
-16. **Heartland inns never hear the masters' news.** No simulated NPC lives there, and rumors don't spread between regions.
-17. **Market and sect rumors are hard to reach.**
-    - Sect-internal news is only in the "อื่น ๆ" drawer.
-    - Sun-Moon members never get it (`sect_ming` ≠ `sunmoon`).
-    - The only market has no rumor spot.
-    - The rumor banner never renders.
+Liveness 2.0 (2026-10-06) fixed the old gaps: people age on their birthdays, the dead leave every map and their seat and quests pass to an heir, talk spreads to the heartland and beyond, markets and sect grounds have a listening spot (Sun-Moon's too), and both silent player echoes fire. What is left:
+
+14. **Generated people have no portrait** — their card shows their costume, with a generic description.
+15. **Killing brings only the law.** A sect does not avenge its dead on the hero (unless the hero betrayed their own sect by it).
+16. **Warnings never fire, and lore `leadsTo` is never read.**
+17. **No repair for `npcExt`** beyond `seedLiveness` completing entries on load.
 
    More detail: [docs/liveness.md](docs/liveness.md#known-gaps).
 
@@ -282,11 +277,7 @@ In rough priority order:
    - Sell or delete the three orphan recipes.
    - Make `audit-content.ts` check drop tables.
 3. **Non-artisan crafting** (issue 8): a craft tab in the life-skills popup for recipes whose skill is not an artisan profession.
-4. **Liveness polish:**
-   - Hide or replace dead masters.
-   - Fix aging.
-   - Give the heartland some news (a named NPC there, or region spread).
-   - Put a rumor spot on `market_miao` and sect grounds.
+4. **Liveness next:** sect revenge on the hero for a killed member, portraits for generated people, quests that come from the simulation (a feud to settle, a disciple to rescue).
 5. **UI fixes:**
    - Check and fix the tracker / drawer overlap.
    - Add action-log labels.

@@ -24,6 +24,7 @@ import { JAIL_BRIBE_GOLD, JAIL_HOURS_PER_DAY, absoluteHours, jailCityFor, jailDa
 import { JAIL_SCENE_ID } from "./data/activities";
 import { STAT_LABEL, deriveAll, getArt, getSkill } from "../game";
 import { generatePlayerEcho } from "./rumor-engine";
+import { questHolder } from "./npc-life";
 
 // Pure mutation: applies a single effect to the world state in place.
 // `triggerBattle` only sets `pendingBattle` — the battle-bridge module
@@ -269,6 +270,8 @@ export function applyEffect(state: WorldStateData, eff: SceneEffect): void {
       };
       state.sectMembership[eff.sectId] = m;
       // No martial arts on joining: the sect's lineage quests teach them.
+      // The jianghu hears of it (every join, the intro quests' reward included).
+      generatePlayerEcho({ state, actionId: "sect_join" });
       return;
     }
 
@@ -664,8 +667,19 @@ function recordSectQuestCompletion(state: WorldStateData, def: QuestDef): void {
 // Called from every "quest just turned done with success" path
 // (case "finishQuest" + case "advanceQuest" final-stage overflow +
 // tickQuestProgress auto-advance).
+/**
+ * Milestones the jianghu talks about: a quest flagged `isMajor`, every
+ * chapter of the main story, and the last chapter of a saga (the one that
+ * hands over its secret move).
+ */
+export function isMajorQuest(def: QuestDef): boolean {
+  if (def.isMajor) return true;
+  if (def.id.startsWith("st_main_")) return true;
+  return !!def.story && (def.rewards ?? []).some((r) => r.t === "learnSkill" || r.t === "learnArt");
+}
+
 function recordMajorQuestCompletion(state: WorldStateData, def: QuestDef): void {
-  if (!def.isMajor) return;
+  if (!isMajorQuest(def)) return;
   applyEffect(state, {
     t: "firePlayerEcho",
     actionId: "quest_major_complete",
@@ -967,7 +981,8 @@ export function isQuestTurnInForNpc(
   const q = state.quests[def.id];
   if (!q || q.status !== "active") return false;
   const target = def.turnInNpcId ?? def.giverNpcId;
-  if (!target || target !== npcId) return false;
+  // A dead giver's charges pass to their heir (lib/world/npc-life.ts).
+  if (!target || (target !== npcId && questHolder(state, target) !== npcId)) return false;
   // Last stage is the "return to NPC" beat by convention.
   return q.stage === def.stages.length - 1;
 }

@@ -29,10 +29,11 @@
 //    20. sect_sunmoon_vice_renwoxing          (sunmoon)   rank 9
 
 import type { NpcExtState } from "../types";
+import { WANDERER_DEFAULTS } from "./liveness-roster";
 
 // NpcDef.id → authored ext defaults. The tick engine clones this on
 // first read so the runtime state is mutable independently.
-export const NAMED_NPC_DEFAULTS: Record<string, NpcExtState> = {
+const SECT_ROSTER: Record<string, NpcExtState> = {
   // ─── Shaolin ─────────────────────────────────────────────────────────
   // Abbot Huiyuan — orthodox patriarch of the southern Buddhist line.
   // Lifelong rivalry with the Sun-Moon sect (heretic order); brotherhood
@@ -448,6 +449,9 @@ export const NAMED_NPC_DEFAULTS: Record<string, NpcExtState> = {
     eventHistory: [],
   },
 };
+
+/** The 30 simulated people: the twenty sect masters above and the ten wanderers. */
+export const NAMED_NPC_DEFAULTS: Record<string, NpcExtState> = { ...SECT_ROSTER, ...WANDERER_DEFAULTS };
 
 export function getNamedDefault(npcId: string): NpcExtState | null {
   return NAMED_NPC_DEFAULTS[npcId] ?? null;
