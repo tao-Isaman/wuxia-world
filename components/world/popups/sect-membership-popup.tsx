@@ -133,7 +133,7 @@ export function SectMembershipPopup({ open, onClose }: Props) {
             </span>
           </div>
           <div className="text-xs">
-            <span className="text-muted-foreground">sect points </span>
+            <span className="text-muted-foreground">แต้มสำนัก </span>
             <strong className="text-vermilion">{m.points}</strong>
           </div>
         </div>
@@ -312,7 +312,7 @@ function RewardsTab({ def, rank, atTop, nextRank, nextCost, canRankUp, worldStat
             <span className="text-xs text-muted-foreground">ขั้นสูงสุดแล้ว</span>
           ) : (
             <span className="text-xs text-muted-foreground">
-              ต้องการ <strong className="text-foreground">{nextCost}</strong> sect points
+              ต้องการ <strong className="text-foreground">{nextCost}</strong> แต้มสำนัก
               เพื่อเลื่อนเป็นขั้น {nextRank}
             </span>
           )}

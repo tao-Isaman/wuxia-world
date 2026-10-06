@@ -152,7 +152,7 @@ const ISLES: LocationScene[] = [
 
 // ─── Terrain: mountains & cliffs (11) ─────────────────────────────────
 const TERRAIN: LocationScene[] = [
-  leaf("mt_baituo", "ภูเขาขาวอูต", "白驼山"),
+  leaf("mt_baituo", "ภูเขาอูฐขาว", "白驼山"),
   leaf("mt_tiezhang", "ภูเขาเหล็กฝ่ามือ", "铁掌山 · สำนักมือเหล็ก"),
   leaf("mt_wuliang", "ภูเขาวุ่นเหลียน", "无量山"),
   leaf("mt_kunlun", "เขาคุนหลุน", "昆仑山 · สำนักคุนหลุน"),
