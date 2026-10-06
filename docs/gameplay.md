@@ -374,7 +374,7 @@ There are 19 life skills:
 
 Mastery levels 1–5 need 0 / 100 / 300 / 700 / 1500 xp.
 
-**Gathering spots** sit on maps as signs (mine, tree, fishing spot, herbs, venom, chess table, begging corner). One try costs the node's stamina and 0.2 ชั่วยาม:
+**Gathering spots** sit on maps as signs (mine, tree, fishing spot, herbs, venom, chess table, begging corner). Every one of the 25 resource nodes is on at least one map: the Tang clan and the Five Venoms have viper and scorpion venom at home, the medicine king's villa rare herbs and centipedes, villages a rock pile, mines silver beside iron and the high peaks gold ([reference/locations.md](reference/locations.md)). One try costs the node's stamina and 0.2 ชั่วยาม:
 
 - **Success chance:** `55 % + 15 % × (mastery − node level)`, between 10 % and 95 %.
 - **Success:** 1–3 picks from the node, more when your mastery exceeds its level; chess and begging also pay gold.
@@ -387,9 +387,11 @@ Mastery levels 1–5 need 0 / 100 / 300 / 700 / 1500 xp.
 
 ## Items and equipment
 
-**Bag items (126).**
+**Bag items (133).**
 
-- **Healing:** potions heal HP; ginseng and lotus seeds restore MP; food heals HP.
+- **Healing:** potions heal a flat amount plus a share of max HP (ยาเลือดเล็ก 40 + 20 %, ยาเลือดกลาง 100 + 35 %, ยาเลือดใหญ่ 200 + 60 %); ยาฟื้นปราณ restores MP 20 + 35 %; ginseng and lotus seeds restore MP.
+- **Food** heals HP and restores stamina (เนื้อย่าง 15, ข้าวผัด 20, แกงเผ็ด 30, ขนมไหว้พระจันทร์ 10) but cannot be used in a fight.
+- **Battle items** (⚔ ใช้กลางการต่อสู้ได้): potions, poisons (ผงพิษงู, เข็มอาบพิษ, ขวดพิษ, พิษตะขาบทมิฬ — a hit plus poison of a % of max HP per turn) and hidden weapons (ลูกดอกเหล็ก, มีดบิน, ดาวกระจาย — damage grows with DEX / Acc). In battle **ใช้ของ** uses one and ends the turn; what was used leaves the bag when the fight ends, whatever the outcome. Alchemy artisans sell potions and poisons and teach their recipes (the เภสัช / ปรุงยา skill; ผงพิษงู, เข็มอาบพิษ and ยาฟื้นปราณ are basic recipes, พิษตะขาบทมิฬ a specialty at ต้าหลี่ and the Five Venoms); forges sell the hidden weapons.
 - **Training:** books and scrolls train a life skill.
 - **Manuals (47):** each teaches a skill or art if a stat is high enough — 0 / 10 / 15 / 20 / 30 for tiers 0–4, counting skills and arts but not gear.
 - **Quest items:** cannot be sold.

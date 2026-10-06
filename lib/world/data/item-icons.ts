@@ -31,6 +31,13 @@ export const ITEM_ICONS: Readonly<Record<string, string>> = {
   potion_mid: "ico_potion_potion_10",
   potion_big: "ico_potion_potion_07",
   poison_vial: "ico_venom_venom_05",
+  potion_qi: "ico_potion_potion_02",
+  poison_powder: "ico_venom_venom_09",
+  poison_needle: "ico_weapon_hidden_weapons_04",
+  poison_black_centipede: "ico_venom_venom_14",
+  throw_dart: "ico_weapon_hidden_weapons_01",
+  throw_knife: "ico_weapon_hidden_weapons_06",
+  throw_star: "ico_weapon_hidden_weapons_08",
   // ── gathered materials
   rock: "ico_material_ore_10",
   iron_ore: "ico_material_ore_13",

@@ -289,6 +289,7 @@ Two deliberate exceptions reach into stores:
    - on a non-fatal loss: `onLose` with at least 1 HP;
    - on a fatal loss: no game over — `reviveFromDeath` (`lib/world/death.ts`): wake at `home_player` a day later with 30 % HP / MP, −50 % gold, half of 1–3 random losable item stacks (quest items, scrolls, manuals, books kept), and the `lastDeath` report (`DeathReport`, not saved);
    - on an escape: no rewards.
+3. **Battle items.** `battleBag(inventory)` passes the items with `ItemDef.battle` (potions, poisons, hidden weapons; food has none) as the battle's `bag`; the grid action `{ t: "item" }` (ใช้ของ tray, `components/game/battle-items.tsx`) heals or throws (`throwDamage`, poison via `addDebuff`) and ends the turn; `acknowledgeBattleResult` takes `itemsUsed` from the inventory on every outcome. Food's `use.heal.stamina` restores stamina outside battle.
 
 ## Rendering (`lib/stage/`)
 

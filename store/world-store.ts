@@ -1137,6 +1137,18 @@ function recordVisit(state: WorldStateData, locationId: string): void {
   }
 }
 
+// Battle items the hero used (potions, poisons, hidden weapons) leave the bag,
+// whatever the outcome.
+function consumeBattleItems(draft: WorldStateData, battleState: { itemsUsed?: Record<string, number> } | null | undefined): void {
+  const used = Object.entries(battleState?.itemsUsed ?? {}).filter(([, n]) => n > 0);
+  if (!used.length) return;
+  draft.inventory = { ...draft.inventory };
+  for (const [id, n] of used) {
+    const left = (draft.inventory[id] ?? 0) - n;
+    if (left > 0) draft.inventory[id] = left; else delete draft.inventory[id];
+  }
+}
+
 // Roll a won fight's spoils from the battle store's final state.
 function rollVictorySpoils(s: WorldStateData, pb: NonNullable<WorldStateData["pendingBattle"]>): VictorySpoils {
   const battleState = useBattleStore.getState().state;
@@ -1554,6 +1566,7 @@ export const useWorldStore = create<WorldStore>()(
           draft.pendingBattle = null;
           draft.pendingSpar = null;
           draft.pendingHuntYield = null;
+          consumeBattleItems(draft, battleState);
           draft.currentHp = Math.max(1, battleState.hA);
           draft.currentMp = Math.max(0, battleState.mpA);
           if (isLawOpponent(pb.opponentId)) draft.jailCityId = null;
@@ -1581,6 +1594,7 @@ export const useWorldStore = create<WorldStore>()(
         draft.stamina = Math.max(0, draft.stamina - FIGHT_STAMINA);
         advanceTime(draft, FIGHT_HOURS);
         draft.pendingBattle = null;
+        consumeBattleItems(draft, battleState);
         // Carry resources back into the world. Non-fatal defeat leaves one HP
         // below; fatal losses preserve zero and route to gameOver.
         if (battleState) {
@@ -1985,9 +1999,11 @@ export const useWorldStore = create<WorldStore>()(
           const d = deriveAll(s.playerBuild);
           const hpRoom = Math.max(0, d.HP - s.currentHp);
           const mpRoom = Math.max(0, d.MP - s.currentMp);
-          const wantsHp = (def.use.hp ?? 0) > 0;
-          const wantsMp = (def.use.mp ?? 0) > 0;
-          if ((!wantsHp || hpRoom === 0) && (!wantsMp || mpRoom === 0)) {
+          const staminaRoom = Math.max(0, s.staminaMax - s.stamina);
+          const wantsHp = (def.use.hp ?? 0) > 0 || (def.use.hpPct ?? 0) > 0;
+          const wantsMp = (def.use.mp ?? 0) > 0 || (def.use.mpPct ?? 0) > 0;
+          const wantsStamina = (def.use.stamina ?? 0) > 0;
+          if ((!wantsHp || hpRoom === 0) && (!wantsMp || mpRoom === 0) && (!wantsStamina || staminaRoom === 0)) {
             return { ok: false, reason: "full" };
           }
         }
@@ -2062,20 +2078,20 @@ export const useWorldStore = create<WorldStore>()(
         if (eff.t === "heal") {
           // playerBuild was checked above for heal items.
           const d = deriveAll(draft.playerBuild!);
-          const hpHealed =
-            eff.hp && eff.hp > 0
-              ? Math.min(d.HP - draft.currentHp, eff.hp)
-              : 0;
-          const mpHealed =
-            eff.mp && eff.mp > 0
-              ? Math.min(d.MP - draft.currentMp, eff.mp)
-              : 0;
+          // Flat + % of max (potions scale with the hero); food also restores stamina.
+          const hpAmount = Math.round((eff.hp ?? 0) + d.HP * (eff.hpPct ?? 0) / 100);
+          const mpAmount = Math.round((eff.mp ?? 0) + d.MP * (eff.mpPct ?? 0) / 100);
+          const hpHealed = hpAmount > 0 ? Math.max(0, Math.min(d.HP - draft.currentHp, hpAmount)) : 0;
+          const mpHealed = mpAmount > 0 ? Math.max(0, Math.min(d.MP - draft.currentMp, mpAmount)) : 0;
+          const staminaHealed = Math.max(0, Math.min(draft.staminaMax - draft.stamina, eff.stamina ?? 0));
           draft.currentHp = Math.min(d.HP, draft.currentHp + hpHealed);
           draft.currentMp = Math.min(d.MP, draft.currentMp + mpHealed);
+          draft.stamina = Math.min(draft.staminaMax, draft.stamina + staminaHealed);
           rollLukXp(draft);
           const parts: string[] = [];
           if (hpHealed > 0) parts.push(`HP +${hpHealed}`);
           if (mpHealed > 0) parts.push(`MP +${mpHealed}`);
+          if (staminaHealed > 0) parts.push(`พลัง +${staminaHealed}`);
           appendActionLog(draft, "use", `ใช้ ${def.name} · ${parts.join(" / ") || "ไม่มีพลังให้ฟื้น"}`);
           set({ ...draft });
           return { ok: true, kind: "heal", itemId, hpHealed, mpHealed };

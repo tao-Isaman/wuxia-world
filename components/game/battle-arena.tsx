@@ -1,5 +1,6 @@
 "use client";
 
+import { BattleItemTray } from "./battle-items";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -33,7 +34,7 @@ import { hexColor, statusKey, statusStyle } from "@/lib/ui/status-catalog";
 import { SkillIcon, ArtIcon } from "./skill-icon";
 import { SoundButton } from "@/components/sound-button";
 import type { GridBattleUi } from "@/lib/stage/grid-battle-runtime";
-import { Bot, Check, Footprints, Hourglass, X } from "lucide-react";
+import { Bot, Check, Footprints, Hourglass, X, FlaskConical } from "lucide-react";
 import "@/app/grid-battle.css";
 
 const TIMELINE_LENGTH = 8;
@@ -195,6 +196,7 @@ export function BattleArena({ mode = "free", onContinue, winExtra }: BattleArena
   const [hover, setHover] = useState<Cell | null>(null);
   const [inspect, setInspect] = useState<string | null>(null);
   const [showLog, setShowLog] = useState(false);
+  const [showItems, setShowItems] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [rendererDown, setRendererDown] = useState(false);
   const [rawSelection, setSelection] = useState<Selection>({ key: "", slot: null, aimed: null });
@@ -373,6 +375,7 @@ export function BattleArena({ mode = "free", onContinue, winExtra }: BattleArena
         {myTurn && active && <div key={turnKey} className="gb-callout" aria-hidden="true"><span>ถึงตาเจ้า</span></div>}
         {inspected && <UnitCard unit={inspected} onClose={() => setInspect(null)} />}
         {hint && !resultReady && <p className="gb-hint" aria-live="polite" data-notice={notice ? "true" : undefined}>{hint}</p>}
+        {showItems && myTurn && active?.leader && <BattleItemTray state={state} unit={active} onClose={() => setShowItems(false)} />}
         {showLog && <div id="combat-log-drawer" className="gb-log-drawer" role="region" aria-label="บันทึกการต่อสู้">
           <BattleLog log={state.log} />
         </div>}
@@ -417,6 +420,10 @@ export function BattleArena({ mode = "free", onContinue, winExtra }: BattleArena
                 <Check size={18} aria-hidden="true" /><span>ยืนยัน</span>
               </button>
             </> : <>
+              {mode === "world" && state.bag && <button type="button" className="gb-control" data-kind="item" aria-expanded={showItems}
+                onClick={() => setShowItems((v) => !v)} disabled={!myTurn || !active?.leader} title="ใช้ยา พิษ หรืออาวุธลับ (จบตา)">
+                <FlaskConical size={18} aria-hidden="true" /><span>ใช้ของ</span>
+              </button>}
               <button type="button" className="gb-control" onClick={doWait} disabled={!myTurn} aria-keyshortcuts="W" title="จบตานี้โดยไม่ออกกระบวนท่า">
                 <Hourglass size={18} aria-hidden="true" /><span>รอ</span>
               </button>

@@ -6,7 +6,7 @@
 
 import { gaugeRate, resolveArtActive } from "../battle";
 import { fleeChance } from "../combat-actions";
-import { applySelfEffect, escapeBattleText } from "../effects";
+import { addDebuff, applySelfEffect, escapeBattleText } from "../effects";
 import { deriveAll } from "../derive";
 import { meridianActiveEffects } from "../meridians";
 import { REVIVE_LABEL, meridianStart, spdPctOf, spdWithPct } from "../meridian-battle";
@@ -19,6 +19,7 @@ import {
   GRID_DEFAULT_ROWS,
   cellKey,
   sameCell,
+  type BattleItemEffect,
   type Cell,
   type GridAction,
   type GridBattleOptions,
@@ -362,7 +363,62 @@ export function applyAction(state: GridBattleState, unitId: string, action: Grid
       endTurn(state);
       return true;
     case "flee": return doFlee(state, u, rng);
+    case "item": return doItem(state, u, action.itemId, action.name, action.effect, action.target);
   }
+}
+
+/** Cells a battle item can be used on: the user's own cell for heals, foes within range for throws. */
+export function itemTargetCells(state: GridBattleState, unitId: string, effect: BattleItemEffect): Cell[] {
+  const u = unitById(state, unitId);
+  if (!u || !u.alive) return [];
+  if (effect.t === "heal") return [{ ...u.pos }];
+  return foesOf(state, u).filter((f) => manhattan(u.pos, f.pos) <= effect.range).map((f) => ({ ...f.pos }));
+}
+
+/** Damage a thrown item deals to `target` (no roll: hidden weapons don't miss). */
+export function throwDamage(u: GridUnit, target: GridUnit, effect: Extract<BattleItemEffect, { t: "throw" }>): number {
+  return Math.max(1, Math.round(effect.power + u.derived.Acc * effect.dexScale - target.derived.PD * 0.5));
+}
+
+function doItem(state: GridBattleState, u: GridUnit, itemId: string, name: string, effect: BattleItemEffect, aimed: Cell): boolean {
+  if (!u.leader || u.team !== "ally") return false;
+  if ((state.bag?.[itemId] ?? 0) <= 0) return false;
+  if (!itemTargetCells(state, u.id, effect).some((c) => sameCell(c, aimed))) return false;
+  const turn = ++state.turn;
+  const results: TargetResult[] = [];
+  if (effect.t === "heal") {
+    const hp = Math.min(u.derived.HP - u.hp, Math.round((effect.hp ?? 0) + u.derived.HP * (effect.hpPct ?? 0) / 100));
+    const mp = Math.min(u.derived.MP - u.mp, Math.round((effect.mp ?? 0) + u.derived.MP * (effect.mpPct ?? 0) / 100));
+    u.hp += Math.max(0, hp); u.mp += Math.max(0, mp);
+    results.push({ unitId: u.id, damages: [], crits: [], misses: [], healed: Math.max(0, hp), killed: false });
+    pushLog(state, { cls: cls(u), txt: `[${turn}] ${nm(u)} ใช้ ${escapeBattleText(name)}${hp > 0 ? ` · HP +${hp}` : ""}${mp > 0 ? ` · MP +${mp}` : ""}` });
+  } else {
+    const t = state.units.find((o) => o.alive && sameCell(o.pos, aimed) && o.team !== u.team);
+    if (!t) return false;
+    const dmg = throwDamage(u, t, effect);
+    t.hp = Math.max(0, t.hp - dmg);
+    t.hitsReceived += 1;
+    pushLog(state, { cls: cls(u), txt: `[${turn}] ${nm(u)} ขว้าง ${escapeBattleText(name)} ใส่ ${nm(t)} · ${dmg}` });
+    if (effect.poison && t.hp > 0) {
+      const view = makeDuelView(u, t, turn);
+      addDebuff(view, "B", { t: "debuff_poison", n: "พิษ", pp: effect.poison.pct, u: effect.poison.turns });
+      commitDuelView(view, u, t);
+      pushLog(state, gridLogLines(view));
+      flushProcs(state, view, u, t);
+    }
+    results.push({ unitId: t.id, damages: [dmg], crits: [false], misses: [false], healed: 0, killed: t.hp <= 0 && !t.revive });
+    if (!sameCell(aimed, u.pos)) u.facing = facingToward(u.pos, aimed, u.facing);
+  }
+  state.bag = { ...state.bag, [itemId]: (state.bag![itemId] ?? 1) - 1 };
+  state.itemsUsed = { ...state.itemsUsed, [itemId]: (state.itemsUsed?.[itemId] ?? 0) + 1 };
+  pushEvent(state, {
+    t: "cast", unitId: u.id, name, tier: 0,
+    source: { kind: "item", id: itemId, poison: effect.t === "throw" && !!effect.poison },
+    aimed: { ...aimed }, cells: [{ ...aimed }], results,
+  });
+  settle(state);
+  endTurn(state);
+  return true;
 }
 
 function doMove(state: GridBattleState, u: GridUnit, to: Cell): boolean {

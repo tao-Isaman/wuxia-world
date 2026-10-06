@@ -17,7 +17,7 @@ const before = JSON.stringify(state);
 const advice = clinicPreparation(state)!;
 assert.ok(advice);
 assert.equal(advice.nextStep, "จุดหมาย → ตลาดนครหลวง");
-assert.match(advice.description, /50 ทอง · มี 80 ทอง · ฟื้น HP ได้สูงสุด 30/);
+assert.match(advice.description, /50 ทอง · มี 80 ทอง · ฟื้น HP 40 \+ 20% ของ HP สูงสุด/);
 assert.match(advice.note, /อัปขั้นใช้ 50 W-EXP · มี 20 W-EXP/);
 assert.equal(JSON.stringify(state), before, "advice does not mutate the game");
 assert.match(clinicPreparation({ ...state, gold: 49 })!.nextStep, /ฝึกประลองฟรี/, "free practice remains accessible without enough gold");

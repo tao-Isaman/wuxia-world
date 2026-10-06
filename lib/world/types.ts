@@ -3,6 +3,7 @@
 // (lib/game/types.ts uses `t` on SelfEffect / EnemyEffect / ArtPassiveEffect).
 
 import type { CharacterBuild, StatKey } from "@/lib/game";
+import type { BattleItemEffect } from "@/lib/game/grid/types";
 
 // ─── Scenes ────────────────────────────────────────────────────────────
 // Three scene kinds, discriminated on `kind`:
@@ -563,6 +564,9 @@ export interface ItemDef {
   // Consumable: item shows a "ใช้" action; effect runs on use, one count is
   // removed from inventory.
   use?: ItemUseEffect;
+  // Usable in a fight (the ใช้ของ action; costs the turn): potions heal,
+  // poisons and hidden weapons are thrown at a foe. Food has none.
+  battle?: BattleItemEffect;
   // Shop / inventory bucket. Defaults to "misc" when omitted.
   category?: ItemCategory;
   // Base shop price in gold. Sell-back is a fraction (typically × 0.5)
@@ -573,9 +577,9 @@ export interface ItemDef {
 
 export type ItemUseEffect =
   | { t: "trainSkill"; skill: LifeSkill; xp: number }
-  // Heal current HP and/or MP, capped at the player's deriveAll max. At
-  // least one of `hp` / `mp` must be > 0.
-  | { t: "heal"; hp?: number; mp?: number }
+  // Heal current HP / MP (flat + % of max) and / or stamina (food), capped
+  // at the max. At least one must be > 0.
+  | { t: "heal"; hp?: number; hpPct?: number; mp?: number; mpPct?: number; stamina?: number }
   // ตำราวิชา — single-use manual that teaches a move skill. Refuses (does
   // not consume the item) if the player's stat is below `reqValue`, or if
   // the skill is already learned. The store checks base + skills + arts

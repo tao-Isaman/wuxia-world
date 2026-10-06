@@ -25,6 +25,7 @@ import {
   createGridBattle,
   planTurn,
   sameCell,
+  type BattleItemEffect,
   type Cell,
   type GridAction,
   type GridBattleState,
@@ -47,6 +48,8 @@ export interface BattleStartOpts {
   /** Board size; defaults to `boardSizeFor(unit count)` (10 × 7 up to 15 × 10). */
   cols?: number;
   rows?: number;
+  /** The leader's battle items (item id → count); `useItem` draws on it. */
+  bag?: Record<string, number>;
 }
 
 interface BattleStore {
@@ -66,6 +69,8 @@ interface BattleStore {
   act: (slot: number, target: Cell) => boolean;
   /** Player's active unit ends its turn. */
   wait: () => boolean;
+  /** The leader uses a battle item from the bag on `target` (costs the turn). */
+  useItem: (itemId: string, name: string, effect: BattleItemEffect, target: Cell) => boolean;
   /** Leader tries to retreat (fails → turn spent). */
   flee: () => boolean;
   /** Advance one visible beat of non-player play (see header). */
@@ -202,6 +207,7 @@ export const useBattleStore = create<BattleStore>((set, get) => {
       ];
       const size = opts.cols && opts.rows ? { cols: opts.cols, rows: opts.rows } : boardSizeFor(specs.length);
       const state = createGridBattle(specs, { blocked: opts.blocked, ...size });
+      if (opts.bag) { state.bag = { ...opts.bag }; state.itemsUsed = {}; }
       const leader = state.units[0];
       const log = (txt: string) => state.log.push({ cls: "lS", txt });
       log("━━ เริ่มการต่อสู้ ━━");
@@ -225,6 +231,7 @@ export const useBattleStore = create<BattleStore>((set, get) => {
     move: (to) => playerAction({ t: "move", to }),
     act: (slot, target) => playerAction({ t: "skill", slot, target }),
     wait: () => playerAction({ t: "wait" }),
+    useItem: (itemId, name, effect, target) => playerAction({ t: "item", itemId, name, effect, target }),
     flee: () => playerAction({ t: "flee" }),
     step,
     stepAll,
