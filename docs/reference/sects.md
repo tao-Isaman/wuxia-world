@@ -8,7 +8,7 @@
 | --- | --- | --- | --- | --- | --- |
 | `sect_shaolin` | วัดเส้าหลิน | `shaolin` | เจ้าอาวาสฮุยหยวน | 9 → 1 | 8 |
 | `sect_wudang` | อู่ตัง / บู๊ตึ๊ง | `wudang` | อาจารย์ชิงซวี่ | 9 → 1 | 8 |
-| `sect_emei` | ง้อไบ๊ | `emei` | ท่านนิ้วห้วนจิงฉาน | 9 → 1 | 8 |
+| `sect_emei` | ง้อไบ๊ | `emei` | ซือไท้จิงฉาน | 9 → 1 | 8 |
 | `sect_huashan` | หัวซาน | `huashan` | อาจารย์ใหญ่อี้ชิง | 5 → 1 | 5 |
 | `sect_hengshan_south` | เฮิงซาน | `hengshan_south` | อาจารย์ใหญ่เซี่ยอวิ๋น | 5 → 1 | 5 |
 | `sect_hengshan_north` | เหิงซาน | `hengshan_north` | ภิกษุณีเสวียนเยว่ | 5 → 1 | 5 |
@@ -236,7 +236,7 @@ Martial line — every skill and art is taught only by its lineage quest or saga
 
 ## ง้อไบ๊ (`emei`)
 
-- Hall: ง้อไบ๊ (`sect_emei`) · registrar: ท่านนิ้วห้วนจิงฉาน (`sect_emei_abbess_jingchan`)
+- Hall: ง้อไบ๊ (`sect_emei`) · registrar: ซือไท้จิงฉาน (`sect_emei_abbess_jingchan`)
 - Join requirements: female hero **and** ความเลว ≤ 10
 - Ranks: start 9, top 1 · quest cooldown 30 days
 - Rank-up cost (sect points): →8: 100 · →7: 200 · →6: 350 · →5: 500 · →4: 700 · →3: 1000 · →2: 1400 · →1: 2000

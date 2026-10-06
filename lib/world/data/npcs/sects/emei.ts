@@ -7,8 +7,8 @@ import type { NpcDef } from "../../../types";
 export const NPCS_EMEI: readonly NpcDef[] = [
   {
     id: "sect_emei_abbess_jingchan",
-    name: "ท่านนิ้วห้วนจิงฉาน",
-    description: "ท่านนิ้วชั้นสูงของง้อไบ๊ · ผู้สืบทอดวิชาโพธิสัตว์และกระบี่พิทักษ์ · มารยาทงดงามแต่ใจเฉียบขาดต่อกฎศีลและความยุติธรรม · ฝีมือเทียบเท่าตำนานยุทธจักร",
+    name: "ซือไท้จิงฉาน",
+    description: "ภิกษุณีชั้นสูงของง้อไบ๊ · ผู้สืบทอดวิชาโพธิสัตว์และกระบี่พิทักษ์ · มารยาทงดงามแต่ใจเฉียบขาดต่อกฎศีลและความยุติธรรม · ฝีมือเทียบเท่าตำนานยุทธจักร",
     locationIds: ["sect_emei"],
     dialogSceneId: "npc_sect_emei_abbess_jingchan_talk",
     sparOpponentId: "spar_emei_abbess_jingchan",
@@ -38,8 +38,8 @@ export const NPCS_EMEI: readonly NpcDef[] = [
 
   {
     id: "sect_emei_vice_abbess_huimiao",
-    name: "รองท่านนิ้วฮุยเหมียว",
-    description: "รองท่านนิ้วของง้อไบ๊ · เคียงข้างจิงฉานนานนับสิบปี · กระบี่ดอกเหมยและฝ่ามือดอกบัวบานเชี่ยวชาญ",
+    name: "รองเจ้าสำนักฮุยเหมียว",
+    description: "รองเจ้าสำนักของง้อไบ๊ · เคียงข้างจิงฉานนานนับสิบปี · กระบี่ดอกเหมยและฝ่ามือดอกบัวบานเชี่ยวชาญ",
     locationIds: ["sect_emei"],
     dialogSceneId: "npc_sect_emei_vice_abbess_huimiao_talk",
     sparOpponentId: "spar_emei_huimiao",
@@ -57,7 +57,7 @@ export const NPCS_EMEI: readonly NpcDef[] = [
 
   {
     id: "sect_emei_sword_elder_qingxin",
-    name: "ท่านนิ้วดาบชิงซิน",
+    name: "ซือไท้ชิงซิน",
     description: "ปรมาจารย์กระบี่ของง้อไบ๊ · ผู้สืบทอดเพลงกระบี่วิธีพุทธและกระบี่พิทักษ์โพธิสัตว์ · พูดน้อยแต่ดาบเฉียบขาด",
     locationIds: ["sect_emei"],
     dialogSceneId: "npc_sect_emei_sword_elder_qingxin_talk",
@@ -74,7 +74,7 @@ export const NPCS_EMEI: readonly NpcDef[] = [
 
   {
     id: "sect_emei_palm_elder_huiyu",
-    name: "ท่านนิ้วฝ่ามือฮุยอวี้",
+    name: "ซือไท้ฮุยอวี้",
     description: "ปรมาจารย์ฝ่ามือของง้อไบ๊ · เชี่ยวชาญฝ่ามือโพธิสัตว์และฝ่ามือดอกบัวบาน · ใจเมตตาและฝีมือเงียบ",
     locationIds: ["sect_emei"],
     sparOpponentId: "spar_emei_huiyu",
@@ -90,7 +90,7 @@ export const NPCS_EMEI: readonly NpcDef[] = [
 
   {
     id: "sect_emei_healer_elder_yuxin",
-    name: "หมอนิ้วอวี้ซิน",
+    name: "หมอชีอวี้ซิน",
     description: "ปรมาจารย์ยาของง้อไบ๊ · เชี่ยวชาญสมุนไพรและการรักษาบาดแผล · ดูแลห้องยาของวัด",
     locationIds: ["sect_emei"],
     sparOpponentId: "spar_emei_yuxin",

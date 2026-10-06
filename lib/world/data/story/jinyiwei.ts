@@ -598,7 +598,7 @@ const EXECUTION_SWORD: StoryArcSpec = {
               cast: {
                 eunuch: { name: "ขันทีใหญ่เหลียง", look: "elder", at: [3, -1], facing: "left", tint: "#9a8fa8" },
                 abbot: { name: "เจ้าอาวาสฮุยหยวน", look: ABBOT, at: [-3, -2], facing: "right" },
-                abbess: { name: "ท่านนิ้วห้วนจิงฉาน", look: "sect_emei_abbess_jingchan", at: [-4, 0], facing: "right" },
+                abbess: { name: "ซือไท้จิงฉาน", look: "sect_emei_abbess_jingchan", at: [-4, 0], facing: "right" },
                 wudang: { name: "อาจารย์ชิงซวี่", look: "sect_wudang_master_qingxu", at: [-3, 2], facing: "right" },
                 hero: { name: "{hero}", look: "hero", at: [-1, 1], facing: "right" },
               },
@@ -629,7 +629,7 @@ const EXECUTION_SWORD: StoryArcSpec = {
               ["ขันทีใหญ่เหลียง", "ฆ่าข้าสิ เจ้าเป็นองครักษ์ ฆ่าคนตามคำสั่ง ไม่ใช่หรือ"],
               ["{hero}", "ข้าฟันตามคำตัดสิน ไม่ใช่ตามความโกรธ ท่านจะไปที่ศาล และตอบคำถามทั้งสามด้วยตัวเอง"],
               ["เจ้าอาวาสฮุยหยวน", "สิบนิ้ว ครบ… อาตมาขอบใจองครักษ์เสื้อแพรเป็นครั้งแรกในชีวิต"],
-              ["ท่านนิ้วห้วนจิงฉาน", "ง้อไบ๊ก็เช่นกัน แต่ชานี่รสแย่มาก"],
+              ["ซือไท้จิงฉาน", "ง้อไบ๊ก็เช่นกัน แต่ชานี่รสแย่มาก"],
             ],
             go: "ส่งตัวขันทีให้ฉิน",
           } },

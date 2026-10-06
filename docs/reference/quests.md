@@ -65,14 +65,14 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 
 | Id | Name | Giver | Stages | Notes |
 | --- | --- | --- | --- | --- |
-| `qst_emei_sect_patrol` | ลาดตระเวนรอบวัดง้อไบ๊ | ท่านนิ้วห้วนจิงฉาน | kill → turn-in | prereqs |
-| `qst_emei_sect_herb` | เก็บสมุนไพรเขาง้อไบ๊ | ท่านนิ้วห้วนจิงฉาน | item → turn-in | prereqs |
-| `qst_emei_art_bodhi` | บททดสอบก่อนตำนาน: วิชาลึกลับ | ท่านนิ้วห้วนจิงฉาน | kill → trait → turn-in | art, rank ≤ 3, prereqs |
-| `qst_emei_redemption` | ไถ่บาปต่อง้อไบ๊ | ท่านนิ้วห้วนจิงฉาน | kill → item → turn-in | prereqs |
-| `qst_emei_sect_lotus` | ส่งเม็ดบัวให้แม่ชี | ท่านนิ้วห้วนจิงฉาน | item → turn-in | prereqs |
-| `qst_emei_sect_bandit_clear` | กวาดล้างโจรเชิงเขาง้อไบ๊ | ท่านนิ้วห้วนจิงฉาน | kill → item → turn-in | prereqs |
-| `qst_emei_sect_snowlotus` | บัวหิมะยอดเขาง้อไบ๊ | ท่านนิ้วห้วนจิงฉาน | item → item → turn-in | prereqs |
-| `qst_emei_sect_pill_delivery` | ส่งยาให้หมอชาวบ้าน | ท่านนิ้วห้วนจิงฉาน | item → turn-in | prereqs |
+| `qst_emei_sect_patrol` | ลาดตระเวนรอบวัดง้อไบ๊ | ซือไท้จิงฉาน | kill → turn-in | prereqs |
+| `qst_emei_sect_herb` | เก็บสมุนไพรเขาง้อไบ๊ | ซือไท้จิงฉาน | item → turn-in | prereqs |
+| `qst_emei_art_bodhi` | บททดสอบก่อนตำนาน: วิชาลึกลับ | ซือไท้จิงฉาน | kill → trait → turn-in | art, rank ≤ 3, prereqs |
+| `qst_emei_redemption` | ไถ่บาปต่อง้อไบ๊ | ซือไท้จิงฉาน | kill → item → turn-in | prereqs |
+| `qst_emei_sect_lotus` | ส่งเม็ดบัวให้แม่ชี | ซือไท้จิงฉาน | item → turn-in | prereqs |
+| `qst_emei_sect_bandit_clear` | กวาดล้างโจรเชิงเขาง้อไบ๊ | ซือไท้จิงฉาน | kill → item → turn-in | prereqs |
+| `qst_emei_sect_snowlotus` | บัวหิมะยอดเขาง้อไบ๊ | ซือไท้จิงฉาน | item → item → turn-in | prereqs |
+| `qst_emei_sect_pill_delivery` | ส่งยาให้หมอชาวบ้าน | ซือไท้จิงฉาน | item → turn-in | prereqs |
 
 ### หัวซาน (`huashan`)
 
@@ -290,22 +290,22 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 
 | Id | Name | Giver | Stages | Notes |
 | --- | --- | --- | --- | --- |
-| `qst_emei_disciple_intro` | ขอเข้าเป็นศิษย์ง้อไบ๊ | ท่านนิ้วห้วนจิงฉาน | item → turn-in | prereqs |
-| `qst_emei_kidnapped_novice` | สาวกถูกลักพาตัว | ท่านนิ้วห้วนจิงฉาน | objective (spot) → kill → turn-in |  |
-| `qst_emei_poison_antidote` | ยาต้านพิษอสุรา | ท่านนิ้วห้วนจิงฉาน | item → turn-in | prereqs |
+| `qst_emei_disciple_intro` | ขอเข้าเป็นศิษย์ง้อไบ๊ | ซือไท้จิงฉาน | item → turn-in | prereqs |
+| `qst_emei_kidnapped_novice` | สาวกถูกลักพาตัว | ซือไท้จิงฉาน | objective (spot) → kill → turn-in |  |
+| `qst_emei_poison_antidote` | ยาต้านพิษอสุรา | ซือไท้จิงฉาน | item → turn-in | prereqs |
 | `ql_skill_em_graceful_sword` | สืบทอดวิชาลึกลับของศิษย์อวี้เจี๋ย | ศิษย์อวี้เจี๋ย | kill → turn-in | prereqs |
 | `ql_art_t0_em_meditation` | สืบทอดวิชาลึกลับของศิษย์หลิงซิน | ศิษย์หลิงซิน | kill → turn-in | prereqs |
 | `ql_skill_em_blossom_sword` | สืบทอดวิชาลึกลับของหัวหน้าศิษย์จื้อฮุย | หัวหน้าศิษย์จื้อฮุย | kill → item → turn-in | prereqs |
 | `ql_art_t1_em_lotus` | สืบทอดวิชาลึกลับของศิษย์เสี่ยวอวี้ | ศิษย์เสี่ยวอวี้ | kill → item → turn-in | prereqs |
-| `ql_skill_em_heart_sword` | สืบทอดวิชาลึกลับของหมอนิ้วอวี้ซิน | หมอนิ้วอวี้ซิน | kill → item → kill → turn-in | prereqs |
+| `ql_skill_em_heart_sword` | สืบทอดวิชาลึกลับของหมอชีอวี้ซิน | หมอชีอวี้ซิน | kill → item → kill → turn-in | prereqs |
 | `ql_skill_em_heart_palm` | สืบทอดวิชาลึกลับของนักพรตชิงอวี้ | นักพรตชิงอวี้ | kill → item → kill → turn-in | prereqs |
 | `ql_skill_em_lotus_palm` | สืบทอดวิชาลึกลับของศิษย์เสี่ยวอวี้ · ม้วนที่ 2 | ศิษย์เสี่ยวอวี้ | kill → item → kill → turn-in | prereqs |
-| `ql_art_t2_em_garland` | สืบทอดวิชาลึกลับของหมอนิ้วอวี้ซิน · ม้วนที่ 2 | หมอนิ้วอวี้ซิน | kill → item → kill → turn-in | prereqs |
-| `ql_skill_em_buddha_sword` | สืบทอดวิชาลึกลับของท่านนิ้วดาบชิงซิน | ท่านนิ้วดาบชิงซิน | kill → item → kill → turn-in | prereqs |
-| `ql_art_t3_em_grace` | สืบทอดวิชาลึกลับของท่านนิ้วดาบชิงซิน · ม้วนที่ 2 | ท่านนิ้วดาบชิงซิน | kill → item → kill → turn-in | prereqs |
-| `ql_skill_em_plum_sword` | สืบทอดวิชาลึกลับของรองท่านนิ้วฮุยเหมียว | รองท่านนิ้วฮุยเหมียว | kill → item → kill → turn-in | prereqs |
-| `ql_art_t3_em_ice` | สืบทอดวิชาลึกลับของรองท่านนิ้วฮุยเหมียว · ม้วนที่ 2 | รองท่านนิ้วฮุยเหมียว | kill → item → kill → turn-in | prereqs |
-| `ql_art_t3_em_heart` | สืบทอดวิชาลึกลับของท่านนิ้วฝ่ามือฮุยอวี้ | ท่านนิ้วฝ่ามือฮุยอวี้ | kill → item → kill → turn-in | prereqs |
+| `ql_art_t2_em_garland` | สืบทอดวิชาลึกลับของหมอชีอวี้ซิน · ม้วนที่ 2 | หมอชีอวี้ซิน | kill → item → kill → turn-in | prereqs |
+| `ql_skill_em_buddha_sword` | สืบทอดวิชาลึกลับของซือไท้ชิงซิน | ซือไท้ชิงซิน | kill → item → kill → turn-in | prereqs |
+| `ql_art_t3_em_grace` | สืบทอดวิชาลึกลับของซือไท้ชิงซิน · ม้วนที่ 2 | ซือไท้ชิงซิน | kill → item → kill → turn-in | prereqs |
+| `ql_skill_em_plum_sword` | สืบทอดวิชาลึกลับของรองเจ้าสำนักฮุยเหมียว | รองเจ้าสำนักฮุยเหมียว | kill → item → kill → turn-in | prereqs |
+| `ql_art_t3_em_ice` | สืบทอดวิชาลึกลับของรองเจ้าสำนักฮุยเหมียว · ม้วนที่ 2 | รองเจ้าสำนักฮุยเหมียว | kill → item → kill → turn-in | prereqs |
+| `ql_art_t3_em_heart` | สืบทอดวิชาลึกลับของซือไท้ฮุยอวี้ | ซือไท้ฮุยอวี้ | kill → item → kill → turn-in | prereqs |
 
 ### จินหลิง (`city_jinling`)
 

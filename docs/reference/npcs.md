@@ -170,11 +170,11 @@
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `sect_emei_abbess_jingchan` | ท่านนิ้วห้วนจิงฉาน | 💬 ⚔ 🤏 | 19 |
-| `sect_emei_vice_abbess_huimiao` | รองท่านนิ้วฮุยเหมียว | 💬 ⚔ 🤏 | 7 |
-| `sect_emei_sword_elder_qingxin` | ท่านนิ้วดาบชิงซิน | 💬 ⚔ 🤏 | 10 |
-| `sect_emei_palm_elder_huiyu` | ท่านนิ้วฝ่ามือฮุยอวี้ | ⚔ 🤏 | 9 |
-| `sect_emei_healer_elder_yuxin` | หมอนิ้วอวี้ซิน | ⚔ 🤏 | 4 |
+| `sect_emei_abbess_jingchan` | ซือไท้จิงฉาน | 💬 ⚔ 🤏 | 19 |
+| `sect_emei_vice_abbess_huimiao` | รองเจ้าสำนักฮุยเหมียว | 💬 ⚔ 🤏 | 7 |
+| `sect_emei_sword_elder_qingxin` | ซือไท้ชิงซิน | 💬 ⚔ 🤏 | 10 |
+| `sect_emei_palm_elder_huiyu` | ซือไท้ฮุยอวี้ | ⚔ 🤏 | 9 |
+| `sect_emei_healer_elder_yuxin` | หมอชีอวี้ซิน | ⚔ 🤏 | 4 |
 | `sect_emei_head_disciple_zhihui` | หัวหน้าศิษย์จื้อฮุย | ⚔ 🤏 | 3 |
 | `sect_emei_disciple_xiaoyu` | ศิษย์เสี่ยวอวี้ | ⚔ | 2 |
 | `sect_emei_gatekeeper_lingxin` | ศิษย์หลิงซิน | ⚔ | 4 |

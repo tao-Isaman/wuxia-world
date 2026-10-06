@@ -172,7 +172,7 @@ Per tier: T0: 9 · T1: 44 · T2: 74 · T3: 55 · T4: 208. Per category: ฝ่�
 | `spar_taishan_yuyangzi` | รองเจ้าสำนักอวี้หยางจื่อ | human | — | 10 | spar |
 | `spar_hengshan_south_master` | อาจารย์ใหญ่เซี่ยอวิ๋น | human | — | 12 | spar |
 | `spar_hengshan_north_dingyi` | ภิกษุณีเสวียนเยว่ | human | — | 12 | spar |
-| `spar_emei_yuxin` | หมอนิ้วอวี้ซิน | human | — | 11 | spar |
+| `spar_emei_yuxin` | หมอชีอวี้ซิน | human | — | 11 | spar |
 | `spar_kunlun_qiu` | ชิวเฉียน | human | — | 10 | spar, scene ×2 |
 | `spar_beggars_yunsi` | อาจารย์ข่าวสารยุนซือ | human | — | 10 | spar |
 | `spar_gumu_disciple` | ศิษย์เลิ่งเยว่ | human | — | 8 | spar |
@@ -227,10 +227,10 @@ Per tier: T0: 9 · T1: 44 · T2: 74 · T3: 55 · T4: 208. Per category: ฝ่�
 | `spar_wudang_master_qingxu` | อาจารย์ชิงซวี่ | human | — | 14 | spar, scene ×1 |
 | `spar_wudang_xuancheng` | รองอาจารย์เสวียนเฉิง | human | — | 12 | spar |
 | `spar_wudang_lingyu` | อาจารย์ดาบหลิงอวี้ | human | — | 11 | spar, scene ×1 |
-| `spar_emei_abbess_jingchan` | ท่านนิ้วห้วนจิงฉาน | human | — | 15 | spar |
-| `spar_emei_huimiao` | รองท่านนิ้วฮุยเหมียว | human | — | 13 | spar |
-| `spar_emei_qingxin` | ท่านนิ้วดาบชิงซิน | human | — | 11 | spar, scene ×1 |
-| `spar_emei_huiyu` | ท่านนิ้วฝ่ามือฮุยอวี้ | human | — | 11 | spar |
+| `spar_emei_abbess_jingchan` | ซือไท้จิงฉาน | human | — | 15 | spar |
+| `spar_emei_huimiao` | รองเจ้าสำนักฮุยเหมียว | human | — | 13 | spar |
+| `spar_emei_qingxin` | ซือไท้ชิงซิน | human | — | 11 | spar, scene ×1 |
+| `spar_emei_huiyu` | ซือไท้ฮุยอวี้ | human | — | 11 | spar |
 | `spar_beggars_chief_hongtian` | หัวหน้าหงเทียน | human | — | 14 | spar, scene ×1 |
 | `spar_beggars_lifang` | รองหัวหน้าหลี่ฟาง | human | — | 12 | spar |
 | `spar_beggars_qicheng` | อาจารย์ไม้เท้าฉีเฉิง | human | — | 11 | spar, scene ×1 |

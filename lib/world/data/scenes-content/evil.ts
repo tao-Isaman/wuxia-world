@@ -179,13 +179,13 @@ export const SCENES_EVIL: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qe_wudu_assassinate_emei_offer",
     lines: [
-      { t: "dialogue", speaker: "ผู้อาวุโสตู๋ซื่อ", text: "ท่านนิ้วห้วนจิงฉาน เจ้าสำนักง้อไบ๊... ข้าเกลียดนางนั้นมานานสิบปี" },
+      { t: "dialogue", speaker: "ผู้อาวุโสตู๋ซื่อ", text: "ซือไท้จิงฉาน เจ้าสำนักง้อไบ๊... ข้าเกลียดนางนั้นมานานสิบปี" },
       { t: "dialogue", speaker: "ผู้อาวุโสตู๋ซื่อ", text: "นางทำลายแผนการของสำนักเบญจพิษหลายครั้ง ถึงเวลาแล้วที่นางจะไม่ขัดขวางใครอีก" },
       { t: "dialogue", speaker: "ผู้อาวุโสตู๋ซื่อ", text: "กำจัดนาง แล้วข้าจะให้สิ่งที่เจ้าต้องการ — ไม่มีอะไรจะหยุดเราได้อีก" },
     ],
     choices: [
       {
-        text: "รับงาน — ลอบสังหารท่านนิ้วห้วนจิงฉาน",
+        text: "รับงาน — ลอบสังหารซือไท้จิงฉาน",
         effects: [{ t: "startQuest", questId: "qe_wudu_assassinate_emei" }],
         next: "sect_wudu",
       },
@@ -1544,7 +1544,7 @@ export const SCENES_EVIL: readonly Scene[] = [
     id: "qs_qe_xueyu_kidnap_disciple_offer",
     lines: [
       { t: "dialogue", speaker: "ทูตเซี่ย", text: "ง้อไบ๊มีเทคนิควิชาที่สำนักดาบโลหิตสนใจ เราต้องการข้อมูลนั้น" },
-      { t: "dialogue", speaker: "ทูตเซี่ย", text: "จับตัวท่านนิ้วห้วนจิงฉานมา เธอรู้วิชาเยอะ และจะพูดในที่สุด" },
+      { t: "dialogue", speaker: "ทูตเซี่ย", text: "จับตัวซือไท้จิงฉานมา เธอรู้วิชาเยอะ และจะพูดในที่สุด" },
     ],
     choices: [
       {

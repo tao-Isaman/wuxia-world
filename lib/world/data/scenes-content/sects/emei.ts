@@ -9,7 +9,7 @@ export const SCENES_EMEI: readonly Scene[] = [
     kind: "dialog",
     id: "npc_sect_emei_abbess_jingchan_talk",
     lines: [
-      { t: "narration", text: "ท่านนิ้วห้วนจิงฉานยืนทอดสายตามองสวนดอกไม้ สีหน้าสงบแต่แฝงความกังวล" },
+      { t: "narration", text: "ซือไท้จิงฉานยืนทอดสายตามองสวนดอกไม้ สีหน้าสงบแต่แฝงความกังวล" },
       { t: "dialogue", speaker: "จิงฉาน", text: "ง้อไบ๊สอนให้เราเมตตาต่อสรรพสิ่ง แต่บางครั้งโลกก็บีบให้เราใช้กำลัง" },
       { t: "dialogue", speaker: "จิงฉาน", text: "เจ้ามาด้วยเรื่องอะไร?" },
     ],
@@ -75,7 +75,7 @@ export const SCENES_EMEI: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qst_emei_disciple_intro_offer",
     lines: [
-      { t: "narration", text: "ท่านนิ้วห้วนจิงฉานพยักหน้าและยกมือประสานต่อหน้าอก" },
+      { t: "narration", text: "ซือไท้จิงฉานพยักหน้าและยกมือประสานต่อหน้าอก" },
       { t: "dialogue", speaker: "จิงฉาน", text: "เจ้าต้องการเป็นศิษย์ง้อไบ๊? ดี — ดวงใจเมตตาของเจ้าเหมาะกับสำนักของเรา" },
       { t: "dialogue", speaker: "จิงฉาน", text: "แต่ก่อนรับเจ้าเข้าสำนัก ขอพิสูจน์ความเพียร — เก็บสมุนไพรหายาก ๑๐, โสม ๑๐, เม็ดบัว ๑๐ มาให้ห้องยา" },
       { t: "dialogue", speaker: "จิงฉาน", text: "เมื่อครบแล้วกลับมา ข้าจะรับเจ้าเป็นศิษย์ขั้นที่ ๙" },
@@ -112,7 +112,7 @@ export const SCENES_EMEI: readonly Scene[] = [
     kind: "dialog",
     id: "npc_sect_emei_vice_abbess_huimiao_talk",
     lines: [
-      { t: "narration", text: "รองท่านนิ้วฮุยเหมียวนั่งร้อยดอกบุปผาเป็นมาลัย ยิ้มน้อย ๆ ให้เจ้า" },
+      { t: "narration", text: "รองเจ้าสำนักฮุยเหมียวนั่งร้อยดอกบุปผาเป็นมาลัย ยิ้มน้อย ๆ ให้เจ้า" },
       { t: "dialogue", speaker: "ฮุยเหมียว", text: "ดอกเหมยห้ากลีบทั้งบริสุทธิ์และคมเฉียบ — กระบี่ของง้อไบ๊ก็เช่นกัน" },
       { t: "dialogue", speaker: "ฮุยเหมียว", text: "หากเจ้าตั้งใจฝึก สำนักจะไม่ปิดประตูใส่เจ้า" },
     ],
@@ -122,7 +122,7 @@ export const SCENES_EMEI: readonly Scene[] = [
     kind: "dialog",
     id: "npc_sect_emei_sword_elder_qingxin_talk",
     lines: [
-      { t: "narration", text: "ท่านนิ้วดาบชิงซินสาธิตท่ากระบี่พิทักษ์โพธิสัตว์ในลานฝึก เสียงเหล็กกระทบลมดังก้อง" },
+      { t: "narration", text: "ซือไท้ชิงซินสาธิตท่ากระบี่พิทักษ์โพธิสัตว์ในลานฝึก เสียงเหล็กกระทบลมดังก้อง" },
       { t: "dialogue", speaker: "ชิงซิน", text: "กระบี่พิทักษ์โพธิสัตว์มี ๓ ท่าหลัก — แต่ละท่ารักษาทั้งตัวเองและผู้อื่นในเวลาเดียวกัน" },
       { t: "dialogue", speaker: "ชิงซิน", text: "อยากลองดูฝีมือกระบี่ของเจ้าไหม? มาประลองสักวันก็ได้" },
     ],
@@ -144,7 +144,7 @@ export const SCENES_EMEI: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qst_emei_kidnapped_novice_complete",
     lines: [
-      { t: "narration", text: "ท่านนิ้วห้วนจิงฉานโอบกอดสาวกผู้กลับมาด้วยความโล่งใจ" },
+      { t: "narration", text: "ซือไท้จิงฉานโอบกอดสาวกผู้กลับมาด้วยความโล่งใจ" },
       { t: "dialogue", speaker: "จิงฉาน", text: "ขอบคุณมาก... สาวกของเราปลอดภัยแล้ว" },
       { t: "dialogue", speaker: "จิงฉาน", text: "ง้อไบ๊จะไม่ลืมบุญคุณนี้" },
     ],
@@ -169,7 +169,7 @@ export const SCENES_EMEI: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qst_emei_poison_antidote_complete",
     lines: [
-      { t: "narration", text: "ท่านนิ้วห้วนจิงฉานรับพิษตะขาบและรีบไปปรุงยา" },
+      { t: "narration", text: "ซือไท้จิงฉานรับพิษตะขาบและรีบไปปรุงยา" },
       { t: "dialogue", speaker: "จิงฉาน", text: "ดีแล้ว... ข้าจะปรุงยาให้ทันเวลา ขอบคุณยอดยุทธ" },
     ],
     choices: [
