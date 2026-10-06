@@ -6,6 +6,10 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-06
 
+### Life-skill cards no longer clip their xp
+
+- In อาชีพ → มาสเตอร์รี่ the level and the xp (45/400) now share one row above the bar, so the card's edge no longer cuts the numbers on phones.
+
 ### Sleep at your sect
 
 - An active disciple standing on their own sect's grounds gets 🏯 **นอนพักที่สำนัก**, like sleeping at home: free, a full restore, 4 ชั่วยาม. Resigned or betrayed members, and other sects' grounds, keep the roadside rest.

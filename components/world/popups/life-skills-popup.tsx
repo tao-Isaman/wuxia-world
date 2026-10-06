@@ -65,7 +65,7 @@ function SkillsTab() {
   const xpMap = useWorldStore((s) => s.lifeSkillXp);
   const short = useShortScreen();
   return (
-    <PagedGrid items={LIFE_SKILL_KEYS} itemKey={(k) => k} cellWidth={short ? 118 : 150} cellHeight={short ? 66 : 92} gap={6}
+    <PagedGrid items={LIFE_SKILL_KEYS} itemKey={(k) => k} cellWidth={short ? 118 : 150} cellHeight={short ? 70 : 92} gap={6}
       label="มาสเตอร์รี่" render={(k) => <SkillTile skill={k} xp={xpMap[k] ?? 0} />} />
   );
 }
@@ -80,9 +80,9 @@ function SkillTile({ skill, xp }: { skill: LifeSkill; xp: number }) {
         <span className="life-tile-icon" aria-hidden="true">{LIFE_SKILL_ICON[skill]}</span>
         <strong>{LIFE_SKILL_LABEL[skill]}</strong>
       </div>
-      <div className="life-tile-level">ระดับ <b>{lvl}</b>/{MAX_MASTERY}</div>
-      <Progress value={pct} className="h-1.5" />
-      <small>{atCap ? "สูงสุด" : `${cur}/${need}`}</small>
+      {/* Level and xp share a row, so the card never clips the numbers. */}
+      <div className="life-tile-level"><span>ระดับ <b>{lvl}</b>/{MAX_MASTERY}</span><small>{atCap ? "สูงสุด" : `${cur}/${need}`}</small></div>
+      <Progress value={pct} className="h-1.5 shrink-0" />
     </div>
   );
 }
