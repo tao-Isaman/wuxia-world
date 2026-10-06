@@ -130,8 +130,8 @@ export const SCENES_WUDANG: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qst_wudang_sacred_herb_offer",
     lines: [
-      { t: "dialogue", speaker: "ชิงซวี่", text: "ลูกศิษย์ของข้าป่วยหนัก ต้องการบัวหิมะจากยอดเขาทางเหนือ" },
-      { t: "dialogue", speaker: "ชิงซวี่", text: "เส้นทางนั้นไม่ง่าย แต่ถ้าเจ้าหามาได้ ข้าจะสอนไทจี้ให้" },
+      { t: "dialogue", speaker: "ชิงซวี่", text: "ลูกศิษย์ของข้าป่วยหนัก ต้องการบัวหิมะแท้ซึ่งงอกได้ที่ก้นหุบเขาตัดใจเท่านั้น" },
+      { t: "dialogue", speaker: "ชิงซวี่", text: "เส้นทางนั้นไม่ง่าย แต่ถ้าเจ้าหามาได้ ข้าจะตอบแทนให้สมน้ำใจ" },
     ],
     choices: [
       { text: "รับภารกิจ", next: "sect_wudang" },
@@ -229,8 +229,8 @@ export const SCENES_WUDANG: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qst_wudang_mountain_seal_offer",
     lines: [
-      { t: "dialogue", speaker: "ชิงซวี่", text: "วัดตาหลุนและอู่ตังมีพันธสัญญาโบราณ ต่ออายุทุกรอบสิบปี" },
-      { t: "dialogue", speaker: "ชิงซวี่", text: "รอบนี้ถึงเวลาแล้ว แต่ข้าติดธุระ เจ้าช่วยไปรับตราประทับมาให้ได้ไหม?" },
+      { t: "dialogue", speaker: "ชิงซวี่", text: "วิหารล้อลมกับอู่ตังมีพันธสัญญาโบราณ ต่ออายุทุกรอบสิบปี" },
+      { t: "dialogue", speaker: "ชิงซวี่", text: "รอบนี้ถึงเวลาแล้ว แต่ข้าติดธุระ เจ้าช่วยไปรับตราประทับจากพระกงซินที่วิหารมาให้ได้ไหม?" },
     ],
     choices: [
       { text: "รับภารกิจ", next: "sect_wudang" },
