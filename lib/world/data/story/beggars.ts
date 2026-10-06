@@ -709,7 +709,7 @@ const DRAGON_PALMS: StoryArcSpec = {
         go: "ไปเรือนพยาบาล",
       },
       steps: [
-        { t: "talk", npcId: WUDAO, locationId: "sect_beggars", label: "เยี่ยมตั้งกิมเหลียงที่เรือนพยาบาล", hint: "ไปเยี่ยมตั้งกิมเหลียงที่อาจารย์อู่เต้ากำลังรักษา",
+        { t: "talk", npcId: WUDAO, locationId: "sect_beggars", label: "เยี่ยมตั้งกิมเหลียงที่เรือนพยาบาล", hint: "ไปเยี่ยมตั้งกิมเหลียงที่อาจารย์หมัดอู่เต้ากำลังรักษา",
           scene: {
             lines: [
               "ตั้งกิมเหลียงนอนอยู่บนเสื่อ เข็มปักเต็มแขนเหมือนเม่น อู่เต้านั่งป้อนข้าวต้มให้ทีละช้อน",
@@ -1053,7 +1053,7 @@ const LUCKY_STAFF: StoryArcSpec = {
         go: "เก็บสมุนไพร แล้วไปหมู่บ้านชีกู่",
       },
       steps: [
-        { t: "gather", itemId: "herb", count: 4, hint: "หาสมุนไพร 4 กำ ไว้ต้มยาให้แม่ของอาโถ่ว" },
+        { t: "gather", itemId: "herb", count: 4, hint: "หาสมุนไพรหายาก 4 กำ ไว้ต้มยาให้แม่ของอาโถ่ว" },
         { t: "visit", locationId: "village_qigu", label: "บ้านไม้หลังเล็กท้ายหมู่บ้าน", hint: "ไปหาอาโถ่วที่บ้านไม้หลังเล็กท้ายหมู่บ้านชีกู่",
           scene: {
             lines: [

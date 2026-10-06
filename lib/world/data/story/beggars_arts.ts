@@ -234,7 +234,7 @@ const THOUSAND_CROWD: StoryArcSpec = {
       },
       steps: [
         { t: "trait", trait: "humility", min: 25, hint: "วางหน้าลงกับพื้นถนนให้ได้ (ความถ่อมตน ≥ 25)" },
-        { t: "talk", npcId: CHEF_SU, locationId: "city_yangzhou", label: "นั่งขอทานหน้าร้านพ่อครัวซู", hint: "นั่งขอทานที่ท่าเรือหยางโจว แล้วรอดูว่าใครแบ่งข้าวให้",
+        { t: "talk", npcId: CHEF_SU, locationId: "city_yangzhou", label: "นั่งขอทานหน้าร้านพ่อครัวซู", hint: "นั่งขอทานหน้าร้านพ่อครัวซูที่ท่าเรือหยางโจว แล้วรอดูว่าใครแบ่งข้าวให้",
           scene: {
             lines: [
               "วันแรก ไม่มีใครมองท่าน วันที่สอง หมาตัวหนึ่งมานั่งข้าง ๆ และได้เศษกระดูกมากกว่าท่าน",
@@ -654,7 +654,7 @@ const THOUSAND_CROWD: StoryArcSpec = {
       },
       steps: [
         { t: "gather", itemId: "rice_dish", count: 5, hint: "หาข้าวหมูแดง 5 ห่อมาเลี้ยงยาจกทั้งแผ่นดิน" },
-        { t: "talk", npcId: XIAOMAO, locationId: HALL, label: "จัดลานเลี้ยงกับเสี่ยวเหมา", hint: "ช่วยเสี่ยวเหมาจัดลานเลี้ยงที่พรรคยาจก",
+        { t: "talk", npcId: XIAOMAO, locationId: HALL, label: "จัดลานเลี้ยงกับเสี่ยวเหมา", hint: "ช่วยศิษย์เสี่ยวเหมาจัดลานเลี้ยงที่พรรคยาจก",
           scene: {
             lines: [
               ["ศิษย์เสี่ยวเหมา", "{hero}! เสี่ยวโต้วกับน้องมาด้วย! เด็กสิบสองคนนั่นก็มา ตอนนี้ทุกคนทำท่าที่สามได้แล้ว… ผิดหมดทุกคน"],
