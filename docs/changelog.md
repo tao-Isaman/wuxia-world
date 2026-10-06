@@ -6,6 +6,15 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-06
 
+### Sleep at your sect
+
+- An active disciple standing on their own sect's grounds gets 🏯 **นอนพักที่สำนัก**, like sleeping at home: free, a full restore, 4 ชั่วยาม. Resigned or betrayed members, and other sects' grounds, keep the roadside rest.
+
+### Spoils on the victory screen
+
+- After a win the result panel shows what the fight paid, as icons: gold, w-exp, every item that dropped (and a hunt's carcass) and each move's xp. Tap one to read it. The spoils are rolled once when the fight is won, so what you see is exactly what you get.
+- Hostile foes now carry a little gold by tier (T0 5–15 … T4 180–350); spars, tournament bouts and the law pay none.
+
 ### Sleep at home
 
 - At home the พัก bubble offers 🛏 **นอนพักที่บ้าน**: free, a full restore of stamina, HP and MP, and only 4 ชั่วยาม (other rests take 12). It replaces the roadside rest there.

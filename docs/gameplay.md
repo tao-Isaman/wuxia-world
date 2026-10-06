@@ -117,11 +117,12 @@ Night falls from about the 8th ชั่วยาม. It only changes the lighti
 
 ### Resting
 
-The พัก button offers what the place allows. A rest restores stamina, HP and MP by the same fraction of their maximum; sleeping at home takes 4 ชั่วยาม (`REST_HOME_HOURS`), every other rest 12:
+The พัก button offers what the place allows. A rest restores stamina, HP and MP by the same fraction of their maximum; sleeping at home or at your own sect takes 4 ชั่วยาม (`REST_HOME_HOURS`), every other rest 12:
 
 | Where | Choice | Cost | Restores |
 | --- | --- | --- | --- |
 | your own home (`home_player`), the only choice there | 🛏 นอนพักที่บ้าน | free | 100 %, in 4 ชั่วยาม |
+| your own sect's grounds while an active disciple (`ownSectAt`), the only choice there | 🏯 นอนพักที่สำนัก | free | 100 %, in 4 ชั่วยาม |
 | cities (`city_*`) and inns (`inn_*`) | 🍵 พักโรงเตี๊ยม | 300 gold | 100 % |
 | temples and palaces | 🏛 พักที่วัด / พักในลานวัง | free | 50 % |
 | anywhere else, including the above | 🌿 พักริมทาง | free | 25 % |

@@ -285,7 +285,7 @@ Two deliberate exceptions reach into stores:
 2. At the end, the player's ดำเนินเรื่อง → `acknowledgeBattleResult()`. It applies:
    - stamina −5 and 0.5 ชั่วยาม;
    - HP / MP carry-over;
-   - on a win: loot, 50 w-exp, 20 xp per skill / art use, stat xp and kill counts (pack members included), then quest progress and `onWin`;
+   - on a win: the spoils the result panel showed (`victorySpoils`: loot, gold by foe tier for hostile foes, a hunt's carcass, rolled once per battle), 50 w-exp, 20 xp per skill / art use, stat xp and kill counts (pack members included), then quest progress and `onWin`;
    - on a non-fatal loss: `onLose` with at least 1 HP;
    - on a fatal loss: no game over — `reviveFromDeath` (`lib/world/death.ts`): wake at `home_player` a day later with 30 % HP / MP, −50 % gold, half of 1–3 random losable item stacks (quest items, scrolls, manuals, books kept), and the `lastDeath` report (`DeathReport`, not saved);
    - on an escape: no rewards.

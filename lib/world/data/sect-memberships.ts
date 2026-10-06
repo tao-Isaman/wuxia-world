@@ -489,3 +489,14 @@ export function rankUpGold(def: SectMembershipDef, targetRank: number): number {
   const cost = def.rankUpCost(targetRank);
   return Number.isFinite(cost) ? Math.round(cost / 2) : 0;
 }
+
+/** The sect whose grounds `locationId` are, if the hero is an active disciple there (they may sleep there free). */
+export function ownSectAt(
+  sectMembership: Readonly<Record<string, { status?: string } | undefined>>,
+  locationId: string,
+): SectMembershipDef | null {
+  for (const def of Object.values(SECT_MEMBERSHIPS)) {
+    if (def.hallLocationId === locationId && sectMembership[def.id]?.status === "active") return def;
+  }
+  return null;
+}

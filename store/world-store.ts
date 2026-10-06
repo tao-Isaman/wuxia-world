@@ -79,7 +79,7 @@ import { namedNpcIds } from "@/lib/world/data/named-npcs";
 import { checkOpenMeridianNode, getMeridianChart } from "@/lib/game";
 import { meridianReadBlock, rollMeridianLoot } from "@/lib/world/meridians";
 import { toast } from "@/store/toast-store";
-import { SECT_MEMBERSHIPS, rankUpGold } from "@/lib/world/data/sect-memberships";
+import { SECT_MEMBERSHIPS, ownSectAt, rankUpGold } from "@/lib/world/data/sect-memberships";
 import {
   ASSASSINATE_TRAIT_EVIL,
   KIDNAP_TRAIT_EVIL,
@@ -163,7 +163,8 @@ const ACTION_HOURS = 0.2;
 const FIGHT_HOURS = 0.5;
 const FIGHT_STAMINA = 5;
 const REST_HOURS = 12;
-// Sleeping in one's own bed (home_player): free, a full restore, 4 ชั่วยาม.
+// Sleeping in one's own bed (home_player) or at one's own sect (an active
+// disciple on its grounds): free, a full restore, 4 ชั่วยาม.
 export const REST_HOME_HOURS = 4;
 const REST_INN_COST = 300;
 
@@ -361,8 +362,8 @@ const FOE_GOLD: Readonly<Record<number, readonly [number, number]>> = {
 // One roll per pendingBattle (the object the battle was started for).
 const spoilsByBattle = new WeakMap<object, VictorySpoils>();
 
-// Rest tiers: one's own bed (home_player), an inn, a temple, the roadside.
-export type RestKind = "home" | "inn" | "temple" | "route";
+// Rest tiers: one's own bed (or one's own sect's grounds, as an active disciple) (home_player), an inn, a temple, the roadside.
+export type RestKind = "home" | "sect" | "inn" | "temple" | "route";
 
 export type RestResult =
   | { ok: false; reason: "gold" | "place" }
@@ -2164,8 +2165,9 @@ export const useWorldStore = create<WorldStore>()(
         const max = s.staminaMax;
         let cost = 0;
         let pct = 0;
-        if (kind === "home") {
-          if (s.currentSceneId !== "home_player") return { ok: false, reason: "place" };
+        if (kind === "home" || kind === "sect") {
+          const here = kind === "home" ? s.currentSceneId === "home_player" : !!ownSectAt(s.sectMembership, s.currentSceneId);
+          if (!here) return { ok: false, reason: "place" };
           pct = 1;
         } else if (kind === "inn") {
           cost = REST_INN_COST;
@@ -2189,9 +2191,9 @@ export const useWorldStore = create<WorldStore>()(
           draft.currentHp = Math.min(d.HP, draft.currentHp + Math.floor(d.HP * pct));
           draft.currentMp = Math.min(d.MP, draft.currentMp + Math.floor(d.MP * pct));
         }
-        const hours = kind === "home" ? REST_HOME_HOURS : REST_HOURS;
+        const hours = kind === "home" || kind === "sect" ? REST_HOME_HOURS : REST_HOURS;
         advanceTime(draft, hours);
-        const restLabel = kind === "home" ? "นอนพักที่บ้าน" : kind === "inn" ? "พักโรงเตี๊ยม" : kind === "temple" ? "พักวัด" : "พักริมทาง";
+        const restLabel = kind === "home" ? "นอนพักที่บ้าน" : kind === "sect" ? "นอนพักที่สำนัก" : kind === "inn" ? "พักโรงเตี๊ยม" : kind === "temple" ? "พักวัด" : "พักริมทาง";
         appendActionLog(
           draft,
           "rest",
