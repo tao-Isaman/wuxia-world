@@ -346,14 +346,14 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
   {
     id: "qe_chuangwang_steal_relic",
     name: "ขโมยพระธาตุโบราณ",
-    description: "พระนอกรีตฮุยเป้าเห็นในนิมิตว่าพระธาตุของวัดตาหลุน (วิหารล้อลม) คือกุญแจของพิธีกรรมมาร พระกงซินเป็นผู้เก็บรักษามันไว้",
-    briefSummary: "ขโมยพระธาตุจากพระกงซินที่วิหารล้อลม",
+    description: "พระนอกรีตฮุยเป้าเห็นในนิมิตว่าพระธาตุของวัดต้าหลุน (วัดต้าหลุน) คือกุญแจของพิธีกรรมมาร พระกงซินเป็นผู้เก็บรักษามันไว้",
+    briefSummary: "ขโมยพระธาตุจากพระกงซินที่วัดต้าหลุน",
     type: "side",
     giverNpcId: "evil_chuangwang_heretic_huibao",
     stages: [
       {
         id: "infiltrate",
-        description: "แอบเข้าวิหารล้อลม แล้วขโมยพระธาตุจากพระกงซิน",
+        description: "แอบเข้าวัดต้าหลุน แล้วขโมยพระธาตุจากพระกงซิน",
         autoAdvance: { t: "stoleFromNpc", npcId: "temple_dalun_monk_kongxin", count: 1 },
       },
       {

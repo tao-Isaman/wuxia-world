@@ -257,7 +257,7 @@ export const SCENES__OTHER: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qst_dalun_pilgrim_offer",
     lines: [
-      { t: "dialogue", speaker: "กงซิน", text: "วิหารล้อลมของเรากับวิหารหลวงจีนสวรรค์มีพิธีกรรมร่วมกันมาหลายร้อยปี" },
+      { t: "dialogue", speaker: "กงซิน", text: "วัดต้าหลุนของเรากับวิหารหลวงจีนสวรรค์มีพิธีกรรมร่วมกันมาหลายร้อยปี" },
       { t: "dialogue", speaker: "กงซิน", text: "เจ้าช่วยไปสวดมนต์ที่วิหารหลวงจีนสวรรค์แทนอาตมา แล้วกลับมาเล่าให้ฟังได้ไหม?" },
     ],
     choices: [

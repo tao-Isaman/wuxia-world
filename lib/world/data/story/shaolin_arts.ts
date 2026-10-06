@@ -1087,7 +1087,7 @@ const DIAMOND: StoryArcSpec = {
         go: "ไปสระมังกรดำ",
       },
       steps: [
-        { t: "talk", npcId: "wld_heilong_fisherman_tan", locationId: "pool_heilong", label: "ถามต่านเหลาตูเรื่องชายใส่แหวนหยก", hint: "ไปมังกรดำสระน้ำ ถามชาวประมงต่านเหลาตูว่าเห็นคหบดีเซ่งไหม",
+        { t: "talk", npcId: "wld_heilong_fisherman_tan", locationId: "pool_heilong", label: "ถามต่านเหลาตูเรื่องชายใส่แหวนหยก", hint: "ไปสระมังกรดำ ถามชาวประมงต่านเหลาตูว่าเห็นคหบดีเซ่งไหม",
           scene: {
             lines: [
               ["ต่านเหลาตู (ชาวประมงแก่)", "ชายใส่แหวนหยกหรือ วิ่งผ่านมาเมื่อเช้า ถามข้าว่าตรงไหนลึกที่สุด ข้าบอกว่าตรงที่เจ้ายืนแหละ ลึกที่สุดแล้ว — ในใจคน"],
@@ -1097,7 +1097,7 @@ const DIAMOND: StoryArcSpec = {
             ],
             go: "ไปที่โขดหินปลายสระ",
           } },
-        { t: "duel", locationId: "pool_heilong", label: "เผชิญคหบดีเซ่งที่โขดหินปลายสระ", hint: "เอาชนะคหบดีเซ่งที่มังกรดำสระน้ำ", opponentId: "st_shaolinarts_patron_seng",
+        { t: "duel", locationId: "pool_heilong", label: "เผชิญคหบดีเซ่งที่โขดหินปลายสระ", hint: "เอาชนะคหบดีเซ่งที่สระมังกรดำ", opponentId: "st_shaolinarts_patron_seng",
           before: {
             cutscene: {
               stage: "pool_heilong", mood: "dusk",

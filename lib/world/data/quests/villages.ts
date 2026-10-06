@@ -482,20 +482,20 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
   {
     id: "qv_inn_lost_satchel",
     name: "กระเป๋าที่ลืมไว้",
-    description: "แขกของโรงเตี๊ยมยั่วไหลลืมกระเป๋าเอกสารไว้พร้อมกุญแจ นางสาวซิ่วฝากให้นำไปส่งเขาที่โรงเตี๊ยมเก้าอี้สูง ที่เขากำลังมุ่งหน้าไป",
-    briefSummary: "นำกระเป๋ากับกุญแจไปส่งแขกที่โรงเตี๊ยมเก้าอี้สูง",
+    description: "แขกของโรงเตี๊ยมยั่วไหลลืมกระเป๋าเอกสารไว้พร้อมกุญแจ นางสาวซิ่วฝากให้นำไปส่งเขาที่โรงเตี๊ยมเกาเซิ่ง ที่เขากำลังมุ่งหน้าไป",
+    briefSummary: "นำกระเป๋ากับกุญแจไปส่งแขกที่โรงเตี๊ยมเกาเซิ่ง",
     type: "side",
     giverNpcId: "inn_yuelai_server_xiu",
     turnInNpcId: "inn_gaosheng_keeper_fat",
     stages: [
       {
         id: "travel_to_gaosheng",
-        description: "เดินทางพร้อมกระเป๋าไปโรงเตี๊ยมเก้าอี้สูง",
+        description: "เดินทางพร้อมกระเป๋าไปโรงเตี๊ยมเกาเซิ่ง",
         autoAdvance: { t: "visitedLocation", locationId: "inn_gaosheng" },
       },
       {
         id: "deliver_satchel",
-        description: "ถามเฉาอ้วนเจ้าของโรงเตี๊ยมเก้าอี้สูงหาแขกคนนั้น แล้วส่งกระเป๋าคืน",
+        description: "ถามเฉาอ้วนเจ้าของโรงเตี๊ยมเกาเซิ่งหาแขกคนนั้น แล้วส่งกระเป๋าคืน",
       },
     ],
     rewards: [
@@ -564,7 +564,7 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
   {
     id: "qv_inn_special_ingredient",
     name: "วัตถุดิบพิเศษ",
-    description: "เฉาอ้วน เจ้าของโรงเตี๊ยมเก้าอี้สูง ต้องการปลาไหลสด 3 ตัวทำเมนูให้ลูกค้าสำคัญ แต่ตลาดหาไม่ได้",
+    description: "เฉาอ้วน เจ้าของโรงเตี๊ยมเกาเซิ่ง ต้องการปลาไหลสด 3 ตัวทำเมนูให้ลูกค้าสำคัญ แต่ตลาดหาไม่ได้",
     briefSummary: "หาปลาไหล 3 ตัวให้เฉาอ้วน",
     type: "side",
     giverNpcId: "inn_gaosheng_keeper_fat",
@@ -576,7 +576,7 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
       },
       {
         id: "deliver_eels",
-        description: "นำปลาไหลไปให้เฉาอ้วนที่โรงเตี๊ยมเก้าอี้สูง",
+        description: "นำปลาไหลไปให้เฉาอ้วนที่โรงเตี๊ยมเกาเซิ่ง",
       },
     ],
     rewards: [
@@ -602,7 +602,7 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
       },
       {
         id: "report_back",
-        description: "กลับไปเล่าให้เฉาอ้วนที่โรงเตี๊ยมเก้าอี้สูงฟัง",
+        description: "กลับไปเล่าให้เฉาอ้วนที่โรงเตี๊ยมเกาเซิ่งฟัง",
       },
     ],
     rewards: [
@@ -615,14 +615,14 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
   {
     id: "qv_inn_drunk_warrior",
     name: "นักรบที่เศร้าโศก",
-    description: "นักรบที่สำนักล่มสลายนั่งดื่มเหล้าอยู่ในโรงเตี๊ยมเก้าอี้สูงมาหลายชั่วยาม เฉาอ้วนเป็นห่วงและขอให้ไปคุยกับเขา",
+    description: "นักรบที่สำนักล่มสลายนั่งดื่มเหล้าอยู่ในโรงเตี๊ยมเกาเซิ่งมาหลายชั่วยาม เฉาอ้วนเป็นห่วงและขอให้ไปคุยกับเขา",
     briefSummary: "คุยกับนักรบที่กำลังเศร้าโศกและช่วยเขาหาความหมาย",
     type: "side",
     giverNpcId: "inn_gaosheng_keeper_fat",
     stages: [
       {
         id: "talk_warrior",
-        description: "ไปนั่งคุยกับนักรบผู้เศร้าโศกในโรงเตี๊ยมเก้าอี้สูง",
+        description: "ไปนั่งคุยกับนักรบผู้เศร้าโศกในโรงเตี๊ยมเกาเซิ่ง",
         objective: {
           spots: [
             { locationId: "inn_gaosheng", label: "คุยกับนักรบผู้เศร้าโศก", sceneId: "qs_qv_inn_drunk_warrior_talk" },
@@ -662,7 +662,7 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
       },
       {
         id: "report_findings",
-        description: "กลับไปเล่าให้โปผู้เล่าเรื่องที่โรงเตี๊ยมห้วอลั่วฟัง",
+        description: "กลับไปเล่าให้โปผู้เล่าเรื่องที่โรงเตี๊ยมเฮ่อลั่วฟัง",
       },
     ],
     rewards: [
@@ -678,13 +678,13 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
     id: "qv_inn_missing_traveler",
     name: "ผู้เดินทางที่หายไป",
     description: "ผู้หญิงคนหนึ่งพักที่โรงเตี๊ยมแล้วหายตัวไปอย่างลึกลับ โปผู้เล่าเรื่องเป็นห่วงมาก",
-    briefSummary: "สืบหาผู้หญิงที่หายตัวจากโรงเตี๊ยมห้วอลั่ว",
+    briefSummary: "สืบหาผู้หญิงที่หายตัวจากโรงเตี๊ยมเฮ่อลั่ว",
     type: "side",
     giverNpcId: "inn_heluo_storyteller_po",
     stages: [
       {
         id: "search_area",
-        description: "สืบร่องรอยของผู้หญิงที่หายไปจากโรงเตี๊ยมห้วอลั่ว",
+        description: "สืบร่องรอยของผู้หญิงที่หายไปจากโรงเตี๊ยมเฮ่อลั่ว",
         objective: {
           spots: [
             { locationId: "inn_heluo", label: "สืบร่องรอยหญิงที่หายไป", sceneId: "qs_qv_inn_missing_traveler_found" },

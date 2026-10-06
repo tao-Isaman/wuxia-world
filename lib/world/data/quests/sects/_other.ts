@@ -118,15 +118,15 @@ export const QUESTS__OTHER: readonly QuestDef[] = [
 
   {
     id: "qst_dalun_stolen_relic",
-    name: "พระธาตุวิหารล้อลม",
-    description: "พระธาตุโบราณแห่งวิหารล้อลมหายไปในคืนพายุ พระกงซินสงสัยว่ามีคนในวัดเกี่ยวข้อง",
-    briefSummary: "สืบหาพระธาตุที่หายจากวิหารล้อลม",
+    name: "พระธาตุวัดต้าหลุน",
+    description: "พระธาตุโบราณแห่งวัดต้าหลุนหายไปในคืนพายุ พระกงซินสงสัยว่ามีคนในวัดเกี่ยวข้อง",
+    briefSummary: "สืบหาพระธาตุที่หายจากวัดต้าหลุน",
     type: "side",
     giverNpcId: "temple_dalun_monk_kongxin",
     stages: [
       {
         id: "search_temple",
-        description: "ค้นหาร่องรอยในวิหารล้อลม",
+        description: "ค้นหาร่องรอยในวัดต้าหลุน",
         autoAdvance: { t: "visitedLocation", locationId: "temple_dalun" },
       },
       {

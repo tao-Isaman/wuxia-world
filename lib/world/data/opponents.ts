@@ -1656,9 +1656,9 @@ export const OPPONENTS: readonly OpponentDef[] = [
       skillIds: ["mi_firepalm"],
     }) },
 
-  { id: "spar_sunmoon_xiaoyu", name: "ศิษย์เสี่ยวอวี้", ti: 1, category: "human",
+  { id: "spar_sunmoon_xiaoyu", name: "ศิษย์เสี่ยวเยว่", ti: 1, category: "human",
     drops: [...DROPS_T1],
-    build: () => build("ศิษย์เสี่ยวอวี้", 1, {
+    build: () => build("ศิษย์เสี่ยวเยว่", 1, {
       stats: { POW: 5, INT: 4 },
       artId: "t0_sm_dual", artLevel: 4,
       skillIds: ["mi_firepalm"],

@@ -67,8 +67,8 @@ export const SHOPS: readonly ShopDef[] = ([
   // Inn shops — food + basics only, accept food/herb/material at 40 %.
   { id: "shop_inn_yuelai",   locationId: "inn_yuelai",   label: "🍵 ของกินที่ยั่วไหล",   inventory: INN_SHOP, sellMultiplier: 0.4, acceptsCategories: ["food", "herb", "material"] },
   { id: "shop_inn_youjian",  locationId: "inn_youjian",  label: "🍵 ของกินที่มีหว่าง",   inventory: INN_SHOP, sellMultiplier: 0.4, acceptsCategories: ["food", "herb", "material"] },
-  { id: "shop_inn_gaosheng", locationId: "inn_gaosheng", label: "🍵 ของกินที่เก้าอี้สูง", inventory: INN_SHOP, sellMultiplier: 0.4, acceptsCategories: ["food", "herb", "material"] },
-  { id: "shop_inn_heluo",    locationId: "inn_heluo",    label: "🍵 ของกินที่ห้วอลั่ว",   inventory: INN_SHOP, sellMultiplier: 0.4, acceptsCategories: ["food", "herb", "material"] },
+  { id: "shop_inn_gaosheng", locationId: "inn_gaosheng", label: "🍵 ของกินที่เกาเซิ่ง", inventory: INN_SHOP, sellMultiplier: 0.4, acceptsCategories: ["food", "herb", "material"] },
+  { id: "shop_inn_heluo",    locationId: "inn_heluo",    label: "🍵 ของกินที่เฮ่อลั่ว",   inventory: INN_SHOP, sellMultiplier: 0.4, acceptsCategories: ["food", "herb", "material"] },
 
   // Village shops — tiny inventory, accept basics at 35 %.
   { id: "shop_village",         locationId: "village",         label: "🏪 ร้านในหมู่บ้าน", inventory: VILLAGE_SHOP, sellMultiplier: 0.35, acceptsCategories: ["food", "herb", "material"] },

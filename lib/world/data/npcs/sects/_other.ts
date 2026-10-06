@@ -8,7 +8,7 @@ export const NPCS__OTHER: readonly NpcDef[] = [
   {
     id: "villa_yaowang_doctor_shennong",
     name: "หมอเสินหนง",
-    description: "หมอผีมือสูงแห่งวิลล่ายาวัง ผู้รู้สรรพวิชาสมุนไพรและยาพิษ เงียบขรึมแต่เมตตา",
+    description: "หมอผีมือสูงแห่งคุ้มสมุนไพร ผู้รู้สรรพวิชาสมุนไพรและยาพิษ เงียบขรึมแต่เมตตา",
     locationIds: ["villa_yaowang"],
     dialogSceneId: "npc_villa_yaowang_doctor_shennong_talk",
     questIds: [
@@ -31,7 +31,7 @@ export const NPCS__OTHER: readonly NpcDef[] = [
   {
     id: "temple_dalun_monk_kongxin",
     name: "พระกงซิน",
-    description: "พระผู้รักษาพระธาตุโบราณแห่งวัดตาหลุน สงบนิ่งอยู่เสมอ แต่มีเรื่องหนักใจซ่อนอยู่",
+    description: "พระผู้รักษาพระธาตุโบราณแห่งวัดต้าหลุน สงบนิ่งอยู่เสมอ แต่มีเรื่องหนักใจซ่อนอยู่",
     locationIds: ["temple_dalun"],
     dialogSceneId: "npc_temple_dalun_monk_kongxin_talk",
     questIds: [
@@ -52,7 +52,7 @@ export const NPCS__OTHER: readonly NpcDef[] = [
   {
     id: "villa_yanzi_lord_yanfeng",
     name: "เจ้าบ้านเหยินเฟิง",
-    description: "เจ้าของคฤหาสน์เหยินซี ตระกูลขุนนางเก่า ใจโอบอ้อมอารีแต่มีศัตรูมาก ชอบผู้มีฝีมือ",
+    description: "เจ้าของคุ้มนกนางแอ่น ตระกูลขุนนางเก่า ใจโอบอ้อมอารีแต่มีศัตรูมาก ชอบผู้มีฝีมือ",
     locationIds: ["villa_yanzi"],
     dialogSceneId: "npc_villa_yanzi_lord_yanfeng_talk",
     questIds: [

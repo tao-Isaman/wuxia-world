@@ -123,7 +123,7 @@ export const NPCS_MING: readonly NpcDef[] = [
 
   {
     id: "sect_sunmoon_junior_xiaoyu",
-    name: "ศิษย์เสี่ยวอวี้",
+    name: "ศิษย์เสี่ยวเยว่",
     description: "ศิษย์รุ่นเยาว์ · เพิ่งเริ่มฝึกพลังสองขั้ว · สดใสและกระตือรือร้น",
     locationIds: ["sect_ming"],
     sparOpponentId: "spar_sunmoon_xiaoyu",

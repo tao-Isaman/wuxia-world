@@ -46,7 +46,6 @@ export const QUESTS_SPIES: readonly QuestDef[] = [
       { t: "wExp", amount: 100 },
       { t: "trait", trait: "good", amount: 3 },
       { t: "npcRelationship", npcId: "spy_capital_feng", amount: 12 },
-      { t: "gold", amount: 400 },
     ],
   },
 
@@ -79,7 +78,6 @@ export const QUESTS_SPIES: readonly QuestDef[] = [
       { t: "wExp", amount: 150 },
       { t: "trait", trait: "good", amount: 5 },
       { t: "npcRelationship", npcId: "spy_capital_feng", amount: 16 },
-      { t: "gold", amount: 400 },
     ],
   },
 
@@ -171,7 +169,6 @@ export const QUESTS_SPIES: readonly QuestDef[] = [
       { t: "wExp", amount: 110 },
       { t: "trait", trait: "good", amount: 3 },
       { t: "npcRelationship", npcId: "spy_dali_mei", amount: 12 },
-      { t: "gold", amount: 400 },
     ],
   },
 
@@ -199,7 +196,6 @@ export const QUESTS_SPIES: readonly QuestDef[] = [
       { t: "wExp", amount: 140 },
       { t: "trait", trait: "good", amount: 4 },
       { t: "npcRelationship", npcId: "spy_dali_mei", amount: 14 },
-      { t: "gold", amount: 400 },
     ],
   },
 
@@ -229,7 +225,6 @@ export const QUESTS_SPIES: readonly QuestDef[] = [
       { t: "gold", amount: 250 },
       { t: "wExp", amount: 80 },
       { t: "npcRelationship", npcId: "spy_inn_zhou", amount: 9 },
-      { t: "gold", amount: 400 },
     ],
   },
 
@@ -257,7 +252,6 @@ export const QUESTS_SPIES: readonly QuestDef[] = [
       { t: "wExp", amount: 130 },
       { t: "trait", trait: "good", amount: 3 },
       { t: "npcRelationship", npcId: "spy_inn_zhou", amount: 13 },
-      { t: "gold", amount: 400 },
     ],
   },
 
@@ -287,7 +281,6 @@ export const QUESTS_SPIES: readonly QuestDef[] = [
       { t: "gold", amount: 280 },
       { t: "wExp", amount: 80 },
       { t: "npcRelationship", npcId: "spy_village_si", amount: 9 },
-      { t: "gold", amount: 400 },
     ],
   },
 

@@ -203,19 +203,19 @@ export const QUESTS_WUDANG: readonly QuestDef[] = [
   {
     id: "qst_wudang_mountain_seal",
     name: "ตราประทับภูเขา",
-    description: "อาจารย์ชิงซวี่ขอให้เดินทางไปวิหารล้อลม รับตราประทับศักดิ์สิทธิ์จากพระกงซิน แล้วนำกลับมา เพื่อต่ออายุพันธสัญญาโบราณระหว่างอู่ตังกับวิหาร",
-    briefSummary: "ไปรับตราประทับจากพระกงซินที่วิหารล้อลม มาให้อาจารย์ชิงซวี่",
+    description: "อาจารย์ชิงซวี่ขอให้เดินทางไปวัดต้าหลุน รับตราประทับศักดิ์สิทธิ์จากพระกงซิน แล้วนำกลับมา เพื่อต่ออายุพันธสัญญาโบราณระหว่างอู่ตังกับวิหาร",
+    briefSummary: "ไปรับตราประทับจากพระกงซินที่วัดต้าหลุน มาให้อาจารย์ชิงซวี่",
     type: "side",
     giverNpcId: "sect_wudang_master_qingxu",
     stages: [
       {
         id: "visit_temple",
-        description: "เดินทางไปวิหารล้อลม",
+        description: "เดินทางไปวัดต้าหลุน",
         autoAdvance: { t: "visitedLocation", locationId: "temple_dalun" },
       },
       {
         id: "get_seal",
-        description: "รับตราประทับจากพระกงซินที่วิหารล้อลม",
+        description: "รับตราประทับจากพระกงซินที่วัดต้าหลุน",
         objective: {
           spots: [
             { locationId: "temple_dalun", label: "รับตราประทับจากพระกงซิน", npcId: "temple_dalun_monk_kongxin", text: "พระกงซินมอบตราประทับศักดิ์สิทธิ์ให้ห่อผ้าไหมอย่างดี" },

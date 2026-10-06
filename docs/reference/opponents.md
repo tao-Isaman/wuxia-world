@@ -57,7 +57,7 @@ Per tier: T0: 9 · T1: 44 · T2: 74 · T3: 55 · T4: 208. Per category: ฝ่�
 | `spar_xiaoyao_xiaolan` | ศิษย์เสี่ยวหลาน | human | — | 5 | spar |
 | `spar_spy_zhou` | โจวพ่อค้าเหล้า | human | — | 5 | spar |
 | `spar_spy_si` | ซื่อชาวนา | human | — | 5 | spar |
-| `spar_sunmoon_xiaoyu` | ศิษย์เสี่ยวอวี้ | human | — | 5 | spar |
+| `spar_sunmoon_xiaoyu` | ศิษย์เสี่ยวเยว่ | human | — | 5 | spar |
 | `spar_tang_tangxiu` | ศิษย์ถังซิ่ว | human | — | 5 | spar |
 | `law_constable` | เจ้าหน้าที่รัฐ | human | — | 5 | law |
 | `vampire_bat` | ค้างคาวดูดเลือด | beast | 2× ค้างคาวดูดเลือด | 5 | roams (frontier, isle, wild) |
@@ -66,7 +66,7 @@ Per tier: T0: 9 · T1: 44 · T2: 74 · T3: 55 · T4: 208. Per category: ฝ่�
 | `spar_village_noname_carter_lu` | ลู่เกวียน | human | — | 5 | spar |
 | `spar_village_huashan_dreamer_yang` | หยางซื่อ | human | — | 5 | spar |
 | `spar_palace_royal_zhao` | จ้าวเทีย | human | — | 5 | spar, scene ×1 |
-| `spar_tribe_huizu_ma` | หม่าต้าหลี่ | human | — | 5 | spar, scene ×2 |
+| `spar_tribe_huizu_ma` | หม่าต้าหู่ | human | — | 5 | spar, scene ×2 |
 | `spar_home_hufei_yuan` | จิ่งจื่ออิง | human | — | 5 | spar |
 | `spar_home_chengkun_chen` | เฉินเหวินฮ่าว | human | — | 5 | spar |
 | `spar_chengying_lu` | เหอชิงหลาน | human | — | 5 | spar |

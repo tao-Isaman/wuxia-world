@@ -229,7 +229,7 @@ export const SCENES_WUDANG: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qst_wudang_mountain_seal_offer",
     lines: [
-      { t: "dialogue", speaker: "ชิงซวี่", text: "วิหารล้อลมกับอู่ตังมีพันธสัญญาโบราณ ต่ออายุทุกรอบสิบปี" },
+      { t: "dialogue", speaker: "ชิงซวี่", text: "วัดต้าหลุนกับอู่ตังมีพันธสัญญาโบราณ ต่ออายุทุกรอบสิบปี" },
       { t: "dialogue", speaker: "ชิงซวี่", text: "รอบนี้ถึงเวลาแล้ว แต่ข้าติดธุระ เจ้าช่วยไปรับตราประทับจากพระกงซินที่วิหารมาให้ได้ไหม?" },
     ],
     choices: [

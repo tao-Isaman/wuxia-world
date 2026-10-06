@@ -626,7 +626,7 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
   {
     id: "qw_heilong_dragon_pearl",
     name: "ความลับก้นสระมังกรดำ",
-    description: "ต่านเหลาตู ชาวประมงแก่ที่มังกรดำสระน้ำ ได้ยินข่าวลือว่าก้นสระมีมังกรกับไข่มุกวิเศษ เขาขอให้เจ้าดำลงไปดูว่าข้างล่างมีอะไรจริง ๆ",
+    description: "ต่านเหลาตู ชาวประมงแก่ที่สระมังกรดำ ได้ยินข่าวลือว่าก้นสระมีมังกรกับไข่มุกวิเศษ เขาขอให้เจ้าดำลงไปดูว่าข้างล่างมีอะไรจริง ๆ",
     briefSummary: "สำรวจก้นสระมังกรดำ",
     type: "side",
     giverNpcId: "wld_heilong_fisherman_tan",
@@ -660,7 +660,7 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
     stages: [
       {
         id: "search",
-        description: "ค้นหาชาวประมงรอบมังกรดำสระน้ำ",
+        description: "ค้นหาชาวประมงรอบสระมังกรดำ",
         objective: {
           spots: [
             { locationId: "pool_heilong", label: "ค้นหารอบสระมังกรดำ", text: "พบเรือของชาวประมงผูกอยู่กับเรือโจรสลัดในดงกก" },
@@ -686,7 +686,7 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
   {
     id: "qw_heilong_depths_secret",
     name: "แสงแดงจากก้นสระ",
-    description: "ชาวบ้านเห็นแสงสีแดงโผล่จากมังกรดำสระน้ำทุกคืนเพ็ญ ต่านเหลาตูขอให้ดำลงไปดูต้นตอ แล้วนำตัวอย่างกลับมาให้เขาดู",
+    description: "ชาวบ้านเห็นแสงสีแดงโผล่จากสระมังกรดำทุกคืนเพ็ญ ต่านเหลาตูขอให้ดำลงไปดูต้นตอ แล้วนำตัวอย่างกลับมาให้เขาดู",
     briefSummary: "สืบสวนแสงลึกลับจากก้นสระมังกรดำ",
     type: "side",
     giverNpcId: "wld_heilong_fisherman_tan",
@@ -694,7 +694,7 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
     stages: [
       {
         id: "wait_fullmoon",
-        description: "รอคืนเพ็ญที่มังกรดำสระน้ำ แล้วดำลงไปตามแสง",
+        description: "รอคืนเพ็ญที่สระมังกรดำ แล้วดำลงไปตามแสง",
         objective: {
           hours: 4,
           spots: [

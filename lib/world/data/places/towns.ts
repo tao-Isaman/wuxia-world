@@ -3,7 +3,7 @@
 // meetings, plus the ยุทธจักร skills / arts these places pass on:
 //   city_lingxiao — t0_fiveyuan (ลุงไป๋), nd10 (หูเตาถ่าน), ne7 (เฝิงหานเหมย), nf8 (ซือหม่าเหยียน)
 //   palace_royal  — nc5 (จ้าวเทีย), t2_plumblossom (ชุ่ยเอ๋อ), t3_voidstep (ขันทีเกา)
-//   tribe_huizu   — t1_blackiron (ช่างไห่), nd7 (หม่าต้าหลี่), ne11 (นาซีร์)
+//   tribe_huizu   — t1_blackiron (ช่างไห่), nd7 (หม่าต้าหู่), ne11 (นาซีร์)
 import type { DialogScene, NpcDef, QuestDef, SceneLine } from "../../types";
 import type { ActivityDef } from "../activities";
 import type { StoryOpponentSpec } from "../../story/types";
@@ -27,7 +27,7 @@ const ZHAO = "จ้าวเทีย";
 const CUI = "ชุ่ยเอ๋อ";
 const QIAN = "ขุนนางเฉียน";
 const HAI = "ช่างไห่";
-const MA = "หม่าต้าหลี่";
+const MA = "หม่าต้าหู่";
 const NASIR = "นาซีร์";
 const AISHA = "อาอีซา";
 
@@ -417,14 +417,14 @@ const QUESTS: QuestDef[] = [
   {
     id: "qc_tribe_huizu_tiger_palm", type: "side",
     name: "วิชาลึกลับหน้ากระโจม",
-    description: "นักรบทะเลทรายมาข่มขู่เก็บค่าผ่านทางจากเผ่า หม่าต้าหลี่อยากรู้ว่าเจ้าแข็งพอจะรับวิชาลึกลับหรือเปล่า",
-    briefSummary: "ปราบนักรบทะเลทราย 3 คนแล้วกลับไปหาหม่าต้าหลี่",
+    description: "นักรบทะเลทรายมาข่มขู่เก็บค่าผ่านทางจากเผ่า หม่าต้าหู่อยากรู้ว่าเจ้าแข็งพอจะรับวิชาลึกลับหรือเปล่า",
+    briefSummary: "ปราบนักรบทะเลทราย 3 คนแล้วกลับไปหาหม่าต้าหู่",
     giverNpcId: "tribe_huizu_wrestler_ma",
     prereqs: { t: "statAtLeast", stat: "STR", min: 10 },
     stages: [
       { id: "raiders", description: "ปราบนักรบทะเลทราย 3 คนที่ข่มขู่ชนเผ่าหุยซู",
         autoAdvance: { t: "defeatedOpponent", opponentId: "desert_marauder", count: 3 } },
-      { id: "return", description: "กลับไปหาหม่าต้าหลี่หน้ากระโจม" },
+      { id: "return", description: "กลับไปหาหม่าต้าหู่หน้ากระโจม" },
     ],
     rewards: [
       { t: "gold", amount: 200 },
@@ -661,7 +661,7 @@ const TALK_SCENES: DialogScene[] = [
     say(HAI, "ถ้าเจ้ามีแร่และมีลมหายใจยาวพอ มาช่วยข้าที่เตาเถิด"),
   ], choices: [back(HZ, "ข้าจะหาแร่มาให้")] },
 
-  // หม่าต้าหลี่
+  // หม่าต้าหู่
   { kind: "dialog", id: "npc_tribe_huizu_wrestler_ma_talk", lines: [
     say(MA, "เฮ้! เจ้าคนแปลกหน้า! แขนเจ้าดูพอใช้ได้ มาปล้ำกับข้าสักยกไหม"),
     say(MA, "แพ้ข้าไม่ต้องอาย ทั้งเผ่ายังไม่มีใครชนะข้าได้นอกจากแม่ข้า"),
@@ -702,7 +702,7 @@ const TALK_SCENES: DialogScene[] = [
     back(HZ),
   ] },
   { kind: "dialog", id: "npc_tribe_huizu_herder_aisha_names", lines: [
-    say(AISHA, "ตัวนั้นชื่อหิมะ ตัวนั้นชื่อเมฆ ตัวนั้นชื่อหม่าต้าหลี่เพราะมันชอบชนคน"),
+    say(AISHA, "ตัวนั้นชื่อหิมะ ตัวนั้นชื่อเมฆ ตัวนั้นชื่อหม่าต้าหู่เพราะมันชอบชนคน"),
     say(AISHA, "อย่าบอกพี่หม่านะ เขาจะงอน"),
   ], choices: [{ text: "ไม่บอกแน่นอน", effects: [{ t: "addNpcRelationship", npcId: "tribe_huizu_herder_aisha", amount: 2 }], next: HZ }] },
 ];
@@ -983,7 +983,7 @@ const QUEST_SCENES: DialogScene[] = [
   { kind: "dialog", id: "qs_qc_tribe_huizu_tiger_palm_complete", lines: [
     say(MA, "สามคน! เจ้าจัดการได้หมดจริง ๆ! แม่บ้านทั้งเผ่าจะทำแป้งทอดเลี้ยงเจ้าแน่"),
     say(MA, "มา ฝ่ามือเสือ ย่อตัวเหมือนเสือหมอบ ส่งแรงจากเท้าผ่านเอวไปที่ฝ่ามือ แล้วตบ!"),
-    nar("หม่าต้าหลี่ตบกระสอบทรายจนขาดกลาง ทรายพุ่งกระจายเต็มลาน อาอีซาวิ่งมาบ่นว่าแกะตกใจ"),
+    nar("หม่าต้าหู่ตบกระสอบทรายจนขาดกลาง ทรายพุ่งกระจายเต็มลาน อาอีซาวิ่งมาบ่นว่าแกะตกใจ"),
     say(MA, "ขอโทษอาอีซา! นั่นแหละ ฝึกจนตบกระสอบขาดได้ แล้วเจ้าจะไม่กลัวใครในทะเลทราย"),
   ], choices: [
     { text: "ขอบใจท่านหม่า", effects: [{ t: "finishQuest", questId: "qc_tribe_huizu_tiger_palm", success: true }], next: HZ },
@@ -1051,7 +1051,7 @@ const ACTIVITIES: ActivityDef[] = [
   { id: "act_tribe_huizu_wrestle", label: "ปล้ำมวยหน้ากระโจม", badge: "practice", icon: "🤼", hours: 2, stamina: 15,
     description: "มวยปล้ำแบบชนเผ่ากับหนุ่ม ๆ ในเผ่า · ฝึกพละกำลัง",
     place: { locationIds: [HZ], cooldownDays: 1, reward: { statXp: "STR", wExp: 10, relationship: { npcId: "tribe_huizu_wrestler_ma", amount: 1 } },
-      doneText: "เจ้าทุ่มหนุ่มในเผ่าล้มไปสองคน หม่าต้าหลี่ตะโกนเชียร์ลั่นลาน" } },
+      doneText: "เจ้าทุ่มหนุ่มในเผ่าล้มไปสองคน หม่าต้าหู่ตะโกนเชียร์ลั่นลาน" } },
   { id: "act_tribe_huizu_milk_tea", label: "จิบชานมในกระโจม", badge: "rest", icon: "🍵", hours: 1, stamina: 0,
     description: "ชานมเกลือร้อน ๆ กับแป้งทอด 5 ตำลึง · ฟื้นแรงและบาดแผล",
     place: { locationIds: [HZ], cooldownDays: 1, costGold: 5, reward: { stamina: 25, heal: 0.2 },

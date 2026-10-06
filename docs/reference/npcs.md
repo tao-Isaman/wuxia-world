@@ -128,7 +128,7 @@
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
 | `tribe_huizu_smith_hai` | ช่างไห่ | 💬 🤏 | 2 |
-| `tribe_huizu_wrestler_ma` | หม่าต้าหลี่ | 💬 ⚔ | 2 |
+| `tribe_huizu_wrestler_ma` | หม่าต้าหู่ | 💬 ⚔ | 2 |
 | `tribe_huizu_caravan_nasir` | นาซีร์ | 💬 ⚔ 🤏 | 3 |
 | `tribe_huizu_herder_aisha` | อาอีซา | 💬 | 1 |
 
@@ -282,7 +282,7 @@
 | `sect_sunmoon_balance_elder_qudongfeng` | ผู้อาวุโสสมดุลฉวี่ตงเฟิง | ⚔ 🤏 | 3 |
 | `sect_sunmoon_head_disciple_yilin` | หัวหน้าศิษย์เยี่ยนชิว | ⚔ 🤏 | 2 |
 | `sect_sunmoon_disciple_lanfenghuang` | ศิษย์ไต้ซิ่วเหอ | ⚔ | 2 |
-| `sect_sunmoon_junior_xiaoyu` | ศิษย์เสี่ยวอวี้ | ⚔ | 1 |
+| `sect_sunmoon_junior_xiaoyu` | ศิษย์เสี่ยวเยว่ | ⚔ | 1 |
 | `sect_ming_elder_zhuying` | ผู้อาวุโสจูอิง | 💬 🤏 | 9 |
 | `sect_ming_envoy_huozhi` | ผู้แทนหั่วจี้ | 💬 ⚔ | 8 |
 
@@ -348,7 +348,7 @@
 
 ## Temples and palaces
 
-### วิหารล้อลม (`temple_dalun`)
+### วัดต้าหลุน (`temple_dalun`)
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
@@ -418,13 +418,13 @@
 | `inn_youjian_cook_bao` | ปาวซาลาเปา | 💬 | 1 |
 | `inn_youjian_diviner_gua` | ซินแสกว้า | 💬 🤏 | 3 |
 
-### โรงเตี๊ยมเก้าอี้สูง (`inn_gaosheng`)
+### โรงเตี๊ยมเกาเซิ่ง (`inn_gaosheng`)
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
 | `inn_gaosheng_keeper_fat` | เฉาอ้วน | 💬 🤏 | 10 |
 
-### โรงเตี๊ยมห้วอลั่ว (`inn_heluo`)
+### โรงเตี๊ยมเฮ่อลั่ว (`inn_heluo`)
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
@@ -470,7 +470,7 @@
 | --- | --- | --- | --- |
 | `home_nanxian_sage_nanxian` | ท่านหนานเสียน | 💬 ⚔ 🤏 | 2 |
 | `home_nanxian_servant_ashu` | อาซู | 💬 | — |
-| `home_nanxian_woodcutter_bai` | ลุงไป๋ | 💬 | 1 |
+| `home_nanxian_woodcutter_bai` | ลุงฉาย | 💬 | 1 |
 
 ### บ้านอู๋เฉิน (`home_yideng`)
 
@@ -595,7 +595,7 @@
 | --- | --- | --- | --- |
 | `evil_shenlong_cult_leader_zhao` | เจ้าลัทธิจ้าวมังกรเทพ | 💬 🤏 | 6 |
 
-### มังกรดำสระน้ำ (`pool_heilong`)
+### สระมังกรดำ (`pool_heilong`)
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
