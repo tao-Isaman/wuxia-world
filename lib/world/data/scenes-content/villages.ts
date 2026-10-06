@@ -751,6 +751,7 @@ export const SCENES_VILLAGES: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qv_wuxia_missing_boat_complete",
     lines: [
+      { t: "narration", text: "เจ้าพบน้อยเติ้งที่เกาะไร้ชื่อ เรือเกยตื้น เด็กหิวโซแต่ปลอดภัย จึงพากลับมาที่หมู่บ้าน" },
       { t: "narration", text: "เติ้งลองหางวิ่งออกมาต้อนรับลูกชายด้วยน้ำตา" },
       { t: "dialogue", speaker: "เติ้งลองหาง", text: "ขอบคุณ! ขอบคุณมาก เจ้าช่วยชีวิตลูกข้า" },
       { t: "dialogue", speaker: "เติ้งลองหาง", text: "ปลาและเงินนี้น้อยไปมาก แต่รับไปเถิด" },
