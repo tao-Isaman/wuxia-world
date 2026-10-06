@@ -25,8 +25,10 @@ export function mergeSave(persisted: unknown, current: WorldStore): WorldStore {
   return merged;
 }
 
-// Only persist the data fields, not the action functions.
-export const partializeSave = (s: WorldStore) => ({
+// Only persist the data fields, not the action functions. Typed as
+// WorldStateData, so a field added there and forgotten here (or a stray one)
+// is a type error.
+export const partializeSave = (s: WorldStore): WorldStateData => ({
   hasGame: s.hasGame,
   playerBuild: s.playerBuild,
   gender: s.gender,

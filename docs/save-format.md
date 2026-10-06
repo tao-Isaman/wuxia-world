@@ -235,7 +235,7 @@ Its `migrate` fills a missing side with a default build (ยุนม่อ / �
 When you add or change a persisted field:
 
 1. Add it to `WorldStateData` in `lib/world/types.ts` and to `emptyData()` in `store/world/state.ts`.
-2. Add it to `partializeSave` in `store/world/persist.ts` (the list is explicit).
+2. Add it to `partializeSave` in `store/world/persist.ts` (the list is explicit; it is typed `WorldStateData`, so a forgotten field fails `bun run typecheck`).
 3. Give it a default in `migrateSave` (same file), so older saves get a valid value.
 4. Bump `version` in `store/world-store.ts`, and extend the comment above `migrateSave`.
 
