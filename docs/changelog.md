@@ -6,6 +6,10 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-06
 
+### Sleep at home
+
+- At home the พัก bubble offers 🛏 **นอนพักที่บ้าน**: free, a full restore of stamina, HP and MP, and only 4 ชั่วยาม (other rests take 12). It replaces the roadside rest there.
+
 ### Lines type out to keyboard keys
 
 - The chalk sound under typing dialog and cutscene lines is now a keyboard: a switch click and a keycap thock per key, a fast typist's rhythm, a heavier space bar now and then (`keyTick`).

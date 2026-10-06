@@ -45,7 +45,8 @@ test("mobile HUD: top icons, left-thumb joystick and a context action button", a
   // Rest is a quick bubble, not a page: pick a choice right there.
   await page.getByRole("button", { name: "พักผ่อน", exact: true }).click();
   const bubble = page.getByRole("group", { name: "เลือกวิธีพักผ่อน" });
-  await expect(bubble.getByRole("button", { name: /พักริมทาง/ })).toBeVisible();
+  // At home the hero sleeps in their own bed (free, full, 4 ชั่วยาม).
+  await expect(bubble.getByRole("button", { name: /นอนพักที่บ้าน/ })).toBeVisible();
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await page.screenshot({ path: "test-results/screenshots/mobile-rest-bubble.png" });
   await page.keyboard.press("Escape");
