@@ -368,7 +368,7 @@ export const QUESTS_SHAOLIN: readonly QuestDef[] = [
     id: "qst_shaolin_wudang_joint",
     name: "ความลับใต้ผืนดิน",
     description: "ร่องรอยพระธาตุเส้าหลินและตราประทับอู่ตังนำสู่ถ้ำโบราณเดียวกัน อาจมีความลับฝังลึกกว่านั้น",
-    briefSummary: "สืบสวนถ้ำโบราณที่เชื่อมพระธาตุเส้าหลินและอู่ตังเข้าด้วยกัน",
+    briefSummary: "เทียบเบาะแสกับอาจารย์ชิงซวี่ แล้วสำรวจถ้ำฝึกวิทยายุทธ์ที่เชื่อมเส้าหลินกับอู่ตัง",
     type: "side",
     giverNpcId: "sect_shaolin_abbot_huiyuan",
     prereqs: {
@@ -381,20 +381,34 @@ export const QUESTS_SHAOLIN: readonly QuestDef[] = [
     stages: [
       {
         id: "discover_connection",
-        description: "พูดคุยกับอาจารย์ทั้งสองสำนักเพื่อเชื่อมโยงเบาะแส",
+        description: "ไปพบอาจารย์ชิงซวี่ที่สำนักอู่ตัง นำรอยพระธาตุเส้าหลินไปเทียบกับตราประทับอู่ตัง",
+        objective: {
+          spots: [
+            { locationId: "sect_wudang", npcId: "sect_wudang_master_qingxu", label: "เทียบเบาะแสกับอาจารย์ชิงซวี่", sceneId: "qs_qst_shaolin_wudang_joint_start" },
+          ],
+        },
       },
       {
         id: "enter_cave",
-        description: "เข้าสำรวจถ้ำโบราณ",
+        description: "ไปถ้ำฝึกวิทยายุทธ์ที่ร่องรอยทั้งสองชี้ไป แล้วเข้าสำรวจส่วนลึกของถ้ำ",
+        objective: {
+          spots: [
+            { locationId: "cave_zixiu", label: "สำรวจส่วนลึกของถ้ำโบราณ", sceneId: "qs_qst_shaolin_wudang_joint_cave" },
+          ],
+        },
       },
       {
         id: "defeat_guardian",
-        description: "ปราบผู้พิทักษ์ถ้ำ",
-        autoAdvance: { t: "defeatedOpponent", opponentId: "demonic_master", count: 1 },
+        description: "ปราบผู้พิทักษ์ถ้ำในส่วนลึกของถ้ำฝึกวิทยายุทธ์",
+        objective: {
+          spots: [
+            { locationId: "cave_zixiu", label: "เผชิญหน้าผู้พิทักษ์ถ้ำ", sceneId: "qs_qst_shaolin_wudang_joint_guardian" },
+          ],
+        },
       },
       {
         id: "uncover_truth",
-        description: "ค้นพบความลับโบราณและเลือกว่าจะทำอย่างไรกับมัน",
+        description: "กลับไปหาเจ้าอาวาสฮุยหยวนที่เส้าหลิน แล้วเล่าความลับที่พบ (หรือเก็บไว้คนเดียว)",
       },
     ],
     rewards: [

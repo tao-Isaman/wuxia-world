@@ -294,41 +294,40 @@ export const SCENES_SHAOLIN: readonly Scene[] = [
     ],
   },
 
+  // ── qst_shaolin_wudang_joint ──────────────────────────────────────
+  // Offer at Shaolin → compare clues with Qingxu at Wudang (objective at his
+  // card) → enter the practice cave (map spot) → face its guardian (map spot)
+  // → choose what to do with the scripture → hand-in to Huiyuan.
   {
-    kind: "dialog",
-    id: "qs_qst_shaolin_wudang_joint_start",
-    lines: [
-      { t: "narration", text: "เมื่อเจ้าเชื่อมโยงร่องรอยจากพระธาตุเส้าหลินและตราประทับอู่ตังเข้าด้วยกัน" },
-      { t: "narration", text: "ทั้งสองชี้ไปยังถ้ำโบราณที่อยู่ระหว่างสองสำนัก" },
-    ],
-    choices: [
-      {
-        text: "รับภารกิจร่วมจากเจ้าอาวาสฮุยหยวน",
-        next: "sect_shaolin",
-        visibleIf: { t: "questStatus", questId: "qst_shaolin_wudang_joint", status: "none" },
-        effects: [{ t: "startQuest", questId: "qst_shaolin_wudang_joint" }],
-      },
-    ],
-  },
-
-  {
-    // Popup accept lands here. Stages 0-1 (discover_connection, enter_cave)
-    // have no autoAdvance; these two beats advance them, then the guardian
-    // fight's defeatedOpponent autoAdvance and the truth scenes finish it.
     kind: "dialog",
     id: "qs_qst_shaolin_wudang_joint_offer",
     lines: [
       { t: "dialogue", speaker: "ฮุยหยวน", text: "พระธาตุของเรากับตราประทับของอู่ตัง ล้วนชี้ไปยังที่เดียวกัน" },
-      { t: "narration", text: "เมื่อเจ้าเชื่อมโยงร่องรอยทั้งสองเข้าด้วยกัน มันชี้ไปยังถ้ำโบราณที่อยู่ระหว่างสองสำนัก" },
+      { t: "dialogue", speaker: "ฮุยหยวน", text: "นำรอยพระธาตุนี้ไปเทียบกับตราประทับของอาจารย์ชิงซวี่ที่อู่ตัง สองสำนักต้องเห็นร่องรอยนี้ด้วยกัน" },
     ],
     choices: [
       {
-        text: "เดินทางไปยังถ้ำโบราณ",
-        next: "qs_qst_shaolin_wudang_joint_cave",
-        effects: [
-          { t: "advanceQuest", questId: "qst_shaolin_wudang_joint" }, // → enter_cave
-          { t: "advanceQuest", questId: "qst_shaolin_wudang_joint" }, // → defeat_guardian
-        ],
+        text: "รับภารกิจร่วม",
+        next: "sect_shaolin",
+        effects: [{ t: "startQuest", questId: "qst_shaolin_wudang_joint" }],
+      },
+      { text: "ยังไม่พร้อม", next: "sect_shaolin" },
+    ],
+  },
+
+  {
+    kind: "dialog",
+    id: "qs_qst_shaolin_wudang_joint_start",
+    lines: [
+      { t: "narration", text: "อาจารย์ชิงซวี่วางรอยพระธาตุเส้าหลินลงข้างตราประทับอู่ตัง ลายเส้นสองชิ้นต่อกันเป็นแผนที่เดียว" },
+      { t: "dialogue", speaker: "ชิงซวี่", text: "ทั้งสองชี้ไปยังถ้ำฝึกวิทยายุทธ์ — ถ้ำโบราณที่นักพรตและภิกษุรุ่นก่อนเคยเข้าไปฝึกตนร่วมกัน" },
+      { t: "dialogue", speaker: "ชิงซวี่", text: "ว่ากันว่ามีผู้พิทักษ์เฝ้าส่วนลึกของถ้ำมาหลายชั่วคน ไปเถิด แล้วกลับไปเล่าให้เจ้าอาวาสฮุยหยวนฟังว่าพบอะไร" },
+    ],
+    choices: [
+      {
+        text: "มุ่งหน้าไปถ้ำฝึกวิทยายุทธ์",
+        next: "sect_wudang",
+        effects: [{ t: "advanceQuest", questId: "qst_shaolin_wudang_joint" }], // → enter_cave
       },
     ],
   },
@@ -343,6 +342,21 @@ export const SCENES_SHAOLIN: readonly Scene[] = [
     ],
     choices: [
       {
+        text: "ก้าวเข้าไปใกล้รูปสลัก",
+        next: "qs_qst_shaolin_wudang_joint_guardian",
+        effects: [{ t: "advanceQuest", questId: "qst_shaolin_wudang_joint" }], // → defeat_guardian
+      },
+    ],
+  },
+
+  {
+    kind: "dialog",
+    id: "qs_qst_shaolin_wudang_joint_guardian",
+    lines: [
+      { t: "narration", text: "เงาร่างสูงใหญ่ลุกขึ้นขวางหน้ารูปสลัก ลมปราณของมันกดทับไปทั้งถ้ำ" },
+    ],
+    choices: [
+      {
         text: "เผชิญหน้ากับผู้พิทักษ์",
         next: "qs_qst_shaolin_wudang_joint_battle",
         effects: [
@@ -350,11 +364,12 @@ export const SCENES_SHAOLIN: readonly Scene[] = [
             t: "triggerBattle",
             opponentId: "demonic_master",
             onWin: "qs_qst_shaolin_wudang_joint_win",
-            onLose: "sect_shaolin",
+            onLose: "cave_zixiu",
             nonFatal: false,
           },
         ],
       },
+      { text: "ถอยออกไปเตรียมตัวก่อน", next: "cave_zixiu" },
     ],
   },
 
@@ -376,19 +391,46 @@ export const SCENES_SHAOLIN: readonly Scene[] = [
     choices: [
       {
         text: "นำคัมภีร์กลับไปให้เจ้าอาวาส",
-        next: "qs_qst_shaolin_wudang_joint_truth_reveal",
+        next: "cave_zixiu",
         effects: [
           { t: "addTrait", trait: "good", amount: 5 },
           { t: "setFlag", flag: "joint_secret_revealed", value: true },
+          { t: "setFlag", flag: "joint_secret_hidden", value: false },
+          { t: "advanceQuest", questId: "qst_shaolin_wudang_joint" }, // → uncover_truth
         ],
       },
       {
         text: "เก็บความลับไว้คนเดียว",
-        next: "qs_qst_shaolin_wudang_joint_secret_keep",
+        next: "cave_zixiu",
         effects: [
           { t: "addTrait", trait: "arrogance", amount: 3 },
           { t: "setFlag", flag: "joint_secret_hidden", value: true },
+          { t: "setFlag", flag: "joint_secret_revealed", value: false },
+          { t: "advanceQuest", questId: "qst_shaolin_wudang_joint" }, // → uncover_truth
         ],
+      },
+    ],
+  },
+
+  {
+    // Hand-in at Huiyuan's card: what the hero chose in the cave decides the report.
+    kind: "dialog",
+    id: "qs_qst_shaolin_wudang_joint_complete",
+    lines: [
+      { t: "narration", text: "เจ้ากลับถึงเส้าหลิน เจ้าอาวาสฮุยหยวนรออยู่ในโถงพระธาตุ อาจารย์ชิงซวี่เดินทางมาสมทบ" },
+    ],
+    choices: [
+      {
+        text: "มอบคัมภีร์และเล่าความจริง",
+        visibleIf: { t: "not", of: { t: "flag", flag: "joint_secret_hidden" } },
+        next: "qs_qst_shaolin_wudang_joint_truth_reveal",
+        effects: [{ t: "finishQuest", questId: "qst_shaolin_wudang_joint", success: true }],
+      },
+      {
+        text: "รายงานว่าไม่พบสิ่งใดพิเศษ",
+        visibleIf: { t: "flag", flag: "joint_secret_hidden" },
+        next: "qs_qst_shaolin_wudang_joint_secret_keep",
+        effects: [{ t: "finishQuest", questId: "qst_shaolin_wudang_joint", success: true }],
       },
     ],
   },
@@ -401,13 +443,7 @@ export const SCENES_SHAOLIN: readonly Scene[] = [
       { t: "dialogue", speaker: "ฮุยหยวน", text: "อู่ตังและเส้าหลิน... เป็นน้ำหนึ่งใจเดียวกัน ข้าลืมเรื่องนี้ไปนาน" },
       { t: "dialogue", speaker: "ชิงซวี่", text: "ขอบคุณยอดยุทธ ที่ทำให้เราจำสิ่งที่สำคัญกลับคืนมา" },
     ],
-    choices: [
-      {
-        text: "รับรางวัล",
-        next: "sect_shaolin",
-        effects: [{ t: "finishQuest", questId: "qst_shaolin_wudang_joint", success: true }],
-      },
-    ],
+    choices: [{ text: "รับรางวัล", next: "sect_shaolin" }],
   },
 
   {
@@ -418,12 +454,6 @@ export const SCENES_SHAOLIN: readonly Scene[] = [
       { t: "dialogue", speaker: "ฮุยหยวน", text: "... ขอบคุณที่ไปสำรวจ" },
       { t: "narration", text: "ความลับยังคงฝังอยู่ใต้ผืนดิน" },
     ],
-    choices: [
-      {
-        text: "รับรางวัล",
-        next: "sect_shaolin",
-        effects: [{ t: "finishQuest", questId: "qst_shaolin_wudang_joint", success: true }],
-      },
-    ],
+    choices: [{ text: "รับรางวัล", next: "sect_shaolin" }],
   },
 ];
