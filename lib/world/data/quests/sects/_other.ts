@@ -8,19 +8,19 @@ export const QUESTS__OTHER: readonly QuestDef[] = [
   {
     id: "qst_yaowang_rare_ingredient",
     name: "ส่วนผสมลับของตำรับยา",
-    description: "หมอเสินหนงต้องการโสมโบราณ หยก และงาช้างเพื่อปรุงยาตำรับพิเศษ",
+    description: "หมอเสินหนงแห่งคุ้มสมุนไพรกำลังปรุงยาตำรับพิเศษ ขาดโสม 2 รากกับหยกล้ำค่า 1 ก้อน (หยกบดใช้ถอนพิษร้อน)",
     briefSummary: "รวบรวมส่วนผสมหายากสำหรับหมอเสินหนง",
     type: "side",
     giverNpcId: "villa_yaowang_doctor_shennong",
     stages: [
       {
         id: "gather_ginseng",
-        description: "หาโสม 2 หน่วย",
+        description: "หาโสม 2 ราก",
         autoAdvance: { t: "hasItem", itemId: "ginseng", count: 2 },
       },
       {
         id: "gather_jade",
-        description: "หาหยกล้ำค่า 1 ชิ้น",
+        description: "หาหยกล้ำค่า 1 ก้อน",
         autoAdvance: { t: "hasItem", itemId: "jade", count: 1 },
       },
       {
@@ -47,7 +47,7 @@ export const QUESTS__OTHER: readonly QuestDef[] = [
     stages: [
       {
         id: "visit_village",
-        description: "เดินทางไปสำรวจหมู่บ้านที่ป่วย",
+        description: "เดินทางไปสำรวจหมู่บ้านที่ป่วยแถบถ้ำหุบเขาผีเสื้อ",
         objective: {
           spots: [
             { locationId: "valley_hudie", label: "สำรวจหมู่บ้านที่ป่วย", text: "ชาวบ้านไข้สูง ผิวขึ้นผื่นม่วง ดูคล้ายพิษจากสมุนไพรบางชนิด" },
@@ -56,7 +56,7 @@ export const QUESTS__OTHER: readonly QuestDef[] = [
       },
       {
         id: "collect_sample",
-        description: "เก็บตัวอย่างสมุนไพรและรายงานอาการ",
+        description: "เก็บตัวอย่างสมุนไพรและจดอาการคนป่วยที่ถ้ำหุบเขาผีเสื้อ",
         objective: {
           spots: [
             { locationId: "valley_hudie", label: "เก็บตัวอย่างสมุนไพรและบันทึกอาการ", text: "เก็บต้นหญ้าริมลำธารที่ชาวบ้านใช้ต้มกิน และจดอาการไว้ครบ" },
@@ -65,7 +65,7 @@ export const QUESTS__OTHER: readonly QuestDef[] = [
       },
       {
         id: "return_report",
-        description: "กลับมารายงานและส่งตัวอย่างให้หมอ",
+        description: "นำตัวอย่างกลับไปให้หมอเสินหนง",
       },
     ],
     rewards: [
@@ -86,7 +86,7 @@ export const QUESTS__OTHER: readonly QuestDef[] = [
     stages: [
       {
         id: "investigate_scene",
-        description: "สืบสวนสถานที่เกิดเหตุ",
+        description: "สืบสวนที่เกิดเหตุปากถ้ำแมงมุม",
         objective: {
           spots: [
             { locationId: "cave_zhizhu", label: "สืบสวนปากถ้ำแมงมุม", text: "พบเศษขวดยาและรอยเท้าคนเลี้ยงพิษ — ต้องหาพิษงูมาเทียบ" },
@@ -95,7 +95,7 @@ export const QUESTS__OTHER: readonly QuestDef[] = [
       },
       {
         id: "find_clues",
-        description: "เก็บหลักฐาน: หาพิษงู 2 หน่วย",
+        description: "หาพิษงู 2 ขวดมาเทียบกับพิษที่ใช้",
         autoAdvance: { t: "hasItem", itemId: "viper_venom", count: 2 },
       },
       {
@@ -118,15 +118,15 @@ export const QUESTS__OTHER: readonly QuestDef[] = [
 
   {
     id: "qst_dalun_stolen_relic",
-    name: "พระธาตุวัดตาหลุน",
-    description: "พระธาตุโบราณแห่งวัดตาหลุนหายไปในคืนพายุ พระกงซินสงสัยว่ามีคนในวัดเกี่ยวข้อง",
-    briefSummary: "สืบหาพระธาตุที่หายจากวัดตาหลุน",
+    name: "พระธาตุวิหารล้อลม",
+    description: "พระธาตุโบราณแห่งวิหารล้อลมหายไปในคืนพายุ พระกงซินสงสัยว่ามีคนในวัดเกี่ยวข้อง",
+    briefSummary: "สืบหาพระธาตุที่หายจากวิหารล้อลม",
     type: "side",
     giverNpcId: "temple_dalun_monk_kongxin",
     stages: [
       {
         id: "search_temple",
-        description: "ค้นหาร่องรอยในวัด",
+        description: "ค้นหาร่องรอยในวิหารล้อลม",
         autoAdvance: { t: "visitedLocation", locationId: "temple_dalun" },
       },
       {
@@ -145,7 +145,7 @@ export const QUESTS__OTHER: readonly QuestDef[] = [
       },
       {
         id: "recover_relic",
-        description: "นำพระธาตุกลับคืนวัด",
+        description: "นำพระธาตุกลับคืนพระกงซิน",
       },
     ],
     rewards: [
@@ -159,20 +159,20 @@ export const QUESTS__OTHER: readonly QuestDef[] = [
   {
     id: "qst_dalun_pilgrim_mission",
     name: "ทางแสวงบุญแห่งสี่วัด",
-    description: "พระกงซินขอให้ไปสวดมนต์ที่วัดเทียนหนิงและกลับมารายงาน เพื่อเป็นส่วนหนึ่งของพิธีกรรมโบราณ",
-    briefSummary: "เดินทางไปวัดเทียนหนิงแล้วกลับมารายงาน",
+    description: "พระกงซินขอให้ไปสวดมนต์ที่วิหารหลวงจีนสวรรค์และกลับมารายงาน เพื่อเป็นส่วนหนึ่งของพิธีกรรมโบราณ",
+    briefSummary: "เดินทางไปวิหารหลวงจีนสวรรค์แล้วกลับมารายงาน",
     type: "side",
     giverNpcId: "temple_dalun_monk_kongxin",
     prereqs: { t: "questStatus", questId: "qst_dalun_stolen_relic", status: "done" },
     stages: [
       {
         id: "visit_tianning",
-        description: "เดินทางไปยังวัดเทียนหนิง",
+        description: "เดินทางไปยังวิหารหลวงจีนสวรรค์",
         autoAdvance: { t: "visitedLocation", locationId: "temple_tianning" },
       },
       {
         id: "return_report",
-        description: "กลับมารายงานพระกงซิน",
+        description: "กลับไปรายงานพระกงซิน",
       },
     ],
     rewards: [
@@ -187,24 +187,24 @@ export const QUESTS__OTHER: readonly QuestDef[] = [
   {
     id: "qst_yanzi_rival_clan",
     name: "ตระกูลอริอาฆาต",
-    description: "ตระกูลหลงส่งนักรบมาคุกคามคฤหาสน์เหยินซี เจ้าของบ้านขอให้ขับไล่พวกเขา",
-    briefSummary: "ขับไล่นักรบตระกูลหลงออกจากคฤหาสน์เหยินซี",
+    description: "ตระกูลหลงส่งนักรบมาคุกคามคุ้มนกนางแอ่น เจ้าบ้านเหยินเฟิงขอให้ขับไล่พวกมัน",
+    briefSummary: "ขับไล่นักรบตระกูลหลงออกจากคุ้มนกนางแอ่น",
     type: "side",
     giverNpcId: "villa_yanzi_lord_yanfeng",
     stages: [
       {
         id: "patrol",
-        description: "ลาดตระเวนบริเวณคฤหาสน์",
+        description: "ลาดตระเวนรอบคุ้มนกนางแอ่น",
         autoAdvance: { t: "visitedLocation", locationId: "villa_yanzi" },
       },
       {
         id: "defeat_raiders",
-        description: "ปราบหัวหน้านักรบตระกูลหลง",
+        description: "ปราบหัวหน้านักรบตระกูลหลง (ผู้อาวุโสสำนักที่ตระกูลหลงจ้างมา)",
         autoAdvance: { t: "defeatedOpponent", opponentId: "sect_elder", count: 1 },
       },
       {
         id: "report",
-        description: "รายงานเจ้าบ้านว่าเหตุการณ์สงบแล้ว",
+        description: "รายงานเจ้าบ้านเหยินเฟิงว่าเหตุการณ์สงบแล้ว",
       },
     ],
     rewards: [
@@ -218,14 +218,14 @@ export const QUESTS__OTHER: readonly QuestDef[] = [
   {
     id: "qst_yanzi_bodyguard_escort",
     name: "คุ้มกันแห่งพ่อค้า",
-    description: "เจ้าบ้านส่งพ่อค้าไปค้าขาย ขอให้คุ้มกันพ่อค้าถึงเมืองหลวงและกลับมา",
+    description: "เจ้าบ้านเหยินเฟิงส่งพ่อค้าของคุ้มไปค้าขายที่นครหลวง ขอให้คุ้มกันไปจนถึงร้านแล้วกลับมารายงาน",
     briefSummary: "คุ้มกันพ่อค้าของเจ้าบ้านเหยินเฟิงถึงจุดหมาย",
     type: "side",
     giverNpcId: "villa_yanzi_lord_yanfeng",
     stages: [
       {
         id: "depart",
-        description: "รับภารกิจคุ้มกันและออกเดินทาง",
+        description: "พบพ่อค้าที่หน้าคุ้มนกนางแอ่นแล้วออกเดินทาง",
         objective: {
           spots: [
             { locationId: "villa_yanzi", label: "พบพ่อค้าที่หน้าคฤหาสน์", text: "พ่อค้าบรรทุกเกวียนเสร็จแล้ว ออกเดินทางได้ — ระวังโจรดักปล้นตามทาง" },
@@ -234,12 +234,12 @@ export const QUESTS__OTHER: readonly QuestDef[] = [
       },
       {
         id: "fend_ambush",
-        description: "ขับไล่โจรที่ดักซุ่มโจมตี",
+        description: "ขับไล่โจรเส้นทาง 2 คนที่ดักซุ่มระหว่างทาง",
         autoAdvance: { t: "defeatedOpponent", opponentId: "road_bandit", count: 2 },
       },
       {
         id: "deliver_safely",
-        description: "ส่งพ่อค้าถึงจุดหมายโดยสวัสดิภาพ",
+        description: "ส่งพ่อค้าถึงร้านในนครหลวงโดยสวัสดิภาพ",
         objective: {
           spots: [
             { locationId: "city_capital", label: "ส่งพ่อค้าถึงร้านในเมืองหลวง", text: "พ่อค้าถึงเมืองหลวงอย่างปลอดภัย ฝากคำขอบคุณถึงเจ้าบ้าน" },
@@ -248,7 +248,7 @@ export const QUESTS__OTHER: readonly QuestDef[] = [
       },
       {
         id: "return_report",
-        description: "กลับรายงานเจ้าบ้านเหยินเฟิง",
+        description: "กลับไปรายงานเจ้าบ้านเหยินเฟิง",
       },
     ],
     rewards: [
@@ -261,15 +261,15 @@ export const QUESTS__OTHER: readonly QuestDef[] = [
   {
     id: "qst_yanzi_stolen_heirloom",
     name: "มรดกตกทอดสูญหาย",
-    description: "ดาบมรดกของตระกูลเหยินถูกขโมยออกไปในคืนงานเลี้ยง ผู้ต้องสงสัยมีสามคน",
-    briefSummary: "สืบหาดาบมรดกที่ถูกขโมยจากคฤหาสน์เหยินซี",
+    description: "ดาบมรดกของเจ้าบ้านเหยินเฟิงถูกขโมยไปในคืนงานเลี้ยงที่คุ้มนกนางแอ่น ผู้ต้องสงสัยมีสามคน: พ่อบ้าน แขกนักดนตรี และองครักษ์",
+    briefSummary: "สืบหาดาบมรดกที่ถูกขโมยจากคุ้มนกนางแอ่น",
     type: "side",
     giverNpcId: "villa_yanzi_lord_yanfeng",
     prereqs: { t: "questStatus", questId: "qst_yanzi_rival_clan", status: "done" },
     stages: [
       {
         id: "investigate",
-        description: "สืบสวนร่องรอยในคฤหาสน์",
+        description: "สืบร่องรอยในห้องเก็บดาบของคุ้มนกนางแอ่น",
         objective: {
           spots: [
             { locationId: "villa_yanzi", label: "สืบร่องรอยในห้องเก็บดาบ", text: "กุญแจไม่ถูกงัด — คนร้ายต้องเป็นคนที่อยู่ในงานเลี้ยงคืนนั้น" },
@@ -278,7 +278,7 @@ export const QUESTS__OTHER: readonly QuestDef[] = [
       },
       {
         id: "question_suspects",
-        description: "สอบสวนผู้ต้องสงสัยสามคน",
+        description: "สอบสวนผู้ต้องสงสัยสามคน: พ่อบ้าน แขกนักดนตรี และองครักษ์",
         objective: {
           spots: [
             { locationId: "villa_yanzi", label: "สอบสวนพ่อบ้าน", text: "พ่อบ้านอยู่ในครัวทั้งคืน มีพยานยืนยัน" },
@@ -289,12 +289,12 @@ export const QUESTS__OTHER: readonly QuestDef[] = [
       },
       {
         id: "confront_thief",
-        description: "เผชิญหน้ากับผู้ขโมย",
+        description: "เผชิญหน้ากับนักฆ่าเงาที่ขโมยดาบ",
         autoAdvance: { t: "defeatedOpponent", opponentId: "shadow_assassin", count: 1 },
       },
       {
         id: "recover_sword",
-        description: "นำดาบมรดกกลับคืนเจ้าบ้าน",
+        description: "นำดาบมรดกกลับคืนเจ้าบ้านเหยินเฟิง",
       },
     ],
     rewards: [
@@ -307,9 +307,9 @@ export const QUESTS__OTHER: readonly QuestDef[] = [
 
   {
     id: "qst_zhongyang_imperial_letter",
-    name: "สาส์นพระราชา",
-    description: "ทูตหลิวอิงได้รับสาส์นเร่งด่วนจากพระราชา ขอให้ส่งสาส์นไปยังอาจารย์ชิงซวี่แห่งอู่ตัง",
-    briefSummary: "ส่งสาส์นพระราชาจากวังจงหยางถึงอาจารย์อู่ตัง",
+    name: "สาส์นจากราชสำนัก",
+    description: "ทูตหลิวอิงได้รับสาส์นเร่งด่วนจากราชสำนัก ขอให้ส่งสาส์นไปยังอาจารย์ชิงซวี่แห่งอู่ตัง",
+    briefSummary: "นำสาส์นราชสำนักจากพระราชวังจงหยางไปให้อาจารย์ชิงซวี่แห่งอู่ตัง",
     type: "side",
     giverNpcId: "palace_zhongyang_envoy_liuying",
     stages: [
@@ -338,7 +338,7 @@ export const QUESTS__OTHER: readonly QuestDef[] = [
       },
       {
         id: "return_confirm",
-        description: "กลับรายงานทูตหลิวอิง",
+        description: "กลับไปรายงานทูตหลิวอิง",
       },
     ],
     rewards: [
@@ -352,15 +352,15 @@ export const QUESTS__OTHER: readonly QuestDef[] = [
   {
     id: "qst_zhongyang_noble_intrigue",
     name: "วังวนขุนนาง",
-    description: "ทูตหลิวอิงพบว่ามีขุนนางสองฝ่ายกำลังแย่งชิงตำแหน่ง ขอให้ไปสอดแนมและรายงานว่าฝ่ายไหนโกง",
-    briefSummary: "สืบข้อมูลเรื่องสงครามระหว่างขุนนางในวัง",
+    description: "ทูตหลิวอิงพบว่าขุนนางสองฝ่ายในพระราชวังจงหยางกำลังแย่งชิงตำแหน่ง ขอให้ไปสอดแนมเรือนของทั้งสองฝ่ายและรายงานว่าฝ่ายไหนโกง",
+    briefSummary: "สอดแนมขุนนางสองฝ่ายในพระราชวังจงหยาง แล้วรายงานทูตหลิวอิง",
     type: "side",
     giverNpcId: "palace_zhongyang_envoy_liuying",
     prereqs: { t: "questStatus", questId: "qst_zhongyang_imperial_letter", status: "done" },
     stages: [
       {
         id: "spy_faction_a",
-        description: "สอดแนมฝ่ายขุนนางฝั่งแรก",
+        description: "สอดแนมเรือนขุนนางฝั่งตะวันออกในพระราชวังจงหยาง",
         objective: {
           spots: [
             { locationId: "palace_zhongyang", label: "สอดแนมเรือนขุนนางฝั่งตะวันออก", text: "ขุนนางฝั่งตะวันออกนับทองกับพ่อค้าเกลือเถื่อนกลางดึก" },
@@ -369,7 +369,7 @@ export const QUESTS__OTHER: readonly QuestDef[] = [
       },
       {
         id: "spy_faction_b",
-        description: "สอดแนมฝ่ายขุนนางฝั่งที่สอง",
+        description: "สอดแนมเรือนขุนนางฝั่งตะวันตกในพระราชวังจงหยาง",
         objective: {
           spots: [
             { locationId: "palace_zhongyang", label: "สอดแนมเรือนขุนนางฝั่งตะวันตก", text: "ขุนนางฝั่งตะวันตกเขียนฎีกาทูลเรื่องภาษีอย่างซื่อตรง" },
@@ -378,7 +378,7 @@ export const QUESTS__OTHER: readonly QuestDef[] = [
       },
       {
         id: "discover_truth",
-        description: "ค้นพบความจริง",
+        description: "ค้นห้องเก็บเอกสารในวังเพื่อหาความจริง",
         objective: {
           spots: [
             { locationId: "palace_zhongyang", label: "ค้นห้องเก็บเอกสาร", text: "บัญชีลับยืนยันว่าฝั่งตะวันออกยักยอกภาษี — ต้องตัดสินใจว่าจะรายงานทูตอย่างไร" },
@@ -387,7 +387,7 @@ export const QUESTS__OTHER: readonly QuestDef[] = [
       },
       {
         id: "report_with_choice",
-        description: "รายงานทูต — จะพูดความจริงหรือบิดเบือน?",
+        description: "รายงานทูตหลิวอิง — จะพูดความจริงหรือบิดเบือน?",
       },
     ],
     rewards: [
@@ -399,26 +399,26 @@ export const QUESTS__OTHER: readonly QuestDef[] = [
 
   {
     id: "qst_zhongyang_ceremony_guard",
-    name: "คุ้มกันพิธีพระราชา",
-    description: "มีข่าวว่าจะมีความพยายามลอบสังหารระหว่างพิธีพิเศษที่วังจงหยาง ทูตขอให้คอยเฝ้าระวัง",
-    briefSummary: "คุ้มกันพิธีสำคัญในวังจงหยาง",
+    name: "คุ้มกันพิธีในวังหลวง",
+    description: "มีข่าวว่าจะมีความพยายามลอบสังหารระหว่างพิธีพิเศษที่พระราชวังจงหยาง ทูตหลิวอิงขอให้คอยเฝ้าระวัง",
+    briefSummary: "คุ้มกันพิธีสำคัญในพระราชวังจงหยาง",
     type: "side",
     giverNpcId: "palace_zhongyang_envoy_liuying",
     prereqs: { t: "questStatus", questId: "qst_zhongyang_noble_intrigue", status: "done" },
     stages: [
       {
         id: "station_guard",
-        description: "รับตำแหน่งยามและเฝ้าระวัง",
+        description: "ไปรับตำแหน่งยามที่พระราชวังจงหยาง",
         autoAdvance: { t: "visitedLocation", locationId: "palace_zhongyang" },
       },
       {
         id: "repel_assassin",
-        description: "ขับไล่นักฆ่าที่บุกรุกเข้ามา",
+        description: "ขับไล่นักฆ่าที่บุกเข้ามา (อาจารย์ดาบรับจ้าง)",
         autoAdvance: { t: "defeatedOpponent", opponentId: "blade_master", count: 1 },
       },
       {
         id: "report_success",
-        description: "รายงานผลการคุ้มกัน",
+        description: "รายงานผลการคุ้มกันต่อทูตหลิวอิง",
       },
     ],
     rewards: [

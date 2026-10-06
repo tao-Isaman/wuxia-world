@@ -57,7 +57,7 @@ export const QUESTS_SHAOLIN: readonly QuestDef[] = [
     id: "qst_shaolin_sect_patrol",
     name: "ตรวจตราเขตวัด",
     description: "ภารกิจประจำของศิษย์เส้าหลิน — ออกตรวจตราเขตวัดและกำราบโจรที่ลอบเข้าสำนัก",
-    briefSummary: "ปราบโจรในเขตวัด 2 คน · sect points +50",
+    briefSummary: "ปราบโจรในเขตวัด 2 คน · แต้มสำนัก +50",
     type: "side",
     sectId: "shaolin",
     giverNpcId: "sect_shaolin_abbot_huiyuan",
@@ -70,7 +70,7 @@ export const QUESTS_SHAOLIN: readonly QuestDef[] = [
       },
       {
         id: "report",
-        description: "กลับไปรายงานเจ้าอาวาส",
+        description: "กลับไปรายงานเจ้าอาวาสฮุยหยวน",
       },
     ],
     rewards: [
@@ -85,7 +85,7 @@ export const QUESTS_SHAOLIN: readonly QuestDef[] = [
     id: "qst_shaolin_sect_herb_run",
     name: "ส่งสมุนไพรให้วัด",
     description: "วัดต้องการสมุนไพรสำหรับยารักษาศิษย์ที่บาดเจ็บ — เก็บสมุนไพรในป่าเขาซงซานและนำกลับมา",
-    briefSummary: "ส่งสมุนไพร 5 ชิ้น · sect points +60",
+    briefSummary: "ส่งสมุนไพรหายาก 5 ชิ้น · แต้มสำนัก +60",
     type: "side",
     sectId: "shaolin",
     giverNpcId: "sect_shaolin_abbot_huiyuan",
@@ -93,12 +93,12 @@ export const QUESTS_SHAOLIN: readonly QuestDef[] = [
     stages: [
       {
         id: "gather_herbs",
-        description: "เก็บสมุนไพร 5 ชิ้น",
+        description: "เก็บสมุนไพรหายาก 5 ชิ้น",
         autoAdvance: { t: "hasItem", itemId: "herb", count: 5 },
       },
       {
         id: "deliver",
-        description: "ส่งสมุนไพรให้เจ้าอาวาส",
+        description: "ส่งสมุนไพรให้เจ้าอาวาสฮุยหยวน",
       },
     ],
     rewards: [
@@ -111,9 +111,9 @@ export const QUESTS_SHAOLIN: readonly QuestDef[] = [
 
   {
     id: "qst_shaolin_sect_meditation",
-    name: "ปฏิบัติธรรมที่ถ้ำลึก",
-    description: "นั่งวิปัสนาที่ถ้ำลึกของซงซาน 1 ครั้ง เพื่อชำระจิตใจ — เพิ่มความถ่อมตน",
-    briefSummary: "ปฏิบัติธรรม + เก็บอาหาร 5 ชิ้น · sect points +80",
+    name: "ทานแก่ผู้ตกยาก",
+    description: "ปฏิบัติธรรมด้วยการให้ทาน — พรานป่าและคนตัดฟืนที่หลบหนาวในถ้ำลึกของซงซานกำลังอดอยาก พระฆ่าสัตว์ไม่ได้ แต่ศิษย์ฆราวาสหาเนื้อย่างไปให้ได้ เจ้าอาวาสฮุยหยวนว่าการให้โดยไม่หวังสิ่งใดคือการขัดเกลาใจให้ถ่อมตน",
+    briefSummary: "หาเนื้อย่าง 3 ชิ้นไปเป็นทาน · แต้มสำนัก +80",
     type: "side",
     sectId: "shaolin",
     minSectRank: 7,
@@ -128,12 +128,12 @@ export const QUESTS_SHAOLIN: readonly QuestDef[] = [
     stages: [
       {
         id: "meditate",
-        description: "เก็บเนื้อย่างระหว่างเดินทาง 3 ชิ้น",
+        description: "หาเนื้อย่าง 3 ชิ้น (ซื้อหรือย่างเองก็ได้)",
         autoAdvance: { t: "hasItem", itemId: "cooked_meat", count: 3 },
       },
       {
         id: "report",
-        description: "กลับไปรายงานเจ้าอาวาส",
+        description: "กลับไปรายงานเจ้าอาวาสฮุยหยวน",
       },
     ],
     rewards: [
@@ -147,7 +147,7 @@ export const QUESTS_SHAOLIN: readonly QuestDef[] = [
   {
     id: "qst_shaolin_art_zen_finger",
     name: "บททดสอบก่อนสืบทอด: วิชาลึกลับ",
-    description: "เจ้าอาวาสจะทดสอบก่อนเปิดตำราวิชาลึกลับให้ศิษย์ผู้มีจิตใจสูงสุดได้ฝึก — ผ่านการนั่งวิปัสนาที่ถ้ำซงซานและพิสูจน์ฝีมือ (ผ่านแล้วจึงรับภารกิจสืบทอดวิชาลึกลับได้)",
+    description: "เจ้าอาวาสจะทดสอบก่อนเปิดตำราวิชาลึกลับให้ศิษย์ผู้มีจิตใจสูงสุดได้ฝึก — ปราบหัวหน้าโจร 2 คน และเก็บสมุนไพรหายาก 8 ชิ้นถวายโรงยาของวัด (ผ่านแล้วจึงรับภารกิจสืบทอดวิชาลึกลับได้)",
     briefSummary: "บททดสอบ — เปิดทางสู่การสืบทอดวิชาลึกลับ",
     type: "side",
     sectId: "shaolin",
@@ -164,12 +164,12 @@ export const QUESTS_SHAOLIN: readonly QuestDef[] = [
     stages: [
       {
         id: "trial_kill",
-        description: "พิสูจน์พลัง — ปราบหัวหน้าโจร (bandit_chief) 2 คน",
+        description: "พิสูจน์พลัง — ปราบหัวหน้าโจร 2 คน",
         autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 2 },
       },
       {
         id: "trial_meditate",
-        description: "นั่งสมาธิ — รวบรวมสมุนไพรหายาก 8 ชิ้น",
+        description: "พิสูจน์ความเพียร — เก็บสมุนไพรหายาก 8 ชิ้นถวายโรงยาของวัด",
         autoAdvance: { t: "hasItem", itemId: "herb", count: 8 },
       },
       {
@@ -189,7 +189,7 @@ export const QUESTS_SHAOLIN: readonly QuestDef[] = [
   {
     id: "qst_shaolin_art_legendary",
     name: "บททดสอบก่อนตำนาน: วิชาลึกลับ",
-    description: "ตำนานสุดยอดของเส้าหลิน — วิชาลึกลับ. เปิดให้ศิษย์ที่ได้รับความไว้วางใจสูงสุดเท่านั้น พิสูจน์ทั้งกายและจิตใจ ผ่านบททดสอบนี้แล้ว อาจารย์จะเล่าตำนานที่นำไปสู่วิชานี้ (ดูแท็บตำนานในบันทึกภารกิจ)",
+    description: "เจ้าอาวาสฮุยหยวนเก็บตำนานสุดยอดของเส้าหลินไว้ให้ศิษย์ที่ไว้ใจที่สุดเท่านั้น — ปราบหัวหน้าโจร 3 คนเพื่อพิสูจน์กาย และสะสมความถ่อมตนให้ถึง 30 เพื่อพิสูจน์ใจ ผ่านแล้วท่านจะเล่าตำนานที่นำไปสู่วิชานั้น (ดูแท็บตำนานในบันทึกภารกิจ)",
     briefSummary: "บททดสอบ — เปิดทางสู่ตำนานของวิชาลึกลับ",
     type: "side",
     sectId: "shaolin",
@@ -206,7 +206,7 @@ export const QUESTS_SHAOLIN: readonly QuestDef[] = [
     stages: [
       {
         id: "trial_body",
-        description: "พิสูจน์ร่างกาย — ปราบหัวหน้าโจร (bandit_chief) 3 คน",
+        description: "พิสูจน์ร่างกาย — ปราบหัวหน้าโจร 3 คน",
         autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 3 },
       },
       {
@@ -230,19 +230,19 @@ export const QUESTS_SHAOLIN: readonly QuestDef[] = [
   {
     id: "qst_shaolin_relic_theft",
     name: "พระธาตุสูญหาย",
-    description: "พระธาตุสำคัญของเส้าหลินถูกขโมยออกไปในคืนวาน เจ้าอาวาสสงสัยว่าเป็นฝีมือโจรปีนขื่อ",
+    description: "พระธาตุสำคัญของวัดเส้าหลินถูกขโมยไปเมื่อคืน เจ้าอาวาสฮุยหยวนสงสัยว่าเป็นฝีมือโจรปีนขื่อ — สืบร่องรอยในวัด ตามโจรไปทางซงซาน แล้วชิงพระธาตุคืนมา",
     briefSummary: "ค้นหาและนำพระธาตุกลับคืนให้เจ้าอาวาสเส้าหลิน",
     type: "side",
     giverNpcId: "sect_shaolin_abbot_huiyuan",
     stages: [
       {
         id: "investigate",
-        description: "สืบหาร่องรอยพระธาตุที่วัด",
+        description: "สืบหาร่องรอยพระธาตุที่วัดเส้าหลิน",
         autoAdvance: { t: "visitedLocation", locationId: "sect_shaolin" },
       },
       {
         id: "track_thief",
-        description: "ติดตามโจรที่หลบหนีออกไปทางป่า",
+        description: "ตามรอยโจรที่หนีขึ้นเนินเขาซงซาน",
         objective: {
           spots: [
             { locationId: "sect_songshan", label: "ตามรอยโจรบนเนินซงซาน", text: "กิ่งไม้หักและรอยเท้าบอกว่าโจรหนีไปรวมกับหัวหน้าโจรแถบภูเขา" },
@@ -251,12 +251,12 @@ export const QUESTS_SHAOLIN: readonly QuestDef[] = [
       },
       {
         id: "defeat_thief",
-        description: "ปราบโจรและนำพระธาตุกลับคืน",
+        description: "ปราบหัวหน้าโจรที่ขโมยพระธาตุ แล้วชิงคืนมา",
         autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 1 },
       },
       {
         id: "return_relic",
-        description: "ส่งพระธาตุคืนแก่เจ้าอาวาส",
+        description: "ส่งพระธาตุคืนแก่เจ้าอาวาสฮุยหยวน",
       },
     ],
     rewards: [
@@ -271,7 +271,7 @@ export const QUESTS_SHAOLIN: readonly QuestDef[] = [
   {
     id: "qst_shaolin_disciple_gone",
     name: "ลูกศิษย์สาบสูญ",
-    description: "ลูกศิษย์เส้าหลินคนหนึ่งหายตัวและถูกพบเห็นว่าลักขโมยและก่อความวุ่นวาย เจ้าอาวาสขอให้นำตัวกลับมา",
+    description: "ลูกศิษย์เส้าหลินคนหนึ่งหนีออกจากวัด มีคนเห็นเขาลักขโมยและก่อเรื่องในนครหลวง เจ้าอาวาสฮุยหยวนขอให้ไปตามตัวกลับมา — ถ้าเขาไม่ยอม ก็ต้องเอาชนะให้ได้ก่อน",
     briefSummary: "ตามหาและนำลูกศิษย์เส้าหลินที่หลงทางกลับมาสำนัก",
     type: "side",
     giverNpcId: "sect_shaolin_abbot_huiyuan",
@@ -279,7 +279,7 @@ export const QUESTS_SHAOLIN: readonly QuestDef[] = [
     stages: [
       {
         id: "search_city",
-        description: "ค้นหาลูกศิษย์ตามเมืองใกล้เคียง",
+        description: "สอบถามหาลูกศิษย์ที่หนีไปในนครหลวง",
         objective: {
           spots: [
             { locationId: "city_capital", label: "สอบถามหาลูกศิษย์ในเมืองหลวง", text: "ชาวบ้านเห็นภิกษุหนุ่มก่อเรื่องแล้วหนีออกนอกเมือง — เขายังท่องไปตามทาง" },
@@ -293,7 +293,7 @@ export const QUESTS_SHAOLIN: readonly QuestDef[] = [
       },
       {
         id: "bring_back",
-        description: "พาลูกศิษย์กลับวัดเส้าหลิน",
+        description: "พาลูกศิษย์กลับวัดเส้าหลิน ไปหาเจ้าอาวาสฮุยหยวน",
       },
     ],
     rewards: [
@@ -322,7 +322,7 @@ export const QUESTS_SHAOLIN: readonly QuestDef[] = [
     stages: [
       {
         id: "enter_trial",
-        description: "เข้ารับการทดสอบจากเจ้าอาวาส",
+        description: "เข้ารับการทดสอบจากเจ้าอาวาสฮุยหยวน",
       },
       {
         id: "complete_trial",
@@ -341,7 +341,7 @@ export const QUESTS_SHAOLIN: readonly QuestDef[] = [
   {
     id: "qst_shaolin_iron_training",
     name: "วัตถุดิบฝึกเหล็ก",
-    description: "อาจารย์ฝาหมิงต้องการแร่เหล็กพิเศษสำหรับฝึกกระดิ่งทอง นำแร่เทพมาให้ท่าน",
+    description: "อาจารย์ฝาหมิงแห่งวัดเส้าหลินฝึกวิชากระดิ่งทองด้วยการให้ศิษย์ตีกายด้วยเหล็ก — ท่านต้องการแร่เทพ 1 ก้อนมาหลอมเป็นตะบองฝึก",
     briefSummary: "นำแร่เทพให้อาจารย์ฝาหมิงของเส้าหลิน",
     type: "side",
     giverNpcId: "sect_shaolin_elder_faming",
@@ -411,16 +411,16 @@ export const QUESTS_SHAOLIN: readonly QuestDef[] = [
   {
     id: "qst_shaolin_redemption",
     name: "ไถ่บาปต่อเส้าหลิน",
-    description: "เจ้าผู้ทรยศกลับมาขออภัย — เจ้าสำนักเส้าหลินทดสอบความจริงใจเจ้าด้วยภารกิจหนัก ปราบหัวหน้าโจร 5 คนและนำของล้ำค่าของสำนักมาถวาย หากผ่าน ความเป็นทรยศจะถูกล้างเป็น \"ลาออก\" — นักล่าจะหยุดตามล่า แต่วิชาจะถูกแช่แข็ง",
-    briefSummary: "ไถ่บาปต่อเส้าหลิน — ปราบหัวหน้าโจร 5 + ส่งของถวาย 5 ชิ้น",
+    description: "เจ้าเคยทรยศเส้าหลิน สำนักจึงส่งนักล่ามาตามเจ้า — แต่เจ้าอาวาสฮุยหยวนยังเปิดทางให้ไถ่โทษ: ปราบหัวหน้าโจร 5 คน แล้วนำโสม 5 รากมาถวาย หากผ่าน เจ้าจะนับเป็น \"ผู้ลาออก\" แทน \"ผู้ทรยศ\" นักล่าจะเลิกตามล่า แต่วิชาของเส้าหลินที่ติดตัวจะไม่เก่งขึ้นจากการต่อสู้อีก และกลับเข้าสำนักไม่ได้",
+    briefSummary: "ไถ่บาปต่อเส้าหลิน — ปราบหัวหน้าโจร 5 + ถวายโสม 5 ราก",
     type: "side",
     sectId: "shaolin",
     giverNpcId: "sect_shaolin_abbot_huiyuan",
     prereqs: { t: "sectStatus", sectId: "shaolin", status: "betrayed" },
     stages: [
-      { id: "trial_kill", description: "ปราบหัวหน้าโจร (bandit_chief) 5 คน เพื่อพิสูจน์ใจ", autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 5 } },
-      { id: "trial_offering", description: "นำของถวาย — ginseng 5 ชิ้น", autoAdvance: { t: "hasItem", itemId: "ginseng", count: 5 } },
-      { id: "return_to_master", description: "กลับไปขออภัยต่อเจ้าสำนักเส้าหลิน" },
+      { id: "trial_kill", description: "ปราบหัวหน้าโจร 5 คนเพื่อพิสูจน์ว่ากลับใจจริง", autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 5 } },
+      { id: "trial_offering", description: "นำโสม 5 รากมาถวาย", autoAdvance: { t: "hasItem", itemId: "ginseng", count: 5 } },
+      { id: "return_to_master", description: "กลับไปขออภัยต่อเจ้าอาวาสฮุยหยวน" },
     ],
     rewards: [
       { t: "wExp", amount: 300 },
@@ -434,7 +434,7 @@ export const QUESTS_SHAOLIN: readonly QuestDef[] = [
     id: "qst_shaolin_sect_protect_village",
     name: "ปกป้องชาวบ้านจากโจร",
     description: "ชาวบ้านใกล้เขาซงซานร้องขอความช่วยเหลือ — โจรลอบเข้ารังแกชาวนาผู้ยากไร้ เจ้าอาวาสสั่งให้ศิษย์เส้าหลินกำราบโจรและนำอาหารไปแจกชาวบ้าน",
-    briefSummary: "ปราบโจร 3 คน + นำข้าวหมูแดง 5 จานแจกชาวบ้าน · sect points +65",
+    briefSummary: "ปราบโจร 3 คน + นำข้าวหมูแดง 5 จานแจกชาวบ้าน · แต้มสำนัก +65",
     type: "side",
     sectId: "shaolin",
     giverNpcId: "sect_shaolin_abbot_huiyuan",
@@ -442,7 +442,7 @@ export const QUESTS_SHAOLIN: readonly QuestDef[] = [
     stages: [
       {
         id: "fight_bandits",
-        description: "ปราบโจร (bandit) 3 คน",
+        description: "ปราบโจร 3 คน",
         autoAdvance: { t: "defeatedOpponent", opponentId: "bandit", count: 3 },
       },
       {
@@ -452,7 +452,7 @@ export const QUESTS_SHAOLIN: readonly QuestDef[] = [
       },
       {
         id: "report",
-        description: "กลับไปรายงานเจ้าอาวาส",
+        description: "กลับไปรายงานเจ้าอาวาสฮุยหยวน",
       },
     ],
     rewards: [
@@ -466,9 +466,9 @@ export const QUESTS_SHAOLIN: readonly QuestDef[] = [
 
   {
     id: "qst_shaolin_sect_sutra_paper",
-    name: "กระดาษคัดลอกพระสูตร",
-    description: "หอพระสูตรของวัดเส้าหลินขาดกระดาษสำหรับคัดลอกพระไตรปิฎก เจ้าอาวาสฮุยหยวนขอให้ศิษย์ออกหากระดาษคุณภาพดีจากเมืองใกล้เคียง",
-    briefSummary: "ส่งกระดาษ 6 แผ่นเข้าหอพระสูตร · sect points +50",
+    name: "กระดาษสาคัดลอกพระสูตร",
+    description: "หอพระสูตรของวัดเส้าหลินขาดกระดาษสาสำหรับคัดลอกพระไตรปิฎก เจ้าอาวาสฮุยหยวนขอให้ศิษย์ไปหากระดาษสา 6 แผ่นจากร้านในเมืองใกล้เคียง",
+    briefSummary: "ส่งกระดาษสา 6 แผ่นเข้าหอพระสูตร · แต้มสำนัก +50",
     type: "side",
     sectId: "shaolin",
     giverNpcId: "sect_shaolin_abbot_huiyuan",
@@ -476,12 +476,12 @@ export const QUESTS_SHAOLIN: readonly QuestDef[] = [
     stages: [
       {
         id: "main",
-        description: "หากระดาษ 6 แผ่น",
+        description: "หากระดาษสา 6 แผ่น",
         autoAdvance: { t: "hasItem", itemId: "paper", count: 6 },
       },
       {
         id: "report",
-        description: "ส่งกระดาษให้เจ้าอาวาส",
+        description: "ส่งกระดาษสาให้เจ้าอาวาสฮุยหยวน",
       },
     ],
     rewards: [

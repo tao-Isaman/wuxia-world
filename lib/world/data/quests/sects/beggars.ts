@@ -8,8 +8,8 @@ export const QUESTS_BEGGARS: readonly QuestDef[] = [
   {
     id: "qst_beggars_disciple_intro",
     name: "ขอเข้าเป็นศิษย์พรรคยาจก",
-    description: "หัวหน้าหงเทียนรับเฉพาะผู้ที่เข้าใจวิถียาจก — ผู้ที่ฝึกขอทานจนถึงขั้น ๒ แล้วเท่านั้น เก็บอาหารและเงินทองที่ได้จากท้องถนนมาแสดงให้ท่านเห็น",
-    briefSummary: "ส่งข้าวห่อ 5 + เงิน 100 ทอง · เข้าเป็นศิษย์พรรคยาจกขั้นที่ 9",
+    description: "หัวหน้าหงเทียนรับเฉพาะผู้ที่เข้าใจวิถียาจก — ผู้ที่ฝึกอาชีพขอทานถึงขั้น 2 แล้วเท่านั้น — นำข้าวหมูแดง 5 จานกับเงิน 100 ทองที่หาได้จากท้องถนนมาแสดงให้ท่านเห็น",
+    briefSummary: "ส่งข้าวหมูแดง 5 + เงิน 100 ทอง · เข้าเป็นศิษย์พรรคยาจกขั้นที่ 9",
     type: "side",
     giverNpcId: "sect_beggars_chief_hongtian",
     prereqs: {
@@ -23,7 +23,7 @@ export const QUESTS_BEGGARS: readonly QuestDef[] = [
     stages: [
       {
         id: "gather_offering",
-        description: "รวบรวมข้าวห่อ 5 + เงิน 100 ทอง จากการขอทาน",
+        description: "รวบรวมข้าวหมูแดง 5 + เงิน 100 ทอง จากการขอทาน",
         autoAdvance: {
           t: "and",
           all: [
@@ -50,7 +50,7 @@ export const QUESTS_BEGGARS: readonly QuestDef[] = [
     id: "qst_beggars_sect_patrol",
     name: "ลาดตระเวนตรอกเมือง",
     description: "ภารกิจประจำของศิษย์พรรคยาจก — ลาดตระเวนตรอกเมืองและกำราบโจรที่รังแกผู้อ่อนแอ",
-    briefSummary: "ปราบโจร 2 คน · sect points +50",
+    briefSummary: "ปราบโจร 2 คน · แต้มสำนัก +50",
     type: "side",
     sectId: "beggars",
     giverNpcId: "sect_beggars_chief_hongtian",
@@ -77,8 +77,8 @@ export const QUESTS_BEGGARS: readonly QuestDef[] = [
   {
     id: "qst_beggars_sect_alms",
     name: "แจกอาหารคนยากไร้",
-    description: "พรรคยาจกช่วยเหลือคนยากไร้เป็นกิจวัตร — เก็บข้าวห่อมาแจกให้ผู้หิวโหยในตรอกเมือง",
-    briefSummary: "ส่งข้าวห่อ 8 · sect points +60",
+    description: "พรรคยาจกช่วยเหลือคนยากไร้เป็นกิจวัตร — เก็บข้าวหมูแดงมาแจกให้ผู้หิวโหยในตรอกเมือง",
+    briefSummary: "ส่งข้าวหมูแดง 8 · แต้มสำนัก +60",
     type: "side",
     sectId: "beggars",
     giverNpcId: "sect_beggars_chief_hongtian",
@@ -86,12 +86,12 @@ export const QUESTS_BEGGARS: readonly QuestDef[] = [
     stages: [
       {
         id: "gather",
-        description: "เก็บข้าวห่อ 8 ห่อ",
+        description: "เก็บข้าวหมูแดง 8 จาน",
         autoAdvance: { t: "hasItem", itemId: "rice_dish", count: 8 },
       },
       {
         id: "deliver",
-        description: "ส่งข้าวห่อให้หัวหน้าหงเทียนนำไปแจก",
+        description: "ส่งข้าวหมูแดงให้หัวหน้าหงเทียนนำไปแจก",
       },
     ],
     rewards: [
@@ -106,7 +106,7 @@ export const QUESTS_BEGGARS: readonly QuestDef[] = [
   {
     id: "qst_beggars_art_thousandcrowd",
     name: "บททดสอบก่อนตำนาน: วิชาลึกลับ",
-    description: "หัวหน้าหงเทียนจะเล่าตำนานของวิชาลึกลับให้ศิษย์ที่พิสูจน์ได้ทั้งฝีมือและน้ำใจ — เป็นวิชาลับสุดยอดของพรรคยาจก (เมื่อผ่าน ดูแท็บตำนานในบันทึกภารกิจ)",
+    description: "หัวหน้าหงเทียนจะเล่าตำนานของวิชาลึกลับให้ศิษย์ที่พิสูจน์ได้ทั้งฝีมือและน้ำใจ — ปราบหัวหน้าโจร 3 คน และเก็บข้าวหมูแดง 12 จานไว้แจกเลี้ยง (เมื่อผ่าน ดูแท็บตำนานในบันทึกภารกิจ)",
     briefSummary: "บททดสอบ — เปิดทางสู่ตำนานของวิชาลึกลับ",
     type: "side",
     sectId: "beggars",
@@ -123,12 +123,12 @@ export const QUESTS_BEGGARS: readonly QuestDef[] = [
     stages: [
       {
         id: "trial_kill",
-        description: "พิสูจน์พลัง — ปราบหัวหน้าโจร (bandit_chief) 3 คน",
+        description: "พิสูจน์พลัง — ปราบหัวหน้าโจร 3 คน",
         autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 3 },
       },
       {
         id: "trial_alms",
-        description: "พิสูจน์น้ำใจ — เก็บข้าวห่อ 12 ห่อสำหรับแจกเลี้ยง",
+        description: "พิสูจน์น้ำใจ — เก็บข้าวหมูแดง 12 จานสำหรับแจกเลี้ยง",
         autoAdvance: { t: "hasItem", itemId: "rice_dish", count: 12 },
       },
       {
@@ -147,14 +147,14 @@ export const QUESTS_BEGGARS: readonly QuestDef[] = [
   {
     id: "qst_beggars_spy_report",
     name: "รายงานสายลับยุทธภพ",
-    description: "หัวหน้าหงเทียนได้รับข่าวว่ามีองค์กรลึกลับเคลื่อนไหวในยุทธภพ ขอให้ไปสืบข้อมูลมาให้",
+    description: "หัวหน้าหงเทียนได้ข่าวว่ามีองค์กรลึกลับเคลื่อนไหวในยุทธภพ ขอให้ไปสืบข่าวที่นครหลวง หยางโจว และจินหลิง แล้วจับตัวสายลับของมันมาสอบสวน",
     briefSummary: "สืบหาข้อมูลองค์กรลึกลับให้หัวหน้าพรรคยาจก",
     type: "side",
     giverNpcId: "sect_beggars_chief_hongtian",
     stages: [
       {
         id: "visit_three_places",
-        description: "สืบหาข้อมูลจากสามสถานที่ต่างกัน",
+        description: "สืบข่าวสามแห่ง: โรงน้ำชาในนครหลวง ท่าเรือหยางโจว และตลาดจินหลิง",
         objective: {
           spots: [
             { locationId: "city_capital", label: "สืบข่าวในโรงน้ำชาเมืองหลวง", text: "คนในโรงน้ำชาพูดถึงนักฆ่าชุดดำที่ถามหาเส้นทางลับ" },
@@ -165,7 +165,7 @@ export const QUESTS_BEGGARS: readonly QuestDef[] = [
       },
       {
         id: "confront_spy",
-        description: "เผชิญหน้าและสอบสวนสายลับขององค์กร",
+        description: "ตามจับนักฆ่าเงาที่เป็นสายลับขององค์กร แล้วเอาชนะให้ได้",
         autoAdvance: { t: "defeatedOpponent", opponentId: "shadow_assassin", count: 1 },
       },
       {
@@ -183,7 +183,7 @@ export const QUESTS_BEGGARS: readonly QuestDef[] = [
   {
     id: "qst_beggars_hungry_children",
     name: "อาหารเพื่อเด็กยาจก",
-    description: "เด็กกำพร้าในพรรคยาจกขาดแคลนอาหาร หัวหน้าขอให้นำข้าวสารและเนื้อสัตว์มาช่วย",
+    description: "เด็กกำพร้าในพรรคยาจกขาดแคลนอาหาร หัวหน้าหงเทียนขอเนื้อสด 3 ชิ้นมาต้มเลี้ยงพวกเขา",
     briefSummary: "รวบรวมอาหารมาช่วยเด็กในพรรคยาจก",
     type: "side",
     giverNpcId: "sect_beggars_chief_hongtian",
@@ -210,16 +210,16 @@ export const QUESTS_BEGGARS: readonly QuestDef[] = [
   {
     id: "qst_beggars_redemption",
     name: "ไถ่บาปต่อพรรคยาจก",
-    description: "เจ้าผู้ทรยศกลับมาขออภัย — เจ้าสำนักพรรคยาจกทดสอบความจริงใจเจ้าด้วยภารกิจหนัก ปราบหัวหน้าโจร 5 คนและนำของล้ำค่าของสำนักมาถวาย หากผ่าน ความเป็นทรยศจะถูกล้างเป็น \"ลาออก\" — นักล่าจะหยุดตามล่า แต่วิชาจะถูกแช่แข็ง",
-    briefSummary: "ไถ่บาปต่อพรรคยาจก — ปราบหัวหน้าโจร 5 + ส่งของถวาย 5 ชิ้น",
+    description: "เจ้าเคยทรยศพรรคยาจก สำนักจึงส่งนักล่ามาตามเจ้า — แต่หัวหน้าหงเทียนยังเปิดทางให้ไถ่โทษ: ปราบหัวหน้าโจร 5 คน แล้วนำข้าวหมูแดง 5 จานมาถวาย หากผ่าน เจ้าจะนับเป็น \"ผู้ลาออก\" แทน \"ผู้ทรยศ\" นักล่าจะเลิกตามล่า แต่วิชาของพรรคยาจกที่ติดตัวจะไม่เก่งขึ้นจากการต่อสู้อีก และกลับเข้าสำนักไม่ได้",
+    briefSummary: "ไถ่บาปต่อพรรคยาจก — ปราบหัวหน้าโจร 5 + ถวายข้าวหมูแดง 5 จาน",
     type: "side",
     sectId: "beggars",
     giverNpcId: "sect_beggars_chief_hongtian",
     prereqs: { t: "sectStatus", sectId: "beggars", status: "betrayed" },
     stages: [
-      { id: "trial_kill", description: "ปราบหัวหน้าโจร (bandit_chief) 5 คน เพื่อพิสูจน์ใจ", autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 5 } },
-      { id: "trial_offering", description: "นำของถวาย — rice_dish 5 ชิ้น", autoAdvance: { t: "hasItem", itemId: "rice_dish", count: 5 } },
-      { id: "return_to_master", description: "กลับไปขออภัยต่อเจ้าสำนักพรรคยาจก" },
+      { id: "trial_kill", description: "ปราบหัวหน้าโจร 5 คนเพื่อพิสูจน์ว่ากลับใจจริง", autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 5 } },
+      { id: "trial_offering", description: "นำข้าวหมูแดง 5 จานมาถวาย", autoAdvance: { t: "hasItem", itemId: "rice_dish", count: 5 } },
+      { id: "return_to_master", description: "กลับไปขออภัยต่อหัวหน้าหงเทียน" },
     ],
     rewards: [
       { t: "wExp", amount: 300 },
@@ -231,16 +231,16 @@ export const QUESTS_BEGGARS: readonly QuestDef[] = [
 
   {
     id: "qst_beggars_sect_rice2",
-    name: "เก็บข้าวห่อให้คนยาก",
-    description: "ภารกิจประจำของศิษย์พรรคยาจก — เก็บข้าวห่อ 6 ชิ้น",
-    briefSummary: "ส่งข้าวห่อ 6 ชิ้น · sect points +50",
+    name: "เก็บข้าวหมูแดงให้คนยาก",
+    description: "ภารกิจประจำของศิษย์พรรคยาจก — เก็บข้าวหมูแดง 6 จาน",
+    briefSummary: "ส่งข้าวหมูแดง 6 จาน · แต้มสำนัก +50",
     type: "side",
     sectId: "beggars",
     giverNpcId: "sect_beggars_chief_hongtian",
     prereqs: { t: "sectMember", sectId: "beggars" },
     stages: [
-      { id: "main", description: "เก็บข้าวห่อ 6 ชิ้น", autoAdvance: { t: "hasItem", itemId: "rice_dish", count: 6 } },
-      { id: "report", description: "กลับไปรายงาน" },
+      { id: "main", description: "เก็บข้าวหมูแดง 6 จาน", autoAdvance: { t: "hasItem", itemId: "rice_dish", count: 6 } },
+      { id: "report", description: "กลับไปรายงานหัวหน้าหงเทียน" },
     ],
     rewards: [
       { t: "gold", amount: 130 },
@@ -254,7 +254,7 @@ export const QUESTS_BEGGARS: readonly QuestDef[] = [
     id: "qst_beggars_sect_thug_road",
     name: "กำราบโจรริมทาง",
     description: "หัวหน้าหงเทียนได้ข่าวว่ามีโจรเร่ร่อนรังแกพ่อค้าและคนเดินทางตามชายป่า — ขอให้ปราบและนำเหรียญที่โจรขโมยไปคืน",
-    briefSummary: "ปราบโจรเร่ร่อน 4 + เหรียญโบราณ 1 · sect points +65",
+    briefSummary: "ปราบโจรเร่ร่อน 4 + เหรียญโบราณ 1 · แต้มสำนัก +65",
     type: "side",
     sectId: "beggars",
     giverNpcId: "sect_beggars_chief_hongtian",
@@ -262,7 +262,7 @@ export const QUESTS_BEGGARS: readonly QuestDef[] = [
     stages: [
       {
         id: "fight",
-        description: "ปราบโจรเร่ร่อน (thug) 4 คน",
+        description: "ปราบโจรเร่ร่อน 4 คน",
         autoAdvance: { t: "defeatedOpponent", opponentId: "thug", count: 4 },
       },
       {
@@ -287,8 +287,8 @@ export const QUESTS_BEGGARS: readonly QuestDef[] = [
   {
     id: "qst_beggars_sect_supplies",
     name: "รวบรวมเสบียงและผ้าให้คนยากไร้",
-    description: "ฤดูหนาวใกล้มาถึง — พรรคยาจกจะแจกข้าวและผ้าให้คนยากไร้ในตรอก หัวหน้าขอให้ช่วยรวบรวมข้าวห่อและผ้าไหมเก่าให้พอแจก",
-    briefSummary: "ส่งข้าวห่อ 6 + ผ้าไหม 4 · sect points +70",
+    description: "ฤดูหนาวใกล้มาถึง — พรรคยาจกจะแจกข้าวและผ้าให้คนยากไร้ในตรอก หัวหน้าขอให้ช่วยรวบรวมข้าวหมูแดงและผ้าไหมเก่าให้พอแจก",
+    briefSummary: "ส่งข้าวหมูแดง 6 + ผ้าไหม 4 · แต้มสำนัก +70",
     type: "side",
     sectId: "beggars",
     giverNpcId: "sect_beggars_chief_hongtian",
@@ -296,7 +296,7 @@ export const QUESTS_BEGGARS: readonly QuestDef[] = [
     stages: [
       {
         id: "gather_food",
-        description: "รวบรวมข้าวห่อ 6 ห่อ",
+        description: "รวบรวมข้าวหมูแดง 6 จาน",
         autoAdvance: { t: "hasItem", itemId: "rice_dish", count: 6 },
       },
       {
@@ -321,8 +321,8 @@ export const QUESTS_BEGGARS: readonly QuestDef[] = [
   {
     id: "qst_beggars_sect_village_delivery",
     name: "ส่งของยังหมู่บ้านอดอยาก",
-    description: "หมู่บ้านชายแดนกำลังประสบภัยอดอยาก — หัวหน้าหงเทียนขอให้นำเนื้อย่างไปส่งและเอาข้าวห่อแจกชาวบ้าน",
-    briefSummary: "ส่งเนื้อย่าง 5 + ข้าวห่อ 4 · sect points +60",
+    description: "หมู่บ้านชายแดนกำลังประสบภัยอดอยาก — หัวหน้าหงเทียนขอให้นำเนื้อย่างไปส่งและเอาข้าวหมูแดงแจกชาวบ้าน",
+    briefSummary: "ส่งเนื้อย่าง 5 + ข้าวหมูแดง 4 · แต้มสำนัก +60",
     type: "side",
     sectId: "beggars",
     giverNpcId: "sect_beggars_chief_hongtian",
@@ -330,7 +330,7 @@ export const QUESTS_BEGGARS: readonly QuestDef[] = [
     stages: [
       {
         id: "main",
-        description: "เก็บเนื้อย่าง 5 ชิ้น + ข้าวห่อ 4 ห่อ",
+        description: "เก็บเนื้อย่าง 5 ชิ้น + ข้าวหมูแดง 4 จาน",
         autoAdvance: {
           t: "and",
           all: [

@@ -27,7 +27,7 @@ export const SCENES__OTHER: readonly Scene[] = [
     lines: [
       { t: "narration", text: "เติ้งหยวนเจินหรี่ตามองเจ้านิ่ง ๆ" },
       { t: "dialogue", speaker: "เติ้งหยวนเจิน", text: "เจ้าฝึกหนึ่งพลังสุริยันต์จนเจอกำแพงแล้วสิ — ใช่ไหม?" },
-      { t: "dialogue", speaker: "เติ้งหยวนเจิน", text: "ปลายของแสง... อยู่ในเงา ปลายของไฟ... อยู่ในน้ำแข็ง พลังตรงข้ามนั้นเองที่จะปลดล็อกขั้นต่อไป" },
+      { t: "dialogue", speaker: "เติ้งหยวนเจิน", text: "ปลายของแสง... อยู่ในเงา ปลายของไฟ... อยู่ในน้ำแข็ง พลังตรงข้ามนั้นเองที่จะเปิดทางสู่ขั้นต่อไป" },
       { t: "dialogue", speaker: "เติ้งหยวนเจิน", text: "ข้ามภูเขาไปทางเหนือ มีสุสานเก่าตั้งอยู่ตรงข้ามวัด — แต่ข้าเตือนเจ้า หากเจ้าก้าวเข้าไปและรับวิชา เจ้าจะไม่เป็นศิษย์ฉวนเจินอีก" },
       { t: "dialogue", speaker: "เติ้งหยวนเจิน", text: "เลือกเอง... แต่จงเลือกอย่างมีสติ" },
     ],
@@ -112,7 +112,7 @@ export const SCENES__OTHER: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qst_yaowang_rare_ingredient_offer",
     lines: [
-      { t: "dialogue", speaker: "เสินหนง", text: "ข้ากำลังปรุงยาตำรับพิเศษ ต้องการโสม 2 หน่วยและหยก 1 ชิ้น" },
+      { t: "dialogue", speaker: "เสินหนง", text: "ข้ากำลังปรุงยาตำรับพิเศษ ต้องการโสม 2 รากกับหยกล้ำค่า 1 ก้อน" },
       { t: "dialogue", speaker: "เสินหนง", text: "หากหามาได้จะมีบัวหิมะเป็นรางวัล" },
     ],
     choices: [
@@ -136,7 +136,7 @@ export const SCENES__OTHER: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qst_yaowang_plague_village_offer",
     lines: [
-      { t: "dialogue", speaker: "เสินหนง", text: "ได้ยินว่ามีหมู่บ้านป่วยระบาด อาการแปลกมาก" },
+      { t: "dialogue", speaker: "เสินหนง", text: "ได้ยินว่าหมู่บ้านแถบถ้ำหุบเขาผีเสื้อป่วยกันทั้งหมู่บ้าน อาการแปลกมาก" },
       { t: "dialogue", speaker: "เสินหนง", text: "ไปดูให้ข้าหน่อย เก็บตัวอย่างพืชพรรณที่นั่นมาด้วย" },
     ],
     choices: [
@@ -161,7 +161,7 @@ export const SCENES__OTHER: readonly Scene[] = [
     id: "qs_qst_yaowang_venom_antidote_offer",
     lines: [
       { t: "dialogue", speaker: "เสินหนง", text: "มีนักรบตายจากพิษลึกลับ ข้าวิเคราะห์แล้วว่าเป็นพิษงูชนิดพิเศษ" },
-      { t: "dialogue", speaker: "เสินหนง", text: "ช่วยหาพิษงู 2 หน่วยมา แล้วติดตามหาว่าใครวางยา" },
+      { t: "dialogue", speaker: "เสินหนง", text: "เริ่มจากปากถ้ำแมงมุมที่พบศพ หาพิษงู 2 ขวดมาให้ข้าเทียบ แล้วตามหาตัวคนวางยา" },
     ],
     choices: [
       { text: "รับภารกิจ", next: "villa_yaowang" },
@@ -214,7 +214,7 @@ export const SCENES__OTHER: readonly Scene[] = [
         effects: [{ t: "startQuest", questId: "qst_dalun_pilgrim_mission" }],
       },
       {
-        text: "กลับจากวัดเทียนหนิงแล้ว",
+        text: "กลับจากวิหารหลวงจีนสวรรค์แล้ว",
         next: "qs_qst_dalun_pilgrim_complete",
         visibleIf: {
           t: "and",
@@ -257,8 +257,8 @@ export const SCENES__OTHER: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qst_dalun_pilgrim_offer",
     lines: [
-      { t: "dialogue", speaker: "กงซิน", text: "วัดตาหลุนและวัดเทียนหนิงมีพิธีกรรมร่วมกันมาหลายร้อยปี" },
-      { t: "dialogue", speaker: "กงซิน", text: "เจ้าช่วยไปแวะวัดเทียนหนิงและกลับมาบอกข้าได้ไหม?" },
+      { t: "dialogue", speaker: "กงซิน", text: "วิหารล้อลมของเรากับวิหารหลวงจีนสวรรค์มีพิธีกรรมร่วมกันมาหลายร้อยปี" },
+      { t: "dialogue", speaker: "กงซิน", text: "เจ้าช่วยไปสวดมนต์ที่วิหารหลวงจีนสวรรค์แทนอาตมา แล้วกลับมาเล่าให้ฟังได้ไหม?" },
     ],
     choices: [
       { text: "รับภารกิจ", next: "temple_dalun" },
@@ -396,7 +396,7 @@ export const SCENES__OTHER: readonly Scene[] = [
     id: "qs_qst_yanzi_stolen_heirloom_offer",
     lines: [
       { t: "dialogue", speaker: "เหยินเฟิง", text: "ดาบมรดกของตระกูลเหยินหายไปในคืนงานเลี้ยง" },
-      { t: "dialogue", speaker: "เหยินเฟิง", text: "ผู้ต้องสงสัยสามคน: แขกชาวเหนือ ข้าราชบริพาร และบุตรสาวตระกูลหลง" },
+      { t: "dialogue", speaker: "เหยินเฟิง", text: "ผู้ต้องสงสัยมีสามคน: พ่อบ้าน แขกนักดนตรี และองครักษ์ของคุ้ม" },
     ],
     choices: [
       { text: "รับภารกิจสืบสวน", next: "villa_yanzi" },
@@ -420,25 +420,25 @@ export const SCENES__OTHER: readonly Scene[] = [
     id: "qs_yanzi_heirloom_investigation",
     lines: [
       { t: "narration", text: "เจ้าสอบสวนผู้ต้องสงสัยสามคนอย่างระมัดระวัง" },
-      { t: "narration", text: "แขกชาวเหนือมีสีหน้าเฉยเมย ข้าราชบริพารหน้าตกใจ บุตรสาวตระกูลหลงดูเป็นปกติเกินไป" },
+      { t: "narration", text: "พ่อบ้านมีพยานว่าอยู่ในครัวทั้งคืน นักดนตรีเล่นพิณจนรุ่งเช้า ส่วนองครักษ์ผู้หนึ่งพูดวกวนและแขนมีแผลใหม่" },
     ],
     choices: [
       {
-        text: "กล่าวหาบุตรสาวตระกูลหลง",
+        text: "กล่าวหาองครักษ์",
         next: "qs_yanzi_heirloom_confront",
         effects: [
           { t: "setFlag", flag: "yanzi_sword_suspect", value: "long_daughter" },
         ],
       },
       {
-        text: "กล่าวหาข้าราชบริพาร",
+        text: "กล่าวหาพ่อบ้าน",
         next: "qs_yanzi_heirloom_confront",
         effects: [
           { t: "setFlag", flag: "yanzi_sword_suspect", value: "servant" },
         ],
       },
       {
-        text: "กล่าวหาแขกชาวเหนือ",
+        text: "กล่าวหาแขกนักดนตรี",
         next: "qs_yanzi_heirloom_confront",
         effects: [
           { t: "setFlag", flag: "yanzi_sword_suspect", value: "northern_guest" },
@@ -484,7 +484,7 @@ export const SCENES__OTHER: readonly Scene[] = [
     id: "qs_yanzi_heirloom_win",
     lines: [
       { t: "narration", text: "ผู้ขโมยล้มลง ดาบมรดกหล่นจากมือเขา" },
-      { t: "dialogue", speaker: "ผู้ขโมย", text: "ฉัน... แพ้แล้ว" },
+      { t: "dialogue", speaker: "ผู้ขโมย", text: "ข้า... แพ้แล้ว" },
     ],
     choices: [
       {
@@ -503,7 +503,7 @@ export const SCENES__OTHER: readonly Scene[] = [
       { t: "narration", text: "เจ้ารู้สึกอึดอัดในใจ แต่ภารกิจสำเร็จ" },
     ],
     choices: [
-      { text: "กลับรายงานผู้อาวุโส", next: "npc_sect_ming_elder_zhuying_talk" },
+      { text: "กลับไปรายงานผู้อาวุโสจูอิง", next: "npc_sect_ming_elder_zhuying_talk" },
     ],
   },
 
@@ -515,7 +515,7 @@ export const SCENES__OTHER: readonly Scene[] = [
       { t: "dialogue", speaker: "ผู้แปรพักตร์", text: "เจ้าช่วยชีวิตข้า... ข้าจะไม่ลืมนี้" },
     ],
     choices: [
-      { text: "กลับรายงานผู้อาวุโส (โกหก)", next: "npc_sect_ming_elder_zhuying_talk" },
+      { text: "กลับไปรายงานผู้อาวุโสจูอิง (โกหก)", next: "npc_sect_ming_elder_zhuying_talk" },
     ],
   },
 
@@ -524,11 +524,11 @@ export const SCENES__OTHER: readonly Scene[] = [
     id: "npc_palace_zhongyang_envoy_liuying_talk",
     lines: [
       { t: "narration", text: "ทูตหลิวอิงยืนอยู่ในห้องโถงวัง แต่งตัวสวยงามตามขนบธรรมเนียมราชสำนัก สายตาตื่นตัวเสมอ" },
-      { t: "dialogue", speaker: "หลิวอิง", text: "ยินดีต้อนรับสู่วังจงหยาง ข้าเป็นตัวแทนของพระราชา ท่านนักเดินทาง" },
+      { t: "dialogue", speaker: "หลิวอิง", text: "ยินดีต้อนรับสู่พระราชวังจงหยาง ข้าเป็นทูตของราชสำนัก ท่านนักเดินทาง" },
     ],
     choices: [
       {
-        text: "รับภารกิจสาส์นพระราชา",
+        text: "รับภารกิจสาส์นราชสำนัก",
         next: "qs_qst_zhongyang_imperial_letter_offer",
         visibleIf: { t: "questStatus", questId: "qst_zhongyang_imperial_letter", status: "none" },
         effects: [{ t: "startQuest", questId: "qst_zhongyang_imperial_letter" }],
@@ -546,13 +546,13 @@ export const SCENES__OTHER: readonly Scene[] = [
         effects: [{ t: "finishQuest", questId: "qst_zhongyang_imperial_letter", success: true }],
       },
       {
-        text: "รับภารกิจสงครามขุนนาง",
+        text: "รับภารกิจสอดแนมขุนนาง",
         next: "qs_qst_zhongyang_noble_intrigue_offer",
         visibleIf: { t: "questStatus", questId: "qst_zhongyang_noble_intrigue", status: "none" },
         effects: [{ t: "startQuest", questId: "qst_zhongyang_noble_intrigue" }],
       },
       {
-        text: "รายงานผลสงครามขุนนาง",
+        text: "รายงานผลสอดแนมขุนนาง",
         next: "qs_qst_zhongyang_noble_intrigue_decide",
         visibleIf: {
           t: "and",
@@ -588,8 +588,8 @@ export const SCENES__OTHER: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qst_zhongyang_imperial_letter_offer",
     lines: [
-      { t: "dialogue", speaker: "หลิวอิง", text: "สาส์นนี้เร่งด่วนมาก พระราชาต้องการแจ้งอาจารย์อู่ตัง" },
-      { t: "dialogue", speaker: "หลิวอิง", text: "ไปส่งให้อาจารย์ชิงซวี่โดยเร็ว" },
+      { t: "dialogue", speaker: "หลิวอิง", text: "สาส์นนี้เร่งด่วนมาก ราชสำนักต้องการแจ้งข่าวถึงอู่ตัง" },
+      { t: "dialogue", speaker: "หลิวอิง", text: "นำไปส่งถึงมืออาจารย์ชิงซวี่ที่อู่ตังโดยเร็ว" },
     ],
     choices: [
       {
@@ -617,7 +617,7 @@ export const SCENES__OTHER: readonly Scene[] = [
     id: "qs_qst_zhongyang_noble_intrigue_offer",
     lines: [
       { t: "dialogue", speaker: "หลิวอิง", text: "ขุนนางสองฝ่ายกำลังแย่งชิงตำแหน่ง ข้าต้องการรู้ว่าฝ่ายไหนโกง" },
-      { t: "dialogue", speaker: "หลิวอิง", text: "ไปสอดแนมทั้งสองฝ่ายแล้วกลับมารายงานตามความจริง" },
+      { t: "dialogue", speaker: "หลิวอิง", text: "ไปสอดแนมเรือนฝั่งตะวันออกและฝั่งตะวันตกในวังนี้ แล้วกลับมารายงานตามความจริง" },
     ],
     choices: [
       { text: "รับภารกิจ", next: "palace_zhongyang" },
@@ -628,7 +628,7 @@ export const SCENES__OTHER: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qst_zhongyang_noble_intrigue_decide",
     lines: [
-      { t: "narration", text: "เจ้าค้นพบว่าฝ่าย A โกงด้วยการรับสินบน แต่ฝ่าย B ก็มีความผิดในเรื่องอื่น" },
+      { t: "narration", text: "บัญชีลับยืนยันว่าขุนนางฝั่งตะวันออกยักยอกภาษี — แต่เจ้าสังเกตว่าทูตหลิวอิงสนิทกับฝั่งนั้น และคงอยากได้ยินว่าฝั่งตะวันตกผิด" },
     ],
     choices: [
       {
@@ -640,7 +640,7 @@ export const SCENES__OTHER: readonly Scene[] = [
         ],
       },
       {
-        text: "รายงานเฉพาะฝ่าย A (เพื่อฝ่าย B)",
+        text: "รายงานว่าฝั่งตะวันตกผิด (ตามที่ทูตอยากฟัง)",
         next: "qs_zhongyang_intrigue_bias",
         effects: [
           { t: "addTrait", trait: "evil", amount: 3 },
@@ -655,7 +655,7 @@ export const SCENES__OTHER: readonly Scene[] = [
     id: "qs_zhongyang_intrigue_truth",
     lines: [
       { t: "narration", text: "ทูตฟังรายงานและพยักหน้าอย่างเคร่งขรึม" },
-      { t: "dialogue", speaker: "หลิวอิง", text: "ขอบคุณที่ซื่อสัตย์... เรื่องนี้จะต้องนำขึ้นสู่พระราชา" },
+      { t: "dialogue", speaker: "หลิวอิง", text: "ขอบคุณที่ซื่อสัตย์... เรื่องนี้จะต้องนำขึ้นกราบทูลฮ่องเต้" },
     ],
     choices: [
       {
@@ -693,7 +693,7 @@ export const SCENES__OTHER: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qst_zhongyang_ceremony_offer",
     lines: [
-      { t: "dialogue", speaker: "หลิวอิง", text: "มีข่าวว่านักฆ่าจะโจมตีพิธีพรุ่งนี้..." },
+      { t: "dialogue", speaker: "หลิวอิง", text: "มีข่าวว่านักฆ่าจะลอบโจมตีพิธีในวังพรุ่งนี้..." },
       { t: "dialogue", speaker: "หลิวอิง", text: "เจ้าช่วยคอยเฝ้าระวังได้ไหม? ต้องการคนที่มีฝีมือจริง ๆ" },
     ],
     choices: [
@@ -746,7 +746,7 @@ export const SCENES__OTHER: readonly Scene[] = [
     id: "qs_qst_zhongyang_ceremony_complete",
     lines: [
       { t: "narration", text: "ทูตหลิวอิงโค้งคำนับอย่างสุขุม" },
-      { t: "dialogue", speaker: "หลิวอิง", text: "เจ้าช่วยรักษาพิธีสำคัญไว้ได้ ยุทธภพทั้งผืนเป็นหนี้บุญคุณเจ้า" },
+      { t: "dialogue", speaker: "หลิวอิง", text: "เจ้าช่วยรักษาพิธีสำคัญไว้ได้ ราชสำนักเป็นหนี้บุญคุณเจ้า" },
     ],
     choices: [
       { text: "รับรางวัล", next: "palace_zhongyang" },
