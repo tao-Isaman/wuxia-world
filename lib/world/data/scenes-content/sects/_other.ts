@@ -419,7 +419,7 @@ export const SCENES__OTHER: readonly Scene[] = [
     kind: "dialog",
     id: "qs_yanzi_heirloom_investigation",
     lines: [
-      { t: "narration", text: "เจ้าสอบสวนผู้ต้องสงสัยสามคนอย่างระมัดระวัง" },
+      { t: "narration", text: "เจ้าทบทวนคำให้การของผู้ต้องสงสัยทั้งสามคนกลางโถงคุ้ม" },
       { t: "narration", text: "พ่อบ้านมีพยานว่าอยู่ในครัวทั้งคืน นักดนตรีเล่นพิณจนรุ่งเช้า ส่วนองครักษ์ผู้หนึ่งพูดวกวนและแขนมีแผลใหม่" },
     ],
     choices: [
@@ -451,8 +451,8 @@ export const SCENES__OTHER: readonly Scene[] = [
     kind: "dialog",
     id: "qs_yanzi_heirloom_confront",
     lines: [
-      { t: "narration", text: "เจ้าเผชิญหน้ากับผู้ต้องสงสัย ความตึงเครียดสูงขึ้น" },
-      { t: "narration", text: "ผู้ต้องสงสัยชักดาบออกมา — ดาบมรดกอยู่ในมือเขา!" },
+      { t: "narration", text: "เจ้าเอ่ยข้อกล่าวหากลางโถงคุ้ม ความตึงเครียดสูงขึ้น" },
+      { t: "narration", text: "องครักษ์ผู้มีแผลที่แขนชักดาบออกมาก่อนใคร — ดาบมรดกอยู่ในมือเขา! ที่แท้เขาคือนักฆ่าเงาที่แฝงตัวมา" },
     ],
     choices: [
       {
@@ -503,7 +503,7 @@ export const SCENES__OTHER: readonly Scene[] = [
       { t: "narration", text: "เจ้ารู้สึกอึดอัดในใจ แต่ภารกิจสำเร็จ" },
     ],
     choices: [
-      { text: "กลับไปรายงานผู้อาวุโสจูอิง", next: "npc_sect_ming_elder_zhuying_talk" },
+      { text: "ออกเดินทางกลับพรรค", next: "cliff_heimu" },
     ],
   },
 
@@ -515,7 +515,7 @@ export const SCENES__OTHER: readonly Scene[] = [
       { t: "dialogue", speaker: "ผู้แปรพักตร์", text: "เจ้าช่วยชีวิตข้า... ข้าจะไม่ลืมนี้" },
     ],
     choices: [
-      { text: "กลับไปรายงานผู้อาวุโสจูอิง (โกหก)", next: "npc_sect_ming_elder_zhuying_talk" },
+      { text: "กลับไปรายงานผู้อาวุโสจูอิง (และปิดบังความจริง)", next: "cliff_heimu" },
     ],
   },
 

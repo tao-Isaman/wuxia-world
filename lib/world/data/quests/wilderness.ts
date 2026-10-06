@@ -213,7 +213,7 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
         description: "ลงไปสืบสวนในก้นหุบเขายามค่ำ",
         objective: {
           spots: [
-            { locationId: "valley_jueqing", label: "ลงสืบก้นหุบเขายามค่ำ", text: "ก้นหุบเขามีซากเกราะเก่าสลักรูปงู — เครื่องหมายพรรคเบญจพิษ ลมที่ลอดซอกหินผ่านซากนั้นฟังเหมือนเสียงร้องไห้ — กลับไปรายงานหลินชัวซัน" },
+            { locationId: "valley_jueqing", label: "ลงสืบก้นหุบเขายามค่ำ", sceneId: "qs_qw_jueqing_ghost_hunt_investigate" },
           ],
         },
       },
@@ -304,7 +304,7 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
         description: "ไปตลาดชาวเมี่ยว ให้อาเป้าหัวหน้าเผ่าแปลจารึก",
         objective: {
           spots: [
-            { locationId: "market_miao", label: "ให้หัวหน้าเผ่าอาเป้าแปลจารึก", npcId: "wld_miao_tribaleldr_abao", text: "อาเป้าอ่านจารึกออก: เป็นแผนที่ไปยังคลังสมบัติโบราณกลางทะเลทรายร้างที่บรรพบุรุษเผ่าเคยเฝ้า — และสมบัตินั้นมีผู้พิทักษ์ กลับไปบอกโม่ฉิงเทียน" },
+            { locationId: "market_miao", label: "ให้หัวหน้าเผ่าอาเป้าแปลจารึก", npcId: "wld_miao_tribaleldr_abao", sceneId: "qs_qw_desert_ancient_map_decoded" },
           ],
         },
       },
@@ -321,20 +321,18 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
   {
     id: "qw_desert_relic_return",
     name: "คืนของโบราณให้เจ้าของ",
-    description: "โม่ฉิงเทียนพบเหรียญโบราณของตระกูลเชื้อพระวงศ์เก่าแห่งหยางโจว เขาฝากเจ้านำไปคืน — ไปหยางโจว แล้วมอบเหรียญให้ชาวเมืองคนใดก็ได้ช่วยส่งต่อถึงตระกูลนั้น",
-    briefSummary: "นำเหรียญโบราณไปมอบให้ชาวหยางโจว",
+    description: "โม่ฉิงเทียนพบเหรียญโบราณของตระกูลจ้าว เชื้อพระวงศ์ราชวงศ์ซ่งเก่าแห่งหยางโจว เขาฝากเจ้านำไปคืน — ไปหยางโจว แล้วมอบเหรียญแก่ผู้เฝ้าศาลบรรพชนของตระกูลนั้น",
+    briefSummary: "นำเหรียญโบราณไปคืนศาลบรรพชนตระกูลจ้าวที่หยางโจว",
     type: "side",
     giverNpcId: "wld_desert_collector_mo",
     prereqs: { t: "visitedLocation", locationId: "desert_ruins" },
     stages: [
       {
         id: "travel",
-        description: "ไปหยางโจว แล้วใช้ 'ให้ของขวัญ' มอบเหรียญโบราณแก่ชาวเมืองสักคนเพื่อส่งคืนตระกูลเจ้าของ",
-        autoAdvance: {
-          t: "and",
-          all: [
-            { t: "visitedLocation", locationId: "city_yangzhou" },
-            { t: "not", of: { t: "hasItem", itemId: "ancient_coin", count: 1 } },
+        description: "ไปหยางโจว แล้วมอบเหรียญโบราณแก่ผู้เฝ้าศาลบรรพชนตระกูลจ้าวริมคลอง",
+        objective: {
+          spots: [
+            { locationId: "city_yangzhou", label: "มอบเหรียญที่ศาลบรรพชนตระกูลจ้าว", sceneId: "qs_qw_desert_relic_return_shrine" },
           ],
         },
       },
@@ -369,7 +367,7 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
         description: "เข้าไปในซากเมืองที่ทะเลทรายร้าง ตามหาผู้พิทักษ์สมบัติ",
         objective: {
           spots: [
-            { locationId: "desert_ruins", label: "เข้าไปในซากปรักหักพัง", text: "ลึกเข้าไปในซากมีโจรทะเลทรายเฝ้าสมบัติอยู่ — เขาคือผู้พิทักษ์ที่โม่ฉิงเทียนพูดถึง" },
+            { locationId: "desert_ruins", label: "เข้าไปในซากปรักหักพัง", sceneId: "qs_qw_desert_guardian_test_battle" },
           ],
         },
       },
@@ -431,19 +429,10 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
     stages: [
       {
         id: "search",
-        description: "ค้นป่าหลังตลาดชาวเมี่ยวหาสัตว์ศักดิ์สิทธิ์",
+        description: "ค้นป่าหลังตลาดชาวเมี่ยว หากรงที่พรานขังสัตว์ศักดิ์สิทธิ์ไว้ แล้วปล่อยมันกลับสู่ป่า",
         objective: {
           spots: [
-            { locationId: "market_miao", label: "ค้นป่าหลังตลาดเมี่ยว", text: "พบกรงไม้ไผ่ซ่อนในพุ่มไม้ สัตว์ศักดิ์สิทธิ์ขดตัวอยู่ข้างใน" },
-          ],
-        },
-      },
-      {
-        id: "free",
-        description: "เปิดกรงปล่อยสัตว์ศักดิ์สิทธิ์ในป่าหลังตลาดชาวเมี่ยว",
-        objective: {
-          spots: [
-            { locationId: "market_miao", label: "ปล่อยสัตว์ศักดิ์สิทธิ์จากกรง", text: "สัตว์ศักดิ์สิทธิ์วิ่งกลับเข้าป่า หันมามองครู่หนึ่งก่อนหายไป" },
+            { locationId: "market_miao", label: "ค้นป่าหลังตลาดเมี่ยว", sceneId: "qs_qw_miao_spirit_beast_found" },
           ],
         },
       },
@@ -473,10 +462,10 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
       },
       {
         id: "place_offering",
-        description: "วางของถวายบนแท่นหินในถ้ำบทกวีถัง",
+        description: "วางเม็ดบัวถวายบนแท่นหินในถ้ำบทกวีถัง (ระวังตะขาบยักษ์)",
         objective: {
           spots: [
-            { locationId: "cave_tangshi", label: "วางของถวายบนแท่นหิน", text: "ของถวายวางบนแท่นเรียบร้อย ลมเย็นพัดผ่านถ้ำราวกับรับรู้" },
+            { locationId: "cave_tangshi", label: "วางของถวายบนแท่นหิน", sceneId: "qs_qw_miao_offering_cave_arrived" },
           ],
         },
       },
@@ -495,8 +484,8 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
   {
     id: "qw_motian_restless_soul",
     name: "วิญญาณไม่สงบยอดเขามรณะ",
-    description: "เหลียงเก๋อ วิญญาณนักรบที่ตายบนยอดเขามรณะ ฝากด้ามดาบขึ้นสนิมไว้กับเจ้า นำมันเข้าไปในคลังสมบัติลับ ที่ใบดาบของเขาซ่อนอยู่ แล้วนำดาบที่สมบูรณ์กลับมาคืน เขาจึงจะไปสู่สุคติได้",
-    briefSummary: "นำด้ามดาบไปที่คลังสมบัติลับ แล้วนำดาบคืนเหลียงเก๋อ",
+    description: "เหลียงเก๋อ วิญญาณนักรบที่ตายบนยอดเขามรณะ ฝากด้ามดาบขึ้นสนิมไว้กับเจ้า นำมันเข้าไปในคลังสมบัติลับ ที่ใบดาบของเขาซ่อนอยู่ แล้วนำดาบที่สมบูรณ์กลับมา — จะคืนให้เขาตามสัญญาเพื่อให้ไปสู่สุคติ หรือเก็บดาบทรงพลังนั้นไว้เอง ก็สุดแต่ใจเจ้า",
+    briefSummary: "นำด้ามดาบไปที่คลังสมบัติลับ แล้วเลือกว่าจะคืนดาบให้เหลียงเก๋อหรือเก็บไว้",
     type: "side",
     giverNpcId: "wld_motian_ghost_liang",
     prereqs: { t: "flag", flag: "motian_ghost_revealed" },
@@ -517,7 +506,7 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
           ],
         },
       },
-      { id: "decide", description: "นำดาบโบราณกลับไปคืนเหลียงเก๋อที่ยอดเขามรณะ" },
+      { id: "decide", description: "นำดาบโบราณกลับไปหาเหลียงเก๋อที่ยอดเขามรณะ แล้วตัดสินใจ: คืนดาบตามสัญญา หรือเก็บไว้เอง" },
     ],
     rewards: [
       { t: "wExp", amount: 120 },
@@ -635,9 +624,8 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
         id: "dive",
         description: "ดำลงไปสำรวจก้นสระมังกรดำ",
         objective: {
-          hours: 2,
           spots: [
-            { locationId: "pool_heilong", label: "ดำลงสำรวจก้นสระ", text: "ก้นสระไม่มีมังกร มีเพียงโพรงหินเรืองแสงสีน้ำเงิน — และร่างในชุดชาวประมงที่นอนอยู่ข้างหินใสนั้น เหมือนเฝ้ามันมานานหลายปี" },
+            { locationId: "pool_heilong", label: "ดำลงสำรวจก้นสระ", sceneId: "qs_qw_heilong_dragon_pearl_deep" },
           ],
         },
       },
@@ -663,7 +651,7 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
         description: "ค้นหาชาวประมงรอบมังกรดำสระน้ำ",
         objective: {
           spots: [
-            { locationId: "pool_heilong", label: "ค้นหารอบสระมังกรดำ", text: "พบเรือของชาวประมงผูกอยู่กับเรือโจรสลัดในดงกก" },
+            { locationId: "pool_heilong", label: "ค้นหารอบสระมังกรดำ", sceneId: "qs_qw_heilong_missing_fisher_found" },
           ],
         },
       },
@@ -696,15 +684,14 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
         id: "wait_fullmoon",
         description: "รอคืนเพ็ญที่มังกรดำสระน้ำ แล้วดำลงไปตามแสง",
         objective: {
-          hours: 4,
           spots: [
-            { locationId: "pool_heilong", label: "ดำตามแสงสีแดงในคืนเพ็ญ", text: "แสงแดงมาจากสายแร่เรืองแสงในผนังหินใต้น้ำ" },
+            { locationId: "pool_heilong", label: "ดำตามแสงสีแดงในคืนเพ็ญ", sceneId: "qs_qw_heilong_depths_secret_investigate" },
           ],
         },
       },
       {
         id: "collect_ore",
-        description: "หาแร่เทพ 1 ก้อน แร่ชนิดเดียวกับที่เรืองแสงใต้สระ (ขุดได้จากสายแร่หายาก เช่นบนยอดนิรันดร์คุนหลุน)",
+        description: "ถือแร่เทพที่เรืองแสงใต้สระไว้ 1 ก้อน (ถ้าทำหาย ขุดใหม่ได้จากสายแร่หายาก เช่นบนยอดนิรันดร์คุนหลุน)",
         autoAdvance: { t: "hasItem", itemId: "mithril_ore", count: 1 },
       },
       { id: "report", description: "นำแร่เทพไปให้ต่านเหลาตูดู" },
@@ -729,15 +716,20 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
     stages: [
       {
         id: "clear_bears",
-        description: "ปราบหมีสีน้ำตาลที่ขวางทางไปถ้ำสมบัติ",
+        description: "ปราบหมีสีน้ำตาลที่ขวางทางไปถ้ำสมบัติหลังบ้านโฮ่งชีก๋ง",
         autoAdvance: { t: "defeatedOpponent", opponentId: "brown_bear", count: 1 },
+        objective: {
+          spots: [
+            { locationId: "home_hong", label: "ตามแผนที่ไปทางเข้าถ้ำสมบัติ", sceneId: "qs_qw_hong_treasure_map_battle" },
+          ],
+        },
       },
       {
         id: "find_cache",
         description: "ค้นถ้ำสมบัติตามแผนที่ที่บ้านโฮ่งชีก๋ง",
         objective: {
           spots: [
-            { locationId: "home_hong", label: "ค้นถ้ำสมบัติตามแผนที่", text: "สมบัติคือหีบจดหมายของโฮ่งชีก๋งถึงศิษย์ — ความทรงจำ ไม่ใช่ทองคำ" },
+            { locationId: "home_hong", label: "ค้นถ้ำสมบัติตามแผนที่", sceneId: "qs_qw_hong_treasure_map_clear" },
           ],
         },
       },

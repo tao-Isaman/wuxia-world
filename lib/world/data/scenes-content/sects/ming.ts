@@ -95,6 +95,7 @@ export const SCENES_MING: readonly Scene[] = [
     id: "qs_qst_ming_defector_decide",
     lines: [
       { t: "narration", text: "เจ้าพบผู้แปรพักตร์ในกระท่อมร้างที่ไม้ดำหน้าผา เขาสีหน้าหมดหวัง" },
+      { t: "dialogue", speaker: "ผู้แปรพักตร์", text: "พรรคสั่งให้ข้าฆ่าคนบริสุทธิ์ทั้งครอบครัว ข้าทำไม่ลง จึงหนีมา" },
       { t: "dialogue", speaker: "ผู้แปรพักตร์", text: "ข้าเบื่อแล้วกับการต้องซ่อนตัวและโกหก... ข้าแค่อยากมีชีวิตปกติ" },
     ],
     choices: [
@@ -104,6 +105,7 @@ export const SCENES_MING: readonly Scene[] = [
         effects: [
           { t: "addTrait", trait: "evil", amount: 2 },
           { t: "setFlag", flag: "ming_defector_resolved", value: true },
+          { t: "advanceQuest", questId: "qst_ming_defector_choice" },
         ],
       },
       {
@@ -113,6 +115,7 @@ export const SCENES_MING: readonly Scene[] = [
           { t: "addTrait", trait: "good", amount: 4 },
           { t: "addTrait", trait: "humility", amount: 2 },
           { t: "setFlag", flag: "ming_defector_resolved", value: true },
+          { t: "advanceQuest", questId: "qst_ming_defector_choice" },
         ],
       },
     ],

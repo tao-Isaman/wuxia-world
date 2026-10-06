@@ -444,7 +444,7 @@ export const SCENES_WILDERNESS: readonly Scene[] = [
       },
       {
         text: "ออกไปก่อน",
-        next: "valley_jueqing_bottom",
+        next: "valley_jueqing",
       },
     ],
   },
@@ -609,7 +609,7 @@ export const SCENES_WILDERNESS: readonly Scene[] = [
     choices: [
       {
         text: "นำข้อมูลกลับไป",
-        next: "desert_ruins",
+        next: "market_miao",
         effects: [{ t: "advanceQuest", questId: "qw_desert_ancient_map" }],
       },
     ],
@@ -639,7 +639,7 @@ export const SCENES_WILDERNESS: readonly Scene[] = [
     lines: [
       { t: "dialogue", speaker: "โม่ฉิงเทียน", text: "ข้าพบเหรียญโบราณที่ชัดเจนว่าเป็นของตระกูลเชื้อพระวงศ์ในหยางโจว" },
       { t: "dialogue", speaker: "โม่ฉิงเทียน", text: "นำมันไปคืนให้ตระกูลนั้นเถิด ข้าสะสมของได้มากมายแต่ไม่อยากรับของที่เป็นของคนอื่น" },
-      { t: "dialogue", speaker: "โม่ฉิงเทียน", text: "ข้าไม่รู้ว่าตระกูลนั้นยังเหลือใครบ้าง ไปถึงหยางโจวแล้วฝากเหรียญไว้กับชาวเมืองที่ไว้ใจได้สักคน เขาจะรู้ทางส่งต่อเอง" },
+      { t: "dialogue", speaker: "โม่ฉิงเทียน", text: "ข้าไม่รู้ว่าตระกูลจ้าวยังเหลือใครบ้าง แต่ได้ยินว่าศาลบรรพชนของพวกเขาริมคลองหยางโจวยังมีคนเฝ้า ฝากเหรียญไว้ที่นั่น ผู้เฝ้าศาลจะรู้ทางส่งต่อเอง" },
     ],
     choices: [
       {
@@ -655,9 +655,33 @@ export const SCENES_WILDERNESS: readonly Scene[] = [
   },
   {
     kind: "dialog",
+    id: "qs_qw_desert_relic_return_shrine",
+    lines: [
+      { t: "narration", text: "ศาลบรรพชนเก่าแก่ริมคลองหยางโจว ป้ายชื่อตระกูลจ้าวผุกร่อนจนแทบอ่านไม่ออก ธูปหน้าแท่นยังมีควันกรุ่น" },
+      { t: "dialogue", speaker: "ผู้เฝ้าศาลชรา", text: "ตราบนเหรียญนี้... ตราประจำตระกูลจ้าว! ทายาทคนสุดท้ายยังมาไหว้ที่นี่ทุกต้นเดือน ข้าจะส่งถึงมือเขาเอง" },
+    ],
+    choices: [
+      {
+        text: "มอบเหรียญโบราณ",
+        visibleIf: { t: "hasItem", itemId: "ancient_coin", count: 1 },
+        next: "city_yangzhou",
+        effects: [
+          { t: "takeItem", itemId: "ancient_coin", count: 1 },
+          { t: "advanceQuest", questId: "qw_desert_relic_return" },
+        ],
+      },
+      {
+        text: "เหรียญไม่อยู่ในย่ามแล้ว... ขอตัวก่อน",
+        visibleIf: { t: "not", of: { t: "hasItem", itemId: "ancient_coin", count: 1 } },
+        next: "city_yangzhou",
+      },
+    ],
+  },
+  {
+    kind: "dialog",
     id: "qs_qw_desert_relic_return_complete",
     lines: [
-      { t: "dialogue", speaker: "โม่ฉิงเทียน", text: "เจ้าคืนเหรียญไปแล้ว? ดีนักเลย!" },
+      { t: "dialogue", speaker: "โม่ฉิงเทียน", text: "เหรียญถึงศาลบรรพชนตระกูลจ้าวแล้ว? ดีนักเลย!" },
       { t: "dialogue", speaker: "โม่ฉิงเทียน", text: "ข้าเจอของดีอีกอย่าง แบ่งให้เจ้าเป็นค่าตอบแทน" },
     ],
     choices: [
@@ -878,7 +902,7 @@ export const SCENES_WILDERNESS: readonly Scene[] = [
         text: "สู้ตะขาบและวางของถวาย",
         next: "qs_qw_miao_offering_cave_done",
         effects: [
-          { t: "triggerBattle", opponentId: "giant_centipede", onWin: "qs_qw_miao_offering_cave_done", onLose: "market_miao" },
+          { t: "triggerBattle", opponentId: "giant_centipede", onWin: "qs_qw_miao_offering_cave_done", onLose: "cave_tangshi" },
         ],
       },
       { text: "วางของและถอยเร็ว ๆ", next: "qs_qw_miao_offering_cave_done" },
@@ -894,8 +918,11 @@ export const SCENES_WILDERNESS: readonly Scene[] = [
     choices: [
       {
         text: "กลับไปรายงาน",
-        next: "market_miao",
-        effects: [{ t: "advanceQuest", questId: "qw_miao_offering_cave" }],
+        next: "cave_tangshi",
+        effects: [
+          { t: "takeItem", itemId: "lotus_seed", count: 3 },
+          { t: "advanceQuest", questId: "qw_miao_offering_cave" },
+        ],
       },
     ],
   },
@@ -952,7 +979,7 @@ export const SCENES_WILDERNESS: readonly Scene[] = [
   },
   {
     kind: "dialog",
-    id: "qs_qw_motian_restless_soul_choice",
+    id: "qs_qw_motian_restless_soul_complete",
     lines: [
       { t: "narration", text: "เจ้านำดาบโบราณรูปทรงแปลกมาถึงยอดเขามรณะ วิญญาณเหลียงเก๋อปรากฏขึ้น" },
       { t: "dialogue", speaker: "เหลียงเก๋อ", text: "นั่นคือดาบข้า... ขอบคุณ นักเดินทาง" },
@@ -967,6 +994,7 @@ export const SCENES_WILDERNESS: readonly Scene[] = [
           { t: "takeItem", itemId: "qst_motian_ancient_sword", count: 1 },
           { t: "addTrait", trait: "good", amount: 10 },
           { t: "addTrait", trait: "humility", amount: 5 },
+          { t: "finishQuest", questId: "qw_motian_restless_soul", success: true },
         ],
       },
       {
@@ -975,6 +1003,7 @@ export const SCENES_WILDERNESS: readonly Scene[] = [
         effects: [
           { t: "addTrait", trait: "evil", amount: 8 },
           { t: "addTrait", trait: "arrogance", amount: 5 },
+          { t: "finishQuest", questId: "qw_motian_restless_soul", success: true },
         ],
       },
     ],
@@ -991,9 +1020,6 @@ export const SCENES_WILDERNESS: readonly Scene[] = [
       {
         text: "ยืนอยู่ในความเงียบสงบ",
         next: "cliff_motian",
-        effects: [
-          { t: "finishQuest", questId: "qw_motian_restless_soul", success: true },
-        ],
       },
     ],
   },
@@ -1008,10 +1034,6 @@ export const SCENES_WILDERNESS: readonly Scene[] = [
       {
         text: "จากไปโดยไม่หันกลับไปมอง",
         next: "cliff_motian",
-        effects: [
-          { t: "finishQuest", questId: "qw_motian_restless_soul", success: true },
-          { t: "giveItem", itemId: "jade", count: 1 },
-        ],
       },
     ],
   },
@@ -1356,6 +1378,7 @@ export const SCENES_WILDERNESS: readonly Scene[] = [
         text: "รับรางวัล",
         next: "pool_heilong",
         effects: [
+          { t: "takeItem", itemId: "mithril_ore", count: 1 },
           { t: "finishQuest", questId: "qw_heilong_depths_secret", success: true },
         ],
       },

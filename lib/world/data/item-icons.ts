@@ -24,6 +24,7 @@ export const ITEM_ICONS: Readonly<Record<string, string>> = {
   qst_kunlun_snow_ginseng: "ico_herb_herb_11",
   qst_jinshe_golden_snake: "ico_material_animal_part_07",
   qst_motian_ancient_sword: "ico_weapon_jian_sword_14",
+  qst_lin_formula: "ico_book_book_05",
   // ── valuables, potions
   jade: "ico_valuable_valuable_08",
   ancient_coin: "ico_valuable_valuable_01",

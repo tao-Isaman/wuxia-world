@@ -539,12 +539,25 @@ export function NpcInteractionPopup({ open, npc, onClose }: Props) {
                 const def = getQuest(q.id)!;
                 const entry = worldState.quests[q.id]!;
                 const stage = def.stages[entry.stage];
+                // A `qs_<id>_progress` dialog is the giver's word on how it goes.
+                const progressSceneId = `qs_${q.id}_progress`;
+                const hasProgressScene = getScene(progressSceneId) !== null;
                 return (
                   <div key={q.id} className="rounded border border-border/40 bg-muted/40 p-2">
                     <div className="text-sm font-semibold">{def.name}</div>
                     <div className="text-[10px] text-muted-foreground">
                       ขั้นที่ {entry.stage + 1}/{def.stages.length}: {stage?.description}
                     </div>
+                    {hasProgressScene && (
+                      <Button
+                        variant="outline"
+                        data-quest-progress={q.id}
+                        onClick={() => { onClose(); gotoScene(progressSceneId); }}
+                        className="mt-1.5 h-auto py-1 text-xs"
+                      >
+                        💬 ถามความคืบหน้า
+                      </Button>
+                    )}
                   </div>
                 );
               })}

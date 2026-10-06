@@ -289,8 +289,13 @@ export const QUESTS__OTHER: readonly QuestDef[] = [
       },
       {
         id: "confront_thief",
-        description: "เผชิญหน้ากับนักฆ่าเงาที่ขโมยดาบ",
+        description: "ชี้ตัวคนร้ายกลางโถงคุ้ม แล้วเผชิญหน้ากับนักฆ่าเงาที่ขโมยดาบ",
         autoAdvance: { t: "defeatedOpponent", opponentId: "shadow_assassin", count: 1 },
+        objective: {
+          spots: [
+            { locationId: "villa_yanzi", label: "ชี้ตัวคนร้าย", sceneId: "qs_yanzi_heirloom_investigation" },
+          ],
+        },
       },
       {
         id: "recover_sword",
@@ -413,8 +418,13 @@ export const QUESTS__OTHER: readonly QuestDef[] = [
       },
       {
         id: "repel_assassin",
-        description: "ขับไล่นักฆ่าที่บุกเข้ามา (อาจารย์ดาบรับจ้าง)",
+        description: "เฝ้ายามระหว่างพิธีในพระราชวังจงหยาง แล้วขับไล่นักฆ่าที่บุกเข้ามา (อาจารย์ดาบรับจ้าง)",
         autoAdvance: { t: "defeatedOpponent", opponentId: "blade_master", count: 1 },
+        objective: {
+          spots: [
+            { locationId: "palace_zhongyang", label: "เฝ้ายามระหว่างพิธี", sceneId: "qs_qst_zhongyang_ceremony_battle_offer" },
+          ],
+        },
       },
       {
         id: "report_success",
