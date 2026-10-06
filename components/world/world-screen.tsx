@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Panel } from "@/components/ui/wuxia/panel";
 import { VictorySpoils } from "./victory-spoils";
-import { DeathReport } from "./death-report";
+import { ArrestReport, DeathReport } from "./death-report";
 import { WuxiaButton } from "@/components/ui/wuxia/button";
 import { npcsAt } from "@/lib/world/npc-life";
 import { useWorldStore } from "@/store/world-store";
@@ -202,7 +202,7 @@ export function WorldScreen() {
             <LoadingOverlay key="loading" />
             <ToastStack key="toasts" />
             <ConfirmDialog key="confirm" />
-            <DeathReport />
+            <DeathReport /><ArrestReport />
           </>
         );
       }
@@ -218,7 +218,7 @@ export function WorldScreen() {
             <LoadingOverlay />
             <ToastStack />
             <ConfirmDialog />
-            <DeathReport />
+            <DeathReport /><ArrestReport />
           </>
         );
       }
@@ -246,7 +246,7 @@ export function WorldScreen() {
             <LoadingOverlay />
             <ToastStack />
             <ConfirmDialog />
-            <DeathReport />
+            <DeathReport /><ArrestReport />
           </>
         );
       }
@@ -284,7 +284,7 @@ export function WorldScreen() {
       <LoadingOverlay />
       <ToastStack />
       <ConfirmDialog />
-      <DeathReport />
+      <DeathReport /><ArrestReport />
     </>
   );
 }

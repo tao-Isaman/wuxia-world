@@ -34,7 +34,7 @@ Generated lists of everything in the game, taken straight from the data tables. 
 | Recipes | 36 |
 | Gathering and hunting nodes | 25 |
 | Life skills | 19 |
-| Opponents | 388 |
+| Opponents | 390 |
 | Roaming foe events | 64 |
 
 Regenerate with `bun scripts/build-docs-reference.ts`; `--check` fails when a page is stale.

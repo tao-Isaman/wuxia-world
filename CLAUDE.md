@@ -129,7 +129,7 @@ bun scripts/assets/build-kits.ts plan && python3 scripts/assets/generate.py run 
 ```
 app/, components/         React: screens, HUD, menus, popups, battle UI
    ↓
-store/                    Zustand: world (saved, v24), battle, character (/debug, v3), loading, toast, confirm
+store/                    Zustand: world (saved, v25), battle, character (/debug, v3), loading, toast, confirm
    ↓
 lib/world/  ──────►  lib/game/          pure engines — no React, no DOM, no I/O
    └ battle-bridge.ts: the one place the world and battle stores meet
@@ -224,8 +224,9 @@ Two deliberate exceptions reach into stores:
   - Foes are picked by zone and scaled by the hero's power (`max(day/200, (9 − best sect rank)/8)`): tier mix, elites, and opponent stats ×(1 + 0.6·power) for **every** battle.
   - `rollRandomEvent` is a no-op kept for old content.
 - **Law** (`law.ts`).
-  - Wanted marks (max 5) come from failed steals (+1) and jail escapes (+2); one fades every 10 quiet days.
-  - Law fights are non-fatal. A loss goes to `jail_cell`: arrest (the `jail` map, `jailUntil`, 2 days per mark) or a 300-gold bribe.
+  - Wanted marks have no ceiling (the HUD draws 5 seals, then `×N`): failed steals +1, jail escapes +2, failed attempts on a life +2, killings +5 (`KILL_MARKS`); one fades every 10 quiet days.
+  - Escaping the law (`lawEvasions`, saved: flee, win, bribe, jail break; reset by a sentence) brings the Brocade Guard (`law_jinyiwei_agent` T3, `law_jinyiwei_captain` T4) and at last the Jinyiwei chief in person (`lawnpc@<npc foe>`); from 2 marks righteous liveness NPCs in the region may ambush the hero for the law (`ambushChance`, `pendingBattle.ambushNpcId`).
+  - Law fights are non-fatal. A loss goes to `jail_cell`: arrest (`imprison` → `arrestPenalty`: 2 days per mark up to 30, a 50-per-mark fine, seizure from 5 marks, crippled arts from 10; the คำพิพากษา window reads `flags._arrestReport`) or a bribe (`bribeCost`: 300 + 150 per mark past 2). มอบตัว (the HUD wanted chip, store `surrender`) goes straight to jail with half the sentence and fine, no seizure.
 - **Bad actions** (`bad-actions.ts`). Steal, assassinate and kidnap use base stats. A failed steal is a non-fatal fight plus a mark; failed assassinations and kidnappings are fatal fights (the hero falls and wakes at home, poorer).
 - **Sects** (`data/sect-memberships.ts`, 15 joinable).
   - Ladders: 9 → 1 (eight sects), 5 → 1 (six) or 3 → 1 (Gumu).
@@ -268,7 +269,7 @@ Two deliberate exceptions reach into stores:
 
 ## Stores (`store/`)
 
-- **`world-store.ts`** is saved as `wusia-world-v1`, **version 24**.
+- **`world-store.ts`** is saved as `wusia-world-v1`, **version 25**.
   - Actions draft a copy (`draftFrom`, **one level deep** — nested quest, sect and NPC entries are shared), call engine functions, then `set`.
   - Time goes through `advanceTime` (12 ชั่วยาม = 1 day). The player-visible log uses `appendActionLog` (newest 100).
 - **`battle-store.ts`** is not saved.
@@ -370,7 +371,7 @@ Content changes need **no save version bump**. Removed ids are dropped on load.
 
 ## Saves
 
-- **Keys.** The world save is `localStorage["wusia-world-v1"]`, **version 24**. The "wusia" spelling is historical — never rename it.
+- **Keys.** The world save is `localStorage["wusia-world-v1"]`, **version 25**. The "wusia" spelling is historical — never rename it.
 - **Migration.** `migrate` is one idempotent normalizer (it ignores `fromVersion`). The persist `merge` also back-fills lore rumors on every load, and `onRehydrateStorage` runs `validateAndRepair`.
 - **Adding a persisted field:**
   1. `WorldStateData` + `emptyData()`;

@@ -20,11 +20,13 @@ import {
   pickWeighted,
 } from "./data/random-events";
 import { evaluateCondition, gearlessStat } from "./conditions";
-import { JAIL_BRIBE_GOLD, JAIL_HOURS_PER_DAY, absoluteHours, jailCityFor, jailDays, lawChance, pickLawPursuer, sentenceLeft } from "./law";
+import { JAIL_HOURS_PER_DAY, LAW_NPC_PREFIX, absoluteHours, ambushChance, arrestPenalty, bribeCost, jailCityFor, jailDays, lawChance, pickLawPursuer, sentenceLeft } from "./law";
+import { deathLosableItems } from "./death";
+import { regionOf } from "./data/regions";
 import { JAIL_SCENE_ID } from "./data/activities";
 import { STAT_LABEL, deriveAll, getArt, getSkill } from "../game";
 import { generatePlayerEcho } from "./rumor-engine";
-import { questHolder } from "./npc-life";
+import { npcFoeFor, questHolder, sectChief } from "./npc-life";
 
 // Pure mutation: applies a single effect to the world state in place.
 // `triggerBattle` only sets `pendingBattle` — the battle-bridge module
@@ -333,11 +335,15 @@ export function applyEffect(state: WorldStateData, eff: SceneEffect): void {
     }
 
     case "imprison": {
-      const hours = jailDays(state.wanted) * JAIL_HOURS_PER_DAY;
+      // The marks become the sentence — and, for a heavy record, a fine, the
+      // seizure of property and the crippling of one's arts (lib/world/law.ts).
+      const penalty = arrestPenalty(state.wanted, eff.surrender);
+      const report = applyArrestPenalty(state, penalty, eff.surrender);
+      state.flags = { ...state.flags, _arrestReport: report.join("\n") };
       state.jailCityId = state.jailCityId ?? jailCityFor(state.lastLocationId);
-      state.jailUntil = absoluteHours(state) + hours;
-      // The marks become the sentence.
+      state.jailUntil = absoluteHours(state) + penalty.days * JAIL_HOURS_PER_DAY;
       state.wanted = 0;
+      state.lawEvasions = 0;
       state.wantedDay = state.day;
       state.lastLocationId = JAIL_SCENE_ID;
       state.currentHp = Math.max(1, state.currentHp ?? 1);
@@ -356,13 +362,65 @@ export function applyEffect(state: WorldStateData, eff: SceneEffect): void {
     }
 
     case "bribeJail": {
-      if (state.gold < JAIL_BRIBE_GOLD) return;
-      state.gold -= JAIL_BRIBE_GOLD;
+      const cost = bribeCost(state.wanted);
+      if (state.gold < cost) return;
+      state.gold -= cost;
       state.wanted = Math.max(0, state.wanted - 2);
+      // Bought off, not caught: the law remembers.
+      state.lawEvasions = (state.lawEvasions ?? 0) + 1;
       releaseFromJail(state);
       return;
     }
   }
+}
+
+/**
+ * Take an arrest's price from the hero: the fine (what they have), seized
+ * property (a third of the gold left and half of one or two carried goods),
+ * and crippled arts (the best moves lose two levels each). Returns the Thai
+ * lines for the arrest report.
+ */
+export function applyArrestPenalty(state: WorldStateData, penalty: ReturnType<typeof arrestPenalty>, surrendered = false): string[] {
+  const lines: string[] = [surrendered ? `มอบตัว · โทษจำคุก ${penalty.days} วัน (ลดกึ่งหนึ่ง)` : `โทษจำคุก ${penalty.days} วัน`];
+  const fine = Math.min(state.gold, penalty.fine);
+  if (fine > 0) { state.gold -= fine; lines.push(`ค่าปรับ ${fine.toLocaleString()} ตำลึง`); }
+  if (penalty.confiscate) {
+    const seized = Math.floor(state.gold / 3);
+    state.gold -= seized;
+    if (seized > 0) lines.push(`ริบทรัพย์ ${seized.toLocaleString()} ตำลึง`);
+    const pool = deathLosableItems(state.inventory);
+    const inventory = { ...state.inventory };
+    for (let i = 0; i < Math.min(2, pool.length); i++) {
+      const [id] = pool.splice(Math.floor(Math.random() * pool.length), 1);
+      const count = Math.ceil((inventory[id] ?? 0) / 2);
+      if (count <= 0) continue;
+      inventory[id] = inventory[id] - count;
+      if (inventory[id] <= 0) delete inventory[id];
+      lines.push(`ริบ${getItem(id)?.name ?? id} ×${count}`);
+    }
+    state.inventory = inventory;
+  }
+  if (penalty.cripple > 0 && state.playerBuild) {
+    // The best-trained moves first: skills by level, inner arts by level.
+    const moves = [
+      ...Object.entries(state.skillLevel).map(([id, lv]) => ({ kind: "skill" as const, id, lv })),
+      ...Object.entries(state.playerBuild.artLevels ?? {}).map(([id, lv]) => ({ kind: "art" as const, id, lv: lv ?? 1 })),
+    ].filter((m) => m.lv > 1).sort((a, b) => b.lv - a.lv).slice(0, penalty.cripple);
+    if (moves.length) {
+      const skillLevel = { ...state.skillLevel };
+      const artLevels = { ...(state.playerBuild.artLevels ?? {}) };
+      for (const m of moves) {
+        const to = Math.max(1, m.lv - 2);
+        if (m.kind === "skill") { skillLevel[m.id] = to; state.skillExp = { ...state.skillExp, [m.id]: 0 }; }
+        else { artLevels[m.id] = to; state.artExp = { ...state.artExp, [m.id]: 0 }; }
+        const name = m.kind === "skill" ? getSkill(m.id)?.n : getArt(m.id)?.n;
+        lines.push(`ถูกทำลายวรยุทธ: ${name ?? m.id} ลดจากระดับ ${m.lv} เหลือ ${to}`);
+      }
+      state.skillLevel = skillLevel;
+      state.playerBuild = { ...state.playerBuild, artLevels, skillLevels: { ...skillLevel } };
+    }
+  }
+  return lines;
 }
 
 /**
@@ -407,14 +465,39 @@ export function rollWalkEvent(state: WorldStateData, chanceScale: number): void 
   // from (the road's ย้อนกลับ exit and the quest guide route from it).
 
   // Wanted players: the law may catch up first (lib/world/law.ts).
-  if (state.wanted > 0 && Math.random() < lawChance(state.wanted)) {
+  const evasions = state.lawEvasions ?? 0;
+  if (state.wanted > 0 && Math.random() < lawChance(state.wanted, evasions)) {
     applyOpponentStatScale(state);
     state.jailCityId = jailCityFor(state.currentSceneId);
+    const pursuer = pickLawPursuer(state.wanted, Math.random(), evasions);
+    // The Brocade Guard's commander — whoever holds that seat now — comes in person.
+    const chief = pursuer === "chief" ? sectChief(state, "jinyiwei") : null;
     state.pendingEncounter = {
-      opponentId: pickLawPursuer(state.wanted, Math.random()),
+      opponentId: pursuer !== "chief" ? pursuer : chief ? LAW_NPC_PREFIX + npcFoeFor(state, chief) : "law_jinyiwei_captain",
       returnSceneId: state.currentSceneId,
     };
     return;
+  }
+
+  // An upright person of the jianghu near here waylays the wanted hero to
+  // hand them over: a fight at once (no chance to slip away); losing is arrest.
+  if (Math.random() < ambushChance(state.wanted)) {
+    const here = regionOf(state.lastLocationId ?? state.currentSceneId);
+    const hunters = Object.entries(state.npcExt ?? {}).filter(([, e]) => e.status === "alive" && (e.temper?.righteous ?? 0) >= 0.5
+      && e.power >= 30 && (e.woundedUntil ?? 0) <= state.day && regionOf(e.currentLocation) === here);
+    if (hunters.length) {
+      const [npcId] = hunters[Math.floor(Math.random() * hunters.length)]!;
+      applyOpponentStatScale(state);
+      state.jailCityId = jailCityFor(state.currentSceneId);
+      state.pendingBattle = {
+        opponentId: LAW_NPC_PREFIX + npcFoeFor(state, npcId),
+        onWin: state.currentSceneId,
+        onLose: "jail_cell",
+        nonFatal: true,
+        ambushNpcId: npcId,
+      };
+      return;
+    }
   }
 
   // Sect-hunter ambush — 30% chance per tick if the player has any

@@ -219,7 +219,7 @@ Nothing rolls on arrival. While the hero walks on a location or route map, the w
 
 | Per walk tick | Chance |
 | --- | --- |
-| Law pursuer (1–5 marks) | 13 % / 21 % / 29 % / 37 % / 45 % |
+| Law pursuer (1–5+ marks) | 13 % / 21 % / 29 % / 37 % / 45 %, +1 % per escape (max 55 %) |
 | Sect hunter (after a betrayal) | 30 % |
 | A foe appears (fewer than 3 about) | 30 % |
 | A foe appears while hunting a quest target | 80 % |
@@ -247,11 +247,14 @@ When the current stage of an active quest is a top-level `defeatedOpponent` (`co
 
 `lib/world/law.ts`, `lib/world/data/activities.ts`, and the jail actions in `store/world-store.ts`.
 
-- **Wanted marks** (หมายจับ, 0–5): +1 for every failed steal, +2 for a successful jail escape. One mark fades every 10 quiet days (`WANTED_DECAY_DAYS`).
-- **Pursuers**: `lawChance(m) = min(45 %, 5 % + 8 % × m)` per walk tick. `pickLawPursuer` weights: constable `max(0, 6 − 1.2m)`, imperial guard `m − 1` from 2 marks, bounty hunter `1.5 × (m − 2)` from 3 marks — at 1 mark always a constable, at 5 marks 47 % guard / 53 % bounty hunter. The bounty hunter brings a constable.
-- **Law fights** are non-fatal. Winning or escaping clears the pending jail city; losing goes to `jail_cell`.
-- **`jail_cell`** offers two choices: accept arrest (`imprison` → the `jail` map), or, with 300 gold, bribe (`bribeJail` → released, 2 marks removed).
-- **`imprison`**: sentence = `jailDays(marks) = max(1, min(5, marks)) × 2` days (2 days even with no marks) × 12 ชั่วยาม; marks reset to 0; `jailUntil` = the absolute ชั่วยาม the sentence ends (`day × 12 + time`); HP at least 1.
+- **Wanted marks** (หมายจับ, no ceiling since v25): +1 failed steal, +2 jail escape, +2 failed attempt on a life, +5 (`KILL_MARKS`) a killing. One mark fades every 10 quiet days (`WANTED_DECAY_DAYS`). `WANTED_MAX` (5) is only how many seals the HUD draws before it shows `×N`.
+- **Escapes** (`lawEvasions`, saved, v25): +1 for fleeing a law encounter, escaping or winning a law fight, a bribe, a jail break; reset to 0 by `imprison`.
+- **Pursuers**: `lawChance(m, e) = min(55 %, 5 % + 8 % × min(m, 5) + 1 % × min(e, 10))` per walk tick. `pickLawPursuer(m, roll, e)` weights (m capped at 10): constable `max(0, 6 − 1.2m − 0.5e)`; imperial guard `min(m, 5) − 1` from 2 marks; bounty hunter `1.5 × (min(m, 5) − 2)` from 3; Brocade agent `law_jinyiwei_agent` (T3, + a constable) `0.8e + max(0, m − 3)` from 1 escape or 4 marks; Brocade captain `law_jinyiwei_captain` (T4, + two agents) `0.6 × max(0, e − 3) + 0.6 × max(0, m − 6)` from 4 escapes or 7 marks; `"chief"` `0.5 + 0.3 (e − 8)` from 8 escapes with 5+ marks — resolved to the current Jinyiwei chief (`sectChief`) fighting as `lawnpc@<npcFoeFor>` (a captain if the seat is empty).
+- **Ambush** (`ambushChance(m)` = `min(20 %, 3 % + 1.5 % × min(m, 10))` from 2 marks, after the law roll): a living person with `temper.righteous ≥ 0.5`, power ≥ 30, unwounded, in the hero's region, attacks at once — `pendingBattle` with `lawnpc@…`, `ambushNpcId`, `onLose: "jail_cell"`, non-fatal, no encounter screen. Beaten, they are wounded 30 days.
+- **Law fights** (`isLawOpponent`: the `LAW_OPPONENTS` ids and any `lawnpc@` id) are non-fatal. Winning or escaping clears the pending jail city and counts an escape; losing goes to `jail_cell`.
+- **`jail_cell`** offers two choices: accept arrest (`imprison` → the `jail` map), or bribe when `canBribeJail` (`bribeCost(m)` = 300 + 150 × max(0, m − 2); `bribeJail` → released, 2 marks removed, an escape counted).
+- **`imprison`** (`{ surrender? }`): `arrestPenalty(m, surrender)` — days `jailDays(m) = clamp(m, 1, 15) × 2`, fine 50 × m, `confiscate` from 5 marks, `cripple` = 1 + ⌊(m − 10)/5⌋ (max 4) from 10 marks; a surrender halves days (rounded up) and fine, drops the seizure and one crippled move. `applyArrestPenalty` takes the fine (what the hero has), seizes a third of the gold left and half of 1–2 losable stacks (`deathLosableItems`), and lowers the best skills / arts by 2 levels (min 1, their xp reset); the lines go to `flags._arrestReport` (the คำพิพากษา window, `ArrestReport`). Marks and escapes reset to 0; `jailUntil` = the absolute ชั่วยาม the sentence ends; HP at least 1.
+- **มอบตัว** (store `surrender`): wanted, not jailed, nothing pending → `imprison { surrender: true }` and straight to the `jail` map (no road, no stamina). The HUD's wanted chip offers it with the penalty preview.
 - **The jail map** has no exits. While `jailUntil` is set, travel to any other place is refused (`jailBlocks`) and walk ticks don't fire there. Any time that passes serves the sentence. Two people live there: ตาเฒ่าหลิว (tips) and ผู้คุมจาง (bribe).
 - **Release** (`releaseFromJail`): to the jail city — a `city_*` stays itself, else the nearest city on the world map (`jailCityFor`; unplaced places → นครหลวง). HP and MP are raised to at least 60 %.
 
@@ -261,7 +264,7 @@ Jail activities (`doActivity`, only in `jail`):
 | --- | --- | --- | --- |
 | ทุบหินใช้แรงงาน (`jail_labor`) | 6 | 25 | sentence −6 extra (−12 in all), STR xp +20, w-exp +5 |
 | ทอยเต๋ากับผู้คุม (`jail_dice`) | 2 | 5 | needs 10 gold; win chance `min(60 %, 40 % + LUK/200)`, ±10 gold; LUK xp +10 |
-| นั่งสมาธิ (`jail_meditate`) | 6 | 0 | MP full, HP +20 %, stamina +15, w-exp +5 |
+| นั่งสมาธิ (`jail_meditate`) | 6 | 0 | MP full, HP +20 %, stamina +15, w-exp +40 (`JAIL_MEDITATE_WEXP`) |
 | ประตูคุก (`jail_gate`) | 0 | 0 | locked while time remains (the UI offers `serveSentence`: wait it out at once); open afterwards |
 | แหกคุกทางกำแพงร้าว (`jail_escape`) | 2 | 30 | success `min(55 %, 20 % + AGI/200)`: free, +2 wanted marks; failure: +1 day |
 

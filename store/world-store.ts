@@ -73,7 +73,7 @@ import { GIFT_REACTION_LINE, giftOutcome, giftWaitDays, giftable, type GiftReact
 import { tickAllNamedNpcs } from "@/lib/world/npc-tick";
 import { deadIds, killNpc, npcFoeFor, npcIsDead, npcPower, powerTier, seedLiveness, settleChargesOfDead, type ChargeChange } from "@/lib/world/npc-life";
 import { releaseFromJail, rollFoeSpawn, rollWalkEvent } from "@/lib/world/effects";
-import { WANTED_DECAY_DAYS, WANTED_MAX, describeSentence, isLawOpponent, sentenceLeft } from "@/lib/world/law";
+import { KILL_MARKS, WANTED_DECAY_DAYS, describeSentence, isLawOpponent, jailCityFor, sentenceLeft } from "@/lib/world/law";
 import { JAIL_SCENE_ID, getActivity, jailDiceChance, jailEscapeChance } from "@/lib/world/data/activities";
 import { fadeHeardRumor, maintainRumors, seedLoreRumors, RUMOR_SEEN_CAP } from "@/lib/world/rumor-engine";
 import { checkOpenMeridianNode, getMeridianChart } from "@/lib/game";
@@ -534,7 +534,7 @@ interface WorldStore extends WorldStateData {
   /**
    * ⚔ สังหาร: an open fight to the death with anyone. Winning kills them for
    * good (their quests pass to an heir or fail) and the hero is at once wanted
-   * at the top of the list (WANTED_MAX); a failed attempt adds two marks.
+   * at once (KILL_MARKS more marks); a failed attempt adds two.
    */
   startKillDuel: (npcId: string) => SparResult;
 
@@ -579,6 +579,12 @@ interface WorldStore extends WorldStateData {
   // not saved (the action log keeps it).
   lastDeath: { lines: string[] } | null;
   dismissDeath: () => void;
+  /**
+   * มอบตัว: a wanted hero gives themselves up and is taken straight to the
+   * jail — half the sentence and fine, no seizure, one less crippled move
+   * (lib/world/law.ts arrestPenalty). The arrest report shows next.
+   */
+  surrender: () => { ok: boolean; reason?: "not-wanted" | "busy" };
   // Map activities (see lib/world/data/activities.ts) — the jail's labour,
   // dice, meditation, gate and escape. Returns a message for the toast.
   doActivity: (id: string) => ActivityResult;
@@ -668,6 +674,7 @@ const emptyData = (): WorldStateData => ({
   lastNpcTickDay: 1,
   wanted: 0,
   wantedDay: 1,
+  lawEvasions: 0,
   jailCityId: null,
   jailUntil: null,
 });
@@ -919,12 +926,15 @@ function settleTournamentBout(state: WorldStateData, won: boolean): void {
   }
 }
 
+/** w-exp from one session of jail meditation (6 ชั่วยาม). */
+const JAIL_MEDITATE_WEXP = 40;
+
 /** Marks for an attempt on someone's life that did not end in their death. */
 const ATTEMPTED_MURDER_MARKS = 2;
 function markAttemptedMurder(state: WorldStateData, npcId: string): void {
-  state.wanted = Math.min(WANTED_MAX, (state.wanted ?? 0) + ATTEMPTED_MURDER_MARKS);
+  state.wanted = (state.wanted ?? 0) + ATTEMPTED_MURDER_MARKS;
   state.wantedDay = state.day;
-  appendActionLog(state, "law", `ลงมือหมายเอาชีวิต${getNpc(npcId)?.name ?? "ผู้คน"}แต่ไม่สำเร็จ · หมายจับ ${state.wanted}/${WANTED_MAX}`);
+  appendActionLog(state, "law", `ลงมือหมายเอาชีวิต${getNpc(npcId)?.name ?? "ผู้คน"}แต่ไม่สำเร็จ · หมายจับ ${state.wanted}`);
 }
 
 /**
@@ -940,11 +950,11 @@ function heroKills(state: WorldStateData, npcId: string): void {
     killNpc(state, npcId, state.day, { by: "player", kind: "killed_by_player", locationId: state.currentSceneId });
   });
   if (!state.assassinatedNpcIds.includes(npcId)) state.assassinatedNpcIds = [...state.assassinatedNpcIds, npcId];
-  state.wanted = WANTED_MAX;
+  state.wanted = (state.wanted ?? 0) + KILL_MARKS;
   state.wantedDay = state.day;
   state.traits.evil = (state.traits.evil ?? 0) + 10;
   state.traits.fame = (state.traits.fame ?? 0) + 3;
-  appendActionLog(state, "law", `สังหาร${npc?.name ?? "ผู้คน"} — ทางการออกหมายจับ ${WANTED_MAX}/${WANTED_MAX} ทั่วแผ่นดิน`);
+  appendActionLog(state, "law", `สังหาร${npc?.name ?? "ผู้คน"} — ทางการออกหมายจับทั่วแผ่นดิน · หมายจับ ${state.wanted}`);
   applyEffect(state, { t: "firePlayerEcho", actionId: "kill_npc", targetNpcId: npcId });
   const own = sect ? state.sectMembership[sect] : undefined;
   if (sect && own && (own.status ?? "active") === "active") {
@@ -1134,6 +1144,7 @@ function draftFrom(s: WorldStateData): WorldStateData {
     lastNpcTickDay: s.lastNpcTickDay,
     wanted: s.wanted ?? 0,
     wantedDay: s.wantedDay ?? s.day,
+    lawEvasions: s.lawEvasions ?? 0,
     jailCityId: s.jailCityId ?? null,
     jailUntil: s.jailUntil ?? null,
   };
@@ -1578,7 +1589,11 @@ export const useWorldStore = create<WorldStore>()(
           consumeBattleItems(draft, battleState);
           draft.currentHp = Math.max(1, battleState.hA);
           draft.currentMp = Math.max(0, battleState.mpA);
-          if (isLawOpponent(pb.opponentId)) draft.jailCityId = null;
+          if (isLawOpponent(pb.opponentId)) {
+            // Slipped the law: the Brocade Guard takes note (law.ts pickLawPursuer).
+            draft.jailCityId = null;
+            draft.lawEvasions = (draft.lawEvasions ?? 0) + 1;
+          }
           if (pb.killNpcId) markAttemptedMurder(draft, pb.killNpcId);
           const opponent = getOpponent(pb.opponentId);
           if (pb.tournament) {
@@ -1650,8 +1665,17 @@ export const useWorldStore = create<WorldStore>()(
         const spoils = victorySpoilsFor(s) ?? rollVictorySpoils(s, pb);
         draft.wExp = Math.max(0, draft.wExp + spoils.wExp);
         draft.gold += spoils.gold;
-        // Beat the law this time: no jail pending (the marks stay).
-        if (isLawOpponent(pb.opponentId)) draft.jailCityId = null;
+        // Beat the law this time: no jail pending (the marks stay), and the
+        // law grows keener. An upright waylayer is left wounded.
+        if (isLawOpponent(pb.opponentId)) {
+          draft.jailCityId = null;
+          draft.lawEvasions = (draft.lawEvasions ?? 0) + 1;
+          const ambusher = pb.ambushNpcId ? draft.npcExt[pb.ambushNpcId] : undefined;
+          if (ambusher) {
+            draft.npcExt = { ...draft.npcExt, [pb.ambushNpcId!]: { ...ambusher, woundedUntil: draft.day + 30 } };
+            appendActionLog(draft, "law", `ตีโต้${getNpc(pb.ambushNpcId)?.name ?? "ผู้ลอบโจมตี"}ที่หมายจับตัวส่งทางการจนบาดเจ็บ`);
+          }
+        }
         // Bump the defeat counter so `Condition.defeatedOpponent` quests
         // can auto-advance against this kill.
         draft.defeatedCounts[pb.opponentId] =
@@ -2724,9 +2748,14 @@ export const useWorldStore = create<WorldStore>()(
         const here = s.roamingFoes.filter((foe) => foe.locationId === scene.id);
         const draft = draftFrom(s);
         rollWalkEvent(draft, WALK_TICK_CHANCE);
+        if (draft.pendingBattle?.ambushNpcId) {
+          appendActionLog(draft, "law", `${getNpc(draft.pendingBattle.ambushNpcId)?.name ?? "ผู้ไม่ประสงค์ออกนาม"}ลอบโจมตีหมายจับตัวส่งทางการ!`);
+          set({ ...draft, roamingFoes: here });
+          return;
+        }
         if (draft.pendingEncounter) {
           if (isLawOpponent(draft.pendingEncounter.opponentId)) {
-            appendActionLog(draft, "encounter", `ถูกตามจับ! หมายจับ ${draft.wanted}/${WANTED_MAX}`);
+            appendActionLog(draft, "encounter", `ถูกตามจับ! หมายจับ ${draft.wanted}`);
           }
           set({ ...draft, roamingFoes: here });
           return;
@@ -2743,6 +2772,21 @@ export const useWorldStore = create<WorldStore>()(
       roamingFoes: [],
       lastDeath: null,
       dismissDeath: () => set({ lastDeath: null }),
+
+      surrender: () => {
+        const s = get();
+        if (!s.hasGame || (s.wanted ?? 0) <= 0) return { ok: false, reason: "not-wanted" };
+        if (s.jailUntil != null || s.pendingBattle || s.pendingEncounter) return { ok: false, reason: "busy" };
+        const draft = draftFrom(s);
+        const marks = draft.wanted;
+        draft.jailCityId = jailCityFor(draft.lastLocationId ?? draft.currentSceneId);
+        applyEffect(draft, { t: "imprison", surrender: true });
+        appendActionLog(draft, "law", `มอบตัวต่อทางการ (หมายจับ ${marks}) · ${String(draft.flags._arrestReport ?? "").split("\n").join(" · ")}`);
+        // Taken straight to the cells: no road to walk, no stamina to pay.
+        draft.currentSceneId = JAIL_SCENE_ID;
+        set({ ...draft, roamingFoes: [] });
+        return { ok: true };
+      },
       engageFoe: (foeId) => {
         const s = get();
         const foe = s.roamingFoes.find((f) => f.id === foeId);
@@ -2847,8 +2891,9 @@ export const useWorldStore = create<WorldStore>()(
               draft.currentHp = Math.min(derived.HP, (draft.currentHp ?? 0) + Math.round(derived.HP * 0.2));
             }
             draft.stamina = Math.min(draft.staminaMax, draft.stamina + 15);
-            draft.wExp += 5;
-            message = "จิตสงบท่ามกลางซี่กรง · ปราณเต็มเปี่ยม";
+            // Nothing to do but sit with one's arts: insight comes (w-exp).
+            draft.wExp += JAIL_MEDITATE_WEXP;
+            message = `จิตสงบท่ามกลางซี่กรง · ปราณเต็มเปี่ยม · w-exp +${JAIL_MEDITATE_WEXP}`;
             break;
           }
           case "jail_escape": {
@@ -2856,12 +2901,13 @@ export const useWorldStore = create<WorldStore>()(
             advanceTime(draft, activity.hours);
             if (Math.random() < jailEscapeChance(draft.playerBuild?.stats.AGI ?? 0)) {
               releaseFromJail(draft);
-              draft.wanted = Math.min(WANTED_MAX, draft.wanted + 2);
+              draft.wanted += 2;
+              draft.lawEvasions = (draft.lawEvasions ?? 0) + 1;
               draft.wantedDay = draft.day;
               draft.currentSceneId = draft.lastLocationId!;
-              appendActionLog(draft, "law", `แหกคุกสำเร็จ! หมายจับ ${draft.wanted}/${WANTED_MAX}`);
+              appendActionLog(draft, "law", `แหกคุกสำเร็จ! หมายจับ ${draft.wanted}`);
               set({ ...draft });
-              return { ok: true, message: `ปีนกำแพงร้าวหนีออกมาได้ · หมายจับเพิ่มเป็น ${draft.wanted}/${WANTED_MAX}` };
+              return { ok: true, message: `ปีนกำแพงร้าวหนีออกมาได้ · หมายจับเพิ่มเป็น ${draft.wanted}` };
             }
             if (draft.jailUntil != null) draft.jailUntil += HOURS_PER_DAY;
             message = `ผู้คุมจับได้คาหนังคาเขา · โทษเพิ่ม 1 วัน · เหลือ ${describeSentence(sentenceLeft(draft))}`;
@@ -2924,9 +2970,10 @@ export const useWorldStore = create<WorldStore>()(
             set({ ...draft });
             return;
           }
-          // Successful flee — log it and clear.
+          // Successful flee — log it and clear. Slipping the law counts.
           const draft = draftFrom(s);
           appendActionLog(draft, "encounter", `หนีนักล่าสำเร็จ (${chance.toFixed(0)}%)`);
+          if (isLawOpponent(oppId)) draft.lawEvasions = (draft.lawEvasions ?? 0) + 1;
           draft.pendingEncounter = null;
           set({ ...draft });
           return;
@@ -3081,7 +3128,7 @@ export const useWorldStore = create<WorldStore>()(
         const opponentId = npc.sparOpponentId ?? TIER_TO_BAD_ACTION_OPPONENT[tier];
         draft.lifeSkillXp.steal = (draft.lifeSkillXp.steal ?? 0) + STEAL_XP_ON_FAIL;
         // Caught: a หมายจับ goes out (max 5). The law now hunts the player.
-        draft.wanted = Math.min(WANTED_MAX, (draft.wanted ?? 0) + 1);
+        draft.wanted = (draft.wanted ?? 0) + 1;
         draft.wantedDay = draft.day;
         draft.pendingBattle = {
           opponentId,
@@ -3089,7 +3136,7 @@ export const useWorldStore = create<WorldStore>()(
           onLose: draft.currentSceneId,
           nonFatal: true,
         };
-        appendActionLog(draft, "steal", `ขโมย ${npc.name} ล้มเหลว (${chance.toFixed(0)}%) — ถูกจับได้ · หมายจับ ${draft.wanted}/${WANTED_MAX}`);
+        appendActionLog(draft, "steal", `ขโมย ${npc.name} ล้มเหลว (${chance.toFixed(0)}%) — ถูกจับได้ · หมายจับ ${draft.wanted}`);
         set({ ...draft });
         return { ok: true, outcome: "failed", chance };
       },
@@ -3280,7 +3327,7 @@ export const useWorldStore = create<WorldStore>()(
     }),
     {
       name: "wusia-world-v1",
-      version: 24,
+      version: 25,
       // Content backfill also runs for current-version saves (migrate does
       // not). Keep the standard shallow merge and add only missing lore.
       merge: (persisted, current) => {
@@ -3352,6 +3399,7 @@ export const useWorldStore = create<WorldStore>()(
         lastNpcTickDay: s.lastNpcTickDay,
         wanted: s.wanted,
         wantedDay: s.wantedDay,
+        lawEvasions: s.lawEvasions,
         jailCityId: s.jailCityId,
         jailUntil: s.jailUntil,
       }),
@@ -3539,7 +3587,9 @@ export const useWorldStore = create<WorldStore>()(
               ? p.lastNpcTickDay
               : (typeof p.day === "number" && p.day >= 1 ? p.day : 1),
           // v20+: wanted marks / jail
-          wanted: typeof p.wanted === "number" ? Math.max(0, Math.min(5, Math.floor(p.wanted))) : 0,
+          wanted: typeof p.wanted === "number" ? Math.max(0, Math.floor(p.wanted)) : 0,
+          // v25+: escapes from the law since the last sentence
+          lawEvasions: typeof p.lawEvasions === "number" ? Math.max(0, Math.floor(p.lawEvasions)) : 0,
           wantedDay: typeof p.wantedDay === "number" ? p.wantedDay : (typeof p.day === "number" ? p.day : 1),
           jailCityId: typeof p.jailCityId === "string" ? p.jailCityId : null,
           // v21+: imprisonment lock

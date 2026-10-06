@@ -38,7 +38,7 @@ import { npcCharacterId } from "@/lib/characters/catalog";
 import { GiftPicker } from "./gift-picker";
 import { DECLINE_TEXT } from "@/lib/world/story/compile";
 import { POWER_TIER_LABEL, heldQuests, npcPower, npcTitle, powerTier } from "@/lib/world/npc-life";
-import { WANTED_MAX } from "@/lib/world/law";
+import { KILL_MARKS } from "@/lib/world/law";
 
 /** What the jianghu knows of a simulated person now: journey, wounds, seclusion, family. */
 function lifeLines(state: ReturnType<typeof useWorldStore.getState>, npcId: string): string[] {
@@ -123,7 +123,7 @@ export function NpcInteractionPopup({ open, npc, onClose }: Props) {
       message: [
         `ชักอาวุธเข้าใส่${npc.name}และสู้กันถึงตาย?`,
         `ฝีมือของอีกฝ่าย: ${tierLabel}`,
-        `ถ้าสังหารได้ ทางการจะออกหมายจับ ${WANTED_MAX} ดาวทันที · ถ้าพลาดหรือหนี หมายจับ +2`,
+        `ถ้าสังหารได้ ทางการจะออกหมายจับเพิ่ม ${KILL_MARKS} ทันที · ถ้าพลาดหรือหนี หมายจับ +2`,
         charges.length ? `ภารกิจที่ค้างกับผู้นี้ ${charges.length} อย่างอาจล้มเหลว` : "",
         "ถ้าแพ้ เจ้าจะสลบและฟื้นที่บ้านพร้อมสูญเสียทรัพย์",
       ].filter(Boolean).join("\n"),
@@ -339,7 +339,7 @@ export function NpcInteractionPopup({ open, npc, onClose }: Props) {
                     : "ไม่ได้ของ";
                   toast("success", `ขโมยสำเร็จ! ${loot}`);
                 } else {
-                  toast("error", `ถูกจับได้! ถูกออกหมายจับ ${useWorldStore.getState().wanted}/5 — ต้องสู้หนีเอาตัวรอด`);
+                  toast("error", `ถูกจับได้! ถูกออกหมายจับ ${useWorldStore.getState().wanted} — ต้องสู้หนีเอาตัวรอด`);
                   onClose();
                 }
               }}
@@ -441,7 +441,7 @@ export function NpcInteractionPopup({ open, npc, onClose }: Props) {
             <span className="flex flex-col items-start gap-0.5">
               <span className="font-semibold text-sm text-rose-800 npc-action-label">⚔ สังหาร</span>
               <span className="text-[10px] text-muted-foreground">
-                สู้กันถึงตาย · สำเร็จแล้วหมายจับ {WANTED_MAX} ดาวทันที
+                สู้กันถึงตาย · สำเร็จแล้วหมายจับ +{KILL_MARKS} ทันที
               </span>
             </span>
           </Button>

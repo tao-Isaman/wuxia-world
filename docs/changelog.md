@@ -6,6 +6,15 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-06
 
+### The law bites harder
+
+- **มอบตัว.** Tap the wanted chip to give yourself up: straight to the cells, half the sentence and fine, nothing seized.
+- **Wanted marks have no ceiling.** Five seals, then a number (⛓ หมายจับ ×7). A killing adds 5.
+- **The Brocade Guard.** Every escape from the law (fleeing, winning, bribing, breaking out) makes them keener: Brocade agents (T3), captains with agents (T4), and after a long run the Jinyiwei commander in person. Serving a sentence wipes the slate.
+- **Upright people turn you in.** Righteous masters, wanderers and disciples nearby may waylay a wanted hero for the law — no fleeing; lose and you are arrested.
+- **Heavier sentences.** Arrest reads a sentence: up to 30 days, a fine of 50 per mark, seizure of property from 5 marks, crippled martial arts (the best moves lose 2 levels) from 10. Bribes cost more for a long record.
+- **Jail meditation** now gives w-exp +40.
+
 ### The living jianghu (Liveness 2.0)
 
 - **People age for real** — a year on each one's birthday — and die of age by a yearly risk that rises with age and falls with inner strength, or in duels.

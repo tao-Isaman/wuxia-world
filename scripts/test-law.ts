@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { JAIL_BRIBE_GOLD, jailCityFor, jailDays, lawChance, pickLawPursuer, isLawOpponent, LAW_OPPONENTS } from "../lib/world/law";
+import { JAIL_BRIBE_GOLD, ambushChance, arrestPenalty, bribeCost, jailCityFor, jailDays, lawChance, pickLawPursuer, isLawOpponent, LAW_OPPONENTS } from "../lib/world/law";
 import { applyEffect, rollFoeSpawn, rollWalkEvent } from "../lib/world/effects";
 import { FOE_SPAWN } from "../lib/world/data/random-events";
 import { getLocationMap, getOpponent, getScene } from "../lib/world";
@@ -34,6 +34,89 @@ check("more marks: more pursuit, tougher pursuers, longer sentences", () => {
   assert.ok(heavy.has("law_imperial_guard") && heavy.has("law_bounty_hunter"));
   assert.equal(jailDays(1), 2);
   assert.equal(jailDays(5), 10);
+  assert.equal(jailDays(12), 24, "marks have no ceiling — nor, up to a month, does the sentence");
+  assert.equal(jailDays(40), 30);
+});
+
+const sequence = (rolls: number[], run: () => void) => {
+  const r = Math.random; let i = 0; Math.random = () => rolls[i++] ?? 0.5;
+  try { run(); } finally { Math.random = r; }
+};
+
+check("the Brocade Guard hunts those who keep slipping the law; at last their commander comes", () => {
+  const roll = (marks: number, evasions: number) => new Set(Array.from({ length: 200 }, (_, i) => pickLawPursuer(marks, i / 200, evasions)));
+  assert.deepEqual([...roll(1, 0)], ["law_constable"]);
+  assert.ok(!roll(3, 0).has("law_jinyiwei_agent"), "no Brocade Guard for a fresh petty record");
+  assert.ok(roll(3, 3).has("law_jinyiwei_agent"), "three escapes bring the Brocade Guard");
+  assert.ok(roll(5, 6).has("law_jinyiwei_captain"));
+  assert.ok(!roll(5, 7).has("chief"));
+  assert.ok(roll(6, 10).has("chief"), "a long run brings their commander");
+  for (const id of ["law_jinyiwei_agent", "law_jinyiwei_captain"]) assert.ok((getOpponent(id)?.ti ?? 0) >= 3, `${id} is strong`);
+  assert.ok(lawChance(3, 8) > lawChance(3, 0), "every escape makes them keener");
+  // The commander in person: whoever holds the Brocade Guard's seat, as a law fight.
+  const state = freshState();
+  state.currentSceneId = "city_capital";
+  state.wanted = 8; state.lawEvasions = 30;
+  sequence([0, 0.999], () => rollWalkEvent(state, 0.4));
+  const id = state.pendingEncounter?.opponentId ?? "";
+  assert.ok(id.startsWith("lawnpc@") && isLawOpponent(id), id);
+  assert.ok(getOpponent(id)?.name, "the commander resolves to a fighter");
+});
+
+check("an upright person nearby may waylay a wanted hero to hand them over — no fleeing; losing is arrest", () => {
+  assert.equal(ambushChance(1), 0);
+  assert.ok(ambushChance(6) > ambushChance(2));
+  const state = freshState();
+  state.currentSceneId = "city_capital"; state.lastLocationId = "city_capital";
+  state.wanted = 6;
+  for (const ext of Object.values(state.npcExt)) ext.currentLocation = "sect_xiaoyao"; // nobody near…
+  state.npcExt.wander_sun_yao = { ...state.npcExt.wander_sun_yao, currentLocation: "city_capital", power: 40 }; // …but the healer
+  sequence([0.99, 0, 0], () => rollWalkEvent(state, 0.4));
+  const pb = state.pendingBattle!;
+  assert.equal(pb.ambushNpcId, "wander_sun_yao");
+  assert.ok(isLawOpponent(pb.opponentId) && pb.onLose === "jail_cell" && pb.nonFatal);
+  assert.equal(state.pendingEncounter, null, "an ambush is a fight at once");
+});
+
+check("arrest costs grow with the record: fines, then seizure, then crippled arts; giving oneself up halves it", () => {
+  assert.deepEqual(arrestPenalty(1), { days: 2, fine: 50, confiscate: false, cripple: 0 });
+  assert.equal(arrestPenalty(5).confiscate, true);
+  assert.equal(arrestPenalty(10).cripple, 1);
+  assert.equal(arrestPenalty(20).cripple, 3);
+  assert.deepEqual(arrestPenalty(10, true), { days: 10, fine: 250, confiscate: false, cripple: 0 });
+  const state = freshState();
+  state.wanted = 12; state.gold = 1200; state.inventory = { potion: 4, herb: 6 };
+  state.skillLevel = { basic_punch: 7 };
+  applyEffect(state, { t: "imprison" });
+  assert.equal(state.wanted, 0);
+  assert.equal(state.gold, Math.ceil((1200 - 600) * 2 / 3), "fine 600, then a third seized");
+  assert.equal(state.skillLevel.basic_punch, 5, "the best move loses two levels");
+  assert.ok(Object.values(state.inventory).reduce((a, b) => a + b, 0) < 10, "goods seized");
+  const report = String(state.flags._arrestReport);
+  assert.ok(report.includes("ค่าปรับ") && report.includes("ริบ") && report.includes("ทำลายวรยุทธ"), report);
+});
+
+check("มอบตัว: straight to the cells, half the sentence and fine; escapes counted until a sentence clears them", () => {
+  const store = useWorldStore.getState();
+  store.startNewGame({ name: "ทดสอบ", gender: "male" } as never);
+  useWorldStore.setState({ currentSceneId: "route_home_player__to__city_capital", lastLocationId: "city_capital", wanted: 0 });
+  assert.equal(useWorldStore.getState().surrender().ok, false, "nothing to answer for");
+  useWorldStore.setState({ wanted: 6, gold: 500, lawEvasions: 4 });
+  assert.equal(useWorldStore.getState().surrender().ok, true);
+  const s = useWorldStore.getState();
+  assert.equal(s.currentSceneId, "jail");
+  assert.equal(s.wanted, 0);
+  assert.equal(s.lawEvasions, 0);
+  assert.equal(sentenceLeft(s), 6 * JAIL_HOURS_PER_DAY, "12 days halved");
+  assert.equal(s.gold, 500 - 150);
+  assert.ok(String(s.flags._arrestReport).includes("มอบตัว"));
+  assert.equal(useWorldStore.getState().surrender().ok, false, "not twice");
+  // Unlimited marks: a failed theft at 5 makes 6.
+  useWorldStore.getState().startNewGame({ name: "ทดสอบ", gender: "male" } as never);
+  useWorldStore.setState({ wanted: 5 });
+  const thief = [...(require("../lib/world").NPCS as { id: string; stealLoot?: unknown[] }[])].find((npc) => npc.stealLoot?.length);
+  withRandom(0.999, () => useWorldStore.getState().attemptSteal(thief!.id));
+  assert.equal(useWorldStore.getState().wanted, 6);
 });
 
 check("a wanted player's walk tick can bring the law; losing routes to jail", () => {
@@ -63,9 +146,12 @@ check("serving time clears the marks and releases into the jail's city", () => {
 
 check("a bribe costs gold and lifts two marks", () => {
   const state = freshState();
-  state.wanted = 3; state.gold = JAIL_BRIBE_GOLD + 5; state.jailCityId = "city_capital";
+  state.wanted = 3; state.gold = bribeCost(3) + 5; state.jailCityId = "city_capital";
+  assert.equal(bribeCost(2), JAIL_BRIBE_GOLD);
+  assert.equal(bribeCost(5), JAIL_BRIBE_GOLD + 3 * 150, "the price grows with the record");
   applyEffect(state, { t: "bribeJail" });
   assert.equal(state.gold, 5);
+  assert.equal(state.lawEvasions, 1, "a bribe is slipping the law");
   assert.equal(state.wanted, 1);
   assert.equal(state.lastLocationId, "city_capital");
 });
@@ -120,15 +206,18 @@ check("arrest locks the player in the jail map until the sentence is served", ()
 check("dice, meditation and escape: costs, odds and consequences", () => {
   const store = useWorldStore.getState();
   store.startNewGame({ name: "ทดสอบ", gender: "male" } as never);
-  useWorldStore.setState({ currentSceneId: "jail_cell", lastLocationId: "city_capital", wanted: 1, jailCityId: "city_capital", stamina: 100, gold: 30 });
+  useWorldStore.setState({ currentSceneId: "jail_cell", lastLocationId: "city_capital", wanted: 1, jailCityId: "city_capital", stamina: 100, gold: 80 });
   useWorldStore.getState().makeChoice(0);
+  assert.equal(useWorldStore.getState().gold, 30, "a 50-gold fine for one mark");
   withRandom(0, () => useWorldStore.getState().doActivity("jail_dice"));
   assert.equal(useWorldStore.getState().gold, 40);
   withRandom(0.99, () => useWorldStore.getState().doActivity("jail_dice"));
   assert.equal(useWorldStore.getState().gold, 30);
   useWorldStore.setState({ currentMp: 0 });
+  const wExp = useWorldStore.getState().wExp;
   useWorldStore.getState().doActivity("jail_meditate");
   assert.ok(useWorldStore.getState().currentMp > 0);
+  assert.equal(useWorldStore.getState().wExp, wExp + 40, "meditation in the cells gives insight (w-exp)");
   const left = sentenceLeft(useWorldStore.getState());
   withRandom(0.99, () => useWorldStore.getState().doActivity("jail_escape"));
   assert.equal(sentenceLeft(useWorldStore.getState()), left - 2 + JAIL_HOURS_PER_DAY, "a failed escape adds a day");

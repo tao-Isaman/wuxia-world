@@ -2,11 +2,11 @@
 
 # Opponents
 
-388 opponents (`lib/world/data/opponents.ts`). Foes that turn up on the map while the hero walks come from 64 fight events filtered by zone (`lib/world/data/random-events.ts`).
+390 opponents (`lib/world/data/opponents.ts`). Foes that turn up on the map while the hero walks come from 64 fight events filtered by zone (`lib/world/data/random-events.ts`).
 
 Met via: **roams** = turns up on the map in the listed zones while the hero walks · **hunt** = a hunting node · **spar** = an NPC's practice bout · **scene** = a quest or story battle (count of scene choices) · **law** = pursuers after wanted marks · **betrayal** = hunters after betraying a sect.
 
-Per tier: T0: 9 · T1: 44 · T2: 74 · T3: 54 · T4: 207. Per category: ฝ่ายมนุษย์ (human): 353 · สัตว์ป่า (beast): 27 · ผู้พิเศษ (supernatural): 8.
+Per tier: T0: 9 · T1: 44 · T2: 74 · T3: 55 · T4: 208. Per category: ฝ่ายมนุษย์ (human): 355 · สัตว์ป่า (beast): 27 · ผู้พิเศษ (supernatural): 8.
 
 ## Tier 0 (9)
 
@@ -150,7 +150,7 @@ Per tier: T0: 9 · T1: 44 · T2: 74 · T3: 54 · T4: 207. Per category: ฝ่�
 | `spar_qigu_farmer_lao` | ลาวหนาน | human | — | 6 | scene ×1 |
 | `spar_taohua_huang_waterstep` | หวงชิงเฉวียน (สามส่วนฝีมือ) | human | — | 6 | scene ×1 |
 
-## Tier 3 (54)
+## Tier 3 (55)
 
 | Id | Name | Category | Pack | Drops | Met via |
 | --- | --- | --- | --- | --- | --- |
@@ -187,6 +187,7 @@ Per tier: T0: 9 · T1: 44 · T2: 74 · T3: 54 · T4: 207. Per category: ฝ่�
 | `spar_tang_tangrong` | ผู้อาวุโสไล่ล่าถังหรง | human | — | 9 | spar |
 | `law_imperial_guard` | องครักษ์หลวง | human | — | 7 | law |
 | `law_bounty_hunter` | นักล่าค่าหัว | human | 1× เจ้าหน้าที่รัฐ | 7 | law |
+| `law_jinyiwei_agent` | องครักษ์เสื้อแพร | human | 1× เจ้าหน้าที่รัฐ | 7 | law |
 | `golden_tiger` | เสือทองคำ | beast | — | 8 | roams (frontier, isle, wild) |
 | `jade_python` | งูเหลือมหยก | beast | — | 9 | roams (frontier, isle, wild) |
 | `thunder_eagle` | อินทรีสายฟ้า | beast | — | 7 | roams (frontier, isle, wild) |
@@ -209,7 +210,7 @@ Per tier: T0: 9 · T1: 44 · T2: 74 · T3: 54 · T4: 207. Per category: ฝ่�
 | `spar_dalun_kongxin` | พระกงซิน | human | — | 7 | scene ×1 |
 | `spar_bingcan_wei_firefist` | เว่ยชิงเหวิน (หมัดเพลิง) | human | — | 7 | scene ×1 |
 
-## Tier 4 (207)
+## Tier 4 (208)
 
 | Id | Name | Category | Pack | Drops | Met via |
 | --- | --- | --- | --- | --- | --- |
@@ -268,6 +269,7 @@ Per tier: T0: 9 · T1: 44 · T2: 74 · T3: 54 · T4: 207. Per category: ฝ่�
 | `hunter_jinyiwei` | นักล่าองครักษ์เสื้อแพร | human | — | 10 | betrayal |
 | `hunter_sunmoon` | นักล่าพรรคตะวันจันทรา | human | — | 10 | betrayal |
 | `hunter_tang` | นักล่าสำนักสกุลถัง | human | — | 10 | betrayal |
+| `law_jinyiwei_captain` | นายกององครักษ์เสื้อแพร | human | 2× องครักษ์เสื้อแพร | 8 | law |
 | `elite_bandit_king` | ราชาโจรภูเขา | human | 1× รองหัวหน้าโจร + 2× มือเข็มโจรป่า + 2× โจรป่า | 10 | — |
 | `elite_cult_elder` | ผู้อาวุโสลัทธิมาร | human | 3× สาวกลัทธิมาร | 10 | scene ×2 |
 | `elite_bear_king` | ราชาหมีพันปี | beast | 1× หมีสีน้ำตาล | 9 | — |
