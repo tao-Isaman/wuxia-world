@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { chalkTick } from "@/lib/audio/engine";
+import { keyTick } from "@/lib/audio/engine";
 import { createPortal } from "react-dom";
 import type { CutsceneLine, CutsceneRuntime } from "@/lib/stage/cutscene-runtime";
 import { getCutscene } from "@/lib/world/story/registry";
@@ -69,7 +69,7 @@ export function CutscenePlayer({ cutsceneId, onDone }: { cutsceneId: string; onD
   const full = visibleLength(text);
   useEffect(() => {
     if (shown >= full) return;
-    chalkTick();
+    keyTick();
     const timer = setTimeout(() => setShown((n) => Math.min(full, n + 2)), 22);
     return () => clearTimeout(timer);
   }, [shown, full]);

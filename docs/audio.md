@@ -124,7 +124,7 @@ It also plays cues when the store changes:
 | gold goes up | `coin` |
 | stamina rises by 20 or more | `rest` |
 | the scene changes to a non-dialog | `step` |
-| a dialog or cutscene line types out | `chalkTick` — chalk strokes on a board (gritty noise grains, 2.5–7 kHz), self-throttled to a writing rhythm; silent with instant text or reduced motion |
+| a dialog or cutscene line types out | `keyTick` — keyboard keystrokes (a high-passed switch click over a band-passed keycap thock, now and then a lower space bar), self-throttled to 10–16 keys a second; silent with instant text or reduced motion |
 | any enabled button is clicked | `open` in the icon bar, `tap` elsewhere |
 
 ## Skill sounds
