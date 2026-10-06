@@ -73,16 +73,7 @@ export function rollOpponentLoot(
 ): { itemId: string; count: number }[] {
   if (!drops || drops.length === 0) return [];
   const picks = tier >= 4 ? 4 : tier >= 2 ? 3 : 2;
-  const merged: Record<string, number> = {};
-  for (let i = 0; i < picks; i++) {
-    const drop = pickWeighted(drops, Math.random());
-    if (!drop) continue;
-    const min = drop.count?.[0] ?? 1;
-    const max = drop.count?.[1] ?? 1;
-    const c = min + Math.floor(Math.random() * Math.max(1, max - min + 1));
-    merged[drop.itemId] = (merged[drop.itemId] ?? 0) + c;
-  }
-  return Object.entries(merged).map(([itemId, count]) => ({ itemId, count }));
+  return rollWeightedPicks(drops, picks);
 }
 
 // Roll a yield. Two-stage:
@@ -103,17 +94,20 @@ export function rollResourceYield(
   if (surplus >= 3) picks++;
   picks = Math.max(1, Math.min(3, picks));
 
+  return { items: rollWeightedPicks(resource.yields, picks), passed: true };
+}
+
+// `picks` weighted draws from a drop / yield table, each with its count rolled
+// in its range; duplicate item ids merge. Shared by loot and resource yields.
+function rollWeightedPicks(table: readonly ResourceYield[], picks: number): { itemId: string; count: number }[] {
   const merged: Record<string, number> = {};
   for (let i = 0; i < picks; i++) {
-    const drop = pickWeighted(resource.yields, Math.random());
+    const drop = pickWeighted(table, Math.random());
     if (!drop) continue;
     const min = drop.count?.[0] ?? 1;
     const max = drop.count?.[1] ?? 1;
     const c = min + Math.floor(Math.random() * Math.max(1, max - min + 1));
     merged[drop.itemId] = (merged[drop.itemId] ?? 0) + c;
   }
-  return {
-    items: Object.entries(merged).map(([itemId, count]) => ({ itemId, count })),
-    passed: true,
-  };
+  return Object.entries(merged).map(([itemId, count]) => ({ itemId, count }));
 }
