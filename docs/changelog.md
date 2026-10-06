@@ -6,6 +6,11 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-06
 
+### Item windows in the bag and the shop
+
+- The ✕ on the bag's item window works again: the item name's colour filter painted over it, so taps hit the name.
+- Shop items open the same window: tap a row (buy or sell tab) to read the item's description, effects, how many you have and the price, and buy or sell one from there. New `item-details.spec.ts` checks both on a phone-sized screen.
+
 ### The skills window speaks plain Thai
 
 - Moves read as what they do: โจมตีภายนอก / โจมตีภายใน (no more ทางกาย / ทางใน), how many strikes, what happens to you and the foe ("ศัตรู: หลบหลีก −15 นาน 5 ตา") — generated from the data instead of the table's shorthand ("Phy×115%×1.1 · Eva-15 (5ตา)").

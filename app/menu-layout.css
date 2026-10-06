@@ -71,8 +71,12 @@
   padding: 14px 16px; color: var(--scroll-ink); background: linear-gradient(#f6ead0, #ecd9ad); border: 2px solid var(--scroll-edge, #8f6a3a);
   border-radius: 8px; box-shadow: 0 0 0 2px #2a160c, 0 12px 30px #0008;
 }
-.bag-popup-close { position: absolute; top: 6px; right: 8px; width: 32px; height: 32px; font-size: 18px; color: #a02f27; border-radius: 50%; }
+.bag-popup-close { position: absolute; z-index: 2; top: 6px; right: 8px; width: 32px; height: 32px; font-size: 18px; color: #a02f27; border-radius: 50%; }
 .bag-popup-close:hover { background: #a02f271a; }
+/* The shop's item window is portalled to <body> and covers the screen. */
+.shop-detail-backdrop { position: fixed; z-index: 60; }
+.shop-detail-backdrop .bag-detail-name { filter: brightness(.55) saturate(1.7); }
+.shop-row { cursor: pointer; }
 .bag-popup .bag-detail-name { padding-right: 32px; font: 20px/1.35 var(--font-display); }
 .bag-popup .bag-detail-text { font-size: 13.5px; line-height: 1.55; }
 .bag-popup .bag-notice { margin: 0; }

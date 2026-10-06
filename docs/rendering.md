@@ -395,7 +395,7 @@ A menu section opens as a full-screen **menu shell** (`components/ui/modal.tsx` 
 | Popup (`components/world/popups/`) | Shows |
 | --- | --- |
 | `profile-popup.tsx` | three columns (`fill`): who (figure, name, ฉายา from `lib/world/epithet.ts`, gold, HP / MP / พลัง bars, power tier, sects, the five traits) · tabs ค่าพลัง (base stats with training bars; tap for sources) / อุปกรณ์ · detailed status (combat numbers, weapon mastery, move bonuses); styles `app/profile.css` |
-| `inventory-popup.tsx` | two columns: worn gear as a paper doll around the hero (`DOLL_AREA` grid areas) · category tabs over a `PagedGrid` of the bag (gear first, then items). Picking anything opens a small window (`.bag-popup`: details, ใช้ / ติดตั้ง / ถอด); tapping outside it goes back to the bag |
+| `inventory-popup.tsx` | two columns: worn gear as a paper doll around the hero (`DOLL_AREA` grid areas) · category tabs over a `PagedGrid` of the bag (gear first, then items). Picking anything opens a small window (`.bag-popup`: details, ใช้ / ติดตั้ง / ถอด); its ✕ (`z-index: 2`, above the name's `filter`) or tapping outside it goes back to the bag |
 | `move-skills-popup.tsx` | three columns: counts, weapon mastery, conflicts and the 10 loadout slots · the learned library (`PagedGrid`, filters) · the picked move (`SkillDetail`: actions first — equip / replace / remove, เลื่อนระดับ (ใช้ประสบการณ์ยุทธ) with the `upgrade-payoff.tsx` card, ลืม — then the plain-Thai summary and numbers from `lib/game/skill-text.ts`, and ค่าประสบการณ์) |
 | `life-skills-popup.tsx` | tabs มาสเตอร์รี่ / ฝึกฝน / สูตรที่เรียน, each a `PagedGrid` of tiles: the 19 life skills · music practice and training items · learned recipes (read-only) |
 | `letters-popup.tsx` | two columns: the inbox (`PagedGrid`; the gift as an item tile, ● unread, ลบที่อ่านแล้ว) · the open letter (portrait, text, the gift tile and rarity, ลบ). Deleting takes an unclaimed gift first (`deleteLetters`) |
@@ -404,7 +404,7 @@ A menu section opens as a full-screen **menu shell** (`components/ui/modal.tsx` 
 | `sect-membership-popup.tsx` | the sect, rank-up, 🎖 rewards, 📜 sect quests, ☯ arts, leaving (resign or betray) |
 | `action-log-popup.tsx` | the last 100 actions, newest first |
 | `npc-interaction-popup.tsx` | the NPC card: portrait, badges, description; ทักทาย, ขอประลอง, ขโมย, ลอบทำร้าย, ลักพาตัว; objective actions, hand-ins, offers, active quests |
-| `shop-popup.tsx` | ซื้อ · ขาย |
+| `shop-popup.tsx` | ซื้อ · ขาย. Tapping a row (or its tile) opens the item's window (`.bag-popup` in `.shop-detail-backdrop`, portalled to `<body>` so the card's transform and scroll don't clip it): details, effects, owned, price, and ซื้อ / ขาย 1 ชิ้น |
 | `sect-hall-popup.tsx` | the city hall's offers; the capital's free training duel |
 | `artisan-popup.tsx` | ซื้อสูตร · ประดิษฐ์ · ซื้อ-ขาย |
 | `practice-popup.tsx` | skills and arts to practise, the place bonus, the cost |
