@@ -103,12 +103,19 @@ export function getNpc(id: string | null | undefined): NpcDef | null {
   return NPCS_BY_ID.get(id) ?? DYNAMIC_NPCS.get(id) ?? null;
 }
 
+// Registry NPCs by the locations they live at, in NPCS order (built once:
+// the map view asks for every render).
+const NPCS_BY_LOCATION = new Map<string, NpcDef[]>();
+for (const n of NPCS) {
+  for (const locationId of new Set(n.locationIds)) {
+    const list = NPCS_BY_LOCATION.get(locationId);
+    if (list) list.push(n); else NPCS_BY_LOCATION.set(locationId, [n]);
+  }
+}
+
 // All registry NPCs whose locationIds include `locationId`. LocationView
 // uses this to decorate the NPC list with the registered NPCs at that spot.
+// Returns a fresh array the caller may change.
 export function getNpcsAtLocation(locationId: string): NpcDef[] {
-  const out: NpcDef[] = [];
-  for (const n of NPCS) {
-    if (n.locationIds.includes(locationId)) out.push(n);
-  }
-  return out;
+  return NPCS_BY_LOCATION.get(locationId)?.slice() ?? [];
 }
