@@ -151,16 +151,18 @@ export function NpcInteractionPopup({ open, npc, onClose }: Props) {
   });
 
   const onAcceptQuest = async (def: QuestDef) => {
-    // A sect move quest can be turned down. A compiled one's offer scene
-    // carries รับคำ / ปฏิเสธ itself, so open it before accepting; a trial
-    // without one asks first.
+    // An offer scene whose accept choice runs `startQuest` (compiled
+    // lineage / saga offers and hand-written ones alike) carries its own
+    // รับ / ปฏิเสธ, so open it before accepting: the accept choice starts
+    // the quest, a decline leaves it on offer. A sect move trial without
+    // one asks first.
     const offerScene = getScene(`qs_${def.id}_offer`);
+    if (offerScene && sceneStartsQuest(offerScene, def.id)) {
+      onClose();
+      gotoScene(offerScene.id);
+      return;
+    }
     if (isSectMoveQuest(def)) {
-      if (offerScene && sceneStartsQuest(offerScene, def.id)) {
-        onClose();
-        gotoScene(offerScene.id);
-        return;
-      }
       const ok = await confirmDialog({
         title: def.name,
         message: `${def.briefSummary ?? def.description}\n\nรับภารกิจนี้หรือไม่?`,
@@ -181,10 +183,8 @@ export function NpcInteractionPopup({ open, npc, onClose }: Props) {
     toast("success", `รับภารกิจ: ${def.name}`);
 
     // Routing in priority order:
-    //   1. `qs_<id>_offer` — gives the player the briefing dialog with the
-    //      "what to do next" instructions (which itemId to fetch, where to
-    //      travel, etc.). Without this hop the player just lands back on
-    //      an ambient greet and has no idea what they accepted.
+    //   1. `qs_<id>_offer` — a briefing-only offer (no accept choice of its
+    //      own) gives the "what to do next" instructions after accepting.
     //   2. NPC's ambient `dialogSceneId` — fallback for quests with no
     //      offer scene authored (engine-side accept already ran above).
     const offerSceneId = `qs_${def.id}_offer`;
