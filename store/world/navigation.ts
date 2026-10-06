@@ -1,10 +1,11 @@
 // Moving between scenes inside an action's draft: travel costs, the jail
 // lock, dialog choices and auto-advance.
 import { STAT_XP_PER_ACTION } from "@/lib/world/stat-progression";
-import { applyEffects, getScene, type Choice, type SceneEffect, type WorldStateData } from "@/lib/world";
+import { applyEffects, getQuest, getScene, type Choice, type SceneEffect, type WorldStateData } from "@/lib/world";
 import { tickQuestProgress } from "@/lib/world/effects";
 import { JAIL_SCENE_ID } from "@/lib/world/data/activities";
 import { advanceTime } from "./lifecycle";
+import { appendActionLog } from "./state";
 import { grantStatXp, rollLukXp } from "./progression";
 import { LOC_TO_ROUTE_HOURS, ROUTE_TO_LOC_HOURS, TRAVEL_STAMINA_COST } from "./rules";
 
@@ -97,7 +98,13 @@ export function takeChoice(state: WorldStateData, choice: Choice): boolean {
   if (!canAffordTravelTo(state, choice.next)) return false;
 
   const effects: readonly SceneEffect[] = choice.effects ?? [];
+  // Quests this choice accepts (an offer's รับ choice): log them as the NPC
+  // card's accept does.
+  const accepting = effects.flatMap((e) => (e.t === "startQuest" && !state.quests[e.questId] ? [e.questId] : []));
   applyEffects(state, effects);
+  for (const id of accepting) {
+    if (state.quests[id]) appendActionLog(state, "quest", `รับภารกิจ: ${getQuest(id)?.name ?? id}`);
+  }
   if (state.pendingBattle) {
     // Battle suspends scene navigation; the onWin/onLose path overrides `next`.
     return true;

@@ -102,7 +102,7 @@ export const SCENES_VILLAGES: readonly Scene[] = [
     id: "npc_inn_gaosheng_keeper_fat_talk",
     lines: [
       { t: "narration", text: "ชายอ้วนผิวขาวสวมผ้ากันเปื้อนเดินออกมาจากครัวด้วยรอยยิ้ม" },
-      { t: "dialogue", speaker: "เฉาอ้วน", text: "ยินดีต้อนรับ! ข้าชื่อเฉาอ้วน เจ้าของโรงเตี๊ยมเก้าอี้สูงแห่งนี้" },
+      { t: "dialogue", speaker: "เฉาอ้วน", text: "ยินดีต้อนรับ! ข้าชื่อเฉาอ้วน เจ้าของโรงเตี๊ยมเกาเซิ่งแห่งนี้" },
       { t: "dialogue", speaker: "เฉาอ้วน", text: "เมื่อก่อนข้าล่มจมในยุทธจักร ตอนนี้พบว่าทำอาหารอร่อยสุขใจกว่าจริง ๆ" },
       { t: "narration", text: "เขาส่งชาร้อนหนึ่งถ้วยมาให้" },
     ],
@@ -289,18 +289,38 @@ export const SCENES_VILLAGES: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qv_qigu_poisoned_well_investigate",
     lines: [
-      { t: "narration", text: "เจ้าค้นพบว่ามีโจรเร่ร่อนแอบปล่อยพิษเพื่อบีบค้าขาย" },
-      { t: "dialogue", speaker: "โจร", text: "เจ้ารู้มากเกินไปแล้ว! ต้องกำจัดเจ้าออกก่อน!" },
+      { t: "narration", text: "ข้างบ่อน้ำมีรอยเท้าเปื้อนผงสีเขียว นำออกไปยังเพิงร้างท้ายหมู่บ้าน" },
+      { t: "narration", text: "ในเพิงนั้น หมอดูเร่ที่ขายยาวิเศษให้ชาวบ้านกำลังกวาดห่อผงสีเขียวใส่ย่ามอย่างรีบร้อน" },
+      { t: "dialogue", speaker: "หมอดูปลอม", text: "เจ้ารู้มากเกินไปแล้ว! อย่าหวังว่าจะได้กลับไปบอกใคร!" },
     ],
     choices: [
       {
         text: "สู้เพื่อปกป้องหมู่บ้าน",
-        next: "qs_qv_qigu_poisoned_well_complete",
+        next: "qs_qv_qigu_poisoned_well_caught",
         effects: [
-          { t: "triggerBattle", opponentId: "fortune_thief", onWin: "qs_qv_qigu_poisoned_well_complete", onLose: "village_qigu" },
+          { t: "triggerBattle", opponentId: "fortune_thief", onWin: "qs_qv_qigu_poisoned_well_caught", onLose: "village_qigu" },
         ],
       },
-      { text: "ถอยกลับไปแจ้งนางเหมย", next: "village_qigu" },
+      {
+        text: "ปล่อยเขาหนีไป แล้วรีบกลับไปบอกนางเหมย",
+        next: "village_qigu",
+        effects: [{ t: "advanceQuest", questId: "qv_qigu_poisoned_well" }],
+      },
+    ],
+  },
+  {
+    kind: "dialog",
+    id: "qs_qv_qigu_poisoned_well_caught",
+    lines: [
+      { t: "narration", text: "หมอดูปลอมล้มคว่ำ ทิ้งห่อผงสีเขียวไว้แล้ววิ่งหนีออกจากหมู่บ้านไปไม่เหลียวหลัง" },
+      { t: "narration", text: "ผงในห่อนั้นมีกลิ่นเดียวกับน้ำในบ่อ — นางเหมยน่าจะรู้ว่าเป็นหญ้าอะไร" },
+    ],
+    choices: [
+      {
+        text: "นำห่อผงไปให้นางเหมยดู",
+        next: "village_qigu",
+        effects: [{ t: "advanceQuest", questId: "qv_qigu_poisoned_well" }],
+      },
     ],
   },
   {
@@ -381,14 +401,15 @@ export const SCENES_VILLAGES: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qv_meihua_music_duel_deliver",
     lines: [
-      { t: "narration", text: "เจ้าเดินทางถึงหมู่บ้านเพื่อนบ้านและนำสารของเฉินเยว่ไปมอบ" },
+      { t: "narration", text: "เจ้าถามหานักดนตรีผู้ท้าเฉินเยว่ในหมู่บ้านฮิงซาน แล้วมอบสารเพลงตอบให้เขา" },
+      { t: "narration", text: "นักดนตรีคู่แข่งดีดพิณตามโน้ตในสารทีละวรรค ก่อนวางมือลงช้า ๆ" },
       { t: "dialogue", speaker: "นักดนตรีคู่แข่ง", text: "โอ้... เพลงนี้ไพเราะจริง ๆ ข้าแพ้แล้ว" },
-      { t: "narration", text: "เขาส่งจดหมายตอบรับและของขวัญกลับมา" },
+      { t: "narration", text: "เขาเขียนจดหมายยอมรับฝากเจ้ากลับไปให้เฉินเยว่" },
     ],
     choices: [
       {
         text: "นำจดหมายกลับให้เฉินเยว่",
-        next: "qs_qv_meihua_music_duel_complete",
+        next: "village_hengshan",
         effects: [{ t: "advanceQuest", questId: "qv_meihua_music_duel" }],
       },
     ],
@@ -506,7 +527,7 @@ export const SCENES_VILLAGES: readonly Scene[] = [
     choices: [
       {
         text: "กลับไปรายงานเปาเหล็กก้าน",
-        next: "qs_qv_meihua_tiger_track_complete",
+        next: "cave_zhizhu",
         effects: [{ t: "advanceQuest", questId: "qv_meihua_tiger_track" }],
       },
       {
@@ -524,12 +545,30 @@ export const SCENES_VILLAGES: readonly Scene[] = [
     choices: [
       {
         text: "สู้กับเสือภูเขา",
-        next: "qs_qv_meihua_tiger_track_complete",
+        next: "qs_qv_meihua_tiger_track_slain",
         effects: [
-          { t: "triggerBattle", opponentId: "mountain_tiger", onWin: "qs_qv_meihua_tiger_track_complete", onLose: "village_meihua" },
+          { t: "triggerBattle", opponentId: "mountain_tiger", onWin: "qs_qv_meihua_tiger_track_slain", onLose: "cave_zhizhu" },
         ],
       },
-      { text: "หลบหนีออกมา", next: "qs_qv_meihua_tiger_track_complete" },
+      {
+        text: "หลบหนีออกมา",
+        next: "cave_zhizhu",
+        effects: [{ t: "advanceQuest", questId: "qv_meihua_tiger_track" }],
+      },
+    ],
+  },
+  {
+    kind: "dialog",
+    id: "qs_qv_meihua_tiger_track_slain",
+    lines: [
+      { t: "narration", text: "เสือภูเขาล้มลงหน้าปากถ้ำ ตัวใหญ่กว่าเสือที่ใครในหมู่บ้านเคยเห็น" },
+    ],
+    choices: [
+      {
+        text: "กลับไปรายงานเปาเหล็กก้าน",
+        next: "cave_zhizhu",
+        effects: [{ t: "advanceQuest", questId: "qv_meihua_tiger_track" }],
+      },
     ],
   },
   {
@@ -675,8 +714,8 @@ export const SCENES_VILLAGES: readonly Scene[] = [
     id: "qs_qv_hengshan_winter_aid_offer",
     lines: [
       { t: "dialogue", speaker: "ผู้อาวุโสอู๋", text: "ฤดูหนาวมาเร็วกว่าปกติ ผู้สูงอายุในหมู่บ้านขาดแคลนอาหาร" },
-      { t: "dialogue", speaker: "ผู้อาวุโสอู๋", text: "เจ้าช่วยนำข้าวหมูแดงกับยาเลือดเล็กเหล่านี้ไปแจกผู้สูงอายุในหมู่บ้านได้ไหม?" },
-      { t: "dialogue", speaker: "ผู้อาวุโสอู๋", text: "แจกให้หมดอย่าเหลือติดตัว คนแก่ที่นี่ไม่ยอมรับของจากข้าตรง ๆ แต่จากคนแปลกหน้าเขายอมรับ" },
+      { t: "dialogue", speaker: "ผู้อาวุโสอู๋", text: "เจ้าช่วยนำข้าวหมูแดง 3 จานกับยาเลือดเล็ก 3 ขวดนี้ไปส่งที่กระท่อมท้ายหมู่บ้านได้ไหม?" },
+      { t: "dialogue", speaker: "ผู้อาวุโสอู๋", text: "ยายหลี่กับตาเฉินอยู่ที่นั่น ตาเฉินไอไม่หยุดมาหลายคืนแล้ว สองคนนี้ไม่ยอมรับของจากข้าตรง ๆ แต่จากคนแปลกหน้าเขายอมรับ" },
     ],
     choices: [
       {
@@ -693,9 +732,58 @@ export const SCENES_VILLAGES: readonly Scene[] = [
   },
   {
     kind: "dialog",
+    id: "qs_qv_hengshan_winter_aid_deliver",
+    lines: [
+      { t: "narration", text: "กระท่อมท้ายหมู่บ้านหนาวเยียบ เตาไฟมีแต่ขี้เถ้า ยายหลี่นั่งห่มผ้าอยู่ข้างตาเฉินที่ไอโขลก" },
+      { t: "dialogue", speaker: "ยายหลี่", text: "คนแปลกหน้ามาทำอะไรที่นี่... ของพวกนี้ให้พวกเราหรือ?" },
+    ],
+    choices: [
+      {
+        text: "มอบข้าวหมูแดง 3 จานกับยาเลือดเล็ก 3 ขวด",
+        visibleIf: {
+          t: "and",
+          all: [
+            { t: "hasItem", itemId: "rice_dish", count: 3 },
+            { t: "hasItem", itemId: "potion", count: 3 },
+          ],
+        },
+        next: "qs_qv_hengshan_winter_aid_delivered",
+        effects: [
+          { t: "takeItem", itemId: "rice_dish", count: 3 },
+          { t: "takeItem", itemId: "potion", count: 3 },
+          { t: "advanceQuest", questId: "qv_hengshan_winter_aid" },
+        ],
+      },
+      {
+        text: "ของในย่ามไม่ครบ — ไปหามาให้ครบก่อน (ข้าวหมูแดง 3 · ยาเลือดเล็ก 3)",
+        visibleIf: {
+          t: "not",
+          of: {
+            t: "and",
+            all: [
+              { t: "hasItem", itemId: "rice_dish", count: 3 },
+              { t: "hasItem", itemId: "potion", count: 3 },
+            ],
+          },
+        },
+        next: "village_hengshan",
+      },
+    ],
+  },
+  {
+    kind: "dialog",
+    id: "qs_qv_hengshan_winter_aid_delivered",
+    lines: [
+      { t: "narration", text: "ยายหลี่รับข้าวไปอุ่นบนเตา ส่วนตาเฉินกลืนยาเลือดเล็กแล้วไอเบาลง" },
+      { t: "dialogue", speaker: "ยายหลี่", text: "ฝากขอบใจคนที่ส่งเจ้ามาด้วย... เราคงรู้ว่าเป็นใคร" },
+    ],
+    choices: [{ text: "กลับไปบอกผู้อาวุโสอู๋", next: "village_hengshan" }],
+  },
+  {
+    kind: "dialog",
     id: "qs_qv_hengshan_winter_aid_complete",
     lines: [
-      { t: "dialogue", speaker: "ผู้อาวุโสอู๋", text: "เจ้าส่งของให้ครบแล้ว ขอบคุณมาก ใจดีอย่างนี้หาได้ยาก" },
+      { t: "dialogue", speaker: "ผู้อาวุโสอู๋", text: "ยายหลี่กับตาเฉินได้ของครบแล้วหรือ? ขอบคุณมาก ใจดีอย่างนี้หาได้ยาก" },
       { t: "dialogue", speaker: "ผู้อาวุโสอู๋", text: "รับเงินและสมุนไพรโสมนี้ไปเป็นรางวัล" },
     ],
     choices: [
@@ -734,16 +822,13 @@ export const SCENES_VILLAGES: readonly Scene[] = [
     lines: [
       { t: "narration", text: "เจ้าพบน้อยเติ้งอยู่บนเกาะกลางแม่น้ำ เรือเกยตื้น เด็กหายใจหอบแต่ปลอดภัย" },
       { t: "dialogue", speaker: "น้อยเติ้ง", text: "ท่านช่วยข้าด้วย! พบโจรสลัด ต้องหนีมา..." },
+      { t: "dialogue", speaker: "น้อยเติ้ง", text: "ข้าเห็นพวกมันฝังอะไรบางอย่างไว้ที่เกาะอีกฝั่ง ข้าจะเล่าให้พ่อฟังทั้งหมด" },
     ],
     choices: [
       {
         text: "พาน้อยเติ้งกลับบ้าน",
-        next: "qs_qv_wuxia_missing_boat_complete",
+        next: "isle_wuming",
         effects: [{ t: "advanceQuest", questId: "qv_wuxia_missing_boat" }],
-      },
-      {
-        text: "ถามเรื่องโจรสลัดก่อน",
-        next: "qs_qv_wuxia_pirate_cache_offer",
       },
     ],
   },
@@ -791,33 +876,13 @@ export const SCENES_VILLAGES: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qv_wuxia_river_ghost_discover",
     lines: [
-      { t: "narration", text: "เจ้าไปสืบถึงกลางคืน และพบว่าเสียงมาจากชายหนุ่มที่ซ่อนตัวอยู่ในถ้ำริมน้ำ" },
-      { t: "dialogue", speaker: "ชายหนุ่ม", text: "อย่าจับข้า! ข้าแค่ซ่อนตัวจากพ่อพ่อแม่บังคับให้แต่งงาน..." },
+      { t: "narration", text: "เจ้าซุ่มอยู่ในพงอ้อริมแม่น้ำจนดึก เสียงโหยหวนดังขึ้นอีกครั้ง — ไม่ได้มาจากน้ำ แต่มาจากใต้ต้นหลิว" },
+      { t: "narration", text: "ชายสองคนผลัดกันเป่าขลุ่ยกระดูก เรือไร้ตะเกียงลำหนึ่งค่อย ๆ เทียบท่าตามสัญญาณ แล้วขนหีบขึ้นฝั่งอย่างเงียบเชียบ" },
     ],
     choices: [
       {
-        text: "เข้าใจ — ช่วยเจรจากับครอบครัวให้",
-        next: "qs_qv_wuxia_river_ghost_kind",
-        effects: [{ t: "addTrait", trait: "good", amount: 1 }],
-      },
-      {
-        text: "นำตัวกลับหมู่บ้านก่อน",
-        next: "qs_qv_wuxia_river_ghost_complete",
-        effects: [{ t: "advanceQuest", questId: "qv_wuxia_river_ghost" }],
-      },
-    ],
-  },
-  {
-    kind: "dialog",
-    id: "qs_qv_wuxia_river_ghost_kind",
-    lines: [
-      { t: "narration", text: "เจ้าพาชายหนุ่มกลับและช่วยเจรจากับครอบครัว สุดท้ายตกลงให้เขาเลือกเองได้" },
-      { t: "dialogue", speaker: "เติ้งลองหาง", text: "เจ้าใจดีจริง แก้ปัญหาได้โดยไม่ทำให้ใครเสียหน้า" },
-    ],
-    choices: [
-      {
-        text: "รับคำชม",
-        next: "qs_qv_wuxia_river_ghost_complete",
+        text: "จดจำหน้าพวกมันไว้ แล้วกลับไปบอกเติ้งลองหาง",
+        next: "village_wuxia",
         effects: [{ t: "advanceQuest", questId: "qv_wuxia_river_ghost" }],
       },
     ],
@@ -866,19 +931,33 @@ export const SCENES_VILLAGES: readonly Scene[] = [
     choices: [
       {
         text: "สู้กับโจรสลัด",
-        next: "qs_qv_wuxia_pirate_cache_complete",
+        next: "qs_qv_wuxia_pirate_cache_won",
         effects: [
-          { t: "triggerBattle", opponentId: "river_pirate", onWin: "qs_qv_wuxia_pirate_cache_complete", onLose: "village_wuxia" },
+          { t: "triggerBattle", opponentId: "river_pirate", onWin: "qs_qv_wuxia_pirate_cache_won", onLose: "isle_yuanyang" },
         ],
       },
-      { text: "หนีทิ้งสมบัติ", next: "village_wuxia" },
+      { text: "ถอยไปก่อน", next: "isle_yuanyang" },
+    ],
+  },
+  {
+    kind: "dialog",
+    id: "qs_qv_wuxia_pirate_cache_won",
+    lines: [
+      { t: "narration", text: "โจรสลัดพ่ายแพ้ หนีลงเรือไปทั้งที่ยังบาดเจ็บ เจ้าขุดกล่องสมบัติขึ้นจากใต้ต้นโพธิ์" },
+    ],
+    choices: [
+      {
+        text: "แบกกล่องกลับไปหาเติ้งลองหาง",
+        next: "isle_yuanyang",
+        effects: [{ t: "advanceQuest", questId: "qv_wuxia_pirate_cache" }],
+      },
     ],
   },
   {
     kind: "dialog",
     id: "qs_qv_wuxia_pirate_cache_complete",
     lines: [
-      { t: "narration", text: "โจรสลัดพ่ายแพ้ เจ้าเปิดกล่องพบเหรียญโบราณและหยก" },
+      { t: "narration", text: "เจ้าวางกล่องสมบัติจากเกาะยกซานลงตรงหน้าเติ้งลองหาง ในกล่องมีเหรียญโบราณและหยก" },
       { t: "dialogue", speaker: "เติ้งลองหาง", text: "เจ้าทำได้! รักษาส่วนแบ่งไว้เถิด เราช่วยกัน" },
     ],
     choices: [
@@ -908,7 +987,7 @@ export const SCENES_VILLAGES: readonly Scene[] = [
     lines: [
       { t: "narration", text: "นางสาวซิ่วเดินมาหาเจ้าอย่างเร่งร้อน" },
       { t: "dialogue", speaker: "นางสาวซิ่ว", text: "ท่านผู้เดินทาง! แขกที่ออกจากโรงเตี๊ยมไปเมื่อเช้าลืมกระเป๋าเอกสารไว้ กุญแจกระเป๋าก็วางทิ้งไว้บนโต๊ะด้วย" },
-      { t: "dialogue", speaker: "นางสาวซิ่ว", text: "ข้าทิ้งร้านไปไม่ได้ เจ้าช่วยนำทั้งกระเป๋ากับกุญแจไปส่งที่โรงเตี๊ยมเก้าอี้สูงได้ไหม? เขาบอกว่าจะไปพักที่นั่น ถามเฉาอ้วนเจ้าของร้านดูก็ได้" },
+      { t: "dialogue", speaker: "นางสาวซิ่ว", text: "ข้าทิ้งร้านไปไม่ได้ เจ้าช่วยนำทั้งกระเป๋ากับกุญแจไปส่งที่โรงเตี๊ยมเกาเซิ่งได้ไหม? เขาบอกว่าจะไปพักที่นั่น ถามเฉาอ้วนเจ้าของร้านดูก็ได้" },
     ],
     choices: [
       {
@@ -1157,24 +1236,22 @@ export const SCENES_VILLAGES: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qv_inn_rival_inn_report",
     lines: [
-      { t: "narration", text: "เจ้าไปลองอาหารและสังเกตดูโรงเตี๊ยมใหม่ พบว่าพวกเขาใช้สมุนไพรพิเศษในการปรุง" },
+      { t: "narration", text: "เจ้าสั่งอาหารเต็มโต๊ะที่โรงเตี๊ยมมีหว่างและสังเกตครัว พบว่าพวกเขาใช้สมุนไพรพิเศษในการปรุง" },
+      { t: "narration", text: "พ่อครัวทิ้งสูตรเครื่องเทศไว้บนโต๊ะข้างเตาโดยไม่ทันระวัง" },
     ],
     choices: [
       {
-        text: "บอกความลับนั้นกับเฉาอ้วน",
-        next: "qs_qv_inn_rival_inn_complete",
+        text: "แอบจดสูตรสมุนไพรไว้บอกเฉาอ้วน",
+        next: "inn_youjian",
         effects: [
+          { t: "setFlag", flag: "qv_inn_rival_inn_recipe", value: true },
           { t: "advanceQuest", questId: "qv_inn_rival_inn" },
-          { t: "addTrait", trait: "evil", amount: 1 },
         ],
       },
       {
-        text: "บอกเฉาอ้วนให้ปรับปรุงด้วยตัวเอง ไม่เปิดเผยความลับ",
-        next: "qs_qv_inn_rival_inn_honest",
-        effects: [
-          { t: "advanceQuest", questId: "qv_inn_rival_inn" },
-          { t: "addTrait", trait: "good", amount: 1 },
-        ],
+        text: "ชิมให้รู้รสก็พอ ไม่แตะสูตรของเขา",
+        next: "inn_youjian",
+        effects: [{ t: "advanceQuest", questId: "qv_inn_rival_inn" }],
       },
     ],
   },
@@ -1185,13 +1262,7 @@ export const SCENES_VILLAGES: readonly Scene[] = [
       { t: "dialogue", speaker: "เฉาอ้วน", text: "เจ้าไม่บอกความลับ... ก็ดีนะ ข้าว่าควรแข่งกันด้วยฝีมือตนเอง" },
       { t: "dialogue", speaker: "เฉาอ้วน", text: "ข้าคิดออกแล้ว จะทำเมนูใหม่เอง ขอบคุณที่ตรงไปตรงมา" },
     ],
-    choices: [
-      {
-        text: "รับคำขอบคุณ",
-        next: "qs_qv_inn_rival_inn_complete",
-        effects: [{ t: "advanceQuest", questId: "qv_inn_rival_inn" }],
-      },
-    ],
+    choices: [{ text: "รับคำขอบคุณ", next: "inn_gaosheng" }],
   },
   {
     kind: "dialog",
@@ -1201,9 +1272,21 @@ export const SCENES_VILLAGES: readonly Scene[] = [
     ],
     choices: [
       {
-        text: "รับรางวัล",
+        text: "เล่าสูตรสมุนไพรที่แอบจดมา",
+        visibleIf: { t: "flag", flag: "qv_inn_rival_inn_recipe" },
         next: "inn_gaosheng",
-        effects: [{ t: "finishQuest", questId: "qv_inn_rival_inn", success: true }],
+        effects: [
+          { t: "finishQuest", questId: "qv_inn_rival_inn", success: true },
+          { t: "addTrait", trait: "evil", amount: 1 },
+        ],
+      },
+      {
+        text: "บอกให้เขาปรับปรุงด้วยฝีมือตัวเอง ไม่เปิดเผยความลับของคู่แข่ง",
+        next: "qs_qv_inn_rival_inn_honest",
+        effects: [
+          { t: "finishQuest", questId: "qv_inn_rival_inn", success: true },
+          { t: "addTrait", trait: "good", amount: 1 },
+        ],
       },
     ],
   },
@@ -1326,7 +1409,7 @@ export const SCENES_VILLAGES: readonly Scene[] = [
     choices: [
       {
         text: "กลับไปเล่าให้โปผู้เล่าเรื่องฟัง",
-        next: "qs_qv_inn_legend_verify_complete",
+        next: "cave_tangshi",
         effects: [{ t: "advanceQuest", questId: "qv_inn_legend_verify" }],
       },
     ],

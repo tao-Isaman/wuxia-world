@@ -956,13 +956,13 @@ export const OPPONENTS: readonly OpponentDef[] = [
   // Buddhist nun sect — leadership tier matches Shaolin / Wudang. Yin /
   // internal sword + fist with the bodhisattva-line capstone. Abbess
   // Jingchan carries the full top-tier kit (4 arts + 6 skills).
-  { id: "spar_emei_abbess_jingchan", name: "ท่านนิ้วห้วนจิงฉาน", ti: 4, category: "human",
+  { id: "spar_emei_abbess_jingchan", name: "ซือไท้จิงฉาน", ti: 4, category: "human",
     drops: [...DROPS_T4,
       { itemId: "ginseng", weight: 4 }, { itemId: "snow_lotus", weight: 3 },
       { itemId: "lotus_seed", weight: 4 }, { itemId: "jade", weight: 4 },
       { itemId: "ancient_coin", weight: 3 }, { itemId: "wood_sacred", weight: 2 },
       { itemId: "mithril_ore", weight: 1 }],
-    build: () => build("ท่านนิ้วห้วนจิงฉาน", 4, {
+    build: () => build("ซือไท้จิงฉาน", 4, {
       stats: { STR: 8, VIT: 22, DEF: 16, POW: 28, INT: 24, DEX: 14, AGI: 14, LUK: 8 },
       artId: "t4_em_bodhi", artLevel: 10,
       skillIds: ["em_bodhi_sword", "em_bodhi_palm", "em_plum_sword", "em_buddha_sword", "em_lotus_palm", "em_heart_palm"],
@@ -971,12 +971,12 @@ export const OPPONENTS: readonly OpponentDef[] = [
       learnedArtIds: ["t3_em_ice"],
     }) },
 
-  { id: "spar_emei_huimiao", name: "รองท่านนิ้วฮุยเหมียว", ti: 4, category: "human",
+  { id: "spar_emei_huimiao", name: "รองเจ้าสำนักฮุยเหมียว", ti: 4, category: "human",
     drops: [...DROPS_T4,
       { itemId: "ginseng", weight: 3 }, { itemId: "lotus_seed", weight: 3 },
       { itemId: "jade", weight: 3 }, { itemId: "ancient_coin", weight: 2 },
       { itemId: "wood_sacred", weight: 2 }],
-    build: () => build("รองท่านนิ้วฮุยเหมียว", 4, {
+    build: () => build("รองเจ้าสำนักฮุยเหมียว", 4, {
       stats: { POW: 22, INT: 18, VIT: 16, DEF: 12, DEX: 12, AGI: 12 },
       artId: "emei", artLevel: 10,
       skillIds: ["em_bodhi_palm", "em_plum_sword", "em_lotus_palm", "em_heart_palm", "em_blossom_sword"],
@@ -984,11 +984,11 @@ export const OPPONENTS: readonly OpponentDef[] = [
       artLevels: { emei: 10, t3_em_heart: 9, t2_em_garland: 9 },
     }) },
 
-  { id: "spar_emei_qingxin", name: "ท่านนิ้วดาบชิงซิน", ti: 4, category: "human",
+  { id: "spar_emei_qingxin", name: "ซือไท้ชิงซิน", ti: 4, category: "human",
     drops: [...DROPS_T4,
       { itemId: "jade", weight: 3 }, { itemId: "iron_ore", weight: 2 },
       { itemId: "ancient_coin", weight: 2 }],
-    build: () => build("ท่านนิ้วดาบชิงซิน", 4, {
+    build: () => build("ซือไท้ชิงซิน", 4, {
       stats: { POW: 18, INT: 14, DEX: 16, AGI: 14, STR: 8 },
       artId: "t3_em_grace", artLevel: 9,
       skillIds: ["em_bodhi_sword", "em_plum_sword", "em_buddha_sword", "em_blossom_sword"],
@@ -996,11 +996,11 @@ export const OPPONENTS: readonly OpponentDef[] = [
       artLevels: { t3_em_grace: 9, t2_em_garland: 9 },
     }) },
 
-  { id: "spar_emei_huiyu", name: "ท่านนิ้วฝ่ามือฮุยอวี้", ti: 4, category: "human",
+  { id: "spar_emei_huiyu", name: "ซือไท้ฮุยอวี้", ti: 4, category: "human",
     drops: [...DROPS_T4,
       { itemId: "ginseng", weight: 4 }, { itemId: "lotus_seed", weight: 3 },
       { itemId: "jade", weight: 2 }],
-    build: () => build("ท่านนิ้วฝ่ามือฮุยอวี้", 4, {
+    build: () => build("ซือไท้ฮุยอวี้", 4, {
       stats: { POW: 18, INT: 16, VIT: 12, DEX: 8 },
       artId: "t4_em_bodhi", artLevel: 9,
       skillIds: ["em_bodhi_palm", "em_lotus_palm", "em_heart_palm"],
@@ -1008,11 +1008,11 @@ export const OPPONENTS: readonly OpponentDef[] = [
       artLevels: { t4_em_bodhi: 9, t3_em_heart: 9 },
     }) },
 
-  { id: "spar_emei_yuxin", name: "หมอนิ้วอวี้ซิน", ti: 3, category: "human",
+  { id: "spar_emei_yuxin", name: "หมอชีอวี้ซิน", ti: 3, category: "human",
     drops: [...DROPS_T3,
       { itemId: "herb", weight: 5 }, { itemId: "ginseng", weight: 4 },
       { itemId: "snow_lotus", weight: 2 }, { itemId: "potion_mid", weight: 3 }],
-    build: () => build("หมอนิ้วอวี้ซิน", 3, {
+    build: () => build("หมอชีอวี้ซิน", 3, {
       stats: { POW: 14, INT: 14, VIT: 10, DEX: 6 },
       artId: "t3_em_heart", artLevel: 8,
       skillIds: ["em_heart_sword", "em_heart_palm", "em_lotus_palm"],
@@ -1656,9 +1656,9 @@ export const OPPONENTS: readonly OpponentDef[] = [
       skillIds: ["mi_firepalm"],
     }) },
 
-  { id: "spar_sunmoon_xiaoyu", name: "ศิษย์เสี่ยวอวี้", ti: 1, category: "human",
+  { id: "spar_sunmoon_xiaoyu", name: "ศิษย์เสี่ยวเยว่", ti: 1, category: "human",
     drops: [...DROPS_T1],
-    build: () => build("ศิษย์เสี่ยวอวี้", 1, {
+    build: () => build("ศิษย์เสี่ยวเยว่", 1, {
       stats: { POW: 5, INT: 4 },
       artId: "t0_sm_dual", artLevel: 4,
       skillIds: ["mi_firepalm"],

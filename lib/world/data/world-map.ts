@@ -160,7 +160,7 @@ const TERRAIN: LocationScene[] = [
   leaf("cliff_motian", "ยอดเขามรณะ", "摩天崖"),
   leaf("cliff_heimu", "ไม้ดำหน้าผา", "黑木崖 · หน้าผาในตำนาน"),
   leaf("cliff_yunhe", "หน้าผาหมู่ก้อน", "云鹤崖"),
-  leaf("cliff_siguo", "หน้าผาหินอาถรรพ์", "思过崖 · ที่ลิ้งฮูฉงฝึกวิทยายุทธ์"),
+  leaf("cliff_siguo", "ผาสำนึกผิด", "思过崖 · ที่ลิ้งฮูฉงฝึกวิทยายุทธ์"),
   leaf("mt_leigu", "ป้อมหลำกู่", "擂鼓山"),
   leaf("sea_xingxiu", "เขาดาวฤกษ์ทะเล", "星宿海 · บ้านดิงชุนชิว"),
 ];
@@ -183,7 +183,7 @@ const CAVES: LocationScene[] = [
 
 // ─── Temples / palaces / fortresses (5) ──────────────────────────────
 const TEMPLES: LocationScene[] = [
-  leaf("temple_dalun", "วิหารล้อลม", "大轮寺"),
+  leaf("temple_dalun", "วัดต้าหลุน", "大轮寺"),
   leaf("temple_tianning", "วิหารหลวงจีนสวรรค์", "天宁寺"),
   leaf("palace_zhongyang", "พระราชวังจงหยาง", "重阳宫 · ที่อยู่ฉวนเจินเจี้ยว"),
   leaf("city_lingxiao", "เมืองลิ้งเซียว", "凌霄城"),
@@ -202,8 +202,8 @@ const MANSIONS: LocationScene[] = [
 const INNS: LocationScene[] = [
   leaf("inn_yuelai", "โรงเตี๊ยมยั่วไหล", "悦来客栈 · กลางเกม"),
   leaf("inn_youjian", "โรงเตี๊ยมมีหว่าง", "有间客栈"),
-  leaf("inn_gaosheng", "โรงเตี๊ยมเก้าอี้สูง", "高升客栈"),
-  leaf("inn_heluo", "โรงเตี๊ยมห้วอลั่ว", "河洛客栈"),
+  leaf("inn_gaosheng", "โรงเตี๊ยมเกาเซิ่ง", "高升客栈"),
+  leaf("inn_heluo", "โรงเตี๊ยมเฮ่อลั่ว", "河洛客栈"),
 ];
 
 // ─── NPC homes (11) ───────────────────────────────────────────────────
@@ -226,7 +226,7 @@ const MISC: LocationScene[] = [
   leaf("desert_ruins", "ทะเลทรายร้าง", "沙漠废墟"),
   leaf("tribe_huizu", "ชนเผ่าหุยซู", "回族部落"),
   leaf("market_miao", "ตลาดชาวเมี่ยว", "苗族集市 · เฉพาะ JY Online"),
-  leaf("pool_heilong", "มังกรดำสระน้ำ", "黑龙潭"),
+  leaf("pool_heilong", "สระมังกรดำ", "黑龙潭"),
   leaf("peak_guangming", "ยอดแสงสว่าง", "光明顶 · มิ่งเจี้ยว"),
   leaf("home_player", "คฤหาสน์ตนเอง", "自宅 · บ้านของผู้เล่น"),
   leaf("sect_xueyu", "สำนักดาบโลหิต", "ฝ่ายอธรรม · สำนักใหม่"),

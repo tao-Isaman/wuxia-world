@@ -35,7 +35,7 @@ Per tier: T0: 9 · T1: 44 · T2: 74 · T3: 55 · T4: 208. Per category: ฝ่�
 | `road_bandit` | โจรเส้นทาง | human | 1× โจรเร่ร่อน | 5 | roams (city, frontier, isle, mansion, sect, temple, wild) |
 | `river_pirate` | โจรสลัดน้ำ | human | 1× โจรเร่ร่อน | 6 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×2 |
 | `desert_marauder` | นักรบทะเลทราย | human | — | 5 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×1 |
-| `fortune_thief` | หมอดูปลอม | human | — | 5 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×3 |
+| `fortune_thief` | หมอดูปลอม | human | — | 5 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×4 |
 | `hunt_wild_dog` | สุนัขป่า | beast | — | 5 | hunt |
 | `hunt_boar` | หมูป่าฝูง | beast | 1× หมูป่าฝูง | 6 | hunt |
 | `hunt_jungle_cat` | เสือดาวป่า | beast | — | 6 | hunt |
@@ -57,7 +57,7 @@ Per tier: T0: 9 · T1: 44 · T2: 74 · T3: 55 · T4: 208. Per category: ฝ่�
 | `spar_xiaoyao_xiaolan` | ศิษย์เสี่ยวหลาน | human | — | 5 | spar |
 | `spar_spy_zhou` | โจวพ่อค้าเหล้า | human | — | 5 | spar |
 | `spar_spy_si` | ซื่อชาวนา | human | — | 5 | spar |
-| `spar_sunmoon_xiaoyu` | ศิษย์เสี่ยวอวี้ | human | — | 5 | spar |
+| `spar_sunmoon_xiaoyu` | ศิษย์เสี่ยวเยว่ | human | — | 5 | spar |
 | `spar_tang_tangxiu` | ศิษย์ถังซิ่ว | human | — | 5 | spar |
 | `law_constable` | เจ้าหน้าที่รัฐ | human | — | 5 | law |
 | `vampire_bat` | ค้างคาวดูดเลือด | beast | 2× ค้างคาวดูดเลือด | 5 | roams (frontier, isle, wild) |
@@ -66,7 +66,7 @@ Per tier: T0: 9 · T1: 44 · T2: 74 · T3: 55 · T4: 208. Per category: ฝ่�
 | `spar_village_noname_carter_lu` | ลู่เกวียน | human | — | 5 | spar |
 | `spar_village_huashan_dreamer_yang` | หยางซื่อ | human | — | 5 | spar |
 | `spar_palace_royal_zhao` | จ้าวเทีย | human | — | 5 | spar, scene ×1 |
-| `spar_tribe_huizu_ma` | หม่าต้าหลี่ | human | — | 5 | spar, scene ×2 |
+| `spar_tribe_huizu_ma` | หม่าต้าหู่ | human | — | 5 | spar, scene ×2 |
 | `spar_home_hufei_yuan` | จิ่งจื่ออิง | human | — | 5 | spar |
 | `spar_home_chengkun_chen` | เฉินเหวินฮ่าว | human | — | 5 | spar |
 | `spar_chengying_lu` | เหอชิงหลาน | human | — | 5 | spar |
@@ -172,7 +172,7 @@ Per tier: T0: 9 · T1: 44 · T2: 74 · T3: 55 · T4: 208. Per category: ฝ่�
 | `spar_taishan_yuyangzi` | รองเจ้าสำนักอวี้หยางจื่อ | human | — | 10 | spar |
 | `spar_hengshan_south_master` | อาจารย์ใหญ่เซี่ยอวิ๋น | human | — | 12 | spar |
 | `spar_hengshan_north_dingyi` | ภิกษุณีเสวียนเยว่ | human | — | 12 | spar |
-| `spar_emei_yuxin` | หมอนิ้วอวี้ซิน | human | — | 11 | spar |
+| `spar_emei_yuxin` | หมอชีอวี้ซิน | human | — | 11 | spar |
 | `spar_kunlun_qiu` | ชิวเฉียน | human | — | 10 | spar, scene ×2 |
 | `spar_beggars_yunsi` | อาจารย์ข่าวสารยุนซือ | human | — | 10 | spar |
 | `spar_gumu_disciple` | ศิษย์เลิ่งเยว่ | human | — | 8 | spar |
@@ -227,10 +227,10 @@ Per tier: T0: 9 · T1: 44 · T2: 74 · T3: 55 · T4: 208. Per category: ฝ่�
 | `spar_wudang_master_qingxu` | อาจารย์ชิงซวี่ | human | — | 14 | spar, scene ×1 |
 | `spar_wudang_xuancheng` | รองอาจารย์เสวียนเฉิง | human | — | 12 | spar |
 | `spar_wudang_lingyu` | อาจารย์ดาบหลิงอวี้ | human | — | 11 | spar, scene ×1 |
-| `spar_emei_abbess_jingchan` | ท่านนิ้วห้วนจิงฉาน | human | — | 15 | spar |
-| `spar_emei_huimiao` | รองท่านนิ้วฮุยเหมียว | human | — | 13 | spar |
-| `spar_emei_qingxin` | ท่านนิ้วดาบชิงซิน | human | — | 11 | spar, scene ×1 |
-| `spar_emei_huiyu` | ท่านนิ้วฝ่ามือฮุยอวี้ | human | — | 11 | spar |
+| `spar_emei_abbess_jingchan` | ซือไท้จิงฉาน | human | — | 15 | spar |
+| `spar_emei_huimiao` | รองเจ้าสำนักฮุยเหมียว | human | — | 13 | spar |
+| `spar_emei_qingxin` | ซือไท้ชิงซิน | human | — | 11 | spar, scene ×1 |
+| `spar_emei_huiyu` | ซือไท้ฮุยอวี้ | human | — | 11 | spar |
 | `spar_beggars_chief_hongtian` | หัวหน้าหงเทียน | human | — | 14 | spar, scene ×1 |
 | `spar_beggars_lifang` | รองหัวหน้าหลี่ฟาง | human | — | 12 | spar |
 | `spar_beggars_qicheng` | อาจารย์ไม้เท้าฉีเฉิง | human | — | 11 | spar, scene ×1 |

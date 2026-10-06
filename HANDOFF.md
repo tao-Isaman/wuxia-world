@@ -187,15 +187,12 @@ Real behaviour today, found during the docs audit. Each is small and self-contai
 5. **Resign or betray through quest rewards skip the echo**, the log line and betrayal's evil +5. (Joining by the reward now echoes, and milestone quests — main-story chapters, saga finales — fire `quest_major_complete`.)
 6. **Resigning freezes only battle xp** for that sect's skills. Practice, w-exp level-ups and quest `skillExp` still raise them.
 7. **Store sect actions don't check status.** `upgradeSectRank` and `acceptSectQuest` ignore it; only the UI hides inactive memberships.
-8. **Found by the 2026-10-06 quest text pass (text was fixed to match; the mechanics still need a decision):**
-   - Map names differ from the prose the stories use: `inn_heluo` โรงเตี๊ยมห้วอลั่ว (stories: เฮ่อลั่ว), `inn_gaosheng` โรงเตี๊ยมเก้าอี้สูง (เกาเซิ่ง), วิหารล้อลม (วัดตาหลุน), คุ้มนกนางแอ่น (คฤหาสน์เหยินซี), `pool_heilong` มังกรดำสระน้ำ, `cliff_siguo` หน้าผาหินอาถรรพ์ (ผาสำนึกผิด). Quest text now uses the map names; renaming the registry entries would be the cleaner fix.
-   - Two NPCs are named ลุงไป๋ (`city_lingxiao_sweeper_bai`, `home_nanxian_woodcutter_bai`), and หม่าต้าหลี่ contains the city name ต้าหลี่; the guide's name matching can pick the wrong one.
-   - Old offer dialogs play after the NPC card has already accepted, so their ปฏิเสธ / ยังไม่พร้อม choices do nothing.
-   - About 16 dialogs are never reached because their quests advance by spots or visits instead (e.g. `qw_motian_restless_soul_choice` — its keep-or-return choice never plays and there is no `_complete`).
-   - `qv_hengshan_winter_aid` advances only when the hero holds no ข้าวหมูแดง / ยาเลือดเล็ก at all, with nowhere to deliver them; `qw_desert_relic_return` has nowhere to hand the coin in; `qc_capital_stolen_formula` asks for an 800-gold ตำราขั้นสูง.
-   - `qst_spy_capital_seal_ledger` and the next spy quest list a second `gold 400` reward.
-   - `qst_shaolin_wudang_joint`: two stages (`discover_connection`, `enter_cave`) have no place or objective; one dialog choice advances both.
-   - Wilderness and evil dialogs use short speaker names that differ from the NPC's full `name`, so portrait lookup may miss.
+8. **Left from the 2026-10-06/07 quest passes** (the rest of that list — place names, duplicate NPC names, unreachable dialogs, offers that couldn't be declined, the winter-aid / relic / formula / Shaolin–Wudang quests, speaker portraits, the spy quests' extra gold — is fixed):
+   - `st_jh_godslayer_blade_17`'s offer is staged in the desert ruins but its giver ลู่เกวียน stands in หมู่บ้านไร้นาม; `st_jh_sunflower_30` and `st_jh_nine_yin_27` have givers far from where the chapter happens.
+   - Shared saga people (ทหารแก่เฉิน, นักยุทธศาสตร์กง, หวงชิงเฉวียน's family tree) have backstories that differ between sagas without contradicting outright.
+   - A few saga speaker labels (ทูตเซี่ย, เสี่ยวเฉ่า, ขุนนางหยาน, อาจารย์ดาบ) don't resolve to an NPC portrait.
+   - Story beats moved onto dialog spots (the Heilong dives, the river watch) no longer cost hours.
+   - `st_jh_lone_sword_08` asks AGI 90 on the chapter but 80 on its stat step.
 
 ### Content data
 

@@ -54,10 +54,17 @@ check("Shaolin proof of heart: the offer opens the trial and the quest completes
   assert.equal(store().quests.qst_shaolin_proof_of_heart.status, "done");
 });
 
-check("Shaolin–Wudang joint quest: the offer reaches the cave guardian at the kill stage", () => {
+check("Shaolin–Wudang joint quest: Qingxu's clue and the cave reach the guardian at the kill stage", () => {
   acceptAtOffer("qst_shaolin_wudang_joint", "sect_shaolin");
-  choose(/ถ้ำโบราณ/);
+  assert.equal(store().quests.qst_shaolin_wudang_joint.stage, 0);
+  store().gotoScene("sect_wudang");
+  assert.equal(store().doQuestObjective("qst_shaolin_wudang_joint", 0).ok, true);
+  assert.equal(store().currentSceneId, "qs_qst_shaolin_wudang_joint_start");
+  choose(/ถ้ำฝึกวิทยายุทธ์/);
+  store().gotoScene("cave_zixiu");
+  assert.equal(store().doQuestObjective("qst_shaolin_wudang_joint", 0).ok, true);
   assert.equal(store().currentSceneId, "qs_qst_shaolin_wudang_joint_cave");
+  choose(/รูปสลัก/);
   assert.equal(store().quests.qst_shaolin_wudang_joint.stage, 2, "discover_connection and enter_cave are done");
   choose(/ผู้พิทักษ์/);
   assert.equal(store().pendingBattle?.opponentId, "demonic_master");

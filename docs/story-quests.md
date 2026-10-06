@@ -152,7 +152,7 @@ A cutscene is registered under `cs_<sceneId>` and played by a dialog whose `cuts
   - who offers the next chapter and what it still needs;
   - 🎬 replays of watched films.
 - **Badges.** Story chapters show 📜 and a "ตำนาน" badge; lineage quests show "สืบทอดวิชา".
-- **NPC card.** Chapters and lineage quests are ordinary offers on the giver's card, and the briefing (`qs_<id>_offer`) opens after accepting.
+- **NPC card.** Chapters and lineage quests are ordinary offers on the giver's card, and their offer (`qs_<id>_offer`) opens before accepting — its รับคำ choice accepts (below).
 
 ## Safety rules
 

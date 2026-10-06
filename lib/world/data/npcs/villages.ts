@@ -98,7 +98,7 @@ export const NPCS_VILLAGES: readonly NpcDef[] = [
   {
     id: "inn_yuelai_server_xiu",
     name: "นางสาวซิ่ว",
-    description: "สาวเสิร์ฟช่างพูดของโรงเตี๊ยมยุเหล่ย รู้ทุกข่าวคราวของผู้คนที่ผ่านไปมา",
+    description: "สาวเสิร์ฟช่างพูดของโรงเตี๊ยมยั่วไหล รู้ทุกข่าวคราวของผู้คนที่ผ่านไปมา",
     locationIds: ["inn_yuelai"],
     dialogSceneId: "npc_inn_yuelai_server_xiu_talk",
     questIds: [

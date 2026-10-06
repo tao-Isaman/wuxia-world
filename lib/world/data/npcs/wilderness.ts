@@ -127,7 +127,7 @@ export const NPCS_WILDERNESS: readonly NpcDef[] = [
     tags: ["scholar", "recluse"],
   },
 
-  // ─── มังกรดำสระน้ำ (pool_heilong) ───────────────────────────────────
+  // ─── สระมังกรดำ (pool_heilong) ───────────────────────────────────
   {
     id: "wld_heilong_fisherman_tan",
     name: "ต่านเหลาตู (ชาวประมงแก่)",

@@ -8,7 +8,7 @@ export const QUESTS_EMEI: readonly QuestDef[] = [
   {
     id: "qst_emei_disciple_intro",
     name: "ขอเข้าเป็นศิษย์ง้อไบ๊",
-    description: "ท่านนิ้วห้วนจิงฉานรับเฉพาะศิษย์หญิงที่มีจิตใจเมตตา — เก็บสมุนไพรหลากชนิดมาให้ห้องยาของวัดเพื่อพิสูจน์ความเพียร · สมุนไพรหายาก 10 · โสม 10 · เม็ดบัว 10",
+    description: "ซือไท้จิงฉานรับเฉพาะศิษย์หญิงที่มีจิตใจเมตตา — เก็บสมุนไพรหลากชนิดมาให้ห้องยาของวัดเพื่อพิสูจน์ความเพียร · สมุนไพรหายาก 10 · โสม 10 · เม็ดบัว 10",
     briefSummary: "ส่งสมุนไพรหายาก 10 + โสม 10 + เม็ดบัว 10 เข้าเป็นศิษย์ง้อไบ๊ขั้นที่ 9",
     type: "side",
     giverNpcId: "sect_emei_abbess_jingchan",
@@ -35,7 +35,7 @@ export const QUESTS_EMEI: readonly QuestDef[] = [
       },
       {
         id: "return_to_abbess",
-        description: "นำสมุนไพรกลับไปถวายท่านนิ้วห้วนจิงฉาน",
+        description: "นำสมุนไพรกลับไปถวายซือไท้จิงฉาน",
       },
     ],
     rewards: [
@@ -64,7 +64,7 @@ export const QUESTS_EMEI: readonly QuestDef[] = [
       },
       {
         id: "report",
-        description: "กลับไปรายงานท่านนิ้วห้วนจิงฉาน",
+        description: "กลับไปรายงานซือไท้จิงฉาน",
       },
     ],
     rewards: [
@@ -98,7 +98,7 @@ export const QUESTS_EMEI: readonly QuestDef[] = [
       },
       {
         id: "deliver",
-        description: "ส่งสมุนไพรให้ท่านนิ้วห้วนจิงฉาน",
+        description: "ส่งสมุนไพรให้ซือไท้จิงฉาน",
       },
     ],
     rewards: [
@@ -112,7 +112,7 @@ export const QUESTS_EMEI: readonly QuestDef[] = [
   {
     id: "qst_emei_art_bodhi",
     name: "บททดสอบก่อนตำนาน: วิชาลึกลับ",
-    description: "ท่านนิ้วห้วนจิงฉานจะเล่าตำนานของวิชาลึกลับให้ศิษย์ที่ผ่านการพิสูจน์ทั้งดาบและจิตใจ — ปราบหัวหน้าโจร 3 คน และสะสมความถ่อมตนให้ถึง 30 (เมื่อผ่าน ดูแท็บตำนานในบันทึกภารกิจ)",
+    description: "ซือไท้จิงฉานจะเล่าตำนานของวิชาลึกลับให้ศิษย์ที่ผ่านการพิสูจน์ทั้งดาบและจิตใจ — ปราบหัวหน้าโจร 3 คน และสะสมความถ่อมตนให้ถึง 30 (เมื่อผ่าน ดูแท็บตำนานในบันทึกภารกิจ)",
     briefSummary: "บททดสอบ — เปิดทางสู่ตำนานของวิชาลึกลับ",
     type: "side",
     sectId: "emei",
@@ -139,7 +139,7 @@ export const QUESTS_EMEI: readonly QuestDef[] = [
       },
       {
         id: "return_art",
-        description: "กลับไปรายงานผลต่อท่านนิ้วห้วนจิงฉาน",
+        description: "กลับไปรายงานผลต่อซือไท้จิงฉาน",
       },
     ],
     rewards: [
@@ -153,7 +153,7 @@ export const QUESTS_EMEI: readonly QuestDef[] = [
   {
     id: "qst_emei_kidnapped_novice",
     name: "สาวกถูกลักพาตัว",
-    description: "สาวกง้อไบ๊คนหนึ่งถูกโจรจับตัวไปเรียกค่าไถ่ ท่านนิ้วห้วนจิงฉานขอให้ช่วยนำสาวกกลับมาโดยสวัสดิภาพ",
+    description: "สาวกง้อไบ๊คนหนึ่งถูกโจรจับตัวไปเรียกค่าไถ่ ซือไท้จิงฉานขอให้ช่วยนำสาวกกลับมาโดยสวัสดิภาพ",
     briefSummary: "ช่วยสาวกง้อไบ๊จากมือโจร",
     type: "side",
     giverNpcId: "sect_emei_abbess_jingchan",
@@ -188,8 +188,8 @@ export const QUESTS_EMEI: readonly QuestDef[] = [
   {
     id: "qst_emei_poison_antidote",
     name: "ยาต้านพิษอสุรา",
-    description: "สาวกง้อไบ๊ถูกวางยาพิษจากคนร้าย ท่านนิ้วห้วนจิงฉานต้องการพิษตะขาบเพื่อสังเคราะห์ยาต้านพิษ",
-    briefSummary: "หาพิษตะขาบมาให้ท่านนิ้วห้วนจิงฉานแห่งง้อไบ๊",
+    description: "สาวกง้อไบ๊ถูกวางยาพิษจากคนร้าย ซือไท้จิงฉานต้องการพิษตะขาบเพื่อสังเคราะห์ยาต้านพิษ",
+    briefSummary: "หาพิษตะขาบมาให้ซือไท้จิงฉานแห่งง้อไบ๊",
     type: "side",
     giverNpcId: "sect_emei_abbess_jingchan",
     prereqs: { t: "questStatus", questId: "qst_emei_kidnapped_novice", status: "done" },
@@ -201,7 +201,7 @@ export const QUESTS_EMEI: readonly QuestDef[] = [
       },
       {
         id: "deliver_venom",
-        description: "ส่งพิษตะขาบให้ท่านนิ้วห้วนจิงฉาน",
+        description: "ส่งพิษตะขาบให้ซือไท้จิงฉาน",
       },
     ],
     rewards: [
@@ -215,7 +215,7 @@ export const QUESTS_EMEI: readonly QuestDef[] = [
   {
     id: "qst_emei_redemption",
     name: "ไถ่บาปต่อง้อไบ๊",
-    description: "เจ้าเคยทรยศง้อไบ๊ สำนักจึงส่งนักล่ามาตามเจ้า — แต่ท่านนิ้วห้วนจิงฉานยังเปิดทางให้ไถ่โทษ: ปราบหัวหน้าโจร 5 คน แล้วนำเม็ดบัว 5 เม็ดมาถวาย หากผ่าน เจ้าจะนับเป็น \"ผู้ลาออก\" แทน \"ผู้ทรยศ\" นักล่าจะเลิกตามล่า แต่วิชาของง้อไบ๊ที่ติดตัวจะไม่เก่งขึ้นจากการต่อสู้อีก และกลับเข้าสำนักไม่ได้",
+    description: "เจ้าเคยทรยศง้อไบ๊ สำนักจึงส่งนักล่ามาตามเจ้า — แต่ซือไท้จิงฉานยังเปิดทางให้ไถ่โทษ: ปราบหัวหน้าโจร 5 คน แล้วนำเม็ดบัว 5 เม็ดมาถวาย หากผ่าน เจ้าจะนับเป็น \"ผู้ลาออก\" แทน \"ผู้ทรยศ\" นักล่าจะเลิกตามล่า แต่วิชาของง้อไบ๊ที่ติดตัวจะไม่เก่งขึ้นจากการต่อสู้อีก และกลับเข้าสำนักไม่ได้",
     briefSummary: "ไถ่บาปต่อง้อไบ๊ — ปราบหัวหน้าโจร 5 + ถวายเม็ดบัว 5 เม็ด",
     type: "side",
     sectId: "emei",
@@ -224,7 +224,7 @@ export const QUESTS_EMEI: readonly QuestDef[] = [
     stages: [
       { id: "trial_kill", description: "ปราบหัวหน้าโจร 5 คนเพื่อพิสูจน์ว่ากลับใจจริง", autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 5 } },
       { id: "trial_offering", description: "นำเม็ดบัว 5 เม็ดมาถวาย", autoAdvance: { t: "hasItem", itemId: "lotus_seed", count: 5 } },
-      { id: "return_to_master", description: "กลับไปขออภัยต่อท่านนิ้วห้วนจิงฉาน" },
+      { id: "return_to_master", description: "กลับไปขออภัยต่อซือไท้จิงฉาน" },
     ],
     rewards: [
       { t: "wExp", amount: 300 },
@@ -245,7 +245,7 @@ export const QUESTS_EMEI: readonly QuestDef[] = [
     prereqs: { t: "sectMember", sectId: "emei" },
     stages: [
       { id: "main", description: "เก็บเม็ดบัว 6 ชิ้น", autoAdvance: { t: "hasItem", itemId: "lotus_seed", count: 6 } },
-      { id: "report", description: "กลับไปรายงานท่านนิ้วห้วนจิงฉาน" },
+      { id: "report", description: "กลับไปรายงานซือไท้จิงฉาน" },
     ],
     rewards: [
       { t: "gold", amount: 130 },
@@ -258,7 +258,7 @@ export const QUESTS_EMEI: readonly QuestDef[] = [
   {
     id: "qst_emei_sect_bandit_clear",
     name: "กวาดล้างโจรเชิงเขาง้อไบ๊",
-    description: "มีโจรกลุ่มหนึ่งตั้งซ่องเชิงเขาง้อไบ๊ ดักรีดไถผู้แสวงบุญที่ขึ้นมาไหว้พระ — ท่านนิ้วห้วนจิงฉานขอให้ปราบและนำสมุนไพรหายากที่โจรปล้นมาคืน",
+    description: "มีโจรกลุ่มหนึ่งตั้งซ่องเชิงเขาง้อไบ๊ ดักรีดไถผู้แสวงบุญที่ขึ้นมาไหว้พระ — ซือไท้จิงฉานขอให้ปราบและนำสมุนไพรหายากที่โจรปล้นมาคืน",
     briefSummary: "ปราบโจรป่า 3 คน + เก็บสมุนไพรหายาก 4 ชิ้น · แต้มสำนัก +60",
     type: "side",
     sectId: "emei",
@@ -277,7 +277,7 @@ export const QUESTS_EMEI: readonly QuestDef[] = [
       },
       {
         id: "report",
-        description: "กลับไปรายงานท่านนิ้วห้วนจิงฉาน",
+        description: "กลับไปรายงานซือไท้จิงฉาน",
       },
     ],
     rewards: [
@@ -325,7 +325,7 @@ export const QUESTS_EMEI: readonly QuestDef[] = [
   {
     id: "qst_emei_sect_pill_delivery",
     name: "ส่งยาให้หมอชาวบ้าน",
-    description: "ท่านนิ้วห้วนจิงฉานปรุงยาแก้ไข้เสร็จแล้ว — ต้องการกระดาษสาห่อยาและเม็ดบัวเพื่อปรุงเป็นเม็ดยาส่งให้หมอชาวบ้านที่เชิงเขา",
+    description: "ซือไท้จิงฉานปรุงยาแก้ไข้เสร็จแล้ว — ต้องการกระดาษสาห่อยาและเม็ดบัวเพื่อปรุงเป็นเม็ดยาส่งให้หมอชาวบ้านที่เชิงเขา",
     briefSummary: "ส่งกระดาษสา 6 + เม็ดบัว 5 · แต้มสำนัก +50",
     type: "side",
     sectId: "emei",
@@ -345,7 +345,7 @@ export const QUESTS_EMEI: readonly QuestDef[] = [
       },
       {
         id: "report",
-        description: "ส่งของให้ท่านนิ้วห้วนจิงฉานปรุงยา",
+        description: "ส่งของให้ซือไท้จิงฉานปรุงยา",
       },
     ],
     rewards: [

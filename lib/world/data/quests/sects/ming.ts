@@ -68,16 +68,16 @@ export const QUESTS_MING: readonly QuestDef[] = [
       },
       {
         id: "hear_story",
-        description: "ฟังเรื่องราวของเขา",
+        description: "ฟังเรื่องราวของเขา แล้วตัดสินใจ: ปล่อยไป หรือนำตัวกลับพรรค",
         objective: {
           spots: [
-            { locationId: "cliff_heimu", label: "ฟังเรื่องราวของผู้แปรพักตร์", text: "เขาเล่าว่าพรรคบังคับให้ฆ่าคนบริสุทธิ์ จึงหนีออกมา — ต้องกลับไปตัดสินใจกับผู้อาวุโส" },
+            { locationId: "cliff_heimu", label: "ฟังเรื่องราวของผู้แปรพักตร์", sceneId: "qs_qst_ming_defector_decide" },
           ],
         },
       },
       {
         id: "decide",
-        description: "ตัดสินใจ: ปล่อยไปหรือนำตัวกลับ",
+        description: "กลับไปรายงานผู้อาวุโสจูอิงที่พรรคตะวันจันทรา",
       },
     ],
     rewards: [

@@ -9,9 +9,9 @@ export const SCENES_EMEI: readonly Scene[] = [
     kind: "dialog",
     id: "npc_sect_emei_abbess_jingchan_talk",
     lines: [
-      { t: "narration", text: "ท่านนิ้วห้วนจิงฉานยืนทอดสายตามองสวนดอกไม้ สีหน้าสงบแต่แฝงความกังวล" },
-      { t: "dialogue", speaker: "จิงฉาน", text: "ง้อไบ๊สอนให้เราเมตตาต่อสรรพสิ่ง แต่บางครั้งโลกก็บีบให้เราใช้กำลัง" },
-      { t: "dialogue", speaker: "จิงฉาน", text: "เจ้ามาด้วยเรื่องอะไร?" },
+      { t: "narration", text: "ซือไท้จิงฉานยืนทอดสายตามองสวนดอกไม้ สีหน้าสงบแต่แฝงความกังวล" },
+      { t: "dialogue", speaker: "ซือไท้จิงฉาน", text: "ง้อไบ๊สอนให้เราเมตตาต่อสรรพสิ่ง แต่บางครั้งโลกก็บีบให้เราใช้กำลัง" },
+      { t: "dialogue", speaker: "ซือไท้จิงฉาน", text: "เจ้ามาด้วยเรื่องอะไร?" },
     ],
     choices: [
       // Sect-disciple lore offers gated to disciples only — outsiders
@@ -75,10 +75,10 @@ export const SCENES_EMEI: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qst_emei_disciple_intro_offer",
     lines: [
-      { t: "narration", text: "ท่านนิ้วห้วนจิงฉานพยักหน้าและยกมือประสานต่อหน้าอก" },
-      { t: "dialogue", speaker: "จิงฉาน", text: "เจ้าต้องการเป็นศิษย์ง้อไบ๊? ดี — ดวงใจเมตตาของเจ้าเหมาะกับสำนักของเรา" },
-      { t: "dialogue", speaker: "จิงฉาน", text: "แต่ก่อนรับเจ้าเข้าสำนัก ขอพิสูจน์ความเพียร — เก็บสมุนไพรหายาก ๑๐, โสม ๑๐, เม็ดบัว ๑๐ มาให้ห้องยา" },
-      { t: "dialogue", speaker: "จิงฉาน", text: "เมื่อครบแล้วกลับมา ข้าจะรับเจ้าเป็นศิษย์ขั้นที่ ๙" },
+      { t: "narration", text: "ซือไท้จิงฉานพยักหน้าและยกมือประสานต่อหน้าอก" },
+      { t: "dialogue", speaker: "ซือไท้จิงฉาน", text: "เจ้าต้องการเป็นศิษย์ง้อไบ๊? ดี — ดวงใจเมตตาของเจ้าเหมาะกับสำนักของเรา" },
+      { t: "dialogue", speaker: "ซือไท้จิงฉาน", text: "แต่ก่อนรับเจ้าเข้าสำนัก ขอพิสูจน์ความเพียร — เก็บสมุนไพรหายาก ๑๐, โสม ๑๐, เม็ดบัว ๑๐ มาให้ห้องยา" },
+      { t: "dialogue", speaker: "ซือไท้จิงฉาน", text: "เมื่อครบแล้วกลับมา ข้าจะรับเจ้าเป็นศิษย์ขั้นที่ ๙" },
     ],
     choices: [
       { text: "ข้าจะไปทำตามคำสั่ง", next: "sect_emei" },
@@ -90,9 +90,9 @@ export const SCENES_EMEI: readonly Scene[] = [
     id: "qs_qst_emei_disciple_intro_complete",
     lines: [
       { t: "narration", text: "เจ้าวางสมุนไพรหลากชนิดลงบนแท่นไม้หน้าหอใหญ่" },
-      { t: "dialogue", speaker: "จิงฉาน", text: "เจ้ากลับมาแล้ว และครบจำนวนทุกชนิด — ความเพียรของเจ้าน่ายกย่อง" },
+      { t: "dialogue", speaker: "ซือไท้จิงฉาน", text: "เจ้ากลับมาแล้ว และครบจำนวนทุกชนิด — ความเพียรของเจ้าน่ายกย่อง" },
       { t: "narration", text: "ท่านยกมือประสานเปล่งวาจาภาวนาเบา ๆ" },
-      { t: "dialogue", speaker: "จิงฉาน", text: "ตั้งแต่บัดนี้ เจ้าคือศิษย์ง้อไบ๊ขั้นที่ ๙ — วิชาของง้อไบ๊ ศิษย์พี่และอาจารย์จะถ่ายทอดให้ทีละขั้นเมื่อเจ้าพิสูจน์ตนได้ — ไปคารวะพวกนางเถิด" },
+      { t: "dialogue", speaker: "ซือไท้จิงฉาน", text: "ตั้งแต่บัดนี้ เจ้าคือศิษย์ง้อไบ๊ขั้นที่ ๙ — วิชาของง้อไบ๊ ศิษย์พี่และอาจารย์จะถ่ายทอดให้ทีละขั้นเมื่อเจ้าพิสูจน์ตนได้ — ไปคารวะพวกนางเถิด" },
     ],
     choices: [
       {
@@ -112,7 +112,7 @@ export const SCENES_EMEI: readonly Scene[] = [
     kind: "dialog",
     id: "npc_sect_emei_vice_abbess_huimiao_talk",
     lines: [
-      { t: "narration", text: "รองท่านนิ้วฮุยเหมียวนั่งร้อยดอกบุปผาเป็นมาลัย ยิ้มน้อย ๆ ให้เจ้า" },
+      { t: "narration", text: "รองเจ้าสำนักฮุยเหมียวนั่งร้อยดอกบุปผาเป็นมาลัย ยิ้มน้อย ๆ ให้เจ้า" },
       { t: "dialogue", speaker: "ฮุยเหมียว", text: "ดอกเหมยห้ากลีบทั้งบริสุทธิ์และคมเฉียบ — กระบี่ของง้อไบ๊ก็เช่นกัน" },
       { t: "dialogue", speaker: "ฮุยเหมียว", text: "หากเจ้าตั้งใจฝึก สำนักจะไม่ปิดประตูใส่เจ้า" },
     ],
@@ -122,7 +122,7 @@ export const SCENES_EMEI: readonly Scene[] = [
     kind: "dialog",
     id: "npc_sect_emei_sword_elder_qingxin_talk",
     lines: [
-      { t: "narration", text: "ท่านนิ้วดาบชิงซินสาธิตท่ากระบี่พิทักษ์โพธิสัตว์ในลานฝึก เสียงเหล็กกระทบลมดังก้อง" },
+      { t: "narration", text: "ซือไท้ชิงซินสาธิตท่ากระบี่พิทักษ์โพธิสัตว์ในลานฝึก เสียงเหล็กกระทบลมดังก้อง" },
       { t: "dialogue", speaker: "ชิงซิน", text: "กระบี่พิทักษ์โพธิสัตว์มี ๓ ท่าหลัก — แต่ละท่ารักษาทั้งตัวเองและผู้อื่นในเวลาเดียวกัน" },
       { t: "dialogue", speaker: "ชิงซิน", text: "อยากลองดูฝีมือกระบี่ของเจ้าไหม? มาประลองสักวันก็ได้" },
     ],
@@ -132,8 +132,8 @@ export const SCENES_EMEI: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qst_emei_kidnapped_novice_offer",
     lines: [
-      { t: "dialogue", speaker: "จิงฉาน", text: "สาวกของเราถูกจับไปเรียกค่าไถ่ ข้ากังวลมาก" },
-      { t: "dialogue", speaker: "จิงฉาน", text: "ชาวบ้านที่หมู่บ้านดอกเหมยน่าจะรู้ว่าโจรซ่อนตัวที่ไหน เจ้าช่วยได้ไหม?" },
+      { t: "dialogue", speaker: "ซือไท้จิงฉาน", text: "สาวกของเราถูกจับไปเรียกค่าไถ่ ข้ากังวลมาก" },
+      { t: "dialogue", speaker: "ซือไท้จิงฉาน", text: "ชาวบ้านที่หมู่บ้านดอกเหมยน่าจะรู้ว่าโจรซ่อนตัวที่ไหน เจ้าช่วยได้ไหม?" },
     ],
     choices: [
       { text: "รับภารกิจ", next: "sect_emei" },
@@ -144,9 +144,9 @@ export const SCENES_EMEI: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qst_emei_kidnapped_novice_complete",
     lines: [
-      { t: "narration", text: "ท่านนิ้วห้วนจิงฉานโอบกอดสาวกผู้กลับมาด้วยความโล่งใจ" },
-      { t: "dialogue", speaker: "จิงฉาน", text: "ขอบคุณมาก... สาวกของเราปลอดภัยแล้ว" },
-      { t: "dialogue", speaker: "จิงฉาน", text: "ง้อไบ๊จะไม่ลืมบุญคุณนี้" },
+      { t: "narration", text: "ซือไท้จิงฉานโอบกอดสาวกผู้กลับมาด้วยความโล่งใจ" },
+      { t: "dialogue", speaker: "ซือไท้จิงฉาน", text: "ขอบคุณมาก... สาวกของเราปลอดภัยแล้ว" },
+      { t: "dialogue", speaker: "ซือไท้จิงฉาน", text: "ง้อไบ๊จะไม่ลืมบุญคุณนี้" },
     ],
     choices: [
       { text: "รับรางวัลและกล่าวลา", next: "sect_emei" },
@@ -157,8 +157,8 @@ export const SCENES_EMEI: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qst_emei_poison_antidote_offer",
     lines: [
-      { t: "dialogue", speaker: "จิงฉาน", text: "มีสาวกถูกวางยาพิษชนิดที่ข้าไม่รู้จัก" },
-      { t: "dialogue", speaker: "จิงฉาน", text: "ต้องการพิษตะขาบยักษ์เพื่อสังเคราะห์ยาต้านพิษ นำมาให้ได้ไหม?" },
+      { t: "dialogue", speaker: "ซือไท้จิงฉาน", text: "มีสาวกถูกวางยาพิษชนิดที่ข้าไม่รู้จัก" },
+      { t: "dialogue", speaker: "ซือไท้จิงฉาน", text: "ต้องการพิษตะขาบยักษ์เพื่อสังเคราะห์ยาต้านพิษ นำมาให้ได้ไหม?" },
     ],
     choices: [
       { text: "รับภารกิจ", next: "sect_emei" },
@@ -169,8 +169,8 @@ export const SCENES_EMEI: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qst_emei_poison_antidote_complete",
     lines: [
-      { t: "narration", text: "ท่านนิ้วห้วนจิงฉานรับพิษตะขาบและรีบไปปรุงยา" },
-      { t: "dialogue", speaker: "จิงฉาน", text: "ดีแล้ว... ข้าจะปรุงยาให้ทันเวลา ขอบคุณยอดยุทธ" },
+      { t: "narration", text: "ซือไท้จิงฉานรับพิษตะขาบและรีบไปปรุงยา" },
+      { t: "dialogue", speaker: "ซือไท้จิงฉาน", text: "ดีแล้ว... ข้าจะปรุงยาให้ทันเวลา ขอบคุณยอดยุทธ" },
     ],
     choices: [
       { text: "รับรางวัลและกล่าวลา", next: "sect_emei" },

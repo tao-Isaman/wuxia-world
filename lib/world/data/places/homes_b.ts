@@ -71,7 +71,7 @@ const npcs: NpcDef[] = [
     likes: ["moon_cake", "food", "gold"], dislikes: ["herb"],
   },
   {
-    id: "home_nanxian_woodcutter_bai", name: "ลุงไป๋",
+    id: "home_nanxian_woodcutter_bai", name: "ลุงฉาย",
     description: "คนตัดฟืนร่างกำยำที่หาบฟืนขึ้นลงเขาทุกวัน ไม้คานของแกหนักจนนักเลงต้องหลีกทาง",
     locationIds: [NX], dialogSceneId: "npc_home_nanxian_woodcutter_bai_talk",
     tags: ["woodcutter", "laborer"], look: { body: "m3", wander: true },
@@ -185,12 +185,12 @@ const opponents: StoryOpponentSpec[] = [
 const quests: QuestDef[] = [
   // ── home_nanxian ──
   {
-    id: "qw_home_nanxian_carrying_pole", type: "side", name: "ไม้คานของลุงไป๋",
-    description: "ลุงไป๋คนตัดฟืนเจ็บหลังหาบฟืนไม่ไหว ถ้าเจ้าหาไม้มาให้ห้ามัด แกจะสอนวิธีใช้ไม้คานตีคนให้",
-    briefSummary: "หาไม้เนื้ออ่อนให้ลุงไป๋ แลกกับวิชาลึกลับ",
+    id: "qw_home_nanxian_carrying_pole", type: "side", name: "ไม้คานของลุงฉาย",
+    description: "ลุงฉายคนตัดฟืนเจ็บหลังหาบฟืนไม่ไหว ถ้าเจ้าหาไม้มาให้ห้ามัด แกจะสอนวิธีใช้ไม้คานตีคนให้",
+    briefSummary: "หาไม้เนื้ออ่อนให้ลุงฉาย แลกกับวิชาลึกลับ",
     giverNpcId: "home_nanxian_woodcutter_bai",
     stages: [
-      { id: "wood", description: "หาไม้เนื้ออ่อน 5 ท่อนให้ลุงไป๋", autoAdvance: { t: "hasItem", itemId: "wood_soft", count: 5 } },
+      { id: "wood", description: "หาไม้เนื้ออ่อน 5 ท่อนให้ลุงฉาย", autoAdvance: { t: "hasItem", itemId: "wood_soft", count: 5 } },
       { id: "return", description: "นำไม้กลับไปให้ลุงคนตัดฟืนที่บ้านหนานเสียน" },
     ],
     rewards: [{ t: "learnSkill", skillId: "dg" }, { t: "gold", amount: 80 }, { t: "npcRelationship", npcId: "home_nanxian_woodcutter_bai", amount: 5 }],
@@ -404,7 +404,7 @@ const quests: QuestDef[] = [
 ];
 
 // ─── dialogs ───────────────────────────────────────────────────────────
-const SAGE = "ท่านหนานเสียน", ASHU = "อาซู", BAI = "ลุงไป๋";
+const SAGE = "ท่านหนานเสียน", ASHU = "อาซู", BAI = "ลุงฉาย";
 const YIDENG = "อู๋เฉินไต้ซือ", FISHER = "ฤๅษีประมงชิงเจียง", GENG = "ชาวนาเกิง", ZHU = "บัณฑิตเยี่ยจื่อหลาน";
 const TIAN = "หานเฟยหลาง", LUO = "ป้าหลัว", CHEN = "ทหารแก่เฉิน";
 const MIAO = "เยวี่ยเหรินซาน", RUOLAN = "เยวี่ยรั่วหลิง", ZHONG = "ทหารทวนเฒ่าจง";
@@ -429,7 +429,7 @@ const scenes: DialogScene[] = [
     say(ASHU, "ท่านอาจารย์ตื่นตีห้า ชงชา แต่งกลอน แล้วก็บ่นว่ากลอนไม่ดี ทุกวันเลย"),
     say(ASHU, "โตขึ้นข้าจะเป็นจอมกระบี่ หรือไม่ก็เปิดร้านขนม ยังไม่ได้ตัดสินใจ"),
   ], { label: "มีเรื่องอะไรน่าสนใจบ้าง", lines: [
-    say(ASHU, "ลุงไป๋ตีโจรสามคนด้วยไม้คานเดียว! ข้าเห็นกับตา... ก็เกือบเห็น ข้าแอบอยู่หลังกองฟืน"),
+    say(ASHU, "ลุงฉายตีโจรสามคนด้วยไม้คานเดียว! ข้าเห็นกับตา... ก็เกือบเห็น ข้าแอบอยู่หลังกองฟืน"),
     say(ASHU, "เวลาท่านอาจารย์มองไปทางฉวนเจินนาน ๆ ห้ามไปกวนนะ เขาว่าคิดถึงเพื่อนเก่า"),
   ] }),
   ...talk("home_nanxian_woodcutter_bai", NX, [
@@ -562,9 +562,9 @@ const scenes: DialogScene[] = [
   complete("qw_home_nanxian_carrying_pole", NX, [
     say(BAI, "ห้าท่อนพอดี! เอาล่ะ จับไม้คานนี่ ยืนให้มั่น"),
     say(BAI, "ดามอกุนไม่มีอะไรมาก ยกให้สูง ฟาดให้หนัก ใช้หลังไม่ใช่ใช้แขน"),
-    nar("ลุงไป๋ฟาดไม้คานลงตอไม้ ตอไม้แยกเป็นสองซีก แล้วแกก็ร้องโอยกุมหลัง"),
+    nar("ลุงฉายฟาดไม้คานลงตอไม้ ตอไม้แยกเป็นสองซีก แล้วแกก็ร้องโอยกุมหลัง"),
     say(BAI, "...นั่นแหละที่ข้าบอกว่าใช้หลัง จำไว้ อย่าใช้มากเกินเหมือนข้า"),
-  ], "รับวิชาและช่วยนวดหลังลุงไป๋"),
+  ], "รับวิชาและช่วยนวดหลังลุงฉาย"),
   offer("qw_home_nanxian_red_lotus", NX, [
     say(SAGE, "ปราณเจ้าอุ่นขึ้นแล้ว ข้ารู้สึกได้ตั้งแต่เจ้าเดินเข้ามา"),
     say(SAGE, "บัวแดงเพลิงน้อยคือการจุดไฟเล็ก ๆ ในท้องน้อย แล้วเลี้ยงมันเหมือนเลี้ยงบัวในสระ"),
@@ -757,10 +757,10 @@ const activities: ActivityDef[] = [
     place: { locationIds: [NX], cooldownDays: 3, reward: { statXp: "INT", wExp: 10,
       relationship: { npcId: "home_nanxian_sage_nanxian", amount: 1 } },
       doneText: "ชาหมดกาน้ำ กลอนหมดบท ใจเจ้าสงบลงอย่างประหลาด" } },
-  { id: "act_home_nanxian_firewood", label: "ช่วยลุงไป๋ผ่าฟืน", badge: "labor", icon: "🪓", hours: 3, stamina: 15,
+  { id: "act_home_nanxian_firewood", label: "ช่วยลุงฉายผ่าฟืน", badge: "labor", icon: "🪓", hours: 3, stamina: 15,
     description: "ผ่าฟืนกองโตให้บ้านหนานเสียน · ได้ค่าแรงเล็กน้อยและฝึกพละกำลัง",
     place: { locationIds: [NX], cooldownDays: 1, reward: { gold: [20, 40], statXp: "STR" },
-      doneText: "ฟืนกองสูงท่วมหัว ลุงไป๋ยกนิ้วโป้งให้" } },
+      doneText: "ฟืนกองสูงท่วมหัว ลุงฉายยกนิ้วโป้งให้" } },
   { id: "act_home_yideng_chant", label: "สวดมนต์เย็นกับอู๋เฉินไต้ซือ", badge: "rest", icon: "🪷", hours: 2, stamina: 0,
     description: "นั่งสวดมนต์ใต้แสงตะเกียงดวงเดียว · ฟื้นบาดแผลและใจ",
     place: { locationIds: [YD], cooldownDays: 2, reward: { heal: 0.3, stamina: 15, trait: { trait: "humility", amount: 1 } },

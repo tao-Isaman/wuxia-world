@@ -108,14 +108,14 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
   {
     id: "qe_wudu_assassinate_emei",
     name: "ลอบสังหารเจ้าสำนักง้อไบ๊",
-    description: "ท่านนิ้วห้วนจิงฉาน เจ้าสำนักง้อไบ๊ ทำลายแผนการของพรรคเบญจพิษมาหลายครั้ง ผู้อาวุโสตู๋ซื่อต้องการให้นางตาย",
-    briefSummary: "ลอบสังหารท่านนิ้วห้วนจิงฉานแห่งง้อไบ๊",
+    description: "ซือไท้จิงฉาน เจ้าสำนักง้อไบ๊ ทำลายแผนการของพรรคเบญจพิษมาหลายครั้ง ผู้อาวุโสตู๋ซื่อต้องการให้นางตาย",
+    briefSummary: "ลอบสังหารซือไท้จิงฉานแห่งง้อไบ๊",
     type: "side",
     giverNpcId: "evil_wudu_elder_dushi",
     stages: [
       {
         id: "execute",
-        description: "ลอบสังหารท่านนิ้วห้วนจิงฉานที่สำนักง้อไบ๊",
+        description: "ลอบสังหารซือไท้จิงฉานที่สำนักง้อไบ๊",
         autoAdvance: { t: "assassinatedNpc", npcId: "sect_emei_abbess_jingchan" },
       },
       {
@@ -346,14 +346,14 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
   {
     id: "qe_chuangwang_steal_relic",
     name: "ขโมยพระธาตุโบราณ",
-    description: "พระนอกรีตฮุยเป้าเห็นในนิมิตว่าพระธาตุของวัดตาหลุน (วิหารล้อลม) คือกุญแจของพิธีกรรมมาร พระกงซินเป็นผู้เก็บรักษามันไว้",
-    briefSummary: "ขโมยพระธาตุจากพระกงซินที่วิหารล้อลม",
+    description: "พระนอกรีตฮุยเป้าเห็นในนิมิตว่าพระธาตุของวัดต้าหลุน (วัดต้าหลุน) คือกุญแจของพิธีกรรมมาร พระกงซินเป็นผู้เก็บรักษามันไว้",
+    briefSummary: "ขโมยพระธาตุจากพระกงซินที่วัดต้าหลุน",
     type: "side",
     giverNpcId: "evil_chuangwang_heretic_huibao",
     stages: [
       {
         id: "infiltrate",
-        description: "แอบเข้าวิหารล้อลม แล้วขโมยพระธาตุจากพระกงซิน",
+        description: "แอบเข้าวัดต้าหลุน แล้วขโมยพระธาตุจากพระกงซิน",
         autoAdvance: { t: "stoleFromNpc", npcId: "temple_dalun_monk_kongxin", count: 1 },
       },
       {
@@ -1282,14 +1282,14 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
   {
     id: "qe_xueyu_kidnap_disciple",
     name: "ลักพาตัวเจ้าสำนักง้อไบ๊",
-    description: "สำนักดาบโลหิตอยากได้วิชาของง้อไบ๊ ทูตเซี่ยจึงให้ลักพาตัวท่านนิ้วห้วนจิงฉาน เจ้าสำนักง้อไบ๊ มาสอบเค้น",
-    briefSummary: "ลักพาตัวท่านนิ้วห้วนจิงฉานแห่งง้อไบ๊",
+    description: "สำนักดาบโลหิตอยากได้วิชาของง้อไบ๊ ทูตเซี่ยจึงให้ลักพาตัวซือไท้จิงฉาน เจ้าสำนักง้อไบ๊ มาสอบเค้น",
+    briefSummary: "ลักพาตัวซือไท้จิงฉานแห่งง้อไบ๊",
     type: "side",
     giverNpcId: "evil_xueyu_envoy_xie",
     stages: [
       {
         id: "kidnap_emei",
-        description: "ลักพาตัวท่านนิ้วห้วนจิงฉานที่ง้อไบ๊",
+        description: "ลักพาตัวซือไท้จิงฉานที่ง้อไบ๊",
         autoAdvance: { t: "kidnappedNpc", npcId: "sect_emei_abbess_jingchan" },
       },
       {

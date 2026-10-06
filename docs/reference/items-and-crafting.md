@@ -2,7 +2,7 @@
 
 # Items, shops, crafting and gathering
 
-478 items (`lib/world/data/items.ts`), 19 shops, 7 martial halls, 49 artisans, 36 recipes and 25 gathering / hunting nodes.
+479 items (`lib/world/data/items.ts`), 19 shops, 7 martial halls, 49 artisans, 36 recipes and 25 gathering / hunting nodes.
 
 ## Contents
 
@@ -526,7 +526,7 @@
 | `bear_claw` | อุ้งหมี | 150 | — |
 | `fish_dragon` | ปลามังกร | 1500 | — |
 
-### ของภารกิจ (`quest`, 13)
+### ของภารกิจ (`quest`, 14)
 
 | Id | Name | Price | Use |
 | --- | --- | --- | --- |
@@ -542,6 +542,7 @@
 | `qst_kunlun_evidence` | ม้วนหนังสือพิสูจน์ฤๅษี | 0 | — |
 | `qst_kunlun_snow_ginseng` | โสมหิมะคุนหลุน | 0 | — |
 | `qst_jinshe_golden_snake` | งูทองของซวีเหลิงชิง | 0 | — |
+| `qst_lin_formula` | ตำรับยาลับของหมอหลิน | 0 | — |
 | `qst_motian_ancient_sword` | ดาบโบราณของเหลียงเก๋อ | 0 | — |
 
 ## Shops
@@ -557,8 +558,8 @@
 | ฉางอัน (`city_changan`) | 🏪 ตลาดฉางอัน | 23 | everything | ×0.5 |
 | โรงเตี๊ยมยั่วไหล (`inn_yuelai`) | 🍵 ของกินที่ยั่วไหล | 5 | food, herb, material | ×0.4 |
 | โรงเตี๊ยมมีหว่าง (`inn_youjian`) | 🍵 ของกินที่มีหว่าง | 5 | food, herb, material | ×0.4 |
-| โรงเตี๊ยมเก้าอี้สูง (`inn_gaosheng`) | 🍵 ของกินที่เก้าอี้สูง | 5 | food, herb, material | ×0.4 |
-| โรงเตี๊ยมห้วอลั่ว (`inn_heluo`) | 🍵 ของกินที่ห้วอลั่ว | 5 | food, herb, material | ×0.4 |
+| โรงเตี๊ยมเกาเซิ่ง (`inn_gaosheng`) | 🍵 ของกินที่เกาเซิ่ง | 5 | food, herb, material | ×0.4 |
+| โรงเตี๊ยมเฮ่อลั่ว (`inn_heluo`) | 🍵 ของกินที่เฮ่อลั่ว | 5 | food, herb, material | ×0.4 |
 | หมู่บ้านบนเชิงเขา (`village`) | 🏪 ร้านในหมู่บ้าน | 4 | food, herb, material | ×0.35 |
 | หมู่บ้านชีกู่ (`village_qigu`) | 🏪 ร้านชีกู่ | 4 | food, herb, material | ×0.35 |
 | หมู่บ้านไร้นาม (`village_noname`) | 🏪 ร้านไร้นาม | 4 | food, herb, material | ×0.35 |
@@ -761,7 +762,7 @@ Every city hosts all six craft professions; villages and some sects host one. Re
 | `hunt_forest` | ล่าสัตว์ในป่า | hunting | 1 | 15 | เนื้อสด, หนังสัตว์ · fights: กระต่ายป่า, ไก่ฟ้า, กระรอกแก้ม, สุนัขป่า, หมูป่าฝูง | 25 places |
 | `hunt_mountain` | ล่าเสือบนภูเขา | hunting | 3 | 18 | เนื้อสด, หนังสัตว์, เล็บเสือ, อุ้งหมี · fights: เสือดาวป่า, หมาป่าจ่าฝูง, หมีหิน, เสือเขาเล็ก | 10 places |
 | `hunt_legendary` | ล่าเสือพยัคฆ์ตำนาน | hunting | 5 | 25 | เล็บเสือ, อุ้งหมี, หนังสัตว์ · fights: หมาป่าจ่าฝูง, หมีหิน, เสือเขาเล็ก, งูยักษ์ป่า | ภูเขาอูฐขาว, หน้าผาหมู่ก้อน |
-| `fish_river` | ตกปลาในลำธาร | fishing | 1 | 8 | ปลาคาร์ป, ปลาไหล | โรงเตี๊ยมยั่วไหล, โรงเตี๊ยมมีหว่าง, โรงเตี๊ยมเก้าอี้สูง, โรงเตี๊ยมห้วอลั่ว |
+| `fish_river` | ตกปลาในลำธาร | fishing | 1 | 8 | ปลาคาร์ป, ปลาไหล | โรงเตี๊ยมยั่วไหล, โรงเตี๊ยมมีหว่าง, โรงเตี๊ยมเกาเซิ่ง, โรงเตี๊ยมเฮ่อลั่ว |
 | `fish_sea` | ตกปลาในทะเล | fishing | 3 | 12 | ปลาไหล, ปลาคาร์ป | 9 places |
 | `fish_dragon` | ตามรอยปลามังกร | fishing | 5 | 25 | ปลามังกร, ปลาไหล | เกาะมังกรเทพ |
 | `herb_common` | เก็บสมุนไพรทั่วไป | herbalism | 1 | 8 | โสม, เม็ดบัว, สมุนไพรหายาก | 41 places |
