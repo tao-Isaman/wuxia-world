@@ -7,7 +7,7 @@
 | Refactor + performance | แยก world store เป็นโมดูล, เพิ่ม index ให้การค้นหา, ให้ compiler จับ effect ที่ลืมเขียน case, เพิ่มเครื่องมือวัดและตรวจ |
 | บทเควส (เนื้อเรื่องหลัก + เควสทั่วไป) | รีวิวราว 220 เควส แก้ราว 145 |
 | บทเควส (สำนัก + สายวิชา + saga) | แก้ราว 110 เควสสำนัก, แม่แบบเควสสายวิชาทั้ง 154, บทแรกของ saga ทั้ง 48 |
-| การตรวจ | typecheck ผ่าน · lint 0 error · unit test ผ่านทุกชุด · audit ผ่าน · e2e ดูท้ายรายงาน |
+| การตรวจ | typecheck ผ่าน · lint 0 error · unit test ผ่านทุกชุด · audit ผ่าน · e2e 58/58 ผ่าน |
 
 ---
 
@@ -152,4 +152,4 @@ agent แก้ข้อความให้ตรงกับกลไกเ�
 - `bun scripts/audit-content.ts`: ผ่าน
 - `test:docs`: ผ่าน หลังสร้าง reference ใหม่
 - golden replay: agent refactor รันเทียบทุก commit แล้ว ผลเหมือนเดิมทุกไบต์
-- e2e (Playwright บน production build): ดูผลใน PR
+- e2e (Playwright บน production build): **58/58 ผ่าน** (22.2 นาที)
