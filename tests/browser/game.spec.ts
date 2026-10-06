@@ -114,6 +114,14 @@ test("grid battle: tap a tile to move, auto plays to the result, back to the wor
   // อัตโนมัติ lets the AI finish the fight.
   await page.getByRole("button", { name: /อัตโนมัติ/ }).click();
   await expect(page.getByTestId("combat-result")).toBeVisible({ timeout: 90_000 });
+  await expect(page.getByTestId("combat-result")).toHaveAttribute("data-outcome", "ally");
+  // The spoils as icons (w-exp and the moves' xp at least); tap one to read it.
+  const spoils = page.getByTestId("victory-spoils");
+  await expect(spoils).toBeVisible();
+  await spoils.getByRole("button", { name: /w-exp 50/ }).click();
+  await expect(page.getByTestId("victory-spoil-detail")).toContainText("w-exp +50");
+  await expect(spoils.getByRole("button", { name: /หมัดตรง \+\d+ xp/ })).toBeVisible();
+  await page.screenshot({ path: "test-results/screenshots/victory-spoils.png" });
   await page.setViewportSize({ width: 844, height: 390 });
   await page.getByRole("button", { name: /บันทึกการต่อสู้/ }).click();
   await expect(page.getByRole("region", { name: "บันทึกการต่อสู้" })).toBeVisible();

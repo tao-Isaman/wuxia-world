@@ -117,11 +117,12 @@ Night falls from about the 8th ชั่วยาม. It only changes the lighti
 
 ### Resting
 
-The พัก button offers what the place allows. A rest restores stamina, HP and MP by the same fraction of their maximum; sleeping at home takes 4 ชั่วยาม (`REST_HOME_HOURS`), every other rest 12:
+The พัก button offers what the place allows. A rest restores stamina, HP and MP by the same fraction of their maximum; sleeping at home or at your own sect takes 4 ชั่วยาม (`REST_HOME_HOURS`), every other rest 12:
 
 | Where | Choice | Cost | Restores |
 | --- | --- | --- | --- |
 | your own home (`home_player`), the only choice there | 🛏 นอนพักที่บ้าน | free | 100 %, in 4 ชั่วยาม |
+| your own sect's grounds while an active disciple (`ownSectAt`), the only choice there | 🏯 นอนพักที่สำนัก | free | 100 %, in 4 ชั่วยาม |
 | cities (`city_*`) and inns (`inn_*`) | 🍵 พักโรงเตี๊ยม | 300 gold | 100 % |
 | temples and palaces | 🏛 พักที่วัด / พักในลานวัง | free | 50 % |
 | anywhere else, including the above | 🌿 พักริมทาง | free | 25 % |
@@ -218,10 +219,13 @@ Battles are turn-based tactics on a board of 10 × 7 tiles, growing to 15 × 10 
 - **อัตโนมัติ** lets the AI play for you.
 - **Winning** pays:
   - 50 w-exp;
+  - gold from a hostile foe's purse by tier: T0 5–15, T1 15–40, T2 40–90, T3 90–180, T4 180–350 (spars, tournament bouts and the law pay none);
   - loot (2–4 picks from the foe's drop table);
   - 20 xp per use for each skill and art you used;
   - stat xp (see [Stats](#stats));
   - a kill counted for every fallen foe, companions included.
+
+  The result panel shows the spoils as icons before you go on (gold, w-exp, each item, each move's xp); tap one to read it.
 - **Every finished battle** costs 5 stamina and 0.5 ชั่วยาม.
 
 ## NPCs

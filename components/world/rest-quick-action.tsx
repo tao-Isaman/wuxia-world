@@ -8,16 +8,19 @@ import { HERO_SLEEP_POSE } from "@/lib/characters/hero-actions";
 import { toast } from "@/store/toast-store";
 import { deriveAll } from "@/lib/game";
 import { REST_HOME_HOURS } from "@/store/world-store";
+import { ownSectAt } from "@/lib/world/data/sect-memberships";
 
 // Which rest tiers a scene offers. The roadside tier is ALWAYS available
 // as a no-cost fallback (so a broke player can't get soft-locked); richer
 // locations layer the better tier on top:
 //   home            → one's own bed (free full restore, 4 ชั่วยาม) only
+//   own sect        → a disciple's bed on the grounds (same as home) only
 //   city / inn      → inn (paid full restore) + roadside
 //   temple / palace → temple (free half restore) + roadside
 //   everywhere else → roadside only
-export function restKindsForScene(sceneId: string): RestKind[] {
+export function restKindsForScene(sceneId: string, sectMembership: Parameters<typeof ownSectAt>[0] = {}): RestKind[] {
   if (sceneId === "home_player") return ["home"];
+  if (ownSectAt(sectMembership, sceneId)) return ["sect"];
   if (sceneId.startsWith("inn_") || sceneId.startsWith("city_")) return ["inn", "route"];
   if (sceneId.startsWith("temple_") || sceneId.startsWith("palace_")) return ["temple", "route"];
   return ["route"];
@@ -47,6 +50,7 @@ export function RestQuickAction() {
   const gold = useWorldStore((s) => s.gold);
   const player = useWorldStore((s) => s.playerBuild);
   const hp = useWorldStore((s) => s.currentHp);
+  const sectMembership = useWorldStore((s) => s.sectMembership);
   const mp = useWorldStore((s) => s.currentMp);
 
   useEffect(() => {
@@ -66,11 +70,12 @@ export function RestQuickAction() {
 
   const maximum = player ? deriveAll(player) : null;
   const atFull = stamina >= staminaMax && (!maximum || (hp >= maximum.HP && mp >= maximum.MP));
-  const choices = restKindsForScene(currentSceneId).map((kind) => ({
+  const kinds = restKindsForScene(currentSceneId, sectMembership);
+  const choices = kinds.map((kind) => ({
     kind,
-    icon: kind === "home" ? "🛏" : kind === "inn" ? "🍵" : kind === "temple" ? "🏛" : "🌿",
-    title: kind === "home" ? "นอนพักที่บ้าน" : kind === "inn" ? "พักโรงเตี๊ยม" : kind === "temple" ? (currentSceneId.startsWith("palace_") ? "พักในลานวัง" : "พักที่วัด") : "พักริมทาง",
-    detail: kind === "home" ? `ฟรี · ฟื้นเต็ม · ${REST_HOME_HOURS} ชั่วยาม` : kind === "inn" ? `${INN_PRICE} ทอง · ฟื้นเต็ม` : kind === "temple" ? "ฟรี · ฟื้น ½" : "ฟรี · ฟื้น ¼",
+    icon: kind === "home" ? "🛏" : kind === "sect" ? "🏯" : kind === "inn" ? "🍵" : kind === "temple" ? "🏛" : "🌿",
+    title: kind === "home" ? "นอนพักที่บ้าน" : kind === "sect" ? "นอนพักที่สำนัก" : kind === "inn" ? "พักโรงเตี๊ยม" : kind === "temple" ? (currentSceneId.startsWith("palace_") ? "พักในลานวัง" : "พักที่วัด") : "พักริมทาง",
+    detail: kind === "home" || kind === "sect" ? `ฟรี · ฟื้นเต็ม · ${REST_HOME_HOURS} ชั่วยาม` : kind === "inn" ? `${INN_PRICE} ทอง · ฟื้นเต็ม` : kind === "temple" ? "ฟรี · ฟื้น ½" : "ฟรี · ฟื้น ¼",
     short: kind === "inn" && gold < INN_PRICE,
   }));
 
@@ -86,7 +91,7 @@ export function RestQuickAction() {
     <div ref={root} className="rest-quick" data-hud-occluder>
       {open && (
         <div className="rest-bubble" role="group" aria-label="เลือกวิธีพักผ่อน">
-          <p className="rest-bubble-title">พักผ่อน <small>· {restKindsForScene(currentSceneId).includes("home") ? REST_HOME_HOURS : 12} ชั่วยาม</small></p>
+          <p className="rest-bubble-title">พักผ่อน <small>· {kinds.includes("home") || kinds.includes("sect") ? REST_HOME_HOURS : 12} ชั่วยาม</small></p>
           {atFull && <p className="rest-bubble-note">HP, MP และพลังเต็มแล้ว</p>}
           {choices.map((choice) => (
             <button key={choice.kind} type="button" disabled={atFull || choice.short} onClick={() => choose(choice.kind)}

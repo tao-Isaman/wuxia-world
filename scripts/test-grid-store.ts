@@ -320,13 +320,23 @@ check("win: HP carryover, kill counts for the foe and its pack, rewards, battle 
   const pb = useWorldStore.getState().playerBuild!;
   useWorldStore.setState({ playerBuild: strong(pb), currentHp: 99999, currentMp: 9999 });
   const wExp = useWorldStore.getState().wExp;
+  const gold = useWorldStore.getState().gold;
+  const bag = { ...useWorldStore.getState().inventory };
   fight("bandit_chief");
   withRandom(0.5, () => playOut());
   const s = st();
   assert.equal(s.winner, "A");
   const hp = unitById(s, "A")!.hp;
   assert.equal(s.hA, hp);
+  // The result panel's spoils are rolled once and are exactly what is paid.
+  const spoils = useWorldStore.getState().victorySpoils()!;
+  assert.ok(spoils && spoils === useWorldStore.getState().victorySpoils(), "rolled once per battle");
+  assert.ok(spoils.gold >= 40 && spoils.gold <= 90, "a tier-2 foe purse");
+  assert.equal(spoils.wExp, 50);
+  assert.ok(spoils.moves.length > 0, "move xp listed");
   useWorldStore.getState().acknowledgeBattleResult();
+  assert.equal(useWorldStore.getState().gold, gold + spoils.gold);
+  for (const it of spoils.items) assert.equal(useWorldStore.getState().inventory[it.itemId], (bag[it.itemId] ?? 0) + it.count, it.itemId);
   const w = useWorldStore.getState();
   assert.equal(w.pendingBattle, null);
   assert.equal(w.gameOver, false);

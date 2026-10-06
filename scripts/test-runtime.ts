@@ -102,6 +102,15 @@ check("sleeping at home: free, a full restore, 4 ชั่วยาม; only at 
   assert.equal(clock() - before, 4, "4 ชั่วยาม");
   useWorldStore.setState({ currentSceneId: "city_capital" });
   assert.deepEqual(useWorldStore.getState().rest("home"), { ok: false, reason: "place" });
+  // An active disciple sleeps free on their own sect's grounds; elsewhere, or once resigned, they can't.
+  const member = (status: "active" | "resigned") => ({ wudang: { ...useWorldStore.getState().sectMembership.wudang, sectId: "wudang", rank: 9, points: 0, status } });
+  useWorldStore.setState({ currentSceneId: "sect_wudang", stamina: 0, sectMembership: member("active") as never });
+  const sect = useWorldStore.getState().rest("sect");
+  assert.ok(sect.ok && sect.hours === 4 && useWorldStore.getState().stamina === useWorldStore.getState().staminaMax);
+  useWorldStore.setState({ currentSceneId: "sect_shaolin" });
+  assert.deepEqual(useWorldStore.getState().rest("sect"), { ok: false, reason: "place" });
+  useWorldStore.setState({ currentSceneId: "sect_wudang", sectMembership: member("resigned") as never });
+  assert.deepEqual(useWorldStore.getState().rest("sect"), { ok: false, reason: "place" });
   useWorldStore.getState().startNewGame({ name: "Runtime test" });
 });
 

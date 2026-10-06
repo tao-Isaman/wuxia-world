@@ -178,3 +178,26 @@
   .gb-result strong { font-size: 20px; }
   .gb-callout span { font-size: 22px; }
 }
+
+/* The spoils of a won world fight (components/world/victory-spoils.tsx): gold,
+   w-exp, items and move xp as icons; tap one to read it. */
+.gb-result .gb-spoils { position: relative; flex: 1; min-width: 0; display: flex; justify-content: center; }
+.gb-spoils-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 10px; }
+.gb-spoil { display: grid; justify-items: center; gap: 2px; }
+.gb-result .gb-spoil em { font: 600 12px/1 var(--font-body), sans-serif; font-style: normal; color: #f8e5b6; }
+.gb-spoil .item-tile { width: 40px; height: 40px; }
+.gb-result .gb-spoils button.item-tile, .gb-result button.gb-spoil-move { min-height: 0; }
+.gb-spoil-move { display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 1px solid rgb(221 191 126 / .45);
+  border-radius: 6px; background: rgb(28 16 11 / .7); cursor: pointer; }
+.gb-spoil-move[aria-pressed=true], .gb-spoil-move:hover { border-color: #e2bd6a; }
+.gb-spoil-detail { position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); z-index: 5;
+  width: min(300px, calc(100 * var(--vw) - 32px)); display: grid; gap: 4px; padding: 12px 14px; text-align: left;
+  background: linear-gradient(180deg, #2a1811, #170d08); border: 1px solid #c9a35a; border-radius: 8px; box-shadow: 0 8px 24px rgb(0 0 0 / .5); }
+.gb-result .gb-spoil-detail strong { font: 600 16px/1.35 var(--font-body), sans-serif; color: #f8e5b6; }
+.gb-result .gb-spoil-detail small { font-size: 12px; color: #d9c9a6; }
+.gb-spoil-detail p { margin: 0; font-size: 13px; line-height: 1.5; color: #eadfc2; }
+.gb-spoil-close { position: absolute; top: 4px; right: 6px; min-height: 0 !important; padding: 2px 6px; background: none; border: 0; color: #d9c9a6; cursor: pointer; }
+@media (orientation: landscape) and (max-height: 500px), (orientation: portrait) and (max-width: 500px) {
+  .gb-spoil .item-tile, .gb-spoil-move { width: 32px; height: 32px; }
+  .gb-spoils-row { gap: 4px 6px; }
+}

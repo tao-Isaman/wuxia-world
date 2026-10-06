@@ -173,11 +173,13 @@ interface BattleArenaProps {
   //           seam via onContinue, which resolves to the world's onWin/onLose.
   mode?: "free" | "world";
   onContinue?: () => void;
+  /** Shown on the result panel after a win (the world's spoils). */
+  winExtra?: React.ReactNode;
 }
 
 interface Selection { key: string; slot: number | null; aimed: Cell | null }
 
-export function BattleArena({ mode = "free", onContinue }: BattleArenaProps) {
+export function BattleArena({ mode = "free", onContinue, winExtra }: BattleArenaProps) {
   const state = useBattleStore((s) => s.state);
   const auto = useBattleStore((s) => s.auto);
   const start = useBattleStore((s) => s.start);
@@ -380,6 +382,7 @@ export function BattleArena({ mode = "free", onContinue }: BattleArenaProps) {
         {resultReady ? (
           <div className="gb-result" data-testid="combat-result" data-outcome={state.escaped ? "escaped" : state.winnerTeam ?? "none"}>
             <div><span>{winnerLabel}</span><strong>{winnerLine}</strong><small>ประลอง {state.turn} ตา</small></div>
+            {!state.escaped && state.winnerTeam === "ally" && winExtra}
             {mode === "world" ? <Button onClick={() => onContinue?.()}>ดำเนินเรื่อง →</Button> :
               <div className="flex gap-2"><Button onClick={() => start(setupA, setupB)}>เริ่มใหม่</Button>
                 <Button variant="outline" onClick={reset}>Reset</Button></div>}

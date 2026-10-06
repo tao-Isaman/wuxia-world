@@ -79,7 +79,7 @@ import { namedNpcIds } from "@/lib/world/data/named-npcs";
 import { checkOpenMeridianNode, getMeridianChart } from "@/lib/game";
 import { meridianReadBlock, rollMeridianLoot } from "@/lib/world/meridians";
 import { toast } from "@/store/toast-store";
-import { SECT_MEMBERSHIPS, rankUpGold } from "@/lib/world/data/sect-memberships";
+import { SECT_MEMBERSHIPS, ownSectAt, rankUpGold } from "@/lib/world/data/sect-memberships";
 import {
   ASSASSINATE_TRAIT_EVIL,
   KIDNAP_TRAIT_EVIL,
@@ -163,7 +163,8 @@ const ACTION_HOURS = 0.2;
 const FIGHT_HOURS = 0.5;
 const FIGHT_STAMINA = 5;
 const REST_HOURS = 12;
-// Sleeping in one's own bed (home_player): free, a full restore, 4 ชั่วยาม.
+// Sleeping in one's own bed (home_player) or at one's own sect (an active
+// disciple on its grounds): free, a full restore, 4 ชั่วยาม.
 export const REST_HOME_HOURS = 4;
 const REST_INN_COST = 300;
 
@@ -343,8 +344,26 @@ export type BadActionResult =
 export const SPAR_WIN_SCENE_ID = "npc_spar_win";
 export const SPAR_LOSE_SCENE_ID = "npc_spar_lose";
 
-// Rest tiers: one's own bed (home_player), an inn, a temple, the roadside.
-export type RestKind = "home" | "inn" | "temple" | "route";
+/** A won fight's spoils, shown on the result panel before the player goes on. */
+export interface VictorySpoils {
+  gold: number;
+  wExp: number;
+  items: { itemId: string; count: number }[];
+  /** Battle xp per move skill / inner art used (frozen sect moves left out). */
+  moves: { id: string; kind: "skill" | "art"; xp: number }[];
+  /** A hunt's carcass roll (null when the fight was no hunt). */
+  hunt: { items: { itemId: string; count: number }[]; passed: boolean } | null;
+}
+
+// Gold in a hostile foe's purse by tier (min, max); spars, tournament bouts and the law pay none.
+const FOE_GOLD: Readonly<Record<number, readonly [number, number]>> = {
+  0: [5, 15], 1: [15, 40], 2: [40, 90], 3: [90, 180], 4: [180, 350],
+};
+// One roll per pendingBattle (the object the battle was started for).
+const spoilsByBattle = new WeakMap<object, VictorySpoils>();
+
+// Rest tiers: one's own bed (or one's own sect's grounds, as an active disciple) (home_player), an inn, a temple, the roadside.
+export type RestKind = "home" | "sect" | "inn" | "temple" | "route";
 
 export type RestResult =
   | { ok: false; reason: "gold" | "place" }
@@ -426,6 +445,9 @@ interface WorldStore extends WorldStateData {
   // pendingBattle, and resets the battle store. If a hunt was in flight,
   // the spoils are dropped here on win.
   acknowledgeBattleResult: () => void;
+  // What a won fight pays (rolled once, the first time it is asked for, and
+  // used by acknowledgeBattleResult); null while there is no won world battle.
+  victorySpoils: () => VictorySpoils | null;
   /** Open a letter: mark it read and take its gift. */
   openLetter: (letterId: string) => { ok: boolean; gift?: string };
   /** Throw letters away; a gift not yet taken goes to the bag first. */
@@ -1115,6 +1137,42 @@ function recordVisit(state: WorldStateData, locationId: string): void {
   }
 }
 
+// Roll a won fight's spoils from the battle store's final state.
+function rollVictorySpoils(s: WorldStateData, pb: NonNullable<WorldStateData["pendingBattle"]>): VictorySpoils {
+  const battleState = useBattleStore.getState().state;
+  const opp = getOpponent(pb.opponentId);
+  const items: Record<string, number> = {};
+  let gold = 0;
+  if (!pb.tournament) {
+    for (const it of rollOpponentLoot(opp?.drops, opp?.ti ?? 0)) items[it.itemId] = (items[it.itemId] ?? 0) + it.count;
+    for (const itemId of rollMeridianLoot(pb.opponentId)) items[itemId] = (items[itemId] ?? 0) + 1;
+    if (!s.pendingSpar && !pb.nonFatal && !isLawOpponent(pb.opponentId)) {
+      const [min, max] = FOE_GOLD[Math.max(0, Math.min(4, opp?.ti ?? 0))];
+      gold = min + Math.floor(Math.random() * (max - min + 1));
+    }
+  }
+  const moves: VictorySpoils["moves"] = [];
+  for (const [id, count] of Object.entries(battleState?.skillUses?.A ?? {})) {
+    if (typeof count === "number" && count > 0 && getSkill(id) && !isSkillFrozen(s, id)) moves.push({ id, kind: "skill", xp: count * SKILL_USE_XP });
+  }
+  for (const [id, count] of Object.entries(battleState?.artUses?.A ?? {})) {
+    const art = getArt(id);
+    if (typeof count === "number" && count > 0 && art && art.id !== "none" && !isArtFrozen(s, id)) moves.push({ id, kind: "art", xp: count * ART_USE_XP });
+  }
+  let hunt: VictorySpoils["hunt"] = null;
+  const res = s.pendingHuntYield ? getResource(s.pendingHuntYield.resourceId) : null;
+  if (res) hunt = rollResourceYield(res, masteryLevel(s.lifeSkillXp[res.skill] ?? 0));
+  return { gold, wExp: W_EXP_FIGHT_WIN, items: Object.entries(items).map(([itemId, count]) => ({ itemId, count })), moves, hunt };
+}
+
+function victorySpoilsFor(s: WorldStateData): VictorySpoils | null {
+  const pb = s.pendingBattle;
+  if (!pb || useBattleStore.getState().state?.winner !== "A") return null;
+  let spoils = spoilsByBattle.get(pb);
+  if (!spoils) { spoils = rollVictorySpoils(s, pb); spoilsByBattle.set(pb, spoils); }
+  return spoils;
+}
+
 // Roll loot from an opponent's drop table. Picks count is per-tier:
 // tier 0/1 = 2 picks, tier 2/3 = 3, tier 4 = 4. Same weighted-pick helper
 // as resources; merges duplicate item ids.
@@ -1479,6 +1537,8 @@ export const useWorldStore = create<WorldStore>()(
           pendingSpar: null,
         }),
 
+      victorySpoils: () => victorySpoilsFor(get()),
+
       acknowledgeBattleResult: () => {
         const s = get();
         if (!s.pendingBattle) return;
@@ -1560,8 +1620,11 @@ export const useWorldStore = create<WorldStore>()(
 
         // Win path: bank w-exp + per-skill xp + stat xp from every move
         // used and every hit taken, then drop hunt spoils if a hunt was in
-        // flight, then route to the encounter's onWin destination.
-        draft.wExp = Math.max(0, draft.wExp + W_EXP_FIGHT_WIN);
+        // flight, then route to the encounter's onWin destination. The
+        // spoils are the ones the result panel showed (victorySpoils).
+        const spoils = victorySpoilsFor(s) ?? rollVictorySpoils(s, pb);
+        draft.wExp = Math.max(0, draft.wExp + spoils.wExp);
+        draft.gold += spoils.gold;
         // Beat the law this time: no jail pending (the marks stay).
         if (isLawOpponent(pb.opponentId)) draft.jailCityId = null;
         // Bump the defeat counter so `Condition.defeatedOpponent` quests
@@ -1677,21 +1740,13 @@ export const useWorldStore = create<WorldStore>()(
         const oppDef = getOpponent(pb.opponentId);
         const lootSummary: string[] = [];
         if (pb.tournament) settleTournamentBout(draft, true);
-        else if (oppDef?.drops && oppDef.drops.length > 0) {
-          const lootRolls = rollOpponentLoot(oppDef.drops, oppDef.ti ?? 0);
-          for (const it of lootRolls) {
-            draft.inventory[it.itemId] = (draft.inventory[it.itemId] ?? 0) + it.count;
-            const def = getItem(it.itemId);
-            lootSummary.push(`${def?.name ?? it.itemId}×${it.count}`);
-          }
+        // Opponent drops and meridian charts (data/meridian-sources.ts), rolled in victorySpoils.
+        draft.inventory = { ...draft.inventory };
+        for (const it of spoils.items) {
+          draft.inventory[it.itemId] = (draft.inventory[it.itemId] ?? 0) + it.count;
+          lootSummary.push(`${getItem(it.itemId)?.name ?? it.itemId}×${it.count}`);
         }
-        // Meridian charts (data/meridian-sources.ts loot) roll on their own.
-        if (!pb.tournament) {
-          for (const itemId of rollMeridianLoot(pb.opponentId)) {
-            draft.inventory[itemId] = (draft.inventory[itemId] ?? 0) + 1;
-            lootSummary.push(`${getItem(itemId)?.name ?? itemId}×1`);
-          }
-        }
+        if (spoils.gold > 0) lootSummary.push(`${spoils.gold} ตำลึง`);
         appendActionLog(
           draft,
           "combat",
@@ -1709,8 +1764,7 @@ export const useWorldStore = create<WorldStore>()(
         if (hunt) {
           const res = getResource(hunt.resourceId);
           if (res) {
-            const lvl = masteryLevel(draft.lifeSkillXp[res.skill] ?? 0);
-            const yieldRoll = rollResourceYield(res, lvl);
+            const yieldRoll = spoils.hunt ?? rollResourceYield(res, masteryLevel(draft.lifeSkillXp[res.skill] ?? 0));
             for (const it of yieldRoll.items) {
               draft.inventory[it.itemId] = (draft.inventory[it.itemId] ?? 0) + it.count;
             }
@@ -2111,8 +2165,9 @@ export const useWorldStore = create<WorldStore>()(
         const max = s.staminaMax;
         let cost = 0;
         let pct = 0;
-        if (kind === "home") {
-          if (s.currentSceneId !== "home_player") return { ok: false, reason: "place" };
+        if (kind === "home" || kind === "sect") {
+          const here = kind === "home" ? s.currentSceneId === "home_player" : !!ownSectAt(s.sectMembership, s.currentSceneId);
+          if (!here) return { ok: false, reason: "place" };
           pct = 1;
         } else if (kind === "inn") {
           cost = REST_INN_COST;
@@ -2136,9 +2191,9 @@ export const useWorldStore = create<WorldStore>()(
           draft.currentHp = Math.min(d.HP, draft.currentHp + Math.floor(d.HP * pct));
           draft.currentMp = Math.min(d.MP, draft.currentMp + Math.floor(d.MP * pct));
         }
-        const hours = kind === "home" ? REST_HOME_HOURS : REST_HOURS;
+        const hours = kind === "home" || kind === "sect" ? REST_HOME_HOURS : REST_HOURS;
         advanceTime(draft, hours);
-        const restLabel = kind === "home" ? "นอนพักที่บ้าน" : kind === "inn" ? "พักโรงเตี๊ยม" : kind === "temple" ? "พักวัด" : "พักริมทาง";
+        const restLabel = kind === "home" ? "นอนพักที่บ้าน" : kind === "sect" ? "นอนพักที่สำนัก" : kind === "inn" ? "พักโรงเตี๊ยม" : kind === "temple" ? "พักวัด" : "พักริมทาง";
         appendActionLog(
           draft,
           "rest",
