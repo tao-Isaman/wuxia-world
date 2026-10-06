@@ -206,7 +206,7 @@ Then run `bun run test:navigation`: every painted map must keep its spawn open a
 - A dialog with neither choices nor `next` is **terminal**: it shows "ปิด", which returns to the last location for free.
 - `visibleIf` hides a choice. When every choice is hidden, the stage shows an escape button.
 - A choice that costs travel (for example, from a location onto a road) is refused as a whole — effects included — when the hero lacks stamina.
-- **Speaker.** The portrait and heading come from the NPC whose `dialogSceneId` is this scene, else from the first `dialogue` line whose `speaker` equals an NPC's `name` exactly.
+- **Speaker.** The portrait and heading come from the NPC whose `dialogSceneId` is this scene, else from the first `dialogue` line whose `speaker` names an NPC (`lib/world/speaker.ts`): the exact `name`, the name before its "(…)" epithet ("หวงชิงเฉวียน"), a title before a full name, or part of the name of the quest giver / hand-in person of a `qs_<quest>_…` dialog. Prefer the NPC's exact name; any other label ("โจรสลัด", "ยายหลี่") is a walk-on with no portrait.
   - When that NPC stands at the current location, the dialog plays over the live map.
   - Otherwise it plays over the place's painting.
 - Scenes that belong to a quest follow the `qs_<questId>_<beat>` naming (see below).
@@ -247,8 +247,10 @@ Then run `bun run test:navigation`: every painted map must keep its spawn open a
 
 3. **The last stage** is the "return to the giver" beat, with no `autoAdvance`. The NPC card shows ส่งมอบภารกิจ when the quest is on its last stage and the NPC is the turn-in person.
 4. **Optional dialogs:**
-   - **`qs_<questId>_offer`** — the NPC card opens it right after accepting (the briefing).
-   - **`qs_<questId>_complete`** — opened on hand-in. It should run `{ t: "finishQuest", questId, success: true }`; if it doesn't, the card calls `finishQuestNow` as a safety net. Use `takeItem` in this scene when you want explicit item hand-over.
+   - **`qs_<questId>_offer`** — give it an accept choice that runs `{ t: "startQuest", questId }` and a decline choice without it: the NPC card then opens the offer **before** accepting, and declining leaves the quest on offer. An offer with no `startQuest` choice is a briefing the card plays right after accepting.
+   - **`qs_<questId>_progress`** — what the giver says while the quest is under way (💬 ถามความคืบหน้า on the card).
+   - **`qs_<questId>_complete`** — opened on hand-in. Its choices should run `{ t: "finishQuest", questId, success: true }` themselves (a choice made at the hand-in, such as keep or return the sword, goes here); if none does, the card calls `finishQuestNow` first as a safety net. Use `takeItem` in this scene when you want explicit item hand-over.
+   - Any other `qs_` beat must be opened by something — a choice, a battle outcome or an objective spot's `sceneId` — or `test:quests` fails.
 5. **Rewards** (`QuestReward`):
    - `gold`, `item`, `wExp`, `skillExp`
    - `trait`, `npcRelationship`
