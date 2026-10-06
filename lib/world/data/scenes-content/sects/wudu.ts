@@ -9,7 +9,7 @@ export const SCENES_WUDU: readonly Scene[] = [
     kind: "dialog",
     id: "npc_sect_wudu_miao_aman_talk",
     lines: [
-      { t: "dialogue", speaker: "อาหมาน", text: "งูในย่ามข้าหิวมาทั้งวัน... กล้าลองมือกับข้าไหม?" },
+      { t: "dialogue", speaker: "หมอพิษอาหมาน", text: "งูในย่ามข้าหิวมาทั้งวัน... กล้าลองมือกับข้าไหม?" },
       { t: "narration", text: "เสียงเลื้อยเบา ๆ ในย่ามทำให้ผมเจ้าตั้งชัน" },
     ],
   },

@@ -1,5 +1,6 @@
 import { getSkill } from "@/lib/game";
 import { getItem, getNpc, getQuest, getScene, scrollItemId, TRAIT_LABEL, type QuestDef, type WorldStateData } from "@/lib/world";
+import { npcForSpeaker } from "@/lib/world/speaker";
 
 export interface GrantedReward {
   id: string;
@@ -72,7 +73,7 @@ export function questCompletionReceipt(def: QuestDef, before: ReceiptState, afte
   const npc = getNpc(def.turnInNpcId ?? def.giverNpcId);
   const scene = getScene(`qs_${def.id}_complete`);
   const speech = scene?.kind === "dialog"
-    ? scene.lines.find(line => line.t === "dialogue" && line.speaker === npc?.name)
+    ? scene.lines.find(line => line.t === "dialogue" && !!npc && npcForSpeaker(line.speaker, [npc])?.id === npc.id)
     : undefined;
   const numeric = new Map<string, { kind: GrantedReward["kind"]; label: string; expected: number; delta: number }>();
   const rewards: GrantedReward[] = [];

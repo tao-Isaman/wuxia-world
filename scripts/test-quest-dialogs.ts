@@ -10,7 +10,9 @@
  * Run: bun scripts/test-quest-dialogs.ts
  */
 import assert from "node:assert/strict";
-import { NPCS, QUESTS, SCENES, SCENES_BY_ID, START_SCENE_ID, evaluateCondition, getQuest, getScene, type Condition, type DialogScene, type Scene, type SceneEffect } from "../lib/world";
+import { NPCS, QUESTS, SCENES, SCENES_BY_ID, START_SCENE_ID, evaluateCondition, getNpc, getQuest, getScene, type Condition, type DialogScene, type Scene, type SceneEffect } from "../lib/world";
+
+import { dialogSpeaker, npcForSpeaker, questIdOfScene, sceneCast } from "../lib/world/speaker";
 
 const memory = new Map<string, string>();
 Object.defineProperty(globalThis, "localStorage", { configurable: true, value: {
@@ -97,6 +99,26 @@ check("hand-written offers: only the accept choice starts the quest", () => {
     }
   }
   assert.ok(offers > 150, `${offers} declinable offers`);
+});
+
+check("speaker labels find their NPC's portrait; walk-ons and the hero find nobody", () => {
+  const id = (speaker: string, sceneId = "") => npcForSpeaker(speaker, sceneCast(sceneId))?.id;
+  assert.equal(id("หวงชิงเฉวียน"), "wld_taohua_hermit_huang", "name before the (epithet)");
+  assert.equal(id("เหลียงเก๋อ"), "wld_motian_ghost_liang");
+  assert.equal(id("ฤๅษีชิวเฉียน"), "wld_kunlun_exile_qiu", "a title before the full name");
+  assert.equal(id("เถ้าแก่โจว", "qs_qe_capital_jewel_heist_offer"), "evil_capital_blackmarket_zhou", "part of the quest giver's name");
+  assert.equal(id("เถ้าแก่โจว"), undefined, "…but only for that giver's dialogs");
+  assert.equal(id("ซี", "qs_qst_spy_yangzhou_smuggler_ship_offer"), "spy_yangzhou_xi");
+  for (const walkOn of ["{hero}", "โจรสลัด", "ยายหลี่", "นักรบเศร้า", "หมอดูปลอม"]) assert.equal(id(walkOn, "qs_qv_hengshan_winter_aid_deliver"), undefined, walkOn);
+  // Every hand-written quest dialog that names a known person names the right one.
+  for (const scene of SCENES) {
+    if (scene.kind !== "dialog" || !scene.id.endsWith("_offer")) continue;
+    const quest = getQuest(questIdOfScene(scene.id));
+    if (!quest || quest.story || quest.lineage) continue;
+    const npc = dialogSpeaker(scene);
+    if (npc) assert.ok([quest.giverNpcId, quest.turnInNpcId].includes(npc.id), `${scene.id} is voiced by ${npc.name}, not its giver`);
+    else assert.ok(!scene.lines.some((l) => l.t === "dialogue"), `${scene.id}: no line resolves to ${getNpc(quest.giverNpcId ?? "")?.name}`);
+  }
 });
 
 // ── Walkthroughs ─────────────────────────────────────────────────────────

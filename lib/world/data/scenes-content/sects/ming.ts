@@ -10,8 +10,8 @@ export const SCENES_MING: readonly Scene[] = [
     id: "npc_sect_ming_elder_zhuying_talk",
     lines: [
       { t: "narration", text: "ผู้อาวุโสจูอิงนั่งอยู่ในมุมมืดของห้องรับแขก แสงเทียนน้อยเพียงพอที่จะเห็นรอยยิ้มที่ซ่อนนัยยะ" },
-      { t: "dialogue", speaker: "จูอิง", text: "ยอดยุทธผู้มาเยือน... ข้าได้ยินว่าเจ้าน่าไว้วางใจ" },
-      { t: "dialogue", speaker: "จูอิง", text: "พรรคตะวันจันทรามีงานบางอย่างที่ต้องการผู้กล้า" },
+      { t: "dialogue", speaker: "ผู้อาวุโสจูอิง", text: "ยอดยุทธผู้มาเยือน... ข้าได้ยินว่าเจ้าน่าไว้วางใจ" },
+      { t: "dialogue", speaker: "ผู้อาวุโสจูอิง", text: "พรรคตะวันจันทรามีงานบางอย่างที่ต้องการผู้กล้า" },
     ],
     choices: [
       {
@@ -58,7 +58,7 @@ export const SCENES_MING: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qst_ming_spy_mission_offer",
     lines: [
-      { t: "dialogue", speaker: "จูอิง", text: "ส่งจดหมายนี้ให้สายลับของเราในพระราชวังจงหยาง — อย่าให้ใครรู้" },
+      { t: "dialogue", speaker: "ผู้อาวุโสจูอิง", text: "ส่งจดหมายนี้ให้สายลับของเราในพระราชวังจงหยาง — อย่าให้ใครรู้" },
       { t: "narration", text: "จูอิงส่งซองจดหมายปิดผนึกมาให้เจ้า" },
     ],
     choices: [
@@ -71,7 +71,7 @@ export const SCENES_MING: readonly Scene[] = [
     id: "qs_qst_ming_spy_mission_complete",
     lines: [
       { t: "narration", text: "จูอิงพยักหน้าอย่างพอใจ" },
-      { t: "dialogue", speaker: "จูอิง", text: "ดีมาก... เจ้าพิสูจน์ตัวเองแล้ว รับรางวัลไปด้วย" },
+      { t: "dialogue", speaker: "ผู้อาวุโสจูอิง", text: "ดีมาก... เจ้าพิสูจน์ตัวเองแล้ว รับรางวัลไปด้วย" },
     ],
     choices: [
       { text: "รับรางวัล", next: "sect_ming" },
@@ -82,8 +82,8 @@ export const SCENES_MING: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qst_ming_defector_offer",
     lines: [
-      { t: "dialogue", speaker: "จูอิง", text: "สมาชิกคนหนึ่งหนีออกจากพรรคไปซ่อนตัวที่ไม้ดำหน้าผา เขารู้มากเกินไป" },
-      { t: "dialogue", speaker: "จูอิง", text: "ตามหาเขา... แล้วตัดสินว่าจะทำอย่างไร เจ้ามีอิสระ" },
+      { t: "dialogue", speaker: "ผู้อาวุโสจูอิง", text: "สมาชิกคนหนึ่งหนีออกจากพรรคไปซ่อนตัวที่ไม้ดำหน้าผา เขารู้มากเกินไป" },
+      { t: "dialogue", speaker: "ผู้อาวุโสจูอิง", text: "ตามหาเขา... แล้วตัดสินว่าจะทำอย่างไร เจ้ามีอิสระ" },
     ],
     choices: [
       { text: "รับภารกิจ", next: "sect_ming" },
@@ -126,7 +126,7 @@ export const SCENES_MING: readonly Scene[] = [
     id: "qs_qst_ming_defector_complete",
     lines: [
       { t: "narration", text: "จูอิงฟังรายงานอย่างตั้งใจ ใบหน้าอ่านไม่ออก" },
-      { t: "dialogue", speaker: "จูอิง", text: "ดีแล้ว... เรื่องนี้จบแล้ว รับรางวัลไปด้วย" },
+      { t: "dialogue", speaker: "ผู้อาวุโสจูอิง", text: "ดีแล้ว... เรื่องนี้จบแล้ว รับรางวัลไปด้วย" },
     ],
     choices: [
       { text: "รับรางวัล", next: "sect_ming" },

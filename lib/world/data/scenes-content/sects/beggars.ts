@@ -10,8 +10,8 @@ export const SCENES_BEGGARS: readonly Scene[] = [
     id: "npc_sect_beggars_chief_hongtian_talk",
     lines: [
       { t: "narration", text: "หัวหน้าหงเทียนนั่งเอนหลังอย่างสบายใจ ไม้เท้าเก้าข้อพาดอยู่ข้างตัว" },
-      { t: "dialogue", speaker: "หงเทียน", text: "ฮ่าฮ่า ยินดีต้อนรับ! ยาจกก็รู้จักน้ำใจเหมือนกัน" },
-      { t: "dialogue", speaker: "หงเทียน", text: "พรรคยาจกมีหูมีตาทั่วยุทธภพ — เจ้าต้องการอะไร?" },
+      { t: "dialogue", speaker: "หัวหน้าหงเทียน", text: "ฮ่าฮ่า ยินดีต้อนรับ! ยาจกก็รู้จักน้ำใจเหมือนกัน" },
+      { t: "dialogue", speaker: "หัวหน้าหงเทียน", text: "พรรคยาจกมีหูมีตาทั่วยุทธภพ — เจ้าต้องการอะไร?" },
     ],
     choices: [
       // Lore-quest offers gated to disciples only.
@@ -75,10 +75,10 @@ export const SCENES_BEGGARS: readonly Scene[] = [
     id: "qs_qst_beggars_disciple_intro_offer",
     lines: [
       { t: "narration", text: "หัวหน้าหงเทียนหัวเราะลั่นและตบเข่า" },
-      { t: "dialogue", speaker: "หงเทียน", text: "ฮ่าฮ่า เจ้าฝึกขอทานจนถึงขั้น ๒ แล้วสิ — ข้าได้ยินมาจากศิษย์ของข้า" },
-      { t: "dialogue", speaker: "หงเทียน", text: "พรรคยาจกไม่ได้อยากได้ทรัพย์ของเจ้า — แค่อยากเห็นว่าเจ้าเข้าใจวิถีของถนน" },
-      { t: "dialogue", speaker: "หงเทียน", text: "นำข้าวหมูแดง ๕ จาน กับเงิน ๑๐๐ ทองที่หาได้จากท้องถนนมาแบ่งให้พี่น้อง — ข้าอยากรู้ว่าเจ้าใจกว้างพอหรือไม่" },
-      { t: "dialogue", speaker: "หงเทียน", text: "เมื่อครบแล้วกลับมา ข้าจะรับเจ้าเป็นศิษย์ขั้นที่ ๙" },
+      { t: "dialogue", speaker: "หัวหน้าหงเทียน", text: "ฮ่าฮ่า เจ้าฝึกขอทานจนถึงขั้น ๒ แล้วสิ — ข้าได้ยินมาจากศิษย์ของข้า" },
+      { t: "dialogue", speaker: "หัวหน้าหงเทียน", text: "พรรคยาจกไม่ได้อยากได้ทรัพย์ของเจ้า — แค่อยากเห็นว่าเจ้าเข้าใจวิถีของถนน" },
+      { t: "dialogue", speaker: "หัวหน้าหงเทียน", text: "นำข้าวหมูแดง ๕ จาน กับเงิน ๑๐๐ ทองที่หาได้จากท้องถนนมาแบ่งให้พี่น้อง — ข้าอยากรู้ว่าเจ้าใจกว้างพอหรือไม่" },
+      { t: "dialogue", speaker: "หัวหน้าหงเทียน", text: "เมื่อครบแล้วกลับมา ข้าจะรับเจ้าเป็นศิษย์ขั้นที่ ๙" },
     ],
     choices: [
       { text: "ข้าจะไปทำตามคำสั่ง", next: "sect_beggars" },
@@ -90,9 +90,9 @@ export const SCENES_BEGGARS: readonly Scene[] = [
     id: "qs_qst_beggars_disciple_intro_complete",
     lines: [
       { t: "narration", text: "เจ้าวางข้าวหมูแดงและเงินทองลงบนเสื่อหน้าหัวหน้าหงเทียน" },
-      { t: "dialogue", speaker: "หงเทียน", text: "ครบแล้ว — และเจ้าก็ไม่ได้บ่นแม้แต่นิดเดียว ฮ่าฮ่า" },
+      { t: "dialogue", speaker: "หัวหน้าหงเทียน", text: "ครบแล้ว — และเจ้าก็ไม่ได้บ่นแม้แต่นิดเดียว ฮ่าฮ่า" },
       { t: "narration", text: "ท่านยกไม้เท้าเก้าข้อขึ้นแตะไหล่เจ้าเบา ๆ" },
-      { t: "dialogue", speaker: "หงเทียน", text: "ตั้งแต่บัดนี้ เจ้าคือศิษย์พรรคยาจกขั้นที่ ๙ — วิชาของพรรค พี่น้องรุ่นก่อนจะสอนให้ทีละกระบวนเมื่อเจ้าพิสูจน์ตนได้ ไปทักพวกเขาเสีย" },
+      { t: "dialogue", speaker: "หัวหน้าหงเทียน", text: "ตั้งแต่บัดนี้ เจ้าคือศิษย์พรรคยาจกขั้นที่ ๙ — วิชาของพรรค พี่น้องรุ่นก่อนจะสอนให้ทีละกระบวนเมื่อเจ้าพิสูจน์ตนได้ ไปทักพวกเขาเสีย" },
     ],
     choices: [
       {
@@ -112,7 +112,7 @@ export const SCENES_BEGGARS: readonly Scene[] = [
     id: "npc_sect_beggars_vice_chief_lifang_talk",
     lines: [
       { t: "narration", text: "รองหัวหน้าหลี่ฟางพิงกำแพงเคี้ยวเศษอาหาร แต่สายตาคมกริบ" },
-      { t: "dialogue", speaker: "หลี่ฟาง", text: "อย่าดูถูกยาจก — ในเสื้อขาดของข้ามีฝ่ามือที่หักกระดูกได้ในจังหวะเดียว" },
+      { t: "dialogue", speaker: "รองหัวหน้าหลี่ฟาง", text: "อย่าดูถูกยาจก — ในเสื้อขาดของข้ามีฝ่ามือที่หักกระดูกได้ในจังหวะเดียว" },
     ],
   },
 
@@ -121,8 +121,8 @@ export const SCENES_BEGGARS: readonly Scene[] = [
     id: "npc_sect_beggars_staff_elder_qicheng_talk",
     lines: [
       { t: "narration", text: "อาจารย์ฉีเฉิงกำลังขัดไม้เท้าด้วยมือที่หยาบกร้าน" },
-      { t: "dialogue", speaker: "ฉีเฉิง", text: "ไม้เท้าของพรรคยาจกไม่ใช่อาวุธ — มันคือเพื่อนเดินทาง" },
-      { t: "dialogue", speaker: "ฉีเฉิง", text: "ฝึกพอ เจ้าจะเข้าใจว่าทำไมเพลงไม้เท้าตีสุนัขถึงเป็นวิชาสุดยอดของพรรค" },
+      { t: "dialogue", speaker: "อาจารย์ไม้เท้าฉีเฉิง", text: "ไม้เท้าของพรรคยาจกไม่ใช่อาวุธ — มันคือเพื่อนเดินทาง" },
+      { t: "dialogue", speaker: "อาจารย์ไม้เท้าฉีเฉิง", text: "ฝึกพอ เจ้าจะเข้าใจว่าทำไมเพลงไม้เท้าตีสุนัขถึงเป็นวิชาสุดยอดของพรรค" },
     ],
   },
 
@@ -130,8 +130,8 @@ export const SCENES_BEGGARS: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qst_beggars_spy_report_offer",
     lines: [
-      { t: "dialogue", speaker: "หงเทียน", text: "มีองค์กรลึกลับเคลื่อนไหวในยุทธภพ พวกยาจกของข้าสังเกตเห็น" },
-      { t: "dialogue", speaker: "หงเทียน", text: "ไปสืบข่าวที่โรงน้ำชาในนครหลวง ท่าเรือหยางโจว และตลาดจินหลิง แล้วจับสายลับของมันมาให้ได้" },
+      { t: "dialogue", speaker: "หัวหน้าหงเทียน", text: "มีองค์กรลึกลับเคลื่อนไหวในยุทธภพ พวกยาจกของข้าสังเกตเห็น" },
+      { t: "dialogue", speaker: "หัวหน้าหงเทียน", text: "ไปสืบข่าวที่โรงน้ำชาในนครหลวง ท่าเรือหยางโจว และตลาดจินหลิง แล้วจับสายลับของมันมาให้ได้" },
     ],
     choices: [
       { text: "รับภารกิจ", next: "sect_beggars" },
@@ -143,7 +143,7 @@ export const SCENES_BEGGARS: readonly Scene[] = [
     id: "qs_qst_beggars_spy_report_complete",
     lines: [
       { t: "narration", text: "หัวหน้าหงเทียนฟังรายงานอย่างสนใจ โขกไม้เท้าลงพื้น" },
-      { t: "dialogue", speaker: "หงเทียน", text: "ดีมาก! ข้อมูลนี้มีค่ากับพรรคยาจกมาก รับรางวัลไปด้วย!" },
+      { t: "dialogue", speaker: "หัวหน้าหงเทียน", text: "ดีมาก! ข้อมูลนี้มีค่ากับพรรคยาจกมาก รับรางวัลไปด้วย!" },
     ],
     choices: [
       { text: "รับรางวัล", next: "sect_beggars" },
@@ -154,8 +154,8 @@ export const SCENES_BEGGARS: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qst_beggars_hungry_offer",
     lines: [
-      { t: "dialogue", speaker: "หงเทียน", text: "เด็กยาจกในพรรคหิวโหย... เรามีน้อยเกินไป" },
-      { t: "dialogue", speaker: "หงเทียน", text: "นำเนื้อสด 3 ชิ้นมาให้พวกเขาได้ไหม?" },
+      { t: "dialogue", speaker: "หัวหน้าหงเทียน", text: "เด็กยาจกในพรรคหิวโหย... เรามีน้อยเกินไป" },
+      { t: "dialogue", speaker: "หัวหน้าหงเทียน", text: "นำเนื้อสด 3 ชิ้นมาให้พวกเขาได้ไหม?" },
     ],
     choices: [
       { text: "รับภารกิจ", next: "sect_beggars" },
@@ -167,7 +167,7 @@ export const SCENES_BEGGARS: readonly Scene[] = [
     id: "qs_qst_beggars_hungry_complete",
     lines: [
       { t: "narration", text: "หัวหน้าหงเทียนรับเนื้อสดด้วยรอยยิ้มอบอุ่น" },
-      { t: "dialogue", speaker: "หงเทียน", text: "ขอบคุณ... เด็ก ๆ จะได้กินวันนี้ จิตใจเจ้าดีมาก" },
+      { t: "dialogue", speaker: "หัวหน้าหงเทียน", text: "ขอบคุณ... เด็ก ๆ จะได้กินวันนี้ จิตใจเจ้าดีมาก" },
     ],
     choices: [
       { text: "รับรางวัล", next: "sect_beggars" },
