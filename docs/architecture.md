@@ -100,7 +100,7 @@ Two deliberate exceptions reach up into stores:
 **`lib/world/` — story** (details in [world-engine.md](world-engine.md) and [liveness.md](liveness.md)):
 
 - **Types:** `types.ts` holds the scene union, `SceneEffect` (26 kinds), `Condition` (26 kinds), quests, items, NPCs, opponents and `WorldStateData`.
-- **Rules:** `effects.ts` (the effect dispatcher, quest progress and rewards, walk-tick encounters), `conditions.ts`, `validate.ts` (save repair).
+- **Rules:** `effects.ts` (the effect dispatcher, quest progress and rewards), `encounters.ts` (walk-tick encounters), `conditions.ts`, `validate.ts` (save repair).
 - **Systems:** `quest-objectives.ts` and `quest-guide.ts`; `law.ts`, `bad-actions.ts`, `stat-progression.ts`, `location-categories.ts`; `npc-tick.ts` and `rumor-engine.ts`.
 - **Seam to battle:** `battle-looks.ts` and `battle-bridge.ts`.
 - **Content:** everything in `data/` ([content-authoring.md](content-authoring.md)).
@@ -119,6 +119,22 @@ Both engines are plain functions over plain data. World functions take the state
 | `store/confirm-store.ts` | no | one themed confirm | `await confirmDialog({...})` |
 
 Save format, migration and repair are in [save-format.md](save-format.md).
+
+**World-store layout.** `store/world-store.ts` only assembles the store; the code lives in `store/world/`:
+
+| File | Holds |
+| --- | --- |
+| `types.ts` | `WorldStore` (state + every action's signature), the action result types, `WorldSet` / `WorldGet` |
+| `state.ts` | `emptyData`, the starter build, `draftFrom`, `appendActionLog` |
+| `rules.ts` | tuning constants (time and stamina costs, xp rates, rest prices) |
+| `progression.ts` | stat / skill / art xp and level-ups, the resigned-sect freeze, meridian points |
+| `lifecycle.ts` | `advanceTime`, death and waking at home, killings, `withChargesOfDead`, tournament bouts |
+| `navigation.ts` | travel costs, the jail lock, `takeChoice`, `followAutoAdvance` |
+| `spoils.ts` | victory spoils (rolled once per battle), loot and resource yields |
+| `persist.ts` | `partializeSave`, `migrateSave`, `mergeSave` |
+| `actions/<slice>.ts` | the actions, one cohesive slice per file (`game`, `sects`, `travel`, `letters`, `tournament`, `battle`, `encounters`, `life`, `training`, `shops`, `law`, `npcs`, `quests`); each is `(set, get) => Pick<WorldStore, …>` and is spread into the store |
+
+A new action goes in its slice (and its signature in `types.ts`); `useWorldStore` and every action name stay the public API, and `store/world-store.ts` re-exports the constants and result types the UI imports.
 
 **World-store patterns:**
 
@@ -186,8 +202,8 @@ Details: [rendering.md](rendering.md) and [grid-combat.md](grid-combat.md#render
   - scenes switch on `kind`;
   - slot strings are a bare skill id or `art:<id>` (`parseSlotId`).
 - **Exhaustiveness.** New variants need a case in every dispatcher.
-  - Combat effect dispatchers enforce it through TypeScript.
-  - The world `applyEffect` switch does **not**: a missing case compiles and silently does nothing.
+  - The combat effect dispatchers, the world `applyEffect` switch and the quest-reward dispatcher end in a `never` guard, so a missing case is a type error.
+  - `evaluateCondition` returns a value from every case, so TypeScript flags a missing one too.
 - **Data field names.**
   - Combat tables use short names (`n`, `sc`, `ti`, `bp`, `st`, `se`, `ee`), matching `demo.html`.
   - World tables use readable names.

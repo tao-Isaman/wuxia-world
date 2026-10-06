@@ -106,8 +106,19 @@ function neighbours(locationId: string): string[] {
   return out;
 }
 
-/** Breadth-first predecessor map from `from` over the whole world. */
-function walkFrom(from: string): Map<string, string> {
+/**
+ * Breadth-first predecessor map from `from` over the whole world. The road
+ * graph is static content, so each origin's map is built once and shared
+ * (read-only: callers only walk it with pathIn).
+ */
+const walks = new Map<string, ReadonlyMap<string, string>>();
+function walkFrom(from: string): ReadonlyMap<string, string> {
+  let previous = walks.get(from);
+  if (!previous) { previous = searchFrom(from); walks.set(from, previous); }
+  return previous;
+}
+
+function searchFrom(from: string): Map<string, string> {
   const previous = new Map<string, string>([[from, from]]);
   const queue = [from];
   while (queue.length) {
@@ -121,7 +132,7 @@ function walkFrom(from: string): Map<string, string> {
   return previous;
 }
 
-function pathIn(previous: Map<string, string>, from: string, to: string): string[] | null {
+function pathIn(previous: ReadonlyMap<string, string>, from: string, to: string): string[] | null {
   if (!previous.has(to)) return null;
   const path = [to];
   while (path[0] !== from) path.unshift(previous.get(path[0])!);
@@ -251,7 +262,7 @@ function unmetLeaf(state: WorldStateData, c: Condition, quest: QuestDef): Condit
 
 type Target = Omit<QuestGuide, "questId" | "questName" | "stageIndex" | "stageCount" | "stageText" | "path" | "locationName"> & { path?: string[] };
 
-function nearest(sources: Source[], here: string | null, previous: Map<string, string> | null): { source: Source; path: string[] } | null {
+function nearest(sources: Source[], here: string | null, previous: ReadonlyMap<string, string> | null): { source: Source; path: string[] } | null {
   let best: { source: Source; path: string[]; score: number } | null = null;
   for (const source of sources) {
     const path = here && previous ? (source.locationId === here ? [here] : pathIn(previous, here, source.locationId)) : null;
@@ -261,7 +272,7 @@ function nearest(sources: Source[], here: string | null, previous: Map<string, s
   return best;
 }
 
-function npcTarget(state: WorldStateData, npc: NpcDef, action: string, here: string | null, previous: Map<string, string> | null): Target {
+function npcTarget(state: WorldStateData, npc: NpcDef, action: string, here: string | null, previous: ReadonlyMap<string, string> | null): Target {
   // Where they stand now: a travelling person's road, a resident's home.
   const places = npcPlaces(state, npc);
   const pick = nearest(places.map((locationId) => ({ locationId, kind: "shop" as const, cost: 0 })), here, previous);

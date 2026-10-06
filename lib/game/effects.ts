@@ -179,6 +179,12 @@ export function applySelfEffect(
       addBuff(state, side, { t: "buff_eva", n: "ดาวคล้อย", v: eff.ev, u: eff.u });
       logLine(state, "lS", `&nbsp;⟳ ${nm}: สะท้อน${eff.rv}% + Eva+${eff.ev}(${eff.u}ตา)`);
       return;
+
+    default: {
+      // Every kind needs a case above: a new variant without one is a type error.
+      const unhandled: never = eff;
+      void unhandled;
+    }
   }
 }
 
@@ -268,6 +274,12 @@ export function applyEnemyEffect(
       logLine(state, "lS", `&nbsp;✗ ${dnm}: ${removed ? `สลาย[${removed.n ?? "บัฟ"}]` : ""} Acc${eff.acc}(${eff.u}ตา)`);
       return;
     }
+
+    default: {
+      // Every kind needs a case above: a new variant without one is a type error.
+      const unhandled: never = eff;
+      void unhandled;
+    }
   }
 }
 
@@ -345,6 +357,12 @@ function applyPassiveEffect(
     case "mult_atk":
       // Handled inline in damage calc (taiji/scholar branches).
       return;
+
+    default: {
+      // Every kind needs a case above: a new variant without one is a type error.
+      const unhandled: never = e;
+      void unhandled;
+    }
   }
 }
 

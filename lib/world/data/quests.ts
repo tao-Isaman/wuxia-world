@@ -106,24 +106,32 @@ export function getQuest(id: string | null | undefined): QuestDef | null {
   return QUESTS_BY_ID.get(id) ?? null;
 }
 
+// Quests by the person who gives them and the person who takes them in
+// (both, when they differ), and by sect — in QUESTS order, built once. The
+// map view asks for every person on the map on every render.
+type QuestIndexKey = string | null | undefined;
+const QUESTS_BY_NPC = new Map<QuestIndexKey, QuestDef[]>();
+const QUESTS_BY_SECT = new Map<QuestIndexKey, QuestDef[]>();
+function indexQuest(index: Map<QuestIndexKey, QuestDef[]>, key: QuestIndexKey, q: QuestDef): void {
+  const list = index.get(key);
+  if (list) list.push(q); else index.set(key, [q]);
+}
+for (const q of QUESTS) {
+  indexQuest(QUESTS_BY_NPC, q.giverNpcId, q);
+  if (q.turnInNpcId !== q.giverNpcId) indexQuest(QUESTS_BY_NPC, q.turnInNpcId, q);
+  indexQuest(QUESTS_BY_SECT, q.sectId, q);
+}
+
 // All quests an NPC can offer or turn in. Used by the NPC popup to render
-// quest buttons. Filters by `giverNpcId` (offers) and `turnInNpcId` (or
-// giverNpcId when turn-in falls back to the giver). Cheap because the
-// QUESTS table stays small (single-digit hundreds at most).
+// quest buttons. Matches `giverNpcId` (offers) or `turnInNpcId`. Returns a
+// fresh array the caller may change.
 export function getQuestsForNpc(npcId: string): QuestDef[] {
-  const out: QuestDef[] = [];
-  for (const q of QUESTS) {
-    if (q.giverNpcId === npcId) out.push(q);
-    else if (q.turnInNpcId === npcId) out.push(q);
-  }
-  return out;
+  return QUESTS_BY_NPC.get(npcId)?.slice() ?? [];
 }
 
 // All quests tagged with a sect id. Used by the sect popup to enumerate
 // repeatable + art quests. Does NOT include the gateway intro quest (which
 // has no sectId — it's a one-shot side quest in the NPC popup).
 export function getQuestsForSect(sectId: string): QuestDef[] {
-  const out: QuestDef[] = [];
-  for (const q of QUESTS) if (q.sectId === sectId) out.push(q);
-  return out;
+  return QUESTS_BY_SECT.get(sectId)?.slice() ?? [];
 }

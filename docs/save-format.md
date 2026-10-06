@@ -20,7 +20,7 @@ The game keeps everything in the browser's `localStorage` through Zustand's `per
 
 | Key | Holds | Version |
 | --- | --- | --- |
-| `localStorage["wusia-world-v1"]` | the world game (`store/world-store.ts`) | **24** |
+| `localStorage["wusia-world-v1"]` | the world game (`store/world-store.ts`) | **25** |
 | `localStorage["wusia-character-v1"]` | the two /debug builds (`store/character-store.ts`) | **3** |
 | `localStorage["wuxia-audio-v1"]` | sound switches and volumes (`lib/audio/engine.ts`) | — |
 | `localStorage["wuxia-random-events"] = "off"` | turns walk-tick encounters off (tests) | — |
@@ -84,7 +84,7 @@ This is Zustand 5 `persist` over synchronous `localStorage`, so it all happens w
 
 ## Migration
 
-`migrate` in `store/world-store.ts` is **one idempotent normalizer**; it ignores `fromVersion`. It works on any older save:
+`migrate` (`migrateSave` in `store/world/persist.ts`) is **one idempotent normalizer**; it ignores `fromVersion`. It works on any older save:
 
 - **The build.**
   - pads `skillIds` to 10 slots;
@@ -234,10 +234,12 @@ Its `migrate` fills a missing side with a default build (ยุนม่อ / �
 
 When you add or change a persisted field:
 
-1. Add it to `WorldStateData` in `lib/world/types.ts` and to `emptyData()` in `store/world-store.ts`.
-2. Add it to `partialize` in the persist options (the list is explicit).
-3. Give it a default in `migrate`, so older saves get a valid value.
-4. Bump `version`, and extend the comment above `migrate`.
+1. Add it to `WorldStateData` in `lib/world/types.ts` and to `emptyData()` in `store/world/state.ts`.
+2. Add it to `partializeSave` in `store/world/persist.ts` (the list is explicit; it is typed `WorldStateData`, so a forgotten field fails `bun run typecheck`).
+3. Give it a default in `migrateSave` (same file), so older saves get a valid value.
+4. Bump `version` in `store/world-store.ts`, and extend the comment above `migrateSave`.
+
+   If `draftFrom` (`store/world/state.ts`) should copy it per action, add it there too.
 5. If it holds content ids, clean them in `validateAndRepair`.
 6. Update the version and history in this page and the version in `CLAUDE.md`.
 7. Update the e2e test that loads an older save (`tests/browser/game.spec.ts`, "version 18 saves migrate…") to expect the new version.
