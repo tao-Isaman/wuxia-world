@@ -40,7 +40,8 @@ The original requirement and plan are kept as history: [specs/liveness-spec.md](
 | `lib/world/data/lore-rumors.ts` | `LORE_RUMORS` — 30 hand-written rumors |
 | `lib/world/data/opponents.ts` | `npcFoeId` / `parseNpcFoeId` — `npc@<id>@<power>@<sect>` opponents made from a person |
 | `lib/world/npc-presence.ts` | `npcPresent` — the dead, the killed and the kidnapped are not on any map |
-| `store/world-store.ts` | `advanceTime` runs the tick; `withChargesOfDead`; `startSparWith`, `startKillDuel`, `heroKills`; the player-echo call sites |
+| `store/world/lifecycle.ts` | `advanceTime` runs the tick; `withChargesOfDead`; `heroKills` |
+| `store/world/actions/` | `startSparWith`, `startKillDuel` (`npcs.ts`); the player-echo call sites (`sects.ts`, `battle.ts`, and `heroKills` in `lifecycle.ts`) |
 | `components/world/popups/npc-interaction-popup.tsx` | the NPC card: title, journey and family, ขอประลอง, ⚔ สังหาร |
 | `components/world/location-map.tsx`, `location-view.tsx` | people on the map: residents at their spots, heirs in the old seat, travellers near the way in |
 | `components/world/popups/rumor-popup.tsx`, `rumor-listen-button.tsx`, `rumor-banner.tsx` | hearing rumors |

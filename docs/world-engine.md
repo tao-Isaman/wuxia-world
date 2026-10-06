@@ -62,7 +62,7 @@ Not in the barrel (import by path): `rollWalkEvent`, `rollFoeSpawn`, `releaseFro
 
 ### How the store moves between scenes
 
-`store/world-store.ts`:
+`store/world/navigation.ts` (used by the travel actions in `store/world/actions/travel.ts`):
 
 - **`followAutoAdvance`** runs after every scene change (up to 32 hops). On a location it records the visit (`visitedLocationIds`), sets `lastLocationId`, ticks quest progress and stops. It stops at a route, at a dialog with choices, or at a terminal dialog. **A dialog with `next` and no choices jumps straight to `next` without showing its lines** — for "narration, then continue", give the dialog one choice (`{ text: "ก้าวต่อไป", next: "…" }`).
 - **Terminal dialogs** (no choices, no `next`) show a "ปิด" button that returns to `lastLocationId` for free (`exitToLocation`).
@@ -245,7 +245,7 @@ When the current stage of an active quest is a top-level `defeatedOpponent` (`co
 
 ## Law and jail
 
-`lib/world/law.ts`, `lib/world/data/activities.ts`, and the jail actions in `store/world-store.ts`.
+`lib/world/law.ts`, `lib/world/data/activities.ts`, and the jail actions in the world store (`surrender` and `serveSentence` in `store/world/actions/law.ts`, the jail activities in `doActivity`, `store/world/actions/life.ts`).
 
 - **Wanted marks** (หมายจับ, no ceiling since v25): +1 failed steal, +2 jail escape, +2 failed attempt on a life, +5 (`KILL_MARKS`) a killing. One mark fades every 10 quiet days (`WANTED_DECAY_DAYS`). `WANTED_MAX` (5) is only how many seals the HUD draws before it shows `×N`.
 - **Escapes** (`lawEvasions`, saved, v25): +1 for fleeing a law encounter, escaping or winning a law fight, a bribe, a jail break; reset to 0 by `imprison`.

@@ -120,6 +120,22 @@ Both engines are plain functions over plain data. World functions take the state
 
 Save format, migration and repair are in [save-format.md](save-format.md).
 
+**World-store layout.** `store/world-store.ts` only assembles the store; the code lives in `store/world/`:
+
+| File | Holds |
+| --- | --- |
+| `types.ts` | `WorldStore` (state + every action's signature), the action result types, `WorldSet` / `WorldGet` |
+| `state.ts` | `emptyData`, the starter build, `draftFrom`, `appendActionLog` |
+| `rules.ts` | tuning constants (time and stamina costs, xp rates, rest prices) |
+| `progression.ts` | stat / skill / art xp and level-ups, the resigned-sect freeze, meridian points |
+| `lifecycle.ts` | `advanceTime`, death and waking at home, killings, `withChargesOfDead`, tournament bouts |
+| `navigation.ts` | travel costs, the jail lock, `takeChoice`, `followAutoAdvance` |
+| `spoils.ts` | victory spoils (rolled once per battle), loot and resource yields |
+| `persist.ts` | `partializeSave`, `migrateSave`, `mergeSave` |
+| `actions/<slice>.ts` | the actions, one cohesive slice per file (`game`, `sects`, `travel`, `letters`, `tournament`, `battle`, `encounters`, `life`, `training`, `shops`, `law`, `npcs`, `quests`); each is `(set, get) => Pick<WorldStore, …>` and is spread into the store |
+
+A new action goes in its slice (and its signature in `types.ts`); `useWorldStore` and every action name stay the public API, and `store/world-store.ts` re-exports the constants and result types the UI imports.
+
 **World-store patterns:**
 
 - **Draft and set.** Most actions build `draftFrom(get())`, mutate the draft through engine functions, then `set({ ...draft })`.

@@ -93,7 +93,7 @@ A new world hero starts with every stat at 1 and a flat `baseHp` of 100 (so 136 
 
 1. derives from `combinedStats`;
 2. adds art HP / MP: `floor(hL × level × conflict)` and `floor(mL × level × conflict)` for the active art and each learned art;
-3. adds the build's flat `baseHp` to HP (the world hero carries `HERO_BASE_HP` = 100 from `store/world-store.ts`; foes and /debug builds have none);
+3. adds the build's flat `baseHp` to HP (the world hero carries `HERO_BASE_HP` = 100 from `store/world-store.ts`, defined in `store/world/state.ts`; foes and /debug builds have none);
 4. adds equipment and meridian combat fields directly to the derived values (`getBuildBonus` = `getEquipBonus` + the meridian `combat` bonus): `Atk += atkb`, `PD += pdb`, `ID += idb`, `HP += hpb`, `MP += mpb`, `PA += pab`, `IA += iab`, `Spd += spdb`, `Acc += accb`, `Res += resb`, `Cri += crib + flat_cri`, `Eva += evab + flat_eva`.
 
 `pct_atk`, `pct_reduce` / `pct_red` and `hp_regen` (equipment and meridians) are not folded into `Derived`; the battle reads them from `ctx.equipBonus`, which `makeContext` fills with `getBuildBonus(build)` — so 1v1, grid duels (`pairContext`) and the grid AI's damage estimate all see meridians.

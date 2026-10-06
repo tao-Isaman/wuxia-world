@@ -37,7 +37,7 @@ The damage and effect numbers are not re-implemented here: each cast runs the or
 | | `lib/game/combat-actions.ts` | `fleeChance` |
 | Store | `store/battle-store.ts` | the live battle (Zustand, not persisted) |
 | World seam | `lib/world/battle-bridge.ts`, `lib/world/battle-looks.ts` | start battles from `pendingBattle`; unit looks and packs |
-| | `store/world-store.ts` → `acknowledgeBattleResult` | costs, rewards, escapes, defeats |
+| | `store/world/actions/battle.ts` → `acknowledgeBattleResult` | costs, rewards, escapes, defeats |
 | Renderer | `lib/stage/grid-battle-runtime.ts` | Phaser board, event playback, AI pacing, pointer input |
 | | `lib/stage/cast-vfx.ts`, `lib/stage/battle-vfx.ts`, `lib/audio/cast-sfx.ts` | cast effects and sounds |
 | | `lib/stage/battle-background.ts` | background choice |
