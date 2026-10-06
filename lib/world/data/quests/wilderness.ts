@@ -20,7 +20,14 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
       {
         id: "collect",
         description: "หาแผ่นตำรา 3 ชิ้นบนเกาะดอกท้อ (พบได้ตามต้นท้อและชายหาด)",
-        autoAdvance: { t: "hasItem", itemId: "book_advanced", count: 1 },
+        // Three 🔍 spots on the island; the pages are found, not bought.
+        objective: {
+          spots: [
+            { locationId: "isle_taohua", label: "ค้นใต้ดงต้นท้อ", text: "ใต้กองกลีบท้อที่ร่วงหลังพายุ มีแผ่นตำรากระบี่แผ่นแรกติดอยู่กับรากไม้" },
+            { locationId: "isle_taohua", label: "ค้นตามชายหาด", text: "คลื่นซัดแผ่นตำราแผ่นที่สองมาติดโขดหินริมหาด หมึกยังพออ่านออก" },
+            { locationId: "isle_taohua", label: "ค้นโขดหินริมทะเล", text: "แผ่นสุดท้ายถูกลมพัดไปติดซอกหิน — ครบสามแผ่นแล้ว นำกลับไปคืนปรมาจารย์" },
+          ],
+        },
       },
       { id: "return", description: "คืนตำราให้หวงชิงเฉวียน" },
     ],

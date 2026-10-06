@@ -3,6 +3,9 @@
 // ฉางอัน at its "observe" stage. Run: bun scripts/test-quest-guide.ts
 import assert from "node:assert/strict";
 import { QUESTS } from "../lib/world/data/quests";
+import { itemSources } from "../lib/world/quest-guide";
+import { SCENES } from "../lib/world/data/scenes";
+import { RECIPES } from "../lib/world/data/recipes";
 import { TRACK_NONE, activeGuide, getScene, guideForQuest, guideMarkerId, objectiveMarkerId, routeBackTarget, trackedQuestId, type QuestGuide, type RouteScene } from "../lib/world";
 
 const { useWorldStore } = await import("../store/world-store");
@@ -92,6 +95,34 @@ check("kill stages point to where the foe roams or is hunted", () => {
   const guide = guideForQuest(store(), quest.id)!;
   assert.ok(guide.kind === "hunt" || guide.kind === "wander", `${quest.id}: ${guide.kind}`);
   assert.ok(guide.locationId);
+});
+
+check("every item a quest stage waits for can be bought, gathered or looted (or crafted / handed over; else the stage needs 🔍 spots)", () => {
+  const hasItemIn = (c: unknown): string[] => {
+    const x = c as { t?: string; itemId?: string; all?: unknown[]; any?: unknown[] } | undefined;
+    if (!x) return [];
+    if (x.t === "hasItem" && x.itemId) return [x.itemId];
+    return [...(x.all ?? []), ...(x.any ?? [])].flatMap(hasItemIn);
+  };
+  // Letters and tokens someone hands over in a conversation count as sourced.
+  const handedOver = new Set(SCENES.flatMap((scene) => JSON.stringify(scene).match(/"t":"giveItem","itemId":"[a-z0-9_]+"/g) ?? [])
+    .map((m) => m.split('"itemId":"')[1].slice(0, -1)));
+  for (const recipe of RECIPES) handedOver.add(recipe.output.itemId); // crafted
+  const sourceless: string[] = [];
+  for (const quest of QUESTS) quest.stages.forEach((stage, index) => {
+    if (stage.objective) return;
+    for (const itemId of hasItemIn(stage.autoAdvance)) if (!itemSources(itemId).length && !handedOver.has(itemId)) sourceless.push(`${quest.id}#${index} ${itemId}`);
+  });
+  assert.deepEqual(sourceless, [], "items with no world source");
+});
+
+check("แผ่นตำราหายของปรมาจารย์: the pages are three 🔍 spots on เกาะดอกท้อ, and the guide leads there", () => {
+  fresh({ qw_taohua_codex_fragments: 0 }, "isle_taohua");
+  const guide = guideForQuest(store(), "qw_taohua_codex_fragments")!;
+  assert.equal(guide.locationId, "isle_taohua");
+  assert.equal(guide.progress?.required, 3);
+  for (let i = 0; i < 3; i++) assert.ok(store().doQuestObjective("qw_taohua_codex_fragments", i).ok, `spot ${i}`);
+  assert.equal(store().quests.qw_taohua_codex_fragments.stage, 1, "on to the hand-in");
 });
 
 check("tracking: newest by default, the chosen one when pinned, nothing when cleared", () => {

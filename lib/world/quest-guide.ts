@@ -200,7 +200,7 @@ function opponentSources(opponentId: string): Source[] {
 }
 
 /** Places to get an item: shops, gathering nodes, then foes that drop it. */
-function itemSources(itemId: string): Source[] {
+export function itemSources(itemId: string): Source[] {
   const key = "item:" + itemId;
   const cached = sourceCache.get(key);
   if (cached) return cached;

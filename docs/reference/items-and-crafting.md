@@ -548,7 +548,7 @@
 
 | Location | Shop | Items for sale | Buys | Sell-back |
 | --- | --- | --- | --- | --- |
-| นครหลวง (`city_capital`) | 🏪 ตลาดนครหลวง | 23 | everything | ×0.5 |
+| นครหลวง (`city_capital`) | 🏪 ตลาดนครหลวง | 25 | everything | ×0.5 |
 | ซีเซี่ย (`city_xixia`) | 🏪 ตลาดซีเซี่ย | 23 | everything | ×0.5 |
 | ต้าหลี่ (`city_dali`) | 🏪 ตลาดต้าหลี่ | 23 | everything | ×0.5 |
 | หยางโจว (`city_yangzhou`) | 🏪 ตลาดหยางโจว | 23 | everything | ×0.5 |

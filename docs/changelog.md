@@ -6,6 +6,12 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-06
 
+### Quests whose item had nowhere to come from
+
+- แผ่นตำราหายของปรมาจารย์ (เกาะดอกท้อ) waited for a ตำราขั้นสูง that only another quest rewards, while telling the hero to search the island. The three pages are now 🔍 spots on เกาะดอกท้อ (ดงต้นท้อ, ชายหาด, โขดหิน); the guide arrow leads there and counts 0/3.
+- ตลาดนครหลวง now sells ตำราขั้นสูง and ตำราเพลงขั้นกลาง, the two other quest items nothing sold (หมอหลิน's formula, เหลียงอิ้นกง's score).
+- `test-quest-guide.ts` now fails on any quest item with no world source.
+
 ### Item windows in the bag and the shop
 
 - The ✕ on the bag's item window works again: the item name's colour filter painted over it, so taps hit the name.
