@@ -1,5 +1,6 @@
 "use client";
 
+import { DEATH_REVIVE_FRACTION, DEATH_REVIVE_PLACE, applyDeathPenalty, describeDeathPenalty, rollDeathPenalty } from "@/lib/world/death";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { CharacterBuild, EquipSlotType, StatKey } from "@/lib/game";
@@ -118,6 +119,29 @@ const STARTER_BUILD = (): CharacterBuild => ({
 });
 
 const STARTER_STAMINA = 100;
+
+/**
+ * A fallen hero is carried home: pay the price of death (half the gold, some
+ * items), lose a day, wake at home with 30 % HP / MP. Returns the report lines.
+ */
+function reviveFromDeath(draft: WorldStateData, rng: () => number = Math.random): string[] {
+  const penalty = rollDeathPenalty(draft, rng);
+  applyDeathPenalty(draft, penalty);
+  const lines = describeDeathPenalty(penalty);
+  draft.gameOver = false;
+  draft.pendingBattle = null;
+  draft.pendingEncounter = null;
+  draft.pendingSpar = null;
+  draft.pendingHuntYield = null;
+  advanceTime(draft, HOURS_PER_DAY);
+  const d = draft.playerBuild ? deriveAll(draft.playerBuild) : null;
+  draft.currentHp = Math.max(1, Math.floor((d?.HP ?? 1) * DEATH_REVIVE_FRACTION));
+  draft.currentMp = Math.max(0, Math.floor((d?.MP ?? 0) * DEATH_REVIVE_FRACTION));
+  draft.currentSceneId = DEATH_REVIVE_PLACE;
+  draft.lastLocationId = DEATH_REVIVE_PLACE;
+  appendActionLog(draft, "battle", `ล้มลงในการต่อสู้ — ฟื้นขึ้นที่บ้านในวันรุ่งขึ้น · ${lines.join(" · ")}`);
+  return lines;
+}
 const HUNT_XP_MULT = 8;                 // hunting xp = 8 * resourceLevel (combat is risky)
 const GATHER_XP_MULT = 5;               // non-combat xp = 5 * resourceLevel
 const CRAFT_XP_MULT = 5;                // craft xp = 5 * recipe.requiredMastery
@@ -521,6 +545,10 @@ interface WorldStore extends WorldStateData {
   // saved, so a reload clears them. Touching one opens its encounter.
   roamingFoes: RoamingFoe[];
   engageFoe: (foeId: string) => void;
+  // The last death's price (lib/world/death.ts), shown once on waking at home;
+  // not saved (the action log keeps it).
+  lastDeath: { lines: string[] } | null;
+  dismissDeath: () => void;
   // Map activities (see lib/world/data/activities.ts) — the jail's labour,
   // dice, meditation, gate and escape. Returns a message for the toast.
   doActivity: (id: string) => ActivityResult;
@@ -1520,8 +1548,10 @@ export const useWorldStore = create<WorldStore>()(
             get().gotoScene(pb.onLose);
             return;
           }
-          draft.gameOver = true;
-          set({ ...draft });
+          // A fatal loss is not the end: the hero wakes at home a day later,
+          // poorer (lib/world/death.ts).
+          const lines = reviveFromDeath(draft);
+          set({ ...draft, roamingFoes: [], lastDeath: { lines } });
           useBattleStore.getState().reset();
           return;
         }
@@ -2620,6 +2650,8 @@ export const useWorldStore = create<WorldStore>()(
       },
 
       roamingFoes: [],
+      lastDeath: null,
+      dismissDeath: () => set({ lastDeath: null }),
       engageFoe: (foeId) => {
         const s = get();
         const foe = s.roamingFoes.find((f) => f.id === foeId);
@@ -3141,6 +3173,8 @@ export const useWorldStore = create<WorldStore>()(
       merge: (persisted, current) => {
         const merged = { ...current, ...(persisted as Partial<WorldStateData>) };
         if (merged.hasGame) seedLoreRumors(merged);
+        // Saves from when death ended the game: the hero wakes at home instead.
+        if (merged.hasGame && merged.gameOver) merged.lastDeath = { lines: reviveFromDeath(merged) };
         if (merged.playerBuild && merged.playerBuild.baseHp === undefined) {
           merged.playerBuild = { ...merged.playerBuild, baseHp: HERO_BASE_HP };
           if (typeof merged.currentHp === "number") merged.currentHp += HERO_BASE_HP;
@@ -3401,6 +3435,9 @@ export const useWorldStore = create<WorldStore>()(
       },
       onRehydrateStorage: () => (state) => {
         if (state) validateAndRepair(state);
+        // A save revived from the old game over (merge) is written back at
+        // once, so a reload cannot charge the death a second time.
+        if (state?.lastDeath) queueMicrotask(() => useWorldStore.setState({}));
       },
     },
   ),

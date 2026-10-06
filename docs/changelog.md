@@ -4,6 +4,12 @@ What changed, when, and in which pull request. Newest first. Each entry says wha
 
 Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-Isaman/wuxia-world/pulls?q=is%3Apr+is%3Amerged). The waves are the build → test → review rounds the agents worked in (see [HANDOFF.md](../HANDOFF.md)).
 
+## 2026-10-06
+
+### Falling is not the end
+
+- **No more game over.** Losing a fatal fight (roaming foes, hunting, sect hunters, failed assassinations and kidnappings) knocks the hero out: they wake at home a day later with 30 % HP / MP, having lost **half their gold** and **half the stack of 1–3 random carried item kinds**. Quest items, move scrolls, manuals, books and worn equipment are never lost. A ฟื้นคืนสติ window lists the losses (also in the บันทึก log). Saves that ended on the old game-over screen wake the same way on load.
+
 ## 2026-10-05
 
 ### The painted capital is back while the placed one is finished

@@ -338,7 +338,7 @@ check("win: HP carryover, kill counts for the foe and its pack, rewards, battle 
   assert.equal(bs().state, null);
 });
 
-check("loss: fatal → game over at 0 HP; non-fatal → 1 HP and onLose", () => {
+check("loss: fatal → wake at home with a penalty; non-fatal → 1 HP and onLose", () => {
   for (const nonFatal of [false, true]) {
     newGame({ currentHp: 5 });
     fight("law_bounty_hunter", { nonFatal });
@@ -350,8 +350,12 @@ check("loss: fatal → game over at 0 HP; non-fatal → 1 HP and onLose", () => 
     useWorldStore.getState().acknowledgeBattleResult();
     const w = useWorldStore.getState();
     assert.equal(w.pendingBattle, null);
-    assert.equal(w.gameOver, !nonFatal);
-    assert.equal(w.currentHp, nonFatal ? 1 : 0);
+    assert.equal(w.gameOver, false);
+    if (nonFatal) assert.equal(w.currentHp, 1);
+    else {
+      assert.equal(w.currentSceneId, "home_player", "a fatal loss wakes at home");
+      assert.ok(w.currentHp > 1 && w.lastDeath, "with 30 % HP and a death report");
+    }
     assert.equal(w.defeatedCounts.law_bounty_hunter ?? 0, 0);
     assert.equal(bs().state, null);
   }
