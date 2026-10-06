@@ -166,14 +166,14 @@ test("first errand leads to safe training, recovery, and an earned skill upgrade
   await page.getByRole("navigation", { name: "เมนูเกม" }).getByRole("button", { name: "วิชา", exact: true }).click();
   // The w-exp top-up costs what the punch still lacks to reach level 2 (50 XP).
   const upgradeCost = 50 - trained.skillExp.basic_punch;
-  const upgrade = page.getByRole("button", { name: `เร่งด้วย w-exp (${upgradeCost})`, exact: true });
+  const upgrade = page.getByRole("button", { name: `เลื่อนระดับ (ใช้ประสบการณ์ยุทธ ${upgradeCost})`, exact: true });
   await expect(upgrade).toBeEnabled();
   await upgrade.click();
   await expect.poll(async () => (await state(page)).skillLevel.basic_punch).toBe(2);
   expect((await state(page)).wExp).toBe(70 - upgradeCost);
   const payoff = page.getByRole("region", { name: "เลื่อนขั้น หมัดตรง สำเร็จ" });
   await expect(payoff).toBeVisible();
-  await expect(payoff).toContainText("พลังท่า (BP)");
+  await expect(payoff).toContainText("พลังโจมตีพื้นฐาน");
   await expect(payoff).toContainText("14");
   await payoff.getByRole("button", { name: "รับทราบ", exact: true }).click();
   await expect(payoff).toHaveCount(0);

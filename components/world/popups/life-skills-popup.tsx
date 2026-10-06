@@ -75,7 +75,7 @@ function SkillTile({ skill, xp }: { skill: LifeSkill; xp: number }) {
   const pct = need === 0 ? 100 : (cur / need) * 100;
   const atCap = lvl >= MAX_MASTERY;
   return (
-    <div className="life-tile" data-life-skill={skill} title={atCap ? "ถึงระดับสูงสุดแล้ว" : `xp ${xp} · อีก ${Math.max(0, need - cur)} เพื่อระดับถัดไป`}>
+    <div className="life-tile" data-life-skill={skill} title={atCap ? "ถึงระดับสูงสุดแล้ว" : `ค่าประสบการณ์ ${xp} · อีก ${Math.max(0, need - cur)} เพื่อระดับถัดไป`}>
       <div className="life-tile-head">
         <span className="life-tile-icon" aria-hidden="true">{LIFE_SKILL_ICON[skill]}</span>
         <strong>{LIFE_SKILL_LABEL[skill]}</strong>

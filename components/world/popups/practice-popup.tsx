@@ -195,7 +195,7 @@ export function PracticePopup({ open, scene, onClose }: Props) {
                     />
                   </div>
                   <div className="text-[10px] text-muted-foreground">
-                    {maxed ? "ระดับสูงสุดแล้ว" : `xp ${xp}/${cost}`}
+                    {maxed ? "ระดับสูงสุดแล้ว" : `ค่าประสบการณ์ ${xp}/${cost}`}
                   </div>
                 </div>
               );
@@ -268,7 +268,7 @@ export function PracticePopup({ open, scene, onClose }: Props) {
                     />
                   </div>
                   <div className="text-[10px] text-muted-foreground">
-                    {maxed ? "ระดับสูงสุดแล้ว" : `xp ${xp}/${cost}`}
+                    {maxed ? "ระดับสูงสุดแล้ว" : `ค่าประสบการณ์ ${xp}/${cost}`}
                   </div>
                 </div>
               );

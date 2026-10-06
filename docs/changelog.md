@@ -6,6 +6,11 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-06
 
+### The skills window speaks plain Thai
+
+- Moves read as what they do: โจมตีภายนอก / โจมตีภายใน (no more ทางกาย / ทางใน), how many strikes, what happens to you and the foe ("ศัตรู: หลบหลีก −15 นาน 5 ตา") — generated from the data instead of the table's shorthand ("Phy×115%×1.1 · Eva-15 (5ตา)").
+- BP is พลังโจมตีพื้นฐาน (with its level-10 value), xp is ค่าประสบการณ์, w-exp is ประสบการณ์ยุทธ, ×1.1 is ความแรงรวม +10 %, stats are named (เฉียบคม +5, not DEX+5), type tags read สายหยิน·ภายนอก, conflicts read วิชาขัดกัน: สายหยาง เหลือ 50 %. Inner arts' active and passive lines are translated ("เมื่อถูกโจมตี มีโอกาส 25% ที่จะได้ ป้องกัน +10 (5 ตา)"). The upgrade button is เลื่อนระดับ (ใช้ประสบการณ์ยุทธ N).
+
 ### ชุมนุมวิจารณ์กระบี่เขาหัวซาน
 
 - The sword tournament moved from the capital to **Mount Hua** (the Huashan sect's grounds) and is now called **ชุมนุมวิจารณ์กระบี่เขาหัวซาน**. Its champion's epithet is ยอดกระบี่แห่งเขาหัวซาน.

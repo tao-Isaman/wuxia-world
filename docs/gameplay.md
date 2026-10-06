@@ -404,7 +404,9 @@ Mastery levels 1–5 need 0 / 100 / 300 / 700 / 1500 xp.
 
 ### Skills and inner arts
 
-The 🥋 วิชา window: the 10 slots across the top; below, the **library** of everything learned on the left (icon and name, filter ทั้งหมด / ฝีมือ / ในกาย) and the picked move on the right — its numbers and xp, ติดตั้งลงช่อง (the targeted slot if empty, else the first free one, else แทนที่ the targeted slot), ถอดออก, เร่งด้วย w-exp and ลืมวิชา. Tap a slot to target it and show its move.
+The 🥋 วิชา window: the 10 slots across the top; below, the **library** of everything learned on the left (icon and name, filter ทั้งหมด / ฝีมือ / ในกาย) and the picked move on the right — its numbers and ค่าประสบการณ์, ติดตั้งลงช่อง (the targeted slot if empty, else the first free one, else แทนที่ the targeted slot), ถอดออก, เลื่อนระดับ (ใช้ประสบการณ์ยุทธ N) and ลืมวิชา. Tap a slot to target it and show its move.
+
+Everything there is in plain Thai (`lib/game/skill-text.ts`): โจมตีภายนอก / โจมตีภายใน and how many strikes, what the move does to you and to the foe (`describeEffectThai`), พลังโจมตีพื้นฐาน (the base power, with its level-10 value), เสริมพลังท่า / ความเสียหายเพิ่ม / ความแรงรวม for the table's `p` / `f` / `dm`, ความชำนาญ<weapon>, เพิ่มค่าสถานะ by stat name, สาย… for the move's type tags and วิชาขัดกัน (a type kept at N %). Inner arts' active and passive lines are translated from the table's shorthand (`plainThai`).
 
 Move skills (173) and inner arts (111) level from 1 to 10. A move skill's power, its stat bonuses and its weapon mastery grow with level; an art's bonuses scale by level / 10.
 
@@ -433,7 +435,7 @@ Practice:
 
   A skill with no yin / yang / balance tag counts as balance, so it gets the mountain bonus.
 
-**W-exp (悟)** is a shared pool. **เร่งด้วย w-exp** in the วิชา menu buys the rest of the current level with it.
+**W-exp (悟, ประสบการณ์ยุทธ)** is a shared pool. **เลื่อนระดับ (ใช้ประสบการณ์ยุทธ N)** in the วิชา menu buys the rest of the current level with it.
 
 | W-exp source | Amount |
 | --- | --- |
