@@ -304,7 +304,7 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
         description: "ไปตลาดชาวเมี่ยว ให้อาเป้าหัวหน้าเผ่าแปลจารึก",
         objective: {
           spots: [
-            { locationId: "market_miao", label: "ให้หัวหน้าเผ่าอาเป่าแปลจารึก", npcId: "wld_miao_tribaleldr_abao", text: "อาเป่าอ่านจารึกออก: เป็นแผนที่ไปยังบ่อน้ำใต้ดินกลางทะเลทราย" },
+            { locationId: "market_miao", label: "ให้หัวหน้าเผ่าอาเป้าแปลจารึก", npcId: "wld_miao_tribaleldr_abao", text: "อาเป้าอ่านจารึกออก: เป็นแผนที่ไปยังคลังสมบัติโบราณกลางทะเลทรายร้างที่บรรพบุรุษเผ่าเคยเฝ้า — และสมบัตินั้นมีผู้พิทักษ์ กลับไปบอกโม่ฉิงเทียน" },
           ],
         },
       },
