@@ -509,39 +509,36 @@ function driveCurve(): Float32Array<ArrayBuffer> {
 }
 
 /**
- * Chalk on a board while a line types out: short gritty strokes (grains of
- * noise in the 2.5–7 kHz band) at a hand-writing rhythm. Call on every
- * typing tick; it throttles itself, so a line sounds like a hand writing.
+ * A keyboard while a line types out: each keystroke is a sharp click (the
+ * switch, a 2 ms high-passed burst) over a short "thock" (the keycap, band-
+ * passed noise around 400–900 Hz), every key a little different, at a fast
+ * typist's rhythm with now and then a heavier space bar. Call on every typing
+ * tick; it throttles itself.
  */
-let chalkNext = 0;
-export function chalkTick() {
+let keyNext = 0;
+export function keyTick() {
   const bus = sfxBus(); if (!bus || !graph) return;
   const ctx = graph.ctx;
   const t = ctx.currentTime;
-  if (t < chalkNext) return;
-  const len = 0.045 + Math.random() * 0.07;
-  chalkNext = t + len + 0.02 + Math.random() * 0.06;
-  const src = ctx.createBufferSource(); src.buffer = chalkGrain(ctx);
-  src.playbackRate.value = 0.85 + Math.random() * 0.35;
-  const band = ctx.createBiquadFilter(); band.type = "bandpass"; band.Q.value = 1.1;
-  const f = 3200 + Math.random() * 2200;
-  band.frequency.setValueAtTime(f, t); band.frequency.linearRampToValueAtTime(f * (0.8 + Math.random() * 0.4), t + len);
-  const env = envelope(ctx, t, 0.006, 0.16 + Math.random() * 0.08, len * 0.5, len * 0.5);
-  src.connect(band).connect(env); out(env, bus, 0.04);
-  src.start(t, Math.random() * 0.8); src.stop(t + len + 0.03);
-}
-let chalkBuffer: AudioBuffer | null = null;
-/** Noise broken into grains: chalk skipping over the board's grain. */
-function chalkGrain(ctx: Ctx): AudioBuffer {
-  if (chalkBuffer && chalkBuffer.sampleRate === ctx.sampleRate) return chalkBuffer;
-  chalkBuffer = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
-  const data = chalkBuffer.getChannelData(0);
-  let gate = 0;
-  for (let i = 0; i < data.length; i++) {
-    if (i % 48 === 0) gate = Math.random() < 0.55 ? 0.35 + Math.random() * 0.65 : 0.08;
-    data[i] = (Math.random() * 2 - 1) * gate;
-  }
-  return chalkBuffer;
+  if (t < keyNext) return;
+  // ~10–16 keys a second, unevenly, like a hand on the keys.
+  keyNext = t + 0.06 + Math.random() * 0.05;
+  const space = Math.random() < 0.14;
+  const vel = (space ? 0.34 : 0.24) + Math.random() * 0.08;
+  // The switch: a bright click.
+  const click = ctx.createBufferSource(); click.buffer = noise(ctx);
+  const high = ctx.createBiquadFilter(); high.type = "highpass"; high.frequency.value = 3800 + Math.random() * 1500;
+  const clickEnv = envelope(ctx, t, 0.0008, vel * 0.8, 0.001, 0.012);
+  click.connect(high).connect(clickEnv); out(clickEnv, bus, 0.03);
+  click.start(t, Math.random()); click.stop(t + 0.03);
+  // The keycap bottoming out: a short hollow thock (lower and longer for the space bar).
+  const thock = ctx.createBufferSource(); thock.buffer = noise(ctx);
+  const band = ctx.createBiquadFilter(); band.type = "bandpass"; band.Q.value = 2.4;
+  band.frequency.value = space ? 260 + Math.random() * 80 : 420 + Math.random() * 480;
+  const hold = space ? 0.03 : 0.012;
+  const thockEnv = envelope(ctx, t + 0.004, 0.002, vel * 1.6, hold, space ? 0.07 : 0.04);
+  thock.connect(band).connect(thockEnv); out(thockEnv, bus, 0.05);
+  thock.start(t + 0.004, Math.random()); thock.stop(t + 0.15);
 }
 
 /** One instrument note through the effects bus (bells, plucks, gongs as SFX). */
