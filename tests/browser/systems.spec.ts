@@ -64,7 +64,7 @@ test("horse station: ride from the capital to a visited city for gold and time",
 test("sword tournament: register in the window, then the tournament day queues a bout", async ({ page }) => {
   test.setTimeout(120_000);
   await newGame(page);
-  await patch(page, { currentSceneId: "city_capital", lastLocationId: "city_capital", gold: 1000, day: 70 });
+  await patch(page, { currentSceneId: "sect_huashan", lastLocationId: "sect_huashan", gold: 1000, day: 70 });
   await visit(page, "tournament");
   const popup = page.getByTestId("tournament-popup");
   await expect(popup.getByTestId("tournament-calendar")).toContainText("เปิดรับสมัคร");

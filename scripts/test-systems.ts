@@ -10,7 +10,7 @@ import { getItem, getNpc } from "../lib/world/data";
 import { SECT_MEMBERSHIPS } from "../lib/world/data/sect-memberships";
 import { hasStation, stationFare, stationIds, stationTrips } from "../lib/world/stations";
 import {
-  BOUT_GOLD, PLACE_BY_ROUND, PLAYER, TOURNAMENT, boutOdds, currentTournament, dayOfYear, drawEntrants, playerOpponent,
+  BOUT_GOLD, PLACE_BY_ROUND, PLAYER, TOURNAMENT, TOURNAMENT_NAME, boutOdds, sendTournamentInvitation, tournamentHost, currentTournament, dayOfYear, drawEntrants, playerOpponent,
   prizeOptions, registerBlock, resolveRound, roundPairs, settleTournaments, startBlock, tournamentDay, tournamentPhase, yearOf,
 } from "../lib/world/tournament";
 import { namedNpcIds } from "../lib/world/data/named-npcs";
@@ -181,9 +181,13 @@ check("tournament: stronger fighters win simulated bouts more often", () => {
   assert.equal(boutOdds(150, 150), 0.5);
 });
 
-check("tournament: register at the capital in the window, fight round by round, get paid", () => {
+check("tournament: register on Mount Hua in the window, fight round by round, get paid", () => {
   newGame();
+  assert.equal(TOURNAMENT.locationId, "sect_huashan");
+  assert.equal(TOURNAMENT_NAME, "ชุมนุมวิจารณ์กระบี่เขาหัวซาน");
   useWorldStore.setState({ day: 70, gold: 500, currentSceneId: "city_capital" });
+  assert.equal(registerBlock(store()), "elsewhere", "not at the capital any more");
+  useWorldStore.setState({ currentSceneId: "sect_huashan" });
   assert.equal(registerBlock(store()), null);
   assert.ok(store().registerTournament());
   assert.equal(store().gold, 400);
@@ -221,7 +225,7 @@ check("tournament: register at the capital in the window, fight round by round, 
 
 check("tournament: the champion picks one move or art from the entrants and learns it", () => {
   newGame();
-  useWorldStore.setState({ day: 90, gold: 500, currentSceneId: "city_capital" });
+  useWorldStore.setState({ day: 90, gold: 500, currentSceneId: "sect_huashan" });
   store().registerTournament();
   store().fightTournamentBout();
   const rng = seeded(4);
@@ -287,7 +291,7 @@ check("ฉายา: a crown, a price on the head, the top of a sect, then the s
   const top = SECT_MEMBERSHIPS.wudang;
   assert.equal(heroEpithet({ ...base, sectMembership: { wudang: { rank: top.topRank, points: 0, lastQuestDay: {}, artQuestsDone: [], rewardPicks: {}, joinedDay: 0, status: "active" } } } as never), `ประมุขแห่ง${top.name}`);
   assert.equal(heroEpithet({ ...base, wanted: 3, traits: { ...base.traits, good: 90 } }), "ผู้ต้องหาที่ทางการตามล่า");
-  assert.equal(heroEpithet({ ...base, wanted: 5, tournamentHistory: [{ year: 1, champion: PLAYER }] }), "ยอดกระบี่แห่งชุมนุมวิจารณ์กระบี่");
+  assert.equal(heroEpithet({ ...base, wanted: 5, tournamentHistory: [{ year: 1, champion: PLAYER }] }), "ยอดกระบี่แห่งเขาหัวซาน");
 });
 
 check("ฉายา: mixes of traits at 60+ — the widest mix, then the higher total; above wanted and sect rank", () => {
@@ -303,12 +307,35 @@ check("ฉายา: mixes of traits at 60+ — the widest mix, then the higher 
   assert.equal(t({ good: 100, fame: 90, humility: 60 }), "ปรมาจารย์ผู้ค้ำจุนแผ่นดิน");
   assert.equal(t({ good: 100, fame: 90, humility: 59 }), "วีรชนแห่งแผ่นดิน");
   assert.equal(heroEpithet({ ...base, wanted: 4, traits: { ...base.traits, evil: 60, arrogance: 60 } }), "จอมมารโดยเนื้อแท้");
-  assert.equal(heroEpithet({ ...base, tournamentHistory: [{ year: 1, champion: PLAYER }], traits: { ...base.traits, evil: 60, arrogance: 60 } }), "ยอดกระบี่แห่งชุมนุมวิจารณ์กระบี่", "a crown still wins");
+  assert.equal(heroEpithet({ ...base, tournamentHistory: [{ year: 1, champion: PLAYER }], traits: { ...base.traits, evil: 60, arrogance: 60 } }), "ยอดกระบี่แห่งเขาหัวซาน", "a crown still wins");
   // Every mix is a distinct set of traits with its own name.
   const keys = COMBO_EPITHETS.map((c) => [...c.traits].sort().join("+"));
   assert.equal(new Set(keys).size, keys.length);
   assert.equal(new Set(COMBO_EPITHETS.map((c) => c.name)).size, COMBO_EPITHETS.length);
   assert.equal(COMBO_EPITHETS.filter((c) => c.traits.length === 2).length, 10, "every pair of the five traits has a name");
+});
+
+check("tournament: the day registration opens, Huashan's chief sends an invitation with the fee for the road — once a year", () => {
+  newGame();
+  const host = tournamentHost(store());
+  assert.equal(host, "sect_huashan_master_yiqing");
+  useWorldStore.setState({ day: 59, time: 11, letters: [] });
+  const before = store().letters.length;
+  const draft = { ...store(), letters: [...store().letters], day: 60 } as never as Parameters<typeof sendTournamentInvitation>[0];
+  const letter = sendTournamentInvitation(draft, 59)!;
+  assert.ok(letter, "a letter on day 60");
+  assert.equal(letter.npcId, host);
+  assert.equal(letter.gold, TOURNAMENT.fee);
+  assert.ok(letter.text.includes(TOURNAMENT_NAME) && letter.text.includes("หัวซาน"));
+  assert.equal(sendTournamentInvitation(draft, 59), null, "once a year");
+  assert.equal(draft.letters.length, before + 1);
+  // Through the store: a night's rest that crosses day 60 delivers it to the inbox.
+  newGame();
+  useWorldStore.setState({ day: 59, time: 11, letters: [], currentSceneId: "village_noname", lastLocationId: "village_noname" });
+  assert.equal(store().rest("route").ok, true);
+  assert.ok(store().day >= 60);
+  assert.ok(store().letters.some((l) => l.id === "letter_invite_1" && l.gold === TOURNAMENT.fee));
+  assert.ok(store().actionLog.some((e) => e.message.includes("จดหมายเชิญ")));
 });
 
 console.log(`\n${passed} systems checks passed.`);

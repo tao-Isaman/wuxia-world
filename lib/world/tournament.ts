@@ -1,8 +1,11 @@
-// ชุมนุมวิจารณ์กระบี่ — the yearly sword tournament at the capital.
+// ชุมนุมวิจารณ์กระบี่เขาหัวซาน — the yearly sword tournament on Mount Hua
+// (the Huashan sect's grounds). Each year, the day registration opens, the
+// holder of Huashan's seat sends the hero an invitation letter with the fee
+// for the road (`sendTournamentInvitation`).
 //
 // Registration opens TOURNAMENT.registerFrom days into each year (a year is
 // TOURNAMENT.yearDays days) and the tournament is fought on day
-// TOURNAMENT.startDay, or on any of the next `graceDays` days, at the capital.
+// TOURNAMENT.startDay, or on any of the next `graceDays` days, on Mount Hua.
 // 32 entrants: the hero (if registered) and the liveness NPCs (the named
 // roster), topped up with other fighters who spar. Single elimination over
 // five rounds. The hero's bouts are real non-fatal battles; every other bout
@@ -19,10 +22,11 @@ import { SECT_MEMBERSHIPS } from "./data/sect-memberships";
 import { NPCS, getNpc } from "./data/npcs";
 import { getOpponent, npcFoeId } from "./data/opponents";
 import { npcPresent } from "./npc-presence";
+import { sectChief } from "./npc-life";
 import type { TournamentRecord, TournamentState, WorldStateData } from "./types";
 
 export const TOURNAMENT = {
-  locationId: "city_capital",
+  locationId: "sect_huashan",
   yearDays: 360,
   /** Day of the year registration opens, and the tournament day. */
   registerFrom: 60,
@@ -33,6 +37,11 @@ export const TOURNAMENT = {
   size: 32,
   historyMax: 20,
 } as const;
+
+/** The tournament's name, everywhere the player reads it. */
+export const TOURNAMENT_NAME = "ชุมนุมวิจารณ์กระบี่เขาหัวซาน";
+/** Who writes the invitation when nobody holds Huashan's seat (an old save before the first tick). */
+const HOST_FALLBACK = "sect_huashan_master_yiqing";
 
 export const PLAYER = "player";
 /** Gold and w-exp for a bout won, by round (last 32 … final). */
@@ -315,4 +324,40 @@ export function prizeName(slotId: string): string {
   const slot = parseSlotId(slotId);
   if (!slot) return slotId;
   return slot.kind === "skill" ? slot.skill.n : `${slot.art.n} (กำลังภายใน)`;
+}
+
+// ─── The invitation ────────────────────────────────────────────────────
+
+/** The host: whoever holds Huashan's seat now, else its authored master (if alive). */
+export function tournamentHost(state: Pick<WorldStateData, "npcExt" | "assassinatedNpcIds" | "kidnappedUntil" | "day">): string | null {
+  const chief = sectChief(state as WorldStateData, "huashan");
+  if (chief) return chief;
+  return getNpc(HOST_FALLBACK) && npcPresent(state, HOST_FALLBACK) ? HOST_FALLBACK : null;
+}
+
+/**
+ * The day registration opens (any day in (fromDay, state.day]), Huashan's
+ * chief writes to the hero: when, where, the fee — and the fee itself for
+ * the road. One letter a year; returns it when sent.
+ */
+export function sendTournamentInvitation(state: WorldStateData, fromDay: number): import("./types").Letter | null {
+  for (let day = fromDay + 1; day <= state.day; day++) {
+    if (dayOfYear(day) !== TOURNAMENT.registerFrom) continue;
+    const year = yearOf(day);
+    const id = `letter_invite_${year}`;
+    if ((state.letters ?? []).some((l) => l.id === id)) continue;
+    const host = tournamentHost(state);
+    if (!host) continue;
+    const name = getNpc(host)?.name ?? "เจ้าสำนักหัวซาน";
+    const letter = {
+      id, day, npcId: host, rarity: 2, gold: TOURNAMENT.fee, read: false, claimed: false,
+      text: `ถึงจอมยุทธ์ผู้มีฝีมือ — สำนักหัวซานขอเชิญท่านร่วม${TOURNAMENT_NAME}ปีที่ ${year} `
+        + `เปิดรับลงชื่อที่ลานบนยอดเขาหัวซานตั้งแต่บัดนี้ถึงวันที่ ${TOURNAMENT.startDay - 1} ของปี ค่าลงชื่อ ${TOURNAMENT.fee} ตำลึง `
+        + `ประลองจริงวันที่ ${TOURNAMENT.startDay}–${TOURNAMENT.startDay + TOURNAMENT.graceDays} ยอดฝีมือสามสิบสองคนจะได้วัดกันว่าใครคือกระบี่อันดับหนึ่งแห่งยุคนี้ `
+        + `ข้าแนบค่าเดินทางมาให้ด้วย หวังว่าจะได้พบท่านบนยอดเขา — ${name}`,
+    };
+    state.letters = [...(state.letters ?? []), letter];
+    return letter;
+  }
+  return null;
 }

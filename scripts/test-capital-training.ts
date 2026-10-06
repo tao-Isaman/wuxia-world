@@ -95,7 +95,7 @@ try {
   assert.equal(capitalTrainingStatus(won)?.canStart, false, "hall closes the beginner duel after a victory");
   const upgrade = capitalTrainingUpgrade(won)!;
   assert.ok(upgrade, "actual starter battle leaves an affordable upgrade");
-  assert.match(clinicPreparation(won)!.action, /เร่งด้วย w-exp/);
+  assert.match(clinicPreparation(won)!.action, /เลื่อนระดับ \(ใช้ประสบการณ์ยุทธ/);
   const result = won.levelUpSkillFromWExp(upgrade.skill.id);
   assert.equal(result.ok, true);
   assert.equal(useWorldStore.getState().skillLevel.basic_punch, upgrade.level + 1);

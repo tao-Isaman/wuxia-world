@@ -50,7 +50,7 @@ type EpithetState = Pick<WorldStateData, "traits" | "tournamentHistory" | "sectM
 export function heroEpithet(state: EpithetState): string {
   const crowns = (state.tournamentHistory ?? []).filter((r) => r.champion === "player").length;
   if (crowns >= 2) return "ราชันกระบี่ใต้หล้า";
-  if (crowns === 1) return "ยอดกระบี่แห่งชุมนุมวิจารณ์กระบี่";
+  if (crowns === 1) return "ยอดกระบี่แห่งเขาหัวซาน";
   const value = (trait: TraitKey) => state.traits?.[trait] ?? 0;
   let combo: { size: number; total: number; name: string } | null = null;
   for (const { traits, name } of COMBO_EPITHETS) {

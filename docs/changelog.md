@@ -6,6 +6,27 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-06
 
+### Quests whose item had nowhere to come from
+
+- แผ่นตำราหายของปรมาจารย์ (เกาะดอกท้อ) waited for a ตำราขั้นสูง that only another quest rewards, while telling the hero to search the island. The three pages are now 🔍 spots on เกาะดอกท้อ (ดงต้นท้อ, ชายหาด, โขดหิน); the guide arrow leads there and counts 0/3.
+- ตลาดนครหลวง now sells ตำราขั้นสูง and ตำราเพลงขั้นกลาง, the two other quest items nothing sold (หมอหลิน's formula, เหลียงอิ้นกง's score).
+- `test-quest-guide.ts` now fails on any quest item with no world source.
+
+### Item windows in the bag and the shop
+
+- The ✕ on the bag's item window works again: the item name's colour filter painted over it, so taps hit the name.
+- Shop items open the same window: tap a row (buy or sell tab) to read the item's description, effects, how many you have and the price, and buy or sell one from there. New `item-details.spec.ts` checks both on a phone-sized screen.
+
+### The skills window speaks plain Thai
+
+- Moves read as what they do: โจมตีภายนอก / โจมตีภายใน (no more ทางกาย / ทางใน), how many strikes, what happens to you and the foe ("ศัตรู: หลบหลีก −15 นาน 5 ตา") — generated from the data instead of the table's shorthand ("Phy×115%×1.1 · Eva-15 (5ตา)").
+- BP is พลังโจมตีพื้นฐาน (with its level-10 value), xp is ค่าประสบการณ์, w-exp is ประสบการณ์ยุทธ, ×1.1 is ความแรงรวม +10 %, stats are named (เฉียบคม +5, not DEX+5), type tags read สายหยิน·ภายนอก, conflicts read วิชาขัดกัน: สายหยาง เหลือ 50 %. Inner arts' active and passive lines are translated ("เมื่อถูกโจมตี มีโอกาส 25% ที่จะได้ ป้องกัน +10 (5 ตา)"). The upgrade button is เลื่อนระดับ (ใช้ประสบการณ์ยุทธ N).
+
+### ชุมนุมวิจารณ์กระบี่เขาหัวซาน
+
+- The sword tournament moved from the capital to **Mount Hua** (the Huashan sect's grounds) and is now called **ชุมนุมวิจารณ์กระบี่เขาหัวซาน**. Its champion's epithet is ยอดกระบี่แห่งเขาหัวซาน.
+- **An invitation letter** arrives the day registration opens (day 60 of each year), from whoever holds Huashan's seat, with the 100-gold fee enclosed for the road.
+
 ### The law bites harder
 
 - **มอบตัว.** Tap the wanted chip to give yourself up: straight to the cells, half the sentence and fine, nothing seized.

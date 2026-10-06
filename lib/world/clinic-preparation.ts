@@ -21,9 +21,9 @@ export function clinicPreparation(state: PreparationState) {
     return upgrade ? {
       label: "วิชาจากการประลอง",
       title: `ยกระดับ${upgrade.skill.n}`,
-      nextStep: `วิชา → ${upgrade.skill.n} → เร่งด้วย w-exp`,
+      nextStep: `วิชา → ${upgrade.skill.n} → เลื่อนระดับด้วยประสบการณ์ยุทธ`,
       description: `ขั้น ${upgrade.level} → ${upgrade.level + 1} · ใช้อีก ${upgrade.cost} W-EXP · มี ${state.wExp} W-EXP`,
-      action: `เมนู วิชา → ${upgrade.skill.n} → เร่งด้วย w-exp (${upgrade.cost})`,
+      action: `เมนู วิชา → ${upgrade.skill.n} → เลื่อนระดับ (ใช้ประสบการณ์ยุทธ ${upgrade.cost})`,
       note: "ประสบการณ์จากการใช้วิชาลดค่าอัปขั้นแล้ว · เลือกเก็บ W-EXP ไว้ก่อนได้",
     } : null;
   }

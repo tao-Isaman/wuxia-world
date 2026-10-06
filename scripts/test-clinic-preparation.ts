@@ -29,7 +29,7 @@ assert.equal(clinicPreparation({ ...state, quests: { ...state.quests, other: { i
 assert.equal(clinicPreparation({ ...state, quests: { qc_capital_clinic_supplies: { id: "qc_capital_clinic_supplies", status: "active", stage: 1 } } }), null);
 assert.match(clinicPreparation({ ...state, skillExp: { basic_punch: 15 } })!.note, /อัปขั้นใช้ 35 W-EXP/, "accounts for skill-specific experience");
 const won = { ...state, defeatedCounts: { [CAPITAL_TRAINING_OPPONENT_ID]: 1 }, wExp: 70, skillExp: { basic_punch: 20 } };
-assert.match(clinicPreparation(won)!.action, /วิชา → หมัดตรง → เร่งด้วย w-exp \(30\)/);
+assert.match(clinicPreparation(won)!.action, /วิชา → หมัดตรง → เลื่อนระดับ \(ใช้ประสบการณ์ยุทธ 30\)/);
 assert.equal(clinicPreparation({ ...won, skillLevel: { basic_punch: 2 }, skillExp: { basic_punch: 0 }, wExp: 40 }), null, "a real upgrade consumes banked XP and ends the hint");
 assert.equal(clinicPreparation({ ...won, wExp: 0 }), null, "never promises an unaffordable upgrade");
 console.log("PASS post-clinic preparation: real supply, free beginner duel/recovery, affordable earned upgrade, stop after upgrade/departure/other quest, unchanged state");

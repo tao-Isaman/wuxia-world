@@ -23,12 +23,12 @@ import {
   getSkill,
   getStatusFactor,
   isArtSlot,
-  mgMultiplier,
   parseSlotId,
   xpToNextArtLevel,
   xpToNextLevel,
 } from "@/lib/game";
 import type { WeaponFamily } from "@/lib/game";
+import { ATTACK_KIND_LABEL, damageMultiplierText, plainThai, skillFlavour, skillSummaryLines, statLine } from "@/lib/game/skill-text";
 import { useWorldStore } from "@/store/world-store";
 import { confirmDialog } from "@/store/confirm-store";
 import { ArtTooltip, SkillTooltip } from "../skill-tooltip";
@@ -95,7 +95,7 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
     if (info.kind === "skill") {
       const sk = info.skill;
       changes.push({
-        label: "พลังท่า (BP)",
+        label: "พลังโจมตีพื้นฐาน",
         before: Math.round(effectiveBp(sk, previousLevel) * factor),
         after: Math.round(effectiveBp(sk, result.level) * factor),
       }, {
@@ -123,7 +123,7 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
       detail: factor < 1
         ? "ค่าที่แสดงหักผลจากวิชาขัดแย้งแล้ว"
         : info.kind === "skill"
-          ? "พลังท่าและความชำนาญช่วยเพิ่มความเสียหายเมื่อโจมตี"
+          ? "พลังโจมตีพื้นฐานและความชำนาญอาวุธช่วยเพิ่มความเสียหายเมื่อโจมตี"
           : "ค่าพลังสูงสุดใหม่มีผลแล้ว · พักผ่อนเพื่อฟื้นพลัง",
     });
   };
@@ -203,12 +203,12 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
           <div className="skills-stats">
             <span>วิชาฝีมือ <b>{totalSkills}</b></span>
             <span>วิชาในกาย <b>{totalArts}</b></span>
-            <span>ขั้นรวม <b className="text-emerald-600">{skillLevelSum}</b></span>
-            {equippedArtLv !== null && <span>ในกายขั้น <b>{equippedArtLv}</b></span>}
-            <span>w-exp <b className="text-primary">{wExp}</b></span>
+            <span title="ระดับของทุกวิชารวมกัน">ระดับรวม <b className="text-emerald-600">{skillLevelSum}</b></span>
+            {equippedArtLv !== null && <span>ระดับวิชาในกาย <b>{equippedArtLv}</b></span>}
+            <span title="ประสบการณ์ยุทธ (w-exp) ใช้เลื่อนระดับวิชาได้ทันที">ประสบการณ์ยุทธ <b className="text-primary">{wExp}</b></span>
           </div>
           <div className="skills-mastery">
-            <span className="skills-mastery-label">ความชำนาญ</span>
+            <span className="skills-mastery-label" title="ยิ่งชำนาญอาวุธชนิดใด ท่าของอาวุธนั้นยิ่งแรง (สูงสุด 200)">ความชำนาญอาวุธ</span>
             {Object.keys(mastery).length === 0 ? <span className="text-muted-foreground">ยังไม่มี</span> : Object.entries(mastery).map(([w, v]) => (
               <span key={w} className="profile-chip" title={WEAPON_FAMILY_HINT[w as WeaponFamily]}>
                 {WEAPON_FAMILY_LABEL[w as WeaponFamily]} <b>{Math.floor(v ?? 0)}</b>
@@ -216,8 +216,8 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
             ))}
           </div>
           {conflictedTypes.length > 0 && (
-            <div className="skills-conflict">
-              ขัดแย้ง: {conflictedTypes.map((t) => `${SKILL_TYPE_LABEL[t]} ×${(conflict[t] ?? 1).toFixed(1)}`).join(", ")}
+            <div className="skills-conflict" title="วิชาที่ติดตั้งเอียงไปทางหนึ่งมากเกินไป วิชาฝั่งตรงข้ามจึงอ่อนกำลังลง">
+              วิชาขัดกัน: {conflictedTypes.map((t) => `สาย${SKILL_TYPE_LABEL[t]}${conflictText(conflict[t] ?? 1)}`).join(" · ")}
             </div>
           )}
           <div className="menu-col-head"><span className="menu-col-title">วิชาที่ติดตั้ง</span></div>
@@ -350,7 +350,7 @@ function SkillDetail({ raw, info, level: lv, xp, wExp, conflict, slot, equipLabe
             </SkillTooltip>
           )}
           <div className="text-[11px] text-muted-foreground">
-            {info.kind === "art" ? "☯ วิชาในกาย" : "⚔ วิชาฝีมือ"} · {info.kind === "art" ? "ขั้น" : "Lv."}{lv}{maxed ? " (สูงสุด)" : ""}
+            {info.kind === "art" ? "☯ วิชาในกาย" : "⚔ วิชาฝีมือ"} · ระดับ {lv}{maxed ? " (สูงสุด)" : ""}
             {typeof slot === "number" ? ` · ติดตั้งช่อง ${slot + 1}` : ""}
           </div>
         </div>
@@ -364,12 +364,12 @@ function SkillDetail({ raw, info, level: lv, xp, wExp, conflict, slot, equipLabe
         )}
         {!maxed && (
           <Button size="sm" variant="outline" className="text-[12px] h-8" disabled={!canWExp} onClick={onUpgrade}
-            title={canWExp ? `ใช้ ${wExpCost} w-exp (xp ${xpCapped}/${cost})` : `ต้องการ ${wExpCost} w-exp`}>
-            เร่งด้วย w-exp ({wExpCost})
+            title={canWExp ? `ใช้ประสบการณ์ยุทธ ${wExpCost} เลื่อนเป็นระดับถัดไปทันที` : `ต้องมีประสบการณ์ยุทธ ${wExpCost}`}>
+            เลื่อนระดับ (ใช้ประสบการณ์ยุทธ {wExpCost})
           </Button>
         )}
         <Button size="sm" variant="ghost" className="h-8 px-2 text-[12px] text-destructive hover:bg-destructive/10"
-          title="ลบออกจากวิชาที่เรียนแล้ว — ลดการขัดแย้งของวิชา" onClick={onForget}>
+          title="ลบออกจากวิชาที่เรียนแล้ว — ช่วยลดการขัดกันของวิชา" onClick={onForget}>
           ลืมวิชา
         </Button>
       </div>
@@ -382,14 +382,16 @@ function SkillDetail({ raw, info, level: lv, xp, wExp, conflict, slot, equipLabe
         ) : (
           <>
             <Badge variant="outline" className="text-[9px]" title={WEAPON_FAMILY_HINT[info.skill.w]}>{WEAPON_FAMILY_LABEL[info.skill.w]}</Badge>
-            {info.skill.at && <Badge variant="outline" className="text-[9px]">{info.skill.at === "phy" ? "ทางกาย" : "ทางใน"}</Badge>}
+            {info.skill.at && <Badge variant="outline" className="text-[9px]">{ATTACK_KIND_LABEL[info.skill.at] || "ท่าเสริม"}</Badge>}
           </>
         )}
-        {types.map((t) => (
-          <Badge key={t} variant="outline" className="text-[9px] opacity-80">{SKILL_TYPE_LABEL[t]}</Badge>
-        ))}
+        {types.length > 0 && (
+          <Badge variant="outline" className="text-[9px] opacity-80" title="ลักษณะของวิชา — ถ้าติดตั้งวิชาสายเดียวกันมากเกินไป สายตรงข้ามจะอ่อนกำลังลง">
+            สาย{types.map((t) => SKILL_TYPE_LABEL[t]).join("·")}
+          </Badge>
+        )}
         {cFactor < 1 && (
-          <Badge variant="outline" className="text-[9px] border-rose-400 text-rose-600">ขัดแย้ง ×{cFactor.toFixed(1)}</Badge>
+          <Badge variant="outline" className="text-[9px] border-rose-400 text-rose-600">วิชาขัดกัน{conflictText(cFactor)}</Badge>
         )}
       </div>
 
@@ -400,8 +402,8 @@ function SkillDetail({ raw, info, level: lv, xp, wExp, conflict, slot, equipLabe
           {maxed
             ? "ขั้นสูงสุดแล้ว"
             : info.kind === "art"
-              ? `xp ${xpCapped}/${cost} (ตี-${def.ti + 1} · 2× ของวิชาฝีมือ)`
-              : `xp ${xpCapped}/${cost} (ตี-${def.ti + 1})`}
+              ? `ค่าประสบการณ์ ${xpCapped}/${cost} สู่ระดับ ${lv + 1}`
+              : `ค่าประสบการณ์ ${xpCapped}/${cost} สู่ระดับ ${lv + 1}`}
         </div>
         <div className="h-1.5 bg-muted rounded overflow-hidden">
           <div className={`h-full ${maxed ? "bg-amber-500" : "bg-primary"}`} style={{ width: `${xpPct}%` }} />
@@ -415,43 +417,56 @@ function SkillDetail({ raw, info, level: lv, xp, wExp, conflict, slot, equipLabe
 }
 
 function ArtNumbers({ art, lv }: { art: ReturnType<typeof getArt>; lv: number }) {
-  const statRow = Object.entries(art.stats).map(([k, v]) => `${k}+${Math.floor((v * lv) / 10)}`).join(" ");
+  const stats = statLine(art.stats, lv / 10);
+  const extra = [art.hL ? `พลังชีวิต +${art.hL * lv}` : "", art.mL ? `ปราณ +${art.mL * lv}` : ""].filter(Boolean).join(" · ");
   return (
     <>
-      {art.d && <div className="text-[11px] text-muted-foreground">{art.d}</div>}
-      {(statRow || art.hL || art.mL) && (
+      {art.d && <div className="text-[11px] text-muted-foreground">{plainThai(art.d)}</div>}
+      {(stats || extra) && (
         <div className="text-[11px] text-emerald-700">
-          โบนัส:{statRow ? ` ${statRow}` : ""}{art.hL ? ` HP+${art.hL * lv}` : ""}{art.mL ? ` MP+${art.mL * lv}` : ""}
+          เพิ่มค่าสถานะ: {[stats, extra].filter(Boolean).join(" · ")}
+          {lv < ART_LEVEL_MAX && <span className="opacity-60"> (เพิ่มขึ้นทุกระดับ)</span>}
         </div>
       )}
-      {art.act && <div className="text-[11px] text-muted-foreground">⚡ <strong>{art.act.n}</strong> · MP {art.act.c} · CD {art.act.cd} · {art.act.d}</div>}
-      {art.pas && <div className="text-[11px] text-muted-foreground">◆ {art.pas.d}</div>}
+      {art.act && <div className="text-[11px] text-muted-foreground">⚡ ท่าออกพลัง <strong>{art.act.n}</strong> · ใช้ปราณ {art.act.c} · ใช้แล้วพัก {art.act.cd} ตา · {plainThai(art.act.d)}</div>}
+      {art.pas && <div className="text-[11px] text-muted-foreground">◆ ติดตัว: {plainThai(art.pas.d)}</div>}
     </>
   );
 }
 
 function SkillNumbers({ skill: sk, lv }: { skill: NonNullable<ReturnType<typeof getSkill>>; lv: number }) {
-  const bpMul = Math.round(bpMultiplier(lv) * 100);
-  const mgMul = Math.round(mgMultiplier(lv) * 100);
+  const flavour = skillFlavour(sk);
+  const bpMax = Math.round(effectiveBp(sk, SKILL_LEVEL_MAX));
+  const mgMax = Math.round(effectiveMg(sk, SKILL_LEVEL_MAX));
+  const atMax = lv >= SKILL_LEVEL_MAX;
+  const dm = damageMultiplierText(sk.dm);
   return (
     <>
+      {flavour && <div className="text-[11px] italic text-muted-foreground">{flavour}</div>}
+      <ul className="text-[11px] text-foreground space-y-0.5">
+        {skillSummaryLines(sk).map((line) => <li key={line}>• {line}</li>)}
+      </ul>
       {Object.keys(sk.st).length > 0 && (
         <div className="text-[11px] text-emerald-700">
-          โบนัส: {Object.entries(sk.st).map(([k, v]) => `${k}+${Math.floor((v as number) * bpMultiplier(lv))}`).join(" ")}
-          <span className="opacity-60"> ({bpMul}% ของ Lv.10)</span>
+          เพิ่มค่าสถานะ: {statLine(sk.st, bpMultiplier(lv))}
+          {!atMax && <span className="opacity-60"> (ระดับ 10: {statLine(sk.st, 1)})</span>}
         </div>
       )}
-      <div className="text-[11px] text-muted-foreground">{sk.d}</div>
-      <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-[10px] text-muted-foreground">
-        <span>BP {Math.round(effectiveBp(sk, lv))} <span className="opacity-60">({bpMul}% ของ {sk.bp})</span></span>
-        {sk.p > 0 && <span>+{sk.p}%</span>}
-        {sk.f > 0 && <span>+{sk.f} flat</span>}
-        {sk.dm !== 1 && <span>×{sk.dm}</span>}
-        {sk.dr ? <span>ดูด {sk.dr}%</span> : null}
-        <span>ฝีมือ +{Math.round(effectiveMg(sk, lv))} <span className="opacity-60">({mgMul}% ของ {sk.mg})</span></span>
+      <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] text-muted-foreground">
+        <span>พลังโจมตีพื้นฐาน <b className="text-foreground">{Math.round(effectiveBp(sk, lv))}</b>{!atMax && <span className="opacity-60"> (ระดับ 10: {bpMax})</span>}</span>
+        {sk.p > 0 && <span>เสริมพลังท่า +{sk.p}%</span>}
+        {sk.f > 0 && <span>ความเสียหายเพิ่ม +{sk.f}</span>}
+        {dm && <span>{dm}</span>}
+        <span>ความชำนาญ{WEAPON_FAMILY_LABEL[sk.w]} <b className="text-foreground">+{Math.round(effectiveMg(sk, lv))}</b>{!atMax && <span className="opacity-60"> (ระดับ 10: +{mgMax})</span>}</span>
       </div>
     </>
   );
+}
+
+/** "เหลือครึ่งเดียว" for a conflict factor. */
+function conflictText(factor: number): string {
+  if (factor <= 0) return "ไม่ได้ผลเลย";
+  return `เหลือ ${Math.round(factor * 100)}%`;
 }
 
 // Quiet the unused-import warning while leaving the helper available for

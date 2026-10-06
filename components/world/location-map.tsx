@@ -137,7 +137,7 @@ export function LocationMap({ scene, map, handlers, readOnly = false, dialogueSp
   // The sword tournament's ring at the capital.
   if (scene.id === TOURNAMENT.locationId) {
     const point = freeSpot(map.spawn, markers);
-    markers.push({ id: "tournament", ...point, kind: "service", label: "ชุมนุมวิจารณ์กระบี่", badge: "tournament", category: "activity",
+    markers.push({ id: "tournament", ...point, kind: "service", label: "ชุมนุมวิจารณ์กระบี่เขาหัวซาน", badge: "tournament", category: "activity",
       onActivate: handlers.onTournament });
   }
   // Travellers stand near where people come in, and stroll about.

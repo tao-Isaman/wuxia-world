@@ -19,13 +19,13 @@ interface Props {
 
 const REGISTER_BLOCK: Record<string, string> = {
   closed: "ยังไม่เปิดรับสมัคร",
-  elsewhere: "ต้องลงชื่อที่นครหลวง",
+  elsewhere: "ต้องลงชื่อที่สำนักหัวซาน (ยอดเขาหัวซาน)",
   registered: "ลงชื่อแล้ว",
   gold: `ต้องมีค่าสมัคร ${TOURNAMENT.fee} ตำลึง`,
   done: "ปีนี้จัดการแข่งขันไปแล้ว",
 };
 
-// ชุมนุมวิจารณ์กระบี่ — the yearly 32-entrant tournament at the capital:
+// ชุมนุมวิจารณ์กระบี่เขาหัวซาน — the yearly 32-entrant tournament on Mount Hua:
 // register, fight each round, watch the bracket, and (as champion) pick a
 // move or art from the entrants.
 export function TournamentPopup({ open, onClose }: Props) {
@@ -42,7 +42,7 @@ export function TournamentPopup({ open, onClose }: Props) {
   const history = [...(state.tournamentHistory ?? [])].reverse().slice(0, 5);
 
   const register = () => {
-    if (state.registerTournament()) toast("success", "ลงชื่อเข้าร่วมชุมนุมวิจารณ์กระบี่แล้ว");
+    if (state.registerTournament()) toast("success", "ลงชื่อเข้าร่วมชุมนุมวิจารณ์กระบี่เขาหัวซานแล้ว");
   };
   const fight = () => {
     if (state.fightTournamentBout()) onClose();
@@ -53,15 +53,15 @@ export function TournamentPopup({ open, onClose }: Props) {
   };
 
   let calendar: string;
-  if (phase === "day") calendar = "วันนี้คือวันชุมนุมวิจารณ์กระบี่!";
+  if (phase === "day") calendar = "วันนี้คือวันชุมนุมวิจารณ์กระบี่เขาหัวซาน!";
   else if (phase === "registration") calendar = `เปิดรับสมัคร · อีก ${TOURNAMENT.startDay - dayOfYear(state.day)} วันถึงวันแข่งขัน`;
   else calendar = `จะเปิดรับสมัครในอีก ${daysUntilRegistration(state.day)} วัน`;
 
   return (
-    <Modal open={open} onClose={onClose} title="⚔ ชุมนุมวิจารณ์กระบี่">
+    <Modal open={open} onClose={onClose} title="⚔ ชุมนุมวิจารณ์กระบี่เขาหัวซาน">
       <div className="space-y-3 text-sm" data-testid="tournament-popup">
         <p className="text-xs text-muted-foreground">
-          จัดขึ้นปีละครั้งที่นครหลวง · ยอดฝีมือ 32 คนประลองแบบแพ้คัดออก · ชนะแต่ละรอบได้เงินและ w-exp
+          จัดขึ้นปีละครั้งบนยอดเขาหัวซาน (สำนักหัวซานเป็นเจ้าภาพ ส่งจดหมายเชิญเมื่อเปิดรับลงชื่อ) · ยอดฝีมือ 32 คนประลองแบบแพ้คัดออก · ชนะแต่ละรอบได้เงินและ w-exp
           ผู้ชนะเลิศเลือกเรียนวิชาหนึ่งอย่างจากผู้เข้าแข่งขันทั้งหมด
         </p>
         <div className="rounded bg-muted/30 px-2 py-1.5">

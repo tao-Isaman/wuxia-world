@@ -2,7 +2,7 @@
 
 # Quests
 
-1115 quests: 16 main, 429 side, 97 sect quests (15 of them art quests). 0 are marked `isMajor` (completing one spreads a rumor about the hero). 3075 stages in total: 1140 advance on their own (`autoAdvance`), 815 are hands-on objectives (`objective`), the rest are dialog beats or the final hand-in. 1009 quests have an offer scene (`qs_<id>_offer`) and 1006 a completion scene (`qs_<id>_complete`).
+1115 quests: 16 main, 429 side, 97 sect quests (15 of them art quests). 0 are marked `isMajor` (completing one spreads a rumor about the hero). 3075 stages in total: 1139 advance on their own (`autoAdvance`), 816 are hands-on objectives (`objective`), the rest are dialog beats or the final hand-in. 1009 quests have an offer scene (`qs_<id>_offer`) and 1006 a completion scene (`qs_<id>_complete`).
 
 Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assassinate** / **trait** / **flag** = `autoAdvance` condition types · **objective** = map spot, person or scene the hero uses in person (`stage.objective`, ×n = several spots) · **dialog** = advanced by an `advanceQuest` choice in a scene · **turn-in** = last stage, closed at the turn-in person or by the completion scene.
 
@@ -222,7 +222,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 
 | Id | Name | Giver | Stages | Notes |
 | --- | --- | --- | --- | --- |
-| `qw_taohua_codex_fragments` | แผ่นตำราหายของปรมาจารย์ | หวงชิงเฉวียน (ปรมาจารย์ฤาษี) | item → turn-in | prereqs |
+| `qw_taohua_codex_fragments` | แผ่นตำราหายของปรมาจารย์ | หวงชิงเฉวียน (ปรมาจารย์ฤาษี) | objective×3 → turn-in | prereqs |
 | `qw_taohua_peach_wine` | ขนมไหว้พระจันทร์สำหรับฤๅษี | หวงชิงเฉวียน (ปรมาจารย์ฤาษี) | visit+item → turn-in |  |
 | `qw_taohua_duel_proof` | พิสูจน์ฝีมือต่อหน้าผู้แอบอ้าง | หวงชิงเฉวียน (ปรมาจารย์ฤาษี) | kill → turn-in | prereqs |
 | `qw_taohua_water_running_sword` | ของเล่นของปรมาจารย์เกาะดอกท้อ | หวงชิงเฉวียน (ปรมาจารย์ฤาษี) | objective (spot) → objective (scene) → turn-in | prereqs |

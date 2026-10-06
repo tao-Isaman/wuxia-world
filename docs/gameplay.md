@@ -20,7 +20,7 @@ Time in this game is counted in **ชั่วยาม**: 12 of them make one d
 - [Battles](#battles)
 - [NPCs](#npcs)
 - [Quests and tracking](#quests-and-tracking)
-- [The sword tournament](#the-sword-tournament-ชุมนุมวิจารณ์กระบี่)
+- [The sword tournament](#the-sword-tournament-ชุมนุมวิจารณ์กระบี่เขาหัวซาน)
 - [Sects](#sects)
 - [Shops, sect halls and artisans](#shops-sect-halls-and-artisans)
 - [Life skills and gathering](#life-skills-and-gathering)
@@ -298,12 +298,13 @@ Every sect skill and art can be earned from a sect NPC ([story-quests.md](story-
 
 The quest list per giver and location is in [reference/quests.md](reference/quests.md).
 
-## The sword tournament (ชุมนุมวิจารณ์กระบี่)
+## The sword tournament (ชุมนุมวิจารณ์กระบี่เขาหัวซาน)
 
-Once a year (a year is 360 days) the capital hosts a 32-fighter single-elimination tournament. Its ring is a crossed-swords marker on the capital map.
+Once a year (a year is 360 days) the Huashan sect hosts a 32-fighter single-elimination tournament on Mount Hua (`sect_huashan`). Its ring is a crossed-swords marker on the Huashan map.
 
 - **Calendar:** registration opens on day 60 of each year; the tournament is on day 90, and can still be started on the two days after. The first one is on day 90.
-- **Registering:** at the capital, for 100 gold.
+- **The invitation:** the day registration opens, whoever holds Huashan's seat writes to you (✉ จดหมาย): when, where and the fee — with 100 gold enclosed for the road. One a year.
+- **Registering:** on Mount Hua, for 100 gold.
 - **Entrants:** you and 31 NPCs — every living, present member of the liveness roster (the 30 named people; the wanderers fight as themselves), topped up with other fighters who spar. The bracket is drawn at random.
 - **Your bouts** are real, non-fatal battles (leaving the ring forfeits). Every other bout is simulated: the stronger fighter (by power score) usually, but not always, wins.
 - **Rewards** for each bout you win: 100 / 200 / 400 / 800 / 1600 gold and 50 / 100 / 150 / 250 / 400 w-exp (last 32 → final). Your final place adds w-exp and fame: champion 1500 / +40, runner-up 800 / +25, last 4 500 / +15, last 8 300 / +8, last 16 150 / +4, last 32 60 / +1.
@@ -403,7 +404,9 @@ Mastery levels 1–5 need 0 / 100 / 300 / 700 / 1500 xp.
 
 ### Skills and inner arts
 
-The 🥋 วิชา window: the 10 slots across the top; below, the **library** of everything learned on the left (icon and name, filter ทั้งหมด / ฝีมือ / ในกาย) and the picked move on the right — its numbers and xp, ติดตั้งลงช่อง (the targeted slot if empty, else the first free one, else แทนที่ the targeted slot), ถอดออก, เร่งด้วย w-exp and ลืมวิชา. Tap a slot to target it and show its move.
+The 🥋 วิชา window: the 10 slots across the top; below, the **library** of everything learned on the left (icon and name, filter ทั้งหมด / ฝีมือ / ในกาย) and the picked move on the right — its numbers and ค่าประสบการณ์, ติดตั้งลงช่อง (the targeted slot if empty, else the first free one, else แทนที่ the targeted slot), ถอดออก, เลื่อนระดับ (ใช้ประสบการณ์ยุทธ N) and ลืมวิชา. Tap a slot to target it and show its move.
+
+Everything there is in plain Thai (`lib/game/skill-text.ts`): โจมตีภายนอก / โจมตีภายใน and how many strikes, what the move does to you and to the foe (`describeEffectThai`), พลังโจมตีพื้นฐาน (the base power, with its level-10 value), เสริมพลังท่า / ความเสียหายเพิ่ม / ความแรงรวม for the table's `p` / `f` / `dm`, ความชำนาญ<weapon>, เพิ่มค่าสถานะ by stat name, สาย… for the move's type tags and วิชาขัดกัน (a type kept at N %). Inner arts' active and passive lines are translated from the table's shorthand (`plainThai`).
 
 Move skills (173) and inner arts (111) level from 1 to 10. A move skill's power, its stat bonuses and its weapon mastery grow with level; an art's bonuses scale by level / 10.
 
@@ -432,7 +435,7 @@ Practice:
 
   A skill with no yin / yang / balance tag counts as balance, so it gets the mountain bonus.
 
-**W-exp (悟)** is a shared pool. **เร่งด้วย w-exp** in the วิชา menu buys the rest of the current level with it.
+**W-exp (悟, ประสบการณ์ยุทธ)** is a shared pool. **เลื่อนระดับ (ใช้ประสบการณ์ยุทธ N)** in the วิชา menu buys the rest of the current level with it.
 
 | W-exp source | Amount |
 | --- | --- |
@@ -520,7 +523,7 @@ Five traits start at 0 and never drop below 0: good, evil, arrogance, humility, 
 
 The profile shows the name the jianghu gives you, read off your record each time (`lib/world/epithet.ts`). The first rule that fits wins:
 
-1. **A tournament crown:** twice or more → ราชันกระบี่ใต้หล้า; once → ยอดกระบี่แห่งชุมนุมวิจารณ์กระบี่.
+1. **A tournament crown:** twice or more → ราชันกระบี่ใต้หล้า; once → ยอดกระบี่แห่งเขาหัวซาน.
 2. **A mix of traits, every one at 60 or more** (more traits beat fewer; among equals the higher total wins):
 
    | Traits | ฉายา |

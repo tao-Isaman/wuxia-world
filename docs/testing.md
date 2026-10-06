@@ -71,7 +71,7 @@ Each suite is a Bun script (or `bun test` file) wired as `test:*` in `package.js
 - **`scripts/test-quest-dead-ends.ts`** covers regressions for quests that were once impossible.
 - **`scripts/test-quest-turnins.ts`** accepts, progresses and hands in every item, kill and objective quest through the real store. Items are carried before accepting, objective spots are used in place, and kills count only after accepting.
 - **`scripts/test-bad-action-quests.ts`** finds every stage that needs a steal, assassination or kidnapping and checks that the target stands on a map, that their card offers the action, and that a successful attempt through the real store moves the quest on.
-- **`scripts/test-quest-guide.ts`** checks tracking (newest, pinned, off) and that every stage of every quest has an action; fewer than 10 % may lack a place. `GUIDE_DEBUG=1` lists the stages with no place.
+- **`scripts/test-quest-guide.ts`** checks tracking (newest, pinned, off) and that every stage of every quest has an action; fewer than 10 % may lack a place. Every item a stage waits for must be sold, gathered, looted, crafted or handed over in a conversation (else the stage needs 🔍 objective spots) — an item only another quest rewards leaves the hero nowhere to go. `GUIDE_DEBUG=1` lists the stages with no place.
 
 ## Content audits
 

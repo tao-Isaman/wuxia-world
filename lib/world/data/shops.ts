@@ -53,7 +53,9 @@ const VILLAGE_SHOP: readonly string[] = [
 // (data/meridian-sources.ts) — see withMeridianCharts below.
 export const SHOPS: readonly ShopDef[] = ([
   // City general stores (wide inventory, sell-back any category at 50 %).
-  { id: "shop_capital",  locationId: "city_capital",  label: "🏪 ตลาดนครหลวง",      inventory: COMMON_CITY_SHOP, sellMultiplier: 0.5 },
+  // The capital also stocks the rarer books quests ask for: ตำราขั้นสูง
+  // (หมอหลิน's formula) and ตำราเพลงขั้นกลาง (เหลียงอิ้นกง's score).
+  { id: "shop_capital",  locationId: "city_capital",  label: "🏪 ตลาดนครหลวง",      inventory: [...COMMON_CITY_SHOP, "book_advanced", "song_inter"], sellMultiplier: 0.5 },
   { id: "shop_xixia",    locationId: "city_xixia",    label: "🏪 ตลาดซีเซี่ย",       inventory: COMMON_CITY_SHOP, sellMultiplier: 0.5 },
   { id: "shop_dali",     locationId: "city_dali",     label: "🏪 ตลาดต้าหลี่",       inventory: COMMON_CITY_SHOP, sellMultiplier: 0.5 },
   { id: "shop_yangzhou", locationId: "city_yangzhou", label: "🏪 ตลาดหยางโจว",      inventory: COMMON_CITY_SHOP, sellMultiplier: 0.5 },
