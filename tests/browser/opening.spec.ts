@@ -73,7 +73,7 @@ test("first errand leads to safe training, recovery, and an earned skill upgrade
 
   await visit(page, "service-0");
   const potion = page.getByRole("dialog").locator("li").filter({ has: page.getByText("ยาเลือดเล็ก", { exact: true }) });
-  await expect(potion).toContainText("HP +30");
+  await expect(potion).toContainText("HP +40 +20%");
   await potion.getByRole("button", { name: "ซื้อ", exact: true }).click();
   expect((await state(page)).gold).toBe(30);
   expect((await state(page)).inventory.potion).toBe(1);

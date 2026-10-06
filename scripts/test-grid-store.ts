@@ -3,7 +3,7 @@
 import assert from "node:assert/strict";
 import type { CharacterBuild, StatBlock } from "../lib/game/types";
 import {
-  activeUnit, aimableFor, cellKey, manhattan, reachableFor, targetsFor, unitById,
+  activeUnit, aimableFor, cellKey, itemTargetCells, manhattan, reachableFor, targetsFor, throwDamage, unitById,
   type Cell, type GridBattleState,
 } from "../lib/game/grid";
 
@@ -389,6 +389,53 @@ check("escape: no rewards, HP kept, battle cleared", () => {
   assert.equal(w.wExp, before.wExp);
   assert.equal(w.defeatedCounts.thug ?? 0, 0);
   assert.equal(bs().state, null);
+});
+
+check("battle items: a potion heals, a thrown poison hits and poisons, the bag counts down, the world takes what was used", () => {
+  newGame({ currentHp: 40, inventory: { potion: 2, poison_vial: 1, throw_dart: 3, cooked_meat: 4 } });
+  fight("thug", { withPack: false });
+  assert.deepEqual(st().bag, { potion: 2, poison_vial: 1, throw_dart: 3 }, "only battle items come along (no food)");
+  const s0 = st(); unitById(s0, "A")!.gauge = 100;
+  bs().stepAll();
+  assert.ok(isPlayerTurn(st(), false));
+  const potion = { t: "heal" as const, hp: 40, hpPct: 20 };
+  const hero = unitById(st(), "A")!;
+  const hpBefore = hero.hp;
+  assert.equal(bs().useItem("potion", "ยาเลือดเล็ก", potion, { ...hero.pos }), true);
+  const healed = Math.min(hero.derived.HP - hpBefore, Math.round(40 + hero.derived.HP * 0.2));
+  assert.equal(unitById(st(), "A")!.hp, hpBefore + healed);
+  assert.equal(st().bag!.potion, 1);
+  assert.equal(st().itemsUsed!.potion, 1);
+  // Next hero turn: walk next to the thug and throw the poison vial.
+  for (let i = 0; i < 50 && !(isPlayerTurn(st(), false)); i++) bs().stepAll();
+  const me = unitById(st(), "A")!, thug = unitById(st(), "B")!;
+  assert.ok(thug.alive && isPlayerTurn(st(), false), "the hero gets a second turn against a living thug");
+  {
+    const vial = { t: "throw" as const, power: 10, dexScale: 0.8, range: 4, poison: { pct: 6, turns: 4 } };
+    if (manhattan(me.pos, thug.pos) > 4) {
+      const step = [...reachableFor(st(), "A").keys()].map((k) => { const [x, y] = k.split(",").map(Number); return { x, y }; })
+        .sort((a, b) => manhattan(a, thug.pos) - manhattan(b, thug.pos))[0];
+      bs().move(step);
+    }
+    assert.ok(itemTargetCells(st(), "A", vial).length > 0, "the thug is in throwing range");
+    const before = unitById(st(), "B")!.hp;
+    const dmg = throwDamage(unitById(st(), "A")!, unitById(st(), "B")!, vial);
+    assert.equal(bs().useItem("poison_vial", "ขวดพิษ", vial, { ...unitById(st(), "B")!.pos }), true);
+    const after = unitById(st(), "B")!;
+    assert.equal(after.hp, Math.max(0, before - dmg));
+    if (after.hp > 0) assert.ok(after.status.debuffs.some((d) => d.t === "debuff_poison" && d.pp === 6), "poisoned");
+    assert.equal(st().bag!.poison_vial, 0);
+    assert.equal(bs().useItem("poison_vial", "ขวดพิษ", vial, { ...after.pos }), false, "none left");
+  }
+  // Retreat (or finish): whatever the outcome, used items leave the inventory.
+  const used = { ...st().itemsUsed };
+  if (st().phase !== "over") { unitById(st(), "A")!.gauge = 100; bs().stepAll(); if (isPlayerTurn(st(), false)) withRandom(0, () => bs().flee()); }
+  if (st().phase !== "over") { bs().setAuto(true); withRandom(0.5, () => bs().stepAll()); }
+  useWorldStore.getState().acknowledgeBattleResult();
+  const inv = useWorldStore.getState().inventory;
+  assert.equal(inv.potion ?? 0, 2 - (used.potion ?? 0));
+  assert.equal(inv.poison_vial ?? 0, 1 - (used.poison_vial ?? 0));
+  assert.equal(inv.cooked_meat, 4, "food never goes into a fight");
 });
 
 bs().reset();

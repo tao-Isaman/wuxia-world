@@ -107,7 +107,7 @@ export function ShopPopup({ open, shop, onClose }: Props) {
                       <div className="text-[10px] text-muted-foreground">{def.description}</div>
                     )}
                     <div className="mt-1 flex flex-wrap items-center gap-1" aria-label="ผลเมื่อใช้">
-                      <ItemEffects effect={def.use} />
+                      <ItemEffects effect={def.use} battle={def.battle} />
                       <span className="text-[10px] text-muted-foreground">มี {inventory[id] ?? 0} ชิ้น</span>
                     </div>
                   </div>

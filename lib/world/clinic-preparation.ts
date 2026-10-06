@@ -56,7 +56,7 @@ export function clinicPreparation(state: PreparationState) {
     label: "เตรียมเดินทางครั้งต่อไป",
     title: `สำรอง${potion.name}ไว้สักขวด`,
     nextStep: `จุดหมาย → ${shopName}`,
-    description: `${potion.name}ราคา ${price} ทอง · มี ${state.gold} ทอง · ฟื้น HP ได้สูงสุด ${potion.use.hp ?? 0} เมื่อใช้จากย่าม`,
+    description: `${potion.name}ราคา ${price} ทอง · มี ${state.gold} ทอง · ฟื้น HP ${potion.use.hp ?? 0}${potion.use.hpPct ? ` + ${potion.use.hpPct}% ของ HP สูงสุด` : ""} · ดื่มจากย่ามหรือกลางการต่อสู้`,
     action: `จุดหมาย → ${shopName} → ซื้อ ${potion.name} · เก็บไว้ใช้เมื่อบาดเจ็บ`,
     note: skill && upgradeCost !== null
       ? `${skill.n}: อัปขั้นใช้ ${upgradeCost} W-EXP · มี ${state.wExp} W-EXP · เลือกเก็บเงินไว้ก่อนได้`

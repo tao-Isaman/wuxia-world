@@ -263,6 +263,55 @@ export const RECIPES: readonly RecipeDef[] = [
     output: { itemId: "poison_vial", count: 1 },
     description: "กลั่นพิษหลายชนิดให้เข้มข้นและพร้อมใช้",
   },
+  // Poisons and the qi potion — the same เภสัช (alchemy) mastery as healing potions.
+  {
+    id: "alchemy_poison_powder",
+    name: "บดผงพิษงู",
+    skill: "alchemy",
+    requiredMastery: 1,
+    basic: true,
+    inputs: [{ itemId: "viper_venom", count: 1 }],
+    output: { itemId: "poison_powder", count: 2 },
+    description: "ตากพิษงูให้แห้งแล้วบดเป็นผง ไว้ซัดใส่ศัตรู",
+  },
+  {
+    id: "alchemy_poison_needle",
+    name: "ชุบเข็มอาบพิษ",
+    skill: "alchemy",
+    requiredMastery: 2,
+    basic: true,
+    inputs: [
+      { itemId: "viper_venom", count: 1 },
+      { itemId: "iron_ore",    count: 1 },
+    ],
+    output: { itemId: "poison_needle", count: 3 },
+    description: "ตีเข็มเหล็กเล่มเล็กแล้วชุบพิษงู",
+  },
+  {
+    id: "alchemy_potion_qi",
+    name: "ปรุงยาฟื้นปราณ",
+    skill: "alchemy",
+    requiredMastery: 2,
+    basic: true,
+    inputs: [
+      { itemId: "herb",       count: 1 },
+      { itemId: "lotus_seed", count: 2 },
+    ],
+    output: { itemId: "potion_qi", count: 1 },
+    description: "ต้มสมุนไพรกับเม็ดบัวเป็นยาบำรุงลมปราณ",
+  },
+  {
+    id: "alchemy_black_centipede",
+    name: "กลั่นพิษตะขาบทมิฬ",
+    skill: "alchemy",
+    requiredMastery: 5,
+    inputs: [
+      { itemId: "centipede_venom", count: 1 },
+      { itemId: "scorpion_venom",  count: 2 },
+    ],
+    output: { itemId: "poison_black_centipede", count: 1 },
+    description: "ตำรับพิษลับขั้นสูงสุด ผสมพิษตะขาบยักษ์กับพิษแมงป่อง",
+  },
 
   // ─── Chef ───────────────────────────────────────────────────────────
   {

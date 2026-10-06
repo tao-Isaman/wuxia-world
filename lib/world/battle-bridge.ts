@@ -21,6 +21,7 @@
 import { useBattleStore } from "@/store/battle-store";
 import { useWorldStore } from "@/store/world-store";
 import { getOpponent } from "./data/opponents";
+import { getItem } from "./data/items";
 import { applyOpponentStatScale, playerPowerIndex } from "./data/random-events";
 import { worldBattleSetup } from "./battle-looks";
 import { powerOutlook, powerScore, powerTierOf, type CharacterBuild, type PowerOutlook, type PowerTier } from "../game";
@@ -112,7 +113,15 @@ export function ensureBattleStarted(): void {
     mpA: ws.currentMp,
     looks: setup.looks,
     enemies: setup.enemies,
+    bag: battleBag(ws.inventory),
   });
+}
+
+/** The hero's battle items (ItemDef.battle) as they go into a fight: item id → count carried. */
+export function battleBag(inventory: Readonly<Record<string, number>>): Record<string, number> {
+  const bag: Record<string, number> = {};
+  for (const [id, n] of Object.entries(inventory)) if (n > 0 && getItem(id)?.battle) bag[id] = n;
+  return bag;
 }
 
 let initialized = false;

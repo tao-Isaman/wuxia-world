@@ -84,7 +84,7 @@ function SpoilDetail({ picked, onClose }: { picked: Picked; onClose: () => void 
     color = rarityColor(itemRarity(def?.price));
     title = `${def?.name ?? picked.itemId} ×${picked.count}`;
     meta = `${ITEM_CATEGORY_LABEL[def?.category ?? "misc"]}${def?.price ? ` · ราคา ${def.price}` : ""}`;
-    body = <>{def?.description && <p>{def.description}</p>}<div className="gb-spoil-effects"><ItemEffects effect={def?.use} /></div></>;
+    body = <>{def?.description && <p>{def.description}</p>}<div className="gb-spoil-effects"><ItemEffects effect={def?.use} battle={def?.battle} /></div></>;
   } else {
     const skill = picked.move === "skill" ? getSkill(picked.id) : undefined;
     const art = picked.move === "art" ? getArt(picked.id) : undefined;

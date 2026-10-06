@@ -116,12 +116,25 @@ export interface GridUnit {
   revive?: number;
 }
 
+// ─── Battle items (the world's consumables, carried into the fight) ─────
+/**
+ * What a battle item does when the player uses it (costs the turn).
+ * `heal` restores the user (flat + % of max); `throw` hits one foe within
+ * `range` tiles for `power + Acc × dexScale − half its PD`, never missing,
+ * and may leave poison (`pct` % of max HP per turn for `turns` turns).
+ */
+export type BattleItemEffect =
+  | { t: "heal"; hp?: number; hpPct?: number; mp?: number; mpPct?: number }
+  | { t: "throw"; power: number; dexScale: number; range: number; poison?: { pct: number; turns: number } };
+
 // ─── Actions (what the UI / AI submits) ────────────────────────────────
 export type GridAction =
   | { t: "move"; to: Cell }
   | { t: "skill"; slot: number; target: Cell }   // slot = index into build.skillIds (skill or "art:" slot)
   | { t: "wait" }
-  | { t: "flee" };
+  | { t: "flee" }
+  /** Use a battle item from the bag (state.bag); `target` is the user's own cell for heals. */
+  | { t: "item"; itemId: string; name: string; effect: BattleItemEffect; target: Cell };
 
 /** A whole turn as the AI plans it: optional move, then one action. */
 export interface TurnPlan { move?: Cell; action: Exclude<GridAction, { t: "move" }> }
@@ -140,7 +153,7 @@ export interface TargetResult {
 export type GridEvent =
   | { seq: number; t: "move"; unitId: string; path: Cell[] }
   | { seq: number; t: "cast"; unitId: string; name: string; tier: SkillTierIndex;
-      source: { kind: "skill" | "art"; id: string }; aimed: Cell; cells: Cell[]; results: TargetResult[] }
+      source: { kind: "skill" | "art" | "item"; id: string; poison?: boolean }; aimed: Cell; cells: Cell[]; results: TargetResult[] }
   | { seq: number; t: "wait"; unitId: string }
   | { seq: number; t: "stunned"; unitId: string }
   | { seq: number; t: "flee"; unitId: string; success: boolean }
@@ -184,6 +197,10 @@ export interface GridBattleState {
   skillUses: { A: Record<string, number>; B: Record<string, number> };
   artUses: { A: Record<string, number>; B: Record<string, number> };
   hitsReceived: { A: number; B: number };
+  /** The leader's battle items left (item id → count); absent when none were brought. */
+  bag?: Record<string, number>;
+  /** Battle items used so far (item id → count): the world takes them from the inventory. */
+  itemsUsed?: Record<string, number>;
 }
 
 /** Options for createGridBattle. */

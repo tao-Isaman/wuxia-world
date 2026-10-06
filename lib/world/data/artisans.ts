@@ -48,8 +48,8 @@ const PROF_ICON: Record<CraftProfession, string> = {
 // (typically a mix of crafted goods + basic profession-relevant
 // materials so the player can buy ingredients on the same trip).
 const PROF_INVENTORY: Record<CraftProfession, readonly string[]> = {
-  forge:     ["iron_ingot", "iron_blade", "iron_sword"],
-  alchemy:   ["potion", "potion_mid", "herb", "ginseng"],
+  forge:     ["iron_ingot", "iron_blade", "iron_sword", "throw_dart", "throw_knife", "throw_star"],
+  alchemy:   ["potion", "potion_mid", "potion_qi", "herb", "ginseng", "poison_powder", "poison_needle", "poison_vial"],
   tailoring: ["thread", "cloth_robe", "leather_robe"],
   chef:      ["rice_dish", "spicy_stew", "moon_cake", "cooked_meat"],
   jewelry:   ["silver_ring", "gold_ring", "silver_ore"],
@@ -215,6 +215,7 @@ const CITY_SPECIALTIES: readonly {
   // Dali — alchemy + herbalist hub. Heavy potions.
   { city: "city_dali", prof: "alchemy", recipeId: "alchemy_potion_big", price: 800 },
   { city: "city_dali", prof: "alchemy", recipeId: "alchemy_poison", price: 500 },
+  { city: "city_dali", prof: "alchemy", recipeId: "alchemy_black_centipede", price: 1500 },
   // Capital — court chef.
   { city: "city_capital", prof: "chef", recipeId: "chef_moon_cake", price: 250 },
   // Jinling — jade jeweller.
@@ -351,7 +352,7 @@ const SINGLE_PROFESSION_ARTISANS: readonly ArtisanDef[] = [
       { recipeId: "alchemy_potion_mid", price: 280 },
     ],
     equipment: [],
-    inventory: ["potion", "potion_mid", "herb", "ginseng"],
+    inventory: ["potion", "potion_mid", "potion_qi", "herb", "ginseng"],
     acceptsCategories: ["herb", "venom"],
     sellMultiplier: 0.35,
   },
@@ -364,9 +365,10 @@ const SINGLE_PROFESSION_ARTISANS: readonly ArtisanDef[] = [
     description: "หอปรุงพิษของพรรคเบญจพิษ — เฉพาะผู้กล้าที่จิตใจไม่หวั่นไหว",
     recipes: [
       { recipeId: "alchemy_poison", price: 600 },
+      { recipeId: "alchemy_black_centipede", price: 1400 },
     ],
     equipment: [],
-    inventory: ["poison_vial"],
+    inventory: ["poison_powder", "poison_needle", "poison_vial", "poison_black_centipede"],
     acceptsCategories: ["venom", "herb"],
     sellMultiplier: 0.35,
   },

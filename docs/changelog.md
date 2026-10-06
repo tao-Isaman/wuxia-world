@@ -6,6 +6,14 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-06
 
+### Battle items, poisons at the apothecary, food for stamina
+
+- **ใช้ของ in battle.** A new control opens the hero's battle items on their turn: potions heal at once, poisons and hidden weapons are thrown at a foe in range (no miss; poison ticks a % of max HP). Using one ends the turn; what was used leaves the bag after the fight, whatever the outcome.
+- **Stronger potions.** HP potions heal a flat amount plus a share of max HP (40 + 20 %, 100 + 35 %, 200 + 60 %); new ยาฟื้นปราณ restores MP 20 + 35 %.
+- **Poisons and hidden weapons.** Alchemy artisans sell ผงพิษงู, เข็มอาบพิษ, ขวดพิษ and ยาฟื้นปราณ and teach their recipes on the same alchemy (ปรุงยา) mastery; พิษตะขาบทมิฬ is a specialty at ต้าหลี่ and the Five Venoms. Forges sell ลูกดอกเหล็ก, มีดบิน and ดาวกระจาย.
+- **Food restores stamina** (15–30) as well as HP, and stays out of the fight.
+- **Every resource is on a map.** The Tang clan and the Five Venoms gather viper and scorpion venom at home (no more long walks for the Tang quests), the medicine king's villa has rare herbs and centipedes, villages a rock pile, mines silver and the high peaks gold.
+
 ### Life-skill cards no longer clip their xp
 
 - In อาชีพ → มาสเตอร์รี่ the level and the xp (45/400) now share one row above the bar, so the card's edge no longer cuts the numbers on phones.

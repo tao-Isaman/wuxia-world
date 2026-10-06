@@ -63,17 +63,43 @@ export const ITEMS: readonly ItemDef[] = ([
     description: "เหรียญทองคำโบราณ มีอักษรจีนแกะสลัก" },
 
   // ─── Potions ───────────────────────────────────────────────────────
+  // Potions heal a flat amount plus a share of max HP, so they keep up as the
+  // hero grows; all of them can be drunk mid-fight (the ใช้ของ action).
   { id: "potion", name: "ยาเลือดเล็ก", category: "potion", price: 50,
-    description: "ยาฟื้นพลังชีวิต ใช้ในยามฉุกเฉิน",
-    use: { t: "heal", hp: 30 } },
+    description: "ยาฟื้นพลังชีวิต ใช้ในยามฉุกเฉิน ดื่มกลางการต่อสู้ได้",
+    use: { t: "heal", hp: 40, hpPct: 20 }, battle: { t: "heal", hp: 40, hpPct: 20 } },
   { id: "potion_mid", name: "ยาเลือดกลาง", category: "potion", price: 200,
-    description: "ยาฟื้นพลังชีวิตขั้นกลาง",
-    use: { t: "heal", hp: 80 } },
+    description: "ยาฟื้นพลังชีวิตขั้นกลาง ดื่มกลางการต่อสู้ได้",
+    use: { t: "heal", hp: 100, hpPct: 35 }, battle: { t: "heal", hp: 100, hpPct: 35 } },
   { id: "potion_big", name: "ยาเลือดใหญ่", category: "potion", price: 500,
-    description: "ยาฟื้นพลังชีวิตขั้นสูง",
-    use: { t: "heal", hp: 200 } },
+    description: "ยาฟื้นพลังชีวิตขั้นสูง ดื่มกลางการต่อสู้ได้",
+    use: { t: "heal", hp: 200, hpPct: 60 }, battle: { t: "heal", hp: 200, hpPct: 60 } },
+  { id: "potion_qi", name: "ยาฟื้นปราณ", category: "potion", price: 150,
+    description: "ยาบำรุงลมปราณ ฟื้นพลังภายใน ดื่มกลางการต่อสู้ได้",
+    use: { t: "heal", mp: 20, mpPct: 35 }, battle: { t: "heal", mp: 20, mpPct: 35 } },
+
+  // ─── Poisons and hidden weapons (thrown in a fight; alchemy brews the poisons) ──
+  { id: "poison_powder", name: "ผงพิษงู", category: "venom", price: 80,
+    description: "ผงพิษงูบดละเอียด ซัดใส่ศัตรูให้ติดพิษ",
+    battle: { t: "throw", power: 6, dexScale: 0.5, range: 4, poison: { pct: 4, turns: 3 } } },
+  { id: "poison_needle", name: "เข็มอาบพิษ", category: "venom", price: 180,
+    description: "เข็มเหล็กอาบพิษงู ซัดได้ไกล แผลเล็กแต่พิษซึมลึก",
+    battle: { t: "throw", power: 15, dexScale: 1, range: 5, poison: { pct: 5, turns: 3 } } },
   { id: "poison_vial", name: "ขวดพิษ", category: "potion", price: 250,
-    description: "ขวดพิษเข้มข้น ใช้กับงานลอบ" },
+    description: "ขวดพิษเข้มข้น ใช้กับงานลอบ ขว้างใส่ศัตรูให้ติดพิษร้าย",
+    battle: { t: "throw", power: 10, dexScale: 0.8, range: 4, poison: { pct: 6, turns: 4 } } },
+  { id: "poison_black_centipede", name: "พิษตะขาบทมิฬ", category: "venom", price: 900,
+    description: "พิษตะขาบยักษ์ผสมพิษแมงป่อง สุดยอดพิษของตระกูลถัง",
+    battle: { t: "throw", power: 20, dexScale: 1, range: 4, poison: { pct: 9, turns: 5 } } },
+  { id: "throw_dart", name: "ลูกดอกเหล็ก", category: "craft", price: 40,
+    description: "ลูกดอกเหล็กปลายแหลม อาวุธลับพื้นฐานของจอมยุทธ์",
+    battle: { t: "throw", power: 20, dexScale: 1, range: 4 } },
+  { id: "throw_knife", name: "มีดบิน", category: "craft", price: 120,
+    description: "มีดบินสมดุลดี ซัดแม่นและแรง",
+    battle: { t: "throw", power: 45, dexScale: 1.5, range: 4 } },
+  { id: "throw_star", name: "ดาวกระจาย", category: "craft", price: 300,
+    description: "อาวุธลับรูปดาวคมกริบ ซัดได้ไกลและหนักมือ",
+    battle: { t: "throw", power: 80, dexScale: 2, range: 5 } },
 
   // ─── Mining materials ──────────────────────────────────────────────
   { id: "rock",        name: "ก้อนหิน",         category: "material", price: 5,
@@ -145,7 +171,7 @@ export const ITEMS: readonly ItemDef[] = ([
     description: "หนังสัตว์ที่ฟอกแล้ว เหมาะกับงานเย็บเสื้อหนัง" },
   { id: "cooked_meat", name: "เนื้อย่าง",        category: "food", price: 50,
     description: "เนื้อสดที่ปรุงแล้ว เพิ่มแรงระหว่างเดินทาง",
-    use: { t: "heal", hp: 30 } },
+    use: { t: "heal", hp: 30, stamina: 15 } },
 
   // ─── Crafting bases (paper / ink / silk) ───────────────────────────
   { id: "paper",       name: "กระดาษสา",         category: "material", price: 15,
@@ -228,13 +254,13 @@ export const ITEMS: readonly ItemDef[] = ([
   // ─── Chef outputs (food) ───────────────────────────────────────────
   { id: "rice_dish",   name: "ข้าวหมูแดง",         category: "food", price: 60,
     description: "ข้าวจานเดียวเรียบง่าย กินแล้วฟื้นแรง",
-    use: { t: "heal", hp: 40 } },
+    use: { t: "heal", hp: 40, stamina: 20 } },
   { id: "spicy_stew",  name: "ต้มยำเข้มข้น",       category: "food", price: 90,
     description: "ต้มยำเผ็ดร้อน เพิ่มแรงเดินทาง",
-    use: { t: "heal", hp: 60 } },
+    use: { t: "heal", hp: 60, stamina: 30 } },
   { id: "moon_cake",   name: "ขนมไหว้พระจันทร์",   category: "food", price: 30,
     description: "ของหวานพื้นเมือง รสหวานหอม",
-    use: { t: "heal", hp: 20 } },
+    use: { t: "heal", hp: 20, stamina: 10 } },
 
   // ─── Accessory outputs ─────────────────────────────────────────────
   // Belts, fans, talismans — crafted by `accessory` artisans. These are

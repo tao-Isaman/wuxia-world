@@ -75,7 +75,7 @@ Mount points: `components/world/world-screen.tsx` (world mode, over the map) and
 
 1. `beginNextTurn` picks the next unit and, **for that unit only**, ticks its status (poison, burn, durations, regen) and lowers every slot cooldown by 1. A poison death can end the battle here. A stunned unit loses the turn (log "ถูกสตัน — ข้ามตา!", `stunned` event).
 2. The unit may **move** once, up to its move range, before acting.
-3. Then exactly one **action**: a skill or art slot aimed at a cell, **wait** (รอ), or **flee** (ถอยหนี, hero only). Moving after acting is not possible; acting without moving is fine; wait and flee are allowed after moving.
+3. Then exactly one **action**: a skill or art slot aimed at a cell, a **battle item** (ใช้ของ, hero and allies with a bag; below), **wait** (รอ), or **flee** (ถอยหนี, hero only). Moving after acting is not possible; acting without moving is fine; wait and flee are allowed after moving.
 
 Phases (`GridPhase`): `start` (nobody holds the turn) → `turn` (may move or act) → `moved` (must act, wait or flee) → back to `start`; `over` at the end. `state.turn` counts actions (casts, waits, flee attempts, stun skips), not moves.
 
@@ -177,7 +177,8 @@ slotReady(state, unitId, slot): boolean
 applyAction(state, unitId, action, rng = Math.random): boolean   // false (state untouched) when illegal
 ```
 
-- `GridAction` = `{ t: "move", to }` | `{ t: "skill", slot, target }` | `{ t: "wait" }` | `{ t: "flee" }`. A skill, wait or flee ends the turn; the next turn is **not** begun automatically.
+- `GridAction` = `{ t: "move", to }` | `{ t: "skill", slot, target }` | `{ t: "item", itemId, name, effect, target }` | `{ t: "wait" }` | `{ t: "flee" }`. A skill, item, wait or flee ends the turn; the next turn is **not** begun automatically.
+- **Battle items.** `state.bag` (item id → count, set by `start(..., { bag })`) holds what the side may use; `state.itemsUsed` counts what it used. The effect is the item's `BattleItemEffect`: `heal` (flat `hp` / `mp` plus `hpPct` / `mpPct` of the max, on the user's own cell) or `throw` (a foe within manhattan `range`; damage `throwDamage` = `max(1, round(power + Acc × dexScale − PD × 0.5))`, never misses, optional `poison` → `debuff_poison` through `addDebuff`, so a meridian ward still blocks it). `itemTargetCells(state, unitId, effect)` lists the legal cells. The cast event's `source` is `{ kind: "item", id, poison? }` with tier 0; the AI never uses items.
 - `GridEvent` = `move {path}` · `cast {name, tier, source, aimed, cells, results}` · `wait` · `stunned` · `flee {success}` · `end {winner, escaped}` · `proc {unitId, kind, label, el?}` (meridians, below), each with a rising `seq`.
 - Compat fields for the world (`winner`, `escaped`, `hA`, `mpA`, `skillUses.A`, `artUses.A`, `hitsReceived.A`) mirror the leader; the `B` fields mirror the first enemy. They refresh at turn start, turn end and battle end.
 - `geometry.ts`: `manhattan`, `chebyshev`, `inBounds`, `neighbours`, `facingToward`, `reachableCells`, `aimCells`, `areaCells`. `skill-grid.ts`: `skillGrid`, `artGrid`, `slotGrid(rawSlotId)`, `describeGrid`, `SKILL_GRID_OVERRIDES`. `duel.ts`: `pairContext`, `makeDuelView`, `commitDuelView`, `resolveDuel`, `tickUnit`. `ai.ts`: `planTurn`, `scoreAction`.
@@ -217,8 +218,8 @@ applyAction(state, unitId, action, rng = Math.random): boolean   // false (state
 | Member | What it does |
 | --- | --- |
 | `state`, `builds`, `auto` | the `GridBattleState`, the hero and primary-enemy builds, the auto flag |
-| `start(a, b, opts?)` | `opts = { hpA?, mpA?, enemies?, looks?, blocked? }`; creates the battle, logs the opening lines (carry-over HP / MP, mastery per family, each side's primary art, the pack) |
-| `move(to)`, `act(slot, target)`, `wait()`, `flee()` | player actions, only on the player's turn; return `false` when refused |
+| `start(a, b, opts?)` | `opts = { hpA?, mpA?, enemies?, looks?, blocked?, bag? }` (`bag` turns on ใช้ของ); creates the battle, logs the opening lines (carry-over HP / MP, mastery per family, each side's primary art, the pack) |
+| `move(to)`, `act(slot, target)`, `useItem(itemId, name, effect, target)`, `wait()`, `flee()` | player actions, only on the player's turn; return `false` when refused |
 | `setAuto(on)` | อัตโนมัติ: the AI plays the hero's side too |
 | `step()` | one visible beat: begin the next turn, or play the AI's move, or its action. Does nothing while the player must act. The renderer calls it. |
 | `stepAll()` | repeat `step()` until the player's turn or the end (tests) |
@@ -244,13 +245,13 @@ Everything sets `worldStore.pendingBattle = { opponentId, onWin, onLose, nonFata
 
 ### Starting a battle
 
-`lib/world/battle-bridge.ts`: a `pendingBattle` is first briefed (`battleBriefing(hero)`: the foe, its pack and both sides' power tiers, shown by `BattleBriefingScreen`; the encounter screen uses `previewBriefing`). `ensureBattleStarted()`, called when the player goes in, then applies the opponent stat scale for the hero's progress (`applyOpponentStatScale`, ×1 to ×3), builds the setup with `worldBattleSetup(opponentId, { bodyId, withPack })`, and calls `battleStore.start(playerBuild, setup.build, { hpA, mpA, looks, enemies })`. The setup is built once per `pendingBattle`, so the fight is exactly the one briefed. A save with a `pendingBattle` shows the briefing again and restarts that fight. An unknown opponent clears the pending battle.
+`lib/world/battle-bridge.ts`: a `pendingBattle` is first briefed (`battleBriefing(hero)`: the foe, its pack and both sides' power tiers, shown by `BattleBriefingScreen`; the encounter screen uses `previewBriefing`). `ensureBattleStarted()`, called when the player goes in, then applies the opponent stat scale for the hero's progress (`applyOpponentStatScale`, ×1 to ×3), builds the setup with `worldBattleSetup(opponentId, { bodyId, withPack })`, and calls `battleStore.start(playerBuild, setup.build, { hpA, mpA, looks, enemies, bag })` — `bag` is `battleBag(inventory)`, the carried items whose `ItemDef.battle` is set (potions, poisons, hidden weapons; never food). The setup is built once per `pendingBattle`, so the fight is exactly the one briefed. A save with a `pendingBattle` shows the briefing again and restarts that fight. An unknown opponent clears the pending battle.
 
 ### Ending a battle
 
 The result panel's **ดำเนินเรื่อง →** calls `worldStore.acknowledgeBattleResult()`:
 
-- **Every outcome**: stamina −5 (`FIGHT_STAMINA`), +0.5 ชั่วยาม (`FIGHT_HOURS`), HP / MP carried back.
+- **Every outcome**: stamina −5 (`FIGHT_STAMINA`), +0.5 ชั่วยาม (`FIGHT_HOURS`), HP / MP carried back, and the battle items used (`itemsUsed`) taken from the inventory (`consumeBattleItems`).
 - **Escape**: no rewards; a law escape clears the pending jail city; the hero stays where they are (a dialog scene returns to the last location).
 - **Win**: the spoils the result panel showed — `victorySpoils()` rolls gold (`FOE_GOLD` by tier, hostile foes only), the drop table, meridian charts and a hunt's carcass once per `pendingBattle` (cached in a `WeakMap`), and `VictorySpoils` (`components/world/victory-spoils.tsx`, passed as `winExtra`) draws them as tappable icons; then +50 w-exp; +1 kill for the opponent and each fallen pack member; skill xp 20 × uses and art xp 20 × uses (auto-level; skills from a sect the hero resigned from get no battle xp); STR xp for physical skill uses, POW xp for internal ones, DEF xp for hits taken, LUK rolls; sparring fame and +1 relationship; a rumor when the foe is a named NPC; the gold, items and hunt spoils from `victorySpoils`; quest progress; then `onWin`.
 - **Loss, non-fatal**: HP floored at 1, then `onLose`.
@@ -314,7 +315,7 @@ Details of the rewards: [gameplay.md](gameplay.md#progression).
 - **Status row** (`data-testid="combat-status"`): a headline (ถึงตา *name*, เล็งเป้า · *skill*, อัตโนมัติ · *name*, …), the turn-order timeline (`data-testid="turn-timeline"`, 8 portraits; tap one to open that unit's card), the turn number, a 📜 log toggle and the ♪ sound button.
 - **Field**: the board, a ถึงตาเจ้า callout on the player's turn, the unit card (`data-testid="unit-card"`: side, move range and Spd, HP / MP meters, buff and debuff chips with info), a hint pill, and the log drawer.
 - **Skill bar**: a horizontal strip along the bottom, like Wandering Sword — one square tile per filled slot of the acting ally (icon, name, and cooldown "รอ N ตา", MP cost, "MP ไม่พอ", "พร้อม" or "นอกระยะ"), scrolling sideways when the slots don't fit; the controls sit at its right end. The range label (`describeGrid`) is in the tile's tooltip. On a landscape phone the tiles shrink to 58 × 62 and drop the meta line.
-- **Controls**: while aiming, **ยกเลิก** (Esc) and **ยืนยัน** (Enter); otherwise **รอ** (W) and, in world mode, **ถอยหนี**; always **อัตโนมัติ** (A). Free mode adds **Reset**. There is no item command and no undo-move.
+- **Controls**: while aiming, **ยกเลิก** (Esc) and **ยืนยัน** (Enter); otherwise **รอ** (W) and, in world mode, **ถอยหนี**; always **อัตโนมัติ** (A). In world mode **ใช้ของ** opens the item tray (`components/game/battle-items.tsx`, `data-testid="battle-items"`) on the leader's turn: a potion is drunk at once, a poison or hidden weapon lists the foes in range ("ขว้างใส่ …", estimated damage). Free mode adds **Reset**. There is no undo-move.
 - **Aiming**: pick a skill card (keys 1–9 map to the visible cards). Self skills, and skills with exactly one useful aim, are pre-aimed. With a mouse, clicking a red tile confirms at once; with touch, the first tap aims (showing the orange area) and a second tap on the same tile confirms. With no skill selected, tapping a blue tile moves.
 - **Result panel** (`data-testid="combat-result"`, `data-outcome` = `ally` / `enemy` / `escaped`): ชัยชนะ, พ่ายแพ้ or หนีรอด, the number of turns, and **ดำเนินเรื่อง →** (world) or **เริ่มใหม่** / **Reset** (free). It appears once the battle is over and playback has caught up.
 

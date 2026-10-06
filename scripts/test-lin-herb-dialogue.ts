@@ -52,7 +52,7 @@ try {
     assert.ok(information.includes(potion.name));
     assert.ok(information.includes(`${potion.price} ทอง`));
     assert.equal(potion.use?.t, "heal");
-    if (potion.use?.t === "heal") assert.ok(information.includes(`HP ได้สูงสุด ${potion.use.hp}`));
+    if (potion.use?.t === "heal") assert.ok(information.includes(`HP ${potion.use.hp} กับอีก ${potion.use.hpPct}%`));
     assert.ok(information.includes(`เก็บสมุนไพรระดับ ${getResource("herb_snow_lotus")!.level}`));
     assert.ok(information.includes("ก้นหุบเขาตัดใจ"));
     assert.match(getQuest("qc_capital_rare_herb")!.description, /ก้นหุบเขาตัดใจ/);

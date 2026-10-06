@@ -2,7 +2,7 @@
 
 # Items, shops, crafting and gathering
 
-471 items (`lib/world/data/items.ts`), 19 shops, 7 martial halls, 49 artisans, 32 recipes and 25 gathering / hunting nodes.
+478 items (`lib/world/data/items.ts`), 19 shops, 7 martial halls, 49 artisans, 36 recipes and 25 gathering / hunting nodes.
 
 ## Contents
 
@@ -47,21 +47,25 @@
 | `lotus_seed` | เม็ดบัว | 60 | heal MP 30 |
 | `snow_lotus` | บัวหิมะ | 1200 | heal HP 80 MP 80 |
 
-### พิษ (`venom`, 3)
+### พิษ (`venom`, 6)
 
 | Id | Name | Price | Use |
 | --- | --- | --- | --- |
+| `poison_powder` | ผงพิษงู | 80 | — |
+| `poison_needle` | เข็มอาบพิษ | 180 | — |
+| `poison_black_centipede` | พิษตะขาบทมิฬ | 900 | — |
 | `viper_venom` | พิษงู | 100 | — |
 | `scorpion_venom` | พิษแมงป่อง | 150 | — |
 | `centipede_venom` | พิษตะขาบ | 800 | — |
 
-### ยาฟื้นพลัง (`potion`, 4)
+### ยาฟื้นพลัง (`potion`, 5)
 
 | Id | Name | Price | Use |
 | --- | --- | --- | --- |
-| `potion` | ยาเลือดเล็ก | 50 | heal HP 30 |
-| `potion_mid` | ยาเลือดกลาง | 200 | heal HP 80 |
+| `potion` | ยาเลือดเล็ก | 50 | heal HP 40 |
+| `potion_mid` | ยาเลือดกลาง | 200 | heal HP 100 |
 | `potion_big` | ยาเลือดใหญ่ | 500 | heal HP 200 |
+| `potion_qi` | ยาฟื้นปราณ | 150 | heal MP 20 |
 | `poison_vial` | ขวดพิษ | 250 | — |
 
 ### อาหาร (`food`, 4)
@@ -488,10 +492,13 @@
 | `chart_starry_revolution` | แผนภาพชีพจร-ชีพจรดาราหมุนเวียน | 25000 | learn meridian chart `starry_revolution` |
 | `chart_grand_circuit` | แผนภาพชีพจร-มหาจักรวาลชีพจร | 25000 | learn meridian chart `grand_circuit` |
 
-### ของช่างฝีมือ (`craft`, 13)
+### ของช่างฝีมือ (`craft`, 16)
 
 | Id | Name | Price | Use |
 | --- | --- | --- | --- |
+| `throw_dart` | ลูกดอกเหล็ก | 40 | — |
+| `throw_knife` | มีดบิน | 120 | — |
+| `throw_star` | ดาวกระจาย | 300 | — |
 | `iron_blade` | ใบมีดเหล็ก | 150 | — |
 | `iron_sword` | ดาบเหล็กธรรมดา | 250 | — |
 | `steel_sword` | ดาบเหล็กกล้า | 800 | — |
@@ -582,54 +589,54 @@ Every city hosts all six craft professions; villages and some sects host one. Re
 | Location | Profession | Artisan | Recipes taught | Specialties |
 | --- | --- | --- | --- | --- |
 | นครหลวง (`city_capital`) | 🔨 forge | ช่างตีเหล็กแห่งนครหลวง | 1 | — |
-| นครหลวง (`city_capital`) | 🧪 alchemy | ช่างปรุงยาแห่งนครหลวง | 2 | — |
+| นครหลวง (`city_capital`) | 🧪 alchemy | ช่างปรุงยาแห่งนครหลวง | 5 | — |
 | นครหลวง (`city_capital`) | 🧵 tailoring | ช่างตัดเย็บแห่งนครหลวง | 1 | — |
 | นครหลวง (`city_capital`) | 🍳 chef | พ่อครัวแห่งนครหลวง | 2 | ทำขนมไหว้พระจันทร์ |
 | นครหลวง (`city_capital`) | 💍 jewelry | ช่างเครื่องประดับแห่งนครหลวง | 1 | — |
 | นครหลวง (`city_capital`) | 🪭 accessory | ช่างเครื่องสานแห่งนครหลวง | 1 | — |
 | ซีเซี่ย (`city_xixia`) | 🔨 forge | ช่างตีเหล็กแห่งซีเซี่ย | 2 | ตีดาบเหล็กกล้า |
-| ซีเซี่ย (`city_xixia`) | 🧪 alchemy | ช่างปรุงยาแห่งซีเซี่ย | 2 | — |
+| ซีเซี่ย (`city_xixia`) | 🧪 alchemy | ช่างปรุงยาแห่งซีเซี่ย | 5 | — |
 | ซีเซี่ย (`city_xixia`) | 🧵 tailoring | ช่างตัดเย็บแห่งซีเซี่ย | 1 | — |
 | ซีเซี่ย (`city_xixia`) | 🍳 chef | พ่อครัวแห่งซีเซี่ย | 1 | — |
 | ซีเซี่ย (`city_xixia`) | 💍 jewelry | ช่างเครื่องประดับแห่งซีเซี่ย | 1 | — |
 | ซีเซี่ย (`city_xixia`) | 🪭 accessory | ช่างเครื่องสานแห่งซีเซี่ย | 1 | — |
 | ต้าหลี่ (`city_dali`) | 🔨 forge | ช่างตีเหล็กแห่งต้าหลี่ | 1 | — |
-| ต้าหลี่ (`city_dali`) | 🧪 alchemy | ช่างปรุงยาแห่งต้าหลี่ | 4 | ปรุงยาเลือดใหญ่, ปรุงพิษเข้มข้น |
+| ต้าหลี่ (`city_dali`) | 🧪 alchemy | ช่างปรุงยาแห่งต้าหลี่ | 8 | ปรุงยาเลือดใหญ่, ปรุงพิษเข้มข้น, กลั่นพิษตะขาบทมิฬ |
 | ต้าหลี่ (`city_dali`) | 🧵 tailoring | ช่างตัดเย็บแห่งต้าหลี่ | 1 | — |
 | ต้าหลี่ (`city_dali`) | 🍳 chef | พ่อครัวแห่งต้าหลี่ | 1 | — |
 | ต้าหลี่ (`city_dali`) | 💍 jewelry | ช่างเครื่องประดับแห่งต้าหลี่ | 1 | — |
 | ต้าหลี่ (`city_dali`) | 🪭 accessory | ช่างเครื่องสานแห่งต้าหลี่ | 1 | — |
 | หยางโจว (`city_yangzhou`) | 🔨 forge | ช่างตีเหล็กแห่งหยางโจว | 1 | — |
-| หยางโจว (`city_yangzhou`) | 🧪 alchemy | ช่างปรุงยาแห่งหยางโจว | 2 | — |
+| หยางโจว (`city_yangzhou`) | 🧪 alchemy | ช่างปรุงยาแห่งหยางโจว | 5 | — |
 | หยางโจว (`city_yangzhou`) | 🧵 tailoring | ช่างตัดเย็บแห่งหยางโจว | 1 | — |
 | หยางโจว (`city_yangzhou`) | 🍳 chef | พ่อครัวแห่งหยางโจว | 1 | — |
 | หยางโจว (`city_yangzhou`) | 💍 jewelry | ช่างเครื่องประดับแห่งหยางโจว | 1 | — |
 | หยางโจว (`city_yangzhou`) | 🪭 accessory | ช่างเครื่องสานแห่งหยางโจว | 2 | ทำพัดผ้าไหม |
 | ซูโจว (`city_suzhou`) | 🔨 forge | ช่างตีเหล็กแห่งซูโจว | 1 | — |
-| ซูโจว (`city_suzhou`) | 🧪 alchemy | ช่างปรุงยาแห่งซูโจว | 2 | — |
+| ซูโจว (`city_suzhou`) | 🧪 alchemy | ช่างปรุงยาแห่งซูโจว | 5 | — |
 | ซูโจว (`city_suzhou`) | 🧵 tailoring | ช่างตัดเย็บแห่งซูโจว | 2 | เย็บเสื้อผ้าไหม |
 | ซูโจว (`city_suzhou`) | 🍳 chef | พ่อครัวแห่งซูโจว | 1 | — |
 | ซูโจว (`city_suzhou`) | 💍 jewelry | ช่างเครื่องประดับแห่งซูโจว | 1 | — |
 | ซูโจว (`city_suzhou`) | 🪭 accessory | ช่างเครื่องสานแห่งซูโจว | 1 | — |
 | จินหลิง (`city_jinling`) | 🔨 forge | ช่างตีเหล็กแห่งจินหลิง | 1 | — |
-| จินหลิง (`city_jinling`) | 🧪 alchemy | ช่างปรุงยาแห่งจินหลิง | 2 | — |
+| จินหลิง (`city_jinling`) | 🧪 alchemy | ช่างปรุงยาแห่งจินหลิง | 5 | — |
 | จินหลิง (`city_jinling`) | 🧵 tailoring | ช่างตัดเย็บแห่งจินหลิง | 1 | — |
 | จินหลิง (`city_jinling`) | 🍳 chef | พ่อครัวแห่งจินหลิง | 1 | — |
 | จินหลิง (`city_jinling`) | 💍 jewelry | ช่างเครื่องประดับแห่งจินหลิง | 3 | ทำเครื่องรางหยก, หล่อแหวนทอง |
 | จินหลิง (`city_jinling`) | 🪭 accessory | ช่างเครื่องสานแห่งจินหลิง | 1 | — |
 | ฉางอัน (`city_changan`) | 🔨 forge | ช่างตีเหล็กแห่งฉางอัน | 1 | — |
-| ฉางอัน (`city_changan`) | 🧪 alchemy | ช่างปรุงยาแห่งฉางอัน | 2 | — |
+| ฉางอัน (`city_changan`) | 🧪 alchemy | ช่างปรุงยาแห่งฉางอัน | 5 | — |
 | ฉางอัน (`city_changan`) | 🧵 tailoring | ช่างตัดเย็บแห่งฉางอัน | 1 | — |
 | ฉางอัน (`city_changan`) | 🍳 chef | พ่อครัวแห่งฉางอัน | 1 | — |
 | ฉางอัน (`city_changan`) | 💍 jewelry | ช่างเครื่องประดับแห่งฉางอัน | 1 | — |
 | ฉางอัน (`city_changan`) | 🪭 accessory | ช่างเครื่องสานแห่งฉางอัน | 2 | ถักเข็มขัดนักรบ |
 | หมู่บ้านหัวซาน (`village_huashan`) | 🔨 forge | ช่างเหล็กถัง | 1 | — |
 | หมู่บ้านดอกเหมย (`village_meihua`) | 🍳 chef | แม่ครัวเสี่ยวหง | 1 | — |
-| หมู่บ้านชีกู่ (`village_qigu`) | 🧪 alchemy | หมอเฒ่าฉี | 2 | — |
+| หมู่บ้านชีกู่ (`village_qigu`) | 🧪 alchemy | หมอเฒ่าฉี | 5 | — |
 | หมู่บ้านอวู่เซี่ย (`village_wuxia`) | 🧵 tailoring | ช่างเย็บลีหญิง | 1 | — |
 | หัวซาน (`sect_huashan`) | 🔨 forge | ผู้พิทักษ์ตีเหล็กหวาง | 2 | ตีดาบเหล็ก |
-| ง้อไบ๊ (`sect_emei`) | 🧪 alchemy | อาจารย์เภสัชชิงเหมย | 2 | ปรุงยาเลือดกลาง |
-| พรรคเบญจพิษ (`sect_wudu`) | 🧪 alchemy | ผู้อาวุโสปรุงพิษเหมียว | 3 | ปรุงพิษเข้มข้น |
+| ง้อไบ๊ (`sect_emei`) | 🧪 alchemy | อาจารย์เภสัชชิงเหมย | 5 | ปรุงยาเลือดกลาง |
+| พรรคเบญจพิษ (`sect_wudu`) | 🧪 alchemy | ผู้อาวุโสปรุงพิษเหมียว | 7 | ปรุงพิษเข้มข้น, กลั่นพิษตะขาบทมิฬ |
 
 ## Recipes by profession
 
@@ -653,7 +660,7 @@ Every city hosts all six craft professions; villages and some sects host one. Re
 | --- | --- | --- | --- | --- | --- |
 | `brew_potion` | ปรุงยาเลือดเล็ก (สมุนไพร) | 1× โสม + 1× เม็ดบัว → 1× ยาเลือดเล็ก | 1 |  | anywhere (not artisan-gated) |
 
-### เภสัช (`alchemy`, 4)
+### เภสัช (`alchemy`, 8)
 
 | Id | Name | Inputs → output | Mastery | Basic | Taught at |
 | --- | --- | --- | --- | --- | --- |
@@ -661,6 +668,10 @@ Every city hosts all six craft professions; villages and some sects host one. Re
 | `alchemy_potion_mid` | ปรุงยาเลือดกลาง | 2× โสม + 1× สมุนไพรหายาก → 1× ยาเลือดกลาง | 2 | yes | 10 artisans |
 | `alchemy_potion_big` | ปรุงยาเลือดใหญ่ | 1× บัวหิมะ + 2× โสม + 2× สมุนไพรหายาก → 1× ยาเลือดใหญ่ | 4 |  | ต้าหลี่ |
 | `alchemy_poison` | ปรุงพิษเข้มข้น | 2× พิษงู + 1× พิษแมงป่อง → 1× ขวดพิษ | 3 |  | ต้าหลี่, พรรคเบญจพิษ |
+| `alchemy_poison_powder` | บดผงพิษงู | 1× พิษงู → 2× ผงพิษงู | 1 | yes | 10 artisans |
+| `alchemy_poison_needle` | ชุบเข็มอาบพิษ | 1× พิษงู + 1× แร่เหล็ก → 3× เข็มอาบพิษ | 2 | yes | 10 artisans |
+| `alchemy_potion_qi` | ปรุงยาฟื้นปราณ | 1× สมุนไพรหายาก + 2× เม็ดบัว → 1× ยาฟื้นปราณ | 2 | yes | 10 artisans |
+| `alchemy_black_centipede` | กลั่นพิษตะขาบทมิฬ | 1× พิษตะขาบ + 2× พิษแมงป่อง → 1× พิษตะขาบทมิฬ | 5 |  | ต้าหลี่, พรรคเบญจพิษ |
 
 ### เก็บพิษ (`venom`, 1)
 
@@ -739,27 +750,27 @@ Every city hosts all six craft professions; villages and some sects host one. Re
 
 | Id | Name | Life skill | Level | Stamina | Yields | Found at |
 | --- | --- | --- | --- | --- | --- | --- |
-| `mine_rock` | ขุดหินทั่วไป | mining | 1 | 8 | ก้อนหิน, แร่ทองแดง | — |
+| `mine_rock` | ขุดหินทั่วไป | mining | 1 | 8 | ก้อนหิน, แร่ทองแดง | 7 places |
 | `mine_iron` | ขุดแร่เหล็ก | mining | 2 | 12 | แร่เหล็ก, แร่ทองแดง, ก้อนหิน | 17 places |
-| `mine_silver` | ขุดแร่เงิน | mining | 3 | 15 | แร่เงิน, แร่เหล็ก | — |
-| `mine_gold` | ขุดแร่ทองคำ | mining | 4 | 18 | แร่ทองคำ, แร่เงิน | — |
+| `mine_silver` | ขุดแร่เงิน | mining | 3 | 15 | แร่เงิน, แร่เหล็ก | 9 places |
+| `mine_gold` | ขุดแร่ทองคำ | mining | 4 | 18 | แร่ทองคำ, แร่เงิน | เขาคุนหลุน, ยอดเขามรณะ, ป้อมหลำกู่ |
 | `mine_mithril` | ขุดแร่เทพ | mining | 5 | 25 | แร่เทพ, แร่ทองคำ | นิรันดร์คุนหลุน |
 | `wood_soft` | ตัดไม้เนื้ออ่อน | woodcutting | 1 | 8 | ไม้เนื้ออ่อน | 16 places |
 | `wood_hard` | ตัดไม้เนื้อแข็ง | woodcutting | 3 | 14 | ไม้เนื้อแข็ง, ไม้เนื้ออ่อน | 22 places |
 | `wood_sacred` | ตัดไม้ศักดิ์สิทธิ์ | woodcutting | 5 | 25 | ไม้ศักดิ์สิทธิ์, ไม้เนื้อแข็ง | พรรคสราญรมย์ (เซียวหยาว) |
 | `hunt_forest` | ล่าสัตว์ในป่า | hunting | 1 | 15 | เนื้อสด, หนังสัตว์ · fights: กระต่ายป่า, ไก่ฟ้า, กระรอกแก้ม, สุนัขป่า, หมูป่าฝูง | 25 places |
 | `hunt_mountain` | ล่าเสือบนภูเขา | hunting | 3 | 18 | เนื้อสด, หนังสัตว์, เล็บเสือ, อุ้งหมี · fights: เสือดาวป่า, หมาป่าจ่าฝูง, หมีหิน, เสือเขาเล็ก | 10 places |
-| `hunt_legendary` | ล่าเสือพยัคฆ์ตำนาน | hunting | 5 | 25 | เล็บเสือ, อุ้งหมี, หนังสัตว์ · fights: หมาป่าจ่าฝูง, หมีหิน, เสือเขาเล็ก, งูยักษ์ป่า | — |
+| `hunt_legendary` | ล่าเสือพยัคฆ์ตำนาน | hunting | 5 | 25 | เล็บเสือ, อุ้งหมี, หนังสัตว์ · fights: หมาป่าจ่าฝูง, หมีหิน, เสือเขาเล็ก, งูยักษ์ป่า | ภูเขาขาวอูต, หน้าผาหมู่ก้อน |
 | `fish_river` | ตกปลาในลำธาร | fishing | 1 | 8 | ปลาคาร์ป, ปลาไหล | โรงเตี๊ยมยั่วไหล, โรงเตี๊ยมมีหว่าง, โรงเตี๊ยมเก้าอี้สูง, โรงเตี๊ยมห้วอลั่ว |
 | `fish_sea` | ตกปลาในทะเล | fishing | 3 | 12 | ปลาไหล, ปลาคาร์ป | 9 places |
 | `fish_dragon` | ตามรอยปลามังกร | fishing | 5 | 25 | ปลามังกร, ปลาไหล | เกาะมังกรเทพ |
 | `herb_common` | เก็บสมุนไพรทั่วไป | herbalism | 1 | 8 | โสม, เม็ดบัว, สมุนไพรหายาก | 41 places |
-| `herb_rare` | ค้นหาสมุนไพรหายาก | herbalism | 3 | 14 | โสม, เม็ดบัว, สมุนไพรหายาก | — |
+| `herb_rare` | ค้นหาสมุนไพรหายาก | herbalism | 3 | 14 | โสม, เม็ดบัว, สมุนไพรหายาก | 7 places |
 | `herb_snow_lotus` | เก็บบัวหิมะ | herbalism | 5 | 25 | บัวหิมะ, เม็ดบัว | ก้นหุบเขาตัดใจ |
 | `herb_kunlun_ginseng` | เก็บโสมหิมะคุนหลุน | herbalism | 5 | 25 | โสมหิมะคุนหลุน, โสม, บัวหิมะ | นิรันดร์คุนหลุน |
-| `venom_viper` | เก็บพิษงู | venom | 1 | 10 | พิษงู | 10 places |
-| `venom_scorpion` | เก็บพิษแมงป่อง | venom | 3 | 14 | พิษแมงป่อง, พิษงู | — |
-| `venom_centipede` | เก็บพิษตะขาบยักษ์ | venom | 5 | 25 | พิษตะขาบ, พิษแมงป่อง | คลังสมบัติลับ |
+| `venom_viper` | เก็บพิษงู | venom | 1 | 10 | พิษงู | 12 places |
+| `venom_scorpion` | เก็บพิษแมงป่อง | venom | 3 | 14 | พิษแมงป่อง, พิษงู | พรรคเบญจพิษ, สำนักสกุลถัง, ทะเลทรายร้าง, ชนเผ่าหุยซู |
+| `venom_centipede` | เก็บพิษตะขาบยักษ์ | venom | 5 | 25 | พิษตะขาบ, พิษแมงป่อง | คลังสมบัติลับ, คุ้มสมุนไพร |
 | `chess_basic` | เล่นหมากรุกกับชาวบ้าน | chess | 1 | 5 | เหรียญโบราณ, ยาเลือดเล็ก · gold 10–25 | 14 places |
 | `chess_master` | เล่นหมากรุกกับเซียนตัวจริง | chess | 3 | 10 | เหรียญโบราณ, หยกล้ำค่า · gold 40–80 | หยางโจว, ซูโจว |
 | `beg_street` | ขอเงินคนผ่านไปมา | begging | 1 | 6 |  · gold 10–25 | 14 places |
@@ -787,6 +798,6 @@ Mastery levels 1–5 at xp thresholds 0 / 100 / 300 / 700 / 1500 (`lib/world/dat
 | `forge` | ตีอาวุธ | 🔨 | 0 | 3 |
 | `tailoring` | ตัดเย็บ | 🧵 | 0 | 3 |
 | `jewelry` | ช่างเครื่องประดับ | 💍 | 0 | 3 |
-| `alchemy` | เภสัช | 🧪 | 0 | 4 |
+| `alchemy` | เภสัช | 🧪 | 0 | 8 |
 | `chef` | ทำอาหาร | 🍳 | 0 | 3 |
 | `accessory` | ช่างเครื่องสาน | 🪭 | 0 | 4 |

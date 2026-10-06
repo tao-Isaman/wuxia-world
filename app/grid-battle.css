@@ -201,3 +201,26 @@
   .gb-spoil .item-tile, .gb-spoil-move { width: 32px; height: 32px; }
   .gb-spoils-row { gap: 4px 6px; }
 }
+
+/* ใช้ของ: the hero's battle items (components/game/battle-items.tsx). */
+.gb-items { position: absolute; z-index: 6; left: 50%; bottom: 8px; transform: translateX(-50%); width: min(calc(100% - 16px), 560px);
+  display: grid; gap: 8px; padding: 10px 12px; color: #f4ead0;
+  background: linear-gradient(180deg, rgb(42 24 17 / .96), rgb(23 13 8 / .96)); border: 1px solid #c9a35a; border-radius: 8px; box-shadow: 0 8px 24px rgb(0 0 0 / .5); }
+.gb-items header { display: flex; align-items: baseline; gap: 8px; }
+.gb-items header strong { font: 600 15px/1.3 var(--font-body), sans-serif; color: #f8e5b6; }
+.gb-items header small { font-size: 12px; color: #d9c9a6; }
+.gb-items-close { margin-left: auto; padding: 2px 6px; background: none; border: 0; color: #d9c9a6; cursor: pointer; }
+.gb-items-row { display: flex; flex-wrap: wrap; gap: 8px 10px; }
+.gb-item { display: grid; justify-items: center; gap: 2px; width: 64px; }
+.gb-item .item-tile { width: 44px; height: 44px; }
+.gb-item em { font-size: 11px; font-style: normal; color: #eadfc2; text-align: center; line-height: 1.25; }
+.gb-items-targets { display: grid; gap: 6px; }
+.gb-items-targets button { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; padding: 8px 12px; text-align: left; color: #fbf3e0;
+  background: rgb(74 42 22 / .8); border: 1px solid rgb(221 191 126 / .5); border-radius: 6px; cursor: pointer; }
+.gb-items-targets button:hover, .gb-items-targets button:focus-visible { border-color: #e2bd6a; outline: none; }
+.gb-items-targets small { color: #d9c9a6; font-size: 12px; }
+.gb-items-empty { margin: 0; font-size: 13px; color: #d9c9a6; }
+@media (orientation: landscape) and (max-height: 500px), (orientation: portrait) and (max-width: 500px) {
+  .gb-items { padding: 8px 10px; gap: 6px; }
+  .gb-item { width: 56px; } .gb-item .item-tile { width: 36px; height: 36px; }
+}

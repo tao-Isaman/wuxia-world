@@ -555,6 +555,30 @@ for (const spot of RARE_SPOTS) {
   if (lf) lf.resources = spot.resourceIds.map((rid) => ({ resourceId: rid }));
 }
 
+// Every resource has a home. Added on top of the defaults above (an auto map
+// shows at most four nature spots, so no place gets more than four):
+//   - the Tang clan and the Five Poisons gather their own venoms, the herb
+//     garden next door (คุ้มสมุนไพร) has rare herbs and the giant centipede;
+//   - mountains hold silver, the high peaks gold and the legendary tiger;
+//   - villages quarry common stone, temples grow rare herbs, the desert has scorpions.
+function addResources(locationIds: readonly string[], resourceIds: readonly string[]): void {
+  for (const id of locationIds) {
+    const lf = LEAVES_BY_ID.get(id);
+    if (!lf) continue;
+    const have = new Set((lf.resources ?? []).map((r) => r.resourceId));
+    lf.resources = [...(lf.resources ?? []), ...resourceIds.filter((rid) => !have.has(rid)).map((rid) => ({ resourceId: rid }))];
+  }
+}
+addResources(["sect_tang", "sect_wudu"], ["venom_viper", "venom_scorpion"]);
+addResources(["villa_yaowang"], ["herb_rare", "venom_centipede"]);
+addResources(["desert_ruins", "tribe_huizu"], ["venom_scorpion"]);
+addResources(VILLAGES.map((lf) => lf.id), ["mine_rock"]);
+// (not ภูเขาวุ่นเหลียน: its painting has no open ground at the third nature corner)
+addResources(TERRAIN.filter((lf) => lf.id !== "mt_wuliang" && (lf.resources ?? []).some((r) => r.resourceId === "mine_iron")).map((lf) => lf.id), ["mine_silver"]);
+addResources(["mt_kunlun", "cliff_motian", "mt_leigu"], ["mine_gold"]);
+addResources(["mt_baituo", "cliff_yunhe"], ["hunt_legendary"]);
+addResources([...TEMPLES.map((lf) => lf.id), "valley_hudie"], ["herb_rare"]);
+
 // ─── Social activities (chess + begging) ─────────────────────────────
 // Chess fits best at inns / NPC homes — places where a stranger sitting
 // across a board feels natural. Begging is a city-and-large-sect activity

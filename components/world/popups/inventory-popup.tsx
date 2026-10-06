@@ -242,7 +242,7 @@ function BagDetail({ selection, inventory, inventoryEquipment, equipped, onUse, 
       <h3 className="bag-detail-name" style={{ color: rarityColor(rarity) }}>{def?.name ?? selection.id}</h3>
       <p className="bag-detail-meta">{ITEM_CATEGORY_LABEL[def?.category ?? "misc"]} · มี {n} ชิ้น{def?.price ? ` · ราคา ${def.price}` : ""}</p>
       {def?.description && <p className="bag-detail-text">{def.description}</p>}
-      <div className="bag-detail-effects"><ItemEffects effect={def?.use} /></div>
+      <div className="bag-detail-effects"><ItemEffects effect={def?.use} battle={def?.battle} /></div>
       {notice && <p className="bag-notice" role="status">{notice}</p>}
       {def?.use && <button type="button" className="pixel-action bag-detail-action" onClick={() => onUse(selection.id)}>ใช้</button>}
     </>;

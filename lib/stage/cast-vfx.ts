@@ -51,7 +51,10 @@ const FAMILY_SHAPE: Record<WeaponFamily, VfxShape> = {
 };
 
 /** Pure: what a cast should look like. Unknown / tactical casts get a quiet stance glow. */
-export function castVfx(cast: Pick<Cast, "tier" | "source">): CastVfx {
+/** A cast as the renderer sees it: battle items (grid `item` actions) come as source kind "item". */
+type CastLike = { tier: Cast["tier"]; source?: { kind: "skill" | "art" | "item"; id: string; poison?: boolean } };
+
+export function castVfx(cast: CastLike): CastVfx {
   const tier = Math.max(0, Math.min(4, cast.tier ?? 0));
   const palette = TIER_PALETTE[tier];
   let shape: VfxShape = "impact";
@@ -70,6 +73,11 @@ export function castVfx(cast: Pick<Cast, "tier" | "source">): CastVfx {
         : effect === "dispel" ? "holy"
         : fromTypes(skill.types, skill.at === "int");
     }
+  } else if (cast.source?.kind === "item") {
+    // A thrown hidden weapon (poisoned or not); a potion is a support glow.
+    kind = "stance";
+    shape = cast.source.id.startsWith("potion") ? "orb" : "projectile";
+    element = cast.source.poison ? "poison" : cast.source.id.startsWith("potion") ? "holy" : "none";
   } else if (cast.source?.kind === "art") {
     const art = getArt(cast.source.id);
     if (art) {

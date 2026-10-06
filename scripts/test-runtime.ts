@@ -1,4 +1,10 @@
 import assert from "node:assert/strict";
+import { ITEMS } from "../lib/world/data/items";
+import { RECIPES } from "../lib/world/data/recipes";
+import { RESOURCES } from "../lib/world/data/resources";
+import { getScene as sceneById } from "../lib/world";
+import { getLocationMap } from "../lib/world/data/location-maps";
+import { WORLD_COORDS } from "../lib/world/data/world-coords";
 import { deriveAll } from "../lib/game";
 import { applyDeathPenalty, deathLosableItems, describeDeathPenalty, rollDeathPenalty } from "../lib/world/death";
 import { stepTowards, clearMapPositions, getMapPosition, rememberMapPosition } from "../lib/stage/types";
@@ -111,6 +117,36 @@ check("sleeping at home: free, a full restore, 4 ชั่วยาม; only at 
   assert.deepEqual(useWorldStore.getState().rest("sect"), { ok: false, reason: "place" });
   useWorldStore.setState({ currentSceneId: "sect_wudang", sectMembership: member("resigned") as never });
   assert.deepEqual(useWorldStore.getState().rest("sect"), { ok: false, reason: "place" });
+  useWorldStore.getState().startNewGame({ name: "Runtime test" });
+});
+
+check("food restores stamina (never in a fight); potions heal flat + % of max; poisons are alchemy; every resource has a place", () => {
+  useWorldStore.getState().startNewGame({ name: "Item test" });
+  useWorldStore.setState({ stamina: 50, inventory: { spicy_stew: 1, potion: 1, potion_qi: 1 }, currentHp: 10, currentMp: 0 });
+  const stew = useWorldStore.getState().useItem("spicy_stew");
+  assert.ok(stew.ok);
+  assert.equal(useWorldStore.getState().stamina, 80, "ต้มยำ +30 พลัง");
+  const max = deriveAll(useWorldStore.getState().playerBuild!);
+  const hp0 = useWorldStore.getState().currentHp;
+  assert.ok(useWorldStore.getState().useItem("potion").ok);
+  assert.equal(useWorldStore.getState().currentHp, Math.min(max.HP, hp0 + Math.round(40 + max.HP * 0.2)));
+  assert.ok(useWorldStore.getState().useItem("potion_qi").ok);
+  assert.equal(useWorldStore.getState().currentMp, Math.min(max.MP, Math.round(20 + max.MP * 0.35)));
+  for (const it of ITEMS) {
+    if (it.category === "food") assert.equal(it.battle, undefined, `${it.id}: food is not a battle item`);
+    if (it.category === "food" && it.use?.t === "heal") assert.ok((it.use.stamina ?? 0) > 0, `${it.id} restores stamina`);
+  }
+  for (const id of ["potion", "potion_mid", "potion_big", "potion_qi", "poison_powder", "poison_needle", "poison_vial", "poison_black_centipede", "throw_dart", "throw_knife", "throw_star"])
+    assert.ok(ITEMS.find((i) => i.id === id)?.battle, `${id} is usable in battle`);
+  for (const r of RECIPES.filter((x) => x.output.itemId.startsWith("poison_"))) assert.equal(r.skill, "alchemy", `${r.id} uses เภสัช`);
+  const placed = new Set<string>();
+  for (const id of Object.keys(WORLD_COORDS)) {
+    if (sceneById(id)?.kind !== "location") continue;
+    for (const spot of getLocationMap(id)?.spots ?? []) if (spot.kind === "resource") placed.add(spot.resourceId);
+  }
+  for (const r of RESOURCES) assert.ok(placed.has(r.id), `${r.id} can be gathered somewhere`);
+  const tang = (getLocationMap("sect_tang")?.spots ?? []).filter((x) => x.kind === "resource").map((x) => (x as { resourceId: string }).resourceId);
+  assert.ok(tang.includes("venom_viper") && tang.includes("venom_scorpion"), "the Tang clan gathers its own venoms");
   useWorldStore.getState().startNewGame({ name: "Runtime test" });
 });
 
