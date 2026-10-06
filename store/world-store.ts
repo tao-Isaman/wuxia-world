@@ -163,6 +163,8 @@ const ACTION_HOURS = 0.2;
 const FIGHT_HOURS = 0.5;
 const FIGHT_STAMINA = 5;
 const REST_HOURS = 12;
+// Sleeping in one's own bed (home_player): free, a full restore, 4 ชั่วยาม.
+export const REST_HOME_HOURS = 4;
 const REST_INN_COST = 300;
 
 // Result of a gather attempt — surfaced so the UI can show a small banner.
@@ -341,12 +343,12 @@ export type BadActionResult =
 export const SPAR_WIN_SCENE_ID = "npc_spar_win";
 export const SPAR_LOSE_SCENE_ID = "npc_spar_lose";
 
-// Three rest tiers — see plan above.
-export type RestKind = "inn" | "temple" | "route";
+// Rest tiers: one's own bed (home_player), an inn, a temple, the roadside.
+export type RestKind = "home" | "inn" | "temple" | "route";
 
 export type RestResult =
-  | { ok: false; reason: "gold" }
-  | { ok: true; kind: RestKind; cost: number; restored: number };
+  | { ok: false; reason: "gold" | "place" }
+  | { ok: true; kind: RestKind; cost: number; restored: number; hours: number };
 
 // Practice xp granted per "เล่นเพลง" click. Small so the loop isn't trivial
 // to grind — books and song books are the bigger xp source.
@@ -2109,7 +2111,10 @@ export const useWorldStore = create<WorldStore>()(
         const max = s.staminaMax;
         let cost = 0;
         let pct = 0;
-        if (kind === "inn") {
+        if (kind === "home") {
+          if (s.currentSceneId !== "home_player") return { ok: false, reason: "place" };
+          pct = 1;
+        } else if (kind === "inn") {
           cost = REST_INN_COST;
           pct = 1;
         } else if (kind === "temple") {
@@ -2131,8 +2136,9 @@ export const useWorldStore = create<WorldStore>()(
           draft.currentHp = Math.min(d.HP, draft.currentHp + Math.floor(d.HP * pct));
           draft.currentMp = Math.min(d.MP, draft.currentMp + Math.floor(d.MP * pct));
         }
-        advanceTime(draft, REST_HOURS);
-        const restLabel = kind === "inn" ? "พักโรงเตี๊ยม" : kind === "temple" ? "พักวัด" : "พักริมทาง";
+        const hours = kind === "home" ? REST_HOME_HOURS : REST_HOURS;
+        advanceTime(draft, hours);
+        const restLabel = kind === "home" ? "นอนพักที่บ้าน" : kind === "inn" ? "พักโรงเตี๊ยม" : kind === "temple" ? "พักวัด" : "พักริมทาง";
         appendActionLog(
           draft,
           "rest",
@@ -2141,7 +2147,7 @@ export const useWorldStore = create<WorldStore>()(
             : `${restLabel} · ฟื้น ${restored} แรง`,
         );
         set({ ...draft });
-        return { ok: true, kind, cost, restored };
+        return { ok: true, kind, cost, restored, hours };
       },
 
       levelUpSkillFromWExp: (skillId) => {

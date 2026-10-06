@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { deriveAll } from "../lib/game";
 import { applyDeathPenalty, deathLosableItems, describeDeathPenalty, rollDeathPenalty } from "../lib/world/death";
 import { stepTowards, clearMapPositions, getMapPosition, rememberMapPosition } from "../lib/stage/types";
 import type { RouteScene } from "../lib/world/types";
@@ -83,6 +84,25 @@ check("death penalty: half the gold, 1–3 losable kinds halved, quest items / s
   const broke = rollDeathPenalty({ gold: 0, inventory: { old_key: 1 } });
   assert.deepEqual(broke, { goldLost: 0, itemsLost: [] });
   assert.deepEqual(describeDeathPenalty(broke), ["ไม่มีสิ่งใดติดตัวให้สูญเสีย"]);
+});
+
+check("sleeping at home: free, a full restore, 4 ชั่วยาม; only at home", () => {
+  useWorldStore.getState().startNewGame({ name: "Rest test" });
+  useWorldStore.setState({ currentSceneId: "home_player", stamina: 10, currentHp: 5, currentMp: 0, gold: 7 });
+  const clock = () => useWorldStore.getState().day * 12 + useWorldStore.getState().time;
+  const before = clock();
+  const result = useWorldStore.getState().rest("home");
+  assert.ok(result.ok && result.hours === 4);
+  const w = useWorldStore.getState();
+  const max = deriveAll(w.playerBuild!);
+  assert.equal(w.stamina, w.staminaMax);
+  assert.equal(w.currentHp, max.HP);
+  assert.equal(w.currentMp, max.MP);
+  assert.equal(w.gold, 7, "free");
+  assert.equal(clock() - before, 4, "4 ชั่วยาม");
+  useWorldStore.setState({ currentSceneId: "city_capital" });
+  assert.deepEqual(useWorldStore.getState().rest("home"), { ok: false, reason: "place" });
+  useWorldStore.getState().startNewGame({ name: "Runtime test" });
 });
 
 const route: RouteScene = { id: "__runtime_route", kind: "route", label: "Test route", destinations: [

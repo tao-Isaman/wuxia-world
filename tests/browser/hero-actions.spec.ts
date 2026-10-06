@@ -60,7 +60,7 @@ test("resting shows the hero asleep, on the map and in the work overlay", async 
   await page.reload();
   await expect(page.getByTestId("world-canvas")).toHaveAttribute("data-ready", "true", { timeout: 60_000 });
   await page.getByRole("button", { name: "พักผ่อน", exact: true }).click();
-  await page.getByRole("group", { name: "เลือกวิธีพักผ่อน" }).getByRole("button", { name: /พักริมทาง/ }).click();
+  await page.getByRole("group", { name: "เลือกวิธีพักผ่อน" }).getByRole("button", { name: /นอนพักที่บ้าน/ }).click();
   // The overlay lasts 1.4 s: read the work sprite and the map in the same frame
   // (a slow page can otherwise see it close between two checks).
   const seen = await page.waitForFunction(() => {
