@@ -52,8 +52,22 @@ export interface QuestGuide {
 export const TRACK_NONE = "none";
 
 // Longest names first so "หมอหลิน" wins over a shorter name inside it.
-const NAMED_NPCS = [...NPCS].filter((npc) => npc.name.length >= 2 && npc.locationIds.length > 0)
-  .sort((a, b) => b.name.length - a.name.length);
+// Each placed NPC by full name, plus the short name before a bracketed title
+// ("หวงชิงเฉวียน (ปรมาจารย์ฤาษี)" → "หวงชิงเฉวียน") when no one else shares it —
+// stage text usually says the short one. Longest keys first.
+const NAMED_NPCS: { npc: NpcDef; key: string }[] = (() => {
+  const placed = NPCS.filter((npc) => npc.name.length >= 2 && npc.locationIds.length > 0);
+  const full = new Set(placed.map((npc) => npc.name));
+  const shortCount = new Map<string, number>();
+  const shortOf = (name: string) => name.replace(/\s*\(.*$/, "").trim();
+  for (const npc of placed) { const short = shortOf(npc.name); if (short !== npc.name) shortCount.set(short, (shortCount.get(short) ?? 0) + 1); }
+  const keys = placed.flatMap((npc) => {
+    const short = shortOf(npc.name);
+    const usable = short !== npc.name && short.length >= 2 && !full.has(short) && shortCount.get(short) === 1;
+    return usable ? [{ npc, key: npc.name }, { npc, key: short }] : [{ npc, key: npc.name }];
+  });
+  return keys.sort((a, b) => b.key.length - a.key.length);
+})();
 
 /** The person the current stage of `quest` names, or the turn-in person on the last stage. */
 export function stageTargetNpc(state: WorldStateData, quest: QuestDef): NpcDef | null {
@@ -71,10 +85,10 @@ export function stageTargetNpc(state: WorldStateData, quest: QuestDef): NpcDef |
 function namedNpcIn(text: string): NpcDef | null {
   let best: { npc: NpcDef; at: number } | null = null;
   const taken: [number, number][] = [];
-  for (const npc of NAMED_NPCS) {
-    const at = text.indexOf(npc.name);
+  for (const { npc, key } of NAMED_NPCS) {
+    const at = text.indexOf(key);
     if (at < 0 || taken.some(([start, end]) => at >= start && at < end)) continue;
-    taken.push([at, at + npc.name.length]);
+    taken.push([at, at + key.length]);
     if (!best || at < best.at) best = { npc, at };
   }
   return best?.npc ?? null;
