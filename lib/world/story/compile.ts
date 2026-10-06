@@ -202,12 +202,12 @@ export function compileLineage(spec: LineageSpec, r: StoryResolvers, seq = 1): C
   const foe = spec.foe ?? tier.foe;
   const item = spec.item ?? tier.item;
   const stages: QuestStage[] = [
-    { id: "prove", description: `พิสูจน์ฝีมือ — ปราบ${r.opponentName(foe)} ${tier.foes} ครั้ง`, autoAdvance: { t: "defeatedOpponent", opponentId: foe, count: tier.foes } },
+    { id: "prove", description: `พิสูจน์ฝีมือ — ออกไปปราบ${r.opponentName(foe)}ให้ได้ ${tier.foes} ครั้ง`, autoAdvance: { t: "defeatedOpponent", opponentId: foe, count: tier.foes } },
   ];
-  if (tier.items) stages.push({ id: "bring", description: `หา${r.itemName(item)} ${tier.items} ชิ้นมาเป็นเครื่องคำนับ`, autoAdvance: { t: "hasItem", itemId: item, count: tier.items } });
+  if (tier.items) stages.push({ id: "bring", description: `หา${r.itemName(item)} ${tier.items} ชิ้นติดตัวไว้เป็นเครื่องคำนับ (มอบให้ตอนรับวิชา)`, autoAdvance: { t: "hasItem", itemId: item, count: tier.items } });
   const spar = tier.spar ? r.npcSpar(spec.giver) : undefined;
-  if (spar) stages.push({ id: "spar", description: `ขอประลองกับ${r.npcName(spec.giver)} แล้วเอาชนะให้ได้`, autoAdvance: { t: "defeatedOpponent", opponentId: spar, count: 1 } });
-  stages.push({ id: "return", description: `กลับไปรับวิชาจาก${r.npcName(spec.giver)}` });
+  if (spar) stages.push({ id: "spar", description: `ไปหา${r.npcName(spec.giver)} กด "ขอประลอง" แล้วเอาชนะให้ได้`, autoAdvance: { t: "defeatedOpponent", opponentId: spar, count: 1 } });
+  stages.push({ id: "return", description: `กลับไปหา${r.npcName(spec.giver)}เพื่อรับคัมภีร์` });
 
   const rewards: QuestReward[] = [
     spec.kind === "skill" ? { t: "learnSkill", skillId: spec.id } : { t: "learnArt", artId: spec.id, level: 1 },
@@ -216,12 +216,16 @@ export function compileLineage(spec: LineageSpec, r: StoryResolvers, seq = 1): C
   ];
   if (sect) rewards.push({ t: "sectPoints", sectId: sect.id, amount: tier.points });
   const kindLabel = spec.kind === "skill" ? "วิชา" : "ลมปราณ";
+  // The task in one breath for the quest log: what to beat, bring and win.
+  const tasks = [`ปราบ${r.opponentName(foe)} ${tier.foes} ครั้ง`];
+  if (tier.items) tasks.push(`หา${r.itemName(item)} ${tier.items} ชิ้น`);
+  if (spar) tasks.push(`แล้วชนะการประลองกับท่าน`);
   out.quests.push({
     id: qid,
     // The quest never names the move or its tier — only "วิชาลึกลับ"; the
     // scroll it hands over names it. `seq` tells one teacher's quests apart.
     name: spec.title ?? `สืบทอดวิชาลึกลับของ${r.npcName(spec.giver)}${seq > 1 ? ` · ม้วนที่ ${seq}` : ""}`,
-    description: `${r.npcName(spec.giver)}ยินดีถ่ายทอด${kindLabel}ลึกลับให้ผู้ที่พิสูจน์ตนได้ — สำเร็จแล้วจะได้รับคัมภีร์ของวิชานั้น`,
+    description: `${r.npcName(spec.giver)}แห่ง${info.sc}จะถ่ายทอด${kindLabel}ลึกลับให้ เมื่อพิสูจน์ตนได้: ${tasks.join(" ")} — สำเร็จแล้วจะได้รับคัมภีร์ของวิชานั้น`,
     briefSummary: `สืบทอด${kindLabel}ลึกลับ — ${r.npcName(spec.giver)}`,
     type: "side",
     lineage: { kind: spec.kind, id: spec.id },
