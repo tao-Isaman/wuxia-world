@@ -55,7 +55,7 @@ export const SCENES_CITIES: readonly Scene[] = [
     id: "npc_city_capital_magistrate_wu_jobs",
     lines: [
       { t: "dialogue", speaker: "นายอำเภอหวู่", text: "บัญชีคลังหลวงที่หายไปเป็นงานสืบสวนในนครหลวง ไปคุยกับเสมียนนายฉิงที่ยืนด้านซ้ายของข้า เขาให้ยืมกุญแจเก่าเปิดหีบเอกสารได้ ไม่ต้องเดินทางไปพระราชวัง" },
-      { t: "dialogue", speaker: "นายอำเภอหวู่", text: "ส่วนคดีเสมียนฉ้อฉล ให้ถามนายฉิงเรื่องสินบนก่อน แล้วต้องปราบนักเลง 2 คน เตรียมฝีมือให้พร้อม" },
+      { t: "dialogue", speaker: "นายอำเภอหวู่", text: "ส่วนคดีเสมียนฉ้อฉล ให้ถามนายฉิงเรื่องสินบนก่อน แล้วต้องปราบโจรเร่ร่อน 2 คนที่เป็นคนเดินเงินสินบน เตรียมฝีมือให้พร้อม" },
       { t: "dialogue", speaker: "นายอำเภอหวู่", text: "หนังสือนิรโทษกรรมเป็นงานเดินทางไปจินหลิง ส่งให้นักยุทธศาสตร์กง แล้วนำใบรับกลับมานครหลวง เมื่อพร้อมค่อยกลับมาเลือกภารกิจที่เปิดให้รับ" },
     ],
     choices: [
@@ -199,8 +199,8 @@ export const SCENES_CITIES: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qc_capital_corrupt_clerk_contact",
     lines: [
-      { t: "dialogue", speaker: "เสมียนนายฉิง", text: "มีนักเลงนำเงินจากพ่อค้ามาฝากเสมียนในสำนักงานจริง แต่พวกมันเก็บใบรับเงินไว้ ข้าบอกได้เพียงเบาะแส ยังไม่พอเอาผิดใคร" },
-      { t: "dialogue", speaker: "เสมียนนายฉิง", text: "หากพบนักเลงระหว่างเดินทาง ให้รวบรวมหลักฐานจากพวกมัน 2 คนหลังรับงาน แล้วกลับไปหาหวู่ อย่าฝืนสู้หากบาดเจ็บหรือยังไม่พร้อม" },
+      { t: "dialogue", speaker: "เสมียนนายฉิง", text: "มีโจรเร่ร่อนเป็นคนเดินเงินจากพ่อค้ามาให้เสมียนในสำนักงานจริง แต่พวกมันเก็บใบรับเงินไว้กับตัว ข้าบอกได้เพียงเบาะแส ยังไม่พอเอาผิดใคร" },
+      { t: "dialogue", speaker: "เสมียนนายฉิง", text: "ถ้าเจอโจรเร่ร่อนระหว่างเดินทาง ปราบสัก 2 คนแล้วค้นใบรับเงินจากตัวมัน จากนั้นนำไปให้นายอำเภอหวู่ อย่าฝืนสู้ถ้ายังบาดเจ็บอยู่" },
     ],
     choices: [
       { text: "กลับไปถามนายฉิง", next: "npc_city_capital_clerk_qing_talk" },
@@ -256,7 +256,7 @@ export const SCENES_CITIES: readonly Scene[] = [
     id: "npc_city_capital_physician_lin_talk",
     lines: [
       { t: "dialogue", speaker: "หมอหลิน", text: "เจ็บป่วยหรือเปล่า? คลินิกเล็ก ๆ ของข้ายินดีรักษาทุกอาการ" },
-      { t: "dialogue", speaker: "หมอหลิน", text: "ตำรับยาของข้าสืบทอดมาหลายชั่วคน แต่ช่วงนี้มีคนพยายามขโมยความรับรู้ น่ากังวลนัก" },
+      { t: "dialogue", speaker: "หมอหลิน", text: "ตำรับยาของข้าสืบทอดมาหลายชั่วคน แต่ช่วงนี้มีคนด้อม ๆ มอง ๆ อยากขโมยมันไป น่ากังวลนัก" },
     ],
     choices: [
       { text: "ถามเรื่องยาสมุนไพร", next: "npc_city_capital_physician_lin_herbs" },
@@ -510,7 +510,7 @@ export const SCENES_CITIES: readonly Scene[] = [
     id: "qs_qc_capital_lost_ledger_complete",
     lines: [
       { t: "dialogue", speaker: "นายอำเภอหวู่", text: "ขอบคุณที่พบบัญชีและตรวจหลักฐานจนรู้ว่าเอกสารถูกย้ายหนีน้ำ ความรอบคอบของท่านช่วยให้เราไม่ด่วนกล่าวหาผู้ใด" },
-      { t: "dialogue", speaker: "นายอำเภอหวู่", text: "ค่าตอบแทนคือ 150 ทอง และ 30 WEXP กุญแจเก่าท่านเก็บไว้ใช้ต่อได้" },
+      { t: "dialogue", speaker: "นายอำเภอหวู่", text: "ค่าตอบแทนคือ 150 ทอง กับประสบการณ์ที่ได้จากคดีนี้ กุญแจเก่าท่านเก็บไว้ใช้ต่อได้" },
     ],
     choices: [
       {
@@ -532,7 +532,7 @@ export const SCENES_CITIES: readonly Scene[] = [
     id: "qs_qc_capital_corrupt_clerk_offer",
     lines: [
       { t: "dialogue", speaker: "นายอำเภอหวู่", text: "เสมียนคนหนึ่งในสำนักงานรับสินบนจากพ่อค้า ข้าต้องการหลักฐาน ไม่ใช่แค่ข่าวลือ" },
-      { t: "dialogue", speaker: "นายอำเภอหวู่", text: "เริ่มถามเสมียนนายฉิงที่ยืนด้านซ้ายของข้าในนครหลวง เรื่องนี้ต้องปราบนักเลง 2 คนหลังรับงาน จึงควรเตรียมฝีมือและยาก่อนออกเดินทาง" },
+      { t: "dialogue", speaker: "นายอำเภอหวู่", text: "เริ่มจากถามเสมียนนายฉิงที่ยืนด้านซ้ายของข้า เขารู้ว่าเงินเดินทางไหน งานนี้อาจต้องปะทะกับโจรเร่ร่อน เตรียมฝีมือและยาให้พร้อม" },
     ],
     choices: [
       {
@@ -550,7 +550,7 @@ export const SCENES_CITIES: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qc_capital_corrupt_clerk_offer_accept",
     lines: [
-      { t: "dialogue", speaker: "นายอำเภอหวู่", text: "ทักทายเสมียนนายฉิงที่ยืนด้านซ้ายของข้า เลือกถามเรื่องสินบนในสำนักงานเพื่อรับเบาะแส แล้วค่อยไปหาหลักฐานจากนักเลง 2 คนที่พบระหว่างเดินทาง" },
+      { t: "dialogue", speaker: "นายอำเภอหวู่", text: "ทักทายเสมียนนายฉิงที่ยืนด้านซ้ายของข้า ถามเรื่องสินบนในสำนักงานเพื่อรับเบาะแส แล้วค่อยไปเอาหลักฐานจากโจรเร่ร่อน 2 คนที่พบระหว่างเดินทาง" },
     ],
     choices: [{ text: "รับทราบ", next: "npc_city_capital_magistrate_wu_return" }],
   },
@@ -584,7 +584,7 @@ export const SCENES_CITIES: readonly Scene[] = [
     lines: [
       { t: "dialogue", speaker: "นายอำเภอหวู่", text: "มีนักโทษรายหนึ่งถูกตัดสินอย่างไม่เป็นธรรม พยานเดียวที่รู้เรื่องอยู่ที่จินหลิง" },
       { t: "narration", text: "นายอำเภอพูดเบา ๆ ราวกับกลัวคนได้ยิน" },
-      { t: "dialogue", speaker: "นายอำเภอหวู่", text: "ขั้นตอน: 1) รับหนังสือนิรโทษกรรม 2) ไปจินหลิง · ส่งให้นักยุทธศาสตร์กง 3) นำใบรับกลับมาให้ข้า" },
+      { t: "dialogue", speaker: "นายอำเภอหวู่", text: "รับหนังสือนิรโทษกรรมฉบับนี้ไป นำไปส่งนักยุทธศาสตร์กงที่จินหลิง แล้วนำใบรับของเขากลับมาให้ข้า" },
     ],
     choices: [
       {
@@ -768,7 +768,8 @@ export const SCENES_CITIES: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qc_capital_stolen_formula_offer_accept",
     lines: [
-      { t: "dialogue", speaker: "หมอหลิน", text: "ลองสืบว่าใครมาหาข้าในช่วงสองวันที่ผ่านมา มีคนแปลกหน้าหนึ่งคนที่ทำท่าน่าสงสัย" },
+      { t: "dialogue", speaker: "หมอหลิน", text: "สองวันก่อนมีหมอดูแปลกหน้ามาวนเวียนหน้าร้าน ทำท่าน่าสงสัย ลองดูร่องรอยหลังร้านก่อน" },
+      { t: "dialogue", speaker: "หมอหลิน", text: "ถ้าคนร้ายฉีกตำรับไปแล้ว ข้าต้องใช้ตำราขั้นสูงสักเล่มมาเทียบเขียนหน้าที่หายขึ้นใหม่ ตลาดนครหลวงมีขาย" },
     ],
     choices: [{ text: "รับทราบ", next: "city_capital" }],
   },
@@ -777,7 +778,7 @@ export const SCENES_CITIES: readonly Scene[] = [
     id: "qs_qc_capital_stolen_formula_complete",
     lines: [
       { t: "dialogue", speaker: "หมอหลิน", text: "ตำรับยา! ท่านตามคืนได้แล้ว... ขอบคุณจากใจ" },
-      { t: "narration", text: "หมอหลินเปิดตำรับอย่างระมัดระวัง ตรวจดูทุกหน้าด้วยความโล่งใจ" },
+      { t: "narration", text: "หมอหลินเปิดตำรับอย่างระมัดระวัง แล้ววางตำราขั้นสูงไว้ข้าง ๆ เพื่อเทียบเขียนหน้าที่ขาดหายด้วยความโล่งใจ" },
     ],
     choices: [
       {
@@ -816,7 +817,7 @@ export const SCENES_CITIES: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qc_xixia_iron_supply_offer_accept",
     lines: [
-      { t: "dialogue", speaker: "ช่างดูกู", text: "ดี! หาแร่เหล็กจากเหมืองทางเหนือได้ หรือจะปราบโจรที่ยึดกองคาราวานก็ได้ เลือกเอา" },
+      { t: "dialogue", speaker: "ช่างดูกู", text: "ดี! แร่เหล็กขุดได้จากเหมือง ซื้อได้ หรือจะแย่งคืนจากโจรที่ปล้นกองคาราวานก็ได้ เลือกเอา ครบ 10 ก้อนแล้วค่อยกลับมา" },
     ],
     choices: [{ text: "รับทราบ", next: "city_xixia" }],
   },
@@ -860,7 +861,7 @@ export const SCENES_CITIES: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qc_xixia_legendary_blade_offer_accept",
     lines: [
-      { t: "dialogue", speaker: "ช่างดูกู", text: "แร่เทพมักพบในถ้ำที่มีสัตว์ดุร้ายอาศัย เตรียมตัวให้ดี อย่าประมาท" },
+      { t: "dialogue", speaker: "ช่างดูกู", text: "แร่เทพมักอยู่ในถิ่นของสัตว์ดุร้าย เสือภูเขาสักสองตัวคงขวางทางเจ้าแน่ เตรียมตัวให้ดี อย่าประมาท" },
     ],
     choices: [{ text: "รับทราบ", next: "city_xixia" }],
   },
@@ -888,7 +889,7 @@ export const SCENES_CITIES: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qc_xixia_bandit_ore_offer",
     lines: [
-      { t: "dialogue", speaker: "ช่างดูกู", text: "โจรที่ปล้นกองคาราวานแร่มีหัวหน้าอยู่ที่ชายป่า ถ้าจัดการเขาได้ การค้าแร่จะคล่องตัวขึ้น" },
+      { t: "dialogue", speaker: "ช่างดูกู", text: "โจรที่ปล้นกองคาราวานแร่มีหัวหน้าคนหนึ่ง มันออกดักปล้นตามทาง ถ้าจัดการเขาได้ การค้าแร่จะคล่องตัวขึ้น" },
       { t: "dialogue", speaker: "ช่างดูกู", text: "ข้าไม่ได้ขอให้ฆ่า แค่ทำให้เขาหนีหรือยอมแพ้ก็พอ" },
     ],
     choices: [
@@ -936,7 +937,7 @@ export const SCENES_CITIES: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qc_dali_ancient_scroll_offer",
     lines: [
-      { t: "dialogue", speaker: "บัณฑิตต้วน", text: "คัมภีร์โบราณสมัยราชวงศ์เก่าถูกทิ้งในวัดร้างที่ภูเขา ข้าอยากได้มาแปลก่อนที่มันจะผุพัง" },
+      { t: "dialogue", speaker: "บัณฑิตต้วน", text: "ตำราเบื้องต้นฉบับเก่าแก่ที่สุดเล่มหนึ่งถูกทิ้งไว้ในวัดร้างบนภูเขา ข้าอยากได้มาเทียบกับฉบับที่ข้ามีก่อนมันจะผุพัง" },
       { t: "dialogue", speaker: "บัณฑิตต้วน", text: "แต่วัดร้างนั้นมีสัตว์ป่าอยู่ ข้าเองไม่ถนัดการต่อสู้" },
     ],
     choices: [
@@ -952,7 +953,8 @@ export const SCENES_CITIES: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qc_dali_ancient_scroll_offer_accept",
     lines: [
-      { t: "dialogue", speaker: "บัณฑิตต้วน", text: "วัดร้างอยู่ทางเหนือของต้าหลี่ เดินไม่เกินครึ่งวัน คัมภีร์น่าจะอยู่ในห้องสมุดเก่าของวัด" },
+      { t: "dialogue", speaker: "บัณฑิตต้วน", text: "ไล่สัตว์ป่าดุร้ายที่ยึดวัดออกไปก่อน สักสองตัวพวกมันก็หนี" },
+      { t: "dialogue", speaker: "บัณฑิตต้วน", text: "ถ้าฉบับในวัดเปื่อยจนอ่านไม่ออก ฉบับคัดลอกที่ขายตามร้านค้าก็พอใช้เทียบได้ นำมาให้ข้าสักเล่ม" },
     ],
     choices: [{ text: "รับทราบ", next: "city_dali" }],
   },
@@ -1029,7 +1031,7 @@ export const SCENES_CITIES: readonly Scene[] = [
     id: "qs_qc_dali_missing_page_offer",
     lines: [
       { t: "dialogue", speaker: "บัณฑิตต้วน", text: "หนังสือประวัติศาสตร์เล่มสำคัญของข้าขาดหน้าตอนกลาง พ่อค้าหนังสือลี่ที่ซูโจวซื้อไปโดยไม่รู้ว่าเป็นของข้า" },
-      { t: "dialogue", speaker: "บัณฑิตต้วน", text: "ขั้นตอน: 1) ไปซูโจว 2) คุยพ่อค้าหนังสือลี่เพื่อขอหน้าหนังสือคืน 3) นำกลับมาให้ข้า" },
+      { t: "dialogue", speaker: "บัณฑิตต้วน", text: "ช่วยไปซูโจว ขอหน้าหนังสือคืนจากพ่อค้าหนังสือลี่ แล้วนำกลับมาให้ข้าที่นี่" },
     ],
     choices: [
       {
@@ -1094,7 +1096,7 @@ export const SCENES_CITIES: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qc_dali_herb_collection_offer",
     lines: [
-      { t: "dialogue", speaker: "หมอยาไป๋", text: "ข้าต้องการโสมห้าหัวสำหรับยาล็อตใหญ่ที่จะส่งออก แต่ตอนนี้ถิ่นที่หาโสมมีสัตว์ป่าชุม" },
+      { t: "dialogue", speaker: "หมอยาไป๋", text: "ข้าต้องการโสม 5 หัวสำหรับยาล็อตใหญ่ที่จะส่งออก แต่ตอนนี้ถิ่นที่หาโสมมีหมาป่าชุม" },
       { t: "dialogue", speaker: "หมอยาไป๋", text: "ถ้าท่านช่วยเก็บมาได้ ข้าจะสอนวิธีใช้สมุนไพรรักษาตัวให้" },
     ],
     choices: [
@@ -1155,7 +1157,7 @@ export const SCENES_CITIES: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qc_dali_venom_beast_offer_accept",
     lines: [
-      { t: "dialogue", speaker: "หมอยาไป๋", text: "งูเห่ายักษ์อยู่ที่ป่าชายเขาทางตะวันออก หากสู้ชนะ นำพิษมาส่งด้วย อย่าสัมผัสด้วยมือเปล่า" },
+      { t: "dialogue", speaker: "หมอยาไป๋", text: "งูเห่ายักษ์ออกหากินตามทางรอบต้าหลี่ หากสู้ชนะ เก็บพิษงูเห่ามาด้วยสักขวด อย่าสัมผัสด้วยมือเปล่า" },
     ],
     choices: [{ text: "รับทราบ", next: "city_dali" }],
   },
@@ -1189,7 +1191,7 @@ export const SCENES_CITIES: readonly Scene[] = [
     id: "qs_qc_yangzhou_rare_fish_offer",
     lines: [
       { t: "dialogue", speaker: "พ่อครัวซู", text: "ลูกค้าขาใหญ่จองเมนูพิเศษ ต้องใช้ปลามังกร แต่ข้าหาไม่ได้เลย" },
-      { t: "dialogue", speaker: "พ่อครัวซู", text: "ฝีมือท่านดูดี ลองหาปลามังกรในแม่น้ำลึกให้ข้าได้ไหม? ค่าตอบแทนดีแน่" },
+      { t: "dialogue", speaker: "พ่อครัวซู", text: "ฝีมือท่านดูดี ลองหาปลามังกรมาให้ข้าสักตัวได้ไหม? ค่าตอบแทนดีแน่" },
     ],
     choices: [
       {
@@ -1204,7 +1206,7 @@ export const SCENES_CITIES: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qc_yangzhou_rare_fish_offer_accept",
     lines: [
-      { t: "dialogue", speaker: "พ่อครัวซู", text: "ปลามังกรชอบอยู่ใต้น้ำลึก ใกล้โขดหินแม่น้ำ ตกยากหน่อยแต่คุ้มค่า" },
+      { t: "dialogue", speaker: "พ่อครัวซู", text: "ปลามังกรมีแต่ในน้ำลึกรอบเกาะมังกรเทพ ตกยากหน่อยแต่คุ้มค่า" },
     ],
     choices: [{ text: "รับทราบ", next: "city_yangzhou" }],
   },
@@ -1238,7 +1240,7 @@ export const SCENES_CITIES: readonly Scene[] = [
     id: "qs_qc_yangzhou_spice_delivery_offer",
     lines: [
       { t: "dialogue", speaker: "พ่อครัวซู", text: "ข้าสั่งเครื่องเทศพิเศษไว้กับพ่อค้าหวังในนครหลวง ต้องการคนเชื่อใจไปรับและนำกลับมาที่หยางโจว" },
-      { t: "dialogue", speaker: "พ่อครัวซู", text: "ขั้นตอน: 1) ไปนครหลวง 2) คุยพ่อค้าหวังเพื่อรับเครื่องเทศ 3) นำกลับมาส่งให้ข้าที่นี่" },
+      { t: "dialogue", speaker: "พ่อครัวซู", text: "ช่วยไปนครหลวง รับเครื่องเทศจากพ่อค้าหวัง แล้วนำกลับมาส่งให้ข้าที่หยางโจว" },
     ],
     choices: [
       {
@@ -1367,7 +1369,8 @@ export const SCENES_CITIES: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qc_yangzhou_sunken_cargo_offer_accept",
     lines: [
-      { t: "dialogue", speaker: "ชาวประมงเฉิน", text: "เรือจมอยู่ที่แก่งโขดหินทางเหนือ น้ำไม่ลึกมาก แต่กระแสแรง ระวังตัวด้วย" },
+      { t: "dialogue", speaker: "ชาวประมงเฉิน", text: "เรือจมอยู่ที่แก่งโขดหินทางเหนือ ยังมีโจรสลัดเฝ้าซากอยู่ ไล่มันไปก่อน" },
+      { t: "dialogue", speaker: "ชาวประมงเฉิน", text: "ข้าต้องการแร่ทองแดง 5 ก้อน ถ้ากู้ขึ้นมาไม่ครบ หาจากที่อื่นมาเติมก็ได้ ข้าต้องเอาไปใช้หนี้เจ้าของสินค้า" },
     ],
     choices: [{ text: "รับทราบ", next: "city_yangzhou" }],
   },
@@ -1404,7 +1407,7 @@ export const SCENES_CITIES: readonly Scene[] = [
     id: "qs_qc_suzhou_silk_shipment_offer",
     lines: [
       { t: "dialogue", speaker: "ช่างทอเหมย", text: "ผ้าไหมล็อตสำคัญสำหรับราชสำนักต้องส่งให้พ่อค้าหวังที่นครหลวงภายในสามวัน คนนำส่งเดิมล้มป่วยกะทันหัน" },
-      { t: "dialogue", speaker: "ช่างทอเหมย", text: "ขั้นตอน: 1) รับผ้าไหม 2) ไปนครหลวง · ส่งให้พ่อค้าหวังและรับใบรับ 3) นำใบรับกลับมาให้ข้า" },
+      { t: "dialogue", speaker: "ช่างทอเหมย", text: "รับผ้าไหมนี้ไป ส่งให้พ่อค้าหวังที่นครหลวง ขอใบรับจากเขา แล้วนำกลับมาให้ข้า" },
     ],
     choices: [
       {
@@ -1472,7 +1475,7 @@ export const SCENES_CITIES: readonly Scene[] = [
     id: "qs_qc_suzhou_dye_ingredient_offer",
     lines: [
       { t: "dialogue", speaker: "ช่างทอเหมย", text: "สีย้อมพิเศษที่ทำให้ผ้าไหมของข้าต่างจากคนอื่นต้องใช้เม็ดบัวจากป่าชุ่มน้ำ" },
-      { t: "dialogue", speaker: "ช่างทอเหมย", text: "แต่ฤดูนี้ป่ามีสัตว์ป่าชุม ช่วยเก็บเม็ดบัวห้าหัวมาให้ได้ไหม?" },
+      { t: "dialogue", speaker: "ช่างทอเหมย", text: "แต่ฤดูนี้ป่ามีสัตว์ป่าชุม ช่วยหาเม็ดบัวมาให้สัก 5 เม็ดได้ไหม?" },
     ],
     choices: [
       {
@@ -1495,7 +1498,7 @@ export const SCENES_CITIES: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qc_suzhou_dye_ingredient_complete",
     lines: [
-      { t: "dialogue", speaker: "ช่างทอเหมย", text: "เม็ดบัวห้าหัว สมบูรณ์ทุกหัว! นี่แหละวัตถุดิบที่ดีที่สุดที่ข้าเคยเห็น" },
+      { t: "dialogue", speaker: "ช่างทอเหมย", text: "เม็ดบัว 5 เม็ด สมบูรณ์ทุกเม็ด! นี่แหละวัตถุดิบที่ดีที่สุดที่ข้าเคยเห็น" },
       { t: "narration", text: "ช่างทอเหมยยิ้มกว้าง หยิบผ้าไหมที่ย้อมไว้ล่วงหน้ามาให้เป็นตัวอย่าง" },
     ],
     choices: [
@@ -1615,7 +1618,7 @@ export const SCENES_CITIES: readonly Scene[] = [
     id: "qs_qc_jinling_coded_letter_offer",
     lines: [
       { t: "dialogue", speaker: "นักยุทธศาสตร์กง", text: "ข้าได้จดหมายรหัสลับซึ่งดักจับได้จากผู้ส่งสาร เนื้อหาน่าตกใจหากแปลถูก" },
-      { t: "dialogue", speaker: "นักยุทธศาสตร์กง", text: "ขั้นตอน: 1) รับจดหมายรหัสลับ 2) ไปต้าหลี่ · ให้บัณฑิตต้วนแปล 3) นำคำแปลกลับมาให้ข้า" },
+      { t: "dialogue", speaker: "นักยุทธศาสตร์กง", text: "รับจดหมายนี้ไป นำไปให้บัณฑิตต้วนที่ต้าหลี่แปล แล้วนำคำแปลกลับมาให้ข้า" },
     ],
     choices: [
       {
@@ -1700,7 +1703,8 @@ export const SCENES_CITIES: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qc_jinling_defector_offer_accept",
     lines: [
-      { t: "dialogue", speaker: "นักยุทธศาสตร์กง", text: "ผู้แปรพักตร์อยู่ที่ฉางอัน รอท่านอยู่ที่โรงเตี๊ยมชายเมือง บอกรหัสว่า 'จันทร์เสี้ยว' เขาจะเข้าใจ" },
+      { t: "dialogue", speaker: "นักยุทธศาสตร์กง", text: "ผู้แปรพักตร์อยู่ที่ฉางอัน รอท่านอยู่ที่โรงเตี๊ยมชายเมือง บอกรหัสว่า **จันทร์เสี้ยว** เขาจะเข้าใจ" },
+      { t: "dialogue", speaker: "นักยุทธศาสตร์กง", text: "ศิษย์สำนักของเขาจะไล่ตามมาแน่ จัดการพวกมันให้ได้ แล้วพาเขามาหาข้าที่จินหลิง" },
     ],
     choices: [{ text: "รับทราบ", next: "city_jinling" }],
   },
@@ -1733,7 +1737,7 @@ export const SCENES_CITIES: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qc_changan_gate_intruder_offer",
     lines: [
-      { t: "dialogue", speaker: "ยามหยาน", text: "เมื่อคืนมีคนแอบผ่านประตูโดยไม่มีใบอนุญาต และเราตามสูญเสียรอยในเมือง" },
+      { t: "dialogue", speaker: "ยามหยาน", text: "เมื่อคืนมีคนแอบผ่านประตูโดยไม่มีใบผ่านทาง แล้วเราก็ตามรอยไม่ทันในเมือง" },
       { t: "dialogue", speaker: "ยามหยาน", text: "ช่วยสืบว่าคนนั้นหนีไปไหน ข้าจะให้เหรียญทองสำหรับข้อมูลที่เป็นประโยชน์" },
     ],
     choices: [
@@ -1863,7 +1867,7 @@ export const SCENES_CITIES: readonly Scene[] = [
         next: "qs_qc_changan_weapon_smuggle_lawful",
       },
       {
-        text: "นิ่งเฉยปล่อยให้ชาวบ้านสู้ (ตามม양จิตใจ)",
+        text: "นิ่งเฉยปล่อยให้ชาวบ้านสู้ (ตามมโนธรรม)",
         effects: [
           { t: "finishQuest", questId: "qc_changan_weapon_smuggle", success: true },
           { t: "addTrait", trait: "good", amount: 8 },

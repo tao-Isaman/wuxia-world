@@ -233,7 +233,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | --- | --- | --- | --- | --- |
 | `qe_shenlong_kidnap_scholar` | ลักพาตัวนักปราชญ์ | เจ้าลัทธิจ้าวมังกรเทพ | kidnap → turn-in |  |
 | `qe_shenlong_steal_dragon_pearl` | ขโมยลูกแก้วมังกร | เจ้าลัทธิจ้าวมังกรเทพ | steal → turn-in |  |
-| `qe_shenlong_assassinate_priest` | ลอบสังหารพระผู้รักษาธรรม | เจ้าลัทธิจ้าวมังกรเทพ | assassinate → turn-in |  |
+| `qe_shenlong_assassinate_priest` | ลอบสังหารเจ้าสำนักอู่ตัง | เจ้าลัทธิจ้าวมังกรเทพ | assassinate → turn-in |  |
 | `qe_shenlong_collect_tribute` | เก็บบรรณาการ | เจ้าลัทธิจ้าวมังกรเทพ | steal → turn-in |  |
 | `qe_shenlong_clear_rebel` | กำจัดผู้ต่อต้านมังกรเทพ | เจ้าลัทธิจ้าวมังกรเทพ | kill → turn-in |  |
 | `qe_shenlong_initiate_test` | ทดสอบสมาชิกใหม่ลัทธิ | เจ้าลัทธิจ้าวมังกรเทพ | kidnap → turn-in |  |
@@ -341,7 +341,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qc_changan_weapon_smuggle` | การลักลอบขนอาวุธ | ยามหยาน | objective (spot) → kill → turn-in | prereqs |
 | `qe_changan_remove_rival` | กำจัดคู่แข่งทางการ | ขุนนางหยานทุจริต | assassinate → turn-in |  |
 | `qe_changan_steal_evidence` | ขโมยเอกสารลับ | ขุนนางหยานทุจริต | steal → turn-in |  |
-| `qe_changan_silence_clerk` | ปิดปากเสมียนรู้ความลับ | ขุนนางหยานทุจริต | assassinate → turn-in |  |
+| `qe_changan_silence_clerk` | ปิดปากยามผู้รู้ความลับ | ขุนนางหยานทุจริต | assassinate → turn-in |  |
 | `qe_changan_kidnap_witness` | จับตัวพยานหลักฐาน | ขุนนางหยานทุจริต | kidnap → turn-in |  |
 | `qe_changan_smuggling_run` | ขนสินค้าต้องห้ามผ่านด่าน | ขุนนางหยานทุจริต | steal → turn-in |  |
 | `qe_changan_intimidate_judge` | ปิดปากที่ปรึกษาคดี | ขุนนางหยานทุจริต | assassinate → turn-in | prereqs |
@@ -442,7 +442,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | Id | Name | Giver | Stages | Notes |
 | --- | --- | --- | --- | --- |
 | `qe_zhizhu_assassinate_lord` | ลอบสังหารเจ้าคฤหาสน์ | นักฆ่าเงาหยิง | assassinate → turn-in |  |
-| `qe_zhizhu_assassinate_master` | ลอบสังหารอาจารย์ดาบ | นักฆ่าเงาหยิง | assassinate → turn-in |  |
+| `qe_zhizhu_assassinate_master` | ลอบสังหารเจ้าอาวาส | นักฆ่าเงาหยิง | assassinate → turn-in |  |
 | `qe_zhizhu_silence_traitor` | ปิดปากคนทรยศ | นักฆ่าเงาหยิง | kill → turn-in |  |
 | `qe_zhizhu_purge_witnesses` | ล้วงข้อมูลพยาน | นักฆ่าเงาหยิง | steal → turn-in |  |
 | `qe_zhizhu_steal_target_data` | ขโมยข้อมูลเป้าหมาย | นักฆ่าเงาหยิง | steal → turn-in |  |
@@ -618,7 +618,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qe_wudu_collect_centipede` | เก็บตะขาบยักษ์ | ผู้อาวุโสตู๋ซื่อ | kill → turn-in |  |
 | `qe_wudu_kidnap_doctor` | ลักพาตัวหมอยา | ผู้อาวุโสตู๋ซื่อ | kidnap → turn-in |  |
 | `qe_wudu_steal_antidote` | ขโมยสูตรถอนพิษ | ผู้อาวุโสตู๋ซื่อ | steal → turn-in |  |
-| `qe_wudu_assassinate_emei` | ลอบสังหารนิ้วน้ำหวาน | ผู้อาวุโสตู๋ซื่อ | assassinate → turn-in |  |
+| `qe_wudu_assassinate_emei` | ลอบสังหารเจ้าสำนักง้อไบ๊ | ผู้อาวุโสตู๋ซื่อ | assassinate → turn-in |  |
 | `qe_wudu_clear_rival_sect` | กวาดล้างยอดยุทธอธรรม | ผู้อาวุโสตู๋ซื่อ | kill → turn-in |  |
 | `ql_art_t2_snakeform` | สืบทอดวิชาลึกลับของหมอพิษอาหมาน | หมอพิษอาหมาน | kill → item → kill → turn-in | prereqs |
 
@@ -736,8 +736,8 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qv_inn_spy_guest` | แขกน่าสงสัย | นางสาวซิ่ว | objective (scene) → turn-in |  |
 | `qv_inn_debt_collector` | นักเลงเรียกหนี้ | นางสาวซิ่ว | turn-in |  |
 | `qst_spy_inn_drunk_confession` | คำสารภาพของขี้เมา | โจวพ่อค้าเหล้าในโรงเตี๊ยม | kill → turn-in |  |
-| `qst_spy_inn_wandering_blade` | ดาบพเนจรในโรงเตี๊ยม | โจวพ่อค้าเหล้าในโรงเตี๊ยม | kill → turn-in | prereqs |
-| `qe_spy_inn_intimidate_drunk` | ม้วนกลยุทธ์ของขุนพล | โจวพ่อค้าเหล้าในโรงเตี๊ยม | steal → turn-in |  |
+| `qst_spy_inn_wandering_blade` | อาจารย์ดาบในโรงเตี๊ยม | โจวพ่อค้าเหล้าในโรงเตี๊ยม | kill → turn-in | prereqs |
+| `qe_spy_inn_intimidate_drunk` | ม้วนกลยุทธ์ของนักยุทธศาสตร์ | โจวพ่อค้าเหล้าในโรงเตี๊ยม | steal → turn-in |  |
 | `qc_yuelai_woodpile_sword` | กระบี่จากกองฟืน | เซียวจิ้งเทียน | objective×2 → turn-in |  |
 | `qc_yuelai_letter_to_gaosheng` | จดหมายถึงเพื่อนเก่า | เซียวจิ้งเทียน | objective (person) → turn-in |  |
 
@@ -789,9 +789,9 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | Id | Name | Giver | Stages | Notes |
 | --- | --- | --- | --- | --- |
 | `qe_chuangwang_steal_relic` | ขโมยพระธาตุโบราณ | พระอเถระนอกรีตฮุยเป้า | steal → turn-in |  |
-| `qe_chuangwang_kidnap_novice` | ลักพาตัวสามเณร | พระอเถระนอกรีตฮุยเป้า | kidnap → turn-in |  |
+| `qe_chuangwang_kidnap_novice` | ลักพาตัวพระเส้าหลิน | พระอเถระนอกรีตฮุยเป้า | kidnap → turn-in |  |
 | `qe_chuangwang_kill_pilgrim` | ขัดขวางผู้แสวงบุญ | พระอเถระนอกรีตฮุยเป้า | kill → turn-in |  |
-| `qe_chuangwang_burn_temple` | ทำลายเสาหลักวัด | พระอเถระนอกรีตฮุยเป้า | assassinate → turn-in |  |
+| `qe_chuangwang_burn_temple` | ตัดหูตาของยุทธภพ | พระอเถระนอกรีตฮุยเป้า | assassinate → turn-in |  |
 | `qe_chuangwang_purge_witnesses` | ลบร่องรอยกิจกรรมมาร | พระอเถระนอกรีตฮุยเป้า | steal → turn-in |  |
 
 ### สำนักดาบโลหิต (`sect_xueyu`)
@@ -799,8 +799,8 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | Id | Name | Giver | Stages | Notes |
 | --- | --- | --- | --- | --- |
 | `qe_xueyu_sect_initiation` | พิธีรับเข้าสำนัก | ทูตเซี่ยแห่งสำนักดาบโลหิต | kidnap → turn-in |  |
-| `qe_xueyu_kill_pure_monk` | สังหารพระบริสุทธิ์ | ทูตเซี่ยแห่งสำนักดาบโลหิต | kill → turn-in |  |
-| `qe_xueyu_kidnap_disciple` | ลักพาตัวลูกศิษย์ง้อไบ๊ | ทูตเซี่ยแห่งสำนักดาบโลหิต | kidnap → turn-in |  |
+| `qe_xueyu_kill_pure_monk` | สังหารนักพรตบริสุทธิ์ | ทูตเซี่ยแห่งสำนักดาบโลหิต | kill → turn-in |  |
+| `qe_xueyu_kidnap_disciple` | ลักพาตัวเจ้าสำนักง้อไบ๊ | ทูตเซี่ยแห่งสำนักดาบโลหิต | kidnap → turn-in |  |
 | `qe_xueyu_steal_sutra` | ขโมยพระสูตรต้องห้าม | ทูตเซี่ยแห่งสำนักดาบโลหิต | steal → turn-in |  |
 | `qe_xueyu_silence_traitor` | ปิดปากคนทรยศ | ทูตเซี่ยแห่งสำนักดาบโลหิต | kill → turn-in |  |
 | `qe_xueyu_purge_village` | กวาดล้างหมู่บ้านพยาน | ทูตเซี่ยแห่งสำนักดาบโลหิต | kill → turn-in | prereqs |
@@ -907,7 +907,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qc_yangzhou_sunken_cargo` | สินค้าจมน้ำ | ชาวประมงเฉิน | kill → item → turn-in | prereqs |
 | `qst_spy_yangzhou_smuggler_ship` | เรือลักลอบขนสินค้า | ซีคนยกของท่าเรือ | visit → kill → turn-in |  |
 | `qst_spy_yangzhou_silk_seal` | ตราผ้าไหมหลวง | ซีคนยกของท่าเรือ | kill → turn-in |  |
-| `qe_spy_yangzhou_silence_witness` | ปิดปากผู้พิพากษา | ซีคนยกของท่าเรือ | assassinate → turn-in |  |
+| `qe_spy_yangzhou_silence_witness` | ปิดปากนายอำเภอ | ซีคนยกของท่าเรือ | assassinate → turn-in |  |
 | `qc_yangzhou_hook_and_line` | ขอเกี่ยวกับสายเบ็ด | ชาวประมงเฉิน | item → turn-in |  |
 | `qc_yangzhou_mend_the_net` | อวนขาดกลางแม่น้ำ | ชาวประมงเฉิน | item → objective (person) → turn-in |  |
 | `qc_yangzhou_twin_cleavers` | มีดคู่ของพ่อครัว | พ่อครัวซู | kill → objective (scene) → turn-in | prereqs |

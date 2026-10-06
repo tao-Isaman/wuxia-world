@@ -30,7 +30,7 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
     stages: [
       {
         id: "hunt",
-        description: "ออกล่าตะขาบยักษ์ตามถ้ำและโขดหิน",
+        description: "ปราบตะขาบยักษ์ 1 ตัว (พบได้ระหว่างเดินทางตามถ้ำและโขดหิน)",
         autoAdvance: { t: "defeatedOpponent", opponentId: "giant_centipede", count: 1 },
       },
       {
@@ -52,18 +52,18 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
     id: "qe_wudu_kidnap_doctor",
     name: "ลักพาตัวหมอยา",
     description: "ตู๋ซื่อต้องการหมอยาที่รู้วิธีถอนพิษร้ายแรงมาทำงานรับใช้สำนัก",
-    briefSummary: "ลักพาตัวหมอเสินหนงแห่งวิลล่ายาวังมาส่งให้ตู๋ซื่อ",
+    briefSummary: "ลักพาตัวหมอเสินหนงแห่งคุ้มสมุนไพรมาส่งให้ตู๋ซื่อ",
     type: "side",
     giverNpcId: "evil_wudu_elder_dushi",
     stages: [
       {
         id: "seize",
-        description: "จับตัวหมอเสินหนงที่วิลล่ายาวัง",
+        description: "ลักพาตัวหมอเสินหนงที่คุ้มสมุนไพร",
         autoAdvance: { t: "kidnappedNpc", npcId: "villa_yaowang_doctor_shennong" },
       },
       {
         id: "deliver",
-        description: "ส่งตัวหมอให้ผู้อาวุโสตู๋ซื่อ",
+        description: "กลับไปหาผู้อาวุโสตู๋ซื่อที่พรรคเบญจพิษ",
       },
     ],
     rewards: [
@@ -87,12 +87,12 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
     stages: [
       {
         id: "steal",
-        description: "ลักแอบขโมยสูตรยาจากหมอหลิน",
+        description: "แอบขโมยสูตรยาจากหมอหลินในนครหลวง",
         autoAdvance: { t: "stoleFromNpc", npcId: "city_capital_physician_lin", count: 1 },
       },
       {
         id: "handover",
-        description: "นำสูตรยามาส่งให้ผู้อาวุโสตู๋ซื่อ",
+        description: "นำสูตรยาไปให้ผู้อาวุโสตู๋ซื่อที่พรรคเบญจพิษ",
       },
     ],
     rewards: [
@@ -107,9 +107,9 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
   // qe_wudu_assassinate_emei — assassinate
   {
     id: "qe_wudu_assassinate_emei",
-    name: "ลอบสังหารนิ้วน้ำหวาน",
-    description: "ตู๋ซื่อเกลียดชังง้อไบ๊เพราะเคยทำลายแผนการของสำนักเบญจพิษ เขาต้องการเอาคืน",
-    briefSummary: "ลอบสังหารท่านนิ้วจิงฉานแห่งง้อไบ๊",
+    name: "ลอบสังหารเจ้าสำนักง้อไบ๊",
+    description: "ท่านนิ้วห้วนจิงฉาน เจ้าสำนักง้อไบ๊ ทำลายแผนการของพรรคเบญจพิษมาหลายครั้ง ผู้อาวุโสตู๋ซื่อต้องการให้นางตาย",
+    briefSummary: "ลอบสังหารท่านนิ้วห้วนจิงฉานแห่งง้อไบ๊",
     type: "side",
     giverNpcId: "evil_wudu_elder_dushi",
     stages: [
@@ -120,7 +120,7 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
       },
       {
         id: "report",
-        description: "รายงานผลการปฏิบัติการให้ตู๋ซื่อ",
+        description: "กลับไปรายงานผู้อาวุโสตู๋ซื่อที่พรรคเบญจพิษ",
       },
     ],
     rewards: [
@@ -137,14 +137,14 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
   {
     id: "qe_wudu_clear_rival_sect",
     name: "กวาดล้างยอดยุทธอธรรม",
-    description: "ตู๋ซื่อต้องการทดสอบว่าผู้ช่วยของเขาสามารถเอาชนะจอมยุทธมาได้หรือไม่",
+    description: "ผู้อาวุโสตู๋ซื่ออยากรู้ว่าเจ้าเก่งพอจะเป็นพวกเขาหรือไม่ — จอมยุทธมาร ศัตรูเก่าของพรรคเบญจพิษ เป็นบททดสอบ",
     briefSummary: "เอาชนะจอมยุทธมารเพื่อพิสูจน์ฝีมือแก่ตู๋ซื่อ",
     type: "side",
     giverNpcId: "evil_wudu_elder_dushi",
     stages: [
       {
         id: "battle",
-        description: "ค้นหาและปราบจอมยุทธมาร",
+        description: "ปราบจอมยุทธมาร (พบได้ระหว่างเดินทาง)",
         autoAdvance: { t: "defeatedOpponent", opponentId: "demonic_master", count: 1 },
       },
       {
@@ -170,19 +170,19 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
   {
     id: "qe_zhizhu_assassinate_lord",
     name: "ลอบสังหารเจ้าคฤหาสน์",
-    description: "หยิงรับงานปิดปากเจ้าบ้านผู้รู้ความลับมากเกินไป",
-    briefSummary: "ลอบสังหารเจ้าบ้านเหยินเฟิงแห่งคฤหาสน์เหยินซี",
+    description: "นักฆ่าเงาหยิงรับงานปิดปากเจ้าบ้านเหยินเฟิงแห่งคุ้มนกนางแอ่น ผู้รู้ความลับมากเกินไป",
+    briefSummary: "ลอบสังหารเจ้าบ้านเหยินเฟิงที่คุ้มนกนางแอ่น",
     type: "side",
     giverNpcId: "evil_zhizhu_assassin_ying",
     stages: [
       {
         id: "eliminate",
-        description: "เข้าคฤหาสน์เหยินซีและลอบสังหารเจ้าบ้านเหยินเฟิง",
+        description: "แอบเข้าคุ้มนกนางแอ่น แล้วลอบสังหารเจ้าบ้านเหยินเฟิง",
         autoAdvance: { t: "assassinatedNpc", npcId: "villa_yanzi_lord_yanfeng" },
       },
       {
         id: "confirm",
-        description: "กลับมายืนยันงานกับหยิง",
+        description: "กลับไปบอกนักฆ่าเงาหยิงที่ถ้ำแมงมุมว่างานเสร็จ",
       },
     ],
     rewards: [
@@ -198,20 +198,20 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
   // qe_zhizhu_assassinate_master — assassinate
   {
     id: "qe_zhizhu_assassinate_master",
-    name: "ลอบสังหารอาจารย์ดาบ",
-    description: "หยิงต้องการกำจัดอาจารย์ดาบที่รู้ตัวตนของเธอมานานแล้ว",
+    name: "ลอบสังหารเจ้าอาวาส",
+    description: "เจ้าอาวาสฮุยหยวนแห่งวัดเส้าหลินรู้ตัวตนที่แท้ของนักฆ่าเงาหยิงมานาน นางจึงอยากให้เขาหายไป",
     briefSummary: "ลอบสังหารเจ้าอาวาสฮุยหยวนและรายงานหยิง",
     type: "side",
     giverNpcId: "evil_zhizhu_assassin_ying",
     stages: [
       {
         id: "stalk",
-        description: "ติดตามเจ้าอาวาสฮุยหยวนจนถึงโอกาสที่ดี",
+        description: "แทรกซึมวัดเส้าหลิน แล้วลอบสังหารเจ้าอาวาสฮุยหยวน",
         autoAdvance: { t: "assassinatedNpc", npcId: "sect_shaolin_abbot_huiyuan" },
       },
       {
         id: "report",
-        description: "กลับมารายงานหยิง",
+        description: "กลับไปรายงานนักฆ่าเงาหยิงที่ถ้ำแมงมุม",
       },
     ],
     rewards: [
@@ -235,12 +235,12 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
     stages: [
       {
         id: "hunt",
-        description: "ค้นหาและปราบนักฆ่าเงาผู้ทรยศ",
+        description: "ปราบนักฆ่าเงาผู้ทรยศ (พบได้ระหว่างเดินทาง)",
         autoAdvance: { t: "defeatedOpponent", opponentId: "shadow_assassin", count: 1 },
       },
       {
         id: "verify",
-        description: "รายงานให้หยิงทราบว่างานเสร็จสิ้นแล้ว",
+        description: "กลับไปบอกนักฆ่าเงาหยิงว่าคนทรยศเงียบไปแล้ว",
       },
     ],
     rewards: [
@@ -257,7 +257,7 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
   {
     id: "qe_zhizhu_purge_witnesses",
     name: "ล้วงข้อมูลพยาน",
-    description: "ก่อนกำจัดพยาน หยิงต้องการรู้ว่าพยานเก็บข้อมูลไว้ที่ไหน ให้ขโมยบันทึกก่อน",
+    description: "นักยุทธศาสตร์กงแห่งจินหลิงจดบันทึกเรื่ององค์กรนักฆ่าไว้มากเกินไป หยิงต้องการบันทึกนั้นมาทำลายก่อน",
     briefSummary: "ขโมยบันทึกจากนักยุทธศาสตร์กงในจินหลิง",
     type: "side",
     giverNpcId: "evil_zhizhu_assassin_ying",
@@ -269,7 +269,7 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
       },
       {
         id: "deliver",
-        description: "นำบันทึกส่งให้หยิง",
+        description: "นำบันทึกไปให้นักฆ่าเงาหยิงที่ถ้ำแมงมุม",
       },
     ],
     rewards: [
@@ -286,18 +286,18 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
     id: "qe_zhizhu_steal_target_data",
     name: "ขโมยข้อมูลเป้าหมาย",
     description: "หยิงต้องการข้อมูลเส้นทางเดินของทูตพระราชสำนักเพื่อวางแผนลอบสังหาร",
-    briefSummary: "ขโมยข้อมูลจากทูตหลิวอิงแห่งวังจงหยาง",
+    briefSummary: "ขโมยข้อมูลจากทูตหลิวอิงแห่งพระราชวังจงหยาง",
     type: "side",
     giverNpcId: "evil_zhizhu_assassin_ying",
     stages: [
       {
         id: "steal",
-        description: "ล้วงข้อมูลจากทูตหลิวอิงที่วังจงหยาง",
+        description: "ล้วงตารางเดินทางจากทูตหลิวอิงที่พระราชวังจงหยาง",
         autoAdvance: { t: "stoleFromNpc", npcId: "palace_zhongyang_envoy_liuying", count: 1 },
       },
       {
         id: "report",
-        description: "นำข้อมูลส่งให้หยิง",
+        description: "นำข้อมูลไปให้นักฆ่าเงาหยิงที่ถ้ำแมงมุม",
       },
     ],
     rewards: [
@@ -320,12 +320,12 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
     stages: [
       {
         id: "duel",
-        description: "เผชิญหน้าและปราบอาจารย์ดาบให้ได้",
+        description: "ปราบอาจารย์ดาบ (พบได้ระหว่างเดินทาง)",
         autoAdvance: { t: "defeatedOpponent", opponentId: "blade_master", count: 1 },
       },
       {
         id: "return",
-        description: "กลับมาพิสูจน์ฝีมือแก่หยิง",
+        description: "กลับไปบอกนักฆ่าเงาหยิงว่าชนะแล้ว",
       },
     ],
     rewards: [
@@ -346,19 +346,19 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
   {
     id: "qe_chuangwang_steal_relic",
     name: "ขโมยพระธาตุโบราณ",
-    description: "ฮุยเป้าต้องการพระธาตุของวัดตาหลุนซึ่งเก็บพลังงานมารไว้ในตัว เขาต้องการมันเพื่อประกอบพิธีกรรมมาร",
-    briefSummary: "ขโมยพระธาตุจากพระกงซินแห่งวัดตาหลุน",
+    description: "พระนอกรีตฮุยเป้าเห็นในนิมิตว่าพระธาตุของวัดตาหลุน (วิหารล้อลม) คือกุญแจของพิธีกรรมมาร พระกงซินเป็นผู้เก็บรักษามันไว้",
+    briefSummary: "ขโมยพระธาตุจากพระกงซินที่วิหารล้อลม",
     type: "side",
     giverNpcId: "evil_chuangwang_heretic_huibao",
     stages: [
       {
         id: "infiltrate",
-        description: "แอบเข้าวัดตาหลุนและขโมยพระธาตุจากพระกงซิน",
+        description: "แอบเข้าวิหารล้อลม แล้วขโมยพระธาตุจากพระกงซิน",
         autoAdvance: { t: "stoleFromNpc", npcId: "temple_dalun_monk_kongxin", count: 1 },
       },
       {
         id: "offer",
-        description: "นำพระธาตุมาถวายแก่ฮุยเป้า",
+        description: "นำพระธาตุไปให้พระอเถระฮุยเป้าที่สมบัติราชาโจร",
       },
     ],
     rewards: [
@@ -374,20 +374,20 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
   // qe_chuangwang_kidnap_novice — kidnap
   {
     id: "qe_chuangwang_kidnap_novice",
-    name: "ลักพาตัวสามเณร",
-    description: "ฮุยเป้าต้องการสามเณรอ่อนหัดมาเพื่อทดลองพิธีกรรมมารที่มืดดำ",
-    briefSummary: "ลักพาตัวสาวกเส้าหลินคืนนี้และส่งให้ฮุยเป้า",
+    name: "ลักพาตัวพระเส้าหลิน",
+    description: "พิธีกรรมมารของฮุยเป้าต้องใช้คนที่ฝึกธรรมะมาแล้วแต่ยังไม่บรรลุ เขาเลือกอาจารย์ฝาหมิงแห่งวัดเส้าหลิน",
+    briefSummary: "ลักพาตัวอาจารย์ฝาหมิงแห่งเส้าหลินมาให้ฮุยเป้า",
     type: "side",
     giverNpcId: "evil_chuangwang_heretic_huibao",
     stages: [
       {
         id: "capture",
-        description: "จับตัวสาวกอาวุโสฝาหมิงแห่งเส้าหลิน",
+        description: "ลักพาตัวอาจารย์ฝาหมิงที่วัดเส้าหลิน",
         autoAdvance: { t: "kidnappedNpc", npcId: "sect_shaolin_elder_faming" },
       },
       {
         id: "deliver",
-        description: "นำตัวสาวกส่งให้ฮุยเป้าในถ้ำ",
+        description: "กลับไปหาพระอเถระฮุยเป้าที่สมบัติราชาโจร",
       },
     ],
     rewards: [
@@ -410,12 +410,12 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
     stages: [
       {
         id: "ambush",
-        description: "ดักซุ่มและปราบสาวกอู่ตัง",
+        description: "ดักซุ่มปราบสาวกอู่ตัง (พบได้ระหว่างเดินทาง)",
         autoAdvance: { t: "defeatedOpponent", opponentId: "wudang_disciple", count: 1 },
       },
       {
         id: "report",
-        description: "รายงานผลแก่ฮุยเป้า",
+        description: "กลับไปรายงานพระอเถระฮุยเป้า",
       },
     ],
     rewards: [
@@ -430,8 +430,8 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
   // qe_chuangwang_burn_temple — assassinate
   {
     id: "qe_chuangwang_burn_temple",
-    name: "ทำลายเสาหลักวัด",
-    description: "ฮุยเป้าวางแผนทำลายวัดตาหลุน ขั้นแรกต้องกำจัดผู้รักษาสถานที่ศักดิ์สิทธิ์ก่อน",
+    name: "ตัดหูตาของยุทธภพ",
+    description: "ก่อนเริ่มแผนการใหญ่ ฮุยเป้าต้องตัดหูตาของยุทธภพ — หัวหน้าหงเทียนแห่งพรรคยาจกรู้ความเคลื่อนไหวของทุกสำนัก",
     briefSummary: "ลอบสังหารผู้นำของพรรคยาจกเพื่อตัดแหล่งข่าว",
     type: "side",
     giverNpcId: "evil_chuangwang_heretic_huibao",
@@ -443,7 +443,7 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
       },
       {
         id: "report",
-        description: "รายงานผลสำเร็จให้ฮุยเป้า",
+        description: "กลับไปรายงานพระอเถระฮุยเป้า",
       },
     ],
     rewards: [
@@ -460,7 +460,7 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
   {
     id: "qe_chuangwang_purge_witnesses",
     name: "ลบร่องรอยกิจกรรมมาร",
-    description: "ฮุยเป้าต้องการลบหลักฐานที่ผู้อาวุโสจูอิงรวบรวมไว้เกี่ยวกับพิธีกรรมมาร",
+    description: "ผู้อาวุโสจูอิงแห่งพรรคตะวันจันทรารวบรวมหลักฐานเรื่องพิธีกรรมมารของฮุยเป้าไว้ ฮุยเป้าอยากให้หลักฐานนั้นหายไป",
     briefSummary: "ขโมยบันทึกลับจากผู้อาวุโสจูอิงแห่งพรรคตะวันจันทรา",
     type: "side",
     giverNpcId: "evil_chuangwang_heretic_huibao",
@@ -472,7 +472,7 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
       },
       {
         id: "destroy",
-        description: "นำบันทึกกลับมาให้ฮุยเป้าทำลาย",
+        description: "นำบันทึกไปให้พระอเถระฮุยเป้าทำลาย",
       },
     ],
     rewards: [
@@ -492,7 +492,7 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
   {
     id: "qe_shenlong_kidnap_scholar",
     name: "ลักพาตัวนักปราชญ์",
-    description: "จ้าวมังกรเทพต้องการนักปราชญ์ผู้รู้จักโบราณอักษรมาถอดรหัสคัมภีร์มังกรโบราณ",
+    description: "เจ้าลัทธิจ้าวมังกรเทพต้องการคนอ่านอักษรโบราณออก มาถอดรหัสคัมภีร์มังกร เขาเลือกบัณฑิตต้วนแห่งต้าหลี่",
     briefSummary: "ลักพาตัวบัณฑิตต้วนแห่งต้าหลี่มาส่งให้จ้าว",
     type: "side",
     giverNpcId: "evil_shenlong_cult_leader_zhao",
@@ -521,19 +521,19 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
   {
     id: "qe_shenlong_steal_dragon_pearl",
     name: "ขโมยลูกแก้วมังกร",
-    description: "มีของมีค่าในคลังสมบัติของเจ้าบ้านเหยินเฟิงที่จ้าวเชื่อว่าคือลูกแก้วมังกรโบราณ",
-    briefSummary: "ขโมยของมีค่าจากคฤหาสน์เหยินซี",
+    description: "เจ้าลัทธิจ้าวเชื่อว่าลูกแก้วในคลังของเจ้าบ้านเหยินเฟิงแห่งคุ้มนกนางแอ่นคือลูกแก้วมังกรโบราณ",
+    briefSummary: "ขโมยลูกแก้วจากเจ้าบ้านเหยินเฟิงที่คุ้มนกนางแอ่น",
     type: "side",
     giverNpcId: "evil_shenlong_cult_leader_zhao",
     stages: [
       {
         id: "infiltrate",
-        description: "แอบเข้าคฤหาสน์เหยินซีและขโมยลูกแก้ว",
+        description: "แอบเข้าคุ้มนกนางแอ่น แล้วขโมยลูกแก้วจากเจ้าบ้านเหยินเฟิง",
         autoAdvance: { t: "stoleFromNpc", npcId: "villa_yanzi_lord_yanfeng", count: 1 },
       },
       {
         id: "offer",
-        description: "นำลูกแก้วถวายแด่จ้าวมังกรเทพ",
+        description: "นำลูกแก้วไปถวายเจ้าลัทธิจ้าวมังกรเทพที่เกาะมังกรเทพ",
       },
     ],
     rewards: [
@@ -548,8 +548,8 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
   // qe_shenlong_assassinate_priest — assassinate
   {
     id: "qe_shenlong_assassinate_priest",
-    name: "ลอบสังหารพระผู้รักษาธรรม",
-    description: "จ้าวเชื่อว่าอาจารย์ชิงซวี่แห่งอู่ตังเป็นอุปสรรคต่อการขยายอำนาจของลัทธิ",
+    name: "ลอบสังหารเจ้าสำนักอู่ตัง",
+    description: "เจ้าลัทธิจ้าวเชื่อว่าอาจารย์ชิงซวี่ เจ้าสำนักอู่ตัง คืออุปสรรคใหญ่ที่สุดของลัทธิมังกรเทพ",
     briefSummary: "ลอบสังหารอาจารย์ชิงซวี่แห่งอู่ตัง",
     type: "side",
     giverNpcId: "evil_shenlong_cult_leader_zhao",
@@ -561,7 +561,7 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
       },
       {
         id: "return",
-        description: "กลับมารายงานต่อจ้าวมังกรเทพ",
+        description: "กลับไปรายงานเจ้าลัทธิจ้าวมังกรเทพที่เกาะมังกรเทพ",
       },
     ],
     rewards: [
@@ -578,7 +578,7 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
   {
     id: "qe_shenlong_collect_tribute",
     name: "เก็บบรรณาการ",
-    description: "จ้าวสั่งให้เก็บบรรณาการจากเส้าหลิน — สิ่งของมีค่าที่เขาเชื่อว่าเป็นสิทธิ์ของมังกรเทพ",
+    description: "เจ้าลัทธิจ้าวสั่งให้ 'เก็บบรรณาการ' จากเส้าหลิน — คือขโมยของมีค่าจากเจ้าอาวาสฮุยหยวน ที่เขาเชื่อว่าเป็นของมังกรเทพ",
     briefSummary: "ขโมยสิ่งของมีค่าจากเจ้าอาวาสฮุยหยวน",
     type: "side",
     giverNpcId: "evil_shenlong_cult_leader_zhao",
@@ -590,7 +590,7 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
       },
       {
         id: "tribute",
-        description: "นำสิ่งของถวายแด่จ้าวมังกรเทพ",
+        description: "นำของไปถวายเจ้าลัทธิจ้าวมังกรเทพที่เกาะมังกรเทพ",
       },
     ],
     rewards: [
@@ -606,19 +606,19 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
   {
     id: "qe_shenlong_clear_rebel",
     name: "กำจัดผู้ต่อต้านมังกรเทพ",
-    description: "จ้าวส่งคนไปกำจัดเจ้าสำนักอธรรมที่กำลังท้าทายอำนาจของลัทธิมังกรเทพ",
+    description: "เจ้าสำนักอธรรมคนหนึ่งกล้าท้าทายลัทธิมังกรเทพ เจ้าลัทธิจ้าวให้เจ้าไปปราบเขา",
     briefSummary: "ปราบเจ้าสำนักอธรรมที่กล้าท้าทายจ้าว",
     type: "side",
     giverNpcId: "evil_shenlong_cult_leader_zhao",
     stages: [
       {
         id: "confront",
-        description: "ค้นหาและปราบเจ้าสำนักอธรรม",
+        description: "ปราบเจ้าสำนักอธรรม (พบได้ระหว่างเดินทาง)",
         autoAdvance: { t: "defeatedOpponent", opponentId: "heretical_grandmaster", count: 1 },
       },
       {
         id: "proclaim",
-        description: "กลับมาประกาศชัยชนะแด่จ้าวมังกรเทพ",
+        description: "กลับไปประกาศชัยชนะต่อเจ้าลัทธิจ้าวมังกรเทพ",
       },
     ],
     rewards: [
@@ -635,14 +635,14 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
   {
     id: "qe_shenlong_initiate_test",
     name: "ทดสอบสมาชิกใหม่ลัทธิ",
-    description: "พิธีรับสมาชิกใหม่ลัทธิมังกรเทพต้องการ 'เครื่องบูชา' — บุคคลจากสำนักคู่แข่ง",
-    briefSummary: "ลักพาตัวนักยุทธ์มือใหม่มาส่งให้จ้าว",
+    description: "พิธีรับสมาชิกใหม่ของลัทธิมังกรเทพต้องมี 'เครื่องบูชา' เจ้าลัทธิจ้าวเลือกทูตหลิวอิงแห่งพระราชวังจงหยาง ผู้สืบเรื่องลัทธิอยู่",
+    briefSummary: "ลักพาตัวทูตหลิวอิงไปส่งที่เกาะมังกรเทพ",
     type: "side",
     giverNpcId: "evil_shenlong_cult_leader_zhao",
     stages: [
       {
         id: "capture",
-        description: "ลักพาตัวทูตหลิวอิงแห่งวังจงหยาง",
+        description: "ลักพาตัวทูตหลิวอิงที่พระราชวังจงหยาง",
         autoAdvance: { t: "kidnappedNpc", npcId: "palace_zhongyang_envoy_liuying" },
       },
       {
@@ -670,19 +670,19 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
   {
     id: "qe_capital_jewel_heist",
     name: "ขโมยอัญมณีราชสกุล",
-    description: "เถ้าแก่โจวต้องการอัญมณีชุดหนึ่งจากคลังของเจ้าบ้านเหยินเฟิง ให้แอบเข้าไปชิงมาโดยไม่ทิ้งร่องรอย",
-    briefSummary: "ขโมยของมีค่าจากเจ้าบ้านผู้ดี",
+    description: "เถ้าแก่โจวตลาดมืดแห่งนครหลวงต้องการอัญมณีจากคลังของเจ้าบ้านเหยินเฟิงแห่งคุ้มนกนางแอ่น ให้แอบเข้าไปเอามาโดยไม่ทิ้งร่องรอย",
+    briefSummary: "ขโมยของมีค่าจากเจ้าบ้านเหยินเฟิงที่คุ้มนกนางแอ่น",
     type: "side",
     giverNpcId: "evil_capital_blackmarket_zhou",
     stages: [
       {
         id: "steal_jewel",
-        description: "แอบขโมยของมีค่าจากเจ้าบ้านเหยินเฟิง (villa_yanzi)",
+        description: "แอบขโมยของมีค่าจากเจ้าบ้านเหยินเฟิงที่คุ้มนกนางแอ่น",
         autoAdvance: { t: "stoleFromNpc", npcId: "villa_yanzi_lord_yanfeng", count: 1 },
       },
       {
         id: "report",
-        description: "กลับมาส่งของให้เถ้าแก่โจว",
+        description: "นำของไปส่งเถ้าแก่โจวตลาดมืดที่นครหลวง",
       },
     ],
     rewards: [
@@ -698,19 +698,19 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
   {
     id: "qe_capital_silence_witness",
     name: "ปิดปากพยาน",
-    description: "มีนักกระบี่เร่ร่อนรู้เห็นธุรกรรมของเถ้าแก่โจวมากเกินไป ต้องกำจัดก่อนจะเปิดปาก",
-    briefSummary: "กำจัดนักรบที่รู้มากเกินไป",
+    description: "กระบี่พเนจรคนหนึ่งเห็นการค้าของเถ้าแก่โจวตลาดมืดมากเกินไป ต้องจัดการก่อนเขาจะเปิดปาก",
+    briefSummary: "ปราบกระบี่พเนจรที่รู้มากเกินไป",
     type: "side",
     giverNpcId: "evil_capital_blackmarket_zhou",
     stages: [
       {
         id: "find_witness",
-        description: "ตามหาและกำจัดนักกระบี่พเนจรที่เดินเพ่นพ่านในบริเวณนี้",
+        description: "ปราบกระบี่พเนจร (พบได้ระหว่างเดินทาง)",
         autoAdvance: { t: "defeatedOpponent", opponentId: "wandering_swordsman", count: 1 },
       },
       {
         id: "report",
-        description: "กลับมารายงานผลให้เถ้าแก่โจว",
+        description: "กลับไปบอกเถ้าแก่โจวตลาดมืดที่นครหลวง",
       },
     ],
     rewards: [
@@ -733,12 +733,12 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
     stages: [
       {
         id: "kidnap_merchant",
-        description: "จับตัวพ่อค้าหวังไปคุมขังในที่ที่เถ้าแก่โจวกำหนด",
+        description: "ลักพาตัวพ่อค้าหวังในนครหลวง",
         autoAdvance: { t: "kidnappedNpc", npcId: "city_capital_merchant_wang" },
       },
       {
         id: "report",
-        description: "กลับมารายงานให้เถ้าแก่โจวว่างานสำเร็จ",
+        description: "กลับไปบอกเถ้าแก่โจวตลาดมืดว่างานสำเร็จ",
       },
     ],
     rewards: [
@@ -754,19 +754,19 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
   {
     id: "qe_capital_clear_rival",
     name: "กำจัดคู่แข่งตลาดมืด",
-    description: "หัวหน้าโจรกลุ่มใหม่เริ่มบุกรุกเขตของเถ้าแก่โจว ต้องส่งสัญญาณให้ชัดเจนว่าใครเป็นเจ้าของพื้นที่",
+    description: "หัวหน้าโจรกลุ่มใหม่เริ่มรุกเขตของเถ้าแก่โจวตลาดมืด ปราบมันให้รู้ว่าใครเป็นเจ้าถิ่น",
     briefSummary: "กำจัดหัวหน้าโจรคู่แข่ง",
     type: "side",
     giverNpcId: "evil_capital_blackmarket_zhou",
     stages: [
       {
         id: "kill_rival",
-        description: "กำจัดหัวหน้าโจรที่บุกรุกเขตตลาดมืด",
+        description: "ปราบหัวหน้าโจร (พบได้ระหว่างเดินทาง)",
         autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 1 },
       },
       {
         id: "report",
-        description: "รายงานผลให้เถ้าแก่โจว",
+        description: "กลับไปบอกเถ้าแก่โจวตลาดมืดที่นครหลวง",
       },
     ],
     rewards: [
@@ -782,7 +782,7 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
   {
     id: "qe_capital_ledger_burn",
     name: "ลักบัญชีแดง",
-    description: "นายอำเภอหวู่เก็บบัญชีธุรกรรมผิดกฎหมายที่เชื่อมโยงถึงเถ้าแก่โจวไว้ที่บ้าน ต้องขโมยมาก่อนจะส่งขึ้นผู้ใหญ่",
+    description: "นายอำเภอหวู่แห่งนครหลวงเก็บบัญชีการค้าเถื่อนที่โยงถึงเถ้าแก่โจวตลาดมืดไว้ ต้องขโมยมาก่อนจะถูกส่งขึ้นไปถึงผู้ใหญ่",
     briefSummary: "ขโมยหลักฐานจากนายอำเภอ",
     type: "side",
     giverNpcId: "evil_capital_blackmarket_zhou",
@@ -794,7 +794,7 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
       },
       {
         id: "deliver",
-        description: "ส่งบัญชีให้เถ้าแก่โจวเพื่อทำลายทิ้ง",
+        description: "นำบัญชีไปให้เถ้าแก่โจวตลาดมืดทำลายทิ้ง",
       },
     ],
     rewards: [
@@ -810,7 +810,7 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
   {
     id: "qe_capital_steal_seal",
     name: "ขโมยตราประทับหมอ",
-    description: "ตราประทับของหมอหลินมีค่าในตลาดมืด ใครมีตราของเขาสามารถปลอมแปลงใบสั่งยาและยาต้องห้ามได้",
+    description: "ตราประทับของหมอหลินแห่งนครหลวงมีค่าในตลาดมืด ใครถือตรานั้นปลอมใบสั่งยาต้องห้ามได้ เถ้าแก่โจวอยากได้มัน",
     briefSummary: "ขโมยตราประทับจากหมอ",
     type: "side",
     giverNpcId: "evil_capital_blackmarket_zhou",
@@ -822,7 +822,7 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
       },
       {
         id: "report",
-        description: "ส่งตราประทับให้เถ้าแก่โจว",
+        description: "นำตราประทับไปให้เถ้าแก่โจวตลาดมืด",
       },
     ],
     rewards: [
@@ -838,7 +838,7 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
   {
     id: "qe_capital_assassinate_official",
     name: "สังหารทูตราชสำนัก",
-    description: "ทูตหลิวอิงจากวังจงหยางกำลังสืบสวนเครือข่ายตลาดมืด เถ้าแก่โจวต้องการให้เขาหายตัวไปก่อนส่งรายงาน",
+    description: "ทูตหลิวอิงแห่งพระราชวังจงหยางกำลังสืบเครือข่ายตลาดมืด เถ้าแก่โจวต้องการให้เขาหายไปก่อนส่งรายงาน",
     briefSummary: "ลอบสังหารทูตก่อนส่งรายงาน",
     type: "side",
     giverNpcId: "evil_capital_blackmarket_zhou",
@@ -846,12 +846,12 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
     stages: [
       {
         id: "assassinate",
-        description: "ลอบสังหารทูตหลิวอิงแห่งวังจงหยาง",
+        description: "ลอบสังหารทูตหลิวอิงที่พระราชวังจงหยาง",
         autoAdvance: { t: "assassinatedNpc", npcId: "palace_zhongyang_envoy_liuying" },
       },
       {
         id: "collect",
-        description: "กลับมารับค่าจ้างจากเถ้าแก่โจว",
+        description: "กลับไปรับค่าจ้างจากเถ้าแก่โจวตลาดมืด",
       },
     ],
     rewards: [
@@ -884,7 +884,7 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
       },
       {
         id: "report",
-        description: "รายงานให้ขุนนางหยานทราบว่าภัยคุกคามหมดแล้ว",
+        description: "กลับไปบอกขุนนางหยานทุจริตที่ฉางอันว่าภัยหมดแล้ว",
       },
     ],
     rewards: [
@@ -901,19 +901,19 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
   {
     id: "qe_changan_steal_evidence",
     name: "ขโมยเอกสารลับ",
-    description: "ทูตหลิวอิงมีเอกสารลับที่จะเปิดโปงขุนนางหยาน ให้ขโมยมาก่อนจะส่งขึ้นราชสำนัก",
+    description: "ทูตหลิวอิงแห่งพระราชวังจงหยางมีเอกสารที่จะเปิดโปงขุนนางหยานแห่งฉางอัน ให้ขโมยมาก่อนจะถึงราชสำนัก",
     briefSummary: "ขโมยเอกสารสำคัญจากทูต",
     type: "side",
     giverNpcId: "evil_changan_corrupt_official_yan",
     stages: [
       {
         id: "steal_docs",
-        description: "ขโมยเอกสารลับจากทูตหลิวอิงที่วังจงหยาง",
+        description: "ขโมยเอกสารลับจากทูตหลิวอิงที่พระราชวังจงหยาง",
         autoAdvance: { t: "stoleFromNpc", npcId: "palace_zhongyang_envoy_liuying", count: 1 },
       },
       {
         id: "deliver",
-        description: "ส่งเอกสารให้ขุนนางหยานเพื่อทำลายหลักฐาน",
+        description: "นำเอกสารไปให้ขุนนางหยานทุจริตทำลาย",
       },
     ],
     rewards: [
@@ -928,20 +928,20 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
   // qe_changan_silence_clerk — ASSASSINATE
   {
     id: "qe_changan_silence_clerk",
-    name: "ปิดปากเสมียนรู้ความลับ",
-    description: "เสมียนคนหนึ่งในกองทหารได้ยินการสนทนาลับของขุนนางหยาน ต้องกำจัดเขาก่อนปากแตก",
-    briefSummary: "สังหารเสมียนที่รู้เรื่องมากเกินไป",
+    name: "ปิดปากยามผู้รู้ความลับ",
+    description: "ยามหยาน หัวหน้ายามประตูเมืองฉางอัน ได้ยินการสนทนาลับของขุนนางหยาน ต้องกำจัดเขาก่อนปากแตก",
+    briefSummary: "ลอบสังหารยามหยานแห่งฉางอัน",
     type: "side",
     giverNpcId: "evil_changan_corrupt_official_yan",
     stages: [
       {
         id: "silence_clerk",
-        description: "ลอบสังหารยามหยานซึ่งเป็นหัวหน้าเสมียนที่รู้ความลับ",
+        description: "ลอบสังหารยามหยานที่ประตูเมืองฉางอัน",
         autoAdvance: { t: "assassinatedNpc", npcId: "city_changan_guard_yan" },
       },
       {
         id: "report",
-        description: "กลับมารับค่าจ้างจากขุนนางหยาน",
+        description: "กลับไปรับค่าจ้างจากขุนนางหยานทุจริต",
       },
     ],
     rewards: [
@@ -964,12 +964,12 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
     stages: [
       {
         id: "kidnap_scholar",
-        description: "จับตัวบัณฑิตต้วนแห่งต้าหลี่ไปคุมขัง",
+        description: "ลักพาตัวบัณฑิตต้วนที่ต้าหลี่",
         autoAdvance: { t: "kidnappedNpc", npcId: "city_dali_scholar_duan" },
       },
       {
         id: "report",
-        description: "รายงานให้ขุนนางหยานทราบว่าจับตัวได้แล้ว",
+        description: "กลับไปบอกขุนนางหยานทุจริตที่ฉางอันว่าจับตัวได้แล้ว",
       },
     ],
     rewards: [
@@ -997,7 +997,7 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
       },
       {
         id: "deliver",
-        description: "ส่งของให้ขุนนางหยาน",
+        description: "นำของไปให้ขุนนางหยานทุจริต",
       },
     ],
     rewards: [
@@ -1026,7 +1026,7 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
       },
       {
         id: "report",
-        description: "รายงานให้ขุนนางหยานทราบ",
+        description: "กลับไปรายงานขุนนางหยานทุจริตที่ฉางอัน",
       },
     ],
     rewards: [
@@ -1047,14 +1047,14 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
   {
     id: "qe_treasure_caravan_raid",
     name: "ปล้นกองคาราวาน",
-    description: "หัวหน้าโจรชิงต้องการให้โจมตีกองคาราวานพ่อค้าและกำจัดยามคุ้มกันก่อนลูกน้องจะเข้าปล้น",
+    description: "หัวหน้าโจรชิงแห่งคลังสมบัติลับจะปล้นกองคาราวานพ่อค้า แต่ต้องการให้เจ้าจัดการยามคุ้มกันก่อนลูกน้องเข้าปล้น",
     briefSummary: "กำจัดยามคุ้มกองคาราวาน",
     type: "side",
     giverNpcId: "evil_treasure_bandit_chief_qing",
     stages: [
       {
         id: "kill_guard",
-        description: "กำจัดนักเลงฝ่ามือเหล็กที่เป็นยามคุ้มกองคาราวาน",
+        description: "ปราบนักเลงฝ่ามือเหล็กที่รับจ้างคุ้มกองคาราวาน (พบได้ระหว่างเดินทาง)",
         autoAdvance: { t: "defeatedOpponent", opponentId: "iron_palm_thug", count: 1 },
       },
       {
@@ -1076,14 +1076,14 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
   {
     id: "qe_treasure_mountain_purge",
     name: "กวาดล้างบนเขา",
-    description: "นักกระบี่พเนจรกลุ่มหนึ่งเข้ามาทำธุระแถวถ้ำโจร ต้องกำจัดก่อนจะนำเพื่อนกลับมาด้วย",
+    description: "กระบี่พเนจรกลุ่มหนึ่งมาสอดแนมแถวรังโจรในคลังสมบัติลับ หัวหน้าโจรชิงให้จัดการก่อนพวกมันจะพาพวกกลับมา",
     briefSummary: "กำจัดนักรบที่เข้ามาสอดแนม",
     type: "side",
     giverNpcId: "evil_treasure_bandit_chief_qing",
     stages: [
       {
         id: "purge_swordsmen",
-        description: "กำจัดนักกระบี่พเนจรที่ออกสอดแนมบริเวณถ้ำ",
+        description: "ปราบกระบี่พเนจร 2 คน (พบได้ระหว่างเดินทาง)",
         autoAdvance: { t: "defeatedOpponent", opponentId: "wandering_swordsman", count: 2 },
       },
       {
@@ -1140,7 +1140,7 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
     stages: [
       {
         id: "kidnap_lord",
-        description: "จับตัวเจ้าบ้านเหยินเฟิงและนำตัวไปยังถ้ำโจร",
+        description: "ลักพาตัวเจ้าบ้านเหยินเฟิงที่คุ้มนกนางแอ่น",
         autoAdvance: { t: "kidnappedNpc", npcId: "villa_yanzi_lord_yanfeng" },
       },
       {
@@ -1162,14 +1162,14 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
   {
     id: "qe_treasure_kill_lawman",
     name: "สังหารเจ้าหน้าที่กฎหมาย",
-    description: "อาจารย์ดาบกำลังนำกองทหารตรวจสอบถ้ำโจร หัวหน้าโจรชิงต้องการให้จัดการเขาก่อนจะมาถึง",
+    description: "อาจารย์ดาบคนหนึ่งกำลังนำกองลาดตระเวนมาตรวจรังโจรในคลังสมบัติลับ หัวหน้าโจรชิงต้องการให้จัดการเขาก่อนจะมาถึง",
     briefSummary: "สังหารอาจารย์ดาบที่นำกองสอบสวน",
     type: "side",
     giverNpcId: "evil_treasure_bandit_chief_qing",
     stages: [
       {
         id: "kill_blade_master",
-        description: "สังหารอาจารย์ดาบที่นำกองลาดตระเวน",
+        description: "ปราบอาจารย์ดาบที่นำกองลาดตระเวน (พบได้ระหว่างเดินทาง)",
         autoAdvance: { t: "defeatedOpponent", opponentId: "blade_master", count: 1 },
       },
       {
@@ -1199,7 +1199,7 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
     stages: [
       {
         id: "kill_assassin",
-        description: "สังหารนักฆ่าเงาที่บุกรุกพื้นที่ปฏิบัติงาน",
+        description: "ปราบนักฆ่าเงาที่รุกเขตของโจรชิง (พบได้ระหว่างเดินทาง)",
         autoAdvance: { t: "defeatedOpponent", opponentId: "shadow_assassin", count: 1 },
       },
       {
@@ -1225,14 +1225,14 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
   {
     id: "qe_xueyu_sect_initiation",
     name: "พิธีรับเข้าสำนัก",
-    description: "เพื่อพิสูจน์ตนเองต่อสำนักดาบโลหิต ต้องจับตัวลูกศิษย์สำนักเส้าหลินเป็นของขวัญแรกเข้า",
-    briefSummary: "จับลูกศิษย์เส้าหลินเป็นพิธีรับสมัคร",
+    description: "ทูตเซี่ยแห่งสำนักดาบโลหิตบอกว่าของขวัญแรกเข้าที่ดีที่สุดคือเจ้าอาวาสฮุยหยวนแห่งวัดเส้าหลิน — ลักพาตัวมาให้ได้",
+    briefSummary: "ลักพาตัวเจ้าอาวาสฮุยหยวนเป็นของขวัญแรกเข้า",
     type: "side",
     giverNpcId: "evil_xueyu_envoy_xie",
     stages: [
       {
         id: "kidnap_shaolin",
-        description: "จับตัวเจ้าอาวาสฮุยหยวนแห่งเส้าหลินส่งให้ทูตเซี่ย",
+        description: "ลักพาตัวเจ้าอาวาสฮุยหยวนที่วัดเส้าหลิน",
         autoAdvance: { t: "kidnappedNpc", npcId: "sect_shaolin_abbot_huiyuan" },
       },
       {
@@ -1252,20 +1252,20 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
   // qe_xueyu_kill_pure_monk — KILL
   {
     id: "qe_xueyu_kill_pure_monk",
-    name: "สังหารพระบริสุทธิ์",
-    description: "ทูตเซี่ยต้องการพิสูจน์ว่าผู้สมัครพร้อมจะฝ่าฝืนศีล ให้สังหารสาวกอู่ตังที่ออกบิณฑบาตอยู่",
-    briefSummary: "สังหารพระเพื่อพิสูจน์ความโหดเหี้ยม",
+    name: "สังหารนักพรตบริสุทธิ์",
+    description: "ทูตเซี่ยอยากรู้ว่าเจ้ากล้าทำบาปหรือไม่ ให้ปราบสาวกอู่ตังผู้ถือศีลที่เดินทางอยู่สักคน",
+    briefSummary: "ปราบสาวกอู่ตังเพื่อพิสูจน์ความโหดเหี้ยม",
     type: "side",
     giverNpcId: "evil_xueyu_envoy_xie",
     stages: [
       {
         id: "kill_monk",
-        description: "สังหารสาวกอู่ตังที่กำลังเดินทางอยู่",
+        description: "ปราบสาวกอู่ตัง (พบได้ระหว่างเดินทาง)",
         autoAdvance: { t: "defeatedOpponent", opponentId: "wudang_disciple", count: 1 },
       },
       {
         id: "report",
-        description: "กลับมารายงานให้ทูตเซี่ยว่าสำเร็จแล้ว",
+        description: "กลับไปบอกทูตเซี่ยที่สำนักดาบโลหิต",
       },
     ],
     rewards: [
@@ -1281,20 +1281,20 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
   // qe_xueyu_kidnap_disciple — KIDNAP
   {
     id: "qe_xueyu_kidnap_disciple",
-    name: "ลักพาตัวลูกศิษย์ง้อไบ๊",
-    description: "สำนักดาบโลหิตต้องการองค์ความรู้ของง้อไบ๊ ให้จับตัวลูกศิษย์อาวุโสมาเพื่อสอบสวนเทคนิควิชา",
-    briefSummary: "จับลูกศิษย์ง้อไบ๊เพื่อสอบสวน",
+    name: "ลักพาตัวเจ้าสำนักง้อไบ๊",
+    description: "สำนักดาบโลหิตอยากได้วิชาของง้อไบ๊ ทูตเซี่ยจึงให้ลักพาตัวท่านนิ้วห้วนจิงฉาน เจ้าสำนักง้อไบ๊ มาสอบเค้น",
+    briefSummary: "ลักพาตัวท่านนิ้วห้วนจิงฉานแห่งง้อไบ๊",
     type: "side",
     giverNpcId: "evil_xueyu_envoy_xie",
     stages: [
       {
         id: "kidnap_emei",
-        description: "จับตัวท่านนิ้วห้วนจิงฉานแห่งง้อไบ๊",
+        description: "ลักพาตัวท่านนิ้วห้วนจิงฉานที่ง้อไบ๊",
         autoAdvance: { t: "kidnappedNpc", npcId: "sect_emei_abbess_jingchan" },
       },
       {
         id: "deliver",
-        description: "ส่งตัวประกันให้ทูตเซี่ยที่สำนัก",
+        description: "กลับไปหาทูตเซี่ยที่สำนักดาบโลหิต",
       },
     ],
     rewards: [
@@ -1311,7 +1311,7 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
   {
     id: "qe_xueyu_steal_sutra",
     name: "ขโมยพระสูตรต้องห้าม",
-    description: "สำนักดาบโลหิตต้องการพระสูตรที่เจ้าอาวาสฮุยหยวนเก็บรักษาไว้ในห้องลับ ให้ขโมยออกมาโดยไม่ให้รู้ตัว",
+    description: "สำนักดาบโลหิตต้องการพระสูตรที่เจ้าอาวาสฮุยหยวนแห่งวัดเส้าหลินเก็บไว้ในห้องลับ ให้ขโมยออกมาโดยไม่ให้รู้ตัว",
     briefSummary: "ขโมยคัมภีร์ลับจากเส้าหลิน",
     type: "side",
     giverNpcId: "evil_xueyu_envoy_xie",
@@ -1323,7 +1323,7 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
       },
       {
         id: "deliver",
-        description: "ส่งพระสูตรให้ทูตเซี่ย",
+        description: "นำพระสูตรไปให้ทูตเซี่ยที่สำนักดาบโลหิต",
       },
     ],
     rewards: [
@@ -1347,12 +1347,12 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
     stages: [
       {
         id: "hunt_traitor",
-        description: "ตามล่าและสังหารคนทรยศที่หนีไปอยู่กับนักฆ่าเงา",
+        description: "ปราบนักฆ่าเงาผู้ทรยศ (พบได้ระหว่างเดินทาง)",
         autoAdvance: { t: "defeatedOpponent", opponentId: "shadow_assassin", count: 1 },
       },
       {
         id: "report",
-        description: "กลับมายืนยันกับทูตเซี่ยว่าภัยคุกคามหมดสิ้นแล้ว",
+        description: "กลับไปบอกทูตเซี่ยว่าคนทรยศไม่อยู่แล้ว",
       },
     ],
     rewards: [
@@ -1377,12 +1377,12 @@ export const QUESTS_EVIL: readonly QuestDef[] = [
     stages: [
       {
         id: "purge",
-        description: "กำจัดผู้อาวุโสสำนักที่ปกป้องหมู่บ้าน",
+        description: "ปราบผู้อาวุโสสำนักที่ปกป้องหมู่บ้าน (พบได้ระหว่างเดินทาง)",
         autoAdvance: { t: "defeatedOpponent", opponentId: "sect_elder", count: 1 },
       },
       {
         id: "report",
-        description: "กลับมารายงานให้ทูตเซี่ยว่าปฏิบัติการสำเร็จ",
+        description: "กลับไปรายงานทูตเซี่ยที่สำนักดาบโลหิต",
       },
     ],
     rewards: [
