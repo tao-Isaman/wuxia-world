@@ -67,6 +67,7 @@ function freshState(): WorldStateData {
     lastNpcTickDay: 1,
     wanted: 0,
     wantedDay: 1,
+    lawEvasions: 0,
     jailCityId: null,
     jailUntil: null,
   };

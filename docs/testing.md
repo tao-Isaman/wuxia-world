@@ -44,7 +44,7 @@ Each suite is a Bun script (or `bun test` file) wired as `test:*` in `package.js
 | `test:rumors` | `scripts/test-lore-rumors.ts`, `scripts/test-rumor-formatting.ts` | 5 + 4 | lore seeding (new game and v18 / v19 hydration), caps, selection rules; 104 template × truth combinations render without stray `{tokens}` |
 | `test:investigation` | `scripts/test-capital-investigation.ts` | 5 | the capital ledger and corrupt-clerk quests end to end, legacy stages, the one-time reward |
 | `test:audio` | `scripts/test-audio.ts` | 4 | the note data in `lib/audio/songs.ts`: timing, ranges, pentatonic modes, the battle drums |
-| `test:law` | `scripts/test-law.ts` | 9 | wanted marks, pursuers, jail sentence, bribe, theft marks, the jail map and its activities; roaming foes (by zone, the 30 % rate, at most three, spot needed, contact → encounter, dropped on leaving, none at home) |
+| `test:law` | `scripts/test-law.ts` | 13 | wanted marks (no ceiling), pursuers and the Brocade Guard by escapes, the Jinyiwei chief, upright ambushes, arrest penalties (fine, seizure, crippling), มอบตัว, jail sentence, bribe, theft marks, the jail map and its activities; roaming foes (by zone, the 30 % rate, at most three, spot needed, contact → encounter, dropped on leaving, none at home) |
 | `test:walk` | `scripts/test-walk-cycle.ts` | 1 | the walk cycle alternates feet and bobs 1 px |
 | `test:grid` | `scripts/test-grid-engine.ts` | 14 | the grid engine: layout, movement rules, turn order, ranges and areas, arts, damage over time, stun, victory, flee, full battles against real opponents, packs |
 | `test:grid-ai` | `scripts/test-grid-ai.ts` | 13 | AI legality and behaviour over dozens of seeded battles; average planning time under 15 ms |

@@ -66,7 +66,7 @@ export const ACTIVITIES: readonly ActivityDef[] = [
   { id: "jail_dice", label: "ทอยเต๋ากับผู้คุม", badge: "dice", icon: "🎲", hours: 2, stamina: 5,
     description: "เดิมพัน 10 ตำลึง · ชนะได้ 20 · ดวงดีช่วยได้" },
   { id: "jail_meditate", label: "นั่งสมาธิ", badge: "practice", icon: "🧘", hours: 6, stamina: 0,
-    description: "6 ชั่วยาม · ฟื้นปราณเต็ม · ฟื้นพลังและบาดแผลเล็กน้อย" },
+    description: "6 ชั่วยาม · ฟื้นปราณเต็ม · ฟื้นพลังและบาดแผลเล็กน้อย · ตรึกตรองวิชาได้ w-exp +40" },
   { id: "jail_gate", label: "ประตูคุก", badge: "gate", icon: "🔒", hours: 0, stamina: 0,
     description: "ออกได้เมื่อพ้นโทษ · หรือนั่งนับวันจนครบ" },
   { id: "jail_escape", label: "แหกคุกทางกำแพงร้าว", badge: "escape", icon: "🧱", hours: 2, stamina: 30,

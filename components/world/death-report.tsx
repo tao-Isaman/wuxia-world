@@ -27,3 +27,26 @@ export function DeathReport() {
     </Modal>
   );
 }
+
+/**
+ * After an arrest (the jail cell's ยอมถูกคุมตัว, or มอบตัว): the sentence, the
+ * fine, seized property and crippled arts (lib/world/effects.ts
+ * applyArrestPenalty). Shown once; the line lives in flags._arrestReport.
+ */
+export function ArrestReport() {
+  const report = useWorldStore((s) => s.flags._arrestReport);
+  const setFlag = useWorldStore((s) => s._setFlag);
+  if (typeof report !== "string" || !report) return null;
+  const dismiss = () => setFlag("_arrestReport", "");
+  return (
+    <Modal open onClose={dismiss} title="คำพิพากษา" maxWidth="max-w-md">
+      <div className="space-y-3 text-center" data-testid="arrest-report">
+        <p className="text-sm leading-relaxed">ทางการอ่านคำพิพากษาต่อหน้าเจ้า ก่อนตีตรวนคุมตัวเข้าห้องขัง</p>
+        <ul className="text-sm space-y-1" aria-label="โทษที่ได้รับ">
+          {report.split("\n").map((line) => <li key={line} className="text-rose-700 font-semibold">{line}</li>)}
+        </ul>
+        <WuxiaButton variant="default" onClick={dismiss} autoFocus>รับโทษ</WuxiaButton>
+      </div>
+    </Modal>
+  );
+}

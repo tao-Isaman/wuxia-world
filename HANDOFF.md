@@ -27,7 +27,7 @@ A Thai wuxia RPG in the browser: Next.js 15, React 19, TypeScript, Phaser 4, Zus
 - **Exploring.** The hero walks painted maps: 101 places, 129 roads; villages, towns and homes have their own people and activities; foes turn up on the map as the hero walks.
 - **Doing.** They talk to 235 NPCs (30 of whom, with their disciples and heirs, live their own lives) (and give them gifts), take 882 quests (a 15-chapter main story, 154 sect lineage quests and 38 story sagas among them), join one of 15 sects, gather, craft, steal, and land in jail.
 - **Fighting.** Battles are turn-based tactics on a 10 × 7 board that grows to 15 × 10 for big gangs (up to 6 pack members plus the leader).
-- **Code.** Two pure engines (`lib/game`, `lib/world`) sit under Zustand stores and React / Phaser views. The world saves to `localStorage` (version 24).
+- **Code.** Two pure engines (`lib/game`, `lib/world`) sit under Zustand stores and React / Phaser views. The world saves to `localStorage` (version 25).
 
 Start with [README.md](README.md), then [docs/README.md](docs/README.md).
 
@@ -65,7 +65,7 @@ Checked on 2026-10-05 for the hero's flat base HP (a new hero starts at 136 HP),
 | `test:liveness` | 14 checks pass: the 30-person roster, birthdays, death odds, roads, succession and quest transfer, five seeded years, spar / kill anyone |
 | `test:investigation` | 5 checks pass |
 | `test:audio` | 6 checks pass |
-| `test:law` | 9 checks pass |
+| `test:law` | 13 checks pass |
 | `test:walk` | 1 check passes |
 | `test:grid` | 14 checks pass |
 | `test:grid-ai` | 13 checks pass |
@@ -82,7 +82,7 @@ Checked on 2026-10-05 for the hero's flat base HP (a new hero starts at 136 HP),
 | `test:docs` | the generated reference is current; every link, repo path and command in the docs resolves |
 | `bun scripts/audit-content.ts` | 235 NPCs · 1115 quests · 4057 scenes, all references resolve |
 | `bun run build` | passes; `/` first-load JS 1.12 MB (was 508 kB before the sagas; the saga text is about 2.9 MB of source, ~500 kB gzipped) |
-| `bun run test:e2e` | all 55 Playwright tests pass against the production build (11.9 minutes, Chromium 141 via the container shim), including the map editor and its kit brush on `/game/engine` |
+| `bun run test:e2e` | all 56 Playwright tests pass against the production build (11.9 minutes, Chromium 141 via the container shim), including the map editor and its kit brush on `/game/engine` |
 
 Not verified:
 

@@ -210,7 +210,8 @@ export type SceneEffect =
   | { t: "revealNpcStatus"; npcId: string }
   // ─── Law (wanted marks / jail) ──────────────────────────────────────
   // Locked into the jail map: sentence = 2 days per wanted mark, marks clear.
-  | { t: "imprison" }
+  // `surrender`: the hero gave themselves up (มอบตัว) — half the sentence and fine.
+  | { t: "imprison"; surrender?: boolean }
   // Sit out the whole remaining sentence at once, then walk free into the city.
   | { t: "serveJail" }
   // Bribe the jailer (JAIL_BRIBE_GOLD): released now, two marks lifted.
@@ -268,6 +269,8 @@ export type Condition =
   // an entry fee — gate the turn-in choice so the player can't proceed
   // while broke.
   | { t: "goldAtLeast"; amount: number }
+  // The hero can pay the jailer's price for their record (lib/world/law.ts bribeCost).
+  | { t: "canBribeJail" }
   // Player has learned this inner art (regardless of level). Backed by
   // playerBuild.learnedArtIds. Used by the Gumu intro to require the
   // player to have absorbed the Quanzhen sun art before the secret-sect
@@ -856,6 +859,9 @@ export interface PendingBattle {
   // ⚔ สังหาร: an open fight to the death with this NPC. A win kills them
   // (lib/world/npc-life.ts) and puts the hero at the top of the wanted list.
   killNpcId?: string;
+  // An upright NPC waylaying a wanted hero for the law (lib/world/effects.ts
+  // rollWalkEvent): a law battle — losing is arrest.
+  ambushNpcId?: string;
 }
 
 // ─── Letters (lib/world/letters.ts) ──────────────────────────────────
@@ -1295,8 +1301,11 @@ export interface WorldStateData {
   // how many 7-day batches to process when the player advanceTimes a lot.
   lastNpcTickDay: number;
   // ─── Law (v20) ───────────────────────────────────────────────────────
-  // หมายจับ — wanted marks from failed thefts (0–5). See lib/world/law.ts.
+  // หมายจับ — wanted marks, no ceiling (v25; 0–5 before). See lib/world/law.ts.
   wanted: number;
+  // v25: times the hero slipped the law since their last sentence (fled,
+  // beat the law, bribed, broke out). The Brocade Guard comes as it grows.
+  lawEvasions: number;
   // Day of the last crime (or last decay step): marks fade after 10 quiet days.
   wantedDay: number;
   // City whose jail holds the player while in the jail scene.

@@ -2,7 +2,29 @@
 import { useEffect, useRef, useState } from "react";
 import { getScene } from "@/lib/world";
 import { useWorldStore } from "@/store/world-store";
-import { describeSentence, sentenceLeft } from "@/lib/world/law";
+import { WANTED_MAX, arrestPenalty, describeSentence, sentenceLeft } from "@/lib/world/law";
+import { confirmDialog } from "@/store/confirm-store";
+import { toast } from "@/store/toast-store";
+
+/** มอบตัว from the wanted chip: show what the arrest will cost, then go straight to the cells. */
+async function offerSurrender() {
+  const { wanted, surrender } = useWorldStore.getState();
+  const p = arrestPenalty(wanted, true);
+  const ok = await confirmDialog({
+    title: "⛓ มอบตัวต่อทางการ",
+    message: [
+      `หมายจับ ${wanted} · เดินเข้าไปมอบตัวที่ทางการ ถูกคุมตัวเข้าคุกทันที`,
+      `โทษจำคุก ${p.days} วัน · ค่าปรับ ${p.fine.toLocaleString()} ตำลึง (มอบตัวลดโทษกึ่งหนึ่ง ไม่ริบทรัพย์)`,
+      p.cripple ? `คดีหนัก: วรยุทธ ${p.cripple} อย่างจะถูกทำลายลง 2 ระดับ` : "",
+      "พ้นโทษแล้วหมายจับจะถูกล้าง",
+    ].filter(Boolean).join("\n"),
+    confirmText: "มอบตัว",
+    variant: "warn",
+  });
+  if (!ok) return;
+  const r = surrender();
+  if (!r.ok) toast("warn", "มอบตัวไม่ได้ในตอนนี้");
+}
 
 /**
  * The twelve double-hours (ชั่วยาม). A world day is 12 units long and starts
@@ -34,8 +56,11 @@ export function MapHud() {
   return <>
     {/* No party card: the map stays clear. Law status floats top-centre. */}
     {(wanted > 0 || sentence != null) && <div className="hud-law" role="status" data-hud-occluder>
-      {wanted > 0 && <span className="hud-wanted" title={`หมายจับ ${wanted}/5 — ระวังเจ้าหน้าที่ตามล่า`} aria-label={`หมายจับ ${wanted} จาก 5`}>
-        ⛓ หมายจับ {"●".repeat(wanted)}<i>{"○".repeat(5 - wanted)}</i></span>}
+      {wanted > 0 && sentence == null && <button type="button" className="hud-wanted" data-testid="hud-wanted"
+        title={`หมายจับ ${wanted} — ระวังเจ้าหน้าที่ตามล่า · แตะเพื่อมอบตัว`} aria-label={`หมายจับ ${wanted} · มอบตัว`} onClick={offerSurrender}>
+        ⛓ หมายจับ {wanted <= WANTED_MAX
+          ? <>{"●".repeat(wanted)}<i>{"○".repeat(WANTED_MAX - wanted)}</i></>
+          : <b>×{wanted}</b>} <small>มอบตัว</small></button>}
       {sentence != null && <span className="hud-sentence">
         {sentence > 0 ? `⛓ เหลือโทษ ${describeSentence(sentence)}` : "🔓 พ้นโทษแล้ว · ไปที่ประตูคุก"}</span>}
     </div>}

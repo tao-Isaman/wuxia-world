@@ -99,7 +99,7 @@ try {
   useWorldStore.getState().recordRumorHeard(unheard.id);
   assert.deepEqual(useWorldStore.getState().rumorSeenLog, heard.rumorSeenLog, "repeated hearing is idempotent");
   const saved = JSON.parse(memory.get(saveKey)!) as { version: number; state: WorldStateData };
-  assert.equal(saved.version, 24);
+  assert.equal(saved.version, 25);
   assertLore(saved.state);
   for (let i = 0; i < 2; i++) {
     await useWorldStore.persist.rehydrate();

@@ -1,5 +1,6 @@
 import type { Condition, QuestStatus, WorldStateData } from "./types";
 import { masteryLevel } from "./data/life-skills";
+import { bribeCost } from "./law";
 import { combinedStats } from "@/lib/game/derive";
 import type { StatKey } from "@/lib/game";
 
@@ -77,6 +78,8 @@ export function evaluateCondition(state: WorldStateData, c: Condition): boolean 
     }
     case "goldAtLeast":
       return state.gold >= c.amount;
+    case "canBribeJail":
+      return state.gold >= bribeCost(state.wanted ?? 0);
     case "learnedArt":
       return (state.playerBuild?.learnedArtIds ?? []).includes(c.artId);
     case "learnedSkill":

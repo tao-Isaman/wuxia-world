@@ -54,6 +54,10 @@ test("wanted marks: walking draws the law, jail costs days per mark and clears t
   expect(jailed.wanted).toBe(0);
   expect(jailed.jailUntil - (jailed.day * 12 + jailed.time)).toBe(3 * 2 * 12);
   await expect(page.locator(".hud-sentence")).toContainText("เหลือโทษ 6 วัน");
+  // The sentence is read out: the days and the fine (50 a mark).
+  const report = page.getByTestId("arrest-report");
+  await expect(report).toContainText("โทษจำคุก 6 วัน");
+  await report.getByRole("button", { name: "รับโทษ" }).click();
   await page.screenshot({ path: "test-results/screenshots/jail-map.png" });
 
   // The places list: no roads out; activities are the way to spend the time.

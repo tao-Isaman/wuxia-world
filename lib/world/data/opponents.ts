@@ -1931,6 +1931,19 @@ export const OPPONENTS: readonly OpponentDef[] = [
   { id: "law_bounty_hunter", name: "นักล่าค่าหัว", ti: 3, category: "human", drops: DROPS_T3,
     pack: { opponentId: "law_constable", count: 1 },
     build: () => build("นักล่าค่าหัว", 3, { stats: { AGI: 12, DEX: 12, STR: 8, LUK: 6 }, skillIds: ["jy_chain", "ne4", "basic_punch"] }) },
+  // The Brocade Guard (องครักษ์เสื้อแพร) hunts those who keep slipping the law
+  // (lib/world/law.ts pickLawPursuer): an agent with a constable, then a captain
+  // with two agents. Their own school's chains, claws and execution blades.
+  { id: "law_jinyiwei_agent", name: "องครักษ์เสื้อแพร", ti: 3, category: "human", drops: DROPS_T3,
+    pack: { opponentId: "law_constable", count: 1 },
+    build: () => build("องครักษ์เสื้อแพร", 3, { stats: { STR: 14, AGI: 13, VIT: 12, DEX: 12, DEF: 10, POW: 8 },
+      skillIds: ["jy_sword", "jy_eagleclaw", "jy_chainmaster", "jy_blade"], artId: "jy_a2_goldarmor", artLevel: 6, extraArtSlots: ["jy_a2_goldarmor"] }) },
+  { id: "law_jinyiwei_captain", name: "นายกององครักษ์เสื้อแพร", ti: 4, category: "human", drops: DROPS_T4,
+    pack: { opponentId: "law_jinyiwei_agent", count: 2 },
+    look: { size: 1.15 },
+    build: () => build("นายกององครักษ์เสื้อแพร", 4, { stats: { STR: 20, AGI: 18, VIT: 18, DEX: 17, DEF: 15, POW: 14, INT: 10, LUK: 8 },
+      skillIds: ["jy_execution_blade", "jy_chain_assassin", "jy_blade_king", "jy_sword"], artId: "jy_a4_brocadelord", artLevel: 8,
+      learnedArtIds: ["jy_a2_goldarmor"], extraArtSlots: ["jy_a4_brocadelord"] }) },
 
   // ─── Variants, gangs and bosses (random encounters) ─────────────
   // Recoloured / resized beasts and humans drawn from the shared sheets
@@ -2135,7 +2148,7 @@ export const OPPONENTS_BY_ID = new Map<string, OpponentDef>(
 
 export function getOpponent(id: string | null | undefined): OpponentDef | null {
   if (!id) return null;
-  return OPPONENTS_BY_ID.get(id) ?? npcFoe(id);
+  return OPPONENTS_BY_ID.get(id) ?? npcFoe(id) ?? lawNpcFoe(id);
 }
 
 // ─── Any person as a foe (Liveness 2.0) ──────────────────────────────
@@ -2160,6 +2173,13 @@ export function parseNpcFoeId(id: string): { npcId: string; power: number; sectN
   return { npcId, power: Number(power) || 1, sectName: sect && sect !== "-" ? sect : null };
 }
 const NPC_FOE_DROPS = [DROPS_T0, DROPS_T1, DROPS_T2, DROPS_T3, DROPS_T4] as const;
+
+/** A person fighting for the law (lib/world/law.ts LAW_NPC_PREFIX): the same build, a law battle (jail on a loss). */
+function lawNpcFoe(id: string): OpponentDef | null {
+  if (!id.startsWith("lawnpc@")) return null;
+  const inner = npcFoe(id.slice("lawnpc@".length)) ?? OPPONENTS_BY_ID.get(id.slice("lawnpc@".length)) ?? null;
+  return inner ? { ...inner, id } : null;
+}
 const NPC_FOE_CACHE = new Map<string, OpponentDef>();
 
 function npcFoe(id: string): OpponentDef | null {

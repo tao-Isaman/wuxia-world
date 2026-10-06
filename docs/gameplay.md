@@ -564,18 +564,20 @@ Chances are clamped to 5–95 %. Formulas: [world-engine.md](world-engine.md#bad
 
 ## The law and the jail
 
-- **Wanted marks** (หมายจับ ●○○○○, up to 5) come from failed steals (+1), jail escapes (+2) and failed attempts on a life (+2); **killing anyone puts you at 5 at once**. One fades every 10 days without a new crime.
-- **Pursuers.** While wanted, walk ticks can bring the law: a constable at 1 mark, then imperial guards and a bounty hunter (with a constable) as marks grow. Fleeing uses the AGI + LUK check.
+- **Wanted marks** (หมายจับ) have **no ceiling**: failed steals +1, jail escapes +2, failed attempts on a life +2, **every killing +5**. The HUD shows five seals (●●●○○), then a number (⛓ หมายจับ ×7). One fades every 10 days without a new crime.
+- **Pursuers.** While wanted, walk ticks can bring the law (13–45 %, +1 % per escape, at most 55 %): a constable at 1 mark, then imperial guards and a bounty hunter (with a constable) as marks grow. **Every time you slip the law** — flee, win, bribe, break out — the **Brocade Guard (องครักษ์เสื้อแพร)** grows keener: from 3 escapes (or 4 marks) Brocade agents (T3, with a constable), from 4–7 a Brocade captain (T4, with two agents), and after 8 escapes with 5+ marks **their commander in person** — whoever holds the Jinyiwei seat. A sentence served clears the count. Fleeing uses the AGI + LUK check.
+- **Upright people turn you in.** From 2 marks, a walk tick may bring an ambush (3–20 %): a righteous member of the living jianghu (a master, a wanderer, a disciple — power 30+, in your region) attacks to hand you over. No fleeing; lose and you are arrested; win and they limp off wounded.
 - **Law fights** are not fatal. Win and you walk on (the marks stay); lose and you are taken to a cell, where you either:
-  - **accept arrest** — you go to the **jail map** for 2 days per mark (at least 2, at most 10), and your marks are cleared; or
-  - **bribe with 300 gold** — you walk free and two marks are removed.
+  - **accept arrest** — the sentence is read (คำพิพากษา): 2 days per mark (up to 30), a **fine** of 50 gold per mark; from 5 marks **property is seized** (a third of the gold left and half of one or two carried goods); from 10 marks **your martial arts are crippled** (the best move or art loses 2 levels — one more per 5 marks, up to 4). Then the **jail map**, and the marks are cleared; or
+  - **bribe** — 300 gold, plus 150 per mark beyond two: you walk free with two marks removed (and the law remembers).
+- **มอบตัว (give yourself up).** Tap the wanted chip at the top of the screen: you are taken straight to the cells with **half the sentence and half the fine, no seizure**, and one fewer crippled move.
 - **The jail** has no exits:
 
 | Spot | Time | Stamina | Effect |
 | --- | --- | --- | --- |
 | ทุบหิน (labour) | 6 | 25 | the sentence drops 12 ชั่วยาม in all; STR xp +20 |
 | ทอยเต๋า (dice) | 2 | 5 | bet 10 gold; win `min(60 %, 40 % + LUK/2 %)` |
-| นั่งสมาธิ (meditate) | 6 | 0 | MP full, HP +20 %, stamina +15 |
+| นั่งสมาธิ (meditate) | 6 | 0 | MP full, HP +20 %, stamina +15, **w-exp +40** |
 | แหกคุก (escape) | 2 | 30 | `min(55 %, 20 % + AGI/2 %)`: free with +2 marks; failure adds a day |
 | ประตูคุก (gate) | — | — | open when the time is served; before that, offers to sit out the rest at once |
 
