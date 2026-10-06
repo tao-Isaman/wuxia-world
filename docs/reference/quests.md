@@ -41,12 +41,12 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | --- | --- | --- | --- | --- |
 | `qst_shaolin_sect_patrol` | ตรวจตราเขตวัด | เจ้าอาวาสฮุยหยวน | kill → turn-in | prereqs |
 | `qst_shaolin_sect_herb_run` | ส่งสมุนไพรให้วัด | เจ้าอาวาสฮุยหยวน | item → turn-in | prereqs |
-| `qst_shaolin_sect_meditation` | ปฏิบัติธรรมที่ถ้ำลึก | เจ้าอาวาสฮุยหยวน | item → turn-in | rank ≤ 7, prereqs |
+| `qst_shaolin_sect_meditation` | ทานแก่ผู้ตกยาก | เจ้าอาวาสฮุยหยวน | item → turn-in | rank ≤ 7, prereqs |
 | `qst_shaolin_art_zen_finger` | บททดสอบก่อนสืบทอด: วิชาลึกลับ | เจ้าอาวาสฮุยหยวน | kill → item → turn-in | art, rank ≤ 5, prereqs |
 | `qst_shaolin_art_legendary` | บททดสอบก่อนตำนาน: วิชาลึกลับ | เจ้าอาวาสฮุยหยวน | kill → trait → turn-in | art, rank ≤ 2, prereqs |
 | `qst_shaolin_redemption` | ไถ่บาปต่อเส้าหลิน | เจ้าอาวาสฮุยหยวน | kill → item → turn-in | prereqs |
 | `qst_shaolin_sect_protect_village` | ปกป้องชาวบ้านจากโจร | เจ้าอาวาสฮุยหยวน | kill → item → turn-in | prereqs |
-| `qst_shaolin_sect_sutra_paper` | กระดาษคัดลอกพระสูตร | เจ้าอาวาสฮุยหยวน | item → turn-in | prereqs |
+| `qst_shaolin_sect_sutra_paper` | กระดาษสาคัดลอกพระสูตร | เจ้าอาวาสฮุยหยวน | item → turn-in | prereqs |
 
 ### อู่ตัง (`wudang`)
 
@@ -56,7 +56,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qst_wudang_sect_herb_run` | เก็บสมุนไพรเขาอู่ตัง | อาจารย์ชิงซวี่ | item → turn-in | prereqs |
 | `qst_wudang_art_yinyang` | บททดสอบก่อนสืบทอด: วิชาลึกลับ | อาจารย์ชิงซวี่ | kill → item → turn-in | art, rank ≤ 5, prereqs |
 | `qst_wudang_redemption` | ไถ่บาปต่ออู่ตัง | อาจารย์ชิงซวี่ | kill → item → turn-in | prereqs |
-| `qst_wudang_sect_kindling` | ทำความสะอาดศาลา | อาจารย์ชิงซวี่ | item → turn-in | prereqs |
+| `qst_wudang_sect_kindling` | ไม้ซ่อมศาลา | อาจารย์ชิงซวี่ | item → turn-in | prereqs |
 | `qst_wudang_sect_ginseng_run` | เก็บโสมเทพในป่าเขา | อาจารย์ชิงซวี่ | item → turn-in | prereqs |
 | `qst_wudang_sect_tiger_hunt` | ปราบเสือร้ายเชิงเขา | อาจารย์ชิงซวี่ | kill → item → turn-in | prereqs |
 | `qst_wudang_sect_scripture_copy` | คัดลอกตำราเต๋า | อาจารย์ชิงซวี่ | item → turn-in | prereqs |
@@ -89,8 +89,8 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | Id | Name | Giver | Stages | Notes |
 | --- | --- | --- | --- | --- |
 | `qst_songshan_sect_patrol` | ลาดตระเวนเชิงเขาซงซาน | อาจารย์ใหญ่เกาซงเหยียน | kill → turn-in | prereqs |
-| `qst_songshan_sect_iron` | ส่งเหล็กดิบให้โรงตีดาบ | อาจารย์ใหญ่เกาซงเหยียน | item → turn-in | prereqs |
-| `qst_songshan_sect_wooden` | ส่งไม้แข็งให้โรงดาบ | อาจารย์ใหญ่เกาซงเหยียน | item → turn-in | prereqs |
+| `qst_songshan_sect_iron` | ส่งแร่เหล็กให้โรงตีดาบ | อาจารย์ใหญ่เกาซงเหยียน | item → turn-in | prereqs |
+| `qst_songshan_sect_wooden` | ส่งไม้เนื้อแข็งให้โรงดาบ | อาจารย์ใหญ่เกาซงเหยียน | item → turn-in | prereqs |
 | `qst_songshan_art_pillar` | บททดสอบก่อนสืบทอด: วิชาลึกลับ | อาจารย์ใหญ่เกาซงเหยียน | kill → item → turn-in | art, rank ≤ 3, prereqs |
 | `qst_songshan_redemption` | ไถ่บาปต่อซงซาน | อาจารย์ใหญ่เกาซงเหยียน | kill → item → turn-in | prereqs |
 
@@ -100,7 +100,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | --- | --- | --- | --- | --- |
 | `qst_taishan_sect_patrol` | ลาดตระเวนเชิงเขาบูรพา | เจ้าสำนักชิงสือเต้าเหริน | kill → turn-in | prereqs |
 | `qst_taishan_sect_jade` | ส่งหยกบูชาเทพสุริยัน | เจ้าสำนักชิงสือเต้าเหริน | item → turn-in | prereqs |
-| `qst_taishan_sect_dawn_offering` | เครื่องบูชาแสงแรก | เจ้าสำนักชิงสือเต้าเหริน | item → turn-in | prereqs |
+| `qst_taishan_sect_dawn_offering` | เหล็กหลอมกระบี่สุริยัน | เจ้าสำนักชิงสือเต้าเหริน | item → turn-in | prereqs |
 | `qst_taishan_art_sun` | บททดสอบก่อนสืบทอด: วิชาลึกลับ | เจ้าสำนักชิงสือเต้าเหริน | kill → item → turn-in | art, rank ≤ 3, prereqs |
 | `qst_taishan_redemption` | ไถ่บาปต่อไท่ซาน | เจ้าสำนักชิงสือเต้าเหริน | kill → item → turn-in | prereqs |
 
@@ -128,7 +128,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 
 | Id | Name | Giver | Stages | Notes |
 | --- | --- | --- | --- | --- |
-| `qst_quanzhen_sect_patrol` | ลาดตระเวนรอบพระราชวังจงหยาง | อาจารย์ใหญ่หลิงเจิน | kill → turn-in | prereqs |
+| `qst_quanzhen_sect_patrol` | ลาดตระเวนรอบตำหนักฉวนเจิน | อาจารย์ใหญ่หลิงเจิน | kill → turn-in | prereqs |
 | `qst_quanzhen_sect_scripture` | คัดลอกตำราเต๋า | อาจารย์ใหญ่หลิงเจิน | item → turn-in | prereqs |
 | `qst_quanzhen_art_sun` | บททดสอบก่อนสืบทอด: วิชาลึกลับ | อาจารย์ใหญ่หลิงเจิน | kill → item → turn-in | art, rank ≤ 3, prereqs |
 | `qst_quanzhen_redemption` | ไถ่บาปต่อฉวนเจิน | อาจารย์ใหญ่หลิงเจิน | kill → item → turn-in | prereqs |
@@ -151,7 +151,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qst_beggars_sect_alms` | แจกอาหารคนยากไร้ | หัวหน้าหงเทียน | item → turn-in | prereqs |
 | `qst_beggars_art_thousandcrowd` | บททดสอบก่อนตำนาน: วิชาลึกลับ | หัวหน้าหงเทียน | kill → item → turn-in | art, rank ≤ 3, prereqs |
 | `qst_beggars_redemption` | ไถ่บาปต่อพรรคยาจก | หัวหน้าหงเทียน | kill → item → turn-in | prereqs |
-| `qst_beggars_sect_rice2` | เก็บข้าวห่อให้คนยาก | หัวหน้าหงเทียน | item → turn-in | prereqs |
+| `qst_beggars_sect_rice2` | เก็บข้าวหมูแดงให้คนยาก | หัวหน้าหงเทียน | item → turn-in | prereqs |
 | `qst_beggars_sect_thug_road` | กำราบโจรริมทาง | หัวหน้าหงเทียน | kill → item → turn-in | prereqs |
 | `qst_beggars_sect_supplies` | รวบรวมเสบียงและผ้าให้คนยากไร้ | หัวหน้าหงเทียน | item → item → turn-in | prereqs |
 | `qst_beggars_sect_village_delivery` | ส่งของยังหมู่บ้านอดอยาก | หัวหน้าหงเทียน | item → turn-in | prereqs |
@@ -176,7 +176,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qst_jinyiwei_sect_arms` | ส่งเหล็กให้โรงตีอาวุธ | ผู้บัญชาการจ้าวฝู่ | item → turn-in | prereqs |
 | `qst_jinyiwei_art_godslayer` | บททดสอบก่อนตำนาน: วิชาลึกลับ | ผู้บัญชาการจ้าวฝู่ | kill → trait → turn-in | art, rank ≤ 3, prereqs |
 | `qst_jinyiwei_redemption` | ไถ่บาปต่อองครักษ์เสื้อแพร | ผู้บัญชาการจ้าวฝู่ | kill → item → turn-in | prereqs |
-| `qst_jinyiwei_sect_scroll` | ส่งกระดาษให้กรม | ผู้บัญชาการจ้าวฝู่ | item → turn-in | prereqs |
+| `qst_jinyiwei_sect_scroll` | ส่งกระดาษสาให้กรม | ผู้บัญชาการจ้าวฝู่ | item → turn-in | prereqs |
 | `qst_jinyiwei_sect_thugs` | กวาดล้างตลาดหลวง | ผู้บัญชาการจ้าวฝู่ | kill → turn-in | prereqs |
 | `qst_jinyiwei_sect_intel` | รวบรวมข่าวกรอง | ผู้บัญชาการจ้าวฝู่ | item → item → turn-in | prereqs |
 | `qst_jinyiwei_sect_fugitive` | ตามจับโจรหนีหมายจับ | ผู้บัญชาการจ้าวฝู่ | kill → item → turn-in | prereqs |
@@ -199,7 +199,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | Id | Name | Giver | Stages | Notes |
 | --- | --- | --- | --- | --- |
 | `qst_sunmoon_sect_patrol` | ลาดตระเวนหุบเขา | อาจารย์ใหญ่หยินอวี้ | kill → turn-in | prereqs |
-| `qst_sunmoon_sect_scripture` | เก็บคัมภีร์เก่าจากซากเมือง | อาจารย์ใหญ่หยินอวี้ | item → turn-in | prereqs |
+| `qst_sunmoon_sect_scripture` | กระดาษหมึกคัดคัมภีร์ | อาจารย์ใหญ่หยินอวี้ | item → turn-in | prereqs |
 | `qst_sunmoon_art_qiankun` | บททดสอบก่อนตำนาน: วิชาลึกลับ | อาจารย์ใหญ่หยินอวี้ | kill → trait → turn-in | art, rank ≤ 3, prereqs |
 | `qst_sunmoon_redemption` | ไถ่บาปต่อพรรคตะวันจันทรา | อาจารย์ใหญ่หยินอวี้ | kill → item → turn-in | prereqs |
 | `qst_sunmoon_sect_patrol2` | ลาดตระเวนยอดเขา | อาจารย์ใหญ่หยินอวี้ | kill → turn-in | prereqs |
@@ -233,7 +233,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | --- | --- | --- | --- | --- |
 | `qe_shenlong_kidnap_scholar` | ลักพาตัวนักปราชญ์ | เจ้าลัทธิจ้าวมังกรเทพ | kidnap → turn-in |  |
 | `qe_shenlong_steal_dragon_pearl` | ขโมยลูกแก้วมังกร | เจ้าลัทธิจ้าวมังกรเทพ | steal → turn-in |  |
-| `qe_shenlong_assassinate_priest` | ลอบสังหารพระผู้รักษาธรรม | เจ้าลัทธิจ้าวมังกรเทพ | assassinate → turn-in |  |
+| `qe_shenlong_assassinate_priest` | ลอบสังหารเจ้าสำนักอู่ตัง | เจ้าลัทธิจ้าวมังกรเทพ | assassinate → turn-in |  |
 | `qe_shenlong_collect_tribute` | เก็บบรรณาการ | เจ้าลัทธิจ้าวมังกรเทพ | steal → turn-in |  |
 | `qe_shenlong_clear_rebel` | กำจัดผู้ต่อต้านมังกรเทพ | เจ้าลัทธิจ้าวมังกรเทพ | kill → turn-in |  |
 | `qe_shenlong_initiate_test` | ทดสอบสมาชิกใหม่ลัทธิ | เจ้าลัทธิจ้าวมังกรเทพ | kidnap → turn-in |  |
@@ -341,7 +341,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qc_changan_weapon_smuggle` | การลักลอบขนอาวุธ | ยามหยาน | objective (spot) → kill → turn-in | prereqs |
 | `qe_changan_remove_rival` | กำจัดคู่แข่งทางการ | ขุนนางหยานทุจริต | assassinate → turn-in |  |
 | `qe_changan_steal_evidence` | ขโมยเอกสารลับ | ขุนนางหยานทุจริต | steal → turn-in |  |
-| `qe_changan_silence_clerk` | ปิดปากเสมียนรู้ความลับ | ขุนนางหยานทุจริต | assassinate → turn-in |  |
+| `qe_changan_silence_clerk` | ปิดปากยามผู้รู้ความลับ | ขุนนางหยานทุจริต | assassinate → turn-in |  |
 | `qe_changan_kidnap_witness` | จับตัวพยานหลักฐาน | ขุนนางหยานทุจริต | kidnap → turn-in |  |
 | `qe_changan_smuggling_run` | ขนสินค้าต้องห้ามผ่านด่าน | ขุนนางหยานทุจริต | steal → turn-in |  |
 | `qe_changan_intimidate_judge` | ปิดปากที่ปรึกษาคดี | ขุนนางหยานทุจริต | assassinate → turn-in | prereqs |
@@ -442,7 +442,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | Id | Name | Giver | Stages | Notes |
 | --- | --- | --- | --- | --- |
 | `qe_zhizhu_assassinate_lord` | ลอบสังหารเจ้าคฤหาสน์ | นักฆ่าเงาหยิง | assassinate → turn-in |  |
-| `qe_zhizhu_assassinate_master` | ลอบสังหารอาจารย์ดาบ | นักฆ่าเงาหยิง | assassinate → turn-in |  |
+| `qe_zhizhu_assassinate_master` | ลอบสังหารเจ้าอาวาส | นักฆ่าเงาหยิง | assassinate → turn-in |  |
 | `qe_zhizhu_silence_traitor` | ปิดปากคนทรยศ | นักฆ่าเงาหยิง | kill → turn-in |  |
 | `qe_zhizhu_purge_witnesses` | ล้วงข้อมูลพยาน | นักฆ่าเงาหยิง | steal → turn-in |  |
 | `qe_zhizhu_steal_target_data` | ขโมยข้อมูลเป้าหมาย | นักฆ่าเงาหยิง | steal → turn-in |  |
@@ -618,7 +618,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qe_wudu_collect_centipede` | เก็บตะขาบยักษ์ | ผู้อาวุโสตู๋ซื่อ | kill → turn-in |  |
 | `qe_wudu_kidnap_doctor` | ลักพาตัวหมอยา | ผู้อาวุโสตู๋ซื่อ | kidnap → turn-in |  |
 | `qe_wudu_steal_antidote` | ขโมยสูตรถอนพิษ | ผู้อาวุโสตู๋ซื่อ | steal → turn-in |  |
-| `qe_wudu_assassinate_emei` | ลอบสังหารนิ้วน้ำหวาน | ผู้อาวุโสตู๋ซื่อ | assassinate → turn-in |  |
+| `qe_wudu_assassinate_emei` | ลอบสังหารเจ้าสำนักง้อไบ๊ | ผู้อาวุโสตู๋ซื่อ | assassinate → turn-in |  |
 | `qe_wudu_clear_rival_sect` | กวาดล้างยอดยุทธอธรรม | ผู้อาวุโสตู๋ซื่อ | kill → turn-in |  |
 | `ql_art_t2_snakeform` | สืบทอดวิชาลึกลับของหมอพิษอาหมาน | หมอพิษอาหมาน | kill → item → kill → turn-in | prereqs |
 
@@ -671,9 +671,9 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 
 | Id | Name | Giver | Stages | Notes |
 | --- | --- | --- | --- | --- |
-| `qst_zhongyang_imperial_letter` | สาส์นพระราชา | ทูตหลิวอิง | objective (person) → visit → objective (person) → turn-in |  |
+| `qst_zhongyang_imperial_letter` | สาส์นจากราชสำนัก | ทูตหลิวอิง | objective (person) → visit → objective (person) → turn-in |  |
 | `qst_zhongyang_noble_intrigue` | วังวนขุนนาง | ทูตหลิวอิง | objective (spot) → objective (spot) → objective (spot) → turn-in | prereqs |
-| `qst_zhongyang_ceremony_guard` | คุ้มกันพิธีพระราชา | ทูตหลิวอิง | visit → kill → turn-in | prereqs |
+| `qst_zhongyang_ceremony_guard` | คุ้มกันพิธีในวังหลวง | ทูตหลิวอิง | visit → kill → turn-in | prereqs |
 
 ### พระราชวังหลวง (`palace_royal`)
 
@@ -736,8 +736,8 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qv_inn_spy_guest` | แขกน่าสงสัย | นางสาวซิ่ว | objective (scene) → turn-in |  |
 | `qv_inn_debt_collector` | นักเลงเรียกหนี้ | นางสาวซิ่ว | turn-in |  |
 | `qst_spy_inn_drunk_confession` | คำสารภาพของขี้เมา | โจวพ่อค้าเหล้าในโรงเตี๊ยม | kill → turn-in |  |
-| `qst_spy_inn_wandering_blade` | ดาบพเนจรในโรงเตี๊ยม | โจวพ่อค้าเหล้าในโรงเตี๊ยม | kill → turn-in | prereqs |
-| `qe_spy_inn_intimidate_drunk` | ม้วนกลยุทธ์ของขุนพล | โจวพ่อค้าเหล้าในโรงเตี๊ยม | steal → turn-in |  |
+| `qst_spy_inn_wandering_blade` | อาจารย์ดาบในโรงเตี๊ยม | โจวพ่อค้าเหล้าในโรงเตี๊ยม | kill → turn-in | prereqs |
+| `qe_spy_inn_intimidate_drunk` | ม้วนกลยุทธ์ของนักยุทธศาสตร์ | โจวพ่อค้าเหล้าในโรงเตี๊ยม | steal → turn-in |  |
 | `qc_yuelai_woodpile_sword` | กระบี่จากกองฟืน | เซียวจิ้งเทียน | objective×2 → turn-in |  |
 | `qc_yuelai_letter_to_gaosheng` | จดหมายถึงเพื่อนเก่า | เซียวจิ้งเทียน | objective (person) → turn-in |  |
 
@@ -779,7 +779,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 
 | Id | Name | Giver | Stages | Notes |
 | --- | --- | --- | --- | --- |
-| `qst_dalun_stolen_relic` | พระธาตุวัดตาหลุน | พระกงซิน | visit → objective (spot) → kill → turn-in |  |
+| `qst_dalun_stolen_relic` | พระธาตุวิหารล้อลม | พระกงซิน | visit → objective (spot) → kill → turn-in |  |
 | `qst_dalun_pilgrim_mission` | ทางแสวงบุญแห่งสี่วัด | พระกงซิน | visit → turn-in | prereqs |
 | `qw_dalun_prayer_flags` | ธงมนตร์ที่ขาดวิ่น | พระกงซิน | item → objective (spot) → turn-in |  |
 | `qw_dalun_dragon_elephant` | จารึกใต้ฐานช้างศิลา | พระกงซิน | item → objective (scene) → objective (scene) → turn-in | prereqs |
@@ -789,9 +789,9 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | Id | Name | Giver | Stages | Notes |
 | --- | --- | --- | --- | --- |
 | `qe_chuangwang_steal_relic` | ขโมยพระธาตุโบราณ | พระอเถระนอกรีตฮุยเป้า | steal → turn-in |  |
-| `qe_chuangwang_kidnap_novice` | ลักพาตัวสามเณร | พระอเถระนอกรีตฮุยเป้า | kidnap → turn-in |  |
+| `qe_chuangwang_kidnap_novice` | ลักพาตัวพระเส้าหลิน | พระอเถระนอกรีตฮุยเป้า | kidnap → turn-in |  |
 | `qe_chuangwang_kill_pilgrim` | ขัดขวางผู้แสวงบุญ | พระอเถระนอกรีตฮุยเป้า | kill → turn-in |  |
-| `qe_chuangwang_burn_temple` | ทำลายเสาหลักวัด | พระอเถระนอกรีตฮุยเป้า | assassinate → turn-in |  |
+| `qe_chuangwang_burn_temple` | ตัดหูตาของยุทธภพ | พระอเถระนอกรีตฮุยเป้า | assassinate → turn-in |  |
 | `qe_chuangwang_purge_witnesses` | ลบร่องรอยกิจกรรมมาร | พระอเถระนอกรีตฮุยเป้า | steal → turn-in |  |
 
 ### สำนักดาบโลหิต (`sect_xueyu`)
@@ -799,8 +799,8 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | Id | Name | Giver | Stages | Notes |
 | --- | --- | --- | --- | --- |
 | `qe_xueyu_sect_initiation` | พิธีรับเข้าสำนัก | ทูตเซี่ยแห่งสำนักดาบโลหิต | kidnap → turn-in |  |
-| `qe_xueyu_kill_pure_monk` | สังหารพระบริสุทธิ์ | ทูตเซี่ยแห่งสำนักดาบโลหิต | kill → turn-in |  |
-| `qe_xueyu_kidnap_disciple` | ลักพาตัวลูกศิษย์ง้อไบ๊ | ทูตเซี่ยแห่งสำนักดาบโลหิต | kidnap → turn-in |  |
+| `qe_xueyu_kill_pure_monk` | สังหารนักพรตบริสุทธิ์ | ทูตเซี่ยแห่งสำนักดาบโลหิต | kill → turn-in |  |
+| `qe_xueyu_kidnap_disciple` | ลักพาตัวเจ้าสำนักง้อไบ๊ | ทูตเซี่ยแห่งสำนักดาบโลหิต | kidnap → turn-in |  |
 | `qe_xueyu_steal_sutra` | ขโมยพระสูตรต้องห้าม | ทูตเซี่ยแห่งสำนักดาบโลหิต | steal → turn-in |  |
 | `qe_xueyu_silence_traitor` | ปิดปากคนทรยศ | ทูตเซี่ยแห่งสำนักดาบโลหิต | kill → turn-in |  |
 | `qe_xueyu_purge_village` | กวาดล้างหมู่บ้านพยาน | ทูตเซี่ยแห่งสำนักดาบโลหิต | kill → turn-in | prereqs |
@@ -907,7 +907,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qc_yangzhou_sunken_cargo` | สินค้าจมน้ำ | ชาวประมงเฉิน | kill → item → turn-in | prereqs |
 | `qst_spy_yangzhou_smuggler_ship` | เรือลักลอบขนสินค้า | ซีคนยกของท่าเรือ | visit → kill → turn-in |  |
 | `qst_spy_yangzhou_silk_seal` | ตราผ้าไหมหลวง | ซีคนยกของท่าเรือ | kill → turn-in |  |
-| `qe_spy_yangzhou_silence_witness` | ปิดปากผู้พิพากษา | ซีคนยกของท่าเรือ | assassinate → turn-in |  |
+| `qe_spy_yangzhou_silence_witness` | ปิดปากนายอำเภอ | ซีคนยกของท่าเรือ | assassinate → turn-in |  |
 | `qc_yangzhou_hook_and_line` | ขอเกี่ยวกับสายเบ็ด | ชาวประมงเฉิน | item → turn-in |  |
 | `qc_yangzhou_mend_the_net` | อวนขาดกลางแม่น้ำ | ชาวประมงเฉิน | item → objective (person) → turn-in |  |
 | `qc_yangzhou_twin_cleavers` | มีดคู่ของพ่อครัว | พ่อครัวซู | kill → objective (scene) → turn-in | prereqs |

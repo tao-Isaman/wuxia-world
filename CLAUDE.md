@@ -203,7 +203,7 @@ Two deliberate exceptions reach into stores:
   - A dialog with `next` and no `choices` **auto-advances without showing its lines**. For narration, use one confirmation choice (`{ text: "ก้าวต่อไป", next }`).
   - A terminal dialog (no choices, no next) shows "ปิด", which returns to `lastLocationId`.
 - **`SceneEffect`** (26 kinds) and **`Condition`** (26 kinds) live in `types.ts`, dispatched by `effects.ts` / `conditions.ts`.
-  - **The `applyEffect` switch has no exhaustiveness guard**: a new variant without a case compiles and does nothing.
+  - **The `applyEffect` switch ends in a `never` guard**: a new variant without a case is a type error (so are the combat effect and quest-reward dispatchers).
   - Counted conditions also need `describeQuestCondition` and the quest guide's `unmetLeaf`.
 - **Quest progress.**
   - Kill stages (`defeatedOpponent`) count kills **since accepting** (snapshot in `acceptedDefeatedAt`).

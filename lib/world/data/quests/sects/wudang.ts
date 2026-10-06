@@ -50,7 +50,7 @@ export const QUESTS_WUDANG: readonly QuestDef[] = [
     id: "qst_wudang_sect_patrol",
     name: "ตรวจตรารอบเขาอู่ตัง",
     description: "ภารกิจประจำของศิษย์อู่ตัง — ลาดตระเวนรอบเขาและกำราบโจรที่ลอบเข้ามา",
-    briefSummary: "ปราบโจรรอบเขา 2 คน · sect points +50",
+    briefSummary: "ปราบโจรรอบเขา 2 คน · แต้มสำนัก +50",
     type: "side",
     sectId: "wudang",
     giverNpcId: "sect_wudang_master_qingxu",
@@ -78,7 +78,7 @@ export const QUESTS_WUDANG: readonly QuestDef[] = [
     id: "qst_wudang_sect_herb_run",
     name: "เก็บสมุนไพรเขาอู่ตัง",
     description: "ห้องยาของอู่ตังต้องการสมุนไพรสดสำหรับปรุงยาฟื้นปราณ — เก็บโสมและบัวหิมะแล้วส่งกลับ",
-    briefSummary: "ส่งโสม 5 + บัวหิมะ 1 · sect points +60",
+    briefSummary: "ส่งโสม 5 + บัวหิมะ 1 · แต้มสำนัก +60",
     type: "side",
     sectId: "wudang",
     giverNpcId: "sect_wudang_master_qingxu",
@@ -111,7 +111,7 @@ export const QUESTS_WUDANG: readonly QuestDef[] = [
   {
     id: "qst_wudang_art_yinyang",
     name: "บททดสอบก่อนสืบทอด: วิชาลึกลับ",
-    description: "อาจารย์ชิงซวี่จะทดสอบก่อนเปิดตำราวิชาลึกลับให้ศิษย์ที่มีจิตเที่ยงตรง — ผ่านการทดสอบหมัดและจิต (ผ่านแล้วจึงรับภารกิจสืบทอดวิชาลึกลับได้)",
+    description: "อาจารย์ชิงซวี่จะทดสอบก่อนเปิดตำราวิชาลึกลับให้ศิษย์ที่มีจิตเที่ยงตรง — ปราบหัวหน้าโจร 2 คนเพื่อพิสูจน์หมัด และเก็บโสม 8 รากเพื่อพิสูจน์ความเพียร (ผ่านแล้วจึงรับภารกิจสืบทอดวิชาลึกลับได้)",
     briefSummary: "บททดสอบ — เปิดทางสู่การสืบทอดวิชาลึกลับ",
     type: "side",
     sectId: "wudang",
@@ -128,12 +128,12 @@ export const QUESTS_WUDANG: readonly QuestDef[] = [
     stages: [
       {
         id: "trial_kill",
-        description: "พิสูจน์พลัง — ปราบหัวหน้าโจร (bandit_chief) 2 คน",
+        description: "พิสูจน์พลัง — ปราบหัวหน้าโจร 2 คน",
         autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 2 },
       },
       {
         id: "trial_meditate",
-        description: "นั่งสมาธิ — รวบรวมโสม 8 ราก",
+        description: "พิสูจน์ความเพียร — เก็บโสม 8 รากถวายห้องยา",
         autoAdvance: { t: "hasItem", itemId: "ginseng", count: 8 },
       },
       {
@@ -178,7 +178,7 @@ export const QUESTS_WUDANG: readonly QuestDef[] = [
   {
     id: "qst_wudang_traitor_disciple",
     name: "ลูกศิษย์ผู้ทรยศ",
-    description: "มีลูกศิษย์อู่ตังที่ขายความลับสำนักให้ศัตรู อาจารย์ให้เจ้าจัดการ — จะเลือกมอบตัวหรือให้โอกาสกลับใจ?",
+    description: "มีลูกศิษย์อู่ตังคนหนึ่งขายความลับของสำนักให้ศัตรู อาจารย์ชิงซวี่มอบให้เจ้าไปตามตัวและตัดสิน — จะส่งตัวให้สำนักลงโทษ หรือให้โอกาสกลับใจ?",
     briefSummary: "ตัดสินใจชะตากรรมของลูกศิษย์ทรยศแห่งอู่ตัง",
     type: "side",
     giverNpcId: "sect_wudang_master_qingxu",
@@ -203,19 +203,19 @@ export const QUESTS_WUDANG: readonly QuestDef[] = [
   {
     id: "qst_wudang_mountain_seal",
     name: "ตราประทับภูเขา",
-    description: "อาจารย์ขอให้เดินทางไปวัดตาหลุนและนำตราประทับศักดิ์สิทธิ์กลับมา เพื่อต่ออายุพันธสัญญาโบราณ",
-    briefSummary: "เดินทางไปวัดตาหลุนเพื่อนำตราประทับมาให้อาจารย์อู่ตัง",
+    description: "อาจารย์ชิงซวี่ขอให้เดินทางไปวิหารล้อลม รับตราประทับศักดิ์สิทธิ์จากพระกงซิน แล้วนำกลับมา เพื่อต่ออายุพันธสัญญาโบราณระหว่างอู่ตังกับวิหาร",
+    briefSummary: "ไปรับตราประทับจากพระกงซินที่วิหารล้อลม มาให้อาจารย์ชิงซวี่",
     type: "side",
     giverNpcId: "sect_wudang_master_qingxu",
     stages: [
       {
         id: "visit_temple",
-        description: "เดินทางไปวัดตาหลุน",
+        description: "เดินทางไปวิหารล้อลม",
         autoAdvance: { t: "visitedLocation", locationId: "temple_dalun" },
       },
       {
         id: "get_seal",
-        description: "รับตราประทับจากพระวัดตาหลุน",
+        description: "รับตราประทับจากพระกงซินที่วิหารล้อลม",
         objective: {
           spots: [
             { locationId: "temple_dalun", label: "รับตราประทับจากพระกงซิน", npcId: "temple_dalun_monk_kongxin", text: "พระกงซินมอบตราประทับศักดิ์สิทธิ์ให้ห่อผ้าไหมอย่างดี" },
@@ -239,16 +239,16 @@ export const QUESTS_WUDANG: readonly QuestDef[] = [
   {
     id: "qst_wudang_redemption",
     name: "ไถ่บาปต่ออู่ตัง",
-    description: "เจ้าผู้ทรยศกลับมาขออภัย — เจ้าสำนักอู่ตังทดสอบความจริงใจเจ้าด้วยภารกิจหนัก ปราบหัวหน้าโจร 5 คนและนำของล้ำค่าของสำนักมาถวาย หากผ่าน ความเป็นทรยศจะถูกล้างเป็น \"ลาออก\" — นักล่าจะหยุดตามล่า แต่วิชาจะถูกแช่แข็ง",
-    briefSummary: "ไถ่บาปต่ออู่ตัง — ปราบหัวหน้าโจร 5 + ส่งของถวาย 5 ชิ้น",
+    description: "เจ้าเคยทรยศอู่ตัง สำนักจึงส่งนักล่ามาตามเจ้า — แต่อาจารย์ชิงซวี่ยังเปิดทางให้ไถ่โทษ: ปราบหัวหน้าโจร 5 คน แล้วนำบัวหิมะ 5 ดอกมาถวาย หากผ่าน เจ้าจะนับเป็น \"ผู้ลาออก\" แทน \"ผู้ทรยศ\" นักล่าจะเลิกตามล่า แต่วิชาของอู่ตังที่ติดตัวจะไม่เก่งขึ้นจากการต่อสู้อีก และกลับเข้าสำนักไม่ได้",
+    briefSummary: "ไถ่บาปต่ออู่ตัง — ปราบหัวหน้าโจร 5 + ถวายบัวหิมะ 5 ดอก",
     type: "side",
     sectId: "wudang",
     giverNpcId: "sect_wudang_master_qingxu",
     prereqs: { t: "sectStatus", sectId: "wudang", status: "betrayed" },
     stages: [
-      { id: "trial_kill", description: "ปราบหัวหน้าโจร (bandit_chief) 5 คน เพื่อพิสูจน์ใจ", autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 5 } },
-      { id: "trial_offering", description: "นำของถวาย — snow_lotus 5 ชิ้น", autoAdvance: { t: "hasItem", itemId: "snow_lotus", count: 5 } },
-      { id: "return_to_master", description: "กลับไปขออภัยต่อเจ้าสำนักอู่ตัง" },
+      { id: "trial_kill", description: "ปราบหัวหน้าโจร 5 คนเพื่อพิสูจน์ว่ากลับใจจริง", autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 5 } },
+      { id: "trial_offering", description: "นำบัวหิมะ 5 ดอกมาถวาย", autoAdvance: { t: "hasItem", itemId: "snow_lotus", count: 5 } },
+      { id: "return_to_master", description: "กลับไปขออภัยต่ออาจารย์ชิงซวี่" },
     ],
     rewards: [
       { t: "wExp", amount: 300 },
@@ -260,16 +260,16 @@ export const QUESTS_WUDANG: readonly QuestDef[] = [
 
   {
     id: "qst_wudang_sect_kindling",
-    name: "ทำความสะอาดศาลา",
-    description: "ภารกิจประจำของศิษย์อู่ตัง — เก็บไม้แข็ง 4 ชิ้น",
-    briefSummary: "ส่งไม้แข็ง 4 ชิ้น · sect points +50",
+    name: "ไม้ซ่อมศาลา",
+    description: "ภารกิจประจำของศิษย์อู่ตัง — ศาลาริมทางขึ้นเขาผุพัง อาจารย์ชิงซวี่ขอไม้เนื้อแข็ง 4 ชิ้นมาซ่อม",
+    briefSummary: "ส่งไม้เนื้อแข็ง 4 ชิ้น · แต้มสำนัก +50",
     type: "side",
     sectId: "wudang",
     giverNpcId: "sect_wudang_master_qingxu",
     prereqs: { t: "sectMember", sectId: "wudang" },
     stages: [
-      { id: "main", description: "เก็บไม้แข็ง 4 ชิ้น", autoAdvance: { t: "hasItem", itemId: "wood_hard", count: 4 } },
-      { id: "report", description: "กลับไปรายงาน" },
+      { id: "main", description: "เก็บไม้เนื้อแข็ง 4 ชิ้น", autoAdvance: { t: "hasItem", itemId: "wood_hard", count: 4 } },
+      { id: "report", description: "กลับไปรายงานอาจารย์ชิงซวี่" },
     ],
     rewards: [
       { t: "gold", amount: 130 },
@@ -283,7 +283,7 @@ export const QUESTS_WUDANG: readonly QuestDef[] = [
     id: "qst_wudang_sect_ginseng_run",
     name: "เก็บโสมเทพในป่าเขา",
     description: "ห้องยาของอู่ตังต้องการโสมจำนวนมากเพื่อปรุงยาบำรุงปราณให้ศิษย์รุ่นใหม่ — อาจารย์ชิงซวี่ขอให้ศิษย์ออกเก็บโสมในป่าเขา",
-    briefSummary: "ส่งโสม 8 ราก · sect points +50",
+    briefSummary: "ส่งโสม 8 ราก · แต้มสำนัก +50",
     type: "side",
     sectId: "wudang",
     giverNpcId: "sect_wudang_master_qingxu",
@@ -311,7 +311,7 @@ export const QUESTS_WUDANG: readonly QuestDef[] = [
     id: "qst_wudang_sect_tiger_hunt",
     name: "ปราบเสือร้ายเชิงเขา",
     description: "เสือดุร้ายลงจากเขาทำร้ายผู้แสวงบุญที่ขึ้นมาเขาอู่ตัง อาจารย์ชิงซวี่สั่งให้ศิษย์กำราบเสือและนำหนังของมันกลับมาเป็นหลักฐาน",
-    briefSummary: "ปราบเสือเขา 2 ตัว + นำหนังสัตว์ 3 ผืน · sect points +65",
+    briefSummary: "ปราบเสือเขา 2 ตัว + นำหนังสัตว์ 3 ผืน · แต้มสำนัก +65",
     type: "side",
     sectId: "wudang",
     giverNpcId: "sect_wudang_master_qingxu",
@@ -319,7 +319,7 @@ export const QUESTS_WUDANG: readonly QuestDef[] = [
     stages: [
       {
         id: "fight",
-        description: "ปราบเสือเขา (mountain_tiger) 2 ตัว",
+        description: "ปราบเสือเขา 2 ตัว",
         autoAdvance: { t: "defeatedOpponent", opponentId: "mountain_tiger", count: 2 },
       },
       {
@@ -344,8 +344,8 @@ export const QUESTS_WUDANG: readonly QuestDef[] = [
   {
     id: "qst_wudang_sect_scripture_copy",
     name: "คัดลอกตำราเต๋า",
-    description: "หอตำราของอู่ตังต้องการเสริมตำราเต๋าเล่มใหม่ อาจารย์ชิงซวี่ให้ศิษย์รวบรวมกระดาษและไม้อ่อนสำหรับทำม้วนตำรา",
-    briefSummary: "ส่งกระดาษ 5 + ไม้อ่อน 3 · sect points +50",
+    description: "หอตำราของอู่ตังต้องการเสริมตำราเต๋าเล่มใหม่ อาจารย์ชิงซวี่ให้ศิษย์รวบรวมกระดาษสาและไม้เนื้ออ่อนสำหรับทำม้วนตำรา",
+    briefSummary: "ส่งกระดาษสา 5 + ไม้เนื้ออ่อน 3 · แต้มสำนัก +50",
     type: "side",
     sectId: "wudang",
     giverNpcId: "sect_wudang_master_qingxu",
@@ -353,7 +353,7 @@ export const QUESTS_WUDANG: readonly QuestDef[] = [
     stages: [
       {
         id: "main",
-        description: "หากระดาษ 5 แผ่น + ไม้อ่อน 3 ชิ้น",
+        description: "หากระดาษสา 5 แผ่น + ไม้เนื้ออ่อน 3 ชิ้น",
         autoAdvance: {
           t: "and",
           all: [

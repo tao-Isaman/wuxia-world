@@ -29,7 +29,8 @@ The NPC simulation and rumors are in [liveness.md](liveness.md). The content tab
 | File | Role |
 | --- | --- |
 | `lib/world/types.ts` | Every world type: scenes, `SceneEffect`, `Condition`, quests, items, life skills, NPCs, opponents, `WorldStateData`, Liveness types, sect membership, `SectId` |
-| `lib/world/effects.ts` | `applyEffect` / `applyEffects`, quest progress and rewards, `rollWalkEvent` (law, hunters), `rollFoeSpawn`, `releaseFromJail`, `describeQuestCondition`, offer / turn-in checks |
+| `lib/world/effects.ts` | `applyEffect` / `applyEffects`, quest progress and rewards, `releaseFromJail`, `describeQuestCondition`, offer / turn-in checks |
+| `lib/world/encounters.ts` | walk-tick encounters: `rollWalkEvent` (law, ambushers, hunters), `rollFoeSpawn`, `encounterFoeAvailable`, `collectActiveHuntTargets` (re-exported from `effects.ts`) |
 | `lib/world/conditions.ts` | `evaluateCondition`, `getQuestStatus` |
 | `lib/world/quest-objectives.ts` | hands-on objective spots |
 | `lib/world/quest-guide.ts` | what to do next for a quest, where, and which way to walk; tracking |
@@ -62,7 +63,7 @@ Not in the barrel (import by path): `rollWalkEvent`, `rollFoeSpawn`, `releaseFro
 
 ### How the store moves between scenes
 
-`store/world-store.ts`:
+`store/world/navigation.ts` (used by the travel actions in `store/world/actions/travel.ts`):
 
 - **`followAutoAdvance`** runs after every scene change (up to 32 hops). On a location it records the visit (`visitedLocationIds`), sets `lastLocationId`, ticks quest progress and stops. It stops at a route, at a dialog with choices, or at a terminal dialog. **A dialog with `next` and no choices jumps straight to `next` without showing its lines** — for "narration, then continue", give the dialog one choice (`{ text: "ก้าวต่อไป", next: "…" }`).
 - **Terminal dialogs** (no choices, no `next`) show a "ปิด" button that returns to `lastLocationId` for free (`exitToLocation`).
@@ -73,7 +74,7 @@ Not in the barrel (import by path): `rollWalkEvent`, `rollFoeSpawn`, `releaseFro
 
 ## Scene effects
 
-`applyEffect(state, effect)` mutates the state; `applyEffects(state, list)` applies them in order, then ticks quest progress once. The dispatcher is a plain `switch` with **no exhaustiveness guard** — a new variant without a case compiles and silently does nothing.
+`applyEffect(state, effect)` mutates the state; `applyEffects(state, list)` applies them in order, then ticks quest progress once. The dispatcher is a plain `switch` ending in a `never` guard: a new variant without a case is a type error.
 
 | `t` | Fields | Does | Used in content |
 | --- | --- | --- | --- |
@@ -212,7 +213,7 @@ Nothing rolls on arrival. While the hero walks on a location or route map, the w
 
 `walkTick` does nothing when there is no game, the game is over, a battle or encounter is pending, the scene is `home_player` or `jail` (`SAFE_SCENES`), or `localStorage["wuxia-random-events"] === "off"` (the switch the browser tests use). Otherwise:
 
-1. **`rollWalkEvent(state)`** (`lib/world/effects.ts`): the law, then sect hunters, each setting `pendingEncounter` at once.
+1. **`rollWalkEvent(state)`** (`lib/world/encounters.ts`): the law, then sect hunters, each setting `pendingEncounter` at once.
    - **The law.** With wanted marks, `lawChance(marks)` spawns a law pursuer; the city whose jail would hold the hero is remembered (`jailCityId`).
    - **Sect hunters.** If any membership is `betrayed`, a 30 % roll spawns that sect's `hunter_<sectId>`.
 2. **`rollFoeSpawn(state, present)`**: if fewer than `FOE_SPAWN.maxPerMap` (3) foes wait on this map, a `FOE_SPAWN.chance` (30 %) roll picks a foe from the zone's pool. In a settled place (`isSettledPlace` in `data/random-events.ts`: cities, villages, homes, inns, sects, temples, the palace, villas, markets, tribes) nothing spawns unless an active kill quest's target is in this zone's pool; then only that quarry comes (at `FOE_SPAWN.huntChance`). Roads and the wilds keep their foes. The store then asks `pickSpot` and adds a `RoamingFoe { id, opponentId, locationId, x, y }` to `roamingFoes`.
@@ -245,7 +246,7 @@ When the current stage of an active quest is a top-level `defeatedOpponent` (`co
 
 ## Law and jail
 
-`lib/world/law.ts`, `lib/world/data/activities.ts`, and the jail actions in `store/world-store.ts`.
+`lib/world/law.ts`, `lib/world/data/activities.ts`, and the jail actions in the world store (`surrender` and `serveSentence` in `store/world/actions/law.ts`, the jail activities in `doActivity`, `store/world/actions/life.ts`).
 
 - **Wanted marks** (หมายจับ, no ceiling since v25): +1 failed steal, +2 jail escape, +2 failed attempt on a life, +5 (`KILL_MARKS`) a killing. One mark fades every 10 quiet days (`WANTED_DECAY_DAYS`). `WANTED_MAX` (5) is only how many seals the HUD draws before it shows `×N`.
 - **Escapes** (`lawEvasions`, saved, v25): +1 for fleeing a law encounter, escaping or winning a law fight, a bribe, a jail break; reset to 0 by `imprison`.

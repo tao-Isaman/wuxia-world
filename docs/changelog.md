@@ -6,6 +6,16 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-06
 
+### Overnight pass: maintainability, speed, and quest text a newcomer can follow
+
+Full report (Thai): [docs/reports/2026-10-06-overnight.md](reports/2026-10-06-overnight.md).
+
+- **The world store is split.** `store/world-store.ts` (3,631 lines) is now a 90-line assembler over `store/world/` (state, rules, progression, lifecycle, navigation, spoils, persist, and 13 action slices); the public API, the persist name and version 25 are unchanged.
+- **Faster lookups.** Quests are indexed by person and sect and NPCs by place, and the guide caches its road search: map-view work in the capital went from 561 µs to 168 µs on a new game (667 → 290 µs after a year), `activeGuide` from 63 µs to 17 µs (`bun scripts/bench-world.ts`).
+- **Safer to change.** `applyEffect`, the quest-reward dispatcher, the combat effect switches and `resolveArtActive` end in a `never` guard, so a new variant without a case no longer compiles; `partializeSave` is typed `WorldStateData`. Walk-tick encounters moved to `lib/world/encounters.ts`; loot and resource yields share one weighted roller.
+- **Tools.** `scripts/golden-replay.ts` (a seeded run through almost every store action, hashed after each; byte-identical before and after every refactor commit), `scripts/bench-world.ts`, `scripts/bench-browser.ts`.
+- **Quest text.** The main story, ~140 hand-written quests and their dialogs, ~110 sect quests, every sect dialog, the lineage quest templates (all 154) and the opening chapters of all 48 sagas were rewritten for a player with no context: who is asking, why, what to do and where — with the map's exact place / person names so the guide arrow finds them. Internal ids, English and game shorthand (`bandit_chief`, `ginseng`, `sect points`, `INT ≥ 45`, `30 WEXP`, step lists) became Thai; texts that promised what the stage doesn't check now match it; the guide now points to the right person in `qc_capital_lost_ledger` and three other quests. The sect window says แต้มสำนัก; ภูเขาอูฐขาว is spelled right. Mismatches that need a mechanics decision are listed in HANDOFF (Quests and sects, 8).
+
 ### Quests whose item had nowhere to come from
 
 - แผ่นตำราหายของปรมาจารย์ (เกาะดอกท้อ) waited for a ตำราขั้นสูง that only another quest rewards, while telling the hero to search the island. The three pages are now 🔍 spots on เกาะดอกท้อ (ดงต้นท้อ, ชายหาด, โขดหิน); the guide arrow leads there and counts 0/3.

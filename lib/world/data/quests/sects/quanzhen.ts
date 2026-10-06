@@ -8,7 +8,7 @@ export const QUESTS_QUANZHEN: readonly QuestDef[] = [
   {
     id: "qst_quanzhen_disciple_intro",
     name: "ขอเข้าเป็นศิษย์ฉวนเจิน",
-    description: "อาจารย์หลิงเจินรับศิษย์ใหม่ที่ใจสะอาดและพากเพียร — เก็บสมุนไพรประจำเขาเทียนซานให้ครบสามชนิดเพื่อพิสูจน์ตน · สมุนไพรหายาก 10 · โสม 10 · เม็ดบัว 10",
+    description: "อาจารย์ใหญ่หลิงเจินรับศิษย์ใหม่ที่ใจสะอาดและพากเพียร — เก็บสมุนไพรประจำเขาเทียนซานให้ครบสามชนิดเพื่อพิสูจน์ตน · สมุนไพรหายาก 10 · โสม 10 · เม็ดบัว 10",
     briefSummary: "ส่งสมุนไพรหายาก 10 + โสม 10 + เม็ดบัว 10 เข้าเป็นศิษย์ฉวนเจินขั้นที่ 9",
     type: "side",
     giverNpcId: "sect_quanzhen_master_chongyang",
@@ -34,7 +34,7 @@ export const QUESTS_QUANZHEN: readonly QuestDef[] = [
       },
       {
         id: "return_to_master",
-        description: "นำสมุนไพรกลับไปถวายอาจารย์หลิงเจิน",
+        description: "นำสมุนไพรกลับไปถวายอาจารย์ใหญ่หลิงเจิน",
       },
     ],
     rewards: [
@@ -48,9 +48,9 @@ export const QUESTS_QUANZHEN: readonly QuestDef[] = [
 
   {
     id: "qst_quanzhen_sect_patrol",
-    name: "ลาดตระเวนรอบพระราชวังจงหยาง",
-    description: "ภารกิจประจำของศิษย์ฉวนเจิน — ลาดตระเวนรอบพระราชวังจงหยางและกำราบโจรที่ก่อกวน",
-    briefSummary: "ปราบโจรเร่ร่อน 2 คน · sect points +50",
+    name: "ลาดตระเวนรอบตำหนักฉวนเจิน",
+    description: "ภารกิจประจำของศิษย์ฉวนเจิน — ลาดตระเวนรอบตำหนักบนเขาของฉวนเจินและกำราบโจรที่ก่อกวน",
+    briefSummary: "ปราบโจรเร่ร่อน 2 คน · แต้มสำนัก +50",
     type: "side",
     sectId: "quanzhen",
     giverNpcId: "sect_quanzhen_master_chongyang",
@@ -63,7 +63,7 @@ export const QUESTS_QUANZHEN: readonly QuestDef[] = [
       },
       {
         id: "report",
-        description: "กลับไปรายงานอาจารย์หลิงเจิน",
+        description: "กลับไปรายงานอาจารย์ใหญ่หลิงเจิน",
       },
     ],
     rewards: [
@@ -77,8 +77,8 @@ export const QUESTS_QUANZHEN: readonly QuestDef[] = [
   {
     id: "qst_quanzhen_sect_scripture",
     name: "คัดลอกตำราเต๋า",
-    description: "ห้องสมุดของฉวนเจินต้องการกระดาษและหมึกสำหรับคัดลอกตำราเต๋าเก่า — เก็บมาให้ครบ",
-    briefSummary: "ส่งกระดาษ 5 + หมึก 5 · sect points +60",
+    description: "ห้องสมุดของฉวนเจินต้องการกระดาษสาและหมึกเข้มสำหรับคัดลอกตำราเต๋าเก่า — เก็บมาให้ครบ",
+    briefSummary: "ส่งกระดาษสา 5 + หมึกเข้ม 5 · แต้มสำนัก +60",
     type: "side",
     sectId: "quanzhen",
     giverNpcId: "sect_quanzhen_master_chongyang",
@@ -86,7 +86,7 @@ export const QUESTS_QUANZHEN: readonly QuestDef[] = [
     stages: [
       {
         id: "gather",
-        description: "เก็บกระดาษ 5 + หมึก 5",
+        description: "เก็บกระดาษสา 5 + หมึกเข้ม 5",
         autoAdvance: {
           t: "and",
           all: [
@@ -97,7 +97,7 @@ export const QUESTS_QUANZHEN: readonly QuestDef[] = [
       },
       {
         id: "deliver",
-        description: "ส่งวัสดุให้อาจารย์หลิงเจิน",
+        description: "ส่งวัสดุให้อาจารย์ใหญ่หลิงเจิน",
       },
     ],
     rewards: [
@@ -111,7 +111,7 @@ export const QUESTS_QUANZHEN: readonly QuestDef[] = [
   {
     id: "qst_quanzhen_art_sun",
     name: "บททดสอบก่อนสืบทอด: วิชาลึกลับ",
-    description: "อาจารย์หลิงเจินจะทดสอบก่อนเปิดตำราวิชาลึกลับให้ศิษย์ที่จิตใจเที่ยงตรง — ผ่านการประลองและการนั่งสมาธิที่หน้าผา (ผ่านแล้วจึงรับภารกิจสืบทอดวิชาลึกลับได้)",
+    description: "อาจารย์ใหญ่หลิงเจินจะทดสอบก่อนเปิดตำราวิชาลึกลับให้ศิษย์ที่จิตใจเที่ยงตรง — ปราบหัวหน้าโจร 2 คน และเก็บโสม 8 รากเพื่อพิสูจน์ความเพียร (ผ่านแล้วจึงรับภารกิจสืบทอดวิชาลึกลับได้)",
     briefSummary: "บททดสอบ — เปิดทางสู่การสืบทอดวิชาลึกลับ",
     type: "side",
     sectId: "quanzhen",
@@ -128,17 +128,17 @@ export const QUESTS_QUANZHEN: readonly QuestDef[] = [
     stages: [
       {
         id: "trial_kill",
-        description: "พิสูจน์พลัง — ปราบหัวหน้าโจร (bandit_chief) 2 คน",
+        description: "พิสูจน์พลัง — ปราบหัวหน้าโจร 2 คน",
         autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 2 },
       },
       {
         id: "trial_meditate",
-        description: "นั่งสมาธิ — รวบรวมโสม 8 ราก",
+        description: "พิสูจน์ความเพียร — เก็บโสม 8 ราก",
         autoAdvance: { t: "hasItem", itemId: "ginseng", count: 8 },
       },
       {
         id: "return_art",
-        description: "กลับไปรายงานผลต่ออาจารย์หลิงเจิน",
+        description: "กลับไปรายงานผลต่ออาจารย์ใหญ่หลิงเจิน",
       },
     ],
     rewards: [
@@ -153,7 +153,7 @@ export const QUESTS_QUANZHEN: readonly QuestDef[] = [
   {
     id: "qst_gumu_disciple_intro",
     name: "เส้นทางสู่สุสานโบราณ",
-    description: "หญิงปริศนาในสุสานโบราณบอกใบ้ว่า — เจ้าได้ฝึกหนึ่งพลังสุริยันต์ของฉวนเจินแล้ว แต่ปลายของวิชาสุริยันต์มีเพียงน้ำแข็งเย็นเฉียบรออยู่ · พิสูจน์ใจของเจ้า แล้วนางจะเปิดประตูสุสานให้",
+    description: "หญิงปริศนาในสุสานโบราณบอกใบ้ว่า — เจ้าฝึกลมปราณสุริยันของฉวนเจินจนถึงขั้นสูงแล้ว แต่ปลายทางของสุริยันมีเพียงน้ำแข็งเย็นเฉียบรออยู่ — ปราบหัวหน้าโจร 3 คน นำบัวหิมะ 3 ดอกกับแร่เทพ 1 ก้อนมาถวาย แล้วนางจะเปิดประตูสุสานรับเจ้าเป็นศิษย์ (ต้องสละฉวนเจิน)",
     briefSummary: "พิสูจน์ใจ — รับเข้าเป็นศิษย์สุสานโบราณ (สละจากฉวนเจิน)",
     type: "side",
     giverNpcId: "sect_gumu_mystery_woman",
@@ -170,12 +170,12 @@ export const QUESTS_QUANZHEN: readonly QuestDef[] = [
     stages: [
       {
         id: "trial_blade",
-        description: "พิสูจน์ฝีมือ — ปราบหัวหน้าโจร (bandit_chief) 3 คน",
+        description: "พิสูจน์ฝีมือ — ปราบหัวหน้าโจร 3 คน",
         autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 3 },
       },
       {
         id: "trial_offering",
-        description: "นำของถวาย — เก็บบัวหิมะ 3 ดอก + แร่เทพ 1 ก้อน",
+        description: "นำของถวาย — บัวหิมะ 3 ดอก + แร่เทพ 1 ก้อน",
         autoAdvance: {
           t: "and",
           all: [
@@ -205,16 +205,16 @@ export const QUESTS_QUANZHEN: readonly QuestDef[] = [
   {
     id: "qst_quanzhen_redemption",
     name: "ไถ่บาปต่อฉวนเจิน",
-    description: "เจ้าผู้ทรยศกลับมาขออภัย — เจ้าสำนักฉวนเจินทดสอบความจริงใจเจ้าด้วยภารกิจหนัก ปราบหัวหน้าโจร 5 คนและนำของล้ำค่าของสำนักมาถวาย หากผ่าน ความเป็นทรยศจะถูกล้างเป็น \"ลาออก\" — นักล่าจะหยุดตามล่า แต่วิชาจะถูกแช่แข็ง",
-    briefSummary: "ไถ่บาปต่อฉวนเจิน — ปราบหัวหน้าโจร 5 + ส่งของถวาย 5 ชิ้น",
+    description: "เจ้าเคยทรยศฉวนเจิน สำนักจึงส่งนักล่ามาตามเจ้า — แต่อาจารย์ใหญ่หลิงเจินยังเปิดทางให้ไถ่โทษ: ปราบหัวหน้าโจร 5 คน แล้วนำกระดาษสา 5 แผ่นมาถวาย หากผ่าน เจ้าจะนับเป็น \"ผู้ลาออก\" แทน \"ผู้ทรยศ\" นักล่าจะเลิกตามล่า แต่วิชาของฉวนเจินที่ติดตัวจะไม่เก่งขึ้นจากการต่อสู้อีก และกลับเข้าสำนักไม่ได้",
+    briefSummary: "ไถ่บาปต่อฉวนเจิน — ปราบหัวหน้าโจร 5 + ถวายกระดาษสา 5 แผ่น",
     type: "side",
     sectId: "quanzhen",
     giverNpcId: "sect_quanzhen_master_chongyang",
     prereqs: { t: "sectStatus", sectId: "quanzhen", status: "betrayed" },
     stages: [
-      { id: "trial_kill", description: "ปราบหัวหน้าโจร (bandit_chief) 5 คน เพื่อพิสูจน์ใจ", autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 5 } },
-      { id: "trial_offering", description: "นำของถวาย — paper 5 ชิ้น", autoAdvance: { t: "hasItem", itemId: "paper", count: 5 } },
-      { id: "return_to_master", description: "กลับไปขออภัยต่อเจ้าสำนักฉวนเจิน" },
+      { id: "trial_kill", description: "ปราบหัวหน้าโจร 5 คนเพื่อพิสูจน์ว่ากลับใจจริง", autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 5 } },
+      { id: "trial_offering", description: "นำกระดาษสา 5 แผ่นมาถวาย", autoAdvance: { t: "hasItem", itemId: "paper", count: 5 } },
+      { id: "return_to_master", description: "กลับไปขออภัยต่ออาจารย์ใหญ่หลิงเจิน" },
     ],
     rewards: [
       { t: "wExp", amount: 300 },
@@ -228,14 +228,14 @@ export const QUESTS_QUANZHEN: readonly QuestDef[] = [
     id: "qst_quanzhen_sect_patrol2",
     name: "ลาดตระเวนภูเขา",
     description: "ภารกิจประจำของศิษย์ฉวนเจิน — ปราบโจร 3 คน",
-    briefSummary: "ปราบโจร 3 คน · sect points +50",
+    briefSummary: "ปราบโจร 3 คน · แต้มสำนัก +50",
     type: "side",
     sectId: "quanzhen",
     giverNpcId: "sect_quanzhen_master_chongyang",
     prereqs: { t: "sectMember", sectId: "quanzhen" },
     stages: [
       { id: "main", description: "ปราบโจรเร่ร่อน 3 คน", autoAdvance: { t: "defeatedOpponent", opponentId: "thug", count: 3 } },
-      { id: "report", description: "กลับไปรายงาน" },
+      { id: "report", description: "กลับไปรายงานอาจารย์ใหญ่หลิงเจิน" },
     ],
     rewards: [
       { t: "gold", amount: 130 },

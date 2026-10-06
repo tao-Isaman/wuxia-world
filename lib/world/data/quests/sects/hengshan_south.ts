@@ -8,8 +8,8 @@ export const QUESTS_HENGSHAN_SOUTH: readonly QuestDef[] = [
   {
     id: "qst_hengshan_south_disciple_intro",
     name: "ขอเข้าเป็นศิษย์เฮิงซานใต้",
-    description: "อาจารย์เซี่ยอวิ๋นรับศิษย์ใหม่ที่มีใจรักกระบี่ลีลาห้ายอด — ต้องเตรียมค่าเข้าสำนัก ๕๐๐ เหรียญทอง และเหล็กดิบ ๓ ก้อนสำหรับตีกระบี่ฝึก",
-    briefSummary: "จ่ายค่าเข้าสำนัก 500 ทอง + ส่งเหล็กดิบ 3 ก้อน เข้าเป็นศิษย์เฮิงซานใต้ขั้นที่ 9",
+    description: "อาจารย์ใหญ่เซี่ยอวิ๋นรับศิษย์ใหม่ที่มีใจรักกระบี่ลีลาห้ายอด — ต้องเตรียมค่าเข้าสำนัก 500 เหรียญทอง และแร่เหล็ก 3 ก้อนสำหรับตีกระบี่ฝึก",
+    briefSummary: "จ่ายค่าเข้าสำนัก 500 ทอง + ส่งแร่เหล็ก 3 ก้อน เข้าเป็นศิษย์เฮิงซานใต้ขั้นที่ 9",
     type: "side",
     giverNpcId: "sect_hengshan_south_master_modaxiansheng",
     prereqs: {
@@ -22,7 +22,7 @@ export const QUESTS_HENGSHAN_SOUTH: readonly QuestDef[] = [
     stages: [
       {
         id: "gather_offering",
-        description: "เตรียมเหล็กดิบ 3 ก้อน + เก็บเงินให้ครบ 500 ทอง",
+        description: "เตรียมแร่เหล็ก 3 ก้อน + เก็บเงินให้ครบ 500 ทอง",
         autoAdvance: {
           t: "and",
           all: [
@@ -33,7 +33,7 @@ export const QUESTS_HENGSHAN_SOUTH: readonly QuestDef[] = [
       },
       {
         id: "return_to_master",
-        description: "นำของและเงินค่าเข้าสำนักไปถวายอาจารย์เซี่ยอวิ๋น",
+        description: "นำของและเงินค่าเข้าสำนักไปถวายอาจารย์ใหญ่เซี่ยอวิ๋น",
       },
     ],
     // Gold/item deduction happens at the complete-scene's choice
@@ -52,7 +52,7 @@ export const QUESTS_HENGSHAN_SOUTH: readonly QuestDef[] = [
     id: "qst_hengshan_south_sect_patrol",
     name: "ลาดตระเวนรอบห้ายอด",
     description: "ภารกิจประจำของศิษย์เฮิงซานใต้ — ลาดตระเวนรอบเขาห้ายอดและกำราบโจรที่ก่อกวนผู้แสวงบุญ",
-    briefSummary: "ปราบโจรเร่ร่อน 2 คน · sect points +50",
+    briefSummary: "ปราบโจรเร่ร่อน 2 คน · แต้มสำนัก +50",
     type: "side",
     sectId: "hengshan_south",
     giverNpcId: "sect_hengshan_south_master_modaxiansheng",
@@ -65,7 +65,7 @@ export const QUESTS_HENGSHAN_SOUTH: readonly QuestDef[] = [
       },
       {
         id: "report",
-        description: "กลับไปรายงานอาจารย์เซี่ยอวิ๋น",
+        description: "กลับไปรายงานอาจารย์ใหญ่เซี่ยอวิ๋น",
       },
     ],
     rewards: [
@@ -80,7 +80,7 @@ export const QUESTS_HENGSHAN_SOUTH: readonly QuestDef[] = [
     id: "qst_hengshan_south_sect_silk",
     name: "ส่งผ้าไหมให้ห้องเครื่องแต่งกาย",
     description: "ห้องเครื่องแต่งกายของเฮิงซานใต้ขาดผ้าไหมสำหรับตัดชุดศิษย์รุ่นใหม่ — เก็บผ้าไหมมาให้ครบจำนวน",
-    briefSummary: "ส่งผ้าไหม 4 ผืน · sect points +50",
+    briefSummary: "ส่งผ้าไหม 4 ผืน · แต้มสำนัก +50",
     type: "side",
     sectId: "hengshan_south",
     giverNpcId: "sect_hengshan_south_master_modaxiansheng",
@@ -93,7 +93,7 @@ export const QUESTS_HENGSHAN_SOUTH: readonly QuestDef[] = [
       },
       {
         id: "deliver",
-        description: "ส่งผ้าไหมให้อาจารย์เซี่ยอวิ๋น",
+        description: "ส่งผ้าไหมให้อาจารย์ใหญ่เซี่ยอวิ๋น",
       },
     ],
     rewards: [
@@ -108,7 +108,7 @@ export const QUESTS_HENGSHAN_SOUTH: readonly QuestDef[] = [
     id: "qst_hengshan_south_sect_herb",
     name: "ปราบเสือภูเขารบกวนนักดนตรี",
     description: "เสือภูเขาลงมาคุกคามนักดนตรีที่มาฝึกบนยอดเขา — ขอให้เจ้าจัดการให้เรียบร้อย",
-    briefSummary: "ปราบเสือภูเขา 2 ตัว · sect points +60",
+    briefSummary: "ปราบเสือภูเขา 2 ตัว · แต้มสำนัก +60",
     type: "side",
     sectId: "hengshan_south",
     giverNpcId: "sect_hengshan_south_master_modaxiansheng",
@@ -121,7 +121,7 @@ export const QUESTS_HENGSHAN_SOUTH: readonly QuestDef[] = [
       },
       {
         id: "report",
-        description: "กลับไปรายงานอาจารย์เซี่ยอวิ๋น",
+        description: "กลับไปรายงานอาจารย์ใหญ่เซี่ยอวิ๋น",
       },
     ],
     rewards: [
@@ -135,7 +135,7 @@ export const QUESTS_HENGSHAN_SOUTH: readonly QuestDef[] = [
   {
     id: "qst_hengshan_south_art_swiftblade",
     name: "บททดสอบก่อนสืบทอด: วิชาลึกลับ",
-    description: "อาจารย์เซี่ยอวิ๋นจะทดสอบก่อนเปิดตำราวิชาลึกลับให้ศิษย์ที่พิสูจน์ฝีมือกระบี่และหัวใจอันสงบ — ผ่านการประลองหัวหน้าโจรและรวบรวมแร่เทพ (ผ่านแล้วจึงรับภารกิจสืบทอดวิชาลึกลับได้)",
+    description: "อาจารย์ใหญ่เซี่ยอวิ๋นจะทดสอบก่อนเปิดตำราวิชาลึกลับให้ศิษย์ที่พิสูจน์ฝีมือกระบี่และหัวใจอันสงบ — ปราบหัวหน้าโจร 2 คน และหาแร่เทพ 1 ก้อน (ผ่านแล้วจึงรับภารกิจสืบทอดวิชาลึกลับได้)",
     briefSummary: "บททดสอบ — เปิดทางสู่การสืบทอดวิชาลึกลับ",
     type: "side",
     sectId: "hengshan_south",
@@ -152,7 +152,7 @@ export const QUESTS_HENGSHAN_SOUTH: readonly QuestDef[] = [
     stages: [
       {
         id: "trial_kill",
-        description: "พิสูจน์ดาบ — ปราบหัวหน้าโจร (bandit_chief) 2 คน",
+        description: "พิสูจน์ดาบ — ปราบหัวหน้าโจร 2 คน",
         autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 2 },
       },
       {
@@ -162,7 +162,7 @@ export const QUESTS_HENGSHAN_SOUTH: readonly QuestDef[] = [
       },
       {
         id: "return_art",
-        description: "กลับไปรายงานผลต่ออาจารย์เซี่ยอวิ๋น",
+        description: "กลับไปรายงานผลต่ออาจารย์ใหญ่เซี่ยอวิ๋น",
       },
     ],
     rewards: [
@@ -177,16 +177,16 @@ export const QUESTS_HENGSHAN_SOUTH: readonly QuestDef[] = [
   {
     id: "qst_hengshan_south_redemption",
     name: "ไถ่บาปต่อเฮิงซานใต้",
-    description: "เจ้าผู้ทรยศกลับมาขออภัย — อาจารย์เซี่ยอวิ๋นทดสอบความจริงใจเจ้าด้วยภารกิจหนัก ปราบหัวหน้าโจร 5 คนและนำของล้ำค่าของสำนักมาถวาย หากผ่าน ความเป็นทรยศจะถูกล้างเป็น \"ลาออก\" — นักล่าจะหยุดตามล่า แต่วิชาจะถูกแช่แข็ง",
-    briefSummary: "ไถ่บาปต่อเฮิงซานใต้ — ปราบหัวหน้าโจร 5 + ส่งของถวาย 5 ชิ้น",
+    description: "เจ้าเคยทรยศเฮิงซานใต้ สำนักจึงส่งนักล่ามาตามเจ้า — แต่อาจารย์ใหญ่เซี่ยอวิ๋นยังเปิดทางให้ไถ่โทษ: ปราบหัวหน้าโจร 5 คน แล้วนำแร่เหล็ก 5 ก้อนมาถวาย หากผ่าน เจ้าจะนับเป็น \"ผู้ลาออก\" แทน \"ผู้ทรยศ\" นักล่าจะเลิกตามล่า แต่วิชาของเฮิงซานใต้ที่ติดตัวจะไม่เก่งขึ้นจากการต่อสู้อีก และกลับเข้าสำนักไม่ได้",
+    briefSummary: "ไถ่บาปต่อเฮิงซานใต้ — ปราบหัวหน้าโจร 5 + ถวายแร่เหล็ก 5 ก้อน",
     type: "side",
     sectId: "hengshan_south",
     giverNpcId: "sect_hengshan_south_master_modaxiansheng",
     prereqs: { t: "sectStatus", sectId: "hengshan_south", status: "betrayed" },
     stages: [
-      { id: "trial_kill", description: "ปราบหัวหน้าโจร (bandit_chief) 5 คน เพื่อพิสูจน์ใจ", autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 5 } },
-      { id: "trial_offering", description: "นำของถวาย — iron_ore 5 ชิ้น", autoAdvance: { t: "hasItem", itemId: "iron_ore", count: 5 } },
-      { id: "return_to_master", description: "กลับไปขออภัยต่ออาจารย์เซี่ยอวิ๋น" },
+      { id: "trial_kill", description: "ปราบหัวหน้าโจร 5 คนเพื่อพิสูจน์ว่ากลับใจจริง", autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 5 } },
+      { id: "trial_offering", description: "นำแร่เหล็ก 5 ก้อนมาถวาย", autoAdvance: { t: "hasItem", itemId: "iron_ore", count: 5 } },
+      { id: "return_to_master", description: "กลับไปขออภัยต่ออาจารย์ใหญ่เซี่ยอวิ๋น" },
     ],
     rewards: [
       { t: "wExp", amount: 300 },

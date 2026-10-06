@@ -58,7 +58,7 @@ export const SCENES_MING: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qst_ming_spy_mission_offer",
     lines: [
-      { t: "dialogue", speaker: "จูอิง", text: "ส่งจดหมายนี้ให้สายลับของเราในวังจงหยาง — อย่าให้ใครรู้" },
+      { t: "dialogue", speaker: "จูอิง", text: "ส่งจดหมายนี้ให้สายลับของเราในพระราชวังจงหยาง — อย่าให้ใครรู้" },
       { t: "narration", text: "จูอิงส่งซองจดหมายปิดผนึกมาให้เจ้า" },
     ],
     choices: [
@@ -82,7 +82,7 @@ export const SCENES_MING: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qst_ming_defector_offer",
     lines: [
-      { t: "dialogue", speaker: "จูอิง", text: "สมาชิกคนหนึ่งต้องการออกจากพรรค เขารู้มากเกินไป" },
+      { t: "dialogue", speaker: "จูอิง", text: "สมาชิกคนหนึ่งหนีออกจากพรรคไปซ่อนตัวที่ไม้ดำหน้าผา เขารู้มากเกินไป" },
       { t: "dialogue", speaker: "จูอิง", text: "ตามหาเขา... แล้วตัดสินว่าจะทำอย่างไร เจ้ามีอิสระ" },
     ],
     choices: [
@@ -94,7 +94,7 @@ export const SCENES_MING: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qst_ming_defector_decide",
     lines: [
-      { t: "narration", text: "เจ้าพบผู้แปรพักตร์ในกระท่อมป่า เขาสีหน้าหมดหวัง" },
+      { t: "narration", text: "เจ้าพบผู้แปรพักตร์ในกระท่อมร้างที่ไม้ดำหน้าผา เขาสีหน้าหมดหวัง" },
       { t: "dialogue", speaker: "ผู้แปรพักตร์", text: "ข้าเบื่อแล้วกับการต้องซ่อนตัวและโกหก... ข้าแค่อยากมีชีวิตปกติ" },
     ],
     choices: [
@@ -134,7 +134,7 @@ export const SCENES_MING: readonly Scene[] = [
     kind: "dialog",
     id: "npc_sect_ming_envoy_huozhi_talk",
     lines: [
-      { t: "dialogue", speaker: "ผู้แทนหั่วจี้", text: "พรรคมิ่งไม่ได้ดำดังคำเล่าลือ — แต่ฝ่ามือเพลิงนี่ของจริง" },
+      { t: "dialogue", speaker: "ผู้แทนหั่วจี้", text: "พรรคตะวันจันทราไม่ได้ดำดังคำเล่าลือ — แต่ฝ่ามือเพลิงนี่ของจริง" },
       { t: "narration", text: "ฝ่ามือเขาเรืองแสงสีแดงจาง ๆ" },
     ],
   },

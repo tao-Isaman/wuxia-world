@@ -8,7 +8,7 @@ export const QUESTS_XIAOYAO: readonly QuestDef[] = [
   {
     id: "qst_xiaoyao_disciple_intro",
     name: "ขอเข้าเป็นศิษย์พรรคสราญรมย์",
-    description: "ปรมาจารย์ยุนเซียวรับเฉพาะผู้ใจอิสระ — เก็บดอกเหมย ๑๐ + โสม ๑๐ + บัวหิมะ ๒ มาแสดงว่าเจ้าก้าวเดินไปในยุทธภพได้คล่อง · ดอกเหมย/โสมเก็บได้ในป่าเขา · บัวหิมะได้จากที่สูง",
+    description: "ปรมาจารย์ยุนเซียวรับเฉพาะผู้ใจอิสระ — เก็บสมุนไพรหายาก 10 + โสม 10 + บัวหิมะ 2 มาแสดงว่าเจ้าท่องยุทธภพได้คล่อง · สมุนไพรหายากและโสมเก็บได้ในป่าเขา · บัวหิมะได้จากที่สูง",
     briefSummary: "ส่งสมุนไพรหายาก 10 + โสม 10 + บัวหิมะ 2 เข้าเป็นศิษย์พรรคสราญรมย์ขั้นที่ 9",
     type: "side",
     giverNpcId: "sect_xiaoyao_master_yunxiao",
@@ -47,14 +47,14 @@ export const QUESTS_XIAOYAO: readonly QuestDef[] = [
     id: "qst_xiaoyao_sect_patrol",
     name: "ลาดตระเวนหุบเขาเซียวหยาว",
     description: "ภารกิจประจำของศิษย์พรรคสราญรมย์ — กำราบโจรที่หลงเข้ามาในเขตหุบเขา",
-    briefSummary: "ปราบหัวหน้าโจร 2 คน · sect points +50",
+    briefSummary: "ปราบหัวหน้าโจร 2 คน · แต้มสำนัก +50",
     type: "side",
     sectId: "xiaoyao",
     giverNpcId: "sect_xiaoyao_master_yunxiao",
     prereqs: { t: "sectMember", sectId: "xiaoyao" },
     stages: [
-      { id: "patrol", description: "ปราบหัวหน้าโจร (bandit_chief) 2 คน", autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 2 } },
-      { id: "report", description: "กลับไปรายงานปรมาจารย์" },
+      { id: "patrol", description: "ปราบหัวหน้าโจร 2 คน", autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 2 } },
+      { id: "report", description: "กลับไปรายงานปรมาจารย์ยุนเซียว" },
     ],
     rewards: [
       { t: "gold", amount: 200 },
@@ -68,14 +68,14 @@ export const QUESTS_XIAOYAO: readonly QuestDef[] = [
     id: "qst_xiaoyao_sect_herb",
     name: "เก็บสมุนไพรหุบเขาเซียวหยาว",
     description: "ห้องยาของพรรคต้องการสมุนไพรเพิ่ม — เก็บโสม + บัวหิมะมาให้",
-    briefSummary: "ส่งโสม 6 + บัวหิมะ 1 · sect points +60",
+    briefSummary: "ส่งโสม 6 + บัวหิมะ 1 · แต้มสำนัก +60",
     type: "side",
     sectId: "xiaoyao",
     giverNpcId: "sect_xiaoyao_master_yunxiao",
     prereqs: { t: "sectMember", sectId: "xiaoyao" },
     stages: [
       { id: "gather", description: "เก็บโสม 6 + บัวหิมะ 1", autoAdvance: { t: "and", all: [{ t: "hasItem", itemId: "ginseng", count: 6 }, { t: "hasItem", itemId: "snow_lotus", count: 1 }] } },
-      { id: "deliver", description: "ส่งสมุนไพรให้ปรมาจารย์" },
+      { id: "deliver", description: "ส่งสมุนไพรให้ปรมาจารย์ยุนเซียว" },
     ],
     rewards: [
       { t: "gold", amount: 150 },
@@ -88,15 +88,15 @@ export const QUESTS_XIAOYAO: readonly QuestDef[] = [
   {
     id: "qst_xiaoyao_sect_music",
     name: "ส่งเครื่องเขียนให้นักดนตรี",
-    description: "พรรคสราญรมย์ขึ้นชื่อเรื่องดนตรีและกวี — เก็บกระดาษและหมึกให้ห้องนักดนตรี",
-    briefSummary: "ส่งกระดาษ 5 + หมึก 5 · sect points +60",
+    description: "พรรคสราญรมย์ขึ้นชื่อเรื่องดนตรีและกวี — เก็บกระดาษสาและหมึกเข้มให้ห้องนักดนตรี",
+    briefSummary: "ส่งกระดาษสา 5 + หมึกเข้ม 5 · แต้มสำนัก +60",
     type: "side",
     sectId: "xiaoyao",
     giverNpcId: "sect_xiaoyao_master_yunxiao",
     prereqs: { t: "sectMember", sectId: "xiaoyao" },
     stages: [
-      { id: "gather", description: "เก็บกระดาษ 5 + หมึก 5", autoAdvance: { t: "and", all: [{ t: "hasItem", itemId: "paper", count: 5 }, { t: "hasItem", itemId: "ink", count: 5 }] } },
-      { id: "deliver", description: "ส่งวัสดุให้ห้องนักดนตรี" },
+      { id: "gather", description: "เก็บกระดาษสา 5 + หมึกเข้ม 5", autoAdvance: { t: "and", all: [{ t: "hasItem", itemId: "paper", count: 5 }, { t: "hasItem", itemId: "ink", count: 5 }] } },
+      { id: "deliver", description: "ส่งวัสดุให้ปรมาจารย์ยุนเซียว นำเข้าห้องนักดนตรี" },
     ],
     rewards: [
       { t: "gold", amount: 120 },
@@ -110,7 +110,7 @@ export const QUESTS_XIAOYAO: readonly QuestDef[] = [
   {
     id: "qst_xiaoyao_art_seepower",
     name: "บททดสอบก่อนสืบทอด: วิชาลึกลับ",
-    description: "ปรมาจารย์จะทดสอบก่อนเปิดตำราวิชาลึกลับให้ศิษย์ที่จิตใจเที่ยงตรง — ผ่านการประลองและการเก็บสมุนไพรหายาก (ผ่านแล้วจึงรับภารกิจสืบทอดวิชาลึกลับได้)",
+    description: "ปรมาจารย์ยุนเซียวจะทดสอบก่อนเปิดตำราวิชาลึกลับให้ศิษย์ที่จิตใจเที่ยงตรง — ปราบหัวหน้าโจร 3 คน และเก็บโสม 8 ราก (ผ่านแล้วจึงรับภารกิจสืบทอดวิชาลึกลับได้)",
     briefSummary: "บททดสอบ — เปิดทางสู่การสืบทอดวิชาลึกลับ",
     type: "side",
     sectId: "xiaoyao",
@@ -126,8 +126,8 @@ export const QUESTS_XIAOYAO: readonly QuestDef[] = [
     },
     stages: [
       { id: "trial_kill", description: "พิสูจน์ฝีมือ — ปราบหัวหน้าโจร 3 คน", autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 3 } },
-      { id: "trial_meditate", description: "นั่งสมาธิ — เก็บโสม 8 ราก", autoAdvance: { t: "hasItem", itemId: "ginseng", count: 8 } },
-      { id: "return_art", description: "กลับไปรายงานผลต่อปรมาจารย์" },
+      { id: "trial_meditate", description: "พิสูจน์ความเพียร — เก็บโสม 8 ราก", autoAdvance: { t: "hasItem", itemId: "ginseng", count: 8 } },
+      { id: "return_art", description: "กลับไปรายงานผลต่อปรมาจารย์ยุนเซียว" },
     ],
     rewards: [
       { t: "wExp", amount: 250 },
@@ -142,7 +142,7 @@ export const QUESTS_XIAOYAO: readonly QuestDef[] = [
     id: "qst_xiaoyao_sect_instrument",
     name: "วัสดุสร้างเครื่องดนตรี",
     description: "ห้องดนตรีของพรรคสราญรมย์ต้องการไม้เนื้อแข็งสำหรับทำคันพิณและผ้าไหมสำหรับสายพิณ — เก็บมาให้ครบ",
-    briefSummary: "ส่งไม้เนื้อแข็ง 5 + ผ้าไหม 4 · sect points +50",
+    briefSummary: "ส่งไม้เนื้อแข็ง 5 + ผ้าไหม 4 · แต้มสำนัก +50",
     type: "side",
     sectId: "xiaoyao",
     giverNpcId: "sect_xiaoyao_master_yunxiao",
@@ -159,7 +159,7 @@ export const QUESTS_XIAOYAO: readonly QuestDef[] = [
           ],
         },
       },
-      { id: "deliver", description: "ส่งวัสดุให้ห้องดนตรี" },
+      { id: "deliver", description: "ส่งวัสดุให้ปรมาจารย์ยุนเซียว นำเข้าห้องดนตรี" },
     ],
     rewards: [
       { t: "gold", amount: 130 },
@@ -173,7 +173,7 @@ export const QUESTS_XIAOYAO: readonly QuestDef[] = [
     id: "qst_xiaoyao_sect_intruders",
     name: "ขับไล่ผู้บุกรุกหุบเขา",
     description: "โจรป่ากลุ่มหนึ่งบุกเข้ามาเก็บเม็ดบัวในสระศักดิ์สิทธิ์ของพรรค — ขับไล่พวกเขาและนำเม็ดบัวที่เหลือกลับมาเพื่อพิธี",
-    briefSummary: "ปราบโจรป่า 4 + เก็บเม็ดบัว 6 · sect points +65",
+    briefSummary: "ปราบโจรป่า 4 + เก็บเม็ดบัว 6 · แต้มสำนัก +65",
     type: "side",
     sectId: "xiaoyao",
     giverNpcId: "sect_xiaoyao_master_yunxiao",
@@ -181,7 +181,7 @@ export const QUESTS_XIAOYAO: readonly QuestDef[] = [
     stages: [
       {
         id: "expel",
-        description: "ปราบโจรป่า (bandit) 4 คน",
+        description: "ปราบโจรป่า 4 คน",
         autoAdvance: { t: "defeatedOpponent", opponentId: "bandit", count: 4 },
       },
       {
@@ -204,7 +204,7 @@ export const QUESTS_XIAOYAO: readonly QuestDef[] = [
     id: "qst_xiaoyao_sect_ritual",
     name: "เตรียมพิธีบูชาเทพเซียน",
     description: "พรรคสราญรมย์จัดพิธีประจำปีเพื่อบูชาเทพเซียน — เก็บโสมสำหรับชา เม็ดบัวสำหรับบูชา และหยกสำหรับวางบนแท่นพิธี",
-    briefSummary: "ส่งโสม 8 + เม็ดบัว 8 + หยก 1 · sect points +70",
+    briefSummary: "ส่งโสม 8 + เม็ดบัว 8 + หยก 1 · แต้มสำนัก +70",
     type: "side",
     sectId: "xiaoyao",
     giverNpcId: "sect_xiaoyao_master_yunxiao",

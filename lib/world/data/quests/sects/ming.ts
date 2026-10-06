@@ -15,7 +15,7 @@ export const QUESTS_MING: readonly QuestDef[] = [
     stages: [
       {
         id: "receive_letter",
-        description: "รับจดหมายลับจากผู้อาวุโส",
+        description: "รับจดหมายลับจากผู้อาวุโสจูอิงที่พรรคตะวันจันทรา",
         objective: {
           spots: [
             { locationId: "sect_ming", label: "รับจดหมายลับจากผู้อาวุโสจูอิง", npcId: "sect_ming_elder_zhuying", text: "ผู้อาวุโสจูอิงยื่นจดหมายผนึกขี้ผึ้งให้ — ห้ามให้ใครเห็นเด็ดขาด" },
@@ -29,7 +29,7 @@ export const QUESTS_MING: readonly QuestDef[] = [
       },
       {
         id: "deliver_letter",
-        description: "ส่งจดหมายให้สายลับอย่างลับ ๆ",
+        description: "ส่งจดหมายให้สายลับในพระราชวังจงหยางอย่างลับ ๆ",
         objective: {
           spots: [
             { locationId: "palace_zhongyang", label: "ส่งจดหมายให้สายลับในวัง", text: "ขันทีผู้หนึ่งรับจดหมายไปอย่างแนบเนียนแล้วหายเข้าระเบียงวัง" },
@@ -38,7 +38,7 @@ export const QUESTS_MING: readonly QuestDef[] = [
       },
       {
         id: "return_confirm",
-        description: "กลับรายงานผู้อาวุโส",
+        description: "กลับไปรายงานผู้อาวุโสจูอิง",
       },
     ],
     rewards: [
@@ -51,7 +51,7 @@ export const QUESTS_MING: readonly QuestDef[] = [
   {
     id: "qst_ming_defector_choice",
     name: "ผู้แปรพักตร์",
-    description: "สมาชิกพรรคตะวันจันทราต้องการออกจากพรรค ผู้อาวุโสให้เจ้าตัดสิน — ปล่อยไปหรือนำตัวกลับมา?",
+    description: "สมาชิกพรรคตะวันจันทราคนหนึ่งหนีไปซ่อนตัวที่ไม้ดำหน้าผา ผู้อาวุโสจูอิงให้เจ้าไปตามและตัดสิน — ปล่อยไป หรือนำตัวกลับมา?",
     briefSummary: "ตัดสินชะตากรรมของผู้ที่ต้องการออกจากพรรคตะวันจันทรา",
     type: "side",
     giverNpcId: "sect_ming_elder_zhuying",
@@ -59,7 +59,7 @@ export const QUESTS_MING: readonly QuestDef[] = [
     stages: [
       {
         id: "find_defector",
-        description: "ตามหาผู้แปรพักตร์",
+        description: "ตามหาผู้แปรพักตร์ที่ไม้ดำหน้าผา",
         objective: {
           spots: [
             { locationId: "cliff_heimu", label: "ตามหาผู้แปรพักตร์ที่ผาดำ", text: "พบชายผู้หนึ่งหลบซ่อนอยู่ในเงาผา เขายอมพูดด้วยหากไม่ถูกทำร้าย" },

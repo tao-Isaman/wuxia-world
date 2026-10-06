@@ -82,7 +82,7 @@ Checked on 2026-10-05 for the hero's flat base HP (a new hero starts at 136 HP),
 | `test:docs` | the generated reference is current; every link, repo path and command in the docs resolves |
 | `bun scripts/audit-content.ts` | 235 NPCs · 1115 quests · 4057 scenes, all references resolve |
 | `bun run build` | passes; `/` first-load JS 1.12 MB (was 508 kB before the sagas; the saga text is about 2.9 MB of source, ~500 kB gzipped) |
-| `bun run test:e2e` | all 58 Playwright tests pass against the production build (about 23 minutes, Chromium 141 via the container shim), including the map editor and its kit brush on `/game/engine` |
+| `bun run test:e2e` | all 58 Playwright tests pass against the production build (22 minutes, Chromium 141 via the container shim), including the map editor and its kit brush on `/game/engine` |
 
 Not verified:
 
@@ -187,6 +187,15 @@ Real behaviour today, found during the docs audit. Each is small and self-contai
 5. **Resign or betray through quest rewards skip the echo**, the log line and betrayal's evil +5. (Joining by the reward now echoes, and milestone quests — main-story chapters, saga finales — fire `quest_major_complete`.)
 6. **Resigning freezes only battle xp** for that sect's skills. Practice, w-exp level-ups and quest `skillExp` still raise them.
 7. **Store sect actions don't check status.** `upgradeSectRank` and `acceptSectQuest` ignore it; only the UI hides inactive memberships.
+8. **Found by the 2026-10-06 quest text pass (text was fixed to match; the mechanics still need a decision):**
+   - Map names differ from the prose the stories use: `inn_heluo` โรงเตี๊ยมห้วอลั่ว (stories: เฮ่อลั่ว), `inn_gaosheng` โรงเตี๊ยมเก้าอี้สูง (เกาเซิ่ง), วิหารล้อลม (วัดตาหลุน), คุ้มนกนางแอ่น (คฤหาสน์เหยินซี), `pool_heilong` มังกรดำสระน้ำ, `cliff_siguo` หน้าผาหินอาถรรพ์ (ผาสำนึกผิด). Quest text now uses the map names; renaming the registry entries would be the cleaner fix.
+   - Two NPCs are named ลุงไป๋ (`city_lingxiao_sweeper_bai`, `home_nanxian_woodcutter_bai`), and หม่าต้าหลี่ contains the city name ต้าหลี่; the guide's name matching can pick the wrong one.
+   - Old offer dialogs play after the NPC card has already accepted, so their ปฏิเสธ / ยังไม่พร้อม choices do nothing.
+   - About 16 dialogs are never reached because their quests advance by spots or visits instead (e.g. `qw_motian_restless_soul_choice` — its keep-or-return choice never plays and there is no `_complete`).
+   - `qv_hengshan_winter_aid` advances only when the hero holds no ข้าวหมูแดง / ยาเลือดเล็ก at all, with nowhere to deliver them; `qw_desert_relic_return` has nowhere to hand the coin in; `qc_capital_stolen_formula` asks for an 800-gold ตำราขั้นสูง.
+   - `qst_spy_capital_seal_ledger` and the next spy quest list a second `gold 400` reward.
+   - `qst_shaolin_wudang_joint`: two stages (`discover_connection`, `enter_cave`) have no place or objective; one dialog choice advances both.
+   - Wilderness and evil dialogs use short speaker names that differ from the NPC's full `name`, so portrait lookup may miss.
 
 ### Content data
 
@@ -288,13 +297,15 @@ In rough priority order:
    - Let hunting use packs.
    - Do a balance pass on encounter power scaling.
 7. **Tooling:**
+   - Run `bun scripts/golden-replay.ts` before and after any store or engine refactor; its output must be byte-identical (see docs/scripts.md).
+   - Possible next performance steps (measured as small today, so not done): batch save writes per microtask with a `flush()` for tests; narrower store subscriptions in the 15 components that read the whole store; split `world-runtime.ts` / `grid-battle-runtime.ts`.
    - Declare `sharp`.
    - Wire `test-world-vignettes.ts`.
    - Move off `next lint`.
    - Add a CI workflow that runs typecheck, lint and the `test:*` suites.
 8. **Story content:**
    - Load `lib/world/data/story/` lazily to win back the ~480 kB of first load (issue 38).
-   - Proofread the 38 sagas in play, and unify transliterations of new names.
+   - Proofread saga chapters 3 and later line by line (the 2026-10-06 pass read chapters 1–2 of all 48 sagas and ran scripted checks on the rest), and unify transliterations of new names.
    - Give saga bosses that borrow an NPC's sheet their own sprite, or skip them once that NPC is gone (issue 35).
 
 ## Environment notes

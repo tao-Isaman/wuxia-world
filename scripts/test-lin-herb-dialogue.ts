@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { evaluateCondition, getItem, getNpc, getQuest, getResource, getScene, getShopAt, isQuestOfferable } from "../lib/world";
+import { evaluateCondition, getItem, getNpc, getOpponent, getQuest, getResource, getScene, getShopAt, isQuestOfferable } from "../lib/world";
 import type { DialogScene } from "../lib/world";
 
 const memory = new Map<string, string>();
@@ -99,7 +99,7 @@ try {
     assert.ok(information.includes(getItem("old_key")!.name));
     const fightRequirement = getQuest("qc_capital_corrupt_clerk")!.stages[1].autoAdvance!;
     assert.equal(fightRequirement.t, "defeatedOpponent");
-    if (fightRequirement.t === "defeatedOpponent") assert.ok(information.includes(`นักเลง ${fightRequirement.count} คน`));
+    if (fightRequirement.t === "defeatedOpponent") assert.ok(information.includes(`${getOpponent(fightRequirement.opponentId)!.name} ${fightRequirement.count} คน`));
     assert.ok(information.includes("จินหลิง"));
     assert.ok(information.includes(getNpc("city_jinling_strategist_kong")!.name));
     assert.equal(progression(), before, "Wu's overview neither accepts a job nor advances clinic delivery");

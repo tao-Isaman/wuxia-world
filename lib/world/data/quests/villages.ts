@@ -13,19 +13,19 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
   {
     id: "qv_qigu_missing_seed",
     name: "สมุนไพรทดแทนเมล็ดพันธุ์",
-    description: "ชาวนาลาวหนานสูญเสียเมล็ดพันธุ์ทั้งหมดให้แก่หนูป่า เขาขอให้หาสมุนไพรพันธุ์ดีมาให้ห้าหน่วยเพื่อปลูกแทน",
-    briefSummary: "เก็บสมุนไพร 5 หน่วยและนำกลับมาให้ลาวหนาน",
+    description: "หนูป่ากินเมล็ดข้าวของลาวหนาน ชาวนาแก่แห่งหมู่บ้านชีกู่ จนหมดยุ้ง ปีนี้เขาจะปลูกสมุนไพรขายแทน และขอสมุนไพรหายาก 5 กำมาเพาะเป็นต้นพันธุ์",
+    briefSummary: "หาสมุนไพรหายาก 5 กำให้ลาวหนานที่หมู่บ้านชีกู่",
     type: "side",
     giverNpcId: "vil_qigu_farmer_lao",
     stages: [
       {
         id: "collect_seed",
-        description: "เก็บสมุนไพรพันธุ์ดี 5 หน่วยจากป่ารอบหมู่บ้าน",
+        description: "หาสมุนไพรหายาก 5 กำ",
         autoAdvance: { t: "hasItem", itemId: "herb", count: 5 },
       },
       {
         id: "return_seed",
-        description: "นำสมุนไพรกลับมาให้ลาวหนาน",
+        description: "นำสมุนไพรกลับไปให้ลาวหนานที่หมู่บ้านชีกู่",
       },
     ],
     rewards: [
@@ -39,8 +39,8 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
   {
     id: "qv_qigu_wolf_menace",
     name: "ภัยหมาป่า",
-    description: "ฝูงหมาป่าทำลายนาข้าวของชาวบ้าน ลาวหนานต้องการให้ใครสักคนช่วยกำจัดออกไป",
-    briefSummary: "ปราบหมาป่า 3 ตัวบริเวณโกดังเก่า",
+    description: "ฝูงหมาป่าบุกทำลายนาข้าวของหมู่บ้านชีกู่ ลาวหนานขอให้ปราบสัก 3 ตัว ฝูงจะได้ถอยไป",
+    briefSummary: "ปราบหมาป่า 3 ตัว แล้วกลับไปบอกลาวหนาน",
     type: "side",
     giverNpcId: "vil_qigu_farmer_lao",
     stages: [
@@ -51,7 +51,7 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
       },
       {
         id: "report_back",
-        description: "รายงานผลให้ลาวหนาน",
+        description: "กลับไปบอกลาวหนานที่หมู่บ้านชีกู่",
       },
     ],
     rewards: [
@@ -66,19 +66,19 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
   {
     id: "qv_qigu_ancestor_tablet",
     name: "แผ่นบรรพบุรุษที่สาบสูญ",
-    description: "แผ่นบรรพบุรุษของตระกูลลาวหนานถูกขโมยโดยโจรเร่ร่อน ต้องนำกลับมาเพื่อปลอบใจชายแก่",
-    briefSummary: "สืบหาและนำแผ่นบรรพบุรุษกลับคืน",
+    description: "ป้ายบรรพบุรุษของตระกูลลาวหนานถูกโจรเส้นทางขโมยไป ปราบโจรให้ได้แล้วนำป้ายกลับมาคืนชาวนาแก่",
+    briefSummary: "ปราบโจรเส้นทาง แล้วนำป้ายบรรพบุรุษคืนลาวหนาน",
     type: "side",
     giverNpcId: "vil_qigu_farmer_lao",
     stages: [
       {
         id: "find_tablet",
-        description: "ปราบโจรและนำแผ่นบรรพบุรุษกลับ",
+        description: "ปราบโจรเส้นทางที่ขโมยป้ายบรรพบุรุษไป (พบได้ระหว่างเดินทาง)",
         autoAdvance: { t: "defeatedOpponent", opponentId: "road_bandit", count: 1 },
       },
       {
         id: "return_tablet",
-        description: "นำแผ่นกลับให้ลาวหนาน",
+        description: "นำป้ายบรรพบุรุษกลับไปคืนลาวหนานที่หมู่บ้านชีกู่",
       },
     ],
     rewards: [
@@ -104,12 +104,12 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
     stages: [
       {
         id: "get_herb",
-        description: "เดินทางลงไปยังก้นหุบเขาตัดใจและเก็บบัวหิมะ",
+        description: "ลงไปก้นหุบเขาตัดใจ แล้วเก็บบัวหิมะ 1 ดอก (ต้องมีทักษะเก็บสมุนไพรระดับ 5)",
         autoAdvance: { t: "hasItem", itemId: "snow_lotus", count: 1 },
       },
       {
         id: "return_herb",
-        description: "ส่งบัวหิมะให้นางเหมย",
+        description: "นำบัวหิมะไปให้นางเหมยที่หมู่บ้านชีกู่",
       },
     ],
     rewards: [
@@ -123,14 +123,14 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
   {
     id: "qv_qigu_poisoned_well",
     name: "บ่อน้ำถูกวางยา",
-    description: "บ่อน้ำกลางหมู่บ้านถูกวางยาพิษ นางเหมยต้องการผู้ช่วยสืบหาคนร้ายและกำจัดออก",
-    briefSummary: "สืบหาและปราบผู้วางยาพิษในบ่อน้ำ",
+    description: "บ่อน้ำกลางหมู่บ้านชีกู่ถูกวางยาพิษ คนป่วยแล้วสามราย นางเหมยหมอสมุนไพรขอให้สืบรอยเท้าแปลก ๆ ข้างบ่อ แล้วกลับไปบอกนางว่าพบอะไร",
+    briefSummary: "สืบรอยเท้าข้างบ่อ แล้วกลับไปบอกนางเหมย",
     type: "side",
     giverNpcId: "vil_qigu_herbalist_mei",
     stages: [
       {
         id: "investigate",
-        description: "สืบสวนสอดสวนรอยเท้าใกล้บ่อน้ำ",
+        description: "ตรวจรอยเท้าข้างบ่อน้ำกลางหมู่บ้านชีกู่",
         objective: {
           spots: [
             { locationId: "village_qigu", label: "ตรวจรอยเท้าข้างบ่อน้ำ", text: "รอยเท้าเปื้อนผงสีเขียวนำออกไปจากบ่อ — นางเหมยน่าจะรู้ว่าเป็นของใคร" },
@@ -139,7 +139,7 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
       },
       {
         id: "confront",
-        description: "เผชิญหน้ากับผู้ต้องสงสัย",
+        description: "กลับไปบอกนางเหมยเรื่องรอยเท้าเปื้อนผงสีเขียว",
       },
     ],
     rewards: [
@@ -158,19 +158,19 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
   {
     id: "qv_meihua_lost_score",
     name: "ตำราเพลงที่หายไป",
-    description: "ตำราเพลงโบราณของเฉินเยว่หายไปจากสำนักดนตรี น่าจะถูกพ่อค้าเร่นำไปขาย",
-    briefSummary: "ตามหาตำราเพลงโบราณที่หายไปของเฉินเยว่",
+    description: "ตำราเพลงของเฉินเยว่ นักดนตรีแห่งหมู่บ้านดอกเหมย หายไป เขาสงสัยว่าพ่อค้าเร่เอาไปขายต่อ หาตำราเพลงพื้นฐานมาให้เขาสักเล่ม",
+    briefSummary: "หาตำราเพลงพื้นฐาน 1 เล่มให้เฉินเยว่",
     type: "side",
     giverNpcId: "vil_meihua_musician_chen",
     stages: [
       {
         id: "search_book",
-        description: "หาตำราเพลงโบราณ",
+        description: "หาตำราเพลงพื้นฐาน 1 เล่ม (พ่อค้าเร่อาจขายต่อให้ร้านค้าไปแล้ว)",
         autoAdvance: { t: "hasItem", itemId: "song_basic", count: 1 },
       },
       {
         id: "return_book",
-        description: "ส่งคืนให้เฉินเยว่",
+        description: "นำตำราเพลงไปคืนเฉินเยว่ที่หมู่บ้านดอกเหมย",
       },
     ],
     rewards: [
@@ -184,19 +184,19 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
   {
     id: "qv_meihua_music_duel",
     name: "ดวลดนตรี",
-    description: "เฉินเยว่ได้รับคำท้าจากนักดนตรีคู่แข่ง ต้องการผู้ช่วยนำสารและเพลงไปพิสูจน์",
-    briefSummary: "นำจดหมายท้าดวลดนตรีและกลับมาพร้อมคำตอบ",
+    description: "นักดนตรีที่หมู่บ้านฮิงซานท้าว่าเพลงของเฉินเยว่ไม่สมบูรณ์ เฉินเยว่ฝากเพลงตอบไปให้เขาฟัง นำสารไปส่งที่หมู่บ้านฮิงซาน แล้วนำคำตอบกลับมา",
+    briefSummary: "ส่งสารไปหมู่บ้านฮิงซาน แล้วกลับมาบอกเฉินเยว่",
     type: "side",
     giverNpcId: "vil_meihua_musician_chen",
     stages: [
       {
         id: "deliver_letter",
-        description: "เดินทางไปยังหมู่บ้านใกล้เคียงและส่งสาร",
+        description: "นำสารของเฉินเยว่ไปส่งที่หมู่บ้านฮิงซาน",
         autoAdvance: { t: "visitedLocation", locationId: "village_hengshan" },
       },
       {
         id: "return_reply",
-        description: "นำคำตอบกลับมาให้เฉินเยว่",
+        description: "นำคำตอบกลับไปให้เฉินเยว่ที่หมู่บ้านดอกเหมย",
       },
     ],
     rewards: [
@@ -211,19 +211,19 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
   {
     id: "qv_meihua_plum_festival",
     name: "เครื่องประดับเทศกาลดอกเหมย",
-    description: "เฉินเยว่ต้องการเม็ดบัวร้อยพวงประดับแท่นบูชาเทศกาลดอกเหมยประจำปี",
-    briefSummary: "เก็บเม็ดบัว 5 หน่วยสำหรับเทศกาลดอกเหมยก่อนรุ่งสาง",
+    description: "เฉินเยว่ต้องการเม็ดบัว 5 เม็ดมาร้อยเป็นพวงประดับแท่นบูชาในเทศกาลดอกเหมยประจำปี",
+    briefSummary: "หาเม็ดบัว 5 เม็ดให้เฉินเยว่",
     type: "side",
     giverNpcId: "vil_meihua_musician_chen",
     stages: [
       {
         id: "gather_plum",
-        description: "เก็บเม็ดบัว 5 หน่วยจากบ่อน้ำ / ป่ารอบหมู่บ้าน",
+        description: "หาเม็ดบัว 5 เม็ด",
         autoAdvance: { t: "hasItem", itemId: "lotus_seed", count: 5 },
       },
       {
         id: "deliver_plum",
-        description: "ส่งเม็ดบัวให้เฉินเยว่ตกแต่งแท่นบูชา",
+        description: "นำเม็ดบัวไปให้เฉินเยว่ที่หมู่บ้านดอกเหมย",
       },
     ],
     rewards: [
@@ -241,8 +241,8 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
   {
     id: "qv_meihua_boar_hunt",
     name: "ล่าหมูป่าดุ",
-    description: "หมูป่าดุร้ายทำลายสวนชาวบ้านหลายหลัง เปาเหล็กก้านเจ็บเข่าและต้องการผู้ช่วย",
-    briefSummary: "ล่าหมูป่าดุ 2 ตัวในป่าทางเหนือ",
+    description: "หมูป่าดุร้ายทำลายสวนชาวบ้านในหมู่บ้านดอกเหมยหลายหลัง เปาเหล็กก้าน นายพรานของหมู่บ้าน เจ็บเข่าออกล่าไม่ไหว เขาขอให้ปราบแทนสัก 2 ตัว",
+    briefSummary: "ปราบหมูป่า 2 ตัว แล้วกลับไปบอกเปาเหล็กก้าน",
     type: "side",
     giverNpcId: "vil_meihua_hunter_bao",
     stages: [
@@ -253,7 +253,7 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
       },
       {
         id: "report_back",
-        description: "รายงานผลให้เปาเหล็กก้าน",
+        description: "กลับไปบอกเปาเหล็กก้านที่หมู่บ้านดอกเหมย",
       },
     ],
     rewards: [
@@ -267,19 +267,19 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
   {
     id: "qv_meihua_tiger_track",
     name: "รอยเสือภูเขา",
-    description: "เปาเหล็กก้านเห็นรอยเสือภูเขาขนาดใหญ่ผิดปกติ ต้องการให้ไปยืนยันที่ถ้ำ",
-    briefSummary: "สำรวจถ้ำเพื่อยืนยันรอยเสือและกลับมารายงาน",
+    description: "เปาเหล็กก้านเห็นรอยเสือภูเขาขนาดใหญ่ผิดปกติมุ่งไปทางถ้ำแมงมุม เขาขอให้ไปดูว่ามีเสืออยู่จริงไหม แล้วกลับมาบอก",
+    briefSummary: "ไปดูที่ถ้ำแมงมุม แล้วกลับมาบอกเปาเหล็กก้าน",
     type: "side",
     giverNpcId: "vil_meihua_hunter_bao",
     stages: [
       {
         id: "visit_cave",
-        description: "เดินทางไปยังถ้ำเหนือเขา",
+        description: "เดินทางไปถ้ำแมงมุม",
         autoAdvance: { t: "visitedLocation", locationId: "cave_zhizhu" },
       },
       {
         id: "report_back",
-        description: "กลับมารายงานเปาเหล็กก้าน",
+        description: "กลับไปบอกเปาเหล็กก้านที่หมู่บ้านดอกเหมยว่าเห็นอะไร",
       },
     ],
     rewards: [
@@ -298,19 +298,19 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
   {
     id: "qv_hengshan_song_scroll",
     name: "ม้วนเพลงโบราณ",
-    description: "ม้วนเพลงโบราณของหมู่บ้านฮิงซานอยู่ที่สำนักเฮิงซาน ผู้อาวุโสอู๋ต้องการให้ขอคืนมา",
-    briefSummary: "ไปสำนักเฮิงซานเพื่อขอม้วนเพลงกลับคืน",
+    description: "ม้วนเพลงโบราณของหมู่บ้านฮิงซานไปอยู่ที่สำนักเขาเฮิงซาน ผู้อาวุโสอู๋อยากได้คืนมาสอนเด็ก ๆ ขึ้นไปขอที่สำนัก แล้วนำกลับมาให้เขา",
+    briefSummary: "ไปสำนักเฮิงซาน แล้วนำม้วนเพลงกลับมาให้ผู้อาวุโสอู๋",
     type: "side",
     giverNpcId: "vil_hengshan_elder_wu",
     stages: [
       {
         id: "visit_sect",
-        description: "เดินทางไปยังสำนักเฮิงซาน",
+        description: "เดินทางไปสำนักเฮิงซาน",
         autoAdvance: { t: "visitedLocation", locationId: "sect_hengshan_south" },
       },
       {
         id: "return_scroll",
-        description: "นำม้วนเพลงกลับมาให้ผู้อาวุโสอู๋",
+        description: "นำม้วนเพลงกลับไปให้ผู้อาวุโสอู๋ที่หมู่บ้านฮิงซาน",
       },
     ],
     rewards: [
@@ -325,14 +325,14 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
   {
     id: "qv_hengshan_dispute_land",
     name: "ข้อพิพาทที่ดิน",
-    description: "สองครอบครัวในหมู่บ้านฮิงซานทะเลาะกันเรื่องเขตที่ดิน ผู้อาวุโสอู๋ต้องการคนกลางที่เป็นกลาง",
+    description: "สองครอบครัวในหมู่บ้านฮิงซานทะเลาะกันเรื่องเขตที่ดินจนเกือบชกกัน ผู้อาวุโสอู๋อยากให้คนนอกที่ไม่เข้าข้างใครไปฟังทั้งสองฝ่าย แล้วช่วยตัดสิน",
     briefSummary: "ทำหน้าที่คนกลางไกล่เกลี่ยข้อพิพาทที่ดิน",
     type: "side",
     giverNpcId: "vil_hengshan_elder_wu",
     stages: [
       {
         id: "hear_both_sides",
-        description: "ฟังทั้งสองฝ่ายและตัดสินใจ",
+        description: "ฟังความทั้งสองครอบครัวในหมู่บ้านฮิงซาน แล้วตัดสิน",
         objective: {
           spots: [
             { locationId: "village_hengshan", label: "ฟังความสองครอบครัว", sceneId: "qs_qv_hengshan_dispute_land_mediate" },
@@ -355,14 +355,14 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
   {
     id: "qv_hengshan_winter_aid",
     name: "ช่วยเหลือฤดูหนาว",
-    description: "ฤดูหนาวมาเร็ว ผู้สูงอายุในหมู่บ้านฮิงซานขาดแคลนอาหารและยา ผู้อาวุโสอู๋ขอให้ช่วยส่งของ",
-    briefSummary: "ส่งอาหารและยาให้ครอบครัวผู้สูงอายุสามหลัง",
+    description: "ฤดูหนาวมาเร็ว ผู้สูงอายุในหมู่บ้านฮิงซานขาดอาหารและยา ผู้อาวุโสอู๋ฝากข้าวหมูแดงกับยาเลือดเล็กให้แจกจนหมด",
+    briefSummary: "แจกข้าวหมูแดงและยาเลือดเล็กจนหมดย่าม แล้วกลับไปบอกผู้อาวุโสอู๋",
     type: "side",
     giverNpcId: "vil_hengshan_elder_wu",
     stages: [
       {
         id: "deliver_aid",
-        description: "ส่งอาหารและยาให้ครบสามครอบครัว",
+        description: "แจกข้าวหมูแดงและยาเลือดเล็กให้ผู้สูงอายุจนไม่เหลือติดตัว (ให้ของขวัญ ใช้เอง หรือขาย ก็นับ)",
         autoAdvance: {
           t: "and",
           all: [
@@ -373,7 +373,7 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
       },
       {
         id: "report_complete",
-        description: "รายงานผลให้ผู้อาวุโสอู๋",
+        description: "กลับไปบอกผู้อาวุโสอู๋ที่หมู่บ้านฮิงซาน",
       },
     ],
     rewards: [
@@ -392,19 +392,19 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
   {
     id: "qv_wuxia_missing_boat",
     name: "เรือหายและลูกชายหาย",
-    description: "ลูกชายของเติ้งลองหางนำเรือออกไปและหายตัวสามวัน ต้องการความช่วยเหลือในการตามหา",
-    briefSummary: "ตามหาน้อยเติ้งที่หายไปพร้อมเรือ",
+    description: "น้อยเติ้ง ลูกชายวัยสิบห้าของเติ้งลองหาง ชาวประมงแห่งหมู่บ้านอวู่เซี่ย พายเรือออกไปแล้วหายไปสามวัน เรือน่าจะเกยตื้นที่เกาะไร้ชื่อกลางแม่น้ำ",
+    briefSummary: "ไปเกาะไร้ชื่อ ตามหาน้อยเติ้ง แล้วพากลับบ้าน",
     type: "side",
     giverNpcId: "vil_wuxia_fisherman_deng",
     stages: [
       {
         id: "search_river",
-        description: "ค้นหาน้อยเติ้งตามแม่น้ำ",
+        description: "เดินทางไปเกาะไร้ชื่อ ตามหาน้อยเติ้ง",
         autoAdvance: { t: "visitedLocation", locationId: "isle_wuming" },
       },
       {
         id: "return_boy",
-        description: "พาน้อยเติ้งกลับบ้านอย่างปลอดภัย",
+        description: "พาน้อยเติ้งกลับไปหาเติ้งลองหางที่หมู่บ้านอวู่เซี่ย",
       },
     ],
     rewards: [
@@ -419,14 +419,14 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
   {
     id: "qv_wuxia_river_ghost",
     name: "เสียงประหลาดจากแม่น้ำ",
-    description: "เสียงร้องประหลาดยามกลางคืนทำให้ชาวบ้านกลัว เติ้งลองหางเชื่อว่าเป็นฝีมือมนุษย์",
+    description: "ทุกคืนมีเสียงร้องประหลาดดังมาจากแม่น้ำ ชาวหมู่บ้านอวู่เซี่ยกลัวว่าเป็นผี แต่เติ้งลองหางเชื่อว่าเป็นฝีมือคน ซุ่มฟังริมแม่น้ำยามค่ำ แล้วกลับไปบอกเขา",
     briefSummary: "สืบหาแหล่งกำเนิดของเสียงประหลาดในแม่น้ำ",
     type: "side",
     giverNpcId: "vil_wuxia_fisherman_deng",
     stages: [
       {
         id: "investigate_sound",
-        description: "ค้นหาแหล่งเสียงประหลาดในยามค่ำ",
+        description: "ซุ่มฟังเสียงริมแม่น้ำของหมู่บ้านอวู่เซี่ยยามค่ำ",
         objective: {
           hours: 2,
           spots: [
@@ -436,7 +436,7 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
       },
       {
         id: "resolve",
-        description: "จัดการกับปัญหาและรายงานผล",
+        description: "กลับไปบอกเติ้งลองหางว่าเสียงนั้นมาจากไหน",
       },
     ],
     rewards: [
@@ -450,20 +450,20 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
   {
     id: "qv_wuxia_pirate_cache",
     name: "สมบัติโจรสลัด",
-    description: "น้อยเติ้งเห็นโจรสลัดฝังสมบัติไว้ที่หาดทราย เติ้งลองหางต้องการให้ไปเอามาก่อนโจรจะกลับ",
-    briefSummary: "ค้นหาและยึดสมบัติที่โจรสลัดฝังไว้",
+    description: "ตอนติดเกาะ น้อยเติ้งเห็นโจรสลัดฝังสมบัติไว้ที่หาดทรายของเกาะยกซาน ใต้ต้นโพธิ์สองต้น เติ้งลองหางอยากให้ไปเอามาก่อนโจรจะกลับมา",
+    briefSummary: "ไปเกาะยกซาน แล้วปราบโจรสลัดน้ำที่เฝ้าสมบัติ",
     type: "side",
     giverNpcId: "vil_wuxia_fisherman_deng",
     prereqs: { t: "questStatus", questId: "qv_wuxia_missing_boat", status: "done" },
     stages: [
       {
         id: "find_cache",
-        description: "ค้นหาสมบัติใต้ต้นโพธิ์สองต้น",
+        description: "เดินทางไปเกาะยกซาน (นกกระยาง) หาสมบัติใต้ต้นโพธิ์สองต้น",
         autoAdvance: { t: "visitedLocation", locationId: "isle_yuanyang" },
       },
       {
         id: "defeat_pirates",
-        description: "ปราบโจรสลัดที่ปกป้องสมบัติ",
+        description: "ปราบโจรสลัดน้ำที่กลับมาเฝ้าสมบัติ แล้วกลับไปหาเติ้งลองหาง",
         autoAdvance: { t: "defeatedOpponent", opponentId: "river_pirate", count: 1 },
       },
     ],
@@ -482,20 +482,20 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
   {
     id: "qv_inn_lost_satchel",
     name: "กระเป๋าที่ลืมไว้",
-    description: "แขกของโรงเตี๊ยมลืมกระเป๋าสำคัญไว้ นางสาวซิ่วต้องการให้ช่วยนำไปส่งที่โรงเตี๊ยมถัดไป",
-    briefSummary: "นำกระเป๋าที่ลืมไว้ไปส่งให้แขกที่โรงเตี๊ยมเกาเซิ่ง",
+    description: "แขกของโรงเตี๊ยมยั่วไหลลืมกระเป๋าเอกสารไว้พร้อมกุญแจ นางสาวซิ่วฝากให้นำไปส่งเขาที่โรงเตี๊ยมเก้าอี้สูง ที่เขากำลังมุ่งหน้าไป",
+    briefSummary: "นำกระเป๋ากับกุญแจไปส่งแขกที่โรงเตี๊ยมเก้าอี้สูง",
     type: "side",
     giverNpcId: "inn_yuelai_server_xiu",
     turnInNpcId: "inn_gaosheng_keeper_fat",
     stages: [
       {
         id: "travel_to_gaosheng",
-        description: "เดินทางพร้อมกระเป๋าไปยังโรงเตี๊ยมเกาเซิ่ง",
+        description: "เดินทางพร้อมกระเป๋าไปโรงเตี๊ยมเก้าอี้สูง",
         autoAdvance: { t: "visitedLocation", locationId: "inn_gaosheng" },
       },
       {
         id: "deliver_satchel",
-        description: "ส่งกระเป๋าให้แขกที่โรงเตี๊ยมเกาเซิ่ง",
+        description: "ถามเฉาอ้วนเจ้าของโรงเตี๊ยมเก้าอี้สูงหาแขกคนนั้น แล้วส่งกระเป๋าคืน",
       },
     ],
     rewards: [
@@ -509,14 +509,14 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
   {
     id: "qv_inn_spy_guest",
     name: "แขกน่าสงสัย",
-    description: "นางสาวซิ่วสังเกตเห็นแขกที่ถามคำถามประหลาดเกี่ยวกับสำนักต่าง ๆ เชื่อว่าเขาเป็นสายลับ",
-    briefSummary: "สืบสวนตัวตนของแขกประหลาดในโรงเตี๊ยม",
+    description: "แขกห้อง 3 ของโรงเตี๊ยมยั่วไหลเอาแต่ถามที่ตั้งสำนักต่าง ๆ นางสาวซิ่วสงสัยว่าเขาเป็นสายลับ แอบดูเขาแล้วจัดการให้เรียบร้อย",
+    briefSummary: "แอบดูแขกห้อง 3 ที่โรงเตี๊ยมยั่วไหล",
     type: "side",
     giverNpcId: "inn_yuelai_server_xiu",
     stages: [
       {
         id: "observe_guest",
-        description: "สังเกตพฤติกรรมแขกห้อง 3",
+        description: "แอบดูแขกห้อง 3 ในโรงเตี๊ยมยั่วไหล",
         objective: {
           spots: [
             { locationId: "inn_yuelai", label: "สังเกตแขกห้อง 3", sceneId: "qs_qv_inn_spy_guest_confront" },
@@ -525,7 +525,7 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
       },
       {
         id: "confront",
-        description: "เผชิญหน้ากับแขกประหลาด",
+        description: "กลับไปบอกนางสาวซิ่วว่าจัดการแขกห้อง 3 แล้ว",
       },
     ],
     rewards: [
@@ -539,14 +539,14 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
   {
     id: "qv_inn_debt_collector",
     name: "นักเลงเรียกหนี้",
-    description: "นักเลงมาคุกคามนางสาวซิ่วเรื่องหนี้ของแขกเก่า ต้องการคนช่วยจัดการ",
-    briefSummary: "ไล่นักเลงออกจากโรงเตี๊ยมด้วยวิธีที่เหมาะสม",
+    description: "นักเลงคนหนึ่งมาทวงหนี้ของแขกเก่ากับนางสาวซิ่วที่โรงเตี๊ยมยั่วไหล ช่วยไล่เขาไป จะพูดดี ๆ หรือสู้ก็ได้",
+    briefSummary: "ไล่นักเลงทวงหนี้ออกจากโรงเตี๊ยมยั่วไหล",
     type: "side",
     giverNpcId: "inn_yuelai_server_xiu",
     stages: [
       {
         id: "deal_with_collector",
-        description: "จัดการกับนักเลงเรียกหนี้",
+        description: "ไล่นักเลงทวงหนี้ แล้วบอกนางสาวซิ่วที่โรงเตี๊ยมยั่วไหล",
       },
     ],
     rewards: [
@@ -564,19 +564,19 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
   {
     id: "qv_inn_special_ingredient",
     name: "วัตถุดิบพิเศษ",
-    description: "เฉาอ้วนต้องการปลาไหลสดจากแม่น้ำวูเซี่ยสำหรับลูกค้าสำคัญ แต่ตลาดหาไม่ได้",
-    briefSummary: "หาปลาไหลสด 3 ตัวจากแม่น้ำวูเซี่ย",
+    description: "เฉาอ้วน เจ้าของโรงเตี๊ยมเก้าอี้สูง ต้องการปลาไหลสด 3 ตัวทำเมนูให้ลูกค้าสำคัญ แต่ตลาดหาไม่ได้",
+    briefSummary: "หาปลาไหล 3 ตัวให้เฉาอ้วน",
     type: "side",
     giverNpcId: "inn_gaosheng_keeper_fat",
     stages: [
       {
         id: "fish_eels",
-        description: "หาปลาไหลสด 3 ตัว",
+        description: "หาปลาไหล 3 ตัว",
         autoAdvance: { t: "hasItem", itemId: "fish_eel", count: 3 },
       },
       {
         id: "deliver_eels",
-        description: "ส่งปลาไหลให้เฉาอ้วน",
+        description: "นำปลาไหลไปให้เฉาอ้วนที่โรงเตี๊ยมเก้าอี้สูง",
       },
     ],
     rewards: [
@@ -590,19 +590,19 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
   {
     id: "qv_inn_rival_inn",
     name: "โรงเตี๊ยมคู่แข่ง",
-    description: "โรงเตี๊ยมใหม่เปิดและแย่งลูกค้าเฉาอ้วน เขาต้องการข้อมูลเกี่ยวกับเมนูพิเศษของคู่แข่ง",
-    briefSummary: "ไปสำรวจโรงเตี๊ยมคู่แข่งและกลับมารายงาน",
+    description: "โรงเตี๊ยมมีหว่างแย่งลูกค้าของเฉาอ้วนไปมาก เขาอยากรู้ว่าคู่แข่งมีเมนูเด็ดอะไร ไปลองดูแล้วกลับมาเล่า",
+    briefSummary: "ไปโรงเตี๊ยมมีหว่าง แล้วกลับมาเล่าให้เฉาอ้วนฟัง",
     type: "side",
     giverNpcId: "inn_gaosheng_keeper_fat",
     stages: [
       {
         id: "scout_rival",
-        description: "ไปสำรวจโรงเตี๊ยมคู่แข่ง",
+        description: "ไปลองอาหารที่โรงเตี๊ยมมีหว่าง",
         autoAdvance: { t: "visitedLocation", locationId: "inn_youjian" },
       },
       {
         id: "report_back",
-        description: "รายงานสิ่งที่พบให้เฉาอ้วน",
+        description: "กลับไปเล่าให้เฉาอ้วนที่โรงเตี๊ยมเก้าอี้สูงฟัง",
       },
     ],
     rewards: [
@@ -615,14 +615,14 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
   {
     id: "qv_inn_drunk_warrior",
     name: "นักรบที่เศร้าโศก",
-    description: "นักรบผู้สูญเสียสำนักนั่งดื่มในโรงเตี๊ยม เฉาอ้วนเป็นห่วงและต้องการให้ช่วยไปคุย",
+    description: "นักรบที่สำนักล่มสลายนั่งดื่มเหล้าอยู่ในโรงเตี๊ยมเก้าอี้สูงมาหลายชั่วยาม เฉาอ้วนเป็นห่วงและขอให้ไปคุยกับเขา",
     briefSummary: "คุยกับนักรบที่กำลังเศร้าโศกและช่วยเขาหาความหมาย",
     type: "side",
     giverNpcId: "inn_gaosheng_keeper_fat",
     stages: [
       {
         id: "talk_warrior",
-        description: "ไปพูดคุยกับนักรบผู้นั้น",
+        description: "ไปนั่งคุยกับนักรบผู้เศร้าโศกในโรงเตี๊ยมเก้าอี้สูง",
         objective: {
           spots: [
             { locationId: "inn_gaosheng", label: "คุยกับนักรบผู้เศร้าโศก", sceneId: "qs_qv_inn_drunk_warrior_talk" },
@@ -631,7 +631,7 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
       },
       {
         id: "report_back",
-        description: "บอกผลให้เฉาอ้วนรู้",
+        description: "กลับไปบอกเฉาอ้วนว่านักรบเป็นอย่างไรบ้าง",
       },
     ],
     rewards: [
@@ -650,19 +650,19 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
   {
     id: "qv_inn_legend_verify",
     name: "ตำนานถ้ำโบราณ",
-    description: "โปผู้เล่าเรื่องได้ยินว่ามีถ้ำโบราณพร้อมภาพสลักเรื่องยุทธจักรในอดีต ต้องการให้ช่วยยืนยัน",
-    briefSummary: "ค้นหาถ้ำโบราณและนำหลักฐานกลับมาให้โป",
+    description: "โปผู้เล่าเรื่องได้ยินว่าถ้ำบทกวีถังมีภาพสลักเรื่องยุทธภพสมัยก่อน เขาอยากรู้ว่าจริงไหม ไปดูแล้วกลับมาเล่าให้ฟัง",
+    briefSummary: "ไปถ้ำบทกวีถัง แล้วกลับมาเล่าให้โปฟัง",
     type: "side",
     giverNpcId: "inn_heluo_storyteller_po",
     stages: [
       {
         id: "find_cave",
-        description: "ค้นหาถ้ำโบราณตามที่โปบอก",
+        description: "เดินทางไปถ้ำบทกวีถัง",
         autoAdvance: { t: "visitedLocation", locationId: "cave_tangshi" },
       },
       {
         id: "report_findings",
-        description: "กลับมาเล่าให้โปฟัง",
+        description: "กลับไปเล่าให้โปผู้เล่าเรื่องที่โรงเตี๊ยมห้วอลั่วฟัง",
       },
     ],
     rewards: [
@@ -678,13 +678,13 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
     id: "qv_inn_missing_traveler",
     name: "ผู้เดินทางที่หายไป",
     description: "ผู้หญิงคนหนึ่งพักที่โรงเตี๊ยมแล้วหายตัวไปอย่างลึกลับ โปผู้เล่าเรื่องเป็นห่วงมาก",
-    briefSummary: "สืบหาผู้หญิงที่หายตัวจากโรงเตี๊ยมเฮ่อลั่ว",
+    briefSummary: "สืบหาผู้หญิงที่หายตัวจากโรงเตี๊ยมห้วอลั่ว",
     type: "side",
     giverNpcId: "inn_heluo_storyteller_po",
     stages: [
       {
         id: "search_area",
-        description: "สืบหาร่องรอยของผู้หญิงที่หายไป",
+        description: "สืบร่องรอยของผู้หญิงที่หายไปจากโรงเตี๊ยมห้วอลั่ว",
         objective: {
           spots: [
             { locationId: "inn_heluo", label: "สืบร่องรอยหญิงที่หายไป", sceneId: "qs_qv_inn_missing_traveler_found" },
@@ -693,7 +693,7 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
       },
       {
         id: "resolve_situation",
-        description: "จัดการสถานการณ์และรายงานให้โป",
+        description: "กลับไปบอกโปผู้เล่าเรื่อง",
       },
     ],
     rewards: [

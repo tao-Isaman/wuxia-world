@@ -33,7 +33,7 @@ export const QUESTS_TAISHAN: readonly QuestDef[] = [
       },
       {
         id: "return_to_master",
-        description: "นำหยกและเงินค่าเข้าสำนักไปถวายชิงสือเต้าเหริน",
+        description: "นำหยกและเงินค่าเข้าสำนักไปถวายเจ้าสำนักชิงสือเต้าเหริน",
       },
     ],
     // Gold + jade deduction happens at the complete-scene's choice
@@ -52,7 +52,7 @@ export const QUESTS_TAISHAN: readonly QuestDef[] = [
     id: "qst_taishan_sect_patrol",
     name: "ลาดตระเวนเชิงเขาบูรพา",
     description: "ภารกิจประจำของศิษย์ไท่ซาน — ลาดตระเวนเชิงเขาด้านบูรพาและกำราบโจรที่บุกรุกพื้นที่สำนัก",
-    briefSummary: "ปราบโจรเร่ร่อน 2 คน · sect points +50",
+    briefSummary: "ปราบโจรเร่ร่อน 2 คน · แต้มสำนัก +50",
     type: "side",
     sectId: "taishan",
     giverNpcId: "sect_taishan_master_tianmen",
@@ -65,7 +65,7 @@ export const QUESTS_TAISHAN: readonly QuestDef[] = [
       },
       {
         id: "report",
-        description: "กลับไปรายงานชิงสือเต้าเหริน",
+        description: "กลับไปรายงานเจ้าสำนักชิงสือเต้าเหริน",
       },
     ],
     rewards: [
@@ -80,7 +80,7 @@ export const QUESTS_TAISHAN: readonly QuestDef[] = [
     id: "qst_taishan_sect_jade",
     name: "ส่งหยกบูชาเทพสุริยัน",
     description: "หอบูชาตะวันของไท่ซานต้องการหยกใหม่สำหรับพิธีต้อนรับแสงแรกประจำเดือน — เก็บหยกมาถวายให้ครบ",
-    briefSummary: "ส่งหยก 5 ก้อน · sect points +60",
+    briefSummary: "ส่งหยก 5 ก้อน · แต้มสำนัก +60",
     type: "side",
     sectId: "taishan",
     giverNpcId: "sect_taishan_master_tianmen",
@@ -93,7 +93,7 @@ export const QUESTS_TAISHAN: readonly QuestDef[] = [
       },
       {
         id: "deliver",
-        description: "ส่งหยกให้ชิงสือเต้าเหริน",
+        description: "ส่งหยกให้เจ้าสำนักชิงสือเต้าเหริน",
       },
     ],
     rewards: [
@@ -106,9 +106,9 @@ export const QUESTS_TAISHAN: readonly QuestDef[] = [
 
   {
     id: "qst_taishan_sect_dawn_offering",
-    name: "เครื่องบูชาแสงแรก",
-    description: "ภารกิจประจำของศิษย์ไท่ซาน — โรงตีกระบี่ของสำนักต้องการเหล็กดิบใหม่เพื่อหลอมกระบี่สุริยันสำหรับศิษย์รุ่นใหม่",
-    briefSummary: "ส่งเหล็กดิบ 5 ก้อน · sect points +50",
+    name: "เหล็กหลอมกระบี่สุริยัน",
+    description: "ภารกิจประจำของศิษย์ไท่ซาน — โรงตีกระบี่ของสำนักต้องการแร่เหล็กใหม่เพื่อหลอมกระบี่สุริยันสำหรับศิษย์รุ่นใหม่",
+    briefSummary: "ส่งแร่เหล็ก 5 ก้อน · แต้มสำนัก +50",
     type: "side",
     sectId: "taishan",
     giverNpcId: "sect_taishan_master_tianmen",
@@ -116,7 +116,7 @@ export const QUESTS_TAISHAN: readonly QuestDef[] = [
     stages: [
       {
         id: "gather_iron",
-        description: "เก็บเหล็กดิบ 5 ก้อน",
+        description: "เก็บแร่เหล็ก 5 ก้อน",
         autoAdvance: { t: "hasItem", itemId: "iron_ore", count: 5 },
       },
       {
@@ -135,7 +135,7 @@ export const QUESTS_TAISHAN: readonly QuestDef[] = [
   {
     id: "qst_taishan_art_sun",
     name: "บททดสอบก่อนสืบทอด: วิชาลึกลับ",
-    description: "ชิงสือเต้าเหรินจะทดสอบก่อนเปิดตำราวิชาลึกลับให้ศิษย์ที่พิสูจน์ใจ — ผ่านการประลองกับหัวหน้าโจรชั้นสูงและเก็บแร่เทพสำหรับหลอมกระบี่บูชาตะวัน (ผ่านแล้วจึงรับภารกิจสืบทอดวิชาลึกลับได้)",
+    description: "ชิงสือเต้าเหรินจะทดสอบก่อนเปิดตำราวิชาลึกลับให้ศิษย์ที่พิสูจน์ใจ — ปราบหัวหน้าโจร 2 คน และหาแร่เทพ 1 ก้อนมาหลอมกระบี่บูชาตะวัน (ผ่านแล้วจึงรับภารกิจสืบทอดวิชาลึกลับได้)",
     briefSummary: "บททดสอบ — เปิดทางสู่การสืบทอดวิชาลึกลับ",
     type: "side",
     sectId: "taishan",
@@ -152,7 +152,7 @@ export const QUESTS_TAISHAN: readonly QuestDef[] = [
     stages: [
       {
         id: "trial_kill",
-        description: "พิสูจน์ดาบ — ปราบหัวหน้าโจร (bandit_chief) 2 คน",
+        description: "พิสูจน์ดาบ — ปราบหัวหน้าโจร 2 คน",
         autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 2 },
       },
       {
@@ -162,7 +162,7 @@ export const QUESTS_TAISHAN: readonly QuestDef[] = [
       },
       {
         id: "return_art",
-        description: "กลับไปรายงานผลต่อชิงสือเต้าเหริน",
+        description: "กลับไปรายงานผลต่อเจ้าสำนักชิงสือเต้าเหริน",
       },
     ],
     rewards: [
@@ -177,16 +177,16 @@ export const QUESTS_TAISHAN: readonly QuestDef[] = [
   {
     id: "qst_taishan_redemption",
     name: "ไถ่บาปต่อไท่ซาน",
-    description: "เจ้าผู้ทรยศกลับมาขออภัย — ชิงสือเต้าเหรินทดสอบความจริงใจเจ้าด้วยภารกิจหนัก ปราบหัวหน้าโจร 5 คนและนำหยกบูชาตะวันมาถวาย หากผ่าน ความเป็นทรยศจะถูกล้างเป็น \"ลาออก\" — นักล่าจะหยุดตามล่า แต่วิชาจะถูกแช่แข็ง",
-    briefSummary: "ไถ่บาปต่อไท่ซาน — ปราบหัวหน้าโจร 5 + ส่งหยก 5 ก้อน",
+    description: "เจ้าเคยทรยศไท่ซาน สำนักจึงส่งนักล่ามาตามเจ้า — แต่เจ้าสำนักชิงสือเต้าเหรินยังเปิดทางให้ไถ่โทษ: ปราบหัวหน้าโจร 5 คน แล้วนำหยกล้ำค่า 5 ก้อนมาถวาย หากผ่าน เจ้าจะนับเป็น \"ผู้ลาออก\" แทน \"ผู้ทรยศ\" นักล่าจะเลิกตามล่า แต่วิชาของไท่ซานที่ติดตัวจะไม่เก่งขึ้นจากการต่อสู้อีก และกลับเข้าสำนักไม่ได้",
+    briefSummary: "ไถ่บาปต่อไท่ซาน — ปราบหัวหน้าโจร 5 + ถวายหยกล้ำค่า 5 ก้อน",
     type: "side",
     sectId: "taishan",
     giverNpcId: "sect_taishan_master_tianmen",
     prereqs: { t: "sectStatus", sectId: "taishan", status: "betrayed" },
     stages: [
-      { id: "trial_kill", description: "ปราบหัวหน้าโจร (bandit_chief) 5 คน เพื่อพิสูจน์ใจ", autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 5 } },
-      { id: "trial_offering", description: "นำหยกบูชาตะวัน — jade 5 ก้อน", autoAdvance: { t: "hasItem", itemId: "jade", count: 5 } },
-      { id: "return_to_master", description: "กลับไปขออภัยต่อชิงสือเต้าเหริน" },
+      { id: "trial_kill", description: "ปราบหัวหน้าโจร 5 คนเพื่อพิสูจน์ว่ากลับใจจริง", autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 5 } },
+      { id: "trial_offering", description: "นำหยกล้ำค่า 5 ก้อนมาถวาย", autoAdvance: { t: "hasItem", itemId: "jade", count: 5 } },
+      { id: "return_to_master", description: "กลับไปขออภัยต่อเจ้าสำนักชิงสือเต้าเหริน" },
     ],
     rewards: [
       { t: "wExp", amount: 300 },

@@ -8,8 +8,8 @@ export const QUESTS_HUASHAN: readonly QuestDef[] = [
   {
     id: "qst_huashan_disciple_intro",
     name: "ขอเข้าเป็นศิษย์หัวซาน",
-    description: "อาจารย์อี้ชิงรับศิษย์ใหม่ทุกคนที่ใจรักดาบ — แต่หัวซานเป็นสำนักเล็ก ต้องการค่าเข้าสำนัก ๕๐๐ เหรียญทอง และเหล็กดิบ ๓ ก้อนสำหรับตีดาบฝึก",
-    briefSummary: "จ่ายค่าเข้าสำนัก 500 ทอง + ส่งเหล็กดิบ 3 ก้อน เข้าเป็นศิษย์หัวซานขั้นที่ 9",
+    description: "อาจารย์ใหญ่อี้ชิงรับศิษย์ใหม่ทุกคนที่ใจรักดาบ — แต่หัวซานเป็นสำนักเล็ก ต้องการค่าเข้าสำนัก 500 เหรียญทอง และแร่เหล็ก 3 ก้อนสำหรับตีดาบฝึก",
+    briefSummary: "จ่ายค่าเข้าสำนัก 500 ทอง + ส่งแร่เหล็ก 3 ก้อน เข้าเป็นศิษย์หัวซานขั้นที่ 9",
     type: "side",
     giverNpcId: "sect_huashan_master_yiqing",
     prereqs: {
@@ -22,7 +22,7 @@ export const QUESTS_HUASHAN: readonly QuestDef[] = [
     stages: [
       {
         id: "gather_offering",
-        description: "เตรียมเหล็กดิบ 3 ก้อน + เก็บเงินให้ครบ 500 ทอง",
+        description: "เตรียมแร่เหล็ก 3 ก้อน + เก็บเงินให้ครบ 500 ทอง",
         autoAdvance: {
           t: "and",
           all: [
@@ -33,7 +33,7 @@ export const QUESTS_HUASHAN: readonly QuestDef[] = [
       },
       {
         id: "return_to_master",
-        description: "นำของและเงินค่าเข้าสำนักไปถวายอาจารย์อี้ชิง",
+        description: "นำของและเงินค่าเข้าสำนักไปถวายอาจารย์ใหญ่อี้ชิง",
       },
     ],
     // Gold deduction happens at the complete-scene's choice (addGold:-200)
@@ -52,7 +52,7 @@ export const QUESTS_HUASHAN: readonly QuestDef[] = [
     id: "qst_huashan_sect_patrol",
     name: "ลาดตระเวนเชิงเขาหัวซาน",
     description: "ภารกิจประจำของศิษย์หัวซาน — ลาดตระเวนเชิงเขาและกำราบโจรที่ตั้งฐานก่อกวน",
-    briefSummary: "ปราบโจรเชิงเขา 2 คน · sect points +50",
+    briefSummary: "ปราบโจรเชิงเขา 2 คน · แต้มสำนัก +50",
     type: "side",
     sectId: "huashan",
     giverNpcId: "sect_huashan_master_yiqing",
@@ -65,7 +65,7 @@ export const QUESTS_HUASHAN: readonly QuestDef[] = [
       },
       {
         id: "report",
-        description: "กลับไปรายงานอาจารย์อี้ชิง",
+        description: "กลับไปรายงานอาจารย์ใหญ่อี้ชิง",
       },
     ],
     rewards: [
@@ -79,8 +79,8 @@ export const QUESTS_HUASHAN: readonly QuestDef[] = [
   {
     id: "qst_huashan_sect_iron",
     name: "ส่งเหล็กให้โรงตีดาบ",
-    description: "โรงตีดาบของหัวซานต้องการเหล็กดิบเพิ่มเพื่อหลอมดาบฝึกให้ศิษย์รุ่นใหม่ — เก็บเหล็กดิบมาให้ครบ",
-    briefSummary: "ส่งเหล็กดิบ 5 ก้อน · sect points +60",
+    description: "โรงตีดาบของหัวซานต้องการแร่เหล็กเพิ่มเพื่อหลอมดาบฝึกให้ศิษย์รุ่นใหม่ — เก็บแร่เหล็กมาให้ครบ",
+    briefSummary: "ส่งแร่เหล็ก 5 ก้อน · แต้มสำนัก +60",
     type: "side",
     sectId: "huashan",
     giverNpcId: "sect_huashan_master_yiqing",
@@ -88,12 +88,12 @@ export const QUESTS_HUASHAN: readonly QuestDef[] = [
     stages: [
       {
         id: "gather_iron",
-        description: "เก็บเหล็กดิบ 5 ก้อน",
+        description: "เก็บแร่เหล็ก 5 ก้อน",
         autoAdvance: { t: "hasItem", itemId: "iron_ore", count: 5 },
       },
       {
         id: "deliver",
-        description: "ส่งเหล็กให้อาจารย์อี้ชิง",
+        description: "ส่งเหล็กให้อาจารย์ใหญ่อี้ชิง",
       },
     ],
     rewards: [
@@ -107,7 +107,7 @@ export const QUESTS_HUASHAN: readonly QuestDef[] = [
   {
     id: "qst_huashan_art_purplecloud",
     name: "บททดสอบก่อนตำนาน: วิชาลึกลับ",
-    description: "อาจารย์อี้ชิงจะเล่าตำนานของวิชาลึกลับให้ศิษย์ที่พิสูจน์ได้ทั้งดาบและจิตใจ — ผ่านการประลองกับโจรชั้นสูงและการเก็บเหล็กพิเศษ (เมื่อผ่าน ดูแท็บตำนานในบันทึกภารกิจ)",
+    description: "อาจารย์ใหญ่อี้ชิงจะเล่าตำนานของวิชาลึกลับให้ศิษย์ที่พิสูจน์ได้ทั้งดาบและจิตใจ — ปราบหัวหน้าโจร 2 คน และหาแร่เทพ 1 ก้อน (เมื่อผ่าน ดูแท็บตำนานในบันทึกภารกิจ)",
     briefSummary: "บททดสอบ — เปิดทางสู่ตำนานของวิชาลึกลับ",
     type: "side",
     sectId: "huashan",
@@ -124,7 +124,7 @@ export const QUESTS_HUASHAN: readonly QuestDef[] = [
     stages: [
       {
         id: "trial_kill",
-        description: "พิสูจน์ดาบ — ปราบหัวหน้าโจร (bandit_chief) 2 คน",
+        description: "พิสูจน์ดาบ — ปราบหัวหน้าโจร 2 คน",
         autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 2 },
       },
       {
@@ -134,7 +134,7 @@ export const QUESTS_HUASHAN: readonly QuestDef[] = [
       },
       {
         id: "return_art",
-        description: "กลับไปรายงานผลต่ออาจารย์อี้ชิง",
+        description: "กลับไปรายงานผลต่ออาจารย์ใหญ่อี้ชิง",
       },
     ],
     rewards: [
@@ -148,16 +148,16 @@ export const QUESTS_HUASHAN: readonly QuestDef[] = [
   {
     id: "qst_huashan_redemption",
     name: "ไถ่บาปต่อหัวซาน",
-    description: "เจ้าผู้ทรยศกลับมาขออภัย — เจ้าสำนักหัวซานทดสอบความจริงใจเจ้าด้วยภารกิจหนัก ปราบหัวหน้าโจร 5 คนและนำของล้ำค่าของสำนักมาถวาย หากผ่าน ความเป็นทรยศจะถูกล้างเป็น \"ลาออก\" — นักล่าจะหยุดตามล่า แต่วิชาจะถูกแช่แข็ง",
-    briefSummary: "ไถ่บาปต่อหัวซาน — ปราบหัวหน้าโจร 5 + ส่งของถวาย 5 ชิ้น",
+    description: "เจ้าเคยทรยศหัวซาน สำนักจึงส่งนักล่ามาตามเจ้า — แต่อาจารย์ใหญ่อี้ชิงยังเปิดทางให้ไถ่โทษ: ปราบหัวหน้าโจร 5 คน แล้วนำแร่เหล็ก 5 ก้อนมาถวาย หากผ่าน เจ้าจะนับเป็น \"ผู้ลาออก\" แทน \"ผู้ทรยศ\" นักล่าจะเลิกตามล่า แต่วิชาของหัวซานที่ติดตัวจะไม่เก่งขึ้นจากการต่อสู้อีก และกลับเข้าสำนักไม่ได้",
+    briefSummary: "ไถ่บาปต่อหัวซาน — ปราบหัวหน้าโจร 5 + ถวายแร่เหล็ก 5 ก้อน",
     type: "side",
     sectId: "huashan",
     giverNpcId: "sect_huashan_master_yiqing",
     prereqs: { t: "sectStatus", sectId: "huashan", status: "betrayed" },
     stages: [
-      { id: "trial_kill", description: "ปราบหัวหน้าโจร (bandit_chief) 5 คน เพื่อพิสูจน์ใจ", autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 5 } },
-      { id: "trial_offering", description: "นำของถวาย — iron_ore 5 ชิ้น", autoAdvance: { t: "hasItem", itemId: "iron_ore", count: 5 } },
-      { id: "return_to_master", description: "กลับไปขออภัยต่อเจ้าสำนักหัวซาน" },
+      { id: "trial_kill", description: "ปราบหัวหน้าโจร 5 คนเพื่อพิสูจน์ว่ากลับใจจริง", autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 5 } },
+      { id: "trial_offering", description: "นำแร่เหล็ก 5 ก้อนมาถวาย", autoAdvance: { t: "hasItem", itemId: "iron_ore", count: 5 } },
+      { id: "return_to_master", description: "กลับไปขออภัยต่ออาจารย์ใหญ่อี้ชิง" },
     ],
     rewards: [
       { t: "wExp", amount: 300 },
@@ -170,15 +170,15 @@ export const QUESTS_HUASHAN: readonly QuestDef[] = [
   {
     id: "qst_huashan_sect_wooden",
     name: "ส่งไม้ให้โรงดาบ",
-    description: "ภารกิจประจำของศิษย์หัวซาน — เก็บไม้แข็ง 5 ชิ้น",
-    briefSummary: "ส่งไม้แข็ง 5 ชิ้น · sect points +50",
+    description: "ภารกิจประจำของศิษย์หัวซาน — เก็บไม้เนื้อแข็ง 5 ชิ้น",
+    briefSummary: "ส่งไม้เนื้อแข็ง 5 ชิ้น · แต้มสำนัก +50",
     type: "side",
     sectId: "huashan",
     giverNpcId: "sect_huashan_master_yiqing",
     prereqs: { t: "sectMember", sectId: "huashan" },
     stages: [
-      { id: "main", description: "เก็บไม้แข็ง 5 ชิ้น", autoAdvance: { t: "hasItem", itemId: "wood_hard", count: 5 } },
-      { id: "report", description: "กลับไปรายงาน" },
+      { id: "main", description: "เก็บไม้เนื้อแข็ง 5 ชิ้น", autoAdvance: { t: "hasItem", itemId: "wood_hard", count: 5 } },
+      { id: "report", description: "กลับไปรายงานอาจารย์ใหญ่อี้ชิง" },
     ],
     rewards: [
       { t: "gold", amount: 130 },

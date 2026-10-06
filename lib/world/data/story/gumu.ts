@@ -448,7 +448,7 @@ const SORROW_PALM: StoryArcSpec = {
         go: "ไปฝึกกับเลิ่งเยว่",
       },
       steps: [
-        { t: "stat", stat: "INT", min: 50, hint: "ฝึกจิตให้แน่วแน่พอจะรับความเศร้าโดยไม่ล้ม (INT ≥ 50)" },
+        { t: "stat", stat: "INT", min: 50, hint: "ฝึกจิตให้แน่วแน่พอจะรับความเศร้าโดยไม่ล้ม (ฉลาด ≥ 50)" },
         { t: "talk", npcId: LENGYUE, locationId: "sect_gumu", label: "ฝึกท่า 'ยืนบื้อดั่งไก่ไม้' กับเลิ่งเยว่", hint: "ฝึกฝ่ามือกำสรดกับศิษย์เลิ่งเยว่ในสุสานโบราณ",
           scene: {
             cutscene: {
@@ -1047,7 +1047,7 @@ const WINTER_STEP: StoryArcSpec = {
         go: "ไปนั่งสมาธิที่ลานหิมะ",
       },
       steps: [
-        { t: "stat", stat: "AGI", min: 45, hint: "ฝึกก้าวให้เบาพอจะหลบกรงเล็บ (AGI ≥ 45)" },
+        { t: "stat", stat: "AGI", min: 45, hint: "ฝึกก้าวให้เบาพอจะหลบกรงเล็บ (ความเร็ว ≥ 45)" },
         { t: "visit", locationId: "sect_shaolin", label: "นั่งสมาธิที่ลานหิมะหลังวัด", hint: "นั่งสมาธิที่ลานหิมะหลังวัดเส้าหลินในคืนก่อนประลอง",
           scene: {
             lines: [
@@ -1558,7 +1558,7 @@ const ICE_WEAVE: StoryArcSpec = {
         go: "ฝึกใจให้นิ่ง",
       },
       steps: [
-        { t: "stat", stat: "INT", min: 50, hint: "ฝึกใจให้นิ่งพอจะทอไหมน้ำแข็ง (INT ≥ 50)" },
+        { t: "stat", stat: "INT", min: 50, hint: "ฝึกใจให้นิ่งพอจะทอไหมน้ำแข็ง (ฉลาด ≥ 50)" },
         { t: "visit", locationId: "sect_gumu", label: "ทอไหมน้ำแข็งบนเตียงหยกเย็น", hint: "ทอไหมน้ำแข็งปิดรอยร้าวบนเตียงหยกเย็นพร้อมเลิ่งเยว่",
           scene: {
             cutscene: {

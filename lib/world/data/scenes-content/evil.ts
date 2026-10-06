@@ -113,7 +113,7 @@ export const SCENES_EVIL: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qe_wudu_kidnap_doctor_offer",
     lines: [
-      { t: "dialogue", speaker: "ผู้อาวุโสตู๋ซื่อ", text: "หมอเสินหนงที่วิลล่ายาวังรู้วิธีถอนพิษที่ข้าคิดค้นมานาน — และข้าต้องการให้เขาเป็น 'แขก' ที่นี่" },
+      { t: "dialogue", speaker: "ผู้อาวุโสตู๋ซื่อ", text: "หมอเสินหนงที่คุ้มสมุนไพรรู้วิธีถอนพิษที่ข้าคิดค้นมานาน — และข้าต้องการให้เขาเป็น 'แขก' ที่นี่" },
       { t: "dialogue", speaker: "ผู้อาวุโสตู๋ซื่อ", text: "อย่าทำร้ายเขา ข้าต้องการสมองของเขา ไม่ใช่ร่างกาย แค่นำตัวมาให้ได้" },
     ],
     choices: [
@@ -179,13 +179,13 @@ export const SCENES_EVIL: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qe_wudu_assassinate_emei_offer",
     lines: [
-      { t: "dialogue", speaker: "ผู้อาวุโสตู๋ซื่อ", text: "ท่านนิ้วจิงฉาน... ข้าเกลียดนางนั้นมานานสิบปี" },
+      { t: "dialogue", speaker: "ผู้อาวุโสตู๋ซื่อ", text: "ท่านนิ้วห้วนจิงฉาน เจ้าสำนักง้อไบ๊... ข้าเกลียดนางนั้นมานานสิบปี" },
       { t: "dialogue", speaker: "ผู้อาวุโสตู๋ซื่อ", text: "นางทำลายแผนการของสำนักเบญจพิษหลายครั้ง ถึงเวลาแล้วที่นางจะไม่ขัดขวางใครอีก" },
       { t: "dialogue", speaker: "ผู้อาวุโสตู๋ซื่อ", text: "กำจัดนาง แล้วข้าจะให้สิ่งที่เจ้าต้องการ — ไม่มีอะไรจะหยุดเราได้อีก" },
     ],
     choices: [
       {
-        text: "รับงาน — ลอบสังหารท่านนิ้วจิงฉาน",
+        text: "รับงาน — ลอบสังหารท่านนิ้วห้วนจิงฉาน",
         effects: [{ t: "startQuest", questId: "qe_wudu_assassinate_emei" }],
         next: "sect_wudu",
       },
@@ -255,7 +255,7 @@ export const SCENES_EVIL: readonly Scene[] = [
     ],
     choices: [
       {
-        text: "รับงาน — เข้าคฤหาสน์เหยินซี",
+        text: "รับงาน — เข้าคุ้มนกนางแอ่น",
         effects: [{ t: "startQuest", questId: "qe_zhizhu_assassinate_lord" }],
         next: "cave_zhizhu",
       },
@@ -383,7 +383,7 @@ export const SCENES_EVIL: readonly Scene[] = [
     id: "qs_qe_zhizhu_steal_target_data_offer",
     lines: [
       { t: "dialogue", speaker: "นักฆ่าเงาหยิง", text: "ทูตหลิวอิงเดินทางตามเส้นทางที่ข้าต้องรู้" },
-      { t: "dialogue", speaker: "นักฆ่าเงาหยิง", text: "ขโมยตารางเส้นทางและข้อมูลการ์ดจากเขา เมื่อได้ข้อมูลแล้ว งานหน้าจะง่ายขึ้นมาก" },
+      { t: "dialogue", speaker: "นักฆ่าเงาหยิง", text: "ขโมยตารางเส้นทางและเวรยามคุ้มกันจากเขา เมื่อได้ข้อมูลแล้ว งานหน้าจะง่ายขึ้นมาก" },
     ],
     choices: [
       {
@@ -660,7 +660,7 @@ export const SCENES_EVIL: readonly Scene[] = [
     ],
     choices: [
       {
-        text: "รับพันธกิจ — ขโมยลูกแก้วจากคฤหาสน์เหยินซี",
+        text: "รับพันธกิจ — ขโมยลูกแก้วจากคุ้มนกนางแอ่น",
         effects: [{ t: "startQuest", questId: "qe_shenlong_steal_dragon_pearl" }],
         next: "isle_shenlong",
       },
@@ -787,8 +787,8 @@ export const SCENES_EVIL: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qe_shenlong_initiate_test_offer",
     lines: [
-      { t: "dialogue", speaker: "เจ้าลัทธิจ้าวมังกรเทพ", text: "พิธีรับสมาชิกใหม่แห่งลัทธิมังกรเทพต้องการเครื่องบูชา — ผู้แทนจากราชสำนักที่ยืนยาวมา" },
-      { t: "dialogue", speaker: "เจ้าลัทธิจ้าวมังกรเทพ", text: "ทูตหลิวอิงแห่งวังจงหยาง เขาจะเป็นพยานถึงอำนาจของมังกรเทพ นำเขามาที่เกาะนี้" },
+      { t: "dialogue", speaker: "เจ้าลัทธิจ้าวมังกรเทพ", text: "พิธีรับสมาชิกใหม่แห่งลัทธิมังกรเทพต้องการเครื่องบูชา — ผู้แทนของราชสำนัก" },
+      { t: "dialogue", speaker: "เจ้าลัทธิจ้าวมังกรเทพ", text: "ทูตหลิวอิงแห่งพระราชวังจงหยาง เขาจะเป็นพยานถึงอำนาจของมังกรเทพ นำเขามาที่เกาะนี้" },
     ],
     choices: [
       {
@@ -824,10 +824,10 @@ export const SCENES_EVIL: readonly Scene[] = [
     kind: "dialog",
     id: "npc_evil_capital_blackmarket_zhou_talk",
     lines: [
-      { t: "dialogue", speaker: "เถ้าแก่โจว", text: "เอ้อ...นักรบหนุ่ม ดูแวว ๆ ว่าไม่ใช่คนชอบถามมาก ดี — ข้าชอบแบบนั้น" },
-      { t: "dialogue", speaker: "เถ้าแก่โจว", text: "ตลาดของข้าไม่มีในแผนที่ราชการ แต่ทุกอย่างที่คุณต้องการ — หาได้ที่นี่ถ้าราคาตรงกัน" },
+      { t: "dialogue", speaker: "เถ้าแก่โจว", text: "เอ้อ...จอมยุทธ์ ดูแวว ๆ ว่าไม่ใช่คนชอบถามมาก ดี — ข้าชอบแบบนั้น" },
+      { t: "dialogue", speaker: "เถ้าแก่โจว", text: "ตลาดของข้าไม่มีในแผนที่ราชการ แต่ทุกอย่างที่เจ้าต้องการ — หาได้ที่นี่ถ้าราคาตรงกัน" },
       { t: "dialogue", speaker: "เถ้าแก่โจว", text: "คัมภีร์ประทับตราหอคัมภีร์หลวงก็มีนะ ของจริงบ้าง ของลอกบ้าง ตั้งแต่ศึกจิ้งหนานเริ่ม ราคาขึ้นทุกเดือน" },
-      { t: "dialogue", speaker: "เถ้าแก่โจว", text: "ว่าแต่ ถ้าคุณพร้อมทำงานมากกว่าซื้อ ข้ามีงานที่จ่ายดีกว่าค่าแรงทั่วไปมาก..." },
+      { t: "dialogue", speaker: "เถ้าแก่โจว", text: "ว่าแต่ ถ้าเจ้าพร้อมทำงานมากกว่าซื้อ ข้ามีงานที่จ่ายดีกว่าค่าแรงทั่วไปมาก..." },
     ],
   },
 
@@ -846,7 +846,7 @@ export const SCENES_EVIL: readonly Scene[] = [
     id: "npc_evil_treasure_bandit_chief_qing_talk",
     lines: [
       { t: "dialogue", speaker: "หัวหน้าโจรชิง", text: "ฮ่าฮ่า! คนที่กล้าเดินเข้ามาถ้ำข้าคนเดียว ไม่ใช่คนโง่ก็ต้องเก่งมาก" },
-      { t: "dialogue", speaker: "หัวหน้าโจรชิง", text: "ข้าไม่รบกวนคนที่ไม่มีอะไรให้ข้า แต่ถ้าคุณมีฝีมือ ข้ามีงานที่ต้องการมือดี" },
+      { t: "dialogue", speaker: "หัวหน้าโจรชิง", text: "ข้าไม่รบกวนคนที่ไม่มีอะไรให้ข้า แต่ถ้าเจ้ามีฝีมือ ข้ามีงานที่ต้องการมือดี" },
       { t: "dialogue", speaker: "หัวหน้าโจรชิง", text: "กฎข้าง่าย: ทำงานสำเร็จ ได้เงิน ทำงานพัง หรือทรยศ — ไม่มีกลับบ้าน" },
     ],
   },
@@ -902,7 +902,7 @@ export const SCENES_EVIL: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qe_capital_silence_witness_offer",
     lines: [
-      { t: "dialogue", speaker: "เถ้าแก่โจว", text: "มีนักดาบคนหนึ่งเห็นการแลกเปลี่ยนสินค้าของข้า ตอนนี้เขาเดินพาดพิงในย่านนี้" },
+      { t: "dialogue", speaker: "เถ้าแก่โจว", text: "มีนักดาบคนหนึ่งเห็นการแลกเปลี่ยนสินค้าของข้า ตอนนี้เขาเดินเพ่นพ่านอยู่แถวนี้ เป็นกระบี่พเนจร หาไม่ยาก" },
       { t: "dialogue", speaker: "เถ้าแก่โจว", text: "ข้าต้องการให้เขาหยุดเดินอย่างถาวร เข้าใจไหม?" },
     ],
     choices: [
@@ -918,7 +918,7 @@ export const SCENES_EVIL: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qe_capital_silence_witness_complete",
     lines: [
-      { t: "dialogue", speaker: "เถ้าแก่โจว", text: "ดี ปัญหาหนึ่งจัดการเสร็จ คุณทำงานได้ตรงประเด็นดี นี่ค่าจ้าง" },
+      { t: "dialogue", speaker: "เถ้าแก่โจว", text: "ดี ปัญหาหนึ่งจัดการเสร็จ เจ้าทำงานได้ตรงประเด็นดี นี่ค่าจ้าง" },
     ],
     choices: [
       {
@@ -950,7 +950,7 @@ export const SCENES_EVIL: readonly Scene[] = [
     id: "qs_qe_capital_merchant_kidnap_complete",
     lines: [
       { t: "narration", text: "เถ้าแก่โจวหัวเราะเบา ๆ เมื่อได้ยินข่าว" },
-      { t: "dialogue", speaker: "เถ้าแก่โจว", text: "หวังจะจ่ายหนี้เองแล้วตอนนี้ ฮ่าฮ่า ดี นี่ส่วนแบ่งของคุณ" },
+      { t: "dialogue", speaker: "เถ้าแก่โจว", text: "หวังจะจ่ายหนี้เองแล้วตอนนี้ ฮ่าฮ่า ดี นี่ส่วนแบ่งของเจ้า" },
     ],
     choices: [
       {
@@ -965,7 +965,7 @@ export const SCENES_EVIL: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qe_capital_clear_rival_offer",
     lines: [
-      { t: "dialogue", speaker: "เถ้าแก่โจว", text: "โจรกลุ่มใหม่เริ่มรับงานในเขตของข้า ไม่ขอราชนาม ไม่จ่ายส่วย นั่นคือการท้าทาย" },
+      { t: "dialogue", speaker: "เถ้าแก่โจว", text: "โจรกลุ่มใหม่เริ่มรับงานในเขตของข้า ไม่ขออนุญาตข้า ไม่จ่ายส่วย นั่นคือการท้าทาย" },
       { t: "dialogue", speaker: "เถ้าแก่โจว", text: "ไปบอกหัวหน้าของพวกนั้นว่าเขตนี้มีเจ้าของแล้ว วิธีที่ดีที่สุดคือทำให้เขาหยุดหายใจ" },
     ],
     choices: [
@@ -997,7 +997,7 @@ export const SCENES_EVIL: readonly Scene[] = [
     id: "qs_qe_capital_ledger_burn_offer",
     lines: [
       { t: "dialogue", speaker: "เถ้าแก่โจว", text: "นายอำเภอหวู่มีบัญชีรายการที่ข้าไม่อยากให้ใครเห็น มันอยู่ที่บ้านเขา" },
-      { t: "dialogue", speaker: "เถ้าแก่โจว", text: "ข้าต้องการให้คุณเข้าไปเอาบัญชีนั้นออกมา — เงียบ ๆ และไม่มีร่องรอย ราคาของงานนี้ดีมาก" },
+      { t: "dialogue", speaker: "เถ้าแก่โจว", text: "ข้าต้องการให้เจ้าเข้าไปเอาบัญชีนั้นออกมา — เงียบ ๆ และไม่มีร่องรอย ราคาของงานนี้ดีมาก" },
     ],
     choices: [
       {
@@ -1013,7 +1013,7 @@ export const SCENES_EVIL: readonly Scene[] = [
     id: "qs_qe_capital_ledger_burn_complete",
     lines: [
       { t: "narration", text: "เถ้าแก่โจวรับบัญชีมาโดยไม่เปิดดู แล้วโยนใส่กองไฟด้านข้างทันที" },
-      { t: "dialogue", speaker: "เถ้าแก่โจว", text: "ดีมาก ภัยหนึ่งหมดไป คุณสมควรได้รับรางวัลนี้" },
+      { t: "dialogue", speaker: "เถ้าแก่โจว", text: "ดีมาก ภัยหนึ่งหมดไป เจ้าสมควรได้รับรางวัลนี้" },
     ],
     choices: [
       {
@@ -1045,7 +1045,7 @@ export const SCENES_EVIL: readonly Scene[] = [
     id: "qs_qe_capital_steal_seal_complete",
     lines: [
       { t: "narration", text: "เถ้าแก่โจวพลิกดูตราประทับด้วยความพอใจ" },
-      { t: "dialogue", speaker: "เถ้าแก่โจว", text: "สมบูรณ์แบบ ตรานี้จะสร้างรายได้ให้ข้ามหาศาล นี่ค่าตอบแทนของคุณ" },
+      { t: "dialogue", speaker: "เถ้าแก่โจว", text: "สมบูรณ์แบบ ตรานี้จะสร้างรายได้ให้ข้ามหาศาล นี่ค่าตอบแทนของเจ้า" },
     ],
     choices: [
       {
@@ -1222,7 +1222,7 @@ export const SCENES_EVIL: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qe_changan_smuggling_run_offer",
     lines: [
-      { t: "dialogue", speaker: "ขุนนางหยาน", text: "ยามหยางเก็บของที่ยึดได้จากพ่อค้าผิดกฎหมายไว้เป็นหลักฐาน ข้าพเจ้าต้องการสิ่งนั้นคืน" },
+      { t: "dialogue", speaker: "ขุนนางหยาน", text: "ยามหยานเก็บของที่ยึดได้จากพ่อค้าผิดกฎหมายไว้เป็นหลักฐาน ข้าพเจ้าต้องการสิ่งนั้นคืน" },
       { t: "dialogue", speaker: "ขุนนางหยาน", text: "ขโมยออกมาก่อนที่มันจะถูกส่งต่อ ข้าพเจ้าจะให้ทองคำเป็นค่าตอบแทน" },
     ],
     choices: [
@@ -1291,7 +1291,7 @@ export const SCENES_EVIL: readonly Scene[] = [
     id: "qs_qe_treasure_caravan_raid_offer",
     lines: [
       { t: "dialogue", speaker: "หัวหน้าโจรชิง", text: "มีกองคาราวานผ่านมาพรุ่งนี้ ของหนักดี แต่ยามคุ้มกันก็แกร่ง" },
-      { t: "dialogue", speaker: "หัวหน้าโจรชิง", text: "ลูกน้องข้าพร้อมปล้น แต่ต้องกำจัดยามก่อน นั่นคืองานของคุณ" },
+      { t: "dialogue", speaker: "หัวหน้าโจรชิง", text: "ลูกน้องข้าพร้อมปล้น แต่ต้องกำจัดยามก่อน นั่นคืองานของเจ้า" },
     ],
     choices: [
       {
@@ -1306,7 +1306,7 @@ export const SCENES_EVIL: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qe_treasure_caravan_raid_complete",
     lines: [
-      { t: "dialogue", speaker: "หัวหน้าโจรชิง", text: "ฮ่าฮ่า! การปล้นสำเร็จ ลูกน้องข้าได้ของดีไปเต็ม ๆ นี่ส่วนแบ่งของคุณ" },
+      { t: "dialogue", speaker: "หัวหน้าโจรชิง", text: "ฮ่าฮ่า! การปล้นสำเร็จ ลูกน้องข้าได้ของดีไปเต็ม ๆ นี่ส่วนแบ่งของเจ้า" },
     ],
     choices: [
       {
@@ -1321,7 +1321,7 @@ export const SCENES_EVIL: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qe_treasure_mountain_purge_offer",
     lines: [
-      { t: "dialogue", speaker: "หัวหน้าโจรชิง", text: "มีนักดาบพเนจรสองสามคนเดินวนเวียนแถวถ้ำข้า ดูไม่ธรรมดา อาจเป็นสายลับ" },
+      { t: "dialogue", speaker: "หัวหน้าโจรชิง", text: "มีกระบี่พเนจรสองคนเดินวนเวียนแถวถ้ำข้า ดูไม่ธรรมดา อาจเป็นสายลับ" },
       { t: "dialogue", speaker: "หัวหน้าโจรชิง", text: "ข้าไม่ชอบคนที่มาสอดแนม กำจัดพวกนั้นทิ้งก่อนที่จะกลับไปรายงาน" },
     ],
     choices: [
@@ -1368,7 +1368,7 @@ export const SCENES_EVIL: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qe_treasure_steal_horde_complete",
     lines: [
-      { t: "dialogue", speaker: "หัวหน้าโจรชิง", text: "ฮ่าฮ่า! ขโมยจากสำนักดาบโลหิตได้จริง ๆ คุณเก่งกว่าที่ข้าคิด นี่ส่วนแบ่งใหญ่" },
+      { t: "dialogue", speaker: "หัวหน้าโจรชิง", text: "ฮ่าฮ่า! ขโมยจากสำนักดาบโลหิตได้จริง ๆ เจ้าเก่งกว่าที่ข้าคิด นี่ส่วนแบ่งใหญ่" },
     ],
     choices: [
       {
@@ -1384,7 +1384,7 @@ export const SCENES_EVIL: readonly Scene[] = [
     id: "qs_qe_treasure_kidnap_lord_offer",
     lines: [
       { t: "dialogue", speaker: "หัวหน้าโจรชิง", text: "เจ้าบ้านเหยินเฟิง ตระกูลรวย ที่ดินมาก ทองคำมากมาย แต่ไม่ยอมบริจาคให้กับคนที่ต้องการ" },
-      { t: "dialogue", speaker: "หัวหน้าโจรชิง", text: "จับตัวเขามาเป็นประกัน ค่าไถ่จะทำให้ลูกน้องข้ากินอิ่มได้หลายเดือน แบ่งให้คุณยุติธรรม" },
+      { t: "dialogue", speaker: "หัวหน้าโจรชิง", text: "จับตัวเขามาเป็นประกัน ค่าไถ่จะทำให้ลูกน้องข้ากินอิ่มได้หลายเดือน แบ่งให้เจ้ายุติธรรม" },
     ],
     choices: [
       {
@@ -1399,7 +1399,7 @@ export const SCENES_EVIL: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qe_treasure_kidnap_lord_complete",
     lines: [
-      { t: "dialogue", speaker: "หัวหน้าโจรชิง", text: "เยี่ยมมาก! ตัวประกันอยู่ที่ถ้ำแล้ว ครอบครัวเขากำลังรวบรวมค่าไถ่ นี่ส่วนแบ่งล่วงหน้าของคุณ" },
+      { t: "dialogue", speaker: "หัวหน้าโจรชิง", text: "เยี่ยมมาก! ตัวประกันอยู่ที่ถ้ำแล้ว ครอบครัวเขากำลังรวบรวมค่าไถ่ นี่ส่วนแบ่งล่วงหน้าของเจ้า" },
     ],
     choices: [
       {
@@ -1430,7 +1430,7 @@ export const SCENES_EVIL: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qe_treasure_kill_lawman_complete",
     lines: [
-      { t: "dialogue", speaker: "หัวหน้าโจรชิง", text: "ฮ่าฮ่า! กองทหารถอยไปแล้ว ไม่มีผู้นำก็ไม่มีกล้าหาญ คุณช่วยถ้ำข้าไว้ได้ นี่ค่าจ้าง" },
+      { t: "dialogue", speaker: "หัวหน้าโจรชิง", text: "ฮ่าฮ่า! กองทหารถอยไปแล้ว ไม่มีผู้นำก็ไม่มีกล้าหาญ เจ้าช่วยถ้ำข้าไว้ได้ นี่ค่าจ้าง" },
     ],
     choices: [
       {

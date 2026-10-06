@@ -28,17 +28,17 @@ export const QUESTS_SPIES: readonly QuestDef[] = [
     stages: [
       {
         id: "scout",
-        description: "ออกจากนครหลวงและค้นหาที่ซ่อนของหัวหน้าโจร",
+        description: "ไปหมู่บ้านชีกู่ มีข่าวว่าหัวหน้าโจรซ่อนตัวอยู่แถวนั้น",
         autoAdvance: { t: "visitedLocation", locationId: "village_qigu" },
       },
       {
         id: "defeat",
-        description: "ปราบหัวหน้าโจรและยึดบัญชีคืน",
+        description: "ปราบหัวหน้าโจร (พบได้ระหว่างเดินทาง) แล้วยึดบัญชีคืน",
         autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 1 },
       },
       {
         id: "return",
-        description: "ส่งบัญชีคืนเฟิงในตรอกบะหมี่",
+        description: "นำบัญชีกลับไปให้เฟิงเจ้าของร้านบะหมี่ในนครหลวง",
       },
     ],
     rewards: [
@@ -66,12 +66,12 @@ export const QUESTS_SPIES: readonly QuestDef[] = [
       },
       {
         id: "defeat_traitor",
-        description: "ปราบมือสังหารที่ปลอมตัวเป็นข้าราชสำนัก",
+        description: "ปราบนักฆ่าเงาที่ปลอมตัวเป็นข้าราชสำนัก",
         autoAdvance: { t: "defeatedOpponent", opponentId: "shadow_assassin", count: 1 },
       },
       {
         id: "report",
-        description: "นำหลักฐานกลับให้เฟิง",
+        description: "นำหลักฐานกลับไปให้เฟิงเจ้าของร้านบะหมี่ในนครหลวง",
       },
     ],
     rewards: [
@@ -107,7 +107,7 @@ export const QUESTS_SPIES: readonly QuestDef[] = [
       },
       {
         id: "report",
-        description: "รายงานซีที่ท่าเรือ",
+        description: "กลับไปรายงานซีคนยกของท่าเรือที่หยางโจว",
       },
     ],
     rewards: [
@@ -128,12 +128,12 @@ export const QUESTS_SPIES: readonly QuestDef[] = [
     stages: [
       {
         id: "track",
-        description: "ตามเส้นทางคาราวานออกจากหยางโจว",
+        description: "ตามเส้นทางคาราวานออกจากหยางโจว แล้วปราบโจรเส้นทางที่ชิงผ้าไหมไป",
         autoAdvance: { t: "defeatedOpponent", opponentId: "road_bandit", count: 1 },
       },
       {
         id: "report",
-        description: "นำตราผ้าไหมคืนให้ซี",
+        description: "นำตราผ้าไหมกลับไปให้ซีคนยกของท่าเรือที่หยางโจว",
       },
     ],
     rewards: [
@@ -158,12 +158,12 @@ export const QUESTS_SPIES: readonly QuestDef[] = [
     stages: [
       {
         id: "find",
-        description: "ค้นหาผู้ฝึกพิษบริเวณป่าใกล้ต้าหลี่",
+        description: "ปราบผู้ฝึกพิษ พ่อค้าพิษที่ออกหากินแถวป่าใกล้ต้าหลี่",
         autoAdvance: { t: "defeatedOpponent", opponentId: "poison_practitioner", count: 1 },
       },
       {
         id: "report",
-        description: "นำหลักฐานคืนเหมย",
+        description: "นำหลักฐานไปให้เหมยพรานป่าที่ต้าหลี่",
       },
     ],
     rewards: [
@@ -186,12 +186,12 @@ export const QUESTS_SPIES: readonly QuestDef[] = [
     stages: [
       {
         id: "intercept",
-        description: "ดักจับทูตและกองกำลังคุ้มกัน",
+        description: "ปราบนักฆ่าเงาที่คุ้มกันทูตใต้ (พบได้ระหว่างเดินทาง)",
         autoAdvance: { t: "defeatedOpponent", opponentId: "shadow_assassin", count: 1 },
       },
       {
         id: "report",
-        description: "นำสารคืนเหมย",
+        description: "นำสารลับไปให้เหมยพรานป่าที่ต้าหลี่",
       },
     ],
     rewards: [
@@ -217,12 +217,12 @@ export const QUESTS_SPIES: readonly QuestDef[] = [
     stages: [
       {
         id: "confront",
-        description: "เผชิญหน้ากับชายเมาในโรงเตี๊ยม",
+        description: "ปราบชายเมาก่อเรื่อง (พบได้ระหว่างเดินทาง)",
         autoAdvance: { t: "defeatedOpponent", opponentId: "drunk_brawler", count: 1 },
       },
       {
         id: "report",
-        description: "รายงานโจวที่เคาน์เตอร์เหล้า",
+        description: "กลับไปรายงานโจวพ่อค้าเหล้าในโรงเตี๊ยมยั่วไหล",
       },
     ],
     rewards: [
@@ -235,8 +235,8 @@ export const QUESTS_SPIES: readonly QuestDef[] = [
 
   {
     id: "qst_spy_inn_wandering_blade",
-    name: "ดาบพเนจรในโรงเตี๊ยม",
-    description: "โจวสังเกตดาบพเนจรคนหนึ่งคุยเรื่องลับซ้ำในโรงเตี๊ยม · เขาคิดว่าเป็นคนของฝ่ายอธรรม ขอให้เจ้าทดสอบฝีมือและเอาคำตอบมา",
+    name: "อาจารย์ดาบในโรงเตี๊ยม",
+    description: "โจวพ่อค้าเหล้าสังเกตว่าอาจารย์ดาบพเนจรคนหนึ่งคุยเรื่องลับในโรงเตี๊ยมบ่อยเกินไป เขาคิดว่าเป็นคนของฝ่ายอธรรม ขอให้เจ้าลองฝีมือแล้วเค้นคำตอบมา",
     briefSummary: "ทดสอบฝีมืออาจารย์ดาบที่ผ่านโรงเตี๊ยมและรายงานโจว",
     type: "side",
     giverNpcId: "spy_inn_zhou",
@@ -244,12 +244,12 @@ export const QUESTS_SPIES: readonly QuestDef[] = [
     stages: [
       {
         id: "test",
-        description: "ทดสอบฝีมืออาจารย์ดาบ",
+        description: "ปราบอาจารย์ดาบ (พบได้ระหว่างเดินทาง)",
         autoAdvance: { t: "defeatedOpponent", opponentId: "blade_master", count: 1 },
       },
       {
         id: "report",
-        description: "รายงานโจว",
+        description: "กลับไปรายงานโจวพ่อค้าเหล้าในโรงเตี๊ยมยั่วไหล",
       },
     ],
     rewards: [
@@ -275,12 +275,12 @@ export const QUESTS_SPIES: readonly QuestDef[] = [
     stages: [
       {
         id: "track",
-        description: "ตามรอยที่ขอบหมู่บ้านชีกู่",
+        description: "ตามรอยผู้ส่งสารที่ขอบหมู่บ้านชีกู่ แล้วปราบโจรเร่ร่อนที่จับตัวเขาไว้",
         autoAdvance: { t: "defeatedOpponent", opponentId: "thug", count: 1 },
       },
       {
         id: "report",
-        description: "รายงานซื่อในไร่",
+        description: "กลับไปรายงานซื่อชาวนาในชีกู่ที่ไร่",
       },
     ],
     rewards: [
@@ -302,12 +302,12 @@ export const QUESTS_SPIES: readonly QuestDef[] = [
     stages: [
       {
         id: "intercept",
-        description: "ดักจับคาราวานเหล็กที่ขอบทะเลทราย",
+        description: "ปราบนักรบทะเลทรายที่คุ้มกันคาราวานเหล็ก (พบได้ระหว่างเดินทาง)",
         autoAdvance: { t: "defeatedOpponent", opponentId: "desert_marauder", count: 1 },
       },
       {
         id: "report",
-        description: "รายงานซื่อพร้อมตัวอย่างเหล็ก",
+        description: "นำตัวอย่างเหล็กไปให้ซื่อชาวนาในชีกู่",
       },
     ],
     rewards: [
@@ -327,19 +327,19 @@ export const QUESTS_SPIES: readonly QuestDef[] = [
   {
     id: "qe_spy_capital_frame_merchant",
     name: "ปลูกหลักฐานใส่พ่อค้า",
-    description: "เฟิงต้องการกำจัดเถ้าแก่หวางที่ขัดขวางเครือข่ายข่าวของเขา · ขอให้เจ้าลอบขโมยของจากร้านพ่อค้าเพื่อใช้เป็นหลักฐานเท็จ",
+    description: "เฟิงเจ้าของร้านบะหมี่อยากโค่นเถ้าแก่หวางแห่งนครหลวงที่ขวางเครือข่ายข่าวของเขา · ขอให้เจ้าลอบขโมยของจากเถ้าแก่หวางมาใช้ปลูกหลักฐานเท็จ",
     briefSummary: "ลักของจากเถ้าแก่หวางในนครหลวง",
     type: "side",
     giverNpcId: "spy_capital_feng",
     stages: [
       {
         id: "steal",
-        description: "ลอบขโมยของจากเถ้าแก่หวาง",
+        description: "ลอบขโมยของจากเถ้าแก่หวางในนครหลวง",
         autoAdvance: { t: "stoleFromNpc", npcId: "merchant_wang", count: 1 },
       },
       {
         id: "deliver",
-        description: "ส่งของให้เฟิงเพื่อปลูกหลักฐาน",
+        description: "นำของไปให้เฟิงเจ้าของร้านบะหมี่ปลูกหลักฐาน",
       },
     ],
     rewards: [
@@ -353,20 +353,20 @@ export const QUESTS_SPIES: readonly QuestDef[] = [
   // 2. Silence a witness — ซี (yangzhou)
   {
     id: "qe_spy_yangzhou_silence_witness",
-    name: "ปิดปากผู้พิพากษา",
-    description: "ผู้พิพากษาอู๋แห่งนครหลวงสืบสวนเครือข่ายลักลอบของซี · เขาต้องการให้เจ้าจัดการให้เงียบไป",
-    briefSummary: "สังหารผู้พิพากษาอู๋แห่งนครหลวง",
+    name: "ปิดปากนายอำเภอ",
+    description: "นายอำเภอหวู่แห่งนครหลวงกำลังสืบเครือข่ายลักลอบของซี · ซีต้องการให้เจ้าทำให้เขาเงียบไปตลอดกาล",
+    briefSummary: "ลอบสังหารนายอำเภอหวู่แห่งนครหลวง",
     type: "side",
     giverNpcId: "spy_yangzhou_xi",
     stages: [
       {
         id: "kill",
-        description: "ลอบสังหารผู้พิพากษาอู๋ที่นครหลวง",
+        description: "ลอบสังหารนายอำเภอหวู่ที่นครหลวง",
         autoAdvance: { t: "assassinatedNpc", npcId: "city_capital_magistrate_wu" },
       },
       {
         id: "report",
-        description: "รายงานซีที่ท่าเรือหยางโจว",
+        description: "กลับไปรายงานซีคนยกของท่าเรือที่หยางโจว",
       },
     ],
     rewards: [
@@ -382,19 +382,19 @@ export const QUESTS_SPIES: readonly QuestDef[] = [
   {
     id: "qe_spy_dali_steal_antidote",
     name: "ลักยาแก้พิษหายาก",
-    description: "เหมยต้องการยาแก้พิษหายากของหมอเสินหนงที่วิลล่ายาวัง · เธอจะใช้ต่อรองกับเครือข่ายพิษ",
-    briefSummary: "ลอบขโมยยาแก้พิษจากหมอเสินหนงแห่งวิลล่ายาวัง",
+    description: "เหมยพรานป่าต้องการยาแก้พิษหายากของหมอเสินหนงที่คุ้มสมุนไพร · นางจะใช้มันต่อรองกับเครือข่ายพิษ",
+    briefSummary: "ลอบขโมยยาแก้พิษจากหมอเสินหนงที่คุ้มสมุนไพร",
     type: "side",
     giverNpcId: "spy_dali_mei",
     stages: [
       {
         id: "steal",
-        description: "ลักยาแก้พิษจากหมอเสินหนง",
+        description: "ขโมยยาแก้พิษจากหมอเสินหนงที่คุ้มสมุนไพร",
         autoAdvance: { t: "stoleFromNpc", npcId: "villa_yaowang_doctor_shennong", count: 1 },
       },
       {
         id: "deliver",
-        description: "ส่งยาแก้พิษให้เหมย",
+        description: "นำยาแก้พิษไปให้เหมยพรานป่าที่ต้าหลี่",
       },
     ],
     rewards: [
@@ -409,20 +409,20 @@ export const QUESTS_SPIES: readonly QuestDef[] = [
   // 4. Steal a strategist's scroll — โจว (inn)
   {
     id: "qe_spy_inn_intimidate_drunk",
-    name: "ม้วนกลยุทธ์ของขุนพล",
-    description: "โจวเชื่อว่าขุนพลคงในจินหลิงคุมเครือข่ายลับที่อาจล้มกรมองครักษ์ · ขอให้เจ้าลักม้วนกลยุทธ์จากจวนเขามา",
-    briefSummary: "ลอบขโมยม้วนกลยุทธ์จากขุนพลคงในจินหลิง",
+    name: "ม้วนกลยุทธ์ของนักยุทธศาสตร์",
+    description: "โจวพ่อค้าเหล้าเชื่อว่านักยุทธศาสตร์กงแห่งจินหลิงคุมเครือข่ายลับที่อาจล้มกรมองครักษ์เสื้อแพรได้ · ขอให้เจ้าลักม้วนกลยุทธ์จากบ้านเขามา",
+    briefSummary: "ลอบขโมยม้วนกลยุทธ์จากนักยุทธศาสตร์กงที่จินหลิง",
     type: "side",
     giverNpcId: "spy_inn_zhou",
     stages: [
       {
         id: "steal",
-        description: "ลักม้วนกลยุทธ์จากจวนขุนพลคง",
+        description: "ขโมยม้วนกลยุทธ์จากนักยุทธศาสตร์กงที่จินหลิง",
         autoAdvance: { t: "stoleFromNpc", npcId: "city_jinling_strategist_kong", count: 1 },
       },
       {
         id: "report",
-        description: "ส่งม้วนกลยุทธ์ให้โจว",
+        description: "นำม้วนกลยุทธ์ไปให้โจวพ่อค้าเหล้าในโรงเตี๊ยมยั่วไหล",
       },
     ],
     rewards: [
@@ -438,7 +438,7 @@ export const QUESTS_SPIES: readonly QuestDef[] = [
   {
     id: "qe_spy_village_kidnap_witness",
     name: "ลักพาตัวพ่อค้าใหญ่",
-    description: "ซื่อจดได้ว่าเถ้าแก่หวางนครหลวงเริ่มรู้แผนของกรม · ขอให้เจ้าลักพาตัวเขามาส่งให้เฟิงในตรอกหลัง",
+    description: "ซื่อชาวนาในชีกู่สืบได้ว่าเถ้าแก่หวางแห่งนครหลวงเริ่มรู้แผนของกรมองครักษ์เสื้อแพร · ขอให้เจ้าลักพาตัวเขามาส่งให้ที่ไร่",
     briefSummary: "ลักพาตัวเถ้าแก่หวางและส่งให้ซื่อ",
     type: "side",
     giverNpcId: "spy_village_si",
@@ -450,7 +450,7 @@ export const QUESTS_SPIES: readonly QuestDef[] = [
       },
       {
         id: "deliver",
-        description: "ส่งตัวเถ้าแก่หวางให้ซื่อในไร่",
+        description: "กลับไปหาซื่อชาวนาในชีกู่ที่ไร่ ส่งตัวเถ้าแก่หวางให้เขา",
       },
     ],
     rewards: [

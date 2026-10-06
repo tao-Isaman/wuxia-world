@@ -9,7 +9,7 @@ export const SCENES_EMEI: readonly Scene[] = [
     kind: "dialog",
     id: "npc_sect_emei_abbess_jingchan_talk",
     lines: [
-      { t: "narration", text: "ท่านนิ้วจิงฉานยืนทอดพระเนตรสวนดอกไม้ด้วยสีหน้าสงบแต่มีเรื่องกังวล" },
+      { t: "narration", text: "ท่านนิ้วห้วนจิงฉานยืนทอดสายตามองสวนดอกไม้ สีหน้าสงบแต่แฝงความกังวล" },
       { t: "dialogue", speaker: "จิงฉาน", text: "ง้อไบ๊สอนให้เราเมตตาต่อสรรพสิ่ง แต่บางครั้งโลกก็บีบให้เราใช้กำลัง" },
       { t: "dialogue", speaker: "จิงฉาน", text: "เจ้ามาด้วยเรื่องอะไร?" },
     ],
@@ -75,7 +75,7 @@ export const SCENES_EMEI: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qst_emei_disciple_intro_offer",
     lines: [
-      { t: "narration", text: "ท่านนิ้วจิงฉานพยักหน้าและยกมือประสานต่อหน้าอก" },
+      { t: "narration", text: "ท่านนิ้วห้วนจิงฉานพยักหน้าและยกมือประสานต่อหน้าอก" },
       { t: "dialogue", speaker: "จิงฉาน", text: "เจ้าต้องการเป็นศิษย์ง้อไบ๊? ดี — ดวงใจเมตตาของเจ้าเหมาะกับสำนักของเรา" },
       { t: "dialogue", speaker: "จิงฉาน", text: "แต่ก่อนรับเจ้าเข้าสำนัก ขอพิสูจน์ความเพียร — เก็บสมุนไพรหายาก ๑๐, โสม ๑๐, เม็ดบัว ๑๐ มาให้ห้องยา" },
       { t: "dialogue", speaker: "จิงฉาน", text: "เมื่อครบแล้วกลับมา ข้าจะรับเจ้าเป็นศิษย์ขั้นที่ ๙" },
@@ -92,7 +92,7 @@ export const SCENES_EMEI: readonly Scene[] = [
       { t: "narration", text: "เจ้าวางสมุนไพรหลากชนิดลงบนแท่นไม้หน้าหอใหญ่" },
       { t: "dialogue", speaker: "จิงฉาน", text: "เจ้ากลับมาแล้ว และครบจำนวนทุกชนิด — ความเพียรของเจ้าน่ายกย่อง" },
       { t: "narration", text: "ท่านยกมือประสานเปล่งวาจาภาวนาเบา ๆ" },
-      { t: "dialogue", speaker: "จิงฉาน", text: "ตั้งแต่บัดนี้ เจ้าคือศิษย์ง้อไบ๊ขั้นที่ ๙ — รับกระบี่อ่อนช้อยและสมาธิเยือกเย็นเป็นวิชาแรกของศิษย์ง้อไบ๊" },
+      { t: "dialogue", speaker: "จิงฉาน", text: "ตั้งแต่บัดนี้ เจ้าคือศิษย์ง้อไบ๊ขั้นที่ ๙ — วิชาของง้อไบ๊ ศิษย์พี่และอาจารย์จะถ่ายทอดให้ทีละขั้นเมื่อเจ้าพิสูจน์ตนได้ — ไปคารวะพวกนางเถิด" },
     ],
     choices: [
       {
@@ -133,7 +133,7 @@ export const SCENES_EMEI: readonly Scene[] = [
     id: "qs_qst_emei_kidnapped_novice_offer",
     lines: [
       { t: "dialogue", speaker: "จิงฉาน", text: "สาวกของเราถูกจับไปเรียกค่าไถ่ ข้ากังวลมาก" },
-      { t: "dialogue", speaker: "จิงฉาน", text: "โจรซ่อนตัวอยู่แถวป่าทางตะวันออก เจ้าช่วยได้ไหม?" },
+      { t: "dialogue", speaker: "จิงฉาน", text: "ชาวบ้านที่หมู่บ้านดอกเหมยน่าจะรู้ว่าโจรซ่อนตัวที่ไหน เจ้าช่วยได้ไหม?" },
     ],
     choices: [
       { text: "รับภารกิจ", next: "sect_emei" },
@@ -144,7 +144,7 @@ export const SCENES_EMEI: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qst_emei_kidnapped_novice_complete",
     lines: [
-      { t: "narration", text: "ท่านนิ้วจิงฉานโอบกอดสาวกผู้กลับมาด้วยความโล่งใจ" },
+      { t: "narration", text: "ท่านนิ้วห้วนจิงฉานโอบกอดสาวกผู้กลับมาด้วยความโล่งใจ" },
       { t: "dialogue", speaker: "จิงฉาน", text: "ขอบคุณมาก... สาวกของเราปลอดภัยแล้ว" },
       { t: "dialogue", speaker: "จิงฉาน", text: "ง้อไบ๊จะไม่ลืมบุญคุณนี้" },
     ],
@@ -169,7 +169,7 @@ export const SCENES_EMEI: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qst_emei_poison_antidote_complete",
     lines: [
-      { t: "narration", text: "ท่านนิ้วรับพิษตะขาบและรีบไปปรุงยา" },
+      { t: "narration", text: "ท่านนิ้วห้วนจิงฉานรับพิษตะขาบและรีบไปปรุงยา" },
       { t: "dialogue", speaker: "จิงฉาน", text: "ดีแล้ว... ข้าจะปรุงยาให้ทันเวลา ขอบคุณยอดยุทธ" },
     ],
     choices: [

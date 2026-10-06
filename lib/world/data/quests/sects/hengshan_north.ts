@@ -10,7 +10,7 @@ export const QUESTS_HENGSHAN_NORTH: readonly QuestDef[] = [
     name: "ขอเข้าเป็นศิษย์เหิงซานเหนือ",
     description:
       "ภิกษุณีเสวียนเยว่รับศิษย์ใหม่ที่ใจสงบและเคารพพระธรรม — แต่ตามประเพณีเหิงซานเหนือ ผู้ใหม่ต้องถวายค่าจดทะเบียน ๕๐๐ ทอง พร้อมกระดาษคัดพระสูตร ๓ แผ่นเป็นเครื่องถวายธรรม",
-    briefSummary: "จ่ายค่าเข้าสำนัก 500 ทอง + ส่งกระดาษคัดสูตร 3 แผ่น เข้าเป็นศิษย์ขั้นที่ 9",
+    briefSummary: "จ่ายค่าเข้าสำนัก 500 ทอง + ส่งกระดาษสาคัดสูตร 3 แผ่น เข้าเป็นศิษย์ขั้นที่ 9",
     type: "side",
     giverNpcId: "sect_hengshan_north_abbess_dingyi",
     prereqs: {
@@ -23,7 +23,7 @@ export const QUESTS_HENGSHAN_NORTH: readonly QuestDef[] = [
     stages: [
       {
         id: "gather_offering",
-        description: "เตรียมกระดาษ 3 แผ่น + เก็บเงินให้ครบ 500 ทอง",
+        description: "เตรียมกระดาษสา 3 แผ่น + เก็บเงินให้ครบ 500 ทอง",
         autoAdvance: {
           t: "and",
           all: [
@@ -54,7 +54,7 @@ export const QUESTS_HENGSHAN_NORTH: readonly QuestDef[] = [
     name: "เตรียมเครื่องถวายปลายเดือน",
     description:
       "วัดเหิงซานเหนือต้องเตรียมกระดาษคัดพระสูตร + เมล็ดบัวเป็นเครื่องถวายในงานพระธรรมประจำเดือน — ศิษย์ใหม่ออกไปเก็บมาให้ครบ",
-    briefSummary: "ส่งกระดาษ 5 + เมล็ดบัว 3 · sect points +50",
+    briefSummary: "ส่งกระดาษสา 5 + เม็ดบัว 3 · แต้มสำนัก +50",
     type: "side",
     sectId: "hengshan_north",
     giverNpcId: "sect_hengshan_north_abbess_dingyi",
@@ -62,7 +62,7 @@ export const QUESTS_HENGSHAN_NORTH: readonly QuestDef[] = [
     stages: [
       {
         id: "gather",
-        description: "เก็บกระดาษ 5 แผ่น + เมล็ดบัว 3 เม็ด",
+        description: "เก็บกระดาษสา 5 แผ่น + เม็ดบัว 3 เม็ด",
         autoAdvance: {
           t: "and",
           all: [
@@ -90,7 +90,7 @@ export const QUESTS_HENGSHAN_NORTH: readonly QuestDef[] = [
     name: "ปราบโจรริมเขาเหิงซาน",
     description:
       "พ่อค้าผู้แสวงบุญถูกโจรเร่ร่อนปล้นริมเชิงเขา — ภิกษุณีเสวียนเยว่ขอให้ศิษย์ออกไปกำราบโจรเพื่อรักษาความสงบในละแวกวัด",
-    briefSummary: "ปราบโจรเร่ร่อน 3 คน · sect points +60",
+    briefSummary: "ปราบโจรเร่ร่อน 3 คน · แต้มสำนัก +60",
     type: "side",
     sectId: "hengshan_north",
     giverNpcId: "sect_hengshan_north_abbess_dingyi",
@@ -119,7 +119,7 @@ export const QUESTS_HENGSHAN_NORTH: readonly QuestDef[] = [
     name: "ถวายหยกประทับพระ",
     description:
       "ภิกษุณีอี๋เหอกำลังแกะสลักหยกประทับพระเพื่อเป็นเครื่องคุ้มของศิษย์ใหม่ — ต้องการหยกบริสุทธิ์ ๓ ก้อน และไม้อ่อน ๒ ชิ้นสำหรับด้ามจับ",
-    briefSummary: "ส่งหยก 3 + ไม้อ่อน 2 · sect points +55",
+    briefSummary: "ส่งหยก 3 + ไม้เนื้ออ่อน 2 · แต้มสำนัก +55",
     type: "side",
     sectId: "hengshan_north",
     giverNpcId: "sect_hengshan_north_abbess_dingyi",
@@ -127,7 +127,7 @@ export const QUESTS_HENGSHAN_NORTH: readonly QuestDef[] = [
     stages: [
       {
         id: "gather",
-        description: "เก็บหยก 3 + ไม้อ่อน 2",
+        description: "เก็บหยก 3 + ไม้เนื้ออ่อน 2",
         autoAdvance: {
           t: "and",
           all: [
@@ -153,7 +153,7 @@ export const QUESTS_HENGSHAN_NORTH: readonly QuestDef[] = [
     id: "qst_hengshan_north_art_mirror",
     name: "บททดสอบก่อนสืบทอด: พลังกระจกธรรม",
     description:
-      "ภิกษุณีเสวียนเยว่ยอมเปิดตำราดาบกระจกธรรมให้ศิษย์ที่พิสูจน์ได้ทั้งดาบและจิตใจ — ต้องผ่านการประลองหัวหน้าโจรและรวบรวมหยกบริสุทธิ์เพื่อขัดกระจกพระธรรม",
+      "ภิกษุณีเสวียนเยว่ยอมเปิดตำราดาบกระจกธรรมให้ศิษย์ที่พิสูจน์ได้ทั้งดาบและจิตใจ — ปราบหัวหน้าโจร 2 คน และหาหยกล้ำค่า 3 ก้อนมาขัดกระจกพระธรรม",
     briefSummary: "บททดสอบ — เปิดทางสู่การสืบทอดพลังกระจกธรรม (ขั้น 3)",
     type: "side",
     sectId: "hengshan_north",
@@ -170,7 +170,7 @@ export const QUESTS_HENGSHAN_NORTH: readonly QuestDef[] = [
     stages: [
       {
         id: "trial_kill",
-        description: "พิสูจน์ดาบ — ปราบหัวหน้าโจร (bandit_chief) 2 คน (ผ่านแล้วจึงรับภารกิจสืบทอดพลังกระจกธรรมได้)",
+        description: "พิสูจน์ดาบ — ปราบหัวหน้าโจร 2 คน",
         autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 2 },
       },
       {
@@ -195,16 +195,15 @@ export const QUESTS_HENGSHAN_NORTH: readonly QuestDef[] = [
   {
     id: "qst_hengshan_north_redemption",
     name: "ไถ่บาปต่อเหิงซานเหนือ",
-    description:
-      "เจ้าผู้ทรยศกลับมาขออภัย — ภิกษุณีเสวียนเยว่ทดสอบความจริงใจเจ้าด้วยภารกิจหนัก ปราบหัวหน้าโจร 5 คน + ถวายหยก 5 ก้อนเพื่อหล่อกระจกใหม่ หากผ่าน ความเป็นทรยศจะถูกล้างเป็น \"ลาออก\" — นักล่าจะหยุดตามล่า แต่วิชาจะถูกแช่แข็ง",
-    briefSummary: "ไถ่บาปต่อเหิงซานเหนือ — ปราบหัวหน้าโจร 5 + ส่งหยกถวาย 5 ชิ้น",
+    description: "เจ้าเคยทรยศเหิงซานเหนือ สำนักจึงส่งนักล่ามาตามเจ้า — แต่ภิกษุณีเสวียนเยว่ยังเปิดทางให้ไถ่โทษ: ปราบหัวหน้าโจร 5 คน แล้วนำหยกล้ำค่า 5 ก้อนมาถวาย หากผ่าน เจ้าจะนับเป็น \"ผู้ลาออก\" แทน \"ผู้ทรยศ\" นักล่าจะเลิกตามล่า แต่วิชาของเหิงซานเหนือที่ติดตัวจะไม่เก่งขึ้นจากการต่อสู้อีก และกลับเข้าสำนักไม่ได้",
+    briefSummary: "ไถ่บาปต่อเหิงซานเหนือ — ปราบหัวหน้าโจร 5 + ถวายหยกล้ำค่า 5 ก้อน",
     type: "side",
     sectId: "hengshan_north",
     giverNpcId: "sect_hengshan_north_abbess_dingyi",
     prereqs: { t: "sectStatus", sectId: "hengshan_north", status: "betrayed" },
     stages: [
-      { id: "trial_kill", description: "ปราบหัวหน้าโจร (bandit_chief) 5 คน เพื่อพิสูจน์ใจ", autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 5 } },
-      { id: "trial_offering", description: "นำของถวาย — หยก 5 ก้อนเพื่อหล่อกระจกใหม่", autoAdvance: { t: "hasItem", itemId: "jade", count: 5 } },
+      { id: "trial_kill", description: "ปราบหัวหน้าโจร 5 คนเพื่อพิสูจน์ว่ากลับใจจริง", autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 5 } },
+      { id: "trial_offering", description: "นำหยกล้ำค่า 5 ก้อนมาถวาย ใช้หล่อกระจกพระธรรมใหม่", autoAdvance: { t: "hasItem", itemId: "jade", count: 5 } },
       { id: "return_to_abbess", description: "กลับไปขออภัยต่อภิกษุณีเสวียนเยว่" },
     ],
     rewards: [

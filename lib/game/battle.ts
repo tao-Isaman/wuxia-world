@@ -842,6 +842,12 @@ export function resolveArtActive(
       logLine(state, cls, `[${state.turn}] ${nm} ⚡<b>${act.n}</b> → Eva+${act.selfV} / ศัตรู Eva${act.eneV}(${act.u}ตา)`);
       break;
     }
+
+    default: {
+      // Every kind needs a case above: a new variant without one is a type error.
+      const unhandled: never = act.t;
+      void unhandled;
+    }
   }
 
   // Meridian saps: once, when the active's attack landed.
