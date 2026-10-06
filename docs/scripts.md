@@ -37,6 +37,9 @@ Every file in `scripts/`, what it does, and whether it is safe to run. Run them 
 | `audit-quest-counts.ts` | `bun scripts/audit-quest-counts.ts` | advisory: stage text numbers versus auto-advance counts (heuristic, many false alarms) |
 | `audit-quest-flow.ts` | `bun scripts/audit-quest-flow.ts` | **legacy** offer → accept → complete heuristic; fails with 168 issues; use `audit-quest-completion.ts` |
 | `smoke-liveness.ts` | `bun scripts/smoke-liveness.ts` | a 90-day NPC simulation smoke test with four checks |
+| `golden-replay.ts` | `bun scripts/golden-replay.ts > out.txt` | a seeded run through nearly every world-store action, printing each result and a hash of the store and the save after it, then hashes of the read models (people on maps, quests per person, the quest guide). Run on the base commit and on a change meant to keep behaviour; `cmp` the outputs |
+| `bench-world.ts` | `bun scripts/bench-world.ts [--days 720]` | micro-benchmarks of the save write, the map view's per-render work, the quest guide, quest re-ticks, walk ticks and rests, on a new game and after a simulated year |
+| `bench-browser.ts` | `bun scripts/bench-browser.ts [--place city_capital] [--seconds 6] [--profile]` | needs a production server on :3017; walks the hero and reports per-frame main-thread costs (CPU ×1 and ×4) and, with `--profile`, the top self-time functions |
 | `check-docs.ts` | `bun scripts/check-docs.ts` | docs links, backticked repo paths, `bun run` names and `bun scripts/…` files resolve (in `test:docs`) |
 | `audit-character-source-bounds.ps1` | `powershell -File scripts\audit-character-source-bounds.ps1 [-ReportPath …]` | source-art ownership of every character sheet. **Windows PowerShell only** |
 
