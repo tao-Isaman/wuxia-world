@@ -235,7 +235,7 @@ Arts scale their `stats` by `level/10` and add `hL` / `mL` HP / MP per level. Wh
 
 ## Effects
 
-All effect unions are discriminated on `t`. The dispatchers are in `lib/game/effects.ts` (skills, passives, ticks) and `lib/game/battle.ts` (art actives). The switches are plain `switch` statements with **no exhaustiveness guard** — a missing case silently does nothing.
+All effect unions are discriminated on `t`. The dispatchers are in `lib/game/effects.ts` (skills, passives, ticks) and `lib/game/battle.ts` (art actives). Each switch ends in a `never` guard (`const unhandled: never = eff`), so a new variant without a case is a type error rather than an effect that silently does nothing.
 
 ### Self effects (skill `se`)
 
@@ -460,7 +460,7 @@ These are how the code behaves today; fix them deliberately, with tests.
 2. Art actives skip mastery, stacks, `pct_atk`, the target's `debuff_def` and equipment `pct_reduce`; a stunned caster still pays MP and cooldown; art misses are reported as 0-damage hits.
 3. Reflect is consumed on the first hit of a multi-hit skill and divided by the hit count.
 4. Percent reduction is not clamped at 100; in an extreme stack, reflect and drain could turn negative.
-5. The effect switches have no exhaustiveness guard. Only `components/game/buff-descriptions.tsx` is compiler-checked, for buff / debuff record types.
+5. The effect switches are compiler-checked for exhaustiveness (a `never` guard in each), as is `components/game/buff-descriptions.tsx` for the buff / debuff record types; text helpers such as `describeEffect` (below) are not.
 6. `components/world/skill-tooltip.tsx` (`describeEffect`) has no text for `buff_cri`, `debuff_atk`, `debuff_def_eva`, `burn_hp_mp`, `poison_dmg` or `stun`, so about 18 skill tooltips show the raw effect name.
 7. `lib/game/grid/ai.ts` re-implements the damage formulas as an estimator. Change both together.
 8. Unused but dispatched: self effects `buff_cri`, `buff_iatk_reduce`, `buff_reflect_eva`; enemy effects `drain_mp`, `dispel`.

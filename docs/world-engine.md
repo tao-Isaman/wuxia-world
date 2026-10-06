@@ -73,7 +73,7 @@ Not in the barrel (import by path): `rollWalkEvent`, `rollFoeSpawn`, `releaseFro
 
 ## Scene effects
 
-`applyEffect(state, effect)` mutates the state; `applyEffects(state, list)` applies them in order, then ticks quest progress once. The dispatcher is a plain `switch` with **no exhaustiveness guard** — a new variant without a case compiles and silently does nothing.
+`applyEffect(state, effect)` mutates the state; `applyEffects(state, list)` applies them in order, then ticks quest progress once. The dispatcher is a plain `switch` ending in a `never` guard: a new variant without a case is a type error.
 
 | `t` | Fields | Does | Used in content |
 | --- | --- | --- | --- |

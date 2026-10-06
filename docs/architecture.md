@@ -202,8 +202,8 @@ Details: [rendering.md](rendering.md) and [grid-combat.md](grid-combat.md#render
   - scenes switch on `kind`;
   - slot strings are a bare skill id or `art:<id>` (`parseSlotId`).
 - **Exhaustiveness.** New variants need a case in every dispatcher.
-  - Combat effect dispatchers enforce it through TypeScript.
-  - The world `applyEffect` switch does **not**: a missing case compiles and silently does nothing.
+  - The combat effect dispatchers, the world `applyEffect` switch and the quest-reward dispatcher end in a `never` guard, so a missing case is a type error.
+  - `evaluateCondition` returns a value from every case, so TypeScript flags a missing one too.
 - **Data field names.**
   - Combat tables use short names (`n`, `sc`, `ti`, `bp`, `st`, `se`, `ee`), matching `demo.html`.
   - World tables use readable names.

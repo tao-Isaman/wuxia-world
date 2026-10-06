@@ -371,6 +371,13 @@ export function applyEffect(state: WorldStateData, eff: SceneEffect): void {
       releaseFromJail(state);
       return;
     }
+
+    default: {
+      // Every SceneEffect kind needs a case above: a new variant without one
+      // is a type error here instead of an effect that silently does nothing.
+      const unhandled: never = eff;
+      void unhandled;
+    }
   }
 }
 
@@ -612,6 +619,12 @@ function applyQuestRewards(state: WorldStateData, rewards: readonly QuestReward[
       case "betraySect":
         applyEffect(state, { t: "betraySect", sectId: r.sectId });
         break;
+
+      default: {
+        // Every kind needs a case above: a new variant without one is a type error.
+        const unhandled: never = r;
+        void unhandled;
+      }
     }
   }
 }
