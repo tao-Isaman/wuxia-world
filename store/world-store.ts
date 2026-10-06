@@ -31,7 +31,7 @@ import { letterGiftLabel, rollLetters } from "@/lib/world/letters";
 import { hasStation, stationTrips } from "@/lib/world/stations";
 import {
   TOURNAMENT, currentTournament, entrantName, entrantOpponentId, finishTournament, pickPrize, playerOpponent, prizeName,
-  registerForTournament, resolveRound, settleTournaments, startBlock, startTournament, ROUND_LABEL, PLACE_LABEL,
+  registerForTournament, resolveRound, sendTournamentInvitation, settleTournaments, startBlock, startTournament, ROUND_LABEL, PLACE_LABEL, TOURNAMENT_NAME,
 } from "@/lib/world/tournament";
 import { useBattleStore } from "@/store/battle-store";
 import { packOpponentIdOf } from "@/lib/world/battle-looks";
@@ -894,11 +894,14 @@ function advanceTime(state: WorldStateData, hours: number): void {
     for (const letter of rollLetters(state, dayBefore)) {
       appendActionLog(state, "letter", `ได้รับจดหมายจาก${getNpc(letter.npcId)?.name ?? "สหาย"}`);
     }
+    // Registration opens: Huashan's chief invites the hero to the tournament.
+    const invite = sendTournamentInvitation(state, dayBefore);
+    if (invite) appendActionLog(state, "letter", `ได้รับจดหมายเชิญร่วม${TOURNAMENT_NAME}จาก${getNpc(invite.npcId)?.name ?? "สำนักหัวซาน"}`);
     const before = state.tournamentHistory.length;
     settleTournaments(state);
     const record = state.tournamentHistory[state.tournamentHistory.length - 1];
     if (state.tournamentHistory.length > before && record) {
-      appendActionLog(state, "tournament", `ชุมนุมวิจารณ์กระบี่ปีที่ ${record.year} จบลง · ผู้ชนะเลิศ ${entrantName(record.champion, state.playerBuild?.name)}`);
+      appendActionLog(state, "tournament", `ชุมนุมวิจารณ์กระบี่เขาหัวซานปีที่ ${record.year} จบลง · ผู้ชนะเลิศ ${entrantName(record.champion, state.playerBuild?.name)}`);
     }
   }
 }
@@ -912,15 +915,15 @@ function settleTournamentBout(state: WorldStateData, won: boolean): void {
   const outcome = resolveRound(state, won);
   const heroName = state.playerBuild?.name;
   appendActionLog(state, "tournament", won
-    ? `ชุมนุมวิจารณ์กระบี่ · ชนะ${ROUND_LABEL[round] ?? ""} · +${outcome.gold} ตำลึง · +${outcome.wExp} w-exp`
-    : `ชุมนุมวิจารณ์กระบี่ · ตกรอบ${ROUND_LABEL[round] ?? ""}`);
+    ? `ชุมนุมวิจารณ์กระบี่เขาหัวซาน · ชนะ${ROUND_LABEL[round] ?? ""} · +${outcome.gold} ตำลึง · +${outcome.wExp} w-exp`
+    : `ชุมนุมวิจารณ์กระบี่เขาหัวซาน · ตกรอบ${ROUND_LABEL[round] ?? ""}`);
   const after = currentTournament(state);
   if (after?.playerOut && after.status === "running") finishTournament(state);
   const done = currentTournament(state);
   if (done?.status === "finished") {
     const place = done.playerPlace;
     appendActionLog(state, "tournament",
-      `ชุมนุมวิจารณ์กระบี่จบลง · ผู้ชนะเลิศ ${entrantName(done.champion!, heroName)}` +
+      `ชุมนุมวิจารณ์กระบี่เขาหัวซานจบลง · ผู้ชนะเลิศ ${entrantName(done.champion!, heroName)}` +
       (place ? ` · ท่านได้${PLACE_LABEL[place] ?? `อันดับ ${place}`}` : "") +
       (done.champion !== "player" && done.championPick ? ` · เลือกวิชา ${prizeName(done.championPick)}` : ""));
   }
@@ -1530,7 +1533,7 @@ export const useWorldStore = create<WorldStore>()(
       registerTournament: () => {
         const draft = draftFrom(get());
         if (!registerForTournament(draft)) return false;
-        appendActionLog(draft, "tournament", `ลงชื่อเข้าร่วมชุมนุมวิจารณ์กระบี่ · ค่าสมัคร ${TOURNAMENT.fee} ตำลึง`);
+        appendActionLog(draft, "tournament", `ลงชื่อเข้าร่วมชุมนุมวิจารณ์กระบี่เขาหัวซาน · ค่าสมัคร ${TOURNAMENT.fee} ตำลึง`);
         set({ ...draft });
         return true;
       },
@@ -1541,7 +1544,7 @@ export const useWorldStore = create<WorldStore>()(
         const draft = draftFrom(s);
         if (currentTournament(draft)?.status === "registered") {
           if (startBlock(draft) || !startTournament(draft)) return false;
-          appendActionLog(draft, "tournament", "ชุมนุมวิจารณ์กระบี่เริ่มขึ้น — จับสลากสายการแข่งขันแล้ว");
+          appendActionLog(draft, "tournament", "ชุมนุมวิจารณ์กระบี่เขาหัวซานเริ่มขึ้น — จับสลากสายการแข่งขันแล้ว");
         }
         const foe = playerOpponent(currentTournament(draft));
         const opponentId = foe ? entrantOpponentId(foe) : null;
@@ -1556,7 +1559,7 @@ export const useWorldStore = create<WorldStore>()(
         const prize = pickPrize(draft, slotId);
         if (!prize) return false;
         applyEffect(draft, prize.kind === "skill" ? { t: "learnSkill", skillId: prize.id } : { t: "learnArt", artId: prize.id });
-        appendActionLog(draft, "tournament", `รางวัลแชมป์ชุมนุมวิจารณ์กระบี่ · ได้เรียน ${prizeName(slotId)}`);
+        appendActionLog(draft, "tournament", `รางวัลแชมป์ชุมนุมวิจารณ์กระบี่เขาหัวซาน · ได้เรียน ${prizeName(slotId)}`);
         set({ ...draft });
         return true;
       },

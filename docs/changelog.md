@@ -6,6 +6,11 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-06
 
+### ชุมนุมวิจารณ์กระบี่เขาหัวซาน
+
+- The sword tournament moved from the capital to **Mount Hua** (the Huashan sect's grounds) and is now called **ชุมนุมวิจารณ์กระบี่เขาหัวซาน**. Its champion's epithet is ยอดกระบี่แห่งเขาหัวซาน.
+- **An invitation letter** arrives the day registration opens (day 60 of each year), from whoever holds Huashan's seat, with the 100-gold fee enclosed for the road.
+
 ### The law bites harder
 
 - **มอบตัว.** Tap the wanted chip to give yourself up: straight to the cells, half the sentence and fine, nothing seized.

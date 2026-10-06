@@ -32,7 +32,7 @@ import styles from "./map-editor/map-editor.module.css";
 const LAST_MAP_KEY = "wuxia-engine-map";
 const SPOT_LABELS: Record<string, string> = {
   shop: "ร้านค้า", sectHall: "หอสำนัก", artisan: "ช่างฝีมือ", rest: "พักผ่อน", rumor: "ข่าวลือ",
-  practice: "ฝึกฝน", resource: "แหล่งวัตถุดิบ", activity: "กิจกรรม", station: "สถานีพักม้า", tournament: "ชุมนุมวิจารณ์กระบี่",
+  practice: "ฝึกฝน", resource: "แหล่งวัตถุดิบ", activity: "กิจกรรม", station: "สถานีพักม้า", tournament: "ชุมนุมวิจารณ์กระบี่เขาหัวซาน",
 };
 const GRID_SIZES = [4, 8, 16, 32] as const;
 
