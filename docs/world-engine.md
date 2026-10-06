@@ -128,16 +128,16 @@ Not in the barrel (import by path): `rollWalkEvent`, `rollFoeSpawn`, `releaseFro
 
 - `QuestDef`: `id`, `name`, `description`, `briefSummary?`, `type?` (`"main"` / `"side"` / `"story"`, default main), `giverNpcId?`, `turnInNpcId?` (defaults to the giver), `prereqs?` (a condition), `stages`, `rewards?`, and for sects `sectId?`, `isArtQuest?`, `minSectRank?`; `isMajor?` fires a rumor about the hero on completion. Compiled sect quests also carry `lineage?: { kind, id }` (a lineage quest teaching that skill or art) or `story?: { arcId, chapter }` (a saga chapter) — see [story-quests.md](story-quests.md).
 - There is no `repeatable` field: a quest with a `sectId` that isn't an art quest is repeatable, with the sect's `questCooldownDays` (30 for every sect).
-- `QuestStage`: `id`, `description`, and at most one of `autoAdvance?` (a condition that advances the stage on its own) or `objective?` (see [Quest objectives](#quest-objectives)). A stage with neither is advanced by a dialog beat (`advanceQuest`) or, on the last stage, by the hand-in.
+- `QuestStage`: `id`, `description`, `autoAdvance?` (a condition that advances the stage on its own) and / or `objective?` (see [Quest objectives](#quest-objectives)). A stage with both moves on as soon as the condition holds; its spot is the way there (a dialog spot that opens the fight a kill stage counts). A stage with neither is advanced by a dialog beat (`advanceQuest`) or, on the last stage, by the hand-in.
 - `QuestState` (in the save): `{ id, status: "active" | "done" | "failed", stage, acceptedDefeatedAt?, acceptedHasItemAt? }`.
-- Quest ids use prefixes by source file: `qc_` (cities), `qv_` (villages), `qw_` (wilderness), `qe_` (evil), `qst_` (sects, temples, spies), and the compiled `ql_` (lineage) and `st_` (saga chapters). Their dialog scenes are `qs_<questId>_offer` and `qs_<questId>_complete`.
+- Quest ids use prefixes by source file: `qc_` (cities), `qv_` (villages), `qw_` (wilderness), `qe_` (evil), `qst_` (sects, temples, spies), and the compiled `ql_` (lineage) and `st_` (saga chapters). Their dialog scenes are `qs_<questId>_offer`, `qs_<questId>_complete` and `qs_<questId>_progress` (the NPC card's 💬 ถามความคืบหน้า on an active quest), plus any beat a choice, a battle outcome or an objective spot opens. `test:quests` (`scripts/test-quest-dialogs.ts`) fails on a `qs_*` dialog that nothing opens.
 
 ### Lifecycle
 
 1. **Offer.**
    - The NPC popup lists quests whose giver or turn-in person is that NPC (`getQuestsForNpc`). `isQuestOfferable` hides every sect quest and every quest that already has an entry (so a done, failed or abandoned quest is never offered again), then checks `prereqs`.
    - Sect quests go through the sect popup: `isSectQuestOfferable(state, def, cooldownDays)` checks, in order, that it is a sect quest, that the hero has a membership (any status), `minSectRank`, art quest not done, not already active, the cooldown since the last completion, then `prereqs`.
-2. **Accept.** `startQuest` is idempotent. It walks every stage's `autoAdvance` and snapshots `defeatedCounts` (and the inventory) for the ids it mentions. `acceptSectQuest` deletes the previous entry first, which is what makes sect quests repeatable.
+2. **Accept.** An offer scene whose accept choice runs `startQuest` (compiled or hand-written) opens from the NPC card **before** the quest is accepted: that choice accepts it (and logs รับภารกิจ), any other choice leaves it on offer. A briefing-only offer (no `startQuest` choice) plays after the card accepts. `startQuest` is idempotent. It walks every stage's `autoAdvance` and snapshots `defeatedCounts` (and the inventory) for the ids it mentions. `acceptSectQuest` deletes the previous entry first, which is what makes sect quests repeatable.
 3. **Progress.** `tickQuestProgress` advances every active quest while its current stage's `autoAdvance` holds. It runs after every `applyEffects`, on location entry, after bad actions, and from a store subscription whenever `inventory` or `defeatedCounts` change — so progress never waits for a scene change.
    - **Kills count since accepting** (`current − acceptedDefeatedAt`).
    - **Items count what the hero holds now** (`inventory ≥ count`), so ore gathered before accepting counts. The `acceptedHasItemAt` snapshot is still written but no longer read.
@@ -177,7 +177,8 @@ Each spot (`QuestObjectiveSpot`) is one of three kinds:
 - Progress per spot is a flag `qobj:<questId>:<stageId>:<spotIndex>` (the stage **id**, not its index), so it rides the save without a migration.
 - When the stage's last spot is done, the quest advances (`advanceQuest`) and progress is re-checked.
 - Helpers: `objectiveSpotsFor(state, quest)`, `openObjectiveSpots`, `objectiveSpotsAt(state, locationId)` (map spots only), `objectiveSpotsForNpc`, `objectiveMarkerId`, `objectiveProgress`, `completeObjectiveSpot`. The store action is `doQuestObjective(questId, spotIndex)`.
-- Today 35 quests use 44 objective stages with 48 spots (39 on maps, 5 at people, 4 opening scenes).
+- A dialog spot stays open until its dialog advances the quest, so a retreat or a lost fight can be tried again there. Its choices should stay at the spot's place (`next` = that location), not jump to the giver: the hand-in is a separate beat.
+- Hand-written quests: 119 use 149 objective stages with 172 spots (140 on maps, 32 at people; 66 open a dialog). The compiled lineage and saga quests add the rest (830 stages in all).
 
 ## Quest guide and tracking
 

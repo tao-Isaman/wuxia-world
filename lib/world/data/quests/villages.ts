@@ -133,7 +133,7 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
         description: "ตรวจรอยเท้าข้างบ่อน้ำกลางหมู่บ้านชีกู่",
         objective: {
           spots: [
-            { locationId: "village_qigu", label: "ตรวจรอยเท้าข้างบ่อน้ำ", text: "รอยเท้าเปื้อนผงสีเขียวนำออกไปจากบ่อ — นางเหมยน่าจะรู้ว่าเป็นของใคร" },
+            { locationId: "village_qigu", label: "ตรวจรอยเท้าข้างบ่อน้ำ", sceneId: "qs_qv_qigu_poisoned_well_investigate" },
           ],
         },
       },
@@ -191,8 +191,12 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
     stages: [
       {
         id: "deliver_letter",
-        description: "นำสารของเฉินเยว่ไปส่งที่หมู่บ้านฮิงซาน",
-        autoAdvance: { t: "visitedLocation", locationId: "village_hengshan" },
+        description: "นำสารของเฉินเยว่ไปมอบให้นักดนตรีผู้ท้าที่หมู่บ้านฮิงซาน",
+        objective: {
+          spots: [
+            { locationId: "village_hengshan", label: "มอบสารเพลงให้นักดนตรีผู้ท้า", sceneId: "qs_qv_meihua_music_duel_deliver" },
+          ],
+        },
       },
       {
         id: "return_reply",
@@ -274,8 +278,12 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
     stages: [
       {
         id: "visit_cave",
-        description: "เดินทางไปถ้ำแมงมุม",
-        autoAdvance: { t: "visitedLocation", locationId: "cave_zhizhu" },
+        description: "ไปถ้ำแมงมุม แล้วตามรอยเสือดูว่ามีเสือภูเขาอยู่จริงไหม",
+        objective: {
+          spots: [
+            { locationId: "cave_zhizhu", label: "ตามรอยเสือหน้าถ้ำ", sceneId: "qs_qv_meihua_tiger_track_found" },
+          ],
+        },
       },
       {
         id: "report_back",
@@ -355,19 +363,17 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
   {
     id: "qv_hengshan_winter_aid",
     name: "ช่วยเหลือฤดูหนาว",
-    description: "ฤดูหนาวมาเร็ว ผู้สูงอายุในหมู่บ้านฮิงซานขาดอาหารและยา ผู้อาวุโสอู๋ฝากข้าวหมูแดงกับยาเลือดเล็กให้แจกจนหมด",
-    briefSummary: "แจกข้าวหมูแดงและยาเลือดเล็กจนหมดย่าม แล้วกลับไปบอกผู้อาวุโสอู๋",
+    description: "ฤดูหนาวมาเร็ว ผู้สูงอายุในหมู่บ้านฮิงซานขาดอาหารและยา ผู้อาวุโสอู๋ฝากข้าวหมูแดง 3 จานกับยาเลือดเล็ก 3 ขวดไปส่งให้ยายหลี่กับตาเฉินที่กระท่อมท้ายหมู่บ้าน",
+    briefSummary: "ส่งข้าวหมูแดงและยาเลือดเล็กให้ยายหลี่กับตาเฉิน แล้วกลับไปบอกผู้อาวุโสอู๋",
     type: "side",
     giverNpcId: "vil_hengshan_elder_wu",
     stages: [
       {
         id: "deliver_aid",
-        description: "แจกข้าวหมูแดงและยาเลือดเล็กให้ผู้สูงอายุจนไม่เหลือติดตัว (ให้ของขวัญ ใช้เอง หรือขาย ก็นับ)",
-        autoAdvance: {
-          t: "and",
-          all: [
-            { t: "not", of: { t: "hasItem", itemId: "rice_dish", count: 1 } },
-            { t: "not", of: { t: "hasItem", itemId: "potion", count: 1 } },
+        description: "นำข้าวหมูแดง 3 จานกับยาเลือดเล็ก 3 ขวดไปส่งให้ยายหลี่กับตาเฉินที่กระท่อมท้ายหมู่บ้านฮิงซาน (ถ้าของหายไป ซื้อหาเพิ่มให้ครบ)",
+        objective: {
+          spots: [
+            { locationId: "village_hengshan", label: "ส่งของที่กระท่อมยายหลี่กับตาเฉิน", sceneId: "qs_qv_hengshan_winter_aid_deliver" },
           ],
         },
       },
@@ -400,7 +406,11 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
       {
         id: "search_river",
         description: "เดินทางไปเกาะไร้ชื่อ ตามหาน้อยเติ้ง",
-        autoAdvance: { t: "visitedLocation", locationId: "isle_wuming" },
+        objective: {
+          spots: [
+            { locationId: "isle_wuming", label: "ตามหาน้อยเติ้งตามชายเกาะ", sceneId: "qs_qv_wuxia_missing_boat_found" },
+          ],
+        },
       },
       {
         id: "return_boy",
@@ -428,9 +438,8 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
         id: "investigate_sound",
         description: "ซุ่มฟังเสียงริมแม่น้ำของหมู่บ้านอวู่เซี่ยยามค่ำ",
         objective: {
-          hours: 2,
           spots: [
-            { locationId: "village_wuxia", label: "ซุ่มฟังเสียงริมแม่น้ำยามค่ำ", text: "เสียงผีมาจากขลุ่ยที่พวกลักลอบขนของเป่าส่งสัญญาณกันใต้ต้นหลิว" },
+            { locationId: "village_wuxia", label: "ซุ่มฟังเสียงริมแม่น้ำยามค่ำ", sceneId: "qs_qv_wuxia_river_ghost_discover" },
           ],
         },
       },
@@ -451,20 +460,23 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
     id: "qv_wuxia_pirate_cache",
     name: "สมบัติโจรสลัด",
     description: "ตอนติดเกาะ น้อยเติ้งเห็นโจรสลัดฝังสมบัติไว้ที่หาดทรายของเกาะยกซาน ใต้ต้นโพธิ์สองต้น เติ้งลองหางอยากให้ไปเอามาก่อนโจรจะกลับมา",
-    briefSummary: "ไปเกาะยกซาน แล้วปราบโจรสลัดน้ำที่เฝ้าสมบัติ",
+    briefSummary: "ไปเกาะยกซาน ปราบโจรสลัดน้ำที่เฝ้าสมบัติ แล้วนำกล่องกลับมา",
     type: "side",
     giverNpcId: "vil_wuxia_fisherman_deng",
     prereqs: { t: "questStatus", questId: "qv_wuxia_missing_boat", status: "done" },
     stages: [
       {
         id: "find_cache",
-        description: "เดินทางไปเกาะยกซาน (นกกระยาง) หาสมบัติใต้ต้นโพธิ์สองต้น",
-        autoAdvance: { t: "visitedLocation", locationId: "isle_yuanyang" },
+        description: "ไปเกาะยกซาน (นกกระยาง) ขุดสมบัติใต้ต้นโพธิ์สองต้น — โจรสลัดน้ำยังเฝ้าอยู่",
+        objective: {
+          spots: [
+            { locationId: "isle_yuanyang", label: "ขุดใต้ต้นโพธิ์สองต้น", sceneId: "qs_qv_wuxia_pirate_cache_fight" },
+          ],
+        },
       },
       {
-        id: "defeat_pirates",
-        description: "ปราบโจรสลัดน้ำที่กลับมาเฝ้าสมบัติ แล้วกลับไปหาเติ้งลองหาง",
-        autoAdvance: { t: "defeatedOpponent", opponentId: "river_pirate", count: 1 },
+        id: "return_cache",
+        description: "แบกกล่องสมบัติกลับไปหาเติ้งลองหางที่หมู่บ้านอวู่เซี่ย",
       },
     ],
     rewards: [
@@ -598,7 +610,11 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
       {
         id: "scout_rival",
         description: "ไปลองอาหารที่โรงเตี๊ยมมีหว่าง",
-        autoAdvance: { t: "visitedLocation", locationId: "inn_youjian" },
+        objective: {
+          spots: [
+            { locationId: "inn_youjian", label: "สั่งอาหารชิมและแอบดูครัว", sceneId: "qs_qv_inn_rival_inn_report" },
+          ],
+        },
       },
       {
         id: "report_back",
@@ -657,8 +673,12 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
     stages: [
       {
         id: "find_cave",
-        description: "เดินทางไปถ้ำบทกวีถัง",
-        autoAdvance: { t: "visitedLocation", locationId: "cave_tangshi" },
+        description: "เดินทางไปถ้ำบทกวีถัง แล้วดูภาพสลักบนผนังถ้ำ",
+        objective: {
+          spots: [
+            { locationId: "cave_tangshi", label: "ส่องดูภาพสลักบนผนังถ้ำ", sceneId: "qs_qv_inn_legend_verify_report" },
+          ],
+        },
       },
       {
         id: "report_findings",

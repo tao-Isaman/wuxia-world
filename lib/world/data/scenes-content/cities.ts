@@ -769,22 +769,58 @@ export const SCENES_CITIES: readonly Scene[] = [
     id: "qs_qc_capital_stolen_formula_offer_accept",
     lines: [
       { t: "dialogue", speaker: "หมอหลิน", text: "สองวันก่อนมีหมอดูแปลกหน้ามาวนเวียนหน้าร้าน ทำท่าน่าสงสัย ลองดูร่องรอยหลังร้านก่อน" },
-      { t: "dialogue", speaker: "หมอหลิน", text: "ถ้าคนร้ายฉีกตำรับไปแล้ว ข้าต้องใช้ตำราขั้นสูงสักเล่มมาเทียบเขียนหน้าที่หายขึ้นใหม่ ตลาดนครหลวงมีขาย" },
+      { t: "dialogue", speaker: "หมอหลิน", text: "ถ้าพบคนร้าย ไม่ต้องเอาชีวิตเขา ข้าแค่อยากได้ตำรับคืนมาครบทุกหน้า" },
     ],
     choices: [{ text: "รับทราบ", next: "city_capital" }],
+  },
+  {
+    kind: "dialog",
+    id: "qs_qc_capital_stolen_formula_alley",
+    lines: [
+      { t: "narration", text: "ในตรอกหลังตลาด หมอดูปลอมกำลังกระซิบต่อรองราคากับพ่อค้ายาคนหนึ่ง ห่อผ้าในมือเขาคือตำรับยาที่หายไป" },
+      { t: "dialogue", speaker: "หมอดูปลอม", text: "ตำรับหมอหลวงแท้ ๆ ทั้งเล่ม ราคานี้ถูกยิ่งกว่าดินแล้ว!" },
+    ],
+    choices: [
+      {
+        text: "ขวางไว้ — คืนตำรับของหมอหลินมา!",
+        next: "qs_qc_capital_stolen_formula_recovered",
+        effects: [
+          { t: "triggerBattle", opponentId: "fortune_thief", onWin: "qs_qc_capital_stolen_formula_recovered", onLose: "city_capital", nonFatal: true },
+        ],
+      },
+      { text: "ถอยออกมาก่อน", next: "city_capital" },
+    ],
+  },
+  {
+    kind: "dialog",
+    id: "qs_qc_capital_stolen_formula_recovered",
+    lines: [
+      { t: "narration", text: "หมอดูปลอมทิ้งห่อผ้าแล้วหนีหายเข้าฝูงชน พ่อค้ายาก็รีบเผ่นไปอีกทาง" },
+      { t: "narration", text: "ในห่อผ้าคือตำรับยาลับของหมอหลิน ครบทุกหน้า มีบันทึกลายมือเก่าแทรกอยู่ระหว่างหน้า" },
+    ],
+    choices: [
+      {
+        text: "นำตำรับกลับไปคืนหมอหลิน",
+        next: "city_capital",
+        effects: [
+          { t: "giveItem", itemId: "qst_lin_formula", count: 1 },
+          { t: "advanceQuest", questId: "qc_capital_stolen_formula" },
+        ],
+      },
+    ],
   },
   {
     kind: "dialog",
     id: "qs_qc_capital_stolen_formula_complete",
     lines: [
       { t: "dialogue", speaker: "หมอหลิน", text: "ตำรับยา! ท่านตามคืนได้แล้ว... ขอบคุณจากใจ" },
-      { t: "narration", text: "หมอหลินเปิดตำรับอย่างระมัดระวัง แล้ววางตำราขั้นสูงไว้ข้าง ๆ เพื่อเทียบเขียนหน้าที่ขาดหายด้วยความโล่งใจ" },
+      { t: "narration", text: "หมอหลินเปิดตำรับอย่างระมัดระวัง ปลายนิ้วหยุดที่บันทึกลายมือของพ่อซึ่งยังแทรกอยู่ครบทุกหน้า" },
     ],
     choices: [
       {
-        text: "รับรางวัลความรู้ด้านยา",
+        text: "คืนตำรับและรับรางวัล",
         effects: [
-          { t: "takeItem", itemId: "book_advanced", count: 1 },
+          { t: "takeItem", itemId: "qst_lin_formula", count: 1 },
           { t: "finishQuest", questId: "qc_capital_stolen_formula", success: true },
         ],
         next: "city_capital",

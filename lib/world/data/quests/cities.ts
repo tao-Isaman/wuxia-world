@@ -166,8 +166,8 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
   {
     id: "qc_capital_stolen_formula",
     name: "ตำรับยาที่ถูกขโมย",
-    description: "ตำรับยาลับของหมอหลินถูกขโมยไปจากร้านในนครหลวง สืบรอยคนร้าย ปราบมัน แล้วช่วยหมอหลินเรียบเรียงตำรับขึ้นใหม่",
-    briefSummary: "สืบรอยหลังร้าน · ปราบหมอดูปลอม · หาตำราขั้นสูงให้หมอหลิน",
+    description: "ตำรับยาลับของหมอหลินถูกขโมยไปจากร้านในนครหลวง สืบรอยคนร้าย ชิงตำรับคืนมา แล้วนำกลับไปคืนหมอหลิน",
+    briefSummary: "สืบรอยหลังร้าน · ชิงตำรับคืนจากหมอดูปลอม · นำตำรับคืนหมอหลิน",
     type: "side",
     giverNpcId: "city_capital_physician_lin",
     prereqs: { t: "npcRelationship", npcId: "city_capital_physician_lin", min: 5 },
@@ -177,19 +177,22 @@ export const QUESTS_CITIES: readonly QuestDef[] = [
         description: "สืบร่องรอยหลังร้านยาของหมอหลินในนครหลวง",
         objective: {
           spots: [
-            { locationId: "city_capital", label: "สืบร่องรอยหลังคลินิก", text: "รอยเท้าเปื้อนผงยาพาไปถึงตรอกหลังตลาด — คนร้ายเป็นหัวขโมยเร่ร่อนที่ชอบดักคนตามทาง" },
+            { locationId: "city_capital", label: "สืบร่องรอยหลังคลินิก", text: "รอยเท้าเปื้อนผงยาพาไปถึงตรอกหลังตลาด — คนร้ายคือหมอดูปลอมที่ยังวนเวียนหาคนซื้อตำรับอยู่แถวนั้น" },
           ],
         },
       },
       {
         id: "find_thief",
-        description: "ปราบหมอดูปลอม หัวขโมยที่ฉกตำรับยาไป (พบได้ระหว่างเดินทาง)",
-        autoAdvance: { t: "defeatedOpponent", opponentId: "fortune_thief", count: 1 },
+        description: "ดักหมอดูปลอมในตรอกหลังตลาดนครหลวง แล้วชิงตำรับยาคืนมา",
+        objective: {
+          spots: [
+            { locationId: "city_capital", label: "ดักหมอดูปลอมในตรอกหลังตลาด", sceneId: "qs_qc_capital_stolen_formula_alley" },
+          ],
+        },
       },
       {
         id: "return_formula",
-        description: "ตำรับที่ได้คืนขาดไปหลายหน้า หาตำราขั้นสูง 1 เล่ม (ขายที่ตลาดนครหลวง) ให้หมอหลินใช้เทียบเขียนส่วนที่หายขึ้นใหม่",
-        autoAdvance: { t: "hasItem", itemId: "book_advanced", count: 1 },
+        description: "นำตำรับยาลับกลับไปคืนหมอหลินที่คลินิก",
       },
     ],
     rewards: [

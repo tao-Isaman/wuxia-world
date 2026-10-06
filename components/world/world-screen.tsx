@@ -6,6 +6,7 @@ import { VictorySpoils } from "./victory-spoils";
 import { ArrestReport, DeathReport } from "./death-report";
 import { WuxiaButton } from "@/components/ui/wuxia/button";
 import { npcsAt } from "@/lib/world/npc-life";
+import { dialogSpeaker } from "@/lib/world/speaker";
 import { useWorldStore } from "@/store/world-store";
 import { useBattleStore } from "@/store/battle-store";
 import { confirmDialog } from "@/store/confirm-store";
@@ -112,9 +113,7 @@ export function WorldScreen() {
   // Who stands here now, travellers included (lib/world/npc-life.ts).
   const localNpcs = candidate ? [...npcsAt(useWorldStore.getState(), candidate.id), ...candidate.npcs] : [];
   const speaker = scene?.kind === "dialog"
-    ? [...localNpcs, ...NPCS].find((npc) => npc.dialogSceneId === scene.id) ??
-      scene.lines.flatMap((line) => line.t === "dialogue"
-        ? [...localNpcs, ...NPCS].filter((npc) => npc.name === line.speaker) : [])[0]
+    ? [...localNpcs, ...NPCS].find((npc) => npc.dialogSceneId === scene.id) ?? dialogSpeaker(scene, localNpcs)
     : undefined;
   const speakingHere = speaker && localNpcs.some((npc) => npc.id === speaker.id);
   // Only an authored successor belongs to this conversation. Returning to town

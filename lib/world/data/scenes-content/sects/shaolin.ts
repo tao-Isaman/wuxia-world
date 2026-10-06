@@ -10,9 +10,9 @@ export const SCENES_SHAOLIN: readonly Scene[] = [
     id: "npc_sect_shaolin_abbot_huiyuan_talk",
     lines: [
       { t: "narration", text: "เจ้าอาวาสฮุยหยวนนั่งสงบนิ่งในวิหารหลัก สายตาแหลมคมจับจ้องเจ้า" },
-      { t: "dialogue", speaker: "ฮุยหยวน", text: "คนหนุ่ม — ดาบไม่ใช่คำตอบเสมอไป แต่ก็ขาดมันไม่ได้ในยุทธภพ" },
-      { t: "dialogue", speaker: "ฮุยหยวน", text: "สิบกว่าปีก่อนราชสำนักขนคัมภีร์ของเส้าหลินไปครึ่งหอ ปีนี้กลับมาได้ไม่กี่ม้วน ที่เหลืออยู่ในหัวพระแก่อย่างอาตมา" },
-      { t: "dialogue", speaker: "ฮุยหยวน", text: "เจ้าต้องการสิ่งใด? วิชา หรือความถูกต้อง?" },
+      { t: "dialogue", speaker: "เจ้าอาวาสฮุยหยวน", text: "คนหนุ่ม — ดาบไม่ใช่คำตอบเสมอไป แต่ก็ขาดมันไม่ได้ในยุทธภพ" },
+      { t: "dialogue", speaker: "เจ้าอาวาสฮุยหยวน", text: "สิบกว่าปีก่อนราชสำนักขนคัมภีร์ของเส้าหลินไปครึ่งหอ ปีนี้กลับมาได้ไม่กี่ม้วน ที่เหลืออยู่ในหัวพระแก่อย่างอาตมา" },
+      { t: "dialogue", speaker: "เจ้าอาวาสฮุยหยวน", text: "เจ้าต้องการสิ่งใด? วิชา หรือความถูกต้อง?" },
     ],
     choices: [
       {
@@ -58,9 +58,9 @@ export const SCENES_SHAOLIN: readonly Scene[] = [
     id: "qs_qst_shaolin_disciple_intro_offer",
     lines: [
       { t: "narration", text: "เจ้าอาวาสฮุยหยวนพยักหน้าช้า ๆ" },
-      { t: "dialogue", speaker: "ฮุยหยวน", text: "เจ้าต้องการเป็นศิษย์เส้าหลิน? ดี — แต่วิชาเส้าหลินไม่ใช่สิ่งที่ให้กันได้ง่าย ๆ" },
-      { t: "dialogue", speaker: "ฮุยหยวน", text: "ห้องยาของวัดต้องการสมุนไพรหลากชนิด — สมุนไพรหายาก ๑๐, โสม ๑๐, เม็ดบัว ๑๐" },
-      { t: "dialogue", speaker: "ฮุยหยวน", text: "นำมาให้ครบ แล้วเจ้าจะได้รับการรับรองเป็นศิษย์ขั้นที่ ๙ — นั่นคือบทพิสูจน์แรกของเจ้า" },
+      { t: "dialogue", speaker: "เจ้าอาวาสฮุยหยวน", text: "เจ้าต้องการเป็นศิษย์เส้าหลิน? ดี — แต่วิชาเส้าหลินไม่ใช่สิ่งที่ให้กันได้ง่าย ๆ" },
+      { t: "dialogue", speaker: "เจ้าอาวาสฮุยหยวน", text: "ห้องยาของวัดต้องการสมุนไพรหลากชนิด — สมุนไพรหายาก ๑๐, โสม ๑๐, เม็ดบัว ๑๐" },
+      { t: "dialogue", speaker: "เจ้าอาวาสฮุยหยวน", text: "นำมาให้ครบ แล้วเจ้าจะได้รับการรับรองเป็นศิษย์ขั้นที่ ๙ — นั่นคือบทพิสูจน์แรกของเจ้า" },
     ],
     choices: [
       {
@@ -75,9 +75,9 @@ export const SCENES_SHAOLIN: readonly Scene[] = [
     id: "qs_qst_shaolin_disciple_intro_complete",
     lines: [
       { t: "narration", text: "เจ้าวางสมุนไพรหลากชนิดลงบนแท่นหินด้านหน้าเจ้าอาวาส" },
-      { t: "dialogue", speaker: "ฮุยหยวน", text: "เจ้ากลับมาแล้ว และครบจำนวนทุกชนิด... ไม่ใช่เรื่องง่าย แต่เจ้าทำได้" },
+      { t: "dialogue", speaker: "เจ้าอาวาสฮุยหยวน", text: "เจ้ากลับมาแล้ว และครบจำนวนทุกชนิด... ไม่ใช่เรื่องง่าย แต่เจ้าทำได้" },
       { t: "narration", text: "ท่านพยักหน้าและยกมือขวาขึ้นปลายนิ้วประดิษฐานไว้กลางอก" },
-      { t: "dialogue", speaker: "ฮุยหยวน", text: "ตั้งแต่บัดนี้ เจ้าคือศิษย์เส้าหลินขั้นที่ ๙ — วิชาของสำนัก ศิษย์พี่และอาจารย์จะถ่ายทอดให้ทีละขั้นเมื่อเจ้าพิสูจน์ตนได้ — ไปคารวะพวกเขาเถิด" },
+      { t: "dialogue", speaker: "เจ้าอาวาสฮุยหยวน", text: "ตั้งแต่บัดนี้ เจ้าคือศิษย์เส้าหลินขั้นที่ ๙ — วิชาของสำนัก ศิษย์พี่และอาจารย์จะถ่ายทอดให้ทีละขั้นเมื่อเจ้าพิสูจน์ตนได้ — ไปคารวะพวกเขาเถิด" },
     ],
     choices: [
       {
@@ -97,7 +97,7 @@ export const SCENES_SHAOLIN: readonly Scene[] = [
     kind: "dialog",
     id: "npc_sect_shaolin_abbot_huiyuan_talk_skill",
     lines: [
-      { t: "dialogue", speaker: "ฮุยหยวน", text: "วิชาเส้าหลินไม่ใช่สิ่งให้ได้ง่าย ๆ พิสูจน์จิตใจเจ้าก่อน" },
+      { t: "dialogue", speaker: "เจ้าอาวาสฮุยหยวน", text: "วิชาเส้าหลินไม่ใช่สิ่งให้ได้ง่าย ๆ พิสูจน์จิตใจเจ้าก่อน" },
       { t: "narration", text: "ท่านจ้องมองเจ้าอย่างสงบ" },
     ],
   },
@@ -106,8 +106,8 @@ export const SCENES_SHAOLIN: readonly Scene[] = [
     kind: "dialog",
     id: "npc_sect_shaolin_abbot_huiyuan_talk_help",
     lines: [
-      { t: "dialogue", speaker: "ฮุยหยวน", text: "คืนที่ผ่านมา พระธาตุสำคัญของเราหายไป" },
-      { t: "dialogue", speaker: "ฮุยหยวน", text: "มีร่องรอยว่าโจรปีนขื่อหนีขึ้นเนินเขาซงซาน หากเจ้าตามไปพบ — ชิงคืนมาเถิด" },
+      { t: "dialogue", speaker: "เจ้าอาวาสฮุยหยวน", text: "คืนที่ผ่านมา พระธาตุสำคัญของเราหายไป" },
+      { t: "dialogue", speaker: "เจ้าอาวาสฮุยหยวน", text: "มีร่องรอยว่าโจรปีนขื่อหนีขึ้นเนินเขาซงซาน หากเจ้าตามไปพบ — ชิงคืนมาเถิด" },
     ],
   },
 
@@ -116,7 +116,7 @@ export const SCENES_SHAOLIN: readonly Scene[] = [
     id: "qs_qst_shaolin_relic_theft_complete",
     lines: [
       { t: "narration", text: "เจ้าวางพระธาตุลงบนแท่นด้วยความนอบน้อม" },
-      { t: "dialogue", speaker: "ฮุยหยวน", text: "ขอบคุณยอดยุทธ เส้าหลินจะจดจำบุญคุณนี้" },
+      { t: "dialogue", speaker: "เจ้าอาวาสฮุยหยวน", text: "ขอบคุณยอดยุทธ เส้าหลินจะจดจำบุญคุณนี้" },
       { t: "narration", text: "เจ้าอาวาสโค้งคำนับอย่างสุขุม" },
     ],
     choices: [
@@ -134,8 +134,8 @@ export const SCENES_SHAOLIN: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qst_shaolin_disciple_gone_offer",
     lines: [
-      { t: "dialogue", speaker: "ฮุยหยวน", text: "มีอีกเรื่องหนึ่ง... ลูกศิษย์ของเราชื่อเพ่ยหัวหายตัวไป" },
-      { t: "dialogue", speaker: "ฮุยหยวน", text: "ได้ยินว่าเขาไปก่อเรื่องที่นครหลวง หากพบเจอ — สั่งสอนได้ แต่อย่าเอาชีวิตเขา พากลับมาให้อาตมา" },
+      { t: "dialogue", speaker: "เจ้าอาวาสฮุยหยวน", text: "มีอีกเรื่องหนึ่ง... ลูกศิษย์ของเราชื่อเพ่ยหัวหายตัวไป" },
+      { t: "dialogue", speaker: "เจ้าอาวาสฮุยหยวน", text: "ได้ยินว่าเขาไปก่อเรื่องที่นครหลวง หากพบเจอ — สั่งสอนได้ แต่อย่าเอาชีวิตเขา พากลับมาให้อาตมา" },
     ],
     choices: [
       {
@@ -152,8 +152,8 @@ export const SCENES_SHAOLIN: readonly Scene[] = [
     id: "qs_qst_shaolin_disciple_gone_complete",
     lines: [
       { t: "narration", text: "เจ้าพาเพ่ยหัวกลับมาถึงวัด หน้าตาของเขาอายแดง" },
-      { t: "dialogue", speaker: "ฮุยหยวน", text: "เพ่ยหัว — กลับมาแล้ว บาปที่ทำไว้ต้องชดใช้ด้วยการฝึกวิชาสามเดือน" },
-      { t: "dialogue", speaker: "ฮุยหยวน", text: "ขอบคุณยอดยุทธ เส้าหลินเป็นหนี้บุญคุณ" },
+      { t: "dialogue", speaker: "เจ้าอาวาสฮุยหยวน", text: "เพ่ยหัว — กลับมาแล้ว บาปที่ทำไว้ต้องชดใช้ด้วยการฝึกวิชาสามเดือน" },
+      { t: "dialogue", speaker: "เจ้าอาวาสฮุยหยวน", text: "ขอบคุณยอดยุทธ เส้าหลินเป็นหนี้บุญคุณ" },
     ],
     choices: [
       {
@@ -170,8 +170,8 @@ export const SCENES_SHAOLIN: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qst_shaolin_proof_of_heart_offer",
     lines: [
-      { t: "dialogue", speaker: "ฮุยหยวน", text: "วิชาของเส้าหลินมิได้เริ่มที่กำปั้น แต่เริ่มที่ใจ" },
-      { t: "dialogue", speaker: "ฮุยหยวน", text: "ตามข้ามา ข้าจะทดสอบจิตใจของเจ้าเอง" },
+      { t: "dialogue", speaker: "เจ้าอาวาสฮุยหยวน", text: "วิชาของเส้าหลินมิได้เริ่มที่กำปั้น แต่เริ่มที่ใจ" },
+      { t: "dialogue", speaker: "เจ้าอาวาสฮุยหยวน", text: "ตามข้ามา ข้าจะทดสอบจิตใจของเจ้าเอง" },
     ],
     choices: [
       { text: "เข้ารับการทดสอบ", next: "qs_qst_shaolin_proof_of_heart_trial" },
@@ -183,8 +183,8 @@ export const SCENES_SHAOLIN: readonly Scene[] = [
     id: "qs_qst_shaolin_proof_of_heart_trial",
     lines: [
       { t: "narration", text: "เจ้าอาวาสนำเจ้าเข้าสู่ห้องลับเล็ก ๆ ที่มีธูปควันขึ้นอบอวล" },
-      { t: "dialogue", speaker: "ฮุยหยวน", text: "ข้าจะถามเจ้าเพียงคำถามเดียว..." },
-      { t: "dialogue", speaker: "ฮุยหยวน", text: "หากเจ้าต้องเลือกระหว่างชัยชนะและความเมตตา — เจ้าจะเลือกอะไร?" },
+      { t: "dialogue", speaker: "เจ้าอาวาสฮุยหยวน", text: "ข้าจะถามเจ้าเพียงคำถามเดียว..." },
+      { t: "dialogue", speaker: "เจ้าอาวาสฮุยหยวน", text: "หากเจ้าต้องเลือกระหว่างชัยชนะและความเมตตา — เจ้าจะเลือกอะไร?" },
     ],
     choices: [
       {
@@ -210,7 +210,7 @@ export const SCENES_SHAOLIN: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qst_shaolin_proof_of_heart_complete_mercy",
     lines: [
-      { t: "dialogue", speaker: "ฮุยหยวน", text: "ดี... นั่นคือหัวใจของพุทธ จิตใจเจ้าผ่านแล้ว" },
+      { t: "dialogue", speaker: "เจ้าอาวาสฮุยหยวน", text: "ดี... นั่นคือหัวใจของพุทธ จิตใจเจ้าผ่านแล้ว" },
       { t: "narration", text: "ท่านพยักหน้าด้วยรอยยิ้ม — ประตูเส้าหลินเปิดรอผู้มีใจเช่นเจ้าแล้ว" },
     ],
     choices: [
@@ -226,8 +226,8 @@ export const SCENES_SHAOLIN: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qst_shaolin_proof_of_heart_complete_strength",
     lines: [
-      { t: "dialogue", speaker: "ฮุยหยวน", text: "มิใช่คำตอบของพระ แต่ก็เป็นคำตอบของยอดยุทธ..." },
-      { t: "dialogue", speaker: "ฮุยหยวน", text: "เส้าหลินยินดีต้อนรับจิตใจที่มุ่งมั่นเพื่อคุ้มครองผู้อื่น" },
+      { t: "dialogue", speaker: "เจ้าอาวาสฮุยหยวน", text: "มิใช่คำตอบของพระ แต่ก็เป็นคำตอบของยอดยุทธ..." },
+      { t: "dialogue", speaker: "เจ้าอาวาสฮุยหยวน", text: "เส้าหลินยินดีต้อนรับจิตใจที่มุ่งมั่นเพื่อคุ้มครองผู้อื่น" },
     ],
     choices: [
       {
@@ -243,8 +243,8 @@ export const SCENES_SHAOLIN: readonly Scene[] = [
     id: "npc_sect_shaolin_elder_faming_talk",
     lines: [
       { t: "narration", text: "อาจารย์ฝาหมิงยืนในลานฝึกอย่างสงบ จ้องมองลูกศิษย์อย่างใส่ใจ" },
-      { t: "dialogue", speaker: "ฝาหมิง", text: "วิชากระดิ่งทองต้องการแร่เทพเป็นตัวช่วยในการฝึก" },
-      { t: "dialogue", speaker: "ฝาหมิง", text: "หากเจ้าหามาได้ ข้าจะตอบแทนให้สมน้ำใจ" },
+      { t: "dialogue", speaker: "อาจารย์ฝาหมิง", text: "วิชากระดิ่งทองต้องการแร่เทพเป็นตัวช่วยในการฝึก" },
+      { t: "dialogue", speaker: "อาจารย์ฝาหมิง", text: "หากเจ้าหามาได้ ข้าจะตอบแทนให้สมน้ำใจ" },
     ],
     choices: [
       {
@@ -279,8 +279,8 @@ export const SCENES_SHAOLIN: readonly Scene[] = [
     id: "qs_qst_shaolin_iron_training_complete",
     lines: [
       { t: "narration", text: "อาจารย์ฝาหมิงรับแร่เทพไปพิจารณาด้วยสายตานักรู้" },
-      { t: "dialogue", speaker: "ฝาหมิง", text: "ดีมาก — แร่นี้จะพาวิชากระดิ่งทองไปสู่ระดับใหม่" },
-      { t: "dialogue", speaker: "ฝาหมิง", text: "วิชานี้ถ่ายทอดตามลำดับขั้นในสำนัก — ถึงเวลาเจ้าจะได้เรียน ส่วนนี่คือคำขอบคุณของข้า" },
+      { t: "dialogue", speaker: "อาจารย์ฝาหมิง", text: "ดีมาก — แร่นี้จะพาวิชากระดิ่งทองไปสู่ระดับใหม่" },
+      { t: "dialogue", speaker: "อาจารย์ฝาหมิง", text: "วิชานี้ถ่ายทอดตามลำดับขั้นในสำนัก — ถึงเวลาเจ้าจะได้เรียน ส่วนนี่คือคำขอบคุณของข้า" },
     ],
     choices: [
       {
@@ -294,41 +294,40 @@ export const SCENES_SHAOLIN: readonly Scene[] = [
     ],
   },
 
+  // ── qst_shaolin_wudang_joint ──────────────────────────────────────
+  // Offer at Shaolin → compare clues with Qingxu at Wudang (objective at his
+  // card) → enter the practice cave (map spot) → face its guardian (map spot)
+  // → choose what to do with the scripture → hand-in to Huiyuan.
   {
     kind: "dialog",
-    id: "qs_qst_shaolin_wudang_joint_start",
+    id: "qs_qst_shaolin_wudang_joint_offer",
     lines: [
-      { t: "narration", text: "เมื่อเจ้าเชื่อมโยงร่องรอยจากพระธาตุเส้าหลินและตราประทับอู่ตังเข้าด้วยกัน" },
-      { t: "narration", text: "ทั้งสองชี้ไปยังถ้ำโบราณที่อยู่ระหว่างสองสำนัก" },
+      { t: "dialogue", speaker: "เจ้าอาวาสฮุยหยวน", text: "พระธาตุของเรากับตราประทับของอู่ตัง ล้วนชี้ไปยังที่เดียวกัน" },
+      { t: "dialogue", speaker: "เจ้าอาวาสฮุยหยวน", text: "นำรอยพระธาตุนี้ไปเทียบกับตราประทับของอาจารย์ชิงซวี่ที่อู่ตัง สองสำนักต้องเห็นร่องรอยนี้ด้วยกัน" },
     ],
     choices: [
       {
-        text: "รับภารกิจร่วมจากเจ้าอาวาสฮุยหยวน",
+        text: "รับภารกิจร่วม",
         next: "sect_shaolin",
-        visibleIf: { t: "questStatus", questId: "qst_shaolin_wudang_joint", status: "none" },
         effects: [{ t: "startQuest", questId: "qst_shaolin_wudang_joint" }],
       },
+      { text: "ยังไม่พร้อม", next: "sect_shaolin" },
     ],
   },
 
   {
-    // Popup accept lands here. Stages 0-1 (discover_connection, enter_cave)
-    // have no autoAdvance; these two beats advance them, then the guardian
-    // fight's defeatedOpponent autoAdvance and the truth scenes finish it.
     kind: "dialog",
-    id: "qs_qst_shaolin_wudang_joint_offer",
+    id: "qs_qst_shaolin_wudang_joint_start",
     lines: [
-      { t: "dialogue", speaker: "ฮุยหยวน", text: "พระธาตุของเรากับตราประทับของอู่ตัง ล้วนชี้ไปยังที่เดียวกัน" },
-      { t: "narration", text: "เมื่อเจ้าเชื่อมโยงร่องรอยทั้งสองเข้าด้วยกัน มันชี้ไปยังถ้ำโบราณที่อยู่ระหว่างสองสำนัก" },
+      { t: "narration", text: "อาจารย์ชิงซวี่วางรอยพระธาตุเส้าหลินลงข้างตราประทับอู่ตัง ลายเส้นสองชิ้นต่อกันเป็นแผนที่เดียว" },
+      { t: "dialogue", speaker: "อาจารย์ชิงซวี่", text: "ทั้งสองชี้ไปยังถ้ำฝึกวิทยายุทธ์ — ถ้ำโบราณที่นักพรตและภิกษุรุ่นก่อนเคยเข้าไปฝึกตนร่วมกัน" },
+      { t: "dialogue", speaker: "อาจารย์ชิงซวี่", text: "ว่ากันว่ามีผู้พิทักษ์เฝ้าส่วนลึกของถ้ำมาหลายชั่วคน ไปเถิด แล้วกลับไปเล่าให้เจ้าอาวาสฮุยหยวนฟังว่าพบอะไร" },
     ],
     choices: [
       {
-        text: "เดินทางไปยังถ้ำโบราณ",
-        next: "qs_qst_shaolin_wudang_joint_cave",
-        effects: [
-          { t: "advanceQuest", questId: "qst_shaolin_wudang_joint" }, // → enter_cave
-          { t: "advanceQuest", questId: "qst_shaolin_wudang_joint" }, // → defeat_guardian
-        ],
+        text: "มุ่งหน้าไปถ้ำฝึกวิทยายุทธ์",
+        next: "sect_wudang",
+        effects: [{ t: "advanceQuest", questId: "qst_shaolin_wudang_joint" }], // → enter_cave
       },
     ],
   },
@@ -343,6 +342,21 @@ export const SCENES_SHAOLIN: readonly Scene[] = [
     ],
     choices: [
       {
+        text: "ก้าวเข้าไปใกล้รูปสลัก",
+        next: "qs_qst_shaolin_wudang_joint_guardian",
+        effects: [{ t: "advanceQuest", questId: "qst_shaolin_wudang_joint" }], // → defeat_guardian
+      },
+    ],
+  },
+
+  {
+    kind: "dialog",
+    id: "qs_qst_shaolin_wudang_joint_guardian",
+    lines: [
+      { t: "narration", text: "เงาร่างสูงใหญ่ลุกขึ้นขวางหน้ารูปสลัก ลมปราณของมันกดทับไปทั้งถ้ำ" },
+    ],
+    choices: [
+      {
         text: "เผชิญหน้ากับผู้พิทักษ์",
         next: "qs_qst_shaolin_wudang_joint_battle",
         effects: [
@@ -350,11 +364,12 @@ export const SCENES_SHAOLIN: readonly Scene[] = [
             t: "triggerBattle",
             opponentId: "demonic_master",
             onWin: "qs_qst_shaolin_wudang_joint_win",
-            onLose: "sect_shaolin",
+            onLose: "cave_zixiu",
             nonFatal: false,
           },
         ],
       },
+      { text: "ถอยออกไปเตรียมตัวก่อน", next: "cave_zixiu" },
     ],
   },
 
@@ -376,19 +391,46 @@ export const SCENES_SHAOLIN: readonly Scene[] = [
     choices: [
       {
         text: "นำคัมภีร์กลับไปให้เจ้าอาวาส",
-        next: "qs_qst_shaolin_wudang_joint_truth_reveal",
+        next: "cave_zixiu",
         effects: [
           { t: "addTrait", trait: "good", amount: 5 },
           { t: "setFlag", flag: "joint_secret_revealed", value: true },
+          { t: "setFlag", flag: "joint_secret_hidden", value: false },
+          { t: "advanceQuest", questId: "qst_shaolin_wudang_joint" }, // → uncover_truth
         ],
       },
       {
         text: "เก็บความลับไว้คนเดียว",
-        next: "qs_qst_shaolin_wudang_joint_secret_keep",
+        next: "cave_zixiu",
         effects: [
           { t: "addTrait", trait: "arrogance", amount: 3 },
           { t: "setFlag", flag: "joint_secret_hidden", value: true },
+          { t: "setFlag", flag: "joint_secret_revealed", value: false },
+          { t: "advanceQuest", questId: "qst_shaolin_wudang_joint" }, // → uncover_truth
         ],
+      },
+    ],
+  },
+
+  {
+    // Hand-in at Huiyuan's card: what the hero chose in the cave decides the report.
+    kind: "dialog",
+    id: "qs_qst_shaolin_wudang_joint_complete",
+    lines: [
+      { t: "narration", text: "เจ้ากลับถึงเส้าหลิน เจ้าอาวาสฮุยหยวนรออยู่ในโถงพระธาตุ อาจารย์ชิงซวี่เดินทางมาสมทบ" },
+    ],
+    choices: [
+      {
+        text: "มอบคัมภีร์และเล่าความจริง",
+        visibleIf: { t: "not", of: { t: "flag", flag: "joint_secret_hidden" } },
+        next: "qs_qst_shaolin_wudang_joint_truth_reveal",
+        effects: [{ t: "finishQuest", questId: "qst_shaolin_wudang_joint", success: true }],
+      },
+      {
+        text: "รายงานว่าไม่พบสิ่งใดพิเศษ",
+        visibleIf: { t: "flag", flag: "joint_secret_hidden" },
+        next: "qs_qst_shaolin_wudang_joint_secret_keep",
+        effects: [{ t: "finishQuest", questId: "qst_shaolin_wudang_joint", success: true }],
       },
     ],
   },
@@ -398,16 +440,10 @@ export const SCENES_SHAOLIN: readonly Scene[] = [
     id: "qs_qst_shaolin_wudang_joint_truth_reveal",
     lines: [
       { t: "narration", text: "เจ้าอาวาสฮุยหยวนและอาจารย์ชิงซวี่ฟังเรื่องราวอย่างตั้งใจ" },
-      { t: "dialogue", speaker: "ฮุยหยวน", text: "อู่ตังและเส้าหลิน... เป็นน้ำหนึ่งใจเดียวกัน ข้าลืมเรื่องนี้ไปนาน" },
-      { t: "dialogue", speaker: "ชิงซวี่", text: "ขอบคุณยอดยุทธ ที่ทำให้เราจำสิ่งที่สำคัญกลับคืนมา" },
+      { t: "dialogue", speaker: "เจ้าอาวาสฮุยหยวน", text: "อู่ตังและเส้าหลิน... เป็นน้ำหนึ่งใจเดียวกัน ข้าลืมเรื่องนี้ไปนาน" },
+      { t: "dialogue", speaker: "อาจารย์ชิงซวี่", text: "ขอบคุณยอดยุทธ ที่ทำให้เราจำสิ่งที่สำคัญกลับคืนมา" },
     ],
-    choices: [
-      {
-        text: "รับรางวัล",
-        next: "sect_shaolin",
-        effects: [{ t: "finishQuest", questId: "qst_shaolin_wudang_joint", success: true }],
-      },
-    ],
+    choices: [{ text: "รับรางวัล", next: "sect_shaolin" }],
   },
 
   {
@@ -415,15 +451,9 @@ export const SCENES_SHAOLIN: readonly Scene[] = [
     id: "qs_qst_shaolin_wudang_joint_secret_keep",
     lines: [
       { t: "narration", text: "เจ้าเก็บคัมภีร์ไว้คนเดียว กลับรายงานว่าไม่พบสิ่งใดพิเศษ" },
-      { t: "dialogue", speaker: "ฮุยหยวน", text: "... ขอบคุณที่ไปสำรวจ" },
+      { t: "dialogue", speaker: "เจ้าอาวาสฮุยหยวน", text: "... ขอบคุณที่ไปสำรวจ" },
       { t: "narration", text: "ความลับยังคงฝังอยู่ใต้ผืนดิน" },
     ],
-    choices: [
-      {
-        text: "รับรางวัล",
-        next: "sect_shaolin",
-        effects: [{ t: "finishQuest", questId: "qst_shaolin_wudang_joint", success: true }],
-      },
-    ],
+    choices: [{ text: "รับรางวัล", next: "sect_shaolin" }],
   },
 ];
