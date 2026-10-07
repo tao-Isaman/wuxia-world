@@ -29,6 +29,9 @@ console.warn = (...args: unknown[]) => {
   if (!String(args[0]).includes("zustand persist middleware")) originalWarn(...args);
 };
 let checks = 0;
+import { ARTS } from "../lib/game/data/arts";
+import { SKILLS } from "../lib/game/data/skills";
+import { passiveLine } from "../lib/game/skill-text";
 function check(name: string, run: () => void) { run(); checks++; console.log("PASS " + name); }
 
 check("movement has constant diagonal speed and stops at its destination", () => {
@@ -253,6 +256,22 @@ SCENES_BY_ID.delete("__runtime_location");
   assert.ok(lines > 5000);
   checks += 3;
 }
+
+check("every inner art's passive can fire, and its text names the real trigger", () => {
+  // use_int fires on internal-attack moves or an internal art active (battle.ts);
+  // a sect with neither can never trigger it.
+  const INT_ACTIVES = new Set(["atk_int_pen", "drain", "drain_acc", "debuff_acc_dmg"]);
+  const intSects = new Set(SKILLS.filter((s) => s.at === "int").map((s) => s.sc));
+  for (const art of ARTS) {
+    if (!art.pas) continue;
+    if (art.pas.tr === "use_int" && !intSects.has(art.sc) && !(art.act && INT_ACTIVES.has(art.act.t))) {
+      throw new Error(`${art.id} (${art.n}): fires on internal-attack moves, but ${art.sc} has none`);
+    }
+    const line = passiveLine(art.pas);
+    if (art.pas.tr === "use_act" && line.includes("โจมตีภายใน")) throw new Error(`${art.id}: its own active read as an internal attack — "${line}"`);
+    if (/\b(?:IA|Int skill|Crit|Phy)\b/.test(line)) throw new Error(`${art.id}: shorthand left in "${line}"`);
+  }
+});
 
 console.warn = originalWarn;
 console.log(checks + " runtime regression checks passed.");

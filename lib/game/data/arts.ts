@@ -1,7 +1,7 @@
 import type { Art } from "../types";
 import { withTextOverrides } from "./text-overrides";
 
-// ─── Inner skills (วิชาในกาย / กำลังภายใน) ────────────────────────
+// ─── Inner skills (ลมปราณ / กำลังภายใน) ────────────────────────
 //
 // 123 arts (+ the `none` placeholder), organised by sect first, then by
 // tier (0..5). Sect names follow SECT_ORDER; anything not tied to a specific sect
@@ -118,7 +118,7 @@ export const ARTS: readonly Art[] = withTextOverrides<Art>("arts", [
   { id: "t1_huashan_light", n: "วิชาตัวเบาหัวซาน", sc: "หัวซาน", tp: "หยิน", types: ["yin"], ti: 1,
     stats: { AGI: 8, DEX: 6, POW: 4 }, hL: 18, mL: 22,
     act: { n: "ตัวเบาดั่งขนนก", c: 18, cd: 3, t: "buff_reduce", v: 20, u: 5, d: "ลด dmg 20% (5ตา) CD3" },
-    pas: { tr: "use_int", ch: 30, d: "Int skill 30% → Eva+10 (5ตา)", e: { t: "buff_eva", n: "ตัวเบา", v: 10, u: 5 } } },
+    pas: { tr: "use_act", ch: 100, d: "ใช้ IA → Eva+10 (5ตา)", e: { t: "buff_eva", n: "ตัวเบา", v: 10, u: 5 } } },
   { id: "t2_huashan_cloud", n: "พลังเมฆคล้อย", sc: "หัวซาน", tp: "หยิน·แข็ง", types: ["yin", "hard"], ti: 2,
     stats: { STR: 8, AGI: 8, DEX: 6, VIT: 4 }, hL: 25, mL: 25,
     act: { n: "เมฆาคลื่นคล้อย", c: 22, cd: 3, t: "atk_phy_pen", m: 1.3, pen: 20, d: "Phy×1.3 ทะลุ DEF 20% CD3" },

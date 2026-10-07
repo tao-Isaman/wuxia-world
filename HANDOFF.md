@@ -82,7 +82,7 @@ Checked on 2026-10-05 for the hero's flat base HP (a new hero starts at 136 HP),
 | `test:docs` | the generated reference is current; every link, repo path and command in the docs resolves |
 | `bun scripts/audit-content.ts` | 235 NPCs · 1115 quests · 4057 scenes, all references resolve |
 | `bun run build` | passes; `/` first-load JS 1.12 MB (was 508 kB before the sagas; the saga text is about 2.9 MB of source, ~500 kB gzipped) |
-| `bun run test:e2e` | all 58 Playwright tests pass against the production build (22 minutes, Chromium 141 via the container shim), including the map editor and its kit brush on `/game/engine` |
+| `bun run test:e2e` | all 59 Playwright tests pass against the production build (18 minutes, Chromium 141 via the container shim), including the map editor and its kit brush on `/game/engine` |
 
 Not verified:
 

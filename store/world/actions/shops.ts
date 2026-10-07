@@ -69,7 +69,7 @@ export const shopsActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "bu
       skillIds: slots,
     };
     rollLukXp(draft);
-    appendActionLog(draft, "learn", `เรียน ${sk.n} (วิชาฝีมือ) · -${price}🟡`);
+    appendActionLog(draft, "learn", `เรียน ${sk.n} (กระบวนท่า) · -${price}🟡`);
     set({ ...draft });
     return { ok: true, id: skillId, spent: price };
   },
@@ -100,7 +100,7 @@ export const shopsActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "bu
     };
     rollLukXp(draft);
     const artDef = getArt(artId);
-    appendActionLog(draft, "learn", `เรียน ${artDef?.n ?? artId} (วิชาในกาย) · -${price}🟡`);
+    appendActionLog(draft, "learn", `เรียน ${artDef?.n ?? artId} (ลมปราณ) · -${price}🟡`);
     set({ ...draft });
     return { ok: true, id: artId, spent: price };
   },

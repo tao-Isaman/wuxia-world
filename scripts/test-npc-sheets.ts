@@ -10,7 +10,7 @@ import { existsSync } from "node:fs";
 import sharp from "sharp";
 import { ANIMATED_NPC_IDS, hasAnimatedSheet } from "../lib/characters/npc-sheets";
 import { CHARACTER_IDS, CREATURE_ATLAS, CREATURE_FRAME_COUNT, FOE_CHARACTER_IDS, PAINTED_CHARACTER_IDS, characterDirectionSheet, characterSheet, creatureCell, hasDirectionalSheet, npcCharacterId } from "../lib/characters/catalog";
-import { creatureFrameFor, findOpponentNpc, foeCharacterFor, opponentLook } from "../lib/world/battle-looks";
+import { creatureFrameFor, findOpponentNpc, foeCharacterFor, foeLook, opponentLook, worldBattleSetup } from "../lib/world/battle-looks";
 import { getNpc } from "../lib/world/data/npcs";
 import { getLocationMap } from "../lib/world/data/location-maps";
 import { OPPONENTS } from "../lib/world/data/opponents";
@@ -309,6 +309,14 @@ await check("walk8: the hero faces the way it moves — eight headings, west mir
   assert.deepEqual(walk8Frame("W", 1), { frame: WALK8_FIRST_FRAME + 2 * 4 + 1, mirror: true });
   assert.deepEqual(walk8Frame("SW", null), { frame: WALK8_FIRST_FRAME + 20 + 1, mirror: true });
   assert.deepEqual(walk8Frame("N", null), { frame: WALK8_FIRST_FRAME + 24, mirror: false });
+});
+
+await check("a foe looks the same on the map, the encounter / briefing screens and in battle", () => {
+  for (const o of OPPONENTS) {
+    const setup = worldBattleSetup(o.id, { bodyId: "m1" });
+    assert.ok(setup, o.id);
+    assert.deepEqual(foeLook(o.id), setup!.looks.B, `${o.id}: the picture shown before the fight is not the one fought`);
+  }
 });
 
 console.log(`${passed} NPC sheet and wander checks passed`);

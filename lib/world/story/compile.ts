@@ -13,6 +13,8 @@ export interface StoryResolvers {
   npcName(id: string): string;
   /** The first place the NPC stands on a painted map. */
   npcHome(id: string): string;
+  /** A location's name on the map (its id when unknown). */
+  placeName(id: string): string;
   npcSpar(id: string): string | undefined;
   opponentName(id: string): string;
   itemName(id: string): string;
@@ -117,7 +119,16 @@ export function compileArc(arc: StoryArcSpec | MainArcSpec, r: StoryResolvers): 
       rewards,
     });
     beatScenes(`qs_${qid}_offer`, chapter.offer, [{ t: "startQuest", questId: qid }], home, out, `cs_${qid}_offer`, `${label} — ${chapter.title}`, arc.id, true);
-    beatScenes(`qs_${qid}_complete`, chapter.complete, [{ t: "finishQuest", questId: qid, success: true }], home, out, `cs_${qid}_complete`, `${label} — ปิดบท`, arc.id);
+    // The hand-in ends by naming the next chapter's giver and where they stand,
+    // unless its own lines already do — so the chain never goes cold.
+    const nextGiver = arc.chapters[index + 1]?.giver;
+    let complete = chapter.complete;
+    if (nextGiver && nextGiver !== chapter.giver) {
+      const name = r.npcName(nextGiver);
+      const said = chapter.complete.lines.some((line) => (typeof line === "string" ? line : line[1]).includes(name.replace(/\s*\(.*$/, "")));
+      if (!said) complete = { ...complete, lines: [...complete.lines, `บทต่อไป: ไปพบ${name}ที่${r.placeName(r.npcHome(nextGiver)).trim()}`] };
+    }
+    beatScenes(`qs_${qid}_complete`, complete, [{ t: "finishQuest", questId: qid, success: true }], home, out, `cs_${qid}_complete`, `${label} — ปิดบท`, arc.id);
   });
   const info: StoryArcInfo = {
     id: arc.id, title: arc.title, tagline: arc.tagline,

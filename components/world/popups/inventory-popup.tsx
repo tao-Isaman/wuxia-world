@@ -104,8 +104,8 @@ export function InventoryPopup({ open, onClose }: Props) {
       if (r.hpHealed > 0) parts.push(`HP +${r.hpHealed}`);
       if (r.mpHealed > 0) parts.push(`MP +${r.mpHealed}`);
       message = parts.length > 0 ? `ฟื้นพลัง: ${parts.join(" · ")}` : "ไม่มีพลังให้ฟื้น";
-    } else if (r.kind === "manualLearnSkill") message = "เรียนวิชาฝีมือสำเร็จ · พร้อมใช้ทันที";
-    else if (r.kind === "manualLearnArt") message = `เรียนวิชาในกายสำเร็จ · เริ่มที่ระดับ ${r.level}`;
+    } else if (r.kind === "manualLearnSkill") message = "เรียนกระบวนท่าสำเร็จ · พร้อมใช้ทันที";
+    else if (r.kind === "manualLearnArt") message = `เรียนลมปราณสำเร็จ · เริ่มที่ระดับ ${r.level}`;
     else if (r.kind === "learnMeridian") message = "เรียนรู้แผนภาพชีพจรสำเร็จ · เปิดจุดชีพจรได้ที่เมนูชีพจร";
     // The last one used: back to the bag, the result as a toast.
     if ((useWorldStore.getState().inventory[id] ?? 0) <= 0) {

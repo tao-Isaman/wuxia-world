@@ -101,7 +101,7 @@ export function applySkillLevelUps(state: WorldStateData, skillId: string): void
     appendActionLog(
       state,
       "learn",
-      `วิชาฝีมือ ${sk.n} เลื่อนขั้นเป็น Lv.${state.skillLevel[skillId]}`,
+      `กระบวนท่า ${sk.n} เลื่อนขั้นเป็น Lv.${state.skillLevel[skillId]}`,
     );
     grantMeridianPoints(state, levelsGained);
   }
@@ -136,7 +136,7 @@ export function applyArtLevelUps(state: WorldStateData, artId: string): void {
     appendActionLog(
       state,
       "learn",
-      `วิชาในกาย ${art.n} เลื่อนขั้นเป็น ${newLv}`,
+      `ลมปราณ ${art.n} เลื่อนขั้นเป็น ${newLv}`,
     );
     grantMeridianPoints(state, levelsGained);
   }

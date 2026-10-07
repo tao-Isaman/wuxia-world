@@ -28,7 +28,7 @@ import {
   xpToNextLevel,
 } from "@/lib/game";
 import type { WeaponFamily } from "@/lib/game";
-import { ATTACK_KIND_LABEL, damageMultiplierText, plainThai, skillFlavour, skillSummaryLines, statLine } from "@/lib/game/skill-text";
+import { ATTACK_KIND_LABEL, damageMultiplierText, passiveLine, plainThai, skillFlavour, skillSummaryLines, statLine } from "@/lib/game/skill-text";
 import { useWorldStore } from "@/store/world-store";
 import { confirmDialog } from "@/store/confirm-store";
 import { ArtTooltip, SkillTooltip } from "../skill-tooltip";
@@ -44,7 +44,7 @@ interface Props {
 }
 
 type LibraryFilter = "all" | "skill" | "art";
-const FILTER_LABEL: Record<LibraryFilter, string> = { all: "ทั้งหมด", skill: "⚔ ฝีมือ", art: "☯ ในกาย" };
+const FILTER_LABEL: Record<LibraryFilter, string> = { all: "ทั้งหมด", skill: "⚔ กระบวนท่า", art: "☯ ลมปราณ" };
 
 // Move-skills popup — the unified "skill tab", three landscape columns:
 //   1. what's been gained (counts, weapon mastery, conflicts) and the 10 round
@@ -184,7 +184,7 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
     if (!info) return;
     const name = info.kind === "art" ? info.art.n : info.skill.n;
     const ok = await confirmDialog({
-      title: info.kind === "art" ? "ลืมวิชาในกาย" : "ลืมวิชา",
+      title: info.kind === "art" ? "ลืมลมปราณ" : "ลืมวิชา",
       message: `ลืมวิชา "${name}"?\nระดับและค่าประสบการณ์ของวิชานี้จะถูกล้าง และต้องเรียนใหม่จากตำราอีกครั้ง`,
       confirmText: "ลืมวิชา",
       variant: "warn",
@@ -196,15 +196,15 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
   };
 
   return (
-    <Modal open={open} onClose={onClose} title={`🥋 วิชาฝีมือ (${slots.length} ช่อง)`} fill>
+    <Modal open={open} onClose={onClose} title={`🥋 กระบวนท่า (${slots.length} ช่อง)`} fill>
       <div className="menu-cols skills-cols">
         {/* ─── 1. What's been gained, and the 10 slots ─────────────── */}
         <section className="menu-col skills-status" aria-label="สถานะวิชา" data-testid="skill-status">
           <div className="skills-stats">
-            <span>วิชาฝีมือ <b>{totalSkills}</b></span>
-            <span>วิชาในกาย <b>{totalArts}</b></span>
+            <span>กระบวนท่า <b>{totalSkills}</b></span>
+            <span>ลมปราณ <b>{totalArts}</b></span>
             <span title="ระดับของทุกวิชารวมกัน">ระดับรวม <b className="text-emerald-600">{skillLevelSum}</b></span>
-            {equippedArtLv !== null && <span>ระดับวิชาในกาย <b>{equippedArtLv}</b></span>}
+            {equippedArtLv !== null && <span>ระดับลมปราณ <b>{equippedArtLv}</b></span>}
             <span title="ประสบการณ์ยุทธ (w-exp) ใช้เลื่อนระดับวิชาได้ทันที">ประสบการณ์ยุทธ <b className="text-primary">{wExp}</b></span>
           </div>
           <div className="skills-mastery">
@@ -267,7 +267,7 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
                   </span>
                   <span className="skills-library-name">
                     <span>{def.n}</span>
-                    <small>{info.kind === "art" ? "☯ ในกาย" : `⚔ ${WEAPON_FAMILY_LABEL[info.skill.w]}`} · Lv.{lv}</small>
+                    <small>{info.kind === "art" ? "☯ ลมปราณ" : `⚔ ${WEAPON_FAMILY_LABEL[info.skill.w]}`} · ระดับ {lv}</small>
                   </span>
                   {typeof slotIdx === "number" && <b className="skills-library-slot" title={`ติดตั้งช่อง ${slotIdx + 1}`}>{slotIdx + 1}</b>}
                 </button>
@@ -350,7 +350,7 @@ function SkillDetail({ raw, info, level: lv, xp, wExp, conflict, slot, equipLabe
             </SkillTooltip>
           )}
           <div className="text-[11px] text-muted-foreground">
-            {info.kind === "art" ? "☯ วิชาในกาย" : "⚔ วิชาฝีมือ"} · ระดับ {lv}{maxed ? " (สูงสุด)" : ""}
+            {info.kind === "art" ? "☯ ลมปราณ" : "⚔ กระบวนท่า"} · ระดับ {lv}{maxed ? " (สูงสุด)" : ""}
             {typeof slot === "number" ? ` · ติดตั้งช่อง ${slot + 1}` : ""}
           </div>
         </div>
@@ -429,7 +429,7 @@ function ArtNumbers({ art, lv }: { art: ReturnType<typeof getArt>; lv: number })
         </div>
       )}
       {art.act && <div className="text-[11px] text-muted-foreground">⚡ ท่าออกพลัง <strong>{art.act.n}</strong> · ใช้ปราณ {art.act.c} · ใช้แล้วพัก {art.act.cd} ตา · {plainThai(art.act.d)}</div>}
-      {art.pas && <div className="text-[11px] text-muted-foreground">◆ ติดตัว: {plainThai(art.pas.d)}</div>}
+      {art.pas && <div className="text-[11px] text-muted-foreground">◆ ติดตัว: {passiveLine(art.pas)}</div>}
     </>
   );
 }

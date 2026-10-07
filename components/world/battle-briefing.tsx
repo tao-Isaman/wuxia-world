@@ -3,9 +3,8 @@
 import { useEffect, useMemo } from "react";
 import { getOpponent } from "@/lib/world";
 import { battleBriefing, ensureBattleStarted } from "@/lib/world/battle-bridge";
-import { npcCharacterId } from "@/lib/characters/catalog";
 import { rarityColor } from "@/lib/ui/rarity";
-import { CharacterPreview } from "@/components/game/character-preview";
+import { FoePortrait } from "@/components/game/foe-portrait";
 import { useWorldStore } from "@/store/world-store";
 import { PowerReadout } from "./power-readout";
 
@@ -39,7 +38,7 @@ export function BattleBriefingScreen() {
       <p className="encounter-kicker">ก่อนเข้าต่อสู้</p>
       <div className="encounter-body">
         <div className="encounter-portrait" style={{ borderColor: color }} aria-hidden="true">
-          {opponent.category === "beast" ? <span className="encounter-glyph">獸</span> : <CharacterPreview id={npcCharacterId(opponent.id)} animate />}
+          <FoePortrait opponentId={opponent.id} />
         </div>
         <div className="encounter-copy">
           <h2 id="briefing-name" style={{ color }}>{opponent.name}</h2>

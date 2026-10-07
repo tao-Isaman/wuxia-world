@@ -17,7 +17,7 @@ import {
   type Art,
   type Skill,
 } from "@/lib/game";
-import { ATTACK_KIND_LABEL, damageMultiplierText, plainThai, skillFlavour, skillSummaryLines, statLine } from "@/lib/game/skill-text";
+import { ATTACK_KIND_LABEL, damageMultiplierText, passiveLine, plainThai, skillFlavour, skillSummaryLines, statLine } from "@/lib/game/skill-text";
 
 // SkillTooltip / ArtTooltip — wrap any inline trigger node and reveal
 // the full data card on hover (desktop) or tap (mobile). Use these
@@ -63,7 +63,7 @@ export function SkillCard({ skill, level }: { skill: Skill; level?: number }) {
     <div className="space-y-2">
       <div className="space-y-1">
         <div className="flex items-center gap-1.5 flex-wrap">
-          <Badge variant="default" className="text-[9px]">⚔ วิชาฝีมือ</Badge>
+          <Badge variant="default" className="text-[9px]">⚔ กระบวนท่า</Badge>
           <strong className="text-sm font-display">{skill.n}</strong>
           {typeof level === "number" && (
             <Badge variant="default" className="text-[9px]">
@@ -154,7 +154,7 @@ export function ArtCard({ art, level }: { art: Art; level?: number }) {
     <div className="space-y-2">
       <div className="space-y-1">
         <div className="flex items-center gap-1.5 flex-wrap">
-          <Badge variant="default" className="text-[9px]">☯ วิชาในกาย</Badge>
+          <Badge variant="default" className="text-[9px]">☯ ลมปราณ</Badge>
           <strong className="text-sm font-display">{art.n}</strong>
           {typeof level === "number" && (
             <Badge variant="default" className="text-[9px]">
@@ -202,15 +202,7 @@ export function ArtCard({ art, level }: { art: Art; level?: number }) {
 
       {/* Passive */}
       {art.pas && (
-        <div className="text-[11px] text-foreground">
-          <div className="font-medium">
-            ◆ {trigLabel(art.pas.tr)}{" "}
-            <span className="text-muted-foreground text-[10px]">
-              (โอกาส {art.pas.ch}%)
-            </span>
-          </div>
-          <div className="text-[10px] text-muted-foreground">{plainThai(art.pas.d)}</div>
-        </div>
+        <div className="text-[11px] text-foreground">◆ ติดตัว: {passiveLine(art.pas)}</div>
       )}
     </div>
   );
@@ -218,12 +210,3 @@ export function ArtCard({ art, level }: { art: Art; level?: number }) {
 
 // ─── Helpers ──────────────────────────────────────────────────────────
 
-function trigLabel(t: string): string {
-  switch (t) {
-    case "hit_recv": return "เมื่อโดนโจมตี";
-    case "on_crit":  return "เมื่อคริติคอล";
-    case "use_int":  return "เมื่อใช้วิชาโจมตีภายใน";
-    case "use_act":  return "เมื่อใช้วิชาออกพลัง";
-    default:         return t;
-  }
-}

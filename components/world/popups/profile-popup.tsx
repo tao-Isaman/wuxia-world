@@ -244,8 +244,8 @@ export function ProfilePopup({ open, onClose }: Props) {
                       </div>
                       <ul className="space-y-0.5 text-[13px]">
                         <li className="flex justify-between"><span className="text-muted-foreground">พลังพื้นฐาน</span><span className="font-mono">{b}</span></li>
-                        <li className="flex justify-between"><span className="text-muted-foreground">วิชาในกาย</span><span className="font-mono">{fromArts > 0 ? `+${fromArts}` : fromArts}</span></li>
-                        <li className="flex justify-between"><span className="text-muted-foreground">วิชาฝีมือ</span><span className="font-mono">{fromSkills > 0 ? `+${fromSkills}` : fromSkills}</span></li>
+                        <li className="flex justify-between"><span className="text-muted-foreground">ลมปราณ</span><span className="font-mono">{fromArts > 0 ? `+${fromArts}` : fromArts}</span></li>
+                        <li className="flex justify-between"><span className="text-muted-foreground">กระบวนท่า</span><span className="font-mono">{fromSkills > 0 ? `+${fromSkills}` : fromSkills}</span></li>
                         <li className="flex justify-between"><span className="text-muted-foreground">ชีพจร</span><span className="font-mono">{fromMeridians > 0 ? `+${fromMeridians}` : fromMeridians}</span></li>
                         <li className="flex justify-between"><span className="text-muted-foreground">อุปกรณ์</span><span className="font-mono">{fromEquipment > 0 ? `+${fromEquipment}` : fromEquipment}</span></li>
                       </ul>
@@ -254,7 +254,7 @@ export function ProfilePopup({ open, onClose }: Props) {
                           <span className="text-muted-foreground">เกณฑ์เรียนตำรา</span>
                           <span className="font-mono font-semibold text-emerald-700">{learnable}</span>
                         </div>
-                        <div className="text-muted-foreground italic">ใช้รวม วิชาในกาย + วิชาฝีมือ — ไม่นับอุปกรณ์</div>
+                        <div className="text-muted-foreground italic">ใช้รวม ลมปราณ + กระบวนท่า — ไม่นับอุปกรณ์</div>
                       </div>
                     </div>
                   </InfoPopover>

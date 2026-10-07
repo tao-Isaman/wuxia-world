@@ -22,7 +22,7 @@ const MEI = "vil_qigu_herbalist_mei";         // นางเหมย — herba
 const BEI = "home_beichou_hermit_bei";        // เป่ยฉิว — the burned-faced general
 const AMU = "home_beichou_servant_amu";       // อาหมู่คนใบ้ — the company's drummer boy, mute
 const CAO = "home_beichou_herder_cao";        // เสี่ยวเฉ่า — goat girl, reads อาหมู่'s drawings
-const CHEN = "home_tianboguang_soldier_chen"; // ทหารแก่เฉิน — old blade soldier of the company
+const CHEN = "home_tianboguang_soldier_chen"; // ทหารแก่เฉิน — old archer of the company (on the wall)
 const HAN = "home_tianboguang_blade_tian";    // หานเฟยหลาง — reformed outlaw, all mouth
 const LUO = "home_tianboguang_cook_luo";      // ป้าหลัว — the ladle
 const ZHONG = "home_miaoren_spearman_zhong";  // ทหารทวนเฒ่าจง — the company's spear captain
@@ -330,7 +330,7 @@ const ACT1: readonly StoryChapterSpec[] = [
     offer: {
       lines: [
         "เป่ยฉิวเขียนจดหมายสั้น ๆ ฝากมา บนซองมีแค่คำเดียว — **เฉิน**",
-        ["ทหารแก่เฉิน", "ลายมือแบบนี้… แม่ทัพยังมีชีวิตอยู่! สามสิบปีไม่ส่งข่าวสักคำ เพิ่งนึกได้ว่ามีลูกน้องตอนจะให้ไปรบอีกแล้วสินะ"],
+        ["ทหารแก่เฉิน", "ข้าอ่านไม่ออกสักตัว แต่ลายมือโย้เย้แบบนี้ข้าจำได้… แม่ทัพยังมีชีวิตอยู่! สามสิบปีไม่ส่งข่าวสักคำ พอส่งมาก็คงจะให้ไปรบอีกแล้วสินะ"],
         ["ทหารแก่เฉิน", "ฮั่วจิ้นเผิงหรือ ข้าเคยอุ้มมัน มันฉี่ใส่เกราะข้าตอนขวบเดียว ข้ายังจำกลิ่นได้"],
         ["ทหารแก่เฉิน", "ข้าจะไปหุบชีกู่ แต่ฟันข้าหลอไปสามซี่ เดินทางไกลต้องกินของนุ่ม ๆ ไปหาป้าหลัวที ให้นางทำเสบียงให้"],
         ["หานเฟยหลาง", "ข้าได้ยินนะ! รบหรือ ข้าไปด้วย! ผู้เดินทางหมื่นลี้เพียงลำพังอย่างข้า ไม่เคยพลาดศึกใหญ่!"],

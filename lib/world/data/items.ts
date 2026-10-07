@@ -391,7 +391,7 @@ function scrollItems(): ItemDef[] {
     })),
     ...ARTS.filter((a) => a.id !== "none").map((a): ItemDef => ({
       id: scrollItemId("art", a.id), name: `คัมภีร์${a.n}`, category: "manual", price: 0,
-      description: `คัมภีร์ลับบันทึกลมปราณ${a.n} (${where(a.sc)}${tier(a.ti)}) — อ่านแล้วจะเรียนวิชาในกายนี้ได้ทันที`,
+      description: `คัมภีร์ลับบันทึกลมปราณ${a.n} (${where(a.sc)}${tier(a.ti)}) — อ่านแล้วจะเรียนลมปราณนี้ได้ทันที`,
       use: { t: "manualLearnArt", artId: a.id, reqStat: "STR", reqValue: 0, level: scrollArtLevel(a.ti) },
     })),
   ];

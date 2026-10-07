@@ -132,6 +132,17 @@ export function opponentLook(opponentId: string | null | undefined, npc?: NpcDef
   return { kind: "character", characterId: foeCharacterFor(opponentId, opp), ...variant };
 }
 
+/**
+ * How a foe looks wherever it is shown — on the map, on the encounter and
+ * briefing screens and in battle — so every picture is the one you fight:
+ * `opponentLook` with the NPC the battle finds for it (by `look.npc`, spar id
+ * or build name, as `worldBattleSetup` does).
+ */
+export function foeLook(opponentId: string | null | undefined): UnitLook {
+  const opponent = getOpponent(opponentId);
+  return opponentLook(opponentId, findOpponentNpc(opponentId, opponent?.build().name));
+}
+
 /** Unit id for the n-th (1-based) pack member of `opponentId`. */
 export const packUnitId = (opponentId: string, n: number): string => `${PACK_PREFIX}${n}:${opponentId}`;
 
@@ -189,11 +200,10 @@ export function worldBattleSetup(opponentId: string, opts: { bodyId?: string | n
   const opponent = getOpponent(opponentId);
   if (!opponent) return null;
   const build = opponent.build();
-  const npc = findOpponentNpc(opponentId, build.name);
   return {
     opponent,
     build,
-    looks: { A: playerLook(opts.bodyId), B: opponentLook(opponentId, npc) },
+    looks: { A: playerLook(opts.bodyId), B: foeLook(opponentId) },
     enemies: opts.withPack ? enemyPackSpecs(opponent, opts.power ?? 0) : [],
   };
 }

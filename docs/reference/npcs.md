@@ -13,7 +13,7 @@
 | `merchant_wang` | เถ้าแก่หวาง | 💬 🤏 | — |
 | `city_capital_clerk_qing` | เสมียนนายฉิง | 💬 | 5 |
 | `city_capital_magistrate_wu` | นายอำเภอหวู่ | 💬 🤏 | 7 |
-| `city_capital_physician_lin` | หมอหลิน | 💬 🤏 | 7 |
+| `city_capital_physician_lin` | หมอหลิน | 💬 🤏 | 6 |
 | `city_capital_merchant_wang` | พ่อค้าหวัง | 💬 🤏 | — |
 | `evil_capital_blackmarket_zhou` | เถ้าแก่โจวตลาดมืด | 💬 🤏 | 11 |
 | `spy_capital_feng` | เฟิงเจ้าของร้านบะหมี่ | 💬 ⚔ 🤏 | 11 |
@@ -29,7 +29,7 @@
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
 | `city_dali_scholar_duan` | บัณฑิตต้วน | 💬 🤏 | 5 |
-| `city_dali_herbalist_bai` | หมอยาไป๋ | 💬 🤏 | 5 |
+| `city_dali_herbalist_bai` | หมอยาไป๋ | 💬 🤏 | 4 |
 | `spy_dali_mei` | เหมยพรานป่า | 💬 ⚔ 🤏 | 3 |
 
 ### หยางโจว (`city_yangzhou`)
@@ -85,7 +85,7 @@
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
 | `village_noname_whip_qiao` | ยายเฉียว | 💬 ⚔ | 9 |
-| `village_noname_carter_lu` | ลู่เกวียน | 💬 ⚔ 🤏 | 6 |
+| `village_noname_carter_lu` | ลู่เกวียน | 💬 ⚔ 🤏 | 5 |
 | `village_noname_child_xiaowu` | เสี่ยวอู๋ | 💬 | 1 |
 
 ### หมู่บ้านดอกเหมย (`village_meihua`)
@@ -358,7 +358,7 @@
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `palace_zhongyang_envoy_liuying` | ทูตหลิวอิง | 💬 🤏 | 3 |
+| `palace_zhongyang_envoy_liuying` | ทูตหลิวอิง | 💬 🤏 | 4 |
 
 ### พระราชวังหลวง (`palace_royal`)
 
@@ -436,7 +436,7 @@
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `wld_hong_adventurer_luo` | หลัวเฟย์หาว (นักผจญภัย) | 💬 | 6 |
+| `wld_hong_adventurer_luo` | หลัวเฟย์หาว (นักผจญภัย) | 💬 | 7 |
 
 ### บ้านไป๋เฝยหยาง (`home_hufei`)
 
@@ -459,7 +459,7 @@
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `home_xuemuhua_doctor_xue` | หมอหลิงมู่ซาน | 💬 🤏 | 8 |
+| `home_xuemuhua_doctor_xue` | หมอหลิงมู่ซาน | 💬 🤏 | 7 |
 | `home_xuemuhua_guest_kang` | เจียงอวิ๋นหลิง | 💬 | 2 |
 | `home_xuemuhua_guest_li` | เหยาซือเหมิง | 💬 ⚔ | 2 |
 | `home_xuemuhua_apprentice_dan` | เสี่ยวตัน | 💬 | — |
@@ -599,7 +599,7 @@
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `wld_heilong_fisherman_tan` | ต่านเหลาตู (ชาวประมงแก่) | 💬 | 7 |
+| `wld_heilong_fisherman_tan` | ต่านเหลาตู (ชาวประมงแก่) | 💬 | 8 |
 
 ## Frontier and special places
 
@@ -614,7 +614,7 @@
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `wld_desert_collector_mo` | โม่ฉิงเทียน (นักสะสมโบราณ) | 💬 | 9 |
+| `wld_desert_collector_mo` | โม่ฉิงเทียน (นักสะสมโบราณ) | 💬 | 10 |
 
 ## Not placed on the map
 

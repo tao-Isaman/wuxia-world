@@ -27,7 +27,7 @@ import { isPlayerTurn, useBattleStore } from "@/store/battle-store";
 import { useCharacterStore } from "@/store/character-store";
 import { BattleLog } from "./battle-log";
 import { BattleCanvas } from "./battle-canvas";
-import { CharacterPreview } from "./character-preview";
+import { LookPortrait } from "./foe-portrait";
 import { InfoPopover } from "@/components/ui/wuxia/info-popover";
 import { buffBadgeLabel, debuffBadgeLabel, describeBuff, describeDebuff } from "./buff-descriptions";
 import { hexColor, statusKey, statusStyle } from "@/lib/ui/status-catalog";
@@ -42,16 +42,7 @@ const TIMELINE_LENGTH = 8;
 // ─── Small pieces ──────────────────────────────────────────────────────
 /** A unit's face for the timeline / info card, drawn from its own look. */
 function UnitPortrait({ look }: { look: UnitLook }) {
-  if (look.kind === "creature") {
-    const f = Math.max(0, Math.min(7, look.frame));
-    return <span className="gb-creature" aria-hidden="true"
-      style={{ backgroundPosition: `${(f % 4) * 100 / 3}% ${Math.floor(f / 4) * 100}%` }} />;
-  }
-  if (look.still) {
-    // eslint-disable-next-line @next/next/no-img-element
-    return <span className="gb-still" aria-hidden="true"><img src={look.still} alt="" draggable={false} /></span>;
-  }
-  return <CharacterPreview id={look.characterId} framing="bust" />;
+  return <LookPortrait look={look} />;
 }
 
 function TurnTimeline({ state, onPick }: { state: GridBattleState; onPick: (id: string) => void }) {
