@@ -173,7 +173,7 @@ test("first errand leads to safe training, recovery, and an earned skill upgrade
   expect((await state(page)).wExp).toBe(70 - upgradeCost);
   const payoff = page.getByRole("region", { name: "เลื่อนขั้น หมัดตรง สำเร็จ" });
   await expect(payoff).toBeVisible();
-  await expect(payoff).toContainText("พลังโจมตีพื้นฐาน");
+  await expect(payoff).toContainText("พลังของท่า");
   await expect(payoff).toContainText("14");
   await payoff.getByRole("button", { name: "รับทราบ", exact: true }).click();
   await expect(payoff).toHaveCount(0);

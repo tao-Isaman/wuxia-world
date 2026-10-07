@@ -17,7 +17,7 @@ import {
   type Art,
   type Skill,
 } from "@/lib/game";
-import { ATTACK_KIND_LABEL, damageMultiplierText, passiveLine, plainThai, skillFlavour, skillSummaryLines, statLine } from "@/lib/game/skill-text";
+import { ATTACK_KIND_LABEL, damageMultiplierText, movePower, passiveLine, plainThai, skillFlavour, skillSummaryLines, statLine } from "@/lib/game/skill-text";
 
 // SkillTooltip / ArtTooltip — wrap any inline trigger node and reveal
 // the full data card on hover (desktop) or tap (mobile). Use these
@@ -53,7 +53,6 @@ export function SkillTooltip({ skill, level, children }: SkillTooltipProps) {
 export function SkillCard({ skill, level }: { skill: Skill; level?: number }) {
   const tier = TIERS[skill.ti];
   const lv = level ?? 1;
-  const bpAtLv = Math.round(effectiveBp(skill, lv));
   const mgAtLv = Math.round(effectiveMg(skill, lv));
   const flavour = skillFlavour(skill);
   const types = effectiveTypes(skill);
@@ -106,11 +105,9 @@ export function SkillCard({ skill, level }: { skill: Skill; level?: number }) {
       {/* Numbers, named */}
       <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-[10px] text-muted-foreground">
         <span>
-          พลังโจมตีพื้นฐาน <strong className="text-foreground">{bpAtLv}</strong>
-          {lv < SKILL_LEVEL_MAX && <span className="opacity-60"> (ระดับ 10: {Math.round(effectiveBp(skill, SKILL_LEVEL_MAX))})</span>}
+          พลังของท่า <strong className="text-foreground">{movePower(effectiveBp(skill, lv), skill)}</strong>
+          {lv < SKILL_LEVEL_MAX && <span className="opacity-60"> (ระดับ 10: {movePower(effectiveBp(skill, SKILL_LEVEL_MAX), skill)})</span>}
         </span>
-        {skill.p > 0 && <span>เสริมพลังท่า +{skill.p}%</span>}
-        {skill.f > 0 && <span>ความเสียหายเพิ่ม +{skill.f}</span>}
         {damageMultiplierText(skill.dm) && <span>{damageMultiplierText(skill.dm)}</span>}
         <span>
           ความชำนาญ{WEAPON_FAMILY_LABEL[skill.w]} <strong className="text-foreground">+{mgAtLv}</strong>
