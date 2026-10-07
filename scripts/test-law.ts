@@ -229,7 +229,7 @@ check("dice, meditation and escape: costs, odds and consequences", () => {
   assert.equal(s.wanted, 2, "escaping adds two marks");
 });
 
-check("walking spawns foes that wait on the map: roads and wilds only (towns only a quest's quarry), by zone, at most three; touching one is its encounter", () => {
+check("walking spawns foes that wait on the map: roads and wilds only (towns only a quest's quarry), by habitat, at most three; touching one is its encounter", () => {
   // No dice-roll fights any more: a clean walk tick never springs an encounter by itself.
   const clean = freshState();
   clean.currentSceneId = "city_capital";
@@ -240,14 +240,14 @@ check("walking spawns foes that wait on the map: roads and wilds only (towns onl
   const wild = freshState(); wild.currentSceneId = "cave_jinshe";
   const road = freshState(); road.currentSceneId = "route_home_player__to__city_capital";
   const kinds = (state: typeof city) => {
-    const seen = { human: 0, beast: 0, supernatural: 0 } as Record<string, number>;
+    const seen = { human: 0, beast: 0 } as Record<string, number>;
     for (let i = 0; i < 400; i++) {
       const id = rollFoeSpawn(state, 0);
       if (id) seen[getOpponent(id)?.category ?? "human"]++;
     }
     return seen;
   };
-  const total = (seen: Record<string, number>) => seen.human + seen.beast + seen.supernatural;
+  const total = (seen: Record<string, number>) => seen.human + seen.beast;
   for (const id of ["city_capital", "village_qigu", "sect_wudang", "inn_yuelai", "palace_royal"]) {
     const town = freshState(); town.currentSceneId = id;
     assert.equal(total(kinds(town)), 0, `no stray foe in ${id}`);

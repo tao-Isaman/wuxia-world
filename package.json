@@ -29,6 +29,7 @@
     "test:routes": "bun scripts/test-routes.ts",
     "test:places": "bun scripts/test-places.ts",
     "test:systems": "bun scripts/test-systems.ts",
+    "test:foes": "bun scripts/test-foes.ts",
     "test:quests": "bun scripts/audit-quest-completion.ts && bun scripts/test-quest-dead-ends.ts && bun scripts/test-quest-dialogs.ts && bun scripts/test-quest-turnins.ts && bun scripts/test-quest-guide.ts && bun scripts/test-bad-action-quests.ts",
     "test:engine": "bun scripts/test-engine.ts",
     "test:meridians": "bun scripts/test-meridians.ts && bun scripts/test-meridian-battle.ts",

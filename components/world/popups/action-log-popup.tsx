@@ -33,6 +33,7 @@ const KIND_LABEL: Record<string, string> = {
   kidnap:  "ลักพาตัว",
   letter:  "จดหมาย",
   tournament: "ประลองยุทธ",
+  boss:    "สัตว์ในตำนาน",
 };
 
 const KIND_COLOR: Record<string, string> = {
@@ -53,6 +54,7 @@ const KIND_COLOR: Record<string, string> = {
   activity: "border-teal-500/60 text-teal-700",
   letter:  "border-pink-500/60 text-pink-700",
   tournament: "border-red-600/60 text-red-700",
+  boss:    "border-amber-600/60 text-amber-800",
 };
 
 export function ActionLogPopup({ open, onClose }: Props) {

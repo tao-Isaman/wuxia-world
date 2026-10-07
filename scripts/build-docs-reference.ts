@@ -30,7 +30,10 @@ import { LOCATION_ROUTES } from "@/lib/world/data/location-routes";
 import { regionOf } from "@/lib/world/data/regions";
 import { packMembers } from "@/lib/world/battle-looks";
 import { sectLineage } from "@/lib/world/story/registry";
-import { FIGHT_EVENTS, fightEventsForLocation, zoneOfLocation } from "@/lib/world/data/random-events";
+import { FIGHT_EVENTS, fightEventsForLocation } from "@/lib/world/data/random-events";
+import { FOE_HABITATS } from "@/lib/world/data/habitats";
+import { BOSSES } from "@/lib/world/data/bosses";
+import { powerScore } from "@/lib/game/power-tier";
 
 const OUT_DIR = fileURLToPath(new URL("../docs/reference/", import.meta.url));
 const CHECK = process.argv.includes("--check");
@@ -411,33 +414,32 @@ const pages: Record<string, string> = {};
 // Opponents
 {
   let md = "# Opponents\n\n";
-  const roaming = new Map<string, Set<string>>();
-  for (const loc of locations) for (const ev of fightEventsForLocation(loc.id)) {
-    const zones = roaming.get(ev.opponentId) ?? new Set<string>();
-    zones.add(zoneOfLocation(loc.id));
-    roaming.set(ev.opponentId, zones);
-  }
+  // Habitats (lib/world/data/habitats.ts) and how many places each foe roams at power 1.
+  const roamPlaces = new Map<string, number>();
+  for (const loc of locations) for (const ev of fightEventsForLocation(loc.id, 1)) roamPlaces.set(ev.opponentId, (roamPlaces.get(ev.opponentId) ?? 0) + 1);
   const questFights = count(ALL_EFFECTS.filter((e) => e.t === "triggerBattle"), (e) => (e as { opponentId: string }).opponentId);
-  md += `${OPPONENTS.length} opponents (\`lib/world/data/opponents.ts\`). Foes that turn up on the map while the hero walks come from ${FIGHT_EVENTS.length} fight events filtered by zone (\`lib/world/data/random-events.ts\`).\n\n`;
-  md += "Met via: **roams** = turns up on the map in the listed zones while the hero walks · **hunt** = a hunting node · **spar** = an NPC's practice bout · **scene** = a quest or story battle (count of scene choices) · **law** = pursuers after wanted marks · **betrayal** = hunters after betraying a sect.\n\n";
+  md += `${OPPONENTS.length} opponents (\`lib/world/data/opponents.ts\`). Foes that turn up on the map while the hero walks come from ${FIGHT_EVENTS.length} fight events, each only where it lives (habitats, \`lib/world/data/habitats.ts\`; \`lib/world/data/random-events.ts\`). ${BOSSES.length} legendary beasts wait in their lairs (\`lib/world/data/bosses.ts\`).\n\n`;
+  md += "Power = \`powerScore\` of the build at stat scale 1 (boosted T3 / T4 / NPC-backed builds included). Met via: **roams** = turns up on the map in the listed habitats while the hero walks (places at power 1) · **lair** = a legendary beast's lair · **hunt** = a hunting node · **spar** = an NPC's practice bout · **scene** = a quest or story battle (count of scene choices) · **law** = pursuers after wanted marks · **betrayal** = hunters after betraying a sect.\n\n";
   const byTier = count(OPPONENTS, (o) => `T${o.ti ?? 0}`);
   const byCat = count(OPPONENTS, (o) => o.category ?? "human");
   md += "Per tier: " + Object.entries(byTier).sort().map(([k, v]) => `${k}: ${v}`).join(" · ") + ". Per category: " +
     Object.entries(byCat).map(([k, v]) => `${ENEMY_CATEGORY_LABEL[k as keyof typeof ENEMY_CATEGORY_LABEL] ?? k} (${k}): ${v}`).join(" · ") + ".\n\n";
-  for (let ti = 0; ti <= 4; ti++) {
+  for (let ti = 0; ti <= 5; ti++) {
     const list = OPPONENTS.filter((o) => (o.ti ?? 0) === ti);
     if (!list.length) continue;
     md += `## Tier ${ti} (${list.length})\n\n`;
-    md += table(["Id", "Name", "Category", "Pack", "Drops", "Met via"], list.map((o) => {
+    md += table(["Id", "Name", "Category", "Power", "Pack", "Drops", "Met via"], list.map((o) => {
       const via: string[] = [];
-      const zones = roaming.get(o.id);
-      if (zones) via.push(`roams (${[...zones].sort().join(", ")})`);
+      const home = FOE_HABITATS[o.id];
+      if (home && FIGHT_EVENTS.some((ev) => ev.opponentId === o.id)) via.push(`roams (${home.join(", ")}; ${roamPlaces.get(o.id) ?? 0} places)`);
+      const lair = BOSSES.find((b) => b.id === o.id);
+      if (lair) via.push(`lair (${lair.lair})`);
       if (RESOURCES.some((r) => r.opponentIds?.includes(o.id))) via.push("hunt");
       if (NPCS.some((n) => n.sparOpponentId === o.id)) via.push("spar");
       if (questFights[o.id]) via.push(`scene ×${questFights[o.id]}`);
       if (o.id.startsWith("law_")) via.push("law");
       if (o.id.startsWith("hunter_")) via.push("betrayal");
-      return [code(o.id), esc(o.name), o.category ?? "human", packMembers(o).map((m) => `${m.count}× ${esc(getOpponent(m.opponentId)?.name ?? m.opponentId)}`).join(" + ") || "—",
+      return [code(o.id), esc(o.name), o.category ?? "human", powerScore(o.build()), packMembers(o).map((m) => `${m.count}× ${esc(getOpponent(m.opponentId)?.name ?? m.opponentId)}`).join(" + ") || "—",
         o.drops?.length ?? 0, via.join(", ") || "—"];
     }));
     md += "\n";

@@ -53,8 +53,9 @@ try {
   assert.equal(useWorldStore.getState().currentSceneId, "city_capital");
   const capital = snapshot();
   const offered = inCapital(capital);
-  const expected = LORE_RUMORS.filter(lore => lore.region === "heartland" && lore.channel === "inn");
-  assert.equal(offered.length, expected.length);
+  // The inn hears inn, market and wilderness talk (CHANNEL_ADMITS); five stories at a time.
+  const expected = LORE_RUMORS.filter(lore => lore.region === "heartland" && ["inn", "market", "wilderness"].includes(lore.channel));
+  assert.equal(offered.length, Math.min(5, expected.length));
   assert.ok(offered.length >= 3, "the actual capital inn channel has authored stories immediately");
   for (const rumor of offered) assert.ok(expected.some(lore => lore.text === rumor.text));
   const beforeSelection = clone(capital);
@@ -99,7 +100,7 @@ try {
   useWorldStore.getState().recordRumorHeard(unheard.id);
   assert.deepEqual(useWorldStore.getState().rumorSeenLog, heard.rumorSeenLog, "repeated hearing is idempotent");
   const saved = JSON.parse(memory.get(saveKey)!) as { version: number; state: WorldStateData };
-  assert.equal(saved.version, 25);
+  assert.equal(saved.version, 26);
   assertLore(saved.state);
   for (let i = 0; i < 2; i++) {
     await useWorldStore.persist.rehydrate();
@@ -146,7 +147,7 @@ try {
   // The same selector handles authored lore and generated news. A lore
   // prerequisite must not become optional just because its source is static.
   const gated = clone(capital);
-  const base = offered[0];
+  const base = offered.find(rumor => rumor.channel === "inn")!;
   gated.rumorPool = [
     { ...base, id: "locked_lore", weight: 100, prerequisites: [{ t: "flag", flag: "test_secret_known" }] },
     { ...base, id: "east_lore", region: "east" },

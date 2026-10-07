@@ -50,6 +50,7 @@ function freshState(): WorldStateData {
     tournament: null,
     tournamentHistory: [],
     activityDays: {},
+    bossDefeatedDay: {},
     day: 1,
     time: 0,
     pendingBattle: null,

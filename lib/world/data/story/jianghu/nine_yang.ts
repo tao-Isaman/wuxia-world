@@ -1560,12 +1560,12 @@ const ACT4: readonly StoryChapterSpec[] = [
         [N_KONGXIN, "เด็กคนนั้นหนาวอยู่หลายปี ครั้งหนึ่งโลกทั้งใบเห็นเขาเป็นศพที่ยังเดินได้ — แล้วเขาก็พบตะวันในหุบเหวแห่งหนึ่ง"],
         "นกหิมะตัวหนึ่งบินลงมาเกาะประตูวิหาร ขาของมันผูกกระดาษไว้ ลายมือเฝิงหานเหมยสั้นและห้วน",
         "\"ตู้หานซวงออกจากเมืองตอนกลางคืน ไปทางคุนหลุน มีชายตัวเย็นสามคนตามนางไป ข้าไม่ได้เป็นห่วงนาง ข้าเป็นห่วงแมว — เฝิง\"",
-        [N_KONGXIN, "มือหิมะของนายกองตามล่าเครื่องมือที่ไม่ยอมทำงาน… ไปเถิด ทางขึ้นคุนหลุนมีปีศาจหิมะเพ่นพ่าน ระวังตัว"],
+        [N_KONGXIN, "มือหิมะของนายกองตามล่าเครื่องมือที่ไม่ยอมทำงาน… ไปเถิด ทางขึ้นคุนหลุนมีเสือดาวหิมะเพ่นพ่าน ระวังตัว"],
       ],
       go: "ออกตามตู้หานซวงไปคุนหลุน",
     },
     steps: [
-      { t: "hunt", opponentId: "snow_demon", count: 2, hint: "ฝ่าปีศาจหิมะ 2 ตนบนทางขึ้นเขาคุนหลุน" },
+      { t: "hunt", opponentId: "snow_leopard", count: 2, hint: "ฝ่าเสือดาวหิมะ 2 ตัวบนทางขึ้นเขาคุนหลุน" },
       { t: "duel", locationId: "mt_kunlun", label: "ช่วยตู้หานซวงจากมือหิมะ", hint: "ตามรอยตู้หานซวงขึ้นเขาคุนหลุน ช่วยนางจากมือหิมะของนายกองเว่ย", opponentId: FROST_HAND,
         before: {
           lines: [
@@ -2732,8 +2732,8 @@ const NINE_SUNS: StoryArcSpec = {
       look: { sheet: "foe_cultist", tint: 0xf2efe6, size: 1.1 },
       stats: { POW: 36, STR: 32, AGI: 30, VIT: 30, INT: 28 },
       skillIds: ["mi_firepalm", "nu2", "xy_palm", "nf5"], artId: "qiankun", artLevel: 8 },
-    { id: APE, name: "วานรเผือกเฒ่า", ti: 4, category: "supernatural",
-      look: { sheet: "foe_brute", tint: 0xf2efe6, size: 1.18 },
+    { id: APE, name: "วานรเผือกเฒ่า", ti: 4, category: "beast",
+      look: { frame: 2, tint: 0xf2efe6, size: 1.18 },
       stats: { STR: 42, AGI: 38, VIT: 40, DEX: 30 },
       skillIds: ["nu2", "sl_rock_punch", "ep", "bg_wander_staff"], artId: "tendon", artLevel: 9 },
     { id: PEI_LAST, name: "เผยเหยียนกวง (เพลิงสุดท้าย)", ti: 4, category: "human",

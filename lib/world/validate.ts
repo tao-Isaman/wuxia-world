@@ -6,6 +6,7 @@ import { QUESTS_BY_ID, getQuest } from "./data/quests";
 import { OPPONENTS_BY_ID } from "./data/opponents";
 import { RESOURCES_BY_ID } from "./data/resources";
 import { getNpc } from "./data/npcs";
+import { getBoss } from "./data/bosses";
 import { RECIPES_BY_ID } from "./data/recipes";
 import { SKILLS_BY_ID } from "@/lib/game/data/skills";
 import { ARTS_BY_ID } from "@/lib/game/data/arts";
@@ -335,6 +336,11 @@ export function validateAndRepair(state: WorldStateData): void {
     for (const [id, day] of Object.entries(table)) if (!getNpc(id) || typeof day !== "number") delete table[id];
   }
   if (!state.activityDays || typeof state.activityDays !== "object") state.activityDays = {};
+  // Legendary beasts: drop unknown boss ids and non-numeric days.
+  if (!state.bossDefeatedDay || typeof state.bossDefeatedDay !== "object") state.bossDefeatedDay = {};
+  for (const [id, day] of Object.entries(state.bossDefeatedDay)) {
+    if (!getBoss(id) || typeof day !== "number" || !Number.isFinite(day)) delete state.bossDefeatedDay[id];
+  }
   if (!Array.isArray(state.kidnappedNpcIds)) {
     state.kidnappedNpcIds = [];
   } else {

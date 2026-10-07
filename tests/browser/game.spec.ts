@@ -118,8 +118,9 @@ test("grid battle: tap a tile to move, auto plays to the result, back to the wor
   // The spoils as icons (w-exp and the moves' xp at least); tap one to read it.
   const spoils = page.getByTestId("victory-spoils");
   await expect(spoils).toBeVisible();
-  await spoils.getByRole("button", { name: /w-exp 50/ }).click();
-  await expect(page.getByTestId("victory-spoil-detail")).toContainText("w-exp +50");
+  // A tier-0 person pays 40 w-exp (40 + 20 × tier).
+  await spoils.getByRole("button", { name: /w-exp 40/ }).click();
+  await expect(page.getByTestId("victory-spoil-detail")).toContainText("w-exp +40");
   await expect(spoils.getByRole("button", { name: /หมัดตรง \+\d+ xp/ })).toBeVisible();
   await page.screenshot({ path: "test-results/screenshots/victory-spoils.png" });
   await page.setViewportSize({ width: 844, height: 390 });
@@ -208,7 +209,7 @@ test("version 18 saves migrate and beast battles load the creature atlas", async
   expect(state.playerBodyId).toBe("f1");
   expect(state.gold).toBe(321);
   expect(state.playerBuild.name).toBe("จอมยุทธ์");
-  expect(await page.evaluate(() => JSON.parse(localStorage.getItem("wusia-world-v1")!).version)).toBe(25);
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem("wusia-world-v1")!).version)).toBe(26);
   await expect(page.locator('[data-renderer="phaser"] canvas')).toHaveCount(1);
   await page.setViewportSize({ width: 390, height: 844 });
   await expect.poll(async () => (await page.locator('[data-renderer="phaser"] canvas').boundingBox())!.width).toBeLessThan(390);

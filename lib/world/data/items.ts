@@ -137,6 +137,21 @@ export const ITEMS: readonly ItemDef[] = ([
   { id: "snake_skin",  name: "หนังงู",           category: "material", price: 80,
     description: "หนังงูพิษ ใช้ทำเชือกและเครื่องประดับลับ" },
 
+  // ─── Legendary beast trophies (data/bosses.ts) ─────────────────────
+  // One per win over a legendary beast; a costly crafting material.
+  { id: "trophy_golden_serpent", name: "เกล็ดทองงูยักษ์", category: "material", price: 6000,
+    description: "เกล็ดสีทองแผ่นใหญ่เท่าฝ่ามือจากงูยักษ์เกล็ดทองคำ แข็งกว่าเหล็กกล้า ช่างหลอมถือเป็นของล้ำค่า" },
+  { id: "trophy_blood_tiger", name: "เขี้ยวพยัคฆ์โลหิต", category: "material", price: 6500,
+    description: "เขี้ยวสีแดงคล้ำจากพยัคฆ์โลหิตลายคราม ยาวเกือบคืบ ช่างอาวุธใช้ทำด้ามและปลายอาวุธลับ" },
+  { id: "trophy_sword_eagle", name: "ขนปีกกระบี่อินทรียักษ์", category: "material", price: 7000,
+    description: "ขนปีกแข็งคมดั่งใบกระบี่จากอินทรียักษ์จ้าวแห่งกระบี่ เบาแต่ตัดผ้าไหมได้ในครั้งเดียว" },
+  { id: "trophy_sun_turtle", name: "แผ่นกระดองแบกตะวัน", category: "material", price: 6500,
+    description: "แผ่นกระดองที่ยังอุ่นจากเต่ายักษ์แบกตะวัน ช่างเกราะลือว่าทนได้ทั้งดาบและไฟ" },
+  { id: "trophy_blade_crab", name: "ก้ามดาบปูวิเศษ", category: "material", price: 6500,
+    description: "ก้ามขวาของปูวิเศษจ้าวแห่งดาบ ขอบคมเหมือนคมดาบที่ลับมาร้อยครั้ง" },
+  { id: "trophy_flame_bull", name: "เขาเพลิงกระทิงยักษ์", category: "material", price: 7500,
+    description: "เขาสีแดงดั่งเหล็กเผาไฟของกระทิงยักษ์เขาเพลิง จับแล้วยังอุ่นมือ ช่างหลอมใช้เป็นแกนอาวุธชั้นยอด" },
+
   // ─── Fishing ───────────────────────────────────────────────────────
   { id: "fish_carp",   name: "ปลาคาร์ป",         category: "material", price: 20,
     description: "ปลาน้ำจืดธรรมดา ใช้เป็นอาหารพื้นบ้าน" },

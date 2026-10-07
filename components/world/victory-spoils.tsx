@@ -3,7 +3,8 @@
 import { useMemo, useState } from "react";
 import { getArt, getSkill } from "@/lib/game";
 import { ITEM_CATEGORY_LABEL, getItem } from "@/lib/world";
-import { GOLD_ICON_URL, itemIconUrl } from "@/lib/world/data/item-icons";
+import { GOLD_ICON_URL, equipmentIconUrl, itemIconUrl } from "@/lib/world/data/item-icons";
+import { EQUIPMENT_BY_ID } from "@/lib/game/data/equipment";
 import { itemRarity, rarityColor } from "@/lib/ui/rarity";
 import { CATEGORY_GLYPH, ItemTile } from "@/components/ui/wuxia/item-tile";
 import { ArtIcon, SkillIcon } from "@/components/game/skill-icon";
@@ -14,6 +15,7 @@ type Picked =
   | { kind: "gold"; amount: number }
   | { kind: "wexp"; amount: number }
   | { kind: "item"; itemId: string; count: number }
+  | { kind: "gear"; id: string }
   | { kind: "move"; id: string; move: "skill" | "art"; xp: number };
 
 /**
@@ -53,6 +55,14 @@ export function VictorySpoils() {
             <em>×{it.count}</em>
           </span>;
         })}
+        {(spoils.gear ?? []).map((id) => {
+          const gear = EQUIPMENT_BY_ID.get(id);
+          return <span role="listitem" className="gb-spoil" key={`gear:${id}`}>
+            <ItemTile glyph="甲" icon={equipmentIconUrl(id)} rarity={5} label={gear?.n ?? id}
+              selected={picked?.kind === "gear" && picked.id === id} onClick={() => setPicked({ kind: "gear", id })} />
+            <em>×1</em>
+          </span>;
+        })}
         {spoils.moves.map((m) => {
           const skill = m.kind === "skill" ? getSkill(m.id) : undefined;
           const art = m.kind === "art" ? getArt(m.id) : undefined;
@@ -85,6 +95,9 @@ function SpoilDetail({ picked, onClose }: { picked: Picked; onClose: () => void 
     title = `${def?.name ?? picked.itemId} ×${picked.count}`;
     meta = `${ITEM_CATEGORY_LABEL[def?.category ?? "misc"]}${def?.price ? ` · ราคา ${def.price}` : ""}`;
     body = <>{def?.description && <p>{def.description}</p>}<div className="gb-spoil-effects"><ItemEffects effect={def?.use} battle={def?.battle} /></div></>;
+  } else if (picked.kind === "gear") {
+    title = EQUIPMENT_BY_ID.get(picked.id)?.n ?? picked.id; meta = "อุปกรณ์"; color = rarityColor(5);
+    body = <p>อุปกรณ์ชั้นยอดจากสัตว์ในตำนาน เก็บเข้าถุงอุปกรณ์แล้ว</p>;
   } else {
     const skill = picked.move === "skill" ? getSkill(picked.id) : undefined;
     const art = picked.move === "art" ? getArt(picked.id) : undefined;

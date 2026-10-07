@@ -156,7 +156,7 @@ export interface StoryOpponentSpec {
   id: string;
   name: string;
   ti: 0 | 1 | 2 | 3 | 4;
-  category?: "human" | "beast" | "supernatural";
+  category?: "human" | "beast";
   look?: { sheet?: string; frame?: number; tint?: number; size?: number; npc?: string };
   stats?: Partial<Record<StatKey, number>>;
   skillIds: readonly string[];

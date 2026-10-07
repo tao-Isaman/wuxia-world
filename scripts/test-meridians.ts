@@ -479,7 +479,7 @@ check("store: openMeridianNode spends points, keeps order, stops at rank 3", () 
 
 check("save: v24 persists meridianPoints; migrate defaults it; repair drops unknown charts and fixes ranks", () => {
   const options = useWorldStore.persist.getOptions();
-  assert.equal(options.version, 25);
+  assert.equal(options.version, 26);
   newGame();
   useWorldStore.setState({ meridianPoints: 7 });
   const saved = options.partialize!(store()) as { meridianPoints?: number };

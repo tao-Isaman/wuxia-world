@@ -6,12 +6,15 @@ import { gatherSuccessChance, getOpponent, getResource, masteryLevel, pickWeight
 import { isLawOpponent } from "@/lib/world/law";
 import { rollMeridianLoot } from "@/lib/world/meridians";
 import { isArtFrozen, isSkillFrozen } from "./progression";
-import { ART_USE_XP, SKILL_USE_XP, W_EXP_FIGHT_WIN } from "./rules";
+import { getBoss } from "@/lib/world/data/bosses";
+import { dropsGold, moveXpMultiplier, victoryWExp } from "@/lib/world/victory";
+import { ART_USE_XP, SKILL_USE_XP } from "./rules";
 import type { VictorySpoils } from "./types";
 
-// Gold in a hostile foe's purse by tier (min, max); spars, tournament bouts and the law pay none.
+// Gold in a hostile person's purse by tier (min, max); beasts carry none, and
+// spars, tournament bouts and the law pay none.
 export const FOE_GOLD: Readonly<Record<number, readonly [number, number]>> = {
-  0: [5, 15], 1: [15, 40], 2: [40, 90], 3: [90, 180], 4: [180, 350],
+  0: [5, 15], 1: [15, 40], 2: [40, 90], 3: [90, 180], 4: [180, 350], 5: [350, 600],
 };
 // One roll per pendingBattle (the object the battle was started for).
 export const spoilsByBattle = new WeakMap<object, VictorySpoils>();
@@ -34,26 +37,35 @@ export function rollVictorySpoils(s: WorldStateData, pb: NonNullable<WorldStateD
   const opp = getOpponent(pb.opponentId);
   const items: Record<string, number> = {};
   let gold = 0;
+  const gear: string[] = [];
   if (!pb.tournament) {
     for (const it of rollOpponentLoot(opp?.drops, opp?.ti ?? 0)) items[it.itemId] = (items[it.itemId] ?? 0) + it.count;
     for (const itemId of rollMeridianLoot(pb.opponentId)) items[itemId] = (items[itemId] ?? 0) + 1;
-    if (!s.pendingSpar && !pb.nonFatal && !isLawOpponent(pb.opponentId)) {
-      const [min, max] = FOE_GOLD[Math.max(0, Math.min(4, opp?.ti ?? 0))];
+    // A legendary beast: its trophy every time, now and then a piece of top gear.
+    const boss = opp?.boss ? getBoss(opp.id) : null;
+    if (boss) {
+      items[boss.trophyItemId] = (items[boss.trophyItemId] ?? 0) + 1;
+      if (boss.gear.length && Math.random() < boss.gearChance) gear.push(boss.gear[Math.floor(Math.random() * boss.gear.length)]!);
+    }
+    if (!s.pendingSpar && !pb.nonFatal && !isLawOpponent(pb.opponentId) && dropsGold(opp)) {
+      const [min, max] = FOE_GOLD[Math.max(0, Math.min(5, opp?.ti ?? 0))];
       gold = min + Math.floor(Math.random() * (max - min + 1));
     }
   }
+  // Beasts and legendary beasts teach twice as much per move.
+  const xpMult = moveXpMultiplier(opp);
   const moves: VictorySpoils["moves"] = [];
   for (const [id, count] of Object.entries(battleState?.skillUses?.A ?? {})) {
-    if (typeof count === "number" && count > 0 && getSkill(id) && !isSkillFrozen(s, id)) moves.push({ id, kind: "skill", xp: count * SKILL_USE_XP });
+    if (typeof count === "number" && count > 0 && getSkill(id) && !isSkillFrozen(s, id)) moves.push({ id, kind: "skill", xp: count * SKILL_USE_XP * xpMult });
   }
   for (const [id, count] of Object.entries(battleState?.artUses?.A ?? {})) {
     const art = getArt(id);
-    if (typeof count === "number" && count > 0 && art && art.id !== "none" && !isArtFrozen(s, id)) moves.push({ id, kind: "art", xp: count * ART_USE_XP });
+    if (typeof count === "number" && count > 0 && art && art.id !== "none" && !isArtFrozen(s, id)) moves.push({ id, kind: "art", xp: count * ART_USE_XP * xpMult });
   }
   let hunt: VictorySpoils["hunt"] = null;
   const res = s.pendingHuntYield ? getResource(s.pendingHuntYield.resourceId) : null;
   if (res) hunt = rollResourceYield(res, masteryLevel(s.lifeSkillXp[res.skill] ?? 0));
-  return { gold, wExp: W_EXP_FIGHT_WIN, items: Object.entries(items).map(([itemId, count]) => ({ itemId, count })), moves, hunt };
+  return { gold, wExp: victoryWExp(opp), items: Object.entries(items).map(([itemId, count]) => ({ itemId, count })), moves, hunt, gear };
 }
 
 export function victorySpoilsFor(s: WorldStateData): VictorySpoils | null {
@@ -65,7 +77,7 @@ export function victorySpoilsFor(s: WorldStateData): VictorySpoils | null {
 }
 
 // Roll loot from an opponent's drop table. Picks count is per-tier:
-// tier 0/1 = 2 picks, tier 2/3 = 3, tier 4 = 4. Same weighted-pick helper
+// tier 0/1 = 2 picks, tier 2/3 = 3, tier 4 / 5 (and legendary beasts) = 4. Same weighted-pick helper
 // as resources; merges duplicate item ids.
 export function rollOpponentLoot(
   drops: readonly ResourceYield[] | undefined,

@@ -6,6 +6,7 @@ import { PLACE_OPPONENT_SPECS } from "./places";
 import { SKILLS } from "@/lib/game/data/skills";
 import { ARTS } from "@/lib/game/data/arts";
 import { powerTier } from "./liveness-roster";
+import { powerScore } from "@/lib/game/power-tier";
 
 // ─── Opponent roster: 180 entries in named blocks ──────────────────
 // The random-event roster below has 35 entries, organised by tier; later
@@ -15,7 +16,10 @@ import { powerTier } from "./liveness-roster";
 // Tier 1 (10): early roadside threats.
 // Tier 2 (10): journeyman fighters with one move skill apiece.
 // Tier 3 (5): masters carrying tier-1/2 skills + an inner skill.
-// Tier 4 (5): legendary foes with several leveled skills + a strong inner.
+// Tier 4 (3): legendary foes with several leveled skills + a strong inner.
+// Tier 5 (6): the masters and beasts at the top of the jianghu (power
+// 520–900, `look.anim` sheets), and the six legendary beasts (บอส,
+// lib/world/data/bosses.ts) at 1100–1600 with their minions.
 //
 // Each entry's `build()` factory returns a fresh CharacterBuild so future
 // scaling (story flags, quest tier-ups) can layer on top without mutating
@@ -33,12 +37,14 @@ const slots = (...ids: (string | null)[]): (string | null)[] => {
   return out;
 };
 
-const TIER_STATS: Record<0 | 1 | 2 | 3 | 4, StatBlock> = {
+type Tier = 0 | 1 | 2 | 3 | 4 | 5;
+const TIER_STATS: Record<Tier, StatBlock> = {
   0: { STR: 1, AGI: 1, POW: 1, VIT: 1, DEX: 1, LUK: 1, DEF: 1, INT: 1 },
   1: { STR: 3, AGI: 3, POW: 1, VIT: 3, DEX: 2, LUK: 1, DEF: 2, INT: 1 },
   2: { STR: 5, AGI: 4, POW: 3, VIT: 4, DEX: 3, LUK: 2, DEF: 3, INT: 2 },
   3: { STR: 7, AGI: 6, POW: 5, VIT: 6, DEX: 5, LUK: 3, DEF: 5, INT: 3 },
   4: { STR: 10, AGI: 9, POW: 8, VIT: 9, DEX: 8, LUK: 5, DEF: 8, INT: 6 },
+  5: { STR: 40, AGI: 38, POW: 36, VIT: 40, DEX: 36, LUK: 20, DEF: 36, INT: 28 },
 };
 
 interface BuildOpts {
@@ -86,7 +92,7 @@ function scaleStats(stats: StatBlock): StatBlock {
   return out;
 }
 
-function build(name: string, tier: 0 | 1 | 2 | 3 | 4, opts: BuildOpts = {}): CharacterBuild {
+function build(name: string, tier: Tier, opts: BuildOpts = {}): CharacterBuild {
   const baseSkills = opts.skillIds ?? ["basic_punch"];
   const slotArts = opts.extraArtSlots ?? [];
   const artSlotStrs = slotArts.map((aid) => `art:${aid}`);
@@ -152,6 +158,33 @@ const DROPS_T4: readonly ResourceYield[] = [
   { itemId: "wood_sacred", weight: 1 },
   { itemId: "ancient_coin", weight: 3 },
   { itemId: "potion_big", weight: 3 },
+];
+
+// Tier 5 masters and beasts: rare materials, big potions.
+const DROPS_T5: readonly ResourceYield[] = [
+  { itemId: "mithril_ore", weight: 3 },
+  { itemId: "snow_lotus", weight: 3 },
+  { itemId: "wood_sacred", weight: 2 },
+  { itemId: "jade_amulet", weight: 2 },
+  { itemId: "fish_dragon", weight: 1 },
+  { itemId: "ancient_coin", weight: 3 },
+  { itemId: "potion_big", weight: 4 },
+];
+// A legendary beast's table: 4 rolls on top of its trophy and a rare piece of
+// top gear (store/world/spoils.ts, BossDef in bosses.ts). T4/T5 materials, big
+// potions and rare meridian charts.
+export const BOSS_DROPS: readonly ResourceYield[] = [
+  { itemId: "mithril_ore", weight: 6, count: [1, 2] },
+  { itemId: "wood_sacred", weight: 5, count: [1, 2] },
+  { itemId: "snow_lotus", weight: 5, count: [1, 2] },
+  { itemId: "fish_dragon", weight: 3 },
+  { itemId: "jade_amulet", weight: 4 },
+  { itemId: "ancient_coin", weight: 4, count: [2, 4] },
+  { itemId: "potion_big", weight: 8, count: [2, 3] },
+  { itemId: "potion_qi", weight: 5, count: [2, 3] },
+  { itemId: "chart_void_step", weight: 1 },
+  { itemId: "chart_hidden_dragon", weight: 1 },
+  { itemId: "chart_heaven_sword_heart", weight: 1 },
 ];
 
 export const OPPONENTS: readonly OpponentDef[] = [
@@ -243,12 +276,12 @@ export const OPPONENTS: readonly OpponentDef[] = [
       artId: "t0_lohan", artLevel: 6,
       skillIds: ["tj", "rf", "cs"],
     }) },
-  { id: "snow_demon", name: "ปีศาจหิมะ", ti: 3, category: "supernatural",
-    drops: [...DROPS_T3, { itemId: "snow_lotus", weight: 1 }],
-    build: () => build("ปีศาจหิมะ", 3, {
-      stats: { POW: 7, INT: 5, VIT: 7 },
-      artId: "t4_huashan_purple", artLevel: 4,
-      skillIds: ["nm1", "ne7"],
+  { id: "snow_leopard", name: "เสือดาวหิมะ", ti: 3, category: "beast",
+    drops: [...DROPS_T3, { itemId: "fur_pelt", weight: 3 }, { itemId: "snow_lotus", weight: 1 }],
+    look: { frame: 10, tint: 0xe8f2ff, size: 1.15 },
+    build: () => build("เสือดาวหิมะ", 3, {
+      stats: { AGI: 11, DEX: 9, STR: 9, VIT: 7 },
+      skillIds: ["bst_pounce", "bst_maul", "bst_claw"],
     }) },
   { id: "sect_elder", name: "ผู้อาวุโสสำนัก", ti: 3, category: "human", drops: DROPS_T3,
     build: () => build("ผู้อาวุโสสำนัก", 3, {
@@ -270,22 +303,11 @@ export const OPPONENTS: readonly OpponentDef[] = [
       artId: "huashan", artLevel: 8,
       skillIds: ["dgjj", "qzjf", "nf2", "ne9"],
     }) },
-  { id: "dragon_phoenix_master", name: "ปรมาจารย์มังกร-หงส์", ti: 4, category: "supernatural", drops: DROPS_T4,
-    build: () => build("ปรมาจารย์มังกร-หงส์", 4, {
-      artId: "tendon", artLevel: 9,
-      skillIds: ["ep", "ng3", "nu2", "ne1"],
-    }) },
   { id: "heretical_grandmaster", name: "เจ้าสำนักอธรรม", ti: 4, category: "human", drops: DROPS_T4,
     build: () => build("เจ้าสำนักอธรรม", 4, {
       stats: { POW: 10, INT: 9, DEX: 8 },
       artId: "t4_tang_tenkpoisons", artLevel: 8,
       skillIds: ["nf6", "wd_palm", "nf7", "nf8"],
-    }) },
-  { id: "immortal_warrior", name: "นักรบอมตะ", ti: 4, category: "supernatural", drops: DROPS_T4,
-    build: () => build("นักรบอมตะ", 4, {
-      stats: { STR: 12, VIT: 12, DEF: 10 },
-      artId: "diamond", artLevel: 9,
-      skillIds: ["ep", "ng3", "ng5", "ng2"],
     }) },
 
   // ─── Hunt-only beasts (tier 0–2) ───────────────────────────────
@@ -1502,21 +1524,8 @@ export const OPPONENTS: readonly OpponentDef[] = [
   // to need them. Stats are roughly 2× a regular T4: top-tier multi-art
   // kits, multi-hit signature skills, debuff_atk / stun threats that
   // bypass tank walls. Drops are richer (extra manuals + valuables).
-  { id: "elite_blood_rakshasa", name: "อสุรกายโลหิต", ti: 4, category: "supernatural",
-    pack: { opponentId: "vampire_bat", count: 3 },
-    drops: [...DROPS_T4,
-      { itemId: "ginseng", weight: 4 }, { itemId: "jade", weight: 3 },
-      { itemId: "ancient_coin", weight: 2 }, { itemId: "wood_sacred", weight: 1 }],
-    build: () => build("อสุรกายโลหิต", 4, {
-      stats: { STR: 22, AGI: 18, POW: 16, VIT: 18, DEX: 16, LUK: 10, DEF: 16, INT: 12 },
-      artId: "blood", artLevel: 10,
-      skillIds: ["ep", "ng3", "ne1", "wd_palm"],
-      extraArtSlots: ["blood", "tendon"],
-      artLevels: { blood: 10, tendon: 10 },
-    }) },
-
   { id: "elite_void_grandmaster", name: "ปรมาจารย์ความว่าง", ti: 4, category: "human",
-    pack: { opponentId: "ghost_swordsman", count: 1 },
+    pack: { opponentId: "shadowless_swordsman", count: 1 },
     drops: [...DROPS_T4,
       { itemId: "ginseng", weight: 4 }, { itemId: "jade", weight: 3 },
       { itemId: "ancient_coin", weight: 2 }, { itemId: "mithril_ore", weight: 1 }],
@@ -1554,20 +1563,6 @@ export const OPPONENTS: readonly OpponentDef[] = [
       skillIds: ["sl_petal_finger", "ynss", "qzjf", "yxjf"],
       extraArtSlots: ["fire", "zixia", "qiankun"],
       artLevels: { fire: 10, zixia: 10, scholar: 10 },
-    }) },
-
-  { id: "elite_demon_emperor", name: "จักรพรรดิมาร", ti: 4, category: "supernatural",
-    pack: [{ opponentId: "demon_cult_zealot", count: 2 }, { opponentId: "ghost_swordsman", count: 1 }],
-    drops: [...DROPS_T4,
-      { itemId: "ginseng", weight: 5 }, { itemId: "jade", weight: 5 },
-      { itemId: "ancient_coin", weight: 3 }, { itemId: "wood_sacred", weight: 3 },
-      { itemId: "mithril_ore", weight: 2 }],
-    build: () => build("จักรพรรดิมาร", 4, {
-      stats: { STR: 20, POW: 22, INT: 20, VIT: 22, DEF: 18, DEX: 16, AGI: 16, LUK: 10 },
-      artId: "kgim", artLevel: 10,
-      skillIds: ["dgjj", "ansh", "sl_truth_staff", "sl_thousand_arms", "wd_palm"],
-      extraArtSlots: ["kgim", "t4_tang_tenkpoisons", "qiankun"],
-      artLevels: { kgim: 10, shadow: 10, heaven: 10 },
     }) },
 
   // ─── พรรคตะวันจันทรา — sect leadership (T1-T4) ─────────────────────
@@ -1988,9 +1983,10 @@ export const OPPONENTS: readonly OpponentDef[] = [
   { id: "thunder_eagle", name: "อินทรีสายฟ้า", ti: 3, category: "beast", drops: DROPS_T3,
     look: { frame: 6, tint: 0xc8d0ff, size: 1.15 },
     build: () => build("อินทรีสายฟ้า", 3, { stats: { AGI: 12, DEX: 9, STR: 7 }, skillIds: ["bst_claw", "bst_pounce", "bst_roar"] }) },
-  { id: "ghost_swordsman", name: "วิญญาณจอมกระบี่", ti: 3, category: "supernatural", drops: DROPS_T3,
+  // A living swordsman so fast the eye loses him — no ghost, only speed.
+  { id: "shadowless_swordsman", name: "จอมกระบี่ไร้เงา", ti: 3, category: "human", drops: DROPS_T3,
     look: { sheet: "m1", tint: 0xa8c8ff },
-    build: () => build("วิญญาณจอมกระบี่", 3, {
+    build: () => build("จอมกระบี่ไร้เงา", 3, {
       stats: { DEX: 9, AGI: 9, POW: 7 },
       artId: "t4_tang_tenkpoisons", artLevel: 4,
       skillIds: ["nh2", "nf2", "ne12"],
@@ -2125,6 +2121,137 @@ export const OPPONENTS: readonly OpponentDef[] = [
       skillIds: ["xx_palm", "pn", "nd9", "tang_starrain"],
       extraArtSlots: ["np"],
     }) },
+  // ─── Coast beasts (random encounters; the turtle's and crab's minions) ──
+  { id: "iron_crab", name: "ปูก้ามเหล็ก", ti: 3, category: "beast",
+    drops: [...DROPS_T3, { itemId: "fish_eel", weight: 2 }],
+    look: { frame: 11, tint: 0xff8a5c, size: 1.1 },
+    build: () => build("ปูก้ามเหล็ก", 3, { stats: { DEF: 11, VIT: 9, STR: 9, DEX: 5 }, skillIds: ["bst_constrict", "bst_claw", "bst_charge"] }) },
+  { id: "stone_turtle", name: "เต่ากระดองหิน", ti: 4, category: "beast",
+    drops: [...DROPS_T4, { itemId: "jade", weight: 2 }],
+    look: { frame: 3, tint: 0x9cb8a0, size: 1.25 },
+    build: () => build("เต่ากระดองหิน", 4, {
+      stats: { DEF: 20, VIT: 22, STR: 14, AGI: 4, DEX: 6 },
+      skillIds: ["bst_constrict", "bst_charge", "bst_bite", "bst_roar"],
+    }) },
+
+  // ─── Tier 5 — the top of the jianghu (power 520–900, animated sheets) ──
+  // Authored at their targets (no booster). They turn up only once the hero
+  // is strong (tierWeightForPower(5, p) is zero below power 0.6).
+  { id: "t5_nameless_sword_hermit", name: "ฤๅษีกระบี่ไร้นาม", ti: 5, category: "human", drops: DROPS_T5,
+    look: { anim: "t5_nameless_sword_hermit" },
+    build: () => build("ฤๅษีกระบี่ไร้นาม", 5, {
+      stats: { STR: 52, AGI: 66, POW: 50, VIT: 48, DEX: 68, LUK: 30, DEF: 44, INT: 46 },
+      artId: "kgim", artLevel: 10,
+      skillIds: ["dgjj", "wd_heaven_sword", "nh2", "nf2"],
+      learnedArtIds: ["taiji"], artLevels: { kgim: 10, taiji: 10 },
+      extraArtSlots: ["kgim"],
+    }) },
+  { id: "t5_blood_blade_lord", name: "จ้าวดาบโลหิต", ti: 5, category: "human", drops: DROPS_T5,
+    look: { anim: "t5_blood_blade_lord" },
+    pack: { opponentId: "desert_marauder", count: 2 },
+    build: () => build("จ้าวดาบโลหิต", 5, {
+      stats: { STR: 72, AGI: 54, POW: 46, VIT: 60, DEX: 50, LUK: 26, DEF: 50, INT: 30 },
+      artId: "blood", artLevel: 10,
+      skillIds: ["ng5", "nf6", "jy_blade_king", "bs"],
+      learnedArtIds: ["military"], artLevels: { blood: 10, military: 10 },
+      extraArtSlots: ["blood", "military"],
+    }) },
+  { id: "t5_poison_matriarch", name: "แม่เฒ่าพันพิษ", ti: 5, category: "human",
+    drops: [...DROPS_T5, { itemId: "scorpion_venom", weight: 4 }, { itemId: "centipede_venom", weight: 3 }],
+    look: { anim: "t5_poison_matriarch" },
+    pack: { opponentId: "poison_practitioner", count: 2 },
+    build: () => build("แม่เฒ่าพันพิษ", 5, {
+      stats: { STR: 34, AGI: 52, POW: 70, VIT: 46, DEX: 66, LUK: 36, DEF: 40, INT: 60 },
+      artId: "np", artLevel: 10,
+      skillIds: ["wd_palm", "tang_heartpierce", "tang_starrain", "xx_palm"],
+      learnedArtIds: ["t4_tang_tenkpoisons"], artLevels: { np: 10, t4_tang_tenkpoisons: 10 },
+      extraArtSlots: ["np", "t4_tang_tenkpoisons"],
+    }) },
+  { id: "t5_iron_monk", name: "ภิกษุเกราะเหล็กนอกรีต", ti: 5, category: "human", drops: DROPS_T5,
+    look: { anim: "t5_iron_monk" },
+    build: () => build("ภิกษุเกราะเหล็กนอกรีต", 5, {
+      stats: { STR: 66, AGI: 36, POW: 50, VIT: 76, DEX: 40, LUK: 24, DEF: 74, INT: 34 },
+      artId: "kuyt", artLevel: 10,
+      skillIds: ["sl_truth_staff", "sl_thousand_arms", "sl_rock_punch", "ng3"],
+      learnedArtIds: ["diamond"], artLevels: { kuyt: 10, diamond: 10 },
+      extraArtSlots: ["kuyt", "diamond"],
+    }) },
+  { id: "t5_white_tiger", name: "พยัคฆ์ขาวหิมะ", ti: 5, category: "beast",
+    drops: [...DROPS_T5, { itemId: "tiger_claw", weight: 5 }, { itemId: "snow_lotus", weight: 2 }],
+    look: { anim: "t5_white_tiger" },
+    pack: { opponentId: "snow_leopard", count: 1 },
+    build: () => build("พยัคฆ์ขาวหิมะ", 5, {
+      stats: { STR: 101, AGI: 92, POW: 44, VIT: 97, DEX: 77, LUK: 33, DEF: 70, INT: 22 },
+      skillIds: ["bst_maul", "bst_pounce", "bst_roar", "bst_claw"],
+    }) },
+  { id: "t5_wolf_king", name: "ราชาหมาป่าทุ่งเหนือ", ti: 5, category: "beast",
+    drops: [...DROPS_T5, { itemId: "fur_pelt", weight: 6 }],
+    look: { anim: "t5_wolf_king" },
+    pack: [{ opponentId: "wild_wolf", count: 2 }, { opponentId: "frost_wolf", count: 1 }],
+    build: () => build("ราชาหมาป่าทุ่งเหนือ", 5, {
+      stats: { STR: 86, AGI: 97, POW: 37, VIT: 84, DEX: 81, LUK: 37, DEF: 59, INT: 24 },
+      skillIds: ["bst_maul", "bst_bite", "bst_pounce", "bst_roar"],
+    }) },
+
+  // ─── Legendary beasts (บอส, lib/world/data/bosses.ts) ──────────────
+  // Each waits in its lair, always brings its minions, and is back 90 days
+  // after it falls. Three moves of its own (`bss_*`) and its own inner art
+  // (`art_boss_<x>`, lib/game/data); one common beast move as a fallback.
+  // Power 1100–1600 at stat scale 1 (scripts/test-foes.ts).
+  { id: "boss_golden_serpent", name: "งูยักษ์เกล็ดทองคำ", ti: 5, category: "beast", boss: true,
+    drops: BOSS_DROPS, look: { anim: "boss_golden_serpent" },
+    pack: [{ opponentId: "viper_snake", count: 1 }, { opponentId: "jade_python", count: 1 }],
+    build: () => build("งูยักษ์เกล็ดทองคำ", 5, {
+      stats: { STR: 175, AGI: 160, POW: 150, VIT: 195, DEX: 185, LUK: 105, DEF: 175, INT: 115 },
+      artId: "art_boss_serpent", artLevel: 10,
+      skillIds: ["bss_serpent_fang", "bss_serpent_coil", "bss_serpent_molt", "bst_venom"],
+      extraArtSlots: ["art_boss_serpent"],
+    }) },
+  { id: "boss_blood_tiger", name: "พยัคฆ์โลหิตลายคราม", ti: 5, category: "beast", boss: true,
+    drops: BOSS_DROPS, look: { anim: "boss_blood_tiger" },
+    pack: [{ opponentId: "mountain_tiger", count: 1 }, { opponentId: "golden_tiger", count: 1 }],
+    build: () => build("พยัคฆ์โลหิตลายคราม", 5, {
+      stats: { STR: 215, AGI: 185, POW: 130, VIT: 190, DEX: 175, LUK: 105, DEF: 150, INT: 95 },
+      artId: "art_boss_tiger", artLevel: 10,
+      skillIds: ["bss_tiger_claw", "bss_tiger_roar", "bss_tiger_frenzy", "bst_maul"],
+      extraArtSlots: ["art_boss_tiger"],
+    }) },
+  { id: "boss_sword_eagle", name: "อินทรียักษ์จ้าวแห่งกระบี่", ti: 5, category: "beast", boss: true,
+    drops: BOSS_DROPS, look: { anim: "boss_sword_eagle" },
+    pack: { opponentId: "thunder_eagle", count: 2 },
+    build: () => build("อินทรียักษ์จ้าวแห่งกระบี่", 5, {
+      stats: { STR: 175, AGI: 225, POW: 140, VIT: 155, DEX: 215, LUK: 115, DEF: 130, INT: 110 },
+      artId: "art_boss_eagle", artLevel: 10,
+      skillIds: ["bss_eagle_feathers", "bss_eagle_dive", "bss_eagle_gale", "bst_claw"],
+      extraArtSlots: ["art_boss_eagle"],
+    }) },
+  { id: "boss_sun_turtle", name: "เต่ายักษ์แบกตะวัน", ti: 5, category: "beast", boss: true,
+    drops: BOSS_DROPS, look: { anim: "boss_sun_turtle" },
+    pack: { opponentId: "stone_turtle", count: 2 },
+    build: () => build("เต่ายักษ์แบกตะวัน", 5, {
+      stats: { STR: 160, AGI: 80, POW: 185, VIT: 255, DEX: 115, LUK: 105, DEF: 255, INT: 140 },
+      artId: "art_boss_turtle", artLevel: 10,
+      skillIds: ["bss_turtle_shell", "bss_turtle_sun", "bss_turtle_quake", "bst_constrict"],
+      extraArtSlots: ["art_boss_turtle"],
+    }) },
+  { id: "boss_blade_crab", name: "ปูวิเศษจ้าวแห่งดาบ", ti: 5, category: "beast", boss: true,
+    drops: BOSS_DROPS, look: { anim: "boss_blade_crab" },
+    pack: { opponentId: "iron_crab", count: 2 },
+    build: () => build("ปูวิเศษจ้าวแห่งดาบ", 5, {
+      stats: { STR: 205, AGI: 140, POW: 140, VIT: 195, DEX: 190, LUK: 105, DEF: 220, INT: 95 },
+      artId: "art_boss_crab", artLevel: 10,
+      skillIds: ["bss_crab_pincers", "bss_crab_mirror", "bss_crab_tide", "bst_constrict"],
+      extraArtSlots: ["art_boss_crab"],
+    }) },
+  { id: "boss_flame_bull", name: "กระทิงยักษ์เขาเพลิง", ti: 5, category: "beast", boss: true,
+    drops: BOSS_DROPS, look: { anim: "boss_flame_bull" },
+    pack: { opponentId: "blood_boar", count: 2 },
+    build: () => build("กระทิงยักษ์เขาเพลิง", 5, {
+      stats: { STR: 225, AGI: 130, POW: 175, VIT: 220, DEX: 140, LUK: 95, DEF: 195, INT: 85 },
+      artId: "art_boss_bull", artLevel: 10,
+      skillIds: ["bss_bull_charge", "bss_bull_stomp", "bss_bull_rage", "bst_charge"],
+      extraArtSlots: ["art_boss_bull"],
+    }) },
 ];
 
 // ─── Story saga foes (lib/world/data/story) ────────────────────────
@@ -2141,6 +2268,64 @@ for (const spec of [...STORY_OPPONENT_SPECS, ...PLACE_OPPONENT_SPECS]) {
     }),
   });
 }
+
+// ─── Booster: T3 / T4 foes and NPC-backed fighters hit harder ─────────
+// (docs/design/foes-and-bosses.md). `boostBuild` raises a build's stats so
+// its power score grows by `factor`: (factor − 1) × score is added, spread
+// over the eight stats in proportion to the build's own. Applied once per
+// `build()` call on top of the day / sect-rank stat scale.
+export const BOOST_T3 = 1.6;
+export const BOOST_T4 = 1.45;
+export const BOOST_NPC = 1.4;
+
+export function boostBuild(b: CharacterBuild, factor: number): CharacterBuild {
+  if (!(factor > 1)) return b;
+  const add = Math.round((factor - 1) * powerScore(b));
+  if (add <= 0) return b;
+  const keys = Object.keys(b.stats) as (keyof StatBlock)[];
+  const weights = keys.map((k) => Math.max(0, b.stats[k]));
+  const sum = weights.reduce((a, c) => a + c, 0);
+  const share = weights.map((w) => (sum > 0 ? w / sum : 1 / keys.length) * add);
+  const whole = share.map(Math.floor);
+  // Largest remainder: the added points sum to exactly `add`.
+  let left = add - whole.reduce((a, c) => a + c, 0);
+  const order = share.map((v, i) => [v - whole[i], i] as const).sort((a, c) => c[0] - a[0]);
+  for (let j = 0; left > 0; j = (j + 1) % order.length, left--) whole[order[j][1]]++;
+  const stats = { ...b.stats };
+  keys.forEach((k, i) => { stats[k] += whole[i]; });
+  return { ...b, stats };
+}
+
+/** True for a fighter that stands for a person: spar partners, `npc@` / `lawnpc@` foes, sect hunters, anyone drawn as an NPC. */
+export function isNpcBackedOpponent(def: Pick<OpponentDef, "id" | "look">): boolean {
+  return def.id.startsWith("spar_") || def.id.startsWith("npc@") || def.id.startsWith("lawnpc@")
+    || def.id.startsWith("hunter_") || !!def.look?.npc;
+}
+
+/** The booster factor for an opponent (1 = none): T3 ×1.6, T4 ×1.45, NPC-backed ×1.4, the larger of both. T5 and bosses are authored at target. */
+export function boostFactorOf(def: Pick<OpponentDef, "id" | "look" | "ti" | "boss">): number {
+  if (def.boss || (def.ti ?? 0) >= 5) return 1;
+  const tier = def.ti === 3 ? BOOST_T3 : def.ti === 4 ? BOOST_T4 : 1;
+  return Math.max(tier, isNpcBackedOpponent(def) ? BOOST_NPC : 1);
+}
+
+const UNBOOSTED = new Map<string, () => CharacterBuild>();
+/** An opponent's build before the booster (tests and the docs compare the two). */
+export function unboostedBuild(id: string): CharacterBuild | null {
+  const raw = UNBOOSTED.get(id);
+  if (raw) return raw();
+  return getOpponent(id)?.build() ?? null;
+}
+
+function withBooster(def: OpponentDef): OpponentDef {
+  const factor = boostFactorOf(def);
+  if (factor <= 1) return def;
+  const inner = def.build;
+  UNBOOSTED.set(def.id, inner);
+  return { ...def, build: () => boostBuild(inner(), factor) };
+}
+
+for (let i = 0; i < OPPONENTS.length; i++) (OPPONENTS as OpponentDef[])[i] = withBooster(OPPONENTS[i]);
 
 export const OPPONENTS_BY_ID = new Map<string, OpponentDef>(
   OPPONENTS.map((o) => [o.id, o]),
@@ -2216,6 +2401,8 @@ function npcFoe(id: string): OpponentDef | null {
       extraArtSlots: art ? [art.id] : [],
     }),
   };
-  NPC_FOE_CACHE.set(id, def);
-  return def;
+  // A person is one power tier stronger than their raw build (×1.4, or the T3 / T4 booster).
+  const boosted = withBooster(def);
+  NPC_FOE_CACHE.set(id, boosted);
+  return boosted;
 }
