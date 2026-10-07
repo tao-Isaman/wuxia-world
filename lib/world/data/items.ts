@@ -1,5 +1,5 @@
 import { scaleMoveStat } from "./move-gates";
-import { ARTS, SKILLS, TIERS, MERIDIAN_CHARTS, MERIDIAN_KIND_LABEL, meridianChartItemId, getSkill, getArt } from "@/lib/game";
+import { ARTS, SKILLS, TIERS, MERIDIAN_CHARTS, MERIDIAN_KIND_LABEL, meridianChartItemId, getSkill, getArt, isBeastMove, isBossArt } from "@/lib/game";
 import type { ItemDef } from "../types";
 
 // คัมภีร์ — what a quest that teaches a move or art hands over instead. The
@@ -399,12 +399,12 @@ function scrollItems(): ItemDef[] {
   const tier = (ti: number) => TIERS[ti]?.n ?? `T${ti}`;
   const where = (sc: string) => (sc ? `${sc} · ` : "");
   return [
-    ...SKILLS.filter((s) => !s.id.startsWith("bst_")).map((s): ItemDef => ({
+    ...SKILLS.filter((s) => !isBeastMove(s.id)).map((s): ItemDef => ({
       id: scrollItemId("skill", s.id), name: `คัมภีร์${s.n}`, category: "manual", price: 0,
       description: `คัมภีร์ลับบันทึกวิชา${s.n} (${where(s.sc)}${tier(s.ti)}) — อ่านแล้วจะเรียนวิชานี้ได้ทันที`,
       use: { t: "manualLearnSkill", skillId: s.id, reqStat: "STR", reqValue: 0 },
     })),
-    ...ARTS.filter((a) => a.id !== "none").map((a): ItemDef => ({
+    ...ARTS.filter((a) => a.id !== "none" && !isBossArt(a.id)).map((a): ItemDef => ({
       id: scrollItemId("art", a.id), name: `คัมภีร์${a.n}`, category: "manual", price: 0,
       description: `คัมภีร์ลับบันทึกลมปราณ${a.n} (${where(a.sc)}${tier(a.ti)}) — อ่านแล้วจะเรียนลมปราณนี้ได้ทันที`,
       use: { t: "manualLearnArt", artId: a.id, reqStat: "STR", reqValue: 0, level: scrollArtLevel(a.ti) },

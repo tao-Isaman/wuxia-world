@@ -431,9 +431,9 @@ Per tier: T0: 9 · T1: 44 · T2: 74 · T3: 56 · T4: 205 · T5: 12. Per category
 | `t5_iron_monk` | ภิกษุเกราะเหล็กนอกรีต | human | 701 | — | 7 | roams (mountain, road; 17 places) |
 | `t5_white_tiger` | พยัคฆ์ขาวหิมะ | beast | 602 | 1× เสือดาวหิมะ | 9 | roams (snow, mountain; 19 places) |
 | `t5_wolf_king` | ราชาหมาป่าทุ่งเหนือ | beast | 571 | 2× หมาป่า + 1× หมาป่าหิมะ | 8 | roams (steppe, forest; 14 places) |
-| `boss_golden_serpent` | งูยักษ์เกล็ดทองคำ | beast | 1281 | 1× งูเห่ายักษ์ + 1× งูเหลือมหยก | 11 | lair (cave_jinshe) |
-| `boss_blood_tiger` | พยัคฆ์โลหิตลายคราม | beast | 1269 | 1× เสือภูเขา + 1× เสือทองคำ | 11 | lair (valley_hudie) |
-| `boss_sword_eagle` | อินทรียักษ์จ้าวแห่งกระบี่ | beast | 1276 | 2× อินทรีสายฟ้า | 11 | lair (cliff_motian) |
-| `boss_sun_turtle` | เต่ายักษ์แบกตะวัน | beast | 1317 | 2× เต่ากระดองหิน | 11 | lair (isle_wuming) |
-| `boss_blade_crab` | ปูวิเศษจ้าวแห่งดาบ | beast | 1312 | 2× ปูก้ามเหล็ก | 11 | lair (pool_heilong) |
-| `boss_flame_bull` | กระทิงยักษ์เขาเพลิง | beast | 1277 | 2× หมูป่าเลือดคลั่ง | 11 | lair (peak_guangming) |
+| `boss_golden_serpent` | งูยักษ์เกล็ดทองคำ | beast | 1551 | 1× งูเห่ายักษ์ + 1× งูเหลือมหยก | 11 | lair (cave_jinshe) |
+| `boss_blood_tiger` | พยัคฆ์โลหิตลายคราม | beast | 1534 | 1× เสือภูเขา + 1× เสือทองคำ | 11 | lair (valley_hudie) |
+| `boss_sword_eagle` | อินทรียักษ์จ้าวแห่งกระบี่ | beast | 1577 | 2× อินทรีสายฟ้า | 11 | lair (cliff_motian) |
+| `boss_sun_turtle` | เต่ายักษ์แบกตะวัน | beast | 1570 | 2× เต่ากระดองหิน | 11 | lair (isle_wuming) |
+| `boss_blade_crab` | ปูวิเศษจ้าวแห่งดาบ | beast | 1562 | 2× ปูก้ามเหล็ก | 11 | lair (pool_heilong) |
+| `boss_flame_bull` | กระทิงยักษ์เขาเพลิง | beast | 1546 | 2× หมูป่าเลือดคลั่ง | 11 | lair (peak_guangming) |
