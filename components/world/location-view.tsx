@@ -372,7 +372,7 @@ export function LocationView({ scene, readOnly = false, dialogueSpeakerId }: Pro
                   <span className="flex flex-col items-start gap-0.5">
                     <span className="font-semibold text-sm">{hall.label}</span>
                     <span className="text-[10px] text-muted-foreground">
-                      เรียนวิชาฝีมือ / วิชาในกาย ขั้น 0–1
+                      เรียนกระบวนท่า / ลมปราณ ขั้น 0–1
                     </span>
                   </span>
                 </Button>

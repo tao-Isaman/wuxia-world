@@ -129,11 +129,11 @@ export function PracticePopup({ open, scene, onClose }: Props) {
       {/* ─── Learned move skills ────────────────────────────────────── */}
       <div className="space-y-2">
         <div className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">
-          วิชาฝีมือที่เรียนรู้แล้ว ({learnedSkillIds.length})
+          กระบวนท่าที่เรียนรู้แล้ว ({learnedSkillIds.length})
         </div>
         {learnedSkillIds.length === 0 ? (
           <p className="text-xs text-muted-foreground italic px-2">
-            ยังไม่มีวิชาฝีมือ
+            ยังไม่มีกระบวนท่า
           </p>
         ) : (
           <div className="space-y-1.5">
@@ -161,7 +161,7 @@ export function PracticePopup({ open, scene, onClose }: Props) {
                         </strong>
                       </SkillTooltip>
                       <Badge variant="default" className="text-[9px]">
-                        Lv.{lv}
+                        ระดับ {lv}
                         {maxed ? " (สูงสุด)" : ""}
                       </Badge>
                       {tier && (
@@ -204,11 +204,11 @@ export function PracticePopup({ open, scene, onClose }: Props) {
         )}
 
         <div className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground pt-2">
-          วิชาในกายที่เรียนรู้แล้ว ({learnedArtIds.length})
+          ลมปราณที่เรียนรู้แล้ว ({learnedArtIds.length})
         </div>
         {learnedArtIds.length === 0 ? (
           <p className="text-xs text-muted-foreground italic px-2">
-            ยังไม่มีวิชาในกาย
+            ยังไม่มีลมปราณ
           </p>
         ) : (
           <div className="space-y-1.5">
@@ -288,13 +288,13 @@ function practiceToast(r: PracticeResult): ToastTuple {
     if (r.reason === "no-build") return ["error", "ตัวละครยังไม่พร้อม"];
     return ["error", "ฝึกไม่สำเร็จ"];
   }
-  const kindLabel = r.kind === "skill" ? "วิชาฝีมือ" : "วิชาในกาย";
+  const kindLabel = r.kind === "skill" ? "กระบวนท่า" : "ลมปราณ";
   const def =
     r.kind === "skill" ? getSkill(r.id) : getArt(r.id);
   const name = def && "n" in def ? def.n : r.id;
   const bonusPart = r.matched ? " (สถานที่เหมาะ)" : "";
   if (r.leveledUp) {
-    const lvLabel = r.kind === "skill" ? `Lv.${r.newLevel}` : `ขั้น ${r.newLevel}`;
+    const lvLabel = r.kind === "skill" ? `ระดับ ${r.newLevel}` : `ขั้น ${r.newLevel}`;
     return [
       "success",
       `ฝึก ${kindLabel} ${name} · +${r.xpGained} xp${bonusPart} · ขึ้น ${lvLabel}!`,

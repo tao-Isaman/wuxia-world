@@ -31,7 +31,7 @@ type Tab = "rewards" | "quests" | "art";
 const TAB_LABEL: Record<Tab, string> = {
   rewards: "🎖 ขั้นและวิชา",
   quests: "📜 ภารกิจประจำ",
-  art: "☯ วิชาในกาย",
+  art: "☯ ลมปราณ",
 };
 
 // Multi-tab sect popup. Sect picker (when player has more than one
@@ -354,7 +354,7 @@ function RewardsTab({ def, rank, atTop, nextRank, nextCost, canRankUp, worldStat
             <div key={`${e.kind}:${e.id}`} className="flex items-baseline justify-between gap-2 text-xs" data-lineage-id={e.id}>
               <span className="min-w-0 truncate">
                 {learned ? item?.n ?? e.id : MYSTERY_MOVE_LABEL}{" "}
-                <span className="text-muted-foreground text-[10px]">{learned ? `T${item?.ti} · ` : ""}{e.kind === "skill" ? "วิชาฝีมือ" : "วิชาในกาย"}</span>
+                <span className="text-muted-foreground text-[10px]">{learned ? `T${item?.ti} · ` : ""}{e.kind === "skill" ? "กระบวนท่า" : "ลมปราณ"}</span>
               </span>
               <span className={`shrink-0 ${learned ? "text-jade" : "text-muted-foreground"}`}>{status}</span>
             </div>
@@ -456,12 +456,12 @@ function ArtQuestsTab({
   onAccept,
 }: ArtQuestsTabProps) {
   if (quests.length === 0) {
-    return <div className="text-xs text-muted-foreground">ยังไม่มีภารกิจวิชาในกายของสำนักนี้</div>;
+    return <div className="text-xs text-muted-foreground">ยังไม่มีภารกิจลมปราณของสำนักนี้</div>;
   }
   return (
     <div className="space-y-2">
       <div className="text-xs text-muted-foreground">
-        ภารกิจหายาก — ทำได้ครั้งเดียว เพื่อรับวิชาในกายระดับสูง
+        ภารกิจหายาก — ทำได้ครั้งเดียว เพื่อรับลมปราณระดับสูง
       </div>
       {quests.map((q) => {
         const status = isSectQuestOfferable(worldState, q, cooldownDays);

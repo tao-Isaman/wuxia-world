@@ -94,7 +94,7 @@ export function SectHallPopup({ open, hall, onClose }: Props) {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <Badge variant="default" className="text-[10px]">
-                      {isSkill ? "⚔ วิชาฝีมือ" : "☯ วิชาในกาย"}
+                      {isSkill ? "⚔ กระบวนท่า" : "☯ ลมปราณ"}
                     </Badge>
                     {sk ? (
                       <SkillTooltip skill={sk}>

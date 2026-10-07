@@ -57,7 +57,7 @@ export const trainingActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, 
     appendActionLog(
       draft,
       "learn",
-      `เร่งวิชาฝีมือ ${sk.n} → Lv.${lv + 1} (-${remaining} w-exp)`,
+      `เร่งกระบวนท่า ${sk.n} → Lv.${lv + 1} (-${remaining} w-exp)`,
     );
     grantMeridianPoints(draft, 1);
     set({ ...draft });
@@ -89,7 +89,7 @@ export const trainingActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, 
     appendActionLog(
       draft,
       "learn",
-      `เร่งวิชาในกาย ${art.n} → ขั้น ${lv + 1} (-${remaining} w-exp)`,
+      `เร่งลมปราณ ${art.n} → ขั้น ${lv + 1} (-${remaining} w-exp)`,
     );
     grantMeridianPoints(draft, 1);
     set({ ...draft });
@@ -126,7 +126,7 @@ export const trainingActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, 
     // starts fresh.
     delete draft.skillLevel[skillId];
     delete draft.skillExp[skillId];
-    appendActionLog(draft, "learn", `ลืมวิชาฝีมือ ${sk.n}`);
+    appendActionLog(draft, "learn", `ลืมกระบวนท่า ${sk.n}`);
     set({ ...draft });
     return { ok: true, skillId };
   },
@@ -165,7 +165,7 @@ export const trainingActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, 
       skillIds: nextSlots,
     };
     delete draft.artExp[artId];
-    appendActionLog(draft, "learn", `ลืมวิชาในกาย ${art.n}`);
+    appendActionLog(draft, "learn", `ลืมลมปราณ ${art.n}`);
     set({ ...draft });
     return { ok: true, artId };
   },

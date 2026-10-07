@@ -6,6 +6,15 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-07
 
+### กระบวนท่า and ลมปราณ; passives that say when they really fire; foes look the same everywhere
+
+- **Words:** วิชาฝีมือ is now **กระบวนท่า** and วิชาในกาย / ในกาย **ลมปราณ** in every window and line (the skills window's tabs read ⚔ กระบวนท่า / ☯ ลมปราณ); the library and practice say ระดับ, not Lv.
+- **Passive triggers:** the authored shorthand "ใช้ IA →" (after this art's own active, `use_act`) was translated as "when using an internal attack", so external arts like สกุลถัง's ท่าเท้าไล่ล่า read as if they fed on internal moves. The passive line is now built from the data (`passiveLine`: trigger, chance, effect). วิชาตัวเบาหัวซาน fired on internal-attack moves, which หัวซาน has none of — it now fires on its own active. `test:runtime` checks every passive can fire and names its real trigger.
+- **Foe pictures:** the encounter and briefing screens drew a sprite hashed from the opponent id; they now draw the battle look (`foeLook`, `components/game/foe-portrait.tsx`), beasts included, and the map's roaming foes use the same look. The turn bar's creature cells use the real 4 × 3 atlas.
+- **สำนัก badge** counts only what the sect window offers (not the secret T4 trials, not inactive memberships).
+- **Dialog quest spots** spend their hours again (the Heilong dives, the river watch) before the dialog opens.
+- **Godslayer chapter 17** is offered at the ruins by โม่ฉิงเทียน, where it happens.
+
 ### Names that match, sagas read to the end, quests that work
 
 - **Place names match the story:** โรงเตี๊ยมเฮ่อลั่ว, โรงเตี๊ยมเกาเซิ่ง, วัดต้าหลุน, สระมังกรดำ, ผาสำนึกผิด (and stray spellings of คุ้มสมุนไพร, คุ้มนกนางแอ่น, โรงเตี๊ยมยั่วไหล) — in the map and every line.

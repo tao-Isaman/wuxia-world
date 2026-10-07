@@ -325,7 +325,7 @@ export const lifeActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "gat
       const lv = eff.level && eff.level >= 1 ? eff.level : 1;
       applyEffects(draft, [{ t: "learnArt", artId: eff.artId, level: lv }]);
       draft.wExp += W_EXP_USE_ITEM;
-      appendActionLog(draft, "learn", `ฝึก ${def.name} · เรียนวิชาในกาย ${getArt(eff.artId)?.n ?? eff.artId}`);
+      appendActionLog(draft, "learn", `ฝึก ${def.name} · เรียนลมปราณ ${getArt(eff.artId)?.n ?? eff.artId}`);
       set({ ...draft });
       return { ok: true, kind: "manualLearnArt", itemId, artId: eff.artId, level: lv };
     }

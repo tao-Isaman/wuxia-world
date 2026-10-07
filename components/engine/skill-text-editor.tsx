@@ -14,7 +14,7 @@ import { WEAPON_FAMILY_LABEL } from "@/lib/game/data/weapons";
 import type { WeaponFamily } from "@/lib/game/types";
 import type { EngineSave } from "./engine-app";
 
-const KIND_LABEL: Record<TextKind, string> = { skill: "วิชาฝีมือ", art: "วิชาในกาย" };
+const KIND_LABEL: Record<TextKind, string> = { skill: "กระบวนท่า", art: "ลมปราณ" };
 
 export function SkillTextEditor({ save }: { save: EngineSave }) {
   const rows = useMemo(() => textRows(), []);
@@ -68,8 +68,8 @@ export function SkillTextEditor({ save }: { save: EngineSave }) {
           <span>ชนิด</span>
           <select value={filter.kind ?? ""} onChange={(e) => update({ kind: e.target.value as TextKind | "" })} data-testid="skill-kind">
             <option value="">ทั้งหมด</option>
-            <option value="skill">วิชาฝีมือ</option>
-            <option value="art">วิชาในกาย</option>
+            <option value="skill">กระบวนท่า</option>
+            <option value="art">ลมปราณ</option>
           </select>
         </label>
         <label className="eng-field">
@@ -87,7 +87,7 @@ export function SkillTextEditor({ save }: { save: EngineSave }) {
           </select>
         </label>
         <label className="eng-field">
-          <span>อาวุธ (วิชาฝีมือ)</span>
+          <span>อาวุธ (กระบวนท่า)</span>
           <select value={filter.weapon ?? ""} onChange={(e) => update({ weapon: e.target.value as WeaponFamily | "" })} data-testid="skill-weapon">
             <option value="">ทั้งหมด</option>
             {weapons.map((w) => <option key={w} value={w}>{WEAPON_FAMILY_LABEL[w]}</option>)}
@@ -174,7 +174,7 @@ function TextRowEditor({ row, draft, setDraft, issues, quests }: {
         <label className="eng-field">
           <span>คำบรรยาย <small>({d.length}/{DESC_MAX})</small></span>
           <textarea rows={3} value={d} onChange={(e) => setDraft((x) => setRowText(x, row, "d", e.target.value))} data-testid="skill-desc-input"
-            placeholder={row.kind === "art" ? "วิชาในกายยังไม่มีคำบรรยายในตาราง — ใส่ได้ จะแสดงบนการ์ดวิชา" : ""} />
+            placeholder={row.kind === "art" ? "ลมปราณยังไม่มีคำบรรยายในตาราง — ใส่ได้ จะแสดงบนการ์ดวิชา" : ""} />
           {d !== row.baseD && row.baseD && <small className="eng-muted">เดิม: {row.baseD}</small>}
         </label>
       </div>

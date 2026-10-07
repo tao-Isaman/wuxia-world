@@ -3,7 +3,7 @@
 // this instead: what kind of attack it is, how many strikes, what it does to
 // the hero and the foe, in whole words.
 
-import type { EnemyEffect, SelfEffect, Skill, StatKey } from "./types";
+import type { ArtPassiveTrigger, EnemyEffect, SelfEffect, Skill, StatKey } from "./types";
 import { STAT_LABEL } from "./data/stats";
 
 /** โจมตีภายนอก (body, PA vs PD) / โจมตีภายใน (inner force, IA vs ID). */
@@ -85,13 +85,36 @@ export function damageMultiplierText(dm: number): string | null {
   return `ความแรงรวม ${pct > 0 ? "+" : "−"}${Math.abs(pct)}%`;
 }
 
+// ─── Inner arts' passive line ──────────────────────────────────────────
+
+/** When an art's passive fires (`pas.tr`), in plain Thai. */
+export const PASSIVE_TRIGGER_LABEL: Record<ArtPassiveTrigger, string> = {
+  hit_recv: "เมื่อถูกโจมตี",
+  on_crit: "เมื่อโจมตีติดคริติคอล",
+  use_int: "เมื่อใช้กระบวนท่าโจมตีภายใน",
+  use_act: "เมื่อใช้ท่าออกพลังของลมปราณนี้",
+};
+
+/**
+ * "เมื่อ… (มีโอกาส N%) จะได้ …" — the trigger and chance come from the data
+ * (`tr`, `ch`), never from the authored shorthand, whose "ใช้ IA" (this art's
+ * own active) was once misread as an internal attack. Only the effect after
+ * "→" is taken from `d`.
+ */
+export function passiveLine(pas: { tr: ArtPassiveTrigger; ch: number; d: string }): string {
+  const effect = plainThai(pas.d.includes("→") ? pas.d.slice(pas.d.indexOf("→") + 1).trim() : pas.d);
+  const chance = pas.ch < 100 ? ` มีโอกาส ${pas.ch}% ที่จะได้` : " จะได้";
+  return `${PASSIVE_TRIGGER_LABEL[pas.tr]}${chance} ${effect}`;
+}
+
 // ─── Shorthand in inner arts' active / passive lines ──────────────────
 
 const SHORTHAND: [RegExp, string | ((...m: string[]) => string)][] = [
   // Passive triggers first: "ถูกโจมตี 25% → …" is a 25 % chance when hit.
   [/ถูกโจมตี (\d+)% →/g, "เมื่อถูกโจมตี มีโอกาส $1% ที่จะได้"],
-  [/Int skill (\d+)% →/g, "เมื่อใช้วิชาโจมตีภายใน มีโอกาส $1% ที่จะได้"],
-  [/(?:Int skill|ใช้ IA) →/g, "เมื่อใช้วิชาโจมตีภายใน จะได้"],
+  [/Int skill (\d+)% →/g, "เมื่อใช้กระบวนท่าโจมตีภายใน มีโอกาส $1% ที่จะได้"],
+  [/Int skill →/g, "เมื่อใช้กระบวนท่าโจมตีภายใน จะได้"],
+  [/ใช้ IA →/g, "เมื่อใช้ท่าออกพลังของลมปราณนี้ จะได้"],
   [/\bCrit →/g, "เมื่อติดคริติคอล จะได้"],
   [/^Int →/g, "เมื่อโจมตีภายใน จะได้"],
   [/^Phy →/g, "เมื่อโจมตีภายนอก จะได้"],
@@ -112,8 +135,8 @@ const SHORTHAND: [RegExp, string | ((...m: string[]) => string)][] = [
   [/\(สะสม\s?(\d+)ตา\)/g, "(สะสมได้ $1 ตา)"],
   [/(\d+)ตา/g, "$1 ตา"],
   [/VIT scaling \(×([\d.]+)\/VIT\)/g, "แรงขึ้นตามค่าร่างกาย (+$1 ต่อแต้ม)"],
-  [/\bInt skill\b/g, "ใช้วิชาโจมตีภายใน"],
-  [/ใช้ IA\b/g, "ใช้วิชาโจมตีภายใน"],
+  [/\bInt skill\b/g, "ใช้กระบวนท่าโจมตีภายใน"],
+  [/ใช้ IA\b/g, "ใช้ท่าออกพลังของลมปราณนี้"],
   [/ทุก hit/g, "ทุกครั้งที่ตีโดน"],
   [/\bpure damage\b/g, "ความเสียหายไม่หักป้องกัน"],
   [/\bflat\s?(\d+)/g, "+$1"],
@@ -125,7 +148,7 @@ const SHORTHAND: [RegExp, string | ((...m: string[]) => string)][] = [
   [/\bPDef(?=[+\-\s]|$)/g, "ป้องกันภายนอก"],
   [/\bIDef(?=[+\-\s]|$)/g, "ป้องกันภายใน"],
   [/\bIAtk(?=[+\-\s%]|$)/g, "พลังโจมตีภายใน"],
-  [/\bIA\b/g, "วิชาโจมตีภายใน"],
+  [/\bIA\b/g, "ท่าออกพลังของลมปราณ"],
   [/\bATK(?=[+\-\s%]|$)/g, "พลังโจมตี"],
   [/\bDEF(?=[+\-\s]|$)/g, "ป้องกัน"],
   [/\bEva(?=[+\-\s]|$)/g, "หลบหลีก"],

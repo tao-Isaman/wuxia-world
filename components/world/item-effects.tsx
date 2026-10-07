@@ -17,10 +17,10 @@ export function ItemEffects({ effect, battle }: { effect?: ItemUseEffect; battle
   } else if (effect.t === "trainSkill") {
     labels.push(`${LIFE_SKILL_LABEL[effect.skill]} +${effect.xp} XP`);
   } else if (effect.t === "manualLearnSkill") {
-    labels.push(`เรียน ${getSkill(effect.skillId)?.n ?? "วิชาฝีมือ"}`);
+    labels.push(`เรียน ${getSkill(effect.skillId)?.n ?? "กระบวนท่า"}`);
     if (effect.reqValue > 0) labels.push(`ต้องการ ${effect.reqStat} ${effect.reqValue}`);
   } else if (effect.t === "manualLearnArt") {
-    labels.push(`เรียน ${getArt(effect.artId)?.n ?? "วิชาในกาย"} ระดับ ${effect.level ?? 1}`);
+    labels.push(`เรียน ${getArt(effect.artId)?.n ?? "ลมปราณ"} ระดับ ${effect.level ?? 1}`);
     if (effect.reqValue > 0) labels.push(`ต้องการ ${effect.reqStat} ${effect.reqValue}`);
   } else if (effect.t === "learnMeridian") {
     const chart = getMeridianChart(effect.chartId);

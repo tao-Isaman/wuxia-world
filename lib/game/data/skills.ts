@@ -1,7 +1,7 @@
 import type { Skill } from "../types";
 import { withTextOverrides } from "./text-overrides";
 
-// ─── Move skills (วิชาฝีมือ) ─────────────────────────────────────────
+// ─── Move skills (กระบวนท่า) ─────────────────────────────────────────
 //
 // 173 skills across 5 tiers (incl. 9 bst_* beast moves), organised by sect
 // first, then by tier.

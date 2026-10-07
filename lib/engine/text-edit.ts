@@ -153,7 +153,7 @@ export function validateTextRows(rows: readonly TextRow[], draft: TextOverrides,
       const editedClash = edited || sameKind.some((other) => rowText(other, draft).n.trim() !== other.baseN);
       if (sameKind.length) add(row, { level: editedClash ? "error" : "warning", field: "n", message: `ชื่อซ้ำกับ ${sameKind.map((o) => o.id).join(", ")}${editedClash ? "" : " (มีอยู่เดิม)"}` });
       const otherKind = others.filter((other) => other.kind !== row.kind);
-      if (otherKind.length) add(row, { level: "warning", field: "n", message: `ชื่อเดียวกับ${row.kind === "skill" ? "วิชาในกาย" : "วิชาฝีมือ"} ${otherKind.map((o) => o.id).join(", ")}` });
+      if (otherKind.length) add(row, { level: "warning", field: "n", message: `ชื่อเดียวกับ${row.kind === "skill" ? "ลมปราณ" : "กระบวนท่า"} ${otherKind.map((o) => o.id).join(", ")}` });
     }
     if (d.length > DESC_MAX) add(row, { level: "error", field: "d", message: `คำบรรยายยาวเกิน ${DESC_MAX} ตัวอักษร (${d.length})` });
     if (row.kind === "skill" && !d.trim()) add(row, { level: "warning", field: "d", message: "ไม่มีคำบรรยาย" });

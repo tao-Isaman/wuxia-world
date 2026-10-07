@@ -44,7 +44,7 @@ type PopupId =
 // rows of three) and 6 columns on `sm+`, so touch targets stay ≥40px
 // even on the narrowest phones.
 //
-// The 🥋 วิชาฝีมือ tab manages BOTH move skills and inner arts: each
+// The 🥋 กระบวนท่า tab manages BOTH move skills and inner arts: each
 // of the 10 slots can hold either kind, so a separate ☯ inner-skills
 // popup would just duplicate state.
 export function MenuBar({ hud }: { hud?: boolean } = {}) {

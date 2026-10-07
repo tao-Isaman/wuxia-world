@@ -327,7 +327,7 @@ Grid column: the skill's range and area on the tactics board (`skillGrid` / `art
 | Id | Name | Tier | Active | Grid | Passive | HP/MP per level | Types |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | `t0_huashan_qi` | กำลังภายในหัวซาน | T0 พื้นฐาน | ลมปราณเย็น (heal, 12 MP, cd 3) | ตนเอง | hit_recv 20% → buff_def | 15 / 15 | yin |
-| `t1_huashan_light` | วิชาตัวเบาหัวซาน | T1 ขั้นกลาง | ตัวเบาดั่งขนนก (buff_reduce, 18 MP, cd 3) | ตนเอง | use_int 30% → buff_eva | 18 / 22 | yin |
+| `t1_huashan_light` | วิชาตัวเบาหัวซาน | T1 ขั้นกลาง | ตัวเบาดั่งขนนก (buff_reduce, 18 MP, cd 3) | ตนเอง | use_act 100% → buff_eva | 18 / 22 | yin |
 | `t2_huashan_cloud` | พลังเมฆคล้อย | T2 ขั้นสูง | เมฆาคลื่นคล้อย (atk_phy_pen, 22 MP, cd 3) | ระยะ 1–2 · เป้าเดียว | on_crit 100% → stack_atk | 25 / 25 | yin, hard |
 | `t4_huashan_purple` | พลังเมฆม่วง | T4 เฉพาะ | เมฆาม่วงสะท้านฟ้า (atk_phy_pen, 30 MP, cd 4) | ระยะ 1–2 · เป้าเดียว | on_crit 100% → stack_atk | 30 / 35 | yin, hard |
 | `huashan` | หัวซานเซินกง | T4 เฉพาะ | กระบี่หนึ่งในฟ้า (atk_phy_pen, 35 MP, cd 4) | ระยะ 1–2 · เป้าเดียว | on_crit 100% → stack_atk | 35 / 35 | hard |

@@ -38,7 +38,7 @@ export function SkillSlots({ side }: Props) {
     const skillOpts = SKILLS.map<ComboOption>((sk) => ({
       value: sk.id,
       label: sk.n,
-      group: `วิชาฝีมือ T${sk.ti} (CD${TIERS[sk.ti].cd})`,
+      group: `กระบวนท่า T${sk.ti} (CD${TIERS[sk.ti].cd})`,
       hint: WEAPON_FAMILY_LABEL[sk.w],
     }));
     const artOpts = ARTS.filter((a) => a.id !== "none").map<ComboOption>((a) => ({
