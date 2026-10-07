@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { ARTS, SKILLS, TIERS, getSkill } from "../lib/game/data";
+import { ARTS, SKILLS, TIERS, getSkill, isBeastMove, isBossArt, isBossMove } from "../lib/game/data";
 import type { CharacterBuild, StatBlock } from "../lib/game/types";
 import {
   activeUnit, aimableFor, applyAction, artGrid, beginNextTurn, cellKey, createGridBattle, isOver, predictOrder,
@@ -342,9 +342,9 @@ check("full 1v1 battles with real builds always finish with a winner within 300 
 
 check("SKILLS-sampled builds (every weapon family, arts included) fight to a finish in 1v1 and 1v2", () => {
   // Deterministic sample: 4 attack skills + 1 support per build, walking the table with a stride.
-  const attacks = SKILLS.filter((sk) => sk.at && !sk.id.startsWith("bst_"));
-  const support = SKILLS.filter((sk) => slotGrid(sk.id)?.target === "self");
-  const arts = ARTS.filter((a) => a.act);
+  const attacks = SKILLS.filter((sk) => sk.at && !isBeastMove(sk.id));
+  const support = SKILLS.filter((sk) => slotGrid(sk.id)?.target === "self" && !isBossMove(sk.id));
+  const arts = ARTS.filter((a) => a.act && !isBossArt(a.id));
   const sample = (i: number): CharacterBuild => {
     const ids = [0, 1, 2, 3].map((k) => attacks[(i * 53 + k * 17) % attacks.length].id);
     const b = build(`นักสู้${i}`, [...ids, support[(i * 7) % support.length].id, `art:${arts[(i * 11) % arts.length].id}`],

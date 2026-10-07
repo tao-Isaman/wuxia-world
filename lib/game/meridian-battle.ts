@@ -46,8 +46,8 @@ const sumBuff = (st: SideBattleState, t: BuffRecord["t"]) => {
 };
 
 // ─── The % statuses in the math ───────────────────────────────────────
-/** Attack +% (fire rage, opening atk). Added to the damage multiplier. */
-export const atkPctOf = (st: SideBattleState) => sumBuff(st, "buff_atk_pct");
+/** Attack +% (fire rage, opening atk, a boss frenzy). Added to the damage multiplier. */
+export const atkPctOf = (st: SideBattleState) => sumBuff(st, "buff_atk_pct") + sumBuff(st, "frenzy");
 /** PD / ID +% (earth rage, opening def). */
 export const defPctOf = (st: SideBattleState) => sumBuff(st, "buff_def_pct");
 /** Crit chance + points (thunder rage, opening cri). */

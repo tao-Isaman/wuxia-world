@@ -44,7 +44,7 @@ export const W_EXP_GATHER = 10;
 export const W_EXP_CRAFT = 5;
 export const W_EXP_USE_ITEM = 5;
 export const W_EXP_PRACTICE_MUSIC = 5;
-export const W_EXP_FIGHT_WIN = 50;
+// A won fight pays by the foe: lib/world/victory.ts victoryWExp.
 // Per-skill xp gained for each use of a skill in a battle the player won.
 export const SKILL_USE_XP = 20;
 // Per-art xp gained for each art active fired in a battle the player won.

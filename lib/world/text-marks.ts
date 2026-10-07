@@ -10,6 +10,7 @@
 import { NPCS } from "./data/npcs";
 import { SCENES } from "./data/scenes";
 import { ITEMS, SCROLL_PREFIX } from "./data/items";
+import { isBeastMove } from "@/lib/game";
 import { SECT_MEMBERSHIPS } from "./data/sect-memberships";
 import { OPPONENTS } from "./data/opponents";
 import { ARTS, SKILLS } from "@/lib/game";
@@ -44,7 +45,7 @@ function build() {
   for (const scene of SCENES) if (scene.kind === "location") add(scene.name, "place");
   for (const item of ITEMS) if (!item.id.startsWith(SCROLL_PREFIX)) add(item.name, "item");
   // People, places and items first: a sparring foe named after an NPC stays a person.
-  for (const move of SKILLS) if (!move.id.startsWith("bst_")) add(move.n, "move");
+  for (const move of SKILLS) if (!isBeastMove(move.id)) add(move.n, "move");
   for (const art of ARTS) if (art.id !== "none") add(art.n, "move");
   for (const foe of OPPONENTS) add(foe.name, "foe");
   const names = [...kinds.keys()].sort((a, b) => b.length - a.length).map(escape);

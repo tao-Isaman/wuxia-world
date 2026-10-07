@@ -8,6 +8,7 @@
 import assert from "node:assert/strict";
 import { SKILLS } from "../lib/game/data/skills";
 import { ARTS } from "../lib/game/data/arts";
+import { BEAST_SECT, isBeastMove } from "../lib/game/data/sects";
 import { CHARACTER_IDS, CREATURE_FRAME_COUNT } from "../lib/characters/catalog";
 import { LINEAGE_SPECS, MAIN_ARC, SAGA_PROLOGUES, STORY_ARC_SPECS } from "../lib/world/data/story";
 import { isQuestOfferable, isSecretSectQuest, sectActionCount } from "../lib/world/effects";
@@ -34,8 +35,10 @@ function check(name: string, fn: () => void) {
   if (errors.length === before) { passed++; console.log(`PASS ${name}`); } else console.log(`FAIL ${name}`);
 }
 
-const SECT_SKILLS = SKILLS.filter((s) => s.sc !== "ยุทธจักร" && !s.id.startsWith("bst_"));
-const SECT_ARTS = ARTS.filter((a) => a.id !== "none" && a.sc !== "ยุทธจักร");
+// Beasts' moves (bst_*) and the legendary beasts' own moves / arts (sc
+// BEAST_SECT "สัตว์ร้าย") are fought, never learned: no quest covers them.
+const SECT_SKILLS = SKILLS.filter((s) => s.sc !== "ยุทธจักร" && s.sc !== BEAST_SECT && !isBeastMove(s.id));
+const SECT_ARTS = ARTS.filter((a) => a.id !== "none" && a.sc !== "ยุทธจักร" && a.sc !== BEAST_SECT);
 const ITEMS_TEXT = JSON.stringify([SHOPS, RESOURCES.map((r) => r.yields), RECIPES.map((r) => r.output), OPPONENTS.map((o) => o.drops ?? [])]);
 const obtainable = (itemId: string) => ITEMS_TEXT.includes(`"${itemId}"`);
 const roaming = new Set([...FIGHT_EVENTS.map((e) => e.opponentId), ...RESOURCES.flatMap((r) => r.opponentIds ?? [])]);

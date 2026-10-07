@@ -1,5 +1,6 @@
 // Walk ticks, foes on the map and the fight-or-flee screen; the last death's report.
 import { getNpc, getOpponent, getScene, type WorldStateData } from "@/lib/world";
+import { bossAlive, getBoss } from "@/lib/world/data/bosses";
 import { rollFoeSpawn, rollWalkEvent } from "@/lib/world/effects";
 import { isLawOpponent } from "@/lib/world/law";
 import { JAIL_SCENE_ID } from "@/lib/world/data/activities";
@@ -26,7 +27,7 @@ export function walkEventsDisabled(): boolean {
   try { return typeof localStorage !== "undefined" && localStorage.getItem("wuxia-random-events") === "off"; } catch { return false; }
 }
 
-export const encountersActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "acceptEncounter" | "walkTick" | "roamingFoes" | "engageFoe" | "fleeEncounter" | "lastDeath" | "dismissDeath"> => ({
+export const encountersActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "acceptEncounter" | "walkTick" | "roamingFoes" | "engageFoe" | "engageBoss" | "fleeEncounter" | "lastDeath" | "dismissDeath"> => ({
   acceptEncounter: () => {
     const s = get();
     if (!s.pendingEncounter || s.pendingBattle) return;
@@ -89,6 +90,14 @@ export const encountersActions = (set: WorldSet, get: WorldGet): Pick<WorldStore
     const draft = draftFrom(s);
     draft.pendingEncounter = { opponentId: foe.opponentId, returnSceneId: s.currentSceneId };
     set({ ...draft, roamingFoes });
+  },
+
+  engageBoss: (bossId) => {
+    const s = get();
+    const boss = getBoss(bossId);
+    if (!boss || s.pendingBattle || s.pendingEncounter || boss.lair !== s.currentSceneId || !bossAlive(s, bossId)) return;
+    // Its minions always come with it (encounterBattle sets withPack).
+    set({ pendingEncounter: { opponentId: boss.id, returnSceneId: s.currentSceneId } });
   },
 
   fleeEncounter: () => {

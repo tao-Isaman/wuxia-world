@@ -3,6 +3,8 @@
 // through inn channel without expiring.
 
 import type { Rumor } from "../types";
+import { BOSSES } from "./bosses";
+import { regionOf } from "./regions";
 
 // Hand-authored static rumors — `id` should be unique and start with
 // `lore_`. `createdDay` / `expiresDay` are filled by the rumor engine
@@ -518,4 +520,18 @@ export const LORE_RUMORS: readonly LoreRumorTemplate[] = [
     prerequisites: [],
     weight: 6,
   },
+  // ─── สัตว์ในตำนาน (legendary beasts) — where each one waits ─────────
+  ...BOSSES.map((boss): LoreRumorTemplate => ({
+    idSuffix: `lead_${boss.id}`,
+    text: boss.lore,
+    source: "lore",
+    truth: "true",
+    region: regionOf(boss.lair),
+    channel: "wilderness",
+    about: boss.lair,
+    refersToEvent: null,
+    leadsTo: { locationId: boss.lair },
+    prerequisites: [],
+    weight: 6,
+  })),
 ];

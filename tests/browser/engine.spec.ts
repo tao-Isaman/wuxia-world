@@ -100,7 +100,7 @@ test("engine: skill text editor filters, edits with a live preview, validation a
   const mode = await saveMode(page);
   await page.getByRole("tab", { name: "วิชา" }).click();
   const table = page.getByTestId("skill-table");
-  await expect(table.locator("tbody tr")).toHaveCount(284);
+  await expect(table.locator("tbody tr")).toHaveCount(308);
 
   await page.getByTestId("skill-sect").selectOption("เส้าหลิน");
   await page.getByTestId("skill-tier").selectOption("0");

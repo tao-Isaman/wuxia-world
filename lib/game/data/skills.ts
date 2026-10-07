@@ -3,8 +3,9 @@ import { withTextOverrides } from "./text-overrides";
 
 // ─── Move skills (กระบวนท่า) ─────────────────────────────────────────
 //
-// 173 skills across 5 tiers (incl. 9 bst_* beast moves), organised by sect
-// first, then by tier.
+// 191 skills across 6 tiers (incl. 9 bst_* beast moves and the legendary
+// beasts' 18 bss_* moves under "สัตว์ร้าย", BEAST_SECT — never learnable),
+// organised by sect first, then by tier.
 // Sect names follow SECT_ORDER (lib/game/data/sects.ts); unaffiliated / generic
 // techniques live under "ยุทธจักร" (JIANGHU_SECT) at the bottom.
 //
@@ -15,6 +16,8 @@ import { withTextOverrides } from "./text-overrides";
 //   mg  = mastery gain on equip (cap 200 per weapon)
 //   bp  = base power, p = % boost on bp, f = flat add, dm = dmg mult
 //   dr  = drain % of damage dealt → caster HP
+//   pen = pierce: % of the target's PD / ID ignored
+//   cd  = cooldown override (default TIERS[ti].cd; boss moves set it)
 //   se  = effect on self,  ee = effect on enemy
 //   types = philosophical tags (yin / yang / hard / soft / internal /
 //           external / balance) feeding lib/game/skill-conflict.ts
@@ -230,6 +233,26 @@ export const SKILLS: readonly Skill[] = withTextOverrides<Skill>("skills", [
   { id: "ng2", n: "ทวนประจักษ์พยาน", sc: "ยุทธจักร", ti: 4, w: "long", mg: 100, st: { STR: 10, VIT: 8, AGI: 4, DEX: 8 }, at: "phy", bp: 98, p: 30, f: 0, dm: 1, se: null, ee: { t: "debuff_eva", v: -25, u: 5 }, d: "Phy×130% + Eva-25 (3 ตา)", types: ["yang", "hard"] },
   { id: "dgjj", n: "เก้ากระบี่เดียวดาย", sc: "ยุทธจักร", ti: 4, w: "sword", mg: 100, st: { STR: 7, AGI: 9, DEX: 6, LUK: 8 }, at: "phy", bp: 90, p: 30, f: 0, dm: 1.2, hits: 9, se: { t: "buff_spd", v: 60, u: 5 }, ee: { t: "debuff_eva", v: -20, u: 5 }, d: "Phy×130% · ตี 9 กระบี่ + SPD+60(2ตา) + Eva-20(2ตา) — 独孤九剑 ตำนานยุทธจักรไม่ผูกสำนัก", types: ["yang"] },
   { id: "ng5", n: "ดาบยาวเทพสังหาร", sc: "ยุทธจักร", ti: 4, w: "blade", mg: 100, st: { STR: 11, DEX: 7, AGI: 4, LUK: 8 }, at: "phy", bp: 100, p: 30, f: 0, dm: 1, se: null, ee: { t: "debuff_def", v: -25, u: 5 }, d: "Phy×130% + PDef-25 (3 ตา)", types: ["yang", "hard"] },
+
+  // ─── สัตว์ร้าย ───
+  { id: "bss_serpent_fang", n: "เขี้ยวพิษทองคำ", sc: "สัตว์ร้าย", ti: 5, w: "fist", mg: 100, st: { DEX: 12, AGI: 10, LUK: 8, STR: 5 }, at: "phy", bp: 120, p: 30, f: 0, dm: 1.25, cd: 0, se: null, ee: { t: "heavy_poison", pp: 6, u: 5, av: -15, ev: -15 }, d: "Phy×125% bp×130% + พิษร้าย 6%HP/ตา Acc-15 Eva-15 (5ตา) — เขี้ยวทองพุ่งฉกจากระยะสองช่อง พิษทองคำกัดกร่อนเลือดเนื้อ", types: ["yin"] },
+  { id: "bss_serpent_coil", n: "รัดกระดูกแหลก", sc: "สัตว์ร้าย", ti: 5, w: "fist", mg: 100, st: { STR: 15, VIT: 10, DEX: 10 }, at: "phy", bp: 115, p: 25, f: 0, dm: 1.2, cd: 3, se: null, ee: { t: "bind", ch: 70, u: 2, dv: -35, du: 5 }, d: "Phy×120% bp×125% + รัด: PDef-35 (5ตา) และโอกาส 70% ขยับไม่ได้ (2ตา) — ลำตัวเกล็ดทองพันรอบร่าง บีบจนกระดูกลั่น", types: ["hard"] },
+  { id: "bss_serpent_molt", n: "ลอกคราบเกล็ดทอง", sc: "สัตว์ร้าย", ti: 5, w: "fist", mg: 100, st: { VIT: 15, LUK: 10, AGI: 10 }, at: null, bp: 0, p: 0, f: 0, dm: 1, cd: 5, se: { t: "molt", hp: 20, rv: 30, u: 4 }, ee: null, d: "ลอกคราบ: ล้างดีบัฟทั้งหมด ฟื้น 20% HP + สะท้อน 30% (4ตา) — คราบเก่าหลุดร่วง เกล็ดทองใหม่วาววับไร้รอยแผล", types: ["yin"] },
+  { id: "bss_tiger_claw", n: "กรงเล็บเลือดคราม", sc: "สัตว์ร้าย", ti: 5, w: "fist", mg: 100, st: { STR: 15, AGI: 12, DEX: 8 }, at: "phy", bp: 125, p: 35, f: 0, dm: 1.25, hits: 3, cd: 0, se: null, ee: { t: "bleed", pp: 3, inc: 2, u: 5 }, d: "Phy×125% bp×135% · ตะปบ 3 ครั้ง + เลือดไหล 3%HP/ตา แผลกว้างขึ้น +2%/ตา (5ตา) — กรงเล็บลายครามฉีกเนื้อจนเลือดไม่หยุดไหล", types: ["external"] },
+  { id: "bss_tiger_roar", n: "คำรามสะท้านภพ", sc: "สัตว์ร้าย", ti: 5, w: "fist", mg: 100, st: { STR: 12, VIT: 13, DEX: 10 }, at: "phy", bp: 90, p: 20, f: 0, dm: 1, cd: 3, se: null, ee: { t: "debuff_atk", v: -25, u: 5 }, d: "Phy รอบตัวรัศมี 2 + ATK-25% (5ตา) — เสียงคำรามสะเทือนขุนเขา ผู้ได้ยินขาสั่นมือไร้แรง", types: ["yang"] },
+  { id: "bss_tiger_frenzy", n: "โลหิตคลั่ง", sc: "สัตว์ร้าย", ti: 5, w: "fist", mg: 100, st: { STR: 15, VIT: 10, AGI: 10 }, at: null, bp: 0, p: 0, f: 0, dm: 1, cd: 5, se: { t: "frenzy", v: 20, mx: 80, u: 5 }, ee: null, d: "คลั่ง: ATK+20% ยิ่งเลือดน้อยยิ่งแรงถึง +80% (5ตา) — กลิ่นเลือดปลุกสัญชาตญาณนักล่า ยิ่งบาดเจ็บยิ่งดุร้าย", types: ["yang"] },
+  { id: "bss_eagle_feathers", n: "ขนนกพันกระบี่", sc: "สัตว์ร้าย", ti: 5, w: "hidden", mg: 100, st: { DEX: 15, AGI: 12, LUK: 8 }, at: "phy", bp: 120, p: 30, f: 0, dm: 1.2, hits: 6, pen: 35, cd: 0, se: null, ee: null, d: "Phy×120% bp×130% · ขนนก 6 เล่มรอบเป้า + ทะลวงเกราะ 35% — ขนปีกคมดุจกระบี่นับพันโปรยลงมาเป็นห่าฝน", types: ["external"] },
+  { id: "bss_eagle_dive", n: "ดิ่งฟ้าผ่าภูผา", sc: "สัตว์ร้าย", ti: 5, w: "fist", mg: 100, st: { STR: 13, AGI: 14, DEX: 8 }, at: "phy", bp: 150, p: 40, f: 0, dm: 1.35, pen: 50, cd: 2, se: null, ee: null, d: "Phy×135% bp×140% ระยะ 4 + ทะลวงเกราะ 50% — โฉบดิ่งจากฟ้าด้วยกรงเล็บ แรงพอผ่าหินผาเป็นสองซีก", types: ["yang"] },
+  { id: "bss_eagle_gale", n: "ปีกพายุ", sc: "สัตว์ร้าย", ti: 5, w: "fist", mg: 100, st: { AGI: 15, DEX: 12, LUK: 8 }, at: "phy", bp: 90, p: 20, f: 0, dm: 1, cd: 3, se: null, ee: { t: "blind", v: -30, ch: 40, u: 5 }, d: "Phy กากบาท 2 ช่อง + ตาพร่า Acc-30 (5ตา) ท่าถัดไปพลาด 40% — ปีกกระพือเป็นพายุ ฝุ่นทรายเข้าตาจนมองไม่เห็นทาง", types: ["soft"] },
+  { id: "bss_turtle_shell", n: "กระดองแบกตะวัน", sc: "สัตว์ร้าย", ti: 5, w: "fist", mg: 100, st: { VIT: 15, DEF: 15, STR: 5 }, at: null, bp: 0, p: 0, f: 0, dm: 1, cd: 5, se: { t: "sun_shell", v: 25, rv: 30, u: 5 }, ee: null, d: "โล่ 25% HP สูงสุด + สะท้อน 30% (5ตา) — หดตัวในกระดองที่ร้อนแรงดุจดวงตะวัน อาวุธใดกระทบย่อมสะท้อนกลับ", types: ["hard"] },
+  { id: "bss_turtle_sun", n: "ตะวันแผดเผา", sc: "สัตว์ร้าย", ti: 5, w: "fist", mg: 100, st: { POW: 15, INT: 12, VIT: 8 }, at: "int", bp: 110, p: 30, f: 0, dm: 1.1, cd: 3, se: null, ee: { t: "scorch", pp: 5, u: 5 }, d: "Int×110% bp×130% รัศมี 2 + แผดเผา 5%HP/ตา ฟื้นพลังไม่ได้ (5ตา) — กระดองปล่อยแสงตะวันแผดเผาทุกสิ่งรอบกาย", types: ["yang", "internal"] },
+  { id: "bss_turtle_quake", n: "ทับภูผา", sc: "สัตว์ร้าย", ti: 5, w: "fist", mg: 100, st: { VIT: 15, STR: 12, DEF: 8 }, at: "phy", bp: 130, p: 30, f: 0, dm: 1.3, vitScale: 0.6, cd: 0, se: null, ee: { t: "stun", ch: 35, u: 2 }, d: "Phy×130% bp×130% + VIT scaling (×0.6/VIT) + โอกาส 35% สตัน (2ตา) — ร่างหนักดุจภูเขาทั้งลูกทับลงมา", types: ["hard", "external"] },
+  { id: "bss_crab_pincers", n: "คีมพันดาบ", sc: "สัตว์ร้าย", ti: 5, w: "blade", mg: 100, st: { STR: 15, DEX: 12, AGI: 8 }, at: "phy", bp: 125, p: 35, f: 0, dm: 1.25, hits: 4, cd: 0, se: null, ee: { t: "sunder", dv: -12, u: 5 }, d: "Phy×125% bp×135% · หนีบ 4 ครั้ง + ทลายเกราะ: สลายบัฟ/โล่ทั้งหมด PDef-12 ต่อครั้ง (5ตา) — คีมคมกว่าดาบพันเล่มตัดเกราะใดก็ขาด", types: ["external", "hard"] },
+  { id: "bss_crab_mirror", n: "กระดองสะท้อนดาบ", sc: "สัตว์ร้าย", ti: 5, w: "blade", mg: 100, st: { DEF: 15, VIT: 12, AGI: 8 }, at: null, bp: 0, p: 0, f: 0, dm: 1, cd: 4, se: { t: "buff_reflect_eva", rv: 50, ev: 40, u: 5 }, ee: null, d: "สะท้อน 50% + Eva+40 (5ตา) — กระดองมันวาวดุจกระจก คมดาบที่ฟันมาย้อนกลับเข้าหาผู้ฟัน", types: ["hard"] },
+  { id: "bss_crab_tide", n: "ฟองคลื่นหมอก", sc: "สัตว์ร้าย", ti: 5, w: "fist", mg: 100, st: { POW: 13, INT: 12, AGI: 10 }, at: "int", bp: 100, p: 25, f: 0, dm: 1.05, cd: 3, se: null, ee: { t: "multi_debuff", av: -20, ev: -20, u: 5 }, d: "Int×105% bp×125% รัศมี 2 + Acc-20 Eva-20 (5ตา) — พ่นฟองคลื่นกลายเป็นหมอกทะเลปกคลุมสนาม", types: ["yin", "internal"] },
+  { id: "bss_bull_charge", n: "เขาเพลิงพุ่งทะลวง", sc: "สัตว์ร้าย", ti: 5, w: "long", mg: 100, st: { STR: 15, VIT: 12, AGI: 8 }, at: "phy", bp: 140, p: 35, f: 0, dm: 1.3, pen: 25, cd: 0, se: null, ee: { t: "scorch", pp: 4, u: 4 }, d: "Phy×130% bp×135% แนวตรง 4 ช่อง + ทะลวงเกราะ 25% + แผดเผา 4%HP/ตา (4ตา) — เขาลุกเป็นไฟพุ่งทะลวงทุกสิ่งที่ขวางหน้า", types: ["yang", "hard"] },
+  { id: "bss_bull_stomp", n: "กระทืบธรณี", sc: "สัตว์ร้าย", ti: 5, w: "fist", mg: 100, st: { VIT: 15, STR: 12, DEF: 8 }, at: "phy", bp: 95, p: 20, f: 0, dm: 1, cd: 3, se: null, ee: { t: "stun", ch: 45, u: 2 }, d: "Phy รอบตัวรัศมี 2 + โอกาส 45% สตัน (2ตา) — กีบกระทืบจนแผ่นดินแยก ผู้ยืนใกล้ล้มลุกคลุกคลาน", types: ["hard"] },
+  { id: "bss_bull_rage", n: "เพลิงโทสะ", sc: "สัตว์ร้าย", ti: 5, w: "fist", mg: 100, st: { STR: 15, VIT: 10, POW: 10 }, at: null, bp: 0, p: 0, f: 0, dm: 1, cd: 5, se: { t: "frenzy", v: 25, mx: 70, u: 5 }, ee: null, d: "คลั่ง: ATK+25% ยิ่งเลือดน้อยยิ่งแรงถึง +70% (5ตา) — โทสะลุกเป็นเพลิง ดวงตาแดงก่ำ ไม่หยุดจนศัตรูล้ม", types: ["yang"] },
 ]);
 
 export const SKILLS_BY_ID: Map<string, Skill> = new Map(SKILLS.map((s) => [s.id, s]));

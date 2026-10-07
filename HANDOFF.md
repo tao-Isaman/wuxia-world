@@ -27,7 +27,7 @@ A Thai wuxia RPG in the browser: Next.js 15, React 19, TypeScript, Phaser 4, Zus
 - **Exploring.** The hero walks painted maps: 101 places, 129 roads; villages, towns and homes have their own people and activities; foes turn up on the map as the hero walks.
 - **Doing.** They talk to 235 NPCs (30 of whom, with their disciples and heirs, live their own lives) (and give them gifts), take 1,074 quests (a 15-chapter main story, 113 sect lineage quests — one per sect tier and kind, a pick of one move where a tier has several — and 48 story sagas among them), join one of 15 sects, gather, craft, steal, and land in jail.
 - **Fighting.** Battles are turn-based tactics on a 10 × 7 board that grows to 15 × 10 for big gangs (up to 6 pack members plus the leader).
-- **Code.** Two pure engines (`lib/game`, `lib/world`) sit under Zustand stores and React / Phaser views. The world saves to `localStorage` (version 25).
+- **Code.** Two pure engines (`lib/game`, `lib/world`) sit under Zustand stores and React / Phaser views. The world saves to `localStorage` (version 26).
 
 Start with [README.md](README.md), then [docs/README.md](docs/README.md).
 
@@ -136,7 +136,9 @@ Real behaviour today, found during the docs audit. Each is small and self-contai
 
 ### Roaming foes
 
-- **Only roads and wilds.** Cities, villages, homes, inns, sects, temples and the palace get no stray foes; a kill quest's quarry can still come there (`isSettledPlace`).
+- **Only roads and wilds, and only where they live.** Each foe has habitats (`lib/world/data/habitats.ts`); cities, villages, homes, inns, sects, temples and the palace get no stray foes, and a kill quest's quarry comes only to its habitat (town foes: thieves, drunks, ruffians, the false fortune-teller).
+- **Legendary beasts.** Six bosses wait in their lairs (`lib/world/data/bosses.ts`) and return 90 days after they fall. Their trophies (`trophy_*`) sell well but no recipe uses them yet. Some PixelLab clips are weak: the iron monk's, blood tiger's and poison matriarch's hurt clips barely move; the turtle's fire jet is cut at the frame edge on one attack frame; the eagle's rock is part of its sprite.
+- **Ghost lore left.** The NPC วิญญาณเหลียงเก๋อ (a cutscene spirit) and a few wilderness quest lines still speak of ghosts; no foe is a spirit any more.
 - **Foes can stand on painted scenery.** A spawn spot only needs to be unblocked and reachable by the collision data, so on maps whose collision is loose (the capital's outer wall, for one) a foe can appear somewhere that looks out of bounds.
 - **Not saved.** A reload clears the foes on the map; they also go when the hero walks on another map.
 - **They don't move.** Foes wait where they appear; they don't patrol or give chase.

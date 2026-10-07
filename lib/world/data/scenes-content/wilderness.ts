@@ -347,7 +347,7 @@ export const SCENES_WILDERNESS: readonly Scene[] = [
     id: "qs_qw_kunlun_snow_lotus_offer",
     lines: [
       { t: "dialogue", speaker: "ชิวเฉียน", text: "ข้าเจ็บป่วยมานาน ต้องการบัวหิมะจากยอดนิรันดร์คุนหลุน ยอดสูงสุดของเขาลูกนี้" },
-      { t: "dialogue", speaker: "ชิวเฉียน", text: "แต่ยอดนั้นมีปีศาจหิมะพิทักษ์อยู่ ใครก็ตามที่ขึ้นไปต้องพร้อมสู้" },
+      { t: "dialogue", speaker: "ชิวเฉียน", text: "แต่ยอดนั้นมีเสือดาวหิมะทำรังอยู่ ใครก็ตามที่ขึ้นไปต้องพร้อมสู้" },
     ],
     choices: [
       {

@@ -2,7 +2,7 @@
 
 # Items, shops, crafting and gathering
 
-479 items (`lib/world/data/items.ts`), 19 shops, 7 martial halls, 49 artisans, 36 recipes and 25 gathering / hunting nodes.
+485 items (`lib/world/data/items.ts`), 19 shops, 7 martial halls, 49 artisans, 36 recipes and 25 gathering / hunting nodes.
 
 ## Contents
 
@@ -16,7 +16,7 @@
 
 ## Items by category
 
-### วัตถุดิบ (`material`, 17)
+### วัตถุดิบ (`material`, 23)
 
 | Id | Name | Price | Use |
 | --- | --- | --- | --- |
@@ -29,6 +29,12 @@
 | `raw_meat` | เนื้อสด | 15 | — |
 | `fur_pelt` | หนังสัตว์ | 40 | — |
 | `snake_skin` | หนังงู | 80 | — |
+| `trophy_golden_serpent` | เกล็ดทองงูยักษ์ | 6000 | — |
+| `trophy_blood_tiger` | เขี้ยวพยัคฆ์โลหิต | 6500 | — |
+| `trophy_sword_eagle` | ขนปีกกระบี่อินทรียักษ์ | 7000 | — |
+| `trophy_sun_turtle` | แผ่นกระดองแบกตะวัน | 6500 | — |
+| `trophy_blade_crab` | ก้ามดาบปูวิเศษ | 6500 | — |
+| `trophy_flame_bull` | เขาเพลิงกระทิงยักษ์ | 7500 | — |
 | `fish_carp` | ปลาคาร์ป | 20 | — |
 | `fish_eel` | ปลาไหล | 50 | — |
 | `iron_ingot` | เหล็กแท่ง | 80 | — |

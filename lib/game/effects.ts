@@ -8,6 +8,7 @@ import type {
   BuffRecord,
   DebuffRecord,
   MeridianProc,
+  SideBattleState,
 } from "./types";
 import { getArt } from "./data";
 
@@ -84,6 +85,14 @@ export function addDebuff(state: BattleState, side: Side, d: DebuffRecord): void
   }
   const list = state.st[side].debuffs;
   const existing = list.find((x) => x.t === d.t);
+  // Bleed / scorch: a fresh coat keeps the larger running % (a bleed keeps
+  // its growth) and the longer timer.
+  if (existing && (d.t === "bleed" || d.t === "scorch")) {
+    existing.pp = Math.max(existing.pp ?? 0, d.pp ?? 0);
+    if (d.inc != null) existing.inc = Math.max(existing.inc ?? 0, d.inc);
+    existing.u = Math.max(existing.u, d.u);
+    return;
+  }
   if (existing && STACKABLE_DEBUFF.has(d.t) && d.v != null && existing.v != null) {
     existing.v = clampDebuffValue(existing.v + d.v);
     existing.u = Math.max(existing.u, d.u);
@@ -105,6 +114,69 @@ export function escapeBattleText(value: string): string {
 
 function nameOf(side: Side, names: Record<Side, string>): string {
   return escapeBattleText(names[side]);
+}
+
+// ─── Boss-effect helpers ───────────────────────────────────────────────
+
+/** True while the side burns under a scorch (แผดเผา): it regains no HP. */
+export function isScorched(st: SideBattleState): boolean {
+  return st.debuffs.some((d) => d.t === "scorch" && d.u > 0);
+}
+
+/**
+ * Restore up to `amount` HP to `side` (capped at max HP). Every HP heal in
+ * battle goes through here so a scorch can block it. Returns the HP gained.
+ */
+export function healHp(state: BattleState, side: Side, amount: number): number {
+  if (amount <= 0 || isScorched(state.st[side])) return 0;
+  const cap = side === "A" ? state.dA.HP : state.dB.HP;
+  const before = side === "A" ? state.hA : state.hB;
+  const after = Math.min(cap, before + Math.round(amount));
+  if (side === "A") state.hA = after;
+  else state.hB = after;
+  return Math.max(0, after - before);
+}
+
+/** The "ฟื้นไม่ได้" note a blocked heal leaves in the log (empty when nothing was blocked). */
+function blockedNote(state: BattleState, side: Side, wanted: number, got: number): string {
+  return wanted > 0 && got === 0 && isScorched(state.st[side]) ? " (ถูกแผดเผา ฟื้นไม่ได้)" : "";
+}
+
+/** Frenzy's Atk % at `hp` of `max` HP: `v` at full health rising to `mx` at 0. */
+export function frenzyPct(v: number, mx: number, hp: number, max: number): number {
+  const lost = 1 - Math.max(0, Math.min(1, hp / Math.max(1, max)));
+  return Math.round(v + (mx - v) * lost);
+}
+
+/** Put (or raise) a frenzy record on `side`; the larger value and the longer timer win. */
+function applyFrenzy(state: BattleState, side: Side, n: string, v: number, mx: number, u: number): number {
+  const hp = side === "A" ? state.hA : state.hB;
+  const max = side === "A" ? state.dA.HP : state.dB.HP;
+  const pct = frenzyPct(v, mx, hp, max);
+  const existing = state.st[side].buffs.find((b) => b.t === "frenzy");
+  if (existing) {
+    existing.v = Math.max(existing.v, pct);
+    existing.u = Math.max(existing.u, u);
+    return existing.v;
+  }
+  state.st[side].buffs.push({ t: "frenzy", n, v: pct, u });
+  return pct;
+}
+
+/**
+ * Blind (ตาพร่า): when a blinded side tries a skill / art, roll its chance;
+ * the blind is spent on that roll either way. Returns true when the action fails.
+ */
+export function rollBlind(st: SideBattleState, rng: () => number = Math.random): boolean {
+  const blind = st.debuffs.find((d) => d.t === "blind" && d.u > 0);
+  if (!blind) return false;
+  st.debuffs = st.debuffs.filter((d) => d !== blind);
+  return rng() * 100 < (blind.ch ?? 0);
+}
+
+/** The battle-log line of a blinded side's failed action. */
+export function blindFailLine(name: string): string {
+  return `${escapeBattleText(name)} <span style="color:#AAA">ตาพร่ามัว — ท่าพลาดเป้า!</span>`;
 }
 
 // ─── Self-effect dispatcher (skill `se` + art active self-buff ops) ───
@@ -142,19 +214,17 @@ export function applySelfEffect(
       return;
     case "heal_pct": {
       const cap = side === "A" ? state.dA.HP : state.dB.HP;
-      const heal = Math.round(cap * eff.v / 100);
-      if (side === "A") state.hA = Math.min(cap, state.hA + heal);
-      else state.hB = Math.min(cap, state.hB + heal);
-      logLine(state, "lS", `&nbsp;⟳ ${nm}: ฟื้น${heal}HP`);
+      const want = Math.round(cap * eff.v / 100);
+      const heal = healHp(state, side, want);
+      logLine(state, "lS", `&nbsp;⟳ ${nm}: ฟื้น${heal}HP${blockedNote(state, side, want, heal)}`);
       return;
     }
     case "heal_buff": {
       const cap = side === "A" ? state.dA.HP : state.dB.HP;
-      const heal = Math.round(cap * eff.hp / 100);
-      if (side === "A") state.hA = Math.min(cap, state.hA + heal);
-      else state.hB = Math.min(cap, state.hB + heal);
+      const want = Math.round(cap * eff.hp / 100);
+      const heal = healHp(state, side, want);
       addBuff(state, side, { t: eff.bt, n: "บัฟ", v: eff.bv, u: eff.bu });
-      logLine(state, "lS", `&nbsp;⟳ ${nm}: ฟื้น${heal}HP+${eff.bt}+${eff.bv}(${eff.bu}ตา)`);
+      logLine(state, "lS", `&nbsp;⟳ ${nm}: ฟื้น${heal}HP${blockedNote(state, side, want, heal)}+${eff.bt}+${eff.bv}(${eff.bu}ตา)`);
       return;
     }
     case "stack_atk": {
@@ -179,6 +249,32 @@ export function applySelfEffect(
       addBuff(state, side, { t: "buff_eva", n: "ดาวคล้อย", v: eff.ev, u: eff.u });
       logLine(state, "lS", `&nbsp;⟳ ${nm}: สะท้อน${eff.rv}% + Eva+${eff.ev}(${eff.u}ตา)`);
       return;
+    case "molt": {
+      // Shed the old skin first, so a scorch it carried no longer blocks the heal.
+      const cleared = state.st[side].debuffs.length;
+      state.st[side].debuffs = [];
+      const cap = side === "A" ? state.dA.HP : state.dB.HP;
+      const heal = healHp(state, side, Math.round(cap * eff.hp / 100));
+      addBuff(state, side, { t: "buff_reflect", n: "เกล็ดใหม่", v: eff.rv, u: eff.u });
+      logLine(state, "lS", `&nbsp;⟳ ${nm}: ลอกคราบ ล้างดีบัฟ ${cleared} · ฟื้น${heal}HP · สะท้อน${eff.rv}%(${eff.u}ตา)`);
+      return;
+    }
+    case "frenzy": {
+      const pct = applyFrenzy(state, side, "โลหิตคลั่ง", eff.v, eff.mx, eff.u);
+      logLine(state, "lS", `&nbsp;⟳ ${nm}: คลั่ง ATK+${pct}%(${eff.u}ตา)`);
+      return;
+    }
+    case "sun_shell": {
+      const cap = side === "A" ? state.dA.HP : state.dB.HP;
+      const v = Math.max(1, Math.round(cap * eff.v / 100));
+      const shield = state.st[side].buffs.find((b) => b.t === "shield");
+      if (shield) shield.v = Math.max(shield.v, v);
+      else state.st[side].buffs.push({ t: "shield", n: "กระดองตะวัน", v, u: 1 });
+      addBuff(state, side, { t: "buff_reflect", n: "กระดองตะวัน", v: eff.rv, u: eff.u });
+      pushProc(state, side, "shield", `กระดองตะวัน ${shield ? shield.v : v}`);
+      logLine(state, "lS", `&nbsp;⟳ ${nm}: กระดองตะวัน โล่ ${shield ? shield.v : v} + สะท้อน${eff.rv}%(${eff.u}ตา)`);
+      return;
+    }
 
     default: {
       // Every kind needs a case above: a new variant without one is a type error.
@@ -274,6 +370,38 @@ export function applyEnemyEffect(
       logLine(state, "lS", `&nbsp;✗ ${dnm}: ${removed ? `สลาย[${removed.n ?? "บัฟ"}]` : ""} Acc${eff.acc}(${eff.u}ตา)`);
       return;
     }
+    case "bind": {
+      addDebuff(state, ds, { t: "debuff_def", n: "ถูกรัด", v: eff.dv, u: eff.du });
+      if (Math.random() * 100 < eff.ch) {
+        addDebuff(state, ds, { t: "stun", n: "ถูกรัด", u: eff.u });
+        logLine(state, "lS", `&nbsp;✗ ${dnm}: ถูกรัดแน่น สตัน (${eff.u}ตา) + PDef${eff.dv}(${eff.du}ตา)`);
+      } else {
+        logLine(state, "lS", `&nbsp;✗ ${dnm}: ดิ้นหลุด + PDef${eff.dv}(${eff.du}ตา)`);
+      }
+      return;
+    }
+    case "bleed":
+      addDebuff(state, ds, { t: "bleed", n: "เลือดไหล", pp: eff.pp, inc: eff.inc, u: eff.u });
+      logLine(state, "lS", `&nbsp;✗ ${dnm}: เลือดไหล ${eff.pp}%HP/ตา +${eff.inc}/ตา (${eff.u}ตา)`);
+      return;
+    case "blind":
+      addDebuff(state, ds, { t: "debuff_acc", n: "ตาพร่า", v: eff.v, u: eff.u });
+      addDebuff(state, ds, { t: "blind", n: "ตาบอด", ch: eff.ch, u: eff.u });
+      logLine(state, "lS", `&nbsp;✗ ${dnm}: ตาพร่า Acc${eff.v} · ท่าถัดไปพลาด ${eff.ch}% (${eff.u}ตา)`);
+      return;
+    case "scorch":
+      addDebuff(state, ds, { t: "scorch", n: "แผดเผา", pp: eff.pp, u: eff.u });
+      logLine(state, "lS", `&nbsp;✗ ${dnm}: แผดเผา ${eff.pp}%HP/ตา ฟื้นพลังไม่ได้ (${eff.u}ตา)`);
+      return;
+    case "sunder": {
+      // Strip first: a ward is broken too, so the armour break always lands.
+      const stripped = state.st[ds].buffs.length + (state.st[ds].stk > 0 ? 1 : 0);
+      state.st[ds].buffs = [];
+      state.st[ds].stk = 0;
+      addDebuff(state, ds, { t: "debuff_def", n: "เกราะแหลก", v: eff.dv, u: eff.u });
+      logLine(state, "lS", `&nbsp;✗ ${dnm}: ทลายเกราะ${stripped ? ` สลายบัฟ ${stripped}` : ""} + PDef${eff.dv}(${eff.u}ตา)`);
+      return;
+    }
 
     default: {
       // Every kind needs a case above: a new variant without one is a type error.
@@ -326,10 +454,14 @@ function applyPassiveEffect(
       return;
     case "heal_pct": {
       const cap = side === "A" ? state.dA.HP : state.dB.HP;
-      const heal = Math.round(cap * e.v / 100);
-      if (side === "A") state.hA = Math.min(cap, state.hA + heal);
-      else state.hB = Math.min(cap, state.hB + heal);
-      logLine(state, "lS", `&nbsp;◆ ${nm} ฟื้น ${heal} HP`);
+      const want = Math.round(cap * e.v / 100);
+      const heal = healHp(state, side, want);
+      logLine(state, "lS", `&nbsp;◆ ${nm} ฟื้น ${heal} HP${blockedNote(state, side, want, heal)}`);
+      return;
+    }
+    case "frenzy": {
+      const pct = applyFrenzy(state, side, e.n ?? "โลหิตคลั่ง", e.v, e.mx, e.u);
+      logLine(state, "lS", `&nbsp;◆ ${nm}: คลั่ง ATK+${pct}%(${e.u}ตา)`);
       return;
     }
     case "debuff_acc":
@@ -409,7 +541,10 @@ export function tickSideEffects(
   if ((side === "A" ? state.hA : state.hB) > 0) tickRegen(state, side, hpRegen, names, artId);
 }
 
-// Poison + burn damage, then duration decrement and pruning.
+/** The most a bleed grows to, in % of max HP per tick. */
+export const BLEED_CAP = 15;
+
+// Poison + burn + bleed + scorch damage, then duration decrement and pruning.
 function tickDots(state: BattleState, side: Side, names: Record<Side, string>): void {
   const st = state.st[side];
   const poison = st.debuffs.find((d) => d.t === "debuff_poison");
@@ -438,6 +573,27 @@ function tickDots(state: BattleState, side: Side, names: Record<Side, string>): 
       logLine(state, "lS", `&nbsp;🔥 ${nameOf(side, names)} เผาไหม้ HP-${hpDmg} MP-${mpDmg}`);
   }
 
+  // Bleed: the wound opens wider every tick (pp grows by inc, ≤ BLEED_CAP %).
+  const bleed = st.debuffs.find((d) => d.t === "bleed");
+  if (bleed && bleed.u > 0 && bleed.pp != null) {
+    const cap = side === "A" ? state.dA.HP : state.dB.HP;
+    const dmg = Math.round(cap * bleed.pp / 100);
+    if (side === "A") state.hA = Math.max(0, state.hA - dmg);
+    else state.hB = Math.max(0, state.hB - dmg);
+    if (dmg > 0) logLine(state, "lS", `&nbsp;🩸 ${nameOf(side, names)} เลือดไหล ${dmg} (${bleed.pp}%)`);
+    bleed.pp = Math.min(BLEED_CAP, bleed.pp + (bleed.inc ?? 0));
+  }
+
+  // Scorch: a steady burn (its heal block is read by healHp while it lasts).
+  const scorch = st.debuffs.find((d) => d.t === "scorch");
+  if (scorch && scorch.u > 0 && scorch.pp != null) {
+    const cap = side === "A" ? state.dA.HP : state.dB.HP;
+    const dmg = Math.round(cap * scorch.pp / 100);
+    if (side === "A") state.hA = Math.max(0, state.hA - dmg);
+    else state.hB = Math.max(0, state.hB - dmg);
+    if (dmg > 0) logLine(state, "lS", `&nbsp;☀ ${nameOf(side, names)} ถูกแผดเผา ${dmg}`);
+  }
+
   for (const b of st.buffs) if (b.u > 0 && !UNTIMED_BUFF.has(b.t)) b.u--;
   state.st[side].buffs = st.buffs.filter((b) => b.u > 0);
   for (const d of st.debuffs) if (d.u > 0) d.u--;
@@ -457,16 +613,12 @@ function tickRegen(
   for (const b of state.st[side].buffs) if (b.t === "buff_regen") statusRegen += b.v;
   if (statusRegen > 0) {
     const cap = side === "A" ? state.dA.HP : state.dB.HP;
-    const heal = Math.round(cap * statusRegen / 100);
-    if (side === "A") state.hA = Math.min(cap, state.hA + heal);
-    else state.hB = Math.min(cap, state.hB + heal);
+    const heal = healHp(state, side, Math.round(cap * statusRegen / 100));
     if (heal > 0) logLine(state, "lS", `&nbsp;💧 ${nameOf(side, names)} ฟื้น ${heal} (วารีพิสุทธิ์)`);
   }
   if (regen > 0) {
     const cap = side === "A" ? state.dA.HP : state.dB.HP;
-    const heal = Math.round(cap * regen / 100);
-    if (side === "A") state.hA = Math.min(cap, state.hA + heal);
-    else state.hB = Math.min(cap, state.hB + heal);
+    const heal = healHp(state, side, Math.round(cap * regen / 100));
     if (heal > 0) logLine(state, "lS", `&nbsp;💊 ${nameOf(side, names)} ฟื้น ${heal} (อุปกรณ์)`);
   }
 
@@ -477,9 +629,7 @@ function tickRegen(
     const hpCap = side === "A" ? state.dA.HP : state.dB.HP;
     const mpCap = side === "A" ? state.dA.MP : state.dB.MP;
     if (art.hpRegenPct && art.hpRegenPct > 0) {
-      const heal = Math.round(hpCap * art.hpRegenPct / 100);
-      if (side === "A") state.hA = Math.min(hpCap, state.hA + heal);
-      else state.hB = Math.min(hpCap, state.hB + heal);
+      const heal = healHp(state, side, Math.round(hpCap * art.hpRegenPct / 100));
       if (heal > 0) logLine(state, "lS", `&nbsp;🌱 ${nameOf(side, names)} ฟื้น ${heal} HP (${art.n})`);
     }
     if (art.mpRegenPct && art.mpRegenPct > 0) {

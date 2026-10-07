@@ -24,11 +24,10 @@ export {
   fightEventsForLocation,
   applyOpponentStatScale,
   playerPowerIndex,
-  zoneOfLocation,
   pickWeighted,
-  ZONE_CATEGORY_WEIGHT,
-  type EnemyZone,
 } from "./random-events";
+export { BIOMES, BIOME_LABEL, FOE_HABITATS, PLACE_BIOMES, biomesOf, foeLivesAt, type Biome } from "./habitats";
+export { BOSSES, BOSS_RESPAWN_DAYS, getBoss, bossAlive, bossesAt, type BossDef } from "./bosses";
 export { RESOURCES, RESOURCES_BY_ID, getResource } from "./resources";
 export { RECIPES, RECIPES_BY_ID, getRecipe } from "./recipes";
 export {

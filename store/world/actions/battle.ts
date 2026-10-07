@@ -1,11 +1,13 @@
 // The hand-off back from a battle: spoils and acknowledgeBattleResult.
 import { getArt, getSkill } from "@/lib/game";
+import { EQUIPMENT_BY_ID } from "@/lib/game/data/equipment";
 import { STAT_XP_PER_ACTION } from "@/lib/world/stat-progression";
 import { useBattleStore } from "@/store/battle-store";
 import { packOpponentIdOf } from "@/lib/world/battle-looks";
 import { getItem, getNpc, getOpponent, getResource, getScene, masteryLevel } from "@/lib/world";
 import { applyEffect, tickQuestProgress } from "@/lib/world/effects";
 import { isLawOpponent } from "@/lib/world/law";
+import { bossSlain, moveXpMultiplier } from "@/lib/world/victory";
 import { advanceTime, heroKills, markAttemptedMurder, reviveFromDeath, settleTournamentBout } from "../lifecycle";
 import { applyArtLevelUps, applySkillLevelUps, grantStatXp, isArtFrozen, isSkillFrozen, rollLukXp } from "../progression";
 import { ART_USE_XP, FAIL_XP_FRACTION, FIGHT_HOURS, FIGHT_STAMINA, HUNT_XP_MULT, SKILL_USE_XP } from "../rules";
@@ -139,6 +141,8 @@ export const battleActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "c
       const packId = unit.team === "enemy" && !unit.alive ? packOpponentIdOf(unit.id) : null;
       if (packId) draft.defeatedCounts[packId] = (draft.defeatedCounts[packId] ?? 0) + 1;
     }
+    // Beasts and legendary beasts teach twice as much per move (lib/world/victory.ts).
+    const xpMult = moveXpMultiplier(getOpponent(pb.opponentId));
     const uses = battleState?.skillUses?.A ?? {};
     let actionTotal = 0;
     for (const [sid, count] of Object.entries(uses)) {
@@ -151,7 +155,7 @@ export const battleActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "c
       // current level but never grows further. Betrayed sects keep
       // earning XP — the cost there is the random-event hunters.
       if (!isSkillFrozen(draft, sid)) {
-        draft.skillExp[sid] = (draft.skillExp[sid] ?? 0) + count * SKILL_USE_XP;
+        draft.skillExp[sid] = (draft.skillExp[sid] ?? 0) + count * SKILL_USE_XP * xpMult;
         if (!(sid in draft.skillLevel)) draft.skillLevel[sid] = 1;
         // Per-skill auto-level on overflow.
         applySkillLevelUps(draft, sid);
@@ -175,7 +179,7 @@ export const battleActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "c
       // Same freeze rule as move skills — skip XP for arts learned
       // from a resigned sect.
       if (isArtFrozen(draft, aid)) continue;
-      draft.artExp[aid] = (draft.artExp[aid] ?? 0) + count * ART_USE_XP;
+      draft.artExp[aid] = (draft.artExp[aid] ?? 0) + count * ART_USE_XP * xpMult;
       // Make sure an artLevels entry exists so applyArtLevelUps can
       // read a starting level — also covers legacy builds that learned
       // an art without populating artLevels.
@@ -251,6 +255,14 @@ export const battleActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "c
       draft.inventory[it.itemId] = (draft.inventory[it.itemId] ?? 0) + it.count;
       lootSummary.push(`${getItem(it.itemId)?.name ?? it.itemId}×${it.count}`);
     }
+    // A legendary beast's rare gear goes to the gear bag.
+    if (spoils.gear?.length) {
+      draft.inventoryEquipment = { ...draft.inventoryEquipment };
+      for (const id of spoils.gear) {
+        draft.inventoryEquipment[id] = (draft.inventoryEquipment[id] ?? 0) + 1;
+        lootSummary.push(EQUIPMENT_BY_ID.get(id)?.n ?? id);
+      }
+    }
     if (spoils.gold > 0) lootSummary.push(`${spoils.gold} ตำลึง`);
     appendActionLog(
       draft,
@@ -258,6 +270,12 @@ export const battleActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "c
       `ชนะ ${oppDef?.name ?? pb.opponentId}` +
         (lootSummary.length > 0 ? ` · ${lootSummary.join(", ")}` : ""),
     );
+
+    // A legendary beast fell: it is gone for 90 days and the jianghu hears of it.
+    if (oppDef?.boss) {
+      const boss = bossSlain(draft, oppDef.id);
+      if (boss) appendActionLog(draft, "boss", `ปราบ${boss.name}สำเร็จ! ข่าวนี้จะลือไปทั่วยุทธภพ — มันจะกลับมาอีกใน ${boss.respawnDays} วัน`);
+    }
 
     // Now that loot, kill counts, and skill xp have all been written,
     // give the quest progress ticker a chance to advance any active

@@ -6,6 +6,17 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-07
 
+### Foes live where they belong; tier 5; six legendary beasts
+
+- **Stronger foes:** every T3 foe ×1.6, T4 ×1.45, and every NPC-backed fighter (spar partners, `npc@` / `lawnpc@` foes, sect hunters, named villains) ×1.4 power score (`boostBuild`); the day / rank stat scale stays on top.
+- **Habitats:** every place and road has biomes and every foe lives in some (`lib/world/data/habitats.ts`); foes spawn only where they live, and kill quests send the hero there. Towns still get no strays.
+- **No spirits or demons:** ปีศาจหิมะ is now เสือดาวหิมะ (`snow_leopard`), วิญญาณจอมกระบี่ is จอมกระบี่ไร้เงา (`shadowless_swordsman`), four supernatural foes are gone; `EnemyCategory` is `human | beast`. Story and quest lines rewritten.
+- **Spoils:** beasts drop no gold but give w-exp 80 + 60 × tier (people 40 + 20 × tier) and double move / art xp.
+- **Tier 5:** six foes at the hero's power tiers 9–10 (ฤๅษีกระบี่ไร้นาม, จ้าวดาบโลหิต, แม่เฒ่าพันพิษ, ภิกษุเกราะเหล็กนอกรีต, พยัคฆ์ขาวหิมะ, ราชาหมาป่าทุ่งเหนือ), from hero power 0.6; two new coast beasts (ปูเหล็ก, เต่าศิลา).
+- **Legendary beasts (บอส):** งูยักษ์เกล็ดทองคำ (ถ้ำงูทอง), พยัคฆ์โลหิตลายคราม (หุบเขาผีเสื้อ), อินทรียักษ์จ้าวแห่งกระบี่ (ยอดเขามรณะ), เต่ายักษ์แบกตะวัน (เกาะไร้ชื่อ), ปูวิเศษจ้าวแห่งดาบ (สระมังกรดำ), กระทิงยักษ์เขาเพลิง (ยอดแสงสว่าง): power ~1550 with two minions each, three moves of their own (`bss_*`, 18) and an inner art (`art_boss_*`), nine new effects (`bind`, `molt`, `bleed`, `frenzy`, `pierce`, `blind`, `sun_shell`, `scorch`, `sunder`), back 90 days after they fall (save v26 `bossDefeatedDay`), a trophy, boss drops, 3,000–4,000 w-exp, lore rumors pointing at the lairs.
+- **Art:** PixelLab animated sheets (idle / attack / hurt) for the bosses and T5 (`public/art/anims/`, `scripts/build-anim-sheets.ts`), drawn large in battle, in their lairs and on the encounter screens.
+- Tests: `test:foes`, `test:boss-skills`, `tests/browser/anim-foes.spec.ts`. Design: [design/foes-and-bosses.md](design/foes-and-bosses.md).
+
 ### The quest log keeps pointing on after the next chapter is taken
 
 - Under a finished chapter, the "บทต่อไป" box disappeared as soon as the next chapter was accepted, so a finished main-story chapter said nothing about where to go. It now reads "บทต่อไป (บทที่ N) รับแล้ว" with the next chapter's current step and place (`guideForQuest`); `quest-chain.spec.ts` covers the main story.

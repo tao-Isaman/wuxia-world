@@ -15,6 +15,7 @@
 // ── Skill rule table (skillGrid) ──────────────────────────────────────
 //   no damage, no enemy effect (only `se`)   → self · {0,0} · single
 //   id "bst_*" (beast bites / claws / roars) → enemy · 1 · single
+//   id "bss_*" (legendary beasts' moves)      → each its own override below
 //   fist   phy                               → 1 · single
 //   fist   int  T0–T1                        → 1 · single
 //   fist   int  T2+ (palm / finger qi)       → 1–2 · single
@@ -178,6 +179,37 @@ export const SKILL_GRID_OVERRIDES: Record<string, Partial<GridSkillProfile>> = {
   tang_starrain: { range: { min: 2, max: 4 }, area: { kind: "diamond", size: 2 } },
   // คำรามขู่ — a beast's roar shakes everyone around the tile in front.
   bst_roar: { range: { min: 1, max: 1 }, area: { kind: "diamond", size: 1 } },
+
+  // ── Legendary beasts (บอส, bss_*): every move has its own shape ──
+  // A self-centred blast aims at range 0 (the beast's own tile) or the tile next to it.
+  // เขี้ยวพิษทองคำ — the serpent lunges two tiles to strike.
+  bss_serpent_fang: { range: { min: 1, max: 2 }, area: { kind: "single" } },
+  // รัดกระดูกแหลก — coils round one foe beside it.
+  bss_serpent_coil: { range: { min: 1, max: 1 }, area: { kind: "single" } },
+  // กรงเล็บเลือดคราม — a three-claw rake on one foe.
+  bss_tiger_claw: { range: { min: 1, max: 1 }, area: { kind: "single" } },
+  // คำรามสะท้านภพ — the roar rolls out two tiles all round the tiger.
+  bss_tiger_roar: { range: { min: 0, max: 1 }, area: { kind: "diamond", size: 2 } },
+  // ขนนกพันกระบี่ — six sword-feathers rain on a tile and its neighbours.
+  bss_eagle_feathers: { range: { min: 2, max: 4 }, area: { kind: "diamond", size: 1 } },
+  // ดิ่งฟ้าผ่าภูผา — a dive from the sky onto one foe up to four tiles off.
+  bss_eagle_dive: { range: { min: 1, max: 4 }, area: { kind: "single" } },
+  // ปีกพายุ — the wing-storm blows out in a cross two tiles long.
+  bss_eagle_gale: { range: { min: 1, max: 3 }, area: { kind: "cross", size: 2 } },
+  // ตะวันแผดเผา — sunfire bursts in a wide circle.
+  bss_turtle_sun: { range: { min: 1, max: 3 }, area: { kind: "diamond", size: 2 } },
+  // ทับภูผา — the shell crashes down on the foe in front.
+  bss_turtle_quake: { range: { min: 1, max: 1 }, area: { kind: "single" } },
+  // คีมพันดาบ — four pincer bites on one foe.
+  bss_crab_pincers: { range: { min: 1, max: 1 }, area: { kind: "single" } },
+  // ฟองคลื่นหมอก — a sea-mist of foam over a wide circle.
+  bss_crab_tide: { range: { min: 1, max: 3 }, area: { kind: "diamond", size: 2 } },
+  // เขาเพลิงพุ่งทะลวง — the charge burns through a four-tile line.
+  bss_bull_charge: { range: { min: 1, max: 4 }, area: { kind: "line", size: 4 } },
+  // กระทืบธรณี — the ground splits two tiles all round the bull.
+  bss_bull_stomp: { range: { min: 0, max: 1 }, area: { kind: "diamond", size: 2 } },
+  // (bss_serpent_molt, bss_tiger_frenzy, bss_turtle_shell, bss_crab_mirror and
+  //  bss_bull_rage are self buffs: no override.)
 };
 
 export function skillGrid(skill: Skill): GridSkillProfile {

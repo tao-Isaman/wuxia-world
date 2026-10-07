@@ -11,7 +11,7 @@ import { toast } from "@/store/toast-store";
 import { WorldCanvas } from "@/components/game/world-canvas";
 import { clearArrivalFrom, forgetMapPosition, peekArrivalFrom, type WorldMarker, type WorldPresentation } from "@/lib/stage/types";
 import { capitalVignette } from "@/lib/stage/world-vignettes";
-import { roamingFoesOn } from "./roaming-foes";
+import { bossFoesAt, roamingFoesOn } from "./roaming-foes";
 import { resolveRumorChannel } from "./rumor-listen-button";
 import { hasStation } from "@/lib/world/stations";
 import { TOURNAMENT } from "@/lib/world/tournament";
@@ -168,7 +168,8 @@ export function LocationMap({ scene, map, handlers, readOnly = false, dialogueSp
   const guidedMarkers = guideId ? markers.map((marker) => marker.id === guideId ? { ...marker, guide: true } : marker) : markers;
   const arrival = arrivalSpawn(map, arrivedFrom);
   // Foes that turned up here while the hero walked; walking into one engages it.
-  const foes = roamingFoesOn(state.roamingFoes, scene.id);
+  // An alive legendary beast waits in its lair (data/bosses.ts).
+  const foes = [...roamingFoesOn(state.roamingFoes, scene.id), ...bossFoesAt(state, scene.id)];
   // While the hero works, they play the activity's painted loop on the map.
   const heroAction = workPose && heroHasPose(state.playerBodyId, workPose) ? heroPoseStrip(state.playerBodyId, workPose) : null;
   // A map whose painting the engine replaced draws its tiled ground instead.

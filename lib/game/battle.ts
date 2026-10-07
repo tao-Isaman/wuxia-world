@@ -39,7 +39,16 @@ import {
   tickEffects,
   addDebuff,
   addBuff,
+  blindFailLine,
+  healHp,
+  isScorched,
+  rollBlind,
 } from "./effects";
+
+/** A move's cooldown in turns: its own `cd` when set (boss moves), else its tier's. */
+export function skillCooldown(sk: Pick<Skill, "ti" | "cd">): number {
+  return sk.cd ?? TIERS[sk.ti].cd;
+}
 
 // ─── Battle context: precomputed inputs that don't change during the battle ───
 export interface BattleContext {
@@ -333,7 +342,9 @@ export function calcSkillDamage(
   const vitBonus = sk.vitScale ? sk.vitScale * (ctx.stats[side].VIT ?? 0) : 0;
   const se = eBp * (1 + sk.p / 100) + sk.f + vitBonus;
   const defMul = 1 + defPctOf(dst) / 100;
-  const ed = Math.max(0, (sk.at === "phy" ? dd.PD : dd.ID) * defMul + fD - dR);
+  // Pierce (`pen`) ignores that share of the target's PD / ID.
+  const pierce = 1 - Math.max(0, Math.min(100, sk.pen ?? 0)) / 100;
+  const ed = Math.max(0, (sk.at === "phy" ? dd.PD : dd.ID) * defMul * pierce + fD - dR);
   const raw = Math.max(1, (ad.Atk * sm * ab + ta + se) * sk.dm * mm - ed) * (1 - pR / 100);
 
   const hp = hitPct(ea, ee);
@@ -369,6 +380,8 @@ function isStunned(state: BattleState, side: Side): boolean {
 export interface ResolveOpts {
   tick?: boolean;
   secondary?: boolean;
+  /** The caller already rolled the actor's blind (grid doSkill): don't roll it again. */
+  blindChecked?: boolean;
 }
 
 // ─── Skill resolution ───
@@ -396,8 +409,15 @@ export function resolveSkill(
   const skill = getSkill(skillId);
   if (!skill) return;
   if (!secondary) {
-    state.cd[side][slotIdx] = TIERS[skill.ti].cd;
+    state.cd[side][slotIdx] = skillCooldown(skill);
     state.skillUses[side][skillId] = (state.skillUses[side][skillId] ?? 0) + 1;
+  }
+
+  // Blind: the move is thrown but goes wide (cooldown spent, nothing lands).
+  if (!secondary && !opts?.blindChecked && rollBlind(state.st[side])) {
+    logLine(state, side === "A" ? "lA" : "lB", `[${state.turn}] ${blindFailLine(ctx.names[side])} <b>${skill.n}</b>`);
+    emitCast(state, side, skill.n, 1, [0], [false], [true], skill.ti, { kind: "skill", id: skill.id });
+    return;
   }
 
   const ds = opposite(side);
@@ -454,10 +474,7 @@ export function resolveSkill(
 
       // Life drain (per-hit)
       if (skill.dr && skill.dr > 0) {
-        const heal = Math.round(perHitDmg * skill.dr / 100);
-        const cap = side === "A" ? state.dA.HP : state.dB.HP;
-        if (side === "A") state.hA = Math.min(cap, state.hA + heal);
-        else state.hB = Math.min(cap, state.hB + heal);
+        const heal = healHp(state, side, Math.round(perHitDmg * skill.dr / 100));
         logLine(state, "lS", `&nbsp;→ ดูด ${heal} HP`);
       }
 
@@ -618,6 +635,12 @@ export function resolveArtActive(
     logLine(state, stunCls, `[${state.turn}] ${escapeBattleText(ctx.names[side])} <span style="color:#AAA">ถูกสตัน — ข้ามตา!</span>`);
     return true;
   }
+  // Blind: the art is spent (MP, cooldown) but its power goes astray.
+  if (!secondary && !opts?.blindChecked && rollBlind(state.st[side])) {
+    logLine(state, side === "A" ? "lA" : "lB", `[${state.turn}] ${blindFailLine(ctx.names[side])} ⚡<b>${act.n}</b>`);
+    emitCast(state, side, act.n, 1, [0], [false], [true], art.ti, { kind: "art", id: art.id });
+    return true;
+  }
 
   const cls = side === "A" ? "lA" : "lB";
   const nm = escapeBattleText(ctx.names[side]);
@@ -684,19 +707,20 @@ export function resolveArtActive(
   switch (act.t) {
     case "heal": {
       const cap = side === "A" ? state.dA.HP : state.dB.HP;
-      const heal = Math.round(cap * (act.h ?? 0) / 100);
-      if (side === "A") state.hA = Math.min(cap, state.hA + heal);
-      else state.hB = Math.min(cap, state.hB + heal);
-      logLine(state, cls, `[${state.turn}] ${nm} ⚡<b>${act.n}</b> → ฟื้น <b>${heal}</b> HP`);
+      const want = Math.round(cap * (act.h ?? 0) / 100);
+      const blocked = isScorched(state.st[side]);
+      healHp(state, side, want);
+      logLine(state, cls, `[${state.turn}] ${nm} ⚡<b>${act.n}</b> → ฟื้น <b>${blocked ? 0 : want}</b> HP${blocked ? " (ถูกแผดเผา ฟื้นไม่ได้)" : ""}`);
       break;
     }
     case "heal_cleanse": {
       const cap = side === "A" ? state.dA.HP : state.dB.HP;
-      const heal = Math.round(cap * (act.h ?? 0) / 100);
-      if (side === "A") state.hA = Math.min(cap, state.hA + heal);
-      else state.hB = Math.min(cap, state.hB + heal);
+      // The cleanse comes first: wiping a scorch lets the heal through.
       const removed = state.st[side].debuffs.pop();
-      logLine(state, cls, `[${state.turn}] ${nm} ⚡<b>${act.n}</b> → ฟื้น <b>${heal}</b> HP${removed ? ` +ลบ[${removed.n}]` : ""}`);
+      const want = Math.round(cap * (act.h ?? 0) / 100);
+      const blocked = isScorched(state.st[side]);
+      healHp(state, side, want);
+      logLine(state, cls, `[${state.turn}] ${nm} ⚡<b>${act.n}</b> → ฟื้น <b>${blocked ? 0 : want}</b> HP${blocked ? " (ถูกแผดเผา ฟื้นไม่ได้)" : ""}${removed ? ` +ลบ[${removed.n}]` : ""}`);
       break;
     }
     case "heal_full_cleanse": {
@@ -704,15 +728,12 @@ export function resolveArtActive(
       const mpCap = side === "A" ? state.dA.MP : state.dB.MP;
       const hpHeal = Math.round(hpCap * (act.h ?? 0) / 100);
       const mpHeal = Math.round(mpCap * (act.mh ?? 0) / 100);
-      if (side === "A") {
-        state.hA = Math.min(hpCap, state.hA + hpHeal);
-        state.mpA = Math.min(mpCap, state.mpA + mpHeal);
-      } else {
-        state.hB = Math.min(hpCap, state.hB + hpHeal);
-        state.mpB = Math.min(mpCap, state.mpB + mpHeal);
-      }
+      // Cleanse first (a scorch goes with the rest), then heal.
       const removedCount = state.st[side].debuffs.length;
       state.st[side].debuffs = [];
+      healHp(state, side, hpHeal);
+      if (side === "A") state.mpA = Math.min(mpCap, state.mpA + mpHeal);
+      else state.mpB = Math.min(mpCap, state.mpB + mpHeal);
       logLine(state, cls, `[${state.turn}] ${nm} ⚡<b>${act.n}</b> → ฟื้น <b>${hpHeal}</b> HP / <b>${mpHeal}</b> MP +ลบดีบัฟ ${removedCount} ระดับ`);
       break;
     }
@@ -767,10 +788,7 @@ export function resolveArtActive(
         const m = act.m ?? 1;
         const raw = Math.max(1, (ad.Atk + ad.IA) * m - (dd.ID + fD)) * (1 - pR / 100);
         const r = doAtkHit(raw, hc);
-        const heal = Math.round(r.dmg * (act.h ?? 0) / 100);
-        const cap = side === "A" ? state.dA.HP : state.dB.HP;
-        if (side === "A") state.hA = Math.min(cap, state.hA + heal);
-        else state.hB = Math.min(cap, state.hB + heal);
+        const heal = healHp(state, side, Math.round(r.dmg * (act.h ?? 0) / 100));
         const dt = r.crit ? `<span class="lC">★CRIT! ${r.dmg}</span>` : `<b>${r.dmg}</b>`;
         logLine(state, cls, `[${state.turn}] ${nm} ⚡<b>${act.n}</b>💜 ${dt} + ฟื้น <b>${heal}</b> ${probe(hc.hp, hc.cp)}`);
         checkWin(state, ctx.names);
@@ -785,10 +803,7 @@ export function resolveArtActive(
         const m = act.m ?? 1;
         const raw = Math.max(1, (ad.Atk + ad.PA) * m - (dd.PD + fD)) * (1 - pR / 100);
         const r = doAtkHit(raw, hc);
-        const heal = Math.round(r.dmg * (act.h ?? 0) / 100);
-        const cap = side === "A" ? state.dA.HP : state.dB.HP;
-        if (side === "A") state.hA = Math.min(cap, state.hA + heal);
-        else state.hB = Math.min(cap, state.hB + heal);
+        const heal = healHp(state, side, Math.round(r.dmg * (act.h ?? 0) / 100));
         const dt = r.crit ? `<span class="lC">★CRIT! ${r.dmg}</span>` : `<b>${r.dmg}</b>`;
         logLine(state, cls, `[${state.turn}] ${nm} ⚡<b>${act.n}</b>⚔ ${dt} + ฟื้น <b>${heal}</b> ${probe(hc.hp, hc.cp)}`);
         checkWin(state, ctx.names);
@@ -804,10 +819,7 @@ export function resolveArtActive(
         const m = act.m ?? 1;
         const raw = Math.max(1, (ad.Atk + ad.IA) * m - (dd.ID + fD)) * (1 - pR / 100);
         const r = doAtkHit(raw, hc);
-        const heal = Math.round(r.dmg * (act.h ?? 0) / 100);
-        const cap = side === "A" ? state.dA.HP : state.dB.HP;
-        if (side === "A") state.hA = Math.min(cap, state.hA + heal);
-        else state.hB = Math.min(cap, state.hB + heal);
+        const heal = healHp(state, side, Math.round(r.dmg * (act.h ?? 0) / 100));
         const dt = r.crit ? `<span class="lC">★CRIT! ${r.dmg}</span>` : `<b>${r.dmg}</b>`;
         logLine(state, cls, `[${state.turn}] ${nm} ⚡<b>${act.n}</b>💜 ${dt} + ฟื้น <b>${heal}</b> ${probe(hc.hp, hc.cp)}`);
         checkWin(state, ctx.names);

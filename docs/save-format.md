@@ -20,7 +20,7 @@ The game keeps everything in the browser's `localStorage` through Zustand's `per
 
 | Key | Holds | Version |
 | --- | --- | --- |
-| `localStorage["wusia-world-v1"]` | the world game (`store/world-store.ts`) | **25** |
+| `localStorage["wusia-world-v1"]` | the world game (`store/world-store.ts`) | **26** |
 | `localStorage["wusia-character-v1"]` | the two /debug builds (`store/character-store.ts`) | **3** |
 | `localStorage["wuxia-audio-v1"]` | sound switches and volumes (`lib/audio/engine.ts`) | — |
 | `localStorage["wuxia-random-events"] = "off"` | turns walk-tick encounters off (tests) | — |
@@ -143,6 +143,7 @@ What each version added. v1–v13 and v17→v18 are described in the comment abo
 | v22 → v23 | `letters`, `letterDays` (letters from friends); `tournament`, `tournamentHistory` (the sword tournament) |
 | v23 → v24 | `meridianPoints` and `playerBuild.meridians` (ชีพจร, meridian charts) |
 | v24 → v25 | `lawEvasions` (escapes from the law since the last sentence); `wanted` is no longer clamped to 5 |
+| v25 → v26 | `bossDefeatedDay` (boss id → the day each legendary beast last fell, `lib/world/data/bosses.ts`; default `{}`) |
 
 ## Repair on load
 
@@ -192,7 +193,7 @@ What each version added. v1–v13 and v17→v18 are described in the comment abo
 
 24. `npcStates`: unknown NPCs are dropped; a relationship that is not a number becomes 0.
 25. `defeatedCounts` and `stoleFromCounts` drop unknown ids and keep non-negative integers.
-26. `visitedLocationIds`, `assassinatedNpcIds` and `kidnappedNpcIds` keep known ids only, without duplicates.
+26. `visitedLocationIds`, `assassinatedNpcIds` and `kidnappedNpcIds` keep known ids only, without duplicates. `bossDefeatedDay` keeps known boss ids (`getBoss`) with a finite number day.
 27. Each `sectMembership` rank is clamped between the sect's top rank and its start rank.
 
 **Not repaired:**
@@ -248,7 +249,7 @@ Content-only changes (a new quest, item or scene) need no version bump: missing 
 
 ## Tests
 
-- **Browser.** `tests/browser/game.spec.ts` loads a hand-written version-18 save and checks that it is upgraded to version 25 and plays.
+- **Browser.** `tests/browser/game.spec.ts` loads a hand-written version-18 save and checks that it is upgraded to version 26 and plays.
 - **Meridians.** `scripts/test-meridians.ts` (`bun run test:meridians`) checks `partialize`, the `migrate` default and the repair of `meridians` / `meridianPoints`.
 - **Rumors.** `scripts/test-lore-rumors.ts` (in `bun run test:rumors`) rehydrates v18 / v19 saves and checks the version, lore seeding and repair.
 - **Everything else.** Most `scripts/test-*.ts` files import the real store with an in-memory `localStorage`, so they exercise `persist` as well.

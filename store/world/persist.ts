@@ -67,6 +67,7 @@ export const partializeSave = (s: WorldStore): WorldStateData => ({
   tournament: s.tournament,
   tournamentHistory: s.tournamentHistory,
   activityDays: s.activityDays,
+  bossDefeatedDay: s.bossDefeatedDay,
   day: s.day,
   time: s.time,
   pendingBattle: s.pendingBattle,
@@ -140,6 +141,8 @@ export const partializeSave = (s: WorldStore): WorldStateData => ({
 //   v19 → v20 added wanted / wantedDay / jailCityId (law).
 //   v20 → v21 added jailUntil (the jail map sentence).
 //   v23 → v24 added meridianPoints (ชีพจร) and playerBuild.meridians.
+//   v24 → v25 added lawEvasions.
+//   v25 → v26 added bossDefeatedDay (legendary beasts, data/bosses.ts).
 // Despite the list, `migrate` is one idempotent normalizer: it ignores
 // fromVersion and fills every missing field. See docs/save-format.md.
 export function migrateSave(persisted: unknown, fromVersion: number): WorldStateData {
@@ -243,6 +246,8 @@ export function migrateSave(persisted: unknown, fromVersion: number): WorldState
     tournament: p.tournament && typeof p.tournament === "object" ? p.tournament : null,
     tournamentHistory: Array.isArray(p.tournamentHistory) ? [...p.tournamentHistory] : [],
     activityDays: p.activityDays && typeof p.activityDays === "object" ? { ...p.activityDays } : {},
+    // v26: when each legendary beast last fell.
+    bossDefeatedDay: p.bossDefeatedDay && typeof p.bossDefeatedDay === "object" ? { ...p.bossDefeatedDay } : {},
     day: typeof p.day === "number" && p.day >= 1 ? p.day : 1,
     time: typeof p.time === "number" && p.time >= 0 ? p.time : 0,
     pendingHuntYield: p.pendingHuntYield ?? null,

@@ -13,6 +13,11 @@
 //        support — heals are worth the HP they restore (only below 60 % HP);
 //                  buffs are worth a fraction of the unit's best hit when they
 //                  are not already active and a foe is within two moves.
+//        boss effects — bleed / scorch count as growing DoTs, bind as a stun
+//                  chance plus armour, blind as its fail chance, sunder as the
+//                  shield / buffs it strips; a scorched unit values no heal; a
+//                  molt is worth its heal and the debuffs it sheds, a sun shell
+//                  its shield once hurt, a frenzy its Atk gain × 2.5 best hits.
 //   3. Tiny positional terms break near-ties: ranged casters avoid tiles next
 //      to foes, melee units edge toward the enemy leader, everyone drifts
 //      toward the nearest tile from which a foe can be hit, and walking
@@ -23,6 +28,7 @@
 // The AI never flees — retreat is the player's decision.
 
 import { PCT_REDUCE_CAP } from "../battle";
+import { frenzyPct, isScorched } from "../effects";
 import { accPctOf, atkPctOf, criRateOf, defPctOf } from "../meridian-battle";
 import { critPct, CRIT_MULTIPLIER, hitPct } from "../damage";
 import { effectiveBp } from "../leveling";
@@ -55,6 +61,8 @@ const RANGED_ADJ_PENALTY = 0.15;
 const MELEE_LEADER_PULL = 0.01;
 const APPROACH_PULL = 0.02;
 const WALK_COST = 0.001;
+/** A frenzy's Atk gain is valued over this many of the unit's best hits. */
+const FRENZY_TURNS = 2.5;
 /** MP spent is a small cost so free skills win ties against arts. */
 const MP_COST = 0.05;
 
@@ -118,7 +126,8 @@ function estimateSkill(u: GridUnit, foe: GridUnit, sk: Skill): Estimate {
   const ta = sk.at === "phy" ? d.PA : d.IA * im;
   const vit = sk.vitScale ? sk.vitScale * (ctx.stats.A.VIT ?? 0) : 0;
   const se = eBp * (1 + sk.p / 100) + sk.f + vit;
-  const ed = Math.max(0, (sk.at === "phy" ? dd.PD : dd.ID) * (1 + defPctOf(foe.status) / 100) + fD - dR);
+  const pierce = 1 - Math.max(0, Math.min(100, sk.pen ?? 0)) / 100;
+  const ed = Math.max(0, (sk.at === "phy" ? dd.PD : dd.ID) * (1 + defPctOf(foe.status) / 100) * pierce + fD - dR);
   const raw = Math.max(1, (d.Atk * sm * ab + ta + se) * sk.dm * mm - ed) * (1 - pR / 100);
   const hit = hitPct(accuracy(u), evasion(foe)) / 100;
   const crit = critOf(u, foe);
@@ -176,6 +185,25 @@ function debuffValue(foe: GridUnit, t: string, extra: { pp?: number; u?: number;
       const dot = hp * ((extra.pp ?? 5) / 100) * Math.min(3, extra.u ?? 2) * 0.5;
       return already ? dot * 0.25 : dot;
     }
+    case "bind":
+      // The armour break always lands; the stun is a chance (worth less if already stunned).
+      return hp * DEBUFF_WEIGHT + (hasDebuff(foe, "stun") ? 0 : hp * 0.15 * ((extra.ch ?? 100) / 100));
+    case "bleed":
+    case "scorch": {
+      // Like poison, a bleed is worth more for the turns it grows; a scorch also stops heals.
+      const already = hasDebuff(foe, t);
+      const grow = t === "bleed" ? 1.5 : 1.2;
+      const dot = hp * ((extra.pp ?? 5) / 100) * Math.min(3, extra.u ?? 2) * 0.5 * grow;
+      return already ? dot * 0.25 : dot;
+    }
+    case "blind":
+      return hasDebuff(foe, "blind") ? hp * DEBUFF_WEIGHT * 0.3 : hp * (DEBUFF_WEIGHT + 0.1 * ((extra.ch ?? 0) / 100));
+    case "sunder": {
+      // Worth what it strips (shield HP, buffs, stacks) plus the armour break.
+      const shield = foe.status.buffs.reduce((s, b) => s + (b.t === "shield" ? b.v : 0), 0);
+      const buffs = foe.status.buffs.filter((b) => b.t !== "shield").length + (foe.status.stk > 0 ? 1 : 0);
+      return hp * DEBUFF_WEIGHT * (1 + buffs) + shield * 0.8;
+    }
     case "multi_debuff":
     case "debuff_def_eva":
       return hp * DEBUFF_WEIGHT * 1.5;
@@ -215,17 +243,55 @@ function foeValue(u: GridUnit, foe: GridUnit, est: Estimate, rider: number, drai
   return capped * focus + kill + rider * est.hit + drain;
 }
 
-function supportOfSkill(u: GridUnit, sk: Skill): { v: number; buff: boolean } {
+/** % of max HP a DoT debuff will still take over its next ≤ 3 ticks (a bleed growing as it goes). */
+function dotPctAhead(d: GridUnit["status"]["debuffs"][number]): number {
+  if (d.t !== "bleed" && d.t !== "scorch" && d.t !== "debuff_poison" && d.t !== "burn_hp_mp") return 0;
+  const ticks = Math.min(3, d.u);
+  let pct = 0, pp = d.pp ?? 0;
+  for (let i = 0; i < ticks; i++) { pct += pp; if (d.t === "bleed") pp += d.inc ?? 0; }
+  return pct;
+}
+
+/** A support slot's value: HP-worth `v`, whether it is a buff, and a frenzy's Atk % gain. */
+interface Support { v: number; buff: boolean; atkGain?: number }
+
+function supportOfSkill(u: GridUnit, sk: Skill): Support {
   const se = sk.se;
   if (!se) return { v: 0, buff: true };
   const max = u.derived.HP, missing = max - u.hp;
   const low = u.hp / Math.max(1, max) < HEAL_BELOW;
+  // A scorch (แผดเผา) blocks every heal but a molt's, which sheds it first.
+  const canHeal = !isScorched(u.status);
   switch (se.t) {
     case "heal_pct":
-      return { v: low ? Math.min(missing, max * se.v / 100) * HEAL_WEIGHT : 0, buff: false };
+      return { v: low && canHeal ? Math.min(missing, max * se.v / 100) * HEAL_WEIGHT : 0, buff: false };
     case "heal_buff": {
-      const heal = low ? Math.min(missing, max * se.hp / 100) * HEAL_WEIGHT : 0;
+      const heal = low && canHeal ? Math.min(missing, max * se.hp / 100) * HEAL_WEIGHT : 0;
       return { v: heal, buff: heal === 0 && !hasBuff(u, se.bt) };
+    }
+    case "molt": {
+      // Shedding pays off when wounded or carrying debuffs (a bleed / scorch most of all).
+      // A scorch would block the heal, but the molt sheds it first.
+      const heal = low ? Math.min(missing, max * se.hp / 100) * HEAL_WEIGHT : 0;
+      const cleanse = u.status.debuffs.reduce((sum, d) => sum + max * (dotPctAhead(d) / 100 + DEBUFF_WEIGHT), 0);
+      return { v: heal + cleanse, buff: heal + cleanse === 0 && !hasBuff(u, "buff_reflect") };
+    }
+    case "frenzy": {
+      // Worth the extra damage of the next few hits (scaled by the best hit in
+      // buildSlotPlans) — more the lower the HP, since it's rolled at cast time.
+      const pct = frenzyPct(se.v, se.mx, u.hp, max);
+      const have = u.status.buffs.find((b) => b.t === "frenzy")?.v ?? 0;
+      const gain = pct > have + 5 ? pct - have : 0;
+      return { v: 0, buff: gain > 0, atkGain: gain };
+    }
+    case "sun_shell": {
+      // A shield only matters once the fight is on and the old one is spent.
+      const shield = u.status.buffs.reduce((s, b) => s + (b.t === "shield" ? b.v : 0), 0);
+      const fresh = max * se.v / 100;
+      // Valued like a heal of its size (in full below HEAL_BELOW, half while merely scratched).
+      const hurt = u.hp / Math.max(1, max) < 0.9;
+      const v = hurt && shield < fresh * 0.3 ? fresh * HEAL_WEIGHT * (low ? 1 : 0.5) : 0;
+      return { v, buff: shield < fresh * 0.3 };
     }
     case "stack_atk":
       return { v: 0, buff: u.status.stk < se.mx };
@@ -238,7 +304,7 @@ function supportOfSkill(u: GridUnit, sk: Skill): { v: number; buff: boolean } {
   }
 }
 
-function supportOfArt(u: GridUnit, art: Art): { v: number; buff: boolean } {
+function supportOfArt(u: GridUnit, art: Art): Support {
   const act = art.act;
   if (!act) return { v: 0, buff: false };
   const max = u.derived.HP, missing = max - u.hp;
@@ -247,7 +313,9 @@ function supportOfArt(u: GridUnit, art: Art): { v: number; buff: boolean } {
     case "heal":
     case "heal_cleanse":
     case "heal_full_cleanse": {
-      let v = low ? Math.min(missing, max * (act.h ?? 0) / 100) * HEAL_WEIGHT : 0;
+      // A plain heal can't get through a scorch; the cleansing ones wipe it first (full cleanse) or may.
+      const blocked = act.t === "heal" && isScorched(u.status);
+      let v = low && !blocked ? Math.min(missing, max * (act.h ?? 0) / 100) * HEAL_WEIGHT : 0;
       if (v > 0 && act.t !== "heal" && u.status.debuffs.length) v += max * DEBUFF_WEIGHT;
       return { v, buff: false };
     }
@@ -261,7 +329,7 @@ function supportOfArt(u: GridUnit, art: Art): { v: number; buff: boolean } {
 function buildSlotPlans(state: GridBattleState, u: GridUnit, foes: GridUnit[]): { plans: SlotPlan[]; scale: number; attackProfiles: GridSkillProfile[] } {
   const raws = u.build.skillIds;
   const ests: { slot: number; profile: GridSkillProfile; est: Map<string, Estimate>; rider: Map<string, number>; drain: number; ready: boolean; self: { v: number; buff: boolean } }[] = [];
-  const supports: { slot: number; profile: GridSkillProfile; v: number; buff: boolean; mp: number }[] = [];
+  const supports: { slot: number; profile: GridSkillProfile; v: number; buff: boolean; atkGain: number; mp: number }[] = [];
   const attackProfiles: GridSkillProfile[] = [];
   let scale = 1;
   for (let slot = 0; slot < raws.length; slot++) {
@@ -279,7 +347,8 @@ function buildSlotPlans(state: GridBattleState, u: GridUnit, foes: GridUnit[]): 
         let r = 0;
         if (info.kind === "skill" && info.skill.ee) {
           const ee = info.skill.ee;
-          r = debuffValue(f, ee.t, "pp" in ee ? { pp: ee.pp, u: ee.u } : ee.t === "burn_hp_mp" ? { pp: ee.dmg, u: ee.u } : ee.t === "stun" ? { ch: ee.ch } : {});
+          r = debuffValue(f, ee.t, "pp" in ee ? { pp: ee.pp, u: ee.u } : ee.t === "burn_hp_mp" ? { pp: ee.dmg, u: ee.u }
+            : ee.t === "stun" || ee.t === "bind" || ee.t === "blind" ? { ch: ee.ch } : {});
         } else if (info.kind === "art" && info.art.act) {
           const a = info.art.act;
           if (a.t === "debuff_poison") r = debuffValue(f, "debuff_poison", { pp: a.pp, u: a.u });
@@ -293,7 +362,7 @@ function buildSlotPlans(state: GridBattleState, u: GridUnit, foes: GridUnit[]): 
       ests.push({ slot, profile, est, rider, drain, ready, self });
     } else if (ready) {
       const s = info.kind === "skill" ? supportOfSkill(u, info.skill) : supportOfArt(u, info.art);
-      supports.push({ slot, profile, v: s.v, buff: s.buff, mp: info.kind === "art" ? info.art.act?.c ?? 0 : 0 });
+      supports.push({ slot, profile, v: s.v, buff: s.buff, atkGain: s.atkGain ?? 0, mp: info.kind === "art" ? info.art.act?.c ?? 0 : 0 });
     }
   }
   const plans: SlotPlan[] = [];
@@ -307,7 +376,9 @@ function buildSlotPlans(state: GridBattleState, u: GridUnit, foes: GridUnit[]): 
     plans.push({ slot: e.slot, profile: e.profile, perFoe, support: 0, buffOnly: false, selfBonus, mpCost });
   }
   for (const s of supports) {
-    plans.push({ slot: s.slot, profile: s.profile, perFoe: new Map(), support: s.v, buffOnly: s.v === 0 && s.buff, selfBonus: 0, mpCost: s.mp });
+    // A frenzy is worth its Atk gain over the next few hits of the unit's best attack.
+    const v = s.v + (s.atkGain / 100) * scale * FRENZY_TURNS;
+    plans.push({ slot: s.slot, profile: s.profile, perFoe: new Map(), support: v, buffOnly: v === 0 && s.buff, selfBonus: 0, mpCost: s.mp });
   }
   return { plans, scale, attackProfiles };
 }
