@@ -198,7 +198,7 @@ export const NPCS_CITIES: readonly NpcDef[] = [
   {
     id: "city_jinling_strategist_kong",
     name: "นักยุทธศาสตร์กง",
-    description: "อดีตที่ปรึกษาการทหารผู้ปลีกวิเวกมาอยู่จินหลิง เขามีข้อมูลมากมายแต่ต้องการคนช่วยสอบสวนความจริง",
+    description: "อดีตเสมียนกองร้อยของแม่ทัพเป่ยฉิว รับราชการทัพสามสิบปีจนเป็นที่ปรึกษาการทหาร แล้วลาออกมาปลีกวิเวกที่จินหลิง เขามีข้อมูลมากมายแต่ต้องการคนช่วยสอบสวนความจริง",
     locationIds: ["city_jinling"],
     dialogSceneId: "npc_city_jinling_strategist_kong_talk",
     questIds: [
