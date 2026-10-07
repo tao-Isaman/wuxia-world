@@ -11,6 +11,7 @@ A library of pixel-art assets made with [PixelLab](https://pixellab.ai) for the 
 - [The pipeline](#the-pipeline)
 - [Adding or regenerating assets](#adding-or-regenerating-assets)
 - [Kits: roads and walls that join](#kits-roads-and-walls-that-join)
+- [Animated big foes](#animated-big-foes)
 - [Budget used](#budget-used)
 
 ## What is in it
@@ -130,6 +131,26 @@ Category `kit` holds modular pieces that snap to a grid and join their neighbour
 **Iso sets (diagonal).** The library's buildings are isometric (their walls lean 2:1), so every kit also comes on an **iso grid** (`kit.grid: "iso"`, set ids `kit_<region>_isoroad_`, `_isoplaza_`, `_isowall_`, `_isofence_`): 9 roads, 2 plazas (full cells) and iso versions of all 16 wall / fence styles, gates in both directions (`_gate_se` along a, `_gate_sw` along b). Cells are diamonds `cell` wide and `cell / 2` tall on one lattice for roads and walls (64): cell (a, b) has its centre at (480 + (a − b)·32, (a + b + 1)·16); a runs down-right, b down-left; N is up-right (b − 1), E down-right, S down-left, W up-left. An iso piece is anchored at its diamond's centre (a gate at the centre of its span) and blocks with a staircase of 4-unit boxes along its diagonal band (`solids`). They are drawn by `scripts/assets/kits-iso.ts`, which casts a ray per pixel through a small solid model (band, height, parapet or coping, gate passage) and samples a library ground tile (roads) or the texture set (walls) in grid space, so pieces join without seams and faces light like the buildings'. Iso cells count as on the map while their centre is.
 
 **In the editor.** The map editor's ชิ้นต่อกัน panel is the brush: [engine.md](engine.md#ชิ้นต่อกัน-kit-brush).
+
+## Animated big foes
+
+The six legendary beasts (บอส) and the six tier-5 foes are not library assets: each has one animated sheet, `public/art/anims/<id>.png`, described by `lib/characters/anim-sheets.ts` (the contract) and `lib/characters/anim-sheets-data.ts` (generated). A sheet is rows of equal frames — `idle` (row 0, a loop), `attack` (row 1), `hurt` (row 2) — painted side-on **facing right**, with `frameW` / `frameH`, `feetY` (the ground line, 0..1 of the frame), `scale` (height next to a person) and each clip's frames and fps.
+
+| Sheets | Frame | Scale | Clips |
+| --- | --- | --- | --- |
+| bosses: `boss_golden_serpent`, `boss_blood_tiger`, `boss_sword_eagle`, `boss_sun_turtle`, `boss_blade_crab`, `boss_flame_bull` | 152–215 × 125–183 px | 2.2–2.6 by bulk | idle 8, attack 6–8, hurt 4 |
+| T5 people: `t5_nameless_sword_hermit`, `t5_blood_blade_lord`, `t5_poison_matriarch`, `t5_iron_monk` | 119–133 × 111–139 px | 1.05–1.2 | idle 8, attack 8, hurt 4 |
+| T5 beasts: `t5_white_tiger`, `t5_wolf_king` | 161–170 × 114–118 px | 1.3–1.35 | idle 8, attack 8, hurt 4 |
+
+**How they were made** (2026-10-07, about 440 generations):
+
+1. **Design.** One `create_image_pro` call per subject (4 candidates at ≤ 170 px, 20–25 generations): a side view facing right on a transparent background — bosses on 168 px canvases, people 96 × 128, T5 beasts 128 × 96. The best candidate was picked by eye.
+2. **Room to move.** The pick was placed on a larger canvas (bosses 224 wide with 30 px of headroom, people 152 × 140–144, beasts 176 × 120) so a lunge or a raised weapon is not cut off. Without an API token this was done inside PixelLab: the free `pixelart_workbench draw` with a one-node recipe (`canvas`, the view `offset`, one `copy` of the whole source) takes the candidate's download URL as its source and returns a hosted `full.png`. (Pasting a sprite as inline base64 into an MCP call is unreliable past a few KB: one came through garbled.)
+3. **Object.** `create_object_pro_flash` with that URL as `first_frame_url` and `n_directions: 1` saves it as a one-direction object for free.
+4. **Clips.** `animate_object` (v3, about 2–5 generations each at these sizes): idle 8 frames, attack 8, hurt 4, each prompt starting "side view, facing right". Every clip starts from the same object frame, so all clips share one canvas and stay registered. The object's ZIP (`/mcp/objects/<id>/download`) holds every take.
+5. **Pack.** `bun scripts/build-anim-sheets.ts --from <raw>` reads `<raw>/<id>/{idle,attack,hurt}/NN.png`, takes the frames listed in its `SUBJECTS` table, crops every frame of a subject to their common drawn box (1 px margin), sets `feetY` from the start pose's lowest pixel, writes a palette PNG (the 12 sheets total about 770 KB) and rewrites the data file with a `?v=` content hash. Rerunning on the same frames changes nothing; `bun scripts/build-anim-sheets.ts --from <raw> <id>` rebuilds one sheet and keeps the others.
+
+**Prompting lessons.** v3 drifts on long idles (a sword creeps up, a coil unwinds), so most idles play a ping-pong of their first five frames. "Hit reaction" prompts often draw a white impact flash or turn into a counter-strike; "is hurt by a blow to its face … shrinks back … No effects" gives a clean flinch. Say what must stay ("the sun orb stays fixed on top of the shell") or the model may spend it — the first turtle attack threw its sun away. The raw takes, picks and object ids stay in the raw directory, never in the repo.
 
 ## Budget used
 
