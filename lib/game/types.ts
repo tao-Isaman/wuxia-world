@@ -127,7 +127,18 @@ export type SelfEffect =
     }
   | { t: "stack_atk"; v: number; mx: number }
   | { t: "buff_iatk_reduce"; iv: number; rv: number; u: number }
-  | { t: "buff_reflect_eva"; rv: number; ev: number; u: number };
+  | { t: "buff_reflect_eva"; rv: number; ev: number; u: number }
+  // ─── Boss (legendary beast) self-effects ───
+  // ลอกคราบ — clear every debuff on the caster, heal `hp` % of max HP, then
+  // reflect `rv` % of the next hit for `u` turns (a buff_reflect record).
+  | { t: "molt"; hp: number; rv: number; u: number }
+  // โลหิตคลั่ง — Atk +% for `u` turns, rolled when cast from the caster's HP:
+  // `v` % at full HP rising linearly to `mx` % at 0 HP (a "frenzy" record,
+  // read by atkPctOf). A new frenzy keeps the larger value.
+  | { t: "frenzy"; v: number; mx: number; u: number }
+  // กระดองแบกตะวัน — a shield of `v` % of max HP (the meridian `shield`
+  // record: soaks hits before HP, lasts until spent) plus reflect `rv` % for `u` turns.
+  | { t: "sun_shell"; v: number; rv: number; u: number };
 
 export type EnemyEffect =
   | { t: "debuff_eva"; v: number; u: number }
@@ -154,7 +165,24 @@ export type EnemyEffect =
   // สตัน — บล็อก action เป้าหมายเป็นเวลา u เทิร์น โดยมีโอกาส ch%
   // ที่ทำให้ติดสถานะตอนใช้สกิล. ตรวจที่ต้นรอบของ resolveSkill /
   // resolveArtActive เพื่อข้ามตา.
-  | { t: "stun"; u: number; ch: number };
+  | { t: "stun"; u: number; ch: number }
+  // ─── Boss (legendary beast) enemy-effects ───
+  // รัด — PDef `dv` (negative) for `du` turns, always; plus a `ch` % chance of
+  // a stun lasting `u` (the stun record, same rules as "stun").
+  | { t: "bind"; ch: number; u: number; dv: number; du: number }
+  // เลือดไหล — DoT: `pp` % of max HP at each of the target's turns, growing by
+  // `inc` points per tick while it lasts (`u` turns). Re-applying keeps the
+  // larger running %, refreshes the duration.
+  | { t: "bleed"; pp: number; inc: number; u: number }
+  // ตาพร่า — Acc `v` (negative) for `u` turns, and the target's next action
+  // (skill / art) fails outright with `ch` % chance (spent on that roll).
+  | { t: "blind"; v: number; ch: number; u: number }
+  // แผดเผา — DoT `pp` % of max HP per turn for `u` turns; while it lasts the
+  // target regains no HP from any source (heals, drain, regen, potions).
+  | { t: "scorch"; pp: number; u: number }
+  // ทลายเกราะ — strip every buff of the target (shield and ward included, and
+  // its stack_atk stacks), then PDef `dv` (negative) for `u` turns.
+  | { t: "sunder"; dv: number; u: number };
 
 // ─── Skill definition (SP table) ───────────────────────────────────────
 
@@ -188,6 +216,12 @@ export interface Skill {
   // single hit should also bump `dm` or `bp` to compensate.
   // Default 1 (single hit) when omitted.
   hits?: number;
+  // ทะลวง (pierce): ignores `pen` % of the target's PD / ID for this move
+  // (before flat DEF buffs and DEF debuffs). Read by calcSkillDamage.
+  pen?: number;
+  // Cooldown override in turns; default TIERS[ti].cd (see skillCooldown).
+  // Boss moves use it so a three-move beast is never left with nothing ready.
+  cd?: number;
   se: SelfEffect | null;
   ee: EnemyEffect | null;
   d: string; // description
@@ -213,6 +247,8 @@ export type ArtPassiveEffect =
   | { t: "debuff_eva"; n?: string; v: number; u: number }
   | { t: "debuff_def"; n?: string; v: number; u: number }
   | { t: "stack_atk"; v: number; mx: number }
+  // Boss passive: the same frenzy as the self-effect (Atk +v % at full HP → mx % at 0 HP).
+  | { t: "frenzy"; n?: string; v: number; mx: number; u: number }
   | { t: "mult_iatk" }
   | { t: "mult_atk" };
 
@@ -427,12 +463,20 @@ export interface DebuffRecord {
     | "burn_hp_mp"
     | "stun"
     // battle speed −|v| % (meridian "sap" on spd)
-    | "debuff_spd";
+    | "debuff_spd"
+    // Boss effects: a growing DoT, a next-action failure chance, a DoT that blocks healing.
+    | "bleed"
+    | "blind"
+    | "scorch";
   n?: string;
   v?: number;
   pp?: number;
   // burn_hp_mp uses `pp` (HP %) + `mpp` (MP %) per tick.
   mpp?: number;
+  // bleed: `pp` grows by `inc` after every tick.
+  inc?: number;
+  // blind: % chance the next action fails.
+  ch?: number;
   u: number;
 }
 

@@ -70,10 +70,10 @@ check("the committed text-overrides.json is applied to SKILLS / ARTS at load (ge
   assert.equal(BASE_TEXT.arts.size, ARTS.length, "base text kept for every art");
 });
 
-check("text rows: 173 skills + 111 arts, base text from the table, `none` left out", () => {
+check("text rows: 191 skills + 117 arts (the 18 bss_* boss moves and 6 art_boss_* arts included), base text from the table, `none` left out", () => {
   const rows = textRows();
-  assert.equal(rows.filter((r) => r.kind === "skill").length, 173);
-  assert.equal(rows.filter((r) => r.kind === "art").length, 111);
+  assert.equal(rows.filter((r) => r.kind === "skill").length, 191);
+  assert.equal(rows.filter((r) => r.kind === "art").length, 117);
   assert.ok(!rows.some((r) => r.id === "none"));
 });
 
@@ -122,7 +122,7 @@ check("no shipped quest names the move it teaches (the editor's warning is quiet
 
 check("text filters: kind, sect, tier, weapon, search, edited only", () => {
   const rows = textRows();
-  assert.equal(filterTextRows(rows, { kind: "art" }, emptyOverrides()).length, 111);
+  assert.equal(filterTextRows(rows, { kind: "art" }, emptyOverrides()).length, 117);
   const sword = filterTextRows(rows, { weapon: "sword" }, emptyOverrides());
   assert.ok(sword.length > 0 && sword.every((r) => r.kind === "skill" && r.w === "sword"));
   const t0 = filterTextRows(rows, { tier: 0, sect: "เส้าหลิน" }, emptyOverrides());

@@ -1,7 +1,7 @@
 // Grid tactics AI (lib/game/grid/ai.ts): legality, finishing battles, and
 // the behaviours the design asks for. Run: bun run test:grid-ai
 import assert from "node:assert/strict";
-import { ARTS, SKILLS } from "../lib/game/data";
+import { ARTS, SKILLS, isBeastMove, isBossArt, isBossMove } from "../lib/game/data";
 import type { CharacterBuild, StatBlock } from "../lib/game/types";
 import {
   boardSizeFor, activeUnit, applyAction, beginNextTurn, cellKey, createGridBattle, isOver, manhattan, planTurn,
@@ -96,9 +96,10 @@ const hero = useWorldStore.getState().playerBuild!;
 assert.ok(hero, "startNewGame gives a player build");
 
 // Sampled builds across every weapon family, supports and arts (as in test-grid-engine).
-const attacks = SKILLS.filter((sk) => sk.at && !sk.id.startsWith("bst_"));
-const support = SKILLS.filter((sk) => slotGrid(sk.id)?.target === "self");
-const arts = ARTS.filter((a) => a.act);
+// Learnable moves only: beasts' bites and the legendary beasts' bss_* / art_boss_* stay out.
+const attacks = SKILLS.filter((sk) => sk.at && !isBeastMove(sk.id));
+const support = SKILLS.filter((sk) => slotGrid(sk.id)?.target === "self" && !isBossMove(sk.id));
+const arts = ARTS.filter((a) => a.act && !isBossArt(a.id));
 function sample(i: number): CharacterBuild {
   const ids = [0, 1, 2, 3].map((k) => attacks[(i * 53 + k * 17) % attacks.length].id);
   const art = arts[(i * 11) % arts.length];

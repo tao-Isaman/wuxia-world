@@ -9,6 +9,24 @@
 
 export const JIANGHU_SECT = "ยุทธจักร";
 
+/**
+ * The legendary beasts' (บอส) own moves and inner arts: `sc` of every
+ * `bss_*` move and `art_boss_*` art. Not a sect anyone joins and never
+ * learnable — no scroll, quest, shop, tournament or coverage check counts
+ * them (use `isBossMove` / `isBossArt`).
+ */
+export const BEAST_SECT = "สัตว์ร้าย";
+
+/** A legendary beast's move (`bss_*`): fought, never learned. */
+export const isBossMove = (id: string): boolean => id.startsWith("bss_");
+/** A legendary beast's inner art (`art_boss_*`): fought, never learned. */
+export const isBossArt = (id: string): boolean => id.startsWith("art_boss_");
+/**
+ * True for moves no one can learn: the plain beasts' `bst_*` bites and claws
+ * and the legendary beasts' `bss_*` moves.
+ */
+export const isBeastMove = (id: string): boolean => id.startsWith("bst_") || isBossMove(id);
+
 // Sect display order. JIANGHU_SECT is intentionally last as the catch-all
 // bucket — most generic / unaffiliated entries land there.
 export const SECT_ORDER: readonly string[] = [
@@ -33,6 +51,8 @@ export const SECT_ORDER: readonly string[] = [
   "องครักษ์เสื้อแพร",
   "สำนักสกุลถัง",
   JIANGHU_SECT,
+  // Not a sect: the legendary beasts' own moves and arts sort last.
+  BEAST_SECT,
 ];
 
 // Sortable rank: lower = earlier. Entries not in SECT_ORDER are pushed

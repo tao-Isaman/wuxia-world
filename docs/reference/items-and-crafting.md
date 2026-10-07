@@ -2,7 +2,7 @@
 
 # Items, shops, crafting and gathering
 
-479 items (`lib/world/data/items.ts`), 19 shops, 7 martial halls, 49 artisans, 36 recipes and 25 gathering / hunting nodes.
+503 items (`lib/world/data/items.ts`), 19 shops, 7 martial halls, 49 artisans, 36 recipes and 25 gathering / hunting nodes.
 
 ## Contents
 
@@ -95,7 +95,7 @@
 | `alpha_inter` | อักษรงดงาม | 300 | train writing +80 xp |
 | `alpha_master` | อักษรเทพนิยม | 800 | train writing +180 xp |
 
-### ตำราวิชา (`manual`, 392)
+### ตำราวิชา (`manual`, 416)
 
 | Id | Name | Price | Use |
 | --- | --- | --- | --- |
@@ -285,6 +285,24 @@
 | `scroll_skill_ng2` | คัมภีร์ทวนประจักษ์พยาน | 0 | learn ทวนประจักษ์พยาน (STR ≥ 0) |
 | `scroll_skill_dgjj` | คัมภีร์เก้ากระบี่เดียวดาย | 0 | learn เก้ากระบี่เดียวดาย (STR ≥ 0) |
 | `scroll_skill_ng5` | คัมภีร์ดาบยาวเทพสังหาร | 0 | learn ดาบยาวเทพสังหาร (STR ≥ 0) |
+| `scroll_skill_bss_serpent_fang` | คัมภีร์เขี้ยวพิษทองคำ | 0 | learn เขี้ยวพิษทองคำ (STR ≥ 0) |
+| `scroll_skill_bss_serpent_coil` | คัมภีร์รัดกระดูกแหลก | 0 | learn รัดกระดูกแหลก (STR ≥ 0) |
+| `scroll_skill_bss_serpent_molt` | คัมภีร์ลอกคราบเกล็ดทอง | 0 | learn ลอกคราบเกล็ดทอง (STR ≥ 0) |
+| `scroll_skill_bss_tiger_claw` | คัมภีร์กรงเล็บเลือดคราม | 0 | learn กรงเล็บเลือดคราม (STR ≥ 0) |
+| `scroll_skill_bss_tiger_roar` | คัมภีร์คำรามสะท้านภพ | 0 | learn คำรามสะท้านภพ (STR ≥ 0) |
+| `scroll_skill_bss_tiger_frenzy` | คัมภีร์โลหิตคลั่ง | 0 | learn โลหิตคลั่ง (STR ≥ 0) |
+| `scroll_skill_bss_eagle_feathers` | คัมภีร์ขนนกพันกระบี่ | 0 | learn ขนนกพันกระบี่ (STR ≥ 0) |
+| `scroll_skill_bss_eagle_dive` | คัมภีร์ดิ่งฟ้าผ่าภูผา | 0 | learn ดิ่งฟ้าผ่าภูผา (STR ≥ 0) |
+| `scroll_skill_bss_eagle_gale` | คัมภีร์ปีกพายุ | 0 | learn ปีกพายุ (STR ≥ 0) |
+| `scroll_skill_bss_turtle_shell` | คัมภีร์กระดองแบกตะวัน | 0 | learn กระดองแบกตะวัน (STR ≥ 0) |
+| `scroll_skill_bss_turtle_sun` | คัมภีร์ตะวันแผดเผา | 0 | learn ตะวันแผดเผา (STR ≥ 0) |
+| `scroll_skill_bss_turtle_quake` | คัมภีร์ทับภูผา | 0 | learn ทับภูผา (STR ≥ 0) |
+| `scroll_skill_bss_crab_pincers` | คัมภีร์คีมพันดาบ | 0 | learn คีมพันดาบ (STR ≥ 0) |
+| `scroll_skill_bss_crab_mirror` | คัมภีร์กระดองสะท้อนดาบ | 0 | learn กระดองสะท้อนดาบ (STR ≥ 0) |
+| `scroll_skill_bss_crab_tide` | คัมภีร์ฟองคลื่นหมอก | 0 | learn ฟองคลื่นหมอก (STR ≥ 0) |
+| `scroll_skill_bss_bull_charge` | คัมภีร์เขาเพลิงพุ่งทะลวง | 0 | learn เขาเพลิงพุ่งทะลวง (STR ≥ 0) |
+| `scroll_skill_bss_bull_stomp` | คัมภีร์กระทืบธรณี | 0 | learn กระทืบธรณี (STR ≥ 0) |
+| `scroll_skill_bss_bull_rage` | คัมภีร์เพลิงโทสะ | 0 | learn เพลิงโทสะ (STR ≥ 0) |
 | `scroll_art_t0_lohan` | คัมภีร์ลมปราณอรหันต์ | 0 | learn ลมปราณอรหันต์ (STR ≥ 0) |
 | `scroll_art_t1_goldenbell` | คัมภีร์กระดิ่งทองพื้นฐาน | 0 | learn กระดิ่งทองพื้นฐาน (STR ≥ 0) |
 | `scroll_art_t2_dharma` | คัมภีร์ลมปราณพุทธธรรม | 0 | learn ลมปราณพุทธธรรม (STR ≥ 0) |
@@ -396,6 +414,12 @@
 | `scroll_art_khbt` | คัมภีร์คัมภีร์ทานตะวัน | 0 | learn คัมภีร์ทานตะวัน (STR ≥ 0) |
 | `scroll_art_kuyt` | คัมภีร์วิชาเก้าเอี้ยง | 0 | learn วิชาเก้าเอี้ยง (STR ≥ 0) |
 | `scroll_art_kgim` | คัมภีร์คัมภีร์เก้าอิม | 0 | learn คัมภีร์เก้าอิม (STR ≥ 0) |
+| `scroll_art_art_boss_serpent` | คัมภีร์ลมปราณเกล็ดทองคำ | 0 | learn ลมปราณเกล็ดทองคำ (STR ≥ 0) |
+| `scroll_art_art_boss_tiger` | คัมภีร์ลมปราณพยัคฆ์โลหิต | 0 | learn ลมปราณพยัคฆ์โลหิต (STR ≥ 0) |
+| `scroll_art_art_boss_eagle` | คัมภีร์ลมปราณอินทรีกระบี่ | 0 | learn ลมปราณอินทรีกระบี่ (STR ≥ 0) |
+| `scroll_art_art_boss_turtle` | คัมภีร์ลมปราณเต่าตะวัน | 0 | learn ลมปราณเต่าตะวัน (STR ≥ 0) |
+| `scroll_art_art_boss_crab` | คัมภีร์ลมปราณปูวิเศษ | 0 | learn ลมปราณปูวิเศษ (STR ≥ 0) |
+| `scroll_art_art_boss_bull` | คัมภีร์ลมปราณกระทิงเพลิง | 0 | learn ลมปราณกระทิงเพลิง (STR ≥ 0) |
 | `chart_root_breath` | แผนภาพชีพจร-ชีพจรรากลมปราณ | 400 | learn meridian chart `root_breath` |
 | `chart_iron_sinew` | แผนภาพชีพจร-ชีพจรเอ็นเหล็กน้อย | 400 | learn meridian chart `iron_sinew` |
 | `chart_light_heel` | แผนภาพชีพจร-ชีพจรส้นเท้าเบา | 400 | learn meridian chart `light_heel` |

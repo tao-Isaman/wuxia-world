@@ -118,6 +118,7 @@ Already applied. Kept for history only.
 | `test-grid-engine.ts` | `test:grid` |
 | `test-grid-ai.ts` | `test:grid-ai` |
 | `test-grid-skills.ts` | `test:grid-skills` |
+| `test-boss-skills.ts` | `test:boss-skills` |
 | `test-grid-store.ts` | `test:grid-store` |
 | `audit-quest-completion.ts`, `test-quest-dead-ends.ts`, `test-quest-turnins.ts`, `test-quest-guide.ts` | `test:quests` |
 | `test-engine.ts` | `test:engine` |

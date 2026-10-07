@@ -1,5 +1,5 @@
 import * as Phaser from "phaser";
-import { RAGE_STYLES, statusKey, statusStyle, type StatusIcon, type StatusStyle } from "@/lib/ui/status-catalog";
+import { DEBUFF_KEYS, RAGE_STYLES, statusKey, statusStyle, type StatusIcon, type StatusStyle } from "@/lib/ui/status-catalog";
 import type { MeridianElement } from "@/lib/game/meridian-types";
 
 /**
@@ -383,7 +383,7 @@ export function createStatusVfx(scene: Phaser.Scene, options: StatusVfxOptions):
             a.x, a.top - 34 * ui);
         }
         for (const key of fx.keys) if (!next.has(key)) {
-          const old = statusStyle({ t: key.split(":")[0], el: key.split(":")[1] }, key.startsWith("debuff") || key === "stun" || key === "burn_hp_mp" ? "debuff" : "buff");
+          const old = statusStyle({ t: key.split(":")[0], el: key.split(":")[1] }, key.startsWith("debuff") || DEBUFF_KEYS.has(key) ? "debuff" : "buff");
           expireBurst({ key, style: old, stacks: 0, v: 0, u: 0, t: key }, a, now);
         }
       }

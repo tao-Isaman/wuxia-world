@@ -1,14 +1,29 @@
-import { getArt, getSkill, type BattleState, type WeaponFamily } from "@/lib/game";
+import { getArt, getSkill, isBossMove, type BattleState, type WeaponFamily } from "@/lib/game";
 
 type Cast = NonNullable<BattleState["lastCast"]>;
 
 /** How a strike travels and lands. Skills take it from their weapon family; arts are qi orbs. */
 export type VfxShape = "slash" | "heavy" | "impact" | "thrust" | "flurry" | "projectile" | "wave" | "orb";
 /** Secondary colour and particle style, from the skill's effects / philosophy. */
-export type VfxElement = "none" | "poison" | "fire" | "frost" | "thunder" | "blood" | "qi" | "shadow" | "holy";
+export type VfxElement =
+  | "none" | "poison" | "fire" | "frost" | "thunder" | "blood" | "qi" | "shadow" | "holy"
+  // The legendary beasts' (บอส) own elements.
+  | "gold" | "sun" | "wind" | "water" | "earth";
+
+/**
+ * A legendary beast's move (`bss_<beast>_<sig>`): each draws and sounds its
+ * own way on top of the family shape (battle-vfx / cast-sfx read `signature`).
+ */
+export type BossSignature =
+  | "fang" | "coil" | "molt"          // งูยักษ์เกล็ดทองคำ
+  | "claw" | "roar" | "frenzy"        // พยัคฆ์โลหิตลายคราม
+  | "feathers" | "dive" | "gale"      // อินทรียักษ์จ้าวแห่งกระบี่
+  | "shell" | "sun" | "quake"         // เต่ายักษ์แบกตะวัน
+  | "pincers" | "mirror" | "tide"     // ปูวิเศษจ้าวแห่งดาบ
+  | "charge" | "stomp" | "rage";      // กระทิงยักษ์เขาเพลิง
 
 export interface CastVfx {
-  /** 0 พื้นฐาน … 4 เฉพาะ. Rarity decides palette, layer count and particle budget. */
+  /** 0 พื้นฐาน … 5 ปรมัตถ์. Rarity decides palette, layer count and particle budget. */
   tier: number;
   shape: VfxShape;
   element: VfxElement;
@@ -17,15 +32,18 @@ export interface CastVfx {
   core: number;
   glow: number;
   accent: number;
+  /** A boss move's own look and sound (absent for every other cast). */
+  signature?: BossSignature;
 }
 
-// Rarity ladder, matching the cast-banner name colours (white → jade → sky → violet → gold).
+// Rarity ladder, matching the cast-banner name colours (white → jade → sky → violet → gold → crimson).
 export const TIER_PALETTE: readonly { core: number; glow: number }[] = [
   { core: 0xfff6dc, glow: 0xd9c89a },
   { core: 0xe8fff0, glow: 0x4fd08c },
   { core: 0xe8f5ff, glow: 0x45a6ff },
   { core: 0xf6e8ff, glow: 0xb06cff },
   { core: 0xfff3c4, glow: 0xffb42e },
+  { core: 0xffe6dc, glow: 0xff3b2f },
 ];
 
 export const ELEMENT_ACCENT: Record<VfxElement, number | null> = {
@@ -38,6 +56,11 @@ export const ELEMENT_ACCENT: Record<VfxElement, number | null> = {
   qi: 0xbfeaff,
   shadow: 0x9a6cff,
   holy: 0xfff0a8,
+  gold: 0xffd23a,
+  sun: 0xffb000,
+  wind: 0xd8fff2,
+  water: 0x4fc3ff,
+  earth: 0xc49a5a,
 };
 
 const FAMILY_SHAPE: Record<WeaponFamily, VfxShape> = {
@@ -50,28 +73,58 @@ const FAMILY_SHAPE: Record<WeaponFamily, VfxShape> = {
   music: "wave",
 };
 
-/** Pure: what a cast should look like. Unknown / tactical casts get a quiet stance glow. */
+/** Each boss move's signature and element (its shape stays its weapon family's). */
+export const BOSS_VFX: Readonly<Record<string, { signature: BossSignature; element: VfxElement }>> = {
+  bss_serpent_fang: { signature: "fang", element: "poison" },
+  bss_serpent_coil: { signature: "coil", element: "gold" },
+  bss_serpent_molt: { signature: "molt", element: "gold" },
+  bss_tiger_claw: { signature: "claw", element: "blood" },
+  bss_tiger_roar: { signature: "roar", element: "frost" },
+  bss_tiger_frenzy: { signature: "frenzy", element: "blood" },
+  bss_eagle_feathers: { signature: "feathers", element: "wind" },
+  bss_eagle_dive: { signature: "dive", element: "thunder" },
+  bss_eagle_gale: { signature: "gale", element: "wind" },
+  bss_turtle_shell: { signature: "shell", element: "sun" },
+  bss_turtle_sun: { signature: "sun", element: "sun" },
+  bss_turtle_quake: { signature: "quake", element: "earth" },
+  bss_crab_pincers: { signature: "pincers", element: "water" },
+  bss_crab_mirror: { signature: "mirror", element: "water" },
+  bss_crab_tide: { signature: "tide", element: "water" },
+  bss_bull_charge: { signature: "charge", element: "fire" },
+  bss_bull_stomp: { signature: "stomp", element: "earth" },
+  bss_bull_rage: { signature: "rage", element: "fire" },
+};
+
 /** A cast as the renderer sees it: battle items (grid `item` actions) come as source kind "item". */
 type CastLike = { tier: Cast["tier"]; source?: { kind: "skill" | "art" | "item"; id: string; poison?: boolean } };
 
+/** Pure: what a cast should look like. Unknown / tactical casts get a quiet stance glow. */
 export function castVfx(cast: CastLike): CastVfx {
-  const tier = Math.max(0, Math.min(4, cast.tier ?? 0));
+  const tier = Math.max(0, Math.min(TIER_PALETTE.length - 1, cast.tier ?? 0));
   const palette = TIER_PALETTE[tier];
   let shape: VfxShape = "impact";
   let element: VfxElement = "none";
   let kind: CastVfx["kind"] = "stance";
+  let signature: BossSignature | undefined;
   if (cast.source?.kind === "skill") {
     const skill = getSkill(cast.source.id);
     if (skill) {
       kind = "skill";
       shape = FAMILY_SHAPE[skill.w] ?? "impact";
       const effect = skill.ee?.t;
-      element = effect === "poison_dmg" || effect === "debuff_poison" || effect === "heavy_poison" ? "poison"
-        : effect === "burn_hp_mp" ? "fire"
-        : effect === "stun" ? "thunder"
-        : effect === "drain_mp" || (skill.dr ?? 0) > 0 ? "blood"
-        : effect === "dispel" ? "holy"
-        : fromTypes(skill.types, skill.at === "int");
+      const boss = isBossMove(skill.id) ? BOSS_VFX[skill.id] : undefined;
+      if (boss) {
+        signature = boss.signature;
+        element = boss.element;
+      } else {
+        element = effect === "poison_dmg" || effect === "debuff_poison" || effect === "heavy_poison" ? "poison"
+          : effect === "burn_hp_mp" || effect === "scorch" ? "fire"
+          : effect === "stun" || effect === "bind" ? "thunder"
+          : effect === "bleed" || effect === "drain_mp" || (skill.dr ?? 0) > 0 ? "blood"
+          : effect === "dispel" || effect === "sunder" ? "holy"
+          : effect === "blind" ? "shadow"
+          : fromTypes(skill.types, skill.at === "int");
+      }
     }
   } else if (cast.source?.kind === "item") {
     // A thrown hidden weapon (poisoned or not); a potion is a support glow.
@@ -93,7 +146,9 @@ export function castVfx(cast: CastLike): CastVfx {
     }
   }
   const accent = ELEMENT_ACCENT[element] ?? palette.glow;
-  return { tier, shape, element, kind, core: palette.core, glow: palette.glow, accent };
+  const out: CastVfx = { tier, shape, element, kind, core: palette.core, glow: palette.glow, accent };
+  if (signature) out.signature = signature;
+  return out;
 }
 
 function fromTypes(types: readonly string[] | undefined, internal: boolean): VfxElement {

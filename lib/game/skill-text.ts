@@ -54,7 +54,20 @@ export function describeEffectThai(eff: SelfEffect | EnemyEffect): string {
     case "burn_hp_mp": return `เผาไหม้ เสียพลังชีวิต ${eff.dmg}% และปราณ ${eff.mp}% ทุกตา นาน ${turns(eff.u)}`;
     case "poison_dmg": return `ติดพิษ เสียพลังชีวิต ${eff.pp}% ทุกตา นาน ${turns(eff.u)}`;
     case "stun": return `โอกาส ${eff.ch}% ทำให้มึนงง ข้ามตา ${turns(eff.u)}`;
-    default: return (eff as { t: string }).t;
+    // Legendary beasts' (บอส) effects
+    case "molt": return `ลอกคราบ ล้างสถานะผิดปกติทั้งหมด ฟื้นพลังชีวิต ${eff.hp}% และสะท้อนความเสียหาย ${eff.rv}% นาน ${turns(eff.u)}`;
+    case "frenzy": return `คลั่งโลหิต พลังโจมตี +${eff.v}% ยิ่งเลือดน้อยยิ่งแรงจนถึง +${eff.mx}% นาน ${turns(eff.u)}`;
+    case "sun_shell": return `โล่กระดองดูดซับความเสียหาย ${eff.v}% ของพลังชีวิตสูงสุด และสะท้อนความเสียหาย ${eff.rv}% นาน ${turns(eff.u)}`;
+    case "bind": return `รัดแน่น ป้องกันภายนอก ${signed(eff.dv)} นาน ${turns(eff.du)} และโอกาส ${eff.ch}% ขยับไม่ได้ ข้ามตา ${turns(eff.u)}`;
+    case "bleed": return `เลือดไหล เสียพลังชีวิต ${eff.pp}% ทุกตา และแผลกว้างขึ้นอีก ${eff.inc}% ทุกตา นาน ${turns(eff.u)}`;
+    case "blind": return `ตาพร่า แม่นยำ ${signed(eff.v)} นาน ${turns(eff.u)} และท่าถัดไปมีโอกาส ${eff.ch}% พลาดเป้าทั้งท่า`;
+    case "scorch": return `แผดเผา เสียพลังชีวิต ${eff.pp}% ทุกตา และฟื้นพลังชีวิตไม่ได้ นาน ${turns(eff.u)}`;
+    case "sunder": return `ทลายเกราะ สลายพลังเสริมและโล่ทั้งหมด และป้องกันภายนอก ${signed(eff.dv)} นาน ${turns(eff.u)}`;
+    default: {
+      // Every kind needs a case above: a new variant without one is a type error.
+      const unhandled: never = eff;
+      return (unhandled as { t: string }).t;
+    }
   }
 }
 
@@ -73,6 +86,7 @@ export function skillSummaryLines(sk: Skill): string[] {
   lines.push((sk.hits ?? 1) > 1 ? `${kind} ${sk.hits} ครั้งในตาเดียว` : kind);
   if (sk.vitScale) lines.push(`แรงขึ้นตามค่าร่างกาย (+${sk.vitScale} ต่อร่างกาย 1 แต้ม)`);
   if (sk.dr) lines.push(`ดูดพลังชีวิตคืน ${sk.dr}% ของความเสียหายที่ทำได้`);
+  if (sk.pen) lines.push(`ทะลวงเกราะ ไม่สนใจป้องกันของศัตรู ${sk.pen}%`);
   if (sk.se) lines.push(`ตัวเอง: ${describeEffectThai(sk.se)}`);
   if (sk.ee) lines.push(`ศัตรู: ${describeEffectThai(sk.ee)}`);
   return lines;

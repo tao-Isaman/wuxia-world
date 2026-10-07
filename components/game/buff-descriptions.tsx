@@ -39,8 +39,12 @@ export function buffBadgeLabel(b: BuffRecord): string {
     case "buff_def_pct": return b.n ?? "พลังป้องกัน↑";
     case "buff_cri_rate": return b.n ?? "คริติคอล↑";
     case "buff_acc_pct": return b.n ?? "แม่นยำ↑";
-    case "shield": return `โล่ชีพจร ${b.v}`;
+    case "shield": return `${b.n === "กระดองตะวัน" ? "กระดองตะวัน" : "โล่ชีพจร"} ${b.v}`;
     case "ward": return `ผนึกชีพจร ×${b.v}`;
+    // Boss self-effects: only "frenzy" stays as a record (molt / sun_shell leave reflect + shield).
+    case "frenzy": return `คลั่ง +${b.v}%`;
+    case "molt": return "ลอกคราบ";
+    case "sun_shell": return "กระดองตะวัน";
   }
 }
 
@@ -54,6 +58,9 @@ export function debuffBadgeLabel(d: DebuffRecord): string {
     case "burn_hp_mp": return "เผาไหม้";
     case "stun": return "มึนงง";
     case "debuff_spd": return "เชื่องช้า";
+    case "bleed": return `เลือดไหล ${d.pp ?? 0}%`;
+    case "blind": return "ตาบอด";
+    case "scorch": return "แผดเผา";
   }
 }
 
@@ -139,9 +146,15 @@ export function describeBuff(b: BuffRecord): BuffDescription {
     case "buff_acc_pct":
       return { title: b.n ?? "แม่นยำ↑", detail: `Acc +${b.v}% (ชีพจร)` };
     case "shield":
-      return { title: "โล่ชีพจร", detail: `ดูดซับความเสียหายได้อีก ${b.v} ก่อนถึง HP` };
+      return { title: b.n === "กระดองตะวัน" ? "กระดองตะวัน" : "โล่ชีพจร", detail: `ดูดซับความเสียหายได้อีก ${b.v} ก่อนถึง HP` };
     case "ward":
       return { title: "ผนึกชีพจร", detail: `กันดีบัฟได้อีก ${b.v} ครั้ง` };
+    case "frenzy":
+      return { title: "โลหิตคลั่ง", detail: `พลังโจมตี +${b.v}% — ยิ่งเลือดน้อยยิ่งคลั่งแรง` };
+    case "molt":
+      return { title: "ลอกคราบ", detail: "ล้างดีบัฟทั้งหมด ฟื้น HP และสะท้อนความเสียหาย" };
+    case "sun_shell":
+      return { title: "กระดองตะวัน", detail: "โล่ดูดซับตาม % HP สูงสุด และสะท้อนความเสียหาย" };
   }
 }
 
@@ -184,5 +197,11 @@ export function describeDebuff(d: DebuffRecord): BuffDescription {
       };
     case "debuff_spd":
       return { title: "เชื่องช้า (ความเร็วลด)", detail: `เกจเติมช้าลง ${Math.abs(d.v ?? 0)}% (ถูกสกัดชีพจร)` };
+    case "bleed":
+      return { title: "เลือดไหล", detail: `เสีย HP ${d.pp ?? 0}% ทุกตา และแผลเปิดกว้างขึ้น +${d.inc ?? 0}% ทุกตา` };
+    case "blind":
+      return { title: "ตาบอด", detail: `ท่าถัดไปมีโอกาส ${d.ch ?? 0}% พลาดเป้าทั้งท่า (ใช้แล้วหายไป)` };
+    case "scorch":
+      return { title: "แผดเผา", detail: `เสีย HP ${d.pp ?? 0}% ทุกตา · ฟื้นพลังชีวิตไม่ได้ทุกทาง` };
   }
 }
