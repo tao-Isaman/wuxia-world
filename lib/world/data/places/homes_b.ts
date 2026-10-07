@@ -128,7 +128,7 @@ const npcs: NpcDef[] = [
   },
   {
     id: "home_tianboguang_soldier_chen", name: "ทหารแก่เฉิน",
-    description: "ทหารชายแดนปลดประจำการที่มาอาศัยเฝ้าคอกม้า ฟันหลอไปสามซี่แต่ฟันดาบยาวยังไม่หลอ",
+    description: "ทหารธนูชายแดนปลดประจำการที่มาอาศัยเฝ้าคอกม้า ฟันหลอไปสามซี่แต่สายธนูยังไม่หย่อน อ่านหนังสือไม่ออกสักตัว ศึกจิ้งหนานเคยเรียกเขากลับไปรบอีกครั้ง",
     locationIds: [TBG], dialogSceneId: "npc_home_tianboguang_soldier_chen_talk",
     tags: ["guard", "soldier", "elder"], look: { body: "m3", wander: true },
     likes: ["cooked_meat", "iron_ingot", "potion"], dislikes: ["silk"],
