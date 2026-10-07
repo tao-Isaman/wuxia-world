@@ -117,7 +117,7 @@ export const QUESTS_EMEI: readonly QuestDef[] = [
     type: "side",
     sectId: "emei",
     isArtQuest: true,
-    minSectRank: 3,
+    minSectRank: 1,
     giverNpcId: "sect_emei_abbess_jingchan",
     prereqs: {
       t: "and",

@@ -67,7 +67,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | --- | --- | --- | --- | --- |
 | `qst_emei_sect_patrol` | ลาดตระเวนรอบวัดง้อไบ๊ | ซือไท้จิงฉาน | kill → turn-in | prereqs |
 | `qst_emei_sect_herb` | เก็บสมุนไพรเขาง้อไบ๊ | ซือไท้จิงฉาน | item → turn-in | prereqs |
-| `qst_emei_art_bodhi` | บททดสอบก่อนตำนาน: วิชาลึกลับ | ซือไท้จิงฉาน | kill → trait → turn-in | art, rank ≤ 3, prereqs |
+| `qst_emei_art_bodhi` | บททดสอบก่อนตำนาน: วิชาลึกลับ | ซือไท้จิงฉาน | kill → trait → turn-in | art, rank ≤ 1, prereqs |
 | `qst_emei_redemption` | ไถ่บาปต่อง้อไบ๊ | ซือไท้จิงฉาน | kill → item → turn-in | prereqs |
 | `qst_emei_sect_lotus` | ส่งเม็ดบัวให้แม่ชี | ซือไท้จิงฉาน | item → turn-in | prereqs |
 | `qst_emei_sect_bandit_clear` | กวาดล้างโจรเชิงเขาง้อไบ๊ | ซือไท้จิงฉาน | kill → item → turn-in | prereqs |
@@ -80,7 +80,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | --- | --- | --- | --- | --- |
 | `qst_huashan_sect_patrol` | ลาดตระเวนเชิงเขาหัวซาน | อาจารย์ใหญ่อี้ชิง | kill → turn-in | prereqs |
 | `qst_huashan_sect_iron` | ส่งเหล็กให้โรงตีดาบ | อาจารย์ใหญ่อี้ชิง | item → turn-in | prereqs |
-| `qst_huashan_art_purplecloud` | บททดสอบก่อนตำนาน: วิชาลึกลับ | อาจารย์ใหญ่อี้ชิง | kill → item → turn-in | art, rank ≤ 3, prereqs |
+| `qst_huashan_art_purplecloud` | บททดสอบก่อนตำนาน: วิชาลึกลับ | อาจารย์ใหญ่อี้ชิง | kill → item → turn-in | art, rank ≤ 2, prereqs |
 | `qst_huashan_redemption` | ไถ่บาปต่อหัวซาน | อาจารย์ใหญ่อี้ชิง | kill → item → turn-in | prereqs |
 | `qst_huashan_sect_wooden` | ส่งไม้ให้โรงดาบ | อาจารย์ใหญ่อี้ชิง | item → turn-in | prereqs |
 
@@ -149,7 +149,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | --- | --- | --- | --- | --- |
 | `qst_beggars_sect_patrol` | ลาดตระเวนตรอกเมือง | หัวหน้าหงเทียน | kill → turn-in | prereqs |
 | `qst_beggars_sect_alms` | แจกอาหารคนยากไร้ | หัวหน้าหงเทียน | item → turn-in | prereqs |
-| `qst_beggars_art_thousandcrowd` | บททดสอบก่อนตำนาน: วิชาลึกลับ | หัวหน้าหงเทียน | kill → item → turn-in | art, rank ≤ 3, prereqs |
+| `qst_beggars_art_thousandcrowd` | บททดสอบก่อนตำนาน: วิชาลึกลับ | หัวหน้าหงเทียน | kill → item → turn-in | art, rank ≤ 2, prereqs |
 | `qst_beggars_redemption` | ไถ่บาปต่อพรรคยาจก | หัวหน้าหงเทียน | kill → item → turn-in | prereqs |
 | `qst_beggars_sect_rice2` | เก็บข้าวหมูแดงให้คนยาก | หัวหน้าหงเทียน | item → turn-in | prereqs |
 | `qst_beggars_sect_thug_road` | กำราบโจรริมทาง | หัวหน้าหงเทียน | kill → item → turn-in | prereqs |
@@ -174,7 +174,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | --- | --- | --- | --- | --- |
 | `qst_jinyiwei_sect_patrol` | ปราบโจรในเขตหลวง | ผู้บัญชาการจ้าวฝู่ | kill → turn-in | prereqs |
 | `qst_jinyiwei_sect_arms` | ส่งเหล็กให้โรงตีอาวุธ | ผู้บัญชาการจ้าวฝู่ | item → turn-in | prereqs |
-| `qst_jinyiwei_art_godslayer` | บททดสอบก่อนตำนาน: วิชาลึกลับ | ผู้บัญชาการจ้าวฝู่ | kill → trait → turn-in | art, rank ≤ 3, prereqs |
+| `qst_jinyiwei_art_godslayer` | บททดสอบก่อนตำนาน: วิชาลึกลับ | ผู้บัญชาการจ้าวฝู่ | kill → trait → turn-in | art, rank ≤ 1, prereqs |
 | `qst_jinyiwei_redemption` | ไถ่บาปต่อองครักษ์เสื้อแพร | ผู้บัญชาการจ้าวฝู่ | kill → item → turn-in | prereqs |
 | `qst_jinyiwei_sect_scroll` | ส่งกระดาษสาให้กรม | ผู้บัญชาการจ้าวฝู่ | item → turn-in | prereqs |
 | `qst_jinyiwei_sect_thugs` | กวาดล้างตลาดหลวง | ผู้บัญชาการจ้าวฝู่ | kill → turn-in | prereqs |
@@ -187,7 +187,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | --- | --- | --- | --- | --- |
 | `qst_tang_sect_patrol` | ลาดตระเวนป่าเสฉวน | เจ้าสำนักถังเหมิน | kill → turn-in | prereqs |
 | `qst_tang_sect_venom` | ส่งวัตถุดิบให้ห้องปรุงพิษ | เจ้าสำนักถังเหมิน | item → turn-in | prereqs |
-| `qst_tang_art_tenkpoisons` | บททดสอบก่อนตำนาน: วิชาลึกลับ | เจ้าสำนักถังเหมิน | kill → item → turn-in | art, rank ≤ 3, prereqs |
+| `qst_tang_art_tenkpoisons` | บททดสอบก่อนตำนาน: วิชาลึกลับ | เจ้าสำนักถังเหมิน | kill → item → turn-in | art, rank ≤ 2, prereqs |
 | `qst_tang_redemption` | ไถ่บาปต่อสำนักสกุลถัง | เจ้าสำนักถังเหมิน | kill → item → turn-in | prereqs |
 | `qst_tang_sect_venom2` | เก็บพิษเพิ่ม | เจ้าสำนักถังเหมิน | item → turn-in | prereqs |
 | `qst_tang_sect_herbgather` | เก็บสมุนไพรปรุงพิษ | เจ้าสำนักถังเหมิน | item → turn-in | prereqs |

@@ -112,7 +112,7 @@ export const QUESTS_HUASHAN: readonly QuestDef[] = [
     type: "side",
     sectId: "huashan",
     isArtQuest: true,
-    minSectRank: 3,
+    minSectRank: 2,
     giverNpcId: "sect_huashan_master_yiqing",
     prereqs: {
       t: "and",

@@ -12,7 +12,7 @@ import { CHARACTER_IDS, CREATURE_FRAME_COUNT } from "../lib/characters/catalog";
 import { LINEAGE_SPECS, MAIN_ARC, SAGA_PROLOGUES, STORY_ARC_SPECS } from "../lib/world/data/story";
 import { isQuestOfferable, isSecretSectQuest, sectActionCount } from "../lib/world/effects";
 import { getQuestsForSect } from "../lib/world/data/quests";
-import { CUTSCENES, STORY_ARCS, STORY_QUESTS, STORY_RESOLVERS } from "../lib/world/story/registry";
+import { CUTSCENES, SAGA_RANK, STORY_ARCS, STORY_QUESTS, STORY_RESOLVERS } from "../lib/world/story/registry";
 import { chainNext } from "../lib/world/quest-chain";
 import { DECLINE_TEXT, lineageQuestId, storyQuestId, LINEAGE_TIERS } from "../lib/world/story/compile";
 import type { CutsceneSpec, StoryBeat, StoryLine, StoryStep } from "../lib/world/story/types";
@@ -485,6 +485,20 @@ check("secret trials: the T4 saga trials are off the sect window and offered by 
     if (sectActionCount(busy) !== 0) err(`trial ${qid}: the sect badge counts something the window doesn't offer`);
   }
   for (const q of QUESTS) if (q.sectId && !isSecretSectQuest(q.id) && isQuestOfferable(store(), { ...q, prereqs: undefined })) err(`sect quest ${q.id} offered by an NPC`);
+});
+
+check("a sect's sagas open over ranks 3, 2 and 1, not all at one rank", () => {
+  const bySect = new Map<string, number[]>();
+  for (const arc of STORY_ARC_SPECS) if (arc.sectId) bySect.set(arc.sectId, [...(bySect.get(arc.sectId) ?? []), SAGA_RANK.get(arc.id) ?? 0]);
+  for (const [sect, ranks] of bySect) {
+    if (ranks.length > 1 && new Set(ranks).size < 2) err(`${sect}: every saga opens at rank ${ranks[0]}`);
+    if (ranks.length > 2 && !ranks.includes(1)) err(`${sect}: no saga waits for rank 1`);
+  }
+  for (const [reward, qid] of Object.entries(SAGA_PROLOGUES)) {
+    const arc = STORY_ARC_SPECS.find((a) => a.reward.id === reward);
+    const trial = getQuest(qid);
+    if (arc && trial && trial.minSectRank !== SAGA_RANK.get(arc.id)) err(`${qid}: trial rank ${trial.minSectRank} ≠ its saga's ${SAGA_RANK.get(arc.id)}`);
+  }
 });
 
 check("chains never go cold: after each chapter the log names the next giver and where they stand", () => {

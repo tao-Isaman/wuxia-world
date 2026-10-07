@@ -65,7 +65,23 @@ if (MAIN_ARC.chapters.length) {
   const c = compileArc(MAIN_ARC, STORY_RESOLVERS);
   quests.push(...c.quests); scenes.push(...c.scenes); cutscenes.push(...c.cutscenes); arcs.push(c.info);
 }
-for (const raw of STORY_ARC_SPECS) {
+// A sect's sagas open over its last three ranks, in the order they are listed:
+// the first at rank 3, the last at rank 1 (two: 3, 2 · four: 3, 3, 2, 1 · five:
+// 3, 3, 2, 2, 1) — not all at once. Each saga's sectRankAtLeast gate is set here.
+export const SAGA_RANK: ReadonlyMap<string, number> = (() => {
+  const bySect = new Map<string, string[]>();
+  for (const arc of STORY_ARC_SPECS) if (arc.sectId) bySect.set(arc.sectId, [...(bySect.get(arc.sectId) ?? []), arc.id]);
+  const out = new Map<string, number>();
+  for (const ids of bySect.values()) ids.forEach((id, i) => out.set(id, 3 - Math.floor((i * 3) / ids.length)));
+  return out;
+})();
+const withSagaRank = (c: Condition, rank: number): Condition =>
+  c.t === "and" ? { ...c, all: c.all.map((x) => withSagaRank(x, rank)) }
+    : c.t === "sectRankAtLeast" ? { ...c, maxRank: rank } : c;
+
+for (const raw0 of STORY_ARC_SPECS) {
+  const rank = SAGA_RANK.get(raw0.id);
+  const raw = rank ? { ...raw0, require: withSagaRank(raw0.require, rank) } : raw0;
   // A saga with a prologue trial (an older sect art quest) opens only after it.
   const trial = SAGA_PROLOGUES[raw.reward.id];
   const spec = trial ? { ...raw, require: { t: "and" as const, all: [raw.require, { t: "questStatus" as const, questId: trial, status: "done" as const }] } } : raw;
