@@ -6,6 +6,12 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-07
 
+### Sagas stay secret
+
+- The quest log's **ตำนาน** tab (every saga, its chapters, who offers the next, film replays) is gone — it gave the sagas away. `components/world/saga-list.tsx` is removed.
+- A finished chapter (or any finished quest that leads on) still says, in the log, **who to see next and where** — "บทต่อไป (บทที่ N): ไปหา … ที่ …" — but never the next quest's name.
+- **Skill numbers:** พลังโจมตีพื้นฐาน + เสริมพลังท่า + ความเสียหายเพิ่ม are one number, **พลังของท่า** (what the move adds to your attack: base × (1 + p %) + f), also on the upgrade receipt; ความแรงรวม (`dm`, a per-move balance constant) is no longer shown.
+
 ### กระบวนท่า and ลมปราณ; passives that say when they really fire; foes look the same everywhere
 
 - **Words:** วิชาฝีมือ is now **กระบวนท่า** and วิชาในกาย / ในกาย **ลมปราณ** in every window and line (the skills window's tabs read ⚔ กระบวนท่า / ☯ ลมปราณ); the library and practice say ระดับ, not Lv.

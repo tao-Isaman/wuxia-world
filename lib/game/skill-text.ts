@@ -78,11 +78,13 @@ export function skillSummaryLines(sk: Skill): string[] {
   return lines;
 }
 
-/** What `dm` reads as: "ความแรงรวม +10%" (or −). */
-export function damageMultiplierText(dm: number): string | null {
-  if (dm === 1) return null;
-  const pct = Math.round((dm - 1) * 100);
-  return `ความแรงรวม ${pct > 0 ? "+" : "−"}${Math.abs(pct)}%`;
+/**
+ * The move's own power in a hit: its base power at this level with its bonus
+ * (`p` %) and flat extra (`f`) folded in — the `skillEffect` the damage formula
+ * adds to the attacker's attack (battle.ts), before conflict.
+ */
+export function movePower(baseAtLevel: number, sk: Pick<Skill, "p" | "f">): number {
+  return Math.round(baseAtLevel * (1 + sk.p / 100) + sk.f);
 }
 
 // ─── Inner arts' passive line ──────────────────────────────────────────
@@ -125,7 +127,7 @@ const SHORTHAND: [RegExp, string | ((...m: string[]) => string)][] = [
   [/\b(Phy|Int)×(\d+)%×([\d.]+)/g, (_, k, a, b) => `${k === "Phy" ? "โจมตีภายนอก" : "โจมตีภายใน"} แรง ${Math.round(Number(a) * Number(b))}%`],
   [/\b(Phy|Int)×([\d.]+)(?!%)/g, (_, k, a) => `${k === "Phy" ? "โจมตีภายนอก" : "โจมตีภายใน"} แรง ${Math.round(Number(a) * 100)}%`],
   [/\b(Phy|Int)×(\d+)%/g, (_, k, a) => `${k === "Phy" ? "โจมตีภายนอก" : "โจมตีภายใน"} แรง ${a}%`],
-  [/\bbp×(\d+)%/g, "พลังโจมตีพื้นฐาน $1%"],
+  [/\bbp×(\d+)%/g, "พลังของท่า $1%"],
   [/ทางกาย×([\d.]+)(?!%)/g, (_, a) => `โจมตีภายนอก แรง ${Math.round(Number(a) * 100)}%`],
   [/ทางใน×([\d.]+)(?!%)/g, (_, a) => `โจมตีภายใน แรง ${Math.round(Number(a) * 100)}%`],
   [/ทางกาย/g, "โจมตีภายนอก"],

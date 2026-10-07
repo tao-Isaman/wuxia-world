@@ -28,7 +28,7 @@ import {
   xpToNextLevel,
 } from "@/lib/game";
 import type { WeaponFamily } from "@/lib/game";
-import { ATTACK_KIND_LABEL, damageMultiplierText, passiveLine, plainThai, skillFlavour, skillSummaryLines, statLine } from "@/lib/game/skill-text";
+import { ATTACK_KIND_LABEL, movePower, passiveLine, plainThai, skillFlavour, skillSummaryLines, statLine } from "@/lib/game/skill-text";
 import { useWorldStore } from "@/store/world-store";
 import { confirmDialog } from "@/store/confirm-store";
 import { ArtTooltip, SkillTooltip } from "../skill-tooltip";
@@ -95,9 +95,9 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
     if (info.kind === "skill") {
       const sk = info.skill;
       changes.push({
-        label: "พลังโจมตีพื้นฐาน",
-        before: Math.round(effectiveBp(sk, previousLevel) * factor),
-        after: Math.round(effectiveBp(sk, result.level) * factor),
+        label: "พลังของท่า",
+        before: movePower(effectiveBp(sk, previousLevel) * factor, sk),
+        after: movePower(effectiveBp(sk, result.level) * factor, sk),
       }, {
         label: `ความชำนาญ${WEAPON_FAMILY_LABEL[sk.w]}`,
         before: getMasteryMap(before.playerBuild.skillIds, before.playerBuild.skillLevels, factors)[sk.w] ?? 0,
@@ -123,7 +123,7 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
       detail: factor < 1
         ? "ค่าที่แสดงหักผลจากวิชาขัดแย้งแล้ว"
         : info.kind === "skill"
-          ? "พลังโจมตีพื้นฐานและความชำนาญอาวุธช่วยเพิ่มความเสียหายเมื่อโจมตี"
+          ? "พลังของท่าและความชำนาญอาวุธช่วยเพิ่มความเสียหายเมื่อโจมตี"
           : "ค่าพลังสูงสุดใหม่มีผลแล้ว · พักผ่อนเพื่อฟื้นพลัง",
     });
   };
@@ -439,7 +439,6 @@ function SkillNumbers({ skill: sk, lv }: { skill: NonNullable<ReturnType<typeof 
   const bpMax = Math.round(effectiveBp(sk, SKILL_LEVEL_MAX));
   const mgMax = Math.round(effectiveMg(sk, SKILL_LEVEL_MAX));
   const atMax = lv >= SKILL_LEVEL_MAX;
-  const dm = damageMultiplierText(sk.dm);
   return (
     <>
       {flavour && <div className="text-[11px] italic text-muted-foreground">{flavour}</div>}
@@ -453,10 +452,7 @@ function SkillNumbers({ skill: sk, lv }: { skill: NonNullable<ReturnType<typeof 
         </div>
       )}
       <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] text-muted-foreground">
-        <span>พลังโจมตีพื้นฐาน <b className="text-foreground">{Math.round(effectiveBp(sk, lv))}</b>{!atMax && <span className="opacity-60"> (ระดับ 10: {bpMax})</span>}</span>
-        {sk.p > 0 && <span>เสริมพลังท่า +{sk.p}%</span>}
-        {sk.f > 0 && <span>ความเสียหายเพิ่ม +{sk.f}</span>}
-        {dm && <span>{dm}</span>}
+        <span title="บวกเข้ากับพลังโจมตีของเจ้าทุกครั้งที่ใช้ท่านี้">พลังของท่า <b className="text-foreground">{movePower(effectiveBp(sk, lv), sk)}</b>{!atMax && <span className="opacity-60"> (ระดับ 10: {movePower(bpMax, sk)})</span>}</span>
         <span>ความชำนาญ{WEAPON_FAMILY_LABEL[sk.w]} <b className="text-foreground">+{Math.round(effectiveMg(sk, lv))}</b>{!atMax && <span className="opacity-60"> (ระดับ 10: +{mgMax})</span>}</span>
       </div>
     </>

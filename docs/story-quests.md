@@ -48,7 +48,6 @@ Both reuse the ordinary quest engine: stages, `autoAdvance`, objective spots, NP
 | `lib/stage/cutscene-runtime.ts` | the Phaser film player |
 | `components/world/cutscene-player.tsx` (+ `.module.css`) | the full-screen player UI |
 | `components/world/dialog-stage.tsx` | plays a dialog's film first, then its lines one beat at a time ([rendering.md](rendering.md#dialogs)) |
-| `components/world/saga-list.tsx` | the quest log's ตำนาน tab |
 | `scripts/test-story-quests.ts` | `bun run test:story` |
 
 ## Lineage quests
@@ -132,7 +131,7 @@ A cutscene is registered under `cs_<sceneId>` and played by a dialog whose `cuts
 - **Controls.** Tap, Enter or Space finishes the typewriter, then moves on. "อัตโนมัติ" advances on a timer (1.4 s + 55 ms per character); "ข้าม" or Esc skips.
 - **Pausing.** The player is `role="dialog"`, so the world map pauses underneath.
 - **Reduced motion.** `prefers-reduced-motion` turns walks into cuts and turns off shake, particles and bars.
-- **Watched films** set the flag `seen-cutscene:<id>`, and the ตำนาน tab can replay them. Flags ride the save, so no save version bump is needed.
+- **Watched films** set the flag `seen-cutscene:<id>`, (they are not replayed — sagas stay secret). Flags ride the save, so no save version bump is needed.
 - **Test hooks:** `data-testid="cutscene"`, `data-cutscene-id`, `data-ready`, `data-beat`, `data-mood`.
 
 ## Dialogs: films and pages
@@ -146,11 +145,7 @@ A cutscene is registered under `cs_<sceneId>` and played by a dialog whose `cuts
 
 ## Quest log and NPC card
 
-- **Quest log.** The **ตำนาน** tab (`SagaList`) lists every saga — those under way first — with:
-  - the sect and reward;
-  - chapter progress (✓ / ▶ / ○, future chapter titles hidden);
-  - who offers the next chapter and what it still needs;
-  - 🎬 replays of watched films.
+- **Quest log.** There is no saga list — sagas stay secret until offered. Under a finished chapter the log shows who gives the next one and where (`chainNext`, `ChainNextBlock` in `quest-log.tsx`), never its title.
 - **Badges.** Story chapters show 📜 and a "ตำนาน" badge; lineage quests show "สืบทอดวิชา".
 - **NPC card.** Chapters and lineage quests are ordinary offers on the giver's card, and their offer (`qs_<id>_offer`) opens before accepting — its รับคำ choice accepts (below).
 

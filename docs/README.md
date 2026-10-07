@@ -38,7 +38,7 @@ Start with the [project README](../README.md) for what the game is and how to ru
 - [gameplay.md](gameplay.md) — exploration, time, rest, travel, encounters, law and jail, quests and tracking, sects, life skills, crafting, progression, rumors.
 - [combat.md](combat.md) — the damage engine: derived stats, formulas, skills, arts, equipment, leveling, type conflict, effects.
 - [grid-combat.md](grid-combat.md) — the tactics battle system: rules, engine API, AI, store, renderer and UI.
-- [story-quests.md](story-quests.md) — sect lineage quests, story sagas, the cutscene player, paged dialogs and the ตำนาน tab.
+- [story-quests.md](story-quests.md) — sect lineage quests, story sagas, the cutscene player, paged dialogs.
 - [story-writing.md](story-writing.md) — how to write lineage quests and sagas: the มังกรหยก ภาค 3 framing, voice, rules, Thai names, lore hooks.
 - [world-engine.md](world-engine.md) — scenes, conditions, effects, quests, objectives, guide, random events, law, bad actions.
 - [liveness.md](liveness.md) — NPC simulation and rumors as built, and how they differ from the spec.

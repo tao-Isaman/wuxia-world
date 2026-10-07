@@ -7,7 +7,7 @@ async function start(page: Page) {
   await expect(page.getByTestId("world-canvas")).toHaveAttribute("data-ready", "true", { timeout: 60_000 });
 }
 
-test("story saga: the chapter's film plays (skippable), the long briefing pages, and the ตำนาน tab replays the film", async ({ page }) => {
+test("story saga: the chapter's film plays (skippable), the long briefing pages, and the chapter shows in the quest log — with no saga list to spoil the rest", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await start(page);
@@ -42,17 +42,10 @@ test("story saga: the chapter's film plays (skippable), the long briefing pages,
   await page.getByRole("button", { name: /รับคำ ไปอ่านศิลาจารึก/ }).click();
   await expect(page.getByTestId("world-canvas")).toHaveAttribute("data-ready", "true", { timeout: 60_000 });
 
-  // The quest log's ตำนาน tab lists the saga, the open chapter, and the watched film.
+  // The accepted chapter is in the quest log; there is no list of sagas to give the rest away.
   await page.getByRole("navigation", { name: "เมนูเกม" }).getByRole("button", { name: "ภารกิจ", exact: true }).click();
-  await page.getByRole("button", { name: /^ตำนาน\s*\d*$/ }).click();
-  const saga = page.locator('[data-saga-id="wudang_taiji_fist"]');
-  await expect(saga).toBeVisible();
-  await saga.getByRole("button", { name: /หมัดที่ต้องลืม/ }).click();
-  await expect(saga).toContainText("บทที่ 1: คำถามของคนแก่");
-  await saga.getByRole("button", { name: /🎬/ }).first().click();
-  await expect(page.getByTestId("cutscene")).toHaveAttribute("data-ready", "true", { timeout: 60_000 });
-  await page.getByTestId("cutscene").getByRole("button", { name: /ข้าม/ }).click();
-  await expect(page.getByTestId("cutscene")).toHaveCount(0, { timeout: 10_000 });
+  await expect(page.getByText(/หมัดที่ต้องลืม · บทที่ 1/).first()).toBeVisible();
+  await expect(page.getByRole("button", { name: /^ตำนาน\s*\d*$/ })).toHaveCount(0);
   expect(errors).toEqual([]);
 });
 

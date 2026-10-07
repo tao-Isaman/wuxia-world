@@ -293,7 +293,7 @@ Every sect skill and art can be earned from a sect NPC ([story-quests.md](story-
   - Seven sects' old art quests are now **prologue trials** (บททดสอบก่อนตำนาน) that must be passed before the saga starts. They are secret: not in the sect window — their giver offers them in person to an active member of high enough rank.
   - Chapters send you between places to visit, talk, hunt, gather and duel. A duel is never fatal; lose it and try again.
   - Many scenes open with a **film** on the painted map: subtitles, title cards and moods. Tap to go on, ▶ อัตโนมัติ to play hands-free, ข้าม to skip. Long talks show a page at a time (ต่อ ▶).
-  - The quest log's **ตำนาน** tab lists every saga with its progress and who gives the next chapter, and replays films already seen (🎬).
+  - Sagas stay secret: there is no list of them. Under a finished chapter (or any finished quest that leads on) the quest log says who to see next and where — never what comes next (`ChainNextBlock`).
 - **Turning down and dropping.** Picking one on a sect NPC's card opens the offer first; รับคำ takes it, **ขอปฏิเสธไว้ก่อน** walks away and leaves it on offer. A taken one can be dropped from the quest log (ละทิ้งภารกิจ): its progress is lost, but it is not failed — the giver offers it again. The sect art trials work the same way (a confirm box stands in for the offer scene).
 
 The quest list per giver and location is in [reference/quests.md](reference/quests.md).
@@ -406,7 +406,7 @@ Mastery levels 1–5 need 0 / 100 / 300 / 700 / 1500 xp.
 
 The 🥋 วิชา window: the 10 slots across the top; below, the **library** of everything learned on the left (icon and name, filter ทั้งหมด / ฝีมือ / ในกาย) and the picked move on the right — its numbers and ค่าประสบการณ์, ติดตั้งลงช่อง (the targeted slot if empty, else the first free one, else แทนที่ the targeted slot), ถอดออก, เลื่อนระดับ (ใช้ประสบการณ์ยุทธ N) and ลืมวิชา. Tap a slot to target it and show its move.
 
-Everything there is in plain Thai (`lib/game/skill-text.ts`): โจมตีภายนอก / โจมตีภายใน and how many strikes, what the move does to you and to the foe (`describeEffectThai`), พลังโจมตีพื้นฐาน (the base power, with its level-10 value), เสริมพลังท่า / ความเสียหายเพิ่ม / ความแรงรวม for the table's `p` / `f` / `dm`, ความชำนาญ<weapon>, เพิ่มค่าสถานะ by stat name, สาย… for the move's type tags and วิชาขัดกัน (a type kept at N %). Inner arts' active and passive lines are translated from the table's shorthand (`plainThai`).
+Everything there is in plain Thai (`lib/game/skill-text.ts`): โจมตีภายนอก / โจมตีภายใน and how many strikes, what the move does to you and to the foe (`describeEffectThai`), **พลังของท่า** (one number: the base power at this level with the move's `p` % and flat `f` folded in — `movePower`, the part added to the hero's attack — with its level-10 value) (`dm`, a per-move balance constant, is not shown), ความชำนาญ<weapon>, เพิ่มค่าสถานะ by stat name, สาย… for the move's type tags and วิชาขัดกัน (a type kept at N %). Inner arts' active and passive lines are translated from the table's shorthand (`plainThai`).
 
 Move skills (173) and inner arts (111) level from 1 to 10. A move skill's power, its stat bonuses and its weapon mastery grow with level; an art's bonuses scale by level / 10.
 

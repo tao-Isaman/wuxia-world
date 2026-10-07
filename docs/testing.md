@@ -137,7 +137,7 @@ Many specs replace `Math.random` in the page to make rolls predictable.
 | `places.spec.ts` | 1 | a village has its new people; a 500-gold gift raises trust and starts the 30-day wait; a kidnapped NPC leaves the map and is back after 180 days |
 | `meridians.spec.ts` | 2 | the ชีพจร screen: the HUD badge, a locked point refused, opening and raising point 1 spends (tier+1)×rank points and updates the totals, the hover tooltip; the empty state and a tap tooltip on a phone |
 | `systems.spec.ts` | 3 | a letter's unread badge, reading it and taking the gift (shown as an icon), deleting it; riding from the capital's horse station to a visited city; registering for the sword tournament and starting it on its day (bracket of 32, a bout queued) |
-| `story.spec.ts` | 2 | a saga chapter's film plays (title card, tap, skip), the long briefing pages, and the quest log's ตำนาน tab replays the film; the sect window's ขั้นและวิชา tab lists the sect's skills with their quests, and a rank-up pays gold and teaches nothing |
+| `story.spec.ts` | 2 | a saga chapter's film plays (title card, tap, skip), the long briefing pages, and the accepted chapter shows in the quest log; the sect window's ขั้นและวิชา tab |
 | `scrolls.spec.ts` | 3 | the HUD vitals card (HP / MP / พลัง over the icon menu); turning down a lineage offer at the NPC card, then taking and dropping it from the quest log; the sect window shows unlearned moves as วิชาลึกลับ and leaves T4 off; reading a quest's scroll from the bag teaches the move, and the skills window's library and detail panel take it off and equip it again |
 
 Screenshots from specs go to `test-results/screenshots/`; failure traces go to `test-results/<test>/`. Both are git-ignored.
