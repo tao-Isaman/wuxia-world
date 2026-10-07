@@ -117,7 +117,7 @@ export const QUESTS_TANG: readonly QuestDef[] = [
     type: "side",
     sectId: "tang",
     isArtQuest: true,
-    minSectRank: 3,
+    minSectRank: 2,
     giverNpcId: "sect_tang_chief_tangmen",
     prereqs: {
       t: "and",

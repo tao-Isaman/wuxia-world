@@ -26,7 +26,7 @@ This page covers the engine. How to *write* the content is in [story-writing.md]
 | | Lineage quest | Story saga chapter |
 | --- | --- | --- |
 | Quest id | `ql_<skill\|art>_<id>` | `st_<arcId>_<nn>` |
-| `QuestDef.type` | `"side"`, with `lineage: { kind, id }` | `"story"`, with `story: { arcId, chapter }` |
+| `QuestDef.type` | `"side"`, with `lineage: { kind, id, options? }` | `"story"`, with `story: { arcId, chapter }` |
 | Offered by | a sect NPC's card | the chapter's giver (often the master) |
 | Gate | not learned, scroll not held; tier-based rank, stat, outsider trait; eight T3 arts also need their old art quest done (`LINEAGE_PROLOGUES`) | chapter 1: the saga's `require` + not learned + scroll not held; then the previous chapter done (+ the chapter's own `require`) |
 | Ends with | `learnSkill` / `learnArt` (handed over as the move's scroll) + w-exp + relationship + sect points | small rewards; the last chapter also hands over the T4's scroll (arts read at level 3) |
@@ -51,6 +51,10 @@ Both reuse the ordinary quest engine: stages, `autoAdvance`, objective spots, NP
 | `scripts/test-story-quests.ts` | `bun run test:story` |
 
 ## Lineage quests
+
+**One quest per sect, tier and kind.** `registry.ts` groups `LINEAGE_SPECS` by sect, tier and kind and compiles each group once (`compileLineage(spec, r, seq, options)`): the group's first spec gives the id, teacher, trial and lines; `lineage.options` lists every move. With more than one option the quest carries no learn reward: its complete scene (`qs_<id>_complete`) ends with one choice per move (`เลือกสาย<family> — <name>` / `เลือก<name>`), each giving that move's scroll and finishing the quest — so the pick is made once and the others close (the gate is "none learned, none held"). All options' prologue trials gate the quest. The sect window shows one row per quest (`sectLineageQuests`); `lineageQuestOf(kind, id)` finds a move's quest. 154 moves → 113 quests, 30 with a choice.
+
+**Sagas spread over ranks.** `SAGA_RANK` sets each sect saga's `sectRankAtLeast` by its order in the sect's list, over ranks 3 → 1 (`3 − floor(i·3/n)`); the T4 prologue trials' `minSectRank` match.
 
 `compileLineage` builds the whole quest from the item's tier (`LINEAGE_TIERS`):
 

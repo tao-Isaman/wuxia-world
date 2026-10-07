@@ -111,7 +111,7 @@ export const QUESTS_BEGGARS: readonly QuestDef[] = [
     type: "side",
     sectId: "beggars",
     isArtQuest: true,
-    minSectRank: 3,
+    minSectRank: 2,
     giverNpcId: "sect_beggars_chief_hongtian",
     prereqs: {
       t: "and",

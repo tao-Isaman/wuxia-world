@@ -506,7 +506,8 @@ export interface QuestDef {
   /** Story saga chapter (type "story"): which saga, and its 1-based number. */
   story?: { arcId: string; chapter: number };
   /** Lineage quest: the sect skill or art it passes on (lib/world/story/lineage). */
-  lineage?: { kind: "skill" | "art"; id: string };
+  /** A lineage quest: its move, or (`options`) the moves of that sect tier to pick one from at hand-in. */
+  lineage?: { kind: "skill" | "art"; id: string; options?: readonly string[] };
 }
 
 export interface QuestState {

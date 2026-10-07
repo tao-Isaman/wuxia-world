@@ -109,7 +109,7 @@ export const QUESTS_JINYIWEI: readonly QuestDef[] = [
     type: "side",
     sectId: "jinyiwei",
     isArtQuest: true,
-    minSectRank: 3,
+    minSectRank: 1,
     giverNpcId: "sect_jinyiwei_leader_zhao",
     prereqs: {
       t: "and",
