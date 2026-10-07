@@ -81,7 +81,7 @@ The sagas retell **มังกรหยก ภาค 3** (ดาบมังก
 
 ### Novel characters
 
-- **Earlier novels** (the Condor trilogy, แปดเทพอสูรมังกรฟ้า: ก๊วยเจ๋ง, อึ้งย้ง, เอี้ยก้วย, ฮ่วงเอี้ยะซือ, หวังฉงหยาง, โฮ่งชีก๋ง…) are **history**. Their people never appear alive. A present-day heir may carry the family name: หวงชิงเฉวียน of เกาะดอกท้อ is ฮ่วงเอี้ยะซือ's great-grandson.
+- **Earlier novels** (the Condor trilogy, แปดเทพอสูรมังกรฟ้า: ก๊วยเจ๋ง, อึ้งย้ง, เอี้ยก้วย, ฮ่วงเอี้ยะซือ, หวังฉงหยาง, โฮ่งชีก๋ง…) are **history**. Their people never appear alive. A present-day heir may carry the family name: หวงชิงเฉวียน of เกาะดอกท้อ descends from ฮ่วงเอี้ยะซือ many generations down (a grandson of อึ้งย้ง took the Huang name to keep the island); he calls อึ้งย้ง ท่านย่าบรรพชน.
 - **Later novels** (กระบี่เย้ยยุทธจักร, จิ้งจอกภูเขาหิมะ / จิ้งจอกอหังการ…) **don't exist yet**. Never use their names, nor their family plots under the same names.
 - **Every NPC has an invented name.** Before naming one, check it is not a novel character's. The 2026-10 rename gave 41 NPCs invented names, for example:
   - จั่วเหลิงฉาน → เกาซงเหยียน
