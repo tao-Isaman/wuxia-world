@@ -441,6 +441,7 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
           spots: [
             { locationId: "village_wuxia", label: "ซุ่มฟังเสียงริมแม่น้ำยามค่ำ", sceneId: "qs_qv_wuxia_river_ghost_discover" },
           ],
+          hours: 2,
         },
       },
       {

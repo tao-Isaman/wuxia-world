@@ -82,7 +82,12 @@ export const questsActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "a
     const draft = draftFrom(get());
     const result = completeObjectiveSpot(draft, questId, spotIndex);
     if (!result.ok) return result;
-    if (result.sceneId) { get().gotoScene(result.sceneId); return result; }
+    if (result.sceneId) {
+      // A dialog spot that takes time (a dive, a night's watch) spends it first.
+      if (result.hours > 0) { advanceTime(draft, result.hours); set({ ...draft }); }
+      get().gotoScene(result.sceneId);
+      return result;
+    }
     advanceTime(draft, result.hours);
     const quest = getQuest(questId);
     appendActionLog(draft, "quest", `${quest?.name ?? questId}: ${result.message}`);

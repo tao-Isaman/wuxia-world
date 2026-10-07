@@ -21,12 +21,7 @@ import { HudVitals } from "./hud-vitals";
 import { GameMenuContext } from "@/components/ui/game-menu-context";
 import { InstallGameButton } from "@/components/pwa";
 import { SoundButton } from "@/components/sound-button";
-import {
-  SECT_MEMBERSHIPS,
-  getQuestsForSect,
-  isSectQuestOfferable,
-  type SectId,
-} from "@/lib/world";
+import { sectActionCount } from "@/lib/world";
 
 type PopupId =
   | "profile"
@@ -59,32 +54,8 @@ export function MenuBar({ hud }: { hud?: boolean } = {}) {
   const activeQuestCount = useWorldStore(
     (s) => Object.values(s.quests).filter((q) => q.status === "active").length,
   );
-  // Sect tab badge counts ACTIONABLE items, not just membership presence.
-  // "1 สำนัก joined" was meaningless — the player wants to know if there
-  // is something to do (claim a reward, accept a quest, rank up), not be
-  // reminded they're a disciple. Count:
-  //   - affordable rank-up
-  //   - offerable sect / art quests
-  // The full state object is read once and the helper does the work — re-
-  // computes only when the relevant slices change.
-  const sectActions = useWorldStore((s) => {
-    let count = 0;
-    for (const [sid, m] of Object.entries(s.sectMembership)) {
-      if (!m) continue;
-      const def = SECT_MEMBERSHIPS[sid as SectId];
-      if (!def) continue;
-      // Rank-up affordable.
-      if (m.rank > def.topRank && m.points >= def.rankUpCost(m.rank - 1)) {
-        count++;
-      }
-      // Offerable sect / art quests (excludes ones on cooldown / already
-      // claimed / wrong rank — see isSectQuestOfferable).
-      for (const q of getQuestsForSect(sid)) {
-        if (isSectQuestOfferable(s, q, def.questCooldownDays).offerable) count++;
-      }
-    }
-    return count;
-  });
+  // Sect tab badge: things to do in the สำนัก window (rank-up, quests it offers).
+  const sectActions = useWorldStore(sectActionCount);
 
   // Letters: an unread badge, and a toast when a new one arrives.
   const unread = useWorldStore((s) => s.letters.filter((l) => !l.read).length);

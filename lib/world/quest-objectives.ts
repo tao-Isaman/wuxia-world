@@ -80,7 +80,8 @@ export function completeObjectiveSpot(state: WorldStateData, questId: string, sp
   if (state.currentSceneId !== entry.spot.locationId) return { ok: false, message: "ต้องไปทำที่สถานที่นั้น" };
   const stage = def.stages[entry.stageIndex];
   // Dialog-driven spot: the scene's own choices advance the quest.
-  if (entry.spot.sceneId) return { ok: true, message: "", advanced: false, hours: 0, sceneId: entry.spot.sceneId };
+  // Its hours (only when the stage sets them) pass before the dialog opens.
+  if (entry.spot.sceneId) return { ok: true, message: "", advanced: false, hours: stage.objective?.hours ?? 0, sceneId: entry.spot.sceneId };
   state.flags[objectiveFlag(def.id, stage.id, spotIndex)] = true;
   const remaining = spots.filter((s) => !s.done && s.spotIndex !== spotIndex).length;
   const lead = entry.spot.text ?? `${entry.spot.label} · เสร็จแล้ว`;

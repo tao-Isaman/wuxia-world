@@ -627,6 +627,7 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
           spots: [
             { locationId: "pool_heilong", label: "ดำลงสำรวจก้นสระ", sceneId: "qs_qw_heilong_dragon_pearl_deep" },
           ],
+          hours: 2,
         },
       },
       { id: "decide", description: "ขึ้นจากสระ แล้วตัดสินใจว่าจะบอกต่านเหลาตูว่าเห็นอะไร" },
@@ -687,6 +688,7 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
           spots: [
             { locationId: "pool_heilong", label: "ดำตามแสงสีแดงในคืนเพ็ญ", sceneId: "qs_qw_heilong_depths_secret_investigate" },
           ],
+          hours: 4,
         },
       },
       {

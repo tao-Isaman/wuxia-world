@@ -90,6 +90,7 @@ export {
   isSecretSectQuest,
   isQuestTurnInForNpc,
   isSectQuestOfferable,
+  sectActionCount,
   tickQuestProgress,
   type QuestProgressLine,
 } from "./effects";

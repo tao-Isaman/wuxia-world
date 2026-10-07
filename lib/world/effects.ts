@@ -8,7 +8,7 @@ import type {
 } from "./types";
 import { TRAIT_LABEL } from "./types";
 import { getItem, getNpc, getOpponent, scrollItemId } from "./data";
-import { getQuest } from "./data/quests";
+import { getQuest, getQuestsForSect } from "./data/quests";
 import { SECT_MEMBERSHIPS } from "./data/sect-memberships";
 import { SAGA_PROLOGUES } from "./data/story";
 import { evaluateCondition, gearlessStat } from "./conditions";
@@ -759,6 +759,27 @@ export function isSectQuestOfferable(
     return { offerable: false, cooldownLeft: 0, reason: "ยังไม่ผ่านเงื่อนไข" };
   }
   return { offerable: true, cooldownLeft: 0 };
+}
+
+/**
+ * Things to do in the สำนัก window, for its menu badge: an affordable
+ * rank-up and the quests that window offers, in active memberships only.
+ * Secret T4 saga trials are left out — the window hides them (their giver
+ * offers them in person), so counting them showed a badge with nothing to take.
+ */
+export function sectActionCount(state: WorldStateData): number {
+  let count = 0;
+  for (const [sectId, m] of Object.entries(state.sectMembership)) {
+    if (!m || (m.status ?? "active") !== "active") continue;
+    const def = SECT_MEMBERSHIPS[sectId as keyof typeof SECT_MEMBERSHIPS];
+    if (!def) continue;
+    if (m.rank > def.topRank && m.points >= def.rankUpCost(m.rank - 1)) count++;
+    for (const quest of getQuestsForSect(sectId)) {
+      if (isSecretSectQuest(quest.id)) continue;
+      if (isSectQuestOfferable(state, quest, def.questCooldownDays).offerable) count++;
+    }
+  }
+  return count;
 }
 
 // ─── Stage progress tracker ───────────────────────────────────────────

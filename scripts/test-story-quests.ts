@@ -10,7 +10,8 @@ import { SKILLS } from "../lib/game/data/skills";
 import { ARTS } from "../lib/game/data/arts";
 import { CHARACTER_IDS, CREATURE_FRAME_COUNT } from "../lib/characters/catalog";
 import { LINEAGE_SPECS, MAIN_ARC, SAGA_PROLOGUES, STORY_ARC_SPECS } from "../lib/world/data/story";
-import { isQuestOfferable, isSecretSectQuest } from "../lib/world/effects";
+import { isQuestOfferable, isSecretSectQuest, sectActionCount } from "../lib/world/effects";
+import { getQuestsForSect } from "../lib/world/data/quests";
 import { CUTSCENES, STORY_ARCS, STORY_QUESTS, STORY_RESOLVERS } from "../lib/world/story/registry";
 import { DECLINE_TEXT, lineageQuestId, storyQuestId, LINEAGE_TIERS } from "../lib/world/story/compile";
 import type { CutsceneSpec, StoryBeat, StoryLine, StoryStep } from "../lib/world/story/types";
@@ -473,6 +474,14 @@ check("secret trials: the T4 saga trials are off the sect window and offered by 
     if (!isQuestOfferable(member(rank, "active"), open)) err(`trial ${qid}: giver does not offer it at rank ${rank}`);
     if (isQuestOfferable(member(rank + 1, "active"), open)) err(`trial ${qid}: offered below rank ${rank}`);
     if (isQuestOfferable(member(rank, "resigned"), open)) err(`trial ${qid}: offered to a former member`);
+    // The สำนัก badge: with every quest the window lists on cooldown or done, the
+    // secret trial (offered by its giver, hidden in the window) must not count.
+    const others = getQuestsForSect(def.sectId).filter((q) => !isSecretSectQuest(q.id));
+    const busy = { ...member(rank, "active") } as WorldStateData;
+    const m = busy.sectMembership[def.sectId as keyof typeof busy.sectMembership]!;
+    m.lastQuestDay = Object.fromEntries(others.filter((q) => !q.isArtQuest).map((q) => [q.id, busy.day]));
+    m.artQuestsDone = others.filter((q) => q.isArtQuest).map((q) => q.id);
+    if (sectActionCount(busy) !== 0) err(`trial ${qid}: the sect badge counts something the window doesn't offer`);
   }
   for (const q of QUESTS) if (q.sectId && !isSecretSectQuest(q.id) && isQuestOfferable(store(), { ...q, prereqs: undefined })) err(`sect quest ${q.id} offered by an NPC`);
 });
