@@ -29,12 +29,12 @@ Generated lists of everything in the game, taken straight from the data tables. 
 | Quests | 1074 |
 | Quest stages | 2920 |
 | Move skills / inner arts / equipment | 173 / 111 / 76 |
-| Items | 479 |
+| Items | 485 |
 | Shops / martial halls / artisans | 19 / 7 / 49 |
 | Recipes | 36 |
 | Gathering and hunting nodes | 25 |
 | Life skills | 19 |
-| Opponents | 390 |
-| Roaming foe events | 64 |
+| Opponents | 400 |
+| Roaming foe events | 68 |
 
 Regenerate with `bun scripts/build-docs-reference.ts`; `--check` fails when a page is stale.

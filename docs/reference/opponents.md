@@ -2,423 +2,438 @@
 
 # Opponents
 
-390 opponents (`lib/world/data/opponents.ts`). Foes that turn up on the map while the hero walks come from 64 fight events filtered by zone (`lib/world/data/random-events.ts`).
+400 opponents (`lib/world/data/opponents.ts`). Foes that turn up on the map while the hero walks come from 68 fight events, each only where it lives (habitats, `lib/world/data/habitats.ts`; `lib/world/data/random-events.ts`). 6 legendary beasts wait in their lairs (`lib/world/data/bosses.ts`).
 
-Met via: **roams** = turns up on the map in the listed zones while the hero walks · **hunt** = a hunting node · **spar** = an NPC's practice bout · **scene** = a quest or story battle (count of scene choices) · **law** = pursuers after wanted marks · **betrayal** = hunters after betraying a sect.
+Power = `powerScore` of the build at stat scale 1 (boosted T3 / T4 / NPC-backed builds included). Met via: **roams** = turns up on the map in the listed habitats while the hero walks (places at power 1) · **lair** = a legendary beast's lair · **hunt** = a hunting node · **spar** = an NPC's practice bout · **scene** = a quest or story battle (count of scene choices) · **law** = pursuers after wanted marks · **betrayal** = hunters after betraying a sect.
 
-Per tier: T0: 9 · T1: 44 · T2: 74 · T3: 55 · T4: 208. Per category: ฝ่ายมนุษย์ (human): 355 · สัตว์ป่า (beast): 27 · ผู้พิเศษ (supernatural): 8.
+Per tier: T0: 9 · T1: 44 · T2: 74 · T3: 56 · T4: 205 · T5: 12. Per category: ฝ่ายมนุษย์ (human): 361 · สัตว์ป่า (beast): 39.
 
 ## Tier 0 (9)
 
-| Id | Name | Category | Pack | Drops | Met via |
-| --- | --- | --- | --- | --- | --- |
-| `training_capital_apprentice` | ศิษย์ฝึกหัดอาเฉิง | human | — | 0 | scene ×1 |
-| `petty_thief` | ขโมยน้อย | human | — | 3 | roams (city, frontier, isle, mansion, sect, temple, wild) |
-| `drunk_brawler` | ชายเมาก่อเรื่อง | human | — | 3 | roams (city, frontier, isle, mansion, sect, temple, wild) |
-| `wild_dog` | หมาป่าเล็ก | beast | — | 3 | roams (frontier, isle, wild) |
-| `wild_chicken` | ไก่ป่า | beast | — | 3 | roams (frontier, isle, wild) |
-| `small_snake` | งูเล็ก | beast | — | 3 | roams (frontier, isle, wild) |
-| `hunt_rabbit` | กระต่ายป่า | beast | — | 3 | hunt |
-| `hunt_pheasant` | ไก่ฟ้า | beast | — | 3 | hunt |
-| `hunt_squirrel` | กระรอกแก้ม | beast | — | 3 | hunt |
+| Id | Name | Category | Power | Pack | Drops | Met via |
+| --- | --- | --- | --- | --- | --- | --- |
+| `training_capital_apprentice` | ศิษย์ฝึกหัดอาเฉิง | human | 18 | — | 0 | scene ×1 |
+| `petty_thief` | ขโมยน้อย | human | 18 | — | 3 | roams (town, road; 62 places) |
+| `drunk_brawler` | ชายเมาก่อเรื่อง | human | 19 | — | 3 | roams (town, road; 62 places) |
+| `wild_dog` | หมาป่าเล็ก | beast | 19 | — | 3 | roams (forest, steppe, mountain, road; 24 places) |
+| `wild_chicken` | ไก่ป่า | beast | 20 | — | 3 | roams (forest, steppe; 14 places) |
+| `small_snake` | งูเล็ก | beast | 19 | — | 3 | roams (swamp, forest, cave, river, desert, coast; 29 places) |
+| `hunt_rabbit` | กระต่ายป่า | beast | 20 | — | 3 | hunt |
+| `hunt_pheasant` | ไก่ฟ้า | beast | 20 | — | 3 | hunt |
+| `hunt_squirrel` | กระรอกแก้ม | beast | 21 | — | 3 | hunt |
 
 ## Tier 1 (44)
 
-| Id | Name | Category | Pack | Drops | Met via |
-| --- | --- | --- | --- | --- | --- |
-| `thug` | โจรเร่ร่อน | human | — | 5 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×1 |
-| `bandit` | โจรป่า | human | — | 5 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×1 |
-| `ruffian` | คนร้าย | human | — | 5 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×1 |
-| `wild_beast` | สัตว์ป่าดุร้าย | beast | — | 5 | roams (frontier, isle, wild) |
-| `wild_boar` | หมูป่า | beast | — | 5 | roams (frontier, isle, wild) |
-| `wild_wolf` | หมาป่า | beast | 1× หมาป่าเล็ก | 5 | roams (frontier, isle, wild) |
-| `road_bandit` | โจรเส้นทาง | human | 1× โจรเร่ร่อน | 5 | roams (city, frontier, isle, mansion, sect, temple, wild) |
-| `river_pirate` | โจรสลัดน้ำ | human | 1× โจรเร่ร่อน | 6 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×2 |
-| `desert_marauder` | นักรบทะเลทราย | human | — | 5 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×1 |
-| `fortune_thief` | หมอดูปลอม | human | — | 5 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×4 |
-| `hunt_wild_dog` | สุนัขป่า | beast | — | 5 | hunt |
-| `hunt_boar` | หมูป่าฝูง | beast | 1× หมูป่าฝูง | 6 | hunt |
-| `hunt_jungle_cat` | เสือดาวป่า | beast | — | 6 | hunt |
-| `spar_shaolin_xuanji` | ศิษย์เซวียนจี้ | human | — | 5 | spar |
-| `spar_wudang_qingxin` | ศิษย์ชิงซิน | human | — | 5 | spar |
-| `spar_huashan_xiaoyun` | ศิษย์เสี่ยวอวิ๋น | human | — | 5 | spar |
-| `spar_quanzhen_yangzi` | ศิษย์หยางจื่อ | human | — | 5 | spar |
-| `spar_songshan_disciple` | ศิษย์หลี่เฟิง | human | — | 7 | spar |
-| `spar_songshan_disciple2` | ศิษย์หยางจง | human | — | 7 | spar |
-| `spar_taishan_disciple` | ศิษย์คุนหวู่ | human | — | 7 | spar |
-| `spar_taishan_jingyang` | ศิษย์จิ้งหยาง | human | — | 7 | spar |
-| `spar_hengshan_south_disciple` | ศิษย์เยว่ผาน | human | — | 7 | spar |
-| `spar_hengshan_south_disciple2` | ศิษย์ชิงเฟิง | human | — | 6 | spar |
-| `spar_hengshan_north_nun` | นักพรตจิงซิน | human | — | 8 | spar |
-| `spar_hengshan_north_yilin` | นักพรตหลิงซู่ | human | — | 7 | spar |
-| `spar_emei_lingxin` | ศิษย์หลิงซิน | human | — | 5 | spar |
-| `spar_emei_yujie` | ศิษย์อวี้เจี๋ย | human | — | 5 | spar |
-| `spar_beggars_xiaomao` | ศิษย์เสี่ยวเหมา | human | — | 5 | spar |
-| `spar_xiaoyao_xiaolan` | ศิษย์เสี่ยวหลาน | human | — | 5 | spar |
-| `spar_spy_zhou` | โจวพ่อค้าเหล้า | human | — | 5 | spar |
-| `spar_spy_si` | ซื่อชาวนา | human | — | 5 | spar |
-| `spar_sunmoon_xiaoyu` | ศิษย์เสี่ยวเยว่ | human | — | 5 | spar |
-| `spar_tang_tangxiu` | ศิษย์ถังซิ่ว | human | — | 5 | spar |
-| `law_constable` | เจ้าหน้าที่รัฐ | human | — | 5 | law |
-| `vampire_bat` | ค้างคาวดูดเลือด | beast | 2× ค้างคาวดูดเลือด | 5 | roams (frontier, isle, wild) |
-| `bandit_archer` | มือเข็มโจรป่า | human | — | 5 | roams (city, frontier, isle, mansion, sect, temple, wild) |
-| `st_main_ink_runner` | สมุนเงาหมึก | human | — | 5 | scene ×2 |
-| `spar_village_noname_carter_lu` | ลู่เกวียน | human | — | 5 | spar |
-| `spar_village_huashan_dreamer_yang` | หยางซื่อ | human | — | 5 | spar |
-| `spar_palace_royal_zhao` | จ้าวเทีย | human | — | 5 | spar, scene ×1 |
-| `spar_tribe_huizu_ma` | หม่าต้าหู่ | human | — | 5 | spar, scene ×2 |
-| `spar_home_hufei_yuan` | จิ่งจื่ออิง | human | — | 5 | spar |
-| `spar_home_chengkun_chen` | เฉินเหวินฮ่าว | human | — | 5 | spar |
-| `spar_chengying_lu` | เหอชิงหลาน | human | — | 5 | spar |
+| Id | Name | Category | Power | Pack | Drops | Met via |
+| --- | --- | --- | --- | --- | --- | --- |
+| `thug` | โจรเร่ร่อน | human | 26 | — | 5 | roams (road, river; 4 places), scene ×1 |
+| `bandit` | โจรป่า | human | 36 | — | 5 | roams (forest, mountain, road, steppe; 24 places), scene ×1 |
+| `ruffian` | คนร้าย | human | 41 | — | 5 | roams (town, road; 62 places), scene ×1 |
+| `wild_beast` | สัตว์ป่าดุร้าย | beast | 28 | — | 5 | roams (forest, mountain; 24 places) |
+| `wild_boar` | หมูป่า | beast | 28 | — | 5 | roams (forest, mountain, steppe; 24 places) |
+| `wild_wolf` | หมาป่า | beast | 30 | 1× หมาป่าเล็ก | 5 | roams (steppe, forest, mountain, snow; 26 places) |
+| `road_bandit` | โจรเส้นทาง | human | 30 | 1× โจรเร่ร่อน | 5 | roams (road, mountain; 17 places) |
+| `river_pirate` | โจรสลัดน้ำ | human | 29 | 1× โจรเร่ร่อน | 6 | roams (river, coast; 14 places), scene ×2 |
+| `desert_marauder` | นักรบทะเลทราย | human | 30 | — | 5 | roams (desert, steppe; 5 places), scene ×1 |
+| `fortune_thief` | หมอดูปลอม | human | 31 | — | 5 | roams (town, road; 62 places), scene ×4 |
+| `hunt_wild_dog` | สุนัขป่า | beast | 44 | — | 5 | hunt |
+| `hunt_boar` | หมูป่าฝูง | beast | 40 | 1× หมูป่าฝูง | 6 | hunt |
+| `hunt_jungle_cat` | เสือดาวป่า | beast | 44 | — | 6 | hunt |
+| `spar_shaolin_xuanji` | ศิษย์เซวียนจี้ | human | 73 | — | 5 | spar |
+| `spar_wudang_qingxin` | ศิษย์ชิงซิน | human | 69 | — | 5 | spar |
+| `spar_huashan_xiaoyun` | ศิษย์เสี่ยวอวิ๋น | human | 60 | — | 5 | spar |
+| `spar_quanzhen_yangzi` | ศิษย์หยางจื่อ | human | 63 | — | 5 | spar |
+| `spar_songshan_disciple` | ศิษย์หลี่เฟิง | human | 106 | — | 7 | spar |
+| `spar_songshan_disciple2` | ศิษย์หยางจง | human | 106 | — | 7 | spar |
+| `spar_taishan_disciple` | ศิษย์คุนหวู่ | human | 125 | — | 7 | spar |
+| `spar_taishan_jingyang` | ศิษย์จิ้งหยาง | human | 118 | — | 7 | spar |
+| `spar_hengshan_south_disciple` | ศิษย์เยว่ผาน | human | 92 | — | 7 | spar |
+| `spar_hengshan_south_disciple2` | ศิษย์ชิงเฟิง | human | 92 | — | 6 | spar |
+| `spar_hengshan_north_nun` | นักพรตจิงซิน | human | 102 | — | 8 | spar |
+| `spar_hengshan_north_yilin` | นักพรตหลิงซู่ | human | 95 | — | 7 | spar |
+| `spar_emei_lingxin` | ศิษย์หลิงซิน | human | 62 | — | 5 | spar |
+| `spar_emei_yujie` | ศิษย์อวี้เจี๋ย | human | 57 | — | 5 | spar |
+| `spar_beggars_xiaomao` | ศิษย์เสี่ยวเหมา | human | 77 | — | 5 | spar |
+| `spar_xiaoyao_xiaolan` | ศิษย์เสี่ยวหลาน | human | 59 | — | 5 | spar |
+| `spar_spy_zhou` | โจวพ่อค้าเหล้า | human | 60 | — | 5 | spar |
+| `spar_spy_si` | ซื่อชาวนา | human | 80 | — | 5 | spar |
+| `spar_sunmoon_xiaoyu` | ศิษย์เสี่ยวเยว่ | human | 85 | — | 5 | spar |
+| `spar_tang_tangxiu` | ศิษย์ถังซิ่ว | human | 59 | — | 5 | spar |
+| `law_constable` | เจ้าหน้าที่รัฐ | human | 47 | — | 5 | law |
+| `vampire_bat` | ค้างคาวดูดเลือด | beast | 46 | 2× ค้างคาวดูดเลือด | 5 | roams (cave; 12 places) |
+| `bandit_archer` | มือเข็มโจรป่า | human | 44 | — | 5 | roams (forest, road, mountain; 24 places) |
+| `st_main_ink_runner` | สมุนเงาหมึก | human | 45 | — | 5 | scene ×2 |
+| `spar_village_noname_carter_lu` | ลู่เกวียน | human | 69 | — | 5 | spar |
+| `spar_village_huashan_dreamer_yang` | หยางซื่อ | human | 104 | — | 5 | spar |
+| `spar_palace_royal_zhao` | จ้าวเทีย | human | 83 | — | 5 | spar, scene ×1 |
+| `spar_tribe_huizu_ma` | หม่าต้าหู่ | human | 77 | — | 5 | spar, scene ×2 |
+| `spar_home_hufei_yuan` | จิ่งจื่ออิง | human | 112 | — | 5 | spar |
+| `spar_home_chengkun_chen` | เฉินเหวินฮ่าว | human | 116 | — | 5 | spar |
+| `spar_chengying_lu` | เหอชิงหลาน | human | 77 | — | 5 | spar |
 
 ## Tier 2 (74)
 
-| Id | Name | Category | Pack | Drops | Met via |
-| --- | --- | --- | --- | --- | --- |
-| `mountain_tiger` | เสือภูเขา | beast | — | 7 | roams (frontier, isle, wild), scene ×1 |
-| `brown_bear` | หมีสีน้ำตาล | beast | — | 7 | roams (frontier, isle, wild), scene ×1 |
-| `viper_snake` | งูเห่ายักษ์ | beast | 2× งูเล็ก | 7 | roams (frontier, isle, wild) |
-| `giant_centipede` | ตะขาบยักษ์ | beast | — | 7 | roams (frontier, isle, wild), scene ×1 |
-| `bandit_chief` | หัวหน้าโจร | human | 2× โจรป่า | 6 | roams (city, frontier, isle, mansion, sect, temple, wild) |
-| `iron_palm_thug` | นักเลงฝ่ามือเหล็ก | human | — | 6 | roams (city, frontier, isle, mansion, sect, temple, wild) |
-| `flying_swallow` | นกนางแอ่นบิน | human | — | 6 | roams (city, frontier, isle, mansion, sect, temple, wild) |
-| `poison_practitioner` | ผู้ฝึกพิษ | human | — | 7 | roams (city, frontier, isle, mansion, sect, temple, wild) |
-| `wandering_swordsman` | กระบี่พเนจร | human | — | 6 | roams (city, frontier, isle, mansion, sect, temple, wild) |
-| `sect_disciple` | ลูกศิษย์สำนัก | human | — | 6 | roams (city, frontier, isle, mansion, sect, temple, wild) |
-| `hunt_alpha_wolf` | หมาป่าจ่าฝูง | beast | 2× สุนัขป่า | 6 | hunt |
-| `hunt_giant_bear` | หมีหิน | beast | — | 7 | hunt |
-| `hunt_mountain_lynx` | เสือเขาเล็ก | beast | — | 7 | hunt |
-| `hunt_jungle_serpent` | งูยักษ์ป่า | beast | — | 7 | hunt |
-| `spar_swordsman_xiao` | เซียวจิ้งเทียน | human | — | 10 | spar, scene ×2 |
-| `spar_wudang_zhirong` | หัวหน้าศิษย์จื้อหรง | human | — | 7 | spar |
-| `spar_wudang_yujian` | ศิษย์อวี่เจี้ยน | human | — | 6 | spar |
-| `spar_huashan_qingsong` | อาจารย์ดาบชิงซ่ง | human | — | 8 | spar |
-| `spar_huashan_zhongming` | หัวหน้าศิษย์จงหมิง | human | — | 7 | spar |
-| `spar_quanzhen_qiuchuji` | อาจารย์ดาบกู่จื้อชิง | human | — | 8 | spar |
-| `spar_quanzhen_yaolan` | อาจารย์ปราณเหยาหลัน | human | — | 9 | spar |
-| `spar_songshan_elder_dingmian` | อาจารย์อาวุโสเจิ้งซือหราน | human | — | 8 | spar |
-| `spar_taishan_chiyangzi` | อาจารย์อาวุโสฉื่อหยางจื่อ | human | — | 9 | spar |
-| `spar_hengshan_south_vice` | รองอาจารย์ไป๋หมิงหยวน | human | — | 9 | spar |
-| `spar_hengshan_south_elder` | อาจารย์กระบี่ลู่เก๋อ | human | — | 8 | spar |
-| `spar_hengshan_north_yihe` | ภิกษุณีอี๋เหอ | human | — | 9 | spar |
-| `spar_hengshan_north_yiqing` | ภิกษุณีอี๋ชิง | human | — | 9 | spar |
-| `spar_emei_zhihui` | หัวหน้าศิษย์จื้อฮุย | human | — | 8 | spar |
-| `spar_emei_xiaoyu` | ศิษย์เสี่ยวอวี้ | human | — | 7 | spar, scene ×1 |
-| `spar_wudang_disciple` | สาวกชิงเฟิง | human | — | 6 | spar |
-| `spar_emei_nun` | นักพรตชิงอวี้ | human | — | 9 | spar |
-| `spar_huashan_disciple` | ศิษย์เจี้ยนอี้ | human | — | 10 | spar |
-| `spar_lingjiu_lady` | หญิงสาวจื่อเสีย | human | — | 9 | spar |
-| `spar_beggars_brawler` | ยาจกจิ๊ว | human | — | 8 | spar |
-| `spar_beggars_renhua` | หัวหน้าศิษย์เหรินฮัว | human | — | 8 | spar |
-| `spar_beggars_dawei` | ศิษย์ต้าเหว่ย | human | — | 7 | spar |
-| `spar_beggars_xiaohu` | ศิษย์เสี่ยวฮู | human | — | 7 | spar |
-| `spar_xingxiu_disciple` | ศิษย์ตู๋โซ่ว | human | — | 8 | spar |
-| `spar_wudu_miao` | หมอพิษอาหมาน | human | — | 8 | spar |
-| `spar_quanzhen_disciple` | สาวกชงซวี | human | — | 6 | spar |
-| `spar_xiaoyao_aliao` | หัวหน้าศิษย์อาเหลียว | human | — | 7 | spar |
-| `spar_xiaoyao_jiumozhi` | ศิษย์ฉีม่อหยาง | human | — | 6 | spar |
-| `spar_spy_feng` | เฟิงผู้ส่งข่าว | human | — | 6 | spar, scene ×1 |
-| `spar_spy_xi` | ซีท่าเรือ | human | — | 6 | spar |
-| `spar_spy_mei` | เหมยพรานป่า | human | — | 6 | spar |
-| `spar_sunmoon_yilin` | หัวหน้าศิษย์เยี่ยนชิว | human | — | 8 | spar |
-| `spar_sunmoon_lanfenghuang` | ศิษย์ไต้ซิ่วเหอ | human | — | 7 | spar, scene ×1 |
-| `spar_tang_tanglin` | หัวหน้าศิษย์ถังหลิน | human | — | 8 | spar |
-| `spar_tang_tangtao` | ศิษย์ถังเทา | human | — | 7 | spar |
-| `frost_wolf` | หมาป่าหิมะ | beast | 2× หมาป่า | 7 | roams (frontier, isle, wild) |
-| `blood_boar` | หมูป่าเลือดคลั่ง | beast | 1× หมูป่า | 6 | roams (frontier, isle, wild) |
-| `bandit_lieutenant` | รองหัวหน้าโจร | human | 1× โจรป่า + 1× มือเข็มโจรป่า | 6 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×1 |
-| `night_blade` | มือมีดราตรี | human | — | 6 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×3 |
-| `demon_cult_zealot` | สาวกลัทธิมาร | human | 2× สาวกลัทธิมาร | 6 | roams (city, frontier, isle, mansion, sect, temple, wild) |
-| `st_main_ink_captain` | หลัวเทียะผู้กองเงาหมึก | human | — | 6 | scene ×2 |
-| `spar_village_noname_whip_qiao` | ยายเฉียว | human | — | 6 | spar, scene ×2 |
-| `spar_village_taishan_porter_shi` | สือเปียนตาน | human | — | 6 | spar, scene ×1 |
-| `foe_taishan_toll_chief` | หัวหน้าโจรเก็บค่าผ่านทาง | human | — | 6 | scene ×1 |
-| `foe_youjian_shadow_diviner` | หมอดูเงา | human | — | 6 | scene ×1 |
-| `spar_city_lingxiao_feng` | เฝิงหานเหมย | human | — | 6 | spar, scene ×1 |
-| `spar_tribe_huizu_nasir` | นาซีร์ | human | — | 6 | spar |
-| `spar_home_hufei_hufei` | ไป๋เฝยหยาง | human | — | 6 | spar, scene ×1 |
-| `spar_home_hufei_jiu` | เหล่าจิ่ว | human | — | 6 | spar, scene ×1 |
-| `spar_home_yideng_fisher` | ฤๅษีประมงชิงเจียง | human | — | 6 | spar, scene ×3 |
-| `foe_home_tianboguang_holding_back` | หานเฟยหลาง (ออมมือ) | human | — | 6 | scene ×1 |
-| `spar_home_miaoren_spearman` | ทหารทวนเฒ่าจง | human | — | 6 | spar, scene ×1 |
-| `spar_yanji_liu` | หลิวกระบองไหม้ | human | — | 6 | spar, scene ×1 |
-| `spar_beichou_bei` | เป่ยฉิว | human | — | 6 | spar, scene ×1 |
-| `spar_meizhuang_huang` | เหลียงอิ้นกง | human | — | 6 | spar, scene ×1 |
-| `spar_fuwei_shi` | สื่อเปียวโถว | human | — | 6 | spar |
-| `spar_chef_su_twin` | พ่อครัวซู (มีดคู่) | human | — | 6 | scene ×1 |
-| `spar_hengshan_elder_wu` | ผู้อาวุโสอู๋ | human | — | 6 | scene ×1 |
-| `spar_qigu_farmer_lao` | ลาวหนาน | human | — | 6 | scene ×1 |
-| `spar_taohua_huang_waterstep` | หวงชิงเฉวียน (สามส่วนฝีมือ) | human | — | 6 | scene ×1 |
+| Id | Name | Category | Power | Pack | Drops | Met via |
+| --- | --- | --- | --- | --- | --- | --- |
+| `mountain_tiger` | เสือภูเขา | beast | 38 | — | 7 | roams (mountain, forest; 24 places), scene ×1 |
+| `brown_bear` | หมีสีน้ำตาล | beast | 40 | — | 7 | roams (forest, mountain, cave; 30 places), scene ×1 |
+| `viper_snake` | งูเห่ายักษ์ | beast | 40 | 2× งูเล็ก | 7 | roams (swamp, forest, cave; 23 places) |
+| `giant_centipede` | ตะขาบยักษ์ | beast | 39 | — | 7 | roams (cave, swamp, forest, desert; 25 places), scene ×1 |
+| `bandit_chief` | หัวหน้าโจร | human | 62 | 2× โจรป่า | 6 | roams (mountain, forest, road; 24 places) |
+| `iron_palm_thug` | นักเลงฝ่ามือเหล็ก | human | 61 | — | 6 | roams (road, river; 4 places) |
+| `flying_swallow` | นกนางแอ่นบิน | human | 63 | — | 6 | roams (road, river; 4 places) |
+| `poison_practitioner` | ผู้ฝึกพิษ | human | 54 | — | 7 | roams (swamp, forest; 16 places) |
+| `wandering_swordsman` | กระบี่พเนจร | human | 60 | — | 6 | roams (road, mountain, forest; 24 places) |
+| `sect_disciple` | ลูกศิษย์สำนัก | human | 60 | — | 6 | roams (road, mountain; 17 places) |
+| `hunt_alpha_wolf` | หมาป่าจ่าฝูง | beast | 57 | 2× สุนัขป่า | 6 | hunt |
+| `hunt_giant_bear` | หมีหิน | beast | 61 | — | 7 | hunt |
+| `hunt_mountain_lynx` | เสือเขาเล็ก | beast | 57 | — | 7 | hunt |
+| `hunt_jungle_serpent` | งูยักษ์ป่า | beast | 69 | — | 7 | hunt |
+| `spar_swordsman_xiao` | เซียวจิ้งเทียน | human | 125 | — | 10 | spar, scene ×2 |
+| `spar_wudang_zhirong` | หัวหน้าศิษย์จื้อหรง | human | 190 | — | 7 | spar |
+| `spar_wudang_yujian` | ศิษย์อวี่เจี้ยน | human | 136 | — | 6 | spar |
+| `spar_huashan_qingsong` | อาจารย์ดาบชิงซ่ง | human | 139 | — | 8 | spar |
+| `spar_huashan_zhongming` | หัวหน้าศิษย์จงหมิง | human | 132 | — | 7 | spar |
+| `spar_quanzhen_qiuchuji` | อาจารย์ดาบกู่จื้อชิง | human | 213 | — | 8 | spar |
+| `spar_quanzhen_yaolan` | อาจารย์ปราณเหยาหลัน | human | 217 | — | 9 | spar |
+| `spar_songshan_elder_dingmian` | อาจารย์อาวุโสเจิ้งซือหราน | human | 211 | — | 8 | spar |
+| `spar_taishan_chiyangzi` | อาจารย์อาวุโสฉื่อหยางจื่อ | human | 228 | — | 9 | spar |
+| `spar_hengshan_south_vice` | รองอาจารย์ไป๋หมิงหยวน | human | 234 | — | 9 | spar |
+| `spar_hengshan_south_elder` | อาจารย์กระบี่ลู่เก๋อ | human | 174 | — | 8 | spar |
+| `spar_hengshan_north_yihe` | ภิกษุณีอี๋เหอ | human | 221 | — | 9 | spar |
+| `spar_hengshan_north_yiqing` | ภิกษุณีอี๋ชิง | human | 183 | — | 9 | spar |
+| `spar_emei_zhihui` | หัวหน้าศิษย์จื้อฮุย | human | 192 | — | 8 | spar |
+| `spar_emei_xiaoyu` | ศิษย์เสี่ยวอวี้ | human | 143 | — | 7 | spar, scene ×1 |
+| `spar_wudang_disciple` | สาวกชิงเฟิง | human | 126 | — | 6 | spar |
+| `spar_emei_nun` | นักพรตชิงอวี้ | human | 120 | — | 9 | spar |
+| `spar_huashan_disciple` | ศิษย์เจี้ยนอี้ | human | 150 | — | 10 | spar |
+| `spar_lingjiu_lady` | หญิงสาวจื่อเสีย | human | 134 | — | 9 | spar |
+| `spar_beggars_brawler` | ยาจกจิ๊ว | human | 116 | — | 8 | spar |
+| `spar_beggars_renhua` | หัวหน้าศิษย์เหรินฮัว | human | 164 | — | 8 | spar |
+| `spar_beggars_dawei` | ศิษย์ต้าเหว่ย | human | 125 | — | 7 | spar |
+| `spar_beggars_xiaohu` | ศิษย์เสี่ยวฮู | human | 139 | — | 7 | spar |
+| `spar_xingxiu_disciple` | ศิษย์ตู๋โซ่ว | human | 111 | — | 8 | spar |
+| `spar_wudu_miao` | หมอพิษอาหมาน | human | 120 | — | 8 | spar |
+| `spar_quanzhen_disciple` | สาวกชงซวี | human | 147 | — | 6 | spar |
+| `spar_xiaoyao_aliao` | หัวหน้าศิษย์อาเหลียว | human | 144 | — | 7 | spar |
+| `spar_xiaoyao_jiumozhi` | ศิษย์ฉีม่อหยาง | human | 141 | — | 6 | spar |
+| `spar_spy_feng` | เฟิงผู้ส่งข่าว | human | 108 | — | 6 | spar, scene ×1 |
+| `spar_spy_xi` | ซีท่าเรือ | human | 120 | — | 6 | spar |
+| `spar_spy_mei` | เหมยพรานป่า | human | 115 | — | 6 | spar |
+| `spar_sunmoon_yilin` | หัวหน้าศิษย์เยี่ยนชิว | human | 139 | — | 8 | spar |
+| `spar_sunmoon_lanfenghuang` | ศิษย์ไต้ซิ่วเหอ | human | 115 | — | 7 | spar, scene ×1 |
+| `spar_tang_tanglin` | หัวหน้าศิษย์ถังหลิน | human | 172 | — | 8 | spar |
+| `spar_tang_tangtao` | ศิษย์ถังเทา | human | 123 | — | 7 | spar |
+| `frost_wolf` | หมาป่าหิมะ | beast | 85 | 2× หมาป่า | 7 | roams (snow, steppe; 7 places) |
+| `blood_boar` | หมูป่าเลือดคลั่ง | beast | 70 | 1× หมูป่า | 6 | roams (forest, steppe, mountain; 24 places) |
+| `bandit_lieutenant` | รองหัวหน้าโจร | human | 92 | 1× โจรป่า + 1× มือเข็มโจรป่า | 6 | roams (forest, mountain, road; 24 places), scene ×1 |
+| `night_blade` | มือมีดราตรี | human | 73 | — | 6 | roams (road, forest, river; 15 places), scene ×3 |
+| `demon_cult_zealot` | สาวกลัทธิมาร | human | 74 | 2× สาวกลัทธิมาร | 6 | roams (cave, mountain, desert, coast; 34 places) |
+| `st_main_ink_captain` | หลัวเทียะผู้กองเงาหมึก | human | 99 | — | 6 | scene ×2 |
+| `spar_village_noname_whip_qiao` | ยายเฉียว | human | 115 | — | 6 | spar, scene ×2 |
+| `spar_village_taishan_porter_shi` | สือเปียนตาน | human | 136 | — | 6 | spar, scene ×1 |
+| `foe_taishan_toll_chief` | หัวหน้าโจรเก็บค่าผ่านทาง | human | 82 | — | 6 | scene ×1 |
+| `foe_youjian_shadow_diviner` | หมอดูเงา | human | 91 | — | 6 | scene ×1 |
+| `spar_city_lingxiao_feng` | เฝิงหานเหมย | human | 119 | — | 6 | spar, scene ×1 |
+| `spar_tribe_huizu_nasir` | นาซีร์ | human | 134 | — | 6 | spar |
+| `spar_home_hufei_hufei` | ไป๋เฝยหยาง | human | 176 | — | 6 | spar, scene ×1 |
+| `spar_home_hufei_jiu` | เหล่าจิ่ว | human | 132 | — | 6 | spar, scene ×1 |
+| `spar_home_yideng_fisher` | ฤๅษีประมงชิงเจียง | human | 118 | — | 6 | spar, scene ×3 |
+| `foe_home_tianboguang_holding_back` | หานเฟยหลาง (ออมมือ) | human | 78 | — | 6 | scene ×1 |
+| `spar_home_miaoren_spearman` | ทหารทวนเฒ่าจง | human | 129 | — | 6 | spar, scene ×1 |
+| `spar_yanji_liu` | หลิวกระบองไหม้ | human | 98 | — | 6 | spar, scene ×1 |
+| `spar_beichou_bei` | เป่ยฉิว | human | 174 | — | 6 | spar, scene ×1 |
+| `spar_meizhuang_huang` | เหลียงอิ้นกง | human | 88 | — | 6 | spar, scene ×1 |
+| `spar_fuwei_shi` | สื่อเปียวโถว | human | 97 | — | 6 | spar |
+| `spar_chef_su_twin` | พ่อครัวซู (มีดคู่) | human | 154 | — | 6 | scene ×1 |
+| `spar_hengshan_elder_wu` | ผู้อาวุโสอู๋ | human | 167 | — | 6 | scene ×1 |
+| `spar_qigu_farmer_lao` | ลาวหนาน | human | 162 | — | 6 | scene ×1 |
+| `spar_taohua_huang_waterstep` | หวงชิงเฉวียน (สามส่วนฝีมือ) | human | 161 | — | 6 | scene ×1 |
 
-## Tier 3 (55)
+## Tier 3 (56)
 
-| Id | Name | Category | Pack | Drops | Met via |
-| --- | --- | --- | --- | --- | --- |
-| `blade_master` | อาจารย์ดาบ | human | 1× กระบี่พเนจร | 7 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×2 |
-| `shadow_assassin` | นักฆ่าเงา | human | 2× มือมีดราตรี | 7 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×2 |
-| `wudang_disciple` | สาวกอู่ตัง | human | — | 7 | roams (city, frontier, isle, mansion, sect, temple, wild) |
-| `snow_demon` | ปีศาจหิมะ | supernatural | — | 8 | roams (sect, temple, wild) |
-| `sect_elder` | ผู้อาวุโสสำนัก | human | — | 7 | roams (city, frontier, isle, mansion, sect, temple, wild) |
-| `spar_shaolin_faming` | อาจารย์ฝาหมิง | human | — | 7 | spar |
-| `spar_shaolin_yuanquan` | หัวหน้าศิษย์หยวนเฉวียน | human | — | 7 | spar |
-| `spar_wudang_baochun` | อาจารย์ปราณเป่าชุน | human | — | 10 | spar |
-| `spar_huashan_master_yiqing` | อาจารย์ใหญ่อี้ชิง | human | — | 12 | spar |
-| `spar_huashan_zifeng` | รองอาจารย์จื่อเฟิง | human | — | 10 | spar |
-| `spar_quanzhen_master_chongyang` | อาจารย์ใหญ่หลิงเจิน | human | — | 13 | spar |
-| `spar_quanzhen_mayu` | รองอาจารย์เติ้งหยวนเจิน | human | — | 11 | spar |
-| `spar_songshan_master_zuolengchan` | อาจารย์ใหญ่เกาซงเหยียน | human | — | 12 | spar |
-| `spar_songshan_vice_lubai` | รองอาจารย์เผิงอวิ๋นไห่ | human | — | 10 | spar |
-| `spar_taishan_master_tianmen` | เจ้าสำนักชิงสือเต้าเหริน | human | — | 12 | spar |
-| `spar_taishan_yuyangzi` | รองเจ้าสำนักอวี้หยางจื่อ | human | — | 10 | spar |
-| `spar_hengshan_south_master` | อาจารย์ใหญ่เซี่ยอวิ๋น | human | — | 12 | spar |
-| `spar_hengshan_north_dingyi` | ภิกษุณีเสวียนเยว่ | human | — | 12 | spar |
-| `spar_emei_yuxin` | หมอชีอวี้ซิน | human | — | 11 | spar |
-| `spar_kunlun_qiu` | ชิวเฉียน | human | — | 10 | spar, scene ×2 |
-| `spar_beggars_yunsi` | อาจารย์ข่าวสารยุนซือ | human | — | 10 | spar |
-| `spar_gumu_disciple` | ศิษย์เลิ่งเยว่ | human | — | 8 | spar |
-| `spar_xiaoyao_master` | ปรมาจารย์ยุนเซียว | human | — | 8 | — |
-| `spar_xiaoyao_xiaorang` | ผู้อาวุโสดาบเสี่ยวหรง | human | — | 9 | spar |
-| `spar_ming_envoy` | ผู้แทนหั่วจี้ | human | — | 9 | spar |
-| `spar_xuedao_blade` | ดาบเลือดเซียะลาง | human | — | 8 | spar, scene ×1 |
-| `spar_xueyu_master` | จอมยุทธฉือยิง | human | — | 8 | spar |
-| `spar_jinyiwei_qin` | องครักษ์ฉิน | human | — | 7 | spar |
-| `spar_jinyiwei_lu` | องครักษ์ลู่ | human | — | 7 | spar |
-| `spar_sunmoon_qudongfeng` | ผู้อาวุโสสมดุลฉวี่ตงเฟิง | human | — | 10 | spar |
-| `spar_tang_tangrong` | ผู้อาวุโสไล่ล่าถังหรง | human | — | 9 | spar |
-| `law_imperial_guard` | องครักษ์หลวง | human | — | 7 | law |
-| `law_bounty_hunter` | นักล่าค่าหัว | human | 1× เจ้าหน้าที่รัฐ | 7 | law |
-| `law_jinyiwei_agent` | องครักษ์เสื้อแพร | human | 1× เจ้าหน้าที่รัฐ | 7 | law |
-| `golden_tiger` | เสือทองคำ | beast | — | 8 | roams (frontier, isle, wild) |
-| `jade_python` | งูเหลือมหยก | beast | — | 9 | roams (frontier, isle, wild) |
-| `thunder_eagle` | อินทรีสายฟ้า | beast | — | 7 | roams (frontier, isle, wild) |
-| `ghost_swordsman` | วิญญาณจอมกระบี่ | supernatural | — | 7 | roams (sect, temple, wild) |
-| `st_main_ink_hand_meng` | เมิ่งมือหมึก | human | — | 7 | scene ×1 |
-| `foe_noname_masked_disciple` | ซือหลางหน้ากากเหล็ก | human | — | 7 | scene ×1 |
-| `foe_youjian_sky_room_guest` | หลี่เซียวเฟิง | human | — | 7 | scene ×1 |
-| `opp_city_lingxiao_red_veil` | หญิงผ้าคลุมแดง | human | — | 7 | scene ×1 |
-| `opp_palace_royal_shadow` | เงาไร้รอยรุ่นสอง | human | — | 7 | scene ×1 |
-| `spar_home_xuemuhua_li` | เห้งเจีย (เหยาซือเหมิง) | human | — | 7 | spar, scene ×1 |
-| `qfoe_home_xuemuhua_traitor` | ศิษย์ทรยศพิณมาร | human | — | 7 | scene ×1 |
-| `spar_home_nanxian_sage` | ท่านหนานเสียน | human | — | 7 | spar |
-| `foe_home_nanxian_masked_sword` | กระบี่สวมหน้ากาก | human | — | 7 | scene ×1 |
-| `spar_home_tianboguang` | หานเฟยหลาง | human | — | 7 | spar |
-| `foe_home_miaoren_poison_doctor` | หมอปลอมมือสังหาร | human | — | 7 | scene ×1 |
-| `foe_meizhuang_sunmoon_envoy` | ทูตเงาแห่งลัทธิตะวันจันทรา | human | — | 7 | scene ×1 |
-| `foe_fuwei_qingcheng_luo` | หยวนเหรินเจี๋ยแห่งชิงเฉิง | human | — | 7 | scene ×1 |
-| `qf_suzhou_lanying` | หลานอิงนักพิณพิษเพลง | human | — | 7 | scene ×1 |
-| `qfoe_dalun_shadow_lama` | ลามะเงาไร้นาม | human | — | 7 | scene ×1 |
-| `spar_dalun_kongxin` | พระกงซิน | human | — | 7 | scene ×1 |
-| `spar_bingcan_wei_firefist` | เว่ยชิงเหวิน (หมัดเพลิง) | human | — | 7 | scene ×1 |
+| Id | Name | Category | Power | Pack | Drops | Met via |
+| --- | --- | --- | --- | --- | --- | --- |
+| `blade_master` | อาจารย์ดาบ | human | 197 | 1× กระบี่พเนจร | 7 | roams (road, mountain; 17 places), scene ×2 |
+| `shadow_assassin` | นักฆ่าเงา | human | 182 | 2× มือมีดราตรี | 7 | roams (road, forest; 12 places), scene ×2 |
+| `wudang_disciple` | สาวกอู่ตัง | human | 128 | — | 7 | roams (mountain, road; 17 places) |
+| `snow_leopard` | เสือดาวหิมะ | beast | 165 | — | 9 | roams (snow, mountain; 19 places) |
+| `sect_elder` | ผู้อาวุโสสำนัก | human | 202 | — | 7 | roams (mountain, road; 17 places) |
+| `spar_shaolin_faming` | อาจารย์ฝาหมิง | human | 232 | — | 7 | spar |
+| `spar_shaolin_yuanquan` | หัวหน้าศิษย์หยวนเฉวียน | human | 294 | — | 7 | spar |
+| `spar_wudang_baochun` | อาจารย์ปราณเป่าชุน | human | 384 | — | 10 | spar |
+| `spar_huashan_master_yiqing` | อาจารย์ใหญ่อี้ชิง | human | 466 | — | 12 | spar |
+| `spar_huashan_zifeng` | รองอาจารย์จื่อเฟิง | human | 298 | — | 10 | spar |
+| `spar_quanzhen_master_chongyang` | อาจารย์ใหญ่หลิงเจิน | human | 613 | — | 13 | spar |
+| `spar_quanzhen_mayu` | รองอาจารย์เติ้งหยวนเจิน | human | 360 | — | 11 | spar |
+| `spar_songshan_master_zuolengchan` | อาจารย์ใหญ่เกาซงเหยียน | human | 440 | — | 12 | spar |
+| `spar_songshan_vice_lubai` | รองอาจารย์เผิงอวิ๋นไห่ | human | 312 | — | 10 | spar |
+| `spar_taishan_master_tianmen` | เจ้าสำนักชิงสือเต้าเหริน | human | 438 | — | 12 | spar |
+| `spar_taishan_yuyangzi` | รองเจ้าสำนักอวี้หยางจื่อ | human | 306 | — | 10 | spar |
+| `spar_hengshan_south_master` | อาจารย์ใหญ่เซี่ยอวิ๋น | human | 440 | — | 12 | spar |
+| `spar_hengshan_north_dingyi` | ภิกษุณีเสวียนเยว่ | human | 435 | — | 12 | spar |
+| `spar_emei_yuxin` | หมอชีอวี้ซิน | human | 389 | — | 11 | spar |
+| `spar_kunlun_qiu` | ชิวเฉียน | human | 230 | — | 10 | spar, scene ×2 |
+| `spar_beggars_yunsi` | อาจารย์ข่าวสารยุนซือ | human | 323 | — | 10 | spar |
+| `spar_gumu_disciple` | ศิษย์เลิ่งเยว่ | human | 230 | — | 8 | spar |
+| `spar_xiaoyao_master` | ปรมาจารย์ยุนเซียว | human | 229 | — | 8 | — |
+| `spar_xiaoyao_xiaorang` | ผู้อาวุโสดาบเสี่ยวหรง | human | 259 | — | 9 | spar |
+| `spar_ming_envoy` | ผู้แทนหั่วจี้ | human | 200 | — | 9 | spar |
+| `spar_xuedao_blade` | ดาบเลือดเซียะลาง | human | 240 | — | 8 | spar, scene ×1 |
+| `spar_xueyu_master` | จอมยุทธฉือยิง | human | 288 | — | 8 | spar |
+| `spar_jinyiwei_qin` | องครักษ์ฉิน | human | 246 | — | 7 | spar |
+| `spar_jinyiwei_lu` | องครักษ์ลู่ | human | 242 | — | 7 | spar |
+| `spar_sunmoon_qudongfeng` | ผู้อาวุโสสมดุลฉวี่ตงเฟิง | human | 355 | — | 10 | spar |
+| `spar_tang_tangrong` | ผู้อาวุโสไล่ล่าถังหรง | human | 352 | — | 9 | spar |
+| `law_imperial_guard` | องครักษ์หลวง | human | 170 | — | 7 | law |
+| `law_bounty_hunter` | นักล่าค่าหัว | human | 168 | 1× เจ้าหน้าที่รัฐ | 7 | law |
+| `law_jinyiwei_agent` | องครักษ์เสื้อแพร | human | 336 | 1× เจ้าหน้าที่รัฐ | 7 | law |
+| `golden_tiger` | เสือทองคำ | beast | 168 | — | 8 | roams (forest, mountain; 24 places) |
+| `jade_python` | งูเหลือมหยก | beast | 166 | — | 9 | roams (swamp, forest, river; 17 places) |
+| `thunder_eagle` | อินทรีสายฟ้า | beast | 147 | — | 7 | roams (mountain, snow, steppe; 19 places) |
+| `shadowless_swordsman` | จอมกระบี่ไร้เงา | human | 274 | — | 7 | roams (mountain, road, snow; 19 places) |
+| `iron_crab` | ปูก้ามเหล็ก | beast | 152 | — | 8 | roams (coast, river, swamp; 18 places) |
+| `st_main_ink_hand_meng` | เมิ่งมือหมึก | human | 280 | — | 7 | scene ×1 |
+| `foe_noname_masked_disciple` | ซือหลางหน้ากากเหล็ก | human | 227 | — | 7 | scene ×1 |
+| `foe_youjian_sky_room_guest` | หลี่เซียวเฟิง | human | 250 | — | 7 | scene ×1 |
+| `opp_city_lingxiao_red_veil` | หญิงผ้าคลุมแดง | human | 221 | — | 7 | scene ×1 |
+| `opp_palace_royal_shadow` | เงาไร้รอยรุ่นสอง | human | 243 | — | 7 | scene ×1 |
+| `spar_home_xuemuhua_li` | เห้งเจีย (เหยาซือเหมิง) | human | 282 | — | 7 | spar, scene ×1 |
+| `qfoe_home_xuemuhua_traitor` | ศิษย์ทรยศพิณมาร | human | 202 | — | 7 | scene ×1 |
+| `spar_home_nanxian_sage` | ท่านหนานเสียน | human | 214 | — | 7 | spar |
+| `foe_home_nanxian_masked_sword` | กระบี่สวมหน้ากาก | human | 213 | — | 7 | scene ×1 |
+| `spar_home_tianboguang` | หานเฟยหลาง | human | 198 | — | 7 | spar |
+| `foe_home_miaoren_poison_doctor` | หมอปลอมมือสังหาร | human | 182 | — | 7 | scene ×1 |
+| `foe_meizhuang_sunmoon_envoy` | ทูตเงาแห่งลัทธิตะวันจันทรา | human | 264 | — | 7 | scene ×1 |
+| `foe_fuwei_qingcheng_luo` | หยวนเหรินเจี๋ยแห่งชิงเฉิง | human | 202 | — | 7 | scene ×1 |
+| `qf_suzhou_lanying` | หลานอิงนักพิณพิษเพลง | human | 211 | — | 7 | scene ×1 |
+| `qfoe_dalun_shadow_lama` | ลามะเงาไร้นาม | human | 221 | — | 7 | scene ×1 |
+| `spar_dalun_kongxin` | พระกงซิน | human | 234 | — | 7 | scene ×1 |
+| `spar_bingcan_wei_firefist` | เว่ยชิงเหวิน (หมัดเพลิง) | human | 258 | — | 7 | scene ×1 |
 
-## Tier 4 (208)
+## Tier 4 (205)
 
-| Id | Name | Category | Pack | Drops | Met via |
-| --- | --- | --- | --- | --- | --- |
-| `demonic_master` | จอมยุทธมาร | human | 2× สาวกลัทธิมาร | 8 | roams (city, frontier, isle, mansion, sect, temple, wild), scene ×1 |
-| `legendary_swordsman` | ราชากระบี่ | human | 2× กระบี่พเนจร | 8 | roams (city, frontier, isle, mansion, sect, temple, wild) |
-| `dragon_phoenix_master` | ปรมาจารย์มังกร-หงส์ | supernatural | — | 8 | roams (sect, temple, wild) |
-| `heretical_grandmaster` | เจ้าสำนักอธรรม | human | — | 8 | roams (city, frontier, isle, mansion, sect, temple, wild) |
-| `immortal_warrior` | นักรบอมตะ | supernatural | — | 8 | roams (sect, temple, wild) |
-| `spar_shaolin_xianren` | หลวงพ่อเซียนเหริน | human | — | 10 | spar |
-| `spar_shaolin_juti` | หลวงพ่อจูตี้ | human | — | 11 | spar, scene ×2 |
-| `spar_shaolin_huimiao` | หลวงพี่ใหญ่ฮุยเหมียว | human | — | 11 | spar, scene ×2 |
-| `spar_shaolin_abbot_huiyuan` | เจ้าอาวาสฮุยหยวน | human | — | 13 | spar |
-| `spar_shaolin_luohan` | รองเจ้าอาวาสลั่วฮั่น | human | — | 12 | spar |
-| `spar_wudang_master_qingxu` | อาจารย์ชิงซวี่ | human | — | 14 | spar, scene ×1 |
-| `spar_wudang_xuancheng` | รองอาจารย์เสวียนเฉิง | human | — | 12 | spar |
-| `spar_wudang_lingyu` | อาจารย์ดาบหลิงอวี้ | human | — | 11 | spar, scene ×1 |
-| `spar_emei_abbess_jingchan` | ซือไท้จิงฉาน | human | — | 15 | spar |
-| `spar_emei_huimiao` | รองเจ้าสำนักฮุยเหมียว | human | — | 13 | spar |
-| `spar_emei_qingxin` | ซือไท้ชิงซิน | human | — | 11 | spar, scene ×1 |
-| `spar_emei_huiyu` | ซือไท้ฮุยอวี้ | human | — | 11 | spar |
-| `spar_beggars_chief_hongtian` | หัวหน้าหงเทียน | human | — | 14 | spar, scene ×1 |
-| `spar_beggars_lifang` | รองหัวหน้าหลี่ฟาง | human | — | 12 | spar |
-| `spar_beggars_qicheng` | อาจารย์ไม้เท้าฉีเฉิง | human | — | 11 | spar, scene ×1 |
-| `spar_beggars_wudao` | อาจารย์หมัดอู่เต้า | human | — | 11 | spar |
-| `spar_gumu_mystery_woman` | หญิงปริศนาในสุสาน | human | — | 14 | spar |
-| `spar_xiaoyao_master_yunxiao` | ปรมาจารย์ยุนเซียว | human | — | 14 | spar |
-| `spar_xiaoyao_tianshan` | รองอาจารย์เทียนซาน | human | — | 11 | spar |
-| `spar_xiaoyao_wuyazi` | ผู้อาวุโสกระบี่ซวีเฟิงจื่อ | human | — | 11 | spar |
-| `spar_xiaoyao_libai` | ผู้อาวุโสฝ่ามือหลี่ไป๋ | human | — | 11 | spar, scene ×1 |
-| `hunter_xiaoyao` | นักล่าพรรคสราญรมย์ | human | — | 10 | betrayal |
-| `spar_jinyiwei_leader` | ผู้บัญชาการจ้าวฝู่ | human | — | 8 | spar, scene ×3 |
-| `elite_blood_rakshasa` | อสุรกายโลหิต | supernatural | 3× ค้างคาวดูดเลือด | 12 | — |
-| `elite_void_grandmaster` | ปรมาจารย์ความว่าง | human | 1× วิญญาณจอมกระบี่ | 12 | — |
-| `elite_iron_mountain` | ภูเขาเหล็ก | human | 2× นักเลงฝ่ามือเหล็ก | 13 | — |
-| `elite_phoenix_empress` | จักรพรรดินีหงส์เพลิง | human | 2× มือมีดราตรี | 13 | — |
-| `elite_demon_emperor` | จักรพรรดิมาร | supernatural | 2× สาวกลัทธิมาร + 1× วิญญาณจอมกระบี่ | 13 | — |
-| `spar_sunmoon_chief_dongfang` | อาจารย์ใหญ่หยินอวี้ | human | — | 14 | spar, scene ×1 |
-| `spar_sunmoon_renwoxing` | รองเจ้าสำนักตู้เทียนหาน | human | — | 11 | spar |
-| `spar_sunmoon_zuolengchan` | ผู้อาวุโสตะวันซางเหยียนเลี่ย | human | — | 10 | spar |
-| `spar_sunmoon_xianggwentian` | ผู้อาวุโสจันทราฉินเยว่หลิง | human | — | 11 | spar, scene ×1 |
-| `spar_tang_chief_tangmen` | เจ้าสำนักถังเหมิน | human | — | 14 | spar |
-| `spar_tang_tangshanhu` | รองเจ้าสำนักถังซานหู | human | — | 11 | spar |
-| `spar_tang_tangzhongtian` | ผู้อาวุโสพิษถังจงเทียน | human | — | 12 | spar |
-| `spar_tang_tangshibi` | ผู้อาวุโสมีดถังซือปี้ | human | — | 11 | spar |
-| `hunter_shaolin` | นักล่าเส้าหลิน | human | — | 10 | betrayal |
-| `hunter_wudang` | นักล่าอู่ตัง | human | — | 10 | betrayal |
-| `hunter_huashan` | นักล่าหัวซาน | human | — | 10 | betrayal |
-| `hunter_quanzhen` | นักล่าฉวนเจิน | human | — | 10 | betrayal |
-| `hunter_songshan` | นักล่าซงซาน | human | — | 11 | betrayal |
-| `hunter_taishan` | นักล่าไท่ซาน | human | — | 10 | betrayal |
-| `hunter_hengshan_south` | นักล่าเฮิงซานใต้ | human | — | 10 | betrayal |
-| `hunter_hengshan_north` | นักล่าเหิงซานเหนือ | human | — | 11 | betrayal |
-| `hunter_emei` | นักล่าง้อไบ๊ | human | — | 10 | betrayal |
-| `hunter_gumu` | นักล่ากู่มู่ | human | — | 10 | betrayal |
-| `hunter_beggars` | นักล่าพรรคยาจก | human | — | 10 | betrayal |
-| `hunter_jinyiwei` | นักล่าองครักษ์เสื้อแพร | human | — | 10 | betrayal |
-| `hunter_sunmoon` | นักล่าพรรคตะวันจันทรา | human | — | 10 | betrayal |
-| `hunter_tang` | นักล่าสำนักสกุลถัง | human | — | 10 | betrayal |
-| `law_jinyiwei_captain` | นายกององครักษ์เสื้อแพร | human | 2× องครักษ์เสื้อแพร | 8 | law |
-| `elite_bandit_king` | ราชาโจรภูเขา | human | 1× รองหัวหน้าโจร + 2× มือเข็มโจรป่า + 2× โจรป่า | 10 | — |
-| `elite_cult_elder` | ผู้อาวุโสลัทธิมาร | human | 3× สาวกลัทธิมาร | 10 | scene ×2 |
-| `elite_bear_king` | ราชาหมีพันปี | beast | 1× หมีสีน้ำตาล | 9 | — |
-| `elite_villain_zhou` | เถ้าแก่โจวตลาดมืด | human | 2× โจรเร่ร่อน + 1× มือมีดราตรี | 10 | — |
-| `elite_villain_xie` | ทูตเซี่ยแห่งสำนักดาบโลหิต | human | 2× มือมีดราตรี | 8 | — |
-| `elite_villain_yan` | ขุนนางหยานทุจริต | human | 1× รองหัวหน้าโจร + 2× มือเข็มโจรป่า | 9 | scene ×1 |
-| `elite_villain_qing` | หัวหน้าโจรชิง | human | 1× รองหัวหน้าโจร + 3× โจรป่า | 10 | — |
-| `elite_villain_ying` | นักฆ่าเงาหยิง | human | 2× มือมีดราตรี | 9 | — |
-| `elite_villain_zhao` | เจ้าลัทธิจ้าวมังกรเทพ | human | 3× สาวกลัทธิมาร | 9 | — |
-| `elite_villain_dushi` | ผู้อาวุโสตู๋ซื่อ | human | 2× สาวกลัทธิมาร | 9 | — |
-| `elite_villain_huibao` | พระอเถระนอกรีตฮุยเป้า | human | 1× สาวกลัทธิมาร + 2× นักเลงฝ่ามือเหล็ก | 9 | — |
-| `elite_villain_xuelang` | ดาบเลือดเซียะลาง | human | 1× มือมีดราตรี | 8 | — |
-| `elite_villain_dushou` | ศิษย์ตู๋โซ่ว | human | 2× สาวกลัทธิมาร | 9 | — |
-| `st_vajra_finger_heir` | ทายาทนิ้ววัชระ | human | — | 8 | scene ×1 |
-| `st_wudang_hundred_swords` | ไป่เจี้ยน ผู้สะสมกระบี่ร้อยเล่ม | human | — | 8 | scene ×1 |
-| `st_wudang_pure_white_blade` | ฉุนเจิ้ง กระบี่ขาวบริสุทธิ์ | human | — | 8 | scene ×1 |
-| `st_wudang_silver_tongue` | ซือหม่าเหยียน ลิ้นเงิน | human | — | 8 | scene ×1 |
-| `st_shaolin_thirteen_fists` | เหลยเจิ้น จอมหมัดสิบสาม | human | — | 8 | scene ×1 |
-| `st_shaolin_lion_mourner` | หลิวอู๋ฮุ่ย ผู้สวมขนราชสีห์ | human | — | 8 | scene ×1 |
-| `st_shaolinarts_white_ape` | วานรขาวไป๋หยวน | human | — | 8 | scene ×1 |
-| `st_shaolinarts_patron_seng` | คหบดีเซ่ง | human | — | 8 | scene ×1 |
-| `st_shaolinarts_whip_breaker` | หานเยี่ย ผู้ทำลายวงล้อม | human | — | 8 | scene ×1 |
-| `st_emei_huiniang` | ฮุ้ยเหนียง | human | — | 8 | scene ×1 |
-| `st_emei_black_iron` | ขุนเหล็กดำ | human | — | 8 | scene ×1 |
-| `st_emeiarts_golden_needle` | อาเหิงเข็มทอง | human | — | 8 | scene ×1 |
-| `st_emeiarts_white_bone` | ซูอวิ๋นหัตถ์กระดูกขาว | human | — | 8 | scene ×1 |
-| `st_huashan_gold_fan` | บัณฑิตพัดทอง | human | — | 8 | scene ×1 |
-| `st_huashan_two_faced_blade` | ดาบสองหน้า | human | — | 8 | scene ×1 |
-| `st_gumu_jueqing_lord` | กงซุนเหลียง เจ้าหุบเขาตัดใจ | human | — | 8 | scene ×1 |
-| `st_gumu_bone_claw` | เหยียนซวง นางกรงเล็บกระดูกขาว | human | — | 8 | scene ×1 |
-| `st_gumu_xuanming_heir` | หานเฉิงอวี้ ทายาทฝ่ามือเฮี้ยนเม้ง | human | — | 8 | scene ×1 |
-| `st_beggars_false_chief` | ตั้งกิมเหลียง หัวหน้าเก้าถุงครึ่ง | human | — | 8 | scene ×1 |
-| `st_beggars_iron_staff` | เกาไม้เท้าเหล็ก | human | — | 8 | scene ×1 |
-| `st_beggarsarts_silver_tongue` | ลิ้นเงินซือฉวน | human | — | 8 | scene ×1 |
-| `st_beggarsarts_redplum_heir` | นายน้อยคฤหาสน์เหมยแดง | human | — | 8 | scene ×1 |
-| `st_sunmoon_forced_ninth` | ฉีเหยียนผู้ฝืนขั้นเก้า | human | — | 8 | scene ×1 |
-| `st_sunmoon_radiant_envoy` | ทูตจันทร์ฉาย | human | — | 8 | scene ×1 |
-| `st_xiaoyao_hawk_steward` | พ่อบ้านใหญ่ตาเหยี่ยว | human | — | 8 | scene ×1 |
-| `st_xiaoyao_snow_bat` | ค้างคาวหิมะเหมยเสวี่ย | human | — | 8 | scene ×1 |
-| `st_outsider_sixfold_dushi` | ตู๋ซื่อ มือพิษหกธาตุ | human | — | 8 | scene ×1 |
-| `st_outsider_black_pot` | ลุงหม้อดำ | human | — | 8 | scene ×1 |
-| `st_outsider_lion_mask` | หน้ากากราชสีห์ทอง | human | — | 8 | scene ×1 |
-| `st_jinyiwei_eunuch_liang` | ขันทีใหญ่เหลียง | human | — | 8 | scene ×1 |
-| `st_jinyiwei_helian` | ขุนดาบเฮ่อเหลียนป้า | human | — | 8 | scene ×1 |
-| `st_jinyiweiarts_leng_suo` | เหลิงซั่ว ฝ่ามือเฮี้ยนเม้ง | human | — | 8 | scene ×1 |
-| `st_jinyiweiarts_sun_yu` | เจ้ากรมเงาไหมซุนอวี้ | human | — | 8 | scene ×1 |
-| `st_jinyiweiarts_gu_chang` | ราชครูกู่ฉาง ผู้คุมหอเจดีย์ | human | — | 8 | scene ×1 |
-| `st_tang_peng_canghai` | จอมโจรสลัดเผิงชางไห่ | human | — | 8 | scene ×1 |
-| `st_tang_heartless_liang` | หมอไร้ใจเหลียงอู๋ซิน | human | — | 8 | scene ×1 |
-| `st_tangarts_seven_star` | ถังเชวียน เจ้าหอพิษเจ็ดดาว | human | — | 8 | scene ×1 |
-| `st_tangarts_black_iron_lord` | ประมุขเหล็กดำ | human | — | 8 | scene ×1 |
-| `st_jh_six_meridian_red_disciple` | ศิษย์ลามะจีวรแดง | human | — | 8 | scene ×3 |
-| `st_jh_six_meridian_bone_guard` | ผู้คุ้มกระดูกเหล็ก | human | — | 8 | scene ×2 |
-| `st_jh_six_meridian_mad_sword` | อาหลงผู้คลั่งหกชีพจร | human | — | 8 | scene ×1 |
-| `st_jh_six_meridian_mist_witch` | ซูหลัวแห่งหมอกม่วง | human | — | 8 | scene ×1 |
-| `st_jh_six_meridian_dorje` | ลามะดอร์เจ | human | — | 8 | scene ×1 |
-| `st_jh_six_meridian_dorje_six_fires` | ลามะดอร์เจ · เพลิงหกทิศ | human | — | 8 | scene ×1 |
-| `st_jh_lone_sword_rubber` | มือดาบลอกผา | human | — | 8 | scene ×1 |
-| `st_jh_lone_sword_xiao` | เซียวจิ้งเทียน (เต็มฝีมือ) | human | — | 8 | scene ×1 |
-| `st_jh_lone_sword_mask` | กระบี่ไร้หน้า | human | — | 8 | scene ×1 |
-| `st_jh_lone_sword_bai` | ไป๋เฝยหยาง (ดาบเหยี่ยวเหินเต็มมือ) | human | — | 8 | scene ×1 |
-| `st_jh_lone_sword_silver_spear` | ทวนเงินลักเงา | human | — | 8 | scene ×1 |
-| `st_jh_lone_sword_qiao` | ยายเฉียว (แส้เก้าข้อ) | human | — | 8 | scene ×1 |
-| `st_jh_lone_sword_lasso` | บ่วงทรายแดง | human | — | 8 | scene ×1 |
-| `st_jh_lone_sword_keeper` | ผู้แบกหีบ | human | — | 8 | scene ×1 |
-| `st_jh_lone_sword_bei` | เป่ยฉิว (ลมปราณเต็มเพลง) | human | — | 8 | scene ×1 |
-| `st_jh_lone_sword_puppet` | ศิษย์ร้อยกระบวน | human | — | 8 | scene ×1 |
-| `st_jh_lone_sword_shadow` | เงาบนหินเรียบ | supernatural | — | 8 | scene ×1 |
-| `st_jh_lone_sword_ninefold` | หัวหน้าเก้าเงาอาวุธ | human | — | 8 | scene ×1 |
-| `st_jh_lone_sword_collector` | เหวินอี้ ผู้สะสมร้อยกระบวน | human | — | 8 | scene ×1 |
-| `st_jh_witness_spear_iron_rider` | ทหารม้าเหล็กเป่ยผิง | human | — | 8 | scene ×1 |
-| `st_jh_witness_spear_gao_brothers` | สองพี่น้องเกา | human | — | 8 | scene ×1 |
-| `st_jh_witness_spear_zhong` | ทหารทวนเฒ่าจง (ทวนเต็มมือ) | human | — | 8 | scene ×1 |
-| `st_jh_witness_spear_eraser` | หลานจิ้งโม่ มือลบนาม | human | — | 8 | scene ×2 |
-| `st_jh_witness_spear_bei` | เป่ยฉิว (ทวนเต็มมือ) | human | — | 8 | scene ×1 |
-| `st_jh_witness_spear_tulong` | นายกองม้าเหล็กทูหลง | human | — | 8 | scene ×1 |
-| `st_jh_witness_spear_cuiyang` | ชุยหยาง องครักษ์ขุนพลซ่ง | human | — | 8 | scene ×1 |
-| `st_jh_witness_spear_inkmen` | สาวกหมึกดำ | human | — | 8 | scene ×1 |
-| `st_jh_witness_spear_song` | แม่ทัพใหญ่ซ่งเหวินปิง | human | — | 8 | scene ×1 |
-| `st_jh_witness_spear_eraser_last` | หลานจิ้งโม่ มือลบนาม (คบเพลิง) | human | — | 8 | scene ×1 |
-| `st_jh_godslayer_blade_wolf_rider` | มือขวานหมาป่าทราย | human | — | 8 | scene ×1 |
-| `st_jh_godslayer_blade_sand_wolf` | เจ้าโจรซาหลาง | human | — | 8 | scene ×1 |
-| `st_jh_godslayer_blade_iron_mask` | มือดาบหน้ากากเหล็ก | human | — | 8 | scene ×2 |
-| `st_jh_godslayer_blade_scorpion` | นางพญาแมงป่องซูหลิง | human | — | 8 | scene ×1 |
-| `st_jh_godslayer_blade_iron_vulture` | แร้งเหล็กกู่ชาน | human | — | 8 | scene ×1 |
-| `st_jh_godslayer_blade_bronze_keeper` | เฒ่าหน้ากากทองแดง | human | — | 8 | scene ×2 |
-| `st_jh_godslayer_blade_hulan` | ฮูหลันเจี๋ย | human | — | 8 | scene ×2 |
-| `st_jh_cosmos_fist_dock_ox` | วัวท่าเรือต้าจ้วง | human | — | 8 | scene ×1 |
-| `st_jh_cosmos_fist_eel` | ปลาไหลสองมือ | human | — | 8 | scene ×1 |
-| `st_jh_cosmos_fist_collector` | ลูกคิดเหล็ก | human | — | 8 | scene ×1 |
-| `st_jh_cosmos_fist_iron_belly` | เฉาพุงเหล็ก | human | — | 8 | scene ×1 |
-| `st_jh_cosmos_fist_wine_monk` | หลวงจีนเหล้าหวาน | human | — | 8 | scene ×1 |
-| `st_jh_cosmos_fist_red_lantern` | นางโคมแดง | human | — | 8 | scene ×1 |
-| `st_jh_cosmos_fist_shadow_cook` | พ่อครัวเงา | human | — | 8 | scene ×1 |
-| `st_jh_cosmos_fist_deserter` | เผิงซานทหารหนีทัพ | human | — | 8 | scene ×1 |
-| `st_jh_cosmos_fist_tieba` | เถี่ยปาราชาสังเวียนเหนือ | human | — | 8 | scene ×1 |
-| `st_jh_cosmos_fist_debt_boss` | หัวหน้ามือทวงหนี้ | human | — | 8 | scene ×1 |
-| `st_jh_cosmos_fist_stern_shadow` | เงาท้ายเรือ | human | — | 8 | scene ×1 |
-| `st_jh_cosmos_fist_wave_chen` | เฉินหมัดคลื่น | human | — | 8 | scene ×1 |
-| `st_jh_cosmos_fist_silent_giant` | ยักษ์ใบ้เหล็ก | human | — | 8 | scene ×1 |
-| `st_jh_cosmos_fist_luo` | หลัวเก้าท่า | human | — | 8 | scene ×1 |
-| `st_jh_mountain_army_scout` | หนูตาไว | human | — | 8 | scene ×1 |
-| `st_jh_mountain_army_bei_test` | เป่ยฉิว (ยืนไม่ขยับ) | human | — | 8 | scene ×1 |
-| `st_jh_mountain_army_sun` | ซุนเกราะเหล็ก | human | — | 8 | scene ×2 |
-| `st_jh_mountain_army_zeng` | เจิงธนูเงียบ | human | — | 8 | scene ×1 |
-| `st_jh_mountain_army_assassin` | มือสังหารตราเหล็ก | human | — | 8 | scene ×2 |
-| `st_jh_mountain_army_zhong` | ทหารทวนเฒ่าจง (ทวนจริง) | human | — | 8 | scene ×1 |
-| `st_jh_mountain_army_veteran` | ทหารธงฉีก | human | — | 8 | scene ×1 |
-| `st_jh_mountain_army_bei` | เป่ยฉิว (เต็มมือ) | human | — | 8 | scene ×1 |
-| `st_jh_mountain_army_huo` | ฮั่วจิ้นเผิง | human | — | 8 | scene ×2 |
-| `st_jh_mountain_army_zhang` | จางตราเหล็ก | human | — | 8 | scene ×1 |
-| `st_jh_heaven_fire_ahuo` | อาฮั่วหน้ากากทองแดง | human | — | 8 | scene ×2 |
-| `st_jh_heaven_fire_kite` | เฒ่าซุนช่างว่าว | human | — | 8 | scene ×1 |
-| `st_jh_heaven_fire_inspector` | ผู้ตรวจการเซี่ยงจิ้ง | human | — | 8 | scene ×2 |
-| `st_jh_heaven_fire_captain` | นายกองหลี่เถี่ยฉี | human | — | 8 | scene ×2 |
-| `st_jh_heaven_fire_ashman` | ทหารกินยาเพลิง | human | — | 8 | scene ×1 |
-| `st_jh_heaven_fire_giant` | ยักษ์เตาเหล็กดาว | human | — | 8 | scene ×1 |
-| `st_jh_heaven_fire_chiyan` | ฉือเหยียนเจ้าเก้าเตา | human | — | 8 | scene ×1 |
-| `st_jh_sunflower_shadow_eunuch` | ขันทีเงา | human | — | 8 | scene ×5 |
-| `st_jh_sunflower_silk_widow` | แม่ม่ายใยไหม | human | — | 8 | scene ×2 |
-| `st_jh_sunflower_unmarked_brocade` | เสื้อแพรไร้ตรา | human | — | 8 | scene ×2 |
-| `st_jh_sunflower_north_envoy` | ทูตเหล็กทัพเหนือ | human | — | 8 | scene ×3 |
-| `st_jh_sunflower_palace_captain` | นายกองเถียนหลง | human | — | 8 | scene ×2 |
-| `st_jh_sunflower_red_mask` | หน้ากากเข็มแดง | human | — | 8 | scene ×2 |
-| `st_jh_sunflower_gao_silent_step` | ขันทีเกา (เท้าไร้เสียง) | human | — | 8 | scene ×1 |
-| `st_jh_sunflower_xiaolong` | เสี่ยวหลง | human | — | 8 | scene ×1 |
-| `st_jh_sunflower_gu_red_needle` | ขันทีใหญ่กู้ชิวเซิง | human | — | 8 | scene ×1 |
-| `st_jh_nine_yang_frost_hand` | มือหิมะเฮี้ยนเม้ง | human | — | 8 | scene ×2 |
-| `st_jh_nine_yang_torch_left` | ผู้ถือคบซ้าย | human | — | 8 | scene ×2 |
-| `st_jh_nine_yang_torch_right` | ผู้ถือคบขวา | human | — | 8 | scene ×3 |
-| `st_jh_nine_yang_north_rider` | ทหารม้าเหล็กเหนือ | human | — | 8 | scene ×1 |
-| `st_jh_nine_yang_fire_guardian` | ผู้พิทักษ์ป้ายเพลิง | human | — | 8 | scene ×1 |
-| `st_jh_nine_yang_red_lama` | ลามะจีวรเพลิง | human | — | 8 | scene ×1 |
-| `st_jh_nine_yang_hanshuang` | ตู้หานซวง | human | — | 8 | scene ×2 |
-| `st_jh_nine_yang_wei` | นายกองเว่ยเถี่ยซาน | human | — | 8 | scene ×3 |
-| `st_jh_nine_yang_pei` | เผยเหยียนกวง | human | — | 8 | scene ×3 |
-| `st_jh_nine_yang_white_ape` | วานรเผือกเฒ่า | supernatural | — | 8 | scene ×1 |
-| `st_jh_nine_yang_pei_last` | เผยเหยียนกวง (เพลิงสุดท้าย) | human | — | 8 | scene ×1 |
-| `st_jh_nine_yin_jade_gang` | สมุนสมาคมเล็บหยก | human | — | 8 | scene ×2 |
-| `st_jh_nine_yin_jade_lord` | คุณชายซ่งอวี้หลาง | human | — | 8 | scene ×2 |
-| `st_jh_nine_yin_ice_mask` | ชายหน้ากากน้ำแข็ง | human | — | 8 | scene ×2 |
-| `st_jh_nine_yin_xuan` | เฒ่าเซวียน ศิษย์สุดท้ายแห่งเฮี้ยนเม้ง | human | — | 8 | scene ×2 |
-| `st_jh_nine_yin_north_shadow` | โหวเทียนซิง เงาทัพเหนือ | human | — | 8 | scene ×2 |
-| `st_jh_nine_yin_south_captain` | นายกองเฉียนอู่แห่งทัพใต้ | human | — | 8 | scene ×1 |
-| `st_jh_nine_yin_fake_sage` | ซินแสเก้าเล่ม | human | — | 8 | scene ×1 |
-| `st_jh_nine_yin_peach_shadow` | เงาในค่ายกลดอกท้อ | human | — | 8 | scene ×1 |
-| `st_jh_nine_yin_sea_mate` | ต้นหนหัวโล้นแห่งเรือดำ | human | — | 8 | scene ×1 |
-| `st_jh_nine_yin_sea_king` | เกาไห่ซิง ราชันย์ทะเลดำ | human | — | 8 | scene ×1 |
-| `st_jh_nine_yin_luo_cold` | หลัวเฟย์หาว (ไอเย็นครอบงำ) | human | — | 8 | scene ×2 |
-| `st_jh_nine_yin_frost_twins` | สองพี่น้องฝ่ามือเย็น | human | — | 8 | scene ×1 |
-| `spar_home_yideng_monk` | อู๋เฉินไต้ซือ | human | — | 8 | spar, scene ×2 |
-| `spar_home_miaoren_master` | เยวี่ยเหรินซาน | human | — | 8 | spar |
+| Id | Name | Category | Power | Pack | Drops | Met via |
+| --- | --- | --- | --- | --- | --- | --- |
+| `demonic_master` | จอมยุทธมาร | human | 413 | 2× สาวกลัทธิมาร | 8 | roams (mountain, cave, desert; 27 places), scene ×1 |
+| `legendary_swordsman` | ราชากระบี่ | human | 376 | 2× กระบี่พเนจร | 8 | roams (mountain, road, snow; 19 places) |
+| `heretical_grandmaster` | เจ้าสำนักอธรรม | human | 378 | — | 8 | roams (swamp, cave, forest; 23 places) |
+| `spar_shaolin_xianren` | หลวงพ่อเซียนเหริน | human | 468 | — | 10 | spar |
+| `spar_shaolin_juti` | หลวงพ่อจูตี้ | human | 631 | — | 11 | spar, scene ×2 |
+| `spar_shaolin_huimiao` | หลวงพี่ใหญ่ฮุยเหมียว | human | 637 | — | 11 | spar, scene ×2 |
+| `spar_shaolin_abbot_huiyuan` | เจ้าอาวาสฮุยหยวน | human | 1043 | — | 13 | spar |
+| `spar_shaolin_luohan` | รองเจ้าอาวาสลั่วฮั่น | human | 860 | — | 12 | spar |
+| `spar_wudang_master_qingxu` | อาจารย์ชิงซวี่ | human | 976 | — | 14 | spar, scene ×1 |
+| `spar_wudang_xuancheng` | รองอาจารย์เสวียนเฉิง | human | 660 | — | 12 | spar |
+| `spar_wudang_lingyu` | อาจารย์ดาบหลิงอวี้ | human | 519 | — | 11 | spar, scene ×1 |
+| `spar_emei_abbess_jingchan` | ซือไท้จิงฉาน | human | 1089 | — | 15 | spar |
+| `spar_emei_huimiao` | รองเจ้าสำนักฮุยเหมียว | human | 676 | — | 13 | spar |
+| `spar_emei_qingxin` | ซือไท้ชิงซิน | human | 480 | — | 11 | spar, scene ×1 |
+| `spar_emei_huiyu` | ซือไท้ฮุยอวี้ | human | 481 | — | 11 | spar |
+| `spar_beggars_chief_hongtian` | หัวหน้าหงเทียน | human | 1012 | — | 14 | spar, scene ×1 |
+| `spar_beggars_lifang` | รองหัวหน้าหลี่ฟาง | human | 687 | — | 12 | spar |
+| `spar_beggars_qicheng` | อาจารย์ไม้เท้าฉีเฉิง | human | 450 | — | 11 | spar, scene ×1 |
+| `spar_beggars_wudao` | อาจารย์หมัดอู่เต้า | human | 510 | — | 11 | spar |
+| `spar_gumu_mystery_woman` | หญิงปริศนาในสุสาน | human | 786 | — | 14 | spar |
+| `spar_xiaoyao_master_yunxiao` | ปรมาจารย์ยุนเซียว | human | 937 | — | 14 | spar |
+| `spar_xiaoyao_tianshan` | รองอาจารย์เทียนซาน | human | 484 | — | 11 | spar |
+| `spar_xiaoyao_wuyazi` | ผู้อาวุโสกระบี่ซวีเฟิงจื่อ | human | 418 | — | 11 | spar |
+| `spar_xiaoyao_libai` | ผู้อาวุโสฝ่ามือหลี่ไป๋ | human | 496 | — | 11 | spar, scene ×1 |
+| `hunter_xiaoyao` | นักล่าพรรคสราญรมย์ | human | 493 | — | 10 | betrayal |
+| `spar_jinyiwei_leader` | ผู้บัญชาการจ้าวฝู่ | human | 1050 | — | 8 | spar, scene ×3 |
+| `elite_void_grandmaster` | ปรมาจารย์ความว่าง | human | 567 | 1× จอมกระบี่ไร้เงา | 12 | roams (mountain, snow; 19 places) |
+| `elite_iron_mountain` | ภูเขาเหล็ก | human | 734 | 2× นักเลงฝ่ามือเหล็ก | 13 | roams (mountain, road; 17 places) |
+| `elite_phoenix_empress` | จักรพรรดินีหงส์เพลิง | human | 650 | 2× มือมีดราตรี | 13 | roams (desert, mountain; 19 places) |
+| `spar_sunmoon_chief_dongfang` | อาจารย์ใหญ่หยินอวี้ | human | 787 | — | 14 | spar, scene ×1 |
+| `spar_sunmoon_renwoxing` | รองเจ้าสำนักตู้เทียนหาน | human | 489 | — | 11 | spar |
+| `spar_sunmoon_zuolengchan` | ผู้อาวุโสตะวันซางเหยียนเลี่ย | human | 373 | — | 10 | spar |
+| `spar_sunmoon_xianggwentian` | ผู้อาวุโสจันทราฉินเยว่หลิง | human | 381 | — | 11 | spar, scene ×1 |
+| `spar_tang_chief_tangmen` | เจ้าสำนักถังเหมิน | human | 971 | — | 14 | spar |
+| `spar_tang_tangshanhu` | รองเจ้าสำนักถังซานหู | human | 510 | — | 11 | spar |
+| `spar_tang_tangzhongtian` | ผู้อาวุโสพิษถังจงเทียน | human | 557 | — | 12 | spar |
+| `spar_tang_tangshibi` | ผู้อาวุโสมีดถังซือปี้ | human | 474 | — | 11 | spar |
+| `hunter_shaolin` | นักล่าเส้าหลิน | human | 486 | — | 10 | betrayal |
+| `hunter_wudang` | นักล่าอู่ตัง | human | 484 | — | 10 | betrayal |
+| `hunter_huashan` | นักล่าหัวซาน | human | 421 | — | 10 | betrayal |
+| `hunter_quanzhen` | นักล่าฉวนเจิน | human | 409 | — | 10 | betrayal |
+| `hunter_songshan` | นักล่าซงซาน | human | 393 | — | 11 | betrayal |
+| `hunter_taishan` | นักล่าไท่ซาน | human | 386 | — | 10 | betrayal |
+| `hunter_hengshan_south` | นักล่าเฮิงซานใต้ | human | 399 | — | 10 | betrayal |
+| `hunter_hengshan_north` | นักล่าเหิงซานเหนือ | human | 436 | — | 11 | betrayal |
+| `hunter_emei` | นักล่าง้อไบ๊ | human | 478 | — | 10 | betrayal |
+| `hunter_gumu` | นักล่ากู่มู่ | human | 538 | — | 10 | betrayal |
+| `hunter_beggars` | นักล่าพรรคยาจก | human | 531 | — | 10 | betrayal |
+| `hunter_jinyiwei` | นักล่าองครักษ์เสื้อแพร | human | 525 | — | 10 | betrayal |
+| `hunter_sunmoon` | นักล่าพรรคตะวันจันทรา | human | 532 | — | 10 | betrayal |
+| `hunter_tang` | นักล่าสำนักสกุลถัง | human | 513 | — | 10 | betrayal |
+| `law_jinyiwei_captain` | นายกององครักษ์เสื้อแพร | human | 496 | 2× องครักษ์เสื้อแพร | 8 | law |
+| `elite_bandit_king` | ราชาโจรภูเขา | human | 402 | 1× รองหัวหน้าโจร + 2× มือเข็มโจรป่า + 2× โจรป่า | 10 | roams (mountain, forest; 24 places) |
+| `elite_cult_elder` | ผู้อาวุโสลัทธิมาร | human | 394 | 3× สาวกลัทธิมาร | 10 | roams (cave, mountain, swamp; 29 places), scene ×2 |
+| `elite_bear_king` | ราชาหมีพันปี | beast | 236 | 1× หมีสีน้ำตาล | 9 | roams (forest, mountain, snow; 26 places) |
+| `elite_villain_zhou` | เถ้าแก่โจวตลาดมืด | human | 364 | 2× โจรเร่ร่อน + 1× มือมีดราตรี | 10 | roams (road, river; 4 places) |
+| `elite_villain_xie` | ทูตเซี่ยแห่งสำนักดาบโลหิต | human | 428 | 2× มือมีดราตรี | 8 | roams (snow, mountain, desert; 21 places) |
+| `elite_villain_yan` | ขุนนางหยานทุจริต | human | 423 | 1× รองหัวหน้าโจร + 2× มือเข็มโจรป่า | 9 | roams (road; 0 places), scene ×1 |
+| `elite_villain_qing` | หัวหน้าโจรชิง | human | 419 | 1× รองหัวหน้าโจร + 3× โจรป่า | 10 | roams (mountain, cave, desert; 27 places) |
+| `elite_villain_ying` | นักฆ่าเงาหยิง | human | 397 | 2× มือมีดราตรี | 9 | roams (cave, forest; 21 places) |
+| `elite_villain_zhao` | เจ้าลัทธิจ้าวมังกรเทพ | human | 416 | 3× สาวกลัทธิมาร | 9 | roams (coast; 11 places) |
+| `elite_villain_dushi` | ผู้อาวุโสตู๋ซื่อ | human | 415 | 2× สาวกลัทธิมาร | 9 | roams (swamp, forest; 16 places) |
+| `elite_villain_huibao` | พระอเถระนอกรีตฮุยเป้า | human | 434 | 1× สาวกลัทธิมาร + 2× นักเลงฝ่ามือเหล็ก | 9 | roams (mountain, cave; 25 places) |
+| `elite_villain_xuelang` | ดาบเลือดเซียะลาง | human | 450 | 1× มือมีดราตรี | 8 | roams (snow, desert, mountain; 21 places) |
+| `elite_villain_dushou` | ศิษย์ตู๋โซ่ว | human | 370 | 2× สาวกลัทธิมาร | 9 | roams (desert, swamp; 10 places) |
+| `stone_turtle` | เต่ากระดองหิน | beast | 209 | — | 9 | roams (coast, river; 14 places) |
+| `st_vajra_finger_heir` | ทายาทนิ้ววัชระ | human | 400 | — | 8 | scene ×1 |
+| `st_wudang_hundred_swords` | ไป่เจี้ยน ผู้สะสมกระบี่ร้อยเล่ม | human | 370 | — | 8 | scene ×1 |
+| `st_wudang_pure_white_blade` | ฉุนเจิ้ง กระบี่ขาวบริสุทธิ์ | human | 405 | — | 8 | scene ×1 |
+| `st_wudang_silver_tongue` | ซือหม่าเหยียน ลิ้นเงิน | human | 397 | — | 8 | scene ×1 |
+| `st_shaolin_thirteen_fists` | เหลยเจิ้น จอมหมัดสิบสาม | human | 378 | — | 8 | scene ×1 |
+| `st_shaolin_lion_mourner` | หลิวอู๋ฮุ่ย ผู้สวมขนราชสีห์ | human | 387 | — | 8 | scene ×1 |
+| `st_shaolinarts_white_ape` | วานรขาวไป๋หยวน | human | 361 | — | 8 | scene ×1 |
+| `st_shaolinarts_patron_seng` | คหบดีเซ่ง | human | 383 | — | 8 | scene ×1 |
+| `st_shaolinarts_whip_breaker` | หานเยี่ย ผู้ทำลายวงล้อม | human | 364 | — | 8 | scene ×1 |
+| `st_emei_huiniang` | ฮุ้ยเหนียง | human | 354 | — | 8 | scene ×1 |
+| `st_emei_black_iron` | ขุนเหล็กดำ | human | 386 | — | 8 | scene ×1 |
+| `st_emeiarts_golden_needle` | อาเหิงเข็มทอง | human | 286 | — | 8 | scene ×1 |
+| `st_emeiarts_white_bone` | ซูอวิ๋นหัตถ์กระดูกขาว | human | 368 | — | 8 | scene ×1 |
+| `st_huashan_gold_fan` | บัณฑิตพัดทอง | human | 323 | — | 8 | scene ×1 |
+| `st_huashan_two_faced_blade` | ดาบสองหน้า | human | 364 | — | 8 | scene ×1 |
+| `st_gumu_jueqing_lord` | กงซุนเหลียง เจ้าหุบเขาตัดใจ | human | 349 | — | 8 | scene ×1 |
+| `st_gumu_bone_claw` | เหยียนซวง นางกรงเล็บกระดูกขาว | human | 383 | — | 8 | scene ×1 |
+| `st_gumu_xuanming_heir` | หานเฉิงอวี้ ทายาทฝ่ามือเฮี้ยนเม้ง | human | 410 | — | 8 | scene ×1 |
+| `st_beggars_false_chief` | ตั้งกิมเหลียง หัวหน้าเก้าถุงครึ่ง | human | 381 | — | 8 | scene ×1 |
+| `st_beggars_iron_staff` | เกาไม้เท้าเหล็ก | human | 384 | — | 8 | scene ×1 |
+| `st_beggarsarts_silver_tongue` | ลิ้นเงินซือฉวน | human | 373 | — | 8 | scene ×1 |
+| `st_beggarsarts_redplum_heir` | นายน้อยคฤหาสน์เหมยแดง | human | 364 | — | 8 | scene ×1 |
+| `st_sunmoon_forced_ninth` | ฉีเหยียนผู้ฝืนขั้นเก้า | human | 415 | — | 8 | scene ×1 |
+| `st_sunmoon_radiant_envoy` | ทูตจันทร์ฉาย | human | 367 | — | 8 | scene ×1 |
+| `st_xiaoyao_hawk_steward` | พ่อบ้านใหญ่ตาเหยี่ยว | human | 377 | — | 8 | scene ×1 |
+| `st_xiaoyao_snow_bat` | ค้างคาวหิมะเหมยเสวี่ย | human | 383 | — | 8 | scene ×1 |
+| `st_outsider_sixfold_dushi` | ตู๋ซื่อ มือพิษหกธาตุ | human | 365 | — | 8 | scene ×1 |
+| `st_outsider_black_pot` | ลุงหม้อดำ | human | 335 | — | 8 | scene ×1 |
+| `st_outsider_lion_mask` | หน้ากากราชสีห์ทอง | human | 399 | — | 8 | scene ×1 |
+| `st_jinyiwei_eunuch_liang` | ขันทีใหญ่เหลียง | human | 348 | — | 8 | scene ×1 |
+| `st_jinyiwei_helian` | ขุนดาบเฮ่อเหลียนป้า | human | 367 | — | 8 | scene ×1 |
+| `st_jinyiweiarts_leng_suo` | เหลิงซั่ว ฝ่ามือเฮี้ยนเม้ง | human | 374 | — | 8 | scene ×1 |
+| `st_jinyiweiarts_sun_yu` | เจ้ากรมเงาไหมซุนอวี้ | human | 335 | — | 8 | scene ×1 |
+| `st_jinyiweiarts_gu_chang` | ราชครูกู่ฉาง ผู้คุมหอเจดีย์ | human | 429 | — | 8 | scene ×1 |
+| `st_tang_peng_canghai` | จอมโจรสลัดเผิงชางไห่ | human | 331 | — | 8 | scene ×1 |
+| `st_tang_heartless_liang` | หมอไร้ใจเหลียงอู๋ซิน | human | 354 | — | 8 | scene ×1 |
+| `st_tangarts_seven_star` | ถังเชวียน เจ้าหอพิษเจ็ดดาว | human | 318 | — | 8 | scene ×1 |
+| `st_tangarts_black_iron_lord` | ประมุขเหล็กดำ | human | 419 | — | 8 | scene ×1 |
+| `st_jh_six_meridian_red_disciple` | ศิษย์ลามะจีวรแดง | human | 425 | — | 8 | scene ×3 |
+| `st_jh_six_meridian_bone_guard` | ผู้คุ้มกระดูกเหล็ก | human | 477 | — | 8 | scene ×2 |
+| `st_jh_six_meridian_mad_sword` | อาหลงผู้คลั่งหกชีพจร | human | 428 | — | 8 | scene ×1 |
+| `st_jh_six_meridian_mist_witch` | ซูหลัวแห่งหมอกม่วง | human | 473 | — | 8 | scene ×1 |
+| `st_jh_six_meridian_dorje` | ลามะดอร์เจ | human | 554 | — | 8 | scene ×1 |
+| `st_jh_six_meridian_dorje_six_fires` | ลามะดอร์เจ · เพลิงหกทิศ | human | 690 | — | 8 | scene ×1 |
+| `st_jh_lone_sword_rubber` | มือดาบลอกผา | human | 423 | — | 8 | scene ×1 |
+| `st_jh_lone_sword_xiao` | เซียวจิ้งเทียน (เต็มฝีมือ) | human | 436 | — | 8 | scene ×1 |
+| `st_jh_lone_sword_mask` | กระบี่ไร้หน้า | human | 505 | — | 8 | scene ×1 |
+| `st_jh_lone_sword_bai` | ไป๋เฝยหยาง (ดาบเหยี่ยวเหินเต็มมือ) | human | 458 | — | 8 | scene ×1 |
+| `st_jh_lone_sword_silver_spear` | ทวนเงินลักเงา | human | 442 | — | 8 | scene ×1 |
+| `st_jh_lone_sword_qiao` | ยายเฉียว (แส้เก้าข้อ) | human | 471 | — | 8 | scene ×1 |
+| `st_jh_lone_sword_lasso` | บ่วงทรายแดง | human | 458 | — | 8 | scene ×1 |
+| `st_jh_lone_sword_keeper` | ผู้แบกหีบ | human | 494 | — | 8 | scene ×1 |
+| `st_jh_lone_sword_bei` | เป่ยฉิว (ลมปราณเต็มเพลง) | human | 509 | — | 8 | scene ×1 |
+| `st_jh_lone_sword_puppet` | ศิษย์ร้อยกระบวน | human | 563 | — | 8 | scene ×1 |
+| `st_jh_lone_sword_shadow` | เงาบนหินเรียบ | human | 509 | — | 8 | scene ×1 |
+| `st_jh_lone_sword_ninefold` | หัวหน้าเก้าเงาอาวุธ | human | 594 | — | 8 | scene ×1 |
+| `st_jh_lone_sword_collector` | เหวินอี้ ผู้สะสมร้อยกระบวน | human | 735 | — | 8 | scene ×1 |
+| `st_jh_witness_spear_iron_rider` | ทหารม้าเหล็กเป่ยผิง | human | 426 | — | 8 | scene ×1 |
+| `st_jh_witness_spear_gao_brothers` | สองพี่น้องเกา | human | 436 | — | 8 | scene ×1 |
+| `st_jh_witness_spear_zhong` | ทหารทวนเฒ่าจง (ทวนเต็มมือ) | human | 431 | — | 8 | scene ×1 |
+| `st_jh_witness_spear_eraser` | หลานจิ้งโม่ มือลบนาม | human | 500 | — | 8 | scene ×2 |
+| `st_jh_witness_spear_bei` | เป่ยฉิว (ทวนเต็มมือ) | human | 493 | — | 8 | scene ×1 |
+| `st_jh_witness_spear_tulong` | นายกองม้าเหล็กทูหลง | human | 512 | — | 8 | scene ×1 |
+| `st_jh_witness_spear_cuiyang` | ชุยหยาง องครักษ์ขุนพลซ่ง | human | 481 | — | 8 | scene ×1 |
+| `st_jh_witness_spear_inkmen` | สาวกหมึกดำ | human | 421 | — | 8 | scene ×1 |
+| `st_jh_witness_spear_song` | แม่ทัพใหญ่ซ่งเหวินปิง | human | 587 | — | 8 | scene ×1 |
+| `st_jh_witness_spear_eraser_last` | หลานจิ้งโม่ มือลบนาม (คบเพลิง) | human | 574 | — | 8 | scene ×1 |
+| `st_jh_godslayer_blade_wolf_rider` | มือขวานหมาป่าทราย | human | 429 | — | 8 | scene ×1 |
+| `st_jh_godslayer_blade_sand_wolf` | เจ้าโจรซาหลาง | human | 471 | — | 8 | scene ×1 |
+| `st_jh_godslayer_blade_iron_mask` | มือดาบหน้ากากเหล็ก | human | 442 | — | 8 | scene ×2 |
+| `st_jh_godslayer_blade_scorpion` | นางพญาแมงป่องซูหลิง | human | 438 | — | 8 | scene ×1 |
+| `st_jh_godslayer_blade_iron_vulture` | แร้งเหล็กกู่ชาน | human | 510 | — | 8 | scene ×1 |
+| `st_jh_godslayer_blade_bronze_keeper` | เฒ่าหน้ากากทองแดง | human | 529 | — | 8 | scene ×2 |
+| `st_jh_godslayer_blade_hulan` | ฮูหลันเจี๋ย | human | 600 | — | 8 | scene ×2 |
+| `st_jh_cosmos_fist_dock_ox` | วัวท่าเรือต้าจ้วง | human | 406 | — | 8 | scene ×1 |
+| `st_jh_cosmos_fist_eel` | ปลาไหลสองมือ | human | 422 | — | 8 | scene ×1 |
+| `st_jh_cosmos_fist_collector` | ลูกคิดเหล็ก | human | 441 | — | 8 | scene ×1 |
+| `st_jh_cosmos_fist_iron_belly` | เฉาพุงเหล็ก | human | 454 | — | 8 | scene ×1 |
+| `st_jh_cosmos_fist_wine_monk` | หลวงจีนเหล้าหวาน | human | 448 | — | 8 | scene ×1 |
+| `st_jh_cosmos_fist_red_lantern` | นางโคมแดง | human | 465 | — | 8 | scene ×1 |
+| `st_jh_cosmos_fist_shadow_cook` | พ่อครัวเงา | human | 423 | — | 8 | scene ×1 |
+| `st_jh_cosmos_fist_deserter` | เผิงซานทหารหนีทัพ | human | 477 | — | 8 | scene ×1 |
+| `st_jh_cosmos_fist_tieba` | เถี่ยปาราชาสังเวียนเหนือ | human | 500 | — | 8 | scene ×1 |
+| `st_jh_cosmos_fist_debt_boss` | หัวหน้ามือทวงหนี้ | human | 487 | — | 8 | scene ×1 |
+| `st_jh_cosmos_fist_stern_shadow` | เงาท้ายเรือ | human | 522 | — | 8 | scene ×1 |
+| `st_jh_cosmos_fist_wave_chen` | เฉินหมัดคลื่น | human | 528 | — | 8 | scene ×1 |
+| `st_jh_cosmos_fist_silent_giant` | ยักษ์ใบ้เหล็ก | human | 526 | — | 8 | scene ×1 |
+| `st_jh_cosmos_fist_luo` | หลัวเก้าท่า | human | 555 | — | 8 | scene ×1 |
+| `st_jh_mountain_army_scout` | หนูตาไว | human | 370 | — | 8 | scene ×1 |
+| `st_jh_mountain_army_bei_test` | เป่ยฉิว (ยืนไม่ขยับ) | human | 378 | — | 8 | scene ×1 |
+| `st_jh_mountain_army_sun` | ซุนเกราะเหล็ก | human | 425 | — | 8 | scene ×2 |
+| `st_jh_mountain_army_zeng` | เจิงธนูเงียบ | human | 422 | — | 8 | scene ×1 |
+| `st_jh_mountain_army_assassin` | มือสังหารตราเหล็ก | human | 431 | — | 8 | scene ×2 |
+| `st_jh_mountain_army_zhong` | ทหารทวนเฒ่าจง (ทวนจริง) | human | 419 | — | 8 | scene ×1 |
+| `st_jh_mountain_army_veteran` | ทหารธงฉีก | human | 439 | — | 8 | scene ×1 |
+| `st_jh_mountain_army_bei` | เป่ยฉิว (เต็มมือ) | human | 576 | — | 8 | scene ×1 |
+| `st_jh_mountain_army_huo` | ฮั่วจิ้นเผิง | human | 568 | — | 8 | scene ×2 |
+| `st_jh_mountain_army_zhang` | จางตราเหล็ก | human | 565 | — | 8 | scene ×1 |
+| `st_jh_heaven_fire_ahuo` | อาฮั่วหน้ากากทองแดง | human | 412 | — | 8 | scene ×2 |
+| `st_jh_heaven_fire_kite` | เฒ่าซุนช่างว่าว | human | 441 | — | 8 | scene ×1 |
+| `st_jh_heaven_fire_inspector` | ผู้ตรวจการเซี่ยงจิ้ง | human | 458 | — | 8 | scene ×2 |
+| `st_jh_heaven_fire_captain` | นายกองหลี่เถี่ยฉี | human | 486 | — | 8 | scene ×2 |
+| `st_jh_heaven_fire_ashman` | ทหารกินยาเพลิง | human | 451 | — | 8 | scene ×1 |
+| `st_jh_heaven_fire_giant` | ยักษ์เตาเหล็กดาว | human | 525 | — | 8 | scene ×1 |
+| `st_jh_heaven_fire_chiyan` | ฉือเหยียนเจ้าเก้าเตา | human | 570 | — | 8 | scene ×1 |
+| `st_jh_sunflower_shadow_eunuch` | ขันทีเงา | human | 436 | — | 8 | scene ×5 |
+| `st_jh_sunflower_silk_widow` | แม่ม่ายใยไหม | human | 473 | — | 8 | scene ×2 |
+| `st_jh_sunflower_unmarked_brocade` | เสื้อแพรไร้ตรา | human | 494 | — | 8 | scene ×2 |
+| `st_jh_sunflower_north_envoy` | ทูตเหล็กทัพเหนือ | human | 531 | — | 8 | scene ×3 |
+| `st_jh_sunflower_palace_captain` | นายกองเถียนหลง | human | 503 | — | 8 | scene ×2 |
+| `st_jh_sunflower_red_mask` | หน้ากากเข็มแดง | human | 555 | — | 8 | scene ×2 |
+| `st_jh_sunflower_gao_silent_step` | ขันทีเกา (เท้าไร้เสียง) | human | 509 | — | 8 | scene ×1 |
+| `st_jh_sunflower_xiaolong` | เสี่ยวหลง | human | 474 | — | 8 | scene ×1 |
+| `st_jh_sunflower_gu_red_needle` | ขันทีใหญ่กู้ชิวเซิง | human | 731 | — | 8 | scene ×1 |
+| `st_jh_nine_yang_frost_hand` | มือหิมะเฮี้ยนเม้ง | human | 357 | — | 8 | scene ×2 |
+| `st_jh_nine_yang_torch_left` | ผู้ถือคบซ้าย | human | 393 | — | 8 | scene ×2 |
+| `st_jh_nine_yang_torch_right` | ผู้ถือคบขวา | human | 406 | — | 8 | scene ×3 |
+| `st_jh_nine_yang_north_rider` | ทหารม้าเหล็กเหนือ | human | 409 | — | 8 | scene ×1 |
+| `st_jh_nine_yang_fire_guardian` | ผู้พิทักษ์ป้ายเพลิง | human | 470 | — | 8 | scene ×1 |
+| `st_jh_nine_yang_red_lama` | ลามะจีวรเพลิง | human | 493 | — | 8 | scene ×1 |
+| `st_jh_nine_yang_hanshuang` | ตู้หานซวง | human | 548 | — | 8 | scene ×2 |
+| `st_jh_nine_yang_wei` | นายกองเว่ยเถี่ยซาน | human | 584 | — | 8 | scene ×3 |
+| `st_jh_nine_yang_pei` | เผยเหยียนกวง | human | 542 | — | 8 | scene ×3 |
+| `st_jh_nine_yang_white_ape` | วานรเผือกเฒ่า | beast | 589 | — | 8 | scene ×1 |
+| `st_jh_nine_yang_pei_last` | เผยเหยียนกวง (เพลิงสุดท้าย) | human | 767 | — | 8 | scene ×1 |
+| `st_jh_nine_yin_jade_gang` | สมุนสมาคมเล็บหยก | human | 376 | — | 8 | scene ×2 |
+| `st_jh_nine_yin_jade_lord` | คุณชายซ่งอวี้หลาง | human | 476 | — | 8 | scene ×2 |
+| `st_jh_nine_yin_ice_mask` | ชายหน้ากากน้ำแข็ง | human | 563 | — | 8 | scene ×2 |
+| `st_jh_nine_yin_xuan` | เฒ่าเซวียน ศิษย์สุดท้ายแห่งเฮี้ยนเม้ง | human | 829 | — | 8 | scene ×2 |
+| `st_jh_nine_yin_north_shadow` | โหวเทียนซิง เงาทัพเหนือ | human | 554 | — | 8 | scene ×2 |
+| `st_jh_nine_yin_south_captain` | นายกองเฉียนอู่แห่งทัพใต้ | human | 525 | — | 8 | scene ×1 |
+| `st_jh_nine_yin_fake_sage` | ซินแสเก้าเล่ม | human | 473 | — | 8 | scene ×1 |
+| `st_jh_nine_yin_peach_shadow` | เงาในค่ายกลดอกท้อ | human | 465 | — | 8 | scene ×1 |
+| `st_jh_nine_yin_sea_mate` | ต้นหนหัวโล้นแห่งเรือดำ | human | 473 | — | 8 | scene ×1 |
+| `st_jh_nine_yin_sea_king` | เกาไห่ซิง ราชันย์ทะเลดำ | human | 599 | — | 8 | scene ×1 |
+| `st_jh_nine_yin_luo_cold` | หลัวเฟย์หาว (ไอเย็นครอบงำ) | human | 606 | — | 8 | scene ×2 |
+| `st_jh_nine_yin_frost_twins` | สองพี่น้องฝ่ามือเย็น | human | 587 | — | 8 | scene ×1 |
+| `spar_home_yideng_monk` | อู๋เฉินไต้ซือ | human | 220 | — | 8 | spar, scene ×2 |
+| `spar_home_miaoren_master` | เยวี่ยเหรินซาน | human | 258 | — | 8 | spar |
+
+## Tier 5 (12)
+
+| Id | Name | Category | Power | Pack | Drops | Met via |
+| --- | --- | --- | --- | --- | --- | --- |
+| `t5_nameless_sword_hermit` | ฤๅษีกระบี่ไร้นาม | human | 762 | — | 7 | roams (mountain, snow; 19 places) |
+| `t5_blood_blade_lord` | จ้าวดาบโลหิต | human | 728 | 2× นักรบทะเลทราย | 7 | roams (desert, steppe; 5 places) |
+| `t5_poison_matriarch` | แม่เฒ่าพันพิษ | human | 724 | 2× ผู้ฝึกพิษ | 9 | roams (swamp, forest; 16 places) |
+| `t5_iron_monk` | ภิกษุเกราะเหล็กนอกรีต | human | 701 | — | 7 | roams (mountain, road; 17 places) |
+| `t5_white_tiger` | พยัคฆ์ขาวหิมะ | beast | 602 | 1× เสือดาวหิมะ | 9 | roams (snow, mountain; 19 places) |
+| `t5_wolf_king` | ราชาหมาป่าทุ่งเหนือ | beast | 571 | 2× หมาป่า + 1× หมาป่าหิมะ | 8 | roams (steppe, forest; 14 places) |
+| `boss_golden_serpent` | งูยักษ์เกล็ดทองคำ | beast | 1281 | 1× งูเห่ายักษ์ + 1× งูเหลือมหยก | 11 | lair (cave_jinshe) |
+| `boss_blood_tiger` | พยัคฆ์โลหิตลายคราม | beast | 1269 | 1× เสือภูเขา + 1× เสือทองคำ | 11 | lair (valley_hudie) |
+| `boss_sword_eagle` | อินทรียักษ์จ้าวแห่งกระบี่ | beast | 1276 | 2× อินทรีสายฟ้า | 11 | lair (cliff_motian) |
+| `boss_sun_turtle` | เต่ายักษ์แบกตะวัน | beast | 1317 | 2× เต่ากระดองหิน | 11 | lair (isle_wuming) |
+| `boss_blade_crab` | ปูวิเศษจ้าวแห่งดาบ | beast | 1312 | 2× ปูก้ามเหล็ก | 11 | lair (pool_heilong) |
+| `boss_flame_bull` | กระทิงยักษ์เขาเพลิง | beast | 1277 | 2× หมูป่าเลือดคลั่ง | 11 | lair (peak_guangming) |

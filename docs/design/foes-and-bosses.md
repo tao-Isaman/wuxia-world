@@ -86,7 +86,7 @@ export function foeLivesAt(opponentId: string, sceneId: string): boolean;
 ## Spoils
 
 - **Gold:** beasts drop none (`victorySpoils`). Humans unchanged.
-- **Experience on a win** (`victoryWExp(opponent)`, replaces the flat 50):
+- **Experience on a win** (`victoryWExp(opponent)` in `lib/world/victory.ts`, replaces the flat 50):
   humans `40 + 20 × ti`; beasts `80 + 60 × ti`; bosses `boss.wExp` (3,000–4,000).
   Move / art use xp: beasts and bosses ×2.
 - Bosses: a guaranteed trophy item (`trophy_<boss>`, high sell price, a crafting
@@ -130,12 +130,21 @@ export function bossesAt(state, locationId): BossDef[];       // alive bosses in
 
 | Id | Name | Sheet | Lair (suggested, one per region) | Minions |
 | --- | --- | --- | --- | --- |
-| `boss_golden_serpent` | งูยักษ์เกล็ดทองคำ | `boss_golden_serpent` | `cave_jinshe` ถ้ำงูทอง (east) | 2× งูเห่ายักษ์ / งูเหลือมหยก |
-| `boss_blood_tiger` | พยัคฆ์โลหิตลายคราม | `boss_blood_tiger` | a north cliff / mountain | 2× เสือภูเขา / เสือทองคำ |
-| `boss_sword_eagle` | อินทรียักษ์จ้าวแห่งกระบี่ | `boss_sword_eagle` | `cliff_motian` or a high north cliff | 2× อินทรีสายฟ้า |
-| `boss_sun_turtle` | เต่ายักษ์แบกตะวัน | `boss_sun_turtle` | an east isle | 2× T4 coast foes |
-| `boss_blade_crab` | ปูวิเศษจ้าวแห่งดาบ | `boss_blade_crab` | a coast / isle or `pool_heilong` | 2× crab-like / coast beasts |
-| `boss_flame_bull` | กระทิงยักษ์เขาเพลิง | `boss_flame_bull` | `desert_ruins` or a west mountain | 2× หมูป่าเลือดคลั่ง |
+| `boss_golden_serpent` | งูยักษ์เกล็ดทองคำ | `boss_golden_serpent` | `cave_jinshe` ถ้ำงูทอง (east), spot 82, 32 | `viper_snake` + `jade_python` |
+| `boss_blood_tiger` | พยัคฆ์โลหิตลายคราม | `boss_blood_tiger` | `valley_hudie` ถ้ำหุบเขาผีเสื้อ (south), spot 84, 26 | `mountain_tiger` + `golden_tiger` |
+| `boss_sword_eagle` | อินทรียักษ์จ้าวแห่งกระบี่ | `boss_sword_eagle` | `cliff_motian` ยอดเขามรณะ (north), spot 54, 24 | 2× `thunder_eagle` |
+| `boss_sun_turtle` | เต่ายักษ์แบกตะวัน | `boss_sun_turtle` | `isle_wuming` เกาะไร้ชื่อ (east), spot 84, 32 | 2× `stone_turtle` เต่ากระดองหิน (new T4 coast beast) |
+| `boss_blade_crab` | ปูวิเศษจ้าวแห่งดาบ | `boss_blade_crab` | `pool_heilong` สระมังกรดำ (west), spot 66, 24 | 2× `iron_crab` ปูก้ามเหล็ก (new T3 coast beast) |
+| `boss_flame_bull` | กระทิงยักษ์เขาเพลิง | `boss_flame_bull` | `peak_guangming` ยอดแสงสว่าง (heartland), spot 70, 32 | 2× `blood_boar` |
+
+As built: the six lairs cover all five regions (two in the east: a cave and an
+isle). The tiger moved south (no north lair fits a tiger and the eagle both)
+and the bull to the heartland's Bright Peak, so every region has one. The two
+new minion beasts also roam (coast / river / swamp) as ordinary encounters.
+`BossDef` also carries `gear` + `gearChance` (a 15 % chance of one top piece
+from its list, into the gear bag) and `lore` (the lore rumor's text). Each boss
+slots one common `bst_*` move after its three `bss_*` moves, so it fights even
+before the combat engine's boss moves exist.
 
 (The user wrote อินทรีย์; the game uses the standard spelling อินทรี.)
 
@@ -147,7 +156,8 @@ export function bossesAt(state, locationId): BossDef[];       // alive bosses in
 - **On the map:** an alive boss stands at its lair spot as a `WorldFoe` with
   `boss: true` and `look: { kind: "anim", sheet }`. Walking into it opens the
   encounter screen; going in starts the battle with its pack (`withPack`).
-- **Win:** `bossDefeatedDay[id] = day`, trophy + boss drops, `boss.wExp`, a big
+- **Win** (`bossSlain` in `lib/world/victory.ts`, called by `acknowledgeBattleResult`):
+  `bossDefeatedDay[id] = day`, trophy + boss drops, `boss.wExp`, a big
   rumor ("…ถูกปราบแล้ว"), an action-log line. It is back after 90 days.
 - **Lore:** each boss has a lore rumor pointing at its lair, so the player can
   learn where it lives.
