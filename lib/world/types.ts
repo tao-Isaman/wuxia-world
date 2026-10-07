@@ -818,7 +818,10 @@ export interface OpponentDef {
   // tier = lower weight) and is shown to the player in the encounter
   // screen so they can decide whether to fight or flee. New opponents
   // default to tier 0 when omitted.
-  ti?: 0 | 1 | 2 | 3 | 4;
+  ti?: 0 | 1 | 2 | 3 | 4 | 5;
+  // A legendary beast (lib/world/data/bosses.ts): waits in its lair, always
+  // brings its minions, back 90 days after it falls.
+  boss?: boolean;
   // What kind of foe — humans show up in cities, beasts in the wild,
   // supernaturals only in deeper / sect / temple zones.
   category?: EnemyCategory;
@@ -838,7 +841,8 @@ export interface OpponentDef {
   // (1 = normal; bosses 1.2–1.4). `npc` names the NPC this foe is: the
   // battle draws that NPC's own sheet (rigged NPCs play full clips). Without
   // it the look comes from the id.
-  look?: { sheet?: string; frame?: number; tint?: number; size?: number; npc?: string };
+  // `anim` names an animated sheet (lib/characters/anim-sheets.ts: bosses, T5).
+  look?: { sheet?: string; frame?: number; tint?: number; size?: number; npc?: string; anim?: string };
   build: () => CharacterBuild;
 }
 
