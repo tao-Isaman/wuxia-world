@@ -83,7 +83,6 @@ export function foeCharacterFor(opponentId: string | null | undefined, opp?: Opp
     [/pirate/, "foe_pirate"],
     [/marauder|desert/, "foe_marauder"],
     [/poison|dushi/, "foe_poisoner"],
-    [/ghost|snow_demon|immortal/, "foe_ghost"],
     [/demon|cult|rakshasa|heretic|xuanming|zealot/, "foe_cultist"],
     [/lama|shaolin/, "foe_monk"],
     [/iron_mountain|black_iron|iron_staff|black_pot|lion/, "foe_brute"],
@@ -97,7 +96,7 @@ export function foeCharacterFor(opponentId: string | null | undefined, opp?: Opp
   ];
   for (const [pattern, foe] of rules) if (pattern.test(id)) return foe;
   if (SHEET_FOE[sheet]) return SHEET_FOE[sheet];
-  return opp?.category === "supernatural" ? "foe_ghost" : "foe_bandit";
+  return "foe_bandit";
 }
 
 /** The NPC an opponent stands for: `look.npc`, else a sparring partner matched by spar id or build name. */
