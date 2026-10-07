@@ -19,7 +19,6 @@ import { useWorldStore } from "@/store/world-store";
 import { toast } from "@/store/toast-store";
 import { confirmDialog } from "@/store/confirm-store";
 import { cn } from "@/lib/utils";
-import { SagaList } from "./saga-list";
 import { chainNext } from "@/lib/world/quest-chain";
 
 // Quest log. Tabbed list view:
@@ -38,7 +37,7 @@ import { chainNext } from "@/lib/world/quest-chain";
 //   - "popup"           — bare body for use inside the menu-bar Modal
 
 type QuestStatus = "active" | "done" | "failed";
-type QuestTab = QuestStatus | "story";
+type QuestTab = QuestStatus;
 
 interface QuestLogProps {
   variant?: "card" | "popup";
@@ -48,7 +47,6 @@ const TAB_LABEL: Record<QuestTab, string> = {
   active: "กำลังทำ",
   done: "สำเร็จ",
   failed: "ละทิ้ง",
-  story: "ตำนาน",
 };
 
 export function QuestLog({ variant = "card" }: QuestLogProps = {}) {
@@ -64,7 +62,6 @@ export function QuestLog({ variant = "card" }: QuestLogProps = {}) {
     active: entries.filter((q) => q.status === "active").length,
     done: entries.filter((q) => q.status === "done").length,
     failed: entries.filter((q) => q.status === "failed").length,
-    story: entries.filter((q) => q.id.startsWith("st_")).length,
   };
   const list = entries.filter((q) => q.status === tab);
 
@@ -85,7 +82,7 @@ export function QuestLog({ variant = "card" }: QuestLogProps = {}) {
   const body = (
     <div className="space-y-3">
       <TabBar tab={tab} counts={counts} onSelect={onSwitchTab} />
-      {tab === "story" ? <SagaList /> : list.length === 0 ? (
+      {list.length === 0 ? (
         <div className="menu-empty" data-glyph="令">
           <strong>{tab === "active"
             ? "ยังไม่มีภารกิจที่กำลังทำ"
@@ -134,7 +131,7 @@ interface TabBarProps {
 }
 
 function TabBar({ tab, counts, onSelect }: TabBarProps) {
-  const order: QuestTab[] = ["active", "done", "failed", "story"];
+  const order: QuestTab[] = ["active", "done", "failed"];
   return (
     <div className="flex gap-1 border-b pb-2">
       {order.map((t) => {
@@ -413,9 +410,9 @@ function QuestRow({
 }
 
 /**
- * Under a finished quest: what it leads to — the next chapter of a saga or the
- * main story, or a quest it unlocks — with who offers it, where they stand and
- * what still blocks it, so a chain can always be picked up again from the log.
+ * Under a finished quest of a chain: who to see next and where, so a chain can
+ * be picked up again from the log. It never names what comes next — sagas
+ * stay a secret until they are offered.
  */
 function ChainNextBlock({ questId }: { questId: string }) {
   const state = useWorldStore();
@@ -425,8 +422,7 @@ function ChainNextBlock({ questId }: { questId: string }) {
     <div className="space-y-1" data-testid="quest-chain-next">
       {next.map((n) => (
         <div key={n.quest.id} className="border border-jade/50 bg-jade/10 px-2 py-1 text-[11px]">
-          ➤ ต่อไป: <strong>{n.quest.name}</strong>
-          <br />
+          ➤ {n.quest.story ? `บทต่อไป (บทที่ ${n.quest.story.chapter})` : "เรื่องยังไม่จบ"}:{" "}
           {n.fromSectWindow
             ? <>รับได้ที่หน้าต่างสำนัก</>
             : <>ไปหา <strong>{n.giverName ?? "—"}</strong>{n.locationName && <> ที่ <strong>{n.locationName}</strong>
