@@ -412,24 +412,39 @@ function QuestRow({
 /**
  * Under a finished quest of a chain: who to see next and where, so a chain can
  * be picked up again from the log. It never names what comes next — sagas
- * stay a secret until they are offered.
+ * stay a secret until they are offered. Once the next one is taken, it says
+ * where that one leads now (its guide), so the trail never goes cold.
  */
 function ChainNextBlock({ questId }: { questId: string }) {
   const state = useWorldStore();
-  const next = chainNext(state, questId).filter((n) => !n.taken);
+  const next = chainNext(state, questId).filter((n) => !n.taken || state.quests[n.quest.id]?.status === "active");
   if (!next.length) return null;
   return (
     <div className="space-y-1" data-testid="quest-chain-next">
-      {next.map((n) => (
-        <div key={n.quest.id} className="border border-jade/50 bg-jade/10 px-2 py-1 text-[11px]">
-          ➤ {n.quest.story ? `บทต่อไป (บทที่ ${n.quest.story.chapter})` : "เรื่องยังไม่จบ"}:{" "}
-          {n.fromSectWindow
-            ? <>รับได้ที่หน้าต่างสำนัก</>
-            : <>ไปหา <strong>{n.giverName ?? "—"}</strong>{n.locationName && <> ที่ <strong>{n.locationName}</strong>
-                <span className="text-muted-foreground">{n.legs === 0 ? " — อยู่ที่นี่" : n.legs != null ? ` — อีก ${n.legs} ช่วงทาง` : ""}</span></>}</>}
-          {n.gates.length > 0 && <><br /><span className="text-muted-foreground">ยังต้องการ: {n.gates.join(", ")}</span></>}
-        </div>
-      ))}
+      {next.map((n) => {
+        const head = n.quest.story ? `บทต่อไป (บทที่ ${n.quest.story.chapter})` : "เรื่องยังไม่จบ";
+        if (n.taken) {
+          const g = guideForQuest(state, n.quest.id);
+          const legs = g ? g.path.length - 1 : null;
+          return (
+            <div key={n.quest.id} className="border border-jade/50 bg-jade/10 px-2 py-1 text-[11px]">
+              ➤ {head} รับแล้ว — อยู่ในภารกิจที่กำลังทำ
+              {g && <><br />ตอนนี้: <strong>{g.action}</strong>{g.locationName && <> ที่ <strong>{g.locationName}</strong>
+                <span className="text-muted-foreground">{legs === 0 ? " — อยู่ที่นี่" : legs != null && legs > 0 ? ` — อีก ${legs} ช่วงทาง` : ""}</span></>}</>}
+            </div>
+          );
+        }
+        return (
+          <div key={n.quest.id} className="border border-jade/50 bg-jade/10 px-2 py-1 text-[11px]">
+            ➤ {head}:{" "}
+            {n.fromSectWindow
+              ? <>รับได้ที่หน้าต่างสำนัก</>
+              : <>ไปหา <strong>{n.giverName ?? "—"}</strong>{n.locationName && <> ที่ <strong>{n.locationName}</strong>
+                  <span className="text-muted-foreground">{n.legs === 0 ? " — อยู่ที่นี่" : n.legs != null ? ` — อีก ${n.legs} ช่วงทาง` : ""}</span></>}</>}
+            {n.gates.length > 0 && <><br /><span className="text-muted-foreground">ยังต้องการ: {n.gates.join(", ")}</span></>}
+          </div>
+        );
+      })}
     </div>
   );
 }
