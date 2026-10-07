@@ -6,6 +6,10 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-07
 
+### The quest log keeps pointing on after the next chapter is taken
+
+- Under a finished chapter, the "บทต่อไป" box disappeared as soon as the next chapter was accepted, so a finished main-story chapter said nothing about where to go. It now reads "บทต่อไป (บทที่ N) รับแล้ว" with the next chapter's current step and place (`guideForQuest`); `quest-chain.spec.ts` covers the main story.
+
 ### Sect move quests: one per tier, pick your line; sagas spread over ranks
 
 - **Lineage quests are one per sect, tier and kind** (กระบวนท่า and ลมปราณ apart): 154 quests became 113. Where a tier has several moves (สกุลถัง: มีดสั้น or อาวุธลับ), the teacher lays the scrolls down at the hand-in and the player picks **one, once**; the rest close. The sect window shows one row per quest, "เลือก 1 จาก N" until the pick.

@@ -294,7 +294,7 @@ Every sect skill and art can be earned from a sect NPC ([story-quests.md](story-
   - Seven sects' old art quests are now **prologue trials** (บททดสอบก่อนตำนาน) that must be passed before the saga starts. They are secret: not in the sect window — their giver offers them in person to an active member of high enough rank.
   - Chapters send you between places to visit, talk, hunt, gather and duel. A duel is never fatal; lose it and try again.
   - Many scenes open with a **film** on the painted map: subtitles, title cards and moods. Tap to go on, ▶ อัตโนมัติ to play hands-free, ข้าม to skip. Long talks show a page at a time (ต่อ ▶).
-  - Sagas stay secret: there is no list of them. Under a finished chapter (or any finished quest that leads on) the quest log says who to see next and where — never what comes next (`ChainNextBlock`).
+  - Sagas stay secret: there is no list of them. Under a finished chapter (or any finished quest that leads on) the quest log says who to see next and where — never what comes next (`ChainNextBlock`). Once the next one is taken it says so and where that quest leads now (its guide), so the trail never goes cold.
 - **Turning down and dropping.** Picking one on a sect NPC's card opens the offer first; รับคำ takes it, **ขอปฏิเสธไว้ก่อน** walks away and leaves it on offer. A taken one can be dropped from the quest log (ละทิ้งภารกิจ): its progress is lost, but it is not failed — the giver offers it again. The sect art trials work the same way (a confirm box stands in for the offer scene).
 
 The quest list per giver and location is in [reference/quests.md](reference/quests.md).
