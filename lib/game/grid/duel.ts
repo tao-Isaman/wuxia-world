@@ -77,8 +77,10 @@ export function resolveDuel(
   const view = makeDuelView(a, b, secondary ? turn : turn - 1);
   const ctx = pairContext(a, b);
   let ok = true;
-  if (slot.kind === "skill") resolveSkill(view, "A", slot.slotIdx, slot.id, ctx, { tick: false, secondary });
-  else ok = resolveArtActive(view, "A", ctx, { slotIdx: slot.slotIdx, artId: slot.id, tick: false, secondary });
+  // The engine rolls a blind once per action (doSkill), never per target.
+  const opts = { tick: false, secondary, blindChecked: true };
+  if (slot.kind === "skill") resolveSkill(view, "A", slot.slotIdx, slot.id, ctx, opts);
+  else ok = resolveArtActive(view, "A", ctx, { slotIdx: slot.slotIdx, artId: slot.id, ...opts });
   commitDuelView(view, a, b);
   return { view, ok };
 }

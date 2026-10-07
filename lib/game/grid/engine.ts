@@ -4,9 +4,9 @@
 // duel.ts); nothing here rerolls or re-tunes a number. Mutates the state it
 // is given (callers clone if they need immutability). See docs/grid-combat.md.
 
-import { gaugeRate, resolveArtActive } from "../battle";
+import { gaugeRate, resolveArtActive, skillCooldown } from "../battle";
 import { fleeChance } from "../combat-actions";
-import { addDebuff, applySelfEffect, escapeBattleText } from "../effects";
+import { addDebuff, applySelfEffect, blindFailLine, escapeBattleText, isScorched, rollBlind } from "../effects";
 import { deriveAll } from "../derive";
 import { meridianActiveEffects } from "../meridians";
 import { REVIVE_LABEL, meridianStart, spdPctOf, spdWithPct } from "../meridian-battle";
@@ -355,7 +355,7 @@ export function applyAction(state: GridBattleState, unitId: string, action: Grid
   if (!u || u.id !== unitId || !u.alive || (state.phase !== "turn" && state.phase !== "moved")) return false;
   switch (action.t) {
     case "move": return doMove(state, u, action.to);
-    case "skill": return doSkill(state, u, action.slot, action.target);
+    case "skill": return doSkill(state, u, action.slot, action.target, rng);
     case "wait":
       state.turn++;
       pushEvent(state, { t: "wait", unitId: u.id });
@@ -387,7 +387,9 @@ function doItem(state: GridBattleState, u: GridUnit, itemId: string, name: strin
   const turn = ++state.turn;
   const results: TargetResult[] = [];
   if (effect.t === "heal") {
-    const hp = Math.min(u.derived.HP - u.hp, Math.round((effect.hp ?? 0) + u.derived.HP * (effect.hpPct ?? 0) / 100));
+    // A scorch (แผดเผา) blocks the HP part; MP still flows.
+    const hp = isScorched(u.status) ? 0
+      : Math.min(u.derived.HP - u.hp, Math.round((effect.hp ?? 0) + u.derived.HP * (effect.hpPct ?? 0) / 100));
     const mp = Math.min(u.derived.MP - u.mp, Math.round((effect.mp ?? 0) + u.derived.MP * (effect.mpPct ?? 0) / 100));
     u.hp += Math.max(0, hp); u.mp += Math.max(0, mp);
     results.push({ unitId: u.id, damages: [], crits: [], misses: [], healed: Math.max(0, hp), killed: false });
@@ -455,7 +457,7 @@ function doFlee(state: GridBattleState, u: GridUnit, rng: () => number): boolean
 const nearestFoe = (state: GridBattleState, u: GridUnit): GridUnit | undefined =>
   foesOf(state, u).sort((a, b) => manhattan(u.pos, a.pos) - manhattan(u.pos, b.pos))[0];
 
-function doSkill(state: GridBattleState, u: GridUnit, slot: number, aimed: Cell): boolean {
+function doSkill(state: GridBattleState, u: GridUnit, slot: number, aimed: Cell, rng: () => number = Math.random): boolean {
   if (!slotReady(state, u.id, slot)) return false;
   const sp = slotProfile(u, slot)!;
   const { info, profile } = sp;
@@ -471,6 +473,25 @@ function doSkill(state: GridBattleState, u: GridUnit, slot: number, aimed: Cell)
     ? { kind: "skill" as const, id: info.skill.id, slotIdx: slot, name: info.skill.n, tier: info.skill.ti }
     : { kind: "art" as const, id: info.art.id, slotIdx: slot, name: info.art.act!.n, tier: info.art.ti };
   const turn = ++state.turn;
+
+  // Blind (ตาพร่า): rolled once per action. A failed cast still costs its
+  // cooldown (and an art its MP) and whiffs on every target in the area.
+  if (rollBlind(u.status, rng)) {
+    if (info.kind === "skill") u.cd[slot] = skillCooldown(info.skill);
+    else { u.cd[slot] = info.art.act!.cd; u.mp = Math.max(0, u.mp - info.art.act!.c); }
+    pushLog(state, { cls: cls(u), txt: `[${turn}] ${blindFailLine(u.name)} <b>${escapeBattleText(src.name)}</b>` });
+    if (!sameCell(aimed, u.pos)) u.facing = facingToward(u.pos, aimed, u.facing);
+    const whiffs: TargetResult[] = profile.target === "enemy"
+      ? targets.map((t) => ({ unitId: t.id, damages: [0], crits: [false], misses: [true], healed: 0, killed: false }))
+      : [];
+    pushEvent(state, {
+      t: "cast", unitId: u.id, name: src.name, tier: src.tier, source: { kind: src.kind, id: src.id },
+      aimed: { ...aimed }, cells, results: whiffs,
+    });
+    endTurn(state);
+    return true;
+  }
+
   const hp0 = new Map(state.units.map((o) => [o.id, o.hp]));
   const results = new Map<string, TargetResult>();
   const result = (o: GridUnit) => {

@@ -23,6 +23,7 @@
     "test:grid": "bun scripts/test-grid-engine.ts",
     "test:grid-ai": "bun scripts/test-grid-ai.ts",
     "test:grid-skills": "bun scripts/test-grid-skills.ts",
+    "test:boss-skills": "bun scripts/test-boss-skills.ts",
     "test:grid-store": "bun scripts/test-grid-store.ts",
     "test:npcs": "bun scripts/test-npc-sheets.ts",
     "test:story": "bun scripts/test-story-quests.ts",

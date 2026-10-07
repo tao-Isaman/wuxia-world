@@ -15,6 +15,7 @@ The battle the player sees is the tactics board described in [grid-combat.md](gr
 - [Levels, mastery and type conflict](#levels-mastery-and-type-conflict)
 - [Cooldowns and MP](#cooldowns-and-mp)
 - [Effects](#effects)
+- [Boss moves and arts](#boss-moves-and-arts)
 - [Slots and the primary art](#slots-and-the-primary-art)
 - [Turn-order gauge](#turn-order-gauge)
 - [Power tiers](#power-tiers)
@@ -142,13 +143,13 @@ dmg = round(raw × riposte × (crit ? 1.5 : 1))
 | Term | Meaning |
 | --- | --- |
 | `Atk` | attacker's derived Atk |
-| `sm` | stack modifier: `max(0, 1 + stk×stkV/100 + equipment pct_atk/100 + Σ debuff_atk/100)` (scales the Atk term only) |
+| `sm` | stack modifier: `max(0, 1 + stk×stkV/100 + equipment pct_atk/100 + Σ debuff_atk/100 + atkPctOf/100)` (scales the Atk term only; `atkPctOf` = meridian `buff_atk_pct` + a boss `frenzy`) |
 | `ab` | art bonus: 1.10 for int skills when the primary art is `scholar`, else 1 |
 | `ta` | typed attack: `PA` for physical skills, `IA × im` for internal skills; `im = 1 + Σ buff_iatk/100`, ×1.12 more for int skills when the primary art is `taiji` |
 | `se` | skill effect: `effectiveBp(skill, level) × conflict × (1 + p/100) + f + vitScale × VIT` |
 | `dm` | the skill's damage multiplier |
 | `mm` | mastery: `1 + (mastery[family]/200) × 0.5` (max ×1.5) |
-| `ed` | effective defence: `max(0, (PD for phy / ID for int) + Σ buff_def − Σ |debuff_def|)` |
+| `ed` | effective defence: `max(0, (PD for phy / ID for int) × (1 − pen/100) + Σ buff_def − Σ |debuff_def|)`; `pen` is the skill's pierce (ทะลวง, 0 for all but three boss moves) |
 | `pR` | percent reduction: `Σ defender buff_reduce + defender equipment pct_reduce` (not clamped at 100) |
 | `riposte` | legacy guard bonus (1 + v/100) — unreachable in the game today |
 
@@ -170,8 +171,9 @@ dmg = round(raw × riposte × (crit ? 1.5 : 1))
 - Reflect is consumed on the first landed hit and divided by the hit count, so multi-hit skills take much less reflect.
 - A skill with `at: null` (5 skills: `rf`, `cs`, `yy`, `ig`, `pn`) rolls no damage; it applies `ee` once.
 - Cooldown and the use counter are set before the hits. A stunned caster loses the turn with no cooldown and no use recorded.
+- A **blinded** caster (`blind` debuff) rolls its chance first: on a fail the move is spent (cooldown set) but nothing lands — the log says "ตาพร่ามัว — ท่าพลาดเป้า!" and the cast shows one miss. The blind is used up by that roll either way. Art actives do the same (MP and cooldown spent).
 
-`opts.tick: false` skips the global effect tick (the grid ticks each unit on its own turn). `opts.secondary: true` is used for extra area targets: no cooldown, no use count, no self effect, no stun check — only damage rolls and `ee`.
+`opts.tick: false` skips the global effect tick (the grid ticks each unit on its own turn). `opts.secondary: true` is used for extra area targets: no cooldown, no use count, no self effect, no stun or blind check — only damage rolls and `ee`. `opts.blindChecked: true` means the caller already rolled the blind (the grid rolls it once per action in `doSkill`).
 
 ## Inner-art actives
 
@@ -229,7 +231,7 @@ Arts scale their `stats` by `level/10` and add `hL` / `mL` HP / MP per level. Wh
 
 ## Cooldowns and MP
 
-- A move skill's cooldown is `TIERS[ti].cd`: 0 / 2 / 3 / 4 / 5 / 6 for tiers 0–5. Tier-0 skills have no cooldown.
+- A move skill's cooldown is `skillCooldown(skill)` (`battle.ts`): its own `cd` when set, else `TIERS[ti].cd` — 0 / 2 / 3 / 4 / 5 / 6 for tiers 0–5. Tier-0 skills have no cooldown. Only the boss moves set `cd` (0–5), so a beast with three T5 moves always has one ready.
 - An art active's cooldown is `act.cd` (3 for 97 arts, 4 for 24, 6 for 2) and it costs `act.c` MP (12–60).
 - In the grid, cooldowns count down at the start of the unit's own turn; a slot is ready at 0, and an art slot also needs enough MP. Cooldown N therefore means "usable every N own turns".
 
@@ -251,7 +253,10 @@ All effect unions are discriminated on `t`. The dispatchers are in `lib/game/eff
 | `heal_buff` | hp, bt, bv, bu | heal hp% plus a def / eva / reduce buff | 2 |
 | `stack_atk` | v, mx | +1 attack stack (max `mx`), each worth v% of Atk; lasts the battle | 20 |
 | `buff_iatk_reduce` | iv, rv, u | IA buff plus damage reduction | 0 |
-| `buff_reflect_eva` | rv, ev, u | reflect plus Eva | 0 |
+| `buff_reflect_eva` | rv, ev, u | reflect plus Eva | 1 (`bss_crab_mirror`) |
+| `molt` ลอกคราบ | hp, rv, u | clear **every** debuff on the caster, then heal hp% of max HP, then `buff_reflect` rv for u | 1 (`bss_serpent_molt`) |
+| `frenzy` โลหิตคลั่ง | v, mx, u | a `frenzy` buff: Atk +`round(v + (mx − v) × (1 − HP/maxHP))`% for u, rolled at cast time; a new frenzy keeps the larger % and the longer timer; read by `atkPctOf` | 2 (`bss_tiger_frenzy`, `bss_bull_rage`) |
+| `sun_shell` กระดองแบกตะวัน | v, rv, u | a `shield` of v% of max HP (the meridian shield record: soaks hits before HP, lasts until spent; never shrinks a bigger one) plus `buff_reflect` rv for u; a "shield" proc | 1 (`bss_turtle_shell`) |
 
 ### Enemy effects (skill `ee`)
 
@@ -267,9 +272,16 @@ All effect unions are discriminated on `t`. The dispatchers are in `lib/game/eff
 | `debuff_poison` | pp, u, ev | poison pp% **plus** debuff_eva ev | 3 |
 | `heavy_poison` | pp, u, av, ev | poison plus debuff_acc and debuff_eva | 1 |
 | `burn_hp_mp` | dmg, mp, u | burn dmg% HP and mp% MP per tick | 2 |
-| `stun` | u, ch | ch% chance to stun | 1 (`sl_truth_staff`) |
+| `stun` | u, ch | ch% chance to stun | 3 (`sl_truth_staff`, `bss_turtle_quake`, `bss_bull_stomp`) |
 | `drain_mp` | v | move v% of the target's MP to the caster | 0 |
 | `dispel` | acc, u | remove the target's first buff, add debuff_acc | 0 |
+| `bind` รัด | ch, u, dv, du | `debuff_def` dv for du, always; plus a ch% stun for u | 1 (`bss_serpent_coil`) |
+| `bleed` เลือดไหล | pp, inc, u | a `bleed` DoT: pp% of max HP per tick, growing by inc after every tick (cap `BLEED_CAP` = 15 %); a fresh coat keeps the larger running % and the longer timer | 1 (`bss_tiger_claw`) |
+| `blind` ตาพร่า | v, ch, u | `debuff_acc` v for u, plus a `blind` record: the target's **next** skill / art fails with ch% chance (spent on that roll) | 1 (`bss_eagle_gale`) |
+| `scorch` แผดเผา | pp, u | a `scorch` DoT of pp% max HP per tick; while it lasts the target regains **no HP from anything** (`healHp`: heals, drain, regen, auras, potions — MP still flows) | 2 (`bss_turtle_sun`, `bss_bull_charge`) |
+| `sunder` ทลายเกราะ | dv, u | strip every buff of the target (shield, ward, reflect…) and its attack stacks, then `debuff_def` dv for u (a ward can't stop it — it is stripped first) | 1 (`bss_crab_pincers`) |
+
+Pierce (ทะลวง) is a skill field, not an effect: `pen` (%) of the target's PD / ID is ignored for that move (`bss_eagle_feathers` 35, `bss_eagle_dive` 50, `bss_bull_charge` 25).
 
 ### Equipment effects (`eff`)
 
@@ -292,17 +304,55 @@ All effect unions are discriminated on `t`. The dispatchers are in `lib/game/eff
 | `use_int` | the holder lands an int skill hit or uses an int-type active | 31 |
 | `use_act` | right after that art's own active | 21 |
 
-Passive effects: `buff_def`, `buff_eva`, `buff_reflect`, `buff_spd_cri` (speed and crit together, `khbt`), `heal_pct`, `debuff_acc`, `debuff_eva`, `debuff_def`, `stack_atk`, `mult_iatk`, `mult_atk`.
+Passive effects: `buff_def`, `buff_eva`, `buff_reflect`, `buff_spd_cri` (speed and crit together, `khbt`), `heal_pct`, `debuff_acc`, `debuff_eva`, `debuff_def`, `stack_atk`, `frenzy` (`n`, v, mx, u — the self-effect's frenzy; `art_boss_tiger`), `mult_iatk`, `mult_atk`.
 
 `mult_iatk` and `mult_atk` do **nothing in the dispatcher**. Their only real effect is hard-coded in `calcSkillDamage` for two art ids: `taiji` (IA ×1.12 on int skills) and `scholar` (Atk ×1.10 on int skills), applied whenever that art is primary. Nine other arts carry these passives with no effect: `t4_em_bodhi`, `qzzq`, `t3_sm_dualfusion`, `qiankun`, `t3_xy_seepower`, `bmzq`, `bmsg`, `t3_heartmind`, `shenzhao`.
 
 ### Buffs, debuffs and ticks
 
 - **Stack** (value adds up, duration = the longer one): `buff_def`, `buff_eva`, `buff_reduce`, `buff_reflect`, `buff_spd`, `buff_iatk`; `debuff_def`, `debuff_eva`, `debuff_acc`, `debuff_atk`.
-- **Replace** (a new one overwrites): `buff_cri`, `debuff_poison` (also used by `poison_dmg`), `burn_hp_mp`, `stun`. The art actives `buff_reflect`, `buff_reduce` and `buff_eva_debuff_eva` also replace.
-- **Caps**: ±100 for `buff_reduce` and `buff_reflect`, ±200 for everything else.
-- **Tick** (`tickSideEffects` in the grid, once at the start of the unit's own turn): poison and burn damage, then every duration −1 and expired records removed, then regen (equipment `hp_regen`, and the primary art's `hpRegenPct` / `mpRegenPct` aura — only `kuyt`, 5 % / 5 %). Durations therefore count the **owner's own turns**. Almost all authored durations are 5.
-- **Stun**: a `stun` debuff with `u > 0` skips the unit's turn. The tick lowers `u` before the check, so `u: 3` skips two turns.
+- **Replace** (a new one overwrites): `buff_cri`, `debuff_poison` (also used by `poison_dmg`), `burn_hp_mp`, `stun`, `blind`. The art actives `buff_reflect`, `buff_reduce` and `buff_eva_debuff_eva` also replace.
+- **Keep the larger**: `bleed` and `scorch` keep the larger running `pp` and the longer timer (a bleed keeps its growth); `frenzy` keeps the larger % and the longer timer; a `sun_shell` shield never lowers a bigger shield.
+- **Caps**: ±100 for `buff_reduce` and `buff_reflect`, ±200 for everything else; a bleed grows to at most `BLEED_CAP` = 15 % per tick.
+- **Tick** (`tickSideEffects` in the grid, once at the start of the unit's own turn): poison, burn, bleed (then it grows) and scorch damage, then every duration −1 and expired records removed, then regen (equipment `hp_regen`, meridian `buff_regen`, and the primary art's `hpRegenPct` / `mpRegenPct` aura — `kuyt` 5 % / 5 %, `art_boss_turtle` 3 % HP). Durations therefore count the **owner's own turns**. Almost all authored durations are 5.
+- **Healing**: every HP heal in battle goes through `healHp(state, side, amount)` (`effects.ts`), which returns 0 while the side is scorched. Cleansing heals clear first (`molt`, `heal_full_cleanse`; `heal_cleanse` pops only the newest debuff), so they can lift a scorch and heal in one go.
+- **Stun**: a `stun` debuff with `u > 0` skips the unit's turn. The tick lowers `u` before the check, so `u: 3` skips two turns (`bind` and the boss stuns use `u: 2`: one lost turn).
+
+## Boss moves and arts
+
+The six legendary beasts (บอส; the wave's design contract "Foes, habitats, T5 and legendary beasts", section "Boss skills") fight with moves and arts of their own: `sc` = `BEAST_SECT` "สัตว์ร้าย" (last in `SECT_ORDER`, but **not a sect**), tier 5. They are never learnable: `isBossMove` (`bss_*`), `isBossArt` (`art_boss_*`) and `isBeastMove` (`bst_*` or `bss_*`) in `lib/game/data/sects.ts` keep them out of every quest / scroll / coverage check (`test:story`, `test:places`, the sampled AI builds). Each move's stat bonus sums to 35.
+
+| Beast | Move | Kind | bp · p · dm | Hits / pierce | Effect | CD | Grid |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| งูยักษ์เกล็ดทองคำ | `bss_serpent_fang` เขี้ยวพิษทองคำ | phy | 120 · 30 · 1.25 | — | heavy_poison 6 % · Acc −15 · Eva −15 (5) | 0 | 1–2 single |
+| | `bss_serpent_coil` รัดกระดูกแหลก | phy | 115 · 25 · 1.2 | — | bind: PDef −35 (5), 70 % stun (2) | 3 | 1 single |
+| | `bss_serpent_molt` ลอกคราบเกล็ดทอง | self | — | — | molt: cleanse, heal 20 %, reflect 30 % (4) | 5 | self |
+| พยัคฆ์โลหิตลายคราม | `bss_tiger_claw` กรงเล็บเลือดคราม | phy | 125 · 35 · 1.25 | 3 hits | bleed 3 % +2 %/tick (5) | 0 | 1 single |
+| | `bss_tiger_roar` คำรามสะท้านภพ | phy | 90 · 20 · 1.0 | — | debuff_atk −25 % (5) | 3 | 0–1 diamond 2 (round itself) |
+| | `bss_tiger_frenzy` โลหิตคลั่ง | self | — | — | frenzy 20 % → 80 % (5) | 5 | self |
+| อินทรียักษ์จ้าวแห่งกระบี่ | `bss_eagle_feathers` ขนนกพันกระบี่ | phy (hidden) | 120 · 30 · 1.2 | 6 hits · pierce 35 | — | 0 | 2–4 diamond 1 |
+| | `bss_eagle_dive` ดิ่งฟ้าผ่าภูผา | phy | 150 · 40 · 1.35 | pierce 50 | — | 2 | 1–4 single |
+| | `bss_eagle_gale` ปีกพายุ | phy | 90 · 20 · 1.0 | — | blind: Acc −30, next action fails 40 % (5) | 3 | 1–3 cross 2 |
+| เต่ายักษ์แบกตะวัน | `bss_turtle_shell` กระดองแบกตะวัน | self | — | — | sun_shell: shield 25 % max HP, reflect 30 % (5) | 5 | self |
+| | `bss_turtle_sun` ตะวันแผดเผา | int | 110 · 30 · 1.1 | — | scorch 5 % (5) | 3 | 1–3 diamond 2 |
+| | `bss_turtle_quake` ทับภูผา | phy | 130 · 30 · 1.3 + 0.6 × VIT | — | 35 % stun (2) | 0 | 1 single |
+| ปูวิเศษจ้าวแห่งดาบ | `bss_crab_pincers` คีมพันดาบ | phy (blade) | 125 · 35 · 1.25 | 4 hits | sunder: strip buffs, PDef −12 per hit (5) | 0 | 1 single |
+| | `bss_crab_mirror` กระดองสะท้อนดาบ | self | — | — | buff_reflect_eva: reflect 50 %, Eva +40 (5) | 4 | self |
+| | `bss_crab_tide` ฟองคลื่นหมอก | int | 100 · 25 · 1.05 | — | multi_debuff Acc −20 · Eva −20 (5) | 3 | 1–3 diamond 2 |
+| กระทิงยักษ์เขาเพลิง | `bss_bull_charge` เขาเพลิงพุ่งทะลวง | phy (long) | 140 · 35 · 1.3 | pierce 25 | scorch 4 % (4) | 0 | line 4 |
+| | `bss_bull_stomp` กระทืบธรณี | phy | 95 · 20 · 1.0 | — | 45 % stun (2) | 3 | 0–1 diamond 2 (round itself) |
+| | `bss_bull_rage` เพลิงโทสะ | self | — | — | frenzy 25 % → 70 % (5) | 5 | self |
+
+| Art | Stats (lv 10) | HP / MP per level | Active | Passive |
+| --- | --- | --- | --- | --- |
+| `art_boss_serpent` ลมปราณเกล็ดทองคำ | VIT 30 DEX 30 AGI 20 LUK 20 | 120 / 50 | debuff_poison 8 % Eva −20 (40 MP, CD 4) | hit_recv 35 % → reflect 25 % (3) |
+| `art_boss_tiger` ลมปราณพยัคฆ์โลหิต | STR 35 AGI 30 VIT 25 DEX 10 | 110 / 40 | atk_phy_pen ×1.5 pen 40 (40 MP, CD 4) | hit_recv 100 % → frenzy 10 % → 60 % (3) |
+| `art_boss_eagle` ลมปราณอินทรีกระบี่ | AGI 35 DEX 30 STR 20 LUK 15 | 90 / 50 | buff_spd +80 (4) (35 MP, CD 5) | on_crit → Spd +40 / Cri +10 (3) |
+| `art_boss_turtle` ลมปราณเต่าตะวัน | VIT 40 DEF 35 POW 15 INT 10 | 150 / 60, regen 3 % HP | heal 20 % (45 MP, CD 5) | hit_recv 30 % → DEF +30 (3) |
+| `art_boss_crab` ลมปราณปูวิเศษ | STR 30 DEF 30 DEX 25 VIT 15 | 120 / 40 | atk_phy_pen ×1.4 pen 60 (40 MP, CD 4) | hit_recv 40 % → reflect 25 % (3) |
+| `art_boss_bull` ลมปราณกระทิงเพลิง | STR 40 VIT 30 POW 20 AGI 10 | 130 / 40 | atk_phy_pen ×1.6 pen 30 (45 MP, CD 4) | on_crit → ATK +10 % (≤ 5 stacks) |
+
+A boss build is its three moves plus `art:art_boss_<beast>` (art level 10 gives 900–1,500 extra HP). The AI ([grid-combat.md](grid-combat.md#ai)) uses the self moves when they pay: a frenzy when wounded, a molt under DoTs, the shell once hurt.
 
 ## Slots and the primary art
 
@@ -351,15 +401,15 @@ The grid engine runs this gauge per unit (`advanceGauges`, `predictOrder` in `li
 
 Exact lists with every id: [reference/martial-arts.md](reference/martial-arts.md). Short field names are kept on purpose (they match `demo.html` and make 100-row tables scannable).
 
-**Tiers** (`TIERS`, `lib/game/data/tiers.ts`): 0 พื้นฐาน · 1 ขั้นกลาง · 2 ขั้นสูง · 3 ลับ · 4 เฉพาะ · 5 ปรมัตถ์ (cooldowns 0–6). Skills use tiers 0–4; three arts are tier 5 (`khbt` คัมภีร์ทานตะวัน, `kuyt` วิชาเก้าเอี้ยง and `kgim` คัมภีร์เก้าอิม).
+**Tiers** (`TIERS`, `lib/game/data/tiers.ts`): 0 พื้นฐาน · 1 ขั้นกลาง · 2 ขั้นสูง · 3 ลับ · 4 เฉพาะ · 5 ปรมัตถ์ (cooldowns 0–6). Learnable skills use tiers 0–4 (the 18 boss moves are tier 5); three learnable arts are tier 5 (`khbt` คัมภีร์ทานตะวัน, `kuyt` วิชาเก้าเอี้ยง and `kgim` คัมภีร์เก้าอิม), plus the six boss arts.
 
-**Sects** (`lib/game/data/sects.ts`): `SECT_ORDER` lists 21 names in display order, ending with `JIANGHU_SECT` = ยุทธจักร (unaffiliated). Both tables are sorted by sect, then tier (`bun scripts/sort-by-sect.ts`). ลิ่งจิ้วกง and พรรคอสูรโลหิต have no skills or arts yet.
+**Sects** (`lib/game/data/sects.ts`): `SECT_ORDER` lists 22 names in display order: the sects, then `JIANGHU_SECT` = ยุทธจักร (unaffiliated), then `BEAST_SECT` = สัตว์ร้าย (the legendary beasts' own moves and arts — not a sect, never learnable). Both tables are sorted by sect, then tier (`bun scripts/sort-by-sect.ts`). ลิ่งจิ้วกง and พรรคอสูรโลหิต have no skills or arts yet.
 
 **Weapon families** (skills only; equipment has none): `fist` หมัด/ฝ่ามือ 58 · `sword` กระบี่ 56 · `hidden` อาวุธลับ 21 · `long` อาวุธยาว 19 · `blade` ดาบ 12 · `short` อาวุธสั้น 7 · `music` เครื่องดนตรี 5.
 
-### Move skills (`SKILLS`, `lib/game/data/skills.ts`) — 178
+### Move skills (`SKILLS`, `lib/game/data/skills.ts`) — 191
 
-Per tier 32 / 37 / 42 / 41 / 26; 9 beast moves (`bst_*`, used by hunting beasts); 117 physical, 56 internal, 5 with no damage roll.
+Per tier 32 / 37 / 42 / 41 / 21 / 18; 9 beast moves (`bst_*`, used by hunting beasts) and 18 boss moves (`bss_*`, [above](#boss-moves-and-arts)); 128 physical, 53 internal, 10 with no damage roll.
 
 | Field | Meaning |
 | --- | --- |
@@ -368,20 +418,22 @@ Per tier 32 / 37 / 42 / 41 / 26; 9 beast moves (`bst_*`, used by hunting beasts)
 | `ti` | tier — sets the cooldown and xp cost |
 | `w` | weapon family (mastery bucket) |
 | `mg` | mastery gained while slotted (standard `20 × (ti+1)`) |
-| `st` | stat bonus; the sum is exactly 10 / 15 / 20 / 25 / 30 for tiers 0–4 (`bun scripts/normalize-t3-stats.ts` rewrites toward it) |
+| `st` | stat bonus; the sum is exactly 10 / 15 / 20 / 25 / 30 for tiers 0–4 (`bun scripts/normalize-t3-stats.ts` rewrites toward it; it leaves tier 5 alone — the boss moves sum to 35) |
 | `at` | `"phy"` (PA vs PD), `"int"` (IA vs ID) or `null` (no damage roll) |
 | `bp`, `p`, `f` | base power, % boost on it, flat add |
 | `dm` | damage multiplier |
 | `dr?` | life drain % |
 | `vitScale?` | adds `vitScale × VIT` to the skill term (3 skills) |
 | `hits?` | number of hits (default 1) |
+| `pen?` | pierce: % of the target's PD / ID ignored (3 boss moves) |
+| `cd?` | cooldown override (default `TIERS[ti].cd`; the boss moves) |
 | `se`, `ee` | self effect (once per cast), enemy effect (per landed hit) |
 | `d` | description |
 | `types?` | conflict tags |
 
-### Inner arts (`ARTS`, `lib/game/data/arts.ts`) — 122
+### Inner arts (`ARTS`, `lib/game/data/arts.ts`) — 117 (+ `none`)
 
-`ARTS[0]` is the `none` placeholder (`getArt` falls back to it and never returns null). Per tier 18 / 19 / 20 / 27 / 37 / 2. Every art has both an active and a passive.
+`ARTS[0]` is the `none` placeholder (`getArt` falls back to it and never returns null). Per tier 18 / 19 / 20 / 27 / 24 / 9 (tier 5: three learnable, six `art_boss_*`). Every art has both an active and a passive.
 
 | Field | Meaning |
 | --- | --- |
@@ -410,13 +462,13 @@ Per slot: W 21 · A 10 · H 9 · B 9 · BR 10 · R 8 · C 9. A loadout has 10 sl
 ## Battle log
 
 - `escapeBattleText` (`lib/game/effects.ts`) escapes `& < > " '` in every character name before it enters a log line; `scripts/test-runtime.ts` checks it with an `<img onerror>` name. Skill, art and item names are authored data and are not escaped.
-- A skill line reads `[turn] name → <b>skill</b>{tag} dmg (ตี h/n) <span class="lp">[hit% crit%]</span>`; a crit renders as `<span class="lC">★CRIT! n</span>`. Status lines start with `&nbsp;` and a glyph (⟳ self, ✗ enemy, ◆ passive, ☠ poison, 🔥 burn, 💊 regen, 🌱 aura, ↩ reflect, 🗡 on-hit).
+- A skill line reads `[turn] name → <b>skill</b>{tag} dmg (ตี h/n) <span class="lp">[hit% crit%]</span>`; a crit renders as `<span class="lC">★CRIT! n</span>`. Status lines start with `&nbsp;` and a glyph (⟳ self, ✗ enemy, ◆ passive, ☠ poison, 🔥 burn, 🩸 bleed, ☀ scorch, 💊 regen, 🌱 aura, ↩ reflect, 🗡 on-hit). A heal a scorch blocks reads "(ถูกแผดเผา ฟื้นไม่ได้)"; a blind's failed action "ตาพร่ามัว — ท่าพลาดเป้า!".
 - `components/game/battle-log.tsx` renders lines newest first with `dangerouslySetInnerHTML`; `.lp` and `.lC` are styled in `app/globals.css`.
 - Every cast records `state.lastCast` (`hits`, per-hit damage / crit / miss, `tier`, `source`), which the grid turns into events and the renderer turns into VFX.
 
 ## Skill and art icons
 
-`SkillIcon` / `ArtIcon` (`components/game/skill-icon/`) draw a 64×64 icon: a tier frame, the glyph, type accents and a "×N" badge for multi-hit skills. The glyph is the raster PNG (`public/icons/skills/<id>.png`, `public/icons/arts/<id>.png` — every skill and art has one), else a hand-drawn SVG override (`skill-icons-batch-*.tsx`), else a generic weapon / art glyph. Tier colours: T0 stone, T1 emerald, T2 sky, T3 purple, T4 orange, T5 red.
+`SkillIcon` / `ArtIcon` (`components/game/skill-icon/`) draw a 64×64 icon: a tier frame, the glyph, type accents and a "×N" badge for multi-hit skills. The glyph is the raster PNG (`public/icons/skills/<id>.png`, `public/icons/arts/<id>.png` — every learnable skill and art has one), else a hand-drawn SVG override (`skill-icons-batch-*.tsx`; the boss moves and arts are drawn in `skill-icons-batch-6.tsx`), else a generic weapon / art glyph. Tier colours: T0 stone, T1 emerald, T2 sky, T3 purple, T4 orange, T5 red.
 
 ## The /debug sandbox
 
@@ -460,15 +512,15 @@ These are how the code behaves today; fix them deliberately, with tests.
 2. Art actives skip mastery, stacks, `pct_atk`, the target's `debuff_def` and equipment `pct_reduce`; a stunned caster still pays MP and cooldown; art misses are reported as 0-damage hits.
 3. Reflect is consumed on the first hit of a multi-hit skill and divided by the hit count.
 4. Percent reduction is not clamped at 100; in an extreme stack, reflect and drain could turn negative.
-5. The effect switches are compiler-checked for exhaustiveness (a `never` guard in each), as is `components/game/buff-descriptions.tsx` for the buff / debuff record types; text helpers such as `describeEffect` (below) are not.
+5. The effect switches are compiler-checked for exhaustiveness (a `never` guard in each, `describeEffectThai` in `lib/game/skill-text.ts` too), as is `components/game/buff-descriptions.tsx` for the buff / debuff record types; text helpers such as `describeEffect` (below) are not.
 6. `components/world/skill-tooltip.tsx` (`describeEffect`) has no text for `buff_cri`, `debuff_atk`, `debuff_def_eva`, `burn_hp_mp`, `poison_dmg` or `stun`, so about 18 skill tooltips show the raw effect name.
 7. `lib/game/grid/ai.ts` re-implements the damage formulas as an estimator. Change both together.
-8. Unused but dispatched: self effects `buff_cri`, `buff_iatk_reduce`, `buff_reflect_eva`; enemy effects `drain_mp`, `dispel`.
+8. Unused but dispatched: self effects `buff_cri`, `buff_iatk_reduce`; enemy effects `drain_mp`, `dispel`.
 
 ## Changing combat safely
 
 1. Change the formula or data in `lib/game/`.
-2. Mirror damage changes in the grid AI estimator (`lib/game/grid/ai.ts`), and add tooltip text (`components/world/skill-tooltip.tsx`) and a badge label (`components/game/buff-descriptions.tsx`) for a new effect. A new effect may also want a VFX element accent (`lib/stage/cast-vfx.ts`).
+2. Mirror damage changes in the grid AI estimator (`lib/game/grid/ai.ts`), and add Thai text (`describeEffectThai` in `lib/game/skill-text.ts`, which the skills window and tooltips use), a badge label (`components/game/buff-descriptions.tsx`) and, for a new status record, a look (`lib/ui/status-catalog.ts`; a debuff whose key doesn't start with `debuff` also goes in `DEBUFF_KEYS`) for a new effect. A new effect may also want a VFX element accent (`lib/stage/cast-vfx.ts`). Every HP heal goes through `healHp` so a scorch can block it.
 3. New skill or art: append to the table, then `bun scripts/sort-by-sect.ts` and `bun scripts/normalize-t3-stats.ts`; add an icon PNG (else it gets a generic glyph); check its grid range (`skillGrid`, overrides in `lib/game/grid/skill-grid.ts`). Full steps: [content-authoring.md](content-authoring.md#move-skills-and-inner-arts).
-4. Run `bun run test:combat`, `bun run test:grid`, `bun run test:grid-skills`, `bun run test:grid-ai`, `bun run test:grid-store` and `bun run typecheck`.
+4. Run `bun run test:combat`, `bun run test:grid`, `bun run test:grid-skills`, `bun run test:boss-skills`, `bun run test:grid-ai`, `bun run test:grid-store` and `bun run typecheck`.
 5. Regenerate the reference: `bun scripts/build-docs-reference.ts`.

@@ -5,7 +5,8 @@ import { withTextOverrides } from "./text-overrides";
 //
 // 123 arts (+ the `none` placeholder), organised by sect first, then by
 // tier (0..5). Sect names follow SECT_ORDER; anything not tied to a specific sect
-// lives under "ยุทธจักร" (JIANGHU_SECT) at the bottom.
+// lives under "ยุทธจักร" (JIANGHU_SECT), then the six legendary beasts'
+// `art_boss_*` arts under "สัตว์ร้าย" (BEAST_SECT: never learnable).
 //
 // Each art scales `stats` by `level/10`, contributes `hL` HP and `mL` MP
 // per level, and grants one MP-gated active (`act`) plus one trigger-
@@ -503,6 +504,33 @@ export const ARTS: readonly Art[] = withTextOverrides<Art>("arts", [
     mpRegenPct: 5,
     act: { n: "กรงเล็บกระดูกขาวเก้าอิม", c: 55, cd: 5, t: "atk_int_pen", m: 1.8, pen: 50, d: "Int×1.8 ทะลุ IDef 50% — 九阴真经 CD5" },
     pas: { tr: "use_int", ch: 100, d: "Int skill → ศัตรู PDef-15 (2ตา) — เย็นยะเยือกถึงกระดูก", e: { t: "debuff_def", n: "กระดูกเก้าอิม", v: -15, u: 5 } } },
+
+  // ─── สัตว์ร้าย ───
+  { id: "art_boss_serpent", n: "ลมปราณเกล็ดทองคำ", sc: "สัตว์ร้าย", tp: "หยิน·แข็ง", types: ["yin", "hard"], ti: 5,
+    stats: { VIT: 30, DEX: 30, AGI: 20, LUK: 20 }, hL: 120, mL: 50,
+    act: { n: "พิษทองหลั่งไหล", c: 40, cd: 4, t: "debuff_poison", pp: 8, ev: -20, u: 5, d: "พิษ 8%/ตา Eva-20 (5ตา) CD4" },
+    pas: { tr: "hit_recv", ch: 35, d: "ถูกโจมตี 35% → สะท้อน 25% (3ตา) — เกล็ดทองสะท้อนคมอาวุธ", e: { t: "buff_reflect", n: "เกล็ดทอง", v: 25, u: 3 } } },
+  { id: "art_boss_tiger", n: "ลมปราณพยัคฆ์โลหิต", sc: "สัตว์ร้าย", tp: "หยาง·ภายนอก", types: ["yang", "external"], ti: 5,
+    stats: { STR: 35, AGI: 30, VIT: 25, DEX: 10 }, hL: 110, mL: 40,
+    act: { n: "ขย้ำคอหอย", c: 40, cd: 4, t: "atk_phy_pen", m: 1.5, pen: 40, d: "ทางกาย×1.5 ทะลุ DEF 40% CD4" },
+    pas: { tr: "hit_recv", ch: 100, d: "ถูกโจมตี → คลั่ง ATK+10% ยิ่งเลือดน้อยยิ่งแรงถึง +60% (3ตา) — บาดแผลปลุกสัญชาตญาณนักล่า", e: { t: "frenzy", n: "พยัคฆ์คลั่ง", v: 10, mx: 60, u: 3 } } },
+  { id: "art_boss_eagle", n: "ลมปราณอินทรีกระบี่", sc: "สัตว์ร้าย", tp: "หยาง·อ่อน", types: ["yang", "soft"], ti: 5,
+    stats: { AGI: 35, DEX: 30, STR: 20, LUK: 15 }, hL: 90, mL: 50,
+    act: { n: "เหินฟ้า", c: 35, cd: 5, t: "buff_spd", v: 80, u: 4, d: "SPD+80 (4ตา) CD5" },
+    pas: { tr: "on_crit", ch: 100, d: "Crit → SPD+40 / Cri+10 (3ตา) — ตาอินทรีจับจุดตาย", e: { t: "buff_spd_cri", n: "ตาอินทรี", sv: 40, cv: 10, u: 3 } } },
+  { id: "art_boss_turtle", n: "ลมปราณเต่าตะวัน", sc: "สัตว์ร้าย", tp: "สมดุล·แข็ง", types: ["balance", "hard"], ti: 5,
+    stats: { VIT: 40, DEF: 35, POW: 15, INT: 10 }, hL: 150, mL: 60,
+    hpRegenPct: 3,
+    act: { n: "แสงตะวันหล่อเลี้ยง", c: 45, cd: 5, t: "heal", h: 20, d: "ฟื้น 20% HP CD5" },
+    pas: { tr: "hit_recv", ch: 30, d: "ถูกโจมตี 30% → DEF+30 (3ตา) — กระดองหนาขึ้นทุกครั้งที่ถูกตี", e: { t: "buff_def", n: "กระดองหนา", v: 30, u: 3 } } },
+  { id: "art_boss_crab", n: "ลมปราณปูวิเศษ", sc: "สัตว์ร้าย", tp: "แข็ง·ภายนอก", types: ["hard", "external"], ti: 5,
+    stats: { STR: 30, DEF: 30, DEX: 25, VIT: 15 }, hL: 120, mL: 40,
+    act: { n: "คีมตัดเกราะ", c: 40, cd: 4, t: "atk_phy_pen", m: 1.4, pen: 60, d: "ทางกาย×1.4 ทะลุ DEF 60% CD4" },
+    pas: { tr: "hit_recv", ch: 40, d: "ถูกโจมตี 40% → สะท้อน 25% (3ตา) — กระดองสะท้อนคมดาบ", e: { t: "buff_reflect", n: "กระดองกระจก", v: 25, u: 3 } } },
+  { id: "art_boss_bull", n: "ลมปราณกระทิงเพลิง", sc: "สัตว์ร้าย", tp: "หยาง·แข็ง", types: ["yang", "hard"], ti: 5,
+    stats: { STR: 40, VIT: 30, POW: 20, AGI: 10 }, hL: 130, mL: 40,
+    act: { n: "เขาเพลิงทะลวงทัพ", c: 45, cd: 4, t: "atk_phy_pen", m: 1.6, pen: 30, d: "ทางกาย×1.6 ทะลุ DEF 30% CD4" },
+    pas: { tr: "on_crit", ch: 100, d: "Crit → ATK+10% (≤5ซ้อน) — โทสะสะสมเป็นเพลิง", e: { t: "stack_atk", v: 10, mx: 5 } } },
 ]);
 
 export const ARTS_BY_ID: Map<string, Art> = new Map(ARTS.map((a) => [a.id, a]));

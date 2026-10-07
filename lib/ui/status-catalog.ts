@@ -63,7 +63,15 @@ export const STATUS_STYLES: Readonly<Record<string, StatusStyle>> = {
   debuff_poison: S("พิษ", "debuff", 0x7fdc5a, "skull", "drip"),
   burn_hp_mp: S("เผาไหม้", "debuff", 0xff6a3a, "flame", "rise"),
   stun: S("มึนงง", "debuff", 0xfff27a, "spiral", "none"),
+  // Legendary beasts' (บอส) effects
+  frenzy: S("โลหิตคลั่ง", "buff", 0xff3a3a, "fist", "rise", "up"),
+  bleed: S("เลือดไหล", "debuff", 0xd8283c, "drop", "drip"),
+  blind: S("ตาบอด", "debuff", 0x6e6a8a, "eye", "fall", "down"),
+  scorch: S("แผดเผา", "debuff", 0xffb21e, "flame", "rise"),
 };
+
+/** Debuff kinds whose key does not start with "debuff" (status-vfx expiry looks them up). */
+export const DEBUFF_KEYS: ReadonlySet<string> = new Set(["stun", "burn_hp_mp", "bleed", "blind", "scorch"]);
 
 export const STATUS_FALLBACK_BUFF = S("เสริมพลัง", "buff", 0xf3e2b0, "plus", "rise", "up");
 export const STATUS_FALLBACK_DEBUFF = S("ถูกกด", "debuff", 0xc9a0a0, "chevrons", "fall", "down");
