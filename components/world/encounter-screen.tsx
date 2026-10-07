@@ -3,9 +3,8 @@
 import { useCallback, useEffect, useMemo } from "react";
 import { TIERS } from "@/lib/game";
 import { ENEMY_CATEGORY_LABEL, getOpponent, type EnemyCategory } from "@/lib/world";
-import { npcCharacterId } from "@/lib/characters/catalog";
 import { rarityColor } from "@/lib/ui/rarity";
-import { CharacterPreview } from "@/components/game/character-preview";
+import { FoePortrait } from "@/components/game/foe-portrait";
 import { useWorldStore } from "@/store/world-store";
 import { ensureBattleStarted, previewBriefing } from "@/lib/world/battle-bridge";
 import { PowerReadout } from "./power-readout";
@@ -60,7 +59,7 @@ export function EncounterScreen() {
       <p className="encounter-kicker">พบเจอศัตรู · {ENEMY_CATEGORY_LABEL[cat]}</p>
       <div className="encounter-body">
         <div className="encounter-portrait" style={{ borderColor: color }} aria-hidden="true">
-          {cat === "beast" ? <span className="encounter-glyph">獸</span> : <CharacterPreview id={npcCharacterId(opp.id)} animate />}
+          <FoePortrait opponentId={opp.id} />
         </div>
         <div className="encounter-copy">
           <h2 id="encounter-name" style={{ color }}>{opp.name}</h2>
