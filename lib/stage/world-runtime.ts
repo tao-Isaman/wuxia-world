@@ -6,6 +6,8 @@ import {
   type CharacterId,
 } from "../characters/catalog";
 import { loadCharacterAtlas } from "../characters/sheet";
+import { getAnimSheet, type AnimSheet } from "../characters/anim-sheets";
+import { animFrame, animScaleOf, animVisibleTop } from "./anim-frame";
 import type { HeroPoseStrip } from "../characters/hero-actions";
 import { hasAnimatedSheet } from "../characters/npc-sheets";
 import { WALK8_FIRST_FRAME, WALK8_FPS, WALK8_FRAMES, dir8FromVector, walk8Frame, type Dir8 } from "../characters/walk8";
@@ -37,6 +39,9 @@ const UNIQUE_FEET = 78;
 const UNIQUE_NPC_SIZE = 50;
 /** How close (map units) the hero must come to a roaming foe to engage it. */
 const FOE_TOUCH = 30;
+/** A roaming foe's figure height (map units) at size 1: a 54-unit sheet cell × its 108 / 128 px figure. */
+const FOE_FIGURE = 54 * 108 / 128;
+
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 const toWorld = (point: Point): Point => ({ x: point.x * WIDTH / 100, y: point.y * HEIGHT / 100 });
 const toPercent = (point: Point): Point => ({ x: point.x / WIDTH * 100, y: point.y / HEIGHT * 100 });
@@ -717,8 +722,15 @@ export function createWorldRuntime(
   interface FoeVisual {
     body: Phaser.GameObjects.Image;
     character?: CharacterVisual;
+    /** An animated sheet (bosses, T5): its texture's frames per row and the frame on show. */
+    anim?: { sheet: AnimSheet; columns: number; frame: number; top: number };
+    /** A legendary beast's glow on the ground under it. */
+    aura?: Phaser.GameObjects.Image;
     shadow: Phaser.GameObjects.Image;
     tag: TextSprite;
+    /** How close the hero must come to engage it (bigger for big beasts). */
+    touch: number;
+    boss: boolean;
     phase: number;
     engaged: boolean;
   }
@@ -749,6 +761,63 @@ export function createWorldRuntime(
     }
     return pending;
   }
+  /** One texture per animated sheet, cut into its frames (row-major). */
+  const animTextures = new Map<string, Promise<{ key: string; columns: number; top: number }>>();
+  function animTexture(sheet: AnimSheet): Promise<{ key: string; columns: number; top: number }> {
+    let pending = animTextures.get(sheet.id);
+    if (!pending) {
+      pending = loadImage(sheet.url).then((source) => {
+        const key = `anim:${sheet.id}`;
+        const columns = Math.max(1, Math.floor(source.width / sheet.frameW));
+        if (!scene!.textures.exists(key)) {
+          const canvas = drawCanvas(source.width, source.height, (context) => context.drawImage(source, 0, 0));
+          addGridFrames(canvasTexture(scene!, key, canvas), sheet.frameW, columns, Math.max(1, Math.floor(source.height / sheet.frameH)), sheet.frameH);
+        }
+        return { key, columns, top: animVisibleTop(source, sheet) };
+      });
+      pending.catch(() => animTextures.delete(sheet.id));
+      animTextures.set(sheet.id, pending);
+    }
+    return pending;
+  }
+  function bossAuraCanvas(): HTMLCanvasElement {
+    return drawCanvas(128, 44, (context) => {
+      const glow = context.createRadialGradient(64, 64, 4, 64, 64, 64);
+      glow.addColorStop(0, "rgba(255, 210, 110, 0.95)");
+      glow.addColorStop(0.5, "rgba(226, 92, 40, 0.6)");
+      glow.addColorStop(1, "rgba(120, 20, 10, 0)");
+      context.save();
+      context.scale(1, 44 / 128);
+      context.fillStyle = glow;
+      context.beginPath();
+      context.arc(64, 64, 64, 0, Math.PI * 2);
+      context.fill();
+      context.restore();
+      // A gold ring marks the lair's ground.
+      context.strokeStyle = "rgba(255, 214, 120, 0.85)";
+      context.lineWidth = 2;
+      context.beginPath();
+      context.ellipse(64, 22, 52, 15, 0, 0, Math.PI * 2);
+      context.stroke();
+    });
+  }
+  /** A legendary beast's name plate: gold on lacquer, a little larger than a foe's tag. */
+  function makeBossTag(text: string): TextSprite {
+    const label = `◆ ${text} ◆`;
+    const width = Math.ceil(measure(label, "700 ") * 15 / 13) + 20;
+    return textSprite(width, 26, (context) => {
+      context.fillStyle = "rgba(48, 8, 6, 0.92)";
+      context.fillRect(0, 1, width, 24);
+      context.strokeStyle = "rgba(240, 196, 98, 0.95)";
+      context.lineWidth = 1.5;
+      context.strokeRect(1, 2, width - 2, 22);
+      context.font = `700 15px ${font}`;
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+      context.fillStyle = "#ffd77a";
+      context.fillText(label, width / 2, 13.5);
+    }, 9_030);
+  }
   function makeFoeTag(text: string): TextSprite {
     const label = `⚔ ${text}`;
     const width = Math.ceil(measure(label, "600 ")) + 14;
@@ -768,8 +837,21 @@ export function createWorldRuntime(
       const size = 54 * (foe.look.size ?? 1);
       let body: Phaser.GameObjects.Image;
       let character: CharacterVisual | undefined;
-      if (foe.look.kind === "creature") {
-        const { key, cellHeight } = await creatureFrameTexture(foe.look.frame);
+      let anim: FoeVisual["anim"];
+      const sheet = foe.look.kind === "anim" ? getAnimSheet(foe.look.sheet) : null;
+      if (sheet) {
+        // Bosses and T5: the sheet's idle clip, `scale × size` figures tall, feet on the spot.
+        const { key, columns, top } = await animTexture(sheet);
+        if (disposed || !scene) return;
+        const figure = FOE_FIGURE * animScaleOf(sheet, foe.look.size);
+        const height = figure / Math.max(0.4, sheet.feetY);
+        const first = sheet.clips.idle.row * columns;
+        body = scene.add.image(0, 0, key, first).setDepth(100).setOrigin(0.5, sheet.feetY)
+          .setDisplaySize(height * sheet.frameW / sheet.frameH, height);
+        anim = { sheet, columns, frame: first, top };
+      } else if (foe.look.kind === "creature" || foe.look.kind === "anim") {
+        // (An anim look whose sheet is unknown stands as a beast.)
+        const { key, cellHeight } = await creatureFrameTexture(foe.look.kind === "creature" ? foe.look.frame : 0);
         if (disposed || !scene) return;
         body = image(key, 100).setOrigin(0.5, 1);
         const source = scene.textures.get(key).getSourceImage() as HTMLCanvasElement;
@@ -782,10 +864,15 @@ export function createWorldRuntime(
         body = character.image;
       }
       if (foe.look.tint !== undefined) body.setTint(foe.look.tint);
-      const shadow = image(shadowTexture, 1, 30, 11);
-      const tag = makeFoeTag(foe.name);
+      const boss = !!foe.boss;
+      // A big beast's shadow, aura and reach grow with its painted width.
+      const reach = anim ? Math.max(1, body.displayWidth / 64) : 1;
+      const shadow = image(shadowTexture, 1, 30 * reach, 11 * Math.sqrt(reach));
+      const aura = boss ? image(texture(bossAuraCanvas(), "aura"), 1.5, Math.max(60, body.displayWidth * 1.05), Math.max(22, body.displayWidth * 0.36)) : undefined;
+      const tag = boss ? makeBossTag(foe.name) : makeFoeTag(foe.name);
       tag.image.setDisplaySize(tag.width / viewScale, tag.height / viewScale);
-      foeVisuals.set(foe.id, { body, character, shadow, tag, phase: Math.random() * 6, engaged: false });
+      const touch = anim ? Math.max(FOE_TOUCH, body.displayWidth * 0.34) : FOE_TOUCH;
+      foeVisuals.set(foe.id, { body, character, anim, aura, shadow, tag, touch, boss, phase: Math.random() * 6, engaged: false });
     } catch (error) {
       console.warn("[world] foe could not be drawn:", error);
     } finally {
@@ -795,7 +882,7 @@ export function createWorldRuntime(
   function removeFoe(id: string) {
     const visual = foeVisuals.get(id);
     if (!visual) return;
-    visual.body.destroy(); visual.shadow.destroy(); visual.tag.image.destroy();
+    visual.body.destroy(); visual.shadow.destroy(); visual.tag.image.destroy(); visual.aura?.destroy();
     foeVisuals.delete(id);
   }
   function updateFoes(paused: boolean) {
@@ -808,7 +895,17 @@ export function createWorldRuntime(
       if (!visual) continue;
       const point = toWorld(foe);
       const facingLeft = position.x < point.x;
-      if (visual.character) {
+      if (visual.anim) {
+        // An animated sheet plays its idle loop in place (a boss never drifts from its lair), turned to watch the hero.
+        const { sheet, columns } = visual.anim;
+        const frame = animFrame(sheet.clips.idle, columns, reducedMotion ? 0 : (animationTime + visual.phase) * 1000, true);
+        if (frame !== visual.anim.frame) { visual.body.setFrame(frame, false, false); visual.anim.frame = frame; }
+        visual.body.setFlipX(sheet.facing === "right" ? facingLeft : !facingLeft).setPosition(point.x, point.y);
+        if (visual.aura) {
+          const pulse = reducedMotion ? 0.75 : 0.62 + 0.25 * Math.sin((animationTime + visual.phase) * 2.1);
+          visual.aura.setPosition(point.x, point.y).setAlpha(pulse);
+        }
+      } else if (visual.character) {
         const idle = CHARACTER_CLIPS.idle;
         const frame = reducedMotion ? idle.frames[0] : idle.frames[Math.floor((animationTime + visual.phase) * idle.fps) % idle.frames.length];
         setCharacterFrame(visual.character, frame, facingLeft);
@@ -820,10 +917,11 @@ export function createWorldRuntime(
       }
       visual.body.setDepth(100 + point.y * 10);
       visual.shadow.setPosition(point.x, point.y);
+      const top = visual.anim ? visual.body.displayHeight * Math.max(0.25, visual.anim.sheet.feetY - visual.anim.top) : visual.body.displayHeight * 0.92;
       visual.tag.image.setDisplaySize(visual.tag.width / viewScale, visual.tag.height / viewScale)
-        .setPosition(point.x, point.y - visual.body.displayHeight * 0.92 - 2);
+        .setPosition(point.x, point.y - top - 2);
       // Walking into the foe starts the encounter (once).
-      if (!paused && !visual.engaged && Math.hypot(position.x - point.x, position.y - point.y) < FOE_TOUCH) {
+      if (!paused && !visual.engaged && Math.hypot(position.x - point.x, position.y - point.y) < visual.touch) {
         visual.engaged = true;
         cancelWalk();
         foe.onEngage();
@@ -831,6 +929,10 @@ export function createWorldRuntime(
     }
     parent.dataset.foes = String(foeVisuals.size);
     parent.dataset.foeIds = [...foeVisuals.keys()].join(" ");
+    // Tests: each drawn foe's look kind ("anim" for bosses / T5) and the legendary beasts among them.
+    parent.dataset.foeLooks = JSON.stringify(Object.fromEntries(foes.filter((foe) => foeVisuals.has(foe.id))
+      .map((foe) => [foe.id, foeVisuals.get(foe.id)!.anim ? "anim" : foe.look.kind])));
+    parent.dataset.bossFoes = foes.filter((foe) => foe.boss && foeVisuals.has(foe.id)).map((foe) => foe.id).join(" ");
     parent.dataset.foesAt = JSON.stringify(foes.filter((foe) => foeVisuals.has(foe.id)).map((foe) => {
       const p = toWorld(foe);
       return [Math.round(p.x), Math.round(p.y)];
@@ -843,7 +945,8 @@ export function createWorldRuntime(
       const visual = foeVisuals.get(foe.id);
       if (!visual) continue;
       const at = toWorld(foe);
-      const width = Math.max(28, visual.body.displayWidth * 0.6), height = visual.body.displayHeight * 0.95;
+      const width = Math.max(28, visual.body.displayWidth * 0.6);
+      const height = visual.body.displayHeight * (visual.anim ? Math.max(0.25, visual.anim.sheet.feetY - visual.anim.top) : 0.95);
       if (Math.abs(point.x - at.x) > width / 2 || point.y > at.y + 8 || point.y < at.y - height) continue;
       if (!best || at.y > best.y) best = at;
     }

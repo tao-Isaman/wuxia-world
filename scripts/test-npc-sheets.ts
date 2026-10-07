@@ -13,7 +13,10 @@ import { CHARACTER_IDS, CREATURE_ATLAS, CREATURE_FRAME_COUNT, FOE_CHARACTER_IDS,
 import { creatureFrameFor, findOpponentNpc, foeCharacterFor, foeLook, opponentLook, worldBattleSetup } from "../lib/world/battle-looks";
 import { getNpc } from "../lib/world/data/npcs";
 import { getLocationMap } from "../lib/world/data/location-maps";
-import { OPPONENTS } from "../lib/world/data/opponents";
+import { OPPONENTS, OPPONENTS_BY_ID } from "../lib/world/data/opponents";
+import { ANIM_SHEETS, BOSS_SHEET_IDS, T5_SHEET_IDS, getAnimSheet } from "../lib/characters/anim-sheets";
+import { ANIM_MAX_SCALE, animClipMs, animFrame, animScaleOf } from "../lib/stage/anim-frame";
+import type { OpponentDef } from "../lib/world/types";
 import { FIGHT_EVENTS } from "../lib/world/data/random-events";
 import { npcBattleSprite, npcPixelSprite } from "../lib/world/data/npc-portraits";
 import { WANDER_RADIUS, createWanderer, stepWanderer } from "../lib/stage/npc-wander";
@@ -112,7 +115,7 @@ await check("enemy types: every foe without its own art is a painted, rigged ene
   const used = new Set<string>();
   for (const o of OPPONENTS) {
     const look = opponentLook(o.id, findOpponentNpc(o.id));
-    if (look.kind === "creature" || look.still) continue;
+    if (look.kind === "creature" || look.kind === "anim" || look.still) continue;
     if (hasAnimatedSheet(look.characterId)) continue;
     assert.ok((FOE_CHARACTER_IDS as readonly string[]).includes(look.characterId), `${o.id} is drawn as ${look.characterId}, not an enemy type`);
     assert.equal(look.characterId, foeCharacterFor(o.id, o));
@@ -316,6 +319,75 @@ await check("a foe looks the same on the map, the encounter / briefing screens a
     const setup = worldBattleSetup(o.id, { bodyId: "m1" });
     assert.ok(setup, o.id);
     assert.deepEqual(foeLook(o.id), setup!.looks.B, `${o.id}: the picture shown before the fight is not the one fought`);
+  }
+});
+
+await check("animated sheets: every boss / T5 sheet exists, its clips fit inside its PNG and every frame is drawn", async () => {
+  for (const id of [...BOSS_SHEET_IDS, ...T5_SHEET_IDS]) assert.ok(getAnimSheet(id), `${id} has a sheet`);
+  for (const [id, sheet] of Object.entries(ANIM_SHEETS)) {
+    assert.equal(sheet.id, id);
+    assert.ok(sheet.url.startsWith(`/art/anims/${id}.png`), `${id}: url ${sheet.url}`);
+    assert.ok(sheet.frameW > 0 && sheet.frameH > 0, `${id}: frame size`);
+    assert.ok(sheet.feetY > 0.4 && sheet.feetY <= 1, `${id}: feetY ${sheet.feetY}`);
+    assert.ok(sheet.facing === "left" || sheet.facing === "right", `${id}: facing`);
+    assert.ok(sheet.scale > 0 && sheet.scale <= ANIM_MAX_SCALE, `${id}: scale ${sheet.scale} within the renderers' cap`);
+    const file = `public${sheet.url.split("?")[0]}`;
+    assert.ok(existsSync(file), `${id}: ${file} exists`);
+    const { data, info } = await sharp(file).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+    const columns = Math.floor(info.width / sheet.frameW);
+    for (const [name, clip] of Object.entries(sheet.clips)) {
+      if (!clip) continue;
+      assert.ok(clip.frames >= 1 && clip.fps > 0, `${id} ${name}: frames / fps`);
+      assert.ok(clip.frames <= columns, `${id} ${name}: ${clip.frames} frames fit ${columns} columns (${info.width} px)`);
+      assert.ok((clip.row + 1) * sheet.frameH <= info.height, `${id} ${name}: row ${clip.row} fits ${info.height} px`);
+      for (let f = 0; f < clip.frames; f++) {
+        let opaque = 0;
+        for (let y = clip.row * sheet.frameH; y < (clip.row + 1) * sheet.frameH; y++) {
+          for (let x = f * sheet.frameW; x < (f + 1) * sheet.frameW; x++) if (data[(y * info.width + x) * 4 + 3] >= 128) opaque++;
+        }
+        assert.ok(opaque > 50, `${id} ${name} frame ${f} is drawn (${opaque} px)`);
+      }
+    }
+  }
+});
+
+await check("animated sheets: frame maths loop idle, play attack / hurt once, and cap the size", () => {
+  const sheet = getAnimSheet(BOSS_SHEET_IDS[0])!;
+  const clip = { row: 2, frames: 4, fps: 10 };
+  assert.equal(animFrame(clip, 6, 0, true), 12);
+  assert.equal(animFrame(clip, 6, 250, true), 14);
+  assert.equal(animFrame(clip, 6, 450, true), 12, "idle loops");
+  assert.equal(animFrame(clip, 6, 450, false), 15, "attack / hurt hold the last frame");
+  assert.equal(animFrame(clip, 3, 350, false), 8, "never past the sheet's columns");
+  assert.equal(animClipMs(clip), 400);
+  assert.equal(animScaleOf(sheet, undefined), Math.min(ANIM_MAX_SCALE, sheet.scale));
+  assert.equal(animScaleOf(sheet, 10), ANIM_MAX_SCALE);
+  assert.equal(animScaleOf(sheet, 0.01), 0.6);
+});
+
+await check("animated sheets: an opponent with look.anim (and its pack) fights, and shows, as its sheet", () => {
+  const beast = OPPONENTS.find((o) => o.category === "beast")!;
+  const minion: OpponentDef = { ...beast, id: "test_anim_minion", look: { anim: T5_SHEET_IDS[5], frame: 1 }, pack: undefined };
+  const boss: OpponentDef = { ...beast, id: "test_anim_boss", look: { anim: BOSS_SHEET_IDS[0], size: 1.1, tint: 0xffeeaa },
+    pack: [{ opponentId: minion.id, count: 2 }] };
+  const ghost: OpponentDef = { ...beast, id: "test_anim_missing", look: { anim: "no_such_sheet" } };
+  for (const o of [minion, boss, ghost]) OPPONENTS_BY_ID.set(o.id, o);
+  try {
+    assert.deepEqual(opponentLook(boss.id), { kind: "anim", sheet: BOSS_SHEET_IDS[0], tint: 0xffeeaa, size: 1.1 }, "look.anim wins over the creature frame");
+    assert.deepEqual(foeLook(minion.id), { kind: "anim", sheet: T5_SHEET_IDS[5] });
+    assert.equal(opponentLook(ghost.id).kind, "creature", "an unknown sheet falls back to the creature atlas");
+    const setup = worldBattleSetup(boss.id, { bodyId: "m1", withPack: true });
+    assert.equal(setup!.looks.B.kind, "anim");
+    assert.equal(setup!.enemies.length, 2);
+    for (const unit of setup!.enemies) assert.deepEqual(unit.look, { kind: "anim", sheet: T5_SHEET_IDS[5] });
+  } finally {
+    for (const o of [minion, boss, ghost]) OPPONENTS_BY_ID.delete(o.id);
+  }
+  // Authored ones (bosses, T5 — added with the foes wave) name a sheet that exists.
+  for (const o of OPPONENTS) {
+    if (!o.look?.anim) continue;
+    assert.ok(getAnimSheet(o.look.anim), `${o.id}: sheet ${o.look.anim} exists`);
+    assert.equal(foeLook(o.id).kind, "anim", `${o.id} is drawn from its sheet`);
   }
 });
 

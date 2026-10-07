@@ -17,6 +17,8 @@ import { heroMoveFor, heroPose, movesIn, type HeroMove } from "./hero-motion";
 import { CHARACTER_CLIPS, CHARACTER_FEET_Y, CHARACTER_FRAME_SIZE, characterId, CREATURE_ATLAS, CREATURE_FRAME_COUNT, creatureCell, type CharacterMotion } from "@/lib/characters/catalog";
 import { WALK8_FPS, dir8FromVector, walk8Frame, walk8Source, type Dir8 } from "@/lib/characters/walk8";
 import { loadCharacterAtlas } from "@/lib/characters/sheet";
+import { getAnimSheet, type AnimSheet } from "@/lib/characters/anim-sheets";
+import { animClipMs, animFrame, animScaleOf, animVisibleTop } from "./anim-frame";
 import { HERO_ACTION_CELL, HERO_COMBAT_COLUMNS, HERO_COMBAT_ROWS, hasHeroActions, heroAttackColumn, heroAttackRow, heroCombatFrame,
   heroCombatPoseFrame, heroCombatSheet, type HeroCombatRow } from "@/lib/characters/hero-actions";
 import { getSkill } from "@/lib/game";
@@ -87,7 +89,7 @@ export interface GridBattleRuntime {
 /** The canvas host exposes `gridCellPoint(x, y)` → viewport point of a cell's centre (for tests). */
 export type GridBattleHost = HTMLElement & { gridCellPoint?: (x: number, y: number) => Point | null };
 
-type ActorKind = "sheet" | "still" | "creature";
+type ActorKind = "sheet" | "still" | "creature" | "anim";
 
 interface Actor {
   id: string;
@@ -96,6 +98,8 @@ interface Actor {
   /** Variant colour multiplied into the sprite (UnitLook.tint). */
   tint?: number;
   kind: ActorKind;
+  /** An animated sheet (bosses, T5 — lib/characters/anim-sheets.ts) and its frames per row. */
+  anim?: { sheet: AnimSheet; columns: number };
   directional: boolean;
   /** Painted eight-way walk cells (heroes, lib/characters/walk8.ts). */
   walk8: boolean;
@@ -278,7 +282,9 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
     cssH = Math.max(1, Math.round(parent.clientHeight));
     stage.fit(cssW, cssH);
     const left = boardX(0, rows) - 14, right = boardX(cols, rows) + 14;
-    const top = -(FIGURE * S_FAR + 34), bottom = rowY(rows) + 14;
+    // The tallest unit (a boss stands two figures and more) is fitted at the far row, its bars included.
+    const tallest = actors.reduce((most, actor) => Math.max(most, actor.head), FIGURE);
+    const top = -(tallest * S_FAR + 34), bottom = rowY(rows) + 14;
     zoom = Math.min(cssW / (right - left), cssH / (bottom - top));
     uiScale = 1 / zoom;
     statusFx?.setUiScale(uiScale);
@@ -374,6 +380,8 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
   function floatText(text: string, color: string, size: number, x: number, y: number, life: number, grow = 0) {
     const t = textImage(text, color, size);
     t.item.setDepth(40);
+    // Over a towering unit, numbers start inside the field (below the cast banner).
+    y = Math.max(view().top + 64 * uiScale, y);
     const effect: Effect = { item: t.item, key: t.key, born: elapsed, life: reduced ? Math.min(life, 700) : life,
       x, y, vy: reduced ? 0 : -40, w: t.width, h: t.height, grow: reduced ? 0 : grow };
     t.item.setPosition(x, y).setDisplaySize(t.width * uiScale, t.height * uiScale);
@@ -508,17 +516,30 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
   }
 
   // ── Units ───────────────────────────────────────────────────────────
-  const lookKey = (look: UnitLook) => look.kind === "creature" ? "creature"
+  const lookKey = (look: UnitLook) => look.kind === "creature" ? "creature" : look.kind === "anim" ? `anim:${look.sheet}`
     : look.still ? `still:${look.still}` : `char:${characterId(look.characterId)}`;
 
   interface LookTexture { key: string; kind: ActorKind; feet: number[]; directional: boolean; walk8?: boolean; w: number; h: number;
-    actions?: { key: string; scale: number } }
+    actions?: { key: string; scale: number }; anim?: { sheet: AnimSheet; columns: number }; animTop?: number }
   const textures = new Map<string, Promise<LookTexture>>();
   function textureFor(look: UnitLook): Promise<LookTexture> {
     const key = lookKey(look);
     const cached = textures.get(key);
     if (cached) return cached;
     const pending = (async (): Promise<LookTexture> => {
+      if (look.kind === "anim") {
+        // An animated sheet: rows of equal frames, one row per clip. A missing
+        // sheet (or one that will not load) falls back to a creature-atlas beast.
+        const sheet = getAnimSheet(look.sheet);
+        const image = sheet ? await loadImage(sheet.url).catch(() => null) : null;
+        if (!sheet || !image) return textureFor({ kind: "creature", frame: 0 });
+        const texture = scene!.textures.addImage(`gb:${key}`, image);
+        if (!texture) throw new Error("Battle animation texture is unavailable");
+        const columns = Math.max(1, Math.floor(image.width / sheet.frameW));
+        addGridFrames(texture, sheet.frameW, columns, Math.max(1, Math.floor(image.height / sheet.frameH)), sheet.frameH);
+        return { key: `gb:${key}`, kind: "anim" as const, feet: [sheet.feetY], directional: false, w: sheet.frameW, h: sheet.frameH,
+          anim: { sheet, columns }, animTop: animVisibleTop(image, sheet) };
+      }
       if (look.kind === "creature") {
         const image = await loadImage(CREATURE_ATLAS.url);
         const texture = scene!.textures.addImage(`gb:${key}`, image);
@@ -567,9 +588,12 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
     const frame = tex.kind === "creature" && unit.look.kind === "creature" ? Math.max(0, Math.min(CREATURE_FRAME_COUNT - 1, unit.look.frame)) : 0;
     const feet = tex.feet[tex.kind === "creature" ? frame : 0] ?? 0.94;
     const size = Math.max(0.6, Math.min(1.6, unit.look.size ?? 1));
-    const dispH = (tex.kind === "creature" ? FRAME * 0.92 : FRAME) * size;
+    // An animated sheet stands `sheet.scale × size` figures tall: the frame from its top to the feet line is that figure.
+    const animScale = tex.anim ? animScaleOf(tex.anim.sheet, unit.look.size) : 1;
+    const dispH = tex.anim ? FIGURE * animScale / Math.max(0.4, feet) : (tex.kind === "creature" ? FRAME * 0.92 : FRAME) * size;
     const dispW = dispH * tex.w / tex.h;
-    const head = tex.kind === "creature" ? dispH * feet * 0.72 : FIGURE * size;
+    // Bars and name plates sit on the painted figure's top (its idle frame), not the frame's headroom.
+    const head = tex.anim ? dispH * Math.max(0.25, feet - (tex.animTop ?? 0)) : tex.kind === "creature" ? dispH * feet * 0.72 : FIGURE * size;
     const image = scene!.add.image(0, 0, tex.key, tex.kind === "still" ? undefined : frame).setOrigin(0.5, feet);
     const shadow = scene!.add.ellipse(0, 0, TW * 0.56, TH * 0.4, 0x080604, 0.4).setDepth(3);
     const ring = scene!.add.ellipse(0, 0, TW * 0.72, TH * 0.6).setDepth(3.2);
@@ -580,7 +604,7 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
     tagInfo.item.setDepth(31);
     const bars = scene!.add.graphics().setDepth(30);
     const actor: Actor = {
-      id: unit.id, team: unit.team, index, kind: tex.kind, directional: tex.directional, walk8: !!tex.walk8, walkDir: "E",
+      id: unit.id, team: unit.team, index, kind: tex.kind, anim: tex.anim, directional: tex.directional, walk8: !!tex.walk8, walkDir: "E",
       actions: tex.actions, actionFrame: null, baseKey: tex.key, baseFeet: feet,
       image, shadow, ring, tag: tagInfo.item, tagW: tagInfo.width, tagH: tagInfo.height, bars, barsKey: "",
       dispW, dispH, head,
@@ -696,7 +720,7 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
         if (b.x !== a.x) actor.hFacing = b.x > a.x ? 1 : -1;
         actor.walkDir = dir8FromVector(b.x - a.x, b.y - a.y, actor.walkDir);
         motion = b.y < a.y && actor.directional ? "walkNorth" : b.y > a.y && actor.directional ? "walkSouth" : "walk";
-        if (actor.kind !== "sheet" && !reduced) hop = Math.abs(Math.sin(k * Math.PI)) * 9;
+        if (actor.kind !== "sheet" && !reduced) hop = Math.abs(Math.sin(k * Math.PI)) * (actor.anim ? 5 : 9);
       }
     }
     const s = rowScale(actor.v);
@@ -727,7 +751,7 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
           const lunge = Math.sin(approach * Math.PI / 2) * (1 - retreat) * actor.attack.travel;
           x += actor.attack.dx * lunge; y += actor.attack.dy * lunge;
         }
-        if (actor.kind !== "sheet" && !reduced && !actor.attack.support) {
+        if (actor.kind !== "sheet" && !actor.anim && !reduced && !actor.attack.support) {
           if (age < HIT_DELAY) { const k = age / HIT_DELAY; sx = 1 - 0.07 * k; sy = 1 + 0.07 * k; }
           else if (age < actor.attack.lastImpact + 120) {
             const k = ((age - HIT_DELAY) % HIT_GAP) / HIT_GAP;
@@ -765,6 +789,23 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
       else if (actor.actionFrame !== null) { actor.frame = frame; showActionFrame(actor, null); }
       else if (frame !== actor.frame) { actor.image.setFrame(frame, false, false); actor.frame = frame; }
       if (motion === "defeat") alpha = 0.78;
+    } else if (actor.anim) {
+      // Animated sheet: idle loops; a cast plays `attack` once (holding its last frame);
+      // a hit plays `hurt` once (idle when the sheet has none); the fallen fade and sink.
+      const { sheet, columns } = actor.anim;
+      let frame: number;
+      if (motion === "attack" && actor.attack) frame = animFrame(sheet.clips.attack, columns, elapsed - actor.attack.start, false);
+      else if (motion === "hurt" && sheet.clips.hurt) frame = animFrame(sheet.clips.hurt, columns, age, false);
+      else frame = animFrame(sheet.clips.idle, columns, reduced ? 0 : elapsed + actor.index * 170, true);
+      if (frame !== actor.frame) { actor.image.setFrame(frame, false, false); actor.frame = frame; }
+      if (motion === "hurt" && !sheet.clips.hurt && !reduced) rotation = -actor.hFacing * 0.04;
+      if (motion === "defeat") {
+        const k = reduced ? 1 : Math.min(1, (elapsed - actor.deadAt) / 700);
+        const ease = 1 - (1 - k) * (1 - k);
+        rotation = -actor.hFacing * 0.3 * ease;
+        sy *= 1 - 0.12 * ease;
+        alpha = 1 - 0.65 * ease;
+      }
     } else {
       // Procedural motion for single-pose stills and creature-atlas beasts.
       if (!reduced && motion === "idle") { const b = Math.sin(elapsed / 450 + actor.index * 1.7) * 0.016; sy *= 1 + b; sx *= 1 - b * 0.5; }
@@ -788,7 +829,8 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
     actor.image.setPosition(Math.round(x), y - hop * s)
       .setDisplaySize(cellW * s * sx, cellH * s * sy)
       .setFlipX(actor.walk8 && motion.startsWith("walk") ? walk8Source(actor.walkDir).mirror
-        : walkingVertical ? false : creature ? actor.hFacing > 0 : actor.hFacing < 0)
+        : walkingVertical ? false : actor.anim ? (actor.anim.sheet.facing === "right" ? actor.hFacing < 0 : actor.hFacing > 0)
+        : creature ? actor.hFacing > 0 : actor.hFacing < 0)
       .setRotation(rotation).setAlpha(alpha)
       .setDepth(5 + actor.v * 2 + actor.index * 0.001 + (actor.attack ? 0.5 : 0));
     if (actor.flashUntil > elapsed) actor.image.setTint(0xffffff).setTintMode(Phaser.TintModes.FILL);
@@ -800,12 +842,13 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
       actor.aura.setPosition(x, y + 2 * s).setScale(s * (1 + 0.08 * auraNow)).setFillStyle(actor.attack?.glow ?? 0xbfeaff, 0.5 * auraNow)
         .setVisible(auraNow > 0).setDepth(5 + actor.v * 2 - 0.2);
     }
-    actor.shadow.setPosition(x, y + 2 * s).setScale(s * (creature ? 1.3 : 1)).setAlpha(actor.dead ? 0.15 : 0.4 * alpha);
+    const shadowScale = actor.anim ? Math.max(1.3, actor.dispW / (TW * 0.56) * 0.62) : creature ? 1.3 : 1;
+    actor.shadow.setPosition(x, y + 2 * s).setScale(s * shadowScale).setAlpha(actor.dead ? 0.15 : 0.4 * alpha);
     const active = activeId === actor.id && !actor.dead;
     actor.ring.setPosition(x, y + 2 * s).setScale(s).setVisible(!actor.dead && actor.fledAt < 0);
     actor.ring.setAlpha(active ? 0 : 0.7);
-    // Name tag + bars over the head.
-    const headY = y - hop * s - actor.head * s * sy;
+    // Name tag + bars over the head (a towering beast keeps them inside the field).
+    const headY = Math.max(view().top + (34 + (activeId === actor.id ? 26 : 0)) * uiScale, y - hop * s - actor.head * s * sy);
     const showTag = !actor.dead && actor.fledAt < 0 && (TW * s * zoom >= 46 || active || ui.inspect === actor.id);
     actor.tag.setVisible(showTag).setPosition(Math.round(x), headY - 16 * uiScale);
     actor.bars.setVisible(!actor.dead && actor.fledAt < 0).setPosition(Math.round(x), headY - 7 * uiScale);
@@ -1019,7 +1062,8 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
       anyHit = true; anyCrit ||= crit;
       if (damage > 0) {
         target.hp = Math.max(0, target.hp - damage);
-        target.hurtUntil = elapsed + 220;
+        const hurtClip = target.anim?.sheet.clips.hurt;
+        target.hurtUntil = elapsed + (hurtClip ? Math.max(220, animClipMs(hurtClip)) : 220);
         target.flashUntil = elapsed + 90;
         target.knockUntil = elapsed + 220;
         const kx = caster ? target.x - caster.x : dir, ky = caster ? target.y - caster.y : 0;
@@ -1102,7 +1146,10 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
   function publishUnits(state: GridBattleState) {
     if (unitsState === state) return;
     unitsState = state;
-    parent.dataset.units = JSON.stringify(state.units.map((u) => ({ id: u.id, team: u.team, x: u.pos.x, y: u.pos.y, hp: u.hp, alive: u.alive })));
+    parent.dataset.units = JSON.stringify(state.units.map((u) => ({ id: u.id, team: u.team, x: u.pos.x, y: u.pos.y, hp: u.hp, alive: u.alive,
+      look: u.look.kind, ...(u.look.kind === "anim" ? { sheet: u.look.sheet } : {}) })));
+    // Tests: which units drew as an animated sheet (id → sheet id).
+    parent.dataset.animUnits = JSON.stringify(Object.fromEntries(actors.filter((a) => a.anim).map((a) => [a.id, a.anim!.sheet.id])));
     parent.dataset.phase = state.phase;
     parent.dataset.activeUnit = state.activeId ?? "";
   }
@@ -1187,7 +1234,7 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
       let best: Actor | null = null;
       for (const actor of actors) {
         if (actor.dead || actor.fledAt >= 0) continue;
-        const half = TW * 0.32 * actor.s;
+        const half = Math.max(TW * 0.32, actor.anim ? actor.dispW * 0.3 : 0) * actor.s;
         if (p.x < actor.x - half || p.x > actor.x + half || p.y > actor.y || p.y < actor.y - actor.head * actor.s) continue;
         if (!best || actor.v > best.v) best = actor;
       }
