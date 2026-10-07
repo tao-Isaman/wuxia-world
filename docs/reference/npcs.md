@@ -85,7 +85,7 @@
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
 | `village_noname_whip_qiao` | ยายเฉียว | 💬 ⚔ | 9 |
-| `village_noname_carter_lu` | ลู่เกวียน | 💬 ⚔ 🤏 | 6 |
+| `village_noname_carter_lu` | ลู่เกวียน | 💬 ⚔ 🤏 | 5 |
 | `village_noname_child_xiaowu` | เสี่ยวอู๋ | 💬 | 1 |
 
 ### หมู่บ้านดอกเหมย (`village_meihua`)
@@ -614,7 +614,7 @@
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `wld_desert_collector_mo` | โม่ฉิงเทียน (นักสะสมโบราณ) | 💬 | 9 |
+| `wld_desert_collector_mo` | โม่ฉิงเทียน (นักสะสมโบราณ) | 💬 | 10 |
 
 ## Not placed on the map
 
