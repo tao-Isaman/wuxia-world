@@ -13,7 +13,8 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 - **Foe pictures:** the encounter and briefing screens drew a sprite hashed from the opponent id; they now draw the battle look (`foeLook`, `components/game/foe-portrait.tsx`), beasts included, and the map's roaming foes use the same look. The turn bar's creature cells use the real 4 × 3 atlas.
 - **สำนัก badge** counts only what the sect window offers (not the secret T4 trials, not inactive memberships).
 - **Dialog quest spots** spend their hours again (the Heilong dives, the river watch) before the dialog opens.
-- **Godslayer chapter 17** is offered at the ruins by โม่ฉิงเทียน, where it happens.
+- **Godslayer chapter 17** is offered at the ruins by โม่ฉิงเทียน, where it happens; sunflower 20 / 30, nine_yin 27 and six_meridian 10 likewise, and recurring saga people (ทหารแก่เฉิน, นักยุทธศาสตร์กง, หวงชิงเฉวียน and a dozen more) keep one history across the sagas.
+- **Chains never go cold.** A finished quest shows what it leads to in the log — next chapter or unlocked quest, who offers it, where they stand, what still blocks it (`chainNext`); 255 chapter hand-ins end with a "บทต่อไป: ไปพบ… ที่…" line. หัวใจอยู่ตรงไหน ch1 no longer sends the hero to ต้าหลี่ before ถังซือปี้ gives ch2.
 
 ### Names that match, sagas read to the end, quests that work
 

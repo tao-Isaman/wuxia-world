@@ -20,6 +20,7 @@ import { toast } from "@/store/toast-store";
 import { confirmDialog } from "@/store/confirm-store";
 import { cn } from "@/lib/utils";
 import { SagaList } from "./saga-list";
+import { chainNext } from "@/lib/world/quest-chain";
 
 // Quest log. Tabbed list view:
 //   - กำลังทำ   (active)  — ongoing quests; player can cancel from here
@@ -391,6 +392,8 @@ function QuestRow({
             </li>
           </ul>
 
+          {status === "done" && <ChainNextBlock questId={questId} />}
+
           {status === "active" && (
             <div className="flex justify-end pt-1">
               <Button
@@ -406,6 +409,32 @@ function QuestRow({
         </div>
       )}
     </li>
+  );
+}
+
+/**
+ * Under a finished quest: what it leads to — the next chapter of a saga or the
+ * main story, or a quest it unlocks — with who offers it, where they stand and
+ * what still blocks it, so a chain can always be picked up again from the log.
+ */
+function ChainNextBlock({ questId }: { questId: string }) {
+  const state = useWorldStore();
+  const next = chainNext(state, questId).filter((n) => !n.taken);
+  if (!next.length) return null;
+  return (
+    <div className="space-y-1" data-testid="quest-chain-next">
+      {next.map((n) => (
+        <div key={n.quest.id} className="border border-jade/50 bg-jade/10 px-2 py-1 text-[11px]">
+          ➤ ต่อไป: <strong>{n.quest.name}</strong>
+          <br />
+          {n.fromSectWindow
+            ? <>รับได้ที่หน้าต่างสำนัก</>
+            : <>ไปหา <strong>{n.giverName ?? "—"}</strong>{n.locationName && <> ที่ <strong>{n.locationName}</strong>
+                <span className="text-muted-foreground">{n.legs === 0 ? " — อยู่ที่นี่" : n.legs != null ? ` — อีก ${n.legs} ช่วงทาง` : ""}</span></>}</>}
+          {n.gates.length > 0 && <><br /><span className="text-muted-foreground">ยังต้องการ: {n.gates.join(", ")}</span></>}
+        </div>
+      ))}
+    </div>
   );
 }
 

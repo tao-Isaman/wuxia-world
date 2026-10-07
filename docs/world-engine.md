@@ -208,6 +208,8 @@ Tracking:
 
 Coverage today: 650 of 657 quest stages point to a place (`bun scripts/test-quest-guide.ts`). The rest are the scene-driven tutorial quest and trait goals.
 
+**Chains** (`lib/world/quest-chain.ts`, `chainNext`). What a done quest leads to — a saga's or the main story's next chapter (`STORY_ARCS` order) or any quest whose `prereqs` need it done — with the giver (through `questHolder`), where they stand now and the nearest road distance, and the offer's unmet gates. The quest log shows it under every finished quest (`ChainNextBlock`) and the ตำนาน tab under each saga; a compiled chapter's hand-in also ends with "บทต่อไป: ไปพบ… ที่…" when the next chapter has a different giver its lines don't already name (`compileArc`). `test:story` checks every chapter has a next giver on a map.
+
 ## Random encounters
 
 Nothing rolls on arrival. While the hero walks on a location or route map, the world runtime calls `worldStore.walkTick(pickSpot)` every 220 map units (`WALK_TICK_UNITS`). `pickSpot` is the runtime's `pickFoeSpot`: a free spot 150–320 units from the hero that the hero can reach, away from markers and other foes (map percentages), or null.

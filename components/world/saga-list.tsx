@@ -4,6 +4,7 @@ import { useState } from "react";
 import { getArt, getSkill } from "@/lib/game";
 import { MYSTERY_MOVE_LABEL, describeQuestCondition, getNpc, getQuest } from "@/lib/world";
 import { STORY_ARCS, getCutscene } from "@/lib/world/story/registry";
+import { chainNext } from "@/lib/world/quest-chain";
 import type { StoryArcInfo } from "@/lib/world/story/types";
 import { useWorldStore } from "@/store/world-store";
 import { cn } from "@/lib/utils";
@@ -60,12 +61,17 @@ export function SagaList() {
                       </li>;
                     })}
                   </ol>
-                  {nextDef && !nextState && (
-                    <p className="text-muted-foreground">
-                      บทต่อไปรับได้จาก <b>{getNpc(nextDef.giverNpcId)?.name ?? "—"}</b>
-                      {gates.length > 0 && <> · ต้องการ {gates.map((g) => g.label).join(", ")}</>}
-                    </p>
-                  )}
+                  {nextDef && !nextState && (() => {
+                    const before = arc.questIds[arc.questIds.indexOf(nextDef.id) - 1];
+                    const where = before ? chainNext(state, before).find((n) => n.quest.id === nextDef.id) : null;
+                    return (
+                      <p className="text-muted-foreground" data-testid="saga-next">
+                        บทต่อไปรับได้จาก <b>{where?.giverName ?? getNpc(nextDef.giverNpcId)?.name ?? "—"}</b>
+                        {where?.locationName && <> ที่ <b>{where.locationName}</b>{where.legs === 0 ? " (อยู่ที่นี่)" : where.legs != null ? ` (อีก ${where.legs} ช่วงทาง)` : ""}</>}
+                        {gates.length > 0 && <> · ต้องการ {gates.map((g) => g.label).join(", ")}</>}
+                      </p>
+                    );
+                  })()}
                   {seen.length > 0 && <div className="flex flex-wrap gap-1.5">
                     {seen.map((id) => (
                       <button key={id} type="button" className="rounded-full border border-border px-2 py-0.5 hover:bg-muted/40"

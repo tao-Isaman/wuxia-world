@@ -5,6 +5,7 @@ import { SKILLS_BY_ID } from "@/lib/game/data/skills";
 import type { StatKey } from "@/lib/game";
 import type { Condition, DialogScene, QuestDef } from "../types";
 import { NPCS } from "../data/npcs";
+import { WORLD_MAP_SCENES } from "../data/world-map";
 import { getItem } from "../data/items";
 import { OPPONENTS_BY_ID } from "../data/opponents";
 import { SECT_MEMBERSHIPS } from "../data/sect-memberships";
@@ -21,9 +22,12 @@ function strongestStat(st: Partial<Record<StatKey, number>> | undefined): StatKe
   return best;
 }
 
+const PLACE_NAMES = new Map(WORLD_MAP_SCENES.flatMap((s) => (s.kind === "location" ? [[s.id, s.name] as const] : [])));
+
 export const STORY_RESOLVERS: StoryResolvers = {
   npcName: (id) => NPC_BY_ID.get(id)?.name ?? id,
   npcHome: (id) => NPC_BY_ID.get(id)?.locationIds[0] ?? id,
+  placeName: (id) => PLACE_NAMES.get(id) ?? id,
   npcSpar: (id) => NPC_BY_ID.get(id)?.sparOpponentId,
   opponentName: (id) => OPPONENTS_BY_ID.get(id)?.name ?? id,
   itemName: (id) => getItem(id)?.name ?? id,

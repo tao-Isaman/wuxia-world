@@ -13,6 +13,7 @@ import { LINEAGE_SPECS, MAIN_ARC, SAGA_PROLOGUES, STORY_ARC_SPECS } from "../lib
 import { isQuestOfferable, isSecretSectQuest, sectActionCount } from "../lib/world/effects";
 import { getQuestsForSect } from "../lib/world/data/quests";
 import { CUTSCENES, STORY_ARCS, STORY_QUESTS, STORY_RESOLVERS } from "../lib/world/story/registry";
+import { chainNext } from "../lib/world/quest-chain";
 import { DECLINE_TEXT, lineageQuestId, storyQuestId, LINEAGE_TIERS } from "../lib/world/story/compile";
 import type { CutsceneSpec, StoryBeat, StoryLine, StoryStep } from "../lib/world/story/types";
 import { getNpc, getOpponent, getItem, getScene, getQuest, SHOPS, RESOURCES, RECIPES, OPPONENTS, QUESTS, SCENES, ITEMS, SECT_HALLS, SCROLL_PREFIX, scrollItemId } from "../lib/world/data";
@@ -484,6 +485,21 @@ check("secret trials: the T4 saga trials are off the sect window and offered by 
     if (sectActionCount(busy) !== 0) err(`trial ${qid}: the sect badge counts something the window doesn't offer`);
   }
   for (const q of QUESTS) if (q.sectId && !isSecretSectQuest(q.id) && isQuestOfferable(store(), { ...q, prereqs: undefined })) err(`sect quest ${q.id} offered by an NPC`);
+});
+
+check("chains never go cold: after each chapter the log names the next giver and where they stand", () => {
+  const base = store();
+  for (const arc of STORY_ARCS) arc.questIds.forEach((qid, i) => {
+    const nextId = arc.questIds[i + 1];
+    if (!nextId) return;
+    const state = { ...base, quests: { [qid]: { id: qid, status: "done", stage: 0 } } } as unknown as WorldStateData;
+    const next = chainNext(state, qid).find((n) => n.quest.id === nextId);
+    if (!next) { err(`${qid}: the log doesn't know chapter ${nextId} follows`); return; }
+    if (!next.giverName || !next.locationName) err(`${nextId}: no giver / place to show after ${qid}`);
+  });
+  // The สกุลถัง case: chapter 1 of หัวใจอยู่ตรงไหน hands over to ถังซือปี้ at the sect, not ต้าหลี่.
+  const tang = chainNext({ ...base, quests: { st_tang_heart_pierce_01: { id: "st_tang_heart_pierce_01", status: "done", stage: 0 } } } as unknown as WorldStateData, "st_tang_heart_pierce_01")[0];
+  if (tang?.locationId !== "sect_tang") err(`tang heart ch2 should be taken at sect_tang, got ${tang?.locationId}`);
 });
 
 check("mystery: no quest that teaches a move names it or its tier in its name, summary or description", () => {
