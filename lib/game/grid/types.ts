@@ -70,8 +70,7 @@ export type AreaShape =
  */
 export type UnitLook =
   | { kind: "character"; characterId: string; still?: string; tint?: number; size?: number }   // atlas (+ optional unique still sprite)
-  | { kind: "creature"; frame: number; tint?: number; size?: number }                         // /art/creature-atlas.png frame
-  | { kind: "anim"; sheet: string; tint?: number; size?: number };                           // lib/characters/anim-sheets.ts (bosses, T5)
+  | { kind: "creature"; frame: number; tint?: number; size?: number };                        // /art/creature-atlas.png frame
 
 export interface UnitSpec {
   id: string;

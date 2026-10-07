@@ -35,10 +35,7 @@ export interface WorldFoe extends Point {
   id: string;
   name: string;
   look: { kind: "character"; characterId: string; tint?: number; size?: number }
-    | { kind: "creature"; frame: number; tint?: number; size?: number }
-    | { kind: "anim"; sheet: string; tint?: number; size?: number };
-  /** A legendary beast in its lair: drawn large, never wanders, a name plate over it. */
-  boss?: boolean;
+    | { kind: "creature"; frame: number; tint?: number; size?: number };
   onEngage: () => void;
 }
 
