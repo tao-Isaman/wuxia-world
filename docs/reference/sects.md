@@ -42,19 +42,19 @@ Martial line — every skill and art is taught only by its lineage quest or saga
 | Rank | Kind | Skill / art | Quest |
 | --- | --- | --- | --- |
 | — | skill | หมัดเส้าหลิน (`sf`) | `ql_skill_sf` |
-| — | skill | หมัดยาวพุทธธรรม (`sl_long_dharma`) | `ql_skill_sl_long_dharma` |
+| — | skill | หมัดยาวพุทธธรรม (`sl_long_dharma`) | `ql_skill_sf` |
 | — | art | ลมปราณอรหันต์ (`t0_lohan`) | `ql_art_t0_lohan` |
 | 7 | skill | หมัดอรหันต์ (`nd5`) | `ql_skill_nd5` |
-| 7 | skill | ไม้พลองพุทธธรรม (`sl_staff_dharma`) | `ql_skill_sl_staff_dharma` |
-| 7 | skill | ไม้พลองเส้าหลิน (`sl_staff_shaolin`) | `ql_skill_sl_staff_shaolin` |
+| 7 | skill | ไม้พลองพุทธธรรม (`sl_staff_dharma`) | `ql_skill_nd5` |
+| 7 | skill | ไม้พลองเส้าหลิน (`sl_staff_shaolin`) | `ql_skill_nd5` |
 | 7 | art | กระดิ่งทองพื้นฐาน (`t1_goldenbell`) | `ql_art_t1_goldenbell` |
 | 5 | skill | วิชากรงเล็บมังกร (`ne1`) | `ql_skill_ne1` |
-| 5 | skill | ดาบอรหันต์เส้าหลิน (`ne2`) | `ql_skill_ne2` |
-| 5 | skill | กระบี่วิธีเซน (`sl_zen_sword`) | `ql_skill_sl_zen_sword` |
+| 5 | skill | ดาบอรหันต์เส้าหลิน (`ne2`) | `ql_skill_ne1` |
+| 5 | skill | กระบี่วิธีเซน (`sl_zen_sword`) | `ql_skill_ne1` |
 | 5 | art | ลมปราณพุทธธรรม (`t2_dharma`) | `ql_art_t2_dharma` |
 | 3 | skill | ฝ่ามือโพธิสัตว์ (`sl_bodhi_palm`) | `ql_skill_sl_bodhi_palm` |
-| 3 | skill | ดัชนีเด็ดบุปผา (`sl_petal_finger`) | `ql_skill_sl_petal_finger` |
-| 3 | skill | หมัดทลายผา (`sl_rock_punch`) | `ql_skill_sl_rock_punch` |
+| 3 | skill | ดัชนีเด็ดบุปผา (`sl_petal_finger`) | `ql_skill_sl_bodhi_palm` |
+| 3 | skill | หมัดทลายผา (`sl_rock_punch`) | `ql_skill_sl_bodhi_palm` |
 | 3 | art | เอกนิ้วเซน (`t3_onefinger`) | `ql_art_t3_onefinger` |
 | 3 | skill | อรหันต์พันกร (`sl_thousand_arms`) | saga `shaolin_thousand_arms` |
 | 3 | skill | ไม้เท้าสัจธรรม (`sl_truth_staff`) | saga `shaolin_truth_staff` |
@@ -79,14 +79,14 @@ Martial line — every skill and art is taught only by its lineage quest or saga
 | — | skill | ไทจี้เจี้ยน (`tj`) | `ql_skill_tj` |
 | — | art | สมาธิพื้นฐาน (`t0_meditation`) | `ql_art_t0_meditation` |
 | 7 | skill | สะท้อนพลัง (`rf`) | `ql_skill_rf` |
-| 7 | skill | ก้าวเมฆหมอก (`cs`) | `ql_skill_cs` |
-| 7 | skill | กระบี่ไทเก๊ก (`wd_taiji_sword`) | `ql_skill_wd_taiji_sword` |
+| 7 | skill | ก้าวเมฆหมอก (`cs`) | `ql_skill_rf` |
+| 7 | skill | กระบี่ไทเก๊ก (`wd_taiji_sword`) | `ql_skill_rf` |
 | 7 | art | พลังธรรมชาติ (`t1_naturalqi`) | `ql_art_t1_naturalqi` |
 | 5 | skill | หยิน-หยางฝ่า (`yy`) | `ql_skill_yy` |
-| 5 | skill | กระบี่หยินหยาง (`wd_yinyang_sword`) | `ql_skill_wd_yinyang_sword` |
+| 5 | skill | กระบี่หยินหยาง (`wd_yinyang_sword`) | `ql_skill_yy` |
 | 5 | art | จิตกายนวมเป็นหนึ่ง (`t2_mindbody`) | `ql_art_t2_mindbody` |
 | 3 | skill | หมัดเคลื่อนเมฆา (`wd_cloud_palm`) | `ql_skill_wd_cloud_palm` |
-| 3 | skill | กระบี่เคลื่อนเมฆา (`wd_cloud_sword`) | `ql_skill_wd_cloud_sword` |
+| 3 | skill | กระบี่เคลื่อนเมฆา (`wd_cloud_sword`) | `ql_skill_wd_cloud_palm` |
 | 3 | art | หยินหยางสมดุล (`t3_yinyang`) | `ql_art_t3_yinyang` |
 | 3 | skill | เพลงหมัดไทเก๊ก (`wd_taiji_fist`) | saga `wudang_taiji_fist` |
 | 3 | skill | กระบี่เหนือฟ้า (`wd_heaven_sword`) | saga `wudang_heaven_sword` |
@@ -227,12 +227,12 @@ Martial line — every skill and art is taught only by its lineage quest or saga
 | 4 | skill | กระบี่ร้อนชวนจิน (`qz_hot_sword`) | `ql_skill_qz_hot_sword` |
 | 4 | art | ท่วงท่าถอยม้า (`t1_qz_horse`) | `ql_art_t1_qz_horse` |
 | 3 | skill | กระบี่ชวนจินก่า (`qzjf`) | `ql_skill_qzjf` |
-| 3 | skill | หมัดชวนจินก่า (`qz_punch`) | `ql_skill_qz_punch` |
+| 3 | skill | หมัดชวนจินก่า (`qz_punch`) | `ql_skill_qzjf` |
 | 3 | art | ลมปราณชวนจินก่า (`qzzq`) | `ql_art_qzzq` |
 | 2 | skill | หมัดสุริยัน (`qz_sun_fist`) | `ql_skill_qz_sun_fist` |
-| 2 | skill | กระบี่สะกดสุริยันต์ (`qz_sun_sword`) | `ql_skill_qz_sun_sword` |
+| 2 | skill | กระบี่สะกดสุริยันต์ (`qz_sun_sword`) | `ql_skill_qz_sun_fist` |
 | 2 | art | หนึ่งพลังสุริยันต์ (`t3_qz_sun`) | `ql_art_t3_qz_sun` |
-| 2 | art | หยังทะเลพิฆาตมังกร (`t3_qz_dragon`) | `ql_art_t3_qz_dragon` |
+| 2 | art | หยังทะเลพิฆาตมังกร (`t3_qz_dragon`) | `ql_art_t3_qz_sun` |
 
 ## ง้อไบ๊ (`emei`)
 
@@ -253,14 +253,14 @@ Martial line — every skill and art is taught only by its lineage quest or saga
 | 7 | skill | กระบี่ดอกบุปผา (`em_blossom_sword`) | `ql_skill_em_blossom_sword` |
 | 7 | art | บัวบานภายใน (`t1_em_lotus`) | `ql_art_t1_em_lotus` |
 | 5 | skill | กระบี่รักษาใจ (`em_heart_sword`) | `ql_skill_em_heart_sword` |
-| 5 | skill | ฝ่ามือรักษาใจ (`em_heart_palm`) | `ql_skill_em_heart_palm` |
-| 5 | skill | ฝ่ามือดอกบัวบาน (`em_lotus_palm`) | `ql_skill_em_lotus_palm` |
+| 5 | skill | ฝ่ามือรักษาใจ (`em_heart_palm`) | `ql_skill_em_heart_sword` |
+| 5 | skill | ฝ่ามือดอกบัวบาน (`em_lotus_palm`) | `ql_skill_em_heart_sword` |
 | 5 | art | บุปผาร้อยมาลัย (`t2_em_garland`) | `ql_art_t2_em_garland` |
 | 3 | skill | กระบี่วิธีพุทธ (`em_buddha_sword`) | `ql_skill_em_buddha_sword` |
+| 3 | skill | กระบี่ดอกเหมย (`em_plum_sword`) | `ql_skill_em_buddha_sword` |
 | 3 | art | พลังกายาพริ้วไหว (`t3_em_grace`) | `ql_art_t3_em_grace` |
-| 3 | skill | กระบี่ดอกเหมย (`em_plum_sword`) | `ql_skill_em_plum_sword` |
-| 3 | art | ลมหายใจน้ำแข็ง (`t3_em_ice`) | `ql_art_t3_em_ice` |
-| 3 | art | พลังรักษาใจ (`t3_em_heart`) | `ql_art_t3_em_heart` |
+| 3 | art | ลมหายใจน้ำแข็ง (`t3_em_ice`) | `ql_art_t3_em_grace` |
+| 3 | art | พลังรักษาใจ (`t3_em_heart`) | `ql_art_t3_em_grace` |
 | 3 | skill | ฝ่ามือโพธิสัตว์ง้อไบ๊ (`em_bodhi_palm`) | saga `emei_bodhi_palm` |
 | 3 | skill | กระบี่พิทักษ์โพธิสัตว์ (`em_bodhi_sword`) | saga `emei_bodhi_sword` |
 | 2 | art | ง้อไบ๊เซินกง (`emei`) | saga `emei_founding` |
@@ -281,7 +281,7 @@ Martial line — every skill and art is taught only by its lineage quest or saga
 | Rank | Kind | Skill / art | Quest |
 | --- | --- | --- | --- |
 | 2 | skill | กระบี่สุสานโบราณ (`gm_sword`) | `ql_skill_gm_sword` |
-| 2 | skill | เพลงกระบี่สุรางคนางค์ใจพิสุทธิ์ (`ynss`) | `ql_skill_ynss` |
+| 2 | skill | เพลงกระบี่สุรางคนางค์ใจพิสุทธิ์ (`ynss`) | `ql_skill_gm_sword` |
 | 2 | art | คัมภีร์สาวหยก (`ynxj`) | `ql_art_ynxj` |
 | 3 | skill | ฝ่ามือกำสรดวิญญาณสลาย (`ansh`) | saga `gumu_sixteen_years` |
 | 2 | art | วิชาก้าวย่างเหมันต์ (`t4_gm_winterstep`) | saga `gumu_snow_footprints` |
@@ -302,16 +302,16 @@ Martial line — every skill and art is taught only by its lineage quest or saga
 | Rank | Kind | Skill / art | Quest |
 | --- | --- | --- | --- |
 | — | skill | ประกาศิตพรรคยาจก (`nc1`) | `ql_skill_nc1` |
-| — | skill | ไม้เท้าขอทาน (`nc2`) | `ql_skill_nc2` |
+| — | skill | ไม้เท้าขอทาน (`nc2`) | `ql_skill_nc1` |
 | — | art | วิชาเอาชีวิตรอดพื้นฐาน (`t0_bg_survival`) | `ql_art_t0_bg_survival` |
 | 7 | skill | เพลงหมัดอสรพิษคนจร (`bg_snake_fist`) | `ql_skill_bg_snake_fist` |
-| 7 | skill | ไม้เท้าอสรพิษคนจร (`bg_snake_staff`) | `ql_skill_bg_snake_staff` |
+| 7 | skill | ไม้เท้าอสรพิษคนจร (`bg_snake_staff`) | `ql_skill_bg_snake_fist` |
 | 7 | art | พลังคล้อยตะวัน (`t1_bg_sunshadow`) | `ql_art_t1_bg_sunshadow` |
 | 5 | skill | ไม้เท้าล่องลอย (`bg_drift_staff`) | `ql_skill_bg_drift_staff` |
-| 5 | skill | เพลงหมัดล่องลอย (`bg_drift_fist`) | `ql_skill_bg_drift_fist` |
+| 5 | skill | เพลงหมัดล่องลอย (`bg_drift_fist`) | `ql_skill_bg_drift_staff` |
 | 5 | art | วิชาเก้าไร้เงา (`t2_bg_nineshadow`) | `ql_art_t2_bg_nineshadow` |
 | 3 | skill | ไม้เท้าพเนจร (`bg_wander_staff`) | `ql_skill_bg_wander_staff` |
-| 3 | skill | ฝ่ามือจับมังกร (`ng3`) | `ql_skill_ng3` |
+| 3 | skill | ฝ่ามือจับมังกร (`ng3`) | `ql_skill_bg_wander_staff` |
 | 3 | art | พลังฟื้นตะวัน (`t3_bg_sunrenew`) | `ql_art_t3_bg_sunrenew` |
 | 3 | skill | 18 ฝ่ามือพิชิตมังกร (`ep`) | saga `beggars_dragon_palms` |
 | 3 | skill | เพลงไม้เท้าตีสุนัข (`bg_lucky_staff`) | saga `beggars_lucky_staff` |
@@ -337,13 +337,13 @@ Martial line — every skill and art is taught only by its lineage quest or saga
 | 7 | skill | ดาบราชสำนัก (`jy_blade`) | `ql_skill_jy_blade` |
 | 7 | art | ฝีก้าวเส้นไหม (`jy_a1_silktread`) | `ql_art_jy_a1_silktread` |
 | 5 | skill | กรงเล็บอินทรี (`jy_eagleclaw`) | `ql_skill_jy_eagleclaw` |
-| 5 | skill | กรงเล็บคว้าจับ (`jy_grapple`) | `ql_skill_jy_grapple` |
+| 5 | skill | กรงเล็บคว้าจับ (`jy_grapple`) | `ql_skill_jy_eagleclaw` |
 | 5 | art | เกราะทองอนุรักษ์ (`jy_a2_goldarmor`) | `ql_art_jy_a2_goldarmor` |
 | 3 | skill | กระบี่จารบุรุษ (`jy_sword`) | `ql_skill_jy_sword` |
-| 3 | skill | โซ่ทองเก้ามังกร (`jy_chainmaster`) | `ql_skill_jy_chainmaster` |
-| 3 | skill | ดาบเจ้าพระยา (`jy_blade_king`) | `ql_skill_jy_blade_king` |
+| 3 | skill | โซ่ทองเก้ามังกร (`jy_chainmaster`) | `ql_skill_jy_sword` |
+| 3 | skill | ดาบเจ้าพระยา (`jy_blade_king`) | `ql_skill_jy_sword` |
 | 3 | art | ฟ้าผ่าก้าวเดิน (`jy_a3_thunderstride`) | `ql_art_jy_a3_thunderstride` |
-| 3 | art | เงาสังหาร (`t3_jy_shadow`) | `ql_art_t3_jy_shadow` |
+| 3 | art | เงาสังหาร (`t3_jy_shadow`) | `ql_art_jy_a3_thunderstride` |
 | 3 | skill | กระบี่สำเร็จโทษ (`jy_execution_sword`) | saga `jinyiwei_execution_sword` |
 | 3 | skill | ดาบประหารชีพ (`jy_execution_blade`) | saga `jinyiwei_execution_blade` |
 | 2 | skill | โซ่ล่าสังหาร (`jy_chain_assassin`) | saga `jinyiwei_chain_assassin` |
@@ -366,13 +366,13 @@ Martial line — every skill and art is taught only by its lineage quest or saga
 | --- | --- | --- | --- |
 | — | art | พลังสองขั้ว (`t0_sm_dual`) | `ql_art_t0_sm_dual` |
 | 7 | art | พลังเพลิงตะวัน (`t1_sm_sunfire`) | `ql_art_t1_sm_sunfire` |
-| 7 | art | พลังร้อยจันทรา (`t1_sm_moonweave`) | `ql_art_t1_sm_moonweave` |
+| 7 | art | พลังร้อยจันทรา (`t1_sm_moonweave`) | `ql_art_t1_sm_sunfire` |
 | 5 | art | พลังกายสุริยัน (`t2_sm_sunbody`) | `ql_art_t2_sm_sunbody` |
-| 5 | art | พลังกายจันทรา (`t2_sm_moonbody`) | `ql_art_t2_sm_moonbody` |
+| 5 | art | พลังกายจันทรา (`t2_sm_moonbody`) | `ql_art_t2_sm_sunbody` |
 | 3 | skill | ฝ่ามือเพลิง (`mi_firepalm`) | `ql_skill_mi_firepalm` |
 | 3 | art | พลังสองขั้วผสาน (`t3_sm_dualfusion`) | `ql_art_t3_sm_dualfusion` |
-| 3 | art | พลังสุริยันจันทรา (`t3_sm_sunmoon`) | `ql_art_t3_sm_sunmoon` |
-| 3 | art | คัมภีร์ทานตะวัน (ฉบับย่อ) (`t3_sm_sunscript`) | `ql_art_t3_sm_sunscript` |
+| 3 | art | พลังสุริยันจันทรา (`t3_sm_sunmoon`) | `ql_art_t3_sm_dualfusion` |
+| 3 | art | คัมภีร์ทานตะวัน (ฉบับย่อ) (`t3_sm_sunscript`) | `ql_art_t3_sm_dualfusion` |
 | 3 | art | เฉียนคุนต้าหนัวอี (`qiankun`) | saga `sunmoon_qiankun_tunnel` |
 | 2 | art | ดาวเคลื่อนดาราคล้อย (`yxhd`) | saga `sunmoon_holy_fire_tokens` |
 
@@ -397,10 +397,10 @@ Martial line — every skill and art is taught only by its lineage quest or saga
 | 5 | skill | ดารากระจายฟ้า (`tang_starscatter`) | `ql_skill_tang_starscatter` |
 | 5 | art | ท่าร่างคลื่นลม (`t2_tang_wavewind`) | `ql_art_t2_tang_wavewind` |
 | 3 | skill | ดาวตกแหวกฟ้า (`tang_meteorpierce`) | `ql_skill_tang_meteorpierce` |
-| 3 | skill | มีดสั้นร้อยอสรพิษ (`tang_viperblade`) | `ql_skill_tang_viperblade` |
-| 3 | skill | มีดสั้นงูทอง (`tang_goldsnake`) | `ql_skill_tang_goldsnake` |
+| 3 | skill | มีดสั้นร้อยอสรพิษ (`tang_viperblade`) | `ql_skill_tang_meteorpierce` |
+| 3 | skill | มีดสั้นงูทอง (`tang_goldsnake`) | `ql_skill_tang_meteorpierce` |
 | 3 | art | พลังอสรพิษ (`t3_tang_viperpower`) | `ql_art_t3_tang_viperpower` |
-| 3 | art | ท่าเท้าไล่ล่า (`t3_tang_chase`) | `ql_art_t3_tang_chase` |
+| 3 | art | ท่าเท้าไล่ล่า (`t3_tang_chase`) | `ql_art_t3_tang_viperpower` |
 | 3 | skill | ดาราพิรุณโปรย (`tang_starrain`) | saga `tang_star_rain` |
 | 3 | skill | มีดสั้นทะลวงใจ (`tang_heartpierce`) | saga `tang_heart_pierce` |
 | 2 | art | พลังถังหมื่นพิษ (`t4_tang_tenkpoisons`) | saga `tang_ten_thousand_poisons` |
@@ -425,13 +425,13 @@ Martial line — every skill and art is taught only by its lineage quest or saga
 | 7 | skill | กระบี่ไร้วิถี (`xy_pathless_sword`) | `ql_skill_xy_pathless_sword` |
 | 7 | art | พลังไร้ลักษณ์น้อย (`t1_xy_formless_lesser`) | `ql_art_t1_xy_formless_lesser` |
 | 5 | skill | หมัดอสูรน้อย (`xy_lesserdemon_fist`) | `ql_skill_xy_lesserdemon_fist` |
-| 5 | skill | กระบี่ลมอสูร (`xy_demon_wind_sword`) | `ql_skill_xy_demon_wind_sword` |
-| 5 | skill | หมัดรากพิษ (`xy_root_poison_fist`) | `ql_skill_xy_root_poison_fist` |
+| 5 | skill | กระบี่ลมอสูร (`xy_demon_wind_sword`) | `ql_skill_xy_lesserdemon_fist` |
+| 5 | skill | หมัดรากพิษ (`xy_root_poison_fist`) | `ql_skill_xy_lesserdemon_fist` |
 | 5 | art | พลังไร้ลักษณ์ใหญ่ (`t2_xy_formless_greater`) | `ql_art_t2_xy_formless_greater` |
 | 3 | skill | เพลงหมัดสราญรมย์ (`xy_punch`) | `ql_skill_xy_punch` |
-| 3 | skill | กระบี่ขลุ่ยหยก (`yxjf`) | `ql_skill_yxjf` |
+| 3 | skill | กระบี่ขลุ่ยหยก (`yxjf`) | `ql_skill_xy_punch` |
 | 3 | art | ลมปราณรากพิษ (`t3_xy_root_poison_qi`) | `ql_art_t3_xy_root_poison_qi` |
-| 3 | art | วิชาดูพลัง (`t3_xy_seepower`) | `ql_art_t3_xy_seepower` |
-| 3 | art | ลมปราณภูติอุดร (`bmzq`) | `ql_art_bmzq` |
+| 3 | art | วิชาดูพลัง (`t3_xy_seepower`) | `ql_art_t3_xy_root_poison_qi` |
+| 3 | art | ลมปราณภูติอุดร (`bmzq`) | `ql_art_t3_xy_root_poison_qi` |
 | 3 | skill | ฝ่ามือสราญรมย์ (`xy_palm`) | saga `xiaoyao_mute_envoy` |
 | 2 | art | มหาเวทดูดดาว (`bmsg`) | saga `xiaoyao_northern_sea` |

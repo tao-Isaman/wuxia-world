@@ -19,7 +19,7 @@ export interface StoryResolvers {
   opponentName(id: string): string;
   itemName(id: string): string;
   /** Tier, Thai name, sect label and strongest stat of a skill or art. */
-  martial(kind: "skill" | "art", id: string): { ti: number; name: string; sc: string; stat: StatKey } | null;
+  martial(kind: "skill" | "art", id: string): { ti: number; name: string; sc: string; stat: StatKey; family?: string } | null;
   /** The joinable sect with this label, with its rank ladder. */
   sectByLabel(sc: string): { id: SectId; startRank: number; topRank: number } | null;
 }
@@ -188,7 +188,12 @@ const OUTSIDER_GATES: Record<string, (tier: number) => Condition | null> = {
 
 export function lineageQuestId(spec: Pick<LineageSpec, "kind" | "id">): string { return `ql_${spec.kind}_${spec.id}`; }
 
-export function compileLineage(spec: LineageSpec, r: StoryResolvers, seq = 1): CompiledStory {
+/**
+ * One lineage quest. With `options` (the moves of one sect tier and kind), the
+ * hand-in lets the hero pick ONE of them — a path, e.g. สายมีดสั้น or สายอาวุธลับ
+ * — and the others close for good; `spec` (the first) gives teacher and trial.
+ */
+export function compileLineage(spec: LineageSpec, r: StoryResolvers, seq = 1, options: readonly string[] = [spec.id]): CompiledStory {
   const out: CompiledStory = { quests: [], scenes: [], cutscenes: [] };
   const info = r.martial(spec.kind, spec.id);
   if (!info) throw new Error(`lineage: unknown ${spec.kind} ${spec.id}`);
@@ -196,8 +201,10 @@ export function compileLineage(spec: LineageSpec, r: StoryResolvers, seq = 1): C
   const tier = LINEAGE_TIERS[info.ti];
   const qid = lineageQuestId(spec);
   const home = r.npcHome(spec.giver);
-  const learned: Condition = spec.kind === "skill" ? { t: "learnedSkill", skillId: spec.id } : { t: "learnedArt", artId: spec.id };
-  const gates: Condition[] = [{ t: "not", of: learned }, notHolding(spec.kind, spec.id)];
+  const learnedOf = (id: string): Condition => spec.kind === "skill" ? { t: "learnedSkill", skillId: id } : { t: "learnedArt", artId: id };
+  // Chosen once: any option already learned (or its scroll carried) closes the quest.
+  const gates: Condition[] = options.flatMap((id) => [{ t: "not" as const, of: learnedOf(id) }, notHolding(spec.kind, id)]);
+  const choice = options.length > 1;
   const sect = r.sectByLabel(info.sc);
   if (sect) {
     gates.push({ t: "sectMember", sectId: sect.id }, { t: "sectStatus", sectId: sect.id, status: "active" });
@@ -221,7 +228,8 @@ export function compileLineage(spec: LineageSpec, r: StoryResolvers, seq = 1): C
   stages.push({ id: "return", description: `กลับไปหา${r.npcName(spec.giver)}เพื่อรับคัมภีร์` });
 
   const rewards: QuestReward[] = [
-    spec.kind === "skill" ? { t: "learnSkill", skillId: spec.id } : { t: "learnArt", artId: spec.id, level: 1 },
+    // A choice hands its scroll over in the hand-in dialog instead.
+    ...(choice ? [] : [spec.kind === "skill" ? { t: "learnSkill" as const, skillId: spec.id } : { t: "learnArt" as const, artId: spec.id, level: 1 }]),
     { t: "wExp", amount: tier.wExp },
     { t: "npcRelationship", npcId: spec.giver, amount: 3 + info.ti * 2 },
   ];
@@ -236,16 +244,35 @@ export function compileLineage(spec: LineageSpec, r: StoryResolvers, seq = 1): C
     // The quest never names the move or its tier — only "วิชาลึกลับ"; the
     // scroll it hands over names it. `seq` tells one teacher's quests apart.
     name: spec.title ?? `สืบทอดวิชาลึกลับของ${r.npcName(spec.giver)}${seq > 1 ? ` · ม้วนที่ ${seq}` : ""}`,
-    description: `${r.npcName(spec.giver)}แห่ง${info.sc}จะถ่ายทอด${kindLabel}ลึกลับให้ เมื่อพิสูจน์ตนได้: ${tasks.join(" ")} — สำเร็จแล้วจะได้รับคัมภีร์ของวิชานั้น`,
+    description: choice
+      ? `${r.npcName(spec.giver)}แห่ง${info.sc}จะถ่ายทอด${kindLabel}ลึกลับให้ เมื่อพิสูจน์ตนได้: ${tasks.join(" ")} — สำเร็จแล้วให้เลือกได้ 1 จาก ${options.length} สาย และเลือกได้ครั้งเดียว`
+      : `${r.npcName(spec.giver)}แห่ง${info.sc}จะถ่ายทอด${kindLabel}ลึกลับให้ เมื่อพิสูจน์ตนได้: ${tasks.join(" ")} — สำเร็จแล้วจะได้รับคัมภีร์ของวิชานั้น`,
     briefSummary: `สืบทอด${kindLabel}ลึกลับ — ${r.npcName(spec.giver)}`,
     type: "side",
-    lineage: { kind: spec.kind, id: spec.id },
+    lineage: choice ? { kind: spec.kind, id: spec.id, options } : { kind: spec.kind, id: spec.id },
     giverNpcId: spec.giver,
     prereqs: { t: "and", all: gates },
     stages,
     rewards,
   });
   beatScenes(`qs_${qid}_offer`, { lines: spec.offer, go: "รับคำ" }, [{ t: "startQuest", questId: qid }], home, out, `cs_${qid}`, "วิชาลึกลับ", undefined, true);
-  beatScenes(`qs_${qid}_complete`, { lines: spec.complete, go: "คารวะอาจารย์" }, [{ t: "finishQuest", questId: qid, success: true }], home, out, `cs_${qid}_done`, info.name);
+  if (!choice) {
+    beatScenes(`qs_${qid}_complete`, { lines: spec.complete, go: "คารวะอาจารย์" }, [{ t: "finishQuest", questId: qid, success: true }], home, out, `cs_${qid}_done`, info.name);
+    return out;
+  }
+  // The pick: one choice per path; each hands over its scroll and closes the quest.
+  out.scenes.push({
+    kind: "dialog",
+    id: `qs_${qid}_complete`,
+    lines: [...toSceneLines(spec.complete), { t: "narration", text: `${r.npcName(spec.giver)}วางคัมภีร์ ${options.length} ม้วนลงตรงหน้า — เลือกได้เพียงสายเดียว` }],
+    choices: options.map((id) => {
+      const m = r.martial(spec.kind, id);
+      return {
+        text: spec.kind === "skill" ? `เลือกสาย${m?.family ?? ""} — ${m?.name ?? id}` : `เลือก${m?.name ?? id}`,
+        next: home,
+        effects: [{ t: "giveItem", itemId: scrollItemId(spec.kind, id), count: 1 }, { t: "finishQuest", questId: qid, success: true }],
+      };
+    }),
+  });
   return out;
 }

@@ -250,7 +250,7 @@ Walk up to a person and talk. The NPC card offers what that person supports:
 
 ## Quests and tracking
 
-There are 1,115 quests: the 15-chapter main story (เนื้อเรื่องหลัก, [story-writing.md](story-writing.md#the-main-story)), one older main quest, 526 side quests (97 sect quests, 154 lineage quests and 97 place quests) and 573 story chapters in 48 sagas (38 sect sagas, 10 [jianghu sagas](story-quests.md#jianghu-sagas)) — see [Lineage quests and sagas](#lineage-quests-and-sagas).
+There are 1,074 quests: the 15-chapter main story (เนื้อเรื่องหลัก, [story-writing.md](story-writing.md#the-main-story)), one older main quest, 485 side quests (97 sect quests, 113 lineage quests and 97 place quests) and 573 story chapters in 48 sagas (38 sect sagas, 10 [jianghu sagas](story-quests.md#jianghu-sagas)) — see [Lineage quests and sagas](#lineage-quests-and-sagas).
 
 - **Accepting.** Most quests are offered by a person (the **!** mark). Sect quests are taken in the สำนัก menu.
 - **Stages.** A quest has 1–4 stages. The quest log (ภารกิจ) shows each one with ✓ done, ▸ current and ○ still ahead.
@@ -278,7 +278,7 @@ There are 1,115 quests: the 15-chapter main story (เนื้อเรื่�
 Every sect skill and art can be earned from a sect NPC ([story-quests.md](story-quests.md)):
 
 - **The reward is a mystery, then a scroll.** No quest says which move it teaches or its tier — offers, the quest log and the sect window call it **📜 วิชาลึกลับ**. Finishing the quest puts the move's **คัมภีร์** in the bag (it names the move); read it (ใช้) to learn the move. Scrolls can't be sold, and the quest isn't offered again while its scroll is unread.
-- **Lineage quests** (สืบทอดวิชา, named after the teacher: สืบทอดวิชาลึกลับของ<teacher>) teach a tier 0–3 skill or art. The higher the tier, the harder:
+- **Lineage quests** (สืบทอดวิชา, named after the teacher: สืบทอดวิชาลึกลับของ<teacher>) teach a tier 0–3 skill or art — one quest for each sect tier's กระบวนท่า and one for its ลมปราณ. When a tier has more than one move (สกุลถัง: สายมีดสั้น or สายอาวุธลับ), the teacher lays all the scrolls down at the hand-in and you **pick one, once**; the others close for good. The sect window shows one row per quest ("เลือก 1 จาก N" until picked). The higher the tier, the harder:
 
   | Tier | Needs | Task | Rewards |
   | --- | --- | --- | --- |
@@ -289,6 +289,7 @@ Every sect skill and art can be earned from a sect NPC ([story-quests.md](story-
 
   The stat is the item's strongest, counted without gear. The three outsider sects, which can't be joined, ask for a way of life instead: evil for ดาวดึงส์ and ดาบโลหิต, the venom life skill for เบญจพิษ.
 - **Story sagas** (ตำนาน, 📜) lead to a tier-4 skill or art. Each is 8–10 chapters that retell a legend of มังกรหยก ภาค 3 — set over a hundred years later, with the old heroes in sepia flashbacks — and pay small rewards along the way; the last chapter teaches the technique.
+  - A sect's sagas open over its last three ranks, one after another: the first at rank 3, the last at rank 1 (two sagas: 3 and 2).
   - Chapter 1 needs a high rank and a stat of 40 (or a way of life for the outsiders); each later chapter opens when the previous one is done.
   - Seven sects' old art quests are now **prologue trials** (บททดสอบก่อนตำนาน) that must be passed before the saga starts. They are secret: not in the sect window — their giver offers them in person to an active member of high enough rank.
   - Chapters send you between places to visit, talk, hunt, gather and duel. A duel is never fatal; lose it and try again.

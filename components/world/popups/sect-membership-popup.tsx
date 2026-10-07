@@ -17,7 +17,7 @@ import {
   getQuest,
   rankUpGold,
 } from "@/lib/world";
-import { sectLineage, getStoryArc } from "@/lib/world/story/registry";
+import { sectLineageQuests } from "@/lib/world/story/registry";
 import type { SectId, QuestDef } from "@/lib/world";
 import { getSkill, getArt } from "@/lib/game";
 
@@ -301,7 +301,7 @@ function RewardsTab({ def, rank, atTop, nextRank, nextCost, canRankUp, worldStat
   const learnedArts = worldState.playerBuild?.learnedArtIds ?? [];
   // T4 moves come from sagas the sect window never lists; the rest show as
   // "วิชาลึกลับ" until learned.
-  const lineage = sectLineage(def.name).filter((e) => !e.arcId);
+  const lineage = sectLineageQuests(def.name);
   return (
     <>
       {/* ─── Rank-up ─────────────────────────────────────────────── */}
@@ -332,18 +332,18 @@ function RewardsTab({ def, rank, atTop, nextRank, nextCost, canRankUp, worldStat
         <strong>วิชาของสำนัก</strong>
         {lineage.length === 0 && <div className="text-xs text-muted-foreground">สำนักนี้ยังไม่มีวิชาให้สืบทอด</div>}
         {lineage.map((e) => {
-          const item = e.kind === "skill" ? getSkill(e.id) : getArt(e.id);
-          const learned = e.kind === "skill" ? learnedSkills.includes(e.id) : learnedArts.includes(e.id);
+          // A tier quest with several moves is one choice: the row names the one
+          // picked, or how many there are to pick from.
+          const options = e.options;
+          const learnedId = options.find((id) => (e.kind === "skill" ? learnedSkills : learnedArts).includes(id));
+          const item = learnedId ? (e.kind === "skill" ? getSkill(learnedId) : getArt(learnedId)) : null;
           const quest = getQuest(e.questId);
           const qs = worldState.quests[e.questId];
-          const arc = e.arcId ? getStoryArc(e.arcId) : null;
           const giver = quest?.giverNpcId ? getNpc(quest.giverNpcId)?.name : undefined;
           let status: string;
-          if (learned) status = "✓ เรียนแล้ว";
-          else if (arc) {
-            const done = arc.questIds.filter((id) => worldState.quests[id]?.status === "done").length;
-            status = done || qs ? `ตำนาน ${done}/${arc.questIds.length} บท` : e.rank !== null && rank > e.rank ? `ต้องขั้น ${e.rank}` : quest && isQuestOfferable(worldState, quest) ? `รับได้จาก ${giver ?? "—"}` : "ยังไม่ครบเงื่อนไข";
-          } else if (qs?.status === "active") status = "▶ กำลังทำ";
+          if (learnedId) status = "✓ เรียนแล้ว";
+          else if (qs?.status === "done") status = "✓ ได้คัมภีร์แล้ว";
+          else if (qs?.status === "active") status = "▶ กำลังทำ";
           else if (e.rank !== null && rank > e.rank) status = `ต้องขั้น ${e.rank}`;
           else if (quest && isQuestOfferable(worldState, quest)) status = `รับได้จาก ${giver ?? "—"}`;
           else {
@@ -351,12 +351,15 @@ function RewardsTab({ def, rank, atTop, nextRank, nextCost, canRankUp, worldStat
             status = unmet.length ? `ต้องการ ${unmet.map((l) => l.label).join(", ")}` : "ยังไม่ครบเงื่อนไข";
           }
           return (
-            <div key={`${e.kind}:${e.id}`} className="flex items-baseline justify-between gap-2 text-xs" data-lineage-id={e.id}>
+            <div key={e.questId} className="flex items-baseline justify-between gap-2 text-xs" data-lineage-id={e.id} data-lineage-options={options.length}>
               <span className="min-w-0 truncate">
-                {learned ? item?.n ?? e.id : MYSTERY_MOVE_LABEL}{" "}
-                <span className="text-muted-foreground text-[10px]">{learned ? `T${item?.ti} · ` : ""}{e.kind === "skill" ? "กระบวนท่า" : "ลมปราณ"}</span>
+                {item ? item.n : MYSTERY_MOVE_LABEL}{" "}
+                <span className="text-muted-foreground text-[10px]">
+                  {item ? `T${item.ti} · ` : ""}{e.kind === "skill" ? "กระบวนท่า" : "ลมปราณ"}
+                  {!item && options.length > 1 ? ` · เลือก 1 จาก ${options.length}` : ""}
+                </span>
               </span>
-              <span className={`shrink-0 ${learned ? "text-jade" : "text-muted-foreground"}`}>{status}</span>
+              <span className={`shrink-0 ${learnedId ? "text-jade" : "text-muted-foreground"}`}>{status}</span>
             </div>
           );
         })}

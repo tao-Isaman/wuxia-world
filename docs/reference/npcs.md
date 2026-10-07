@@ -145,13 +145,13 @@
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
 | `sect_shaolin_abbot_huiyuan` | เจ้าอาวาสฮุยหยวน | 💬 ⚔ 🤏 | 26 |
-| `sect_shaolin_elder_faming` | อาจารย์ฝาหมิง | 💬 ⚔ | 8 |
-| `sect_shaolin_disciple_xuanji` | ศิษย์เซวียนจี้ | ⚔ | 5 |
-| `sect_shaolin_head_disciple_yuanquan` | หัวหน้าศิษย์หยวนเฉวียน | ⚔ 🤏 | 6 |
+| `sect_shaolin_elder_faming` | อาจารย์ฝาหมิง | 💬 ⚔ | 6 |
+| `sect_shaolin_disciple_xuanji` | ศิษย์เซวียนจี้ | ⚔ | 4 |
+| `sect_shaolin_head_disciple_yuanquan` | หัวหน้าศิษย์หยวนเฉวียน | ⚔ 🤏 | 4 |
 | `sect_shaolin_zen_master_xianren` | หลวงพ่อเซียนเหริน | ⚔ 🤏 | 7 |
-| `sect_shaolin_staff_master_juti` | หลวงพ่อจูตี้ | ⚔ 🤏 | 11 |
+| `sect_shaolin_staff_master_juti` | หลวงพ่อจูตี้ | ⚔ 🤏 | 10 |
 | `sect_shaolin_dharma_guardian_huimiao` | หลวงพี่ใหญ่ฮุยเหมียว | ⚔ 🤏 | 11 |
-| `sect_shaolin_vice_abbot_luohan` | รองเจ้าอาวาสลั่วฮั่น | ⚔ 🤏 | 5 |
+| `sect_shaolin_vice_abbot_luohan` | รองเจ้าอาวาสลั่วฮั่น | ⚔ 🤏 | 4 |
 
 ### อู่ตัง / บู๊ตึ๊ง (`sect_wudang`)
 
@@ -159,27 +159,27 @@
 | --- | --- | --- | --- |
 | `sect_wudang_master_qingxu` | อาจารย์ชิงซวี่ | 💬 ⚔ 🤏 | 26 |
 | `sect_wudang_vice_master_xuancheng` | รองอาจารย์เสวียนเฉิง | 💬 ⚔ 🤏 | 6 |
-| `sect_wudang_sword_elder_lingyu` | อาจารย์ดาบหลิงอวี้ | 💬 ⚔ 🤏 | 7 |
+| `sect_wudang_sword_elder_lingyu` | อาจารย์ดาบหลิงอวี้ | 💬 ⚔ 🤏 | 6 |
 | `sect_wudang_inner_elder_baochun` | อาจารย์ปราณเป่าชุน | ⚔ 🤏 | 8 |
-| `sect_wudang_head_disciple_zhirong` | หัวหน้าศิษย์จื้อหรง | ⚔ 🤏 | 3 |
-| `sect_wudang_disciple_yujian` | ศิษย์อวี่เจี้ยน | ⚔ | 1 |
+| `sect_wudang_head_disciple_zhirong` | หัวหน้าศิษย์จื้อหรง | ⚔ 🤏 | 2 |
+| `sect_wudang_disciple_yujian` | ศิษย์อวี่เจี้ยน | ⚔ | — |
 | `sect_wudang_disciple_qingxin` | ศิษย์ชิงซิน | ⚔ | 1 |
-| `sect_wudang_disciple_qingfeng` | สาวกชิงเฟิง | 💬 ⚔ | 2 |
+| `sect_wudang_disciple_qingfeng` | สาวกชิงเฟิง | 💬 ⚔ | 1 |
 
 ### ง้อไบ๊ (`sect_emei`)
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
 | `sect_emei_abbess_jingchan` | ซือไท้จิงฉาน | 💬 ⚔ 🤏 | 19 |
-| `sect_emei_vice_abbess_huimiao` | รองเจ้าสำนักฮุยเหมียว | 💬 ⚔ 🤏 | 7 |
+| `sect_emei_vice_abbess_huimiao` | รองเจ้าสำนักฮุยเหมียว | 💬 ⚔ 🤏 | 5 |
 | `sect_emei_sword_elder_qingxin` | ซือไท้ชิงซิน | 💬 ⚔ 🤏 | 10 |
-| `sect_emei_palm_elder_huiyu` | ซือไท้ฮุยอวี้ | ⚔ 🤏 | 9 |
+| `sect_emei_palm_elder_huiyu` | ซือไท้ฮุยอวี้ | ⚔ 🤏 | 8 |
 | `sect_emei_healer_elder_yuxin` | หมอชีอวี้ซิน | ⚔ 🤏 | 4 |
 | `sect_emei_head_disciple_zhihui` | หัวหน้าศิษย์จื้อฮุย | ⚔ 🤏 | 3 |
-| `sect_emei_disciple_xiaoyu` | ศิษย์เสี่ยวอวี้ | ⚔ | 2 |
+| `sect_emei_disciple_xiaoyu` | ศิษย์เสี่ยวอวี้ | ⚔ | 1 |
 | `sect_emei_gatekeeper_lingxin` | ศิษย์หลิงซิน | ⚔ | 4 |
 | `sect_emei_junior_disciple_yujie` | ศิษย์อวี้เจี๋ย | ⚔ | 1 |
-| `sect_emei_nun_qingyu` | นักพรตชิงอวี้ | 💬 ⚔ | 2 |
+| `sect_emei_nun_qingyu` | นักพรตชิงอวี้ | 💬 ⚔ | 1 |
 
 ### หัวซาน (`sect_huashan`)
 
@@ -238,8 +238,8 @@
 | --- | --- | --- | --- |
 | `sect_quanzhen_master_chongyang` | อาจารย์ใหญ่หลิงเจิน | 💬 ⚔ 🤏 | 6 |
 | `sect_quanzhen_vice_master_mayu` | รองอาจารย์เติ้งหยวนเจิน | 💬 ⚔ 🤏 | 2 |
-| `sect_quanzhen_sword_elder_qiuchuji` | อาจารย์ดาบกู่จื้อชิง | 💬 ⚔ 🤏 | 2 |
-| `sect_quanzhen_inner_elder_yaolan` | อาจารย์ปราณเหยาหลัน | ⚔ 🤏 | 3 |
+| `sect_quanzhen_sword_elder_qiuchuji` | อาจารย์ดาบกู่จื้อชิง | 💬 ⚔ 🤏 | 1 |
+| `sect_quanzhen_inner_elder_yaolan` | อาจารย์ปราณเหยาหลัน | ⚔ 🤏 | 1 |
 | `sect_quanzhen_disciple_yangzi` | ศิษย์หยางจื่อ | ⚔ | 2 |
 | `sect_quanzhen_disciple_chongxu` | สาวกชงซวี | 💬 ⚔ | 2 |
 
@@ -247,7 +247,7 @@
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `sect_gumu_disciple_lengyue` | ศิษย์เลิ่งเยว่ | 💬 ⚔ | 3 |
+| `sect_gumu_disciple_lengyue` | ศิษย์เลิ่งเยว่ | 💬 ⚔ | 2 |
 | `sect_gumu_mystery_woman` | หญิงปริศนาในสุสาน | 💬 ⚔ 🤏 | 20 |
 
 ### ลิ่งจิ้วกง (`sect_lingjiu`)
@@ -263,12 +263,12 @@
 | `sect_beggars_chief_hongtian` | หัวหน้าหงเทียน | 💬 ⚔ 🤏 | 20 |
 | `sect_beggars_vice_chief_lifang` | รองหัวหน้าหลี่ฟาง | 💬 ⚔ 🤏 | — |
 | `sect_beggars_staff_elder_qicheng` | อาจารย์ไม้เท้าฉีเฉิง | 💬 ⚔ 🤏 | 5 |
-| `sect_beggars_fist_elder_wudao` | อาจารย์หมัดอู่เต้า | ⚔ 🤏 | 3 |
+| `sect_beggars_fist_elder_wudao` | อาจารย์หมัดอู่เต้า | ⚔ 🤏 | 2 |
 | `sect_beggars_intel_elder_yunsi` | อาจารย์ข่าวสารยุนซือ | ⚔ 🤏 | 13 |
 | `sect_beggars_head_disciple_renhua` | หัวหน้าศิษย์เหรินฮัว | ⚔ 🤏 | 5 |
-| `sect_beggars_disciple_dawei` | ศิษย์ต้าเหว่ย | ⚔ | 1 |
-| `sect_beggars_disciple_xiaohu` | ศิษย์เสี่ยวฮู | ⚔ | 2 |
-| `sect_beggars_junior_xiaomao` | ศิษย์เสี่ยวเหมา | ⚔ | 3 |
+| `sect_beggars_disciple_dawei` | ศิษย์ต้าเหว่ย | ⚔ | — |
+| `sect_beggars_disciple_xiaohu` | ศิษย์เสี่ยวฮู | ⚔ | 1 |
+| `sect_beggars_junior_xiaomao` | ศิษย์เสี่ยวเหมา | ⚔ | 2 |
 | `sect_beggars_brawler_jiu` | ยาจกจิ๊ว | 💬 ⚔ | 3 |
 
 ### พรรคตะวันจันทรา (`sect_ming`)
@@ -276,11 +276,11 @@
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
 | `sect_sunmoon_chief_dongfang` | อาจารย์ใหญ่หยินอวี้ | 💬 ⚔ 🤏 | 13 |
-| `sect_sunmoon_vice_renwoxing` | รองเจ้าสำนักตู้เทียนหาน | 💬 ⚔ 🤏 | 3 |
-| `sect_sunmoon_sun_elder_zuolengchan` | ผู้อาวุโสตะวันซางเหยียนเลี่ย | 💬 ⚔ 🤏 | 1 |
+| `sect_sunmoon_vice_renwoxing` | รองเจ้าสำนักตู้เทียนหาน | 💬 ⚔ 🤏 | 2 |
+| `sect_sunmoon_sun_elder_zuolengchan` | ผู้อาวุโสตะวันซางเหยียนเลี่ย | 💬 ⚔ 🤏 | — |
 | `sect_sunmoon_moon_elder_xianggwentian` | ผู้อาวุโสจันทราฉินเยว่หลิง | ⚔ 🤏 | 6 |
-| `sect_sunmoon_balance_elder_qudongfeng` | ผู้อาวุโสสมดุลฉวี่ตงเฟิง | ⚔ 🤏 | 3 |
-| `sect_sunmoon_head_disciple_yilin` | หัวหน้าศิษย์เยี่ยนชิว | ⚔ 🤏 | 2 |
+| `sect_sunmoon_balance_elder_qudongfeng` | ผู้อาวุโสสมดุลฉวี่ตงเฟิง | ⚔ 🤏 | 2 |
+| `sect_sunmoon_head_disciple_yilin` | หัวหน้าศิษย์เยี่ยนชิว | ⚔ 🤏 | 1 |
 | `sect_sunmoon_disciple_lanfenghuang` | ศิษย์ไต้ซิ่วเหอ | ⚔ | 2 |
 | `sect_sunmoon_junior_xiaoyu` | ศิษย์เสี่ยวเยว่ | ⚔ | 1 |
 | `sect_ming_elder_zhuying` | ผู้อาวุโสจูอิง | 💬 🤏 | 9 |
@@ -291,10 +291,10 @@
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
 | `sect_xiaoyao_master_yunxiao` | ปรมาจารย์ยุนเซียว | 💬 ⚔ 🤏 | 14 |
-| `sect_xiaoyao_vice_tianshan` | รองอาจารย์เทียนซาน | 💬 ⚔ 🤏 | 7 |
-| `sect_xiaoyao_sword_elder_wuyazi` | ผู้อาวุโสกระบี่ซวีเฟิงจื่อ | 💬 ⚔ 🤏 | 2 |
+| `sect_xiaoyao_vice_tianshan` | รองอาจารย์เทียนซาน | 💬 ⚔ 🤏 | 5 |
+| `sect_xiaoyao_sword_elder_wuyazi` | ผู้อาวุโสกระบี่ซวีเฟิงจื่อ | 💬 ⚔ 🤏 | 1 |
 | `sect_xiaoyao_palm_elder_libai` | ผู้อาวุโสฝ่ามือหลี่ไป๋ | ⚔ 🤏 | 6 |
-| `sect_xiaoyao_blade_elder_xiaorang` | ผู้อาวุโสดาบเสี่ยวหรง | ⚔ 🤏 | 3 |
+| `sect_xiaoyao_blade_elder_xiaorang` | ผู้อาวุโสดาบเสี่ยวหรง | ⚔ 🤏 | 1 |
 | `sect_xiaoyao_head_disciple_aliao` | หัวหน้าศิษย์อาเหลียว | ⚔ 🤏 | 2 |
 | `sect_xiaoyao_disciple_jiumozhi` | ศิษย์ฉีม่อหยาง | ⚔ | 3 |
 | `sect_xiaoyao_junior_xiaolan` | ศิษย์เสี่ยวหลาน | ⚔ | 2 |
@@ -323,8 +323,8 @@
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
 | `sect_jinyiwei_leader_zhao` | ผู้บัญชาการจ้าวฝู่ | 💬 ⚔ 🤏 | 30 |
-| `sect_jinyiwei_soldier_qin` | องครักษ์ฉิน | 💬 ⚔ 🤏 | 12 |
-| `sect_jinyiwei_soldier_lu` | องครักษ์ลู่ | 💬 ⚔ 🤏 | 16 |
+| `sect_jinyiwei_soldier_qin` | องครักษ์ฉิน | 💬 ⚔ 🤏 | 10 |
+| `sect_jinyiwei_soldier_lu` | องครักษ์ลู่ | 💬 ⚔ 🤏 | 14 |
 
 ### สำนักสกุลถัง (`sect_tang`)
 
@@ -333,8 +333,8 @@
 | `sect_tang_chief_tangmen` | เจ้าสำนักถังเหมิน | 💬 ⚔ 🤏 | 14 |
 | `sect_tang_vice_tangshanhu` | รองเจ้าสำนักถังซานหู | 💬 ⚔ 🤏 | 11 |
 | `sect_tang_venom_elder_tangzhongtian` | ผู้อาวุโสพิษถังจงเทียน | 💬 ⚔ 🤏 | 9 |
-| `sect_tang_blade_elder_tangshibi` | ผู้อาวุโสมีดถังซือปี้ | ⚔ 🤏 | 8 |
-| `sect_tang_chase_elder_tangrong` | ผู้อาวุโสไล่ล่าถังหรง | ⚔ 🤏 | 5 |
+| `sect_tang_blade_elder_tangshibi` | ผู้อาวุโสมีดถังซือปี้ | ⚔ 🤏 | 6 |
+| `sect_tang_chase_elder_tangrong` | ผู้อาวุโสไล่ล่าถังหรง | ⚔ 🤏 | 4 |
 | `sect_tang_head_disciple_tanglin` | หัวหน้าศิษย์ถังหลิน | ⚔ 🤏 | 4 |
 | `sect_tang_disciple_tangtao` | ศิษย์ถังเทา | ⚔ | 2 |
 | `sect_tang_junior_tangxiu` | ศิษย์ถังซิ่ว | ⚔ | 1 |
@@ -343,7 +343,7 @@
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `sect_xueyu_master_chiying` | จอมยุทธฉือยิง | 💬 ⚔ | 3 |
+| `sect_xueyu_master_chiying` | จอมยุทธฉือยิง | 💬 ⚔ | 2 |
 | `evil_xueyu_envoy_xie` | ทูตเซี่ยแห่งสำนักดาบโลหิต | 💬 🤏 | 9 |
 
 ## Temples and palaces

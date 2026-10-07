@@ -14,7 +14,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **What the player does:**
 
 - Explores 101 places (100 painted maps) joined by 129 roads.
-- Meets 235 NPCs (30 of them, plus the disciples, heirs and newcomers they bring, live their own lives) and takes 1,115 quests: a 15-chapter main story (เนื้อเรื่องหลัก), 373 hand-written, 154 sect lineage quests and 48 story sagas (573 chapters: 38 sect sagas and 10 long jianghu sagas for the unsect T4 / T5 moves); 511 cutscenes.
+- Meets 235 NPCs (30 of them, plus the disciples, heirs and newcomers they bring, live their own lives) and takes 1,074 quests: a 15-chapter main story (เนื้อเรื่องหลัก), 373 hand-written, 113 sect lineage quests (154 moves; 30 of them a choice) and 48 story sagas (573 chapters: 38 sect sagas and 10 long jianghu sagas for the unsect T4 / T5 moves); 511 cutscenes.
 - Lives in the 3rd year of Jianwen (1401), about 40 years after มังกรหยก ภาค 3: the court's seized scriptures have just scattered back into the jianghu ([docs/story-writing.md](docs/story-writing.md#timeline-and-novel-characters)).
 - Joins one of 15 sects and learns 173 move skills and 111 inner arts.
 - Gathers and crafts (19 life skills).
@@ -245,7 +245,8 @@ Two deliberate exceptions reach into stores:
 - **Lineage quests and sagas** (`lib/world/story/`, content in `lib/world/data/story/`). Compact specs compile into quests, dialogs and cutscenes ([docs/story-quests.md](docs/story-quests.md)).
   - **The main story** (`data/story/main.ts`, a `MainArcSpec`): 15 chained chapters `st_main_<nn>` (type `main`, no move at the end), offered by ป้าหลิว at home from the first moment of a new game; 12 films tell the age and the hero's father.
   - **Stat gates on the way to a move are halved** (`MOVE_STAT_GATE_SCALE = 0.5`, `data/move-gates.ts`): lineage quests, saga chapters (not the main story), their sect trials, quests that teach a move and manuals' `reqValue` keep their authored numbers and are scaled at load (`QUESTS` / `ITEMS`).
-  - Every sect T0–T3 skill / art has one lineage quest `ql_<skill|art>_<id>` (type `side`, `lineage`), gated and sized by tier (`LINEAGE_TIERS`).
+  - Every sect T0–T3 skill / art is taught by a lineage quest `ql_<skill|art>_<id>` (type `side`, `lineage`), gated and sized by tier (`LINEAGE_TIERS`). There is **one quest per sect, tier and kind**: the first spec of the group names the quest and teaches; when a tier has several moves (`lineage.options`), the hand-in scene offers one scroll per move and the pick is final (the gate is "none of them learned or held"). `lineageQuestOf(kind, id)` finds a move's quest.
+  - A sect's sagas open over its last three ranks in listed order (`SAGA_RANK`: the first at rank 3, the last at rank 1).
   - Every sect T4 is the reward of a saga: 8–10 chapters `st_<arcId>_<nn>` (type `story`), chained on the previous chapter, with films (`DialogScene.cutscene`); every dialog plays one line per beat (`paged` is legacy).
   - The old sect art quests teach nothing: seven T4 ones are saga prologue trials (`SAGA_PROLOGUES`), eight T3 ones lineage prologue trials (`LINEAGE_PROLOGUES`).
   - Story and lineage quests don't fail when their giver dies. Their offers (and the sect art trials') can be turned down (`DECLINE_TEXT`; the NPC card opens a compiled offer **before** accepting — and so any hand-written `qs_<id>_offer` whose own choice carries `startQuest`), and dropping one (`abandonQuest`) forgets it instead of failing it, so it is offered again.

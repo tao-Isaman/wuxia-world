@@ -12,9 +12,9 @@ import { CHARACTER_IDS, CREATURE_FRAME_COUNT } from "../lib/characters/catalog";
 import { LINEAGE_SPECS, MAIN_ARC, SAGA_PROLOGUES, STORY_ARC_SPECS } from "../lib/world/data/story";
 import { isQuestOfferable, isSecretSectQuest, sectActionCount } from "../lib/world/effects";
 import { getQuestsForSect } from "../lib/world/data/quests";
-import { CUTSCENES, SAGA_RANK, STORY_ARCS, STORY_QUESTS, STORY_RESOLVERS } from "../lib/world/story/registry";
+import { CUTSCENES, SAGA_RANK, STORY_ARCS, STORY_QUESTS, STORY_RESOLVERS, lineageQuestOf } from "../lib/world/story/registry";
 import { chainNext } from "../lib/world/quest-chain";
-import { DECLINE_TEXT, lineageQuestId, storyQuestId, LINEAGE_TIERS } from "../lib/world/story/compile";
+import { DECLINE_TEXT, storyQuestId, LINEAGE_TIERS } from "../lib/world/story/compile";
 import type { CutsceneSpec, StoryBeat, StoryLine, StoryStep } from "../lib/world/story/types";
 import { getNpc, getOpponent, getItem, getScene, getQuest, SHOPS, RESOURCES, RECIPES, OPPONENTS, QUESTS, SCENES, ITEMS, SECT_HALLS, SCROLL_PREFIX, scrollItemId } from "../lib/world/data";
 import { FIGHT_EVENTS } from "../lib/world/data/random-events";
@@ -22,7 +22,7 @@ import { getLocationMap } from "../lib/world/data/location-maps";
 import { WORLD_COORDS } from "../lib/world/data/world-coords";
 import { SECT_MEMBERSHIPS } from "../lib/world/data/sect-memberships";
 import { evaluateCondition } from "../lib/world/conditions";
-import type { Condition, QuestDef, QuestReward, WorldStateData } from "../lib/world/types";
+import type { Choice, Condition, QuestDef, QuestReward, WorldStateData } from "../lib/world/types";
 
 const ONLY = process.env.STORY_SECT;
 const errors: string[] = [];
@@ -83,7 +83,7 @@ check("coverage: every jianghu T4 / T5 move has exactly one saga", () => {
 
 check("coverage: every sect skill and art has exactly one way in — a lineage quest (T0–T3) or a story saga (T4)", () => {
   const grants = new Map<string, string[]>();
-  for (const l of LINEAGE_SPECS) grants.set(`${l.kind}:${l.id}`, [...(grants.get(`${l.kind}:${l.id}`) ?? []), lineageQuestId(l)]);
+  for (const l of LINEAGE_SPECS) grants.set(`${l.kind}:${l.id}`, [...(grants.get(`${l.kind}:${l.id}`) ?? []), lineageQuestOf(l.kind, l.id)!]);
   for (const a of STORY_ARC_SPECS) grants.set(`${a.reward.kind}:${a.reward.id}`, [...(grants.get(`${a.reward.kind}:${a.reward.id}`) ?? []), a.id]);
   const items = [...SECT_SKILLS.map((s) => ({ kind: "skill", id: s.id, ti: s.ti, sc: s.sc, n: s.n })), ...SECT_ARTS.map((a) => ({ kind: "art", id: a.id, ti: a.ti, sc: a.sc, n: a.n }))];
   const missing: string[] = [];
@@ -113,7 +113,9 @@ check("one way only: no other quest, dialog, manual or hall teaches a sect skill
   for (const sc of SCENES) teach(`scene ${sc.id}`, sc);
   // A quest's คัมภีร์ is how its own reward arrives; nothing else may hand one out.
   for (const it of ITEMS) if (!it.id.startsWith(SCROLL_PREFIX)) teach(`item ${it.id}`, it);
-  const scrollRefs = JSON.stringify([QUESTS.map((q) => q.rewards), SCENES, SHOPS, RESOURCES, RECIPES, OPPONENTS, SECT_HALLS]).match(new RegExp(`"${SCROLL_PREFIX}[a-z0-9_]+"`, "g")) ?? [];
+  // A lineage tier's choice hands its chosen scroll over in its own hand-in dialog.
+  const choiceHandIn = new Set(QUESTS.filter((q) => q.lineage?.options).map((q) => `qs_${q.id}_complete`));
+  const scrollRefs = JSON.stringify([QUESTS.map((q) => q.rewards), SCENES.filter((sc) => !choiceHandIn.has(sc.id)), SHOPS, RESOURCES, RECIPES, OPPONENTS, SECT_HALLS]).match(new RegExp(`"${SCROLL_PREFIX}[a-z0-9_]+"`, "g")) ?? [];
   if (scrollRefs.length) err(`scroll items handed out directly: ${[...new Set(scrollRefs)].join(", ")}`);
   for (const h of SECT_HALLS) for (const o of h.offers) if (sectItem.has(`${o.kind}:${o.id}`)) err(`hall ${h.locationId} sells ${o.kind} ${o.id}`);
 });
@@ -333,12 +335,13 @@ function satisfyAuto(c: Condition) {
 }
 
 /** Take the "go on" choice of the current dialog until it leaves dialogs (or a battle starts). */
-function runDialog(questId: string, winBattles = true) {
+function runDialog(questId: string, winBattles = true, pick?: (c: Choice) => boolean) {
   for (let guard = 0; guard < 12; guard++) {
     const scene = getScene(store().currentSceneId);
     if (scene?.kind !== "dialog" || !scene.choices?.length) return;
     const pending = () => store().pendingBattle;
-    store().makeChoice(0);
+    const at = pick ? scene.choices.findIndex(pick) : -1;
+    store().makeChoice(at >= 0 ? at : 0);
     const battle = pending();
     if (battle && winBattles) {
       // Resolve the fight as a win: clear it and follow onWin.
@@ -358,7 +361,7 @@ function satisfyQuestGates(c: Condition | undefined) {
   }
 }
 
-function play(def: QuestDef) {
+function play(def: QuestDef, pick?: (c: Choice) => boolean) {
   const where = def.id;
   if (def.story?.chapter === 1 || def.lineage) satisfyQuestGates(def.prereqs);
   assert.ok(evaluateCondition(store(), def.prereqs ?? { t: "and", all: [] }), `${where}: offerable after the previous one`);
@@ -382,7 +385,7 @@ function play(def: QuestDef) {
     assert.ok((store().quests[def.id]?.stage ?? 0) > i, `${where}: stage ${i} (${stage.description}) advanced`);
   }
   useWorldStore.setState({ currentSceneId: `qs_${def.id}_complete`, lastLocationId: home });
-  runDialog(def.id);
+  runDialog(def.id, true, pick);
   assert.equal(store().quests[def.id]?.status, "done", `${where}: handed in`);
 }
 
@@ -411,7 +414,10 @@ check("play-through: every lineage quest and every saga chapter, accept → step
     store().startNewGame({ name: "ผู้ทดสอบ", gender: "female" } as never);
     empower(info.sc);
     try {
-      play(getQuest(lineageQuestId(l))!);
+      const def = getQuest(lineageQuestOf(l.kind, l.id)!)!;
+      // A tier with several moves is a choice: take this one's path.
+      play(def, (c) => (c.effects ?? []).some((e) => e.t === "giveItem" && e.itemId === scrollItemId(l.kind, l.id)));
+      if (def.lineage?.options) assert.ok(!isQuestOfferable(store(), def), `${def.id}: offered again after choosing ${l.id}`);
       const pre = store().playerBuild!;
       assert.ok(!(l.kind === "skill" ? pre.learnedSkillIds : pre.learnedArtIds)?.includes(l.id), `lineage ${l.id}: not learned before reading the scroll`);
       readScroll(l.kind, l.id, `lineage ${l.id}`);
@@ -453,7 +459,7 @@ check("decline and drop: every lineage / saga offer can be turned down, and an a
   // The jianghu sagas have no lineage quests: then the drop check below has nothing to drop.
   const l = LINEAGE_SPECS.find((x) => inScope(STORY_RESOLVERS.martial(x.kind, x.id)!.sc));
   if (!l) return;
-  const def = getQuest(lineageQuestId(l))!;
+  const def = getQuest(lineageQuestOf(l.kind, l.id)!)!;
   store().startNewGame({ name: "ผู้ทดสอบ", gender: "female" } as never);
   empower(STORY_RESOLVERS.martial(l.kind, l.id)!.sc);
   assert.ok(isQuestOfferable(store(), def), `${def.id}: offered`);
@@ -531,7 +537,7 @@ check("difficulty grows with the tier: higher tiers gate on rank and stats and a
   for (const l of LINEAGE_SPECS) {
     const info = STORY_RESOLVERS.martial(l.kind, l.id)!;
     if (!inScope(info.sc)) continue;
-    const q = getQuest(lineageQuestId(l))!;
+    const q = getQuest(lineageQuestOf(l.kind, l.id)!)!;
     const text = JSON.stringify(q.prereqs);
     if (info.ti >= 1 && !text.includes("statAtLeast")) err(`${q.id}: T${info.ti} needs a stat gate`);
     if (info.ti >= 2 && q.stages.length < 3) err(`${q.id}: T${info.ti} needs at least 3 stages`);
@@ -548,4 +554,4 @@ if (errors.length) {
   console.error(`\n${errors.length} problem(s):\n  - ${errors.join("\n  - ")}`);
   process.exit(1);
 }
-console.log(`${passed} story quest checks passed (${LINEAGE_SPECS.length} lineage quests, ${STORY_ARC_SPECS.length} sagas, ${CUTSCENES.length} cutscenes)`);
+console.log(`${passed} story quest checks passed (${LINEAGE_SPECS.length} sect moves in ${STORY_QUESTS.filter((q) => q.lineage).length} lineage quests, ${STORY_QUESTS.filter((q) => (q.lineage?.options?.length ?? 1) > 1).length} with a choice, ${STORY_ARC_SPECS.length} sagas, ${CUTSCENES.length} cutscenes)`);

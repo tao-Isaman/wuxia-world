@@ -25,7 +25,7 @@ The wave-by-wave history that used to live in this file has moved to [docs/chang
 A Thai wuxia RPG in the browser: Next.js 15, React 19, TypeScript, Phaser 4, Zustand.
 
 - **Exploring.** The hero walks painted maps: 101 places, 129 roads; villages, towns and homes have their own people and activities; foes turn up on the map as the hero walks.
-- **Doing.** They talk to 235 NPCs (30 of whom, with their disciples and heirs, live their own lives) (and give them gifts), take 882 quests (a 15-chapter main story, 154 sect lineage quests and 38 story sagas among them), join one of 15 sects, gather, craft, steal, and land in jail.
+- **Doing.** They talk to 235 NPCs (30 of whom, with their disciples and heirs, live their own lives) (and give them gifts), take 1,074 quests (a 15-chapter main story, 113 sect lineage quests — one per sect tier and kind, a pick of one move where a tier has several — and 48 story sagas among them), join one of 15 sects, gather, craft, steal, and land in jail.
 - **Fighting.** Battles are turn-based tactics on a 10 × 7 board that grows to 15 × 10 for big gangs (up to 6 pack members plus the leader).
 - **Code.** Two pure engines (`lib/game`, `lib/world`) sit under Zustand stores and React / Phaser views. The world saves to `localStorage` (version 25).
 
@@ -74,7 +74,7 @@ Checked on 2026-10-05 for the hero's flat base HP (a new hero starts at 136 HP),
 | `test:npcs` | 14 checks pass |
 | `test:places` | 11 checks pass: 68 new NPCs (35 wander), 97 place quests; all 72 ยุทธจักร T0–T3 moves and arts are quest rewards |
 | `test:routes` | 10 checks pass: 255 exits on 98 maps (243 within 45° of their bearing), 258 roads on 54 of the 56 paintings, 253/256 arrivals on the side the road came from |
-| `test:story` | 12 checks pass (incl. the main story: 15 chapters, 12 films, offered on a new game, played through) (incl. decline / drop, secret trials, scroll hand-over and no move named in quest text): 154 lineage quests, 38 sagas (340 chapters), the main story (15), 304 cutscenes; every quest and chapter plays through in the real store |
+| `test:story` | 15 checks pass (incl. the main story, decline / drop, secret trials, scroll hand-over, tier choices picked once, sagas spread over ranks 3 / 2 / 1, no move named in quest text): 154 moves in 113 lineage quests (30 with a choice), 48 sagas, 511 cutscenes; every quest and chapter plays through in the real store |
 | `test:quests` | the campaign audit passes (882 quests, 101 reachable locations); 439 item / kill / objective quests hand in through the real store; guidance covers 2358 of 2382 stages; all 39 steal / assassinate / kidnap stages offer the action and advance |
 | `test:systems` | 20 checks pass |
 | `test:engine` | 12 checks pass: text overrides, the engine's draft / validation / filters / edits, the save route's whitelist |

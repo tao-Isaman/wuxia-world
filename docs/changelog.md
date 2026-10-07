@@ -6,6 +6,12 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-07
 
+### Sect move quests: one per tier, pick your line; sagas spread over ranks
+
+- **Lineage quests are one per sect, tier and kind** (กระบวนท่า and ลมปราณ apart): 154 quests became 113. Where a tier has several moves (สกุลถัง: มีดสั้น or อาวุธลับ), the teacher lays the scrolls down at the hand-in and the player picks **one, once**; the rest close. The sect window shows one row per quest, "เลือก 1 จาก N" until the pick.
+- **Sagas open over ranks 3, 2 and 1** in their listed order (`SAGA_RANK`), not all at the same rank; the T4 prologue trials' ranks match.
+- Old saves: an in-progress lineage quest whose id no longer exists is dropped on load and its tier quest is offered instead.
+
 ### Sagas stay secret
 
 - The quest log's **ตำนาน** tab (every saga, its chapters, who offers the next, film replays) is gone — it gave the sagas away. `components/world/saga-list.tsx` is removed.
