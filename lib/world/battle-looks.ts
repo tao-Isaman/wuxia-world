@@ -6,6 +6,7 @@
 
 import { characterId, FOE_CHARACTER_IDS, npcCharacterId, type FoeCharacterId } from "@/lib/characters/catalog";
 import { hasAnimatedSheet } from "@/lib/characters/npc-sheets";
+import { getAnimSheet } from "@/lib/characters/anim-sheets";
 import type { CharacterBuild } from "@/lib/game/types";
 import type { UnitLook, UnitSpec } from "@/lib/game/grid/types";
 import { NPCS } from "./data/npcs";
@@ -107,7 +108,8 @@ export function findOpponentNpc(opponentId: string | null | undefined, buildName
 }
 
 /**
- * How an opponent is drawn: beasts use a creature-atlas frame; an NPC with
+ * How an opponent is drawn: a legendary beast or T5 master with an animated
+ * sheet (`look.anim`, lib/characters/anim-sheets.ts) plays it; other beasts use a creature-atlas frame; an NPC with
  * its own rigged sheet plays it; a sparring NPC shows the unique battle sprite
  * the player met in the world (over its costume archetype); everyone else is
  * the painted enemy type for their kind (`foeCharacterFor`).
@@ -117,6 +119,8 @@ export function opponentLook(opponentId: string | null | undefined, npc?: NpcDef
   const variant: { tint?: number; size?: number } = {};
   if (opp?.look?.tint !== undefined) variant.tint = opp.look.tint;
   if (opp?.look?.size !== undefined) variant.size = opp.look.size;
+  // An animated sheet wins over everything else (an unknown sheet id falls through).
+  if (opp?.look?.anim && getAnimSheet(opp.look.anim)) return { kind: "anim", sheet: opp.look.anim, ...variant };
   const frame = creatureFrameFor(opponentId);
   if (frame !== null) return { kind: "creature", frame, ...variant };
   // A rigged NPC (its own sheet) plays full clips; other named NPCs keep their still.
