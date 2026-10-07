@@ -16,7 +16,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Explores 101 places (100 painted maps) joined by 129 roads.
 - Meets 235 NPCs (30 of them, plus the disciples, heirs and newcomers they bring, live their own lives) and takes 1,074 quests: a 15-chapter main story (เนื้อเรื่องหลัก), 373 hand-written, 113 sect lineage quests (154 moves; 30 of them a choice) and 48 story sagas (573 chapters: 38 sect sagas and 10 long jianghu sagas for the unsect T4 / T5 moves); 511 cutscenes.
 - Lives in the 3rd year of Jianwen (1401), about 40 years after มังกรหยก ภาค 3: the court's seized scriptures have just scattered back into the jianghu ([docs/story-writing.md](docs/story-writing.md#timeline-and-novel-characters)).
-- Joins one of 15 sects and learns 173 move skills and 111 inner arts.
+- Joins one of 15 sects and learns 173 move skills and 111 inner arts (plus 18 boss moves and 6 boss arts no one can learn).
+- Hunts foes where they live (habitats), from tier 0 to tier 5, and six legendary beasts (บอส) in their lairs.
 - Gathers and crafts (19 life skills).
 - Steals and gets jailed.
 - Fights **turn-based tactics on a 10 × 7 to 15 × 10 board**.
@@ -80,6 +81,8 @@ bun run test:quests         # campaign audit + dead ends + every item/kill/objec
 bun run test:meridians      # meridian charts: engine, combat bonus, chart items / sources, points, store, repair, content counts
 bun run test:engine         # text overrides over SKILLS / ARTS, the engine's filters / edits / validation, the save route whitelist
 bun run test:docs           # generated reference is current + docs links/paths/commands resolve
+bun run test:foes            # habitats, booster, T5, bosses (lairs, respawn, save v26), spoils
+bun run test:boss-skills     # the boss moves' own effects and boss battles
 bun run test:assets         # asset library: manifest contract, files and sizes, footprints, ≥ 3,000 approved; every item / equipment icon
 bun run test:e2e            # Playwright (Chromium) on :3017 — start a production server first
 bun scripts/audit-content.ts            # every NPC / quest / scene reference resolves
@@ -129,7 +132,7 @@ bun scripts/assets/build-kits.ts plan && python3 scripts/assets/generate.py run 
 ```
 app/, components/         React: screens, HUD, menus, popups, battle UI
    ↓
-store/                    Zustand: world (saved, v25), battle, character (/debug, v3), loading, toast, confirm
+store/                    Zustand: world (saved, v26), battle, character (/debug, v3), loading, toast, confirm
    ↓
 lib/world/  ──────►  lib/game/          pure engines — no React, no DOM, no I/O
    └ battle-bridge.ts: the one place the world and battle stores meet
@@ -162,12 +165,12 @@ Two deliberate exceptions reach into stores:
 ## Combat engine (`lib/game/`)
 
 - **`types.ts`** holds discriminated unions on `t`:
-  - `SelfEffect` (11 kinds);
-  - `EnemyEffect` (13, including `poison_dmg`, `burn_hp_mp`, `stun`, `debuff_atk`);
+  - `SelfEffect` (14 kinds, incl. the boss-only `molt`, `frenzy`, `sun_shell`);
+  - `EnemyEffect` (18, including `poison_dmg`, `burn_hp_mp`, `stun`, `debuff_atk` and the boss-only `bind`, `bleed`, `blind`, `scorch`, `sunder`); a skill's `pen` ignores part of PDef;
   - `ArtPassiveEffect`, `EquipEffect`, 14 art-active types;
   - `SkillType` (yin / yang / balance / hard / soft / internal / external);
   - `SKILL_SLOT_COUNT = 10`.
-- **Data tables** (`data/`): `TIERS`, `STAT_KEYS`, weapon families, `SECT_ORDER` / `JIANGHU_SECT` (`sects.ts`), `SKILLS` (173, incl. `bst_*` beast moves), `ARTS` (111 + the `none` placeholder; T5: `khbt`, `kuyt`, `kgim`), `EQUIPMENT` (76).
+- **Data tables** (`data/`): `TIERS`, `STAT_KEYS`, weapon families, `SECT_ORDER` / `JIANGHU_SECT` (`sects.ts`), `SKILLS` (191, incl. `bst_*` beast moves and the 18 `bss_*` boss moves, `sc` "สัตว์ร้าย"), `ARTS` (117 + the `none` placeholder; T5: `khbt`, `kuyt`, `kgim` and the six `art_boss_*`). `isBeastMove` / `isBossArt` keep boss and beast moves out of scrolls, coverage checks and the skills window, `EQUIPMENT` (76).
 - **Stats.** `derive.ts` (`derive`, `combinedStats`, `deriveAll`, `getMasteryMap`).
   - `combinedStats` merges base + arts + slotted / learned skills with conflict and level scaling.
   - Equipment is **not** in `combinedStats`; `deriveAll` adds it.
@@ -219,9 +222,12 @@ Two deliberate exceptions reach into stores:
   - It feeds the quest log, the HUD tracker and the map's guide arrow.
 - **Encounters come while walking**, not on arrival.
   - Every 220 map units walked, `walkTick(pickSpot)` runs; `home_player` and `jail` are safe. There are no treasure or meeting events.
-  - **Roaming foes:** on roads and in the wilds, per tick a 30 % chance (80 % while hunting a kill-quest target in this zone) puts a foe from the zone's pool on the map. Settled places (`isSettledPlace`: `city_`, `village_`, `home_`, `inn_`, `sect_`, `temple_`, `palace_`, `villa_`, `market_`, `tribe_`) get no stray foes, only an active kill quest's quarry (`rollFoeSpawn`, at most 3; store `roamingFoes`, not saved). The runtime draws them (`presentation.foes`) and walking into one calls `engageFoe` → the encounter screen.
+  - **Roaming foes:** on roads and in the wilds, per tick a 30 % chance (80 % while hunting a kill-quest target in this zone) puts a foe that **lives there** on the map (`lib/world/data/habitats.ts`: every place and road has biomes, every fight-event foe its `FOE_HABITATS`; `fightEventsForLocation` filters by them, so the quest guide sends a kill quest to its quarry's habitat). Settled places (`isSettledPlace`: `city_`, `village_`, `home_`, `inn_`, `sect_`, `temple_`, `palace_`, `villa_`, `market_`, `tribe_`) get no stray foes, only an active kill quest's quarry if it lives in town (`rollFoeSpawn`, at most 3; store `roamingFoes`, not saved). The runtime draws them (`presentation.foes`) and walking into one calls `engageFoe` → the encounter screen.
   - The **law** (`lawChance(marks)`, 13–45 %) and the **30 % sect-hunter roll** still catch up at once (`rollWalkEvent`).
-  - Foes are picked by zone and scaled by the hero's power (`max(day/200, (9 − best sect rank)/8)`): tier mix, elites, and opponent stats ×(1 + 0.6·power) for **every** battle.
+  - Foes are scaled by the hero's power (`max(day/200, (9 − best sect rank)/8)`): tier mix (T5 only from power 0.6), elites, and opponent stats ×(1 + 0.6·power) for **every** battle.
+  - **Booster** (`boostBuild`, `opponents.ts`): every T3 foe ×1.6, T4 ×1.45 and NPC-backed fighter (`spar_*`, `npc@`, `lawnpc@`, `hunter_*`, `look.npc`) ×1.4 power score, the larger one. Categories are `human | beast` only — no spirits or demons.
+  - **Tier 5** (`t5_*`, power 570–760) and **legendary beasts** (`lib/world/data/bosses.ts`, `boss_*`, power ~1550, ti 5, `boss: true`, minions): each boss waits at its lair spot (a `WorldFoe` with `boss: true` and an animated look), comes back 90 days after it falls (`bossDefeatedDay`, saved), pays `boss.wExp`, its trophy and boss drops. Big foes draw from animated sheets (`lib/characters/anim-sheets.ts`, PixelLab, `scripts/build-anim-sheets.ts`).
+  - **Spoils:** beasts drop no gold; win w-exp is `victoryWExp` (people 40 + 20·ti, beasts 80 + 60·ti, bosses their own); move / art xp ×2 against beasts and bosses.
   - `rollRandomEvent` is a no-op kept for old content.
 - **Law** (`law.ts`).
   - Wanted marks have no ceiling (the HUD draws 5 seals, then `×N`): failed steals +1, jail escapes +2, failed attempts on a life +2, killings +5 (`KILL_MARKS`); one fades every 10 quiet days.
@@ -270,7 +276,7 @@ Two deliberate exceptions reach into stores:
 
 ## Stores (`store/`)
 
-- **`world-store.ts`** is saved as `wusia-world-v1`, **version 25**.
+- **`world-store.ts`** is saved as `wusia-world-v1`, **version 26**.
   - Actions draft a copy (`draftFrom`, **one level deep** — nested quest, sect and NPC entries are shared), call engine functions, then `set`.
   - Time goes through `advanceTime` (12 ชั่วยาม = 1 day). The player-visible log uses `appendActionLog` (newest 100).
 - **`battle-store.ts`** is not saved.
@@ -364,6 +370,7 @@ Most additions are data only. Follow [docs/content-authoring.md](docs/content-au
 | a quest | a regional `quests/` file (+ `qs_` scenes); stages need an `autoAdvance`, an `objective` or reachable dialog beats |
 | an item, shop, hall, recipe, artisan, node or opponent | its table in `lib/world/data/` (an item or equipment piece also gets an icon in `item-icons.ts`) |
 | a skill or art | `lib/game/data/`; then sort, icon, battle range, and a way to learn it (a sect one also needs a lineage quest or saga — `test:story`) |
+| a foe | `opponents.ts` (+ `FIGHT_EVENTS` and its `FOE_HABITATS` in `habitats.ts` to roam); a boss also needs a `BOSSES` entry, its moves / art and an animated sheet |
 | a joinable sect | the long checklist in the guide |
 
 New engine variants (effects, conditions, combat effects) are code changes. Update every dispatcher; for combat, see [docs/combat.md](docs/combat.md#changing-combat-safely).
@@ -372,7 +379,7 @@ Content changes need **no save version bump**. Removed ids are dropped on load.
 
 ## Saves
 
-- **Keys.** The world save is `localStorage["wusia-world-v1"]`, **version 25**. The "wusia" spelling is historical — never rename it.
+- **Keys.** The world save is `localStorage["wusia-world-v1"]`, **version 26**. The "wusia" spelling is historical — never rename it.
 - **Migration.** `migrate` is one idempotent normalizer (it ignores `fromVersion`). The persist `merge` also back-fills lore rumors on every load, and `onRehydrateStorage` runs `validateAndRepair`.
 - **Adding a persisted field:**
   1. `WorldStateData` + `emptyData()`;

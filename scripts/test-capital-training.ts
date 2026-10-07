@@ -90,7 +90,7 @@ try {
   assert.equal(won.gameOver, false);
   assert.equal(won.gold, 30);
   assert.deepEqual(won.inventory, { potion: 1, herb: 3 });
-  assert.equal(won.wExp, 70, "only ordinary battle W-EXP is awarded");
+  assert.equal(won.wExp, 60, "only ordinary battle W-EXP is awarded (a T0 person: 40)");
   assert.equal(won.defeatedCounts[opponent.id], 1);
   assert.equal(capitalTrainingStatus(won)?.canStart, false, "hall closes the beginner duel after a victory");
   const upgrade = capitalTrainingUpgrade(won)!;
@@ -99,10 +99,10 @@ try {
   const result = won.levelUpSkillFromWExp(upgrade.skill.id);
   assert.equal(result.ok, true);
   assert.equal(useWorldStore.getState().skillLevel.basic_punch, upgrade.level + 1);
-  assert.equal(useWorldStore.getState().wExp, 70 - upgrade.cost);
+  assert.equal(useWorldStore.getState().wExp, 60 - upgrade.cost);
   assert.equal(clinicPreparation(useWorldStore.getState()), null, "one real upgrade ends the optional guidance");
   useWorldStore.getState().acknowledgeBattleResult();
-  assert.equal(useWorldStore.getState().wExp, 70 - upgrade.cost, "acknowledging twice never repeats rewards");
+  assert.equal(useWorldStore.getState().wExp, 60 - upgrade.cost, "acknowledging twice never repeats rewards");
   console.log(`PASS fixed novice duel: waiting, then punching first wins the grid duel in ${battle.turn} turns at ${battle.hA} HP; ${battle.skillUses.A.basic_punch} punches; upgrade costs ${upgrade.cost} W-EXP`);
 
   newTrainee();

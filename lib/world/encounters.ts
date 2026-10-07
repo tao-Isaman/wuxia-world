@@ -12,6 +12,7 @@ import {
   playerPowerIndex,
   pickWeighted,
 } from "./data/random-events";
+import { isTownScene } from "./data/habitats";
 import { LAW_NPC_PREFIX, ambushChance, jailCityFor, lawChance, pickLawPursuer } from "./law";
 import { regionOf } from "./data/regions";
 import { npcFoeFor, sectChief } from "./npc-life";
@@ -93,10 +94,11 @@ export function rollWalkEvent(state: WorldStateData, chanceScale: number): void 
 }
 
 /**
- * Which foe (if any) turns up on the map this walk tick. Foes come from the
- * zone's pool (cities: people; the wilds: mostly beasts; sects and temples:
- * spirits too), shaped by the hero's power. While the hero hunts a kill-quest
- * target that lives here, spawns are likelier and only those targets appear.
+ * Which foe (if any) turns up on the map this walk tick. Foes come only from
+ * those that live here (data/habitats.ts), shaped by the hero's power. While
+ * the hero hunts a kill-quest target that lives here, spawns are likelier and
+ * only those targets appear; a target never shows up outside its habitat, and
+ * a settled place (town) sees nothing but a town-dwelling quarry.
  */
 export function rollFoeSpawn(state: WorldStateData, present: number): string | null {
   if (!state.playerBuild || present >= FOE_SPAWN.maxPerMap) return null;
@@ -106,7 +108,7 @@ export function rollFoeSpawn(state: WorldStateData, present: number): string | n
   const huntPool = hunt.size ? pool.filter((ev) => hunt.has(ev.opponentId)) : [];
   const hunting = huntPool.length > 0;
   // Towns, villages, sects and homes: only a quest's quarry, never a stray foe.
-  if (!hunting && isSettledPlace(state.currentSceneId)) return null;
+  if (!hunting && (isSettledPlace(state.currentSceneId) || isTownScene(state.currentSceneId))) return null;
   if (Math.random() >= (hunting ? FOE_SPAWN.huntChance : FOE_SPAWN.chance)) return null;
   return pickWeighted(hunting ? huntPool : pool, Math.random())?.opponentId ?? null;
 }

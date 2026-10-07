@@ -28,7 +28,7 @@ The damage and effect numbers are not re-implemented here: each cast runs the or
 | --- | --- | --- |
 | Engine (pure) | `lib/game/grid/types.ts` | contract types; `GRID_DEFAULT_COLS = 10`, `GRID_DEFAULT_ROWS = 7` |
 | | `lib/game/grid/geometry.ts` | distances, walking range, aim cells, area cells |
-| | `lib/game/grid/skill-grid.ts` | range / area profile for every skill and art, 14 overrides, Thai labels |
+| | `lib/game/grid/skill-grid.ts` | range / area profile for every skill and art, 27 overrides (13 of them boss moves), Thai labels |
 | | `lib/game/grid/engine.ts` | battle creation, per-unit turn order, queries, `applyAction` |
 | | `lib/game/grid/duel.ts` | runs `battle.ts` for one actor / target pair |
 | | `lib/game/grid/ai.ts` | `planTurn` for enemies and auto mode |
@@ -87,8 +87,10 @@ Phases (`GridPhase`): `start` (nobody holds the turn) → `turn` (may move or ac
 ### Status, stun and cooldowns
 
 - A unit's status ticks at the start of its own turn, so a duration of N means N of the owner's turns, and poison deals N ticks.
-- Stun is checked after the tick lowers it, so a stun of N skips N − 1 turns. The only stun in the data is `sl_truth_staff` (`u: 3`, 100 %) → 2 skipped turns.
-- A cast sets the slot's cooldown: `TIERS[tier].cd` for skills (T0 0, T1 2, T2 3, T3 4, T4 5, T5 6) or `act.cd` for arts. It drops by 1 at each of the owner's turns, so cooldown N leaves the slot unusable for N − 1 turns (a tier-1 skill works every other turn).
+- Stun is checked after the tick lowers it, so a stun of N skips N − 1 turns. `sl_truth_staff` (`u: 3`, 100 %) → 2 skipped turns; the boss stuns (`bss_serpent_coil`'s bind, `bss_turtle_quake`, `bss_bull_stomp`) use `u: 2` → one lost turn.
+- **Blind** is rolled once per action in `doSkill`, before any target resolves: on a fail the slot's cooldown (and an art's MP) is spent, nothing lands, and the `cast` event carries a miss for every target in the area. The blind is used up by that roll.
+- A scorched unit's battle-item heal restores no HP (MP still flows).
+- A cast sets the slot's cooldown: `skillCooldown(skill)` for skills — its own `cd` if set (the boss moves, 0–5), else `TIERS[tier].cd` (T0 0, T1 2, T2 3, T3 4, T4 5, T5 6) — or `act.cd` for arts. It drops by 1 at each of the owner's turns, so cooldown N leaves the slot unusable for N − 1 turns (a tier-1 skill works every other turn).
 - A slot is ready when the unit is alive, the slot has a profile, its cooldown is 0, and (for arts) it has an active and enough MP.
 
 ### Meridian procs
@@ -135,13 +137,28 @@ A cast hits every living unit of the target team inside the area and is refused 
 4. Internal blade / long / short skills reach 1 further (and lines 1 longer).
 5. Melee skills with 4+ hits collapse to single-target.
 
-Then 18 hand-set exceptions (`SKILL_GRID_OVERRIDES`) apply, for example `ep` 18 ฝ่ามือพิชิตมังกร (1–3 line 3), `lmsj` กระบี่ 6 ชีพจร (1–4 single), `ng5` ดาบยาวเทพสังหาร (3×3 square), `tang_starrain` ดาราพิรุณโปรย (2–4 diamond 2) and `ng6` ขลุ่ยพลิกโลก (2–5 diamond 2). Finally `normalise` caps range at 5, lines at 4 and areas at 2.
+Then the hand-set exceptions (`SKILL_GRID_OVERRIDES`, 27) apply, for example `ep` 18 ฝ่ามือพิชิตมังกร (1–3 line 3), `lmsj` กระบี่ 6 ชีพจร (1–4 single), `ng5` ดาบยาวเทพสังหาร (3×3 square), `tang_starrain` ดาราพิรุณโปรย (2–4 diamond 2) and `ng6` ขลุ่ยพลิกโลก (2–5 diamond 2). Finally `normalise` caps range at 5, lines at 4 and areas at 2.
+
+**Boss moves** (`bss_*`, [combat.md](combat.md#boss-moves-and-arts)) each have their own override; the five self moves (molt, frenzies, shell, mirror) need none:
+
+| Move | Profile |
+| --- | --- |
+| `bss_serpent_fang` เขี้ยวพิษทองคำ | 1–2 single (a lunge) |
+| `bss_serpent_coil`, `bss_tiger_claw` (3 hits), `bss_turtle_quake`, `bss_crab_pincers` (4 hits) | 1 single |
+| `bss_tiger_roar` คำรามสะท้านภพ, `bss_bull_stomp` กระทืบธรณี | 0–1 diamond 2 — aimed at the beast's own tile it blasts everything within 2 |
+| `bss_eagle_feathers` ขนนกพันกระบี่ (6 hits) | 2–4 diamond 1 |
+| `bss_eagle_dive` ดิ่งฟ้าผ่าภูผา | 1–4 single |
+| `bss_eagle_gale` ปีกพายุ | 1–3 cross 2 |
+| `bss_turtle_sun` ตะวันแผดเผา, `bss_crab_tide` ฟองคลื่นหมอก | 1–3 diamond 2 |
+| `bss_bull_charge` เขาเพลิงพุ่งทะลวง | line 4 |
+
+Area casts hit every foe in the area: the first through the normal path, the rest as `secondary` (damage and the enemy effect — bleed, bind, blind, scorch, sunder — on each; the self effect once).
 
 `artGrid(art)`: an art with no active has no profile. Heals and buffs (`heal`, `heal_cleanse`, `heal_full_cleanse`, `buff_reflect`, `buff_reduce`, `buff_spd`, `buff_eva_debuff_eva`) are self; `atk_phy_pen` and `drain_phy` are 1–2 single; `debuff_poison` is 1–3 diamond 1; `atk_int_pen`, `drain`, `drain_acc` and `debuff_acc_dmg` are 1–3 diamond 1 at T3+, else 1–3 single.
 
 `describeGrid(profile)` gives the Thai label shown on skill cards and tooltips: `ตนเอง`, `แนวตรง N ช่อง`, or `ระยะ N` / `ระยะ min–max` followed by `เป้าเดียว`, `วงรัศมี N`, `พื้นที่ 3×3`, `กากบาท N` or `ฟันกวาด 3 ช่อง`.
 
-Every skill's and art's profile is listed in [reference/martial-arts.md](reference/martial-arts.md). Today: of 111 arts, 67 are self, 26 are 1–2 single, 13 are 1–3 diamond 1 and 5 are 1–3 single.
+Every skill's and art's profile is listed in [reference/martial-arts.md](reference/martial-arts.md). Today: of 117 arts, 69 are self, 29 are 1–2 single, 14 are 1–3 diamond 1 and 5 are 1–3 single.
 
 ## Resolving a cast: the duel view
 
@@ -193,6 +210,7 @@ applyAction(state, unitId, action, rng = Math.random): boolean   // false (state
   - plus the skill's own self effect, minus 0.05 × MP cost;
   - minus a small walking cost, and for ranged units a penalty per adjacent enemy, or for melee units a pull toward the enemy leader.
 - Support slots score heals only below 60 % HP (×1.3), and buffs only when an enemy could reach the unit next turn.
+- Boss effects: `bleed` / `scorch` riders count as DoTs (a bleed ×1.5 for its growth), `bind` as armour plus its stun chance, `blind` as its fail chance, `sunder` as the shield HP and buffs it strips; pierce (`pen`) is in the damage estimate and a frenzy in the Atk term. A scorched unit values no heal (except a molt, which sheds the scorch). A **molt** is worth its heal (when low) plus every debuff it sheds (a DoT's next ≤ 3 ticks, a bleed growing); a **sun shell** a heal of its size once below 90 % HP (full below 60 %) while no real shield is up; a **frenzy** its Atk gain × 2.5 of the unit's best hits — so a wounded beast frenzies and a full-HP one attacks.
 - If no action is worth anything, it walks toward the nearest spot from which it could attack, then waits.
 - Any real action beats any idle move. Ties break on tile, then slot (wait last), then aim, so the same state always gives the same plan.
 
@@ -287,9 +305,10 @@ Details of the rewards: [gameplay.md](gameplay.md#progression).
 
 `lib/stage/cast-vfx.ts` (pure) turns a cast's `{ tier, source }` into a profile; `lib/stage/battle-vfx.ts` draws it.
 
-- **Rarity** (tier 0–4) sets the palette — parchment, jade, sky, violet, gold — and the layers: T1+ glow and charge sparks, T2+ a shockwave ring and afterimages, T3+ a rune circle, an element burst and petals, T4 a stage dim, a light pillar, rays and a screen flash.
+- **Rarity** (tier 0–5) sets the palette — parchment, jade, sky, violet, gold, crimson — and the layers: T1+ glow and charge sparks, T2+ a shockwave ring and afterimages, T3+ a rune circle, an element burst and petals, T4+ a stage dim, a light pillar, rays and a screen flash; T5 the most sparks (and a taiko under the gong).
 - **Weapon family** sets the shape: sword crescent slash, blade heavy cleave, fist burst, long thrust, short flurry, hidden-weapon projectiles, music waves; inner arts are qi orbs. Ranged shapes travel to the first target and don't lunge.
-- **Element** comes from the effect or type tags: poison, fire, frost, thunder (stun), blood (drain), qi, shadow, holy (heals).
+- **Element** comes from the effect or type tags: poison, fire (burn, scorch), frost, thunder (stun, bind), blood (drain, bleed), qi, shadow (blind), holy (heals, sunder); the beasts add gold, sun, wind, water and earth.
+- **Boss signature** (`CastVfx.signature`, `BOSS_VFX` in `cast-vfx.ts`): each of the 18 `bss_*` moves has its own look on top of its family shape — a wind-up in `cast` (roar / stomp rings gathering, the eagle climbing and a pillar marking its dive, a flame trail along the bull's charge, feather-blades streaming in, a sun rising over the turtle, a wave rolling from the crab), a mark on each hit in `impact` (gold fangs and venom drips, tightening gold coils, blue-blood rakes, shock rings, a lightning column and crater, a grit whirl, rising embers, a dust crater, a pincer X with armour shards, sea mist, horns of flame) and an aura in `support` (gold scales shed, a blood / flame frenzy column, a sun disc, a mirror sheen) — and its own voice in `cast-sfx.ts` (a hiss, a growl-to-roar, a screech, a shell's boom, pincer clacks, a bellow, then per-hit crunches, rumbles and splashes).
 - Misses get a whiff; support casts get an aura at the target's feet.
 - **The hero's body moves by skill** (`lib/stage/hero-motion.ts`, pure; allies on the hero's side, not enemies). `heroMoveFor` picks a move from the profile and `heroPose(move, age, { hitDelay, lastImpact })` gives the pose each frame — reach toward the target, steps, sideways sway, lift, lean, squash and stretch, afterimages and a qi aura:
   - sword → **sweep** (dash in, a coiled lean that turns into the cut);
@@ -326,7 +345,8 @@ Details of the rewards: [gameplay.md](gameplay.md#progression).
 | --- | --- |
 | `bun run test:grid` (`scripts/test-grid-engine.ts`, 14 checks) | layout, name suffixes, move range, walking rules, turn-order ratios and forecast, reach, areas, cooldowns, art MP, own-turn ticks, stun skips, poison deaths, compat mirrors, hero-only flee, full battles ending within 300 turns |
 | `bun run test:grid-ai` (13) | legal plans across 36 seeded battles, attrition up to 2500 turns, attacks when adjacent, walk-and-strike, ranged units keep distance, areas aim for 2+ foes, heals only when low, plan time < 15 ms, a 1 v 7 plan on 15 × 10 < 25 ms |
-| `bun run test:grid-skills` (7) | every skill and art profile is valid, the self / enemy rule, the 14 overrides, `slotGrid`, `describeGrid` labels |
+| `bun run test:grid-skills` (8) | every skill and art profile is valid, the self / enemy rule, the 27 overrides, `slotGrid`, `describeGrid` labels |
+| `bun run test:boss-skills` (17) | the boss moves' shapes and VFX signatures, each new effect in the duel and on the grid (blind's whiff, bind's lost turn, a scorched potion), every boss with minions fought to a finish by the AI, and the AI's frenzy / molt / shell choices |
 | `bun run test:grid-store` (14) | the briefing (no auto-start, the briefed foe is the one fought, gear doesn't count), bridge start with HP / MP and looks, packs (mixed gangs, power reinforcements, the 6 cap), board size per unit count, variant tint / size, rigged NPC sheets for spars and villains, spar sprites, step pacing, refused input, flee, auto, win rewards including pack kills, fatal vs non-fatal loss, escape without rewards |
 | `bun run test:combat` (15) | legacy 1v1 checks plus grid store turns, ties, cooldown timing and flee odds |
 | `bun run test:battle-background` | background choice |

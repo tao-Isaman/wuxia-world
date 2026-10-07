@@ -128,7 +128,7 @@ test("first errand leads to safe training, recovery, and an earned skill upgrade
   expect(trained.pendingEncounter).toBeNull();
   expect(trained.defeatedCounts.training_capital_apprentice).toBe(1);
   expect(trained.gold).toBe(30);
-  expect(trained.wExp).toBe(70);
+  expect(trained.wExp).toBe(60);
   // 10 XP per punch landed; still short of the 50 needed to level on its own.
   expect(trained.skillExp.basic_punch % 10).toBe(0);
   expect(trained.skillExp.basic_punch).toBeGreaterThanOrEqual(20);
@@ -170,7 +170,7 @@ test("first errand leads to safe training, recovery, and an earned skill upgrade
   await expect(upgrade).toBeEnabled();
   await upgrade.click();
   await expect.poll(async () => (await state(page)).skillLevel.basic_punch).toBe(2);
-  expect((await state(page)).wExp).toBe(70 - upgradeCost);
+  expect((await state(page)).wExp).toBe(60 - upgradeCost);
   const payoff = page.getByRole("region", { name: "เลื่อนขั้น หมัดตรง สำเร็จ" });
   await expect(payoff).toBeVisible();
   await expect(payoff).toContainText("พลังของท่า");
@@ -187,7 +187,7 @@ test("first errand leads to safe training, recovery, and an earned skill upgrade
   const upgraded = await state(page);
   expect(upgraded.skillLevel.basic_punch).toBe(2);
   expect(upgraded.skillExp.basic_punch).toBe(0);
-  expect(upgraded.wExp).toBe(70 - upgradeCost);
+  expect(upgraded.wExp).toBe(60 - upgradeCost);
   expect(upgraded.inventory).toMatchObject({ herb: 3, potion: 1 });
   expect(upgraded.defeatedCounts.training_capital_apprentice).toBe(1);
   expect(errors).toEqual([]);

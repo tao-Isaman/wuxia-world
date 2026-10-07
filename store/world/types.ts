@@ -186,6 +186,8 @@ export interface VictorySpoils {
   moves: { id: string; kind: "skill" | "art"; xp: number }[];
   /** A hunt's carcass roll (null when the fight was no hunt). */
   hunt: { items: { itemId: string; count: number }[]; passed: boolean } | null;
+  /** Equipment ids won (a legendary beast's rare drop); they go to the gear bag. */
+  gear?: string[];
 }
 
 // Rest tiers: one's own bed (or one's own sect's grounds, as an active disciple) (home_player), an inn, a temple, the roadside.
@@ -363,6 +365,8 @@ export interface WorldStore extends WorldStateData {
   // saved, so a reload clears them. Touching one opens its encounter.
   roamingFoes: RoamingFoe[];
   engageFoe: (foeId: string) => void;
+  /** Walk into a legendary beast in its lair (data/bosses.ts): the fight-or-flee screen. */
+  engageBoss: (bossId: string) => void;
   // The last death's price (lib/world/death.ts), shown once on waking at home;
   // not saved (the action log keeps it).
   lastDeath: { lines: string[] } | null;

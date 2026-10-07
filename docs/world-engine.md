@@ -219,7 +219,7 @@ Nothing rolls on arrival. While the hero walks on a location or route map, the w
 1. **`rollWalkEvent(state)`** (`lib/world/encounters.ts`): the law, then sect hunters, each setting `pendingEncounter` at once.
    - **The law.** With wanted marks, `lawChance(marks)` spawns a law pursuer; the city whose jail would hold the hero is remembered (`jailCityId`).
    - **Sect hunters.** If any membership is `betrayed`, a 30 % roll spawns that sect's `hunter_<sectId>`.
-2. **`rollFoeSpawn(state, present)`**: if fewer than `FOE_SPAWN.maxPerMap` (3) foes wait on this map, a `FOE_SPAWN.chance` (30 %) roll picks a foe from the zone's pool. In a settled place (`isSettledPlace` in `data/random-events.ts`: cities, villages, homes, inns, sects, temples, the palace, villas, markets, tribes) nothing spawns unless an active kill quest's target is in this zone's pool; then only that quarry comes (at `FOE_SPAWN.huntChance`). Roads and the wilds keep their foes. The store then asks `pickSpot` and adds a `RoamingFoe { id, opponentId, locationId, x, y }` to `roamingFoes`.
+2. **`rollFoeSpawn(state, present)`**: if fewer than `FOE_SPAWN.maxPerMap` (3) foes wait on this map, a `FOE_SPAWN.chance` (30 %) roll picks a foe from those that live here (`fightEventsForLocation`, habitats below). In a settled place (`isSettledPlace` in `data/random-events.ts`: cities, villages, homes, inns, sects, temples, the palace, villas, markets, tribes; also the opening village and tavern — every `town` scene, `isTownScene`) nothing spawns unless an active kill quest's target lives in town (thieves, drunks, ruffians); then only that quarry comes (at `FOE_SPAWN.huntChance`). Roads and the wilds keep their foes; a hunted quarry comes only where it lives. The store then asks `pickSpot` and adds a `RoamingFoe { id, opponentId, locationId, x, y }` to `roamingFoes`.
 
 | Per walk tick | Chance |
 | --- | --- |
@@ -232,20 +232,23 @@ Nothing rolls on arrival. While the hero walks on a location or route map, the w
 
 There are no treasure or meeting events (removed with their scenes).
 
+**Legendary beasts** (`lib/world/data/bosses.ts`) are not rolled: an alive boss (`bossAlive`: never beaten, or beaten ≥ `respawnDays` (90) ago, `bossDefeatedDay` saved since v26) always waits at its lair's `spot` (`bossesAt(state, locationId)`). The location map adds it to `presentation.foes` as a `WorldFoe` with `boss: true` and `look: { kind: "anim", sheet }` (`bossFoesAt` in `components/world/roaming-foes.ts`); walking into it calls `engageBoss(id)` → the same encounter screen, and ⚔ ต่อสู้ brings its pack (`withPack`). A win calls `bossSlain` (`lib/world/victory.ts`): `bossDefeatedDay[id] = day`, a loud rumor (weight 12, heard everywhere within 10 days, 40-day life) and a `boss` action-log line.
+
 ### Who turns up
 
 `lib/world/data/random-events.ts`:
 
-- **Pool**: 64 fight events (the base roster T0–T4, beasts, gangs, elites and ten named villains at `share` 0.35).
-- **Zones** (`zoneOfLocation`): `city_` / `village_` / `inn_` / `home_` → city; `sect_` → sect; `temple_` / `palace_` → temple; `villa_` → mansion; `isle_` → isle; `tribe_` / `market_` / `desert_` → frontier; everything else (mountains, caves, valleys, route maps, the tutorial foothill) → wild.
-- **Category weights by zone** (human / beast / supernatural): city 1/0/0 · mansion 1/0/0 · sect 4/0/1 · temple 2/0/1 · wild 1/4/0.5 · isle 2/3/0 · frontier 3/2/0. Cities never spawn beasts.
-- **Tier weights follow the hero's power.** `playerPowerIndex(state)` = the larger of `day / 200` and `(9 − rank) / 8` for any sect membership (clamped 0–1). `tierWeightForPower`: T0 `max(0.5, 8 − 7p)`, T1 `max(0.5, 5 − 3p)`, T2 `3 + p`, T3 `1.5 + 4.5p`, T4 `0.5 + 4.5p`, elites `3p` (absent at power 0).
+- **Pool**: 68 fight events (the base roster T0–T4, beasts, gangs, elites, ten named villains at `share` 0.35 and the six T5 foes).
+- **Habitats** (`lib/world/data/habitats.ts`). Each foe lives in biomes (`FOE_HABITATS`; `forest`, `mountain`, `snow`, `desert`, `steppe`, `river`, `coast`, `swamp`, `cave`, `road`, `town`) and each place and road has biomes (`PLACE_BIOMES`, `biomesOf`). Wild places are set by hand (isles coast, Kunlun snow, the western ruins desert, caves cave…); every settled place is `town`; the jail, home and the world menu hold none. A road's biomes come from its painting type (`classifyRouteEdge`: coast → coast, forest → forest, mountain / gorge → mountain, highway / lane / country → road) plus the regions it touches (west → desert, north → steppe, or snow on a mountain road, east highways / country roads → river, south → forest). `foeLivesAt(opponentId, sceneId)` is true when they share a biome; `fightEventsForLocation(id, power)` returns only those, so the quest guide's hunting grounds (`opponentSources`) point at a quarry's habitat with no change of its own. Town foes: `petty_thief`, `drunk_brawler`, `ruffian`, `fortune_thief`.
+- **Kinds.** `EnemyCategory` is `human | beast` — no spirits. Beasts carry no gold; they and the legendary beasts teach double move / art xp (`lib/world/victory.ts`).
+- **Tier weights follow the hero's power.** `playerPowerIndex(state)` = the larger of `day / 200` and `(9 − rank) / 8` for any sect membership (clamped 0–1). `tierWeightForPower`: T0 `max(0.5, 8 − 7p)`, T1 `max(0.5, 5 − 3p)`, T2 `3 + p`, T3 `1.5 + 4.5p`, T4 `0.5 + 4.5p`, T5 `0` below p 0.6, else `0.5 + 3.75 (p − 0.6)` (always below T4), elites `3p` (absent at power 0).
+- **The booster** (`boostBuild(build, factor)`, `lib/world/data/opponents.ts`): every T3 opponent's build is raised ×1.6 in power, every T4 ×1.45, and every NPC-backed fighter (`spar_*`, `npc@…`, `lawnpc@…`, `hunter_*`, anyone with `look.npc`) ×1.4 — the larger factor when both apply. It adds `(factor − 1) × powerScore` to the stats in proportion to the build's own, at registry level (each `OpponentDef.build` is wrapped; `unboostedBuild(id)` gives the raw one). T5 foes and bosses are authored at their targets.
 - **Opponent stats scale too.** `applyOpponentStatScale` multiplies every opponent's stats by `1 + 0.6p` (up to ×1.6) before every battle the bridge starts. Joining a sect that starts at rank 5 sets power to 0.5 at once. The capital training apprentice has a hand-written build and is never scaled.
 - Named villains the hero has killed, assassinated or kidnapped never turn up again (`encounterFoeAvailable`).
 
 ### Hunt boost
 
-When the current stage of an active quest is a top-level `defeatedOpponent` (`collectActiveHuntTargets`) and one of those foes can appear in this zone, a foe appears with 80 % per tick and only the targets appear. It ends by itself when the stage moves on.
+When the current stage of an active quest is a top-level `defeatedOpponent` (`collectActiveHuntTargets`) and one of those foes lives here, a foe appears with 80 % per tick and only the targets appear. Outside its habitat the quarry never comes. It ends by itself when the stage moves on.
 
 ## Law and jail
 

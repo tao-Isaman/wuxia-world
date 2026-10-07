@@ -67,7 +67,7 @@ try {
   useWorldStore.getState().acceptEncounter();
   assert.equal(resolveBattleBackground({ ...useWorldStore.getState(), mode: "world" }).id, "capital-street");
   const saved = JSON.parse(memory.get("wusia-world-v1")!);
-  assert.equal(saved.version, 25);
+  assert.equal(saved.version, 26);
   assert.equal(resolveBattleBackground({ ...saved.state, mode: "world" }).id, "capital-street", "existing serialized world fields retain the honest city origin");
   await useWorldStore.persist.rehydrate();
   assert.equal(resolveBattleBackground({ ...useWorldStore.getState(), mode: "world" }).id, "capital-street");

@@ -54,6 +54,13 @@ export const ITEM_ICONS: Readonly<Record<string, string>> = {
   tiger_claw: "ico_material_animal_part_06",
   bear_claw: "ico_material_animal_part_03",
   snake_skin: "ico_material_animal_part_13",
+  // ── legendary beast trophies
+  trophy_golden_serpent: "ico_material_animal_part_07",
+  trophy_blood_tiger: "ico_material_animal_part_06",
+  trophy_sword_eagle: "ico_material_animal_part_11",
+  trophy_sun_turtle: "ico_material_animal_part_08",
+  trophy_blade_crab: "ico_material_animal_part_12",
+  trophy_flame_bull: "ico_material_animal_part_05",
   fish_carp: "ico_food_fish_01",
   fish_eel: "ico_food_fish_03",
   fish_dragon: "ico_food_fish_07",

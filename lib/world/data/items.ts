@@ -1,5 +1,5 @@
 import { scaleMoveStat } from "./move-gates";
-import { ARTS, SKILLS, TIERS, MERIDIAN_CHARTS, MERIDIAN_KIND_LABEL, meridianChartItemId, getSkill, getArt } from "@/lib/game";
+import { ARTS, SKILLS, TIERS, MERIDIAN_CHARTS, MERIDIAN_KIND_LABEL, meridianChartItemId, getSkill, getArt, isBeastMove, isBossArt } from "@/lib/game";
 import type { ItemDef } from "../types";
 
 // คัมภีร์ — what a quest that teaches a move or art hands over instead. The
@@ -136,6 +136,21 @@ export const ITEMS: readonly ItemDef[] = ([
     description: "อุ้งเท้าหมีดิบ มูลค่าสูงในตลาดยา" },
   { id: "snake_skin",  name: "หนังงู",           category: "material", price: 80,
     description: "หนังงูพิษ ใช้ทำเชือกและเครื่องประดับลับ" },
+
+  // ─── Legendary beast trophies (data/bosses.ts) ─────────────────────
+  // One per win over a legendary beast; a costly crafting material.
+  { id: "trophy_golden_serpent", name: "เกล็ดทองงูยักษ์", category: "material", price: 6000,
+    description: "เกล็ดสีทองแผ่นใหญ่เท่าฝ่ามือจากงูยักษ์เกล็ดทองคำ แข็งกว่าเหล็กกล้า ช่างหลอมถือเป็นของล้ำค่า" },
+  { id: "trophy_blood_tiger", name: "เขี้ยวพยัคฆ์โลหิต", category: "material", price: 6500,
+    description: "เขี้ยวสีแดงคล้ำจากพยัคฆ์โลหิตลายคราม ยาวเกือบคืบ ช่างอาวุธใช้ทำด้ามและปลายอาวุธลับ" },
+  { id: "trophy_sword_eagle", name: "ขนปีกกระบี่อินทรียักษ์", category: "material", price: 7000,
+    description: "ขนปีกแข็งคมดั่งใบกระบี่จากอินทรียักษ์จ้าวแห่งกระบี่ เบาแต่ตัดผ้าไหมได้ในครั้งเดียว" },
+  { id: "trophy_sun_turtle", name: "แผ่นกระดองแบกตะวัน", category: "material", price: 6500,
+    description: "แผ่นกระดองที่ยังอุ่นจากเต่ายักษ์แบกตะวัน ช่างเกราะลือว่าทนได้ทั้งดาบและไฟ" },
+  { id: "trophy_blade_crab", name: "ก้ามดาบปูวิเศษ", category: "material", price: 6500,
+    description: "ก้ามขวาของปูวิเศษจ้าวแห่งดาบ ขอบคมเหมือนคมดาบที่ลับมาร้อยครั้ง" },
+  { id: "trophy_flame_bull", name: "เขาเพลิงกระทิงยักษ์", category: "material", price: 7500,
+    description: "เขาสีแดงดั่งเหล็กเผาไฟของกระทิงยักษ์เขาเพลิง จับแล้วยังอุ่นมือ ช่างหลอมใช้เป็นแกนอาวุธชั้นยอด" },
 
   // ─── Fishing ───────────────────────────────────────────────────────
   { id: "fish_carp",   name: "ปลาคาร์ป",         category: "material", price: 20,
@@ -384,12 +399,12 @@ function scrollItems(): ItemDef[] {
   const tier = (ti: number) => TIERS[ti]?.n ?? `T${ti}`;
   const where = (sc: string) => (sc ? `${sc} · ` : "");
   return [
-    ...SKILLS.filter((s) => !s.id.startsWith("bst_")).map((s): ItemDef => ({
+    ...SKILLS.filter((s) => !isBeastMove(s.id)).map((s): ItemDef => ({
       id: scrollItemId("skill", s.id), name: `คัมภีร์${s.n}`, category: "manual", price: 0,
       description: `คัมภีร์ลับบันทึกวิชา${s.n} (${where(s.sc)}${tier(s.ti)}) — อ่านแล้วจะเรียนวิชานี้ได้ทันที`,
       use: { t: "manualLearnSkill", skillId: s.id, reqStat: "STR", reqValue: 0 },
     })),
-    ...ARTS.filter((a) => a.id !== "none").map((a): ItemDef => ({
+    ...ARTS.filter((a) => a.id !== "none" && !isBossArt(a.id)).map((a): ItemDef => ({
       id: scrollItemId("art", a.id), name: `คัมภีร์${a.n}`, category: "manual", price: 0,
       description: `คัมภีร์ลับบันทึกลมปราณ${a.n} (${where(a.sc)}${tier(a.ti)}) — อ่านแล้วจะเรียนลมปราณนี้ได้ทันที`,
       use: { t: "manualLearnArt", artId: a.id, reqStat: "STR", reqValue: 0, level: scrollArtLevel(a.ti) },

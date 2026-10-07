@@ -86,22 +86,24 @@ These are **advisory** — they fail today for known, harmless reasons, so read 
    - for cities and villages, chess and begging spots.
 2. Pick the id **prefix** with care — it drives several systems:
 
-| Prefix | Categories (practice, bonus) | Encounter zone | Rest | Auto-map spots |
-| --- | --- | --- | --- | --- |
-| `city_` | city | city (humans only) | inn 300 gold + roadside | rest, rumor |
-| `village_` | village | city | roadside | — |
-| `inn_` | inn | city | inn + roadside | rest, rumor |
-| `home_` | home | city | roadside | — |
-| `sect_` | sect + mountain (practice, balance/hard bonus) | sect | roadside | practice |
-| `temple_`, `palace_` | temple (practice) | temple | free ½ + roadside | rest, practice |
-| `villa_` | mansion | mansion | roadside | — |
-| `isle_` | isle | isle | roadside | — |
-| `mt_`, `peak_`, `cliff_`, `valley_` | mountain (practice, balance/hard bonus) | wild | roadside | practice |
-| `cave_`, `grotto_` | cave (practice, yin/soft bonus) | wild | roadside | practice |
-| `pool_`, `river_`, `sea_`, `lake_` | river (practice, internal bonus) | wild | roadside | practice |
-| `forest_`, `grove_` | forest (practice, yang/external bonus) | wild | roadside | practice |
-| `desert_`, `tribe_`, `market_` | frontier | frontier | roadside | — |
-| anything else | none | wild | roadside | — |
+| Prefix | Categories (practice, bonus) | Rest | Auto-map spots |
+| --- | --- | --- | --- |
+| `city_` | city | inn 300 gold + roadside | rest, rumor |
+| `village_` | village | roadside | — |
+| `inn_` | inn | inn + roadside | rest, rumor |
+| `home_` | home | roadside | — |
+| `sect_` | sect + mountain (practice, balance/hard bonus) | roadside | practice |
+| `temple_`, `palace_` | temple (practice) | free ½ + roadside | rest, practice |
+| `villa_` | mansion | roadside | — |
+| `isle_` | isle | roadside | — |
+| `mt_`, `peak_`, `cliff_`, `valley_` | mountain (practice, balance/hard bonus) | roadside | practice |
+| `cave_`, `grotto_` | cave (practice, yin/soft bonus) | roadside | practice |
+| `pool_`, `river_`, `sea_`, `lake_` | river (practice, internal bonus) | roadside | practice |
+| `forest_`, `grove_` | forest (practice, yang/external bonus) | roadside | practice |
+| `desert_`, `tribe_`, `market_` | frontier | roadside | — |
+| anything else | none | roadside | — |
+
+   **Foes.** A settled prefix (`city_`, `village_`, `home_`, `inn_`, `sect_`, `temple_`, `palace_`, `villa_`, `market_`, `tribe_`) makes the place `town`: no stray foes. A wild place needs its biomes in `WILD_PLACES` (`lib/world/data/habitats.ts`, e.g. `cave_new: ["cave", "forest"]`), or nothing lives there (`test:foes` fails). Roads get theirs from the painting type and region by themselves.
 
    `leaf()` cannot set `categories`. To override the inferred set, add `categories: [...]` to the object by hand.
 3. Add at least one road in `location-routes.ts` (below). A leaf with no road is attached to the lowest-degree leaf, with a console warning.
@@ -239,7 +241,7 @@ Then run `bun run test:navigation`: every painted map must keep its spawn open a
 | Stage kind | How |
 | --- | --- |
 | item | `autoAdvance: { t: "hasItem", itemId, count }` — counts what the hero **holds now** (items carried before accepting count). The items are taken on hand-in |
-| kill | `autoAdvance: { t: "defeatedOpponent", opponentId, count }` — counts kills **since accepting**. The foe must be able to appear: in `FIGHT_EVENTS` for a zone the player can reach, or through a scene's `triggerBattle` |
+| kill | `autoAdvance: { t: "defeatedOpponent", opponentId, count }` — counts kills **since accepting**. The foe must be able to appear: in `FIGHT_EVENTS` with a habitat (`FOE_HABITATS`) the player can reach, or through a scene's `triggerBattle` |
 | visit | `autoAdvance: { t: "visitedLocation", locationId }` |
 | bad deed | `autoAdvance: { t: "stoleFromNpc" / "kidnappedNpc" / "assassinatedNpc", npcId }` — naming the NPC also makes the kidnap / assassinate buttons appear on them |
 | objective | `objective: { spots: [{ locationId, label, text?, npcId?, sceneId? }], hours? }` — 🔍 spots on the map (or actions on a person's card) that the player uses in person. See [world-engine.md](world-engine.md#quest-objectives) |
@@ -326,12 +328,20 @@ Then run `bun run test:navigation`: every painted map must keep its spawn open a
   build: () => build("หมาป่า", 1, { stats: { AGI: 5, DEX: 4 }, skillIds: ["…"] }) },
 ```
 
-- **`ti`** (0–4) sets the stats baseline in `build()`, the loot count (2 / 3 / 4 picks) and the encounter tier weight.
-- **`category`** (`human` / `beast` / `supernatural`) sets which zones it appears in and how it looks. A beast picks a creature-atlas frame by keywords in its id (tiger, bear, boar, snake, chicken / pheasant, eagle / bird, bat, rabbit / hare, squirrel, cat / lynx, centipede / spider / scorpion; else wolf). A person without NPC art is drawn as one of the 22 painted enemy types (`foeCharacterFor` in `battle-looks.ts`: thief, bandit, bandit chief, brawler, archer, pirate, marauder, assassin ×2, poisoner, swordsman, swordswoman, ghost, cultist, master, monk, constable, guard, enforcer, strategist, brute, empress), read from keywords in its id.
+- **`ti`** (0–5) sets the stats baseline in `build()`, the loot count (2 / 3 / 4 picks), the encounter tier weight (T5 only from power 0.6) and the w-exp a win pays (a person 40 + 20 × ti, a beast 80 + 60 × ti). T3 and T4 builds are boosted ×1.6 / ×1.45 in power at load, and a foe that is a person of the world (`spar_*`, `hunter_*`, `look.npc`) ×1.4 (`boostBuild`, `boostFactorOf`); author the raw build. T5 foes are authored at power 520–900 (`test:foes`).
+- **`category`** (`human` / `beast`) — no spirits. A beast drops no gold and teaches double move xp. It also sets how it looks. A beast picks a creature-atlas frame by keywords in its id (tiger, bear, boar, snake, chicken / pheasant, eagle / bird, bat, rabbit / hare, squirrel, cat / lynx, centipede / spider / scorpion; else wolf). A person without NPC art is drawn as one of the 22 painted enemy types (`foeCharacterFor` in `battle-looks.ts`: thief, bandit, bandit chief, brawler, archer, pirate, marauder, assassin ×2, poisoner, swordsman, swordswoman, ghost, cultist, master, monk, constable, guard, enforcer, strategist, brute, empress), read from keywords in its id.
 - **`drops`** — per-tier defaults `DROPS_T0`…`DROPS_T4`, or a custom list. Check the item ids yourself.
 - **`pack`** adds weaker companions, only when the fight comes from an accepted encounter. It is one `{ opponentId, count }` or a list for a mixed gang (`[{ opponentId: "bandit_lieutenant", count: 1 }, { opponentId: "bandit_archer", count: 2 }]`). The first kind gains +1 / +2 as the hero grows stronger; the total is capped at 6. Members must not be stronger than the leader (`test:grid-store` checks).
 - **`look`** (optional) makes a variant from an existing sprite. `{ npc: "evil_capital_blackmarket_zhou" }` makes the foe that NPC, drawn with the NPC's own sheet (the villain bosses do this). Otherwise: `{ sheet: "foe_pirate" }` picks an enemy type (an older hero / archetype id such as `"m2"` maps onto the nearest type), `{ frame: 0 }` a creature-atlas cell, `tint: 0xc6e6ff` multiplies a colour over it and `size: 1.25` draws it larger (0.6–1.6). Bosses use a larger size so they stand out from their gang.
-- **Random encounters.** Add `{ id: "fight_…", weight: TIER_SPAWN_WEIGHT[ti], opponentId }` to `FIGHT_EVENTS` in `random-events.ts`. The weight is replaced by the power-scaled tier weight at runtime.
+- **`look.anim`** names an animated sheet (`lib/characters/anim-sheets.ts`, `/art/anims/<id>.png`) for T5 foes and legendary beasts.
+- **Random encounters.** Add `{ id: "fight_…", weight: TIER_SPAWN_WEIGHT[ti], opponentId }` to `FIGHT_EVENTS` in `random-events.ts` **and** its habitat to `FOE_HABITATS` in `lib/world/data/habitats.ts` (e.g. `wild_wolf: ["steppe", "forest", "mountain", "snow"]`). It turns up only where a biome matches, and a kill quest's guide points there; only thieves, drunks and ruffians live in `town`. The weight is replaced by the power-scaled tier weight at runtime. `test:foes` checks every fight event has a habitat that a hero can reach.
+
+## A legendary beast (boss)
+
+1. **The opponent** in the legendary-beast block of `opponents.ts`: `ti: 5`, `category: "beast"`, `boss: true`, `look: { anim: "<sheet>" }`, `drops: BOSS_DROPS`, a `pack` of minions (always brought), its own inner art `art_boss_<x>` and three moves of its own (`bss_*`, combat engine, [combat.md](combat.md)). Power 1100–1600 at stat scale 1.
+2. **The lair** in `BOSSES` (`lib/world/data/bosses.ts`): `lair` (a wild location with a painted map), `spot` (map %: open ground reachable from the spawn and ≥ 12 % from every marker — `test:foes` probes it), `respawnDays` (90), `wExp` (3,000–4,000), `trophyItemId`, `gear` + `gearChance`, and the `lore` line the wilds repeat (it becomes a lore rumor pointing at the lair).
+3. **The trophy** `trophy_<x>` in `items.ts` (category `material`, a high price) with an icon in `item-icons.ts`.
+4. **The art** sheet at `/art/anims/<id>.png` ([assets.md](assets.md)).
 - **Other ways to meet it:**
   - a scene `triggerBattle` (add `nonFatal: true` for a friendly fight);
   - an NPC's `sparOpponentId`;

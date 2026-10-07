@@ -332,7 +332,7 @@ check("win: HP carryover, kill counts for the foe and its pack, rewards, battle 
   const spoils = useWorldStore.getState().victorySpoils()!;
   assert.ok(spoils && spoils === useWorldStore.getState().victorySpoils(), "rolled once per battle");
   assert.ok(spoils.gold >= 40 && spoils.gold <= 90, "a tier-2 foe purse");
-  assert.equal(spoils.wExp, 50);
+  assert.equal(spoils.wExp, 80, "a tier-2 person: 40 + 20 × 2");
   assert.ok(spoils.moves.length > 0, "move xp listed");
   useWorldStore.getState().acknowledgeBattleResult();
   assert.equal(useWorldStore.getState().gold, gold + spoils.gold);
@@ -343,7 +343,7 @@ check("win: HP carryover, kill counts for the foe and its pack, rewards, battle 
   assert.equal(w.currentHp, hp);
   assert.equal(w.defeatedCounts.bandit_chief, 1);
   assert.equal(w.defeatedCounts.bandit, 2);
-  assert.equal(w.wExp, wExp + 50);
+  assert.equal(w.wExp, wExp + spoils.wExp);
   assert.ok(Object.keys(w.skillExp).length > 0, "per-skill xp from the leader's uses");
   assert.equal(bs().state, null);
 });

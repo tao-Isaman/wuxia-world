@@ -2,9 +2,9 @@
 
 # Martial arts and equipment
 
-173 move skills (`lib/game/data/skills.ts`), 111 inner arts (`lib/game/data/arts.ts`, not counting the `none` placeholder) and 76 pieces of equipment (`lib/game/data/equipment.ts`).
+191 move skills (`lib/game/data/skills.ts`), 117 inner arts (`lib/game/data/arts.ts`, not counting the `none` placeholder) and 76 pieces of equipment (`lib/game/data/equipment.ts`).
 
-Move skills per tier: T0 พื้นฐาน: 32 · T1 ขั้นกลาง: 37 · T2 ขั้นสูง: 42 · T3 ลับ: 41 · T4 เฉพาะ: 21.
+Move skills per tier: T0 พื้นฐาน: 32 · T1 ขั้นกลาง: 37 · T2 ขั้นสูง: 42 · T3 ลับ: 41 · T4 เฉพาะ: 21 · T5 ปรมัตถ์: 18.
 
 Grid column: the skill's range and area on the tactics board (`skillGrid` / `artGrid` + `describeGrid` in `lib/game/grid/skill-grid.ts`). Weapon families: `fist` หมัด/ฝ่ามือ · `long` อาวุธยาว · `sword` กระบี่ · `blade` ดาบ · `short` อาวุธสั้น · `hidden` อาวุธลับ · `music` เครื่องดนตรี.
 
@@ -284,6 +284,29 @@ Grid column: the skill's range and area on the tactics board (`skillGrid` / `art
 | `dgjj` | เก้ากระบี่เดียวดาย | T4 เฉพาะ | sword | physical | 90 | 9 | ระยะ 1 · เป้าเดียว | yang |
 | `ng5` | ดาบยาวเทพสังหาร | T4 เฉพาะ | blade | physical | 100 | 1 | ระยะ 1 · พื้นที่ 3×3 | yang, hard |
 
+### สัตว์ร้าย (18)
+
+| Id | Name | Tier | Weapon | Attack | bp | Hits | Grid | Types |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `bss_serpent_fang` | เขี้ยวพิษทองคำ | T5 ปรมัตถ์ | fist | physical | 120 | 1 | ระยะ 1–2 · เป้าเดียว | yin |
+| `bss_serpent_coil` | รัดกระดูกแหลก | T5 ปรมัตถ์ | fist | physical | 115 | 1 | ระยะ 1 · เป้าเดียว | hard |
+| `bss_serpent_molt` | ลอกคราบเกล็ดทอง | T5 ปรมัตถ์ | fist | — | 0 | 1 | ตนเอง | yin |
+| `bss_tiger_claw` | กรงเล็บเลือดคราม | T5 ปรมัตถ์ | fist | physical | 125 | 3 | ระยะ 1 · เป้าเดียว | external |
+| `bss_tiger_roar` | คำรามสะท้านภพ | T5 ปรมัตถ์ | fist | physical | 90 | 1 | ระยะ 0–1 · วงรัศมี 2 | yang |
+| `bss_tiger_frenzy` | โลหิตคลั่ง | T5 ปรมัตถ์ | fist | — | 0 | 1 | ตนเอง | yang |
+| `bss_eagle_feathers` | ขนนกพันกระบี่ | T5 ปรมัตถ์ | hidden | physical | 120 | 6 | ระยะ 2–4 · วงรัศมี 1 | external |
+| `bss_eagle_dive` | ดิ่งฟ้าผ่าภูผา | T5 ปรมัตถ์ | fist | physical | 150 | 1 | ระยะ 1–4 · เป้าเดียว | yang |
+| `bss_eagle_gale` | ปีกพายุ | T5 ปรมัตถ์ | fist | physical | 90 | 1 | ระยะ 1–3 · กากบาท 2 | soft |
+| `bss_turtle_shell` | กระดองแบกตะวัน | T5 ปรมัตถ์ | fist | — | 0 | 1 | ตนเอง | hard |
+| `bss_turtle_sun` | ตะวันแผดเผา | T5 ปรมัตถ์ | fist | internal | 110 | 1 | ระยะ 1–3 · วงรัศมี 2 | yang, internal |
+| `bss_turtle_quake` | ทับภูผา | T5 ปรมัตถ์ | fist | physical | 130 | 1 | ระยะ 1 · เป้าเดียว | hard, external |
+| `bss_crab_pincers` | คีมพันดาบ | T5 ปรมัตถ์ | blade | physical | 125 | 4 | ระยะ 1 · เป้าเดียว | external, hard |
+| `bss_crab_mirror` | กระดองสะท้อนดาบ | T5 ปรมัตถ์ | blade | — | 0 | 1 | ตนเอง | hard |
+| `bss_crab_tide` | ฟองคลื่นหมอก | T5 ปรมัตถ์ | fist | internal | 100 | 1 | ระยะ 1–3 · วงรัศมี 2 | yin, internal |
+| `bss_bull_charge` | เขาเพลิงพุ่งทะลวง | T5 ปรมัตถ์ | long | physical | 140 | 1 | แนวตรง 4 ช่อง | yang, hard |
+| `bss_bull_stomp` | กระทืบธรณี | T5 ปรมัตถ์ | fist | physical | 95 | 1 | ระยะ 0–1 · วงรัศมี 2 | hard |
+| `bss_bull_rage` | เพลิงโทสะ | T5 ปรมัตถ์ | fist | — | 0 | 1 | ตนเอง | yang |
+
 ## Inner arts by sect
 
 ### เส้าหลิน (7)
@@ -491,6 +514,17 @@ Grid column: the skill's range and area on the tactics board (`skillGrid` / `art
 | `khbt` | คัมภีร์ทานตะวัน | T5 ปรมัตถ์ | ทานตะวันพลิกฟ้า (buff_spd, 60 MP, cd 6) | ตนเอง | on_crit 100% → buff_spd_cri | 30 / 50 | balance, soft |
 | `kuyt` | วิชาเก้าเอี้ยง | T5 ปรมัตถ์ | ฟื้นพลังเก้าเอี้ยง (heal_full_cleanse, 50 MP, cd 6) | ตนเอง | hit_recv 100% → buff_reflect | 40 / 40 | balance, internal |
 | `kgim` | คัมภีร์เก้าอิม | T5 ปรมัตถ์ | กรงเล็บกระดูกขาวเก้าอิม (atk_int_pen, 55 MP, cd 5) | ระยะ 1–3 · วงรัศมี 1 | use_int 100% → debuff_def | 20 / 60 | yin, internal |
+
+### สัตว์ร้าย (6)
+
+| Id | Name | Tier | Active | Grid | Passive | HP/MP per level | Types |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `art_boss_serpent` | ลมปราณเกล็ดทองคำ | T5 ปรมัตถ์ | พิษทองหลั่งไหล (debuff_poison, 40 MP, cd 4) | ระยะ 1–3 · วงรัศมี 1 | hit_recv 35% → buff_reflect | 120 / 50 | yin, hard |
+| `art_boss_tiger` | ลมปราณพยัคฆ์โลหิต | T5 ปรมัตถ์ | ขย้ำคอหอย (atk_phy_pen, 40 MP, cd 4) | ระยะ 1–2 · เป้าเดียว | hit_recv 100% → frenzy | 110 / 40 | yang, external |
+| `art_boss_eagle` | ลมปราณอินทรีกระบี่ | T5 ปรมัตถ์ | เหินฟ้า (buff_spd, 35 MP, cd 5) | ตนเอง | on_crit 100% → buff_spd_cri | 90 / 50 | yang, soft |
+| `art_boss_turtle` | ลมปราณเต่าตะวัน | T5 ปรมัตถ์ | แสงตะวันหล่อเลี้ยง (heal, 45 MP, cd 5) | ตนเอง | hit_recv 30% → buff_def | 150 / 60 | balance, hard |
+| `art_boss_crab` | ลมปราณปูวิเศษ | T5 ปรมัตถ์ | คีมตัดเกราะ (atk_phy_pen, 40 MP, cd 4) | ระยะ 1–2 · เป้าเดียว | hit_recv 40% → buff_reflect | 120 / 40 | hard, external |
+| `art_boss_bull` | ลมปราณกระทิงเพลิง | T5 ปรมัตถ์ | เขาเพลิงทะลวงทัพ (atk_phy_pen, 45 MP, cd 4) | ระยะ 1–2 · เป้าเดียว | on_crit 100% → stack_atk | 130 / 40 | yang, hard |
 
 ## Equipment by slot
 

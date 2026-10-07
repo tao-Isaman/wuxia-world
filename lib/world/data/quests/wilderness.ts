@@ -131,12 +131,12 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
     ],
   },
 
-  // 5. Defeat — fight snow_demon on immortal peak to get snow lotus
+  // 5. Defeat — fight the snow leopard on immortal peak to get snow lotus
   {
     id: "qw_kunlun_snow_lotus",
     name: "บัวหิมะยอดนิรันดร์",
-    description: "ชิวเฉียนป่วยมานานและต้องการบัวหิมะจากยอดนิรันดร์คุนหลุน แต่มีปีศาจหิมะเฝ้าอยู่ ขึ้นไปปราบมัน เก็บบัวหิมะ แล้วนำกลับมา",
-    briefSummary: "ปราบปีศาจหิมะและเก็บบัวหิมะจากยอดนิรันดร์คุนหลุน",
+    description: "ชิวเฉียนป่วยมานานและต้องการบัวหิมะจากยอดนิรันดร์คุนหลุน แต่มีเสือดาวหิมะทำรังอยู่ ขึ้นไปปราบมัน เก็บบัวหิมะ แล้วนำกลับมา",
+    briefSummary: "ปราบเสือดาวหิมะและเก็บบัวหิมะจากยอดนิรันดร์คุนหลุน",
     type: "side",
     giverNpcId: "wld_kunlun_exile_qiu",
     prereqs: { t: "visitedLocation", locationId: "mt_kunlun" },
@@ -148,8 +148,8 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
       },
       {
         id: "defeat_demon",
-        description: "ปราบปีศาจหิมะ 1 ตัว ผู้เฝ้าบัวหิมะ",
-        autoAdvance: { t: "defeatedOpponent", opponentId: "snow_demon", count: 1 },
+        description: "ปราบเสือดาวหิมะ 1 ตัวที่ทำรังข้างบัวหิมะ",
+        autoAdvance: { t: "defeatedOpponent", opponentId: "snow_leopard", count: 1 },
       },
       {
         id: "collect_lotus",

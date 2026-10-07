@@ -130,7 +130,7 @@ export function npcPrompt(npc: NpcDef): ActorJob {
   return { id: npc.id, npc: npc.id, name: npc.name, prompt, gender: female ? "female" : "male", age: child ? "child" : elder ? "elder" : "adult", sect };
 }
 
-/** [key, Thai, English subject, subcategory, template] — 120 monsters. */
+/** [key, Thai, English subject, subcategory, template] — 116 monsters. */
 export const MONSTERS: [string, string, string, string, string][] = [
   // ─── beasts from the game's foes ───
   ["wild_dog", "หมาป่าเล็ก", "a scrawny wild dog", "beast", "dog"],
@@ -142,7 +142,7 @@ export const MONSTERS: [string, string, string, string, string][] = [
   ["brown_bear", "หมีสีน้ำตาล", "a brown bear", "beast", "bear"],
   ["giant_viper", "งูเห่ายักษ์", "a giant hooded cobra rearing up", "beast", "dog"],
   ["giant_centipede", "ตะขาบยักษ์", "a giant red centipede", "beast", "dog"],
-  ["snow_demon", "ปีศาจหิมะ", "a hulking white-furred snow demon with icy claws", "demon", "bear"],
+  ["snow_leopard", "เสือดาวหิมะ", "a white snow leopard with grey rosettes and a long thick tail", "beast", "cat"],
   ["rabbit", "กระต่ายป่า", "a brown wild hare", "beast", "cat"],
   ["pheasant", "ไก่ฟ้า", "a golden pheasant with a long tail", "beast", "dog"],
   ["squirrel", "กระรอก", "a red squirrel with a bushy tail", "beast", "cat"],
@@ -158,11 +158,7 @@ export const MONSTERS: [string, string, string, string, string][] = [
   ["jade_python", "งูเหลือมหยก", "a jade-green giant python", "beast", "dog"],
   ["thunder_eagle", "อินทรีสายฟ้า", "a huge eagle crackling with lightning", "beast", "mannequin"],
   ["bear_king", "ราชาหมีพันปี", "an enormous ancient bear king with grey fur", "beast", "bear"],
-  ["blood_rakshasa", "อสุรกายโลหิต", "a red-skinned rakshasa demon with fangs", "demon", "mannequin"],
-  ["demon_emperor", "จักรพรรดิมาร", "a demon emperor in black armour with horns and a dark aura", "demon", "mannequin"],
-  ["ghost_swordsman", "วิญญาณจอมกระบี่", "the ghost of a swordsman, translucent blue, holding a spectral sword", "spirit", "mannequin"],
-  ["immortal_warrior", "นักรบอมตะ", "an undying armoured warrior with glowing eyes", "spirit", "mannequin"],
-  ["dragon_phoenix_master", "ปรมาจารย์มังกร-หงส์", "a legendary master with dragon and phoenix auras", "boss", "mannequin"],
+  ["shadowless_swordsman", "จอมกระบี่ไร้เงา", "a lean swordsman in pale blue robes caught mid-dash, sword drawn, a blur of speed", "human", "mannequin"],
   // ─── more beasts ───
   ["monkey", "ลิง", "a macaque monkey", "beast", "cat"],
   ["white_ape", "วานรเผือก", "a great white ape", "beast", "mannequin"],

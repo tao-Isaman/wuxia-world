@@ -158,8 +158,8 @@ Code: `lib/world/stations.ts`; the store's `stationTravel`.
 Arriving somewhere never triggers anything. Foes turn up while you **walk**: every 220 map units walked on a location or route map is one *walk tick*. Home and the jail are safe.
 
 - **Foes on the map.** On roads and in the wilds a tick may put a foe on the map (30 %, at most three waiting at once), a short walk away. It stands there with a red ⚔ name tag and watches you. Walk (or tap) into it to face it; walk around it to avoid it. It is gone once you have faced it, and foes stay behind when you leave the map.
-- **Who turns up** depends on the place: mostly beasts in the wilds, people too on roads, frontiers and isles. **Towns, villages, homes, inns, sects, temples and the palace send no stray foes** — only a kill quest's quarry (below). Stronger foes, and elites, come as the hero grows (by day and sect rank).
-- **Hunting.** While a kill quest wants a foe that lives here, foes turn up more often (80 % a tick) and they are the quest's targets — in towns as well (the zone table below says who lives where).
+- **Who turns up** depends on the place: every foe lives in its own **habitat** (snakes in swamps, forests and caves, marauders in the desert, pirates on rivers and coasts, wolves on the steppe, in forests and on mountains, snow leopards in the snow, thieves and drunks in town…) and turns up only there. **Towns, villages, homes, inns, sects, temples and the palace send no stray foes** — only a kill quest's quarry, and only if it lives in town (thieves, drunks, ruffians). Stronger foes, elites and at last tier 5 come as the hero grows (by day and sect rank).
+- **Hunting.** While a kill quest wants a foe that lives here, foes turn up more often (80 % a tick) and they are the quest's targets. Nowhere else does the quarry come: the quest guide points to its habitat.
 - **The law and sect hunters** still catch up at once:
 
 | Check | Chance per tick |
@@ -171,7 +171,7 @@ There are no treasure or meeting events.
 
 ### The encounter screen
 
-Walking into a foe (or being caught by the law or a hunter) opens it. It shows the foe, its tier and its kind (human, beast, supernatural), and the **power tiers** of the foe, its strongest companion and the hero, with a verdict (see [Battles](#battles)). You choose:
+Walking into a foe (or being caught by the law or a hunter) opens it. It shows the foe, its tier and its kind (human or beast — the world has no spirits), and the **power tiers** of the foe, its strongest companion and the hero, with a verdict (see [Battles](#battles)). You choose:
 
 - **⚔ ต่อสู้** — fight. Many foes bring weaker companions — wolves, bats, cultists, bandit gangs — and more of them as the hero grows stronger (up to six). The strongest bosses (the bandit king, the cult elder, the bear king) come with their whole gang. Once the hero is strong, the ten named villains — เถ้าแก่โจวตลาดมืด, ทูตเซี่ย, ขุนนางหยาน, หัวหน้าโจรชิง, นักฆ่าเงาหยิง, เจ้าลัทธิจ้าวมังกรเทพ, ผู้อาวุโสตู๋ซื่อ, ฮุยเป้า, ดาบเลือดเซียะลาง and ตู๋โซ่ว — can also cross the hero's path with their followers (rarer than the other bosses).
 - **🏃 หนี** — leave. Free against ordinary foes.
@@ -180,25 +180,46 @@ Walking into a foe (or being caught by the law or a hunter) opens it. It shows t
 
 ### Who you meet
 
-The zone decides the kind of foe. In the city, mansion, sect and temple zones (and tribes and markets) only a kill quest's quarry comes; the table is who that can be.
+Each foe lives in some of eleven biomes, and each place and road has its own (`lib/world/data/habitats.ts`):
 
-| Zone | Places | Humans / beasts / supernatural |
+| Biome | Places | Who lives there (examples) |
 | --- | --- | --- |
-| city | cities, villages, inns, homes | 1 / 0 / 0 |
-| mansion | villas | 1 / 0 / 0 |
-| sect | sect grounds | 4 / 0 / 1 |
-| temple | temples, palaces | 2 / 0 / 1 |
-| isle | islands | 2 / 3 / 0 |
-| frontier | tribes, markets, deserts | 3 / 2 / 0 |
-| wild | mountains, caves, valleys, pools, every road, the tutorial foothill | 1 / 4 / 0.5 |
+| town | cities, villages, homes, inns, sects, temples, palaces, villas, markets, tribes | thieves, drunks, ruffians, the fake fortune-teller — as a kill quest's quarry only |
+| road | highways, lanes and country roads | robbers, road bandits, wandering swordsmen, sect disciples, night blades, the iron monk (T5) |
+| forest | forests, valleys, wooded isles, south roads | boars, wolves, tigers, bears, snakes, bandit gangs, the poison matriarch (T5) |
+| mountain | mountains, cliffs, peaks, mountain and gorge roads | tigers, bears, eagles, swordsmen, sect elders, the nameless sword hermit (T5) |
+| snow | Kunlun, the death cliff, the ice caves, northern mountain roads | frost wolves, snow leopards, the white tiger (T5) |
+| desert | the western ruins and roads, the white-camel mountain | desert marauders, cultists, the blood blade lord (T5) |
+| steppe | northern roads and cliffs | wolves, marauders, the wolf king (T5) |
+| river | eastern roads, lakes and pools | river pirates, crabs, pythons, turtles |
+| coast | every isle, coast roads | pirates, iron crabs, stone turtles |
+| swamp | marshy valleys, snake isles, poison caves | snakes, centipedes, poisoners, pythons |
+| cave | caves and grottoes | bats, centipedes, bears, cultists |
 
 Foes also grow with your **power**: the larger of `day / 200` and `(9 − best sect rank) / 8`, capped at 1. As power rises:
 
 - the mix shifts from tier 0–1 toward tiers 3–4;
-- five elite foes appear;
+- elite foes appear, and from power 0.6 the six **tier-5** foes (rarer than tier 4): the nameless sword hermit, the blood blade lord, the poison matriarch, the heretic iron monk, the white tiger and the wolf king with his pack (power tiers 9–10);
 - **every** opponent's stats are multiplied by `1 + 0.6 × power` (up to ×1.6).
 
 Joining a sect that starts at rank 5 sets power to 0.5 at once. The capital apprentice is the only foe that never scales.
+
+Tier 3 and tier 4 foes are clearly stronger than their numbers suggest (their power is raised ×1.6 and ×1.45), and anyone who is a person of the world — sparring partners, people fought as themselves, sect hunters, named villains — fights one power tier above their raw build (×1.4).
+
+### Legendary beasts (สัตว์ในตำนาน)
+
+Six great animals wait each in its own lair, large on the map with a name plate. Walk into one to face it; it always comes with its brood. They are tougher than any tier-5 foe (power tiers 11–12), each with three moves and an inner art of its own.
+
+| Beast | Lair | Brood |
+| --- | --- | --- |
+| งูยักษ์เกล็ดทองคำ | ถ้ำงูทอง (east) | a giant cobra and a jade python |
+| พยัคฆ์โลหิตลายคราม | ถ้ำหุบเขาผีเสื้อ (south) | a mountain tiger and a golden tiger |
+| อินทรียักษ์จ้าวแห่งกระบี่ | ยอดเขามรณะ (north) | two thunder eagles |
+| เต่ายักษ์แบกตะวัน | เกาะไร้ชื่อ (east) | two stone turtles |
+| ปูวิเศษจ้าวแห่งดาบ | สระมังกรดำ (west) | two iron crabs |
+| กระทิงยักษ์เขาเพลิง | ยอดแสงสว่าง (heartland) | two blood boars |
+
+The wilds talk about each one (a lore rumor names its lair). A win pays 3,000–4,000 w-exp, double move xp, its trophy (a costly crafting material), four rolls of rare materials, big potions and meridian charts, and a 15 % chance of a piece of top gear. The jianghu hears of it at once, and the beast is back **90 days** later.
 
 ### Life and death
 
@@ -218,10 +239,10 @@ Battles are turn-based tactics on a board of 10 × 7 tiles, growing to 15 × 10 
 - **Retreat** succeeds 20–90 % by speed. It gives no rewards and costs the turn if it fails.
 - **อัตโนมัติ** lets the AI play for you.
 - **Winning** pays:
-  - 50 w-exp;
-  - gold from a hostile foe's purse by tier: T0 5–15, T1 15–40, T2 40–90, T3 90–180, T4 180–350 (spars, tournament bouts and the law pay none);
+  - w-exp by the foe: a person 40 + 20 × tier, a beast 80 + 60 × tier, a legendary beast 3,000–4,000;
+  - gold from a hostile person's purse by tier: T0 5–15, T1 15–40, T2 40–90, T3 90–180, T4 180–350, T5 350–600 (beasts carry none; spars, tournament bouts and the law pay none);
   - loot (2–4 picks from the foe's drop table);
-  - 20 xp per use for each skill and art you used;
+  - 20 xp per use for each skill and art you used (double against beasts and legendary beasts);
   - stat xp (see [Stats](#stats));
   - a kill counted for every fallen foe, companions included.
 

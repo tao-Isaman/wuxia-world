@@ -794,14 +794,14 @@ export interface PendingHuntYield {
 
 // ─── Opponents (for triggerBattle) ─────────────────────────────────────
 
-// Enemy biome category — drives which random-event pool a given location
-// pulls from. Cities / villages won't see beasts, wilderness sees more.
-export type EnemyCategory = "human" | "beast" | "supernatural";
+// What kind of foe: a person or an animal. Where a foe turns up is its
+// habitat (lib/world/data/habitats.ts); beasts carry no gold and teach more.
+// The world is grounded wuxia: no gods, demons or spirits.
+export type EnemyCategory = "human" | "beast";
 
 export const ENEMY_CATEGORY_LABEL: Record<EnemyCategory, string> = {
   human: "ฝ่ายมนุษย์",
   beast: "สัตว์ป่า",
-  supernatural: "ผู้พิเศษ",
 };
 
 // Opponents are wrapped in a build factory so future encounters can scale
@@ -818,9 +818,12 @@ export interface OpponentDef {
   // tier = lower weight) and is shown to the player in the encounter
   // screen so they can decide whether to fight or flee. New opponents
   // default to tier 0 when omitted.
-  ti?: 0 | 1 | 2 | 3 | 4;
-  // What kind of foe — humans show up in cities, beasts in the wild,
-  // supernaturals only in deeper / sect / temple zones.
+  ti?: 0 | 1 | 2 | 3 | 4 | 5;
+  // A legendary beast (lib/world/data/bosses.ts): waits in its lair, always
+  // brings its minions, back 90 days after it falls.
+  boss?: boolean;
+  // What kind of foe (human / beast). Where it turns up is its habitat
+  // (lib/world/data/habitats.ts FOE_HABITATS).
   category?: EnemyCategory;
   // Drop table — weighted item rolls when the player wins. Two picks for
   // tier 0/1, three for tier 2/3, four for tier 4 (handled in store).
@@ -838,7 +841,8 @@ export interface OpponentDef {
   // (1 = normal; bosses 1.2–1.4). `npc` names the NPC this foe is: the
   // battle draws that NPC's own sheet (rigged NPCs play full clips). Without
   // it the look comes from the id.
-  look?: { sheet?: string; frame?: number; tint?: number; size?: number; npc?: string };
+  // `anim` names an animated sheet (lib/characters/anim-sheets.ts: bosses, T5).
+  look?: { sheet?: string; frame?: number; tint?: number; size?: number; npc?: string; anim?: string };
   build: () => CharacterBuild;
 }
 
@@ -1242,6 +1246,9 @@ export interface WorldStateData {
   tournamentHistory: TournamentRecord[];
   // Day each place activity was last done (its own cooldown; data/activities.ts).
   activityDays: Record<string, number>;
+  // v26: day each legendary beast (data/bosses.ts) last fell; it is back
+  // `respawnDays` (90) later.
+  bossDefeatedDay: Record<string, number>;
 
   // Game time. Twelve ชั่วยาม per day; `time` is a fractional within-day
   // counter (0 ≤ time < 12) that advances per action and rolls `day` over

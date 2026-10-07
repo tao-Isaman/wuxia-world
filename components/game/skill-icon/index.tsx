@@ -13,6 +13,7 @@ import "../skill-icons-batch-2";
 import "../skill-icons-batch-3";
 import "../skill-icons-batch-4";
 import "../skill-icons-batch-5";
+import "../skill-icons-batch-6";
 
 import { INK, TIER_FRAME_COLOR } from "./constants";
 import { TierFrame } from "./tier-frame";

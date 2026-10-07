@@ -48,15 +48,15 @@ export function EncounterScreen() {
   const tierName = typeof opp.ti === "number" ? TIERS[opp.ti]?.n ?? "" : "";
   const cat: EnemyCategory = opp.category ?? "human";
   const color = rarityColor(opp.ti);
-  const flavor = cat === "beast"
-    ? "สัตว์ป่าตัวหนึ่งกระโจนใส่เจ้าจากในป่า — จะสู้หรือหนี?"
-    : cat === "supernatural"
-      ? "ผู้พิเศษปรากฏกายขัดทางเดินของเจ้า — จะสู้หรือหนี?"
+  const flavor = opp.boss
+    ? `${opp.name}เงยหัวขึ้นจากรังของมัน บริวารของมันรายล้อมอยู่ — จะสู้หรือหนี?`
+    : cat === "beast"
+      ? "สัตว์ป่าตัวหนึ่งกระโจนใส่เจ้า — จะสู้หรือหนี?"
       : "คนแปลกหน้าขวางทางเจ้าด้วยท่าทีคุกคาม — จะสู้หรือหนี?";
 
   return (
     <section className="encounter-panel pixel-panel" role="alertdialog" aria-labelledby="encounter-name" data-testid="encounter-screen">
-      <p className="encounter-kicker">พบเจอศัตรู · {ENEMY_CATEGORY_LABEL[cat]}</p>
+      <p className="encounter-kicker">{opp.boss ? "สัตว์ในตำนาน" : "พบเจอศัตรู"} · {ENEMY_CATEGORY_LABEL[cat]}</p>
       <div className="encounter-body">
         <div className="encounter-portrait" style={{ borderColor: color }} aria-hidden="true">
           <FoePortrait opponentId={opp.id} />
