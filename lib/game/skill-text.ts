@@ -87,13 +87,6 @@ export function movePower(baseAtLevel: number, sk: Pick<Skill, "p" | "f">): numb
   return Math.round(baseAtLevel * (1 + sk.p / 100) + sk.f);
 }
 
-/** What `dm` reads as: the whole hit (attack + move power) scaled — "ท่านี้ตีแรงกว่าปกติ 15%". */
-export function damageMultiplierText(dm: number): string | null {
-  if (dm === 1) return null;
-  const pct = Math.round((dm - 1) * 100);
-  return pct > 0 ? `ท่านี้ตีแรงกว่าปกติ ${pct}%` : `ท่านี้ตีเบากว่าปกติ ${-pct}%`;
-}
-
 // ─── Inner arts' passive line ──────────────────────────────────────────
 
 /** When an art's passive fires (`pas.tr`), in plain Thai. */

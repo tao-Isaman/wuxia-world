@@ -28,7 +28,7 @@ import {
   xpToNextLevel,
 } from "@/lib/game";
 import type { WeaponFamily } from "@/lib/game";
-import { ATTACK_KIND_LABEL, damageMultiplierText, movePower, passiveLine, plainThai, skillFlavour, skillSummaryLines, statLine } from "@/lib/game/skill-text";
+import { ATTACK_KIND_LABEL, movePower, passiveLine, plainThai, skillFlavour, skillSummaryLines, statLine } from "@/lib/game/skill-text";
 import { useWorldStore } from "@/store/world-store";
 import { confirmDialog } from "@/store/confirm-store";
 import { ArtTooltip, SkillTooltip } from "../skill-tooltip";
@@ -439,7 +439,6 @@ function SkillNumbers({ skill: sk, lv }: { skill: NonNullable<ReturnType<typeof 
   const bpMax = Math.round(effectiveBp(sk, SKILL_LEVEL_MAX));
   const mgMax = Math.round(effectiveMg(sk, SKILL_LEVEL_MAX));
   const atMax = lv >= SKILL_LEVEL_MAX;
-  const dm = damageMultiplierText(sk.dm);
   return (
     <>
       {flavour && <div className="text-[11px] italic text-muted-foreground">{flavour}</div>}
@@ -454,7 +453,6 @@ function SkillNumbers({ skill: sk, lv }: { skill: NonNullable<ReturnType<typeof 
       )}
       <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] text-muted-foreground">
         <span title="บวกเข้ากับพลังโจมตีของเจ้าทุกครั้งที่ใช้ท่านี้">พลังของท่า <b className="text-foreground">{movePower(effectiveBp(sk, lv), sk)}</b>{!atMax && <span className="opacity-60"> (ระดับ 10: {movePower(bpMax, sk)})</span>}</span>
-        {dm && <span>{dm}</span>}
         <span>ความชำนาญ{WEAPON_FAMILY_LABEL[sk.w]} <b className="text-foreground">+{Math.round(effectiveMg(sk, lv))}</b>{!atMax && <span className="opacity-60"> (ระดับ 10: +{mgMax})</span>}</span>
       </div>
     </>
