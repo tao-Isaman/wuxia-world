@@ -79,12 +79,12 @@ The pure logic lives in `server/core` (no I/O, clock or randomness), so it is te
 
 | Request | Answer |
 | --- | --- |
-| `GET /health` | `{ ok, protocol }` |
+| `GET /health` | `{ ok, protocol, auth }`: `auth` is `ready`, or why sign-in cannot work yet (`auth_secret_missing`, `auth_secret_short`) |
 | `POST /auth/register` `{ username, password }` | `{ username, token, expires }`, or `{ error }` with 400 / 409 |
 | `POST /auth/login` `{ username, password }` | the same, or 401 `wrong_login` |
 | `GET /rooms/<room>/ws?token=…` (WebSocket upgrade) | the room; 401 for a bad token |
 
-Usernames are 3–20 of `a–z 0–9 _`, case-insensitive. Passwords are 6–72 characters, stored as PBKDF2-HMAC-SHA256 with a random salt; the iteration count (`PBKDF2_ITERATIONS`, default 10,000) is stored per account. Error codes: `bad_username`, `bad_password`, `taken`, `wrong_login`, `bad_token`, `expired`.
+Usernames are 3–20 of `a–z 0–9 _`, case-insensitive. Passwords are 6–72 characters, stored as PBKDF2-HMAC-SHA256 with a random salt; the iteration count (`PBKDF2_ITERATIONS`, default 10,000) is stored per account. Error codes: `bad_username`, `bad_password`, `taken`, `wrong_login`, `bad_token`, `expired`; a server without a usable `AUTH_SECRET` answers 500 `auth_secret_missing` / `auth_secret_short`.
 
 ## The server (`server/`)
 

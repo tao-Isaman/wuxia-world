@@ -30,14 +30,16 @@ pub(crate) fn now_ms() -> f64 {
     Date::now().as_millis() as f64
 }
 
-fn secret(env: &Env) -> Result<Vec<u8>> {
+/// The token-signing secret, or the error code that says what is wrong with
+/// it (`auth_secret_missing`, `auth_secret_short`) — `/health` reports it too.
+fn secret(env: &Env) -> std::result::Result<Vec<u8>, &'static str> {
     let value = env
         .secret("AUTH_SECRET")
         .map(|s| s.to_string())
         .or_else(|_| env.var("AUTH_SECRET").map(|v| v.to_string()))
-        .map_err(|_| Error::RustError("AUTH_SECRET is not set (wrangler secret put AUTH_SECRET)".into()))?;
-    if value.len() < 16 {
-        return Err(Error::RustError("AUTH_SECRET must be at least 16 characters".into()));
+        .map_err(|_| "auth_secret_missing")?;
+    if value.trim().len() < 16 {
+        return Err("auth_secret_short");
     }
     Ok(value.into_bytes())
 }
@@ -94,6 +96,8 @@ struct Session {
 struct Health {
     ok: bool,
     protocol: u32,
+    /// `ready`, or why sign-in cannot work yet (`auth_secret_missing` / `auth_secret_short`).
+    auth: &'static str,
 }
 
 /// Register or log in through the account's Durable Object, then sign a session.
@@ -115,8 +119,12 @@ async fn auth(mut req: Request, env: &Env, action: &str) -> Result<Response> {
     if status != 200 {
         return api_error(body.error.as_deref().unwrap_or("server_error"), status);
     }
+    let key = match secret(env) {
+        Ok(key) => key,
+        Err(code) => return api_error(code, 500),
+    };
     let expires = now_ms() + TOKEN_TTL_MS;
-    let token = sign_token(&Claims { sub: username.clone(), exp: expires }, &secret(env)?);
+    let token = sign_token(&Claims { sub: username.clone(), exp: expires }, &key);
     json(&Session { username, token, expires }, 200)
 }
 
@@ -130,7 +138,11 @@ async fn join_room(req: Request, env: &Env, room: &str) -> Result<Response> {
     }
     let url = req.url()?;
     let token = url.query_pairs().find(|(k, _)| k == "token").map(|(_, v)| v.into_owned()).unwrap_or_default();
-    let claims = match verify_token(&token, &secret(env)?, now_ms()) {
+    let key = match secret(env) {
+        Ok(key) => key,
+        Err(code) => return api_error(code, 500),
+    };
+    let claims = match verify_token(&token, &key, now_ms()) {
         Ok(claims) => claims,
         Err(error) => return auth_error(error),
     };
@@ -146,7 +158,7 @@ async fn fetch(req: Request, env: Env, _ctx: Context) -> Result<Response> {
     let segments: Vec<&str> = path.trim_matches('/').split('/').collect();
     match (req.method(), segments.as_slice()) {
         (Method::Options, _) => Ok(Response::empty()?.with_status(204).with_headers(cors_headers())),
-        (Method::Get, ["health"]) | (Method::Get, [""]) => json(&Health { ok: true, protocol: PROTOCOL_VERSION }, 200),
+        (Method::Get, ["health"]) | (Method::Get, [""]) => json(&Health { ok: true, protocol: PROTOCOL_VERSION, auth: secret(&env).map(|_| "ready").unwrap_or_else(|code| code) }, 200),
         (Method::Post, ["auth", "register"]) => auth(req, &env, "register").await,
         (Method::Post, ["auth", "login"]) => auth(req, &env, "login").await,
         (Method::Get, ["rooms", room, "ws"]) => {
