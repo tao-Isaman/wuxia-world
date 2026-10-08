@@ -6,6 +6,11 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-08
 
+### Online: no secret to set — the server keeps its own signing key
+
+- Sign-in no longer breaks after a deploy. The token-signing key used to be an `AUTH_SECRET` variable, which a dashboard-only variable lost on every `wrangler deploy` (`auth_secret_missing`). Now `KeyObject` (`server/worker/src/keys.rs`, a Durable Object) makes the key once and keeps it, so deploys and local dev need no configuration. Tokens from before the change stop working once: players log in again; accounts are untouched.
+- A room checks the token before the WebSocket upgrade, so a bad token is 401 even where a proxy drops the `Upgrade` header.
+
 ### Online: account → character → play
 
 - With a game server set, the title screen is a three-step flow: **บัญชี** (sign up with a confirmed password, or log in), then **ตัวละคร**, then the game. Without a valid login the account step comes first, even with a save; a returning player opens on log in with the name filled in and goes straight back to their game. Signing out (HUD 🌐) returns to the account step.

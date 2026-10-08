@@ -1,5 +1,6 @@
 # The wuxia game server (docs/online.md). Deploy: `npx wrangler deploy` from
-# this folder, after `npx wrangler secret put AUTH_SECRET` (≥ 16 characters).
+# this folder. Nothing to configure: the token-signing key is made and kept by
+# the server itself (KeyObject, src/keys.rs), so it survives every deploy.
 name = "wuxia-world"
 main = "build/worker/shim.mjs"
 compatibility_date = "2026-01-01"
@@ -15,9 +16,17 @@ class_name = "AccountObject"
 name = "ROOMS"
 class_name = "RoomObject"
 
+[[durable_objects.bindings]]
+name = "KEYS"
+class_name = "KeyObject"
+
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["AccountObject", "RoomObject"]
+
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = ["KeyObject"]
 
 [vars]
 # PBKDF2 rounds for new passwords (Workers bill CPU time; raise on a paid plan).
