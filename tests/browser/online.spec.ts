@@ -28,11 +28,16 @@ async function player(browser: Browser, hero: string, gender: "ชาย" | "ห
   });
   const page = await context.newPage();
   await page.goto("/");
-  // The title screen offers the online sign-up beside the new hero.
-  const panel = page.getByTestId("online-panel");
-  await panel.locator("#online-username").fill(username);
-  await panel.locator("#online-password").fill("secret-pass");
-  await panel.getByRole("button", { name: "สมัครบัญชี" }).click();
+  // Step 1: an account. No hero form until signed in.
+  const account = page.getByTestId("account-form");
+  await expect(account).toHaveAttribute("data-mode", "register");
+  await expect(page.getByTestId("hero-form")).toHaveCount(0);
+  await account.locator("#account-username").fill(username);
+  await account.locator("#account-password").fill("secret-pass");
+  await account.locator("#account-password-confirm").fill("secret-pass");
+  await account.getByTestId("account-submit").click();
+  // Step 2: the character, under the account's name.
+  await expect(page.getByTestId("hero-form")).toBeVisible();
   await expect(page.getByTestId("online-username")).toHaveText(username);
   await page.locator("#hero-name").fill(hero);
   await page.getByRole("button", { name: gender, exact: true }).click();
@@ -81,4 +86,28 @@ test("two players online see each other walk on the same map", async ({ browser 
   await bob.context().close();
   await expect.poll(() => remoteAt(ann, bobId), { timeout: 20_000 }).toBeNull();
   await ann.context().close();
+});
+
+test("online flow: account first; a returning player logs in straight back to their game; signing out asks again", async ({ browser }) => {
+  test.skip(!(await serverUp()), `no game server at ${SERVER} (bun run server:dev)`);
+  test.setTimeout(120_000);
+  const id = `cat_${run}`.slice(0, 20);
+  const page = await player(browser, "เฉินจิ้ง", "หญิง", id);
+  // Signing out from the HUD goes back to step 1 — the save stays.
+  await page.getByTestId("online-button").click();
+  await page.getByRole("button", { name: "ออกจากระบบ" }).click();
+  const account = page.getByTestId("account-form");
+  await expect(account).toBeVisible();
+  // This browser knows the account: log in is the first tab, the name filled in.
+  await expect(account).toHaveAttribute("data-mode", "login");
+  await expect(account.locator("#account-username")).toHaveValue(id);
+  await account.locator("#account-password").fill("wrong-pass");
+  await account.getByTestId("account-submit").click();
+  await expect(account.getByRole("alert")).toContainText("ไม่ถูกต้อง");
+  await account.locator("#account-password").fill("secret-pass");
+  await account.getByTestId("account-submit").click();
+  // Logged in with a save: no character step, straight into the world.
+  await expect(page.getByTestId("world-canvas")).toHaveAttribute("data-ready", "true", { timeout: 60_000 });
+  await expect(page.getByTestId("hero-form")).toHaveCount(0);
+  await page.context().close();
 });

@@ -141,6 +141,14 @@
   .body-options .character-preview { height: 64px; }
   .creation-note, .creation-save-note { display: none; }
   .start-adventure { margin-top: 10px; padding-top: 8px; padding-bottom: 8px; }
+  /* Online account step (account-step.tsx): the tabs name the mode, so no heading. */
+  .flow-steps { padding-right: 44px; margin: 0 0 8px; }
+  .account-step .creation-heading { display: none; }
+  .account-tabs { margin-bottom: 8px; }
+  .account-tabs button { padding: 5px; }
+  .account-step .creation-label { margin-bottom: 3px; }
+  .account-step .mt-4 { margin-top: 6px; }
+  .account-step .start-adventure { margin-top: 10px; }
 }
 
 /* Gamification beats: purse deltas and the autosave quill. */
