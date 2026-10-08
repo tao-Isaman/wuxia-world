@@ -61,6 +61,7 @@ await check("health answers with the protocol version", async () => {
   const health = await (await fetch(`${server}/health`)).json() as { ok: boolean; protocol: number };
   assert.equal(health.ok, true);
   assert.equal(health.protocol, 1);
+  assert.equal((health as { auth?: string }).auth, "ready", "AUTH_SECRET is set on the server");
 });
 
 await check("sign up two accounts; a taken name, a short password and a wrong password are refused", async () => {
