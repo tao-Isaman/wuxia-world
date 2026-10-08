@@ -4,7 +4,6 @@ import { STAT_XP_PER_ACTION } from "@/lib/world/stat-progression";
 import { applyEffects, getQuest, getScene, type Choice, type SceneEffect, type WorldStateData } from "@/lib/world";
 import { tickQuestProgress } from "@/lib/world/effects";
 import { JAIL_SCENE_ID } from "@/lib/world/data/activities";
-import { advanceTime } from "./lifecycle";
 import { appendActionLog } from "./state";
 import { grantStatXp, rollLukXp } from "./progression";
 import { LOC_TO_ROUTE_HOURS, ROUTE_TO_LOC_HOURS, TRAVEL_STAMINA_COST } from "./rules";
@@ -56,7 +55,6 @@ export function chargeTravelIfNeeded(state: WorldStateData, targetSceneId: strin
   if (hours === null) return true; // story warp — free
   if (state.stamina < TRAVEL_STAMINA_COST) return false;
   state.stamina -= TRAVEL_STAMINA_COST;
-  advanceTime(state, hours);
   // Successful overworld travel — grant AGI xp + roll for LUK.
   grantStatXp(state, "AGI", STAT_XP_PER_ACTION);
   rollLukXp(state);

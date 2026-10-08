@@ -158,6 +158,14 @@ test("first errand leads to safe training, recovery, and an earned skill upgrade
   const firstRest = await state(page);
   expect(firstRest.stamina).toBe(firstRest.staminaMax);
   expect(firstRest.currentHp).toBe(30 + restHeal);
+  // A free rest waits REST_COOLDOWN_HOURS on the world clock; let it pass.
+  await page.evaluate(() => {
+    const raw = JSON.parse(localStorage.getItem("wusia-world-v1")!);
+    delete raw.state.flags._restAt;
+    localStorage.setItem("wusia-world-v1", JSON.stringify(raw));
+  });
+  await page.reload();
+  await ready(page);
   // Full stamina must not block a second rest while HP is still injured.
   await restAtRoadside();
   expect((await state(page)).currentHp).toBe(30 + 2 * restHeal);

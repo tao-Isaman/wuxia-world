@@ -124,7 +124,7 @@ check("speaker labels find their NPC's portrait; walk-ons and the hero find nobo
 // ── Walkthroughs ─────────────────────────────────────────────────────────
 function fresh(at: string) {
   Math.random = () => 0.99; // no roadside encounters
-  store().startNewGame({ name: "Quest dialog test" });
+  store().startNewGame({ newWorld: true, name: "Quest dialog test" });
   useWorldStore.setState({ currentSceneId: at, lastLocationId: at });
 }
 function accept(questId: string) {

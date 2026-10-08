@@ -8,14 +8,29 @@ import { seedLoreRumors } from "@/lib/world/rumor-engine";
 import { reviveFromDeath } from "./lifecycle";
 import { ACTION_LOG_MAX, HERO_BASE_HP, STARTER_STAMINA, emptyData, emptyLifeSkillXp, emptyStatExp, emptyTraits } from "./state";
 import type { WorldStore } from "./types";
+import { SHARED_WORLD_KEYS, type SharedWorldKey } from "@/lib/world/shared/world";
+import { rebaseDays } from "@/lib/world/shared/rebase";
+import { worldNow } from "@/lib/world/clock";
 
-// Content backfill also runs for current-version saves (migrate does
-// not). Keep the standard shallow merge and add only missing lore.
+// Content backfill also runs for current-version saves (migrate does not).
+// Keep the standard shallow merge. A v27 save carries no shared world, so the
+// one in memory stays (at boot an empty one, replaced by the stored world in
+// attachSharedWorld, store/world/shared-local.ts); add only missing lore and
+// people.
 export function mergeSave(persisted: unknown, current: WorldStore): WorldStore {
   const merged = { ...current, ...(persisted as Partial<WorldStateData>) };
-  if (merged.hasGame) seedLoreRumors(merged);
-  // Liveness 2.0: complete older saves' people and register generated ones.
-  if (merged.hasGame) seedLiveness(merged);
+  // A save that still carries world fields (an older save, migrated, or one
+  // edited by hand) hands them to the world when it joins.
+  carriedWorldKeys = persisted && typeof persisted === "object"
+    ? SHARED_WORLD_KEYS.filter((key) => key in persisted)
+    : [];
+  if (merged.hasGame) {
+    // An empty world starts on the save's day, not at day 1.
+    if (Object.keys(merged.npcExt ?? {}).length === 0) merged.lastNpcTickDay = merged.day;
+    seedLoreRumors(merged);
+    // Liveness 2.0: complete older saves' people and register generated ones.
+    seedLiveness(merged);
+  }
   // Saves from when death ended the game: the hero wakes at home instead.
   if (merged.hasGame && merged.gameOver) merged.lastDeath = { lines: reviveFromDeath(merged) };
   if (merged.playerBuild && merged.playerBuild.baseHp === undefined) {
@@ -25,10 +40,22 @@ export function mergeSave(persisted: unknown, current: WorldStore): WorldStore {
   return merged;
 }
 
-// Only persist the data fields, not the action functions. Typed as
-// WorldStateData, so a field added there and forgotten here (or a stray one)
-// is a type error.
-export const partializeSave = (s: WorldStore): WorldStateData => ({
+let carriedWorldKeys: SharedWorldKey[] = [];
+/** The shared fields the last loaded save carried itself (read once, by attachSharedWorld). */
+export function takeCarriedWorldKeys(): SharedWorldKey[] {
+  const keys = carriedWorldKeys;
+  carriedWorldKeys = [];
+  return keys;
+}
+
+/** What the player's save holds: everything but the shared world. */
+export type PlayerSave = Omit<WorldStateData, SharedWorldKey>;
+
+// Only persist the player's data fields, not the action functions and not the
+// shared world (lib/world/shared/world.ts, saved by its WorldService). Typed
+// as PlayerSave, so a field added to WorldStateData and forgotten here (or a
+// stray one) is a type error.
+export const partializeSave = (s: WorldStore): PlayerSave => ({
   hasGame: s.hasGame,
   playerBuild: s.playerBuild,
   gender: s.gender,
@@ -58,16 +85,10 @@ export const partializeSave = (s: WorldStore): WorldStateData => ({
   defeatedCounts: s.defeatedCounts,
   visitedLocationIds: s.visitedLocationIds,
   stoleFromCounts: s.stoleFromCounts,
-  assassinatedNpcIds: s.assassinatedNpcIds,
-  kidnappedNpcIds: s.kidnappedNpcIds,
-  kidnappedUntil: s.kidnappedUntil,
   giftDays: s.giftDays,
   letters: s.letters,
   letterDays: s.letterDays,
-  tournament: s.tournament,
-  tournamentHistory: s.tournamentHistory,
   activityDays: s.activityDays,
-  bossDefeatedDay: s.bossDefeatedDay,
   day: s.day,
   time: s.time,
   pendingBattle: s.pendingBattle,
@@ -76,12 +97,8 @@ export const partializeSave = (s: WorldStore): WorldStateData => ({
   pendingSpar: s.pendingSpar,
   gameOver: s.gameOver,
   actionLog: s.actionLog,
-  // v18+: Liveness Layer.
-  npcExt: s.npcExt,
-  rumorPool: s.rumorPool,
-  rumorArchive: s.rumorArchive,
+  // v18+: what the hero heard (the rumors themselves are the world's).
   rumorSeenLog: s.rumorSeenLog,
-  lastNpcTickDay: s.lastNpcTickDay,
   wanted: s.wanted,
   wantedDay: s.wantedDay,
   lawEvasions: s.lawEvasions,
@@ -143,10 +160,19 @@ export const partializeSave = (s: WorldStore): WorldStateData => ({
 //   v23 → v24 added meridianPoints (ชีพจร) and playerBuild.meridians.
 //   v24 → v25 added lawEvasions.
 //   v25 → v26 added bossDefeatedDay (legendary beasts, data/bosses.ts).
+//   v26 → v27 put the save on the world clock (lib/world/clock.ts): every day
+//            stamp is shifted so `day` is the world's day now (rebaseDays),
+//            and the shared world (npcExt, rumors, bosses, tournament…)
+//            moved out of the save into its own key (WorldService).
 // Despite the list, `migrate` is one idempotent normalizer: it ignores
 // fromVersion and fills every missing field. See docs/save-format.md.
 export function migrateSave(persisted: unknown, fromVersion: number): WorldStateData {
   const p = (persisted ?? {}) as Partial<WorldStateData>;
+  // v27: a save that counted its own days joins the world clock. Only this
+  // step reads fromVersion; it must run once, as it shifts every stamp.
+  if (fromVersion < 27 && p.hasGame && typeof p.day === "number") {
+    rebaseDays(p, worldNow().day - p.day);
+  }
   // Pad the build's skillIds to 10 and back-fill learned arrays.
   if (p.playerBuild) {
     const b = p.playerBuild as CharacterBuild;
@@ -285,6 +311,5 @@ export function migrateSave(persisted: unknown, fromVersion: number): WorldState
     // v21+: imprisonment lock
     jailUntil: typeof p.jailUntil === "number" ? p.jailUntil : null,
   };
-  void fromVersion;
   return out;
 }

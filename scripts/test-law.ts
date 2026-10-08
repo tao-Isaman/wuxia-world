@@ -1,9 +1,11 @@
 import assert from "node:assert/strict";
-import { JAIL_BRIBE_GOLD, ambushChance, arrestPenalty, bribeCost, jailCityFor, jailDays, lawChance, pickLawPursuer, isLawOpponent, LAW_OPPONENTS } from "../lib/world/law";
+import { JAIL_BRIBE_GOLD, ambushChance, arrestPenalty, bribeCost, jailCityFor, jailHours, JAIL_MAX_HOURS, lawChance, pickLawPursuer, isLawOpponent, LAW_OPPONENTS } from "../lib/world/law";
 import { applyEffect, rollFoeSpawn, rollWalkEvent } from "../lib/world/effects";
 import { FOE_SPAWN } from "../lib/world/data/random-events";
 import { getLocationMap, getOpponent, getScene } from "../lib/world";
-import { JAIL_HOURS_PER_DAY, sentenceLeft } from "../lib/world/law";
+import { sentenceLeft } from "../lib/world/law";
+import { advanceTestClock, setTestClock, setTestWorldTime } from "../lib/world/clock";
+import { JAIL_ESCAPE_PENALTY_HOURS, JAIL_LABOR_HOURS } from "../store/world/rules";
 import { useWorldStore } from "../store/world-store";
 
 let checks = 0;
@@ -11,7 +13,7 @@ function check(name: string, run: () => void) { run(); checks++; console.log(`PA
 const withRandom = (value: number, run: () => void) => { const r = Math.random; Math.random = () => value; try { run(); } finally { Math.random = r; } };
 
 function freshState() {
-  useWorldStore.getState().startNewGame({ name: "ทดสอบ", gender: "male" } as never);
+  useWorldStore.getState().startNewGame({ newWorld: true, name: "ทดสอบ", gender: "male" } as never);
   return JSON.parse(JSON.stringify(useWorldStore.getState())) as ReturnType<typeof useWorldStore.getState>;
 }
 
@@ -32,10 +34,11 @@ check("more marks: more pursuit, tougher pursuers, longer sentences", () => {
   assert.equal(pickLawPursuer(1, 0.99), "law_constable");
   const heavy = new Set(Array.from({ length: 50 }, (_, i) => pickLawPursuer(5, i / 50)));
   assert.ok(heavy.has("law_imperial_guard") && heavy.has("law_bounty_hunter"));
-  assert.equal(jailDays(1), 2);
-  assert.equal(jailDays(5), 10);
-  assert.equal(jailDays(12), 24, "marks have no ceiling — nor, up to a month, does the sentence");
-  assert.equal(jailDays(40), 30);
+  // One ชั่วยาม (five real minutes) a mark, served on the world clock, at most an hour.
+  assert.equal(jailHours(1), 1);
+  assert.equal(jailHours(5), 5);
+  assert.equal(jailHours(12), JAIL_MAX_HOURS);
+  assert.equal(jailHours(40), JAIL_MAX_HOURS, "marks have no ceiling; the sentence does");
 });
 
 const sequence = (rolls: number[], run: () => void) => {
@@ -79,11 +82,11 @@ check("an upright person nearby may waylay a wanted hero to hand them over — n
 });
 
 check("arrest costs grow with the record: fines, then seizure, then crippled arts; giving oneself up halves it", () => {
-  assert.deepEqual(arrestPenalty(1), { days: 2, fine: 50, confiscate: false, cripple: 0 });
+  assert.deepEqual(arrestPenalty(1), { hours: 1, fine: 50, confiscate: false, cripple: 0 });
   assert.equal(arrestPenalty(5).confiscate, true);
   assert.equal(arrestPenalty(10).cripple, 1);
   assert.equal(arrestPenalty(20).cripple, 3);
-  assert.deepEqual(arrestPenalty(10, true), { days: 10, fine: 250, confiscate: false, cripple: 0 });
+  assert.deepEqual(arrestPenalty(10, true), { hours: 5, fine: 250, confiscate: false, cripple: 0 });
   const state = freshState();
   state.wanted = 12; state.gold = 1200; state.inventory = { potion: 4, herb: 6 };
   state.skillLevel = { basic_punch: 7 };
@@ -98,7 +101,7 @@ check("arrest costs grow with the record: fines, then seizure, then crippled art
 
 check("มอบตัว: straight to the cells, half the sentence and fine; escapes counted until a sentence clears them", () => {
   const store = useWorldStore.getState();
-  store.startNewGame({ name: "ทดสอบ", gender: "male" } as never);
+  store.startNewGame({ newWorld: true, name: "ทดสอบ", gender: "male" } as never);
   useWorldStore.setState({ currentSceneId: "route_home_player__to__city_capital", lastLocationId: "city_capital", wanted: 0 });
   assert.equal(useWorldStore.getState().surrender().ok, false, "nothing to answer for");
   useWorldStore.setState({ wanted: 6, gold: 500, lawEvasions: 4 });
@@ -107,12 +110,12 @@ check("มอบตัว: straight to the cells, half the sentence and fine; es
   assert.equal(s.currentSceneId, "jail");
   assert.equal(s.wanted, 0);
   assert.equal(s.lawEvasions, 0);
-  assert.equal(sentenceLeft(s), 6 * JAIL_HOURS_PER_DAY, "12 days halved");
+  assert.equal(sentenceLeft(s), 3, "6 ชั่วยาม halved");
   assert.equal(s.gold, 500 - 150);
   assert.ok(String(s.flags._arrestReport).includes("มอบตัว"));
   assert.equal(useWorldStore.getState().surrender().ok, false, "not twice");
   // Unlimited marks: a failed theft at 5 makes 6.
-  useWorldStore.getState().startNewGame({ name: "ทดสอบ", gender: "male" } as never);
+  useWorldStore.getState().startNewGame({ newWorld: true, name: "ทดสอบ", gender: "male" } as never);
   useWorldStore.setState({ wanted: 5 });
   const thief = [...(require("../lib/world").NPCS as { id: string; stealLoot?: unknown[] }[])].find((npc) => npc.stealLoot?.length);
   withRandom(0.999, () => useWorldStore.getState().attemptSteal(thief!.id));
@@ -132,16 +135,18 @@ check("a wanted player's walk tick can bring the law; losing routes to jail", ()
   assert.equal(clean.pendingEncounter, null, "no event on a high roll");
 });
 
-check("serving time clears the marks and releases into the jail's city", () => {
+check("serving time clears the marks and releases into the jail's city — only once it is served", () => {
   const state = freshState();
   state.wanted = 3; state.jailCityId = "city_suzhou"; const day = state.day;
-  state.currentHp = 1;
+  state.jailUntil = day * 12 + state.time + 2;
   applyEffect(state, { t: "serveJail" });
-  assert.equal(state.day, day + 6);
+  assert.equal(state.jailCityId, "city_suzhou", "two ชั่วยาม left: the cell stays shut");
+  state.time += 2;
+  applyEffect(state, { t: "serveJail" });
+  assert.equal(state.day, day, "serving takes no time of its own");
   assert.equal(state.wanted, 0);
   assert.equal(state.lastLocationId, "city_suzhou");
   assert.equal(state.jailCityId, null);
-  assert.ok(state.currentHp > 1);
 });
 
 check("a bribe costs gold and lifts two marks", () => {
@@ -158,7 +163,7 @@ check("a bribe costs gold and lifts two marks", () => {
 
 check("a failed theft adds a wanted mark; home is safe from walk events", () => {
   const store = useWorldStore.getState();
-  store.startNewGame({ name: "ทดสอบ", gender: "male" } as never);
+  store.startNewGame({ newWorld: true, name: "ทดสอบ", gender: "male" } as never);
   const thief = [...(require("../lib/world").NPCS as { id: string; stealLoot?: unknown[] }[])].find((npc) => npc.stealLoot?.length);
   assert.ok(thief, "a stealable NPC exists");
   withRandom(0.999, () => useWorldStore.getState().attemptSteal(thief!.id));
@@ -169,16 +174,17 @@ check("a failed theft adds a wanted mark; home is safe from walk events", () => 
 });
 
 check("arrest locks the player in the jail map until the sentence is served", () => {
+  setTestWorldTime(30, 2);
   const store = useWorldStore.getState();
-  store.startNewGame({ name: "ทดสอบ", gender: "male" } as never);
-  useWorldStore.setState({ currentSceneId: "jail_cell", lastLocationId: "city_dali", wanted: 2, jailCityId: "city_dali", stamina: 100 });
+  store.startNewGame({ newWorld: true, name: "ทดสอบ", gender: "male" } as never);
+  useWorldStore.setState({ currentSceneId: "jail_cell", lastLocationId: "city_dali", wanted: 4, jailCityId: "city_dali", stamina: 100 });
   const choice = getScene("jail_cell")!;
   assert.equal(choice.kind, "dialog");
   useWorldStore.getState().makeChoice(0);
   let s = useWorldStore.getState();
   assert.equal(s.currentSceneId, "jail");
   assert.equal(s.wanted, 0, "marks become the sentence");
-  assert.equal(sentenceLeft(s), 2 * 2 * JAIL_HOURS_PER_DAY);
+  assert.equal(sentenceLeft(s), 4, "one ชั่วยาม a mark");
   // No way out on foot, and the gate stays shut.
   useWorldStore.getState().gotoScene("city_dali");
   assert.equal(useWorldStore.getState().currentSceneId, "jail");
@@ -190,22 +196,26 @@ check("arrest locks the player in the jail map until the sentence is served", ()
   withRandom(0, () => useWorldStore.getState().walkTick());
   assert.equal(useWorldStore.getState().pendingEncounter, null);
   useWorldStore.setState({ wanted: 0 });
-  // Labour passes 6 ชั่วยาม and knocks another 6 off.
+  // Labour takes time off the sentence at once.
   const before = sentenceLeft(useWorldStore.getState());
   assert.equal(useWorldStore.getState().doActivity("jail_labor").ok, true);
   s = useWorldStore.getState();
-  assert.equal(sentenceLeft(s), before - 12);
+  assert.equal(sentenceLeft(s), before - JAIL_LABOR_HOURS);
   assert.ok(s.statExp.STR > 0);
-  // Sitting out the rest releases into the jail's city.
-  useWorldStore.getState().serveSentence();
+  // The rest is served on the world clock: not before it has run.
+  assert.equal(useWorldStore.getState().serveSentence(), false);
+  assert.equal(useWorldStore.getState().currentSceneId, "jail");
+  advanceTestClock(sentenceLeft(useWorldStore.getState()));
+  assert.equal(useWorldStore.getState().serveSentence(), true, "served: the cell opens");
   s = useWorldStore.getState();
   assert.equal(s.jailUntil, null);
   assert.equal(s.currentSceneId, "city_dali");
+  setTestClock(null);
 });
 
 check("dice, meditation and escape: costs, odds and consequences", () => {
   const store = useWorldStore.getState();
-  store.startNewGame({ name: "ทดสอบ", gender: "male" } as never);
+  store.startNewGame({ newWorld: true, name: "ทดสอบ", gender: "male" } as never);
   useWorldStore.setState({ currentSceneId: "jail_cell", lastLocationId: "city_capital", wanted: 1, jailCityId: "city_capital", stamina: 100, gold: 80 });
   useWorldStore.getState().makeChoice(0);
   assert.equal(useWorldStore.getState().gold, 30, "a 50-gold fine for one mark");
@@ -218,9 +228,10 @@ check("dice, meditation and escape: costs, odds and consequences", () => {
   useWorldStore.getState().doActivity("jail_meditate");
   assert.ok(useWorldStore.getState().currentMp > 0);
   assert.equal(useWorldStore.getState().wExp, wExp + 40, "meditation in the cells gives insight (w-exp)");
+  assert.equal(useWorldStore.getState().doActivity("jail_meditate").ok, false, "one sitting per cooldown");
   const left = sentenceLeft(useWorldStore.getState());
   withRandom(0.99, () => useWorldStore.getState().doActivity("jail_escape"));
-  assert.equal(sentenceLeft(useWorldStore.getState()), left - 2 + JAIL_HOURS_PER_DAY, "a failed escape adds a day");
+  assert.ok(Math.abs(sentenceLeft(useWorldStore.getState()) - (left + JAIL_ESCAPE_PENALTY_HOURS)) < 0.01, "a failed escape adds to the sentence");
   useWorldStore.setState({ stamina: 100 });
   withRandom(0, () => useWorldStore.getState().doActivity("jail_escape"));
   const s = useWorldStore.getState();
@@ -266,7 +277,7 @@ check("walking spawns foes that wait on the map: roads and wilds only (towns onl
   assert.equal(full, null);
   // The store keeps foes on their map, needs a spot, and turns contact into the encounter.
   const store = useWorldStore.getState();
-  store.startNewGame({ name: "ทดสอบ", gender: "male" } as never);
+  store.startNewGame({ newWorld: true, name: "ทดสอบ", gender: "male" } as never);
   useWorldStore.setState({ currentSceneId: "cave_jinshe", lastLocationId: "cave_jinshe", roamingFoes: [] });
   withRandom(0, () => useWorldStore.getState().walkTick(() => null));
   assert.equal(useWorldStore.getState().roamingFoes.length, 0, "no free spot, no foe");

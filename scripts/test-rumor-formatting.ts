@@ -33,7 +33,7 @@ function readable(rumor: Rumor) {
 
 try {
   Math.random = () => 0.5;
-  useWorldStore.getState().startNewGame({ name: "Rumor formatting test" });
+  useWorldStore.getState().startNewGame({ newWorld: true, name: "Rumor formatting test" });
   assert.equal(useWorldStore.getState().joinSect("shaolin").ok, true);
   const baseline: WorldStateData = clone(useWorldStore.getState());
   baseline.rumorSeenLog = [{ rumorId: baseline.rumorPool[0].id, dayHeard: baseline.day, location: "city_capital" }];

@@ -2,7 +2,7 @@
 import { applyEffects, getQuest } from "@/lib/world";
 import { completeObjectiveSpot } from "@/lib/world/quest-objectives";
 import { consumeQuestAutoItems } from "@/lib/world/effects";
-import { advanceTime } from "../lifecycle";
+import { staminaForHours } from "../lifecycle";
 import { appendActionLog, draftFrom } from "../state";
 import type { WorldGet, WorldSet, WorldStore } from "../types";
 
@@ -83,12 +83,12 @@ export const questsActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "a
     const result = completeObjectiveSpot(draft, questId, spotIndex);
     if (!result.ok) return result;
     if (result.sceneId) {
-      // A dialog spot that takes time (a dive, a night's watch) spends it first.
-      if (result.hours > 0) { advanceTime(draft, result.hours); set({ ...draft }); }
+      // A dialog spot that used to take time (a dive, a night's watch) costs stamina instead.
+      if (result.hours > 0) { draft.stamina = Math.max(0, draft.stamina - staminaForHours(result.hours)); set({ ...draft }); }
       get().gotoScene(result.sceneId);
       return result;
     }
-    advanceTime(draft, result.hours);
+    if (result.hours > 0) draft.stamina = Math.max(0, draft.stamina - staminaForHours(result.hours));
     const quest = getQuest(questId);
     appendActionLog(draft, "quest", `${quest?.name ?? questId}: ${result.message}`);
     set({ ...draft });

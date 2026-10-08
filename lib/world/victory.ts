@@ -35,18 +35,18 @@ export const BOSS_RUMOR_DAYS = 40;
  * `respawnDays`) and spread the news — a loud rumor from its lair's region
  * that reaches every region within ten days. Returns the boss, or null.
  */
-export function bossSlain(state: WorldStateData, bossId: string): BossDef | null {
+export function bossSlain(state: WorldStateData, bossId: string, day: number = state.day): BossDef | null {
   const boss = getBoss(bossId);
   if (!boss) return null;
-  state.bossDefeatedDay = { ...(state.bossDefeatedDay ?? {}), [boss.id]: state.day };
+  state.bossDefeatedDay = { ...(state.bossDefeatedDay ?? {}), [boss.id]: day };
   const place = getScene(boss.lair);
   const where = place?.kind === "location" ? place.name : boss.lair;
   const rumor: Rumor = {
-    id: `rumor_boss_${boss.id}_${state.day}`,
+    id: `rumor_boss_${boss.id}_${day}`,
     text: `ข่าวสะพัดไปทั่วยุทธภพ — ${boss.name}แห่ง${where}ถูกปราบแล้ว! ว่ากันว่าผู้ลงมือเป็นจอมยุทธ์ผู้หนึ่งที่ขึ้นไปเพียงลำพัง`,
     source: "player_echo",
-    createdDay: state.day,
-    expiresDay: state.day + BOSS_RUMOR_DAYS,
+    createdDay: day,
+    expiresDay: day + BOSS_RUMOR_DAYS,
     truth: "true",
     region: regionOf(boss.lair),
     channel: "inn",

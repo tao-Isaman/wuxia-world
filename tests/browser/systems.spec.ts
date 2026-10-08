@@ -3,6 +3,10 @@ import { test, expect, type Page } from "@playwright/test";
 async function save(page: Page) {
   return page.evaluate(() => JSON.parse(localStorage.getItem("wusia-world-v1")!).state);
 }
+// The shared world (lib/world/shared/): the tournament is the world's.
+async function world(page: Page) {
+  return page.evaluate(() => JSON.parse(localStorage.getItem("wusia-shared-v1")!).world);
+}
 async function patch(page: Page, fields: Record<string, unknown>) {
   await page.evaluate((next) => {
     const saved = JSON.parse(localStorage.getItem("wusia-world-v1")!);
@@ -48,7 +52,7 @@ test("letters: a friend's letter waits in the inbox with a badge; opening it tak
   await expect(tab.locator(".hud-icon-badge")).toHaveCount(0);
 });
 
-test("horse station: ride from the capital to a visited city for gold and time", async ({ page }) => {
+test("horse station: ride from the capital to a visited city for gold, arriving at once", async ({ page }) => {
   test.setTimeout(120_000);
   await newGame(page);
   await patch(page, { currentSceneId: "city_capital", lastLocationId: "city_capital", gold: 1000,
@@ -69,7 +73,7 @@ test("sword tournament: register in the window, then the tournament day queues a
   const popup = page.getByTestId("tournament-popup");
   await expect(popup.getByTestId("tournament-calendar")).toContainText("เปิดรับสมัคร");
   await popup.getByTestId("tournament-register").click();
-  await expect.poll(async () => (await save(page)).tournament?.status).toBe("registered");
+  await expect.poll(async () => (await world(page)).tournament?.status).toBe("registered");
   expect((await save(page)).gold).toBe(900);
   await page.keyboard.press("Escape");
 
@@ -77,8 +81,8 @@ test("sword tournament: register in the window, then the tournament day queues a
   await visit(page, "tournament");
   await page.getByTestId("tournament-popup").getByTestId("tournament-start").click();
   await expect.poll(async () => (await save(page)).pendingBattle?.tournament).toBe(true);
-  const state = await save(page);
-  expect(state.tournament.rounds[0]).toHaveLength(32);
-  expect(state.tournament.rounds[0]).toContain("player");
+  const { tournament } = await world(page);
+  expect(tournament.rounds[0]).toHaveLength(32);
+  expect(tournament.rounds[0]).toContain("player");
   await expect(page.getByTestId("battle-briefing")).toBeVisible({ timeout: 20_000 });
 });

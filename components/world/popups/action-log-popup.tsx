@@ -34,6 +34,7 @@ const KIND_LABEL: Record<string, string> = {
   letter:  "จดหมาย",
   tournament: "ประลองยุทธ",
   boss:    "สัตว์ในตำนาน",
+  time:    "กาลเวลา",
 };
 
 const KIND_COLOR: Record<string, string> = {
@@ -55,6 +56,7 @@ const KIND_COLOR: Record<string, string> = {
   letter:  "border-pink-500/60 text-pink-700",
   tournament: "border-red-600/60 text-red-700",
   boss:    "border-amber-600/60 text-amber-800",
+  time:    "border-stone-400/60 text-stone-600",
 };
 
 export function ActionLogPopup({ open, onClose }: Props) {

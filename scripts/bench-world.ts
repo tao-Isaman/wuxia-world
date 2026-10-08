@@ -89,7 +89,7 @@ function report(label: string) {
   const raw = memory.get("wusia-world-v1") ?? "";
   console.log(`  save size                                            ${(raw.length / 1024).toFixed(1)} KiB (${raw.length} chars)`);
   const persisted = JSON.parse(raw).state;
-  bench("save write (JSON.stringify of the persisted slice)", () => { JSON.stringify({ state: persisted, version: 26 }); });
+  bench("save write (JSON.stringify of the persisted slice)", () => { JSON.stringify({ state: persisted, version: 27 }); });
   const sceneIds = ["city_capital", "village_start", "home_player", "sect_shaolin"].filter((id) => world.getScene(id));
   for (const id of sceneIds) bench(`map view work @ ${id}`, () => mapViewWork(s, id));
   bench("activeGuide", () => { world.activeGuide(s); });
@@ -112,7 +112,7 @@ function report(label: string) {
 }
 
 store().resetGame();
-store().startNewGame({ name: "Bench", gender: "male" } as never);
+store().startNewGame({ newWorld: true, name: "Bench", gender: "male" } as never);
 useWorldStore.setState({ currentSceneId: "city_capital", lastLocationId: "city_capital" });
 console.log(`accepted ${acceptSomeQuests(25)} quests`);
 report("new game");

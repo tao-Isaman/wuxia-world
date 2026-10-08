@@ -16,7 +16,7 @@ interface Props {
 const placeName = (id: string) => (getScene(id) as { name?: string } | null)?.name ?? id;
 
 // สถานีพักม้า — ride to any other station place the hero has visited. Each
-// row shows the fare (gold) and the time it takes (ชั่วยาม).
+// row shows the fare (gold); the ride is instant on the world clock.
 export function StationPopup({ open, onClose }: Props) {
   const sceneId = useWorldStore((s) => s.currentSceneId);
   const visited = useWorldStore((s) => s.visitedLocationIds);
@@ -48,7 +48,7 @@ export function StationPopup({ open, onClose }: Props) {
             <li key={trip.to} className="flex items-center justify-between gap-2 rounded bg-muted/30 px-2 py-1.5">
               <div className="min-w-0">
                 <div className="text-sm font-semibold">{placeName(trip.to)}</div>
-                <div className="text-[11px] text-muted-foreground">{trip.gold} ตำลึง · {trip.hours} ชั่วยาม</div>
+                <div className="text-[11px] text-muted-foreground">{trip.gold} ตำลึง · ถึงทันที</div>
               </div>
               <Button size="sm" variant="outline" className="h-8" disabled={gold < trip.gold} onClick={() => ride(trip.to)}
                 data-testid={`station-ride-${trip.to}`}>

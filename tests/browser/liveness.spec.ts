@@ -4,8 +4,12 @@ import { test, expect, type Page } from "@playwright/test";
 // its map; their card says who they are now and offers ขอประลอง and
 // ⚔ สังหาร. Killing them in an open fight removes them for good and puts the
 // hero at the top of the wanted list at once.
+// The player's save and the shared world (people, rumors) side by side.
 async function state(page: Page) {
-  return page.evaluate(() => JSON.parse(localStorage.getItem("wusia-world-v1")!).state);
+  return page.evaluate(() => ({
+    ...JSON.parse(localStorage.getItem("wusia-world-v1")!).state,
+    ...JSON.parse(localStorage.getItem("wusia-shared-v1")!).world,
+  }));
 }
 async function visit(page: Page, marker: string) {
   await expect(page.getByTestId("world-canvas")).toHaveAttribute("data-ready", "true", { timeout: 60_000 });
@@ -25,9 +29,11 @@ test("a travelling wanderer stands in the capital; killing them openly makes the
   await page.evaluate(() => {
     const raw = JSON.parse(localStorage.getItem("wusia-world-v1")!);
     Object.assign(raw.state, { currentSceneId: "city_capital", lastLocationId: "city_capital", wanted: 0 });
-    // Her journey has brought her to the capital; a weak opponent keeps the fight short.
-    Object.assign(raw.state.npcExt.wander_su_linger, { currentLocation: "city_capital", power: 1, plan: null });
     localStorage.setItem("wusia-world-v1", JSON.stringify(raw));
+    // Her journey has brought her to the capital; a weak opponent keeps the fight short.
+    const shared = JSON.parse(localStorage.getItem("wusia-shared-v1")!);
+    Object.assign(shared.world.npcExt.wander_su_linger, { currentLocation: "city_capital", power: 1, plan: null });
+    localStorage.setItem("wusia-shared-v1", JSON.stringify(shared));
   });
   await page.reload();
 

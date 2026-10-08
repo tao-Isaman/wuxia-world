@@ -29,6 +29,7 @@ import {
   CELIBATE_SECTS, CROOKED_SECTS, FEMALE_ONLY_SECTS, MALE_ONLY_SECTS, UPRIGHT_SECTS,
 } from "./data/liveness-roster";
 import { WORLD_COORDS } from "./data/world-coords";
+import { seededRng } from "./shared/rng";
 import {
   SEAT_RANK, TRAVEL_SPOTS, WANDERERS_MIN, aliveDynamicCount, DYNAMIC_CAP, fillEmptySeats, fireLifeEvent, hallOf,
   isAliveExt, journeyTo, killNpc, sectMembers, sectName, seedLiveness, spawnPerson,
@@ -38,6 +39,12 @@ export interface TickOptions {
   currentDay: number;
   /** Random source (tests pass a seeded one). */
   rng?: () => number;
+  /**
+   * The world seed: each week then draws from its own seeded stream
+   * (seededRng(seed, day)), so the same world gives the same week on any
+   * machine. Ignored when `rng` is given.
+   */
+  seed?: number;
 }
 
 export const TICK_INTERVAL_DAYS = 7;
@@ -459,7 +466,8 @@ function pruneDead(state: WorldStateData, day: number): void {
 // ─── Public entry point ────────────────────────────────────────────────
 
 export function tickAllNamedNpcs(state: WorldStateData, opts: TickOptions): void {
-  const rng = opts.rng ?? Math.random;
+  const weekRng = (day: number): (() => number) =>
+    opts.rng ?? (opts.seed ? seededRng(opts.seed, day) : Math.random);
   const since = opts.currentDay - state.lastNpcTickDay;
   if (since < TICK_INTERVAL_DAYS) return;
   // Fresh entries (a draft must not change the previous snapshot), completed for older saves.
@@ -468,6 +476,7 @@ export function tickAllNamedNpcs(state: WorldStateData, opts: TickOptions): void
   const full = Math.min(weeks, MAX_TICKS_PER_CALL);
   for (let week = 1; week <= full; week++) {
     const day = state.lastNpcTickDay + week * TICK_INTERVAL_DAYS;
+    const rng = weekRng(day);
     const held = heldByHero(state);
     for (const id of Object.keys(state.npcExt)) liveWeek(state, id, day, rng, held);
     fillEmptySeats(state, day, rng);

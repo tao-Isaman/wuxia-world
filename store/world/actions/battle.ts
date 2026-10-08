@@ -7,10 +7,13 @@ import { packOpponentIdOf } from "@/lib/world/battle-looks";
 import { getItem, getNpc, getOpponent, getResource, getScene, masteryLevel } from "@/lib/world";
 import { applyEffect, tickQuestProgress } from "@/lib/world/effects";
 import { isLawOpponent } from "@/lib/world/law";
-import { bossSlain, moveXpMultiplier } from "@/lib/world/victory";
-import { advanceTime, heroKills, markAttemptedMurder, reviveFromDeath, settleTournamentBout } from "../lifecycle";
+import { moveXpMultiplier } from "@/lib/world/victory";
+import { getBoss } from "@/lib/world/data/bosses";
+import { emitWorldEvent } from "@/lib/world/shared/events";
+import { heroTag } from "../state";
+import { heroKills, markAttemptedMurder, reviveFromDeath, settleTournamentBout } from "../lifecycle";
 import { applyArtLevelUps, applySkillLevelUps, grantStatXp, isArtFrozen, isSkillFrozen, rollLukXp } from "../progression";
-import { ART_USE_XP, FAIL_XP_FRACTION, FIGHT_HOURS, FIGHT_STAMINA, HUNT_XP_MULT, SKILL_USE_XP } from "../rules";
+import { ART_USE_XP, FAIL_XP_FRACTION, FIGHT_STAMINA, HUNT_XP_MULT, SKILL_USE_XP } from "../rules";
 import { consumeBattleItems, rollResourceYield, rollVictorySpoils, victorySpoilsFor } from "../spoils";
 import { appendActionLog, draftFrom } from "../state";
 import type { WorldGet, WorldSet, WorldStore } from "../types";
@@ -37,7 +40,6 @@ export const battleActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "c
       const pb = s.pendingBattle;
       const draft = draftFrom(s);
       draft.stamina = Math.max(0, draft.stamina - FIGHT_STAMINA);
-      advanceTime(draft, FIGHT_HOURS);
       draft.pendingBattle = null;
       draft.pendingSpar = null;
       draft.pendingHuntYield = null;
@@ -72,7 +74,6 @@ export const battleActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "c
     // Combat charges flat 5 stamina + 0.5 ชั่วยาม regardless of outcome.
     const draft = draftFrom(s);
     draft.stamina = Math.max(0, draft.stamina - FIGHT_STAMINA);
-    advanceTime(draft, FIGHT_HOURS);
     draft.pendingBattle = null;
     consumeBattleItems(draft, battleState);
     // Carry resources back into the world. Non-fatal defeat leaves one HP
@@ -272,8 +273,10 @@ export const battleActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "c
     );
 
     // A legendary beast fell: it is gone for 90 days and the jianghu hears of it.
+    // The beast belongs to the shared world: its fall is a world event.
     if (oppDef?.boss) {
-      const boss = bossSlain(draft, oppDef.id);
+      emitWorldEvent(draft, { t: "boss_slain", bossId: oppDef.id, byPlayer: heroTag(draft), day: draft.day });
+      const boss = getBoss(oppDef.id);
       if (boss) appendActionLog(draft, "boss", `ปราบ${boss.name}สำเร็จ! ข่าวนี้จะลือไปทั่วยุทธภพ — มันจะกลับมาอีกใน ${boss.respawnDays} วัน`);
     }
 

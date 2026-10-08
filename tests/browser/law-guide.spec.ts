@@ -19,11 +19,11 @@ async function patch(page: Page, fields: Record<string, unknown>, map = true) {
   if (map) await expect(page.getByTestId("world-canvas")).toHaveAttribute("data-ready", "true", { timeout: 60_000 });
 }
 
-test("wanted marks: walking draws the law, jail costs days per mark and clears them", async ({ page }) => {
+test("wanted marks: walking draws the law, jail costs real minutes per mark and clears them", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await start(page);
-  await patch(page, { currentSceneId: "city_capital", lastLocationId: "city_capital", wanted: 3, wantedDay: 1 });
+  await patch(page, { currentSceneId: "city_capital", lastLocationId: "city_capital", wanted: 3, wantedDay: (await save(page)).day });
   await expect(page.locator(".hud-wanted")).toContainText("●●●");
   const world = page.getByTestId("world-canvas");
 
@@ -52,11 +52,12 @@ test("wanted marks: walking draws the law, jail costs days per mark and clears t
   await expect.poll(async () => (await save(page)).currentSceneId).toBe("jail");
   const jailed = await save(page);
   expect(jailed.wanted).toBe(0);
-  expect(jailed.jailUntil - (jailed.day * 12 + jailed.time)).toBe(3 * 2 * 12);
-  await expect(page.locator(".hud-sentence")).toContainText("เหลือโทษ 6 วัน");
-  // The sentence is read out: the days and the fine (50 a mark).
+  // One ชั่วยาม (five real minutes) a mark, on the world clock.
+  expect(jailed.jailUntil - (jailed.day * 12 + jailed.time)).toBeCloseTo(3, 1);
+  await expect(page.locator(".hud-sentence")).toContainText("เหลือโทษ 15 นาที");
+  // The sentence is read out: the time and the fine (50 a mark).
   const report = page.getByTestId("arrest-report");
-  await expect(report).toContainText("โทษจำคุก 6 วัน");
+  await expect(report).toContainText("โทษจำคุก 15 นาที");
   await report.getByRole("button", { name: "รับโทษ" }).click();
   await page.screenshot({ path: "test-results/screenshots/jail-map.png" });
 
@@ -66,17 +67,26 @@ test("wanted marks: walking draws the law, jail costs days per mark and clears t
   await page.locator('[data-places-tab="activity"]').click();
   await page.screenshot({ path: "test-results/screenshots/jail-places.png" });
   await page.getByRole("button", { name: /ทุบหินใช้แรงงาน/ }).click();
-  await expect.poll(async () => { const s = await save(page); return s.jailUntil - (s.day * 12 + s.time); }).toBe(72 - 12);
+  // Labour takes two ชั่วยาม off at once.
+  await expect.poll(async () => { const s = await save(page); return Math.round(s.jailUntil - (s.day * 12 + s.time)); }).toBe(1);
 
-  // The gate stays locked until the sentence is served; sitting it out frees you.
+  // The gate stays locked until the sentence is served on the world clock.
   await page.getByRole("button", { name: /จุดหมาย/ }).click();
   await page.locator('[data-places-tab="activity"]').click();
   await page.getByRole("button", { name: /ประตูคุก/ }).click();
-  await page.getByRole("button", { name: "นั่งนับวัน" }).click();
+  await expect(page.getByText(/โทษนับตามเวลาจริง — รอให้ครบ/)).toBeVisible();
+  await page.getByRole("button", { name: "รับทราบ" }).click();
+  expect((await save(page)).currentSceneId).toBe("jail");
+  // Time served (the save's sentence ends now): the gate opens.
+  const served = await save(page);
+  await patch(page, { jailUntil: served.day * 12 + served.time });
+  await page.getByRole("button", { name: /จุดหมาย/ }).click();
+  await page.locator('[data-places-tab="activity"]').click();
+  await page.getByRole("button", { name: /ประตูคุก/ }).click();
   await expect.poll(async () => (await save(page)).currentSceneId).toBe("city_capital");
   const after = await save(page);
   expect(after.jailUntil).toBeNull();
-  expect(after.day).toBeGreaterThanOrEqual(before.day + 5);
+  expect(after.day).toBeGreaterThanOrEqual(before.day);
   expect(errors).toEqual([]);
 });
 

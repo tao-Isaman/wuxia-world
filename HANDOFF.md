@@ -27,7 +27,7 @@ A Thai wuxia RPG in the browser: Next.js 15, React 19, TypeScript, Phaser 4, Zus
 - **Exploring.** The hero walks painted maps: 101 places, 129 roads; villages, towns and homes have their own people and activities; foes turn up on the map as the hero walks.
 - **Doing.** They talk to 235 NPCs (30 of whom, with their disciples and heirs, live their own lives) (and give them gifts), take 1,074 quests (a 15-chapter main story, 113 sect lineage quests — one per sect tier and kind, a pick of one move where a tier has several — and 48 story sagas among them), join one of 15 sects, gather, craft, steal, and land in jail.
 - **Fighting.** Battles are turn-based tactics on a 10 × 7 board that grows to 15 × 10 for big gangs (up to 6 pack members plus the leader).
-- **Code.** Two pure engines (`lib/game`, `lib/world`) sit under Zustand stores and React / Phaser views. The world saves to `localStorage` (version 26).
+- **Code.** Two pure engines (`lib/game`, `lib/world`) sit under Zustand stores and React / Phaser views. The player saves to `localStorage` (version 27); the shared world (people, rumors, beasts) beside it (`wusia-shared-v1`). Time is a world clock: one game day is one real hour.
 
 Start with [README.md](README.md), then [docs/README.md](docs/README.md).
 
@@ -92,6 +92,7 @@ Not verified:
 
 ## Known issues
 
+- **The world clock moves the world fast.** One game day is one real hour, so a 360-day year is about 15 real days: people age a year every two weeks, a 30-day sect cooldown is 30 hours, a boss returns after 90 hours. Long absences only age the jianghu past eight simulated weeks per sync. Rumor wording, distortion and ids still use `Math.random` (they travel as `rumor` events, but a second machine would word them differently). The tournament bracket's "player" is the local hero; a shared bracket needs a server. A save ahead of the world clock (an e2e fixture, a hand-edited day) waits for the clock to catch up before time moves.
 - **Meridian balance not play-tested.** With charts filled, test fights ended in 1–3 turns (big stat totals plus opening attack %); T0 shields are tiny (a few HP). Start effects apply only in grid battles, not the legacy 1v1 loop. On a phone (844×390) an effect point's tooltip covers most of the figure.
 
 - **Meridian charts lean on the spine.** Many charts chain back points (tailbone → lower back → upper back → nape); the silhouette draws them as dashed rings on the centre line, which reads less well than charts along the limbs. The content is generated from routes in the content agent's spec (not in the repo); a pass spreading more charts over the limbs would help.

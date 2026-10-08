@@ -14,11 +14,13 @@ import { maintainRumors } from "@/lib/world/rumor-engine";
 import { toast } from "@/store/toast-store";
 import { SECT_MEMBERSHIPS } from "@/lib/world/data/sect-memberships";
 import { HOURS_PER_DAY } from "./rules";
-import { appendActionLog } from "./state";
+import { now, worldTimeAt } from "@/lib/world/clock";
+import { appendActionLog, heroTag, setDraftClock } from "./state";
+import { emitWorldEvent } from "@/lib/world/shared/events";
 
 /**
  * A fallen hero is carried home: pay the price of death (half the gold, some
- * items), lose a day, wake at home with 30 % HP / MP. Returns the report lines.
+ * items), wake at home at once with 30 % HP / MP. Returns the report lines.
  */
 export function reviveFromDeath(draft: WorldStateData, rng: () => number = Math.random): string[] {
   const penalty = rollDeathPenalty(draft, rng);
@@ -29,43 +31,53 @@ export function reviveFromDeath(draft: WorldStateData, rng: () => number = Math.
   draft.pendingEncounter = null;
   draft.pendingSpar = null;
   draft.pendingHuntYield = null;
-  advanceTime(draft, HOURS_PER_DAY);
   const d = draft.playerBuild ? deriveAll(draft.playerBuild) : null;
   draft.currentHp = Math.max(1, Math.floor((d?.HP ?? 1) * DEATH_REVIVE_FRACTION));
   draft.currentMp = Math.max(0, Math.floor((d?.MP ?? 0) * DEATH_REVIVE_FRACTION));
   draft.currentSceneId = DEATH_REVIVE_PLACE;
   draft.lastLocationId = DEATH_REVIVE_PLACE;
-  appendActionLog(draft, "battle", `ล้มลงในการต่อสู้ — ฟื้นขึ้นที่บ้านในวันรุ่งขึ้น · ${lines.join(" · ")}`);
+  appendActionLog(draft, "battle", `ล้มลงในการต่อสู้ — ฟื้นขึ้นที่บ้าน · ${lines.join(" · ")}`);
   return lines;
 }
-// In-place time advance. Rolls `time` over each `HOURS_PER_DAY` and
-// increments `day`. Negative deltas are not supported (game time is one-way).
-export function advanceTime(state: WorldStateData, hours: number): void {
-  if (hours <= 0) return;
+/** Stamina refills fully over this many ชั่วยาม (30 real minutes). */
+export const STAMINA_REFILL_HOURS = 6;
+/** HP / MP out of battle refill fully over this many ชั่วยาม (one real hour). */
+export const VITALS_REFILL_HOURS = 12;
+
+/**
+ * Bring the state up to the world clock (lib/world/clock.ts): set `day` /
+ * `time` from the real time and run what the time passing brings — stamina,
+ * HP and MP regeneration, wanted marks fading, the NPC simulation, rumor
+ * upkeep, and on a new day letters and the tournament calendar. Time never
+ * goes back; nothing else moves the clock.
+ */
+export function syncClock(state: WorldStateData, at: number = now()): void {
+  const target = worldTimeAt(at);
+  const from = state.day + state.time / HOURS_PER_DAY;
+  const to = target.day + target.time / HOURS_PER_DAY;
+  if (!(to > from)) return;
   const dayBefore = state.day;
-  let total = state.time + hours;
-  let day = state.day;
-  while (total >= HOURS_PER_DAY) {
-    total -= HOURS_PER_DAY;
-    day++;
-  }
-  state.time = total;
-  state.day = day;
+  const hours = (to - from) * HOURS_PER_DAY;
+  state.day = target.day;
+  state.time = target.time;
+  if (!state.hasGame) return;
+  // Back after a day or more: the log says how long the world went on without them.
+  const away = Math.floor(to - from);
+  if (away >= 1) appendActionLog(state, "time", `ระหว่างที่ท่านไม่อยู่ ผ่านไป ${away} วัน`);
+  regenerate(state, hours);
   // Wanted marks fade one at a time after WANTED_DECAY_DAYS without a new crime.
   while (state.wanted > 0 && state.day - state.wantedDay >= WANTED_DECAY_DAYS) {
     state.wanted -= 1;
     state.wantedDay += WANTED_DECAY_DAYS;
   }
   // ─── Liveness Layer hook ────────────────────────────────────────────
-  // After the clock has advanced to its final value, run NPC simulation
-  // + rumor housekeeping ONCE per advanceTime call. The tick engine
-  // batches internally based on (state.day - state.lastNpcTickDay) and
-  // throttles to ≤ 4 batches per call, so the cost stays bounded even
-  // when the player advances by 90+ days at once. After ticking, scan
-  // for any active quest whose `giverNpcId` died this batch and auto-
-  // fail it — see decision §3 in docs/specs/liveness-plan.md.
+  // Run the NPC simulation + rumor housekeeping once the clock is set. The
+  // tick engine batches by (state.day - state.lastNpcTickDay) and throttles
+  // its full weeks per call (a long absence only ages people past that); each
+  // week draws from the world seed, so every machine sees the same week.
+  // Active quests whose giver died are moved or failed (withChargesOfDead).
   withChargesOfDead(state, () => {
-    tickAllNamedNpcs(state, { currentDay: state.day });
+    tickAllNamedNpcs(state, { currentDay: state.day, seed: state.worldSeed });
   });
   maintainRumors(state, state.day);
   // A new day: friends may write (lib/world/letters.ts), and a tournament
@@ -84,6 +96,33 @@ export function advanceTime(state: WorldStateData, hours: number): void {
       appendActionLog(state, "tournament", `ชุมนุมวิจารณ์กระบี่เขาหัวซานปีที่ ${record.year} จบลง · ผู้ชนะเลิศ ${entrantName(record.champion, state.playerBuild?.name)}`);
     }
   }
+}
+
+/**
+ * Stamina, HP and MP come back as time passes (not mid-battle, not when
+ * fallen). The pools stay whole numbers; the fraction not yet earned is
+ * carried in flags (`_regenSt` / `_regenHp` / `_regenMp`) to the next sync.
+ */
+function regenerate(state: WorldStateData, hours: number): void {
+  if (hours <= 0 || state.pendingBattle || state.gameOver) return;
+  const gain = (pool: "St" | "Hp" | "Mp", perHour: number, cur: number, max: number): number => {
+    const key = `_regen${pool}`;
+    if (cur >= max) { delete state.flags[key]; return cur; }
+    const total = Number(state.flags[key] ?? 0) + perHour * hours;
+    const whole = Math.floor(total);
+    state.flags[key] = total - whole;
+    return Math.min(max, cur + whole);
+  };
+  state.stamina = gain("St", state.staminaMax / STAMINA_REFILL_HOURS, state.stamina, state.staminaMax);
+  if (!state.playerBuild) return;
+  const d = deriveAll(state.playerBuild);
+  state.currentHp = gain("Hp", d.HP / VITALS_REFILL_HOURS, state.currentHp, d.HP);
+  state.currentMp = gain("Mp", d.MP / VITALS_REFILL_HOURS, state.currentMp, d.MP);
+}
+
+/** Stamina an action that used to take `hours` ชั่วยาม costs now (5 per ชั่วยาม, at least 2). */
+export function staminaForHours(hours: number): number {
+  return Math.max(2, Math.round(5 * hours));
 }
 
 // Settle the hero's tournament bout: advance the bracket, log the result and
@@ -126,10 +165,10 @@ export function markAttemptedMurder(state: WorldStateData, npcId: string): void 
 export function heroKills(state: WorldStateData, npcId: string): void {
   const npc = getNpc(npcId);
   const sect = state.npcExt[npcId]?.sect ?? null;
+  // A death in the shared world: a world event (lib/world/shared/events.ts).
   withChargesOfDead(state, () => {
-    killNpc(state, npcId, state.day, { by: "player", kind: "killed_by_player", locationId: state.currentSceneId });
+    emitWorldEvent(state, { t: "npc_killed", npcId, byPlayer: heroTag(state), day: state.day, locationId: state.currentSceneId });
   });
-  if (!state.assassinatedNpcIds.includes(npcId)) state.assassinatedNpcIds = [...state.assassinatedNpcIds, npcId];
   state.wanted = (state.wanted ?? 0) + KILL_MARKS;
   state.wantedDay = state.day;
   state.traits.evil = (state.traits.evil ?? 0) + 10;
@@ -162,3 +201,6 @@ export function withChargesOfDead(state: WorldStateData, change: () => void): Ch
   }
   return changes;
 }
+
+// Every action draft starts on the world clock.
+setDraftClock((draft) => syncClock(draft));

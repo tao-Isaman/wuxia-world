@@ -46,7 +46,7 @@ const strong = (b: CharacterBuild): CharacterBuild =>
 
 function newGame(extra: Partial<ReturnType<typeof useWorldStore.getState>> = {}) {
   bs().reset();
-  useWorldStore.getState().startNewGame({ name: "Grid test" });
+  useWorldStore.getState().startNewGame({ newWorld: true, name: "Grid test" });
   useWorldStore.setState({ currentSceneId: "city_capital", lastLocationId: "city_capital", ...extra });
 }
 // Defaults to a roadside encounter (packs come along); pass withPack:false for a quest fight.

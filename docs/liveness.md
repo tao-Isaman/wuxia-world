@@ -40,7 +40,7 @@ The original requirement and plan are kept as history: [specs/liveness-spec.md](
 | `lib/world/data/lore-rumors.ts` | `LORE_RUMORS` — 30 hand-written rumors |
 | `lib/world/data/opponents.ts` | `npcFoeId` / `parseNpcFoeId` — `npc@<id>@<power>@<sect>` opponents made from a person |
 | `lib/world/npc-presence.ts` | `npcPresent` — the dead, the killed and the kidnapped are not on any map |
-| `store/world/lifecycle.ts` | `advanceTime` runs the tick; `withChargesOfDead`; `heroKills` |
+| `store/world/lifecycle.ts` | `syncClock` runs the tick; `withChargesOfDead`; `heroKills` (an `npc_killed` world event) |
 | `store/world/actions/` | `startSparWith`, `startKillDuel` (`npcs.ts`); the player-echo call sites (`sects.ts`, `battle.ts`, and `heroKills` in `lifecycle.ts`) |
 | `components/world/popups/npc-interaction-popup.tsx` | the NPC card: title, journey and family, ขอประลอง, ⚔ สังหาร |
 | `components/world/location-map.tsx`, `location-view.tsx` | people on the map: residents at their spots, heirs in the old seat, travellers near the way in |
@@ -50,18 +50,20 @@ None of these engine modules is in the `lib/world/index.ts` barrel; import them 
 
 ## When it runs
 
-Every store action that spends time goes through `advanceTime`. After the clock moves it runs:
+The world clock (`lib/world/clock.ts`: one game day is one real hour) drives it: `syncClock` runs on every store action and every 10 s while the page is open, and catches up when the game comes back. After setting the time it runs:
 
-1. `withChargesOfDead(state, () => tickAllNamedNpcs(state, { currentDay }))` — the tick, then the quests of anyone who died in it (see [Seats, heirs and quests](#seats-heirs-and-quests)).
+1. `withChargesOfDead(state, () => tickAllNamedNpcs(state, { currentDay, seed: worldSeed }))` — the tick, then the quests of anyone who died in it (see [Seats, heirs and quests](#seats-heirs-and-quests)). Each week draws its dice from `seededRng(worldSeed, day)`, so one world gives the same weeks on any machine (tests pass their own `rng`).
 2. `maintainRumors(state, day)` — expire, archive and cap rumors.
 
 The tick does nothing until 7 days have passed since `lastNpcTickDay`. It then simulates every whole week since, up to 8 in full (`MAX_TICKS_PER_CALL`); weeks beyond that only age people. The leftover days (`since % 7`) count toward the next week.
 
-`seedLiveness` runs on a new game, on every load (the persist `merge`) and at the start of each tick: it seeds any of the thirty who are missing, fills the fields Liveness 2.0 reads into older entries, replaces every entry with a fresh copy (a draft must never change the previous snapshot) and registers generated people with the NPC registry.
+`seedLiveness` runs when a world is joined or created (`joinSharedWorld`), on every load (the persist `merge`) and at the start of each tick: it seeds any of the thirty who are missing, fills the fields Liveness 2.0 reads into older entries, replaces every entry with a fresh copy (a draft must never change the previous snapshot) and registers generated people with the NPC registry.
 
 ## Saved state
 
 Five fields on `WorldStateData` (save v18+, see [save-format.md](save-format.md)): `npcExt`, `rumorPool`, `rumorArchive`, `rumorSeenLog` (newest 50), `lastNpcTickDay`. Liveness 2.0 added no top-level field, so no version bump: everything new is optional on `NpcExtState` and filled on load.
+
+Since v27 the people and the rumors belong to the **shared world** (`npcExt`, `lastNpcTickDay`, `rumorPool`, `rumorArchive`, with `worldSeed` and the killed / kidnapped lists), saved apart from the player in `wusia-shared-v1`; what the hero heard (`rumorSeenLog`) stays in the player's save. A new hero joins the world as it is: the dead stay dead ([design](design/world-clock-and-shared-world.md)).
 
 `NpcExtState` per person:
 

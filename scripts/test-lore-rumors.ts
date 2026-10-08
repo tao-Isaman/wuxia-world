@@ -13,7 +13,12 @@ Object.defineProperty(globalThis, "localStorage", { configurable: true, value: {
 } });
 Object.defineProperty(globalThis, "window", { configurable: true, value: { localStorage: globalThis.localStorage } });
 const { useWorldStore } = await import("../store/world-store");
+const { setTestWorldTime } = await import("../lib/world/clock");
 const saveKey = "wusia-world-v1";
+const sharedKey = "wusia-shared-v1";
+// The legacy saves below are on day 20: pin the world clock there, so loading
+// them shifts no day stamps (save v27 rebases older saves onto the clock).
+setTestWorldTime(20, 0);
 const clone = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
 const snapshot = (): WorldStateData => clone(useWorldStore.getState());
 const loreIds = LORE_RUMORS.map(lore => lore.idSuffix.startsWith("lore_") ? lore.idSuffix : `lore_${lore.idSuffix}`);
@@ -41,7 +46,7 @@ async function load(state: WorldStateData, version = 21) {
 const random = Math.random;
 try {
   Math.random = () => 0.5;
-  useWorldStore.getState().startNewGame({ name: "Rumor integration test" });
+  useWorldStore.getState().startNewGame({ newWorld: true, name: "Rumor integration test" });
   assertLore(useWorldStore.getState());
   assert.deepEqual(useWorldStore.getState().rumorSeenLog, [], "seeding never counts as hearing");
   // Liveness 2.0: the thirty simulated people are seeded on a new game, with no events yet.
@@ -100,8 +105,9 @@ try {
   useWorldStore.getState().recordRumorHeard(unheard.id);
   assert.deepEqual(useWorldStore.getState().rumorSeenLog, heard.rumorSeenLog, "repeated hearing is idempotent");
   const saved = JSON.parse(memory.get(saveKey)!) as { version: number; state: WorldStateData };
-  assert.equal(saved.version, 26);
-  assertLore(saved.state);
+  assert.equal(saved.version, 27);
+  assert.equal((saved.state as Partial<WorldStateData>).rumorPool, undefined, "rumors are the world's, not the save's");
+  assertLore({ ...saved.state, ...(JSON.parse(memory.get(sharedKey)!) as { world: Partial<WorldStateData> }).world } as WorldStateData);
   for (let i = 0; i < 2; i++) {
     await useWorldStore.persist.rehydrate();
     assert.deepEqual(useWorldStore.getState().rumorPool, heard.rumorPool);

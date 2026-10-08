@@ -81,7 +81,8 @@ bun run test:quests         # campaign audit + dead ends + every item/kill/objec
 bun run test:meridians      # meridian charts: engine, combat bonus, chart items / sources, points, store, repair, content counts
 bun run test:engine         # text overrides over SKILLS / ARTS, the engine's filters / edits / validation, the save route whitelist
 bun run test:docs           # generated reference is current + docs links/paths/commands resolve
-bun run test:foes            # habitats, booster, T5, bosses (lairs, respawn, save v26), spoils
+bun run test:foes            # habitats, booster, T5, bosses (lairs, respawn, boss save), spoils
+bun run test:clock           # world clock, syncClock (regen, catch-up), seeded NPC weeks, WorldEvents, save / shared-world split, v27 rebase
 bun run test:boss-skills     # the boss moves' own effects and boss battles
 bun run test:assets         # asset library: manifest contract, files and sizes, footprints, ≥ 3,000 approved; every item / equipment icon
 bun run test:e2e            # Playwright (Chromium) on :3017 — start a production server first
@@ -132,7 +133,7 @@ bun scripts/assets/build-kits.ts plan && python3 scripts/assets/generate.py run 
 ```
 app/, components/         React: screens, HUD, menus, popups, battle UI
    ↓
-store/                    Zustand: world (saved, v26), battle, character (/debug, v3), loading, toast, confirm
+store/                    Zustand: world (saved, v27, + the shared world), battle, character (/debug, v3), loading, toast, confirm
    ↓
 lib/world/  ──────►  lib/game/          pure engines — no React, no DOM, no I/O
    └ battle-bridge.ts: the one place the world and battle stores meet
@@ -216,7 +217,7 @@ Two deliberate exceptions reach into stores:
   - `qs_<questId>_offer` / `qs_<questId>_complete` are the optional briefing and hand-in dialogs.
 - **Objectives** (`quest-objectives.ts`). `QuestStage.objective.spots[]` are 🔍 map spots, NPC-card actions or dialogs for stages nothing else can drive.
   - Each flag is `qobj:<quest>:<stageId>:<i>`.
-  - A spot needs the hero at its `locationId` and costs `hours` (default 1).
+  - A spot needs the hero at its `locationId` and costs the stamina of its `hours` (default 1; `staminaForHours`).
 - **Guide and tracking** (`quest-guide.ts`). `guideForQuest` gives an action, an optional counter, a place and a path for every stage type.
   - `trackedQuestId` is `flags.trackedQuestId`, else the newest active quest.
   - It feeds the quest log, the HUD tracker and the map's guide arrow.
@@ -232,7 +233,7 @@ Two deliberate exceptions reach into stores:
 - **Law** (`law.ts`).
   - Wanted marks have no ceiling (the HUD draws 5 seals, then `×N`): failed steals +1, jail escapes +2, failed attempts on a life +2, killings +5 (`KILL_MARKS`); one fades every 10 quiet days.
   - Escaping the law (`lawEvasions`, saved: flee, win, bribe, jail break; reset by a sentence) brings the Brocade Guard (`law_jinyiwei_agent` T3, `law_jinyiwei_captain` T4) and at last the Jinyiwei chief in person (`lawnpc@<npc foe>`); from 2 marks righteous liveness NPCs in the region may ambush the hero for the law (`ambushChance`, `pendingBattle.ambushNpcId`).
-  - Law fights are non-fatal. A loss goes to `jail_cell`: arrest (`imprison` → `arrestPenalty`: 2 days per mark up to 30, a 50-per-mark fine, seizure from 5 marks, crippled arts from 10; the คำพิพากษา window reads `flags._arrestReport`) or a bribe (`bribeCost`: 300 + 150 per mark past 2). มอบตัว (the HUD wanted chip, store `surrender`) goes straight to jail with half the sentence and fine, no seizure.
+  - Law fights are non-fatal. A loss goes to `jail_cell`: arrest (`imprison` → `arrestPenalty`: 1 ชั่วยาม (5 real minutes) per mark up to 12, served on the world clock, a 50-per-mark fine, seizure from 5 marks, crippled arts from 10; the คำพิพากษา window reads `flags._arrestReport`) or a bribe (`bribeCost`: 300 + 150 per mark past 2). มอบตัว (the HUD wanted chip, store `surrender`) goes straight to jail with half the sentence and fine, no seizure.
 - **Bad actions** (`bad-actions.ts`). Steal, assassinate and kidnap use base stats. A failed steal is a non-fatal fight plus a mark; failed assassinations and kidnappings are fatal fights (the hero falls and wakes at home, poorer).
 - **Sects** (`data/sect-memberships.ts`, 15 joinable).
   - Ladders: 9 → 1 (eight sects), 5 → 1 (six) or 3 → 1 (Gumu).
@@ -241,8 +242,8 @@ Two deliberate exceptions reach into stores:
   - Membership status is `active | resigned | betrayed`. Only `active` counts for `sectMember` / `anySectMember`.
   - Joins go through each intro quest's `joinSect` **reward**, which does not check `joinRequirements`; the intro's `prereqs` are the real gate.
   - Betrayal brings `hunter_<sectId>`; `qst_<sectId>_redemption` (14 sects; not xiaoyao) turns betrayed into resigned.
-- **Liveness** (`npc-tick.ts`, `npc-life.ts`, `rumor-engine.ts`; [docs/liveness.md](docs/liveness.md)). Thirty people (15 chiefs, 5 seconds, 10 wanderers in `npcs/wanderers.ts`) plus generated ones (`dynamic`, ≤ 48: disciples, heirs, newcomers; registered with `registerDynamicNpc`) live in `npcExt`. Every `advanceTime`:
-  - runs each whole week since `lastNpcTickDay` (8 in full, the rest only age; leftover days carry over): a year on each `birthday`, death odds by age and strength (`deathChance`), training, goals, a journey leg on the real roads (`roadPath`), else a choice from their `temper` (`decide`: wander, join a sect, duel a rival, seclusion, take a disciple, leave a sect, marry; people with an active hero quest stay put);
+- **Liveness** (`npc-tick.ts`, `npc-life.ts`, `rumor-engine.ts`; [docs/liveness.md](docs/liveness.md)). Thirty people (15 chiefs, 5 seconds, 10 wanderers in `npcs/wanderers.ts`) plus generated ones (`dynamic`, ≤ 48: disciples, heirs, newcomers; registered with `registerDynamicNpc`) live in `npcExt`. Every `syncClock`:
+  - runs each whole week since `lastNpcTickDay` (8 in full, the rest only age; leftover days carry over; each week's dice from `seededRng(worldSeed, day)`): a year on each `birthday`, death odds by age and strength (`deathChance`), training, goals, a journey leg on the real roads (`roadPath`), else a choice from their `temper` (`decide`: wander, join a sect, duel a rival, seclusion, take a disciple, leave a sect, marry; people with an active hero quest stay put);
   - fills empty seats (`fillEmptySeats`: an elder, else a generated one) — the dead chief's map spot and quests pass to the heir (`heirId`, `questHolder`, `heldQuests`); `withChargesOfDead` moves or fails active quests of the newly dead;
   - maintains rumors (caps 200 / 500, archive after 365 days).
 
@@ -263,7 +264,7 @@ Two deliberate exceptions reach into stores:
   - **NPC looks:** all 68 place NPCs have their own painted portrait and body (`import-npc-art.ts`). Strollers (`look.wander`) are rigged (`ANIMATED_NPC_IDS`); the rest stand as a unique pixel sprite. `look.body` (`registerNpcBodies`) is only the fallback sheet for art-less NPCs.
 - **Letters, stations, tournament.**
   - **Letters** (`letters.ts`): each new day an NPC with relationship ≥ 20 may write (one letter a day, 15 days per NPC; odds from relationship, fame, LUK; gift rarity from LUK). Inbox `state.letters`; `openLetter` takes the gift; `deleteLetters` throws letters away (taking an unclaimed gift first).
-  - **Horse stations** (`stations.ts`): cities, villages and joinable sects' grounds; ride to a visited station place for gold + time by world-map distance (`stationTravel`).
+  - **Horse stations** (`stations.ts`): cities, villages and joinable sects' grounds; ride to a visited station place for gold by world-map distance, arriving at once (`stationTravel`).
   - **Sword tournament** (`tournament.ts`): a 360-day year; held on Mount Hua (`sect_huashan`, `TOURNAMENT_NAME` ชุมนุมวิจารณ์กระบี่เขาหัวซาน); on day 60 Huashan's chief sends an invitation letter with the 100-gold fee (`sendTournamentInvitation`); register there (days 60–89, 100 gold), fight on day 90–92. 32 entrants (hero + the liveness roster + sparring fighters); the hero's bouts are real non-fatal battles (`pendingBattle.tournament`), the rest simulated by power. Bout and place rewards; the champion (hero or NPC) picks one entrant's move or art.
   - **Practice xp** is 30 + 5 % of the xp to the next level, 50 + 6 % at a fitting place (`practiceXpGain`).
 - **Presence** (`npc-presence.ts`). A dead NPC (assassinated, killed, or `npcExt` status `dead`) is gone for good; a kidnapped one is away until `kidnappedUntil` (day + 180) and then stands at their spot again. Maps and the location card filter with `npcPresent`.
@@ -276,9 +277,11 @@ Two deliberate exceptions reach into stores:
 
 ## Stores (`store/`)
 
-- **`world-store.ts`** is saved as `wusia-world-v1`, **version 26**.
+- **`world-store.ts`** is saved as `wusia-world-v1`, **version 27** (the player only); the shared world is saved apart (`wusia-shared-v1`, below).
   - Actions draft a copy (`draftFrom`, **one level deep** — nested quest, sect and NPC entries are shared), call engine functions, then `set`.
-  - Time goes through `advanceTime` (12 ชั่วยาม = 1 day). The player-visible log uses `appendActionLog` (newest 100).
+  - **Time is the world clock** (`lib/world/clock.ts`): 1 game day = 1 real hour (12 ชั่วยาม of 5 real minutes), from `WORLD_EPOCH_MS` (day 1). No action moves time: `draftFrom` brings every draft to the clock (`syncClock`, `store/world/lifecycle.ts`: day / time, stamina back in 6 ชั่วยาม and HP / MP in 12, wanted decay, the NPC tick, rumors, and on a new day letters and the tournament), and `WorldClock` (`components/world/world-clock.tsx`) syncs every 10 s (a toast after a day or more away). Actions that used to take time are instant and cost stamina (`staminaForHours`); free rests have a 2-ชั่วยาม cooldown, jail is served in real time. Tests pin it: `setTestClock` / `setTestWorldTime` / `advanceTestClock`.
+  - The player-visible log uses `appendActionLog` (newest 100).
+- **The shared world** (`lib/world/shared/`, [docs/design/world-clock-and-shared-world.md](docs/design/world-clock-and-shared-world.md)): `worldSeed`, `worldEventLog`, `npcExt`, `lastNpcTickDay`, rumors, killed / kidnapped people, `bossDefeatedDay`, the tournament (`SHARED_WORLD_KEYS`). They stay on the store's state, but `partializeSave` leaves them out; `attachSharedWorld` (`store/world/shared-local.ts`, a `WorldService` on `localStorage["wusia-shared-v1"]`) joins them after load and saves them on change. Changes to them from player actions go through `emitWorldEvent` (`npc_killed`, `npc_kidnapped`, `boss_slain`, `rumor`). A new game joins the world as it is (`startNewGame({ newWorld: true })` makes a fresh one — tests); `resetGame` keeps it.
 - **`battle-store.ts`** is not saved.
   - `start(a, b, { hpA, mpA, enemies, looks, blocked })`, then `move` / `act` / `wait` / `flee` (player turn), `setAuto`, `step` (one AI beat), `stepAll`, `reset`.
   - Unit ids: `A` hero, `B` main foe, `pack<n>:<opponentId>`.
@@ -293,11 +296,11 @@ Two deliberate exceptions reach into stores:
 
 1. `pendingBattle` shows `BattleBriefingScreen` first: the foe, its pack and both sides' **power tiers** (`battleBriefing`; random encounters show it on the encounter screen). Going in calls `ensureBattleStarted()`: scale the foe, run `worldBattleSetup` (looks and pack, built once per `pendingBattle`), then `battleStore.start` with the hero's HP / MP.
 2. At the end, the player's ดำเนินเรื่อง → `acknowledgeBattleResult()`. It applies:
-   - stamina −5 and 0.5 ชั่วยาม;
+   - stamina −5 (no time: the world clock runs on);
    - HP / MP carry-over;
    - on a win: the spoils the result panel showed (`victorySpoils`: loot, gold by foe tier for hostile foes, a hunt's carcass, rolled once per battle), 50 w-exp, 20 xp per skill / art use, stat xp and kill counts (pack members included), then quest progress and `onWin`;
    - on a non-fatal loss: `onLose` with at least 1 HP;
-   - on a fatal loss: no game over — `reviveFromDeath` (`lib/world/death.ts`): wake at `home_player` a day later with 30 % HP / MP, −50 % gold, half of 1–3 random losable item stacks (quest items, scrolls, manuals, books kept), and the `lastDeath` report (`DeathReport`, not saved);
+   - on a fatal loss: no game over — `reviveFromDeath` (`lib/world/death.ts`): wake at `home_player` at once with 30 % HP / MP, −50 % gold, half of 1–3 random losable item stacks (quest items, scrolls, manuals, books kept), and the `lastDeath` report (`DeathReport`, not saved);
    - on an escape: no rewards.
 3. **Battle items.** `battleBag(inventory)` passes the items with `ItemDef.battle` (potions, poisons, hidden weapons; food has none) as the battle's `bag`; the grid action `{ t: "item" }` (ใช้ของ tray, `components/game/battle-items.tsx`) heals or throws (`throwDamage`, poison via `addDebuff`) and ends the turn; `acknowledgeBattleResult` takes `itemsUsed` from the inventory on every outcome. Food's `use.heal.stamina` restores stamina outside battle.
 
@@ -379,11 +382,11 @@ Content changes need **no save version bump**. Removed ids are dropped on load.
 
 ## Saves
 
-- **Keys.** The world save is `localStorage["wusia-world-v1"]`, **version 26**. The "wusia" spelling is historical — never rename it.
-- **Migration.** `migrate` is one idempotent normalizer (it ignores `fromVersion`). The persist `merge` also back-fills lore rumors on every load, and `onRehydrateStorage` runs `validateAndRepair`.
+- **Keys.** The player's save is `localStorage["wusia-world-v1"]`, **version 27**; the shared world `localStorage["wusia-shared-v1"]` (`{ version: 1, world }`). The "wusia" spelling is historical — never rename either.
+- **Migration.** `migrate` is one idempotent normalizer; its one `fromVersion` step is v27's: a save from before is shifted onto the world clock (`rebaseDays`, `lib/world/shared/rebase.ts`: every day stamp moves by `worldNow().day − save.day`; jail cut to ≤ 12 ชั่วยาม; a running tournament dropped). The persist `merge` also back-fills lore rumors and people on every load, and `onRehydrateStorage` runs `validateAndRepair`.
 - **Adding a persisted field:**
   1. `WorldStateData` + `emptyData()`;
-  2. `partialize`;
+  2. `partialize` (a shared-world field instead goes in `SHARED_WORLD_KEYS`);
   3. a default in `migrate`;
   4. bump `version`;
   5. repair in `validate.ts` if it holds ids;

@@ -2,7 +2,6 @@
 import { applyEffect, releaseFromJail } from "@/lib/world/effects";
 import { jailCityFor, sentenceLeft } from "@/lib/world/law";
 import { JAIL_SCENE_ID } from "@/lib/world/data/activities";
-import { advanceTime } from "../lifecycle";
 import { appendActionLog, draftFrom } from "../state";
 import type { WorldGet, WorldSet, WorldStore } from "../types";
 
@@ -22,14 +21,17 @@ export const lawActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "surr
     return { ok: true };
   },
 
+  // The sentence runs on the world clock: the cell opens once it is served
+  // (true), never sooner (false; the hero waits, labours, bribes or escapes).
   serveSentence: () => {
     const s = get();
-    if (s.jailUntil == null) return;
+    if (s.jailUntil == null) return true;
     const draft = draftFrom(s);
-    advanceTime(draft, sentenceLeft(draft));
+    if (sentenceLeft(draft) > 0) { set({ ...draft }); return false; }
     releaseFromJail(draft);
     draft.currentSceneId = draft.lastLocationId!;
-    appendActionLog(draft, "law", "นั่งนับวันจนพ้นโทษ ออกจากคุกหลวง");
+    appendActionLog(draft, "law", "พ้นโทษ ออกจากคุกหลวง");
     set({ ...draft });
+    return true;
   },
 });

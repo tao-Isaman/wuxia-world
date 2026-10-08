@@ -2,6 +2,9 @@ import assert from "node:assert/strict";
 import { observeQuestReceipts, questCompletionReceipt, type QuestReceipt } from "../components/world/quest-completion-receipt-data";
 import { applyEffects, getQuest, getScene } from "../lib/world";
 import type { WorldStateData } from "../lib/world";
+import { setTestClock } from "../lib/world/clock";
+// The world clock stands still here, so time never moves between two snapshots.
+setTestClock(Date.now());
 
 const memory = new Map<string, string>();
 Object.defineProperty(globalThis, "localStorage", { configurable: true, value: {
@@ -11,7 +14,7 @@ Object.defineProperty(globalThis, "localStorage", { configurable: true, value: {
 } });
 Object.defineProperty(globalThis, "window", { configurable: true, value: { localStorage: globalThis.localStorage } });
 const { useWorldStore } = await import("../store/world-store");
-useWorldStore.getState().startNewGame({ name: "Receipt test" });
+useWorldStore.getState().startNewGame({ newWorld: true, name: "Receipt test" });
 const clone = (state: WorldStateData): WorldStateData => JSON.parse(JSON.stringify(state));
 const initial = clone(useWorldStore.getState());
 const def = getQuest("qc_capital_clinic_supplies")!;
@@ -93,7 +96,7 @@ try {
   assert.equal(remounted.length, 0, "mounting with an already completed quest is silent");
   useWorldStore.getState().resetGame();
   assert.deepEqual(remounted, [null], "reset dismisses transient receipt state");
-  useWorldStore.getState().startNewGame({ name: "No replay" });
+  useWorldStore.getState().startNewGame({ newWorld: true, name: "No replay" });
   assert.equal(useWorldStore.getState().acceptQuest(def.id).ok, true);
   useWorldStore.getState().abandonQuest(def.id);
   assert.ok(remounted.every(value => value === null), "real abandonment never produces a success receipt");

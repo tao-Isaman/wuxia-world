@@ -41,12 +41,14 @@ The NPC simulation and rumors are in [liveness.md](liveness.md). The content tab
 | `lib/world/capital-training.ts`, `clinic-preparation.ts` | opening helpers |
 | `lib/world/npc-tick.ts`, `rumor-engine.ts` | the Liveness Layer ([liveness.md](liveness.md)) |
 | `lib/world/meridians.ts` | meridian chart sources (shops, loot, quest rewards from `data/meridian-sources.ts`) and the reading check `meridianReadBlock` |
+| `lib/world/clock.ts` | the world clock: 1 game day = 1 real hour from `WORLD_EPOCH_MS`; `worldNow`, `worldTimeAt`, `msAtWorld`, `formatWait`, the test clock ([design](design/world-clock-and-shared-world.md)) |
+| `lib/world/shared/` | the shared world: `world.ts` (`SHARED_WORLD_KEYS`, `SharedWorld`, `WorldService`), `events.ts` (`WorldEvent`, `applyWorldEvent`, `emitWorldEvent`), `rng.ts` (`seededRng`), `rebase.ts` (`rebaseDays`, save v27) |
 | `lib/world/validate.ts` | repair on load ([save-format.md](save-format.md#repair-on-load)) |
 | `lib/world/battle-bridge.ts`, `battle-looks.ts` | the battle seam ([grid-combat.md](grid-combat.md#world--battle)) |
 | `lib/world/data/` | content tables, plus `random-events.ts`, `activities.ts`, `regions.ts`, `named-npcs.ts`, `rumor-templates.ts`, `lore-rumors.ts` |
 | `lib/world/index.ts` | public barrel |
 
-Not in the barrel (import by path): `rollWalkEvent`, `rollFoeSpawn`, `releaseFromJail`, `consumeQuestAutoItems`, and everything in `law.ts`, `bad-actions.ts`, `npc-tick.ts`, `rumor-engine.ts`, `stat-progression.ts`, `capital-training.ts`, `clinic-preparation.ts`, `data/activities.ts`, `data/regions.ts`. `initBattleBridge` is deliberately excluded (it imports the stores; import it from `@/lib/world/battle-bridge`).
+Not in the barrel (import by path): `rollWalkEvent`, `rollFoeSpawn`, `releaseFromJail`, `consumeQuestAutoItems`, and everything in `clock.ts`, `shared/`, `law.ts`, `bad-actions.ts`, `npc-tick.ts`, `rumor-engine.ts`, `stat-progression.ts`, `capital-training.ts`, `clinic-preparation.ts`, `data/activities.ts`, `data/regions.ts`. `initBattleBridge` is deliberately excluded (it imports the stores; import it from `@/lib/world/battle-bridge`).
 
 ## Scenes
 
@@ -69,7 +71,7 @@ Not in the barrel (import by path): `rollWalkEvent`, `rollFoeSpawn`, `releaseFro
 - **Terminal dialogs** (no choices, no `next`) show a "ปิด" button that returns to `lastLocationId` for free (`exitToLocation`).
 - If every choice is hidden by `visibleIf`, the UI shows "(ไม่มีตัวเลือก — สถานการณ์อาจเปลี่ยนไป)" with an escape button. Choice buttons are numbered in visible order but call the original index.
 - **`takeChoice`**: refuses the whole choice (effects included) if its travel is unaffordable; applies the effects; if a battle was set, stops there (the battle's `onWin` / `onLose` take over); otherwise charges travel, moves, applies the target's `onEnter`, and auto-advances.
-- **Travel** is charged only for location → route (10 stamina, 1 ชั่วยาม) and route → location (10 stamina, 2 ชั่วยาม). Every other transition is a free "story warp". Each charged step also gives +10 AGI xp and a LUK roll.
+- **Travel** is charged only for location → route and route → location (10 stamina each; no time — the world clock runs on, [design](design/world-clock-and-shared-world.md)). Every other transition is a free "story warp". Each charged step also gives +10 AGI xp and a LUK roll.
 - The `goto` effect only sets `currentSceneId`; it does not run the target's `onEnter`.
 
 ## Scene effects
@@ -170,7 +172,7 @@ Each spot (`QuestObjectiveSpot`) is one of three kinds:
 
 | Spot | Shows as | Using it |
 | --- | --- | --- |
-| `{ locationId, label, text? }` | a 🔍 marker on that location's map (id `objective-<questId>-<index>`), placed clear of other markers near the arrival point | takes `hours` ชั่วยาม (default 1), toasts `text`, marks the spot done |
+| `{ locationId, label, text? }` | a 🔍 marker on that location's map (id `objective-<questId>-<index>`), placed clear of other markers near the arrival point | costs `staminaForHours(hours)` stamina (`hours` default 1; no time passes), toasts `text`, marks the spot done |
 | `+ npcId` | an action under งานภารกิจ in that person's popup (the hero must be at `locationId`) | same |
 | `+ sceneId` | a marker that opens that dialog | no time, no flag — the dialog's own choices advance the quest |
 
@@ -260,26 +262,26 @@ When the current stage of an active quest is a top-level `defeatedOpponent` (`co
 - **Ambush** (`ambushChance(m)` = `min(20 %, 3 % + 1.5 % × min(m, 10))` from 2 marks, after the law roll): a living person with `temper.righteous ≥ 0.5`, power ≥ 30, unwounded, in the hero's region, attacks at once — `pendingBattle` with `lawnpc@…`, `ambushNpcId`, `onLose: "jail_cell"`, non-fatal, no encounter screen. Beaten, they are wounded 30 days.
 - **Law fights** (`isLawOpponent`: the `LAW_OPPONENTS` ids and any `lawnpc@` id) are non-fatal. Winning or escaping clears the pending jail city and counts an escape; losing goes to `jail_cell`.
 - **`jail_cell`** offers two choices: accept arrest (`imprison` → the `jail` map), or bribe when `canBribeJail` (`bribeCost(m)` = 300 + 150 × max(0, m − 2); `bribeJail` → released, 2 marks removed, an escape counted).
-- **`imprison`** (`{ surrender? }`): `arrestPenalty(m, surrender)` — days `jailDays(m) = clamp(m, 1, 15) × 2`, fine 50 × m, `confiscate` from 5 marks, `cripple` = 1 + ⌊(m − 10)/5⌋ (max 4) from 10 marks; a surrender halves days (rounded up) and fine, drops the seizure and one crippled move. `applyArrestPenalty` takes the fine (what the hero has), seizes a third of the gold left and half of 1–2 losable stacks (`deathLosableItems`), and lowers the best skills / arts by 2 levels (min 1, their xp reset); the lines go to `flags._arrestReport` (the คำพิพากษา window, `ArrestReport`). Marks and escapes reset to 0; `jailUntil` = the absolute ชั่วยาม the sentence ends; HP at least 1.
+- **`imprison`** (`{ surrender? }`): `arrestPenalty(m, surrender)` — `hours` = `jailHours(m) = clamp(m, 1, 12)` ชั่วยาม (5 real minutes each, `JAIL_MAX_HOURS`), fine 50 × m, `confiscate` from 5 marks, `cripple` = 1 + ⌊(m − 10)/5⌋ (max 4) from 10 marks; a surrender halves the hours (rounded up) and fine, drops the seizure and one crippled move. `applyArrestPenalty` takes the fine (what the hero has), seizes a third of the gold left and half of 1–2 losable stacks (`deathLosableItems`), and lowers the best skills / arts by 2 levels (min 1, their xp reset); the lines go to `flags._arrestReport` (the คำพิพากษา window, `ArrestReport`). Marks and escapes reset to 0; `jailUntil` = the absolute ชั่วยาม the sentence ends; HP at least 1.
 - **มอบตัว** (store `surrender`): wanted, not jailed, nothing pending → `imprison { surrender: true }` and straight to the `jail` map (no road, no stamina). The HUD's wanted chip offers it with the penalty preview.
-- **The jail map** has no exits. While `jailUntil` is set, travel to any other place is refused (`jailBlocks`) and walk ticks don't fire there. Any time that passes serves the sentence. Two people live there: ตาเฒ่าหลิว (tips) and ผู้คุมจาง (bribe).
+- **The jail map** has no exits. While `jailUntil` is set, travel to any other place is refused (`jailBlocks`) and walk ticks don't fire there. The sentence is served on the world clock, in real time; nothing skips it (`describeSentence` reads it in real minutes; the HUD counts it down). Two people live there: ตาเฒ่าหลิว (tips) and ผู้คุมจาง (bribe).
 - **Release** (`releaseFromJail`): to the jail city — a `city_*` stays itself, else the nearest city on the world map (`jailCityFor`; unplaced places → นครหลวง). HP and MP are raised to at least 60 %.
 
 Jail activities (`doActivity`, only in `jail`):
 
-| Activity | Time | Stamina | Effect |
-| --- | --- | --- | --- |
-| ทุบหินใช้แรงงาน (`jail_labor`) | 6 | 25 | sentence −6 extra (−12 in all), STR xp +20, w-exp +5 |
-| ทอยเต๋ากับผู้คุม (`jail_dice`) | 2 | 5 | needs 10 gold; win chance `min(60 %, 40 % + LUK/200)`, ±10 gold; LUK xp +10 |
-| นั่งสมาธิ (`jail_meditate`) | 6 | 0 | MP full, HP +20 %, stamina +15, w-exp +40 (`JAIL_MEDITATE_WEXP`) |
-| ประตูคุก (`jail_gate`) | 0 | 0 | locked while time remains (the UI offers `serveSentence`: wait it out at once); open afterwards |
-| แหกคุกทางกำแพงร้าว (`jail_escape`) | 2 | 30 | success `min(55 %, 20 % + AGI/200)`: free, +2 wanted marks; failure: +1 day |
+| Activity | Stamina | Effect |
+| --- | --- | --- |
+| ทุบหินใช้แรงงาน (`jail_labor`) | 25 | sentence −`JAIL_LABOR_HOURS` (2 ชั่วยาม), STR xp +20, w-exp +5 |
+| ทอยเต๋ากับผู้คุม (`jail_dice`) | 5 | needs 10 gold; win chance `min(60 %, 40 % + LUK/200)`, ±10 gold; LUK xp +10 |
+| นั่งสมาธิ (`jail_meditate`) | 0 | once per `JAIL_MEDITATE_COOLDOWN` (3 ชั่วยาม, `flags._jailMeditateAt`): MP full, HP +20 %, stamina +15, w-exp +40 (`JAIL_MEDITATE_WEXP`) |
+| ประตูคุก (`jail_gate`) | 0 | locked while time remains (`reason: "locked"`, the time left); open afterwards |
+| แหกคุกทางกำแพงร้าว (`jail_escape`) | 30 | success `min(55 %, 20 % + AGI/200)`: free, +2 wanted marks; failure: +`JAIL_ESCAPE_PENALTY_HOURS` (2 ชั่วยาม) |
 
-`serveSentence()` advances time by the remaining sentence (a real `advanceTime`, so the NPC tick and rumor upkeep run) and releases the hero. The `serveJail` effect does the same without `advanceTime`, but no content uses it.
+Every activity is instant (`ActivityDef.hours` only picks the work overlay). `serveSentence()` releases the hero once the sentence is served (returns `true`), else only syncs the clock (`false`). The `serveJail` effect does the same, but no content uses it.
 
 ## Bad actions
 
-`lib/world/bad-actions.ts` (odds) and `attemptSteal` / `attemptAssassinate` / `attemptKidnap` in the store. Each attempt takes 0.2 ชั่วยาม and no stamina, and uses **base** stats. Chance = `clamp(50 + score − penalty, 5, 95)` %.
+`lib/world/bad-actions.ts` (odds) and `attemptSteal` / `attemptAssassinate` / `attemptKidnap` in the store. Each attempt costs 2 stamina (`staminaForHours(ACTION_HOURS)`), and uses **base** stats. Chance = `clamp(50 + score − penalty, 5, 95)` %.
 
 | | Steal | Assassinate | Kidnap |
 | --- | --- | --- | --- |
@@ -308,9 +310,9 @@ Tier guards (`TIER_TO_BAD_ACTION_OPPONENT`): 0 `thug`, 1 `ruffian`, 2 `iron_palm
 
 Three engines that hang off the clock and the map; numbers in [gameplay.md](gameplay.md).
 
-- **Letters** (`lib/world/letters.ts`). `advanceTime` calls `rollLetters(state, dayBefore)` when the day changes (at most the last 7 days). Writers (`letterWriters`): NPCs with relationship ≥ 20, present and alive, not written in 15 days. Each is asked in random order; the first to pass `letterChance(relationship, fame, LUK)` writes that day's one letter, with a gift from `pickLetterGift` at the rarity `giftRarity(roll, LUK, fame)` (giftable items only, the NPC's tastes first, gold for those who like it). `state.letters` (inbox, 40 kept) and `state.letterDays`. The store's `openLetter` takes the gift once.
-- **Horse stations** (`lib/world/stations.ts`). `hasStation`: `city_` / `village_` places and the joinable sects' `hallLocationId`s with a world-map spot. `stationTrips(state, from)` lists visited station places with `stationFare` (gold and ชั่วยาม by world-map distance). The store's `stationTravel` pays, advances time and moves the hero (through `onEnter` and auto-advance, like `gotoScene`, without the travel stamina charge). The map shows a `station` marker at a free spot.
-- **Sword tournament** (`lib/world/tournament.ts`, `TOURNAMENT_NAME`; held at `TOURNAMENT.locationId` = `sect_huashan`). The day registration opens, `sendTournamentInvitation` (from `advanceTime` on a new day) puts a letter `letter_invite_<year>` from `tournamentHost` (Huashan's current chief) in the inbox, with the fee in gold. A 360-day year; `tournamentPhase(day)` is `registration` (days 60–89), `day` (90–92) or `closed`. `state.tournament` holds this year's `TournamentState` (rounds of seeds, `round`, the hero's place and winnings, the champion and their pick); `state.tournamentHistory` past records. `fightTournamentBout` starts the bracket (`startTournament`: the hero + `drawEntrants`, named roster first) and queues `pendingBattle` with `tournament: true` (non-fatal, no loot). `acknowledgeBattleResult` (win, loss or retreat) calls `resolveRound`, which settles the hero's bout, simulates the rest (`boutOdds` from `powerBreakdown` totals), pays out, and after the final records the year and the prize options (`prizeOptions`: every entrant's moves and art the hero lacks). `pickTournamentPrize` teaches one through `learnSkill` / `learnArt` — the one sanctioned way besides lineage quests and sagas to learn a sect move. `settleTournaments` (each new day) finishes a bracket the hero left and fights a year without the hero among the NPCs.
+- **Letters** (`lib/world/letters.ts`). `syncClock` calls `rollLetters(state, dayBefore)` when the day changes (at most the last 7 days). Writers (`letterWriters`): NPCs with relationship ≥ 20, present and alive, not written in 15 days. Each is asked in random order; the first to pass `letterChance(relationship, fame, LUK)` writes that day's one letter, with a gift from `pickLetterGift` at the rarity `giftRarity(roll, LUK, fame)` (giftable items only, the NPC's tastes first, gold for those who like it). `state.letters` (inbox, 40 kept) and `state.letterDays`. The store's `openLetter` takes the gift once.
+- **Horse stations** (`lib/world/stations.ts`). `hasStation`: `city_` / `village_` places and the joinable sects' `hallLocationId`s with a world-map spot. `stationTrips(state, from)` lists visited station places with `stationFare` (gold by world-map distance; its `hours` are not spent). The store's `stationTravel` pays and moves the hero at once (through `onEnter` and auto-advance, like `gotoScene`, without the travel stamina charge). The map shows a `station` marker at a free spot.
+- **Sword tournament** (`lib/world/tournament.ts`, `TOURNAMENT_NAME`; held at `TOURNAMENT.locationId` = `sect_huashan`). The day registration opens, `sendTournamentInvitation` (from `syncClock` on a new day) puts a letter `letter_invite_<year>` from `tournamentHost` (Huashan's current chief) in the inbox, with the fee in gold. A 360-day year; `tournamentPhase(day)` is `registration` (days 60–89), `day` (90–92) or `closed`. `state.tournament` holds this year's `TournamentState` (rounds of seeds, `round`, the hero's place and winnings, the champion and their pick); `state.tournamentHistory` past records. `fightTournamentBout` starts the bracket (`startTournament`: the hero + `drawEntrants`, named roster first) and queues `pendingBattle` with `tournament: true` (non-fatal, no loot). `acknowledgeBattleResult` (win, loss or retreat) calls `resolveRound`, which settles the hero's bout, simulates the rest (`boutOdds` from `powerBreakdown` totals), pays out, and after the final records the year and the prize options (`prizeOptions`: every entrant's moves and art the hero lacks). `pickTournamentPrize` teaches one through `learnSkill` / `learnArt` — the one sanctioned way besides lineage quests and sagas to learn a sect move. `settleTournaments` (each new day) finishes a bracket the hero left and fights a year without the hero among the NPCs.
 
 ## Meridians (ชีพจร)
 

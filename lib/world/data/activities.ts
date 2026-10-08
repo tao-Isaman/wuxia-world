@@ -51,7 +51,7 @@ export interface ActivityDef {
   /** Map sign glyph key (see drawWorldBadge). */
   badge: string;
   icon: string;
-  /** ชั่วยาม spent (the gate spends none; it checks the sentence). */
+  /** ชั่วยาม it used to take (actions are instant now; > 0 plays the work overlay). */
   hours: number;
   stamina: number;
   description: string;
@@ -62,15 +62,15 @@ export interface ActivityDef {
 
 export const ACTIVITIES: readonly ActivityDef[] = [
   { id: "jail_labor", label: "ทุบหินใช้แรงงาน", badge: "labor", icon: "🪨", hours: 6, stamina: 25,
-    description: "ทำงานหนัก 6 ชั่วยาม · ลดโทษเพิ่มอีก 6 ชั่วยาม · ฝึกพละกำลัง" },
+    description: "ทำงานหนัก · ลดโทษ 10 นาที · ฝึกพละกำลัง" },
   { id: "jail_dice", label: "ทอยเต๋ากับผู้คุม", badge: "dice", icon: "🎲", hours: 2, stamina: 5,
     description: "เดิมพัน 10 ตำลึง · ชนะได้ 20 · ดวงดีช่วยได้" },
   { id: "jail_meditate", label: "นั่งสมาธิ", badge: "practice", icon: "🧘", hours: 6, stamina: 0,
-    description: "6 ชั่วยาม · ฟื้นปราณเต็ม · ฟื้นพลังและบาดแผลเล็กน้อย · ตรึกตรองวิชาได้ w-exp +40" },
+    description: "นั่งได้ทุก 15 นาที · ฟื้นปราณเต็ม · ฟื้นพลังและบาดแผลเล็กน้อย · ตรึกตรองวิชาได้ w-exp +40" },
   { id: "jail_gate", label: "ประตูคุก", badge: "gate", icon: "🔒", hours: 0, stamina: 0,
-    description: "ออกได้เมื่อพ้นโทษ · หรือนั่งนับวันจนครบ" },
+    description: "ออกได้เมื่อพ้นโทษ · โทษนับตามเวลาจริง" },
   { id: "jail_escape", label: "แหกคุกทางกำแพงร้าว", badge: "escape", icon: "🧱", hours: 2, stamina: 30,
-    description: "เสี่ยงหนีด้วยความว่องไว · สำเร็จแต่หมายจับเพิ่ม 2 · พลาดโทษเพิ่ม 1 วัน" },
+    description: "เสี่ยงหนีด้วยความว่องไว · สำเร็จแต่หมายจับเพิ่ม 2 · พลาดโทษเพิ่ม 10 นาที" },
   ...PLACE_ACTIVITIES,
 ];
 

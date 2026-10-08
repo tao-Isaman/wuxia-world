@@ -32,7 +32,7 @@ const seeded = (seed: number) => () => { seed = (seed * 1103515245 + 12345) % 21
 function withSeed<T>(seed: number, run: () => T): T { const r = Math.random; Math.random = seeded(seed); try { return run(); } finally { Math.random = r; } }
 
 function freshState() {
-  useWorldStore.getState().startNewGame({ name: "ทดสอบ", gender: "male" } as never);
+  useWorldStore.getState().startNewGame({ newWorld: true, name: "ทดสอบ", gender: "male" } as never);
   return JSON.parse(JSON.stringify(useWorldStore.getState())) as ReturnType<typeof useWorldStore.getState>;
 }
 
@@ -274,7 +274,7 @@ check("bosses: alive until beaten, back after 90 days; bossesAt; save v26 migrat
   // Save: an old save gets an empty table; repair drops unknown ids and bad days.
   const old = migrateSave({ hasGame: true, day: 5 }, 25);
   assert.deepEqual(old.bossDefeatedDay, {});
-  const kept = migrateSave({ hasGame: true, day: 5, bossDefeatedDay: { boss_blade_crab: 3 } }, 26);
+  const kept = migrateSave({ hasGame: true, day: 5, bossDefeatedDay: { boss_blade_crab: 3 } }, 27);
   assert.deepEqual(kept.bossDefeatedDay, { boss_blade_crab: 3 });
   const broken = freshState();
   broken.bossDefeatedDay = { boss_blade_crab: 3, boss_gone: 4, boss_sun_turtle: "x" as never };
@@ -282,7 +282,7 @@ check("bosses: alive until beaten, back after 90 days; bossesAt; save v26 migrat
   assert.deepEqual(broken.bossDefeatedDay, { boss_blade_crab: 3 });
   assert.equal(getBoss("boss_gone"), null);
   // The store: engaging a boss in its lair opens the encounter; elsewhere nothing.
-  useWorldStore.getState().startNewGame({ name: "ทดสอบ", gender: "male" } as never);
+  useWorldStore.getState().startNewGame({ newWorld: true, name: "ทดสอบ", gender: "male" } as never);
   useWorldStore.setState({ currentSceneId: "city_capital" });
   useWorldStore.getState().engageBoss("boss_golden_serpent");
   assert.equal(useWorldStore.getState().pendingEncounter, null);

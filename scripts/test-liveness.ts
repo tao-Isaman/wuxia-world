@@ -22,6 +22,7 @@ const { namedNpcIds } = await import("../lib/world/data/named-npcs");
 const { NPCS_WANDERERS } = await import("../lib/world/data/npcs/wanderers");
 const { getNpc } = await import("../lib/world/data/npcs");
 const { getOpponent, parseNpcFoeId } = await import("../lib/world/data/opponents");
+const { setTestWorldTime } = await import("../lib/world/clock");
 const { QUESTS, getQuest, getQuestsForNpc } = await import("../lib/world/data/quests");
 const { isQuestTurnInForNpc, isMajorQuest } = await import("../lib/world/effects");
 const { npcPresent } = await import("../lib/world/npc-presence");
@@ -55,8 +56,10 @@ function check(name: string, fn: () => void | Promise<void>) {
   });
 }
 function fresh(): WorldStateData {
+  // A new world on day 1 of the world clock, as these checks count from it.
+  setTestWorldTime(1, 0);
   Math.random = () => 0.5;
-  useWorldStore.getState().startNewGame({ name: "Liveness test" });
+  useWorldStore.getState().startNewGame({ newWorld: true, name: "Liveness test" });
   Math.random = random;
   return clone(useWorldStore.getState()) as WorldStateData;
 }

@@ -44,7 +44,7 @@ export function clinicPreparation(state: PreparationState) {
     action: training.needsRest
       ? "จุดหมาย → สำนักยุทธิ์ → พักริมทาง · แล้วเลือก ฝึกประลองฟรี เมื่อพร้อม"
       : "จุดหมาย → สำนักยุทธิ์ → ฝึกประลองฟรี · ใช้ หมัดตรง ต่อสู้ · ถอยหนีได้เมื่อจำเป็น",
-    note: "ใช้ 5 แรง และ 0.5 ชั่วยาม · กลับนครหลวงหลังประลอง · เลือกสำรวจต่อได้",
+    note: "ใช้ 5 แรง · กลับนครหลวงหลังประลอง · เลือกสำรวจต่อได้",
   };
   if (!potion || price == null || state.gold < price ||
     potion.use?.t !== "heal" || !shop?.inventory.includes(potion.id)) return null;

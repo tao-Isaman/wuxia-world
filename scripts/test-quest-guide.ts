@@ -14,7 +14,7 @@ Math.random = () => 0.99;
 let checks = 0;
 function check(name: string, run: () => void) { run(); checks++; console.log(`PASS ${name}`); }
 function fresh(quests: Record<string, number>, at = "home_player") {
-  store().startNewGame({ name: "Guide test", gender: "male" } as never);
+  store().startNewGame({ newWorld: true, name: "Guide test", gender: "male" } as never);
   useWorldStore.setState({ currentSceneId: at, lastLocationId: at,
     quests: Object.fromEntries(Object.entries(quests).map(([id, stage]) => [id, { id, status: "active" as const, stage }])) });
 }

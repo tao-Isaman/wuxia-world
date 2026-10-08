@@ -195,14 +195,26 @@ export type RestKind = "home" | "sect" | "inn" | "temple" | "route";
 
 export type RestResult =
   | { ok: false; reason: "gold" | "place" }
-  | { ok: true; kind: RestKind; cost: number; restored: number; hours: number };
+  | { ok: false; reason: "cooldown"; readyIn: number }
+  | { ok: true; kind: RestKind; cost: number; restored: number };
 
 export interface WorldStore extends WorldStateData {
   // Actions
+  /**
+   * Bring the world up to the world clock (lib/world/clock.ts): time,
+   * regeneration, the day's events. Returns the whole days that passed (a
+   * return after a day or more away).
+   */
+  syncClock: () => number;
   startNewGame: (opts?: {
     name?: string;
     gender?: import("@/lib/world").Gender;
     bodyId?: string;
+    /**
+     * A new world too: fresh people, rumors and beasts. Tests and local
+     * play only — by default a new hero joins the shared world as it is.
+     */
+    newWorld?: boolean;
   }) => void;
   // Sect membership actions
   joinSect: (sectId: import("@/lib/world").SectId) => { ok: boolean; reason?: string };
@@ -381,7 +393,7 @@ export interface WorldStore extends WorldStateData {
   // dice, meditation, gate and escape. Returns a message for the toast.
   doActivity: (id: string) => ActivityResult;
   // Sit out the rest of a jail sentence at once and walk free.
-  serveSentence: () => void;
+  serveSentence: () => boolean;
   // Use a hands-on quest objective spot here (see lib/world/quest-objectives.ts).
   doQuestObjective: (questId: string, spotIndex: number) => ObjectiveResult;
   fleeEncounter: () => void;

@@ -1,12 +1,13 @@
 # Save format
 
-The game keeps everything in the browser's `localStorage` through Zustand's `persist` middleware. There is no server and no save slot: the world save is written after every state change.
+The game keeps everything in the browser's `localStorage`. There is no server and no save slot: the player's save is written through Zustand's `persist` middleware after every state change, and the **shared world** (the people, the rumors, the beasts — what a server would own) beside it under its own key ([design](design/world-clock-and-shared-world.md)).
 
 ## Contents
 
 - [Storage keys](#storage-keys)
 - [What is not saved](#what-is-not-saved)
 - [The world save](#the-world-save)
+- [The shared world](#the-shared-world)
 - [Loading a save](#loading-a-save)
 - [Migration](#migration)
 - [Version history](#version-history)
@@ -20,13 +21,14 @@ The game keeps everything in the browser's `localStorage` through Zustand's `per
 
 | Key | Holds | Version |
 | --- | --- | --- |
-| `localStorage["wusia-world-v1"]` | the world game (`store/world-store.ts`) | **26** |
+| `localStorage["wusia-world-v1"]` | the player's game (`store/world-store.ts`) | **27** |
+| `localStorage["wusia-shared-v1"]` | the shared world, `{ version, world }` (`store/world/shared-local.ts`) | **1** |
 | `localStorage["wusia-character-v1"]` | the two /debug builds (`store/character-store.ts`) | **3** |
 | `localStorage["wuxia-audio-v1"]` | sound switches and volumes (`lib/audio/engine.ts`) | — |
 | `localStorage["wuxia-random-events"] = "off"` | turns walk-tick encounters off (tests) | — |
 | `sessionStorage["wuxia:lastBanner"]` | skips the arrival banner after a reload in the same place | — |
 
-The two save keys keep the historical spelling "wusia". Do not rename them: a new key would orphan every existing save.
+The save keys keep the historical spelling "wusia". Do not rename them: a new key would orphan every existing save.
 
 An installed PWA asks the browser to keep its storage (`navigator.storage.persist()` in `components/pwa.tsx`).
 
@@ -43,48 +45,68 @@ A reload during a battle restarts that battle from the start with the hero's sav
 
 ## The world save
 
-`partialize` writes every data field of `WorldStateData` (`lib/world/types.ts`), 55 in all, and none of the action functions:
+`partialize` (`partializeSave`, typed `PlayerSave` = `WorldStateData` without the shared keys) writes the player's data fields of `WorldStateData` (`lib/world/types.ts`), 47 in all, and none of the action functions or [shared-world](#the-shared-world) fields:
 
 | Group | Fields |
 | --- | --- |
 | Run | `hasGame`, `gameOver`, `gender`, `playerBodyId` |
 | Hero | `playerBuild` (stats, slots, gear, learned skills and arts, levels, meridian charts `meridians`), `currentHp`, `currentMp`, `stamina`, `staminaMax` |
 | Where | `currentSceneId`, `lastLocationId`, `visitedLocationIds` |
-| Time | `day` (from 1), `time` (0 to below 12 ชั่วยาม) |
+| Time | `day`, `time` (0 to below 12 ชั่วยาม): the world clock's, set on every action (`syncClock`) — saved so a reload shows where the hero was |
 | Money and bag | `gold`, `inventory` (item id → count), `inventoryEquipment` (gear id → count) |
 | Progress | `wExp`, `skillLevel`, `skillExp`, `artExp`, `meridianPoints`, `statExp`, `lifeSkillXp` (19 keys), `learnedRecipeIds` |
 | Story | `flags`, `quests` (id → `{ id, status, stage, acceptedDefeatedAt?, acceptedHasItemAt? }`), `traits`, `npcStates` |
-| Ledgers | `defeatedCounts`, `stoleFromCounts`, `assassinatedNpcIds`, `kidnappedNpcIds` |
+| Ledgers | `defeatedCounts`, `stoleFromCounts` |
 | Sects | `sectMembership` (sect id → `{ rank, points, lastQuestDay, artQuestsDone, rewardPicks, joinedDay, status? }`) |
 | Pending | `pendingBattle`, `pendingEncounter`, `pendingHuntYield`, `pendingSpar` |
 | Log | `actionLog` (newest 100) |
 | Law | `wanted`, `wantedDay`, `jailCityId`, `jailUntil` |
-| Liveness | `npcExt`, `rumorPool`, `rumorArchive`, `rumorSeenLog`, `lastNpcTickDay` (Liveness 2.0 added only optional fields inside `npcExt` entries — temper, birthday, journey `plan`, `heirId`, generated people's identity — filled by `seedLiveness` on load, and `pendingBattle.killNpcId`; no version bump) |
+| Rumors heard | `rumorSeenLog` |
+| Gifts, letters, activities | `giftDays`, `letters`, `letterDays`, `activityDays` |
 
 Notes:
 
 - **Levels.** Move-skill levels live in `skillLevel` and are mirrored into `playerBuild.skillLevels`. Art levels live only in `playerBuild.artLevels`.
 - **Meridians.** `meridianPoints` is the unspent point pool; the learned charts and their point ranks are `playerBuild.meridians` (chart id → rank 0–3 per point).
 - **Sect status.** A missing `status` on a membership reads as `"active"`; nothing ever writes the default.
-- **Jail time.** `jailUntil` is an absolute count of ชั่วยาม (`day × 12 + time`).
+- **Jail time.** `jailUntil` is an absolute count of ชั่วยาม (`day × 12 + time`) on the world clock.
+
+## The shared world
+
+`SHARED_WORLD_KEYS` (`lib/world/shared/world.ts`) — what belongs to the world, not the hero:
+
+| Field | Holds |
+| --- | --- |
+| `worldSeed` | the world's random seed (each NPC week draws from `seededRng(worldSeed, day)`) |
+| `worldEventLog` | the last 500 `WorldEvent`s (`npc_killed`, `npc_kidnapped`, `boss_slain`, `rumor`) |
+| `npcExt`, `lastNpcTickDay` | the living jianghu ([liveness.md](liveness.md); Liveness 2.0 added only optional fields inside `npcExt` entries, filled by `seedLiveness` on load) |
+| `rumorPool`, `rumorArchive` | the rumors going round, and the expired ones |
+| `assassinatedNpcIds`, `kidnappedNpcIds`, `kidnappedUntil` | who was killed or carried off |
+| `bossDefeatedDay` | when each legendary beast last fell |
+| `tournament`, `tournamentHistory` | this year's sword tournament and past ones |
+
+They live on the store's state like any other field (every engine reads `state.npcExt`), but `localWorldService` keeps them under `wusia-shared-v1`. `attachSharedWorld` (in `store/world-store.ts`, right after the store is created) lays the stored world over the loaded save (`joinSharedWorld`), keeping any shared field the save itself carried (an older save — `takeCarriedWorldKeys`); with no stored world, the save's own is kept; a missing seed, people or lore are seeded. It then repairs, writes the world and saves it again whenever a shared field changes. A new game joins the world as it is (`startNewGame({ newWorld: true })` makes a fresh one); `resetGame` keeps it.
 
 ## Loading a save
 
 This is Zustand 5 `persist` over synchronous `localStorage`, so it all happens while the store is created:
 
 1. Read `{ state, version }` from `wusia-world-v1`.
-2. If `version !== 24`, run `migrate(state, version)`.
-3. Run `merge(persisted, current)`: `{ ...current, ...persisted }`, then `seedLoreRumors` if a game exists, and back-fill `playerBuild.baseHp` (`HERO_BASE_HP`, also added to `currentHp`) for saves made before the hero's flat base HP.
+2. If `version !== 27`, run `migrate(state, version)`.
+3. Run `merge(persisted, current)`: `{ ...current, ...persisted }` (noting which shared fields the save carried), then `seedLoreRumors` and `seedLiveness` if a game exists, and back-fill `playerBuild.baseHp` (`HERO_BASE_HP`, also added to `currentHp`) for saves made before the hero's flat base HP.
 
    This step runs for current-version saves too; it is how new lore reaches old saves.
 4. Replace the store state with the result.
 5. Run `onRehydrateStorage` → `validateAndRepair(state)`.
 
    It mutates the state object in place, without `set`, so no subscriber fires. The repaired values reach `localStorage` with the next change.
+6. `attachSharedWorld` joins the [shared world](#the-shared-world) and repairs once more against it.
 
 ## Migration
 
-`migrate` (`migrateSave` in `store/world/persist.ts`) is **one idempotent normalizer**; it ignores `fromVersion`. It works on any older save:
+`migrate` (`migrateSave` in `store/world/persist.ts`) is **one idempotent normalizer**. Its only use of `fromVersion` is v27's rebase (below); the rest works on any older save:
+
+- **v27: onto the world clock.** A save from before v27 counted its own days. `rebaseDays` (`lib/world/shared/rebase.ts`) shifts every day stamp by `worldNow().day − save.day` — `day`, `wantedDay`, `lastNpcTickDay`, `giftDays`, `letterDays`, `activityDays`, `kidnappedUntil`, `bossDefeatedDay`, letters, the action log, heard rumors, rumors and their archive, sect `joinedDay` / `lastQuestDay`, and each person's `lastTickDay`, history, seclusion, wounds, death day and journey — so cooldowns and news keep the time they had left. A jail term left is cut to at most 12 ชั่วยาม; a running tournament is dropped (its history kept). Birthdays are days of the year and stay.
 
 - **The build.**
   - pads `skillIds` to 10 slots;
@@ -144,6 +166,7 @@ What each version added. v1–v13 and v17→v18 are described in the comment abo
 | v23 → v24 | `meridianPoints` and `playerBuild.meridians` (ชีพจร, meridian charts) |
 | v24 → v25 | `lawEvasions` (escapes from the law since the last sentence); `wanted` is no longer clamped to 5 |
 | v25 → v26 | `bossDefeatedDay` (boss id → the day each legendary beast last fell, `lib/world/data/bosses.ts`; default `{}`) |
+| v26 → v27 | the world clock: day stamps rebased (`rebaseDays`); `worldSeed`, `worldEventLog`; the shared-world fields move out of the save into `wusia-shared-v1` |
 
 ## Repair on load
 
@@ -154,7 +177,7 @@ What each version added. v1–v13 and v17→v18 are described in the comment abo
 1. An unknown `currentSceneId` becomes `home_player`.
 2. A `lastLocationId` that is unknown or not a location becomes `null`. This also clears a road id that a walk event pinned there.
 3. `flags._skipEventRoll` is deleted.
-4. `day` is at least 1 and `time` at least 0; `time` of 12 or more rolls into `day`.
+4. `day` is at least 1 and `time` at least 0; `time` of 12 or more rolls into `day`. (The world clock then moves them on: `syncClock` never moves time back.)
 
 **Law and pending actions**
 
@@ -249,7 +272,8 @@ Content-only changes (a new quest, item or scene) need no version bump: missing 
 
 ## Tests
 
-- **Browser.** `tests/browser/game.spec.ts` loads a hand-written version-18 save and checks that it is upgraded to version 26 and plays.
+- **Browser.** `tests/browser/game.spec.ts` loads a hand-written version-18 save and checks that it is upgraded to version 27 and plays.
+- **Clock and shared world.** `scripts/test-clock.ts` (`bun run test:clock`) checks the save / shared-world split, `attachSharedWorld`, the carried fields, `rebaseDays` and the v26 → v27 `migrate`.
 - **Meridians.** `scripts/test-meridians.ts` (`bun run test:meridians`) checks `partialize`, the `migrate` default and the repair of `meridians` / `meridianPoints`.
 - **Rumors.** `scripts/test-lore-rumors.ts` (in `bun run test:rumors`) rehydrates v18 / v19 saves and checks the version, lore seeding and repair.
 - **Everything else.** Most `scripts/test-*.ts` files import the real store with an in-memory `localStorage`, so they exercise `persist` as well.
