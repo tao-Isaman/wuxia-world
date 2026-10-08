@@ -6,9 +6,16 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-08
 
+### PixelLab characters: the heroes and the wolf redrawn
+
+- The heroes **m1** and **f1** are redrawn and animated by PixelLab (style B: 128 px, high detail): vivid colours at native pixels, an 8-frame walk in eight directions, breathing idles, a sword slash, hit, guard stance, victory and a fall. The walk, hit, stance and fall are custom (v3) clips that keep the sword in place; the first template takes made the sword flicker while walking and the fall kick into the air. **Wolves** (and wild dogs) are a PixelLab beast (style C) with idle, bite and hurt clips, on the map and in battle. The styles were chosen from three candidates per kind.
+- Engine: a character atlas now carries its own clips, eight-way walk cells and `native` flag (`lib/characters/sheet.ts`, `pl-sheets.ts`); the map, battle, cutscene and preview renderers read them, so rigged and PixelLab sheets play side by side. Beasts map to sheets through `BEAST_SHEETS`.
+- Pipeline: `scripts/pixellab-characters.py` (download), `scripts/build-pixellab-sheets.ts` (people), `scripts/build-anim-sheets.ts` (beasts). Guide: [assets.md](assets.md#pixellab-characters).
+
 ### Online: no secret to set — the server keeps its own signing key
 
-- Sign-in no longer breaks after a deploy. The token-signing key used to be an `AUTH_SECRET` variable, which a dashboard-only variable lost on every `wrangler deploy` (`auth_secret_missing`). Now `KeyObject` (`server/worker/src/keys.rs`, a Durable Object) makes the key once and keeps it, so deploys and local dev need no configuration. Tokens from before the change stop working once: players log in again; accounts are untouched.
+- Sign-in no longer breaks after a deploy. The token-signing key used to be an `AUTH_SECRET` variable, which a dashboard-only variable lost on every `wrangler deploy` (`auth_secret_missing`). Now `KeyObject` (`server/worker/src/keys.rs`, a Durable Object) makes the key once and keeps it, so deploys and local dev need no configuration. Tokens from before the change stop working once; accounts are untouched.
+- A saved token the server no longer accepts signs out on load (`GET /auth/me`, `checkToken` in `OnlineBridge`): the player sees the log-in step again instead of an online status that never connects.
 - A room checks the token before the WebSocket upgrade, so a bad token is 401 even where a proxy drops the `Upgrade` header.
 
 ### Online: account → character → play

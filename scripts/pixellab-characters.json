@@ -1,0 +1,26 @@
+{
+  "m1": {
+    "pixellab": "f16a1e87-20fa-4ca0-87cd-5b8b949e512b",
+    "style": "B",
+    "clips": {
+      "walk": "try_walk_v3",
+      "hurt": "try_hurt_v3",
+      "stance": "try_stance_v3",
+      "defeat": "try_defeat_v3"
+    }
+  },
+  "f1": {
+    "pixellab": "a1292eb4-ee77-468b-a107-65e4e9be9cf0",
+    "style": "B",
+    "clips": {
+      "walk": "try_walk_v3",
+      "hurt": "try_hurt_v3",
+      "stance": "try_stance_v3",
+      "defeat": "try_defeat_v3"
+    }
+  },
+  "beast_wolf": {
+    "pixellab": "de6c716d-b011-4987-8d35-07a5c1c22cb4",
+    "style": "C"
+  }
+}

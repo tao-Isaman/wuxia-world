@@ -45,7 +45,11 @@ export interface CharacterSheetLayout {
 // stay for a hand-drawn sheet with uneven gutters.
 export const CHARACTER_SHEET_LAYOUTS: Partial<Record<CharacterId, CharacterSheetLayout>> = {};
 export const CHARACTER_DIRECTION_LAYOUTS: Partial<Record<CharacterId, CharacterSheetLayout>> = {};
-export const CHARACTER_CLIPS: Record<CharacterMotion, { frames: readonly number[]; fps: number; repeat: number }> = {
+/** A clip: atlas frames in order, its rate, and -1 to loop (0 plays once and holds the last frame). */
+export interface CharacterClip { frames: readonly number[]; fps: number; repeat: number }
+export type CharacterClips = Record<CharacterMotion, CharacterClip>;
+/** The clips of a rigged 4 × 4 (+ 4 × 2 directions) sheet; a PixelLab sheet brings its own (lib/characters/pl-sheets.ts). */
+export const CHARACTER_CLIPS: CharacterClips = {
   idle: { frames: [0, 1, 2, 3], fps: 4, repeat: -1 },
   walk: { frames: [4, 5, 6, 7], fps: 8, repeat: -1 },
   walkNorth: { frames: [16, 17, 18, 19], fps: 8, repeat: -1 },

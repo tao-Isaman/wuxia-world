@@ -48,6 +48,18 @@ export const BOSS_SHEET_IDS = [
   "boss_golden_serpent", "boss_blood_tiger", "boss_sword_eagle",
   "boss_sun_turtle", "boss_blade_crab", "boss_flame_bull",
 ] as const;
+/**
+ * Beasts drawn by PixelLab (style C, docs/assets.md#pixellab-characters), by creature-atlas frame
+ * (CREATURE_ATLAS): a beast whose kind has a sheet plays it instead of the atlas's still painting.
+ * Only kinds whose sheet exists in the data file are used.
+ */
+export const BEAST_SHEETS: Readonly<Record<number, string>> = { 0: "beast_wolf" };
+export const BEAST_SHEET_IDS = Object.values(BEAST_SHEETS);
+/** The PixelLab sheet for a creature-atlas frame, if it has one. */
+export function beastSheetFor(frame: number): string | null {
+  const id = BEAST_SHEETS[frame];
+  return id && ANIM_SHEETS[id] ? id : null;
+}
 export const T5_SHEET_IDS = [
   "t5_nameless_sword_hermit", "t5_blood_blade_lord", "t5_poison_matriarch",
   "t5_iron_monk", "t5_white_tiger", "t5_wolf_king",

@@ -4,7 +4,7 @@
 // Two accounts sign up and log in, walk into the same room, see each other
 // join, move and leave; a second login of one account replaces the first.
 import assert from "node:assert/strict";
-import { connectRoom, login, register, type RoomConnection } from "../lib/net/client";
+import { checkToken, connectRoom, login, register, type RoomConnection } from "../lib/net/client";
 import type { ServerMsg } from "../lib/net/protocol";
 
 const server = (process.env.GAME_SERVER_URL ?? "http://127.0.0.1:8787").replace(/\/$/, "");
@@ -72,6 +72,15 @@ await check("sign up two accounts; a taken name, a short password and a wrong pa
   await assert.rejects(login(server, ann, "wrong-pass"), /wrong_login/);
   const again = await login(server, ann.toUpperCase(), "secret-ann");
   assert.equal(again.username, ann, "usernames are case-insensitive");
+});
+
+await check("a saved token can be checked: valid, or rejected once the server no longer accepts it", async () => {
+  const me = await (await fetch(`${server}/auth/me?token=${encodeURIComponent(annToken)}`)).json() as { username: string; expires: number };
+  assert.equal(me.username, ann);
+  assert.ok(me.expires > Date.now());
+  assert.equal(await checkToken(server, annToken), "valid");
+  assert.equal(await checkToken(server, `${annToken.slice(0, -1)}${annToken.endsWith("A") ? "B" : "A"}`), "rejected");
+  assert.equal(await checkToken(server, "nope"), "rejected");
 });
 
 await check("a room refuses a bad token", async () => {

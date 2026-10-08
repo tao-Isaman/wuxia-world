@@ -14,9 +14,10 @@ import {
   type UnitLook,
 } from "@/lib/game/grid";
 import { heroMoveFor, heroPose, movesIn, type HeroMove } from "./hero-motion";
-import { CHARACTER_CLIPS, CHARACTER_FEET_Y, CHARACTER_FRAME_SIZE, characterId, CREATURE_ATLAS, CREATURE_FRAME_COUNT, creatureCell, type CharacterMotion } from "@/lib/characters/catalog";
-import { WALK8_FPS, dir8FromVector, walk8Frame, walk8Source, type Dir8 } from "@/lib/characters/walk8";
-import { loadCharacterAtlas } from "@/lib/characters/sheet";
+import { CHARACTER_CLIPS, CHARACTER_FEET_Y, CHARACTER_FRAME_SIZE, characterId, CREATURE_ATLAS, CREATURE_FRAME_COUNT, creatureCell, type CharacterClip, type CharacterClips, type CharacterMotion } from "@/lib/characters/catalog";
+import { getPlSheet } from "@/lib/characters/pl-sheets";
+import { dir8FromVector, walk8Frame, walk8Source, type Dir8, type Walk8Cells } from "@/lib/characters/walk8";
+import { figureScale, loadCharacterAtlas } from "@/lib/characters/sheet";
 import { getAnimSheet, type AnimSheet } from "@/lib/characters/anim-sheets";
 import { animClipMs, animFrame, animScaleOf, animVisibleTop } from "./anim-frame";
 import { HERO_ACTION_CELL, HERO_COMBAT_COLUMNS, HERO_COMBAT_ROWS, hasHeroActions, heroAttackColumn, heroAttackRow, heroCombatFrame,
@@ -103,6 +104,10 @@ interface Actor {
   directional: boolean;
   /** Painted eight-way walk cells (heroes, lib/characters/walk8.ts). */
   walk8: boolean;
+  walk8Cells?: Walk8Cells;
+  /** The sheet's clips (a PixelLab sheet brings longer ones) and its battle stance, if it has one. */
+  clips: CharacterClips;
+  battleIdle?: CharacterClip;
   /** The hero's painted combat sheet (lib/characters/hero-actions.ts): its texture and atlas px per cell px. */
   actions?: { key: string; scale: number };
   /** The combat-sheet frame on show, or null while the base sheet is drawn. */
@@ -520,7 +525,8 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
     : look.still ? `still:${look.still}` : `char:${characterId(look.characterId)}`;
 
   interface LookTexture { key: string; kind: ActorKind; feet: number[]; directional: boolean; walk8?: boolean; w: number; h: number;
-    actions?: { key: string; scale: number }; anim?: { sheet: AnimSheet; columns: number }; animTop?: number }
+    actions?: { key: string; scale: number }; anim?: { sheet: AnimSheet; columns: number }; animTop?: number;
+    walk8Cells?: Walk8Cells; clips?: CharacterClips; battleIdle?: CharacterClip; cellScale?: number }
   const textures = new Map<string, Promise<LookTexture>>();
   function textureFor(look: UnitLook): Promise<LookTexture> {
     const key = lookKey(look);
@@ -564,8 +570,9 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
       }
       const id = characterId(look.characterId);
       const [atlas, combat] = await Promise.all([loadCharacterAtlas(id),
-        // A missing combat sheet only costs the painted poses, never the character.
-        hasHeroActions(id) ? loadImage(heroCombatSheet(id)).catch(() => null) : Promise.resolve(null)]);
+        // A missing combat sheet only costs the painted poses, never the character. A PixelLab
+        // hero plays its own attack clip, so the painted poses (another style) stay out.
+        hasHeroActions(id) && !getPlSheet(id) ? loadImage(heroCombatSheet(id)).catch(() => null) : Promise.resolve(null)]);
       const texture = canvasTexture(scene!, `gb:${key}`, atlas.image);
       addGridFrames(texture, atlas.frameSize, atlas.columns, atlas.rows);
       let actions: LookTexture["actions"];
@@ -577,7 +584,8 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
         }
       }
       return { key: `gb:${key}`, kind: "sheet" as const, feet: [atlas.feetY / atlas.frameSize], directional: atlas.directional, walk8: atlas.walk8,
-        w: atlas.frameSize, h: atlas.frameSize, actions };
+        w: atlas.frameSize, h: atlas.frameSize, actions: atlas.native ? undefined : actions, walk8Cells: atlas.walk8Cells ?? undefined,
+        clips: atlas.clips, battleIdle: atlas.battleIdle, cellScale: figureScale(atlas) };
     })();
     textures.set(key, pending);
     return pending;
@@ -590,7 +598,7 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
     const size = Math.max(0.6, Math.min(1.6, unit.look.size ?? 1));
     // An animated sheet stands `sheet.scale × size` figures tall: the frame from its top to the feet line is that figure.
     const animScale = tex.anim ? animScaleOf(tex.anim.sheet, unit.look.size) : 1;
-    const dispH = tex.anim ? FIGURE * animScale / Math.max(0.4, feet) : (tex.kind === "creature" ? FRAME * 0.92 : FRAME) * size;
+    const dispH = tex.anim ? FIGURE * animScale / Math.max(0.4, feet) : (tex.kind === "creature" ? FRAME * 0.92 : FRAME * (tex.cellScale ?? 1)) * size;
     const dispW = dispH * tex.w / tex.h;
     // Bars and name plates sit on the painted figure's top (its idle frame), not the frame's headroom.
     const head = tex.anim ? dispH * Math.max(0.25, feet - (tex.animTop ?? 0)) : tex.kind === "creature" ? dispH * feet * 0.72 : FIGURE * size;
@@ -605,6 +613,7 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
     const bars = scene!.add.graphics().setDepth(30);
     const actor: Actor = {
       id: unit.id, team: unit.team, index, kind: tex.kind, anim: tex.anim, directional: tex.directional, walk8: !!tex.walk8, walkDir: "E",
+      walk8Cells: tex.walk8Cells, clips: tex.clips ?? CHARACTER_CLIPS, battleIdle: tex.battleIdle,
       actions: tex.actions, actionFrame: null, baseKey: tex.key, baseFeet: feet,
       image, shadow, ring, tag: tagInfo.item, tagW: tagInfo.width, tagH: tagInfo.height, bars, barsKey: "",
       dispW, dispH, head,
@@ -623,6 +632,18 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
   function placeTag(actor: Actor) {
     actor.tag.setDisplaySize(actor.tagW * uiScale, actor.tagH * uiScale);
     actor.bars.setScale(uiScale);
+  }
+  /**
+   * A longer attack clip (a PixelLab sheet) laid over the same beats as the rigged one: the
+   * wind-up until the first hit, the strike frames swapping on every hit, then the follow-through.
+   */
+  function attackClipFrame(clip: CharacterClip, age: number, lastImpact: number, reduced: boolean): number {
+    const frames = clip.frames, strike = Math.max(1, Math.round(frames.length * 0.45));
+    if (reduced) return frames[strike];
+    if (age < HIT_DELAY) return frames[Math.min(strike - 1, Math.floor(age / HIT_DELAY * strike))];
+    if (age < lastImpact + 100) return frames[Math.min(frames.length - 1, strike + (Math.floor((age - HIT_DELAY) / HIT_GAP) % 2))];
+    const after = strike + 2 + Math.floor((age - lastImpact - 100) * clip.fps / 1000);
+    return frames[Math.min(frames.length - 1, after)];
   }
   function setMotion(actor: Actor, motion: CharacterMotion) {
     if (actor.motion === motion) return;
@@ -776,11 +797,14 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
       let frame = actor.frame;
       if (motion === "attack" && actor.attack) {
         const a = elapsed - actor.attack.start;
-        frame = reduced ? 10 : a < 135 ? 8 : a < HIT_DELAY ? 9 : a < actor.attack.lastImpact + 100 ? 10 + (Math.floor((a - HIT_DELAY) / HIT_GAP) % 2) : 11;
+        frame = actor.clips === CHARACTER_CLIPS
+          ? (reduced ? 10 : a < 135 ? 8 : a < HIT_DELAY ? 9 : a < actor.attack.lastImpact + 100 ? 10 + (Math.floor((a - HIT_DELAY) / HIT_GAP) % 2) : 11)
+          : attackClipFrame(actor.clips.attack, a, actor.attack.lastImpact, reduced);
       } else if (actor.walk8 && motion.startsWith("walk")) {
-        frame = walk8Frame(actor.walkDir, reduced ? null : Math.floor(Math.max(0, age) * WALK8_FPS / 1000) % 4).frame;
+        const cells = actor.walk8Cells;
+        frame = walk8Frame(actor.walkDir, reduced ? null : Math.floor(Math.max(0, age) * (cells?.fps ?? 8) / 1000), cells).frame;
       } else {
-        const clip = CHARACTER_CLIPS[motion];
+        const clip = motion === "idle" && actor.battleIdle ? actor.battleIdle : actor.clips[motion];
         const progress = reduced && motion === "idle" ? 0 : Math.floor(Math.max(0, age) * clip.fps / 1000);
         frame = clip.frames[clip.repeat === -1 ? progress % clip.frames.length : Math.min(progress, clip.frames.length - 1)];
       }
@@ -789,6 +813,15 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
       else if (actor.actionFrame !== null) { actor.frame = frame; showActionFrame(actor, null); }
       else if (frame !== actor.frame) { actor.image.setFrame(frame, false, false); actor.frame = frame; }
       if (motion === "defeat") alpha = 0.78;
+      // A PixelLab hero plays its own clips (no painted combat sheet): report the motions and frames it showed.
+      if (actor.id === "A" && actor.clips !== CHARACTER_CLIPS) {
+        const add = (key: "heroMotions" | "heroClipFrames", value: string) => {
+          const seen = (parent.dataset[key] ?? "").split(",").filter(Boolean);
+          if (!seen.includes(value)) parent.dataset[key] = [...seen, value].join(",");
+        };
+        add("heroMotions", motion);
+        if (motion === "attack") add("heroClipFrames", String(frame));
+      }
     } else if (actor.anim) {
       // Animated sheet: idle loops; a cast plays `attack` once (holding its last frame);
       // a hit plays `hurt` once (idle when the sheet has none); the fallen fade and sink.

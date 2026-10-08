@@ -162,7 +162,8 @@ check("bridge: pack opponents spawn their weaker members as extra enemies", () =
 
   newGame();
   fight("wild_wolf");
-  assert.deepEqual(st().units.map((u) => u.look.kind), ["character", "creature", "creature"]);
+  // Wolves and wild dogs play the PixelLab wolf (BEAST_SHEETS); other beasts keep the creature atlas.
+  assert.deepEqual(st().units.map((u) => u.look.kind), ["character", "anim", "anim"]);
   newGame();
   fight("mountain_tiger");
   assert.deepEqual(unitById(st(), "B")!.look, { kind: "creature", frame: 1 });
@@ -194,7 +195,7 @@ check("bridge: big gangs get a bigger board, stronger heroes meet more companion
 check("looks: enemy variants carry their tint and size", () => {
   newGame();
   fight("frost_wolf");
-  assert.deepEqual(unitById(st(), "B")!.look, { kind: "creature", frame: 0, tint: 0xc6e6ff, size: 1.08 });
+  assert.deepEqual(unitById(st(), "B")!.look, { kind: "anim", sheet: "beast_wolf", tint: 0xc6e6ff, size: 1.08 });
   useBattleStore.getState().reset();
   newGame();
   fight("elite_cult_elder");

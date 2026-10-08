@@ -26,6 +26,21 @@ async function auth(server: string, path: "register" | "login", username: string
 export const register = (server: string, username: string, password: string) => auth(server, "register", username, password);
 export const login = (server: string, username: string, password: string) => auth(server, "login", username, password);
 
+/**
+ * Whether the server still accepts a saved token: `valid`, `rejected` (401: a
+ * bad or expired token, or one signed with an older server key) or `unknown`
+ * (no answer — keep the token and try later).
+ */
+export async function checkToken(server: string, token: string): Promise<"valid" | "rejected" | "unknown"> {
+  try {
+    const response = await fetch(`${server.replace(/\/$/, "")}/auth/me?token=${encodeURIComponent(token)}`);
+    if (response.ok) return "valid";
+    return response.status === 401 ? "rejected" : "unknown";
+  } catch {
+    return "unknown";
+  }
+}
+
 export interface RoomOptions {
   server: string;
   token: string;

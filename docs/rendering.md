@@ -280,6 +280,7 @@ Objects placed on a location map with the engine's map editor (`/game/engine`, �
   - Heroes: `m1`–`m4` and `f1`–`f4`.
   - Archetypes: `elder`, `monk`, `merchant`, `bandit`.
   - Townspeople: `feng`, `wang`, `qing`.
+- **PixelLab sheets.** A character with a sheet in `lib/characters/pl-sheets-data.ts` (`/art/characters/pl/<id>.png`; so far the heroes m1 and f1) loads it instead of the rigged sheets below: native pixels on square cells, its own clips (8-frame walks in five painted directions, side-facing `battleIdle`) and `native: true`, so renderers draw it `figureScale` larger and the map keeps its colours ([assets.md](assets.md#pixellab-characters)). Beasts with a PixelLab sheet (`beast_wolf`) are animated sheets (below).
 - **Sheets.** `/art/characters/<id>.png` is a 4 × 4 grid of 128 px cells with feet at y 120; heroes add `/art/characters/<id>-directions.png` (4 × 2). That makes 304 poses. The clips:
 
 | Clip | Frames | fps |

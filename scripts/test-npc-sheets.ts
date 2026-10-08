@@ -14,7 +14,8 @@ import { creatureFrameFor, findOpponentNpc, foeCharacterFor, foeLook, opponentLo
 import { getNpc } from "../lib/world/data/npcs";
 import { getLocationMap } from "../lib/world/data/location-maps";
 import { OPPONENTS, OPPONENTS_BY_ID } from "../lib/world/data/opponents";
-import { ANIM_SHEETS, BOSS_SHEET_IDS, T5_SHEET_IDS, getAnimSheet } from "../lib/characters/anim-sheets";
+import { ANIM_SHEETS, BEAST_SHEETS, BOSS_SHEET_IDS, T5_SHEET_IDS, beastSheetFor, getAnimSheet } from "../lib/characters/anim-sheets";
+import { PL_SHEETS } from "../lib/characters/pl-sheets";
 import { ANIM_MAX_SCALE, animClipMs, animFrame, animScaleOf } from "../lib/stage/anim-frame";
 import type { OpponentDef } from "../lib/world/types";
 import { FIGHT_EVENTS } from "../lib/world/data/random-events";
@@ -365,6 +366,44 @@ await check("animated sheets: frame maths loop idle, play attack / hurt once, an
   assert.equal(animScaleOf(sheet, 0.01), 0.6);
 });
 
+await check("PixelLab character sheets: every clip frame is drawn, the walk8 cells are complete, the preview crop stays in its cell", async () => {
+  assert.ok(Object.keys(PL_SHEETS).length > 0);
+  for (const sheet of Object.values(PL_SHEETS)) {
+    const file = `public${sheet.url.split("?")[0]}`;
+    assert.ok(existsSync(file), file);
+    const { data, info } = await sharp(file).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+    assert.equal(info.width, sheet.columns * sheet.cell, `${sheet.id} width`);
+    assert.equal(info.height, sheet.rows * sheet.cell, `${sheet.id} height`);
+    const drawn = (index: number) => {
+      const ox = (index % sheet.columns) * sheet.cell, oy = Math.floor(index / sheet.columns) * sheet.cell;
+      for (let y = 0; y < sheet.cell; y++) for (let x = 0; x < sheet.cell; x++) if (data[((oy + y) * info.width + ox + x) * 4 + 3] > 24) return true;
+      return false;
+    };
+    const used = new Set([...Object.values(sheet.clips).flatMap((c) => [...c.frames]), ...(sheet.battleIdle?.frames ?? []),
+      ...Object.values(sheet.walk8.walk).flat(), ...Object.values(sheet.walk8.stand)]);
+    for (const index of used) {
+      assert.ok(index >= 0 && index < sheet.columns * sheet.rows, `${sheet.id} frame ${index} is on the sheet`);
+      assert.ok(drawn(index), `${sheet.id} frame ${index} is drawn`);
+    }
+    for (const dir of ["S", "SE", "E", "NE", "N"] as const) assert.ok(sheet.walk8.walk[dir].length >= 4, `${sheet.id} walks ${dir}`);
+    // components/game/character-preview.tsx crops the square a rigged 128 px cell would show.
+    const side = sheet.figure * 128 / 108, top = sheet.feetY - side * 120 / 128;
+    assert.ok(top >= 0 && top + side <= sheet.cell && side <= sheet.cell, `${sheet.id} preview crop fits its cell`);
+  }
+});
+
+await check("PixelLab beasts: a kind with a sheet plays it everywhere; the others keep the creature atlas", () => {
+  for (const [frame, id] of Object.entries(BEAST_SHEETS)) {
+    assert.ok(ANIM_SHEETS[id], `${id} is packed (scripts/build-anim-sheets.ts)`);
+    assert.equal(beastSheetFor(Number(frame)), id);
+  }
+  const wolf = OPPONENTS.find((o) => o.category === "beast" && !o.look?.anim && creatureFrameFor(o.id) === 0)!;
+  assert.deepEqual(opponentLook(wolf.id), { kind: "anim", sheet: "beast_wolf" });
+  assert.deepEqual(foeLook(wolf.id), { kind: "anim", sheet: "beast_wolf" });
+  const other = OPPONENTS.find((o) => o.category === "beast" && !o.look?.anim && beastSheetFor(creatureFrameFor(o.id)!) === null)!;
+  assert.equal(opponentLook(other.id).kind, "creature");
+});
+
 await check("animated sheets: an opponent with look.anim (and its pack) fights, and shows, as its sheet", () => {
   const beast = OPPONENTS.find((o) => o.category === "beast")!;
   const minion: OpponentDef = { ...beast, id: "test_anim_minion", look: { anim: T5_SHEET_IDS[5], frame: 1 }, pack: undefined };
@@ -375,7 +414,7 @@ await check("animated sheets: an opponent with look.anim (and its pack) fights, 
   try {
     assert.deepEqual(opponentLook(boss.id), { kind: "anim", sheet: BOSS_SHEET_IDS[0], tint: 0xffeeaa, size: 1.1 }, "look.anim wins over the creature frame");
     assert.deepEqual(foeLook(minion.id), { kind: "anim", sheet: T5_SHEET_IDS[5] });
-    assert.equal(opponentLook(ghost.id).kind, "creature", "an unknown sheet falls back to the creature atlas");
+    assert.deepEqual(opponentLook(ghost.id), opponentLook(beast.id), "an unknown sheet falls back to the beast's own look");
     const setup = worldBattleSetup(boss.id, { bodyId: "m1", withPack: true });
     assert.equal(setup!.looks.B.kind, "anim");
     assert.equal(setup!.enemies.length, 2);

@@ -4,6 +4,7 @@
 // a game and a server, the session gets the hero's name and body; its status
 // and room size are mirrored into the online store for the HUD.
 import { useEffect } from "react";
+import { checkToken } from "@/lib/net/client";
 import { onlineSession } from "@/lib/net/session";
 import { gameServerUrl } from "@/lib/net/config";
 import { signedIn, useOnlineStore } from "@/store/online-store";
@@ -15,6 +16,20 @@ export function OnlineBridge() {
   const hasGame = useWorldStore((s) => s.hasGame);
   const name = useWorldStore((s) => s.playerBuild?.name ?? "");
   const body = useWorldStore((s) => (s.playerBodyId === "f1" ? "f1" : "m1"));
+
+  // A saved token the server no longer accepts (a new server key) signs out,
+  // so the account step asks for the password again instead of retrying forever.
+  useEffect(() => {
+    const server = gameServerUrl();
+    if (!server || !token) return;
+    let live = true;
+    void checkToken(server, token).then((verdict) => {
+      if (!live || verdict !== "rejected" || useOnlineStore.getState().token !== token) return;
+      useOnlineStore.getState().signOut();
+      toast("info", "กรุณาเข้าสู่ระบบอีกครั้ง");
+    });
+    return () => { live = false; };
+  }, [token]);
 
   useEffect(() => {
     const server = gameServerUrl();

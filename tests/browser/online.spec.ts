@@ -88,6 +88,28 @@ test("two players online see each other walk on the same map", async ({ browser 
   await ann.context().close();
 });
 
+test("a saved token the server no longer accepts (a new server key) asks to log in again", async ({ browser }) => {
+  test.skip(!(await serverUp()), `no game server at ${SERVER} (bun run server:dev)`);
+  const id = `old_${run}`.slice(0, 20);
+  // A token that looks valid in this browser (unexpired) but that the server never signed.
+  const stale = { state: { username: id, token: "eyJzdWIiOiJ4IiwiZXhwIjo5OTk5OTk5OTk5OTk5fQ.c2lnbmF0dXJl", expires: Date.now() + 86_400_000 }, version: 1 };
+  const context = await browser.newContext({
+    storageState: { cookies: [], origins: [{ origin: "http://127.0.0.1:3017", localStorage: [
+      { name: "wuxia-random-events", value: "off" },
+      { name: "wuxia-game-server", value: SERVER },
+      { name: "wuxia-online-v1", value: JSON.stringify(stale) },
+    ] }] },
+    viewport: { width: 1280, height: 800 },
+  });
+  const page = await context.newPage();
+  await page.goto("/");
+  const account = page.getByTestId("account-form");
+  await expect(account).toBeVisible({ timeout: 20_000 });
+  await expect(account).toHaveAttribute("data-mode", "login");
+  await expect(account.locator("#account-username")).toHaveValue(id);
+  await context.close();
+});
+
 test("online flow: account first; a returning player logs in straight back to their game; signing out asks again", async ({ browser }) => {
   test.skip(!(await serverUp()), `no game server at ${SERVER} (bun run server:dev)`);
   test.setTimeout(120_000);
