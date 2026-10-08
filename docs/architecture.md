@@ -46,6 +46,8 @@ lib/world/battle-bridge.ts  the one place world and battle stores meet
 
 lib/stage/, lib/characters/ Phaser renderers and sprite atlases (browser only)
 lib/audio/                  Web Audio (browser only)
+lib/net/                    online client: protocol, sockets, presence (docs/online.md)
+server/                     the game server: Rust on Cloudflare Workers (core: pure decide / apply; worker: Durable Objects)
 ```
 
 The import rules:
@@ -79,6 +81,8 @@ Two deliberate exceptions reach up into stores:
 | `lib/stage/` | Phaser stage, world runtime, grid battle runtime, VFX, navigation and other pure helpers |
 | `lib/characters/` | character catalog, atlas building, walk cycle |
 | `lib/audio/` | songs, synth engine, skill sounds |
+| `lib/net/` | online client: wire protocol, `connectRoom`, the presence reducer, `onlineSession` ([online.md](online.md)) |
+| `server/` | the Rust game server: `core` (protocol, rooms, accounts — pure, `cargo test`) and `worker` (Cloudflare Worker, Durable Objects) |
 | `lib/ui/rarity.ts`, `lib/utils.ts` | small UI helpers (`cn`) |
 | `public/` | maps, art, NPC portraits and sprites, icons, PWA icons, `sw.js` |
 | `scripts/` | tests, audits, generators, tools ([scripts.md](scripts.md)) |

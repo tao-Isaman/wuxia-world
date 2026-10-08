@@ -1,0 +1,180 @@
+# Online play
+
+Players sign in with a username and password and see each other walk, live, on the same map. The server is a Cloudflare Worker written in Rust (`server/`); the game talks to it over HTTP (accounts) and one WebSocket per map (presence). The save still lives in the browser; only presence is online so far.
+
+## Contents
+
+- [How it fits together](#how-it-fits-together)
+- [Event-based design](#event-based-design)
+- [The protocol](#the-protocol)
+- [The server (`server/`)](#the-server-server)
+- [The client (`lib/net/`)](#the-client-libnet)
+- [Running it locally](#running-it-locally)
+- [Deploying](#deploying)
+- [Tests](#tests)
+- [Limits and next steps](#limits-and-next-steps)
+
+## How it fits together
+
+```
+browser                                   Cloudflare
+───────                                   ──────────
+OnlinePanel ──POST /auth/register|login──► Worker (server/worker/src/lib.rs)
+  (store/online-store.ts: token)              └─► AccountObject (Durable Object, one per username)
+                                                    event log: registered { salt, hash, iterations }
+map runtime ─report(room, motion)─► OnlineSession (lib/net/session.ts)
+  draws players() ◄──────────────────  │ one WebSocket: /rooms/<map id>/ws?token=…
+                                       └─────────────► Worker checks the token
+                                                         └─► RoomObject (Durable Object, one per map)
+                                                               decide → events → apply → broadcast
+```
+
+- **A room is a map.** Its id is the scene id (`home_player`, `city_capital`, `route_a__to__b`). Walking onto another map closes the socket and opens the new room's.
+- **Accounts.** One Durable Object per username: two sign-ups for one name can never both win.
+- **Sessions.** A signed token (HMAC-SHA256 with `AUTH_SECRET`, 30 days). There is no session table.
+
+## Event-based design
+
+All state changes go one way: **command → `decide` → events → `apply`**.
+
+- A **command** is what a player asks for: `join`, `move`, `leave`.
+- **`Room::decide(&state, command, now)`** (`server/core/src/room.rs`) checks it and returns the **events** it causes, or a `Rejection`. It never changes state.
+- **`Room::apply(&mut state, event)`** folds one event in. It never fails.
+- The room's Durable Object numbers each event (`seq`), applies it and broadcasts it.
+- Every client applies the same events to its own copy (`lib/net/presence.ts`, `applyServerMsg`). A snapshot (`welcome`) plus the events after its `seq` always rebuild the same room. A gap in `seq` makes the client ask for a fresh snapshot (`sync`).
+- Accounts work the same way: `Account::register` decides a `registered` event, and `Account::from_events` rebuilds the account (`server/core/src/auth.rs`).
+
+The pure logic lives in `server/core` (no I/O, clock or randomness), so it is tested natively with `cargo test`. The Worker crate is only glue.
+
+**Hibernation.** Rooms use the Durable Object hibernation API: an idle room may leave memory while its sockets stay open.
+
+- Each socket's **attachment** holds its player's `Presence`; that is the durable truth.
+- The in-memory `Room` is a cache, rebuilt from the attachments after a wake-up.
+- After a wake-up, `seq` restarts under a new `epoch`, and clients resync from the welcome.
+
+## The protocol
+
+`server/core/src/protocol.rs` and its mirror `lib/net/protocol.ts` (keep them in step; bump `PROTOCOL_VERSION` on both sides). Every frame is one JSON object tagged by `t`.
+
+| Direction | Message | Meaning |
+| --- | --- | --- |
+| client → server | `hello { v, name, body, x, y, dir }` | the first message: who walks in, and where |
+| | `move { x, y, dir, moving }` | position and heading, ~10 a second while walking |
+| | `sync` | ask for a fresh snapshot |
+| | `ping { at }` | keep-alive |
+| server → client | `welcome { you, room, epoch, seq, players }` | the room at `seq` (answer to `hello` / `sync`) |
+| | `event { seq, ev }` | one event, in order: `joined { player }`, `moved { id, x, y, dir, moving, at }`, `left { id, reason }` |
+| | `pong { at, server }` | the server's time |
+| | `error { code, message }` | a refused command: `bad_message`, `bad_version`, `not_joined`, `already_joined`, `bad_profile`, `too_fast`, `room_full`, `replaced` |
+
+**Server rules** (`room.rs`):
+
+- Positions are clamped to the 960 × 640 map.
+- A move may cover at most `WALK_SPEED` (150) × 1.6 × the time since the last one, plus 48 units; anything more is `too_fast`.
+- Names are 1–24 printable characters; bodies are `m1` or `f1`.
+- A room holds at most 64 players.
+- Joining again with the same account (a second tab) emits `left { reason: "replaced" }` and closes the older socket with code 4001.
+
+**HTTP:**
+
+| Request | Answer |
+| --- | --- |
+| `GET /health` | `{ ok, protocol }` |
+| `POST /auth/register` `{ username, password }` | `{ username, token, expires }`, or `{ error }` with 400 / 409 |
+| `POST /auth/login` `{ username, password }` | the same, or 401 `wrong_login` |
+| `GET /rooms/<room>/ws?token=…` (WebSocket upgrade) | the room; 401 for a bad token |
+
+Usernames are 3–20 of `a–z 0–9 _`, case-insensitive. Passwords are 6–72 characters, stored as PBKDF2-HMAC-SHA256 with a random salt; the iteration count (`PBKDF2_ITERATIONS`, default 10,000) is stored per account. Error codes: `bad_username`, `bad_password`, `taken`, `wrong_login`, `bad_token`, `expired`.
+
+## The server (`server/`)
+
+| Path | What |
+| --- | --- |
+| `server/Cargo.toml` | the workspace (release profile tuned for size) |
+| `server/core/src/protocol.rs` | wire types (`ClientMsg`, `ServerMsg`, `RoomEvent`, `Presence`, `Dir8`) |
+| `server/core/src/room.rs` | `Room`: `decide` / `apply`, the movement and profile rules |
+| `server/core/src/auth.rs` | usernames, password hashing, `Account` (event-sourced), signed tokens |
+| `server/worker/src/lib.rs` | the router, CORS, token checks, forwarding to the Durable Objects |
+| `server/worker/src/account.rs` | `AccountObject`: the account's event log in Durable Object storage |
+| `server/worker/src/room.rs` | `RoomObject`: hibernating WebSockets, attachments, numbering and broadcast |
+| `server/worker/wrangler.toml` | bindings `ACCOUNTS` / `ROOMS`, the SQLite-backed Durable Object migration, `PBKDF2_ITERATIONS` |
+
+## The client (`lib/net/`)
+
+| File | What |
+| --- | --- |
+| `lib/net/protocol.ts` | the wire types (mirror of `protocol.rs`) |
+| `lib/net/client.ts` | `register` / `login` (HTTP) and `connectRoom` (one socket into one room); no React |
+| `lib/net/presence.ts` | the pure reducer `applyServerMsg` (welcome, events in `seq` order, resync on a gap) |
+| `lib/net/session.ts` | `OnlineSession` (`onlineSession`): one socket for the map the hero is on, throttled moves, reconnects |
+| `lib/net/config.ts` | the server address: `localStorage["wuxia-game-server"]`, else `NEXT_PUBLIC_GAME_SERVER_URL` |
+| `store/online-store.ts` | the sign-in (`wuxia-online-v1`: username, token, expiry) and the live status for the HUD |
+| `components/world/online-bridge.tsx` | gives the session the hero's name and body, mirrors its status into the store |
+| `components/world/online-panel.tsx` | the sign-in panel (title screen) and the HUD's 🌐 ออนไลน์ button |
+
+**Session behaviour** (`OnlineSession`):
+
+- **Driven by the map runtime.** Every frame the runtime calls `presentation.online.report(motion)` with the hero's position, heading and whether they walk (`components/game/world-canvas.tsx` binds it to the map's id). The first report opens the room with that position in `hello`; a report for another map switches rooms.
+- **Throttled moves.** Starting or stopping goes out at once; steps in between at most every 100 ms (`MOVE_INTERVAL_MS`). A hero standing still sends nothing.
+- **Idle close.** When nothing reports for 15 s (`IDLE_CLOSE_MS`: a battle, a dialogue over a painting, a hidden tab) the socket closes and others see the hero leave. The next report rejoins.
+- **Reconnects** back off over 1–15 s. A `replaced` error (the account signed in elsewhere) stops the session and shows a toast.
+
+**Drawing** (`lib/stage/world-runtime.ts`, `updateRemotes`):
+
+- Other players come from `presentation.online.players()` every frame, like the roaming foes.
+- Each walks toward the last position the server sent, catching up over ~100 ms; a jump of more than 160 units snaps.
+- They use their body's painted eight-way walk cells and wear a **gold** name tag (NPCs' are green).
+- The host publishes `data-remote-players` (`[[id, x, y], …]`) for tests.
+
+**UI:** with a server set, the title screen shows the sign-in panel beside the new hero (สมัครบัญชี / เข้าสู่ระบบ), and the HUD gets a 🌐 ออนไลน์ button. The button's dot shows the status (green online, yellow connecting, red replaced) and its badge how many others share the map. Without a server, nothing online shows.
+
+## Running it locally
+
+Needs Rust (with `rustup target add wasm32-unknown-unknown`) and Node. The first run installs `worker-build` (a few minutes).
+
+```bash
+bun run server:dev        # wrangler dev on http://127.0.0.1:8787 (reads server/worker/.dev.vars)
+```
+
+Create `server/worker/.dev.vars` (gitignored) with a local secret:
+
+```
+AUTH_SECRET = "local-dev-secret-change-me-0123456789"
+```
+
+Then point the game at it:
+
+- build with `NEXT_PUBLIC_GAME_SERVER_URL=http://127.0.0.1:8787`, or
+- in the browser console: `localStorage.setItem("wuxia-game-server", "http://127.0.0.1:8787")`, then reload.
+
+Open the game in two browsers (or a normal and a private window), sign up two accounts, start a hero in each: both begin at home and see each other.
+
+## Deploying
+
+From `server/worker`:
+
+```bash
+npx wrangler login
+npx wrangler secret put AUTH_SECRET     # at least 16 random characters
+bun run server:deploy                    # wrangler deploy: builds the wasm, creates the Durable Objects
+```
+
+Then set `NEXT_PUBLIC_GAME_SERVER_URL` to the Worker's URL (`https://wuxia-server.<account>.workers.dev`) in Vercel and redeploy the game.
+
+Durable Objects with SQLite storage are on the Workers free plan. PBKDF2 at 10,000 rounds stays within the free plan's CPU budget per request; raise `PBKDF2_ITERATIONS` on a paid plan.
+
+## Tests
+
+| Command | What |
+| --- | --- |
+| `bun run test:server` | `cargo test` of `wuxia-core`: protocol spelling, `decide` / `apply` (speed limit, bounds, replace, full room, snapshot + events = the same room), accounts and tokens |
+| `bun run test:net` | the client without a server: the presence reducer (order, gaps, resync) and the session (hello with the real position, throttled moves, room switch) against a fake WebSocket |
+| `bun run test:online` | against a running server (`bun run server:dev`, or `GAME_SERVER_URL`): sign-up / login / refusals, a bad token, two players' join → move → leave in `seq` order, a refused teleport, a second login replacing the first |
+| `tests/browser/online.spec.ts` | two browsers sign up on the title screen, start heroes, see each other at home; one walks and the other sees it live; closing one makes them leave. Skipped when no server answers |
+
+## Limits and next steps
+
+- **Only presence is online.** The save, the shared world (`lib/world/shared/`, `WorldService`) and the clock are still local. Next: a `WorldService` backed by a world Durable Object, reusing the `WorldEvent` reducer, with the server's time from `pong.server`.
+- **Trust.** The server checks speed and bounds, not collision; a modified client can walk through walls. Fights, items and gold are not checked at all.
+- **No chat, no emotes, no seeing heroes fight.** Each is one more command and event in `room.rs`.
+- **Rate limits.** A client could flood moves; the throttle is client-side only. A per-socket token bucket in the room would cap it.

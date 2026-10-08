@@ -385,7 +385,8 @@ export const lifeActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "gat
     // ready again REST_COOLDOWN_HOURS ชั่วยาม later; a paid inn room any time.
     if (kind !== "inn") {
       const ready = Number(draft.flags._restAt ?? -Infinity) + REST_COOLDOWN_HOURS;
-      if (absoluteHours(draft) < ready) return { ok: false, reason: "cooldown", readyIn: ready - absoluteHours(draft) };
+      // A hair of tolerance: day × 12 + time is a float, and "exactly ready" must count.
+      if (absoluteHours(draft) + 1e-6 < ready) return { ok: false, reason: "cooldown", readyIn: ready - absoluteHours(draft) };
       draft.flags._restAt = absoluteHours(draft);
     }
     draft.gold -= cost;
@@ -497,7 +498,7 @@ export const lifeActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "gat
         // A sitting takes its time: one per JAIL_MEDITATE_COOLDOWN ชั่วยาม of the world clock.
         const lastSat = Number(draft.flags._jailMeditateAt ?? -Infinity);
         const ready = lastSat + JAIL_MEDITATE_COOLDOWN;
-        if (absoluteHours(draft) < ready) {
+        if (absoluteHours(draft) + 1e-6 < ready) {
           return { ok: false, reason: "cooldown", message: `จิตยังไม่สงบพอ · นั่งสมาธิได้อีกครั้งใน ${describeSentence(ready - absoluteHours(draft))}` };
         }
         draft.flags._jailMeditateAt = absoluteHours(draft);

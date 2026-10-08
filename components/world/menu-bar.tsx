@@ -21,6 +21,7 @@ import { HudVitals } from "./hud-vitals";
 import { GameMenuContext } from "@/components/ui/game-menu-context";
 import { InstallGameButton } from "@/components/pwa";
 import { SoundButton } from "@/components/sound-button";
+import { OnlineButton } from "./online-panel";
 import { sectActionCount } from "@/lib/world";
 
 type PopupId =
@@ -154,6 +155,7 @@ export function MenuBar({ hud }: { hud?: boolean } = {}) {
             </button>
           ))}
           <SoundButton />
+          <OnlineButton />
           <InstallGameButton variant="icon" />
         </nav>
         </div>

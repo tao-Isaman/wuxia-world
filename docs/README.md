@@ -23,6 +23,7 @@ Start with the [project README](../README.md) for what the game is and how to ru
 | Edit the asset library, map placements or skill / art texts in the browser (`/game/engine`) | [Engine](engine.md) |
 | Change install / offline behaviour | [PWA](pwa.md) |
 | Change what is saved, or bump the save version | [Save format](save-format.md) |
+| Online play: the Rust game server, accounts, realtime rooms | [Online](online.md) |
 | Run or write tests, audits and browser checks | [Testing](testing.md) |
 | Find a maintenance script and how to call it | [Scripts](scripts.md) |
 | See what changed and when | [Changelog](changelog.md) |
@@ -47,6 +48,7 @@ Start with the [project README](../README.md) for what the game is and how to ru
 - [engine.md](engine.md) — the `/game/engine` tool; its แผนที่ tab is the map editor.
 - [assets.md](assets.md) — the PixelLab asset library: categories, folder layout, manifest fields, the generate / curate / import pipeline, budget.
 - [audio.md](audio.md) — procedural music and sound.
+- [online.md](online.md) — online play: the Rust / Cloudflare game server, the event-based room protocol, accounts, the client session and drawing other players.
 - [engine.md](engine.md) — the `/game/engine` editor: asset library, map editor, skill / art text overrides, saving in dev vs deployed.
 - [pwa.md](pwa.md) — manifest, service worker, install button.
 - [save-format.md](save-format.md) — persisted keys, version history, migrations, repair on load.

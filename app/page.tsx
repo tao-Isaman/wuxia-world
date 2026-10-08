@@ -8,6 +8,7 @@ import { initBattleBridge } from "@/lib/world/battle-bridge";
 import { SoundDirector } from "@/components/sound-director";
 import { EngineGoto } from "@/components/world/engine-goto";
 import { WorldClock } from "@/components/world/world-clock";
+import { OnlineBridge } from "@/components/world/online-bridge";
 
 // World page (`/`) — the main game. Setup / skill library / free battle sim
 // live in /debug as dev tools. The world owns its own player build (see
@@ -32,6 +33,7 @@ export default function HomePage() {
         <SoundDirector />
         <EngineGoto />
         <WorldClock />
+        <OnlineBridge />
       </main>
     </MobileLandscape>
   );
