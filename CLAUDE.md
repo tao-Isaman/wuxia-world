@@ -88,8 +88,8 @@ bun run test:boss-skills     # the boss moves' own effects and boss battles
 bun run test:net             # online client: presence reducer (seq, resync), session (hello, throttle, room switch)
 bun run test:server          # cargo test of server/core: protocol, room decide / apply, accounts, tokens
 bun run test:online          # against a running game server (bun run server:dev): auth, two players in a room
-bun run server:dev           # the Rust game server on wrangler dev :8787 (server/worker/.dev.vars: AUTH_SECRET)
-bun run server:deploy        # deploy it to Cloudflare (wrangler secret put AUTH_SECRET first)
+bun run server:dev           # the Rust game server on wrangler dev :8787 (no config: it makes its own signing key)
+bun run server:deploy        # deploy it to Cloudflare (no secrets to set)
 bun run test:assets         # asset library: manifest contract, files and sizes, footprints, ≥ 3,000 approved; every item / equipment icon
 bun run test:e2e            # Playwright (Chromium) on :3017 — start a production server first
 bun scripts/audit-content.ts            # every NPC / quest / scene reference resolves
@@ -313,7 +313,7 @@ Two deliberate exceptions reach into stores:
 
 ## Online (`server/`, `lib/net/`; [docs/online.md](docs/online.md))
 
-- **Server:** a Cloudflare Worker in Rust. `server/core` is pure and event-based (`Room::decide` → events → `Room::apply`; `Account` from its events; signed HMAC tokens), tested with `cargo test`; `server/worker` is the glue: `AccountObject` (a Durable Object per username) and `RoomObject` (one per map id, hibernating WebSockets, each socket's attachment holds its `Presence`).
+- **Server:** a Cloudflare Worker in Rust. `server/core` is pure and event-based (`Room::decide` → events → `Room::apply`; `Account` from its events; signed HMAC tokens), tested with `cargo test`; `server/worker` is the glue: `AccountObject` (a Durable Object per username), `RoomObject` (one per map id, hibernating WebSockets, each socket's attachment holds its `Presence`) and `KeyObject` (makes and keeps the token-signing key, so deploys need no secret).
 - **Protocol:** `server/core/src/protocol.rs` ↔ `lib/net/protocol.ts` — keep them in step and bump `PROTOCOL_VERSION` on both. Client commands `hello` / `move` / `sync` / `ping`; server `welcome` (snapshot at `seq`) / `event { seq, ev }` (`joined`, `moved`, `left`) / `pong` / `error`.
 - **Client:** `onlineSession` (`lib/net/session.ts`) holds one socket for the map the hero is on. The map runtime drives it every frame through `presentation.online.report(motion)` (bound per map in `world-canvas.tsx`) and draws `players()` (`updateRemotes`, gold name tags, `data-remote-players`). Moves are throttled to 100 ms; an idle map closes the socket after 15 s.
 - **Flow (with a server): account → character → play.** `WorldScreen` shows the title screen while there is no valid login, even with a save (`AccountStep`: สมัครใหม่ / มีบัญชีแล้ว), then the character form, then the game; signing out returns to the account step. `store/online-store.ts` (`wuxia-online-v1`; sign-out keeps the username), the HUD's 🌐 button (`online-panel.tsx`), `OnlineBridge` in `app/page.tsx`. Online shows only with a server: `localStorage["wuxia-game-server"]` or `NEXT_PUBLIC_GAME_SERVER_URL`.

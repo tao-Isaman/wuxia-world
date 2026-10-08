@@ -31,7 +31,8 @@ map runtime ─report(room, motion)─► OnlineSession (lib/net/session.ts)
 
 - **A room is a map.** Its id is the scene id (`home_player`, `city_capital`, `route_a__to__b`). Walking onto another map closes the socket and opens the new room's.
 - **Accounts.** One Durable Object per username: two sign-ups for one name can never both win.
-- **Sessions.** A signed token (HMAC-SHA256 with `AUTH_SECRET`, 30 days). There is no session table.
+- **Sessions.** A signed token (HMAC-SHA256, 30 days). There is no session table.
+- **The signing key needs no setup.** `KeyObject` (`server/worker/src/keys.rs`, one Durable Object named `auth`) makes 32 random bytes the first time it is asked and keeps them in its storage, so the key survives every deploy and nothing has to be configured on Cloudflare. Each Worker isolate caches it in memory.
 
 ## Event-based design
 
@@ -79,12 +80,12 @@ The pure logic lives in `server/core` (no I/O, clock or randomness), so it is te
 
 | Request | Answer |
 | --- | --- |
-| `GET /health` | `{ ok, protocol, auth }`: `auth` is `ready`, or why sign-in cannot work yet (`auth_secret_missing`, `auth_secret_short`) |
+| `GET /health` | `{ ok, protocol, auth }`: `auth` is `ready`, or `auth_key_unavailable` when the key's Durable Object cannot be reached |
 | `POST /auth/register` `{ username, password }` | `{ username, token, expires }`, or `{ error }` with 400 / 409 |
 | `POST /auth/login` `{ username, password }` | the same, or 401 `wrong_login` |
 | `GET /rooms/<room>/ws?token=…` (WebSocket upgrade) | the room; 401 for a bad token |
 
-Usernames are 3–20 of `a–z 0–9 _`, case-insensitive. Passwords are 6–72 characters, stored as PBKDF2-HMAC-SHA256 with a random salt; the iteration count (`PBKDF2_ITERATIONS`, default 10,000) is stored per account. Error codes: `bad_username`, `bad_password`, `taken`, `wrong_login`, `bad_token`, `expired`; a server without a usable `AUTH_SECRET` answers 500 `auth_secret_missing` / `auth_secret_short`.
+Usernames are 3–20 of `a–z 0–9 _`, case-insensitive. Passwords are 6–72 characters, stored as PBKDF2-HMAC-SHA256 with a random salt; the iteration count (`PBKDF2_ITERATIONS`, default 10,000) is stored per account. Error codes: `bad_username`, `bad_password`, `taken`, `wrong_login`, `bad_token`, `expired`; if the key's Durable Object cannot be reached, 500 `auth_key_unavailable`.
 
 ## The server (`server/`)
 
@@ -97,7 +98,8 @@ Usernames are 3–20 of `a–z 0–9 _`, case-insensitive. Passwords are 6–72 
 | `server/worker/src/lib.rs` | the router, CORS, token checks, forwarding to the Durable Objects |
 | `server/worker/src/account.rs` | `AccountObject`: the account's event log in Durable Object storage |
 | `server/worker/src/room.rs` | `RoomObject`: hibernating WebSockets, attachments, numbering and broadcast |
-| `server/worker/wrangler.toml` | bindings `ACCOUNTS` / `ROOMS`, the SQLite-backed Durable Object migration, `PBKDF2_ITERATIONS` |
+| `server/worker/src/keys.rs` | `KeyObject`: makes and keeps the token-signing key; `signing_key` caches it per isolate |
+| `server/worker/wrangler.toml` | bindings `ACCOUNTS` / `ROOMS` / `KEYS`, the SQLite-backed Durable Object migrations (`v1`, `v2` adds `KeyObject`), `PBKDF2_ITERATIONS` |
 
 ## The client (`lib/net/`)
 
@@ -142,14 +144,10 @@ Usernames are 3–20 of `a–z 0–9 _`, case-insensitive. Passwords are 6–72 
 Needs Rust (with `rustup target add wasm32-unknown-unknown`) and Node. The first run installs `worker-build` (a few minutes).
 
 ```bash
-bun run server:dev        # wrangler dev on http://127.0.0.1:8787 (reads server/worker/.dev.vars)
+bun run server:dev        # wrangler dev on http://127.0.0.1:8787
 ```
 
-Create `server/worker/.dev.vars` (gitignored) with a local secret:
-
-```
-AUTH_SECRET = "local-dev-secret-change-me-0123456789"
-```
+Nothing to configure: the local server makes its own signing key and keeps it in `server/worker/.wrangler/state` (gitignored), so tokens stay valid across restarts.
 
 Then point the game at it:
 
@@ -164,7 +162,6 @@ From `server/worker`:
 
 ```bash
 npx wrangler login
-npx wrangler secret put AUTH_SECRET     # at least 16 random characters
 bun run server:deploy                    # wrangler deploy: builds the wasm, creates the Durable Objects
 ```
 
@@ -183,7 +180,9 @@ Then set `NEXT_PUBLIC_GAME_SERVER_URL` to the Worker's URL (`https://wuxia-world
 | Deploy command | `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \| sh -s -- -y --profile minimal --target wasm32-unknown-unknown && . "$HOME/.cargo/env" && npx wrangler deploy` |
 | Preview command | the same, ending in `npx wrangler deploy --dry-run` |
 
-Then add the Secret `AUTH_SECRET` under the Worker's Settings → Variables and Secrets. `GET /health` answers `{"ok":true,"protocol":1}` once the server is live.
+No variables or secrets to add: the server makes its own signing key (above), and `PBKDF2_ITERATIONS` comes from `wrangler.toml` (variables set only in the dashboard are dropped by the next `wrangler deploy`). `GET /health` answers `{"ok":true,"protocol":1,"auth":"ready"}` once the server is live.
+
+Servers deployed before the key moved into `KeyObject` signed tokens with an `AUTH_SECRET` variable; those tokens stop working once, so players log in again (accounts are untouched), and the `AUTH_SECRET` variable can be deleted.
 
 Durable Objects with SQLite storage are on the Workers free plan. PBKDF2 at 10,000 rounds stays within the free plan's CPU budget per request; raise `PBKDF2_ITERATIONS` on a paid plan.
 

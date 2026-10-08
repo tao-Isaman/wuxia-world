@@ -8,7 +8,8 @@
 //!
 //! Durable Objects: [`account::AccountObject`] (one per username) keeps the
 //! account's event log; [`room::RoomObject`] (one per map id) runs the
-//! realtime room. The game logic itself lives in `wuxia-core`.
+//! realtime room; [`keys::KeyObject`] makes and keeps the token-signing key
+//! (no secret to configure). The game logic itself lives in `wuxia-core`.
 
 use serde::{Deserialize, Serialize};
 use worker::*;
@@ -16,10 +17,13 @@ use wuxia_core::auth::{normalize_username, sign_token, verify_token, AuthError, 
 use wuxia_core::protocol::PROTOCOL_VERSION;
 
 mod account;
+mod keys;
 mod room;
 
 pub use account::AccountObject;
+pub use keys::KeyObject;
 pub use room::RoomObject;
+use keys::signing_key;
 
 /// Room ids are the game's location and road ids (`city_capital`, `route_a__to__b`).
 fn valid_room(id: &str) -> bool {
@@ -28,20 +32,6 @@ fn valid_room(id: &str) -> bool {
 
 pub(crate) fn now_ms() -> f64 {
     Date::now().as_millis() as f64
-}
-
-/// The token-signing secret, or the error code that says what is wrong with
-/// it (`auth_secret_missing`, `auth_secret_short`) — `/health` reports it too.
-fn secret(env: &Env) -> std::result::Result<Vec<u8>, &'static str> {
-    let value = env
-        .secret("AUTH_SECRET")
-        .map(|s| s.to_string())
-        .or_else(|_| env.var("AUTH_SECRET").map(|v| v.to_string()))
-        .map_err(|_| "auth_secret_missing")?;
-    if value.trim().len() < 16 {
-        return Err("auth_secret_short");
-    }
-    Ok(value.into_bytes())
 }
 
 fn cors_headers() -> Headers {
@@ -96,7 +86,7 @@ struct Session {
 struct Health {
     ok: bool,
     protocol: u32,
-    /// `ready`, or why sign-in cannot work yet (`auth_secret_missing` / `auth_secret_short`).
+    /// `ready`, or `auth_key_unavailable` when the signing key cannot be read.
     auth: &'static str,
 }
 
@@ -119,7 +109,7 @@ async fn auth(mut req: Request, env: &Env, action: &str) -> Result<Response> {
     if status != 200 {
         return api_error(body.error.as_deref().unwrap_or("server_error"), status);
     }
-    let key = match secret(env) {
+    let key = match signing_key(env).await {
         Ok(key) => key,
         Err(code) => return api_error(code, 500),
     };
@@ -133,12 +123,9 @@ async fn join_room(req: Request, env: &Env, room: &str) -> Result<Response> {
     if !valid_room(room) {
         return api_error("bad_room", 400);
     }
-    if req.headers().get("Upgrade")?.map(|v| v.to_ascii_lowercase()) != Some("websocket".into()) {
-        return api_error("expected_websocket", 426);
-    }
     let url = req.url()?;
     let token = url.query_pairs().find(|(k, _)| k == "token").map(|(_, v)| v.into_owned()).unwrap_or_default();
-    let key = match secret(env) {
+    let key = match signing_key(env).await {
         Ok(key) => key,
         Err(code) => return api_error(code, 500),
     };
@@ -146,6 +133,9 @@ async fn join_room(req: Request, env: &Env, room: &str) -> Result<Response> {
         Ok(claims) => claims,
         Err(error) => return auth_error(error),
     };
+    if req.headers().get("Upgrade")?.map(|v| v.to_ascii_lowercase()) != Some("websocket".into()) {
+        return api_error("expected_websocket", 426);
+    }
     let mut init = RequestInit::new();
     init.with_method(Method::Get).with_headers(req.headers().clone());
     let forward = Request::new_with_init(&format!("https://room/ws?room={room}&user={}", claims.sub), &init)?;
@@ -158,7 +148,7 @@ async fn fetch(req: Request, env: Env, _ctx: Context) -> Result<Response> {
     let segments: Vec<&str> = path.trim_matches('/').split('/').collect();
     match (req.method(), segments.as_slice()) {
         (Method::Options, _) => Ok(Response::empty()?.with_status(204).with_headers(cors_headers())),
-        (Method::Get, ["health"]) | (Method::Get, [""]) => json(&Health { ok: true, protocol: PROTOCOL_VERSION, auth: secret(&env).map(|_| "ready").unwrap_or_else(|code| code) }, 200),
+        (Method::Get, ["health"]) | (Method::Get, [""]) => json(&Health { ok: true, protocol: PROTOCOL_VERSION, auth: signing_key(&env).await.map(|_| "ready").unwrap_or_else(|code| code) }, 200),
         (Method::Post, ["auth", "register"]) => auth(req, &env, "register").await,
         (Method::Post, ["auth", "login"]) => auth(req, &env, "login").await,
         (Method::Get, ["rooms", room, "ws"]) => {
