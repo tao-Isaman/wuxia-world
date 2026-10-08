@@ -798,7 +798,8 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
       else if (motion === "hurt" && sheet.clips.hurt) frame = animFrame(sheet.clips.hurt, columns, age, false);
       else frame = animFrame(sheet.clips.idle, columns, reduced ? 0 : elapsed + actor.index * 170, true);
       if (frame !== actor.frame) { actor.image.setFrame(frame, false, false); actor.frame = frame; }
-      if (motion === "hurt" && !sheet.clips.hurt && !reduced) rotation = -actor.hFacing * 0.04;
+      // Lean back on a hit (more when the sheet has no hurt clip) so every blow reads.
+      if (motion === "hurt" && !reduced) rotation = -actor.hFacing * (sheet.clips.hurt ? 0.025 : 0.04);
       if (motion === "defeat") {
         const k = reduced ? 1 : Math.min(1, (elapsed - actor.deadAt) / 700);
         const ease = 1 - (1 - k) * (1 - k);
@@ -834,6 +835,8 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
       .setRotation(rotation).setAlpha(alpha)
       .setDepth(5 + actor.v * 2 + actor.index * 0.001 + (actor.attack ? 0.5 : 0));
     if (actor.flashUntil > elapsed) actor.image.setTint(0xffffff).setTintMode(Phaser.TintModes.FILL);
+    // Big animated foes blush red for the rest of a hit, fading as the hurt clip ends.
+    else if (actor.anim && motion === "hurt" && !reduced) actor.image.setTint(hurtTint(actor.tint ?? 0xffffff, (actor.hurtUntil - elapsed) / 320)).setTintMode(Phaser.TintModes.MULTIPLY);
     else if (actor.tint !== undefined) actor.image.setTint(actor.tint).setTintMode(Phaser.TintModes.MULTIPLY);
     else actor.image.clearTint().setTintMode(Phaser.TintModes.MULTIPLY);
     if (ghostNow && elapsed - actor.lastGhost > 45) { actor.lastGhost = elapsed; leaveGhost(actor); }
@@ -1372,6 +1375,13 @@ function loadImage(url: string): Promise<HTMLImageElement> {
     image.onerror = () => reject(new Error(`Battle artwork failed to load: ${url}`));
     image.src = url;
   });
+}
+
+/** A multiply tint `base` pulled toward blood red by `k` (0..1). */
+function hurtTint(base: number, k: number): number {
+  const t = Math.max(0, Math.min(1, k)) * 0.55;
+  const mix = (shift: number, to: number) => Math.round(((base >> shift) & 0xff) * (1 - t) + to * t);
+  return (mix(16, 0xff) << 16) | (mix(8, 0x70) << 8) | mix(0, 0x70);
 }
 
 /** Visible feet line of one creature-atlas cell (0..1 of the cell height). */

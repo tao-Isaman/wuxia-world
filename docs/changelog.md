@@ -4,6 +4,13 @@ What changed, when, and in which pull request. Newest first. Each entry says wha
 
 Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-Isaman/wuxia-world/pulls?q=is%3Apr+is%3Amerged). The waves are the build → test → review rounds the agents worked in (see [HANDOFF.md](../HANDOFF.md)).
 
+## 2026-10-08
+
+### Boss art redone
+
+- **The six bosses' sheets** were re-rolled where they were weak: the eagle has a new design standing on its talons (no rock) and a side-on attack; the turtle's sun keeps its colour, its fire burst stays in the frame and its hurt clip pulls the head under the shell (hand-animated); the crab's pincer strike has no white X; the tiger, bull and serpent have hurt clips that clearly recoil.
+- Animated foes blush red and lean back for the rest of a hit after the white flash (`grid-battle-runtime.ts`).
+
 ## 2026-10-07
 
 ### Foes live where they belong; tier 5; six legendary beasts
