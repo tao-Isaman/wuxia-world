@@ -1,12 +1,30 @@
-import { CHARACTER_FEET_Y, CHARACTER_FRAME_SIZE, CHARACTER_GRID, CHARACTER_SHEET_LAYOUTS, CHARACTER_DIRECTION_LAYOUTS, characterDirectionSheet, characterSheet, characterWalk8Sheet, hasDirectionalSheet, hasWalk8Sheet, type CharacterId, type CharacterSheetLayout } from "./catalog";
+import { CHARACTER_CLIPS, CHARACTER_FEET_Y, CHARACTER_FRAME_SIZE, CHARACTER_GRID, CHARACTER_SHEET_LAYOUTS, CHARACTER_DIRECTION_LAYOUTS, characterDirectionSheet, characterSheet, characterWalk8Sheet, hasDirectionalSheet, hasWalk8Sheet, type CharacterClip, type CharacterClips, type CharacterId, type CharacterSheetLayout } from "./catalog";
+import { getPlSheet, type PlSheet } from "./pl-sheets";
 import { applyWalkBeat, WALK_BEATS } from "./walk-cycle";
+import { DEFAULT_WALK8, type Walk8Cells } from "./walk8";
 
 export interface CharacterAtlas {
-  image: HTMLCanvasElement; frameSize: 128; feetY: 120; columns: 4; rows: number; directional: boolean;
-  /** The atlas carries the eight-direction walk cells (frames 24–51, lib/characters/walk8.ts). */
+  image: HTMLCanvasElement; frameSize: number; feetY: number; columns: number; rows: number; directional: boolean;
+  /** The atlas carries the eight-direction walk cells (`walk8Cells`, lib/characters/walk8.ts). */
   walk8: boolean;
+  walk8Cells: Walk8Cells | null;
   /** A standing figure's height in atlas px (the hero action cells scale to it, lib/characters/hero-actions.ts). */
   figure: number;
+  /** Frames and rates per motion. */
+  clips: CharacterClips;
+  /** Standing in battle, when it differs from the map's idle (a PixelLab sheet's side-facing breathing). */
+  battleIdle?: CharacterClip;
+  /**
+   * A PixelLab sheet at its native pixels (lib/characters/pl-sheets.ts): its figure is not the
+   * rigged sheets' 108 px, so renderers scale it by `figureScale`, and the map keeps its colours.
+   */
+  native: boolean;
+}
+/** The standing height every rigged atlas is normalised to; renderers size figures against it. */
+export const ATLAS_FIGURE = 108;
+/** How much larger a cell must be drawn so this atlas's figure stands as tall as a rigged one's. */
+export function figureScale(atlas: Pick<CharacterAtlas, "native" | "figure" | "frameSize">): number {
+  return atlas.native ? atlas.frameSize / CHARACTER_FRAME_SIZE * ATLAS_FIGURE / atlas.figure : 1;
 }
 /** Painted walk8 cells keep their authored placement: feet on this row of each 128 px cell. */
 const WALK8_SOURCE_FEET = 119;
@@ -63,6 +81,18 @@ function measureFrames(source: HTMLImageElement, rows: number, layout?: Characte
 // Copy-then-sort rather than toSorted(): Safari < 16 / Chrome < 110 lack it and
 // every character atlas (so the whole map) would fail to load there.
 function median(values: number[]) { const sorted = [...values].sort((a, b) => a - b); return sorted[Math.floor(sorted.length / 2)]; }
+
+/** A PixelLab sheet is already packed on its grid: draw it once and take its clips. */
+async function preparePlAtlas(sheet: PlSheet): Promise<CharacterAtlas> {
+  const source = await loadImage(sheet.url);
+  const image = document.createElement("canvas");
+  image.width = source.width; image.height = source.height;
+  const context = image.getContext("2d");
+  if (!context) throw new Error("Character atlas canvas is unavailable");
+  context.drawImage(source, 0, 0);
+  return { image, frameSize: sheet.cell, feetY: sheet.feetY, columns: sheet.columns, rows: sheet.rows, directional: true,
+    walk8: true, walk8Cells: sheet.walk8, figure: sheet.figure, clips: sheet.clips, battleIdle: sheet.battleIdle, native: true };
+}
 
 /** Normalize padding and scale per source sheet, preserving pose variation and original PNGs. */
 async function prepareAtlas(id: CharacterId, directional: boolean): Promise<CharacterAtlas> {
@@ -137,10 +167,20 @@ async function prepareAtlas(id: CharacterId, directional: boolean): Promise<Char
   }
   output.putImageData(pixels, 0, 0);
   return { image, frameSize: CHARACTER_FRAME_SIZE, feetY: CHARACTER_FEET_Y, columns: CHARACTER_GRID, rows, directional, walk8: walk8Cells.length > 0,
-    figure: baseHeight * scale };
+    walk8Cells: walk8Cells.length > 0 ? DEFAULT_WALK8 : null, figure: baseHeight * scale, clips: CHARACTER_CLIPS, native: false };
 }
 
 export function loadCharacterAtlas(id: CharacterId, includeDirections = true): Promise<CharacterAtlas> {
+  const pl = getPlSheet(id);
+  if (pl) {
+    const key = `${id}:pl`;
+    const cached = atlases.get(key);
+    if (cached) return cached;
+    // A PixelLab sheet that fails to load falls back to the rigged sheet of the same id.
+    const pending = preparePlAtlas(pl).catch(() => { atlases.delete(key); return prepareAtlas(id, includeDirections && hasDirectionalSheet(id)); });
+    atlases.set(key, pending);
+    return pending;
+  }
   const directional = includeDirections && hasDirectionalSheet(id);
   const key = `${id}:${directional ? "full" : "base"}`;
   const cached = atlases.get(key);

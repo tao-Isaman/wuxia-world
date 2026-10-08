@@ -3,14 +3,14 @@ import { pageRect, toClientPoint, toPagePoint } from "@/lib/ui/landscape";
 import type * as Phaser from "phaser";
 import {
   CHARACTER_CLIPS, CHARACTER_FRAME_SIZE, CREATURE_ATLAS, characterId, creatureCell, npcCharacterId,
-  type CharacterId,
+  type CharacterClips, type CharacterId,
 } from "../characters/catalog";
-import { loadCharacterAtlas } from "../characters/sheet";
+import { figureScale, loadCharacterAtlas } from "../characters/sheet";
 import { getAnimSheet, type AnimSheet } from "../characters/anim-sheets";
 import { animFrame, animScaleOf, animVisibleTop } from "./anim-frame";
 import type { HeroPoseStrip } from "../characters/hero-actions";
 import { hasAnimatedSheet } from "../characters/npc-sheets";
-import { WALK8_FIRST_FRAME, WALK8_FPS, WALK8_FRAMES, dir8FromVector, walk8Frame, type Dir8 } from "../characters/walk8";
+import { dir8FromVector, walk8Frame, walk8Source, type Dir8, type Walk8Cells } from "../characters/walk8";
 import { WANDER_FREEZE_DISTANCE, createWanderer, stepWanderer, type Wanderer } from "./npc-wander";
 import { worldForeground } from "./world-occlusion";
 import { createWorldLighting } from "./world-lighting";
@@ -53,13 +53,17 @@ export function worldInputBlocked(): boolean {
     !!active?.matches('input, textarea, select, [contenteditable="true"]');
 }
 
-type Atlas = { image: HTMLCanvasElement; frameSize: number; feetY: number; figure?: number };
+type Atlas = { image: HTMLCanvasElement; frameSize: number; feetY: number; figure?: number;
+  native?: boolean; clips?: CharacterClips; walk8Cells?: Walk8Cells | null };
 type CharacterVisual = {
   image: Phaser.GameObjects.Image;
   frame: number;
   facingLeft: boolean;
   frames: number;
   directional: boolean;
+  /** The atlas's clips (a PixelLab sheet brings longer ones) and its eight-way walk, if any. */
+  clips: CharacterClips;
+  walk8: Walk8Cells | null;
 };
 type TextSprite = { image: Phaser.GameObjects.Image; width: number; height: number };
 type MarkerVisual = {
@@ -235,15 +239,19 @@ export function createWorldRuntime(
   function characterTexture(key: string, atlas: Atlas): { key: string; frames: number } {
     const columns = Math.max(1, Math.round(atlas.image.width / atlas.frameSize));
     const rows = Math.max(1, Math.round(atlas.image.height / atlas.frameSize));
-    if (!scene!.textures.exists(key)) addGridFrames(canvasTexture(scene!, key, warmWorldCharacter(atlas.image)), atlas.frameSize, columns, rows);
+    // Rigged sheets get the world's warm ink; PixelLab sheets keep their own colours.
+    if (!scene!.textures.exists(key)) addGridFrames(canvasTexture(scene!, key, atlas.native ? atlas.image : warmWorldCharacter(atlas.image)), atlas.frameSize, columns, rows);
     return { key, frames: columns * rows };
   }
   function makeCharacter(key: string, atlas: Atlas, size: number): CharacterVisual {
     const sheet = characterTexture(key, atlas);
     const body = scene!.add.image(0, 0, sheet.key, 0);
     // All frames share the authored foot baseline.
-    body.setOrigin(0.5, atlas.feetY / atlas.frameSize).setDisplaySize(size, size);
-    const visual = { image: body, frame: -1, facingLeft: false, frames: sheet.frames, directional: sheet.frames >= 24 };
+    // A PixelLab cell is drawn larger or smaller so its figure stands as tall as a rigged one.
+    const cell = size * (atlas.native && atlas.figure ? figureScale({ native: true, figure: atlas.figure, frameSize: atlas.frameSize }) : 1);
+    body.setOrigin(0.5, atlas.feetY / atlas.frameSize).setDisplaySize(cell, cell);
+    const visual = { image: body, frame: -1, facingLeft: false, frames: sheet.frames, directional: sheet.frames >= 24,
+      clips: atlas.clips ?? CHARACTER_CLIPS, walk8: atlas.walk8Cells ?? null };
     setCharacterFrame(visual, 0, false);
     return visual;
   }
@@ -625,7 +633,9 @@ export function createWorldRuntime(
     const playerShadow = image(shadowKey, 1, 30, 11);
     const playerRing = image(texture(groundRing("rgba(225, 199, 139, 0.55)"), "ring"), 2, 28, 10);
     player = makeCharacter(`char:${playerId}`, atlases.get(playerId)!, PLAYER_SIZE);
-    playerFigure = atlases.get(playerId)!.figure ?? playerFigure;
+    // The hero's figure in rigged-atlas px (a PixelLab figure is drawn at the rigged height).
+    const heroAtlas = atlases.get(playerId)!;
+    playerFigure = heroAtlas.native ? 108 : heroAtlas.figure ?? playerFigure;
     const playerSign = image(texture(drawCanvas(9, 7, (context) => {
       context.fillStyle = "#172b26"; context.fillRect(0, 0, 9, 3); context.fillRect(2, 3, 5, 2); context.fillRect(4, 5, 1, 2);
       context.fillStyle = "#fff0bd"; context.fillRect(1, 1, 7, 1); context.fillRect(2, 2, 5, 1); context.fillRect(3, 3, 3, 1); context.fillRect(4, 4, 1, 1);
@@ -906,7 +916,7 @@ export function createWorldRuntime(
           visual.aura.setPosition(point.x, point.y).setAlpha(pulse);
         }
       } else if (visual.character) {
-        const idle = CHARACTER_CLIPS.idle;
+        const idle = visual.character.clips.idle;
         const frame = reducedMotion ? idle.frames[0] : idle.frames[Math.floor((animationTime + visual.phase) * idle.fps) % idle.frames.length];
         setCharacterFrame(visual.character, frame, facingLeft);
         visual.body.setPosition(point.x, point.y);
@@ -991,8 +1001,9 @@ export function createWorldRuntime(
         visual.pos = { x: visual.pos.x + (remote.x - visual.pos.x) * pull, y: visual.pos.y + (remote.y - visual.pos.y) * pull };
       }
       const walking = remote.moving || gap > 2;
-      const step = walking && !reducedMotion ? Math.floor((animationTime + visual.phase) * WALK8_FPS) % 4 : null;
-      const pose = walk8Frame(remote.dir, step);
+      const cells = visual.character.walk8 ?? undefined;
+      const step = walking && !reducedMotion ? Math.floor((animationTime + visual.phase) * (cells?.fps ?? 8)) : null;
+      const pose = walk8Frame(remote.dir, step, cells);
       setCharacterFrame(visual.character, pose.frame, pose.mirror);
       const { x, y } = visual.pos;
       visual.character.image.setPosition(x, y).setDepth(characterDepth(y));
@@ -1089,20 +1100,22 @@ export function createWorldRuntime(
     const nextMotion = moving ? "walk" : "idle";
     if (playerMotion !== nextMotion) { playerMotion = nextMotion; motionTime = 0; }
     let frame: number;
-    if (player.frames >= WALK8_FIRST_FRAME + WALK8_FRAMES) {
+    if (player.walk8) {
       // Painted eight-way walk: the hero always faces the way they move; standing keeps the last heading.
-      const step = moving && !reducedMotion ? Math.floor(motionTime * WALK8_FPS) % 4 : null;
-      const pose = walk8Frame(playerDir, step);
+      const step = moving && !reducedMotion ? Math.floor(motionTime * player.walk8.fps) : null;
+      const pose = walk8Frame(playerDir, step, player.walk8);
       frame = pose.frame;
+      parent.dataset.playerPose = `${step === null ? "stand" : "walk"}:${walk8Source(playerDir).row}`;
       setCharacterFrame(player, frame, pose.mirror);
       // Standing still, the painted pose breathes: a slow 1 % rise from the feet.
       playerBaseScaleY ??= player.image.scaleY;
       player.image.scaleY = playerBaseScaleY * (step === null && !reducedMotion ? 1 + 0.01 * Math.sin(animationTime * 2.2) : 1);
     } else {
       const vertical = player.directional && (playerFacing === "north" || playerFacing === "south");
-      const clip = vertical ? CHARACTER_CLIPS[playerFacing === "north" ? "walkNorth" : "walkSouth"] : CHARACTER_CLIPS[playerMotion];
+      const clip = vertical ? player.clips[playerFacing === "north" ? "walkNorth" : "walkSouth"] : player.clips[playerMotion];
       frame = clip.frames[!moving && (reducedMotion || vertical) ? 0 : Math.floor(motionTime * clip.fps) % clip.frames.length];
       setCharacterFrame(player, frame, playerFacing === "west");
+      parent.dataset.playerPose = `${playerMotion}:${playerFacing}`;
     }
     updateHeroAction();
     parent.dataset.playerDir = playerDir;
@@ -1116,7 +1129,7 @@ export function createWorldRuntime(
       if (!visual) continue;
       visual.shadow.setVisible(bystander.visible !== false);
       visual.character.image.setVisible(bystander.visible !== false);
-      const idle = CHARACTER_CLIPS.idle;
+      const idle = visual.character.clips.idle;
       const idleFrame = idle.frames[reducedMotion ? 0 : Math.floor((animationTime + index * 0.37) * idle.fps) % idle.frames.length];
       setCharacterFrame(visual.character, idleFrame, !!bystander.facingLeft);
     }
@@ -1196,11 +1209,11 @@ export function createWorldRuntime(
         if (wanderer?.moving) {
           // Strolling: the walk clip for the way it heads (north / south on the directional rows).
           const vertical = wanderer.facing === "north" || wanderer.facing === "south";
-          const clip = CHARACTER_CLIPS[vertical ? (wanderer.facing === "north" ? "walkNorth" : "walkSouth") : "walk"];
+          const clip = visual.character.clips[vertical ? (wanderer.facing === "north" ? "walkNorth" : "walkSouth") : "walk"];
           const frame = clip.frames[Math.floor((animationTime + visual.phase) * clip.fps) % clip.frames.length];
           setCharacterFrame(visual.character, frame, vertical ? visual.character.facingLeft : wanderer.facing === "west");
         } else {
-          const idle = CHARACTER_CLIPS.idle;
+          const idle = visual.character.clips.idle;
           const idleFrame = reducedMotion ? idle.frames[0] : idle.frames[Math.floor((animationTime + visual.phase) * idle.fps) % idle.frames.length];
           setCharacterFrame(visual.character, idleFrame, distance < 90 ? position.x < point.x : visual.character.facingLeft);
         }

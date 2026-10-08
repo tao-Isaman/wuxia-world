@@ -1,8 +1,9 @@
 import { test, expect, type Page } from "@playwright/test";
 
-// The heroes' painted action sprites (lib/characters/hero-actions.ts): weapon
-// forms in battle, work loops in the work overlay; and an older save's body
-// falls back to its gender's hero.
+// The heroes' action sprites: their PixelLab attack clip in battle
+// (lib/characters/pl-sheets.ts), the work loops in the work overlay
+// (lib/characters/hero-actions.ts); and an older save's body falls back to its
+// gender's hero.
 
 async function start(page: Page) {
   await page.goto("/");
@@ -11,7 +12,7 @@ async function start(page: Page) {
   await expect(page.getByTestId("world-canvas")).toHaveAttribute("data-ready", "true", { timeout: 60_000 });
 }
 
-test("one body per gender; the hero fights with painted weapon frames", async ({ page }) => {
+test("one body per gender; the hero fights with their attack clip", async ({ page }) => {
   test.setTimeout(150_000);
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
@@ -36,10 +37,10 @@ test("one body per gender; the hero fights with painted weapon frames", async ({
   const battle = page.getByTestId("battle-canvas");
   await expect(battle).toHaveAttribute("data-ready", "true", { timeout: 60_000 });
   await page.getByRole("button", { name: /อัตโนมัติ/ }).click();
-  // The starter punch is a fist move: stance, wind-up and strike of the fist row (frames 0–4).
-  await expect.poll(async () => (await battle.getAttribute("data-hero-poses")) ?? "", { timeout: 60_000 }).toMatch(/(^|,)2(,|$)/);
-  const poses = ((await battle.getAttribute("data-hero-poses")) ?? "").split(",").map(Number);
-  expect(poses.some((frame) => frame === 1)).toBe(true);
+  // The hero plays their PixelLab attack clip: wind-up, strike and follow-through frames.
+  await expect.poll(async () => (await battle.getAttribute("data-hero-motions")) ?? "", { timeout: 60_000 }).toContain("attack");
+  await expect.poll(async () => ((await battle.getAttribute("data-hero-clip-frames")) ?? "").split(",").filter(Boolean).length,
+    { timeout: 20_000 }).toBeGreaterThanOrEqual(3);
   await page.screenshot({ path: "test-results/screenshots/hero-attack-pose.png" });
   // The repaired body is saved with the next store write (the battle's outcome).
   await page.getByRole("button", { name: "ดำเนินเรื่อง →" }).click({ timeout: 90_000 });

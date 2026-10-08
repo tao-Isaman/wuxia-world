@@ -16,11 +16,17 @@
  * palette-quantised, and lib/characters/anim-sheets-data.ts is rewritten with
  * a ?v= content hash, so rerunning on the same frames changes nothing.
  * Ids not given (or without frames in <raw>) keep their current entry.
+ *
+ * Beasts (`beast_<kind>`, BEAST_SHEET_IDS) are PixelLab characters (style C)
+ * downloaded by scripts/pixellab-characters.py, so their clips sit one level
+ * deeper, at <raw>/<id>/<clip>/east/NN.png, and a custom clip's canvas is
+ * larger than the template ones (PixelLab grows it evenly around the body):
+ * every frame is padded to the largest canvas about its centre first.
  */
 import sharp from "sharp";
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { BOSS_SHEET_IDS, T5_SHEET_IDS, type AnimClipName, type AnimSheet } from "../lib/characters/anim-sheets";
+import { BEAST_SHEET_IDS, BOSS_SHEET_IDS, T5_SHEET_IDS, type AnimClipName, type AnimSheet } from "../lib/characters/anim-sheets";
 import { ANIM_SHEET_DATA } from "../lib/characters/anim-sheets-data";
 
 type ClipPick = { frames: number[]; fps: number };
@@ -43,6 +49,7 @@ const SUBJECTS: Record<string, Subject> = {
   t5_iron_monk: { scale: 1.2, clips: { idle: { frames: pingPong(5), fps: 6 }, attack: { frames: range(1, 8), fps: 11 }, hurt: { frames: [1, 3, 4, 3], fps: 9 } } },
   t5_white_tiger: { scale: 1.3, clips: { idle: { frames: range(0, 7), fps: 7 }, attack: { frames: range(1, 8), fps: 12 }, hurt: { frames: [1, 2, 3, 4], fps: 9 } } },
   t5_wolf_king: { scale: 1.35, clips: { idle: { frames: pingPong(5), fps: 6 }, attack: { frames: range(1, 8), fps: 12 }, hurt: { frames: [1, 2, 3, 4], fps: 9 } } },
+  beast_wolf: { scale: 0.78, clips: { idle: { frames: [4, 5, 6, 7, 6, 5], fps: 6 }, attack: { frames: range(1, 8), fps: 12 }, hurt: { frames: range(1, 6), fps: 10 } } },
 };
 const CLIPS: AnimClipName[] = ["idle", "attack", "hurt"];
 const MAX_WIDTH = 2048;
@@ -54,7 +61,9 @@ const fromAt = args.indexOf("--from");
 const from = fromAt >= 0 ? args[fromAt + 1] : undefined;
 if (!from || !existsSync(from)) throw new Error("usage: bun scripts/build-anim-sheets.ts --from <raw dir> [id …]");
 const only = args.filter((a, i) => i !== fromAt && i !== fromAt + 1);
-const ids = [...BOSS_SHEET_IDS, ...T5_SHEET_IDS].filter((id) => !only.length || only.includes(id));
+const ids = [...BOSS_SHEET_IDS, ...T5_SHEET_IDS, ...BEAST_SHEET_IDS].filter((id) => !only.length || only.includes(id));
+/** A clip's folder: <clip>/ for the big foes, <clip>/east/ for a PixelLab character. */
+const clipDir = (dir: string, clip: string) => existsSync(`${dir}/${clip}/east`) ? `${dir}/${clip}/east` : `${dir}/${clip}`;
 
 type Frame = { data: Buffer; w: number; h: number };
 type Box = { x0: number; y0: number; x1: number; y1: number };
@@ -79,11 +88,22 @@ const next: Record<string, AnimSheet> = { ...ANIM_SHEET_DATA };
 for (const id of ids) {
   const subject = SUBJECTS[id];
   const dir = `${from}/${id}`;
-  if (!subject || !CLIPS.every((c) => existsSync(`${dir}/${c}/00.png`))) { console.warn(`${id}: no frames in ${dir}, kept as is`); continue; }
+  if (!subject || !CLIPS.every((c) => existsSync(`${clipDir(dir, c)}/00.png`))) { console.warn(`${id}: no frames in ${dir}, kept as is`); continue; }
 
   const clips = {} as Record<AnimClipName, Frame[]>;
-  for (const clip of CLIPS) clips[clip] = await Promise.all(subject.clips[clip].frames.map((i) => loadFrame(`${dir}/${clip}/${String(i).padStart(2, "0")}.png`)));
-  const start = await loadFrame(`${dir}/idle/00.png`);
+  for (const clip of CLIPS) clips[clip] = await Promise.all(subject.clips[clip].frames.map((i) => loadFrame(`${clipDir(dir, clip)}/${String(i).padStart(2, "0")}.png`)));
+  let start = await loadFrame(`${clipDir(dir, "idle")}/00.png`);
+  // PixelLab grows a custom clip's canvas evenly: centre every frame on the largest canvas.
+  const canvasW = Math.max(start.w, ...CLIPS.flatMap((c) => clips[c].map((f) => f.w)));
+  const canvasH = Math.max(start.h, ...CLIPS.flatMap((c) => clips[c].map((f) => f.h)));
+  const pad = (f: Frame): Frame => {
+    if (f.w === canvasW && f.h === canvasH) return f;
+    const data = Buffer.alloc(canvasW * canvasH * 4), dx = (canvasW - f.w) / 2, dy = (canvasH - f.h) / 2;
+    for (let y = 0; y < f.h; y++) f.data.copy(data, ((y + dy) * canvasW + dx) * 4, y * f.w * 4, (y + 1) * f.w * 4);
+    return { data, w: canvasW, h: canvasH };
+  };
+  start = pad(start);
+  for (const clip of CLIPS) clips[clip] = clips[clip].map(pad);
   const all = CLIPS.flatMap((c) => clips[c]);
   if (all.some((f) => f.w !== start.w || f.h !== start.h)) throw new Error(`${id}: clips are not on one canvas`);
 
@@ -114,7 +134,8 @@ for (const id of ids) {
   console.log(`${id}: ${frameW}×${frameH}, ${CLIPS.map((c) => `${c} ${clips[c].length}`).join(" · ")}, ${(png.length / 1024).toFixed(0)} KB`);
 }
 
-const order = [...BOSS_SHEET_IDS, ...T5_SHEET_IDS, ...Object.keys(next).filter((k) => !(BOSS_SHEET_IDS as readonly string[]).includes(k) && !(T5_SHEET_IDS as readonly string[]).includes(k))];
+const known: readonly string[] = [...BOSS_SHEET_IDS, ...T5_SHEET_IDS];
+const order = [...known, ...Object.keys(next).filter((k) => !known.includes(k)).sort()];
 const body = Object.fromEntries(order.filter((k) => next[k]).map((k) => [k, next[k]]));
 const text = `// Generated by scripts/build-anim-sheets.ts — do not edit by hand.\nimport type { AnimSheet } from "./anim-sheets";\n\nexport const ANIM_SHEET_DATA: Record<string, AnimSheet> = ${JSON.stringify(body, null, 2)};\n`;
 if (!existsSync(DATA_FILE) || readFileSync(DATA_FILE, "utf8") !== text) writeFileSync(DATA_FILE, text);

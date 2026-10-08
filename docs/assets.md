@@ -12,6 +12,7 @@ A library of pixel-art assets made with [PixelLab](https://pixellab.ai) for the 
 - [Adding or regenerating assets](#adding-or-regenerating-assets)
 - [Kits: roads and walls that join](#kits-roads-and-walls-that-join)
 - [Animated big foes](#animated-big-foes)
+- [PixelLab characters](#pixellab-characters)
 - [Budget used](#budget-used)
 
 ## What is in it
@@ -153,6 +154,42 @@ The six legendary beasts (บอส) and the six tier-5 foes are not library ass
 **Prompting lessons.** v3 drifts on long idles (a sword creeps up, a coil unwinds), so most idles play a ping-pong of their first five frames. "Hit reaction" prompts often draw a white impact flash or turn into a counter-strike; "is hurt by a blow to its face … shrinks back … No effects" gives a clean flinch. Say what must stay ("the sun orb stays fixed on top of the shell") or the model may spend it — the first turtle attack threw its sun away. The raw takes, picks and object ids stay in the raw directory, never in the repo.
 
 **Boss re-rolls (2026-10-08, about 60 generations).** The first boss sheets had faults that were re-rolled on the same objects: the turtle's sun changed colour in idle and its fire jet ran off the frame ("keeps exactly the same colour… a SHORT burst of fire that stays close in front of its mouth"); the crab's attack drew a white X ("No slash marks, no white flash, no X shapes"); the tiger's, bull's and serpent's hurt clips barely moved ("recoils hard… crouches low and slides backward", picking the frames without an impact flash). The eagle stood on a painted rock, so it got a new design (`create_image_pro` with the old eagle as `style_image_url`, "standing directly on the ground on its two talons, no rock"), a new 224 × 184 object and three new clips. Two turtle hurt takes still invented things (a swirl, an arrow), so its hurt clip is hand-made with `pixelart_workbench draw`: the head cut out onto a layer behind the shell and slid back under it while the body rocks 2 px — every pixel stays the original. In battle every animated foe also flashes white, blushes red and is knocked back when hit (`grid-battle-runtime.ts`).
+
+## PixelLab characters
+
+People and beasts are being redrawn and animated by PixelLab, replacing the paintings rigged like paper puppets (`build-npc-sheets.ts`) and the creature atlas's stills. The styles were picked from three candidates per kind on 2026-10-08:
+
+| Kind | Style | Made with |
+| --- | --- | --- |
+| people (heroes, NPCs, enemy types) | **B**: 128 px, selective outline, high detail, low top-down | `create_character` `mode: "v3"`, `size: 128`, `outline: "selective outline"`, `detail: "high detail"`, the description ending "vibrant saturated colors, rich shading, clean readable silhouette" (3 generations) |
+| beasts | **C**: Pro Flash, 128 × 128 | `create_character_pro_flash`, `template_id: "dog"` (or the kind's template), "full body pixel art sprite of …, standing on four legs facing the viewer, vibrant saturated colors, crisp clean pixels, transparent background" (8 generations) |
+
+**Clips** (`animate_character`, named with `animation_name` — the packers look clips up by that name):
+
+| Name | Directions | How | Cost |
+| --- | --- | --- | --- |
+| `walk` | south, south-east, east, north-east, north (west-facing ones are mirrored) | v3, 8 frames, `keep_first_frame: false`: "walking forward at a calm steady pace, legs stepping and arms swinging slightly; the sheathed sword stays at his left hip in every frame, exactly as in the first frame" (beasts: template `walk-8-frames`) | 4 per direction |
+| `idle` | south (the map) and east (battle) | template `breathing-idle` (beasts `idle`) | 1 per direction |
+| `attack` | east | v3, 8 frames: "draws the jian sword and slashes forward in one swift wuxia strike, then returns to stance" | 4 |
+| `hurt` | east | v3, 6 frames: "is hit by a blow, flinches and recoils one step backward, then recovers his footing; the sword stays sheathed at his hip, no punching, no effects" | 3 |
+| `stance` | east | v3, 8 frames: "stands in a ready wuxia guard stance, knees bent, one hand on the sword hilt at his hip… no punching" — the guard pose | 4 |
+| `victory` | east | v3, 8 frames: "raises the sword high overhead in triumph" | 4 |
+| `defeat` | east | v3, 8 frames: "is struck hard, staggers backward, drops to his knees and collapses… lying still on the ground; the sword stays sheathed at his hip, no jumping, no kicking" | 4 |
+
+A person costs about 46 generations (3 to create, about 43 to animate); a beast about 16. Twenty jobs can run at once per account.
+
+**Templates redraw the figure; v3 keeps it.** A template clip (`walking-8-frames`, `taking-punch`, `falling-back-death`, `fight-stance-idle-8-frames`) is redrawn frame by frame from a bare skeleton: the sword came and went between walk frames, the hit and the fall started from a boxer's fists and the fall kicked into the air. Template `skeleton-v3` (the skeleton posed onto the character's own pixels) is steadier but still let the sword drift. v3 custom clips that say what must stay ("the sword stays sheathed at his hip in every frame") keep the outfit and weapon whole, so every person clip except the breathing idle is v3. A take is picked per clip in `scripts/pixellab-characters.json` (`clips`), so a re-roll under a new animation name replaces a clip without renaming anything.
+
+**Pipeline.**
+
+1. `scripts/pixellab-characters.json` maps a game id to its PixelLab character id (`m1`, `f1`, `beast_wolf`…) and, optionally, which take each clip uses (`clips`).
+2. `PIXELLAB_API_TOKEN=… python3 scripts/pixellab-characters.py <raw> [id …]` downloads rotations and every clip to `<raw>/<id>/rotations/<dir>.png` and `<raw>/<id>/<clip>/<dir>/NN.png` (the raw directory stays outside the repo).
+3. People: `bun scripts/build-pixellab-sheets.ts --from <raw> [id …]` packs `public/art/characters/pl/<id>.png` and rewrites `lib/characters/pl-sheets-data.ts`. Frames keep their native pixels; a custom clip's larger canvas (172 px for a 128 px character) is aligned by its centre, and every frame stands on the south rotation's foot row. Cells are square (146–148 px for style B), eight to a row.
+4. Beasts: add the kind to `BEAST_SHEETS` (`lib/characters/anim-sheets.ts`, by creature-atlas frame) and to `SUBJECTS` in `scripts/build-anim-sheets.ts`, then `bun scripts/build-anim-sheets.ts --from <raw> beast_<kind>`. It reads `<clip>/east/NN.png` and pads custom clips to one canvas; the beast then plays its sheet in battle, on the map and on the encounter screens (`opponentLook` → `beastSheetFor`).
+
+**In the game.** A character id with a sheet in `pl-sheets-data.ts` loads it instead of its rigged sheet (`loadCharacterAtlas`, a missing PNG falls back to the rigged one). The atlas brings its own `clips` (8-frame walks), `battleIdle` (side-facing breathing), `walk8Cells` and `native: true`: renderers draw the cell `figureScale` larger so the 120 px figure stands as tall as a rigged 108 px one, the map skips the warm ink tint, the battle spreads the attack clip over the hit beats and leaves out the painted combat sheet (`<id>-combat.png`, another style). The work loops (`<id>-work.png`) are still the painted ones.
+
+**Done so far** (2026-10-08, about 250 generations with the style round and the v3 re-rolls): heroes `m1`, `f1` (all clips) and `beast_wolf`.
 
 ## Budget used
 

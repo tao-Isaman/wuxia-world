@@ -313,5 +313,31 @@ export const ANIM_SHEET_DATA: Record<string, AnimSheet> = {
         "fps": 9
       }
     }
+  },
+  "beast_wolf": {
+    "id": "beast_wolf",
+    "url": "/art/anims/beast_wolf.png?v=1ea88daa",
+    "frameW": 130,
+    "frameH": 100,
+    "feetY": 0.94,
+    "facing": "right",
+    "scale": 0.78,
+    "clips": {
+      "idle": {
+        "row": 0,
+        "frames": 6,
+        "fps": 6
+      },
+      "attack": {
+        "row": 1,
+        "frames": 8,
+        "fps": 12
+      },
+      "hurt": {
+        "row": 2,
+        "frames": 6,
+        "fps": 10
+      }
+    }
   }
 };

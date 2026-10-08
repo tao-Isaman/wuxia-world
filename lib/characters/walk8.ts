@@ -16,6 +16,20 @@ export const WALK8_FIRST_FRAME = 24;
 export const WALK8_FRAMES = 28;
 export const WALK8_FPS = 8;
 
+/** Where an atlas keeps its eight-way walk: the steps and the standing pose per painted direction. */
+export interface Walk8Cells {
+  walk: Readonly<Record<Walk8Direction, readonly number[]>>;
+  stand: Readonly<Record<Walk8Direction, number>>;
+  fps: number;
+}
+/** The painted walk8 sheets' cells (rows of four steps, then the standing poses). */
+export const DEFAULT_WALK8: Walk8Cells = {
+  walk: Object.fromEntries(WALK8_DIRECTIONS.map((dir, row) =>
+    [dir, [0, 1, 2, 3].map((step) => WALK8_FIRST_FRAME + row * 4 + step)])) as Record<Walk8Direction, number[]>,
+  stand: Object.fromEntries(WALK8_DIRECTIONS.map((dir, index) => [dir, WALK8_FIRST_FRAME + 20 + index])) as Record<Walk8Direction, number>,
+  fps: WALK8_FPS,
+};
+
 /** The painted row and mirroring for a direction. */
 export function walk8Source(dir: Dir8): { row: Walk8Direction; mirror: boolean } {
   switch (dir) {
@@ -26,11 +40,11 @@ export function walk8Source(dir: Dir8): { row: Walk8Direction; mirror: boolean }
   }
 }
 
-/** Atlas frame for walking (step 0–3) or standing (`step` null) toward `dir`. */
-export function walk8Frame(dir: Dir8, step: number | null): { frame: number; mirror: boolean } {
+/** Atlas frame for walking (`step` counts up and wraps at the walk's length) or standing (`step` null) toward `dir`. */
+export function walk8Frame(dir: Dir8, step: number | null, cells: Walk8Cells = DEFAULT_WALK8): { frame: number; mirror: boolean } {
   const { row, mirror } = walk8Source(dir);
-  const index = WALK8_DIRECTIONS.indexOf(row);
-  const frame = step === null ? WALK8_FIRST_FRAME + 20 + index : WALK8_FIRST_FRAME + index * 4 + (step % 4);
+  const steps = cells.walk[row];
+  const frame = step === null ? cells.stand[row] : steps[step % steps.length];
   return { frame, mirror };
 }
 

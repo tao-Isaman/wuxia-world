@@ -1,6 +1,6 @@
 import type * as Phaser from "phaser";
-import { CHARACTER_CLIPS, characterId, CREATURE_ATLAS, CREATURE_FRAME_COUNT, creatureCell, type CharacterMotion } from "../characters/catalog";
-import { loadCharacterAtlas } from "../characters/sheet";
+import { CHARACTER_CLIPS, characterId, CREATURE_ATLAS, CREATURE_FRAME_COUNT, creatureCell, type CharacterClips, type CharacterMotion } from "../characters/catalog";
+import { figureScale, loadCharacterAtlas } from "../characters/sheet";
 import { getLocationMap } from "../world/data/location-maps";
 import type { CastMember, CutsceneBeat, CutsceneDef, CutsceneFx, CutsceneMood, StagePoint } from "../world/story/types";
 import { addGridFrames, canvasTexture, createStage, drawCanvas, type Stage } from "./phaser-stage";
@@ -55,6 +55,8 @@ type Actor = {
   kind: "sheet" | "beast";
   directional: boolean;
   frames: number;
+  /** The sheet's clips (a PixelLab sheet brings longer ones). */
+  clips: CharacterClips;
   x: number; y: number;
   facingLeft: boolean;
   motion: CharacterMotion;
@@ -81,6 +83,8 @@ export function createCutsceneRuntime(parent: HTMLElement, def: CutsceneDef, opt
   let waitingLine: (() => void) | null = null;
   let autoTimer: ReturnType<typeof setTimeout> | undefined;
   const actors = new Map<string, Actor>();
+  /** Per cast texture: its clips, feet row (0..1) and how much larger to draw it (lib/characters/sheet.ts figureScale). */
+  const sheets = new Map<string, { clips: CharacterClips; feet: number; scale: number }>();
   const particles: Particle[] = [];
   const ambient: { kind: "petals" | "snow" | "rain"; until: number } = { kind: "petals", until: 0 };
   let weather: "snow" | "rain" | null = null;
@@ -149,8 +153,9 @@ export function createCutsceneRuntime(parent: HTMLElement, def: CutsceneDef, opt
       }
       const atlas = await loadCharacterAtlas(characterId(key), true);
       if (!scene) return;
-      const texture = canvasTexture(scene, `cs:${key}`, warmWorldCharacter(atlas.image));
+      const texture = canvasTexture(scene, `cs:${key}`, atlas.native ? atlas.image : warmWorldCharacter(atlas.image));
       addGridFrames(texture, atlas.frameSize, atlas.columns, atlas.rows);
+      sheets.set(`cs:${key}`, { clips: atlas.clips, feet: atlas.feetY / atlas.frameSize, scale: figureScale(atlas) });
     }));
     if (disposed || !scene) return;
     for (const [key, member] of Object.entries(def.cast)) addActor(key, member);
@@ -172,14 +177,15 @@ export function createCutsceneRuntime(parent: HTMLElement, def: CutsceneDef, opt
     const beast = member.look.startsWith("beast:");
     const texKey = beast ? "cs:beast" : `cs:${lookKey(member.look)}`;
     const frame = beast ? Number(member.look.slice(6)) || 0 : 0;
-    const image = scene.add.image(at.x, at.y, texKey, frame).setOrigin(0.5, beast ? 0.9 : 120 / 128);
-    const size = ACTOR_SIZE * (member.size ?? 1);
+    const sheet = sheets.get(texKey);
+    const image = scene.add.image(at.x, at.y, texKey, frame).setOrigin(0.5, beast ? 0.9 : sheet?.feet ?? 120 / 128);
+    const size = ACTOR_SIZE * (member.size ?? 1) * (sheet?.scale ?? 1);
     image.setDisplaySize(beast ? size * 1.1 : size, beast ? size * 0.9 : size);
     if (member.tint) image.setTint(parseInt(member.tint.slice(1), 16));
     const shadow = scene.add.image(at.x, at.y, "cs:shadow").setDisplaySize(30 * (member.size ?? 1), 11);
     const frames = beast ? 1 : (scene.textures.get(texKey).frameTotal - 1);
     const actor: Actor = {
-      key, member, image, shadow, kind: beast ? "beast" : "sheet", directional: frames >= 24, frames,
+      key, member, image, shadow, kind: beast ? "beast" : "sheet", directional: frames >= 24, frames, clips: sheet?.clips ?? CHARACTER_CLIPS,
       x: at.x, y: at.y, facingLeft: member.facing === "left", motion: "idle", motionAt: 0, heading: "side",
       target: null, alpha: member.hidden ? 0 : 1, fadeTo: member.hidden ? 0 : 1, lunge: 0,
     };
@@ -456,10 +462,10 @@ export function createCutsceneRuntime(parent: HTMLElement, def: CutsceneDef, opt
     if (actor.kind === "sheet") {
       if (actor.target) {
         const clip = actor.directional && actor.heading !== "side"
-          ? CHARACTER_CLIPS[actor.heading === "north" ? "walkNorth" : "walkSouth"] : CHARACTER_CLIPS.walk;
+          ? actor.clips[actor.heading === "north" ? "walkNorth" : "walkSouth"] : actor.clips.walk;
         frame = clip.frames[Math.floor(t / 1000 * clip.fps * (actor.target.speed > WALK_SPEED ? 1.6 : 1)) % clip.frames.length];
       } else {
-        const clip = CHARACTER_CLIPS[actor.motion] ?? CHARACTER_CLIPS.idle;
+        const clip = actor.clips[actor.motion] ?? actor.clips.idle;
         const index = Math.floor(t / 1000 * clip.fps);
         frame = clip.repeat === -1 ? clip.frames[index % clip.frames.length] : clip.frames[Math.min(index, clip.frames.length - 1)];
         if (options.reducedMotion && actor.motion === "idle") frame = clip.frames[0];
