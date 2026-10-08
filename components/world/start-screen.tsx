@@ -7,9 +7,11 @@ import { GENDER_LABEL, PLAYER_BODY_LABEL, defaultBodyFor } from "@/lib/world";
 import { CharacterPreview } from "@/components/game/character-preview";
 import { InstallGameButton } from "@/components/pwa";
 import { SoundButton } from "@/components/sound-button";
+import { OnlinePanel, useGameServer } from "./online-panel";
 
 export function StartScreen() {
   const startNewGame = useWorldStore((s) => s.startNewGame);
+  const server = useGameServer();
   const [name, setName] = useState("");
   const [gender, setGender] = useState<Gender>("male");
   // One hero body per gender (m1 / f1), the ones with the painted action sprites.
@@ -31,6 +33,7 @@ export function StartScreen() {
           <div className="title-rule" />
           <p className="title-footnote">ออกเดินทาง · ฝึกวิชา · สร้างตำนาน</p>
           <InstallGameButton />
+          {server && <OnlinePanel compact />}
         </div>
         <form className="hero-creation pixel-panel" onSubmit={(event) => {
           event.preventDefault();

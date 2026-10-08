@@ -6,6 +6,14 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-08
 
+### Online: a Rust game server and seeing other players walk
+
+- **Game server** in `server/`: a Cloudflare Worker in Rust. `server/core` is pure and event-based (`Room::decide` → events → `Room::apply`; accounts rebuilt from their events; HMAC-signed tokens); `server/worker` runs one Durable Object per account and one per map, with hibernating WebSockets. `bun run server:dev` runs it locally, `bun run server:deploy` deploys it.
+- **Accounts:** username + password (PBKDF2), sign up or log in on the title screen or from the HUD's new 🌐 ออนไลน์ button.
+- **Realtime presence:** every map is a room. Players on the same map see each other walk live (gold name tags, the eight-way walk sheets), joining and leaving as they change maps. A second login of one account replaces the first.
+- Client in `lib/net/` (protocol mirror, socket client, presence reducer, session); `store/online-store.ts`.
+- Tests: `test:server` (cargo), `test:net`, `test:online` (needs the server), `tests/browser/online.spec.ts` (two browsers). Guide: [online.md](online.md).
+
 ### The world clock and the shared world (a step toward online)
 
 - **Time is a world clock:** one game day is one real hour (a ชั่วยาม five real minutes), from day 1 at 2026-10-08 00:00 Bangkok time (`lib/world/clock.ts`). The world moves on while the game is closed; the sundial and day move by themselves (`WorldClock`, every 10 s); back after a day or more, a toast and a log line say how long. `advanceTime` is gone: no action moves time (`syncClock` brings every draft to the clock).

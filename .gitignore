@@ -34,3 +34,9 @@ review/**/*.zip
 
 # Sub-agent worktrees (Claude Code)
 .claude/worktrees/
+
+# The Rust game server (server/): build output and local secrets.
+server/target/
+server/worker/build/
+server/worker/.wrangler/
+server/worker/.dev.vars

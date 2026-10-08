@@ -1,0 +1,16 @@
+# The game server (docs/online.md): a Cloudflare Worker in Rust.
+#   core/   — pure, event-based game logic (protocol, room state, auth crypto); `cargo test`
+#   worker/ — the Cloudflare glue (router, Durable Objects, WebSockets); `wrangler dev`
+[workspace]
+resolver = "2"
+members = ["core", "worker"]
+
+[workspace.package]
+edition = "2021"
+version = "0.1.0"
+license = "UNLICENSED"
+
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1

@@ -21,7 +21,7 @@ import { initialWorldPlacement } from "./world-placement";
 import { addGridFrames, canvasTexture, createStage, drawCanvas, stagePixelRatio, type Stage } from "./phaser-stage";
 import {
   WALK_TICK_UNITS, getRememberedMapPosition, rememberMapPosition, stepTowards,
-  type Point, type WorldFoe, type WorldMarker, type WorldPresentation, type WorldRuntime,
+  type Point, type RemotePlayer, type WorldFoe, type WorldMarker, type WorldPresentation, type WorldRuntime,
 } from "./types";
 
 const WIDTH = 960;
@@ -282,7 +282,7 @@ export function createWorldRuntime(
       context.fillText(text, width / 2, 13);
     }, 10_000);
   }
-  function makeNameTag(text: string): TextSprite {
+  function makeNameTag(text: string, color = "#8ee67a"): TextSprite {
     const width = Math.ceil(measure(text, "600 ")) + 10;
     return textSprite(width, 22, (context) => {
       context.font = `600 13px ${font}`;
@@ -292,7 +292,7 @@ export function createWorldRuntime(
       context.lineWidth = 4;
       context.strokeStyle = "rgba(8, 20, 14, 0.95)";
       context.strokeText(text, width / 2, 11);
-      context.fillStyle = "#8ee67a";
+      context.fillStyle = color;
       context.fillText(text, width / 2, 11);
     }, 9_010);
   }
@@ -938,6 +938,70 @@ export function createWorldRuntime(
       return [Math.round(p.x), Math.round(p.y)];
     }));
   }
+  // ── Other players (online, docs/online.md) ───────────────────────────
+  // Synced to `read().online.players()` every frame, like the foes. Each walks
+  // smoothly toward the last position the server sent (moves arrive ~10×/s)
+  // on the painted eight-way walk sheet of their body.
+  interface RemoteVisual {
+    character: CharacterVisual;
+    shadow: Phaser.GameObjects.Image;
+    tag: TextSprite;
+    pos: Point;
+    phase: number;
+  }
+  const remoteVisuals = new Map<string, RemoteVisual>();
+  const remoteLoading = new Set<string>();
+  /** Gold name tags tell players from NPCs (green). */
+  const PLAYER_TAG_COLOR = "#f6d77a";
+  async function addRemote(remote: RemotePlayer) {
+    remoteLoading.add(remote.id);
+    try {
+      const id = characterId(remote.body === "f1" ? "f1" : "m1");
+      const atlas = await loadAtlas(id, true);
+      if (disposed || failed || !scene || remoteVisuals.has(remote.id)) return;
+      const character = makeCharacter(`char:${id}`, atlas, PLAYER_SIZE);
+      const shadow = image(shadowTexture, 1, 30, 11);
+      const tag = makeNameTag(remote.name, PLAYER_TAG_COLOR);
+      remoteVisuals.set(remote.id, { character, shadow, tag, pos: { x: remote.x, y: remote.y }, phase: Math.random() });
+    } catch (error) {
+      console.warn("[world] could not draw another player:", remote.id, error);
+    } finally {
+      remoteLoading.delete(remote.id);
+    }
+  }
+  function removeRemote(id: string) {
+    const visual = remoteVisuals.get(id);
+    if (!visual) return;
+    visual.character.image.destroy(); visual.shadow.destroy(); visual.tag.image.destroy();
+    remoteVisuals.delete(id);
+  }
+  function updateRemotes(dt: number) {
+    const others = read().online?.players() ?? [];
+    const ids = new Set(others.map((remote) => remote.id));
+    for (const id of [...remoteVisuals.keys()]) if (!ids.has(id)) removeRemote(id);
+    for (const remote of others) {
+      if (!remoteVisuals.has(remote.id) && !remoteLoading.has(remote.id)) void addRemote(remote);
+      const visual = remoteVisuals.get(remote.id);
+      if (!visual) continue;
+      const gap = Math.hypot(remote.x - visual.pos.x, remote.y - visual.pos.y);
+      if (gap > 160 || reducedMotion) visual.pos = { x: remote.x, y: remote.y };
+      else if (gap > 0.1) {
+        // Catch up with the latest position over ~100 ms (one move interval).
+        const pull = Math.min(1, dt * 10);
+        visual.pos = { x: visual.pos.x + (remote.x - visual.pos.x) * pull, y: visual.pos.y + (remote.y - visual.pos.y) * pull };
+      }
+      const walking = remote.moving || gap > 2;
+      const step = walking && !reducedMotion ? Math.floor((animationTime + visual.phase) * WALK8_FPS) % 4 : null;
+      const pose = walk8Frame(remote.dir, step);
+      setCharacterFrame(visual.character, pose.frame, pose.mirror);
+      const { x, y } = visual.pos;
+      visual.character.image.setPosition(x, y).setDepth(characterDepth(y));
+      visual.shadow.setPosition(x, y);
+      visual.tag.image.setDisplaySize(visual.tag.width / viewScale, visual.tag.height / viewScale).setPosition(x, y - PLAYER_SIZE - 2);
+    }
+    parent.dataset.remotePlayers = JSON.stringify([...remoteVisuals].map(([id, visual]) => [id, Math.round(visual.pos.x), Math.round(visual.pos.y)]));
+  }
+
   /** The spot of the frontmost roaming foe whose sprite covers `point`, or null. */
   function foeAt(point: Point): Point | null {
     let best: Point | null = null;
@@ -1303,6 +1367,9 @@ export function createWorldRuntime(
       updatePresentation(ambientActive ? dt : 0, moving);
       updatePlacementFade(dt);
       updateFoes(paused);
+      // Online: tell the session where the hero is (it throttles), and draw the others.
+      read().online?.report({ x: Math.round(position.x * 10) / 10, y: Math.round(position.y * 10) / 10, dir: playerDir, moving });
+      updateRemotes(dt);
       if (disposed || failed) return;
       if (veil) {
         if (lighting.update(read().time ?? 0, animationTime, reducedMotion)) veil.texture.refresh();
@@ -1359,6 +1426,7 @@ export function createWorldRuntime(
       delete parent.dataset.nearbyMarker;
       delete parent.dataset.placements;
       delete parent.dataset.placementIds;
+      delete parent.dataset.remotePlayers;
     },
   };
 }

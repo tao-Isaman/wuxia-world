@@ -1,15 +1,22 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { markerCategory, type WorldMarker, type WorldMarkerCategory, type WorldPresentation, type WorldRuntime } from "@/lib/stage/types";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { markerCategory, type OnlinePort, type WorldMarker, type WorldMarkerCategory, type WorldPresentation, type WorldRuntime } from "@/lib/stage/types";
+import { onlineSession } from "@/lib/net/session";
 import { TouchStick } from "./touch-stick";
 import { useWorldStore } from "@/store/world-store";
 
 export function WorldCanvas({ presentation }: { presentation: WorldPresentation }) {
   const host = useRef<HTMLDivElement>(null);
   const runtime = useRef<WorldRuntime | null>(null);
+  // Every map is a room online (docs/online.md): the runtime reports the hero
+  // to it and draws whoever else stands here.
+  const online = useMemo<OnlinePort>(() => ({
+    players: () => onlineSession.players(presentation.key),
+    report: (motion) => onlineSession.report(presentation.key, motion),
+  }), [presentation.key]);
   const latest = useRef(presentation);
-  latest.current = presentation;
+  latest.current = { ...presentation, online };
   const [ready, setReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);

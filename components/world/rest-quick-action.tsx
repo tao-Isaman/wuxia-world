@@ -77,7 +77,7 @@ export function RestQuickAction() {
   const kinds = restKindsForScene(currentSceneId, sectMembership);
   // Free rests share one cooldown on the world clock; an inn room is always open.
   const waitHours = Math.max(0, Number(restAt ?? -Infinity) + REST_COOLDOWN_HOURS - absoluteHours({ day, time }));
-  const wait = waitHours > 0 ? describeSentence(waitHours) : "";
+  const wait = waitHours > 1e-6 ? describeSentence(waitHours) : "";
   const choices = kinds.map((kind) => ({
     kind,
     icon: kind === "home" ? "🛏" : kind === "sect" ? "🏯" : kind === "inn" ? "🍵" : kind === "temple" ? "🏛" : "🌿",

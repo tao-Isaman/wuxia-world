@@ -42,6 +42,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | Music and sound · install and offline | [docs/audio.md](docs/audio.md) · [docs/pwa.md](docs/pwa.md) |
 | The editor at `/game/engine`: asset library, maps, skill / art texts | [docs/engine.md](docs/engine.md) |
 | Saves, migration, repair | [docs/save-format.md](docs/save-format.md) |
+| Online play: the Rust game server (`server/`), protocol, accounts, rooms | [docs/online.md](docs/online.md) |
 | Tests and scripts | [docs/testing.md](docs/testing.md) · [docs/scripts.md](docs/scripts.md) |
 | Every place / NPC / quest / skill / item / foe | [docs/reference/](docs/reference/README.md) (generated) |
 | Current state, known issues, next steps | [HANDOFF.md](HANDOFF.md) |
@@ -84,6 +85,11 @@ bun run test:docs           # generated reference is current + docs links/paths/
 bun run test:foes            # habitats, booster, T5, bosses (lairs, respawn, boss save), spoils
 bun run test:clock           # world clock, syncClock (regen, catch-up), seeded NPC weeks, WorldEvents, save / shared-world split, v27 rebase
 bun run test:boss-skills     # the boss moves' own effects and boss battles
+bun run test:net             # online client: presence reducer (seq, resync), session (hello, throttle, room switch)
+bun run test:server          # cargo test of server/core: protocol, room decide / apply, accounts, tokens
+bun run test:online          # against a running game server (bun run server:dev): auth, two players in a room
+bun run server:dev           # the Rust game server on wrangler dev :8787 (server/worker/.dev.vars: AUTH_SECRET)
+bun run server:deploy        # deploy it to Cloudflare (wrangler secret put AUTH_SECRET first)
 bun run test:assets         # asset library: manifest contract, files and sizes, footprints, ≥ 3,000 approved; every item / equipment icon
 bun run test:e2e            # Playwright (Chromium) on :3017 — start a production server first
 bun scripts/audit-content.ts            # every NPC / quest / scene reference resolves
@@ -137,7 +143,8 @@ store/                    Zustand: world (saved, v27, + the shared world), battl
    ↓
 lib/world/  ──────►  lib/game/          pure engines — no React, no DOM, no I/O
    └ battle-bridge.ts: the one place the world and battle stores meet
-lib/stage/ (Phaser, browser only) · lib/characters/ · lib/audio/
+lib/stage/ (Phaser, browser only) · lib/characters/ · lib/audio/ · lib/net/ (online client)
+server/                   the game server: Rust on Cloudflare Workers (core = pure decide/apply, worker = Durable Objects)
 ```
 
 **Import rules:**
@@ -303,6 +310,14 @@ Two deliberate exceptions reach into stores:
    - on a fatal loss: no game over — `reviveFromDeath` (`lib/world/death.ts`): wake at `home_player` at once with 30 % HP / MP, −50 % gold, half of 1–3 random losable item stacks (quest items, scrolls, manuals, books kept), and the `lastDeath` report (`DeathReport`, not saved);
    - on an escape: no rewards.
 3. **Battle items.** `battleBag(inventory)` passes the items with `ItemDef.battle` (potions, poisons, hidden weapons; food has none) as the battle's `bag`; the grid action `{ t: "item" }` (ใช้ของ tray, `components/game/battle-items.tsx`) heals or throws (`throwDamage`, poison via `addDebuff`) and ends the turn; `acknowledgeBattleResult` takes `itemsUsed` from the inventory on every outcome. Food's `use.heal.stamina` restores stamina outside battle.
+
+## Online (`server/`, `lib/net/`; [docs/online.md](docs/online.md))
+
+- **Server:** a Cloudflare Worker in Rust. `server/core` is pure and event-based (`Room::decide` → events → `Room::apply`; `Account` from its events; signed HMAC tokens), tested with `cargo test`; `server/worker` is the glue: `AccountObject` (a Durable Object per username) and `RoomObject` (one per map id, hibernating WebSockets, each socket's attachment holds its `Presence`).
+- **Protocol:** `server/core/src/protocol.rs` ↔ `lib/net/protocol.ts` — keep them in step and bump `PROTOCOL_VERSION` on both. Client commands `hello` / `move` / `sync` / `ping`; server `welcome` (snapshot at `seq`) / `event { seq, ev }` (`joined`, `moved`, `left`) / `pong` / `error`.
+- **Client:** `onlineSession` (`lib/net/session.ts`) holds one socket for the map the hero is on. The map runtime drives it every frame through `presentation.online.report(motion)` (bound per map in `world-canvas.tsx`) and draws `players()` (`updateRemotes`, gold name tags, `data-remote-players`). Moves are throttled to 100 ms; an idle map closes the socket after 15 s.
+- **Sign-in:** `store/online-store.ts` (`wuxia-online-v1`), the title-screen panel and the HUD's 🌐 button (`online-panel.tsx`), `OnlineBridge` in `app/page.tsx`. Online shows only with a server: `localStorage["wuxia-game-server"]` or `NEXT_PUBLIC_GAME_SERVER_URL`.
+- Only presence is online; the save and the shared world are still local.
 
 ## Rendering (`lib/stage/`)
 

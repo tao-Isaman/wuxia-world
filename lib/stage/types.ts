@@ -1,6 +1,27 @@
 import type { HeroPoseStrip } from "@/lib/characters/hero-actions";
 import type { PlacementGeometry } from "@/lib/assets/placement-geometry";
+import type { Dir8 } from "@/lib/characters/walk8";
 export interface Point { x: number; y: number }
+
+/** Another player on this map (lib/net, docs/online.md), in map units. */
+export interface RemotePlayer extends Point {
+  id: string;
+  name: string;
+  /** Hero body sheet: `m1` or `f1`. */
+  body: string;
+  dir: Dir8;
+  moving: boolean;
+}
+/** Where the hero stands and faces, reported every frame to the online session. */
+export interface HeroMotion extends Point {
+  dir: Dir8;
+  moving: boolean;
+}
+/** The online seam (lib/net/session.ts): who else is on this map, and where the hero is. */
+export interface OnlinePort {
+  players: () => readonly RemotePlayer[];
+  report: (motion: HeroMotion) => void;
+}
 
 export type WorldMarkerCategory = "npc" | "route" | "place" | "activity";
 export const markerCategory = (marker: Pick<WorldMarker, "kind" | "category">): WorldMarkerCategory =>
@@ -83,6 +104,8 @@ export interface WorldPresentation {
    * `image` is then its stand-in key, so no painted collision or foreground applies.
    */
   ground?: { image: string; size: number } | null;
+  /** Other players online on this map (read every frame); absent offline. */
+  online?: OnlinePort | null;
 }
 
 /** Map distance (960×640 units) per random-event walk tick. */

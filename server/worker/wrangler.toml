@@ -1,0 +1,24 @@
+# The wuxia game server (docs/online.md). Deploy: `npx wrangler deploy` from
+# this folder, after `npx wrangler secret put AUTH_SECRET` (≥ 16 characters).
+name = "wuxia-server"
+main = "build/worker/shim.mjs"
+compatibility_date = "2026-01-01"
+
+[build]
+command = "cargo install -q worker-build@^0.8 && worker-build --release"
+
+[[durable_objects.bindings]]
+name = "ACCOUNTS"
+class_name = "AccountObject"
+
+[[durable_objects.bindings]]
+name = "ROOMS"
+class_name = "RoomObject"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["AccountObject", "RoomObject"]
+
+[vars]
+# PBKDF2 rounds for new passwords (Workers bill CPU time; raise on a paid plan).
+PBKDF2_ITERATIONS = "10000"
