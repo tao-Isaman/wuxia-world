@@ -6,13 +6,14 @@ import type {
   SectMembership,
   WorldStateData,
 } from "./types";
+import { recordWorldEvent } from "./shared/events";
 import { TRAIT_LABEL } from "./types";
 import { getItem, getNpc, getOpponent, scrollItemId } from "./data";
 import { getQuest, getQuestsForSect } from "./data/quests";
 import { SECT_MEMBERSHIPS } from "./data/sect-memberships";
 import { SAGA_PROLOGUES } from "./data/story";
 import { evaluateCondition, gearlessStat } from "./conditions";
-import { JAIL_HOURS_PER_DAY, absoluteHours, arrestPenalty, bribeCost, jailCityFor, jailDays, sentenceLeft } from "./law";
+import { absoluteHours, arrestPenalty, bribeCost, describeSentence, jailCityFor, sentenceLeft } from "./law";
 import { deathLosableItems } from "./death";
 import { JAIL_SCENE_ID } from "./data/activities";
 import { STAT_LABEL, deriveAll, getArt, getSkill } from "../game";
@@ -291,11 +292,14 @@ export function applyEffect(state: WorldStateData, eff: SceneEffect): void {
       // pool, render with the player's archetype label + scene location,
       // push onto rumorPool. Any caps/eviction work is folded into the
       // engine itself.
-      generatePlayerEcho({
+      const rumorId = generatePlayerEcho({
         state,
         actionId: eff.actionId,
         targetNpcId: eff.targetNpcId,
       });
+      // The news of what the hero did is part of the shared world: log it as an event.
+      const rumor = rumorId ? state.rumorPool.find((r) => r.id === rumorId) : undefined;
+      if (rumor) recordWorldEvent(state, { t: "rumor", rumor });
       return;
     }
     case "markRumorHeard": {
@@ -334,7 +338,7 @@ export function applyEffect(state: WorldStateData, eff: SceneEffect): void {
       const report = applyArrestPenalty(state, penalty, eff.surrender);
       state.flags = { ...state.flags, _arrestReport: report.join("\n") };
       state.jailCityId = state.jailCityId ?? jailCityFor(state.lastLocationId);
-      state.jailUntil = absoluteHours(state) + penalty.days * JAIL_HOURS_PER_DAY;
+      state.jailUntil = absoluteHours(state) + penalty.hours;
       state.wanted = 0;
       state.lawEvasions = 0;
       state.wantedDay = state.day;
@@ -344,11 +348,9 @@ export function applyEffect(state: WorldStateData, eff: SceneEffect): void {
     }
 
     case "serveJail": {
-      // Sit out whatever remains (or a fresh sentence if never locked up).
-      const hours = state.jailUntil != null ? sentenceLeft(state) : jailDays(state.wanted) * JAIL_HOURS_PER_DAY;
-      const total = state.time + hours;
-      state.day += Math.floor(total / JAIL_HOURS_PER_DAY);
-      state.time = total % JAIL_HOURS_PER_DAY;
+      // The sentence runs on the world clock (lib/world/clock.ts): this only
+      // opens the cell once the time is served; nothing can skip it.
+      if (state.jailUntil != null && sentenceLeft(state) > 0) return;
       state.wanted = 0;
       releaseFromJail(state);
       return;
@@ -381,7 +383,7 @@ export function applyEffect(state: WorldStateData, eff: SceneEffect): void {
  * lines for the arrest report.
  */
 export function applyArrestPenalty(state: WorldStateData, penalty: ReturnType<typeof arrestPenalty>, surrendered = false): string[] {
-  const lines: string[] = [surrendered ? `มอบตัว · โทษจำคุก ${penalty.days} วัน (ลดกึ่งหนึ่ง)` : `โทษจำคุก ${penalty.days} วัน`];
+  const lines: string[] = [surrendered ? `มอบตัว · โทษจำคุก ${describeSentence(penalty.hours)} (ลดกึ่งหนึ่ง)` : `โทษจำคุก ${describeSentence(penalty.hours)}`];
   const fine = Math.min(state.gold, penalty.fine);
   if (fine > 0) { state.gold -= fine; lines.push(`ค่าปรับ ${fine.toLocaleString()} ตำลึง`); }
   if (penalty.confiscate) {

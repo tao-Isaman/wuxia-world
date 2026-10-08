@@ -3,13 +3,13 @@ import { combinedStats, deriveAll, getArt, getEquip, getSkill, getMeridianChart 
 import { statFromLifeSkill, STAT_XP_PER_ACTION } from "@/lib/world/stat-progression";
 import { applyEffects, gatherSuccessChance, getArtisansAt, getItem, getRecipe, getResource, masteryLevel } from "@/lib/world";
 import { applyEffect, releaseFromJail } from "@/lib/world/effects";
-import { describeSentence, sentenceLeft } from "@/lib/world/law";
+import { absoluteHours, describeSentence, sentenceLeft } from "@/lib/world/law";
 import { JAIL_SCENE_ID, getActivity, jailDiceChance, jailEscapeChance } from "@/lib/world/data/activities";
 import { meridianReadBlock } from "@/lib/world/meridians";
 import { ownSectAt } from "@/lib/world/data/sect-memberships";
-import { advanceTime } from "../lifecycle";
+import { staminaForHours } from "../lifecycle";
 import { grantStatXp, rollLukXp } from "../progression";
-import { ACTION_HOURS, ARTISAN_PROFESSIONS, CRAFT_XP_MULT, FAIL_XP_FRACTION, GATHER_XP_MULT, HOURS_PER_DAY, JAIL_MEDITATE_WEXP, MAX_DUMMY_LEVEL, PRACTICE_MUSIC_XP, REST_HOME_HOURS, REST_HOURS, REST_INN_COST, W_EXP_CRAFT, W_EXP_GATHER, W_EXP_PRACTICE_MUSIC, W_EXP_USE_ITEM } from "../rules";
+import { ACTION_HOURS, ARTISAN_PROFESSIONS, CRAFT_XP_MULT, FAIL_XP_FRACTION, GATHER_XP_MULT, JAIL_ESCAPE_PENALTY_HOURS, JAIL_LABOR_HOURS, JAIL_MEDITATE_COOLDOWN, JAIL_MEDITATE_WEXP, MAX_DUMMY_LEVEL, PRACTICE_MUSIC_XP, REST_COOLDOWN_HOURS, REST_INN_COST, W_EXP_CRAFT, W_EXP_GATHER, W_EXP_PRACTICE_MUSIC, W_EXP_USE_ITEM } from "../rules";
 import { rollResourceYield } from "../spoils";
 import { appendActionLog, draftFrom } from "../state";
 import type { WorldGet, WorldSet, WorldStore } from "../types";
@@ -29,7 +29,6 @@ export const lifeActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "gat
         res.opponentIds[Math.floor(Math.random() * res.opponentIds.length)]!;
       const draft = draftFrom(s);
       draft.stamina = Math.max(0, draft.stamina - res.staminaCost);
-      advanceTime(draft, ACTION_HOURS);
       draft.pendingHuntYield = {
         resourceId: res.id,
         returnSceneId: s.currentSceneId,
@@ -51,7 +50,6 @@ export const lifeActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "gat
     // an extra stamina hit only when the drop check fails.
     const draft = draftFrom(s);
     draft.stamina = Math.max(0, draft.stamina - res.staminaCost);
-    advanceTime(draft, ACTION_HOURS);
     const lvl = masteryLevel(draft.lifeSkillXp[res.skill] ?? 0);
     const successChance = gatherSuccessChance(lvl, res.level);
     const yieldRoll = rollResourceYield(res, lvl);
@@ -142,7 +140,7 @@ export const lifeActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "gat
     }
 
     const draft = draftFrom(s);
-    advanceTime(draft, ACTION_HOURS);
+    draft.stamina = Math.max(0, draft.stamina - staminaForHours(ACTION_HOURS));
     // Inputs are consumed regardless of drop-check outcome — failed
     // craft = ingredients lost, success = ingredients lost + output.
     for (const inp of r.inputs) {
@@ -271,7 +269,6 @@ export const lifeActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "gat
     }
 
     const draft = draftFrom(s);
-    advanceTime(draft, ACTION_HOURS);
     // Consume one count.
     const cur = draft.inventory[itemId] ?? 0;
     if (cur <= 1) delete draft.inventory[itemId];
@@ -354,7 +351,7 @@ export const lifeActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "gat
     const w = getEquip(wId);
     if (!w?.instrument) return { ok: false, reason: "no-instrument" };
     const draft = draftFrom(s);
-    advanceTime(draft, ACTION_HOURS);
+    draft.stamina = Math.max(0, draft.stamina - staminaForHours(ACTION_HOURS));
     draft.lifeSkillXp.music = (draft.lifeSkillXp.music ?? 0) + PRACTICE_MUSIC_XP;
     draft.wExp += W_EXP_PRACTICE_MUSIC;
     // Music is a cultural action → INT.
@@ -384,6 +381,13 @@ export const lifeActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "gat
     }
     if (s.gold < cost) return { ok: false, reason: "gold" };
     const draft = draftFrom(s);
+    // Resting takes no time now (the world clock runs on): a free rest is
+    // ready again REST_COOLDOWN_HOURS ชั่วยาม later; a paid inn room any time.
+    if (kind !== "inn") {
+      const ready = Number(draft.flags._restAt ?? -Infinity) + REST_COOLDOWN_HOURS;
+      if (absoluteHours(draft) < ready) return { ok: false, reason: "cooldown", readyIn: ready - absoluteHours(draft) };
+      draft.flags._restAt = absoluteHours(draft);
+    }
     draft.gold -= cost;
     const restored = Math.floor(max * pct);
     draft.stamina = Math.min(max, draft.stamina + restored);
@@ -395,8 +399,6 @@ export const lifeActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "gat
       draft.currentHp = Math.min(d.HP, draft.currentHp + Math.floor(d.HP * pct));
       draft.currentMp = Math.min(d.MP, draft.currentMp + Math.floor(d.MP * pct));
     }
-    const hours = kind === "home" || kind === "sect" ? REST_HOME_HOURS : REST_HOURS;
-    advanceTime(draft, hours);
     const restLabel = kind === "home" ? "นอนพักที่บ้าน" : kind === "sect" ? "นอนพักที่สำนัก" : kind === "inn" ? "พักโรงเตี๊ยม" : kind === "temple" ? "พักวัด" : "พักริมทาง";
     appendActionLog(
       draft,
@@ -406,7 +408,7 @@ export const lifeActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "gat
         : `${restLabel} · ฟื้น ${restored} แรง`,
     );
     set({ ...draft });
-    return { ok: true, kind, cost, restored, hours };
+    return { ok: true, kind, cost, restored };
   },
 
   doActivity: (id) => {
@@ -427,7 +429,6 @@ export const lifeActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "gat
       const draft = draftFrom(s);
       draft.stamina -= activity.stamina;
       if (place.costGold) draft.gold -= place.costGold;
-      if (activity.hours) advanceTime(draft, activity.hours);
       const gains: string[] = [];
       const r = place.reward;
       if (r.gold) {
@@ -476,18 +477,16 @@ export const lifeActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "gat
       }
       case "jail_labor": {
         draft.stamina -= activity.stamina;
-        advanceTime(draft, activity.hours);
-        // Hard labour counts double toward the sentence.
-        if (draft.jailUntil != null) draft.jailUntil -= activity.hours;
+        // Hard labour takes time off the sentence (it runs on the world clock).
+        if (draft.jailUntil != null) draft.jailUntil -= JAIL_LABOR_HOURS;
         grantStatXp(draft, "STR", STAT_XP_PER_ACTION * 2);
         draft.wExp += 5;
-        message = `ทุบหินจนเหงื่อโชก · โทษลดลง ${activity.hours} ชั่วยาม · เหลือ ${describeSentence(sentenceLeft(draft))}`;
+        message = `ทุบหินจนเหงื่อโชก · โทษลดลง ${describeSentence(JAIL_LABOR_HOURS)} · เหลือ ${describeSentence(sentenceLeft(draft))}`;
         break;
       }
       case "jail_dice": {
         if (draft.gold < 10) return { ok: false, reason: "gold", message: "ต้องมีเงินเดิมพัน 10 ตำลึง" };
         draft.stamina -= activity.stamina;
-        advanceTime(draft, activity.hours);
         const won = Math.random() < jailDiceChance(draft.playerBuild?.stats.LUK ?? 0);
         draft.gold += won ? 10 : -10;
         grantStatXp(draft, "LUK", STAT_XP_PER_ACTION);
@@ -495,7 +494,13 @@ export const lifeActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "gat
         break;
       }
       case "jail_meditate": {
-        advanceTime(draft, activity.hours);
+        // A sitting takes its time: one per JAIL_MEDITATE_COOLDOWN ชั่วยาม of the world clock.
+        const lastSat = Number(draft.flags._jailMeditateAt ?? -Infinity);
+        const ready = lastSat + JAIL_MEDITATE_COOLDOWN;
+        if (absoluteHours(draft) < ready) {
+          return { ok: false, reason: "cooldown", message: `จิตยังไม่สงบพอ · นั่งสมาธิได้อีกครั้งใน ${describeSentence(ready - absoluteHours(draft))}` };
+        }
+        draft.flags._jailMeditateAt = absoluteHours(draft);
         if (derived) {
           draft.currentMp = derived.MP;
           draft.currentHp = Math.min(derived.HP, (draft.currentHp ?? 0) + Math.round(derived.HP * 0.2));
@@ -508,7 +513,6 @@ export const lifeActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "gat
       }
       case "jail_escape": {
         draft.stamina -= activity.stamina;
-        advanceTime(draft, activity.hours);
         if (Math.random() < jailEscapeChance(draft.playerBuild?.stats.AGI ?? 0)) {
           releaseFromJail(draft);
           draft.wanted += 2;
@@ -519,8 +523,8 @@ export const lifeActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "gat
           set({ ...draft });
           return { ok: true, message: `ปีนกำแพงร้าวหนีออกมาได้ · หมายจับเพิ่มเป็น ${draft.wanted}` };
         }
-        if (draft.jailUntil != null) draft.jailUntil += HOURS_PER_DAY;
-        message = `ผู้คุมจับได้คาหนังคาเขา · โทษเพิ่ม 1 วัน · เหลือ ${describeSentence(sentenceLeft(draft))}`;
+        if (draft.jailUntil != null) draft.jailUntil += JAIL_ESCAPE_PENALTY_HOURS;
+        message = `ผู้คุมจับได้คาหนังคาเขา · โทษเพิ่ม ${describeSentence(JAIL_ESCAPE_PENALTY_HOURS)} · เหลือ ${describeSentence(sentenceLeft(draft))}`;
         break;
       }
     }

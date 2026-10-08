@@ -1249,6 +1249,12 @@ export interface WorldStateData {
   // v26: day each legendary beast (data/bosses.ts) last fell; it is back
   // `respawnDays` (90) later.
   bossDefeatedDay: Record<string, number>;
+  // v27: the shared world's random seed (its NPC simulation is seeded by
+  // week, lib/world/shared/rng.ts) and its log of player → world events
+  // (lib/world/shared/events.ts, newest last, capped). Both belong to the
+  // shared world, saved apart from the player (lib/world/shared/world.ts).
+  worldSeed: number;
+  worldEventLog: import("./shared/events").WorldEvent[];
 
   // Game time. Twelve ชั่วยาม per day; `time` is a fractional within-day
   // counter (0 ≤ time < 12) that advances per action and rolls `day` over

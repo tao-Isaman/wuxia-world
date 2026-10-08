@@ -60,7 +60,7 @@ function battle(winner: "A" | "B" | "escape") {
 }
 
 step("resetGame", () => st().resetGame());
-step("startNewGame", () => st().startNewGame({ name: "Golden", gender: "female" } as never));
+step("startNewGame", () => st().startNewGame({ newWorld: true, name: "Golden", gender: "female" } as never));
 step("_giveGold", () => st()._giveGold(50000));
 step("_setFlag", () => st()._setFlag("golden", 1));
 // Quests

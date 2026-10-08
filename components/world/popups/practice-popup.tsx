@@ -28,7 +28,6 @@ import {
   type LocationScene,
 } from "@/lib/world";
 import {
-  PRACTICE_HOURS,
   PRACTICE_STAMINA_COST,
   useWorldStore,
   type PracticeResult,
@@ -45,7 +44,7 @@ interface Props {
 }
 
 // Practice popup — pick one learned move skill or inner art to train at the
-// current location. Costs PRACTICE_STAMINA_COST + PRACTICE_HOURS; xp gained
+// current location. Costs PRACTICE_STAMINA_COST; xp gained
 // scales with the location's category bonus (forest→yang/external,
 // cave→yin/soft, mountain→balance/hard, river→internal). Show a 1-second
 // flashLoading on click so the action feels deliberate.
@@ -116,7 +115,7 @@ export function PracticePopup({ open, scene, onClose }: Props) {
           </div>
         )}
         <div className="text-[10px] text-muted-foreground">
-          ค่าใช้: ⚡ {PRACTICE_STAMINA_COST} · เวลา {PRACTICE_HOURS} ชั่วยาม
+          ค่าใช้: ⚡ {PRACTICE_STAMINA_COST}
           <span className="ml-2">
             พลังคงเหลือ:{" "}
             <strong className={tooTired ? "text-rose-600" : ""}>

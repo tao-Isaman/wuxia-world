@@ -63,7 +63,7 @@ function check(name: string, fn: () => void) {
 const store = () => useWorldStore.getState();
 function newGame() {
   store().resetGame();
-  store().startNewGame({ name: "ทดสอบ", gender: "male" } as never);
+  store().startNewGame({ newWorld: true, name: "ทดสอบ", gender: "male" } as never);
 }
 
 // ─── Fixtures (the engine is tested apart from the content table) ────
@@ -479,7 +479,7 @@ check("store: openMeridianNode spends points, keeps order, stops at rank 3", () 
 
 check("save: v24 persists meridianPoints; migrate defaults it; repair drops unknown charts and fixes ranks", () => {
   const options = useWorldStore.persist.getOptions();
-  assert.equal(options.version, 26);
+  assert.equal(options.version, 27);
   newGame();
   useWorldStore.setState({ meridianPoints: 7 });
   const saved = options.partialize!(store()) as { meridianPoints?: number };

@@ -8,7 +8,7 @@ Every system as the player meets it, with the numbers the code uses. Engine deta
 
 The content itself (every place, NPC, quest, item) is listed in the [generated reference](reference/README.md).
 
-Time in this game is counted in **ชั่วยาม**: 12 of them make one day, so one ชั่วยาม is two hours of story time.
+Time in this game is counted in **ชั่วยาม**: 12 of them make one day, so one ชั่วยาม is two hours of story time. Time is a **world clock** that runs on real time: **one game day is one real hour** (a ชั่วยาม is five real minutes, a 360-day year about fifteen real days), and the world moves on while the game is closed. No action moves time; actions that used to take time happen at once and cost stamina instead ([design](design/world-clock-and-shared-world.md)).
 
 ## Contents
 
@@ -102,32 +102,37 @@ A typical first session in the capital:
 
 ### What things cost
 
-| Action | Time (ชั่วยาม) | Stamina |
-| --- | --- | --- |
-| step from a place onto a road | 1 | 10 |
-| step from a road into a place | 2 | 10 |
-| gather, start a hunt, craft, use an item, play music, steal / assassinate / kidnap attempt | 0.2 | gather: the node's cost (5–25); others 0 |
-| a finished battle (win, loss or retreat) | 0.5 | 5 |
-| practise a skill or art | 6 | 30 |
-| rest | 12 (a full day) | — |
-| a quest objective spot | 1 (some 2 or 4) | 0 |
-| buy, sell, equip, level up, talk, start a spar | 0 | 0 |
+Everything happens at once; the price is stamina (an action that used to take *h* ชั่วยาม costs `max(2, round(5h))`, `staminaForHours`).
+
+| Action | Stamina |
+| --- | --- |
+| step from a place onto a road, or from a road into a place | 10 |
+| gather, start a hunt | the node's cost (5–25) |
+| craft, play music | 2 |
+| a steal / assassinate / kidnap attempt | 2 |
+| use an item | 0 |
+| a finished battle (win, loss or retreat) | 5 |
+| practise a skill or art | 30 |
+| a quest objective spot | 5 per ชั่วยาม it names (most 5; some 10 or 20) |
+| buy, sell, equip, level up, talk, start a spar | 0 |
+
+**Regeneration.** Out of battle, stamina refills on its own in 6 ชั่วยาม (30 real minutes) and HP / MP in 12 (one real hour), whether or not the game is open. Back after a day or more away, a toast and the log say how many days passed (ระหว่างที่ท่านไม่อยู่ ผ่านไป N วัน).
 
 Night falls from about the 8th ชั่วยาม. It only changes the lighting, the sundial and the music.
 
 ### Resting
 
-The พัก button offers what the place allows. A rest restores stamina, HP and MP by the same fraction of their maximum; sleeping at home or at your own sect takes 4 ชั่วยาม (`REST_HOME_HOURS`), every other rest 12:
+The พัก button offers what the place allows. A rest restores stamina, HP and MP **at once** by the same fraction of their maximum. A free rest is ready again 2 ชั่วยาม (10 real minutes) later (`REST_COOLDOWN_HOURS`; พัก says how long is left); an inn room any time:
 
 | Where | Choice | Cost | Restores |
 | --- | --- | --- | --- |
-| your own home (`home_player`), the only choice there | 🛏 นอนพักที่บ้าน | free | 100 %, in 4 ชั่วยาม |
-| your own sect's grounds while an active disciple (`ownSectAt`), the only choice there | 🏯 นอนพักที่สำนัก | free | 100 %, in 4 ชั่วยาม |
+| your own home (`home_player`), the only choice there | 🛏 นอนพักที่บ้าน | free | 100 % |
+| your own sect's grounds while an active disciple (`ownSectAt`), the only choice there | 🏯 นอนพักที่สำนัก | free | 100 % |
 | cities (`city_*`) and inns (`inn_*`) | 🍵 พักโรงเตี๊ยม | 300 gold | 100 % |
 | temples and palaces | 🏛 พักที่วัด / พักในลานวัง | free | 50 % |
 | anywhere else, including the above | 🌿 พักริมทาง | free | 25 % |
 
-There is no passive regeneration. HP and MP carry from fight to fight. Other ways to recover:
+Besides the slow regeneration above, HP and MP carry from fight to fight. Other ways to recover:
 
 - healing items;
 - jail meditation;
@@ -137,7 +142,7 @@ There is no passive regeneration. HP and MP carry from fight to fight. Other way
 
 - **Exits.** Each location map has exits (signs with an arrow) on the side facing where the road goes: a place to the east is reached by the right-hand edge. Taking one puts you on the road (a painted route map, or a plain card for a few old roads), where you pick a destination or turn back.
 - **Directions.** The road runs the way you left: leave by the right edge and you walk from left to right along it, then arrive on the left side of the next place, beside the exit back.
-- **Cost.** A full hop from place to place costs 20 stamina and 3 ชั่วยาม, and trains AGI (see [Stats](#stats)).
+- **Cost.** A full hop from place to place costs 20 stamina, and trains AGI (see [Stats](#stats)).
 - **Tired.** Below 10 stamina, exits are disabled until you rest.
 - **Free warps.** Story warps (a dialog that sends you somewhere) and "ปิด" back to the last place are free.
 - **The map.** 102 locations and 129 two-way roads; see [reference/locations.md](reference/locations.md).
@@ -148,7 +153,7 @@ There is no passive regeneration. HP and MP carry from fight to fight. Other way
 Every city, village and the grounds of the 15 joinable sects have a horse station (a horseshoe marker on the map). From one, you can ride to any other station place you have **visited before**:
 
 - **Fare:** 20 gold + 0.2 gold per world-map unit (the capital → ฉางอัน is 65 gold; across the map a few hundred).
-- **Time:** 1 ชั่วยาม per 120 units (at least 1) — far quicker than walking the roads, with no stamina cost and no encounters on the way.
+- **Time:** none — you arrive at once, with no stamina cost and no encounters on the way.
 - Roaming foes on the map you leave are gone when you arrive.
 
 Code: `lib/world/stations.ts`; the store's `stationTravel`.
@@ -225,7 +230,7 @@ The wilds talk about each one (a lore rumor names its lair). A win pays 3,000–
 
 | Fight | If you lose |
 | --- | --- |
-| random encounters, sect hunters, hunting, failed assassination or kidnapping | **you fall**: carried home, you wake a day later with 30 % HP / MP, minus half your gold and half the stack of 1–3 random carried item kinds (quest items, scrolls, manuals, books and worn gear are kept) |
+| random encounters, sect hunters, hunting, failed assassination or kidnapping | **you fall**: carried home, you wake at once with 30 % HP / MP, minus half your gold and half the stack of 1–3 random carried item kinds (quest items, scrolls, manuals, books and worn gear are kept) |
 | spars, the capital duel, a failed steal, the law | you survive with at least 1 HP (the law takes you to jail) |
 
 ## Battles
@@ -247,7 +252,7 @@ Battles are turn-based tactics on a board of 10 × 7 tiles, growing to 15 × 10 
   - a kill counted for every fallen foe, companions included.
 
   The result panel shows the spoils as icons before you go on (gold, w-exp, each item, each move's xp); tap one to read it.
-- **Every finished battle** costs 5 stamina and 0.5 ชั่วยาม.
+- **Every finished battle** costs 5 stamina.
 
 ## NPCs
 
@@ -383,7 +388,7 @@ Sect styles are never sold in city halls; you learn them by rank inside the sect
 - **Professions.** The six craft professions are forge, alchemy, tailoring, chef, jewelry and accessory.
 - **Recipes.** Basic recipes cost 80 gold at any artisan of the profession. Specialties are sold only by certain cities' artisans.
 - **What you need.** The recipe learned, the inputs in the bag, the mastery level, and an artisan of that profession here.
-- **Cost.** 0.2 ชั่วยาม and no stamina. The inputs are always used up.
+- **Cost.** 2 stamina. The inputs are always used up.
 
 Full lists: [reference/items-and-crafting.md](reference/items-and-crafting.md).
 
@@ -398,7 +403,7 @@ There are 19 life skills:
 
 Mastery levels 1–5 need 0 / 100 / 300 / 700 / 1500 xp.
 
-**Gathering spots** sit on maps as signs (mine, tree, fishing spot, herbs, venom, chess table, begging corner). Every one of the 25 resource nodes is on at least one map: the Tang clan and the Five Venoms have viper and scorpion venom at home, the medicine king's villa rare herbs and centipedes, villages a rock pile, mines silver beside iron and the high peaks gold ([reference/locations.md](reference/locations.md)). One try costs the node's stamina and 0.2 ชั่วยาม:
+**Gathering spots** sit on maps as signs (mine, tree, fishing spot, herbs, venom, chess table, begging corner). Every one of the 25 resource nodes is on at least one map: the Tang clan and the Five Venoms have viper and scorpion venom at home, the medicine king's villa rare herbs and centipedes, villages a rock pile, mines silver beside iron and the high peaks gold ([reference/locations.md](reference/locations.md)). One try costs the node's stamina:
 
 - **Success chance:** `55 % + 15 % × (mastery − node level)`, between 10 % and 95 %.
 - **Success:** 1–3 picks from the node, more when your mastery exceeds its level; chess and begging also pay gold.
@@ -448,7 +453,7 @@ Where the xp comes from:
 Practice:
 
 - **Where:** only at sect grounds, mountains, caves, rivers and temples (49 places).
-- **Cost:** 30 stamina and 6 ชั่วยาม; it also pays 5 w-exp.
+- **Cost:** 30 stamina; it also pays 5 w-exp.
 - **Xp per session:** 30 + 5 % of what the skill or art needs for its next level (`practiceXpGain`), so higher levels still move at a steady pace; a maxed skill gets the flat part only.
 - **Fitting place (50 + 6 %)** for a matching skill type:
   - caves: yin / soft;
@@ -576,7 +581,7 @@ The profile shows the name the jianghu gives you, read off your record each time
 
 ## Bad actions
 
-From an NPC's card; every attempt takes 0.2 ชั่วยาม and uses base stats:
+From an NPC's card; every attempt costs 2 stamina and uses base stats:
 
 | | Steal (ขโมย) | Assassinate (ลอบทำร้าย) | Kidnap (ลักพาตัว) |
 | --- | --- | --- | --- |
@@ -593,18 +598,20 @@ Chances are clamped to 5–95 %. Formulas: [world-engine.md](world-engine.md#bad
 - **Pursuers.** While wanted, walk ticks can bring the law (13–45 %, +1 % per escape, at most 55 %): a constable at 1 mark, then imperial guards and a bounty hunter (with a constable) as marks grow. **Every time you slip the law** — flee, win, bribe, break out — the **Brocade Guard (องครักษ์เสื้อแพร)** grows keener: from 3 escapes (or 4 marks) Brocade agents (T3, with a constable), from 4–7 a Brocade captain (T4, with two agents), and after 8 escapes with 5+ marks **their commander in person** — whoever holds the Jinyiwei seat. A sentence served clears the count. Fleeing uses the AGI + LUK check.
 - **Upright people turn you in.** From 2 marks, a walk tick may bring an ambush (3–20 %): a righteous member of the living jianghu (a master, a wanderer, a disciple — power 30+, in your region) attacks to hand you over. No fleeing; lose and you are arrested; win and they limp off wounded.
 - **Law fights** are not fatal. Win and you walk on (the marks stay); lose and you are taken to a cell, where you either:
-  - **accept arrest** — the sentence is read (คำพิพากษา): 2 days per mark (up to 30), a **fine** of 50 gold per mark; from 5 marks **property is seized** (a third of the gold left and half of one or two carried goods); from 10 marks **your martial arts are crippled** (the best move or art loses 2 levels — one more per 5 marks, up to 4). Then the **jail map**, and the marks are cleared; or
+  - **accept arrest** — the sentence is read (คำพิพากษา): 1 ชั่วยาม (5 real minutes) per mark (up to 12 — one real hour), served on the world clock, a **fine** of 50 gold per mark; from 5 marks **property is seized** (a third of the gold left and half of one or two carried goods); from 10 marks **your martial arts are crippled** (the best move or art loses 2 levels — one more per 5 marks, up to 4). Then the **jail map**, and the marks are cleared; or
   - **bribe** — 300 gold, plus 150 per mark beyond two: you walk free with two marks removed (and the law remembers).
 - **มอบตัว (give yourself up).** Tap the wanted chip at the top of the screen: you are taken straight to the cells with **half the sentence and half the fine, no seizure**, and one fewer crippled move.
 - **The jail** has no exits:
 
-| Spot | Time | Stamina | Effect |
-| --- | --- | --- | --- |
-| ทุบหิน (labour) | 6 | 25 | the sentence drops 12 ชั่วยาม in all; STR xp +20 |
-| ทอยเต๋า (dice) | 2 | 5 | bet 10 gold; win `min(60 %, 40 % + LUK/2 %)` |
-| นั่งสมาธิ (meditate) | 6 | 0 | MP full, HP +20 %, stamina +15, **w-exp +40** |
-| แหกคุก (escape) | 2 | 30 | `min(55 %, 20 % + AGI/2 %)`: free with +2 marks; failure adds a day |
-| ประตูคุก (gate) | — | — | open when the time is served; before that, offers to sit out the rest at once |
+The sentence runs on the world clock; nothing skips it. Every spot is instant:
+
+| Spot | Stamina | Effect |
+| --- | --- | --- |
+| ทุบหิน (labour) | 25 | the sentence drops 2 ชั่วยาม (10 real minutes); STR xp +20 |
+| ทอยเต๋า (dice) | 5 | bet 10 gold; win `min(60 %, 40 % + LUK/2 %)` |
+| นั่งสมาธิ (meditate) | 0 | once per 3 ชั่วยาม (15 real minutes): MP full, HP +20 %, stamina +15, **w-exp +40** |
+| แหกคุก (escape) | 30 | `min(55 %, 20 % + AGI/2 %)`: free with +2 marks; failure adds 2 ชั่วยาม |
+| ประตูคุก (gate) | — | opens once the time is served; before that it says how long is left (the HUD counts it down) |
 
 - **People.** ตาเฒ่าหลิว gives tips; ผู้คุมจาง takes the 300-gold bribe.
 - **Release.** You are released in the region's city (นครหลวง, ต้าหลี่, ซีเซี่ย, ซูโจว or ฉางอัน) with HP and MP at least 60 %.

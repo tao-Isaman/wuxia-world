@@ -2,6 +2,9 @@ import assert from "node:assert/strict";
 import { NPCS_SPIES } from "../lib/world/data/npcs/spies";
 import { evaluateCondition, getScene } from "../lib/world";
 import type { DialogScene } from "../lib/world";
+import { setTestClock } from "../lib/world/clock";
+// The world clock stands still here, so time never moves between two snapshots.
+setTestClock(Date.now());
 
 const memory = new Map<string, string>();
 Object.defineProperty(globalThis, "localStorage", { configurable: true, value: {
@@ -21,7 +24,7 @@ let previewCount = 0;
 try {
   for (const npc of NPCS_SPIES) {
     Math.random = () => 0.5;
-    useWorldStore.getState().startNewGame({ name: "Greeting exit test" });
+    useWorldStore.getState().startNewGame({ newWorld: true, name: "Greeting exit test" });
     const location = npc.locationIds[0];
     useWorldStore.getState().gotoScene(location);
     useWorldStore.getState().gotoScene(npc.dialogSceneId!);

@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import { evaluateCondition, getItem, getNpc, getOpponent, getQuest, getResource, getScene, getShopAt, isQuestOfferable } from "../lib/world";
 import type { DialogScene } from "../lib/world";
+import { setTestClock } from "../lib/world/clock";
+// The world clock stands still here, so time never moves between two snapshots.
+setTestClock(Date.now());
 
 const memory = new Map<string, string>();
 Object.defineProperty(globalThis, "localStorage", { configurable: true, value: {
@@ -33,7 +36,7 @@ function progression() {
 try {
   for (const questId of [null, "qc_capital_clinic_supplies", "qc_capital_rare_herb"]) {
     Math.random = () => 0.5;
-    useWorldStore.getState().startNewGame({ name: "Lin conversation test" });
+    useWorldStore.getState().startNewGame({ newWorld: true, name: "Lin conversation test" });
     useWorldStore.getState().gotoScene("route_home_player__to__city_capital");
     useWorldStore.getState().travelRoute("city_capital");
     if (questId) assert.equal(useWorldStore.getState().acceptQuest(questId).ok, true);
@@ -79,7 +82,7 @@ try {
   const clinic = "qc_capital_clinic_supplies";
   for (const questId of [null, clinic, "qc_capital_royal_pardon"]) {
     Math.random = () => 0.5;
-    useWorldStore.getState().startNewGame({ name: "Wu conversation test" });
+    useWorldStore.getState().startNewGame({ newWorld: true, name: "Wu conversation test" });
     useWorldStore.getState().gotoScene("route_home_player__to__city_capital");
     useWorldStore.getState().travelRoute("city_capital");
     if (questId) assert.equal(useWorldStore.getState().acceptQuest(questId).ok, true);

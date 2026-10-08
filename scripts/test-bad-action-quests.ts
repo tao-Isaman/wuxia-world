@@ -33,7 +33,7 @@ for (const q of QUESTS) {
         `${q.id} stage ${i}: ${npcId} stands on a map where the hero can open their card`);
 
       store().resetGame();
-      store().startNewGame({ name: "ทดสอบ" });
+      store().startNewGame({ newWorld: true, name: "ทดสอบ" });
       useWorldStore.setState({ quests: { [q.id]: { id: q.id, status: "active", stage: i } } });
       assert.ok(badActionOffered(store(), npc, kind), `${q.id} stage ${i}: the card of ${npcId} offers ${kind}`);
 

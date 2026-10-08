@@ -2,6 +2,7 @@
 //   bun run test:systems
 import assert from "node:assert/strict";
 import { getSkill } from "../lib/game";
+import { advanceTestClock, msAtWorld, setTestClock, setTestWorldTime } from "../lib/world/clock";
 import { xpToNextLevel } from "../lib/game/leveling";
 import { PRACTICE_XP, practiceXpGain } from "../lib/world/location-categories";
 import { LETTER_RULES, giftRarity, letterChance, letterWriters, pickLetterGift, rollLetters } from "../lib/world/letters";
@@ -27,7 +28,7 @@ function seeded(seed: number) { return () => { seed = (seed * 16807) % 214748364
 const store = () => useWorldStore.getState();
 function newGame() {
   store().resetGame();
-  store().startNewGame({ name: "ทดสอบ", gender: "male" } as never);
+  store().startNewGame({ newWorld: true, name: "ทดสอบ", gender: "male" } as never);
 }
 
 // ─── Practice xp ─────────────────────────────────────────────────────
@@ -121,9 +122,10 @@ check("letters: time passing in the store delivers letters from friends", () => 
   useWorldStore.setState({ npcStates: { [npcId]: { met: true, relationship: 500 } }, traits: { ...store().traits, fame: 500 } });
   const random = Math.random;
   Math.random = seeded(9);
+  setTestClock(msAtWorld(store().day, store().time));
   const day = store().day;
-  try { for (let i = 0; i < 30; i++) { useWorldStore.setState({ gold: 10_000 }); store().rest("inn"); } } finally { Math.random = random; }
-  assert.ok(store().day > day + 10, `rested ${store().day - day} days`);
+  try { for (let i = 0; i < 30; i++) { advanceTestClock(12); store().syncClock(); } } finally { Math.random = random; setTestClock(null); }
+  assert.equal(store().day, day + 30, "a month of the world clock");
   assert.ok(store().letters.length > 0, "a friend wrote within a month");
 });
 
@@ -144,7 +146,7 @@ check("stations: fares grow with distance; only visited station places are offer
   assert.deepEqual(stationTrips({ visitedLocationIds: ["city_xixia"] }, "cave_bingcan"), [], "no station here");
 });
 
-check("stations: riding pays the fare, passes time and arrives", () => {
+check("stations: riding pays the fare and arrives at once", () => {
   newGame();
   useWorldStore.setState({ currentSceneId: "city_capital", visitedLocationIds: ["city_capital", "city_xixia"], gold: 1000 });
   const fare = stationFare("city_capital", "city_xixia");
@@ -152,7 +154,7 @@ check("stations: riding pays the fare, passes time and arrives", () => {
   assert.ok(store().stationTravel("city_xixia").ok);
   assert.equal(store().currentSceneId, "city_xixia");
   assert.equal(store().gold, 1000 - fare.gold);
-  assert.ok(store().day * 12 + store().time >= day * 12 + time + fare.hours - 0.01);
+  assert.ok(store().day * 12 + store().time < day * 12 + time + 0.5, "no time of its own: the world clock runs on");
   useWorldStore.setState({ gold: 0 });
   assert.equal(store().stationTravel("city_capital").reason, "gold");
 });
@@ -265,7 +267,7 @@ check("tournament: a year without the hero is fought among the NPCs; a skipped r
 });
 
 check("letters: deleting one first takes a gift not yet claimed; read ones go in one sweep", () => {
-  store().startNewGame({ name: "ผู้ทดสอบ", gender: "female" } as never);
+  store().startNewGame({ newWorld: true, name: "ผู้ทดสอบ", gender: "female" } as never);
   const before = store().inventory.potion ?? 0;
   useWorldStore.setState({ letters: [
     { id: "keep_gift", day: 1, npcId: "sect_shaolin_abbot_huiyuan", text: "x", rarity: 2, itemId: "potion", count: 2, read: false, claimed: false },
@@ -329,10 +331,13 @@ check("tournament: the day registration opens, Huashan's chief sends an invitati
   assert.ok(letter.text.includes(TOURNAMENT_NAME) && letter.text.includes("หัวซาน"));
   assert.equal(sendTournamentInvitation(draft, 59), null, "once a year");
   assert.equal(draft.letters.length, before + 1);
-  // Through the store: a night's rest that crosses day 60 delivers it to the inbox.
+  // Through the store: the world clock crossing into day 60 delivers it to the inbox.
+  setTestWorldTime(59, 11);
   newGame();
   useWorldStore.setState({ day: 59, time: 11, letters: [], currentSceneId: "village_noname", lastLocationId: "village_noname" });
-  assert.equal(store().rest("route").ok, true);
+  setTestWorldTime(60, 1);
+  store().syncClock();
+  setTestClock(null);
   assert.ok(store().day >= 60);
   assert.ok(store().letters.some((l) => l.id === "letter_invite_1" && l.gold === TOURNAMENT.fee));
   assert.ok(store().actionLog.some((e) => e.message.includes("จดหมายเชิญ")));

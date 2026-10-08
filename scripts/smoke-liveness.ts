@@ -71,6 +71,8 @@ function freshState(): WorldStateData {
     lawEvasions: 0,
     jailCityId: null,
     jailUntil: null,
+    worldSeed: 1,
+    worldEventLog: [],
   };
 }
 

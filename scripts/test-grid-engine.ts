@@ -321,7 +321,7 @@ function runBattle(s: GridBattleState): number {
   return turns;
 }
 
-useWorldStore.getState().startNewGame({ name: "ทดสอบ", gender: "male" } as never);
+useWorldStore.getState().startNewGame({ newWorld: true, name: "ทดสอบ", gender: "male" } as never);
 const hero = useWorldStore.getState().playerBuild!;
 assert.ok(hero, "startNewGame gives a player build");
 

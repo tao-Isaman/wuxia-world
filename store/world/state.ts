@@ -76,6 +76,8 @@ export const emptyData = (): WorldStateData => ({
   tournamentHistory: [],
   activityDays: {},
   bossDefeatedDay: {},
+  worldSeed: 0,
+  worldEventLog: [],
   day: 1,
   time: 0,
   pendingBattle: null,
@@ -112,8 +114,28 @@ export function appendActionLog(state: WorldStateData, kind: string, message: st
   state.actionLog = next;
 }
 
-// Shallow-clone the data fields so the persisted slice picks up the change.
+// Every action starts on the world clock: draftFrom brings its copy up to
+// the real time (syncClock in ./lifecycle, which registers itself here so
+// this module needs no import of it).
+let onDraft: ((draft: WorldStateData) => void) | null = null;
+export function setDraftClock(fn: (draft: WorldStateData) => void): void {
+  onDraft = fn;
+}
+
+/** Who did it, for world events and the news (the hero's name; a player id once online). */
+export function heroTag(state: WorldStateData): string {
+  return state.playerBuild?.name ?? "player";
+}
+
+// Shallow-clone the data fields so the persisted slice picks up the change,
+// then sync the copy to the world clock.
 export function draftFrom(s: WorldStateData): WorldStateData {
+  const draft = copyData(s);
+  onDraft?.(draft);
+  return draft;
+}
+
+function copyData(s: WorldStateData): WorldStateData {
   return {
     hasGame: s.hasGame,
     playerBuild: s.playerBuild,
@@ -151,6 +173,8 @@ export function draftFrom(s: WorldStateData): WorldStateData {
     tournamentHistory: [...s.tournamentHistory],
     activityDays: { ...s.activityDays },
     bossDefeatedDay: { ...(s.bossDefeatedDay ?? {}) },
+    worldSeed: s.worldSeed ?? 0,
+    worldEventLog: s.worldEventLog ?? [],
     day: s.day,
     time: s.time,
     pendingBattle: s.pendingBattle,

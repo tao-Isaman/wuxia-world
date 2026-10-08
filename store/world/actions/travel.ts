@@ -2,7 +2,6 @@
 import { hasStation, stationTrips } from "@/lib/world/stations";
 import { applyEffects, getScene } from "@/lib/world";
 import { evaluateCondition } from "@/lib/world/conditions";
-import { advanceTime } from "../lifecycle";
 import { canAffordTravelTo, chargeTravelIfNeeded, followAutoAdvance, jailBlocks, takeChoice } from "../navigation";
 import { appendActionLog, draftFrom } from "../state";
 import type { WorldGet, WorldSet, WorldStore } from "../types";
@@ -77,7 +76,6 @@ export const travelActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "m
     if (s.gold < trip.gold) return { ok: false, reason: "gold" };
     const draft = draftFrom(s);
     draft.gold -= trip.gold;
-    advanceTime(draft, trip.hours);
     appendActionLog(draft, "travel", `ขี่ม้าจากสถานีพักม้าไป${(getScene(to) as { name?: string } | null)?.name ?? to} · ${trip.gold} ตำลึง`);
     draft.currentSceneId = to;
     const sc = getScene(to);

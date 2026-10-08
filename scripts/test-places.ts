@@ -166,7 +166,7 @@ check("gift worth and taste: liked doubles, a favourite is a delight, disliked c
 });
 
 check("store: a gift raises trust once a month; gold works; absent NPCs take nothing", () => {
-  useWorldStore.getState().startNewGame({ name: "ทดสอบ", gender: "male" } as never);
+  useWorldStore.getState().startNewGame({ newWorld: true, name: "ทดสอบ", gender: "male" } as never);
   const npc = PLACE_NPCS.find((n) => n.likes?.includes("gold")) ?? NPCS[0];
   useWorldStore.setState({ gold: 10000 });
   const first = useWorldStore.getState().giveGift(npc.id, { gold: 1000 });
@@ -189,7 +189,7 @@ check("store: a gift raises trust once a month; gold works; absent NPCs take not
 check("store: a place activity pays out once per cooldown, only at its place", () => {
   const act = PLACE_ACTIVITY_DEFS.find((a) => !a.place!.costGold && (a.place!.cooldownDays ?? 0) > 0);
   assert.ok(act, "an activity with a cooldown");
-  useWorldStore.getState().startNewGame({ name: "ทดสอบ", gender: "male" } as never);
+  useWorldStore.getState().startNewGame({ newWorld: true, name: "ทดสอบ", gender: "male" } as never);
   useWorldStore.setState({ currentSceneId: "city_capital" === act.place!.locationIds[0] ? "village_noname" : "city_capital" });
   const away = useWorldStore.getState().doActivity(act.id);
   assert.ok(!away.ok && away.reason === "not-here");

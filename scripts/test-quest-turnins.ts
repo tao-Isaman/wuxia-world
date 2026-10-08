@@ -52,7 +52,7 @@ function handIn(def: QuestDef): void {
 }
 
 for (const def of counted) {
-  store().startNewGame({ name: "ผู้ทดสอบ", gender: def.id.includes("emei") ? "female" : "male" } as never);
+  store().startNewGame({ newWorld: true, name: "ผู้ทดสอบ", gender: def.id.includes("emei") ? "female" : "male" } as never);
   const wants = def.stages.map((stage) => stage.autoAdvance ? needs(stage.autoAdvance) : null);
   const lastIndex = def.stages.length - 1;
   // Only quests whose counted stages are items / kills and whose other stages
@@ -104,7 +104,7 @@ for (const def of counted) {
 }
 
 // The quest log and the evaluator agree on kill counts since accepting.
-store().startNewGame({ name: "ผู้ทดสอบ", gender: "male" } as never);
+store().startNewGame({ newWorld: true, name: "ผู้ทดสอบ", gender: "male" } as never);
 useWorldStore.setState({ defeatedCounts: { bandit_thug: 7 } });
 const killQuest = counted.find((q) => q.stages[0].autoAdvance?.t === "defeatedOpponent");
 if (killQuest) {

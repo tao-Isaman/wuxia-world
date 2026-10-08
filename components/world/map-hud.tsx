@@ -14,7 +14,7 @@ async function offerSurrender() {
     title: "⛓ มอบตัวต่อทางการ",
     message: [
       `หมายจับ ${wanted} · เดินเข้าไปมอบตัวที่ทางการ ถูกคุมตัวเข้าคุกทันที`,
-      `โทษจำคุก ${p.days} วัน · ค่าปรับ ${p.fine.toLocaleString()} ตำลึง (มอบตัวลดโทษกึ่งหนึ่ง ไม่ริบทรัพย์)`,
+      `โทษจำคุก ${describeSentence(p.hours)} · ค่าปรับ ${p.fine.toLocaleString()} ตำลึง (มอบตัวลดโทษกึ่งหนึ่ง ไม่ริบทรัพย์)`,
       p.cripple ? `คดีหนัก: วรยุทธ ${p.cripple} อย่างจะถูกทำลายลง 2 ระดับ` : "",
       "พ้นโทษแล้วหมายจับจะถูกล้าง",
     ].filter(Boolean).join("\n"),

@@ -6,6 +6,15 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-08
 
+### The world clock and the shared world (a step toward online)
+
+- **Time is a world clock:** one game day is one real hour (a ชั่วยาม five real minutes), from day 1 at 2026-10-08 00:00 Bangkok time (`lib/world/clock.ts`). The world moves on while the game is closed; the sundial and day move by themselves (`WorldClock`, every 10 s); back after a day or more, a toast and a log line say how long. `advanceTime` is gone: no action moves time (`syncClock` brings every draft to the clock).
+- **Actions are instant** and cost stamina instead (`staminaForHours`: 5 a ชั่วยาม they used to take, at least 2): crafting, music and bad-action attempts 2, objective spots 5 per ชั่วยาม; travel, fights, gathering and practice keep their stamina prices; horse rides arrive at once; death wakes the hero at home at once. Stamina refills on its own in 6 ชั่วยาม (30 min), HP / MP in 12 (1 h). Free rests restore at once, then wait 2 ชั่วยาม (10 min); an inn room any time.
+- **Jail in real time:** 1 ชั่วยาม (5 min) per mark, at most 12 (1 h); the gate opens once served (the HUD counts down); labour takes 10 min off, a failed escape adds 10 min, meditation once per 15 min.
+- **The shared world:** NPC lives and deaths, rumors, the killed and kidnapped, the legendary beasts and the tournament are the world's (`lib/world/shared/`), saved apart from the player (`wusia-shared-v1`) by a `WorldService`. Player changes to it are `WorldEvent`s through one pure reducer (`emitWorldEvent`); the NPC week is seeded by the world (`seededRng(worldSeed, day)`), so one world gives the same weeks on any machine. A new hero joins the world as it is — the dead stay dead.
+- **Save v27:** older saves are shifted onto the world clock (`rebaseDays`); the shared fields leave the save.
+- Tests: new `test:clock`; script suites pin the clock (`setTestClock` / `setTestWorldTime`) and start each new game in a fresh world (`newWorld: true`). Design: [design/world-clock-and-shared-world.md](design/world-clock-and-shared-world.md).
+
 ### Boss art redone
 
 - **The six bosses' sheets** were re-rolled where they were weak: the eagle has a new design standing on its talons (no rock) and a side-on attack; the turtle's sun keeps its colour, its fire burst stays in the frame and its hurt clip pulls the head under the shell (hand-animated); the crab's pincer strike has no white X; the tiger, bull and serpent have hurt clips that clearly recoil.

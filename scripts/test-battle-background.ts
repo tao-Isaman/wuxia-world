@@ -46,7 +46,7 @@ console.log("PASS pure background routing: exact training ID, exact capital anch
 const random = Math.random;
 try {
   Math.random = () => 0.5;
-  useWorldStore.getState().startNewGame({ name: "Battle origin test" });
+  useWorldStore.getState().startNewGame({ newWorld: true, name: "Battle origin test" });
   useWorldStore.getState().gotoScene("route_home_player__to__city_capital");
   assert.equal(useWorldStore.getState().pendingEncounter, null, "the road scene itself has no random arrival roll");
   // Arrival itself never rolls; a foe met while walking in the city does. No saved origin
@@ -67,13 +67,13 @@ try {
   useWorldStore.getState().acceptEncounter();
   assert.equal(resolveBattleBackground({ ...useWorldStore.getState(), mode: "world" }).id, "capital-street");
   const saved = JSON.parse(memory.get("wusia-world-v1")!);
-  assert.equal(saved.version, 26);
+  assert.equal(saved.version, 27);
   assert.equal(resolveBattleBackground({ ...saved.state, mode: "world" }).id, "capital-street", "existing serialized world fields retain the honest city origin");
   await useWorldStore.persist.rehydrate();
   assert.equal(resolveBattleBackground({ ...useWorldStore.getState(), mode: "world" }).id, "capital-street");
 
   Math.random = () => 0.5;
-  useWorldStore.getState().startNewGame({ name: "Training background test" });
+  useWorldStore.getState().startNewGame({ newWorld: true, name: "Training background test" });
   useWorldStore.getState().gotoScene("route_home_player__to__city_capital");
   useWorldStore.getState().travelRoute("city_capital");
   useWorldStore.getState().gotoScene(CAPITAL_TRAINING_SCENE_ID);

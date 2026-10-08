@@ -2,6 +2,9 @@ import assert from "node:assert/strict";
 import { clinicPreparation } from "../lib/world/clinic-preparation";
 import { CAPITAL_TRAINING_OPPONENT, CAPITAL_TRAINING_OPPONENT_ID } from "../lib/world/data/capital-training";
 import { deriveAll } from "../lib/game";
+import { setTestClock } from "../lib/world/clock";
+// The world clock stands still here, so time never moves between two snapshots.
+setTestClock(Date.now());
 
 const playerBuild = CAPITAL_TRAINING_OPPONENT.build();
 const derived = deriveAll(playerBuild);

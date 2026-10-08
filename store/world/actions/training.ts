@@ -1,7 +1,6 @@
 // Moves and meridians: w-exp level-ups, forgetting, practice, slots and meridian points.
 import { ART_LEVEL_MAX, effectiveTypes, encodeArtSlot, getArt, getSkill, parseSlotId, SKILL_LEVEL_MAX, xpToNextArtLevel, xpToNextLevel, checkOpenMeridianNode, getMeridianChart } from "@/lib/game";
 import { canPracticeAt, getScene, practiceMatches, practiceXpGain } from "@/lib/world";
-import { advanceTime } from "../lifecycle";
 import { applyArtLevelUps, applySkillLevelUps, grantMeridianPoints, syncPlayerSkillLevels } from "../progression";
 import { PRACTICE_HOURS, PRACTICE_STAMINA_COST, W_EXP_PRACTICE } from "../rules";
 import { appendActionLog, draftFrom } from "../state";
@@ -187,7 +186,6 @@ export const trainingActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, 
 
     const draft = draftFrom(s);
     draft.stamina = Math.max(0, draft.stamina - PRACTICE_STAMINA_COST);
-    advanceTime(draft, PRACTICE_HOURS);
     draft.wExp += W_EXP_PRACTICE;
 
     if (info.kind === "skill") {

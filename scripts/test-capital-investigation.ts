@@ -4,6 +4,9 @@ import { LOCATION_MAPS } from "../lib/world/data/location-maps";
 import { planWorldPath, worldFootprints, worldPointBlocked, worldSegmentClear } from "../lib/stage/world-navigation";
 import { observeQuestReceipts, type QuestReceipt } from "../components/world/quest-completion-receipt-data";
 import type { DialogScene, WorldStateData } from "../lib/world/types";
+import { setTestClock } from "../lib/world/clock";
+// The world clock stands still here, so time never moves between two snapshots.
+setTestClock(Date.now());
 
 const memory = new Map<string, string>();
 Object.defineProperty(globalThis, "localStorage", { configurable: true, value: {
@@ -51,7 +54,7 @@ function resources() {
 }
 function newCapital() {
   Math.random = () => 0.5;
-  useWorldStore.getState().startNewGame({ name: "Capital investigation test" });
+  useWorldStore.getState().startNewGame({ newWorld: true, name: "Capital investigation test" });
   useWorldStore.getState().gotoScene("route_home_player__to__city_capital");
   useWorldStore.getState().travelRoute("city_capital");
   assert.equal(useWorldStore.getState().currentSceneId, "city_capital");
@@ -132,7 +135,7 @@ try {
   assert.equal(visible(chest, borrow), false, "no repeat loan while holding a key");
   const midQuest = clone(useWorldStore.getState());
   const stored = JSON.parse(memory.get("wusia-world-v1")!);
-  assert.equal(stored.version, 26);
+  assert.equal(stored.version, 27);
   await useWorldStore.persist.rehydrate();
   assert.deepEqual(useWorldStore.getState().quests, midQuest.quests);
   assert.deepEqual(useWorldStore.getState().inventory, midQuest.inventory);

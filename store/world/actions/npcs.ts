@@ -6,10 +6,11 @@ import { KIDNAP_RETURN_DAYS, npcPresent } from "@/lib/world/npc-presence";
 import { GIFT_REACTION_LINE, giftOutcome, giftWaitDays, giftable } from "@/lib/world/gifts";
 import { npcFoeFor, npcIsDead, npcPower, powerTier } from "@/lib/world/npc-life";
 import { ASSASSINATE_TRAIT_EVIL, KIDNAP_TRAIT_EVIL, STEAL_TRAIT_EVIL, STEAL_XP_ON_FAIL, STEAL_XP_ON_PASS, TIER_TO_BAD_ACTION_OPPONENT, assassinateChance, badActionOffered, kidnapChance, stealChance } from "@/lib/world/bad-actions";
-import { advanceTime, heroKills } from "../lifecycle";
+import { heroKills, staminaForHours } from "../lifecycle";
 import { grantStatXp, rollLukXp } from "../progression";
 import { ACTION_HOURS, SPAR_LOSE_SCENE_ID, SPAR_WIN_SCENE_ID } from "../rules";
-import { appendActionLog, draftFrom } from "../state";
+import { appendActionLog, draftFrom, heroTag } from "../state";
+import { emitWorldEvent } from "@/lib/world/shared/events";
 import type { WorldGet, WorldSet, WorldStore } from "../types";
 
 export const npcsActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "meetNpc" | "startSparWith" | "startKillDuel" | "giveGift" | "attemptSteal" | "attemptAssassinate" | "attemptKidnap"> => ({
@@ -117,7 +118,7 @@ export const npcsActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "mee
     const chance = stealChance(s.playerBuild, npc, stealXp);
     const passed = Math.random() * 100 < chance;
     const draft = draftFrom(s);
-    advanceTime(draft, ACTION_HOURS);
+    draft.stamina = Math.max(0, draft.stamina - staminaForHours(ACTION_HOURS));
     if (passed) {
       // Pick 1–2 items from the steal pool, weighted.
       const picks = 1 + (Math.random() < 0.3 ? 1 : 0);
@@ -184,7 +185,7 @@ export const npcsActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "mee
     const chance = assassinateChance(s.playerBuild, npc);
     const passed = Math.random() * 100 < chance;
     const draft = draftFrom(s);
-    advanceTime(draft, ACTION_HOURS);
+    draft.stamina = Math.max(0, draft.stamina - staminaForHours(ACTION_HOURS));
     if (passed) {
       heroKills(draft, npcId);
       draft.traits.evil = (draft.traits.evil ?? 0) + ASSASSINATE_TRAIT_EVIL;
@@ -228,11 +229,10 @@ export const npcsActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "mee
     const chance = kidnapChance(s.playerBuild, npc);
     const passed = Math.random() * 100 < chance;
     const draft = draftFrom(s);
-    advanceTime(draft, ACTION_HOURS);
+    draft.stamina = Math.max(0, draft.stamina - staminaForHours(ACTION_HOURS));
     if (passed) {
-      draft.kidnappedNpcIds.push(npcId);
-      // Taken away now; back at their spot after KIDNAP_RETURN_DAYS.
-      draft.kidnappedUntil = { ...draft.kidnappedUntil, [npcId]: draft.day + KIDNAP_RETURN_DAYS };
+      // Taken away now (a shared-world event); back at their spot after KIDNAP_RETURN_DAYS.
+      emitWorldEvent(draft, { t: "npc_kidnapped", npcId, byPlayer: heroTag(draft), day: draft.day, until: draft.day + KIDNAP_RETURN_DAYS });
       draft.traits.evil = (draft.traits.evil ?? 0) + KIDNAP_TRAIT_EVIL;
       draft.traits.arrogance = (draft.traits.arrogance ?? 0) + 1;
       grantStatXp(draft, "STR", STAT_XP_PER_ACTION);

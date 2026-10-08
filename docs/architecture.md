@@ -125,13 +125,14 @@ Save format, migration and repair are in [save-format.md](save-format.md).
 | File | Holds |
 | --- | --- |
 | `types.ts` | `WorldStore` (state + every action's signature), the action result types, `WorldSet` / `WorldGet` |
-| `state.ts` | `emptyData`, the starter build, `draftFrom`, `appendActionLog` |
-| `rules.ts` | tuning constants (time and stamina costs, xp rates, rest prices) |
+| `state.ts` | `emptyData`, the starter build, `draftFrom` (brought to the world clock through `setDraftClock`), `appendActionLog` |
+| `rules.ts` | tuning constants (stamina costs, the old time costs they come from, xp rates, rest prices and cooldown) |
 | `progression.ts` | stat / skill / art xp and level-ups, the resigned-sect freeze, meridian points |
-| `lifecycle.ts` | `advanceTime`, death and waking at home, killings, `withChargesOfDead`, tournament bouts |
+| `lifecycle.ts` | `syncClock` (the world clock: time, regeneration, the NPC tick…), `staminaForHours`, death and waking at home, killings, `withChargesOfDead`, tournament bouts |
 | `navigation.ts` | travel costs, the jail lock, `takeChoice`, `followAutoAdvance` |
 | `spoils.ts` | victory spoils (rolled once per battle), loot and resource yields |
-| `persist.ts` | `partializeSave`, `migrateSave`, `mergeSave` |
+| `persist.ts` | `partializeSave` (the player only), `migrateSave` (v27: `rebaseDays`), `mergeSave` |
+| `shared-local.ts` | the shared world in this browser: `localWorldService` (`wusia-shared-v1`), `joinSharedWorld`, `attachSharedWorld` |
 | `actions/<slice>.ts` | the actions, one cohesive slice per file (`game`, `sects`, `travel`, `letters`, `tournament`, `battle`, `encounters`, `life`, `training`, `shops`, `law`, `npcs`, `quests`); each is `(set, get) => Pick<WorldStore, …>` and is spread into the store |
 
 A new action goes in its slice (and its signature in `types.ts`); `useWorldStore` and every action name stay the public API, and `store/world-store.ts` re-exports the constants and result types the UI imports.
@@ -142,7 +143,8 @@ A new action goes in its slice (and its signature in `types.ts`); `useWorldStore
 
   `draftFrom` copies one level deep only: nested records (a quest entry, a sect membership, an NPC's sim state) are shared with the previous state and mutated in place. Code that compares before and after must deep-copy first, as the quest subscription does.
 - **Action log.** `appendActionLog(state, kind, message)` records player-visible events (newest 100).
-- **Time.** Every action that spends time calls `advanceTime(state, hours)`. That also decays wanted marks, runs the weekly NPC tick, fails quests whose giver died, and maintains rumors.
+- **Time.** The world clock (`lib/world/clock.ts`, 1 game day = 1 real hour) sets the time; no action moves it. `draftFrom` runs `syncClock` on every draft, and `WorldClock` (`components/world/world-clock.tsx`) every 10 s: day / time, regeneration, wanted decay, the weekly NPC tick (seeded by `worldSeed`), quests whose giver died, rumors, and on a new day letters and the tournament.
+- **The shared world.** `SHARED_WORLD_KEYS` (`lib/world/shared/world.ts`) live on the state like any field but are saved apart by a `WorldService`; player actions change them through `emitWorldEvent` (`lib/world/shared/events.ts`). See [design/world-clock-and-shared-world.md](design/world-clock-and-shared-world.md).
 - **Quest progress.** A module-level subscription re-runs `tickQuestProgress` whenever `inventory` or `defeatedCounts` changes, so progress never waits for a scene change.
 - **Reading the store.** Components use selectors: `useWorldStore((s) => s.flags)`. `getState()` is for event handlers, store internals and the bridge — never for rendering.
 

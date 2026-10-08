@@ -22,7 +22,7 @@ function check(name: string, run: () => void) { run(); checks++; console.log(`PA
 /** Force-accept a quest as the NPC popup would, skipping its prereqs, then open the offer scene. */
 function acceptAtOffer(questId: string, location: string) {
   Math.random = () => 0.99; // never roll a roadside encounter
-  store().startNewGame({ name: "Dead-end test" });
+  store().startNewGame({ newWorld: true, name: "Dead-end test" });
   store().gotoScene(location);
   useWorldStore.setState((s) => ({ quests: { ...s.quests, [questId]: { id: questId, status: "active", stage: 0 } } }));
   store().gotoScene(`qs_${questId}_offer`);
@@ -73,7 +73,7 @@ check("Shaolin–Wudang joint quest: Qingxu's clue and the cave reach the guardi
 
 check("the foothill village and its first_steps quest are reachable from home", () => {
   Math.random = () => 0.99;
-  store().startNewGame({ name: "Village route test" });
+  store().startNewGame({ newWorld: true, name: "Village route test" });
   const home = getScene("home_player");
   assert.ok(home?.kind === "location" && home.routes.some((r) => r.routeSceneId === "route_home_player__to__village"));
   store().gotoScene("route_home_player__to__village");

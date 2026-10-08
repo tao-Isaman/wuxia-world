@@ -9,8 +9,11 @@ export const FAIL_XP_FRACTION = 0.5;           // failed drop checks still teach
 // Sentinel mastery used for recipes with no skill — always passes the gate.
 export const MAX_DUMMY_LEVEL = 99;
 
-// Game-time costs. `HOURS_PER_DAY` = 12 ชั่วยาม.
-export const HOURS_PER_DAY = 12;
+// Game time: 12 ชั่วยาม a day, on the world clock (lib/world/clock.ts, one
+// day = one real hour). Actions no longer take time; the `*_HOURS` numbers
+// below are what an action used to take and set its stamina price
+// (staminaForHours in ./lifecycle).
+export { HOURS_PER_DAY } from "@/lib/world/clock";
 // Stepping out of a location onto a road is the cheap half of a journey;
 // arriving at a destination from the road is the expensive half.
 export const LOC_TO_ROUTE_HOURS = 1;
@@ -22,10 +25,11 @@ export const TRAVEL_STAMINA_COST = 10;
 export const ACTION_HOURS = 0.2;
 export const FIGHT_HOURS = 0.5;
 export const FIGHT_STAMINA = 5;
-export const REST_HOURS = 12;
 // Sleeping in one's own bed (home_player) or at one's own sect (an active
-// disciple on its grounds): free, a full restore, 4 ชั่วยาม.
-export const REST_HOME_HOURS = 4;
+// disciple on its grounds): free and a full restore; a temple half, the
+// roadside a quarter. These free rests are ready again after
+// REST_COOLDOWN_HOURS ชั่วยาม (10 real minutes); an inn room (full) any time.
+export const REST_COOLDOWN_HOURS = 2;
 export const REST_INN_COST = 300;
 
 // Generic post-spar landing scenes — all sparring routes here on
@@ -71,5 +75,9 @@ export const ARTISAN_PROFESSIONS: ReadonlySet<LifeSkill> = new Set<LifeSkill>([
   "accessory",
 ]);
 
-/** w-exp from one session of jail meditation (6 ชั่วยาม). */
+/** w-exp from one session of jail meditation; one sitting per JAIL_MEDITATE_COOLDOWN ชั่วยาม. */
 export const JAIL_MEDITATE_WEXP = 40;
+export const JAIL_MEDITATE_COOLDOWN = 3;
+/** ชั่วยาม a stint of hard labour takes off the sentence; a failed escape adds JAIL_ESCAPE_PENALTY_HOURS. */
+export const JAIL_LABOR_HOURS = 2;
+export const JAIL_ESCAPE_PENALTY_HOURS = 2;

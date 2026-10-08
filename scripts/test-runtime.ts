@@ -11,6 +11,7 @@ import { stepTowards, clearMapPositions, getMapPosition, rememberMapPosition } f
 import type { RouteScene } from "../lib/world/types";
 import { makeContext, makeInitialState, resolveSkill } from "../lib/game/battle";
 import { checkWin } from "../lib/game/effects";
+import { advanceTestClock, setTestClock, setTestWorldTime } from "../lib/world/clock";
 
 const memory = new Map<string, string>();
 Object.defineProperty(globalThis, "localStorage", { configurable: true, value: {
@@ -20,7 +21,7 @@ Object.defineProperty(globalThis, "localStorage", { configurable: true, value: {
 } });
 Object.defineProperty(globalThis, "window", { configurable: true, value: { localStorage: globalThis.localStorage } });
 const { useBattleStore, isPlayerTurn } = await import("../store/battle-store");
-const { useWorldStore } = await import("../store/world-store");
+const { useWorldStore, REST_COOLDOWN_HOURS } = await import("../store/world-store");
 const { SCENES_BY_ID } = await import("../lib/world/data/scenes");
 
 // Stores run in memory here; browser persistence is covered by Playwright.
@@ -45,7 +46,7 @@ check("session map positions clear for a new character", () => {
   assert.deepEqual(getMapPosition("test", { x: 1, y: 2 }), { x: 1, y: 2 });
 });
 
-useWorldStore.getState().startNewGame({ name: "Runtime test" });
+useWorldStore.getState().startNewGame({ newWorld: true, name: "Runtime test" });
 const build = useWorldStore.getState().playerBuild!;
 check("player names remain literal text in attack and victory logs", () => {
   const named = { ...build, name: '<img src=x onerror="alert(1)">' };
@@ -95,36 +96,45 @@ check("death penalty: half the gold, 1–3 losable kinds halved, quest items / s
   assert.deepEqual(describeDeathPenalty(broke), ["ไม่มีสิ่งใดติดตัวให้สูญเสีย"]);
 });
 
-check("sleeping at home: free, a full restore, 4 ชั่วยาม; only at home", () => {
-  useWorldStore.getState().startNewGame({ name: "Rest test" });
+check("sleeping at home: free, a full restore at once; only at home; then a cooldown", () => {
+  setTestWorldTime(40, 3);
+  useWorldStore.getState().startNewGame({ newWorld: true, name: "Rest test" });
   useWorldStore.setState({ currentSceneId: "home_player", stamina: 10, currentHp: 5, currentMp: 0, gold: 7 });
-  const clock = () => useWorldStore.getState().day * 12 + useWorldStore.getState().time;
-  const before = clock();
   const result = useWorldStore.getState().rest("home");
-  assert.ok(result.ok && result.hours === 4);
+  assert.ok(result.ok && result.restored > 0);
   const w = useWorldStore.getState();
   const max = deriveAll(w.playerBuild!);
   assert.equal(w.stamina, w.staminaMax);
   assert.equal(w.currentHp, max.HP);
   assert.equal(w.currentMp, max.MP);
   assert.equal(w.gold, 7, "free");
-  assert.equal(clock() - before, 4, "4 ชั่วยาม");
+  assert.equal(w.day, 40, "no time passes");
+  assert.ok(Math.abs(w.time - 3) < 1e-9, "no time passes");
+  // A free rest is ready again REST_COOLDOWN_HOURS ชั่วยาม later; an inn room any time.
+  const again = useWorldStore.getState().rest("home");
+  assert.ok(!again.ok && again.reason === "cooldown" && Math.abs(again.readyIn - REST_COOLDOWN_HOURS) < 1e-9);
+  useWorldStore.setState({ gold: 1000 });
+  assert.ok(useWorldStore.getState().rest("inn").ok, "an inn room has no cooldown");
+  advanceTestClock(REST_COOLDOWN_HOURS);
+  assert.ok(useWorldStore.getState().rest("home").ok, "ready after the cooldown");
   useWorldStore.setState({ currentSceneId: "city_capital" });
   assert.deepEqual(useWorldStore.getState().rest("home"), { ok: false, reason: "place" });
   // An active disciple sleeps free on their own sect's grounds; elsewhere, or once resigned, they can't.
   const member = (status: "active" | "resigned") => ({ wudang: { ...useWorldStore.getState().sectMembership.wudang, sectId: "wudang", rank: 9, points: 0, status } });
+  advanceTestClock(REST_COOLDOWN_HOURS);
   useWorldStore.setState({ currentSceneId: "sect_wudang", stamina: 0, sectMembership: member("active") as never });
   const sect = useWorldStore.getState().rest("sect");
-  assert.ok(sect.ok && sect.hours === 4 && useWorldStore.getState().stamina === useWorldStore.getState().staminaMax);
+  assert.ok(sect.ok && useWorldStore.getState().stamina === useWorldStore.getState().staminaMax);
   useWorldStore.setState({ currentSceneId: "sect_shaolin" });
   assert.deepEqual(useWorldStore.getState().rest("sect"), { ok: false, reason: "place" });
   useWorldStore.setState({ currentSceneId: "sect_wudang", sectMembership: member("resigned") as never });
   assert.deepEqual(useWorldStore.getState().rest("sect"), { ok: false, reason: "place" });
-  useWorldStore.getState().startNewGame({ name: "Runtime test" });
+  setTestClock(null);
+  useWorldStore.getState().startNewGame({ newWorld: true, name: "Runtime test" });
 });
 
 check("food restores stamina (never in a fight); potions heal flat + % of max; poisons are alchemy; every resource has a place", () => {
-  useWorldStore.getState().startNewGame({ name: "Item test" });
+  useWorldStore.getState().startNewGame({ newWorld: true, name: "Item test" });
   useWorldStore.setState({ stamina: 50, inventory: { spicy_stew: 1, potion: 1, potion_qi: 1 }, currentHp: 10, currentMp: 0 });
   const stew = useWorldStore.getState().useItem("spicy_stew");
   assert.ok(stew.ok);
@@ -150,7 +160,7 @@ check("food restores stamina (never in a fight); potions heal flat + % of max; p
   for (const r of RESOURCES) assert.ok(placed.has(r.id), `${r.id} can be gathered somewhere`);
   const tang = (getLocationMap("sect_tang")?.spots ?? []).filter((x) => x.kind === "resource").map((x) => (x as { resourceId: string }).resourceId);
   assert.ok(tang.includes("venom_viper") && tang.includes("venom_scorpion"), "the Tang clan gathers its own venoms");
-  useWorldStore.getState().startNewGame({ name: "Runtime test" });
+  useWorldStore.getState().startNewGame({ newWorld: true, name: "Runtime test" });
 });
 
 const route: RouteScene = { id: "__runtime_route", kind: "route", label: "Test route", destinations: [
@@ -158,12 +168,11 @@ const route: RouteScene = { id: "__runtime_route", kind: "route", label: "Test r
 ] };
 check("non-fatal defeat leaves one HP; a fatal one wakes the hero at home poorer", () => {
   for (const nonFatal of [true, false]) {
-    useWorldStore.getState().startNewGame({ name: "Defeat test" });
+    useWorldStore.getState().startNewGame({ newWorld: true, name: "Defeat test" });
     useWorldStore.setState({ gold: 101, inventory: { ginseng: 5, old_key: 1, scroll_skill_basic_punch: 1 },
       pendingBattle: { opponentId: "petty_thief", onWin: "home_player", onLose: "home_player", nonFatal } });
     useBattleStore.getState().start(build, build);
     useBattleStore.setState({ state: { ...useBattleStore.getState().state!, hA: 0, winner: "B", phase: "over" } });
-    const dayBefore = useWorldStore.getState().day;
     useWorldStore.getState().acknowledgeBattleResult();
     const w = useWorldStore.getState();
     assert.equal(w.gameOver, false, "death never ends the game");
@@ -179,13 +188,13 @@ check("non-fatal defeat leaves one HP; a fatal one wakes the hero at home poorer
       assert.equal(w.inventory.ginseng, 2, "the one losable stack lost half (rounded up)");
       assert.equal(w.inventory.old_key, 1, "quest items are kept");
       assert.equal(w.inventory.scroll_skill_basic_punch, 1, "move scrolls are kept");
-      assert.ok(w.currentHp >= 1 && w.day > dayBefore, "wakes a day later");
+      assert.ok(w.currentHp >= 1, "wakes at home at once");
       assert.ok(w.lastDeath && w.lastDeath.lines.length >= 1);
       useWorldStore.getState().dismissDeath();
       assert.equal(useWorldStore.getState().lastDeath, null);
     }
   }
-  useWorldStore.getState().startNewGame({ name: "Runtime test" });
+  useWorldStore.getState().startNewGame({ newWorld: true, name: "Runtime test" });
 });
 SCENES_BY_ID.set(route.id, route);
 SCENES_BY_ID.set("__runtime_location", { id: "__runtime_location", kind: "location", name: "Test", description: "", npcs: [], routes: [] });
@@ -210,9 +219,9 @@ check("unaffordable, hidden and unknown route destinations have no effects", () 
   assert.equal(useWorldStore.getState().currentSceneId, route.id);
   assert.equal(useWorldStore.getState().gold, 0);
 });
-check("Three.js runtime objects never enter the version 26 save", () => {
+check("Three.js runtime objects never enter the version 27 save", () => {
   const options = useWorldStore.persist.getOptions();
-  assert.equal(options.version, 26);
+  assert.equal(options.version, 27);
   const saved = options.partialize!(useWorldStore.getState());
   assert.equal(JSON.stringify(saved).includes("enemyElapsedMs"), false);
   assert.equal("travelRoute" in saved, false);

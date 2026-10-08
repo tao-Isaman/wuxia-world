@@ -1,5 +1,8 @@
 import assert from "node:assert/strict";
 import type { Choice, DialogScene, WorldStateData } from "../lib/world/types";
+import { setTestClock } from "../lib/world/clock";
+// The world clock stands still here, so time never moves between two snapshots.
+setTestClock(Date.now());
 
 const memory = new Map<string, string>();
 Object.defineProperty(globalThis, "localStorage", { configurable: true, value: {
@@ -25,7 +28,7 @@ function chooseVisible(state: WorldStateData, choice: Choice): boolean {
   return true;
 }
 
-useWorldStore.getState().startNewGame({ name: "Clinic errand test" });
+useWorldStore.getState().startNewGame({ newWorld: true, name: "Clinic errand test" });
 const state: WorldStateData = JSON.parse(JSON.stringify(useWorldStore.getState()));
 state.quests.qc_capital_rare_herb = { id: "qc_capital_rare_herb", status: "active", stage: 0 };
 const existing = JSON.stringify(state.quests.qc_capital_rare_herb);
@@ -105,7 +108,7 @@ function assertLocalReturn(expected: ReturnType<typeof liveResources>) {
 const random = Math.random;
 try {
   Math.random = () => 0.5;
-  useWorldStore.getState().startNewGame({ name: "Clinic local-return test" });
+  useWorldStore.getState().startNewGame({ newWorld: true, name: "Clinic local-return test" });
   useWorldStore.getState().gotoScene("route_home_player__to__city_capital");
   useWorldStore.getState().travelRoute("city_capital");
   const baseline = liveResources();
@@ -142,7 +145,7 @@ try {
   console.log("PASS real-store clinic returns with RNG 0: offer, Wu delivery, unclaimed exit and paid claim stay local with no encounter, time or travel cost; only exact earned rewards");
 
   Math.random = () => 0.5;
-  useWorldStore.getState().startNewGame({ name: "Ordinary arrival control" });
+  useWorldStore.getState().startNewGame({ newWorld: true, name: "Ordinary arrival control" });
   useWorldStore.getState().gotoScene("route_home_player__to__city_capital");
   Math.random = () => 0;
   useWorldStore.getState().travelRoute("city_capital");

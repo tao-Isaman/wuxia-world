@@ -13,6 +13,7 @@ import { tickQuestProgress } from "@/lib/world/effects";
 import type { WorldStore } from "./world/types";
 import { draftFrom, emptyData } from "./world/state";
 import { mergeSave, migrateSave, partializeSave } from "./world/persist";
+import { attachSharedWorld } from "./world/shared-local";
 import { gameActions } from "./world/actions/game";
 import { sectsActions } from "./world/actions/sects";
 import { travelActions } from "./world/actions/travel";
@@ -28,7 +29,7 @@ import { npcsActions } from "./world/actions/npcs";
 import { questsActions } from "./world/actions/quests";
 
 export { MERIDIAN_POINTS_PER_LEVEL } from "./world/progression";
-export { TRAVEL_STAMINA_COST, REST_HOME_HOURS, SPAR_WIN_SCENE_ID, SPAR_LOSE_SCENE_ID, PRACTICE_STAMINA_COST, PRACTICE_HOURS } from "./world/rules";
+export { TRAVEL_STAMINA_COST, REST_COOLDOWN_HOURS, SPAR_WIN_SCENE_ID, SPAR_LOSE_SCENE_ID, PRACTICE_STAMINA_COST, PRACTICE_HOURS } from "./world/rules";
 export { HERO_BASE_HP } from "./world/state";
 export type { GatherResult, CraftResult, BuyRecipeResult, BuyEquipResult, EquipResult, UnequipResult, UseItemResult, OpenMeridianNodeResult, PracticeMusicResult, LevelUpSkillResult, LevelUpArtResult, ForgetSkillResult, ForgetArtResult, PracticeResult, BuyResult, SellResult, BuyOfferResult, SparResult, QuestActionResult, BadActionResult, VictorySpoils, RestKind, RestResult, ActivityResult, RoamingFoe } from "./world/types";
 export type { WorldStore } from "./world/types";
@@ -53,7 +54,7 @@ export const useWorldStore = create<WorldStore>()(
     }),
     {
       name: "wusia-world-v1",
-      version: 26,
+      version: 27,
       // Content backfill also runs for current-version saves (see mergeSave).
       merge: mergeSave,
       // Only persist the data fields, not the action functions.
@@ -69,6 +70,11 @@ export const useWorldStore = create<WorldStore>()(
     },
   ),
 );
+
+// The shared world (people, rumors, beasts, the tournament) is kept apart
+// from the player's save and joins the state here, once the save has loaded
+// (zustand's localStorage hydration is synchronous).
+attachSharedWorld(useWorldStore);
 
 // Quest stages waiting on items or kills re-check after ANY change to the bag
 // or the kill tally, whichever action caused it (shop, craft, loot, gift, a

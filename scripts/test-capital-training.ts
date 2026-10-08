@@ -6,6 +6,10 @@ import { getOpponent, setOpponentStatScale } from "../lib/world/data/opponents";
 import { FIGHT_EVENTS } from "../lib/world/data/random-events";
 import { capitalTrainingStatus, capitalTrainingUpgrade } from "../lib/world/capital-training";
 import { clinicPreparation } from "../lib/world/clinic-preparation";
+import { advanceTestClock, setTestClock } from "../lib/world/clock";
+import { REST_COOLDOWN_HOURS } from "../store/world/rules";
+// The world clock stands still here, so time never moves between two snapshots.
+setTestClock(Date.now());
 
 const memory = new Map<string, string>();
 Object.defineProperty(globalThis, "localStorage", { configurable: true, value: {
@@ -21,7 +25,7 @@ const originalRandom = Math.random;
 Math.random = () => 0.5;
 
 function newTrainee() {
-  useWorldStore.getState().startNewGame({ name: "Training test" });
+  useWorldStore.getState().startNewGame({ newWorld: true, name: "Training test" });
   useWorldStore.setState({ currentSceneId: "city_capital", lastLocationId: "city_capital", gold: 30, wExp: 20,
     inventory: { potion: 1, herb: 3 },
     quests: { qc_capital_clinic_supplies: { id: "qc_capital_clinic_supplies", stage: 1, status: "done" } } });
@@ -121,7 +125,11 @@ try {
   assert.equal(capitalTrainingStatus(lost)?.canStart, false);
   // The hall rest action remains usable even if the separate stamina pool is full.
   useWorldStore.setState({ stamina: useWorldStore.getState().staminaMax });
-  for (let i = 0; i < 4; i++) assert.equal(useWorldStore.getState().rest("route").ok, true);
+  // A free rest is ready again every REST_COOLDOWN_HOURS ชั่วยาม of the world clock.
+  for (let i = 0; i < 4; i++) {
+    assert.equal(useWorldStore.getState().rest("route").ok, true);
+    advanceTestClock(REST_COOLDOWN_HOURS);
+  }
   assert.equal(capitalTrainingStatus(useWorldStore.getState())?.needsRest, false);
   assert.equal(capitalTrainingStatus(useWorldStore.getState())?.canStart, true);
   assert.equal(useWorldStore.getState().gold, 30);

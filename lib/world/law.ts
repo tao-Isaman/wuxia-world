@@ -17,8 +17,8 @@ import { WORLD_COORDS } from "./data/world-coords";
 export const WANTED_MAX = 5;
 export const KILL_MARKS = 5;
 export const WANTED_DECAY_DAYS = 10;
-export const JAIL_DAYS_PER_MARK = 2;
-export const JAIL_MAX_DAYS = 30;
+/** The longest sentence, in ชั่วยาม: one world day (one real hour). */
+export const JAIL_MAX_HOURS = 12;
 export const JAIL_BRIBE_GOLD = 300;
 export const LAW_OPPONENTS = [
   "law_constable", "law_imperial_guard", "law_bounty_hunter", "law_jinyiwei_agent", "law_jinyiwei_captain",
@@ -75,12 +75,14 @@ export function ambushChance(marks: number): number {
   return Math.min(0.2, 0.03 + Math.min(marks, 10) * 0.015);
 }
 
-export const jailDays = (marks: number) => Math.max(1, Math.min(JAIL_MAX_DAYS / JAIL_DAYS_PER_MARK, marks)) * JAIL_DAYS_PER_MARK;
+/** The sentence for a record, in ชั่วยาม: one per mark (five real minutes), at most JAIL_MAX_HOURS. */
+export const jailHours = (marks: number) => Math.max(1, Math.min(JAIL_MAX_HOURS, marks));
 /** The jailer's price grows with the record: 300 for up to two marks, 150 more per mark after. */
 export const bribeCost = (marks: number) => JAIL_BRIBE_GOLD + Math.max(0, marks - 2) * 150;
 
 export interface ArrestPenalty {
-  days: number;
+  /** The sentence in ชั่วยาม (5 real minutes each), served on the world clock. */
+  hours: number;
   fine: number;
   /** Seize property: a share of the gold left and some carried goods (5+ marks). */
   confiscate: boolean;
@@ -91,11 +93,11 @@ export interface ArrestPenalty {
 /** What an arrest costs, by the record. Giving oneself up halves the sentence and the fine and spares the worst. */
 export function arrestPenalty(marks: number, surrendered = false): ArrestPenalty {
   const m = Math.max(1, marks);
-  const days = jailDays(m);
+  const hours = jailHours(m);
   const fine = 50 * m;
   const cripple = m >= 10 ? Math.min(4, 1 + Math.floor((m - 10) / 5)) : 0;
-  if (surrendered) return { days: Math.max(1, Math.ceil(days / 2)), fine: Math.floor(fine / 2), confiscate: false, cripple: Math.max(0, cripple - 1) };
-  return { days, fine, confiscate: m >= 5, cripple };
+  if (surrendered) return { hours: Math.max(1, Math.ceil(hours / 2)), fine: Math.floor(fine / 2), confiscate: false, cripple: Math.max(0, cripple - 1) };
+  return { hours, fine, confiscate: m >= 5, cripple };
 }
 
 /** ชั่วยาม per day (mirrors HOURS_PER_DAY in the world store). */
@@ -105,10 +107,13 @@ export const absoluteHours = (state: { day: number; time: number }) => state.day
 /** ชั่วยาม still to serve (0 once free or released). */
 export const sentenceLeft = (state: { day: number; time: number; jailUntil?: number | null }) =>
   state.jailUntil == null ? 0 : Math.max(0, state.jailUntil - absoluteHours(state));
-/** "2 วัน 4 ชั่วยาม" */
+/** A sentence in real time: "25 นาที", "1 ชั่วโมง" (a ชั่วยาม is five real minutes). */
 export function describeSentence(hours: number): string {
-  const days = Math.floor(hours / JAIL_HOURS_PER_DAY), rest = hours % JAIL_HOURS_PER_DAY;
-  return [days ? `${days} วัน` : "", rest ? `${rest} ชั่วยาม` : ""].filter(Boolean).join(" ") || "ไม่เหลือ";
+  const minutes = Math.ceil(hours * 5 - 1e-6);
+  if (minutes <= 0) return "ไม่เหลือ";
+  if (minutes < 60) return `${minutes} นาที`;
+  const h = Math.floor(minutes / 60), m = minutes % 60;
+  return `${h} ชั่วโมง${m ? ` ${m} นาที` : ""}`;
 }
 
 

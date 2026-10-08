@@ -403,7 +403,7 @@ function readScroll(kind: "skill" | "art", id: string, where: string) {
 
 check("main story: chapter 1 is offered from the first moment of a new game", () => {
   if (ONLY) return;
-  store().startNewGame({ name: "ผู้ทดสอบ", gender: "male" } as never);
+  store().startNewGame({ newWorld: true, name: "ผู้ทดสอบ", gender: "male" } as never);
   const first = getQuest(storyQuestId(MAIN_ARC.id, 1));
   if (!first || first.type !== "main") err("main: chapter 1 is not a main quest");
   else if (!isQuestOfferable(store(), first) || !evaluateCondition(store(), first.prereqs ?? { t: "and", all: [] })) err("main: chapter 1 is not offered on a new game");
@@ -414,7 +414,7 @@ check("play-through: every lineage quest and every saga chapter, accept → step
   for (const l of LINEAGE_SPECS) {
     const info = STORY_RESOLVERS.martial(l.kind, l.id)!;
     if (!inScope(info.sc)) continue;
-    store().startNewGame({ name: "ผู้ทดสอบ", gender: "female" } as never);
+    store().startNewGame({ newWorld: true, name: "ผู้ทดสอบ", gender: "female" } as never);
     empower(info.sc);
     try {
       const def = getQuest(lineageQuestOf(l.kind, l.id)!)!;
@@ -431,7 +431,7 @@ check("play-through: every lineage quest and every saga chapter, accept → step
   }
   for (const arc of STORY_ARC_SPECS) {
     if (!inScope(arc.sc)) continue;
-    store().startNewGame({ name: "ผู้ทดสอบ", gender: "female" } as never);
+    store().startNewGame({ newWorld: true, name: "ผู้ทดสอบ", gender: "female" } as never);
     empower(arc.sc);
     try {
       arc.chapters.forEach((_, i) => { play(getQuest(storyQuestId(arc.id, i + 1))!); chapters++; });
@@ -443,7 +443,7 @@ check("play-through: every lineage quest and every saga chapter, accept → step
     } catch (e) { err(e instanceof Error ? e.message : String(e)); }
   }
   if (!ONLY && MAIN_ARC.chapters.length) {
-    store().startNewGame({ name: "ผู้ทดสอบ", gender: "male" } as never);
+    store().startNewGame({ newWorld: true, name: "ผู้ทดสอบ", gender: "male" } as never);
     empower("");
     try { MAIN_ARC.chapters.forEach((_, i) => { play(getQuest(storyQuestId(MAIN_ARC.id, i + 1))!); chapters++; }); }
     catch (e) { err(e instanceof Error ? e.message : String(e)); }
@@ -463,7 +463,7 @@ check("decline and drop: every lineage / saga offer can be turned down, and an a
   const l = LINEAGE_SPECS.find((x) => inScope(STORY_RESOLVERS.martial(x.kind, x.id)!.sc));
   if (!l) return;
   const def = getQuest(lineageQuestOf(l.kind, l.id)!)!;
-  store().startNewGame({ name: "ผู้ทดสอบ", gender: "female" } as never);
+  store().startNewGame({ newWorld: true, name: "ผู้ทดสอบ", gender: "female" } as never);
   empower(STORY_RESOLVERS.martial(l.kind, l.id)!.sc);
   assert.ok(isQuestOfferable(store(), def), `${def.id}: offered`);
   assert.ok(store().acceptQuest(def.id).ok, `${def.id}: accepted`);
