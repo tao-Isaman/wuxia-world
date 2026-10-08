@@ -31,12 +31,12 @@ const pingPong = (n: number) => [...Array(n).keys(), ...Array.from({ length: n -
 const range = (a: number, b: number) => Array.from({ length: b - a + 1 }, (_, i) => a + i);
 
 const SUBJECTS: Record<string, Subject> = {
-  boss_golden_serpent: { scale: 2.3, clips: { idle: { frames: range(0, 7), fps: 7 }, attack: { frames: range(1, 8), fps: 11 }, hurt: { frames: [1, 2, 3, 4], fps: 9 } } },
-  boss_blood_tiger: { scale: 2.2, clips: { idle: { frames: range(0, 7), fps: 7 }, attack: { frames: range(1, 8), fps: 11 }, hurt: { frames: [1, 2, 2, 1], fps: 8 } } },
-  boss_sword_eagle: { scale: 2.4, clips: { idle: { frames: range(0, 7), fps: 7 }, attack: { frames: range(1, 8), fps: 11 }, hurt: { frames: [1, 2, 3, 4], fps: 9 } } },
-  boss_sun_turtle: { scale: 2.6, clips: { idle: { frames: pingPong(5), fps: 6 }, attack: { frames: range(3, 8), fps: 9 }, hurt: { frames: [1, 2, 3, 2], fps: 8 } } },
+  boss_golden_serpent: { scale: 2.3, clips: { idle: { frames: range(0, 7), fps: 7 }, attack: { frames: range(1, 8), fps: 11 }, hurt: { frames: range(1, 5), fps: 9 } } },
+  boss_blood_tiger: { scale: 2.2, clips: { idle: { frames: range(0, 7), fps: 7 }, attack: { frames: range(1, 8), fps: 11 }, hurt: { frames: [3, 4, 5, 4], fps: 8 } } },
+  boss_sword_eagle: { scale: 2.4, clips: { idle: { frames: pingPong(4), fps: 6 }, attack: { frames: range(1, 8), fps: 11 }, hurt: { frames: [1, 3, 4, 5, 6], fps: 9 } } },
+  boss_sun_turtle: { scale: 2.6, clips: { idle: { frames: pingPong(5), fps: 6 }, attack: { frames: range(1, 6), fps: 9 }, hurt: { frames: range(1, 5), fps: 9 } } },
   boss_blade_crab: { scale: 2.5, clips: { idle: { frames: pingPong(5), fps: 7 }, attack: { frames: range(1, 8), fps: 11 }, hurt: { frames: [1, 2, 3, 4], fps: 9 } } },
-  boss_flame_bull: { scale: 2.4, clips: { idle: { frames: range(0, 7), fps: 7 }, attack: { frames: range(1, 7), fps: 11 }, hurt: { frames: [1, 2, 3, 4], fps: 9 } } },
+  boss_flame_bull: { scale: 2.4, clips: { idle: { frames: range(0, 7), fps: 7 }, attack: { frames: range(1, 7), fps: 11 }, hurt: { frames: [1, 3, 4, 5], fps: 8 } } },
   t5_nameless_sword_hermit: { scale: 1.08, clips: { idle: { frames: pingPong(5), fps: 6 }, attack: { frames: range(1, 8), fps: 12 }, hurt: { frames: [1, 2, 3, 2], fps: 9 } } },
   t5_blood_blade_lord: { scale: 1.15, clips: { idle: { frames: pingPong(5), fps: 6 }, attack: { frames: range(1, 8), fps: 11 }, hurt: { frames: [1, 2, 3, 1], fps: 9 } } },
   t5_poison_matriarch: { scale: 1.05, clips: { idle: { frames: pingPong(5), fps: 6 }, attack: { frames: range(1, 8), fps: 10 }, hurt: { frames: [1, 2, 2, 1], fps: 9 } } },

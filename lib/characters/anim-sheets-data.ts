@@ -4,10 +4,10 @@ import type { AnimSheet } from "./anim-sheets";
 export const ANIM_SHEET_DATA: Record<string, AnimSheet> = {
   "boss_golden_serpent": {
     "id": "boss_golden_serpent",
-    "url": "/art/anims/boss_golden_serpent.png?v=34b9d2ad",
+    "url": "/art/anims/boss_golden_serpent.png?v=d68810c0",
     "frameW": 193,
-    "frameH": 144,
-    "feetY": 0.993,
+    "frameH": 165,
+    "feetY": 0.994,
     "facing": "right",
     "scale": 2.3,
     "clips": {
@@ -23,14 +23,14 @@ export const ANIM_SHEET_DATA: Record<string, AnimSheet> = {
       },
       "hurt": {
         "row": 2,
-        "frames": 4,
+        "frames": 5,
         "fps": 9
       }
     }
   },
   "boss_blood_tiger": {
     "id": "boss_blood_tiger",
-    "url": "/art/anims/boss_blood_tiger.png?v=f8cc0ea3",
+    "url": "/art/anims/boss_blood_tiger.png?v=1445f72e",
     "frameW": 180,
     "frameH": 125,
     "feetY": 0.992,
@@ -56,17 +56,17 @@ export const ANIM_SHEET_DATA: Record<string, AnimSheet> = {
   },
   "boss_sword_eagle": {
     "id": "boss_sword_eagle",
-    "url": "/art/anims/boss_sword_eagle.png?v=fc136c65",
-    "frameW": 202,
-    "frameH": 183,
-    "feetY": 0.995,
+    "url": "/art/anims/boss_sword_eagle.png?v=957bae1b",
+    "frameW": 201,
+    "frameH": 167,
+    "feetY": 0.988,
     "facing": "right",
     "scale": 2.4,
     "clips": {
       "idle": {
         "row": 0,
-        "frames": 8,
-        "fps": 7
+        "frames": 6,
+        "fps": 6
       },
       "attack": {
         "row": 1,
@@ -75,17 +75,17 @@ export const ANIM_SHEET_DATA: Record<string, AnimSheet> = {
       },
       "hurt": {
         "row": 2,
-        "frames": 4,
+        "frames": 5,
         "fps": 9
       }
     }
   },
   "boss_sun_turtle": {
     "id": "boss_sun_turtle",
-    "url": "/art/anims/boss_sun_turtle.png?v=3eaf4d9f",
-    "frameW": 215,
-    "frameH": 162,
-    "feetY": 0.988,
+    "url": "/art/anims/boss_sun_turtle.png?v=1ec91559",
+    "frameW": 203,
+    "frameH": 153,
+    "feetY": 0.987,
     "facing": "right",
     "scale": 2.6,
     "clips": {
@@ -101,17 +101,17 @@ export const ANIM_SHEET_DATA: Record<string, AnimSheet> = {
       },
       "hurt": {
         "row": 2,
-        "frames": 4,
-        "fps": 8
+        "frames": 5,
+        "fps": 9
       }
     }
   },
   "boss_blade_crab": {
     "id": "boss_blade_crab",
-    "url": "/art/anims/boss_blade_crab.png?v=371ec1ad",
-    "frameW": 152,
-    "frameH": 136,
-    "feetY": 0.963,
+    "url": "/art/anims/boss_blade_crab.png?v=f0fb163b",
+    "frameW": 149,
+    "frameH": 128,
+    "feetY": 0.961,
     "facing": "right",
     "scale": 2.5,
     "clips": {
@@ -134,9 +134,9 @@ export const ANIM_SHEET_DATA: Record<string, AnimSheet> = {
   },
   "boss_flame_bull": {
     "id": "boss_flame_bull",
-    "url": "/art/anims/boss_flame_bull.png?v=4df25bdb",
-    "frameW": 188,
-    "frameH": 139,
+    "url": "/art/anims/boss_flame_bull.png?v=bca8c7ff",
+    "frameW": 195,
+    "frameH": 143,
     "feetY": 0.993,
     "facing": "right",
     "scale": 2.4,
@@ -154,7 +154,7 @@ export const ANIM_SHEET_DATA: Record<string, AnimSheet> = {
       "hurt": {
         "row": 2,
         "frames": 4,
-        "fps": 9
+        "fps": 8
       }
     }
   },

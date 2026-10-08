@@ -137,7 +137,7 @@ Real behaviour today, found during the docs audit. Each is small and self-contai
 ### Roaming foes
 
 - **Only roads and wilds, and only where they live.** Each foe has habitats (`lib/world/data/habitats.ts`); cities, villages, homes, inns, sects, temples and the palace get no stray foes, and a kill quest's quarry comes only to its habitat (town foes: thieves, drunks, ruffians, the false fortune-teller).
-- **Legendary beasts.** Six bosses wait in their lairs (`lib/world/data/bosses.ts`) and return 90 days after they fall. Their trophies (`trophy_*`) sell well but no recipe uses them yet. Some PixelLab clips are weak: the iron monk's, blood tiger's and poison matriarch's hurt clips barely move; the turtle's fire jet is cut at the frame edge on one attack frame; the eagle's rock is part of its sprite.
+- **Legendary beasts.** Six bosses wait in their lairs (`lib/world/data/bosses.ts`) and return 90 days after they fall. Their trophies (`trophy_*`) sell well but no recipe uses them yet. The boss sheets were redone on 2026-10-08 (no eagle rock, steady turtle sun, no crab slash, clear hurt clips); among T5 the iron monk's and poison matriarch's hurt clips still barely move (the battle's hit flash, red tint and knockback carry them).
 - **Ghost lore left.** The NPC วิญญาณเหลียงเก๋อ (a cutscene spirit) and a few wilderness quest lines still speak of ghosts; no foe is a spirit any more.
 - **Foes can stand on painted scenery.** A spawn spot only needs to be unblocked and reachable by the collision data, so on maps whose collision is loose (the capital's outer wall, for one) a foe can appear somewhere that looks out of bounds.
 - **Not saved.** A reload clears the foes on the map; they also go when the hero walks on another map.
