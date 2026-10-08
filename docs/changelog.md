@@ -8,7 +8,8 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ### Online: no secret to set — the server keeps its own signing key
 
-- Sign-in no longer breaks after a deploy. The token-signing key used to be an `AUTH_SECRET` variable, which a dashboard-only variable lost on every `wrangler deploy` (`auth_secret_missing`). Now `KeyObject` (`server/worker/src/keys.rs`, a Durable Object) makes the key once and keeps it, so deploys and local dev need no configuration. Tokens from before the change stop working once: players log in again; accounts are untouched.
+- Sign-in no longer breaks after a deploy. The token-signing key used to be an `AUTH_SECRET` variable, which a dashboard-only variable lost on every `wrangler deploy` (`auth_secret_missing`). Now `KeyObject` (`server/worker/src/keys.rs`, a Durable Object) makes the key once and keeps it, so deploys and local dev need no configuration. Tokens from before the change stop working once; accounts are untouched.
+- A saved token the server no longer accepts signs out on load (`GET /auth/me`, `checkToken` in `OnlineBridge`): the player sees the log-in step again instead of an online status that never connects.
 - A room checks the token before the WebSocket upgrade, so a bad token is 401 even where a proxy drops the `Upgrade` header.
 
 ### Online: account → character → play

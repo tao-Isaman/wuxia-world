@@ -83,6 +83,7 @@ The pure logic lives in `server/core` (no I/O, clock or randomness), so it is te
 | `GET /health` | `{ ok, protocol, auth }`: `auth` is `ready`, or `auth_key_unavailable` when the key's Durable Object cannot be reached |
 | `POST /auth/register` `{ username, password }` | `{ username, token, expires }`, or `{ error }` with 400 / 409 |
 | `POST /auth/login` `{ username, password }` | the same, or 401 `wrong_login` |
+| `GET /auth/me?token=…` | `{ username, expires }`, or 401 for a token the server no longer accepts |
 | `GET /rooms/<room>/ws?token=…` (WebSocket upgrade) | the room; 401 for a bad token |
 
 Usernames are 3–20 of `a–z 0–9 _`, case-insensitive. Passwords are 6–72 characters, stored as PBKDF2-HMAC-SHA256 with a random salt; the iteration count (`PBKDF2_ITERATIONS`, default 10,000) is stored per account. Error codes: `bad_username`, `bad_password`, `taken`, `wrong_login`, `bad_token`, `expired`; if the key's Durable Object cannot be reached, 500 `auth_key_unavailable`.
@@ -182,7 +183,7 @@ Then set `NEXT_PUBLIC_GAME_SERVER_URL` to the Worker's URL (`https://wuxia-world
 
 No variables or secrets to add: the server makes its own signing key (above), and `PBKDF2_ITERATIONS` comes from `wrangler.toml` (variables set only in the dashboard are dropped by the next `wrangler deploy`). `GET /health` answers `{"ok":true,"protocol":1,"auth":"ready"}` once the server is live.
 
-Servers deployed before the key moved into `KeyObject` signed tokens with an `AUTH_SECRET` variable; those tokens stop working once, so players log in again (accounts are untouched), and the `AUTH_SECRET` variable can be deleted.
+Servers deployed before the key moved into `KeyObject` signed tokens with an `AUTH_SECRET` variable; those tokens stop working once (accounts are untouched), and the `AUTH_SECRET` variable can be deleted. On load, `OnlineBridge` checks a saved token (`checkToken` → `GET /auth/me`); on a 401 it signs out, so the player lands on the log-in step with the name filled in instead of a room that keeps refusing them.
 
 Durable Objects with SQLite storage are on the Workers free plan. PBKDF2 at 10,000 rounds stays within the free plan's CPU budget per request; raise `PBKDF2_ITERATIONS` on a paid plan.
 
@@ -192,8 +193,8 @@ Durable Objects with SQLite storage are on the Workers free plan. PBKDF2 at 10,0
 | --- | --- |
 | `bun run test:server` | `cargo test` of `wuxia-core`: protocol spelling, `decide` / `apply` (speed limit, bounds, replace, full room, snapshot + events = the same room), accounts and tokens |
 | `bun run test:net` | the client without a server: the presence reducer (order, gaps, resync) and the session (hello with the real position, throttled moves, room switch) against a fake WebSocket |
-| `bun run test:online` | against a running server (`bun run server:dev`, or `GAME_SERVER_URL`): sign-up / login / refusals, a bad token, two players' join → move → leave in `seq` order, a refused teleport, a second login replacing the first |
-| `tests/browser/online.spec.ts` | two browsers sign up on the title screen, start heroes, see each other at home; one walks and the other sees it live; closing one makes them leave. Skipped when no server answers |
+| `bun run test:online` | against a running server (`bun run server:dev`, or `GAME_SERVER_URL`): sign-up / login / refusals, checking a saved token (`/auth/me`), a bad token, two players' join → move → leave in `seq` order, a refused teleport, a second login replacing the first |
+| `tests/browser/online.spec.ts` | two browsers sign up on the title screen, start heroes, see each other at home; one walks and the other sees it live; closing one makes them leave; a saved token the server no longer accepts lands on the log-in step. Skipped when no server answers |
 
 ## Limits and next steps
 

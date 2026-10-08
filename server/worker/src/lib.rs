@@ -4,6 +4,7 @@
 //! - `GET  /health`                      → `{ ok, protocol }`
 //! - `POST /auth/register` `{ username, password }` → `{ username, token }`
 //! - `POST /auth/login`    `{ username, password }` → `{ username, token }`
+//! - `GET  /auth/me?token=…`            → `{ username, expires }`, or 401 for a token that no longer works
 //! - `GET  /rooms/<room>/ws?token=…`     → a WebSocket into that map's room
 //!
 //! Durable Objects: [`account::AccountObject`] (one per username) keeps the
@@ -118,6 +119,26 @@ async fn auth(mut req: Request, env: &Env, action: &str) -> Result<Response> {
     json(&Session { username, token, expires }, 200)
 }
 
+#[derive(Serialize)]
+struct Me {
+    username: String,
+    expires: f64,
+}
+
+/// The token's account, so a client can drop a saved token the server no longer accepts.
+async fn me(req: Request, env: &Env) -> Result<Response> {
+    let url = req.url()?;
+    let token = url.query_pairs().find(|(k, _)| k == "token").map(|(_, v)| v.into_owned()).unwrap_or_default();
+    let key = match signing_key(env).await {
+        Ok(key) => key,
+        Err(code) => return api_error(code, 500),
+    };
+    match verify_token(&token, &key, now_ms()) {
+        Ok(claims) => json(&Me { username: claims.sub, expires: claims.exp }, 200),
+        Err(error) => auth_error(error),
+    }
+}
+
 /// Check the token, then hand the WebSocket upgrade to the room's Durable Object.
 async fn join_room(req: Request, env: &Env, room: &str) -> Result<Response> {
     if !valid_room(room) {
@@ -151,6 +172,7 @@ async fn fetch(req: Request, env: Env, _ctx: Context) -> Result<Response> {
         (Method::Get, ["health"]) | (Method::Get, [""]) => json(&Health { ok: true, protocol: PROTOCOL_VERSION, auth: signing_key(&env).await.map(|_| "ready").unwrap_or_else(|code| code) }, 200),
         (Method::Post, ["auth", "register"]) => auth(req, &env, "register").await,
         (Method::Post, ["auth", "login"]) => auth(req, &env, "login").await,
+        (Method::Get, ["auth", "me"]) => me(req, &env).await,
         (Method::Get, ["rooms", room, "ws"]) => {
             let room = room.to_string();
             join_room(req, &env, &room).await
