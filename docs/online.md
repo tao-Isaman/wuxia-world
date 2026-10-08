@@ -159,7 +159,22 @@ npx wrangler secret put AUTH_SECRET     # at least 16 random characters
 bun run server:deploy                    # wrangler deploy: builds the wasm, creates the Durable Objects
 ```
 
-Then set `NEXT_PUBLIC_GAME_SERVER_URL` to the Worker's URL (`https://wuxia-server.<account>.workers.dev`) in Vercel and redeploy the game.
+Then set `NEXT_PUBLIC_GAME_SERVER_URL` to the Worker's URL (`https://wuxia-world.<account>.workers.dev`) in Vercel and redeploy the game.
+
+**From the Cloudflare dashboard** (Workers Builds, deploying on every push): import the repository as a **Worker**, not a Pages project (Pages cannot host Durable Objects).
+
+- The Worker's name must equal `name` in `server/worker/wrangler.toml` (`wuxia-world`), or the build refuses to deploy.
+- The build image has no Rust, so the commands install it first.
+- Version (preview) URLs are not made for Workers with Durable Objects, so the preview command only checks that the server builds.
+
+| Field | Value |
+| --- | --- |
+| Root directory | `server/worker` |
+| Build command | (empty) |
+| Deploy command | `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \| sh -s -- -y --profile minimal --target wasm32-unknown-unknown && . "$HOME/.cargo/env" && npx wrangler deploy` |
+| Preview command | the same, ending in `npx wrangler deploy --dry-run` |
+
+Then add the Secret `AUTH_SECRET` under the Worker's Settings → Variables and Secrets. `GET /health` answers `{"ok":true,"protocol":1}` once the server is live.
 
 Durable Objects with SQLite storage are on the Workers free plan. PBKDF2 at 10,000 rounds stays within the free plan's CPU budget per request; raise `PBKDF2_ITERATIONS` on a paid plan.
 
