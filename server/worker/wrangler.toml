@@ -1,6 +1,6 @@
 # The wuxia game server (docs/online.md). Deploy: `npx wrangler deploy` from
 # this folder, after `npx wrangler secret put AUTH_SECRET` (≥ 16 characters).
-name = "wuxia-server"
+name = "wuxia-world"
 main = "build/worker/shim.mjs"
 compatibility_date = "2026-01-01"
 
