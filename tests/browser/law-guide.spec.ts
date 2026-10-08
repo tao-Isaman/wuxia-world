@@ -23,7 +23,7 @@ test("wanted marks: walking draws the law, jail costs real minutes per mark and 
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await start(page);
-  await patch(page, { currentSceneId: "city_capital", lastLocationId: "city_capital", wanted: 3, wantedDay: 1 });
+  await patch(page, { currentSceneId: "city_capital", lastLocationId: "city_capital", wanted: 3, wantedDay: (await save(page)).day });
   await expect(page.locator(".hud-wanted")).toContainText("●●●");
   const world = page.getByTestId("world-canvas");
 
