@@ -110,7 +110,8 @@ Usernames are 3–20 of `a–z 0–9 _`, case-insensitive. Passwords are 6–72 
 | `lib/net/config.ts` | the server address: `localStorage["wuxia-game-server"]`, else `NEXT_PUBLIC_GAME_SERVER_URL` |
 | `store/online-store.ts` | the sign-in (`wuxia-online-v1`: username, token, expiry) and the live status for the HUD |
 | `components/world/online-bridge.tsx` | gives the session the hero's name and body, mirrors its status into the store |
-| `components/world/online-panel.tsx` | the sign-in panel (title screen) and the HUD's 🌐 ออนไลน์ button |
+| `components/world/account-step.tsx` | step 1 of the title flow: สมัครใหม่ / มีบัญชีแล้ว, and the step indicator (`FlowSteps`) |
+| `components/world/online-panel.tsx` | the HUD's 🌐 ออนไลน์ button and its status / sign-out panel; `useGameServer` |
 
 **Session behaviour** (`OnlineSession`):
 
@@ -126,7 +127,15 @@ Usernames are 3–20 of `a–z 0–9 _`, case-insensitive. Passwords are 6–72 
 - They use their body's painted eight-way walk cells and wear a **gold** name tag (NPCs' are green).
 - The host publishes `data-remote-players` (`[[id, x, y], …]`) for tests.
 
-**UI:** with a server set, the title screen shows the sign-in panel beside the new hero (สมัครบัญชี / เข้าสู่ระบบ), and the HUD gets a 🌐 ออนไลน์ button. The button's dot shows the status (green online, yellow connecting, red replaced) and its badge how many others share the map. Without a server, nothing online shows.
+**The flow** (with a server set): **account → character → play**.
+
+- **Account first.** `WorldScreen` shows the title screen whenever there is no valid login, even for a player who already has a save. Its first step (`AccountStep`) has two tabs: สมัครใหม่ (username, password, confirm) and มีบัญชีแล้ว.
+- **Returning players.** A browser that has signed in before opens on log in, with the username filled in.
+- **Character.** Once signed in, a player without a save creates a character (the account is shown above the form, with เปลี่ยนบัญชี). A player with a save goes straight into the game.
+- **Signing out** (HUD 🌐 → ออกจากระบบ, or an expired token after 30 days) returns to the account step. The local save stays.
+- Without a server, the title screen is the character form alone, as before.
+
+**UI:** in game, the HUD has a 🌐 ออนไลน์ button. The button's dot shows the status (green online, yellow connecting, red replaced) and its badge how many others share the map. Without a server, nothing online shows.
 
 ## Running it locally
 

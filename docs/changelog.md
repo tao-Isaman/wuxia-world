@@ -6,6 +6,11 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-08
 
+### Online: account → character → play
+
+- With a game server set, the title screen is a three-step flow: **บัญชี** (sign up with a confirmed password, or log in), then **ตัวละคร**, then the game. Without a valid login the account step comes first, even with a save; a returning player opens on log in with the name filled in and goes straight back to their game. Signing out (HUD 🌐) returns to the account step.
+- `components/world/account-step.tsx`; `online.spec.ts` covers both flows. Without a server the title screen is unchanged.
+
 ### Online: a Rust game server and seeing other players walk
 
 - **Game server** in `server/`: a Cloudflare Worker in Rust. `server/core` is pure and event-based (`Room::decide` → events → `Room::apply`; accounts rebuilt from their events; HMAC-signed tokens); `server/worker` runs one Durable Object per account and one per map, with hibernating WebSockets. `bun run server:dev` runs it locally, `bun run server:deploy` deploys it.

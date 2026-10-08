@@ -17,6 +17,8 @@ import {
   getScene,
   type LocationScene,
 } from "@/lib/world";
+import { useGameServer } from "./online-panel";
+import { signedIn, useOnlineStore } from "@/store/online-store";
 import { StartScreen } from "./start-screen";
 import { DialogStage, type DialogSpeaker } from "./dialog-stage";
 import { LocationView } from "./location-view";
@@ -95,6 +97,9 @@ export function WorldScreen() {
   }, []);
 
   const hasGame = useWorldStore((s) => s.hasGame);
+  // Online play (docs/online.md): with a game server set, the flow is account → character → game.
+  const server = useGameServer();
+  const needsAccount = useOnlineStore((s) => !!server && !signedIn(s));
   const currentSceneId = useWorldStore((s) => s.currentSceneId);
   const lastLocationId = useWorldStore((s) => s.lastLocationId);
   const pendingBattle = useWorldStore((s) => s.pendingBattle);
@@ -153,7 +158,8 @@ export function WorldScreen() {
   // silently hangs because no ConfirmDialog is on the tree.
   let body: React.ReactNode;
 
-  if (!hasGame) {
+  if (needsAccount || !hasGame) {
+    // Online, an account comes first — also for a returning player with a save.
     body = <StartScreen />;
   } else if (gameOver) {
     body = <GameOverScreen />;

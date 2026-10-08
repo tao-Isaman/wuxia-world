@@ -7,11 +7,21 @@ import { GENDER_LABEL, PLAYER_BODY_LABEL, defaultBodyFor } from "@/lib/world";
 import { CharacterPreview } from "@/components/game/character-preview";
 import { InstallGameButton } from "@/components/pwa";
 import { SoundButton } from "@/components/sound-button";
-import { OnlinePanel, useGameServer } from "./online-panel";
+import { useGameServer } from "./online-panel";
+import { AccountStep, FlowSteps } from "./account-step";
+import { signedIn, useOnlineStore } from "@/store/online-store";
 
+/**
+ * The title screen. Online (a game server is set) it is a three-step flow —
+ * account (AccountStep), character (this form), then the game; offline only
+ * the character form.
+ */
 export function StartScreen() {
   const startNewGame = useWorldStore((s) => s.startNewGame);
   const server = useGameServer();
+  const account = useOnlineStore((s) => (signedIn(s) ? s.username : null));
+  const signOut = useOnlineStore((s) => s.signOut);
+  const needsAccount = !!server && !account;
   const [name, setName] = useState("");
   const [gender, setGender] = useState<Gender>("male");
   // One hero body per gender (m1 / f1), the ones with the painted action sprites.
@@ -33,15 +43,17 @@ export function StartScreen() {
           <div className="title-rule" />
           <p className="title-footnote">ออกเดินทาง · ฝึกวิชา · สร้างตำนาน</p>
           <InstallGameButton />
-          {server && <OnlinePanel compact />}
         </div>
-        <form className="hero-creation pixel-panel" onSubmit={(event) => {
+        {needsAccount ? <AccountStep /> : <form className="hero-creation pixel-panel" data-testid="hero-form" onSubmit={(event) => {
           event.preventDefault();
           if (!canStart) return;
           clearMapPositions();
           startNewGame({ name: trimmed, gender, bodyId });
         }}>
+          {server && <FlowSteps step={2} />}
           <div className="creation-heading"><span>สร้างตัวละคร</span><span className="text-[#d7bd82]">初</span></div>
+          {account && <p className="account-line" data-testid="account-line">บัญชี <b data-testid="online-username">{account}</b>
+            <button type="button" onClick={signOut}>เปลี่ยนบัญชี</button></p>}
           <label className="creation-label" htmlFor="hero-name">ชื่อตัวละคร</label>
           <input id="hero-name" name="heroName" autoComplete="off" value={name} onChange={(e) => setName(e.target.value)}
             maxLength={24} placeholder="ชื่อของเจ้า" className="creation-input" required />
@@ -63,7 +75,7 @@ export function StartScreen() {
           <p className="creation-note">เริ่มต้นด้วยพลังพื้นฐาน 1 ทุกค่า และวิชาหมัดตรง<br />บางสำนักรับศิษย์ตามเพศที่กำหนด</p>
           <button type="submit" className="pixel-action start-adventure" disabled={!canStart}>เริ่มเกมใหม่ <span aria-hidden="true">↗</span></button>
           <p className="creation-save-note">บันทึกความคืบหน้าอัตโนมัติในเบราว์เซอร์นี้</p>
-        </form>
+        </form>}
       </div>
     </div>
   );

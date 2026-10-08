@@ -51,8 +51,9 @@ export const useOnlineStore = create<OnlineState>()(
           return { ok: false, error: error instanceof AuthFailure ? error.code : "network" };
         }
       },
+      // The username stays: this browser's log in step opens with it filled in.
       signOut() {
-        set({ username: null, token: null, expires: null, status: "off", roomSize: 0 });
+        set({ token: null, expires: null, status: "off", roomSize: 0 });
       },
     }),
     {
