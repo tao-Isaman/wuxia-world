@@ -40,7 +40,7 @@
 import sharp from "sharp";
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, relative, sep } from "node:path";
 import { PL_SHEET_DATA } from "../lib/characters/pl-sheets-data";
 import type { PlSheet } from "../lib/characters/pl-sheets";
 import type { CharacterClip, CharacterMotion } from "../lib/characters/catalog";
@@ -119,10 +119,18 @@ async function pack(id: string): Promise<PlSheet> {
   const defeat = add(clipOr("defeat", "east"));
 
   const frames = await Promise.all(paths.map(readFrame));
-  // The feet: the bottom of the standing south pose; the body's axis: the base canvas's centre.
-  const south = frames[stand.S];
+  // The feet: the bottom of the character's own standing south pose; the body's axis: the base canvas's centre.
+  const south = await readFrame(join(root, "rotations", "south.png"));
   const feet = south.box.y1 + 1 - south.dy, axis = BASE / 2;
   const figure = south.box.y1 - south.box.y0 + 1;
+  // A frame from another character (a state of the same person) stands its feet where that character's do:
+  // move it so its south pose's feet meet this one's.
+  const sources = [...new Set(paths.map((p) => relative(from!, p).split(sep)[0]).filter((c) => c !== id))];
+  for (const c of sources) {
+    const theirs = await readFrame(join(from!, c, "rotations", "south.png"));
+    const shift = feet - (theirs.box.y1 + 1 - theirs.dy);
+    paths.forEach((p, i) => { if (relative(from!, p).split(sep)[0] === c) frames[i].dy -= shift; });
+  }
   let left = 0, right = 0, up = 0, down = 0;
   for (const f of frames) {
     left = Math.max(left, axis - (f.box.x0 - f.dx));
