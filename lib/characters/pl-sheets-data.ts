@@ -4,7 +4,7 @@ import type { PlSheet } from "./pl-sheets";
 export const PL_SHEET_DATA: Record<string, PlSheet> = {
   "f1": {
     "id": "f1",
-    "url": "/art/characters/pl/f1.png?v=4b48b794",
+    "url": "/art/characters/pl/f1.png?v=994bb0c9",
     "cell": 148,
     "columns": 8,
     "rows": 13,
@@ -82,7 +82,7 @@ export const PL_SHEET_DATA: Record<string, PlSheet> = {
   },
   "m1": {
     "id": "m1",
-    "url": "/art/characters/pl/m1.png?v=0b4763cf",
+    "url": "/art/characters/pl/m1.png?v=2f648efa",
     "cell": 146,
     "columns": 8,
     "rows": 13,
