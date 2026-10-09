@@ -20,7 +20,7 @@
  * and a list of takes plays one after another (`["attack#5-6", "slash"]`:
  * the draw of one take, then the strike of another). `"walk:east"` picks a
  * take for one direction only, and a backward range (`"walk_loop#7-0"`) plays
- * a take in reverse (m1's north walk was drawn stepping backward).
+ * a take in reverse (for a walk drawn stepping backward).
  *
  * PixelLab grows the canvas of a custom animation evenly around the character
  * (a 128 px character attacks on 172 px), so every frame is aligned by its

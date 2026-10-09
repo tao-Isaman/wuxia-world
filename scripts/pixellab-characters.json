@@ -12,7 +12,8 @@
         "slash#1-10"
       ],
       "walk:east": "walk_profile_a#0-7",
-      "walk:north": "walk_loop#7-0"
+      "walk:south": "walk_skel",
+      "walk:north": "walk_skel"
     }
   },
   "f1": {
@@ -26,7 +27,9 @@
       "attack": [
         "attack#5-6",
         "slash3#1-10"
-      ]
+      ],
+      "walk:south": "walk_skel",
+      "walk:north": "walk_skel"
     }
   },
   "beast_wolf": {
