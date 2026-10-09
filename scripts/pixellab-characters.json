@@ -12,9 +12,17 @@
         "slash#1-10"
       ],
       "walk:east": "walk_profile_a#0-7",
-      "walk:south": "walk_skel",
-      "walk:north": "walk_skel"
+      "walk:south": "m1_square/walk_skel",
+      "walk:north": "walk_skel",
+      "stand:south": "m1_square",
+      "idle:south": "m1_square/idle"
     }
+  },
+  "m1_square": {
+    "pixellab": "df7207c8-2ba7-4c38-a82b-5d204d20fee6",
+    "style": "B",
+    "partOf": "m1",
+    "note": "m1 standing square to the camera (a PixelLab state): his south stand, idle and walk"
   },
   "f1": {
     "pixellab": "a1292eb4-ee77-468b-a107-65e4e9be9cf0",

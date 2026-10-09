@@ -82,7 +82,7 @@ export const PL_SHEET_DATA: Record<string, PlSheet> = {
   },
   "m1": {
     "id": "m1",
-    "url": "/art/characters/pl/m1.png?v=2f648efa",
+    "url": "/art/characters/pl/m1.png?v=925d6750",
     "cell": 146,
     "columns": 8,
     "rows": 13,
