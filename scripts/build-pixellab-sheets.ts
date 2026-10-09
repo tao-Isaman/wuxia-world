@@ -20,7 +20,11 @@
  * and a list of takes plays one after another (`["attack#5-6", "slash"]`:
  * the draw of one take, then the strike of another). `"walk:east"` picks a
  * take for one direction only, and a backward range (`"walk_loop#7-0"`) plays
- * a take in reverse (for a walk drawn stepping backward).
+ * a take in reverse (for a walk drawn stepping backward). A take may come from
+ * another downloaded character (`"m1_square/walk_skel"`: a PixelLab state of
+ * the same person), and `"stand:south": "m1_square"` takes that direction's
+ * standing pose from it. A manifest entry with `partOf` is such a source only:
+ * it is not packed into a sheet of its own.
  *
  * PixelLab grows the canvas of a custom animation evenly around the character
  * (a 128 px character attacks on 172 px), so every frame is aligned by its
@@ -51,14 +55,14 @@ const BASE = 128;
 const RIGGED = { figure: 108, cell: 128, feet: 120 };
 const DIR_NAME: Record<Walk8Direction, string> = { S: "south", SE: "south-east", E: "east", NE: "north-east", N: "north" };
 /** Per character: which downloaded take each clip uses (default: the clip's own name). */
-const MANIFEST = JSON.parse(readFileSync("scripts/pixellab-characters.json", "utf8")) as Record<string, { clips?: Record<string, string | string[]> }>;
+const MANIFEST = JSON.parse(readFileSync("scripts/pixellab-characters.json", "utf8")) as Record<string, { partOf?: string; clips?: Record<string, string | string[]> }>;
 
 const args = process.argv.slice(2);
 const fromAt = args.indexOf("--from");
 const from = fromAt >= 0 ? args[fromAt + 1] : undefined;
 if (!from || !existsSync(from)) throw new Error("usage: bun scripts/build-pixellab-sheets.ts --from <raw dir> [id …]");
 const only = args.filter((_, i) => i !== fromAt && i !== fromAt + 1);
-const ids = readdirSync(from).filter((id) => existsSync(join(from, id, "rotations")) && !id.startsWith("beast_") && (!only.length || only.includes(id)));
+const ids = readdirSync(from).filter((id) => existsSync(join(from, id, "rotations")) && !id.startsWith("beast_") && !MANIFEST[id]?.partOf && (!only.length || only.includes(id)));
 if (!ids.length) throw new Error(`no characters to pack in ${from}`);
 
 type Frame = { data: Buffer; w: number; h: number; dx: number; dy: number; box: { x0: number; y0: number; x1: number; y1: number } };
@@ -83,17 +87,21 @@ async function pack(id: string): Promise<PlSheet> {
   const root = join(from!, id);
   const paths: string[] = [];
   const add = (files: string[]) => { const start = paths.length; paths.push(...files); return files.map((_, i) => start + i); };
-  const rotation = (dir: string) => join(root, "rotations", `${dir}.png`);
   // `clip:direction` (e.g. "walk:east") overrides the clip's take for one direction.
   const takes = (name: string, dir: string) => [MANIFEST[id]?.clips?.[`${name}:${dir}`] ?? MANIFEST[id]?.clips?.[name] ?? name].flat();
-  /** One take's frames: `name` or `name#from-to` (inclusive frame numbers). */
+  /** The standing pose: this character's rotation, or another downloaded character's (`"stand:south": "m1_square"`). */
+  const rotation = (dir: string) => {
+    const from_ = MANIFEST[id]?.clips?.[`stand:${dir}`];
+    return join(from!, typeof from_ === "string" ? from_ : id, "rotations", `${dir}.png`);
+  };
+  /** One take's frames: `name`, `name#from-to` (inclusive frame numbers), or `<character>/name`. */
   const takeFrames = (spec: string, dir: string) => {
     const [name, range] = spec.split("#");
-    const files = framesOf(join(root, name, dir));
+    const files = framesOf(name.includes("/") ? join(from!, name, dir) : join(root, name, dir));
     if (!range) return files;
     // "7-0" plays the frames backward: a walk drawn stepping backward becomes a forward walk.
-    const [from, to] = range.split("-").map(Number);
-    return from <= to ? files.slice(from, to + 1) : files.slice(to, from + 1).reverse();
+    const [first, last] = range.split("-").map(Number);
+    return first <= last ? files.slice(first, last + 1) : files.slice(last, first + 1).reverse();
   };
   const clipOr = (name: string, dir: string) => {
     const files = takes(name, dir).flatMap((spec) => takeFrames(spec, dir));
