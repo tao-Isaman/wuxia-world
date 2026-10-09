@@ -8,6 +8,7 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ### PixelLab characters: the heroes and the wolf redrawn
 
+- **m1's walk fixed:** walking north (the W key) no longer looks like stepping backward — the north take was drawn walking backward, so its frames now play in reverse (a backward range, `"walk:north": "walk_loop#7-0"`, in `scripts/pixellab-characters.json`); walking east / west uses a side-profile take.
 - **Walk loops and real slashes:** the heroes' walks now loop seamlessly (each direction re-animated from one frame back to the same frame), and their attack draws the sword and swings it in a wide arc with a blade streak instead of only drawing it.
 - The heroes **m1** and **f1** are redrawn and animated by PixelLab (style B: 128 px, high detail): vivid colours at native pixels, an 8-frame walk in eight directions, breathing idles, a sword slash, hit, guard stance, victory and a fall. The walk, hit, stance and fall are custom (v3) clips that keep the sword in place; the first template takes made the sword flicker while walking and the fall kick into the air. **Wolves** (and wild dogs) are a PixelLab beast (style C) with idle, bite and hurt clips, on the map and in battle. The styles were chosen from three candidates per kind.
 - Engine: a character atlas now carries its own clips, eight-way walk cells and `native` flag (`lib/characters/sheet.ts`, `pl-sheets.ts`); the map, battle, cutscene and preview renderers read them, so rigged and PixelLab sheets play side by side. Beasts map to sheets through `BEAST_SHEETS`.
