@@ -19,7 +19,8 @@
  * (`"walk_loop#0-7"` drops a loop's closing frame, which repeats its first)
  * and a list of takes plays one after another (`["attack#5-6", "slash"]`:
  * the draw of one take, then the strike of another). `"walk:east"` picks a
- * take for one direction only.
+ * take for one direction only, and a backward range (`"walk_loop#7-0"`) plays
+ * a take in reverse (m1's north walk was drawn stepping backward).
  *
  * PixelLab grows the canvas of a custom animation evenly around the character
  * (a 128 px character attacks on 172 px), so every frame is aligned by its
@@ -90,8 +91,9 @@ async function pack(id: string): Promise<PlSheet> {
     const [name, range] = spec.split("#");
     const files = framesOf(join(root, name, dir));
     if (!range) return files;
+    // "7-0" plays the frames backward: a walk drawn stepping backward becomes a forward walk.
     const [from, to] = range.split("-").map(Number);
-    return files.slice(from, to + 1);
+    return from <= to ? files.slice(from, to + 1) : files.slice(to, from + 1).reverse();
   };
   const clipOr = (name: string, dir: string) => {
     const files = takes(name, dir).flatMap((spec) => takeFrames(spec, dir));

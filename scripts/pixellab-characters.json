@@ -11,7 +11,8 @@
         "attack#5-6",
         "slash#1-10"
       ],
-      "walk:east": "walk_profile_a#0-7"
+      "walk:east": "walk_profile_a#0-7",
+      "walk:north": "walk_loop#7-0"
     }
   },
   "f1": {
