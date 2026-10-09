@@ -3,20 +3,28 @@
     "pixellab": "f16a1e87-20fa-4ca0-87cd-5b8b949e512b",
     "style": "B",
     "clips": {
-      "walk": "try_walk_v3",
+      "walk": "walk_loop#0-7",
       "hurt": "try_hurt_v3",
       "stance": "try_stance_v3",
-      "defeat": "try_defeat_v3"
+      "defeat": "try_defeat_v3",
+      "attack": [
+        "attack#5-6",
+        "slash#1-10"
+      ]
     }
   },
   "f1": {
     "pixellab": "a1292eb4-ee77-468b-a107-65e4e9be9cf0",
     "style": "B",
     "clips": {
-      "walk": "try_walk_v3",
+      "walk": "walk_loop#0-7",
       "hurt": "try_hurt_v3",
       "stance": "try_stance_v3",
-      "defeat": "try_defeat_v3"
+      "defeat": "try_defeat_v3",
+      "attack": [
+        "attack#5-6",
+        "slash3#1-10"
+      ]
     }
   },
   "beast_wolf": {

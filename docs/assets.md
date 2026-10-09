@@ -168,15 +168,17 @@ People and beasts are being redrawn and animated by PixelLab, replacing the pain
 
 | Name | Directions | How | Cost |
 | --- | --- | --- | --- |
-| `walk` | south, south-east, east, north-east, north (west-facing ones are mirrored) | v3, 8 frames, `keep_first_frame: false`: "walking forward at a calm steady pace, legs stepping and arms swinging slightly; the sheathed sword stays at his left hip in every frame, exactly as in the first frame" (beasts: template `walk-8-frames`) | 4 per direction |
+| `walk` | south, south-east, east, north-east, north (west-facing ones are mirrored) | v3 **loop**: `custom_start_frame_url` and `end_frame_url` both the same mid-stride frame, 8 frames: "one complete walking cycle in place… ends exactly back in the starting pose so it loops seamlessly; the sheathed sword stays at his hip in every frame". The closing frame repeats the first, so the clip uses `walk_loop#0-7` (beasts: template `walk-8-frames`) | 4 per direction |
 | `idle` | south (the map) and east (battle) | template `breathing-idle` (beasts `idle`) | 1 per direction |
-| `attack` | east | v3, 8 frames: "draws the jian sword and slashes forward in one swift wuxia strike, then returns to stance" | 4 |
+| `attack` | east | the draw (frames 5–6 of a first v3 take, "draws the jian sword and slashes forward…") then a v3 slash started from the drawn-sword frame (`custom_start_frame_url`), 10 frames: "lunges forward with a big step and swings the drawn sword in a wide, powerful diagonal slash from high overhead down to low in front, full body twisting into the blow with a bright white blade streak, then recovers into a ready stance holding the sword forward" — `["attack#5-6", "slash#1-10"]` | 4 + 5 |
 | `hurt` | east | v3, 6 frames: "is hit by a blow, flinches and recoils one step backward, then recovers his footing; the sword stays sheathed at his hip, no punching, no effects" | 3 |
 | `stance` | east | v3, 8 frames: "stands in a ready wuxia guard stance, knees bent, one hand on the sword hilt at his hip… no punching" — the guard pose | 4 |
 | `victory` | east | v3, 8 frames: "raises the sword high overhead in triumph" | 4 |
 | `defeat` | east | v3, 8 frames: "is struck hard, staggers backward, drops to his knees and collapses… lying still on the ground; the sword stays sheathed at his hip, no jumping, no kicking" | 4 |
 
-A person costs about 46 generations (3 to create, about 43 to animate); a beast about 16. Twenty jobs can run at once per account.
+A person costs about 50 generations (3 to create, about 47 to animate); a beast about 16. Twenty jobs can run at once per account.
+
+**Loops and strikes.** A plain v3 clip drifts away from its first pose, so a walk built from it jumps when it wraps (the last-to-first difference was about twice a normal step). Giving the same frame as start and end makes v3 come back to it: the closing frame matched the first (pixel difference under 1 against 20–40 between steps), so dropping it gives a seamless loop. A one-shot "draws and slashes" spent most of its frames standing and drawing; starting a second clip from the drawn-sword frame gives the whole clip to the swing. Prompts asking for glow can wash the body out ("her robe keeps its colours" did not help; the diagonal-slash wording did).
 
 **Templates redraw the figure; v3 keeps it.** A template clip (`walking-8-frames`, `taking-punch`, `falling-back-death`, `fight-stance-idle-8-frames`) is redrawn frame by frame from a bare skeleton: the sword came and went between walk frames, the hit and the fall started from a boxer's fists and the fall kicked into the air. Template `skeleton-v3` (the skeleton posed onto the character's own pixels) is steadier but still let the sword drift. v3 custom clips that say what must stay ("the sword stays sheathed at his hip in every frame") keep the outfit and weapon whole, so every person clip except the breathing idle is v3. A take is picked per clip in `scripts/pixellab-characters.json` (`clips`), so a re-roll under a new animation name replaces a clip without renaming anything.
 

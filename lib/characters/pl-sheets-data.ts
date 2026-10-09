@@ -4,10 +4,10 @@ import type { PlSheet } from "./pl-sheets";
 export const PL_SHEET_DATA: Record<string, PlSheet> = {
   "f1": {
     "id": "f1",
-    "url": "/art/characters/pl/f1.png?v=ad8157aa",
+    "url": "/art/characters/pl/f1.png?v=4b48b794",
     "cell": 148,
     "columns": 8,
-    "rows": 12,
+    "rows": 13,
     "feetY": 136,
     "figure": 121,
     "clips": {
@@ -32,27 +32,27 @@ export const PL_SHEET_DATA: Record<string, PlSheet> = {
         "repeat": -1
       },
       "attack": {
-        "frames": [53, 54, 55, 56, 57, 58, 59, 60, 61],
+        "frames": [53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64],
         "fps": 12,
         "repeat": 0
       },
       "hurt": {
-        "frames": [62, 63, 64, 65, 66, 67, 68],
+        "frames": [65, 66, 67, 68, 69, 70, 71],
         "fps": 10,
         "repeat": 0
       },
       "guard": {
-        "frames": [69, 70, 71, 72, 73, 74, 75, 76, 77],
+        "frames": [72, 73, 74, 75, 76, 77, 78, 79, 80],
         "fps": 8,
         "repeat": -1
       },
       "victory": {
-        "frames": [78, 79, 80, 81, 82, 83, 84, 85, 86],
+        "frames": [81, 82, 83, 84, 85, 86, 87, 88, 89],
         "fps": 8,
         "repeat": 0
       },
       "defeat": {
-        "frames": [87, 88, 89, 90, 91, 92, 93, 94, 95],
+        "frames": [90, 91, 92, 93, 94, 95, 96, 97, 98],
         "fps": 8,
         "repeat": 0
       }
@@ -82,10 +82,10 @@ export const PL_SHEET_DATA: Record<string, PlSheet> = {
   },
   "m1": {
     "id": "m1",
-    "url": "/art/characters/pl/m1.png?v=276aec0a",
+    "url": "/art/characters/pl/m1.png?v=ff841d3a",
     "cell": 146,
     "columns": 8,
-    "rows": 12,
+    "rows": 13,
     "feetY": 136,
     "figure": 120,
     "clips": {
@@ -110,27 +110,27 @@ export const PL_SHEET_DATA: Record<string, PlSheet> = {
         "repeat": -1
       },
       "attack": {
-        "frames": [53, 54, 55, 56, 57, 58, 59, 60, 61],
+        "frames": [53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64],
         "fps": 12,
         "repeat": 0
       },
       "hurt": {
-        "frames": [62, 63, 64, 65, 66, 67, 68],
+        "frames": [65, 66, 67, 68, 69, 70, 71],
         "fps": 10,
         "repeat": 0
       },
       "guard": {
-        "frames": [69, 70, 71, 72, 73, 74, 75, 76, 77],
+        "frames": [72, 73, 74, 75, 76, 77, 78, 79, 80],
         "fps": 8,
         "repeat": -1
       },
       "victory": {
-        "frames": [78, 79, 80, 81, 82, 83, 84, 85, 86],
+        "frames": [81, 82, 83, 84, 85, 86, 87, 88, 89],
         "fps": 8,
         "repeat": 0
       },
       "defeat": {
-        "frames": [87, 88, 89, 90, 91, 92, 93, 94, 95],
+        "frames": [90, 91, 92, 93, 94, 95, 96, 97, 98],
         "fps": 8,
         "repeat": 0
       }

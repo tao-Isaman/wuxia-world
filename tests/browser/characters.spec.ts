@@ -24,16 +24,21 @@ test("both heroes walk on their eight-way frames and face where they go", async 
     await expect(world).toHaveAttribute("data-player-motion", "idle");
     await expect(world).toHaveAttribute("data-player-pose", /^stand:/);
     await world.focus();
+    // Out and back on each axis, so the hero stays in the open yard (and never ends up against the well).
     for (const step of [
       { key: "d", dir: "E", row: "E" },
+      { key: "a", dir: "W", row: "E" },
       { key: "w", dir: "N", row: "N" },
       { key: "s", dir: "S", row: "S" },
-      { key: "a", dir: "W", row: "E" },
     ]) {
       await page.keyboard.down(step.key);
       await expect(world).toHaveAttribute("data-player-dir", step.dir);
-      await expect(world).toHaveAttribute("data-player-motion", "walk");
-      await expect(world).toHaveAttribute("data-player-pose", `walk:${step.row}`);
+      // Motion and pose are written in the same tick: read them together (a short walk
+      // can end against a wall between two separate reads).
+      await page.waitForFunction((row) => {
+        const host = document.querySelector('[data-testid="world-canvas"]');
+        return host?.getAttribute("data-player-motion") === "walk" && host.getAttribute("data-player-pose") === `walk:${row}`;
+      }, step.row, { polling: "raf", timeout: 15_000 });
       const first = await world.getAttribute("data-player-frame");
       await expect.poll(() => world.getAttribute("data-player-frame")).not.toBe(first);
       await page.keyboard.up(step.key);
