@@ -15,7 +15,10 @@
  * to the east rotation, so a character can be packed before every clip exists.
  * A character's `clips` in scripts/pixellab-characters.json picks another take
  * for a clip (`"walk": "try_walk_v3"`), so a re-roll can replace a clip
- * without renaming anything on PixelLab.
+ * without renaming anything on PixelLab. A take may name a frame range
+ * (`"walk_loop#0-7"` drops a loop's closing frame, which repeats its first)
+ * and a list of takes plays one after another (`["attack#5-6", "slash"]`:
+ * the draw of one take, then the strike of another).
  *
  * PixelLab grows the canvas of a custom animation evenly around the character
  * (a 128 px character attacks on 172 px), so every frame is aligned by its
@@ -46,7 +49,7 @@ const BASE = 128;
 const RIGGED = { figure: 108, cell: 128, feet: 120 };
 const DIR_NAME: Record<Walk8Direction, string> = { S: "south", SE: "south-east", E: "east", NE: "north-east", N: "north" };
 /** Per character: which downloaded take each clip uses (default: the clip's own name). */
-const MANIFEST = JSON.parse(readFileSync("scripts/pixellab-characters.json", "utf8")) as Record<string, { clips?: Record<string, string> }>;
+const MANIFEST = JSON.parse(readFileSync("scripts/pixellab-characters.json", "utf8")) as Record<string, { clips?: Record<string, string | string[]> }>;
 
 const args = process.argv.slice(2);
 const fromAt = args.indexOf("--from");
@@ -79,8 +82,19 @@ async function pack(id: string): Promise<PlSheet> {
   const paths: string[] = [];
   const add = (files: string[]) => { const start = paths.length; paths.push(...files); return files.map((_, i) => start + i); };
   const rotation = (dir: string) => join(root, "rotations", `${dir}.png`);
-  const take = (name: string) => MANIFEST[id]?.clips?.[name] ?? name;
-  const clipOr = (name: string, dir: string) => { const files = framesOf(join(root, take(name), dir)); return files.length ? files : [rotation(dir)]; };
+  const takes = (name: string) => [MANIFEST[id]?.clips?.[name] ?? name].flat();
+  /** One take's frames: `name` or `name#from-to` (inclusive frame numbers). */
+  const takeFrames = (spec: string, dir: string) => {
+    const [name, range] = spec.split("#");
+    const files = framesOf(join(root, name, dir));
+    if (!range) return files;
+    const [from, to] = range.split("-").map(Number);
+    return files.slice(from, to + 1);
+  };
+  const clipOr = (name: string, dir: string) => {
+    const files = takes(name).flatMap((spec) => takeFrames(spec, dir));
+    return files.length ? files : [rotation(dir)];
+  };
 
   const stand = Object.fromEntries(WALK8_DIRECTIONS.map((d) => [d, add([rotation(DIR_NAME[d])])[0]])) as Record<Walk8Direction, number>;
   const walk = Object.fromEntries(WALK8_DIRECTIONS.map((d) => [d, add(clipOr("walk", DIR_NAME[d]))])) as Record<Walk8Direction, number[]>;
