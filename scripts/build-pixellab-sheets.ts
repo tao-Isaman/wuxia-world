@@ -18,7 +18,8 @@
  * without renaming anything on PixelLab. A take may name a frame range
  * (`"walk_loop#0-7"` drops a loop's closing frame, which repeats its first)
  * and a list of takes plays one after another (`["attack#5-6", "slash"]`:
- * the draw of one take, then the strike of another).
+ * the draw of one take, then the strike of another). `"walk:east"` picks a
+ * take for one direction only.
  *
  * PixelLab grows the canvas of a custom animation evenly around the character
  * (a 128 px character attacks on 172 px), so every frame is aligned by its
@@ -82,7 +83,8 @@ async function pack(id: string): Promise<PlSheet> {
   const paths: string[] = [];
   const add = (files: string[]) => { const start = paths.length; paths.push(...files); return files.map((_, i) => start + i); };
   const rotation = (dir: string) => join(root, "rotations", `${dir}.png`);
-  const takes = (name: string) => [MANIFEST[id]?.clips?.[name] ?? name].flat();
+  // `clip:direction` (e.g. "walk:east") overrides the clip's take for one direction.
+  const takes = (name: string, dir: string) => [MANIFEST[id]?.clips?.[`${name}:${dir}`] ?? MANIFEST[id]?.clips?.[name] ?? name].flat();
   /** One take's frames: `name` or `name#from-to` (inclusive frame numbers). */
   const takeFrames = (spec: string, dir: string) => {
     const [name, range] = spec.split("#");
@@ -92,7 +94,7 @@ async function pack(id: string): Promise<PlSheet> {
     return files.slice(from, to + 1);
   };
   const clipOr = (name: string, dir: string) => {
-    const files = takes(name).flatMap((spec) => takeFrames(spec, dir));
+    const files = takes(name, dir).flatMap((spec) => takeFrames(spec, dir));
     return files.length ? files : [rotation(dir)];
   };
 
