@@ -784,6 +784,13 @@ export function tickQuestProgress(state: WorldStateData): void {
 // sect today) and add to
 // `artQuestsDone` if the quest is one-shot art-tagged.
 function recordSectQuestCompletion(state: WorldStateData, def: QuestDef): void {
+  // Done at last: a dropped attempt no longer matters (a repeatable sect
+  // quest's next round pays its gifts in full).
+  if (droppedQuestFlag(def.id) in state.flags) {
+    const flags = { ...state.flags };
+    delete flags[droppedQuestFlag(def.id)];
+    state.flags = flags;
+  }
   if (!def.sectId) return;
   const m = state.sectMembership[def.sectId];
   if (!m) return;
@@ -1095,7 +1102,8 @@ export function describeQuestCondition(
     case "or": {
       // OR — show every alternative; the stage progresses on any-done.
       const lines = c.any.flatMap((sub) => describeQuestCondition(state, sub, depth + 1, quest));
-      return lines.map((l) => ({ ...l, label: `(หรือ) ${l.label}` }));
+      // A lone line (the other ways have none, e.g. a waived spar) needs no "or".
+      return lines.length > 1 ? lines.map((l) => ({ ...l, label: `(หรือ) ${l.label}` })) : lines;
     }
     case "not": {
       const inner = describeQuestCondition(state, c.of, depth + 1, quest);

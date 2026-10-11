@@ -56,6 +56,8 @@ check("abandon: every quest is forgotten and offered again; how far it got is re
   assert.ok(isQuestOfferable(store(), side), "offered again");
   assert.ok(store().acceptQuest(side.id).ok, "taken again");
   assert.ok(store().actionLog.some((e) => e.message.includes("รับใหม่ได้ภายหลัง")));
+  assert.ok(store().finishQuestNow(side.id).ok);
+  assert.equal(store().flags[droppedQuestFlag(side.id)], undefined, "done at last: the dropped attempt is forgotten");
 });
 
 check("abandon: a sellable start gift is not paid again; an unsellable one is only topped up", () => {
