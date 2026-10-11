@@ -25,9 +25,9 @@ The wave-by-wave history that used to live in this file has moved to [docs/chang
 A Thai wuxia RPG in the browser: Next.js 15, React 19, TypeScript, Phaser 4, Zustand.
 
 - **Exploring.** The hero walks painted maps: 101 places, 129 roads; villages, towns and homes have their own people and activities; foes turn up on the map as the hero walks.
-- **Doing.** They talk to 235 NPCs (30 of whom, with their disciples and heirs, live their own lives) (and give them gifts), take 1,074 quests (a 15-chapter main story, 113 sect lineage quests — one per sect tier and kind, a pick of one move where a tier has several — and 48 story sagas among them), join one of 15 sects, gather, craft, steal, and land in jail.
+- **Doing.** They talk to 235 NPCs (30 of whom, with their disciples and heirs, live their own lives) (and give them gifts), take 1,075 quests (a 15-chapter main story, 113 sect lineage quests — one per sect tier and kind, a pick of one move where a tier has several — and 48 story sagas among them), join one of 15 sects, gather, craft, steal, and land in jail.
 - **Fighting.** Battles are turn-based tactics on a 10 × 7 board that grows to 15 × 10 for big gangs (up to 6 pack members plus the leader).
-- **Code.** Two pure engines (`lib/game`, `lib/world`) sit under Zustand stores and React / Phaser views. The player saves to `localStorage` (version 27); the shared world (people, rumors, beasts) beside it (`wusia-shared-v1`). Time is a world clock: one game day is one real hour.
+- **Code.** Two pure engines (`lib/game`, `lib/world`) sit under Zustand stores and React / Phaser views. Time is a world clock: one game day is one real hour. The released game plays on a server ([docs/online.md](docs/online.md)): accounts and up to four characters, each save (version 28) checked there; **one world for everyone**, which the server runs (people, rumors); **every fight checked by the server** (it stages it, replays it, rolls the spoils). Without a server (dev, tests) the save is `localStorage` and the world sits beside it (`wusia-shared-v1`).
 
 Start with [README.md](README.md), then [docs/README.md](docs/README.md).
 
@@ -48,6 +48,8 @@ Start with [README.md](README.md), then [docs/README.md](docs/README.md).
 Deploys are implied to be on Vercel (`VERCEL_GIT_COMMIT_SHA` sets the service-worker build id). There is no CI workflow in the repo, so the checks below are run by hand.
 
 ## Verified state
+
+**2026-10-11** (the server-run world, checked battles, data generation 2, and the bug-fix wave, PR #114): typecheck clean; lint 0 errors (17 warnings, all in untouched story data and old files); `cargo test` 23; every `test:*` unit suite passes, including the new `test:play-server` (11) and `test:rumors` / `test:grid-store`, which failed on `main` before; `test:online` 12 against `wrangler dev`; `audit-content` OK (1,075 quests); the server bundles from a clean checkout (1.78 MB gzipped); the browser suite as recorded in the PR. The table below is the older baseline.
 
 Checked on 2026-10-05 for the hero's flat base HP (a new hero starts at 136 HP), line-by-line conversations with coloured key words, the map editor's moved markers (NPCs, exits, spawn, service spots), the 1401 timeline and lore (sagas re-timed, the court's seized scriptures, the 15-chapter main story), the story timeline (NPC renames), the road fixes (the way back after a fight, the guide arrow turning back), item icons (every item, scroll and equipment piece shows a library icon), the PixelLab asset library (3,194 assets + 464 kit pieces: roads, city walls, house walls, fences that join on a grid), the engine at `/game/engine` (asset library, map editor, skill / art text overrides) and objects placed on maps:
 
@@ -93,11 +95,11 @@ Not verified:
 ## Known issues
 
 - **Names still from Jin Yong's novels.** The 2026-10-11 rename replaced the names the owner picked; kept by choice are several sect, place and art names (กู่มู่, สราญรมย์, ตะวันจันทรา, ดาวดึงส์, หุบเขาตัดใจ, เกาะดอกท้อ, ถ้ำหยางกั้ว, คัมภีร์ทานตะวัน…). Several sagas also retell the novel's plot beats under the new names ([story-writing.md](docs/story-writing.md#names-ours-not-a-novelists)).
-- **Foes scale with the world day, not the hero's age.** `playerPowerIndex` (`lib/world/data/random-events.ts`) uses `state.day / 200`; since the shared world clock (save v27) `day` is the world's day, so every new hero starts against stronger foes as real days pass (day 86 → power 0.43; from day 200 the late-game pool). Needs a `startDay` on the save (a version bump). Tests pin the clock or strengthen the hero meanwhile.
 - **Vercel builds a commit once.** If a branch is pushed to the merge commit's SHA (resetting the working branch onto `main`) before Vercel picks up the push to `main`, Vercel builds that SHA once, as a Preview, and production keeps the previous deploy (PR #106 went live this way only with the next merge). After merging, wait for the `main` push's Production deployment before resetting the branch.
 - **PixelLab characters are half done.** Only the heroes (m1, f1) and the wolf are redrawn ([docs/assets.md](docs/assets.md#pixellab-characters)); the 65 rigged NPCs, 22 enemy types, 7 archetypes and the other 11 beasts are still the painted / rigged art, so old and new styles meet on the same map. The heroes' work loops (`<id>-work.png`) are still painted, and their battle attack is one sword slash for every weapon family (the painted combat sheet is left out). About 1,520 PixelLab generations are left until 2026-11-04 (a person costs about 46 with v3 clips, a beast about 16).
-- **Saves are on the server, the game is not.** With a server (the released game) characters and saves live on it and every save is checked (`server/core/src/save.rs`: rev, pace, hero, limits, a gold allowance), but fights, rewards and shops are still computed in the browser: the checks stop edited saves, not a client that plays by its own rules. The shared world is one per account, not one for everyone. The server checks movement speed and bounds, not collision. `test:online` and `online.spec.ts` need `bun run server:dev` running (the spec skips otherwise). The server is live at `https://wuxia-world.tao-isaman.workers.dev` (Workers Builds on every push); it needs no secrets. Players with a local hero from before can import it once (gold capped at 100,000).
-- **The world clock moves the world fast.** One game day is one real hour, so a 360-day year is about 15 real days: people age a year every two weeks, a 30-day sect cooldown is 30 hours, a boss returns after 90 hours. Long absences only age the jianghu past eight simulated weeks per sync. Rumor wording, distortion and ids still use `Math.random` (they travel as `rumor` events, but a second machine would word them differently). The tournament bracket's "player" is the local hero; a shared bracket needs a server. A save ahead of the world clock (an e2e fixture, a hand-edited day) waits for the clock to catch up before time moves.
+- **What the server computes, and what it does not.** With a server (the released game) the server runs the one shared world and checks every fight (stages it from the save, replays the browser's command log, rolls the spoils, grants a win's gold); saves are checked (rev, pace, hero, limits, gold allowance). Quests, shops, crafting, gathering, gifts and letters still run in the browser, so an edited client can still give itself items or xp within the save limits — with no trading between players, only in its own game. The server trusts the saved hero it stages a fight from and which fight the save stands before. The server checks movement speed and bounds, not collision. `test:online` and `online.spec.ts` need `bun run server:dev` running (the spec skips otherwise). The server is live at `https://wuxia-world.tao-isaman.workers.dev` (Workers Builds on every push to `main`); it needs no secrets. Data generation 2 (2026-10-11) started it over; old local heroes can be imported once (gold capped at 100,000).
+- **Server CPU and size.** The TypeScript half carries the game's tables (12 MB minified, 1.78 MB gzipped, ~0.1–0.4 s to load at start-up). A week of the world or a long fight's final replay takes a few milliseconds to tens; the Workers free plan's 10 ms per request may be exceeded on long boss fights (Error 1102), which the paid plan lifts. Not measured on Cloudflare yet.
+- **The world clock moves the world fast.** One game day is one real hour, so a 360-day year is about 15 real days: people age a year every two weeks, a 30-day sect cooldown is 30 hours, a boss returns after 90 hours. Long absences only age the jianghu past eight simulated weeks per sync (the server's alarm keeps its world current). Each player has their own tournament bracket (the entrants are the shared world's people). A save ahead of the world clock (an e2e fixture, a hand-edited day) waits for the clock to catch up before time moves.
 - **Meridian balance not play-tested.** With charts filled, test fights ended in 1–3 turns (big stat totals plus opening attack %); T0 shields are tiny (a few HP). Start effects apply only in grid battles, not the legacy 1v1 loop. On a phone (844×390) an effect point's tooltip covers most of the figure.
 
 - **Meridian charts lean on the spine.** Many charts chain back points (tailbone → lower back → upper back → nape); the silhouette draws them as dashed rings on the centre line, which reads less well than charts along the limbs. The content is generated from routes in the content agent's spec (not in the repo); a pass spreading more charts over the limbs would help.
@@ -166,7 +168,6 @@ Real behaviour today, found during the docs audit. Each is small and self-contai
 
 - **New place content is unplayed by hand.** The 97 place quests pass the store play-through and audits; their writing was checked by the agents that wrote it, not proofread.
 - **Two systems teach some ยุทธจักร moves.** 35 of the 69 moves that got a quest can also be bought from city school halls or read from a manual; that is intended (quests are the way for every move), but the hall prices weren't retuned.
-- **Kidnapped NPCs can't be kidnapped again** after they return (`kidnappedNpcIds` stays for quest conditions).
 
 ### Landscape and menus
 
@@ -176,7 +177,6 @@ Real behaviour today, found during the docs audit. Each is small and self-contai
 - **The PixelLab MCP server is configured per container.** It was added with `claude mcp add` (local scope, `/root/.claude.json`), which a fresh cloud container does not have; the scripts call the REST API with `PIXELLAB_API_TOKEN` instead.
 - **f1 lacks six work loops.** Alchemy, needlework, meditation, reading, zither and sleep were not painted for f1 (the image API credits ran out); the work overlay keeps the plain preview for them (`HERO_WORK_GAPS`). Paint with `scripts/paint-hero-actions.py`, rebuild with `scripts/build-hero-actions.ts`, empty the list.
 - **A few painted attack frames carry a stray weapon tip.** Where a strip's figures touched (m1 sword strike / follow-through, f1 spear recover and sabre follow-through), the split leaves a bit of the neighbour's weapon in the cell; repaint those strips to clean them.
-- **`characters.spec` is flaky.** "both heroes walk" sometimes times out waiting for the walk motion in a full run; it passes when run alone.
 - **ฉายา is derived, not earned.** `heroEpithet` reads the record each time (crown, wanted marks, top sect rank, strongest trait); there is no title the player picks or keeps.
 
 ### Quests and sects
@@ -184,83 +184,41 @@ Real behaviour today, found during the docs audit. Each is small and self-contai
 - **Some writing still names the move.** Quest names, summaries, rewards and the sect window say วิชาลึกลับ, but the hand-written offer / hand-in lines of lineage quests and saga chapters, and saga titles, were not rewritten and can name or hint at the move.
 - **Old saves keep their moves.** Moves learned before scrolls existed stay learned; a quest in progress hands over a scroll when it ends.
 
-1. **Abandoned quests can never be taken again** (lineage quests, saga chapters and sect art trials excepted: those are forgotten and offered again).
-   - `abandonQuest` marks the quest `failed`.
-   - `acceptQuest` refuses failed quests, and `isQuestOfferable` hides any quest with an entry.
-2. **Leaving a sect blocks rejoining it forever.** Any membership entry, including resigned and betrayed ones, blocks both the `joinSect` action and the reward.
-3. **สำนักสราญรมย์ has no redemption quest.** A betrayer's `hunter_xiaoyao` never stops.
-4. **`joinRequirements` is only read by the store `joinSect` action, which no UI calls.** Real joins go through the intro quest's `joinSect` reward, which does not check it.
-
-   The intro quests' `prereqs` carry the same gates today, so nothing is broken yet, but the two can drift apart.
-5. **Resign or betray through quest rewards skip the echo**, the log line and betrayal's evil +5. (Joining by the reward now echoes, and milestone quests — main-story chapters, saga finales — fire `quest_major_complete`.)
-6. **Resigning freezes only battle xp** for that sect's skills. Practice, w-exp level-ups and quest `skillExp` still raise them.
-7. **Store sect actions don't check status.** `upgradeSectRank` and `acceptSectQuest` ignore it; only the UI hides inactive memberships.
-8. **Left from the 2026-10-06/07 quest passes** (the rest of that list — place names, duplicate NPC names, unreachable dialogs, offers that couldn't be declined, the winter-aid / relic / formula / Shaolin–Wudang quests, speaker portraits, the spy quests' extra gold — is fixed):
-   - `st_jh_godslayer_blade_17`'s offer is staged in the desert ruins but its giver ลู่เกวียน stands in หมู่บ้านไร้นาม; `st_jh_sunflower_30` and `st_jh_nine_yin_27` have givers far from where the chapter happens.
-   - Shared saga people (ทหารแก่เฉิน, นักยุทธศาสตร์กง, หวงชิงเฉวียน's family tree) have backstories that differ between sagas without contradicting outright.
-   - A few saga speaker labels (ทูตเซี่ย, เสี่ยวเฉ่า, ขุนนางหยาน, อาจารย์ดาบ) don't resolve to an NPC portrait.
-   - Story beats moved onto dialog spots (the Heilong dives, the river watch) no longer cost hours.
-   - `st_jh_lone_sword_08` asks AGI 90 on the chapter but 80 on its stat step.
+8. **Left from the 2026-10-06/07 quest passes:** shared saga people (ทหารแก่เฉิน, นักยุทธศาสตร์กง, หวงชิงเฉวียน's family tree) have backstories that differ between sagas without contradicting outright. (The sect, quest and saga issues 1–7 and the rest of this item were fixed on 2026-10-11.)
 
 ### Content data
 
-8. **Twelve non-artisan recipes have no crafting button** (drawing, writing, mining, hunting, fishing, herbalism, venom, woodcutting). The store could craft them anywhere, but only the artisan popup calls `craftRecipe`.
-9. ~~A dangling drop (`man_ne2`).~~ Fixed: the sect manuals and their drops were removed. `audit-content.ts` still does not check drop tables.
-10. **Unused content:**
-    - `spar_xiaoyao_master` is referenced by nothing.
-    - Six gathering nodes are placed nowhere: `mine_rock`, `mine_silver`, `mine_gold`, `hunt_legendary`, `herb_rare`, `venom_scorpion`.
-    - Three recipes are sold nowhere: `tailor_leather`, `chef_stew`, `accessory_jade_pendant`.
-11. ~~No way to learn `sl_long_dharma`.~~ Fixed: its lineage quest teaches it.
-12. **Unread or orphaned fields:**
-    - `NpcDef.questIds` is never read by code.
-    - The `village_to_world` road is orphaned.
-    - `world_journey` is reachable only from two tutorial dialogs.
-13. ~~A missing location (`cave_heimu`).~~ Fixed: treasure journeys go to real caves, cliffs, mountains and valleys.
+9. **`world_journey`** (the old random-teleport hub) is reachable only from two tutorial dialogs (documented in content-authoring.md). The 2026-10-11 wave fixed the rest of this list: crafting the twelve trades anywhere, drop tables in `audit-content`, the orphan recipes, `spar_xiaoyao_master`, `NpcDef.questIds`, the `village_to_world` road.
 
 ### Liveness (NPC simulation and rumors)
 
-Liveness 2.0 (2026-10-06) fixed the old gaps: people age on their birthdays, the dead leave every map and their seat and quests pass to an heir, talk spreads to the heartland and beyond, markets and sect grounds have a listening spot (Sun-Moon's too), and both silent player echoes fire. What is left:
+Generated people now have portraits, sects avenge their dead with a 60-day feud, the tournament is announced, leads pay when followed, and `npcExt` is repaired on load (2026-10-11). What is left:
 
-14. **Generated people have no portrait** — their card shows their costume, with a generic description.
-15. **Killing brings only the law.** A sect does not avenge its dead on the hero (unless the hero betrayed their own sect by it).
-16. **Warnings never fire, and lore `leadsTo` is never read.**
-17. **No repair for `npcExt`** beyond `seedLiveness` completing entries on load.
+16. **Only the tournament warning fires.** The festival, sect-gathering, bandit-raid and eclipse warnings have templates but nothing schedules those events.
 
    More detail: [docs/liveness.md](docs/liveness.md#known-gaps).
 
 ### UI and rendering
 
-18. **The quest tracker may cover the "อื่น ๆ" drawer button** at the top right, on the six maps that show it (including `home_player`). Not yet confirmed in a browser.
-19. **Action-log names.** The kinds `battle`, `encounter`, `steal`, `assassinate` and `kidnap` show their raw English names; the `travel` label is never used.
-20. **`/progress` fills the cache.** Its 5-second polling of `/progress.json?t=…` fills the service worker's 900-entry asset cache and can evict real art.
-21. **Night disagrees.** The sundial calls 戌–丑 night; the lighting and music use ชั่วยาม 8–11.
-22. **Raw effect names.** Skill tooltips have no text for `buff_cri`, `debuff_atk`, `debuff_def_eva`, `burn_hp_mp`, `poison_dmg` and `stun`, so about 18 skills show the raw name.
+The tracker / drawer overlap, the log labels, `/progress.json` in the cache, the night definition and the effect names were fixed on 2026-10-11. Nothing numbered is left here; see the sections above for the landscape and menu notes.
 
 ### Combat
 
-23. **`mult_iatk` / `mult_atk` passives work only for `taiji` and `scholar`.** Nine other arts carry them for nothing.
-24. **Hunt packs never spawn.** The `hunt_boar` and `hunt_alpha_wolf` packs don't appear, because hunting fights are 1v1.
-25. **Art actives skip several modifiers:** mastery, stacks, `pct_atk`, the target's `debuff_def` and gear `pct_reduce`. A stunned caster still pays MP.
-
-   More: [docs/combat.md](docs/combat.md#known-quirks) and [docs/grid-combat.md](docs/grid-combat.md#known-gaps).
+The `mult_*` passives, hunt packs and art actives' modifiers were fixed on 2026-10-11. Left: poison, burn and regeneration change HP without a battle event, so no number pops up for them ([docs/grid-combat.md](docs/grid-combat.md#known-gaps)).
 
 ### Balance and data
 
-26. **The forest practice bonus is unreachable.** No location id is `forest_` / `grove_`.
-27. **Power jumps early.** Joining any sect that starts at rank 5 sets encounter power to 0.5 at once, which scales every opponent ×1.3.
+The forest practice bonus and the early power jump were fixed on 2026-10-11 (forest places come from their land; sect standing grows with rank progress and time in the sect; foes grow with the hero's own days, `startDay`).
 
 ### Tooling
 
-28. **`sharp` is undeclared.** It is used by `build-npc-sprites.ts`, `build-npc-sheets.ts`, `test-npc-sheets.ts`, `build-pwa-icons.ts`, `build-route-variants.ts` and `map-collision-tool.ts`, but not listed in `package.json`; it arrives through Next.
 29. **Footprints can't be rebuilt safely.** The per-map footprint JSON sources are not in the repo, so `build-map-footprints.ts` cannot rebuild the data without dropping maps.
 30. **Dangerous scripts:**
     - `split-sects-file.ts` and `append-templated-quests.ts` are one-off migrations; rerunning them empties the sect barrels or duplicates 20 quests.
     - `audit-quest-flow.ts` is a legacy audit that fails with 168 false positives.
 31. **Loose ends:**
-    - `test-world-vignettes.ts` passes but is not wired into a suite.
     - `public/progress.json` is frozen at wave 11.
     - `next lint` is deprecated and will need replacing for Next 16.
-32. **A few stale comments remain in UI and CSS files.** Examples: the party-card rules in `app/game-hud.css` / `app/mobile-hud.css`, the column counts in `components/world/menu-bar.tsx`, `components/world/status-bar.tsx`, and `app/dq-theme.css` naming `combat-actions.css`. Comments in the engines and data tables were corrected in the docs rewrite.
 
 ### Rigged NPCs
 
@@ -275,43 +233,20 @@ Liveness 2.0 (2026-10-06) fixed the old gaps: people age on their birthdays, the
 
 ### Story quests
 
-35. **Saga foes and their NPCs coexist.** A saga boss that borrows an NPC's sheet (`st_outsider_sixfold_dushi` uses ตู๋ซื่อ) still fights even if that NPC was killed or kidnapped earlier.
 36. **Cutscene actors are the map sprites.** Films stage the same rigged sheets and archetypes, so side and back views are approximate (see 33), and novel heroes in flashbacks borrow archetype bodies.
 37. **Thai name renderings.** Novel names follow the Thai translation (ลั่วเทียนหมิง, เหลยจิ้น, ไป๋อวี่เฟิง…), but transliterations of new characters vary between writers.
 38. **Bundle size.** The story content is bundled with the rest of the world data, nearly doubling `/`'s first load (508 → 984 kB). Loading `lib/world/data/story/` lazily would need the quest and scene tables to become async.
-39. **Lineage teachers are fixed.** If a lineage teacher dies in the simulation, the quest can still be accepted and handed in on their card (dead NPCs stay on the map), which reads oddly.
 
 ## Suggested next steps
 
 In rough priority order:
 
-1. **Quest and sect dead ends** (issues 1–3): allow re-accepting an abandoned side quest (or hide abandon for one-shot story quests), allow rejoining a resigned sect or say clearly that it is final, and add `qst_xiaoyao_redemption`.
-2. **Data fixes:**
-   - Place or delete the six unused nodes.
-   - Sell or delete the three orphan recipes.
-   - Make `audit-content.ts` check drop tables.
-3. **Non-artisan crafting** (issue 8): a craft tab in the life-skills popup for recipes whose skill is not an artisan profession.
-4. **Liveness next:** sect revenge on the hero for a killed member, portraits for generated people, quests that come from the simulation (a feud to settle, a disciple to rescue).
-5. **UI fixes:**
-   - Check and fix the tracker / drawer overlap.
-   - Add action-log labels.
-   - Stop caching `/progress.json`, or retire `/progress`.
-   - Add tooltip text for the six effects.
-6. **Combat:**
-   - Make `mult_*` passives generic.
-   - Let hunting use packs.
-   - Do a balance pass on encounter power scaling.
-7. **Tooling:**
-   - Run `bun scripts/golden-replay.ts` before and after any store or engine refactor; its output must be byte-identical (see docs/scripts.md).
-   - Possible next performance steps (measured as small today, so not done): batch save writes per microtask with a `flush()` for tests; narrower store subscriptions in the 15 components that read the whole store; split `world-runtime.ts` / `grid-battle-runtime.ts`.
-   - Declare `sharp`.
-   - Wire `test-world-vignettes.ts`.
-   - Move off `next lint`.
-   - Add a CI workflow that runs typecheck, lint and the `test:*` suites.
-8. **Story content:**
-   - Load `lib/world/data/story/` lazily to win back the ~480 kB of first load (issue 38).
-   - Proofread saga chapters 3 and later line by line (the 2026-10-06 pass read chapters 1–2 of all 48 sagas and ran scripted checks on the rest), and unify transliterations of new names.
-   - Give saga bosses that borrow an NPC's sheet their own sprite, or skip them once that NPC is gone (issue 35).
+1. **Watch the server after the deploy.** Check `/health`, a sign-up, a fight and the world on the live server; if Cloudflare reports Error 1102 (CPU) on long fights, move to the Workers paid plan or split the final replay.
+2. **More on the server, if players come to share an economy:** shops and quest rewards as server calls, and an audit of items and moves against the game's tables ([online.md](docs/online.md#limits-and-next-steps)).
+3. **Scheduled world events** for the warnings that never fire (festivals, sect gatherings, bandit raids, eclipses), run by the server's world.
+4. **Art:** the rest of the PixelLab characters, f1's six work loops, the leftover painted paths.
+5. **Story content:** load `lib/world/data/story/` lazily (issue 38); proofread saga chapters 3 and later; unify transliterations.
+6. **Tooling:** run `bun scripts/golden-replay.ts` before and after store or engine refactors; move off `next lint`; add a CI workflow that runs typecheck, lint and the `test:*` suites.
 
 ## Environment notes
 
