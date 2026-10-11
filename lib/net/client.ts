@@ -1,5 +1,5 @@
-// The low-level client for the game server (docs/online.md): the HTTP auth
-// calls and one WebSocket into one room. No React, no store — the browser
+// The low-level client for the game server (docs/online.md): the HTTP auth,
+// character, save and world calls, and one WebSocket into one room. No React, no store — the browser
 // (lib/net/session.ts) and the server test (scripts/test-online-server.ts)
 // both use it.
 import { PROTOCOL_VERSION, type ClientMsg, type HeroBody, type Motion, type ServerMsg, type Session } from "./protocol";
@@ -40,6 +40,61 @@ export async function checkToken(server: string, token: string): Promise<"valid"
     return "unknown";
   }
 }
+
+/** A characters / saves / world call the server refused (`code`: `stale`, `gold_too_fast`, …). */
+export class ApiFailure extends Error {
+  constructor(public readonly code: string, public readonly status: number, public readonly detail?: string) {
+    super(detail ? `${code}: ${detail}` : code);
+  }
+}
+
+/** A character on the server (`wuxia_core::save::Character`, without its bookkeeping). */
+export interface CharacterInfo {
+  id: string;
+  name: string;
+  gender: "male" | "female";
+  body: "m1" | "f1";
+  created: number;
+  updated: number;
+  /** The last accepted save's number (0: never saved). */
+  rev: number;
+  summary: { day: number; gold: number; location: string | null; sect: string | null; rank: number | null } | null;
+}
+
+/** The game's own save JSON (zustand persist's `{ state, version }`). */
+export interface SaveBlob {
+  version: number;
+  state: Record<string, unknown>;
+}
+
+async function call<T>(server: string, token: string, method: string, path: string, body?: unknown, keepalive = false): Promise<T> {
+  const response = await fetch(`${server.replace(/\/$/, "")}${path}`, {
+    method,
+    headers: { authorization: `Bearer ${token}`, ...(body === undefined ? {} : { "content-type": "application/json" }) },
+    body: body === undefined ? undefined : JSON.stringify(body),
+    keepalive,
+  });
+  const reply = await response.json().catch(() => ({ error: "server_error" })) as T & { error?: string; detail?: string };
+  if (!response.ok) throw new ApiFailure(reply.error ?? "server_error", response.status, reply.detail ?? undefined);
+  return reply;
+}
+
+export const listCharacters = (server: string, token: string) =>
+  call<{ characters: CharacterInfo[] }>(server, token, "GET", "/characters").then((r) => r.characters);
+export const createCharacter = (server: string, token: string, name: string, gender: "male" | "female") =>
+  call<CharacterInfo>(server, token, "POST", "/characters", { name, gender });
+export const deleteCharacter = (server: string, token: string, id: string) =>
+  call<{ deleted: string }>(server, token, "DELETE", `/characters/${encodeURIComponent(id)}`);
+export const loadSave = (server: string, token: string, id: string) =>
+  call<{ rev: number; save: SaveBlob | null }>(server, token, "GET", `/characters/${encodeURIComponent(id)}/save`);
+/** Store a save built on `rev` (the server answers `stale` if another tab or device saved since). */
+export const storeSave = (server: string, token: string, id: string, rev: number, save: SaveBlob, keepalive = false) =>
+  call<{ rev: number; summary: CharacterInfo["summary"] }>(server, token, "PUT", `/characters/${encodeURIComponent(id)}/save`,
+    { rev, version: save.version, state: save.state }, keepalive);
+export const loadWorld = (server: string, token: string) =>
+  call<{ rev: number; world: Record<string, unknown> | null }>(server, token, "GET", "/world");
+export const storeWorld = (server: string, token: string, world: unknown, keepalive = false) =>
+  call<{ rev: number }>(server, token, "PUT", "/world", { world }, keepalive);
 
 export interface RoomOptions {
   server: string;

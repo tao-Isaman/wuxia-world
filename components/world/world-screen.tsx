@@ -19,6 +19,7 @@ import {
 } from "@/lib/world";
 import { useGameServer } from "./online-panel";
 import { signedIn, useOnlineStore } from "@/store/online-store";
+import { useCloudSession } from "@/store/cloud-session";
 import { StartScreen } from "./start-screen";
 import { DialogStage, type DialogSpeaker } from "./dialog-stage";
 import { LocationView } from "./location-view";
@@ -100,6 +101,8 @@ export function WorldScreen() {
   // Online play (docs/online.md): with a game server set, the flow is account → character → game.
   const server = useGameServer();
   const needsAccount = useOnlineStore((s) => !!server && !signedIn(s));
+  // On a server the save is a character's: nothing to play until one is entered.
+  const needsCharacter = useCloudSession((s) => !!server && s.phase !== "playing");
   const currentSceneId = useWorldStore((s) => s.currentSceneId);
   const lastLocationId = useWorldStore((s) => s.lastLocationId);
   const pendingBattle = useWorldStore((s) => s.pendingBattle);
@@ -158,8 +161,8 @@ export function WorldScreen() {
   // silently hangs because no ConfirmDialog is on the tree.
   let body: React.ReactNode;
 
-  if (needsAccount || !hasGame) {
-    // Online, an account comes first — also for a returning player with a save.
+  if (needsAccount || needsCharacter || !hasGame) {
+    // Online, an account and a character come first.
     body = <StartScreen />;
   } else if (gameOver) {
     body = <GameOverScreen />;

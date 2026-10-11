@@ -3,8 +3,13 @@
 //   GAME_SERVER_URL=http://127.0.0.1:8787 bun scripts/test-online-server.ts
 // Two accounts sign up and log in, walk into the same room, see each other
 // join, move and leave; a second login of one account replaces the first.
+// Characters and saves: create / list / delete, saves the server checks
+// (rev, rate, hero, numbers, gold allowance), the account's shared world.
 import assert from "node:assert/strict";
-import { checkToken, connectRoom, login, register, type RoomConnection } from "../lib/net/client";
+import {
+  ApiFailure, checkToken, connectRoom, createCharacter, deleteCharacter, listCharacters, loadSave, loadWorld, login, register,
+  storeSave, storeWorld, type RoomConnection,
+} from "../lib/net/client";
 import type { ServerMsg } from "../lib/net/protocol";
 
 const server = (process.env.GAME_SERVER_URL ?? "http://127.0.0.1:8787").replace(/\/$/, "");
@@ -144,6 +149,78 @@ await check("logging in again elsewhere replaces the older socket", async () => 
   assert.equal(watcher.inbox.filter(isEvent("left")).length, 0);
   second.conn.close();
   watcher.conn.close();
+});
+
+/** The code a refused call answered with. */
+async function refusal(promise: Promise<unknown>): Promise<string> {
+  try {
+    await promise;
+  } catch (error) {
+    if (error instanceof ApiFailure) return error.code;
+    throw error;
+  }
+  throw new Error("the call was accepted");
+}
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+function heroState(name: string, gold: number) {
+  return { hasGame: true, day: 90, gold, wExp: 0, meridianPoints: 0, lastLocationId: "city_capital", inventory: { herb_common: 2 },
+    inventoryEquipment: {}, sectMembership: {}, playerBuild: { name, artLevel: 1, stats: { STR: 5 }, skillLevels: { basic_punch: 1 } } };
+}
+
+await check("characters: none at first, created up to four with unique names, one deleted; only the owner sees them", async () => {
+  assert.deepEqual(await listCharacters(server, annToken), []);
+  const mei = await createCharacter(server, annToken, " เหมยหลิง ", "female");
+  assert.equal(mei.name, "เหมยหลิง");
+  assert.equal(mei.body, "f1");
+  assert.equal(mei.rev, 0);
+  assert.equal(await refusal(createCharacter(server, annToken, "เหมยหลิง", "male")), "name_taken");
+  assert.equal(await refusal(createCharacter(server, annToken, "", "male")), "bad_name");
+  for (const name of ["ข", "ค", "ง"]) await createCharacter(server, annToken, name, "male");
+  assert.equal(await refusal(createCharacter(server, annToken, "จ", "male")), "too_many");
+  assert.equal((await listCharacters(server, annToken)).length, 4);
+  assert.deepEqual(await listCharacters(server, bobToken), [], "another account sees none of them");
+  const extra = (await listCharacters(server, annToken)).find((c) => c.name === "ง")!;
+  await deleteCharacter(server, annToken, extra.id);
+  assert.equal(await refusal(deleteCharacter(server, annToken, extra.id)), "no_character");
+  assert.equal(await refusal(deleteCharacter(server, bobToken, mei.id)), "no_character", "bob cannot delete ann's character");
+  const response = await fetch(`${server}/characters`);
+  assert.equal(response.status, 401, "no token, no list");
+});
+
+await check("saves: the server checks rev, pace, the hero, its numbers and the gold allowance", async () => {
+  const mei = (await listCharacters(server, annToken)).find((c) => c.name === "เหมยหลิง")!;
+  assert.deepEqual(await loadSave(server, annToken, mei.id), { rev: 0, save: null });
+  const first = await storeSave(server, annToken, mei.id, 0, { version: 27, state: heroState("เหมยหลิง", 50) });
+  assert.equal(first.rev, 1);
+  assert.equal(first.summary?.gold, 50);
+  assert.equal(await refusal(storeSave(server, annToken, mei.id, 0, { version: 27, state: heroState("เหมยหลิง", 60) })), "stale");
+  assert.equal(await refusal(storeSave(server, annToken, mei.id, 1, { version: 27, state: heroState("เหมยหลิง", 60) })), "too_fast");
+  await sleep(1100);
+  assert.equal(await refusal(storeSave(server, annToken, mei.id, 1, { version: 27, state: heroState("คนอื่น", 60) })), "name_mismatch");
+  assert.equal(await refusal(storeSave(server, annToken, mei.id, 1, { version: 27, state: heroState("เหมยหลิง", 5_000_000) })), "gold_too_fast");
+  assert.equal(await refusal(storeSave(server, annToken, mei.id, 1, { version: 26, state: heroState("เหมยหลิง", 60) })), "bad_version");
+  const broken = heroState("เหมยหลิง", 60);
+  (broken.playerBuild.skillLevels as Record<string, number>).basic_punch = 99;
+  assert.equal(await refusal(storeSave(server, annToken, mei.id, 1, { version: 27, state: broken })), "bad_save");
+  const second = await storeSave(server, annToken, mei.id, 1, { version: 27, state: heroState("เหมยหลิง", 80) });
+  assert.equal(second.rev, 2);
+  const loaded = await loadSave(server, annToken, mei.id);
+  assert.equal(loaded.rev, 2);
+  assert.equal(loaded.save?.version, 27);
+  assert.equal((loaded.save?.state as { gold: number }).gold, 80);
+  const listed = (await listCharacters(server, annToken)).find((c) => c.id === mei.id)!;
+  assert.deepEqual([listed.rev, listed.summary?.day, listed.summary?.location], [2, 90, "city_capital"]);
+});
+
+await check("the shared world: one per account, stored as sent", async () => {
+  assert.deepEqual(await loadWorld(server, bobToken), { rev: 0, world: null });
+  const { rev } = await storeWorld(server, bobToken, { worldSeed: "abc", rumorPool: [] });
+  assert.equal(rev, 1);
+  const world = await loadWorld(server, bobToken);
+  assert.equal(world.rev, 1);
+  assert.deepEqual(world.world, { worldSeed: "abc", rumorPool: [] });
+  assert.equal(await refusal(storeWorld(server, bobToken, [1, 2])), "bad_save");
+  assert.deepEqual((await loadWorld(server, annToken)).world, null, "ann's account has its own world");
 });
 
 if (failed) {

@@ -10,8 +10,12 @@ import { gameServerUrl } from "@/lib/net/config";
 import { signedIn, useOnlineStore } from "@/store/online-store";
 import { useWorldStore } from "@/store/world-store";
 import { toast } from "@/store/toast-store";
+import { startCloudSession, useCloudSession } from "@/store/cloud-session";
 
 export function OnlineBridge() {
+  // Server saves: resume / follow the save status / write on close (store/cloud-session.ts).
+  useEffect(() => { startCloudSession(); }, []);
+
   const token = useOnlineStore((s) => (signedIn(s) ? s.token : null));
   const hasGame = useWorldStore((s) => s.hasGame);
   const name = useWorldStore((s) => s.playerBuild?.name ?? "");
@@ -25,7 +29,7 @@ export function OnlineBridge() {
     let live = true;
     void checkToken(server, token).then((verdict) => {
       if (!live || verdict !== "rejected" || useOnlineStore.getState().token !== token) return;
-      useOnlineStore.getState().signOut();
+      void useCloudSession.getState().signOut();
       toast("info", "กรุณาเข้าสู่ระบบอีกครั้ง");
     });
     return () => { live = false; };

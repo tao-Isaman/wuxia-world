@@ -7,6 +7,14 @@
 //! - `GET  /auth/me?token=…`            → `{ username, expires }`, or 401 for a token that no longer works
 //! - `GET  /rooms/<room>/ws?token=…`     → a WebSocket into that map's room
 //!
+//! Characters and saves (`Authorization: Bearer <token>`; docs/online.md):
+//! - `GET    /characters`                 → `{ characters }`
+//! - `POST   /characters` `{ name, gender }` → the new character
+//! - `DELETE /characters/<id>`           → `{ deleted }`
+//! - `GET    /characters/<id>/save`      → `{ rev, save }` (`save` is `null` before the first)
+//! - `PUT    /characters/<id>/save` `{ rev, version, state }` → `{ rev, summary }`, checked by `wuxia_core::save`
+//! - `GET    /world` · `PUT /world` `{ world }` → the account's shared world (`{ rev, world }` · `{ rev }`)
+//!
 //! Durable Objects: [`account::AccountObject`] (one per username) keeps the
 //! account's event log; [`room::RoomObject`] (one per map id) runs the
 //! realtime room; [`keys::KeyObject`] makes and keeps the token-signing key
@@ -38,8 +46,8 @@ pub(crate) fn now_ms() -> f64 {
 fn cors_headers() -> Headers {
     let headers = Headers::new();
     let _ = headers.set("Access-Control-Allow-Origin", "*");
-    let _ = headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-    let _ = headers.set("Access-Control-Allow-Headers", "content-type");
+    let _ = headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    let _ = headers.set("Access-Control-Allow-Headers", "content-type, authorization");
     let _ = headers.set("Access-Control-Max-Age", "86400");
     headers
 }
@@ -139,6 +147,41 @@ async fn me(req: Request, env: &Env) -> Result<Response> {
     }
 }
 
+/// The session token: `Authorization: Bearer <token>`, else `?token=`.
+fn token_of(req: &Request) -> String {
+    if let Ok(Some(header)) = req.headers().get("Authorization") {
+        if let Some(token) = header.strip_prefix("Bearer ") {
+            return token.trim().to_string();
+        }
+    }
+    req.url().ok().and_then(|url| url.query_pairs().find(|(k, _)| k == "token").map(|(_, v)| v.into_owned())).unwrap_or_default()
+}
+
+/// A characters / saves / world call: check the token, then hand the request
+/// to the account's Durable Object and answer with its reply (plus CORS).
+async fn account_call(mut req: Request, env: &Env, path: &str) -> Result<Response> {
+    let key = match signing_key(env).await {
+        Ok(key) => key,
+        Err(code) => return api_error(code, 500),
+    };
+    let claims = match verify_token(&token_of(&req), &key, now_ms()) {
+        Ok(claims) => claims,
+        Err(error) => return auth_error(error),
+    };
+    let mut init = RequestInit::new();
+    init.with_method(req.method());
+    if matches!(req.method(), Method::Post | Method::Put) {
+        init.with_body(Some(req.text().await?.into()));
+    }
+    let stub = env.durable_object("ACCOUNTS")?.id_from_name(&claims.sub)?.get_stub()?;
+    let mut reply = stub.fetch_with_request(Request::new_with_init(&format!("https://account{path}"), &init)?).await?;
+    let status = reply.status_code();
+    let text = reply.text().await?;
+    let headers = cors_headers();
+    let _ = headers.set("content-type", "application/json");
+    Ok(Response::ok(text)?.with_status(status).with_headers(headers))
+}
+
 /// Check the token, then hand the WebSocket upgrade to the room's Durable Object.
 async fn join_room(req: Request, env: &Env, room: &str) -> Result<Response> {
     if !valid_room(room) {
@@ -173,6 +216,12 @@ async fn fetch(req: Request, env: Env, _ctx: Context) -> Result<Response> {
         (Method::Post, ["auth", "register"]) => auth(req, &env, "register").await,
         (Method::Post, ["auth", "login"]) => auth(req, &env, "login").await,
         (Method::Get, ["auth", "me"]) => me(req, &env).await,
+        (Method::Get, ["characters"]) | (Method::Post, ["characters"]) | (Method::Get, ["world"]) | (Method::Put, ["world"]) => {
+            account_call(req, &env, &path).await
+        }
+        (Method::Delete, ["characters", _]) | (Method::Get, ["characters", _, "save"]) | (Method::Put, ["characters", _, "save"]) => {
+            account_call(req, &env, &path).await
+        }
         (Method::Get, ["rooms", room, "ws"]) => {
             let room = room.to_string();
             join_room(req, &env, &room).await

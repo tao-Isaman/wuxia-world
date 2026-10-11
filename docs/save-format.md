@@ -21,8 +21,9 @@ The game keeps everything in the browser's `localStorage`. There is no server an
 
 | Key | Holds | Version |
 | --- | --- | --- |
-| `localStorage["wusia-world-v1"]` | the player's game (`store/world-store.ts`) | **27** |
-| `localStorage["wusia-shared-v1"]` | the shared world, `{ version, world }` (`store/world/shared-local.ts`) | **1** |
+| `localStorage["wusia-world-v1"]` | the player's game (`store/world-store.ts`) — **only without a game server**; with one, each character's save lives on the server ([online.md](online.md#characters-and-saves)) in this same format | **27** |
+| `localStorage["wusia-shared-v1"]` | the shared world, `{ version, world }` (`store/world/shared-local.ts`) — with a game server, the account's world on the server instead | **1** |
+| `localStorage["wuxia-imported-v1"]` | the local hero already imported to the server (the offer is not shown again) | — |
 | `localStorage["wusia-character-v1"]` | the two /debug builds (`store/character-store.ts`) | **3** |
 | `localStorage["wuxia-audio-v1"]` | sound switches and volumes (`lib/audio/engine.ts`) | — |
 | `localStorage["wuxia-random-events"] = "off"` | turns walk-tick encounters off (tests) | — |

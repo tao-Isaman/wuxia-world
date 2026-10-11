@@ -260,6 +260,7 @@
 .online-actions button, .online-signout { flex: 1; min-height: 34px; padding: 0 10px; border-radius: 6px; border: 1px solid #c9a35a;
   background: linear-gradient(#2f5a4b, #1d3d33); color: #fff3cf; font-size: 14px; cursor: pointer; }
 .online-actions button:disabled { opacity: 0.5; cursor: default; }
+.online-buttons { display: flex; gap: 8px; }
 .online-error { margin: 0; color: #ffb4a2; font-size: 13px; }
 .online-status { margin: 0; display: flex; align-items: center; gap: 6px; font-size: 13px; color: #e4d9b7; }
 .online-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: #8a8a80; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.45); }

@@ -7,6 +7,7 @@ import { useState, useSyncExternalStore } from "react";
 import { AUTH_ERROR_TEXT, signedIn, useOnlineStore } from "@/store/online-store";
 import { gameServerUrl } from "@/lib/net/config";
 import { Modal } from "@/components/ui/modal";
+import { useCloudSession } from "@/store/cloud-session";
 
 const noSubscribe = () => () => {};
 
@@ -23,13 +24,26 @@ const STATUS_TEXT = {
   replaced: "เข้าสู่ระบบจากที่อื่นแล้ว",
 } as const;
 
+const SAVE_TEXT = {
+  off: "ยังไม่บันทึก",
+  saved: "บันทึกแล้ว",
+  saving: "กำลังบันทึก…",
+  offline: "รอบันทึก",
+  conflict: "ถูกบันทึกจากที่อื่น",
+  rejected: "บันทึกไม่ผ่าน",
+} as const;
+
 export function OnlinePanel({ compact = false }: { compact?: boolean }) {
   const username = useOnlineStore((s) => s.username);
   const active = useOnlineStore(signedIn);
   const status = useOnlineStore((s) => s.status);
   const roomSize = useOnlineStore((s) => s.roomSize);
   const signIn = useOnlineStore((s) => s.signIn);
-  const signOut = useOnlineStore((s) => s.signOut);
+  const signOut = useCloudSession((s) => s.signOut);
+  const leave = useCloudSession((s) => s.leave);
+  const playing = useCloudSession((s) => s.phase === "playing");
+  const hero = useCloudSession((s) => s.current?.name ?? null);
+  const saveStatus = useCloudSession((s) => s.saveStatus);
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -43,7 +57,12 @@ export function OnlinePanel({ compact = false }: { compact?: boolean }) {
           <span className={`online-dot online-dot-${status}`} aria-hidden="true" />
           {STATUS_TEXT[status]}{status === "online" && ` · ในแผนที่นี้ ${roomSize} คน`}
         </p>
-        <button type="button" className="online-signout" onClick={signOut}>ออกจากระบบ</button>
+        {playing && hero && <p className="online-status" data-testid="online-character" data-save-status={saveStatus}>
+          ตัวละคร <b>{hero}</b> · {SAVE_TEXT[saveStatus]}</p>}
+        <div className="online-buttons">
+          {playing && <button type="button" className="online-signout" data-testid="change-character" onClick={() => void leave()}>เปลี่ยนตัวละคร</button>}
+          <button type="button" className="online-signout" onClick={() => void signOut()}>ออกจากระบบ</button>
+        </div>
       </div>
     );
   }

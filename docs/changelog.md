@@ -6,6 +6,12 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-11
 
+### Characters and saves on the server
+
+- **Several characters per account, saved on the server.** After signing in the player picks one of up to four characters (day, gold, sect rank and place shown), creates a new one, or deletes one after a confirmation; the one last played is re-entered on the next visit, and เปลี่ยนตัวละคร in the 🌐 panel goes back to the list. A hero from the days of local saves can be imported once (gold capped at 100,000). Without a server (dev, tests) the game saves in the browser as before.
+- **The server checks every save** (`server/core/src/save.rs`): it must build on the save the server holds (another tab or device → `stale`), come at most once a second, keep the hero's name, keep levels, stats, stacks and gold inside the game's limits, and gold may rise no faster than an allowance (100,000 at once, +3,000 a minute). A refused save stops writing and returns to the list; entering again loads the last good one. The account's shared world is kept on the server too.
+- Server: `GET/POST /characters`, `DELETE /characters/<id>`, `GET/PUT /characters/<id>/save`, `GET/PUT /world` behind the session token (`AccountObject`). Client: `lib/net/cloud-save.ts` (the world store's persist storage), `store/cloud-session.ts`, `components/world/character-select.tsx`. Guide: [online.md](online.md#characters-and-saves).
+
 ### Tests that read the real date
 
 - **Old lore no longer runs out:** flavour lore fades 60 days after the world seeds it (`LORE_FLAVOUR_DAYS`), not on world day 60 itself; on the shared real-time clock a world started after day 60 had none (the capital tea house offered one rumor, not five). Lore stamped with the old fixed day restarts once.

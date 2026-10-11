@@ -97,6 +97,92 @@ await check("the session joins with the hero's real position, throttles moves an
   assert.equal(session.status, "off");
 });
 
+// Server saves (lib/net/cloud-save.ts) against a fake server: one fetch stub
+// answers like the worker would.
+{
+  const { cloudSave, SAVE_DEBOUNCE_MS } = await import("../lib/net/cloud-save");
+  type Call = { method: string; url: string; body: unknown };
+  const calls: Call[] = [];
+  let answer: (call: Call) => { status: number; body: unknown } | "down" = () => ({ status: 200, body: { rev: 1, summary: null } });
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = (async (url: string, init?: RequestInit) => {
+    const call = { method: init?.method ?? "GET", url, body: init?.body ? JSON.parse(String(init.body)) : undefined };
+    calls.push(call);
+    const reply = answer(call);
+    if (reply === "down") throw new TypeError("fetch failed");
+    return new Response(JSON.stringify(reply.body), { status: reply.status });
+  }) as typeof fetch;
+  const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+  const save = (gold: number, hasGame = true) => JSON.stringify({ state: { hasGame, gold }, version: 27 });
+
+  await check("cloud save: loads the rev, waits while paused, debounces to the newest save, builds on the rev", async () => {
+    calls.length = 0;
+    answer = (call) => call.method === "GET"
+      ? { status: 200, body: { rev: 4, save: { version: 27, state: { hasGame: true, gold: 7 } } } }
+      : { status: 200, body: { rev: (call.body as { rev: number }).rev + 1, summary: null } };
+    cloudSave.select("http://srv", "tok", "c1");
+    const loaded = await cloudSave.storage.getItem("wusia-world-v1");
+    assert.equal(JSON.parse(String(loaded)).state.gold, 7);
+    cloudSave.storage.setItem("wusia-world-v1", save(8));
+    await wait(SAVE_DEBOUNCE_MS + 100);
+    assert.equal(calls.filter((c) => c.method === "PUT").length, 0, "paused: nothing written");
+    cloudSave.resume();
+    cloudSave.storage.setItem("wusia-world-v1", save(9));
+    cloudSave.storage.setItem("wusia-world-v1", save(10));
+    cloudSave.storage.setItem("wusia-world-v1", save(10, false));
+    await wait(SAVE_DEBOUNCE_MS + 100);
+    const puts = calls.filter((c) => c.method === "PUT");
+    assert.equal(puts.length, 1, "one write for a burst");
+    assert.deepEqual(puts[0].body, { rev: 4, version: 27, state: { hasGame: true, gold: 10 } }, "the newest hero save, on rev 4");
+    assert.equal(puts[0].url, "http://srv/characters/c1/save");
+    assert.equal(cloudSave.status, "saved");
+    cloudSave.storage.setItem("wusia-world-v1", save(11));
+    await cloudSave.flush();
+    assert.equal((calls.filter((c) => c.method === "PUT")[1].body as { rev: number }).rev, 5, "the next builds on the new rev");
+  });
+
+  await check("cloud save: a stale save stops writing (conflict); a refused one too (rejected)", async () => {
+    calls.length = 0;
+    answer = () => ({ status: 409, body: { error: "stale" } });
+    cloudSave.storage.setItem("wusia-world-v1", save(12));
+    await cloudSave.flush();
+    assert.equal(cloudSave.status, "conflict");
+    cloudSave.storage.setItem("wusia-world-v1", save(13));
+    await cloudSave.flush();
+    assert.equal(calls.length, 1, "no more writes after a conflict");
+    cloudSave.select("http://srv", "tok", "c2");
+    cloudSave.resume();
+    answer = () => ({ status: 422, body: { error: "gold_too_fast", detail: null } });
+    cloudSave.storage.setItem("wusia-world-v1", save(99_999));
+    await cloudSave.flush();
+    assert.equal(cloudSave.status, "rejected");
+    assert.equal(cloudSave.lastError, "gold_too_fast");
+  });
+
+  await check("cloud save: no answer keeps the save and tries again; too fast waits a moment", async () => {
+    cloudSave.select("http://srv", "tok", "c3");
+    cloudSave.resume();
+    calls.length = 0;
+    answer = () => "down";
+    cloudSave.storage.setItem("wusia-world-v1", save(20));
+    await cloudSave.flush();
+    assert.equal(cloudSave.status, "offline");
+    answer = () => ({ status: 200, body: { rev: 1, summary: null } });
+    await cloudSave.flush();
+    assert.equal(cloudSave.status, "saved");
+    assert.deepEqual((calls.at(-1)!.body as { state: unknown }).state, { hasGame: true, gold: 20 });
+    let first = true;
+    answer = () => (first ? ((first = false), { status: 429, body: { error: "too_fast" } }) : { status: 200, body: { rev: 2, summary: null } });
+    cloudSave.storage.setItem("wusia-world-v1", save(21));
+    await cloudSave.flush();
+    await wait(1400);
+    assert.equal(cloudSave.status, "saved");
+    cloudSave.clear();
+    assert.equal(cloudSave.status, "off");
+  });
+  globalThis.fetch = realFetch;
+}
+
 if (failed) {
   console.error(`${failed} net check(s) failed`);
   process.exit(1);

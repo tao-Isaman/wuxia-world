@@ -1,7 +1,8 @@
 import { test, expect, type Browser, type Page } from "@playwright/test";
 
 // Online (docs/online.md): two players in two separate browsers sign up,
-// stand on the same map and see each other walk in real time.
+// stand on the same map and see each other walk in real time; an account's
+// characters live on the server (select, create, switch, delete, resume).
 // Needs the game server running: `bun run server:dev` (wrangler dev on :8787),
 // or GAME_SERVER_URL pointing at one. Skipped when none answers.
 const SERVER = (process.env.GAME_SERVER_URL ?? "http://127.0.0.1:8787").replace(/\/$/, "");
@@ -16,9 +17,8 @@ async function serverUp(): Promise<boolean> {
   }
 }
 
-/** A fresh browser (own storage) with a new hero, signed up online. */
-async function player(browser: Browser, hero: string, gender: "ชาย" | "หญิง", username: string): Promise<Page> {
-  const context = await browser.newContext({
+async function newContext(browser: Browser) {
+  return browser.newContext({
     storageState: { cookies: [], origins: [{ origin: "http://127.0.0.1:3017", localStorage: [
       { name: "wuxia-random-events", value: "off" },
       { name: "wuxia-dialog-instant", value: "on" },
@@ -26,6 +26,20 @@ async function player(browser: Browser, hero: string, gender: "ชาย" | "ห
     ] }] },
     viewport: { width: 1280, height: 800 },
   });
+}
+
+/** Step 2 on the select screen: a new character, then into the world. */
+async function createHero(page: Page, hero: string, gender: "ชาย" | "หญิง") {
+  await page.getByTestId("character-new").click();
+  await page.locator("#hero-name").fill(hero);
+  await page.getByRole("button", { name: gender, exact: true }).click();
+  await page.getByRole("button", { name: "เริ่มเกมใหม่" }).click();
+  await expect(page.getByTestId("world-canvas")).toHaveAttribute("data-ready", "true", { timeout: 60_000 });
+}
+
+/** A fresh browser (own storage) with a new hero, signed up online. */
+async function player(browser: Browser, hero: string, gender: "ชาย" | "หญิง", username: string): Promise<Page> {
+  const context = await newContext(browser);
   const page = await context.newPage();
   await page.goto("/");
   // Step 1: an account. No hero form until signed in.
@@ -36,13 +50,11 @@ async function player(browser: Browser, hero: string, gender: "ชาย" | "ห
   await account.locator("#account-password").fill("secret-pass");
   await account.locator("#account-password-confirm").fill("secret-pass");
   await account.getByTestId("account-submit").click();
-  // Step 2: the character, under the account's name.
-  await expect(page.getByTestId("hero-form")).toBeVisible();
+  // Step 2: the account's characters (none yet), then a new one.
+  await expect(page.getByTestId("character-select")).toBeVisible();
   await expect(page.getByTestId("online-username")).toHaveText(username);
-  await page.locator("#hero-name").fill(hero);
-  await page.getByRole("button", { name: gender, exact: true }).click();
-  await page.getByRole("button", { name: "เริ่มเกมใหม่" }).click();
-  await expect(page.getByTestId("world-canvas")).toHaveAttribute("data-ready", "true", { timeout: 60_000 });
+  await expect(page.getByTestId("character-card")).toHaveCount(0);
+  await createHero(page, hero, gender);
   await expect(page.getByTestId("online-button")).toHaveAttribute("data-online-status", "online", { timeout: 20_000 });
   return page;
 }
@@ -128,8 +140,50 @@ test("online flow: account first; a returning player logs in straight back to th
   await expect(account.getByRole("alert")).toContainText("ไม่ถูกต้อง");
   await account.locator("#account-password").fill("secret-pass");
   await account.getByTestId("account-submit").click();
-  // Logged in with a save: no character step, straight into the world.
+  // Logged in: the account's character is waiting on the server.
+  const card = page.getByTestId("character-card");
+  await expect(card).toHaveCount(1);
+  await expect(card).toContainText("เฉินจิ้ง");
+  await card.getByTestId("character-play").click();
   await expect(page.getByTestId("world-canvas")).toHaveAttribute("data-ready", "true", { timeout: 60_000 });
   await expect(page.getByTestId("hero-form")).toHaveCount(0);
+  await page.context().close();
+});
+
+test("characters on the server: two heroes on one account, switch, resume after a reload and from another browser, delete", async ({ browser }) => {
+  test.skip(!(await serverUp()), `no game server at ${SERVER} (bun run server:dev)`);
+  test.setTimeout(180_000);
+  const id = `dan_${run}`.slice(0, 20);
+  const page = await player(browser, "ซ่งอวิ๋น", "ชาย", id);
+  const hud = page.getByTestId("online-button");
+  // The first save reaches the server.
+  await hud.click();
+  await expect(page.getByTestId("online-character")).toHaveAttribute("data-save-status", "saved", { timeout: 20_000 });
+  // A second hero: back to the list, a new one.
+  await page.getByTestId("change-character").click();
+  await expect(page.getByTestId("character-card")).toHaveCount(1);
+  await expect(page.getByTestId("character-card")).toContainText("ซ่งอวิ๋น");
+  await createHero(page, "เหลียนฮวา", "หญิง");
+  // A reload comes back to the hero last played.
+  await page.reload();
+  await expect(page.getByTestId("world-canvas")).toHaveAttribute("data-ready", "true", { timeout: 60_000 });
+  await page.getByTestId("online-button").click();
+  await expect(page.getByTestId("online-character")).toContainText("เหลียนฮวา");
+  // Another browser, same account: both heroes are there.
+  const other = await (await newContext(browser)).newPage();
+  await other.goto("/");
+  const account = other.getByTestId("account-form");
+  await account.getByRole("tab", { name: "มีบัญชีแล้ว" }).click();
+  await account.locator("#account-username").fill(id);
+  await account.locator("#account-password").fill("secret-pass");
+  await account.getByTestId("account-submit").click();
+  await expect(other.getByTestId("character-card")).toHaveCount(2);
+  // Delete one (after a confirmation).
+  const doomed = other.getByTestId("character-card").filter({ hasText: "ซ่งอวิ๋น" });
+  await doomed.getByTestId("character-delete").click();
+  await other.getByRole("dialog").getByRole("button", { name: "ลบถาวร" }).click();
+  await expect(other.getByTestId("character-card")).toHaveCount(1);
+  await expect(other.getByTestId("character-card")).toContainText("เหลียนฮวา");
+  await other.context().close();
   await page.context().close();
 });
