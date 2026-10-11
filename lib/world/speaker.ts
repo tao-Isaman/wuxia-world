@@ -7,10 +7,15 @@
 // "เถ้าแก่โจวตลาดมืด". A label matches, in order:
 //   1. an NPC's exact name;
 //   2. an NPC's name before its "(…)" epithet (only when one NPC has it);
-//   3. part of the name of the quest giver or hand-in person of a
+//   3. a short name the sagas use for one person (SPEAKER_ALIASES: "ทูตเซี่ย"
+//      is ทูตเซี่ยแห่งสำนักดาบโลหิต) — a table, as a loose prefix rule would
+//      also catch titles ("ผู้อาวุโส", "หัวหน้าโจร");
+//   4. part of the name of the quest giver or hand-in person of a
 //      `qs_<quest>_…` / `st_<quest>_…` dialog, when exactly one of them fits.
 // People standing where the dialog plays are preferred for 1 and 2.
-// Narration, "{hero}" and walk-on labels ("โจรสลัด", "ยายหลี่") match nobody.
+// Narration, "{hero}" and walk-on labels ("โจรสลัด", "ยายหลี่") match nobody,
+// except the few walk-ons with a stock look (WALK_ON_SPEAKERS), whose bust is
+// that archetype's.
 import { NPCS, getNpc, getQuest } from "./data";
 import type { DialogScene, NpcDef } from "./types";
 
@@ -47,16 +52,36 @@ export function sceneCast(sceneId: string): NpcDef[] {
 /** Anyone with a name: an NPC definition or a location's NPC link. */
 export type Named = { id: string; name: string };
 
+/** Short names saga dialogs call a registered person by, which no rule reaches. */
+export const SPEAKER_ALIASES: Readonly<Record<string, string>> = {
+  "ทูตเซี่ย": "evil_xueyu_envoy_xie", // ทูตเซี่ยแห่งสำนักดาบโลหิต (the outsiders' saga)
+  "ขุนนางหยาน": "evil_changan_corrupt_official_yan", // ขุนนางหยานทุจริต (Wudang's saga)
+  "เสี่ยวเฉ่า": "home_beichou_herder_cao", // เสี่ยวเฉ่าเด็กเลี้ยงแพะ (the mountain-army saga)
+};
+
+/**
+ * Walk-ons who speak with no NPC behind them but fit a stock look: their id
+ * goes to npcCharacterId (lib/characters/catalog.ts), so the bust shows that
+ * archetype (a swordsman: m1) instead of nothing.
+ */
+export const WALK_ON_SPEAKERS: Readonly<Record<string, Named>> = {
+  "อาจารย์ดาบ": { id: "walkon_swordsman", name: "อาจารย์ดาบ" }, // Tang's sword-feast challenger (blade_master)
+};
+
 /**
  * The NPC a speaker label names. `cast` are the people the dialog is about
  * (its quest's giver / hand-in person), `nearby` those standing where it plays.
  */
-export function npcForSpeaker<T extends Named = NpcDef>(speaker: string, cast: readonly NpcDef[] = [], nearby: readonly T[] = []): NpcDef | T | undefined {
+export function npcForSpeaker<T extends Named = NpcDef>(speaker: string, cast: readonly NpcDef[] = [], nearby: readonly T[] = []): NpcDef | T | Named | undefined {
   const label = speaker.trim();
   if (!label || label.includes("{")) return undefined;
   const near: (NpcDef | T)[] = [...cast, ...nearby];
   const exact = near.find((n) => n.name === label) ?? NPCS.find((n) => n.name === label);
   if (exact) return exact;
+  const alias = SPEAKER_ALIASES[label];
+  const aliased = alias ? getNpc(alias) : null;
+  if (aliased) return aliased;
+  if (WALK_ON_SPEAKERS[label]) return WALK_ON_SPEAKERS[label];
   const local = unique(near.filter((n) => npcBaseName(n.name) === label));
   if (local.length === 1) return local[0];
   const byBase = BY_BASE.get(label) ?? [];
@@ -73,7 +98,7 @@ export function npcForSpeaker<T extends Named = NpcDef>(speaker: string, cast: r
 const unique = <N extends Named>(npcs: readonly N[]) => [...new Map(npcs.map((n) => [n.id, n])).values()];
 
 /** The first line of a dialog spoken by a known NPC, and who that is. */
-export function dialogSpeaker<T extends Named = NpcDef>(scene: DialogScene, nearby: readonly T[] = []): NpcDef | T | undefined {
+export function dialogSpeaker<T extends Named = NpcDef>(scene: DialogScene, nearby: readonly T[] = []): NpcDef | T | Named | undefined {
   const cast = sceneCast(scene.id);
   for (const line of scene.lines) {
     if (line.t !== "dialogue") continue;

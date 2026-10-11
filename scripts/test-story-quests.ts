@@ -553,6 +553,31 @@ check("difficulty grows with the tier: higher tiers gate on rank and stats and a
   }
 });
 
+check("stat steps agree with the gate: no chapter trains a stat to less than it already asked for", () => {
+  const leaves = (c: Condition | undefined): Condition[] => (!c ? [] : c.t === "and" ? c.all.flatMap(leaves) : [c]);
+  for (const q of QUESTS) {
+    const gates = leaves(q.prereqs).flatMap((c) => (c.t === "statAtLeast" ? [c] : []));
+    for (const stage of q.stages) {
+      for (const c of leaves(stage.autoAdvance)) {
+        if (c.t !== "statAtLeast") continue;
+        const gate = gates.find((g) => g.stat === c.stat);
+        if (gate && c.min < gate.min) err(`${q.id} stage ${stage.id}: ${c.stat} ${c.min} below the chapter's own gate ${gate.min}`);
+      }
+    }
+  }
+});
+
+check("offers happen where their giver stands: chapters once staged far from the giver", () => {
+  // Godslayer ch17 (the ruins), Sunflower ch30 (the palace gate), Nine Yin ch27 (the sick friend's bedside).
+  for (const id of ["st_jh_godslayer_blade_17", "st_jh_sunflower_30", "st_jh_nine_yin_27"]) {
+    const q = getQuest(id);
+    if (!q) { err(`${id}: missing`); continue; }
+    const where = q.stages[0]?.objective?.spots?.[0]?.locationId;
+    const giver = getNpc(q.giverNpcId ?? "");
+    if (!where || !giver?.locationIds.includes(where)) err(`${id}: giver ${giver?.name} stands at ${giver?.locationIds.join("/")}, the chapter opens at ${where}`);
+  }
+});
+
 if (errors.length) {
   console.error(`\n${errors.length} problem(s):\n  - ${errors.join("\n  - ")}`);
   process.exit(1);
