@@ -20,7 +20,7 @@ Time in this game is counted in **ชั่วยาม**: 12 of them make one d
 - [Battles](#battles)
 - [NPCs](#npcs)
 - [Quests and tracking](#quests-and-tracking)
-- [The sword tournament](#the-sword-tournament-ชุมนุมวิจารณ์กระบี่เขาหัวซาน)
+- [The sword tournament](#the-sword-tournament-ชุมนุมประลองกระบี่หัวซาน)
 - [Sects](#sects)
 - [Shops, sect halls and artisans](#shops-sect-halls-and-artisans)
 - [Life skills and gathering](#life-skills-and-gathering)
@@ -218,11 +218,11 @@ Six great animals wait each in its own lair, large on the map with a name plate.
 | Beast | Lair | Brood |
 | --- | --- | --- |
 | งูยักษ์เกล็ดทองคำ | ถ้ำงูทอง (east) | a giant cobra and a jade python |
-| พยัคฆ์โลหิตลายคราม | ถ้ำหุบเขาผีเสื้อ (south) | a mountain tiger and a golden tiger |
+| พยัคฆ์โลหิตลายคราม | ถ้ำหุบเขาร้อยยา (south) | a mountain tiger and a golden tiger |
 | อินทรียักษ์จ้าวแห่งกระบี่ | ยอดเขามรณะ (north) | two thunder eagles |
 | เต่ายักษ์แบกตะวัน | เกาะไร้ชื่อ (east) | two stone turtles |
 | ปูวิเศษจ้าวแห่งดาบ | สระมังกรดำ (west) | two iron crabs |
-| กระทิงยักษ์เขาเพลิง | ยอดแสงสว่าง (heartland) | two blood boars |
+| กระทิงยักษ์เขาเพลิง | ยอดเพลิงอุดร (heartland) | two blood boars |
 
 The wilds talk about each one (a lore rumor names its lair). A win pays 3,000–4,000 w-exp, double move xp, its trophy (a costly crafting material), four rolls of rare materials, big potions and meridian charts, and a 15 % chance of a piece of top gear. The jianghu hears of it at once, and the beast is back **90 days** later.
 
@@ -314,7 +314,7 @@ Every sect skill and art can be earned from a sect NPC ([story-quests.md](story-
   | 3 | ¾ up, stat 25 | 4 foes, 2 items, spar | w-exp 320, 100 points |
 
   The stat is the item's strongest, counted without gear. The three outsider sects, which can't be joined, ask for a way of life instead: evil for ดาวดึงส์ and ดาบโลหิต, the venom life skill for เบญจพิษ.
-- **Story sagas** (ตำนาน, 📜) lead to a tier-4 skill or art. Each is 8–10 chapters that retell a legend of มังกรหยก ภาค 3 — set over a hundred years later, with the old heroes in sepia flashbacks — and pay small rewards along the way; the last chapter teaches the technique.
+- **Story sagas** (ตำนาน, 📜) lead to a tier-4 skill or art. Each is 8–10 chapters that retell a legend of the last age — set over a hundred years later, with the old heroes in sepia flashbacks — and pay small rewards along the way; the last chapter teaches the technique.
   - A sect's sagas open over its last three ranks, one after another: the first at rank 3, the last at rank 1 (two sagas: 3 and 2).
   - Chapter 1 needs a high rank and a stat of 40 (or a way of life for the outsiders); each later chapter opens when the previous one is done.
   - Seven sects' old art quests are now **prologue trials** (บททดสอบก่อนตำนาน) that must be passed before the saga starts. They are secret: not in the sect window — their giver offers them in person to an active member of high enough rank.
@@ -325,7 +325,7 @@ Every sect skill and art can be earned from a sect NPC ([story-quests.md](story-
 
 The quest list per giver and location is in [reference/quests.md](reference/quests.md).
 
-## The sword tournament (ชุมนุมวิจารณ์กระบี่เขาหัวซาน)
+## The sword tournament (ชุมนุมประลองกระบี่หัวซาน)
 
 Once a year (a year is 360 days) the Huashan sect hosts a 32-fighter single-elimination tournament on Mount Hua (`sect_huashan`). Its ring is a crossed-swords marker on the Huashan map.
 

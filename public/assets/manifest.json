@@ -148201,14 +148201,14 @@
   },
   {
    "id": "sct_lingjiu_altar",
-   "name": "แท่นบูชาลิ่งจิ้วกง",
+   "name": "แท่นบูชาวังอินทรีหิมะ",
    "category": "sect",
    "subcategory": "religious",
    "region": "west",
    "sect": "lingjiu",
    "tags": [
     "แท่นบูชา",
-    "ลิ่งจิ้วกง",
+    "วังอินทรีหิมะ",
     "Lingjiu Palace",
     "altar",
     "religious"
@@ -148238,14 +148238,14 @@
   },
   {
    "id": "sct_lingjiu_banner",
-   "name": "ธงสำนักลิ่งจิ้วกง",
+   "name": "ธงสำนักวังอินทรีหิมะ",
    "category": "sect",
    "subcategory": "banner",
    "region": "west",
    "sect": "lingjiu",
    "tags": [
     "ธงสำนัก",
-    "ลิ่งจิ้วกง",
+    "วังอินทรีหิมะ",
     "Lingjiu Palace",
     "banner"
    ],
@@ -148281,7 +148281,7 @@
    "sect": "lingjiu",
    "tags": [
     "ผลึกหิมะ",
-    "ลิ่งจิ้วกง",
+    "วังอินทรีหิมะ",
     "Lingjiu Palace",
     "crystal cluster",
     "crystal"
@@ -148318,7 +148318,7 @@
    "sect": "lingjiu",
    "tags": [
     "ชั้นวางเข็มเหมย",
-    "ลิ่งจิ้วกง",
+    "วังอินทรีหิมะ",
     "Lingjiu Palace",
     "dart rack",
     "weapon"
@@ -148355,7 +148355,7 @@
    "sect": "lingjiu",
    "tags": [
     "เตาไฟน้ำแข็ง",
-    "ลิ่งจิ้วกง",
+    "วังอินทรีหิมะ",
     "Lingjiu Palace",
     "frost brazier",
     "light"
@@ -148392,7 +148392,7 @@
    "sect": "lingjiu",
    "tags": [
     "พรมขนสัตว์ขาว",
-    "ลิ่งจิ้วกง",
+    "วังอินทรีหิมะ",
     "Lingjiu Palace",
     "fur rug",
     "rug"
@@ -148417,14 +148417,14 @@
   },
   {
    "id": "sct_lingjiu_gate",
-   "name": "ประตูสำนักลิ่งจิ้วกง",
+   "name": "ประตูสำนักวังอินทรีหิมะ",
    "category": "sect",
    "subcategory": "gate",
    "region": "west",
    "sect": "lingjiu",
    "tags": [
     "ประตูสำนัก",
-    "ลิ่งจิ้วกง",
+    "วังอินทรีหิมะ",
     "Lingjiu Palace",
     "gate"
    ],
@@ -148460,7 +148460,7 @@
    "sect": "lingjiu",
    "tags": [
     "เสาน้ำแข็ง",
-    "ลิ่งจิ้วกง",
+    "วังอินทรีหิมะ",
     "Lingjiu Palace",
     "ice pillar",
     "decor"
@@ -148497,7 +148497,7 @@
    "sect": "lingjiu",
    "tags": [
     "บัลลังก์น้ำแข็ง",
-    "ลิ่งจิ้วกง",
+    "วังอินทรีหิมะ",
     "Lingjiu Palace",
     "ice throne",
     "chair"
@@ -148527,14 +148527,14 @@
   },
   {
    "id": "sct_lingjiu_lantern",
-   "name": "โคมสำนักลิ่งจิ้วกง",
+   "name": "โคมสำนักวังอินทรีหิมะ",
    "category": "sect",
    "subcategory": "lantern",
    "region": "west",
    "sect": "lingjiu",
    "tags": [
     "โคมสำนัก",
-    "ลิ่งจิ้วกง",
+    "วังอินทรีหิมะ",
     "Lingjiu Palace",
     "lantern"
    ],
@@ -148570,7 +148570,7 @@
    "sect": "lingjiu",
    "tags": [
     "โคมวังหิมะ",
-    "ลิ่งจิ้วกง",
+    "วังอินทรีหิมะ",
     "Lingjiu Palace",
     "palace lantern",
     "lantern"
@@ -148607,7 +148607,7 @@
    "sect": "lingjiu",
    "tags": [
     "ม่านไหมม่วง",
-    "ลิ่งจิ้วกง",
+    "วังอินทรีหิมะ",
     "Lingjiu Palace",
     "silk curtain",
     "decor"
@@ -148644,7 +148644,7 @@
    "sect": "lingjiu",
    "tags": [
     "แปลงบัวหิมะ",
-    "ลิ่งจิ้วกง",
+    "วังอินทรีหิมะ",
     "Lingjiu Palace",
     "snow lotus bed",
     "plant"
@@ -148676,7 +148676,7 @@
    "sect": "lingjiu",
    "tags": [
     "รูปปั้นแร้งวิญญาณ",
-    "ลิ่งจิ้วกง",
+    "วังอินทรีหิมะ",
     "Lingjiu Palace",
     "vulture statue",
     "statue"
@@ -148706,14 +148706,14 @@
   },
   {
    "id": "sct_lingjiu_weapon_rack",
-   "name": "ชั้นวางอาวุธลิ่งจิ้วกง",
+   "name": "ชั้นวางอาวุธวังอินทรีหิมะ",
    "category": "sect",
    "subcategory": "weapon",
    "region": "west",
    "sect": "lingjiu",
    "tags": [
     "ชั้นวางอาวุธ",
-    "ลิ่งจิ้วกง",
+    "วังอินทรีหิมะ",
     "Lingjiu Palace",
     "weapon rack",
     "weapon"

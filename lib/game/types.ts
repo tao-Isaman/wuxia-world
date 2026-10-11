@@ -264,7 +264,7 @@ export type ArtActiveType =
   | "heal_cleanse"
   // Full-recovery active: heals HP by `h` % AND MP by `mh` % AND clears
   // ALL debuffs on the caster's side. Used by capstone T5 arts (e.g.,
-  // วิชาเก้าเอี้ยง / Nine-Yang Manual).
+  // ลมปราณตะวันเก้าชั้น / Nine-Yang Manual).
   | "heal_full_cleanse"
   | "atk_phy_pen"
   | "atk_int_pen"

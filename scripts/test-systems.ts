@@ -186,7 +186,7 @@ check("tournament: stronger fighters win simulated bouts more often", () => {
 check("tournament: register on Mount Hua in the window, fight round by round, get paid", () => {
   newGame();
   assert.equal(TOURNAMENT.locationId, "sect_huashan");
-  assert.equal(TOURNAMENT_NAME, "ชุมนุมวิจารณ์กระบี่เขาหัวซาน");
+  assert.equal(TOURNAMENT_NAME, "ชุมนุมประลองกระบี่หัวซาน");
   useWorldStore.setState({ day: 70, gold: 500, currentSceneId: "city_capital" });
   assert.equal(registerBlock(store()), "elsewhere", "not at the capital any more");
   useWorldStore.setState({ currentSceneId: "sect_huashan" });

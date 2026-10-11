@@ -667,14 +667,14 @@ export const QUESTS_VILLAGES: readonly QuestDef[] = [
   {
     id: "qv_inn_legend_verify",
     name: "ตำนานถ้ำโบราณ",
-    description: "โปผู้เล่าเรื่องได้ยินว่าถ้ำบทกวีถังมีภาพสลักเรื่องยุทธภพสมัยก่อน เขาอยากรู้ว่าจริงไหม ไปดูแล้วกลับมาเล่าให้ฟัง",
-    briefSummary: "ไปถ้ำบทกวีถัง แล้วกลับมาเล่าให้โปฟัง",
+    description: "โปผู้เล่าเรื่องได้ยินว่าถ้ำจารึกกลอนมีภาพสลักเรื่องยุทธภพสมัยก่อน เขาอยากรู้ว่าจริงไหม ไปดูแล้วกลับมาเล่าให้ฟัง",
+    briefSummary: "ไปถ้ำจารึกกลอน แล้วกลับมาเล่าให้โปฟัง",
     type: "side",
     giverNpcId: "inn_heluo_storyteller_po",
     stages: [
       {
         id: "find_cave",
-        description: "เดินทางไปถ้ำบทกวีถัง แล้วดูภาพสลักบนผนังถ้ำ",
+        description: "เดินทางไปถ้ำจารึกกลอน แล้วดูภาพสลักบนผนังถ้ำ",
         objective: {
           spots: [
             { locationId: "cave_tangshi", label: "ส่องดูภาพสลักบนผนังถ้ำ", sceneId: "qs_qv_inn_legend_verify_report" },

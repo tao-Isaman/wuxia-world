@@ -8,7 +8,7 @@ export const NPCS_GUMU: readonly NpcDef[] = [
   {
     id: "sect_gumu_disciple_lengyue",
     name: "ศิษย์เลิ่งเยว่",
-    description: "สาวกสุสานโบราณ ใช้กระบี่เย็นและคัมภีร์สาวหยกเป็นทางออกของฝีมือ",
+    description: "สาวกสุสานโบราณ ใช้กระบี่เย็นและคัมภีร์หยกเหมันต์เป็นทางออกของฝีมือ",
     locationIds: ["sect_gumu"],
     dialogSceneId: "npc_sect_gumu_disciple_lengyue_talk",
     sparOpponentId: "spar_gumu_disciple",

@@ -484,15 +484,6 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qc_capital_clerk_night_sword` | กระบี่ของเสมียนยามดึก | เสมียนนายฉิง | kill → turn-in | prereqs |
 | `qc_capital_soaked_ledgers` | ทะเบียนเปียกฝน | เสมียนนายฉิง | item → objective (person) → turn-in |  |
 
-### บ้านค้าขายเจิ้นเวย (`villa_fuwei`)
-
-| Id | Name | Giver | Stages | Notes |
-| --- | --- | --- | --- | --- |
-| `qw_fuwei_riding_whip` | แส้ม้าของคุณชายเฉา | เฉาเหวินจือ | item → turn-in |  |
-| `qw_fuwei_white_horse` | วิชาลึกลับแห่งเจิ้นเวย | เฉาหย่งอัน | kill → objective (spot) → turn-in | prereqs |
-| `qw_fuwei_escort_run` | หีบผ้าไปหยางโจว | สื่อเปียวโถว | objective (spot) → kill → turn-in |  |
-| `qw_fuwei_dragon_spear` | วิชาลึกลับกับรอยเลือดในคอกม้า | สื่อเปียวโถว | objective (spot) → objective (scene) → item → turn-in | prereqs |
-
 ### บ้านฉีเหลียง (`home_yanji`)
 
 | Id | Name | Giver | Stages | Notes |
@@ -542,6 +533,14 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qw_home_hufei_drunken_fist` | กับแกล้มของเหล่าจิ่ว | เหล่าจิ่ว | item → kill → turn-in | prereqs |
 | `qw_home_hufei_tiger_roar` | เสียงคำรามของตระกูลไป๋ | ไป๋เฝยหยาง | kill → objective (scene) → turn-in | prereqs |
 
+### บ้านเผิงเหล่าจิ่ว (`home_hong`)
+
+| Id | Name | Giver | Stages | Notes |
+| --- | --- | --- | --- | --- |
+| `qw_hong_treasure_map` | แผนที่สมบัติเผิงเหล่าจิ่ว | หลัวเฟย์หาว (นักผจญภัย) | objective (scene) → objective (scene) → turn-in |  |
+| `qw_hong_beast_swarm` | ฝูงหมาป่าบุกบ้านเผิงเหล่าจิ่ว | หลัวเฟย์หาว (นักผจญภัย) | kill → turn-in |  |
+| `qw_hong_legend_verify` | ตำนานเผิงเหล่าจิ่ว | หลัวเฟย์หาว (นักผจญภัย) | visit → turn-in | prereqs |
+
 ### บ้านแพทย์น้ำจืด (`home_xuemuhua`)
 
 | Id | Name | Giver | Stages | Notes |
@@ -576,14 +575,6 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qw_home_yideng_terrace_wall` | กำแพงนาขั้นบันได | ชาวนาเกิง | item → kill → turn-in | prereqs |
 | `qw_home_yideng_brush_point` | พู่กันจิ้มจุด | บัณฑิตเยี่ยจื่อหลาน | item → objective (spot) → turn-in | prereqs |
 | `qw_home_yideng_fishhook` | ตะขอเบ็ดเฝ้าทาง | ฤๅษีประมงชิงเจียง | item → objective (scene) → turn-in | prereqs |
-
-### บ้านโฮ่งชีก๋ง (`home_hong`)
-
-| Id | Name | Giver | Stages | Notes |
-| --- | --- | --- | --- | --- |
-| `qw_hong_treasure_map` | แผนที่สมบัติโฮ่งชีก๋ง | หลัวเฟย์หาว (นักผจญภัย) | objective (scene) → objective (scene) → turn-in |  |
-| `qw_hong_beast_swarm` | ฝูงหมาป่าบุกบ้านโฮ่งชีก๋ง | หลัวเฟย์หาว (นักผจญภัย) | kill → turn-in |  |
-| `qw_hong_legend_verify` | ตำนานโฮ่งชีก๋ง | หลัวเฟย์หาว (นักผจญภัย) | visit → turn-in | prereqs |
 
 ### พรรคตะวันจันทรา (`sect_ming`)
 
@@ -764,6 +755,15 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qw_heilong_missing_fisher` | ชาวประมงที่หายตัวไป | ต่านเหลาตู (ชาวประมงแก่) | objective (scene) → kill → turn-in |  |
 | `qw_heilong_depths_secret` | แสงแดงจากก้นสระ | ต่านเหลาตู (ชาวประมงแก่) | objective (scene) → item → turn-in | prereqs |
 | `qw_heilong_hook_lesson` | เบ็ดของคนแก่ริมสระ | ต่านเหลาตู (ชาวประมงแก่) | kill → turn-in |  |
+
+### สำนักคุ้มภัยเจิ้นหยวน (`villa_fuwei`)
+
+| Id | Name | Giver | Stages | Notes |
+| --- | --- | --- | --- | --- |
+| `qw_fuwei_riding_whip` | แส้ม้าของคุณชายเฉา | เฉาเหวินจือ | item → turn-in |  |
+| `qw_fuwei_white_horse` | วิชาลึกลับแห่งเจิ้นหยวน | เฉาหย่งอัน | kill → objective (spot) → turn-in | prereqs |
+| `qw_fuwei_escort_run` | หีบผ้าไปหยางโจว | สื่อเปียวโถว | objective (spot) → kill → turn-in |  |
+| `qw_fuwei_dragon_spear` | วิชาลึกลับกับรอยเลือดในคอกม้า | สื่อเปียวโถว | objective (spot) → objective (scene) → item → turn-in | prereqs |
 
 ### สำนักดาบโลหิต (`sect_xueyu`)
 

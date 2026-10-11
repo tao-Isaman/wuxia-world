@@ -142,11 +142,11 @@ export const NPCS_WILDERNESS: readonly NpcDef[] = [
     tags: ["fisherman", "elder", "witness"],
   },
 
-  // ─── บ้านโฮ่งชีก๋ง (home_hong) ──────────────────────────────────────
+  // ─── บ้านเผิงเหล่าจิ่ว (home_hong) ──────────────────────────────────────
   {
     id: "wld_hong_adventurer_luo",
     name: "หลัวเฟย์หาว (นักผจญภัย)",
-    description: "นักผจญภัยหนุ่มที่มาสำรวจบริเวณบ้านโฮ่งชีก๋งหวังพบปรมาจารย์ ตอนนี้ติดอยู่เพราะพบปริศนาที่ยากเกินแก้คนเดียว",
+    description: "นักผจญภัยหนุ่มที่มาสำรวจบริเวณบ้านเผิงเหล่าจิ่วหวังพบปรมาจารย์ ตอนนี้ติดอยู่เพราะพบปริศนาที่ยากเกินแก้คนเดียว",
     locationIds: ["home_hong"],
     dialogSceneId: "npc_wld_hong_adventurer_luo_talk",
     questIds: [

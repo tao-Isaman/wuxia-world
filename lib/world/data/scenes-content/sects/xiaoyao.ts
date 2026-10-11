@@ -58,7 +58,7 @@ export const SCENES_XIAOYAO: readonly Scene[] = [
     id: "npc_sect_xiaoyao_vice_tianshan_talk",
     lines: [
       { t: "narration", text: "เทียนซานยืนหันหลังให้เจ้า กำลังจ้องมองหุบเขายามค่ำ" },
-      { t: "dialogue", speaker: "รองอาจารย์เทียนซาน", text: "ลมปราณภูติอุดร — สะท้อนแรงของศัตรูกลับ ใครทำร้ายข้า ข้าก็ส่งคืน" },
+      { t: "dialogue", speaker: "รองอาจารย์เทียนซาน", text: "ลมปราณทะเลลึก — สะท้อนแรงของศัตรูกลับ ใครทำร้ายข้า ข้าก็ส่งคืน" },
     ],
   },
 

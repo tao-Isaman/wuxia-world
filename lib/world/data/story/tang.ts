@@ -1,5 +1,5 @@
 // สำนักสกุลถัง (ถังเหมิน) — lineage quests (T0–T3) and story sagas (T4 skills).
-// Sagas retell legends of มังกรหยก ภาค 3 (ดาบมังกรหยก): some sixty years
+// Sagas retell legends of the jianghu: some sixty years
 // ago a Tang woman sat at the Dragon-Saber feast on เกาะหวังพ่าน, and some
 // fifty years ago a poisoner granny with golden-flower needles saved a Tang
 // dagger-man by piercing his heart. The present is the age of strife (Jianwen 3):
@@ -147,7 +147,7 @@ export const LINEAGE: readonly LineageSpec[] = [
 ];
 
 // ─── Saga: ดาราพิรุณโปรย — "ทุกดาวมีชื่อ" ─────────────────────────────
-// Legend: at the Dragon-Saber feast on เกาะหวังพ่าน, เจียซุ่น's lion roar
+// Legend: at the Dragon-Saber feast on เกาะหวังพ่าน, เหลยจิ้น's lion roar
 // drove every guest mad. One Tang woman, ถังเหลียนอวี่, had stuffed her ears
 // with wax against the long speeches. From under a table she threw fifteen
 // knives: fourteen blunt ones pinned the sleeves of men about to leap into
@@ -201,7 +201,7 @@ const STAR_RAIN: StoryArcSpec = {
           ],
         },
         lines: [
-          [N_VICE, "หกสิบกว่าปีก่อน พรรคอินทรีฟ้าจัดงานเลี้ยงบนเกาะหวังพ่าน เพื่ออวดดาบเล่มหนึ่ง — ดาบฆ่ามังกร"],
+          [N_VICE, "หกสิบกว่าปีก่อน พรรคอินทรีฟ้าจัดงานเลี้ยงบนเกาะหวังพ่าน เพื่ออวดดาบเล่มหนึ่ง — ดาบปราบมังกร"],
           [N_VICE, "ทุกสำนักส่งคนไป ถังเหมินส่งถังเหลียนอวี่ ศิษย์หญิงที่ปามีดเก่งที่สุดในรุ่น"],
           [N_VICE, "คนทั้งเกาะกลับมาเป็นบ้าหรือไม่ก็ไม่กลับมาเลย นางกลับมาคนเดียว ไม่มีแผลสักแผล ไม่มีมีดสักเล่ม และไม่ยอมเล่าอะไรสักคำ"],
           [N_VICE, "บันทึกตระกูลเขียนว่านาง 'มุดใต้โต๊ะ' ไปอ่านเองที่หอบรรพชน"],
@@ -243,7 +243,7 @@ const STAR_RAIN: StoryArcSpec = {
     },
     {
       title: "คนเดียวที่ไม่ได้ยิน",
-      summary: "บนเกาะมังกรเทพ โจรสลัดกำลังขุดถ้ำที่พายุเปิดออก และในถ้ำนั้น ตำนานงานเลี้ยงดาบฆ่ามังกรยังไม่จบ",
+      summary: "บนเกาะมังกรเทพ โจรสลัดกำลังขุดถ้ำที่พายุเปิดออก และในถ้ำนั้น ตำนานงานเลี้ยงดาบปราบมังกรยังไม่จบ",
       giver: VICE,
       offer: {
         lines: [
@@ -261,12 +261,12 @@ const STAR_RAIN: StoryArcSpec = {
           scene: {
             cutscene: {
               stage: "isle_shenlong", mood: "past",
-              title: "หกสิบกว่าปีก่อน", subtitle: "เกาะหวังพ่าน · งานเลี้ยงดาบฆ่ามังกร",
+              title: "หกสิบกว่าปีก่อน", subtitle: "เกาะหวังพ่าน · งานเลี้ยงดาบปราบมังกร",
               cast: {
                 host: { name: "ผู้อาวุโสพรรคอินทรีฟ้า", look: "merchant", at: [0, -2], facing: "right", tint: "#8a8a8a" },
                 lianyu: { name: "ถังเหลียนอวี่", look: "f2", at: [-3, 1], facing: "right", tint: "#cfd8c8" },
                 guest: { name: "แขกในงาน", look: "m4", at: [2, 1], facing: "left" },
-                xie: { name: "เจียซุ่น ราชสีห์ขนทอง", look: "bandit", at: [6, -1], facing: "left", tint: "#e6c35c", size: 1.2, hidden: true },
+                xie: { name: "เหลยจิ้น ราชสีห์ตาบอด", look: "bandit", at: [6, -1], facing: "left", tint: "#e6c35c", size: 1.2, hidden: true },
               },
               beats: [
                 ["say", "host", "…และดาบเล่มนี้ ผู้ใดครอบครอง ผู้นั้นเป็นใหญ่ในยุทธภพ ข้าขอเล่าความเป็นมาโดยย่อ เริ่มจากเมื่อสามร้อยปีก่อน…"],
@@ -303,7 +303,7 @@ const STAR_RAIN: StoryArcSpec = {
       complete: {
         lines: [
           [N_VICE, "ขี้ผึ้งอุดหู…"],
-          [N_VICE, "เสียงคำรามของเจียซุ่นทำให้คนทั้งเกาะเป็นบ้า แต่นางไม่ได้ยิน เพราะนางเบื่อคำปราศรัย"],
+          [N_VICE, "เสียงคำรามของเหลยจิ้นทำให้คนทั้งเกาะเป็นบ้า แต่นางไม่ได้ยิน เพราะนางเบื่อคำปราศรัย"],
           ["{hero}", "แล้วนางทำอะไรใต้โต๊ะ ในเมื่อนางเป็นคนเดียวที่ยังมีสติ"],
           [N_VICE, "นั่นคือคำถามที่ไม่มีใครในตระกูลเคยถาม"],
           [N_VICE, "จดหมายข้าส่งให้เจ้าสำนักแล้ว ท่านว่าจะยังไม่เปิด จนกว่าจะมีคน 'ถามถึงมีดเล่มที่สิบห้า' จริง ๆ"],
@@ -467,7 +467,7 @@ const STAR_RAIN: StoryArcSpec = {
     },
     {
       title: "จดหมายที่ไม่เคยเปิด",
-      summary: "เจ้าสำนักแกะผนึกจดหมายหกสิบปี — ถังเหลียนอวี่เล่าสิ่งที่เกิดใต้โต๊ะทั้งหมด และสิ่งที่ราชสีห์ขนทองพูดกับนาง",
+      summary: "เจ้าสำนักแกะผนึกจดหมายหกสิบปี — ถังเหลียนอวี่เล่าสิ่งที่เกิดใต้โต๊ะทั้งหมด และสิ่งที่ราชสีห์ตาบอดพูดกับนาง",
       giver: CHIEF,
       offer: {
         cutscene: {
@@ -478,7 +478,7 @@ const STAR_RAIN: StoryArcSpec = {
             madman: { name: "หลู่ต้าเหอ", look: "merchant", at: [-5, -1], facing: "left" },
             pengold: { name: "เผิงเหล่าซาน", look: "bandit", at: [3, 1], facing: "right", tint: "#5a7f9a" },
             victim: { name: "แขกที่หมดสติ", look: "m2", at: [5, 1], facing: "left" },
-            xie: { name: "เจียซุ่น ราชสีห์ขนทอง", look: "bandit", at: [2, -2], facing: "left", tint: "#e6c35c", size: 1.2 },
+            xie: { name: "เหลยจิ้น ราชสีห์ตาบอด", look: "bandit", at: [2, -2], facing: "left", tint: "#e6c35c", size: 1.2 },
           },
           beats: [
             ["narrate", "\"…ข้าไม่ได้ยินเสียงคำราม ข้าเห็นแต่คนทั้งงานอ้าปาก แล้วเริ่มทำร้ายกันเอง…\""],

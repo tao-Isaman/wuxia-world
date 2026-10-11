@@ -136,7 +136,7 @@ export const SCENES__OTHER: readonly Scene[] = [
     kind: "dialog",
     id: "qs_qst_yaowang_plague_village_offer",
     lines: [
-      { t: "dialogue", speaker: "หมอเสินหนง", text: "ได้ยินว่าหมู่บ้านแถบถ้ำหุบเขาผีเสื้อป่วยกันทั้งหมู่บ้าน อาการแปลกมาก" },
+      { t: "dialogue", speaker: "หมอเสินหนง", text: "ได้ยินว่าหมู่บ้านแถบถ้ำหุบเขาร้อยยาป่วยกันทั้งหมู่บ้าน อาการแปลกมาก" },
       { t: "dialogue", speaker: "หมอเสินหนง", text: "ไปดูให้ข้าหน่อย เก็บตัวอย่างพืชพรรณที่นั่นมาด้วย" },
     ],
     choices: [

@@ -682,7 +682,7 @@ const T3: readonly MeridianChart[] = [
   },
   {
     id: "jade_maiden", name: "ชีพจรสาวหยก", ti: 3, kind: "base",
-    description: "คัมภีร์สาวหยกแห่งสุสานโบราณให้ร่างเย็นดั่งหยก เบาดั่งปุยเมฆ",
+    description: "คัมภีร์หยกเหมันต์แห่งสุสานโบราณให้ร่างเย็นดั่งหยก เบาดั่งปุยเมฆ",
     requires: { skills: ["ynss", "ne5", "ne12", "nd6"], arts: ["ynxj"] },
     nodes: [
       n("feishu", "จุดเฟ่ยซู", "upper_back", { AGI: [2, 3, 3] }),
@@ -696,8 +696,8 @@ const T3: readonly MeridianChart[] = [
     ],
   },
   {
-    id: "northern_ghost", name: "ชีพจรภูติอุดร", ti: 3, kind: "base",
-    description: "ปราณภูติอุดรเย็นยะเยือกหมุนรอบตันเถียนไม่หยุด เก็บพลังไว้ไม่รั่วไหล",
+    id: "northern_ghost", name: "ชีพจรทะเลลึก", ti: 3, kind: "base",
+    description: "ปราณทะเลลึกเย็นยะเยือกหมุนรอบตันเถียนไม่หยุด เก็บพลังไว้ไม่รั่วไหล",
     requires: { skills: ["xy_demon_wind_sword", "xy_pathless_sword"], arts: ["bmzq", "t3_xy_seepower", "t2_xy_formless_greater", "t0_xy_plum"] },
     nodes: [
       n("zhongji", "จุดจงจี๋", "dantian", { POW: [3, 3, 4] }),
@@ -711,7 +711,7 @@ const T3: readonly MeridianChart[] = [
   },
   {
     id: "one_finger", name: "ชีพจรเอกดัชนี", ti: 3, kind: "combat",
-    description: "รวมปราณทั้งร่างไว้ที่ปลายนิ้วเดียว ดัชนีเอกสุริยันจึงเจาะได้ทุกเกราะ",
+    description: "รวมปราณทั้งร่างไว้ที่ปลายนิ้วเดียว นิ้วเพลิงอรุณจึงเจาะได้ทุกเกราะ",
     requires: { skills: ["yyz", "nf5", "ne11", "ne7", "nd10"] },
     nodes: [
       n("shenting", "จุดเสินถิง", "brow", { ia: [12, 12, 12] }),
@@ -908,7 +908,7 @@ const T4: readonly MeridianChart[] = [
   },
   {
     id: "star_devouring", name: "ชีพจรดาราดูดกลืน", ti: 4, kind: "base",
-    description: "เส้นลับของมหาเวทดูดดาว ปราณไหลเข้าเหมือนแม่น้ำไหลลงทะเล ไม่เคยเต็ม",
+    description: "เส้นลับของวิชากลืนลมปราณ ปราณไหลเข้าเหมือนแม่น้ำไหลลงทะเล ไม่เคยเต็ม",
     requires: { skills: ["xy_punch", "xy_lesserdemon_fist", "xy_root_poison_fist"], arts: ["bmsg", "t3_xy_root_poison_qi", "t1_xy_formless_lesser"] },
     nodes: [
       n("sishencong", "จุดซื่อเสินชง", "crown", { POW: [3, 3, 3] }),
@@ -1007,7 +1007,7 @@ const T4: readonly MeridianChart[] = [
   },
   {
     id: "dragon_subduing", name: "ชีพจรพิชิตมังกร", ti: 4, kind: "ability",
-    description: "สิบแปดฝ่ามือต้องมีเส้นแขนที่ไม่ขาดแม้ตีครบทั้งชุด ยิ่งตียิ่งหนักดั่งมังกรโถม",
+    description: "ฝ่ามือปราบมังกรต้องมีเส้นแขนที่ไม่ขาดแม้ตีครบทั้งชุด ยิ่งตียิ่งหนักดั่งมังกรโถม",
     requires: { skills: ["ep", "ng3", "bg_wander_staff", "bg_drift_fist", "bg_drift_staff", "bg_snake_fist"] },
     nodes: [
       n("shenfeng", "จุดเสินเฟิง", "heart", { STR: [1, 1, 2] }),
@@ -1127,7 +1127,7 @@ const T4: readonly MeridianChart[] = [
 const T5: readonly MeridianChart[] = [
   {
     id: "nine_yang", name: "ชีพจรเก้าสุริยะ", ti: 5, kind: "base",
-    description: "วิชาเก้าเอี้ยงเปิดครบรอบโคจรใหญ่ ปราณหยางไหลเวียนไม่หยุดดั่งตะวันเก้าดวง ร่างกายไม่มีวันอ่อนล้า",
+    description: "ลมปราณตะวันเก้าชั้นเปิดครบรอบโคจรใหญ่ ปราณหยางไหลเวียนไม่หยุดดั่งตะวันเก้าดวง ร่างกายไม่มีวันอ่อนล้า",
     requires: { skills: ["nu2", "nf4", "yyz", "na2", "ne8", "nd7"], arts: ["kuyt"] },
     nodes: [
       n("zhongji", "จุดจงจี๋", "dantian", { STR: [2, 2, 3] }),
@@ -1146,7 +1146,7 @@ const T5: readonly MeridianChart[] = [
   },
   {
     id: "nine_yin", name: "ชีพจรเก้ายิน", ti: 5, kind: "base",
-    description: "คัมภีร์เก้าอิมเปิดทางปราณหยินจากศีรษะลงถึงเท้าแล้ววนกลับ ร่างเบาและมือไวเกินสายตาคน",
+    description: "คัมภีร์จันทราเก้าชั้นเปิดทางปราณหยินจากศีรษะลงถึงเท้าแล้ววนกลับ ร่างเบาและมือไวเกินสายตาคน",
     requires: { skills: ["lmsj", "nf1", "zs", "sa", "nd12"], arts: ["kgim", "t2_eighttri", "t0_sevenstar"] },
     nodes: [
       n("baihui", "จุดไป่ฮุ่ย", "crown", { AGI: [3, 4, 4] }),

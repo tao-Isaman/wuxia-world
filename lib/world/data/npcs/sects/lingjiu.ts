@@ -8,7 +8,7 @@ export const NPCS_LINGJIU: readonly NpcDef[] = [
   {
     id: "sect_lingjiu_lady_zixia",
     name: "หญิงสาวจื่อเสีย",
-    description: "หญิงนักรบลิ่งจิ้วกง เคลื่อนไหวรวดเร็ว ใช้เข็มและดาบลมประกอบกัน",
+    description: "หญิงนักรบวังอินทรีหิมะ เคลื่อนไหวรวดเร็ว ใช้เข็มและดาบลมประกอบกัน",
     locationIds: ["sect_lingjiu"],
     dialogSceneId: "npc_sect_lingjiu_lady_zixia_talk",
     sparOpponentId: "spar_lingjiu_lady",

@@ -137,7 +137,7 @@ A cast hits every living unit of the target team inside the area and is refused 
 4. Internal blade / long / short skills reach 1 further (and lines 1 longer).
 5. Melee skills with 4+ hits collapse to single-target.
 
-Then the hand-set exceptions (`SKILL_GRID_OVERRIDES`, 27) apply, for example `ep` 18 ฝ่ามือพิชิตมังกร (1–3 line 3), `lmsj` กระบี่ 6 ชีพจร (1–4 single), `ng5` ดาบยาวเทพสังหาร (3×3 square), `tang_starrain` ดาราพิรุณโปรย (2–4 diamond 2) and `ng6` ขลุ่ยพลิกโลก (2–5 diamond 2). Finally `normalise` caps range at 5, lines at 4 and areas at 2.
+Then the hand-set exceptions (`SKILL_GRID_OVERRIDES`, 27) apply, for example `ep` ฝ่ามือปราบมังกร 18 ท่า (1–3 line 3), `lmsj` กระบี่ 6 ชีพจร (1–4 single), `ng5` ดาบยาวเทพสังหาร (3×3 square), `tang_starrain` ดาราพิรุณโปรย (2–4 diamond 2) and `ng6` ขลุ่ยพลิกโลก (2–5 diamond 2). Finally `normalise` caps range at 5, lines at 4 and areas at 2.
 
 **Boss moves** (`bss_*`, [combat.md](combat.md#boss-moves-and-arts)) each have their own override; the five self moves (molt, frenzies, shell, mirror) need none:
 

@@ -4,6 +4,18 @@ What changed, when, and in which pull request. Newest first. Each entry says wha
 
 Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-Isaman/wuxia-world/pulls?q=is%3Apr+is%3Amerged). The waves are the build → test → review rounds the agents worked in (see [HANDOFF.md](../HANDOFF.md)).
 
+## 2026-10-11
+
+### Our own names: the legend no longer borrows a novel's
+
+- The game is no longer framed as a sequel to มังกรหยก ภาค 3, and the names players recognise straight from Jin Yong's novels are replaced with invented ones (ids, saves and quest logic unchanged; the owner chose each name from an audit of 85 terms):
+  - **People:** เตียบ่อกี้ → ลั่วเทียนหมิง, เจียซุ่น ราชสีห์ขนทอง → เหลยจิ้น ราชสีห์ตาบอด, โฮ่งชีก๋ง → เผิงเหล่าจิ่ว, จิวจี้เยียก → ไป๋ซู่หลิง, ก๊วยเซียง → ฉินเซียงหลิง, เซ่งคุน → เฉินหย่วนกง, เตียบ้อ → เอ๋อหลันจู, ค่งเกี่ยน → หยวนจิ้ง, เมียะเจ็ก → จิ้งหาน, โอ้วแชงู → เหอหมิงซาน, อุ่ยอิดเซี้ยว ราชาค้างคาว → เหว่ยเฉวียน ค้างคาวราตรี, กักอ้วน → จื้อหยวน, อึ้งย้ง → ซูหวั่นชิง, ฮวมเอี๊ยว → ฟางหยวน, อ๋องหลันกู → หลันจู, เซียวเจียว → อาเหมย, เอี้ยก้วย / หยางกั้ว → ไป๋อวี่เฟิง, เตียชุ่ยซัว → ซ่งชิงหยวน, เอี้ยเซียว → ลู่ชิงเฉิน, ก๊วยเจ๋ง → ลู่เหวินเจิ้ง, ฮึงซ่อซ่อ → อินเยว่หรู, ยู้ไต้งำ → ซ่งต้าเหยียน, ฮึงเทียนเจ็ง ราชาอินทรีคิ้วขาว → อินชางเฟิง ราชาอินทรีหิมะ; the last mention of ฮ่วงเอี้ยะซือ and of the Five Greats is gone.
+  - **Places and events:** ยอดกวงเม้ง / ยอดแสงสว่าง → ยอดเพลิงอุดร, หุบผีเสื้อ → หุบเขาร้อยยา, เกาะไฟน้ำแข็ง → เกาะทะเลเพลิงน้ำแข็งเหนือ, ลิ่งจิ้วกง → วังอินทรีหิมะ, สำนักคุ้มกันเจิ้นเวย → สำนักคุ้มภัยเจิ้นหยวน, ถ้ำบทกวีถัง → ถ้ำจารึกกลอน, เกาะอัศวิน → เกาะหมอกทอง, เกาะงูวิเศษ → เกาะงูเงิน, ชุมนุมวิจารณ์กระบี่เขาหัวซาน → ชุมนุมประลองกระบี่หัวซาน (`TOURNAMENT_NAME`).
+  - **Items and arts:** กระบี่อิงฟ้า → กระบี่เคียงฟ้า, ดาบฆ่ามังกร → ดาบปราบมังกร, 18 ฝ่ามือพิชิตมังกร → ฝ่ามือปราบมังกร 18 ท่า, วิชาเก้าเอี้ยง → ลมปราณตะวันเก้าชั้น, คัมภีร์เก้าอิม → คัมภีร์จันทราเก้าชั้น, มหาเวทดูดดาว → วิชากลืนลมปราณ, เฉียนคุนต้าหนัวอี → วิชาพลิกฟ้าคว่ำดิน, เพลงกระบี่สุรางคนางค์ใจพิสุทธิ์ → เพลงกระบี่วารีพิสุทธิ์, คัมภีร์สาวหยก → คัมภีร์หยกเหมันต์, ฝ่ามือกำสรดวิญญาณสลาย → ฝ่ามืออาลัยจันทร์, ลมปราณภูติอุดร → ลมปราณทะเลลึก, ดัชนีเอกสุริยัน → นิ้วเพลิงอรุณ, มังกร-ช้างปัญญา → พลังคชสารปัญญาบารมี (with their Chinese labels).
+  - Kept by choice for now: the historical or legendary people (เตียซำฮง, หวังฉงหยาง, ตั้งอิ้วเลี้ยง), several sect, place and art names (กู่มู่, สราญรมย์, ตะวันจันทรา, ดาวดึงส์, หุบเขาตัดใจ, เกาะดอกท้อ, ถ้ำหยางกั้ว, คัมภีร์ทานตะวัน, เก้ากระบี่เดียวดาย…).
+- Rumors already saved in a browser keep their old wording until they fade.
+- Docs: [story-writing.md](story-writing.md#names-ours-not-a-novelists) now says the legend is our own and lists the new names; CLAUDE.md and the guides no longer call the game a sequel.
+
 ## 2026-10-08
 
 ### PixelLab characters: the heroes and the wolf redrawn

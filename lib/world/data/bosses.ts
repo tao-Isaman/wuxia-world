@@ -40,7 +40,7 @@ export const BOSSES: readonly BossDef[] = [
   { id: "boss_blood_tiger", name: "พยัคฆ์โลหิตลายคราม", lair: "valley_hudie", spot: { x: 84, y: 26 },
     respawnDays: BOSS_RESPAWN_DAYS, wExp: 3400, trophyItemId: "trophy_blood_tiger",
     gear: ["W5", "B4"], gearChance: 0.15,
-    lore: "พรานป่าทางใต้ไม่กล้าเข้าหุบเขาผีเสื้อเกินครึ่งทาง เขาว่ามีพยัคฆ์ลายครามขนแดงดั่งเลือดตัวโตเท่าวัว คุมเสือภูเขาทั้งหุบเหมือนแม่ทัพ" },
+    lore: "พรานป่าทางใต้ไม่กล้าเข้าหุบเขาร้อยยาเกินครึ่งทาง เขาว่ามีพยัคฆ์ลายครามขนแดงดั่งเลือดตัวโตเท่าวัว คุมเสือภูเขาทั้งหุบเหมือนแม่ทัพ" },
   { id: "boss_sword_eagle", name: "อินทรียักษ์จ้าวแห่งกระบี่", lair: "cliff_motian", spot: { x: 54, y: 24 },
     respawnDays: BOSS_RESPAWN_DAYS, wExp: 3600, trophyItemId: "trophy_sword_eagle",
     gear: ["W5", "H5"], gearChance: 0.15,
@@ -56,7 +56,7 @@ export const BOSSES: readonly BossDef[] = [
   { id: "boss_flame_bull", name: "กระทิงยักษ์เขาเพลิง", lair: "peak_guangming", spot: { x: 70, y: 32 },
     respawnDays: BOSS_RESPAWN_DAYS, wExp: 4000, trophyItemId: "trophy_flame_bull",
     gear: ["W5", "B5"], gearChance: 0.15,
-    lore: "คนเลี้ยงสัตว์ใต้ยอดแสงสว่างเห็นกระทิงยักษ์เขาแดงดั่งเหล็กเผาไฟ ตะกุยดินทีไรหญ้าไหม้เป็นวง ฝูงหมูป่าคลั่งวิ่งตามมันไปทั่วยอดเขา" },
+    lore: "คนเลี้ยงสัตว์ใต้ยอดเพลิงอุดรเห็นกระทิงยักษ์เขาแดงดั่งเหล็กเผาไฟ ตะกุยดินทีไรหญ้าไหม้เป็นวง ฝูงหมูป่าคลั่งวิ่งตามมันไปทั่วยอดเขา" },
 ];
 
 export const BOSSES_BY_ID: ReadonlyMap<string, BossDef> = new Map(BOSSES.map((b) => [b.id, b]));

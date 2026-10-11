@@ -47,7 +47,7 @@ export const QUESTS__OTHER: readonly QuestDef[] = [
     stages: [
       {
         id: "visit_village",
-        description: "เดินทางไปสำรวจหมู่บ้านที่ป่วยแถบถ้ำหุบเขาผีเสื้อ",
+        description: "เดินทางไปสำรวจหมู่บ้านที่ป่วยแถบถ้ำหุบเขาร้อยยา",
         objective: {
           spots: [
             { locationId: "valley_hudie", label: "สำรวจหมู่บ้านที่ป่วย", text: "ชาวบ้านไข้สูง ผิวขึ้นผื่นม่วง ดูคล้ายพิษจากสมุนไพรบางชนิด" },
@@ -56,7 +56,7 @@ export const QUESTS__OTHER: readonly QuestDef[] = [
       },
       {
         id: "collect_sample",
-        description: "เก็บตัวอย่างสมุนไพรและจดอาการคนป่วยที่ถ้ำหุบเขาผีเสื้อ",
+        description: "เก็บตัวอย่างสมุนไพรและจดอาการคนป่วยที่ถ้ำหุบเขาร้อยยา",
         objective: {
           spots: [
             { locationId: "valley_hudie", label: "เก็บตัวอย่างสมุนไพรและบันทึกอาการ", text: "เก็บต้นหญ้าริมลำธารที่ชาวบ้านใช้ต้มกิน และจดอาการไว้ครบ" },

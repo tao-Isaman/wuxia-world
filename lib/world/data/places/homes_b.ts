@@ -80,7 +80,7 @@ const npcs: NpcDef[] = [
   // home_yideng
   {
     id: "home_yideng_monk_yideng", name: "อู๋เฉินไต้ซือ",
-    description: "พระชราเชื้อสายตระกูลต้วนแห่งต้าหลี่ (สายเดียวกับหนานตี้ในตำนาน) สละยศศักดิ์มาจุดตะเกียงดวงเดียวในกระท่อม ใจดีและรักษาคนไม่เลือกหน้า",
+    description: "พระชราเชื้อสายตระกูลต้วนแห่งต้าหลี่ สละยศศักดิ์มาจุดตะเกียงดวงเดียวในกระท่อม ใจดีและรักษาคนไม่เลือกหน้า",
     locationIds: [YD], dialogSceneId: "npc_home_yideng_monk_yideng_talk",
     sparOpponentId: "spar_home_yideng_monk", sparFameReward: 8,
     tags: ["monk", "healer", "elder", "master"], defenseTier: 4,

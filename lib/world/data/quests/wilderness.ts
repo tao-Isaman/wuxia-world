@@ -450,19 +450,19 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
   {
     id: "qw_miao_offering_cave",
     name: "ของถวายในถ้ำบทกวี",
-    description: "อาเป้าฝากของถวายประจำปีของเผ่าเมี่ยวให้นำไปวางบนแท่นหินในถ้ำบทกวีถัง เพราะเด็กในเผ่าไม่กล้าเข้าไป",
-    briefSummary: "นำของถวายไปวางที่ถ้ำบทกวีถัง",
+    description: "อาเป้าฝากของถวายประจำปีของเผ่าเมี่ยวให้นำไปวางบนแท่นหินในถ้ำจารึกกลอน เพราะเด็กในเผ่าไม่กล้าเข้าไป",
+    briefSummary: "นำของถวายไปวางที่ถ้ำจารึกกลอน",
     type: "side",
     giverNpcId: "wld_miao_tribaleldr_abao",
     stages: [
       {
         id: "travel",
-        description: "เดินทางไปถ้ำบทกวีถัง",
+        description: "เดินทางไปถ้ำจารึกกลอน",
         autoAdvance: { t: "visitedLocation", locationId: "cave_tangshi" },
       },
       {
         id: "place_offering",
-        description: "วางเม็ดบัวถวายบนแท่นหินในถ้ำบทกวีถัง (ระวังตะขาบยักษ์)",
+        description: "วางเม็ดบัวถวายบนแท่นหินในถ้ำจารึกกลอน (ระวังตะขาบยักษ์)",
         objective: {
           spots: [
             { locationId: "cave_tangshi", label: "วางของถวายบนแท่นหิน", sceneId: "qs_qw_miao_offering_cave_arrived" },
@@ -710,15 +710,15 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
   // 23. Defeat / Exploration — clear bears to reach the treasure cache
   {
     id: "qw_hong_treasure_map",
-    name: "แผนที่สมบัติโฮ่งชีก๋ง",
-    description: "หลัวเฟย์หาว นักผจญภัยหนุ่ม พบแผนที่สมบัติของโฮ่งชีก๋งในบ้านของท่าน แต่ทางไปถ้ำสมบัติมีหมีสีน้ำตาลขวางอยู่ ปราบหมี แล้วเข้าไปดูว่าสมบัติคืออะไร",
-    briefSummary: "ปราบหมีสีน้ำตาล แล้วค้นถ้ำสมบัติของโฮ่งชีก๋ง",
+    name: "แผนที่สมบัติเผิงเหล่าจิ่ว",
+    description: "หลัวเฟย์หาว นักผจญภัยหนุ่ม พบแผนที่สมบัติของเผิงเหล่าจิ่วในบ้านของท่าน แต่ทางไปถ้ำสมบัติมีหมีสีน้ำตาลขวางอยู่ ปราบหมี แล้วเข้าไปดูว่าสมบัติคืออะไร",
+    briefSummary: "ปราบหมีสีน้ำตาล แล้วค้นถ้ำสมบัติของเผิงเหล่าจิ่ว",
     type: "side",
     giverNpcId: "wld_hong_adventurer_luo",
     stages: [
       {
         id: "clear_bears",
-        description: "ปราบหมีสีน้ำตาลที่ขวางทางไปถ้ำสมบัติหลังบ้านโฮ่งชีก๋ง",
+        description: "ปราบหมีสีน้ำตาลที่ขวางทางไปถ้ำสมบัติหลังบ้านเผิงเหล่าจิ่ว",
         autoAdvance: { t: "defeatedOpponent", opponentId: "brown_bear", count: 1 },
         objective: {
           spots: [
@@ -728,7 +728,7 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
       },
       {
         id: "find_cache",
-        description: "ค้นถ้ำสมบัติตามแผนที่ที่บ้านโฮ่งชีก๋ง",
+        description: "ค้นถ้ำสมบัติตามแผนที่ที่บ้านเผิงเหล่าจิ่ว",
         objective: {
           spots: [
             { locationId: "home_hong", label: "ค้นถ้ำสมบัติตามแผนที่", sceneId: "qs_qw_hong_treasure_map_clear" },
@@ -747,15 +747,15 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
   // 24. Defeat — drive wolf pack away from hong's residence
   {
     id: "qw_hong_beast_swarm",
-    name: "ฝูงหมาป่าบุกบ้านโฮ่งชีก๋ง",
-    description: "ฝูงหมาป่าบุกเข้ามาใกล้บ้านโฮ่งชีก๋งจนคนเฝ้าบ้านหนีหมด หลัวเฟย์หาวขอให้ปราบสัก 2 ตัวเพื่อขู่ฝูงให้ถอยไป",
-    briefSummary: "ปราบหมาป่า 2 ตัวรอบบ้านโฮ่งชีก๋ง",
+    name: "ฝูงหมาป่าบุกบ้านเผิงเหล่าจิ่ว",
+    description: "ฝูงหมาป่าบุกเข้ามาใกล้บ้านเผิงเหล่าจิ่วจนคนเฝ้าบ้านหนีหมด หลัวเฟย์หาวขอให้ปราบสัก 2 ตัวเพื่อขู่ฝูงให้ถอยไป",
+    briefSummary: "ปราบหมาป่า 2 ตัวรอบบ้านเผิงเหล่าจิ่ว",
     type: "side",
     giverNpcId: "wld_hong_adventurer_luo",
     stages: [
       {
         id: "hunt_wolves",
-        description: "ปราบหมาป่า 2 ตัวรอบบ้านโฮ่งชีก๋ง",
+        description: "ปราบหมาป่า 2 ตัวรอบบ้านเผิงเหล่าจิ่ว",
         autoAdvance: { t: "defeatedOpponent", opponentId: "wild_wolf", count: 2 },
       },
       { id: "report", description: "กลับไปบอกหลัวเฟย์หาวว่าฝูงหมาป่าถอยไปแล้ว" },
@@ -771,9 +771,9 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
   // 25. Investigation — talk to hong's ghost in cave (bonus quest requiring motian ghost flag)
   {
     id: "qw_hong_legend_verify",
-    name: "ตำนานโฮ่งชีก๋ง",
-    description: "หลัวเฟย์หาวได้ยินตำนานว่าโฮ่งชีก๋งทิ้งข้อความสำคัญไว้ก่อนตาย ไปถามวิญญาณเหลียงเก๋อที่ยอดเขามรณะว่าจริงหรือไม่",
-    briefSummary: "ยืนยันตำนานโฮ่งชีก๋งกับวิญญาณเหลียงเก๋อ",
+    name: "ตำนานเผิงเหล่าจิ่ว",
+    description: "หลัวเฟย์หาวได้ยินตำนานว่าเผิงเหล่าจิ่วทิ้งข้อความสำคัญไว้ก่อนตาย ไปถามวิญญาณเหลียงเก๋อที่ยอดเขามรณะว่าจริงหรือไม่",
+    briefSummary: "ยืนยันตำนานเผิงเหล่าจิ่วกับวิญญาณเหลียงเก๋อ",
     type: "side",
     giverNpcId: "wld_hong_adventurer_luo",
     prereqs: {
@@ -786,10 +786,10 @@ export const QUESTS_WILDERNESS: readonly QuestDef[] = [
     stages: [
       {
         id: "visit_motian",
-        description: "ไปถามวิญญาณที่ยอดเขามรณะเรื่องตำนานโฮ่งชีก๋ง",
+        description: "ไปถามวิญญาณที่ยอดเขามรณะเรื่องตำนานเผิงเหล่าจิ่ว",
         autoAdvance: { t: "visitedLocation", locationId: "cliff_motian" },
       },
-      { id: "report", description: "นำคำตอบของวิญญาณกลับไปบอกหลัวเฟย์หาวที่บ้านโฮ่งชีก๋ง" },
+      { id: "report", description: "นำคำตอบของวิญญาณกลับไปบอกหลัวเฟย์หาวที่บ้านเผิงเหล่าจิ่ว" },
     ],
     rewards: [
       { t: "gold", amount: 250 },

@@ -25,7 +25,7 @@ const REGISTER_BLOCK: Record<string, string> = {
   done: "ปีนี้จัดการแข่งขันไปแล้ว",
 };
 
-// ชุมนุมวิจารณ์กระบี่เขาหัวซาน — the yearly 32-entrant tournament on Mount Hua:
+// ชุมนุมประลองกระบี่หัวซาน — the yearly 32-entrant tournament on Mount Hua:
 // register, fight each round, watch the bracket, and (as champion) pick a
 // move or art from the entrants.
 export function TournamentPopup({ open, onClose }: Props) {
@@ -42,7 +42,7 @@ export function TournamentPopup({ open, onClose }: Props) {
   const history = [...(state.tournamentHistory ?? [])].reverse().slice(0, 5);
 
   const register = () => {
-    if (state.registerTournament()) toast("success", "ลงชื่อเข้าร่วมชุมนุมวิจารณ์กระบี่เขาหัวซานแล้ว");
+    if (state.registerTournament()) toast("success", "ลงชื่อเข้าร่วมชุมนุมประลองกระบี่หัวซานแล้ว");
   };
   const fight = () => {
     if (state.fightTournamentBout()) onClose();
@@ -53,12 +53,12 @@ export function TournamentPopup({ open, onClose }: Props) {
   };
 
   let calendar: string;
-  if (phase === "day") calendar = "วันนี้คือวันชุมนุมวิจารณ์กระบี่เขาหัวซาน!";
+  if (phase === "day") calendar = "วันนี้คือวันชุมนุมประลองกระบี่หัวซาน!";
   else if (phase === "registration") calendar = `เปิดรับสมัคร · อีก ${TOURNAMENT.startDay - dayOfYear(state.day)} วันถึงวันแข่งขัน`;
   else calendar = `จะเปิดรับสมัครในอีก ${daysUntilRegistration(state.day)} วัน`;
 
   return (
-    <Modal open={open} onClose={onClose} title="⚔ ชุมนุมวิจารณ์กระบี่เขาหัวซาน">
+    <Modal open={open} onClose={onClose} title="⚔ ชุมนุมประลองกระบี่หัวซาน">
       <div className="space-y-3 text-sm" data-testid="tournament-popup">
         <p className="text-xs text-muted-foreground">
           จัดขึ้นปีละครั้งบนยอดเขาหัวซาน (สำนักหัวซานเป็นเจ้าภาพ ส่งจดหมายเชิญเมื่อเปิดรับลงชื่อ) · ยอดฝีมือ 32 คนประลองแบบแพ้คัดออก · ชนะแต่ละรอบได้เงินและ w-exp

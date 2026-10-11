@@ -15,7 +15,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - Explores 101 places (100 painted maps) joined by 129 roads.
 - Meets 235 NPCs (30 of them, plus the disciples, heirs and newcomers they bring, live their own lives) and takes 1,074 quests: a 15-chapter main story (เนื้อเรื่องหลัก), 373 hand-written, 113 sect lineage quests (154 moves; 30 of them a choice) and 48 story sagas (573 chapters: 38 sect sagas and 10 long jianghu sagas for the unsect T4 / T5 moves); 511 cutscenes.
-- Lives in the 3rd year of Jianwen (1401), about 40 years after มังกรหยก ภาค 3: the court's seized scriptures have just scattered back into the jianghu ([docs/story-writing.md](docs/story-writing.md#timeline-and-novel-characters)).
+- Lives in the 3rd year of Jianwen (1401), about 40 years after the legend of the last age (our own story, not a novel's sequel): the court's seized scriptures have just scattered back into the jianghu ([docs/story-writing.md](docs/story-writing.md#timeline-and-the-legends-people)).
 - Joins one of 15 sects and learns 173 move skills and 111 inner arts (plus 18 boss moves and 6 boss arts no one can learn).
 - Hunts foes where they live (habitats), from tier 0 to tier 5, and six legendary beasts (บอส) in their lairs.
 - Gathers and crafts (19 life skills).
@@ -33,7 +33,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | Stats, damage, effects, levels, type conflict | [docs/combat.md](docs/combat.md) |
 | The tactics battle: board, turns, ranges, AI, store, renderer, UI | [docs/grid-combat.md](docs/grid-combat.md) |
 | Scenes, effects, conditions, quests, objectives, guide, encounters, law, bad actions | [docs/world-engine.md](docs/world-engine.md) |
-| Sect lineage quests, story sagas (มังกรหยก ภาค 3), cutscenes | [docs/story-quests.md](docs/story-quests.md) · writing: [docs/story-writing.md](docs/story-writing.md) |
+| Sect lineage quests, story sagas, cutscenes | [docs/story-quests.md](docs/story-quests.md) · writing: [docs/story-writing.md](docs/story-writing.md) |
 | NPC simulation and rumors | [docs/liveness.md](docs/liveness.md) |
 | Adding content (places, NPCs, quests, items, skills, sects…) | [docs/content-authoring.md](docs/content-authoring.md) |
 | Map runtime, collision, characters, HUD, menus, CSS | [docs/rendering.md](docs/rendering.md) |
@@ -272,7 +272,7 @@ Two deliberate exceptions reach into stores:
 - **Letters, stations, tournament.**
   - **Letters** (`letters.ts`): each new day an NPC with relationship ≥ 20 may write (one letter a day, 15 days per NPC; odds from relationship, fame, LUK; gift rarity from LUK). Inbox `state.letters`; `openLetter` takes the gift; `deleteLetters` throws letters away (taking an unclaimed gift first).
   - **Horse stations** (`stations.ts`): cities, villages and joinable sects' grounds; ride to a visited station place for gold by world-map distance, arriving at once (`stationTravel`).
-  - **Sword tournament** (`tournament.ts`): a 360-day year; held on Mount Hua (`sect_huashan`, `TOURNAMENT_NAME` ชุมนุมวิจารณ์กระบี่เขาหัวซาน); on day 60 Huashan's chief sends an invitation letter with the 100-gold fee (`sendTournamentInvitation`); register there (days 60–89, 100 gold), fight on day 90–92. 32 entrants (hero + the liveness roster + sparring fighters); the hero's bouts are real non-fatal battles (`pendingBattle.tournament`), the rest simulated by power. Bout and place rewards; the champion (hero or NPC) picks one entrant's move or art.
+  - **Sword tournament** (`tournament.ts`): a 360-day year; held on Mount Hua (`sect_huashan`, `TOURNAMENT_NAME` ชุมนุมประลองกระบี่หัวซาน); on day 60 Huashan's chief sends an invitation letter with the 100-gold fee (`sendTournamentInvitation`); register there (days 60–89, 100 gold), fight on day 90–92. 32 entrants (hero + the liveness roster + sparring fighters); the hero's bouts are real non-fatal battles (`pendingBattle.tournament`), the rest simulated by power. Bout and place rewards; the champion (hero or NPC) picks one entrant's move or art.
   - **Practice xp** is 30 + 5 % of the xp to the next level, 50 + 6 % at a fitting place (`practiceXpGain`).
 - **Presence** (`npc-presence.ts`). A dead NPC (assassinated, killed, or `npcExt` status `dead`) is gone for good; a kidnapped one is away until `kidnappedUntil` (day + 180) and then stands at their spot again. Maps and the location card filter with `npcPresent`.
 - **Gifts** (`gifts.ts`, store `giveGift`). One gift per NPC every 30 days (`giftDays`), an item or 100 / 500 / 1000 / 5000 gold. Worth 1–5 by price; liked ×2 (+2 for a favourite item id), disliked −2. Tastes are `NpcDef.likes` / `dislikes` (item ids, categories, `"gold"`) or follow the NPC's tags.

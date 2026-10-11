@@ -110,7 +110,7 @@ If unsure: tell me the *flavor* ("steady defensive breath" / "burst-strike capst
 
 ## 5 · Membership (joinable sects)
 
-Skip this section for a lore-only sect (visitable grounds, no membership — like ลิ่งจิ้วกง or พรรคเบญจพิษ). For a joinable sect I also add the `SectId`, the `SECT_MEMBERSHIPS` entry, a `hunter_<sectId>` and a redemption quest.
+Skip this section for a lore-only sect (visitable grounds, no membership — like วังอินทรีหิมะ or พรรคเบญจพิษ). For a joinable sect I also add the `SectId`, the `SECT_MEMBERSHIPS` entry, a `hunter_<sectId>` and a redemption quest.
 
 | Field | Options / defaults |
 |---|---|

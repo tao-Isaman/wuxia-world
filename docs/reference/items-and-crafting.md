@@ -185,8 +185,8 @@
 | `scroll_skill_qz_sun_fist` | คัมภีร์หมัดสุริยัน | 0 | learn หมัดสุริยัน (STR ≥ 0) |
 | `scroll_skill_qz_sun_sword` | คัมภีร์กระบี่สะกดสุริยันต์ | 0 | learn กระบี่สะกดสุริยันต์ (STR ≥ 0) |
 | `scroll_skill_gm_sword` | คัมภีร์กระบี่สุสานโบราณ | 0 | learn กระบี่สุสานโบราณ (STR ≥ 0) |
-| `scroll_skill_ynss` | คัมภีร์เพลงกระบี่สุรางคนางค์ใจพิสุทธิ์ | 0 | learn เพลงกระบี่สุรางคนางค์ใจพิสุทธิ์ (STR ≥ 0) |
-| `scroll_skill_ansh` | คัมภีร์ฝ่ามือกำสรดวิญญาณสลาย | 0 | learn ฝ่ามือกำสรดวิญญาณสลาย (STR ≥ 0) |
+| `scroll_skill_ynss` | คัมภีร์เพลงกระบี่วารีพิสุทธิ์ | 0 | learn เพลงกระบี่วารีพิสุทธิ์ (STR ≥ 0) |
+| `scroll_skill_ansh` | คัมภีร์ฝ่ามืออาลัยจันทร์ | 0 | learn ฝ่ามืออาลัยจันทร์ (STR ≥ 0) |
 | `scroll_skill_nc1` | คัมภีร์ประกาศิตพรรคยาจก | 0 | learn ประกาศิตพรรคยาจก (STR ≥ 0) |
 | `scroll_skill_nc2` | คัมภีร์ไม้เท้าขอทาน | 0 | learn ไม้เท้าขอทาน (STR ≥ 0) |
 | `scroll_skill_bg_snake_fist` | คัมภีร์เพลงหมัดอสรพิษคนจร | 0 | learn เพลงหมัดอสรพิษคนจร (STR ≥ 0) |
@@ -195,7 +195,7 @@
 | `scroll_skill_bg_drift_fist` | คัมภีร์เพลงหมัดล่องลอย | 0 | learn เพลงหมัดล่องลอย (STR ≥ 0) |
 | `scroll_skill_bg_wander_staff` | คัมภีร์ไม้เท้าพเนจร | 0 | learn ไม้เท้าพเนจร (STR ≥ 0) |
 | `scroll_skill_ng3` | คัมภีร์ฝ่ามือจับมังกร | 0 | learn ฝ่ามือจับมังกร (STR ≥ 0) |
-| `scroll_skill_ep` | คัมภีร์18 ฝ่ามือพิชิตมังกร | 0 | learn 18 ฝ่ามือพิชิตมังกร (STR ≥ 0) |
+| `scroll_skill_ep` | คัมภีร์ฝ่ามือปราบมังกร 18 ท่า | 0 | learn ฝ่ามือปราบมังกร 18 ท่า (STR ≥ 0) |
 | `scroll_skill_bg_lucky_staff` | คัมภีร์เพลงไม้เท้าตีสุนัข | 0 | learn เพลงไม้เท้าตีสุนัข (STR ≥ 0) |
 | `scroll_skill_mi_firepalm` | คัมภีร์ฝ่ามือเพลิง | 0 | learn ฝ่ามือเพลิง (STR ≥ 0) |
 | `scroll_skill_xy_lesserdemon_blade` | คัมภีร์ดาบอสูรน้อย | 0 | learn ดาบอสูรน้อย (STR ≥ 0) |
@@ -278,7 +278,7 @@
 | `scroll_skill_zs` | คัมภีร์กู่ฉินสะท้านจิต | 0 | learn กู่ฉินสะท้านจิต (STR ≥ 0) |
 | `scroll_skill_nh1` | คัมภีร์พลองเทวดา | 0 | learn พลองเทวดา (STR ≥ 0) |
 | `scroll_skill_nh2` | คัมภีร์กระบี่วิเศษ | 0 | learn กระบี่วิเศษ (STR ≥ 0) |
-| `scroll_skill_yyz` | คัมภีร์ดัชนีเอกสุริยัน | 0 | learn ดัชนีเอกสุริยัน (STR ≥ 0) |
+| `scroll_skill_yyz` | คัมภีร์นิ้วเพลิงอรุณ | 0 | learn นิ้วเพลิงอรุณ (STR ≥ 0) |
 | `scroll_skill_nf1` | คัมภีร์กู่ฉินสังหาร | 0 | learn กู่ฉินสังหาร (STR ≥ 0) |
 | `scroll_skill_nf2` | คัมภีร์ดาบโดดเดี่ยว | 0 | learn ดาบโดดเดี่ยว (STR ≥ 0) |
 | `scroll_skill_nf3` | คัมภีร์ทวนประทับมังกร | 0 | learn ทวนประทับมังกร (STR ≥ 0) |
@@ -338,7 +338,7 @@
 | `scroll_art_qzzq` | คัมภีร์ลมปราณชวนจินก่า | 0 | learn ลมปราณชวนจินก่า (STR ≥ 0) |
 | `scroll_art_t3_qz_sun` | คัมภีร์หนึ่งพลังสุริยันต์ | 0 | learn หนึ่งพลังสุริยันต์ (STR ≥ 0) |
 | `scroll_art_t3_qz_dragon` | คัมภีร์หยังทะเลพิฆาตมังกร | 0 | learn หยังทะเลพิฆาตมังกร (STR ≥ 0) |
-| `scroll_art_ynxj` | คัมภีร์คัมภีร์สาวหยก | 0 | learn คัมภีร์สาวหยก (STR ≥ 0) |
+| `scroll_art_ynxj` | คัมภีร์คัมภีร์หยกเหมันต์ | 0 | learn คัมภีร์หยกเหมันต์ (STR ≥ 0) |
 | `scroll_art_t4_gm_iceweave` | คัมภีร์วิชาไหมน้ำแข็ง | 0 | learn วิชาไหมน้ำแข็ง (STR ≥ 0) |
 | `scroll_art_t4_gm_winterstep` | คัมภีร์วิชาก้าวย่างเหมันต์ | 0 | learn วิชาก้าวย่างเหมันต์ (STR ≥ 0) |
 | `scroll_art_t0_bg_survival` | คัมภีร์วิชาเอาชีวิตรอดพื้นฐาน | 0 | learn วิชาเอาชีวิตรอดพื้นฐาน (STR ≥ 0) |
@@ -355,15 +355,15 @@
 | `scroll_art_t3_sm_dualfusion` | คัมภีร์พลังสองขั้วผสาน | 0 | learn พลังสองขั้วผสาน (STR ≥ 0) |
 | `scroll_art_t3_sm_sunmoon` | คัมภีร์พลังสุริยันจันทรา | 0 | learn พลังสุริยันจันทรา (STR ≥ 0) |
 | `scroll_art_t3_sm_sunscript` | คัมภีร์คัมภีร์ทานตะวัน (ฉบับย่อ) | 0 | learn คัมภีร์ทานตะวัน (ฉบับย่อ) (STR ≥ 0) |
-| `scroll_art_qiankun` | คัมภีร์เฉียนคุนต้าหนัวอี | 0 | learn เฉียนคุนต้าหนัวอี (STR ≥ 0) |
+| `scroll_art_qiankun` | คัมภีร์วิชาพลิกฟ้าคว่ำดิน | 0 | learn วิชาพลิกฟ้าคว่ำดิน (STR ≥ 0) |
 | `scroll_art_yxhd` | คัมภีร์ดาวเคลื่อนดาราคล้อย | 0 | learn ดาวเคลื่อนดาราคล้อย (STR ≥ 0) |
 | `scroll_art_t0_xy_plum` | คัมภีร์ลมปราณดอกเหมย | 0 | learn ลมปราณดอกเหมย (STR ≥ 0) |
 | `scroll_art_t1_xy_formless_lesser` | คัมภีร์พลังไร้ลักษณ์น้อย | 0 | learn พลังไร้ลักษณ์น้อย (STR ≥ 0) |
 | `scroll_art_t2_xy_formless_greater` | คัมภีร์พลังไร้ลักษณ์ใหญ่ | 0 | learn พลังไร้ลักษณ์ใหญ่ (STR ≥ 0) |
 | `scroll_art_t3_xy_root_poison_qi` | คัมภีร์ลมปราณรากพิษ | 0 | learn ลมปราณรากพิษ (STR ≥ 0) |
 | `scroll_art_t3_xy_seepower` | คัมภีร์วิชาดูพลัง | 0 | learn วิชาดูพลัง (STR ≥ 0) |
-| `scroll_art_bmzq` | คัมภีร์ลมปราณภูติอุดร | 0 | learn ลมปราณภูติอุดร (STR ≥ 0) |
-| `scroll_art_bmsg` | คัมภีร์มหาเวทดูดดาว | 0 | learn มหาเวทดูดดาว (STR ≥ 0) |
+| `scroll_art_bmzq` | คัมภีร์ลมปราณทะเลลึก | 0 | learn ลมปราณทะเลลึก (STR ≥ 0) |
+| `scroll_art_bmsg` | คัมภีร์วิชากลืนลมปราณ | 0 | learn วิชากลืนลมปราณ (STR ≥ 0) |
 | `scroll_art_hgdf` | คัมภีร์วิชาสลายพลัง | 0 | learn วิชาสลายพลัง (STR ≥ 0) |
 | `scroll_art_t2_snakeform` | คัมภีร์งูพิษเจ็ดสี | 0 | learn งูพิษเจ็ดสี (STR ≥ 0) |
 | `scroll_art_np` | คัมภีร์เบญจพิษรวมกาย | 0 | learn เบญจพิษรวมกาย (STR ≥ 0) |
@@ -394,14 +394,14 @@
 | `scroll_art_t2_plumblossom` | คัมภีร์ลมปราณเหมยห้ากลีบ | 0 | learn ลมปราณเหมยห้ากลีบ (STR ≥ 0) |
 | `scroll_art_t2_craneform` | คัมภีร์กระเรียนสมาธิ | 0 | learn กระเรียนสมาธิ (STR ≥ 0) |
 | `scroll_art_t2_tigerroar` | คัมภีร์เสือคำราม | 0 | learn เสือคำราม (STR ≥ 0) |
-| `scroll_art_t3_dragonelephant` | คัมภีร์มังกร-ช้างปัญญา | 0 | learn มังกร-ช้างปัญญา (STR ≥ 0) |
+| `scroll_art_t3_dragonelephant` | คัมภีร์พลังคชสารปัญญาบารมี | 0 | learn พลังคชสารปัญญาบารมี (STR ≥ 0) |
 | `scroll_art_t3_heartmind` | คัมภีร์วิชากลใจเป็นจิต | 0 | learn วิชากลใจเป็นจิต (STR ≥ 0) |
 | `scroll_art_t3_voidstep` | คัมภีร์ก้าวว่างไร้รอย | 0 | learn ก้าวว่างไร้รอย (STR ≥ 0) |
 | `scroll_art_military` | คัมภีร์เคล็ดวิชาภูผาทะลายทัพ | 0 | learn เคล็ดวิชาภูผาทะลายทัพ (STR ≥ 0) |
 | `scroll_art_fire` | คัมภีร์ตำราเพลิงสวรรค์ | 0 | learn ตำราเพลิงสวรรค์ (STR ≥ 0) |
 | `scroll_art_khbt` | คัมภีร์คัมภีร์ทานตะวัน | 0 | learn คัมภีร์ทานตะวัน (STR ≥ 0) |
-| `scroll_art_kuyt` | คัมภีร์วิชาเก้าเอี้ยง | 0 | learn วิชาเก้าเอี้ยง (STR ≥ 0) |
-| `scroll_art_kgim` | คัมภีร์คัมภีร์เก้าอิม | 0 | learn คัมภีร์เก้าอิม (STR ≥ 0) |
+| `scroll_art_kuyt` | คัมภีร์ลมปราณตะวันเก้าชั้น | 0 | learn ลมปราณตะวันเก้าชั้น (STR ≥ 0) |
+| `scroll_art_kgim` | คัมภีร์คัมภีร์จันทราเก้าชั้น | 0 | learn คัมภีร์จันทราเก้าชั้น (STR ≥ 0) |
 | `chart_root_breath` | แผนภาพชีพจร-ชีพจรรากลมปราณ | 400 | learn meridian chart `root_breath` |
 | `chart_iron_sinew` | แผนภาพชีพจร-ชีพจรเอ็นเหล็กน้อย | 400 | learn meridian chart `iron_sinew` |
 | `chart_light_heel` | แผนภาพชีพจร-ชีพจรส้นเท้าเบา | 400 | learn meridian chart `light_heel` |
@@ -460,7 +460,7 @@
 | `chart_dragon_elephant` | แผนภาพชีพจร-ชีพจรมังกรช้างสาร | 6000 | learn meridian chart `dragon_elephant` |
 | `chart_heart_mind_lattice` | แผนภาพชีพจร-ชีพจรกลใจเป็นจิต | 6000 | learn meridian chart `heart_mind_lattice` |
 | `chart_jade_maiden` | แผนภาพชีพจร-ชีพจรสาวหยก | 6000 | learn meridian chart `jade_maiden` |
-| `chart_northern_ghost` | แผนภาพชีพจร-ชีพจรภูติอุดร | 6000 | learn meridian chart `northern_ghost` |
+| `chart_northern_ghost` | แผนภาพชีพจร-ชีพจรทะเลลึก | 6000 | learn meridian chart `northern_ghost` |
 | `chart_one_finger` | แผนภาพชีพจร-ชีพจรเอกดัชนี | 6000 | learn meridian chart `one_finger` |
 | `chart_void_step` | แผนภาพชีพจร-ชีพจรก้าวว่าง | 6000 | learn meridian chart `void_step` |
 | `chart_thunder_stride` | แผนภาพชีพจร-ชีพจรอัสนีก้าวย่าง | 6000 | learn meridian chart `thunder_stride` |

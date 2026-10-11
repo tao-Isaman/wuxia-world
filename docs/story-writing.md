@@ -6,14 +6,14 @@ How to write the content in `lib/world/data/story/`: the **lineage quests** that
 
 - [The two kinds](#the-two-kinds)
 - [The legend we tell](#the-legend-we-tell)
-- [Timeline and novel characters](#timeline-and-novel-characters)
+- [Timeline and the legend's people](#timeline-and-the-legends-people)
 - [The main story](#the-main-story)
 - [Voice](#voice)
 - [Lineage quests](#lineage-quests)
 - [Story sagas](#story-sagas)
 - [Cutscenes](#cutscenes)
 - [Rules the validator enforces](#rules-the-validator-enforces)
-- [Thai names from the novel](#thai-names-from-the-novel)
+- [The legend's names](#the-legends-names)
 - [Lore hooks per sect](#lore-hooks-per-sect)
 
 ## The two kinds
@@ -28,19 +28,19 @@ How to write the content in `lib/world/data/story/`: the **lineage quests** that
 
 ## The legend we tell
 
-The sagas retell **มังกรหยก ภาค 3** (ดาบมังกรหยก, 倚天屠龍記): the Dragon-Slaying Saber and the Heaven-Reliant Sword, ปรมาจารย์เตียซำฮง of บู๊ตึ๊ง, เตียบ่อกี้, the six great sects against เม้งก่า, เจียซุ่นราชสีห์ขนทอง, เตียบ้อ of the Yuan court, the Nine Yin and Nine Yang manuals.
+The sagas retell **the legend of the last age**, our own story inspired by wuxia novels: the Dragon-Quelling Saber (ดาบปราบมังกร) and the Sky-Leaning Sword (กระบี่เคียงฟ้า), ปรมาจารย์เตียซำฮง of บู๊ตึ๊ง, ลั่วเทียนหมิง, the six great sects against เม้งก่า, เหลยจิ้นราชสีห์ตาบอด, เอ๋อหลันจู of the Yuan court, the Moon and Sun manuals in nine layers (คัมภีร์จันทราเก้าชั้น, ลมปราณตะวันเก้าชั้น). The game is **not** a sequel to any novel: never call it one, and never bring a novelist's characters, events or signature arts in under their own names ([names and the 2026-10 rename](#timeline-and-the-legends-people)).
 
 **Framing — keep it this way:**
 
-- The legend is **living memory**: the game is set about 40 years after it ([Timeline](#timeline-and-novel-characters)). Today's elders (our NPCs) were young disciples or witnesses then, or are its people's children and disciples.
-- Novel characters appear **only in flashback cutscenes** (`mood: "past"`) and in what elders tell. The hero never meets them: those still alive have withdrawn (below).
+- The legend is **living memory**: the game is set about 40 years after it ([Timeline](#timeline-and-the-legends-people)). Today's elders (our NPCs) were young disciples or witnesses then, or are its people's children and disciples.
+- The legend's people appear **only in flashback cutscenes** (`mood: "past"`) and in what elders tell. The hero never meets them: those still alive have withdrawn (below).
 - Each saga follows the hero in the **present day**, retracing one legend: an elder tells part of it, the hero goes somewhere, something from that legend echoes now (a descendant, a lost object, an old grudge, a misunderstanding), and the T4 skill or art is the lesson of that legend.
-- Use the game's sect names (เส้าหลิน, อู่ตัง, ง้อไบ๊, พรรคยาจก…). The old names (บู๊ตึ๊ง, เม้งก่า, ยอดกวงเม้ง) are fine inside the legend.
+- Use the game's sect names (เส้าหลิน, อู่ตัง, ง้อไบ๊, พรรคยาจก…). The old names (บู๊ตึ๊ง, เม้งก่า, ยอดเพลิงอุดร) are fine inside the legend.
 - Paraphrase; write your own scenes and dialogue. Never copy passages from the novel or its translations. One famous line said in your own words is fine.
 
-## Timeline and novel characters
+## Timeline and the legend's people
 
-**The present day is the 3rd year of Jianwen (ค.ศ. 1401), about 40 years after มังกรหยก ภาค 3.** ปรมาจารย์เตียซำฮง is alive at about 154.
+**The present day is the 3rd year of Jianwen (ค.ศ. 1401), about 40 years after the legend.** ปรมาจารย์เตียซำฮง is alive at about 154.
 
 ### The age we play in (the game's lore)
 
@@ -56,12 +56,12 @@ The sagas retell **มังกรหยก ภาค 3** (ดาบมังก
 
 | Event | Distance now |
 | --- | --- |
-| ก๊วยเซียง, หลวงจีนกักอ้วน, the founding of ง้อไบ๊, young เตียซำฮง leaving เส้าหลิน, the Condor-era heroes, Xiangyang | ร้อยกว่าปีก่อน (about 140) |
+| ฉินเซียงหลิง, หลวงจีนจื้อหยวน, the founding of ง้อไบ๊, young เตียซำฮง leaving เส้าหลิน, the Condor-era heroes, Xiangyang | ร้อยกว่าปีก่อน (about 140) |
 | เตียซำฮง founding อู่ตัง's arts | about a hundred years and more |
-| เตียชุ่ยซัว meeting ฮึงซ่อซ่อ | หกสิบกว่าปีก่อน |
-| เกาะไฟน้ำแข็ง, the Dragon Saber's return, the master's 100th birthday (เตียชุ่ยซัว and ฮึงซ่อซ่อ die) | ห้าสิบกว่าปีก่อน |
-| young เตียบ่อกี้'s cold poison, หุบผีเสื้อ | ห้าสิบปีก่อน / เกือบห้าสิบปี |
-| the siege of ยอดกวงเม้ง, วัดหมื่นสุข, the Shaolin hero gathering, the war against the Yuan | สี่สิบกว่าปีก่อน / ราวสี่สิบปีก่อน |
+| ซ่งชิงหยวน meeting อินเยว่หรู | หกสิบกว่าปีก่อน |
+| เกาะทะเลเพลิงน้ำแข็งเหนือ, the return of ดาบปราบมังกร, the master's 100th birthday (ซ่งชิงหยวน and อินเยว่หรู die) | ห้าสิบกว่าปีก่อน |
+| young ลั่วเทียนหมิง's cold poison, หุบเขาร้อยยา | ห้าสิบปีก่อน / เกือบห้าสิบปี |
+| the siege of ยอดเพลิงอุดร, วัดหมื่นสุข, the Shaolin hero gathering, the war against the Yuan | สี่สิบกว่าปีก่อน / ราวสี่สิบปีก่อน |
 | the founding of the Ming (1368) | สามสิบกว่าปีก่อน |
 | the seizure of the scriptures | สิบกว่าปีก่อน |
 | ฮ่องเต้หงอู่'s death | สามปีก่อน |
@@ -70,28 +70,36 @@ The sagas retell **มังกรหยก ภาค 3** (ดาบมังก
 ### Who is alive
 
 - **เตียซำฮง** (about 154) lives in seclusion behind อู่ตัง. No one sees him; a master may relay a word.
-- **เตียบ่อกี้** (about 60) and **เตียบ้อ** left the jianghu long ago, whereabouts unknown.
-- **จิวจี้เยียก** (about 58) has withdrawn. She is not the current ง้อไบ๊ head.
+- **ลั่วเทียนหมิง** (about 60) and **เอ๋อหลันจู** left the jianghu long ago, whereabouts unknown.
+- **ไป๋ซู่หลิง** (about 58) has withdrawn. She is not the current ง้อไบ๊ head.
 - **Dead:**
-  - **เจียซุ่น** died a monk at เส้าหลิน some years ago.
-  - **เอี้ยเซียว, ฮวมเอี๊ยว, อุ่ยอิดเซี้ยว** are dead or nearly all gone; stay vague.
-  - **ซือไท้เมียะเจ็ก, ฮึงเทียนเจ็ง, โอ้วแชงู and อ๋องหลันกู, เตียชุ่ยซัว and ฮึงซ่อซ่อ, ค่งเกี่ยน, ตั้งอิ้วเลี้ยง** died in the novel.
-- **เซ่งคุน** was crippled and vanished.
-- **Today's elders** (60–75) were young disciples or witnesses at ยอดกวงเม้ง. A family link to the legend is a child or a grandchild.
+  - **เหลยจิ้น** died a monk at เส้าหลิน some years ago.
+  - **ลู่ชิงเฉิน, ฟางหยวน, เหว่ยเฉวียน** are dead or nearly all gone; stay vague.
+  - **ซือไท้จิ้งหาน, อินชางเฟิง, เหอหมิงซาน and หลันจู, ซ่งชิงหยวน and อินเยว่หรู, หยวนจิ้ง, ตั้งอิ้วเลี้ยง** died in the novel.
+- **เฉินหย่วนกง** was crippled and vanished.
+- **Today's elders** (60–75) were young disciples or witnesses at ยอดเพลิงอุดร. A family link to the legend is a child or a grandchild.
 
-### Novel characters
+### Names: ours, not a novelist's
 
-- **Earlier novels** (the Condor trilogy, แปดเทพอสูรมังกรฟ้า: ก๊วยเจ๋ง, อึ้งย้ง, เอี้ยก้วย, ฮ่วงเอี้ยะซือ, หวังฉงหยาง, โฮ่งชีก๋ง…) are **history**. Their people never appear alive. A present-day heir may carry the family name: หวงชิงเฉวียน of เกาะดอกท้อ descends from ฮ่วงเอี้ยะซือ many generations down (a grandson of อึ้งย้ง took the Huang name to keep the island); he calls อึ้งย้ง ท่านย่าบรรพชน.
-- **Later novels** (กระบี่เย้ยยุทธจักร, จิ้งจอกภูเขาหิมะ / จิ้งจอกอหังการ…) **don't exist yet**. Never use their names, nor their family plots under the same names.
-- **Every NPC has an invented name.** Before naming one, check it is not a novel character's. The 2026-10 rename gave 41 NPCs invented names, for example:
-  - จั่วเหลิงฉาน → เกาซงเหยียน
-  - เหรินหวัวสิง → ตู้เทียนหาน
-  - ฮ่วงเอี้ยะซือ → หวงชิงเฉวียน
-  - อิดเต็ง → อู๋เฉินไต้ซือ
-  - ฮูเฝย์ → ไป๋เฝยหยาง
-  - หลินผิงจือ → เฉาเหวินจือ
+- **The legend's people are our own.** In 2026-10 every name that came straight from Jin Yong's novels and was easy to recognise was replaced (ids unchanged), for example:
 
-  Their ids are unchanged.
+  | Was | Now |
+  | --- | --- |
+  | เตียบ่อกี้ | ลั่วเทียนหมิง |
+  | เจียซุ่น ราชสีห์ขนทอง | เหลยจิ้น ราชสีห์ตาบอด |
+  | จิวจี้เยียก · เตียบ้อ · เซียวเจียว | ไป๋ซู่หลิง · เอ๋อหลันจู · อาเหมย |
+  | ก๊วยเจ๋ง · อึ้งย้ง · ก๊วยเซียง · เอี้ยก้วย | ลู่เหวินเจิ้ง · ซูหวั่นชิง · ฉินเซียงหลิง · ไป๋อวี่เฟิง |
+  | โฮ่งชีก๋ง | เผิงเหล่าจิ่ว |
+  | ยอดกวงเม้ง · หุบผีเสื้อ · เกาะไฟน้ำแข็ง | ยอดเพลิงอุดร · หุบเขาร้อยยา · เกาะทะเลเพลิงน้ำแข็งเหนือ |
+  | ดาบฆ่ามังกร · กระบี่อิงฟ้า | ดาบปราบมังกร · กระบี่เคียงฟ้า |
+  | เก้าอิม · เก้าเอี้ยง · 18 ฝ่ามือพิชิตมังกร | จันทราเก้าชั้น · ตะวันเก้าชั้น · ฝ่ามือปราบมังกร 18 ท่า |
+  | ลิ่งจิ้วกง · ชุมนุมวิจารณ์กระบี่ | วังอินทรีหิมะ · ชุมนุมประลองกระบี่หัวซาน |
+
+  The full list is in the changelog entry of that date. The owner chose to keep some names for now (the sect names กู่มู่, สราญรมย์, ตะวันจันทรา, ดาวดึงส์, some places such as หุบเขาตัดใจ and เกาะดอกท้อ, and arts such as คัมภีร์ทานตะวัน); don't add new ones.
+- **Historical and legendary people are fine**: เตียซำฮง (จางซานเฟิง), หวังฉงหยาง, ตั้งอิ้วเลี้ยง, the Ming emperors.
+- **Every NPC has an invented name.** Before naming anyone, check the name is not a novel character's. Earlier, 41 NPCs were renamed the same way (จั่วเหลิงฉาน → เกาซงเหยียน, เหรินหวัวสิง → ตู้เทียนหาน, ฮ่วงเอี้ยะซือ → หวงชิงเฉวียน, อิดเต็ง → อู๋เฉินไต้ซือ, ฮูเฝย์ → ไป๋เฝยหยาง, หลินผิงจือ → เฉาเหวินจือ).
+- **The far past** (a century and more ago: ลู่เหวินเจิ้ง, ซูหวั่นชิง, ไป๋อวี่เฟิง, หวังฉงหยาง, เผิงเหล่าจิ่ว…) is history; its people never appear alive. หวงชิงเฉวียน of เกาะดอกท้อ descends from the island's founder many generations down (a grandson of ซูหวั่นชิง took the Huang name to keep the island); he calls ซูหวั่นชิง ท่านย่าบรรพชน.
+- Paraphrase; write your own scenes. Never copy a novel's passages or its plot beats under new names.
 
 ## The main story
 
@@ -205,7 +213,7 @@ const MY_SAGA: StoryArcSpec = {
   | `gather` | bring N of an obtainable item | |
   | `trait` / `stat` | reach a trait or stat value | pacing, and growth that fits the theme (humility for Taiji, evil for blood arts…) |
 
-- **Go places.** Visit other sects, cities, caves and islands that fit the legend (Shaolin for Xie Xun, the ice island for the Dragon Saber…), not only your own grounds.
+- **Go places.** Visit other sects, cities, caves and islands that fit the legend (Shaolin for เหลยจิ้น, the ice island for ดาบปราบมังกร…), not only your own grounds.
 - **Dialogue amount:** each chapter needs at least 14 story lines across its dialogs and cutscene text. Offers have at least 4 lines, hand-ins at least 3, and visit / talk scenes at least 3. Long dialogs page automatically.
 - **Climax:** chapter N−1 or N has a `duel` against the saga's villain or the master's spar build.
 - **Finale:** the last chapter's `complete` has a cutscene, and its lines hand over the skill or art.
@@ -222,7 +230,7 @@ cutscene: {
   title: "ร้อยกว่าปีก่อน", subtitle: "ยอดเขาบู๊ตึ๊ง",
   cast: {
     sanfeng: { name: "ปรมาจารย์เตียซำฮง", look: "elder", at: [0, -1], facing: "right", tint: "#f2efe6" },
-    wuji:    { name: "เตียบ่อกี้", look: "m1", at: [-6, 1], facing: "right", hidden: true },
+    wuji:    { name: "ลั่วเทียนหมิง", look: "m1", at: [-6, 1], facing: "right", hidden: true },
     hero:    { name: "{hero}", look: "hero", at: [-2, 1] },
   },
   beats: [
@@ -272,46 +280,36 @@ cutscene: {
 - **Play-through.** Every quest is played in the real store: accept → each step → hand-in → the next chapter opens → the reward is learned.
 - **Difficulty:** T1+ lineage has a stat gate; sagas gate chapter 1 on rank and a stat.
 
-## Thai names from the novel
+## The legend's names
 
-The usual Thai renderings:
+Our own names for the legend's people, places and things (the novel's names are not used; see [Names](#names-ours-not-a-novelists)):
 
-| Character | Thai name |
+| Name | Who |
 | --- | --- |
-| Zhang Wuji | เตียบ่อกี้ |
-| Zhang Sanfeng | เตียซำฮง |
-| Zhang Cuishan | เตียชุ่ยซัว |
-| Yin Susu | ฮึงซ่อซ่อ |
-| Xie Xun, the Golden Lion King | เจียซุ่น (ราชสีห์ขนทอง) |
-| Zhou Zhiruo | จิวจี้เยียก |
-| Zhao Min | เตียบ้อ |
-| Xiaozhao | เซียวเจียว |
-| Abbess Miejue | ซือไท้เมียะเจ็ก |
-| Yang Xiao | เอี้ยเซียว |
-| Fan Yao | ฮวมเอี๊ยว |
-| Wei Yixiao, the Bat King | อุ่ยอิดเซี้ยว (ราชาค้างคาว) |
-| Yin Tianzheng, the White-Browed Eagle King | ฮึงเทียนเจ็ง (ราชาอินทรีคิ้วขาว) |
-| Cheng Kun | เซ่งคุน |
-| Yu Daiyan | ยู้ไต้งำ |
-| Hu Qingniu, the doctor | โอ้วแชงู |
-| Wang Nangu, his poisoner wife | อ๋องหลันกู |
-| Chen Youliang | ตั้งอิ้วเลี้ยง |
-| The two Xuanming elders | สองเฒ่าเฮี้ยนเม้ง |
-| Ji Xiaofu | กี่เฮี้ยวฮู้ |
-| Guo Xiang | ก๊วยเซียง |
-| The monk Jueyuan | หลวงจีนกักอ้วน |
+| ลั่วเทียนหมิง | the young leader of เม้งก่า who ended the war on ยอดเพลิงอุดร (about 60 now, whereabouts unknown) |
+| เตียซำฮง | founder of อู่ตัง (a legendary Taoist), alive at about 154 |
+| ซ่งชิงหยวน · อินเยว่หรู | อู่ตัง's fifth disciple and his wife; ลั่วเทียนหมิง's parents |
+| เหลยจิ้น (ราชสีห์ตาบอด) | a blind protector king of เม้งก่า, ลั่วเทียนหมิง's godfather |
+| ไป๋ซู่หลิง | head of ง้อไบ๊ after ซือไท้จิ้งหาน, now withdrawn |
+| เอ๋อหลันจู | a princess of the Yuan court |
+| อาเหมย | a maid at ยอดเพลิงอุดร who left with the Persian envoys |
+| ซือไท้จิ้งหาน | the stern abbess of ง้อไบ๊ |
+| ลู่ชิงเฉิน · ฟางหยวน | เม้งก่า's left and right envoys |
+| เหว่ยเฉวียน (ค้างคาวราตรี) · อินชางเฟิง (ราชาอินทรีหิมะ) | two of เม้งก่า's protector kings |
+| เฉินหย่วนกง | the schemer who hid in เส้าหลิน under a monk's name |
+| ซ่งต้าเหยียน | อู่ตัง's third disciple, crippled |
+| เหอหมิงซาน · หลันจู | the doctor of หุบเขาร้อยยา and his poisoner wife |
+| ตั้งอิ้วเลี้ยง | the historical warlord (Chen Youliang) |
+| ฉินเซียงหลิง | founder of ง้อไบ๊, a century and more ago |
+| หลวงจีนจื้อหยวน · หยวนจิ้ง | เส้าหลิน monks of the legend |
 
-Places and objects:
-
-| Place or object | Thai name |
+| Place or object | Name |
 | --- | --- |
-| Dragon-Slaying Saber | ดาบฆ่ามังกร |
-| Heaven-Reliant Sword | กระบี่อิงฟ้า |
-| Bright Peak | ยอดกวงเม้ง |
-| The Ming cult | เม้งก่า |
-| Ice-Fire Island | เกาะไฟน้ำแข็ง |
-| Nine Yin / Nine Yang | คัมภีร์เก้าอิม / เก้าเอี้ยง |
-| Qiankun Danuoyi | วิชาเคลื่อนย้ายจักรวาล |
+| The saber and the sword | ดาบปราบมังกร · กระบี่เคียงฟ้า |
+| เม้งก่า's mountain seat | ยอดเพลิงอุดร |
+| The far ice island | เกาะทะเลเพลิงน้ำแข็งเหนือ |
+| The two great manuals | คัมภีร์จันทราเก้าชั้น · ลมปราณตะวันเก้าชั้น |
+| The universe-shifting art | วิชาพลิกฟ้าคว่ำดิน |
 
 When unsure of a minor name, use a title instead ("ผู้เฒ่าแห่งวังหลวง", "ภิกษุชราสามรูปใต้ต้นสน").
 
@@ -321,22 +319,22 @@ Starting points; invent freely within the legend's spirit.
 
 - **เส้าหลิน**
   - Jueyuan reciting the Nine Yang while carrying iron buckets (tendon, inner strength).
-  - เจียซุ่น imprisoned in a pit beneath three pines, guarded by three elder monks and their Vajra Demon-Subduing Circle (the demon-subduing art, the staff).
-  - ค่งเกี่ยน, who let เจียซุ่น strike him thirteen times without fighting back, to end his killing (thousand-arms: strength that refuses to strike).
-  - เซ่งคุน hiding in the temple under a monk's name, exposed at the hero gathering (diamond: an unbreakable body, an unbreakable truth).
+  - เหลยจิ้น imprisoned in a pit beneath three pines, guarded by three elder monks and their Vajra Demon-Subduing Circle (the demon-subduing art, the staff).
+  - หยวนจิ้ง, who let เหลยจิ้น strike him thirteen times without fighting back, to end his killing (thousand-arms: strength that refuses to strike).
+  - เฉินหย่วนกง hiding in the temple under a monk's name, exposed at the hero gathering (diamond: an unbreakable body, an unbreakable truth).
 - **อู่ตัง** — beyond Taiji fist:
   - the Taiji sword taught with a wooden sword, "forget it" again (heaven sword);
-  - เตียชุ่ยซัว, ฮึงซ่อซ่อ and the Dragon Saber, ending on the hundredth birthday (taiji art: grief, balance);
+  - ซ่งชิงหยวน, อินเยว่หรู and ดาบปราบมังกร, ending on the hundredth birthday (taiji art: grief, balance);
   - the betrayal of a senior disciple's son and the cost of jealousy (zixia: clear purple mist, a clear heart).
 - **ง้อไบ๊**
-  - ก๊วยเซียง wandering the world, then founding the sect;
-  - the secret inside the Heaven Sword and the Dragon Saber;
-  - ซือไท้เมียะเจ็ก's harsh duty;
+  - ฉินเซียงหลิง wandering the world, then founding the sect;
+  - the secret inside กระบี่เคียงฟ้า and ดาบปราบมังกร;
+  - ซือไท้จิ้งหาน's harsh duty;
   - กี่เฮี้ยวฮู้, who would not kill the man she loved;
-  - จิวจี้เยียก's Nine-Yin claw and her regret (mercy vs duty — the bodhi palm and sword).
+  - ไป๋ซู่หลิง's Nine-Yin claw and her regret (mercy vs duty — the bodhi palm and sword).
 - **หัวซาน**
   - the elder who used golden-silkworm poison and betrayed the woman who saved him;
-  - the two-elder saber formation at Bright Peak (purple mist, Huashan's honour).
+  - the two-elder saber formation at ยอดเพลิงอุดร (purple mist, Huashan's honour).
 - **กู่มู่**
   - the woman in yellow, heir of the ancient tomb, who appears at the hero gathering to set things right;
   - the sorrow palm (ansh) born of a sixteen-year wait;
@@ -348,21 +346,21 @@ Starting points; invent freely within the legend's spirit.
   - the beggars' network of a thousand eyes;
   - the wandering qi.
 - **พรรคตะวันจันทรา** (heirs of เม้งก่า)
-  - เตียบ่อกี้ learning the universe-shifting art in the secret tunnel beneath Bright Peak with เซียวเจียว;
+  - ลั่วเทียนหมิง learning the universe-shifting art in the secret tunnel beneath ยอดเพลิงอุดร with อาเหมย;
   - the old chief who died there;
   - the Holy Fire tokens of Persia;
-  - เซียวเจียว's farewell.
+  - อาเหมย's farewell.
 - **พรรคสราญรมย์**
-  - the two Xiaoyao envoys: เอี้ยเซียว, and ฮวมเอี๊ยว, who scarred his own face and lived for years as a mute monk among the enemy (a comedy about a talker who must not talk);
+  - the two Xiaoyao envoys: ลู่ชิงเฉิน, and ฟางหยวน, who scarred his own face and lived for years as a mute monk among the enemy (a comedy about a talker who must not talk);
   - the art of drawing in another's strength.
 - **พรรคเบญจพิษ**
-  - อ๋องหลันกู, who poisoned herself to make her doctor husband โอ้วแชงู prove his skill (poison vs healing, a marriage of rivals);
+  - หลันจู, who poisoned herself to make her doctor husband เหอหมิงซาน prove his skill (poison vs healing, a marriage of rivals);
   - the five poisons made one body.
 - **สำนักดาบโลหิต**
-  - rage and redemption: เจียซุ่น's killing spree to draw out เซ่งคุน, signing the master's name in blood, and his final peace as a monk;
+  - rage and redemption: เหลยจิ้น's killing spree to draw out เฉินหย่วนกง, signing the master's name in blood, and his final peace as a monk;
   - the blood art that eats its wielder.
 - **องครักษ์เสื้อแพร** (heirs of the court's guards)
-  - เตียบ้อ and the Yuan court;
+  - เอ๋อหลันจู and the Yuan court;
   - the two Xuanming elders and their cold palm;
   - the tower where six sects' masters were drugged and caged;
   - duty vs conscience, and a princess who chose love over the court.

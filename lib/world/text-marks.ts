@@ -18,10 +18,10 @@ import type { SceneLine } from "./types";
 
 export type MarkKind = "key" | "person" | "place" | "item" | "sect" | "move" | "foe" | "number";
 
-/** The age's key words (docs/story-writing.md#timeline-and-novel-characters), marked wherever they appear. */
+/** The age's key words (docs/story-writing.md#timeline-and-the-legends-people), marked wherever they appear. */
 const LORE_TERMS = [
   "หอคัมภีร์หลวง", "คัมภีร์", "องครักษ์เสื้อแพร", "ฮ่องเต้หงอู่", "ฮ่องเต้เจี้ยนเหวิน", "อ๋องเยียน", "ศึกจิ้งหนาน",
-  "เตียซำฮง", "เตียบ่อกี้", "ยอดกวงเม้ง", "เม้งก่า", "ดาบฆ่ามังกร", "กระบี่อิงฟ้า", "วิชาลึกลับ",
+  "เตียซำฮง", "ลั่วเทียนหมิง", "ยอดเพลิงอุดร", "เม้งก่า", "ดาบปราบมังกร", "กระบี่เคียงฟ้า", "วิชาลึกลับ",
 ];
 export interface TextSegment { text: string; mark?: MarkKind }
 

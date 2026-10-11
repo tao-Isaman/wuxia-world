@@ -401,9 +401,9 @@ The grid engine runs this gauge per unit (`advanceGauges`, `predictOrder` in `li
 
 Exact lists with every id: [reference/martial-arts.md](reference/martial-arts.md). Short field names are kept on purpose (they match `demo.html` and make 100-row tables scannable).
 
-**Tiers** (`TIERS`, `lib/game/data/tiers.ts`): 0 พื้นฐาน · 1 ขั้นกลาง · 2 ขั้นสูง · 3 ลับ · 4 เฉพาะ · 5 ปรมัตถ์ (cooldowns 0–6). Learnable skills use tiers 0–4 (the 18 boss moves are tier 5); three learnable arts are tier 5 (`khbt` คัมภีร์ทานตะวัน, `kuyt` วิชาเก้าเอี้ยง and `kgim` คัมภีร์เก้าอิม), plus the six boss arts.
+**Tiers** (`TIERS`, `lib/game/data/tiers.ts`): 0 พื้นฐาน · 1 ขั้นกลาง · 2 ขั้นสูง · 3 ลับ · 4 เฉพาะ · 5 ปรมัตถ์ (cooldowns 0–6). Learnable skills use tiers 0–4 (the 18 boss moves are tier 5); three learnable arts are tier 5 (`khbt` คัมภีร์ทานตะวัน, `kuyt` ลมปราณตะวันเก้าชั้น and `kgim` คัมภีร์จันทราเก้าชั้น), plus the six boss arts.
 
-**Sects** (`lib/game/data/sects.ts`): `SECT_ORDER` lists 22 names in display order: the sects, then `JIANGHU_SECT` = ยุทธจักร (unaffiliated), then `BEAST_SECT` = สัตว์ร้าย (the legendary beasts' own moves and arts — not a sect, never learnable). Both tables are sorted by sect, then tier (`bun scripts/sort-by-sect.ts`). ลิ่งจิ้วกง and พรรคอสูรโลหิต have no skills or arts yet.
+**Sects** (`lib/game/data/sects.ts`): `SECT_ORDER` lists 22 names in display order: the sects, then `JIANGHU_SECT` = ยุทธจักร (unaffiliated), then `BEAST_SECT` = สัตว์ร้าย (the legendary beasts' own moves and arts — not a sect, never learnable). Both tables are sorted by sect, then tier (`bun scripts/sort-by-sect.ts`). วังอินทรีหิมะ and พรรคอสูรโลหิต have no skills or arts yet.
 
 **Weapon families** (skills only; equipment has none): `fist` หมัด/ฝ่ามือ 58 · `sword` กระบี่ 56 · `hidden` อาวุธลับ 21 · `long` อาวุธยาว 19 · `blade` ดาบ 12 · `short` อาวุธสั้น 7 · `music` เครื่องดนตรี 5.
 

@@ -160,7 +160,7 @@ export const SECTS: SectArt[] = [
       ["bone_niche", "ช่องอัฐิ", "a stone wall niche with ancestral urns", "tomb", "solid", 45, 64],
       ["spring_pool", "บ่อน้ำพุเย็น", "a small icy underground spring pool", "water", "flat", 60, 64],
     ] },
-  { id: "lingjiu", thai: "ลิ่งจิ้วกง", thaiEn: "Lingjiu Palace", region: "west", look: "Tianshan snow palace, white and lavender, ice and pale stone", weapon: "plum-blossom darts, short swords and silk sashes", emblem: "a spirit vulture with spread wings",
+  { id: "lingjiu", thai: "วังอินทรีหิมะ", thaiEn: "Lingjiu Palace", region: "west", look: "Tianshan snow palace, white and lavender, ice and pale stone", weapon: "plum-blossom darts, short swords and silk sashes", emblem: "a spirit vulture with spread wings",
     items: [
       ["vulture_statue", "รูปปั้นแร้งวิญญาณ", "a white stone statue of a vulture with spread wings", "statue", "tall", 50, 96],
       ["ice_throne", "บัลลังก์น้ำแข็ง", "an ice-carved throne", "chair", "solid", 45, 64],

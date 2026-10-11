@@ -3,7 +3,7 @@
 //   home_yanji      閻基 (Yan Ji), thief turned bone-setter
 //   home_beichou    北醜 (the Ugly One of the North), a scarred spear hermit
 //   villa_meizhuang 梅莊 (the Plum Manor of the four Jiangnan friends)
-//   villa_fuwei     镇威鏢局 (the Cao family's escort agency)
+//   villa_fuwei     镇远镖局 (the Cao family's escort agency)
 // Teaches (one quest each): gn, nc8, t1_whitehorse, nd2, nm1, fs, ne3, sa, nf3, yyz.
 import type { Choice, Condition, DialogScene, NpcDef, QuestDef, SceneEffect, SceneLine } from "../../types";
 import type { ActivityDef } from "../activities";
@@ -180,7 +180,7 @@ const npcs: NpcDef[] = [
 
   // villa_fuwei
   { id: LINZ, name: LINZ_N, locationIds: [FW], dialogSceneId: `npc_${LINZ}_talk`, defenseTier: 2,
-    description: "เจ้าสำนักคุ้มกันเจิ้นเวย ใจดี ยิ้มง่าย ค้าขายเก่งกว่าฟันดาบ และภูมิใจในธงสิงห์ของตระกูลยิ่งกว่าสิ่งใด",
+    description: "เจ้าสำนักคุ้มภัยเจิ้นหยวน ใจดี ยิ้มง่าย ค้าขายเก่งกว่าฟันดาบ และภูมิใจในธงสิงห์ของตระกูลยิ่งกว่าสิ่งใด",
     tags: ["merchant", "official", "master"], look: { body: "merchant" },
     likes: ["gold", "jade", "steel_sword", "ancient_coin"], dislikes: ["poison_vial"],
     stealLoot: [{ itemId: "silver_ring", weight: 4 }, { itemId: "ancient_coin", weight: 3 }, { itemId: "jade", weight: 1 }, { itemId: "gold_ring", weight: 1 }] },
@@ -399,19 +399,19 @@ const quests: QuestDef[] = [
     briefSummary: "นำเนื้อสด 2 ชิ้นมาให้เฉาเหวินจือ",
     stages: [
       { id: "meat", description: "หาเนื้อสด 2 ชิ้นให้เฉาเหวินจือ", autoAdvance: { t: "hasItem", itemId: "raw_meat", count: 2 } },
-      { id: "return", description: "นำเนื้อไปให้เฉาเหวินจือที่สำนักคุ้มกันเจิ้นเวย" },
+      { id: "return", description: "นำเนื้อไปให้เฉาเหวินจือที่สำนักคุ้มภัยเจิ้นหยวน" },
     ],
     rewards: [{ t: "learnSkill", skillId: "nc8" }, { t: "gold", amount: 80 }, { t: "npcRelationship", npcId: PING, amount: 8 }],
   },
   {
     id: Q_HORSE, type: "side", giverNpcId: LINZ,
-    name: "วิชาลึกลับแห่งเจิ้นเวย",
-    description: "โจรเส้นทางดักปล้นเกวียนของเจิ้นเวยถึงสามครั้งในเดือนนี้ เฉาหย่งอันขอให้ไปกวาดล้าง แลกกับลมปราณที่ปู่ของเขาฝึกบนหลังม้าขาวตลอดเส้นทางคุ้มกัน",
+    name: "วิชาลึกลับแห่งเจิ้นหยวน",
+    description: "โจรเส้นทางดักปล้นเกวียนของเจิ้นหยวนถึงสามครั้งในเดือนนี้ เฉาหย่งอันขอให้ไปกวาดล้าง แลกกับลมปราณที่ปู่ของเขาฝึกบนหลังม้าขาวตลอดเส้นทางคุ้มกัน",
     briefSummary: "ปราบโจรเส้นทาง 3 คน แล้วปักธงสิงห์คืนหน้าประตูสำนัก",
     prereqs: { t: "statAtLeast", stat: "POW", min: 10 },
     stages: [
-      { id: "bandits", description: "ปราบโจรเส้นทาง 3 คนที่ดักปล้นเกวียนเจิ้นเวย", autoAdvance: { t: "defeatedOpponent", opponentId: "road_bandit", count: 3 } },
-      { id: "banner", description: "ปักธงสิงห์ของเจิ้นเวยคืนหน้าประตูสำนัก",
+      { id: "bandits", description: "ปราบโจรเส้นทาง 3 คนที่ดักปล้นเกวียนเจิ้นหยวน", autoAdvance: { t: "defeatedOpponent", opponentId: "road_bandit", count: 3 } },
+      { id: "banner", description: "ปักธงสิงห์ของเจิ้นหยวนคืนหน้าประตูสำนัก",
         objective: { spots: [{ locationId: FW, label: "ปักธงสิงห์หน้าประตู",
           text: "ธงสิงห์สะบัดเหนือประตูอีกครั้ง คนคุ้มกันโห่ร้อง เฉาเหวินจือตะโกนว่าเขาก็ช่วย (เขาถือเชือกปลายเดียว)" }] } },
       { id: "return", description: "กลับไปหาเฉาหย่งอัน" },
@@ -425,7 +425,7 @@ const quests: QuestDef[] = [
     briefSummary: "ส่งหีบผ้าที่หยางโจว แล้วปราบโจรป่า 2 คนระหว่างทางกลับ",
     stages: [
       { id: "deliver", description: "ส่งหีบผ้าให้ร้านผ้าในเมืองหยางโจว",
-        objective: { spots: [{ locationId: "city_yangzhou", label: "ส่งหีบผ้าของเจิ้นเวย",
+        objective: { spots: [{ locationId: "city_yangzhou", label: "ส่งหีบผ้าของเจิ้นหยวน",
           text: "เถ้าแก่ร้านผ้าเปิดหีบตรวจนับ ครบทุกพับ เขาประทับตราใบรับให้พร้อมชาหนึ่งถ้วย" }] } },
       { id: "bandits", description: "ปราบโจรป่า 2 คนที่ตามมาระหว่างทางกลับ", autoAdvance: { t: "defeatedOpponent", opponentId: "bandit", count: 2 } },
       { id: "return", description: "กลับไปรายงานสื่อเปียวโถว" },
@@ -436,13 +436,13 @@ const quests: QuestDef[] = [
     id: Q_DRAGON, type: "side", giverNpcId: SHI,
     name: "วิชาลึกลับกับรอยเลือดในคอกม้า",
     description: "เช้านี้ม้าในคอกตายไปสามตัว ไม่มีบาดแผลนอก สื่อเปียวโถวหน้าเครียดเป็นครั้งแรก เขาว่าถ้าเจ้าช่วยสืบเรื่องนี้ได้ เขาจะสอนทวนที่เขาไม่เคยใช้ต่อหน้าใคร",
-    briefSummary: "สืบความตายในคอกม้า เผชิญศัตรูที่จ้องสำนักเจิ้นเวย และหาไม้ศักดิ์สิทธิ์มาทำด้ามทวน",
+    briefSummary: "สืบความตายในคอกม้า เผชิญศัตรูที่จ้องสำนักเจิ้นหยวน และหาไม้ศักดิ์สิทธิ์มาทำด้ามทวน",
     prereqs: { t: "and", all: [{ t: "statAtLeast", stat: "STR", min: 25 }, rel(SHI, 15), { t: "questStatus", questId: Q_ESCORT, status: "done" }] },
     stages: [
-      { id: "stable", description: "สืบรอยเลือดในคอกม้าของสำนักคุ้มกันเจิ้นเวย",
+      { id: "stable", description: "สืบรอยเลือดในคอกม้าของสำนักคุ้มภัยเจิ้นหยวน",
         objective: { spots: [{ locationId: FW, label: "สืบรอยในคอกม้า",
           text: "ม้าทุกตัวหัวใจแหลก แต่ผิวหนังไม่ช้ำ — ฝ่ามือทำลายใจของสำนักชิงเฉิง ข้างรางหญ้ามีรอยเท้าคนใส่รองเท้าฟาง" }] } },
-      { id: "luo", description: "เผชิญหน้ากับคนของสำนักชิงเฉิงที่ซุ่มอยู่หลังกำแพงเจิ้นเวย",
+      { id: "luo", description: "เผชิญหน้ากับคนของสำนักชิงเฉิงที่ซุ่มอยู่หลังกำแพงเจิ้นหยวน",
         objective: { spots: [{ locationId: FW, label: "ตามรอยเท้าหลังกำแพง", sceneId: `qd_${Q_DRAGON}_luo` }] } },
       { id: "shaft", description: "หาไม้ศักดิ์สิทธิ์ 1 ท่อนมาทำด้ามทวนใหม่ให้สื่อเปียวโถว", autoAdvance: { t: "hasItem", itemId: "wood_sacred", count: 1 } },
       { id: "return", description: "กลับไปหาสื่อเปียวโถวพร้อมไม้ศักดิ์สิทธิ์" },
@@ -849,7 +849,7 @@ const scenes: DialogScene[] = [
     say(HEIBAI_N, "ข้ามีงานหนึ่ง ต้องเป็นคนที่ข้าไว้ใจ และฉลาดพอจะไม่ถามมาก"),
     say(HEIBAI_N, "ใต้ทะเลสาบหลังคฤหาสน์มีคุกเหล็ก แขกชราคนหนึ่งถูกขังไว้ที่นั่นมาสิบสองปี"),
     say(HEIBAI_N, "เอาห่อยานี้ลงไปให้เขา บอกว่า \"ชิวผิงจื่อยังรอคำตอบ\""),
-    say(HEIBAI_N, "ถ้าเจ้าทำได้ ข้าจะสอนดัชนีเอกสุริยัน วิชาที่ข้าไม่เคยสอนใคร"),
+    say(HEIBAI_N, "ถ้าเจ้าทำได้ ข้าจะสอนนิ้วเพลิงอรุณ วิชาที่ข้าไม่เคยสอนใคร"),
   ], "รับห่อยามา", "ข้าไม่อยากลงไปใต้น้ำ"),
   dialog(`qd_${Q_FINGER}_cell`, [
     tell("บันไดหินเปียกชื้นพาลงไปลึกใต้ทะเลสาบ เสียงน้ำหยดก้องไปตามทางเดิน"),
@@ -881,10 +881,10 @@ const scenes: DialogScene[] = [
   complete(Q_FINGER, MZ, [
     tell("บัวหิมะต้มจนน้ำใส รอยดำบนไหล่ชิวผิงจื่อค่อย ๆ จางลง"),
     say(HEIBAI_N, "หมากทั้งชีวิตของข้า ข้ามองข้ามเม็ดเดียว คือใจคนที่ช่วยข้าโดยไม่หวังอะไร"),
-    say(HEIBAI_N, "ดัชนีเอกสุริยัน รวมปราณทั้งร่างไว้ที่ปลายนิ้วเดียว จี้ให้ตรงจุด ศัตรูจะมองไม่เห็นทาง"),
+    say(HEIBAI_N, "นิ้วเพลิงอรุณ รวมปราณทั้งร่างไว้ที่ปลายนิ้วเดียว จี้ให้ตรงจุด ศัตรูจะมองไม่เห็นทาง"),
     say(HEIBAI_N, "ใช้มันวางหมากที่ถูกต้อง อย่าใช้มันอย่างที่ข้าเกือบใช้"),
     tell("เขายื่นหยกเม็ดหนึ่งให้ — หมากเม็ดขาวที่เขาเก็บไว้สามสิบปี"),
-  ], "รับวิชาดัชนีเอกสุริยัน"),
+  ], "รับวิชานิ้วเพลิงอรุณ"),
   offer(Q_PAINT, MZ, [
     say(DANQING_N, "ข้าตัดสินใจแล้ว! ภาพต่อไปของข้าคือ \"จอมยุทธผู้มาเยือนใต้ต้นเหมย\""),
     say(DANQING_N, "ปัญหาเดียวคือหมึกหมด ข้าเผลอเทลงไหเหล้าเมื่อคืน... เหล้าไหนั้นรสชาติแปลกดี"),
@@ -899,7 +899,7 @@ const scenes: DialogScene[] = [
   // ═══ villa_fuwei ══════════════════════════════════════════════════
   dialog(`npc_${LINZ}_talk`, [
     tell("ชายวัยกลางคนหน้าตาอิ่มเอิบยืนใต้ธงสิงห์ ยิ้มต้อนรับเหมือนต้อนรับลูกค้ารายใหญ่"),
-    say(LINZ_N, "ยินดีต้อนรับสู่สำนักคุ้มกันเจิ้นเวย! ส่งของสิบเมือง ไม่เคยหายสักหีบ"),
+    say(LINZ_N, "ยินดีต้อนรับสู่สำนักคุ้มภัยเจิ้นหยวน! ส่งของสิบเมือง ไม่เคยหายสักหีบ"),
     say(LINZ_N, "ปู่ของข้า เฉาเทียนถู ขี่ม้าขาวตัวเดียวสร้างชื่อนี้ขึ้นมา ข้าแค่รักษาไว้"),
     say(LINZ_N, "ความลับของการคุ้มกันคือ เพื่อนมากกว่าศัตรู ข้าจ่ายเงินให้โจรทุกสายจนพวกมันโค้งให้ธงข้า"),
   ], [
@@ -962,7 +962,7 @@ const scenes: DialogScene[] = [
   ], "รับวิชาแส้เบื้องต้น"),
   offer(Q_HORSE, FW, [
     say(LINZ_N, "โจรเส้นทางกลุ่มนี้ไม่รับเงิน ไม่รับเหล้า ไม่รับมิตรภาพ รับแต่หีบของข้า"),
-    say(LINZ_N, "ช่วยกวาดล้างให้สักสามคน แล้วปักธงสิงห์คืนหน้าประตู ให้ทุกคนรู้ว่าเจิ้นเวยยังอยู่"),
+    say(LINZ_N, "ช่วยกวาดล้างให้สักสามคน แล้วปักธงสิงห์คืนหน้าประตู ให้ทุกคนรู้ว่าเจิ้นหยวนยังอยู่"),
     say(LINZ_N, "ปู่ของข้าขี่ม้าขาวคุ้มกันเกวียนพันลี้ ไม่เคยเหนื่อย เพราะเขาฝึกลมปราณม้าขาว"),
     say(LINZ_N, "ข้าจะสอนให้ ปราณนี้ช่วยให้ฟื้นตัวเองได้กลางศึก เหมาะกับคนที่ต้องเดินทางไกล"),
   ], "รับงานกวาดล้างโจร", "ข้ายังไม่ว่าง"),
@@ -1047,7 +1047,7 @@ const activities: ActivityDef[] = [
     place: { locationIds: [MZ], cooldownDays: 1, reward: { wExp: 10, statXp: "INT", relationship: { npcId: DING, amount: 1 } },
       doneText: "พ่อบ้านติงแพ้อย่างสุภาพ — เจ้าสงสัยว่าเขาจงใจ" } },
   { id: "act_fuwei_cart", label: "ช่วยขนหีบขึ้นเกวียน", badge: "labor", icon: "📦", hours: 3, stamina: 18,
-    description: "3 ชั่วยาม · ขนหีบสินค้าให้สำนักคุ้มกันเจิ้นเวย · ค่าแรงดี ฝึกพละกำลัง",
+    description: "3 ชั่วยาม · ขนหีบสินค้าให้สำนักคุ้มภัยเจิ้นหยวน · ค่าแรงดี ฝึกพละกำลัง",
     place: { locationIds: [FW], cooldownDays: 1, reward: { gold: [30, 55], statXp: "STR", relationship: { npcId: SHI, amount: 1 } },
       doneText: "หีบหนักจนหลังแอ่น สื่อเปียวโถวตะโกนนับ \"สิบเจ็ด! สิบแปด!\" แล้วจ่ายค่าแรงเต็ม" } },
 ];

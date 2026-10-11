@@ -1,4 +1,4 @@
-// ชุมนุมวิจารณ์กระบี่เขาหัวซาน — the yearly sword tournament on Mount Hua
+// ชุมนุมประลองกระบี่หัวซาน — the yearly sword tournament on Mount Hua
 // (the Huashan sect's grounds). Each year, the day registration opens, the
 // holder of Huashan's seat sends the hero an invitation letter with the fee
 // for the road (`sendTournamentInvitation`).
@@ -39,7 +39,7 @@ export const TOURNAMENT = {
 } as const;
 
 /** The tournament's name, everywhere the player reads it. */
-export const TOURNAMENT_NAME = "ชุมนุมวิจารณ์กระบี่เขาหัวซาน";
+export const TOURNAMENT_NAME = "ชุมนุมประลองกระบี่หัวซาน";
 /** Who writes the invitation when nobody holds Huashan's seat (an old save before the first tick). */
 const HOST_FALLBACK = "sect_huashan_master_yiqing";
 

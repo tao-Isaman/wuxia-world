@@ -57,7 +57,7 @@ export const SCENES_SUNMOON: readonly Scene[] = [
     id: "npc_sect_sunmoon_vice_renwoxing_talk",
     lines: [
       { t: "narration", text: "ตู้เทียนหานยืนหลังเสาดำ เสื้อสีดำสะท้อนแสงเทียน" },
-      { t: "dialogue", speaker: "รองเจ้าสำนักตู้เทียนหาน", text: "พลังดูดดาวของข้าเรียกพลังของศัตรูได้ — เจ้าอยากเห็นไหม?" },
+      { t: "dialogue", speaker: "รองเจ้าสำนักตู้เทียนหาน", text: "พลังกลืนลมปราณของข้าเรียกพลังของศัตรูได้ — เจ้าอยากเห็นไหม?" },
     ],
   },
 
