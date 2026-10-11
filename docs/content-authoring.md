@@ -303,7 +303,7 @@ Then run `bun run test:navigation`: every painted map must keep its spawn open a
 - **Recipe** (`recipes.ts`): `{ id, name, inputs, output, skill, requiredMastery?, usesDropCheck?, basic? }`.
   - `basic: true` puts it on every artisan of that profession for 80 gold.
   - A specialty recipe must be assigned: a row in `CITY_SPECIALTIES` (`{ city, prof, recipeId, price }`) or an artisan's `recipes`.
-  - Only the six craft professions (forge, alchemy, tailoring, chef, jewelry, accessory) have a crafting screen. A recipe for another life skill (mining, drawing…) can be defined, but no UI crafts it.
+  - A recipe of the six craft professions (`ARTISAN_PROFESSIONS`: forge, alchemy, tailoring, chef, jewelry, accessory) is bought and crafted at an artisan; it must be `basic` or a specialty somewhere (`test:systems` checks). A recipe of any other life skill (mining, drawing…) is crafted anywhere from the อาชีพ menu's ประดิษฐ์ tab (`craftsAnywhere`, `FIELD_RECIPES`), with no purchase.
 - **Artisan** (`artisans.ts`):
   - A new city gets all six artisans from one row in `CITIES_WITH_FULL_ROSTER`.
   - A single artisan in a village or sect goes in `SINGLE_PROFESSION_ARTISANS`.

@@ -389,6 +389,8 @@ Sect styles are never sold in city halls; you learn them by rank inside the sect
 - **Recipes.** Basic recipes cost 80 gold at any artisan of the profession. Specialties are sold only by certain cities' artisans.
 - **What you need.** The recipe learned, the inputs in the bag, the mastery level, and an artisan of that profession here.
 - **Cost.** 2 stamina. The inputs are always used up.
+- **Your own trades.** Recipes of the gathering and cultural skills (mining, hunting, fishing, herbalism, venom, woodcutting, drawing, writing — 12 in all) need no artisan and no bought recipe: the อาชีพ menu's **ประดิษฐ์** tab lists them and crafts them anywhere, as soon as you hold the inputs and the mastery.
+- **Specialties.** ซีเซี่ย's tailor sells the hide coat, หยางโจว's cook the eel stew and its accessory maker the jade pendant.
 
 Full lists: [reference/items-and-crafting.md](reference/items-and-crafting.md).
 
@@ -644,6 +646,5 @@ These are real today and listed in [HANDOFF.md](../HANDOFF.md#known-issues):
 
 - An abandoned quest can never be taken again.
 - Leaving a sect blocks rejoining it forever. สำนักสราญรมย์ has no redemption quest, so its hunters never stop.
-- The 12 non-artisan recipes (drawing, writing, mining, hunting…) have no crafting button.
 - Resigning freezes battle xp only; practice and w-exp still raise frozen sect skills.
 - Market and sect-internal rumors are hard to reach, and heartland inns never hear the masters' news.
