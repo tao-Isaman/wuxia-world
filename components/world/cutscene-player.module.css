@@ -157,8 +157,8 @@
 
 .controls {
   position: absolute;
-  top: calc(env(safe-area-inset-top, 0px) + 0.6rem);
-  right: calc(env(safe-area-inset-right, 0px) + 0.75rem);
+  top: calc(var(--safe-top) + 0.6rem);
+  right: calc(var(--safe-right) + 0.75rem);
   display: flex;
   gap: 0.5rem;
   z-index: 2;

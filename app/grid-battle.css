@@ -9,7 +9,7 @@
 }
 .grid-battle[data-mode=world] {
   position: fixed; inset: 0; z-index: 45; width: 100%; height: calc(100 * var(--dvh)); max-width: none; margin: 0; overflow: hidden;
-  padding: max(8px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+  padding: max(8px, var(--safe-top)) max(10px, var(--safe-right)) max(8px, var(--safe-bottom)) max(10px, var(--safe-left));
   border: 0; box-shadow: none; border-radius: 0;
 }
 
@@ -158,7 +158,7 @@
 @media (orientation: landscape) and (max-height: 560px) and (min-width: 561px), (orientation: portrait) and (max-width: 560px) and (min-height: 561px) {
   .grid-battle, .grid-battle[data-mode=world] {
     grid-template: "status" auto "field" minmax(0, 1fr) "bar" auto / minmax(0, 1fr); gap: 5px;
-    padding: max(5px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(5px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+    padding: max(5px, var(--safe-top)) max(8px, var(--safe-right)) max(5px, var(--safe-bottom)) max(8px, var(--safe-left));
   }
   .gb-status { min-height: 38px; gap: 8px; }
   .gb-status strong { font-size: 17px; }

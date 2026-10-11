@@ -11,7 +11,7 @@
 .battle-arena[data-mode=world] {
   position: fixed; inset: 0; z-index: 45;
   width: 100%; height: calc(100 * var(--dvh)); max-width: none; margin: 0;
-  padding: max(12px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
+  padding: max(12px, var(--safe-top)) max(18px, var(--safe-right)) max(8px, var(--safe-bottom)) max(18px, var(--safe-left));
   border: 0; box-shadow: none; overflow: hidden;
 }
 .combat-status { grid-area: status; display: flex; align-items: center; justify-content: space-between; gap: 18px; min-height: 46px; color: #cad6bc; padding: 0 4px 3px; }
@@ -85,7 +85,7 @@
 @media (orientation: landscape) and (max-width: 640px), (orientation: portrait) and (max-height: 640px) { .turn-callout span { font-size: 24px; padding: 4px 18px; } }
 
 @media (orientation: landscape) and (max-width: 640px) and (min-height: 561px), (orientation: portrait) and (max-height: 640px) and (min-width: 561px) {
-  .battle-arena[data-mode=world] { padding: max(8px, env(safe-area-inset-top)) 10px max(8px, env(safe-area-inset-bottom)); gap: 8px; }
+  .battle-arena[data-mode=world] { padding: max(8px, var(--safe-top)) 10px max(8px, var(--safe-bottom)); gap: 8px; }
   .combat-status { min-height: 57px; gap: 8px; }
   .combat-status > span { gap: 9px; }
   .combat-status strong { font-size: 17px; line-height: 1.35; }
@@ -115,7 +115,7 @@
 @media (orientation: landscape) and (max-height: 560px) and (min-width: 641px), (orientation: portrait) and (max-width: 560px) and (min-height: 641px) {
   .battle-arena, .battle-arena[data-mode=world] {
     grid-template: "status status" 32px "field actions" minmax(0, 1fr) "field log" 24px / minmax(0, 1fr) 238px;
-    gap: 7px; padding: max(6px, env(safe-area-inset-top)) max(9px, env(safe-area-inset-right)) max(6px, env(safe-area-inset-bottom)) max(9px, env(safe-area-inset-left));
+    gap: 7px; padding: max(6px, var(--safe-top)) max(9px, var(--safe-right)) max(6px, var(--safe-bottom)) max(9px, var(--safe-left));
   }
   .combat-status { min-height: 0; padding: 0 2px; }
   .combat-status strong { font-size: 18px; line-height: 1.2; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }

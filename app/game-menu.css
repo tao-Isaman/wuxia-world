@@ -48,7 +48,7 @@
 @keyframes hud-menu-in { from { opacity: 0; } to { opacity: 1; } }
 .hud-menu-bar {
   display: flex; align-items: flex-end; gap: 12px; flex: 0 0 auto;
-  padding: max(14px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) 0 max(20px, env(safe-area-inset-left));
+  padding: max(14px, var(--safe-top)) max(20px, var(--safe-right)) 0 max(20px, var(--safe-left));
   border-bottom: 2px solid #6f5f3d; background: linear-gradient(#0a1512, #0d1a17);
 }
 .hud-menu-tabs { flex: 1; display: flex; justify-content: center; gap: 6px; min-width: 0; overflow-x: auto; scrollbar-width: none; }
@@ -83,7 +83,7 @@
 .hud-menu-close:focus-visible { outline: 2px solid #f2d790; }
 .hud-menu-stage {
   flex: 1; min-height: 0; display: flex; justify-content: center; align-items: flex-start;
-  padding: 18px max(20px, env(safe-area-inset-right)) max(18px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+  padding: 18px max(20px, var(--safe-right)) max(18px, var(--safe-bottom)) max(20px, var(--safe-left));
 }
 .hud-menu-panel {
   position: relative; width: min(1120px, 100%); display: flex; flex-direction: column; min-height: min(360px, 100%); max-height: 100%;
@@ -109,7 +109,7 @@
   .hud-menu-tab { flex-direction: column; gap: 1px; min-height: 54px; padding: 5px 8px 6px; font-size: 11px; }
   .hud-menu-tab img { width: 24px; height: 24px; }
   .hud-menu-close { width: 44px; height: 48px; font-size: 30px; }
-  .hud-menu-stage { padding: 8px 6px max(8px, env(safe-area-inset-bottom)); }
+  .hud-menu-stage { padding: 8px 6px max(8px, var(--safe-bottom)); }
   .hud-menu-panel::before, .hud-menu-panel::after { display: none; }
   .hud-menu-title { font-size: 18px; padding: 8px 12px; }
   .hud-menu-body { padding: 12px 12px 18px; }

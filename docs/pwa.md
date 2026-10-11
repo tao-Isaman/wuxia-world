@@ -47,7 +47,7 @@ The game is an installable Progressive Web App. It runs full screen from the hom
 - `appleWebApp` (capable, title, `black-translucent` status bar);
 - a 192 px icon and a 180 px Apple touch icon;
 - no telephone-number detection;
-- a `viewport` with `viewportFit: "cover"`, so the HUD can use `env(safe-area-inset-*)` around notches.
+- a `viewport` with `viewportFit: "cover"`, so the HUD can pad around notches (through `--safe-top` / `-right` / `-bottom` / `-left`, which turn with the page; [rendering.md](rendering.md#landscape-only)).
 
 ## Service worker
 
