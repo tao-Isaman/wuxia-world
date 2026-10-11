@@ -201,7 +201,7 @@ Each foe lives in some of eleven biomes, and each place and road has its own (`l
 | swamp | marshy valleys, snake isles, poison caves | snakes, centipedes, poisoners, pythons |
 | cave | caves and grottoes | bats, centipedes, bears, cultists |
 
-Foes also grow with your **power**: the larger of `day / 200` and `(9 − best sect rank) / 8`, capped at 1. As power rises:
+Foes also grow with your **power**: the larger of `day / 200` and your sect standing (how far up your sect's own ladder you have climbed, 0 at entry and 1 at the top, weighed by time in the sect: full after 60 days — so joining a sect adds nothing at once), capped at 1. As power rises:
 
 - the mix shifts from tier 0–1 toward tiers 3–4;
 - elite foes appear, and from power 0.6 the six **tier-5** foes (rarer than tier 4): the nameless sword hermit, the blood blade lord, the poison matriarch, the heretic iron monk, the white tiger and the wolf king with his pack (power tiers 9–10);

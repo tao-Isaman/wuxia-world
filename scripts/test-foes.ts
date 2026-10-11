@@ -7,7 +7,7 @@ import { powerScore } from "../lib/game/power-tier";
 import {
   BOOST_NPC, BOOST_T3, BOOST_T4, OPPONENTS, boostBuild, boostFactorOf, getOpponent, unboostedBuild,
 } from "../lib/world/data/opponents";
-import { FIGHT_EVENTS, FOE_SPAWN, fightEventsForLocation, tierWeightForPower } from "../lib/world/data/random-events";
+import { FIGHT_EVENTS, FOE_SPAWN, SECT_TENURE_DAYS, fightEventsForLocation, playerPowerIndex, sectRankPower, tierWeightForPower } from "../lib/world/data/random-events";
 import { BIOMES, FOE_HABITATS, PLACE_BIOMES, biomesOf, foeLivesAt, isTownScene } from "../lib/world/data/habitats";
 import { BOSSES, BOSS_RESPAWN_DAYS, bossAlive, bossesAt, getBoss } from "../lib/world/data/bosses";
 import { SCENES } from "../lib/world/data/scenes";
@@ -317,6 +317,24 @@ check("spoils: beasts carry no gold; w-exp by kind and tier; beasts and bosses t
   }
   // Every boss drop is a real item.
   for (const b of BOSSES) for (const d of getOpponent(b.id)!.drops ?? []) assert.ok(getItem(d.itemId), d.itemId);
+});
+
+check("power: joining a sect adds nothing at once; rank counts by ladder progress and time in the sect", () => {
+  const day = 10;
+  const member = (rank: number, joinedDay: number) => ({ rank, points: 0, lastQuestDay: {}, artQuestsDone: [], rewardPicks: {}, joinedDay, status: "active" as const });
+  const at = (sectId: string, rank: number, joinedDay: number) => {
+    const m = member(rank, joinedDay);
+    const state = { day, sectMembership: { [sectId]: m } } as never as Parameters<typeof playerPowerIndex>[0];
+    return { power: playerPowerIndex(state), share: sectRankPower(state, m) };
+  };
+  // Huashan starts at rank 5 (a 5 → 1 ladder): the old rule jumped to 0.5 on joining.
+  assert.equal(at("huashan", 5, day).share, 0);
+  assert.equal(at("huashan", 5, day).power, day / 200);
+  assert.equal(at("shaolin", 9, day - 100).share, 0, "entry rank is no standing, however long");
+  assert.equal(at("huashan", 3, day - SECT_TENURE_DAYS).share, 0.5, "half way up, settled in");
+  assert.equal(at("huashan", 3, day - SECT_TENURE_DAYS / 2).share, 0.25, "half way up, still new");
+  assert.equal(at("shaolin", 5, day - SECT_TENURE_DAYS).share, 0.5);
+  assert.equal(at("gumu", 1, day - 200).power, 1, "the top of any ladder is full power");
 });
 
 check("hunting brings the beast's pack onto the grid (a boar herd, the alpha wolf's dogs)", () => {
