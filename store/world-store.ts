@@ -54,7 +54,7 @@ export const useWorldStore = create<WorldStore>()(
     }),
     {
       name: "wusia-world-v1",
-      version: 27,
+      version: 28,
       // Content backfill also runs for current-version saves (see mergeSave).
       merge: mergeSave,
       // Only persist the data fields, not the action functions.

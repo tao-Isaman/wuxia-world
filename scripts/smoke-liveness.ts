@@ -52,6 +52,7 @@ function freshState(): WorldStateData {
     activityDays: {},
     bossDefeatedDay: {},
     day: 1,
+    startDay: 1,
     time: 0,
     pendingBattle: null,
     pendingEncounter: null,

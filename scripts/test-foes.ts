@@ -7,7 +7,7 @@ import { powerScore } from "../lib/game/power-tier";
 import {
   BOOST_NPC, BOOST_T3, BOOST_T4, OPPONENTS, boostBuild, boostFactorOf, getOpponent, unboostedBuild,
 } from "../lib/world/data/opponents";
-import { FIGHT_EVENTS, FOE_SPAWN, fightEventsForLocation, tierWeightForPower } from "../lib/world/data/random-events";
+import { FIGHT_EVENTS, FOE_SPAWN, fightEventsForLocation, playerPowerIndex, tierWeightForPower } from "../lib/world/data/random-events";
 import { BIOMES, FOE_HABITATS, PLACE_BIOMES, biomesOf, foeLivesAt, isTownScene } from "../lib/world/data/habitats";
 import { BOSSES, BOSS_RESPAWN_DAYS, bossAlive, bossesAt, getBoss } from "../lib/world/data/bosses";
 import { SCENES } from "../lib/world/data/scenes";
@@ -24,6 +24,7 @@ import { getAnimSheet } from "../lib/characters/anim-sheets";
 import { migrateSave } from "../store/world/persist";
 import { rollVictorySpoils } from "../store/world/spoils";
 import { useWorldStore } from "../store/world-store";
+import { setTestWorldTime, setTestClock } from "../lib/world/clock";
 
 let checks = 0;
 function check(name: string, run: () => void) { run(); checks++; console.log(`PASS ${name}`); }
@@ -107,6 +108,31 @@ check("every wild place and every road has foes, early and late; settled places 
   for (const id of ["cave_jinshe", "desert_ruins", "route_home_player__to__city_capital"]) assert.ok(!isTownScene(id), id);
 });
 
+check("foes scale with the hero's own days (day − startDay), not the world clock's", () => {
+  try {
+    setTestWorldTime(900, 3);
+    const fresh = freshState();
+    assert.equal(fresh.startDay, 900, "a new hero starts on the world's day");
+    assert.equal(playerPowerIndex(fresh), 0, "a brand-new hero on world day 900 meets early foes");
+    assert.equal(playerPowerIndex({ ...fresh, day: 1000 }), 0.5, "100 days in: half power");
+    assert.equal(playerPowerIndex({ ...fresh, day: 1200 }), 1, "200+ days in: full power");
+    // v27 saves never knew their start: they count from the day they load.
+    const v27 = migrateSave({ hasGame: true, day: 640, time: 2 }, 27);
+    assert.equal(v27.startDay, 640);
+    assert.equal(playerPowerIndex(v27), 0);
+    // A pre-clock save counted its own days from 1: rebased with the rest, its age is kept.
+    const v26 = migrateSave({ hasGame: true, day: 101, time: 2 }, 26);
+    assert.equal(v26.day, 900);
+    assert.equal(v26.day - v26.startDay, 100, "a 100-day-old save stays 100 days old");
+    // Repair: a start after today is today.
+    const ahead = { ...fresh, startDay: 2000 };
+    validateAndRepair(ahead);
+    assert.equal(ahead.startDay, ahead.day);
+  } finally {
+    setTestClock(null);
+  }
+});
+
 check("tier 5 opens at power 0.6 and stays rarer than T4", () => {
   for (const p of [0, 0.3, 0.59]) assert.equal(tierWeightForPower(5, p), 0);
   for (const p of [0.6, 0.8, 1]) {
@@ -125,7 +151,7 @@ check("no foe spawns outside its habitat — not strays, not a hunted quarry, no
     for (const id of sample) {
       const state = freshState();
       state.currentSceneId = id;
-      state.day = power ? 400 : 1;
+      state.day = state.startDay + (power ? 400 : 0);
       withSeed(id.length * 31 + power, () => {
         for (let i = 0; i < 60; i++) {
           const foe = rollFoeSpawn(state, 0);

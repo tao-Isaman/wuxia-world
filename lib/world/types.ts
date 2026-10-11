@@ -1261,6 +1261,10 @@ export interface WorldStateData {
   // when it crosses 12.
   day: number;
   time: number;
+  // v28: the world day this hero entered the jianghu (startNewGame). The
+  // world clock runs for everyone, so `day` says nothing about how long the
+  // hero has played: progress reads `day - startDay` (daysInJianghu).
+  startDay: number;
 
   // Set when the player loses a fight. The world UI swaps to a game-over
   // screen and the only action available is "เริ่มใหม่" (resetGame).

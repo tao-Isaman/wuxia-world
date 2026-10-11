@@ -31,6 +31,8 @@ export const gameActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "syn
     fresh.day = start.day;
     fresh.time = start.time;
     fresh.wantedDay = start.day;
+    // The hero's own first day: progress (foe power…) counts from here.
+    fresh.startDay = start.day;
     joinSharedWorld(fresh, null);
     fresh.hasGame = true;
     const build = STARTER_BUILD();

@@ -105,7 +105,7 @@ try {
   useWorldStore.getState().recordRumorHeard(unheard.id);
   assert.deepEqual(useWorldStore.getState().rumorSeenLog, heard.rumorSeenLog, "repeated hearing is idempotent");
   const saved = JSON.parse(memory.get(saveKey)!) as { version: number; state: WorldStateData };
-  assert.equal(saved.version, 27);
+  assert.equal(saved.version, 28);
   assert.equal((saved.state as Partial<WorldStateData>).rumorPool, undefined, "rumors are the world's, not the save's");
   assertLore({ ...saved.state, ...(JSON.parse(memory.get(sharedKey)!) as { world: Partial<WorldStateData> }).world } as WorldStateData);
   for (let i = 0; i < 2; i++) {

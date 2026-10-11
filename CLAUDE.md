@@ -139,7 +139,7 @@ bun scripts/assets/build-kits.ts plan && python3 scripts/assets/generate.py run 
 ```
 app/, components/         React: screens, HUD, menus, popups, battle UI
    ↓
-store/                    Zustand: world (saved, v27, + the shared world), battle, character (/debug, v3), loading, toast, confirm
+store/                    Zustand: world (saved, v28, + the shared world), battle, character (/debug, v3), loading, toast, confirm
    ↓
 lib/world/  ──────►  lib/game/          pure engines — no React, no DOM, no I/O
    └ battle-bridge.ts: the one place the world and battle stores meet
@@ -232,7 +232,7 @@ Two deliberate exceptions reach into stores:
   - Every 220 map units walked, `walkTick(pickSpot)` runs; `home_player` and `jail` are safe. There are no treasure or meeting events.
   - **Roaming foes:** on roads and in the wilds, per tick a 30 % chance (80 % while hunting a kill-quest target in this zone) puts a foe that **lives there** on the map (`lib/world/data/habitats.ts`: every place and road has biomes, every fight-event foe its `FOE_HABITATS`; `fightEventsForLocation` filters by them, so the quest guide sends a kill quest to its quarry's habitat). Settled places (`isSettledPlace`: `city_`, `village_`, `home_`, `inn_`, `sect_`, `temple_`, `palace_`, `villa_`, `market_`, `tribe_`) get no stray foes, only an active kill quest's quarry if it lives in town (`rollFoeSpawn`, at most 3; store `roamingFoes`, not saved). The runtime draws them (`presentation.foes`) and walking into one calls `engageFoe` → the encounter screen.
   - The **law** (`lawChance(marks)`, 13–45 %) and the **30 % sect-hunter roll** still catch up at once (`rollWalkEvent`).
-  - Foes are scaled by the hero's power (`max(day/200, (9 − best sect rank)/8)`): tier mix (T5 only from power 0.6), elites, and opponent stats ×(1 + 0.6·power) for **every** battle.
+  - Foes are scaled by the hero's power (`max((day − startDay)/200, (9 − best sect rank)/8)`: the hero's own days, not the world's): tier mix (T5 only from power 0.6), elites, and opponent stats ×(1 + 0.6·power) for **every** battle.
   - **Booster** (`boostBuild`, `opponents.ts`): every T3 foe ×1.6, T4 ×1.45 and NPC-backed fighter (`spar_*`, `npc@`, `lawnpc@`, `hunter_*`, `look.npc`) ×1.4 power score, the larger one. Categories are `human | beast` only — no spirits or demons.
   - **Tier 5** (`t5_*`, power 570–760) and **legendary beasts** (`lib/world/data/bosses.ts`, `boss_*`, power ~1550, ti 5, `boss: true`, minions): each boss waits at its lair spot (a `WorldFoe` with `boss: true` and an animated look), comes back 90 days after it falls (`bossDefeatedDay`, saved), pays `boss.wExp`, its trophy and boss drops. Big foes draw from animated sheets (`lib/characters/anim-sheets.ts`, PixelLab, `scripts/build-anim-sheets.ts`).
   - **Spoils:** beasts drop no gold; win w-exp is `victoryWExp` (people 40 + 20·ti, beasts 80 + 60·ti, bosses their own); move / art xp ×2 against beasts and bosses.
@@ -284,7 +284,7 @@ Two deliberate exceptions reach into stores:
 
 ## Stores (`store/`)
 
-- **`world-store.ts`** is saved as `wusia-world-v1`, **version 27** (the player only); the shared world is saved apart (`wusia-shared-v1`, below).
+- **`world-store.ts`** is saved as `wusia-world-v1`, **version 28** (the player only); the shared world is saved apart (`wusia-shared-v1`, below).
   - Actions draft a copy (`draftFrom`, **one level deep** — nested quest, sect and NPC entries are shared), call engine functions, then `set`.
   - **Time is the world clock** (`lib/world/clock.ts`): 1 game day = 1 real hour (12 ชั่วยาม of 5 real minutes), from `WORLD_EPOCH_MS` (day 1). No action moves time: `draftFrom` brings every draft to the clock (`syncClock`, `store/world/lifecycle.ts`: day / time, stamina back in 6 ชั่วยาม and HP / MP in 12, wanted decay, the NPC tick, rumors, and on a new day letters and the tournament), and `WorldClock` (`components/world/world-clock.tsx`) syncs every 10 s (a toast after a day or more away). Actions that used to take time are instant and cost stamina (`staminaForHours`); free rests have a 2-ชั่วยาม cooldown, jail is served in real time. Tests pin it: `setTestClock` / `setTestWorldTime` / `advanceTestClock`.
   - The player-visible log uses `appendActionLog` (newest 100).
@@ -397,7 +397,7 @@ Content changes need **no save version bump**. Removed ids are dropped on load.
 
 ## Saves
 
-- **Keys.** The player's save is `localStorage["wusia-world-v1"]`, **version 27**; the shared world `localStorage["wusia-shared-v1"]` (`{ version: 1, world }`). The "wusia" spelling is historical — never rename either.
+- **Keys.** The player's save is `localStorage["wusia-world-v1"]`, **version 28**; the shared world `localStorage["wusia-shared-v1"]` (`{ version: 1, world }`). The "wusia" spelling is historical — never rename either.
 - **Migration.** `migrate` is one idempotent normalizer; its one `fromVersion` step is v27's: a save from before is shifted onto the world clock (`rebaseDays`, `lib/world/shared/rebase.ts`: every day stamp moves by `worldNow().day − save.day`; jail cut to ≤ 12 ชั่วยาม; a running tournament dropped). The persist `merge` also back-fills lore rumors and people on every load, and `onRehydrateStorage` runs `validateAndRepair`.
 - **Adding a persisted field:**
   1. `WorldStateData` + `emptyData()`;

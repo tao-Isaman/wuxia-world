@@ -49,6 +49,10 @@ function newGame(extra: Partial<ReturnType<typeof useWorldStore.getState>> = {})
   useWorldStore.getState().startNewGame({ newWorld: true, name: "Grid test" });
   useWorldStore.setState({ currentSceneId: "city_capital", lastLocationId: "city_capital", ...extra });
 }
+/** The hero has lived `days` days in the jianghu (power = days / 200; startDay, save v28). */
+function heroDays(days: number) {
+  useWorldStore.setState({ startDay: useWorldStore.getState().day - days });
+}
 // Defaults to a roadside encounter (packs come along); pass withPack:false for a quest fight.
 function fight(opponentId: string, extra: { nonFatal?: boolean; withPack?: boolean } = {}) {
   useWorldStore.setState({ pendingBattle: { opponentId, onWin: "city_capital", onLose: "city_capital", withPack: true, ...extra } });
@@ -180,13 +184,15 @@ check("bridge: big gangs get a bigger board, stronger heroes meet more companion
   assert.deepEqual([s.cols, s.rows], [13, 9], "7 units → 13 × 9");
   assert.equal(new Set(s.units.map((u) => cellKey(u.pos))).size, 7, "no overlapping units");
   useBattleStore.getState().reset();
-  // Day 200 → power 1: the first member kind brings two more, capped at MAX_PACK_SIZE.
-  newGame({ day: 200 });
+  // 200 days in the jianghu → power 1: the first member kind brings two more, capped at MAX_PACK_SIZE.
+  newGame();
+  heroDays(200);
   fight("elite_bandit_king");
   assert.equal(st().units.length, 1 + 1 + MAX_PACK_SIZE);
   assert.deepEqual([st().cols, st().rows], [15, 10], "a full board is 15 × 10");
   useBattleStore.getState().reset();
-  newGame({ day: 120 });
+  newGame();
+  heroDays(120);
   fight("bandit_chief");
   assert.equal(st().units.length, 5, "power 0.6: the chief brings 3 bandits");
   useBattleStore.getState().reset();

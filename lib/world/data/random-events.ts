@@ -31,13 +31,16 @@ const TIER_SPAWN_WEIGHT = { 0: 8, 1: 5, 2: 3, 3: 1.5, 4: 0.5, 5: 0 } as const;
 
 // Player power index (0..1). Drives dynamic tier weights + the
 // OPPONENT_STAT_SCALE multiplier on random opponent base stats.
-//   - early game (day 1, no sect): power = 0 → unchanged behavior
-//   - late game (day 200+ OR sect rank ≤ 1): power = 1 → harder pool
+//   - early game (the hero's first day, no sect): power = 0 → unchanged behavior
+//   - late game (200+ days since the hero's start OR sect rank ≤ 1): power = 1
+// The days are the hero's own (`day - startDay`, daysInJianghu), not the world
+// clock's: the world day is the same for every hero, however new.
 import type { WorldStateData } from "../types";
+import { daysInJianghu } from "../clock";
 import { setOpponentStatScale } from "./opponents";
 
 export function playerPowerIndex(state: WorldStateData): number {
-  let p = state.day / 200;
+  let p = daysInJianghu(state) / 200;
   for (const m of Object.values(state.sectMembership)) {
     if (!m) continue;
     // Sect rank: 9 (entry) → 1 (top). Map rank 9 → 0, rank 1 → 1.

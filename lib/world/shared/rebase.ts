@@ -20,6 +20,7 @@ export function rebaseDays(p: Partial<WorldStateData>, offset: number): void {
   if (!offset || !Number.isFinite(offset)) return;
   if (typeof p.day === "number") p.day += offset;
   if (typeof p.wantedDay === "number") p.wantedDay += offset;
+  if (typeof p.startDay === "number") p.startDay += offset;
   if (typeof p.lastNpcTickDay === "number") p.lastNpcTickDay += offset;
   // Jail: an absolute time in ชั่วยาม. What was left shrinks to the new scale.
   if (typeof p.jailUntil === "number" && typeof p.day === "number") {
