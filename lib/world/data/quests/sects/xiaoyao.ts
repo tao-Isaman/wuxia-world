@@ -44,6 +44,28 @@ export const QUESTS_XIAOYAO: readonly QuestDef[] = [
   },
 
   {
+    id: "qst_xiaoyao_redemption",
+    name: "ไถ่บาปต่อพรรคสราญรมย์",
+    description: "เจ้าเคยทรยศพรรคสราญรมย์ พรรคจึงส่งนักล่ามาตามเจ้า — แต่ปรมาจารย์ยุนเซียวผู้ไม่ชอบผูกใจเจ็บยังเปิดทางให้ไถ่โทษ: ปราบหัวหน้าโจร 5 คน แล้วนำโสม 5 ต้นมาถวาย หากผ่าน เจ้าจะนับเป็น \"ผู้ลาออก\" แทน \"ผู้ทรยศ\" นักล่าจะเลิกตามล่า แต่วิชาของพรรคสราญรมย์ที่ติดตัวจะไม่เก่งขึ้นอีกจนกว่าจะกลับเข้าสำนัก — ซึ่งทำได้เมื่อพ้น 30 วัน โดยเริ่มจากขั้นแรก",
+    briefSummary: "ไถ่บาปต่อพรรคสราญรมย์ — ปราบหัวหน้าโจร 5 + ถวายโสม 5 ต้น",
+    type: "side",
+    sectId: "xiaoyao",
+    giverNpcId: "sect_xiaoyao_master_yunxiao",
+    prereqs: { t: "sectStatus", sectId: "xiaoyao", status: "betrayed" },
+    stages: [
+      { id: "trial_kill", description: "ปราบหัวหน้าโจร 5 คนเพื่อพิสูจน์ว่ากลับใจจริง", autoAdvance: { t: "defeatedOpponent", opponentId: "bandit_chief", count: 5 } },
+      { id: "trial_offering", description: "นำโสม 5 ต้นมาถวาย", autoAdvance: { t: "hasItem", itemId: "ginseng", count: 5 } },
+      { id: "return_to_master", description: "กลับไปขออภัยต่อปรมาจารย์ยุนเซียว" },
+    ],
+    rewards: [
+      { t: "wExp", amount: 300 },
+      { t: "trait", trait: "humility", amount: 8 },
+      { t: "resignSect", sectId: "xiaoyao" },
+      { t: "npcRelationship", npcId: "sect_xiaoyao_master_yunxiao", amount: 10 },
+    ],
+  },
+
+  {
     id: "qst_xiaoyao_sect_patrol",
     name: "ลาดตระเวนหุบเขาเซียวหยาว",
     description: "ภารกิจประจำของศิษย์พรรคสราญรมย์ — กำราบโจรที่หลงเข้ามาในเขตหุบเขา",

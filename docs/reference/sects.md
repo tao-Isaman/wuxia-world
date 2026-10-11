@@ -19,7 +19,7 @@
 | `sect_lingjiu` | วังอินทรีหิมะ | — (no membership) | — | — | — |
 | `sect_beggars` | พรรคยาจก | `beggars` | หัวหน้าหงเทียน | 9 → 1 | 8 |
 | `sect_ming` | พรรคตะวันจันทรา | `sunmoon` | อาจารย์ใหญ่หยินอวี้ | 9 → 1 | 8 |
-| `sect_xiaoyao` | พรรคสราญรมย์ (เซียวหยาว) | `xiaoyao` | ปรมาจารย์ยุนเซียว | 9 → 1 | 7 |
+| `sect_xiaoyao` | พรรคสราญรมย์ (เซียวหยาว) | `xiaoyao` | ปรมาจารย์ยุนเซียว | 9 → 1 | 8 |
 | `sect_xingxiu` | สำนักดาวดึงส์ (เห็งซัว) | — (no membership) | — | — | — |
 | `sect_xuedao` | พรรคอสูรโลหิต | — (no membership) | — | — | — |
 | `sect_wudu` | พรรคเบญจพิษ | — (no membership) | — | — | — |
@@ -412,7 +412,7 @@ Martial line — every skill and art is taught only by its lineage quest or saga
 - Join requirements: ความเลว ≤ 15
 - Ranks: start 9, top 1 · quest cooldown 30 days
 - Rank-up cost (sect points): →8: 100 · →7: 200 · →6: 350 · →5: 500 · →4: 700 · →3: 1000 · →2: 1400 · →1: 2000
-- Sect quests: 7 (1 art quests) · betrayal hunter `hunter_xiaoyao`
+- Sect quests: 8 (1 art quests) · redemption quest `qst_xiaoyao_redemption` · betrayal hunter `hunter_xiaoyao`
 
 - Rank-up gold: →8: 50 · →7: 100 · →6: 175 · →5: 250 · →4: 350 · →3: 500 · →2: 700 · →1: 1000
 

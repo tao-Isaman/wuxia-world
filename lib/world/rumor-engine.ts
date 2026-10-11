@@ -131,6 +131,8 @@ export interface PlayerEchoArgs {
    * own, writes a player's echo from the context the player sends.
    */
   context?: EchoContext;
+  /** The sect the deed is about (join / leave), when the caller knows it. */
+  sectId?: string;
 }
 
 /** The hero-side facts a player echo is written from (playerEchoContext). */
@@ -244,13 +246,13 @@ export function isEchoAction(actionId: string): boolean {
 }
 
 /** The hero-side facts of an echo, as the hero's state stands. */
-export function playerEchoContext(state: WorldStateData, actionId: string): EchoContext {
+export function playerEchoContext(state: WorldStateData, actionId: string, sectId?: string): EchoContext {
   return {
     archetype: archetypeLabel(state.traits),
     // Player echos use the player's CURRENT scene as the location anchor.
     // Fall back to lastLocationId when the player is mid-dialog scene.
     sceneId: state.lastLocationId ?? state.currentSceneId ?? null,
-    sectId: playerEchoSect(state, actionId) ?? null,
+    sectId: sectId ?? playerEchoSect(state, actionId) ?? null,
   };
 }
 
@@ -432,7 +434,7 @@ export function generatePlayerEcho(args: PlayerEchoArgs): string | null {
   const tpl = pickRandom(pool);
   if (!tpl) return null;
 
-  const context = args.context ?? playerEchoContext(state, actionId);
+  const context = args.context ?? playerEchoContext(state, actionId, args.sectId);
   const targetName = targetNpcId ? npcDisplayName(targetNpcId) : "";
   const sceneId = context.sceneId ?? state.currentSceneId;
   const locName = locationDisplayName(sceneId);

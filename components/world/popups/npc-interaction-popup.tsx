@@ -37,7 +37,10 @@ import { CharacterPreview } from "@/components/game/character-preview";
 import { npcCharacterId } from "@/lib/characters/catalog";
 import { GiftPicker } from "./gift-picker";
 import { DECLINE_TEXT } from "@/lib/world/story/compile";
-import { POWER_TIER_LABEL, heldQuests, npcPower, npcTitle, powerTier } from "@/lib/world/npc-life";
+import { POWER_TIER_LABEL, heldQuests, npcPower, npcTitle, powerTier, questHolder } from "@/lib/world/npc-life";
+import { SECT_MEMBERSHIPS } from "@/lib/world/data/sect-memberships";
+import { membershipStatus, sectIntroQuest, sectJoinCheck } from "@/lib/world/sects";
+import type { SectId } from "@/lib/world/types";
 import { KILL_MARKS } from "@/lib/world/law";
 
 /** What the jianghu knows of a simulated person now: journey, wounds, seclusion, family. */
@@ -446,6 +449,8 @@ export function NpcInteractionPopup({ open, npc, onClose }: Props) {
             </span>
           </Button>
 
+          <SectDoor npcId={npc.id} onDone={onClose} />
+
           {objectives.length > 0 && (
             <div className="pt-2 space-y-1.5">
               <div className="text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
@@ -601,6 +606,58 @@ function summarizeRewards(rewards: readonly QuestReward[]): string {
     }
   }
   return parts.join(" · ");
+}
+
+// ─── The sect's door ─────────────────────────────────────────────────
+// On the card of a sect's master (or whoever now holds their charges): a
+// former disciple asks to come back (REJOIN_COOLDOWN_DAYS after leaving,
+// from the first rank), a hero whose intro quest could not admit them asks
+// again, and a betrayer is told the way back is the redemption quest.
+function SectDoor({ npcId, onDone }: { npcId: string; onDone: () => void }) {
+  const state = useWorldStore();
+  const joinSect = useWorldStore((s) => s.joinSect);
+  const doors = (Object.keys(SECT_MEMBERSHIPS) as SectId[]).flatMap((sectId) => {
+    const def = SECT_MEMBERSHIPS[sectId];
+    if (def.registrarNpcId !== npcId && questHolder(state, def.registrarNpcId) !== npcId) return [];
+    const m = state.sectMembership[sectId];
+    const status = m ? membershipStatus(m) : null;
+    if (status === "active") return [];
+    const intro = sectIntroQuest(sectId);
+    if (!m && (!intro || state.quests[intro.id]?.status !== "done")) return [];
+    return [{ sectId, def, status, check: sectJoinCheck(state, sectId) }];
+  });
+  if (doors.length === 0) return null;
+  return (
+    <div className="pt-2 space-y-1.5" data-testid="sect-door">
+      <div className="text-[10px] font-semibold uppercase tracking-wider text-amber-700">สำนัก</div>
+      {doors.map(({ sectId, def, status, check }) => (
+        <Button
+          key={sectId}
+          variant="outline"
+          data-sect-door={sectId}
+          disabled={!check.ok}
+          onClick={() => {
+            const r = joinSect(sectId);
+            if (!r.ok) { toast("warn", r.reason ?? "ยังเข้าสำนักไม่ได้"); return; }
+            toast("success", `${status === "resigned" ? "กลับเข้า" : "เข้าร่วม"}สำนัก${def.name} · ขั้นที่ ${def.startRank}`);
+            onDone();
+          }}
+          className="w-full justify-start text-left h-auto py-2 whitespace-normal border-amber-300"
+        >
+          <span className="flex flex-col items-start gap-0.5">
+            <span className="font-semibold text-sm npc-action-label">
+              🪷 {status === "resigned" || status === "betrayed" ? `ขอกลับเข้า${def.name}` : `ขอเข้าเป็นศิษย์${def.name}`}
+            </span>
+            <span className="text-[10px] text-muted-foreground">
+              {check.ok
+                ? `เริ่มใหม่ที่ขั้น ${def.startRank}${status === "resigned" ? " · วิชาของสำนักกลับมาเก่งขึ้นได้" : ""}`
+                : check.reason}
+            </span>
+          </span>
+        </Button>
+      ))}
+    </div>
+  );
 }
 
 // True when the offer can be accepted right now. Mirrors `isQuestOfferable`

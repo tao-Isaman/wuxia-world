@@ -11,6 +11,7 @@ import { getOpponent } from "./data/opponents";
 import { getItem } from "./data/items";
 import { applyOpponentStatScale, playerPowerIndex } from "./data/random-events";
 import { worldBattleSetup } from "./battle-looks";
+import { npcPresent } from "./npc-presence";
 
 export type BattleSetup = NonNullable<ReturnType<typeof worldBattleSetup>>;
 
@@ -21,7 +22,7 @@ export function battleSetupFor(state: WorldStateData, opponentId: string, withPa
   // the factories pick up the current opponent stat scale (pack members
   // included).
   applyOpponentStatScale(state);
-  return worldBattleSetup(opponentId, { bodyId: state.playerBodyId, withPack, power: playerPowerIndex(state) });
+  return worldBattleSetup(opponentId, { bodyId: state.playerBodyId, withPack, power: playerPowerIndex(state), present: (id) => npcPresent(state, id) });
 }
 
 /** The hero's battle items (ItemDef.battle) as they go into a fight: item id → count carried. */

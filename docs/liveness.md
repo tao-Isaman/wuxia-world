@@ -154,6 +154,8 @@ What five years look like (seeded run, `test:liveness`): every seat held, genera
 - **The dead chief's seat and quests pass to the heir** (`heirId`). On the map the heir stands at the old chief's spot (`predecessorsOf`). `heldQuests(heir)` lists the old chief's quests, `isQuestTurnInForNpc` accepts the heir for the hand-in, and the quest guide points at the heir.
 - **A dead sect member's quests pass to the sect's chief.**
 - **`settleChargesOfDead`** runs after every tick and every killing the hero does: an active quest whose giver or hand-in person died passes to their holder (`questHolder` follows `heirId` through the dead), with a log line and a toast; with nobody to take it — a sectless person — it fails.
+- **Lineage teachers pass their teaching on.** A dead lineage teacher with no heir (the outsider schools have no chief) leaves their quests to another teacher of the same school (the moves' `sc`), else to someone living on the same grounds (`schoolmatesOf` in `questHolder`); a school with no one left dies with its last teacher. `heldQuests` covers every dead person (`npcExt` dead or assassinated), not only those with an `heirId`. The spar stage of a lineage quest (`defeatedOpponent spar_<teacher>`) also passes once the teacher is dead (`or npcStatus dead`).
+- **The dead don't speak.** In a quest dialog, a dead speaker's lines and bust go to whoever holds their charges (`livingVoice` / `voiceLabel`, `lib/world/speaker.ts`, used by the dialog stage and `DialogDisplay`).
 - **The dead are gone.** `npcPresent` is false for anyone dead, so they leave every map, the card layout, letters and the tournament.
 
 ## Generated people

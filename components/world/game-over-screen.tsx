@@ -4,13 +4,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useWorldStore } from "@/store/world-store";
 import { confirmDialog } from "@/store/confirm-store";
+import { daysInJianghu } from "@/lib/world/clock";
 
 // Shown when `worldStore.gameOver === true`. The only available action is
 // `resetGame`, which wipes the persisted slice back to the start screen.
 // We deliberately don't preserve any progress — the game over state is final.
 export function GameOverScreen() {
   const resetGame = useWorldStore((s) => s.resetGame);
-  const day = useWorldStore((s) => s.day);
+  // The hero's own days (save v28 startDay), not the shared world clock's.
+  const day = useWorldStore((s) => daysInJianghu(s) + 1);
   return (
     <Card className="border-rose-300">
       <CardContent className="p-8 space-y-4 text-center">

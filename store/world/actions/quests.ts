@@ -1,7 +1,7 @@
-// Accepting, dropping and handing in quests; hands-on objective spots.
+// Accepting, dropping (forgetting) and handing in quests; hands-on objective spots.
 import { applyEffects, getQuest } from "@/lib/world";
 import { completeObjectiveSpot } from "@/lib/world/quest-objectives";
-import { consumeQuestAutoItems } from "@/lib/world/effects";
+import { consumeQuestAutoItems, droppedQuestFlag } from "@/lib/world/effects";
 import { staminaForHours } from "../lifecycle";
 import { appendActionLog, draftFrom } from "../state";
 import type { WorldGet, WorldSet, WorldStore } from "../types";
@@ -34,26 +34,23 @@ export const questsActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "a
     const cur = s.quests[questId];
     if (!cur || cur.status !== "active") return { ok: false, reason: "already-done" };
     const draft = draftFrom(s);
-    // Saga chapters, lineage quests and the sect art trials are the only
-    // way to their skill or art; failing one for good would lock it away,
-    // so dropping one just forgets it (and its objective progress) — it is
-    // offered again.
-    if (def.story || def.lineage || def.isArtQuest) {
-      const quests = { ...draft.quests };
-      delete quests[questId];
-      draft.quests = quests;
-      const flags = { ...draft.flags };
-      for (const key of Object.keys(flags)) if (key.startsWith(`qobj:${questId}:`)) delete flags[key];
-      if (flags.trackedQuestId === questId) delete flags.trackedQuestId;
-      draft.flags = flags;
-      appendActionLog(draft, "quest", `ละทิ้งภารกิจ: ${def.name} (รับใหม่ได้ภายหลัง)`);
-      set({ ...draft });
-      return { ok: true, questId };
-    }
-    // Mark failed without granting rewards — finishQuest's success=false
-    // path skips the reward dispatcher.
-    applyEffects(draft, [{ t: "finishQuest", questId, success: false }]);
-    appendActionLog(draft, "quest", `ละทิ้งภารกิจ: ${def.name}`);
+    // Dropping a quest forgets it (and its objective progress): it is offered
+    // again, by its giver or the sect window. No kind stays failed — nothing
+    // in the content reads a failed status, and failing for good locked away
+    // quests (and their moves) for one tap. What its start (or a stage
+    // already passed) handed over is not paid twice: `qdropped:<id>` keeps
+    // how far the hero got (applyEffects, lib/world/effects.ts).
+    const quests = { ...draft.quests };
+    delete quests[questId];
+    draft.quests = quests;
+    const flags = { ...draft.flags };
+    for (const key of Object.keys(flags)) if (key.startsWith(`qobj:${questId}:`)) delete flags[key];
+    if (flags.trackedQuestId === questId) delete flags.trackedQuestId;
+    const reached = cur.stage + 1;
+    const before = flags[droppedQuestFlag(questId)];
+    flags[droppedQuestFlag(questId)] = Math.max(typeof before === "number" ? before : 0, reached);
+    draft.flags = flags;
+    appendActionLog(draft, "quest", `ละทิ้งภารกิจ: ${def.name} (รับใหม่ได้ภายหลัง)`);
     set({ ...draft });
     return { ok: true, questId };
   },

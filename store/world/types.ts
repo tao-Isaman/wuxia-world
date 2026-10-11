@@ -102,12 +102,12 @@ export type PracticeMusicResult =
 
 // Result of attempting to level up a move skill via either xp source.
 export type LevelUpSkillResult =
-  | { ok: false; reason: "unknown" | "maxed" | "insufficient" }
+  | { ok: false; reason: "unknown" | "maxed" | "insufficient" | "frozen" }
   | { ok: true; skillId: string; level: number; cost: number };
 
 // Result of attempting to level up an inner art via w-exp.
 export type LevelUpArtResult =
-  | { ok: false; reason: "unknown" | "maxed" | "insufficient" }
+  | { ok: false; reason: "unknown" | "maxed" | "insufficient" | "frozen" }
   | { ok: true; artId: string; level: number; cost: number };
 
 // Result of attempting to forget a learned skill / art. Forgetting
@@ -129,7 +129,7 @@ export type ForgetArtResult =
 
 // Result of attempting "ฝึกฝน" on a learned skill / art at a location.
 export type PracticeResult =
-  | { ok: false; reason: "no-build" | "stamina" | "unknown" | "not-allowed" }
+  | { ok: false; reason: "no-build" | "stamina" | "unknown" | "not-allowed" | "frozen" }
   | {
       ok: true;
       kind: "skill" | "art";

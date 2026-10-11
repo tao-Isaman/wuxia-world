@@ -46,14 +46,14 @@ A reload during a battle restarts that battle from the start with the hero's sav
 
 ## The world save
 
-`partialize` (`partializeSave`, typed `PlayerSave` = `WorldStateData` without the shared keys) writes the player's data fields of `WorldStateData` (`lib/world/types.ts`), 47 in all, and none of the action functions or [shared-world](#the-shared-world) fields:
+`partialize` (`partializeSave`, typed `PlayerSave` = `WorldStateData` without the shared keys) writes the player's data fields of `WorldStateData` (`lib/world/types.ts`), 48 in all, and none of the action functions or [shared-world](#the-shared-world) fields:
 
 | Group | Fields |
 | --- | --- |
 | Run | `hasGame`, `gameOver`, `gender`, `playerBodyId` |
 | Hero | `playerBuild` (stats, slots, gear, learned skills and arts, levels, meridian charts `meridians`), `currentHp`, `currentMp`, `stamina`, `staminaMax` |
 | Where | `currentSceneId`, `lastLocationId`, `visitedLocationIds` |
-| Time | `day`, `time` (0 to below 12 ชั่วยาม): the world clock's, set on every action (`syncClock`) — saved so a reload shows where the hero was |
+| Time | `day`, `time` (0 to below 12 ชั่วยาม): the world clock's, set on every action (`syncClock`) — saved so a reload shows where the hero was; `startDay` (v28): the world day the hero entered the jianghu (`startNewGame`) — progress that grows with the hero's own days (foe power, `playerPowerIndex`; the game-over day count) reads `daysInJianghu` = `day − startDay` (`lib/world/clock.ts`), never the world's `day` |
 | Money and bag | `gold`, `inventory` (item id → count), `inventoryEquipment` (gear id → count) |
 | Progress | `wExp`, `skillLevel`, `skillExp`, `artExp`, `meridianPoints`, `statExp`, `lifeSkillXp` (19 keys), `learnedRecipeIds` |
 | Story | `flags`, `quests` (id → `{ id, status, stage, acceptedDefeatedAt?, acceptedHasItemAt? }`), `traits`, `npcStates` |
@@ -105,6 +105,8 @@ This is Zustand 5 `persist` over synchronous `localStorage`, so it all happens w
 ## Migration
 
 `migrate` (`migrateSave` in `store/world/persist.ts`) is **one idempotent normalizer**. Its only use of `fromVersion` is v27's rebase (below); the rest works on any older save:
+
+- **v28: the hero's first day (`startDay`).** A save from before v27 counted its own days from 1, so its `startDay` is 1, rebased with every other stamp (a 100-day-old hero stays 100 days old). A v27 save never recorded it: it gets its own `day`, i.e. it counts as starting now (foe power from days restarts at 0; sect rank still raises it). Repair keeps `startDay` a number no later than `day` (it may be below 1 for a rebased old save).
 
 - **v27: onto the world clock.** A save from before v27 counted its own days. `rebaseDays` (`lib/world/shared/rebase.ts`) shifts every day stamp by `worldNow().day − save.day` — `day`, `wantedDay`, `lastNpcTickDay`, `giftDays`, `letterDays`, `activityDays`, `kidnappedUntil`, `bossDefeatedDay`, letters, the action log, heard rumors, rumors and their archive, sect `joinedDay` / `lastQuestDay`, and each person's `lastTickDay`, history, seclusion, wounds, death day and journey — so cooldowns and news keep the time they had left. A jail term left is cut to at most 12 ชั่วยาม; a running tournament is dropped (its history kept). Birthdays are days of the year and stay.
 
@@ -167,7 +169,7 @@ What each version added. v1–v13 and v17→v18 are described in the comment abo
 | v24 → v25 | `lawEvasions` (escapes from the law since the last sentence); `wanted` is no longer clamped to 5 |
 | v25 → v26 | `bossDefeatedDay` (boss id → the day each legendary beast last fell, `lib/world/data/bosses.ts`; default `{}`) |
 | v26 → v27 | the world clock: day stamps rebased (`rebaseDays`); `worldSeed`, `worldEventLog`; the shared-world fields move out of the save into `wusia-shared-v1` |
-| v27 → v28 | the hero's own deeds come back from the shared world (`PLAYER_FROM_WORLD_KEYS`: `assassinatedNpcIds`, `kidnappedNpcIds`, `kidnappedUntil`, `bossDefeatedDay`, `tournament`, `tournamentHistory`): in a world shared by many players these are each player's own. `joinSharedWorld` hands an older local world's values to a save that has none |
+| v27 → v28 | the hero's own deeds come back from the shared world (`PLAYER_FROM_WORLD_KEYS`: `assassinatedNpcIds`, `kidnappedNpcIds`, `kidnappedUntil`, `bossDefeatedDay`, `tournament`, `tournamentHistory`): in a world shared by many players these are each player's own; and `startDay` (the hero's first world day: 1 rebased for a pre-v27 save, else the save's `day`). `joinSharedWorld` hands an older local world's values to a save that has none |
 
 ## Repair on load
 
@@ -178,7 +180,7 @@ What each version added. v1–v13 and v17→v18 are described in the comment abo
 1. An unknown `currentSceneId` becomes `home_player`.
 2. A `lastLocationId` that is unknown or not a location becomes `null`. This also clears a road id that a walk event pinned there.
 3. `flags._skipEventRoll` is deleted.
-4. `day` is at least 1 and `time` at least 0; `time` of 12 or more rolls into `day`. (The world clock then moves them on: `syncClock` never moves time back.)
+4. `day` is at least 1 and `time` at least 0; `time` of 12 or more rolls into `day`. `startDay` is a number no later than `day` (missing: `day`). (The world clock then moves them on: `syncClock` never moves time back.)
 
 **Law and pending actions**
 

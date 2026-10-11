@@ -85,3 +85,12 @@ export function formatWait(fromStamp: number, toStamp: number): string {
   const h = hours % 24;
   return `อีก ${days} วัน${h ? ` ${h} ชั่วโมง` : ""}`;
 }
+
+/**
+ * Whole days the hero has lived in the jianghu: today minus the day they
+ * entered it (`startDay`, save v28). The world day is the same for everyone,
+ * so anything that grows with the hero's progress reads this, not `day`.
+ */
+export function daysInJianghu(state: { day: number; startDay?: number }): number {
+  return Math.max(0, state.day - (state.startDay ?? 1));
+}

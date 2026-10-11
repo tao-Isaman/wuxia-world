@@ -1256,6 +1256,10 @@ export interface WorldStateData {
   // when it crosses 12.
   day: number;
   time: number;
+  // v28: the world day this hero entered the jianghu (startNewGame). The
+  // world clock runs for everyone, so `day` says nothing about how long the
+  // hero has played: progress reads `day - startDay` (daysInJianghu).
+  startDay: number;
 
   // Set when the player loses a fight. The world UI swaps to a game-over
   // screen and the only action available is "เริ่มใหม่" (resetGame).
@@ -1369,15 +1373,25 @@ export interface SectMembership {
   // Membership status. Drives `sectMember` Condition + cross-sect
   // exclusion + skill-XP freeze + hunter random events:
   //   "active"    — current disciple, all sect benefits enabled
-  //   "resigned"  — formal resignation. Rewards-from-sect are FROZEN
-  //                 (no XP gain). Player is free to join a new sect.
+  //   "resigned"  — formal resignation. The sect's moves are FROZEN
+  //                 (no xp from any source). Player is free to join a new
+  //                 sect, and may rejoin this one REJOIN_COOLDOWN_DAYS
+  //                 after leaving (lib/world/sects.ts), from its first rank.
   //                 Hunters do NOT spawn.
   //   "betrayed"  — left without leave. Skills can level up, but a
   //                 strong sect-hunter NPC may ambush in random events.
-  //                 Cleared by completing the sect's redemption quest.
+  //                 Cleared by completing the sect's redemption quest
+  //                 (→ "resigned"); no way back in until then.
   // Missing means "active": readers apply `status ?? "active"` (nothing
   // back-fills it in old saves).
   status?: "active" | "resigned" | "betrayed";
+  // Day the hero last left (resigned, betrayed, or was forgiven by the
+  // redemption quest): the rejoin cooldown counts from it. Optional, no
+  // save bump: a resigned membership without it may rejoin at once.
+  leftDay?: number;
+  // The best (lowest) rank ever held here. A rejoin starts again at the
+  // first rank; rank-ups pay their gold only for ranks never held before.
+  bestRank?: number;
 }
 
 export type SectId = "shaolin" | "wudang" | "huashan" | "quanzhen" | "emei" | "gumu" | "beggars" | "jinyiwei" | "sunmoon" | "tang" | "xiaoyao" | "hengshan_south" | "hengshan_north" | "songshan" | "taishan";

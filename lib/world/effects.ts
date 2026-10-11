@@ -3,6 +3,7 @@ import type {
   QuestDef,
   QuestReward,
   SceneEffect,
+  SectId,
   SectMembership,
   WorldStateData,
 } from "./types";
@@ -20,6 +21,10 @@ import { STAT_LABEL, deriveAll, getArt, getSkill } from "../game";
 import { generatePlayerEcho, playerEchoContext } from "./rumor-engine";
 import { sendPlayerEcho, worldRunsOnServer } from "./shared/world";
 import { questHolder } from "./npc-life";
+import { appendActionLog } from "./action-log";
+import {
+  REJOIN_COOLDOWN_DAYS, bestSectRank, isRedemptionQuest, isSkillFrozen, membershipStatus, redemptionQuestId, sectJoinCheck,
+} from "./sects";
 // Walk-tick encounters live in ./encounters; re-exported for existing importers.
 export { collectActiveHuntTargets, encounterFoeAvailable, rollFoeSpawn, rollWalkEvent } from "./encounters";
 
@@ -217,59 +222,56 @@ export function applyEffect(state: WorldStateData, eff: SceneEffect): void {
       return;
     }
 
-    case "leaveSect": {
-      // Legacy effect (originally used by the Gumu defection from
-      // Quanzhen). Maps to a clean "resigned" status — keeps the
-      // membership entry around for skill-freeze tracking but stops
-      // counting as an active disciple. New content should prefer
-      // `resignSect` / `betraySect` for the explicit semantic.
-      const m = state.sectMembership[eff.sectId];
-      if (!m) return;
-      m.status = "resigned";
+    case "leaveSect":
+      // Legacy effect (the Gumu defection from Quanzhen): a resignation.
+    case "resignSect":
+      // Formal resignation (or, on a betrayed membership, forgiveness: the
+      // redemption quest). The entry stays "resigned": the sect's moves stop
+      // growing, no hunters come, and the sect takes the hero back
+      // REJOIN_COOLDOWN_DAYS later (lib/world/sects.ts). Every path — the
+      // sect window, a quest reward, a scene — logs it and tells the jianghu.
+      resignFromSect(state, eff.sectId);
       return;
-    }
 
-    case "resignSect": {
-      // Formal resignation. Marks the membership "resigned" — keeps the
-      // entry so we can track which skills were granted via sect rewards
-      // (those skills are XP-frozen for resigned sects). Player can join
-      // a new sect.
-      const m = state.sectMembership[eff.sectId];
-      if (!m) return;
-      m.status = "resigned";
+    case "betraySect":
+      // Defection without leave: the moves keep growing, but the sect's
+      // hunters ambush the hero (lib/world/encounters.ts) until the
+      // redemption quest is done. A moral wound: evil +5.
+      betrayTheSect(state, eff.sectId);
       return;
-    }
-
-    case "betraySect": {
-      // Defection without leave. Marks "betrayed" — skills can still
-      // level up, BUT a sect-hunter NPC may ambush in random events.
-      // Cleared by completing the sect's redemption quest.
-      const m = state.sectMembership[eff.sectId];
-      if (!m) return;
-      m.status = "betrayed";
-      return;
-    }
 
     case "joinSect": {
-      // Idempotent — if the player is already a member, do nothing.
-      // (Includes resigned / betrayed memberships — those slots stay
-      // permanently allocated to track skill-freeze + hunter state.)
-      if (state.sectMembership[eff.sectId]) return;
+      // A first join or the return to a resigned sect (from its first rank;
+      // the moves thaw). No-op for an active or betrayed membership. Callers
+      // check sectJoinCheck (lib/world/sects.ts) first: the store action
+      // and the intro quests' reward do.
       const def = SECT_MEMBERSHIPS[eff.sectId];
-      const m: SectMembership = {
-        rank: def.startRank,
-        points: 0,
-        lastQuestDay: {} as Record<string, number>,
-        artQuestsDone: [] as string[],
-        rewardPicks: {} as Record<string, string>,
-        joinedDay: state.day,
-        status: "active",
-      };
+      if (!def) return;
+      const prev = state.sectMembership[eff.sectId];
+      if (prev && membershipStatus(prev) !== "resigned") return;
+      const m: SectMembership = prev
+        ? {
+          ...prev,
+          rank: def.startRank,
+          points: 0,
+          joinedDay: state.day,
+          status: "active",
+          bestRank: bestSectRank(prev),
+        }
+        : {
+          rank: def.startRank,
+          points: 0,
+          lastQuestDay: {} as Record<string, number>,
+          artQuestsDone: [] as string[],
+          rewardPicks: {} as Record<string, string>,
+          joinedDay: state.day,
+          status: "active",
+        };
+      delete m.leftDay;
       state.sectMembership[eff.sectId] = m;
       // No martial arts on joining: the sect's lineage quests teach them.
       // The jianghu hears of it (every join, the intro quests' reward included).
-      generatePlayerEcho({ state, actionId: "sect_join" });
-      if (worldRunsOnServer()) sendPlayerEcho({ actionId: "sect_join", context: playerEchoContext(state, "sect_join") });
+      echoDeed(state, "sect_join", eff.sectId);
       return;
     }
 
@@ -383,6 +385,61 @@ export function applyEffect(state: WorldStateData, eff: SceneEffect): void {
   }
 }
 
+// ─── Leaving a sect ────────────────────────────────────────────────────
+// One place for what leaving costs and how the jianghu hears of it, so the
+// sect window (store actions), quest rewards and scenes all agree.
+
+/** Tell the jianghu what the hero did (a player-echo rumor, logged as a world event). */
+function echoDeed(state: WorldStateData, actionId: string, sectId?: string): void {
+  const rumorId = generatePlayerEcho({ state, actionId, sectId });
+  const rumor = rumorId ? state.rumorPool.find((r) => r.id === rumorId) : undefined;
+  if (rumor) recordWorldEvent(state, { t: "rumor", rumor });
+  // On the game server the world is the server's: it writes the rumor everyone hears.
+  if (worldRunsOnServer()) sendPlayerEcho({ actionId, context: playerEchoContext(state, actionId, sectId) });
+}
+
+function resignFromSect(state: WorldStateData, sectId: SectId): void {
+  const cur = state.sectMembership[sectId];
+  if (!cur) return;
+  // A fresh entry: a draft shares nested memberships with the state before it.
+  const m = { ...cur };
+  state.sectMembership[sectId] = m;
+  const def = SECT_MEMBERSHIPS[sectId];
+  const status = membershipStatus(m);
+  if (status === "resigned") return;
+  m.status = "resigned";
+  m.leftDay = state.day;
+  if (status === "betrayed") {
+    // The redemption quest: forgiven, the hunters are called off.
+    appendActionLog(state, "sect", `${def.name}ให้อภัยแล้ว — นักล่าเลิกตามล่า · นับเป็นผู้ลาออก (กลับเข้าสำนักได้อีกเมื่อพ้น ${REJOIN_COOLDOWN_DAYS} วัน)`);
+    return;
+  }
+  appendActionLog(state, "sect", `ลาออกอย่างเป็นทางการจากสำนัก${def.name} — วิชาที่ได้จากสำนักจะหยุดเลื่อนขั้น · กลับเข้าสำนักได้อีกเมื่อพ้น ${REJOIN_COOLDOWN_DAYS} วัน`);
+  // From the public's view a resign and a betray both look like "the hero
+  // left" — one actionId, one template pool.
+  echoDeed(state, "sect_leave_or_betray", sectId);
+}
+
+function betrayTheSect(state: WorldStateData, sectId: SectId): void {
+  const cur = state.sectMembership[sectId];
+  if (!cur || membershipStatus(cur) !== "active") return;
+  const m = { ...cur };
+  state.sectMembership[sectId] = m;
+  const def = SECT_MEMBERSHIPS[sectId];
+  m.status = "betrayed";
+  m.leftDay = state.day;
+  state.traits.evil = Math.max(0, (state.traits.evil ?? 0) + 5);
+  // A redemption done for an earlier betrayal is offered again.
+  const redemption = redemptionQuestId(sectId);
+  if (state.quests[redemption] && state.quests[redemption].status !== "active") {
+    const quests = { ...state.quests };
+    delete quests[redemption];
+    state.quests = quests;
+  }
+  appendActionLog(state, "sect", `ทรยศสำนัก${def.name} — ระวังนักล่าจากสำนักจะตามล่าเจ้าในที่ต่าง ๆ`);
+  echoDeed(state, "sect_leave_or_betray", sectId);
+}
+
 /**
  * Take an arrest's price from the hero: the fine (what they have), seized
  * property (a third of the gold left and half of one or two carried goods),
@@ -455,8 +512,74 @@ export function releaseFromJail(state: WorldStateData): void {
 // resolve in the same beat (a giveItem effect can immediately complete a
 // "gather X" stage, for example).
 export function applyEffects(state: WorldStateData, effects: readonly SceneEffect[]): void {
-  for (const e of effects) applyEffect(state, e);
+  // A quest dropped and taken again does not pay its start (or mid-quest)
+  // gifts twice: see repeatsQuestGifts.
+  const repeat = repeatsQuestGifts(state, effects);
+  for (const e of effects) {
+    if (repeat && applyRepeatGift(state, e)) continue;
+    applyEffect(state, e);
+  }
   tickQuestProgress(state);
+}
+
+// ─── Dropped quests ────────────────────────────────────────────────────
+// Abandoning a quest forgets it (the store's abandonQuest): it is offered
+// again. What its giver handed over when it began — a letter, a potion, an
+// advance in gold — must not be farmed by dropping and retaking it, so the
+// flag `qdropped:<questId>` keeps how many of its stages the hero had
+// entered (the furthest attempt), and a batch of effects that starts the
+// quest again, or advances it past a stage already entered, is a repeat:
+//   - items that cannot be sold (letters, keys…) are only topped up to the
+//     authored count, so the quest can still be done;
+//   - sellable items, gold, positive trait / relationship / sect-point
+//     gains are not paid again.
+// Costs (negative amounts, takeItem) and everything else apply as usual.
+
+/** The flag that remembers a dropped quest: stages entered (1 = it was begun). */
+export function droppedQuestFlag(questId: string): string {
+  return `qdropped:${questId}`;
+}
+
+function droppedStages(state: WorldStateData, questId: string): number {
+  const v = state.flags[droppedQuestFlag(questId)];
+  return typeof v === "number" ? v : 0;
+}
+
+/** True when this batch pays gifts the hero already had from a dropped attempt. */
+export function repeatsQuestGifts(state: WorldStateData, effects: readonly SceneEffect[]): boolean {
+  for (const e of effects) {
+    if (e.t === "startQuest" && !state.quests[e.questId] && droppedStages(state, e.questId) >= 1) return true;
+    if (e.t === "advanceQuest") {
+      const q = state.quests[e.questId];
+      const def = getQuest(e.questId);
+      // Advancing from stage s enters stage s + 1; the final advance (the
+      // reward) never happened, since the quest was dropped before it.
+      if (q && def && q.status === "active" && q.stage + 1 < def.stages.length && droppedStages(state, e.questId) >= q.stage + 2) return true;
+    }
+  }
+  // A briefing-only offer (`qs_<id>_offer`, shown after the NPC card accepts).
+  const offer = /^qs_(.+)_offer$/.exec(state.currentSceneId ?? "");
+  return !!offer && droppedStages(state, offer[1]!) >= 1;
+}
+
+/** Apply a gift effect the repeat way; false when `e` is not a gift (apply it as usual). */
+function applyRepeatGift(state: WorldStateData, e: SceneEffect): boolean {
+  switch (e.t) {
+    case "giveItem": {
+      const want = e.count ?? 1;
+      if (want <= 0) return false;
+      if ((getItem(e.itemId)?.price ?? 0) > 0) return true;
+      if ((state.inventory[e.itemId] ?? 0) < want) state.inventory[e.itemId] = want;
+      return true;
+    }
+    case "addGold":
+    case "addTrait":
+    case "addNpcRelationship":
+    case "addSectPoints":
+      return e.amount > 0;
+    default:
+      return false;
+  }
 }
 
 function grantScroll(state: WorldStateData, kind: "skill" | "art", id: string, known: boolean): void {
@@ -487,7 +610,8 @@ function applyQuestRewards(state: WorldStateData, rewards: readonly QuestReward[
         break;
       }
       case "skillExp": {
-        if (r.amount > 0) {
+        // A resigned sect's move gains nothing, from any source.
+        if (r.amount > 0 && !isSkillFrozen(state, r.skillId)) {
           state.skillExp[r.skillId] = (state.skillExp[r.skillId] ?? 0) + r.amount;
         }
         break;
@@ -511,9 +635,22 @@ function applyQuestRewards(state: WorldStateData, rewards: readonly QuestReward[
       case "learnArt":
         grantScroll(state, "art", r.artId, (state.playerBuild?.learnedArtIds ?? []).includes(r.artId));
         break;
-      case "joinSect":
+      case "joinSect": {
+        // The intro quest's reward honours the sect's own rules too
+        // (joinRequirements, one sect at a time, no betrayer): a hero who no
+        // longer meets them is not admitted, and may ask the sect's master
+        // later (the store's joinSect, on their card).
+        const def = SECT_MEMBERSHIPS[r.sectId];
+        if (!def) break;
+        const check = sectJoinCheck(state, r.sectId, { viaQuest: true });
+        if (!check.ok) {
+          appendActionLog(state, "sect", `${def.name}ยังรับเจ้าเป็นศิษย์ไม่ได้: ${check.reason} — กลับไปขอเข้าสำนักได้เมื่อพร้อม`);
+          break;
+        }
         applyEffect(state, { t: "joinSect", sectId: r.sectId });
+        appendActionLog(state, "sect", `${check.rejoin ? "กลับเข้า" : "เข้าร่วม"}สำนัก${def.name} · ขั้นที่ ${def.startRank}`);
         break;
+      }
       case "sectPoints":
         applyEffect(state, { t: "addSectPoints", sectId: r.sectId, amount: r.amount });
         break;
@@ -655,6 +792,13 @@ export function tickQuestProgress(state: WorldStateData): void {
 // sect today) and add to
 // `artQuestsDone` if the quest is one-shot art-tagged.
 function recordSectQuestCompletion(state: WorldStateData, def: QuestDef): void {
+  // Done at last: a dropped attempt no longer matters (a repeatable sect
+  // quest's next round pays its gifts in full).
+  if (droppedQuestFlag(def.id) in state.flags) {
+    const flags = { ...state.flags };
+    delete flags[droppedQuestFlag(def.id)];
+    state.flags = flags;
+  }
   if (!def.sectId) return;
   const m = state.sectMembership[def.sectId];
   if (!m) return;
@@ -703,10 +847,15 @@ export function isQuestOfferable(state: WorldStateData, def: QuestDef): boolean 
   // except the T4 saga trials, which the sect window keeps secret: only their
   // giver offers them, to an active member of high enough rank.
   if (def.sectId) {
-    if (!isSecretSectQuest(def.id)) return false;
     const m = state.sectMembership[def.sectId];
-    if (!m || m.status !== "active") return false;
-    if (def.minSectRank != null && m.rank > def.minSectRank) return false;
+    if (isRedemptionQuest(def)) {
+      // A betrayer asks the sect's master for forgiveness in person.
+      if (!m || membershipStatus(m) !== "betrayed") return false;
+    } else {
+      if (!isSecretSectQuest(def.id)) return false;
+      if (!m || membershipStatus(m) !== "active") return false;
+      if (def.minSectRank != null && m.rank > def.minSectRank) return false;
+    }
   }
   if (state.quests[def.id]) return false;
   if (def.prereqs && !evaluateCondition(state, def.prereqs)) return false;
@@ -734,6 +883,10 @@ export function isSectQuestOfferable(
   if (!def.sectId) return { offerable: false, cooldownLeft: 0, reason: "ไม่ใช่ภารกิจสำนัก" };
   const m = state.sectMembership[def.sectId];
   if (!m) return { offerable: false, cooldownLeft: 0, reason: "ยังไม่ได้เป็นศิษย์" };
+  // Only a disciple in good standing takes the sect's work; a redemption is
+  // asked for in person (isQuestOfferable), not taken from the sect window.
+  if (membershipStatus(m) !== "active") return { offerable: false, cooldownLeft: 0, reason: "ไม่ได้เป็นศิษย์ของสำนักนี้แล้ว" };
+  if (isRedemptionQuest(def)) return { offerable: false, cooldownLeft: 0, reason: "ภารกิจไถ่บาปรับได้กับเจ้าสำนักเท่านั้น" };
   if (def.minSectRank != null && m.rank > def.minSectRank) {
     return {
       offerable: false,
@@ -784,7 +937,7 @@ export function sectActionCount(state: WorldStateData): number {
     if (!def) continue;
     if (m.rank > def.topRank && m.points >= def.rankUpCost(m.rank - 1)) count++;
     for (const quest of getQuestsForSect(sectId)) {
-      if (isSecretSectQuest(quest.id)) continue;
+      if (isSecretSectQuest(quest.id) || isRedemptionQuest(quest)) continue;
       if (isSectQuestOfferable(state, quest, def.questCooldownDays).offerable) count++;
     }
   }
@@ -957,7 +1110,8 @@ export function describeQuestCondition(
     case "or": {
       // OR — show every alternative; the stage progresses on any-done.
       const lines = c.any.flatMap((sub) => describeQuestCondition(state, sub, depth + 1, quest));
-      return lines.map((l) => ({ ...l, label: `(หรือ) ${l.label}` }));
+      // A lone line (the other ways have none, e.g. a waived spar) needs no "or".
+      return lines.length > 1 ? lines.map((l) => ({ ...l, label: `(หรือ) ${l.label}` })) : lines;
     }
     case "not": {
       const inner = describeQuestCondition(state, c.of, depth + 1, quest);

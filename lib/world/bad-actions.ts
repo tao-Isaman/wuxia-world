@@ -139,9 +139,16 @@ export function questsNeedingBadAction(
   return out;
 }
 
+/** Never kidnapped, or back at their spot (KIDNAP_RETURN_DAYS after it). */
+export function kidnapReturned(state: Pick<WorldStateData, "kidnappedNpcIds"> & Partial<Pick<WorldStateData, "kidnappedUntil" | "day">>, npcId: string): boolean {
+  if (!state.kidnappedNpcIds.includes(npcId)) return true;
+  const until = state.kidnappedUntil?.[npcId];
+  return until !== undefined && state.day !== undefined && state.day >= until;
+}
+
 /** True when the NPC card should show the action. */
 export function badActionOffered(
-  state: Pick<WorldStateData, "quests" | "assassinatedNpcIds" | "kidnappedNpcIds">,
+  state: Pick<WorldStateData, "quests" | "assassinatedNpcIds" | "kidnappedNpcIds"> & Partial<Pick<WorldStateData, "kidnappedUntil" | "day" | "npcExt">>,
   npc: NpcDef,
   kind: BadActionKind,
 ): boolean {
@@ -149,6 +156,8 @@ export function badActionOffered(
     return (npc.stealLoot?.length ?? 0) > 0 || questsNeedingBadAction(state, npc.id, "steal").length > 0;
   }
   if (kind === "assassinate" && state.assassinatedNpcIds.includes(npc.id)) return false;
-  if (kind === "kidnap" && state.kidnappedNpcIds.includes(npc.id)) return false;
+  // Someone carried off before can be taken again once they are back
+  // (kidnappedNpcIds stays as the record quest conditions read).
+  if (kind === "kidnap" && !kidnapReturned(state, npc.id)) return false;
   return questsNeedingBadAction(state, npc.id, kind).length > 0;
 }

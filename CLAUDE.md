@@ -14,7 +14,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **What the player does:**
 
 - Explores 101 places (100 painted maps) joined by 129 roads.
-- Meets 235 NPCs (30 of them, plus the disciples, heirs and newcomers they bring, live their own lives) and takes 1,074 quests: a 15-chapter main story (เนื้อเรื่องหลัก), 373 hand-written, 113 sect lineage quests (154 moves; 30 of them a choice) and 48 story sagas (573 chapters: 38 sect sagas and 10 long jianghu sagas for the unsect T4 / T5 moves); 511 cutscenes.
+- Meets 235 NPCs (30 of them, plus the disciples, heirs and newcomers they bring, live their own lives) and takes 1,075 quests: a 15-chapter main story (เนื้อเรื่องหลัก), 374 hand-written, 113 sect lineage quests (154 moves; 30 of them a choice) and 48 story sagas (573 chapters: 38 sect sagas and 10 long jianghu sagas for the unsect T4 / T5 moves); 511 cutscenes.
 - Lives in the 3rd year of Jianwen (1401), about 40 years after the legend of the last age (our own story, not a novel's sequel): the court's seized scriptures have just scattered back into the jianghu ([docs/story-writing.md](docs/story-writing.md#timeline-and-the-legends-people)).
 - Joins one of 15 sects and learns 173 move skills and 111 inner arts (plus 18 boss moves and 6 boss arts no one can learn).
 - Hunts foes where they live (habitats), from tier 0 to tier 5, and six legendary beasts (บอส) in their lairs.
@@ -77,7 +77,7 @@ bun run test:npcs
 bun run test:story          # every sect skill/art has a quest; lineage + sagas + cutscenes well formed; all play through
 bun run test:routes         # compass exits, 8-way road paintings and arrival sides; world coords current
 bun run test:places         # place NPCs / quests / activities; every ยุทธจักร T0–T3 move is a quest reward; gifts; presence
-bun run test:systems        # practice xp, letters, horse stations, the sword tournament
+bun run test:systems        # practice xp, letters, horse stations, the sword tournament; sect join / rejoin / redemption, dropped quests
 bun run test:quests         # campaign audit + dead ends + every item/kill/objective quest + guidance + bad-action stages
 bun run test:meridians      # meridian charts: engine, combat bonus, chart items / sources, points, store, repair, content counts
 bun run test:engine         # text overrides over SKILLS / ARTS, the engine's filters / edits / validation, the save route whitelist
@@ -233,7 +233,7 @@ Two deliberate exceptions reach into stores:
   - Every 220 map units walked, `walkTick(pickSpot)` runs; `home_player` and `jail` are safe. There are no treasure or meeting events.
   - **Roaming foes:** on roads and in the wilds, per tick a 30 % chance (80 % while hunting a kill-quest target in this zone) puts a foe that **lives there** on the map (`lib/world/data/habitats.ts`: every place and road has biomes, every fight-event foe its `FOE_HABITATS`; `fightEventsForLocation` filters by them, so the quest guide sends a kill quest to its quarry's habitat). Settled places (`isSettledPlace`: `city_`, `village_`, `home_`, `inn_`, `sect_`, `temple_`, `palace_`, `villa_`, `market_`, `tribe_`) get no stray foes, only an active kill quest's quarry if it lives in town (`rollFoeSpawn`, at most 3; store `roamingFoes`, not saved). The runtime draws them (`presentation.foes`) and walking into one calls `engageFoe` → the encounter screen.
   - The **law** (`lawChance(marks)`, 13–45 %) and the **30 % sect-hunter roll** still catch up at once (`rollWalkEvent`).
-  - Foes are scaled by the hero's power (`max(day/200, (9 − best sect rank)/8)`): tier mix (T5 only from power 0.6), elites, and opponent stats ×(1 + 0.6·power) for **every** battle.
+  - Foes are scaled by the hero's power (`max((day − startDay)/200, (9 − best sect rank)/8)`: the hero's own days, not the world's): tier mix (T5 only from power 0.6), elites, and opponent stats ×(1 + 0.6·power) for **every** battle.
   - **Booster** (`boostBuild`, `opponents.ts`): every T3 foe ×1.6, T4 ×1.45 and NPC-backed fighter (`spar_*`, `npc@`, `lawnpc@`, `hunter_*`, `look.npc`) ×1.4 power score, the larger one. Categories are `human | beast` only — no spirits or demons.
   - **Tier 5** (`t5_*`, power 570–760) and **legendary beasts** (`lib/world/data/bosses.ts`, `boss_*`, power ~1550, ti 5, `boss: true`, minions): each boss waits at its lair spot (a `WorldFoe` with `boss: true` and an animated look), comes back 90 days after it falls (`bossDefeatedDay`, saved), pays `boss.wExp`, its trophy and boss drops. Big foes draw from animated sheets (`lib/characters/anim-sheets.ts`, PixelLab, `scripts/build-anim-sheets.ts`).
   - **Spoils:** beasts drop no gold; win w-exp is `victoryWExp` (people 40 + 20·ti, beasts 80 + 60·ti, bosses their own); move / art xp ×2 against beasts and bosses.
@@ -247,9 +247,10 @@ Two deliberate exceptions reach into stores:
   - Ladders: 9 → 1 (eight sects), 5 → 1 (six) or 3 → 1 (Gumu).
   - Ranks grant no martial arts: a rank-up pays gold (`rankUpGold`, half its point cost) and opens lineage quests and sagas, the **only** way to any sect skill or art (`test:story` enforces it; no rank pool, manual, hall, dialog or other quest may teach one). The one exception is the sword tournament champion's prize pick (below).
   - Sect quests are repeatable after a 30-day cooldown.
-  - Membership status is `active | resigned | betrayed`. Only `active` counts for `sectMember` / `anySectMember`.
-  - Joins go through each intro quest's `joinSect` **reward**, which does not check `joinRequirements`; the intro's `prereqs` are the real gate.
-  - Betrayal brings `hunter_<sectId>`; `qst_<sectId>_redemption` (14 sects; not xiaoyao) turns betrayed into resigned.
+  - Membership status is `active | resigned | betrayed`. Only `active` counts for `sectMember` / `anySectMember`, and the store's sect actions (rank-up, sect quests, leaving) need it.
+  - Joins go through each intro quest's `joinSect` **reward**, which checks `sectJoinCheck` (`lib/world/sects.ts`: `joinRequirements`, one sect at a time, no betrayer); a hero refused there asks later on the master's card (store `joinSect`). `test:systems` checks every intro's `prereqs` carry the `joinRequirements`.
+  - Leaving (resign / betray, by the menu, a quest reward or a scene) logs, echoes and (betrayal) adds evil +5 inside the effect. A resigned sect's moves get no xp from any source; it takes the hero back `REJOIN_COOLDOWN_DAYS` (30) after `leftDay`, from the first rank (`bestRank` stops rank-up gold paying twice).
+  - Betrayal brings `hunter_<sectId>`; `qst_<sectId>_redemption` (all 15 sects, offered by the master to a betrayer) turns betrayed into resigned.
 - **Liveness** (`npc-tick.ts`, `npc-life.ts`, `rumor-engine.ts`; [docs/liveness.md](docs/liveness.md)). Thirty people (15 chiefs, 5 seconds, 10 wanderers in `npcs/wanderers.ts`) plus generated ones (`dynamic`, ≤ 48: disciples, heirs, newcomers; registered with `registerDynamicNpc`) live in `npcExt`. Every `syncClock`:
   - runs each whole week since `lastNpcTickDay` (8 in full, the rest only age; leftover days carry over; each week's dice from `seededRng(worldSeed, day)`): a year on each `birthday`, death odds by age and strength (`deathChance`), training, goals, a journey leg on the real roads (`roadPath`), else a choice from their `temper` (`decide`: wander, join a sect, duel a rival, seclusion, take a disciple, leave a sect, marry; people with an active hero quest stay put);
   - fills empty seats (`fillEmptySeats`: an elder, else a generated one) — the dead chief's map spot and quests pass to the heir (`heirId`, `questHolder`, `heldQuests`); `withChargesOfDead` moves or fails active quests of the newly dead;
@@ -414,7 +415,7 @@ Content changes need **no save version bump**. Removed ids are dropped on load.
 ## Gotchas
 
 - **Store warnings.** `test:law`, `test:grid`, `test:grid-ai` and `test:quests` print harmless `[zustand persist middleware] Unable to update item` warnings.
-- **Quests are one-shot.** `abandonQuest` fails a quest for good (it can't be re-accepted) — except lineage quests, saga chapters and sect art trials, which it forgets so they come back. Leaving a sect blocks rejoining it.
+- **Dropped quests come back.** `abandonQuest` forgets any quest so it is offered again; `flags["qdropped:<id>"]` makes `applyEffects` skip the gifts of its start (and of stages already entered) when it is taken again (unsellable items are only topped up). A sect left by resigning can be rejoined after 30 days; a betrayed one only after its redemption quest.
 - **`_setFlag` looks dev-only but isn't.** The quest-log pin (`trackedQuestId`) and the rumor banner use it.
 - **Advisory audits fail by design.** `audit-quest-counts.ts`, `audit-complete-scenes.ts` and `audit-quest-flow.ts` report known false positives.
 - **`sharp`** is used by the image scripts but comes in through Next; it is not in `package.json`.

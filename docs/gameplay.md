@@ -201,7 +201,7 @@ Each foe lives in some of eleven biomes, and each place and road has its own (`l
 | swamp | marshy valleys, snake isles, poison caves | snakes, centipedes, poisoners, pythons |
 | cave | caves and grottoes | bats, centipedes, bears, cultists |
 
-Foes also grow with your **power**: the larger of `day / 200` and your sect standing (how far up your sect's own ladder you have climbed, 0 at entry and 1 at the top, weighed by time in the sect: full after 60 days — so joining a sect adds nothing at once), capped at 1. As power rises:
+Foes also grow with your **power**: the larger of your days in the jianghu `/ 200` (counted from the day your hero started, not the world's day) and your sect standing (how far up your sect's own ladder you have climbed — the best rank you ever held — 0 at entry and 1 at the top, weighed by time in the sect: full after 60 days, so joining a sect adds nothing at once), capped at 1. As power rises:
 
 - the mix shifts from tier 0–1 toward tiers 3–4;
 - elite foes appear, and from power 0.6 the six **tier-5** foes (rarer than tier 4): the nameless sword hermit, the blood blade lord, the poison matriarch, the heretic iron monk, the white tiger and the wolf king with his pack (power tiers 9–10);
@@ -276,7 +276,7 @@ Walk up to a person and talk. The NPC card offers what that person supports:
 
 ## Quests and tracking
 
-There are 1,074 quests: the 15-chapter main story (เนื้อเรื่องหลัก, [story-writing.md](story-writing.md#the-main-story)), one older main quest, 485 side quests (97 sect quests, 113 lineage quests and 97 place quests) and 573 story chapters in 48 sagas (38 sect sagas, 10 [jianghu sagas](story-quests.md#jianghu-sagas)) — see [Lineage quests and sagas](#lineage-quests-and-sagas).
+There are 1,075 quests: the 15-chapter main story (เนื้อเรื่องหลัก, [story-writing.md](story-writing.md#the-main-story)), one older main quest, 486 side quests (98 sect quests, 113 lineage quests and 97 place quests) and 573 story chapters in 48 sagas (38 sect sagas, 10 [jianghu sagas](story-quests.md#jianghu-sagas)) — see [Lineage quests and sagas](#lineage-quests-and-sagas).
 
 - **Accepting.** Most quests are offered by a person (the **!** mark). Sect quests are taken in the สำนัก menu.
 - **Stages.** A quest has 1–4 stages. The quest log (ภารกิจ) shows each one with ✓ done, ▸ current and ○ still ahead.
@@ -296,7 +296,7 @@ There are 1,074 quests: the 15-chapter main story (เนื้อเรื่�
   - where to go (📍 with the number of roads left).
 
   On the map a jade arrow bobs over the target, or over the exit toward it. An edge pointer shows the way when the target is off screen (or behind the HUD); it never hides under the HUD. **➤ นำทาง** in the log points the arrow at a quest.
-- **Abandoning** (ละทิ้งภารกิจ) fails the quest for good. It can never be taken again.
+- **Abandoning** (ละทิ้งภารกิจ) forgets the quest and its progress: its giver offers it again. What it handed you when you took it (or at a step you had already passed) is not given twice — a lost letter or key comes back, but not gold or anything you could sell.
 - **Losing the giver.** A quest fails when its giver, one of the simulated masters, dies. Lineage quests and saga chapters don't.
 
 ### Lineage quests and sagas
@@ -365,9 +365,11 @@ There are 15 joinable sects and 5 more sect grounds you can only visit.
   - Sect quests pay sect points, and a rank-up spends them: 6250 points in total on a 9-rank ladder, 1850 on a 5-rank ladder, 1600 for กู่มู่.
   - A rank-up pays gold (half the points it costs) and opens more of the sect's lineage quests and sagas. Ranks grant no martial arts: every sect skill and art comes **only** from its lineage quest or saga. The 🎖 ขั้นและวิชา tab lists the tier 0–3 ones (as วิชาลึกลับ until learned) with what each still needs; tier-4 moves stay off the list.
 - **Sect quests** (📜 ภารกิจประจำ) can repeat, each 30 days after you last completed it. Some need a minimum rank, and each sect has one art quest. Art quests teach nothing now: eight are trials that open the lineage quest of their tier-3 art (in the sect window), and seven are secret trials that open a saga (offered only by their giver).
-- **Leaving** (in the sect menu) — either way, you can never join that sect again:
-  - **ลาออกอย่างเป็นทางการ** (resign): you keep the skills, but that sect's skills and arts stop gaining xp in battle.
-  - **ทรยศสำนัก** (betray): evil +5, and the sect's hunter (a tier-4 foe) may ambush you on 30 % of walk ticks. The sect's redemption quest ends the hunt by turning the betrayal into a resignation. สำนักสราญรมย์ has no redemption quest.
+- **Joining.** The intro quest's reward admits you only if you still meet the sect's own rules when you hand it in (`joinRequirements`, no other sect, not a betrayer of it); if not, ask again later on the master's card (🪷 ขอเข้าเป็นศิษย์). One sect at a time.
+- **Leaving** (in the sect menu), whichever way, and whether by the menu, a quest reward or a scene, is logged and talked about:
+  - **ลาออกอย่างเป็นทางการ** (resign): you keep the skills, but that sect's skills and arts stop gaining xp from **every** source (battle, practice, w-exp, quest xp) until you come back. **Rejoining:** 30 days after leaving (`REJOIN_COOLDOWN_DAYS`), the master's card offers 🪷 ขอกลับเข้า… — you start again at the first rank with no points (lineage quests, sagas and art trials you finished stay done), the skills thaw, and climbing back to a rank you held before pays no gold again. The sect menu's สำนักเดิม list shows how long is left.
+  - **ทรยศสำนัก** (betray): evil +5, and the sect's hunter (a tier-4 foe) may ambush you on 30 % of walk ticks. No way back in until the sect's redemption quest (every sect has one, offered by its master to a betrayer) turns the betrayal into a resignation; the 30-day wait then counts from the forgiveness.
+- **Only a disciple in good standing** ranks up or takes the sect's quests (the store's sect actions check it, not just the menu).
 
 Full sect data: [reference/sects.md](reference/sects.md).
 
@@ -644,7 +646,4 @@ Talk passes with time: news lasts 20 days (big news 40), and once you have heard
 
 These are real today and listed in [HANDOFF.md](../HANDOFF.md#known-issues):
 
-- An abandoned quest can never be taken again.
-- Leaving a sect blocks rejoining it forever. สำนักสราญรมย์ has no redemption quest, so its hunters never stop.
-- Resigning freezes battle xp only; practice and w-exp still raise frozen sect skills.
 - Market and sect-internal rumors are hard to reach, and heartland inns never hear the masters' news.

@@ -31,18 +31,23 @@ const TIER_SPAWN_WEIGHT = { 0: 8, 1: 5, 2: 3, 3: 1.5, 4: 0.5, 5: 0 } as const;
 
 // Player power index (0..1). Drives dynamic tier weights + the
 // OPPONENT_STAT_SCALE multiplier on random opponent base stats.
-//   - early game (day 1, no sect): power = 0 → unchanged behavior
-//   - late game (day 200+ OR sect rank ≤ 1): power = 1 → harder pool
+//   - early game (the hero's first day, no sect): power = 0 → unchanged behavior
+//   - late game (200+ days since the hero's start OR sect rank ≤ 1): power = 1
+// The days are the hero's own (`day - startDay`, daysInJianghu), not the world
+// clock's: the world day is the same for every hero, however new.
 import type { WorldStateData } from "../types";
+import { daysInJianghu } from "../clock";
 import { setOpponentStatScale } from "./opponents";
 import type { SectId, SectMembership } from "../types";
 import { SECT_MEMBERSHIPS } from "./sect-memberships";
 
 export function playerPowerIndex(state: WorldStateData): number {
-  let p = state.day / 200;
+  let p = daysInJianghu(state) / 200;
   for (const m of Object.values(state.sectMembership)) {
     if (!m) continue;
-    // Sect rank: progress up its own ladder, weighed by time in the sect.
+    // Sect rank: progress up its own ladder (the best rank ever held — a
+    // disciple who left and came back starts again at the first rank but has
+    // not forgotten how to fight), weighed by time in the sect.
     const rankPower = sectRankPower(state, m);
     if (rankPower > p) p = rankPower;
   }
@@ -65,8 +70,10 @@ export function sectRankPower(state: Pick<WorldStateData, "day" | "sectMembershi
   const start = def?.startRank ?? 9;
   const top = def?.topRank ?? 1;
   const span = Math.max(1, start - top);
-  const progress = Math.max(0, Math.min(1, (start - m.rank) / span));
-  const tenure = Math.max(0, Math.min(1, (state.day - (m.joinedDay ?? state.day)) / SECT_TENURE_DAYS));
+  const best = Math.min(m.rank, m.bestRank ?? m.rank);
+  const progress = Math.max(0, Math.min(1, (start - best) / span));
+  // A member who came back to a rank they once held keeps their seasoning.
+  const tenure = best < m.rank ? 1 : Math.max(0, Math.min(1, (state.day - (m.joinedDay ?? state.day)) / SECT_TENURE_DAYS));
   return progress * tenure;
 }
 

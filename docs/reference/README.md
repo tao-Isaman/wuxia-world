@@ -26,8 +26,8 @@ Generated lists of everything in the game, taken straight from the data tables. 
 | Painted maps (hand-placed / auto layout) | 3 / 97 |
 | Sect locations / memberships | 20 / 15 |
 | NPCs | 235 |
-| Quests | 1074 |
-| Quest stages | 2920 |
+| Quests | 1075 |
+| Quest stages | 2923 |
 | Move skills / inner arts / equipment | 191 / 117 / 76 |
 | Items | 485 |
 | Shops / martial halls / artisans | 19 / 7 / 49 |

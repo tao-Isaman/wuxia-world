@@ -36,7 +36,7 @@
     "test:online": "bun scripts/test-online-server.ts",
     "server:dev": "cd server/worker && npx -y wrangler@4.148.0 dev --port 8787 --ip 127.0.0.1",
     "server:deploy": "cd server/worker && npx -y wrangler@4.148.0 deploy",
-    "test:systems": "bun scripts/test-systems.ts",
+    "test:systems": "bun scripts/test-systems.ts && bun scripts/test-sects.ts",
     "test:foes": "bun scripts/test-foes.ts",
     "test:quests": "bun scripts/audit-quest-completion.ts && bun scripts/test-quest-dead-ends.ts && bun scripts/test-quest-dialogs.ts && bun scripts/test-quest-turnins.ts && bun scripts/test-quest-guide.ts && bun scripts/test-bad-action-quests.ts",
     "test:engine": "bun scripts/test-engine.ts",

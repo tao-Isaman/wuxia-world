@@ -3,6 +3,7 @@
 import type { DialogScene, SceneLine } from "@/lib/world";
 import { useWorldStore } from "@/store/world-store";
 import { RichText } from "./rich-text";
+import { voiceLabel } from "@/lib/world/speaker";
 
 interface Props {
   scene: DialogScene;
@@ -26,6 +27,9 @@ export function useHeroNamer() {
 // words are coloured (RichText).
 export function DialogDisplay({ scene, speakerName, lines, shown }: Props) {
   const named = useHeroNamer();
+  const npcExt = useWorldStore((s) => s.npcExt);
+  const assassinatedNpcIds = useWorldStore((s) => s.assassinatedNpcIds);
+  const world = { npcExt, assassinatedNpcIds };
   return (
     <div className="bg-ink/85 text-paper shadow-pixel p-4 space-y-3">
       {(lines ?? scene.lines).map((raw, i) => {
@@ -36,7 +40,8 @@ export function DialogDisplay({ scene, speakerName, lines, shown }: Props) {
             </p>
           );
         }
-        const speaker = named(raw.speaker);
+        // A dead person's lines are spoken by their stand-in (lib/world/speaker.ts).
+        const speaker = named(voiceLabel(world, scene.id, raw.speaker));
         return (
           <div key={i} className="space-y-1" data-line-kind="dialogue">
             {speaker !== speakerName && <div className="text-sm font-bold text-primary font-display">
