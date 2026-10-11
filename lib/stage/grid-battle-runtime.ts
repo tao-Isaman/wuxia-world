@@ -52,7 +52,8 @@ const HIT_DELAY = 300;
 const HIT_GAP = 110;
 const WALK_MS = 180;
 const STEP_PACE = 350;
-const TIER_COLORS = ["#f7edcf", "#b7e9cc", "#abd3ed", "#e3bcec", "#f4cc91"];
+// Cast-banner ink per tier (0–5); T5 (ปรมัตถ์) a vermilion gold of its own.
+const TIER_COLORS = ["#f7edcf", "#b7e9cc", "#abd3ed", "#e3bcec", "#f4cc91", "#ffb38a"];
 const TEAM_RING: Record<Team, number> = { ally: 0x6fd39a, enemy: 0xe7684a };
 const TEAM_HP: Record<Team, number> = { ally: 0x59c784, enemy: 0xe0553b };
 const TEAM_TAG: Record<Team, string> = { ally: "#c5f2d4", enemy: "#ffc9b6" };

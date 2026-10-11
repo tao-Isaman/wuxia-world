@@ -239,7 +239,7 @@ Battles are turn-based tactics on a board of 10 × 7 tiles, growing to 15 × 10 
 
 - **The warning first.** Every fight opens with a briefing before the board: the foe, its companions, and both sides' **power tier** — twelve named steps from สามัญชน to ยอดคนใต้หล้า, each with its own colour (names only, no numbers), scored from stats, inner arts and move skills, never equipment ([combat.md](combat.md#power-tiers)). The verdict reads อันตรายยิ่ง (foe 2+ tiers up), เหนือกว่าเล็กน้อย, สูสี, ด้อยกว่าเล็กน้อย or ด้อยกว่ามาก, and the note says whether a loss can kill. เข้าต่อสู้ (F / Enter) starts the fight; retreating is still possible inside it. The hero's own tier is on the profile.
 
-- **Units.** You are one unit. An accepted encounter can add the foe's companions (up to six); quest fights, spars and hunts are one against one.
+- **Units.** You are one unit. An accepted encounter or a hunt can add the foe's companions (up to six: a boar herd, the alpha wolf's dogs); quest fights and spars are one against one.
 - **Your turn.** Move, then use one of the (up to 10) skills or inner arts in your slots, or รอ (wait), or ถอยหนี (retreat).
 - **Retreat** succeeds 20–90 % by speed. It gives no rewards and costs the turn if it fails.
 - **อัตโนมัติ** lets the AI play for you.

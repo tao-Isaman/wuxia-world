@@ -24,6 +24,7 @@ import { getAnimSheet } from "../lib/characters/anim-sheets";
 import { migrateSave } from "../store/world/persist";
 import { rollVictorySpoils } from "../store/world/spoils";
 import { useWorldStore } from "../store/world-store";
+import { worldBattleSetup } from "../lib/world/battle-looks";
 
 let checks = 0;
 function check(name: string, run: () => void) { run(); checks++; console.log(`PASS ${name}`); }
@@ -316,6 +317,22 @@ check("spoils: beasts carry no gold; w-exp by kind and tier; beasts and bosses t
   }
   // Every boss drop is a real item.
   for (const b of BOSSES) for (const d of getOpponent(b.id)!.drops ?? []) assert.ok(getItem(d.itemId), d.itemId);
+});
+
+check("hunting brings the beast's pack onto the grid (a boar herd, the alpha wolf's dogs)", () => {
+  freshState();
+  // hunt_mountain lists hunt_alpha_wolf second: a draw of 0.3 picks it.
+  withRandom(0.3, () => {
+    const res = useWorldStore.getState().gatherResource("hunt_mountain");
+    assert.equal(res.ok, true);
+  });
+  const pending = useWorldStore.getState().pendingBattle!;
+  assert.equal(pending.opponentId, "hunt_alpha_wolf");
+  assert.equal(pending.withPack, true);
+  const setup = worldBattleSetup("hunt_alpha_wolf", { withPack: pending.withPack, power: 0 })!;
+  assert.equal(setup.enemies.length, 2, "two wild dogs come with the alpha");
+  assert.ok(setup.enemies.every((e) => e.id.endsWith(":hunt_wild_dog")));
+  assert.equal(worldBattleSetup("hunt_boar", { withPack: true, power: 0 })!.enemies.length, 1, "a boar brings one more");
 });
 
 console.log(`${checks} foe checks passed`);

@@ -485,7 +485,8 @@ export function createBattleVfx(scene: Phaser.Scene, view: () => { left: number;
           // A thin cut line across the target.
           add("streak", core, now, { x: at.x, y: at.y, w: 110 * scale * big, h: 6, rotation: facing + tilt * 0.8, life: 200, grow: 0.3 });
           if (vfx.shape === "heavy") {
-            for (let i = 0; i < 6 + t * 2; i++) add("spark", 0xc9a877, now, { x: at.x + (rand(i) - 0.5) * 40, y: 369, w: 12, h: 8,
+            // Debris kicked up at the target's feet (the same ground line as the earth chips).
+            for (let i = 0; i < 6 + t * 2; i++) add("spark", 0xc9a877, now, { x: at.x + (rand(i) - 0.5) * 40, y: at.y + 40, w: 12, h: 8,
               vx: (rand(i * 3) - 0.5) * 120, vy: -30 - rand(i * 5) * 50, ay: 160, life: 480 }, { blend: "normal", depth: 12 });
           }
           break;
