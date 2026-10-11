@@ -13,14 +13,6 @@ export const NPCS_HENGSHAN_SOUTH: readonly NpcDef[] = [
     dialogSceneId: "npc_sect_hengshan_south_master_modaxiansheng_talk",
     sparOpponentId: "spar_hengshan_south_master",
     sparFameReward: 12,
-    questIds: [
-      "qst_hengshan_south_disciple_intro",
-      "qst_hengshan_south_sect_patrol",
-      "qst_hengshan_south_sect_silk",
-      "qst_hengshan_south_sect_herb",
-      "qst_hengshan_south_art_swiftblade",
-      "qst_hengshan_south_redemption",
-    ],
     defenseTier: 3,
     stealLoot: [
       { itemId: "iron_ore", weight: 4 },

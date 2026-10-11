@@ -4,10 +4,10 @@ import assert from "node:assert/strict";
 import { getSkill } from "../lib/game";
 import { advanceTestClock, msAtWorld, setTestClock, setTestWorldTime } from "../lib/world/clock";
 import { xpToNextLevel } from "../lib/game/leveling";
-import { PRACTICE_XP, practiceXpGain } from "../lib/world/location-categories";
+import { PRACTICE_XP, canPracticeAt, inferCategoriesFromId, isForestPlace, practiceMatches, practiceXpGain } from "../lib/world/location-categories";
 import { LETTER_RULES, giftRarity, letterChance, letterWriters, pickLetterGift, rollLetters } from "../lib/world/letters";
 import { giftable, giftWorth } from "../lib/world/gifts";
-import { getItem, getNpc } from "../lib/world/data";
+import { ARTISAN_PROFESSIONS, ARTISANS, FIELD_RECIPES, RECIPES, craftsAnywhere, getItem, getNpc, getRecipe, recipesOfferedBy } from "../lib/world/data";
 import { SECT_MEMBERSHIPS } from "../lib/world/data/sect-memberships";
 import { hasStation, stationFare, stationIds, stationTrips } from "../lib/world/stations";
 import {
@@ -53,6 +53,45 @@ check("practice: the store grants the new formula", () => {
   if (!result.ok || result.kind !== "skill") return;
   assert.equal(result.xpGained, practiceXpGain(result.matched, xpToNextLevel(skill, lv)));
   assert.ok((store().skillExp[skill.id] ?? 0) >= before || result.leveledUp);
+});
+
+check("practice: forest places (by their land) give the forest bonus; the prefix rule still holds", () => {
+  for (const id of ["valley_baihua", "valley_hudie", "cave_jinshe", "mt_wuliang", "isle_taohua"]) {
+    assert.ok(isForestPlace(id), id);
+    assert.ok(inferCategoriesFromId(id).includes("forest"), id);
+    assert.ok(canPracticeAt({ id }), id);
+    assert.ok(practiceMatches({ id }, ["yang"]), `${id} fits yang`);
+  }
+  for (const id of ["city_capital", "village_niujia", "sect_shaolin", "cave_bingcan", "home_player"]) {
+    assert.equal(inferCategoriesFromId(id).includes("forest"), false, id);
+  }
+  assert.deepEqual(inferCategoriesFromId("forest_new"), ["forest"]);
+  assert.deepEqual(inferCategoriesFromId("valley_baihua"), ["mountain", "forest"]);
+});
+
+// ─── Crafting by one's own trade ─────────────────────────────────────
+check("crafting: the hero's own trades' recipes (not artisan ones) craft anywhere, without a bought recipe", () => {
+  const skills = new Set(FIELD_RECIPES.map((r) => r.skill));
+  assert.equal(FIELD_RECIPES.length, RECIPES.filter((r) => !r.skill || !ARTISAN_PROFESSIONS.has(r.skill)).length);
+  assert.ok(FIELD_RECIPES.length >= 12, `${FIELD_RECIPES.length} field recipes`);
+  for (const s of ["mining", "hunting", "fishing", "herbalism", "venom", "woodcutting", "drawing", "writing"]) assert.ok(skills.has(s as never), s);
+  for (const r of FIELD_RECIPES) assert.ok(craftsAnywhere(r) && !ARTISAN_PROFESSIONS.has(r.skill!), r.id);
+  newGame();
+  const recipe = getRecipe("cook_meat")!;
+  const inventory: Record<string, number> = {};
+  for (const inp of recipe.inputs) inventory[inp.itemId] = inp.count;
+  useWorldStore.setState({ currentSceneId: "home_player", inventory, learnedRecipeIds: [] });
+  const res = store().craftRecipe(recipe.id);
+  assert.ok(res.ok, JSON.stringify(res));
+  assert.equal(store().inventory[recipe.output.itemId], recipe.output.count);
+  for (const inp of recipe.inputs) assert.equal(store().inventory[inp.itemId] ?? 0, 0);
+  // An artisan recipe still needs the artisan.
+  assert.equal(store().craftRecipe("forge_iron_sword").ok, false);
+  // ...and every artisan recipe is sold by some artisan of its profession.
+  for (const r of RECIPES.filter((x) => !craftsAnywhere(x))) {
+    const sellers = ARTISANS.filter((a) => a.profession === r.skill && recipesOfferedBy(a).some((o) => o.recipeId === r.id));
+    assert.ok(sellers.length > 0, `${r.id} is sold nowhere`);
+  }
 });
 
 // ─── Letters ─────────────────────────────────────────────────────────

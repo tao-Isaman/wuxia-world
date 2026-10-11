@@ -1,7 +1,12 @@
 import type {
+  ArtActive,
+  ArtActiveType,
+  AttackType,
   BattleState,
   CharacterBuild,
+  Derived,
   Side,
+  SideBattleState,
   Skill,
   StatBlock,
 } from "./types";
@@ -261,6 +266,130 @@ export function decrementCooldowns(state: BattleState, side: Side): void {
   state.iaCD[side] = Math.max(0, state.iaCD[side] - 1);
 }
 
+// ─── Shared attack modifiers (moves and art actives) ───
+
+/**
+ * The Atk-term multiplier: attack stacks, gear `pct_atk`, the attacker's
+ * `debuff_atk` and the meridian / frenzy Atk % (clamped ≥ 0).
+ */
+export function atkStackMod(ast: SideBattleState, equipPctAtk: number): number {
+  let atkDebuff = 0;
+  for (const d of ast.debuffs) if (d.t === "debuff_atk" && d.v != null) atkDebuff += d.v;
+  return Math.max(0, 1 + (ast.stk * ast.stkV) / 100 + equipPctAtk / 100 + atkDebuff / 100 + atkPctOf(ast) / 100);
+}
+
+/** The IA multiplier from the attacker's `buff_iatk` records. */
+export function iatkBuffMod(ast: SideBattleState): number {
+  let iatkBuff = 0;
+  for (const b of ast.buffs) if (b.t === "buff_iatk") iatkBuff += b.v;
+  return 1 + iatkBuff / 100;
+}
+
+/** A `mult_iatk` / `mult_atk` passive's strength when its `v` is left out. */
+export const MULT_IATK_DEFAULT = 12;
+export const MULT_ATK_DEFAULT = 10;
+
+/**
+ * The primary art's damage passive for an attack of type `at`: `im` scales IA
+ * (`mult_iatk`, internal attacks only), `ab` the Atk term (`mult_atk`; with a
+ * `use_int` trigger only on internal attacks). A chance below 100 is rolled,
+ * or folded in as its expected value when `expected` (the grid AI).
+ */
+export function artDamageMults(
+  artId: string | null | undefined,
+  at: AttackType,
+  expected = false,
+): { im: number; ab: number } {
+  const out = { im: 1, ab: 1 };
+  if (!artId || !at) return out;
+  const pas = getArt(artId).pas;
+  if (!pas || (pas.e.t !== "mult_iatk" && pas.e.t !== "mult_atk")) return out;
+  if (pas.e.t === "mult_iatk" && at !== "int") return out;
+  if (pas.tr === "use_int" && at !== "int") return out;
+  const ch = Math.max(0, Math.min(100, pas.ch)) / 100;
+  let share = 1;
+  if (ch < 1) {
+    if (expected) share = ch;
+    else if (Math.random() >= ch) return out;
+  }
+  if (pas.e.t === "mult_iatk") out.im = 1 + (share * (pas.e.v ?? MULT_IATK_DEFAULT)) / 100;
+  else out.ab = 1 + (share * (pas.e.v ?? MULT_ATK_DEFAULT)) / 100;
+  return out;
+}
+
+/** Weapon-mastery multiplier for one family: `1 + mastery/200 × 0.5` (max ×1.5). */
+export function masteryMod(mastery: number): number {
+  return 1 + (Math.max(0, Math.min(200, mastery)) / 200) * 0.5;
+}
+
+/**
+ * Mastery for an art active. An art has no weapon family of its own, so it
+ * draws on the caster's best family (the inner force flows through the hands
+ * or the weapon they know best).
+ */
+export function artMasteryMod(masteries: MasteryMap): number {
+  let best = 0;
+  for (const v of Object.values(masteries)) if (typeof v === "number" && v > best) best = v;
+  return masteryMod(best);
+}
+
+/** The attack type of a damaging art active, or null for heals / buffs / poison. */
+export function artActiveAttack(t: ArtActiveType): "phy" | "int" | null {
+  switch (t) {
+    case "atk_phy_pen":
+    case "drain_phy":
+      return "phy";
+    case "atk_int_pen":
+    case "drain":
+    case "drain_acc":
+    case "debuff_acc_dmg":
+      return "int";
+    default:
+      return null;
+  }
+}
+
+/** One side of an art active's damage roll. */
+export interface ArtHitSide {
+  d: Derived;
+  st: SideBattleState;
+  equip: EquipBonus;
+}
+
+/**
+ * Raw (pre-crit, pre-riposte) damage of a damaging art active, with the same
+ * modifiers as a move: Atk × stacks / gear `pct_atk` / `debuff_atk` / meridian
+ * Atk %, IA × `buff_iatk` and the primary art's damage passive, mastery (the
+ * caster's best family), the target's PD / ID % and `buff_def` − `debuff_def`,
+ * and `buff_reduce` + gear `pct_reduce` (capped at PCT_REDUCE_CAP).
+ * 0 for actives that deal no damage.
+ */
+export function artActiveRaw(
+  act: Pick<ArtActive, "t" | "m" | "dm" | "pen">,
+  atk: ArtHitSide & { masteries: MasteryMap; primaryArtId: string | null | undefined },
+  def: ArtHitSide,
+  expected = false,
+): number {
+  const kind = artActiveAttack(act.t);
+  if (!kind) return 0;
+  const mul = act.t === "debuff_acc_dmg" ? act.dm ?? 1 : act.m ?? 1;
+  const pen = act.t === "atk_phy_pen" || act.t === "atk_int_pen" ? act.pen ?? 0 : 0;
+  const sm = atkStackMod(atk.st, atk.equip.pct_atk);
+  const pm = artDamageMults(atk.primaryArtId, kind, expected);
+  const ta = kind === "phy" ? atk.d.PA : atk.d.IA * iatkBuffMod(atk.st) * pm.im;
+  let fD = 0, pR = 0, dR = 0;
+  for (const b of def.st.buffs) {
+    if (b.t === "buff_def") fD += b.v;
+    if (b.t === "buff_reduce") pR += b.v;
+  }
+  for (const d of def.st.debuffs) if (d.t === "debuff_def" && d.v != null) dR += Math.abs(d.v);
+  pR = Math.min(PCT_REDUCE_CAP, pR + def.equip.pct_red);
+  const defMul = 1 + defPctOf(def.st) / 100;
+  const pierce = 1 - Math.max(0, Math.min(100, pen)) / 100;
+  const ed = Math.max(0, (kind === "phy" ? def.d.PD : def.d.ID) * defMul * pierce + fD - dR);
+  return Math.max(1, (atk.d.Atk * sm * pm.ab + ta) * mul * artMasteryMod(atk.masteries) - ed) * (1 - pR / 100);
+}
+
 // ─── Damage calculation ───
 export interface DamageResult {
   hit: boolean;
@@ -293,22 +422,14 @@ export function calcSkillDamage(
   const aid = ctx.artIds[side];
   const riposte = sk.at === "phy" ? consumeRiposte(state, side) : 1;
 
-  // IAtk multiplier from buff_iatk + art-specific bonuses
-  let iatkBuff = 0;
-  for (const b of ast.buffs) if (b.t === "buff_iatk") iatkBuff += b.v;
+  // IAtk multiplier from buff_iatk and the primary art's damage passive
+  // (mult_iatk on IA, mult_atk on the Atk term).
+  const pm = artDamageMults(aid, sk.at);
+  const im = iatkBuffMod(ast) * pm.im;
+  const ab = pm.ab;
 
-  let im = 1 + iatkBuff / 100;
-  const ab = 1;
-  if (aid === "taiji" && sk.at === "int") im = (1 + iatkBuff / 100) * 1.12;
-
-  // Stack ATK + equipment %ATK
-  // debuff_atk on attacker reduces the multiplier (clamped ≥ 0).
-  let atkDebuff = 0;
-  for (const d of ast.debuffs) if (d.t === "debuff_atk" && d.v != null) atkDebuff += d.v;
-  const sm = Math.max(
-    0,
-    1 + (ast.stk * ast.stkV) / 100 + ctx.equipBonus[side].pct_atk / 100 + atkDebuff / 100 + atkPctOf(ast) / 100,
-  );
+  // Stack ATK + equipment %ATK; debuff_atk on the attacker lowers it (≥ 0).
+  const sm = atkStackMod(ast, ctx.equipBonus[side].pct_atk);
 
   // Effective Acc / Eva with debuffs/buffs
   let ea = ad.Acc * (1 + accPctOf(ast) / 100);
@@ -330,8 +451,7 @@ export function calcSkillDamage(
   pR = Math.min(PCT_REDUCE_CAP, pR + ctx.equipBonus[ds].pct_red);
 
   // Mastery multiplier
-  const mas = ctx.masteries[side][sk.w] ?? 0;
-  const mm = 1 + (mas / 200) * 0.5;
+  const mm = masteryMod(ctx.masteries[side][sk.w] ?? 0);
 
   // Damage formula. `bp` is scaled by the skill's level (lv1 → 50%, lv10 → 100%)
   // AND by any conflict factor on the skill's type tags (half / zero).
@@ -355,11 +475,9 @@ export function calcSkillDamage(
   const crit = Math.random() * 100 < cp;
   const dmg = Math.round(raw * riposte * (crit ? CRIT_MULTIPLIER : 1));
 
-  let reflectDmg = 0;
-  if (ref > 0) {
-    reflectDmg = Math.round(dmg * ref / 100);
-    state.st[ds].buffs = dst.buffs.filter((b) => b.t !== "buff_reflect");
-  }
+  // The reflect is used up by the whole attack (resolveSkill drops it after
+  // the last hit), so every landed hit of a multi-hit move reflects its share.
+  const reflectDmg = ref > 0 ? Math.round(dmg * ref / 100) : 0;
 
   return { hit: true, dmg, crit, hpPct: Math.round(hp), critPct: Math.round(cp), reflectDmg };
 }
@@ -437,6 +555,7 @@ export function resolveSkill(
     const hitMisses: boolean[] = [];
     let firstProbe = "";
     let landed = false;
+    let reflected = false;
     for (let h = 0; h < hitCount; h++) {
       if (state.winner) break;
       const res = calcSkillDamage(state, side, skill, ctx);
@@ -478,8 +597,10 @@ export function resolveSkill(
         logLine(state, "lS", `&nbsp;→ ดูด ${heal} HP`);
       }
 
-      // Reflect on caster (per-hit; consumes the buff stack on first reflect)
+      // Reflect on the caster: each landed hit reflects its share; the
+      // buff is consumed once the whole cast is over (below).
       if (res.reflectDmg > 0) {
+        reflected = true;
         const reflectPerHit = Math.round(res.reflectDmg / hitCount);
         if (side === "A") state.hA = Math.max(0, state.hA - reflectPerHit);
         else state.hB = Math.max(0, state.hB - reflectPerHit);
@@ -508,6 +629,7 @@ export function resolveSkill(
       checkWin(state, ctx.names);
     }
 
+    if (reflected) state.st[ds].buffs = state.st[ds].buffs.filter((b) => b.t !== "buff_reflect");
     // Meridian saps roll once per target an attack landed on.
     if (landed && !state.winner) rollSaps(state, side, ctx.meridian[side]);
     // Emit cast event for the UI overlay (skill name + per-hit damages).
@@ -616,6 +738,19 @@ export function resolveArtActive(
       return false;
     }
 
+    state.turn++;
+    if (opts?.tick !== false)
+      tickEffects(state, ctx.equipBonus.A.hp_regen, ctx.equipBonus.B.hp_regen, ctx.names, ctx.artIds.A, ctx.artIds.B);
+    if (state.winner) return true;
+
+    // A stunned caster loses the turn before paying anything (like a move:
+    // no MP, no cooldown, no use recorded).
+    if (isStunned(state, side)) {
+      const stunCls = side === "A" ? "lA" : "lB";
+      logLine(state, stunCls, `[${state.turn}] ${escapeBattleText(ctx.names[side])} <span style="color:#AAA">ถูกสตัน — ข้ามตา!</span>`);
+      return true;
+    }
+
     if (side === "A") state.mpA -= act.c;
     else state.mpB -= act.c;
     if (typeof slotIdx === "number") state.cd[side][slotIdx] = act.cd;
@@ -623,18 +758,8 @@ export function resolveArtActive(
 
     // Track art active uses for the world's per-art XP track.
     state.artUses[side][art.id] = (state.artUses[side][art.id] ?? 0) + 1;
-
-    state.turn++;
-    if (opts?.tick !== false)
-      tickEffects(state, ctx.equipBonus.A.hp_regen, ctx.equipBonus.B.hp_regen, ctx.names, ctx.artIds.A, ctx.artIds.B);
   }
   if (state.winner) return true;
-
-  if (!secondary && isStunned(state, side)) {
-    const stunCls = side === "A" ? "lA" : "lB";
-    logLine(state, stunCls, `[${state.turn}] ${escapeBattleText(ctx.names[side])} <span style="color:#AAA">ถูกสตัน — ข้ามตา!</span>`);
-    return true;
-  }
   // Blind: the art is spent (MP, cooldown) but its power goes astray.
   if (!secondary && !opts?.blindChecked && rollBlind(state.st[side])) {
     logLine(state, side === "A" ? "lA" : "lB", `[${state.turn}] ${blindFailLine(ctx.names[side])} ⚡<b>${act.n}</b>`);
@@ -645,28 +770,26 @@ export function resolveArtActive(
   const cls = side === "A" ? "lA" : "lB";
   const nm = escapeBattleText(ctx.names[side]);
   const ds = opposite(side);
-  const ad0 = side === "A" ? state.dA : state.dB;
-  const dd0 = ds === "A" ? state.dA : state.dB;
+  const ad = side === "A" ? state.dA : state.dB;
+  const dd = ds === "A" ? state.dA : state.dB;
   const dst = state.st[ds];
-  // Meridian % statuses: the attacker's Atk +%, the defender's PD / ID +%.
-  const atkMul = 1 + atkPctOf(state.st[side]) / 100;
-  const defMul = 1 + defPctOf(dst) / 100;
-  const ad = atkMul === 1 ? ad0 : { ...ad0, Atk: ad0.Atk * atkMul };
-  const dd = defMul === 1 ? dd0 : { ...dd0, PD: dd0.PD * defMul, ID: dd0.ID * defMul };
   let landed = false;
 
-  let fD = 0, pR = 0, ref = 0;
-  const riposte = act.t === "atk_phy_pen" || act.t === "drain_phy" ? consumeRiposte(state, side) : 1;
-  for (const b of dst.buffs) {
-    if (b.t === "buff_def") fD += b.v;
-    if (b.t === "buff_reduce") pR += b.v;
-    if (b.t === "buff_reflect") ref = b.v;
-  }
+  let ref = 0;
+  const riposte = artActiveAttack(act.t) === "phy" ? consumeRiposte(state, side) : 1;
+  for (const b of dst.buffs) if (b.t === "buff_reflect") ref = b.v;
+  // The damage roll, with every modifier a move gets (artActiveRaw).
+  const rawDamage = () =>
+    artActiveRaw(
+      act,
+      { d: ad, st: state.st[side], equip: ctx.equipBonus[side], masteries: ctx.masteries[side], primaryArtId: ctx.artIds[side] },
+      { d: dd, st: dst, equip: ctx.equipBonus[ds] },
+    );
 
   // Cast tracking — emitCast at the bottom uses these.
   let castDmg = 0;
   let castCrit = false;
-  const castMiss = false;
+  let castMiss = false;
 
   const probe = (hp: number, cp: number) => `<span class="lp">[hit${hp}% crit${cp}%]</span>`;
 
@@ -740,10 +863,10 @@ export function resolveArtActive(
     case "atk_phy_pen": {
       const hc = computeMissProbe();
       if (Math.random() * 100 >= hc.hp) {
+        castMiss = true;
         logLine(state, cls, `[${state.turn}] ${nm} ⚡<b>${act.n}</b> → <span style="color:#AAA">พลาด!</span> ${probe(hc.hp, hc.cp)}`);
       } else {
-        const m = act.m ?? 1, pen = act.pen ?? 0;
-        const raw = Math.max(1, (ad.Atk + ad.PA) * m - (dd.PD * (1 - pen / 100) + fD)) * (1 - pR / 100);
+        const raw = rawDamage();
         const r = doAtkHit(raw, hc);
         const dt = r.crit ? `<span class="lC">★CRIT! ${r.dmg}</span>` : `<b>${r.dmg}</b>`;
         logLine(state, cls, `[${state.turn}] ${nm} ⚡<b>${act.n}</b>⚔ ${dt} ${probe(hc.hp, hc.cp)}`);
@@ -754,10 +877,10 @@ export function resolveArtActive(
     case "atk_int_pen": {
       const hc = computeMissProbe();
       if (Math.random() * 100 >= hc.hp) {
+        castMiss = true;
         logLine(state, cls, `[${state.turn}] ${nm} ⚡<b>${act.n}</b> → <span style="color:#AAA">พลาด!</span> ${probe(hc.hp, hc.cp)}`);
       } else {
-        const m = act.m ?? 1, pen = act.pen ?? 0;
-        const raw = Math.max(1, (ad.Atk + ad.IA) * m - (dd.ID * (1 - pen / 100) + fD)) * (1 - pR / 100);
+        const raw = rawDamage();
         const r = doAtkHit(raw, hc);
         const dt = r.crit ? `<span class="lC">★CRIT! ${r.dmg}</span>` : `<b>${r.dmg}</b>`;
         logLine(state, cls, `[${state.turn}] ${nm} ⚡<b>${act.n}</b>💜 ${dt} ${probe(hc.hp, hc.cp)}`);
@@ -783,10 +906,10 @@ export function resolveArtActive(
     case "drain": {
       const hc = computeMissProbe();
       if (Math.random() * 100 >= hc.hp) {
+        castMiss = true;
         logLine(state, cls, `[${state.turn}] ${nm} ⚡<b>${act.n}</b> → <span style="color:#AAA">พลาด!</span> ${probe(hc.hp, hc.cp)}`);
       } else {
-        const m = act.m ?? 1;
-        const raw = Math.max(1, (ad.Atk + ad.IA) * m - (dd.ID + fD)) * (1 - pR / 100);
+        const raw = rawDamage();
         const r = doAtkHit(raw, hc);
         const heal = healHp(state, side, Math.round(r.dmg * (act.h ?? 0) / 100));
         const dt = r.crit ? `<span class="lC">★CRIT! ${r.dmg}</span>` : `<b>${r.dmg}</b>`;
@@ -798,10 +921,10 @@ export function resolveArtActive(
     case "drain_phy": {
       const hc = computeMissProbe();
       if (Math.random() * 100 >= hc.hp) {
+        castMiss = true;
         logLine(state, cls, `[${state.turn}] ${nm} ⚡<b>${act.n}</b> → <span style="color:#AAA">พลาด!</span> ${probe(hc.hp, hc.cp)}`);
       } else {
-        const m = act.m ?? 1;
-        const raw = Math.max(1, (ad.Atk + ad.PA) * m - (dd.PD + fD)) * (1 - pR / 100);
+        const raw = rawDamage();
         const r = doAtkHit(raw, hc);
         const heal = healHp(state, side, Math.round(r.dmg * (act.h ?? 0) / 100));
         const dt = r.crit ? `<span class="lC">★CRIT! ${r.dmg}</span>` : `<b>${r.dmg}</b>`;
@@ -814,10 +937,10 @@ export function resolveArtActive(
       addDebuff(state, ds, { t: "debuff_acc", n: "จุดจำ", v: act.adv ?? 0, u: 2 });
       const hc = computeMissProbe();
       if (Math.random() * 100 >= hc.hp) {
+        castMiss = true;
         logLine(state, cls, `[${state.turn}] ${nm} ⚡<b>${act.n}</b> → Acc${act.adv} + <span style="color:#AAA">พลาด!</span> ${probe(hc.hp, hc.cp)}`);
       } else {
-        const m = act.m ?? 1;
-        const raw = Math.max(1, (ad.Atk + ad.IA) * m - (dd.ID + fD)) * (1 - pR / 100);
+        const raw = rawDamage();
         const r = doAtkHit(raw, hc);
         const heal = healHp(state, side, Math.round(r.dmg * (act.h ?? 0) / 100));
         const dt = r.crit ? `<span class="lC">★CRIT! ${r.dmg}</span>` : `<b>${r.dmg}</b>`;
@@ -831,10 +954,10 @@ export function resolveArtActive(
       addDebuff(state, ds, { t: "debuff_acc", n: "สับสน", v: act.ad ?? 0, u: act.u ?? 2 });
       const hc = computeMissProbe();
       if (Math.random() * 100 >= hc.hp) {
+        castMiss = true;
         logLine(state, cls, `[${state.turn}] ${nm} ⚡<b>${act.n}</b> → Acc${act.ad} + <span style="color:#AAA">พลาด!</span> ${probe(hc.hp, hc.cp)}`);
       } else {
-        const dm = act.dm ?? 1;
-        const raw = Math.max(1, (ad.Atk + ad.IA) * dm - (dd.ID + fD)) * (1 - pR / 100);
+        const raw = rawDamage();
         const r = doAtkHit(raw, hc);
         const dt = r.crit ? `<span class="lC">★CRIT! ${r.dmg}</span>` : `<b>${r.dmg}</b>`;
         logLine(state, cls, `[${state.turn}] ${nm} ⚡<b>${act.n}</b> → Acc${act.ad} + ${dt} ${probe(hc.hp, hc.cp)}`);
@@ -890,7 +1013,7 @@ export function resolveArtActive(
     1,
     [castDmg],
     [castCrit],
-    [castMiss && castDmg === 0],
+    [castMiss],
     art.ti,
     { kind: "art", id: art.id },
   );

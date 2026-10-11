@@ -27,9 +27,9 @@
 // touching state. Ties break on lower x, then y, then slot (deterministic).
 // The AI never flees — retreat is the player's decision.
 
-import { PCT_REDUCE_CAP } from "../battle";
+import { artActiveRaw, artDamageMults, atkStackMod, iatkBuffMod, masteryMod, PCT_REDUCE_CAP } from "../battle";
 import { frenzyPct, isScorched } from "../effects";
-import { accPctOf, atkPctOf, criRateOf, defPctOf } from "../meridian-battle";
+import { accPctOf, criRateOf, defPctOf } from "../meridian-battle";
 import { critPct, CRIT_MULTIPLIER, hitPct } from "../damage";
 import { effectiveBp } from "../leveling";
 import { getStatusFactor } from "../skill-conflict";
@@ -108,18 +108,13 @@ function defenderMods(foe: GridUnit) {
 function estimateSkill(u: GridUnit, foe: GridUnit, sk: Skill): Estimate {
   if (!sk.at) return { expected: 0, onHit: 0, hit: hitPct(accuracy(u), evasion(foe)) / 100, crit: 0 };
   const ctx = pairContext(u, foe);
-  let iatk = 0;
-  for (const b of u.status.buffs) if (b.t === "buff_iatk") iatk += b.v;
-  let im = 1 + iatk / 100;
-  const ab = 1;
-  const aid = ctx.artIds.A;
-  if (aid === "taiji" && sk.at === "int") im *= 1.12;
-  let atkDebuff = 0;
-  for (const d of u.status.debuffs) if (d.t === "debuff_atk" && d.v != null) atkDebuff += d.v;
-  const sm = Math.max(0, 1 + (u.status.stk * u.status.stkV) / 100 + ctx.equipBonus.A.pct_atk / 100 + atkDebuff / 100 + atkPctOf(u.status) / 100);
+  const pm = artDamageMults(ctx.artIds.A, sk.at, true);
+  const im = iatkBuffMod(u.status) * pm.im;
+  const ab = pm.ab;
+  const sm = atkStackMod(u.status, ctx.equipBonus.A.pct_atk);
   const { fD, dR } = defenderMods(foe);
   const pR = Math.min(PCT_REDUCE_CAP, defenderMods(foe).pR + ctx.equipBonus.B.pct_red);
-  const mm = 1 + ((ctx.masteries.A[sk.w] ?? 0) / 200) * 0.5;
+  const mm = masteryMod(ctx.masteries.A[sk.w] ?? 0);
   const lv = ctx.skillLevels.A[sk.id];
   const eBp = effectiveBp(sk, typeof lv === "number" ? lv : 1) * getStatusFactor(sk, ctx.conflict.A);
   const d = u.derived, dd = foe.derived;
@@ -139,32 +134,14 @@ function estimateArt(u: GridUnit, foe: GridUnit, art: Art): Estimate {
   const hit = hitPct(accuracy(u), evasion(foe)) / 100;
   const crit = critOf(u, foe);
   if (!act) return { expected: 0, onHit: 0, hit, crit };
-  // Meridian Atk +% / PD-ID +% (as resolveArtActive applies them).
-  const atkMul = 1 + atkPctOf(u.status) / 100, defMul = 1 + defPctOf(foe.status) / 100;
-  const d = { ...u.derived, Atk: u.derived.Atk * atkMul };
-  const dd = { ...foe.derived, PD: foe.derived.PD * defMul, ID: foe.derived.ID * defMul };
-  const { fD, pR } = defenderMods(foe);
-  let raw = 0;
-  switch (act.t) {
-    case "atk_phy_pen":
-      raw = Math.max(1, (d.Atk + d.PA) * (act.m ?? 1) - (dd.PD * (1 - (act.pen ?? 0) / 100) + fD)) * (1 - pR / 100);
-      break;
-    case "atk_int_pen":
-      raw = Math.max(1, (d.Atk + d.IA) * (act.m ?? 1) - (dd.ID * (1 - (act.pen ?? 0) / 100) + fD)) * (1 - pR / 100);
-      break;
-    case "drain":
-    case "drain_acc":
-      raw = Math.max(1, (d.Atk + d.IA) * (act.m ?? 1) - (dd.ID + fD)) * (1 - pR / 100);
-      break;
-    case "drain_phy":
-      raw = Math.max(1, (d.Atk + d.PA) * (act.m ?? 1) - (dd.PD + fD)) * (1 - pR / 100);
-      break;
-    case "debuff_acc_dmg":
-      raw = Math.max(1, (d.Atk + d.IA) * (act.dm ?? 1) - (dd.ID + fD)) * (1 - pR / 100);
-      break;
-    default:
-      raw = 0;
-  }
+  // The same roll resolveArtActive makes (artActiveRaw), its passive chance folded in.
+  const ctx = pairContext(u, foe);
+  const raw = artActiveRaw(
+    act,
+    { d: u.derived, st: u.status, equip: ctx.equipBonus.A, masteries: ctx.masteries.A, primaryArtId: ctx.artIds.A },
+    { d: foe.derived, st: foe.status, equip: ctx.equipBonus.B },
+    true,
+  );
   return { expected: raw * hit * (1 + crit * (CRIT_MULTIPLIER - 1)), onHit: raw, hit, crit };
 }
 

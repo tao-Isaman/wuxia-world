@@ -13,14 +13,6 @@ export const NPCS_EMEI: readonly NpcDef[] = [
     dialogSceneId: "npc_sect_emei_abbess_jingchan_talk",
     sparOpponentId: "spar_emei_abbess_jingchan",
     sparFameReward: 18,
-    questIds: [
-      "qst_emei_disciple_intro",
-      "qst_emei_kidnapped_novice",
-      "qst_emei_poison_antidote",
-      "qst_emei_sect_patrol",
-      "qst_emei_sect_herb",
-      "qst_emei_art_bodhi",
-    ],
     defenseTier: 4,
     stealLoot: [
       { itemId: "herb", weight: 4 },

@@ -63,7 +63,7 @@ Run these after any content change:
 
 | Command | Catches |
 | --- | --- |
-| `bun scripts/audit-content.ts` | NPC / quest / scene references that do not resolve; duplicate NPC or quest ids |
+| `bun scripts/audit-content.ts` | NPC / quest / scene references that do not resolve; duplicate NPC or quest ids; drop tables (opponent drops and packs, boss trophies, resource yields and hunt foes, meridian-chart loot, recipe items) |
 | `bun run test:quests` | every quest can be started, progressed and finished from `home_player`; every item and kill quest plays through the real store; every stage has guidance |
 | `bun run typecheck` | wrong field names, bad unions, missing `Record<SectId, …>` entries |
 | `bun run test:navigation` | a painted map whose spawn, NPCs, exits or services cannot be reached |
@@ -76,7 +76,7 @@ These are **advisory** — they fail today for known, harmless reasons, so read 
 - `bun scripts/audit-complete-scenes.ts`
 - `bun scripts/audit-quest-counts.ts`
 
-`audit-content.ts` does **not** check opponent drop tables. Check new `drops` item ids by hand.
+`audit-content.ts` also checks the drop tables: every `drops` / `yields` item id resolves, weights are above 0 and counts are `1 ≤ min ≤ max`; packs, hunting `opponentIds`, boss trophies, meridian-chart loot and recipe items resolve.
 
 ## A location
 
@@ -100,6 +100,7 @@ These are **advisory** — they fail today for known, harmless reasons, so read 
 | `cave_`, `grotto_` | cave (practice, yin/soft bonus) | roadside | practice |
 | `pool_`, `river_`, `sea_`, `lake_` | river (practice, internal bonus) | roadside | practice |
 | `forest_`, `grove_` | forest (practice, yang/external bonus) | roadside | practice |
+| (any wild place with `forest` in its `WILD_PLACES` biomes) | + forest (`isForestPlace`) | — | practice |
 | `desert_`, `tribe_`, `market_` | frontier | roadside | — |
 | anything else | none | roadside | — |
 
@@ -174,7 +175,7 @@ Then run `bun run test:navigation`: every painted map must keep its spawn open a
 
 2. **Talk dialog.** Write the dialog scene (convention `npc_<npcId>_talk`). Give it at least one choice that returns to the location (`next` = the location id), so the player can leave.
 3. **Spar.** Add an opponent (see [An opponent](#an-opponent)). Its id convention is `spar_<sect>_<name>`.
-4. **Quests** attach through the quest's `giverNpcId` / `turnInNpcId`. `NpcDef.questIds` is informational only; no code reads it.
+4. **Quests** attach through the quest's `giverNpcId` / `turnInNpcId` (an NPC has no quest list of its own).
 5. **Art** is resolved by id:
    - Put a 256×256 portrait at `public/npcs/<id>.png` and a 192×192 body at `public/npcs/body/<id>.png`.
    - Add the id to `npc-portrait-ids.ts` and `npc-body-ids.ts`.
@@ -302,7 +303,7 @@ Then run `bun run test:navigation`: every painted map must keep its spawn open a
 - **Recipe** (`recipes.ts`): `{ id, name, inputs, output, skill, requiredMastery?, usesDropCheck?, basic? }`.
   - `basic: true` puts it on every artisan of that profession for 80 gold.
   - A specialty recipe must be assigned: a row in `CITY_SPECIALTIES` (`{ city, prof, recipeId, price }`) or an artisan's `recipes`.
-  - Only the six craft professions (forge, alchemy, tailoring, chef, jewelry, accessory) have a crafting screen. A recipe for another life skill (mining, drawing…) can be defined, but no UI crafts it.
+  - A recipe of the six craft professions (`ARTISAN_PROFESSIONS`: forge, alchemy, tailoring, chef, jewelry, accessory) is bought and crafted at an artisan; it must be `basic` or a specialty somewhere (`test:systems` checks). A recipe of any other life skill (mining, drawing…) is crafted anywhere from the อาชีพ menu's ประดิษฐ์ tab (`craftsAnywhere`, `FIELD_RECIPES`), with no purchase.
 - **Artisan** (`artisans.ts`):
   - A new city gets all six artisans from one row in `CITIES_WITH_FULL_ROSTER`.
   - A single artisan in a village or sect goes in `SINGLE_PROFESSION_ARTISANS`.

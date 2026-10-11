@@ -114,7 +114,7 @@ export function roadBiomes(src: string, dst: string): Biome[] {
 const ROUTE_RE = /^route_(.+)__to__(.+)$/;
 /** Authored (tutorial) roads with the classic card screen: plain roads. */
 const TUTORIAL_ROADS: Record<string, Biome[]> = {
-  tavern_road: ["road"], back_road: ["road"], village_to_world: ["road"],
+  tavern_road: ["road"], back_road: ["road"],
   route_village__to__home_player: ["road"], route_home_player__to__village: ["road"],
 };
 /** The world-journey menu's category "roads" (cat_*) are menus: nobody walks them. */

@@ -13,14 +13,6 @@ export const NPCS_BEGGARS: readonly NpcDef[] = [
     dialogSceneId: "npc_sect_beggars_chief_hongtian_talk",
     sparOpponentId: "spar_beggars_chief_hongtian",
     sparFameReward: 18,
-    questIds: [
-      "qst_beggars_disciple_intro",
-      "qst_beggars_spy_report",
-      "qst_beggars_hungry_children",
-      "qst_beggars_sect_patrol",
-      "qst_beggars_sect_alms",
-      "qst_beggars_art_thousandcrowd",
-    ],
     defenseTier: 4,
     stealLoot: [
       { itemId: "rice_dish", weight: 5 },

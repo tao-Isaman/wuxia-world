@@ -487,7 +487,7 @@ function applyPassiveEffect(
     }
     case "mult_iatk":
     case "mult_atk":
-      // Handled inline in damage calc (taiji/scholar branches).
+      // Damage passives: read by calcSkillDamage / artActiveRaw (artDamageMults).
       return;
 
     default: {

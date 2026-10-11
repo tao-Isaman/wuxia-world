@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { makeContext, makeInitialState, calcSkillDamage, resolveSkill, resolveArtActive, predictTurnOrder, getNextTurn } from "../lib/game/battle";
+import { makeContext, makeInitialState, calcSkillDamage, resolveSkill, resolveArtActive, predictTurnOrder, getNextTurn, artDamageMults, artActiveRaw } from "../lib/game/battle";
 import { tickEffects } from "../lib/game/effects";
 import { SKILLS, ARTS, getSkill, getArt } from "../lib/game/data";
 import { resolveCombatAction, recoveryAmount, GUARD_MP_COST, fleeChance } from "../lib/game/combat-actions";
@@ -108,7 +108,78 @@ check("physical art attempts also consume riposte when they miss", () => {
     assert.equal(resolveArtActive(state, "A", context), true);
     assert.equal(state.st.A.buffs.some((buff) => buff.t === "buff_riposte"), false);
     assert.deepEqual(state.lastCast!.hitDamages, [0]);
+    assert.deepEqual(state.lastCast!.hitMisses, [true], "an art miss is reported as a miss, not a 0 hit");
   } finally { Math.random = random; }
+});
+
+check("mult_iatk / mult_atk passives work for every art that carries them", () => {
+  const carriers = ARTS.filter((a) => a.pas?.e.t === "mult_iatk" || a.pas?.e.t === "mult_atk");
+  assert.ok(carriers.length >= 9, `${carriers.length} carriers`);
+  for (const a of carriers) {
+    const int = artDamageMults(a.id, "int");
+    assert.ok(int.im > 1 || int.ab > 1, `${a.id} boosts internal attacks`);
+    if (a.pas!.e.t === "mult_iatk") assert.deepEqual(artDamageMults(a.id, "phy"), { im: 1, ab: 1 }, `${a.id}: IA only`);
+  }
+  assert.deepEqual(artDamageMults("none", "int"), { im: 1, ab: 1 });
+  // In the damage roll: the same fight, the primary art swapped for one carrier.
+  const intSkill = SKILLS.find((s) => s.at === "int" && s.ti === 1 && !s.hits)!;
+  const caster: CharacterBuild = { ...build, stats: { ...build.stats, POW: 30 }, skillIds: [intSkill.id] };
+  const base = makeContext(caster, build);
+  const random = Math.random; Math.random = () => 0.5;
+  try {
+    const roll = (artId: string) => {
+      const state = makeInitialState(caster, build);
+      return calcSkillDamage(state, "A", intSkill, { ...base, artIds: { ...base.artIds, A: artId } }).dmg;
+    };
+    assert.ok(roll("qzzq") > roll("none"), "a non-taiji carrier raises internal damage");
+  } finally { Math.random = random; }
+});
+
+check("a reflect answers every landed hit of a multi-hit move, then is used up", () => {
+  const multi = SKILLS.find((s) => s.at === "phy" && (s.hits ?? 1) >= 3 && !s.dr && !s.se && !s.ee)!;
+  const caster: CharacterBuild = { ...build, stats: { ...build.stats, STR: 40, DEX: 40 }, skillIds: [multi.id] };
+  const context = makeContext(caster, build);
+  const state = makeInitialState(caster, build); state.phase = "player";
+  state.hA = 10_000; state.hB = 10_000;
+  state.st.B.buffs.push({ t: "buff_reflect", n: "สะท้อน", v: 50, u: 3 });
+  const random = Math.random; Math.random = () => 0.5;
+  try { resolveSkill(state, "A", 0, multi.id, context, { tick: false }); } finally { Math.random = random; }
+  const dealt = state.lastCast!.hitDamages.reduce((a, b) => a + b, 0);
+  const reflected = 10_000 - state.hA;
+  assert.ok(state.lastCast!.hitDamages.filter((d) => d > 0).length >= 2, "several hits landed");
+  assert.ok(Math.abs(reflected - dealt * 0.5) <= multi.hits!, `reflected ${reflected} of ${dealt}`);
+  assert.equal(state.st.B.buffs.some((b) => b.t === "buff_reflect"), false, "used up after the cast");
+});
+
+check("art actives use stacks, gear pct, mastery and the target's debuff_def; a stunned caster pays nothing", () => {
+  const act = { t: "atk_int_pen" as const, m: 1.5, pen: 0 };
+  const d = makeInitialState(build, build).dA;
+  const st = () => ({ buffs: [], debuffs: [], stk: 0, stkV: 0 } as ReturnType<typeof fresh>["st"]["A"]);
+  const eq = { ...ctx.equipBonus.A, pct_atk: 0, pct_red: 0 };
+  const raw = (o: { stk?: number; pctAtk?: number; mastery?: number; defDebuff?: number; pctRed?: number } = {}) => {
+    const a = st(); a.stk = o.stk ?? 0; a.stkV = 10;
+    const b = st(); if (o.defDebuff) b.debuffs.push({ t: "debuff_def", n: "x", v: -o.defDebuff, u: 3 });
+    const big = { ...d, Atk: 200, IA: 200, ID: 100 };
+    return artActiveRaw(act,
+      { d: big, st: a, equip: { ...eq, pct_atk: o.pctAtk ?? 0 }, masteries: { fist: o.mastery ?? 0 }, primaryArtId: "none" },
+      { d: big, st: b, equip: { ...eq, pct_red: o.pctRed ?? 0 } });
+  };
+  const plain = raw();
+  assert.ok(raw({ stk: 2 }) > plain, "attack stacks");
+  assert.ok(raw({ pctAtk: 20 }) > plain, "gear pct_atk");
+  assert.ok(raw({ mastery: 200 }) > plain, "mastery");
+  assert.ok(raw({ defDebuff: 30 }) > plain, "the target's debuff_def");
+  assert.ok(raw({ pctRed: 30 }) < plain, "the target's gear pct_reduce");
+  // Stunned: the turn is lost before MP, cooldown or a use are paid.
+  const art = ARTS.find((candidate) => candidate.act?.t === "atk_phy_pen")!;
+  const caster = { ...build, artId: art.id };
+  const state = makeInitialState(caster, build); state.phase = "player";
+  state.mpA = 100;
+  state.st.A.debuffs.push({ t: "stun", u: 3 });
+  assert.equal(resolveArtActive(state, "A", makeContext(caster, build)), true);
+  assert.equal(state.mpA, 100);
+  assert.equal(state.iaCD.A, 0);
+  assert.deepEqual(state.artUses.A, {});
 });
 
 check("repeated Guard pays each time and refreshes one riposte charge without stacking", () => {

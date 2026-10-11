@@ -24,10 +24,6 @@ export const NPCS_GUMU: readonly NpcDef[] = [
     dialogSceneId: "npc_sect_gumu_mystery_woman_talk",
     sparOpponentId: "spar_gumu_mystery_woman",
     sparFameReward: 22,
-    questIds: [
-      "qst_gumu_disciple_intro",
-      "qst_gumu_sect_lonely",
-    ],
     defenseTier: 4,
     stealLoot: [
       { itemId: "ginseng", weight: 5 },

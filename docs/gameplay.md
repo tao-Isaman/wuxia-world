@@ -201,7 +201,7 @@ Each foe lives in some of eleven biomes, and each place and road has its own (`l
 | swamp | marshy valleys, snake isles, poison caves | snakes, centipedes, poisoners, pythons |
 | cave | caves and grottoes | bats, centipedes, bears, cultists |
 
-Foes also grow with your **power**: the larger of `day / 200` and `(9 − best sect rank) / 8`, capped at 1. As power rises:
+Foes also grow with your **power**: the larger of `day / 200` and your sect standing (how far up your sect's own ladder you have climbed, 0 at entry and 1 at the top, weighed by time in the sect: full after 60 days — so joining a sect adds nothing at once), capped at 1. As power rises:
 
 - the mix shifts from tier 0–1 toward tiers 3–4;
 - elite foes appear, and from power 0.6 the six **tier-5** foes (rarer than tier 4): the nameless sword hermit, the blood blade lord, the poison matriarch, the heretic iron monk, the white tiger and the wolf king with his pack (power tiers 9–10);
@@ -239,7 +239,7 @@ Battles are turn-based tactics on a board of 10 × 7 tiles, growing to 15 × 10 
 
 - **The warning first.** Every fight opens with a briefing before the board: the foe, its companions, and both sides' **power tier** — twelve named steps from สามัญชน to ยอดคนใต้หล้า, each with its own colour (names only, no numbers), scored from stats, inner arts and move skills, never equipment ([combat.md](combat.md#power-tiers)). The verdict reads อันตรายยิ่ง (foe 2+ tiers up), เหนือกว่าเล็กน้อย, สูสี, ด้อยกว่าเล็กน้อย or ด้อยกว่ามาก, and the note says whether a loss can kill. เข้าต่อสู้ (F / Enter) starts the fight; retreating is still possible inside it. The hero's own tier is on the profile.
 
-- **Units.** You are one unit. An accepted encounter can add the foe's companions (up to six); quest fights, spars and hunts are one against one.
+- **Units.** You are one unit. An accepted encounter or a hunt can add the foe's companions (up to six: a boar herd, the alpha wolf's dogs); quest fights and spars are one against one.
 - **Your turn.** Move, then use one of the (up to 10) skills or inner arts in your slots, or รอ (wait), or ถอยหนี (retreat).
 - **Retreat** succeeds 20–90 % by speed. It gives no rewards and costs the turn if it fails.
 - **อัตโนมัติ** lets the AI play for you.
@@ -389,6 +389,8 @@ Sect styles are never sold in city halls; you learn them by rank inside the sect
 - **Recipes.** Basic recipes cost 80 gold at any artisan of the profession. Specialties are sold only by certain cities' artisans.
 - **What you need.** The recipe learned, the inputs in the bag, the mastery level, and an artisan of that profession here.
 - **Cost.** 2 stamina. The inputs are always used up.
+- **Your own trades.** Recipes of the gathering and cultural skills (mining, hunting, fishing, herbalism, venom, woodcutting, drawing, writing — 12 in all) need no artisan and no bought recipe: the อาชีพ menu's **ประดิษฐ์** tab lists them and crafts them anywhere, as soon as you hold the inputs and the mastery.
+- **Specialties.** ซีเซี่ย's tailor sells the hide coat, หยางโจว's cook the eel stew and its accessory maker the jade pendant.
 
 Full lists: [reference/items-and-crafting.md](reference/items-and-crafting.md).
 
@@ -452,13 +454,16 @@ Where the xp comes from:
 
 Practice:
 
-- **Where:** only at sect grounds, mountains, caves, rivers and temples (49 places).
+- **Where:** only at sect grounds, mountains, forests, caves, rivers and temples (52 places; a forest is a wild place whose land is forest — the three forest valleys, the jungle caves, the wooded peaks and three isles).
 - **Cost:** 30 stamina; it also pays 5 w-exp.
 - **Xp per session:** 30 + 5 % of what the skill or art needs for its next level (`practiceXpGain`), so higher levels still move at a steady pace; a maxed skill gets the flat part only.
 - **Fitting place (50 + 6 %)** for a matching skill type:
   - caves: yin / soft;
   - mountains and sect grounds: balance / hard;
+  - forests: yang / external;
   - rivers: internal.
+
+  A place can be two kinds at once (a wooded peak is mountain and forest); either one fitting is enough.
 
   A skill with no yin / yang / balance tag counts as balance, so it gets the mountain bonus.
 
@@ -641,6 +646,5 @@ These are real today and listed in [HANDOFF.md](../HANDOFF.md#known-issues):
 
 - An abandoned quest can never be taken again.
 - Leaving a sect blocks rejoining it forever. สำนักสราญรมย์ has no redemption quest, so its hunters never stop.
-- The 12 non-artisan recipes (drawing, writing, mining, hunting…) have no crafting button.
 - Resigning freezes battle xp only; practice and w-exp still raise frozen sect skills.
 - Market and sect-internal rumors are hard to reach, and heartland inns never hear the masters' news.

@@ -62,16 +62,9 @@ export const PRACTICE_HOURS = 6;
 export const W_EXP_PRACTICE = 5;
 
 // Crafting professions that require an artisan + learned recipe to
-// craft. Non-artisan recipes (mining-derived, drawing/writing, etc.)
-// keep the legacy "craft inline" behavior.
-export const ARTISAN_PROFESSIONS: ReadonlySet<LifeSkill> = new Set<LifeSkill>([
-  "forge",
-  "alchemy",
-  "tailoring",
-  "chef",
-  "jewelry",
-  "accessory",
-]);
+// craft. Non-artisan recipes (mining-derived, drawing/writing, etc.) are
+// crafted anywhere (`craftsAnywhere`, the อาชีพ menu's ประดิษฐ์ tab).
+export { ARTISAN_PROFESSIONS } from "@/lib/world/data/recipes";
 
 /** w-exp from one session of jail meditation; one sitting per JAIL_MEDITATE_COOLDOWN ชั่วยาม. */
 export const JAIL_MEDITATE_WEXP = 40;

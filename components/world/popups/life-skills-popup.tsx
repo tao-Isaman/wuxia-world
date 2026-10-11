@@ -8,7 +8,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { getEquip } from "@/lib/game";
+import { lifeSkillPose } from "@/lib/characters/hero-actions";
 import {
+  FIELD_RECIPES,
   ITEMS,
   LIFE_SKILL_ICON,
   LIFE_SKILL_KEYS,
@@ -23,19 +25,23 @@ import {
 import type { LifeSkill, RecipeDef } from "@/lib/world";
 import { useWorldStore } from "@/store/world-store";
 import { toast } from "@/store/toast-store";
+import { flashLoading } from "@/store/loading-store";
 
 interface Props {
   open: boolean;
   onClose: () => void;
 }
 
-type Tab = "skills" | "practice" | "recipes";
+type Tab = "skills" | "practice" | "craft" | "recipes";
 
-// Combined popup for the menu's "🌾 อาชีพ" button: three tabs, each a paged
+// Combined popup for the menu's "🌾 อาชีพ" button: four tabs, each a paged
 // grid of tiles (no scrolling, landscape):
 //   • มาสเตอร์รี่    — one tile per life skill: icon, level, progress
 //   • ฝึกฝน          — the music practice + every training item in the bag
-//   • สูตรที่เรียน    — learned recipes (crafting happens at artisans)
+//   • ประดิษฐ์        — the hero's own trades' recipes (mining, hunting, fishing,
+//                      herbalism, venom, woodcutting, drawing, writing), crafted
+//                      here, anywhere (`FIELD_RECIPES`)
+//   • สูตรที่เรียน    — learned artisan recipes (crafted at artisans)
 export function LifeSkillsPopup({ open, onClose }: Props) {
   const [tab, setTab] = useState<Tab>("skills");
   return (
@@ -48,6 +54,7 @@ export function LifeSkillsPopup({ open, onClose }: Props) {
         </div>
         {tab === "skills" && <SkillsTab />}
         {tab === "practice" && <PracticeTab />}
+        {tab === "craft" && <CraftTab />}
         {tab === "recipes" && <RecipesTab />}
       </div>
     </Modal>
@@ -57,6 +64,7 @@ export function LifeSkillsPopup({ open, onClose }: Props) {
 const TABS: { id: Tab; label: string }[] = [
   { id: "skills", label: "มาสเตอร์รี่" },
   { id: "practice", label: "ฝึกฝน" },
+  { id: "craft", label: "ประดิษฐ์" },
   { id: "recipes", label: "สูตรที่เรียน" },
 ];
 
@@ -142,6 +150,42 @@ function PracticeTab() {
   );
 }
 
+// ─── Craft tab — the hero's own trades ───────────────────────────────
+// Recipes outside the six artisan professions need no artisan and no bought
+// recipe: the store's craftRecipe crafts them anywhere, so this is their only
+// button. The tile greys out its button while an input or the mastery is short.
+function CraftTab() {
+  const inventory = useWorldStore((s) => s.inventory);
+  const xpMap = useWorldStore((s) => s.lifeSkillXp);
+  const craftRecipe = useWorldStore((s) => s.craftRecipe);
+  const short = useShortScreen();
+
+  const craft = (recipe: RecipeDef) => {
+    flashLoading("กำลังประดิษฐ์...", undefined, "work", lifeSkillPose(recipe.skill));
+    const res = craftRecipe(recipe.id);
+    if (!res.ok) {
+      toast("error", res.reason === "missing-input" ? "วัตถุดิบไม่ครบ"
+        : res.reason === "missing-mastery" ? "มาสเตอร์รี่ยังไม่ถึงระดับที่กำหนด"
+          : "ไม่สามารถประดิษฐ์ได้");
+      return;
+    }
+    if (res.dropCheck === "failed") {
+      toast("warn", `พลาดในขั้นตอนสุดท้าย — เสียวัตถุดิบ · +${res.xpGained} xp`);
+      return;
+    }
+    toast("success", `สร้าง ${getItem(res.outputItemId)?.name ?? res.outputItemId}×${res.outputCount} · +${res.xpGained} xp`);
+  };
+
+  return (
+    <PagedGrid items={FIELD_RECIPES} itemKey={(r) => r.id} cellWidth={short ? 210 : 250} cellHeight={short ? 110 : 132} gap={6}
+      label="ประดิษฐ์"
+      render={(r) => (
+        <RecipeRow recipe={r} inventory={inventory} masteryLv={r.skill ? masteryLevel(xpMap[r.skill] ?? 0) : MAX_MASTERY}
+          onCraft={() => craft(r)} />
+      )} />
+  );
+}
+
 // ─── Recipes tab — read-only "what have I learned" reference ─────────
 // Crafting happens at the artisan popups (city / village / sect); each tile
 // says what the recipe needs and which artisan to visit.
@@ -167,13 +211,17 @@ function RecipeRow({
   recipe,
   inventory,
   masteryLv,
+  onCraft,
 }: {
   recipe: RecipeDef;
   inventory: Record<string, number>;
   masteryLv: number;
+  /** Crafted on the spot (the ประดิษฐ์ tab); without it the row points to the artisan. */
+  onCraft?: () => void;
 }) {
   const required = recipe.requiredMastery ?? 1;
   const masteryOk = masteryLv >= required;
+  const inputsOk = recipe.inputs.every((inp) => (inventory[inp.itemId] ?? 0) >= inp.count);
   const out = getItem(recipe.output.itemId);
   const skillKey = recipe.skill;
 
@@ -182,7 +230,7 @@ function RecipeRow({
     : null;
 
   return (
-    <div className="life-tile life-tile--recipe" title={recipe.description}>
+    <div className="life-tile life-tile--recipe" title={recipe.description} data-recipe={recipe.id}>
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <div className="flex items-center gap-1.5 flex-wrap">
           <strong className="text-sm">{recipe.name}</strong>
@@ -203,7 +251,7 @@ function RecipeRow({
             </Badge>
           )}
         </div>
-        {skillKey && (
+        {skillKey && !onCraft && (
           <span className="text-[10px] text-muted-foreground">
             ไปร้าน{LIFE_SKILL_LABEL[skillKey]}
           </span>
@@ -232,6 +280,12 @@ function RecipeRow({
           {out?.name ?? recipe.output.itemId} ×{recipe.output.count}
         </span>
       </div>
+      {onCraft && (
+        <Button size="sm" variant="outline" className="h-7 text-[12px] mt-auto" data-craft-recipe={recipe.id}
+          disabled={!masteryOk || !inputsOk}
+          title={!masteryOk ? `ต้องมาสเตอร์รี่ระดับ ${required}` : !inputsOk ? "วัตถุดิบไม่ครบ" : undefined}
+          onClick={onCraft}>ประดิษฐ์</Button>
+      )}
     </div>
   );
 }

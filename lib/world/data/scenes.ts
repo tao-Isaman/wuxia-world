@@ -72,8 +72,8 @@ const CORE_SCENES: readonly Scene[] = [
       },
       {
         // Two-way link with home_player (the reverse is appended to the
-        // home leaf in world-map.ts). The old village_to_world connector led
-        // to the retired random-teleport hub and left this area orphaned.
+        // home leaf in world-map.ts). The old village_to_world connector
+        // (removed) led to the retired random-teleport hub.
         routeSceneId: "route_village__to__home_player",
         label: "ทางลงเขาสู่บ้าน",
         hint: "เส้นทางกลับบ้านของเจ้าและออกสู่ยุทธภพ",

@@ -13,17 +13,6 @@ export const NPCS_SHAOLIN: readonly NpcDef[] = [
     dialogSceneId: "npc_sect_shaolin_abbot_huiyuan_talk",
     sparOpponentId: "spar_shaolin_abbot_huiyuan",
     sparFameReward: 18,
-    questIds: [
-      "qst_shaolin_disciple_intro",
-      "qst_shaolin_relic_theft",
-      "qst_shaolin_disciple_gone",
-      "qst_shaolin_proof_of_heart",
-      "qst_shaolin_sect_patrol",
-      "qst_shaolin_sect_herb_run",
-      "qst_shaolin_sect_meditation",
-      "qst_shaolin_art_zen_finger",
-      "qst_shaolin_art_legendary",
-    ],
     defenseTier: 4,
     stealLoot: [
       { itemId: "herb", weight: 4 },
@@ -46,7 +35,6 @@ export const NPCS_SHAOLIN: readonly NpcDef[] = [
     dialogSceneId: "npc_sect_shaolin_elder_faming_talk",
     sparOpponentId: "spar_shaolin_faming",
     sparFameReward: 8,
-    questIds: ["qst_shaolin_iron_training"],
     tags: ["elder", "monk", "shaolin"],
   },
 

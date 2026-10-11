@@ -30,7 +30,7 @@ Every file in `scripts/`, what it does, and whether it is safe to run. Run them 
 
 | Script | Usage | Does |
 | --- | --- | --- |
-| `audit-content.ts` | `bun scripts/audit-content.ts` | every NPC / quest / scene reference resolves; duplicate NPC or quest ids fail. Does not check drop tables |
+| `audit-content.ts` | `bun scripts/audit-content.ts` | every NPC / quest / scene reference resolves; duplicate NPC or quest ids fail; drop tables (drops, packs, trophies, yields, chart loot, recipe items) resolve |
 | `audit-quest-completion.ts` | `bun scripts/audit-quest-completion.ts` | the campaign completability audit (in `test:quests`) |
 | `audit-manual-names.ts` | `bun scripts/audit-manual-names.ts` | manual item names match the skill / art they teach |
 | `audit-complete-scenes.ts` | `bun scripts/audit-complete-scenes.ts` | advisory: `qs_*_complete` scenes that do not fire `finishQuest` (33, all handled by the NPC card's safety net) |

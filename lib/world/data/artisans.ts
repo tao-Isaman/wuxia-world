@@ -208,8 +208,9 @@ const CITY_SPECIALTIES: readonly {
   recipeId: string;
   price: number;
 }[] = [
-  // Xixia — frontier blacksmith city. Premium steel.
+  // Xixia — frontier blacksmith city. Premium steel; hide coats for the steppe.
   { city: "city_xixia", prof: "forge", recipeId: "forge_steel_sword", price: 600 },
+  { city: "city_xixia", prof: "tailoring", recipeId: "tailor_leather", price: 300 },
   // Suzhou — silk capital. Top-tier robe.
   { city: "city_suzhou", prof: "tailoring", recipeId: "tailor_silk", price: 700 },
   // Dali — alchemy + herbalist hub. Heavy potions.
@@ -221,8 +222,11 @@ const CITY_SPECIALTIES: readonly {
   // Jinling — jade jeweller.
   { city: "city_jinling", prof: "jewelry", recipeId: "jewel_jade_amulet", price: 900 },
   { city: "city_jinling", prof: "jewelry", recipeId: "jewel_gold_ring", price: 400 },
-  // Yangzhou — accessory specialty (silk fan, jade pendant).
+  // Yangzhou — accessory specialty (silk fan, jade pendant); a canal-town
+  // cook's eel stew.
   { city: "city_yangzhou", prof: "accessory", recipeId: "accessory_silk_fan", price: 350 },
+  { city: "city_yangzhou", prof: "accessory", recipeId: "accessory_jade_pendant", price: 600 },
+  { city: "city_yangzhou", prof: "chef", recipeId: "chef_stew", price: 200 },
   // Changan — accessory specialty (warrior's belt).
   { city: "city_changan", prof: "accessory", recipeId: "accessory_warrior_belt", price: 450 },
 ];

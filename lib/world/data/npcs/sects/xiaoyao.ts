@@ -13,13 +13,6 @@ export const NPCS_XIAOYAO: readonly NpcDef[] = [
     dialogSceneId: "npc_sect_xiaoyao_master_yunxiao_talk",
     sparOpponentId: "spar_xiaoyao_master_yunxiao",
     sparFameReward: 18,
-    questIds: [
-      "qst_xiaoyao_disciple_intro",
-      "qst_xiaoyao_sect_patrol",
-      "qst_xiaoyao_sect_herb",
-      "qst_xiaoyao_sect_music",
-      "qst_xiaoyao_art_seepower",
-    ],
     defenseTier: 4,
     stealLoot: [
       { itemId: "ginseng", weight: 4 },

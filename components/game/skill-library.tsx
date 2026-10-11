@@ -19,6 +19,7 @@ const TIER_COLORS = [
   "bg-indigo-100 text-indigo-800",
   "bg-orange-100 text-orange-900",
   "bg-blue-100 text-blue-900",
+  "bg-rose-100 text-rose-900",
 ];
 
 export function SkillLibrary() {

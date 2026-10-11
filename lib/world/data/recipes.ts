@@ -1,4 +1,4 @@
-import type { RecipeDef } from "../types";
+import type { LifeSkill, RecipeDef } from "../types";
 
 // Crafting recipes. Inputs are consumed in order; output is added to the
 // player's inventory. The store's `craftRecipe` action enforces input
@@ -471,3 +471,30 @@ export function getRecipe(id: string | null | undefined): RecipeDef | null {
   if (!id) return null;
   return RECIPES_BY_ID.get(id) ?? null;
 }
+
+/**
+ * The six craft professions. Their recipes are bought from an artisan
+ * (learnedRecipeIds) and crafted at an artisan of the same profession.
+ */
+export const ARTISAN_PROFESSIONS: ReadonlySet<LifeSkill> = new Set<LifeSkill>([
+  "forge",
+  "alchemy",
+  "tailoring",
+  "chef",
+  "jewelry",
+  "accessory",
+]);
+
+/**
+ * A recipe the hero knows by their own trade and crafts anywhere, without an
+ * artisan or a bought recipe: mining, hunting, fishing, herbalism, venom,
+ * woodcutting, drawing and writing (the อาชีพ menu's ประดิษฐ์ tab).
+ */
+export function craftsAnywhere(r: Pick<RecipeDef, "skill">): boolean {
+  return !r.skill || !ARTISAN_PROFESSIONS.has(r.skill);
+}
+
+/** Every recipe crafted anywhere, by skill then required mastery. */
+export const FIELD_RECIPES: readonly RecipeDef[] = RECIPES.filter(craftsAnywhere).sort(
+  (a, b) => (a.skill ?? "").localeCompare(b.skill ?? "") || (a.requiredMastery ?? 1) - (b.requiredMastery ?? 1),
+);

@@ -86,7 +86,7 @@ Read-only scripts, not wired into `package.json`:
 
 | Command | Checks | Status |
 | --- | --- | --- |
-| `bun scripts/audit-content.ts` | every NPC / quest / scene reference resolves; no duplicate NPC or quest ids | passes — run it after every content change |
+| `bun scripts/audit-content.ts` | every NPC / quest / scene reference resolves; no duplicate NPC or quest ids; every drop table resolves | passes — run it after every content change |
 | `bun scripts/audit-manual-names.ts` | each manual's name matches what it teaches | passes |
 | `bun scripts/smoke-liveness.ts` | a 90-day NPC simulation and rumor run | passes |
 | `bun scripts/audit-complete-scenes.ts` | every `qs_*_complete` scene fires `finishQuest` | **advisory**: 33 scenes flagged, all covered by the NPC card's `finishQuestNow` safety net |

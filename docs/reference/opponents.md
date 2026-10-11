@@ -2,11 +2,11 @@
 
 # Opponents
 
-400 opponents (`lib/world/data/opponents.ts`). Foes that turn up on the map while the hero walks come from 68 fight events, each only where it lives (habitats, `lib/world/data/habitats.ts`; `lib/world/data/random-events.ts`). 6 legendary beasts wait in their lairs (`lib/world/data/bosses.ts`).
+399 opponents (`lib/world/data/opponents.ts`). Foes that turn up on the map while the hero walks come from 68 fight events, each only where it lives (habitats, `lib/world/data/habitats.ts`; `lib/world/data/random-events.ts`). 6 legendary beasts wait in their lairs (`lib/world/data/bosses.ts`).
 
 Power = `powerScore` of the build at stat scale 1 (boosted T3 / T4 / NPC-backed builds included). Met via: **roams** = turns up on the map in the listed habitats while the hero walks (places at power 1) · **lair** = a legendary beast's lair · **hunt** = a hunting node · **spar** = an NPC's practice bout · **scene** = a quest or story battle (count of scene choices) · **law** = pursuers after wanted marks · **betrayal** = hunters after betraying a sect.
 
-Per tier: T0: 9 · T1: 44 · T2: 74 · T3: 56 · T4: 205 · T5: 12. Per category: ฝ่ายมนุษย์ (human): 361 · สัตว์ป่า (beast): 39.
+Per tier: T0: 9 · T1: 44 · T2: 74 · T3: 55 · T4: 205 · T5: 12. Per category: ฝ่ายมนุษย์ (human): 360 · สัตว์ป่า (beast): 39.
 
 ## Tier 0 (9)
 
@@ -54,7 +54,7 @@ Per tier: T0: 9 · T1: 44 · T2: 74 · T3: 56 · T4: 205 · T5: 12. Per category
 | `spar_emei_lingxin` | ศิษย์หลิงซิน | human | 62 | — | 5 | spar |
 | `spar_emei_yujie` | ศิษย์อวี้เจี๋ย | human | 57 | — | 5 | spar |
 | `spar_beggars_xiaomao` | ศิษย์เสี่ยวเหมา | human | 77 | — | 5 | spar |
-| `spar_xiaoyao_xiaolan` | ศิษย์เสี่ยวหลาน | human | 59 | — | 5 | spar |
+| `spar_xiaoyao_xiaolan` | ศิษย์เสี่ยวหลาน | human | 59 | — | 6 | spar |
 | `spar_spy_zhou` | โจวพ่อค้าเหล้า | human | 60 | — | 5 | spar |
 | `spar_spy_si` | ซื่อชาวนา | human | 80 | — | 5 | spar |
 | `spar_sunmoon_xiaoyu` | ศิษย์เสี่ยวเยว่ | human | 85 | — | 5 | spar |
@@ -150,7 +150,7 @@ Per tier: T0: 9 · T1: 44 · T2: 74 · T3: 56 · T4: 205 · T5: 12. Per category
 | `spar_qigu_farmer_lao` | ลาวหนาน | human | 162 | — | 6 | scene ×1 |
 | `spar_taohua_huang_waterstep` | หวงชิงเฉวียน (สามส่วนฝีมือ) | human | 161 | — | 6 | scene ×1 |
 
-## Tier 3 (56)
+## Tier 3 (55)
 
 | Id | Name | Category | Power | Pack | Drops | Met via |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -176,7 +176,6 @@ Per tier: T0: 9 · T1: 44 · T2: 74 · T3: 56 · T4: 205 · T5: 12. Per category
 | `spar_kunlun_qiu` | ชิวเฉียน | human | 230 | — | 10 | spar, scene ×2 |
 | `spar_beggars_yunsi` | อาจารย์ข่าวสารยุนซือ | human | 323 | — | 10 | spar |
 | `spar_gumu_disciple` | ศิษย์เลิ่งเยว่ | human | 230 | — | 8 | spar |
-| `spar_xiaoyao_master` | ปรมาจารย์ยุนเซียว | human | 229 | — | 8 | — |
 | `spar_xiaoyao_xiaorang` | ผู้อาวุโสดาบเสี่ยวหรง | human | 259 | — | 9 | spar |
 | `spar_ming_envoy` | ผู้แทนหั่วจี้ | human | 200 | — | 9 | spar |
 | `spar_xuedao_blade` | ดาบเลือดเซียะลาง | human | 240 | — | 8 | spar, scene ×1 |

@@ -13,12 +13,6 @@ export const NPCS_QUANZHEN: readonly NpcDef[] = [
     dialogSceneId: "npc_sect_quanzhen_master_chongyang_talk",
     sparOpponentId: "spar_quanzhen_master_chongyang",
     sparFameReward: 12,
-    questIds: [
-      "qst_quanzhen_disciple_intro",
-      "qst_quanzhen_sect_patrol",
-      "qst_quanzhen_sect_scripture",
-      "qst_quanzhen_art_sun",
-    ],
     defenseTier: 3,
     stealLoot: [
       { itemId: "paper", weight: 5 },
