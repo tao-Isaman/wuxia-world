@@ -36,7 +36,7 @@ Each suite is a Bun script (or `bun test` file) wired as `test:*` in `package.js
 | --- | --- | --- | --- |
 | `test:runtime` | `scripts/test-runtime.ts` | 9 | constant-speed movement, map positions cleared for a new hero, escaped names in battle logs, battle-store stepping, a waiting player turn can't be skipped, fatal / non-fatal defeat, route effects and cost commit together, blocked destinations, the save's version and `partialize` |
 | `test:combat` | `scripts/test-combat-actions.ts` | 15 | mostly the **legacy** 1v1 action layer (guard, riposte, recover — no longer in the UI), the grid store's turn use, the 1v1 turn forecast, and `fleeChance` (the one live function there) |
-| `test:opening` | 6 scripts | 12 | the clinic errand and its exact rewards; the (unused) preparation advice; the capital training duel (fixed stats, non-fatal, once); the quest completion receipt fires once; spy greetings always have a free exit; Lin's and Wu's read-only replies |
+| `test:opening` | 7 scripts | 13 | the clinic errand and its exact rewards; the (unused) preparation advice; the capital training duel (fixed stats, non-fatal, once); the quest completion receipt fires once; spy greetings always have a free exit; Lin's and Wu's read-only replies; the capital vignette (`world-vignettes.ts`: one archive chest at a time, stable resources, the clinic props, capital only) |
 | `test:navigation` | `bun test lib/stage/world-navigation.test.ts lib/stage/world-placement.test.ts` | 19 | collision and path planning on the hand maps; **every painted map** keeps its spawn open and every NPC, exit and service reachable; placing the hero beside the speaker after a reload |
 | `test:placements` | `bun test lib/stage/placements.test.ts` | 8 | objects placed by the map editor: geometry (anchor, scale, flip, views, overrides), depth against characters, a footprint blocks movement and paths route around it, maps without placements unchanged, planning time with 40 objects, the marker checker, and the committed `public/assets/placements.json` (known maps and assets, unique ids, nothing covered or cut off) |
 | `test:battle-background` | `scripts/test-battle-background.ts` | 2 | which battle background a fight gets, and that it survives a save round trip |
@@ -192,8 +192,6 @@ touch chromium-1243/INSTALLATION_COMPLETE chromium_headless_shell-1243/INSTALLAT
 - **Never run bare `bun test`.** Bun also collects `tests/browser/*.spec.ts` and fails with "Playwright Test did not expect test() to be called here". `test:navigation` passes explicit files for this reason.
 - **Harmless warnings.** `test:law`, `test:grid`, `test:grid-ai` and `test:quests` print many `[zustand persist middleware] Unable to update item 'wusia-world-v1'` warnings. They import the store without a `localStorage` shim; filter with `| grep -v "zustand persist"`.
 - **`test:combat`** mostly guards legacy 1v1 code that the game no longer uses (see [combat.md](combat.md#legacy-1v1-code-kept-for-tests)).
-- **`scripts/test-world-vignettes.ts`** passes but is not wired into any `test:*` script.
-- **`scripts/test-runtime.ts`** still names one check "Three.js runtime objects…". The renderer is Phaser; the assertion is right.
 
 ## Writing a test
 

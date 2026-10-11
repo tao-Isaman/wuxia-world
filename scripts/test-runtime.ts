@@ -221,7 +221,7 @@ check("unaffordable, hidden and unknown route destinations have no effects", () 
   assert.equal(useWorldStore.getState().currentSceneId, route.id);
   assert.equal(useWorldStore.getState().gold, 0);
 });
-check("Three.js runtime objects never enter the version 27 save", () => {
+check("Phaser runtime objects never enter the version 27 save", () => {
   const options = useWorldStore.persist.getOptions();
   assert.equal(options.version, 27);
   const saved = options.partialize!(useWorldStore.getState());
