@@ -10,13 +10,14 @@ import { applyEffect } from "@/lib/world/effects";
 import { tickAllNamedNpcs } from "@/lib/world/npc-tick";
 import { deadIds, killNpc, settleChargesOfDead, type ChargeChange } from "@/lib/world/npc-life";
 import { KILL_MARKS, WANTED_DECAY_DAYS } from "@/lib/world/law";
-import { maintainRumors } from "@/lib/world/rumor-engine";
+import { RUMOR_SEEN_CAP, maintainRumors } from "@/lib/world/rumor-engine";
 import { toast } from "@/store/toast-store";
 import { SECT_MEMBERSHIPS } from "@/lib/world/data/sect-memberships";
 import { HOURS_PER_DAY } from "./rules";
 import { now, worldTimeAt } from "@/lib/world/clock";
 import { appendActionLog, heroTag, setDraftClock } from "./state";
 import { emitWorldEvent } from "@/lib/world/shared/events";
+import { worldRunsOnServer } from "@/lib/world/shared/world";
 
 /**
  * A fallen hero is carried home: pay the price of death (half the gold, some
@@ -76,10 +77,16 @@ export function syncClock(state: WorldStateData, at: number = now()): void {
   // its full weeks per call (a long absence only ages people past that); each
   // week draws from the world seed, so every machine sees the same week.
   // Active quests whose giver died are moved or failed (withChargesOfDead).
-  withChargesOfDead(state, () => {
-    tickAllNamedNpcs(state, { currentDay: state.day, seed: state.worldSeed });
-  });
-  maintainRumors(state, state.day);
+  // On the game server the server runs the world (store/cloud-world.ts brings
+  // it here); the hero only forgets what they heard long ago.
+  if (worldRunsOnServer()) {
+    if (state.rumorSeenLog.length > RUMOR_SEEN_CAP) state.rumorSeenLog = state.rumorSeenLog.slice(-RUMOR_SEEN_CAP);
+  } else {
+    withChargesOfDead(state, () => {
+      tickAllNamedNpcs(state, { currentDay: state.day, seed: state.worldSeed });
+    });
+    maintainRumors(state, state.day);
+  }
   // A new day: friends may write (lib/world/letters.ts), and a tournament
   // whose days have passed is settled (lib/world/tournament.ts).
   if (state.day > dayBefore) {

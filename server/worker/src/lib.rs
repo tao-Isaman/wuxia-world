@@ -34,6 +34,17 @@ pub use keys::KeyObject;
 pub use room::RoomObject;
 use keys::signing_key;
 
+/// The data generation: every Durable Object name starts with it (the
+/// TypeScript half uses the same, `server/worker/ts/env.ts`). Raising it starts
+/// the server over — no accounts, characters, saves or world, and a new
+/// signing key. Generation 2 began 2026-10-11.
+pub(crate) const DATA_EPOCH: &str = "2";
+
+/// The name of a Durable Object in this data generation.
+pub(crate) fn object_name(name: &str) -> String {
+    format!("{DATA_EPOCH}:{name}")
+}
+
 /// Room ids are the game's location and road ids (`city_capital`, `route_a__to__b`).
 fn valid_room(id: &str) -> bool {
     (1..=96).contains(&id.len()) && id.bytes().all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'_')
@@ -108,7 +119,7 @@ async fn auth(mut req: Request, env: &Env, action: &str) -> Result<Response> {
         Ok(name) => name,
         Err(error) => return auth_error(error),
     };
-    let stub = env.durable_object("ACCOUNTS")?.id_from_name(&username)?.get_stub()?;
+    let stub = env.durable_object("ACCOUNTS")?.id_from_name(&object_name(&username))?.get_stub()?;
     let mut init = RequestInit::new();
     init.with_method(Method::Post)
         .with_body(Some(serde_json::to_string(&Credentials { username: username.clone(), password: credentials.password })?.into()));
@@ -157,7 +168,7 @@ fn token_of(req: &Request) -> String {
     req.url().ok().and_then(|url| url.query_pairs().find(|(k, _)| k == "token").map(|(_, v)| v.into_owned())).unwrap_or_default()
 }
 
-/// A characters / saves / world call: check the token, then hand the request
+/// A characters / saves call: check the token, then hand the request
 /// to the account's Durable Object and answer with its reply (plus CORS).
 async fn account_call(mut req: Request, env: &Env, path: &str) -> Result<Response> {
     let key = match signing_key(env).await {
@@ -173,7 +184,7 @@ async fn account_call(mut req: Request, env: &Env, path: &str) -> Result<Respons
     if matches!(req.method(), Method::Post | Method::Put) {
         init.with_body(Some(req.text().await?.into()));
     }
-    let stub = env.durable_object("ACCOUNTS")?.id_from_name(&claims.sub)?.get_stub()?;
+    let stub = env.durable_object("ACCOUNTS")?.id_from_name(&object_name(&claims.sub))?.get_stub()?;
     let mut reply = stub.fetch_with_request(Request::new_with_init(&format!("https://account{path}"), &init)?).await?;
     let status = reply.status_code();
     let text = reply.text().await?;
@@ -203,7 +214,7 @@ async fn join_room(req: Request, env: &Env, room: &str) -> Result<Response> {
     let mut init = RequestInit::new();
     init.with_method(Method::Get).with_headers(req.headers().clone());
     let forward = Request::new_with_init(&format!("https://room/ws?room={room}&user={}", claims.sub), &init)?;
-    env.durable_object("ROOMS")?.id_from_name(room)?.get_stub()?.fetch_with_request(forward).await
+    env.durable_object("ROOMS")?.id_from_name(&object_name(room))?.get_stub()?.fetch_with_request(forward).await
 }
 
 #[event(fetch)]
@@ -216,7 +227,7 @@ async fn fetch(req: Request, env: Env, _ctx: Context) -> Result<Response> {
         (Method::Post, ["auth", "register"]) => auth(req, &env, "register").await,
         (Method::Post, ["auth", "login"]) => auth(req, &env, "login").await,
         (Method::Get, ["auth", "me"]) => me(req, &env).await,
-        (Method::Get, ["characters"]) | (Method::Post, ["characters"]) | (Method::Get, ["world"]) | (Method::Put, ["world"]) => {
+        (Method::Get, ["characters"]) | (Method::Post, ["characters"]) => {
             account_call(req, &env, &path).await
         }
         (Method::Delete, ["characters", _]) | (Method::Get, ["characters", _, "save"]) | (Method::Put, ["characters", _, "save"]) => {

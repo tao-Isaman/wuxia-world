@@ -1,9 +1,10 @@
 // The low-level client for the game server (docs/online.md): the HTTP auth,
-// character, save and world calls, and one WebSocket into one room. No React, no store — the browser
+// character, save, world and battle calls, and one WebSocket into one room. No React, no store — the browser
 // (lib/net/session.ts) and the server test (scripts/test-online-server.ts)
 // both use it.
 import { PROTOCOL_VERSION, type ClientMsg, type HeroBody, type Motion, type ServerMsg, type Session } from "./protocol";
 import type { Dir8 } from "@/lib/characters/walk8";
+import type { BattleLogRequest, BattleStartReply, BattleVerdict, EchoRequest, WorldReply } from "./play-protocol";
 
 /** An auth call the server refused: `code` is its error (`taken`, `wrong_login`, …). */
 export class AuthFailure extends Error {
@@ -91,10 +92,26 @@ export const loadSave = (server: string, token: string, id: string) =>
 export const storeSave = (server: string, token: string, id: string, rev: number, save: SaveBlob, keepalive = false) =>
   call<{ rev: number; summary: CharacterInfo["summary"] }>(server, token, "PUT", `/characters/${encodeURIComponent(id)}/save`,
     { rev, version: save.version, state: save.state }, keepalive);
-export const loadWorld = (server: string, token: string) =>
-  call<{ rev: number; world: Record<string, unknown> | null }>(server, token, "GET", "/world");
-export const storeWorld = (server: string, token: string, world: unknown, keepalive = false) =>
-  call<{ rev: number }>(server, token, "PUT", "/world", { world }, keepalive);
+
+/** The one shared world (`same` when `rev` is still current). */
+export const loadWorld = (server: string, token: string, rev?: number, pins: readonly string[] = []) => {
+  const query = [rev === undefined ? "" : `rev=${rev}`, pins.length ? `pins=${pins.map(encodeURIComponent).join(",")}` : ""].filter(Boolean).join("&");
+  return call<WorldReply>(server, token, "GET", query ? `/world?${query}` : "/world");
+};
+/** Tell the jianghu what the hero did; the server writes the rumor. */
+export const postEcho = (server: string, token: string, echo: EchoRequest) =>
+  call<{ rev: number }>(server, token, "POST", "/world/echo", echo);
+
+const battlePath = (id: string, what: string) => `/characters/${encodeURIComponent(id)}/battle/${what}`;
+/** Stage the saved pending battle on the server: its seed and the exact fight. */
+export const startBattle = (server: string, token: string, id: string) =>
+  call<BattleStartReply>(server, token, "POST", battlePath(id, "start"), {});
+/** Hand the server the commands played so far (it replays them as they come). */
+export const logBattle = (server: string, token: string, id: string, log: BattleLogRequest) =>
+  call<{ at: number }>(server, token, "POST", battlePath(id, "log"), log);
+/** The last commands; the server's verdict and spoils. */
+export const finishBattle = (server: string, token: string, id: string, log: BattleLogRequest) =>
+  call<BattleVerdict>(server, token, "POST", battlePath(id, "finish"), log);
 
 export interface RoomOptions {
   server: string;

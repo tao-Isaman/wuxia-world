@@ -23,8 +23,6 @@ pub const MAX_CHARACTERS: usize = 4;
 pub const MAX_NAME_CHARS: usize = 24;
 /// A save's JSON, in bytes (a late-game save is well under 200 KB).
 pub const MAX_SAVE_BYTES: usize = 1_000_000;
-/// The shared world's JSON, in bytes (people, rumors, events).
-pub const MAX_WORLD_BYTES: usize = 1_500_000;
 /// The first save format kept on the server (the world clock's, v27).
 pub const MIN_SAVE_VERSION: u64 = 27;
 pub const MAX_SAVE_VERSION: u64 = 1_000;
@@ -33,6 +31,8 @@ pub const MAX_GOLD: f64 = 99_999_999.0;
 /// Gold a character may gain at once, and how fast the allowance refills.
 pub const GOLD_BUDGET_CAP: f64 = 100_000.0;
 pub const GOLD_BUDGET_PER_MIN: f64 = 3_000.0;
+/// Unspent server grants a character may hold (far above any battle's purse).
+pub const MAX_GRANTED: f64 = 10_000_000.0;
 pub const MAX_LEVEL: f64 = 10.0;
 pub const MAX_STAT: f64 = 9_999.0;
 pub const MAX_STACK: f64 = 9_999.0;
@@ -123,6 +123,10 @@ pub struct Character {
     pub budget_at: f64,
     #[serde(default)]
     pub saved_at: f64,
+    /// Gold the server paid this character (checked battles) that no save
+    /// has shown yet: a save may rise by this much beyond the allowance.
+    #[serde(default)]
+    pub granted: f64,
 }
 
 /// An account's characters.
@@ -176,6 +180,7 @@ impl Roster {
             version: 0,
             gold_budget: GOLD_BUDGET_CAP,
             budget_at: now,
+            granted: 0.0,
             saved_at: 0.0,
         });
         Ok(self.characters.last().unwrap())
@@ -201,6 +206,8 @@ pub struct Accepted {
     pub rev: u64,
     pub summary: SaveSummary,
     pub gold_budget: f64,
+    /// What is left of the server's grants after this save.
+    pub granted: f64,
 }
 
 fn number(state: &Map<String, Value>, field: &'static str, min: f64, max: f64) -> Result<f64, SaveError> {
@@ -284,12 +291,15 @@ pub fn check_save(character: &Character, upload: &SaveUpload, bytes: usize, now:
     number(state, "wExp", 0.0, MAX_WEXP)?;
     let day = number(state, "day", -1_000_000.0, 1_000_000_000.0)?;
 
-    // Gold may rise only as fast as the allowance refills.
+    // Gold may rise by what the server paid (checked battles) plus an
+    // allowance that refills over time (everything the browser still pays).
     let refill = ((now - character.budget_at).max(0.0) / 60_000.0) * GOLD_BUDGET_PER_MIN;
     let budget = (character.gold_budget + refill).min(GOLD_BUDGET_CAP);
     let before = character.summary.as_ref().map(|s| s.gold as f64).unwrap_or(0.0);
     let gain = (gold - before).max(0.0);
-    if gain > budget {
+    let from_grants = gain.min(character.granted);
+    let rest = gain - from_grants;
+    if rest > budget {
         return Err(SaveError::GoldTooFast);
     }
     let (sect, rank) = active_sect(state);
@@ -302,7 +312,8 @@ pub fn check_save(character: &Character, upload: &SaveUpload, bytes: usize, now:
             sect,
             rank,
         },
-        gold_budget: budget - gain,
+        gold_budget: budget - rest,
+        granted: character.granted - from_grants,
     })
 }
 
@@ -311,21 +322,18 @@ pub fn accept(character: &mut Character, accepted: Accepted, version: u64, now: 
     character.rev = accepted.rev;
     character.summary = Some(accepted.summary);
     character.gold_budget = accepted.gold_budget;
+    character.granted = accepted.granted;
     character.budget_at = now;
     character.saved_at = now;
     character.updated = now;
     character.version = version;
 }
 
-/// The shared world upload: a JSON object within [`MAX_WORLD_BYTES`].
-pub fn check_world(world: &Value, bytes: usize) -> Result<(), SaveError> {
-    if bytes > MAX_WORLD_BYTES {
-        return Err(SaveError::TooLarge);
+/// Gold the server paid a character (a checked battle's spoils), for its next saves.
+pub fn grant_gold(character: &mut Character, gold: f64) {
+    if gold.is_finite() && gold > 0.0 {
+        character.granted = (character.granted + gold).min(MAX_GRANTED);
     }
-    if !world.is_object() {
-        return Err(SaveError::BadSave("world"));
-    }
-    Ok(())
 }
 
 #[cfg(test)]
@@ -443,9 +451,25 @@ mod tests {
     }
 
     #[test]
-    fn the_world_is_an_object_within_its_size() {
-        assert!(check_world(&json!({ "worldSeed": "x" }), 100).is_ok());
-        assert_eq!(check_world(&json!([1]), 100), Err(SaveError::BadSave("world")));
-        assert_eq!(check_world(&json!({}), MAX_WORLD_BYTES + 1), Err(SaveError::TooLarge));
+    fn server_grants_raise_what_a_save_may_show() {
+        let mut roster = roster_with_hero();
+        let hero = roster.get_mut("c1").unwrap();
+        let accepted = check_save(hero, &upload(0, GOLD_BUDGET_CAP), 10, T0).unwrap();
+        accept(hero, accepted, 27, T0);
+        // The allowance is spent; a checked battle pays 500.
+        assert_eq!(check_save(hero, &upload(1, GOLD_BUDGET_CAP + 500.0), 10, T0 + 2_000.0), Err(SaveError::GoldTooFast));
+        grant_gold(hero, 500.0);
+        grant_gold(hero, -5.0);
+        grant_gold(hero, f64::NAN);
+        assert_eq!(hero.granted, 500.0);
+        let accepted = check_save(hero, &upload(1, GOLD_BUDGET_CAP + 500.0), 10, T0 + 2_000.0).unwrap();
+        assert_eq!(accepted.granted, 0.0);
+        accept(hero, accepted, 27, T0 + 2_000.0);
+        // A grant not yet shown waits for the save that shows it.
+        grant_gold(hero, 300.0);
+        let accepted = check_save(hero, &upload(2, GOLD_BUDGET_CAP + 500.0), 10, T0 + 4_000.0).unwrap();
+        assert_eq!(accepted.granted, 300.0);
+        accept(hero, accepted, 27, T0 + 4_000.0);
+        assert!(check_save(hero, &upload(3, GOLD_BUDGET_CAP + 800.0), 10, T0 + 6_000.0).is_ok());
     }
 }

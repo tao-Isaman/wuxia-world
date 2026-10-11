@@ -22,7 +22,7 @@ const { useWorldStore } = await import("../store/world-store");
 const { syncClock, staminaForHours, STAMINA_REFILL_HOURS, VITALS_REFILL_HOURS } = await import("../store/world/lifecycle");
 const { partializeSave, migrateSave, mergeSave, takeCarriedWorldKeys } = await import("../store/world/persist");
 const { SHARED_WORLD_KEY, attachSharedWorld, joinSharedWorld, localWorldService } = await import("../store/world/shared-local");
-const { SHARED_WORLD_KEYS, sameWorld, sharedSlice } = await import("../lib/world/shared/world");
+const { PLAYER_FROM_WORLD_KEYS, SHARED_WORLD_KEYS, sameWorld, sharedSlice } = await import("../lib/world/shared/world");
 const { WORLD_EVENT_LOG_MAX, applyWorldEvent, emitWorldEvent, recordWorldEvent } = await import("../lib/world/shared/events");
 const { hashSeed, seededRng } = await import("../lib/world/shared/rng");
 const { rebaseDays } = await import("../lib/world/shared/rebase");
@@ -229,24 +229,28 @@ check("WorldEvents: the store's actions go through them (a fallen beast, a killi
 });
 
 // ─── The save split ────────────────────────────────────────────────────
-check("the save holds the player only; the shared world has its own key", () => {
+check("the save holds the player and their own deeds; the shared world (people, talk) has its own key", () => {
   newGame(60, 0);
   const saved = partializeSave(store());
   for (const key of SHARED_WORLD_KEYS) assert.ok(!(key in saved), `${key} is not in the player's save`);
+  for (const key of PLAYER_FROM_WORLD_KEYS) assert.ok(key in saved, `${key} is the player's own (v28)`);
   assert.ok("playerBuild" in saved && "day" in saved && "rumorSeenLog" in saved);
   const world = JSON.parse(memory.get(SHARED_WORLD_KEY)!) as { version: number; world: SharedWorld };
   assert.equal(world.version, 1);
   for (const key of SHARED_WORLD_KEYS) assert.ok(key in world.world, `${key} is in the shared world`);
+  for (const key of PLAYER_FROM_WORLD_KEYS) assert.ok(!(key in world.world), `${key} is not the world's`);
   assert.equal(world.world.worldSeed, store().worldSeed);
-  // Changing the world writes it back.
+  // Changing the world writes it back; a felled beast stays the hero's.
   const draft = clone(store()) as WorldStateData;
   emitWorldEvent(draft, { t: "boss_slain", bossId: "boss_sun_turtle", byPlayer: "x", day: 60 });
-  useWorldStore.setState(sharedSlice(draft));
-  assert.equal((JSON.parse(memory.get(SHARED_WORLD_KEY)!) as { world: SharedWorld }).world.bossDefeatedDay.boss_sun_turtle, 60);
-  assert.equal(localWorldService.load()?.bossDefeatedDay.boss_sun_turtle, 60);
+  useWorldStore.setState({ ...sharedSlice(draft), bossDefeatedDay: draft.bossDefeatedDay });
+  const written = (JSON.parse(memory.get(SHARED_WORLD_KEY)!) as { world: SharedWorld }).world;
+  assert.ok(written.rumorPool.some((r) => r.id === "rumor_boss_boss_sun_turtle_60"), "the jianghu talks of it");
+  assert.equal(partializeSave(store()).bossDefeatedDay.boss_sun_turtle, 60);
+  assert.ok(localWorldService.load()?.rumorPool.some((r) => r.id === "rumor_boss_boss_sun_turtle_60"));
 });
 
-check("attachSharedWorld: the stored world joins the loaded save; a save's own world fields win", () => {
+check("attachSharedWorld: the stored world joins the loaded save; a save's own world fields win; an old world hands over the hero's deeds", () => {
   const base = newGame(70, 0);
   const memoryService = (world: SharedWorld | null) => {
     let kept = world;
@@ -255,14 +259,14 @@ check("attachSharedWorld: the stored world joins the loaded save; a save's own w
   // A stored world replaces what the state had.
   const stored = sharedSlice(clone(base));
   stored.worldSeed = 777;
-  stored.bossDefeatedDay = { boss_flame_bull: 66 };
+  stored.lastNpcTickDay = 66;
   const svc = memoryService(clone(stored));
   const s1 = createStore<WorldStateData>(() => clone(base));
   const stop = attachSharedWorld(s1, svc);
   assert.equal(s1.getState().worldSeed, 777);
-  assert.deepEqual(s1.getState().bossDefeatedDay, { boss_flame_bull: 66 });
-  s1.setState({ bossDefeatedDay: { boss_flame_bull: 66, boss_blade_crab: 70 } });
-  assert.equal(svc.get()!.bossDefeatedDay.boss_blade_crab, 70, "saved on change");
+  assert.equal(s1.getState().lastNpcTickDay, 66);
+  s1.setState({ lastNpcTickDay: 70 });
+  assert.equal(svc.get()!.lastNpcTickDay, 70, "saved on change");
   stop();
   // No stored world: the state's own is kept (an old save), seeded with a world seed.
   const empty = memoryService(null);
@@ -272,11 +276,19 @@ check("attachSharedWorld: the stored world joins the loaded save; a save's own w
   assert.deepEqual(empty.get()!.npcExt, clone(s2.getState().npcExt));
   // A save carrying a world field (old or hand-edited) keeps it over the stored world.
   const joined = clone(base);
-  joined.bossDefeatedDay = { boss_sun_turtle: 69 };
-  joinSharedWorld(joined, stored, ["bossDefeatedDay"]);
-  assert.deepEqual(joined.bossDefeatedDay, { boss_sun_turtle: 69 });
+  joined.lastNpcTickDay = 69;
+  joinSharedWorld(joined, stored, ["lastNpcTickDay"]);
+  assert.equal(joined.lastNpcTickDay, 69);
   assert.equal(joined.worldSeed, 777);
   assert.equal(sameWorld(joined, joined), true);
+  // A world stored before v28 still holds the hero's deeds: an empty save takes them, a full one keeps its own.
+  const old = { ...clone(stored), bossDefeatedDay: { boss_flame_bull: 66 }, assassinatedNpcIds: ["npc_x"] } as unknown as SharedWorld;
+  const fresh = clone(base);
+  fresh.bossDefeatedDay = {};
+  fresh.assassinatedNpcIds = ["npc_y"];
+  joinSharedWorld(fresh, old);
+  assert.deepEqual(fresh.bossDefeatedDay, { boss_flame_bull: 66 });
+  assert.deepEqual(fresh.assassinatedNpcIds, ["npc_y"]);
 });
 
 // ─── v27: older saves join the world clock ─────────────────────────────

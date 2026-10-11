@@ -28,6 +28,7 @@ import { shopsActions } from "./world/actions/shops";
 import { lawActions } from "./world/actions/law";
 import { npcsActions } from "./world/actions/npcs";
 import { questsActions } from "./world/actions/quests";
+import { SAVE_VERSION } from "./world/save-version";
 
 export { MERIDIAN_POINTS_PER_LEVEL } from "./world/progression";
 export { TRAVEL_STAMINA_COST, REST_COOLDOWN_HOURS, SPAR_WIN_SCENE_ID, SPAR_LOSE_SCENE_ID, PRACTICE_STAMINA_COST, PRACTICE_HOURS } from "./world/rules";
@@ -61,7 +62,7 @@ export const useWorldStore = create<WorldStore>()(
     }),
     {
       name: "wusia-world-v1",
-      version: 27,
+      version: SAVE_VERSION,
       storage: createJSONStorage<PlayerSave>(() => (CLOUD ? cloudSave.storage : localStorage)),
       skipHydration: CLOUD,
       // Content backfill also runs for current-version saves (see mergeSave).

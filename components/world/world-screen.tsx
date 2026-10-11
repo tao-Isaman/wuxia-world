@@ -35,6 +35,7 @@ import { LoadingOverlay } from "./loading-overlay";
 import { ToastStack } from "./toast-stack";
 import { ConfirmDialog } from "./confirm-dialog";
 import { BattleArena } from "@/components/game/battle-arena";
+import { useVerdictNote } from "./battle-verdict-note";
 
 // Fullscreen overlay that shows the player's current surroundings (the
 // map painting of the scene, or of the last location for dialogs and
@@ -109,6 +110,8 @@ export function WorldScreen() {
   const pendingEncounter = useWorldStore((s) => s.pendingEncounter);
   const gameOver = useWorldStore((s) => s.gameOver);
   const acknowledge = useWorldStore((s) => s.acknowledgeBattleResult);
+  // A fight the game server checks waits on its verdict before the world goes on.
+  const verdictNote = useVerdictNote();
   const resetGame = useWorldStore((s) => s.resetGame);
   // Subscribe to battle state so the layout updates when winner is set / cleared.
   const battleStateExists = useBattleStore((s) => s.state !== null);
@@ -177,7 +180,7 @@ export function WorldScreen() {
   } else if (pendingBattle) {
     body = (
       <MapBackdrop>
-        <BattleArena mode="world" onContinue={acknowledge} winExtra={<VictorySpoils />} />
+        <BattleArena mode="world" onContinue={acknowledge} winExtra={<VictorySpoils />} pendingNote={verdictNote} />
       </MapBackdrop>
     );
   } else if (pendingEncounter) {

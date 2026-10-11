@@ -3,6 +3,7 @@ import { getArt, getSkill } from "@/lib/game";
 import { EQUIPMENT_BY_ID } from "@/lib/game/data/equipment";
 import { STAT_XP_PER_ACTION } from "@/lib/world/stat-progression";
 import { useBattleStore } from "@/store/battle-store";
+import { cloudBattle, useCloudBattle } from "@/store/cloud-battle";
 import { packOpponentIdOf } from "@/lib/world/battle-looks";
 import { getItem, getNpc, getOpponent, getResource, getScene, masteryLevel } from "@/lib/world";
 import { applyEffect, tickQuestProgress } from "@/lib/world/effects";
@@ -32,7 +33,19 @@ export const battleActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "c
   acknowledgeBattleResult: () => {
     const s = get();
     if (!s.pendingBattle) return;
-    const battleState = useBattleStore.getState().state;
+    // A battle the game server checks ends on the server's verdict and pays
+    // the spoils it rolled (store/cloud-battle.ts). A battle it refused counts
+    // as left: no rewards, no harm.
+    const checked = cloudBattle.checking();
+    if (checked && useCloudBattle.getState().status !== "done") return;
+    const local = useBattleStore.getState().state;
+    const verdict = checked ? cloudBattle.verdict() : null;
+    const battleState = !checked || !local ? local
+      : verdict
+        ? { ...local, winner: verdict.winner, escaped: verdict.escaped, hA: verdict.hA, mpA: verdict.mpA, itemsUsed: verdict.itemsUsed }
+        : { ...local, winner: null, escaped: true, hA: s.currentHp, mpA: s.currentMp, itemsUsed: {} };
+    const serverSpoils = checked ? verdict?.spoils ?? { gold: 0, wExp: 0, items: [], moves: [], hunt: null, gear: [] } : null;
+    if (checked) cloudBattle.stop();
     const winner = battleState?.winner;
     if (battleState?.escaped) {
       // Retreat: the fight simply ends. No rewards, no defeat; the player
@@ -61,7 +74,9 @@ export const battleActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "c
         useBattleStore.getState().reset();
         return;
       }
-      appendActionLog(draft, "battle", `ถอยหนีจาก${opponent?.name ?? "ศัตรู"}สำเร็จ`);
+      appendActionLog(draft, "battle", checked && !verdict
+        ? `การต่อสู้กับ${opponent?.name ?? "ศัตรู"}ไม่ผ่านการตรวจของเซิร์ฟเวอร์ — ไม่นับผล`
+        : `ถอยหนีจาก${opponent?.name ?? "ศัตรู"}สำเร็จ`);
       const back = getScene(draft.currentSceneId)?.kind === "dialog" ? draft.lastLocationId : null;
       set({ ...draft });
       useBattleStore.getState().reset();
@@ -118,7 +133,7 @@ export const battleActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "c
     // used and every hit taken, then drop hunt spoils if a hunt was in
     // flight, then route to the encounter's onWin destination. The
     // spoils are the ones the result panel showed (victorySpoils).
-    const spoils = victorySpoilsFor(s) ?? rollVictorySpoils(s, pb);
+    const spoils = serverSpoils ?? victorySpoilsFor(s) ?? rollVictorySpoils(s, pb);
     draft.wExp = Math.max(0, draft.wExp + spoils.wExp);
     draft.gold += spoils.gold;
     // Beat the law this time: no jail pending (the marks stay), and the

@@ -49,12 +49,10 @@ export const W_EXP_CRAFT = 5;
 export const W_EXP_USE_ITEM = 5;
 export const W_EXP_PRACTICE_MUSIC = 5;
 // A won fight pays by the foe: lib/world/victory.ts victoryWExp.
-// Per-skill xp gained for each use of a skill in a battle the player won.
-export const SKILL_USE_XP = 20;
-// Per-art xp gained for each art active fired in a battle the player won.
-// Same value as SKILL_USE_XP — the natural 2× difficulty comes from the
-// art-tier xp curve being 2× the move-skill curve, not from a smaller drop.
-export const ART_USE_XP = 20;
+// Per-skill / per-art xp for each use in a battle the player won (the art's is
+// the same — the natural 2× difficulty comes from the art-tier xp curve being
+// 2× the move-skill curve). Defined with the spoils roll, lib/world/spoils.ts.
+export { ART_USE_XP, SKILL_USE_XP } from "@/lib/world/spoils";
 
 // "ฝึกฝน" practice action — costs stamina + ชั่วยาม, awards xp on the
 // chosen skill / art. Practice xp scales with the location's category-type

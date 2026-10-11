@@ -9,7 +9,7 @@ import { seedLoreRumors } from "@/lib/world/rumor-engine";
 import { worldNow } from "@/lib/world/clock";
 import { newWorldSeed } from "@/lib/world/shared/rng";
 import { takeCarriedWorldKeys } from "./persist";
-import { SHARED_WORLD_KEYS, sameWorld, sharedSlice, type SharedWorld, type WorldService } from "@/lib/world/shared/world";
+import { PLAYER_FROM_WORLD_KEYS, SHARED_WORLD_KEYS, sameWorld, sharedSlice, type SharedWorld, type WorldService } from "@/lib/world/shared/world";
 
 /** The localStorage key of the shared world. Never rename it. */
 export const SHARED_WORLD_KEY = "wusia-shared-v1";
@@ -52,13 +52,12 @@ export const localWorldService: WorldService = {
  * lacks keep the state's values.
  */
 export function joinSharedWorld(state: WorldStateData, stored: Partial<SharedWorld> | null, keep: readonly string[] = []): void {
+  if (stored) takePlayerFields(state, stored as Partial<WorldStateData>);
   if (stored) {
     for (const key of SHARED_WORLD_KEYS) {
       if (keep.includes(key)) continue;
       if (stored[key] !== undefined && stored[key] !== null) (state as unknown as Record<string, unknown>)[key] = stored[key];
     }
-    // `tournament` may be null on purpose.
-    if (stored.tournament === null && !keep.includes("tournament")) state.tournament = null;
   }
   if (!state.worldSeed) state.worldSeed = newWorldSeed();
   if (!Array.isArray(state.worldEventLog)) state.worldEventLog = [];
@@ -72,6 +71,20 @@ export function joinSharedWorld(state: WorldStateData, stored: Partial<SharedWor
   // Completes older rosters and registers the generated people (idempotent).
   seedLiveness(state);
   seedLoreRumors(state);
+}
+
+/**
+ * A world stored before save v28 still holds the hero's own deeds
+ * (PLAYER_FROM_WORLD_KEYS); the save takes them where it has none.
+ */
+function takePlayerFields(state: WorldStateData, stored: Partial<WorldStateData>): void {
+  const empty = (value: unknown) => value === undefined || value === null
+    || (Array.isArray(value) ? value.length === 0 : typeof value === "object" && Object.keys(value as object).length === 0);
+  const target = state as unknown as Record<string, unknown>;
+  for (const key of PLAYER_FROM_WORLD_KEYS) {
+    const old = stored[key];
+    if (!empty(old) && empty(target[key])) target[key] = old;
+  }
 }
 
 /**

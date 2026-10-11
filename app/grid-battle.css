@@ -129,6 +129,9 @@
 .gb-result small { font-size: 12px; color: #d9c9a6; }
 .gb-result[data-outcome=enemy] span { color: #f0a489; }
 .gb-result button { flex-shrink: 0; min-height: 44px; }
+/* Waiting on the game server's verdict (components/world/battle-verdict-note.tsx). */
+.gb-verdict { flex: 1; margin: 0; font-size: 14px; color: #e7cb8f; }
+.gb-verdict .pixel-action { min-height: 36px; margin-left: 8px; }
 
 @media (pointer: coarse) { .gb-skill kbd { display: none; } }
 @media (prefers-reduced-motion: reduce) { .gb-callout { display: none; } }

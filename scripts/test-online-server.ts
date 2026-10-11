@@ -4,13 +4,36 @@
 // Two accounts sign up and log in, walk into the same room, see each other
 // join, move and leave; a second login of one account replaces the first.
 // Characters and saves: create / list / delete, saves the server checks
-// (rev, rate, hero, numbers, gold allowance), the account's shared world.
+// (rev, rate, hero, numbers, gold allowance). The one shared world (the same
+// for every account, echoes become rumors) and checked battles (the server
+// stages the fight, replays the log, gives the verdict and the spoils; a
+// killing of a simulated person reaches the world; a felled beast rests).
 import assert from "node:assert/strict";
-import {
-  ApiFailure, checkToken, connectRoom, createCharacter, deleteCharacter, listCharacters, loadSave, loadWorld, login, register,
-  storeSave, storeWorld, type RoomConnection,
-} from "../lib/net/client";
-import type { ServerMsg } from "../lib/net/protocol";
+
+// The world store runs here to build real saves (it needs a localStorage).
+const memory = new Map<string, string>();
+Object.defineProperty(globalThis, "localStorage", { configurable: true, value: {
+  getItem: (key: string) => memory.get(key) ?? null,
+  setItem: (key: string, value: string) => memory.set(key, value),
+  removeItem: (key: string) => memory.delete(key),
+} });
+const originalWarn = console.warn;
+console.warn = (...args: unknown[]) => { if (!String(args[0]).includes("zustand persist middleware")) originalWarn(...args); };
+
+const {
+  ApiFailure, checkToken, connectRoom, createCharacter, deleteCharacter, finishBattle, listCharacters, loadSave, loadWorld, logBattle,
+  login, postEcho, register, startBattle, storeSave,
+} = await import("../lib/net/client");
+type RoomConnection = import("../lib/net/client").RoomConnection;
+type ServerMsg = import("../lib/net/protocol").ServerMsg;
+type BattleStartReply = import("../lib/net/play-protocol").BattleStartReply;
+const { useWorldStore } = await import("../store/world-store");
+const { partializeSave } = await import("../store/world/persist");
+const { SAVE_VERSION } = await import("../store/world/save-version");
+const { setSessionAuto, startSession, stepSession } = await import("../lib/game/grid/session");
+const { OPPONENTS } = await import("../lib/world/data/opponents");
+const { BOSSES } = await import("../lib/world/data/bosses");
+const { npcFoeFor } = await import("../lib/world/npc-life");
 
 const server = (process.env.GAME_SERVER_URL ?? "http://127.0.0.1:8787").replace(/\/$/, "");
 const run = Date.now().toString(36);
@@ -212,15 +235,102 @@ await check("saves: the server checks rev, pace, the hero, its numbers and the g
   assert.deepEqual([listed.rev, listed.summary?.day, listed.summary?.location], [2, 90, "city_capital"]);
 });
 
-await check("the shared world: one per account, stored as sent", async () => {
-  assert.deepEqual(await loadWorld(server, bobToken), { rev: 0, world: null });
-  const { rev } = await storeWorld(server, bobToken, { worldSeed: "abc", rumorPool: [] });
-  assert.equal(rev, 1);
+await check("the shared world: one for every account; a deed becomes a rumor the server writes", async () => {
+  const forAnn = await loadWorld(server, annToken);
+  const forBob = await loadWorld(server, bobToken);
+  assert.ok(!forAnn.same && !forBob.same);
+  if (forAnn.same || forBob.same) return;
+  assert.equal(forAnn.world.worldSeed, forBob.world.worldSeed, "the same world");
+  assert.ok(Object.keys(forAnn.world.npcExt).length >= 30, "its people live on the server");
+  assert.deepEqual(await loadWorld(server, annToken, forAnn.rev), { rev: forAnn.rev, same: true });
+  const before = forAnn.world.rumorPool.length;
+  const { rev } = await postEcho(server, annToken, {
+    actionId: "sect_join", context: { archetype: "นักท่องยุทธ์", sceneId: "city_capital", sectId: "shaolin" },
+  });
+  assert.ok(rev > forAnn.rev);
+  const after = await loadWorld(server, bobToken, forBob.rev);
+  assert.ok(!after.same && after.world.rumorPool.length > before, "bob hears of ann's deed");
+  assert.equal(await refusal(postEcho(server, annToken, { actionId: "made_up", context: { archetype: "นักท่องยุทธ์", sceneId: null, sectId: null } })), "bad_action");
+  assert.equal(await refusal(postEcho(server, annToken, { actionId: "sect_join", context: { archetype: "<b>hi</b>", sceneId: null, sectId: null } })), "bad_context");
+  assert.equal((await fetch(`${server}/world`)).status, 401, "no token, no world");
+});
+
+// ─── Checked battles ───────────────────────────────────────────────────
+let heroRev = 0;
+const heroId = (await listCharacters(server, bobToken).catch(() => []))[0]?.id ?? (await createCharacter(server, bobToken, "หลี่ทดสอบ", "male")).id;
+
+/** Bob's hero, strong enough to win, standing before `pendingBattle`; saved on the server. */
+async function standBefore(pendingBattle: Record<string, unknown>, gold = 0): Promise<void> {
+  const store = useWorldStore.getState();
+  if (!store.hasGame) store.startNewGame({ name: "หลี่ทดสอบ", gender: "male" });
+  const s = useWorldStore.getState();
+  const stats = Object.fromEntries(Object.keys(s.playerBuild!.stats).map((k) => [k, 900]));
+  useWorldStore.setState({ playerBuild: { ...s.playerBuild!, stats: stats as never }, currentHp: 99_999, currentMp: 99_999, gold, pendingBattle: pendingBattle as never });
+  await sleep(1100);
+  const saved = await storeSave(server, bobToken, heroId, heroRev, { version: SAVE_VERSION, state: partializeSave(useWorldStore.getState()) as never });
+  heroRev = saved.rev;
+}
+
+/** Play the server's fight here on auto, sending the log in parts; returns the local end and the verdict. */
+async function fight(reply: BattleStartReply, tamper = false) {
+  const session = startSession(reply.start.a, reply.start.b, { ...reply.start.opts, seed: reply.seed });
+  setSessionAuto(session, true);
+  for (let i = 0; i < 5000 && session.state.phase !== "over"; i++) stepSession(session);
+  const log = [...session.commands!];
+  if (tamper) log.splice(2, 0, ["a", 63, 0, 0]);
+  const half = Math.floor(log.length / 2);
+  const { at } = await logBattle(server, bobToken, heroId, { battleId: reply.battleId, from: 0, commands: log.slice(0, half) });
+  assert.equal(at, half);
+  // A repeated part (an answer lost on the way) is fine.
+  await logBattle(server, bobToken, heroId, { battleId: reply.battleId, from: 0, commands: log.slice(0, half) });
+  const verdict = await finishBattle(server, bobToken, heroId, { battleId: reply.battleId, from: half, commands: log.slice(half) });
+  return { session, verdict };
+}
+
+await check("battles: the server stages the saved fight, replays the log and pays a win; its gold lifts the allowance", async () => {
+  const foe = OPPONENTS.find((o) => o.ti === 5 && o.category === "human" && !o.boss && !o.id.startsWith("law_"))!;
+  // The whole first allowance spent at once.
+  await standBefore({ opponentId: foe.id, onWin: "city_capital", onLose: "city_capital" }, 100_000);
+  const reply = await startBattle(server, bobToken, heroId);
+  assert.equal(reply.start.b.name.length > 0, true);
+  const { session, verdict } = await fight(reply);
+  assert.equal(verdict.winner, session.state.winner, "the server saw the same fight");
+  assert.equal(verdict.hA, session.state.hA);
+  assert.equal(verdict.winner, "A");
+  assert.ok(verdict.spoils && verdict.spoils.gold >= 350, "a T5 purse");
+  // Asking again gives the same verdict.
+  assert.deepEqual(await finishBattle(server, bobToken, heroId, { battleId: reply.battleId, from: session.commands!.length, commands: [] }), verdict);
+  // The purse can be saved at once though the allowance is spent.
+  useWorldStore.setState({ gold: 100_000 + verdict.spoils!.gold, pendingBattle: null });
+  await sleep(1100);
+  heroRev = (await storeSave(server, bobToken, heroId, heroRev, { version: SAVE_VERSION, state: partializeSave(useWorldStore.getState()) as never })).rev;
+});
+
+await check("battles: a log that does not fit the fight is refused, and no fight without a saved one", async () => {
+  await standBefore({ opponentId: "petty_thief", onWin: "city_capital", onLose: "city_capital" }, 100_000);
+  const reply = await startBattle(server, bobToken, heroId);
+  assert.equal(await refusal(fight(reply, true)), "bad_log");
+  await standBefore(null as never, 100_000);
+  assert.equal(await refusal(startBattle(server, bobToken, heroId)), "no_battle");
+  assert.equal(await refusal(startBattle(server, annToken, heroId)), "no_character", "only the owner's characters");
+});
+
+await check("battles: a felled beast rests for this hero; a killing of a simulated person reaches the world", async () => {
+  const boss = BOSSES[0]!;
+  await standBefore({ opponentId: boss.id, onWin: boss.lair, onLose: "home_player" }, 100_000);
+  const { verdict } = await fight(await startBattle(server, bobToken, heroId));
+  assert.equal(verdict.winner, "A");
+  assert.equal(await refusal(startBattle(server, bobToken, heroId)), "boss_resting");
   const world = await loadWorld(server, bobToken);
-  assert.equal(world.rev, 1);
-  assert.deepEqual(world.world, { worldSeed: "abc", rumorPool: [] });
-  assert.equal(await refusal(storeWorld(server, bobToken, [1, 2])), "bad_save");
-  assert.deepEqual((await loadWorld(server, annToken)).world, null, "ann's account has its own world");
+  assert.ok(!world.same);
+  if (world.same) return;
+  const victim = Object.entries(world.world.npcExt).find(([, ext]) => ext.status !== "dead" && ext.sectRank < 10)![0];
+  useWorldStore.setState({ npcExt: world.world.npcExt });
+  await standBefore({ opponentId: npcFoeFor(useWorldStore.getState(), victim), onWin: "city_capital", onLose: "city_capital", killNpcId: victim }, 100_000);
+  const killed = await fight(await startBattle(server, bobToken, heroId));
+  assert.equal(killed.verdict.winner, "A");
+  const after = await loadWorld(server, annToken);
+  assert.ok(!after.same && after.world.npcExt[victim]?.status === "dead", "dead for everyone");
 });
 
 if (failed) {

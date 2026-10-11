@@ -104,6 +104,13 @@ export const partializeSave = (s: WorldStore): PlayerSave => ({
   lawEvasions: s.lawEvasions,
   jailCityId: s.jailCityId,
   jailUntil: s.jailUntil,
+  // v28: the hero's own deeds in the world (were the shared world's).
+  assassinatedNpcIds: s.assassinatedNpcIds,
+  kidnappedNpcIds: s.kidnappedNpcIds,
+  kidnappedUntil: s.kidnappedUntil,
+  bossDefeatedDay: s.bossDefeatedDay,
+  tournament: s.tournament,
+  tournamentHistory: s.tournamentHistory,
 });
 
 // Migrations:
@@ -164,6 +171,10 @@ export const partializeSave = (s: WorldStore): PlayerSave => ({
 //            stamp is shifted so `day` is the world's day now (rebaseDays),
 //            and the shared world (npcExt, rumors, bosses, tournament…)
 //            moved out of the save into its own key (WorldService).
+//   v27 → v28 brought the hero's own deeds back from the shared world
+//            (PLAYER_FROM_WORLD_KEYS: killed / kidnapped people, felled
+//            beasts, the tournament); joinSharedWorld hands an older local
+//            world's values to the save once.
 // Despite the list, `migrate` is one idempotent normalizer: it ignores
 // fromVersion and fills every missing field. See docs/save-format.md.
 export function migrateSave(persisted: unknown, fromVersion: number): WorldStateData {

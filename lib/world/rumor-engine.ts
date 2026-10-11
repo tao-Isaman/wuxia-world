@@ -125,6 +125,19 @@ export interface PlayerEchoArgs {
   state: WorldStateData;
   actionId: string;
   targetNpcId?: string;
+  /**
+   * How people know the hero, where it happened and the sect concerned —
+   * read off `state` when absent. The game server, which has no hero of its
+   * own, writes a player's echo from the context the player sends.
+   */
+  context?: EchoContext;
+}
+
+/** The hero-side facts a player echo is written from (playerEchoContext). */
+export interface EchoContext {
+  archetype: string;
+  sceneId: string | null;
+  sectId: string | null;
 }
 
 export interface WarningArgs {
@@ -220,6 +233,27 @@ function isBigNews(state: WorldStateData, kind: NpcEventKind, npcId: string): bo
 // Spec §3.2.2 — archetype label table. Order matters: more specific
 // combinations (good+evil, arrogance+humility) win over single-axis
 // labels.
+/** Every label archetypeLabel gives (a server checks a sent context against it). */
+export const ECHO_ARCHETYPES: readonly string[] = [
+  "บ้ายุทธ์จักรดีร้ายตามใจตน", "ผู้ล้ำลึกหยั่งไม่ถึง", "ผู้กล้าแห่งเจียงหู", "จอมมาร", "นักพรตไร้นาม", "นักท่องยุทธ์",
+];
+
+/** Whether `actionId` is a deed the jianghu talks about (it has echo templates). */
+export function isEchoAction(actionId: string): boolean {
+  return (PLAYER_ECHO_TEMPLATES[actionId]?.length ?? 0) > 0;
+}
+
+/** The hero-side facts of an echo, as the hero's state stands. */
+export function playerEchoContext(state: WorldStateData, actionId: string): EchoContext {
+  return {
+    archetype: archetypeLabel(state.traits),
+    // Player echos use the player's CURRENT scene as the location anchor.
+    // Fall back to lastLocationId when the player is mid-dialog scene.
+    sceneId: state.lastLocationId ?? state.currentSceneId ?? null,
+    sectId: playerEchoSect(state, actionId) ?? null,
+  };
+}
+
 function archetypeLabel(traits: WorldStateData["traits"]): string {
   const t = (k: TraitKey): number => traits[k] ?? 0;
   const good = t("good");
@@ -398,21 +432,19 @@ export function generatePlayerEcho(args: PlayerEchoArgs): string | null {
   const tpl = pickRandom(pool);
   if (!tpl) return null;
 
-  const archetype = archetypeLabel(state.traits);
+  const context = args.context ?? playerEchoContext(state, actionId);
   const targetName = targetNpcId ? npcDisplayName(targetNpcId) : "";
-  // Player echos use the player's CURRENT scene as the location anchor.
-  // Fall back to lastLocationId when the player is mid-dialog scene.
-  const sceneId = state.lastLocationId ?? state.currentSceneId;
+  const sceneId = context.sceneId ?? state.currentSceneId;
   const locName = locationDisplayName(sceneId);
   const region = regionOf(sceneId);
 
   const vars: Record<string, string> = {
-    archetype,
+    archetype: context.archetype,
     npc: targetName,
     npc2: targetName,
     location: locName,
   };
-  resolveDetailNames(vars, playerEchoSect(state, actionId));
+  resolveDetailNames(vars, context.sectId ?? undefined);
 
   // Player-echo distortion: heavier than the standard split.
   const r = Math.random();

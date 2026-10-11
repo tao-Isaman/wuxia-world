@@ -2,18 +2,19 @@
 
 // Characters on the game server (docs/online.md#characters-and-saves): the
 // account's character list, and entering / leaving one. Entering binds the
-// server save (lib/net/cloud-save.ts) to the world store, loads the account's
-// shared world, hydrates the store from the save (or starts a new hero for a
-// character never played) and then lets saves flow. Leaving writes what is
-// pending and empties the store. Only used with a game server set.
+// server save (lib/net/cloud-save.ts) to the world store, loads the shared
+// world everyone plays in (store/cloud-world.ts), hydrates the store from the
+// save (or starts a new hero for a character never played) and then lets
+// saves flow. Leaving writes what is pending and empties the store. Only used
+// with a game server set.
 import { create } from "zustand";
 import {
-  ApiFailure, createCharacter, deleteCharacter, listCharacters, loadWorld, storeSave, storeWorld,
+  ApiFailure, createCharacter, deleteCharacter, listCharacters, storeSave,
   type CharacterInfo, type SaveBlob,
 } from "@/lib/net/client";
 import { cloudMode, cloudSave, type CloudStatus } from "@/lib/net/cloud-save";
 import { gameServerUrl } from "@/lib/net/config";
-import { SHARED_WORLD_KEYS, sharedSlice, type SharedWorld } from "@/lib/world/shared/world";
+import { PLAYER_FROM_WORLD_KEYS, SHARED_WORLD_KEYS } from "@/lib/world/shared/world";
 import { clearMapPositions } from "@/lib/stage/types";
 import { useWorldStore } from "./world-store";
 import { useBattleStore } from "./battle-store";
@@ -21,6 +22,9 @@ import { useOnlineStore } from "./online-store";
 import { emptyData } from "./world/state";
 import { attachSharedWorld, SHARED_WORLD_KEY } from "./world/shared-local";
 import { migrateSave } from "./world/persist";
+import { SAVE_VERSION } from "./world/save-version";
+import { fetchServerWorld, followServerWorld, stopServerWorld } from "./cloud-world";
+import { cloudBattle } from "./cloud-battle";
 import { toast } from "./toast-store";
 
 export type SessionPhase = "select" | "entering" | "playing";
@@ -144,8 +148,9 @@ export const useCloudSession = create<CloudSessionState>()((set, get) => ({
     set({ phase: "entering", busy: true, error: null, current: character });
     try {
       cloudSave.select(auth.server, auth.token, character.id);
-      const { world } = await loadWorld(auth.server, auth.token);
-      cloudSave.setWorld(world as SharedWorld | null);
+      // The one world everyone plays in, as the server runs it.
+      const { rev, world } = await fetchServerWorld(auth.server, auth.token);
+      cloudSave.setWorld(world);
       emptyStore();
       await useWorldStore.persist.rehydrate();
       detachWorld = attachSharedWorld(useWorldStore, cloudSave.world);
@@ -153,15 +158,16 @@ export const useCloudSession = create<CloudSessionState>()((set, get) => ({
       if (!useWorldStore.getState().hasGame) {
         useWorldStore.getState().startNewGame({ name: character.name, gender: character.gender, bodyId: character.body });
       }
+      followServerWorld(auth.server, auth.token, rev);
       cloudSave.resume();
-      // Write once at entry: a new hero's first save, and the world.
+      // Write once at entry: a new hero's first save.
       useWorldStore.setState({});
-      cloudSave.world.save(sharedSlice(useWorldStore.getState()));
       useOnlineStore.setState({ characterId: character.id });
       set({ phase: "playing", busy: false });
     } catch (error) {
       detachWorld?.();
       detachWorld = null;
+      stopServerWorld();
       cloudSave.clear();
       emptyStore();
       set({ phase: "select", busy: false, current: null, error: codeOf(error) });
@@ -175,6 +181,8 @@ export const useCloudSession = create<CloudSessionState>()((set, get) => ({
       if (cloudSave.status !== "conflict" && cloudSave.status !== "rejected") await cloudSave.flushAll();
       detachWorld?.();
       detachWorld = null;
+      stopServerWorld();
+      cloudBattle.stop();
       cloudSave.clear();
       emptyStore();
       useOnlineStore.setState({ characterId: null });
@@ -208,29 +216,27 @@ export const useCloudSession = create<CloudSessionState>()((set, get) => ({
     set({ busy: true, error: null });
     try {
       const character = await createCharacter(auth.server, auth.token, hero.name, hero.gender);
-      // The save as the game would load it, without the shared world (that goes to the account).
-      const version = Math.max(hero.save.version ?? 0, 27);
-      const state = (hero.save.version ?? 0) < 27
+      // The save as the game would load it, without the shared world (the
+      // server runs one world for everyone); the hero's own deeds that an
+      // older browser kept in its world come along.
+      const version = Math.max(hero.save.version ?? 0, SAVE_VERSION);
+      const state = (hero.save.version ?? 0) < SAVE_VERSION
         ? migrateSave(hero.save.state, hero.save.version ?? 0) as unknown as Record<string, unknown>
         : { ...hero.save.state };
-      const world: Record<string, unknown> = {};
-      for (const key of SHARED_WORLD_KEYS) {
-        if (key in state) world[key] = state[key];
-        delete state[key];
+      let localWorld: Record<string, unknown> | null = null;
+      try {
+        localWorld = (JSON.parse(localStorage.getItem(SHARED_WORLD_KEY) ?? "null") as { world?: Record<string, unknown> } | null)?.world ?? null;
+      } catch {
+        localWorld = null;
       }
+      for (const key of PLAYER_FROM_WORLD_KEYS) {
+        const own = state[key];
+        const empty = own === undefined || own === null || (typeof own === "object" && Object.keys(own as object).length === 0);
+        if (empty && localWorld?.[key] !== undefined) state[key] = localWorld[key];
+      }
+      for (const key of SHARED_WORLD_KEYS) delete state[key];
       state.gold = Math.min(Number(state.gold) || 0, IMPORT_GOLD_CAP);
       await storeSave(auth.server, auth.token, character.id, 0, { version, state });
-      // The browser's shared world becomes the account's when the account has none yet.
-      const { world: existing } = await loadWorld(auth.server, auth.token);
-      if (!existing) {
-        let local: Record<string, unknown> | null = null;
-        try {
-          local = (JSON.parse(localStorage.getItem(SHARED_WORLD_KEY) ?? "null") as { world?: Record<string, unknown> } | null)?.world ?? null;
-        } catch {
-          local = null;
-        }
-        if (local || Object.keys(world).length) await storeWorld(auth.server, auth.token, { ...world, ...(local ?? {}) });
-      }
       try { localStorage.setItem(IMPORTED_KEY, hero.name); } catch { /* blocked storage: the offer stays */ }
       set({ busy: false });
       await get().refresh();

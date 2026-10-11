@@ -17,7 +17,8 @@ import { absoluteHours, arrestPenalty, bribeCost, describeSentence, jailCityFor,
 import { deathLosableItems } from "./death";
 import { JAIL_SCENE_ID } from "./data/activities";
 import { STAT_LABEL, deriveAll, getArt, getSkill } from "../game";
-import { generatePlayerEcho } from "./rumor-engine";
+import { generatePlayerEcho, playerEchoContext } from "./rumor-engine";
+import { sendPlayerEcho, worldRunsOnServer } from "./shared/world";
 import { questHolder } from "./npc-life";
 // Walk-tick encounters live in ./encounters; re-exported for existing importers.
 export { collectActiveHuntTargets, encounterFoeAvailable, rollFoeSpawn, rollWalkEvent } from "./encounters";
@@ -268,6 +269,7 @@ export function applyEffect(state: WorldStateData, eff: SceneEffect): void {
       // No martial arts on joining: the sect's lineage quests teach them.
       // The jianghu hears of it (every join, the intro quests' reward included).
       generatePlayerEcho({ state, actionId: "sect_join" });
+      if (worldRunsOnServer()) sendPlayerEcho({ actionId: "sect_join", context: playerEchoContext(state, "sect_join") });
       return;
     }
 
@@ -297,6 +299,11 @@ export function applyEffect(state: WorldStateData, eff: SceneEffect): void {
         actionId: eff.actionId,
         targetNpcId: eff.targetNpcId,
       });
+      // On the game server the world is the server's: it writes the rumor
+      // everyone hears from the deed (this one only shows until the next sync).
+      if (worldRunsOnServer()) {
+        sendPlayerEcho({ actionId: eff.actionId, targetNpcId: eff.targetNpcId, context: playerEchoContext(state, eff.actionId) });
+      }
       // The news of what the hero did is part of the shared world: log it as an event.
       const rumor = rumorId ? state.rumorPool.find((r) => r.id === rumorId) : undefined;
       if (rumor) recordWorldEvent(state, { t: "rumor", rumor });

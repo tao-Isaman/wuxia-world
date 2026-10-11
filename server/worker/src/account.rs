@@ -1,26 +1,25 @@
 //! One Durable Object per username: the account's event log (only
-//! `registered` so far), its characters and their saves, and its shared
-//! world. A Durable Object runs one request at a time, so two sign-ups for the
-//! same name can never both win, and two saves of one character never race.
+//! `registered` so far), its characters and their saves. A Durable Object runs
+//! one request at a time, so two sign-ups for the same name can never both
+//! win, and two saves of one character never race.
 //!
 //! Storage keys: `events` (the account), `roster` (its characters,
 //! `wuxia_core::save::Roster`), `save:<id>` (a character's last accepted save,
-//! raw JSON `{ version, state }`), `world` / `world_rev` (the shared world).
-//! The worker (`lib.rs`) checks the session token before it calls any path
-//! but `/register` and `/login`.
+//! raw JSON `{ version, state }`). The worker (`lib.rs`) checks the session
+//! token before it calls any path but `/register` and `/login`; `/grant` is
+//! called only by the TypeScript half's BattleObject (a checked win's gold),
+//! never routed from outside.
 
 use serde::Deserialize;
 use serde_json::{json, Value};
 use worker::*;
 use wuxia_core::auth::{Account, AccountEvent, AuthError, SALT_BYTES};
-use wuxia_core::save::{accept, check_save, check_world, Character, Roster, SaveError, SaveUpload};
+use wuxia_core::save::{accept, check_save, Character, Roster, SaveError, SaveUpload};
 
 use crate::{now_ms, AccountReply, Credentials};
 
 const EVENTS_KEY: &str = "events";
 const ROSTER_KEY: &str = "roster";
-const WORLD_KEY: &str = "world";
-const WORLD_REV_KEY: &str = "world_rev";
 /// PBKDF2 rounds for new accounts (env `PBKDF2_ITERATIONS`); stored per account.
 const DEFAULT_ITERATIONS: u32 = 10_000;
 
@@ -83,8 +82,8 @@ struct NewCharacter {
 }
 
 #[derive(Deserialize)]
-struct WorldUpload {
-    world: Value,
+struct Grant {
+    gold: f64,
 }
 
 impl AccountObject {
@@ -179,27 +178,15 @@ impl AccountObject {
         Response::from_json(&answer)
     }
 
-    async fn world(&self) -> Result<Response> {
-        let storage = self.state.storage();
-        let raw: Option<String> = storage.get(WORLD_KEY).await?;
-        let rev: u64 = storage.get(WORLD_REV_KEY).await?.unwrap_or(0);
-        json_text(format!(r#"{{"rev":{},"world":{}}}"#, rev, raw.as_deref().unwrap_or("null")))
-    }
-
-    async fn store_world(&self, mut req: Request) -> Result<Response> {
-        let text = req.text().await?;
-        if text.len() > wuxia_core::save::MAX_WORLD_BYTES {
-            return refused(SaveError::TooLarge);
-        }
-        let Ok(upload) = serde_json::from_str::<WorldUpload>(&text) else { return refused(SaveError::BadSave("json")) };
-        if let Err(error) = check_world(&upload.world, text.len()) {
-            return refused(error);
-        }
-        let storage = self.state.storage();
-        let rev: u64 = storage.get::<u64>(WORLD_REV_KEY).await?.unwrap_or(0) + 1;
-        let world = serde_json::to_string(&upload.world)?;
-        put_two(&storage, (WORLD_KEY, wasm_bindgen::JsValue::from_str(&world)), (WORLD_REV_KEY, wasm_bindgen::JsValue::from_f64(rev as f64))).await?;
-        Response::from_json(&json!({ "rev": rev }))
+    /// Gold a checked battle paid this character: the next saves may show it.
+    async fn grant(&self, mut req: Request, id: &str) -> Result<Response> {
+        let Ok(grant) = req.json::<Grant>().await else { return refused(SaveError::BadSave("grant")) };
+        let mut roster = self.roster().await?;
+        let Some(character) = roster.get_mut(id) else { return refused(SaveError::NoCharacter) };
+        wuxia_core::save::grant_gold(character, grant.gold);
+        let granted = character.granted;
+        self.state.storage().put(ROSTER_KEY, &roster).await?;
+        Response::from_json(&json!({ "granted": granted }))
     }
 }
 
@@ -220,8 +207,7 @@ impl DurableObject for AccountObject {
             (Method::Delete, ["characters", id]) => self.delete(id).await,
             (Method::Get, ["characters", id, "save"]) => self.load(id).await,
             (Method::Put, ["characters", id, "save"]) => self.store(req, id).await,
-            (Method::Get, ["world"]) => self.world().await,
-            (Method::Put, ["world"]) => self.store_world(req).await,
+            (Method::Post, ["characters", id, "grant"]) => self.grant(req, id).await,
             _ => reply(None, Some("not_found"), 404),
         }
     }

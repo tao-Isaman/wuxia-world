@@ -1,8 +1,10 @@
 // Saves on the game server (docs/online.md#characters-and-saves). With a game
 // server set the world store does not use localStorage: its persist storage
-// is `cloudSave.storage`, bound to the character being played, and the shared
-// world goes through `cloudSave.world` (a WorldService). No React, no store
-// imports: store/cloud-session.ts drives it.
+// is `cloudSave.storage`, bound to the character being played. The shared
+// world is the server's (one for everyone): `cloudSave.world` hands the world
+// loaded at entry to attachSharedWorld and never writes it back
+// (store/cloud-world.ts keeps it current). No React, no store imports:
+// store/cloud-session.ts drives it.
 //
 // Writes are debounced (the store changes many times a second) and build on
 // the save the server holds (`rev`): if another tab or device saved since,
@@ -12,14 +14,13 @@
 // failure retries.
 import type { StateStorage } from "zustand/middleware";
 import type { SharedWorld, WorldService } from "@/lib/world/shared/world";
-import { ApiFailure, loadSave, storeSave, storeWorld, type SaveBlob } from "./client";
+import { ApiFailure, loadSave, storeSave, type SaveBlob } from "./client";
 import { gameServerUrl } from "./config";
 
 export type CloudStatus = "off" | "saved" | "saving" | "offline" | "conflict" | "rejected";
 
 /** Debounce of save and world writes, ms (the server allows one save a second). */
 export const SAVE_DEBOUNCE_MS = 1500;
-const WORLD_DEBOUNCE_MS = 4000;
 const RETRY_MS = 5000;
 
 interface Active {
@@ -40,8 +41,6 @@ class CloudSave {
   private timer: ReturnType<typeof setTimeout> | null = null;
   private inflight: Promise<void> | null = null;
   private worldCache: SharedWorld | null = null;
-  private worldPending: SharedWorld | null = null;
-  private worldTimer: ReturnType<typeof setTimeout> | null = null;
   private listeners = new Set<() => void>();
   status: CloudStatus = "off";
   /** The server's code for the last refusal (`gold_too_fast`, `bad_save`…). */
@@ -74,9 +73,8 @@ class CloudSave {
   /** Stop writing and forget the character (after `flush`). */
   clear(): void {
     if (this.timer) clearTimeout(this.timer);
-    if (this.worldTimer) clearTimeout(this.worldTimer);
-    this.timer = this.worldTimer = null;
-    this.pending = this.worldPending = null;
+    this.timer = null;
+    this.pending = null;
     this.worldCache = null;
     this.active = null;
     this.paused = true;
@@ -85,6 +83,12 @@ class CloudSave {
 
   get characterId(): string | null {
     return this.active?.id ?? null;
+  }
+
+  /** The server, session token and character being played (null when none). */
+  get session(): { server: string; token: string; id: string } | null {
+    const active = this.active;
+    return active && !this.paused ? { server: active.server, token: active.token, id: active.id } : null;
   }
 
   /** zustand persist's storage: the active character's save on the server. */
@@ -152,41 +156,35 @@ class CloudSave {
     if (this.pending && !this.timer && this.status === "saving") this.schedule(SAVE_DEBOUNCE_MS);
   }
 
-  /** The account's shared world, loaded before the save (`WorldService.load` is synchronous). */
+  /**
+   * Write until nothing is pending (the server allows one save a second), so
+   * the server holds the state as it is now — before it stages a battle.
+   */
+  async settle(): Promise<boolean> {
+    for (let tries = 0; tries < 6; tries++) {
+      if (this.inflight) await this.inflight;
+      if (this.pending === null) return this.status === "saved";
+      if (this.status === "conflict" || this.status === "rejected") return false;
+      await this.flush();
+      if (this.pending !== null) await new Promise((resolve) => setTimeout(resolve, 1200));
+    }
+    return this.pending === null;
+  }
+
+  /** The shared world as loaded from the server at entry (`WorldService.load` is synchronous). */
   setWorld(world: SharedWorld | null): void {
     this.worldCache = world;
   }
 
+  /** The server's world for attachSharedWorld: read at entry, never written from here. */
   readonly world: WorldService = {
     load: () => this.worldCache,
-    save: (world) => {
-      this.worldCache = world;
-      if (!this.active || this.paused) return;
-      this.worldPending = world;
-      if (this.worldTimer) clearTimeout(this.worldTimer);
-      this.worldTimer = setTimeout(() => { this.worldTimer = null; void this.flushWorld(); }, WORLD_DEBOUNCE_MS);
-    },
+    save: () => {},
   };
-
-  async flushWorld(keepalive = false): Promise<void> {
-    const active = this.active;
-    const world = this.worldPending;
-    if (!active || !world) return;
-    this.worldPending = null;
-    if (this.worldTimer) { clearTimeout(this.worldTimer); this.worldTimer = null; }
-    try {
-      await storeWorld(active.server, active.token, world, keepalive);
-    } catch {
-      if (this.active === active && !this.worldPending) {
-        this.worldPending = world;
-        this.worldTimer = setTimeout(() => { this.worldTimer = null; void this.flushWorld(); }, RETRY_MS);
-      }
-    }
-  }
 
   /** Write everything pending (leaving a character, signing out, closing the page). */
   async flushAll(keepalive = false): Promise<void> {
-    await Promise.all([this.flush(keepalive), this.flushWorld(keepalive)]);
+    await this.flush(keepalive);
   }
 }
 
