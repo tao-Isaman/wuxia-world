@@ -134,7 +134,6 @@
   .hud-icon { width: 38px; height: 40px; border-radius: 8px; }
   .hud-icon img { width: 19px; height: 19px; }
   .hud-icon-label { font-size: 9px; }
-  .journey-extras { top: 154px !important; right: 8px !important; }
   .rest-quick { right: max(10px, var(--safe-right)); bottom: max(10px, var(--safe-bottom)); }
   .rest-quick-button { width: 54px; height: 54px; }
   .action-prompt { right: 10px; bottom: calc(max(10px, var(--safe-bottom)) + 64px); }
@@ -203,8 +202,12 @@
 .hud-wanted i { font-style: normal; color: #8a6a55; }
 .hud-sentence { color: #ffd79a; }
 
-/* 📌 Tracked quest: under the purse + sundial, top-right. Tap → quest log. */
-.quest-tracker { position: fixed; z-index: 31; top: calc(max(12px, var(--safe-top)) + 150px); right: 14px; width: min(260px, calc(42 * var(--vw))); }
+/* Top-right stack under the purse + sundial: 📌 the tracked quest (tap → quest
+   log), then the map's extras (the อื่น ๆ drawer button), right-aligned below it. */
+.hud-right-stack { position: fixed; z-index: 31; top: calc(max(12px, var(--safe-top)) + 150px); right: max(14px, var(--safe-right));
+  width: min(260px, calc(42 * var(--vw))); display: flex; flex-direction: column; align-items: flex-end; gap: 6px; pointer-events: none; }
+.hud-right-stack > * { pointer-events: auto; }
+.quest-tracker { width: 100%; }
 .quest-tracker button { display: flex; flex-direction: column; gap: 2px; width: 100%; padding: 7px 11px 8px; text-align: left; color: #f3e6c8;
   border: 1px solid #9a7442; border-left: 3px solid #5fb89c; border-radius: 6px; background: #2a1611e0; box-shadow: 2px 3px 0 #0a0503aa;
   font: 500 12px/1.35 var(--font-body); text-shadow: 1px 1px 0 #140a07; cursor: pointer; }
@@ -216,12 +219,12 @@
 .qt-action b { color: #f6dc8a; font-variant-numeric: tabular-nums; }
 .qt-where { font-size: 11px; color: #d8c49a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 @media (orientation: landscape) and (max-width: 640px), (orientation: portrait) and (max-height: 640px) {
-  .quest-tracker { top: calc(max(6px, var(--safe-top)) + 112px); right: 6px; width: min(210px, calc(56 * var(--vw))); }
+  .hud-right-stack { top: calc(max(6px, var(--safe-top)) + 112px); right: max(6px, var(--safe-right)); width: min(210px, calc(56 * var(--vw))); gap: 4px; }
   .quest-tracker button { padding: 5px 8px 6px; font-size: 11px; }
   .qt-name { font-size: 12px; }
 }
 @media (orientation: landscape) and (max-height: 560px) and (min-width: 641px), (orientation: portrait) and (max-width: 560px) and (min-height: 641px) {
-  .quest-tracker { top: 96px; right: 8px; width: 230px; }
+  .hud-right-stack { top: calc(max(4px, var(--safe-top)) + 92px); right: max(8px, var(--safe-right)); width: 230px; gap: 4px; }
   .quest-tracker button { padding: 4px 9px 5px; }
   .qt-where { display: none; }
 }

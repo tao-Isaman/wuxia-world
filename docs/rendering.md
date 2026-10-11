@@ -192,7 +192,7 @@ Both runtimes are loaded with a dynamic `import()` in the browser only. The host
 - chess and begging on a street corner;
 - nature nodes at the map edge.
 
-Anything that does not fit is listed in the **"อื่น ๆ ในบริเวณนี้" drawer** (`.journey-extras`). Six maps show the drawer today:
+Anything that does not fit is listed in the **"อื่น ๆ ในบริเวณนี้" drawer** (`.journey-extras`; its button rides in the HUD's top-right stack under the quest tracker, passed to `MenuBar` as `extras`). Six maps show the drawer today:
 
 | Map | Why |
 | --- | --- |
@@ -365,7 +365,7 @@ On a map (`MapHud` in `components/world/map-hud.tsx` + `MenuBar hud`):
   - Gold "ตำลึง" and w-exp "悟", each with a floating +N / −N for 1.6 s.
   - The sundial: 12 shichen from 卯; the ring turns, and 戌–寅 are styled as night (`isNight`, `lib/world/clock.ts`).
   - The "วันที่ N" pill, and the hour line (hidden on phones).
-- **Quest tracker** under the purse (`quest-tracker.tsx`): 📌 stage n/N, the quest name, 🎯 action and counter, 📍 place and roads left. Tapping it opens the quest log.
+- **Quest tracker** under the purse (`quest-tracker.tsx`): 📌 stage n/N, the quest name, 🎯 action and counter, 📍 place and roads left. Tapping it opens the quest log. It heads `.hud-right-stack` (`app/mobile-hud.css`, a flex column at the top right); the map's `extras` (the drawer button) sit right-aligned below it, so a tall tracker pushes the button down instead of covering it.
 - **Top centre:** law chips — "⛓ หมายจับ ●●○○○", "⛓ เหลือโทษ …", "🔓 พ้นโทษแล้ว · ไปที่ประตูคุก".
 - **Arrival banner.**
   - Entering a location shows "❖ name ❖" for 3.2 s.
@@ -554,7 +554,6 @@ The data in `public/progress.json` is **frozen at wave 11** (2026-09-29), so tre
 
 ## Known issues
 
-- **Drawer button.** The quest tracker may cover the "อื่น ๆ" drawer button (both sit at the top right) on the six maps that show the drawer, including `home_player`.
 - **Market and sect-internal rumors** are reachable only through the drawer.
 - **Menus still scrolling.** ภารกิจ, สำนัก and บันทึก (and shop / artisan / hall popups) keep their old scrolling layouts; only โปรไฟล์, ย่าม, วิชา, อาชีพ, จดหมาย and ชีพจร are landscape columns.
 - **Turned portrait** (see [Landscape only](#landscape-only)): Radix popovers (the stat tooltips, comboboxes) may sit off their trigger.

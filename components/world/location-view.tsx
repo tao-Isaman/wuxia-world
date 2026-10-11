@@ -552,21 +552,21 @@ export function LocationView({ scene, readOnly = false, dialogueSpeakerId }: Pro
         />
         {!readOnly && <>
         <MapHud />
-        <MenuBar hud />
-        <RumorBanner locationId={scene.id} floating />
-        {hasLeftovers && (
+        {/* The อื่น ๆ drawer button rides in the HUD's top-right stack, under the quest tracker. */}
+        <MenuBar hud extras={hasLeftovers && (
           <button
             type="button"
             title="อื่น ๆ ในบริเวณนี้"
             onClick={() => setDrawerOpen(true)}
             aria-label="อื่น ๆ ในบริเวณนี้"
             data-hud-occluder
-            className="journey-extras absolute top-40 right-3 z-30 w-11 h-11 pixel-panel hover:brightness-125"
+            className="journey-extras w-11 h-11 pixel-panel hover:brightness-125"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/icons/ui/log.png" alt="" className="pixel w-7 h-7" draggable={false} />
           </button>
-        )}
+        )} />
+        <RumorBanner locationId={scene.id} floating />
         <Modal
           open={drawerOpen}
           onClose={() => setDrawerOpen(false)}

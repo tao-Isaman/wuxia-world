@@ -77,8 +77,8 @@
 .world-controls button { padding: 0 10px; border-left: 1px solid #e2bd6a44; }
 @media (pointer: fine) { .world-controls button { min-height: 36px; } }
 
-/* "Other things here" drawer. */
-.journey-extras { top: 158px !important; right: 40px !important; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center;
+/* "Other things here" drawer: under the quest tracker in .hud-right-stack (mobile-hud.css). */
+.journey-extras { position: relative; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center;
   background: var(--dq-box-solid) !important; border: 2px solid var(--dq-edge) !important; }
 
 @media (orientation: landscape) and (max-width: 900px), (orientation: portrait) and (max-height: 900px) {
@@ -100,7 +100,6 @@
   .hud-hour { display: none; }
   .arrival-banner { top: 16%; padding: 8px 18px; gap: 10px; } .arrival-banner strong { font-size: 26px; }
   .world-controls { bottom: 150px; }
-  .journey-extras { top: 104px !important; right: 12px !important; }
 }
 @media (orientation: landscape) and (max-height: 560px) and (min-width: 641px), (orientation: portrait) and (max-width: 560px) and (min-height: 641px) {
   .hud-portrait { width: 52px; height: 52px; margin-right: -14px; }
@@ -116,7 +115,6 @@
   .hud-hour { display: none; }
   .arrival-banner { top: 14%; } .arrival-banner strong { font-size: 26px; }
   .world-controls { bottom: 6px; font-size: 11px; }
-  .journey-extras { top: 96px !important; }
 }
 @media (prefers-reduced-motion: reduce) { .sundial-ring, .hud-gauge-track > div { transition: none; } .arrival-banner { animation: none; } }
 

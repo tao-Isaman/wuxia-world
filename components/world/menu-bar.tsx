@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Panel } from "@/components/ui/wuxia/panel";
 import { WuxiaButton } from "@/components/ui/wuxia/button";
 import { Badge } from "@/components/ui/badge";
@@ -39,14 +39,15 @@ type PopupId =
 // The game's menu: nine sections (โปรไฟล์ … ชีพจร), one popup at a time.
 // On a painted map (`hud`) it is the top-left stack — the vitals card over
 // an icon bar that wraps into rows (four to a row on phones, see
-// mobile-hud.css) — plus the quest tracker and the rest button. In the
+// mobile-hud.css) — plus the top-right stack (the quest tracker over the
+// map's `extras`) and the rest button. In the
 // classic card layout (world_journey and the unpainted roads) it sits under
 // the StatusBar as a 4-column grid, 8 columns from `sm`.
 //
 // The วิชา tab manages BOTH move skills and inner arts: each of the 10
 // slots can hold either kind, so a separate inner-arts popup would just
 // duplicate state.
-export function MenuBar({ hud }: { hud?: boolean } = {}) {
+export function MenuBar({ hud, extras }: { hud?: boolean; extras?: ReactNode } = {}) {
   const [open, setOpen] = useState<PopupId>(null);
   const close = () => setOpen(null);
   // Active-quest counter for the seal badge on the ภารกิจ tab.
@@ -157,7 +158,12 @@ export function MenuBar({ hud }: { hud?: boolean } = {}) {
           <InstallGameButton variant="icon" />
         </nav>
         </div>
-        <QuestTracker onOpen={() => setOpen("quests")} />
+        {/* Top right, under the purse: the tracked quest, then whatever the
+            map adds (the อื่น ๆ drawer button), stacked so neither covers the other. */}
+        <div className="hud-right-stack">
+          <QuestTracker onOpen={() => setOpen("quests")} />
+          {extras}
+        </div>
         <RestQuickAction />
         {popups}
       </>
