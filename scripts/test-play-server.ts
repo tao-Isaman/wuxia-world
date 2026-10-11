@@ -285,6 +285,27 @@ await check("a battle the server refuses counts as left: no spoils, no harm", as
   }
 });
 
+await check("the server's TypeScript half bundles from the repository alone (no npm package: Workers Builds has none)", async () => {
+  const packages = new Set<string>();
+  const result = await Bun.build({
+    entrypoints: [`${process.cwd()}/server/worker/ts/entry.ts`],
+    target: "browser",
+    external: ["cloudflare:workers", "wuxia-rust"],
+    plugins: [{
+      name: "no-npm",
+      setup(build) {
+        build.onResolve({ filter: /.*/ }, (args) => {
+          if (/^(\.|\/|@\/)/.test(args.path) || args.path === "cloudflare:workers" || args.path === "wuxia-rust") return undefined;
+          packages.add(args.path);
+          return { path: args.path, external: true };
+        });
+      },
+    }],
+  });
+  assert.ok(result.success, result.logs.join("\n"));
+  assert.deepEqual([...packages], []);
+});
+
 if (failed) {
   console.error(`${failed} play-server check(s) failed`);
   process.exit(1);
