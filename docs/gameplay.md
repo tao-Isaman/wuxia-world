@@ -118,7 +118,7 @@ Everything happens at once; the price is stamina (an action that used to take *h
 
 **Regeneration.** Out of battle, stamina refills on its own in 6 ชั่วยาม (30 real minutes) and HP / MP in 12 (one real hour), whether or not the game is open. Back after a day or more away, a toast and the log say how many days passed (ระหว่างที่ท่านไม่อยู่ ผ่านไป N วัน).
 
-Night falls from about the 8th ชั่วยาม. It only changes the lighting, the sundial and the music.
+Night is the five watches, 戌 to 寅 (ชั่วยาม 7–11; `isNight` in `lib/world/clock.ts`). It only changes the lighting, the sundial, the HUD's ยามค่ำ and the music (the synthesized `night` song where a place has no region song).
 
 ### Resting
 

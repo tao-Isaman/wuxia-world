@@ -43,11 +43,12 @@ const WILD_PLACE = /^(cave|cliff|mt|valley|peak|forest|swamp|lake|river)_/;
 /**
  * The exploring track for where the hero is: the desert song, the wilds song
  * on roads and in wild places, else the region's song (the west's non-desert
- * places play the themes). `region` is the place's region (regionOf).
+ * places play the themes, as `night` after dark). `region` is the place's
+ * region (regionOf); `night` is `isNight` of the world clock (lib/world/clock.ts).
  */
-export function exploringTrack(locationId: string | null | undefined, onRoad: boolean, region: string): TrackId {
+export function exploringTrack(locationId: string | null | undefined, onRoad: boolean, region: string, night = false): TrackId {
   if (isDesertPlace(locationId)) return "desert";
   if (onRoad || (locationId && WILD_PLACE.test(locationId))) return "wilds";
   if (region in REGION_SONGS) return region as RegionTrackId;
-  return "world";
+  return night ? "night" : "world";
 }
