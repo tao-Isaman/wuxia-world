@@ -887,7 +887,7 @@ export interface Letter {
 }
 
 // ─── Sword tournament (lib/world/tournament.ts) ───────────────────────
-// One year's ชุมนุมวิจารณ์กระบี่: a 32-entrant single-elimination bracket.
+// One year's ชุมนุมประลองกระบี่: a 32-entrant single-elimination bracket.
 // Entrant ids are NPC ids, or "player" for the hero.
 export interface TournamentState {
   year: number;

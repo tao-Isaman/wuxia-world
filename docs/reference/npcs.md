@@ -250,7 +250,7 @@
 | `sect_gumu_disciple_lengyue` | ศิษย์เลิ่งเยว่ | 💬 ⚔ | 2 |
 | `sect_gumu_mystery_woman` | หญิงปริศนาในสุสาน | 💬 ⚔ 🤏 | 20 |
 
-### ลิ่งจิ้วกง (`sect_lingjiu`)
+### วังอินทรีหิมะ (`sect_lingjiu`)
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
@@ -392,7 +392,7 @@
 | `villa_meizhuang_painter_danqing` | ชุยหลานเซิง | 💬 | 1 |
 | `villa_meizhuang_steward_ding` | พ่อบ้านเกิ่งหลี่ | 💬 | — |
 
-### บ้านค้าขายเจิ้นเวย (`villa_fuwei`)
+### สำนักคุ้มภัยเจิ้นหยวน (`villa_fuwei`)
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
@@ -432,7 +432,7 @@
 
 ## Homes
 
-### บ้านโฮ่งชีก๋ง (`home_hong`)
+### บ้านเผิงเหล่าจิ่ว (`home_hong`)
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |

@@ -3,7 +3,7 @@
 Every sect skill and art can be earned through a quest:
 
 - **Lineage quests** pass on each T0–T3 sect skill and art.
-- **Story sagas** are 8–10 linked chapters that tell a legend of มังกรหยก ภาค 3 and end in a T4 sect skill or art.
+- **Story sagas** are 8–10 linked chapters that tell a legend of the last age and end in a T4 sect skill or art.
 - **Cutscenes** stage scenes on the painted maps, like a film.
 
 This page covers the engine. How to *write* the content is in [story-writing.md](story-writing.md).
@@ -112,8 +112,8 @@ Their duel foes (`st_jh_*`) are about twice as strong as sect-saga foes, and inn
 | `mountain_army` | `military` เคล็ดวิชาภูผาทะลายทัพ | T4 |
 | `heaven_fire` | `fire` ตำราเพลิงสวรรค์ | T4 |
 | `sunflower` | `khbt` คัมภีร์ทานตะวัน | T5 |
-| `nine_yang` | `kuyt` วิชาเก้าเอี้ยง | T5 |
-| `nine_yin` | `kgim` คัมภีร์เก้าอิม | T5 |
+| `nine_yang` | `kuyt` ลมปราณตะวันเก้าชั้น | T5 |
+| `nine_yin` | `kgim` คัมภีร์จันทราเก้าชั้น | T5 |
 
 ## Cutscenes
 
@@ -155,7 +155,7 @@ A cutscene is registered under `cs_<sceneId>` and played by a dialog whose `cuts
 
 ## Safety rules
 
-- **Declinable and droppable, never lost.** Every compiled offer scene (and its asides) carries a `DECLINE_TEXT` choice ("ขอปฏิเสธไว้ก่อน") back to the giver's place; the NPC card opens an offer scene that starts its quest **before** accepting, so declining leaves nothing behind. The sect art trials (no offer scene) ask in a confirm box. `abandonQuest` on a lineage quest, saga chapter or art trial deletes its entry, its `qobj:` flags and the tracking pin instead of failing it: they are the only way to their skill or art (save the sword tournament champion's prize pick — see [gameplay.md](gameplay.md#the-sword-tournament-ชุมนุมวิจารณ์กระบี่เขาหัวซาน)), so they must come back.
+- **Declinable and droppable, never lost.** Every compiled offer scene (and its asides) carries a `DECLINE_TEXT` choice ("ขอปฏิเสธไว้ก่อน") back to the giver's place; the NPC card opens an offer scene that starts its quest **before** accepting, so declining leaves nothing behind. The sect art trials (no offer scene) ask in a confirm box. `abandonQuest` on a lineage quest, saga chapter or art trial deletes its entry, its `qobj:` flags and the tracking pin instead of failing it: they are the only way to their skill or art (save the sword tournament champion's prize pick — see [gameplay.md](gameplay.md#the-sword-tournament-ชุมนุมประลองกระบี่หัวซาน)), so they must come back.
 - **Outlive their giver.** When the NPC simulation kills a giver, `failQuestsForDeadGivers` skips story and lineage quests. Dead masters stay on their map, so the hand-in still works.
 - **New conditions.**
   - `learnedSkill` is the counterpart of `learnedArt`.

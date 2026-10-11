@@ -8,7 +8,7 @@ export const NPCS_XIAOYAO: readonly NpcDef[] = [
   {
     id: "sect_xiaoyao_master_yunxiao",
     name: "ปรมาจารย์ยุนเซียว",
-    description: "ปรมาจารย์พรรคสราญรมย์ · ผู้สืบทอดมหาเวทดูดดาวและฝ่ามือสราญรมย์ · ฝีมือเทียบเท่าตำนานยุทธจักร · บุคลิกเสรีและไม่ชอบกฎเกณฑ์",
+    description: "ปรมาจารย์พรรคสราญรมย์ · ผู้สืบทอดวิชากลืนลมปราณและฝ่ามือสราญรมย์ · ฝีมือเทียบเท่าตำนานยุทธจักร · บุคลิกเสรีและไม่ชอบกฎเกณฑ์",
     locationIds: ["sect_xiaoyao"],
     dialogSceneId: "npc_sect_xiaoyao_master_yunxiao_talk",
     sparOpponentId: "spar_xiaoyao_master_yunxiao",
@@ -35,7 +35,7 @@ export const NPCS_XIAOYAO: readonly NpcDef[] = [
   {
     id: "sect_xiaoyao_vice_tianshan",
     name: "รองอาจารย์เทียนซาน",
-    description: "รองอาจารย์ของเซียวหยาว · ผู้เชี่ยวชาญลมปราณภูติอุดร · เคียงข้างยุนเซียวมาหลายสิบปี",
+    description: "รองอาจารย์ของเซียวหยาว · ผู้เชี่ยวชาญลมปราณทะเลลึก · เคียงข้างยุนเซียวมาหลายสิบปี",
     locationIds: ["sect_xiaoyao"],
     dialogSceneId: "npc_sect_xiaoyao_vice_tianshan_talk",
     sparOpponentId: "spar_xiaoyao_tianshan",

@@ -1,6 +1,6 @@
 // องครักษ์เสื้อแพร — story sagas for the T4 chain skill and the two T4 arts.
-// Sagas retell legends of มังกรหยก ภาค 3 (ดาบมังกรหยก): forty to fifty
-// years ago the Yuan court's guards and spymasters served เตียบ้อ and her
+// Sagas retell legends of the jianghu: forty to fifty
+// years ago the Yuan court's guards and spymasters served เอ๋อหลันจู and her
 // father; today's brocade guards are their heirs and survivors. Present-day guards pass the arts on;
 // flashback cutscenes (mood "past") show the legend itself. The bureau's own
 // recent past colours the present: it seized the sects' scriptures into the
@@ -28,7 +28,7 @@ const FROST = "#9fc3ff"; // cold-palm blue
 export const LINEAGE: readonly LineageSpec[] = [];
 
 // ─── Saga: โซ่ล่าสังหาร — "โซ่สิบสองข้อ" ─────────────────────────────────
-// Legend: the two Xuanming elders struck a boy (เตียบ่อกี้) with their
+// Legend: the two Xuanming elders struck a boy (ลั่วเทียนหมิง) with their
 // freezing palm while a young court guard, กวนเถี่ย, was ordered to stand by.
 // He quit the escort and hunted them for twelve years — one link of his chain
 // for each year. When he caught them, old and sick on Kunlun, he did not kill
@@ -149,7 +149,7 @@ const CHAIN_ASSASSIN: StoryArcSpec = {
           beats: [
             ["fx", "ice"],
             ["narrate", "สองเฒ่าเฮี้ยนเม้งแห่งราชสำนักหยวน ปลอมตัวเป็นทหารมองโกล คุมตัวเด็กชายคนหนึ่งข้ามทางหิมะ"],
-            ["say", "deer", "บอกมาเถิดหนู พ่อเจ้าเก็บความลับของราชสีห์ขนทองไว้ที่ไหน"],
+            ["say", "deer", "บอกมาเถิดหนู พ่อเจ้าเก็บความลับของราชสีห์ตาบอดไว้ที่ไหน"],
             ["say", "boy", "ข้าไม่รู้ ถึงรู้ก็ไม่บอก"],
             ["say", "crane", "ปากแข็งดี ลองดูซิว่าจะแข็งกว่าน้ำแข็งไหม"],
             ["act", "crane", "attack"],
@@ -163,7 +163,7 @@ const CHAIN_ASSASSIN: StoryArcSpec = {
           ],
         },
         lines: [
-          ["องครักษ์ลู่", "เด็กคนนั้นคือเตียบ่อกี้ ภายหลังเป็นประมุขที่ยุทธภพเกรงขาม แต่ตอนนั้นเขาแค่เด็กที่หนาวจนนอนไม่หลับไปหลายปี"],
+          ["องครักษ์ลู่", "เด็กคนนั้นคือลั่วเทียนหมิง ภายหลังเป็นประมุขที่ยุทธภพเกรงขาม แต่ตอนนั้นเขาแค่เด็กที่หนาวจนนอนไม่หลับไปหลายปี"],
           ["องครักษ์ลู่", "องครักษ์หนุ่มชื่อกวนเถี่ย คืนนั้นเขาถอดป้ายองครักษ์วางไว้บนหิมะ แล้วเดินตามสองเฒ่าไปโดยไม่มีใครสั่ง"],
           ["องครักษ์ลู่", "เขาตามอยู่สิบสองปี ทุกปีที่ตามไม่ทัน เขาเพิ่มข้อโซ่หนึ่งข้อ — นี่คือโซ่เส้นนั้น"],
           ["องครักษ์ลู่", "แต่ตำนานเก่าช่วยเด็กที่ชีกู่ไม่ได้ ตำรายาของกรมว่า โสมช่วยรั้งไฟในตัวไว้ได้ชั่วคราว ไปหามาสามราก"],
@@ -630,8 +630,8 @@ const CHAIN_ASSASSIN: StoryArcSpec = {
 };
 
 // ─── Saga: เจ้านายเสื้อแพร — "ตาพันดวงของท่านอ๋อง" ───────────────────────
-// Legend: the Yuan prince (เตียบ้อ's father) ran a web of a thousand eyes
-// across the land, sealed with a jade hawk. The true mind of it was เตียบ้อ,
+// Legend: the Yuan prince (เอ๋อหลันจู's father) ran a web of a thousand eyes
+// across the land, sealed with a jade hawk. The true mind of it was เอ๋อหลันจู,
 // who knew every agent by name. When she left the court for the man she
 // loved, her last order under the seal set every agent free — but the old
 // guard who carried it never delivered it. Today the hawk seal, stolen from
@@ -733,7 +733,7 @@ const BROCADE_LORD: StoryArcSpec = {
           title: "สี่สิบกว่าปีก่อน", subtitle: "ตำหนักท่านอ๋องแห่งราชสำนักหยวน",
           cast: {
             prince: { name: "ท่านอ๋องแห่งราชสำนักหยวน", look: "elder", at: [2, -1], facing: "left", tint: YUAN, size: 1.1 },
-            min: { name: "เตียบ้อ", look: "f2", at: [-1, 0], facing: "right" },
+            min: { name: "เอ๋อหลันจู", look: "f2", at: [-1, 0], facing: "right" },
             ma: { name: "องครักษ์หม่า", look: "m4", at: [-4, 1], facing: "right", tint: OLD_BROCADE },
           },
           beats: [
@@ -748,7 +748,7 @@ const BROCADE_LORD: StoryArcSpec = {
           ],
         },
         lines: [
-          ["ผู้บัญชาการจ้าวฝู่", "ท่านอ๋องสร้างตาพันดวง เตียบ้อทำให้มันมองเห็น"],
+          ["ผู้บัญชาการจ้าวฝู่", "ท่านอ๋องสร้างตาพันดวง เอ๋อหลันจูทำให้มันมองเห็น"],
           ["ผู้บัญชาการจ้าวฝู่", "องครักษ์หม่าในภาพนั้น คือคนแรกในสายของกรมเรา"],
           ["องครักษ์ฉิน", "และโจวที่โรงเตี๊ยมยั่วไหลเพิ่งส่งรหัสมา — รหัสของเขาคือขวดเหล้าเปล่า ส่งมาสามขวด แปลว่าด่วนมาก หรือแปลว่าเขาเมามาก"],
           ["ผู้บัญชาการจ้าวฝู่", "ไปหาเขา คนที่ตรวจว่าใครทำตามคำสั่งก็คงเฝ้าอยู่แถวนั้น"],
@@ -810,7 +810,7 @@ const BROCADE_LORD: StoryArcSpec = {
       complete: {
         lines: [
           ["{hero}", "เรือที่ส่งผ้าไหมมาจากคลังพระราชวังจงหยาง และซีบอกว่าตาของเขาเคยได้ของขวัญจากองค์หญิงที่จำชื่อตาได้"],
-          ["เฟิงเจ้าของร้านบะหมี่", "องค์หญิงเตียบ้อ… พ่อข้าก็เล่าแบบเดียวกัน ว่าเคยได้หม้อบะหมี่ใบแรกจากนาง"],
+          ["เฟิงเจ้าของร้านบะหมี่", "องค์หญิงเอ๋อหลันจู… พ่อข้าก็เล่าแบบเดียวกัน ว่าเคยได้หม้อบะหมี่ใบแรกจากนาง"],
           "เฟิงฝนหมึกพลางเขียนรหัสใหม่ลงกระดาษ ทุกคำเป็นชื่อเมนูบะหมี่ที่ไม่มีอยู่จริง",
           ["เฟิงเจ้าของร้านบะหมี่", "'บะหมี่เป็ดทะเล' แปลว่าศัตรูมาทางน้ำ 'บะหมี่ไร้เส้น' แปลว่าหนี ข้าว่าข้ามีพรสวรรค์"],
           ["เฟิงเจ้าของร้านบะหมี่", "ยังมีอีกคน เหมยพรานป่าที่ต้าหลี่ นางไม่ตอบรหัสใดเลย ข้าเป็นห่วง"],
@@ -866,7 +866,7 @@ const BROCADE_LORD: StoryArcSpec = {
           stage: "palace_zhongyang", mood: "past",
           title: "คืนสุดท้ายในวังหลวง", subtitle: "สี่สิบกว่าปีก่อน",
           cast: {
-            min: { name: "เตียบ้อ", look: "f2", at: [0, 0], facing: "left" },
+            min: { name: "เอ๋อหลันจู", look: "f2", at: [0, 0], facing: "left" },
             ma: { name: "องครักษ์หม่า", look: "m4", at: [-3, 1], facing: "right", tint: OLD_BROCADE },
           },
           beats: [
@@ -899,7 +899,7 @@ const BROCADE_LORD: StoryArcSpec = {
             lines: [
               "กล่องไม้จันทน์ใบบนสุดบุผ้าไหมแดง มีรอยบุ๋มรูปเหยี่ยวกางปีก — แต่ว่างเปล่า ตราเหยี่ยวหยกหายไปแล้ว",
               "กล่องใบล่างสุดผนึกด้วยครั่งสีดำที่แห้งจนแตกลายงา ข้างในมีจดหมายฉบับเดียว กระดาษเหลืองกรอบ ตราเหยี่ยวประทับสีจาง",
-              "\"ถึงตาทุกดวง จากวันนี้ทุกคนเป็นอิสระ จะอยู่หรือไปเลือกเอง ขอบใจที่ลืมตาเพื่อข้ามานาน — เตียบ้อ\"",
+              "\"ถึงตาทุกดวง จากวันนี้ทุกคนเป็นอิสระ จะอยู่หรือไปเลือกเอง ขอบใจที่ลืมตาเพื่อข้ามานาน — เอ๋อหลันจู\"",
               "ใต้จดหมายมีอีกแผ่นหนึ่ง ลายมือหยาบกระด้าง: \"ข้า หม่า ไม่ได้ส่ง ขอให้ผู้สืบทอดกรมทุกคนรู้ว่า ตาพันดวงอยู่กับเรามาได้ เพราะข้าโกหก\"",
               ["{hero}", "สี่สิบกว่าปี… พวกเขาเป็นอิสระมาตลอด แต่ไม่มีใครรู้"],
             ],
@@ -994,7 +994,7 @@ const BROCADE_LORD: StoryArcSpec = {
           ["ผู้บัญชาการจ้าวฝู่", "ต้องมีพยาน ตาพันดวงต้องยืนยันเองว่าได้รับคำสั่งจากใคร"],
           ["{hero}", "พวกเขาจะยืนยันได้ ก็ต่อเมื่อเลิกกลัวตรา"],
           ["ผู้บัญชาการจ้าวฝู่", "และจะเลิกกลัวตรา ก็ต่อเมื่อรู้ว่าตัวเองเป็นอิสระ"],
-          "ผู้บัญชาการวางจดหมายของเตียบ้อลงตรงหน้าท่าน แล้วถอยหลังหนึ่งก้าว",
+          "ผู้บัญชาการวางจดหมายของเอ๋อหลันจูลงตรงหน้าท่าน แล้วถอยหลังหนึ่งก้าว",
           ["ผู้บัญชาการจ้าวฝู่", "เจ้าเลือก"],
         ],
       },
@@ -1002,7 +1002,7 @@ const BROCADE_LORD: StoryArcSpec = {
     },
     {
       title: "จดหมายที่ส่งช้าไปสี่สิบปี",
-      summary: "ส่งคำสั่งสุดท้ายของเตียบ้อถึงตาทุกดวง — แม้จะเสี่ยงว่าพวกเขาจะเลือกจากไป",
+      summary: "ส่งคำสั่งสุดท้ายของเอ๋อหลันจูถึงตาทุกดวง — แม้จะเสี่ยงว่าพวกเขาจะเลือกจากไป",
       giver: "spy_capital_feng",
       offer: {
         lines: [
@@ -1014,8 +1014,8 @@ const BROCADE_LORD: StoryArcSpec = {
         go: "รับคำ",
       },
       steps: [
-        { t: "gather", itemId: "paper", count: 5, hint: "หากระดาษสา 5 แผ่น คัดลอกคำสั่งสุดท้ายของเตียบ้อ" },
-        { t: "talk", npcId: "spy_village_si", locationId: "village_qigu", label: "ส่งจดหมายให้ซื่อชาวนา", hint: "นำจดหมายของเตียบ้อไปให้ซื่อชาวนาที่หมู่บ้านชีกู่",
+        { t: "gather", itemId: "paper", count: 5, hint: "หากระดาษสา 5 แผ่น คัดลอกคำสั่งสุดท้ายของเอ๋อหลันจู" },
+        { t: "talk", npcId: "spy_village_si", locationId: "village_qigu", label: "ส่งจดหมายให้ซื่อชาวนา", hint: "นำจดหมายของเอ๋อหลันจูไปให้ซื่อชาวนาที่หมู่บ้านชีกู่",
           scene: {
             lines: [
               "ซื่ออ่านจดหมายสามรอบ แล้ววางจอบลงพิงรั้ว",
@@ -1026,7 +1026,7 @@ const BROCADE_LORD: StoryArcSpec = {
             ],
             go: "ไปส่งฉบับต่อไป",
           } },
-        { t: "talk", npcId: "spy_inn_zhou", locationId: "inn_yuelai", label: "ส่งจดหมายให้โจวพ่อค้าเหล้า", hint: "นำจดหมายของเตียบ้อไปให้โจวพ่อค้าเหล้าที่โรงเตี๊ยมยั่วไหล",
+        { t: "talk", npcId: "spy_inn_zhou", locationId: "inn_yuelai", label: "ส่งจดหมายให้โจวพ่อค้าเหล้า", hint: "นำจดหมายของเอ๋อหลันจูไปให้โจวพ่อค้าเหล้าที่โรงเตี๊ยมยั่วไหล",
           scene: {
             lines: [
               ["โจวพ่อค้าเหล้าในโรงเตี๊ยม", "อิสระ… ข้าอิสระ… งั้นข้าเลิกจดเสียงคนเมาได้แล้วสิ ฮึก"],
@@ -1182,7 +1182,7 @@ const BROCADE_LORD: StoryArcSpec = {
 };
 
 // ─── Saga: พลังประหารเทพ — "หอเจดีย์หมื่นปี" ───────────────────────────
-// Legend (forty-odd years ago): เตียบ้อ drugged the masters of the six great sects with a
+// Legend (forty-odd years ago): เอ๋อหลันจู drugged the masters of the six great sects with a
 // ten-fragrance powder and caged them in a tall pagoda in the capital. The
 // court's guards devised an art to pierce bodies hardened by a lifetime of
 // inner power — a strike to slay the "gods" of the jianghu. A young guard,
@@ -1285,8 +1285,8 @@ const GODSLAYER: StoryArcSpec = {
           stage: "city_capital", mood: "past",
           title: "สี่สิบกว่าปีก่อน", subtitle: "หอเจดีย์หมื่นปี · นครหลวง",
           cast: {
-            min: { name: "เตียบ้อ", look: "f2", at: [3, -1], facing: "left" },
-            miejue: { name: "ซือไท้เมียะเจ็ก", look: "f4", at: [0, 0], facing: "right", tint: "#f2efe6" },
+            min: { name: "เอ๋อหลันจู", look: "f2", at: [3, -1], facing: "left" },
+            miejue: { name: "ซือไท้จิ้งหาน", look: "f4", at: [0, 0], facing: "right", tint: "#f2efe6" },
             shen: { name: "เสิ่นเหยียน องครักษ์หนุ่ม", look: "m3", at: [-3, 1], facing: "right", tint: OLD_BROCADE },
             monk: { name: "เจ้าอาวาสค่งบุ้น", look: "monk", at: [-1, -2], facing: "right", tint: "#e0c080" },
           },
@@ -1317,7 +1317,7 @@ const GODSLAYER: StoryArcSpec = {
           scene: {
             lines: [
               ["ซือไท้จิงฉาน", "เสิ่นเหยียน… ในบันทึกที่ง้อไบ๊เพิ่งไถ่คืนจากหอคัมภีร์หลวงมีชื่อนี้ เขียนโดยศิษย์ที่รอดจากหอเจดีย์ ใต้ชื่อเขียนว่า 'องครักษ์ที่ไม่ยอมตัดนิ้ว'"],
-              ["ซือไท้จิงฉาน", "ศิษย์ง้อไบ๊ทุกคนต้องไหว้ชื่อนั้นปีละครั้ง ทั้งที่เขาเป็นคนของราชสำนัก — นั่นคือสิ่งที่ซือไท้เมียะเจ็กสั่งไว้"],
+              ["ซือไท้จิงฉาน", "ศิษย์ง้อไบ๊ทุกคนต้องไหว้ชื่อนั้นปีละครั้ง ทั้งที่เขาเป็นคนของราชสำนัก — นั่นคือสิ่งที่ซือไท้จิ้งหานสั่งไว้"],
               "ซือไท้ห้วนรับบัตรเชิญไปถือ แต่ไม่คลี่ออก นางวางมันลงบนโต๊ะห่างตัวหนึ่งศอก",
               ["ซือไท้จิงฉาน", "กลิ่นนี้… อาตมาจะไป เพราะถ้าง้อไบ๊ไม่ไป ราชสำนักจะว่าเรากลัว และง้อไบ๊ไม่กลัว"],
             ],

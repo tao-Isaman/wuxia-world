@@ -622,7 +622,7 @@ function tickRegen(
     if (heal > 0) logLine(state, "lS", `&nbsp;💊 ${nameOf(side, names)} ฟื้น ${heal} (อุปกรณ์)`);
   }
 
-  // Art aura regen — capstone arts (e.g., วิชาเก้าเอี้ยง) grant a
+  // Art aura regen — capstone arts (e.g., ลมปราณตะวันเก้าชั้น) grant a
   // constant HP/MP trickle each turn from their primary-art slot.
   if (artId) {
     const art = getArt(artId);

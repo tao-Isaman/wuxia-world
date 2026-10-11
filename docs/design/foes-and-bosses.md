@@ -131,11 +131,11 @@ export function bossesAt(state, locationId): BossDef[];       // alive bosses in
 | Id | Name | Sheet | Lair (suggested, one per region) | Minions |
 | --- | --- | --- | --- | --- |
 | `boss_golden_serpent` | งูยักษ์เกล็ดทองคำ | `boss_golden_serpent` | `cave_jinshe` ถ้ำงูทอง (east), spot 82, 32 | `viper_snake` + `jade_python` |
-| `boss_blood_tiger` | พยัคฆ์โลหิตลายคราม | `boss_blood_tiger` | `valley_hudie` ถ้ำหุบเขาผีเสื้อ (south), spot 84, 26 | `mountain_tiger` + `golden_tiger` |
+| `boss_blood_tiger` | พยัคฆ์โลหิตลายคราม | `boss_blood_tiger` | `valley_hudie` ถ้ำหุบเขาร้อยยา (south), spot 84, 26 | `mountain_tiger` + `golden_tiger` |
 | `boss_sword_eagle` | อินทรียักษ์จ้าวแห่งกระบี่ | `boss_sword_eagle` | `cliff_motian` ยอดเขามรณะ (north), spot 54, 24 | 2× `thunder_eagle` |
 | `boss_sun_turtle` | เต่ายักษ์แบกตะวัน | `boss_sun_turtle` | `isle_wuming` เกาะไร้ชื่อ (east), spot 84, 32 | 2× `stone_turtle` เต่ากระดองหิน (new T4 coast beast) |
 | `boss_blade_crab` | ปูวิเศษจ้าวแห่งดาบ | `boss_blade_crab` | `pool_heilong` สระมังกรดำ (west), spot 66, 24 | 2× `iron_crab` ปูก้ามเหล็ก (new T3 coast beast) |
-| `boss_flame_bull` | กระทิงยักษ์เขาเพลิง | `boss_flame_bull` | `peak_guangming` ยอดแสงสว่าง (heartland), spot 70, 32 | 2× `blood_boar` |
+| `boss_flame_bull` | กระทิงยักษ์เขาเพลิง | `boss_flame_bull` | `peak_guangming` ยอดเพลิงอุดร (heartland), spot 70, 32 | 2× `blood_boar` |
 
 As built: the six lairs cover all five regions (two in the east: a cave and an
 isle). The tiger moved south (no north lair fits a tiger and the eagle both)

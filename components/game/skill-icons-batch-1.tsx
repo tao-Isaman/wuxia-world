@@ -460,8 +460,8 @@ Object.assign(SKILL_ICON_RASTER, {
   qz_sun_fist: "/icons/skills/qz_sun_fist.png", // หมัดสุริยัน
   qz_sun_sword: "/icons/skills/qz_sun_sword.png", // กระบี่สะกดสุริยันต์
   gm_sword: "/icons/skills/gm_sword.png", // กระบี่สุสานโบราณ
-  ynss: "/icons/skills/ynss.png", // เพลงกระบี่สุรางคนางค์ใจพิสุทธิ์
-  ansh: "/icons/skills/ansh.png", // ฝ่ามือกำสรดวิญญาณสลาย
+  ynss: "/icons/skills/ynss.png", // เพลงกระบี่วารีพิสุทธิ์
+  ansh: "/icons/skills/ansh.png", // ฝ่ามืออาลัยจันทร์
   nc1: "/icons/skills/nc1.png", // ประกาศิตพรรคยาจก
   nc2: "/icons/skills/nc2.png", // ไม้เท้าขอทาน
   bg_snake_fist: "/icons/skills/bg_snake_fist.png", // เพลงหมัดอสรพิษคนจร
@@ -470,7 +470,7 @@ Object.assign(SKILL_ICON_RASTER, {
   bg_drift_fist: "/icons/skills/bg_drift_fist.png", // เพลงหมัดล่องลอย
   bg_wander_staff: "/icons/skills/bg_wander_staff.png", // ไม้เท้าพเนจร
   ng3: "/icons/skills/ng3.png", // ฝ่ามือจับมังกร
-  ep: "/icons/skills/ep.png", // 18 ฝ่ามือพิชิตมังกร
+  ep: "/icons/skills/ep.png", // ฝ่ามือปราบมังกร 18 ท่า
   bg_lucky_staff: "/icons/skills/bg_lucky_staff.png", // เพลงไม้เท้าตีสุนัข
   mi_firepalm: "/icons/skills/mi_firepalm.png", // ฝ่ามือเพลิง
   xy_lesserdemon_blade: "/icons/skills/xy_lesserdemon_blade.png", // ดาบอสูรน้อย
@@ -562,7 +562,7 @@ Object.assign(SKILL_ICON_RASTER, {
   zs: "/icons/skills/zs.png", // กู่ฉินสะท้านจิต
   nh1: "/icons/skills/nh1.png", // พลองเทวดา
   nh2: "/icons/skills/nh2.png", // กระบี่วิเศษ
-  yyz: "/icons/skills/yyz.png", // ดัชนีเอกสุริยัน
+  yyz: "/icons/skills/yyz.png", // นิ้วเพลิงอรุณ
   nf1: "/icons/skills/nf1.png", // กู่ฉินสังหาร
   nf2: "/icons/skills/nf2.png", // ดาบโดดเดี่ยว
   nf3: "/icons/skills/nf3.png", // ทวนประทับมังกร

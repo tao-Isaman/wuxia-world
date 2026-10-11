@@ -16,7 +16,7 @@
 | `sect_taishan` | ไท่ซาน | `taishan` | เจ้าสำนักชิงสือเต้าเหริน | 5 → 1 | 5 |
 | `sect_quanzhen` | ฉวนเจิน / ชวนจิน | `quanzhen` | อาจารย์ใหญ่หลิงเจิน | 5 → 1 | 5 |
 | `sect_gumu` | กู่มู่ / โบราณสุสาน | `gumu` | หญิงปริศนาในสุสาน | 3 → 1 | 4 |
-| `sect_lingjiu` | ลิ่งจิ้วกง | — (no membership) | — | — | — |
+| `sect_lingjiu` | วังอินทรีหิมะ | — (no membership) | — | — | — |
 | `sect_beggars` | พรรคยาจก | `beggars` | หัวหน้าหงเทียน | 9 → 1 | 8 |
 | `sect_ming` | พรรคตะวันจันทรา | `sunmoon` | อาจารย์ใหญ่หยินอวี้ | 9 → 1 | 8 |
 | `sect_xiaoyao` | พรรคสราญรมย์ (เซียวหยาว) | `xiaoyao` | ปรมาจารย์ยุนเซียว | 9 → 1 | 7 |
@@ -281,9 +281,9 @@ Martial line — every skill and art is taught only by its lineage quest or saga
 | Rank | Kind | Skill / art | Quest |
 | --- | --- | --- | --- |
 | 2 | skill | กระบี่สุสานโบราณ (`gm_sword`) | `ql_skill_gm_sword` |
-| 2 | skill | เพลงกระบี่สุรางคนางค์ใจพิสุทธิ์ (`ynss`) | `ql_skill_gm_sword` |
-| 2 | art | คัมภีร์สาวหยก (`ynxj`) | `ql_art_ynxj` |
-| 3 | skill | ฝ่ามือกำสรดวิญญาณสลาย (`ansh`) | saga `gumu_sixteen_years` |
+| 2 | skill | เพลงกระบี่วารีพิสุทธิ์ (`ynss`) | `ql_skill_gm_sword` |
+| 2 | art | คัมภีร์หยกเหมันต์ (`ynxj`) | `ql_art_ynxj` |
+| 3 | skill | ฝ่ามืออาลัยจันทร์ (`ansh`) | saga `gumu_sixteen_years` |
 | 2 | art | วิชาก้าวย่างเหมันต์ (`t4_gm_winterstep`) | saga `gumu_snow_footprints` |
 | 1 | art | วิชาไหมน้ำแข็ง (`t4_gm_iceweave`) | saga `gumu_ice_silk` |
 
@@ -313,7 +313,7 @@ Martial line — every skill and art is taught only by its lineage quest or saga
 | 3 | skill | ไม้เท้าพเนจร (`bg_wander_staff`) | `ql_skill_bg_wander_staff` |
 | 3 | skill | ฝ่ามือจับมังกร (`ng3`) | `ql_skill_bg_wander_staff` |
 | 3 | art | พลังฟื้นตะวัน (`t3_bg_sunrenew`) | `ql_art_t3_bg_sunrenew` |
-| 3 | skill | 18 ฝ่ามือพิชิตมังกร (`ep`) | saga `beggars_dragon_palms` |
+| 3 | skill | ฝ่ามือปราบมังกร 18 ท่า (`ep`) | saga `beggars_dragon_palms` |
 | 3 | skill | เพลงไม้เท้าตีสุนัข (`bg_lucky_staff`) | saga `beggars_lucky_staff` |
 | 2 | art | วิชาหมื่นมวลชน (`t4_bg_thousandcrowd`) | saga `beggars_thousand_crowd` |
 | 1 | art | เจียงหูชี่ (`wanderer`) | saga `beggars_wanderer` |
@@ -373,7 +373,7 @@ Martial line — every skill and art is taught only by its lineage quest or saga
 | 3 | art | พลังสองขั้วผสาน (`t3_sm_dualfusion`) | `ql_art_t3_sm_dualfusion` |
 | 3 | art | พลังสุริยันจันทรา (`t3_sm_sunmoon`) | `ql_art_t3_sm_dualfusion` |
 | 3 | art | คัมภีร์ทานตะวัน (ฉบับย่อ) (`t3_sm_sunscript`) | `ql_art_t3_sm_dualfusion` |
-| 3 | art | เฉียนคุนต้าหนัวอี (`qiankun`) | saga `sunmoon_qiankun_tunnel` |
+| 3 | art | วิชาพลิกฟ้าคว่ำดิน (`qiankun`) | saga `sunmoon_qiankun_tunnel` |
 | 2 | art | ดาวเคลื่อนดาราคล้อย (`yxhd`) | saga `sunmoon_holy_fire_tokens` |
 
 ## สำนักสกุลถัง (`tang`)
@@ -432,6 +432,6 @@ Martial line — every skill and art is taught only by its lineage quest or saga
 | 3 | skill | กระบี่ขลุ่ยหยก (`yxjf`) | `ql_skill_xy_punch` |
 | 3 | art | ลมปราณรากพิษ (`t3_xy_root_poison_qi`) | `ql_art_t3_xy_root_poison_qi` |
 | 3 | art | วิชาดูพลัง (`t3_xy_seepower`) | `ql_art_t3_xy_root_poison_qi` |
-| 3 | art | ลมปราณภูติอุดร (`bmzq`) | `ql_art_t3_xy_root_poison_qi` |
+| 3 | art | ลมปราณทะเลลึก (`bmzq`) | `ql_art_t3_xy_root_poison_qi` |
 | 3 | skill | ฝ่ามือสราญรมย์ (`xy_palm`) | saga `xiaoyao_mute_envoy` |
-| 2 | art | มหาเวทดูดดาว (`bmsg`) | saga `xiaoyao_northern_sea` |
+| 2 | art | วิชากลืนลมปราณ (`bmsg`) | saga `xiaoyao_northern_sea` |

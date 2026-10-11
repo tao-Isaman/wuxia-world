@@ -8,7 +8,7 @@ export const NPCS_MING: readonly NpcDef[] = [
   {
     id: "sect_sunmoon_chief_dongfang",
     name: "อาจารย์ใหญ่หยินอวี้",
-    description: "เจ้าสำนักพรรคตะวันจันทรา · ผู้สืบทอดเฉียนคุนต้าหนัวอีและพลังสุริยันจันทรา · ฝีมือเทียบเท่าตำนานยุทธจักร · ใจเด็ดเดี่ยวและคิดล้ำลึก",
+    description: "เจ้าสำนักพรรคตะวันจันทรา · ผู้สืบทอดวิชาพลิกฟ้าคว่ำดินและพลังสุริยันจันทรา · ฝีมือเทียบเท่าตำนานยุทธจักร · ใจเด็ดเดี่ยวและคิดล้ำลึก",
     locationIds: ["sect_ming"],
     dialogSceneId: "npc_sect_sunmoon_chief_dongfang_talk",
     sparOpponentId: "spar_sunmoon_chief_dongfang",
@@ -34,7 +34,7 @@ export const NPCS_MING: readonly NpcDef[] = [
   {
     id: "sect_sunmoon_vice_renwoxing",
     name: "รองเจ้าสำนักตู้เทียนหาน",
-    description: "รองเจ้าสำนักของพรรคตะวันจันทรา · ฝึกพลังดูดดาวจนเชี่ยวชาญ · นิสัยรุนแรงแต่ภักดี",
+    description: "รองเจ้าสำนักของพรรคตะวันจันทรา · ฝึกพลังกลืนลมปราณจนเชี่ยวชาญ · นิสัยรุนแรงแต่ภักดี",
     locationIds: ["sect_ming"],
     dialogSceneId: "npc_sect_sunmoon_vice_renwoxing_talk",
     sparOpponentId: "spar_sunmoon_renwoxing",

@@ -35,7 +35,7 @@ const BATCH: Record<string, IconRenderer> = {
     </g>
   ),
 
-  // 2. เพลงกระบี่สุรางคนางค์ใจพิสุทธิ์ — twin slim crossed jade-maiden swords
+  // 2. เพลงกระบี่วารีพิสุทธิ์ — twin slim crossed jade-maiden swords
   ynss: ({ ink, accent }) => (
     <g stroke={ink} strokeWidth="2" strokeLinejoin="round">
       {/* left-leaning slim sword */}
@@ -51,7 +51,7 @@ const BATCH: Record<string, IconRenderer> = {
     </g>
   ),
 
-  // 3. ฝ่ามือกำสรดวิญญาณสลาย — sorrowful palm with broken heart + ghost wisp
+  // 3. ฝ่ามืออาลัยจันทร์ — sorrowful palm with broken heart + ghost wisp
   ansh: ({ ink, accent }) => (
     <g stroke={ink} strokeWidth="2" strokeLinejoin="round">
       {/* upright open palm */}
@@ -151,7 +151,7 @@ const BATCH: Record<string, IconRenderer> = {
     </g>
   ),
 
-  // 7. 18 ฝ่ามือพิชิตมังกร — dragon palm — open hand with curling dragon body
+  // 7. ฝ่ามือปราบมังกร 18 ท่า — dragon palm — open hand with curling dragon body
   ep: ({ ink, accent }) => (
     <g stroke={ink} strokeWidth="2" strokeLinejoin="round">
       {/* curling dragon body around the back */}

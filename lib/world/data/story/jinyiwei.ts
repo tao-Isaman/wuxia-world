@@ -1,7 +1,7 @@
 // องครักษ์เสื้อแพร — lineage quests (T0–T3) and two story sagas (T4 blades).
-// Heirs of the old court's guards. Sagas retell มังกรหยก ภาค 3 (ดาบมังกรหยก)
+// Heirs of the old court's guards. Sagas retell legends of the jianghu
 // from the court's side, some forty-odd years ago: the thirteen-storey tower where the six sects'
-// masters were drugged and caged, and เตียบ้อ, the princess who chose love
+// masters were drugged and caged, and เอ๋อหลันจู, the princess who chose love
 // over the court. Present-day guards retrace them; flashbacks use mood "past".
 // The bureau's own past is grey: founded by ฮ่องเต้หงอู่ (1382), it seized the
 // sects' scriptures into the หอคัมภีร์หลวง some fifteen years ago, was reined
@@ -154,7 +154,7 @@ export const LINEAGE: readonly LineageSpec[] = [
 ];
 
 // ─── Saga 1: กระบี่สำเร็จโทษ — "สามคำถามก่อนกระบี่ตก" ──────────────────
-// Legend: in the thirteen-storey tower of the Yuan capital, เตียบ้อ held the
+// Legend: in the thirteen-storey tower of the Yuan capital, เอ๋อหลันจู held the
 // six sects' masters, drugged with the ten-scent powder, and took a finger a
 // day from those who would not serve. The tower guard เกาซ่ง held the sword.
 // On the night of the fire the court ordered every prisoner killed; he asked
@@ -314,7 +314,7 @@ const EXECUTION_SWORD: StoryArcSpec = {
           stage: "city_capital", mood: "past",
           title: "สี่สิบกว่าปีก่อน", subtitle: "หอเจดีย์สิบสามชั้น · นครหลวงของราชสำนักหยวน",
           cast: {
-            zhaomin: { name: "เตียบ้อ", look: "f2", at: [3, -1], facing: "left", tint: "#e6d3b3" },
+            zhaomin: { name: "เอ๋อหลันจู", look: "f2", at: [3, -1], facing: "left", tint: "#e6d3b3" },
             gaosong: { name: "องครักษ์เกาซ่ง", look: "m4", at: [1, 0], facing: "left", tint: "#8a8a8a" },
             monk: { name: "เจ้าอาวาสผู้ถูกขัง", look: "monk", at: [-3, 0], facing: "right", tint: "#f2efe6" },
             master: { name: "เจ้าสำนักผู้ถูกขัง", look: "elder", at: [-4, -2], facing: "right", tint: "#f2efe6" },
@@ -711,7 +711,7 @@ const EXECUTION_SWORD: StoryArcSpec = {
 };
 
 // ─── Saga 2: ดาบประหารชีพ — "ดาบที่ประหารเจ้าหญิง" ─────────────────────
-// Legend (some forty-odd years ago): the court swordsman เถี่ยมู่, who had guarded เตียบ้อ since she
+// Legend (some forty-odd years ago): the court swordsman เถี่ยมู่, who had guarded เอ๋อหลันจู since she
 // was seven, swore to the prince to bring her home when she left the court
 // for the leader of เม้งก่า. He followed her for three years and never drew
 // on her. At last he went home alone, knelt, and laid her golden hairpin cut
@@ -723,7 +723,7 @@ const EXECUTION_SWORD: StoryArcSpec = {
 const EXECUTION_BLADE: StoryArcSpec = {
   id: "jinyiwei_execution_blade",
   title: "ดาบที่ประหารเจ้าหญิง",
-  tagline: "สี่สิบกว่าปีก่อน ขุนดาบผู้หนึ่งสาบานจะพาเจ้าหญิงเตียบ้อกลับวัง สามปีต่อมาเขารายงานว่า 'ข้าประหารนางแล้ว' — วันนี้ดาบเล่มเดียวกันอยู่ในมือเจ้า",
+  tagline: "สี่สิบกว่าปีก่อน ขุนดาบผู้หนึ่งสาบานจะพาเจ้าหญิงเอ๋อหลันจูกลับวัง สามปีต่อมาเขารายงานว่า 'ข้าประหารนางแล้ว' — วันนี้ดาบเล่มเดียวกันอยู่ในมือเจ้า",
   sc: "องครักษ์เสื้อแพร",
   sectId: "jinyiwei",
   reward: { kind: "skill", id: "jy_execution_blade" },
@@ -798,7 +798,7 @@ const EXECUTION_BLADE: StoryArcSpec = {
           ["{hero}", "ไม่มีรอยเลือด มีแต่ปิ่นทองบนหมอน จดหมายว่านางเลือกเอง และสมุดหุงข้าวที่ไหม้สิบเจ็ดครั้ง"],
           ["ผู้บัญชาการจ้าวฝู่", "…หุงข้าว"],
           "จ้าวฝู่เงียบไปนาน มุมปากกระตุกครั้งหนึ่ง ซึ่งฉินบอกภายหลังว่านั่นคือการหัวเราะ",
-          ["ผู้บัญชาการจ้าวฝู่", "จี้เปลวไฟนั่นของพรรคตะวันจันทรา ทายาทเม้งก่า สี่สิบกว่าปีก่อนเจ้าหญิงเตียบ้อก็ทิ้งวังไปเคียงข้างประมุขเม้งก่า ประวัติศาสตร์ชอบเล่นมุกซ้ำ"],
+          ["ผู้บัญชาการจ้าวฝู่", "จี้เปลวไฟนั่นของพรรคตะวันจันทรา ทายาทเม้งก่า สี่สิบกว่าปีก่อนเจ้าหญิงเอ๋อหลันจูก็ทิ้งวังไปเคียงข้างประมุขเม้งก่า ประวัติศาสตร์ชอบเล่นมุกซ้ำ"],
           ["ผู้บัญชาการจ้าวฝู่", "ไปหาฉิน สายของเราที่โรงเตี๊ยมยั่วไหลส่งข่าวว่าเห็นคู่หนุ่มสาวแปลก ๆ เมื่อสามคืนก่อน"],
         ],
       },
@@ -845,14 +845,14 @@ const EXECUTION_BLADE: StoryArcSpec = {
     },
     {
       title: "เจ้าหญิงที่ถอดปิ่น",
-      summary: "ผู้บัญชาการเล่าคืนที่เจ้าหญิงเตียบ้อวางปิ่นทองไว้ตรงหน้าขุนดาบผู้เฝ้าประตู",
+      summary: "ผู้บัญชาการเล่าคืนที่เจ้าหญิงเอ๋อหลันจูวางปิ่นทองไว้ตรงหน้าขุนดาบผู้เฝ้าประตู",
       giver: MASTER,
       offer: {
         cutscene: {
           stage: "city_capital", mood: "past",
           title: "สี่สิบกว่าปีก่อน", subtitle: "จวนท่านอ๋องแห่งราชสำนักหยวน",
           cast: {
-            zhaomin: { name: "เจ้าหญิงเตียบ้อ", look: "f2", at: [1, -1], facing: "left", tint: "#e6d3b3" },
+            zhaomin: { name: "เจ้าหญิงเอ๋อหลันจู", look: "f2", at: [1, -1], facing: "left", tint: "#e6d3b3" },
             tiemu: { name: "ขุนดาบเถี่ยมู่", look: "m4", at: [-2, 0], facing: "right", tint: "#8a8a8a", size: 1.15 },
           },
           beats: [
@@ -871,7 +871,7 @@ const EXECUTION_BLADE: StoryArcSpec = {
           ],
         },
         lines: [
-          ["ผู้บัญชาการจ้าวฝู่", "ขุนดาบเถี่ยมู่ตามเจ้าหญิงเตียบ้อไปสามปี จากนครหลวง สู่เส้าหลิน สู่ยอดกวงเม้ง สู่ทะเล"],
+          ["ผู้บัญชาการจ้าวฝู่", "ขุนดาบเถี่ยมู่ตามเจ้าหญิงเอ๋อหลันจูไปสามปี จากนครหลวง สู่เส้าหลิน สู่ยอดเพลิงอุดร สู่ทะเล"],
           ["ผู้บัญชาการจ้าวฝู่", "ไม่เคยชักดาบใส่นางสักครั้ง และไม่เคยเลิกตาม"],
           ["ผู้บัญชาการจ้าวฝู่", "ชายร่างสูงที่ฉินพูดถึงคือขุนดาบเฮ่อเหลียนป้า คู่หมั้นที่ท่านอ๋องเลือกให้ท่านหญิง เขาออกตามไปก่อนเจ้าสองวัน"],
           ["ผู้บัญชาการจ้าวฝู่", "เขาไม่ได้ไปพานางกลับ เขาไปเอาของของเขาคืน… ไปหยางโจว ซีที่ท่าเรือจดเรือทุกลำที่เข้าออก"],
@@ -1018,28 +1018,28 @@ const EXECUTION_BLADE: StoryArcSpec = {
         lines: [
           ["{hero}", "ผู้บัญชาการเขียนให้ทำอย่างที่ขุนดาบเถี่ยมู่ทำ แต่ข้าไม่รู้ว่าตอนจบเขาทำอะไร"],
           ["ผู้แทนหั่วจี้", "ฝั่งราชสำนักเล่าว่าเขาประหารนาง ฝั่งเราเล่าอีกแบบ"],
-          ["ผู้แทนหั่วจี้", "ผู้อาวุโสจูอิงเก็บบันทึกเก่าของเม้งก่าไว้ ท่านเล่าเรื่องขุนดาบที่ยอดกวงเม้งได้ดีกว่าข้า"],
+          ["ผู้แทนหั่วจี้", "ผู้อาวุโสจูอิงเก็บบันทึกเก่าของเม้งก่าไว้ ท่านเล่าเรื่องขุนดาบที่ยอดเพลิงอุดรได้ดีกว่าข้า"],
           ["ผู้แทนหั่วจี้", "และรีบหน่อย กลองศึกเมื่อคืนดังสองครั้งแล้ว"],
         ],
       },
       reward: [{ t: "wExp", amount: 160 }, { t: "trait", trait: "good", amount: 3 }],
     },
     {
-      title: "ขุนดาบที่ยอดกวงเม้ง",
-      summary: "บันทึกของเม้งก่าเล่าวันที่ขุนดาบราชสำนักเดินขึ้นยอดกวงเม้ง — ขณะที่ทหารรับจ้างกำลังเผาหมู่บ้านรอบเขา",
+      title: "ขุนดาบที่ยอดเพลิงอุดร",
+      summary: "บันทึกของเม้งก่าเล่าวันที่ขุนดาบราชสำนักเดินขึ้นยอดเพลิงอุดร — ขณะที่ทหารรับจ้างกำลังเผาหมู่บ้านรอบเขา",
       giver: ZHUYING,
       offer: {
         cutscene: {
           stage: "sect_ming", around: ZHUYING, mood: "past",
-          title: "สี่สิบกว่าปีก่อน", subtitle: "ยอดกวงเม้ง",
+          title: "สี่สิบกว่าปีก่อน", subtitle: "ยอดเพลิงอุดร",
           cast: {
-            zhaomin: { name: "เจ้าหญิงเตียบ้อ", look: "f2", at: [1, -1], facing: "left", tint: "#e6d3b3" },
-            wuji: { name: "เตียบ่อกี้", look: "m1", at: [2, 0], facing: "left", tint: "#e07a5f" },
+            zhaomin: { name: "เจ้าหญิงเอ๋อหลันจู", look: "f2", at: [1, -1], facing: "left", tint: "#e6d3b3" },
+            wuji: { name: "ลั่วเทียนหมิง", look: "m1", at: [2, 0], facing: "left", tint: "#e07a5f" },
             mingman: { name: "ศิษย์เม้งก่า", look: "m2", at: [3, 1], facing: "left", tint: "#e07a5f" },
             tiemu: { name: "ขุนดาบเถี่ยมู่", look: "m4", at: [-6, 0], facing: "right", tint: "#8a8a8a", size: 1.15, hidden: true },
           },
           beats: [
-            ["narrate", "สามปีหลังเจ้าหญิงทิ้งปิ่นทอง นางยืนบนยอดกวงเม้ง เคียงข้างประมุขของพรรคที่ราชสำนักเรียกว่าพรรคมาร"],
+            ["narrate", "สามปีหลังเจ้าหญิงทิ้งปิ่นทอง นางยืนบนยอดเพลิงอุดร เคียงข้างประมุขของพรรคที่ราชสำนักเรียกว่าพรรคมาร"],
             ["enter", "tiemu", [-6, 0]],
             ["move", "tiemu", [-2, 0]],
             ["say", "mingman", "ขุนดาบราชสำนัก! ชักอาวุธ!"],
@@ -1054,7 +1054,7 @@ const EXECUTION_BLADE: StoryArcSpec = {
         },
         lines: [
           ["ผู้อาวุโสจูอิง", "บันทึกของเม้งก่าจบตรงนั้น หน้าถัดไปถูกน้ำท่วมจนอ่านไม่ออก เล่มนี้รอดจากมือเสื้อแพรเพราะซ่อนในโอ่ง ประวัติศาสตร์ชอบทำแบบนี้"],
-          ["ผู้อาวุโสจูอิง", "แต่ข้ารู้อยู่เรื่องหนึ่ง หลังวันนั้นเจ้าหญิงเตียบ้อไม่เคยกลับวังอีก และขุนดาบเถี่ยมู่กลับไปคนเดียว"],
+          ["ผู้อาวุโสจูอิง", "แต่ข้ารู้อยู่เรื่องหนึ่ง หลังวันนั้นเจ้าหญิงเอ๋อหลันจูไม่เคยกลับวังอีก และขุนดาบเถี่ยมู่กลับไปคนเดียว"],
           ["ผู้อาวุโสจูอิง", "ตอนนี้มีเรื่องที่เร่งกว่า ทหารรับจ้างของเฮ่อเหลียนป้าเผาหมู่บ้านรอบเขา ยั่วให้ศิษย์เราลงไปสู้ จะได้มีข้ออ้างว่าพรรคมารฆ่าทหาร"],
           ["ผู้อาวุโสจูอิง", "คนของเราลงไปไม่ได้ แต่คนของกรมองครักษ์เสื้อแพรลงไปได้"],
         ],

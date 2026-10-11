@@ -65,16 +65,16 @@ export const LAYOUT_REGION: Record<string, Region> = {
   sect_wudang: "north", // 武当派 — Mt. Wudang
   sect_songshan: "north", // 嵩山派 — Mt. Songshan
   sect_taishan: "north", // 泰山派 — Mt. Taishan
-  sect_lingjiu: "north", // 灵鹫宫 — Tianshan, far north
+  sect_lingjiu: "north", // 雪鹰宫 — Tianshan, far north
   village_taishan: "north", // village under Taishan
   palace_zhongyang: "north", // 重阳宫 — Quanzhen home palace
   mt_leigu: "north", // 擂鼓山 — northern peak
   cliff_motian: "north", // 摩天崖 — northern cliff
   cliff_yunhe: "north", // 云鹤崖 — northern cliff
   cave_bingcan: "north", // 冰蚕秘洞 — ice-silkworm cave (cold = north)
-  isle_binghuo: "north", // 冰火岛 — far-north ice/fire isle
+  isle_binghuo: "north", // 北海冰焰岛 — far-north ice/fire isle
   inn_gaosheng: "north", // 高升客栈 — northern road inn
-  home_hong: "north", // 洪七公 — wandered north often, but central; place north for variety
+  home_hong: "north", // 彭老九 — wandered north often, but central; place north for variety
   home_chengkun: "north", // 司徒昆 — antagonist tied to Mingjiao schemes (north→west axis)
 
   // ─── South (Shaolin + Emei + southern temples) ──────────────────────
@@ -93,7 +93,7 @@ export const LAYOUT_REGION: Record<string, Region> = {
   temple_tianning: "south", // 天宁寺 — southern temple
   home_yideng: "south", // 无尘 — a monk of the Dali Duan line
   home_xuemuhua: "south", // 凌慕山 — physician of Hudie Valley (southern)
-  valley_hudie: "south", // 蝴蝶谷 — southern healing valley
+  valley_hudie: "south", // 百药谷 — southern healing valley
   villa_yaowang: "south", // 药王庄 — southern herbalist mansion
 
   // ─── West (Huashan + Kunlun + Gumu frontier) ────────────────────────
@@ -123,16 +123,16 @@ export const LAYOUT_REGION: Record<string, Region> = {
   sect_xiaoyao: "east", // 逍遥派 — eastern ranges
   city_suzhou: "east", // 苏州 — eastern Jiangnan
   villa_yanzi: "east", // 燕子坞 — Murong mansion, eastern Jiangnan
-  villa_fuwei: "east", // 镇威镖局 — eastern escort agency
+  villa_fuwei: "east", // 镇远镖局 — eastern escort agency
   isle_taohua: "east", // 桃花岛 — east of the Yellow Sea coast
-  isle_xiake: "east", // 侠客岛 — far east mystery isle
+  isle_xiake: "east", // 金雾岛 — far east mystery isle
   isle_yuanyang: "east", // 鸳鸯岛
   isle_pili: "east", // 霹雳堂
-  isle_lingshe: "east", // 灵蛇岛
+  isle_lingshe: "east", // 银蛇岛
   isle_shenlong: "east", // 神龙岛 — Dragon Isle, east
   inn_heluo: "east", // 河洛客栈 — Heluo river-road inn (eastern)
   cave_jinshe: "east", // 金蛇洞 — golden snake cave (east coast Jin Yong lore)
-  peak_guangming: "east", // 光明顶 — Mingjiao HQ
+  peak_guangming: "east", // 北焰峰 — Mingjiao HQ
   home_chengying: "east", // 苏英月 — eastern lyric
   village_wuxia: "east", // riverside village near eastern delta
 
@@ -153,7 +153,7 @@ export const LAYOUT_REGION: Record<string, Region> = {
   valley_jueqing_bottom: "jianghu_wild", // 绝情谷底
   valley_baihua: "jianghu_wild", // 百花谷
   cave_zhizhu: "jianghu_wild", // 蜘蛛洞
-  cave_tangshi: "jianghu_wild", // 唐诗山洞
+  cave_tangshi: "jianghu_wild", // 刻诗洞
   cave_treasure: "jianghu_wild", // 藏宝洞
   cave_chuangwang: "jianghu_wild", // 闯王宝藏
   cave_zixiu: "jianghu_wild", // 自修山洞

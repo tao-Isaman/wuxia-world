@@ -424,7 +424,7 @@ const SKILL_BATCH: Record<string, IconRenderer> = {
     </g>
   ),
 
-  // 20. yyz ดัชนีเอกสุริยัน — single sun-finger 一阳指
+  // 20. yyz นิ้วเพลิงอรุณ — single sun-finger 炎晨指
   yyz: ({ ink, accent }) => (
     <g>
       {/* sun behind finger */}
@@ -1047,7 +1047,7 @@ const ART_BATCH: Record<string, IconRenderer> = {
     </g>
   ),
 
-  // 49. ynxj คัมภีร์สาวหยก — jade maiden classic with heart
+  // 49. ynxj คัมภีร์หยกเหมันต์ — jade maiden classic with heart
   ynxj: ({ ink, accent }) => (
     <g>
       {/* scroll/book open */}
@@ -1091,7 +1091,7 @@ const ART_BATCH: Record<string, IconRenderer> = {
     </g>
   ),
 
-  // 51. qiankun เฉียนคุนต้าหนัวอี — heaven-earth shift with rotating arrows
+  // 51. qiankun วิชาพลิกฟ้าคว่ำดิน — heaven-earth shift with rotating arrows
   qiankun: ({ ink, accent }) => (
     <g>
       {/* central yin-yang */}
@@ -1129,7 +1129,7 @@ const ART_BATCH: Record<string, IconRenderer> = {
     </g>
   ),
 
-  // 53. bmzq ลมปราณภูติอุดร — northern netherworld qi
+  // 53. bmzq ลมปราณทะเลลึก — northern netherworld qi
   bmzq: ({ ink, accent }) => (
     <g>
       {/* northern compass star */}
@@ -1147,7 +1147,7 @@ const ART_BATCH: Record<string, IconRenderer> = {
     </g>
   ),
 
-  // 54. bmsg มหาเวทดูดดาว — star-sucking great art with vortex
+  // 54. bmsg วิชากลืนลมปราณ — star-sucking great art with vortex
   bmsg: ({ ink, accent }) => (
     <g>
       {/* vortex spiral */}
@@ -1480,7 +1480,7 @@ const ART_BATCH: Record<string, IconRenderer> = {
     </g>
   ),
 
-  // 68. kgim คัมภีร์เก้าอิม (T5) — the nine-yin manual: dark moon and white bone
+  // 68. kgim คัมภีร์จันทราเก้าชั้น (T5) — the nine-yin manual: dark moon and white bone
   kgim: ({ ink, accent }) => (
     <g>
       {/* dark moon background */}
@@ -1699,7 +1699,7 @@ Object.assign(ART_ICON_RASTER, {
   qzzq: "/icons/arts/qzzq.png", // ลมปราณชวนจินก่า
   t3_qz_sun: "/icons/arts/t3_qz_sun.png", // หนึ่งพลังสุริยันต์
   t3_qz_dragon: "/icons/arts/t3_qz_dragon.png", // หยังทะเลพิฆาตมังกร
-  ynxj: "/icons/arts/ynxj.png", // คัมภีร์สาวหยก
+  ynxj: "/icons/arts/ynxj.png", // คัมภีร์หยกเหมันต์
   t4_gm_iceweave: "/icons/arts/t4_gm_iceweave.png", // วิชาไหมน้ำแข็ง
   t4_gm_winterstep: "/icons/arts/t4_gm_winterstep.png", // วิชาก้าวย่างเหมันต์
   t0_bg_survival: "/icons/arts/t0_bg_survival.png", // วิชาเอาชีวิตรอดพื้นฐาน
@@ -1716,15 +1716,15 @@ Object.assign(ART_ICON_RASTER, {
   t3_sm_dualfusion: "/icons/arts/t3_sm_dualfusion.png", // พลังสองขั้วผสาน
   t3_sm_sunmoon: "/icons/arts/t3_sm_sunmoon.png", // พลังสุริยันจันทรา
   t3_sm_sunscript: "/icons/arts/t3_sm_sunscript.png", // คัมภีร์ทานตะวัน (ฉบับย่อ)
-  qiankun: "/icons/arts/qiankun.png", // เฉียนคุนต้าหนัวอี
+  qiankun: "/icons/arts/qiankun.png", // วิชาพลิกฟ้าคว่ำดิน
   yxhd: "/icons/arts/yxhd.png", // ดาวเคลื่อนดาราคล้อย
   t0_xy_plum: "/icons/arts/t0_xy_plum.png", // ลมปราณดอกเหมย
   t1_xy_formless_lesser: "/icons/arts/t1_xy_formless_lesser.png", // พลังไร้ลักษณ์น้อย
   t2_xy_formless_greater: "/icons/arts/t2_xy_formless_greater.png", // พลังไร้ลักษณ์ใหญ่
   t3_xy_root_poison_qi: "/icons/arts/t3_xy_root_poison_qi.png", // ลมปราณรากพิษ
   t3_xy_seepower: "/icons/arts/t3_xy_seepower.png", // วิชาดูพลัง
-  bmzq: "/icons/arts/bmzq.png", // ลมปราณภูติอุดร
-  bmsg: "/icons/arts/bmsg.png", // มหาเวทดูดดาว
+  bmzq: "/icons/arts/bmzq.png", // ลมปราณทะเลลึก
+  bmsg: "/icons/arts/bmsg.png", // วิชากลืนลมปราณ
   hgdf: "/icons/arts/hgdf.png", // วิชาสลายพลัง
   t2_snakeform: "/icons/arts/t2_snakeform.png", // งูพิษเจ็ดสี
   np: "/icons/arts/np.png", // เบญจพิษรวมกาย
@@ -1755,7 +1755,7 @@ Object.assign(ART_ICON_RASTER, {
   t2_plumblossom: "/icons/arts/t2_plumblossom.png", // ลมปราณเหมยห้ากลีบ
   t2_craneform: "/icons/arts/t2_craneform.png", // กระเรียนสมาธิ
   t2_tigerroar: "/icons/arts/t2_tigerroar.png", // เสือคำราม
-  t3_dragonelephant: "/icons/arts/t3_dragonelephant.png", // มังกร-ช้างปัญญา
+  t3_dragonelephant: "/icons/arts/t3_dragonelephant.png", // พลังคชสารปัญญาบารมี
   t3_heartmind: "/icons/arts/t3_heartmind.png", // วิชากลใจเป็นจิต
   t3_voidstep: "/icons/arts/t3_voidstep.png", // ก้าวว่างไร้รอย
   military: "/icons/arts/military.png", // เคล็ดวิชาภูผาทะลายทัพ
@@ -1772,6 +1772,6 @@ Object.assign(ART_ICON_RASTER, {
   huoxue: "/icons/arts/huoxue.png", // ฮั่วเสวียสินฝ่า
   dongxuan: "/icons/arts/dongxuan.png", // ตงซวนเซินกง
   khbt: "/icons/arts/khbt.png", // คัมภีร์ทานตะวัน
-  kuyt: "/icons/arts/kuyt.png", // วิชาเก้าเอี้ยง
-  kgim: "/icons/arts/kgim.png", // คัมภีร์เก้าอิม
+  kuyt: "/icons/arts/kuyt.png", // ลมปราณตะวันเก้าชั้น
+  kgim: "/icons/arts/kgim.png", // คัมภีร์จันทราเก้าชั้น
 });
