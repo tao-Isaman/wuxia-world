@@ -23,7 +23,7 @@
 
 /* Landscape phones with a notch: keep side-anchored HUD clear of the cut-out. */
 @supports (padding: max(0px)) {
-  .player-hud, .location-hud, .autosave-note { margin-right: env(safe-area-inset-right); }
+  .player-hud, .location-hud, .autosave-note { margin-right: var(--safe-right); }
 }
 @media (orientation: landscape) and (max-width: 900px), (orientation: portrait) and (max-height: 900px) {
   .title-intro .pwa-install { margin-inline: auto; align-items: center; }

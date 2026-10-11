@@ -287,14 +287,17 @@ await check("a battle the server refuses counts as left: no spoils, no harm", as
 
 await check("the server's TypeScript half bundles from the repository alone (no npm package: Workers Builds has none)", async () => {
   const packages = new Set<string>();
-  const result = await Bun.build({
+  type Resolve = { path: string };
+  type Builder = { onResolve(options: { filter: RegExp }, fn: (args: Resolve) => { path: string; external: boolean } | undefined): void };
+  const bun = (globalThis as unknown as { Bun: { build(options: unknown): Promise<{ success: boolean; logs: unknown[] }> } }).Bun;
+  const result = await bun.build({
     entrypoints: [`${process.cwd()}/server/worker/ts/entry.ts`],
     target: "browser",
     external: ["cloudflare:workers", "wuxia-rust"],
     plugins: [{
       name: "no-npm",
-      setup(build) {
-        build.onResolve({ filter: /.*/ }, (args) => {
+      setup(build: Builder) {
+        build.onResolve({ filter: /.*/ }, (args: Resolve) => {
           if (/^(\.|\/|@\/)/.test(args.path) || args.path === "cloudflare:workers" || args.path === "wuxia-rust") return undefined;
           packages.add(args.path);
           return { path: args.path, external: true };

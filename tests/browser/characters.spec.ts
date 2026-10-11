@@ -24,27 +24,36 @@ test("both heroes walk on their eight-way frames and face where they go", async 
     await expect(world).toHaveAttribute("data-player-motion", "idle");
     await expect(world).toHaveAttribute("data-player-pose", /^stand:/);
     await world.focus();
-    // Out and back on each axis, so the hero stays in the open yard (and never ends up against the well).
-    for (const step of [
-      { key: "d", dir: "E", row: "E" },
-      { key: "a", dir: "W", row: "E" },
-      { key: "w", dir: "N", row: "N" },
-      { key: "s", dir: "S", row: "S" },
+    const at = async (axis: "x" | "y") => Number(await world.getAttribute(`data-player-${axis}`));
+    // Out and back on each axis. The way back walks until the hero has passed
+    // where the step began, so however long the test takes to see a frame turn
+    // (a loaded machine is slow to look), the hero ends where it started and
+    // never drifts into the yard's edge, the house or the well.
+    for (const axis of [
+      { coord: "x" as const, out: { key: "d", dir: "E", row: "E", sign: 1 }, back: { key: "a", dir: "W", row: "E", sign: -1 } },
+      { coord: "y" as const, out: { key: "w", dir: "N", row: "N", sign: -1 }, back: { key: "s", dir: "S", row: "S", sign: 1 } },
     ]) {
-      await page.keyboard.down(step.key);
-      await expect(world).toHaveAttribute("data-player-dir", step.dir);
-      // Motion and pose are written in the same tick: read them together (a short walk
-      // can end against a wall between two separate reads).
-      await page.waitForFunction((row) => {
-        const host = document.querySelector('[data-testid="world-canvas"]');
-        return host?.getAttribute("data-player-motion") === "walk" && host.getAttribute("data-player-pose") === `walk:${row}`;
-      }, step.row, { polling: "raf", timeout: 15_000 });
-      const first = await world.getAttribute("data-player-frame");
-      await expect.poll(() => world.getAttribute("data-player-frame")).not.toBe(first);
-      await page.keyboard.up(step.key);
-      await expect(world).toHaveAttribute("data-player-motion", "idle");
-      await expect(world).toHaveAttribute("data-player-pose", `stand:${step.row}`);
-      await expect(world).toHaveAttribute("data-player-dir", step.dir);
+      const start = await at(axis.coord);
+      for (const step of [axis.out, axis.back]) {
+        // Hold the key the way a keyboard does: a held key repeats its keydown, so one
+        // dropped while the map was not taking input (just rebuilt, or busy for a
+        // moment) is sent again. The hero spawns facing E, so the heading alone
+        // could not tell whether the first step's key arrived.
+        await expect(async () => {
+          await page.keyboard.down(step.key);
+          // Motion and pose are written in the same tick: read them together.
+          const state = await world.evaluate((host) => [host.dataset.playerMotion, host.dataset.playerPose, host.dataset.playerDir]);
+          expect(state).toEqual(["walk", `walk:${step.row}`, step.dir]);
+        }).toPass({ intervals: [50, 100, 250], timeout: 15_000 });
+        const first = await world.getAttribute("data-player-frame");
+        await expect.poll(() => world.getAttribute("data-player-frame")).not.toBe(first);
+        // Back to (or just past) where the axis began.
+        if (step === axis.back) await expect.poll(async () => (await at(axis.coord) - start) * step.sign, { intervals: [16] }).toBeGreaterThanOrEqual(0);
+        await page.keyboard.up(step.key);
+        await expect(world).toHaveAttribute("data-player-motion", "idle");
+        await expect(world).toHaveAttribute("data-player-pose", `stand:${step.row}`);
+        await expect(world).toHaveAttribute("data-player-dir", step.dir);
+      }
     }
     await expect(world.locator("canvas")).toHaveCount(1);
   }

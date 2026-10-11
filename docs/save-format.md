@@ -173,13 +173,17 @@ What each version added. v1–v13 and v17→v18 are described in the comment abo
 
 ## Repair on load
 
-`validateAndRepair` (`lib/world/validate.ts`) keeps a save playable after content changes: renamed scenes, removed items, quests, NPCs, opponents, skills, arts or recipes. It returns at once when there is no game, and otherwise runs these steps in order, logging a warning for most fixes.
+`validateAndRepair` (`lib/world/validate.ts`) keeps a save playable after content changes: renamed scenes, removed items, quests, NPCs, opponents, skills, arts or recipes. It first repairs the simulated people (step 0, which belongs to the shared world and so runs even with no game), then returns at once when there is no game, and otherwise runs these steps in order, logging a warning for most fixes.
+
+**The simulated people** (`repairNpcExt`, `lib/world/npc-repair.ts`)
+
+0. `npcExt`: an entry whose id is neither in the NPC registry nor a generated person (`dynamic: true`, id `dyn_<n>`) is dropped. In the rest, `power` is clamped 0–100, `age` 1–130, `sectRank` 1–10 (0 without a sect), the temper 0–1 (`righteous` −1…1) and `birthday` 0–364; an unknown `status` becomes `alive`, an unknown `sect` / `formerSect` / `gender` is cleared; a home or current place that is not a location falls back to the home, the authored home, else `city_capital`; rivals and allies keep known people only (no duplicates, never oneself); `masterId` / `spouseId` / `heirId` naming nobody known and non-finite `secludedUntil` / `woundedUntil` / `deathDay` are removed; malformed goals and history entries are dropped (history kept to 10); a journey through an unknown place or after an unknown person is cancelled (`plan: null`). A non-finite `lastNpcTickDay` becomes `day`. Day stamps are never pulled back to the save's day: the shared world may be ahead of it until the clock syncs. Changed entries are replaced, never mutated.
 
 **Place and time**
 
 1. An unknown `currentSceneId` becomes `home_player`.
 2. A `lastLocationId` that is unknown or not a location becomes `null`. This also clears a road id that a walk event pinned there.
-3. `flags._skipEventRoll` is deleted.
+3. `flags._skipEventRoll` is deleted; malformed sect-feud flags (`feud:<sect>` …, an unknown sect, a non-number end day) are dropped (`repairFeudFlags`, `lib/world/feuds.ts`).
 4. `day` is at least 1 and `time` at least 0; `time` of 12 or more rolls into `day`. `startDay` is a number no later than `day` (missing: `day`). (The world clock then moves them on: `syncClock` never moves time back.)
 
 **Law and pending actions**
@@ -226,10 +230,10 @@ What each version added. v1–v13 and v17→v18 are described in the comment abo
 
 - unknown ids inside skill slots or equipped gear;
 - `gold`;
-- flags other than `_skipEventRoll`;
+- flags other than `_skipEventRoll` and the feud flags;
 - quest `status`;
 - a sect's `status`, or sect ids that no longer exist;
-- `npcExt` and the rumor arrays;
+- the rumor arrays;
 - `actionLog`, `gender`, `playerBodyId`, `gameOver`;
 - whether `jailUntil` agrees with `currentSceneId`.
 
@@ -245,6 +249,8 @@ What each version added. v1–v13 and v17→v18 are described in the comment abo
 | `capital_ledger_recovered` | content flag that also swaps the capital's archive chest to open |
 | `begging_learned` | content flag that reveals begging spots |
 | `_skipEventRoll` | written by walk events and hunting; nothing reads it any more, and repair deletes it |
+| `feud:<sectId>`, `feud_wins:<sectId>`, `feud_victim:<sectId>` | a sect's blood feud against the hero ([liveness.md](liveness.md#sects-avenge-their-dead)): the feud's last day, the avengers beaten, whom they avenge |
+| `lead:<rumorId>` | a lore lead the hero heard (`"heard"`) or followed to its place (`"found"`), [liveness.md](liveness.md#leads-and-warnings) |
 
 `trackedQuestId` and `_lastBannerDay` are written through the store's `_setFlag`, which is therefore used by production UI despite its underscore name.
 

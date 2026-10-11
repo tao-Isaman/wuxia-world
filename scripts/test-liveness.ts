@@ -38,6 +38,18 @@ const { foeLook, worldBattleSetup } = await import("../lib/world/battle-looks");
 const { livingVoice, npcBaseName, voiceLabel } = await import("../lib/world/speaker");
 const { kidnapReturned } = await import("../lib/world/bad-actions");
 const { encounterFoeAvailable } = await import("../lib/world/encounters");
+const { repairNpcExt } = await import("../lib/world/npc-repair");
+const { validateAndRepair } = await import("../lib/world/validate");
+const { npcPortrait } = await import("../lib/world/data/npc-portraits");
+const { NPC_PORTRAIT_IDS } = await import("../lib/world/data/npc-portrait-ids");
+const { SECT_PORTRAITS, SECTLESS_PORTRAITS, ageBand, generatedPortraitId } = await import("../lib/world/data/generated-portraits");
+const { FEMALE_ONLY_SECTS } = await import("../lib/world/data/liveness-roster");
+const feuds = await import("../lib/world/feuds");
+const { rollWalkEvent } = await import("../lib/world/encounters");
+const { followLeads, loreLeads, noteLeadHeard, LEAD_WEXP } = await import("../lib/world/rumor-engine");
+const { TOURNAMENT, TOURNAMENT_WARNING_DAYS, scheduleTournamentWarning, tournamentDay } = await import("../lib/world/tournament");
+const { ITEMS_BY_ID } = await import("../lib/world/data/items");
+const { existsSync } = await import("node:fs");
 import type { DialogScene, NpcExtState, Rumor, WorldStateData } from "../lib/world/types";
 
 const clone = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
@@ -210,7 +222,223 @@ try {
       if (!life.isAliveExt(e)) continue;
       assert.ok(e.currentLocation in WORLD_COORDS || e.currentLocation === e.homeLocation, `${id} stands somewhere real`);
       assert.ok(getNpc(id), `${id} is in the registry`);
+      if (e.dynamic) assert.ok(npcPortrait(id), `${id} (generated) has a portrait`);
     }
+    // Five years of the simulation leave nothing for the load repair to fix.
+    const repaired = clone(state);
+    const report = repairNpcExt(repaired);
+    assert.deepEqual(report, { dropped: [], fixed: [] }, "a healthy world needs no repair");
+  });
+
+  await check("generated people borrow a portrait that fits their school, sex and age, and read as someone", () => {
+    for (const [sect, pool] of Object.entries(SECT_PORTRAITS)) {
+      assert.ok(pool.length > 0, `${sect} has faces`);
+      for (const [id, sex] of pool) {
+        assert.ok(NPC_PORTRAIT_IDS.has(id) && existsSync(`public/npcs/${id}.png`), `${id} is a painted portrait`);
+        if (FEMALE_ONLY_SECTS.has(sect as never)) assert.equal(sex, "female", `${sect} admits women only`);
+        if (sect === "shaolin") assert.equal(sex, "male");
+      }
+    }
+    for (const [id] of SECTLESS_PORTRAITS) assert.ok(NPC_PORTRAIT_IDS.has(id) && existsSync(`public/npcs/${id}.png`), `${id} is a painted portrait`);
+    const all = [...Object.values(SECT_PORTRAITS).flat(), ...SECTLESS_PORTRAITS];
+    for (const named of namedNpcIds()) assert.ok(!all.some(([id]) => id === named), `${named} (simulated) lends no face`);
+    const sexOf = new Map(all.map(([id, sex]) => [id, sex]));
+    const bandOf = new Map(all.map(([id, , band]) => [id, band]));
+    // Every school, both sexes, three ages: a face of the right sex, the right age where one exists.
+    for (const sect of [...Object.keys(SECT_MEMBERSHIPS), null] as (keyof typeof SECT_PORTRAITS | null)[]) {
+      for (const gender of ["male", "female"] as const) {
+        for (const age of [18, 40, 70]) {
+          const id = `dyn_${sect ?? "none"}_${gender}_${age}`;
+          const face = generatedPortraitId(id, { sect, gender, age });
+          assert.equal(sexOf.get(face), gender, `${id}: ${face}`);
+          assert.equal(generatedPortraitId(id, { sect, gender, age }), face, "the same person keeps the same face");
+          const pool = sect ? SECT_PORTRAITS[sect] : SECTLESS_PORTRAITS;
+          if (pool.some(([, s, b]) => s === gender && b === ageBand(age))) assert.equal(bandOf.get(face), ageBand(age), `${id}: a face of their age`);
+        }
+      }
+    }
+    const state = fresh();
+    const id = life.spawnPerson(state, { sect: "wudang", rank: 1, home: "sect_wudang", power: 20, age: 17, day: state.day, gender: "male", masterId: "sect_wudang_master_zhang" }, seeded(7))!;
+    const portrait = npcPortrait(id);
+    assert.ok(portrait && SECT_PORTRAITS.wudang.some(([face]) => portrait === `/npcs/${face}.png`), `a Wudang disciple wears a Wudang face (${portrait})`);
+    const def = getNpc(id)!;
+    assert.ok(def.description?.includes("อายุ 17"), def.description);
+    assert.ok(!def.description?.includes("ยุทธจักรเพิ่งรู้จักชื่อ"), "no longer the one generic line");
+  });
+
+  await check("the load repair drops unknown people and brings every field back in range", () => {
+    const state = fresh();
+    const chief = state.npcExt[CHIEF]!;
+    state.npcExt.ghost_nobody = clone(chief);
+    state.npcExt.dyn_bad = { ...clone(chief), dynamic: true, name: "x" } as NpcExtState; // a generated id must be dyn_<n>
+    state.npcExt[CHIEF] = {
+      ...chief, power: 500, age: -3, status: "zombie" as never, currentLocation: "nowhere", sect: "atlantis" as never, sectRank: 99,
+      rivals: ["ghost_nobody", VICE, VICE], allies: [CHIEF], temper: { righteous: 7, ambition: -1, wanderlust: Number.NaN, loyalty: 2 },
+      birthday: 900, woundedUntil: Number.POSITIVE_INFINITY, masterId: "ghost_nobody", formerSect: "nowhere" as never,
+      plan: { purpose: "wander", path: ["nowhere"], to: "city_capital" },
+    };
+    state.flags["feud:atlantis"] = 99;
+    state.flags["feud:emei"] = "soon";
+    state.flags["feud:wudang"] = state.day + 5;
+    validateAndRepair(state);
+    assert.ok(!("ghost_nobody" in state.npcExt) && !("dyn_bad" in state.npcExt), "unknown ids dropped");
+    const e = state.npcExt[CHIEF]!;
+    assert.equal(e.power, 100);
+    assert.equal(e.age, 1);
+    assert.equal(e.status, "alive");
+    assert.equal(e.currentLocation, e.homeLocation);
+    assert.equal(getScene(e.homeLocation)?.kind, "location");
+    assert.equal(e.sect, null);
+    assert.equal(e.sectRank, 0);
+    assert.deepEqual(e.rivals, [VICE], "unknown and duplicate rivals dropped");
+    assert.deepEqual(e.allies, [], "nobody is their own ally");
+    assert.deepEqual(e.temper, { righteous: 1, ambition: 0, wanderlust: 0.3, loyalty: 1 });
+    assert.equal(e.birthday, 364);
+    assert.equal(e.woundedUntil, undefined);
+    assert.equal(e.masterId, undefined);
+    assert.equal(e.formerSect, undefined);
+    assert.equal(e.plan, null, "a journey through nowhere is dropped");
+    assert.equal(state.flags["feud:atlantis"], undefined);
+    assert.equal(state.flags["feud:emei"], undefined);
+    assert.equal(state.flags["feud:wudang"], state.day + 5, "a sound feud stays");
+    assert.deepEqual(state.npcExt[VICE], fresh().npcExt[VICE], "sound entries are left as they were");
+  });
+
+  await check("a sect avenges its dead: killing a member brings its hunters for a while, until beaten off or blood is paid", async () => {
+    const state = fresh();
+    useWorldStore.setState({ ...state, currentSceneId: "sect_emei", lastLocationId: "sect_emei", wanted: 0 });
+    useWorldStore.getState().startKillDuel(VICE);
+    ensureBattleStarted();
+    const won = useBattleStore.getState().state!;
+    useBattleStore.setState({ state: { ...won, winner: "A", phase: "over" } });
+    useWorldStore.getState().acknowledgeBattleResult();
+    useBattleStore.getState().reset();
+    let s = useWorldStore.getState();
+    assert.deepEqual(feuds.activeFeuds(s), ["emei"], "Emei swears vengeance");
+    assert.equal(feuds.feudVictim(s, "emei"), VICE);
+    assert.ok(s.actionLog.some((e) => e.kind === "feud" && e.message.includes(getNpc(VICE)!.name)), "the log says so");
+    assert.ok(s.rumorPool.some((r) => r.source === "player_echo" && r.id.includes("feud_declared") && r.text.includes(SECT_MEMBERSHIPS.emei.name)), "and the jianghu hears of it");
+    // The hunters catch up on the road (the law aside: no marks here).
+    const road = clone(s) as WorldStateData;
+    road.wanted = 0;
+    road.currentSceneId = "city_changan";
+    Math.random = () => 0.01;
+    rollWalkEvent(road, 1);
+    Math.random = random;
+    assert.equal(road.pendingEncounter?.opponentId, "hunter_emei");
+    Math.random = () => 0.5;
+    const calm = clone(s) as WorldStateData;
+    calm.wanted = 0;
+    rollWalkEvent(calm, 1);
+    Math.random = random;
+    assert.equal(calm.pendingEncounter ?? null, null, `only now and then (${feuds.FEUD_CHANCE * 100} % a tick)`);
+    // Beat FEUD_SETTLE_WINS of them and the sect lets it go.
+    for (let i = 0; i < feuds.FEUD_SETTLE_WINS; i++) {
+      assert.ok(feuds.feudActive(useWorldStore.getState(), "emei"), `still hunted after ${i} wins`);
+      useWorldStore.setState({ pendingEncounter: { opponentId: "hunter_emei", returnSceneId: "city_changan" }, currentSceneId: "city_changan" });
+      useWorldStore.getState().acceptEncounter();
+      ensureBattleStarted();
+      const fight = useBattleStore.getState().state!;
+      useBattleStore.setState({ state: { ...fight, winner: "A", phase: "over" } });
+      useWorldStore.getState().acknowledgeBattleResult();
+      useBattleStore.getState().reset();
+    }
+    s = useWorldStore.getState();
+    assert.deepEqual(feuds.activeFeuds(s), [], "settled");
+    assert.ok(s.actionLog.some((e) => e.kind === "feud" && e.message.includes("ยอมเลิก")));
+    // Struck down by an avenger: blood is paid.
+    const again = clone(s) as WorldStateData;
+    feuds.startFeud(again, "wudang", "sect_wudang_master_zhang");
+    useWorldStore.setState({ ...again, pendingEncounter: { opponentId: "hunter_wudang", returnSceneId: "city_changan" } });
+    useWorldStore.getState().acceptEncounter();
+    ensureBattleStarted();
+    const lost = useBattleStore.getState().state!;
+    useBattleStore.setState({ state: { ...lost, winner: "B", phase: "over" } });
+    useWorldStore.getState().acknowledgeBattleResult();
+    useBattleStore.getState().reset();
+    assert.equal(feuds.feudActive(useWorldStore.getState(), "wudang"), false, "a fall to the avengers ends it");
+    // Or time runs out.
+    const old = clone(s) as WorldStateData;
+    feuds.startFeud(old, "huashan", "x");
+    old.day += feuds.FEUD_DAYS + 1;
+    assert.deepEqual(feuds.expireFeuds(old), ["huashan"]);
+    assert.equal(old.flags["feud:huashan"], undefined);
+    // A school the hero betrayed hunts them already: no second feud on top.
+    const traitor = fresh();
+    traitor.sectMembership.emei = { ...(traitor.sectMembership.emei ?? { rank: 9, points: 0 }), status: "betrayed" } as never;
+    useWorldStore.setState({ ...traitor, currentSceneId: "sect_emei", lastLocationId: "sect_emei", wanted: 0 });
+    useWorldStore.getState().startKillDuel(VICE);
+    ensureBattleStarted();
+    const w2 = useBattleStore.getState().state!;
+    useBattleStore.setState({ state: { ...w2, winner: "A", phase: "over" } });
+    useWorldStore.getState().acknowledgeBattleResult();
+    useBattleStore.getState().reset();
+    assert.deepEqual(feuds.activeFeuds(useWorldStore.getState()), []);
+  });
+
+  await check("warnings fire: the inns talk about the tournament before it comes, with the days counting down", () => {
+    const state = fresh();
+    const year = 1;
+    const day = tournamentDay(year);
+    state.rumorPool = state.rumorPool.filter((r) => r.source !== "warning");
+    state.day = day - TOURNAMENT_WARNING_DAYS - 1;
+    assert.equal(scheduleTournamentWarning(state), null, "not yet");
+    state.day = day - 30;
+    const id = scheduleTournamentWarning(state)!;
+    const warning = () => state.rumorPool.find((r) => r.id === id)!;
+    assert.equal(warning().source, "warning");
+    assert.equal(warning().region, "global");
+    assert.ok(warning().text.includes("อีก 30 วัน") && warning().text.includes("ชุมนุมประลองกระบี่หัวซาน"), warning().text);
+    assert.equal(warning().expiresDay, day - 1);
+    state.day = day - 3;
+    assert.equal(scheduleTournamentWarning(state), id, "one rumor a year");
+    assert.ok(warning().text.includes("อีก 3 วัน"), "its days count down");
+    assert.equal(state.rumorPool.filter((r) => r.source === "warning").length, 1);
+    state.day = day;
+    assert.equal(scheduleTournamentWarning(state), null, "the day itself needs no warning");
+    assert.equal(TOURNAMENT.startDay, 90);
+    // syncClock schedules it: a store action in the window leaves the warning in the pool.
+    setTestWorldTime(day - 10, 0);
+    useWorldStore.setState({ ...fresh(), day: day - 11 });
+    setTestWorldTime(day - 10, 0);
+    useWorldStore.getState().recordRumorHeard("nothing");
+    useWorldStore.getState().gotoScene(useWorldStore.getState().currentSceneId);
+    assert.ok(useWorldStore.getState().rumorPool.some((r) => r.id === `rumor_warn_tournament_y${year}` && r.text.includes("อีก 10 วัน")));
+    setTestWorldTime(1, 0);
+  });
+
+  await check("lore leads pay off: reaching the place a heard lead names finds something, once", () => {
+    const leads = [...loreLeads()];
+    assert.ok(leads.length >= 8);
+    for (const [id, lore] of leads) {
+      assert.equal(getScene(lore.leadsTo!.locationId)?.kind, "location", `${id} leads to a real place`);
+      if (lore.leadsTo!.hintItemId) assert.ok(ITEMS_BY_ID.has(lore.leadsTo!.hintItemId), `${id} hints at a real item`);
+    }
+    const [rumorId, lore] = leads.find(([, l]) => l.leadsTo!.hintItemId === "snow_lotus")!;
+    const place = lore.leadsTo!.locationId;
+    const state = fresh();
+    assert.deepEqual(followLeads(state, place), [], "an unheard lead gives nothing");
+    noteLeadHeard(state, rumorId);
+    const wExp = state.wExp;
+    const found = followLeads(state, place);
+    assert.deepEqual(found.map((f) => f.itemId), ["snow_lotus"]);
+    assert.equal(state.inventory.snow_lotus, 1);
+    assert.equal(state.wExp, wExp + LEAD_WEXP);
+    assert.deepEqual(followLeads(state, place), [], "once only");
+    // A lead whose hint is a quest item gives no quest item (its quest hands it over).
+    const [questLead, ql] = leads.find(([, l]) => ITEMS_BY_ID.get(l.leadsTo!.hintItemId ?? "")?.category === "quest")!;
+    const s2 = fresh();
+    noteLeadHeard(s2, questLead);
+    assert.deepEqual(followLeads(s2, ql.leadsTo!.locationId).map((f) => f.itemId), [null]);
+    // In the store: hearing it at an inn, then arriving, logs the find.
+    useWorldStore.setState({ ...fresh(), stamina: 999 });
+    useWorldStore.getState().recordRumorHeard(rumorId);
+    assert.equal(useWorldStore.getState().flags[`lead:${rumorId}`], "heard");
+    useWorldStore.getState().gotoScene(place);
+    const after = useWorldStore.getState();
+    assert.equal(after.currentSceneId, place);
+    assert.equal(after.flags[`lead:${rumorId}`], "found");
+    assert.ok(after.actionLog.some((e) => e.kind === "lead" && e.message.includes(ITEMS_BY_ID.get("snow_lotus")!.name)));
   });
 
   await check("anyone can be sparred: a person without an authored build fights as themselves", () => {

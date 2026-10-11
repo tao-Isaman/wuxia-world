@@ -22,6 +22,7 @@ import { SECT_MEMBERSHIPS } from "./data/sect-memberships";
 import { NPCS, getNpc } from "./data/npcs";
 import { getOpponent, npcFoeId } from "./data/opponents";
 import { npcPresent } from "./npc-presence";
+import { generateWarning } from "./rumor-engine";
 import { sectChief } from "./npc-life";
 import type { TournamentRecord, TournamentState, WorldStateData } from "./types";
 
@@ -360,4 +361,31 @@ export function sendTournamentInvitation(state: WorldStateData, fromDay: number)
     return letter;
   }
   return null;
+}
+
+/** Days before the tournament the inns start talking about it (a warning rumor). */
+export const TOURNAMENT_WARNING_DAYS = 45;
+
+/**
+ * The tournament's warning rumor (rumor-engine `generateWarning`, kind
+ * `tournament`): from TOURNAMENT_WARNING_DAYS before the tournament day until
+ * the day before it, every inn hears "อีก N วันจะมีชุมนุมประลองกระบี่หัวซาน…".
+ * One rumor a year (id `rumor_warn_tournament_y<year>`), its day count kept
+ * current on every sync. Returns its id, or null outside the window.
+ */
+export function scheduleTournamentWarning(state: WorldStateData): string | null {
+  const year = yearOf(state.day);
+  const day = tournamentDay(year);
+  const left = day - state.day;
+  if (left < 1 || left > TOURNAMENT_WARNING_DAYS) return null;
+  return generateWarning({
+    state,
+    warningKind: "tournament",
+    triggerDay: day,
+    locationId: TOURNAMENT.locationId,
+    payload: { event: TOURNAMENT_NAME },
+    id: `rumor_warn_tournament_y${year}`,
+    expiresDay: day - 1,
+    region: "global",
+  });
 }

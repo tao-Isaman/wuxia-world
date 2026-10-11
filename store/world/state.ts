@@ -1,6 +1,7 @@
 // The world store's blank state, the starter hero, the per-action draft copy
 // and the player-visible action log.
 import { type CharacterBuild, type StatKey, STAT_KEYS } from "@/lib/game";
+import type { ActionLogKind } from "@/lib/world/action-log";
 import { LIFE_SKILL_KEYS, START_SCENE_ID, TRAIT_KEYS, type LifeSkill, type TraitKey, type WorldStateData } from "@/lib/world";
 
 // ─── Starter build ─────────────────────────────────────────────────────

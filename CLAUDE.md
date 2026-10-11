@@ -356,6 +356,7 @@ Two deliberate exceptions reach into stores:
   - the จุดหมาย list of markers in tabs.
 - **Landscape only.** A portrait viewport turns the whole `body` 90° (`app/globals.css`). So:
   - never use raw `vw` / `vh` — use `calc(N * var(--vh))` (`--vw`, `--vh`, `--dvw`, `--dvh` swap in portrait);
+  - never use raw `env(safe-area-inset-*)` — use `var(--safe-top)` / `--safe-right` / `--safe-bottom` / `--safe-left` (`app/globals.css`; they follow the turned page). `test:runtime` fails on either;
   - write media queries for both orientations (`(orientation: landscape) and (max-height: 500px), (orientation: portrait) and (max-width: 500px)`); Tailwind breakpoints are already raw queries of that shape;
   - map pointer client coordinates through `lib/ui/landscape.ts` (`toPagePoint`, `toClientPoint`, `pageRect`).
 - **Menus don't scroll.** A menu section is `<Modal fill>` with `.menu-cols > .menu-col` columns and `.menu-tabs` (`app/menu-layout.css`); long collections page with `PagedGrid` (`components/ui/paged-grid.tsx`, `useShortScreen` for phone cell sizes). Done for โปรไฟล์ (ฉายา: `lib/world/epithet.ts`), ย่าม (paper doll + item window), วิชา, อาชีพ, จดหมาย; ภารกิจ / สำนัก / บันทึก still scroll.
@@ -418,5 +419,5 @@ Content changes need **no save version bump**. Removed ids are dropped on load.
 - **Dropped quests come back.** `abandonQuest` forgets any quest so it is offered again; `flags["qdropped:<id>"]` makes `applyEffects` skip the gifts of its start (and of stages already entered) when it is taken again (unsellable items are only topped up). A sect left by resigning can be rejoined after 30 days; a betrayed one only after its redemption quest.
 - **`_setFlag` looks dev-only but isn't.** The quest-log pin (`trackedQuestId`) and the rumor banner use it.
 - **Advisory audits fail by design.** `audit-quest-counts.ts`, `audit-complete-scenes.ts` and `audit-quest-flow.ts` report known false positives.
-- **`sharp`** is used by the image scripts but comes in through Next; it is not in `package.json`.
+- **`sharp`** (the image scripts) is a dev dependency at the version Next brings.
 - **More.** [HANDOFF.md](HANDOFF.md#known-issues) lists every known issue.

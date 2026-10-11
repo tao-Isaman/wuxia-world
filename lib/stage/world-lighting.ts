@@ -1,3 +1,5 @@
+import { nightLevel } from "@/lib/world/clock";
+
 // Positions follow the painted lanterns, in the same 960x640 ground coordinates.
 const LANTERNS: Record<string, readonly [number, number][]> = {
   home_player: [[270, 151], [313, 143], [390, 122], [420, 112], [448, 106]],
@@ -66,7 +68,7 @@ export function createWorldLighting(location: string) {
     /** Returns true when the canvas pixels changed and need re-uploading. */
     update(time: number, elapsed: number, reducedMotion: boolean): boolean {
       const hour = ((time % 12) + 12) % 12;
-      const night = hour >= 8 ? Math.min(1, (hour - 7) / 2) : 0;
+      const night = nightLevel(time);
       state.opacity = night ? 0.13 + night * 0.34 : hour < 4 ? 0.025 : 0.012;
       const flicker = reducedMotion || !lamps.length ? 1 : 0.97 + Math.sin(elapsed * 2.1) * 0.02 + Math.sin(elapsed * 3.7) * 0.01;
       const nightStep = Math.round(night * 50) / 50;

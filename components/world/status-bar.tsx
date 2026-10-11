@@ -6,9 +6,11 @@ import { Progress } from "@/components/ui/progress";
 import { deriveAll } from "@/lib/game";
 import { useWorldStore } from "@/store/world-store";
 
-// Top-of-page status banner — always visible on every world scene.
+// Status banner of the classic card layout only (world_journey and the
+// unpainted roads, see WorldScreen); painted maps show HudVitals and the
+// MapHud purse / sundial instead.
 //
-// Wuxia redesign: cream paper Panel with vermilion-accented frame; HP /
+// Cream paper Panel with vermilion-accented frame; HP /
 // MP / Stamina use the new Progress `variant` prop (hp = red, qi = blue,
 // stamina = jade); proper-noun bits (player name) use the Charm display
 // font; numeric metrics stay in the readable Sarabun body font; gold +

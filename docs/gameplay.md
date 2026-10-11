@@ -118,7 +118,7 @@ Everything happens at once; the price is stamina (an action that used to take *h
 
 **Regeneration.** Out of battle, stamina refills on its own in 6 ชั่วยาม (30 real minutes) and HP / MP in 12 (one real hour), whether or not the game is open. Back after a day or more away, a toast and the log say how many days passed (ระหว่างที่ท่านไม่อยู่ ผ่านไป N วัน).
 
-Night falls from about the 8th ชั่วยาม. It only changes the lighting, the sundial and the music.
+Night is the five watches, 戌 to 寅 (ชั่วยาม 7–11; `isNight` in `lib/world/clock.ts`). It only changes the lighting, the sundial, the HUD's ยามค่ำ and the music (the synthesized `night` song where a place has no region song).
 
 ### Resting
 
@@ -171,6 +171,7 @@ Arriving somewhere never triggers anything. Foes turn up while you **walk**: eve
 | --- | --- |
 | **Law** — only with wanted marks | 13 / 21 / 29 / 37 / 45 % for 1–5 marks |
 | **Sect hunter** — only after betraying a sect | 30 % |
+| **Avengers** — for 60 days after killing a member of a sect; three wins over them, or falling to one, ends it | 12 % |
 
 There are no treasure or meeting events.
 
@@ -262,7 +263,7 @@ Walk up to a person and talk. The NPC card offers what that person supports:
 | --- | --- | --- |
 | 💬 ทักทาย | a dialog | their conversation |
 | ⚔ ขอประลอง | anyone not in closed-door training | a non-fatal duel against them; a win gives fame (their authored value, else 1–13 by their strength) and +1 relationship |
-| ⚔ สังหาร | anyone | a fight to the death: win and they are dead for good, the law marks you **wanted 5/5 at once**; lose or flee and it is attempted murder, +2 marks |
+| ⚔ สังหาร | anyone | a fight to the death: win and they are dead for good, the law marks you **wanted 5/5 at once**, and if they belonged to a sect (not yours) it swears vengeance and sends its hunters after you for a while ([liveness.md](liveness.md#sects-avenge-their-dead)); lose or flee and it is attempted murder, +2 marks |
 | quests | they give or receive one | offer, progress and turn-in sections |
 | ขโมย | something to steal (94 NPCs), or a quest asks for it | see [Bad actions](#bad-actions) |
 | ลอบทำร้าย / 🪢 ลักพาตัว | an active quest stage that names them | see [Bad actions](#bad-actions) |

@@ -6,6 +6,8 @@
  *   The cache is versioned per deploy (the ?v= on the registration URL) and old ones are dropped.
  * - Art, maps, sprites, icons: stale-while-revalidate in a shared cache, trimmed to a cap,
  *   so places the player has visited load instantly and keep working offline.
+ * - /progress.json is never cached: /progress polls it every 5 s with a fresh ?t=, and each
+ *   variant would take a slot in the asset cache and push real art out.
  */
 const VERSION = new URL(self.location.href).searchParams.get("v") || "dev";
 const SHELL = `shell-${VERSION}`;
@@ -13,7 +15,9 @@ const STATIC = `static-${VERSION}`;
 const ASSETS = "assets-v1";
 const ASSET_LIMIT = 900;
 const SHELL_URLS = ["/", "/manifest.webmanifest", "/pwa/icon-192.png", "/pwa/icon-512.png"];
-const ASSET_PATHS = ["/art/", "/maps/", "/npcs/", "/player/", "/icons/", "/fonts/", "/pwa/", "/progress.json"];
+const ASSET_PATHS = ["/art/", "/maps/", "/npcs/", "/player/", "/icons/", "/fonts/", "/pwa/"];
+// Polled JSON (any query string): straight to the network, never stored.
+const NEVER_CACHE = ["/progress.json"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -27,6 +31,11 @@ self.addEventListener("activate", (event) => {
   event.waitUntil((async () => {
     const keep = new Set([SHELL, STATIC, ASSETS]);
     for (const key of await caches.keys()) if (!keep.has(key)) await caches.delete(key);
+    // Older workers cached every ?t= poll of /progress.json; clear them out.
+    const assets = await caches.open(ASSETS);
+    for (const request of await assets.keys()) {
+      if (NEVER_CACHE.includes(new URL(request.url).pathname)) await assets.delete(request);
+    }
     if (self.registration.navigationPreload) await self.registration.navigationPreload.enable();
     await self.clients.claim();
   })());
@@ -37,6 +46,7 @@ self.addEventListener("fetch", (event) => {
   if (request.method !== "GET" || request.headers.has("range")) return;
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
+  if (NEVER_CACHE.includes(url.pathname)) return;
 
   if (request.mode === "navigate") {
     event.respondWith(navigate(event));

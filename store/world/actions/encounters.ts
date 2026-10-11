@@ -3,6 +3,8 @@ import { getNpc, getOpponent, getScene, type WorldStateData } from "@/lib/world"
 import { bossAlive, getBoss } from "@/lib/world/data/bosses";
 import { rollFoeSpawn, rollWalkEvent } from "@/lib/world/effects";
 import { isLawOpponent } from "@/lib/world/law";
+import { feudActive, feudVictim, hunterSect, sectTitle } from "@/lib/world/feuds";
+import { SECT_MEMBERSHIPS } from "@/lib/world/data/sect-memberships";
 import { JAIL_SCENE_ID } from "@/lib/world/data/activities";
 import { appendActionLog, draftFrom } from "../state";
 import type { WorldGet, WorldSet, WorldStore } from "../types";
@@ -65,6 +67,11 @@ export const encountersActions = (set: WorldSet, get: WorldGet): Pick<WorldStore
     if (draft.pendingEncounter) {
       if (isLawOpponent(draft.pendingEncounter.opponentId)) {
         appendActionLog(draft, "encounter", `ถูกตามจับ! หมายจับ ${draft.wanted}`);
+      }
+      const feud = hunterSect(draft.pendingEncounter.opponentId);
+      if (feud && feudActive(draft, feud) && draft.sectMembership[feud]?.status !== "betrayed") {
+        const victim = feudVictim(draft, feud);
+        appendActionLog(draft, "feud", `ศิษย์${sectTitle(feud)}ตามมาล้างแค้นให้${(victim && getNpc(victim)?.name) || "ศิษย์ของตน"}!`);
       }
       set({ ...draft, roamingFoes: here });
       return;

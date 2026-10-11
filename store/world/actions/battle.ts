@@ -8,6 +8,8 @@ import { packOpponentIdOf } from "@/lib/world/battle-looks";
 import { getItem, getNpc, getOpponent, getResource, getScene, masteryLevel } from "@/lib/world";
 import { applyEffect, tickQuestProgress } from "@/lib/world/effects";
 import { isLawOpponent } from "@/lib/world/law";
+import { FEUD_SETTLE_WINS, sectTitle, endFeud, feudActive, hunterSect, recordFeudWin } from "@/lib/world/feuds";
+import { SECT_MEMBERSHIPS } from "@/lib/world/data/sect-memberships";
 import { moveXpMultiplier } from "@/lib/world/victory";
 import { getBoss } from "@/lib/world/data/bosses";
 import { emitWorldEvent } from "@/lib/world/shared/events";
@@ -121,6 +123,12 @@ export const battleActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "c
         return;
       }
       if (pb.killNpcId) markAttemptedMurder(draft, pb.killNpcId);
+      // Struck down by a sect's avengers: blood is paid, the feud is over.
+      const fellToFeud = hunterSect(pb.opponentId);
+      if (fellToFeud && feudActive(draft, fellToFeud) && draft.sectMembership[fellToFeud]?.status !== "betrayed") {
+        endFeud(draft, fellToFeud);
+        appendActionLog(draft, "feud", `${sectTitle(fellToFeud)}ถือว่าได้ล้างแค้นแล้ว — ความแค้นสิ้นสุด`);
+      }
       // A fatal loss is not the end: the hero wakes at home a day later,
       // poorer (lib/world/death.ts).
       const lines = reviveFromDeath(draft);
@@ -259,6 +267,15 @@ export const battleActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "c
 
     // ⚔ สังหาร won: the person is dead for good, and the law knows who did it.
     if (pb.killNpcId) heroKills(draft, pb.killNpcId);
+
+    // An avenger beaten: enough of them and the sect lets the feud go.
+    const feudSect = hunterSect(pb.opponentId);
+    if (feudSect && feudActive(draft, feudSect) && draft.sectMembership[feudSect]?.status !== "betrayed") {
+      const settled = recordFeudWin(draft, feudSect);
+      appendActionLog(draft, "feud", settled
+        ? `${sectTitle(feudSect)}ยอมเลิกตามล้างแค้น — ไม่มีใครกล้าส่งศิษย์มาอีก`
+        : `ตีโต้ศิษย์${sectTitle(feudSect)}ที่มาล้างแค้นได้ — ชนะอีก ${FEUD_SETTLE_WINS - Number(draft.flags[`feud_wins:${feudSect}`] ?? 0)} ครั้ง สำนักจึงจะยอมเลิก`);
+    }
 
     // Roll the opponent's drop table (separate from hunt-yield, which
     // covers gathering kicks; these are the random-encounter loot).

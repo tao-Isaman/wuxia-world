@@ -200,7 +200,7 @@ export type SceneEffect =
   // to a template pool in lib/world/data/rumor-templates.ts. Used by
   // store actions (duel-win-named, sect-join/leave/betray, major quest
   // complete, sect rank-up). Region defaults to player's current region.
-  | { t: "firePlayerEcho"; actionId: string; targetNpcId?: string }
+  | { t: "firePlayerEcho"; actionId: string; targetNpcId?: string; sectId?: SectId }
   // Mark a rumor as heard by the player — pushes onto rumorSeenLog so
   // future rumor selections de-prioritise it. Used by the inn/market
   // listen popups when the player picks a rumor to focus on.
@@ -1332,9 +1332,8 @@ export interface ActionLogEntry {
   // Game-time when the action happened (day + within-day fraction).
   day: number;
   time: number;
-  // Free-form category — used for the badge in the log popup. Written
-  // today: battle, buy, combat, craft, encounter, gather, law, learn, quest,
-  // rest, sect, sell, steal, assassinate, kidnap, use (no "travel").
+  // The badge in the log popup: an `ActionLogKind` (lib/world/action-log.ts)
+  // when written; kept a string so an old save's unknown kind still loads.
   kind: string;
   // Human-readable Thai message shown in the action-log popup.
   message: string;

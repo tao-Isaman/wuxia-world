@@ -13,6 +13,35 @@ export const MS_PER_DAY = 3_600_000;
 /** One ชั่วยาม is five real minutes. */
 export const MS_PER_HOUR = MS_PER_DAY / HOURS_PER_DAY;
 
+/**
+ * Night is the five night watches (五更), 戌 through 寅: ชั่วยาม 7–11 of the
+ * day that starts at 卯 (dawn). The sundial, the map's lighting veil, the
+ * HUD's ยามค่ำ and the exploring music all read it from here.
+ */
+export const NIGHT_FROM_HOUR = 7;
+
+/** The ชั่วยาม index 0–11 (0 = 卯) of a within-day time. */
+export function shichenIndex(time: number): number {
+  return ((Math.floor(time) % HOURS_PER_DAY) + HOURS_PER_DAY) % HOURS_PER_DAY;
+}
+
+/** True from 戌 (ชั่วยาม 7) until dawn at 卯. */
+export function isNight(time: number): boolean {
+  return shichenIndex(time) >= NIGHT_FROM_HOUR;
+}
+
+/**
+ * How dark it is, 0–1: dusk deepens through 戌 (7 → 8), full night from 亥
+ * to the start of 寅, and it pales through 寅 (11 → 12) toward dawn.
+ */
+export function nightLevel(time: number): number {
+  const hour = ((time % HOURS_PER_DAY) + HOURS_PER_DAY) % HOURS_PER_DAY;
+  if (hour < NIGHT_FROM_HOUR) return 0;
+  if (hour < NIGHT_FROM_HOUR + 1) return Math.max(0.05, hour - NIGHT_FROM_HOUR);
+  if (hour < HOURS_PER_DAY - 1) return 1;
+  return Math.max(0.05, HOURS_PER_DAY - hour);
+}
+
 let testNow: number | null = null;
 
 /** The real time the world is at: `Date.now()`, or the test clock when one is set. */

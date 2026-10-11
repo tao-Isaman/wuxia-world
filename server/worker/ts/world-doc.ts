@@ -15,6 +15,7 @@ import { newWorldSeed } from "@/lib/world/shared/rng";
 import { sharedSlice, type SharedWorld } from "@/lib/world/shared/world";
 import type { WorldStateData } from "@/lib/world/types";
 import { bossSlain } from "@/lib/world/victory";
+import { scheduleTournamentWarning } from "@/lib/world/tournament";
 import { emptyData } from "@/store/world/state";
 
 export interface WorldDoc {
@@ -100,6 +101,8 @@ export function advanceWorld(doc: WorldDoc, at: number): boolean {
   state.time = t.time;
   tickAllNamedNpcs(state, { currentDay: state.day, seed: state.worldSeed, held: activePins(doc, at) });
   maintainRumors(state, state.day);
+  // The tournament is talked about in the inns before it comes.
+  scheduleTournamentWarning(state);
   commit(doc, state);
   return true;
 }

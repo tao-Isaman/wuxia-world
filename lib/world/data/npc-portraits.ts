@@ -3,10 +3,19 @@ import { NPC_BODY_IDS } from "./npc-body-ids";
 import { NPC_PIXEL_IDS } from "./npc-pixel-ids";
 import { hasAnimatedSheet } from "@/lib/characters/npc-sheets";
 
+// Generated people (lib/world/npc-life.ts) have no painting of their own;
+// each borrows one that fits (data/generated-portraits.ts), registered here.
+const BORROWED = new Map<string, string>();
+export function registerBorrowedPortrait(npcId: string, portraitId: string): void {
+  if (NPC_PORTRAIT_IDS.has(portraitId)) BORROWED.set(npcId, portraitId);
+}
+
 // Public-relative portrait path for an NPC, or undefined when the id
 // has no generated art (callers fall back to the 👤 emoji marker).
 export function npcPortrait(npcId: string): string | undefined {
-  return NPC_PORTRAIT_IDS.has(npcId) ? `/npcs/${npcId}.png` : undefined;
+  if (NPC_PORTRAIT_IDS.has(npcId)) return `/npcs/${npcId}.png`;
+  const borrowed = BORROWED.get(npcId);
+  return borrowed ? `/npcs/${borrowed}.png` : undefined;
 }
 
 // Full-body transparent sprite for map markers, or undefined. Callers

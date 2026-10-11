@@ -18,7 +18,7 @@ import { absoluteHours, arrestPenalty, bribeCost, describeSentence, jailCityFor,
 import { deathLosableItems } from "./death";
 import { JAIL_SCENE_ID } from "./data/activities";
 import { STAT_LABEL, deriveAll, getArt, getSkill } from "../game";
-import { generatePlayerEcho, playerEchoContext } from "./rumor-engine";
+import { generatePlayerEcho, noteLeadHeard, playerEchoContext } from "./rumor-engine";
 import { sendPlayerEcho, worldRunsOnServer } from "./shared/world";
 import { questHolder } from "./npc-life";
 import { appendActionLog } from "./action-log";
@@ -300,6 +300,7 @@ export function applyEffect(state: WorldStateData, eff: SceneEffect): void {
         state,
         actionId: eff.actionId,
         targetNpcId: eff.targetNpcId,
+        sectId: eff.sectId,
       });
       // On the game server the world is the server's: it writes the rumor
       // everyone hears from the deed (this one only shows until the next sync).
@@ -324,6 +325,7 @@ export function applyEffect(state: WorldStateData, eff: SceneEffect): void {
       // append-only above).
       while (log.length > 50) log.shift();
       state.rumorSeenLog = log;
+      noteLeadHeard(state, eff.rumorId);
       return;
     }
     case "revealNpcStatus": {

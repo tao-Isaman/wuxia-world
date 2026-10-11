@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 // `overflow: auto` — the 9-slice border-image clips ugly at the scroll
 // edge. Wrap the scrollable region inside the Panel:
 //
-//   <Panel><div className="overflow-y-auto max-h-[70vh]">...</div></Panel>
+//   <Panel><div className="overflow-y-auto max-h-[calc(70*var(--vh))]">...</div></Panel>
 //
 // Variants:
 //   "default" — vermilion-accented frame, used for primary surfaces

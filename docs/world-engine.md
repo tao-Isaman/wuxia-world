@@ -226,15 +226,17 @@ Nothing rolls on arrival. While the hero walks on a location or route map, the w
 
 `walkTick` does nothing when there is no game, the game is over, a battle or encounter is pending, the scene is `home_player` or `jail` (`SAFE_SCENES`), or `localStorage["wuxia-random-events"] === "off"` (the switch the browser tests use). Otherwise:
 
-1. **`rollWalkEvent(state)`** (`lib/world/encounters.ts`): the law, then sect hunters, each setting `pendingEncounter` at once.
+1. **`rollWalkEvent(state)`** (`lib/world/encounters.ts`): the law, then sect hunters, then a sect's avengers, each setting `pendingEncounter` at once.
    - **The law.** With wanted marks, `lawChance(marks)` spawns a law pursuer; the city whose jail would hold the hero is remembered (`jailCityId`).
    - **Sect hunters.** If any membership is `betrayed`, a 30 % roll spawns that sect's `hunter_<sectId>`.
+   - **Avengers.** For 60 days after the hero kills a member of another sect, a 12 % roll (`FEUD_CHANCE`, `lib/world/feuds.ts`) spawns that sect's `hunter_<sectId>`; three wins over them, a fall to them or the days running out end the feud ([liveness.md](liveness.md#sects-avenge-their-dead)).
 2. **`rollFoeSpawn(state, present)`**: if fewer than `FOE_SPAWN.maxPerMap` (3) foes wait on this map, a `FOE_SPAWN.chance` (30 %) roll picks a foe from those that live here (`fightEventsForLocation`, habitats below). In a settled place (`isSettledPlace` in `data/random-events.ts`: cities, villages, homes, inns, sects, temples, the palace, villas, markets, tribes; also the opening village and tavern — every `town` scene, `isTownScene`) nothing spawns unless an active kill quest's target lives in town (thieves, drunks, ruffians); then only that quarry comes (at `FOE_SPAWN.huntChance`). Roads and the wilds keep their foes; a hunted quarry comes only where it lives. The store then asks `pickSpot` and adds a `RoamingFoe { id, opponentId, locationId, x, y }` to `roamingFoes`.
 
 | Per walk tick | Chance |
 | --- | --- |
 | Law pursuer (1–5+ marks) | 13 % / 21 % / 29 % / 37 % / 45 %, +1 % per escape (max 55 %) |
 | Sect hunter (after a betrayal) | 30 % |
+| A sect's avengers (a blood feud) | 12 % |
 | A foe appears (fewer than 3 about) | 30 % |
 | A foe appears while hunting a quest target | 80 % |
 

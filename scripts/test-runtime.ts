@@ -32,7 +32,9 @@ console.warn = (...args: unknown[]) => {
 let checks = 0;
 import { ARTS } from "../lib/game/data/arts";
 import { SKILLS } from "../lib/game/data/skills";
-import { passiveLine } from "../lib/game/skill-text";
+import { describeEffectThai, passiveLine, skillSummaryLines } from "../lib/game/skill-text";
+import { ACTION_LOG_KINDS, ACTION_LOG_LABEL, actionLogLabel } from "../lib/world/action-log";
+import { readFileSync, readdirSync } from "node:fs";
 function check(name: string, run: () => void) { run(); checks++; console.log("PASS " + name); }
 
 check("movement has constant diagonal speed and stops at its destination", () => {
@@ -219,7 +221,7 @@ check("unaffordable, hidden and unknown route destinations have no effects", () 
   assert.equal(useWorldStore.getState().currentSceneId, route.id);
   assert.equal(useWorldStore.getState().gold, 0);
 });
-check("Three.js runtime objects never enter the version 28 save", () => {
+check("Phaser runtime objects never enter the version 28 save", () => {
   const options = useWorldStore.persist.getOptions();
   assert.equal(options.version, 28);
   const saved = options.partialize!(useWorldStore.getState());
@@ -280,6 +282,61 @@ check("every inner art's passive can fire, and its text names the real trigger",
     if (art.pas.tr === "use_act" && line.includes("โจมตีภายใน")) throw new Error(`${art.id}: its own active read as an internal attack — "${line}"`);
     if (/\b(?:IA|Int skill|Crit|Phy)\b/.test(line)) throw new Error(`${art.id}: shorthand left in "${line}"`);
   }
+});
+
+check("every effect a move carries reads in Thai, never as its raw kind", () => {
+  // Skill tooltips and the skills window print describeEffectThai for se / ee.
+  const THAI = /[\u0E00-\u0E7F]/;
+  let seen = 0;
+  for (const sk of SKILLS) {
+    for (const eff of [sk.se, sk.ee]) {
+      if (!eff) continue;
+      seen++;
+      const text = describeEffectThai(eff);
+      assert.ok(THAI.test(text), `${sk.id}: effect ${eff.t} has no Thai text ("${text}")`);
+      assert.ok(!text.includes(eff.t) && !/\b(?:buff|debuff)_/.test(text), `${sk.id}: raw effect name in "${text}"`);
+      assert.ok(!/undefined|NaN/.test(text), `${sk.id}: ${eff.t} reads a field the effect lacks — "${text}"`);
+    }
+    for (const line of skillSummaryLines(sk)) assert.ok(!/\b(?:buff|debuff)_\w+/.test(line), `${sk.id}: "${line}"`);
+  }
+  assert.ok(seen > 50, "moves carry effects");
+});
+
+check("every action-log kind written by the game has a Thai badge", () => {
+  const THAI = /[\u0E00-\u0E7F]/;
+  for (const kind of ACTION_LOG_KINDS) assert.ok(THAI.test(ACTION_LOG_LABEL[kind]), `${kind}: badge not in Thai`);
+  // appendActionLog takes an ActionLogKind, so typecheck catches literals; this also
+  // catches kinds built at run time and keeps the label table free of dead entries.
+  const used = new Set<string>();
+  const files = ["store", "lib", "components", "app"].flatMap((dir) =>
+    (readdirSync(dir, { recursive: true }) as string[]).filter((f) => /\.tsx?$/.test(f)).map((f) => `${dir}/${f}`));
+  for (const file of files) {
+    const src = readFileSync(file, "utf8");
+    for (const m of src.matchAll(/appendActionLog\(\s*[\w.]+\s*,\s*(["'`])?([\w$.{}]+)\1?\s*,/g)) {
+      assert.ok(m[1] === '"' || m[1] === "'", `${file}: appendActionLog with a computed kind (${m[2]})`);
+      used.add(m[2]);
+    }
+  }
+  for (const kind of used) assert.ok(kind in ACTION_LOG_LABEL, `kind "${kind}" has no label`);
+  for (const kind of ACTION_LOG_KINDS) assert.ok(used.has(kind), `label for "${kind}" is never written`);
+  assert.equal(actionLogLabel("an_old_kind"), "บันทึก");
+});
+
+check("styles read the viewport and safe-area insets only through the turned variables", () => {
+  // A portrait phone turns the page 90° (app/globals.css); raw vw / vh and
+  // env(safe-area-inset-*) name the physical screen, so only globals.css may use them.
+  const files = ["app", "components"].flatMap((dir) =>
+    (readdirSync(dir, { recursive: true }) as string[]).filter((f) => /\.(css|tsx)$/.test(f)).map((f) => `${dir}/${f}`));
+  for (const file of files) {
+    if (file === "app/globals.css") continue;
+    const src = readFileSync(file, "utf8");
+    assert.ok(!/env\(\s*safe-area-inset/.test(src), `${file}: raw env(safe-area-inset-*) — use var(--safe-top|right|bottom|left)`);
+    assert.ok(!/[\d.]d?v[wh]\b/.test(src), `${file}: raw vw / vh — use calc(N * var(--vw|--vh))`);
+  }
+  const globals = readFileSync("app/globals.css", "utf8");
+  const portrait = globals.slice(globals.indexOf("@media (orientation: portrait)"));
+  assert.match(portrait, /--safe-top:\s*env\(safe-area-inset-right/, "turned page: its top is the screen's right edge");
+  assert.match(portrait, /--safe-left:\s*env\(safe-area-inset-top/, "turned page: its left is the screen's top edge");
 });
 
 console.warn = originalWarn;
