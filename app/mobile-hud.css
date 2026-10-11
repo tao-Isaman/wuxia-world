@@ -1,8 +1,8 @@
 /* ── Mobile-first exploration controls ──────────────────────────────────
-   Party card and icon bar along the top, a floating thumb joystick on the
+   Vitals card and icon bar top-left, a floating thumb joystick on the
    left half, and a right thumb column: rest bubble, context action, places. */
 
-/* Party card (HP / MP / พลัง), top-left. */
+/* The old party card's spot (unused: the vitals card sits in .hud-topleft). */
 .player-hud { top: max(10px, var(--safe-top)); left: max(10px, var(--safe-left)); right: auto; bottom: auto; }
 
 /* Top-left stack: the vitals card (HP / MP / พลัง, no portrait) over the

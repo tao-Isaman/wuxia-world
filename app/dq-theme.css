@@ -141,8 +141,9 @@ body:has(.hud-menu, .game-modal) [data-radix-popper-content-wrapper] > * { borde
 .encounter-flee:hover { background: #4a2a1c; }
 .encounter-note { color: #c8b894; }
 
-/* ── Battle in lacquer brown (".battle-arena" prefix outranks combat-actions.css,
-   which the battle component imports after this sheet) ───────────────────── */
+/* ── Battle in lacquer brown (the doubled ".battle-arena" outranks the
+   battle's own sheet, grid-battle.css, which battle-arena.tsx imports after
+   this one) ───────────────────────────────────────────────────────────────── */
 .battle-arena.battle-arena {
   --foreground: 42 52% 92%; --muted-foreground: 38 30% 72%; --card: 12 42% 11%; --card-foreground: 42 52% 92%;
   --secondary: 12 45% 7%; --muted: 14 30% 20%; --border: 33 38% 43%; --primary: 41 67% 65%; --primary-foreground: 12 45% 10%;

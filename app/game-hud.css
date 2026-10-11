@@ -1,7 +1,8 @@
 /* ── Exploration HUD: Dragon Quest XI layout, wuxia dress ──────────────────
    The world stays clear. Lacquer-brown boxes with gold hairlines carry the
-   chrome: icon menu along the top, purse + sundial top-right, the bottom-left
-   kept free for the thumb joystick, party card bottom-right, arrival banner. */
+   chrome: the vitals card over the icon menu top-left, purse + sundial
+   top-right, the bottom-left kept free for the thumb joystick, the rest and
+   action buttons bottom-right, arrival banner. */
 :root {
   --dq-box: #2a1611e8; --dq-box-solid: #2d1812; --dq-edge: #9a7442; --dq-gold: #e2bd6a; --dq-text: #f7eedb; --dq-name: #9fe38a;
 }
@@ -12,7 +13,9 @@
 
 /* The gold pointing hand. */
 
-/* Party card (portrait, green name, pill gauges); placed top-left in mobile-hud.css. */
+/* The vitals card's gauges (.hud-strip / .hud-vitals, hud-vitals.tsx), placed
+   top-left in mobile-hud.css. .player-hud / .hud-portrait / .hud-player-name are
+   left from the old party card with its portrait; nothing renders them now. */
 .player-hud {
   position: absolute; z-index: 30; display: flex; align-items: center;
   pointer-events: none; filter: drop-shadow(2px 3px 0 #0a0503aa);
@@ -69,7 +72,7 @@
 .arrival-flourish { color: var(--dq-gold); font-size: 18px; }
 @keyframes arrival { 0% { opacity: 0; letter-spacing: .3em; } 14% { opacity: 1; letter-spacing: .02em; } 78% { opacity: 1; } 100% { opacity: 0; } }
 
-/* Controls hint: a slim pill centred at the bottom, between the joystick and the party card. */
+/* Controls hint: a slim pill centred at the bottom, between the joystick and the right thumb column. */
 .world-controls { left: 50%; transform: translateX(-50%); bottom: max(18px, var(--safe-bottom)); padding: 2px 6px 2px 14px; gap: 10px; font-size: 12px; background: var(--dq-box); border: 1px solid var(--dq-edge); border-radius: 999px; }
 .world-controls button { padding: 0 10px; border-left: 1px solid #e2bd6a44; }
 @media (pointer: fine) { .world-controls button { min-height: 36px; } }

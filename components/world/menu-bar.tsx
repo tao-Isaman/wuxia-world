@@ -36,18 +36,16 @@ type PopupId =
   | "meridians"
   | null;
 
-// Main-screen menu bar — popup buttons, one popup at a time. The bar
-// lives directly under the StatusBar in WorldScreen so it's reachable
-// from every scene kind (location / route / dialog).
+// The game's menu: nine sections (โปรไฟล์ … ชีพจร), one popup at a time.
+// On a painted map (`hud`) it is the top-left stack — the vitals card over
+// an icon bar that wraps into rows (four to a row on phones, see
+// mobile-hud.css) — plus the quest tracker and the rest button. In the
+// classic card layout (world_journey and the unpainted roads) it sits under
+// the StatusBar as a 4-column grid, 8 columns from `sm`.
 //
-// Wuxia redesign: each tab is a pixel-bordered WuxiaButton instead of a
-// plain shadcn outline button. The grid is 3 columns on mobile (two
-// rows of three) and 6 columns on `sm+`, so touch targets stay ≥40px
-// even on the narrowest phones.
-//
-// The 🥋 กระบวนท่า tab manages BOTH move skills and inner arts: each
-// of the 10 slots can hold either kind, so a separate ☯ inner-skills
-// popup would just duplicate state.
+// The วิชา tab manages BOTH move skills and inner arts: each of the 10
+// slots can hold either kind, so a separate inner-arts popup would just
+// duplicate state.
 export function MenuBar({ hud }: { hud?: boolean } = {}) {
   const [open, setOpen] = useState<PopupId>(null);
   const close = () => setOpen(null);
