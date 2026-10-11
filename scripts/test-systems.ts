@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import { getSkill } from "../lib/game";
 import { advanceTestClock, msAtWorld, setTestClock, setTestWorldTime } from "../lib/world/clock";
 import { xpToNextLevel } from "../lib/game/leveling";
-import { PRACTICE_XP, practiceXpGain } from "../lib/world/location-categories";
+import { PRACTICE_XP, canPracticeAt, inferCategoriesFromId, isForestPlace, practiceMatches, practiceXpGain } from "../lib/world/location-categories";
 import { LETTER_RULES, giftRarity, letterChance, letterWriters, pickLetterGift, rollLetters } from "../lib/world/letters";
 import { giftable, giftWorth } from "../lib/world/gifts";
 import { getItem, getNpc } from "../lib/world/data";
@@ -53,6 +53,20 @@ check("practice: the store grants the new formula", () => {
   if (!result.ok || result.kind !== "skill") return;
   assert.equal(result.xpGained, practiceXpGain(result.matched, xpToNextLevel(skill, lv)));
   assert.ok((store().skillExp[skill.id] ?? 0) >= before || result.leveledUp);
+});
+
+check("practice: forest places (by their land) give the forest bonus; the prefix rule still holds", () => {
+  for (const id of ["valley_baihua", "valley_hudie", "cave_jinshe", "mt_wuliang", "isle_taohua"]) {
+    assert.ok(isForestPlace(id), id);
+    assert.ok(inferCategoriesFromId(id).includes("forest"), id);
+    assert.ok(canPracticeAt({ id }), id);
+    assert.ok(practiceMatches({ id }, ["yang"]), `${id} fits yang`);
+  }
+  for (const id of ["city_capital", "village_niujia", "sect_shaolin", "cave_bingcan", "home_player"]) {
+    assert.equal(inferCategoriesFromId(id).includes("forest"), false, id);
+  }
+  assert.deepEqual(inferCategoriesFromId("forest_new"), ["forest"]);
+  assert.deepEqual(inferCategoriesFromId("valley_baihua"), ["mountain", "forest"]);
 });
 
 // ─── Letters ─────────────────────────────────────────────────────────

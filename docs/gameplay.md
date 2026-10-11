@@ -452,13 +452,16 @@ Where the xp comes from:
 
 Practice:
 
-- **Where:** only at sect grounds, mountains, caves, rivers and temples (49 places).
+- **Where:** only at sect grounds, mountains, forests, caves, rivers and temples (52 places; a forest is a wild place whose land is forest — the three forest valleys, the jungle caves, the wooded peaks and three isles).
 - **Cost:** 30 stamina; it also pays 5 w-exp.
 - **Xp per session:** 30 + 5 % of what the skill or art needs for its next level (`practiceXpGain`), so higher levels still move at a steady pace; a maxed skill gets the flat part only.
 - **Fitting place (50 + 6 %)** for a matching skill type:
   - caves: yin / soft;
   - mountains and sect grounds: balance / hard;
+  - forests: yang / external;
   - rivers: internal.
+
+  A place can be two kinds at once (a wooded peak is mountain and forest); either one fitting is enough.
 
   A skill with no yin / yang / balance tag counts as balance, so it gets the mountain bonus.
 

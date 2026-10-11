@@ -100,6 +100,7 @@ These are **advisory** — they fail today for known, harmless reasons, so read 
 | `cave_`, `grotto_` | cave (practice, yin/soft bonus) | roadside | practice |
 | `pool_`, `river_`, `sea_`, `lake_` | river (practice, internal bonus) | roadside | practice |
 | `forest_`, `grove_` | forest (practice, yang/external bonus) | roadside | practice |
+| (any wild place with `forest` in its `WILD_PLACES` biomes) | + forest (`isForestPlace`) | — | practice |
 | `desert_`, `tribe_`, `market_` | frontier | roadside | — |
 | anything else | none | roadside | — |
 
