@@ -407,14 +407,14 @@ This touches many files. In order:
    - `lib/world/data/scenes-content/sects/<file>.ts` (barrel: `scenes-content/sects-temples.ts`).
 5. **People.** The registrar and other residents, each with a spar opponent (`spar_<sect>_<name>`).
 6. **Intro quest.** Given by the registrar, with **no** `sectId`:
-   - `prereqs` includes `{ t: "not", of: { t: "anySectMember" } }` and the real gates;
+   - `prereqs` includes `{ t: "not", of: { t: "anySectMember" } }` and the real gates — every leaf of the sect's `joinRequirements` too (`test:systems` checks it; the reward re-checks them at hand-in);
    - stages for the entry task;
    - rewards `joinSect` + `sectPoints`;
    - optional `qs_` offer / complete scenes that collect a fee with `addGold` (a negative amount) and `takeItem`.
 7. **Sect quests.** Repeatable quests and one art quest, all with `sectId`.
 8. **Betrayal.**
    - A `hunter_<sectId>` opponent (tier 4).
-   - A redemption quest `qst_<sectId>_redemption`, gated by `{ t: "sectStatus", sectId, status: "betrayed" }`, whose rewards include `resignSect`.
+   - A redemption quest `qst_<sectId>_redemption` with `sectId`, given by the master on the sect's grounds, gated by `{ t: "sectStatus", sectId, status: "betrayed" }`, whose rewards include `resignSect` (`test:systems` checks every sect has one).
 9. **Lineage and sagas.** A lineage quest for each of the sect's T0–T3 skills and arts, and a saga for each T4, in `lib/world/data/story/<sect>.ts` (registered in `story/index.ts`). See [story-writing.md](story-writing.md).
 10. **Optional.** Add the chief to the Liveness roster.
 11. **Check.** Run `bun scripts/audit-content.ts`, `bun run test:quests`, `bun run test:story`, `bun run typecheck`, and regenerate the reference ([reference/sects.md](reference/sects.md)).

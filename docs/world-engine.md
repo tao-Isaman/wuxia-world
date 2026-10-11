@@ -91,9 +91,9 @@ Not in the barrel (import by path): `rollWalkEvent`, `rollFoeSpawn`, `releaseFro
 | `addTrait` | trait, amount | floored at 0 | several |
 | `addNpcRelationship` | npcId, amount | unclamped | 11 |
 | `learnSkill` / `learnArt` | skillId / artId, level? | learn and auto-slot into the first empty slot | several |
-| `joinSect` | sectId | seed a membership at the start rank (no skills: the sect's lineage quests teach them); no-op if any membership (even resigned / betrayed) exists | 15 |
-| `resignSect` / `leaveSect` | sectId | status `resigned` (`leaveSect` is the legacy name) | 14 / 1 |
-| `betraySect` | sectId | status `betrayed` | 0 (store action only) |
+| `joinSect` | sectId | seed a membership at the start rank (no skills: the sect's lineage quests teach them), or **rejoin** a `resigned` one (start rank, 0 points, `bestRank` kept, `leftDay` cleared; finished quests stay done); no-op for an active or betrayed one; the `sect_join` echo. Callers check `sectJoinCheck` first | 15 |
+| `resignSect` / `leaveSect` | sectId | an active membership → `resigned`, `leftDay` = today, log line, `sect_leave_or_betray` echo; a **betrayed** one → `resigned` (the redemption: forgiven, its own log line, no echo) (`leaveSect` is the legacy name) | 15 / 1 |
+| `betraySect` | sectId | an active membership → `betrayed`, `leftDay`, evil +5, log line, echo; a finished redemption quest is forgotten so it is offered again | 0 (store action, `heroKills`) |
 | `addSectPoints` | sectId, amount | floored at 0 | via quest rewards |
 | `imprison` / `bribeJail` / `serveJail` | — | see [Law and jail](#law-and-jail) (`serveJail` is used only by tests) | 1 / 2 / 0 |
 | `firePlayerEcho` / `markRumorHeard` / `revealNpcStatus` | … | Liveness hooks ([liveness.md](liveness.md)); `revealNpcStatus` is a no-op | 0 |
@@ -137,8 +137,8 @@ Not in the barrel (import by path): `rollWalkEvent`, `rollFoeSpawn`, `releaseFro
 ### Lifecycle
 
 1. **Offer.**
-   - The NPC popup lists quests whose giver or turn-in person is that NPC (`getQuestsForNpc`). `isQuestOfferable` hides every sect quest and every quest that already has an entry (so a done, failed or abandoned quest is never offered again), then checks `prereqs`.
-   - Sect quests go through the sect popup: `isSectQuestOfferable(state, def, cooldownDays)` checks, in order, that it is a sect quest, that the hero has a membership (any status), `minSectRank`, art quest not done, not already active, the cooldown since the last completion, then `prereqs`.
+   - The NPC popup lists quests whose giver or turn-in person is that NPC (`getQuestsForNpc`). `isQuestOfferable` hides every sect quest (but the secret T4 saga trials, and a sect's redemption quest `qst_<sectId>_redemption`, offered by its giver to a betrayer) and every quest that already has an entry (a done or failed quest is not offered again; an abandoned one has no entry), then checks `prereqs`.
+   - Sect quests go through the sect popup: `isSectQuestOfferable(state, def, cooldownDays)` checks, in order, that it is a sect quest, that the hero has an **active** membership, that it is not the redemption quest, `minSectRank`, art quest not done, not already active, the cooldown since the last completion, then `prereqs`.
 2. **Accept.** An offer scene whose accept choice runs `startQuest` (compiled or hand-written) opens from the NPC card **before** the quest is accepted: that choice accepts it (and logs รับภารกิจ), any other choice leaves it on offer. A briefing-only offer (no `startQuest` choice) plays after the card accepts. `startQuest` is idempotent. It walks every stage's `autoAdvance` and snapshots `defeatedCounts` (and the inventory) for the ids it mentions. `acceptSectQuest` deletes the previous entry first, which is what makes sect quests repeatable.
 3. **Progress.** `tickQuestProgress` advances every active quest while its current stage's `autoAdvance` holds. It runs after every `applyEffects`, on location entry, after bad actions, and from a store subscription whenever `inventory` or `defeatedCounts` change — so progress never waits for a scene change.
    - **Kills count since accepting** (`current − acceptedDefeatedAt`).
@@ -148,7 +148,7 @@ Not in the barrel (import by path): `rollWalkEvent`, `rollFoeSpawn`, `releaseFro
    - `advanceQuest` past the last stage → done with rewards (no item consumption);
    - `finishQuest` → rewards on success, `failed` otherwise.
 5. **Hand-in at a person.** `isQuestTurnInForNpc` is true when the quest is active, on its **last** stage, and the NPC is `turnInNpcId ?? giverNpcId`. The popup opens `qs_<id>_complete` if it exists (and closes the quest itself if that scene doesn't), else calls `finishQuestNow` (consume items + finish).
-6. **Abandon.** `abandonQuest` marks the quest `failed` with no rewards. It can never be offered or accepted again (sect quests excepted, which the sect popup re-offers after the cooldown). Lineage quests, saga chapters and sect art trials are instead **forgotten** (entry, `qobj:` flags and tracking pin removed), so they are offered again: they are the only way to their skill or art.
+6. **Abandon.** `abandonQuest` **forgets** every quest (entry, `qobj:` flags and tracking pin removed), so it is offered again; no kind stays failed (nothing in the content reads a `failed` status). It sets `flags["qdropped:<id>"]` to the most stages the hero ever entered in it (`droppedQuestFlag`), and `applyEffects` treats a batch that starts the quest again, advances it into a stage already entered, or plays its briefing-only `qs_<id>_offer` as a **repeat** (`repeatsQuestGifts`): unsellable items (letters, keys) are only topped up to the authored count, while sellable items, gold and positive trait / relationship / sect-point gains are not paid again. Costs still apply. Older saves keep quests they failed by abandoning before this rule. A quest still fails when its giver dies with no one to take it on.
 
 `consumeQuestAutoItems` removes `min(count, held)` for every `hasItem` leaf in every stage (including inside `not`). Scene-driven completions use explicit `takeItem` effects instead, so nothing is taken twice.
 
@@ -156,7 +156,15 @@ Not in the barrel (import by path): `rollWalkEvent`, `rollFoeSpawn`, `releaseFro
 
 ### Rewards
 
-`QuestReward` (applied in order by `applyQuestRewards`): `gold`, `item`, `wExp`, `skillExp` (no immediate level-up), `trait`, `npcRelationship`, `learnSkill` / `learnArt` (**give the move's scroll**, `scroll_<skill|art>_<id>`, not the move — read from the bag to learn it; nothing if known or already held), `joinSect`, `sectPoints`, `leaveSect`, `resignSect`, `betraySect`. Gold, w-exp and skill xp ignore non-positive amounts; traits, relationships and sect points may be negative (traits and points floor at 0).
+`QuestReward` (applied in order by `applyQuestRewards`): `gold`, `item`, `wExp`, `skillExp` (no immediate level-up; nothing for a frozen move of a resigned sect), `trait`, `npcRelationship`, `learnSkill` / `learnArt` (**give the move's scroll**, `scroll_<skill|art>_<id>`, not the move — read from the bag to learn it; nothing if known or already held), `joinSect` (only if `sectJoinCheck(state, sectId, { viaQuest: true })` passes — the sect's `joinRequirements`, no other active sect, not a betrayer, the rejoin cooldown; otherwise a log line, and the hero may ask later on the master's card), `sectPoints`, `leaveSect`, `resignSect`, `betraySect` (the effects above, so they log and echo like the sect window). Gold, w-exp and skill xp ignore non-positive amounts; traits, relationships and sect points may be negative (traits and points floor at 0).
+
+### Sect membership (`lib/world/sects.ts`)
+
+- **`sectJoinCheck(state, sectId, { viaQuest? })`** — may the hero join now? Not already active, not betrayed (redemption first), no other active sect, a resigned one only `REJOIN_COOLDOWN_DAYS` (30) after `leftDay`, a first join only with the intro quest (`sectIntroQuest`: the quest whose reward joins it) done unless the intro's own reward asks, and always `joinRequirements`. The store's `joinSect` (the 🪷 button on the card of the sect's `registrarNpcId`, or whoever holds their charges) uses it; `test:systems` (`scripts/test-sects.ts`) also checks that every intro's `prereqs` carry every `joinRequirements` leaf, so the two cannot drift.
+- **Rejoining** starts at the start rank with 0 points; `bestRank` keeps the best rank ever held, so a rank-up pays its gold (`rankUpGold`) only for a rank never held before, and foe power reads the best rank.
+- **Redemption.** Every joinable sect has `qst_<sectId>_redemption` (`redemptionQuestId`, `isRedemptionQuest`), gated by `sectStatus betrayed`, given by the master on the sect's grounds, rewarding `resignSect`.
+- **The freeze.** `isSkillFrozen` / `isArtFrozen` (a move of a resigned sect, by `sc`, or an old rank-pool pick): no xp from battle, practice (`practiceSkill` → `frozen`), w-exp (`levelUpSkillFromWExp` / `levelUpArtFromWExp` → `frozen`), quest `skillExp`, and `applySkillLevelUps` / `applyArtLevelUps` never level one. Rejoining thaws it.
+- **Standing.** `upgradeSectRank`, `acceptSectQuest` (through `isSectQuestOfferable`), `resignSect` and `betraySect` need an active membership.
 
 `isQuestOfferable` keeps sect quests (`sectId`) off the NPC card, except the T4 saga trials (`isSecretSectQuest`: the `SAGA_PROLOGUES` quests), which their giver offers to an active member at `minSectRank` or better; the sect window hides them.
 
@@ -363,7 +371,5 @@ Content for villages, towns, homes and new quests for old NPCs lives in `lib/wor
 
 ## Known gaps
 
-- Quest-reward `joinSect` doesn't check the sect's `joinRequirements` (only the unused store action does); the effective gate is the intro quest's `prereqs`.
-- An abandoned quest can never be accepted again; a sect the hero left can never be rejoined.
 - The `_skipEventRoll` flag is still written but nothing reads it.
 - The forest practice bonus is unreachable (no forest locations).

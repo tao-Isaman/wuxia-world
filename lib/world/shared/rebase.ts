@@ -49,6 +49,7 @@ export function rebaseDays(p: Partial<WorldStateData>, offset: number): void {
     p.sectMembership = Object.fromEntries(Object.entries(p.sectMembership).map(([id, m]) => [id, m && {
       ...m,
       joinedDay: m.joinedDay + offset,
+      ...(typeof m.leftDay === "number" ? { leftDay: m.leftDay + offset } : {}),
       lastQuestDay: shiftRecord(m.lastQuestDay, offset),
     }])) as WorldStateData["sectMembership"];
   }

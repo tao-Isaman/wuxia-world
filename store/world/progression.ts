@@ -3,7 +3,7 @@
 import { type CharacterBuild, type StatKey, ART_LEVEL_MAX, getArt, getSkill, SKILL_LEVEL_MAX, xpToNextArtLevel, xpToNextLevel } from "@/lib/game";
 import { lukRollChance, STAT_XP_PER_ACTION, xpToNextStatLevel } from "@/lib/world/stat-progression";
 import type { WorldStateData } from "@/lib/world";
-import { SECT_MEMBERSHIPS } from "@/lib/world/data/sect-memberships";
+import { isArtFrozen, isSkillFrozen } from "@/lib/world/sects";
 import { appendActionLog } from "./state";
 
 // Push the current skill levels into the player build so the engine reads
@@ -56,29 +56,10 @@ export function rollLukXp(state: WorldStateData): void {
   }
 }
 
-// Returns true if the skill / art was granted via a sect's reward chain
-// AND that sect's membership status is "resigned". Resigned skills /
-// arts retain their current level but never accumulate further XP —
-// the cost of formal resignation. Betrayed sects keep gaining XP (the
-// trade-off there is hunter ambushes elsewhere).
-export function isFrozen(state: WorldStateData, id: string, sect: string | undefined): boolean {
-  for (const [sectId, m] of Object.entries(state.sectMembership)) {
-    if (!m || m.status !== "resigned") continue;
-    // The resigned sect's own lineage (taught by its lineage quests and
-    // sagas), plus anything picked under the old rank pools (older saves).
-    if (sect && SECT_MEMBERSHIPS[sectId as import("@/lib/world").SectId]?.name === sect) return true;
-    if (Object.values(m.rewardPicks).includes(id)) return true;
-  }
-  return false;
-}
-
-export function isSkillFrozen(state: WorldStateData, skillId: string): boolean {
-  return isFrozen(state, skillId, getSkill(skillId)?.sc);
-}
-
-export function isArtFrozen(state: WorldStateData, artId: string): boolean {
-  return isFrozen(state, artId, getArt(artId)?.sc);
-}
+// The resigned-sect freeze lives in lib/world/sects.ts (pure, so quest
+// rewards can honour it too): a resigned sect's moves keep their level but
+// gain no xp from any source until the hero rejoins.
+export { isArtFrozen, isFrozen, isSkillFrozen } from "@/lib/world/sects";
 
 // Auto-level a move skill while its xp pool allows. Caps at SKILL_LEVEL_MAX
 // and rolls overflow into the next tier (which will simply sit at 0 if the
@@ -86,6 +67,8 @@ export function isArtFrozen(state: WorldStateData, artId: string): boolean {
 export function applySkillLevelUps(state: WorldStateData, skillId: string): void {
   const sk = getSkill(skillId);
   if (!sk) return;
+  // A resigned sect's move does not level, whatever banked the xp.
+  if (isSkillFrozen(state, skillId)) return;
   let levelsGained = 0;
   while (true) {
     const lv = state.skillLevel[skillId] ?? 1;
@@ -114,6 +97,7 @@ export function applySkillLevelUps(state: WorldStateData, skillId: string): void
 export function applyArtLevelUps(state: WorldStateData, artId: string): void {
   const art = getArt(artId);
   if (!art || art.id === "none") return;
+  if (isArtFrozen(state, artId)) return;
   let build: CharacterBuild | null = state.playerBuild;
   if (!build) return;
   let levelsGained = 0;

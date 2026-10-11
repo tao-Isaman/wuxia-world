@@ -44,7 +44,9 @@ export function playerPowerIndex(state: WorldStateData): number {
   for (const m of Object.values(state.sectMembership)) {
     if (!m) continue;
     // Sect rank: 9 (entry) → 1 (top). Map rank 9 → 0, rank 1 → 1.
-    const rankPower = (9 - m.rank) / 8;
+    // The best rank ever held: a disciple who left and came back starts
+    // again at the first rank, but has not forgotten how to fight.
+    const rankPower = (9 - Math.min(m.rank, m.bestRank ?? m.rank)) / 8;
     if (rankPower > p) p = rankPower;
   }
   return Math.max(0, Math.min(1, p));

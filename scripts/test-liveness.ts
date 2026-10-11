@@ -257,7 +257,8 @@ try {
 
   await check("echoes: joining a sect by its intro quest's reward and finishing the main story are talked about", () => {
     const state = fresh();
-    useWorldStore.setState(state);
+    // The master's door (store joinSect) opens once the intro quest is done.
+    useWorldStore.setState({ ...state, quests: { ...state.quests, qst_wudang_disciple_intro: { id: "qst_wudang_disciple_intro", status: "done", stage: 1 } } });
     const before = useWorldStore.getState().rumorPool.length;
     assert.equal(useWorldStore.getState().joinSect("wudang").ok, true);
     assert.ok(useWorldStore.getState().rumorPool.slice(before).some((r) => r.source === "player_echo" && r.id.includes("sect_join")));

@@ -15,6 +15,7 @@ export const NPCS_XIAOYAO: readonly NpcDef[] = [
     sparFameReward: 18,
     questIds: [
       "qst_xiaoyao_disciple_intro",
+      "qst_xiaoyao_redemption",
       "qst_xiaoyao_sect_patrol",
       "qst_xiaoyao_sect_herb",
       "qst_xiaoyao_sect_music",

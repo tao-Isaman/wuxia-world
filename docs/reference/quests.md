@@ -2,7 +2,7 @@
 
 # Quests
 
-1074 quests: 16 main, 388 side, 97 sect quests (15 of them art quests). 0 are marked `isMajor` (completing one spreads a rumor about the hero). 2920 stages in total: 1014 advance on their own (`autoAdvance`), 830 are hands-on objectives (`objective`), the rest are dialog beats or the final hand-in. 968 quests have an offer scene (`qs_<id>_offer`) and 967 a completion scene (`qs_<id>_complete`).
+1075 quests: 16 main, 388 side, 98 sect quests (15 of them art quests). 0 are marked `isMajor` (completing one spreads a rumor about the hero). 2923 stages in total: 1016 advance on their own (`autoAdvance`), 830 are hands-on objectives (`objective`), the rest are dialog beats or the final hand-in. 968 quests have an offer scene (`qs_<id>_offer`) and 967 a completion scene (`qs_<id>_complete`).
 
 Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assassinate** / **trait** / **flag** = `autoAdvance` condition types · **objective** = map spot, person or scene the hero uses in person (`stage.objective`, ×n = several spots) · **dialog** = advanced by an `advanceQuest` choice in a scene · **turn-in** = last stage, closed at the turn-in person or by the completion scene.
 
@@ -160,6 +160,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 
 | Id | Name | Giver | Stages | Notes |
 | --- | --- | --- | --- | --- |
+| `qst_xiaoyao_redemption` | ไถ่บาปต่อพรรคสราญรมย์ | ปรมาจารย์ยุนเซียว | kill → item → turn-in | prereqs |
 | `qst_xiaoyao_sect_patrol` | ลาดตระเวนหุบเขาเซียวหยาว | ปรมาจารย์ยุนเซียว | kill → turn-in | prereqs |
 | `qst_xiaoyao_sect_herb` | เก็บสมุนไพรหุบเขาเซียวหยาว | ปรมาจารย์ยุนเซียว | item → turn-in | prereqs |
 | `qst_xiaoyao_sect_music` | ส่งเครื่องเขียนให้นักดนตรี | ปรมาจารย์ยุนเซียว | item → turn-in | prereqs |

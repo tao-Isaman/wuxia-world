@@ -24,8 +24,9 @@ import { chainNext } from "@/lib/world/quest-chain";
 // Quest log. Tabbed list view:
 //   - กำลังทำ   (active)  — ongoing quests; player can cancel from here
 //   - สำเร็จ    (done)    — completed for the run
-//   - ละทิ้ง   (failed)  — abandoned or failed; only side quests fail and
-//                          they stay here as a record (never re-offered)
+//   - ละทิ้ง   (failed)  — quests that failed (a giver who died with no
+//                          heir; older saves' abandoned quests). Abandoning
+//                          now forgets a quest, so it is offered again.
 //
 // Each row shows just the quest name by default (one line per quest);
 // the player clicks a row to expand and read the full briefing, stage
@@ -197,9 +198,7 @@ function QuestRow({
   const onCancel = async () => {
     const ok = await confirmDialog({
       title: "ละทิ้งภารกิจ",
-      message: def.story || def.lineage || def.isArtQuest
-        ? `ยืนยันละทิ้งภารกิจ "${def.name}"?\nความคืบหน้าจะหายไป แต่กลับไปรับใหม่กับผู้มอบภารกิจได้ภายหลัง`
-        : `ยืนยันละทิ้งภารกิจ "${def.name}"?\nภารกิจรองที่ล้มเหลวจะไม่กลับมาให้รับอีก`,
+      message: `ยืนยันละทิ้งภารกิจ "${def.name}"?\nความคืบหน้าจะหายไป แต่กลับไปรับใหม่กับผู้มอบภารกิจได้ภายหลัง (ของที่ได้รับตอนรับภารกิจจะไม่ได้ซ้ำ)`,
       confirmText: "ละทิ้ง",
       variant: "danger",
     });

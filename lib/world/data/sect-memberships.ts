@@ -496,7 +496,7 @@ export function ownSectAt(
   locationId: string,
 ): SectMembershipDef | null {
   for (const def of Object.values(SECT_MEMBERSHIPS)) {
-    if (def.hallLocationId === locationId && sectMembership[def.id]?.status === "active") return def;
+    if (def.hallLocationId === locationId && sectMembership[def.id] && (sectMembership[def.id]!.status ?? "active") === "active") return def;
   }
   return null;
 }

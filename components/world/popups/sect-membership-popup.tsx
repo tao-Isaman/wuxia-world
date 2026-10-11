@@ -18,6 +18,8 @@ import {
   rankUpGold,
 } from "@/lib/world";
 import { sectLineageQuests } from "@/lib/world/story/registry";
+import { REJOIN_COOLDOWN_DAYS, isRedemptionQuest, membershipStatus, rejoinWaitDays, redemptionQuestId } from "@/lib/world/sects";
+import { questHolder } from "@/lib/world/npc-life";
 import type { SectId, QuestDef } from "@/lib/world";
 import { getSkill, getArt } from "@/lib/game";
 
@@ -79,6 +81,7 @@ export function SectMembershipPopup({ open, onClose }: Props) {
           <strong>ยังไม่ได้เข้าสำนักใด</strong>
           <span>เดินทางไปยังสำนักที่สนใจ แล้วคุยกับเจ้าอาวาสหรืออาจารย์ใหญ่เพื่อขอเข้าเป็นศิษย์ บางสำนักรับเฉพาะเพศหรือต้องมีคุณสมบัติก่อน</span>
         </div>
+        <FormerSects worldState={worldState} />
       </Modal>
     );
   }
@@ -90,7 +93,8 @@ export function SectMembershipPopup({ open, onClose }: Props) {
   const nextCost = atTop ? Infinity : def.rankUpCost(nextRank);
   const canRankUp = !atTop && m.points >= nextCost;
   const sectQuests = getQuestsForSect(current);
-  const repeatable = sectQuests.filter((q) => !q.isArtQuest);
+  // The redemption quest is asked for in person by a betrayer, never listed here.
+  const repeatable = sectQuests.filter((q) => !q.isArtQuest && !isRedemptionQuest(q));
   // The T4 saga trials stay secret: their giver offers them in person.
   const artQuests = sectQuests.filter((q) => q.isArtQuest && !isSecretSectQuest(q.id));
 
@@ -197,6 +201,8 @@ export function SectMembershipPopup({ open, onClose }: Props) {
         )}
       </div>
 
+      <FormerSects worldState={worldState} />
+
       {/* ─── Leave sect ─────────────────────────────────────────────
         * Disciple can either formally resign (skills freeze, no hunters)
         * or betray (skills keep leveling but hunters spawn). Both clear
@@ -233,6 +239,47 @@ export function SectMembershipPopup({ open, onClose }: Props) {
   );
 }
 
+// ─── Former sects ────────────────────────────────────────────────────
+// Sects the hero left: when (and where) a resigned one takes them back, and
+// the redemption a betrayed one asks for.
+function FormerSects({ worldState }: { worldState: import("@/lib/world").WorldStateData }) {
+  const former = (Object.keys(worldState.sectMembership) as SectId[]).flatMap((id) => {
+    const m = worldState.sectMembership[id];
+    const def = SECT_MEMBERSHIPS[id];
+    if (!m || !def || membershipStatus(m) === "active") return [];
+    return [{ id, def, m }];
+  });
+  if (former.length === 0) return null;
+  const nameOf = (npcId: string | null | undefined) => (npcId ? getNpc(npcId)?.name : undefined) ?? "เจ้าสำนัก";
+  return (
+    <section className="mt-3 pt-3 border-t border-border space-y-1.5 text-xs" data-testid="former-sects">
+      <strong className="text-sm">สำนักเดิม</strong>
+      {former.map(({ id, def, m }) => {
+        const master = nameOf(questHolder(worldState, def.registrarNpcId));
+        let line: string;
+        if (membershipStatus(m) === "betrayed") {
+          const quest = getQuest(redemptionQuestId(id));
+          const active = worldState.quests[redemptionQuestId(id)]?.status === "active";
+          line = active
+            ? "ทรยศ · กำลังทำภารกิจไถ่บาป"
+            : `ทรยศ · นักล่ากำลังตามล่า — ขอไถ่บาปได้กับ${nameOf(questHolder(worldState, quest?.giverNpcId ?? def.registrarNpcId))}`;
+        } else {
+          const wait = rejoinWaitDays(worldState, id);
+          line = wait > 0
+            ? `ลาออกแล้ว · วิชาของสำนักหยุดเลื่อนขั้น — กลับเข้าสำนักได้ในอีก ${wait} วัน (คุยกับ${master})`
+            : `ลาออกแล้ว · วิชาของสำนักหยุดเลื่อนขั้น — ขอกลับเข้าสำนักได้กับ${master} (เริ่มที่ขั้น ${def.startRank})`;
+        }
+        return (
+          <div key={id} className="flex items-baseline justify-between gap-2" data-former-sect={id}>
+            <span className="shrink-0 font-semibold">{def.name}</span>
+            <span className="text-muted-foreground text-right">{line}</span>
+          </div>
+        );
+      })}
+    </section>
+  );
+}
+
 // ─── Leave-sect confirm ──────────────────────────────────────────────
 // Two-choice confirmation. Resign = clean break (skills freeze, no
 // hunters). Betray = keep growing skills but a sect-hunter NPC may
@@ -261,7 +308,7 @@ function LeaveSectConfirm({
         >
           <div className="font-semibold">ลาออกอย่างเป็นทางการ</div>
           <div className="text-xs text-muted-foreground mt-1">
-            จากกันด้วยดี — ไม่มีนักล่ามาตามล่า · แต่วิชา / ลมปราณที่ได้จากสำนักจะหยุดเลื่อนขั้น (ระดับเดิมยังใช้ได้)
+            จากกันด้วยดี — ไม่มีนักล่ามาตามล่า · แต่วิชา / ลมปราณที่ได้จากสำนักจะหยุดเลื่อนขั้น (ระดับเดิมยังใช้ได้) · กลับเข้าสำนักได้อีกเมื่อพ้น {REJOIN_COOLDOWN_DAYS} วัน โดยเริ่มจากขั้นแรก
           </div>
         </button>
         <button
@@ -270,7 +317,7 @@ function LeaveSectConfirm({
         >
           <div className="font-semibold">ทรยศสำนัก</div>
           <div className="text-xs text-muted-foreground mt-1">
-            หนีโดยไม่บอกใคร — วิชาจากสำนักยังเลื่อนขั้นได้ตามปกติ · แต่นักล่าจากสำนักจะตามล่าเจ้าในที่ต่าง ๆ (เช็กหนีด้วย AGI + LUK) · ล้างได้ด้วยภารกิจไถ่บาปกับเจ้าสำนัก
+            หนีโดยไม่บอกใคร — วิชาจากสำนักยังเลื่อนขั้นได้ตามปกติ · แต่นักล่าจากสำนักจะตามล่าเจ้าในที่ต่าง ๆ (เช็กหนีด้วย AGI + LUK) · ความชั่ว +5 · ล้างได้ด้วยภารกิจไถ่บาปกับเจ้าสำนัก แล้วจึงกลับเข้าสำนักได้
           </div>
         </button>
         <button

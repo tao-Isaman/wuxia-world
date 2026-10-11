@@ -119,6 +119,8 @@ export interface PlayerEchoArgs {
   state: WorldStateData;
   actionId: string;
   targetNpcId?: string;
+  /** The sect the deed is about (join / leave), when the caller knows it. */
+  sectId?: string;
 }
 
 export interface WarningArgs {
@@ -406,7 +408,7 @@ export function generatePlayerEcho(args: PlayerEchoArgs): string | null {
     npc2: targetName,
     location: locName,
   };
-  resolveDetailNames(vars, playerEchoSect(state, actionId));
+  resolveDetailNames(vars, args.sectId ?? playerEchoSect(state, actionId));
 
   // Player-echo distortion: heavier than the standard split.
   const r = Math.random();
