@@ -204,7 +204,7 @@ applyAction(state, unitId, action, rng = Math.random): boolean   // false (state
 
 `planTurn(state, unitId): TurnPlan` in `lib/game/grid/ai.ts` plays every enemy turn, and the hero's side when อัตโนมัติ (auto) is on. It is pure and deterministic (no randomness) and takes about 1.5 ms per plan. It never flees.
 
-- It estimates damage without dice by mirroring `battle.ts` (`estimateSkill`, `estimateArt`): the same attack, mastery, stack, defence, buff and art-bonus terms, times hit chance and expected crit. **Change it together with the damage formula.**
+- It estimates damage without dice by mirroring `battle.ts` (`estimateSkill`, `estimateArt`): the same attack, mastery, stack, defence, buff and art-passive terms (shared helpers in `battle.ts`; `estimateArt` calls `artActiveRaw` itself, with a passive's chance folded in), times hit chance and expected crit. **Change it together with the damage formula.**
 - For every reachable tile × ready slot × aim cell it scores the action:
   - per enemy in the area: expected damage (capped at the enemy's HP) × focus (up to ×1.5 on wounded foes, ×1.15 on the hero), plus a kill bonus, plus the value of the debuff it applies, plus life drain;
   - plus the skill's own self effect, minus 0.05 × MP cost;

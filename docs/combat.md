@@ -144,13 +144,13 @@ dmg = round(raw × riposte × (crit ? 1.5 : 1))
 | --- | --- |
 | `Atk` | attacker's derived Atk |
 | `sm` | stack modifier: `max(0, 1 + stk×stkV/100 + equipment pct_atk/100 + Σ debuff_atk/100 + atkPctOf/100)` (scales the Atk term only; `atkPctOf` = meridian `buff_atk_pct` + a boss `frenzy`) |
-| `ab` | art bonus: 1.10 for int skills when the primary art is `scholar`, else 1 |
-| `ta` | typed attack: `PA` for physical skills, `IA × im` for internal skills; `im = 1 + Σ buff_iatk/100`, ×1.12 more for int skills when the primary art is `taiji` |
+| `ab` | art bonus: `1 + v/100` when the primary art's passive is `mult_atk` (default v 10; a `use_int` trigger limits it to int skills), else 1 |
+| `ta` | typed attack: `PA` for physical skills, `IA × im` for internal skills; `im = (1 + Σ buff_iatk/100) × (1 + v/100)` when the primary art's passive is `mult_iatk` (v 12 or 15; `artDamageMults`) |
 | `se` | skill effect: `effectiveBp(skill, level) × conflict × (1 + p/100) + f + vitScale × VIT` |
 | `dm` | the skill's damage multiplier |
 | `mm` | mastery: `1 + (mastery[family]/200) × 0.5` (max ×1.5) |
 | `ed` | effective defence: `max(0, (PD for phy / ID for int) × (1 − pen/100) + Σ buff_def − Σ |debuff_def|)`; `pen` is the skill's pierce (ทะลวง, 0 for all but three boss moves) |
-| `pR` | percent reduction: `Σ defender buff_reduce + defender equipment pct_reduce` (not clamped at 100) |
+| `pR` | percent reduction: `Σ defender buff_reduce + defender equipment pct_reduce`, capped at `PCT_REDUCE_CAP` (90) |
 | `riposte` | legacy guard bonus (1 + v/100) — unreachable in the game today |
 
 `buff_def` / `debuff_def` change whichever defence the attack targets (PD or ID). `stack_atk` and `pct_atk` scale only the Atk term, not PA / IA / the skill term.
@@ -168,7 +168,7 @@ dmg = round(raw × riposte × (crit ? 1.5 : 1))
 - For each **landed** hit, in order: the target loses HP and counts a hit received → life drain `round(perHit × dr/100)` heals the caster → reflect → the weapon's `on_hit` debuff → the caster's `on_crit` passive (if crit) → the target's `hit_recv` passive → the caster's `use_int` passive (int skills) → the skill's enemy effect `ee` → win check.
 - `ee` applies **per landed hit** (stackable debuffs accumulate). A miss does nothing but log "พลาด!".
 - The skill's self effect `se` applies **once per cast**, after the hits.
-- Reflect is consumed on the first landed hit and divided by the hit count, so multi-hit skills take much less reflect.
+- Reflect answers every landed hit with its share (`round(dmg × v/100 / hits)`), so a multi-hit move takes as much reflect as a single hit; the reflect buff is used up once the cast ends.
 - A skill with `at: null` (5 skills: `rf`, `cs`, `yy`, `ig`, `pn`) rolls no damage; it applies `ee` once.
 - Cooldown and the use counter are set before the hits. A stunned caster loses the turn with no cooldown and no use recorded.
 - A **blinded** caster (`blind` debuff) rolls its chance first: on a fail the move is spent (cooldown set) but nothing lands — the log says "ตาพร่ามัว — ท่าพลาดเป้า!" and the cast shows one miss. The blind is used up by that roll either way. Art actives do the same (MP and cooldown spent).
@@ -177,7 +177,7 @@ dmg = round(raw × riposte × (crit ? 1.5 : 1))
 
 ## Inner-art actives
 
-`resolveArtActive(state, side, ctx, opts?)` fires an art's active (`act`). It fails (returns `false`) when the art has no active, is on cooldown, or MP is short. Otherwise it pays `act.c` MP, sets the cooldown `act.cd`, counts the use, and resolves by type:
+`resolveArtActive(state, side, ctx, opts?)` fires an art's active (`act`). It fails (returns `false`) when the art has no active, is on cooldown, or MP is short. Otherwise (unless the caster is stunned) it pays `act.c` MP, sets the cooldown `act.cd`, counts the use, and resolves by type (damage shown in its base form; every damage active also takes the shared modifiers below):
 
 | `act.t` | Fields | Effect | Arts |
 | --- | --- | --- | --- |
@@ -196,7 +196,13 @@ dmg = round(raw × riposte × (crit ? 1.5 : 1))
 | `buff_spd` | `v`, `u` | add a speed buff (stacks) | 1 (`khbt`) |
 | `buff_eva_debuff_eva` | `selfV`, `eneV`, `u` | replace the caster's evasion buff, debuff the target's evasion | 7 |
 
-Damage actives roll hit (same Acc / Eva rule) and crit (×1.5), but **ignore** mastery, attack stacks, equipment `pct_atk`, `debuff_atk`, `buff_iatk`, the taiji / scholar bonus, the target's `debuff_def` and the target's equipment `pct_reduce` (only its `buff_reduce` counts). After the switch, the activated art's `use_act` passive fires, and the primary art's `use_int` passive fires for internal-type actives. A stunned caster still pays the MP and cooldown. Misses are reported to the renderer as 0-damage hits.
+Damage actives roll hit (same Acc / Eva rule) and crit (×1.5) and take the same modifiers as a move (`artActiveRaw`, which the grid AI's estimate calls too):
+
+```
+raw = max(1, (Atk × sm × ab + ta) × m × mm − ed) × (1 − pR/100)
+```
+
+`sm`, `ab`, `ed` and `pR` are the move terms above (stacks, gear `pct_atk`, `debuff_atk`, meridian Atk %; the primary art's `mult_atk`; the target's PD / ID % and `pen`, `buff_def` − `debuff_def`; `buff_reduce` + gear `pct_reduce`, capped at 90). `ta` is `PA` for `atk_phy_pen` / `drain_phy` and `IA × im` for the internal ones (`buff_iatk`, `mult_iatk`); `m` is `act.m` (`act.dm` for `debuff_acc_dmg`); `mm` is the mastery multiplier of the caster's **best** weapon family, since an art has no family of its own. The order is: cooldown / MP check (fail → `false`) → the tick → a stunned caster loses the turn **before paying** (no MP, no cooldown, no use counted, like a move) → pay MP, set the cooldown, count the use → blind roll → the switch. After the switch, the activated art's `use_act` passive fires, and the primary art's `use_int` passive fires for internal-type actives. A miss is reported to the renderer as a miss (`hitMisses: [true]`).
 
 ## Levels, mastery and type conflict
 
@@ -306,7 +312,7 @@ Pierce (ทะลวง) is a skill field, not an effect: `pen` (%) of the targe
 
 Passive effects: `buff_def`, `buff_eva`, `buff_reflect`, `buff_spd_cri` (speed and crit together, `khbt`), `heal_pct`, `debuff_acc`, `debuff_eva`, `debuff_def`, `stack_atk`, `frenzy` (`n`, v, mx, u — the self-effect's frenzy; `art_boss_tiger`), `mult_iatk`, `mult_atk`.
 
-`mult_iatk` and `mult_atk` do **nothing in the dispatcher**. Their only real effect is hard-coded in `calcSkillDamage` for two art ids: `taiji` (IA ×1.12 on int skills) and `scholar` (Atk ×1.10 on int skills), applied whenever that art is primary. Nine other arts carry these passives with no effect: `t4_em_bodhi`, `qzzq`, `t3_sm_dualfusion`, `qiankun`, `t3_xy_seepower`, `bmzq`, `bmsg`, `t3_heartmind`, `shenzhao`.
+`mult_iatk` (`v`, default 12) and `mult_atk` (`v`, default 10) do nothing in the dispatcher: they are damage multipliers that `calcSkillDamage` and `artActiveRaw` read from the **primary** art (`artDamageMults`). `mult_iatk` scales IA on internal attacks; `mult_atk` scales the Atk term (only on internal attacks when its trigger is `use_int`). A chance below 100 is rolled per attack (the AI folds it in). Nine arts carry `mult_iatk` (IA +12 % or +15 %): `taiji`, `t4_em_bodhi`, `qzzq`, `t3_sm_dualfusion`, `qiankun`, `t3_xy_seepower`, `bmzq`, `bmsg`, `t3_heartmind`; none carries `mult_atk` today.
 
 ### Buffs, debuffs and ticks
 
@@ -357,7 +363,7 @@ A boss build is its three moves plus `art:art_boss_<beast>` (art level 10 gives 
 ## Slots and the primary art
 
 - A build has 10 slots (`SKILL_SLOT_COUNT`); each holds `null`, a skill id, or `art:<artId>` (`ART_SLOT_PREFIX`). `parseSlotId` returns `{ kind: "skill", skill }`, `{ kind: "art", art }` or `null`.
-- The **primary art** is the first `art:` slot, or else `build.artId`. It drives passives, the aura regen and the taiji / scholar bonuses. Other slotted arts can still fire their actives; `use_act` belongs to whichever art fired.
+- The **primary art** is the first `art:` slot, or else `build.artId`. It drives passives, the aura regen and the `mult_iatk` / `mult_atk` damage passives. Other slotted arts can still fire their actives; `use_act` belongs to whichever art fired.
 - `BattleContext` (`makeContext`) carries names, primary art ids, the weapon id, equipment totals, masteries (slotted skills, with level and conflict), skill levels, conflict factors and `combinedStats` (no equipment).
 
 ## Power tiers
@@ -508,14 +514,9 @@ It has no multi-hit, `vitScale`, `poison_dmg`, burn, stun, type conflict, skill 
 
 These are how the code behaves today; fix them deliberately, with tests.
 
-1. `mult_iatk` / `mult_atk` passives only work for `taiji` and `scholar`; nine arts carry them for nothing.
-2. Art actives skip mastery, stacks, `pct_atk`, the target's `debuff_def` and equipment `pct_reduce`; a stunned caster still pays MP and cooldown; art misses are reported as 0-damage hits.
-3. Reflect is consumed on the first hit of a multi-hit skill and divided by the hit count.
-4. Percent reduction is not clamped at 100; in an extreme stack, reflect and drain could turn negative.
-5. The effect switches are compiler-checked for exhaustiveness (a `never` guard in each, `describeEffectThai` in `lib/game/skill-text.ts` too), as is `components/game/buff-descriptions.tsx` for the buff / debuff record types; text helpers such as `describeEffect` (below) are not.
-6. `components/world/skill-tooltip.tsx` (`describeEffect`) has no text for `buff_cri`, `debuff_atk`, `debuff_def_eva`, `burn_hp_mp`, `poison_dmg` or `stun`, so about 18 skill tooltips show the raw effect name.
-7. `lib/game/grid/ai.ts` re-implements the damage formulas as an estimator. Change both together.
-8. Unused but dispatched: self effects `buff_cri`, `buff_iatk_reduce`; enemy effects `drain_mp`, `dispel`.
+1. The effect switches are compiler-checked for exhaustiveness (a `never` guard in each, `describeEffectThai` in `lib/game/skill-text.ts` too, which the tooltips and the skills window use), as is `components/game/buff-descriptions.tsx` for the buff / debuff record types.
+2. `lib/game/grid/ai.ts` re-implements the move damage formula as an estimator (sharing `atkStackMod`, `iatkBuffMod`, `artDamageMults` and `masteryMod`; art actives call `artActiveRaw` itself). Change both together.
+3. Unused but dispatched: self effects `buff_cri`, `buff_iatk_reduce`; enemy effects `drain_mp`, `dispel`.
 
 ## Changing combat safely
 
