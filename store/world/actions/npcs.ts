@@ -5,7 +5,7 @@ import { tickQuestProgress } from "@/lib/world/effects";
 import { KIDNAP_RETURN_DAYS, npcPresent } from "@/lib/world/npc-presence";
 import { GIFT_REACTION_LINE, giftOutcome, giftWaitDays, giftable } from "@/lib/world/gifts";
 import { npcFoeFor, npcIsDead, npcPower, powerTier } from "@/lib/world/npc-life";
-import { ASSASSINATE_TRAIT_EVIL, KIDNAP_TRAIT_EVIL, STEAL_TRAIT_EVIL, STEAL_XP_ON_FAIL, STEAL_XP_ON_PASS, TIER_TO_BAD_ACTION_OPPONENT, assassinateChance, badActionOffered, kidnapChance, stealChance } from "@/lib/world/bad-actions";
+import { ASSASSINATE_TRAIT_EVIL, KIDNAP_TRAIT_EVIL, STEAL_TRAIT_EVIL, STEAL_XP_ON_FAIL, STEAL_XP_ON_PASS, TIER_TO_BAD_ACTION_OPPONENT, assassinateChance, badActionOffered, kidnapChance, kidnapReturned, stealChance } from "@/lib/world/bad-actions";
 import { heroKills, staminaForHours } from "../lifecycle";
 import { grantStatXp, rollLukXp } from "../progression";
 import { ACTION_HOURS, SPAR_LOSE_SCENE_ID, SPAR_WIN_SCENE_ID } from "../rules";
@@ -223,7 +223,8 @@ export const npcsActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "mee
     const npc = getNpc(npcId);
     if (!npc) return { ok: false, reason: "unknown" };
     if (!s.playerBuild) return { ok: false, reason: "no-build" };
-    if (s.kidnappedNpcIds.includes(npcId)) {
+    // Still away (carried off before and not yet back): nothing to take.
+    if (!kidnapReturned(s, npcId)) {
       return { ok: false, reason: "already-done" };
     }
     const chance = kidnapChance(s.playerBuild, npc);

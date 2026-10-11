@@ -386,7 +386,8 @@ function RewardsTab({ def, rank, atTop, nextRank, nextCost, canRankUp, worldStat
           const item = learnedId ? (e.kind === "skill" ? getSkill(learnedId) : getArt(learnedId)) : null;
           const quest = getQuest(e.questId);
           const qs = worldState.quests[e.questId];
-          const giver = quest?.giverNpcId ? getNpc(quest.giverNpcId)?.name : undefined;
+          // A teacher who died hands the quest on (questHolder): name who offers it now.
+          const giver = quest?.giverNpcId ? getNpc(questHolder(worldState, quest.giverNpcId) ?? quest.giverNpcId)?.name : undefined;
           let status: string;
           if (learnedId) status = "✓ เรียนแล้ว";
           else if (qs?.status === "done") status = "✓ ได้คัมภีร์แล้ว";

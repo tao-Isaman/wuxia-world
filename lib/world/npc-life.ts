@@ -17,7 +17,8 @@ import type { NpcDef, NpcExtState, NpcEventKind, QuestDef, SectId, WorldStateDat
 import { getNpc, getNpcsAtLocation, registerDynamicNpc } from "./data/npcs";
 import { getNamedDefault, namedNpcIds } from "./data/named-npcs";
 import { SECT_MEMBERSHIPS } from "./data/sect-memberships";
-import { getQuestsForNpc } from "./data/quests";
+import { QUESTS, getQuestsForNpc } from "./data/quests";
+import { getArt, getSkill } from "../game";
 import { LOCATION_ROUTES } from "./data/location-routes";
 import { WORLD_COORDS } from "./data/world-coords";
 import {
@@ -414,11 +415,44 @@ export function killNpc(
 /** The living person who now holds a (possibly dead) person's charges. */
 export function questHolder(state: Partial<LifeState>, npcId: string | null | undefined): string | null {
   let id = npcId ?? null;
+  const passed = new Set<string>();
   for (let hops = 0; id && hops < 12; hops++) {
     if (!npcIsDead(state, id)) return id;
-    id = state.npcExt?.[id]?.heirId ?? null;
+    passed.add(id);
+    // Their heir (a sect's chief, a disciple…); a lineage teacher with none
+    // (the outsider schools have no chief) leaves their teaching to another
+    // teacher of the same school, so no move is lost with them.
+    const heir: string | null = state.npcExt?.[id]?.heirId ?? null;
+    id = heir ?? schoolmatesOf(id).find((m) => !passed.has(m) && !npcIsDead(state, m)) ?? null;
   }
   return null;
+}
+
+// Lineage teachers by school (the taught move's `sc`): giver → the other
+// givers of lineage quests for the same school. Built once from the quests.
+let SCHOOLMATES: Map<string, string[]> | null = null;
+function schoolmatesOf(npcId: string): readonly string[] {
+  if (!SCHOOLMATES) {
+    const bySchool = new Map<string, string[]>();
+    const schoolOf = new Map<string, string>();
+    for (const q of QUESTS) {
+      if (!q.lineage || !q.giverNpcId) continue;
+      const sc = q.lineage.kind === "skill" ? getSkill(q.lineage.id)?.sc : getArt(q.lineage.id).sc;
+      if (!sc) continue;
+      schoolOf.set(q.giverNpcId, sc);
+      const list = bySchool.get(sc) ?? [];
+      if (!list.includes(q.giverNpcId)) list.push(q.giverNpcId);
+      bySchool.set(sc, list);
+    }
+    // Then anyone else who lives on the same grounds (the Five Poisons' elder
+    // for its lone teacher). A school with no one left dies with its teacher.
+    SCHOOLMATES = new Map([...schoolOf].map(([giver, sc]) => {
+      const home = getNpc(giver)?.locationIds[0];
+      const neighbours = home ? getNpcsAtLocation(home).map((n) => n.id) : [];
+      return [giver, [...new Set([...(bySchool.get(sc) ?? []), ...neighbours])].filter((id) => id !== giver)];
+    }));
+  }
+  return SCHOOLMATES.get(npcId) ?? [];
 }
 
 /** Quests a person gives or takes now: their own, and those of the dead whose charges they hold. */
@@ -426,8 +460,12 @@ export function heldQuests(state: Partial<LifeState>, npcId: string): QuestDef[]
   if (npcIsDead(state, npcId)) return [];
   const out = [...getQuestsForNpc(npcId)];
   const seen = new Set(out.map((q) => q.id));
-  for (const [id, ext] of Object.entries(state.npcExt ?? {})) {
-    if (ext.status !== "dead" || !ext.heirId || questHolder(state, id) !== npcId) continue;
+  const dead = new Set([
+    ...Object.entries(state.npcExt ?? {}).filter(([, ext]) => ext.status === "dead").map(([id]) => id),
+    ...(state.assassinatedNpcIds ?? []),
+  ]);
+  for (const id of dead) {
+    if (questHolder(state, id) !== npcId) continue;
     for (const q of getQuestsForNpc(id)) if (!seen.has(q.id)) { out.push(q); seen.add(q.id); }
   }
   return out;

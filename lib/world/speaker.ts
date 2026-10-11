@@ -17,7 +17,8 @@
 // except the few walk-ons with a stock look (WALK_ON_SPEAKERS), whose bust is
 // that archetype's.
 import { NPCS, getNpc, getQuest } from "./data";
-import type { DialogScene, NpcDef } from "./types";
+import type { DialogScene, NpcDef, WorldStateData } from "./types";
+import { npcIsDead, questHolder } from "./npc-life";
 
 /** "หวงชิงเฉวียน (ปรมาจารย์ฤาษี)" → "หวงชิงเฉวียน". */
 export const npcBaseName = (name: string): string => name.replace(/\s*\([^()]*\)\s*$/, "").trim();
@@ -106,4 +107,24 @@ export function dialogSpeaker<T extends Named = NpcDef>(scene: DialogScene, near
     if (npc) return npc;
   }
   return undefined;
+}
+
+/**
+ * A quest dialog's dead speaker hands their voice on: the person who holds
+ * their charges now (their heir, or for a lineage teacher another teacher of
+ * the school — `questHolder`) speaks their lines, so no one talks from beyond
+ * the grave. Anyone alive, and narrators, are left as they are.
+ */
+export function livingVoice<N extends Named>(state: Partial<Pick<WorldStateData, "npcExt" | "assassinatedNpcIds">>, npc: N | undefined): N | NpcDef | undefined {
+  if (!npc || !npcIsDead(state, npc.id)) return npc;
+  const holder = questHolder(state, npc.id);
+  return holder ? getNpc(holder) ?? undefined : undefined;
+}
+
+/** The name shown over a line: a dead person's label becomes their stand-in's (see livingVoice). */
+export function voiceLabel(state: Partial<Pick<WorldStateData, "npcExt" | "assassinatedNpcIds">>, sceneId: string, label: string): string {
+  const npc = npcForSpeaker(label, sceneCast(sceneId));
+  if (!npc || !npcIsDead(state, npc.id)) return label;
+  const voice = livingVoice(state, npc);
+  return voice ? npcBaseName(voice.name) : label;
 }

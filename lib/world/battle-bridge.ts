@@ -24,6 +24,7 @@ import { getOpponent } from "./data/opponents";
 import { getItem } from "./data/items";
 import { applyOpponentStatScale, playerPowerIndex } from "./data/random-events";
 import { worldBattleSetup } from "./battle-looks";
+import { npcPresent } from "./npc-presence";
 import { powerOutlook, powerScore, powerTierOf, type CharacterBuild, type PowerOutlook, type PowerTier } from "../game";
 
 type BattleSetup = NonNullable<ReturnType<typeof worldBattleSetup>>;
@@ -41,7 +42,7 @@ function setupFor(opponentId: string, withPack?: boolean): BattleSetup | null {
   // already; this re-applies for triggerBattle paths (quest fights,
   // sparring, etc.) too.
   applyOpponentStatScale(ws);
-  return worldBattleSetup(opponentId, { bodyId: ws.playerBodyId, withPack, power: playerPowerIndex(ws) });
+  return worldBattleSetup(opponentId, { bodyId: ws.playerBodyId, withPack, power: playerPowerIndex(ws), present: (id) => npcPresent(ws, id) });
 }
 
 /** The setup for the pending battle, built once per pendingBattle. */

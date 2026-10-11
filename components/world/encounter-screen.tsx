@@ -5,6 +5,7 @@ import { TIERS } from "@/lib/game";
 import { ENEMY_CATEGORY_LABEL, getOpponent, type EnemyCategory } from "@/lib/world";
 import { rarityColor } from "@/lib/ui/rarity";
 import { FoePortrait } from "@/components/game/foe-portrait";
+import { npcPresent } from "@/lib/world/npc-presence";
 import { useWorldStore } from "@/store/world-store";
 import { ensureBattleStarted, previewBriefing } from "@/lib/world/battle-bridge";
 import { PowerReadout } from "./power-readout";
@@ -59,7 +60,7 @@ export function EncounterScreen() {
       <p className="encounter-kicker">{opp.boss ? "สัตว์ในตำนาน" : "พบเจอศัตรู"} · {ENEMY_CATEGORY_LABEL[cat]}</p>
       <div className="encounter-body">
         <div className="encounter-portrait" style={{ borderColor: color }} aria-hidden="true">
-          <FoePortrait opponentId={opp.id} />
+          <FoePortrait opponentId={opp.id} present={(id) => npcPresent(useWorldStore.getState(), id)} />
         </div>
         <div className="encounter-copy">
           <h2 id="encounter-name" style={{ color }}>{opp.name}</h2>

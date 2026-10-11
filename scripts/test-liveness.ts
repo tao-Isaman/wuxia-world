@@ -30,7 +30,15 @@ const { rumorReaches, SPREAD_HEARTLAND_DAYS, SPREAD_ALL_DAYS } = await import(".
 const { WANTED_MAX } = await import("../lib/world/law");
 const { SECT_MEMBERSHIPS } = await import("../lib/world/data/sect-memberships");
 const { WORLD_COORDS } = await import("../lib/world/data/world-coords");
-import type { NpcExtState, Rumor, WorldStateData } from "../lib/world/types";
+const { evaluateCondition } = await import("../lib/world/conditions");
+const { getScene } = await import("../lib/world/data/scenes");
+const { OPPONENTS: ALL_OPPONENTS } = await import("../lib/world/data/opponents");
+const OPPONENTS = ALL_OPPONENTS;
+const { foeLook, worldBattleSetup } = await import("../lib/world/battle-looks");
+const { livingVoice, npcBaseName, voiceLabel } = await import("../lib/world/speaker");
+const { kidnapReturned } = await import("../lib/world/bad-actions");
+const { encounterFoeAvailable } = await import("../lib/world/encounters");
+import type { DialogScene, NpcExtState, Rumor, WorldStateData } from "../lib/world/types";
 
 const clone = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
 /** A seeded random source (mulberry32). */
@@ -269,6 +277,73 @@ try {
     assert.ok(finale && isMajorQuest(finale), "a saga's last chapter is a milestone");
     const errand = QUESTS.find((q) => !q.story && !q.isMajor && !q.id.startsWith("st_main_"))!;
     assert.equal(isMajorQuest(errand), false, "an errand is not");
+  });
+
+  await check("a dead lineage teacher's quest passes on: to the heir, else a schoolmate or a neighbour; the spar is waived; the stand-in speaks", () => {
+    const lineage = QUESTS.filter((q) => q.lineage && q.giverNpcId);
+    const teachers = [...new Set(lineage.map((q) => q.giverNpcId!))];
+    let orphaned = 0;
+    for (const teacher of teachers) {
+      const state = fresh();
+      life.killNpc(state, teacher, state.day, { kind: "death_natural" });
+      const holder = life.questHolder(state, teacher);
+      if (!holder) { orphaned++; continue; }
+      assert.notEqual(holder, teacher);
+      assert.ok(life.heldQuests(state, holder).some((q) => q.lineage && q.giverNpcId === teacher), `${teacher}'s lineage passes to ${holder}`);
+      assert.ok(!life.npcsAt(state, getNpc(teacher)!.locationIds[0]!).some((n) => n.id === teacher), `${teacher} is on no map`);
+    }
+    assert.ok(orphaned <= 2, `only a lone school with no one else on its grounds dies with its teacher (${orphaned})`);
+    // The spar stage of a T2+ lineage quest passes once its teacher is dead.
+    const sparQuest = lineage.find((q) => q.stages.some((s) => s.id === "spar"))!;
+    const spar = sparQuest.stages.find((s) => s.id === "spar")!;
+    const state = fresh();
+    assert.equal(evaluateCondition(state, spar.autoAdvance!), false);
+    life.killNpc(state, sparQuest.giverNpcId!, state.day, { kind: "death_natural" });
+    assert.equal(evaluateCondition(state, spar.autoAdvance!), true, "no spar with the dead");
+    // Their lines in the quest's dialogs are spoken by the stand-in.
+    const offer = getScene(`qs_${sparQuest.id}_offer`) as DialogScene;
+    const label = offer.lines.find((l) => l.t === "dialogue" && getNpc(sparQuest.giverNpcId!)!.name.startsWith(l.speaker))!;
+    assert.ok(label && label.t === "dialogue");
+    const heir = getNpc(life.questHolder(state, sparQuest.giverNpcId!)!)!;
+    assert.equal(voiceLabel(state, offer.id, label.speaker), npcBaseName(heir.name));
+    assert.equal(livingVoice(state, getNpc(sparQuest.giverNpcId!) ?? undefined)?.id, heir.id);
+  });
+
+  await check("a foe borrowing a dead or carried-off person's look is drawn as its kind, not as them", () => {
+    const boss = "st_outsider_sixfold_dushi";
+    const person = getOpponent(boss)!.look!.npc!;
+    const alive = foeLook(boss, () => true);
+    assert.equal(alive.kind === "character" && (alive.characterId === person || !!alive.still), true, "while they live, the boss wears their look");
+    const gone = foeLook(boss, (id) => id !== person);
+    assert.ok(gone.kind === "character" && gone.characterId !== person && !gone.still, "once they are gone, an enemy type");
+    const state = fresh();
+    life.killNpc(state, person, state.day, { kind: "death_natural" });
+    const setup = worldBattleSetup(boss, { present: (id) => npcPresent(state, id) })!;
+    assert.deepEqual(setup.looks.B, gone);
+  });
+
+  await check("a kidnapped person can be carried off again once back; quest conditions still read the first time", () => {
+    const state = fresh();
+    const npc = getNpc(CHIEF)!;
+    state.kidnappedNpcIds = [CHIEF];
+    state.kidnappedUntil = { [CHIEF]: state.day + 10 };
+    assert.equal(kidnapReturned(state, CHIEF), false);
+    assert.equal(npcPresent(state, CHIEF), false);
+    state.day += 10;
+    assert.equal(kidnapReturned(state, CHIEF), true, "back at their spot");
+    assert.equal(evaluateCondition(state, { t: "kidnappedNpc", npcId: CHIEF }), true, "the record stays for quests");
+    useWorldStore.setState({ ...state, currentSceneId: npc.locationIds[0]!, lastLocationId: npc.locationIds[0]!, stamina: 100 });
+    Math.random = () => 0;
+    const r = useWorldStore.getState().attemptKidnap(CHIEF);
+    Math.random = random;
+    assert.equal(r.ok, true, "taken again");
+    assert.ok((useWorldStore.getState().kidnappedUntil[CHIEF] ?? 0) > state.day, "away again");
+    assert.equal(useWorldStore.getState().kidnappedNpcIds.filter((id) => id === CHIEF).length, 1);
+    // A villain carried off rides again once back.
+    const villain = OPPONENTS.find((o) => o.look?.npc && encounterFoeAvailable(state, o.id))!;
+    const away = { ...state, kidnappedNpcIds: [villain.look!.npc!], kidnappedUntil: { [villain.look!.npc!]: state.day + 5 } };
+    assert.equal(encounterFoeAvailable(away, villain.id), false);
+    assert.equal(encounterFoeAvailable({ ...away, day: state.day + 5 }, villain.id), true);
   });
 
   await check("rumors spread: big news reaches every region in days; ordinary news reaches the heartland, not the far side", () => {

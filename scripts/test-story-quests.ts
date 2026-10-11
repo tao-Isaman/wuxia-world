@@ -331,6 +331,8 @@ function empower(sectLabel: string) {
 
 function satisfyAuto(c: Condition) {
   if (c.t === "and") { c.all.forEach(satisfyAuto); return; }
+  // An either-or (a lineage spar, waived if the teacher has died): take the first way.
+  if (c.t === "or") { satisfyAuto(c.any[0]!); return; }
   if (c.t === "defeatedOpponent") useWorldStore.setState({ defeatedCounts: { ...store().defeatedCounts, [c.opponentId]: (store().defeatedCounts[c.opponentId] ?? 0) + (c.count ?? 1) } });
   if (c.t === "hasItem") useWorldStore.setState({ inventory: { ...store().inventory, [c.itemId]: (store().inventory[c.itemId] ?? 0) + (c.count ?? 1) } });
   // Traits and stats were raised by empower(); nudge the store to re-tick.

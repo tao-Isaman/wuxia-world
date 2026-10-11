@@ -5,6 +5,7 @@ import { getOpponent } from "@/lib/world";
 import { battleBriefing, ensureBattleStarted } from "@/lib/world/battle-bridge";
 import { rarityColor } from "@/lib/ui/rarity";
 import { FoePortrait } from "@/components/game/foe-portrait";
+import { npcPresent } from "@/lib/world/npc-presence";
 import { useWorldStore } from "@/store/world-store";
 import { PowerReadout } from "./power-readout";
 
@@ -38,7 +39,7 @@ export function BattleBriefingScreen() {
       <p className="encounter-kicker">ก่อนเข้าต่อสู้</p>
       <div className="encounter-body">
         <div className="encounter-portrait" style={{ borderColor: color }} aria-hidden="true">
-          <FoePortrait opponentId={opponent.id} />
+          <FoePortrait opponentId={opponent.id} present={(id) => npcPresent(useWorldStore.getState(), id)} />
         </div>
         <div className="encounter-copy">
           <h2 id="briefing-name" style={{ color }}>{opponent.name}</h2>
