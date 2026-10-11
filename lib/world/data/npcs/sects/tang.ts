@@ -13,12 +13,6 @@ export const NPCS_TANG: readonly NpcDef[] = [
     dialogSceneId: "npc_sect_tang_chief_tangmen_talk",
     sparOpponentId: "spar_tang_chief_tangmen",
     sparFameReward: 18,
-    questIds: [
-      "qst_tang_disciple_intro",
-      "qst_tang_sect_patrol",
-      "qst_tang_sect_venom",
-      "qst_tang_art_tenkpoisons",
-    ],
     defenseTier: 4,
     stealLoot: [
       { itemId: "ancient_coin", weight: 4 },

@@ -13,14 +13,6 @@ export const NPCS_TAISHAN: readonly NpcDef[] = [
     dialogSceneId: "npc_sect_taishan_master_tianmen_talk",
     sparOpponentId: "spar_taishan_master_tianmen",
     sparFameReward: 12,
-    questIds: [
-      "qst_taishan_disciple_intro",
-      "qst_taishan_sect_patrol",
-      "qst_taishan_sect_jade",
-      "qst_taishan_sect_dawn_offering",
-      "qst_taishan_art_sun",
-      "qst_taishan_redemption",
-    ],
     defenseTier: 3,
     stealLoot: [
       { itemId: "jade", weight: 5 },

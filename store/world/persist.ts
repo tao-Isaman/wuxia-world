@@ -91,6 +91,7 @@ export const partializeSave = (s: WorldStore): PlayerSave => ({
   activityDays: s.activityDays,
   day: s.day,
   time: s.time,
+  startDay: s.startDay,
   pendingBattle: s.pendingBattle,
   pendingEncounter: s.pendingEncounter,
   pendingHuntYield: s.pendingHuntYield,
@@ -104,6 +105,13 @@ export const partializeSave = (s: WorldStore): PlayerSave => ({
   lawEvasions: s.lawEvasions,
   jailCityId: s.jailCityId,
   jailUntil: s.jailUntil,
+  // v28: the hero's own deeds in the world (were the shared world's).
+  assassinatedNpcIds: s.assassinatedNpcIds,
+  kidnappedNpcIds: s.kidnappedNpcIds,
+  kidnappedUntil: s.kidnappedUntil,
+  bossDefeatedDay: s.bossDefeatedDay,
+  tournament: s.tournament,
+  tournamentHistory: s.tournamentHistory,
 });
 
 // Migrations:
@@ -164,13 +172,29 @@ export const partializeSave = (s: WorldStore): PlayerSave => ({
 //            stamp is shifted so `day` is the world's day now (rebaseDays),
 //            and the shared world (npcExt, rumors, bosses, tournament…)
 //            moved out of the save into its own key (WorldService).
+//   v27 → v28 brought the hero's own deeds back from the shared world
+//            (PLAYER_FROM_WORLD_KEYS: killed / kidnapped people, felled
+//            beasts, the tournament); joinSharedWorld hands an older local
+//            world's values to the save once.
+//            It also added startDay, the world day the hero entered the jianghu
+//            (foes scale with the hero's days, not the world's). A save from
+//            before v27 counted its own days from 1, so its start is day 1
+//            rebased with the rest; a v27 save never knew it, so it is
+//            treated as starting now (its current day).
 // Despite the list, `migrate` is one idempotent normalizer: it ignores
 // fromVersion and fills every missing field. See docs/save-format.md.
+function migratedStartDay(p: Partial<WorldStateData>): number {
+  const day = typeof p.day === "number" && p.day >= 1 ? p.day : 1;
+  return typeof p.startDay === "number" && Number.isFinite(p.startDay) ? Math.min(day, p.startDay) : day;
+}
+
 export function migrateSave(persisted: unknown, fromVersion: number): WorldStateData {
   const p = (persisted ?? {}) as Partial<WorldStateData>;
   // v27: a save that counted its own days joins the world clock. Only this
   // step reads fromVersion; it must run once, as it shifts every stamp.
   if (fromVersion < 27 && p.hasGame && typeof p.day === "number") {
+    // Its own day 1 was the hero's first day; rebased with every other stamp.
+    if (typeof p.startDay !== "number") p.startDay = 1;
     rebaseDays(p, worldNow().day - p.day);
   }
   // Pad the build's skillIds to 10 and back-fill learned arrays.
@@ -276,6 +300,8 @@ export function migrateSave(persisted: unknown, fromVersion: number): WorldState
     bossDefeatedDay: p.bossDefeatedDay && typeof p.bossDefeatedDay === "object" ? { ...p.bossDefeatedDay } : {},
     day: typeof p.day === "number" && p.day >= 1 ? p.day : 1,
     time: typeof p.time === "number" && p.time >= 0 ? p.time : 0,
+    // v28: unknown for a v27 save — it starts counting now.
+    startDay: migratedStartDay(p),
     pendingHuntYield: p.pendingHuntYield ?? null,
     pendingSpar: p.pendingSpar ?? null,
     pendingEncounter: p.pendingEncounter ?? null,

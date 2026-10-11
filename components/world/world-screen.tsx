@@ -6,7 +6,7 @@ import { VictorySpoils } from "./victory-spoils";
 import { ArrestReport, DeathReport } from "./death-report";
 import { WuxiaButton } from "@/components/ui/wuxia/button";
 import { npcsAt } from "@/lib/world/npc-life";
-import { dialogSpeaker } from "@/lib/world/speaker";
+import { dialogSpeaker, livingVoice } from "@/lib/world/speaker";
 import { useWorldStore } from "@/store/world-store";
 import { useBattleStore } from "@/store/battle-store";
 import { confirmDialog } from "@/store/confirm-store";
@@ -19,6 +19,7 @@ import {
 } from "@/lib/world";
 import { useGameServer } from "./online-panel";
 import { signedIn, useOnlineStore } from "@/store/online-store";
+import { useCloudSession } from "@/store/cloud-session";
 import { StartScreen } from "./start-screen";
 import { DialogStage, type DialogSpeaker } from "./dialog-stage";
 import { LocationView } from "./location-view";
@@ -34,6 +35,7 @@ import { LoadingOverlay } from "./loading-overlay";
 import { ToastStack } from "./toast-stack";
 import { ConfirmDialog } from "./confirm-dialog";
 import { BattleArena } from "@/components/game/battle-arena";
+import { useVerdictNote } from "./battle-verdict-note";
 
 // Fullscreen overlay that shows the player's current surroundings (the
 // map painting of the scene, or of the last location for dialogs and
@@ -100,12 +102,16 @@ export function WorldScreen() {
   // Online play (docs/online.md): with a game server set, the flow is account → character → game.
   const server = useGameServer();
   const needsAccount = useOnlineStore((s) => !!server && !signedIn(s));
+  // On a server the save is a character's: nothing to play until one is entered.
+  const needsCharacter = useCloudSession((s) => !!server && s.phase !== "playing");
   const currentSceneId = useWorldStore((s) => s.currentSceneId);
   const lastLocationId = useWorldStore((s) => s.lastLocationId);
   const pendingBattle = useWorldStore((s) => s.pendingBattle);
   const pendingEncounter = useWorldStore((s) => s.pendingEncounter);
   const gameOver = useWorldStore((s) => s.gameOver);
   const acknowledge = useWorldStore((s) => s.acknowledgeBattleResult);
+  // A fight the game server checks waits on its verdict before the world goes on.
+  const verdictNote = useVerdictNote();
   const resetGame = useWorldStore((s) => s.resetGame);
   // Subscribe to battle state so the layout updates when winner is set / cleared.
   const battleStateExists = useBattleStore((s) => s.state !== null);
@@ -117,8 +123,9 @@ export function WorldScreen() {
     (!hasRenderedScene.current && lastLocation?.kind === "location" ? lastLocation : undefined);
   // Who stands here now, travellers included (lib/world/npc-life.ts).
   const localNpcs = candidate ? [...npcsAt(useWorldStore.getState(), candidate.id), ...candidate.npcs] : [];
+  // A dead speaker's lines go to whoever holds their charges now (livingVoice).
   const speaker = scene?.kind === "dialog"
-    ? [...localNpcs, ...NPCS].find((npc) => npc.dialogSceneId === scene.id) ?? dialogSpeaker(scene, localNpcs)
+    ? livingVoice(useWorldStore.getState(), [...localNpcs, ...NPCS].find((npc) => npc.dialogSceneId === scene.id) ?? dialogSpeaker(scene, localNpcs))
     : undefined;
   const speakingHere = speaker && localNpcs.some((npc) => npc.id === speaker.id);
   // Only an authored successor belongs to this conversation. Returning to town
@@ -158,8 +165,8 @@ export function WorldScreen() {
   // silently hangs because no ConfirmDialog is on the tree.
   let body: React.ReactNode;
 
-  if (needsAccount || !hasGame) {
-    // Online, an account comes first — also for a returning player with a save.
+  if (needsAccount || needsCharacter || !hasGame) {
+    // Online, an account and a character come first.
     body = <StartScreen />;
   } else if (gameOver) {
     body = <GameOverScreen />;
@@ -174,7 +181,7 @@ export function WorldScreen() {
   } else if (pendingBattle) {
     body = (
       <MapBackdrop>
-        <BattleArena mode="world" onContinue={acknowledge} winExtra={<VictorySpoils />} />
+        <BattleArena mode="world" onContinue={acknowledge} winExtra={<VictorySpoils />} pendingNote={verdictNote} />
       </MapBackdrop>
     );
   } else if (pendingEncounter) {

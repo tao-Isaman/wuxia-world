@@ -2,8 +2,9 @@
 
 // The online sign-in (docs/online.md): the account's session token, saved in
 // this browser, and the live status of the room socket (mirrored from
-// lib/net/session.ts by components/world/online-bridge.tsx). The game save
-// itself stays local; only presence goes online for now.
+// lib/net/session.ts by components/world/online-bridge.tsx), and the
+// character last played (re-entered on the next visit; the saves themselves
+// live on the server, store/cloud-session.ts).
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { AuthFailure, login, register } from "@/lib/net/client";
@@ -15,6 +16,8 @@ export interface OnlineState {
   token: string | null;
   /** Token expiry, ms since 1970. */
   expires: number | null;
+  /** The character last played on this browser (resumed on load). */
+  characterId: string | null;
   /** Not saved: the room socket's status and who is in the room (us included). */
   status: OnlineStatus;
   roomSize: number;
@@ -38,6 +41,7 @@ export const useOnlineStore = create<OnlineState>()(
       username: null,
       token: null,
       expires: null,
+      characterId: null,
       status: "off",
       roomSize: 0,
       async signIn(mode, username, password) {
@@ -53,13 +57,13 @@ export const useOnlineStore = create<OnlineState>()(
       },
       // The username stays: this browser's log in step opens with it filled in.
       signOut() {
-        set({ token: null, expires: null, status: "off", roomSize: 0 });
+        set({ token: null, expires: null, characterId: null, status: "off", roomSize: 0 });
       },
     }),
     {
       name: "wuxia-online-v1",
       version: 1,
-      partialize: (s) => ({ username: s.username, token: s.token, expires: s.expires }),
+      partialize: (s) => ({ username: s.username, token: s.token, expires: s.expires, characterId: s.characterId }),
     },
   ),
 );

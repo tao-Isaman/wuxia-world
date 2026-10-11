@@ -114,7 +114,7 @@ export function findOpponentNpc(opponentId: string | null | undefined, buildName
  * the player met in the world (over its costume archetype); everyone else is
  * the painted enemy type for their kind (`foeCharacterFor`).
  */
-export function opponentLook(opponentId: string | null | undefined, npc?: NpcDef): UnitLook {
+export function opponentLook(opponentId: string | null | undefined, npc?: NpcDef | null): UnitLook {
   const opp = getOpponent(opponentId);
   const variant: { tint?: number; size?: number } = {};
   if (opp?.look?.tint !== undefined) variant.tint = opp.look.tint;
@@ -128,7 +128,8 @@ export function opponentLook(opponentId: string | null | undefined, npc?: NpcDef
     return beast ? { kind: "anim", sheet: beast, ...variant } : { kind: "creature", frame, ...variant };
   }
   // A rigged NPC (its own sheet) plays full clips; other named NPCs keep their still.
-  const npcId = npc?.id ?? opp?.look?.npc;
+  // `npc === null`: borrow no one's look (the person it would show is gone).
+  const npcId = npc === null ? undefined : npc?.id ?? opp?.look?.npc;
   if (npcId && hasAnimatedSheet(npcId)) return { kind: "character", characterId: npcId, ...variant };
   const still = npcId ? npcBattleSprite(npcId) : undefined;
   if (still) return { kind: "character", characterId: npcCharacterId(npcId!), still, ...variant };
@@ -146,9 +147,14 @@ export function opponentLook(opponentId: string | null | undefined, npc?: NpcDef
  * `opponentLook` with the NPC the battle finds for it (by `look.npc`, spar id
  * or build name, as `worldBattleSetup` does).
  */
-export function foeLook(opponentId: string | null | undefined): UnitLook {
+export function foeLook(opponentId: string | null | undefined, present?: (npcId: string) => boolean): UnitLook {
   const opponent = getOpponent(opponentId);
-  return opponentLook(opponentId, findOpponentNpc(opponentId, opponent?.build().name));
+  const npc = findOpponentNpc(opponentId, opponent?.build().name);
+  // A foe that borrows a person's look (a saga boss as ตู๋ซื่อ…) whom the world
+  // has lost — dead, or carried off — is drawn as the enemy type of its kind,
+  // not as that person (`present`: npcPresent against the world).
+  if (npc && present && !present(npc.id)) return opponentLook(opponentId, null);
+  return opponentLook(opponentId, npc);
 }
 
 /** Unit id for the n-th (1-based) pack member of `opponentId`. */
@@ -199,7 +205,7 @@ export function enemyPackSpecs(opp: OpponentDef, power = 0): UnitSpec[] {
 }
 
 /** Everything the battle store needs to start a world battle against `opponentId`. */
-export function worldBattleSetup(opponentId: string, opts: { bodyId?: string | null; withPack?: boolean; power?: number } = {}): {
+export function worldBattleSetup(opponentId: string, opts: { bodyId?: string | null; withPack?: boolean; power?: number; present?: (npcId: string) => boolean } = {}): {
   opponent: OpponentDef;
   build: CharacterBuild;
   looks: { A: UnitLook; B: UnitLook };
@@ -211,7 +217,7 @@ export function worldBattleSetup(opponentId: string, opts: { bodyId?: string | n
   return {
     opponent,
     build,
-    looks: { A: playerLook(opts.bodyId), B: foeLook(opponentId) },
+    looks: { A: playerLook(opts.bodyId), B: foeLook(opponentId, opts.present) },
     enemies: opts.withPack ? enemyPackSpecs(opponent, opts.power ?? 0) : [],
   };
 }

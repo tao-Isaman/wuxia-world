@@ -2,6 +2,7 @@ import type { WorldFoe } from "@/lib/stage/types";
 import { getOpponent } from "@/lib/world/data/opponents";
 import { bossesAt } from "@/lib/world/data/bosses";
 import { foeLook } from "@/lib/world/battle-looks";
+import { npcPresent } from "@/lib/world/npc-presence";
 import type { WorldStateData } from "@/lib/world";
 import { useWorldStore, type RoamingFoe } from "@/store/world-store";
 
@@ -9,7 +10,8 @@ import { useWorldStore, type RoamingFoe } from "@/store/world-store";
 function mapLook(opponentId: string): WorldFoe["look"] {
   const opp = getOpponent(opponentId);
   if (opp?.look?.anim) return { kind: "anim", sheet: opp.look.anim, tint: opp.look.tint, size: opp.look.size };
-  const look = foeLook(opponentId);
+  const world = useWorldStore.getState();
+  const look = foeLook(opponentId, (id) => npcPresent(world, id));
   if (look.kind === "creature") return { kind: "creature", frame: look.frame, tint: look.tint, size: look.size };
   if (look.kind === "character") return { kind: "character", characterId: look.characterId, tint: look.tint, size: look.size };
   return { kind: "anim", sheet: look.sheet, tint: look.tint, size: look.size };

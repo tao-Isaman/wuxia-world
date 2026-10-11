@@ -1,8 +1,13 @@
-// Joining, ranking up in, taking quests from and leaving sects.
+// Joining (and rejoining), ranking up in, taking quests from and leaving sects.
+// Every action here works only on a membership in the right standing: rank-ups
+// and sect quests for an active disciple, leaving from an active one, joining
+// through sectJoinCheck (lib/world/sects.ts). The consequences of joining and
+// leaving (log, echo, betrayal's evil) live in the effects themselves, so a
+// quest reward does the same as these buttons.
 import { getQuest } from "@/lib/world";
 import { applyEffect, isSectQuestOfferable } from "@/lib/world/effects";
-import { evaluateCondition } from "@/lib/world/conditions";
 import { SECT_MEMBERSHIPS, rankUpGold } from "@/lib/world/data/sect-memberships";
+import { membershipStatus, sectJoinCheck } from "@/lib/world/sects";
 import { appendActionLog, draftFrom } from "../state";
 import type { WorldGet, WorldSet, WorldStore } from "../types";
 
@@ -10,16 +15,16 @@ export const sectsActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "jo
   joinSect: (sectId) => {
     const s = get();
     if (!s.hasGame || !s.playerBuild) return { ok: false, reason: "ยังไม่ได้เริ่มเกม" };
-    if (s.sectMembership[sectId]) return { ok: false, reason: "เป็นศิษย์อยู่แล้ว" };
     const def = SECT_MEMBERSHIPS[sectId];
     if (!def) return { ok: false, reason: "ไม่พบสำนัก" };
-    if (!evaluateCondition(s, def.joinRequirements)) {
-      return { ok: false, reason: "ไม่ผ่านเงื่อนไขการรับศิษย์" };
-    }
+    // A first join after the intro quest (when its reward could not admit
+    // the hero), or the return of a resigned disciple after the cooldown.
+    const check = sectJoinCheck(s, sectId);
+    if (!check.ok) return { ok: false, reason: check.reason };
     const draft = draftFrom(s);
     applyEffect(draft, { t: "joinSect", sectId });
     // The joinSect effect also tells the jianghu (a sect_join echo).
-    appendActionLog(draft, "sect", `เข้าร่วมสำนัก${def.name} · ขั้นที่ ${def.startRank}`);
+    appendActionLog(draft, "sect", `${check.rejoin ? "กลับเข้า" : "เข้าร่วม"}สำนัก${def.name} · ขั้นที่ ${def.startRank}`);
     set({ ...draft });
     return { ok: true };
   },
@@ -28,6 +33,7 @@ export const sectsActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "jo
     const s = get();
     const m = s.sectMembership[sectId];
     if (!m) return { ok: false, reason: "ยังไม่ได้เป็นศิษย์" };
+    if (membershipStatus(m) !== "active") return { ok: false, reason: "ไม่ได้เป็นศิษย์ของสำนักนี้แล้ว" };
     const def = SECT_MEMBERSHIPS[sectId];
     if (!def) return { ok: false, reason: "ไม่พบสำนัก" };
     if (m.rank <= def.topRank) return { ok: false, reason: "ขั้นสูงสุดแล้ว" };
@@ -39,16 +45,19 @@ export const sectsActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "jo
     const draft = draftFrom(s);
     const dm = draft.sectMembership[sectId];
     if (!dm) return { ok: false, reason: "membership lost" };
-    dm.points -= cost;
-    dm.rank = target;
-    // Rank-ups pay gold; the sect's martial arts come from its lineage
-    // quests and sagas, which the new rank may open.
-    const gold = rankUpGold(def, target);
+    // Nested entries are shared with the previous state (draftFrom is one
+    // level deep): replace the membership instead of mutating it.
+    const best = dm.bestRank ?? dm.rank;
+    // Rank-ups pay gold — once per rank: a disciple who came back climbs
+    // again without being paid twice. The sect's martial arts come from its
+    // lineage quests and sagas, which the new rank may open.
+    const gold = target < best ? rankUpGold(def, target) : 0;
+    draft.sectMembership[sectId] = { ...dm, points: dm.points - cost, rank: target, bestRank: Math.min(best, target) };
     draft.gold += gold;
     appendActionLog(
       draft,
       "sect",
-      `เลื่อนขั้น${def.name} → ขั้นที่ ${target} (จ่าย ${cost} sect points · ได้รับ ${gold} ตำลึง)`,
+      `เลื่อนขั้น${def.name} → ขั้นที่ ${target} (จ่าย ${cost} sect points${gold ? ` · ได้รับ ${gold} ตำลึง` : ""})`,
     );
     // Liveness Layer: rank-up is a public milestone — player-echo
     // rumor lands in the pool for inn-goers to repeat.
@@ -61,7 +70,9 @@ export const sectsActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "jo
     const s = get();
     const def = getQuest(questId);
     if (!def) return { ok: false, reason: "ไม่พบภารกิจ" };
+    if (def.sectId !== sectId) return { ok: false, reason: "ไม่ใช่ภารกิจของสำนักนี้" };
     const sectDef = SECT_MEMBERSHIPS[sectId];
+    // isSectQuestOfferable also requires an active membership.
     const check = isSectQuestOfferable(s, def, sectDef.questCooldownDays);
     if (!check.offerable) {
       return {
@@ -86,15 +97,11 @@ export const sectsActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "jo
     const s = get();
     const m = s.sectMembership[sectId];
     if (!m) return { ok: false, reason: "ไม่ได้เป็นศิษย์สำนักนี้" };
-    if ((m.status ?? "active") !== "active") return { ok: false, reason: "ไม่อยู่ในสถานะศิษย์ที่ออกได้" };
+    if (membershipStatus(m) !== "active") return { ok: false, reason: "ไม่อยู่ในสถานะศิษย์ที่ออกได้" };
     const draft = draftFrom(s);
+    // The effect freezes the sect's moves, logs and tells the jianghu.
+    draft.sectMembership[sectId] = { ...m };
     applyEffect(draft, { t: "resignSect", sectId });
-    const def = SECT_MEMBERSHIPS[sectId];
-    appendActionLog(draft, "sect", `ลาออกอย่างเป็นทางการจากสำนัก${def.name} — วิชาที่ได้จากสำนักจะหยุดเลื่อนขั้น`);
-    // Liveness Layer: from the public's view a resign and a betray
-    // both look like "the player left" — same actionId so they share
-    // the template pool.
-    applyEffect(draft, { t: "firePlayerEcho", actionId: "sect_leave_or_betray" });
     set({ ...draft });
     return { ok: true };
   },
@@ -103,17 +110,11 @@ export const sectsActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "jo
     const s = get();
     const m = s.sectMembership[sectId];
     if (!m) return { ok: false, reason: "ไม่ได้เป็นศิษย์สำนักนี้" };
-    if ((m.status ?? "active") !== "active") return { ok: false, reason: "ไม่อยู่ในสถานะศิษย์ที่ทรยศได้" };
+    if (membershipStatus(m) !== "active") return { ok: false, reason: "ไม่อยู่ในสถานะศิษย์ที่ทรยศได้" };
     const draft = draftFrom(s);
+    // The effect sets the hunters on the hero, adds evil +5, logs and tells the jianghu.
+    draft.sectMembership[sectId] = { ...m };
     applyEffect(draft, { t: "betraySect", sectId });
-    // Betrayal is a moral wound — bumps evil + arrogance traits.
-    applyEffect(draft, { t: "addTrait", trait: "evil", amount: 5 });
-    const def = SECT_MEMBERSHIPS[sectId];
-    appendActionLog(draft, "sect", `ทรยศสำนัก${def.name} — ระวังนักล่าจากสำนักจะตามล่าเจ้าในที่ต่าง ๆ`);
-    // Liveness Layer: same actionId as resign — the rumor mill
-    // doesn't differentiate "left politely" vs "betrayed" until
-    // a specific accuser surfaces.
-    applyEffect(draft, { t: "firePlayerEcho", actionId: "sect_leave_or_betray" });
     set({ ...draft });
     return { ok: true };
   },

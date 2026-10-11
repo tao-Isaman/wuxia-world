@@ -18,10 +18,13 @@ The original requirement and plan are kept as history: [specs/liveness-spec.md](
 - [Seats, heirs and quests](#seats-heirs-and-quests)
 - [Generated people](#generated-people)
 - [The hero and the living](#the-hero-and-the-living)
+- [Sects avenge their dead](#sects-avenge-their-dead)
 - [Rumors](#rumors)
+- [Leads and warnings](#leads-and-warnings)
 - [Player echoes](#player-echoes)
 - [Where the hero hears rumors](#where-the-hero-hears-rumors)
 - [Hooks for content](#hooks-for-content)
+- [Repair on load](#repair-on-load)
 - [Tests](#tests)
 - [Known gaps](#known-gaps)
 - [Changing it safely](#changing-it-safely)
@@ -40,6 +43,9 @@ The original requirement and plan are kept as history: [specs/liveness-spec.md](
 | `lib/world/data/lore-rumors.ts` | `LORE_RUMORS` — 30 hand-written rumors |
 | `lib/world/data/opponents.ts` | `npcFoeId` / `parseNpcFoeId` — `npc@<id>@<power>@<sect>` opponents made from a person |
 | `lib/world/npc-presence.ts` | `npcPresent` — the dead, the killed and the kidnapped are not on any map |
+| `lib/world/feuds.ts` | a sect's blood feud against the hero who killed one of its members (`startFeud`, `activeFeuds`, `recordFeudWin`, `expireFeuds`; kept in `flags`) |
+| `lib/world/npc-repair.ts` | `repairNpcExt`, run by `validateAndRepair` on load |
+| `lib/world/data/generated-portraits.ts` | the painted portraits generated people borrow, by school, sex and age band (`generatedPortraitId`) |
 | `store/world/lifecycle.ts` | `syncClock` runs the tick; `withChargesOfDead`; `heroKills` (an `npc_killed` world event) |
 | `store/world/actions/` | `startSparWith`, `startKillDuel` (`npcs.ts`); the player-echo call sites (`sects.ts`, `battle.ts`, and `heroKills` in `lifecycle.ts`) |
 | `components/world/popups/npc-interaction-popup.tsx` | the NPC card: title, journey and family, ขอประลอง, ⚔ สังหาร |
@@ -55,6 +61,8 @@ The world clock (`lib/world/clock.ts`: one game day is one real hour) drives it:
 1. `withChargesOfDead(state, () => tickAllNamedNpcs(state, { currentDay, seed: worldSeed }))` — the tick, then the quests of anyone who died in it (see [Seats, heirs and quests](#seats-heirs-and-quests)). Each week draws its dice from `seededRng(worldSeed, day)`, so one world gives the same weeks on any machine (tests pass their own `rng`).
 2. `maintainRumors(state, day)` — expire, archive and cap rumors.
 
+**On a game server the server runs it** ([online.md](online.md#the-shared-world)): one world for every player, kept by `WorldObject`, which runs the same two steps whenever its clock moves on (`advanceWorld`, and an alarm every real hour). The browser then skips both (`worldRunsOnServer()` in `syncClock`), takes the server's world every minute (`applyServerWorld`, which settles the hero's quests of the newly dead), and sends the people its quests are about (pins; the tick's `held` option keeps them home, as it keeps the local hero's).
+
 The tick does nothing until 7 days have passed since `lastNpcTickDay`. It then simulates every whole week since, up to 8 in full (`MAX_TICKS_PER_CALL`); weeks beyond that only age people. The leftover days (`since % 7`) count toward the next week.
 
 `seedLiveness` runs when a world is joined or created (`joinSharedWorld`), on every load (the persist `merge`) and at the start of each tick: it seeds any of the thirty who are missing, fills the fields Liveness 2.0 reads into older entries, replaces every entry with a fresh copy (a draft must never change the previous snapshot) and registers generated people with the NPC registry.
@@ -63,7 +71,7 @@ The tick does nothing until 7 days have passed since `lastNpcTickDay`. It then s
 
 Five fields on `WorldStateData` (save v18+, see [save-format.md](save-format.md)): `npcExt`, `rumorPool`, `rumorArchive`, `rumorSeenLog` (newest 50), `lastNpcTickDay`. Liveness 2.0 added no top-level field, so no version bump: everything new is optional on `NpcExtState` and filled on load.
 
-Since v27 the people and the rumors belong to the **shared world** (`npcExt`, `lastNpcTickDay`, `rumorPool`, `rumorArchive`, with `worldSeed` and the killed / kidnapped lists), saved apart from the player in `wusia-shared-v1`; what the hero heard (`rumorSeenLog`) stays in the player's save. A new hero joins the world as it is: the dead stay dead ([design](design/world-clock-and-shared-world.md)).
+Since v27 the people and the rumors belong to the **shared world** (`npcExt`, `lastNpcTickDay`, `rumorPool`, `rumorArchive`, with `worldSeed`), saved apart from the player in `wusia-shared-v1` (on a game server, the server's one world); since v28 the killed / kidnapped lists are the hero's own (a killing of one of the simulated people still marks them dead in `npcExt`); what the hero heard (`rumorSeenLog`) stays in the player's save. A new hero joins the world as it is: the dead stay dead ([design](design/world-clock-and-shared-world.md)).
 
 `NpcExtState` per person:
 
@@ -152,18 +160,32 @@ What five years look like (seeded run, `test:liveness`): every seat held, genera
 - **The dead chief's seat and quests pass to the heir** (`heirId`). On the map the heir stands at the old chief's spot (`predecessorsOf`). `heldQuests(heir)` lists the old chief's quests, `isQuestTurnInForNpc` accepts the heir for the hand-in, and the quest guide points at the heir.
 - **A dead sect member's quests pass to the sect's chief.**
 - **`settleChargesOfDead`** runs after every tick and every killing the hero does: an active quest whose giver or hand-in person died passes to their holder (`questHolder` follows `heirId` through the dead), with a log line and a toast; with nobody to take it — a sectless person — it fails.
+- **Lineage teachers pass their teaching on.** A dead lineage teacher with no heir (the outsider schools have no chief) leaves their quests to another teacher of the same school (the moves' `sc`), else to someone living on the same grounds (`schoolmatesOf` in `questHolder`); a school with no one left dies with its last teacher. `heldQuests` covers every dead person (`npcExt` dead or assassinated), not only those with an `heirId`. The spar stage of a lineage quest (`defeatedOpponent spar_<teacher>`) also passes once the teacher is dead (`or npcStatus dead`).
+- **The dead don't speak.** In a quest dialog, a dead speaker's lines and bust go to whoever holds their charges (`livingVoice` / `voiceLabel`, `lib/world/speaker.ts`, used by the dialog stage and `DialogDisplay`).
 - **The dead are gone.** `npcPresent` is false for anyone dead, so they leave every map, the card layout, letters and the tournament.
 
 ## Generated people
 
 `spawnPerson` makes a person with `dynamic: true`: a name nobody alive has (Buddhist names in Shaolin, Emei and north Hengshan), a sex the sect admits, a costume (m2–m4 / f2–f4, so they can stroll), a temper and a birthday. `syncDynamicNpcs` registers them with the NPC registry (`registerDynamicNpc` in `data/npcs.ts`), so `getNpc`, rumors, the map and the card treat them like authored people. At most 48 are alive at once (`DYNAMIC_CAP`). They come as disciples, as elders who take an empty seat, and as newcomers on the roads.
 
+- **Portrait.** Nobody painted them, so each borrows a painted bust (`registerBorrowedPortrait` in `data/npc-portraits.ts`, so `npcPortrait` — the card, dialogs, letters — finds it). `generatedPortraitId` picks from `data/generated-portraits.ts`: the school's own minor members (disciples, guards, elders; Sun-Moon also draws on `sect_ming`'s), else a pool of travellers, villagers and guests for the sectless and for a school with no face of that sex; narrowed to their sex and age band (under 30, 30–54, 55+), falling back to any age of their sex. The pick is a hash of the id, so a person keeps one face within an age band and gets an older one as they age. The pools were sorted by eye; the thirty simulated people lend no face. A borrowed face can belong to an authored minor NPC, who then has a look-alike.
+- **Description.** Their place (the rank title, or a former sect, or a newcomer), age, master and a few words from their temper ("ยึดมั่นในคุณธรรม", "ทะเยอทะยานอยากเป็นยอดฝีมือ"…), rebuilt every week.
+
 ## The hero and the living
 
 - **Where people are.** `npcsAt(state, locationId)` lists the residents who are home plus every simulated person standing there. Painted maps put residents at their spots, heirs in the inherited seat and travellers on a free spot near the way in, strolling. The quest guide finds a person where they stand now (`npcPlaces`).
 - **The NPC card** shows a simulated person's title, age and standing (`npcTitle`: "เจ้าสำนักง้อไบ๊ · อายุ 68 · ปรมาจารย์"), and what the jianghu knows: a journey under way, seclusion, wounds, their master, spouse, a former sect.
 - **ขอประลอง with anyone.** `startSparWith` no longer needs `sparOpponentId`: a person without an authored sparring build fights as themselves (`npcFoeFor` → `npc@<id>@<power>@<sect>`, built in `opponents.ts` from their power and their sect's own moves — none for townsfolk under power 10, one to four moves and an inner art as they grow). Fame for a win is the authored value, else `1 + tier × 3`. A secluded person refuses. Winning against anyone the simulation tracks fires `duel_win_named`.
-- **⚔ สังหาร anyone.** `startKillDuel` queues a fight to the death (`pendingBattle.killNpcId`). Win → `heroKills`: the person dies (`killNpc` with `by: "player"`; their seat and quests pass on or fail), joins `assassinatedNpcIds`, the hero is **wanted at once at the top of the list** (`wanted = WANTED_MAX`), evil +10, fame +3, the `killed_by_player` news and the `kill_npc` echo go out; killing one's own sect-mates is betraying the sect. Lose or flee → +2 wanted marks (attempted murder); a loss is a fall (wake at home). A successful ลอบสังหาร (quest assassination) counts as a killing too.
+- **⚔ สังหาร anyone.** `startKillDuel` queues a fight to the death (`pendingBattle.killNpcId`). Win → `heroKills`: the person dies (`killNpc` with `by: "player"`; their seat and quests pass on or fail), joins `assassinatedNpcIds`, the hero is **wanted at once at the top of the list** (`wanted = WANTED_MAX`), evil +10, fame +3, the `killed_by_player` news and the `kill_npc` echo go out; killing one's own sect-mates is betraying the sect. Lose or flee → +2 wanted marks (attempted murder); a loss is a fall (wake at home). A successful ลอบสังหาร (quest assassination) counts as a killing too. Killing a member of another school starts a feud (next section).
+
+## Sects avenge their dead
+
+`heroKills` (`store/world/lifecycle.ts`) finds the dead person's school (`sectOfNpc`: their simulated sect, else the grounds they stood on). Killing one's own sect-mate is betrayal (the betrayal hunters chase the hero, as before); killing anyone else's member starts a **blood feud** (`lib/world/feuds.ts`), unless the hero already betrayed that school:
+
+- **Declared.** `startFeud`: the feud lasts `FEUD_DAYS` (60) from the killing; a new killing restarts it. The log says "<school> ประกาศล้างแค้นให้ <the dead>" (kind `feud`, ความแค้น) and the `feud_declared` player echo tells the jianghu.
+- **Hunted.** Each walk tick (`rollWalkEvent`, after the law and the betrayal hunters) rolls `FEUD_CHANCE` (12 %, against the betrayal hunters' 30 %) for an avenging school: its `hunter_<sectId>` waits on the fight-or-flee screen ("ศิษย์<school>ตามมาล้างแค้นให้<the dead>"), as hard to slip as any hunter (`fleeEncounter`'s AGI + LUK check), with a log line.
+- **Ended.** Beating `FEUD_SETTLE_WINS` (3) of the avengers settles it ("ยอมเลิกตามล้างแค้น"); falling to one pays the blood ("ถือว่าได้ล้างแค้นแล้ว"); otherwise `syncClock` drops it on the first new day past its end (`expireFeuds`). Each ending is logged.
+- **Saved** in the player's `flags` (`feud:<sect>` = last day, `feud_wins:<sect>`, `feud_victim:<sect>`), so no save field; the feud is the hero's, not the shared world's. `validateAndRepair` drops malformed ones.
 
 ## Rumors
 
@@ -173,17 +195,23 @@ What five years look like (seeded run, `test:liveness`): every seat held, genera
 | --- | --- | --- | --- | --- |
 | `npc_event` | `generateNpcEventEcho`, from every event that is not silent | 20 days; 40 for big news | always true — it happened | template weight, ×2 for big news |
 | `player_echo` | `generatePlayerEcho`, from the hero's deeds | 20 days | 75 % true, 25 % exaggerated (`distorted`) — never false | template weight, +4 for loud deeds (`kill_npc`, leaving a sect, a milestone quest) |
-| `lore` | `seedLoreRumors` | flavour: until day 60; leads: until heard | fixed per entry | fixed per entry |
-| `warning` | `generateWarning` — only called by tests | until the day after the event | always true | template weight |
+| `lore` | `seedLoreRumors` | flavour: 60 days from seeding (`LORE_FLAVOUR_DAYS`); leads: until heard | fixed per entry | fixed per entry |
+| `warning` | `generateWarning`, for scheduled events (today the tournament, `scheduleTournamentWarning`) | until the day before the event | always true | template weight |
 
 - **Big news**: `death_combat`, `killed_by_player`, `master_art`, `betray_sect`, `new_chief`, and anything (but a journey) that befalls a sect's chief.
 - **Templates** (`NPC_EVENT_TEMPLATES`) cover every event kind; `when` narrows a template to a journey's purpose, to people with or without a sect, or to a named art. Tokens: `{npc}`, `{npc2}`, `{location}`, `{sect}`, `{art}`, `{item}`, `{dest}` (a journey's destination), `{title}` (the rank title now), `{tier}` (standing by power), `{archetype}`, `{days}`, `{event}`. `renderTemplate` tidies "สำนักสำนัก…", "สำนักพรรค…" and "วิชาวิชา…".
 - **Heard news fades**: once heard a rumor lasts at most 15 more days (a lead 30).
 - **Deduplication**: a new NPC-event rumor about the same person and kind within 7 days bumps the old one's weight instead.
 
+### Leads and warnings
+
+**Lore leads** (`leadsTo` on eight treasure / secret-art legends and the six legendary beasts' lairs) pay off. Hearing one (`recordRumorHeard` or the `markRumorHeard` effect) also sets `flags["lead:<rumorId>"] = "heard"` (`noteLeadHeard`), which outlives the 50-entry seen log. The first time the hero then reaches the lead's place (`followAutoAdvance` → `followLeads`, `lib/world/rumor-engine.ts`), they find something: the hinted item (`hintItemId`; a quest item is left to its quest) and `LEAD_WEXP` (30) w-exp, logged as `lead` (เบาะแส: "ตามข่าวลือมาถึง… พบ…"). The flag turns `"found"`; a lead pays once. Saves from before keep their heard leads through `rumorSeenLog`.
+
+**Warnings** tell of a scheduled event before it comes. The one scheduled event is the sword tournament: from `TOURNAMENT_WARNING_DAYS` (45) before its day, `syncClock` calls `scheduleTournamentWarning` (`lib/world/tournament.ts`), which keeps one `warning` rumor a year (id `rumor_warn_tournament_y<year>`, region `global`, inn channel): "อีก N วันจะมีชุมนุมประลองกระบี่หัวซานที่…", its day count rewritten on every sync (`generateWarning` with a fixed `id` updates the text instead of adding a rumor; its `payload` names the `{event}`). It expires the day before the tournament. The other warning templates (festival, sect gathering, bandit raid, eclipse) have no event that schedules them yet.
+
 ### Spread
 
-A rumor is heard in its own region (`regionOf` the place it happened). `rumorReaches` lets talk travel by age, with nothing extra saved: the heartland, where all roads meet, hears ordinary news after 10 days and big news after 3; big news reaches every region after 10 days; news that starts in the heartland goes out to every region after 10 days. Lore and warnings stay where they are.
+A rumor is heard in its own region (`regionOf` the place it happened). `rumorReaches` lets talk travel by age, with nothing extra saved: the heartland, where all roads meet, hears ordinary news after 10 days and big news after 3; big news reaches every region after 10 days; news that starts in the heartland goes out to every region after 10 days. Lore and warnings stay where they are (the tournament's warning is `global`, heard everywhere).
 
 ### Choosing what the hero hears
 
@@ -195,7 +223,7 @@ A rumor is heard in its own region (`regionOf` the place it happened). `rumorRea
 
 ## Player echoes
 
-`generatePlayerEcho` renders the hero's **archetype** (by traits: บ้ายุทธ์จักรดีร้ายตามใจตน, ผู้ล้ำลึกหยั่งไม่ถึง, ผู้กล้าแห่งเจียงหู, จอมมาร, นักพรตไร้นาม, else นักท่องยุทธ์) at the hero's current place.
+`generatePlayerEcho` renders the hero's **archetype** (by traits: บ้ายุทธ์จักรดีร้ายตามใจตน, ผู้ล้ำลึกหยั่งไม่ถึง, ผู้กล้าแห่งเจียงหู, จอมมาร, นักพรตไร้นาม, else นักท่องยุทธ์) at the hero's current place. These hero-side facts are its **context** (`playerEchoContext`); on a game server the browser sends the action and the context, and the server writes the rumor from them (`context` argument, checked against `ECHO_ARCHETYPES`, the scenes and the sects — no free text).
 
 | Action | Fired from |
 | --- | --- |
@@ -217,11 +245,15 @@ A rumor is heard in its own region (`regionOf` the place it happened). `rumorRea
 
 Unchanged: effects `firePlayerEcho`, `markRumorHeard`, `revealNpcStatus` (no-op); conditions `heardRumor`, `heardRumorAbout`, `npcStatus` (a person the simulation does not track reads as `alive`; a killed one as `dead`). `QuestDef.isMajor` marks a milestone.
 
+## Repair on load
+
+`validateAndRepair` runs `repairNpcExt` (`lib/world/npc-repair.ts`) on every load and on joining the shared world: entries for ids nobody knows are dropped, and every field is brought back in range (power, age, rank, temper, birthday, status, sect, places, the people they name, a journey through unknown places). See [save-format.md](save-format.md#repair-on-load) for the list. A healthy world — five seeded years of it in `test:liveness` — needs no repair.
+
 ## Tests
 
 | Command | Covers |
 | --- | --- |
-| `bun run test:liveness` | `scripts/test-liveness.ts`: the roster, aging on birthdays, death odds, roads, sect choice, succession (seat, map spot, quests, rumor), a generated elder, quests of the dead, five seeded years, spar with anyone, ⚔ สังหาร (wanted 5, death, echo) and its failure (+2), the two echoes, rumor spread |
+| `bun run test:liveness` | `scripts/test-liveness.ts`: the roster, aging on birthdays, death odds, roads, sect choice, succession (seat, map spot, quests, rumor), a generated elder, quests of the dead, five seeded years (and no repair needed after them), generated people's portraits and descriptions, the load repair, a sect's feud (declared, hunted, settled by wins, paid by a fall, run out), the tournament warning, lore leads, spar with anyone, ⚔ สังหาร (wanted 5, death, echo) and its failure (+2), the two echoes, rumor spread |
 | `bun run test:rumors` | lore seeding, selection, caps; every template renders with readable names and true NPC news |
 | `bun scripts/smoke-liveness.ts` | a 90-day run: events, inn rumors, caps |
 | `tests/browser/liveness.spec.ts` | a traveller on the capital's map, the card, a kill in the browser |
@@ -229,11 +261,9 @@ Unchanged: effects `firePlayerEcho`, `markRumorHeard`, `revealNpcStatus` (no-op)
 ## Known gaps
 
 1. **Templates' `lifespan` is ignored**; the engine uses 20 / 40 days.
-2. **Warnings never fire in play** (`generateWarning` has no caller).
-3. **`leadsTo` on lore is never read** — following a treasure lead gives nothing extra.
-4. **Generated people have no portrait** (the card shows their costume) and only a generic description.
-5. **The hero's killings bring no sect revenge** beyond the law and (for one's own sect) the betrayal hunters.
-6. **No save repair** for `npcExt` beyond `seedLiveness` completing entries.
+2. **Only the tournament is a scheduled event.** The festival, sect-gathering, bandit-raid and eclipse warning templates wait for events that schedule them.
+3. **Borrowed faces.** A generated person's portrait is a minor authored NPC's, so the two look alike; women of schools with no painted woman (Wudang, Huashan…) wear a traveller's face.
+4. **Avengers are the sect's hunters.** A feud sends the same `hunter_<sectId>` the betrayal path uses, not the dead person's master or kin in person.
 
 ## Changing it safely
 

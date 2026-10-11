@@ -13,14 +13,6 @@ export const NPCS_SONGSHAN: readonly NpcDef[] = [
     dialogSceneId: "npc_sect_songshan_master_zuolengchan_talk",
     sparOpponentId: "spar_songshan_master_zuolengchan",
     sparFameReward: 12,
-    questIds: [
-      "qst_songshan_disciple_intro",
-      "qst_songshan_sect_patrol",
-      "qst_songshan_sect_iron",
-      "qst_songshan_sect_wooden",
-      "qst_songshan_art_pillar",
-      "qst_songshan_redemption",
-    ],
     defenseTier: 3,
     stealLoot: [
       { itemId: "iron_ore", weight: 5 },

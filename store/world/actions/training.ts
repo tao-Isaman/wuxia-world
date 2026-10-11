@@ -1,7 +1,7 @@
 // Moves and meridians: w-exp level-ups, forgetting, practice, slots and meridian points.
 import { ART_LEVEL_MAX, effectiveTypes, encodeArtSlot, getArt, getSkill, parseSlotId, SKILL_LEVEL_MAX, xpToNextArtLevel, xpToNextLevel, checkOpenMeridianNode, getMeridianChart } from "@/lib/game";
 import { canPracticeAt, getScene, practiceMatches, practiceXpGain } from "@/lib/world";
-import { applyArtLevelUps, applySkillLevelUps, grantMeridianPoints, syncPlayerSkillLevels } from "../progression";
+import { applyArtLevelUps, applySkillLevelUps, grantMeridianPoints, isArtFrozen, isSkillFrozen, syncPlayerSkillLevels } from "../progression";
 import { PRACTICE_HOURS, PRACTICE_STAMINA_COST, W_EXP_PRACTICE } from "../rules";
 import { appendActionLog, draftFrom } from "../state";
 import type { WorldGet, WorldSet, WorldStore } from "../types";
@@ -40,6 +40,7 @@ export const trainingActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, 
     if (!sk) return { ok: false, reason: "unknown" };
     const lv = s.skillLevel[skillId] ?? 1;
     if (lv >= SKILL_LEVEL_MAX) return { ok: false, reason: "maxed" };
+    if (isSkillFrozen(s, skillId)) return { ok: false, reason: "frozen" };
     const fullCost = xpToNextLevel(sk, lv);
     // Pay only what's missing — the player's already-banked per-skill
     // xp counts toward the level-up.
@@ -70,6 +71,7 @@ export const trainingActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, 
     if (!s.playerBuild) return { ok: false, reason: "unknown" };
     const lv = s.playerBuild.artLevels?.[artId] ?? 1;
     if (lv >= ART_LEVEL_MAX) return { ok: false, reason: "maxed" };
+    if (isArtFrozen(s, artId)) return { ok: false, reason: "frozen" };
     const fullCost = xpToNextArtLevel(art, lv);
     const banked = Math.min(s.artExp[artId] ?? 0, fullCost);
     const remaining = Math.max(0, fullCost - banked);
@@ -182,6 +184,10 @@ export const trainingActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, 
     }
     if (s.stamina < PRACTICE_STAMINA_COST) {
       return { ok: false, reason: "stamina" };
+    }
+    // A resigned sect's moves are frozen: practice teaches them nothing.
+    if (info.kind === "skill" ? isSkillFrozen(s, info.skill.id) : isArtFrozen(s, info.art.id)) {
+      return { ok: false, reason: "frozen" };
     }
 
     const draft = draftFrom(s);

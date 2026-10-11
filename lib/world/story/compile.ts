@@ -224,7 +224,8 @@ export function compileLineage(spec: LineageSpec, r: StoryResolvers, seq = 1, op
   ];
   if (tier.items) stages.push({ id: "bring", description: `หา${r.itemName(item)} ${tier.items} ชิ้นติดตัวไว้เป็นเครื่องคำนับ (มอบให้ตอนรับวิชา)`, autoAdvance: { t: "hasItem", itemId: item, count: tier.items } });
   const spar = tier.spar ? r.npcSpar(spec.giver) : undefined;
-  if (spar) stages.push({ id: "spar", description: `ไปหา${r.npcName(spec.giver)} กด "ขอประลอง" แล้วเอาชนะให้ได้`, autoAdvance: { t: "defeatedOpponent", opponentId: spar, count: 1 } });
+  // A teacher who has died can't be sparred: their heir (questHolder) waives it.
+  if (spar) stages.push({ id: "spar", description: `ไปหา${r.npcName(spec.giver)} กด "ขอประลอง" แล้วเอาชนะให้ได้`, autoAdvance: { t: "or", any: [{ t: "defeatedOpponent", opponentId: spar, count: 1 }, { t: "npcStatus", npcId: spec.giver, status: "dead" }] } });
   stages.push({ id: "return", description: `กลับไปหา${r.npcName(spec.giver)}เพื่อรับคัมภีร์` });
 
   const rewards: QuestReward[] = [

@@ -35,6 +35,7 @@ import {
 import { flashLoading } from "@/store/loading-store";
 import { practicePose } from "@/lib/characters/hero-actions";
 import { toast } from "@/store/toast-store";
+import { FROZEN_MOVE_TEXT } from "@/lib/world/sects";
 import { ArtTooltip, SkillTooltip } from "../skill-tooltip";
 
 interface Props {
@@ -284,6 +285,7 @@ function practiceToast(r: PracticeResult): ToastTuple {
   if (!r.ok) {
     if (r.reason === "stamina") return ["warn", "พลังไม่พอสำหรับการฝึก"];
     if (r.reason === "not-allowed") return ["warn", "ที่นี่ฝึกฝนไม่ได้"];
+    if (r.reason === "frozen") return ["warn", FROZEN_MOVE_TEXT];
     if (r.reason === "no-build") return ["error", "ตัวละครยังไม่พร้อม"];
     return ["error", "ฝึกไม่สำเร็จ"];
   }

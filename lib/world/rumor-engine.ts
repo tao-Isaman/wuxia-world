@@ -6,7 +6,7 @@
 import { evaluateCondition } from "./conditions";
 import { ARTS_BY_ID } from "../game/data/arts";
 import { ITEMS_BY_ID } from "./data/items";
-import { LORE_RUMORS } from "./data/lore-rumors";
+import { LORE_RUMORS, type LoreRumorTemplate } from "./data/lore-rumors";
 import { SECT_MEMBERSHIPS } from "./data/sect-memberships";
 import { CHANNEL_ADMITS, regionOf } from "./data/regions";
 import { getNamedDefault } from "./data/named-npcs";
@@ -47,15 +47,17 @@ export const RUMOR_ARCHIVE_DAYS = 365;
 // Rumors fade. News lives DEFAULT / BIG_NEWS_LIFESPAN_DAYS; once the hero
 // has heard one it lasts at most RUMOR_HEARD_DAYS more (a treasure lead
 // RUMOR_LEAD_HEARD_DAYS, time to go and look). Authored lore is talk of the
-// day the hero sets out: it fades by LORE_FLAVOUR_LAST_DAY, while lore that
+// day the world is seeded: it fades LORE_FLAVOUR_DAYS later, while lore that
 // leads somewhere stays until heard.
 export const RUMOR_HEARD_DAYS = 15;
 export const RUMOR_LEAD_HEARD_DAYS = 30;
-export const LORE_FLAVOUR_LAST_DAY = 60;
+export const LORE_FLAVOUR_DAYS = 60;
 // JSON turns Infinity into null. A finite sentinel keeps unheard lore leads
 // alive across saves while retaining the same numeric expiry/filter semantics.
 const LORE_EXPIRES_DAY = Number.MAX_SAFE_INTEGER;
-const loreExpiry = (rumor: { leadsTo: unknown }) => (rumor.leadsTo ? LORE_EXPIRES_DAY : LORE_FLAVOUR_LAST_DAY);
+const loreExpiry = (rumor: { leadsTo: unknown }, fromDay: number) => (rumor.leadsTo ? LORE_EXPIRES_DAY : fromDay + LORE_FLAVOUR_DAYS);
+/** Before the shared world clock, flavour lore faded on world day 60 itself, so a world seeded later never heard it. */
+const LEGACY_LORE_LAST_DAY = 60;
 const loreId = (suffix: string): string => suffix.startsWith("lore_") ? suffix : `lore_${suffix}`;
 const LORE_IDS = new Set(LORE_RUMORS.map((lore) => loreId(lore.idSuffix)));
 
@@ -66,18 +68,73 @@ export function seedLoreRumors(state: WorldStateData): void {
   // Repair pre-seeded lore whose deadline became null in JSON (or was the
   // old "never" sentinel on flavour lore). Replace entries rather than
   // mutating a caller's previous snapshot.
+  const day = Math.max(1, state.day);
   const pool = state.rumorPool.map((rumor) => {
     if (rumor.source !== "lore" || !LORE_IDS.has(rumor.id)) return rumor;
     const broken = typeof rumor.expiresDay !== "number" || (rumor.expiresDay === LORE_EXPIRES_DAY && !rumor.leadsTo);
-    return broken ? { ...rumor, expiresDay: loreExpiry(rumor) } : rumor;
+    // Flavour lore stamped with the old fixed last day: the talk starts again from today.
+    const legacy = !rumor.leadsTo && rumor.createdDay === 1 && rumor.expiresDay === LEGACY_LORE_LAST_DAY;
+    if (legacy) return { ...rumor, createdDay: day, expiresDay: loreExpiry(rumor, day) };
+    return broken ? { ...rumor, expiresDay: loreExpiry(rumor, rumor.createdDay ?? day) } : rumor;
   });
   for (const { idSuffix, ...lore } of LORE_RUMORS) {
     const id = loreId(idSuffix);
     if (ids.has(id)) continue;
-    pool.push({ ...lore, prerequisites: [...lore.prerequisites], id, createdDay: 1, expiresDay: loreExpiry(lore) });
+    pool.push({ ...lore, prerequisites: [...lore.prerequisites], id, createdDay: day, expiresDay: loreExpiry(lore, day) });
     ids.add(id);
   }
   state.rumorPool = pool;
+}
+
+// ─── Lore leads (`leadsTo`) ────────────────────────────────────────────
+// A lead the hero has heard (`lead:<rumorId>` = "heard" in flags, set by
+// noteLeadHeard; older saves: the rumor in rumorSeenLog) pays something extra
+// the first time they reach its place: the hinted item (unless it is a quest
+// item, which its quest hands out) and LEAD_WEXP w-exp. Then the flag reads
+// "found" and the lead is spent.
+export const LEAD_WEXP = 30;
+const LEAD_FLAG = "lead:";
+const LEADS_BY_ID = new Map(LORE_RUMORS.filter((lore) => lore.leadsTo).map((lore) => [loreId(lore.idSuffix), lore]));
+
+/** Every lore rumor that leads somewhere, by id (for tests and the guide). */
+export function loreLeads(): ReadonlyMap<string, LoreRumorTemplate> {
+  return LEADS_BY_ID;
+}
+
+/** The hero heard `rumorId`: if it is a lead, remember it (flags outlive the 50-entry seen log). */
+export function noteLeadHeard(state: Pick<WorldStateData, "flags">, rumorId: string): void {
+  if (LEADS_BY_ID.has(rumorId) && state.flags[LEAD_FLAG + rumorId] !== "found") state.flags[LEAD_FLAG + rumorId] = "heard";
+}
+
+export interface LeadFound {
+  rumorId: string;
+  locationId: string;
+  /** The hinted item handed over, if any. */
+  itemId: string | null;
+  wExp: number;
+}
+
+/**
+ * The hero stands at `locationId`: follow up every lead they heard that points
+ * here and has not paid out yet. Mutates `state` (flags, inventory, w-exp) and
+ * returns what was found, for the log.
+ */
+export function followLeads(state: WorldStateData, locationId: string): LeadFound[] {
+  const out: LeadFound[] = [];
+  const heard = new Set((state.rumorSeenLog ?? []).map((entry) => entry.rumorId));
+  for (const [rumorId, lore] of LEADS_BY_ID) {
+    if (lore.leadsTo!.locationId !== locationId) continue;
+    const flag = state.flags[LEAD_FLAG + rumorId];
+    if (flag === "found" || (flag !== "heard" && !heard.has(rumorId))) continue;
+    state.flags[LEAD_FLAG + rumorId] = "found";
+    const hint = lore.leadsTo!.hintItemId;
+    const item = hint ? ITEMS_BY_ID.get(hint) : undefined;
+    const itemId = item && item.category !== "quest" ? item.id : null;
+    if (itemId) state.inventory = { ...state.inventory, [itemId]: (state.inventory[itemId] ?? 0) + 1 };
+    state.wExp = (state.wExp ?? 0) + LEAD_WEXP;
+    out.push({ rumorId, locationId, itemId, wExp: LEAD_WEXP });
+  }
+  return out;
 }
 
 // Big-news rule used by both lifespan + weight booster. Spec §3.2.1.
@@ -119,6 +176,21 @@ export interface PlayerEchoArgs {
   state: WorldStateData;
   actionId: string;
   targetNpcId?: string;
+  /**
+   * How people know the hero, where it happened and the sect concerned —
+   * read off `state` when absent. The game server, which has no hero of its
+   * own, writes a player's echo from the context the player sends.
+   */
+  context?: EchoContext;
+  /** The sect the deed concerns ({sect}); default: the hero's sole membership, or for a feud the target's sect. */
+  sectId?: string | null;
+}
+
+/** The hero-side facts a player echo is written from (playerEchoContext). */
+export interface EchoContext {
+  archetype: string;
+  sceneId: string | null;
+  sectId: string | null;
 }
 
 export interface WarningArgs {
@@ -127,6 +199,12 @@ export interface WarningArgs {
   triggerDay: number;
   locationId: string;
   payload?: Record<string, string | number | boolean>;
+  /** A stable id: the warning is made once and its text refreshed on later calls. */
+  id?: string;
+  /** The last day it can be heard (default: the day after the event). */
+  expiresDay?: number;
+  /** Where it is heard (default: the event's region; "global" for news every inn talks about). */
+  region?: Region;
 }
 
 // ─── Helpers exported for tests / callers ──────────────────────────────
@@ -214,6 +292,27 @@ function isBigNews(state: WorldStateData, kind: NpcEventKind, npcId: string): bo
 // Spec §3.2.2 — archetype label table. Order matters: more specific
 // combinations (good+evil, arrogance+humility) win over single-axis
 // labels.
+/** Every label archetypeLabel gives (a server checks a sent context against it). */
+export const ECHO_ARCHETYPES: readonly string[] = [
+  "บ้ายุทธ์จักรดีร้ายตามใจตน", "ผู้ล้ำลึกหยั่งไม่ถึง", "ผู้กล้าแห่งเจียงหู", "จอมมาร", "นักพรตไร้นาม", "นักท่องยุทธ์",
+];
+
+/** Whether `actionId` is a deed the jianghu talks about (it has echo templates). */
+export function isEchoAction(actionId: string): boolean {
+  return (PLAYER_ECHO_TEMPLATES[actionId]?.length ?? 0) > 0;
+}
+
+/** The hero-side facts of an echo, as the hero's state stands. */
+export function playerEchoContext(state: WorldStateData, actionId: string, sectId?: string): EchoContext {
+  return {
+    archetype: archetypeLabel(state.traits),
+    // Player echos use the player's CURRENT scene as the location anchor.
+    // Fall back to lastLocationId when the player is mid-dialog scene.
+    sceneId: state.lastLocationId ?? state.currentSceneId ?? null,
+    sectId: sectId ?? playerEchoSect(state, actionId) ?? null,
+  };
+}
+
 function archetypeLabel(traits: WorldStateData["traits"]): string {
   const t = (k: TraitKey): number => traits[k] ?? 0;
   const good = t("good");
@@ -392,21 +491,20 @@ export function generatePlayerEcho(args: PlayerEchoArgs): string | null {
   const tpl = pickRandom(pool);
   if (!tpl) return null;
 
-  const archetype = archetypeLabel(state.traits);
+  const feudSect = actionId === "feud_declared" && targetNpcId ? state.npcExt?.[targetNpcId]?.sect : undefined;
+  const context = args.context ?? playerEchoContext(state, actionId, args.sectId ?? feudSect ?? undefined);
   const targetName = targetNpcId ? npcDisplayName(targetNpcId) : "";
-  // Player echos use the player's CURRENT scene as the location anchor.
-  // Fall back to lastLocationId when the player is mid-dialog scene.
-  const sceneId = state.lastLocationId ?? state.currentSceneId;
+  const sceneId = context.sceneId ?? state.currentSceneId;
   const locName = locationDisplayName(sceneId);
   const region = regionOf(sceneId);
 
   const vars: Record<string, string> = {
-    archetype,
+    archetype: context.archetype,
     npc: targetName,
     npc2: targetName,
     location: locName,
   };
-  resolveDetailNames(vars, playerEchoSect(state, actionId));
+  resolveDetailNames(vars, context.sectId ?? undefined);
 
   // Player-echo distortion: heavier than the standard split.
   const r = Math.random();
@@ -444,6 +542,9 @@ export function generatePlayerEcho(args: PlayerEchoArgs): string | null {
 
 export function generateWarning(args: WarningArgs): string | null {
   const { state, warningKind, triggerDay, locationId, payload } = args;
+  // A warning with a fixed id is one rumor that keeps its text current
+  // ("อีก N วัน") instead of a new one each time it is scheduled.
+  const existing = args.id ? state.rumorPool?.find((r) => r.id === args.id) : undefined;
   ensureRumorArrays(state);
 
   const pool = WARNING_TEMPLATES[warningKind];
@@ -460,18 +561,19 @@ export function generateWarning(args: WarningArgs): string | null {
     location: locName,
     event: warningKind,
   };
-  if (payload) {
-    for (const [k, v] of Object.entries(payload)) {
-      if (vars[k] === undefined || vars[k] === "") vars[k] = String(v);
-    }
-  }
+  // The payload names the event ({event}: "ชุมนุมประลอง…", not the kind's id).
+  if (payload) for (const [k, v] of Object.entries(payload)) vars[k] = String(v);
 
   const text = renderTemplate(tpl.text, vars);
+  if (existing) {
+    if (existing.text !== text) state.rumorPool = state.rumorPool.map((r) => (r === existing ? { ...r, text } : r));
+    return existing.id;
+  }
   // Warnings are always "true" per spec §3.2.4.
   const truth: RumorTruth = "true";
-  const region = regionOf(locationId);
+  const region = args.region ?? regionOf(locationId);
 
-  const id = `rumor_warn_${warningKind}_${triggerDay}_${rngTag()}`;
+  const id = args.id ?? `rumor_warn_${warningKind}_${triggerDay}_${rngTag()}`;
   const rumor: Rumor = {
     id,
     text,
@@ -479,7 +581,7 @@ export function generateWarning(args: WarningArgs): string | null {
     createdDay: currentDay,
     // Warnings expire one day AFTER the event lands so the day-of player
     // can still hear "today is X day".
-    expiresDay: triggerDay + 1,
+    expiresDay: args.expiresDay ?? triggerDay + 1,
     truth,
     region,
     channel: tpl.channel,

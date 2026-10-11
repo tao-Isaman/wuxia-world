@@ -47,7 +47,7 @@ The game is an installable Progressive Web App. It runs full screen from the hom
 - `appleWebApp` (capable, title, `black-translucent` status bar);
 - a 192 px icon and a 180 px Apple touch icon;
 - no telephone-number detection;
-- a `viewport` with `viewportFit: "cover"`, so the HUD can use `env(safe-area-inset-*)` around notches.
+- a `viewport` with `viewportFit: "cover"`, so the HUD can pad around notches (through `--safe-top` / `-right` / `-bottom` / `-left`, which turn with the page; [rendering.md](rendering.md#landscape-only)).
 
 ## Service worker
 
@@ -57,11 +57,11 @@ The game is an installable Progressive Web App. It runs full screen from the hom
 | --- | --- | --- |
 | `shell-<v>` | page navigations; pre-caches `/`, `/manifest.webmanifest` and the 192 / 512 icons at install | **network first** (with navigation preload), cached on success. Offline: the same page (ignoring the query), else `/`, else a 503 "ออฟไลน์อยู่ กรุณาเชื่อมต่ออินเทอร์เน็ตแล้วลองใหม่" |
 | `static-<v>` | `/_next/static/…` (content-hashed JS and CSS) | **cache first** |
-| `assets-v1` | `/art/`, `/maps/`, `/npcs/`, `/player/`, `/icons/`, `/fonts/`, `/pwa/`, `/progress.json`, `/manifest.webmanifest` | **stale-while-revalidate**, trimmed oldest-first to **900** entries; shared across deploys |
+| `assets-v1` | `/art/`, `/maps/`, `/npcs/`, `/player/`, `/icons/`, `/fonts/`, `/pwa/`, `/manifest.webmanifest` | **stale-while-revalidate**, trimmed oldest-first to **900** entries; shared across deploys |
 
 - **Install** pre-caches the shell and calls `skipWaiting`.
 - **Activate** deletes every other cache (old deploys), enables navigation preload and claims open pages.
-- **Ignored requests:** non-GET, `Range` requests (media) and other origins.
+- **Ignored requests:** non-GET, `Range` requests (media), other origins and `/progress.json` with any query (`NEVER_CACHE`: `/progress` polls it every 5 s with a fresh `?t=`, which used to fill the asset cache and evict art). Activate also deletes any `/progress.json` entries an older worker cached.
 - **Update message:** posting `"skipWaiting"` to the worker activates a waiting version.
 
 ## Registration and build ids
@@ -99,7 +99,7 @@ navigator.serviceWorker.register(`/sw.js?v=${process.env.NEXT_PUBLIC_BUILD_ID ??
 | `public/pwa/icon-512.png` | 512 |
 | `public/pwa/icon-maskable-512.png` | 512, face kept inside the maskable safe zone |
 
-The script uses `sharp`, which arrives through Next.js rather than `package.json`.
+The script uses `sharp` (a dev dependency).
 
 ## Testing
 

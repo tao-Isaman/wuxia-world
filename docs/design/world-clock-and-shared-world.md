@@ -1,5 +1,7 @@
 # World clock and the shared world — design
 
+> **Since 2026-10-11 the server runs the world.** On a game server there is one world for every player, kept and simulated by the server's `WorldObject`; the hero's own deeds (killings outside checked fights, kidnappings, felled beasts, the tournament) moved back into the save (v28). See [online.md](../online.md#the-shared-world). This page is the design of the clock and of the world's boundary, which the server now uses.
+
 A step toward an online game. Two changes, made together:
 
 1. **Time is a world clock**, not a counter the player pushes forward. One game

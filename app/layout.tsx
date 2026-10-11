@@ -46,7 +46,7 @@ export const metadata: Metadata = {
   formatDetection: { telephone: false },
 };
 
-// viewport-fit=cover lets the HUD use env(safe-area-inset-*) around notches.
+// viewport-fit=cover lets the HUD pad around notches (--safe-top/right/bottom/left in globals.css, turned with the page).
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,

@@ -57,7 +57,7 @@ pub(crate) async fn signing_key(env: &Env) -> std::result::Result<Vec<u8>, &'sta
         return Ok(key);
     }
     let fetched = async {
-        let stub = env.durable_object("KEYS")?.id_from_name(KEY_NAME)?.get_stub()?;
+        let stub = env.durable_object("KEYS")?.id_from_name(&crate::object_name(KEY_NAME))?.get_stub()?;
         let mut response = stub.fetch_with_str("https://keys/signing").await?;
         response.text().await
     }

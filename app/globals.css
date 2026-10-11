@@ -175,17 +175,33 @@
  * shows landscape. Every size in the app reads the viewport through these
  * variables (never raw vw / vh), and media queries are written for both
  * orientations, so "width" always means the long side the player sees.
- * Pointer code maps client coordinates back with lib/ui/landscape.ts. */
-:root { --vw: 1vw; --vh: 1vh; --dvw: 1dvw; --dvh: 1dvh; }
+ * Pointer code maps client coordinates back with lib/ui/landscape.ts.
+ * Safe-area insets likewise go through --safe-top / -right / -bottom / -left
+ * (never raw env(safe-area-inset-*)): env() names the physical screen edges,
+ * and once the page is turned the page's top is the screen's right edge, its
+ * right the bottom, its bottom the left and its left the top. */
+:root {
+  --vw: 1vw; --vh: 1vh; --dvw: 1dvw; --dvh: 1dvh;
+  --safe-top: env(safe-area-inset-top, 0px); --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px); --safe-left: env(safe-area-inset-left, 0px);
+}
 @media (orientation: portrait) {
-  :root { --vw: 1vh; --vh: 1vw; --dvw: 1dvh; --dvh: 1dvw; }
+  :root {
+    --vw: 1vh; --vh: 1vw; --dvw: 1dvh; --dvh: 1dvw;
+    --safe-top: env(safe-area-inset-right, 0px); --safe-right: env(safe-area-inset-bottom, 0px);
+    --safe-bottom: env(safe-area-inset-left, 0px); --safe-left: env(safe-area-inset-top, 0px);
+  }
   html, body { overflow: hidden; }
   body {
     position: fixed; top: 0; left: 0; width: 100dvh; height: 100dvw;
     transform-origin: 0 0; transform: rotate(90deg) translateY(-100%);
   }
   /* The engine (/game/engine) is a desktop tool, not the game: never turned. */
-  :root:has([data-engine-root]) { --vw: 1vw; --vh: 1vh; --dvw: 1dvw; --dvh: 1dvh; }
+  :root:has([data-engine-root]) {
+    --vw: 1vw; --vh: 1vh; --dvw: 1dvw; --dvh: 1dvh;
+    --safe-top: env(safe-area-inset-top, 0px); --safe-right: env(safe-area-inset-right, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px); --safe-left: env(safe-area-inset-left, 0px);
+  }
   html:has([data-engine-root]), body:has([data-engine-root]) { overflow: auto; }
   body:has([data-engine-root]) {
     position: static; width: auto; height: auto; transform: none;

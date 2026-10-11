@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { evaluateCondition } from "../lib/world/conditions";
 import { LORE_RUMORS } from "../lib/world/data/lore-rumors";
 import { regionOf } from "../lib/world/data/regions";
-import { generatePlayerEcho, LORE_FLAVOUR_LAST_DAY, maintainRumors, RUMOR_HEARD_DAYS, RUMOR_POOL_HARD_CAP, seedLoreRumors, selectRumorsForScene } from "../lib/world/rumor-engine";
+import { generatePlayerEcho, LORE_FLAVOUR_DAYS, maintainRumors, RUMOR_HEARD_DAYS, RUMOR_POOL_HARD_CAP, seedLoreRumors, selectRumorsForScene } from "../lib/world/rumor-engine";
 import type { Rumor, WorldStateData } from "../lib/world/types";
 
 const memory = new Map<string, string>();
@@ -28,12 +28,12 @@ function assertLore(state: WorldStateData) {
   assert.equal(lore.length, LORE_RUMORS.length);
   assert.equal(new Set(lore.map(rumor => rumor.id)).size, LORE_RUMORS.length);
   assert.ok(lore.every(rumor => Number.isSafeInteger(rumor.expiresDay)));
-  // Talk of the day: unheard flavour lore fades by LORE_FLAVOUR_LAST_DAY; unheard leads stay.
+  // Talk of the day: unheard flavour lore fades LORE_FLAVOUR_DAYS after it was seeded; unheard leads stay.
   const heard = new Set(state.rumorSeenLog.map(entry => entry.rumorId));
   for (const rumor of lore) {
     if (heard.has(rumor.id)) continue;
     if (rumor.leadsTo) assert.ok(rumor.expiresDay > state.day, `${rumor.id}: an unheard lead stays`);
-    else assert.equal(rumor.expiresDay, LORE_FLAVOUR_LAST_DAY, `${rumor.id}: flavour lore fades by day ${LORE_FLAVOUR_LAST_DAY}`);
+    else assert.equal(rumor.expiresDay, rumor.createdDay + LORE_FLAVOUR_DAYS, `${rumor.id}: flavour lore fades ${LORE_FLAVOUR_DAYS} days after it was seeded`);
   }
   assert.ok(lore.every(rumor => rumor.source === "lore" && rumor.refersToEvent === null));
 }
@@ -105,7 +105,7 @@ try {
   useWorldStore.getState().recordRumorHeard(unheard.id);
   assert.deepEqual(useWorldStore.getState().rumorSeenLog, heard.rumorSeenLog, "repeated hearing is idempotent");
   const saved = JSON.parse(memory.get(saveKey)!) as { version: number; state: WorldStateData };
-  assert.equal(saved.version, 27);
+  assert.equal(saved.version, 28);
   assert.equal((saved.state as Partial<WorldStateData>).rumorPool, undefined, "rumors are the world's, not the save's");
   assertLore({ ...saved.state, ...(JSON.parse(memory.get(sharedKey)!) as { world: Partial<WorldStateData> }).world } as WorldStateData);
   for (let i = 0; i < 2; i++) {

@@ -31,6 +31,8 @@ import type { WeaponFamily } from "@/lib/game";
 import { ATTACK_KIND_LABEL, movePower, passiveLine, plainThai, skillFlavour, skillSummaryLines, statLine } from "@/lib/game/skill-text";
 import { useWorldStore } from "@/store/world-store";
 import { confirmDialog } from "@/store/confirm-store";
+import { toast } from "@/store/toast-store";
+import { FROZEN_MOVE_TEXT } from "@/lib/world/sects";
 import { ArtTooltip, SkillTooltip } from "../skill-tooltip";
 import { UpgradePayoff, type UpgradeReceipt } from "./upgrade-payoff";
 import { ArtIcon, SkillIcon } from "@/components/game/skill-icon";
@@ -83,7 +85,10 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
     const result = info.kind === "skill"
       ? levelUpFromWExp(info.skill.id)
       : levelUpArtFromWExp(info.art.id);
-    if (!result.ok) return;
+    if (!result.ok) {
+      if (result.reason === "frozen") toast("warn", FROZEN_MOVE_TEXT);
+      return;
+    }
     const after = useWorldStore.getState();
     if (!after.playerBuild) return;
 

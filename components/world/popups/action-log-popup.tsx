@@ -3,6 +3,7 @@
 import { Modal } from "@/components/ui/modal";
 import { Badge } from "@/components/ui/badge";
 import { useWorldStore } from "@/store/world-store";
+import { actionLogLabel } from "@/lib/world/action-log";
 
 interface Props {
   open: boolean;
@@ -12,31 +13,6 @@ interface Props {
 // Player-action log (last 100 entries). Each row shows the in-game day +
 // hour, a small kind badge, and the message that the toast emitted at the
 // time. Newest entries first.
-const KIND_LABEL: Record<string, string> = {
-  rest:    "พัก",
-  gather:  "เก็บของ",
-  craft:   "ประดิษฐ์",
-  buy:     "ซื้อ",
-  sell:    "ขาย",
-  use:     "ใช้",
-  travel:  "เดินทาง",
-  combat:  "ต่อสู้",
-  learn:   "เรียน",
-  meridian: "ชีพจร",
-  quest:   "ภารกิจ",
-  sect:    "สำนัก",
-  law:     "ทางการ",
-  gift:    "ของขวัญ",
-  activity: "กิจกรรม",
-  steal:   "ขโมย",
-  assassinate: "ลอบสังหาร",
-  kidnap:  "ลักพาตัว",
-  letter:  "จดหมาย",
-  tournament: "ประลองยุทธ",
-  boss:    "สัตว์ในตำนาน",
-  time:    "กาลเวลา",
-};
-
 const KIND_COLOR: Record<string, string> = {
   rest:    "border-emerald-500/60 text-emerald-700",
   gather:  "border-amber-500/60 text-amber-700",
@@ -46,6 +22,13 @@ const KIND_COLOR: Record<string, string> = {
   use:     "border-slate-500/60 text-slate-700",
   travel:  "border-blue-500/60 text-blue-700",
   combat:  "border-rose-500/60 text-rose-700",
+  battle:  "border-rose-500/60 text-rose-700",
+  encounter: "border-orange-600/60 text-orange-800",
+  steal:   "border-stone-600/60 text-stone-800",
+  assassinate: "border-red-700/60 text-red-800",
+  kidnap:  "border-purple-600/60 text-purple-800",
+  feud:    "border-red-700/60 text-red-800",
+  lead:    "border-amber-600/60 text-amber-800",
   learn:   "border-indigo-500/60 text-indigo-700",
   meridian: "border-fuchsia-600/60 text-fuchsia-800",
   quest:   "border-yellow-600/60 text-yellow-800",
@@ -76,7 +59,7 @@ export function ActionLogPopup({ open, onClose }: Props) {
       ) : (
         <ul className="space-y-1">
           {reversed.map((e, i) => {
-            const kindLabel = KIND_LABEL[e.kind] ?? e.kind;
+            const kindLabel = actionLogLabel(e.kind);
             const colorCls = KIND_COLOR[e.kind] ?? "border-muted-foreground/40";
             return (
               <li

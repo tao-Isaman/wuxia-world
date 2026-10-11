@@ -17,7 +17,8 @@ import type { NpcDef, NpcExtState, NpcEventKind, QuestDef, SectId, WorldStateDat
 import { getNpc, getNpcsAtLocation, registerDynamicNpc } from "./data/npcs";
 import { getNamedDefault, namedNpcIds } from "./data/named-npcs";
 import { SECT_MEMBERSHIPS } from "./data/sect-memberships";
-import { getQuestsForNpc } from "./data/quests";
+import { QUESTS, getQuestsForNpc } from "./data/quests";
+import { getArt, getSkill } from "../game";
 import { LOCATION_ROUTES } from "./data/location-routes";
 import { WORLD_COORDS } from "./data/world-coords";
 import {
@@ -26,6 +27,8 @@ import {
 } from "./data/liveness-roster";
 import { generateNpcEventEcho } from "./rumor-engine";
 import { npcFoeId, registerNpcFoeNames } from "./data/opponents";
+import { registerBorrowedPortrait } from "./data/npc-portraits";
+import { generatedPortraitId } from "./data/generated-portraits";
 
 registerNpcFoeNames((id) => getNpc(id)?.name ?? null);
 
@@ -165,13 +168,38 @@ function completeExt(id: string, ext: NpcExtState): NpcExtState {
   };
 }
 
+/** A few words on a generated person's bent, from their temper. */
+function temperLine(ext: NpcExtState): string | null {
+  const t = ext.temper;
+  if (!t) return null;
+  const bits: string[] = [];
+  if (t.righteous >= 0.5) bits.push("ยึดมั่นในคุณธรรม");
+  else if (t.righteous <= -0.3) bits.push("ใจคอโหดเหี้ยม ไม่เลือกวิธี");
+  if (t.ambition >= 0.75) bits.push("ทะเยอทะยานอยากเป็นยอดฝีมือ");
+  if (t.wanderlust >= 0.7) bits.push("ชอบท่องเที่ยวไม่อยู่กับที่");
+  if (t.loyalty >= 0.8 && ext.sect) bits.push("ภักดีต่อสำนักยิ่งกว่าสิ่งใด");
+  return bits.length ? bits.join(" ") : null;
+}
+
+/** Who a generated person is, in a line or two: their place in the world, age, master and bent. */
+function dynamicDescription(ext: NpcExtState): string {
+  const who = ext.sect
+    ? rankTitle(ext.sectRank, sectName(ext.sect))
+    : ext.formerSect ? `อดีตศิษย์${sectName(ext.formerSect)} ผู้ท่องยุทธภพลำพัง` : "จอมยุทธ์หน้าใหม่ผู้ท่องยุทธภพ";
+  const master = ext.masterId ? getNpc(ext.masterId)?.name : null;
+  const lines = [`${who} อายุ ${ext.age} ปี`];
+  if (master) lines.push(`ศิษย์ของ${master}`);
+  const bent = temperLine(ext);
+  if (bent) lines.push(bent);
+  return lines.join(" · ");
+}
+
 /** A registry NpcDef for a generated person. */
 function dynamicDef(id: string, ext: NpcExtState): NpcDef {
-  const title = rankTitle(ext.sectRank, sectName(ext.sect));
   return {
     id,
     name: ext.name ?? id,
-    description: ext.sect ? `${title} · ศิษย์รุ่นใหม่ที่ยุทธจักรเพิ่งรู้จักชื่อ` : "จอมยุทธ์หน้าใหม่ที่เพิ่งปรากฏตัวในยุทธจักร",
+    description: dynamicDescription(ext),
     locationIds: [],
     defenseTier: powerTier(ext.power),
     tags: ["liveness", ext.sect ? "disciple" : "wanderer"],
@@ -179,10 +207,16 @@ function dynamicDef(id: string, ext: NpcExtState): NpcDef {
   };
 }
 
+/** A generated person in the NPC registry, with a borrowed portrait that fits them. */
+function registerGenerated(id: string, ext: NpcExtState): void {
+  registerDynamicNpc(dynamicDef(id, ext));
+  registerBorrowedPortrait(id, generatedPortraitId(id, { sect: ext.sect, gender: ext.gender, age: ext.age }));
+}
+
 /** Register every generated person of this save with the NPC registry. */
 export function syncDynamicNpcs(state: Pick<WorldStateData, "npcExt">): void {
   for (const [id, ext] of Object.entries(state.npcExt ?? {})) {
-    if (ext.dynamic) registerDynamicNpc(dynamicDef(id, ext));
+    if (ext.dynamic) registerGenerated(id, ext);
   }
 }
 
@@ -281,7 +315,7 @@ export function spawnPerson(state: WorldStateData, spec: SpawnSpec, rng: () => n
     masterId: spec.masterId,
   };
   state.npcExt[id] = ext;
-  registerDynamicNpc(dynamicDef(id, ext));
+  registerGenerated(id, ext);
   return id;
 }
 
@@ -414,11 +448,44 @@ export function killNpc(
 /** The living person who now holds a (possibly dead) person's charges. */
 export function questHolder(state: Partial<LifeState>, npcId: string | null | undefined): string | null {
   let id = npcId ?? null;
+  const passed = new Set<string>();
   for (let hops = 0; id && hops < 12; hops++) {
     if (!npcIsDead(state, id)) return id;
-    id = state.npcExt?.[id]?.heirId ?? null;
+    passed.add(id);
+    // Their heir (a sect's chief, a disciple…); a lineage teacher with none
+    // (the outsider schools have no chief) leaves their teaching to another
+    // teacher of the same school, so no move is lost with them.
+    const heir: string | null = state.npcExt?.[id]?.heirId ?? null;
+    id = heir ?? schoolmatesOf(id).find((m) => !passed.has(m) && !npcIsDead(state, m)) ?? null;
   }
   return null;
+}
+
+// Lineage teachers by school (the taught move's `sc`): giver → the other
+// givers of lineage quests for the same school. Built once from the quests.
+let SCHOOLMATES: Map<string, string[]> | null = null;
+function schoolmatesOf(npcId: string): readonly string[] {
+  if (!SCHOOLMATES) {
+    const bySchool = new Map<string, string[]>();
+    const schoolOf = new Map<string, string>();
+    for (const q of QUESTS) {
+      if (!q.lineage || !q.giverNpcId) continue;
+      const sc = q.lineage.kind === "skill" ? getSkill(q.lineage.id)?.sc : getArt(q.lineage.id).sc;
+      if (!sc) continue;
+      schoolOf.set(q.giverNpcId, sc);
+      const list = bySchool.get(sc) ?? [];
+      if (!list.includes(q.giverNpcId)) list.push(q.giverNpcId);
+      bySchool.set(sc, list);
+    }
+    // Then anyone else who lives on the same grounds (the Five Poisons' elder
+    // for its lone teacher). A school with no one left dies with its teacher.
+    SCHOOLMATES = new Map([...schoolOf].map(([giver, sc]) => {
+      const home = getNpc(giver)?.locationIds[0];
+      const neighbours = home ? getNpcsAtLocation(home).map((n) => n.id) : [];
+      return [giver, [...new Set([...(bySchool.get(sc) ?? []), ...neighbours])].filter((id) => id !== giver)];
+    }));
+  }
+  return SCHOOLMATES.get(npcId) ?? [];
 }
 
 /** Quests a person gives or takes now: their own, and those of the dead whose charges they hold. */
@@ -426,8 +493,12 @@ export function heldQuests(state: Partial<LifeState>, npcId: string): QuestDef[]
   if (npcIsDead(state, npcId)) return [];
   const out = [...getQuestsForNpc(npcId)];
   const seen = new Set(out.map((q) => q.id));
-  for (const [id, ext] of Object.entries(state.npcExt ?? {})) {
-    if (ext.status !== "dead" || !ext.heirId || questHolder(state, id) !== npcId) continue;
+  const dead = new Set([
+    ...Object.entries(state.npcExt ?? {}).filter(([, ext]) => ext.status === "dead").map(([id]) => id),
+    ...(state.assassinatedNpcIds ?? []),
+  ]);
+  for (const id of dead) {
+    if (questHolder(state, id) !== npcId) continue;
     for (const q of getQuestsForNpc(id)) if (!seen.has(q.id)) { out.push(q); seen.add(q.id); }
   }
   return out;

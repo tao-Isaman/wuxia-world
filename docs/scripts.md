@@ -30,7 +30,7 @@ Every file in `scripts/`, what it does, and whether it is safe to run. Run them 
 
 | Script | Usage | Does |
 | --- | --- | --- |
-| `audit-content.ts` | `bun scripts/audit-content.ts` | every NPC / quest / scene reference resolves; duplicate NPC or quest ids fail. Does not check drop tables |
+| `audit-content.ts` | `bun scripts/audit-content.ts` | every NPC / quest / scene reference resolves; duplicate NPC or quest ids fail; drop tables (drops, packs, trophies, yields, chart loot, recipe items) resolve |
 | `audit-quest-completion.ts` | `bun scripts/audit-quest-completion.ts` | the campaign completability audit (in `test:quests`) |
 | `audit-manual-names.ts` | `bun scripts/audit-manual-names.ts` | manual item names match the skill / art they teach |
 | `audit-complete-scenes.ts` | `bun scripts/audit-complete-scenes.ts` | advisory: `qs_*_complete` scenes that do not fire `finishQuest` (33, all handled by the NPC card's safety net) |
@@ -72,7 +72,7 @@ Every file in `scripts/`, what it does, and whether it is safe to run. Run them 
 | `build-jail-map.ts` | `bun scripts/build-jail-map.ts` | `public/maps/jail.png` | paints the jail in Chromium (hard-coded `/opt/pw-browsers/chromium`) |
 | `build-map-footprints.ts` | `bun scripts/build-map-footprints.ts <dir>` | `lib/stage/world-footprints-data.ts` | rebuilds **the whole file** from `<dir>/<locationId>.json`. The JSON sources are not in the repo, so a partial folder drops every other map; edit the data file directly for small fixes |
 
-`sharp` arrives through Next.js, not as a direct dependency. Add it to `package.json` if a future Next drops it.
+`sharp` is a dev dependency (`package.json`, at the version Next.js brings: 0.34.5), so the image scripts keep working if a future Next drops it.
 
 ## Art and collision tools
 
@@ -110,7 +110,7 @@ Already applied. Kept for history only.
 | --- | --- |
 | `test-runtime.ts` | `test:runtime` |
 | `test-combat-actions.ts` | `test:combat` |
-| `test-clinic-errand.ts`, `test-clinic-preparation.ts`, `test-capital-training.ts`, `test-quest-completion-receipt.ts`, `test-spy-greeting-exits.ts`, `test-lin-herb-dialogue.ts` | `test:opening` |
+| `test-clinic-errand.ts`, `test-clinic-preparation.ts`, `test-capital-training.ts`, `test-quest-completion-receipt.ts`, `test-spy-greeting-exits.ts`, `test-lin-herb-dialogue.ts`, `test-world-vignettes.ts` | `test:opening` |
 | `test-battle-background.ts` | `test:battle-background` |
 | `test-lore-rumors.ts`, `test-rumor-formatting.ts` | `test:rumors` |
 | `test-liveness.ts` | `test:liveness` |
@@ -127,7 +127,6 @@ Already applied. Kept for history only.
 | `test-engine.ts` | `test:engine` |
 | `test-assets.ts` | `test:assets` |
 | `build-docs-reference.ts --check`, `check-docs.ts` | `test:docs` |
-| `test-world-vignettes.ts` | none — passes; run it by hand |
 
 `test:navigation` runs the `bun test` files `lib/stage/world-navigation.test.ts` and `lib/stage/world-placement.test.ts`; `test:placements` runs `lib/stage/placements.test.ts`.
 

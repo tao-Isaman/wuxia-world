@@ -29,7 +29,7 @@ export {
 export { BIOMES, BIOME_LABEL, FOE_HABITATS, PLACE_BIOMES, biomesOf, foeLivesAt, type Biome } from "./habitats";
 export { BOSSES, BOSS_RESPAWN_DAYS, getBoss, bossAlive, bossesAt, type BossDef } from "./bosses";
 export { RESOURCES, RESOURCES_BY_ID, getResource } from "./resources";
-export { RECIPES, RECIPES_BY_ID, getRecipe } from "./recipes";
+export { ARTISAN_PROFESSIONS, FIELD_RECIPES, RECIPES, RECIPES_BY_ID, craftsAnywhere, getRecipe } from "./recipes";
 export {
   LIFE_SKILL_LABEL,
   LIFE_SKILL_ICON,

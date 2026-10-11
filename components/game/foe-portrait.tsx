@@ -41,10 +41,12 @@ export function LookPortrait({ look, framing = "bust", animate = false }: {
 }
 
 /** The foe `opponentId` as the battle will draw it (`foeLook`). */
-export function FoePortrait({ opponentId, framing = "body", animate = true }: {
+export function FoePortrait({ opponentId, framing = "body", animate = true, present }: {
   opponentId: string; framing?: "body" | "bust"; animate?: boolean;
+  /** Who is still in the world (npcPresent): a foe borrowing a lost person's look shows its kind instead. */
+  present?: (npcId: string) => boolean;
 }) {
-  return <LookPortrait look={foeLook(opponentId)} framing={framing} animate={animate} />;
+  return <LookPortrait look={foeLook(opponentId, present)} framing={framing} animate={animate} />;
 }
 
 /**

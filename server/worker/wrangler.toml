@@ -1,9 +1,19 @@
 # The wuxia game server (docs/online.md). Deploy: `npx wrangler deploy` from
 # this folder. Nothing to configure: the token-signing key is made and kept by
 # the server itself (KeyObject, src/keys.rs), so it survives every deploy.
+#
+# Two halves in one Worker: ts/entry.ts (TypeScript: the shared world and
+# checked battles, running the game's own engines from lib/) is the entry; it
+# hands everything else to the Rust half (src/, built into build/ by
+# worker-build, imported as "wuxia-rust").
 name = "wuxia-world"
-main = "build/worker/shim.mjs"
+main = "ts/entry.ts"
 compatibility_date = "2026-01-01"
+# The game data is large (Thai text): minified it loads faster.
+minify = true
+
+[alias]
+"wuxia-rust" = "./build/index.js"
 
 [build]
 command = "cargo install -q worker-build@^0.8 && worker-build --release"
@@ -20,6 +30,14 @@ class_name = "RoomObject"
 name = "KEYS"
 class_name = "KeyObject"
 
+[[durable_objects.bindings]]
+name = "WORLD"
+class_name = "WorldObject"
+
+[[durable_objects.bindings]]
+name = "BATTLES"
+class_name = "BattleObject"
+
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["AccountObject", "RoomObject"]
@@ -27,6 +45,10 @@ new_sqlite_classes = ["AccountObject", "RoomObject"]
 [[migrations]]
 tag = "v2"
 new_sqlite_classes = ["KeyObject"]
+
+[[migrations]]
+tag = "v3"
+new_sqlite_classes = ["WorldObject", "BattleObject"]
 
 [vars]
 # PBKDF2 rounds for new passwords (Workers bill CPU time; raise on a paid plan).

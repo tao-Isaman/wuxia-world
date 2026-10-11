@@ -6,6 +6,36 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-11
 
+### The server runs the world and checks every fight; the server starts over
+
+- **One world for everyone, run by the server.** The simulated jianghu — its people's lives, deaths, heirs and journeys — and the rumors now live on the game server (`WorldObject`), which moves them on every real hour whether anyone plays or not; every player sees the same people. The browser stops simulating them and takes the server's world every minute, passing on the hero's quests of anyone who died meanwhile. People a player's open quests are about stay home. A hero's deeds reach the jianghu as rumors the server writes from known templates (no free text, 30 an hour).
+- **Each player's own deeds** (save v28): assassinations, kidnappings, felled legendary beasts (their 90-day rest) and the tournament are each player's, so one player cannot empty the map for everyone. Killing one of the simulated people in a fight the server checked (⚔ สังหาร) still kills them for all.
+- **Fights are checked by the server.** Going into any fight, the server stages it from the saved state and picks the dice's seed; the battle plays in the browser at full speed while its moves stream to the server, which replays them. The result panel waits for the server's verdict ("กำลังตรวจผลการต่อสู้กับเซิร์ฟเวอร์…"), then shows the spoils the server rolled. A win's gold counts toward the save checks; a fight the server refuses counts as left.
+- **The server starts over** (data generation 2): no accounts, characters, saves or world from before, and everyone signs in again.
+- Server: one Worker, two halves — a TypeScript entry (`server/worker/ts/`, running the game's own `lib/` engines: `WorldObject`, `BattleObject`) in front of the Rust half (accounts, saves, rooms; `/grant` for checked gold). Client: `store/cloud-world.ts`, `store/cloud-battle.ts`; battles as replayable commands (`lib/game/grid/session.ts`), pure setup and spoils (`lib/world/battle-setup.ts`, `lib/world/spoils.ts`). New suite `test:play-server`; `test:online` and `online.spec.ts` cover the world and a checked fight. Guide: [online.md](online.md#the-shared-world).
+
+### Bug fixes
+
+- **Foes grow with the hero, not the world.** Encounter power counts the days since the hero started (`startDay`, save v28), so a new hero no longer meets late-game foes because the world is old; joining a sect no longer jumps foe power (sect standing grows with rank progress and time in the sect).
+- **Quests and sects:** an abandoned quest is offered again (without paying its gifts twice); a resigned disciple may rejoin after 30 days from the first rank, from the master's card or the sect window's สำนักเดิม list; สำนักสราญรมย์ has a redemption quest, and redemption quests can actually be offered now; the intro reward honours the sect's join rules; leaving by any path logs and is talked about; a resigned sect's moves stop gaining xp from every source; store sect actions need an active membership.
+- **Sagas and the dead:** `st_jh_lone_sword_08` asks the same AGI throughout; three saga speakers get their portraits; a dead lineage teacher's quests pass to an heir or another teacher; a saga boss borrowing an absent person's look is drawn as a generic foe; someone back from captivity can be kidnapped again.
+- **Combat:** the nine arts' `mult_*` passives work; art actives take mastery, stacks, Atk %, the target's DEF debuff and gear reduction, and a stunned caster no longer pays MP; reflect answers every hit of a multi-hit move; hunts bring their packs.
+- **Content:** a ประดิษฐ์ tab crafts the twelve trades' recipes anywhere; the three orphan recipes are sold; the forest practice bonus reaches the forests; `audit-content` checks drop tables; dead fields and the orphan road removed.
+- **The living world:** generated people have portraits; a sect avenges a killed member (a 60-day feud with its hunters); the tournament is announced in the inns; heard leads pay when followed; `npcExt` is repaired on load.
+- **UI:** the quest tracker no longer covers the อื่น ๆ button; every log entry has a Thai label; night is one definition for the sundial, lighting and music; safe-area insets follow the turned page; `/progress.json` stays out of the offline cache.
+- **Tooling:** `sharp` declared; the world vignettes run in `test:opening`; stale comments fixed; `characters.spec` no longer loses its first step; `lib/game` no longer imports outside itself.
+
+### Characters and saves on the server
+
+- **Several characters per account, saved on the server.** After signing in the player picks one of up to four characters (day, gold, sect rank and place shown), creates a new one, or deletes one after a confirmation; the one last played is re-entered on the next visit, and เปลี่ยนตัวละคร in the 🌐 panel goes back to the list. A hero from the days of local saves can be imported once (gold capped at 100,000). Without a server (dev, tests) the game saves in the browser as before.
+- **The server checks every save** (`server/core/src/save.rs`): it must build on the save the server holds (another tab or device → `stale`), come at most once a second, keep the hero's name, keep levels, stats, stacks and gold inside the game's limits, and gold may rise no faster than an allowance (100,000 at once, +3,000 a minute). A refused save stops writing and returns to the list; entering again loads the last good one. The account's shared world is kept on the server too **(replaced** the same day: one world for everyone, run by the server, above).
+- Server: `GET/POST /characters`, `DELETE /characters/<id>`, `GET/PUT /characters/<id>/save`, `GET/PUT /world` behind the session token (`AccountObject`). Client: `lib/net/cloud-save.ts` (the world store's persist storage), `store/cloud-session.ts`, `components/world/character-select.tsx`. Guide: [online.md](online.md#characters-and-saves).
+
+### Tests that read the real date
+
+- **Old lore no longer runs out:** flavour lore fades 60 days after the world seeds it (`LORE_FLAVOUR_DAYS`), not on world day 60 itself; on the shared real-time clock a world started after day 60 had none (the capital tea house offered one rumor, not five). Lore stamped with the old fixed day restarts once.
+- `test:grid-store` and `test:rumors` pin the world clock to day 1; `liveness.spec.ts` gives its hero real stats, since foes grow with the world day (see HANDOFF).
+
 ### Our own names: the legend no longer borrows a novel's
 
 - The game is no longer framed as a sequel to มังกรหยก ภาค 3, and the names players recognise straight from Jin Yong's novels are replaced with invented ones (ids, saves and quest logic unchanged; the owner chose each name from an audit of 85 terms):

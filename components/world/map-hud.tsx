@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { getScene } from "@/lib/world";
 import { useWorldStore } from "@/store/world-store";
+import { isNight, shichenIndex } from "@/lib/world/clock";
 import { WANTED_MAX, arrestPenalty, describeSentence, sentenceLeft } from "@/lib/world/law";
 import { confirmDialog } from "@/store/confirm-store";
 import { toast } from "@/store/toast-store";
@@ -51,8 +52,8 @@ export function MapHud() {
   const scene = getScene(currentSceneId);
   const place = scene?.kind === "location" || scene?.kind === "route" ? scene : getScene(lastLocationId);
   const name = place?.kind === "location" ? place.name : place?.kind === "route" ? place.label.replace(/\s*\(.*\)$/, "") : "ยุทธภพ";
-  const phase = time < 4 ? "ยามเช้า" : time < 8 ? "ยามบ่าย" : "ยามค่ำ";
-  const hour = ((Math.floor(time) % 12) + 12) % 12;
+  const phase = isNight(time) ? "ยามค่ำ" : time % 12 < 4 ? "ยามเช้า" : "ยามบ่าย";
+  const hour = shichenIndex(time);
   return <>
     {/* No party card: the map stays clear. Law status floats top-centre. */}
     {(wanted > 0 || sentence != null) && <div className="hud-law" role="status" data-hud-occluder>
@@ -83,8 +84,8 @@ export function MapHud() {
 
 /** Sundial: the current double-hour sits under the gold pointer at the top. */
 function Sundial({ time }: { time: number }) {
-  const index = ((Math.floor(time) % 12) + 12) % 12;
-  const night = index >= 7 && index <= 10; // 戌 through 丑
+  const index = shichenIndex(time);
+  const night = isNight(time); // 戌 through 寅
   const turn = -(time / 12) * 360; // the ring turns; the pointer stays up
   return <div className={`sundial${night ? " sundial--night" : ""}`} role="img"
     aria-label={`${SHICHEN_THAI[index]} (${SHICHEN[index]}) · ${night ? "กลางคืน" : "กลางวัน"}`}>

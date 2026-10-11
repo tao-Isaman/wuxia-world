@@ -16,6 +16,9 @@ Object.defineProperty(globalThis, "localStorage", { configurable: true, value: {
 } });
 Object.defineProperty(globalThis, "window", { configurable: true, value: { localStorage: globalThis.localStorage } });
 const { useWorldStore } = await import("../store/world-store");
+// Pin the world clock: the NPC tick below walks days 8–91 from a new game on day 1.
+const { setTestWorldTime } = await import("../lib/world/clock");
+setTestWorldTime(1);
 const clone = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
 const npcId = "sect_shaolin_abbot_huiyuan";
 const random = Math.random;
@@ -34,6 +37,8 @@ function readable(rumor: Rumor) {
 try {
   Math.random = () => 0.5;
   useWorldStore.getState().startNewGame({ newWorld: true, name: "Rumor formatting test" });
+  // The master's door (store joinSect) opens once the intro quest is done.
+  useWorldStore.setState({ quests: { ...useWorldStore.getState().quests, qst_shaolin_disciple_intro: { id: "qst_shaolin_disciple_intro", status: "done", stage: 1 } } });
   assert.equal(useWorldStore.getState().joinSect("shaolin").ok, true);
   const baseline: WorldStateData = clone(useWorldStore.getState());
   baseline.rumorSeenLog = [{ rumorId: baseline.rumorPool[0].id, dayHeard: baseline.day, location: "city_capital" }];
@@ -140,7 +145,10 @@ try {
   // A near-complete authored goal deterministically exercises the live
   // tick's artId payload without relying on random long-term progress.
   ticking.npcExt[npcId].goals.find(goal => goal.kind === "master_art")!.progress = 99;
-  for (let day = 8; day <= 91; day += 7) {
+  // Weeks after the hero's start: the world clock puts a new game on today's
+  // world day, so the dates are relative to it (they were days 8–91 when the
+  // world was young).
+  for (let day = baseline.day + 7; day <= baseline.day + 84; day += 7) {
     ticking.day = day;
     tickAllNamedNpcs(ticking, { currentDay: day });
   }

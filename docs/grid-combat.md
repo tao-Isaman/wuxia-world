@@ -204,7 +204,7 @@ applyAction(state, unitId, action, rng = Math.random): boolean   // false (state
 
 `planTurn(state, unitId): TurnPlan` in `lib/game/grid/ai.ts` plays every enemy turn, and the hero's side when อัตโนมัติ (auto) is on. It is pure and deterministic (no randomness) and takes about 1.5 ms per plan. It never flees.
 
-- It estimates damage without dice by mirroring `battle.ts` (`estimateSkill`, `estimateArt`): the same attack, mastery, stack, defence, buff and art-bonus terms, times hit chance and expected crit. **Change it together with the damage formula.**
+- It estimates damage without dice by mirroring `battle.ts` (`estimateSkill`, `estimateArt`): the same attack, mastery, stack, defence, buff and art-passive terms (shared helpers in `battle.ts`; `estimateArt` calls `artActiveRaw` itself, with a passive's chance folded in), times hit chance and expected crit. **Change it together with the damage formula.**
 - For every reachable tile × ready slot × aim cell it scores the action:
   - per enemy in the area: expected damage (capped at the enemy's HP) × focus (up to ×1.5 on wounded foes, ×1.15 on the hero), plus a kill bonus, plus the value of the debuff it applies, plus life drain;
   - plus the skill's own self effect, minus 0.05 × MP cost;
@@ -225,23 +225,24 @@ applyAction(state, unitId, action, rng = Math.random): boolean   // false (state
 
 - `OpponentDef.pack` is one `{ opponentId, count }` or a list of them (a gang of mixed kinds), e.g. `elite_bandit_king` brings a lieutenant, two archers and two bandits. Members are the same tier or weaker (`enemyPackSpecs` in `lib/world/battle-looks.ts`, `packMembers` reads either form). Unit ids: `A` hero, `B` primary enemy, `pack1:<id>` … `pack6:<id>`.
 - **Reinforcements.** The first member kind gets +1 when the hero's power (`playerPowerIndex`) is at least 0.4 and +2 at 0.75 (`packCounts`). The pack is capped at `MAX_PACK_SIZE = 6`, so a battle has at most 8 units.
-- Packs come only with **random encounters** (`PendingBattle.withPack`, set by `encounterBattle` — accepting an encounter, or failing to flee a hunter or the law). Quest battles, spars, hunts and bad-action fights stay 1 v 1.
-- 35 opponents have packs — from `vampire_bat` (+2 bats) and `wild_wolf` (+1 wild dog) up to the bosses `elite_bandit_king`, `elite_cult_elder`, `elite_bear_king` and the ten `elite_villain_*` named villains. `hunt_boar` / `hunt_alpha_wolf` only appear on hunting nodes, which never bring packs. The full list is the Pack column of [reference/opponents.md](reference/opponents.md).
+- Packs come with **random encounters** (`PendingBattle.withPack`, set by `encounterBattle` — accepting an encounter, or failing to flee a hunter or the law) and with **hunts** (`gatherResource` on a hunting node sets `withPack` too). Quest battles, spars and bad-action fights stay 1 v 1.
+- 35 opponents have packs — from `vampire_bat` (+2 bats) and `wild_wolf` (+1 wild dog) up to the bosses `elite_bandit_king`, `elite_cult_elder`, `elite_bear_king` and the ten `elite_villain_*` named villains. `hunt_boar` (+1 boar) and `hunt_alpha_wolf` (+2 wild dogs) appear on hunting nodes, which bring their packs. The full list is the Pack column of [reference/opponents.md](reference/opponents.md).
 - The battle log says "ฝ่ายศัตรูมีพวกอีก N คน" at the start. On a win, only the primary enemy's drops roll, but every fallen pack member counts toward `defeatedCounts` (so pack kills advance kill quests).
 
 ## Battle store
 
-`store/battle-store.ts` (`"use client"`, not persisted — a reload mid-fight restarts the battle).
+`store/battle-store.ts` (`"use client"`, not persisted — a reload mid-fight restarts the battle) wraps one **battle session** (`lib/game/grid/session.ts`, pure): the same logic as commands (`startSession`, `playerAction`, `stepSession`, `setSessionAuto`, `applyCommand`). Started with `opts.seed`, a session rolls every die from the seed (`withRandom`, `lib/game/rng.ts`) and logs its commands — step `["s"]`, move `["m", x, y]`, skill `["a", slot, x, y]`, wait, flee, item `["i", id, x, y]`, auto — so the game server can replay the battle and reach the same end ([online.md](online.md#battles-on-the-server)).
 
 | Member | What it does |
 | --- | --- |
-| `state`, `builds`, `auto` | the `GridBattleState`, the hero and primary-enemy builds, the auto flag |
-| `start(a, b, opts?)` | `opts = { hpA?, mpA?, enemies?, looks?, blocked?, bag? }` (`bag` turns on ใช้ของ); creates the battle, logs the opening lines (carry-over HP / MP, mastery per family, each side's primary art, the pack) |
+| `state`, `builds`, `auto`, `seed` | the `GridBattleState`, the hero and primary-enemy builds, the auto flag, the seed of a checked battle (else null) |
+| `start(a, b, opts?)` | `opts = { hpA?, mpA?, enemies?, looks?, blocked?, bag?, seed? }` (`bag` turns on ใช้ของ; `seed` makes it a checked battle); creates the battle, logs the opening lines (carry-over HP / MP, mastery per family, each side's primary art, the pack) |
 | `move(to)`, `act(slot, target)`, `useItem(itemId, name, effect, target)`, `wait()`, `flee()` | player actions, only on the player's turn; return `false` when refused |
 | `setAuto(on)` | อัตโนมัติ: the AI plays the hero's side too |
 | `step()` | one visible beat: begin the next turn, or play the AI's move, or its action. Does nothing while the player must act. The renderer calls it. |
 | `stepAll()` | repeat `step()` until the player's turn or the end (tests) |
 | `reset()` | clear the battle and turn auto off |
+| `commands()` | the command log of a seeded battle so far |
 
 Helpers: `isPlayerTurn(state, auto)`, `aiControls(unit, auto)`, `cloneBattle`, `PLAYER_UNIT = "A"`, `PRIMARY_ENEMY_UNIT = "B"`. Every change publishes fresh `state`, `units`, `events` and `log` references. The store never runs a timer.
 
@@ -356,11 +357,8 @@ Browser specs: `tests/browser/game.spec.ts` (tap a tile with `gridCellPoint`, au
 
 ## Known gaps
 
-1. The `hunt_boar` and `hunt_alpha_wolf` packs never spawn (hunting fights don't bring packs).
-2. Poison, burn and regen change HP without an event, so health bars catch up only at the next event.
-3. The victory / defeat jingle plays when the last action resolves, slightly before the final animation.
-4. Tier-5 arts (`khbt`, `kuyt`) draw T4 VFX but their cast banner uses the tier-0 colour.
-5. The heavy-blade debris effect is drawn at a fixed spot below the board instead of at the target.
-6. Reloading mid-battle restarts it from the beginning (the battle store isn't saved).
-7. The ally-support branch in `doSkill` is unreachable: no profile targets allies yet.
-8. No browser test covers the battle canvas's โหลดฉากใหม่ retry (only the world canvas's).
+1. Poison, burn and regen change HP without an event, so health bars catch up only at the next event.
+2. The victory / defeat jingle plays when the last action resolves, slightly before the final animation.
+3. Reloading mid-battle restarts it from the beginning (the battle store isn't saved).
+4. The ally-support branch in `doSkill` is unreachable: no profile targets allies yet.
+5. No browser test covers the battle canvas's โหลดฉากใหม่ retry (only the world canvas's).

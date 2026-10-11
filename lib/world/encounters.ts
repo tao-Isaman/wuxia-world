@@ -16,19 +16,25 @@ import { isTownScene } from "./data/habitats";
 import { LAW_NPC_PREFIX, ambushChance, jailCityFor, lawChance, pickLawPursuer } from "./law";
 import { regionOf } from "./data/regions";
 import { npcFoeFor, sectChief } from "./npc-life";
+import { kidnapReturned } from "./bad-actions";
+import { FEUD_CHANCE, activeFeuds } from "./feuds";
 
 // ─── Walk ticks ────────────────────────────────────────────────────────
 // Called by the world store for every stretch the player walks on a map
-// (see WALK_TICK_UNITS). The law (if wanted) and a sect hunter (if betrayed)
-// may catch up at once; otherwise `rollFoeSpawn` may put a foe on the map,
+// (see WALK_TICK_UNITS). The law (if wanted), a sect hunter (if betrayed) or a
+// sect's avengers (a blood feud, lib/world/feuds.ts) may catch up at once; otherwise `rollFoeSpawn` may put a foe on the map,
 // which waits there until the hero touches it (lib/world/roaming-foes in the
 // store, drawn by the map runtime).
-/** A named villain (`look.npc`) the hero has killed or carried off, or who died, never ambushes again. */
-export function encounterFoeAvailable(state: Pick<WorldStateData, "npcExt" | "assassinatedNpcIds" | "kidnappedNpcIds">, opponentId: string): boolean {
+/**
+ * A named villain (`look.npc`) ambushes only while they are in the world:
+ * never once killed or dead, not while carried off (back after
+ * KIDNAP_RETURN_DAYS, like everyone kidnapped).
+ */
+export function encounterFoeAvailable(state: Pick<WorldStateData, "npcExt" | "assassinatedNpcIds" | "kidnappedNpcIds"> & Partial<Pick<WorldStateData, "kidnappedUntil" | "day">>, opponentId: string): boolean {
   const npcId = getOpponent(opponentId)?.look?.npc;
   if (!npcId) return true;
   return ((state.npcExt ?? {})[npcId]?.status ?? "alive") === "alive" &&
-    !(state.assassinatedNpcIds ?? []).includes(npcId) && !(state.kidnappedNpcIds ?? []).includes(npcId);
+    !(state.assassinatedNpcIds ?? []).includes(npcId) && kidnapReturned({ ...state, kidnappedNpcIds: state.kidnappedNpcIds ?? [] }, npcId);
 }
 
 /** The law or a sect hunter catching up: sets `pendingEncounter` when one does. */
@@ -90,6 +96,16 @@ export function rollWalkEvent(state: WorldStateData, chanceScale: number): void 
       opponentId: `hunter_${sid}`,
       returnSceneId: state.currentSceneId,
     };
+    return;
+  }
+
+  // A sect avenging a member the hero killed (lib/world/feuds.ts): its
+  // hunters catch up now and then until the feud runs out or is settled.
+  const feuds = activeFeuds(state).filter((sid) => !betrayedSects.includes(sid));
+  if (feuds.length > 0 && Math.random() < FEUD_CHANCE) {
+    const sid = feuds[Math.floor(Math.random() * feuds.length)]!;
+    applyOpponentStatScale(state);
+    state.pendingEncounter = { opponentId: `hunter_${sid}`, returnSceneId: state.currentSceneId };
   }
 }
 

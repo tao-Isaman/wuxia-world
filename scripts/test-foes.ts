@@ -7,7 +7,7 @@ import { powerScore } from "../lib/game/power-tier";
 import {
   BOOST_NPC, BOOST_T3, BOOST_T4, OPPONENTS, boostBuild, boostFactorOf, getOpponent, unboostedBuild,
 } from "../lib/world/data/opponents";
-import { FIGHT_EVENTS, FOE_SPAWN, fightEventsForLocation, tierWeightForPower } from "../lib/world/data/random-events";
+import { FIGHT_EVENTS, FOE_SPAWN, SECT_TENURE_DAYS, fightEventsForLocation, playerPowerIndex, sectRankPower, tierWeightForPower } from "../lib/world/data/random-events";
 import { BIOMES, FOE_HABITATS, PLACE_BIOMES, biomesOf, foeLivesAt, isTownScene } from "../lib/world/data/habitats";
 import { BOSSES, BOSS_RESPAWN_DAYS, bossAlive, bossesAt, getBoss } from "../lib/world/data/bosses";
 import { SCENES } from "../lib/world/data/scenes";
@@ -24,6 +24,8 @@ import { getAnimSheet } from "../lib/characters/anim-sheets";
 import { migrateSave } from "../store/world/persist";
 import { rollVictorySpoils } from "../store/world/spoils";
 import { useWorldStore } from "../store/world-store";
+import { worldBattleSetup } from "../lib/world/battle-looks";
+import { setTestWorldTime, setTestClock } from "../lib/world/clock";
 
 let checks = 0;
 function check(name: string, run: () => void) { run(); checks++; console.log(`PASS ${name}`); }
@@ -107,6 +109,31 @@ check("every wild place and every road has foes, early and late; settled places 
   for (const id of ["cave_jinshe", "desert_ruins", "route_home_player__to__city_capital"]) assert.ok(!isTownScene(id), id);
 });
 
+check("foes scale with the hero's own days (day − startDay), not the world clock's", () => {
+  try {
+    setTestWorldTime(900, 3);
+    const fresh = freshState();
+    assert.equal(fresh.startDay, 900, "a new hero starts on the world's day");
+    assert.equal(playerPowerIndex(fresh), 0, "a brand-new hero on world day 900 meets early foes");
+    assert.equal(playerPowerIndex({ ...fresh, day: 1000 }), 0.5, "100 days in: half power");
+    assert.equal(playerPowerIndex({ ...fresh, day: 1200 }), 1, "200+ days in: full power");
+    // v27 saves never knew their start: they count from the day they load.
+    const v27 = migrateSave({ hasGame: true, day: 640, time: 2 }, 27);
+    assert.equal(v27.startDay, 640);
+    assert.equal(playerPowerIndex(v27), 0);
+    // A pre-clock save counted its own days from 1: rebased with the rest, its age is kept.
+    const v26 = migrateSave({ hasGame: true, day: 101, time: 2 }, 26);
+    assert.equal(v26.day, 900);
+    assert.equal(v26.day - v26.startDay, 100, "a 100-day-old save stays 100 days old");
+    // Repair: a start after today is today.
+    const ahead = { ...fresh, startDay: 2000 };
+    validateAndRepair(ahead);
+    assert.equal(ahead.startDay, ahead.day);
+  } finally {
+    setTestClock(null);
+  }
+});
+
 check("tier 5 opens at power 0.6 and stays rarer than T4", () => {
   for (const p of [0, 0.3, 0.59]) assert.equal(tierWeightForPower(5, p), 0);
   for (const p of [0.6, 0.8, 1]) {
@@ -125,7 +152,7 @@ check("no foe spawns outside its habitat — not strays, not a hunted quarry, no
     for (const id of sample) {
       const state = freshState();
       state.currentSceneId = id;
-      state.day = power ? 400 : 1;
+      state.day = state.startDay + (power ? 400 : 0);
       withSeed(id.length * 31 + power, () => {
         for (let i = 0; i < 60; i++) {
           const foe = rollFoeSpawn(state, 0);
@@ -316,6 +343,40 @@ check("spoils: beasts carry no gold; w-exp by kind and tier; beasts and bosses t
   }
   // Every boss drop is a real item.
   for (const b of BOSSES) for (const d of getOpponent(b.id)!.drops ?? []) assert.ok(getItem(d.itemId), d.itemId);
+});
+
+check("power: joining a sect adds nothing at once; rank counts by ladder progress and time in the sect", () => {
+  const day = 10;
+  const member = (rank: number, joinedDay: number) => ({ rank, points: 0, lastQuestDay: {}, artQuestsDone: [], rewardPicks: {}, joinedDay, status: "active" as const });
+  const at = (sectId: string, rank: number, joinedDay: number) => {
+    const m = member(rank, joinedDay);
+    const state = { day, startDay: 0, sectMembership: { [sectId]: m } } as never as Parameters<typeof playerPowerIndex>[0];
+    return { power: playerPowerIndex(state), share: sectRankPower(state, m) };
+  };
+  // Huashan starts at rank 5 (a 5 → 1 ladder): the old rule jumped to 0.5 on joining.
+  assert.equal(at("huashan", 5, day).share, 0);
+  assert.equal(at("huashan", 5, day).power, day / 200);
+  assert.equal(at("shaolin", 9, day - 100).share, 0, "entry rank is no standing, however long");
+  assert.equal(at("huashan", 3, day - SECT_TENURE_DAYS).share, 0.5, "half way up, settled in");
+  assert.equal(at("huashan", 3, day - SECT_TENURE_DAYS / 2).share, 0.25, "half way up, still new");
+  assert.equal(at("shaolin", 5, day - SECT_TENURE_DAYS).share, 0.5);
+  assert.equal(at("gumu", 1, day - 200).power, 1, "the top of any ladder is full power");
+});
+
+check("hunting brings the beast's pack onto the grid (a boar herd, the alpha wolf's dogs)", () => {
+  freshState();
+  // hunt_mountain lists hunt_alpha_wolf second: a draw of 0.3 picks it.
+  withRandom(0.3, () => {
+    const res = useWorldStore.getState().gatherResource("hunt_mountain");
+    assert.equal(res.ok, true);
+  });
+  const pending = useWorldStore.getState().pendingBattle!;
+  assert.equal(pending.opponentId, "hunt_alpha_wolf");
+  assert.equal(pending.withPack, true);
+  const setup = worldBattleSetup("hunt_alpha_wolf", { withPack: pending.withPack, power: 0 })!;
+  assert.equal(setup.enemies.length, 2, "two wild dogs come with the alpha");
+  assert.ok(setup.enemies.every((e) => e.id.endsWith(":hunt_wild_dog")));
+  assert.equal(worldBattleSetup("hunt_boar", { withPack: true, power: 0 })!.enemies.length, 1, "a boar brings one more");
 });
 
 console.log(`${checks} foe checks passed`);

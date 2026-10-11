@@ -58,6 +58,8 @@ export {
   RESOURCES_BY_ID,
   getResource,
   RECIPES,
+  FIELD_RECIPES,
+  craftsAnywhere,
   RECIPES_BY_ID,
   getRecipe,
   LIFE_SKILL_LABEL,

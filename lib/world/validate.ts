@@ -13,6 +13,8 @@ import { ARTS_BY_ID } from "@/lib/game/data/arts";
 import { EQUIPMENT_BY_ID } from "@/lib/game/data/equipment";
 import { SECT_MEMBERSHIPS } from "./data/sect-memberships";
 import { heroBodyFor } from "./data/player-bodies";
+import { repairNpcExt } from "./npc-repair";
+import { repairFeudFlags } from "./feuds";
 import {
   deriveAll,
   getMeridianChart,
@@ -27,6 +29,11 @@ import {
 // to data ids that don't exist anymore (e.g., a scene was removed between
 // deploys, or an item id was renamed). Logs to console so authors notice.
 export function validateAndRepair(state: WorldStateData): void {
+  // The simulated people belong to the shared world, which a fresh title
+  // screen (no hero yet) holds too: repaired before the hero check.
+  const people = repairNpcExt(state);
+  if (people.dropped.length) console.warn(`[world] dropping unknown simulated people: ${people.dropped.join(", ")}`);
+  if (people.fixed.length) console.warn(`[world] repaired simulated people: ${people.fixed.join(", ")}`);
   if (!state.hasGame) return;
 
   const cur = SCENES_BY_ID.get(state.currentSceneId);
@@ -61,6 +68,8 @@ export function validateAndRepair(state: WorldStateData): void {
   // still written by walk events and hunting (rollWalkEvent), though nothing
   // reads it since encounters moved from arrival to walk ticks.
   delete state.flags._skipEventRoll;
+  // Sect feuds (lib/world/feuds.ts) live in flags: drop malformed or unknown-sect ones.
+  repairFeudFlags(state.flags);
 
   // Wanted marks: 0–5; a jail city must be a real city.
   state.wanted = Math.max(0, Math.floor(Number(state.wanted) || 0));
@@ -153,6 +162,10 @@ export function validateAndRepair(state: WorldStateData): void {
     state.time -= 12;
     state.day += 1;
   }
+  // v28: the hero's first day, never after today.
+  // (It may be ≤ 0: a pre-clock save's first day, rebased, can predate the world's day 1.)
+  if (typeof state.startDay !== "number" || !Number.isFinite(state.startDay)) state.startDay = state.day;
+  if (state.startDay > state.day) state.startDay = state.day;
 
   // Move-skill progression: clamp level into [1, MAX], drop entries for
   // skills that no longer exist, and keep the player build's `skillLevels`
@@ -421,5 +434,10 @@ export function validateAndRepair(state: WorldStateData): void {
     if (typeof m.rank === "number" && m.rank < def.topRank) {
       m.rank = def.topRank;
     }
+    // The best rank held stays on the ladder; a leave day is never in the future.
+    if (m.bestRank !== undefined && (typeof m.bestRank !== "number" || !Number.isFinite(m.bestRank))) delete m.bestRank;
+    else if (typeof m.bestRank === "number") m.bestRank = Math.max(def.topRank, Math.min(def.startRank, m.bestRank));
+    if (m.leftDay !== undefined && (typeof m.leftDay !== "number" || !Number.isFinite(m.leftDay))) delete m.leftDay;
+    else if (typeof m.leftDay === "number" && m.leftDay > state.day) m.leftDay = state.day;
   }
 }

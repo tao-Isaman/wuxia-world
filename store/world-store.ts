@@ -7,13 +7,14 @@
 // This file only assembles them, so the public API — useWorldStore and every
 // action name and signature — is unchanged.
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
 import { getQuestStatus, validateAndRepair } from "@/lib/world";
 import { tickQuestProgress } from "@/lib/world/effects";
 import type { WorldStore } from "./world/types";
 import { draftFrom, emptyData } from "./world/state";
-import { mergeSave, migrateSave, partializeSave } from "./world/persist";
+import { mergeSave, migrateSave, partializeSave, type PlayerSave } from "./world/persist";
 import { attachSharedWorld } from "./world/shared-local";
+import { cloudMode, cloudSave } from "@/lib/net/cloud-save";
 import { gameActions } from "./world/actions/game";
 import { sectsActions } from "./world/actions/sects";
 import { travelActions } from "./world/actions/travel";
@@ -27,12 +28,19 @@ import { shopsActions } from "./world/actions/shops";
 import { lawActions } from "./world/actions/law";
 import { npcsActions } from "./world/actions/npcs";
 import { questsActions } from "./world/actions/quests";
+import { SAVE_VERSION } from "./world/save-version";
 
 export { MERIDIAN_POINTS_PER_LEVEL } from "./world/progression";
 export { TRAVEL_STAMINA_COST, REST_COOLDOWN_HOURS, SPAR_WIN_SCENE_ID, SPAR_LOSE_SCENE_ID, PRACTICE_STAMINA_COST, PRACTICE_HOURS } from "./world/rules";
 export { HERO_BASE_HP } from "./world/state";
 export type { GatherResult, CraftResult, BuyRecipeResult, BuyEquipResult, EquipResult, UnequipResult, UseItemResult, OpenMeridianNodeResult, PracticeMusicResult, LevelUpSkillResult, LevelUpArtResult, ForgetSkillResult, ForgetArtResult, PracticeResult, BuyResult, SellResult, BuyOfferResult, SparResult, QuestActionResult, BadActionResult, VictorySpoils, RestKind, RestResult, ActivityResult, RoamingFoe } from "./world/types";
 export type { WorldStore } from "./world/types";
+
+// With a game server set, saves live there, one per character
+// (docs/online.md#characters-and-saves): the store hydrates only when a
+// character is entered (store/cloud-session.ts). Without one (dev, tests) it
+// is the browser's single local save, as before.
+const CLOUD = cloudMode();
 
 export const useWorldStore = create<WorldStore>()(
   persist(
@@ -54,7 +62,9 @@ export const useWorldStore = create<WorldStore>()(
     }),
     {
       name: "wusia-world-v1",
-      version: 27,
+      version: SAVE_VERSION,
+      storage: createJSONStorage<PlayerSave>(() => (CLOUD ? cloudSave.storage : localStorage)),
+      skipHydration: CLOUD,
       // Content backfill also runs for current-version saves (see mergeSave).
       merge: mergeSave,
       // Only persist the data fields, not the action functions.
@@ -73,8 +83,9 @@ export const useWorldStore = create<WorldStore>()(
 
 // The shared world (people, rumors, beasts, the tournament) is kept apart
 // from the player's save and joins the state here, once the save has loaded
-// (zustand's localStorage hydration is synchronous).
-attachSharedWorld(useWorldStore);
+// (zustand's localStorage hydration is synchronous). On a server it joins
+// when a character is entered (store/cloud-session.ts).
+if (!CLOUD) attachSharedWorld(useWorldStore);
 
 // Quest stages waiting on items or kills re-check after ANY change to the bag
 // or the kill tally, whichever action caused it (shop, craft, loot, gift, a

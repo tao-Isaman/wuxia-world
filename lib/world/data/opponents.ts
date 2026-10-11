@@ -1296,15 +1296,6 @@ export const OPPONENTS: readonly OpponentDef[] = [
       extraArtSlots: ["t4_gm_iceweave", "t4_gm_winterstep", "ynxj"],
       artLevels: { t4_gm_iceweave: 10, t4_gm_winterstep: 10, ynxj: 10 },
     }) },
-  { id: "spar_xiaoyao_master", name: "ปรมาจารย์ยุนเซียว", ti: 3, category: "human",
-    // All-T3 loadout — drops a thematic T0 fan manual.
-    drops: [...DROPS_T3, { itemId: "man_nc9", weight: 1 }],
-    build: () => build("ปรมาจารย์ยุนเซียว", 3, {
-      stats: { POW: 8, INT: 8, AGI: 6 },
-      artId: "bmzq", artLevel: 5,
-      skillIds: ["xy_punch", "yxjf"],
-    }) },
-
   // ─── พรรคสราญรมย์ — sect leadership (T1-T4) ────────────────────────
   // T4 master + 7 disciple-line spar opponents.
   { id: "spar_xiaoyao_master_yunxiao", name: "ปรมาจารย์ยุนเซียว", ti: 4, category: "human",
@@ -1388,7 +1379,8 @@ export const OPPONENTS: readonly OpponentDef[] = [
     }) },
 
   { id: "spar_xiaoyao_xiaolan", name: "ศิษย์เสี่ยวหลาน", ti: 1, category: "human",
-    drops: [...DROPS_T1],
+    // The fan primer once carried by an unused T3 copy of the chief.
+    drops: [...DROPS_T1, { itemId: "man_nc9", weight: 1 }],
     build: () => build("ศิษย์เสี่ยวหลาน", 1, {
       stats: { STR: 5, AGI: 4 },
       artId: "t0_xy_plum", artLevel: 4,

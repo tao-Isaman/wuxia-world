@@ -1,4 +1,5 @@
 import { existsSync, statSync } from "node:fs";
+import { isNight, nightLevel } from "../lib/world/clock";
 import { RECORDINGS, REGION_SONGS, STARTS_ON_FIRST, exploringTrack, isDesertPlace } from "../lib/audio/recordings";
 import { regionOf } from "../lib/world/data/regions";
 import assert from "node:assert/strict";
@@ -89,6 +90,24 @@ check("exploring music by place: desert, wilds on roads and wild places, else th
   const seen = new Set<string>();
   for (const id of ["city_suzhou", "city_dali", "sect_wudang", "sect_quanzhen", "sect_huashan", "village_huashan", "sect_emei"]) seen.add(exploringTrack(id, false, regionOf(id)));
   for (const track of ["east", "south", "north"]) assert.ok(seen.has(track), `some place plays ${track}`);
+});
+
+check("one night for the sundial, the veil and the music: 戌 through 寅", () => {
+  for (let t = 0; t < 24; t += 0.25) {
+    const index = Math.floor(t) % 12;
+    assert.equal(isNight(t), index >= 7, `t=${t}`);
+    assert.equal(nightLevel(t) > 0, isNight(t), `t=${t}: the veil darkens exactly when the sundial says night`);
+  }
+  assert.equal(nightLevel(9), 1);
+  assert.ok(nightLevel(7.5) > 0 && nightLevel(7.5) < 1, "dusk deepens through 戌");
+  assert.ok(nightLevel(11.5) > 0 && nightLevel(11.5) < 1, "dawn pales through 寅");
+  const west = ["city_xixia", "city_dunhuang", "village_xixia"].find((id) => !(regionOf(id) in REGION_SONGS) && !isDesertPlace(id));
+  if (west) {
+    assert.equal(exploringTrack(west, false, regionOf(west), false), "world");
+    assert.equal(exploringTrack(west, false, regionOf(west), true), "night");
+  }
+  assert.equal(exploringTrack(null, false, "nowhere", true), "night");
+  assert.equal(exploringTrack("desert_ruins", false, regionOf("desert_ruins"), true), "desert", "the desert song plays day and night");
 });
 
 console.log(`${checks} audio checks passed`);

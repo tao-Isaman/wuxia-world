@@ -565,7 +565,7 @@ const ACT2: readonly StoryChapterSpec[] = [
     title: "แส้ของยายเฉียว",
     summary: "ยายเฉียวแห่งหมู่บ้านไร้นามต้อนแพะด้วยแส้ยาว และไม่เคยบอกใครว่าเคยเป็นใคร — ใครอยากคุยกับนางต้องหลบแส้ได้ก่อน",
     giver: QIAO,
-    require: { t: "statAtLeast", stat: "AGI", min: 90 },
+    require: { t: "statAtLeast", stat: "AGI", min: 80 },
     offer: {
       lines: [
         "เพี้ยะ! แส้หนังเส้นยาวฟาดดินห่างปลายเท้าท่านครึ่งนิ้ว แพะสามตัวหันมามองท่านอย่างเหยียดหยาม",

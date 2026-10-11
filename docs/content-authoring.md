@@ -63,7 +63,7 @@ Run these after any content change:
 
 | Command | Catches |
 | --- | --- |
-| `bun scripts/audit-content.ts` | NPC / quest / scene references that do not resolve; duplicate NPC or quest ids |
+| `bun scripts/audit-content.ts` | NPC / quest / scene references that do not resolve; duplicate NPC or quest ids; drop tables (opponent drops and packs, boss trophies, resource yields and hunt foes, meridian-chart loot, recipe items) |
 | `bun run test:quests` | every quest can be started, progressed and finished from `home_player`; every item and kill quest plays through the real store; every stage has guidance |
 | `bun run typecheck` | wrong field names, bad unions, missing `Record<SectId, …>` entries |
 | `bun run test:navigation` | a painted map whose spawn, NPCs, exits or services cannot be reached |
@@ -76,7 +76,7 @@ These are **advisory** — they fail today for known, harmless reasons, so read 
 - `bun scripts/audit-complete-scenes.ts`
 - `bun scripts/audit-quest-counts.ts`
 
-`audit-content.ts` does **not** check opponent drop tables. Check new `drops` item ids by hand.
+`audit-content.ts` also checks the drop tables: every `drops` / `yields` item id resolves, weights are above 0 and counts are `1 ≤ min ≤ max`; packs, hunting `opponentIds`, boss trophies, meridian-chart loot and recipe items resolve.
 
 ## A location
 
@@ -100,6 +100,7 @@ These are **advisory** — they fail today for known, harmless reasons, so read 
 | `cave_`, `grotto_` | cave (practice, yin/soft bonus) | roadside | practice |
 | `pool_`, `river_`, `sea_`, `lake_` | river (practice, internal bonus) | roadside | practice |
 | `forest_`, `grove_` | forest (practice, yang/external bonus) | roadside | practice |
+| (any wild place with `forest` in its `WILD_PLACES` biomes) | + forest (`isForestPlace`) | — | practice |
 | `desert_`, `tribe_`, `market_` | frontier | roadside | — |
 | anything else | none | roadside | — |
 
@@ -174,7 +175,7 @@ Then run `bun run test:navigation`: every painted map must keep its spawn open a
 
 2. **Talk dialog.** Write the dialog scene (convention `npc_<npcId>_talk`). Give it at least one choice that returns to the location (`next` = the location id), so the player can leave.
 3. **Spar.** Add an opponent (see [An opponent](#an-opponent)). Its id convention is `spar_<sect>_<name>`.
-4. **Quests** attach through the quest's `giverNpcId` / `turnInNpcId`. `NpcDef.questIds` is informational only; no code reads it.
+4. **Quests** attach through the quest's `giverNpcId` / `turnInNpcId` (an NPC has no quest list of its own).
 5. **Art** is resolved by id:
    - Put a 256×256 portrait at `public/npcs/<id>.png` and a 192×192 body at `public/npcs/body/<id>.png`.
    - Add the id to `npc-portrait-ids.ts` and `npc-body-ids.ts`.
@@ -208,7 +209,7 @@ Then run `bun run test:navigation`: every painted map must keep its spawn open a
 - A dialog with neither choices nor `next` is **terminal**: it shows "ปิด", which returns to the last location for free.
 - `visibleIf` hides a choice. When every choice is hidden, the stage shows an escape button.
 - A choice that costs travel (for example, from a location onto a road) is refused as a whole — effects included — when the hero lacks stamina.
-- **Speaker.** The portrait and heading come from the NPC whose `dialogSceneId` is this scene, else from the first `dialogue` line whose `speaker` names an NPC (`lib/world/speaker.ts`): the exact `name`, the name before its "(…)" epithet ("หวงชิงเฉวียน"), a title before a full name, or part of the name of the quest giver / hand-in person of a `qs_<quest>_…` dialog. Prefer the NPC's exact name; any other label ("โจรสลัด", "ยายหลี่") is a walk-on with no portrait.
+- **Speaker.** The portrait and heading come from the NPC whose `dialogSceneId` is this scene, else from the first `dialogue` line whose `speaker` names an NPC (`lib/world/speaker.ts`): the exact `name`, the name before its "(…)" epithet ("หวงชิงเฉวียน"), a title before a full name, a short name listed in `SPEAKER_ALIASES` ("ทูตเซี่ย", "ขุนนางหยาน", "เสี่ยวเฉ่า": a table, since a loose prefix would also catch titles such as "ผู้อาวุโส"), or part of the name of the quest giver / hand-in person of a `qs_<quest>_…` dialog. Prefer the NPC's exact name; any other label ("โจรสลัด", "ยายหลี่") is a walk-on with no portrait, unless `WALK_ON_SPEAKERS` gives it a stock look ("อาจารย์ดาบ" → a swordsman bust, via `npcCharacterId`).
   - When that NPC stands at the current location, the dialog plays over the live map.
   - Otherwise it plays over the place's painting.
 - Scenes that belong to a quest follow the `qs_<questId>_<beat>` naming (see below).
@@ -302,7 +303,7 @@ Then run `bun run test:navigation`: every painted map must keep its spawn open a
 - **Recipe** (`recipes.ts`): `{ id, name, inputs, output, skill, requiredMastery?, usesDropCheck?, basic? }`.
   - `basic: true` puts it on every artisan of that profession for 80 gold.
   - A specialty recipe must be assigned: a row in `CITY_SPECIALTIES` (`{ city, prof, recipeId, price }`) or an artisan's `recipes`.
-  - Only the six craft professions (forge, alchemy, tailoring, chef, jewelry, accessory) have a crafting screen. A recipe for another life skill (mining, drawing…) can be defined, but no UI crafts it.
+  - A recipe of the six craft professions (`ARTISAN_PROFESSIONS`: forge, alchemy, tailoring, chef, jewelry, accessory) is bought and crafted at an artisan; it must be `basic` or a specialty somewhere (`test:systems` checks). A recipe of any other life skill (mining, drawing…) is crafted anywhere from the อาชีพ menu's ประดิษฐ์ tab (`craftsAnywhere`, `FIELD_RECIPES`), with no purchase.
 - **Artisan** (`artisans.ts`):
   - A new city gets all six artisans from one row in `CITIES_WITH_FULL_ROSTER`.
   - A single artisan in a village or sect goes in `SINGLE_PROFESSION_ARTISANS`.
@@ -407,14 +408,14 @@ This touches many files. In order:
    - `lib/world/data/scenes-content/sects/<file>.ts` (barrel: `scenes-content/sects-temples.ts`).
 5. **People.** The registrar and other residents, each with a spar opponent (`spar_<sect>_<name>`).
 6. **Intro quest.** Given by the registrar, with **no** `sectId`:
-   - `prereqs` includes `{ t: "not", of: { t: "anySectMember" } }` and the real gates;
+   - `prereqs` includes `{ t: "not", of: { t: "anySectMember" } }` and the real gates — every leaf of the sect's `joinRequirements` too (`test:systems` checks it; the reward re-checks them at hand-in);
    - stages for the entry task;
    - rewards `joinSect` + `sectPoints`;
    - optional `qs_` offer / complete scenes that collect a fee with `addGold` (a negative amount) and `takeItem`.
 7. **Sect quests.** Repeatable quests and one art quest, all with `sectId`.
 8. **Betrayal.**
    - A `hunter_<sectId>` opponent (tier 4).
-   - A redemption quest `qst_<sectId>_redemption`, gated by `{ t: "sectStatus", sectId, status: "betrayed" }`, whose rewards include `resignSect`.
+   - A redemption quest `qst_<sectId>_redemption` with `sectId`, given by the master on the sect's grounds, gated by `{ t: "sectStatus", sectId, status: "betrayed" }`, whose rewards include `resignSect` (`test:systems` checks every sect has one).
 9. **Lineage and sagas.** A lineage quest for each of the sect's T0–T3 skills and arts, and a saga for each T4, in `lib/world/data/story/<sect>.ts` (registered in `story/index.ts`). See [story-writing.md](story-writing.md).
 10. **Optional.** Add the chief to the Liveness roster.
 11. **Check.** Run `bun scripts/audit-content.ts`, `bun run test:quests`, `bun run test:story`, `bun run typecheck`, and regenerate the reference ([reference/sects.md](reference/sects.md)).

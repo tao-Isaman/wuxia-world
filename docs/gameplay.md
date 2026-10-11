@@ -118,7 +118,7 @@ Everything happens at once; the price is stamina (an action that used to take *h
 
 **Regeneration.** Out of battle, stamina refills on its own in 6 ชั่วยาม (30 real minutes) and HP / MP in 12 (one real hour), whether or not the game is open. Back after a day or more away, a toast and the log say how many days passed (ระหว่างที่ท่านไม่อยู่ ผ่านไป N วัน).
 
-Night falls from about the 8th ชั่วยาม. It only changes the lighting, the sundial and the music.
+Night is the five watches, 戌 to 寅 (ชั่วยาม 7–11; `isNight` in `lib/world/clock.ts`). It only changes the lighting, the sundial, the HUD's ยามค่ำ and the music (the synthesized `night` song where a place has no region song).
 
 ### Resting
 
@@ -171,6 +171,7 @@ Arriving somewhere never triggers anything. Foes turn up while you **walk**: eve
 | --- | --- |
 | **Law** — only with wanted marks | 13 / 21 / 29 / 37 / 45 % for 1–5 marks |
 | **Sect hunter** — only after betraying a sect | 30 % |
+| **Avengers** — for 60 days after killing a member of a sect; three wins over them, or falling to one, ends it | 12 % |
 
 There are no treasure or meeting events.
 
@@ -201,7 +202,7 @@ Each foe lives in some of eleven biomes, and each place and road has its own (`l
 | swamp | marshy valleys, snake isles, poison caves | snakes, centipedes, poisoners, pythons |
 | cave | caves and grottoes | bats, centipedes, bears, cultists |
 
-Foes also grow with your **power**: the larger of `day / 200` and `(9 − best sect rank) / 8`, capped at 1. As power rises:
+Foes also grow with your **power**: the larger of your days in the jianghu `/ 200` (counted from the day your hero started, not the world's day) and your sect standing (how far up your sect's own ladder you have climbed — the best rank you ever held — 0 at entry and 1 at the top, weighed by time in the sect: full after 60 days, so joining a sect adds nothing at once), capped at 1. As power rises:
 
 - the mix shifts from tier 0–1 toward tiers 3–4;
 - elite foes appear, and from power 0.6 the six **tier-5** foes (rarer than tier 4): the nameless sword hermit, the blood blade lord, the poison matriarch, the heretic iron monk, the white tiger and the wolf king with his pack (power tiers 9–10);
@@ -239,7 +240,7 @@ Battles are turn-based tactics on a board of 10 × 7 tiles, growing to 15 × 10 
 
 - **The warning first.** Every fight opens with a briefing before the board: the foe, its companions, and both sides' **power tier** — twelve named steps from สามัญชน to ยอดคนใต้หล้า, each with its own colour (names only, no numbers), scored from stats, inner arts and move skills, never equipment ([combat.md](combat.md#power-tiers)). The verdict reads อันตรายยิ่ง (foe 2+ tiers up), เหนือกว่าเล็กน้อย, สูสี, ด้อยกว่าเล็กน้อย or ด้อยกว่ามาก, and the note says whether a loss can kill. เข้าต่อสู้ (F / Enter) starts the fight; retreating is still possible inside it. The hero's own tier is on the profile.
 
-- **Units.** You are one unit. An accepted encounter can add the foe's companions (up to six); quest fights, spars and hunts are one against one.
+- **Units.** You are one unit. An accepted encounter or a hunt can add the foe's companions (up to six: a boar herd, the alpha wolf's dogs); quest fights and spars are one against one.
 - **Your turn.** Move, then use one of the (up to 10) skills or inner arts in your slots, or รอ (wait), or ถอยหนี (retreat).
 - **Retreat** succeeds 20–90 % by speed. It gives no rewards and costs the turn if it fails.
 - **อัตโนมัติ** lets the AI play for you.
@@ -262,7 +263,7 @@ Walk up to a person and talk. The NPC card offers what that person supports:
 | --- | --- | --- |
 | 💬 ทักทาย | a dialog | their conversation |
 | ⚔ ขอประลอง | anyone not in closed-door training | a non-fatal duel against them; a win gives fame (their authored value, else 1–13 by their strength) and +1 relationship |
-| ⚔ สังหาร | anyone | a fight to the death: win and they are dead for good, the law marks you **wanted 5/5 at once**; lose or flee and it is attempted murder, +2 marks |
+| ⚔ สังหาร | anyone | a fight to the death: win and they are dead for good, the law marks you **wanted 5/5 at once**, and if they belonged to a sect (not yours) it swears vengeance and sends its hunters after you for a while ([liveness.md](liveness.md#sects-avenge-their-dead)); lose or flee and it is attempted murder, +2 marks |
 | quests | they give or receive one | offer, progress and turn-in sections |
 | ขโมย | something to steal (94 NPCs), or a quest asks for it | see [Bad actions](#bad-actions) |
 | ลอบทำร้าย / 🪢 ลักพาตัว | an active quest stage that names them | see [Bad actions](#bad-actions) |
@@ -276,7 +277,7 @@ Walk up to a person and talk. The NPC card offers what that person supports:
 
 ## Quests and tracking
 
-There are 1,074 quests: the 15-chapter main story (เนื้อเรื่องหลัก, [story-writing.md](story-writing.md#the-main-story)), one older main quest, 485 side quests (97 sect quests, 113 lineage quests and 97 place quests) and 573 story chapters in 48 sagas (38 sect sagas, 10 [jianghu sagas](story-quests.md#jianghu-sagas)) — see [Lineage quests and sagas](#lineage-quests-and-sagas).
+There are 1,075 quests: the 15-chapter main story (เนื้อเรื่องหลัก, [story-writing.md](story-writing.md#the-main-story)), one older main quest, 486 side quests (98 sect quests, 113 lineage quests and 97 place quests) and 573 story chapters in 48 sagas (38 sect sagas, 10 [jianghu sagas](story-quests.md#jianghu-sagas)) — see [Lineage quests and sagas](#lineage-quests-and-sagas).
 
 - **Accepting.** Most quests are offered by a person (the **!** mark). Sect quests are taken in the สำนัก menu.
 - **Stages.** A quest has 1–4 stages. The quest log (ภารกิจ) shows each one with ✓ done, ▸ current and ○ still ahead.
@@ -296,7 +297,7 @@ There are 1,074 quests: the 15-chapter main story (เนื้อเรื่�
   - where to go (📍 with the number of roads left).
 
   On the map a jade arrow bobs over the target, or over the exit toward it. An edge pointer shows the way when the target is off screen (or behind the HUD); it never hides under the HUD. **➤ นำทาง** in the log points the arrow at a quest.
-- **Abandoning** (ละทิ้งภารกิจ) fails the quest for good. It can never be taken again.
+- **Abandoning** (ละทิ้งภารกิจ) forgets the quest and its progress: its giver offers it again. What it handed you when you took it (or at a step you had already passed) is not given twice — a lost letter or key comes back, but not gold or anything you could sell.
 - **Losing the giver.** A quest fails when its giver, one of the simulated masters, dies. Lineage quests and saga chapters don't.
 
 ### Lineage quests and sagas
@@ -365,9 +366,11 @@ There are 15 joinable sects and 5 more sect grounds you can only visit.
   - Sect quests pay sect points, and a rank-up spends them: 6250 points in total on a 9-rank ladder, 1850 on a 5-rank ladder, 1600 for กู่มู่.
   - A rank-up pays gold (half the points it costs) and opens more of the sect's lineage quests and sagas. Ranks grant no martial arts: every sect skill and art comes **only** from its lineage quest or saga. The 🎖 ขั้นและวิชา tab lists the tier 0–3 ones (as วิชาลึกลับ until learned) with what each still needs; tier-4 moves stay off the list.
 - **Sect quests** (📜 ภารกิจประจำ) can repeat, each 30 days after you last completed it. Some need a minimum rank, and each sect has one art quest. Art quests teach nothing now: eight are trials that open the lineage quest of their tier-3 art (in the sect window), and seven are secret trials that open a saga (offered only by their giver).
-- **Leaving** (in the sect menu) — either way, you can never join that sect again:
-  - **ลาออกอย่างเป็นทางการ** (resign): you keep the skills, but that sect's skills and arts stop gaining xp in battle.
-  - **ทรยศสำนัก** (betray): evil +5, and the sect's hunter (a tier-4 foe) may ambush you on 30 % of walk ticks. The sect's redemption quest ends the hunt by turning the betrayal into a resignation. สำนักสราญรมย์ has no redemption quest.
+- **Joining.** The intro quest's reward admits you only if you still meet the sect's own rules when you hand it in (`joinRequirements`, no other sect, not a betrayer of it); if not, ask again later on the master's card (🪷 ขอเข้าเป็นศิษย์). One sect at a time.
+- **Leaving** (in the sect menu), whichever way, and whether by the menu, a quest reward or a scene, is logged and talked about:
+  - **ลาออกอย่างเป็นทางการ** (resign): you keep the skills, but that sect's skills and arts stop gaining xp from **every** source (battle, practice, w-exp, quest xp) until you come back. **Rejoining:** 30 days after leaving (`REJOIN_COOLDOWN_DAYS`), the master's card offers 🪷 ขอกลับเข้า… — you start again at the first rank with no points (lineage quests, sagas and art trials you finished stay done), the skills thaw, and climbing back to a rank you held before pays no gold again. The sect menu's สำนักเดิม list shows how long is left.
+  - **ทรยศสำนัก** (betray): evil +5, and the sect's hunter (a tier-4 foe) may ambush you on 30 % of walk ticks. No way back in until the sect's redemption quest (every sect has one, offered by its master to a betrayer) turns the betrayal into a resignation; the 30-day wait then counts from the forgiveness.
+- **Only a disciple in good standing** ranks up or takes the sect's quests (the store's sect actions check it, not just the menu).
 
 Full sect data: [reference/sects.md](reference/sects.md).
 
@@ -389,6 +392,8 @@ Sect styles are never sold in city halls; you learn them by rank inside the sect
 - **Recipes.** Basic recipes cost 80 gold at any artisan of the profession. Specialties are sold only by certain cities' artisans.
 - **What you need.** The recipe learned, the inputs in the bag, the mastery level, and an artisan of that profession here.
 - **Cost.** 2 stamina. The inputs are always used up.
+- **Your own trades.** Recipes of the gathering and cultural skills (mining, hunting, fishing, herbalism, venom, woodcutting, drawing, writing — 12 in all) need no artisan and no bought recipe: the อาชีพ menu's **ประดิษฐ์** tab lists them and crafts them anywhere, as soon as you hold the inputs and the mastery.
+- **Specialties.** ซีเซี่ย's tailor sells the hide coat, หยางโจว's cook the eel stew and its accessory maker the jade pendant.
 
 Full lists: [reference/items-and-crafting.md](reference/items-and-crafting.md).
 
@@ -452,13 +457,16 @@ Where the xp comes from:
 
 Practice:
 
-- **Where:** only at sect grounds, mountains, caves, rivers and temples (49 places).
+- **Where:** only at sect grounds, mountains, forests, caves, rivers and temples (52 places; a forest is a wild place whose land is forest — the three forest valleys, the jungle caves, the wooded peaks and three isles).
 - **Cost:** 30 stamina; it also pays 5 w-exp.
 - **Xp per session:** 30 + 5 % of what the skill or art needs for its next level (`practiceXpGain`), so higher levels still move at a steady pace; a maxed skill gets the flat part only.
 - **Fitting place (50 + 6 %)** for a matching skill type:
   - caves: yin / soft;
   - mountains and sect grounds: balance / hard;
+  - forests: yang / external;
   - rivers: internal.
+
+  A place can be two kinds at once (a wooded peak is mountain and forest); either one fitting is enough.
 
   A skill with no yin / yang / balance tag counts as balance, so it gets the mountain bonus.
 
@@ -627,7 +635,7 @@ At the 🍶 ฟังข่าวลือ spot in a city or inn, you hear up to
 
 Some rumors are exaggerated or false, and the game never says which.
 
-Talk passes with time: news lasts 20 days (big news 40), and once you have heard a rumor it fades within 15 days (a treasure lead 30). The old lore is talk of the days when you set out and fades by day 60; treasure leads stay until you hear them. Arriving in a city, inn or market may also bring a passing word at the bottom of the screen, which fades after a few seconds. Details: [liveness.md](liveness.md).
+Talk passes with time: news lasts 20 days (big news 40), and once you have heard a rumor it fades within 15 days (a treasure lead 30). The old lore is talk of the days when your world began and fades 60 days later; treasure leads stay until you hear them. Arriving in a city, inn or market may also bring a passing word at the bottom of the screen, which fades after a few seconds. Details: [liveness.md](liveness.md).
 
 ## Saving, falling and starting again
 
@@ -639,8 +647,4 @@ Talk passes with time: news lasts 20 days (big news 40), and once you have heard
 
 These are real today and listed in [HANDOFF.md](../HANDOFF.md#known-issues):
 
-- An abandoned quest can never be taken again.
-- Leaving a sect blocks rejoining it forever. สำนักสราญรมย์ has no redemption quest, so its hunters never stop.
-- The 12 non-artisan recipes (drawing, writing, mining, hunting…) have no crafting button.
-- Resigning freezes battle xp only; practice and w-exp still raise frozen sect skills.
 - Market and sect-internal rumors are hard to reach, and heartland inns never hear the masters' news.

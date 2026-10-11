@@ -20,28 +20,19 @@
 
 import { useBattleStore } from "@/store/battle-store";
 import { useWorldStore } from "@/store/world-store";
-import { getOpponent } from "./data/opponents";
-import { getItem } from "./data/items";
-import { applyOpponentStatScale, playerPowerIndex } from "./data/random-events";
-import { worldBattleSetup } from "./battle-looks";
+import { battleSetupFor, worldBattleStart, type BattleSetup } from "./battle-setup";
 import { powerOutlook, powerScore, powerTierOf, type CharacterBuild, type PowerOutlook, type PowerTier } from "../game";
+import { cloudBattle } from "@/store/cloud-battle";
 
-type BattleSetup = NonNullable<ReturnType<typeof worldBattleSetup>>;
+export { battleBag } from "./battle-setup";
+
 // The setup prepared for the current pendingBattle: the briefing shows it and
 // the battle starts with it, so the warning describes the exact fight.
 let prepared: { pending: object; setup: BattleSetup } | null = null;
 
 /** The scaled foe (and pack) for a fight against `opponentId` as things stand now. */
 function setupFor(opponentId: string, withPack?: boolean): BattleSetup | null {
-  if (!getOpponent(opponentId)) return null;
-  const ws = useWorldStore.getState();
-  // Apply progression-based stat scaling RIGHT before the builds are made so
-  // the factories pick up the current OPPONENT_STAT_SCALE module value
-  // (pack members included). Random encounters set this in rollRandomEvent
-  // already; this re-applies for triggerBattle paths (quest fights,
-  // sparring, etc.) too.
-  applyOpponentStatScale(ws);
-  return worldBattleSetup(opponentId, { bodyId: ws.playerBodyId, withPack, power: playerPowerIndex(ws) });
+  return battleSetupFor(useWorldStore.getState(), opponentId, withPack);
 }
 
 /** The setup for the pending battle, built once per pendingBattle. */
@@ -105,23 +96,17 @@ export function ensureBattleStarted(): void {
     ws.clearPendingBattle();
     return;
   }
+  // On the game server the server stages the fight and hands out its seed
+  // (lib/net/cloud-battle.ts); the battle starts when it answers.
+  if (cloudBattle.enabled()) {
+    void cloudBattle.begin();
+    return;
+  }
   prepared = null;
   // Grid battle: the hero (leader) vs the opponent, plus its pack on random
   // encounters (quest / spar fights stay 1v1).
-  bs.start(ws.playerBuild, setup.build, {
-    hpA: ws.currentHp,
-    mpA: ws.currentMp,
-    looks: setup.looks,
-    enemies: setup.enemies,
-    bag: battleBag(ws.inventory),
-  });
-}
-
-/** The hero's battle items (ItemDef.battle) as they go into a fight: item id → count carried. */
-export function battleBag(inventory: Readonly<Record<string, number>>): Record<string, number> {
-  const bag: Record<string, number> = {};
-  for (const [id, n] of Object.entries(inventory)) if (n > 0 && getItem(id)?.battle) bag[id] = n;
-  return bag;
+  const start = worldBattleStart(ws, setup);
+  if (start) bs.start(start.a, start.b, start.opts);
 }
 
 let initialized = false;

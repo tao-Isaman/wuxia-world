@@ -5,6 +5,7 @@ import { playJingle, playMusic, stopMusic, uiSound, unlockAudio } from "@/lib/au
 import type { TrackId } from "@/lib/audio/songs";
 import { exploringTrack } from "@/lib/audio/recordings";
 import { getScene } from "@/lib/world";
+import { isNight } from "@/lib/world/clock";
 import { regionOf } from "@/lib/world/data/regions";
 import { useWorldStore } from "@/store/world-store";
 import { useBattleStore } from "@/store/battle-store";
@@ -22,7 +23,7 @@ export function SoundDirector() {
   const exploring: TrackId = useWorldStore((s) => {
     const kind = getScene(s.currentSceneId)?.kind;
     const place = kind === "location" ? s.currentSceneId : s.lastLocationId;
-    return exploringTrack(place, kind === "route", regionOf(place));
+    return exploringTrack(place, kind === "route", regionOf(place), isNight(s.time));
   });
 
   // Sound may only start from a user gesture: the first tap or key unlocks it.

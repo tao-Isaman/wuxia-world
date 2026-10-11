@@ -13,12 +13,6 @@ export const NPCS_JINYIWEI: readonly NpcDef[] = [
     dialogSceneId: "npc_sect_jinyiwei_leader_zhao_talk",
     sparOpponentId: "spar_jinyiwei_leader",
     sparFameReward: 18,
-    questIds: [
-      "qst_jinyiwei_disciple_intro",
-      "qst_jinyiwei_sect_patrol",
-      "qst_jinyiwei_sect_arms",
-      "qst_jinyiwei_art_godslayer",
-    ],
     defenseTier: 4,
     stealLoot: [
       { itemId: "ancient_coin", weight: 5 },

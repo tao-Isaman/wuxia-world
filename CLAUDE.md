@@ -14,7 +14,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **What the player does:**
 
 - Explores 101 places (100 painted maps) joined by 129 roads.
-- Meets 235 NPCs (30 of them, plus the disciples, heirs and newcomers they bring, live their own lives) and takes 1,074 quests: a 15-chapter main story (เนื้อเรื่องหลัก), 373 hand-written, 113 sect lineage quests (154 moves; 30 of them a choice) and 48 story sagas (573 chapters: 38 sect sagas and 10 long jianghu sagas for the unsect T4 / T5 moves); 511 cutscenes.
+- Meets 235 NPCs (30 of them, plus the disciples, heirs and newcomers they bring, live their own lives) and takes 1,075 quests: a 15-chapter main story (เนื้อเรื่องหลัก), 374 hand-written, 113 sect lineage quests (154 moves; 30 of them a choice) and 48 story sagas (573 chapters: 38 sect sagas and 10 long jianghu sagas for the unsect T4 / T5 moves); 511 cutscenes.
 - Lives in the 3rd year of Jianwen (1401), about 40 years after the legend of the last age (our own story, not a novel's sequel): the court's seized scriptures have just scattered back into the jianghu ([docs/story-writing.md](docs/story-writing.md#timeline-and-the-legends-people)).
 - Joins one of 15 sects and learns 173 move skills and 111 inner arts (plus 18 boss moves and 6 boss arts no one can learn).
 - Hunts foes where they live (habitats), from tier 0 to tier 5, and six legendary beasts (บอส) in their lairs.
@@ -77,17 +77,18 @@ bun run test:npcs
 bun run test:story          # every sect skill/art has a quest; lineage + sagas + cutscenes well formed; all play through
 bun run test:routes         # compass exits, 8-way road paintings and arrival sides; world coords current
 bun run test:places         # place NPCs / quests / activities; every ยุทธจักร T0–T3 move is a quest reward; gifts; presence
-bun run test:systems        # practice xp, letters, horse stations, the sword tournament
+bun run test:systems        # practice xp, letters, horse stations, the sword tournament; sect join / rejoin / redemption, dropped quests
 bun run test:quests         # campaign audit + dead ends + every item/kill/objective quest + guidance + bad-action stages
 bun run test:meridians      # meridian charts: engine, combat bonus, chart items / sources, points, store, repair, content counts
 bun run test:engine         # text overrides over SKILLS / ARTS, the engine's filters / edits / validation, the save route whitelist
 bun run test:docs           # generated reference is current + docs links/paths/commands resolve
 bun run test:foes            # habitats, booster, T5, bosses (lairs, respawn, boss save), spoils
-bun run test:clock           # world clock, syncClock (regen, catch-up), seeded NPC weeks, WorldEvents, save / shared-world split, v27 rebase
+bun run test:clock           # world clock, syncClock (regen, catch-up), seeded NPC weeks, WorldEvents, save / shared-world split (v28 hand-over), v27 rebase
 bun run test:boss-skills     # the boss moves' own effects and boss battles
 bun run test:net             # online client: presence reducer (seq, resync), session (hello, throttle, room switch)
 bun run test:server          # cargo test of server/core: protocol, room decide / apply, accounts, tokens
-bun run test:online          # against a running game server (bun run server:dev): auth, two players in a room
+bun run test:play-server     # the server's TypeScript half without a server: replayable battles, world / battle documents, the checked-battle loop
+bun run test:online          # against a running game server (bun run server:dev): auth, two players in a room, characters, saves, the one world, checked battles
 bun run server:dev           # the Rust game server on wrangler dev :8787 (no config: it makes its own signing key)
 bun run server:deploy        # deploy it to Cloudflare (no secrets to set)
 bun run test:assets         # asset library: manifest contract, files and sizes, footprints, ≥ 3,000 approved; every item / equipment icon
@@ -139,12 +140,12 @@ bun scripts/assets/build-kits.ts plan && python3 scripts/assets/generate.py run 
 ```
 app/, components/         React: screens, HUD, menus, popups, battle UI
    ↓
-store/                    Zustand: world (saved, v27, + the shared world), battle, character (/debug, v3), loading, toast, confirm
+store/                    Zustand: world (saved, v28, + the shared world), battle, character (/debug, v3), loading, toast, confirm
    ↓
 lib/world/  ──────►  lib/game/          pure engines — no React, no DOM, no I/O
    └ battle-bridge.ts: the one place the world and battle stores meet
 lib/stage/ (Phaser, browser only) · lib/characters/ · lib/audio/ · lib/net/ (online client)
-server/                   the game server: Rust on Cloudflare Workers (core = pure decide/apply, worker = Durable Objects)
+server/                   the game server on Cloudflare Workers: Rust (core = pure decide/apply, worker = accounts, saves, rooms) + TypeScript (worker/ts = the shared world and checked battles, running lib/)
 ```
 
 **Import rules:**
@@ -232,7 +233,7 @@ Two deliberate exceptions reach into stores:
   - Every 220 map units walked, `walkTick(pickSpot)` runs; `home_player` and `jail` are safe. There are no treasure or meeting events.
   - **Roaming foes:** on roads and in the wilds, per tick a 30 % chance (80 % while hunting a kill-quest target in this zone) puts a foe that **lives there** on the map (`lib/world/data/habitats.ts`: every place and road has biomes, every fight-event foe its `FOE_HABITATS`; `fightEventsForLocation` filters by them, so the quest guide sends a kill quest to its quarry's habitat). Settled places (`isSettledPlace`: `city_`, `village_`, `home_`, `inn_`, `sect_`, `temple_`, `palace_`, `villa_`, `market_`, `tribe_`) get no stray foes, only an active kill quest's quarry if it lives in town (`rollFoeSpawn`, at most 3; store `roamingFoes`, not saved). The runtime draws them (`presentation.foes`) and walking into one calls `engageFoe` → the encounter screen.
   - The **law** (`lawChance(marks)`, 13–45 %) and the **30 % sect-hunter roll** still catch up at once (`rollWalkEvent`).
-  - Foes are scaled by the hero's power (`max(day/200, (9 − best sect rank)/8)`): tier mix (T5 only from power 0.6), elites, and opponent stats ×(1 + 0.6·power) for **every** battle.
+  - Foes are scaled by the hero's power (`max((day − startDay)/200, (9 − best sect rank)/8)`: the hero's own days, not the world's): tier mix (T5 only from power 0.6), elites, and opponent stats ×(1 + 0.6·power) for **every** battle.
   - **Booster** (`boostBuild`, `opponents.ts`): every T3 foe ×1.6, T4 ×1.45 and NPC-backed fighter (`spar_*`, `npc@`, `lawnpc@`, `hunter_*`, `look.npc`) ×1.4 power score, the larger one. Categories are `human | beast` only — no spirits or demons.
   - **Tier 5** (`t5_*`, power 570–760) and **legendary beasts** (`lib/world/data/bosses.ts`, `boss_*`, power ~1550, ti 5, `boss: true`, minions): each boss waits at its lair spot (a `WorldFoe` with `boss: true` and an animated look), comes back 90 days after it falls (`bossDefeatedDay`, saved), pays `boss.wExp`, its trophy and boss drops. Big foes draw from animated sheets (`lib/characters/anim-sheets.ts`, PixelLab, `scripts/build-anim-sheets.ts`).
   - **Spoils:** beasts drop no gold; win w-exp is `victoryWExp` (people 40 + 20·ti, beasts 80 + 60·ti, bosses their own); move / art xp ×2 against beasts and bosses.
@@ -246,15 +247,16 @@ Two deliberate exceptions reach into stores:
   - Ladders: 9 → 1 (eight sects), 5 → 1 (six) or 3 → 1 (Gumu).
   - Ranks grant no martial arts: a rank-up pays gold (`rankUpGold`, half its point cost) and opens lineage quests and sagas, the **only** way to any sect skill or art (`test:story` enforces it; no rank pool, manual, hall, dialog or other quest may teach one). The one exception is the sword tournament champion's prize pick (below).
   - Sect quests are repeatable after a 30-day cooldown.
-  - Membership status is `active | resigned | betrayed`. Only `active` counts for `sectMember` / `anySectMember`.
-  - Joins go through each intro quest's `joinSect` **reward**, which does not check `joinRequirements`; the intro's `prereqs` are the real gate.
-  - Betrayal brings `hunter_<sectId>`; `qst_<sectId>_redemption` (14 sects; not xiaoyao) turns betrayed into resigned.
+  - Membership status is `active | resigned | betrayed`. Only `active` counts for `sectMember` / `anySectMember`, and the store's sect actions (rank-up, sect quests, leaving) need it.
+  - Joins go through each intro quest's `joinSect` **reward**, which checks `sectJoinCheck` (`lib/world/sects.ts`: `joinRequirements`, one sect at a time, no betrayer); a hero refused there asks later on the master's card (store `joinSect`). `test:systems` checks every intro's `prereqs` carry the `joinRequirements`.
+  - Leaving (resign / betray, by the menu, a quest reward or a scene) logs, echoes and (betrayal) adds evil +5 inside the effect. A resigned sect's moves get no xp from any source; it takes the hero back `REJOIN_COOLDOWN_DAYS` (30) after `leftDay`, from the first rank (`bestRank` stops rank-up gold paying twice).
+  - Betrayal brings `hunter_<sectId>`; `qst_<sectId>_redemption` (all 15 sects, offered by the master to a betrayer) turns betrayed into resigned.
 - **Liveness** (`npc-tick.ts`, `npc-life.ts`, `rumor-engine.ts`; [docs/liveness.md](docs/liveness.md)). Thirty people (15 chiefs, 5 seconds, 10 wanderers in `npcs/wanderers.ts`) plus generated ones (`dynamic`, ≤ 48: disciples, heirs, newcomers; registered with `registerDynamicNpc`) live in `npcExt`. Every `syncClock`:
   - runs each whole week since `lastNpcTickDay` (8 in full, the rest only age; leftover days carry over; each week's dice from `seededRng(worldSeed, day)`): a year on each `birthday`, death odds by age and strength (`deathChance`), training, goals, a journey leg on the real roads (`roadPath`), else a choice from their `temper` (`decide`: wander, join a sect, duel a rival, seclusion, take a disciple, leave a sect, marry; people with an active hero quest stay put);
   - fills empty seats (`fillEmptySeats`: an elder, else a generated one) — the dead chief's map spot and quests pass to the heir (`heirId`, `questHolder`, `heldQuests`); `withChargesOfDead` moves or fails active quests of the newly dead;
   - maintains rumors (caps 200 / 500, archive after 365 days).
 
-  The dead are on no map (`npcPresent`); anyone else stands where `npcsAt` says (travellers on a free spot). NPC-event rumors are always true; talk spreads by age (`rumorReaches`: heartland after 10 days, big news everywhere after 10). Rumors fade: news 20 days (big 40), 15 once heard, flavour lore by day 60.
+  The dead are on no map (`npcPresent`); anyone else stands where `npcsAt` says (travellers on a free spot). NPC-event rumors are always true; talk spreads by age (`rumorReaches`: heartland after 10 days, big news everywhere after 10). Rumors fade: news 20 days (big 40), 15 once heard, flavour lore 60 days after the world seeds it (`LORE_FLAVOUR_DAYS`).
 - **Anyone can be fought.** ขอประลอง works on every NPC (`startSparWith`; without `sparOpponentId` they fight as `npc@<id>@<power>@<sect>`, built in `opponents.ts`), and ⚔ สังหาร (`startKillDuel`, `pendingBattle.killNpcId`) is a fight to the death: a win kills them (`heroKills`: dead for good, quests pass on or fail, `wanted = 5`, `kill_npc` echo; killing a sect-mate is betrayal), a loss or flight adds 2 marks.
 - **Lineage quests and sagas** (`lib/world/story/`, content in `lib/world/data/story/`). Compact specs compile into quests, dialogs and cutscenes ([docs/story-quests.md](docs/story-quests.md)).
   - **The main story** (`data/story/main.ts`, a `MainArcSpec`): 15 chained chapters `st_main_<nn>` (type `main`, no move at the end), offered by ป้าหลิว at home from the first moment of a new game; 12 films tell the age and the hero's father.
@@ -284,7 +286,7 @@ Two deliberate exceptions reach into stores:
 
 ## Stores (`store/`)
 
-- **`world-store.ts`** is saved as `wusia-world-v1`, **version 27** (the player only); the shared world is saved apart (`wusia-shared-v1`, below).
+- **`world-store.ts`** is saved as `wusia-world-v1`, **version 28** (`SAVE_VERSION`, `store/world/save-version.ts`; the player only); the shared world is saved apart (`wusia-shared-v1`, below).
   - Actions draft a copy (`draftFrom`, **one level deep** — nested quest, sect and NPC entries are shared), call engine functions, then `set`.
   - **Time is the world clock** (`lib/world/clock.ts`): 1 game day = 1 real hour (12 ชั่วยาม of 5 real minutes), from `WORLD_EPOCH_MS` (day 1). No action moves time: `draftFrom` brings every draft to the clock (`syncClock`, `store/world/lifecycle.ts`: day / time, stamina back in 6 ชั่วยาม and HP / MP in 12, wanted decay, the NPC tick, rumors, and on a new day letters and the tournament), and `WorldClock` (`components/world/world-clock.tsx`) syncs every 10 s (a toast after a day or more away). Actions that used to take time are instant and cost stamina (`staminaForHours`); free rests have a 2-ชั่วยาม cooldown, jail is served in real time. Tests pin it: `setTestClock` / `setTestWorldTime` / `advanceTestClock`.
   - The player-visible log uses `appendActionLog` (newest 100).
@@ -313,11 +315,13 @@ Two deliberate exceptions reach into stores:
 
 ## Online (`server/`, `lib/net/`; [docs/online.md](docs/online.md))
 
-- **Server:** a Cloudflare Worker in Rust. `server/core` is pure and event-based (`Room::decide` → events → `Room::apply`; `Account` from its events; signed HMAC tokens), tested with `cargo test`; `server/worker` is the glue: `AccountObject` (a Durable Object per username), `RoomObject` (one per map id, hibernating WebSockets, each socket's attachment holds its `Presence`) and `KeyObject` (makes and keeps the token-signing key, so deploys need no secret).
+- **Server:** one Cloudflare Worker, two halves. The entry is TypeScript (`server/worker/ts/entry.ts`): it answers `/world…` and `/characters/<id>/battle/…` with the game's own engines and hands everything else to the Rust half (`wuxia-rust`, worker-build's output). Rust: `server/core` is pure and event-based (`Room::decide` → events → `Room::apply`; `Account` from its events; signed HMAC tokens; `save.rs` checks), tested with `cargo test`; `server/worker/src` is the glue: `AccountObject` (a Durable Object per username), `RoomObject` (one per map id, hibernating WebSockets, each socket's attachment holds its `Presence`) and `KeyObject` (makes and keeps the token-signing key, so deploys need no secret). TypeScript: `WorldObject` and `BattleObject` (below). Every Durable Object name starts with the data generation `DATA_EPOCH` (`"2"`, in `src/lib.rs` and `ts/env.ts`); raising it starts the server over (no accounts, saves or world).
 - **Protocol:** `server/core/src/protocol.rs` ↔ `lib/net/protocol.ts` — keep them in step and bump `PROTOCOL_VERSION` on both. Client commands `hello` / `move` / `sync` / `ping`; server `welcome` (snapshot at `seq`) / `event { seq, ev }` (`joined`, `moved`, `left`) / `pong` / `error`.
 - **Client:** `onlineSession` (`lib/net/session.ts`) holds one socket for the map the hero is on. The map runtime drives it every frame through `presentation.online.report(motion)` (bound per map in `world-canvas.tsx`) and draws `players()` (`updateRemotes`, gold name tags, `data-remote-players`). Moves are throttled to 100 ms; an idle map closes the socket after 15 s.
-- **Flow (with a server): account → character → play.** `WorldScreen` shows the title screen while there is no valid login, even with a save (`AccountStep`: สมัครใหม่ / มีบัญชีแล้ว), then the character form, then the game; signing out returns to the account step. `store/online-store.ts` (`wuxia-online-v1`; sign-out keeps the username), the HUD's 🌐 button (`online-panel.tsx`), `OnlineBridge` in `app/page.tsx`. Online shows only with a server: `localStorage["wuxia-game-server"]` or `NEXT_PUBLIC_GAME_SERVER_URL`.
-- Only presence is online; the save and the shared world are still local.
+- **Flow (with a server): account → character → play.** `WorldScreen` shows the title screen while there is no valid login or no character entered (`AccountStep`: สมัครใหม่ / มีบัญชีแล้ว, then `CharacterSelect`, the hero form for a new one), then the game; the character last played is re-entered on load; signing out returns to the account step, เปลี่ยนตัวละคร to the list. `store/online-store.ts` (`wuxia-online-v1`; sign-out keeps the username), the HUD's 🌐 button (`online-panel.tsx`), `OnlineBridge` in `app/page.tsx`. Online shows only with a server: `localStorage["wuxia-game-server"]` or `NEXT_PUBLIC_GAME_SERVER_URL`.
+- **Characters and saves on the server** (`server/core/src/save.rs`, `lib/net/cloud-save.ts`, `store/cloud-session.ts`, [docs/online.md](docs/online.md#characters-and-saves)): with a server set, an account has up to 4 characters (select / create / delete, `character-select.tsx`); the world store's persist storage is the server (`skipHydration`, hydrated on entering a character). The server keeps a save only if it builds on its `rev`, comes ≥ 1 s after the last, keeps the hero's name and the game's limits, and gold rises no faster than the server's grants (checked wins) plus the allowance (100,000, +3,000 / min). Without a server (dev, tests) the save stays local, as before.
+- **One shared world, run by the server** (`server/worker/ts/world-doc.ts` · `world-object.ts`, `store/cloud-world.ts`, [docs/online.md](docs/online.md#the-shared-world)): one `WorldObject` keeps the simulated people and the rumors and runs them (each request brings it to the clock; an hourly alarm). The browser stops simulating (`setServerRunsWorld`, checked in `syncClock`), polls `GET /world` every minute with its hero's quest people (`pins`, kept home) and lays the world over the state (`applyServerWorld`, settling quests of the newly dead). The hero's deeds go as echoes (`POST /world/echo`: action id + archetype / place / sect, never text); the server writes the rumor. Killings outside checked fights, kidnappings, felled beasts and the tournament are each player's own (save v28, `PLAYER_FROM_WORLD_KEYS`).
+- **Battles checked by the server** (`server/worker/ts/battle-doc.ts` · `battle-object.ts`, `store/cloud-battle.ts`, [docs/online.md](docs/online.md#battles-on-the-server)): going in, the browser saves and the server stages the saved `pendingBattle` (`worldBattleStart`, `lib/world/battle-setup.ts`) with a seed; the battle plays here as commands (`lib/game/grid/session.ts`, every engine call under `withRandom(seed)`) and its log streams to the server, which replays it; at the end the server's verdict and spoils (`rollVictorySpoilsFrom`, `lib/world/spoils.ts`) are what `acknowledgeBattleResult` applies (the result panel waits). A win's gold is granted to the save allowance, a felled beast rests per character, a won ⚔ สังหาร of a simulated person kills them in the world. Quests, shops and crafting still run in the browser.
 
 ## Rendering (`lib/stage/`)
 
@@ -343,7 +347,7 @@ Two deliberate exceptions reach into stores:
 
 ## UI and theme
 
-- **Root.** `components/world/world-screen.tsx` picks a view: start → game over → battle → encounter → mapped location (+ dialog over the same canvas) → dialog over a painting → road map → the classic card layout (only `world_journey` and 14 unpainted roads).
+- **Root.** `components/world/world-screen.tsx` picks a view: start → game over → battle → encounter → mapped location (+ dialog over the same canvas) → dialog over a painting → road map → the classic card layout (only `world_journey` and 13 unpainted roads).
 - **HUD** (mobile first):
   - top left, stacked: the vitals card (HP / MP / พลัง gauges, no portrait; `hud-vitals.tsx`) over the icon grid: 1 โปรไฟล์ 2 ย่าม 3 วิชา 4 อาชีพ 5 ภารกิจ 6 สำนัก 7 บันทึก 8 จดหมาย (unread badge) 9 ชีพจร (badge: unspent points that can open something), then ♪ and install;
   - purse, sundial and day at the top right, with the quest tracker below;
@@ -352,6 +356,7 @@ Two deliberate exceptions reach into stores:
   - the จุดหมาย list of markers in tabs.
 - **Landscape only.** A portrait viewport turns the whole `body` 90° (`app/globals.css`). So:
   - never use raw `vw` / `vh` — use `calc(N * var(--vh))` (`--vw`, `--vh`, `--dvw`, `--dvh` swap in portrait);
+  - never use raw `env(safe-area-inset-*)` — use `var(--safe-top)` / `--safe-right` / `--safe-bottom` / `--safe-left` (`app/globals.css`; they follow the turned page). `test:runtime` fails on either;
   - write media queries for both orientations (`(orientation: landscape) and (max-height: 500px), (orientation: portrait) and (max-width: 500px)`); Tailwind breakpoints are already raw queries of that shape;
   - map pointer client coordinates through `lib/ui/landscape.ts` (`toPagePoint`, `toClientPoint`, `pageRect`).
 - **Menus don't scroll.** A menu section is `<Modal fill>` with `.menu-cols > .menu-col` columns and `.menu-tabs` (`app/menu-layout.css`); long collections page with `PagedGrid` (`components/ui/paged-grid.tsx`, `useShortScreen` for phone cell sizes). Done for โปรไฟล์ (ฉายา: `lib/world/epithet.ts`), ย่าม (paper doll + item window), วิชา, อาชีพ, จดหมาย; ภารกิจ / สำนัก / บันทึก still scroll.
@@ -397,7 +402,7 @@ Content changes need **no save version bump**. Removed ids are dropped on load.
 
 ## Saves
 
-- **Keys.** The player's save is `localStorage["wusia-world-v1"]`, **version 27**; the shared world `localStorage["wusia-shared-v1"]` (`{ version: 1, world }`). The "wusia" spelling is historical — never rename either.
+- **Keys.** The player's save is `localStorage["wusia-world-v1"]`, **version 28**; the shared world `localStorage["wusia-shared-v1"]` (`{ version: 1, world }`). The "wusia" spelling is historical — never rename either.
 - **Migration.** `migrate` is one idempotent normalizer; its one `fromVersion` step is v27's: a save from before is shifted onto the world clock (`rebaseDays`, `lib/world/shared/rebase.ts`: every day stamp moves by `worldNow().day − save.day`; jail cut to ≤ 12 ชั่วยาม; a running tournament dropped). The persist `merge` also back-fills lore rumors and people on every load, and `onRehydrateStorage` runs `validateAndRepair`.
 - **Adding a persisted field:**
   1. `WorldStateData` + `emptyData()`;
@@ -411,8 +416,8 @@ Content changes need **no save version bump**. Removed ids are dropped on load.
 ## Gotchas
 
 - **Store warnings.** `test:law`, `test:grid`, `test:grid-ai` and `test:quests` print harmless `[zustand persist middleware] Unable to update item` warnings.
-- **Quests are one-shot.** `abandonQuest` fails a quest for good (it can't be re-accepted) — except lineage quests, saga chapters and sect art trials, which it forgets so they come back. Leaving a sect blocks rejoining it.
+- **Dropped quests come back.** `abandonQuest` forgets any quest so it is offered again; `flags["qdropped:<id>"]` makes `applyEffects` skip the gifts of its start (and of stages already entered) when it is taken again (unsellable items are only topped up). A sect left by resigning can be rejoined after 30 days; a betrayed one only after its redemption quest.
 - **`_setFlag` looks dev-only but isn't.** The quest-log pin (`trackedQuestId`) and the rumor banner use it.
 - **Advisory audits fail by design.** `audit-quest-counts.ts`, `audit-complete-scenes.ts` and `audit-quest-flow.ts` report known false positives.
-- **`sharp`** is used by the image scripts but comes in through Next; it is not in `package.json`.
+- **`sharp`** (the image scripts) is a dev dependency at the version Next brings.
 - **More.** [HANDOFF.md](HANDOFF.md#known-issues) lists every known issue.

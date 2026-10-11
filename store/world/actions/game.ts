@@ -2,7 +2,7 @@
 import { deriveAll } from "@/lib/game";
 import { useBattleStore } from "@/store/battle-store";
 import { applyEffects, getScene, START_SCENE_ID, heroBodyFor } from "@/lib/world";
-import { fadeHeardRumor, RUMOR_SEEN_CAP } from "@/lib/world/rumor-engine";
+import { fadeHeardRumor, noteLeadHeard, RUMOR_SEEN_CAP } from "@/lib/world/rumor-engine";
 import { sharedSlice } from "@/lib/world/shared/world";
 import type { WorldStateData } from "@/lib/world";
 import { joinSharedWorld } from "../shared-local";
@@ -31,6 +31,8 @@ export const gameActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "syn
     fresh.day = start.day;
     fresh.time = start.time;
     fresh.wantedDay = start.day;
+    // The hero's own first day: progress (foe power…) counts from here.
+    fresh.startDay = start.day;
     joinSharedWorld(fresh, null);
     fresh.hasGame = true;
     const build = STARTER_BUILD();
@@ -81,8 +83,11 @@ export const gameActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "syn
     });
     // Cap matches RUMOR_SEEN_CAP — drop oldest first (FIFO).
     while (log.length > RUMOR_SEEN_CAP) log.shift();
+    // A lead (lore with leadsTo) is remembered until the hero follows it.
+    const flags = { ...s.flags };
+    noteLeadHeard({ flags }, rumorId);
     // Heard news fades: it lasts at most RUMOR_HEARD_DAYS more.
-    set({ rumorSeenLog: log, rumorPool: fadeHeardRumor(s.rumorPool ?? [], rumorId, s.day) });
+    set({ rumorSeenLog: log, flags, rumorPool: fadeHeardRumor(s.rumorPool ?? [], rumorId, s.day) });
   },
 
   _setFlag: (flag, value) =>

@@ -1,4 +1,5 @@
-import { clamp } from "@/lib/utils";
+// lib/game imports nothing outside itself (the game server bundles it alone).
+const clamp = (v: number, min: number, max: number): number => Math.min(Math.max(v, min), max);
 
 // Hit % formula: 80 baseline, ±0.25 per (Acc - Eva), clamped [5, 95].
 export function hitPct(acc: number, eva: number): number {

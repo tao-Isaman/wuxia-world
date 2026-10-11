@@ -47,6 +47,8 @@ test("walking brings foes onto the map; walking into one opens its encounter wit
   const box = (await world.boundingBox())!;
   const encounter = page.getByTestId("encounter-screen");
   for (let i = 0; i < 8; i++) {
+    // Contact may already have opened the encounter (it replaces the map).
+    if (await encounter.isVisible()) break;
     const point = await world.evaluate((host: Host, at) => host.worldScreenPoint!(at[0], at[1]), [fx, fy] as [number, number]);
     const margin = 60;
     const inside = point.x > box.x + margin && point.x < box.x + box.width - margin && point.y > box.y + margin && point.y < box.y + box.height - margin;

@@ -1,5 +1,6 @@
 import type { SkillType } from "@/lib/game";
 import type { LocationCategory, LocationScene } from "./types";
+import { biomesOf } from "./data/habitats";
 
 // Practice / category bonus rules.
 //
@@ -43,12 +44,30 @@ export const CATEGORY_TYPE_BONUS: Partial<
   river: ["internal"],
 };
 
+/**
+ * A wild place whose land is forest (habitats.ts lists "forest" among its
+ * biomes: the flower and butterfly valleys, the jungle caves, wooded peaks
+ * and isles). No location id carries a `forest_` / `grove_` prefix, so this
+ * is where the forest category comes from today.
+ */
+export function isForestPlace(locationId: string): boolean {
+  const biomes = biomesOf(locationId);
+  return biomes.includes("forest") && !biomes.includes("town");
+}
+
 // Infer a default category list from the location id when the scene has no
 // explicit `categories` field. Mirrors the prefix scheme used elsewhere in
-// the world data so the 80+ existing leaves don't need migrating.
+// the world data so the 80+ existing leaves don't need migrating; a forest
+// place (`isForestPlace`) also gets "forest".
 export function inferCategoriesFromId(
   locationId: string,
 ): readonly LocationCategory[] {
+  const cats = categoriesFromPrefix(locationId);
+  if (!cats.includes("forest") && isForestPlace(locationId)) return [...cats, "forest"];
+  return cats;
+}
+
+function categoriesFromPrefix(locationId: string): readonly LocationCategory[] {
   if (locationId.startsWith("city_")) return ["city"];
   if (locationId.startsWith("village_")) return ["village"];
   if (locationId.startsWith("inn_")) return ["inn"];

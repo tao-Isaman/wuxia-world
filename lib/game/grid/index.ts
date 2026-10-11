@@ -5,3 +5,4 @@ export * from "./skill-grid";
 export * from "./engine";
 export { pairContext, makeDuelView, commitDuelView, resolveDuel, tickUnit, type DuelCast } from "./duel";
 export * from "./ai";
+export * from "./session";

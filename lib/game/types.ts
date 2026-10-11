@@ -249,8 +249,12 @@ export type ArtPassiveEffect =
   | { t: "stack_atk"; v: number; mx: number }
   // Boss passive: the same frenzy as the self-effect (Atk +v % at full HP → mx % at 0 HP).
   | { t: "frenzy"; n?: string; v: number; mx: number; u: number }
-  | { t: "mult_iatk" }
-  | { t: "mult_atk" };
+  // Damage passives, read by calcSkillDamage / resolveArtActive (not the
+  // dispatcher) for the primary art: `mult_iatk` raises IA by `v` % on
+  // internal attacks (default 12), `mult_atk` the Atk term by `v` % (default
+  // 10; with a `use_int` trigger only on internal attacks).
+  | { t: "mult_iatk"; v?: number }
+  | { t: "mult_atk"; v?: number };
 
 export interface ArtPassive {
   tr: ArtPassiveTrigger;

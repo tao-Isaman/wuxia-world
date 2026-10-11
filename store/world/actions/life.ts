@@ -33,10 +33,13 @@ export const lifeActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "gat
         resourceId: res.id,
         returnSceneId: s.currentSceneId,
       };
+      // A hunted beast brings its pack (a boar's herd, the alpha wolf's
+      // dogs) like any other encounter on the grid.
       draft.pendingBattle = {
         opponentId: oppId,
         onWin: s.currentSceneId,
         onLose: s.currentSceneId,
+        withPack: true,
       };
       // Legacy flag: nothing reads it since encounters moved to walk ticks.
       draft.flags._skipEventRoll = true;

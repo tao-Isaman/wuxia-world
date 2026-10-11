@@ -13,15 +13,6 @@ export const NPCS_WUDANG: readonly NpcDef[] = [
     dialogSceneId: "npc_sect_wudang_master_qingxu_talk",
     sparOpponentId: "spar_wudang_master_qingxu",
     sparFameReward: 18,
-    questIds: [
-      "qst_wudang_disciple_intro",
-      "qst_wudang_sacred_herb",
-      "qst_wudang_traitor_disciple",
-      "qst_wudang_mountain_seal",
-      "qst_wudang_sect_patrol",
-      "qst_wudang_sect_herb_run",
-      "qst_wudang_art_yinyang",
-    ],
     defenseTier: 4,
     stealLoot: [
       { itemId: "herb", weight: 4 },

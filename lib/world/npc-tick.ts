@@ -37,6 +37,11 @@ import {
 
 export interface TickOptions {
   currentDay: number;
+  /**
+   * People some player has open business with (the game server gathers them
+   * from every player): they stay put like the hero's own quest people.
+   */
+  held?: Iterable<string>;
   /** Random source (tests pass a seeded one). */
   rng?: () => number;
   /**
@@ -478,6 +483,7 @@ export function tickAllNamedNpcs(state: WorldStateData, opts: TickOptions): void
     const day = state.lastNpcTickDay + week * TICK_INTERVAL_DAYS;
     const rng = weekRng(day);
     const held = heldByHero(state);
+    for (const id of opts.held ?? []) held.add(id);
     for (const id of Object.keys(state.npcExt)) liveWeek(state, id, day, rng, held);
     fillEmptySeats(state, day, rng);
     welcomeNewcomers(state, day, rng);

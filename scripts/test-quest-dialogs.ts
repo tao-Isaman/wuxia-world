@@ -13,6 +13,7 @@ import assert from "node:assert/strict";
 import { NPCS, QUESTS, SCENES, SCENES_BY_ID, START_SCENE_ID, evaluateCondition, getNpc, getQuest, getScene, type Condition, type DialogScene, type Scene, type SceneEffect } from "../lib/world";
 
 import { dialogSpeaker, npcForSpeaker, questIdOfScene, sceneCast } from "../lib/world/speaker";
+import { npcCharacterId } from "../lib/characters/catalog";
 
 const memory = new Map<string, string>();
 Object.defineProperty(globalThis, "localStorage", { configurable: true, value: {
@@ -24,6 +25,7 @@ Object.defineProperty(globalThis, "window", { configurable: true, value: { local
 const { useWorldStore } = await import("../store/world-store");
 const { useBattleStore } = await import("../store/battle-store");
 const { ensureBattleStarted } = await import("../lib/world/battle-bridge");
+const { staminaForHours } = await import("../store/world/lifecycle");
 const store = () => useWorldStore.getState();
 let checks = 0;
 function check(name: string, run: () => void) { run(); checks++; console.log(`PASS ${name}`); }
@@ -110,6 +112,14 @@ check("speaker labels find their NPC's portrait; walk-ons and the hero find nobo
   assert.equal(id("เถ้าแก่โจว"), undefined, "…but only for that giver's dialogs");
   assert.equal(id("ซี", "qs_qst_spy_yangzhou_smuggler_ship_offer"), "spy_yangzhou_xi");
   for (const walkOn of ["{hero}", "โจรสลัด", "ยายหลี่", "นักรบเศร้า", "หมอดูปลอม"]) assert.equal(id(walkOn, "qs_qv_hengshan_winter_aid_deliver"), undefined, walkOn);
+  // The sagas' short names for registered people (SPEAKER_ALIASES)…
+  assert.equal(id("ทูตเซี่ย"), "evil_xueyu_envoy_xie");
+  assert.equal(id("ขุนนางหยาน"), "evil_changan_corrupt_official_yan");
+  assert.equal(id("เสี่ยวเฉ่า"), "home_beichou_herder_cao");
+  // …and a walk-on with a stock look: a bust of that archetype, no portrait.
+  assert.equal(id("อาจารย์ดาบ"), "walkon_swordsman");
+  assert.equal(npcCharacterId("walkon_swordsman"), "m1");
+  for (const label of ["ผู้อาวุโส", "หัวหน้าโจร", "นักฆ่า"]) assert.equal(id(label), undefined, `${label} is a title, not a person`);
   // Every hand-written quest dialog that names a known person names the right one.
   for (const scene of SCENES) {
     if (scene.kind !== "dialog" || !scene.id.endsWith("_offer")) continue;
@@ -186,8 +196,11 @@ check("the red glow: the full-moon dive brings up the ore Tan keeps", () => {
   fresh("pool_heilong");
   useWorldStore.setState({ npcStates: { wld_heilong_fisherman_tan: { met: true, relationship: 20 } } as never });
   accept("qw_heilong_depths_secret");
+  useWorldStore.setState({ stamina: 100 });
   useSpot("qw_heilong_depths_secret");
   assert.equal(store().currentSceneId, "qs_qw_heilong_depths_secret_investigate");
+  // A dialog spot that takes time (the night-long dive, hours: 4) costs its stamina.
+  assert.equal(store().stamina, 100 - staminaForHours(4), "the dive costs four ชั่วยาม of stamina");
   choose(/เก็บตัวอย่าง/);
   assert.equal(stageId("qw_heilong_depths_secret"), "report", "holding the ore skips the mining stage");
   store().gotoScene("qs_qw_heilong_depths_secret_complete");

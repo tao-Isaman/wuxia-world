@@ -102,12 +102,12 @@ export type PracticeMusicResult =
 
 // Result of attempting to level up a move skill via either xp source.
 export type LevelUpSkillResult =
-  | { ok: false; reason: "unknown" | "maxed" | "insufficient" }
+  | { ok: false; reason: "unknown" | "maxed" | "insufficient" | "frozen" }
   | { ok: true; skillId: string; level: number; cost: number };
 
 // Result of attempting to level up an inner art via w-exp.
 export type LevelUpArtResult =
-  | { ok: false; reason: "unknown" | "maxed" | "insufficient" }
+  | { ok: false; reason: "unknown" | "maxed" | "insufficient" | "frozen" }
   | { ok: true; artId: string; level: number; cost: number };
 
 // Result of attempting to forget a learned skill / art. Forgetting
@@ -129,7 +129,7 @@ export type ForgetArtResult =
 
 // Result of attempting "ฝึกฝน" on a learned skill / art at a location.
 export type PracticeResult =
-  | { ok: false; reason: "no-build" | "stamina" | "unknown" | "not-allowed" }
+  | { ok: false; reason: "no-build" | "stamina" | "unknown" | "not-allowed" | "frozen" }
   | {
       ok: true;
       kind: "skill" | "art";
@@ -178,17 +178,8 @@ export type BadActionResult =
   | { ok: true; outcome: "failed"; chance: number };
 
 /** A won fight's spoils, shown on the result panel before the player goes on. */
-export interface VictorySpoils {
-  gold: number;
-  wExp: number;
-  items: { itemId: string; count: number }[];
-  /** Battle xp per move skill / inner art used (frozen sect moves left out). */
-  moves: { id: string; kind: "skill" | "art"; xp: number }[];
-  /** A hunt's carcass roll (null when the fight was no hunt). */
-  hunt: { items: { itemId: string; count: number }[]; passed: boolean } | null;
-  /** Equipment ids won (a legendary beast's rare drop); they go to the gear bag. */
-  gear?: string[];
-}
+import type { VictorySpoils } from "@/lib/world/spoils";
+export type { VictorySpoils };
 
 // Rest tiers: one's own bed (or one's own sect's grounds, as an active disciple) (home_player), an inn, a temple, the roadside.
 export type RestKind = "home" | "sect" | "inn" | "temple" | "route";

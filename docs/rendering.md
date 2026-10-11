@@ -54,7 +54,7 @@ How the game is drawn and operated: the Phaser stage, the world map runtime, col
 7. **A location with a painted map** — `LocationView` over the Phaser canvas. A dialog that continues a conversation at that place keeps the **same keyed canvas** mounted, read-only, with `DialogStage` on top.
 8. **Any other dialog** — `MapBackdrop` (the place's painting at 40 %) + `DialogStage`, titled by the first speaker.
 9. **A road with a painting** — `RouteMapView`.
-10. **Otherwise** — the classic cream card layout (`StatusBar`, `MenuBar`, `LocationView` / `RouteView`). Only `world_journey` and 14 unpainted roads reach it.
+10. **Otherwise** — the classic cream card layout (`StatusBar`, `MenuBar`, `LocationView` / `RouteView`). Only `world_journey` (the legacy random-teleport hub, reached from the tutorial's `start` / `ending_good` dialogs) and 13 unpainted roads reach it.
 
 `LoadingOverlay`, `ToastStack` and `ConfirmDialog` are mounted beside every branch.
 
@@ -141,7 +141,7 @@ Both runtimes are loaded with a dynamic `import()` in the browser only. The host
 - **Guide arrow.** A jade arrow bobs over the marker flagged `guide` (the tracked quest's target). When that marker is off screen, a pulsing edge pointer turns toward it. Published as `data-guide-marker`.
   - **Never under the HUD.** HUD boxes over the map carry `data-hud-occluder` (the vitals + menu stack, purse and sundial, quest tracker, law chips, rest button, action button, places control, the extras button); the runtime measures them once a frame while the guide needs them (`hudOccluders`; boxes come and go — the action button appears beside a marker). An arrow they would cover turns into the edge pointer, and the pointer slides in along its ray toward the screen centre — still pointing the same way — until it clears every box. Its host-pixel spot is published as `data-guide-edge` (`x,y`). Give any new HUD box over the map `data-hud-occluder`.
 - **Occluders.** Foreground cut-outs from the painting, sorted against feet (`world-occlusion.ts`). Only `home_player` and `city_capital` have them.
-- **Lighting.** A flat veil over the scene (`world-lighting.ts`). Night fades in from ชั่วยาม 8 and is full from 9. Lantern pools exist only on `home_player` and `city_capital`; they flicker at about 10 fps, except under reduced motion.
+- **Lighting.** A flat veil over the scene (`world-lighting.ts`). Its darkness is `nightLevel(time)` (`lib/world/clock.ts`): night is the five watches 戌–寅 (ชั่วยาม 7–11), deepening through 戌, full from 亥 and paling through 寅 — the same night the sundial, the HUD's ยามค่ำ and the music use. Lantern pools exist only on `home_player` and `city_capital`; they flicker at about 10 fps, except under reduced motion.
 - **Vignettes.** `capitalVignette` (`world-vignettes.ts`) adds story props on `city_capital` only:
   - clinic supplies and a waiting elder once the clinic errand is done;
   - the archive chest, closed or open by `capital_ledger_recovered`.
@@ -192,7 +192,7 @@ Both runtimes are loaded with a dynamic `import()` in the browser only. The host
 - chess and begging on a street corner;
 - nature nodes at the map edge.
 
-Anything that does not fit is listed in the **"อื่น ๆ ในบริเวณนี้" drawer** (`.journey-extras`). Six maps show the drawer today:
+Anything that does not fit is listed in the **"อื่น ๆ ในบริเวณนี้" drawer** (`.journey-extras`; its button rides in the HUD's top-right stack under the quest tracker, passed to `MenuBar` as `extras`). Six maps show the drawer today:
 
 | Map | Why |
 | --- | --- |
@@ -231,7 +231,7 @@ Travel follows the compass of the world map. Leave a place by its right-hand exi
 - **Painting.** `/maps/routes/<type>-<dir>.webp`: 56 top-down paintings (7 types × 8 directions, the road running from one edge or corner to the opposite one, 1152 × 768). The region (`RouteMapDef.grade`: the destination's, else the start's, unless heartland) is applied when the map loads: `gradePixels` (`lib/stage/route-grade.ts`) collapses each region's grade into one affine colour transform and runs it over the background canvas (`WorldPresentation.imageGrade`). `scripts/build-route-variants.ts --from <dir>` imports new paintings; `--preview` renders a painting in every grade.
 - **Layout** (`routeGeometry(dir)`). Spawn 12 % along the road from its near end, the destination at its far end (extra destinations fan out beside it), ย้อนกลับ at the near edge. The hero faces the way the road runs.
 
-`RouteMapView` shows destination markers (`destination-<i>`) and a `back` marker, all disabled when the hero is too tired to travel. The 14 hand-written roads (`tavern_road`, `back_road`, `village_to_world`, 11 `cat_*`) have no painting and use the classic `RouteView` card.
+`RouteMapView` shows destination markers (`destination-<i>`) and a `back` marker, all disabled when the hero is too tired to travel. The 13 hand-written roads (`tavern_road`, `back_road`, 11 `cat_*`) have no painting and use the classic `RouteView` card.
 
 ## Navigation and collision
 
@@ -363,9 +363,9 @@ On a map (`MapHud` in `components/world/map-hud.tsx` + `MenuBar hud`):
   - Layout: two rows on desktop and landscape; on phones, rows of four.
 - **Top right:** the purse and the day.
   - Gold "ตำลึง" and w-exp "悟", each with a floating +N / −N for 1.6 s.
-  - The sundial: 12 shichen from 卯; the ring turns, and 戌–丑 are styled as night.
+  - The sundial: 12 shichen from 卯; the ring turns, and 戌–寅 are styled as night (`isNight`, `lib/world/clock.ts`).
   - The "วันที่ N" pill, and the hour line (hidden on phones).
-- **Quest tracker** under the purse (`quest-tracker.tsx`): 📌 stage n/N, the quest name, 🎯 action and counter, 📍 place and roads left. Tapping it opens the quest log.
+- **Quest tracker** under the purse (`quest-tracker.tsx`): 📌 stage n/N, the quest name, 🎯 action and counter, 📍 place and roads left. Tapping it opens the quest log. It heads `.hud-right-stack` (`app/mobile-hud.css`, a flex column at the top right); the map's `extras` (the drawer button) sit right-aligned below it, so a tall tracker pushes the button down instead of covering it.
 - **Top centre:** law chips — "⛓ หมายจับ ●●○○○", "⛓ เหลือโทษ …", "🔓 พ้นโทษแล้ว · ไปที่ประตูคุก".
 - **Arrival banner.**
   - Entering a location shows "❖ name ❖" for 3.2 s.
@@ -386,7 +386,8 @@ The game is laid out for a landscape screen. A portrait viewport (a phone held u
 - **Viewport units.** Nothing uses raw `vw` / `vh`: every size goes through `--vw`, `--vh`, `--dvw`, `--dvh` (`calc(70 * var(--vh))`), which swap in portrait so "height" is always the short side the player sees.
 - **Media queries** are written for both orientations: `(orientation: landscape) and (max-height: 500px), (orientation: portrait) and (max-width: 500px)`. Tailwind's `sm` / `md` / `lg` / `xl` / `2xl` are raw queries of the same shape (`tailwind.config.ts`). Write new ones the same way.
 - **Pointers.** Client coordinates are screen coordinates. Code that maps a pointer onto the page (the map runtime's `toMap` / `tapAt`, the battle board's `toWorld`, the joystick, the HUD occluders) goes through `lib/ui/landscape.ts`: `toPagePoint`, `toClientPoint`, `pageRect`. Test hooks (`worldScreenPoint`, `gridCellPoint`) return client coordinates.
-- **Not handled:** `env(safe-area-inset-*)` still names the physical edges, so a notch is padded on the wrong side when turned; Radix popovers place themselves in client space and may sit off their trigger when turned.
+- **Safe areas.** Nothing uses raw `env(safe-area-inset-*)`, which names the physical screen edges: every inset goes through `--safe-top`, `--safe-right`, `--safe-bottom`, `--safe-left` (`app/globals.css`). Turned, the page's top is the screen's right edge, its right the bottom, its bottom the left and its left the top, so the variables swap to match and a notch is padded on the side the player sees. `test:runtime` fails on raw insets or raw `vw` / `vh` outside `globals.css`.
+- **Not handled:** Radix popovers place themselves in client space and may sit off their trigger when turned.
 
 ## Menus and popups
 
@@ -403,7 +404,7 @@ A menu section opens as a full-screen **menu shell** (`components/ui/modal.tsx` 
 | `profile-popup.tsx` | three columns (`fill`): who (figure, name, ฉายา from `lib/world/epithet.ts`, gold, HP / MP / พลัง bars, power tier, sects, the five traits) · tabs ค่าพลัง (base stats with training bars; tap for sources) / อุปกรณ์ · detailed status (combat numbers, weapon mastery, move bonuses); styles `app/profile.css` |
 | `inventory-popup.tsx` | two columns: worn gear as a paper doll around the hero (`DOLL_AREA` grid areas) · category tabs over a `PagedGrid` of the bag (gear first, then items). Picking anything opens a small window (`.bag-popup`: details, ใช้ / ติดตั้ง / ถอด); its ✕ (`z-index: 2`, above the name's `filter`) or tapping outside it goes back to the bag |
 | `move-skills-popup.tsx` | three columns: counts, weapon mastery, conflicts and the 10 loadout slots · the learned library (`PagedGrid`, filters) · the picked move (`SkillDetail`: actions first — equip / replace / remove, เลื่อนระดับ (ใช้ประสบการณ์ยุทธ) with the `upgrade-payoff.tsx` card, ลืม — then the plain-Thai summary and numbers from `lib/game/skill-text.ts`, and ค่าประสบการณ์) |
-| `life-skills-popup.tsx` | tabs มาสเตอร์รี่ / ฝึกฝน / สูตรที่เรียน, each a `PagedGrid` of tiles: the 19 life skills · music practice and training items · learned recipes (read-only) |
+| `life-skills-popup.tsx` | tabs มาสเตอร์รี่ / ฝึกฝน / ประดิษฐ์ / สูตรที่เรียน, each a `PagedGrid` of tiles: the 19 life skills · music practice and training items · the hero's own trades' recipes (`FIELD_RECIPES`) with a ประดิษฐ์ button (`craftRecipe`, `data-craft-recipe`) · learned artisan recipes (read-only) |
 | `letters-popup.tsx` | two columns: the inbox (`PagedGrid`; the gift as an item tile, ● unread, ลบที่อ่านแล้ว) · the open letter (portrait, text, the gift tile and rarity, ลบ). Deleting takes an unclaimed gift first (`deleteLetters`) |
 | `meridian-popup.tsx` | ชีพจร, three columns (`app/meridian.css`): the learned charts (`PagedGrid`; tier badge, points opened, a rank bar in the kind's colour) and the unspent แต้มชีพจร · the chart on a black silhouette under a moon: one of five training poses (`components/world/popups/meridian-poses.ts`, picked by kind and chart id) drawn from a skeleton, every `MeridianBodyPoint` placed from the same joints (back points are dashed rings); points are buttons joined in node order (lit lines flow once opened), glowing by rank, the openable one breathing; hover (mouse) or tap shows a tooltip with each rank's bonus and the next cost; the bar under it opens / raises the picked point (`openMeridianNode`) · the chart's total bonus, points spent, description and requirements (✓ / ✗). No chart yet → an explanation of how to get one |
 | `quest-log-popup.tsx` → `components/world/quest-log.tsx` | กำลังทำ / สำเร็จ / ละทิ้ง; each row expands to the stage checklist, the guide box (🎯 / 📍 / ➤ นำทาง), objective spots, 📌 ติดตาม, ละทิ้งภารกิจ |
@@ -499,7 +500,7 @@ More styling details:
   - Phones: `max-width` 640 / 639 / 480 px.
   - Short landscape: `(max-height: 560px) and (min-width: 641px)` for the HUD, `(max-height: 500px) and (orientation: landscape)` for dialogs and menus.
   - `(pointer: coarse)` hides keyboard hints and shows the idle joystick.
-  - Safe areas via `env(safe-area-inset-*)` (the page sets `viewport-fit=cover`).
+  - Safe areas via `--safe-top` / `-right` / `-bottom` / `-left` (the page sets `viewport-fit=cover`; see [Landscape only](#landscape-only)).
 - **z-index ladder:**
 
 | z-index | Layer |
@@ -553,11 +554,7 @@ The data in `public/progress.json` is **frozen at wave 11** (2026-09-29), so tre
 
 ## Known issues
 
-- **Drawer button.** The quest tracker may cover the "อื่น ๆ" drawer button (both sit at the top right) on the six maps that show the drawer, including `home_player`.
 - **Market and sect-internal rumors** are reachable only through the drawer.
 - **Menus still scrolling.** ภารกิจ, สำนัก and บันทึก (and shop / artisan / hall popups) keep their old scrolling layouts; only โปรไฟล์, ย่าม, วิชา, อาชีพ, จดหมาย and ชีพจร are landscape columns.
-- **Turned portrait** (see [Landscape only](#landscape-only)): safe-area insets name the physical edges, and Radix popovers (the stat tooltips, comboboxes) may sit off their trigger.
-- **Action log.** Kinds `battle`, `encounter`, `steal`, `assassinate` and `kidnap` show their raw English names, and `travel` is labelled but never logged.
-- **`/progress` and the cache.** With the service worker active, each 5-second poll of `/progress.json?t=…` adds a cache entry and eventually pushes real art out of the 900-entry cache.
-- **Night.** The sundial styles 戌–丑 (7–10) as night; the veil and the night music run from 8 to 11.
+- **Turned portrait** (see [Landscape only](#landscape-only)): Radix popovers (the stat tooltips, comboboxes) may sit off their trigger.
 - **Minor.** `map-hud.tsx` reads `sessionStorage` outside `try`. The authored map `zoom` values are ignored.

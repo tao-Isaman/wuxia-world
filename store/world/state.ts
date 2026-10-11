@@ -1,6 +1,7 @@
 // The world store's blank state, the starter hero, the per-action draft copy
 // and the player-visible action log.
 import { type CharacterBuild, type StatKey, STAT_KEYS } from "@/lib/game";
+import type { ActionLogKind } from "@/lib/world/action-log";
 import { LIFE_SKILL_KEYS, START_SCENE_ID, TRAIT_KEYS, type LifeSkill, type TraitKey, type WorldStateData } from "@/lib/world";
 
 // ─── Starter build ─────────────────────────────────────────────────────
@@ -80,6 +81,7 @@ export const emptyData = (): WorldStateData => ({
   worldEventLog: [],
   day: 1,
   time: 0,
+  startDay: 1,
   pendingBattle: null,
   pendingEncounter: null,
   pendingHuntYield: null,
@@ -105,14 +107,9 @@ export const emptyData = (): WorldStateData => ({
 
 // Append a player-action entry to the rolling log. Keeps the most recent
 // 100. Mutates `state` in place so it's safe to call from inside a draft
-// before the final `set({ ...draft })`.
-export const ACTION_LOG_MAX = 100;
-export function appendActionLog(state: WorldStateData, kind: string, message: string): void {
-  const entry = { day: state.day, time: state.time, kind, message };
-  const next = [...state.actionLog, entry];
-  if (next.length > ACTION_LOG_MAX) next.splice(0, next.length - ACTION_LOG_MAX);
-  state.actionLog = next;
-}
+// before the final `set({ ...draft })`. Lives in lib/world/action-log.ts so
+// engine effects can log too.
+export { ACTION_LOG_MAX, appendActionLog } from "@/lib/world/action-log";
 
 // Every action starts on the world clock: draftFrom brings its copy up to
 // the real time (syncClock in ./lifecycle, which registers itself here so
@@ -177,6 +174,7 @@ function copyData(s: WorldStateData): WorldStateData {
     worldEventLog: s.worldEventLog ?? [],
     day: s.day,
     time: s.time,
+    startDay: s.startDay ?? s.day,
     pendingBattle: s.pendingBattle,
     pendingEncounter: s.pendingEncounter,
     pendingHuntYield: s.pendingHuntYield,

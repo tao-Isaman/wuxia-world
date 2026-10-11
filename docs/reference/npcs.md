@@ -290,7 +290,7 @@
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `sect_xiaoyao_master_yunxiao` | ปรมาจารย์ยุนเซียว | 💬 ⚔ 🤏 | 14 |
+| `sect_xiaoyao_master_yunxiao` | ปรมาจารย์ยุนเซียว | 💬 ⚔ 🤏 | 15 |
 | `sect_xiaoyao_vice_tianshan` | รองอาจารย์เทียนซาน | 💬 ⚔ 🤏 | 5 |
 | `sect_xiaoyao_sword_elder_wuyazi` | ผู้อาวุโสกระบี่ซวีเฟิงจื่อ | 💬 ⚔ 🤏 | 1 |
 | `sect_xiaoyao_palm_elder_libai` | ผู้อาวุโสฝ่ามือหลี่ไป๋ | ⚔ 🤏 | 6 |

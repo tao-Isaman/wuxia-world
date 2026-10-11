@@ -59,6 +59,22 @@
 .account-line { display: flex; align-items: center; gap: 8px; margin: -8px 0 16px; font-size: 13px; color: #d8cfb2; }
 .account-line b { color: #f6d77a; }
 .account-line button { margin-left: auto; padding: 3px 10px; border: 1px solid #64725b; background: #213a31; color: #d8d6bf; font-size: 12px; }
+/* Characters on the server (character-select.tsx): up to four cards, play / delete, new, import. */
+.character-list { list-style: none; margin: 0 0 14px; padding: 0; display: grid; gap: 8px; }
+.character-card { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 8px; border: 1px solid #4f5f4c; background: #12261f; }
+.character-portrait { width: 56px; height: 56px; overflow: hidden; background: #0c1c18; border: 1px solid #3c4a3e; }
+.character-info { min-width: 0; }
+.character-name { margin: 0; font-family: var(--font-display); font-size: 18px; color: #f6e2a6; overflow-wrap: anywhere; }
+.character-meta { margin: 2px 0 0; font-size: 12px; color: #c9c3a8; line-height: 1.5; }
+.character-actions { display: flex; flex-direction: column; gap: 6px; }
+.character-actions .pixel-action { padding: 6px 14px; font-size: 14px; }
+.character-delete { padding: 3px 10px; border: 1px solid #7a4a3e; background: #2a1915; color: #f1b9a8; font-size: 12px; }
+.character-delete:hover, .character-delete:focus-visible { background: #4a231c; }
+.character-empty, .character-entering { margin: 0 0 12px; font-size: 13px; color: #c9c3a8; }
+.character-import { width: 100%; margin-bottom: 10px; padding: 9px 10px; border: 1px dashed #c9a35a; background: #1b2f27; color: #f1dba6; font-size: 13px; text-align: left; }
+.character-import b { color: #f6d77a; }
+.character-back { display: block; width: 100%; margin-top: 10px; padding: 6px; border: 1px solid #4f5f4c; background: transparent; color: #d8d6bf; font-size: 13px; }
+.character-select button:disabled { opacity: .55; cursor: default; }
 .world-viewport, .stage-host { position: absolute; inset: 0; overflow: hidden; }
 .stage-host { touch-action: none; background: #172723; }
 .stage-host canvas, .battle-stage canvas { display: block; image-rendering: pixelated; }
