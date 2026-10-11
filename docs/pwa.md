@@ -99,7 +99,7 @@ navigator.serviceWorker.register(`/sw.js?v=${process.env.NEXT_PUBLIC_BUILD_ID ??
 | `public/pwa/icon-512.png` | 512 |
 | `public/pwa/icon-maskable-512.png` | 512, face kept inside the maskable safe zone |
 
-The script uses `sharp`, which arrives through Next.js rather than `package.json`.
+The script uses `sharp` (a dev dependency).
 
 ## Testing
 

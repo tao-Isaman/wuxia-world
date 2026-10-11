@@ -72,7 +72,7 @@ Every file in `scripts/`, what it does, and whether it is safe to run. Run them 
 | `build-jail-map.ts` | `bun scripts/build-jail-map.ts` | `public/maps/jail.png` | paints the jail in Chromium (hard-coded `/opt/pw-browsers/chromium`) |
 | `build-map-footprints.ts` | `bun scripts/build-map-footprints.ts <dir>` | `lib/stage/world-footprints-data.ts` | rebuilds **the whole file** from `<dir>/<locationId>.json`. The JSON sources are not in the repo, so a partial folder drops every other map; edit the data file directly for small fixes |
 
-`sharp` arrives through Next.js, not as a direct dependency. Add it to `package.json` if a future Next drops it.
+`sharp` is a dev dependency (`package.json`, at the version Next.js brings: 0.34.5), so the image scripts keep working if a future Next drops it.
 
 ## Art and collision tools
 
