@@ -6,6 +6,11 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-11
 
+### Tests that read the real date
+
+- **Old lore no longer runs out:** flavour lore fades 60 days after the world seeds it (`LORE_FLAVOUR_DAYS`), not on world day 60 itself; on the shared real-time clock a world started after day 60 had none (the capital tea house offered one rumor, not five). Lore stamped with the old fixed day restarts once.
+- `test:grid-store` and `test:rumors` pin the world clock to day 1; `liveness.spec.ts` gives its hero real stats, since foes grow with the world day (see HANDOFF).
+
 ### Our own names: the legend no longer borrows a novel's
 
 - The game is no longer framed as a sequel to มังกรหยก ภาค 3, and the names players recognise straight from Jin Yong's novels are replaced with invented ones (ids, saves and quest logic unchanged; the owner chose each name from an audit of 85 terms):

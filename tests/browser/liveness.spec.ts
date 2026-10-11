@@ -29,6 +29,9 @@ test("a travelling wanderer stands in the capital; killing them openly makes the
   await page.evaluate(() => {
     const raw = JSON.parse(localStorage.getItem("wusia-world-v1")!);
     Object.assign(raw.state, { currentSceneId: "city_capital", lastLocationId: "city_capital", wanted: 0 });
+    // Foes grow with the world day (lib/world/encounter-scaling): a seasoned hero keeps the outcome certain.
+    for (const key of Object.keys(raw.state.playerBuild.stats)) raw.state.playerBuild.stats[key] = 80;
+    Object.assign(raw.state, { currentHp: 9999, currentMp: 9999 });
     localStorage.setItem("wusia-world-v1", JSON.stringify(raw));
     // Her journey has brought her to the capital; a weak opponent keeps the fight short.
     const shared = JSON.parse(localStorage.getItem("wusia-shared-v1")!);
