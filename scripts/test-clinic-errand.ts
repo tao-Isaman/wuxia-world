@@ -39,7 +39,7 @@ const before = {
 const wu = scene("npc_city_capital_magistrate_wu_talk");
 const delivery = wu.choices!.find(choice => choice.next === `qs_${id}_delivery`)!;
 const claim = scene(`qs_${id}_complete`).choices!.find(choice => choice.effects?.some(effect => effect.t === "finishQuest"))!;
-assert.ok(getNpc(lin)?.questIds?.includes(id));
+assert.equal(quest.giverNpcId, lin);
 assert.ok(isQuestOfferable(state, quest), "new player can accept without gold, items, mastery or combat");
 assert.equal(chooseVisible(state, delivery), false, "Wu cannot deliver before acceptance");
 assert.equal(chooseVisible(state, claim), false, "Lin cannot reward before acceptance");

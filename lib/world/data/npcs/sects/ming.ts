@@ -13,12 +13,6 @@ export const NPCS_MING: readonly NpcDef[] = [
     dialogSceneId: "npc_sect_sunmoon_chief_dongfang_talk",
     sparOpponentId: "spar_sunmoon_chief_dongfang",
     sparFameReward: 18,
-    questIds: [
-      "qst_sunmoon_disciple_intro",
-      "qst_sunmoon_sect_patrol",
-      "qst_sunmoon_sect_scripture",
-      "qst_sunmoon_art_qiankun",
-    ],
     defenseTier: 4,
     stealLoot: [
       { itemId: "ancient_coin", weight: 5 },
@@ -137,10 +131,6 @@ export const NPCS_MING: readonly NpcDef[] = [
     description: "ผู้อาวุโสลับของพรรค · รู้ความลับมาก ใช้คนเป็น ไม่ค่อยเปิดเผยตัว",
     locationIds: ["sect_ming"],
     dialogSceneId: "npc_sect_ming_elder_zhuying_talk",
-    questIds: [
-      "qst_ming_spy_mission",
-      "qst_ming_defector_choice",
-    ],
     defenseTier: 3,
     stealLoot: [
       { itemId: "ancient_coin", weight: 4 },

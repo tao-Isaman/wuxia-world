@@ -352,11 +352,6 @@ export interface NpcDef {
   visibleIf?: Condition;
   // Free-form tags for future condition queries (e.g., "merchant").
   tags?: readonly string[];
-  // Quests this NPC offers / turns in. The NPC popup looks up each quest
-  // and renders an "Accept" or "Turn in" button as appropriate. Adding a
-  // new quest is one entry in lib/world/data/quests/* plus appending its
-  // id here.
-  questIds?: readonly string[];
 
   // ─── Bad-action target capability ───────────────────────────────────
   // How tough this NPC is when bad-action checks (steal / assassinate /

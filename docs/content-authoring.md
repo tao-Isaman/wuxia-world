@@ -175,7 +175,7 @@ Then run `bun run test:navigation`: every painted map must keep its spawn open a
 
 2. **Talk dialog.** Write the dialog scene (convention `npc_<npcId>_talk`). Give it at least one choice that returns to the location (`next` = the location id), so the player can leave.
 3. **Spar.** Add an opponent (see [An opponent](#an-opponent)). Its id convention is `spar_<sect>_<name>`.
-4. **Quests** attach through the quest's `giverNpcId` / `turnInNpcId`. `NpcDef.questIds` is informational only; no code reads it.
+4. **Quests** attach through the quest's `giverNpcId` / `turnInNpcId` (an NPC has no quest list of its own).
 5. **Art** is resolved by id:
    - Put a 256×256 portrait at `public/npcs/<id>.png` and a 192×192 body at `public/npcs/body/<id>.png`.
    - Add the id to `npc-portrait-ids.ts` and `npc-body-ids.ts`.

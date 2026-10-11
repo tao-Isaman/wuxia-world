@@ -20,14 +20,6 @@ export const NPCS_HENGSHAN_NORTH: readonly NpcDef[] = [
     dialogSceneId: "npc_sect_hengshan_north_abbess_dingyi_talk",
     sparOpponentId: "spar_hengshan_north_dingyi",
     sparFameReward: 12,
-    questIds: [
-      "qst_hengshan_north_disciple_intro",
-      "qst_hengshan_north_sect_offering",
-      "qst_hengshan_north_sect_thugs",
-      "qst_hengshan_north_sect_amulet",
-      "qst_hengshan_north_art_mirror",
-      "qst_hengshan_north_redemption",
-    ],
     defenseTier: 3,
     stealLoot: [
       { itemId: "paper", weight: 5 },

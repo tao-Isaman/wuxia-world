@@ -16,11 +16,6 @@ export const NPCS_SPIES: readonly NpcDef[] = [
     dialogSceneId: "npc_spy_capital_feng_talk",
     sparOpponentId: "spar_spy_feng",
     sparFameReward: 6,
-    questIds: [
-      "qst_spy_capital_seal_ledger",
-      "qst_spy_capital_court_traitor",
-      "qe_spy_capital_frame_merchant",
-    ],
     defenseTier: 2,
     stealLoot: [
       { itemId: "ancient_coin", weight: 4 },
@@ -39,11 +34,6 @@ export const NPCS_SPIES: readonly NpcDef[] = [
     dialogSceneId: "npc_spy_yangzhou_xi_talk",
     sparOpponentId: "spar_spy_xi",
     sparFameReward: 6,
-    questIds: [
-      "qst_spy_yangzhou_smuggler_ship",
-      "qst_spy_yangzhou_silk_seal",
-      "qe_spy_yangzhou_silence_witness",
-    ],
     defenseTier: 2,
     stealLoot: [
       { itemId: "fish_eel", weight: 3 },
@@ -62,11 +52,6 @@ export const NPCS_SPIES: readonly NpcDef[] = [
     dialogSceneId: "npc_spy_dali_mei_talk",
     sparOpponentId: "spar_spy_mei",
     sparFameReward: 6,
-    questIds: [
-      "qst_spy_dali_poisoner_track",
-      "qst_spy_dali_southern_envoy",
-      "qe_spy_dali_steal_antidote",
-    ],
     defenseTier: 2,
     stealLoot: [
       { itemId: "herb", weight: 4 },
@@ -85,11 +70,6 @@ export const NPCS_SPIES: readonly NpcDef[] = [
     dialogSceneId: "npc_spy_inn_zhou_talk",
     sparOpponentId: "spar_spy_zhou",
     sparFameReward: 4,
-    questIds: [
-      "qst_spy_inn_drunk_confession",
-      "qst_spy_inn_wandering_blade",
-      "qe_spy_inn_intimidate_drunk",
-    ],
     defenseTier: 1,
     stealLoot: [
       { itemId: "raw_meat", weight: 4 },
@@ -108,11 +88,6 @@ export const NPCS_SPIES: readonly NpcDef[] = [
     dialogSceneId: "npc_spy_village_si_talk",
     sparOpponentId: "spar_spy_si",
     sparFameReward: 4,
-    questIds: [
-      "qst_spy_village_missing_courier",
-      "qst_spy_village_iron_caravan",
-      "qe_spy_village_kidnap_witness",
-    ],
     defenseTier: 1,
     stealLoot: [
       { itemId: "herb", weight: 4 },

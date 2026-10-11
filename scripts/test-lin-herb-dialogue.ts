@@ -79,6 +79,9 @@ try {
   console.log("PASS Lin herb question: real store shows new authored response, truthful item/shop/mastery facts, unchanged empty/clinic/advanced quest state, repeatable read-only conversation and safe free goodbyes");
 
   const wu = getNpc("city_capital_magistrate_wu")!;
+  // The three jobs Wu's overview describes (his own hand-written quests).
+  const WU_JOBS = ["qc_capital_lost_ledger", "qc_capital_corrupt_clerk", "qc_capital_royal_pardon"];
+  for (const id of WU_JOBS) assert.equal(getQuest(id)?.giverNpcId, wu.id);
   const clinic = "qc_capital_clinic_supplies";
   for (const questId of [null, clinic, "qc_capital_royal_pardon"]) {
     Math.random = () => 0.5;
@@ -91,14 +94,14 @@ try {
     const deliveryIndex = dialog().choices!.findIndex(choice => choice.text === "ส่งคำขอเสบียงจากหมอหลิน");
     const deliveryGate = dialog().choices![deliveryIndex].visibleIf!;
     assert.equal(evaluateCondition(useWorldStore.getState(), deliveryGate), questId === clinic);
-    const offersBefore = wu.questIds!.map(id => isQuestOfferable(useWorldStore.getState(), getQuest(id)!));
+    const offersBefore = WU_JOBS.map(id => isQuestOfferable(useWorldStore.getState(), getQuest(id)!));
     useWorldStore.setState({ stamina: 0 });
     const before = progression();
     choose("รับฟังงานที่นายอำเภอมอบหมาย");
     assert.notEqual(useWorldStore.getState().currentSceneId, wu.dialogSceneId);
     assert.notDeepEqual(dialog().lines, initialLines, "Wu answers with new job information");
     const information = dialog().lines.map(line => line.text).join(" ");
-    for (const id of wu.questIds!) assert.ok(information.includes(getQuest(id)!.name));
+    for (const id of WU_JOBS) assert.ok(information.includes(getQuest(id)!.name));
     assert.ok(information.includes(getItem("old_key")!.name));
     const fightRequirement = getQuest("qc_capital_corrupt_clerk")!.stages[1].autoAdvance!;
     assert.equal(fightRequirement.t, "defeatedOpponent");
@@ -106,7 +109,7 @@ try {
     assert.ok(information.includes("จินหลิง"));
     assert.ok(information.includes(getNpc("city_jinling_strategist_kong")!.name));
     assert.equal(progression(), before, "Wu's overview neither accepts a job nor advances clinic delivery");
-    assert.deepEqual(wu.questIds!.map(id => isQuestOfferable(useWorldStore.getState(), getQuest(id)!)), offersBefore);
+    assert.deepEqual(WU_JOBS.map(id => isQuestOfferable(useWorldStore.getState(), getQuest(id)!)), offersBefore);
     choose("กลับไปคุยเรื่องอื่น");
     assert.equal(useWorldStore.getState().currentSceneId, wu.dialogSceneId);
     assert.equal(evaluateCondition(useWorldStore.getState(), deliveryGate), questId === clinic);

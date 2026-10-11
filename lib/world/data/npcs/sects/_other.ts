@@ -11,11 +11,6 @@ export const NPCS__OTHER: readonly NpcDef[] = [
     description: "หมอผีมือสูงแห่งคุ้มสมุนไพร ผู้รู้สรรพวิชาสมุนไพรและยาพิษ เงียบขรึมแต่เมตตา",
     locationIds: ["villa_yaowang"],
     dialogSceneId: "npc_villa_yaowang_doctor_shennong_talk",
-    questIds: [
-      "qst_yaowang_rare_ingredient",
-      "qst_yaowang_plague_village",
-      "qst_yaowang_venom_antidote",
-    ],
     defenseTier: 2,
     stealLoot: [
       { itemId: "herb", weight: 4 },
@@ -34,10 +29,6 @@ export const NPCS__OTHER: readonly NpcDef[] = [
     description: "พระผู้รักษาพระธาตุโบราณแห่งวัดต้าหลุน สงบนิ่งอยู่เสมอ แต่มีเรื่องหนักใจซ่อนอยู่",
     locationIds: ["temple_dalun"],
     dialogSceneId: "npc_temple_dalun_monk_kongxin_talk",
-    questIds: [
-      "qst_dalun_stolen_relic",
-      "qst_dalun_pilgrim_mission",
-    ],
     defenseTier: 2,
     stealLoot: [
       { itemId: "jade", weight: 3 },
@@ -55,11 +46,6 @@ export const NPCS__OTHER: readonly NpcDef[] = [
     description: "เจ้าของคุ้มนกนางแอ่น ตระกูลขุนนางเก่า ใจโอบอ้อมอารีแต่มีศัตรูมาก ชอบผู้มีฝีมือ",
     locationIds: ["villa_yanzi"],
     dialogSceneId: "npc_villa_yanzi_lord_yanfeng_talk",
-    questIds: [
-      "qst_yanzi_rival_clan",
-      "qst_yanzi_bodyguard_escort",
-      "qst_yanzi_stolen_heirloom",
-    ],
     defenseTier: 3,
     stealLoot: [
       { itemId: "jade", weight: 3 },
@@ -77,10 +63,6 @@ export const NPCS__OTHER: readonly NpcDef[] = [
     description: "ทูตพระราชสำนักประจำวังจงหยาง หน้าตาดีแต่ซ่อนเจตนาลึก ส่งข้อความระหว่างสำนักต่าง ๆ",
     locationIds: ["palace_zhongyang"],
     dialogSceneId: "npc_palace_zhongyang_envoy_liuying_talk",
-    questIds: [
-      "qst_zhongyang_imperial_letter",
-      "qst_zhongyang_noble_intrigue",
-    ],
     defenseTier: 3,
     stealLoot: [
       { itemId: "ancient_coin", weight: 4 },

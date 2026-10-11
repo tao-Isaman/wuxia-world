@@ -13,12 +13,6 @@ export const NPCS_HUASHAN: readonly NpcDef[] = [
     dialogSceneId: "npc_sect_huashan_master_yiqing_talk",
     sparOpponentId: "spar_huashan_master_yiqing",
     sparFameReward: 12,
-    questIds: [
-      "qst_huashan_disciple_intro",
-      "qst_huashan_sect_patrol",
-      "qst_huashan_sect_iron",
-      "qst_huashan_art_purplecloud",
-    ],
     defenseTier: 3,
     stealLoot: [
       { itemId: "iron_ore", weight: 5 },

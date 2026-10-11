@@ -22,7 +22,7 @@ import {
   LIFE_SKILL_LABEL, LOCATION_MAPS, MASTERY_THRESHOLDS, NPCS, OPPONENTS, QUESTS, RECIPES, RESOURCES, SCENES,
   SECT_HALLS, SECT_MEMBERSHIPS, SHOPS, START_SCENE_ID, TRAIT_LABEL, rankUpGold,
   canPracticeAt, getArtisansAt, getItem, getNpc, getNpcsAtLocation, getOpponent, getResource, getScene,
-  getSectHallAt, getShopAt, recipesOfferedBy,
+  craftsAnywhere, getSectHallAt, getShopAt, recipesOfferedBy,
   type Condition, type LocationScene, type QuestDef, type QuestStage, type Scene, type SceneEffect,
 } from "@/lib/world";
 import { AUTO_MAP_IDS } from "@/lib/world/data/auto-map-ids";
@@ -392,7 +392,7 @@ const pages: Record<string, string> = {};
       const at = ARTISANS.filter((a) => recipesOfferedBy(a).some((o) => o.recipeId === r.id)).map((a) => locName(a.locationId));
       return [code(r.id), esc(r.name),
         esc(r.inputs.map((i) => `${i.count}× ${getItem(i.itemId)?.name ?? i.itemId}`).join(" + ") + ` → ${r.output.count}× ${getItem(r.output.itemId)?.name ?? r.output.itemId}`),
-        r.requiredMastery ?? 1, r.basic ? "yes" : "", esc(at.length > 4 ? `${at.length} artisans` : at.join(", ") || "anywhere (not artisan-gated)")];
+        r.requiredMastery ?? 1, r.basic ? "yes" : "", esc(at.length > 4 ? `${at.length} artisans` : at.join(", ") || (craftsAnywhere(r) ? "anywhere (อาชีพ → ประดิษฐ์)" : "nowhere (sold by no artisan)"))];
     }));
     md += "\n";
   }

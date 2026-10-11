@@ -54,7 +54,7 @@ How the game is drawn and operated: the Phaser stage, the world map runtime, col
 7. **A location with a painted map** — `LocationView` over the Phaser canvas. A dialog that continues a conversation at that place keeps the **same keyed canvas** mounted, read-only, with `DialogStage` on top.
 8. **Any other dialog** — `MapBackdrop` (the place's painting at 40 %) + `DialogStage`, titled by the first speaker.
 9. **A road with a painting** — `RouteMapView`.
-10. **Otherwise** — the classic cream card layout (`StatusBar`, `MenuBar`, `LocationView` / `RouteView`). Only `world_journey` and 14 unpainted roads reach it.
+10. **Otherwise** — the classic cream card layout (`StatusBar`, `MenuBar`, `LocationView` / `RouteView`). Only `world_journey` (the legacy random-teleport hub, reached from the tutorial's `start` / `ending_good` dialogs) and 13 unpainted roads reach it.
 
 `LoadingOverlay`, `ToastStack` and `ConfirmDialog` are mounted beside every branch.
 
@@ -231,7 +231,7 @@ Travel follows the compass of the world map. Leave a place by its right-hand exi
 - **Painting.** `/maps/routes/<type>-<dir>.webp`: 56 top-down paintings (7 types × 8 directions, the road running from one edge or corner to the opposite one, 1152 × 768). The region (`RouteMapDef.grade`: the destination's, else the start's, unless heartland) is applied when the map loads: `gradePixels` (`lib/stage/route-grade.ts`) collapses each region's grade into one affine colour transform and runs it over the background canvas (`WorldPresentation.imageGrade`). `scripts/build-route-variants.ts --from <dir>` imports new paintings; `--preview` renders a painting in every grade.
 - **Layout** (`routeGeometry(dir)`). Spawn 12 % along the road from its near end, the destination at its far end (extra destinations fan out beside it), ย้อนกลับ at the near edge. The hero faces the way the road runs.
 
-`RouteMapView` shows destination markers (`destination-<i>`) and a `back` marker, all disabled when the hero is too tired to travel. The 14 hand-written roads (`tavern_road`, `back_road`, `village_to_world`, 11 `cat_*`) have no painting and use the classic `RouteView` card.
+`RouteMapView` shows destination markers (`destination-<i>`) and a `back` marker, all disabled when the hero is too tired to travel. The 13 hand-written roads (`tavern_road`, `back_road`, 11 `cat_*`) have no painting and use the classic `RouteView` card.
 
 ## Navigation and collision
 

@@ -16,7 +16,6 @@ import { NPCS_WANDERERS } from "./npcs/wanderers";
 //   dialogSceneId       — adds a 💬 ทักทาย button (opens that DialogScene)
 //   sparOpponentId      — adds a ⚔ ขอประลอง button (triggers a non-fatal
 //                         battle; win grants `sparFameReward` ชื่อเสียง)
-//   questIds            — pulls quests this NPC offers / turns in
 //   visibleIf           — hide the NPC behind a Condition (quest gating)
 //   tags                — free-form labels for future condition queries
 //

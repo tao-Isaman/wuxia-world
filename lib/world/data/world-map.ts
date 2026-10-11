@@ -29,7 +29,9 @@ for (const r of LOCATION_ROUTES) {
 // onEnter effects directly to the leaf entries.
 //
 // Structure (97 leaves in 11 arrays; each array also gets a cat_* route):
-//   world_journey  ← the hub (reachable only from two tutorial dialogs)
+//   world_journey  ← the legacy hub, reachable only from the tutorial's
+//                    `start` / `ending_good` dialogs (scenes.ts); its onEnter
+//                    sends the hero to a random leaf (`gotoRandom`)
 //     ├─ cat_cities    → 7 cities
 //     ├─ cat_villages  → 7 villages
 //     ├─ cat_sects     → 19 sects (the 20th, sect_xueyu, is in MISC)
@@ -653,19 +655,6 @@ const WORLD_HUB: LocationScene = {
   onEnter: [{ t: "gotoRandom", sceneIds: ALL_LEAVES.map((l) => l.id) }],
 };
 
-// Connector — village → world hub. Currently orphaned: no RouteRef points
-// to it (the foothill village links to home_player instead).
-const VILLAGE_TO_WORLD: RouteScene = {
-  kind: "route",
-  id: "village_to_world",
-  label: "ออกเดินทางสู่ยุทธภพ",
-  description:
-    "เส้นทางใหญ่นำเจ้าออกจากหมู่บ้านสู่โลกกว้าง เจ้ายืนอยู่บนทางแยกที่ผู้คนต่างเดินทางไปทั่วบู๊ลิ้ม",
-  destinations: [
-    { locationId: "world_journey", label: "ยุทธจักร — แผนที่โลก", hint: "เริ่มผจญภัย" },
-  ],
-};
-
 // ─── Category routes — derived from each leaf array ───────────────────
 const CATEGORY_ROUTES: RouteScene[] = [
   categoryRoute("cat_cities", "ทางสู่เมืองหลัก", "เส้นทางสายหลักเชื่อมเมืองใหญ่ของแผ่นดิน", CITIES),
@@ -682,11 +671,10 @@ const CATEGORY_ROUTES: RouteScene[] = [
 ];
 
 // ─── Public export ────────────────────────────────────────────────────
-// Combined: hub + all routes (return + village + per-category + per-edge) +
+// Combined: hub + all routes (per-category + per-edge) +
 // all leaves. scenes.ts spreads this into SCENES.
 export const WORLD_MAP_SCENES: Scene[] = [
   WORLD_HUB,
-  VILLAGE_TO_WORLD,
   ...CATEGORY_ROUTES,
   ...EDGE_ROUTES,
   ...CITIES,

@@ -1,5 +1,5 @@
 // One-shot audit: walks every NPC and Quest, verifies every referenced
-// id (dialogSceneId, sparOpponentId, questIds, giverNpcId, turnInNpcId,
+// id (dialogSceneId, sparOpponentId, giverNpcId, turnInNpcId,
 // rewards.itemId / opponentId / skillId / artId / npcId, prereqs, stage
 // autoAdvance, etc.) and every drop table (opponent drops and packs, boss
 // trophies, resource yields, meridian-chart loot, recipe items) resolves to a
@@ -223,9 +223,6 @@ function checkNpc(npc: NpcDef): void {
     );
   }
   if (npc.visibleIf) checkCondition(`${ctx}.visibleIf`, npc.visibleIf);
-  for (const qid of npc.questIds ?? []) {
-    require(`${ctx}.questIds: unknown quest "${qid}"`, QUESTS_BY_ID.has(qid));
-  }
 }
 
 function checkQuest(q: QuestDef): void {

@@ -603,7 +603,7 @@ Every city hosts all six craft professions; villages and some sects host one. Re
 | นครหลวง (`city_capital`) | 🪭 accessory | ช่างเครื่องสานแห่งนครหลวง | 1 | — |
 | ซีเซี่ย (`city_xixia`) | 🔨 forge | ช่างตีเหล็กแห่งซีเซี่ย | 2 | ตีดาบเหล็กกล้า |
 | ซีเซี่ย (`city_xixia`) | 🧪 alchemy | ช่างปรุงยาแห่งซีเซี่ย | 5 | — |
-| ซีเซี่ย (`city_xixia`) | 🧵 tailoring | ช่างตัดเย็บแห่งซีเซี่ย | 1 | — |
+| ซีเซี่ย (`city_xixia`) | 🧵 tailoring | ช่างตัดเย็บแห่งซีเซี่ย | 2 | เย็บเสื้อหนัง |
 | ซีเซี่ย (`city_xixia`) | 🍳 chef | พ่อครัวแห่งซีเซี่ย | 1 | — |
 | ซีเซี่ย (`city_xixia`) | 💍 jewelry | ช่างเครื่องประดับแห่งซีเซี่ย | 1 | — |
 | ซีเซี่ย (`city_xixia`) | 🪭 accessory | ช่างเครื่องสานแห่งซีเซี่ย | 1 | — |
@@ -616,9 +616,9 @@ Every city hosts all six craft professions; villages and some sects host one. Re
 | หยางโจว (`city_yangzhou`) | 🔨 forge | ช่างตีเหล็กแห่งหยางโจว | 1 | — |
 | หยางโจว (`city_yangzhou`) | 🧪 alchemy | ช่างปรุงยาแห่งหยางโจว | 5 | — |
 | หยางโจว (`city_yangzhou`) | 🧵 tailoring | ช่างตัดเย็บแห่งหยางโจว | 1 | — |
-| หยางโจว (`city_yangzhou`) | 🍳 chef | พ่อครัวแห่งหยางโจว | 1 | — |
+| หยางโจว (`city_yangzhou`) | 🍳 chef | พ่อครัวแห่งหยางโจว | 2 | ต้มยำสมุนไพร |
 | หยางโจว (`city_yangzhou`) | 💍 jewelry | ช่างเครื่องประดับแห่งหยางโจว | 1 | — |
-| หยางโจว (`city_yangzhou`) | 🪭 accessory | ช่างเครื่องสานแห่งหยางโจว | 2 | ทำพัดผ้าไหม |
+| หยางโจว (`city_yangzhou`) | 🪭 accessory | ช่างเครื่องสานแห่งหยางโจว | 3 | ทำพัดผ้าไหม, แกะจี้หยก |
 | ซูโจว (`city_suzhou`) | 🔨 forge | ช่างตีเหล็กแห่งซูโจว | 1 | — |
 | ซูโจว (`city_suzhou`) | 🧪 alchemy | ช่างปรุงยาแห่งซูโจว | 5 | — |
 | ซูโจว (`city_suzhou`) | 🧵 tailoring | ช่างตัดเย็บแห่งซูโจว | 2 | เย็บเสื้อผ้าไหม |
@@ -651,21 +651,21 @@ Every city hosts all six craft professions; villages and some sects host one. Re
 
 | Id | Name | Inputs → output | Mastery | Basic | Taught at |
 | --- | --- | --- | --- | --- | --- |
-| `smelt_iron` | ถลุงเหล็กแท่ง | 2× แร่เหล็ก + 1× ไม้เนื้ออ่อน → 1× เหล็กแท่ง | 1 |  | anywhere (not artisan-gated) |
-| `jade_polish` | ขัดหยกล้ำค่า | 2× แร่เงิน + 3× ก้อนหิน → 1× หยกล้ำค่า | 1 |  | anywhere (not artisan-gated) |
+| `smelt_iron` | ถลุงเหล็กแท่ง | 2× แร่เหล็ก + 1× ไม้เนื้ออ่อน → 1× เหล็กแท่ง | 1 |  | anywhere (อาชีพ → ประดิษฐ์) |
+| `jade_polish` | ขัดหยกล้ำค่า | 2× แร่เงิน + 3× ก้อนหิน → 1× หยกล้ำค่า | 1 |  | anywhere (อาชีพ → ประดิษฐ์) |
 
 ### ล่าสัตว์ (`hunting`, 2)
 
 | Id | Name | Inputs → output | Mastery | Basic | Taught at |
 | --- | --- | --- | --- | --- | --- |
-| `tan_leather` | ฟอกหนัง | 2× หนังสัตว์ + 1× สมุนไพรหายาก → 1× หนังฟอก | 1 |  | anywhere (not artisan-gated) |
-| `cook_meat` | ย่างเนื้อ | 1× เนื้อสด + 1× ไม้เนื้ออ่อน → 1× เนื้อย่าง | 1 |  | anywhere (not artisan-gated) |
+| `tan_leather` | ฟอกหนัง | 2× หนังสัตว์ + 1× สมุนไพรหายาก → 1× หนังฟอก | 1 |  | anywhere (อาชีพ → ประดิษฐ์) |
+| `cook_meat` | ย่างเนื้อ | 1× เนื้อสด + 1× ไม้เนื้ออ่อน → 1× เนื้อย่าง | 1 |  | anywhere (อาชีพ → ประดิษฐ์) |
 
 ### เก็บสมุนไพร (`herbalism`, 1)
 
 | Id | Name | Inputs → output | Mastery | Basic | Taught at |
 | --- | --- | --- | --- | --- | --- |
-| `brew_potion` | ปรุงยาเลือดเล็ก (สมุนไพร) | 1× โสม + 1× เม็ดบัว → 1× ยาเลือดเล็ก | 1 |  | anywhere (not artisan-gated) |
+| `brew_potion` | ปรุงยาเลือดเล็ก (สมุนไพร) | 1× โสม + 1× เม็ดบัว → 1× ยาเลือดเล็ก | 1 |  | anywhere (อาชีพ → ประดิษฐ์) |
 
 ### เภสัช (`alchemy`, 8)
 
@@ -684,19 +684,19 @@ Every city hosts all six craft professions; villages and some sects host one. Re
 
 | Id | Name | Inputs → output | Mastery | Basic | Taught at |
 | --- | --- | --- | --- | --- | --- |
-| `refine_venom` | กลั่นพิษเสริมแรง | 1× พิษงู + 1× พิษแมงป่อง → 1× พิษตะขาบ | 1 |  | anywhere (not artisan-gated) |
+| `refine_venom` | กลั่นพิษเสริมแรง | 1× พิษงู + 1× พิษแมงป่อง → 1× พิษตะขาบ | 1 |  | anywhere (อาชีพ → ประดิษฐ์) |
 
 ### ตัดไม้ (`woodcutting`, 1)
 
 | Id | Name | Inputs → output | Mastery | Basic | Taught at |
 | --- | --- | --- | --- | --- | --- |
-| `wood_handle` | เหลาด้ามไม้แข็ง | 2× ไม้เนื้อแข็ง → 3× ไม้เนื้ออ่อน | 1 |  | anywhere (not artisan-gated) |
+| `wood_handle` | เหลาด้ามไม้แข็ง | 2× ไม้เนื้อแข็ง → 3× ไม้เนื้ออ่อน | 1 |  | anywhere (อาชีพ → ประดิษฐ์) |
 
 ### ประมง (`fishing`, 1)
 
 | Id | Name | Inputs → output | Mastery | Basic | Taught at |
 | --- | --- | --- | --- | --- | --- |
-| `fish_meal` | ปรุงเนื้อปลามัน | 1× ปลาไหล + 1× ไม้เนื้ออ่อน → 1× เนื้อย่าง | 1 |  | anywhere (not artisan-gated) |
+| `fish_meal` | ปรุงเนื้อปลามัน | 1× ปลาไหล + 1× ไม้เนื้ออ่อน → 1× เนื้อย่าง | 1 |  | anywhere (อาชีพ → ประดิษฐ์) |
 
 ### ตีอาวุธ (`forge`, 3)
 
@@ -711,7 +711,7 @@ Every city hosts all six craft professions; villages and some sects host one. Re
 | Id | Name | Inputs → output | Mastery | Basic | Taught at |
 | --- | --- | --- | --- | --- | --- |
 | `tailor_cloth` | ตัดเสื้อผ้าฝ้าย | 2× เส้นด้าย → 1× เสื้อผ้าทอ | 1 | yes | 8 artisans |
-| `tailor_leather` | เย็บเสื้อหนัง | 2× หนังฟอก + 1× เส้นด้าย → 1× เสื้อหนังเบา | 2 |  | anywhere (not artisan-gated) |
+| `tailor_leather` | เย็บเสื้อหนัง | 2× หนังฟอก + 1× เส้นด้าย → 1× เสื้อหนังเบา | 2 |  | ซีเซี่ย |
 | `tailor_silk` | เย็บเสื้อผ้าไหม | 3× ผ้าไหม + 2× เส้นด้าย → 1× เสื้อผ้าไหม | 4 |  | ซูโจว |
 
 ### ช่างเครื่องประดับ (`jewelry`, 3)
@@ -727,22 +727,22 @@ Every city hosts all six craft professions; villages and some sects host one. Re
 | Id | Name | Inputs → output | Mastery | Basic | Taught at |
 | --- | --- | --- | --- | --- | --- |
 | `chef_rice` | ทำข้าวหมูแดง | 1× เนื้อย่าง + 1× ไม้เนื้ออ่อน → 1× ข้าวหมูแดง | 1 | yes | 8 artisans |
-| `chef_stew` | ต้มยำสมุนไพร | 1× ปลาไหล + 2× สมุนไพรหายาก → 1× ต้มยำเข้มข้น | 2 |  | anywhere (not artisan-gated) |
+| `chef_stew` | ต้มยำสมุนไพร | 1× ปลาไหล + 2× สมุนไพรหายาก → 1× ต้มยำเข้มข้น | 2 |  | หยางโจว |
 | `chef_moon_cake` | ทำขนมไหว้พระจันทร์ | 2× เม็ดบัว + 1× ไม้เนื้ออ่อน → 1× ขนมไหว้พระจันทร์ | 3 |  | นครหลวง |
 
 ### วาดภาพ (`drawing`, 2)
 
 | Id | Name | Inputs → output | Mastery | Basic | Taught at |
 | --- | --- | --- | --- | --- | --- |
-| `draw_basic` | วาดภาพเบื้องต้น | 1× กระดาษสา + 1× หมึกเข้ม → 1× ภาพวาดเบื้องต้น | 1 |  | anywhere (not artisan-gated) |
-| `draw_master` | วาดภาพชั้นสูง | 2× กระดาษสา + 2× หมึกเข้ม → 1× ภาพวาดศิลปิน | 3 |  | anywhere (not artisan-gated) |
+| `draw_basic` | วาดภาพเบื้องต้น | 1× กระดาษสา + 1× หมึกเข้ม → 1× ภาพวาดเบื้องต้น | 1 |  | anywhere (อาชีพ → ประดิษฐ์) |
+| `draw_master` | วาดภาพชั้นสูง | 2× กระดาษสา + 2× หมึกเข้ม → 1× ภาพวาดศิลปิน | 3 |  | anywhere (อาชีพ → ประดิษฐ์) |
 
 ### อักษรศิลป์ (`writing`, 2)
 
 | Id | Name | Inputs → output | Mastery | Basic | Taught at |
 | --- | --- | --- | --- | --- | --- |
-| `write_basic` | เขียนอักษรพื้นฐาน | 1× กระดาษสา + 1× หมึกเข้ม → 1× ตัวอักษรพื้นฐาน | 1 |  | anywhere (not artisan-gated) |
-| `write_master` | เขียนอักษรชั้นเทพ | 2× กระดาษสา + 2× หมึกเข้ม → 1× อักษรเทพนิยม | 3 |  | anywhere (not artisan-gated) |
+| `write_basic` | เขียนอักษรพื้นฐาน | 1× กระดาษสา + 1× หมึกเข้ม → 1× ตัวอักษรพื้นฐาน | 1 |  | anywhere (อาชีพ → ประดิษฐ์) |
+| `write_master` | เขียนอักษรชั้นเทพ | 2× กระดาษสา + 2× หมึกเข้ม → 1× อักษรเทพนิยม | 3 |  | anywhere (อาชีพ → ประดิษฐ์) |
 
 ### ช่างเครื่องสาน (`accessory`, 4)
 
@@ -751,7 +751,7 @@ Every city hosts all six craft professions; villages and some sects host one. Re
 | `accessory_fortune_charm` | ถักเครื่องรางเสริมโชค | 2× เส้นด้าย + 1× สมุนไพรหายาก → 1× เครื่องรางเสริมโชค | 1 | yes | 7 artisans |
 | `accessory_silk_fan` | ทำพัดผ้าไหม | 2× ผ้าไหม + 1× ไม้เนื้อแข็ง → 1× พัดผ้าไหม | 2 |  | หยางโจว |
 | `accessory_warrior_belt` | ถักเข็มขัดนักรบ | 2× หนังฟอก + 1× เหล็กแท่ง → 1× เข็มขัดนักรบ | 3 |  | ฉางอัน |
-| `accessory_jade_pendant` | แกะจี้หยก | 1× หยกล้ำค่า + 1× เส้นด้าย → 1× จี้หยก | 4 |  | anywhere (not artisan-gated) |
+| `accessory_jade_pendant` | แกะจี้หยก | 1× หยกล้ำค่า + 1× เส้นด้าย → 1× จี้หยก | 4 |  | หยางโจว |
 
 ## Gathering and hunting nodes
 

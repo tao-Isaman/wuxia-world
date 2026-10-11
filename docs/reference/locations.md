@@ -2,7 +2,7 @@
 
 # Locations
 
-101 locations, 274 route scenes and 129 hand-authored connections (`lib/world/data/location-routes.ts`). The game starts at `home_player`. Map column: *painted (hand-placed markers)* = an entry in `LOCATION_MAPS` (`lib/world/data/location-maps.ts`); *painted (auto layout)* = listed in `AUTO_MAP_IDS` and laid out by `lib/world/data/auto-maps.ts`; *cards only* = no painting, the classic card view.
+101 locations, 273 route scenes and 129 hand-authored connections (`lib/world/data/location-routes.ts`). The game starts at `home_player`. Map column: *painted (hand-placed markers)* = an entry in `LOCATION_MAPS` (`lib/world/data/location-maps.ts`); *painted (auto layout)* = listed in `AUTO_MAP_IDS` and laid out by `lib/world/data/auto-maps.ts`; *cards only* = no painting, the classic card view.
 
 Services: 🏪 shop · 🏯 martial hall · 🔨 artisans (professions) · 🧘 practice allowed · ⛏ gathering / hunting nodes.
 
@@ -155,15 +155,15 @@ Services: 🏪 shop · 🏯 martial hall · 🔨 artisans (professions) · 🧘 
 
 | Id | Name | Region | Map | People | Services | Connects to |
 | --- | --- | --- | --- | --- | --- | --- |
-| `isle_taohua` | เกาะดอกท้อ | east | painted (auto layout) | 1 | ⛏ ตกปลาในทะเล, ตัดไม้เนื้ออ่อน | เกาะหมอกทอง, เกาะยกซาน (นกกระยาง), ซูโจว |
+| `isle_taohua` | เกาะดอกท้อ | east | painted (auto layout) | 1 | 🧘 · ⛏ ตกปลาในทะเล, ตัดไม้เนื้ออ่อน | เกาะหมอกทอง, เกาะยกซาน (นกกระยาง), ซูโจว |
 | `isle_xiake` | เกาะหมอกทอง | east | painted (auto layout) | 0 | ⛏ ตกปลาในทะเล, ตัดไม้เนื้ออ่อน | เกาะไร้ชื่อ, เกาะดอกท้อ, เกาะทะเลเพลิงน้ำแข็งเหนือ |
 | `isle_binghuo` | เกาะทะเลเพลิงน้ำแข็งเหนือ | east | painted (auto layout) | 0 | ⛏ ตกปลาในทะเล, ตัดไม้เนื้ออ่อน | เกาะมังกรเทพ, เกาะหมอกทอง |
 | `isle_yuanyang` | เกาะยกซาน (นกกระยาง) | east | painted (auto layout) | 0 | ⛏ ตกปลาในทะเล, ตัดไม้เนื้ออ่อน | เกาะดอกท้อ, เกาะฟ้าผ่า |
 | `isle_wane` | เกาะจระเข้หมื่นตัว | east | painted (auto layout) | 0 | ⛏ ตกปลาในทะเล, ตัดไม้เนื้ออ่อน | เกาะงูเงิน, เกาะโรตี |
 | `isle_pili` | เกาะฟ้าผ่า | east | painted (auto layout) | 0 | ⛏ ตกปลาในทะเล, ตัดไม้เนื้ออ่อน | เกาะยกซาน (นกกระยาง), เกาะงูเงิน |
-| `isle_lingshe` | เกาะงูเงิน | east | painted (auto layout) | 0 | ⛏ ตกปลาในทะเล, ตัดไม้เนื้ออ่อน | เกาะฟ้าผ่า, เกาะจระเข้หมื่นตัว |
+| `isle_lingshe` | เกาะงูเงิน | east | painted (auto layout) | 0 | 🧘 · ⛏ ตกปลาในทะเล, ตัดไม้เนื้ออ่อน | เกาะฟ้าผ่า, เกาะจระเข้หมื่นตัว |
 | `isle_boni` | เกาะโรตี | east | painted (auto layout) | 0 | ⛏ ตกปลาในทะเล, ตัดไม้เนื้ออ่อน | เกาะจระเข้หมื่นตัว, เกาะไร้ชื่อ |
-| `isle_shenlong` | เกาะมังกรเทพ | east | painted (auto layout) | 1 | ⛏ ตามรอยปลามังกร | เกาะทะเลเพลิงน้ำแข็งเหนือ, เกาะไร้ชื่อ |
+| `isle_shenlong` | เกาะมังกรเทพ | east | painted (auto layout) | 1 | 🧘 · ⛏ ตามรอยปลามังกร | เกาะทะเลเพลิงน้ำแข็งเหนือ, เกาะไร้ชื่อ |
 | `isle_wuming` | เกาะไร้ชื่อ | east | painted (auto layout) | 0 | ⛏ ตกปลาในทะเล, ตัดไม้เนื้ออ่อน | เกาะโรตี, เกาะหมอกทอง, เกาะมังกรเทพ |
 | `sea_xingxiu` | เขาดาวฤกษ์ทะเล | west | painted (auto layout) | 0 | 🧘 · ⛏ ขุดแร่เหล็ก, ล่าเสือบนภูเขา, ขุดแร่เงิน | สำนักดาวดึงส์ (เห็งซัว) |
 | `pool_heilong` | สระมังกรดำ | west | painted (auto layout) | 1 | 🧘 · ⛏ ล่าสัตว์ในป่า | พรรคเบญจพิษ, ต้าหลี่ |
