@@ -27,6 +27,8 @@ const KIND_COLOR: Record<string, string> = {
   steal:   "border-stone-600/60 text-stone-800",
   assassinate: "border-red-700/60 text-red-800",
   kidnap:  "border-purple-600/60 text-purple-800",
+  feud:    "border-red-700/60 text-red-800",
+  lead:    "border-amber-600/60 text-amber-800",
   learn:   "border-indigo-500/60 text-indigo-700",
   meridian: "border-fuchsia-600/60 text-fuchsia-800",
   quest:   "border-yellow-600/60 text-yellow-800",

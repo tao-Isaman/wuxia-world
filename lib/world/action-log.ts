@@ -26,6 +26,8 @@ export const ACTION_LOG_LABEL = {
   letter: "จดหมาย",
   tournament: "ประลองยุทธ",
   boss: "สัตว์ในตำนาน",
+  feud: "ความแค้น",
+  lead: "เบาะแส",
   time: "กาลเวลา",
 } as const satisfies Record<string, string>;
 

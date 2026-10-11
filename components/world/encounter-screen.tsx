@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useMemo } from "react";
 import { TIERS } from "@/lib/game";
-import { ENEMY_CATEGORY_LABEL, getOpponent, type EnemyCategory } from "@/lib/world";
+import { ENEMY_CATEGORY_LABEL, getNpc, getOpponent, type EnemyCategory } from "@/lib/world";
+import { feudActive, feudVictim, hunterSect, sectTitle } from "@/lib/world/feuds";
 import { rarityColor } from "@/lib/ui/rarity";
 import { FoePortrait } from "@/components/game/foe-portrait";
 import { useWorldStore } from "@/store/world-store";
@@ -20,6 +21,15 @@ export function EncounterScreen() {
   // The power reading is shown here, so going in starts the fight at once.
   const accept = useCallback(() => { acceptEncounter(); ensureBattleStarted(); }, [acceptEncounter]);
   const flee = useWorldStore((s) => s.fleeEncounter);
+  // A sect's hunter: sent after a betrayer, or avenging a member the hero killed (lib/world/feuds.ts).
+  const hunt = useWorldStore((s) => {
+    const sect = s.pendingEncounter ? hunterSect(s.pendingEncounter.opponentId) : null;
+    if (!sect) return null;
+    if (s.sectMembership[sect]?.status === "betrayed") return `${sectTitle(sect)}ส่งนักล่ามาตามตัวผู้ทรยศ — หนียากกว่าปกติ`;
+    if (!feudActive(s, sect)) return null;
+    const victim = feudVictim(s, sect);
+    return `ศิษย์${sectTitle(sect)}ตามมาล้างแค้นให้${(victim && getNpc(victim)?.name) || "ศิษย์ของตน"} — หนียากกว่าปกติ`;
+  });
   const opp = enc ? getOpponent(enc.opponentId) : null;
   const briefing = useMemo(() => (enc ? previewBriefing(playerBuild, enc.opponentId) : null), [enc, playerBuild]);
 
@@ -48,11 +58,11 @@ export function EncounterScreen() {
   const tierName = typeof opp.ti === "number" ? TIERS[opp.ti]?.n ?? "" : "";
   const cat: EnemyCategory = opp.category ?? "human";
   const color = rarityColor(opp.ti);
-  const flavor = opp.boss
+  const flavor = hunt ?? (opp.boss
     ? `${opp.name}เงยหัวขึ้นจากรังของมัน บริวารของมันรายล้อมอยู่ — จะสู้หรือหนี?`
     : cat === "beast"
       ? "สัตว์ป่าตัวหนึ่งกระโจนใส่เจ้า — จะสู้หรือหนี?"
-      : "คนแปลกหน้าขวางทางเจ้าด้วยท่าทีคุกคาม — จะสู้หรือหนี?";
+      : "คนแปลกหน้าขวางทางเจ้าด้วยท่าทีคุกคาม — จะสู้หรือหนี?");
 
   return (
     <section className="encounter-panel pixel-panel" role="alertdialog" aria-labelledby="encounter-name" data-testid="encounter-screen">

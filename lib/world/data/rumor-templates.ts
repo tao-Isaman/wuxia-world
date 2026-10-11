@@ -154,6 +154,22 @@ export const PLAYER_ECHO_TEMPLATES: Record<string, readonly RumorTemplate[]> = {
     },
   ],
 
+  // ─── feud_declared — a sect swears to avenge a member the hero killed ──
+  feud_declared: [
+    {
+      text: "สำนัก{sect}ประกาศล่าตัว{archetype}ผู้สังหาร{npc} ศิษย์ทั้งสำนักลงจากเขาออกตามล้างแค้น",
+      weight: 9,
+      lifespan: 60,
+      channel: "inn",
+    },
+    {
+      text: "ได้ยินว่าศิษย์สำนัก{sect}เดินทางกันเป็นกลุ่ม ตามหา{archetype}ที่ฆ่า{npc}ที่{location}",
+      weight: 8,
+      lifespan: 60,
+      channel: "wilderness",
+    },
+  ],
+
   // ─── sect_join — player joined a sect ──────────────────────────────────
   sect_join: [
     {

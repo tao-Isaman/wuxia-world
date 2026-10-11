@@ -8,9 +8,11 @@ import { currentTournament, entrantName, finishTournament, prizeName, resolveRou
 import { getNpc, getQuest, type WorldStateData } from "@/lib/world";
 import { applyEffect } from "@/lib/world/effects";
 import { tickAllNamedNpcs } from "@/lib/world/npc-tick";
-import { deadIds, killNpc, settleChargesOfDead, type ChargeChange } from "@/lib/world/npc-life";
+import { deadIds, killNpc, sectOfNpc, settleChargesOfDead, type ChargeChange } from "@/lib/world/npc-life";
+import { FEUD_DAYS, expireFeuds, sectTitle, startFeud } from "@/lib/world/feuds";
 import { KILL_MARKS, WANTED_DECAY_DAYS } from "@/lib/world/law";
 import { maintainRumors } from "@/lib/world/rumor-engine";
+import { scheduleTournamentWarning } from "@/lib/world/tournament";
 import { toast } from "@/store/toast-store";
 import { SECT_MEMBERSHIPS } from "@/lib/world/data/sect-memberships";
 import { HOURS_PER_DAY } from "./rules";
@@ -80,6 +82,8 @@ export function syncClock(state: WorldStateData, at: number = now()): void {
     tickAllNamedNpcs(state, { currentDay: state.day, seed: state.worldSeed });
   });
   maintainRumors(state, state.day);
+  // The tournament is talked about in the inns before it comes (a warning rumor).
+  scheduleTournamentWarning(state);
   // A new day: friends may write (lib/world/letters.ts), and a tournament
   // whose days have passed is settled (lib/world/tournament.ts).
   if (state.day > dayBefore) {
@@ -89,6 +93,9 @@ export function syncClock(state: WorldStateData, at: number = now()): void {
     // Registration opens: Huashan's chief invites the hero to the tournament.
     const invite = sendTournamentInvitation(state, dayBefore);
     if (invite) appendActionLog(state, "letter", `ได้รับจดหมายเชิญร่วม${TOURNAMENT_NAME}จาก${getNpc(invite.npcId)?.name ?? "สำนักหัวซาน"}`);
+    for (const sect of expireFeuds(state)) {
+      appendActionLog(state, "feud", `${sectTitle(sect)}เลิกตามล้างแค้นแล้ว — เวลาผ่านไปนานพอ`);
+    }
     const before = state.tournamentHistory.length;
     settleTournaments(state);
     const record = state.tournamentHistory[state.tournamentHistory.length - 1];
@@ -165,6 +172,8 @@ export function markAttemptedMurder(state: WorldStateData, npcId: string): void 
 export function heroKills(state: WorldStateData, npcId: string): void {
   const npc = getNpc(npcId);
   const sect = state.npcExt[npcId]?.sect ?? null;
+  // The school the dead belonged to (simulated, else by the grounds they stood on) avenges them.
+  const avenging = sectOfNpc(state, npcId);
   // A death in the shared world: a world event (lib/world/shared/events.ts).
   withChargesOfDead(state, () => {
     emitWorldEvent(state, { t: "npc_killed", npcId, byPlayer: heroTag(state), day: state.day, locationId: state.currentSceneId });
@@ -179,6 +188,12 @@ export function heroKills(state: WorldStateData, npcId: string): void {
   if (sect && own && (own.status ?? "active") === "active") {
     applyEffect(state, { t: "betraySect", sectId: sect });
     appendActionLog(state, "sect", `สังหารคนในสำนัก${SECT_MEMBERSHIPS[sect].name} — นับเป็นการทรยศสำนัก`);
+  } else if (avenging && (state.sectMembership[avenging]?.status ?? null) !== "betrayed") {
+    // Another school's member (or a school the hero left): a blood feud
+    // (lib/world/feuds.ts). A school the hero betrayed already hunts them.
+    startFeud(state, avenging, npcId);
+    appendActionLog(state, "feud", `${sectTitle(avenging)}ประกาศล้างแค้นให้${npc?.name ?? "ศิษย์ของตน"} — ระวังนักล่าของสำนักไปอีก ${FEUD_DAYS} วัน`);
+    applyEffect(state, { t: "firePlayerEcho", actionId: "feud_declared", targetNpcId: npcId, sectId: avenging });
   }
 }
 

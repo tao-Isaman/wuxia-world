@@ -17,7 +17,7 @@ import { absoluteHours, arrestPenalty, bribeCost, describeSentence, jailCityFor,
 import { deathLosableItems } from "./death";
 import { JAIL_SCENE_ID } from "./data/activities";
 import { STAT_LABEL, deriveAll, getArt, getSkill } from "../game";
-import { generatePlayerEcho } from "./rumor-engine";
+import { generatePlayerEcho, noteLeadHeard } from "./rumor-engine";
 import { questHolder } from "./npc-life";
 // Walk-tick encounters live in ./encounters; re-exported for existing importers.
 export { collectActiveHuntTargets, encounterFoeAvailable, rollFoeSpawn, rollWalkEvent } from "./encounters";
@@ -296,6 +296,7 @@ export function applyEffect(state: WorldStateData, eff: SceneEffect): void {
         state,
         actionId: eff.actionId,
         targetNpcId: eff.targetNpcId,
+        sectId: eff.sectId,
       });
       // The news of what the hero did is part of the shared world: log it as an event.
       const rumor = rumorId ? state.rumorPool.find((r) => r.id === rumorId) : undefined;
@@ -315,6 +316,7 @@ export function applyEffect(state: WorldStateData, eff: SceneEffect): void {
       // append-only above).
       while (log.length > 50) log.shift();
       state.rumorSeenLog = log;
+      noteLeadHeard(state, eff.rumorId);
       return;
     }
     case "revealNpcStatus": {

@@ -6,7 +6,7 @@
 import { evaluateCondition } from "./conditions";
 import { ARTS_BY_ID } from "../game/data/arts";
 import { ITEMS_BY_ID } from "./data/items";
-import { LORE_RUMORS } from "./data/lore-rumors";
+import { LORE_RUMORS, type LoreRumorTemplate } from "./data/lore-rumors";
 import { SECT_MEMBERSHIPS } from "./data/sect-memberships";
 import { CHANNEL_ADMITS, regionOf } from "./data/regions";
 import { getNamedDefault } from "./data/named-npcs";
@@ -80,6 +80,57 @@ export function seedLoreRumors(state: WorldStateData): void {
   state.rumorPool = pool;
 }
 
+// ─── Lore leads (`leadsTo`) ────────────────────────────────────────────
+// A lead the hero has heard (`lead:<rumorId>` = "heard" in flags, set by
+// noteLeadHeard; older saves: the rumor in rumorSeenLog) pays something extra
+// the first time they reach its place: the hinted item (unless it is a quest
+// item, which its quest hands out) and LEAD_WEXP w-exp. Then the flag reads
+// "found" and the lead is spent.
+export const LEAD_WEXP = 30;
+const LEAD_FLAG = "lead:";
+const LEADS_BY_ID = new Map(LORE_RUMORS.filter((lore) => lore.leadsTo).map((lore) => [loreId(lore.idSuffix), lore]));
+
+/** Every lore rumor that leads somewhere, by id (for tests and the guide). */
+export function loreLeads(): ReadonlyMap<string, LoreRumorTemplate> {
+  return LEADS_BY_ID;
+}
+
+/** The hero heard `rumorId`: if it is a lead, remember it (flags outlive the 50-entry seen log). */
+export function noteLeadHeard(state: Pick<WorldStateData, "flags">, rumorId: string): void {
+  if (LEADS_BY_ID.has(rumorId) && state.flags[LEAD_FLAG + rumorId] !== "found") state.flags[LEAD_FLAG + rumorId] = "heard";
+}
+
+export interface LeadFound {
+  rumorId: string;
+  locationId: string;
+  /** The hinted item handed over, if any. */
+  itemId: string | null;
+  wExp: number;
+}
+
+/**
+ * The hero stands at `locationId`: follow up every lead they heard that points
+ * here and has not paid out yet. Mutates `state` (flags, inventory, w-exp) and
+ * returns what was found, for the log.
+ */
+export function followLeads(state: WorldStateData, locationId: string): LeadFound[] {
+  const out: LeadFound[] = [];
+  const heard = new Set((state.rumorSeenLog ?? []).map((entry) => entry.rumorId));
+  for (const [rumorId, lore] of LEADS_BY_ID) {
+    if (lore.leadsTo!.locationId !== locationId) continue;
+    const flag = state.flags[LEAD_FLAG + rumorId];
+    if (flag === "found" || (flag !== "heard" && !heard.has(rumorId))) continue;
+    state.flags[LEAD_FLAG + rumorId] = "found";
+    const hint = lore.leadsTo!.hintItemId;
+    const item = hint ? ITEMS_BY_ID.get(hint) : undefined;
+    const itemId = item && item.category !== "quest" ? item.id : null;
+    if (itemId) state.inventory = { ...state.inventory, [itemId]: (state.inventory[itemId] ?? 0) + 1 };
+    state.wExp = (state.wExp ?? 0) + LEAD_WEXP;
+    out.push({ rumorId, locationId, itemId, wExp: LEAD_WEXP });
+  }
+  return out;
+}
+
 // Big-news rule used by both lifespan + weight booster. Spec §3.2.1.
 const BIG_EVENT_KINDS: ReadonlySet<NpcEventKind> = new Set([
   "death_combat",
@@ -119,6 +170,8 @@ export interface PlayerEchoArgs {
   state: WorldStateData;
   actionId: string;
   targetNpcId?: string;
+  /** The sect the deed concerns ({sect}); default: the hero's sole membership, or for a feud the target's sect. */
+  sectId?: SectId | null;
 }
 
 export interface WarningArgs {
@@ -127,6 +180,12 @@ export interface WarningArgs {
   triggerDay: number;
   locationId: string;
   payload?: Record<string, string | number | boolean>;
+  /** A stable id: the warning is made once and its text refreshed on later calls. */
+  id?: string;
+  /** The last day it can be heard (default: the day after the event). */
+  expiresDay?: number;
+  /** Where it is heard (default: the event's region; "global" for news every inn talks about). */
+  region?: Region;
 }
 
 // ─── Helpers exported for tests / callers ──────────────────────────────
@@ -406,7 +465,8 @@ export function generatePlayerEcho(args: PlayerEchoArgs): string | null {
     npc2: targetName,
     location: locName,
   };
-  resolveDetailNames(vars, playerEchoSect(state, actionId));
+  const feudSect = actionId === "feud_declared" && targetNpcId ? state.npcExt?.[targetNpcId]?.sect : undefined;
+  resolveDetailNames(vars, args.sectId ?? feudSect ?? playerEchoSect(state, actionId));
 
   // Player-echo distortion: heavier than the standard split.
   const r = Math.random();
@@ -444,6 +504,9 @@ export function generatePlayerEcho(args: PlayerEchoArgs): string | null {
 
 export function generateWarning(args: WarningArgs): string | null {
   const { state, warningKind, triggerDay, locationId, payload } = args;
+  // A warning with a fixed id is one rumor that keeps its text current
+  // ("อีก N วัน") instead of a new one each time it is scheduled.
+  const existing = args.id ? state.rumorPool?.find((r) => r.id === args.id) : undefined;
   ensureRumorArrays(state);
 
   const pool = WARNING_TEMPLATES[warningKind];
@@ -460,18 +523,19 @@ export function generateWarning(args: WarningArgs): string | null {
     location: locName,
     event: warningKind,
   };
-  if (payload) {
-    for (const [k, v] of Object.entries(payload)) {
-      if (vars[k] === undefined || vars[k] === "") vars[k] = String(v);
-    }
-  }
+  // The payload names the event ({event}: "ชุมนุมประลอง…", not the kind's id).
+  if (payload) for (const [k, v] of Object.entries(payload)) vars[k] = String(v);
 
   const text = renderTemplate(tpl.text, vars);
+  if (existing) {
+    if (existing.text !== text) state.rumorPool = state.rumorPool.map((r) => (r === existing ? { ...r, text } : r));
+    return existing.id;
+  }
   // Warnings are always "true" per spec §3.2.4.
   const truth: RumorTruth = "true";
-  const region = regionOf(locationId);
+  const region = args.region ?? regionOf(locationId);
 
-  const id = `rumor_warn_${warningKind}_${triggerDay}_${rngTag()}`;
+  const id = args.id ?? `rumor_warn_${warningKind}_${triggerDay}_${rngTag()}`;
   const rumor: Rumor = {
     id,
     text,
@@ -479,7 +543,7 @@ export function generateWarning(args: WarningArgs): string | null {
     createdDay: currentDay,
     // Warnings expire one day AFTER the event lands so the day-of player
     // can still hear "today is X day".
-    expiresDay: triggerDay + 1,
+    expiresDay: args.expiresDay ?? triggerDay + 1,
     truth,
     region,
     channel: tpl.channel,

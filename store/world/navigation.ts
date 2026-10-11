@@ -1,7 +1,8 @@
 // Moving between scenes inside an action's draft: travel costs, the jail
 // lock, dialog choices and auto-advance.
 import { STAT_XP_PER_ACTION } from "@/lib/world/stat-progression";
-import { applyEffects, getQuest, getScene, type Choice, type SceneEffect, type WorldStateData } from "@/lib/world";
+import { followLeads } from "@/lib/world/rumor-engine";
+import { applyEffects, getItem, getQuest, getScene, type Choice, type SceneEffect, type WorldStateData } from "@/lib/world";
 import { tickQuestProgress } from "@/lib/world/effects";
 import { JAIL_SCENE_ID } from "@/lib/world/data/activities";
 import { appendActionLog } from "./state";
@@ -71,6 +72,11 @@ export function followAutoAdvance(state: WorldStateData): void {
     if (sc.kind === "location") {
       state.lastLocationId = state.currentSceneId;
       recordVisit(state, state.currentSceneId);
+      // A rumor's lead followed here pays out once (lib/world/rumor-engine.ts followLeads).
+      for (const found of followLeads(state, state.currentSceneId)) {
+        const item = found.itemId ? getItem(found.itemId)?.name : null;
+        appendActionLog(state, "lead", `ตามข่าวลือมาถึง${sc.name}${item ? ` พบ${item}` : " พบร่องรอยตามที่เล่าลือ"} · +${found.wExp} ประสบการณ์ยุทธ`);
+      }
       tickQuestProgress(state);
       return; // locations wait for the player
     }

@@ -13,6 +13,8 @@ import { ARTS_BY_ID } from "@/lib/game/data/arts";
 import { EQUIPMENT_BY_ID } from "@/lib/game/data/equipment";
 import { SECT_MEMBERSHIPS } from "./data/sect-memberships";
 import { heroBodyFor } from "./data/player-bodies";
+import { repairNpcExt } from "./npc-repair";
+import { repairFeudFlags } from "./feuds";
 import {
   deriveAll,
   getMeridianChart,
@@ -27,6 +29,11 @@ import {
 // to data ids that don't exist anymore (e.g., a scene was removed between
 // deploys, or an item id was renamed). Logs to console so authors notice.
 export function validateAndRepair(state: WorldStateData): void {
+  // The simulated people belong to the shared world, which a fresh title
+  // screen (no hero yet) holds too: repaired before the hero check.
+  const people = repairNpcExt(state);
+  if (people.dropped.length) console.warn(`[world] dropping unknown simulated people: ${people.dropped.join(", ")}`);
+  if (people.fixed.length) console.warn(`[world] repaired simulated people: ${people.fixed.join(", ")}`);
   if (!state.hasGame) return;
 
   const cur = SCENES_BY_ID.get(state.currentSceneId);
@@ -61,6 +68,8 @@ export function validateAndRepair(state: WorldStateData): void {
   // still written by walk events and hunting (rollWalkEvent), though nothing
   // reads it since encounters moved from arrival to walk ticks.
   delete state.flags._skipEventRoll;
+  // Sect feuds (lib/world/feuds.ts) live in flags: drop malformed or unknown-sect ones.
+  repairFeudFlags(state.flags);
 
   // Wanted marks: 0–5; a jail city must be a real city.
   state.wanted = Math.max(0, Math.floor(Number(state.wanted) || 0));

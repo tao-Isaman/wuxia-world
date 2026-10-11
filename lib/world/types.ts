@@ -200,7 +200,7 @@ export type SceneEffect =
   // to a template pool in lib/world/data/rumor-templates.ts. Used by
   // store actions (duel-win-named, sect-join/leave/betray, major quest
   // complete, sect rank-up). Region defaults to player's current region.
-  | { t: "firePlayerEcho"; actionId: string; targetNpcId?: string }
+  | { t: "firePlayerEcho"; actionId: string; targetNpcId?: string; sectId?: SectId }
   // Mark a rumor as heard by the player — pushes onto rumorSeenLog so
   // future rumor selections de-prioritise it. Used by the inn/market
   // listen popups when the player picks a rumor to focus on.

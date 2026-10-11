@@ -26,6 +26,8 @@ import {
 } from "./data/liveness-roster";
 import { generateNpcEventEcho } from "./rumor-engine";
 import { npcFoeId, registerNpcFoeNames } from "./data/opponents";
+import { registerBorrowedPortrait } from "./data/npc-portraits";
+import { generatedPortraitId } from "./data/generated-portraits";
 
 registerNpcFoeNames((id) => getNpc(id)?.name ?? null);
 
@@ -165,13 +167,38 @@ function completeExt(id: string, ext: NpcExtState): NpcExtState {
   };
 }
 
+/** A few words on a generated person's bent, from their temper. */
+function temperLine(ext: NpcExtState): string | null {
+  const t = ext.temper;
+  if (!t) return null;
+  const bits: string[] = [];
+  if (t.righteous >= 0.5) bits.push("ยึดมั่นในคุณธรรม");
+  else if (t.righteous <= -0.3) bits.push("ใจคอโหดเหี้ยม ไม่เลือกวิธี");
+  if (t.ambition >= 0.75) bits.push("ทะเยอทะยานอยากเป็นยอดฝีมือ");
+  if (t.wanderlust >= 0.7) bits.push("ชอบท่องเที่ยวไม่อยู่กับที่");
+  if (t.loyalty >= 0.8 && ext.sect) bits.push("ภักดีต่อสำนักยิ่งกว่าสิ่งใด");
+  return bits.length ? bits.join(" ") : null;
+}
+
+/** Who a generated person is, in a line or two: their place in the world, age, master and bent. */
+function dynamicDescription(ext: NpcExtState): string {
+  const who = ext.sect
+    ? rankTitle(ext.sectRank, sectName(ext.sect))
+    : ext.formerSect ? `อดีตศิษย์${sectName(ext.formerSect)} ผู้ท่องยุทธภพลำพัง` : "จอมยุทธ์หน้าใหม่ผู้ท่องยุทธภพ";
+  const master = ext.masterId ? getNpc(ext.masterId)?.name : null;
+  const lines = [`${who} อายุ ${ext.age} ปี`];
+  if (master) lines.push(`ศิษย์ของ${master}`);
+  const bent = temperLine(ext);
+  if (bent) lines.push(bent);
+  return lines.join(" · ");
+}
+
 /** A registry NpcDef for a generated person. */
 function dynamicDef(id: string, ext: NpcExtState): NpcDef {
-  const title = rankTitle(ext.sectRank, sectName(ext.sect));
   return {
     id,
     name: ext.name ?? id,
-    description: ext.sect ? `${title} · ศิษย์รุ่นใหม่ที่ยุทธจักรเพิ่งรู้จักชื่อ` : "จอมยุทธ์หน้าใหม่ที่เพิ่งปรากฏตัวในยุทธจักร",
+    description: dynamicDescription(ext),
     locationIds: [],
     defenseTier: powerTier(ext.power),
     tags: ["liveness", ext.sect ? "disciple" : "wanderer"],
@@ -179,10 +206,16 @@ function dynamicDef(id: string, ext: NpcExtState): NpcDef {
   };
 }
 
+/** A generated person in the NPC registry, with a borrowed portrait that fits them. */
+function registerGenerated(id: string, ext: NpcExtState): void {
+  registerDynamicNpc(dynamicDef(id, ext));
+  registerBorrowedPortrait(id, generatedPortraitId(id, { sect: ext.sect, gender: ext.gender, age: ext.age }));
+}
+
 /** Register every generated person of this save with the NPC registry. */
 export function syncDynamicNpcs(state: Pick<WorldStateData, "npcExt">): void {
   for (const [id, ext] of Object.entries(state.npcExt ?? {})) {
-    if (ext.dynamic) registerDynamicNpc(dynamicDef(id, ext));
+    if (ext.dynamic) registerGenerated(id, ext);
   }
 }
 
@@ -281,7 +314,7 @@ export function spawnPerson(state: WorldStateData, spec: SpawnSpec, rng: () => n
     masterId: spec.masterId,
   };
   state.npcExt[id] = ext;
-  registerDynamicNpc(dynamicDef(id, ext));
+  registerGenerated(id, ext);
   return id;
 }
 
