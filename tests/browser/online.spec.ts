@@ -187,3 +187,40 @@ test("characters on the server: two heroes on one account, switch, resume after 
   await other.context().close();
   await page.context().close();
 });
+
+test("a fight on the server: staged there, played here, judged there before the world goes on", async ({ browser }) => {
+  test.skip(!(await serverUp()), `no game server at ${SERVER} (bun run server:dev)`);
+  test.setTimeout(180_000);
+  const page = await player(browser, "หลิวเฟิง", "ชาย", `eve_${run}`.slice(0, 20));
+  await page.getByTestId("online-button").click();
+  await expect(page.getByTestId("online-character")).toHaveAttribute("data-save-status", "saved", { timeout: 20_000 });
+  // Stand the hero, made strong, before a thief: written to the server's save, then reloaded.
+  const stored = await page.evaluate(async (server) => {
+    const online = JSON.parse(localStorage.getItem("wuxia-online-v1")!).state as { token: string; characterId: string };
+    const headers = { authorization: `Bearer ${online.token}`, "content-type": "application/json" };
+    const path = `${server}/characters/${online.characterId}/save`;
+    const { rev, save } = await (await fetch(path, { headers })).json();
+    const state = save.state;
+    state.playerBuild.stats = Object.fromEntries(Object.keys(state.playerBuild.stats).map((k: string) => [k, 900]));
+    state.currentHp = 99_999;
+    state.currentMp = 99_999;
+    state.pendingBattle = { opponentId: "petty_thief", onWin: state.currentSceneId, onLose: state.currentSceneId };
+    await new Promise((resolve) => setTimeout(resolve, 1200));
+    const put = await fetch(path, { method: "PUT", headers, body: JSON.stringify({ rev, version: save.version, state }) });
+    return { ok: put.ok, gold: state.gold as number };
+  }, SERVER);
+  expect(stored.ok).toBe(true);
+  await page.reload();
+  const briefing = page.getByTestId("battle-briefing");
+  await expect(briefing).toBeVisible({ timeout: 60_000 });
+  await briefing.getByRole("button", { name: /เข้าต่อสู้/ }).click();
+  await page.getByRole("button", { name: "อัตโนมัติ" }).click();
+  const result = page.getByTestId("combat-result");
+  await expect(result).toHaveAttribute("data-outcome", "ally", { timeout: 90_000 });
+  // The server's verdict brings the spoils; only then does the story go on.
+  await expect(page.getByTestId("victory-spoils")).toBeVisible({ timeout: 20_000 });
+  await result.getByRole("button", { name: /ดำเนินเรื่อง/ }).click();
+  await expect(page.getByTestId("world-canvas")).toHaveAttribute("data-ready", "true", { timeout: 60_000 });
+  await expect(page.getByTestId("combat-result")).toHaveCount(0);
+  await page.context().close();
+});
