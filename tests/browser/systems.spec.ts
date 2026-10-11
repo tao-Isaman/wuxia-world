@@ -3,10 +3,6 @@ import { test, expect, type Page } from "@playwright/test";
 async function save(page: Page) {
   return page.evaluate(() => JSON.parse(localStorage.getItem("wusia-world-v1")!).state);
 }
-// The shared world (lib/world/shared/): the tournament is the world's.
-async function world(page: Page) {
-  return page.evaluate(() => JSON.parse(localStorage.getItem("wusia-shared-v1")!).world);
-}
 async function patch(page: Page, fields: Record<string, unknown>) {
   await page.evaluate((next) => {
     const saved = JSON.parse(localStorage.getItem("wusia-world-v1")!);
@@ -67,21 +63,30 @@ test("horse station: ride from the capital to a visited city for gold, arriving 
 
 test("sword tournament: register in the window, then the tournament day queues a bout", async ({ page }) => {
   test.setTimeout(120_000);
+  // The world clock decides the day (one game day is one real hour from the
+  // epoch): put the page on world day 70, inside the registration window.
+  const WORLD_EPOCH_MS = Date.UTC(2026, 9, 7, 17, 0, 0);
+  const worldDay = (day: number) => WORLD_EPOCH_MS + (day - 1) * 3_600_000 + 60_000;
+  await page.clock.install({ time: worldDay(70) });
   await newGame(page);
-  await patch(page, { currentSceneId: "sect_huashan", lastLocationId: "sect_huashan", gold: 1000, day: 70 });
+  await patch(page, { currentSceneId: "sect_huashan", lastLocationId: "sect_huashan", gold: 1000 });
   await visit(page, "tournament");
   const popup = page.getByTestId("tournament-popup");
   await expect(popup.getByTestId("tournament-calendar")).toContainText("เปิดรับสมัคร");
   await popup.getByTestId("tournament-register").click();
-  await expect.poll(async () => (await world(page)).tournament?.status).toBe("registered");
+  // The tournament is the hero's own (save v28).
+  await expect.poll(async () => (await save(page)).tournament?.status).toBe("registered");
   expect((await save(page)).gold).toBe(900);
   await page.keyboard.press("Escape");
 
-  await patch(page, { day: 90 });
+  // Tournament day.
+  await page.clock.setSystemTime(worldDay(90));
+  await page.reload();
+  await expect(page.getByTestId("world-canvas")).toHaveAttribute("data-ready", "true", { timeout: 60_000 });
   await visit(page, "tournament");
   await page.getByTestId("tournament-popup").getByTestId("tournament-start").click();
   await expect.poll(async () => (await save(page)).pendingBattle?.tournament).toBe(true);
-  const { tournament } = await world(page);
+  const { tournament } = await save(page);
   expect(tournament.rounds[0]).toHaveLength(32);
   expect(tournament.rounds[0]).toContain("player");
   await expect(page.getByTestId("battle-briefing")).toBeVisible({ timeout: 20_000 });
