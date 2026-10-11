@@ -298,7 +298,7 @@ Per tier: T0: 9 · T1: 44 · T2: 74 · T3: 56 · T4: 205 · T5: 12. Per category
 | `st_huashan_two_faced_blade` | ดาบสองหน้า | human | 364 | — | 8 | scene ×1 |
 | `st_gumu_jueqing_lord` | กงซุนเหลียง เจ้าหุบเขาตัดใจ | human | 349 | — | 8 | scene ×1 |
 | `st_gumu_bone_claw` | เหยียนซวง นางกรงเล็บกระดูกขาว | human | 383 | — | 8 | scene ×1 |
-| `st_gumu_xuanming_heir` | หานเฉิงอวี้ ทายาทฝ่ามือเฮี้ยนเม้ง | human | 410 | — | 8 | scene ×1 |
+| `st_gumu_xuanming_heir` | หานเฉิงอวี้ ทายาทฝ่ามือเงาเหมันต์ | human | 410 | — | 8 | scene ×1 |
 | `st_beggars_false_chief` | ตั้งกิมเหลียง หัวหน้าเก้าถุงครึ่ง | human | 381 | — | 8 | scene ×1 |
 | `st_beggars_iron_staff` | เกาไม้เท้าเหล็ก | human | 384 | — | 8 | scene ×1 |
 | `st_beggarsarts_silver_tongue` | ลิ้นเงินซือฉวน | human | 373 | — | 8 | scene ×1 |
@@ -312,7 +312,7 @@ Per tier: T0: 9 · T1: 44 · T2: 74 · T3: 56 · T4: 205 · T5: 12. Per category
 | `st_outsider_lion_mask` | หน้ากากราชสีห์ทอง | human | 399 | — | 8 | scene ×1 |
 | `st_jinyiwei_eunuch_liang` | ขันทีใหญ่เหลียง | human | 348 | — | 8 | scene ×1 |
 | `st_jinyiwei_helian` | ขุนดาบเฮ่อเหลียนป้า | human | 367 | — | 8 | scene ×1 |
-| `st_jinyiweiarts_leng_suo` | เหลิงซั่ว ฝ่ามือเฮี้ยนเม้ง | human | 374 | — | 8 | scene ×1 |
+| `st_jinyiweiarts_leng_suo` | เหลิงซั่ว ฝ่ามือเงาเหมันต์ | human | 374 | — | 8 | scene ×1 |
 | `st_jinyiweiarts_sun_yu` | เจ้ากรมเงาไหมซุนอวี้ | human | 335 | — | 8 | scene ×1 |
 | `st_jinyiweiarts_gu_chang` | ราชครูกู่ฉาง ผู้คุมหอเจดีย์ | human | 429 | — | 8 | scene ×1 |
 | `st_tang_peng_canghai` | จอมโจรสลัดเผิงชางไห่ | human | 331 | — | 8 | scene ×1 |
@@ -395,7 +395,7 @@ Per tier: T0: 9 · T1: 44 · T2: 74 · T3: 56 · T4: 205 · T5: 12. Per category
 | `st_jh_sunflower_gao_silent_step` | ขันทีเกา (เท้าไร้เสียง) | human | 509 | — | 8 | scene ×1 |
 | `st_jh_sunflower_xiaolong` | เสี่ยวหลง | human | 474 | — | 8 | scene ×1 |
 | `st_jh_sunflower_gu_red_needle` | ขันทีใหญ่กู้ชิวเซิง | human | 731 | — | 8 | scene ×1 |
-| `st_jh_nine_yang_frost_hand` | มือหิมะเฮี้ยนเม้ง | human | 357 | — | 8 | scene ×2 |
+| `st_jh_nine_yang_frost_hand` | มือหิมะเงาเหมันต์ | human | 357 | — | 8 | scene ×2 |
 | `st_jh_nine_yang_torch_left` | ผู้ถือคบซ้าย | human | 393 | — | 8 | scene ×2 |
 | `st_jh_nine_yang_torch_right` | ผู้ถือคบขวา | human | 406 | — | 8 | scene ×3 |
 | `st_jh_nine_yang_north_rider` | ทหารม้าเหล็กเหนือ | human | 409 | — | 8 | scene ×1 |
@@ -409,7 +409,7 @@ Per tier: T0: 9 · T1: 44 · T2: 74 · T3: 56 · T4: 205 · T5: 12. Per category
 | `st_jh_nine_yin_jade_gang` | สมุนสมาคมเล็บหยก | human | 376 | — | 8 | scene ×2 |
 | `st_jh_nine_yin_jade_lord` | คุณชายซ่งอวี้หลาง | human | 476 | — | 8 | scene ×2 |
 | `st_jh_nine_yin_ice_mask` | ชายหน้ากากน้ำแข็ง | human | 563 | — | 8 | scene ×2 |
-| `st_jh_nine_yin_xuan` | เฒ่าเซวียน ศิษย์สุดท้ายแห่งเฮี้ยนเม้ง | human | 829 | — | 8 | scene ×2 |
+| `st_jh_nine_yin_xuan` | เฒ่าเซวียน ศิษย์สุดท้ายแห่งเงาเหมันต์ | human | 829 | — | 8 | scene ×2 |
 | `st_jh_nine_yin_north_shadow` | โหวเทียนซิง เงาทัพเหนือ | human | 554 | — | 8 | scene ×2 |
 | `st_jh_nine_yin_south_captain` | นายกองเฉียนอู่แห่งทัพใต้ | human | 525 | — | 8 | scene ×1 |
 | `st_jh_nine_yin_fake_sage` | ซินแสเก้าเล่ม | human | 473 | — | 8 | scene ×1 |

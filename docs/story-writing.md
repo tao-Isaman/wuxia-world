@@ -330,7 +330,7 @@ Starting points; invent freely within the legend's spirit.
   - ฉินเซียงหลิง wandering the world, then founding the sect;
   - the secret inside กระบี่เคียงฟ้า and ดาบปราบมังกร;
   - ซือไท้จิ้งหาน's harsh duty;
-  - กี่เฮี้ยวฮู้, who would not kill the man she loved;
+  - เหมยซิ่วหลาน, who would not kill the man she loved;
   - ไป๋ซู่หลิง's Nine-Yin claw and her regret (mercy vs duty — the bodhi palm and sword).
 - **หัวซาน**
   - the elder who used golden-silkworm poison and betrayed the woman who saved him;
