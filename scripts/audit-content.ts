@@ -1,7 +1,9 @@
 // One-shot audit: walks every NPC and Quest, verifies every referenced
 // id (dialogSceneId, sparOpponentId, questIds, giverNpcId, turnInNpcId,
 // rewards.itemId / opponentId / skillId / artId / npcId, prereqs, stage
-// autoAdvance, etc.) resolves to a registered entry. Prints a punch list
+// autoAdvance, etc.) and every drop table (opponent drops and packs, boss
+// trophies, resource yields, meridian-chart loot, recipe items) resolves to a
+// registered entry. Prints a punch list
 // of bad references and exits non-zero on any miss.
 //
 // Usage:  bun run scripts/audit-content.ts
@@ -24,6 +26,12 @@ import {
 } from "@/lib/world";
 import { SKILLS_BY_ID } from "@/lib/game/data/skills";
 import { ARTS_BY_ID } from "@/lib/game/data/arts";
+import { OPPONENTS } from "@/lib/world/data/opponents";
+import { BOSSES } from "@/lib/world/data/bosses";
+import { RESOURCES } from "@/lib/world/data/resources";
+import { RECIPES } from "@/lib/world/data/recipes";
+import { MERIDIAN_SOURCES } from "@/lib/world/data/meridian-sources";
+import type { ResourceYield } from "@/lib/world/types";
 
 const issues: string[] = [];
 
@@ -300,16 +308,64 @@ function checkScene(): void {
   }
 }
 
+// Drop tables and the other loot / yield lists: every dropped, yielded or
+// crafted id resolves, weights and counts are sane.
+let yieldCount = 0;
+function checkYield(ctx: string, y: ResourceYield): void {
+  yieldCount++;
+  require(`${ctx}: unknown item "${y.itemId}"`, ITEMS_BY_ID.has(y.itemId));
+  require(`${ctx}: weight ${y.weight} for "${y.itemId}" must be > 0`, y.weight > 0);
+  if (y.count) {
+    const [lo, hi] = y.count;
+    require(`${ctx}: count [${lo}, ${hi}] for "${y.itemId}" must be 1 ≤ min ≤ max`, lo >= 1 && hi >= lo);
+  }
+}
+
+function checkDropTables(): void {
+  for (const o of OPPONENTS) {
+    (o.drops ?? []).forEach((d, i) => checkYield(`opponent[${o.id}].drops[${i}]`, d));
+    const pack = o.pack ? (Array.isArray(o.pack) ? o.pack : [o.pack]) : [];
+    pack.forEach((m, i) =>
+      require(`opponent[${o.id}].pack[${i}]: unknown opponent "${m.opponentId}"`, OPPONENTS_BY_ID.has(m.opponentId)),
+    );
+  }
+  for (const b of BOSSES) {
+    require(`boss[${b.id}]: unknown opponent`, OPPONENTS_BY_ID.has(b.id));
+    require(`boss[${b.id}].trophyItemId: unknown item "${b.trophyItemId}"`, ITEMS_BY_ID.has(b.trophyItemId));
+  }
+  for (const r of RESOURCES) {
+    r.yields.forEach((y, i) => checkYield(`resource[${r.id}].yields[${i}]`, y));
+    (r.opponentIds ?? []).forEach((id, i) =>
+      require(`resource[${r.id}].opponentIds[${i}]: unknown opponent "${id}"`, OPPONENTS_BY_ID.has(id)),
+    );
+  }
+  for (const [chart, src] of Object.entries(MERIDIAN_SOURCES)) {
+    require(`meridianSource[${chart}]: unknown item "chart_${chart}"`, ITEMS_BY_ID.has(`chart_${chart}`));
+    (src.loot ?? []).forEach((l, i) => {
+      require(`meridianSource[${chart}].loot[${i}]: unknown opponent "${l.opponentId}"`, OPPONENTS_BY_ID.has(l.opponentId));
+      require(`meridianSource[${chart}].loot[${i}]: chance ${l.chance} outside (0, 1]`, l.chance > 0 && l.chance <= 1);
+    });
+    (src.questRewards ?? []).forEach((q, i) =>
+      require(`meridianSource[${chart}].questRewards[${i}]: unknown quest "${q}"`, QUESTS_BY_ID.has(q)),
+    );
+  }
+  for (const r of RECIPES) {
+    r.inputs.forEach((x, i) => require(`recipe[${r.id}].inputs[${i}]: unknown item "${x.itemId}"`, ITEMS_BY_ID.has(x.itemId)));
+    require(`recipe[${r.id}].output: unknown item "${r.output.itemId}"`, ITEMS_BY_ID.has(r.output.itemId));
+  }
+}
+
 NPCS.forEach(checkNpc);
 QUESTS.forEach(checkQuest);
 checkScene();
+checkDropTables();
 
 // Sanity touch evaluateCondition so tree-shaking can't drop it.
 void evaluateCondition;
 
 if (issues.length === 0) {
   console.log(
-    `[audit] OK — ${NPCS.length} NPCs · ${QUESTS.length} quests · ${SCENES_BY_ID.size} scenes · all references resolve.`,
+    `[audit] OK — ${NPCS.length} NPCs · ${QUESTS.length} quests · ${SCENES_BY_ID.size} scenes · ${yieldCount} drops / yields · all references resolve.`,
   );
   process.exit(0);
 } else {

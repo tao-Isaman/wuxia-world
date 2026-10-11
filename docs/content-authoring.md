@@ -63,7 +63,7 @@ Run these after any content change:
 
 | Command | Catches |
 | --- | --- |
-| `bun scripts/audit-content.ts` | NPC / quest / scene references that do not resolve; duplicate NPC or quest ids |
+| `bun scripts/audit-content.ts` | NPC / quest / scene references that do not resolve; duplicate NPC or quest ids; drop tables (opponent drops and packs, boss trophies, resource yields and hunt foes, meridian-chart loot, recipe items) |
 | `bun run test:quests` | every quest can be started, progressed and finished from `home_player`; every item and kill quest plays through the real store; every stage has guidance |
 | `bun run typecheck` | wrong field names, bad unions, missing `Record<SectId, …>` entries |
 | `bun run test:navigation` | a painted map whose spawn, NPCs, exits or services cannot be reached |
@@ -76,7 +76,7 @@ These are **advisory** — they fail today for known, harmless reasons, so read 
 - `bun scripts/audit-complete-scenes.ts`
 - `bun scripts/audit-quest-counts.ts`
 
-`audit-content.ts` does **not** check opponent drop tables. Check new `drops` item ids by hand.
+`audit-content.ts` also checks the drop tables: every `drops` / `yields` item id resolves, weights are above 0 and counts are `1 ≤ min ≤ max`; packs, hunting `opponentIds`, boss trophies, meridian-chart loot and recipe items resolve.
 
 ## A location
 
