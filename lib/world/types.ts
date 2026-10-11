@@ -1333,9 +1333,8 @@ export interface ActionLogEntry {
   // Game-time when the action happened (day + within-day fraction).
   day: number;
   time: number;
-  // Free-form category — used for the badge in the log popup. Written
-  // today: battle, buy, combat, craft, encounter, gather, law, learn, quest,
-  // rest, sect, sell, steal, assassinate, kidnap, use (no "travel").
+  // The badge in the log popup: an `ActionLogKind` (lib/world/action-log.ts)
+  // when written; kept a string so an old save's unknown kind still loads.
   kind: string;
   // Human-readable Thai message shown in the action-log popup.
   message: string;

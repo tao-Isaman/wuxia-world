@@ -1,6 +1,7 @@
 // The world store's blank state, the starter hero, the per-action draft copy
 // and the player-visible action log.
 import { type CharacterBuild, type StatKey, STAT_KEYS } from "@/lib/game";
+import type { ActionLogKind } from "@/lib/world/action-log";
 import { LIFE_SKILL_KEYS, START_SCENE_ID, TRAIT_KEYS, type LifeSkill, type TraitKey, type WorldStateData } from "@/lib/world";
 
 // ─── Starter build ─────────────────────────────────────────────────────
@@ -107,7 +108,7 @@ export const emptyData = (): WorldStateData => ({
 // 100. Mutates `state` in place so it's safe to call from inside a draft
 // before the final `set({ ...draft })`.
 export const ACTION_LOG_MAX = 100;
-export function appendActionLog(state: WorldStateData, kind: string, message: string): void {
+export function appendActionLog(state: WorldStateData, kind: ActionLogKind, message: string): void {
   const entry = { day: state.day, time: state.time, kind, message };
   const next = [...state.actionLog, entry];
   if (next.length > ACTION_LOG_MAX) next.splice(0, next.length - ACTION_LOG_MAX);
