@@ -231,17 +231,18 @@ applyAction(state, unitId, action, rng = Math.random): boolean   // false (state
 
 ## Battle store
 
-`store/battle-store.ts` (`"use client"`, not persisted — a reload mid-fight restarts the battle).
+`store/battle-store.ts` (`"use client"`, not persisted — a reload mid-fight restarts the battle) wraps one **battle session** (`lib/game/grid/session.ts`, pure): the same logic as commands (`startSession`, `playerAction`, `stepSession`, `setSessionAuto`, `applyCommand`). Started with `opts.seed`, a session rolls every die from the seed (`withRandom`, `lib/game/rng.ts`) and logs its commands — step `["s"]`, move `["m", x, y]`, skill `["a", slot, x, y]`, wait, flee, item `["i", id, x, y]`, auto — so the game server can replay the battle and reach the same end ([online.md](online.md#battles-on-the-server)).
 
 | Member | What it does |
 | --- | --- |
-| `state`, `builds`, `auto` | the `GridBattleState`, the hero and primary-enemy builds, the auto flag |
-| `start(a, b, opts?)` | `opts = { hpA?, mpA?, enemies?, looks?, blocked?, bag? }` (`bag` turns on ใช้ของ); creates the battle, logs the opening lines (carry-over HP / MP, mastery per family, each side's primary art, the pack) |
+| `state`, `builds`, `auto`, `seed` | the `GridBattleState`, the hero and primary-enemy builds, the auto flag, the seed of a checked battle (else null) |
+| `start(a, b, opts?)` | `opts = { hpA?, mpA?, enemies?, looks?, blocked?, bag?, seed? }` (`bag` turns on ใช้ของ; `seed` makes it a checked battle); creates the battle, logs the opening lines (carry-over HP / MP, mastery per family, each side's primary art, the pack) |
 | `move(to)`, `act(slot, target)`, `useItem(itemId, name, effect, target)`, `wait()`, `flee()` | player actions, only on the player's turn; return `false` when refused |
 | `setAuto(on)` | อัตโนมัติ: the AI plays the hero's side too |
 | `step()` | one visible beat: begin the next turn, or play the AI's move, or its action. Does nothing while the player must act. The renderer calls it. |
 | `stepAll()` | repeat `step()` until the player's turn or the end (tests) |
 | `reset()` | clear the battle and turn auto off |
+| `commands()` | the command log of a seeded battle so far |
 
 Helpers: `isPlayerTurn(state, auto)`, `aiControls(unit, auto)`, `cloneBattle`, `PLAYER_UNIT = "A"`, `PRIMARY_ENEMY_UNIT = "B"`. Every change publishes fresh `state`, `units`, `events` and `log` references. The store never runs a timer.
 

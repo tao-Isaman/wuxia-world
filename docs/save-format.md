@@ -1,6 +1,6 @@
 # Save format
 
-The game keeps everything in the browser's `localStorage`. There is no server and no save slot: the player's save is written through Zustand's `persist` middleware after every state change, and the **shared world** (the people, the rumors, the beasts — what a server would own) beside it under its own key ([design](design/world-clock-and-shared-world.md)).
+Without a game server the game keeps everything in the browser's `localStorage`: the player's save is written through Zustand's `persist` middleware after every state change, and the **shared world** (the people and the rumors) beside it under its own key ([design](design/world-clock-and-shared-world.md)). With a server (the released game) each character's save, in this same format, lives on the server, and the world is the server's one world for everyone ([online.md](online.md)).
 
 ## Contents
 
@@ -21,8 +21,8 @@ The game keeps everything in the browser's `localStorage`. There is no server an
 
 | Key | Holds | Version |
 | --- | --- | --- |
-| `localStorage["wusia-world-v1"]` | the player's game (`store/world-store.ts`) — **only without a game server**; with one, each character's save lives on the server ([online.md](online.md#characters-and-saves)) in this same format | **27** |
-| `localStorage["wusia-shared-v1"]` | the shared world, `{ version, world }` (`store/world/shared-local.ts`) — with a game server, the account's world on the server instead | **1** |
+| `localStorage["wusia-world-v1"]` | the player's game (`store/world-store.ts`) — **only without a game server**; with one, each character's save lives on the server ([online.md](online.md#characters-and-saves)) in this same format | **28** |
+| `localStorage["wusia-shared-v1"]` | the shared world, `{ version, world }` (`store/world/shared-local.ts`) — only without a game server; with one there is one world on the server for everyone ([online.md](online.md#the-shared-world)) | **1** |
 | `localStorage["wuxia-imported-v1"]` | the local hero already imported to the server (the offer is not shown again) | — |
 | `localStorage["wusia-character-v1"]` | the two /debug builds (`store/character-store.ts`) | **3** |
 | `localStorage["wuxia-audio-v1"]` | sound switches and volumes (`lib/audio/engine.ts`) | — |
@@ -82,18 +82,17 @@ Notes:
 | `worldEventLog` | the last 500 `WorldEvent`s (`npc_killed`, `npc_kidnapped`, `boss_slain`, `rumor`) |
 | `npcExt`, `lastNpcTickDay` | the living jianghu ([liveness.md](liveness.md); Liveness 2.0 added only optional fields inside `npcExt` entries, filled by `seedLiveness` on load) |
 | `rumorPool`, `rumorArchive` | the rumors going round, and the expired ones |
-| `assassinatedNpcIds`, `kidnappedNpcIds`, `kidnappedUntil` | who was killed or carried off |
-| `bossDefeatedDay` | when each legendary beast last fell |
-| `tournament`, `tournamentHistory` | this year's sword tournament and past ones |
 
-They live on the store's state like any other field (every engine reads `state.npcExt`), but `localWorldService` keeps them under `wusia-shared-v1`. `attachSharedWorld` (in `store/world-store.ts`, right after the store is created) lays the stored world over the loaded save (`joinSharedWorld`), keeping any shared field the save itself carried (an older save — `takeCarriedWorldKeys`); with no stored world, the save's own is kept; a missing seed, people or lore are seeded. It then repairs, writes the world and saves it again whenever a shared field changes. A new game joins the world as it is (`startNewGame({ newWorld: true })` makes a fresh one); `resetGame` keeps it.
+Since v28 the hero's own deeds are the save's, not the world's (`PLAYER_FROM_WORLD_KEYS`): `assassinatedNpcIds`, `kidnappedNpcIds`, `kidnappedUntil` (whom this hero killed or carried off — gone from this hero's map), `bossDefeatedDay` (the beasts this hero felled) and `tournament`, `tournamentHistory` (this hero's tournaments). A killing of one of the simulated people still marks them dead in `npcExt`, the world's.
+
+They live on the store's state like any other field (every engine reads `state.npcExt`), but `localWorldService` keeps them under `wusia-shared-v1`. `attachSharedWorld` (in `store/world-store.ts`, right after the store is created) lays the stored world over the loaded save (`joinSharedWorld`), keeping any shared field the save itself carried (an older save — `takeCarriedWorldKeys`); with no stored world, the save's own is kept; a missing seed, people or lore are seeded. It then repairs, writes the world and saves it again whenever a shared field changes. A new game joins the world as it is (`startNewGame({ newWorld: true })` makes a fresh one); `resetGame` keeps it. On a game server the world comes from the server instead and is never written from the browser (`cloudSave.world`, `store/cloud-world.ts`).
 
 ## Loading a save
 
 This is Zustand 5 `persist` over synchronous `localStorage`, so it all happens while the store is created:
 
 1. Read `{ state, version }` from `wusia-world-v1`.
-2. If `version !== 27`, run `migrate(state, version)`.
+2. If `version !== 28` (`SAVE_VERSION`, `store/world/save-version.ts`), run `migrate(state, version)`.
 3. Run `merge(persisted, current)`: `{ ...current, ...persisted }` (noting which shared fields the save carried), then `seedLoreRumors` and `seedLiveness` if a game exists, and back-fill `playerBuild.baseHp` (`HERO_BASE_HP`, also added to `currentHp`) for saves made before the hero's flat base HP.
 
    This step runs for current-version saves too; it is how new lore reaches old saves.
@@ -168,6 +167,7 @@ What each version added. v1–v13 and v17→v18 are described in the comment abo
 | v24 → v25 | `lawEvasions` (escapes from the law since the last sentence); `wanted` is no longer clamped to 5 |
 | v25 → v26 | `bossDefeatedDay` (boss id → the day each legendary beast last fell, `lib/world/data/bosses.ts`; default `{}`) |
 | v26 → v27 | the world clock: day stamps rebased (`rebaseDays`); `worldSeed`, `worldEventLog`; the shared-world fields move out of the save into `wusia-shared-v1` |
+| v27 → v28 | the hero's own deeds come back from the shared world (`PLAYER_FROM_WORLD_KEYS`: `assassinatedNpcIds`, `kidnappedNpcIds`, `kidnappedUntil`, `bossDefeatedDay`, `tournament`, `tournamentHistory`): in a world shared by many players these are each player's own. `joinSharedWorld` hands an older local world's values to a save that has none |
 
 ## Repair on load
 
@@ -273,8 +273,8 @@ Content-only changes (a new quest, item or scene) need no version bump: missing 
 
 ## Tests
 
-- **Browser.** `tests/browser/game.spec.ts` loads a hand-written version-18 save and checks that it is upgraded to version 27 and plays.
-- **Clock and shared world.** `scripts/test-clock.ts` (`bun run test:clock`) checks the save / shared-world split, `attachSharedWorld`, the carried fields, `rebaseDays` and the v26 → v27 `migrate`.
+- **Browser.** `tests/browser/game.spec.ts` loads a hand-written version-18 save and checks that it is upgraded to version 28 and plays.
+- **Clock and shared world.** `scripts/test-clock.ts` (`bun run test:clock`) checks the save / shared-world split, `attachSharedWorld`, the carried fields, the v28 hand-over of the hero's deeds, `rebaseDays` and the v26 → v27 `migrate`.
 - **Meridians.** `scripts/test-meridians.ts` (`bun run test:meridians`) checks `partialize`, the `migrate` default and the repair of `meridians` / `meridianPoints`.
 - **Rumors.** `scripts/test-lore-rumors.ts` (in `bun run test:rumors`) rehydrates v18 / v19 saves and checks the version, lore seeding and repair.
 - **Everything else.** Most `scripts/test-*.ts` files import the real store with an in-memory `localStorage`, so they exercise `persist` as well.

@@ -55,6 +55,8 @@ The world clock (`lib/world/clock.ts`: one game day is one real hour) drives it:
 1. `withChargesOfDead(state, () => tickAllNamedNpcs(state, { currentDay, seed: worldSeed }))` — the tick, then the quests of anyone who died in it (see [Seats, heirs and quests](#seats-heirs-and-quests)). Each week draws its dice from `seededRng(worldSeed, day)`, so one world gives the same weeks on any machine (tests pass their own `rng`).
 2. `maintainRumors(state, day)` — expire, archive and cap rumors.
 
+**On a game server the server runs it** ([online.md](online.md#the-shared-world)): one world for every player, kept by `WorldObject`, which runs the same two steps whenever its clock moves on (`advanceWorld`, and an alarm every real hour). The browser then skips both (`worldRunsOnServer()` in `syncClock`), takes the server's world every minute (`applyServerWorld`, which settles the hero's quests of the newly dead), and sends the people its quests are about (pins; the tick's `held` option keeps them home, as it keeps the local hero's).
+
 The tick does nothing until 7 days have passed since `lastNpcTickDay`. It then simulates every whole week since, up to 8 in full (`MAX_TICKS_PER_CALL`); weeks beyond that only age people. The leftover days (`since % 7`) count toward the next week.
 
 `seedLiveness` runs when a world is joined or created (`joinSharedWorld`), on every load (the persist `merge`) and at the start of each tick: it seeds any of the thirty who are missing, fills the fields Liveness 2.0 reads into older entries, replaces every entry with a fresh copy (a draft must never change the previous snapshot) and registers generated people with the NPC registry.
@@ -63,7 +65,7 @@ The tick does nothing until 7 days have passed since `lastNpcTickDay`. It then s
 
 Five fields on `WorldStateData` (save v18+, see [save-format.md](save-format.md)): `npcExt`, `rumorPool`, `rumorArchive`, `rumorSeenLog` (newest 50), `lastNpcTickDay`. Liveness 2.0 added no top-level field, so no version bump: everything new is optional on `NpcExtState` and filled on load.
 
-Since v27 the people and the rumors belong to the **shared world** (`npcExt`, `lastNpcTickDay`, `rumorPool`, `rumorArchive`, with `worldSeed` and the killed / kidnapped lists), saved apart from the player in `wusia-shared-v1`; what the hero heard (`rumorSeenLog`) stays in the player's save. A new hero joins the world as it is: the dead stay dead ([design](design/world-clock-and-shared-world.md)).
+Since v27 the people and the rumors belong to the **shared world** (`npcExt`, `lastNpcTickDay`, `rumorPool`, `rumorArchive`, with `worldSeed`), saved apart from the player in `wusia-shared-v1` (on a game server, the server's one world); since v28 the killed / kidnapped lists are the hero's own (a killing of one of the simulated people still marks them dead in `npcExt`); what the hero heard (`rumorSeenLog`) stays in the player's save. A new hero joins the world as it is: the dead stay dead ([design](design/world-clock-and-shared-world.md)).
 
 `NpcExtState` per person:
 
@@ -195,7 +197,7 @@ A rumor is heard in its own region (`regionOf` the place it happened). `rumorRea
 
 ## Player echoes
 
-`generatePlayerEcho` renders the hero's **archetype** (by traits: บ้ายุทธ์จักรดีร้ายตามใจตน, ผู้ล้ำลึกหยั่งไม่ถึง, ผู้กล้าแห่งเจียงหู, จอมมาร, นักพรตไร้นาม, else นักท่องยุทธ์) at the hero's current place.
+`generatePlayerEcho` renders the hero's **archetype** (by traits: บ้ายุทธ์จักรดีร้ายตามใจตน, ผู้ล้ำลึกหยั่งไม่ถึง, ผู้กล้าแห่งเจียงหู, จอมมาร, นักพรตไร้นาม, else นักท่องยุทธ์) at the hero's current place. These hero-side facts are its **context** (`playerEchoContext`); on a game server the browser sends the action and the context, and the server writes the rumor from them (`context` argument, checked against `ECHO_ARCHETYPES`, the scenes and the sects — no free text).
 
 | Action | Fired from |
 | --- | --- |
