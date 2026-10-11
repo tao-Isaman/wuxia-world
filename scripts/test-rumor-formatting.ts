@@ -16,6 +16,9 @@ Object.defineProperty(globalThis, "localStorage", { configurable: true, value: {
 } });
 Object.defineProperty(globalThis, "window", { configurable: true, value: { localStorage: globalThis.localStorage } });
 const { useWorldStore } = await import("../store/world-store");
+// Pin the world clock: the NPC tick below walks days 8–91 from a new game on day 1.
+const { setTestWorldTime } = await import("../lib/world/clock");
+setTestWorldTime(1);
 const clone = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
 const npcId = "sect_shaolin_abbot_huiyuan";
 const random = Math.random;

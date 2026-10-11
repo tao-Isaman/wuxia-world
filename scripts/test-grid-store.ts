@@ -16,6 +16,10 @@ Object.defineProperty(globalThis, "localStorage", { configurable: true, value: {
 Object.defineProperty(globalThis, "window", { configurable: true, value: { localStorage: globalThis.localStorage } });
 const { useBattleStore, isPlayerTurn } = await import("../store/battle-store");
 const { useWorldStore } = await import("../store/world-store");
+// Pin the world clock: foes grow with the world day (power = day / 200), so a
+// real-time clock would change pack sizes as the days pass.
+const { setTestWorldTime } = await import("../lib/world/clock");
+setTestWorldTime(1);
 const { ensureBattleStarted, battleBriefing, previewBriefing } = await import("../lib/world/battle-bridge");
 const { powerScore } = await import("../lib/game/power-tier");
 const { NPCS } = await import("../lib/world/data/npcs");

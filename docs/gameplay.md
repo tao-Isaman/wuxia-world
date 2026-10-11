@@ -627,7 +627,7 @@ At the 🍶 ฟังข่าวลือ spot in a city or inn, you hear up to
 
 Some rumors are exaggerated or false, and the game never says which.
 
-Talk passes with time: news lasts 20 days (big news 40), and once you have heard a rumor it fades within 15 days (a treasure lead 30). The old lore is talk of the days when you set out and fades by day 60; treasure leads stay until you hear them. Arriving in a city, inn or market may also bring a passing word at the bottom of the screen, which fades after a few seconds. Details: [liveness.md](liveness.md).
+Talk passes with time: news lasts 20 days (big news 40), and once you have heard a rumor it fades within 15 days (a treasure lead 30). The old lore is talk of the days when your world began and fades 60 days later; treasure leads stay until you hear them. Arriving in a city, inn or market may also bring a passing word at the bottom of the screen, which fades after a few seconds. Details: [liveness.md](liveness.md).
 
 ## Saving, falling and starting again
 

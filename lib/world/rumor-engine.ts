@@ -47,15 +47,17 @@ export const RUMOR_ARCHIVE_DAYS = 365;
 // Rumors fade. News lives DEFAULT / BIG_NEWS_LIFESPAN_DAYS; once the hero
 // has heard one it lasts at most RUMOR_HEARD_DAYS more (a treasure lead
 // RUMOR_LEAD_HEARD_DAYS, time to go and look). Authored lore is talk of the
-// day the hero sets out: it fades by LORE_FLAVOUR_LAST_DAY, while lore that
+// day the world is seeded: it fades LORE_FLAVOUR_DAYS later, while lore that
 // leads somewhere stays until heard.
 export const RUMOR_HEARD_DAYS = 15;
 export const RUMOR_LEAD_HEARD_DAYS = 30;
-export const LORE_FLAVOUR_LAST_DAY = 60;
+export const LORE_FLAVOUR_DAYS = 60;
 // JSON turns Infinity into null. A finite sentinel keeps unheard lore leads
 // alive across saves while retaining the same numeric expiry/filter semantics.
 const LORE_EXPIRES_DAY = Number.MAX_SAFE_INTEGER;
-const loreExpiry = (rumor: { leadsTo: unknown }) => (rumor.leadsTo ? LORE_EXPIRES_DAY : LORE_FLAVOUR_LAST_DAY);
+const loreExpiry = (rumor: { leadsTo: unknown }, fromDay: number) => (rumor.leadsTo ? LORE_EXPIRES_DAY : fromDay + LORE_FLAVOUR_DAYS);
+/** Before the shared world clock, flavour lore faded on world day 60 itself, so a world seeded later never heard it. */
+const LEGACY_LORE_LAST_DAY = 60;
 const loreId = (suffix: string): string => suffix.startsWith("lore_") ? suffix : `lore_${suffix}`;
 const LORE_IDS = new Set(LORE_RUMORS.map((lore) => loreId(lore.idSuffix)));
 
@@ -66,15 +68,19 @@ export function seedLoreRumors(state: WorldStateData): void {
   // Repair pre-seeded lore whose deadline became null in JSON (or was the
   // old "never" sentinel on flavour lore). Replace entries rather than
   // mutating a caller's previous snapshot.
+  const day = Math.max(1, state.day);
   const pool = state.rumorPool.map((rumor) => {
     if (rumor.source !== "lore" || !LORE_IDS.has(rumor.id)) return rumor;
     const broken = typeof rumor.expiresDay !== "number" || (rumor.expiresDay === LORE_EXPIRES_DAY && !rumor.leadsTo);
-    return broken ? { ...rumor, expiresDay: loreExpiry(rumor) } : rumor;
+    // Flavour lore stamped with the old fixed last day: the talk starts again from today.
+    const legacy = !rumor.leadsTo && rumor.createdDay === 1 && rumor.expiresDay === LEGACY_LORE_LAST_DAY;
+    if (legacy) return { ...rumor, createdDay: day, expiresDay: loreExpiry(rumor, day) };
+    return broken ? { ...rumor, expiresDay: loreExpiry(rumor, rumor.createdDay ?? day) } : rumor;
   });
   for (const { idSuffix, ...lore } of LORE_RUMORS) {
     const id = loreId(idSuffix);
     if (ids.has(id)) continue;
-    pool.push({ ...lore, prerequisites: [...lore.prerequisites], id, createdDay: 1, expiresDay: loreExpiry(lore) });
+    pool.push({ ...lore, prerequisites: [...lore.prerequisites], id, createdDay: day, expiresDay: loreExpiry(lore, day) });
     ids.add(id);
   }
   state.rumorPool = pool;

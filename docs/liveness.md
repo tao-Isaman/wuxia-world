@@ -173,7 +173,7 @@ What five years look like (seeded run, `test:liveness`): every seat held, genera
 | --- | --- | --- | --- | --- |
 | `npc_event` | `generateNpcEventEcho`, from every event that is not silent | 20 days; 40 for big news | always true — it happened | template weight, ×2 for big news |
 | `player_echo` | `generatePlayerEcho`, from the hero's deeds | 20 days | 75 % true, 25 % exaggerated (`distorted`) — never false | template weight, +4 for loud deeds (`kill_npc`, leaving a sect, a milestone quest) |
-| `lore` | `seedLoreRumors` | flavour: until day 60; leads: until heard | fixed per entry | fixed per entry |
+| `lore` | `seedLoreRumors` | flavour: 60 days from seeding (`LORE_FLAVOUR_DAYS`); leads: until heard | fixed per entry | fixed per entry |
 | `warning` | `generateWarning` — only called by tests | until the day after the event | always true | template weight |
 
 - **Big news**: `death_combat`, `killed_by_player`, `master_art`, `betray_sect`, `new_chief`, and anything (but a journey) that befalls a sect's chief.
