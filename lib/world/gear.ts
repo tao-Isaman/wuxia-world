@@ -141,12 +141,13 @@ export function rollSpiritMaterials(opp: { ti?: number; boss?: boolean } | null 
 
 // ─── Recipes for craft-only gear ─────────────────────────────────────
 
-/** Odds per won fight that a foe carries a gear recipe (สูตร…). */
+/** Odds per won fight that a foe carries a gear recipe (สูตร…); a legendary beast more often. */
 export const RECIPE_DROP_CHANCE = 0.05;
+export const RECIPE_DROP_CHANCE_BOSS = 0.25;
 
 /** Which tiers of craft-only piece a foe of this tier carries the recipe of. */
 export function recipeTiersFor(foeTier: number): readonly number[] {
-  return foeTier <= 0 ? [0] : foeTier === 1 ? [0, 1] : foeTier === 2 ? [1, 2] : [2];
+  return foeTier <= 0 ? [0] : foeTier === 1 ? [0, 1] : foeTier === 2 ? [1, 2] : foeTier === 3 ? [2, 3] : [3];
 }
 
 /**
@@ -154,12 +155,12 @@ export function recipeTiersFor(foeTier: number): readonly number[] {
  * that fits the foe, one the hero neither knows nor carries when there is one.
  */
 export function rollRecipeDrop(
-  opp: { ti?: number } | null | undefined,
+  opp: { ti?: number; boss?: boolean } | null | undefined,
   s: Pick<WorldStateData, "learnedRecipeIds" | "inventory">,
 ): string | null {
-  if (!opp || Math.random() >= RECIPE_DROP_CHANCE) return null;
+  if (!opp || Math.random() >= (opp.boss ? RECIPE_DROP_CHANCE_BOSS : RECIPE_DROP_CHANCE)) return null;
   const tiers = recipeTiersFor(opp.ti ?? 0);
-  const fits = GEAR_RECIPES.filter((r) => r.output.equipId !== undefined && tiers.includes(Math.min(2, getEquip(r.output.equipId)?.ti ?? 0)));
+  const fits = GEAR_RECIPES.filter((r) => r.output.equipId !== undefined && tiers.includes(Math.min(3, getEquip(r.output.equipId)?.ti ?? 0)));
   const fresh = fits.filter((r) => !s.learnedRecipeIds?.includes(r.id) && !(s.inventory?.[recipeItemId(r.id)] > 0));
   const pool = fresh.length ? fresh : fits;
   if (!pool.length) return null;

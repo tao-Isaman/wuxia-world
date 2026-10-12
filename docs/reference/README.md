@@ -29,9 +29,9 @@ Generated lists of everything in the game, taken straight from the data tables. 
 | Quests | 1075 |
 | Quest stages | 2923 |
 | Move skills / inner arts / equipment | 191 / 117 / 76 |
-| Items | 508 |
+| Items | 515 |
 | Shops / martial halls / artisans | 19 / 7 / 49 |
-| Recipes | 57 |
+| Recipes | 64 |
 | Gathering and hunting nodes | 25 |
 | Life skills | 19 |
 | Opponents | 399 |

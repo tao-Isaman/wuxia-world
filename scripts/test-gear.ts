@@ -160,10 +160,13 @@ check("keys: canonical, clamped, unknown tokens and extra options dropped, a bar
   assert.equal(affixQuality({ k: "stat", v: 1 }), 0);
 });
 
-check("sources: every slot has tier-3 and tier-4 beast gear, instruments are sold, no two pieces share a name", () => {
+check("sources: beasts drop every slot's tier-4 piece (and only tier 4), instruments are sold, no two pieces share a name", () => {
   const beast = new Set(BOSSES.flatMap((b) => b.gear));
+  for (const b of BOSSES) assert.ok(b.gear.length >= 2, `${b.id} drops gear`);
+  for (const id of beast) assert.equal(getEquip(id)!.ti, 4, `${id} from a beast is tier 4`);
   for (const ty of ["W", "A", "H", "B", "BR", "R", "C"] as const) {
-    for (const ti of [3, 4]) assert.ok([...beast].some((id) => getEquip(id)!.ty === ty && getEquip(id)!.ti === ti), `${ty} T${ti} from a beast`);
+    assert.ok([...beast].some((id) => getEquip(id)!.ty === ty), `${ty} T4 from a beast`);
+    assert.ok(EQUIPMENT.some((e) => e.ty === ty && e.ti === 3 && CRAFT_ONLY_GEAR.has(e.id)), `${ty} T3 crafted`);
   }
   const sold = new Set(ARTISANS.flatMap((a) => equipmentOfferedBy(a).map((o) => o.equipId)));
   for (const id of ["W_flute", "W_pipa"]) assert.ok(sold.has(id) && getEquip(id)!.instrument, `${id} sold`);
@@ -331,14 +334,16 @@ check("re-rolling: the line's own shop, craft level 3, one material; bag and wor
 check("craft-only gear: a recipe per piece, none sold or dropped, its สูตร an item foes drop by tier", () => {
   const sold = new Set(ARTISANS.flatMap((a) => equipmentOfferedBy(a).map((o) => o.equipId)));
   const beast = new Set(BOSSES.flatMap((b) => b.gear));
-  assert.equal(CRAFT_ONLY_GEAR.size, 21);
+  assert.equal(CRAFT_ONLY_GEAR.size, 28);
   for (const id of CRAFT_ONLY_GEAR) {
     const def = getEquip(id)!;
     assert.ok(!sold.has(id) && !beast.has(id), `${id} is craft-only`);
     const r = getRecipe(gearRecipeId(id))!;
     assert.ok(r && r.output.equipId === id, `${id} recipe`);
     assert.equal(r.skill, equipmentProfession(def), `${id} line`);
-    assert.equal(r.requiredMastery, [1, 2, 3][Math.min(2, def.ti)]);
+    assert.equal(r.requiredMastery, [1, 2, 3, 4][def.ti]);
+    // A tier-3 piece takes a legendary beast's trophy.
+    if (def.ti === 3) assert.ok(r.inputs.some((i) => BOSSES.some((b) => b.trophyItemId === i.itemId)), `${id} needs a trophy`);
     for (const inp of r.inputs) assert.ok(getItem(inp.itemId), `${id} input ${inp.itemId}`);
     const item = getItem(recipeItemId(r.id))!;
     assert.ok(item && item.category === "manual" && (item.price ?? 0) > 0 && itemIconId(item.id), `${id} สูตร item`);
@@ -359,8 +364,14 @@ check("craft-only gear: a recipe per piece, none sold or dropped, its สูต�
   });
   assert.ok(drops > 120 && drops < 280, `≈5 %: ${drops}`);
   withRandom(seededRng(6, 6), () => {
-    for (let i = 0; i < 2000; i++) { const d = rollRecipeDrop({ ti: 4 }, s); if (d) assert.equal(tierOf(d), 2); }
+    for (let i = 0; i < 2000; i++) { const d = rollRecipeDrop({ ti: 4 }, s); if (d) assert.equal(tierOf(d), 3); }
   });
+  // A legendary beast leaves a tier-3 recipe a quarter of the time.
+  let boss = 0;
+  withRandom(seededRng(8, 8), () => {
+    for (let i = 0; i < 2000; i++) { const d = rollRecipeDrop({ ti: 5, boss: true }, s); if (d) { boss++; assert.equal(tierOf(d), 3); } }
+  });
+  assert.ok(boss > 400 && boss < 600, `≈25 %: ${boss}`);
   const known = { learnedRecipeIds: GEAR_RECIPES.filter((r) => r.id !== "gear_w1" && getEquip(r.output.equipId!)!.ti === 0).map((r) => r.id), inventory: {} };
   withRandom(seededRng(7, 7), () => {
     for (let i = 0; i < 2000; i++) { const d = rollRecipeDrop({ ti: 0 }, known); if (d) assert.equal(d, "recipe_gear_w1", "the one not known"); }

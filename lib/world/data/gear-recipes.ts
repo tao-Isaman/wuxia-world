@@ -8,10 +8,10 @@ import type { LifeSkill, RecipeDef } from "../types";
 // like any other (gainGear).
 
 /** Mastery of the craft each tier of piece needs (and its recipe's price). */
-const MASTERY_BY_TIER = [1, 2, 3] as const;
-export const GEAR_RECIPE_PRICE = [150, 400, 900] as const;
+const MASTERY_BY_TIER = [1, 2, 3, 4] as const;
+export const GEAR_RECIPE_PRICE = [150, 400, 900, 2000] as const;
 
-/** The pieces and what each takes, by tier: 0 ธรรมดา · 1 ดี · 2 ชั้นเลิศ. */
+/** The pieces and what each takes, by tier: 0 ธรรมดา · 1 ดี · 2 ชั้นเลิศ · 3 หายาก (a beast's trophy in each). */
 // `skill` is the craft line (the same one equipmentProfession in artisans.ts
 // gives the piece; test:gear checks they agree).
 const SPECS: readonly { equipId: string; skill: LifeSkill; inputs: RecipeDef["inputs"] }[] = [
@@ -40,6 +40,14 @@ const SPECS: readonly { equipId: string; skill: LifeSkill; inputs: RecipeDef["in
   { equipId: "C1", skill: "accessory", inputs: [{ itemId: "copper_ore", count: 2 }, { itemId: "thread", count: 1 }] },
   { equipId: "C2", skill: "accessory", inputs: [{ itemId: "tiger_claw", count: 1 }, { itemId: "silver_ore", count: 1 }, { itemId: "thread", count: 2 }] },
   { equipId: "C3", skill: "accessory", inputs: [{ itemId: "jade", count: 1 }, { itemId: "silk", count: 2 }, { itemId: "ancient_coin", count: 1 }] },
+  // ── tier 3 (หายาก): no longer beast drops — forged from a legendary beast's trophy
+  { equipId: "W4", skill: "forge", inputs: [{ itemId: "iron_ingot", count: 6 }, { itemId: "snake_skin", count: 3 }, { itemId: "poison_vial", count: 2 }, { itemId: "trophy_golden_serpent", count: 1 }] },
+  { equipId: "A4", skill: "forge", inputs: [{ itemId: "iron_ingot", count: 8 }, { itemId: "leather", count: 4 }, { itemId: "trophy_golden_serpent", count: 1 }] },
+  { equipId: "H4", skill: "forge", inputs: [{ itemId: "iron_ingot", count: 5 }, { itemId: "jade", count: 1 }, { itemId: "trophy_sun_turtle", count: 1 }] },
+  { equipId: "B4", skill: "forge", inputs: [{ itemId: "leather", count: 3 }, { itemId: "iron_ingot", count: 2 }, { itemId: "trophy_sword_eagle", count: 1 }] },
+  { equipId: "BR4", skill: "forge", inputs: [{ itemId: "iron_ingot", count: 5 }, { itemId: "gold_ore", count: 2 }, { itemId: "trophy_blood_tiger", count: 1 }] },
+  { equipId: "R4", skill: "jewelry", inputs: [{ itemId: "gold_ore", count: 3 }, { itemId: "jade", count: 2 }, { itemId: "trophy_blade_crab", count: 1 }] },
+  { equipId: "C4", skill: "accessory", inputs: [{ itemId: "jade", count: 2 }, { itemId: "ginseng", count: 3 }, { itemId: "trophy_flame_bull", count: 1 }] },
 ];
 
 /** The recipe id that forges a piece. */
@@ -50,7 +58,7 @@ export const recipeItemId = (recipeId: string) => `recipe_${recipeId}`;
 export const GEAR_RECIPES: readonly RecipeDef[] = SPECS.map(({ equipId, skill, inputs }): RecipeDef => {
   const def = getEquip(equipId);
   if (!def) throw new Error(`gear recipe: unknown equipment ${equipId}`);
-  const ti = Math.min(2, def.ti) as 0 | 1 | 2;
+  const ti = Math.min(3, def.ti) as 0 | 1 | 2 | 3;
   return {
     id: gearRecipeId(equipId),
     name: `สร้าง${def.n}`,

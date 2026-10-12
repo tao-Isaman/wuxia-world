@@ -163,8 +163,8 @@ const ART_BOOK_BY_TIER = ["01", "14", "04", "06", "12", "09"];
 // Meridian charts (แผนภาพชีพจร) are scrolls of their own, one per tier.
 const CHART_SCROLL_BY_TIER = ["07", "08", "11", "12", "13", "14"];
 const CHART_TIER = new Map(MERIDIAN_CHARTS.map((c) => [c.id, c.ti]));
-// Gear recipes (สูตร…) are bound books, one look per piece tier (T0–T2).
-const RECIPE_BOOK_BY_TIER = ["02", "08", "11"];
+// Gear recipes (สูตร…) are bound books, one look per piece tier (T0–T3).
+const RECIPE_BOOK_BY_TIER = ["02", "08", "11", "05"];
 const RECIPE_TIER = new Map(GEAR_RECIPES.map((r) => [r.id, getEquip(r.output.equipId)?.ti ?? 0]));
 const SKILL_TIER = new Map(SKILLS.map((s) => [s.id, s.ti]));
 const ART_TIER = new Map(ARTS.map((a) => [a.id, a.ti]));

@@ -435,7 +435,7 @@ function gearRecipeItems(): ItemDef[] {
   const LINE: Record<string, string> = { forge: "ช่างตีเหล็ก", tailoring: "ช่างตัดเย็บ", jewelry: "ช่างเครื่องประดับ", accessory: "ช่างเครื่องสาน" };
   return GEAR_RECIPES.map((r): ItemDef => {
     const def = r.output.equipId ? getEquipDef(r.output.equipId) : null;
-    const ti = Math.min(2, def?.ti ?? 0);
+    const ti = Math.min(3, def?.ti ?? 0);
     return {
       id: recipeItemId(r.id),
       name: `สูตร${def?.n ?? r.name}`,
