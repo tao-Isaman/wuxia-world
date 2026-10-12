@@ -38,6 +38,7 @@
     "server:deploy": "cd server/worker && npx -y wrangler@4.148.0 deploy",
     "test:systems": "bun scripts/test-systems.ts && bun scripts/test-sects.ts",
     "test:appearance": "bun scripts/test-appearance.ts",
+    "test:gear": "bun scripts/test-gear.ts",
     "test:foes": "bun scripts/test-foes.ts",
     "test:quests": "bun scripts/audit-quest-completion.ts && bun scripts/test-quest-dead-ends.ts && bun scripts/test-quest-dialogs.ts && bun scripts/test-quest-turnins.ts && bun scripts/test-quest-guide.ts && bun scripts/test-bad-action-quests.ts",
     "test:engine": "bun scripts/test-engine.ts",

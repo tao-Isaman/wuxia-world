@@ -7,6 +7,7 @@ import type {
   SectMembership,
   WorldStateData,
 } from "./types";
+import { wExpWithGear } from "./gear";
 import { recordWorldEvent } from "./shared/events";
 import { TRAIT_LABEL } from "./types";
 import { getItem, getNpc, getOpponent, scrollItemId } from "./data";
@@ -608,7 +609,8 @@ function applyQuestRewards(state: WorldStateData, rewards: readonly QuestReward[
         break;
       }
       case "wExp": {
-        if (r.amount > 0) state.wExp = Math.max(0, state.wExp + r.amount);
+        // The worn pieces' ประสบการณ์ยุทธ option raises it (lib/world/gear.ts).
+        if (r.amount > 0) state.wExp = Math.max(0, state.wExp + wExpWithGear(state.playerBuild, r.amount));
         break;
       }
       case "skillExp": {

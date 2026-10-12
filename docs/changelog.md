@@ -6,6 +6,15 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-12
 
+### Gear options (ออฟชั่นเสริม)
+
+- **Every piece of gear counts at half** its old numbers (stats and effects); random options make up the rest. A piece rolls them when gained, by its tier: ธรรมดา 0–1, ดี 1–2, ชั้นเลิศ (city specialties) 1–3, หายาก (beast gear) 2–3, ในตำนาน 3–4.
+- **17 kinds of option**, each equally likely: a base stat +1–10; ป้องกันกาย / ป้องกันใน / โจมตีกาย / โจมตีใน +5–15 or +1–10 %; แม่นยำ / หลบหลีก +1–15 %; คริติคอล / ต้านทานคริติคอล +5–15; ความเสียหายคริติคอล +1–10 %; ประสบการณ์ยุทธที่ได้รับ +5–15 %; a weapon family's moves +5–25 % harder, or −5–25 % on the wearer (capped at 60 %).
+- **Coloured by how good the roll is**: grey at the bottom of an option's range, then green, blue, purple, orange, red-gold at the very top — in the bag, the profile, the craft shop and the spoils panel.
+- **✦ สุ่มออฟชั่น** at the craft shop of the piece's line (forge, tailor, jeweller, accessory maker) re-rolls the whole set, worn or in the bag, with the hero's own craft at level 3+ and one magic material: **หินศิลาวิเศษ** (weapons, rings, charms) or **ด้ายศิลาวิเศษ** (robes, hats, boots, bracers). They drop only from tier-3-and-up foes (20–40 %), a legendary beast always leaving 2–3 of each.
+- Old saves keep their gear: a piece from before options gets its share on load. Gear rarity colours now follow the tier, and a flat crit / evasion effect shows on one line with the stat (no more "หลบหลีก +12 · หลบหลีก +8").
+- New suite `test:gear`; design in [gameplay.md](gameplay.md#items-and-equipment) and [combat.md](combat.md#gear-options-libgamegearts).
+
 ### A painted world map, and boats to the islands
 
 - **แผนที่โลก** — a new menu section (the last icon, hotkey **M**): the whole jianghu as one ink-and-watercolour painting with its walled cities, mountain temples, villages, caves, roads and island boat lanes drawn in, painted over a layout sketch made from the world coordinates so every place sits where it is in the game. Over it: every place by kind (visited or not, 🐎 stations, ⛵ piers), the roads by type, the five regions (tabs frame one, darken the rest and list its places with an explored count), where you are, the tracked quest 📌, and a planner — tap a place for its roads out and the way there step by step (road names, directions, boat fares) drawn as a marching red line; **🧭 นำทางไปที่นี่** sends the guide arrow there (a gold card in the HUD, ✕ to drop it, gone on arrival). Drag, pinch or wheel to zoom; names and markers keep their size; works on phones.

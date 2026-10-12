@@ -16,11 +16,18 @@ import {
   getRecipe,
   masteryLevel,
   recipesOfferedBy,
+  REFORGE_MIN_LEVEL,
+  SPIRIT_STONE,
+  SPIRIT_THREAD,
+  reforgeCheck,
+  reforgeablePieces,
   type ArtisanDef,
   type ItemCategory,
   type RecipeDef,
 } from "@/lib/world";
-import { SLOT_LABELS, equipStatParts, getEquip } from "@/lib/game";
+import { SLOT_LABELS, affixParts, equipStatParts, getEquip } from "@/lib/game";
+import { GearAffixList } from "@/components/game/gear-affixes";
+import { equipmentIconUrl, itemIconUrl } from "@/lib/world/data/item-icons";
 import { useWorldStore } from "@/store/world-store";
 import { flashLoading } from "@/store/loading-store";
 import { lifeSkillPose } from "@/lib/characters/hero-actions";
@@ -32,7 +39,10 @@ interface Props {
   onClose: () => void;
 }
 
-type Tab = "learn" | "craft" | "trade";
+type Tab = "learn" | "craft" | "trade" | "reforge";
+
+// The crafts whose shops re-roll gear options (lib/world/gear.ts).
+const GEAR_CRAFTS = new Set(["forge", "tailoring", "jewelry", "accessory"]);
 
 // Artisan popup — three tabs:
 //   ซื้อสูตร    list recipes the artisan teaches that the player has
@@ -89,11 +99,23 @@ export function ArtisanPopup({ open, artisan, onClose }: Props) {
           >
             🏪 ซื้อ-ขาย ({Math.round(artisan.sellMultiplier * 100)}%)
           </Button>
+          {GEAR_CRAFTS.has(artisan.profession) && (
+            <Button
+              size="sm"
+              variant={tab === "reforge" ? "default" : "ghost"}
+              className="text-xs h-7"
+              onClick={() => setTab("reforge")}
+              data-testid="artisan-tab-reforge"
+            >
+              ✦ สุ่มออฟชั่น
+            </Button>
+          )}
         </div>
 
         {tab === "learn" && <LearnTab artisan={artisan} />}
         {tab === "craft" && <CraftTab artisan={artisan} />}
         {tab === "trade" && <TradeTab artisan={artisan} />}
+        {tab === "reforge" && GEAR_CRAFTS.has(artisan.profession) && <ReforgeTab artisan={artisan} />}
       </div>
     </Modal>
   );
@@ -448,7 +470,8 @@ function TradeTab({ artisan }: { artisan: ArtisanDef }) {
                             );
                             return;
                           }
-                          toast("success", `ซื้อ ${e.n} (-${res.spent}🟡)`);
+                          const opts = affixParts(res.equipId);
+                          toast("success", `ซื้อ ${e.n} (-${res.spent}🟡)${opts.length ? ` · ✦ ${opts.join(" · ")}` : " · ไม่มีออฟชั่นเสริม"}`);
                         }}
                       >
                         {offer.price}🟡
@@ -560,6 +583,99 @@ function TradeTab({ artisan }: { artisan: ArtisanDef }) {
                 >
                   +{sellPrice}🟡
                 </Button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+/* eslint-disable @next/next/no-img-element -- the re-roll tab's small pixel-art icons, no optimisation wanted */
+// ─── สุ่มออฟชั่น tab ─────────────────────────────────────────────────
+// Re-roll a piece's random options (lib/world/gear.ts): only this craft's own
+// pieces, worn or in the bag; one หินศิลาวิเศษ (weapons, rings, charms) or
+// ด้ายศิลาวิเศษ (robes, hats, boots, bracers) each time, and the hero's own
+// skill in this craft at level 3 or more.
+function ReforgeTab({ artisan }: { artisan: ArtisanDef }) {
+  const inventory = useWorldStore((s) => s.inventory);
+  const inventoryEquipment = useWorldStore((s) => s.inventoryEquipment);
+  const playerBuild = useWorldStore((s) => s.playerBuild);
+  const lifeSkillXp = useWorldStore((s) => s.lifeSkillXp);
+  const reforgeGear = useWorldStore((s) => s.reforgeGear);
+  const [last, setLast] = useState<string | null>(null);
+  const prof = artisan.profession;
+  const level = masteryLevel(lifeSkillXp[prof] ?? 0);
+  const pieces = reforgeablePieces({ inventoryEquipment, playerBuild }, prof);
+  const stones = inventory[SPIRIT_STONE] ?? 0;
+  const threads = inventory[SPIRIT_THREAD] ?? 0;
+
+  return (
+    <div className="space-y-2" data-testid="artisan-reforge">
+      <div className="rounded bg-muted/30 px-3 py-2 text-xs space-y-1">
+        <div className="flex items-center justify-between gap-2 flex-wrap">
+          <span>
+            {LIFE_SKILL_ICON[prof]} ฝีมือ{LIFE_SKILL_LABEL[prof]}ของท่าน{" "}
+            <strong className={level >= REFORGE_MIN_LEVEL ? "text-emerald-700" : "text-red-700"}>ขั้น {level}/{MAX_MASTERY}</strong>
+            {level < REFORGE_MIN_LEVEL && <> · ต้องถึงขั้น {REFORGE_MIN_LEVEL} จึงสุ่มออฟชั่นได้</>}
+          </span>
+          <span className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1"><img src={itemIconUrl(SPIRIT_STONE)} alt="" width={18} height={18} /> {getItem(SPIRIT_STONE)?.name} ×{stones}</span>
+            <span className="inline-flex items-center gap-1"><img src={itemIconUrl(SPIRIT_THREAD)} alt="" width={18} height={18} /> {getItem(SPIRIT_THREAD)?.name} ×{threads}</span>
+          </span>
+        </div>
+        <p className="text-[11px] text-muted-foreground">
+          สุ่มออฟชั่นเสริมทั้งชุดใหม่ ใช้วัตถุดิบ 1 ชิ้นต่อครั้ง · อาวุธ แหวน เครื่องประดับใช้หินศิลาวิเศษ · เสื้อ หมวก รองเท้า ปลอกแขนใช้ด้ายศิลาวิเศษ · ได้จากศัตรูขั้นลับขึ้นไป
+        </p>
+      </div>
+      {last && <p className="text-xs rounded bg-emerald-50 text-emerald-800 px-3 py-1.5" role="status">{last}</p>}
+      {pieces.length === 0 ? (
+        <p className="text-xs text-muted-foreground italic py-3 text-center">ท่านไม่มีอุปกรณ์ที่ช่างคนนี้สุ่มออฟชั่นให้ได้</p>
+      ) : (
+        <ul className="space-y-1.5">
+          {pieces.map(({ key, worn }, i) => {
+            const e = getEquip(key);
+            if (!e) return null;
+            const check = reforgeCheck({ inventory, lifeSkillXp }, prof, key);
+            const material = getItem(check.material ?? "")?.name ?? "";
+            const why =
+              check.reason === "low-skill" ? `ฝีมือต้องถึงขั้น ${REFORGE_MIN_LEVEL}` :
+              check.reason === "no-material" ? `ไม่มี${material}` : null;
+            return (
+              <li key={`${worn ? `${worn.ty}${worn.idx}` : "bag"}:${key}:${i}`} className="rounded bg-muted/30 px-2 py-1.5 text-xs space-y-1" data-reforge-key={key}>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <img src={equipmentIconUrl(key)} alt="" width={24} height={24} />
+                    <strong className="truncate">{e.n}</strong>
+                    <Badge variant="outline" className="text-[9px]">{SLOT_LABELS[e.ty]}</Badge>
+                    {worn && <Badge variant="outline" className="text-[9px]">สวมอยู่</Badge>}
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={!check.ok}
+                    title={why ?? undefined}
+                    className="h-7 text-[11px] shrink-0"
+                    data-testid="reforge-button"
+                    onClick={() => {
+                      const res = reforgeGear(key, worn);
+                      if (!res.ok) {
+                        toast("error", res.reason === "low-skill" ? `ฝีมือต้องถึงขั้น ${REFORGE_MIN_LEVEL}` : res.reason === "no-material" ? `ไม่มี${material}` : "สุ่มออฟชั่นไม่สำเร็จ");
+                        return;
+                      }
+                      const opts = affixParts(res.key);
+                      const text = `${e.n}: ${opts.length ? opts.join(" · ") : "ไม่ได้ออฟชั่นเสริม"}`;
+                      setLast(`✦ ${text}`);
+                      flashLoading(`ช่างกำลังหลอม ${e.n}…`, 900, "work", lifeSkillPose(prof));
+                      toast("success", `สุ่มออฟชั่นใหม่ · ${text}`);
+                    }}
+                  >
+                    ✦ สุ่มใหม่ · {material} 1
+                  </Button>
+                </div>
+                <GearAffixList gearKey={key} />
+                {why && <p className="text-[10px] text-red-700">{why}</p>}
               </li>
             );
           })}

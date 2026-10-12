@@ -28,6 +28,7 @@ import {
 } from "./skill-conflict";
 import { firstArtSlotIndex, parseSlotId } from "./slots";
 import { meridianActiveEffects } from "./meridians";
+import { familyDamageMod, gearFamilyMods, type GearFamilyMods } from "./gear";
 import type { MeridianEffect } from "./meridian-types";
 import { accPctOf, atkPctOf, criRateOf, defPctOf, landDamage, rollRage, rollSaps, spdPctOf, spdWithPct } from "./meridian-battle";
 
@@ -61,6 +62,8 @@ export interface BattleContext {
   artIds: Record<Side, string>;
   weaponEquipIds: Record<Side, string | null>;
   equipBonus: Record<Side, EquipBonus>;
+  // Gear options that change a move's damage by its weapon family (gear.ts).
+  gearFamily: Record<Side, GearFamilyMods>;
   masteries: Record<Side, MasteryMap>;
   // Per-skill levels in effect for each side. Read at damage time so the
   // skill's `bp` gets scaled by the level multiplier. Empty record → all
@@ -101,6 +104,7 @@ export function makeContext(buildA: CharacterBuild, buildB: CharacterBuild): Bat
     weaponEquipIds: { A: buildA.equipment.W, B: buildB.equipment.W },
     // Equipment + meridian (ชีพจร) pct_atk / pct_red / hp_regen and flats.
     equipBonus: { A: getBuildBonus(buildA), B: getBuildBonus(buildB) },
+    gearFamily: { A: gearFamilyMods(buildA.equipment), B: gearFamilyMods(buildB.equipment) },
     masteries: {
       A: getMasteryMap(buildA.skillIds, lvA, conflictA),
       B: getMasteryMap(buildB.skillIds, lvB, conflictB),
@@ -400,6 +404,11 @@ export interface DamageResult {
   reflectDmg: number;
 }
 
+/** A crit's damage multiplier: ×1.5, plus the attacker's crit-damage gear options. */
+export function critMultiplier(equip: Pick<EquipBonus, "crit_dmg"> | undefined): number {
+  return CRIT_MULTIPLIER + (equip?.crit_dmg ?? 0) / 100;
+}
+
 /** Consume before the hit roll: a miss spends the one-use stance too. */
 function consumeRiposte(state: BattleState, side: Side): number {
   const charge = state.st[side].buffs.find((buff) => buff.t === "buff_riposte" && buff.u > 0);
@@ -465,7 +474,9 @@ export function calcSkillDamage(
   // Pierce (`pen`) ignores that share of the target's PD / ID.
   const pierce = 1 - Math.max(0, Math.min(100, sk.pen ?? 0)) / 100;
   const ed = Math.max(0, (sk.at === "phy" ? dd.PD : dd.ID) * defMul * pierce + fD - dR);
-  const raw = Math.max(1, (ad.Atk * sm * ab + ta + se) * sk.dm * mm - ed) * (1 - pR / 100);
+  // Gear options: more damage with this weapon family's moves, less taken from them.
+  const fm = familyDamageMod(ctx.gearFamily?.[side], ctx.gearFamily?.[ds], sk.w);
+  const raw = Math.max(1, (ad.Atk * sm * ab + ta + se) * sk.dm * mm - ed) * (1 - pR / 100) * fm;
 
   const hp = hitPct(ea, ee);
   if (Math.random() * 100 >= hp) {
@@ -473,7 +484,7 @@ export function calcSkillDamage(
   }
   const cp = Math.min(100, critPct(effectiveCri(state, side, ad.Cri), dd.Res) + criRateOf(ast));
   const crit = Math.random() * 100 < cp;
-  const dmg = Math.round(raw * riposte * (crit ? CRIT_MULTIPLIER : 1));
+  const dmg = Math.round(raw * riposte * (crit ? critMultiplier(ctx.equipBonus[side]) : 1));
 
   // The reflect is used up by the whole attack (resolveSkill drops it after
   // the last hit), so every landed hit of a multi-hit move reflects its share.
@@ -809,7 +820,7 @@ export function resolveArtActive(
   // doAtkHit applies damage, optional reflect; returns final dmg + crit flag.
   const doAtkHit = (rawDmg: number, hc: { cp: number }) => {
     const crit = Math.random() * 100 < hc.cp;
-    const dealt = Math.round(rawDmg * riposte * (crit ? CRIT_MULTIPLIER : 1));
+    const dealt = Math.round(rawDmg * riposte * (crit ? critMultiplier(ctx.equipBonus[side]) : 1));
     state.hitsReceived[ds]++;
     // A meridian shield soaks first; then the defender's rages roll.
     const dmg = landDamage(state, ds, dealt);

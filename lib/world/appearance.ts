@@ -1,7 +1,7 @@
 // How the hero looks (docs/design/appearance.md): the outfit worn, which ones
 // the wardrobe holds and why the others are locked, and how the equipped
 // weapon is carried on the body. Pure.
-import { getEquip } from "@/lib/game/data/equipment";
+import { gearBaseId, getEquip } from "@/lib/game/data/equipment";
 import type { WeaponFamily } from "@/lib/game/types";
 import { DEFAULT_OUTFIT, OUTFITS, getOutfit, type OutfitDef } from "./data/outfits";
 import { equipmentIconId, equipmentIconUrl } from "./data/item-icons";
@@ -151,7 +151,8 @@ export function weaponLookOf(equipmentId: string | null | undefined): WeaponLook
 /** What others see: the outfit, and the weapon carried on the body (null when hidden or not drawn). */
 export function heroLook(state: AppearanceState & Pick<WorldStateData, "playerBuild">): { outfit: string; weapon: string | null } {
   const weapon = state.playerBuild?.equipment?.W ?? null;
-  const carried = !state.appearance?.hideWeapon && weaponLookOf(weapon)?.carry ? weapon : null;
+  // Others see the piece, not its options: the bare equipment id.
+  const carried = weapon && !state.appearance?.hideWeapon && weaponLookOf(weapon)?.carry ? gearBaseId(weapon) : null;
   return { outfit: currentOutfit(state), weapon: carried };
 }
 

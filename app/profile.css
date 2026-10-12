@@ -52,6 +52,10 @@
 .profile-gear-name { font-size: 13.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .profile-gear-name i { font-weight: 400; color: var(--scroll-ink-soft); }
 .profile-gear li small { font-size: 11px; color: #2c6a37; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Options on parchment: the rarity colours, deepened to read on paper. */
+.profile-gear li small.gear-affix-line { color: #6a3a9a; }
+.gear-affix-line .affix-q0 { color: #6b6658; } .gear-affix-line .affix-q1 { color: #2f7d3e; } .gear-affix-line .affix-q2 { color: #2463a8; }
+.gear-affix-line .affix-q3 { color: #7a3fb0; } .gear-affix-line .affix-q4 { color: #b5651a; } .gear-affix-line .affix-q5 { color: #b8321f; font-weight: 700; }
 .profile-gear-total { flex: 0 0 auto; font-size: 12.5px; padding: 4px 8px; background: #b0802a1f; border-left: 3px solid #b0802a; border-radius: 4px; }
 
 /* 3 · Detailed status */

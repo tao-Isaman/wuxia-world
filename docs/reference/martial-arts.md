@@ -532,109 +532,109 @@ Grid column: the skill's range and area on the tactics board (`skillGrid` / `art
 
 | Id | Name | Bonuses | Effect |
 | --- | --- | --- | --- |
-| `W1` | ดาบเหล็กสามัญ | ATK +20 | — |
-| `W2` | ดาบทองคำ | ATK +71, PA +23, IA +7, HP +24, Acc +14, Cri +8 | — |
-| `W3` | ดาบเพลิง | ATK +75, PA +20, IA +20, PD +10, ID +10, HP +30, MP +120, Cri +10 | `{"t":"pct_atk","v":10}` |
-| `W4` | ดาบพิษ | ATK +55, PA +18, IA +18, Acc +20, Cri +8, Res +8 | `{"t":"on_hit","db":{"t":"debuff_eva","v":-10,"u":2}}` |
-| `W5` | ดาบมังกรเทพ | ATK +110, PA +24, IA +4, HP +30, SPD +12, Eva +12, Acc +8, Cri +10 | `{"t":"flat_cri","v":20}` |
-| `W_flute` | ขลุ่ยไผ่ | ATK +22, IA +8, PD +12, ID +12, MP +94 | instrument |
-| `W_pipa` | พิณยี่ห้อง | ATK +27, IA +10, PD +15, ID +15, MP +120 | instrument |
-| `eq_t0_w_fist` | นวมไม้ฝึกหมัด | ATK +14, PA +4, HP +6, Cri +2 | — |
-| `eq_t0_w_long` | ทวนไม้ฝึก | ATK +16, PA +4, PD +1, ID +1, HP +26, Cri +2 | — |
-| `eq_t0_w_sword` | กระบี่ไม้ฝึก | ATK +12, IA +4, PD +2, ID +2, MP +24, SPD +2, Eva +2 | — |
-| `eq_t0_w_blade` | ดาบไม้ฝึก | ATK +20, PA +6, HP +9, Cri +3 | — |
-| `eq_t0_w_short` | พัดฝึกฝีมือ | ATK +11, IA +4, PD +4, ID +4, MP +38 | — |
-| `eq_t0_w_hidden` | เข็มฝึกซ้อม | ATK +9, PA +3, IA +3, Acc +6 | — |
-| `eq_t1_w_fist` | หมัดเหล็ก | ATK +33, PA +10, PD +2, ID +2, HP +55, Cri +5 | — |
-| `eq_t1_w_long` | ทวนเหล็ก | ATK +40, PA +10, HP +15, SPD +6, Eva +6, Cri +5 | — |
-| `eq_t1_w_sword` | กระบี่เหล็ก | ATK +28, PA +4, IA +12, PD +4, ID +4, MP +48, Acc +8 | — |
-| `eq_t1_w_blade` | ดาบเหล็กกล้า | ATK +42, PA +12, HP +18, Cri +6 | — |
-| `eq_t1_w_short` | พัดเหล็กบาง | ATK +28, IA +8, PD +12, ID +12, MP +84 | — |
-| `eq_t1_w_hidden` | เข็มเหล็กพิษอ่อน | ATK +20, PA +9, IA +9, Acc +12, Cri +3, Res +3 | `{"t":"on_hit","db":{"t":"debuff_eva","v":-5,"u":1}}` |
-| `eq_xixia_w_blade` | ดาบเหล็กชายแดน | ATK +51, PA +14, PD +3, ID +3, HP +81, Cri +7 | — |
-| `eq_yangzhou_w_blade` | ดาบโค้งแม่น้ำ | ATK +36, PA +4, IA +4, SPD +12, Eva +12, Acc +8 | `{"t":"flat_eva","v":8}` |
+| `W1` | ดาบเหล็กสามัญ | ATK +10 | — |
+| `W2` | ดาบทองคำ | ATK +36, PA +12, IA +4, HP +12, Acc +7, Cri +4 | — |
+| `W3` | ดาบเพลิง | ATK +38, PA +10, IA +10, PD +5, ID +5, HP +15, MP +60, Cri +5 | `{"t":"pct_atk","v":5}` |
+| `W4` | ดาบพิษ | ATK +28, PA +9, IA +9, Acc +10, Cri +4, Res +4 | `{"t":"on_hit","db":{"t":"debuff_eva","v":-5,"u":2}}` |
+| `W5` | ดาบมังกรเทพ | ATK +55, PA +12, IA +2, HP +15, SPD +6, Eva +6, Acc +4, Cri +5 | `{"t":"flat_cri","v":10}` |
+| `W_flute` | ขลุ่ยไผ่ | ATK +11, IA +4, PD +6, ID +6, MP +47 | instrument |
+| `W_pipa` | พิณยี่ห้อง | ATK +14, IA +5, PD +8, ID +8, MP +60 | instrument |
+| `eq_t0_w_fist` | นวมไม้ฝึกหมัด | ATK +7, PA +2, HP +3, Cri +1 | — |
+| `eq_t0_w_long` | ทวนไม้ฝึก | ATK +8, PA +2, PD +1, ID +1, HP +13, Cri +1 | — |
+| `eq_t0_w_sword` | กระบี่ไม้ฝึก | ATK +6, IA +2, PD +1, ID +1, MP +12, SPD +1, Eva +1 | — |
+| `eq_t0_w_blade` | ดาบไม้ฝึก | ATK +10, PA +3, HP +5, Cri +2 | — |
+| `eq_t0_w_short` | พัดฝึกฝีมือ | ATK +6, IA +2, PD +2, ID +2, MP +19 | — |
+| `eq_t0_w_hidden` | เข็มฝึกซ้อม | ATK +5, PA +2, IA +2, Acc +3 | — |
+| `eq_t1_w_fist` | หมัดเหล็ก | ATK +17, PA +5, PD +1, ID +1, HP +28, Cri +3 | — |
+| `eq_t1_w_long` | ทวนเหล็ก | ATK +20, PA +5, HP +8, SPD +3, Eva +3, Cri +3 | — |
+| `eq_t1_w_sword` | กระบี่เหล็ก | ATK +14, PA +2, IA +6, PD +2, ID +2, MP +24, Acc +4 | — |
+| `eq_t1_w_blade` | ดาบเหล็กกล้า | ATK +21, PA +6, HP +9, Cri +3 | — |
+| `eq_t1_w_short` | พัดเหล็กบาง | ATK +14, IA +4, PD +6, ID +6, MP +42 | — |
+| `eq_t1_w_hidden` | เข็มเหล็กพิษอ่อน | ATK +10, PA +5, IA +5, Acc +6, Cri +2, Res +2 | `{"t":"on_hit","db":{"t":"debuff_eva","v":-2,"u":1}}` |
+| `eq_xixia_w_blade` | ดาบเหล็กชายแดน | ATK +26, PA +7, PD +2, ID +2, HP +41, Cri +4 | — |
+| `eq_yangzhou_w_blade` | ดาบโค้งแม่น้ำ | ATK +18, PA +2, IA +2, SPD +6, Eva +6, Acc +4 | `{"t":"flat_eva","v":4}` |
 
 ### เสื้อ (`A`, 10)
 
 | Id | Name | Bonuses | Effect |
 | --- | --- | --- | --- |
-| `A1` | เสื้อผ้าธรรมดา | PD +30, ID +20 | — |
-| `A2` | เกราะหนัง | PD +85, ID +68, HP +300, Res +5 | — |
-| `A3` | เกราะเหล็ก | PD +122, ID +92, HP +280, Res +6 | `{"t":"pct_reduce","v":8}` |
-| `A4` | เกราะมังกร | PD +150, ID +115, HP +300, Res +5 | — |
-| `A5` | เกราะเทพ | ATK +4, IA +8, PD +178, ID +138, HP +240, MP +48, Res +4 | `{"t":"pct_reduce","v":12}` |
-| `eq_t0_a_cloth` | เสื้อผ้าฝ้ายเรียบ | PD +18, ID +12 | — |
-| `eq_t0_a_iron` | เกราะแผ่นเหล็กเล็ก | PD +31, ID +21, HP +30, Res +1 | — |
-| `eq_t1_a_leather` | เสื้อหนัง | PD +48, ID +35, HP +140, Res +2 | — |
-| `eq_t1_a_iron` | เกราะเหล็กหนา | PD +69, ID +53, HP +180, Res +4 | — |
-| `eq_suzhou_a_silk` | เสื้อผ้าไหมซูโจว | ATK +15, IA +10, PD +43, ID +53, MP +110 | — |
+| `A1` | เสื้อผ้าธรรมดา | PD +15, ID +10 | — |
+| `A2` | เกราะหนัง | PD +43, ID +34, HP +150, Res +3 | — |
+| `A3` | เกราะเหล็ก | PD +61, ID +46, HP +140, Res +3 | `{"t":"pct_reduce","v":4}` |
+| `A4` | เกราะมังกร | PD +75, ID +58, HP +150, Res +3 | — |
+| `A5` | เกราะเทพ | ATK +2, IA +4, PD +89, ID +69, HP +120, MP +24, Res +2 | `{"t":"pct_reduce","v":6}` |
+| `eq_t0_a_cloth` | เสื้อผ้าฝ้ายเรียบ | PD +9, ID +6 | — |
+| `eq_t0_a_iron` | เกราะแผ่นเหล็กเล็ก | PD +16, ID +11, HP +15, Res +1 | — |
+| `eq_t1_a_leather` | เสื้อหนัง | PD +24, ID +18, HP +70, Res +1 | — |
+| `eq_t1_a_iron` | เกราะเหล็กหนา | PD +35, ID +27, HP +90, Res +2 | — |
+| `eq_suzhou_a_silk` | เสื้อผ้าไหมซูโจว | ATK +8, IA +5, PD +22, ID +27, MP +55 | — |
 
 ### หมวก (`H`, 9)
 
 | Id | Name | Bonuses | Effect |
 | --- | --- | --- | --- |
-| `H1` | หมวกผ้า | PD +15, ID +10 | — |
-| `H2` | หมวกหนัง | PD +46, ID +38, HP +210, Res +2 | — |
-| `H3` | หมวกเหล็ก | PD +78, ID +65, HP +300, Res +5 | — |
-| `H4` | หมวกเทพ | ATK +20, PD +108, ID +90, HP +100, MP +40, Res +5 | `{"t":"pct_reduce","v":5}` |
-| `H5` | มงกุฎมังกร | ATK +8, PD +117, ID +97, HP +240, MP +16, Res +4 | `{"t":"flat_cri","v":12}` |
-| `eq_t0_h_cloth` | ผ้าโพกหัว | PD +8, ID +5 | — |
-| `eq_t0_h_iron` | หมวกเหล็กบาง | PD +16, ID +11, HP +20, Res +1 | — |
-| `eq_t1_h_leather` | หมวกหนังบุนวม | PD +20, ID +15, HP +80 | — |
-| `eq_t1_h_iron` | หมวกเหล็กแข็ง | PD +34, ID +28, HP +60, Res +3 | — |
+| `H1` | หมวกผ้า | PD +8, ID +5 | — |
+| `H2` | หมวกหนัง | PD +23, ID +19, HP +105, Res +1 | — |
+| `H3` | หมวกเหล็ก | PD +39, ID +33, HP +150, Res +3 | — |
+| `H4` | หมวกเทพ | ATK +10, PD +54, ID +45, HP +50, MP +20, Res +3 | `{"t":"pct_reduce","v":3}` |
+| `H5` | มงกุฎมังกร | ATK +4, PD +59, ID +49, HP +120, MP +8, Res +2 | `{"t":"flat_cri","v":6}` |
+| `eq_t0_h_cloth` | ผ้าโพกหัว | PD +4, ID +3 | — |
+| `eq_t0_h_iron` | หมวกเหล็กบาง | PD +8, ID +6, HP +10, Res +1 | — |
+| `eq_t1_h_leather` | หมวกหนังบุนวม | PD +10, ID +8, HP +40 | — |
+| `eq_t1_h_iron` | หมวกเหล็กแข็ง | PD +17, ID +14, HP +30, Res +2 | — |
 
 ### รองเท้า (`B`, 9)
 
 | Id | Name | Bonuses | Effect |
 | --- | --- | --- | --- |
-| `B1` | รองเท้าผ้า | PD +12, ID +8 | — |
-| `B2` | รองเท้าหนัง | ATK +13, PA +5, IA +5, PD +22, ID +16, SPD +16, Eva +16, Acc +10 | — |
-| `B3` | รองเท้าเหล็ก | ATK +6, PD +60, ID +50, HP +200, SPD +12, Eva +12, Res +4 | — |
-| `B4` | รองเท้าลม | ATK +20, PA +8, IA +8, PD +28, ID +20, SPD +24, Eva +24, Acc +16 | `{"t":"flat_eva","v":20}` |
-| `B5` | รองเท้าเทพ | ATK +16, PA +12, IA +12, PD +50, ID +38, SPD +16, Eva +16, Acc +16, Cri +4, Res +4 | `{"t":"flat_eva","v":15}` |
-| `eq_t0_b_cloth` | รองเท้าฟาง | ATK +2, PD +6, ID +4, SPD +4, Eva +4 | — |
-| `eq_t0_b_iron` | รองเท้าหุ้มเหล็ก | PD +14, ID +10, HP +20, Res +1 | — |
-| `eq_t1_b_leather` | รองเท้าหนังหนา | ATK +7, PA +2, IA +2, PD +14, ID +10, SPD +10, Eva +10, Acc +4 | — |
-| `eq_t1_b_iron` | รองเท้าเหล็กแข็ง | PD +31, ID +26, HP +110, Res +2 | — |
+| `B1` | รองเท้าผ้า | PD +6, ID +4 | — |
+| `B2` | รองเท้าหนัง | ATK +7, PA +3, IA +3, PD +11, ID +8, SPD +8, Eva +8, Acc +5 | — |
+| `B3` | รองเท้าเหล็ก | ATK +3, PD +30, ID +25, HP +100, SPD +6, Eva +6, Res +2 | — |
+| `B4` | รองเท้าลม | ATK +10, PA +4, IA +4, PD +14, ID +10, SPD +12, Eva +12, Acc +8 | `{"t":"flat_eva","v":10}` |
+| `B5` | รองเท้าเทพ | ATK +8, PA +6, IA +6, PD +25, ID +19, SPD +8, Eva +8, Acc +8, Cri +2, Res +2 | `{"t":"flat_eva","v":8}` |
+| `eq_t0_b_cloth` | รองเท้าฟาง | ATK +1, PD +3, ID +2, SPD +2, Eva +2 | — |
+| `eq_t0_b_iron` | รองเท้าหุ้มเหล็ก | PD +7, ID +5, HP +10, Res +1 | — |
+| `eq_t1_b_leather` | รองเท้าหนังหนา | ATK +4, PA +1, IA +1, PD +7, ID +5, SPD +5, Eva +5, Acc +2 | — |
+| `eq_t1_b_iron` | รองเท้าเหล็กแข็ง | PD +16, ID +13, HP +55, Res +1 | — |
 
 ### ปลอกแขน (`BR`, 10)
 
 | Id | Name | Bonuses | Effect |
 | --- | --- | --- | --- |
-| `BR1` | ปลอกแขนผ้า | PD +8, ID +6 | — |
-| `BR2` | ปลอกแขนหนัง | ATK +18, PA +12, PD +23, ID +20, HP +58, Cri +6, Res +2 | — |
-| `BR3` | ปลอกแขนเหล็ก | ATK +18, PA +12, PD +47, ID +40, HP +218, Cri +6, Res +4 | — |
-| `BR4` | ปลอกแขนมังกร | ATK +40, PA +30, IA +10, PD +38, ID +28, HP +30, Acc +20, Cri +10 | `{"t":"pct_atk","v":8}` |
-| `BR5` | ปลอกแขนเทพ | ATK +40, PA +26, IA +6, PD +50, ID +38, HP +30, SPD +8, Eva +8, Acc +12, Cri +10 | — |
-| `eq_t0_br_cloth` | ปลอกแขนผ้าฝ้าย | PD +5, ID +3 | — |
-| `eq_t0_br_iron` | ปลอกแขนเหล็กบาง | ATK +6, PA +4, PD +8, ID +5, HP +6, Cri +2 | — |
-| `eq_t1_br_leather` | ปลอกแขนหนัง | ATK +12, PA +8, PD +10, ID +8, HP +12, Cri +4 | — |
-| `eq_t1_br_iron` | ปลอกแขนเหล็กหนา | ATK +15, PA +10, PD +20, ID +16, HP +45, Cri +5, Res +1 | — |
-| `eq_changan_br_iron` | ปลอกแขนทหารราชสำนัก | ATK +18, PA +12, PD +26, ID +22, HP +58, Cri +6, Res +2 | — |
+| `BR1` | ปลอกแขนผ้า | PD +4, ID +3 | — |
+| `BR2` | ปลอกแขนหนัง | ATK +9, PA +6, PD +12, ID +10, HP +29, Cri +3, Res +1 | — |
+| `BR3` | ปลอกแขนเหล็ก | ATK +9, PA +6, PD +24, ID +20, HP +109, Cri +3, Res +2 | — |
+| `BR4` | ปลอกแขนมังกร | ATK +20, PA +15, IA +5, PD +19, ID +14, HP +15, Acc +10, Cri +5 | `{"t":"pct_atk","v":4}` |
+| `BR5` | ปลอกแขนเทพ | ATK +20, PA +13, IA +3, PD +25, ID +19, HP +15, SPD +4, Eva +4, Acc +6, Cri +5 | — |
+| `eq_t0_br_cloth` | ปลอกแขนผ้าฝ้าย | PD +3, ID +2 | — |
+| `eq_t0_br_iron` | ปลอกแขนเหล็กบาง | ATK +3, PA +2, PD +4, ID +3, HP +3, Cri +1 | — |
+| `eq_t1_br_leather` | ปลอกแขนหนัง | ATK +6, PA +4, PD +5, ID +4, HP +6, Cri +2 | — |
+| `eq_t1_br_iron` | ปลอกแขนเหล็กหนา | ATK +8, PA +5, PD +10, ID +8, HP +23, Cri +3, Res +1 | — |
+| `eq_changan_br_iron` | ปลอกแขนทหารราชสำนัก | ATK +9, PA +6, PD +13, ID +11, HP +29, Cri +3, Res +1 | — |
 
 ### แหวน (`R`, 8)
 
 | Id | Name | Bonuses | Effect |
 | --- | --- | --- | --- |
-| `R1` | แหวนทองเปล่า | HP +100, MP +60 | — |
-| `R2` | แหวนพลัง | ATK +20, PA +10, IA +10, PD +5, ID +5, HP +165, MP +140, Cri +5 | — |
-| `R3` | แหวนชีวิต | PA +2, IA +2, PD +8, ID +8, HP +440, MP +80, Cri +2, Res +2 | — |
-| `R4` | แหวนปัญญา | ATK +16, IA +8, PD +16, ID +16, HP +100, MP +272 | `{"t":"hp_regen","v":3}` |
-| `R5` | แหวนมังกร | ATK +20, PA +10, IA +10, PD +5, ID +5, HP +215, MP +210, Cri +5 | `{"t":"flat_cri","v":12}` |
-| `eq_t0_r_copper` | แหวนทองแดง | HP +60, MP +30 | — |
-| `eq_t1_r_silver` | แหวนเงิน | PA +3, IA +3, HP +100, MP +60, Cri +3, Res +3 | — |
-| `eq_jinling_r_jade` | แหวนหยกจินหลิง | ATK +13, IA +6, PD +13, ID +13, HP +140, MP +156 | — |
+| `R1` | แหวนทองเปล่า | HP +50, MP +30 | — |
+| `R2` | แหวนพลัง | ATK +10, PA +5, IA +5, PD +3, ID +3, HP +83, MP +70, Cri +3 | — |
+| `R3` | แหวนชีวิต | PA +1, IA +1, PD +4, ID +4, HP +220, MP +40, Cri +1, Res +1 | — |
+| `R4` | แหวนปัญญา | ATK +8, IA +4, PD +8, ID +8, HP +50, MP +136 | `{"t":"hp_regen","v":2}` |
+| `R5` | แหวนมังกร | ATK +10, PA +5, IA +5, PD +3, ID +3, HP +108, MP +105, Cri +3 | `{"t":"flat_cri","v":6}` |
+| `eq_t0_r_copper` | แหวนทองแดง | HP +30, MP +15 | — |
+| `eq_t1_r_silver` | แหวนเงิน | PA +2, IA +2, HP +50, MP +30, Cri +2, Res +2 | — |
+| `eq_jinling_r_jade` | แหวนหยกจินหลิง | ATK +7, IA +3, PD +7, ID +7, HP +70, MP +78 | — |
 
 ### ประดับ (`C`, 9)
 
 | Id | Name | Bonuses | Effect |
 | --- | --- | --- | --- |
-| `C1` | เหรียญโชคลาภ | HP +180 | — |
-| `C2` | ประดับเลือดมังกร | ATK +15, PA +10, PD +5, ID +5, HP +465, Cri +5 | — |
-| `C3` | ประดับปัญญาสวรรค์ | ATK +15, IA +10, PD +15, ID +15, HP +250, MP +80 | `{"t":"pct_atk","v":6}` |
-| `C4` | ประดับชีวิตนิรันดร์ | PD +10, ID +10, HP +700 | `{"t":"hp_regen","v":5}` |
-| `C5` | ประดับมังกรเทพ | ATK +15, PA +10, PD +5, ID +5, HP +565, Cri +5 | `{"t":"pct_reduce","v":8}` |
-| `eq_t0_c_cloth` | เครื่องรางผ้าแดง | PA +2, IA +2, HP +100, Cri +2, Res +2 | — |
-| `eq_t1_c_wood` | เครื่องรางไม้แกะสลัก | PD +3, ID +3, HP +240 | — |
-| `eq_dali_c_herb` | เครื่องรางสมุนไพรต้าหลี่ | PD +4, ID +4, HP +300 | `{"t":"hp_regen","v":2}` |
-| `eq_capital_c_seal` | ตราประทับนครหลวง | PA +4, IA +4, HP +200, MP +60, Cri +4, Res +4 | `{"t":"pct_atk","v":4}` |
+| `C1` | เหรียญโชคลาภ | HP +90 | — |
+| `C2` | ประดับเลือดมังกร | ATK +8, PA +5, PD +3, ID +3, HP +233, Cri +3 | — |
+| `C3` | ประดับปัญญาสวรรค์ | ATK +8, IA +5, PD +8, ID +8, HP +125, MP +40 | `{"t":"pct_atk","v":3}` |
+| `C4` | ประดับชีวิตนิรันดร์ | PD +5, ID +5, HP +350 | `{"t":"hp_regen","v":3}` |
+| `C5` | ประดับมังกรเทพ | ATK +8, PA +5, PD +3, ID +3, HP +283, Cri +3 | `{"t":"pct_reduce","v":4}` |
+| `eq_t0_c_cloth` | เครื่องรางผ้าแดง | PA +1, IA +1, HP +50, Cri +1, Res +1 | — |
+| `eq_t1_c_wood` | เครื่องรางไม้แกะสลัก | PD +2, ID +2, HP +120 | — |
+| `eq_dali_c_herb` | เครื่องรางสมุนไพรต้าหลี่ | PD +2, ID +2, HP +150 | `{"t":"hp_regen","v":1}` |
+| `eq_capital_c_seal` | ตราประทับนครหลวง | PA +2, IA +2, HP +100, MP +30, Cri +2, Res +2 | `{"t":"pct_atk","v":2}` |

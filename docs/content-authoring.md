@@ -381,13 +381,14 @@ Every dialog plays one line per beat, with its key words coloured. Write short l
 Append to `EQUIPMENT` in `lib/game/data/equipment.ts`:
 
 - `ty` is the slot: W, A, H, B, BR, R or C.
+- `ti` is its tier 0–4 (how many random options it rolls, `lib/game/gear.ts`). Author the numbers at full strength: the game uses them × `EQUIP_STAT_SCALE` (0.5).
 - Put the boosts in `atkb`, `pdb`, `idb`, `hpb`, `mpb` (required) and the optional `pab`, `iab`, `spdb`, `evab`, `accb`, `crib`, `resb`.
 - `st` is ignored; keep `{}`.
 - `eff` is an equipment effect or `null`.
 - `instrument: true` marks a music weapon.
 - Give it an icon in `EQUIPMENT_ICONS` (`lib/world/data/item-icons.ts`); a new item likewise needs one in `ITEM_ICONS`. `test:assets` fails otherwise ([assets.md](assets.md#item-icons)).
 
-Sell it through artisans (`equipmentOfferedBy`) or give it as a quest item.
+Sell it through artisans (`equipmentOfferedBy`) or as a legendary beast's gear. Every way a piece is gained must roll its options (`gainGear` / `rollGearKey`). The craft that re-rolls it is the profession that sells it, else by slot and name (`equipmentProfession` in `artisans.ts`).
 
 ## A joinable sect
 

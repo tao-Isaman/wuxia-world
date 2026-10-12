@@ -2,7 +2,7 @@
 // the result types the actions hand back to the UI.
 import type { StoreApi } from "zustand";
 import type { EquipSlotType, StatKey } from "@/lib/game";
-import type { LifeSkill, WorldStateData } from "@/lib/world";
+import type { LifeSkill, ReforgeRefusal, WorldStateData } from "@/lib/world";
 import type { ObjectiveResult } from "@/lib/world/quest-objectives";
 import type { GiftReaction } from "@/lib/world/gifts";
 
@@ -48,7 +48,13 @@ export type BuyRecipeResult =
 // equipment lands in `inventoryEquipment`, NOT directly in a slot.
 export type BuyEquipResult =
   | { ok: false; reason: "unknown" | "no-gold" }
+  // `equipId` is the bought piece's key, its options rolled (lib/game/gear.ts).
   | { ok: true; equipId: string; spent: number };
+
+// Result of re-rolling a piece's options at a craft shop (lib/world/gear.ts).
+export type ReforgeResult =
+  | { ok: false; reason: ReforgeRefusal | "no-artisan" | "no-build" }
+  | { ok: true; before: string; key: string; material: string };
 
 // Result of equipping a bag item into a slot. `swapped` (when present)
 // is the id of the item that got pushed back into the bag.
@@ -322,6 +328,10 @@ export interface WorldStore extends WorldStateData {
   // required for multi-slot types (BR / R / C) and ignored for the
   // single-slot ones (W / A / H / B).
   unequipFromSlot: (slotType: EquipSlotType, slotIdx?: 0 | 1) => UnequipResult;
+  // Re-roll a piece's options at the craft shop of its line here, for one
+  // หินศิลาวิเศษ / ด้ายศิลาวิเศษ, with the hero's craft at level 3 or more.
+  // `worn` names the slot when the piece is worn; else it comes from the bag.
+  reforgeGear: (key: string, worn?: { ty: EquipSlotType; idx: 0 | 1 }) => ReforgeResult;
 
   // Equip a learned skill or art into a specific slot. `rawId` follows
   // the slot encoding from `lib/game/slots.ts` — bare skill id or

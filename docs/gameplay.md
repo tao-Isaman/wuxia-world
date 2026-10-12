@@ -455,7 +455,35 @@ Mastery levels 1–5 need 0 / 100 / 300 / 700 / 1500 xp.
 - **Manuals (47):** each teaches a skill or art if a stat is high enough — 0 / 10 / 15 / 20 / 30 for tiers 0–4, counting skills and arts but not gear.
 - **Quest items:** cannot be sold.
 
-**Gear (76 pieces).** Ten slots: weapon, armour, head, boots, two bracers, two rings, two charms. Gear from the bag is equipped in ย่าม, and a replaced piece goes back to the bag. Stats and effects are in [combat.md](combat.md).
+**Gear (76 pieces).** Ten slots: weapon, armour, head, boots, two bracers, two rings, two charms. Gear from the bag is equipped in ย่าม, and a replaced piece goes back to the bag. Stats and effects are in [combat.md](combat.md#equipment-equipment-libgamedataequipmentts--76); every piece's authored numbers count at half (`EQUIP_STAT_SCALE` = 0.5), and its random options make up the rest.
+
+**Options (ออฟชั่นเสริม, `lib/game/gear.ts`, `lib/world/gear.ts`).** Every piece gained (bought, or won from a legendary beast) rolls random options by its tier, and the bag, the profile, the shop and the spoils panel list them under the piece's stats. Each option's colour is how good its roll is, in the rarity colours: grey at the bottom of its range, then green, blue, purple, orange, and red-gold for the very top (`affixQuality`).
+
+| Tier (ชั้น) | Pieces | Options |
+| --- | --- | --- |
+| 0 ธรรมดา | the shops' starter roster, the old ×1 pieces | 0–1 |
+| 1 ดี | the shops' iron / leather / silver roster, the old ×2 pieces, ขลุ่ยไผ่ | 1–2 |
+| 2 ชั้นเลิศ | the seven city specialties, the old ×3 pieces, พิณยี่ห้อง | 1–3 |
+| 3 หายาก | beast gear ดาบพิษ, เกราะมังกร, หมวกเทพ, รองเท้าลม (and the old ×4) | 2–3 |
+| 4 ในตำนาน | beast gear ดาบมังกรเทพ, เกราะเทพ, มงกุฎมังกร, รองเท้าเทพ (and the old ×5) | 3–4 |
+
+Each of the 17 kinds is equally likely, and a piece never rolls one kind twice:
+
+| Option | Range |
+| --- | --- |
+| a base stat (กำลัง … ฉลาด, random) | +1–10 |
+| ป้องกันกาย / ป้องกันใน / โจมตีกาย / โจมตีใน | +5–15 each |
+| ป้องกันกาย / ป้องกันใน / โจมตีกาย / โจมตีใน % (on the whole stat) | +1–10 % each |
+| แม่นยำ % / หลบหลีก % | +1–15 % each |
+| คริติคอล / ต้านทานคริติคอล | +5–15 each |
+| ความเสียหายคริติคอล (the ×1.5 crit becomes ×1.5 + v/100) | +1–10 % |
+| ประสบการณ์ยุทธที่ได้รับ (won fights and quest rewards) | +5–15 % |
+| a weapon family's moves (หมัด, กระบี่, ดาบ… random) hit harder | +5–25 % |
+| a weapon family's moves hurt the wearer less (capped at 60 % per family) | −5–25 % |
+
+A base-stat option counts in battle and everywhere stats are shown, but not for training gates (manuals, quest stat conditions).
+
+**Re-rolling options (✦ สุ่มออฟชั่น).** The craft shop of the piece's own line re-rolls the whole set, on a worn piece or one in the bag: the forge (weapons, iron armour and every beast-won armour), the tailor (cloth, leather and silk), the jeweller (rings) and the accessory maker (charms). It needs the hero's own skill in that craft at **level 3** or more, and one magic material per roll: **หินศิลาวิเศษ** for weapons, rings and charms, **ด้ายศิลาวิเศษ** for robes, hats, boots and bracers. Both drop only from tier-3-and-up foes: tier 3 each 20 % (1), tier 4 30 % (1–2), tier 5 40 % (1–2), a legendary beast always 2–3 of each. Spars, the law and tournament bouts leave none.
 
 **Outfits and the weapon on the body** ([design/appearance.md](design/appearance.md)). The โปรไฟล์ window's **ชุด** tab is the wardrobe: each outfit shows the hero in it, carrying their weapon. An outfit changes only the look (never stats) and is a recolour of the hero's own drawing, so it shows on the map, in battle and in films, and other players see it online.
 

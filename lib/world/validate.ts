@@ -12,7 +12,7 @@ import { getBoss } from "./data/bosses";
 import { RECIPES_BY_ID } from "./data/recipes";
 import { SKILLS_BY_ID } from "@/lib/game/data/skills";
 import { ARTS_BY_ID } from "@/lib/game/data/arts";
-import { EQUIPMENT_BY_ID } from "@/lib/game/data/equipment";
+import { repairGear } from "./gear";
 import { SECT_MEMBERSHIPS } from "./data/sect-memberships";
 import { heroBodyFor } from "./data/player-bodies";
 import { repairNpcExt } from "./npc-repair";
@@ -220,29 +220,12 @@ export function validateAndRepair(state: WorldStateData): void {
     new Set(state.learnedRecipeIds.filter((id) => RECIPES_BY_ID.has(id))),
   );
 
-  // Equipment bag — drop unknown ids, clamp counts to non-negative
-  // integers. Equipment ids live in lib/game/data/equipment.ts; missing
-  // ids likely mean a piece was renamed or removed between deploys.
-  if (
-    !state.inventoryEquipment ||
-    typeof state.inventoryEquipment !== "object"
-  ) {
-    state.inventoryEquipment = {};
-  } else {
-    for (const id of Object.keys(state.inventoryEquipment)) {
-      if (!EQUIPMENT_BY_ID.has(id)) {
-        console.warn(`[world] dropping unknown equipment id "${id}"`);
-        delete state.inventoryEquipment[id];
-        continue;
-      }
-      const v = state.inventoryEquipment[id];
-      if (typeof v !== "number" || v <= 0 || !Number.isFinite(v)) {
-        delete state.inventoryEquipment[id];
-      } else {
-        state.inventoryEquipment[id] = Math.floor(v);
-      }
-    }
-  }
+  // Equipment bag and loadout — drop unknown pieces, clamp counts to whole
+  // numbers, canonical option keys, and a piece from before options gets its
+  // share (lib/world/gear.ts). Missing ids likely mean a piece was renamed or
+  // removed between deploys.
+  if (!state.inventoryEquipment || typeof state.inventoryEquipment !== "object") state.inventoryEquipment = {};
+  repairGear(state);
   if (state.playerBuild) {
     state.playerBuild = {
       ...state.playerBuild,

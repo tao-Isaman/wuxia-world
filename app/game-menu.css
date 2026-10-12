@@ -365,3 +365,13 @@ body:has(.hud-menu, .game-modal) [data-radix-popper-content-wrapper] > * {
 /* Sparse sections no longer sit in a tall empty frame. */
 .hud-menu-panel { min-height: 0; }
 .npc-action-label::before { content: "◆" / ""; margin-right: 7px; font-size: 11px; color: #c9a55c; vertical-align: 2px; }
+
+/* ── Gear options (ออฟชั่นเสริม, components/game/gear-affixes.tsx) ───── */
+.gear-affixes { display: flex; flex-direction: column; gap: 3px; padding: 6px 8px; background: #241a33; border: 1px solid #5b4380; border-radius: 3px; }
+.gear-affixes-head { font-size: 13px; font-weight: 700; color: #d9b8ff; }
+.gear-affixes-head span { margin-left: 6px; font-weight: 400; font-size: 12px; color: #b9a6d6; }
+.gear-affixes ul { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 10px; font-size: 13px; color: #e6d2ff; }
+/* An option's colour is how good its roll is (affixQuality 0–5, the rarity colours). */
+.affix-q0 { color: #d8d3c2; } .affix-q1 { color: #7fd48f; } .affix-q2 { color: #6fb8f2; }
+.affix-q3 { color: #c48ff0; } .affix-q4 { color: #f0a456; } .affix-q5 { color: #f06a55; font-weight: 700; }
+.gear-affixes-none { font-size: 13px; color: #9b8fb0; font-style: italic; }

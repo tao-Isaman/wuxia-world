@@ -350,6 +350,8 @@ export interface Equipment {
   id: string;
   n: string;
   ty: EquipSlotType;
+  /** Tier 0–4: how many random options the piece rolls (lib/game/gear.ts). */
+  ti: number;
   // Direct combat-stat boosts. Equipment now contributes ONLY through
   // these fields — the legacy `st` (base-stat boost) field is kept
   // type-compatibly but ignored by combinedStats / deriveAll. This

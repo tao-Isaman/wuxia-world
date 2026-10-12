@@ -200,6 +200,12 @@ export const ITEMS: readonly ItemDef[] = ([
   { id: "thread",      name: "เส้นด้าย",         category: "material", price: 20,
     description: "ด้ายเย็บคุณภาพ วัตถุดิบงานตัดเย็บ" },
 
+  // ─── Magic materials: re-roll gear options at a craft shop (lib/world/gear.ts)
+  { id: "spirit_stone",  name: "หินศิลาวิเศษ",     category: "material", price: 400,
+    description: "ผลึกหินเรืองแสงที่ยอดฝีมือและสัตว์ร้ายระดับสูงพกติดตัว ช่างที่ชำนาญขั้น 3 ขึ้นไปใช้หลอมออฟชั่นเสริมของอาวุธ แหวน และเครื่องประดับใหม่" },
+  { id: "spirit_thread", name: "ด้ายศิลาวิเศษ",    category: "material", price: 400,
+    description: "ด้ายที่ฟั่นด้วยผงศิลาวิเศษ ช่างที่ชำนาญขั้น 3 ขึ้นไปใช้สุ่มออฟชั่นเสริมของเสื้อ หมวก รองเท้า และปลอกแขนใหม่" },
+
   // ─── Books / scrolls / images ──────────────────────────────────────
   { id: "book_basic",   name: "ตำราเบื้องต้น",    category: "book", price: 100,
     description: "ตำราสำหรับผู้เริ่มต้น อ่านเพื่อฝึกฝน",

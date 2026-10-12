@@ -1,0 +1,204 @@
+// Gear options in the world (the engine is lib/game/gear.ts): every piece
+// gained rolls its options; a craft shop of the piece's own line re-rolls them
+// for one magic material, once the hero's own skill in that craft is at least
+// level 3; the materials drop from tier-3-and-up foes; and the ประสบการณ์ยุทธ
+// option raises what fights and quests pay.
+import {
+  affixCountRange,
+  getBuildBonus,
+  getEquip,
+  gearKey,
+  parseGear,
+  rollGearAffixes,
+  rollGearKey,
+  type CharacterBuild,
+  type Equipment,
+  type EquipLoadout,
+  type EquipSlotType,
+} from "../game";
+import { seededRng } from "../game/rng";
+import type { WorldStateData } from "./types";
+import { equipmentProfession, getArtisansAt, type CraftProfession } from "./data/artisans";
+import { masteryLevel } from "./data/life-skills";
+
+/** หินศิลาวิเศษ: re-rolls a weapon's, a ring's or a charm's options. */
+export const SPIRIT_STONE = "spirit_stone";
+/** ด้ายศิลาวิเศษ: re-rolls a robe's, a hat's, boots' or bracers' options. */
+export const SPIRIT_THREAD = "spirit_thread";
+
+/** The hero's own level in the piece's craft needed to re-roll it. */
+export const REFORGE_MIN_LEVEL = 3;
+
+/** The material a piece of this slot is re-rolled with. */
+export function reforgeMaterial(ty: EquipSlotType): string {
+  return ty === "W" || ty === "R" || ty === "C" ? SPIRIT_STONE : SPIRIT_THREAD;
+}
+
+/** The craft whose shop re-rolls this piece (and whose level the hero needs). */
+export function gearProfession(def: Equipment): CraftProfession {
+  return equipmentProfession(def);
+}
+
+export type ReforgeRefusal = "unknown" | "wrong-shop" | "low-skill" | "no-material" | "not-owned";
+
+export interface ReforgeCheck {
+  ok: boolean;
+  reason?: ReforgeRefusal;
+  def?: Equipment;
+  profession?: CraftProfession;
+  material?: string;
+  /** The hero's level in the craft (1–5). */
+  level?: number;
+}
+
+/** Can this artisan's craft re-roll the piece now (shop, skill, material)? */
+export function reforgeCheck(
+  s: Pick<WorldStateData, "lifeSkillXp" | "inventory">,
+  artisanProfession: string,
+  key: string,
+): ReforgeCheck {
+  const def = getEquip(key);
+  if (!def) return { ok: false, reason: "unknown" };
+  const profession = gearProfession(def);
+  const material = reforgeMaterial(def.ty);
+  const level = masteryLevel(s.lifeSkillXp?.[profession] ?? 0);
+  const base = { def, profession, material, level };
+  if (artisanProfession !== profession) return { ok: false, reason: "wrong-shop", ...base };
+  if (level < REFORGE_MIN_LEVEL) return { ok: false, reason: "low-skill", ...base };
+  if ((s.inventory[material] ?? 0) < 1) return { ok: false, reason: "no-material", ...base };
+  return { ok: true, ...base };
+}
+
+/** Whether an artisan of that craft stands here (the shop the re-roll needs). */
+export function reforgeShopHere(locationId: string, profession: string): boolean {
+  return getArtisansAt(locationId).some((a) => a.profession === profession);
+}
+
+/** Every piece the hero owns that a shop of this craft re-rolls: worn ones first, then the bag. */
+export function reforgeablePieces(
+  s: Pick<WorldStateData, "inventoryEquipment" | "playerBuild">,
+  profession: string,
+): { key: string; worn?: { ty: EquipSlotType; idx: 0 | 1 } }[] {
+  const out: { key: string; worn?: { ty: EquipSlotType; idx: 0 | 1 } }[] = [];
+  const eq = s.playerBuild?.equipment;
+  if (eq) {
+    for (const ty of ["W", "A", "H", "B"] as const) {
+      const key = eq[ty];
+      if (key && getEquip(key) && gearProfession(getEquip(key)!) === profession) out.push({ key, worn: { ty, idx: 0 } });
+    }
+    for (const ty of ["BR", "R", "C"] as const) {
+      eq[ty].forEach((key, idx) => {
+        if (key && getEquip(key) && gearProfession(getEquip(key)!) === profession) out.push({ key, worn: { ty, idx: idx as 0 | 1 } });
+      });
+    }
+  }
+  for (const [key, n] of Object.entries(s.inventoryEquipment ?? {})) {
+    const def = getEquip(key);
+    if (n > 0 && def && gearProfession(def) === profession) out.push({ key });
+  }
+  return out;
+}
+
+/** The same piece with a fresh set of options. */
+export function rerollGear(key: string, rand: () => number = Math.random): string {
+  const g = parseGear(key);
+  return g ? gearKey(g.def.id, rollGearAffixes(g.def.ti, rand)) : key;
+}
+
+/** Put one gained piece in the bag, its options rolled (returns its key). */
+export function gainGear(s: Pick<WorldStateData, "inventoryEquipment">, equipId: string, rand: () => number = Math.random): string {
+  const key = equipId.includes("~") ? (parseGear(equipId)?.key ?? equipId) : rollGearKey(equipId, rand);
+  s.inventoryEquipment = { ...s.inventoryEquipment, [key]: (s.inventoryEquipment[key] ?? 0) + 1 };
+  return key;
+}
+
+// ─── Materials from the strong ───────────────────────────────────────
+
+/** Odds per won fight that a foe of this tier carries each material, and how many. */
+export const SPIRIT_DROP: Readonly<Record<number, { chance: number; count: readonly [number, number] }>> = {
+  3: { chance: 0.2, count: [1, 1] },
+  4: { chance: 0.3, count: [1, 2] },
+  5: { chance: 0.4, count: [1, 2] },
+};
+/** A legendary beast always leaves both, this many of each. */
+export const SPIRIT_DROP_BOSS: readonly [number, number] = [2, 3];
+
+/** The magic materials a beaten foe leaves (tier 3 and up; none from spars, the law or bouts — the caller decides). */
+export function rollSpiritMaterials(opp: { ti?: number; boss?: boolean } | null | undefined): { itemId: string; count: number }[] {
+  if (!opp) return [];
+  const between = ([lo, hi]: readonly [number, number]) => lo + Math.floor(Math.random() * (hi - lo + 1));
+  if (opp.boss) return [SPIRIT_STONE, SPIRIT_THREAD].map((itemId) => ({ itemId, count: between(SPIRIT_DROP_BOSS) }));
+  const drop = SPIRIT_DROP[Math.min(5, opp.ti ?? 0)];
+  if (!drop) return [];
+  const out: { itemId: string; count: number }[] = [];
+  for (const itemId of [SPIRIT_STONE, SPIRIT_THREAD]) {
+    if (Math.random() < drop.chance) out.push({ itemId, count: between(drop.count) });
+  }
+  return out;
+}
+
+// ─── The ประสบการณ์ยุทธ option ─────────────────────────────────────────
+
+/** ประสบการณ์ยุทธ raised by the worn pieces' option (fights and quests pay this). */
+export function wExpWithGear(build: Pick<CharacterBuild, "equipment" | "meridians"> | null | undefined, amount: number): number {
+  if (!build || amount <= 0) return amount;
+  const pct = getBuildBonus(build).wexp;
+  return pct > 0 ? Math.round(amount * (1 + pct / 100)) : amount;
+}
+
+// ─── Repair ──────────────────────────────────────────────────────────
+
+function hashKey(key: string): number {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < key.length; i++) {
+    h ^= key.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return h >>> 0;
+}
+
+/**
+ * A piece's key as it should be saved: canonical options, and a piece from
+ * before options (fewer than its tier's least) given its share — seeded by the
+ * key and its place, so the browser and the server repair it alike.
+ */
+export function repairGearKey(key: string, salt: number): string | null {
+  const g = parseGear(key);
+  if (!g) return null;
+  if (g.affixes.length >= affixCountRange(g.def.ti)[0]) return g.key;
+  return gearKey(g.def.id, rollGearAffixes(g.def.ti, seededRng(hashKey(g.key), salt)));
+}
+
+/** Repair the bag and the loadout's keys (unknown pieces dropped). */
+export function repairGear(state: Pick<WorldStateData, "inventoryEquipment" | "playerBuild">): void {
+  const bag: Record<string, number> = {};
+  let n = 0;
+  for (const [key, count] of Object.entries(state.inventoryEquipment ?? {})) {
+    if (typeof count !== "number" || !Number.isFinite(count) || count < 1) continue;
+    const g = parseGear(key);
+    if (!g) {
+      console.warn(`[world] dropping unknown equipment id "${key}"`);
+      continue;
+    }
+    // Each copy of a piece from before options rolls its own.
+    const whole = g.affixes.length >= affixCountRange(g.def.ti)[0];
+    for (let i = 0; i < (whole ? 1 : Math.floor(count)); i++) {
+      const fixed = whole ? g.key : repairGearKey(g.key, n++)!;
+      bag[fixed] = (bag[fixed] ?? 0) + (whole ? Math.floor(count) : 1);
+    }
+  }
+  state.inventoryEquipment = bag;
+  const eq = state.playerBuild?.equipment;
+  if (!eq || !state.playerBuild) return;
+  const fix = (key: string | null): string | null => (key ? repairGearKey(key, n++) : null);
+  const next: EquipLoadout = {
+    W: fix(eq.W), A: fix(eq.A), H: fix(eq.H), B: fix(eq.B),
+    BR: [fix(eq.BR?.[0] ?? null), fix(eq.BR?.[1] ?? null)],
+    R: [fix(eq.R?.[0] ?? null), fix(eq.R?.[1] ?? null)],
+    C: [fix(eq.C?.[0] ?? null), fix(eq.C?.[1] ?? null)],
+  };
+  // A piece in the wrong slot type (hand-edited saves) is taken off.
+  for (const ty of ["W", "A", "H", "B"] as const) if (next[ty] && getEquip(next[ty])?.ty !== ty) next[ty] = null;
+  for (const ty of ["BR", "R", "C"] as const) next[ty] = next[ty].map((k) => (k && getEquip(k)?.ty === ty ? k : null)) as [string | null, string | null];
+  state.playerBuild = { ...state.playerBuild, equipment: next };
+}

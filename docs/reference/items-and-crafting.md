@@ -2,7 +2,7 @@
 
 # Items, shops, crafting and gathering
 
-485 items (`lib/world/data/items.ts`), 19 shops, 7 martial halls, 49 artisans, 36 recipes and 25 gathering / hunting nodes.
+487 items (`lib/world/data/items.ts`), 19 shops, 7 martial halls, 49 artisans, 36 recipes and 25 gathering / hunting nodes.
 
 ## Contents
 
@@ -16,7 +16,7 @@
 
 ## Items by category
 
-### วัตถุดิบ (`material`, 23)
+### วัตถุดิบ (`material`, 25)
 
 | Id | Name | Price | Use |
 | --- | --- | --- | --- |
@@ -43,6 +43,8 @@
 | `ink` | หมึกเข้ม | 25 | — |
 | `silk` | ผ้าไหม | 80 | — |
 | `thread` | เส้นด้าย | 20 | — |
+| `spirit_stone` | หินศิลาวิเศษ | 400 | — |
+| `spirit_thread` | ด้ายศิลาวิเศษ | 400 | — |
 
 ### สมุนไพร (`herb`, 4)
 

@@ -1,11 +1,14 @@
 // Shops, sect halls and artisans: buying and selling, recipes, equipment in and out of the bag.
 import { getArt, getEquip, getSkill } from "@/lib/game";
-import { getItem, getRecipe } from "@/lib/world";
+import { gainGear, gearProfession, getArtisansAt, getItem, getRecipe, reforgeCheck, rerollGear } from "@/lib/world";
+import { affixParts } from "@/lib/game";
+import { staminaForHours } from "../lifecycle";
+import { ACTION_HOURS } from "../rules";
 import { rollLukXp } from "../progression";
 import { appendActionLog, draftFrom } from "../state";
 import type { WorldGet, WorldSet, WorldStore } from "../types";
 
-export const shopsActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "buyItem" | "sellItem" | "buyMoveSkill" | "buyInnerSkill" | "buyRecipe" | "buyEquipment" | "equipFromBag" | "unequipFromSlot"> => ({
+export const shopsActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "buyItem" | "sellItem" | "buyMoveSkill" | "buyInnerSkill" | "buyRecipe" | "buyEquipment" | "equipFromBag" | "unequipFromSlot" | "reforgeGear"> => ({
   buyItem: (itemId, count) => {
     if (count <= 0) return { ok: false, reason: "unknown" };
     const s = get();
@@ -129,12 +132,13 @@ export const shopsActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "bu
     if (s.gold < price) return { ok: false, reason: "no-gold" };
     const draft = draftFrom(s);
     draft.gold -= price;
-    draft.inventoryEquipment[equipId] =
-      (draft.inventoryEquipment[equipId] ?? 0) + 1;
+    // Every piece gained rolls its options (lib/game/gear.ts).
+    const key = gainGear(draft, equipId);
     rollLukXp(draft);
-    appendActionLog(draft, "buy", `ซื้อ ${e.n} · -${price}🟡`);
+    const opts = affixParts(key);
+    appendActionLog(draft, "buy", `ซื้อ ${e.n} · -${price}🟡${opts.length ? ` · ${opts.join(" · ")}` : ""}`);
     set({ ...draft });
-    return { ok: true, equipId, spent: price };
+    return { ok: true, equipId: key, spent: price };
   },
 
   equipFromBag: (equipId) => {
@@ -225,5 +229,49 @@ export const shopsActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "bu
     appendActionLog(draft, "use", `ถอด ${e.n} เก็บลงย่าม`);
     set({ ...draft });
     return { ok: true, equipId: cur, slotType, slotIdx: idx };
+  },
+
+  reforgeGear: (key, worn) => {
+    const s = get();
+    if (!s.playerBuild) return { ok: false, reason: "no-build" };
+    const def = getEquip(key);
+    if (!def) return { ok: false, reason: "unknown" };
+    // The shop of the piece's own line, here.
+    const profession = gearProfession(def);
+    if (!getArtisansAt(s.currentSceneId).some((a) => a.profession === profession)) return { ok: false, reason: "no-artisan" };
+    const check = reforgeCheck(s, profession, key);
+    if (!check.ok) return { ok: false, reason: check.reason ?? "unknown" };
+    const eq = s.playerBuild.equipment;
+    const wornKey = worn ? (worn.ty === "BR" || worn.ty === "R" || worn.ty === "C" ? eq[worn.ty][worn.idx] : eq[worn.ty]) : null;
+    if (worn ? wornKey !== key : (s.inventoryEquipment[key] ?? 0) < 1) return { ok: false, reason: "not-owned" };
+
+    const draft = draftFrom(s);
+    const material = check.material!;
+    const left = (draft.inventory[material] ?? 0) - 1;
+    if (left <= 0) delete draft.inventory[material];
+    else draft.inventory[material] = left;
+    draft.stamina = Math.max(0, draft.stamina - staminaForHours(ACTION_HOURS));
+    const next = rerollGear(key);
+    if (worn) {
+      const loadout = { ...draft.playerBuild!.equipment };
+      if (worn.ty === "BR" || worn.ty === "R" || worn.ty === "C") {
+        const arr = [...loadout[worn.ty]] as [string | null, string | null];
+        arr[worn.idx] = next;
+        loadout[worn.ty] = arr;
+      } else {
+        loadout[worn.ty] = next;
+      }
+      draft.playerBuild = { ...draft.playerBuild!, equipment: loadout };
+    } else {
+      const bag = { ...draft.inventoryEquipment };
+      if ((bag[key] ?? 0) <= 1) delete bag[key];
+      else bag[key] = bag[key]! - 1;
+      bag[next] = (bag[next] ?? 0) + 1;
+      draft.inventoryEquipment = bag;
+    }
+    const opts = affixParts(next);
+    appendActionLog(draft, "craft", `สุ่มออฟชั่นเสริม ${def.n} ใหม่ · ใช้${getItem(material)?.name ?? material} · ${opts.length ? opts.join(" · ") : "ไม่ได้ออฟชั่น"}`);
+    set({ ...draft });
+    return { ok: true, before: key, key: next, material };
   },
 });

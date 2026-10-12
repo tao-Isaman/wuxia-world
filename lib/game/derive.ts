@@ -16,6 +16,7 @@ import {
 } from "./skill-conflict";
 import type { Equipment } from "./types";
 import { meridianBuildBonus } from "./meridians";
+import { loadoutAffixes } from "./gear";
 
 // Pure: base stats → derived combat stats.
 //
@@ -68,7 +69,8 @@ export function getEquippedItems(loadout: EquipLoadout): Equipment[] {
   return ids.map(getEquip).filter((e): e is Equipment => e !== null);
 }
 
-// Aggregate stat bonuses from equipped items.
+// Aggregate base-stat bonuses from equipped items: the pieces' `stat` options
+// (gear.ts; the legacy `st` blocks are all empty).
 export function getEquipStatBonus(loadout: EquipLoadout): PartialStats {
   const out: PartialStats = {};
   for (const e of getEquippedItems(loadout)) {
@@ -76,6 +78,9 @@ export function getEquipStatBonus(loadout: EquipLoadout): PartialStats {
       const v = e.st[k];
       if (v) out[k] = (out[k] ?? 0) + v;
     }
+  }
+  for (const a of loadoutAffixes(loadout)) {
+    if (a.k === "stat" && a.stat) out[a.stat] = (out[a.stat] ?? 0) + a.v;
   }
   return out;
 }
@@ -101,14 +106,25 @@ export interface EquipBonus {
   pct_atk: number;
   pct_red: number;
   hp_regen: number;
+  // Gear options (gear.ts): % on the derived PD / ID / PA / IA / Acc / Eva,
+  // crit damage % and ประสบการณ์ยุทธ %. Meridians leave these at 0.
+  pd_pct: number;
+  id_pct: number;
+  pa_pct: number;
+  ia_pct: number;
+  acc_pct: number;
+  eva_pct: number;
+  crit_dmg: number;
+  wexp: number;
 }
 
-// Aggregate special effects + flat additions from equipment.
+// Aggregate special effects + flat additions from equipment and its options.
 export function getEquipBonus(loadout: EquipLoadout): EquipBonus {
   const b: EquipBonus = {
     atk: 0, pd: 0, id_: 0, hp: 0, mp: 0,
     pa: 0, ia: 0, spd: 0, acc: 0, res: 0,
     cri: 0, eva: 0, pct_atk: 0, pct_red: 0, hp_regen: 0,
+    pd_pct: 0, id_pct: 0, pa_pct: 0, ia_pct: 0, acc_pct: 0, eva_pct: 0, crit_dmg: 0, wexp: 0,
   };
   for (const e of getEquippedItems(loadout)) {
     b.atk += e.atkb;
@@ -133,6 +149,25 @@ export function getEquipBonus(loadout: EquipLoadout): EquipBonus {
       // on_hit handled at hit time, not in passive bonus aggregation
     }
   }
+  for (const a of loadoutAffixes(loadout)) {
+    switch (a.k) {
+      case "pd": b.pd += a.v; break;
+      case "id": b.id_ += a.v; break;
+      case "pa": b.pa += a.v; break;
+      case "ia": b.ia += a.v; break;
+      case "cri": b.cri += a.v; break;
+      case "res": b.res += a.v; break;
+      case "pd_pct": b.pd_pct += a.v; break;
+      case "id_pct": b.id_pct += a.v; break;
+      case "pa_pct": b.pa_pct += a.v; break;
+      case "ia_pct": b.ia_pct += a.v; break;
+      case "acc_pct": b.acc_pct += a.v; break;
+      case "eva_pct": b.eva_pct += a.v; break;
+      case "crit_dmg": b.crit_dmg += a.v; break;
+      case "wexp": b.wexp += a.v; break;
+      // stat → getEquipStatBonus; fam_dmg / fam_red → gearFamilyMods (battle context)
+    }
+  }
   return b;
 }
 
@@ -143,7 +178,7 @@ export function getBuildBonus(build: Pick<CharacterBuild, "equipment" | "meridia
   const b = getEquipBonus(build.equipment);
   if (!build.meridians) return b;
   const m = meridianBuildBonus(build).combat;
-  for (const k of Object.keys(b) as (keyof EquipBonus)[]) b[k] += m[k];
+  for (const k of Object.keys(m) as (keyof typeof m)[]) b[k] += m[k] ?? 0;
   return b;
 }
 
@@ -265,28 +300,25 @@ export interface CombinedStatsOpts {
 // learned contributes their `st`). Same for arts. Conflict factors
 // halve / zero misaligned contributions per skill-conflict.ts.
 //
-// EQUIPMENT no longer contributes to base stats — by design, equipment
-// boosts derived combat stats directly (Atk / PD / ID / HP / MP via
-// `atkb` / `pdb` / etc. in deriveAll's overlay pass) instead of feeding
-// back into STR / VIT / DEF and compounding through every derived
-// formula. This kept tank stat-stacking from spiraling into invincible
-// damage walls (a 30/30/30 tank with +28/+28/+30 equipment used to
-// reach PD ~415, walling almost every random encounter to 1 dmg/hit).
-//
-// `excludeEquipment` is now a no-op for back-compat — equipment is
-// already excluded everywhere. Kept in the signature so callers don't
-// need to update.
+// Equipment's own numbers boost derived combat stats directly (Atk / PD /
+// ID / HP / MP via `atkb` / `pdb` / etc. in deriveAll's overlay pass)
+// instead of feeding back into STR / VIT / DEF and compounding through
+// every derived formula. This kept tank stat-stacking from spiraling into
+// invincible damage walls (a 30/30/30 tank with +28/+28/+30 equipment used
+// to reach PD ~415, walling almost every random encounter to 1 dmg/hit).
+// The one way gear touches base stats is a piece's `stat` option (+1–10,
+// gear.ts), small by design; gates that should reward training only
+// (learning from a manual, quest stat conditions) pass `excludeEquipment`.
 export function combinedStats(
   build: CharacterBuild,
   conflict?: ConflictFactors,
   opts?: CombinedStatsOpts,
 ): StatBlock {
-  void opts;
   const breakdown = statBreakdown(build, conflict);
   const out: StatBlock = { ...breakdown.base };
+  const gear = opts?.excludeEquipment ? 0 : 1;
   for (const k of STAT_KEYS) {
-    out[k] += breakdown.fromArts[k] + breakdown.fromSkills[k] + breakdown.fromMeridians[k];
-    // fromEquipment intentionally NOT added — see header comment.
+    out[k] += breakdown.fromArts[k] + breakdown.fromSkills[k] + breakdown.fromMeridians[k] + gear * breakdown.fromEquipment[k];
   }
   return out;
 }
@@ -330,6 +362,14 @@ export function deriveAll(build: CharacterBuild): Derived {
   d.Res += eb.res;
   d.Cri += eb.cri;
   d.Eva += eb.eva;
+  // Gear options in %: on the whole stat, after every flat bonus.
+  const pct = (v: number, p: number) => (p ? Math.round(v * (1 + p / 100)) : v);
+  d.PD = pct(d.PD, eb.pd_pct);
+  d.ID = pct(d.ID, eb.id_pct);
+  d.PA = pct(d.PA, eb.pa_pct);
+  d.IA = pct(d.IA, eb.ia_pct);
+  d.Acc = pct(d.Acc, eb.acc_pct);
+  d.Eva = pct(d.Eva, eb.eva_pct);
   return d;
 }
 

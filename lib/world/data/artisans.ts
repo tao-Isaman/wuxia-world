@@ -466,10 +466,30 @@ export function equipmentOfferedBy(
 
 // Internal type — narrows LifeSkill to the 6 craft professions used by
 // artisans. Keeps `accessory` etc. discoverable to the type system.
-type CraftProfession =
+export type CraftProfession =
   | "forge"
   | "alchemy"
   | "tailoring"
   | "chef"
   | "jewelry"
   | "accessory";
+
+// ─── Which craft line a piece belongs to ─────────────────────────────
+// The artisan who re-rolls a piece's options (lib/world/gear.ts): the
+// profession that sells it, else by slot — weapons forged, rings to the
+// jeweller, charms to the accessory maker, cloth and leather to the tailor,
+// metal (and every beast-won armour) to the forge.
+const SOLD_BY = new Map<string, CraftProfession>();
+for (const [prof, ids] of Object.entries(PROF_BASIC_EQUIPMENT) as [CraftProfession, readonly string[]][]) {
+  for (const id of ids) SOLD_BY.set(id, prof);
+}
+for (const s of CITY_EQUIPMENT_SPECIALTIES) SOLD_BY.set(s.equipId, s.prof);
+
+export function equipmentProfession(def: { id: string; n: string; ty: string }): CraftProfession {
+  const sold = SOLD_BY.get(def.id);
+  if (sold) return sold;
+  if (def.ty === "R") return "jewelry";
+  if (def.ty === "C") return "accessory";
+  if (def.ty === "W") return "forge";
+  return /ผ้า|หนัง|ไหม/.test(def.n) ? "tailoring" : "forge";
+}

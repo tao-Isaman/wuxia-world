@@ -1,4 +1,4 @@
-import { ARTS, EQUIPMENT, MERIDIAN_CHARTS, SKILLS } from "@/lib/game";
+import { ARTS, EQUIPMENT, MERIDIAN_CHARTS, SKILLS, gearBaseId } from "@/lib/game";
 import { getItem } from "./items";
 
 // Item and equipment icons — every bag item and gear piece shows a painted
@@ -54,6 +54,9 @@ export const ITEM_ICONS: Readonly<Record<string, string>> = {
   tiger_claw: "ico_material_animal_part_06",
   bear_claw: "ico_material_animal_part_03",
   snake_skin: "ico_material_animal_part_13",
+  // ── magic materials (gear options)
+  spirit_stone: "ico_material_ore_05",
+  spirit_thread: "ico_material_cloth_03",
   // ── legendary beast trophies
   trophy_golden_serpent: "ico_material_animal_part_07",
   trophy_blood_tiger: "ico_material_animal_part_06",
@@ -174,9 +177,9 @@ export function itemIconId(itemId: string): string | null {
   return null;
 }
 
-/** The icon asset id for an equipment piece, else null. */
+/** The icon asset id for an equipment piece (an id or an owned piece's key), else null. */
 export function equipmentIconId(equipId: string): string | null {
-  return EQUIPMENT_ICONS[equipId] ?? null;
+  return EQUIPMENT_ICONS[gearBaseId(equipId)] ?? null;
 }
 
 /** Public URL of an icon asset (`ico_<group>_…` lives in public/assets/icon/<group>/). */
