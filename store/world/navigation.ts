@@ -2,7 +2,7 @@
 // lock, dialog choices and auto-advance.
 import { STAT_XP_PER_ACTION } from "@/lib/world/stat-progression";
 import { followLeads } from "@/lib/world/rumor-engine";
-import { applyEffects, getItem, getQuest, getScene, type Choice, type SceneEffect, type WorldStateData } from "@/lib/world";
+import { WAYPOINT_FLAG, applyEffects, getItem, getQuest, getScene, type Choice, type SceneEffect, type WorldStateData } from "@/lib/world";
 import { tickQuestProgress } from "@/lib/world/effects";
 import { JAIL_SCENE_ID } from "@/lib/world/data/activities";
 import { appendActionLog } from "./state";
@@ -127,5 +127,13 @@ export function takeChoice(state: WorldStateData, choice: Choice): boolean {
 export function recordVisit(state: WorldStateData, locationId: string): void {
   if (!state.visitedLocationIds.includes(locationId)) {
     state.visitedLocationIds.push(locationId);
+  }
+  // Reaching the world map's waypoint ends it.
+  if (state.flags[WAYPOINT_FLAG] === locationId) {
+    const flags = { ...state.flags };
+    delete flags[WAYPOINT_FLAG];
+    state.flags = flags;
+    const place = getScene(locationId);
+    appendActionLog(state, "travel", `ถึง${place?.kind === "location" ? place.name : "จุดหมาย"}แล้ว · จุดหมายบนแผนที่สิ้นสุด`);
   }
 }

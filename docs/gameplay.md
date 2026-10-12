@@ -158,6 +158,31 @@ Every city, village and the grounds of the 15 joinable sects have a horse statio
 
 Code: `lib/world/stations.ts`; the store's `stationTravel`.
 
+### Boats to the islands (ลุงจาง คนแจวเรือ)
+
+Nobody walks to the ten islands of the eastern sea. **ลุงจาง คนแจวเรือ** stands at the ports (ซูโจว and หยางโจว) and on every island, where the old sea path met the shore; talking to him opens the boat list:
+
+- **Where:** from any pier to any other pier — a port or an island — visited or not.
+- **Fare:** 40 gold + 0.5 gold per world-map unit (ซูโจว → เกาะดอกท้อ about 100, to the far islands about 200).
+- **Time:** none, like a horse; foes left behind on the map are gone.
+- He is not a registry NPC: he can't be fought, robbed or killed, so nobody is ever stranded on an island.
+- The quest guide and the world map's way-finding walk to a port, then point at him for the crossing.
+
+Code: `lib/world/ferries.ts`; the store's `ferryTravel`; `components/world/popups/ferry-popup.tsx`.
+
+### The world map (แผนที่โลก)
+
+The แผนที่ section (the last menu icon, hotkey **M**) shows the jianghu as one painted ink-and-watercolour map with its cities, temples, villages and roads drawn in (`public/maps/world-atlas.webp`, painted to the world coordinates), and over it:
+
+- **Every place** as a marker by kind (city, sect, village, home, inn, temple and palace, manor, cave and valley, island, peak, lake, desert, tribe and market), 🐎 on horse stations, ⛵ on piers; places never visited are paler, with a dashed ring. Cities' and sects' names always show, the rest once the map is zoomed in.
+- **The roads** in the style of their kind (ทางหลวง, ทางชนบท, ทางป่า, ทางขึ้นเขา, ทางหุบผา, ทางตรอก) and the dotted sea lanes; a road whose both ends you have visited is drawn in full ink.
+- **The five regions**: ภาคกลาง is the circle round the capital, the others the compass quarters beyond it — the same rule rumors, music and road colours use. A region tab frames the region, darkens the rest and lists its places with how many you have explored.
+- **Where you are** (a red pin; on a road, half way along it), the tracked quest's place 📌 and the waypoint 🧭.
+- **The way there:** tap a place to read it, see its roads out, and the walk from where you are, step by step — each road's name and direction, and any boat with its fare — drawn on the map as a marching red line. **🧭 นำทางไปที่นี่** makes it the guide arrow's destination (a gold card above the quest tracker, ✕ to drop it); arriving ends it.
+- Drag to move, pinch or the wheel to zoom, ◎ to come back to yourself.
+
+Code: `lib/world/world-atlas.ts` (places, roads, regions, position, routes), `components/world/popups/world-map-popup.tsx`, `app/world-map.css`; the waypoint is `flags.mapWaypoint` (`waypointGuide` / `navigationGuide`, `lib/world/quest-guide.ts`).
+
 ## Random encounters
 
 Arriving somewhere never triggers anything. Foes turn up while you **walk**: every 220 map units walked on a location or route map is one *walk tick*. Home and the jail are safe.

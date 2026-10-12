@@ -365,6 +365,7 @@ On a map (`MapHud` in `components/world/map-hud.tsx` + `MenuBar hud`):
   - Gold "ตำลึง" and w-exp "ยุทธ", each with a floating +N / −N for 1.6 s.
   - The sundial: 12 shichen from ยามเหม่า, Thai numerals ๑–๑๒ on the ring and the hour's name on the face; the ring turns, and ยามซวี–ยามอิ๋น are styled as night (`isNight`, `lib/world/clock.ts`).
   - The "วันที่ N" pill, and the hour line (hidden on phones).
+- **Waypoint card** (`.qt-waypoint`, `[data-waypoint]`): when a place is picked on the world map, a gold-edged card above the quest tracker — 🧭 the place and the roads left, ✕ to drop it.
 - **Quest tracker** under the purse (`quest-tracker.tsx`): 📌 stage n/N, the quest name, 🎯 action and counter, 📍 place and roads left. Tapping it opens the quest log. It heads `.hud-right-stack` (`app/mobile-hud.css`, a flex column at the top right); the map's `extras` (the drawer button) sit right-aligned below it, so a tall tracker pushes the button down instead of covering it.
 - **Top centre:** law chips — "⛓ หมายจับ ●●○○○", "⛓ เหลือโทษ …", "🔓 พ้นโทษแล้ว · ไปที่ประตูคุก".
 - **Arrival banner.**
@@ -415,6 +416,8 @@ A menu section opens as a full-screen **menu shell** (`components/ui/modal.tsx` 
 | `sect-hall-popup.tsx` | the city hall's offers; the capital's free training duel |
 | `artisan-popup.tsx` | ซื้อสูตร · ประดิษฐ์ · ซื้อ-ขาย |
 | `practice-popup.tsx` | skills and arts to practise, the place bonus, the cost |
+| `world-map-popup.tsx` | แผนที่โลก (`fill`, `app/world-map.css`): the painted atlas as an SVG — the image, region tints (`regionPolygon` minus `HEARTLAND_CIRCLE`), roads and sea lanes, place markers, the hero's pin, the planned route — with region tabs, drag / pinch / wheel zoom, ＋ － ◎; markers and names keep one screen size (`k` = map units per pixel) and minor names appear above 0.95 px per unit. The side column: a place (kind, region, tags, roads out, the way there step by step, 🧭 นำทาง), a region (its places by kind, explored count) or the overview and legend |
+| `ferry-popup.tsx` | ลุงจาง คนแจวเรือ: every other pier with its fare and ลงเรือ |
 | `rumor-popup.tsx` | the rumor list and "ฟังต่อ" (see [liveness.md](liveness.md#where-the-hero-hears-rumors)) |
 
 ## Overlays

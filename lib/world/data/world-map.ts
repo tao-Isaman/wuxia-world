@@ -290,14 +290,16 @@ function addEdge(a: string, b: string): boolean {
 
 // All routes are now read from the explicit table. Authoring lives in
 // lib/world/data/location-routes.ts.
-for (const r of LOCATION_ROUTES) addEdge(r.a, r.b);
+// Sea lanes (the islands) are sailed with the boatman (lib/world/ferries.ts), not walked.
+for (const r of LOCATION_ROUTES) if (!r.sea) addEdge(r.a, r.b);
+const BY_SEA_ONLY = new Set(LOCATION_ROUTES.filter((r) => r.sea).flatMap((r) => [r.a, r.b]).filter((id) => id.startsWith("isle_")));
 
 // Connectivity safety net — every leaf must end up with at least one
 // outbound edge. If an author forgot to write one, attach the orphan to
 // the lowest-degree neighbour we can find. Logs to console so the gap is
 // visible during development.
 for (const lf of ALL_LEAVES) {
-  if (adj.get(lf.id)!.size > 0) continue;
+  if (adj.get(lf.id)!.size > 0 || BY_SEA_ONLY.has(lf.id)) continue;
   console.warn(
     `[world-map] leaf "${lf.id}" has no explicit route — adding fallback. Add an entry to location-routes.ts.`,
   );

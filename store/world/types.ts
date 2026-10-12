@@ -257,6 +257,8 @@ export interface WorldStore extends WorldStateData {
   deleteLetters: (letterIds: string[]) => { ok: boolean; deleted: number; discarded: number };
   /** Ride from this place's horse station to a visited station place. */
   stationTravel: (to: string) => { ok: boolean; reason?: "no-station" | "unknown" | "gold" };
+  /** Sail with the boatman from a pier to another (lib/world/ferries.ts). */
+  ferryTravel: (to: string) => { ok: boolean; reason?: "no-ferry" | "unknown" | "gold" };
   /** Pay the fee and register for this year's sword tournament. */
   registerTournament: () => boolean;
   /** Start the tournament (on its day) or the hero's next bout: queues the battle. */

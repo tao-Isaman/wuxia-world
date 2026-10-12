@@ -12,6 +12,7 @@ import { evaluateCondition } from "./conditions";
 import { describeQuestCondition, type QuestProgressLine } from "./effects";
 import { objectiveMarkerId, objectiveSpotsFor } from "./quest-objectives";
 import { npcPlaces, questHolder } from "./npc-life";
+import { FERRYMAN, ferryStops, hasFerry, isFerryHop } from "./ferries";
 
 /**
  * Quest guidance for every kind of stage: what to do next for a quest, where
@@ -117,6 +118,8 @@ function neighbours(locationId: string): string[] {
     if (route?.kind !== "route") continue;
     for (const destination of route.destinations) if (destination.locationId !== locationId) out.push(destination.locationId);
   }
+  // The islands are a boat ride away from every pier (lib/world/ferries.ts).
+  if (hasFerry(locationId)) for (const stop of ferryStops()) if (stop !== locationId && !out.includes(stop)) out.push(stop);
   return out;
 }
 
@@ -394,6 +397,29 @@ export function activeGuide(state: WorldStateData): QuestGuide | null {
   return id ? guideForQuest(state, id) : null;
 }
 
+/** The flag holding the place picked on the world map (แผนที่ → นำทาง), if any. */
+export const WAYPOINT_FLAG = "mapWaypoint";
+
+/** The world map's waypoint as a guide: the walk from here to the picked place. */
+export function waypointGuide(state: WorldStateData): QuestGuide | null {
+  const id = state.flags[WAYPOINT_FLAG];
+  if (typeof id !== "string" || !id) return null;
+  const scene = getScene(id);
+  if (scene?.kind !== "location") return null;
+  const here = currentLocation(state);
+  const path = here ? pathBetween(here, id) : null;
+  if (!path) return null;
+  return {
+    questId: "", questName: "จุดหมายบนแผนที่", stageIndex: 0, stageCount: 1, stageText: "",
+    kind: "place", action: `เดินทางไป${scene.name}`, locationId: id, locationName: scene.name, path,
+  };
+}
+
+/** What the guide arrow follows: a waypoint set on the world map, else the tracked quest. */
+export function navigationGuide(state: WorldStateData): QuestGuide | null {
+  return waypointGuide(state) ?? activeGuide(state);
+}
+
 /**
  * Which marker on the current map the guide arrow should sit on:
  *   at the target's location → the target marker (person, spot, shop, hunting ground)
@@ -406,7 +432,10 @@ export function guideMarkerId(state: WorldStateData, guide: QuestGuide): string 
   if (scene?.kind === "location") {
     if (scene.id === guide.locationId) return guide.markerId ?? null;
     const next = guide.path[1];
-    return next ? "route_" + scene.id + "__to__" + next : null;
+    if (!next) return null;
+    // A boat ride: point at the boatman rather than a road exit.
+    if (isFerryHop(scene.id, next) && !scene.routes.some((r) => r.routeSceneId === "route_" + scene.id + "__to__" + next)) return FERRYMAN.markerId;
+    return "route_" + scene.id + "__to__" + next;
   }
   if (scene?.kind === "route") {
     // Same filter + indexing as RouteMapView's destination markers.

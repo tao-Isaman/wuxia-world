@@ -36,6 +36,7 @@ import { SectHallPopup } from "./popups/sect-hall-popup";
 import { ArtisanPopup } from "./popups/artisan-popup";
 import { PracticePopup } from "./popups/practice-popup";
 import { StationPopup } from "./popups/station-popup";
+import { FerryPopup } from "./popups/ferry-popup";
 import { TournamentPopup } from "./popups/tournament-popup";
 import { RumorBanner } from "./rumor-banner";
 import { RumorListenButton } from "./rumor-listen-button";
@@ -77,6 +78,7 @@ export function LocationView({ scene, readOnly = false, dialogueSpeakerId }: Pro
   const [hallOpen, setHallOpen] = useState(false);
   const [practiceOpen, setPracticeOpen] = useState(false);
   const [stationOpen, setStationOpen] = useState(false);
+  const [ferryOpen, setFerryOpen] = useState(false);
   const [tournamentOpen, setTournamentOpen] = useState(false);
   const [activeArtisan, setActiveArtisan] = useState<ArtisanDef | null>(null);
   // Map-spot popups: rest + rumor objects on the painted map.
@@ -507,6 +509,7 @@ export function LocationView({ scene, readOnly = false, dialogueSpeakerId }: Pro
         onClose={() => setActiveArtisan(null)}
       />
       <StationPopup open={stationOpen} onClose={() => setStationOpen(false)} />
+      <FerryPopup open={ferryOpen} onClose={() => setFerryOpen(false)} />
       <TournamentPopup open={tournamentOpen} onClose={() => setTournamentOpen(false)} />
       <PracticePopup
         open={practiceOpen}
@@ -547,6 +550,7 @@ export function LocationView({ scene, readOnly = false, dialogueSpeakerId }: Pro
             onActivity: (id) => void runActivity(id),
             onObjective: runObjective,
             onStation: () => setStationOpen(true),
+            onFerry: () => setFerryOpen(true),
             onTournament: () => setTournamentOpen(true),
           }}
         />

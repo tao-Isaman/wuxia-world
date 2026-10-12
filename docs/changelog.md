@@ -6,6 +6,12 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-12
 
+### A painted world map, and boats to the islands
+
+- **แผนที่โลก** — a new menu section (the last icon, hotkey **M**): the whole jianghu as one ink-and-watercolour painting with its walled cities, mountain temples, villages, caves, roads and island boat lanes drawn in, painted over a layout sketch made from the world coordinates so every place sits where it is in the game. Over it: every place by kind (visited or not, 🐎 stations, ⛵ piers), the roads by type, the five regions (tabs frame one, darken the rest and list its places with an explored count), where you are, the tracked quest 📌, and a planner — tap a place for its roads out and the way there step by step (road names, directions, boat fares) drawn as a marching red line; **🧭 นำทางไปที่นี่** sends the guide arrow there (a gold card in the HUD, ✕ to drop it, gone on arrival). Drag, pinch or wheel to zoom; names and markers keep their size; works on phones.
+- **The islands are reached by boat only.** The ten islands lost their walking roads: ลุงจาง คนแจวเรือ waits at ซูโจว, หยางโจว and on every island and sails to any other pier for 40 gold + 0.5 per world-map unit, at once. The quest guide walks you to a port and points at him. He can't be fought or killed, so nobody is stranded.
+- A map menu icon painted to match the others. New checks in `test:routes` (the atlas) and `test:systems` (ferries), and `world-map.spec.ts` (the map on desktop and phone, planning a route to an island, following the guide to the boatman and sailing).
+
 ### Everything the player reads is Thai
 
 - **Stats in words.** The vitals read ชีวิต / ปราณ / พลัง instead of HP / MP; the profile drops the English keys beside each stat (STR, ATK, PD…); equipment, shop badges and the bag read พลังโจมตี +12 · ป้องกันกาย +4 · ลดความเสียหายที่ได้รับ 5 % (one helper, `lib/game/stat-text.ts`: `DERIVED_LABEL`, `equipStatParts`, `equipBonusParts`).
