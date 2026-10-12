@@ -1,11 +1,24 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { markerCategory, type OnlinePort, type WorldMarker, type WorldMarkerCategory, type WorldPresentation, type WorldRuntime } from "@/lib/stage/types";
+import { characterLook } from "@/lib/world/appearance";
+import type { Presence } from "@/lib/net/protocol";
+import { markerCategory, type OnlinePort, type RemotePlayer, type WorldMarker, type WorldMarkerCategory, type WorldPresentation, type WorldRuntime } from "@/lib/stage/types";
 import { onlineSession } from "@/lib/net/session";
 import { useSocialStore } from "@/store/social-store";
 import { TouchStick } from "./touch-stick";
 import { useWorldStore } from "@/store/world-store";
+
+/** A presence as the runtime draws it: with its look resolved (cached per presence object). */
+const dressedCache = new WeakMap<Presence, RemotePlayer>();
+function dressed(presence: Presence): RemotePlayer {
+  let player = dressedCache.get(presence);
+  if (!player) {
+    player = { ...presence, look: characterLook(presence.outfit ?? "default", presence.weapon ?? null) };
+    dressedCache.set(presence, player);
+  }
+  return player;
+}
 
 export function WorldCanvas({ presentation }: { presentation: WorldPresentation }) {
   const host = useRef<HTMLDivElement>(null);
@@ -13,7 +26,8 @@ export function WorldCanvas({ presentation }: { presentation: WorldPresentation 
   // Every map is a room online (docs/online.md): the runtime reports the hero
   // to it and draws whoever else stands here.
   const online = useMemo<OnlinePort>(() => ({
-    players: () => onlineSession.players(presentation.key),
+    // Others in their outfits, carrying their weapons (docs/design/appearance.md).
+    players: () => onlineSession.players(presentation.key).map(dressed),
     report: (motion) => onlineSession.report(presentation.key, motion),
     bubble: (id) => {
       const who = id ?? onlineSession.you;

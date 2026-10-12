@@ -19,6 +19,7 @@ import { gameActions } from "./world/actions/game";
 import { sectsActions } from "./world/actions/sects";
 import { travelActions } from "./world/actions/travel";
 import { lettersActions } from "./world/actions/letters";
+import { appearanceActions } from "./world/actions/appearance";
 import { tournamentActions } from "./world/actions/tournament";
 import { battleActions } from "./world/actions/battle";
 import { encountersActions } from "./world/actions/encounters";
@@ -50,6 +51,7 @@ export const useWorldStore = create<WorldStore>()(
       ...sectsActions(set, get),
       ...travelActions(set, get),
       ...lettersActions(set, get),
+      ...appearanceActions(set, get),
       ...tournamentActions(set, get),
       ...battleActions(set, get),
       ...encountersActions(set, get),

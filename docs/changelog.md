@@ -6,6 +6,14 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-12
 
+### Outfits and the weapon on the body
+
+- **A wardrobe (ชุด)** in โปรไฟล์: ชุดเดิม, the uniform of the hero's own sect (only while a disciple; other sects' uniforms are not listed; Shaolin's for men and Emei's for women only), six tailor's outfits bought in any city (300–3,000 ตำลึง, kept for good) and the tournament champion's gold. Each card shows the hero in it, carrying their weapon. An outfit is only a look: no stats.
+- **The hero is drawn in it everywhere** — on the map, in battle and in films — because an outfit is a recolour of the hero's own PixelLab sheet (the robe and the light cloth under it; skin, hair and head untouched), not new art (PixelLab has 276 generations left).
+- **The weapon on the body:** the equipped weapon is drawn on the hero on the map from its own icon — spears, staves, sabres and instruments slung across the back, fans at the waist — behind the body facing the viewer or in profile, in front of it facing away; **ซ่อนอาวุธ** hides it.
+- **Online:** others see the outfit and the weapon on the back, and a change at once (protocol 3: `look` / `looked`, the look in `hello`; the server checks only its shape and pace).
+- Save v29 (`appearance`, `wardrobe`). New suite `test:appearance`; `test:server`, `test:net`, `test:online`, `appearance.spec.ts` and `online.spec.ts` cover the rest. Design and research: [design/appearance.md](design/appearance.md).
+
 ### Players meet: friends, a party, chat and mail; NPC gifts wait for รับของ
 
 - **Friends (สหาย).** A new HUD tab (10th, hotkey 0) when playing online: add a friend by username or by tapping them on the map, accept or decline requests, see who is online, as which hero and where; remove or block. A request to someone who already asked you makes you friends at once.

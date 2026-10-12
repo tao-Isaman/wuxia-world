@@ -1,6 +1,6 @@
 import type * as Phaser from "phaser";
 import { CHARACTER_CLIPS, characterId, CREATURE_ATLAS, CREATURE_FRAME_COUNT, creatureCell, type CharacterClips, type CharacterMotion } from "../characters/catalog";
-import { figureScale, loadCharacterAtlas } from "../characters/sheet";
+import { figureScale, loadCharacterAtlas, type AtlasOutfit } from "../characters/sheet";
 import { getLocationMap } from "../world/data/location-maps";
 import type { CastMember, CutsceneBeat, CutsceneDef, CutsceneFx, CutsceneMood, StagePoint } from "../world/story/types";
 import { addGridFrames, canvasTexture, createStage, drawCanvas, type Stage } from "./phaser-stage";
@@ -71,6 +71,8 @@ type Particle = { image: Phaser.GameObjects.Image; vx: number; vy: number; life:
 
 export function createCutsceneRuntime(parent: HTMLElement, def: CutsceneDef, options: {
   heroBody: string; heroName: string; reducedMotion: boolean;
+  /** The hero's outfit (docs/design/appearance.md); absent: as drawn. */
+  heroOutfit?: AtlasOutfit;
 }, view: CutsceneView): CutsceneRuntime {
   const map = getLocationMap(def.stage);
   const sub = (text: string) => text.split("{hero}").join(options.heroName);
@@ -151,7 +153,9 @@ export function createCutsceneRuntime(parent: HTMLElement, def: CutsceneDef, opt
         }
         return;
       }
-      const atlas = await loadCharacterAtlas(characterId(key), true);
+      // "<id>@<outfit>" is the hero in their outfit.
+      const [id, outfitId] = key.split("@");
+      const atlas = await loadCharacterAtlas(characterId(id), true, outfitId && options.heroOutfit?.id === outfitId ? options.heroOutfit : undefined);
       if (!scene) return;
       const texture = canvasTexture(scene, `cs:${key}`, atlas.native ? atlas.image : warmWorldCharacter(atlas.image));
       addGridFrames(texture, atlas.frameSize, atlas.columns, atlas.rows);
@@ -167,7 +171,7 @@ export function createCutsceneRuntime(parent: HTMLElement, def: CutsceneDef, opt
 
   function lookKey(look: string): string {
     if (look.startsWith("beast:")) return "beast";
-    if (look === "hero") return characterId(options.heroBody);
+    if (look === "hero") return options.heroOutfit?.tint ? `${characterId(options.heroBody)}@${options.heroOutfit.id}` : characterId(options.heroBody);
     return characterId(look);
   }
 

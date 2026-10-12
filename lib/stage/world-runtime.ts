@@ -5,7 +5,8 @@ import {
   CHARACTER_CLIPS, CHARACTER_FRAME_SIZE, CREATURE_ATLAS, characterId, creatureCell, npcCharacterId,
   type CharacterClips, type CharacterId,
 } from "../characters/catalog";
-import { figureScale, loadCharacterAtlas } from "../characters/sheet";
+import { figureScale, loadCharacterAtlas, type AtlasOutfit } from "../characters/sheet";
+import type { FrameBox } from "../characters/outfit-recolor";
 import { getAnimSheet, type AnimSheet } from "../characters/anim-sheets";
 import { animFrame, animScaleOf, animVisibleTop } from "./anim-frame";
 import type { HeroPoseStrip } from "../characters/hero-actions";
@@ -21,7 +22,7 @@ import { initialWorldPlacement } from "./world-placement";
 import { addGridFrames, canvasTexture, createStage, drawCanvas, stagePixelRatio, type Stage } from "./phaser-stage";
 import {
   WALK_TICK_UNITS, getRememberedMapPosition, rememberMapPosition, stepTowards,
-  type Point, type RemotePlayer, type WorldFoe, type WorldMarker, type WorldPresentation, type WorldRuntime,
+  type CarriedWeapon, type CharacterLook, type Point, type RemotePlayer, type WorldFoe, type WorldMarker, type WorldPresentation, type WorldRuntime,
 } from "./types";
 
 const WIDTH = 960;
@@ -54,7 +55,7 @@ export function worldInputBlocked(): boolean {
 }
 
 type Atlas = { image: HTMLCanvasElement; frameSize: number; feetY: number; figure?: number;
-  native?: boolean; clips?: CharacterClips; walk8Cells?: Walk8Cells | null };
+  native?: boolean; clips?: CharacterClips; walk8Cells?: Walk8Cells | null; boxes?: (FrameBox | null)[] };
 type CharacterVisual = {
   image: Phaser.GameObjects.Image;
   frame: number;
@@ -64,7 +65,14 @@ type CharacterVisual = {
   /** The atlas's clips (a PixelLab sheet brings longer ones) and its eight-way walk, if any. */
   clips: CharacterClips;
   walk8: Walk8Cells | null;
+  /** Where each frame's figure stands in its cell (PixelLab sheets), the cell size and feet row, and map units per atlas px. */
+  boxes: (FrameBox | null)[] | null;
+  cellPx: number;
+  feetY: number;
+  unit: number;
 };
+/** A weapon drawn on a character's body (docs/design/appearance.md). */
+type CarriedVisual = { image: Phaser.GameObjects.Image; weapon: CarriedWeapon };
 type TextSprite = { image: Phaser.GameObjects.Image; width: number; height: number };
 type MarkerVisual = {
   point: Point;
@@ -208,12 +216,12 @@ export function createWorldRuntime(
       image.src = source;
     });
   }
-  async function loadAtlas(id: CharacterId, includeDirections: boolean): Promise<Atlas> {
+  async function loadAtlas(id: CharacterId, includeDirections: boolean, outfit?: AtlasOutfit): Promise<Atlas> {
     let timeout: ReturnType<typeof setTimeout> | undefined;
     let cancel: (() => void) | undefined;
     try {
       return await Promise.race([
-        loadCharacterAtlas(id, includeDirections),
+        loadCharacterAtlas(id, includeDirections, outfit),
         new Promise<never>((_, reject) => { timeout = setTimeout(() => reject(new Error("Character load timed out")), LOAD_TIMEOUT); }),
         new Promise<never>((_, reject) => {
           cancel = () => reject(new Error("World disposed"));
@@ -251,7 +259,8 @@ export function createWorldRuntime(
     const cell = size * (atlas.native && atlas.figure ? figureScale({ native: true, figure: atlas.figure, frameSize: atlas.frameSize }) : 1);
     body.setOrigin(0.5, atlas.feetY / atlas.frameSize).setDisplaySize(cell, cell);
     const visual = { image: body, frame: -1, facingLeft: false, frames: sheet.frames, directional: sheet.frames >= 24,
-      clips: atlas.clips ?? CHARACTER_CLIPS, walk8: atlas.walk8Cells ?? null };
+      clips: atlas.clips ?? CHARACTER_CLIPS, walk8: atlas.walk8Cells ?? null,
+      boxes: atlas.boxes ?? null, cellPx: atlas.frameSize, feetY: atlas.feetY, unit: cell / atlas.frameSize };
     setCharacterFrame(visual, 0, false);
     return visual;
   }
@@ -539,7 +548,9 @@ export function createWorldRuntime(
       // Only the controlled hero walks north/south. Stationary NPCs sharing a
       // hero costume need its base poses, not the large direction supplement.
       // Rigged NPCs walk in every direction, so they load it too.
-      Promise.all([...ids].map(async (id) => [id, await loadAtlas(id, id === playerId || hasAnimatedSheet(id) || walkers.has(id))] as const)),
+      // The hero comes dressed in their outfit.
+      Promise.all([...ids].map(async (id) => [id, await loadAtlas(id, id === playerId || hasAnimatedSheet(id) || walkers.has(id),
+        id === playerId && initial.heroLook?.tint ? { id: initial.heroLook.outfit, tint: initial.heroLook.tint } : undefined)] as const)),
       Promise.all((initial.props ?? []).map(async (prop) => [prop.id, await loadImage(prop.image)] as const)),
       // A placed object whose image fails is skipped (its footprint still blocks).
       Promise.all(placedUrls.map(async (url) => [url, await loadImage(url).catch((error: unknown) => {
@@ -666,7 +677,9 @@ export function createWorldRuntime(
 
     const playerShadow = image(shadowKey, 1, 30, 11);
     const playerRing = image(texture(groundRing("rgba(225, 199, 139, 0.55)"), "ring"), 2, 28, 10);
-    player = makeCharacter(`char:${playerId}`, atlases.get(playerId)!, PLAYER_SIZE);
+    heroOutfit = initial.heroLook?.tint ? initial.heroLook.outfit : "default";
+    player = makeCharacter(`char:${playerId}:${heroOutfit}`, atlases.get(playerId)!, PLAYER_SIZE);
+    heroCharacterId = playerId;
     // The hero's figure in rigged-atlas px (a PixelLab figure is drawn at the rigged height).
     const heroAtlas = atlases.get(playerId)!;
     playerFigure = heroAtlas.native ? 108 : heroAtlas.figure ?? playerFigure;
@@ -982,6 +995,94 @@ export function createWorldRuntime(
       return [Math.round(p.x), Math.round(p.y)];
     }));
   }
+  // ── Looks: outfits and carried weapons (docs/design/appearance.md) ──
+  // An outfit is the hero's own sheet recoloured (lib/characters/sheet.ts
+  // loads it per outfit); a carried weapon is its item icon pinned to each
+  // frame's figure: across the back (or at the waist), behind the body when
+  // facing the viewer or in profile, in front of it when facing away.
+  const iconTextures = new Map<string, string | null>();
+  /** The texture of an icon image, or null while it loads (or if it failed). */
+  function iconTexture(url: string): string | null {
+    if (iconTextures.has(url)) return iconTextures.get(url) ?? null;
+    iconTextures.set(url, null);
+    void loadImage(url).then((source) => {
+      if (disposed || !scene) return;
+      const key = `carried:${url}`;
+      if (!scene.textures.exists(key)) scene.textures.addImage(key, source);
+      iconTextures.set(url, key);
+    }).catch(() => {});
+    return null;
+  }
+  /** Facing rules for a carried weapon, by the painted row: drawn behind?, shift toward the back (share of width), icon mirrored? */
+  const CARRY_RULES: Record<"back" | "waist", Record<string, [boolean, number, boolean]>> = {
+    back: { S: [true, 0, false], SE: [true, -0.12, false], E: [true, -0.22, true], NE: [false, -0.05, true], N: [false, 0, false] },
+    waist: { S: [false, 0.2, false], SE: [false, 0.12, false], E: [false, 0.02, false], NE: [true, -0.1, true], N: [true, -0.2, true] },
+  };
+  /** Keep a character's carried weapon in step with its look; returns the visual (or null). */
+  function syncCarried(current: CarriedVisual | null, weapon: CarriedWeapon | null): CarriedVisual | null {
+    if (current && weapon && current.weapon.icon === weapon.icon && current.weapon.carry === weapon.carry) {
+      current.weapon = weapon;
+      return current;
+    }
+    current?.image.destroy();
+    if (!weapon) return null;
+    const key = iconTexture(weapon.icon);
+    if (!key || !scene) return null;
+    return { image: scene.add.image(0, 0, key).setOrigin(0.5, 0.5), weapon };
+  }
+  /** Pin a carried weapon to the character's current frame at map point (x, y), facing `dir`. */
+  function placeCarried(carried: CarriedVisual | null, character: CharacterVisual, x: number, y: number, dir: Dir8, depth: number, visible: boolean) {
+    if (!carried) return;
+    const box = character.boxes?.[character.frame];
+    if (!box || !visible) { carried.image.setVisible(false); return; }
+    const { row, mirror } = walk8Source(dir);
+    const [behind, shift, flipIcon] = CARRY_RULES[carried.weapon.carry][row] ?? CARRY_RULES[carried.weapon.carry].S;
+    const height = box.bottom - box.top, width = box.right - box.left;
+    const share = carried.weapon.carry === "back" ? 0.38 : 0.55;
+    const side = mirror ? -1 : 1;
+    const px = (box.left + box.right) / 2 + shift * width;
+    const py = box.top + share * height;
+    const texture = carried.image.texture.getSourceImage() as { width: number; height: number };
+    const length = carried.weapon.length * height * character.unit;
+    const scale = length / Math.hypot(texture.width, texture.height);
+    carried.image
+      .setVisible(true)
+      .setScale(scale)
+      .setFlipX(flipIcon !== mirror)
+      .setPosition(x + side * (px - character.cellPx / 2) * character.unit, y + (py - character.feetY) * character.unit)
+      .setDepth(depth + (behind ? -0.5 : 0.5));
+  }
+  /** Load a hero's sheet in an outfit and put it on the character (the frame is kept). */
+  async function dress(character: CharacterVisual, id: CharacterId, look: CharacterLook) {
+    const atlas = await loadAtlas(id, true, look.tint ? { id: look.outfit, tint: look.tint } : undefined);
+    if (disposed || !scene) return;
+    const sheet = characterTexture(`char:${id}:${look.outfit}`, atlas);
+    character.image.setTexture(sheet.key, Math.max(0, character.frame) % sheet.frames);
+    character.boxes = atlas.boxes ?? null;
+  }
+  let heroCharacterId: CharacterId | null = null;
+  let heroOutfit = "default";
+  let heroDressing = false;
+  let heroCarried: CarriedVisual | null = null;
+  /** The hero's look: dress them when the outfit changes, carry the weapon. */
+  function updateHeroLook() {
+    if (!player || !heroCharacterId) return;
+    const look = read().heroLook ?? null;
+    const outfit = look?.outfit ?? "default";
+    if (outfit !== heroOutfit && !heroDressing) {
+      heroDressing = true;
+      const target = look ?? { outfit: "default", tint: null, weapon: null };
+      void dress(player, heroCharacterId, target).then(() => { heroOutfit = outfit; }).catch((error) => {
+        console.warn("[world] could not dress the hero:", error);
+        heroOutfit = outfit;
+      }).finally(() => { heroDressing = false; });
+    }
+    heroCarried = syncCarried(heroCarried, look?.weapon ?? null);
+    placeCarried(heroCarried, player, position.x, position.y, playerDir, player.image.depth, player.image.visible);
+    parent.dataset.playerOutfit = heroOutfit;
+    parent.dataset.playerWeapon = heroCarried?.image.visible ? heroCarried.weapon.id : "";
+  }
+
   // ── Other players (online, docs/online.md) ───────────────────────────
   // Synced to `read().online.players()` every frame, like the foes. Each walks
   // smoothly toward the last position the server sent (moves arrive ~10×/s)
@@ -994,6 +1095,10 @@ export function createWorldRuntime(
     party: boolean;
     bubble: { sprite: TextSprite; text: string } | null;
     remote: RemotePlayer;
+    /** The outfit they are drawn in (a change re-dresses them), and the weapon they carry. */
+    outfit: string;
+    dressing: boolean;
+    carried: CarriedVisual | null;
     pos: Point;
     phase: number;
   }
@@ -1008,13 +1113,16 @@ export function createWorldRuntime(
     remoteLoading.add(remote.id);
     try {
       const id = characterId(remote.body === "f1" ? "f1" : "m1");
-      const atlas = await loadAtlas(id, true);
+      const look = remote.look ?? null;
+      const atlas = await loadAtlas(id, true, look?.tint ? { id: look.outfit, tint: look.tint } : undefined);
       if (disposed || failed || !scene || remoteVisuals.has(remote.id)) return;
-      const character = makeCharacter(`char:${id}`, atlas, PLAYER_SIZE);
+      const outfit = look?.tint ? look.outfit : "default";
+      const character = makeCharacter(`char:${id}:${outfit}`, atlas, PLAYER_SIZE);
       const shadow = image(shadowTexture, 1, 30, 11);
       const party = !!read().online?.inParty?.(remote.id);
       const tag = makeNameTag(remote.name, party ? PARTY_TAG_COLOR : PLAYER_TAG_COLOR);
-      remoteVisuals.set(remote.id, { character, shadow, tag, party, bubble: null, remote, pos: { x: remote.x, y: remote.y }, phase: Math.random() });
+      remoteVisuals.set(remote.id, { character, shadow, tag, party, bubble: null, remote, outfit, dressing: false, carried: null,
+        pos: { x: remote.x, y: remote.y }, phase: Math.random() });
     } catch (error) {
       console.warn("[world] could not draw another player:", remote.id, error);
     } finally {
@@ -1025,6 +1133,7 @@ export function createWorldRuntime(
     const visual = remoteVisuals.get(id);
     if (!visual) return;
     visual.character.image.destroy(); visual.shadow.destroy(); visual.tag.image.destroy();
+    visual.carried?.image.destroy();
     setBubble(visual.bubble, null);
     remoteVisuals.delete(id);
   }
@@ -1053,6 +1162,18 @@ export function createWorldRuntime(
       visual.character.image.setPosition(x, y).setDepth(characterDepth(y));
       visual.shadow.setPosition(x, y);
       visual.remote = remote;
+      // Their look: re-dress on a new outfit, carry their weapon.
+      const look = remote.look ?? null;
+      const outfit = look?.tint ? look.outfit : "default";
+      if (outfit !== visual.outfit && !visual.dressing) {
+        visual.dressing = true;
+        const id = characterId(remote.body === "f1" ? "f1" : "m1");
+        void dress(visual.character, id, look ?? { outfit: "default", tint: null, weapon: null })
+          .catch((error) => console.warn("[world] could not dress another player:", error))
+          .finally(() => { visual.outfit = outfit; visual.dressing = false; });
+      }
+      visual.carried = syncCarried(visual.carried, look?.weapon ?? null);
+      placeCarried(visual.carried, visual.character, x, y, remote.dir, visual.character.image.depth, true);
       const party = !!port?.inParty?.(remote.id);
       if (party !== visual.party) {
         const key = visual.tag.image.texture.key;
@@ -1072,6 +1193,7 @@ export function createWorldRuntime(
       .setPosition(position.x, position.y - PLAYER_SIZE - 4);
     parent.dataset.chatBubbles = String([...remoteVisuals.values()].filter((v) => v.bubble).length + (heroBubble ? 1 : 0));
     parent.dataset.partyTags = [...remoteVisuals].filter(([, v]) => v.party).map(([id]) => id).join(" ");
+    parent.dataset.remoteLooks = JSON.stringify([...remoteVisuals].map(([id, v]) => [id, v.outfit, v.carried?.image.visible ? v.carried.weapon.id : null]));
     parent.dataset.remotePlayers = JSON.stringify([...remoteVisuals].map(([id, visual]) => [id, Math.round(visual.pos.x), Math.round(visual.pos.y)]));
     // Tests: where each other player's body is on the host (px), to tap them.
     parent.dataset.remoteScreen = JSON.stringify([...remoteVisuals].map(([id, visual]) => {
@@ -1195,6 +1317,7 @@ export function createWorldRuntime(
       parent.dataset.playerPose = `${playerMotion}:${playerFacing}`;
     }
     updateHeroAction();
+    updateHeroLook();
     parent.dataset.playerDir = playerDir;
     parent.dataset.playerMotion = playerMotion;
     parent.dataset.playerFrame = String(frame);

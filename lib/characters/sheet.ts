@@ -2,6 +2,7 @@ import { CHARACTER_CLIPS, CHARACTER_FEET_Y, CHARACTER_FRAME_SIZE, CHARACTER_GRID
 import { getPlSheet, type PlSheet } from "./pl-sheets";
 import { applyWalkBeat, WALK_BEATS } from "./walk-cycle";
 import { DEFAULT_WALK8, type Walk8Cells } from "./walk8";
+import { frameBoxes, recolorSheet, type FrameBox, type RecolorTint } from "./outfit-recolor";
 
 export interface CharacterAtlas {
   image: HTMLCanvasElement; frameSize: number; feetY: number; columns: number; rows: number; directional: boolean;
@@ -19,6 +20,14 @@ export interface CharacterAtlas {
    * rigged sheets' 108 px, so renderers scale it by `figureScale`, and the map keeps its colours.
    */
   native: boolean;
+  /** Each cell's opaque box (PixelLab sheets): where a carried weapon is pinned (lib/stage/world-runtime.ts). */
+  boxes?: (FrameBox | null)[];
+}
+
+/** An outfit to load a sheet in (docs/design/appearance.md): its id (the cache key) and its recolour. */
+export interface AtlasOutfit {
+  id: string;
+  tint: RecolorTint | null;
 }
 /** The standing height every rigged atlas is normalised to; renderers size figures against it. */
 export const ATLAS_FIGURE = 108;
@@ -83,15 +92,21 @@ function measureFrames(source: HTMLImageElement, rows: number, layout?: Characte
 function median(values: number[]) { const sorted = [...values].sort((a, b) => a - b); return sorted[Math.floor(sorted.length / 2)]; }
 
 /** A PixelLab sheet is already packed on its grid: draw it once and take its clips. */
-async function preparePlAtlas(sheet: PlSheet): Promise<CharacterAtlas> {
+async function preparePlAtlas(sheet: PlSheet, outfit?: AtlasOutfit): Promise<CharacterAtlas> {
   const source = await loadImage(sheet.url);
   const image = document.createElement("canvas");
   image.width = source.width; image.height = source.height;
-  const context = image.getContext("2d");
+  const context = image.getContext("2d", { willReadFrequently: true });
   if (!context) throw new Error("Character atlas canvas is unavailable");
   context.drawImage(source, 0, 0);
+  const pixels = context.getImageData(0, 0, image.width, image.height);
+  // The outfit's colours, and where each frame's figure stands (for a carried weapon).
+  if (outfit?.tint && recolorSheet(pixels.data, image.width, image.height, sheet.cell, sheet.id, outfit.tint) > 0) {
+    context.putImageData(pixels, 0, 0);
+  }
+  const boxes = frameBoxes(pixels.data, image.width, image.height, sheet.cell);
   return { image, frameSize: sheet.cell, feetY: sheet.feetY, columns: sheet.columns, rows: sheet.rows, directional: true,
-    walk8: true, walk8Cells: sheet.walk8, figure: sheet.figure, clips: sheet.clips, battleIdle: sheet.battleIdle, native: true };
+    walk8: true, walk8Cells: sheet.walk8, figure: sheet.figure, clips: sheet.clips, battleIdle: sheet.battleIdle, native: true, boxes };
 }
 
 /** Normalize padding and scale per source sheet, preserving pose variation and original PNGs. */
@@ -170,14 +185,19 @@ async function prepareAtlas(id: CharacterId, directional: boolean): Promise<Char
     walk8Cells: walk8Cells.length > 0 ? DEFAULT_WALK8 : null, figure: baseHeight * scale, clips: CHARACTER_CLIPS, native: false };
 }
 
-export function loadCharacterAtlas(id: CharacterId, includeDirections = true): Promise<CharacterAtlas> {
+/**
+ * A character's atlas. A PixelLab hero may be loaded in an outfit (its own
+ * sheet recoloured, cached per outfit); other sheets ignore it.
+ */
+export function loadCharacterAtlas(id: CharacterId, includeDirections = true, outfit?: AtlasOutfit): Promise<CharacterAtlas> {
   const pl = getPlSheet(id);
   if (pl) {
-    const key = `${id}:pl`;
+    const dressed = outfit?.tint ? outfit : undefined;
+    const key = `${id}:pl${dressed ? `:${dressed.id}` : ""}`;
     const cached = atlases.get(key);
     if (cached) return cached;
     // A PixelLab sheet that fails to load falls back to the rigged sheet of the same id.
-    const pending = preparePlAtlas(pl).catch(() => { atlases.delete(key); return prepareAtlas(id, includeDirections && hasDirectionalSheet(id)); });
+    const pending = preparePlAtlas(pl, dressed).catch(() => { atlases.delete(key); return prepareAtlas(id, includeDirections && hasDirectionalSheet(id)); });
     atlases.set(key, pending);
     return pending;
   }

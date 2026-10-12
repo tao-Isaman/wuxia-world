@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Wardrobe } from "../wardrobe";
 import { Modal } from "@/components/ui/modal";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -281,6 +282,7 @@ export function ProfilePopup({ open, onClose }: Props) {
               <p className="profile-gear-total">รวม: {equipSummary.length > 0 ? equipSummary.join(" · ") : "ไม่มีโบนัส"}</p>
             </div>
           )}
+          {tab === "outfit" && <Wardrobe />}
         </section>
 
         {/* ─── 3. Detailed status ──────────────────────────────────── */}
@@ -321,6 +323,7 @@ const TRAIT_SHORT: Record<(typeof TRAIT_KEYS)[number], string> = { good: "คว
 const PROFILE_TABS = [
   { id: "stats", label: "ค่าพลัง" },
   { id: "gear", label: "อุปกรณ์" },
+  { id: "outfit", label: "ชุด" },
 ] as const;
 type ProfileTab = (typeof PROFILE_TABS)[number]["id"];
 

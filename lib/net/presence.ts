@@ -33,6 +33,11 @@ export function applyEvent(players: Readonly<Record<string, Presence>>, ev: Room
     case "said":
       // Chat changes no one's place (lib/net/session.ts hands it to the chat).
       return { ...players };
+    case "looked": {
+      const player = players[ev.id];
+      if (!player) return { ...players };
+      return { ...players, [ev.id]: { ...player, outfit: ev.outfit, weapon: ev.weapon } };
+    }
   }
 }
 

@@ -1,5 +1,6 @@
 "use client";
 import { useLoadingStore } from "@/store/loading-store";
+import { characterLook, heroLook } from "@/lib/world/appearance";
 import { heroHasPose, heroPoseStrip } from "@/lib/characters/hero-actions";
 import { useEffect, useRef, useState } from "react";
 import type { ArtisanDef, LocationMapDef, LocationScene, MapSpot, NpcDef } from "@/lib/world";
@@ -174,7 +175,10 @@ export function LocationMap({ scene, map, handlers, readOnly = false, dialogueSp
   const heroAction = workPose && heroHasPose(state.playerBodyId, workPose) ? heroPoseStrip(state.playerBodyId, workPose) : null;
   // A map whose painting the engine replaced draws its tiled ground instead.
   const ground = placements ? peekMapGround(scene.id) : null;
+  // The hero's outfit and the weapon they carry (docs/design/appearance.md).
+  const look = heroLook(state);
   const presentation: WorldPresentation = { key: scene.id, name: scene.name, image: ground ? groundImageKey(ground.tile) : map.image, heroAction,
+    heroLook: characterLook(look.outfit, look.weapon),
     ground: ground ? { image: ground.image, size: ground.size } : null,
     time: state.time, spawn: arrival?.spawn ?? map.spawn, spawnFacing: arrival?.facing, playerImage: playerBodySprite(state.playerBodyId), markers: guidedMarkers, foes, placements,
     ...capitalVignette(scene.id, state.quests.qc_capital_clinic_supplies?.status === "done",

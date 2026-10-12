@@ -97,3 +97,20 @@
   .profile-id { flex-direction: column; align-items: flex-start; }
   .profile-figure { width: 100%; height: 170px; }
 }
+
+/* ── ชุด: the wardrobe (components/world/wardrobe.tsx) ─────────────────── */
+.wardrobe { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 6px; }
+.wardrobe-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 10px; font-size: 13px; }
+.wardrobe-head small { color: var(--scroll-ink-soft); }
+.wardrobe-toggle { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; cursor: pointer; }
+.wardrobe-card {
+  width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 4px 3px;
+  background: #f3e6c255; border: 1px solid var(--scroll-line); border-radius: 6px; text-align: center;
+}
+.wardrobe-card canvas { flex: 1; min-height: 0; image-rendering: pixelated; }
+.wardrobe-card b { font-size: 12.5px; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.wardrobe-card small { font-size: 10.5px; line-height: 1.2; color: var(--scroll-ink-soft); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wardrobe-card:hover { background: #fff4d6; }
+.wardrobe-card--worn { border-color: var(--ribbon); background: #fff4d6; box-shadow: inset 0 0 0 1px var(--ribbon); }
+.wardrobe-card--worn small { color: var(--ribbon-deep); font-weight: 700; }
+.wardrobe-card--locked canvas { filter: grayscale(0.6) brightness(0.8); opacity: 0.75; }

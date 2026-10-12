@@ -241,6 +241,12 @@ export interface WorldStore extends WorldStateData {
   // What a won fight pays (rolled once, the first time it is asked for, and
   // used by acknowledgeBattleResult); null while there is no won world battle.
   victorySpoils: () => VictorySpoils | null;
+  /** Wear an outfit the wardrobe holds (lib/world/appearance.ts); false when it is locked. */
+  wearOutfit: (id: string) => boolean;
+  /** Buy a tailor's outfit (in a city) and wear it. */
+  buyOutfit: (id: string) => { ok: boolean; reason?: import("@/lib/world/appearance").BuyOutfitRefusal };
+  /** Hide or show the weapon carried on the body (ซ่อนอาวุธ). */
+  setHideWeapon: (hide: boolean) => void;
   /** Open a letter: mark it read (its gift waits for claimLetterGift). */
   readLetter: (letterId: string) => { ok: boolean };
   /** Take a letter's gift into the bag (รับของ). */

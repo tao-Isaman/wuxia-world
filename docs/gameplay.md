@@ -432,6 +432,11 @@ Mastery levels 1–5 need 0 / 100 / 300 / 700 / 1500 xp.
 
 **Gear (76 pieces).** Ten slots: weapon, armour, head, boots, two bracers, two rings, two charms. Gear from the bag is equipped in ย่าม, and a replaced piece goes back to the bag. Stats and effects are in [combat.md](combat.md).
 
+**Outfits and the weapon on the body** ([design/appearance.md](design/appearance.md)). The โปรไฟล์ window's **ชุด** tab is the wardrobe: each outfit shows the hero in it, carrying their weapon. An outfit changes only the look (never stats) and is a recolour of the hero's own drawing, so it shows on the map, in battle and in films, and other players see it online.
+
+- **Which:** ชุดเดิม; the uniform of the hero's own sect while they are its disciple (other sects' uniforms are not listed; leaving the sect puts it away); six tailor's outfits, bought in any city (ชุดคราม 300, ชุดขาวไว้ทุกข์ 300, ชุดหมึกดำ 500, ชุดผ้าไหมแดง 600, ชุดเขียวหยก 800, ชุดขุนนางทอง 3,000 ตำลึง) and kept for good; ชุดยอดฝีมือ for a tournament champion.
+- **The weapon on the body:** the equipped weapon is drawn on the hero on the map — long weapons, sabres and instruments across the back, fans at the waist (fists, hidden weapons and the jian the hero already wears at the hip are not drawn). Behind the body facing the viewer or in profile, in front of it facing away. **ซ่อนอาวุธ** hides it.
+
 ## Progression
 
 ### Skills and inner arts

@@ -75,13 +75,14 @@ The pure logic lives in `server/core` (no I/O, clock or randomness), so it is te
 
 | Direction | Message | Meaning |
 | --- | --- | --- |
-| client → server | `hello { v, name, body, x, y, dir }` | the first message: who walks in, and where |
+| client → server | `hello { v, name, body, x, y, dir, outfit, weapon }` | the first message: who walks in, where, and how they look (protocol 3; missing look fields: `default`, none) |
 | | `move { x, y, dir, moving }` | position and heading, ~10 a second while walking |
 | | `sync` | ask for a fresh snapshot |
 | | `ping { at }` | keep-alive |
 | | `say { text }` | a line of map chat (protocol 2) |
+| | `look { outfit, weapon }` | the hero's look changed: the outfit worn, the weapon carried on the body (protocol 3) |
 | server → client | `welcome { you, room, epoch, seq, players }` | the room at `seq` (answer to `hello` / `sync`) |
-| | `event { seq, ev }` | one event, in order: `joined { player }`, `moved { id, x, y, dir, moving, at }`, `left { id, reason }`, `said { id, name, text, at }` |
+| | `event { seq, ev }` | one event, in order: `joined { player }`, `moved { id, x, y, dir, moving, at }`, `left { id, reason }`, `said { id, name, text, at }`, `looked { id, outfit, weapon, at }` |
 | | `pong { at, server }` | the server's time |
 | | `error { code, message }` | a refused command: `bad_message`, `bad_version`, `not_joined`, `already_joined`, `bad_profile`, `too_fast`, `room_full`, `replaced`, `bad_text` |
 
@@ -91,6 +92,7 @@ The pure logic lives in `server/core` (no I/O, clock or randomness), so it is te
 - A move may cover at most `WALK_SPEED` (150) × 1.6 × the time since the last one, plus 48 units; anything more is `too_fast`.
 - Names are 1–24 printable characters; bodies are `m1` or `f1`.
 - A room holds at most 64 players.
+- Looks ([design/appearance.md](design/appearance.md)): an outfit id is 1–32 of `a–z 0–9 _`, a weapon id 1–48 of `A–Z a–z 0–9 _` or none (`bad_profile`); at most one look change every 500 ms (`too_fast`); the same look again is no event. Each `Presence` carries `outfit` and `weapon`. The server does not check that a look was earned: it is only a look.
 - Map chat: 1–120 characters (control characters removed, trimmed), at most 5 lines per 10 s per player (`too_fast`); only a joined player may speak. The line goes to everyone in the room, the speaker included, with the hero name.
 - Joining again with the same account (a second tab) emits `left { reason: "replaced" }` and closes the older socket with code 4001.
 
@@ -164,7 +166,8 @@ Usernames are 3–20 of `a–z 0–9 _`, case-insensitive. Passwords are 6–72 
 - They use their body's painted eight-way walk cells and wear a **gold** name tag (NPCs' are green).
 - The name tag of a party member is **sky blue**. A chat line floats over its speaker for 6 s (`onlineSession.bubble`), the hero's own too.
 - Tapping another player opens their card (`presentation.online.pick`).
-- The host publishes `data-remote-players` (`[[id, x, y], …]`), `data-remote-screen` (where to tap them), `data-chat-bubbles` and `data-party-tags` for tests.
+- They wear their outfit (their sheet recoloured, loaded once per outfit) and carry their weapon on the body, like the hero; a `looked` event re-dresses them in place (`components/game/world-canvas.tsx` resolves a presence's look with `characterLook`, `lib/world/appearance.ts`). The session sends the hero's look in `hello` and as `look` when it changes (`onlineSession.setLook`, from `OnlineBridge`).
+- The host publishes `data-remote-players` (`[[id, x, y], …]`), `data-remote-screen` (where to tap them), `data-remote-looks` (`[[id, outfit, weapon], …]`), `data-chat-bubbles` and `data-party-tags` for tests.
 
 **The flow** (with a server set): **account → character → play**.
 
@@ -330,7 +333,7 @@ Then set `NEXT_PUBLIC_GAME_SERVER_URL` to the Worker's URL (`https://wuxia-world
 | Deploy command | `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \| sh -s -- -y --profile minimal --target wasm32-unknown-unknown && . "$HOME/.cargo/env" && npx wrangler deploy` |
 | Preview command | the same, ending in `npx wrangler deploy --dry-run` |
 
-No variables or secrets to add: the server makes its own signing key (above), and `PBKDF2_ITERATIONS` comes from `wrangler.toml` (variables set only in the dashboard are dropped by the next `wrangler deploy`). `GET /health` answers `{"ok":true,"protocol":2,"auth":"ready"}` once the server is live.
+No variables or secrets to add: the server makes its own signing key (above), and `PBKDF2_ITERATIONS` comes from `wrangler.toml` (variables set only in the dashboard are dropped by the next `wrangler deploy`). `GET /health` answers `{"ok":true,"protocol":3,"auth":"ready"}` once the server is live.
 
 Servers deployed before the key moved into `KeyObject` signed tokens with an `AUTH_SECRET` variable; those tokens stop working once (accounts are untouched), and the `AUTH_SECRET` variable can be deleted. On load, `OnlineBridge` checks a saved token (`checkToken` → `GET /auth/me`); on a 401 it signs out, so the player lands on the log-in step with the name filled in instead of a room that keeps refusing them.
 
@@ -340,11 +343,11 @@ Durable Objects with SQLite storage are on the Workers free plan. PBKDF2 at 10,0
 
 | Command | What |
 | --- | --- |
-| `bun run test:server` | `cargo test` of `wuxia-core`: protocol spelling, `decide` / `apply` (speed limit, bounds, replace, full room, map chat's cleaning and rate limit, snapshot + events = the same room), accounts and tokens, the roster, every save check, the server's gold grants and a parcel's debit |
+| `bun run test:server` | `cargo test` of `wuxia-core`: protocol spelling, `decide` / `apply` (speed limit, bounds, replace, full room, map chat's cleaning and rate limit, looks' shape and rate limit, snapshot + events = the same room), accounts and tokens, the roster, every save check, the server's gold grants and a parcel's debit |
 | `bun run test:play-server` | the TypeScript half without a server: battles as replayable commands, the world document (days and weeks, pins, echoes and their limits, killings, beasts), the battle document (staging, replay in parts, refusals, verdict) and the browser's checked-battle loop against them behind a fake fetch; the social documents (text, usernames, requests, blocks, rate limits, parcels, mail claim / full box / delete / expiry, the party's rules and bonus) |
-| `bun run test:net` | the client without a server: the presence reducer (order, gaps, resync), the session (hello with the real position, throttled moves, room switch, map chat and bubbles) against a fake WebSocket, and `cloudSave` against a fake server (debounce, rev, conflict, refusal, retry, `exclusive`) |
-| `bun run test:online` | against a running server (`bun run server:dev`, or `GAME_SERVER_URL`): sign-up / login / refusals, checking a saved token (`/auth/me`), a bad token, two players' join → move → leave in `seq` order, a refused teleport, a second login replacing the first; characters (limit, unique names, owner only, delete), saves (rev, pace, hero, numbers, gold allowance); the one world (the same for two accounts, an echo heard by the other, refusals); checked battles (staged from the save, the log replayed in parts, the verdict, a T5 purse saved past a spent allowance, a bad log refused, a resting beast, a killing reaching the world); map chat; friends (request, accept, status), whispers, mail with gold and item parcels (a save that keeps the parcel refused, claim once, a deleted parcel returned), the party (invite, chat, the bonus on the same map and not elsewhere, dissolving), blocking |
-| `tests/browser/online.spec.ts` | two browsers sign up on the title screen, start heroes, see each other at home; one walks and the other sees it live; closing one makes them leave; a saved token the server no longer accepts lands on the log-in step; two characters on one account: switch, resume after a reload, see both from another browser, delete one; a fight staged on the server, played on อัตโนมัติ, its result held until the server's verdict and spoils; two players chat on the map (a bubble over the speaker, typing does not walk), one taps the other for the card and befriends them, a party with its frame, colour and chat, a letter with 100 ตำลึง taken by รับของ and checked in both saves. Skipped when no server answers |
+| `bun run test:net` | the client without a server: the presence reducer (order, gaps, resync), the session (hello with the real position and look, throttled moves, room switch, map chat and bubbles, look changes) against a fake WebSocket, and `cloudSave` against a fake server (debounce, rev, conflict, refusal, retry, `exclusive`) |
+| `bun run test:online` | against a running server (`bun run server:dev`, or `GAME_SERVER_URL`): sign-up / login / refusals, checking a saved token (`/auth/me`), a bad token, two players' join → move → leave in `seq` order, a refused teleport, looks (in hello, a change heard by all, bad or hurried looks refused), a second login replacing the first; characters (limit, unique names, owner only, delete), saves (rev, pace, hero, numbers, gold allowance); the one world (the same for two accounts, an echo heard by the other, refusals); checked battles (staged from the save, the log replayed in parts, the verdict, a T5 purse saved past a spent allowance, a bad log refused, a resting beast, a killing reaching the world); map chat; friends (request, accept, status), whispers, mail with gold and item parcels (a save that keeps the parcel refused, claim once, a deleted parcel returned), the party (invite, chat, the bonus on the same map and not elsewhere, dissolving), blocking |
+| `tests/browser/online.spec.ts` | two browsers sign up on the title screen, start heroes, see each other at home; one walks and the other sees it live; closing one makes them leave; a saved token the server no longer accepts lands on the log-in step; two characters on one account: switch, resume after a reload, see both from another browser, delete one; a fight staged on the server, played on อัตโนมัติ, its result held until the server's verdict and spoils; two players chat on the map (a bubble over the speaker, typing does not walk), one taps the other for the card and befriends them, a party with its frame, colour and chat, a letter with 100 ตำลึง taken by รับของ and checked in both saves; another player's outfit and weapon on the back seen, and a change seen at once. Skipped when no server answers |
 
 ## Limits and next steps
 

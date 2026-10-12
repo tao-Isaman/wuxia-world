@@ -13,8 +13,8 @@ function check(name: string, fn: () => void | Promise<void>) {
   );
 }
 
-const ann: Presence = { id: "ann", name: "หลี่", body: "f1", x: 100, y: 200, dir: "S", moving: false, at: 1 };
-const bob: Presence = { id: "bob", name: "จาง", body: "m1", x: 500, y: 300, dir: "W", moving: false, at: 2 };
+const ann: Presence = { id: "ann", name: "หลี่", body: "f1", x: 100, y: 200, dir: "S", moving: false, at: 1, outfit: "default", weapon: null };
+const bob: Presence = { id: "bob", name: "จาง", body: "m1", x: 500, y: 300, dir: "W", moving: false, at: 2, outfit: "default", weapon: null };
 const welcome: ServerMsg = { t: "welcome", you: "ann", room: "home_player", epoch: "e1", seq: 4, players: [ann, bob] };
 const fold = (state: PresenceState, ...messages: ServerMsg[]) => messages.reduce((s, m) => applyServerMsg(s, m).state, state);
 
@@ -77,7 +77,7 @@ await check("the session joins with the hero's real position, throttles moves an
   assert.equal(sockets.length, 1);
   assert.equal(sockets[0].url, "ws://game.test/rooms/home_player/ws?token=tok");
   sockets[0].fire("open");
-  assert.deepEqual(sockets[0].sent[0], { t: "hello", v: 2, name: "หลี่", body: "f1", x: 300, y: 400, dir: "E" });
+  assert.deepEqual(sockets[0].sent[0], { t: "hello", v: 3, outfit: "default", weapon: null, name: "หลี่", body: "f1", x: 300, y: 400, dir: "E" });
   sockets[0].fire("message", welcome);
   assert.equal(session.status, "online");
   assert.deepEqual(session.players("home_player").map((p) => p.id), ["bob"]);
@@ -105,10 +105,20 @@ await check("the session joins with the hero's real position, throttles moves an
   sockets[0].fire("message", { t: "error", code: "too_fast", message: "" });
   assert.deepEqual(refused, ["too_fast"]);
   off();
+  // Looks: a change goes out as `look` (no rejoin); another's `looked` re-dresses them.
+  session.setLook({ outfit: "sect_emei", weapon: "eq_t1_w_long" });
+  assert.deepEqual(sockets[0].sent.at(-1), { t: "look", outfit: "sect_emei", weapon: "eq_t1_w_long" });
+  const sentBefore = sockets[0].sent.length;
+  session.setLook({ outfit: "sect_emei", weapon: "eq_t1_w_long" });
+  assert.equal(sockets[0].sent.length, sentBefore, "the same look is not sent twice");
+  sockets[0].fire("message", { t: "event", seq: 5, ev: { t: "looked", id: "bob", outfit: "tailor_ink", weapon: null, at: 2 } });
+  assert.deepEqual(session.players("home_player").map((p) => [p.id, p.outfit, p.weapon]), [["bob", "tailor_ink", null]]);
   // A new map is a new room.
   session.report("city_capital", { x: 50, y: 60, dir: "N", moving: false });
   assert.equal(sockets.length, 2);
   assert.ok(sockets[1].url.includes("/rooms/city_capital/"));
+  sockets[1].fire("open");
+  assert.equal((sockets[1].sent[0] as { outfit: string }).outfit, "sect_emei", "a new room hears the look in hello");
   assert.equal(session.bubble("city_capital", "bob"), null, "a new room starts without bubbles");
   assert.equal(session.say("hi"), false, "not in the room yet");
   session.configure(null);

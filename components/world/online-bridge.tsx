@@ -13,6 +13,7 @@ import { useWorldStore } from "@/store/world-store";
 import { toast } from "@/store/toast-store";
 import { startCloudSession, useCloudSession } from "@/store/cloud-session";
 import { socialSocket } from "@/lib/net/social";
+import { heroLook } from "@/lib/world/appearance";
 import { useSocialStore } from "@/store/social-store";
 
 export function OnlineBridge() {
@@ -56,6 +57,11 @@ export function OnlineBridge() {
   useEffect(() => {
     socialSocket.setHero(playing && name ? { name, body, location: location ?? null, characterId: playing } : null);
   }, [playing, name, body, location]);
+
+  // The hero's look goes to the map room (others see the outfit and the weapon on the back).
+  const lookOutfit = useWorldStore((s) => heroLook(s).outfit);
+  const lookWeapon = useWorldStore((s) => heroLook(s).weapon);
+  useEffect(() => { onlineSession.setLook({ outfit: lookOutfit, weapon: lookWeapon }); }, [lookOutfit, lookWeapon]);
 
   useEffect(() => onlineSession.subscribe(() => {
     const before = useOnlineStore.getState().status;

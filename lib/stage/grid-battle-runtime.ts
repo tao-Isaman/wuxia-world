@@ -523,7 +523,7 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
 
   // ── Units ───────────────────────────────────────────────────────────
   const lookKey = (look: UnitLook) => look.kind === "creature" ? "creature" : look.kind === "anim" ? `anim:${look.sheet}`
-    : look.still ? `still:${look.still}` : `char:${characterId(look.characterId)}`;
+    : look.still ? `still:${look.still}` : `char:${characterId(look.characterId)}${look.outfit ? `:${look.outfit.id}` : ""}`;
 
   interface LookTexture { key: string; kind: ActorKind; feet: number[]; directional: boolean; walk8?: boolean; w: number; h: number;
     actions?: { key: string; scale: number }; anim?: { sheet: AnimSheet; columns: number }; animTop?: number;
@@ -570,7 +570,8 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
         }
       }
       const id = characterId(look.characterId);
-      const [atlas, combat] = await Promise.all([loadCharacterAtlas(id),
+      const outfit = look.outfit ? { id: look.outfit.id, tint: { primary: look.outfit.primary, secondary: look.outfit.secondary } } : undefined;
+      const [atlas, combat] = await Promise.all([loadCharacterAtlas(id, true, outfit),
         // A missing combat sheet only costs the painted poses, never the character. A PixelLab
         // hero plays its own attack clip, so the painted poses (another style) stay out.
         hasHeroActions(id) && !getPlSheet(id) ? loadImage(heroCombatSheet(id)).catch(() => null) : Promise.resolve(null)]);

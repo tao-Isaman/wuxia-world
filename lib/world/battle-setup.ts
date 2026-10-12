@@ -4,6 +4,7 @@
 // (docs/online.md "Battles on the server"); lib/world/battle-bridge.ts uses it
 // for the briefing and the start.
 import type { CharacterBuild } from "../game/types";
+import { currentOutfit } from "./appearance";
 import type { BattleStartOpts } from "../game/grid/session";
 import type { BattleItemEffect } from "../game/grid/types";
 import type { WorldStateData } from "./types";
@@ -22,7 +23,7 @@ export function battleSetupFor(state: WorldStateData, opponentId: string, withPa
   // the factories pick up the current opponent stat scale (pack members
   // included).
   applyOpponentStatScale(state);
-  return worldBattleSetup(opponentId, { bodyId: state.playerBodyId, withPack, power: playerPowerIndex(state), present: (id) => npcPresent(state, id) });
+  return worldBattleSetup(opponentId, { bodyId: state.playerBodyId, outfit: state.appearance ? currentOutfit(state) : null, withPack, power: playerPowerIndex(state), present: (id) => npcPresent(state, id) });
 }
 
 /** The hero's battle items (ItemDef.battle) as they go into a fight: item id → count carried. */

@@ -5,6 +5,7 @@
 // battle bridge (which builds the grid battle's UnitSpecs) and the battle UI.
 
 import { characterId, FOE_CHARACTER_IDS, npcCharacterId, type FoeCharacterId } from "@/lib/characters/catalog";
+import { getOutfit } from "./data/outfits";
 import { hasAnimatedSheet } from "@/lib/characters/npc-sheets";
 import { beastSheetFor, getAnimSheet } from "@/lib/characters/anim-sheets";
 import type { CharacterBuild } from "@/lib/game/types";
@@ -19,9 +20,11 @@ export const PLAYER_UNIT_ID = "A";
 export const PRIMARY_ENEMY_UNIT_ID = "B";
 const PACK_PREFIX = "pack";
 
-/** The hero's look: their chosen body sheet (defaults to m1). */
-export function playerLook(bodyId: string | null | undefined): UnitLook {
-  return { kind: "character", characterId: characterId(bodyId ?? "m1") };
+/** The hero's look: their chosen body sheet (defaults to m1), in their outfit. */
+export function playerLook(bodyId: string | null | undefined, outfitId?: string | null): UnitLook {
+  const outfit = getOutfit(outfitId);
+  return { kind: "character", characterId: characterId(bodyId ?? "m1"),
+    ...(outfit?.tint ? { outfit: { id: outfit.id, ...outfit.tint } } : {}) };
 }
 
 /**
@@ -205,7 +208,7 @@ export function enemyPackSpecs(opp: OpponentDef, power = 0): UnitSpec[] {
 }
 
 /** Everything the battle store needs to start a world battle against `opponentId`. */
-export function worldBattleSetup(opponentId: string, opts: { bodyId?: string | null; withPack?: boolean; power?: number; present?: (npcId: string) => boolean } = {}): {
+export function worldBattleSetup(opponentId: string, opts: { bodyId?: string | null; outfit?: string | null; withPack?: boolean; power?: number; present?: (npcId: string) => boolean } = {}): {
   opponent: OpponentDef;
   build: CharacterBuild;
   looks: { A: UnitLook; B: UnitLook };
@@ -217,7 +220,7 @@ export function worldBattleSetup(opponentId: string, opts: { bodyId?: string | n
   return {
     opponent,
     build,
-    looks: { A: playerLook(opts.bodyId), B: foeLook(opponentId, opts.present) },
+    looks: { A: playerLook(opts.bodyId, opts.outfit), B: foeLook(opponentId, opts.present) },
     enemies: opts.withPack ? enemyPackSpecs(opponent, opts.power ?? 0) : [],
   };
 }
