@@ -1,7 +1,7 @@
 // Life skills and the bag: gathering, crafting, using items, music, rest and place activities.
-import { combinedStats, deriveAll, getArt, getEquip, getSkill, getMeridianChart } from "@/lib/game";
+import { affixParts, combinedStats, deriveAll, getArt, getEquip, getSkill, getMeridianChart } from "@/lib/game";
 import { statFromLifeSkill, STAT_XP_PER_ACTION } from "@/lib/world/stat-progression";
-import { applyEffects, gatherSuccessChance, getArtisansAt, getItem, getRecipe, getResource, masteryLevel } from "@/lib/world";
+import { applyEffects, gainGear, gatherSuccessChance, getArtisansAt, getItem, getRecipe, getResource, masteryLevel } from "@/lib/world";
 import { applyEffect, releaseFromJail } from "@/lib/world/effects";
 import { absoluteHours, describeSentence, sentenceLeft } from "@/lib/world/law";
 import { JAIL_SCENE_ID, getActivity, jailDiceChance, jailEscapeChance } from "@/lib/world/data/activities";
@@ -163,9 +163,12 @@ export const lifeActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "gat
       outputProduced = true;
     }
 
+    // A gear recipe forges a piece into the gear bag, its options rolled.
+    let outputEquipKey: string | undefined;
+    const out = r.output;
     if (outputProduced) {
-      draft.inventory[r.output.itemId] =
-        (draft.inventory[r.output.itemId] ?? 0) + r.output.count;
+      if (out.equipId !== undefined) outputEquipKey = gainGear(draft, out.equipId);
+      else draft.inventory[out.itemId] = (draft.inventory[out.itemId] ?? 0) + out.count;
     }
 
     // XP scales with recipe required mastery; failed drop-checks still
@@ -180,21 +183,24 @@ export const lifeActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "gat
     const craftStat = statFromLifeSkill(skill);
     if (craftStat) grantStatXp(draft, craftStat, STAT_XP_PER_ACTION);
     rollLukXp(draft);
-    const outDef = getItem(r.output.itemId);
+    const outName = out.equipId !== undefined ? getEquip(out.equipId)?.n ?? out.equipId : getItem(out.itemId)?.name ?? out.itemId;
+    const opts = outputEquipKey ? affixParts(outputEquipKey) : [];
     if (dropCheck === "failed") {
       appendActionLog(draft, "craft", `ประดิษฐ์ ${r.name}: พลาด · +${xpGained} ประสบการณ์`);
     } else {
       appendActionLog(
         draft,
         "craft",
-        `ประดิษฐ์ ${outDef?.name ?? r.output.itemId}×${r.output.count} · +${xpGained} ประสบการณ์`,
+        `ประดิษฐ์ ${outName}×${r.output.count}${opts.length ? ` (${opts.join(" · ")})` : ""} · +${xpGained} ประสบการณ์`,
       );
     }
     set({ ...draft });
     return {
       ok: true,
       recipeId: r.id,
-      outputItemId: r.output.itemId,
+      outputItemId: r.output.itemId ?? null,
+      outputEquipKey,
+      outputName: outName,
       outputCount: outputProduced ? r.output.count : 0,
       xpGained,
       dropCheck,
@@ -271,6 +277,12 @@ export const lifeActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "gat
       if (block) return { ok: false, reason: "meridian-locked", itemId, message: block };
     }
 
+    // สูตร…: known already → kept.
+    if (def.use.t === "learnRecipe") {
+      if (!getRecipe(def.use.recipeId)) return { ok: false, reason: "unknown" };
+      if (s.learnedRecipeIds.includes(def.use.recipeId)) return { ok: false, reason: "already-learned", itemId };
+    }
+
     const draft = draftFrom(s);
     // Consume one count.
     const cur = draft.inventory[itemId] ?? 0;
@@ -341,6 +353,13 @@ export const lifeActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "gat
       appendActionLog(draft, "meridian", `อ่าน ${def.name} · เรียนรู้ชีพจร${chart.name} (${chart.nodes.length} จุด)`);
       set({ ...draft });
       return { ok: true, kind: "learnMeridian", itemId, chartId: chart.id };
+    }
+    if (eff.t === "learnRecipe") {
+      const recipe = getRecipe(eff.recipeId)!;
+      draft.learnedRecipeIds = [...draft.learnedRecipeIds, recipe.id];
+      appendActionLog(draft, "learn", `อ่าน ${def.name} · จำสูตร${recipe.name}ได้แล้ว`);
+      set({ ...draft });
+      return { ok: true, kind: "learnRecipe", itemId, recipeId: recipe.id };
     }
     // Unknown effect t — fall through; no xp granted but item consumed.
     set({ ...draft });

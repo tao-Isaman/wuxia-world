@@ -78,6 +78,7 @@ bun run test:story          # every sect skill/art has a quest; lineage + sagas 
 bun run test:routes         # compass exits, 8-way road paintings and arrival sides; world coords current
 bun run test:places         # place NPCs / quests / activities; every ยุทธจักร T0–T3 move is a quest reward; gifts; presence
 bun run test:systems        # practice xp, letters, horse stations, the sword tournament; sect join / rejoin / redemption, dropped quests
+bun run test:gear           # gear options: halved stats, tiers, rolls, keys that clamp, options in stats and battle, magic materials, buy / re-roll, repair
 bun run test:appearance     # outfits (unlocks, gender, tailor, wardrobe save v29), weapon families and carry, the recolour on the real sheets, the battle look
 bun run test:quests         # campaign audit + dead ends + every item/kill/objective quest + guidance + bad-action stages
 bun run test:meridians      # meridian charts: engine, combat bonus, chart items / sources, points, store, repair, content counts
@@ -180,7 +181,7 @@ Two deliberate exceptions reach into stores:
   - `ArtPassiveEffect`, `EquipEffect`, 14 art-active types;
   - `SkillType` (yin / yang / balance / hard / soft / internal / external);
   - `SKILL_SLOT_COUNT = 10`.
-- **Data tables** (`data/`): `TIERS`, `STAT_KEYS`, weapon families, `SECT_ORDER` / `JIANGHU_SECT` (`sects.ts`), `SKILLS` (191, incl. `bst_*` beast moves and the 18 `bss_*` boss moves, `sc` "สัตว์ร้าย"), `ARTS` (117 + the `none` placeholder; T5: `khbt`, `kuyt`, `kgim` and the six `art_boss_*`). `isBeastMove` / `isBossArt` keep boss and beast moves out of scrolls, coverage checks and the skills window, `EQUIPMENT` (76).
+- **Data tables** (`data/`): `TIERS`, `STAT_KEYS`, weapon families, `SECT_ORDER` / `JIANGHU_SECT` (`sects.ts`), `SKILLS` (191, incl. `bst_*` beast moves and the 18 `bss_*` boss moves, `sc` "สัตว์ร้าย"), `ARTS` (117 + the `none` placeholder; T5: `khbt`, `kuyt`, `kgim` and the six `art_boss_*`). `isBeastMove` / `isBossArt` keep boss and beast moves out of scrolls, coverage checks and the skills window, `EQUIPMENT` (76, `ti` 0–4, every number × `EQUIP_STAT_SCALE` 0.5 at load).
 - **Stats.** `derive.ts` (`derive`, `combinedStats`, `deriveAll`, `getMasteryMap`).
   - `combinedStats` merges base + arts + slotted / learned skills with conflict and level scaling.
   - Equipment is **not** in `combinedStats`; `deriveAll` adds it.
@@ -208,6 +209,7 @@ Two deliberate exceptions reach into stores:
   - `ai.ts` has `planTurn`.
   - Move range is `clamp(3 + floor(Spd/80), 3, 6)`. Buffs and cooldowns tick on the owner's turn.
   - Retreat odds are `fleeChance` (`combat-actions.ts`), 20–90 %.
+- **Gear options** (`gear.ts`): an owned piece is a key, `<equipment id>~<options>` (`eq_t1_w_sword~pa:6,fam_dmg:sword:15`), in the bag, the loadout and the save; `getEquip` strips it, `parseGear` clamps it. A piece rolls 0–1 / 1–2 / 1–3 / 2–3 / 3–4 of 17 kinds by tier (`GEAR_AFFIX_COUNT`, `GEAR_AFFIX_RANGE`); they reach `getEquipStatBonus` (base stats, left out by `excludeEquipment`), `getEquipBonus` (flats, `*_pct` on the whole derived stat, `crit_dmg`, `wexp`) and `ctx.gearFamily` (a weapon family's move damage ±). World side (`lib/world/gear.ts`): every gain rolls (`gainGear`), the line's craft shop re-rolls for หินศิลาวิเศษ / ด้ายศิลาวิเศษ at craft level 3 (`reforgeGear`), tier-3+ foes drop them (`rollSpiritMaterials`), `repairGear` on load. 28 pieces (every tier-3 one included) are craft-only (`data/gear-recipes.ts`: recipes with `output: { equipId }`, crafted into the gear bag); foes drop their สูตร items (`recipe_<recipeId>`, use `learnRecipe`, `rollRecipeDrop` 5 % by tier, beasts 25 %); the beasts drop only tier-4 gear. Enhancement +1…+10 (`en:N` in the key, `enhanceBonus`, `final_dmg` → `finalDamageMod`) at a city shop of the line, craft 3+, for ศิลาเสริมพลัง (`enhanceGear`; failing at +6–8 drops a level, at +9–10 breaks the piece).
 - **Legacy.** The 1v1 loop (`tickGauges` / `getNextTurn`), `ai.ts` `runAITurn` and the guard / recover actions are kept only for tests.
 
 ## World engine (`lib/world/`)
@@ -398,7 +400,7 @@ Most additions are data only. Follow [docs/content-authoring.md](docs/content-au
 | a place | a `leaf()` in `world-map.ts` + a road in `location-routes.ts` + a region in `regions.ts` (+ a painting) |
 | an NPC | a regional `npcs/` file (+ talk dialog, spar opponent, art ids) |
 | a quest | a regional `quests/` file (+ `qs_` scenes); stages need an `autoAdvance`, an `objective` or reachable dialog beats |
-| an item, shop, hall, recipe, artisan, node or opponent | its table in `lib/world/data/` (an item or equipment piece also gets an icon in `item-icons.ts`) |
+| an item, shop, hall, recipe, artisan, node or opponent | its table in `lib/world/data/` (an item or equipment piece also gets an icon in `item-icons.ts`; a piece needs its tier `ti`, and every way to gain it must roll its options, `gainGear`) |
 | a skill or art | `lib/game/data/`; then sort, icon, battle range, and a way to learn it (a sect one also needs a lineage quest or saga — `test:story`) |
 | a foe | `opponents.ts` (+ `FIGHT_EVENTS` and its `FOE_HABITATS` in `habitats.ts` to roam); a boss also needs a `BOSSES` entry, its moves / art and an animated sheet |
 | a joinable sect | the long checklist in the guide |

@@ -590,7 +590,10 @@ export type ItemUseEffect =
   // แผนภาพชีพจร — learns a meridian chart (lib/game/meridians.ts). Refuses
   // (item kept) unless every skill / art in the chart's `requires` is
   // learned, or when the chart is already learned.
-  | { t: "learnMeridian"; chartId: string };
+  | { t: "learnMeridian"; chartId: string }
+  // สูตร… — teaches a crafting recipe (learnedRecipeIds). Refuses (item
+  // kept) when the recipe is already known. Gear recipes drop from foes.
+  | { t: "learnRecipe"; recipeId: string };
 
 // Stat threshold per skill / art tier when learning from a manual. T0
 // items have no stat gate; higher tiers escalate. Authors set the stat
@@ -702,11 +705,17 @@ export interface ResourceNodeRef {
 // from any chef, any forge, etc.). Non-basic ("specialty") recipes are
 // hand-assigned to specific artisans in lib/world/data/artisans.ts so
 // each city/village shop has its own signature offerings.
+export type RecipeOutput =
+  | { itemId: string; count: number; equipId?: undefined }
+  | { equipId: string; count: 1; itemId?: undefined };
+
 export interface RecipeDef {
   id: string;
   name: string;
   inputs: { itemId: string; count: number }[];
-  output: { itemId: string; count: number };
+  // An item into the bag, or (gear recipes, data/gear-recipes.ts) an
+  // equipment piece into the gear bag, its options rolled.
+  output: RecipeOutput;
   skill?: LifeSkill;
   requiredMastery?: 1 | 2 | 3 | 4 | 5;
   usesDropCheck?: boolean;

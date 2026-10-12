@@ -49,6 +49,8 @@ Deploys are implied to be on Vercel (`VERCEL_GIT_COMMIT_SHA` sets the service-wo
 
 ## Verified state
 
+**2026-10-12** (gear options: every piece halved, random options by tier coloured by roll, re-rolls at craft shops, magic materials from tier-3+ foes): typecheck clean; lint 0 errors (17 warnings); `cargo test` 26; every `test:*` unit suite passes, including the new `test:gear` (11); `test:online` 19 against `wrangler dev`; `audit-content` OK; build OK; `test:e2e` 74 passed with the local game server running (the new `gear.spec.ts` included).
+
 **2026-10-12** (friends, party, chat, player mail; NPC letter gifts behind รับของ): typecheck clean; lint 0 errors (17 warnings); `cargo test` 25; every `test:*` unit suite passes (`test:play-server` 18, `test:net` 8); `test:online` 18 against `wrangler dev`; `audit-content` OK; build OK; `test:e2e` 69 passed with the local game server running (the online specs included).
 
 **2026-10-11** (the server-run world, checked battles, data generation 2, and the bug-fix wave, PR #114): typecheck clean; lint 0 errors (17 warnings, all in untouched story data and old files); `cargo test` 23; every `test:*` unit suite passes, including the new `test:play-server` (11) and `test:rumors` / `test:grid-store`, which failed on `main` before; `test:online` 12 against `wrangler dev`; `audit-content` OK (1,075 quests); the server bundles from a clean checkout (1.78 MB gzipped); the browser suite as recorded in the PR. The table below is the older baseline.
@@ -211,6 +213,8 @@ The tracker / drawer overlap, the log labels, `/progress.json` in the cache, the
 The `mult_*` passives, hunt packs and art actives' modifiers were fixed on 2026-10-11. Left: poison, burn and regeneration change HP without a battle event, so no number pops up for them ([docs/grid-combat.md](docs/grid-combat.md#known-gaps)).
 
 ### Balance and data
+
+Gear now counts at half and leans on random options (`lib/game/gear.ts`); the option ranges, the counts by tier and the magic-material drop rates (`SPIRIT_DROP` in `lib/world/gear.ts`) are first guesses to tune by play.
 
 The forest practice bonus and the early power jump were fixed on 2026-10-11 (forest places come from their land; sect standing grows with rank progress and time in the sect; foes grow with the hero's own days, `startDay`).
 

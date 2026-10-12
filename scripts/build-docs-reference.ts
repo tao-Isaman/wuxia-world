@@ -16,6 +16,7 @@ import {
   ARTS, EQUIPMENT, SECT_ORDER, SKILLS, SLOT_LABELS, TIERS, WEAPON_FAMILY_LABEL,
   type Art, type Equipment, type EquipSlotType, type Skill,
 } from "@/lib/game";
+import { getEquip as getEquipDef } from "@/lib/game/data/equipment";
 import { artGrid, describeGrid, skillGrid } from "@/lib/game/grid";
 import {
   ARTISANS, ENEMY_CATEGORY_LABEL, ITEMS, ITEM_CATEGORIES, ITEM_CATEGORY_LABEL, LIFE_SKILL_ICON, LIFE_SKILL_KEYS,
@@ -360,6 +361,7 @@ const pages: Record<string, string> = {};
       case "manualLearnSkill": return `learn ${esc(skillName(u.skillId))} (${u.reqStat} ≥ ${u.reqValue})`;
       case "manualLearnArt": return `learn ${esc(artName(u.artId))} (${u.reqStat} ≥ ${u.reqValue})`;
       case "learnMeridian": return `learn meridian chart ${code(u.chartId)}`;
+      case "learnRecipe": return `learn recipe ${code(u.recipeId)}`;
     }
   };
   for (const cat of ITEM_CATEGORIES) {
@@ -391,7 +393,7 @@ const pages: Record<string, string> = {};
     md += table(["Id", "Name", "Inputs → output", "Mastery", "Basic", "Taught at"], list.map((r) => {
       const at = ARTISANS.filter((a) => recipesOfferedBy(a).some((o) => o.recipeId === r.id)).map((a) => locName(a.locationId));
       return [code(r.id), esc(r.name),
-        esc(r.inputs.map((i) => `${i.count}× ${getItem(i.itemId)?.name ?? i.itemId}`).join(" + ") + ` → ${r.output.count}× ${getItem(r.output.itemId)?.name ?? r.output.itemId}`),
+        esc(r.inputs.map((i) => `${i.count}× ${getItem(i.itemId)?.name ?? i.itemId}`).join(" + ") + ` → ${r.output.count}× ${r.output.equipId !== undefined ? `${getEquipDef(r.output.equipId)?.n ?? r.output.equipId} (gear)` : getItem(r.output.itemId)?.name ?? r.output.itemId}`),
         r.requiredMastery ?? 1, r.basic ? "yes" : "", esc(at.length > 4 ? `${at.length} artisans` : at.join(", ") || (craftsAnywhere(r) ? "anywhere (อาชีพ → ประดิษฐ์)" : "nowhere (sold by no artisan)"))];
     }));
     md += "\n";

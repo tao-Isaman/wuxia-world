@@ -89,12 +89,13 @@ check("crafting: the hero's own trades' recipes (not artisan ones) craft anywher
   useWorldStore.setState({ currentSceneId: "home_player", inventory, learnedRecipeIds: [] });
   const res = store().craftRecipe(recipe.id);
   assert.ok(res.ok, JSON.stringify(res));
-  assert.equal(store().inventory[recipe.output.itemId], recipe.output.count);
+  assert.equal(store().inventory[recipe.output.itemId!], recipe.output.count);
   for (const inp of recipe.inputs) assert.equal(store().inventory[inp.itemId] ?? 0, 0);
   // An artisan recipe still needs the artisan.
   assert.equal(store().craftRecipe("forge_iron_sword").ok, false);
-  // ...and every artisan recipe is sold by some artisan of its profession.
-  for (const r of RECIPES.filter((x) => !craftsAnywhere(x))) {
+  // ...and every artisan recipe is sold by some artisan of its profession
+  // (gear recipes are not: foes drop them as สูตร items — test:gear).
+  for (const r of RECIPES.filter((x) => !craftsAnywhere(x) && x.output.equipId === undefined)) {
     const sellers = ARTISANS.filter((a) => a.profession === r.skill && recipesOfferedBy(a).some((o) => o.recipeId === r.id));
     assert.ok(sellers.length > 0, `${r.id} is sold nowhere`);
   }

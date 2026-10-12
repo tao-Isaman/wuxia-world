@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
-import { DERIVED_LABEL, STAT_LABEL, TIERS, getArt, getMeridianChart, getSkill } from "@/lib/game";
-import { LIFE_SKILL_LABEL, type ItemUseEffect } from "@/lib/world";
+import { DERIVED_LABEL, STAT_LABEL, TIERS, getArt, getEquip, getMeridianChart, getSkill } from "@/lib/game";
+import { LIFE_SKILL_LABEL, getRecipe, type ItemUseEffect } from "@/lib/world";
 import type { BattleItemEffect } from "@/lib/game/grid/types";
 
 // Shop and bag share the same effects, so purchases can be compared before paying.
@@ -25,6 +25,11 @@ export function ItemEffects({ effect, battle }: { effect?: ItemUseEffect; battle
   } else if (effect.t === "learnMeridian") {
     const chart = getMeridianChart(effect.chartId);
     labels.push(`ชีพจรขั้น${TIERS[chart?.ti ?? 0]?.n ?? ""} · ${chart?.nodes.length ?? 0} จุด`);
+  } else if (effect.t === "learnRecipe") {
+    const recipe = getRecipe(effect.recipeId);
+    const piece = recipe?.output.equipId !== undefined ? getEquip(recipe?.output.equipId) : null;
+    labels.push(`จำสูตร${piece ? `สร้าง${piece.n}` : recipe?.name ?? ""}`);
+    if (recipe?.skill) labels.push(`${LIFE_SKILL_LABEL[recipe.skill]} ขั้น ${recipe.requiredMastery ?? 1}+`);
   }
   if (battle) {
     if (battle.t === "heal") labels.push("⚔ ใช้กลางการต่อสู้ได้");

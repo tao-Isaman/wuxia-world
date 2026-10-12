@@ -1,4 +1,5 @@
-import { ARTS, EQUIPMENT, MERIDIAN_CHARTS, SKILLS } from "@/lib/game";
+import { ARTS, EQUIPMENT, MERIDIAN_CHARTS, SKILLS, gearBaseId, getEquip } from "@/lib/game";
+import { GEAR_RECIPES } from "./gear-recipes";
 import { getItem } from "./items";
 
 // Item and equipment icons — every bag item and gear piece shows a painted
@@ -54,6 +55,10 @@ export const ITEM_ICONS: Readonly<Record<string, string>> = {
   tiger_claw: "ico_material_animal_part_06",
   bear_claw: "ico_material_animal_part_03",
   snake_skin: "ico_material_animal_part_13",
+  // ── magic materials (gear options)
+  spirit_stone: "ico_material_ore_05",
+  spirit_thread: "ico_material_cloth_03",
+  enhance_stone: "ico_material_ore_03",
   // ── legendary beast trophies
   trophy_golden_serpent: "ico_material_animal_part_07",
   trophy_blood_tiger: "ico_material_animal_part_06",
@@ -159,6 +164,9 @@ const ART_BOOK_BY_TIER = ["01", "14", "04", "06", "12", "09"];
 // Meridian charts (แผนภาพชีพจร) are scrolls of their own, one per tier.
 const CHART_SCROLL_BY_TIER = ["07", "08", "11", "12", "13", "14"];
 const CHART_TIER = new Map(MERIDIAN_CHARTS.map((c) => [c.id, c.ti]));
+// Gear recipes (สูตร…) are bound books, one look per piece tier (T0–T3).
+const RECIPE_BOOK_BY_TIER = ["02", "08", "11", "05"];
+const RECIPE_TIER = new Map(GEAR_RECIPES.map((r) => [r.id, getEquip(r.output.equipId)?.ti ?? 0]));
 const SKILL_TIER = new Map(SKILLS.map((s) => [s.id, s.ti]));
 const ART_TIER = new Map(ARTS.map((a) => [a.id, a.ti]));
 const pick = (list: string[], ti: number) => list[Math.max(0, Math.min(list.length - 1, ti))];
@@ -170,13 +178,14 @@ export function itemIconId(itemId: string): string | null {
   const use = getItem(itemId)?.use;
   if (use?.t === "manualLearnSkill") return `ico_book_scroll_${pick(SKILL_SCROLL_BY_TIER, SKILL_TIER.get(use.skillId) ?? 0)}`;
   if (use?.t === "manualLearnArt") return `ico_book_book_${pick(ART_BOOK_BY_TIER, ART_TIER.get(use.artId) ?? 0)}`;
+  if (use?.t === "learnRecipe") return `ico_book_book_${pick(RECIPE_BOOK_BY_TIER, RECIPE_TIER.get(use.recipeId) ?? 0)}`;
   if (use?.t === "learnMeridian") return `ico_book_scroll_${pick(CHART_SCROLL_BY_TIER, CHART_TIER.get(use.chartId) ?? 0)}`;
   return null;
 }
 
-/** The icon asset id for an equipment piece, else null. */
+/** The icon asset id for an equipment piece (an id or an owned piece's key), else null. */
 export function equipmentIconId(equipId: string): string | null {
-  return EQUIPMENT_ICONS[equipId] ?? null;
+  return EQUIPMENT_ICONS[gearBaseId(equipId)] ?? null;
 }
 
 /** Public URL of an icon asset (`ico_<group>_…` lives in public/assets/icon/<group>/). */

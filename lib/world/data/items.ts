@@ -1,6 +1,8 @@
 import { scaleMoveStat } from "./move-gates";
 import { ARTS, SKILLS, TIERS, MERIDIAN_CHARTS, MERIDIAN_KIND_LABEL, meridianChartItemId, getSkill, getArt, isBeastMove, isBossArt } from "@/lib/game";
 import type { ItemDef } from "../types";
+import { GEAR_RECIPES, GEAR_RECIPE_PRICE, recipeItemId } from "./gear-recipes";
+import { getEquip as getEquipDef, SLOT_LABELS } from "@/lib/game";
 
 // คัมภีร์ — what a quest that teaches a move or art hands over instead. The
 // quest log only calls its reward "วิชาลึกลับ"; the scroll names the move
@@ -200,6 +202,14 @@ export const ITEMS: readonly ItemDef[] = ([
   { id: "thread",      name: "เส้นด้าย",         category: "material", price: 20,
     description: "ด้ายเย็บคุณภาพ วัตถุดิบงานตัดเย็บ" },
 
+  // ─── Magic materials: re-roll gear options at a craft shop (lib/world/gear.ts)
+  { id: "spirit_stone",  name: "หินศิลาวิเศษ",     category: "material", price: 400,
+    description: "ผลึกหินเรืองแสงที่ยอดฝีมือและสัตว์ร้ายระดับสูงพกติดตัว ช่างที่ชำนาญขั้น 3 ขึ้นไปใช้หลอมออฟชั่นเสริมของอาวุธ แหวน และเครื่องประดับใหม่" },
+  { id: "enhance_stone", name: "ศิลาเสริมพลัง",    category: "material", price: 150,
+    description: "ศิลาผลึกใสที่ศัตรูฝีมือดีพกติดตัว ช่างในเมืองที่ชำนาญขั้น 3 ขึ้นไปใช้เสริมพลังอุปกรณ์ +1 ถึง +10 · ยิ่งสูงยิ่งเสี่ยง +6 ขึ้นไปพลาดแล้วลดขั้น +9 ขึ้นไปพลาดแล้วแตกสลาย" },
+  { id: "spirit_thread", name: "ด้ายศิลาวิเศษ",    category: "material", price: 400,
+    description: "ด้ายที่ฟั่นด้วยผงศิลาวิเศษ ช่างที่ชำนาญขั้น 3 ขึ้นไปใช้สุ่มออฟชั่นเสริมของเสื้อ หมวก รองเท้า และปลอกแขนใหม่" },
+
   // ─── Books / scrolls / images ──────────────────────────────────────
   { id: "book_basic",   name: "ตำราเบื้องต้น",    category: "book", price: 100,
     description: "ตำราสำหรับผู้เริ่มต้น อ่านเพื่อฝึกฝน",
@@ -386,6 +396,7 @@ export const ITEMS: readonly ItemDef[] = ([
 
   // ─── แผนภาพชีพจร — one per meridian chart (generated) ───────────────
   ...meridianChartItems(),
+  ...gearRecipeItems(),
 ] satisfies readonly ItemDef[]).map(scaleManualGate);
 
 /** Manuals ask half their authored stat (MOVE_STAT_GATE_SCALE). */
@@ -419,6 +430,23 @@ export function meridianRequirementText(req: { skills?: readonly string[]; arts?
     ...(req.arts ?? []).map((id) => getArt(id)?.n ?? id),
   ];
   return names.join(", ");
+}
+
+/** สูตร… — one per craft-only gear recipe (data/gear-recipes.ts); foes drop them. */
+function gearRecipeItems(): ItemDef[] {
+  const LINE: Record<string, string> = { forge: "ช่างตีเหล็ก", tailoring: "ช่างตัดเย็บ", jewelry: "ช่างเครื่องประดับ", accessory: "ช่างเครื่องสาน" };
+  return GEAR_RECIPES.map((r): ItemDef => {
+    const def = r.output.equipId ? getEquipDef(r.output.equipId) : null;
+    const ti = Math.min(3, def?.ti ?? 0);
+    return {
+      id: recipeItemId(r.id),
+      name: `สูตร${def?.n ?? r.name}`,
+      category: "manual",
+      price: GEAR_RECIPE_PRICE[ti],
+      description: `สูตรสร้าง${def?.n ?? ""} (${def ? SLOT_LABELS[def.ty] : "อุปกรณ์"}) — อ่านแล้วจำสูตรได้ ไปสร้างที่ร้าน${LINE[r.skill ?? ""] ?? "ช่าง"} ต้องฝีมือขั้น ${r.requiredMastery ?? 1} ขึ้นไป ของชิ้นนี้ไม่มีร้านใดขาย`,
+      use: { t: "learnRecipe", recipeId: r.id },
+    };
+  });
 }
 
 function meridianChartItems(): ItemDef[] {

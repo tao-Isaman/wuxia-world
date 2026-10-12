@@ -16,6 +16,8 @@ import {
   derive,
   deriveAll,
   getEquip,
+  gearFamilyMods,
+  gearName,
   equipBonusParts,
   equipStatParts,
   getEquipBonus,
@@ -29,6 +31,7 @@ import {
 } from "@/lib/game";
 import { InfoPopover } from "@/components/ui/wuxia/info-popover";
 import type { EquipSlotType, WeaponFamily } from "@/lib/game";
+import { GearAffixLine } from "@/components/game/gear-affixes";
 import { useWorldStore } from "@/store/world-store";
 import { PowerTierBadge } from "@/components/world/power-tier-badge";
 import { xpToNextStatLevel } from "@/lib/world/stat-progression";
@@ -134,7 +137,13 @@ export function ProfilePopup({ open, onClose }: Props) {
   // Equipment bonus summary (mirrors EquipmentSlots).
   const eb = getEquipBonus(player.equipment);
   const sb = getEquipStatBonus(player.equipment);
-  const equipSummary = equipBonusParts(eb, sb);
+  // The per-family options (gear.ts) aren't in EquipBonus: listed after it.
+  const fam = gearFamilyMods(player.equipment);
+  const equipSummary = [
+    ...equipBonusParts(eb, sb),
+    ...Object.entries(fam.dmg).map(([f, v]) => `กระบวนท่าสาย${WEAPON_FAMILY_LABEL[f as WeaponFamily]} แรงขึ้น ${v}%`),
+    ...Object.entries(fam.red).map(([f, v]) => `รับกระบวนท่าสาย${WEAPON_FAMILY_LABEL[f as WeaponFamily]} เบาลง ${v}%`),
+  ];
 
   const staminaPct = staminaMax > 0 ? Math.min(100, (stamina / staminaMax) * 100) : 0;
   const hpNow = Math.min(currentHp, derivedAll.HP), mpNow = Math.min(currentMp, derivedAll.MP);
@@ -246,8 +255,9 @@ export function ProfilePopup({ open, onClose }: Props) {
                   return (
                     <li key={`${row.type}-${row.index ?? "x"}`}>
                       <span className="profile-gear-slot">{row.label}</span>
-                      <span className="profile-gear-name">{e ? e.n : <i>— ว่าง —</i>}</span>
+                      <span className="profile-gear-name">{e ? gearName(id) : <i>— ว่าง —</i>}</span>
                       {e && <small>{describeEquip(id)}</small>}
+                      {e && <GearAffixLine gearKey={id} />}
                     </li>
                   );
                 })}

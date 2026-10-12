@@ -19,6 +19,7 @@ import {
   RECIPES_BY_ID,
   gatherSuccessChance,
   getItem,
+  recipeOutputName,
   masteryLevel,
   masteryProgress,
 } from "@/lib/world";
@@ -173,7 +174,7 @@ function CraftTab() {
       toast("warn", `พลาดในขั้นตอนสุดท้าย — เสียวัตถุดิบ · +${res.xpGained} ประสบการณ์`);
       return;
     }
-    toast("success", `สร้าง ${getItem(res.outputItemId)?.name ?? res.outputItemId}×${res.outputCount} · +${res.xpGained} ประสบการณ์`);
+    toast("success", `สร้าง ${res.outputName}×${res.outputCount} · +${res.xpGained} ประสบการณ์`);
   };
 
   return (
@@ -222,7 +223,6 @@ function RecipeRow({
   const required = recipe.requiredMastery ?? 1;
   const masteryOk = masteryLv >= required;
   const inputsOk = recipe.inputs.every((inp) => (inventory[inp.itemId] ?? 0) >= inp.count);
-  const out = getItem(recipe.output.itemId);
   const skillKey = recipe.skill;
 
   const successChance = recipe.usesDropCheck
@@ -277,7 +277,7 @@ function RecipeRow({
         })}
         <span className="text-muted-foreground">→</span>
         <span className="bg-amber-100 text-amber-900 px-1.5 py-0.5 rounded">
-          {out?.name ?? recipe.output.itemId} ×{recipe.output.count}
+          {recipeOutputName(recipe)} ×{recipe.output.count}
         </span>
       </div>
       {onCraft && (

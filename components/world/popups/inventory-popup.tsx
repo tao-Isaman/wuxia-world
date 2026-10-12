@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { Modal } from "@/components/ui/modal";
-import { SLOT_LABELS, STAT_LABEL, equipStatParts, getEquip } from "@/lib/game";
+import { SLOT_LABELS, STAT_LABEL, affixParts, equipStatParts, gearName, gearTierLabel, getEquip } from "@/lib/game";
+import { GearAffixList } from "@/components/game/gear-affixes";
 import type { EquipSlotType, Equipment } from "@/lib/game";
 import { ITEM_CATEGORIES, ITEM_CATEGORY_LABEL, LIFE_SKILL_LABEL, getItem, type ItemCategory } from "@/lib/world";
 import { useWorldStore } from "@/store/world-store";
@@ -71,11 +72,12 @@ export function InventoryPopup({ open, onClose }: Props) {
 
   const items = Object.entries(inventory).filter(([, n]) => n > 0);
   const bagEquipment = Object.entries(inventoryEquipment).filter(([, n]) => n > 0);
-  const equipped = (row: SlotRow) => {
+  // The worn piece's key (its options ride on it, lib/game/gear.ts) and its definition.
+  const equippedKey = (row: SlotRow): string | null => {
     const slot = player.equipment[row.type];
-    const id = Array.isArray(slot) ? slot[row.index ?? 0] : slot;
-    return getEquip(id);
+    return (Array.isArray(slot) ? slot[row.index ?? 0] : slot) ?? null;
   };
+  const equipped = (row: SlotRow) => getEquip(equippedKey(row));
   const categories = ITEM_CATEGORIES.filter((c) => items.some(([id]) => (getItem(id)?.category ?? "misc") === c));
   const shownItems = filter === "gear" ? [] : items.filter(([id]) => filter === "all" || (getItem(id)?.category ?? "misc") === filter);
   const shownGear = filter === "all" || filter === "gear" ? bagEquipment : [];
@@ -100,6 +102,7 @@ export function InventoryPopup({ open, onClose }: Props) {
     } else if (r.kind === "manualLearnSkill") message = "เรียนกระบวนท่าสำเร็จ · พร้อมใช้ทันที";
     else if (r.kind === "manualLearnArt") message = `เรียนลมปราณสำเร็จ · เริ่มที่ระดับ ${r.level}`;
     else if (r.kind === "learnMeridian") message = "เรียนรู้แผนภาพชีพจรสำเร็จ · เปิดจุดชีพจรได้ที่เมนูชีพจร";
+    else if (r.kind === "learnRecipe") message = "จำสูตรได้แล้ว · ไปสร้างได้ที่ร้านช่างแท็บ ประดิษฐ์";
     // The last one used: back to the bag, the result as a toast.
     if ((useWorldStore.getState().inventory[id] ?? 0) <= 0) {
       if (message) toast("success", message);
@@ -110,7 +113,7 @@ export function InventoryPopup({ open, onClose }: Props) {
     const r = equipFromBag(id);
     if (!r.ok) { toast("error", r.reason === "missing" ? "ไม่มีอุปกรณ์นี้ในย่าม" : "ติดตั้งไม่สำเร็จ"); return; }
     const swappedDef = r.swapped ? getEquip(r.swapped) : null;
-    toast("success", r.swapped ? `ติดตั้ง ${eq.n} (เก็บ ${swappedDef?.n ?? r.swapped} กลับย่าม)` : `ติดตั้ง ${eq.n}`);
+    toast("success", r.swapped ? `ติดตั้ง ${eq.n} (เก็บ ${swappedDef?.n ?? "ชิ้นเดิม"} กลับย่าม)` : `ติดตั้ง ${eq.n}`);
     setSelection(null);
   };
   const unequip = (row: SlotRow, eq: Equipment) => {
@@ -140,13 +143,14 @@ export function InventoryPopup({ open, onClose }: Props) {
             <div className="bag-doll-figure" aria-hidden="true"><CharacterPreview id={bodyId} animate /></div>
             {SLOT_ROWS.map((row) => {
               const eq = equipped(row);
+              const name = gearName(equippedKey(row));
               const key = `${row.type}-${row.index ?? "x"}`;
               return <div key={key} className="bag-doll-slot" style={{ gridArea: DOLL_AREA[key] }} data-slot={key}>
                 <ItemTile glyph={CATEGORY_GLYPH[row.type]} icon={equipmentIconUrl(eq?.id)} rarity={eq ? equipRarity(eq) : 0} dim={!eq}
-                  label={eq ? `${row.label}: ${eq.n}` : `${row.label}: ว่าง`}
+                  label={eq ? `${row.label}: ${name}` : `${row.label}: ว่าง`}
                   selected={isSelected({ kind: "slot", row })}
                   onClick={() => setSelection({ kind: "slot", row })} />
-                <span className="bag-gear-label">{eq ? eq.n : row.label}</span>
+                <span className="bag-gear-label">{eq ? name : row.label}</span>
               </div>;
             })}
           </div>
@@ -171,11 +175,12 @@ export function InventoryPopup({ open, onClose }: Props) {
               if (c.kind === "bagEquip") {
                 const eq = getEquip(c.id)!;
                 const rarity = equipRarity(eq);
-                return <div className="bag-cell">
+                const opts = affixParts(c.id);
+                return <div className="bag-cell" data-gear-key={c.id}>
                   <ItemTile glyph={CATEGORY_GLYPH[eq.ty]} icon={equipmentIconUrl(eq.id)} rarity={rarity} count={c.n}
-                    label={`${eq.n} ×${c.n}`} selected={isSelected({ kind: "bagEquip", id: c.id })}
+                    label={`${gearName(c.id)} ×${c.n}${opts.length ? ` · ${opts.join(" · ")}` : ""}`} selected={isSelected({ kind: "bagEquip", id: c.id })}
                     onClick={() => setSelection({ kind: "bagEquip", id: c.id })} />
-                  <span style={{ color: rarityColor(rarity) }} aria-hidden="true">{eq.n}</span>
+                  <span style={{ color: rarityColor(rarity) }} aria-hidden="true">{gearName(c.id)}</span>
                 </div>;
               }
               const def = getItem(c.id);
@@ -196,7 +201,7 @@ export function InventoryPopup({ open, onClose }: Props) {
           <div className="bag-popup" role="dialog" aria-label="รายละเอียดของ" onClick={(e) => e.stopPropagation()} aria-live="polite">
             <button type="button" className="bag-popup-close" aria-label="กลับไปที่ย่าม" onClick={() => setSelection(null)}>✕</button>
             <BagDetail selection={selection} inventory={inventory} inventoryEquipment={inventoryEquipment}
-              equipped={equipped} onUse={use} onEquip={equip} onUnequip={unequip} notice={lastUsed} />
+              equipped={equipped} equippedKey={equippedKey} onUse={use} onEquip={equip} onUnequip={unequip} notice={lastUsed} />
           </div>
         </div>
       )}
@@ -215,12 +220,13 @@ const DOLL_AREA: Record<string, string> = {
   "C-0": "c1", "B-x": "b", "C-1": "c2",
 };
 
-function BagDetail({ selection, inventory, inventoryEquipment, equipped, onUse, onEquip, onUnequip, notice }: {
+function BagDetail({ selection, inventory, inventoryEquipment, equipped, equippedKey, onUse, onEquip, onUnequip, notice }: {
   selection: Selection | null;
   notice: string | null;
   inventory: Record<string, number>;
   inventoryEquipment: Record<string, number>;
   equipped: (row: SlotRow) => Equipment | null | undefined;
+  equippedKey: (row: SlotRow) => string | null;
   onUse: (id: string) => void;
   onEquip: (id: string, eq: Equipment) => void;
   onUnequip: (row: SlotRow, eq: Equipment) => void;
@@ -245,9 +251,10 @@ function BagDetail({ selection, inventory, inventoryEquipment, equipped, onUse, 
     const eq = getEquip(selection.id);
     if (!eq || n <= 0) return <p className="bag-detail-hint">ไม่มีอุปกรณ์นี้ในย่ามแล้ว</p>;
     return <>
-      <h3 className="bag-detail-name" style={{ color: rarityColor(equipRarity(eq)) }}>{eq.n}</h3>
-      <p className="bag-detail-meta">{SLOT_LABELS[eq.ty]} · มี {n} ชิ้น</p>
+      <h3 className="bag-detail-name" style={{ color: rarityColor(equipRarity(eq)) }}>{gearName(selection.id)}</h3>
+      <p className="bag-detail-meta">{SLOT_LABELS[eq.ty]} · ชั้น{gearTierLabel(eq.ti)} · มี {n} ชิ้น</p>
       <ul className="bag-detail-stats">{equipStats(eq).map((stat) => <li key={stat}>{stat}</li>)}</ul>
+      <GearAffixList gearKey={selection.id} />
       <button type="button" className="pixel-action bag-detail-action" onClick={() => onEquip(selection.id, eq)}>ติดตั้ง</button>
     </>;
   }
@@ -257,9 +264,10 @@ function BagDetail({ selection, inventory, inventoryEquipment, equipped, onUse, 
     <p className="bag-detail-hint">ช่องว่าง — เลือกอุปกรณ์ในย่ามแล้วกดติดตั้ง</p>
   </>;
   return <>
-    <h3 className="bag-detail-name" style={{ color: rarityColor(equipRarity(eq)) }}>{eq.n}</h3>
-    <p className="bag-detail-meta">สวมอยู่ · {selection.row.label}</p>
+    <h3 className="bag-detail-name" style={{ color: rarityColor(equipRarity(eq)) }}>{gearName(equippedKey(selection.row))}</h3>
+    <p className="bag-detail-meta">สวมอยู่ · {selection.row.label} · ชั้น{gearTierLabel(eq.ti)}</p>
     <ul className="bag-detail-stats">{equipStats(eq).map((stat) => <li key={stat}>{stat}</li>)}</ul>
+    <GearAffixList gearKey={equippedKey(selection.row)} />
     <button type="button" className="bag-detail-action bag-detail-secondary" onClick={() => onUnequip(selection.row, eq)}>ถอด</button>
   </>;
 }

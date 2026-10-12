@@ -54,7 +54,7 @@ A reload during a battle restarts that battle from the start with the hero's sav
 | Hero | `playerBuild` (stats, slots, gear, learned skills and arts, levels, meridian charts `meridians`), `currentHp`, `currentMp`, `stamina`, `staminaMax` |
 | Where | `currentSceneId`, `lastLocationId`, `visitedLocationIds` |
 | Time | `day`, `time` (0 to below 12 ชั่วยาม): the world clock's, set on every action (`syncClock`) — saved so a reload shows where the hero was; `startDay` (v28): the world day the hero entered the jianghu (`startNewGame`) — progress that grows with the hero's own days (foe power, `playerPowerIndex`; the game-over day count) reads `daysInJianghu` = `day − startDay` (`lib/world/clock.ts`), never the world's `day` |
-| Money and bag | `gold`, `inventory` (item id → count), `inventoryEquipment` (gear id → count) |
+| Money and bag | `gold`, `inventory` (item id → count), `inventoryEquipment` (gear key → count; a key is the equipment id plus its enhancement and options, `eq_t1_w_sword~en:7,pa:6,cri:9`, [combat.md](combat.md#gear-options-libgamegearts)) |
 | Looks (v29) | `appearance`: `{ outfit, hideWeapon }` (the outfit worn, ซ่อนอาวุธ); `wardrobe`: the outfits bought from tailors (the others unlock from the save itself: sects, the tournament) — [design/appearance.md](design/appearance.md) |
 | Progress | `wExp`, `skillLevel`, `skillExp`, `artExp`, `meridianPoints`, `statExp`, `lifeSkillXp` (19 keys), `learnedRecipeIds` |
 | Story | `flags`, `quests` (id → `{ id, status, stage, acceptedDefeatedAt?, acceptedHasItemAt? }`), `traits`, `npcStates` |
@@ -200,7 +200,7 @@ What each version added. v1–v13 and v17→v18 are described in the comment abo
 **Bag and quests**
 
 11. Unknown item ids are dropped from `inventory`.
-12. Unknown gear ids are dropped from `inventoryEquipment`; counts become positive integers.
+12. Gear (`repairGear`, `lib/world/gear.ts`): unknown pieces are dropped from `inventoryEquipment` and the loadout, counts become positive integers, keys become canonical (options clamped), a piece from before options (fewer than its tier's least) gets them rolled — seeded by its key, so the browser and the server repair it alike — and a piece in the wrong slot type is taken off. No save version bump: keys are still strings.
 13. Unknown quest ids are dropped, and each quest's `stage` is clamped to its stage list.
 
 **Hero**

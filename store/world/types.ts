@@ -2,7 +2,7 @@
 // the result types the actions hand back to the UI.
 import type { StoreApi } from "zustand";
 import type { EquipSlotType, StatKey } from "@/lib/game";
-import type { LifeSkill, WorldStateData } from "@/lib/world";
+import type { EnhanceRefusal, LifeSkill, ReforgeRefusal, WorldStateData } from "@/lib/world";
 import type { ObjectiveResult } from "@/lib/world/quest-objectives";
 import type { GiftReaction } from "@/lib/world/gifts";
 
@@ -32,7 +32,12 @@ export type CraftResult =
   | {
       ok: true;
       recipeId: string;
-      outputItemId: string;
+      /** The item made (null for a gear recipe). */
+      outputItemId: string | null;
+      /** A gear recipe's piece, its options rolled (lib/game/gear.ts). */
+      outputEquipKey?: string;
+      /** What was made, in Thai. */
+      outputName: string;
       outputCount: number;
       xpGained: number;
       dropCheck: "passed" | "failed" | "none";
@@ -48,7 +53,19 @@ export type BuyRecipeResult =
 // equipment lands in `inventoryEquipment`, NOT directly in a slot.
 export type BuyEquipResult =
   | { ok: false; reason: "unknown" | "no-gold" }
+  // `equipId` is the bought piece's key, its options rolled (lib/game/gear.ts).
   | { ok: true; equipId: string; spent: number };
+
+// Result of an enhancement attempt (เสริมพลัง, lib/world/gear.ts): `key` is the
+// piece after it (null when it broke); `level` its enhancement now.
+export type EnhanceResult =
+  | { ok: false; reason: EnhanceRefusal | "no-artisan" | "no-build" | "not-owned" }
+  | { ok: true; outcome: "success" | "kept" | "down" | "broken"; before: string; key: string | null; level: number; stones: number };
+
+// Result of re-rolling a piece's options at a craft shop (lib/world/gear.ts).
+export type ReforgeResult =
+  | { ok: false; reason: ReforgeRefusal | "no-artisan" | "no-build" }
+  | { ok: true; before: string; key: string; material: string };
 
 // Result of equipping a bag item into a slot. `swapped` (when present)
 // is the id of the item that got pushed back into the bag.
@@ -90,7 +107,8 @@ export type UseItemResult =
     }
   | { ok: true; kind: "manualLearnSkill"; itemId: string; skillId: string }
   | { ok: true; kind: "manualLearnArt"; itemId: string; artId: string; level: number }
-  | { ok: true; kind: "learnMeridian"; itemId: string; chartId: string };
+  | { ok: true; kind: "learnMeridian"; itemId: string; chartId: string }
+  | { ok: true; kind: "learnRecipe"; itemId: string; recipeId: string };
 
 // Result of opening / upgrading a meridian point (openMeridianNode).
 export type OpenMeridianNodeResult = { ok: true; rank: number } | { ok: false; reason: string };
@@ -322,6 +340,14 @@ export interface WorldStore extends WorldStateData {
   // required for multi-slot types (BR / R / C) and ignored for the
   // single-slot ones (W / A / H / B).
   unequipFromSlot: (slotType: EquipSlotType, slotIdx?: 0 | 1) => UnequipResult;
+  // Re-roll a piece's options at the craft shop of its line here, for one
+  // หินศิลาวิเศษ / ด้ายศิลาวิเศษ, with the hero's craft at level 3 or more.
+  // `worn` names the slot when the piece is worn; else it comes from the bag.
+  reforgeGear: (key: string, worn?: { ty: EquipSlotType; idx: 0 | 1 }) => ReforgeResult;
+  // Enhance a piece one level (+1…+10) at a city craft shop of its line, for
+  // ศิลาเสริมพลัง, with the hero's craft at level 3 or more. A failure aiming
+  // at +6–8 drops it a level; at +9–10 it breaks and is gone.
+  enhanceGear: (key: string, worn?: { ty: EquipSlotType; idx: 0 | 1 }) => EnhanceResult;
 
   // Equip a learned skill or art into a specific slot. `rawId` follows
   // the slot encoding from `lib/game/slots.ts` — bare skill id or

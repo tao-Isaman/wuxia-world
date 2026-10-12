@@ -97,7 +97,8 @@ const PROF_BASIC_EQUIPMENT: Record<CraftProfession, readonly string[]> = {
     "eq_t1_a_leather", "eq_t1_h_leather", "eq_t1_b_leather", "eq_t1_br_leather",
   ],
   jewelry:   ["eq_t0_r_copper", "eq_t1_r_silver"],
-  accessory: ["eq_t0_c_cloth",  "eq_t1_c_wood"],
+  // The bamboo flute (an instrument: the music life skill needs one in the W slot).
+  accessory: ["eq_t0_c_cloth",  "eq_t1_c_wood", "W_flute"],
   alchemy:   [],
   chef:      [],
 };
@@ -139,6 +140,7 @@ const EQUIPMENT_PRICE: Record<string, number> = {
   eq_t1_br_iron:    180,
   eq_t1_r_silver:   320,
   eq_t1_c_wood:     280,
+  W_flute:          250,
 };
 
 // City × profession × specialty equipment. Mirrors CITY_SPECIALTIES for
@@ -163,6 +165,8 @@ const CITY_EQUIPMENT_SPECIALTIES: readonly {
   { city: "city_changan",  prof: "forge",     equipId: "eq_changan_br_iron", price: 460 },
   // Capital court accessory — imperial seal charm.
   { city: "city_capital",  prof: "accessory", equipId: "eq_capital_c_seal",  price: 780 },
+  // Suzhou's accessory maker strings the pipa — the finer instrument.
+  { city: "city_suzhou",   prof: "accessory", equipId: "W_pipa",            price: 900 },
 ];
 
 function specialtyEquipFor(
@@ -466,10 +470,30 @@ export function equipmentOfferedBy(
 
 // Internal type — narrows LifeSkill to the 6 craft professions used by
 // artisans. Keeps `accessory` etc. discoverable to the type system.
-type CraftProfession =
+export type CraftProfession =
   | "forge"
   | "alchemy"
   | "tailoring"
   | "chef"
   | "jewelry"
   | "accessory";
+
+// ─── Which craft line a piece belongs to ─────────────────────────────
+// The artisan who re-rolls a piece's options (lib/world/gear.ts): the
+// profession that sells it, else by slot — weapons forged, rings to the
+// jeweller, charms to the accessory maker, cloth and leather to the tailor,
+// metal (and every beast-won armour) to the forge.
+const SOLD_BY = new Map<string, CraftProfession>();
+for (const [prof, ids] of Object.entries(PROF_BASIC_EQUIPMENT) as [CraftProfession, readonly string[]][]) {
+  for (const id of ids) SOLD_BY.set(id, prof);
+}
+for (const s of CITY_EQUIPMENT_SPECIALTIES) SOLD_BY.set(s.equipId, s.prof);
+
+export function equipmentProfession(def: { id: string; n: string; ty: string }): CraftProfession {
+  const sold = SOLD_BY.get(def.id);
+  if (sold) return sold;
+  if (def.ty === "R") return "jewelry";
+  if (def.ty === "C") return "accessory";
+  if (def.ty === "W") return "forge";
+  return /ผ้า|หนัง|ไหม/.test(def.n) ? "tailoring" : "forge";
+}

@@ -3,6 +3,7 @@
 
 export * from "./types";
 export * from "./meridians";
+export * from "./gear";
 export {
   SCENES,
   SCENES_BY_ID,

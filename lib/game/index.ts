@@ -42,6 +42,8 @@ export {
   type MasteryMap,
   type StatBreakdown,
 } from "./derive";
+export * from "./gear";
+export { gearBaseId, EQUIP_STAT_SCALE, EQUIPMENT_BY_ID } from "./data";
 export * from "./meridian-types";
 export {
   MERIDIAN_RANK_MAX,
@@ -140,4 +142,4 @@ export {
   POWER_TIERS, powerBreakdown, powerScore, powerTier, powerTierOf, powerOutlook,
   type PowerTier, type PowerBreakdown, type PowerOutlook,
 } from "./power-tier";
-export { DERIVED_LABEL, equipStatParts, equipBonusParts } from "./stat-text";
+export { AFFIX_LABEL, DERIVED_LABEL, GEAR_TIER_LABEL, affixParts, affixText, enhanceParts, equipStatParts, equipBonusParts, gearName, gearTierLabel } from "./stat-text";

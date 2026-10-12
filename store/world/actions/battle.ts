@@ -1,6 +1,5 @@
 // The hand-off back from a battle: spoils and acknowledgeBattleResult.
-import { getArt, getSkill } from "@/lib/game";
-import { EQUIPMENT_BY_ID } from "@/lib/game/data/equipment";
+import { getArt, getEquip, getSkill } from "@/lib/game";
 import { STAT_XP_PER_ACTION } from "@/lib/world/stat-progression";
 import { useBattleStore } from "@/store/battle-store";
 import { cloudBattle, useCloudBattle } from "@/store/cloud-battle";
@@ -293,7 +292,7 @@ export const battleActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "c
       draft.inventoryEquipment = { ...draft.inventoryEquipment };
       for (const id of spoils.gear) {
         draft.inventoryEquipment[id] = (draft.inventoryEquipment[id] ?? 0) + 1;
-        lootSummary.push(EQUIPMENT_BY_ID.get(id)?.n ?? id);
+        lootSummary.push(getEquip(id)?.n ?? id);
       }
     }
     if (spoils.gold > 0) lootSummary.push(`${spoils.gold} ตำลึง`);

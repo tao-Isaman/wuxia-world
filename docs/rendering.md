@@ -396,7 +396,7 @@ A menu section opens as a full-screen **menu shell** (`components/ui/modal.tsx` 
 
 - **No scrolling, landscape columns.** A section opened with `<Modal fill>` takes the whole stage (`.hud-menu-panel--fill`, at most 700 px tall; on short screens its title hides — the tab names it). Its content is `.menu-cols > .menu-col` framed columns (`app/menu-layout.css`) with `.menu-tabs` for switching inside a column. Long collections use `PagedGrid` (`components/ui/paged-grid.tsx`): it measures its box, shows the cells that fit and pages the rest (◀ n/m ▶). `useShortScreen()` picks smaller cells on a phone. `.menu-col--scroll` is the last resort (the skill detail with its upgrade card).
 
-- The shell has a tab strip, a red ✕ and a titled parchment panel. Digits switch tabs and Esc closes.
+- The shell is the section alone: a titled parchment panel with a red ✕ in its top corner, no strip of the other sections above it (2026-10-12). The HUD's icons open a section; digits (and M) still switch sections from the keyboard, and Esc or a tap outside closes.
 - A modal opened inside the shell (a confirm) floats as a card.
 - Both are `role="dialog"`, so the map pauses.
 

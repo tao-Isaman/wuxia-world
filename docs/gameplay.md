@@ -455,7 +455,50 @@ Mastery levels 1–5 need 0 / 100 / 300 / 700 / 1500 xp.
 - **Manuals (47):** each teaches a skill or art if a stat is high enough — 0 / 10 / 15 / 20 / 30 for tiers 0–4, counting skills and arts but not gear.
 - **Quest items:** cannot be sold.
 
-**Gear (76 pieces).** Ten slots: weapon, armour, head, boots, two bracers, two rings, two charms. Gear from the bag is equipped in ย่าม, and a replaced piece goes back to the bag. Stats and effects are in [combat.md](combat.md).
+**Gear (76 pieces).** Ten slots: weapon, armour, head, boots, two bracers, two rings, two charms. Gear from the bag is equipped in ย่าม, and a replaced piece goes back to the bag. Stats and effects are in [combat.md](combat.md#equipment-equipment-libgamedataequipmentts--76); every piece's authored numbers count at half (`EQUIP_STAT_SCALE` = 0.5), and its random options make up the rest.
+
+**Options (ออฟชั่นเสริม, `lib/game/gear.ts`, `lib/world/gear.ts`).** Every piece gained (bought, or won from a legendary beast) rolls random options by its tier, and the bag, the profile, the shop and the spoils panel list them under the piece's stats. Each option's colour is how good its roll is, in the rarity colours: grey at the bottom of its range, then green, blue, purple, orange, and red-gold for the very top (`affixQuality`).
+
+| Tier (ชั้น) | Pieces | Options |
+| --- | --- | --- |
+| 0 ธรรมดา | the shops' starter roster, the old ×1 pieces | 0–1 |
+| 1 ดี | the shops' iron / leather / silver roster, the old ×2 pieces, ขลุ่ยไผ่ | 1–2 |
+| 2 ชั้นเลิศ | the city specialties, the old ×3 pieces, พิณยี่ห้อง | 1–3 |
+| 3 หายาก | crafted only: ดาบพิษ, เกราะมังกร, หมวกเทพ, รองเท้าลม, ปลอกแขนมังกร, แหวนปัญญา, ประดับชีวิตนิรันดร์ | 2–3 |
+| 4 ในตำนาน | beast gear ดาบมังกรเทพ, เกราะเทพ, มงกุฎมังกร, รองเท้าเทพ, ปลอกแขนเทพ, แหวนมังกร, ประดับมังกรเทพ | 3–4 |
+
+Every slot has a tier-4 piece from the legendary beasts (each beast 2–3 pieces, one of them 15 % per kill: งูยักษ์ แหวนมังกร / ประดับมังกรเทพ, พยัคฆ์ ดาบมังกรเทพ / ปลอกแขนเทพ, อินทรี ดาบมังกรเทพ / มงกุฎมังกร / แหวนมังกร, เต่า เกราะเทพ / ประดับมังกรเทพ, ปู เกราะเทพ / ปลอกแขนเทพ, กระทิง ดาบมังกรเทพ / รองเท้าเทพ) and a crafted tier-3 one. The two instruments are sold: ขลุ่ยไผ่ by every city's accessory maker (250), พิณยี่ห้อง by Suzhou's (900) — the music life skill needs one in the weapon slot.
+
+Each of the 17 kinds is equally likely, and a piece never rolls one kind twice:
+
+| Option | Range |
+| --- | --- |
+| a base stat (กำลัง … ฉลาด, random) | +1–10 |
+| ป้องกันกาย / ป้องกันใน / โจมตีกาย / โจมตีใน | +5–15 each |
+| ป้องกันกาย / ป้องกันใน / โจมตีกาย / โจมตีใน % (on the whole stat) | +1–10 % each |
+| แม่นยำ % / หลบหลีก % | +1–15 % each |
+| คริติคอล / ต้านทานคริติคอล | +5–15 each |
+| ความเสียหายคริติคอล (the ×1.5 crit becomes ×1.5 + v/100) | +1–10 % |
+| ประสบการณ์ยุทธที่ได้รับ (won fights and quest rewards) | +5–15 % |
+| a weapon family's moves (หมัด, กระบี่, ดาบ… random) hit harder | +5–25 % |
+| a weapon family's moves hurt the wearer less (capped at 60 % per family) | −5–25 % |
+
+A base-stat option counts in battle and everywhere stats are shown, but not for training gates (manuals, quest stat conditions).
+
+**Craft-only gear (`lib/world/data/gear-recipes.ts`).** Twenty-eight pieces are sold by no one and dropped by no foe: the old ×1–×3 sets (ดาบเหล็กสามัญ, ดาบทองคำ, ดาบเพลิง; เสื้อผ้าธรรมดา, เกราะหนัง, เกราะเหล็ก; the cloth, leather and iron hats, boots and bracers; แหวนทองเปล่า, แหวนพลัง, แหวนชีวิต; เหรียญโชคลาภ, ประดับเลือดมังกร, ประดับปัญญาสวรรค์) and every tier-3 piece. Each is made from its recipe at the craft shop of its line, with that craft at level 1 / 2 / 3 / 4 for tier 0 / 1 / 2 / 3, from common materials (iron ingots, leather, thread, ores, jade…) — a tier-3 piece also takes a legendary beast's trophy; a crafted piece rolls its options like any other. The recipe is what drops: a foe leaves a **สูตร…** item 5 % of wins (a legendary beast 25 %; not spars, the law or bouts) — tier-0 foes tier-0 recipes, tier 1 tiers 0–1, tier 2 tiers 1–2, tier 3 tiers 2–3, tier 4 and up (beasts too) tier 3 — preferring one the hero neither knows nor carries. Reading it (ย่าม → ใช้) adds it to the shop's ประดิษฐ์ tab; a known recipe is kept.
+
+**Enhancement (⚒ เสริมพลัง, +1 to +10).** At a **city** craft shop of the piece's line, with the hero's own craft at level 3+, for **ศิลาเสริมพลัง** (1 stone aiming at +1–5, 2 at +6–8, 3 at +9–10). Each level adds by the kind of piece, and the levels add up:
+
+| Piece | +1–5, each | +6–8, each | +9–10, each | at +10 |
+| --- | --- | --- | --- | --- |
+| weapon | พลังโจมตี +10 | พลังโจมตี +15, ความเสียหายสุดท้าย +1 % | พลังโจมตี +20, ความเสียหายสุดท้าย +4 % | +135, +11 % |
+| robe, hat, boots, bracers | ป้องกันกาย / ใน +10, HP +50 | +15, HP +100 | +20, HP +150 | +135 each, HP +850 |
+| charm | HP and MP +50 | +100 | +150 | +850 each |
+| ring | โจมตีกาย / ใน +5 | +10 | +15 | +85 each |
+
+Success odds by the level aimed at: +1 100 %, +2 95, +3 90, +4 85, +5 80, +6 65, +7 55, +8 45, +9 30, +10 20 %. A failure aiming at +1–5 costs only the stones; at +6–8 the piece drops a level; at +9–10 it breaks and is gone (the shop asks first). ความเสียหายสุดท้าย multiplies every hit the wearer lands, moves and art actives alike. The stones drop from tier-1-and-up foes (10 / 15 / 20 / 25 / 30 % for T1–T5, 1–3 of them) and always 2–4 from a legendary beast. An enhanced piece shows as "+7 ดาบ…"; a re-roll of its options keeps the level.
+
+**Re-rolling options (✦ สุ่มออฟชั่น).** The craft shop of the piece's own line re-rolls the whole set, on a worn piece or one in the bag: the forge (weapons, iron armour and every beast-won armour), the tailor (cloth, leather and silk), the jeweller (rings) and the accessory maker (charms). It needs the hero's own skill in that craft at **level 3** or more, and one magic material per roll: **หินศิลาวิเศษ** for weapons, rings and charms, **ด้ายศิลาวิเศษ** for robes, hats, boots and bracers. Both drop only from tier-3-and-up foes: tier 3 each 20 % (1), tier 4 30 % (1–2), tier 5 40 % (1–2), a legendary beast always 2–3 of each. Spars, the law and tournament bouts leave none.
 
 **Outfits and the weapon on the body** ([design/appearance.md](design/appearance.md)). The โปรไฟล์ window's **ชุด** tab is the wardrobe: each outfit shows the hero in it, carrying their weapon. An outfit changes only the look (never stats) and is a recolour of the hero's own drawing, so it shows on the map, in battle and in films, and other players see it online.
 

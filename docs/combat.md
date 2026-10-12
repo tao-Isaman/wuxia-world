@@ -82,12 +82,12 @@ A new world hero starts with every stat at 1 and a flat `baseHp` of 100 (so 136 
 
 ### Where the stats come from
 
-`statBreakdown(build)` splits a build's stats into five buckets; `combinedStats` = base + arts + skills + meridians (everything but equipment).
+`statBreakdown(build)` splits a build's stats into five buckets; `combinedStats` = base + arts + skills + meridians + gear options' base stats (`{ excludeEquipment: true }` leaves the last out: manuals and quest stat gates).
 
 1. **base** — `build.stats`.
 2. **fromArts** — the active art (`build.artId`) adds `floor(stat × artLevel/10 × conflict)` per stat; every other art in `learnedArtIds` adds the same with its own level (`artLevels[id] ?? 1`).
 3. **fromSkills** — every slotted skill and every learned skill (counted once) adds its `st` bonus × `bpMultiplier(level)` × conflict. A fresh level-1 skill gives half its listed stats; level 10 gives all.
-4. **fromEquipment** — the legacy `st` field of equipment. **Always zero**: every item has `st: {}` and `combinedStats` leaves equipment out on purpose.
+4. **fromEquipment** — the worn pieces' `stat` options (+1–10 each, [gear options](#gear-options-libgamegearts)); the legacy `st` field is always `{}`. Equipment's own numbers never reach base stats.
 5. **fromMeridians** — the base stats of every opened meridian point (ชีพจร, [below](#meridians-ชีพจร)), flat: no level or conflict scaling.
 
 `deriveAll(build)` then:
@@ -95,9 +95,10 @@ A new world hero starts with every stat at 1 and a flat `baseHp` of 100 (so 136 
 1. derives from `combinedStats`;
 2. adds art HP / MP: `floor(hL × level × conflict)` and `floor(mL × level × conflict)` for the active art and each learned art;
 3. adds the build's flat `baseHp` to HP (the world hero carries `HERO_BASE_HP` = 100 from `store/world-store.ts`, defined in `store/world/state.ts`; foes and /debug builds have none);
-4. adds equipment and meridian combat fields directly to the derived values (`getBuildBonus` = `getEquipBonus` + the meridian `combat` bonus): `Atk += atkb`, `PD += pdb`, `ID += idb`, `HP += hpb`, `MP += mpb`, `PA += pab`, `IA += iab`, `Spd += spdb`, `Acc += accb`, `Res += resb`, `Cri += crib + flat_cri`, `Eva += evab + flat_eva`.
+4. adds equipment and meridian combat fields directly to the derived values (`getBuildBonus` = `getEquipBonus` + the meridian `combat` bonus): `Atk += atkb`, `PD += pdb`, `ID += idb`, `HP += hpb`, `MP += mpb`, `PA += pab`, `IA += iab`, `Spd += spdb`, `Acc += accb`, `Res += resb`, `Cri += crib + flat_cri`, `Eva += evab + flat_eva` — plus the options' flats (`pd`, `id`, `pa`, `ia`, `cri`, `res`);
+5. multiplies by the options' percentages, after every flat: `PD × (1 + pd_pct/100)`, and the same for `ID`, `PA`, `IA`, `Acc`, `Eva` (rounded).
 
-`pct_atk`, `pct_reduce` / `pct_red` and `hp_regen` (equipment and meridians) are not folded into `Derived`; the battle reads them from `ctx.equipBonus`, which `makeContext` fills with `getBuildBonus(build)` — so 1v1, grid duels (`pairContext`) and the grid AI's damage estimate all see meridians.
+`pct_atk`, `pct_reduce` / `pct_red`, `hp_regen` and the options' `crit_dmg` and `wexp` are not folded into `Derived`; the battle reads them from `ctx.equipBonus`, which `makeContext` fills with `getBuildBonus(build)` — so 1v1, grid duels (`pairContext`) and the grid AI's damage estimate all see meridians.
 
 ### Meridians (ชีพจร)
 
@@ -459,11 +460,24 @@ Per slot: W 21 · A 10 · H 9 · B 9 · BR 10 · R 8 · C 9. A loadout has 10 sl
 | Field | Meaning |
 | --- | --- |
 | `id`, `n`, `ty` | id, Thai name, slot type |
+| `ti` | tier 0–4: how many options it rolls ([below](#gear-options-libgamegearts)) |
 | `atkb`, `pdb`, `idb`, `hpb`, `mpb` | direct boosts (required) |
 | `pab?`, `iab?`, `spdb?`, `evab?`, `accb?`, `crib?`, `resb?` | direct boosts (optional) |
 | `st` | legacy base-stat boost — **ignored**, keep `{}` |
 | `eff` | equipment effect or `null` |
 | `instrument?` | a musical instrument (the music life skill needs one in the W slot) |
+
+The table keeps the authored numbers; `EQUIPMENT` is built from it with every boost and effect value × `EQUIP_STAT_SCALE` (0.5, rounded).
+
+### Gear options (`lib/game/gear.ts`)
+
+An owned piece is a **key**: the equipment id, then its options — `eq_t1_w_sword~pa:6,fam_dmg:sword:15` (a bare id has none). The bag, the loadout, the battle build and the save all hold keys; `getEquip(key)` / `gearBaseId` strip the options, `parseGear(key)` reads them, clamping each value to its range, one per kind, at most the tier's count, so an edited key is never stronger than a lucky roll.
+
+- **Rolls** (`rollGearAffixes(ti, rand)`, `rollGearKey`): a count in `GEAR_AFFIX_COUNT` (T0 0–1, T1 1–2, T2 1–3, T3 2–3, T4 3–4), then distinct kinds, each equally likely, values uniform in `GEAR_AFFIX_RANGE`. `affixQuality` ranks a value 0–5 by its place in the range (the UI colours it).
+- **Kinds:** `stat` (+1–10 to one base stat), `pd` / `id` / `pa` / `ia` (+5–15), `pd_pct` / `id_pct` / `pa_pct` / `ia_pct` (+1–10 %), `acc_pct` / `eva_pct` (+1–15 %), `cri` / `res` (+5–15), `crit_dmg` (+1–10 %), `wexp` (+5–15 %), `fam_dmg` / `fam_red` (+5–25 %, one weapon family).
+- **In battle:** `EquipBonus` carries `pd_pct`… `eva_pct`, `crit_dmg` and `wexp`; `critMultiplier(equip)` = `CRIT_MULTIPLIER` + `crit_dmg`/100. `gearFamilyMods(loadout)` (in the context as `ctx.gearFamily`) multiplies a move's raw damage by `(1 + attacker fam_dmg[w]/100) × (1 − defender fam_red[w]/100)`, the reduction capped at `GEAR_FAMILY_REDUCE_CAP` (60) per family (`familyDamageMod`; art actives have no family). The grid AI's estimate uses both.
+- **Enhancement** (`en:N` in the key, 0–`ENHANCE_MAX` 10; `enhanceBonus(ty, level)` sums `ENHANCE_STEP` by kind and band — weapon Atk + `final_dmg`, armour PD + ID + HP, charm HP + MP, ring PA + IA). `getEquipBonus` adds it; `final_dmg` (`finalDamageMod`) multiplies a move's raw damage and an art active's hit, and the grid AI's estimate.
+- **In the world** (`lib/world/gear.ts`): `gainGear` rolls a gained piece, `rerollGear` / store `reforgeGear` re-roll at a shop (keeping the enhancement), `enhanceCheck` / `rollEnhance` / store `enhanceGear` enhance at a city shop, `rollSpiritMaterials` drops the materials, `wExpWithGear` raises w-exp, `repairGear` fixes saves ([gameplay.md](gameplay.md#items-and-equipment)).
 
 ## Battle log
 

@@ -190,3 +190,5 @@ body:has(.hud-menu, .game-modal) [data-radix-popper-content-wrapper] > * { borde
 .battle-arena .combat-actions-wrap { align-items: start; }
 .battle-arena .combat-action-detail { align-self: start; }
 .encounter-portrait { border-radius: 4px; }
+/* The options box stays a dark lacquer panel on parchment, so the rarity colours read. */
+.gear-affixes { background: #2a1f38; border-color: #6b4f93; }

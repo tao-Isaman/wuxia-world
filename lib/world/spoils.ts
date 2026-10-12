@@ -12,6 +12,8 @@ import { isLawOpponent } from "./law";
 import { rollMeridianLoot } from "./meridians";
 import { getBoss } from "./data/bosses";
 import { dropsGold, moveXpMultiplier, victoryWExp } from "./victory";
+import { ENHANCE_STONE, rollEnhanceStones, rollRecipeDrop, rollSpiritMaterials, wExpWithGear } from "./gear";
+import { rollGearKey } from "../game";
 
 /** Battle xp per use of a move skill / an inner art in a won fight (store/world/rules.ts re-exports these). */
 export const SKILL_USE_XP = 20;
@@ -25,7 +27,7 @@ export interface VictorySpoils {
   moves: { id: string; kind: "skill" | "art"; xp: number }[];
   /** A hunt's carcass roll (null when the fight was no hunt). */
   hunt: { items: { itemId: string; count: number }[]; passed: boolean } | null;
-  /** Equipment ids won (a legendary beast's rare drop); they go to the gear bag. */
+  /** Pieces won (a legendary beast's rare drop), as keys with their options rolled; they go to the gear bag. */
   gear?: string[];
   /** A party member stood on the same map (online play): w-exp and move xp are already raised for it. */
   partyBonus?: boolean;
@@ -64,7 +66,17 @@ export function rollVictorySpoilsFrom(
     const boss = opp?.boss ? getBoss(opp.id) : null;
     if (boss) {
       items[boss.trophyItemId] = (items[boss.trophyItemId] ?? 0) + 1;
-      if (boss.gear.length && Math.random() < boss.gearChance) gear.push(boss.gear[Math.floor(Math.random() * boss.gear.length)]!);
+      if (boss.gear.length && Math.random() < boss.gearChance) gear.push(rollGearKey(boss.gear[Math.floor(Math.random() * boss.gear.length)]!));
+    }
+    // Tier-3-and-up foes carry the magic materials that re-roll gear options
+    // (not a spar's partner or the law's men).
+    if (!s.pendingSpar && !pb.nonFatal && !isLawOpponent(pb.opponentId)) {
+      for (const it of rollSpiritMaterials(opp)) items[it.itemId] = (items[it.itemId] ?? 0) + it.count;
+      const stones = rollEnhanceStones(opp);
+      if (stones > 0) items[ENHANCE_STONE] = (items[ENHANCE_STONE] ?? 0) + stones;
+      // A craft-only piece's recipe (data/gear-recipes.ts).
+      const recipe = rollRecipeDrop(opp, s);
+      if (recipe) items[recipe] = (items[recipe] ?? 0) + 1;
     }
     if (!s.pendingSpar && !pb.nonFatal && !isLawOpponent(pb.opponentId) && dropsGold(opp)) {
       const [min, max] = FOE_GOLD[Math.max(0, Math.min(5, opp?.ti ?? 0))];
@@ -84,7 +96,7 @@ export function rollVictorySpoilsFrom(
   let hunt: VictorySpoils["hunt"] = null;
   const res = s.pendingHuntYield ? getResource(s.pendingHuntYield.resourceId) : null;
   if (res) hunt = rollResourceYield(res, masteryLevel(s.lifeSkillXp[res.skill] ?? 0));
-  return { gold, wExp: victoryWExp(opp), items: Object.entries(items).map(([itemId, count]) => ({ itemId, count })), moves, hunt, gear };
+  return { gold, wExp: wExpWithGear(s.playerBuild, victoryWExp(opp)), items: Object.entries(items).map(([itemId, count]) => ({ itemId, count })), moves, hunt, gear };
 }
 
 // Roll loot from an opponent's drop table. Picks count is per-tier:

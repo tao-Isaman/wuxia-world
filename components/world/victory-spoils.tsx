@@ -1,11 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { getArt, getSkill } from "@/lib/game";
+import { getArt, getEquip, getSkill } from "@/lib/game";
+import { GearAffixList } from "@/components/game/gear-affixes";
 import { plainThai } from "@/lib/game/skill-text";
 import { ITEM_CATEGORY_LABEL, getItem } from "@/lib/world";
 import { GOLD_ICON_URL, equipmentIconUrl, itemIconUrl } from "@/lib/world/data/item-icons";
-import { EQUIPMENT_BY_ID } from "@/lib/game/data/equipment";
 import { itemRarity, rarityColor } from "@/lib/ui/rarity";
 import { CATEGORY_GLYPH, ItemTile } from "@/components/ui/wuxia/item-tile";
 import { ArtIcon, SkillIcon } from "@/components/game/skill-icon";
@@ -57,7 +57,7 @@ export function VictorySpoils() {
           </span>;
         })}
         {(spoils.gear ?? []).map((id) => {
-          const gear = EQUIPMENT_BY_ID.get(id);
+          const gear = getEquip(id);
           return <span role="listitem" className="gb-spoil" key={`gear:${id}`}>
             <ItemTile glyph="🛡" icon={equipmentIconUrl(id)} rarity={5} label={gear?.n ?? id}
               selected={picked?.kind === "gear" && picked.id === id} onClick={() => setPicked({ kind: "gear", id })} />
@@ -97,8 +97,8 @@ function SpoilDetail({ picked, onClose }: { picked: Picked; onClose: () => void 
     meta = `${ITEM_CATEGORY_LABEL[def?.category ?? "misc"]}${def?.price ? ` · ราคา ${def.price}` : ""}`;
     body = <>{def?.description && <p>{def.description}</p>}<div className="gb-spoil-effects"><ItemEffects effect={def?.use} battle={def?.battle} /></div></>;
   } else if (picked.kind === "gear") {
-    title = EQUIPMENT_BY_ID.get(picked.id)?.n ?? picked.id; meta = "อุปกรณ์"; color = rarityColor(5);
-    body = <p>อุปกรณ์ชั้นยอดจากสัตว์ในตำนาน เก็บเข้าถุงอุปกรณ์แล้ว</p>;
+    title = getEquip(picked.id)?.n ?? picked.id; meta = "อุปกรณ์"; color = rarityColor(5);
+    body = <><p>อุปกรณ์ชั้นยอดจากสัตว์ในตำนาน เก็บเข้าถุงอุปกรณ์แล้ว</p><GearAffixList gearKey={picked.id} /></>;
   } else {
     const skill = picked.move === "skill" ? getSkill(picked.id) : undefined;
     const art = picked.move === "art" ? getArt(picked.id) : undefined;
