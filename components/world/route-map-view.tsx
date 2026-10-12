@@ -1,7 +1,7 @@
 "use client";
 import type { RouteMapDef, RouteScene } from "@/lib/world";
 import { navigationGuide, evaluateCondition, guideMarkerId, playerBodySprite, routeBackTarget } from "@/lib/world";
-import { useWorldStore, TRAVEL_STAMINA_COST } from "@/store/world-store";
+import { useWorldStore } from "@/store/world-store";
 import { WorldCanvas } from "@/components/game/world-canvas";
 import { setArrivalFrom, type WorldMarker } from "@/lib/stage/types";
 import { toast } from "@/store/toast-store";
@@ -15,24 +15,23 @@ const facingOf = (dir: RouteMapDef["direction"]) =>
 export function RouteMapView({ scene, map }: { scene: RouteScene; map: RouteMapDef }) {
   const state = useWorldStore();
   const visible = scene.destinations.filter((d) => !d.visibleIf || evaluateCondition(state, d.visibleIf));
-  const tired = state.stamina < TRAVEL_STAMINA_COST;
   // route_<source>__to__<destination>: the place this road starts from.
   const source = scene.id.startsWith("route_") ? scene.id.slice("route_".length).split("__to__")[0] : null;
   const markers: WorldMarker[] = visible.map((destination, index) => ({
     id: "destination-" + index, label: destination.label, kind: "exit",
-    ...(map.destSlots[index] ?? { x: 15 + index * 12 % 70, y: 24 }), disabled: tired,
+    ...(map.destSlots[index] ?? { x: 15 + index * 12 % 70, y: 24 }),
     onActivate: () => {
       const current = useWorldStore.getState();
-      if (!current.canTravelTo(destination.locationId)) { toast("warn", "พลังไม่พอสำหรับการเดินทาง"); return; }
+      if (!current.canTravelTo(destination.locationId)) { toast("warn", "ยังเดินทางไม่ได้ในตอนนี้"); return; }
       if (source) setArrivalFrom(destination.locationId, source);
       current.travelRoute(destination.locationId);
     },
   }));
   const back = routeBackTarget(state, scene);
-  if (back) markers.push({ id: "back", ...map.back, kind: "exit", label: "ย้อนกลับ", disabled: tired,
+  if (back) markers.push({ id: "back", ...map.back, kind: "exit", label: "ย้อนกลับ",
     onActivate: () => {
       const current = useWorldStore.getState();
-      if (!current.canTravelTo(back)) { toast("warn", "พลังไม่พอสำหรับการเดินทาง"); return; }
+      if (!current.canTravelTo(back)) { toast("warn", "ยังเดินทางไม่ได้ในตอนนี้"); return; }
       const ahead = visible[0]?.locationId;
       if (ahead) setArrivalFrom(back, ahead);
       current.gotoScene(back);

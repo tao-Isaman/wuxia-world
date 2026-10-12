@@ -49,7 +49,7 @@ test("exploration: movement, menu pause, travel, NPC and save reload", async ({ 
   }).toBe(true);
   if ((await save(page)).pendingEncounter) await page.getByRole("button", { name: /หนี/ }).click();
   else if ((await save(page)).currentSceneId !== "city_capital") await page.getByRole("button", { name: "ปิด", exact: true }).click();
-  expect((await save(page)).stamina).toBe(80);
+  expect((await save(page)).stamina).toBe(100); // travel costs no stamina
   await expect(world).toHaveAttribute("data-ready", "true");
   await page.screenshot({ path: "test-results/screenshots/capital-desktop.png" });
   await page.getByRole("button", { name: /จุดหมาย/ }).click();

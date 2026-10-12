@@ -9,7 +9,7 @@ import { reviveFromDeath } from "./lifecycle";
 import { ACTION_LOG_MAX, HERO_BASE_HP, STARTER_STAMINA, emptyData, emptyLifeSkillXp, emptyStatExp, emptyTraits } from "./state";
 import type { WorldStore } from "./types";
 import { SHARED_WORLD_KEYS, type SharedWorldKey } from "@/lib/world/shared/world";
-import { rebaseDays } from "@/lib/world/shared/rebase";
+import { rebaseDays, rewindSaveToClock } from "@/lib/world/shared/rebase";
 import { worldNow } from "@/lib/world/clock";
 
 // Content backfill also runs for current-version saves (migrate does not).
@@ -18,6 +18,11 @@ import { worldNow } from "@/lib/world/clock";
 // attachSharedWorld, store/world/shared-local.ts); add only missing lore and
 // people.
 export function mergeSave(persisted: unknown, current: WorldStore): WorldStore {
+  // A save from before the world clock was moved back (a world restart,
+  // WORLD_EPOCH_MS) is rewound to today with all its stamps.
+  if (persisted && typeof persisted === "object" && (persisted as Partial<WorldStateData>).hasGame) {
+    rewindSaveToClock(persisted as Partial<WorldStateData>, worldNow().day);
+  }
   const merged = { ...current, ...(persisted as Partial<WorldStateData>) };
   // A save that still carries world fields (an older save, migrated, or one
   // edited by hand) hands them to the world when it joins.

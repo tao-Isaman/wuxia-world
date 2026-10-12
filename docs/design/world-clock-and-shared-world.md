@@ -24,7 +24,7 @@ Decisions (from the brief):
 ## 1. The clock (`lib/world/clock.ts`, pure)
 
 ```ts
-export const WORLD_EPOCH_MS: number;    // 2026-10-08 00:00 Asia/Bangkok = world day 1, ชั่วยาม 0
+export const WORLD_EPOCH_MS: number;    // 2026-10-13 00:00 Asia/Bangkok = world day 1, ชั่วยาม 0 (2026-10-08 before the restart; older stamps rewind on load)
 export const MS_PER_DAY = 3_600_000;    // one real hour
 export const MS_PER_HOUR = 300_000;     // one ชั่วยาม (12 per day)
 export function worldTimeAt(ms: number): { day: number; time: number };   // time 0 ≤ t < 12, fractional
@@ -61,7 +61,7 @@ export function formatWait(fromStamp: number, toStamp: number): string;  // "อ
 | Gathering, crafting, work, place activities, quest objective spots | 0.2–6 ชั่วยาม | instant; stamina `5 × ชั่วยาม` the action used to take (a minimum of 2) |
 | Practice | 6 ชั่วยาม + 30 stamina | 30 stamina |
 | Fights | 0.5 ชั่วยาม + 5 stamina | 5 stamina |
-| Walking between a place and a road | 1–2 ชั่วยาม + 10 stamina | 10 stamina |
+| Walking between a place and a road | 1–2 ชั่วยาม + 10 stamina | free (since 2026-10-12) |
 | Horse station ride | gold + hours | gold, instant |
 | Death | wake at home the next day | wake at home at once |
 | Jail | 2 days per mark (≤ 30) | 1 ชั่วยาม per mark (≤ 12 = 1 real hour), served in real time; labour takes 2 ชั่วยาม off, a failed escape adds 2, meditation once per 3 ชั่วยาม; bribe and escape stay; the gate opens once served |

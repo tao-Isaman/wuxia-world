@@ -8,6 +8,7 @@ import { seedLiveness } from "@/lib/world/npc-life";
 import { seedLoreRumors } from "@/lib/world/rumor-engine";
 import { worldNow } from "@/lib/world/clock";
 import { newWorldSeed } from "@/lib/world/shared/rng";
+import { rewindWorldToClock } from "@/lib/world/shared/rebase";
 import { takeCarriedWorldKeys } from "./persist";
 import { PLAYER_FROM_WORLD_KEYS, SHARED_WORLD_KEYS, sameWorld, sharedSlice, type SharedWorld, type WorldService } from "@/lib/world/shared/world";
 
@@ -52,6 +53,8 @@ export const localWorldService: WorldService = {
  * lacks keep the state's values.
  */
 export function joinSharedWorld(state: WorldStateData, stored: Partial<SharedWorld> | null, keep: readonly string[] = []): void {
+  // A world stored on the old clock (WORLD_EPOCH_MS moved later) rewinds to today.
+  if (stored) rewindWorldToClock(stored as Partial<WorldStateData>, worldNow().day);
   if (stored) takePlayerFields(state, stored as Partial<WorldStateData>);
   if (stored) {
     for (const key of SHARED_WORLD_KEYS) {

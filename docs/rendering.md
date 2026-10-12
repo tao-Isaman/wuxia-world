@@ -208,7 +208,7 @@ Anything that does not fit is listed in the **"อื่น ๆ ในบริ�
 | NPCs | `npc-<id>` | registry and scene NPCs at `npcSpots`, with a quest mark `offer` / `turnin` |
 | services | `service-<i>` | shop, sectHall, artisan, rest, rumor, practice, resource, activity |
 | quest objective spots | `objective-<quest>-<i>` | 🔍, placed on free ground near the spawn |
-| exits | `route_<scene>__to__<to>` | disabled below 10 stamina |
+| exits | `route_<scene>__to__<to>` | free; closed only while a jail sentence runs |
 
 One marker gets `guide: true` from `activeGuide` / `guideMarkerId`. While a dialog is shown, the markers and the hour are frozen.
 

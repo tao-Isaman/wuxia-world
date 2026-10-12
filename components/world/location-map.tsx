@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import type { ArtisanDef, LocationMapDef, LocationScene, MapSpot, NpcDef } from "@/lib/world";
 import { npcPresent, navigationGuide, evaluateCondition, guideMarkerId, objectiveMarkerId, objectiveSpotsAt, objectiveSpotsForNpc, getArtisan, isQuestOfferable, isQuestTurnInForNpc, getResource, getScene, getSectHallAt, getShopAt, npcBodySprite, npcPixelSprite, playerBodySprite } from "@/lib/world";
 import { heldQuests, npcsAt, predecessorsOf } from "@/lib/world/npc-life";
-import { useWorldStore, TRAVEL_STAMINA_COST } from "@/store/world-store";
+import { useWorldStore } from "@/store/world-store";
 import { getActivity } from "@/lib/world/data/activities";
 import { toast } from "@/store/toast-store";
 import { WorldCanvas } from "@/components/game/world-canvas";
@@ -167,9 +167,9 @@ export function LocationMap({ scene, map, handlers, readOnly = false, dialogueSp
       (!other.visibleIf || evaluateCondition(state, other.visibleIf)));
     const label = duplicateLabel && destination?.kind === "location" ? `${route.label} · ${destination.name}` : route.label;
     markers.push({ id: routeId, x: exit.x, y: exit.y, label, kind: "exit",
-      disabled: state.stamina < TRAVEL_STAMINA_COST, onActivate: () => {
+      onActivate: () => {
         const current = useWorldStore.getState();
-        if (!current.canTravelTo(routeId)) { toast("warn", "พลังไม่พอสำหรับการเดินทาง"); return; }
+        if (!current.canTravelTo(routeId)) { toast("warn", "ยังเดินทางไม่ได้ในตอนนี้"); return; }
         forgetMapPosition(scene.id);
         forgetMapPosition(routeId); // a road always starts at its near end
         current.gotoScene(routeId);

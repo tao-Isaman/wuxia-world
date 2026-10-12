@@ -200,21 +200,17 @@ check("non-fatal defeat leaves one HP; a fatal one wakes the hero at home poorer
 });
 SCENES_BY_ID.set(route.id, route);
 SCENES_BY_ID.set("__runtime_location", { id: "__runtime_location", kind: "location", name: "Test", description: "", npcs: [], routes: [] });
-check("route effects and travel cost are committed together", () => {
-  useWorldStore.setState({ currentSceneId: route.id, stamina: 100, gold: 0, traits: { ...useWorldStore.getState().traits, good: 0 } });
+check("route effects are committed and travel costs no stamina, even when the hero is spent", () => {
+  useWorldStore.setState({ currentSceneId: route.id, stamina: 0, gold: 0, traits: { ...useWorldStore.getState().traits, good: 0 } });
   useWorldStore.getState().travelRoute("__runtime_location");
   const state = useWorldStore.getState();
   assert.equal(state.currentSceneId, "__runtime_location");
-  assert.equal(state.stamina, 90);
+  assert.equal(state.stamina, 0);
   assert.equal(state.gold, 13);
   assert.equal(state.traits.good, 7);
 });
-check("unaffordable, hidden and unknown route destinations have no effects", () => {
-  useWorldStore.setState({ currentSceneId: route.id, stamina: 0, gold: 0 });
-  useWorldStore.getState().travelRoute("__runtime_location");
-  assert.equal(useWorldStore.getState().gold, 0);
-  assert.equal(useWorldStore.getState().currentSceneId, route.id);
-  useWorldStore.setState({ stamina: 100 });
+check("hidden and unknown route destinations have no effects", () => {
+  useWorldStore.setState({ currentSceneId: route.id, stamina: 100, gold: 0 });
   route.destinations[0].visibleIf = { t: "flag", flag: "__never_true", equals: true };
   useWorldStore.getState().travelRoute("__runtime_location");
   useWorldStore.getState().travelRoute("city_capital");

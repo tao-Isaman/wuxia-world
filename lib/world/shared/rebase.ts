@@ -7,6 +7,11 @@ import type { WorldStateData } from "../types";
 import { HOURS_PER_DAY } from "../clock";
 import { JAIL_MAX_HOURS } from "../law";
 
+/** Flags holding an absolute ชั่วยาม (store/world/actions/life.ts). */
+const HOUR_FLAGS: readonly string[] = ["_restAt", "_jailMeditateAt"];
+/** Flags (by prefix) holding a day (lib/world/feuds.ts). */
+const DAY_FLAG_PREFIXES: readonly string[] = ["feud:"];
+
 const shiftRecord = (rec: Record<string, number> | undefined, offset: number): Record<string, number> =>
   Object.fromEntries(Object.entries(rec ?? {}).map(([k, v]) => [k, typeof v === "number" ? v + offset : v]));
 
@@ -27,6 +32,14 @@ export function rebaseDays(p: Partial<WorldStateData>, offset: number): void {
     const nowHours = p.day * HOURS_PER_DAY + (p.time ?? 0);
     const left = p.jailUntil + offset * HOURS_PER_DAY - nowHours;
     p.jailUntil = nowHours + Math.max(0, Math.min(JAIL_MAX_HOURS, left));
+  }
+  // Flags that hold a clock stamp: rest / jail meditation (ชั่วยาม), feuds (days).
+  if (p.flags) {
+    p.flags = Object.fromEntries(Object.entries(p.flags).map(([k, v]) => [k,
+      typeof v !== "number" ? v
+        : HOUR_FLAGS.includes(k) ? v + offset * HOURS_PER_DAY
+        : DAY_FLAG_PREFIXES.some((pre) => k.startsWith(pre)) ? v + offset
+        : v]));
   }
   p.giftDays = shiftRecord(p.giftDays, offset);
   p.letterDays = shiftRecord(p.letterDays, offset);
@@ -65,4 +78,26 @@ export function rebaseDays(p: Partial<WorldStateData>, offset: number): void {
     }]));
   }
   p.tournament = null;
+}
+
+/**
+ * When the world clock has been moved back (WORLD_EPOCH_MS set later, as at a
+ * restart of the world), a save stamped on the old clock reads a day after
+ * today. Shift it back so its day is today (rebaseDays); every cooldown keeps
+ * the time it had left. Returns whether it moved. Idempotent.
+ */
+export function rewindSaveToClock(p: Partial<WorldStateData>, today: number): boolean {
+  if (typeof p.day !== "number" || !(p.day > today)) return false;
+  rebaseDays(p, today - p.day);
+  return true;
+}
+
+/**
+ * The same for a stored shared world (no `day` of its own: its NPC week
+ * stamp `lastNpcTickDay` stands for it). Returns whether it moved.
+ */
+export function rewindWorldToClock(world: Partial<WorldStateData>, today: number): boolean {
+  if (typeof world.lastNpcTickDay !== "number" || !(world.lastNpcTickDay > today)) return false;
+  rebaseDays(world, today - world.lastNpcTickDay);
+  return true;
 }

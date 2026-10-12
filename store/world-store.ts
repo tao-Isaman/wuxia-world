@@ -32,7 +32,7 @@ import { questsActions } from "./world/actions/quests";
 import { SAVE_VERSION } from "./world/save-version";
 
 export { MERIDIAN_POINTS_PER_LEVEL } from "./world/progression";
-export { TRAVEL_STAMINA_COST, REST_COOLDOWN_HOURS, SPAR_WIN_SCENE_ID, SPAR_LOSE_SCENE_ID, PRACTICE_STAMINA_COST, PRACTICE_HOURS } from "./world/rules";
+export { REST_COOLDOWN_HOURS, SPAR_WIN_SCENE_ID, SPAR_LOSE_SCENE_ID, PRACTICE_STAMINA_COST, PRACTICE_HOURS } from "./world/rules";
 export { HERO_BASE_HP } from "./world/state";
 export type { GatherResult, CraftResult, BuyRecipeResult, BuyEquipResult, EquipResult, UnequipResult, UseItemResult, OpenMeridianNodeResult, PracticeMusicResult, LevelUpSkillResult, LevelUpArtResult, ForgetSkillResult, ForgetArtResult, PracticeResult, BuyResult, SellResult, BuyOfferResult, SparResult, QuestActionResult, BadActionResult, VictorySpoils, RestKind, RestResult, ActivityResult, RoamingFoe } from "./world/types";
 export type { WorldStore } from "./world/types";

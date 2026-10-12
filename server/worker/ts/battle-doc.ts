@@ -58,7 +58,7 @@ export function stageBattle(
   if (opponent.boss) {
     const boss = getBoss(opponent.id);
     const fell = bosses[opponent.id];
-    if (boss && typeof fell === "number" && worldNow().day - fell < boss.respawnDays) return { error: "boss_resting" };
+    if (boss && typeof fell === "number" && fell <= worldNow().day && worldNow().day - fell < boss.respawnDays) return { error: "boss_resting" };
   }
   // The state as the browser's would be: every field present (an old save may lack some).
   const state = { ...emptyData(), ...save } as WorldStateData;

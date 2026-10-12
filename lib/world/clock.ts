@@ -4,8 +4,13 @@
 // store reads `now()` and sets `state.day` / `state.time` from it (syncClock);
 // no action pushes time forward any more.
 
-/** World day 1, ชั่วยาม 0: 2026-10-08 00:00 Asia/Bangkok. */
-export const WORLD_EPOCH_MS = Date.UTC(2026, 9, 7, 17, 0, 0);
+/**
+ * World day 1, ชั่วยาม 0: 2026-10-13 00:00 Asia/Bangkok (the world restarted
+ * with the server's data generation 3; it began on 2026-10-08 before).
+ * Moving it later rewinds every save and world stamped on the old clock
+ * (rewindSaveToClock / rewindWorldToClock, lib/world/shared/rebase.ts).
+ */
+export const WORLD_EPOCH_MS = Date.UTC(2026, 9, 12, 17, 0, 0);
 /** Twelve ชั่วยาม to a day. */
 export const HOURS_PER_DAY = 12;
 /** One game day is one real hour. */

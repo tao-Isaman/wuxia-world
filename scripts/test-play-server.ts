@@ -133,6 +133,18 @@ await check("the world moves with the clock: a day keeps the talk, a week lives 
   assert.deepEqual(clone(twin.world.npcExt), clone(doc.world.npcExt));
 });
 
+await check("a world from before the clock moved back rewinds to today and lives on from there", () => {
+  const doc = createWorld(msAtWorld(121, 3), 99);
+  const npc = Object.keys(doc.world.npcExt)[0]!;
+  const tick = doc.world.npcExt[npc]!.lastTickDay;
+  assert.equal(advanceWorld(doc, msAtWorld(2, 1)), true);
+  assert.equal(doc.day, 2);
+  assert.equal(doc.world.lastNpcTickDay, 2);
+  assert.equal(doc.world.npcExt[npc]!.lastTickDay, tick - 119);
+  advanceWorld(doc, msAtWorld(9, 0));
+  assert.equal(doc.world.lastNpcTickDay, 9, "a week later the people live it");
+});
+
 await check("pins: people a player's quests hold, kept for two game days, only known people", () => {
   const doc = createWorld(msAtWorld(50), 5);
   const npc = Object.keys(doc.world.npcExt)[0]!;

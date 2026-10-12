@@ -69,7 +69,7 @@ test("sword tournament: register in the window, then the tournament day queues a
   test.setTimeout(120_000);
   // The world clock decides the day (one game day is one real hour from the
   // epoch): put the page on world day 70, inside the registration window.
-  const WORLD_EPOCH_MS = Date.UTC(2026, 9, 7, 17, 0, 0);
+  const WORLD_EPOCH_MS = Date.UTC(2026, 9, 12, 17, 0, 0);
   const worldDay = (day: number) => WORLD_EPOCH_MS + (day - 1) * 3_600_000 + 60_000;
   await page.clock.install({ time: worldDay(70) });
   await newGame(page);

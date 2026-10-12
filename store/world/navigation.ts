@@ -7,11 +7,11 @@ import { tickQuestProgress } from "@/lib/world/effects";
 import { JAIL_SCENE_ID } from "@/lib/world/data/activities";
 import { appendActionLog } from "./state";
 import { grantStatXp, rollLukXp } from "./progression";
-import { LOC_TO_ROUTE_HOURS, ROUTE_TO_LOC_HOURS, TRAVEL_STAMINA_COST } from "./rules";
+import { LOC_TO_ROUTE_HOURS, ROUTE_TO_LOC_HOURS } from "./rules";
 
-// Returns true when the move is either free (story warp / same scene) or
-// the player has enough stamina for the overworld travel cost. UI buttons
-// can call this against the current state to grey themselves out.
+// The two real overworld transitions (location → road, road → location);
+// null for a story warp. Travel itself is free: stamina goes on fights and
+// activities, never on the road.
 export function travelTransitionHours(
   source: ReturnType<typeof getScene>,
   target: ReturnType<typeof getScene>,
@@ -29,34 +29,24 @@ export function jailBlocks(state: WorldStateData, targetSceneId: string): boolea
   return kind === "location" || kind === "route";
 }
 
+/** Whether the hero may go to a scene now: only a running sentence stops them (travel costs no stamina). */
 export function canAffordTravelTo(state: WorldStateData, targetSceneId: string): boolean {
+  if (state.currentSceneId === targetSceneId) return true;
+  return !jailBlocks(state, targetSceneId);
+}
+
+// The two real overworld transitions (location → route, route → location)
+// cost nothing but still train: AGI xp and a LUK roll. Story warps (dialog →
+// anywhere, location → location, etc.) give neither. Returns false only when
+// the jail keeps the hero in; callers abort the navigation then.
+export function chargeTravelIfNeeded(state: WorldStateData, targetSceneId: string): boolean {
   if (state.currentSceneId === targetSceneId) return true;
   if (jailBlocks(state, targetSceneId)) return false;
   const target = getScene(targetSceneId);
   const source = getScene(state.currentSceneId);
   const hours = travelTransitionHours(source, target);
-  if (hours === null) return true; // story warp — free, always allowed
-  return state.stamina >= TRAVEL_STAMINA_COST;
-}
-
-// Charge the per-navigation travel cost only on the two real overworld
-// transitions:
-//   location → route  → 10 stamina + 1 ชั่วยาม (stepping onto a road)
-//   route → location  → 10 stamina + 2 ชั่วยาม (arriving at a destination)
-// Story warps (dialog → anywhere, location → location, etc.) are free —
-// only walking the map costs stamina and time.
-//
-// Returns false when the move is real travel and the player cannot afford
-// the stamina cost. Callers must abort the navigation in that case.
-export function chargeTravelIfNeeded(state: WorldStateData, targetSceneId: string): boolean {
-  if (state.currentSceneId === targetSceneId) return true;
-  const target = getScene(targetSceneId);
-  const source = getScene(state.currentSceneId);
-  const hours = travelTransitionHours(source, target);
   if (hours === null) return true; // story warp — free
-  if (state.stamina < TRAVEL_STAMINA_COST) return false;
-  state.stamina -= TRAVEL_STAMINA_COST;
-  // Successful overworld travel — grant AGI xp + roll for LUK.
+  // Overworld travel — grant AGI xp + roll for LUK.
   grantStatXp(state, "AGI", STAT_XP_PER_ACTION);
   rollLukXp(state);
   return true;
@@ -96,9 +86,8 @@ export function followAutoAdvance(state: WorldStateData): void {
 // Returns false when the choice required overworld travel and the player
 // couldn't afford the stamina cost — caller discards the draft.
 export function takeChoice(state: WorldStateData, choice: Choice): boolean {
-  // Pre-flight: refuse the whole choice (effects + nav) when the move is
-  // real travel and the player can't pay. Otherwise zero-stamina players
-  // could still trigger flag/quest side effects by tapping a route.
+  // Pre-flight: refuse the whole choice (effects + nav) when the jail keeps
+  // the hero in, so a locked-in hero can't trigger its side effects.
   if (!canAffordTravelTo(state, choice.next)) return false;
 
   const effects: readonly SceneEffect[] = choice.effects ?? [];
@@ -113,8 +102,7 @@ export function takeChoice(state: WorldStateData, choice: Choice): boolean {
     // Battle suspends scene navigation; the onWin/onLose path overrides `next`.
     return true;
   }
-  // Same-target navigation (closing a dialog back to where you stood) is free;
-  // a different route/location pays the travel cost.
+  // Overworld travel is free; it only trains AGI / LUK.
   if (!chargeTravelIfNeeded(state, choice.next)) return false;
   state.currentSceneId = choice.next;
   const sc = getScene(state.currentSceneId);

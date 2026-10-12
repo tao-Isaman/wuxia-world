@@ -25,7 +25,7 @@ const { SHARED_WORLD_KEY, attachSharedWorld, joinSharedWorld, localWorldService 
 const { PLAYER_FROM_WORLD_KEYS, SHARED_WORLD_KEYS, sameWorld, sharedSlice } = await import("../lib/world/shared/world");
 const { WORLD_EVENT_LOG_MAX, applyWorldEvent, emitWorldEvent, recordWorldEvent } = await import("../lib/world/shared/events");
 const { hashSeed, seededRng } = await import("../lib/world/shared/rng");
-const { rebaseDays } = await import("../lib/world/shared/rebase");
+const { rebaseDays, rewindSaveToClock, rewindWorldToClock } = await import("../lib/world/shared/rebase");
 const { tickAllNamedNpcs } = await import("../lib/world/npc-tick");
 const { npcPresent } = await import("../lib/world/npc-presence");
 const { WANTED_DECAY_DAYS, JAIL_MAX_HOURS } = await import("../lib/world/law");
@@ -334,6 +334,36 @@ check("migrate v26 → v27: an old save lands on today's world day; a v27 save i
   assert.equal(merged.day, 12);
   assert.deepEqual(takeCarriedWorldKeys(), ["npcExt"], "the save carried npcExt: it wins when the world joins");
   assert.deepEqual(takeCarriedWorldKeys(), [], "read once");
+});
+
+// ─── A world restart: WORLD_EPOCH_MS moved later rewinds old stamps ──────
+check("a save and a world from before the clock moved back rewind to today with their cooldowns", () => {
+  setTestWorldTime(3, 2);
+  const p = clone(newGame(121, 5)) as WorldStateData;
+  p.giftDays = { a: 110 };
+  p.activityDays = { c: 120 };
+  p.flags = { ...p.flags, _restAt: 121 * 12 + 5, "feud:wudang": 130, other: 7 };
+  assert.equal(rewindSaveToClock(p, 3), true);
+  assert.equal(p.day, 3);
+  assert.deepEqual(p.giftDays, { a: -8 });
+  assert.deepEqual(p.activityDays, { c: 2 });
+  assert.equal(p.flags._restAt, 3 * 12 + 5, "the rest cooldown keeps its place in the day");
+  assert.equal(p.flags["feud:wudang"], 12);
+  assert.equal(p.flags.other, 7, "other flags are left alone");
+  assert.equal(rewindSaveToClock(p, 3), false, "idempotent");
+  const today = clone(newGame(3, 1)) as WorldStateData;
+  assert.equal(rewindSaveToClock(today, 3), false, "a save of today is left as it is");
+  // Through the load-time merge.
+  const merged = mergeSave({ hasGame: true, day: 121, time: 5, wantedDay: 119 }, store());
+  assert.equal(merged.day, 3);
+  assert.equal(merged.wantedDay, 1);
+  takeCarriedWorldKeys();
+  // A stored world: its NPC week stamp stands for its day.
+  const w = { lastNpcTickDay: 119, kidnappedUntil: { npc: 200 } } as Partial<WorldStateData>;
+  assert.equal(rewindWorldToClock(w, 3), true);
+  assert.equal(w.lastNpcTickDay, 3);
+  assert.deepEqual(w.kidnappedUntil, { npc: 84 });
+  assert.equal(rewindWorldToClock(w, 3), false);
 });
 
 console.warn = originalWarn;

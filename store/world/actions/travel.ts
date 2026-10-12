@@ -16,8 +16,8 @@ export const travelActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "m
     const choice = sc.choices[idx];
     if (!choice) return;
     const draft = draftFrom(s);
-    // Drop the draft entirely if takeChoice refuses (e.g., stamina too
-    // low for a travel-bearing choice). State stays exactly as it was.
+    // Drop the draft entirely if takeChoice refuses (the jail keeps the
+    // hero in). State stays exactly as it was.
     if (!takeChoice(draft, choice)) return;
     set({ ...draft });
   },
@@ -42,9 +42,6 @@ export const travelActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "m
     }
     const draft = draftFrom(get());
     if (jailBlocks(draft, sceneId)) return;
-    // Refuse the move entirely when stamina is too low for an overworld
-    // travel hop — UI buttons should also be disabled, but defend here
-    // in case something slips through.
     if (!chargeTravelIfNeeded(draft, sceneId)) return;
     draft.currentSceneId = sceneId;
     const sc = getScene(sceneId);

@@ -18,10 +18,7 @@ export { HOURS_PER_DAY } from "@/lib/world/clock";
 // arriving at a destination from the road is the expensive half.
 export const LOC_TO_ROUTE_HOURS = 1;
 export const ROUTE_TO_LOC_HOURS = 2;
-// Stamina spent on every overworld travel (location → route or route →
-// location). Exported so the UI can disable buttons when the player can't
-// afford the move.
-export const TRAVEL_STAMINA_COST = 10;
+// Travel costs no stamina: only fights and activities spend it.
 export const ACTION_HOURS = 0.2;
 export const FIGHT_HOURS = 0.5;
 export const FIGHT_STAMINA = 5;

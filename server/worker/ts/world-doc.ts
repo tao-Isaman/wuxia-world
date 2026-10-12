@@ -12,6 +12,7 @@ import { tickAllNamedNpcs } from "@/lib/world/npc-tick";
 import { ECHO_ARCHETYPES, generatePlayerEcho, isEchoAction, maintainRumors, seedLoreRumors, type EchoContext } from "@/lib/world/rumor-engine";
 import { emitWorldEvent, recordWorldEvent } from "@/lib/world/shared/events";
 import { newWorldSeed } from "@/lib/world/shared/rng";
+import { rebaseDays } from "@/lib/world/shared/rebase";
 import { sharedSlice, type SharedWorld } from "@/lib/world/shared/world";
 import type { WorldStateData } from "@/lib/world/types";
 import { bossSlain } from "@/lib/world/victory";
@@ -92,6 +93,16 @@ export function setPins(doc: WorldDoc, player: string, ids: readonly string[], a
  */
 export function advanceWorld(doc: WorldDoc, at: number): boolean {
   const t = worldTimeAt(at);
+  if (t.day < doc.day) {
+    // The world clock was moved back (WORLD_EPOCH_MS set later): every stamp
+    // rewinds with the world's day, so the people keep living from today.
+    const state = shell(doc);
+    rebaseDays(state, t.day - doc.day);
+    state.day = t.day;
+    state.time = t.time;
+    commit(doc, state);
+    return true;
+  }
   if (t.day <= doc.day) {
     if (t.day === doc.day && t.time > doc.time) doc.time = t.time;
     return false;

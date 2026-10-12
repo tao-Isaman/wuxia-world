@@ -6,6 +6,11 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-12
 
+### Free travel, and the world's day starts over
+
+- **Travel costs no stamina**: exits, roads and arriving are free, and a spent hero can still walk home; stamina goes only on fights and activities. Each road hop still trains AGI and rolls LUK.
+- **The world clock starts over**: day 1 is now 2026-10-13 00:00 Bangkok time (it was 2026-10-08, so the HUD read day 120). Saves, the stored world and the server's world from the old clock are rewound to today on load, keeping every cooldown's time left (`rewindSaveToClock`, `rewindWorldToClock`, the server's `advanceWorld`).
+
 ### Gear options (ออฟชั่นเสริม)
 
 - **The server started over** (data generation 3): no accounts, characters, saves or world from before; everyone signs up again.
@@ -130,7 +135,7 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ### The world clock and the shared world (a step toward online)
 
-- **Time is a world clock:** one game day is one real hour (a ชั่วยาม five real minutes), from day 1 at 2026-10-08 00:00 Bangkok time (`lib/world/clock.ts`). The world moves on while the game is closed; the sundial and day move by themselves (`WorldClock`, every 10 s); back after a day or more, a toast and a log line say how long. `advanceTime` is gone: no action moves time (`syncClock` brings every draft to the clock).
+- **Time is a world clock:** one game day is one real hour (a ชั่วยาม five real minutes), from day 1 at 2026-10-08 00:00 Bangkok time (`lib/world/clock.ts`; restarted at 2026-10-13, see that day). The world moves on while the game is closed; the sundial and day move by themselves (`WorldClock`, every 10 s); back after a day or more, a toast and a log line say how long. `advanceTime` is gone: no action moves time (`syncClock` brings every draft to the clock).
 - **Actions are instant** and cost stamina instead (`staminaForHours`: 5 a ชั่วยาม they used to take, at least 2): crafting, music and bad-action attempts 2, objective spots 5 per ชั่วยาม; travel, fights, gathering and practice keep their stamina prices; horse rides arrive at once; death wakes the hero at home at once. Stamina refills on its own in 6 ชั่วยาม (30 min), HP / MP in 12 (1 h). Free rests restore at once, then wait 2 ชั่วยาม (10 min); an inn room any time.
 - **Jail in real time:** 1 ชั่วยาม (5 min) per mark, at most 12 (1 h); the gate opens once served (the HUD counts down); labour takes 10 min off, a failed escape adds 10 min, meditation once per 15 min.
 - **The shared world:** NPC lives and deaths, rumors, the killed and kidnapped, the legendary beasts and the tournament are the world's (`lib/world/shared/`), saved apart from the player (`wusia-shared-v1`) by a `WorldService`. Player changes to it are `WorldEvent`s through one pure reducer (`emitWorldEvent`); the NPC week is seeded by the world (`seededRng(worldSeed, day)`), so one world gives the same weeks on any machine. A new hero joins the world as it is — the dead stay dead.

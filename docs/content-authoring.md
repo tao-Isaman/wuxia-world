@@ -208,7 +208,7 @@ Then run `bun run test:navigation`: every painted map must keep its spawn open a
 - **A dialog with `next` and no `choices` skips its lines** (it auto-advances). For narration that should be read, use a single confirmation choice: `{ text: "ก้าวต่อไป", next: "…" }`.
 - A dialog with neither choices nor `next` is **terminal**: it shows "ปิด", which returns to the last location for free.
 - `visibleIf` hides a choice. When every choice is hidden, the stage shows an escape button.
-- A choice that costs travel (for example, from a location onto a road) is refused as a whole — effects included — when the hero lacks stamina.
+- Travel costs no stamina; a choice that moves the hero onto a road or into a place is refused as a whole — effects included — only while a jail sentence keeps them in.
 - **Speaker.** The portrait and heading come from the NPC whose `dialogSceneId` is this scene, else from the first `dialogue` line whose `speaker` names an NPC (`lib/world/speaker.ts`): the exact `name`, the name before its "(…)" epithet ("หวงชิงเฉวียน"), a title before a full name, a short name listed in `SPEAKER_ALIASES` ("ทูตเซี่ย", "ขุนนางหยาน", "เสี่ยวเฉ่า": a table, since a loose prefix would also catch titles such as "ผู้อาวุโส"), or part of the name of the quest giver / hand-in person of a `qs_<quest>_…` dialog. Prefer the NPC's exact name; any other label ("โจรสลัด", "ยายหลี่") is a walk-on with no portrait, unless `WALK_ON_SPEAKERS` gives it a stock look ("อาจารย์ดาบ" → a swordsman bust, via `npcCharacterId`).
   - When that NPC stands at the current location, the dialog plays over the live map.
   - Otherwise it plays over the place's painting.

@@ -43,7 +43,6 @@ import { RumorListenButton } from "./rumor-listen-button";
 import { NpcStatusBadge } from "./npc-status-badge";
 import {
   useWorldStore,
-  TRAVEL_STAMINA_COST,
   PRACTICE_STAMINA_COST,
   type GatherResult,
 } from "@/store/world-store";
@@ -305,23 +304,18 @@ export function LocationView({ scene, readOnly = false, dialogueSpeakerId }: Pro
                 const destinations = valid ? target.destinations.map(destination => getScene(destination.locationId))
                   .flatMap(destination => destination?.kind === "location" ? [destination.name] : []).join(" / ") : "";
                 const label = duplicateLabel && destinations ? `${route.label} · ${destinations}` : route.label;
-                const tooTired = stamina < TRAVEL_STAMINA_COST;
                 return (
                   <Button
                     key={route.routeSceneId}
                     variant="outline"
-                    disabled={!valid || tooTired}
+                    disabled={!valid}
                     onClick={() => gotoScene(route.routeSceneId)}
                     className="w-full justify-start text-left h-auto py-2 whitespace-normal"
                   >
                     <span className="flex flex-col items-start gap-0.5">
                       <span className="font-semibold text-sm">🚶 {label}</span>
                       <span className="text-[10px] text-muted-foreground">
-                        ⚡ {TRAVEL_STAMINA_COST}
-                        {route.hint && <span className="ml-2">{route.hint}</span>}
-                        {tooTired && (
-                          <span className="text-rose-600 ml-2">พลังไม่พอ</span>
-                        )}
+                        {route.hint}
                       </span>
                     </span>
                   </Button>
