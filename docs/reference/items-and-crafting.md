@@ -2,7 +2,7 @@
 
 # Items, shops, crafting and gathering
 
-487 items (`lib/world/data/items.ts`), 19 shops, 7 martial halls, 49 artisans, 36 recipes and 25 gathering / hunting nodes.
+508 items (`lib/world/data/items.ts`), 19 shops, 7 martial halls, 49 artisans, 57 recipes and 25 gathering / hunting nodes.
 
 ## Contents
 
@@ -103,7 +103,7 @@
 | `alpha_inter` | อักษรงดงาม | 300 | train writing +80 xp |
 | `alpha_master` | อักษรเทพนิยม | 800 | train writing +180 xp |
 
-### ตำราวิชา (`manual`, 392)
+### ตำราวิชา (`manual`, 413)
 
 | Id | Name | Price | Use |
 | --- | --- | --- | --- |
@@ -499,6 +499,27 @@
 | `chart_heavenly_demon` | แผนภาพชีพจร-ชีพจรมารสวรรค์ | 25000 | learn meridian chart `heavenly_demon` |
 | `chart_starry_revolution` | แผนภาพชีพจร-ชีพจรดาราหมุนเวียน | 25000 | learn meridian chart `starry_revolution` |
 | `chart_grand_circuit` | แผนภาพชีพจร-มหาจักรวาลชีพจร | 25000 | learn meridian chart `grand_circuit` |
+| `recipe_gear_w1` | สูตรดาบเหล็กสามัญ | 150 | learn recipe `gear_w1` |
+| `recipe_gear_w2` | สูตรดาบทองคำ | 400 | learn recipe `gear_w2` |
+| `recipe_gear_w3` | สูตรดาบเพลิง | 900 | learn recipe `gear_w3` |
+| `recipe_gear_a3` | สูตรเกราะเหล็ก | 900 | learn recipe `gear_a3` |
+| `recipe_gear_h3` | สูตรหมวกเหล็ก | 900 | learn recipe `gear_h3` |
+| `recipe_gear_b3` | สูตรรองเท้าเหล็ก | 900 | learn recipe `gear_b3` |
+| `recipe_gear_br3` | สูตรปลอกแขนเหล็ก | 900 | learn recipe `gear_br3` |
+| `recipe_gear_a1` | สูตรเสื้อผ้าธรรมดา | 150 | learn recipe `gear_a1` |
+| `recipe_gear_h1` | สูตรหมวกผ้า | 150 | learn recipe `gear_h1` |
+| `recipe_gear_b1` | สูตรรองเท้าผ้า | 150 | learn recipe `gear_b1` |
+| `recipe_gear_br1` | สูตรปลอกแขนผ้า | 150 | learn recipe `gear_br1` |
+| `recipe_gear_a2` | สูตรเกราะหนัง | 400 | learn recipe `gear_a2` |
+| `recipe_gear_h2` | สูตรหมวกหนัง | 400 | learn recipe `gear_h2` |
+| `recipe_gear_b2` | สูตรรองเท้าหนัง | 400 | learn recipe `gear_b2` |
+| `recipe_gear_br2` | สูตรปลอกแขนหนังสัตว์ | 400 | learn recipe `gear_br2` |
+| `recipe_gear_r1` | สูตรแหวนทองเปล่า | 150 | learn recipe `gear_r1` |
+| `recipe_gear_r2` | สูตรแหวนพลัง | 400 | learn recipe `gear_r2` |
+| `recipe_gear_r3` | สูตรแหวนชีวิต | 900 | learn recipe `gear_r3` |
+| `recipe_gear_c1` | สูตรเหรียญโชคลาภ | 150 | learn recipe `gear_c1` |
+| `recipe_gear_c2` | สูตรประดับเลือดมังกร | 400 | learn recipe `gear_c2` |
+| `recipe_gear_c3` | สูตรประดับปัญญาสวรรค์ | 900 | learn recipe `gear_c3` |
 
 ### ของช่างฝีมือ (`craft`, 16)
 
@@ -700,29 +721,47 @@ Every city hosts all six craft professions; villages and some sects host one. Re
 | --- | --- | --- | --- | --- | --- |
 | `fish_meal` | ปรุงเนื้อปลามัน | 1× ปลาไหล + 1× ไม้เนื้ออ่อน → 1× เนื้อย่าง | 1 |  | anywhere (อาชีพ → ประดิษฐ์) |
 
-### ตีอาวุธ (`forge`, 3)
+### ตีอาวุธ (`forge`, 10)
 
 | Id | Name | Inputs → output | Mastery | Basic | Taught at |
 | --- | --- | --- | --- | --- | --- |
 | `forge_iron_blade` | ตีใบมีดเหล็ก | 2× เหล็กแท่ง → 1× ใบมีดเหล็ก | 1 | yes | 9 artisans |
 | `forge_iron_sword` | ตีดาบเหล็ก | 1× ใบมีดเหล็ก + 1× ไม้เนื้อแข็ง → 1× ดาบเหล็กธรรมดา | 2 |  | หัวซาน |
 | `forge_steel_sword` | ตีดาบเหล็กกล้า | 4× เหล็กแท่ง + 1× ไม้ศักดิ์สิทธิ์ → 1× ดาบเหล็กกล้า | 3 |  | ซีเซี่ย |
+| `gear_w1` | สร้างดาบเหล็กสามัญ | 2× เหล็กแท่ง + 1× ไม้เนื้ออ่อน → 1× ดาบเหล็กสามัญ (gear) | 1 |  | nowhere (sold by no artisan) |
+| `gear_w2` | สร้างดาบทองคำ | 3× เหล็กแท่ง + 2× แร่ทองคำ → 1× ดาบทองคำ (gear) | 2 |  | nowhere (sold by no artisan) |
+| `gear_w3` | สร้างดาบเพลิง | 5× เหล็กแท่ง + 2× ไม้เนื้อแข็ง + 1× แร่เงิน → 1× ดาบเพลิง (gear) | 3 |  | nowhere (sold by no artisan) |
+| `gear_a3` | สร้างเกราะเหล็ก | 6× เหล็กแท่ง + 2× หนังฟอก → 1× เกราะเหล็ก (gear) | 3 |  | nowhere (sold by no artisan) |
+| `gear_h3` | สร้างหมวกเหล็ก | 4× เหล็กแท่ง + 1× หนังฟอก → 1× หมวกเหล็ก (gear) | 3 |  | nowhere (sold by no artisan) |
+| `gear_b3` | สร้างรองเท้าเหล็ก | 4× เหล็กแท่ง + 1× หนังฟอก → 1× รองเท้าเหล็ก (gear) | 3 |  | nowhere (sold by no artisan) |
+| `gear_br3` | สร้างปลอกแขนเหล็ก | 3× เหล็กแท่ง + 1× หนังฟอก → 1× ปลอกแขนเหล็ก (gear) | 3 |  | nowhere (sold by no artisan) |
 
-### ตัดเย็บ (`tailoring`, 3)
+### ตัดเย็บ (`tailoring`, 11)
 
 | Id | Name | Inputs → output | Mastery | Basic | Taught at |
 | --- | --- | --- | --- | --- | --- |
 | `tailor_cloth` | ตัดเสื้อผ้าฝ้าย | 2× เส้นด้าย → 1× เสื้อผ้าทอ | 1 | yes | 8 artisans |
 | `tailor_leather` | เย็บเสื้อหนัง | 2× หนังฟอก + 1× เส้นด้าย → 1× เสื้อหนังเบา | 2 |  | ซีเซี่ย |
 | `tailor_silk` | เย็บเสื้อผ้าไหม | 3× ผ้าไหม + 2× เส้นด้าย → 1× เสื้อผ้าไหม | 4 |  | ซูโจว |
+| `gear_a1` | สร้างเสื้อผ้าธรรมดา | 3× เส้นด้าย → 1× เสื้อผ้าธรรมดา (gear) | 1 |  | nowhere (sold by no artisan) |
+| `gear_h1` | สร้างหมวกผ้า | 2× เส้นด้าย → 1× หมวกผ้า (gear) | 1 |  | nowhere (sold by no artisan) |
+| `gear_b1` | สร้างรองเท้าผ้า | 2× เส้นด้าย → 1× รองเท้าผ้า (gear) | 1 |  | nowhere (sold by no artisan) |
+| `gear_br1` | สร้างปลอกแขนผ้า | 1× เส้นด้าย → 1× ปลอกแขนผ้า (gear) | 1 |  | nowhere (sold by no artisan) |
+| `gear_a2` | สร้างเกราะหนัง | 4× หนังฟอก + 2× เส้นด้าย → 1× เกราะหนัง (gear) | 2 |  | nowhere (sold by no artisan) |
+| `gear_h2` | สร้างหมวกหนัง | 2× หนังฟอก + 1× เส้นด้าย → 1× หมวกหนัง (gear) | 2 |  | nowhere (sold by no artisan) |
+| `gear_b2` | สร้างรองเท้าหนัง | 2× หนังฟอก + 1× เส้นด้าย → 1× รองเท้าหนัง (gear) | 2 |  | nowhere (sold by no artisan) |
+| `gear_br2` | สร้างปลอกแขนหนังสัตว์ | 2× หนังฟอก + 1× หนังสัตว์ → 1× ปลอกแขนหนังสัตว์ (gear) | 2 |  | nowhere (sold by no artisan) |
 
-### ช่างเครื่องประดับ (`jewelry`, 3)
+### ช่างเครื่องประดับ (`jewelry`, 6)
 
 | Id | Name | Inputs → output | Mastery | Basic | Taught at |
 | --- | --- | --- | --- | --- | --- |
 | `jewel_silver_ring` | หล่อแหวนเงิน | 3× แร่เงิน → 1× แหวนเงิน | 1 | yes | 7 artisans |
 | `jewel_gold_ring` | หล่อแหวนทอง | 3× แร่ทองคำ → 1× แหวนทอง | 3 |  | จินหลิง |
 | `jewel_jade_amulet` | ทำเครื่องรางหยก | 1× หยกล้ำค่า + 1× เส้นด้าย → 1× เครื่องราง·หยก | 4 |  | จินหลิง |
+| `gear_r1` | สร้างแหวนทองเปล่า | 1× แร่ทองคำ → 1× แหวนทองเปล่า (gear) | 1 |  | nowhere (sold by no artisan) |
+| `gear_r2` | สร้างแหวนพลัง | 2× แร่เงิน + 1× แร่ทองคำ → 1× แหวนพลัง (gear) | 2 |  | nowhere (sold by no artisan) |
+| `gear_r3` | สร้างแหวนชีวิต | 2× แร่ทองคำ + 1× หยกล้ำค่า → 1× แหวนชีวิต (gear) | 3 |  | nowhere (sold by no artisan) |
 
 ### ทำอาหาร (`chef`, 3)
 
@@ -746,7 +785,7 @@ Every city hosts all six craft professions; villages and some sects host one. Re
 | `write_basic` | เขียนอักษรพื้นฐาน | 1× กระดาษสา + 1× หมึกเข้ม → 1× ตัวอักษรพื้นฐาน | 1 |  | anywhere (อาชีพ → ประดิษฐ์) |
 | `write_master` | เขียนอักษรชั้นเทพ | 2× กระดาษสา + 2× หมึกเข้ม → 1× อักษรเทพนิยม | 3 |  | anywhere (อาชีพ → ประดิษฐ์) |
 
-### ช่างเครื่องสาน (`accessory`, 4)
+### ช่างเครื่องสาน (`accessory`, 7)
 
 | Id | Name | Inputs → output | Mastery | Basic | Taught at |
 | --- | --- | --- | --- | --- | --- |
@@ -754,6 +793,9 @@ Every city hosts all six craft professions; villages and some sects host one. Re
 | `accessory_silk_fan` | ทำพัดผ้าไหม | 2× ผ้าไหม + 1× ไม้เนื้อแข็ง → 1× พัดผ้าไหม | 2 |  | หยางโจว |
 | `accessory_warrior_belt` | ถักเข็มขัดนักรบ | 2× หนังฟอก + 1× เหล็กแท่ง → 1× เข็มขัดนักรบ | 3 |  | ฉางอัน |
 | `accessory_jade_pendant` | แกะจี้หยก | 1× หยกล้ำค่า + 1× เส้นด้าย → 1× จี้หยก | 4 |  | หยางโจว |
+| `gear_c1` | สร้างเหรียญโชคลาภ | 2× แร่ทองแดง + 1× เส้นด้าย → 1× เหรียญโชคลาภ (gear) | 1 |  | nowhere (sold by no artisan) |
+| `gear_c2` | สร้างประดับเลือดมังกร | 1× เล็บเสือ + 1× แร่เงิน + 2× เส้นด้าย → 1× ประดับเลือดมังกร (gear) | 2 |  | nowhere (sold by no artisan) |
+| `gear_c3` | สร้างประดับปัญญาสวรรค์ | 1× หยกล้ำค่า + 2× ผ้าไหม + 1× เหรียญโบราณ → 1× ประดับปัญญาสวรรค์ (gear) | 3 |  | nowhere (sold by no artisan) |
 
 ## Gathering and hunting nodes
 
@@ -804,9 +846,9 @@ Mastery levels 1–5 at xp thresholds 0 / 100 / 300 / 700 / 1500 (`lib/world/dat
 | `chess` | หมากรุก | ♟ | 2 | 0 |
 | `begging` | ขอทาน | 🥣 | 2 | 0 |
 | `steal` | ขโมย | 🥷 | 0 | 0 |
-| `forge` | ตีอาวุธ | 🔨 | 0 | 3 |
-| `tailoring` | ตัดเย็บ | 🧵 | 0 | 3 |
-| `jewelry` | ช่างเครื่องประดับ | 💍 | 0 | 3 |
+| `forge` | ตีอาวุธ | 🔨 | 0 | 10 |
+| `tailoring` | ตัดเย็บ | 🧵 | 0 | 11 |
+| `jewelry` | ช่างเครื่องประดับ | 💍 | 0 | 6 |
 | `alchemy` | เภสัช | 🧪 | 0 | 8 |
 | `chef` | ทำอาหาร | 🍳 | 0 | 3 |
-| `accessory` | ช่างเครื่องสาน | 🪭 | 0 | 4 |
+| `accessory` | ช่างเครื่องสาน | 🪭 | 0 | 7 |

@@ -102,6 +102,7 @@ export function InventoryPopup({ open, onClose }: Props) {
     } else if (r.kind === "manualLearnSkill") message = "เรียนกระบวนท่าสำเร็จ · พร้อมใช้ทันที";
     else if (r.kind === "manualLearnArt") message = `เรียนลมปราณสำเร็จ · เริ่มที่ระดับ ${r.level}`;
     else if (r.kind === "learnMeridian") message = "เรียนรู้แผนภาพชีพจรสำเร็จ · เปิดจุดชีพจรได้ที่เมนูชีพจร";
+    else if (r.kind === "learnRecipe") message = "จำสูตรได้แล้ว · ไปสร้างได้ที่ร้านช่างแท็บ ประดิษฐ์";
     // The last one used: back to the bag, the result as a toast.
     if ((useWorldStore.getState().inventory[id] ?? 0) <= 0) {
       if (message) toast("success", message);

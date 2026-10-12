@@ -388,7 +388,7 @@ Append to `EQUIPMENT` in `lib/game/data/equipment.ts`:
 - `instrument: true` marks a music weapon.
 - Give it an icon in `EQUIPMENT_ICONS` (`lib/world/data/item-icons.ts`); a new item likewise needs one in `ITEM_ICONS`. `test:assets` fails otherwise ([assets.md](assets.md#item-icons)).
 
-Sell it through artisans (`equipmentOfferedBy`) or as a legendary beast's gear. Every way a piece is gained must roll its options (`gainGear` / `rollGearKey`). The craft that re-rolls it is the profession that sells it, else by slot and name (`equipmentProfession` in `artisans.ts`).
+Sell it through artisans (`equipmentOfferedBy`), make it a legendary beast's gear, or make it craft-only: a row in `lib/world/data/gear-recipes.ts` (its craft line, inputs) adds the recipe (`output: { equipId }`) and its สูตร item, which foes drop by tier (`rollRecipeDrop`). Every way a piece is gained must roll its options (`gainGear` / `rollGearKey`). The craft that re-rolls it is the profession that sells it, else by slot and name (`equipmentProfession` in `artisans.ts`).
 
 ## A joinable sect
 

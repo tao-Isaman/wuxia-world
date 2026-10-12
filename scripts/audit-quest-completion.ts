@@ -102,7 +102,7 @@ for (let changed = true; changed;) {
   changed = false;
   for (const q of QUESTS) for (const i of rewardItems(q)) if (!obtainable.has(i)) { obtainable.add(i); changed = true; }
   for (const r of RECIPES) {
-    if (obtainable.has(r.output.itemId) || !r.inputs.every((inp) => obtainable.has(inp.itemId))) continue;
+    if (r.output.itemId === undefined || obtainable.has(r.output.itemId) || !r.inputs.every((inp) => obtainable.has(inp.itemId))) continue;
     obtainable.add(r.output.itemId); changed = true;
   }
 }

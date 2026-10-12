@@ -32,7 +32,12 @@ export type CraftResult =
   | {
       ok: true;
       recipeId: string;
-      outputItemId: string;
+      /** The item made (null for a gear recipe). */
+      outputItemId: string | null;
+      /** A gear recipe's piece, its options rolled (lib/game/gear.ts). */
+      outputEquipKey?: string;
+      /** What was made, in Thai. */
+      outputName: string;
       outputCount: number;
       xpGained: number;
       dropCheck: "passed" | "failed" | "none";
@@ -96,7 +101,8 @@ export type UseItemResult =
     }
   | { ok: true; kind: "manualLearnSkill"; itemId: string; skillId: string }
   | { ok: true; kind: "manualLearnArt"; itemId: string; artId: string; level: number }
-  | { ok: true; kind: "learnMeridian"; itemId: string; chartId: string };
+  | { ok: true; kind: "learnMeridian"; itemId: string; chartId: string }
+  | { ok: true; kind: "learnRecipe"; itemId: string; recipeId: string };
 
 // Result of opening / upgrading a meridian point (openMeridianNode).
 export type OpenMeridianNodeResult = { ok: true; rank: number } | { ok: false; reason: string };

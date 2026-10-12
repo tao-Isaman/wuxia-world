@@ -107,7 +107,7 @@ check("every item a quest stage waits for can be bought, gathered or looted (or 
   // Letters and tokens someone hands over in a conversation count as sourced.
   const handedOver = new Set(SCENES.flatMap((scene) => JSON.stringify(scene).match(/"t":"giveItem","itemId":"[a-z0-9_]+"/g) ?? [])
     .map((m) => m.split('"itemId":"')[1].slice(0, -1)));
-  for (const recipe of RECIPES) handedOver.add(recipe.output.itemId); // crafted
+  for (const recipe of RECIPES) if (recipe.output.itemId !== undefined) handedOver.add(recipe.output.itemId); // crafted
   const sourceless: string[] = [];
   for (const quest of QUESTS) quest.stages.forEach((stage, index) => {
     if (stage.objective) return;

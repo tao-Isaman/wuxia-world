@@ -12,7 +12,7 @@ import { isLawOpponent } from "./law";
 import { rollMeridianLoot } from "./meridians";
 import { getBoss } from "./data/bosses";
 import { dropsGold, moveXpMultiplier, victoryWExp } from "./victory";
-import { rollSpiritMaterials, wExpWithGear } from "./gear";
+import { rollRecipeDrop, rollSpiritMaterials, wExpWithGear } from "./gear";
 import { rollGearKey } from "../game";
 
 /** Battle xp per use of a move skill / an inner art in a won fight (store/world/rules.ts re-exports these). */
@@ -72,6 +72,9 @@ export function rollVictorySpoilsFrom(
     // (not a spar's partner or the law's men).
     if (!s.pendingSpar && !pb.nonFatal && !isLawOpponent(pb.opponentId)) {
       for (const it of rollSpiritMaterials(opp)) items[it.itemId] = (items[it.itemId] ?? 0) + it.count;
+      // A craft-only piece's recipe (data/gear-recipes.ts).
+      const recipe = rollRecipeDrop(opp, s);
+      if (recipe) items[recipe] = (items[recipe] ?? 0) + 1;
     }
     if (!s.pendingSpar && !pb.nonFatal && !isLawOpponent(pb.opponentId) && dropsGold(opp)) {
       const [min, max] = FOE_GOLD[Math.max(0, Math.min(5, opp?.ti ?? 0))];

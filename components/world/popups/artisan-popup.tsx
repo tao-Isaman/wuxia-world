@@ -21,6 +21,7 @@ import {
   SPIRIT_THREAD,
   reforgeCheck,
   reforgeablePieces,
+  recipeOutputName,
   type ArtisanDef,
   type ItemCategory,
   type RecipeDef,
@@ -259,7 +260,6 @@ function CraftTab({ artisan }: { artisan: ArtisanDef }) {
               );
               return;
             }
-            const out = getItem(res.outputItemId);
             if (res.dropCheck === "failed") {
               toast(
                 "warn",
@@ -269,7 +269,7 @@ function CraftTab({ artisan }: { artisan: ArtisanDef }) {
             }
             toast(
               "success",
-              `สร้าง ${out?.name ?? res.outputItemId}×${res.outputCount} · +${res.xpGained} ประสบการณ์`,
+              `สร้าง ${res.outputName}×${res.outputCount}${res.outputEquipKey ? ` · ${affixParts(res.outputEquipKey).join(" · ") || "ไม่มีออฟชั่นเสริม"}` : ""} · +${res.xpGained} ประสบการณ์`,
             );
           }}
         />
@@ -298,7 +298,6 @@ function RecipeRow({
     (inp) => (inventory[inp.itemId] ?? 0) >= inp.count,
   );
   const canCraft = masteryOk && inputsOk;
-  const out = getItem(recipe.output.itemId);
   const successChance = recipe.usesDropCheck
     ? gatherSuccessChance(masteryLv, required)
     : null;
@@ -353,7 +352,7 @@ function RecipeRow({
         })}
         <span className="text-muted-foreground">→</span>
         <span className="bg-amber-100 text-amber-900 px-1.5 py-0.5 rounded">
-          {out?.name ?? recipe.output.itemId} ×{recipe.output.count}
+          {recipeOutputName(recipe)} ×{recipe.output.count}
         </span>
       </div>
     </div>

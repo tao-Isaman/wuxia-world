@@ -17,9 +17,11 @@ import {
   type EquipSlotType,
 } from "../game";
 import { seededRng } from "../game/rng";
-import type { WorldStateData } from "./types";
+import type { RecipeDef, WorldStateData } from "./types";
+import { getItem } from "./data/items";
 import { equipmentProfession, getArtisansAt, type CraftProfession } from "./data/artisans";
 import { masteryLevel } from "./data/life-skills";
+import { GEAR_RECIPES, recipeItemId } from "./data/gear-recipes";
 
 /** หินศิลาวิเศษ: re-rolls a weapon's, a ring's or a charm's options. */
 export const SPIRIT_STONE = "spirit_stone";
@@ -135,6 +137,40 @@ export function rollSpiritMaterials(opp: { ti?: number; boss?: boolean } | null 
     if (Math.random() < drop.chance) out.push({ itemId, count: between(drop.count) });
   }
   return out;
+}
+
+// ─── Recipes for craft-only gear ─────────────────────────────────────
+
+/** Odds per won fight that a foe carries a gear recipe (สูตร…). */
+export const RECIPE_DROP_CHANCE = 0.05;
+
+/** Which tiers of craft-only piece a foe of this tier carries the recipe of. */
+export function recipeTiersFor(foeTier: number): readonly number[] {
+  return foeTier <= 0 ? [0] : foeTier === 1 ? [0, 1] : foeTier === 2 ? [1, 2] : [2];
+}
+
+/**
+ * A recipe a beaten foe leaves (or none): a craft-only piece's สูตร of a tier
+ * that fits the foe, one the hero neither knows nor carries when there is one.
+ */
+export function rollRecipeDrop(
+  opp: { ti?: number } | null | undefined,
+  s: Pick<WorldStateData, "learnedRecipeIds" | "inventory">,
+): string | null {
+  if (!opp || Math.random() >= RECIPE_DROP_CHANCE) return null;
+  const tiers = recipeTiersFor(opp.ti ?? 0);
+  const fits = GEAR_RECIPES.filter((r) => r.output.equipId !== undefined && tiers.includes(Math.min(2, getEquip(r.output.equipId)?.ti ?? 0)));
+  const fresh = fits.filter((r) => !s.learnedRecipeIds?.includes(r.id) && !(s.inventory?.[recipeItemId(r.id)] > 0));
+  const pool = fresh.length ? fresh : fits;
+  if (!pool.length) return null;
+  return recipeItemId(pool[Math.min(pool.length - 1, Math.floor(Math.random() * pool.length))]!.id);
+}
+
+/** What a recipe makes, in Thai: the item's name, or the piece's ("ดาบเพลิง (อุปกรณ์)"). */
+export function recipeOutputName(r: Pick<RecipeDef, "output">): string {
+  const out = r.output;
+  if (out.equipId !== undefined) return `${getEquip(out.equipId)?.n ?? out.equipId} (อุปกรณ์)`;
+  return getItem(out.itemId)?.name ?? out.itemId;
 }
 
 // ─── The ประสบการณ์ยุทธ option ─────────────────────────────────────────

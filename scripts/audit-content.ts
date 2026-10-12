@@ -25,6 +25,7 @@ import {
   TRAIT_KEYS,
 } from "@/lib/world";
 import { SKILLS_BY_ID } from "@/lib/game/data/skills";
+import { getEquip } from "@/lib/game/data/equipment";
 import { ARTS_BY_ID } from "@/lib/game/data/arts";
 import { OPPONENTS } from "@/lib/world/data/opponents";
 import { BOSSES } from "@/lib/world/data/bosses";
@@ -348,7 +349,8 @@ function checkDropTables(): void {
   }
   for (const r of RECIPES) {
     r.inputs.forEach((x, i) => require(`recipe[${r.id}].inputs[${i}]: unknown item "${x.itemId}"`, ITEMS_BY_ID.has(x.itemId)));
-    require(`recipe[${r.id}].output: unknown item "${r.output.itemId}"`, ITEMS_BY_ID.has(r.output.itemId));
+    if (r.output.equipId !== undefined) require(`recipe[${r.id}].output: unknown equipment "${r.output.equipId}"`, !!getEquip(r.output.equipId));
+    else require(`recipe[${r.id}].output: unknown item "${r.output.itemId}"`, ITEMS_BY_ID.has(r.output.itemId));
   }
 }
 

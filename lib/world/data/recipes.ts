@@ -1,4 +1,5 @@
 import type { LifeSkill, RecipeDef } from "../types";
+import { GEAR_RECIPES } from "./gear-recipes";
 
 // Crafting recipes. Inputs are consumed in order; output is added to the
 // player's inventory. The store's `craftRecipe` action enforces input
@@ -461,6 +462,8 @@ export const RECIPES: readonly RecipeDef[] = [
     output: { itemId: "jade_pendant", count: 1 },
     description: "แกะหยกเป็นจี้และร้อยด้วยเชือกถักเป็นเครื่องประดับชั้นสูง",
   },
+  // Craft-only gear: the recipes foes drop as สูตร… items (gear-recipes.ts).
+  ...GEAR_RECIPES,
 ];
 
 export const RECIPES_BY_ID = new Map<string, RecipeDef>(

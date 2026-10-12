@@ -37,6 +37,8 @@ import {
   gearProfession,
   reforgeCheck,
   reforgeMaterial,
+  recipeOutputName,
+  rollRecipeDrop,
   repairGear,
   rollSpiritMaterials,
   wExpWithGear,
@@ -44,7 +46,9 @@ import {
 import { getItem } from "../lib/world/data/items";
 import { itemIconId } from "../lib/world/data/item-icons";
 import { BOSSES } from "../lib/world/data/bosses";
-import { ARTISANS, equipmentOfferedBy } from "../lib/world/data/artisans";
+import { ARTISANS, equipmentOfferedBy, equipmentProfession } from "../lib/world/data/artisans";
+import { CRAFT_ONLY_GEAR, GEAR_RECIPES, gearRecipeId, recipeItemId } from "../lib/world/data/gear-recipes";
+import { getRecipe } from "../lib/world/data/recipes";
 import { getOpponent } from "../lib/world/data/opponents";
 import { rollVictorySpoilsFrom } from "../lib/world/spoils";
 import { validateAndRepair } from "../lib/world/validate";
@@ -322,6 +326,75 @@ check("re-rolling: the line's own shop, craft level 3, one material; bag and wor
   // A piece the hero doesn't hold.
   useWorldStore.setState({ inventory: { ...store().inventory, [SPIRIT_STONE]: 1 } });
   assert.deepEqual(store().reforgeGear("eq_t1_w_blade~pa:5,cri:5"), { ok: false, reason: "not-owned" });
+});
+
+check("craft-only gear: a recipe per piece, none sold or dropped, its สูตร an item foes drop by tier", () => {
+  const sold = new Set(ARTISANS.flatMap((a) => equipmentOfferedBy(a).map((o) => o.equipId)));
+  const beast = new Set(BOSSES.flatMap((b) => b.gear));
+  assert.equal(CRAFT_ONLY_GEAR.size, 21);
+  for (const id of CRAFT_ONLY_GEAR) {
+    const def = getEquip(id)!;
+    assert.ok(!sold.has(id) && !beast.has(id), `${id} is craft-only`);
+    const r = getRecipe(gearRecipeId(id))!;
+    assert.ok(r && r.output.equipId === id, `${id} recipe`);
+    assert.equal(r.skill, equipmentProfession(def), `${id} line`);
+    assert.equal(r.requiredMastery, [1, 2, 3][Math.min(2, def.ti)]);
+    for (const inp of r.inputs) assert.ok(getItem(inp.itemId), `${id} input ${inp.itemId}`);
+    const item = getItem(recipeItemId(r.id))!;
+    assert.ok(item && item.category === "manual" && (item.price ?? 0) > 0 && itemIconId(item.id), `${id} สูตร item`);
+    assert.deepEqual(item.use, { t: "learnRecipe", recipeId: r.id });
+    assert.match(item.name, /^สูตร/);
+  }
+  // Every piece in the game has a way in: a shop, a beast or a recipe.
+  for (const e of EQUIPMENT) assert.ok(sold.has(e.id) || beast.has(e.id) || CRAFT_ONLY_GEAR.has(e.id), `${e.id} obtainable`);
+  // Foes drop recipes of their own band, rarely; fresh ones first.
+  const tierOf = (itemId: string) => getEquip(getRecipe(itemId.replace(/^recipe_/, ""))!.output.equipId!)!.ti;
+  const s = { learnedRecipeIds: [] as string[], inventory: {} as Record<string, number> };
+  let drops = 0;
+  withRandom(seededRng(5, 5), () => {
+    for (let i = 0; i < 4000; i++) {
+      const d = rollRecipeDrop({ ti: 0 }, s);
+      if (d) { drops++; assert.equal(tierOf(d), 0); }
+    }
+  });
+  assert.ok(drops > 120 && drops < 280, `≈5 %: ${drops}`);
+  withRandom(seededRng(6, 6), () => {
+    for (let i = 0; i < 2000; i++) { const d = rollRecipeDrop({ ti: 4 }, s); if (d) assert.equal(tierOf(d), 2); }
+  });
+  const known = { learnedRecipeIds: GEAR_RECIPES.filter((r) => r.id !== "gear_w1" && getEquip(r.output.equipId!)!.ti === 0).map((r) => r.id), inventory: {} };
+  withRandom(seededRng(7, 7), () => {
+    for (let i = 0; i < 2000; i++) { const d = rollRecipeDrop({ ti: 0 }, known); if (d) assert.equal(d, "recipe_gear_w1", "the one not known"); }
+  });
+});
+
+check("reading a สูตร teaches it once; crafting at the line's shop forges the piece with its options", () => {
+  newGame();
+  const recipe = getRecipe(gearRecipeId("W3"))!;
+  const item = recipeItemId(recipe.id);
+  useWorldStore.setState({ inventory: { [item]: 2 }, currentSceneId: "city_capital" });
+  const read = store().useItem(item);
+  assert.ok(read.ok && read.kind === "learnRecipe", JSON.stringify(read));
+  assert.ok(store().learnedRecipeIds.includes(recipe.id));
+  assert.equal(store().inventory[item], 1);
+  assert.deepEqual(store().useItem(item), { ok: false, reason: "already-learned", itemId: item });
+  assert.equal(store().inventory[item], 1, "kept");
+  // Too green, then skilled enough: the piece lands in the gear bag, rolled.
+  const inventory = { ...store().inventory } as Record<string, number>;
+  for (const inp of recipe.inputs) inventory[inp.itemId] = inp.count;
+  useWorldStore.setState({ inventory, lifeSkillXp: { ...store().lifeSkillXp, forge: 0 } });
+  assert.deepEqual(store().craftRecipe(recipe.id), { ok: false, reason: "missing-mastery" });
+  useWorldStore.setState({ lifeSkillXp: { ...store().lifeSkillXp, forge: 300 } });
+  const res = store().craftRecipe(recipe.id);
+  assert.ok(res.ok && res.outputEquipKey, JSON.stringify(res));
+  const g = parseGear(res.outputEquipKey)!;
+  assert.equal(g.def.id, "W3");
+  assert.ok(g.affixes.length >= 1 && g.affixes.length <= 3);
+  assert.equal(store().inventoryEquipment[res.outputEquipKey!], 1);
+  for (const inp of recipe.inputs) assert.equal(store().inventory[inp.itemId] ?? 0, 0);
+  assert.equal(recipeOutputName(recipe), "ดาบเพลิง (อุปกรณ์)");
+  // Not at a forge: no craft.
+  useWorldStore.setState({ currentSceneId: "home_player", inventory: { ...inventory } });
+  assert.deepEqual(store().craftRecipe(recipe.id), { ok: false, reason: "no-artisan" });
 });
 
 check("repair: pieces from before options get their share, alike every time; bad keys and slots go", () => {

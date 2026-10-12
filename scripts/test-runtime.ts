@@ -153,7 +153,7 @@ check("food restores stamina (never in a fight); potions heal flat + % of max; p
   }
   for (const id of ["potion", "potion_mid", "potion_big", "potion_qi", "poison_powder", "poison_needle", "poison_vial", "poison_black_centipede", "throw_dart", "throw_knife", "throw_star"])
     assert.ok(ITEMS.find((i) => i.id === id)?.battle, `${id} is usable in battle`);
-  for (const r of RECIPES.filter((x) => x.output.itemId.startsWith("poison_"))) assert.equal(r.skill, "alchemy", `${r.id} uses เภสัช`);
+  for (const r of RECIPES.filter((x) => x.output.itemId?.startsWith("poison_"))) assert.equal(r.skill, "alchemy", `${r.id} uses เภสัช`);
   const placed = new Set<string>();
   for (const id of Object.keys(WORLD_COORDS)) {
     if (sceneById(id)?.kind !== "location") continue;
