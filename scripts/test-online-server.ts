@@ -8,6 +8,8 @@
 // for every account, echoes become rumors) and checked battles (the server
 // stages the fight, replays the log, gives the verdict and the spoils; a
 // killing of a simulated person reaches the world; a felled beast rests).
+// Map chat, friends, whispers, mail with parcels and the party
+// (docs/design/social.md).
 import assert from "node:assert/strict";
 
 // The world store runs here to build real saves (it needs a localStorage).
@@ -21,9 +23,10 @@ const originalWarn = console.warn;
 console.warn = (...args: unknown[]) => { if (!String(args[0]).includes("zustand persist middleware")) originalWarn(...args); };
 
 const {
-  ApiFailure, checkToken, connectRoom, createCharacter, deleteCharacter, finishBattle, listCharacters, loadSave, loadWorld, logBattle,
-  login, postEcho, register, startBattle, storeSave,
+  ApiFailure, checkToken, claimMail, connectRoom, createCharacter, deleteCharacter, finishBattle, listCharacters, loadSave, loadSocial,
+  loadWorld, logBattle, login, partyAction, postEcho, register, sendMail, socialAction, socialUrl, startBattle, storeSave,
 } = await import("../lib/net/client");
+type SocialPush = import("../lib/net/social-protocol").SocialPush;
 type RoomConnection = import("../lib/net/client").RoomConnection;
 type ServerMsg = import("../lib/net/protocol").ServerMsg;
 type BattleStartReply = import("../lib/net/play-protocol").BattleStartReply;
@@ -88,7 +91,7 @@ let bobToken = "";
 await check("health answers with the protocol version", async () => {
   const health = await (await fetch(`${server}/health`)).json() as { ok: boolean; protocol: number };
   assert.equal(health.ok, true);
-  assert.equal(health.protocol, 1);
+  assert.equal(health.protocol, 2);
   assert.equal((health as { auth?: string }).auth, "ready", "the server can reach its signing key (KeyObject)");
 });
 
@@ -152,6 +155,25 @@ await check("two players in one room: welcome, join, move and leave arrive in or
   const left = await next(a.inbox, isEvent("left"));
   assert.ok(left.ev.t === "left" && left.ev.id === bob && left.ev.reason === "closed");
   a.conn.close();
+});
+
+await check("map chat: a line reaches everyone on the map with the speaker's name; empty, long and fast lines are refused", async () => {
+  const a = await open(annToken, "อาจารย์หลิว", 200);
+  await next(a.inbox, isWelcome);
+  const b = await open(bobToken, "กาเหว่า", 600);
+  await next(b.inbox, isWelcome);
+  a.conn.say("  สวัสดีสหาย  ");
+  const said = await next(b.inbox, isEvent("said"));
+  assert.ok(said.ev.t === "said" && said.ev.id === ann && said.ev.name === "อาจารย์หลิว" && said.ev.text === "สวัสดีสหาย");
+  await next(a.inbox, isEvent("said"));
+  a.conn.say("   ");
+  await next(a.inbox, isError("bad_text"));
+  a.conn.say("ก".repeat(121));
+  await next(a.inbox, isError("bad_text"));
+  for (let i = 0; i < 5; i++) a.conn.say(`บรรทัด ${i}`);
+  await next(a.inbox, isError("too_fast"));
+  a.conn.close();
+  b.conn.close();
 });
 
 await check("logging in again elsewhere replaces the older socket", async () => {
@@ -332,6 +354,170 @@ await check("battles: a felled beast rests for this hero; a killing of a simulat
   const after = await loadWorld(server, annToken);
   assert.ok(!after.same && after.world.npcExt[victim]?.status === "dead", "dead for everyone");
 });
+
+// ─── Friends, whispers, mail, party (docs/design/social.md) ───────────
+
+/** A player's social socket: what their hub pushes, and a way to tell it where they stand. */
+function openSocial(token: string): Promise<{ inbox: SocialPush[]; status: (name: string, location: string | null, characterId?: string) => void; close: () => void }> {
+  const inbox: SocialPush[] = [];
+  const socket = new WebSocket(socialUrl(server, token));
+  socket.addEventListener("message", (event) => { try { inbox.push(JSON.parse(String(event.data)) as SocialPush); } catch { /* skip */ } });
+  return new Promise((resolve, reject) => {
+    socket.addEventListener("error", () => reject(new Error("social socket failed")));
+    socket.addEventListener("open", () => resolve({
+      inbox,
+      status: (name, location, characterId) => socket.send(JSON.stringify({ t: "status", name, body: "m1", location, characterId: characterId ?? null })),
+      close: () => socket.close(1000, "bye"),
+    }));
+  });
+}
+function pushed<K extends SocialPush["t"]>(inbox: SocialPush[], t: K, ms = 5000, pick: (m: Extract<SocialPush, { t: K }>) => boolean = () => true): Promise<Extract<SocialPush, { t: K }>> {
+  const started = Date.now();
+  return new Promise((resolve, reject) => {
+    const poll = () => {
+      const index = inbox.findIndex((m) => m.t === t && pick(m as Extract<SocialPush, { t: K }>));
+      if (index >= 0) { resolve(inbox.splice(index, 1)[0] as Extract<SocialPush, { t: K }>); return; }
+      if (Date.now() - started > ms) { reject(new Error(`no ${t}; inbox: ${JSON.stringify(inbox)}`)); return; }
+      setTimeout(poll, 20);
+    };
+    poll();
+  });
+}
+
+const annSocial = await openSocial(annToken);
+const bobSocial = await openSocial(bobToken);
+annSocial.status("เหมยหลิง", "city_capital");
+bobSocial.status("หลี่ทดสอบ", useWorldStore.getState().currentSceneId, heroId);
+await sleep(300);
+
+await check("friends: a request is pushed, accepted on the other side; both see each other online and where", async () => {
+  assert.equal(await refusal(socialAction(server, annToken, "friends/request", { to: "nobody_here_x" })), "no_player");
+  assert.equal(await refusal(socialAction(server, annToken, "friends/request", { to: ann })), "bad_target");
+  const asked = await socialAction<{ outcome: string }>(server, annToken, "friends/request", { to: bob });
+  assert.equal(asked.outcome, "requested");
+  const request = await pushed(bobSocial.inbox, "friend_request");
+  assert.equal(request.from.username, ann);
+  assert.equal(request.from.name, "เหมยหลิง", "the hero name the hub last heard");
+  await socialAction(server, bobToken, "friends/accept", { from: ann });
+  await pushed(annSocial.inbox, "friend_added", 5000, (m) => m.friend.username === bob);
+  const forAnn = await loadSocial(server, annToken);
+  const friend = forAnn.friends.find((f) => f.username === bob)!;
+  assert.ok(friend.online, "bob's socket is open");
+  assert.equal(friend.name, "หลี่ทดสอบ");
+  assert.equal(friend.location, useWorldStore.getState().currentSceneId);
+  assert.equal(await refusal(socialAction(server, annToken, "friends/request", { to: bob })), "already");
+  // Bob moves: Ann hears it.
+  bobSocial.status("หลี่ทดสอบ", "city_capital", heroId);
+  await pushed(annSocial.inbox, "friend_status", 5000, (m) => m.friend.username === bob && m.friend.location === "city_capital");
+});
+
+await check("whispers reach the other player, are kept for later, and are rate limited", async () => {
+  const sent = await socialAction<{ whisper: { text: string } }>(server, annToken, "whisper", { to: bob, text: "ไปดื่มชากันไหม" });
+  assert.equal(sent.whisper.text, "ไปดื่มชากันไหม");
+  const got = await pushed(bobSocial.inbox, "whisper");
+  assert.ok(!got.whisper.mine && got.whisper.with.username === ann);
+  const kept = await loadSocial(server, bobToken);
+  assert.ok(kept.whispers.some((w) => w.text === "ไปดื่มชากันไหม"));
+  assert.equal(await refusal(socialAction(server, annToken, "whisper", { to: bob, text: "" })), "bad_text");
+  let refusedFast = "";
+  for (let i = 0; i < 6 && !refusedFast; i++) {
+    refusedFast = await socialAction(server, annToken, "whisper", { to: bob, text: `${i}` }).then(() => "", (e) => (e as InstanceType<typeof ApiFailure>).code);
+  }
+  assert.equal(refusedFast, "too_fast");
+});
+
+await check("mail: a parcel must leave the sender's save; the letter arrives; taking it once grants the gold", async () => {
+  const mei = (await listCharacters(server, annToken)).find((c) => c.name === "เหมยหลิง")!;
+  let { rev } = await loadSave(server, annToken, mei.id);
+  await sleep(1100);
+  // A save that kept the gold is refused (not_enough) and nothing is sent.
+  const cheat = { to: bob, text: "ทองให้", parcel: { gold: 50 }, characterId: mei.id, rev, version: 27, state: heroState("เหมยหลิง", 80) };
+  assert.equal(await refusal(sendMail(server, annToken, cheat)), "not_enough");
+  assert.equal(await refusal(sendMail(server, annToken, { ...cheat, parcel: { gold: 500 }, state: heroState("เหมยหลิง", 0) })), "not_enough", "ann has only 80");
+  assert.equal(await refusal(sendMail(server, annToken, { ...cheat, parcel: { itemId: "no_such", count: 1 } })), "not_mailable");
+  const sent = await sendMail(server, annToken, { ...cheat, state: heroState("เหมยหลิง", 20) });
+  assert.ok(sent.delivered && sent.rev === rev + 1);
+  rev = sent.rev;
+  assert.equal(((await loadSave(server, annToken, mei.id)).save?.state as { gold: number }).gold, 20, "the paid save is the one kept");
+  const mail = await pushed(bobSocial.inbox, "mail");
+  assert.deepEqual(mail.mail.parcel, { gold: 50 });
+  assert.equal(mail.mail.from.username, ann);
+  // Reading does not take it; claiming does, once.
+  await socialAction(server, bobToken, "mail/read", { ids: [mail.mail.id] });
+  const box = await loadSocial(server, bobToken);
+  assert.ok(box.mail.find((m) => m.id === mail.mail.id)?.read && !box.mail.find((m) => m.id === mail.mail.id)?.claimed);
+  const taken = await claimMail(server, bobToken, mail.mail.id, heroId);
+  assert.deepEqual(taken.parcel, { gold: 50 });
+  assert.equal(await refusal(claimMail(server, bobToken, mail.mail.id, heroId)), "claimed");
+  // An item parcel; deleting it untaken sends it home to the sender.
+  await sleep(1100);
+  const withPotion = { ...heroState("เหมยหลิง", 10), inventory: { potion: 3 } };
+  rev = (await storeSave(server, annToken, mei.id, rev, { version: 27, state: withPotion })).rev;
+  await sleep(1100);
+  const potionMail = await sendMail(server, annToken, { to: bob, text: "ยาให้", parcel: { itemId: "potion", count: 2 }, characterId: mei.id, rev, version: 27,
+    state: { ...heroState("เหมยหลิง", 0), inventory: { potion: 1 } } });
+  assert.ok(potionMail.delivered);
+  const arrived = await pushed(bobSocial.inbox, "mail");
+  await socialAction(server, bobToken, "mail/delete", { ids: [arrived.mail.id] });
+  const back = await pushed(annSocial.inbox, "mail");
+  assert.ok(back.mail.returned);
+  assert.deepEqual(back.mail.parcel, { itemId: "potion", count: 2 });
+  const home = await claimMail(server, annToken, back.mail.id, mei.id);
+  assert.deepEqual(home.parcel, { itemId: "potion", count: 2 });
+  assert.equal(await refusal(sendMail(server, annToken, { ...cheat, to: "nobody_here_x" })), "no_player");
+});
+
+await check("party: invite, accept, party chat; a companion on the map lifts a checked win; leaving dissolves a party of two", async () => {
+  assert.equal(await refusal(partyAction(server, annToken, "chat", { text: "hi" })), "no_party");
+  const { partyId } = await partyAction<{ partyId: string }>(server, annToken, "invite", { to: bob });
+  const invite = await pushed(bobSocial.inbox, "party_invite");
+  assert.equal(invite.invite.partyId, partyId);
+  await partyAction(server, bobToken, "accept", { partyId });
+  const view = await pushed(annSocial.inbox, "party", 5000, (m) => (m.party?.members.length ?? 0) === 2);
+  assert.equal(view.party!.leader, ann);
+  await partyAction(server, bobToken, "chat", { text: "ออกเดินทางกัน" });
+  const line = await pushed(annSocial.inbox, "party_chat");
+  assert.equal(line.text, "ออกเดินทางกัน");
+  assert.equal(line.from.username, bob);
+  // Ann stands where Bob fights: the win pays the party bonus.
+  const foe = OPPONENTS.find((o) => o.ti === 2 && o.category === "human" && !o.boss && !o.id.startsWith("law_"))!;
+  await standBefore({ opponentId: foe.id, onWin: "city_capital", onLose: "city_capital" }, 100_000);
+  const location = useWorldStore.getState().currentSceneId;
+  annSocial.status("เหมยหลิง", location);
+  await pushed(bobSocial.inbox, "party", 5000, (m) => m.party?.members.find((x) => x.username === ann)?.location === location);
+  const { verdict } = await fight(await startBattle(server, bobToken, heroId));
+  assert.equal(verdict.winner, "A");
+  assert.equal(verdict.spoils?.partyBonus, true);
+  // Ann walks away: no bonus.
+  annSocial.status("เหมยหลิง", "village_far_away");
+  await pushed(bobSocial.inbox, "party", 5000, (m) => m.party?.members.find((x) => x.username === ann)?.location === "village_far_away");
+  await standBefore({ opponentId: foe.id, onWin: "city_capital", onLose: "city_capital" }, 100_000);
+  const alone = await fight(await startBattle(server, bobToken, heroId));
+  assert.ok(!alone.verdict.spoils?.partyBonus);
+  // Ann leaves: two less one dissolves; Bob is told.
+  await partyAction(server, annToken, "leave", {});
+  await pushed(bobSocial.inbox, "party", 5000, (m) => m.party === null);
+  assert.equal((await loadSocial(server, bobToken)).party, null);
+});
+
+await check("block: the blocked player is unfriended and their whispers, requests and mail are refused", async () => {
+  await sleep(10_500); // the whisper burst above
+  await socialAction(server, bobToken, "block", { username: ann, name: "เหมยหลิง" });
+  await pushed(annSocial.inbox, "friend_removed", 5000, (m) => m.username === bob);
+  assert.equal(await refusal(socialAction(server, annToken, "whisper", { to: bob, text: "ฮัลโหล" })), "refused");
+  assert.equal(await refusal(socialAction(server, annToken, "friends/request", { to: bob })), "refused");
+  assert.equal(await refusal(partyAction(server, annToken, "invite", { to: bob })), "refused");
+  const mei = (await listCharacters(server, annToken)).find((c) => c.name === "เหมยหลิง")!;
+  const { rev } = await loadSave(server, annToken, mei.id);
+  assert.equal(await refusal(sendMail(server, annToken, { to: bob, text: "ขอโทษ", parcel: null, characterId: mei.id, rev, version: 27, state: heroState("เหมยหลิง", 0) })), "refused");
+  assert.equal((await loadSave(server, annToken, mei.id)).rev, rev, "no postage paid for a refused letter");
+  const forBob = await loadSocial(server, bobToken);
+  assert.ok(forBob.blocked.some((b) => b.username === ann) && !forBob.friends.some((f) => f.username === ann));
+  await socialAction(server, bobToken, "unblock", { username: ann });
+  assert.equal(await refusal(fetch(`${server}/social`).then((r) => { if (!r.ok) throw new ApiFailure("bad_token", r.status); })), "bad_token");
+});
+annSocial.close();
+bobSocial.close();
 
 if (failed) {
   console.error(`${failed} online check(s) failed`);

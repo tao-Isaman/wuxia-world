@@ -8,14 +8,25 @@
 //   GET  /world[?rev=…&pins=…]                 the shared world (WorldObject)
 //   POST /world/echo                           a deed for the jianghu to talk about
 //   POST /characters/<id>/battle/start|log|finish   a checked battle (BattleObject)
+//   GET  /social · /social/ws                  the player's friends, mail, party (PlayerHub)
+//   POST /social/<action> · /party/<action>    friends, whispers, mail, the party
 import { WorkerEntrypoint } from "cloudflare:workers";
 import RustWorker, { AccountObject, KeyObject, RoomObject } from "wuxia-rust";
-import { accountObjectName, battleObjectName, WORLD_OBJECT_NAME, type Env } from "./env";
+import { accountObjectName, battleObjectName, hubObjectName, WORLD_OBJECT_NAME, type Env } from "./env";
 import { callObject, json, readJson, withCors } from "./http";
 
 export { AccountObject, KeyObject, RoomObject };
 export { WorldObject } from "./world-object";
 export { BattleObject } from "./battle-object";
+export { PlayerHub } from "./hub-object";
+export { PartyObject } from "./party-object";
+
+/** What a player may ask their hub for (its `/internal/*` routes are for other objects only). */
+const SOCIAL_ACTIONS = new Set([
+  "friends/request", "friends/accept", "friends/decline", "friends/remove", "block", "unblock", "whisper",
+  "mail/send", "mail/read", "mail/claim", "mail/delete",
+]);
+const PARTY_ACTIONS = new Set(["invite", "accept", "decline", "leave", "kick", "lead", "chat"]);
 
 /** The session token: `Authorization: Bearer <token>`, else `?token=`. */
 function tokenOf(request: Request, url: URL): string {
@@ -45,15 +56,46 @@ export default class GameServer extends WorkerEntrypoint<Env> {
     const isWorld = parts[0] === "world" && (parts.length === 1 ? request.method === "GET" : parts.length === 2 && parts[1] === "echo" && request.method === "POST");
     const isBattle = parts[0] === "characters" && parts.length === 4 && parts[2] === "battle" && request.method === "POST"
       && ["start", "log", "finish"].includes(parts[3]!);
-    if (!isWorld && !isBattle) return this.rust().fetch(request);
+    const social = this.socialPath(request, parts);
+    if (!isWorld && !isBattle && !social) return this.rust().fetch(request);
     const player = await this.player(request, url);
     if (!player) return withCors(json({ error: "bad_token" }, 401));
     try {
+      // A socket upgrade goes back as it is (CORS headers do not apply).
+      if (social === "/ws") return await this.hub(request, player, social);
+      if (social) return withCors(await this.hub(request, player, social));
       return withCors(isWorld ? await this.world(request, url, player) : await this.battle(request, player, decodeURIComponent(parts[1]!), parts[3]!));
     } catch (error) {
       console.error("[server]", error);
       return withCors(json({ error: "server_error" }, 500));
     }
+  }
+
+  /** The hub path a `/social…` or `/party…` request maps to, or null. */
+  private socialPath(request: Request, parts: string[]): string | null {
+    if (parts[0] === "social" && request.method === "GET") {
+      if (parts.length === 1) return "/snapshot";
+      if (parts.length === 2 && parts[1] === "ws") return "/ws";
+      return null;
+    }
+    if (request.method !== "POST") return null;
+    const rest = parts.slice(1).join("/");
+    if (parts[0] === "social" && SOCIAL_ACTIONS.has(rest)) return `/${rest}`;
+    if (parts[0] === "party" && PARTY_ACTIONS.has(rest)) return `/party/${rest}`;
+    return null;
+  }
+
+  /** Hand a social request to the player's own hub (`x-hub-user` is set here, never by the browser). */
+  private hub(request: Request, player: string, path: string): Promise<Response> {
+    const stub = this.env.HUBS.get(this.env.HUBS.idFromName(hubObjectName(player)));
+    const headers = new Headers({ "x-hub-user": player, "content-type": "application/json" });
+    const upgrade = request.headers.get("upgrade");
+    if (upgrade) headers.set("upgrade", upgrade);
+    return stub.fetch(`https://hub${path}`, {
+      method: request.method,
+      headers,
+      body: request.method === "POST" ? request.body : undefined,
+    });
   }
 
   private worldStub(): DurableObjectStub {

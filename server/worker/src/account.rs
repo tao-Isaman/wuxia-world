@@ -6,15 +6,16 @@
 //! Storage keys: `events` (the account), `roster` (its characters,
 //! `wuxia_core::save::Roster`), `save:<id>` (a character's last accepted save,
 //! raw JSON `{ version, state }`). The worker (`lib.rs`) checks the session
-//! token before it calls any path but `/register` and `/login`; `/grant` is
-//! called only by the TypeScript half's BattleObject (a checked win's gold),
-//! never routed from outside.
+//! token before it calls any path but `/register` and `/login`. `/grant`
+//! (BattleObject: a checked win's gold; PlayerHub: a mail parcel's gold),
+//! `/save-debit` (PlayerHub: the save that pays for a parcel) and `/exists`
+//! are called only by the TypeScript half, never routed from outside.
 
 use serde::Deserialize;
 use serde_json::{json, Value};
 use worker::*;
 use wuxia_core::auth::{Account, AccountEvent, AuthError, SALT_BYTES};
-use wuxia_core::save::{accept, check_save, Character, Roster, SaveError, SaveUpload};
+use wuxia_core::save::{accept, check_debit, check_save, Character, Debit, Roster, SaveError, SaveUpload};
 
 use crate::{now_ms, AccountReply, Credentials};
 
@@ -84,6 +85,14 @@ struct NewCharacter {
 #[derive(Deserialize)]
 struct Grant {
     gold: f64,
+}
+
+/// A save that pays for a parcel (`/save-debit`): the save, and what leaves the bag.
+#[derive(Deserialize)]
+struct DebitUpload {
+    #[serde(flatten)]
+    upload: SaveUpload,
+    debit: Debit,
 }
 
 impl AccountObject {
@@ -158,24 +167,53 @@ impl AccountObject {
 
     async fn store(&self, mut req: Request, id: &str) -> Result<Response> {
         let text = req.text().await?;
-        let mut roster = self.roster().await?;
-        let Some(character) = roster.get_mut(id) else { return refused(SaveError::NoCharacter) };
         if text.len() > wuxia_core::save::MAX_SAVE_BYTES {
             return refused(SaveError::TooLarge);
         }
         let Ok(upload) = serde_json::from_str::<SaveUpload>(&text) else { return refused(SaveError::BadSave("json")) };
+        self.keep(id, upload, None, text.len()).await
+    }
+
+    /// A save that pays for a mail parcel (internal: the TypeScript half's
+    /// PlayerHub). Kept only if the last accepted save held the parcel and this
+    /// one shows it gone (`check_debit`), so a parcel cannot be sent and kept.
+    async fn store_debit(&self, mut req: Request, id: &str) -> Result<Response> {
+        let text = req.text().await?;
+        if text.len() > wuxia_core::save::MAX_SAVE_BYTES + 10_000 {
+            return refused(SaveError::TooLarge);
+        }
+        let Ok(body) = serde_json::from_str::<DebitUpload>(&text) else { return refused(SaveError::BadSave("json")) };
+        self.keep(id, body.upload, Some(body.debit), text.len()).await
+    }
+
+    async fn keep(&self, id: &str, upload: SaveUpload, debit: Option<Debit>, bytes: usize) -> Result<Response> {
+        let mut roster = self.roster().await?;
+        let Some(character) = roster.get_mut(id) else { return refused(SaveError::NoCharacter) };
         let now = now_ms();
-        let accepted = match check_save(character, &upload, text.len(), now) {
+        let accepted = match check_save(character, &upload, bytes, now) {
             Ok(accepted) => accepted,
             Err(error) => return refused(error),
         };
+        let key = format!("save:{id}");
+        if let Some(debit) = &debit {
+            let raw: Option<String> = self.state.storage().get(&key).await?;
+            let before = raw.and_then(|text| serde_json::from_str::<Value>(&text).ok()).and_then(|v| v.get("state").cloned()).unwrap_or(Value::Null);
+            if let Err(error) = check_debit(&before, &upload.state, debit) {
+                return refused(error);
+            }
+        }
         accept(character, accepted, upload.version, now);
         let saved = serde_json::to_string(&json!({ "version": upload.version, "state": upload.state }))?;
         let answer = json!({ "rev": character.rev, "summary": character.summary });
         // One write: the save and the roster that numbers it move together.
-        let key = format!("save:{id}");
         put_two(&self.state.storage(), (ROSTER_KEY, roster_value(&roster)?), (&key, wasm_bindgen::JsValue::from_str(&saved))).await?;
         Response::from_json(&answer)
+    }
+
+    /// Whether this account exists (internal: mail and friend requests check the name).
+    async fn exists(&self) -> Result<Response> {
+        let events: Vec<AccountEvent> = self.state.storage().get(EVENTS_KEY).await?.unwrap_or_default();
+        Response::from_json(&json!({ "exists": !events.is_empty() }))
     }
 
     /// Gold a checked battle paid this character: the next saves may show it.
@@ -208,6 +246,8 @@ impl DurableObject for AccountObject {
             (Method::Get, ["characters", id, "save"]) => self.load(id).await,
             (Method::Put, ["characters", id, "save"]) => self.store(req, id).await,
             (Method::Post, ["characters", id, "grant"]) => self.grant(req, id).await,
+            (Method::Post, ["characters", id, "save-debit"]) => self.store_debit(req, id).await,
+            (Method::Get, ["exists"]) => self.exists().await,
             _ => reply(None, Some("not_found"), 404),
         }
     }

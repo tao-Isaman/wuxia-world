@@ -24,7 +24,7 @@ async function newGame(page: Page) {
   await expect(page.getByTestId("world-canvas")).toHaveAttribute("data-ready", "true", { timeout: 60_000 });
 }
 
-test("letters: a friend's letter waits in the inbox with a badge; opening it takes the gift", async ({ page }) => {
+test("letters: a friend's letter waits in the inbox with a badge; opening reads it, รับของ takes the gift", async ({ page }) => {
   test.setTimeout(120_000);
   await newGame(page);
   await patch(page, { letters: [{ id: "letter_e2e", day: 1, npcId: "sect_shaolin_abbot_huiyuan", text: "ทดสอบจดหมาย\n\n— เจ้าอาวาส",
@@ -35,11 +35,15 @@ test("letters: a friend's letter waits in the inbox with a badge; opening it tak
   await page.getByTestId("letters-list").getByRole("button").first().click();
   await expect(page.getByTestId("letter-open")).toContainText("ทดสอบจดหมาย");
   await expect(page.getByTestId("letter-open")).toContainText("หายาก");
-  const after = await save(page);
-  expect(after.inventory.potion).toBeGreaterThanOrEqual(2);
-  expect(after.letters[0].read).toBe(true);
-  // The gift shows as an icon; the letter can be thrown away.
+  await expect.poll(async () => (await save(page)).letters[0].read).toBe(true);
+  const before = (await save(page)).inventory.potion ?? 0;
+  expect((await save(page)).letters[0].claimed).toBe(false);
+  // The gift shows as an icon and waits for รับของ.
   await expect(page.getByTestId("letter-open").locator(".letter-gift .item-tile")).toBeVisible();
+  await page.getByTestId("letter-claim").click();
+  await expect.poll(async () => (await save(page)).inventory.potion ?? 0).toBe(before + 2);
+  await expect(page.getByTestId("letter-claimed")).toBeVisible();
+  // The letter can be thrown away.
   await page.getByTestId("letter-delete").click();
   await page.getByRole("dialog").filter({ hasText: "ลบจดหมายฉบับนี้" }).getByRole("button", { name: "ลบ", exact: true }).click();
   await expect.poll(async () => (await save(page)).letters.length).toBe(0);

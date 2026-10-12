@@ -241,10 +241,14 @@ export interface WorldStore extends WorldStateData {
   // What a won fight pays (rolled once, the first time it is asked for, and
   // used by acknowledgeBattleResult); null while there is no won world battle.
   victorySpoils: () => VictorySpoils | null;
-  /** Open a letter: mark it read and take its gift. */
-  openLetter: (letterId: string) => { ok: boolean; gift?: string };
-  /** Throw letters away; a gift not yet taken goes to the bag first. */
-  deleteLetters: (letterIds: string[]) => { ok: boolean; deleted: number; gifts: string[] };
+  /** Open a letter: mark it read (its gift waits for claimLetterGift). */
+  readLetter: (letterId: string) => { ok: boolean };
+  /** Take a letter's gift into the bag (รับของ). */
+  claimLetterGift: (letterId: string) => { ok: boolean; gift?: string };
+  /** Take every gift still waiting in a letter (รับทั้งหมด). */
+  claimAllLetterGifts: () => { ok: boolean; gifts: string[] };
+  /** Throw letters away; a gift not yet taken goes with them (`discarded` counts those). */
+  deleteLetters: (letterIds: string[]) => { ok: boolean; deleted: number; discarded: number };
   /** Ride from this place's horse station to a visited station place. */
   stationTravel: (to: string) => { ok: boolean; reason?: "no-station" | "unknown" | "gold" };
   /** Pay the fee and register for this year's sword tournament. */

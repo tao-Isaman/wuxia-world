@@ -29,12 +29,19 @@ pub const JUMP_SLACK: f32 = 48.0;
 pub const MAX_PLAYERS: usize = 64;
 /// The longest hero name, in characters.
 pub const MAX_NAME_CHARS: usize = 24;
+/// The longest chat line, in characters.
+pub const MAX_SAY_CHARS: usize = 120;
+/// At most this many chat lines per player…
+pub const SAY_BURST: usize = 5;
+/// …within this window (ms).
+pub const SAY_WINDOW_MS: f64 = 10_000.0;
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum Command {
     Join { id: String, name: String, body: String, x: f32, y: f32, dir: Dir8 },
     Move { id: String, x: f32, y: f32, dir: Dir8, moving: bool },
     Leave { id: String, reason: LeaveReason },
+    Say { id: String, text: String },
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -52,12 +59,15 @@ impl Rejection {
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct Room {
     players: BTreeMap<String, Presence>,
+    /// When each player last spoke (ms, the last [`SAY_BURST`]), for the chat
+    /// rate limit. Not part of the snapshot: a restarted room forgets it.
+    said: BTreeMap<String, Vec<f64>>,
 }
 
 impl Room {
     /// A room rebuilt from what each connection remembers (after the server slept).
     pub fn from_players(players: impl IntoIterator<Item = Presence>) -> Self {
-        Room { players: players.into_iter().map(|p| (p.id.clone(), p)).collect() }
+        Room { players: players.into_iter().map(|p| (p.id.clone(), p)).collect(), said: BTreeMap::new() }
     }
 
     pub fn player(&self, id: &str) -> Option<&Presence> {
@@ -122,6 +132,17 @@ impl Room {
             } else {
                 Vec::new()
             }),
+            Command::Say { id, text } => {
+                let Some(player) = self.players.get(id) else {
+                    return Err(Rejection::new(ErrorCode::NotJoined, "say hello first"));
+                };
+                let text = clean_text(text)?;
+                let recent = self.said.get(id).map_or(0, |times| times.iter().filter(|t| now - **t < SAY_WINDOW_MS).count());
+                if recent >= SAY_BURST {
+                    return Err(Rejection::new(ErrorCode::TooFast, format!("at most {SAY_BURST} lines every {} s", SAY_WINDOW_MS / 1000.0)));
+                }
+                Ok(vec![RoomEvent::Said { id: id.clone(), name: player.name.clone(), text, at: now }])
+            }
         }
     }
 
@@ -142,6 +163,14 @@ impl Room {
             }
             RoomEvent::Left { id, .. } => {
                 self.players.remove(id);
+                self.said.remove(id);
+            }
+            RoomEvent::Said { id, at, .. } => {
+                let times = self.said.entry(id.clone()).or_default();
+                times.push(*at);
+                if times.len() > SAY_BURST {
+                    times.remove(0);
+                }
             }
         }
     }
@@ -157,6 +186,17 @@ fn clean_name(name: &str) -> Result<String, Rejection> {
         ));
     }
     Ok(name.to_string())
+}
+
+/// A chat line: trimmed, control characters dropped, 1–[`MAX_SAY_CHARS`] characters.
+fn clean_text(text: &str) -> Result<String, Rejection> {
+    let text: String = text.chars().filter(|c| !c.is_control()).collect();
+    let text = text.trim();
+    let count = text.chars().count();
+    if count == 0 || count > MAX_SAY_CHARS {
+        return Err(Rejection::new(ErrorCode::BadText, format!("a chat line is 1–{MAX_SAY_CHARS} characters")));
+    }
+    Ok(text.to_string())
 }
 
 fn clamp_to_map(x: f32, y: f32) -> (f32, f32) {
@@ -299,5 +339,25 @@ mod tests {
             from_zero.apply(event);
         }
         assert_eq!(from_zero, live);
+    }
+
+    #[test]
+    fn chat_lines_are_cleaned_carry_the_name_and_are_rate_limited() {
+        let mut room = Room::default();
+        assert_eq!(room.decide(&Command::Say { id: "a".into(), text: "hi".into() }, 0.0).unwrap_err().code, ErrorCode::NotJoined);
+        run(&mut room, join("a", 100.0, 100.0), 0.0).unwrap();
+        let said = run(&mut room, Command::Say { id: "a".into(), text: "  สวัสดี\u{7}  ".into() }, 10.0).unwrap();
+        assert_eq!(said, vec![RoomEvent::Said { id: "a".into(), name: "hero a".into(), text: "สวัสดี".into(), at: 10.0 }]);
+        assert_eq!(room.decide(&Command::Say { id: "a".into(), text: "   ".into() }, 20.0).unwrap_err().code, ErrorCode::BadText);
+        let long = "ก".repeat(MAX_SAY_CHARS + 1);
+        assert_eq!(room.decide(&Command::Say { id: "a".into(), text: long }, 20.0).unwrap_err().code, ErrorCode::BadText);
+        for i in 1..SAY_BURST {
+            run(&mut room, Command::Say { id: "a".into(), text: format!("{i}") }, 100.0 + i as f64).unwrap();
+        }
+        assert_eq!(room.decide(&Command::Say { id: "a".into(), text: "again".into() }, 200.0).unwrap_err().code, ErrorCode::TooFast);
+        // The window passes.
+        assert!(room.decide(&Command::Say { id: "a".into(), text: "again".into() }, 10.0 + SAY_WINDOW_MS + 1.0).is_ok());
+        // The chat leaves no trace in the snapshot.
+        assert_eq!(room.snapshot().len(), 1);
     }
 }

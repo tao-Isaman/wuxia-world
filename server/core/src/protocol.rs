@@ -10,7 +10,7 @@
 use serde::{Deserialize, Serialize};
 
 /// Bumped when a message changes shape; the client sends it in `hello`.
-pub const PROTOCOL_VERSION: u32 = 1;
+pub const PROTOCOL_VERSION: u32 = 2;
 
 /// The eight headings of the painted walk sheets (`lib/characters/walk8.ts`).
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize, Default)]
@@ -58,6 +58,8 @@ pub enum ClientMsg {
     Sync,
     /// Keep-alive; answered with `pong`.
     Ping { at: f64 },
+    /// A line of map chat, for everyone on this map (protocol 2).
+    Say { text: String },
 }
 
 /// Something that happened in a room. Applied in `seq` order by every client.
@@ -67,6 +69,8 @@ pub enum RoomEvent {
     Joined { player: Presence },
     Moved { id: String, x: f32, y: f32, dir: Dir8, moving: bool, at: f64 },
     Left { id: String, reason: LeaveReason },
+    /// A player said something on this map (`name` as they stand there).
+    Said { id: String, name: String, text: String, at: f64 },
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -109,6 +113,8 @@ pub enum ErrorCode {
     TooFast,
     RoomFull,
     Replaced,
+    /// A chat line that is empty, too long or unprintable.
+    BadText,
 }
 
 impl ClientMsg {
@@ -137,6 +143,9 @@ mod tests {
         assert_eq!(ClientMsg::parse(r#"{"t":"sync"}"#).unwrap(), ClientMsg::Sync);
         let event = ServerMsg::Event { seq: 3, ev: RoomEvent::Left { id: "a".into(), reason: LeaveReason::Replaced } };
         assert_eq!(event.to_json(), r#"{"t":"event","seq":3,"ev":{"t":"left","id":"a","reason":"replaced"}}"#);
+        assert_eq!(ClientMsg::parse(r#"{"t":"say","text":"สวัสดี"}"#).unwrap(), ClientMsg::Say { text: "สวัสดี".into() });
+        let said = ServerMsg::Event { seq: 4, ev: RoomEvent::Said { id: "a".into(), name: "ลี่".into(), text: "hi".into(), at: 5.0 } };
+        assert_eq!(said.to_json(), r#"{"t":"event","seq":4,"ev":{"t":"said","id":"a","name":"ลี่","text":"hi","at":5.0}}"#);
     }
 
     #[test]

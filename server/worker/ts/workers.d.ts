@@ -46,7 +46,21 @@ interface DurableObjectState {
   readonly id: DurableObjectId;
   readonly storage: DurableObjectStorage;
   blockConcurrencyWhile<T>(callback: () => Promise<T>): Promise<T>;
+  /** Hibernation: the object may sleep while this socket stays open. */
+  acceptWebSocket(socket: CfWebSocket, tags?: string[]): void;
+  getWebSockets(tag?: string): CfWebSocket[];
 }
+
+/** A Workers WebSocket (the server end), with the hibernation attachment. */
+interface CfWebSocket {
+  send(message: string): void;
+  close(code?: number, reason?: string): void;
+  serializeAttachment(value: unknown): void;
+  deserializeAttachment(): unknown;
+}
+
+/** `new WebSocketPair()`: [client, server]. */
+declare const WebSocketPair: { new (): { 0: CfWebSocket; 1: CfWebSocket } };
 
 interface DurableObjectStub {
   fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response>;

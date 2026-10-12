@@ -4,7 +4,8 @@ Players sign in with a username and password, pick one of their characters, and 
 
 - **the saves live on the server**: up to four characters per account, each save checked before it is kept;
 - **there is one world for everyone** and the server runs it: the simulated jianghu (its people's lives, deaths and successions) and the talk ([The shared world](#the-shared-world));
-- **the server checks every fight**: it stages the fight from the saved state, replays what the browser played and rolls the spoils ([Battles on the server](#battles-on-the-server)).
+- **the server checks every fight**: it stages the fight from the saved state, replays what the browser played and rolls the spoils ([Battles on the server](#battles-on-the-server));
+- **players meet**: friends, a party of up to four, chat on the map, in the party and in whispers, and letters that carry gold or an item ([Friends, party, chat and mail](#friends-party-chat-and-mail); design: [design/social.md](design/social.md)).
 
 The rest of the game (quests, shops, crafting, walking) still runs in the browser, bounded by the save checks.
 
@@ -18,6 +19,7 @@ The rest of the game (quests, shops, crafting, walking) still runs in the browse
 - [Characters and saves](#characters-and-saves)
 - [The shared world](#the-shared-world)
 - [Battles on the server](#battles-on-the-server)
+- [Friends, party, chat and mail](#friends-party-chat-and-mail)
 - [Data generations (resetting the server)](#data-generations-resetting-the-server)
 - [Running it locally](#running-it-locally)
 - [Deploying](#deploying)
@@ -34,6 +36,7 @@ OnlinePanel ──POST /auth/register|login──►   Rust: AccountObject (Dura
   (store/online-store.ts: token)                    event log, characters, saves
 cloud-world ──GET /world, POST /world/echo─► TS: WorldObject (one): the shared world, run hourly
 cloud-battle ─POST …/battle/start|log|finish► TS: BattleObject (one per character): checked fights
+social-store ─GET /social, /social/ws, POST /social/…, /party/…► TS: PlayerHub (one per account) ⇄ PartyObject (one per party)
 map runtime ─report(room, motion)─► OnlineSession (lib/net/session.ts)
   draws players() ◄──────────────────  │ one WebSocket: /rooms/<map id>/ws?token=…
                                        └─────────────► Worker checks the token
@@ -76,10 +79,11 @@ The pure logic lives in `server/core` (no I/O, clock or randomness), so it is te
 | | `move { x, y, dir, moving }` | position and heading, ~10 a second while walking |
 | | `sync` | ask for a fresh snapshot |
 | | `ping { at }` | keep-alive |
+| | `say { text }` | a line of map chat (protocol 2) |
 | server → client | `welcome { you, room, epoch, seq, players }` | the room at `seq` (answer to `hello` / `sync`) |
-| | `event { seq, ev }` | one event, in order: `joined { player }`, `moved { id, x, y, dir, moving, at }`, `left { id, reason }` |
+| | `event { seq, ev }` | one event, in order: `joined { player }`, `moved { id, x, y, dir, moving, at }`, `left { id, reason }`, `said { id, name, text, at }` |
 | | `pong { at, server }` | the server's time |
-| | `error { code, message }` | a refused command: `bad_message`, `bad_version`, `not_joined`, `already_joined`, `bad_profile`, `too_fast`, `room_full`, `replaced` |
+| | `error { code, message }` | a refused command: `bad_message`, `bad_version`, `not_joined`, `already_joined`, `bad_profile`, `too_fast`, `room_full`, `replaced`, `bad_text` |
 
 **Server rules** (`room.rs`):
 
@@ -87,6 +91,7 @@ The pure logic lives in `server/core` (no I/O, clock or randomness), so it is te
 - A move may cover at most `WALK_SPEED` (150) × 1.6 × the time since the last one, plus 48 units; anything more is `too_fast`.
 - Names are 1–24 printable characters; bodies are `m1` or `f1`.
 - A room holds at most 64 players.
+- Map chat: 1–120 characters (control characters removed, trimmed), at most 5 lines per 10 s per player (`too_fast`); only a joined player may speak. The line goes to everyone in the room, the speaker included, with the hero name.
 - Joining again with the same account (a second tab) emits `left { reason: "replaced" }` and closes the older socket with code 4001.
 
 **HTTP:**
@@ -117,8 +122,10 @@ Usernames are 3–20 of `a–z 0–9 _`, case-insensitive. Passwords are 6–72 
 | `server/worker/ts/entry.ts` | the Worker's entry (TypeScript): the world and battle routes, everything else to the Rust half |
 | `server/worker/ts/world-doc.ts` · `world-object.ts` | the shared world: the pure document (create, advance, pins, echoes, killings) and `WorldObject` (storage, hourly alarm) |
 | `server/worker/ts/battle-doc.ts` · `battle-object.ts` | checked battles: the pure record (stage, replay, judge) and `BattleObject` (one per character: replay, beasts' rest, grants, world killings) |
+| `server/worker/ts/social-doc.ts` · `hub-object.ts` | a player's social home: the pure document (friends, requests, blocks, mail, whispers, rate limits, parcels) and `PlayerHub` (one per account: the social socket, talking to other hubs, parties and the account) |
+| `server/worker/ts/party-doc.ts` · `party-object.ts` | a party: the pure document (invite, join, leave, kick, lead, chat, the bonus) and `PartyObject` (tells every member's hub) |
 | `server/worker/ts/env.ts` · `http.ts` · `workers.d.ts` | bindings and object names (`DATA_EPOCH`), HTTP helpers, the few Workers types used |
-| `server/worker/wrangler.toml` | `main = "ts/entry.ts"`, the `wuxia-rust` alias, `minify`, bindings `ACCOUNTS` / `ROOMS` / `KEYS` / `WORLD` / `BATTLES`, the SQLite-backed Durable Object migrations (`v1`, `v2` adds `KeyObject`, `v3` `WorldObject` and `BattleObject`), `PBKDF2_ITERATIONS` |
+| `server/worker/wrangler.toml` | `main = "ts/entry.ts"`, the `wuxia-rust` alias, `minify`, bindings `ACCOUNTS` / `ROOMS` / `KEYS` / `WORLD` / `BATTLES` / `HUBS` / `PARTIES`, the SQLite-backed Durable Object migrations (`v1`, `v2` adds `KeyObject`, `v3` `WorldObject` and `BattleObject`, `v4` `PlayerHub` and `PartyObject`), `PBKDF2_ITERATIONS` |
 
 ## The client (`lib/net/`)
 
@@ -130,6 +137,9 @@ Usernames are 3–20 of `a–z 0–9 _`, case-insensitive. Passwords are 6–72 
 | `lib/net/cloud-save.ts` | `cloudSave`: the world store's persist storage on the server (debounced writes on the server's `rev`, status, `settle`), the read-only `WorldService` for the world loaded at entry |
 | `store/cloud-world.ts` | follows the server's world: polls it every minute with the hero's pins, lays it over the state (`applyServerWorld`), sends the hero's echoes |
 | `store/cloud-battle.ts` | `cloudBattle` / `useCloudBattle`: stage a fight on the server, stream its command log, wait for the verdict |
+| `lib/net/social-protocol.ts` · `social.ts` | the social types and limits (browser and server) and `socialSocket`, the one socket to the account's hub (status, reconnects) |
+| `store/social-store.ts` | `useSocialStore`: friends, requests, blocked, the party, player mail, chat lines; every social action; parcels paid through `cloudSave.exclusive` |
+| `components/world/social/` | the chat box and its HUD button, the สหาย window, the player card, the party frame, the จากสหาย / เขียนจดหมาย tabs |
 | `lib/net/presence.ts` | the pure reducer `applyServerMsg` (welcome, events in `seq` order, resync on a gap) |
 | `lib/net/session.ts` | `OnlineSession` (`onlineSession`): one socket for the map the hero is on, throttled moves, reconnects |
 | `lib/net/config.ts` | the server address: `localStorage["wuxia-game-server"]`, else `NEXT_PUBLIC_GAME_SERVER_URL` |
@@ -152,7 +162,9 @@ Usernames are 3–20 of `a–z 0–9 _`, case-insensitive. Passwords are 6–72 
 - Other players come from `presentation.online.players()` every frame, like the roaming foes.
 - Each walks toward the last position the server sent, catching up over ~100 ms; a jump of more than 160 units snaps.
 - They use their body's painted eight-way walk cells and wear a **gold** name tag (NPCs' are green).
-- The host publishes `data-remote-players` (`[[id, x, y], …]`) for tests.
+- The name tag of a party member is **sky blue**. A chat line floats over its speaker for 6 s (`onlineSession.bubble`), the hero's own too.
+- Tapping another player opens their card (`presentation.online.pick`).
+- The host publishes `data-remote-players` (`[[id, x, y], …]`), `data-remote-screen` (where to tap them), `data-chat-bubbles` and `data-party-tags` for tests.
 
 **The flow** (with a server set): **account → character → play**.
 
@@ -241,9 +253,39 @@ The browser and the server roll the same numbers because the engines are the sam
 
 Without a server (dev, tests, `/debug`) battles are unseeded and roll in the browser as before.
 
+## Friends, party, chat and mail
+
+The design, with what other games do, is in [design/social.md](design/social.md). Everything here needs a game server and a character being played.
+
+**Who.** A player is their account (`username`): friends, parties, whispers and mail are between accounts, shown with the hero name the account last played.
+
+**The hub.** Each account has a `PlayerHub` (`2:hub:<username>`, `server/worker/ts/hub-object.ts`) keeping its friends (100), requests (30 each way), blocks (100), player mail (50 letters, 30 days), the last 50 whispers, its status and its party. The browser holds one hibernating socket to it (`GET /social/ws`, `lib/net/social.ts`) and tells it the hero's name, body, map and character (`status`); the hub pushes what happens (`SocialPush`: a request, a new friend, a friend's status, a whisper, mail, the party, an invite, a party line). Hubs talk to each other and to parties over internal routes the Worker never forwards from outside.
+
+**The party.** A `PartyObject` (`2:party:<id>`) holds up to 4 members and a leader; invites lapse after 2 minutes; a leader who leaves passes the lead to the longest-standing member; a party of one dissolves. A checked battle won while another online member stands on the same map pays **+10 % w-exp and move xp**: `BattleObject` asks the player's hub at the verdict (`/internal/party-bonus`) and raises the spoils itself (`withPartyBonus`; the verdict's `spoils.partyBonus`).
+
+**Chat.** Map chat goes through the room (`say` / `said`, above). Party chat (`POST /party/chat`) and whispers (`POST /social/whisper`) go through the hubs, 1–120 characters, 5 lines per 10 s; a block refuses whispers, requests, invites and mail, and hides the blocked player's map lines.
+
+**Mail and parcels.** A letter is up to 500 characters with an optional parcel: gold (1–50,000) or one stack of a sellable item (no quest items, manuals or scrolls). Every letter costs 10 ตำลึง postage; 10 letters an hour.
+
+- **Sending pays first.** The browser writes what is pending (`cloudSave.exclusive`), then sends `POST /social/mail/send` with the letter **and its next save** (the state minus the parcel and the postage, on the save's `rev`). The account checks that save as usual and that the parcel really left the bag (`check_debit`, `save.rs`: the last save held it, the new one holds that much less) and stores it (`POST /characters/<id>/save-debit`, internal). The receiver is asked before anything is paid (blocked or a full box refuses the letter).
+- **Delivery.** If the letter cannot be delivered after paying, its parcel comes back at once as a returned letter in the sender's box.
+- **Taking it (รับของ)** is `POST /social/mail/claim`: once; gold is granted to the character's save allowance (the battle purse's `/grant`), and the browser adds the parcel to the bag. Deleting a letter with an untaken parcel sends it back to the sender (a returned parcel deleted untaken is gone); a letter past 30 days returns its parcel the same way.
+
+| Request (session token) | Answer |
+| --- | --- |
+| `GET /social` | `SocialSnapshot`: me, friends (online, where, in a party), requests in / out, blocked, mail, whispers, the party, invites |
+| `GET /social/ws?token=…` | the social socket |
+| `POST /social/friends/request\|accept\|decline\|remove`, `/social/block`, `/social/unblock` | `{ outcome }` / `{ ok }`; errors `no_player`, `already`, `blocked`, `refused`, `full`, `their_list_full`, `no_request` |
+| `POST /social/whisper { to, text }` | `{ whisper }`; `bad_text`, `too_fast`, `refused` |
+| `POST /social/mail/send` (`SendMailRequest`) | `{ rev, mailId, delivered, reason }`; `not_enough`, `bad_parcel`, `not_mailable`, `too_many`, `their_box_full`, the save errors |
+| `POST /social/mail/read\|claim\|delete` | `{ ok }` / `{ parcel }`; `claimed`, `no_parcel`, `no_character` |
+| `POST /party/invite\|accept\|decline\|leave\|kick\|lead\|chat` | `{ ok }`; `not_leader`, `full`, `member`, `in_party`, `no_invite`, `no_party`, `too_fast` |
+
+**In the game.** A สหาย tab (10th, hotkey 0) lists friends (online first, where they are; กระซิบ, ชวนเข้าคณะ, จดหมาย, ลบ), requests and invites, the party (leader's tools) and the blocked. A สนทนา button opens the chat box at the bottom left (แผนที่ / คณะ / กระซิบ; Enter on the map opens it, Esc closes it; typing never moves the hero); closed, new lines float there for a few seconds. The จดหมาย window gains จากสหาย and เขียนจดหมาย tabs. The party frame under the vitals shows each companion, ★ when they share the map. Tapping another player opens their card: กระซิบ, เพิ่มสหาย, ชวนเข้าคณะ, เขียนจดหมาย, บล็อก.
+
 ## Data generations (resetting the server)
 
-Every Durable Object name starts with the **data generation** (`DATA_EPOCH`, `"2"` since 2026-10-11, in both `server/worker/src/lib.rs` and `server/worker/ts/env.ts`): accounts are `2:<username>`, rooms `2:<map id>`, the signing key `2:auth`, the world `2:world`, battles `2:<username>:<character id>`. Raising it starts the server over — no accounts, characters, saves or world, and a new signing key, so every saved session signs out (the browser lands on the log-in step). The old generation's objects stay in storage, unreachable. Generation 1 (accounts and saves made before 2026-10-11) was left behind this way while nobody played yet.
+Every Durable Object name starts with the **data generation** (`DATA_EPOCH`, `"2"` since 2026-10-11, in both `server/worker/src/lib.rs` and `server/worker/ts/env.ts`): accounts are `2:<username>`, rooms `2:<map id>`, the signing key `2:auth`, the world `2:world`, battles `2:<username>:<character id>`, hubs `2:hub:<username>`, parties `2:party:<id>`. Raising it starts the server over — no accounts, characters, saves or world, and a new signing key, so every saved session signs out (the browser lands on the log-in step). The old generation's objects stay in storage, unreachable. Generation 1 (accounts and saves made before 2026-10-11) was left behind this way while nobody played yet.
 
 ## Running it locally
 
@@ -288,7 +330,7 @@ Then set `NEXT_PUBLIC_GAME_SERVER_URL` to the Worker's URL (`https://wuxia-world
 | Deploy command | `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \| sh -s -- -y --profile minimal --target wasm32-unknown-unknown && . "$HOME/.cargo/env" && npx wrangler deploy` |
 | Preview command | the same, ending in `npx wrangler deploy --dry-run` |
 
-No variables or secrets to add: the server makes its own signing key (above), and `PBKDF2_ITERATIONS` comes from `wrangler.toml` (variables set only in the dashboard are dropped by the next `wrangler deploy`). `GET /health` answers `{"ok":true,"protocol":1,"auth":"ready"}` once the server is live.
+No variables or secrets to add: the server makes its own signing key (above), and `PBKDF2_ITERATIONS` comes from `wrangler.toml` (variables set only in the dashboard are dropped by the next `wrangler deploy`). `GET /health` answers `{"ok":true,"protocol":2,"auth":"ready"}` once the server is live.
 
 Servers deployed before the key moved into `KeyObject` signed tokens with an `AUTH_SECRET` variable; those tokens stop working once (accounts are untouched), and the `AUTH_SECRET` variable can be deleted. On load, `OnlineBridge` checks a saved token (`checkToken` → `GET /auth/me`); on a 401 it signs out, so the player lands on the log-in step with the name filled in instead of a room that keeps refusing them.
 
@@ -298,17 +340,18 @@ Durable Objects with SQLite storage are on the Workers free plan. PBKDF2 at 10,0
 
 | Command | What |
 | --- | --- |
-| `bun run test:server` | `cargo test` of `wuxia-core`: protocol spelling, `decide` / `apply` (speed limit, bounds, replace, full room, snapshot + events = the same room), accounts and tokens, the roster, every save check and the server's gold grants |
-| `bun run test:play-server` | the TypeScript half without a server: battles as replayable commands, the world document (days and weeks, pins, echoes and their limits, killings, beasts), the battle document (staging, replay in parts, refusals, verdict) and the browser's checked-battle loop against them behind a fake fetch |
-| `bun run test:net` | the client without a server: the presence reducer (order, gaps, resync), the session (hello with the real position, throttled moves, room switch) against a fake WebSocket, and `cloudSave` against a fake server (debounce, rev, conflict, refusal, retry) |
-| `bun run test:online` | against a running server (`bun run server:dev`, or `GAME_SERVER_URL`): sign-up / login / refusals, checking a saved token (`/auth/me`), a bad token, two players' join → move → leave in `seq` order, a refused teleport, a second login replacing the first; characters (limit, unique names, owner only, delete), saves (rev, pace, hero, numbers, gold allowance); the one world (the same for two accounts, an echo heard by the other, refusals); checked battles (staged from the save, the log replayed in parts, the verdict, a T5 purse saved past a spent allowance, a bad log refused, a resting beast, a killing reaching the world) |
-| `tests/browser/online.spec.ts` | two browsers sign up on the title screen, start heroes, see each other at home; one walks and the other sees it live; closing one makes them leave; a saved token the server no longer accepts lands on the log-in step; two characters on one account: switch, resume after a reload, see both from another browser, delete one; a fight staged on the server, played on อัตโนมัติ, its result held until the server's verdict and spoils. Skipped when no server answers |
+| `bun run test:server` | `cargo test` of `wuxia-core`: protocol spelling, `decide` / `apply` (speed limit, bounds, replace, full room, map chat's cleaning and rate limit, snapshot + events = the same room), accounts and tokens, the roster, every save check, the server's gold grants and a parcel's debit |
+| `bun run test:play-server` | the TypeScript half without a server: battles as replayable commands, the world document (days and weeks, pins, echoes and their limits, killings, beasts), the battle document (staging, replay in parts, refusals, verdict) and the browser's checked-battle loop against them behind a fake fetch; the social documents (text, usernames, requests, blocks, rate limits, parcels, mail claim / full box / delete / expiry, the party's rules and bonus) |
+| `bun run test:net` | the client without a server: the presence reducer (order, gaps, resync), the session (hello with the real position, throttled moves, room switch, map chat and bubbles) against a fake WebSocket, and `cloudSave` against a fake server (debounce, rev, conflict, refusal, retry, `exclusive`) |
+| `bun run test:online` | against a running server (`bun run server:dev`, or `GAME_SERVER_URL`): sign-up / login / refusals, checking a saved token (`/auth/me`), a bad token, two players' join → move → leave in `seq` order, a refused teleport, a second login replacing the first; characters (limit, unique names, owner only, delete), saves (rev, pace, hero, numbers, gold allowance); the one world (the same for two accounts, an echo heard by the other, refusals); checked battles (staged from the save, the log replayed in parts, the verdict, a T5 purse saved past a spent allowance, a bad log refused, a resting beast, a killing reaching the world); map chat; friends (request, accept, status), whispers, mail with gold and item parcels (a save that keeps the parcel refused, claim once, a deleted parcel returned), the party (invite, chat, the bonus on the same map and not elsewhere, dissolving), blocking |
+| `tests/browser/online.spec.ts` | two browsers sign up on the title screen, start heroes, see each other at home; one walks and the other sees it live; closing one makes them leave; a saved token the server no longer accepts lands on the log-in step; two characters on one account: switch, resume after a reload, see both from another browser, delete one; a fight staged on the server, played on อัตโนมัติ, its result held until the server's verdict and spoils; two players chat on the map (a bubble over the speaker, typing does not walk), one taps the other for the card and befriends them, a party with its frame, colour and chat, a letter with 100 ตำลึง taken by รับของ and checked in both saves. Skipped when no server answers |
 
 ## Limits and next steps
 
-- **Not everything runs on the server.** The world and every fight do; quests, shops, crafting, gathering, gifts and letters still run in the browser, and the save checks (limits, the gold allowance) bound what an edited client can give itself. With no trading between players, that cheating stays in one's own game. Next steps if players come to share an economy: shops and quest rewards as server calls, and an audit of items and moves against the game's tables.
+- **Not everything runs on the server.** The world and every fight do; quests, shops, crafting, gathering, gifts and NPC letters still run in the browser, and the save checks (limits, the gold allowance) bound what an edited client can give itself. **Mail now passes gold and items between players**: the parcel must really leave the sender's save (checked on the server), but an item an edited client gave itself can be mailed on. Gold is bounded by the allowance at both ends. Next steps as players share an economy: shops and quest rewards as server calls, and an audit of items against the game's tables.
 - **What the server trusts in a fight.** It stages the fight from the saved hero, so a hero edited within the save limits fights as edited; and it trusts which fight the save says the hero stands before (the opponent, not its loot or outcome). A reload mid-fight restarts it with a new seed.
 - **CPU.** The TypeScript half loads the game's tables at start-up (~6 MB of mostly Thai text, minified; ~2 MB gzipped) and a week of the world or a long replay takes a few milliseconds. The free plan's 10 ms per request fits the usual call; a long boss fight's final replay may need the paid plan's limit.
 - **Trust in movement.** The server checks speed and bounds, not collision; a modified client can walk through walls.
-- **No chat, no emotes, no seeing heroes fight.** Each is one more command and event in `room.rs`.
+- **No world chat, no emotes, no fighting together, no face-to-face trade.** The party gives a bonus; battles stay one hero. A world channel would be one more object every hub subscribes to.
+- **Chat moderation** is blocking only: no reports or word filter yet.
 - **Rate limits.** A client could flood moves; the throttle is client-side only. A per-socket token bucket in the room would cap it.

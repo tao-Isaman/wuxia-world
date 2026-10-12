@@ -16,8 +16,8 @@ import { getOpponent } from "@/lib/world/data/opponents";
 import type { BattleSession } from "@/lib/game/grid/session";
 import type { BattleStartReply, BattleVerdict } from "@/lib/net/play-protocol";
 import type { WorldStateData } from "@/lib/world/types";
-import { judge, newSession, playCommands, stageBattle, type BattleRecord, type BossDays } from "./battle-doc";
-import { accountObjectName, WORLD_OBJECT_NAME, type Env } from "./env";
+import { judge, newSession, playCommands, stageBattle, withPartyBonus, type BattleRecord, type BossDays } from "./battle-doc";
+import { accountObjectName, hubObjectName, WORLD_OBJECT_NAME, type Env } from "./env";
 import { callObject, json, readJson } from "./http";
 
 const RECORD = "battle";
@@ -98,10 +98,23 @@ export class BattleObject extends DurableObject<Env> {
     }
     const verdict = judge(record, session);
     if (!verdict) return json({ error: "not_over", at: record.commands.length }, 422);
+    if (verdict.spoils && await this.partyBonus(record)) verdict.spoils = withPartyBonus(verdict.spoils);
     record.verdict = verdict;
     await this.save();
     await this.consequences(record, verdict);
     return json(verdict);
+  }
+
+  /** Whether another online party member stands on the hero's map (the player's hub asks the party). */
+  private async partyBonus(record: BattleRecord): Promise<boolean> {
+    const location = record.context.currentSceneId;
+    if (!location) return false;
+    const hub = this.env.HUBS.get(this.env.HUBS.idFromName(hubObjectName(record.player)));
+    const reply = await hub.fetch(`https://hub/internal/party-bonus?location=${encodeURIComponent(location)}`, {
+      headers: { "x-hub-user": record.player },
+    }).catch(() => null);
+    const body = reply?.ok ? await reply.json().catch(() => null) as { bonus?: boolean } | null : null;
+    return !!body?.bonus;
   }
 
   /** What a checked win changes beyond the hero: gold allowance, beasts, the world. */

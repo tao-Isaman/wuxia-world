@@ -195,3 +195,40 @@
   .letter-text { font-size: 13px; padding: 6px 9px; }
   .letter-portrait { width: 36px; height: 36px; }
 }
+
+/* ── Letters online: จากผู้คน | จากสหาย | เขียนจดหมาย (docs/design/social.md) ── */
+.letters-wrap { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 8px; color: var(--scroll-ink); }
+.letters-wrap > .menu-tabs { max-width: 520px; }
+.mail-compose {
+  flex: 1; min-height: 0; overflow: auto; display: flex; flex-direction: column; gap: 8px; padding: 10px 12px;
+  background: #fff8e650; border: 1px solid var(--scroll-line); border-radius: 6px; max-width: 640px;
+}
+.mail-field { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+.mail-field > span { flex: 0 0 64px; font-weight: 600; color: var(--ribbon-deep); }
+.mail-field input, .mail-field select, .mail-field textarea, .social-add input {
+  min-width: 0; flex: 1; padding: 5px 8px; font-size: 14px; color: var(--scroll-ink); background: #fffaf0;
+  border: 1px solid var(--scroll-line); border-radius: 5px;
+}
+.mail-field input[type=number] { flex: 0 0 110px; }
+.mail-field--text { align-items: flex-start; }
+.mail-field--text textarea { resize: none; line-height: 1.5; }
+.mail-field--text small { align-self: flex-end; font-size: 11px; color: var(--scroll-ink-soft); }
+.mail-field .menu-tabs { flex: 1; }
+
+/* ── สหาย: friends | requests · invites | the party ───────────────────── */
+.social-cols { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1fr); grid-auto-flow: row; color: var(--scroll-ink); }
+.social-add { display: flex; gap: 6px; }
+.social-list { display: flex; flex-direction: column; gap: 4px; margin: 0; padding: 0; list-style: none; }
+.social-row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; padding: 4px 6px; background: #f3e6c255; border-radius: 5px; font-size: 13.5px; }
+.social-who { flex: 1 1 160px; min-width: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 2px 6px; text-align: left; }
+.social-who small { font-size: 11px; color: var(--scroll-ink-soft); }
+.social-where { flex-basis: 100%; }
+.social-actions { display: flex; flex-wrap: wrap; gap: 2px; }
+.social-actions button { height: 26px; padding: 0 6px; font-size: 12px; }
+.player-card { display: grid; gap: 8px; }
+.player-card-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+@media (orientation: landscape) and (max-height: 500px), (orientation: portrait) and (max-width: 500px) {
+  .social-row { font-size: 12.5px; padding: 3px 5px; }
+  .mail-field { font-size: 13px; }
+  .mail-field > span { flex-basis: 52px; }
+}

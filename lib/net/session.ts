@@ -8,6 +8,17 @@ import { connectRoom, type RoomConnection } from "./client";
 import { applyServerMsg, emptyPresence, othersIn, type PresenceState } from "./presence";
 import type { HeroBody, Motion, Presence } from "./protocol";
 
+/** A line of map chat as the chat box shows it. */
+export interface MapLine {
+  id: string;
+  name: string;
+  text: string;
+  at: number;
+}
+
+/** How long a chat line floats over its speaker's head (ms). */
+export const BUBBLE_MS = 6000;
+
 /** Moves are sent at most this often while walking (ms)… */
 export const MOVE_INTERVAL_MS = 100;
 /** …and a standing hero re-sends nothing. A silent map closes the socket after this long. */
@@ -40,6 +51,12 @@ export class OnlineSession {
   private retryTimer: ReturnType<typeof setTimeout> | null = null;
   private timer: ReturnType<typeof setInterval> | null = null;
   private listeners = new Set<Listener>();
+  private chatListeners = new Set<(line: MapLine) => void>();
+  private chatErrorListeners = new Set<(code: string) => void>();
+  /** The last line each player said on this map (for bubbles). */
+  private bubbles = new Map<string, MapLine>();
+  /** The seq of the last chat line heard (a line arriving out of order is still shown, once). */
+  private lastSaidSeq = 0;
   status: OnlineStatus = "off";
 
   /** Sign in (or out, with null): the next report joins the current map. */
@@ -79,6 +96,37 @@ export class OnlineSession {
     this.lastSentAt = Date.now();
   }
 
+  /** Say a line to everyone on this map; false when not in a room. */
+  say(text: string): boolean {
+    if (!this.conn?.isOpen || this.presence.epoch === null) return false;
+    this.conn.say(text);
+    return true;
+  }
+
+  /** Every map chat line heard (ours included, as the server echoes it). */
+  onChat(listener: (line: MapLine) => void): () => void {
+    this.chatListeners.add(listener);
+    return () => { this.chatListeners.delete(listener); };
+  }
+
+  /** A map chat line the server refused (`too_fast`, `bad_text`). */
+  onChatError(listener: (code: string) => void): () => void {
+    this.chatErrorListeners.add(listener);
+    return () => { this.chatErrorListeners.delete(listener); };
+  }
+
+  /** What `id` said in the last few seconds on `room`'s map (drawn over their head), or null. */
+  bubble(room: string, id: string): string | null {
+    if (room !== this.room) return null;
+    const line = this.bubbles.get(id);
+    return line && Date.now() - line.at < BUBBLE_MS ? line.text : null;
+  }
+
+  /** Our own username in the room (null before the welcome). */
+  get you(): string | null {
+    return this.presence.you;
+  }
+
   subscribe(listener: Listener): () => void {
     this.listeners.add(listener);
     return () => { this.listeners.delete(listener); };
@@ -111,6 +159,7 @@ export class OnlineSession {
     this.setStatus("connecting");
     this.presence = emptyPresence();
     this.others = [];
+    this.lastSaidSeq = 0;
     this.lastSent = { ...motion };
     this.lastSentAt = Date.now();
     const conn = connectRoom({
@@ -121,6 +170,15 @@ export class OnlineSession {
       onMessage: (message) => {
         if (conn !== this.conn) return;
         if (message.t === "error" && message.code === "replaced") { this.setStatus("replaced"); return; }
+        if (message.t === "error" && (message.code === "too_fast" || message.code === "bad_text")) {
+          for (const listener of this.chatErrorListeners) listener(message.code);
+        }
+        if (message.t === "event" && message.ev.t === "said" && message.seq > Math.max(this.presence.seq, this.lastSaidSeq)) {
+          this.lastSaidSeq = message.seq;
+          const line: MapLine = { id: message.ev.id, name: message.ev.name, text: message.ev.text, at: Date.now() };
+          this.bubbles.set(line.id, line);
+          for (const listener of this.chatListeners) listener(line);
+        }
         const { state, resync } = applyServerMsg(this.presence, message);
         if (resync) conn.sync();
         if (state !== this.presence) {
@@ -176,6 +234,7 @@ export class OnlineSession {
     this.room = null;
     this.presence = emptyPresence();
     this.others = [];
+    this.bubbles.clear();
     this.lastSent = null;
     this.emit();
   }

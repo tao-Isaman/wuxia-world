@@ -21,6 +21,12 @@ export interface HeroMotion extends Point {
 export interface OnlinePort {
   players: () => readonly RemotePlayer[];
   report: (motion: HeroMotion) => void;
+  /** What a player (or `null`: the hero) said on this map a moment ago, drawn over their head. */
+  bubble?: (id: string | null) => string | null;
+  /** Whether a player is in the hero's party (their name tag is drawn in the party colour). */
+  inParty?: (id: string) => boolean;
+  /** Another player was tapped (the player card opens). */
+  pick?: (player: RemotePlayer) => void;
 }
 
 export type WorldMarkerCategory = "npc" | "route" | "place" | "activity";

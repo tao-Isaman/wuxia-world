@@ -23,6 +23,11 @@ import { InstallGameButton } from "@/components/pwa";
 import { SoundButton } from "@/components/sound-button";
 import { OnlineButton } from "./online-panel";
 import { sectActionCount } from "@/lib/world";
+import { mailWaiting, useSocialStore } from "@/store/social-store";
+import { FriendsPopup } from "./social/friends-popup";
+import { ChatBox, ChatButton } from "./social/chat-box";
+import { PlayerCard } from "./social/player-card";
+import { PartyFrame } from "./social/party-frame";
 
 type PopupId =
   | "profile"
@@ -34,9 +39,11 @@ type PopupId =
   | "log"
   | "letters"
   | "meridians"
+  | "friends"
   | null;
 
-// The game's menu: nine sections (โปรไฟล์ … ชีพจร), one popup at a time.
+// The game's menu: nine sections (โปรไฟล์ … ชีพจร), and สหาย online (hotkey
+// 0), one popup at a time.
 // On a painted map (`hud`) it is the top-left stack — the vitals card over
 // an icon bar that wraps into rows (four to a row on phones, see
 // mobile-hud.css) — plus the top-right stack (the quest tracker over the
@@ -68,6 +75,17 @@ export function MenuBar({ hud, extras }: { hud?: boolean; extras?: ReactNode } =
     if (letter && !letter.read) toast("info", "✉ มีจดหมายฉบับใหม่ — เปิดดูที่ จดหมาย");
   }, [hud, newest, seenNewest]);
 
+  // Online: player mail joins the จดหมาย badge; สหาย counts requests and invites.
+  const online = useSocialStore((s) => s.status !== "off");
+  const playerMail = useSocialStore(mailWaiting);
+  const socialPending = useSocialStore((s) => s.requestsIn.length + s.invites.length);
+  const menuRequest = useSocialStore((s) => s.menuRequest);
+  useEffect(() => {
+    if (!menuRequest) return;
+    setOpen(menuRequest);
+    useSocialStore.setState({ menuRequest: null });
+  }, [menuRequest]);
+
   // ชีพจร: the unspent points, shown only while a point can be opened with them.
   const meridianPoints = useWorldStore((s) => s.meridianPoints ?? 0);
   const meridianReady = useWorldStore((s) => meridianActionable(s.playerBuild?.meridians, s.meridianPoints ?? 0));
@@ -95,14 +113,17 @@ export function MenuBar({ hud, extras }: { hud?: boolean; extras?: ReactNode } =
       badge: sectActions > 0 ? sectActions : undefined,
     },
     { id: "log", icon: "/icons/ui/log.png", label: "บันทึก" },
-    { id: "letters", icon: "/icons/ui/letter.png", label: "จดหมาย", badge: unread > 0 ? unread : undefined },
+    { id: "letters", icon: "/icons/ui/letter.png", label: "จดหมาย", badge: unread + playerMail > 0 ? unread + playerMail : undefined },
     { id: "meridians", icon: "/icons/ui/meridian.png", label: "ชีพจร", badge: meridianReady ? meridianPoints : undefined },
+    ...(online ? [{ id: "friends" as const, icon: "/icons/ui/friends.png", label: "สหาย", badge: socialPending > 0 ? socialPending : undefined }] : []),
   ];
+  /** Tab hotkeys: 1–9, then 0 for the tenth. */
+  const hotkey = (i: number) => String((i + 1) % 10);
 
   // Hero's Adventure-style unified menu: the open popup renders inside one
   // full-screen tabbed shell, and number keys 1-9 switch sections in place.
   const menu = {
-    tabs: tabs.map((t, i) => ({ ...t, hotkey: String(i + 1) })),
+    tabs: tabs.map((t, i) => ({ ...t, hotkey: hotkey(i) })),
     active: open,
     select: (id: string) => setOpen(id as Exclude<PopupId, null>),
   };
@@ -117,6 +138,7 @@ export function MenuBar({ hud, extras }: { hud?: boolean; extras?: ReactNode } =
       <ActionLogPopup open={open === "log"} onClose={close} />
       <LettersPopup open={open === "letters"} onClose={close} />
       <MeridianPopup open={open === "meridians"} onClose={close} />
+      <FriendsPopup open={open === "friends"} onClose={close} />
     </GameMenuContext.Provider>
   );
 
@@ -129,8 +151,8 @@ export function MenuBar({ hud, extras }: { hud?: boolean; extras?: ReactNode } =
       const target = e.target;
       if (target instanceof HTMLElement && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName))) return;
       if (document.querySelector('[role="dialog"], [role="alertdialog"], [data-world-busy]')) return;
-      const index = Number(e.key) - 1;
-      if (Number.isInteger(index) && index >= 0 && index < tabs.length) { e.preventDefault(); setOpen(tabs[index].id); }
+      const index = tabs.findIndex((_, i) => hotkey(i) === e.key);
+      if (index >= 0) { e.preventDefault(); setOpen(tabs[index].id); }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -143,9 +165,10 @@ export function MenuBar({ hud, extras }: { hud?: boolean; extras?: ReactNode } =
       <>
         <div className="hud-topleft" data-hud-occluder>
         <HudVitals />
+        <PartyFrame onOpen={() => setOpen("friends")} />
         <nav className="hud-iconbar" aria-label="เมนูเกม">
           {tabs.map((t, i) => (
-            <button key={t.id} type="button" title={`${t.label} (${i + 1})`} aria-label={t.label} aria-keyshortcuts={String(i + 1)}
+            <button key={t.id} type="button" title={`${t.label} (${hotkey(i)})`} aria-label={t.label} aria-keyshortcuts={hotkey(i)}
               className="hud-icon" onClick={() => setOpen(t.id)}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={t.icon} alt="" className="pixel" draggable={false} />
@@ -153,6 +176,7 @@ export function MenuBar({ hud, extras }: { hud?: boolean; extras?: ReactNode } =
               {typeof t.badge === "number" && <b className="hud-icon-badge" aria-hidden="true">{t.badge}</b>}
             </button>
           ))}
+          <ChatButton />
           <SoundButton />
           <OnlineButton />
           <InstallGameButton variant="icon" />
@@ -165,6 +189,8 @@ export function MenuBar({ hud, extras }: { hud?: boolean; extras?: ReactNode } =
           {extras}
         </div>
         <RestQuickAction />
+        <ChatBox />
+        <PlayerCard />
         {popups}
       </>
     );

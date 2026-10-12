@@ -3,7 +3,8 @@
 # the server itself (KeyObject, src/keys.rs), so it survives every deploy.
 #
 # Two halves in one Worker: ts/entry.ts (TypeScript: the shared world and
-# checked battles, running the game's own engines from lib/) is the entry; it
+# checked battles, friends / party / mail, running the game's own engines from
+# lib/) is the entry; it
 # hands everything else to the Rust half (src/, built into build/ by
 # worker-build, imported as "wuxia-rust").
 name = "wuxia-world"
@@ -38,6 +39,14 @@ class_name = "WorldObject"
 name = "BATTLES"
 class_name = "BattleObject"
 
+[[durable_objects.bindings]]
+name = "HUBS"
+class_name = "PlayerHub"
+
+[[durable_objects.bindings]]
+name = "PARTIES"
+class_name = "PartyObject"
+
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["AccountObject", "RoomObject"]
@@ -49,6 +58,10 @@ new_sqlite_classes = ["KeyObject"]
 [[migrations]]
 tag = "v3"
 new_sqlite_classes = ["WorldObject", "BattleObject"]
+
+[[migrations]]
+tag = "v4"
+new_sqlite_classes = ["PlayerHub", "PartyObject"]
 
 [vars]
 # PBKDF2 rounds for new passwords (Workers bill CPU time; raise on a paid plan).

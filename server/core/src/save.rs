@@ -53,6 +53,8 @@ pub enum SaveError {
     Stale,
     TooFast,
     GoldTooFast,
+    /// The save that pays for a parcel does not show it leaving (or it was never there).
+    NotEnough,
 }
 
 impl SaveError {
@@ -70,6 +72,7 @@ impl SaveError {
             SaveError::Stale => "stale",
             SaveError::TooFast => "too_fast",
             SaveError::GoldTooFast => "gold_too_fast",
+            SaveError::NotEnough => "not_enough",
         }
     }
     pub fn status(&self) -> u16 {
@@ -78,7 +81,7 @@ impl SaveError {
             SaveError::NoCharacter => 404,
             SaveError::NameTaken | SaveError::TooMany | SaveError::Stale => 409,
             SaveError::TooLarge => 413,
-            SaveError::BadSave(_) | SaveError::NameMismatch | SaveError::GoldTooFast => 422,
+            SaveError::BadSave(_) | SaveError::NameMismatch | SaveError::GoldTooFast | SaveError::NotEnough => 422,
             SaveError::TooFast => 429,
         }
     }
@@ -329,6 +332,50 @@ pub fn accept(character: &mut Character, accepted: Accepted, version: u64, now: 
     character.version = version;
 }
 
+/// What a save pays out of the hero's bag (a parcel sent by mail, and its
+/// postage): gold, and at most one stack of one item.
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+pub struct Debit {
+    #[serde(default)]
+    pub gold: f64,
+    #[serde(default, rename = "itemId")]
+    pub item_id: Option<String>,
+    #[serde(default)]
+    pub count: f64,
+}
+
+/// The largest parcel of gold one letter may carry.
+pub const MAX_PARCEL_GOLD: f64 = 50_000.0;
+
+fn gold_of(state: &Value) -> f64 {
+    state.get("gold").and_then(Value::as_f64).unwrap_or(0.0)
+}
+
+fn held(state: &Value, item: &str) -> f64 {
+    state.get("inventory").and_then(|inv| inv.get(item)).and_then(Value::as_f64).unwrap_or(0.0)
+}
+
+/// A save that pays `debit`: the last accepted save (`before`) held it, and the
+/// new one (`after`) holds at least that much less — so a parcel can never be
+/// sent and kept. Checked together with [`check_save`].
+pub fn check_debit(before: &Value, after: &Value, debit: &Debit) -> Result<(), SaveError> {
+    if !(debit.gold.is_finite() && (0.0..=MAX_PARCEL_GOLD + 1_000.0).contains(&debit.gold)) {
+        return Err(SaveError::BadSave("debit"));
+    }
+    if gold_of(before) < debit.gold || gold_of(after) > gold_of(before) - debit.gold {
+        return Err(SaveError::NotEnough);
+    }
+    if let Some(item) = &debit.item_id {
+        if !(debit.count.is_finite() && debit.count >= 1.0 && debit.count <= MAX_STACK) {
+            return Err(SaveError::BadSave("debit"));
+        }
+        if held(before, item) < debit.count || held(after, item) > held(before, item) - debit.count {
+            return Err(SaveError::NotEnough);
+        }
+    }
+    Ok(())
+}
+
 /// Gold the server paid a character (a checked battle's spoils), for its next saves.
 pub fn grant_gold(character: &mut Character, gold: f64) {
     if gold.is_finite() && gold > 0.0 {
@@ -471,5 +518,24 @@ mod tests {
         assert_eq!(accepted.granted, 300.0);
         accept(hero, accepted, 27, T0 + 4_000.0);
         assert!(check_save(hero, &upload(3, GOLD_BUDGET_CAP + 800.0), 10, T0 + 6_000.0).is_ok());
+    }
+
+    #[test]
+    fn a_parcel_must_leave_the_bag() {
+        let before = json!({ "gold": 500, "inventory": { "herb_common": 4 } });
+        let paid = Debit { gold: 110.0, item_id: Some("herb_common".into()), count: 3.0 };
+        assert!(check_debit(&before, &json!({ "gold": 390, "inventory": { "herb_common": 1 } }), &paid).is_ok());
+        assert!(check_debit(&before, &json!({ "gold": 10, "inventory": {} }), &paid).is_ok(), "less is fine");
+        // Kept the gold, or the herbs.
+        assert_eq!(check_debit(&before, &json!({ "gold": 500, "inventory": { "herb_common": 1 } }), &paid), Err(SaveError::NotEnough));
+        assert_eq!(check_debit(&before, &json!({ "gold": 390, "inventory": { "herb_common": 4 } }), &paid), Err(SaveError::NotEnough));
+        // Never had it.
+        let rich = Debit { gold: 600.0, ..Debit::default() };
+        assert_eq!(check_debit(&before, &json!({ "gold": 0 }), &rich), Err(SaveError::NotEnough));
+        let missing = Debit { gold: 0.0, item_id: Some("pearl".into()), count: 1.0 };
+        assert_eq!(check_debit(&before, &json!({ "gold": 500 }), &missing), Err(SaveError::NotEnough));
+        // Nonsense.
+        assert_eq!(check_debit(&before, &before, &Debit { gold: -5.0, ..Debit::default() }), Err(SaveError::BadSave("debit")));
+        assert_eq!(check_debit(&before, &before, &Debit { gold: 0.0, item_id: Some("x".into()), count: 0.0 }), Err(SaveError::BadSave("debit")));
     }
 }
