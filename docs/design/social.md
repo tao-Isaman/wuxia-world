@@ -28,7 +28,7 @@ Sources: [WoW mail](https://warcraft.wiki.gg/wiki/Mail), [ESO mail](https://en.u
 
 ## Server
 
-### PlayerHub — one per account (TypeScript Durable Object, `2:hub:<username>`)
+### PlayerHub — one per account (TypeScript Durable Object, `3:hub:<username>`)
 
 The account's social home:
 
@@ -44,7 +44,7 @@ The account's social home:
 
 Every player has **one social socket** to their own hub (`/social/ws`, hibernating like the rooms). The hub pushes what happens to them: a whisper, a friend request or answer, new mail, a party invite, the party's state or chat. Hubs talk to each other and to parties over internal requests; nothing between players is client-to-client.
 
-### PartyObject — one per party (`2:party:<id>`)
+### PartyObject — one per party (`3:party:<id>`)
 
 Up to **4** members, a leader, pending invites (they lapse after 2 minutes). Members' places come from their hubs' status. Every change is pushed to every member (their hub forwards it on their socket):
 

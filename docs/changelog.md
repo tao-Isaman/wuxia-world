@@ -8,6 +8,8 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ### Gear options (ออฟชั่นเสริม)
 
+- **The server started over** (data generation 3): no accounts, characters, saves or world from before; everyone signs up again.
+
 - **Menus open alone**: an open menu no longer shows the strip of every other section above it; the ✕ sits in the panel's top corner, the HUD icons open another section (keys 1–0 and M still switch).
 
 - **Every piece of gear counts at half** its old numbers (stats and effects); random options make up the rest. A piece rolls them when gained, by its tier: ธรรมดา 0–1, ดี 1–2, ชั้นเลิศ (city specialties) 1–3, หายาก (beast gear) 2–3, ในตำนาน 3–4.

@@ -48,7 +48,7 @@ map runtime ─report(room, motion)─► OnlineSession (lib/net/session.ts)
 - **Accounts.** One Durable Object per username: two sign-ups for one name can never both win.
 - **Sessions.** A signed token (HMAC-SHA256, 30 days). There is no session table.
 - **Two halves, one Worker.** `server/worker/ts/entry.ts` is the Worker's entry: it answers `/world…` and `/characters/<id>/battle/…` itself and hands every other request to the Rust half (worker-build's output, imported as `wuxia-rust`). It checks a session by asking the Rust half (`/auth/me`).
-- **The signing key needs no setup.** `KeyObject` (`server/worker/src/keys.rs`, one Durable Object named `2:auth`) makes 32 random bytes the first time it is asked and keeps them in its storage, so the key survives every deploy and nothing has to be configured on Cloudflare. Each Worker isolate caches it in memory.
+- **The signing key needs no setup.** `KeyObject` (`server/worker/src/keys.rs`, one Durable Object named `3:auth`) makes 32 random bytes the first time it is asked and keeps them in its storage, so the key survives every deploy and nothing has to be configured on Cloudflare. Each Worker isolate caches it in memory.
 
 ## Event-based design
 
@@ -218,7 +218,7 @@ Storage keeps the save and the roster that numbers it in one write.
 
 ## The shared world
 
-**One world for everyone.** The world is the simulated jianghu — the thirty people and the generated ones (`npcExt`: their ages, sects, journeys, marriages, deaths and heirs) — and the talk (`rumorPool`, `rumorArchive`), with the world's seed and event log (`SHARED_WORLD_KEYS`, `lib/world/shared/world.ts`). On a server there is one `WorldObject` (named `2:world`) and **the server runs it**:
+**One world for everyone.** The world is the simulated jianghu — the thirty people and the generated ones (`npcExt`: their ages, sects, journeys, marriages, deaths and heirs) — and the talk (`rumorPool`, `rumorArchive`), with the world's seed and event log (`SHARED_WORLD_KEYS`, `lib/world/shared/world.ts`). On a server there is one `WorldObject` (named `3:world`) and **the server runs it**:
 
 - **It moves with the clock.** Every request first brings the world to the clock (`advanceWorld`): a new day keeps the rumors (`maintainRumors`), each week passed the people live it (`tickAllNamedNpcs`, seeded by the world seed and the day). An alarm every real hour (one game day) keeps it moving when nobody plays.
 - **Pins.** The browser sends the people its hero's open quests are about (`heroPins`, with every world poll); the simulation keeps them where they are, as it did for the one local hero. A player's pins last two game days.
@@ -262,9 +262,9 @@ The design, with what other games do, is in [design/social.md](design/social.md)
 
 **Who.** A player is their account (`username`): friends, parties, whispers and mail are between accounts, shown with the hero name the account last played.
 
-**The hub.** Each account has a `PlayerHub` (`2:hub:<username>`, `server/worker/ts/hub-object.ts`) keeping its friends (100), requests (30 each way), blocks (100), player mail (50 letters, 30 days), the last 50 whispers, its status and its party. The browser holds one hibernating socket to it (`GET /social/ws`, `lib/net/social.ts`) and tells it the hero's name, body, map and character (`status`); the hub pushes what happens (`SocialPush`: a request, a new friend, a friend's status, a whisper, mail, the party, an invite, a party line). Hubs talk to each other and to parties over internal routes the Worker never forwards from outside.
+**The hub.** Each account has a `PlayerHub` (`3:hub:<username>`, `server/worker/ts/hub-object.ts`) keeping its friends (100), requests (30 each way), blocks (100), player mail (50 letters, 30 days), the last 50 whispers, its status and its party. The browser holds one hibernating socket to it (`GET /social/ws`, `lib/net/social.ts`) and tells it the hero's name, body, map and character (`status`); the hub pushes what happens (`SocialPush`: a request, a new friend, a friend's status, a whisper, mail, the party, an invite, a party line). Hubs talk to each other and to parties over internal routes the Worker never forwards from outside.
 
-**The party.** A `PartyObject` (`2:party:<id>`) holds up to 4 members and a leader; invites lapse after 2 minutes; a leader who leaves passes the lead to the longest-standing member; a party of one dissolves. A checked battle won while another online member stands on the same map pays **+10 % w-exp and move xp**: `BattleObject` asks the player's hub at the verdict (`/internal/party-bonus`) and raises the spoils itself (`withPartyBonus`; the verdict's `spoils.partyBonus`).
+**The party.** A `PartyObject` (`3:party:<id>`) holds up to 4 members and a leader; invites lapse after 2 minutes; a leader who leaves passes the lead to the longest-standing member; a party of one dissolves. A checked battle won while another online member stands on the same map pays **+10 % w-exp and move xp**: `BattleObject` asks the player's hub at the verdict (`/internal/party-bonus`) and raises the spoils itself (`withPartyBonus`; the verdict's `spoils.partyBonus`).
 
 **Chat.** Map chat goes through the room (`say` / `said`, above). Party chat (`POST /party/chat`) and whispers (`POST /social/whisper`) go through the hubs, 1–120 characters, 5 lines per 10 s; a block refuses whispers, requests, invites and mail, and hides the blocked player's map lines.
 
@@ -288,7 +288,7 @@ The design, with what other games do, is in [design/social.md](design/social.md)
 
 ## Data generations (resetting the server)
 
-Every Durable Object name starts with the **data generation** (`DATA_EPOCH`, `"2"` since 2026-10-11, in both `server/worker/src/lib.rs` and `server/worker/ts/env.ts`): accounts are `2:<username>`, rooms `2:<map id>`, the signing key `2:auth`, the world `2:world`, battles `2:<username>:<character id>`, hubs `2:hub:<username>`, parties `2:party:<id>`. Raising it starts the server over — no accounts, characters, saves or world, and a new signing key, so every saved session signs out (the browser lands on the log-in step). The old generation's objects stay in storage, unreachable. Generation 1 (accounts and saves made before 2026-10-11) was left behind this way while nobody played yet.
+Every Durable Object name starts with the **data generation** (`DATA_EPOCH`, `"3"` since 2026-10-12, in both `server/worker/src/lib.rs` and `server/worker/ts/env.ts`): accounts are `3:<username>`, rooms `3:<map id>`, the signing key `3:auth`, the world `3:world`, battles `3:<username>:<character id>`, hubs `3:hub:<username>`, parties `3:party:<id>`. Raising it starts the server over — no accounts, characters, saves or world, and a new signing key, so every saved session signs out (the browser lands on the log-in step). The old generation's objects stay in storage, unreachable. Generation 1 (accounts and saves made before 2026-10-11) was left behind this way while nobody played yet, and generation 2 on 2026-10-12, when gear changed (halved pieces, random options, enhancement).
 
 ## Running it locally
 
