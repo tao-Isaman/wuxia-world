@@ -77,7 +77,7 @@ await check("the session joins with the hero's real position, throttles moves an
   assert.equal(sockets.length, 1);
   assert.equal(sockets[0].url, "ws://game.test/rooms/home_player/ws?token=tok");
   sockets[0].fire("open");
-  assert.deepEqual(sockets[0].sent[0], { t: "hello", v: 1, name: "หลี่", body: "f1", x: 300, y: 400, dir: "E" });
+  assert.deepEqual(sockets[0].sent[0], { t: "hello", v: 2, name: "หลี่", body: "f1", x: 300, y: 400, dir: "E" });
   sockets[0].fire("message", welcome);
   assert.equal(session.status, "online");
   assert.deepEqual(session.players("home_player").map((p) => p.id), ["bob"]);
@@ -89,10 +89,28 @@ await check("the session joins with the hero's real position, throttles moves an
   await new Promise((r) => setTimeout(r, MOVE_INTERVAL_MS + 20));
   session.report("home_player", { x: 320, y: 400, dir: "E", moving: true });
   assert.deepEqual(sockets[0].sent.at(-1), { t: "move", x: 320, y: 400, dir: "E", moving: true });
+  // Map chat: a line said here reaches the chat and floats over the speaker; a repeat (old seq) is ignored.
+  const heard: string[] = [];
+  const off = session.onChat((line) => heard.push(`${line.name}:${line.text}`));
+  const refused: string[] = [];
+  session.onChatError((code) => refused.push(code));
+  assert.ok(session.say("สวัสดี"));
+  assert.deepEqual(sockets[0].sent.at(-1), { t: "say", text: "สวัสดี" });
+  sockets[0].fire("message", { t: "event", seq: 6, ev: { t: "said", id: "bob", name: "บ็อบ", text: "ไปกันเถอะ", at: 1 } });
+  sockets[0].fire("message", { t: "event", seq: 6, ev: { t: "said", id: "bob", name: "บ็อบ", text: "ไปกันเถอะ", at: 1 } });
+  assert.deepEqual(heard, ["บ็อบ:ไปกันเถอะ"]);
+  assert.equal(session.bubble("home_player", "bob"), "ไปกันเถอะ");
+  assert.equal(session.bubble("city_capital", "bob"), null, "bubbles belong to their map");
+  assert.deepEqual(session.players("home_player").map((p) => p.id), ["bob"], "a chat line moves no one");
+  sockets[0].fire("message", { t: "error", code: "too_fast", message: "" });
+  assert.deepEqual(refused, ["too_fast"]);
+  off();
   // A new map is a new room.
   session.report("city_capital", { x: 50, y: 60, dir: "N", moving: false });
   assert.equal(sockets.length, 2);
   assert.ok(sockets[1].url.includes("/rooms/city_capital/"));
+  assert.equal(session.bubble("city_capital", "bob"), null, "a new room starts without bubbles");
+  assert.equal(session.say("hi"), false, "not in the room yet");
   session.configure(null);
   assert.equal(session.status, "off");
 });
@@ -179,6 +197,29 @@ await check("the session joins with the hero's real position, throttles moves an
     assert.equal(cloudSave.status, "saved");
     cloudSave.clear();
     assert.equal(cloudSave.status, "off");
+  });
+  await check("cloud save: a call that stores a save itself (a letter's parcel) writes what is pending first, holds writes, then builds on its rev", async () => {
+    cloudSave.select("http://srv", "tok", "c4");
+    cloudSave.resume();
+    calls.length = 0;
+    answer = (call) => ({ status: 200, body: { rev: (call.body as { rev: number }).rev + 1, summary: null } });
+    cloudSave.storage.setItem("wusia-world-v1", save(30));
+    const reply = await cloudSave.exclusive(async (at) => {
+      assert.equal(at.rev, 1, "the pending save went first");
+      assert.equal(at.id, "c4");
+      cloudSave.storage.setItem("wusia-world-v1", save(31));
+      await wait(SAVE_DEBOUNCE_MS + 100);
+      assert.equal(calls.length, 1, "no write while the call runs");
+      return { rev: 7 };
+    });
+    assert.equal(reply.rev, 7);
+    await wait(SAVE_DEBOUNCE_MS + 100);
+    assert.deepEqual(calls.at(-1)!.body, { rev: 7, version: 27, state: { hasGame: true, gold: 31 } });
+    await assert.rejects(cloudSave.exclusive(async () => { throw new Error("refused"); }), /refused/);
+    cloudSave.storage.setItem("wusia-world-v1", save(32));
+    await cloudSave.flush();
+    assert.equal((calls.at(-1)!.body as { state: { gold: number } }).state.gold, 32, "writes go on after a refused call");
+    cloudSave.clear();
   });
   globalThis.fetch = realFetch;
 }

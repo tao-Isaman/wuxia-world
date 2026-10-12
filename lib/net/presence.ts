@@ -30,6 +30,9 @@ export function applyEvent(players: Readonly<Record<string, Presence>>, ev: Room
       delete next[ev.id];
       return next;
     }
+    case "said":
+      // Chat changes no one's place (lib/net/session.ts hands it to the chat).
+      return { ...players };
   }
 }
 

@@ -25,6 +25,10 @@ const { applyCommand, setSessionAuto, startSession, stepSession } = await import
 const { battleItemOf, worldBattleStart } = await import("../lib/world/battle-setup");
 const { acceptEcho, activePins, advanceWorld, bossFellInWorld, createWorld, echoProblem, killInWorld, setPins, ECHOES_PER_HOUR } = await import("../server/worker/ts/world-doc");
 const { judge, newSession, playCommands, stageBattle } = await import("../server/worker/ts/battle-doc");
+const { withPartyBonus } = await import("../server/worker/ts/battle-doc");
+const social = await import("../server/worker/ts/social-doc");
+const party = await import("../server/worker/ts/party-doc");
+const { SOCIAL_LIMITS, cleanText, normalUsername } = await import("../lib/net/social-protocol");
 const { BOSSES } = await import("../lib/world/data/bosses");
 const { getQuest, QUESTS: allQuests } = await import("../lib/world");
 type WorldStateData = import("../lib/world/types").WorldStateData;
@@ -283,6 +287,145 @@ await check("a battle the server refuses counts as left: no spoils, no harm", as
     cloudBattle.stop();
     cloudSave.clear();
   }
+});
+
+// ─── Friends, mail, party (docs/design/social.md) ─────────────────────
+
+await check("social: chat and letter text is cleaned, usernames normalized", () => {
+  assert.equal(cleanText("  สวัสดี\u0007 ", 120), "สวัสดี");
+  assert.equal(cleanText("   ", 120), null);
+  assert.equal(cleanText("ก".repeat(121), 120), null);
+  assert.equal(cleanText(5, 120), null);
+  assert.equal(normalUsername("@Lin_Chong"), "lin_chong");
+  assert.equal(normalUsername("ab"), null);
+  assert.equal(normalUsername("bad name"), null);
+});
+
+await check("social: friend requests — ask, a request both ways makes friends, block forgets and refuses", () => {
+  const a = social.emptyHub("aaa");
+  const b = social.emptyHub("bbb");
+  assert.equal(social.receiveRequest(b, { username: "aaa", name: "อา" }, 1), "requested");
+  social.recordAsked(a, { username: "bbb", name: "บี" }, "requested", 1);
+  assert.ok(a.requestsOut.bbb && b.requestsIn.aaa);
+  // b asks a back: a's hub sees its own request out → friends.
+  assert.equal(social.receiveRequest(a, { username: "bbb", name: "บี" }, 2), "friends");
+  assert.ok(a.friends.bbb && !a.requestsOut.bbb);
+  assert.equal(social.receiveRequest(a, { username: "bbb", name: "บี" }, 3), "already");
+  assert.ok(social.acceptRequest(b, "aaa", 3));
+  assert.ok(b.friends.aaa && !b.requestsIn.aaa);
+  assert.equal(social.acceptRequest(b, "nobody", 3), null);
+  social.block(b, { username: "aaa", name: "อา" }, 4);
+  assert.ok(!b.friends.aaa && b.blocked.aaa);
+  assert.equal(social.receiveRequest(b, { username: "aaa", name: "อา" }, 5), "blocked");
+});
+
+await check("social: chat and mail rate limits", () => {
+  const hub = social.emptyHub("aaa");
+  for (let i = 0; i < SOCIAL_LIMITS.chatBurst; i++) assert.ok(social.takeChat(hub, 1000 + i));
+  assert.ok(!social.takeChat(hub, 1100));
+  assert.ok(social.takeChat(hub, 1000 + SOCIAL_LIMITS.chatWindowMs + 10));
+  for (let i = 0; i < SOCIAL_LIMITS.mailPerHour; i++) assert.ok(social.takeMail(hub, i));
+  assert.ok(!social.takeMail(hub, 100));
+  assert.ok(social.takeMail(hub, 3_600_001));
+});
+
+const { ITEMS } = await import("../lib/world/data/items");
+const { giftable } = await import("../lib/world/gifts");
+await check("social: parcels — gold within limits, giftable items only, the debit carries the postage", () => {
+  assert.equal(social.parcelProblem(null), null);
+  assert.equal(social.parcelProblem({ gold: 100 }), null);
+  assert.equal(social.parcelProblem({ gold: 0 }), "bad_parcel");
+  assert.equal(social.parcelProblem({ gold: SOCIAL_LIMITS.maxParcelGold + 1 }), "bad_parcel");
+  assert.equal(social.parcelProblem({ gold: 1.5 }), "bad_parcel");
+  assert.equal(social.parcelProblem({ itemId: "no_such_item", count: 1 }), "not_mailable");
+  const ok = Object.values(ITEMS).find((i) => giftable(i) && !i.id.startsWith("scroll_"))!;
+  const canGift = (i: (typeof ITEMS)[number]): boolean => giftable(i);
+  const quest = ITEMS.find((i) => !canGift(i));
+  assert.equal(social.parcelProblem({ itemId: ok.id, count: 2 }), null);
+  if (quest) assert.equal(social.parcelProblem({ itemId: quest.id, count: 1 }), "not_mailable");
+  const scroll = Object.values(ITEMS).find((i) => i.id.startsWith("scroll_"));
+  if (scroll) assert.equal(social.parcelProblem({ itemId: scroll.id, count: 1 }), "not_mailable");
+  assert.deepEqual(social.debitOf(null), { gold: SOCIAL_LIMITS.postage });
+  assert.deepEqual(social.debitOf({ gold: 500 }), { gold: 500 + SOCIAL_LIMITS.postage });
+  assert.deepEqual(social.debitOf({ itemId: ok.id, count: 2 }), { gold: SOCIAL_LIMITS.postage, itemId: ok.id, count: 2 });
+});
+
+await check("social: mail — claim once, a full box refuses but keeps room for returns, delete and expiry send parcels home", () => {
+  const hub = social.emptyHub("bbb");
+  const from = { username: "aaa", name: "อา" };
+  const letter = (id: string, parcel: import("../lib/net/social-protocol").Parcel | null, sentAt = 0) =>
+    ({ id, from, text: "สวัสดี", parcel, sentAt, read: false, claimed: false, returned: false });
+  assert.equal(social.receiveMail(hub, letter("m1", { gold: 50 })), "ok");
+  assert.equal(social.receiveMail(hub, letter("m1", { gold: 50 })), "ok");
+  assert.equal(hub.mail.length, 1, "a repeated delivery is one letter");
+  const taken = social.claimMail(hub, "m1");
+  assert.deepEqual(taken, { parcel: { gold: 50 } });
+  assert.deepEqual(social.claimMail(hub, "m1"), { error: "claimed" });
+  assert.ok(hub.mail[0]!.read);
+  // Fill the box: a new letter is refused, a returned one makes room.
+  for (let i = 2; i <= SOCIAL_LIMITS.mailbox; i++) social.receiveMail(hub, letter(`m${i}`, null));
+  assert.equal(social.receiveMail(hub, letter("extra", null)), "full");
+  const back = social.returnedLetter(letter("x", { gold: 5 }), { username: "_post", name: "ม้าเร็ว" }, 9);
+  assert.equal(social.receiveMail(hub, back), "ok");
+  assert.equal(hub.mail.length, SOCIAL_LIMITS.mailbox);
+  assert.ok(!hub.mail.some((m) => m.id === "m1"), "the read, claimed letter made room");
+  // Blocked senders are refused (a return never is).
+  social.block(hub, { username: "ccc", name: "" }, 1);
+  assert.equal(social.receiveMail(hub, { ...letter("c1", null), from: { username: "ccc", name: "" } }), "blocked");
+  // Delete: an untaken parcel goes home; a returned one deleted untaken is gone.
+  const box = social.emptyHub("ddd");
+  social.receiveMail(box, letter("p1", { gold: 7 }));
+  social.receiveMail(box, back);
+  assert.deepEqual(social.deleteMail(box, ["p1", back.id]).map((m) => m.id), ["p1"]);
+  assert.equal(box.mail.length, 0);
+  // Expiry: after 30 days the letter leaves; its untaken parcel goes home.
+  social.receiveMail(box, letter("old", { gold: 3 }, 0));
+  social.receiveMail(box, letter("new", null, SOCIAL_LIMITS.mailKeepMs));
+  assert.deepEqual(social.expireMail(box, SOCIAL_LIMITS.mailKeepMs + 1).map((m) => m.id), ["old"]);
+  assert.deepEqual(box.mail.map((m) => m.id), ["new"]);
+});
+
+await check("party: invite, join, four at most, leaving passes the lead, one alone dissolves, the bonus needs a companion on the map", () => {
+  const doc = party.createParty("0123456789abcdef", { username: "aaa", name: "อา", location: "city_capital" }, 0);
+  assert.equal(party.invite(doc, "bbb", "ccc", 1), "not_leader");
+  assert.equal(party.invite(doc, "aaa", "aaa", 1), "self");
+  assert.equal(party.invite(doc, "aaa", "bbb", 1), "ok");
+  assert.equal(party.join(doc, { username: "zzz", name: "" }, 2), "not_invited");
+  assert.equal(party.join(doc, { username: "bbb", name: "บี", location: "city_capital" }, 2), "ok");
+  assert.equal(party.invite(doc, "aaa", "bbb", 3), "member");
+  party.invite(doc, "aaa", "ccc", 3);
+  party.invite(doc, "aaa", "ddd", 3);
+  assert.equal(party.invite(doc, "aaa", "eee", 3), "full", "two members and two invites fill the party");
+  // Invites lapse.
+  assert.equal(party.join(doc, { username: "ccc", name: "" }, 3 + SOCIAL_LIMITS.inviteMs + 1), "not_invited");
+  assert.equal(party.join(doc, { username: "ddd", name: "" }, 3 + SOCIAL_LIMITS.inviteMs + 1), "not_invited");
+  // The bonus: another online member on the same map.
+  assert.ok(party.bonusFor(doc, "aaa", "city_capital"));
+  assert.ok(!party.bonusFor(doc, "aaa", "village_peach"));
+  party.memberStatus(doc, "bbb", { online: false, location: "city_capital", body: null });
+  assert.ok(!party.bonusFor(doc, "aaa", "city_capital"), "an offline member gives no bonus");
+  assert.ok(!party.bonusFor(doc, "zzz", "city_capital"));
+  // Chat burst.
+  for (let i = 0; i < SOCIAL_LIMITS.chatBurst; i++) assert.ok(party.takePartyChat(doc, "aaa", 10 + i));
+  assert.ok(!party.takePartyChat(doc, "aaa", 20));
+  // Kick, lead, leave.
+  assert.equal(party.kick(doc, "bbb", "aaa"), "not_leader");
+  assert.equal(party.lead(doc, "aaa", "bbb"), "ok");
+  assert.equal(doc.leader, "bbb");
+  assert.deepEqual(party.leave(doc, "bbb"), { dissolved: true });
+  assert.equal(doc.leader, "aaa", "the lead passes to who stayed longest");
+  const view = party.viewOf(doc, 30);
+  assert.deepEqual(view.members.map((m) => m.username), ["aaa"]);
+});
+
+await check("party bonus raises w-exp and move xp by a tenth, nothing else", () => {
+  const spoils = { gold: 40, wExp: 100, items: [{ itemId: "x", count: 1 }], moves: [{ id: "s", kind: "skill" as const, xp: 20 }], hunt: null };
+  const raised = withPartyBonus(spoils);
+  assert.equal(raised.wExp, 110);
+  assert.equal(raised.moves[0]!.xp, 22);
+  assert.equal(raised.gold, 40);
+  assert.deepEqual(raised.items, spoils.items);
+  assert.ok(raised.partyBonus);
 });
 
 await check("the server's TypeScript half bundles from the repository alone (no npm package: Workers Builds has none)", async () => {

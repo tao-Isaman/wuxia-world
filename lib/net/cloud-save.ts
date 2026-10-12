@@ -42,6 +42,8 @@ class CloudSave {
   private inflight: Promise<void> | null = null;
   private worldCache: SharedWorld | null = null;
   private listeners = new Set<() => void>();
+  /** A call that stores a save itself is running (`exclusive`): writes wait. */
+  private holding = false;
   status: CloudStatus = "off";
   /** The server's code for the last refusal (`gold_too_fast`, `bad_save`…). */
   lastError: string | null = null;
@@ -121,7 +123,7 @@ class CloudSave {
     if (this.inflight) await this.inflight;
     const active = this.active;
     const value = this.pending;
-    if (!active || value === null || this.paused) return;
+    if (!active || value === null || this.paused || this.holding) return;
     this.pending = null;
     if (this.timer) { clearTimeout(this.timer); this.timer = null; }
     const save = JSON.parse(value) as SaveBlob;
@@ -169,6 +171,28 @@ class CloudSave {
       if (this.pending !== null) await new Promise((resolve) => setTimeout(resolve, 1200));
     }
     return this.pending === null;
+  }
+
+  /**
+   * Run a call that stores a save on the server itself (a letter paying for
+   * its parcel, `POST /social/mail/send`): everything pending is written
+   * first, writes wait while it runs, and the rev it answers with is the one
+   * the next save builds on. `fn` must put the paid state in the store before
+   * it returns, so no older state is written after it.
+   */
+  async exclusive<T extends { rev: number }>(fn: (at: { server: string; token: string; id: string; rev: number }) => Promise<T>): Promise<T> {
+    const settled = await this.settle();
+    const active = this.active;
+    if (!active || this.paused || !settled || this.holding) throw new ApiFailure(this.lastError ?? "not_saved", 0);
+    this.holding = true;
+    try {
+      const result = await fn({ server: active.server, token: active.token, id: active.id, rev: active.rev });
+      if (this.active === active) active.rev = result.rev;
+      return result;
+    } finally {
+      this.holding = false;
+      if (this.pending !== null && !this.timer) this.schedule(SAVE_DEBOUNCE_MS);
+    }
   }
 
   /** The shared world as loaded from the server at entry (`WorldService.load` is synchronous). */

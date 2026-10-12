@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { markerCategory, type OnlinePort, type WorldMarker, type WorldMarkerCategory, type WorldPresentation, type WorldRuntime } from "@/lib/stage/types";
 import { onlineSession } from "@/lib/net/session";
+import { useSocialStore } from "@/store/social-store";
 import { TouchStick } from "./touch-stick";
 import { useWorldStore } from "@/store/world-store";
 
@@ -14,6 +15,12 @@ export function WorldCanvas({ presentation }: { presentation: WorldPresentation 
   const online = useMemo<OnlinePort>(() => ({
     players: () => onlineSession.players(presentation.key),
     report: (motion) => onlineSession.report(presentation.key, motion),
+    bubble: (id) => {
+      const who = id ?? onlineSession.you;
+      return who ? onlineSession.bubble(presentation.key, who) : null;
+    },
+    inParty: (id) => !!useSocialStore.getState().party?.members.some((m) => m.username === id),
+    pick: (player) => useSocialStore.getState().showCard({ username: player.id, name: player.name }),
   }), [presentation.key]);
   const latest = useRef(presentation);
   latest.current = { ...presentation, online };

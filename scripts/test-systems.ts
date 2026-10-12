@@ -142,17 +142,28 @@ check("letters: a friend's letter lands in the inbox at most once a day, then th
   assert.deepEqual(letterWriters(s), [], "on cooldown");
 });
 
-check("letters: opening one takes its gift and marks it read", () => {
+check("letters: opening one only reads it; รับของ takes the gift once; รับทั้งหมด takes every gift left", () => {
   newGame();
   const letter = { id: "letter_test", day: 1, npcId: "sect_shaolin_abbot_huiyuan", text: "ทดสอบ", rarity: 2, itemId: "potion", count: 2, read: false, claimed: false };
-  useWorldStore.setState({ letters: [letter] });
+  const goldLetter = { id: "letter_gold", day: 2, npcId: "sect_shaolin_abbot_huiyuan", text: "ทอง", rarity: 1, gold: 100, read: false, claimed: false };
+  useWorldStore.setState({ letters: [letter, goldLetter] });
   const before = store().inventory.potion ?? 0;
-  const result = store().openLetter("letter_test");
+  const gold = store().gold;
+  assert.ok(store().readLetter("letter_test").ok);
+  assert.equal(store().inventory.potion ?? 0, before, "reading takes nothing");
+  assert.ok(store().letters[0].read && !store().letters[0].claimed);
+  const result = store().claimLetterGift("letter_test");
   assert.ok(result.ok && result.gift);
   assert.equal(store().inventory.potion, before + 2);
-  assert.ok(store().letters[0].read && store().letters[0].claimed);
-  store().openLetter("letter_test");
-  assert.equal(store().inventory.potion, before + 2, "a gift is taken once");
+  assert.ok(store().letters[0].claimed);
+  assert.equal(store().claimLetterGift("letter_test").ok, false, "a gift is taken once");
+  assert.equal(store().inventory.potion, before + 2);
+  const all = store().claimAllLetterGifts();
+  assert.deepEqual(all.gifts.length, 1);
+  assert.equal(store().gold, gold + 100);
+  assert.ok(store().letters[1].read && store().letters[1].claimed, "claiming reads it too");
+  assert.equal(store().claimAllLetterGifts().ok, false, "nothing left to take");
+  assert.equal(store().readLetter("nope").ok, false);
 });
 
 check("letters: time passing in the store delivers letters from friends", () => {
@@ -223,68 +234,76 @@ check("tournament: stronger fighters win simulated bouts more often", () => {
 });
 
 check("tournament: register on Mount Hua in the window, fight round by round, get paid", () => {
-  newGame();
-  assert.equal(TOURNAMENT.locationId, "sect_huashan");
-  assert.equal(TOURNAMENT_NAME, "ชุมนุมประลองกระบี่หัวซาน");
-  useWorldStore.setState({ day: 70, gold: 500, currentSceneId: "city_capital" });
-  assert.equal(registerBlock(store()), "elsewhere", "not at the capital any more");
-  useWorldStore.setState({ currentSceneId: "sect_huashan" });
-  assert.equal(registerBlock(store()), null);
-  assert.ok(store().registerTournament());
-  assert.equal(store().gold, 400);
-  assert.equal(registerBlock(store()), "registered");
-  assert.equal(startBlock(store()), "closed", "not before the day");
-  useWorldStore.setState({ day: 90 });
-  assert.ok(store().fightTournamentBout(), "starts the bracket and queues the first bout");
-  const t = currentTournament(store())!;
-  assert.equal(t.status, "running");
-  assert.equal(t.rounds[0].length, 32);
-  assert.ok(t.rounds[0].includes(PLAYER));
-  const pb = store().pendingBattle!;
-  assert.ok(pb.tournament && pb.nonFatal);
-  // Win the first bout (the battle store's result).
-  useBattleStore.setState({ state: { winner: "A", units: [], skillUses: {}, artUses: {}, hitsReceived: {}, hA: 100, mpA: 50 } as never });
-  const gold = store().gold;
-  store().acknowledgeBattleResult();
-  const after = currentTournament(store())!;
-  assert.equal(after.round, 1);
-  assert.equal(after.rounds[1].length, 16);
-  assert.ok(after.rounds[1].includes(PLAYER));
-  assert.equal(store().gold, gold + BOUT_GOLD[0]);
-  // Lose the next: out in the last 16, the rest simulated to a champion.
-  assert.ok(store().fightTournamentBout());
-  useBattleStore.setState({ state: { winner: "B", units: [], skillUses: {}, artUses: {}, hitsReceived: {}, hA: 0, mpA: 0 } as never });
-  store().acknowledgeBattleResult();
-  const done = currentTournament(store())!;
-  assert.equal(done.status, "finished");
-  assert.equal(done.playerPlace, PLACE_BY_ROUND[1]);
-  assert.ok(done.champion && done.champion !== PLAYER);
-  assert.ok(done.championPick, "an NPC champion picks too");
-  assert.equal(store().tournamentHistory.at(-1)?.year, 1);
-  assert.ok(store().currentHp! >= 1, "tournament defeats are never fatal");
+  // The world clock is pinned: the store brings every action to it.
+  setTestWorldTime(70, 1);
+  try {
+    newGame();
+    assert.equal(TOURNAMENT.locationId, "sect_huashan");
+    assert.equal(TOURNAMENT_NAME, "ชุมนุมประลองกระบี่หัวซาน");
+    useWorldStore.setState({ day: 70, gold: 500, currentSceneId: "city_capital" });
+    assert.equal(registerBlock(store()), "elsewhere", "not at the capital any more");
+    useWorldStore.setState({ currentSceneId: "sect_huashan" });
+    assert.equal(registerBlock(store()), null);
+    assert.ok(store().registerTournament());
+    assert.equal(store().gold, 400);
+    assert.equal(registerBlock(store()), "registered");
+    assert.equal(startBlock(store()), "closed", "not before the day");
+    setTestWorldTime(90, 1);
+    useWorldStore.setState({ day: 90 });
+    assert.ok(store().fightTournamentBout(), "starts the bracket and queues the first bout");
+    const t = currentTournament(store())!;
+    assert.equal(t.status, "running");
+    assert.equal(t.rounds[0].length, 32);
+    assert.ok(t.rounds[0].includes(PLAYER));
+    const pb = store().pendingBattle!;
+    assert.ok(pb.tournament && pb.nonFatal);
+    // Win the first bout (the battle store's result).
+    useBattleStore.setState({ state: { winner: "A", units: [], skillUses: {}, artUses: {}, hitsReceived: {}, hA: 100, mpA: 50 } as never });
+    const gold = store().gold;
+    store().acknowledgeBattleResult();
+    const after = currentTournament(store())!;
+    assert.equal(after.round, 1);
+    assert.equal(after.rounds[1].length, 16);
+    assert.ok(after.rounds[1].includes(PLAYER));
+    assert.equal(store().gold, gold + BOUT_GOLD[0]);
+    // Lose the next: out in the last 16, the rest simulated to a champion.
+    assert.ok(store().fightTournamentBout());
+    useBattleStore.setState({ state: { winner: "B", units: [], skillUses: {}, artUses: {}, hitsReceived: {}, hA: 0, mpA: 0 } as never });
+    store().acknowledgeBattleResult();
+    const done = currentTournament(store())!;
+    assert.equal(done.status, "finished");
+    assert.equal(done.playerPlace, PLACE_BY_ROUND[1]);
+    assert.ok(done.champion && done.champion !== PLAYER);
+    assert.ok(done.championPick, "an NPC champion picks too");
+    assert.equal(store().tournamentHistory.at(-1)?.year, 1);
+    assert.ok(store().currentHp! >= 1, "tournament defeats are never fatal");
+  } finally { setTestClock(null); }
 });
 
 check("tournament: the champion picks one move or art from the entrants and learns it", () => {
-  newGame();
-  useWorldStore.setState({ day: 90, gold: 500, currentSceneId: "sect_huashan" });
-  store().registerTournament();
-  store().fightTournamentBout();
-  const rng = seeded(4);
-  // Win every bout.
-  const s = JSON.parse(JSON.stringify(useWorldStore.getState())) as ReturnType<typeof store>;
-  for (let round = 0; round < 5; round++) resolveRound(s, true, rng);
-  const t = currentTournament(s)!;
-  assert.equal(t.champion, PLAYER);
-  assert.equal(t.playerPlace, 1);
-  assert.ok(t.pickOptions && t.pickOptions.length > 5);
-  assert.deepEqual(prizeOptions(t, s.playerBuild), t.pickOptions);
-  useWorldStore.setState({ tournament: t, tournamentHistory: s.tournamentHistory, pendingBattle: null });
-  const pick = t.pickOptions[0];
-  assert.ok(store().pickTournamentPrize(pick));
-  const build = store().playerBuild!;
-  const learned = pick.startsWith("art:") ? build.learnedArtIds?.includes(pick.slice(4)) : build.learnedSkillIds?.includes(pick);
-  assert.ok(learned, `learned ${pick}`);
-  assert.equal(store().pickTournamentPrize(t.pickOptions[1]), false, "one pick only");
+  setTestWorldTime(90, 1);
+  try {
+    newGame();
+    useWorldStore.setState({ day: 90, gold: 500, currentSceneId: "sect_huashan" });
+    store().registerTournament();
+    store().fightTournamentBout();
+    const rng = seeded(4);
+    // Win every bout.
+    const s = JSON.parse(JSON.stringify(useWorldStore.getState())) as ReturnType<typeof store>;
+    for (let round = 0; round < 5; round++) resolveRound(s, true, rng);
+    const t = currentTournament(s)!;
+    assert.equal(t.champion, PLAYER);
+    assert.equal(t.playerPlace, 1);
+    assert.ok(t.pickOptions && t.pickOptions.length > 5);
+    assert.deepEqual(prizeOptions(t, s.playerBuild), t.pickOptions);
+    useWorldStore.setState({ tournament: t, tournamentHistory: s.tournamentHistory, pendingBattle: null });
+    const pick = t.pickOptions[0];
+    assert.ok(store().pickTournamentPrize(pick));
+    const build = store().playerBuild!;
+    const learned = pick.startsWith("art:") ? build.learnedArtIds?.includes(pick.slice(4)) : build.learnedSkillIds?.includes(pick);
+    assert.ok(learned, `learned ${pick}`);
+    assert.equal(store().pickTournamentPrize(t.pickOptions[1]), false, "one pick only");
+  } finally { setTestClock(null); }
 });
 
 check("tournament: a year without the hero is fought among the NPCs; a skipped registration is forfeit", () => {
@@ -305,7 +324,7 @@ check("tournament: a year without the hero is fought among the NPCs; a skipped r
   assert.equal(roundPairs(s.tournament!, 0).length, 16);
 });
 
-check("letters: deleting one first takes a gift not yet claimed; read ones go in one sweep", () => {
+check("letters: deleting one with a gift not yet taken throws the gift away (the window asks first); read ones go in one sweep", () => {
   store().startNewGame({ newWorld: true, name: "ผู้ทดสอบ", gender: "female" } as never);
   const before = store().inventory.potion ?? 0;
   useWorldStore.setState({ letters: [
@@ -315,11 +334,11 @@ check("letters: deleting one first takes a gift not yet claimed; read ones go in
   const gold = store().gold;
   const r = store().deleteLetters(["keep_gift"]);
   assert.equal(r.deleted, 1);
-  assert.equal(r.gifts.length, 1, "the unclaimed gift was taken");
-  assert.equal(store().inventory.potion, before + 2);
+  assert.equal(r.discarded, 1, "the untaken gift went with it");
+  assert.equal(store().inventory.potion ?? 0, before);
   assert.deepEqual(store().letters.map((l) => l.id), ["read_one"]);
   assert.equal(store().deleteLetters(["read_one"]).deleted, 1);
-  assert.equal(store().gold, gold, "a claimed letter's gold is not paid twice");
+  assert.equal(store().gold, gold, "deleting pays nothing");
   assert.equal(store().letters.length, 0);
   assert.equal(store().deleteLetters(["nope"]).ok, false);
 });

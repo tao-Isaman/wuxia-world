@@ -224,3 +224,129 @@ test("a fight on the server: staged there, played here, judged there before the 
   await expect(page.getByTestId("combat-result")).toHaveCount(0);
   await page.context().close();
 });
+
+/** Rewrite this character's save on the server (then reload): `edit` changes the state. */
+async function editSave(page: Page, edit: string) {
+  const ok = await page.evaluate(async ([server, body]) => {
+    const online = JSON.parse(localStorage.getItem("wuxia-online-v1")!).state as { token: string; characterId: string };
+    const headers = { authorization: `Bearer ${online.token}`, "content-type": "application/json" };
+    const path = `${server}/characters/${online.characterId}/save`;
+    const { rev, save } = await (await fetch(path, { headers })).json();
+    const state = save.state;
+    new Function("state", body)(state);
+    await new Promise((resolve) => setTimeout(resolve, 1200));
+    return (await fetch(path, { method: "PUT", headers, body: JSON.stringify({ rev, version: save.version, state }) })).ok;
+  }, [SERVER, edit] as const);
+  expect(ok).toBe(true);
+  await page.reload();
+  await expect(page.getByTestId("world-canvas")).toHaveAttribute("data-ready", "true", { timeout: 60_000 });
+  await expect(page.getByTestId("online-button")).toHaveAttribute("data-online-status", "online", { timeout: 20_000 });
+}
+
+/** Open a HUD menu section by its label. */
+const openMenu = (page: Page, label: string) => page.locator(".hud-iconbar").getByRole("button", { name: label, exact: true }).click();
+
+test("between players: map chat with bubbles, a tap opens the card, friends, a party with its chat, and a letter with gold", async ({ browser }) => {
+  test.skip(!(await serverUp()), `no game server at ${SERVER} (bun run server:dev)`);
+  test.setTimeout(300_000);
+  const annId = `sa_${run}`.slice(0, 20);
+  const bobId = `sb_${run}`.slice(0, 20);
+  const ann = await player(browser, "เหมยอิง", "หญิง", annId);
+  // Ann has a purse to post from.
+  await editSave(ann, "state.gold = 500;");
+  const bob = await player(browser, "ซ่งหลาง", "ชาย", bobId);
+  await expect.poll(() => remoteAt(ann, bobId), { timeout: 20_000 }).not.toBeNull();
+  await expect.poll(() => remoteAt(bob, annId), { timeout: 20_000 }).not.toBeNull();
+
+  // Map chat: Enter opens the box; the line reaches Bob's feed and floats over Ann's head on his map.
+  await ann.getByTestId("world-canvas").focus();
+  await ann.keyboard.press("Enter");
+  const annChat = ann.getByTestId("chat-box");
+  await expect(annChat).toBeVisible();
+  await ann.getByTestId("chat-input").fill("สวัสดีสหายร่วมทาง");
+  await ann.getByTestId("chat-input").press("Enter");
+  await expect(bob.getByTestId("chat-feed")).toContainText("สวัสดีสหายร่วมทาง", { timeout: 10_000 });
+  await expect.poll(async () => Number(await bob.getByTestId("world-canvas").getAttribute("data-chat-bubbles")), { timeout: 10_000 }).toBeGreaterThan(0);
+  await expect(annChat.getByTestId("chat-list")).toContainText("สวัสดีสหายร่วมทาง");
+  await bob.screenshot({ path: "test-results/screenshots/online-chat-bubble.png" });
+  await ann.screenshot({ path: "test-results/screenshots/online-chat-box.png" });
+  // Typing does not walk the hero.
+  const x = await ann.getByTestId("world-canvas").getAttribute("data-player-x");
+  await ann.getByTestId("chat-input").type("dddd");
+  await ann.waitForTimeout(400);
+  expect(await ann.getByTestId("world-canvas").getAttribute("data-player-x")).toBe(x);
+  await ann.getByTestId("chat-input").fill("");
+  await ann.getByTestId("chat-input").press("Escape");
+  await expect(annChat).toHaveCount(0);
+
+  // Bob taps Ann on the map: her card; he asks to be friends.
+  const canvas = bob.getByTestId("world-canvas");
+  const box = (await canvas.boundingBox())!;
+  const spots = JSON.parse((await canvas.getAttribute("data-remote-screen")) ?? "[]") as [string, number, number][];
+  const spot = spots.find(([id]) => id === annId)!;
+  await bob.mouse.click(box.x + spot[1], box.y + spot[2]);
+  const card = bob.getByTestId("player-card");
+  await expect(card).toHaveAttribute("data-player", annId);
+  await bob.screenshot({ path: "test-results/screenshots/online-player-card.png" });
+  await card.getByTestId("card-befriend").click();
+  await bob.keyboard.press("Escape");
+
+  // Ann accepts in สหาย (its badge counts the request).
+  await expect(ann.locator(".hud-iconbar").getByRole("button", { name: "สหาย", exact: true }).locator(".hud-icon-badge")).toHaveText("1", { timeout: 10_000 });
+  await openMenu(ann, "สหาย");
+  await ann.getByTestId("friend-requests").getByTestId("friend-accept").click();
+  await expect(ann.getByTestId("friend-list")).toContainText("ซ่งหลาง");
+  // …and asks Bob into a party.
+  await ann.getByTestId("friend-list").locator(`[data-friend="${bobId}"]`).getByRole("button", { name: "ชวนเข้าคณะ" }).click();
+  await ann.keyboard.press("Escape");
+  await openMenu(bob, "สหาย");
+  await bob.getByTestId("party-invites").getByTestId("party-accept").click();
+  await expect(bob.getByTestId("party-members")).toContainText("เหมยอิง");
+  await bob.screenshot({ path: "test-results/screenshots/online-friends.png" });
+  await bob.keyboard.press("Escape");
+  // Both see the other in the party frame, and the name tag turns to the party colour.
+  await expect(ann.getByTestId("party-frame")).toContainText("ซ่งหลาง", { timeout: 10_000 });
+  await expect(bob.getByTestId("party-frame")).toContainText("เหมยอิง");
+  await expect(ann.getByTestId("party-frame").locator(`[data-member="${bobId}"]`)).toHaveAttribute("data-near", "true");
+  await expect(ann.getByTestId("world-canvas")).toHaveAttribute("data-party-tags", bobId, { timeout: 10_000 });
+
+  // Party chat.
+  await bob.getByTestId("chat-button").click();
+  await bob.getByTestId("chat-tab-party").click();
+  await bob.getByTestId("chat-input").fill("ออกเดินทางกันเถิด");
+  await bob.getByTestId("chat-input").press("Enter");
+  await expect(ann.getByTestId("chat-feed")).toContainText("ออกเดินทางกันเถิด", { timeout: 10_000 });
+  await bob.getByTestId("chat-input").press("Escape");
+
+  // A letter with 100 ตำลึง: Ann pays the parcel and the postage; Bob takes it when he chooses.
+  const goldOf = (page: Page) => page.evaluate(async (server) => {
+    const online = JSON.parse(localStorage.getItem("wuxia-online-v1")!).state as { token: string; characterId: string };
+    const { save } = await (await fetch(`${server}/characters/${online.characterId}/save`, { headers: { authorization: `Bearer ${online.token}` } })).json();
+    return save.state.gold as number;
+  }, SERVER);
+  const bobBefore = await goldOf(bob);
+  await openMenu(ann, "จดหมาย");
+  await ann.getByTestId("letters-tab-write").click();
+  await ann.getByTestId("mail-to").fill(bobId);
+  await ann.getByTestId("mail-text").fill("ค่าเดินทางสำหรับสหาย");
+  await ann.getByTestId("mail-kind-gold").click();
+  await ann.getByTestId("mail-gold").fill("100");
+  await ann.getByTestId("mail-send").click();
+  await expect(ann.getByTestId("mail-compose")).toHaveCount(0, { timeout: 20_000 });
+  await ann.keyboard.press("Escape");
+  await expect(bob.locator(".hud-iconbar").getByRole("button", { name: "จดหมาย", exact: true }).locator(".hud-icon-badge")).toHaveText("1", { timeout: 10_000 });
+  await openMenu(bob, "จดหมาย");
+  await bob.getByTestId("letters-tab-players").click();
+  await bob.getByTestId("mail-list").getByRole("button").first().click();
+  await expect(bob.getByTestId("mail-open")).toContainText("ค่าเดินทางสำหรับสหาย");
+  await bob.screenshot({ path: "test-results/screenshots/online-mail.png" });
+  await bob.getByTestId("mail-claim").click();
+  await expect(bob.getByTestId("mail-claimed")).toBeVisible({ timeout: 10_000 });
+  await bob.keyboard.press("Escape");
+  // The gold is in Bob's save on the server, and out of Ann's.
+  await expect.poll(() => goldOf(bob), { timeout: 20_000 }).toBe(bobBefore + 100);
+  await expect.poll(() => goldOf(ann), { timeout: 20_000 }).toBe(390);
+  await ann.screenshot({ path: "test-results/screenshots/online-social.png" });
+  await ann.context().close();
+  await bob.context().close();
+});

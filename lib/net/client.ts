@@ -1,10 +1,11 @@
 // The low-level client for the game server (docs/online.md): the HTTP auth,
-// character, save, world and battle calls, and one WebSocket into one room. No React, no store — the browser
+// character, save, world, battle and social calls, and one WebSocket into one room. No React, no store — the browser
 // (lib/net/session.ts) and the server test (scripts/test-online-server.ts)
 // both use it.
 import { PROTOCOL_VERSION, type ClientMsg, type HeroBody, type Motion, type ServerMsg, type Session } from "./protocol";
 import type { Dir8 } from "@/lib/characters/walk8";
 import type { BattleLogRequest, BattleStartReply, BattleVerdict, EchoRequest, WorldReply } from "./play-protocol";
+import type { Parcel, SendMailRequest, SocialSnapshot } from "./social-protocol";
 
 /** An auth call the server refused: `code` is its error (`taken`, `wrong_login`, …). */
 export class AuthFailure extends Error {
@@ -113,6 +114,27 @@ export const logBattle = (server: string, token: string, id: string, log: Battle
 export const finishBattle = (server: string, token: string, id: string, log: BattleLogRequest) =>
   call<BattleVerdict>(server, token, "POST", battlePath(id, "finish"), log);
 
+// ─── Friends, party, whispers, mail (docs/design/social.md) ───────────
+/** Everything the สหาย and จดหมาย windows show. */
+export const loadSocial = (server: string, token: string) => call<SocialSnapshot>(server, token, "GET", "/social");
+/** A social action (`friends/request`, `whisper`, `mail/claim`, …) with its body. */
+export const socialAction = <T = { ok: boolean }>(server: string, token: string, action: string, body: Record<string, unknown>) =>
+  call<T>(server, token, "POST", `/social/${action}`, body);
+/** A party action (`invite`, `accept`, `decline`, `leave`, `kick`, `lead`, `chat`). */
+export const partyAction = <T = { ok: boolean }>(server: string, token: string, action: string, body: Record<string, unknown>) =>
+  call<T>(server, token, "POST", `/party/${action}`, body);
+/** Send a letter; the save in it pays the parcel and postage. */
+export const sendMail = (server: string, token: string, request: SendMailRequest) =>
+  call<{ rev: number; mailId: string; delivered: boolean; reason: string }>(server, token, "POST", "/social/mail/send", request as unknown as Record<string, unknown>);
+/** Take a letter's parcel (gold joins the character's save allowance). */
+export const claimMail = (server: string, token: string, id: string, characterId: string) =>
+  call<{ parcel: Parcel }>(server, token, "POST", "/social/mail/claim", { id, characterId });
+
+/** The social socket's URL: `ws(s)://<server>/social/ws?token=…`. */
+export function socialUrl(server: string, token: string): string {
+  return `${server.replace(/\/$/, "").replace(/^http/, "ws")}/social/ws?token=${encodeURIComponent(token)}`;
+}
+
 export interface RoomOptions {
   server: string;
   token: string;
@@ -129,6 +151,8 @@ export interface RoomConnection {
   move: (motion: Motion) => void;
   sync: () => void;
   ping: () => void;
+  /** Say a line to everyone on the map. */
+  say: (text: string) => void;
   close: () => void;
   readonly isOpen: boolean;
 }
@@ -162,6 +186,7 @@ export function connectRoom(options: RoomOptions): RoomConnection {
     move: (motion) => send({ t: "move", ...motion }),
     sync: () => send({ t: "sync" }),
     ping: () => send({ t: "ping", at: Date.now() }),
+    say: (text) => send({ t: "say", text }),
     close: () => socket.close(1000, "bye"),
     get isOpen() { return socket.readyState === WebSocket.OPEN; },
   };

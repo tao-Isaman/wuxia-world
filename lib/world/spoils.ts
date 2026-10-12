@@ -27,6 +27,8 @@ export interface VictorySpoils {
   hunt: { items: { itemId: string; count: number }[]; passed: boolean } | null;
   /** Equipment ids won (a legendary beast's rare drop); they go to the gear bag. */
   gear?: string[];
+  /** A party member stood on the same map (online play): w-exp and move xp are already raised for it. */
+  partyBonus?: boolean;
 }
 
 /** What a battle left that the spoils read: the hero's move and art uses. */

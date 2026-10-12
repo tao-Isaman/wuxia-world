@@ -5,7 +5,7 @@
 // on both sides when a message changes shape).
 import type { Dir8 } from "@/lib/characters/walk8";
 
-export const PROTOCOL_VERSION = 1;
+export const PROTOCOL_VERSION = 2;
 
 export type HeroBody = "m1" | "f1";
 
@@ -35,18 +35,22 @@ export type ClientMsg =
   | { t: "hello"; v: number; name: string; body: HeroBody; x: number; y: number; dir: Dir8 }
   | ({ t: "move" } & Motion)
   | { t: "sync" }
-  | { t: "ping"; at: number };
+  | { t: "ping"; at: number }
+  /** A line of map chat (1–120 characters, 5 per 10 s). */
+  | { t: "say"; text: string };
 
 export type LeaveReason = "closed" | "replaced";
 
 export type RoomEvent =
   | { t: "joined"; player: Presence }
   | ({ t: "moved"; id: string; at: number } & Motion)
-  | { t: "left"; id: string; reason: LeaveReason };
+  | { t: "left"; id: string; reason: LeaveReason }
+  /** A line of map chat, with the speaker's hero name. */
+  | { t: "said"; id: string; name: string; text: string; at: number };
 
 export type ErrorCode =
   | "bad_message" | "bad_version" | "not_joined" | "already_joined"
-  | "bad_profile" | "too_fast" | "room_full" | "replaced";
+  | "bad_profile" | "too_fast" | "room_full" | "replaced" | "bad_text";
 
 export type ServerMsg =
   | { t: "welcome"; you: string; room: string; epoch: string; seq: number; players: Presence[] }

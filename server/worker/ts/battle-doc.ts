@@ -10,7 +10,8 @@ import { worldNow } from "@/lib/world/clock";
 import { getOpponent } from "@/lib/world/data/opponents";
 import { getBoss } from "@/lib/world/data/bosses";
 import { battleItemOf, worldBattleStart, type WorldBattleStart } from "@/lib/world/battle-setup";
-import { rollVictorySpoilsFrom } from "@/lib/world/spoils";
+import { rollVictorySpoilsFrom, type VictorySpoils } from "@/lib/world/spoils";
+import { SOCIAL_LIMITS } from "@/lib/net/social-protocol";
 import type { PendingBattle, WorldStateData } from "@/lib/world/types";
 import { applyCommand, startSession, type BattleCommand, type BattleSession } from "@/lib/game/grid/session";
 import type { BattleVerdict } from "@/lib/net/play-protocol";
@@ -123,4 +124,10 @@ export function judge(record: BattleRecord, session: BattleSession): BattleVerdi
     itemsUsed: { ...(state.itemsUsed ?? {}) },
     spoils,
   };
+}
+
+/** The spoils with the party bonus (docs/design/social.md): w-exp and move xp ×(1 + SOCIAL_LIMITS.partyBonus). */
+export function withPartyBonus(spoils: VictorySpoils): VictorySpoils {
+  const raise = (n: number) => Math.round(n * (1 + SOCIAL_LIMITS.partyBonus));
+  return { ...spoils, wExp: raise(spoils.wExp), moves: spoils.moves.map((m) => ({ ...m, xp: raise(m.xp) })), partyBonus: true };
 }

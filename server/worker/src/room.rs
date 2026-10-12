@@ -117,7 +117,7 @@ impl RoomObject {
                         }
                     }
                 }
-                RoomEvent::Left { .. } => {}
+                RoomEvent::Left { .. } | RoomEvent::Said { .. } => {}
             }
         }
         // Everyone joined hears every event, in order (the joiner gets a welcome instead).
@@ -217,6 +217,15 @@ impl DurableObject for RoomObject {
                     return Ok(());
                 }
                 if let Err(rejection) = self.run(Command::Move { id: conn.user.clone(), x, y, dir, moving }, &ws) {
+                    reject(&ws, rejection);
+                }
+            }
+            ClientMsg::Say { text } => {
+                if conn.joined.is_none() {
+                    reject(&ws, Rejection { code: ErrorCode::NotJoined, message: "say hello first".into() });
+                    return Ok(());
+                }
+                if let Err(rejection) = self.run(Command::Say { id: conn.user.clone(), text }, &ws) {
                     reject(&ws, rejection);
                 }
             }

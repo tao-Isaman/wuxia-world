@@ -304,6 +304,36 @@ export function createWorldRuntime(
       context.fillText(text, width / 2, 11);
     }, 9_010);
   }
+  /** A chat line over a speaker's head (one line, cut at 36 characters). */
+  function makeBubble(text: string): TextSprite {
+    const line = [...text].length > 36 ? `${[...text].slice(0, 35).join("")}…` : text;
+    const width = Math.ceil(measure(line)) + 16;
+    return textSprite(width, 30, (context) => {
+      context.fillStyle = "rgba(250, 244, 226, 0.96)";
+      context.strokeStyle = "rgba(60, 40, 18, 0.9)";
+      context.lineWidth = 1.5;
+      context.beginPath();
+      context.roundRect(1, 1, width - 2, 22, 6);
+      context.moveTo(width / 2 - 5, 23); context.lineTo(width / 2, 29); context.lineTo(width / 2 + 5, 23);
+      context.fill();
+      context.stroke();
+      context.fillStyle = "#2b1d0e";
+      context.font = `13px ${font}`;
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+      context.fillText(line, width / 2, 12);
+    }, 10_020);
+  }
+  /** Swap a bubble to `text` (or remove it with null); the bubble now shown. */
+  function setBubble(current: { sprite: TextSprite; text: string } | null, text: string | null): { sprite: TextSprite; text: string } | null {
+    if (current && current.text === text) return current;
+    if (current) {
+      const key = current.sprite.image.texture.key;
+      current.sprite.image.destroy();
+      scene?.textures.remove(key);
+    }
+    return text ? { sprite: makeBubble(text), text } : null;
+  }
   function questMarkCanvas(glyph: "!" | "?"): HTMLCanvasElement {
     return drawCanvas(22 * dpr, 30 * dpr, (context) => {
       context.scale(dpr, dpr);
@@ -473,6 +503,10 @@ export function createWorldRuntime(
     if (!ready || blocked()) return;
     parent.focus({ preventScroll: true });
     const point = toMap({ clientX, clientY } as PointerEvent);
+    // Another player: their card opens.
+    const other = remoteAt(point);
+    const pick = read().online?.pick;
+    if (other && pick) { pick(other); return; }
     // A foe drawn over a marker wins the tap: the hero walks into it.
     const foe = foeAt(point);
     if (foe) { walk(foe); return; }
@@ -956,13 +990,20 @@ export function createWorldRuntime(
     character: CharacterVisual;
     shadow: Phaser.GameObjects.Image;
     tag: TextSprite;
+    /** Whether the tag is drawn in the party colour. */
+    party: boolean;
+    bubble: { sprite: TextSprite; text: string } | null;
+    remote: RemotePlayer;
     pos: Point;
     phase: number;
   }
   const remoteVisuals = new Map<string, RemoteVisual>();
   const remoteLoading = new Set<string>();
-  /** Gold name tags tell players from NPCs (green). */
+  /** Gold name tags tell players from NPCs (green); party members are sky blue. */
   const PLAYER_TAG_COLOR = "#f6d77a";
+  const PARTY_TAG_COLOR = "#8fd8ff";
+  /** The hero's own chat bubble. */
+  let heroBubble: { sprite: TextSprite; text: string } | null = null;
   async function addRemote(remote: RemotePlayer) {
     remoteLoading.add(remote.id);
     try {
@@ -971,8 +1012,9 @@ export function createWorldRuntime(
       if (disposed || failed || !scene || remoteVisuals.has(remote.id)) return;
       const character = makeCharacter(`char:${id}`, atlas, PLAYER_SIZE);
       const shadow = image(shadowTexture, 1, 30, 11);
-      const tag = makeNameTag(remote.name, PLAYER_TAG_COLOR);
-      remoteVisuals.set(remote.id, { character, shadow, tag, pos: { x: remote.x, y: remote.y }, phase: Math.random() });
+      const party = !!read().online?.inParty?.(remote.id);
+      const tag = makeNameTag(remote.name, party ? PARTY_TAG_COLOR : PLAYER_TAG_COLOR);
+      remoteVisuals.set(remote.id, { character, shadow, tag, party, bubble: null, remote, pos: { x: remote.x, y: remote.y }, phase: Math.random() });
     } catch (error) {
       console.warn("[world] could not draw another player:", remote.id, error);
     } finally {
@@ -983,10 +1025,12 @@ export function createWorldRuntime(
     const visual = remoteVisuals.get(id);
     if (!visual) return;
     visual.character.image.destroy(); visual.shadow.destroy(); visual.tag.image.destroy();
+    setBubble(visual.bubble, null);
     remoteVisuals.delete(id);
   }
   function updateRemotes(dt: number) {
-    const others = read().online?.players() ?? [];
+    const port = read().online;
+    const others = port?.players() ?? [];
     const ids = new Set(others.map((remote) => remote.id));
     for (const id of [...remoteVisuals.keys()]) if (!ids.has(id)) removeRemote(id);
     for (const remote of others) {
@@ -1008,11 +1052,44 @@ export function createWorldRuntime(
       const { x, y } = visual.pos;
       visual.character.image.setPosition(x, y).setDepth(characterDepth(y));
       visual.shadow.setPosition(x, y);
+      visual.remote = remote;
+      const party = !!port?.inParty?.(remote.id);
+      if (party !== visual.party) {
+        const key = visual.tag.image.texture.key;
+        visual.tag.image.destroy();
+        scene?.textures.remove(key);
+        visual.tag = makeNameTag(remote.name, party ? PARTY_TAG_COLOR : PLAYER_TAG_COLOR);
+        visual.party = party;
+      }
       visual.tag.image.setDisplaySize(visual.tag.width / viewScale, visual.tag.height / viewScale).setPosition(x, y - PLAYER_SIZE - 2);
+      visual.bubble = setBubble(visual.bubble, port?.bubble?.(remote.id) ?? null);
+      visual.bubble?.sprite.image.setDisplaySize(visual.bubble.sprite.width / viewScale, visual.bubble.sprite.height / viewScale)
+        .setPosition(x, y - PLAYER_SIZE - 2 - visual.tag.height / viewScale);
     }
+    // The hero's own line floats over the hero.
+    heroBubble = setBubble(heroBubble, port?.bubble?.(null) ?? null);
+    heroBubble?.sprite.image.setDisplaySize(heroBubble.sprite.width / viewScale, heroBubble.sprite.height / viewScale)
+      .setPosition(position.x, position.y - PLAYER_SIZE - 4);
+    parent.dataset.chatBubbles = String([...remoteVisuals.values()].filter((v) => v.bubble).length + (heroBubble ? 1 : 0));
+    parent.dataset.partyTags = [...remoteVisuals].filter(([, v]) => v.party).map(([id]) => id).join(" ");
     parent.dataset.remotePlayers = JSON.stringify([...remoteVisuals].map(([id, visual]) => [id, Math.round(visual.pos.x), Math.round(visual.pos.y)]));
+    // Tests: where each other player's body is on the host (px), to tap them.
+    parent.dataset.remoteScreen = JSON.stringify([...remoteVisuals].map(([id, visual]) => {
+      const at = toScreen({ x: visual.pos.x, y: visual.pos.y - PLAYER_SIZE / 2 });
+      return [id, Math.round(at.x), Math.round(at.y)];
+    }));
   }
 
+  /** The frontmost other player whose sprite covers `point`, or null. */
+  function remoteAt(point: Point): RemotePlayer | null {
+    let best: RemoteVisual | null = null;
+    for (const visual of remoteVisuals.values()) {
+      const { x, y } = visual.pos;
+      if (Math.abs(point.x - x) > 20 || point.y > y + 8 || point.y < y - PLAYER_SIZE - 4) continue;
+      if (!best || y > best.pos.y) best = visual;
+    }
+    return best?.remote ?? null;
+  }
   /** The spot of the frontmost roaming foe whose sprite covers `point`, or null. */
   function foeAt(point: Point): Point | null {
     let best: Point | null = null;

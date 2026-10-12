@@ -2,7 +2,8 @@
 
 // Joins the online session (lib/net/session.ts) to the stores: signed in, with
 // a game and a server, the session gets the hero's name and body; its status
-// and room size are mirrored into the online store for the HUD.
+// and room size are mirrored into the online store for the HUD. The social
+// socket (lib/net/social.ts) follows the character being played.
 import { useEffect } from "react";
 import { checkToken } from "@/lib/net/client";
 import { onlineSession } from "@/lib/net/session";
@@ -11,6 +12,8 @@ import { signedIn, useOnlineStore } from "@/store/online-store";
 import { useWorldStore } from "@/store/world-store";
 import { toast } from "@/store/toast-store";
 import { startCloudSession, useCloudSession } from "@/store/cloud-session";
+import { socialSocket } from "@/lib/net/social";
+import { useSocialStore } from "@/store/social-store";
 
 export function OnlineBridge() {
   // Server saves: resume / follow the save status / write on close (store/cloud-session.ts).
@@ -39,6 +42,20 @@ export function OnlineBridge() {
     const server = gameServerUrl();
     onlineSession.configure(server && token && hasGame && name ? { server, token, name, body } : null);
   }, [token, hasGame, name, body]);
+
+  // Friends, party, whispers, mail: one socket to the account's hub while a
+  // character is played (docs/design/social.md); it hears who and where.
+  const playing = useCloudSession((s) => (s.phase === "playing" ? s.current?.id ?? null : null));
+  const location = useWorldStore((s) => s.currentSceneId);
+  useEffect(() => {
+    const server = gameServerUrl();
+    const on = !!(server && token && playing);
+    socialSocket.configure(on ? { server: server!, token: token! } : null);
+    if (!on) useSocialStore.setState({ status: "off", loaded: false, lines: [], unread: 0, party: null, friends: [], mail: [], invites: [], requestsIn: [], requestsOut: [], blocked: [], card: null, whisperTo: null });
+  }, [token, playing]);
+  useEffect(() => {
+    socialSocket.setHero(playing && name ? { name, body, location: location ?? null, characterId: playing } : null);
+  }, [playing, name, body, location]);
 
   useEffect(() => onlineSession.subscribe(() => {
     const before = useOnlineStore.getState().status;

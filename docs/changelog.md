@@ -4,6 +4,18 @@ What changed, when, and in which pull request. Newest first. Each entry says wha
 
 Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-Isaman/wuxia-world/pulls?q=is%3Apr+is%3Amerged). The waves are the build → test → review rounds the agents worked in (see [HANDOFF.md](../HANDOFF.md)).
 
+## 2026-10-12
+
+### Players meet: friends, a party, chat and mail; NPC gifts wait for รับของ
+
+- **Friends (สหาย).** A new HUD tab (10th, hotkey 0) when playing online: add a friend by username or by tapping them on the map, accept or decline requests, see who is online, as which hero and where; remove or block. A request to someone who already asked you makes you friends at once.
+- **A party (คณะ) of up to four.** The leader invites (an invite lapses after 2 minutes), kicks or hands over the lead; leaving passes it on; a party of one dissolves. Companions show in a frame under the vitals (★ when they share your map) and with sky-blue name tags. **A won fight pays +10 % w-exp and move xp while another online member stands on the same map** — the server checks it at the verdict.
+- **Chat (สนทนา).** A chat box at the bottom left with แผนที่ (everyone on the map), คณะ and กระซิบ; Enter on the map opens it, Esc closes it, typing never moves the hero. Map lines float over the speaker's head. 1–120 characters, 5 lines per 10 s, blocked players silenced.
+- **Mail between players.** The จดหมาย window gains จากสหาย and เขียนจดหมาย: a letter (500 characters) can carry gold (up to 50,000) or one stack of a sellable item, for 10 ตำลึง postage. The server makes sure the parcel really leaves the sender's bag; the receiver takes it with **รับของ** when they choose; an untaken parcel goes back to its sender when the letter is deleted or after 30 days; an undeliverable one comes back at once.
+- **NPC letters: opening no longer takes the gift.** รับของ takes one letter's gift, รับทั้งหมด every gift left; the list shows which letters still hold one; deleting a letter with an untaken gift asks first.
+- Server: `PlayerHub` (one per account: friends, requests, blocks, mail, whispers, the social socket) and `PartyObject` (`server/worker/ts/`), migration `v4`; map chat is protocol 2 (`say` / `said`); `check_debit` and the internal `/save-debit` and `/exists` on the account. Client: `lib/net/social.ts`, `store/social-store.ts`, `components/world/social/`, `cloudSave.exclusive`. Tests: `test:server` (chat, debit), `test:play-server` (the social documents, the party bonus), `test:net` (map chat, `exclusive`), `test:online` (friends, whispers, mail and parcels, the party and its bonus, blocking) and a two-browser `online.spec.ts` run. Design and research: [design/social.md](design/social.md); guide: [online.md](online.md#friends-party-chat-and-mail).
+- The tournament checks in `test:systems` pin the world clock (they failed once the real world day passed day 90).
+
 ## 2026-10-11
 
 ### The server runs the world and checks every fight; the server starts over

@@ -172,7 +172,9 @@ for (let i = 0; i < 600; i++) {
 }
 step("letters", () => st().letters.length);
 const letter = st().letters[0];
-step("openLetter", () => letter && st().openLetter(letter.id));
+step("readLetter", () => letter && st().readLetter(letter.id));
+step("claimLetterGift", () => letter && st().claimLetterGift(letter.id));
+step("claimAllLetterGifts", () => st().claimAllLetterGifts());
 step("deleteLetters", () => st().deleteLetters(st().letters.slice(0, 3).map((l) => l.id)));
 step("recordRumorHeard", () => { const r = st().rumorPool[0]; return r && st().recordRumorHeard(r.id); });
 // Tournament
