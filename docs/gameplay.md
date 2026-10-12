@@ -463,9 +463,11 @@ Mastery levels 1–5 need 0 / 100 / 300 / 700 / 1500 xp.
 | --- | --- | --- |
 | 0 ธรรมดา | the shops' starter roster, the old ×1 pieces | 0–1 |
 | 1 ดี | the shops' iron / leather / silver roster, the old ×2 pieces, ขลุ่ยไผ่ | 1–2 |
-| 2 ชั้นเลิศ | the seven city specialties, the old ×3 pieces, พิณยี่ห้อง | 1–3 |
-| 3 หายาก | beast gear ดาบพิษ, เกราะมังกร, หมวกเทพ, รองเท้าลม (and the old ×4) | 2–3 |
-| 4 ในตำนาน | beast gear ดาบมังกรเทพ, เกราะเทพ, มงกุฎมังกร, รองเท้าเทพ (and the old ×5) | 3–4 |
+| 2 ชั้นเลิศ | the city specialties, the old ×3 pieces, พิณยี่ห้อง | 1–3 |
+| 3 หายาก | beast gear ดาบพิษ, เกราะมังกร, หมวกเทพ, รองเท้าลม, ปลอกแขนมังกร, แหวนปัญญา, ประดับชีวิตนิรันดร์ | 2–3 |
+| 4 ในตำนาน | beast gear ดาบมังกรเทพ, เกราะเทพ, มงกุฎมังกร, รองเท้าเทพ, ปลอกแขนเทพ, แหวนมังกร, ประดับมังกรเทพ | 3–4 |
+
+Every slot has a tier-3 and a tier-4 piece from the legendary beasts (each beast 3–4 pieces, one of them 15 % per kill). The two instruments are sold: ขลุ่ยไผ่ by every city's accessory maker (250), พิณยี่ห้อง by Suzhou's (900) — the music life skill needs one in the weapon slot.
 
 Each of the 17 kinds is equally likely, and a piece never rolls one kind twice:
 

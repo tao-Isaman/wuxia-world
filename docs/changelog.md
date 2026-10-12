@@ -13,6 +13,7 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 - **Coloured by how good the roll is**: grey at the bottom of an option's range, then green, blue, purple, orange, red-gold at the very top — in the bag, the profile, the craft shop and the spoils panel.
 - **✦ สุ่มออฟชั่น** at the craft shop of the piece's line (forge, tailor, jeweller, accessory maker) re-rolls the whole set, worn or in the bag, with the hero's own craft at level 3+ and one magic material: **หินศิลาวิเศษ** (weapons, rings, charms) or **ด้ายศิลาวิเศษ** (robes, hats, boots, bracers). They drop only from tier-3-and-up foes (20–40 %), a legendary beast always leaving 2–3 of each.
 - Old saves keep their gear: a piece from before options gets its share on load. Gear rarity colours now follow the tier, and a flat crit / evasion effect shows on one line with the stat (no more "หลบหลีก +12 · หลบหลีก +8").
+- **Every slot can reach the top**: the legendary beasts now also drop the tier-3 / tier-4 bracers, rings and charms (ปลอกแขนมังกร / เทพ, แหวนปัญญา / มังกร, ประดับชีวิตนิรันดร์ / มังกรเทพ). The instruments are sold at last (ขลุ่ยไผ่ at every city's accessory maker, พิณยี่ห้อง in Suzhou), so the music life skill can be trained; the old BR2 is renamed ปลอกแขนหนังสัตว์ so no two pieces share a name.
 - New suite `test:gear`; design in [gameplay.md](gameplay.md#items-and-equipment) and [combat.md](combat.md#gear-options-libgamegearts).
 
 ### A painted world map, and boats to the islands

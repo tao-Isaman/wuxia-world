@@ -44,6 +44,7 @@ import {
 import { getItem } from "../lib/world/data/items";
 import { itemIconId } from "../lib/world/data/item-icons";
 import { BOSSES } from "../lib/world/data/bosses";
+import { ARTISANS, equipmentOfferedBy } from "../lib/world/data/artisans";
 import { getOpponent } from "../lib/world/data/opponents";
 import { rollVictorySpoilsFrom } from "../lib/world/spoils";
 import { validateAndRepair } from "../lib/world/validate";
@@ -153,6 +154,17 @@ check("keys: canonical, clamped, unknown tokens and extra options dropped, a bar
   assert.equal(affixQuality({ k: "pd", v: 15 }), 5);
   assert.equal(affixQuality({ k: "fam_dmg", v: 25 }), 5);
   assert.equal(affixQuality({ k: "stat", v: 1 }), 0);
+});
+
+check("sources: every slot has tier-3 and tier-4 beast gear, instruments are sold, no two pieces share a name", () => {
+  const beast = new Set(BOSSES.flatMap((b) => b.gear));
+  for (const ty of ["W", "A", "H", "B", "BR", "R", "C"] as const) {
+    for (const ti of [3, 4]) assert.ok([...beast].some((id) => getEquip(id)!.ty === ty && getEquip(id)!.ti === ti), `${ty} T${ti} from a beast`);
+  }
+  const sold = new Set(ARTISANS.flatMap((a) => equipmentOfferedBy(a).map((o) => o.equipId)));
+  for (const id of ["W_flute", "W_pipa"]) assert.ok(sold.has(id) && getEquip(id)!.instrument, `${id} sold`);
+  const names = EQUIPMENT.map((e) => e.n);
+  assert.equal(new Set(names).size, names.length, "unique names");
 });
 
 newGame();

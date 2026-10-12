@@ -602,7 +602,7 @@ Grid column: the skill's range and area on the tactics board (`skillGrid` / `art
 | Id | Name | Bonuses | Effect |
 | --- | --- | --- | --- |
 | `BR1` | ปลอกแขนผ้า | PD +4, ID +3 | — |
-| `BR2` | ปลอกแขนหนัง | ATK +9, PA +6, PD +12, ID +10, HP +29, Cri +3, Res +1 | — |
+| `BR2` | ปลอกแขนหนังสัตว์ | ATK +9, PA +6, PD +12, ID +10, HP +29, Cri +3, Res +1 | — |
 | `BR3` | ปลอกแขนเหล็ก | ATK +9, PA +6, PD +24, ID +20, HP +109, Cri +3, Res +2 | — |
 | `BR4` | ปลอกแขนมังกร | ATK +20, PA +15, IA +5, PD +19, ID +14, HP +15, Acc +10, Cri +5 | `{"t":"pct_atk","v":4}` |
 | `BR5` | ปลอกแขนเทพ | ATK +20, PA +13, IA +3, PD +25, ID +19, HP +15, SPD +4, Eva +4, Acc +6, Cri +5 | — |

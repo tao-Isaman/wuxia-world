@@ -44,7 +44,7 @@ const AUTHORED_EQUIPMENT: readonly Equipment[] = [
 
   // ปลอกแขน BR — base: PD+ID
   { id: "BR1", n: "ปลอกแขนผ้า", ty: "BR", ti: 0, atkb: 0, pdb: 8, idb: 6, hpb: 0, mpb: 0, st: {}, eff: null },
-  { id: "BR2", n: "ปลอกแขนหนัง", ty: "BR", ti: 1, atkb: 18, pdb: 23, idb: 20, hpb: 58, mpb: 0, pab: 12, crib: 6, resb: 2, st: {}, eff: null },
+  { id: "BR2", n: "ปลอกแขนหนังสัตว์", ty: "BR", ti: 1, atkb: 18, pdb: 23, idb: 20, hpb: 58, mpb: 0, pab: 12, crib: 6, resb: 2, st: {}, eff: null },
   { id: "BR3", n: "ปลอกแขนเหล็ก", ty: "BR", ti: 2, atkb: 18, pdb: 47, idb: 40, hpb: 218, mpb: 0, pab: 12, crib: 6, resb: 4, st: {}, eff: null },
   { id: "BR4", n: "ปลอกแขนมังกร", ty: "BR", ti: 3, atkb: 40, pdb: 38, idb: 28, hpb: 30, mpb: 0, pab: 30, iab: 10, accb: 20, crib: 10, st: {}, eff: { t: "pct_atk", v: 8 } },
   { id: "BR5", n: "ปลอกแขนเทพ", ty: "BR", ti: 4, atkb: 40, pdb: 50, idb: 38, hpb: 30, mpb: 0, pab: 26, iab: 6, spdb: 8, evab: 8, accb: 12, crib: 10, st: {}, eff: null },
