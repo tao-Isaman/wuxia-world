@@ -7,13 +7,13 @@ import { RARITY_COLORS } from "@/lib/ui/rarity";
 /**
  * Hero's Adventure-style item slot: a square framed in its rarity colour
  * with the item's painted icon (lib/world/data/item-icons.ts) — or, without
- * one, an ink glyph for the category — and a count in the corner. The whole
+ * one, an emoji for the category — and a count in the corner. The whole
  * tile is a button when `onClick` is given.
  */
 export const CATEGORY_GLYPH: Record<string, string> = {
-  material: "材", herb: "草", venom: "毒", potion: "藥", food: "食", book: "書", manual: "譜",
-  craft: "工", valuable: "寶", quest: "令", misc: "雜",
-  W: "兵", A: "衣", H: "冠", B: "靴", BR: "腕", R: "戒", C: "飾",
+  material: "🪨", herb: "🌿", venom: "☠", potion: "🧪", food: "🍚", book: "📖", manual: "📜",
+  craft: "🔨", valuable: "💎", quest: "📯", misc: "📦",
+  W: "🗡", A: "👘", H: "🪖", B: "👟", BR: "💪", R: "💍", C: "🎖",
 };
 
 export function ItemTile({ glyph, icon, rarity, count, label, selected, dim, onClick, children }: {

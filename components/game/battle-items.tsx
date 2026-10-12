@@ -53,7 +53,7 @@ export function BattleItemTray({ state, unit, onClose }: { state: GridBattleStat
             ? <p className="gb-items-empty">ไม่มีศัตรูในระยะ {effect.range} ช่อง · เดินเข้าใกล้ก่อน</p>
             : targets.map((t) => (
               <button key={t.id} type="button" onClick={() => apply(chosen.id, t)}>
-                ขว้างใส่ <b>{t.name}</b> <small>HP {t.hp}/{t.derived.HP} · ≈{throwDamage(unit, t, effect)}{effect.poison ? ` + พิษ ${effect.poison.pct}%×${effect.poison.turns}` : ""}</small>
+                ขว้างใส่ <b>{t.name}</b> <small>พลังชีวิต {t.hp}/{t.derived.HP} · ≈{throwDamage(unit, t, effect)}{effect.poison ? ` + พิษ ${effect.poison.pct}%×${effect.poison.turns}` : ""}</small>
               </button>
             ))}
         </div>

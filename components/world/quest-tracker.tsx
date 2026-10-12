@@ -1,5 +1,5 @@
 "use client";
-import { activeGuide, getQuest, trackedQuestId } from "@/lib/world";
+import { WAYPOINT_FLAG, activeGuide, getQuest, trackedQuestId, waypointGuide } from "@/lib/world";
 import { useWorldStore } from "@/store/world-store";
 
 /**
@@ -8,6 +8,26 @@ import { useWorldStore } from "@/store/world-store";
  * counter, and where. Tapping it opens the quest log.
  */
 export function QuestTracker({ onOpen }: { onOpen: () => void }) {
+  const state = useWorldStore();
+  const waypoint = waypointGuide(state);
+  const quest = trackedQuestId(state) ? getQuest(trackedQuestId(state)!) : undefined;
+  return <>
+    {waypoint && (
+      <aside className="quest-tracker quest-tracker--waypoint" aria-label="จุดหมายบนแผนที่" data-hud-occluder data-waypoint={waypoint.locationId ?? ""}>
+        <div className="qt-waypoint">
+          <span className="qt-kicker">🧭 จุดหมายบนแผนที่</span>
+          <strong className="qt-name">{waypoint.locationName}</strong>
+          <span className="qt-where">{waypoint.path.length <= 1 ? "อยู่ที่นี่" : `อีก ${waypoint.path.length - 1} ช่วงทาง · ตามลูกศรไป`}</span>
+          <button type="button" className="qt-cancel" aria-label="ยกเลิกการนำทาง" title="ยกเลิกการนำทาง"
+            onClick={() => useWorldStore.getState()._setFlag(WAYPOINT_FLAG, "")}>✕</button>
+        </div>
+      </aside>
+    )}
+    {quest && <TrackedQuest onOpen={onOpen} />}
+  </>;
+}
+
+function TrackedQuest({ onOpen }: { onOpen: () => void }) {
   const state = useWorldStore();
   const questId = trackedQuestId(state);
   const quest = questId ? getQuest(questId) : undefined;

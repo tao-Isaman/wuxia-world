@@ -231,7 +231,13 @@ async function editSave(page: Page, edit: string) {
     const online = JSON.parse(localStorage.getItem("wuxia-online-v1")!).state as { token: string; characterId: string };
     const headers = { authorization: `Bearer ${online.token}`, "content-type": "application/json" };
     const path = `${server}/characters/${online.characterId}/save`;
-    const { rev, save } = await (await fetch(path, { headers })).json();
+    // A hero just created is on the server after its first save.
+    let loaded = await (await fetch(path, { headers })).json();
+    for (let tries = 0; !loaded.save && tries < 20; tries++) {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      loaded = await (await fetch(path, { headers })).json();
+    }
+    const { rev, save } = loaded;
     const state = save.state;
     new Function("state", body)(state);
     await new Promise((resolve) => setTimeout(resolve, 1200));
@@ -347,6 +353,32 @@ test("between players: map chat with bubbles, a tap opens the card, friends, a p
   await expect.poll(() => goldOf(bob), { timeout: 20_000 }).toBe(bobBefore + 100);
   await expect.poll(() => goldOf(ann), { timeout: 20_000 }).toBe(390);
   await ann.screenshot({ path: "test-results/screenshots/online-social.png" });
+  await ann.context().close();
+  await bob.context().close();
+});
+
+test("looks online: another player sees the outfit and the weapon on the back, and a change at once", async ({ browser }) => {
+  test.skip(!(await serverUp()), `no game server at ${SERVER} (bun run server:dev)`);
+  test.setTimeout(240_000);
+  const annId = `la_${run}`.slice(0, 20);
+  const bobId = `lb_${run}`.slice(0, 20);
+  const ann = await player(browser, "หมิงเยว่", "หญิง", annId);
+  await editSave(ann, `state.wardrobe = ["tailor_jade", "tailor_ink"]; state.appearance = { outfit: "tailor_jade", hideWeapon: false };
+    state.playerBuild.equipment.W = "eq_t1_w_long";`);
+  const bob = await player(browser, "ซูหาน", "ชาย", bobId);
+  const looksOf = async (page: Page, id: string) => {
+    const raw = await page.getByTestId("world-canvas").getAttribute("data-remote-looks");
+    return (JSON.parse(raw ?? "[]") as [string, string, string | null][]).find(([who]) => who === id)?.slice(1) ?? null;
+  };
+  await expect.poll(() => looksOf(bob, annId), { timeout: 30_000 }).toEqual(["tailor_jade", "eq_t1_w_long"]);
+  // Ann changes outfit in her wardrobe: Bob sees it without her leaving the map.
+  await ann.locator(".hud-iconbar").getByRole("button", { name: "โปรไฟล์", exact: true }).click();
+  await ann.getByRole("tab", { name: "ชุด" }).click();
+  await ann.getByTestId("wardrobe").locator('[data-outfit="tailor_ink"]').click();
+  await ann.getByTestId("hide-weapon").check();
+  await ann.keyboard.press("Escape");
+  await expect.poll(() => looksOf(bob, annId), { timeout: 20_000 }).toEqual(["tailor_ink", null]);
+  await bob.screenshot({ path: "test-results/screenshots/online-looks.png" });
   await ann.context().close();
   await bob.context().close();
 });

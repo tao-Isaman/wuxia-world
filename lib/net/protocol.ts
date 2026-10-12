@@ -5,7 +5,7 @@
 // on both sides when a message changes shape).
 import type { Dir8 } from "@/lib/characters/walk8";
 
-export const PROTOCOL_VERSION = 2;
+export const PROTOCOL_VERSION = 3;
 
 export type HeroBody = "m1" | "f1";
 
@@ -22,6 +22,16 @@ export interface Presence {
   moving: boolean;
   /** Server time (ms) of the last accepted update. */
   at: number;
+  /** The outfit worn (protocol 3; lib/world/data/outfits.ts). */
+  outfit: string;
+  /** The equipment id of the weapon carried on the body, if shown. */
+  weapon: string | null;
+}
+
+/** A player's look: the outfit worn and the weapon carried (protocol 3). */
+export interface Look {
+  outfit: string;
+  weapon: string | null;
 }
 
 export interface Motion {
@@ -32,12 +42,14 @@ export interface Motion {
 }
 
 export type ClientMsg =
-  | { t: "hello"; v: number; name: string; body: HeroBody; x: number; y: number; dir: Dir8 }
+  | ({ t: "hello"; v: number; name: string; body: HeroBody; x: number; y: number; dir: Dir8 } & Look)
   | ({ t: "move" } & Motion)
   | { t: "sync" }
   | { t: "ping"; at: number }
   /** A line of map chat (1–120 characters, 5 per 10 s). */
-  | { t: "say"; text: string };
+  | { t: "say"; text: string }
+  /** The look changed (at most one every 500 ms). */
+  | ({ t: "look" } & Look);
 
 export type LeaveReason = "closed" | "replaced";
 
@@ -46,7 +58,9 @@ export type RoomEvent =
   | ({ t: "moved"; id: string; at: number } & Motion)
   | { t: "left"; id: string; reason: LeaveReason }
   /** A line of map chat, with the speaker's hero name. */
-  | { t: "said"; id: string; name: string; text: string; at: number };
+  | { t: "said"; id: string; name: string; text: string; at: number }
+  /** A player changed their look. */
+  | ({ t: "looked"; id: string; at: number } & Look);
 
 export type ErrorCode =
   | "bad_message" | "bad_version" | "not_joined" | "already_joined"

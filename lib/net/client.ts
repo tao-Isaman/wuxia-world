@@ -2,7 +2,7 @@
 // character, save, world, battle and social calls, and one WebSocket into one room. No React, no store — the browser
 // (lib/net/session.ts) and the server test (scripts/test-online-server.ts)
 // both use it.
-import { PROTOCOL_VERSION, type ClientMsg, type HeroBody, type Motion, type ServerMsg, type Session } from "./protocol";
+import { PROTOCOL_VERSION, type ClientMsg, type HeroBody, type Look, type Motion, type ServerMsg, type Session } from "./protocol";
 import type { Dir8 } from "@/lib/characters/walk8";
 import type { BattleLogRequest, BattleStartReply, BattleVerdict, EchoRequest, WorldReply } from "./play-protocol";
 import type { Parcel, SendMailRequest, SocialSnapshot } from "./social-protocol";
@@ -140,7 +140,7 @@ export interface RoomOptions {
   token: string;
   room: string;
   /** Who walks in and where (sent as `hello` when the socket opens). */
-  hello: { name: string; body: HeroBody; x: number; y: number; dir: Dir8 };
+  hello: { name: string; body: HeroBody; x: number; y: number; dir: Dir8 } & Partial<Look>;
   onMessage: (message: ServerMsg) => void;
   onOpen?: () => void;
   /** The socket closed (`code` 4001: replaced by another login; 4002: protocol version). */
@@ -153,6 +153,8 @@ export interface RoomConnection {
   ping: () => void;
   /** Say a line to everyone on the map. */
   say: (text: string) => void;
+  /** Tell the room the hero's look changed. */
+  look: (look: Look) => void;
   close: () => void;
   readonly isOpen: boolean;
 }
@@ -170,7 +172,7 @@ export function connectRoom(options: RoomOptions): RoomConnection {
     if (socket.readyState === WebSocket.OPEN) socket.send(JSON.stringify(message));
   };
   socket.addEventListener("open", () => {
-    send({ t: "hello", v: PROTOCOL_VERSION, ...options.hello });
+    send({ t: "hello", v: PROTOCOL_VERSION, outfit: "default", weapon: null, ...options.hello });
     options.onOpen?.();
   });
   socket.addEventListener("message", (event) => {
@@ -187,6 +189,7 @@ export function connectRoom(options: RoomOptions): RoomConnection {
     sync: () => send({ t: "sync" }),
     ping: () => send({ t: "ping", at: Date.now() }),
     say: (text) => send({ t: "say", text }),
+    look: (look) => send({ t: "look", ...look }),
     close: () => socket.close(1000, "bye"),
     get isOpen() { return socket.readyState === WebSocket.OPEN; },
   };

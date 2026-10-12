@@ -6,7 +6,7 @@
 // tab) the socket is closed after a short while, so others see the hero leave.
 import { connectRoom, type RoomConnection } from "./client";
 import { applyServerMsg, emptyPresence, othersIn, type PresenceState } from "./presence";
-import type { HeroBody, Motion, Presence } from "./protocol";
+import type { HeroBody, Look, Motion, Presence } from "./protocol";
 
 /** A line of map chat as the chat box shows it. */
 export interface MapLine {
@@ -44,6 +44,8 @@ export class OnlineSession {
   private presence: PresenceState = emptyPresence();
   private others: Presence[] = [];
   private lastMotion: Motion | null = null;
+  /** The hero's look (outfit, carried weapon): sent in `hello`, and as `look` when it changes. */
+  private look: Look = { outfit: "default", weapon: null };
   private lastSent: Motion | null = null;
   private lastSentAt = 0;
   private lastReportAt = 0;
@@ -66,6 +68,13 @@ export class OnlineSession {
     if (!changed) return;
     this.disconnect();
     this.setStatus(config ? "offline" : "off");
+  }
+
+  /** The hero's look now; others see a change at once (no rejoin). */
+  setLook(look: Look) {
+    if (look.outfit === this.look.outfit && look.weapon === this.look.weapon) return;
+    this.look = { ...look };
+    if (this.conn?.isOpen && this.presence.epoch !== null) this.conn.look(this.look);
   }
 
   /** Everyone else on the room's map (read every frame by the runtime). */
@@ -166,7 +175,7 @@ export class OnlineSession {
       server: config.server,
       token: config.token,
       room,
-      hello: { name: config.name, body: config.body, x: motion.x, y: motion.y, dir: motion.dir },
+      hello: { name: config.name, body: config.body, x: motion.x, y: motion.y, dir: motion.dir, ...this.look },
       onMessage: (message) => {
         if (conn !== this.conn) return;
         if (message.t === "error" && message.code === "replaced") { this.setStatus("replaced"); return; }

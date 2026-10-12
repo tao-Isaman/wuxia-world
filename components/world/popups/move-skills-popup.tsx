@@ -112,8 +112,8 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
       const previousStats = deriveAll(before.playerBuild);
       const nextStats = deriveAll(after.playerBuild);
       changes.push(
-        { label: "พลังชีวิตสูงสุด (HP)", before: previousStats.HP, after: nextStats.HP },
-        { label: "ปราณสูงสุด (MP)", before: previousStats.MP, after: nextStats.MP },
+        { label: "พลังชีวิตสูงสุด", before: previousStats.HP, after: nextStats.HP },
+        { label: "ปราณสูงสุด", before: previousStats.MP, after: nextStats.MP },
       );
     }
     setUpgradeReceipt({
@@ -210,7 +210,7 @@ export function MoveSkillsPopup({ open, onClose }: Props) {
             <span>ลมปราณ <b>{totalArts}</b></span>
             <span title="ระดับของทุกวิชารวมกัน">ระดับรวม <b className="text-emerald-600">{skillLevelSum}</b></span>
             {equippedArtLv !== null && <span>ระดับลมปราณ <b>{equippedArtLv}</b></span>}
-            <span title="ประสบการณ์ยุทธ (w-exp) ใช้เลื่อนระดับวิชาได้ทันที">ประสบการณ์ยุทธ <b className="text-primary">{wExp}</b></span>
+            <span title="ประสบการณ์ยุทธ ใช้เลื่อนระดับวิชาได้ทันที">ประสบการณ์ยุทธ <b className="text-primary">{wExp}</b></span>
           </div>
           <div className="skills-mastery">
             <span className="skills-mastery-label" title="ยิ่งชำนาญอาวุธชนิดใด ท่าของอาวุธนั้นยิ่งแรง (สูงสุด 200)">ความชำนาญอาวุธ</span>

@@ -10,7 +10,8 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { SKILLS, TIERS, WEAPON_FAMILY_LABEL } from "@/lib/game";
+import { SKILLS, STAT_LABEL, TIERS, WEAPON_FAMILY_LABEL } from "@/lib/game";
+import { plainThai } from "@/lib/game/skill-text";
 import { cn } from "@/lib/utils";
 
 const TIER_COLORS = [
@@ -27,7 +28,7 @@ export function SkillLibrary() {
     <Card>
       <CardContent className="p-4">
         <h3 className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground mb-3">
-          คลังวิชา {SKILLS.length} วิชา — stat รวมต่อวิชา ≤ 20 pts | hpLv+mpLv=70 สำหรับกำลังภายใน
+          คลังวิชา {SKILLS.length} วิชา — ค่าพลังรวมต่อวิชาไม่เกิน 20 แต้ม · กำลังภายในเพิ่มพลังชีวิตกับปราณรวม 70 ต่อขั้น
         </h3>
         <div className="overflow-x-auto">
           <Table>
@@ -35,9 +36,9 @@ export function SkillLibrary() {
               <TableRow>
                 <TableHead>ชื่อวิชา</TableHead>
                 <TableHead>ระดับ</TableHead>
-                <TableHead>CD</TableHead>
+                <TableHead>พัก (ตา)</TableHead>
                 <TableHead>อาวุธ</TableHead>
-                <TableHead>MG</TableHead>
+                <TableHead>ความชำนาญ</TableHead>
                 <TableHead>พลังฐาน</TableHead>
                 <TableHead>สถิติ</TableHead>
                 <TableHead>ผลกระทบ</TableHead>
@@ -47,9 +48,9 @@ export function SkillLibrary() {
               {SKILLS.map((sk) => {
                 const t = TIERS[sk.ti];
                 const sb = Object.entries(sk.st)
-                  .map(([k, v]) => `${k}+${v}`)
+                  .map(([k, v]) => `${STAT_LABEL[k as keyof typeof STAT_LABEL] ?? k} +${v}`)
                   .join(" ");
-                const kind = sk.at === "phy" ? "⚔Phy" : sk.at === "int" ? "💜Int" : sk.se ? "⟳Buff" : "💥Debuff";
+                const kind = sk.at === "phy" ? "⚔ภายนอก" : sk.at === "int" ? "💜ภายใน" : sk.se ? "⟳เสริม" : "💥ลดทอน";
                 let bp: React.ReactNode = "—";
                 if (sk.at) {
                   const se = Math.round(sk.bp * (1 + sk.p / 100) + sk.f);
@@ -77,7 +78,7 @@ export function SkillLibrary() {
                     <TableCell className="text-[10px]">{bp}</TableCell>
                     <TableCell className="text-[10px]">{sb}</TableCell>
                     <TableCell className="text-[10px]">
-                      {kind} · {sk.d}
+                      {kind} · {plainThai(sk.d)}
                     </TableCell>
                   </TableRow>
                 );

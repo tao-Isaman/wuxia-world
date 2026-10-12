@@ -52,11 +52,11 @@
 .sundial-sky { fill: #2d5c7c; stroke: #16252d; stroke-width: 1.5; }
 .sundial--night .sundial-sky { fill: #16223f; }
 .sundial-ring { transition: transform 900ms ease-in-out; }
-.sundial-ring text { font: 11px serif; fill: #f3e6c2; text-anchor: middle; }
+.sundial-ring text { font: 10px var(--font-body), sans-serif; fill: #f3e6c2; text-anchor: middle; }
 .sundial-ring text.sundial-current { fill: #ffd76b; font-weight: 700; }
 .sundial-face { fill: #efdcac; stroke: #8c6c33; stroke-width: 2; }
 .sundial--night .sundial-face { fill: #c9c4e8; }
-.sundial-hour { font: 700 19px serif; fill: #3b2a12; text-anchor: middle; }
+.sundial-hour { font: 700 13px var(--font-body), sans-serif; fill: #3b2a12; text-anchor: middle; }
 .sundial-pointer { fill: #ffcf5a; stroke: #6d4d17; stroke-width: 1; }
 .hud-day { position: relative; z-index: 1; margin-top: 5px; padding: 0 12px; font-size: 12px; color: var(--dq-text); background: var(--dq-box-solid); border: 2px solid var(--dq-edge); border-radius: 999px; white-space: nowrap; }
 .hud-day b { font: 700 16px/1.3 var(--font-display); color: #fff3cf; }
@@ -132,7 +132,7 @@
 @media (max-height: 500px) and (orientation: landscape), (orientation: portrait) and (max-width: 500px) {
   .title-content { grid-template-columns: 1fr 380px; padding: 10px 24px; gap: 20px; align-items: start; }
   .title-description, .title-rule, .title-footnote { display: none; }
-  .title-seal { width: 38px; height: 46px; font-size: 26px; margin-bottom: 8px; }
+  .title-seal { width: 38px; height: 46px; font-size: 13px; margin-bottom: 8px; }
   .title-intro h1 { font-size: 42px; }
   .hero-creation { padding: 12px 16px; }
   .creation-heading { font-size: 18px; padding-bottom: 6px; margin-bottom: 8px; }

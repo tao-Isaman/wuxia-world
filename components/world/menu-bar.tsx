@@ -25,6 +25,7 @@ import { OnlineButton } from "./online-panel";
 import { sectActionCount } from "@/lib/world";
 import { mailWaiting, useSocialStore } from "@/store/social-store";
 import { FriendsPopup } from "./social/friends-popup";
+import { WorldMapPopup } from "./popups/world-map-popup";
 import { ChatBox, ChatButton } from "./social/chat-box";
 import { PlayerCard } from "./social/player-card";
 import { PartyFrame } from "./social/party-frame";
@@ -40,6 +41,7 @@ type PopupId =
   | "letters"
   | "meridians"
   | "friends"
+  | "map"
   | null;
 
 // The game's menu: nine sections (โปรไฟล์ … ชีพจร), and สหาย online (hotkey
@@ -95,6 +97,8 @@ export function MenuBar({ hud, extras }: { hud?: boolean; extras?: ReactNode } =
     icon: string;
     label: string;
     badge?: number;
+    /** A letter hotkey instead of the next digit. */
+    key?: string;
   }[] = [
     { id: "profile", icon: "/icons/ui/profile.png", label: "โปรไฟล์" },
     { id: "inventory", icon: "/icons/ui/bag.png", label: "ย่าม" },
@@ -116,9 +120,10 @@ export function MenuBar({ hud, extras }: { hud?: boolean; extras?: ReactNode } =
     { id: "letters", icon: "/icons/ui/letter.png", label: "จดหมาย", badge: unread + playerMail > 0 ? unread + playerMail : undefined },
     { id: "meridians", icon: "/icons/ui/meridian.png", label: "ชีพจร", badge: meridianReady ? meridianPoints : undefined },
     ...(online ? [{ id: "friends" as const, icon: "/icons/ui/friends.png", label: "สหาย", badge: socialPending > 0 ? socialPending : undefined }] : []),
+    { id: "map", icon: "/icons/ui/map.png", label: "แผนที่", key: "m" },
   ];
-  /** Tab hotkeys: 1–9, then 0 for the tenth. */
-  const hotkey = (i: number) => String((i + 1) % 10);
+  /** Tab hotkeys: 1–9, then 0 for the tenth; a tab with its own letter keeps it. */
+  const hotkey = (i: number) => tabs[i]?.key ?? String((i + 1) % 10);
 
   // Hero's Adventure-style unified menu: the open popup renders inside one
   // full-screen tabbed shell, and number keys 1-9 switch sections in place.
@@ -139,6 +144,7 @@ export function MenuBar({ hud, extras }: { hud?: boolean; extras?: ReactNode } =
       <LettersPopup open={open === "letters"} onClose={close} />
       <MeridianPopup open={open === "meridians"} onClose={close} />
       <FriendsPopup open={open === "friends"} onClose={close} />
+      <WorldMapPopup open={open === "map"} onClose={close} />
     </GameMenuContext.Provider>
   );
 
@@ -151,7 +157,7 @@ export function MenuBar({ hud, extras }: { hud?: boolean; extras?: ReactNode } =
       const target = e.target;
       if (target instanceof HTMLElement && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName))) return;
       if (document.querySelector('[role="dialog"], [role="alertdialog"], [data-world-busy]')) return;
-      const index = tabs.findIndex((_, i) => hotkey(i) === e.key);
+      const index = tabs.findIndex((_, i) => hotkey(i) === e.key.toLowerCase());
       if (index >= 0) { e.preventDefault(); setOpen(tabs[index].id); }
     };
     window.addEventListener("keydown", onKey);

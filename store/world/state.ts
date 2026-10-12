@@ -90,6 +90,8 @@ export const emptyData = (): WorldStateData => ({
   actionLog: [],
   gender: "male",
   playerBodyId: "m1",
+  appearance: { outfit: "default", hideWeapon: false },
+  wardrobe: [],
   sectMembership: {},
   // Liveness Layer (NPC sim + rumors). v18+. Defaults are empty —
   // npcExt seeds lazily on first tickAllNamedNpcs from authored roster.
@@ -183,6 +185,8 @@ function copyData(s: WorldStateData): WorldStateData {
     actionLog: [...s.actionLog],
     gender: s.gender,
     playerBodyId: s.playerBodyId,
+    appearance: { ...(s.appearance ?? { outfit: "default", hideWeapon: false }) },
+    wardrobe: [...(s.wardrobe ?? [])],
     sectMembership: { ...s.sectMembership },
     // v18+: Liveness Layer
     npcExt: { ...s.npcExt },

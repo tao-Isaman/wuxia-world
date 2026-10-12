@@ -13,7 +13,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **What the player does:**
 
-- Explores 101 places (100 painted maps) joined by 129 roads.
+- Explores 101 places (100 painted maps) joined by 117 roads and, for the ten islands, 12 sea lanes sailed with the boatman; the แผนที่ (M) section shows it all on one painted world map.
 - Meets 235 NPCs (30 of them, plus the disciples, heirs and newcomers they bring, live their own lives) and takes 1,075 quests: a 15-chapter main story (เนื้อเรื่องหลัก), 374 hand-written, 113 sect lineage quests (154 moves; 30 of them a choice) and 48 story sagas (573 chapters: 38 sect sagas and 10 long jianghu sagas for the unsect T4 / T5 moves); 511 cutscenes.
 - Lives in the 3rd year of Jianwen (1401), about 40 years after the legend of the last age (our own story, not a novel's sequel): the court's seized scriptures have just scattered back into the jianghu ([docs/story-writing.md](docs/story-writing.md#timeline-and-the-legends-people)).
 - Joins one of 15 sects and learns 173 move skills and 111 inner arts (plus 18 boss moves and 6 boss arts no one can learn).
@@ -78,6 +78,7 @@ bun run test:story          # every sect skill/art has a quest; lineage + sagas 
 bun run test:routes         # compass exits, 8-way road paintings and arrival sides; world coords current
 bun run test:places         # place NPCs / quests / activities; every ยุทธจักร T0–T3 move is a quest reward; gifts; presence
 bun run test:systems        # practice xp, letters, horse stations, the sword tournament; sect join / rejoin / redemption, dropped quests
+bun run test:appearance     # outfits (unlocks, gender, tailor, wardrobe save v29), weapon families and carry, the recolour on the real sheets, the battle look
 bun run test:quests         # campaign audit + dead ends + every item/kill/objective quest + guidance + bad-action stages
 bun run test:meridians      # meridian charts: engine, combat bonus, chart items / sources, points, store, repair, content counts
 bun run test:engine         # text overrides over SKILLS / ARTS, the engine's filters / edits / validation, the save route whitelist
@@ -140,7 +141,7 @@ bun scripts/assets/build-kits.ts plan && python3 scripts/assets/generate.py run 
 ```
 app/, components/         React: screens, HUD, menus, popups, battle UI
    ↓
-store/                    Zustand: world (saved, v28, + the shared world), battle, character (/debug, v3), loading, toast, confirm
+store/                    Zustand: world (saved, v29, + the shared world), battle, character (/debug, v3), loading, toast, confirm
    ↓
 lib/world/  ──────►  lib/game/          pure engines — no React, no DOM, no I/O
    └ battle-bridge.ts: the one place the world and battle stores meet
@@ -276,6 +277,10 @@ Two deliberate exceptions reach into stores:
   - **Horse stations** (`stations.ts`): cities, villages and joinable sects' grounds; ride to a visited station place for gold by world-map distance, arriving at once (`stationTravel`).
   - **Sword tournament** (`tournament.ts`): a 360-day year; held on Mount Hua (`sect_huashan`, `TOURNAMENT_NAME` ชุมนุมประลองกระบี่หัวซาน); on day 60 Huashan's chief sends an invitation letter with the 100-gold fee (`sendTournamentInvitation`); register there (days 60–89, 100 gold), fight on day 90–92. 32 entrants (hero + the liveness roster + sparring fighters); the hero's bouts are real non-fatal battles (`pendingBattle.tournament`), the rest simulated by power. Bout and place rewards; the champion (hero or NPC) picks one entrant's move or art.
   - **Practice xp** is 30 + 5 % of the xp to the next level, 50 + 6 % at a fitting place (`practiceXpGain`).
+- **Ferries and the world map.**
+  - **Islands by boat only** (`lib/world/ferries.ts`): island entries in `location-routes.ts` are `sea: true` (layout and the map's boat lanes only; `isWalkable` filters them, so no route scene, NPC road or habitat). ลุงจาง คนแจวเรือ (`FERRYMAN`, marker `npc-ferry_boatman`, not an `NpcDef`: unkillable) waits at ซูโจว, หยางโจว and every island and sails to any other pier for 40 + 0.5 gold per world-map unit (store `ferryTravel`, instant). The quest guide links every pier to every other and points at him for a crossing.
+  - **แผนที่โลก** (`lib/world/world-atlas.ts`, `components/world/popups/world-map-popup.tsx`, menu tab M): the painted atlas `public/maps/world-atlas.webp` (1536 × 1024, painted to `WORLD_COORDS` — repaint it if places move) under an SVG of places by kind, roads by type, sea lanes, the five regions (`regionPolygon`, `HEARTLAND_CIRCLE`), the hero (`atlasPosition`), and a route planner (`atlasRoute`, boat legs with fares). 🧭 นำทาง sets `flags.mapWaypoint`; `navigationGuide` (what the maps follow) prefers it to the tracked quest, and arriving clears it.
+- **Outfits and the weapon on the body** (`lib/world/appearance.ts`, `data/outfits.ts`, `lib/characters/outfit-recolor.ts`; [docs/design/appearance.md](docs/design/appearance.md)). An outfit is a recolour of the hero's own PixelLab sheet (two cloth classes per hero, `HERO_CLOTH`; the head left alone), loaded per outfit by `loadCharacterAtlas(id, dirs, { id, tint })`, so it shows on the map, in battle (`playerLook(body, outfit)`, staged by the server too) and in films. 23 outfits: ชุดเดิม, the 15 sect uniforms (the wardrobe lists only the hero's own active sect's — `wardrobeOutfits`; Shaolin men only, Emei women only — `sectGender`), six tailor's (bought in a `city_`, kept in `wardrobe`), the champion's. The equipped weapon is drawn on the body from its own icon (`weaponLookOf`: family from the icon; long / blade / music on the back, short at the waist; fist, hidden and the sheet's own jian not drawn), pinned to each frame's opaque box (`frameBoxes`), behind the body facing the viewer or in profile, in front facing away. Save v29: `appearance { outfit, hideWeapon }`, `wardrobe`. The profile's ชุด tab (`components/world/wardrobe.tsx`) wears, buys and hides (ซ่อนอาวุธ). Online the look rides in `hello` and `look` (protocol 3).
 - **Presence** (`npc-presence.ts`). A dead NPC (assassinated, killed, or `npcExt` status `dead`) is gone for good; a kidnapped one is away until `kidnappedUntil` (day + 180) and then stands at their spot again. Maps and the location card filter with `npcPresent`.
 - **Gifts** (`gifts.ts`, store `giveGift`). One gift per NPC every 30 days (`giftDays`), an item or 100 / 500 / 1000 / 5000 gold. Worth 1–5 by price; liked ×2 (+2 for a favourite item id), disliked −2. Tastes are `NpcDef.likes` / `dislikes` (item ids, categories, `"gold"`) or follow the NPC's tags.
 - **Meridians (ชีพจร).** Pure engine `lib/game/meridians.ts` (95 charts in `lib/game/data/meridians.ts`, contract `meridian-types.ts`); sources `lib/world/data/meridian-sources.ts` (shops, loot, quest rewards → `lib/world/meridians.ts`).
@@ -286,7 +291,7 @@ Two deliberate exceptions reach into stores:
 
 ## Stores (`store/`)
 
-- **`world-store.ts`** is saved as `wusia-world-v1`, **version 28** (`SAVE_VERSION`, `store/world/save-version.ts`; the player only); the shared world is saved apart (`wusia-shared-v1`, below).
+- **`world-store.ts`** is saved as `wusia-world-v1`, **version 29** (`SAVE_VERSION`, `store/world/save-version.ts`; the player only); the shared world is saved apart (`wusia-shared-v1`, below).
   - Actions draft a copy (`draftFrom`, **one level deep** — nested quest, sect and NPC entries are shared), call engine functions, then `set`.
   - **Time is the world clock** (`lib/world/clock.ts`): 1 game day = 1 real hour (12 ชั่วยาม of 5 real minutes), from `WORLD_EPOCH_MS` (day 1). No action moves time: `draftFrom` brings every draft to the clock (`syncClock`, `store/world/lifecycle.ts`: day / time, stamina back in 6 ชั่วยาม and HP / MP in 12, wanted decay, the NPC tick, rumors, and on a new day letters and the tournament), and `WorldClock` (`components/world/world-clock.tsx`) syncs every 10 s (a toast after a day or more away). Actions that used to take time are instant and cost stamina (`staminaForHours`); free rests have a 2-ชั่วยาม cooldown, jail is served in real time. Tests pin it: `setTestClock` / `setTestWorldTime` / `advanceTestClock`.
   - The player-visible log uses `appendActionLog` (newest 100).
@@ -316,7 +321,7 @@ Two deliberate exceptions reach into stores:
 ## Online (`server/`, `lib/net/`; [docs/online.md](docs/online.md))
 
 - **Server:** one Cloudflare Worker, two halves. The entry is TypeScript (`server/worker/ts/entry.ts`): it answers `/world…` and `/characters/<id>/battle/…` with the game's own engines and hands everything else to the Rust half (`wuxia-rust`, worker-build's output). Rust: `server/core` is pure and event-based (`Room::decide` → events → `Room::apply`; `Account` from its events; signed HMAC tokens; `save.rs` checks), tested with `cargo test`; `server/worker/src` is the glue: `AccountObject` (a Durable Object per username), `RoomObject` (one per map id, hibernating WebSockets, each socket's attachment holds its `Presence`) and `KeyObject` (makes and keeps the token-signing key, so deploys need no secret). TypeScript: `WorldObject`, `BattleObject`, `PlayerHub` and `PartyObject` (below). Every Durable Object name starts with the data generation `DATA_EPOCH` (`"2"`, in `src/lib.rs` and `ts/env.ts`); raising it starts the server over (no accounts, saves or world).
-- **Protocol:** `server/core/src/protocol.rs` ↔ `lib/net/protocol.ts` — keep them in step and bump `PROTOCOL_VERSION` on both. Client commands `hello` / `move` / `sync` / `ping` / `say`; server `welcome` (snapshot at `seq`) / `event { seq, ev }` (`joined`, `moved`, `left`, `said`) / `pong` / `error`. `PROTOCOL_VERSION` is 2.
+- **Protocol:** `server/core/src/protocol.rs` ↔ `lib/net/protocol.ts` — keep them in step and bump `PROTOCOL_VERSION` on both. Client commands `hello` (with the look) / `move` / `sync` / `ping` / `say` / `look`; server `welcome` (snapshot at `seq`) / `event { seq, ev }` (`joined`, `moved`, `left`, `said`, `looked`) / `pong` / `error`. `PROTOCOL_VERSION` is 3.
 - **Client:** `onlineSession` (`lib/net/session.ts`) holds one socket for the map the hero is on. The map runtime drives it every frame through `presentation.online.report(motion)` (bound per map in `world-canvas.tsx`) and draws `players()` (`updateRemotes`, gold name tags, `data-remote-players`). Moves are throttled to 100 ms; an idle map closes the socket after 15 s.
 - **Flow (with a server): account → character → play.** `WorldScreen` shows the title screen while there is no valid login or no character entered (`AccountStep`: สมัครใหม่ / มีบัญชีแล้ว, then `CharacterSelect`, the hero form for a new one), then the game; the character last played is re-entered on load; signing out returns to the account step, เปลี่ยนตัวละคร to the list. `store/online-store.ts` (`wuxia-online-v1`; sign-out keeps the username), the HUD's 🌐 button (`online-panel.tsx`), `OnlineBridge` in `app/page.tsx`. Online shows only with a server: `localStorage["wuxia-game-server"]` or `NEXT_PUBLIC_GAME_SERVER_URL`.
 - **Characters and saves on the server** (`server/core/src/save.rs`, `lib/net/cloud-save.ts`, `store/cloud-session.ts`, [docs/online.md](docs/online.md#characters-and-saves)): with a server set, an account has up to 4 characters (select / create / delete, `character-select.tsx`); the world store's persist storage is the server (`skipHydration`, hydrated on entering a character). The server keeps a save only if it builds on its `rev`, comes ≥ 1 s after the last, keeps the hero's name and the game's limits, and gold rises no faster than the server's grants (checked wins) plus the allowance (100,000, +3,000 / min). Without a server (dev, tests) the save stays local, as before.
@@ -350,7 +355,7 @@ Two deliberate exceptions reach into stores:
 
 - **Root.** `components/world/world-screen.tsx` picks a view: start → game over → battle → encounter → mapped location (+ dialog over the same canvas) → dialog over a painting → road map → the classic card layout (only `world_journey` and 13 unpainted roads).
 - **HUD** (mobile first):
-  - top left, stacked: the vitals card (HP / MP / พลัง gauges, no portrait; `hud-vitals.tsx`), online the party frame, then the icon grid: 1 โปรไฟล์ 2 ย่าม 3 วิชา 4 อาชีพ 5 ภารกิจ 6 สำนัก 7 บันทึก 8 จดหมาย (unread badge) 9 ชีพจร (badge: unspent points that can open something), online 0 สหาย, then สนทนา (online), ♪, 🌐 and install;
+  - top left, stacked: the vitals card (HP / MP / พลัง gauges, no portrait; `hud-vitals.tsx`), online the party frame, then the icon grid: 1 โปรไฟล์ 2 ย่าม 3 วิชา 4 อาชีพ 5 ภารกิจ 6 สำนัก 7 บันทึก 8 จดหมาย (unread badge) 9 ชีพจร (badge: unspent points that can open something), online 0 สหาย, M แผนที่, then สนทนา (online), ♪, 🌐 and install;
   - purse, sundial and day at the top right, with the quest tracker below;
   - law chips at the top centre;
   - พัก and the action button at the bottom right;
@@ -363,6 +368,7 @@ Two deliberate exceptions reach into stores:
 - **Menus don't scroll.** A menu section is `<Modal fill>` with `.menu-cols > .menu-col` columns and `.menu-tabs` (`app/menu-layout.css`); long collections page with `PagedGrid` (`components/ui/paged-grid.tsx`, `useShortScreen` for phone cell sizes). Done for โปรไฟล์ (ฉายา: `lib/world/epithet.ts`), ย่าม (paper doll + item window), วิชา, อาชีพ, จดหมาย; ภารกิจ / สำนัก / บันทึก still scroll.
 - **Look.** It comes from `app/game-hud.css`, `app/mobile-hud.css`, `app/game-menu.css`, `app/dq-theme.css` (parchment menus), `app/profile.css` and `app/menu-layout.css`, loaded after `app/globals.css`. The cream / ink / vermilion root tokens show only in fallback layouts, toasts and `/debug`.
 - **Conversations.** `DialogStage` plays every dialog in the **cutscene layout** (letterbox bars, portrait at the left, subtitle box, choices beside it), **one line per beat**, typed out like a film's subtitles: tap or ต่อ to go on, ข้าม to skip; choices come after the last line, and long lines are cut by `splitBeats`. Key words are coloured by `RichText` / `markText` (`lib/world/text-marks.ts`): people, places, items, sects, moves, foes, numbers, the age's terms, and `**marked**` words. `localStorage["wuxia-dialog-instant"]="on"` shows all lines at once (the e2e suite seeds it).
+- **Thai only.** Everything the player reads is Thai, battle log and toasts included: derived stats and equipment through `lib/game/stat-text.ts` (`DERIVED_LABEL`, `equipStatParts`, `equipBonusParts`), base stats through `STAT_LABEL`, move shorthand (`d`) through `plainThai`; w-exp is ประสบการณ์ยุทธ, xp ประสบการณ์, a level ขั้น, a tier its `TIERS[ti].n`. Only keyboard key names (Enter, Esc, WASD, E) stay English, and no Chinese characters reach the screen (glyph slots use emoji or Thai, the sundial Thai numerals).
 - **Fonts.** Charm (`--font-display`) for headings of 16 px or more; Sarabun (`--font-body`) for everything else — Thai tone marks blur in Charm below 16 px.
 
 ## Conventions
@@ -403,7 +409,7 @@ Content changes need **no save version bump**. Removed ids are dropped on load.
 
 ## Saves
 
-- **Keys.** The player's save is `localStorage["wusia-world-v1"]`, **version 28**; the shared world `localStorage["wusia-shared-v1"]` (`{ version: 1, world }`). The "wusia" spelling is historical — never rename either.
+- **Keys.** The player's save is `localStorage["wusia-world-v1"]`, **version 29**; the shared world `localStorage["wusia-shared-v1"]` (`{ version: 1, world }`). The "wusia" spelling is historical — never rename either.
 - **Migration.** `migrate` is one idempotent normalizer; its one `fromVersion` step is v27's: a save from before is shifted onto the world clock (`rebaseDays`, `lib/world/shared/rebase.ts`: every day stamp moves by `worldNow().day − save.day`; jail cut to ≤ 12 ชั่วยาม; a running tournament dropped). The persist `merge` also back-fills lore rumors and people on every load, and `onRehydrateStorage` runs `validateAndRepair`.
 - **Adding a persisted field:**
   1. `WorldStateData` + `emptyData()`;

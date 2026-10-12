@@ -128,6 +128,7 @@ export const PLACE_BIOMES: Record<string, Biome[]> = (() => {
   for (const route of LOCATION_ROUTES) {
     places.add(route.a);
     places.add(route.b);
+    if (route.sea) continue; // sailed, not walked: no road scene
     out[`route_${route.a}__to__${route.b}`] = roadBiomes(route.a, route.b);
     out[`route_${route.b}__to__${route.a}`] = roadBiomes(route.b, route.a);
   }

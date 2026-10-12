@@ -92,6 +92,9 @@ export const partializeSave = (s: WorldStore): PlayerSave => ({
   day: s.day,
   time: s.time,
   startDay: s.startDay,
+  // v29: the outfit worn, the weapon shown, the outfits bought.
+  appearance: s.appearance,
+  wardrobe: s.wardrobe,
   pendingBattle: s.pendingBattle,
   pendingEncounter: s.pendingEncounter,
   pendingHuntYield: s.pendingHuntYield,
@@ -181,6 +184,8 @@ export const partializeSave = (s: WorldStore): PlayerSave => ({
 //            before v27 counted its own days from 1, so its start is day 1
 //            rebased with the rest; a v27 save never knew it, so it is
 //            treated as starting now (its current day).
+//   v28 → v29 added appearance (the outfit worn, ซ่อนอาวุธ) and wardrobe
+//            (outfits bought from tailors).
 // Despite the list, `migrate` is one idempotent normalizer: it ignores
 // fromVersion and fills every missing field. See docs/save-format.md.
 function migratedStartDay(p: Partial<WorldStateData>): number {
@@ -315,6 +320,12 @@ export function migrateSave(persisted: unknown, fromVersion: number): WorldState
         : p.gender === "female"
           ? "f1"
           : "m1",
+    // v29: how the hero looks.
+    appearance: {
+      outfit: typeof p.appearance?.outfit === "string" && p.appearance.outfit ? p.appearance.outfit : "default",
+      hideWeapon: p.appearance?.hideWeapon === true,
+    },
+    wardrobe: Array.isArray(p.wardrobe) ? p.wardrobe.filter((id): id is string => typeof id === "string") : [],
     sectMembership:
       p.sectMembership && typeof p.sectMembership === "object"
         ? { ...p.sectMembership }

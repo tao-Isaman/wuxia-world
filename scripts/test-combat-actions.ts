@@ -248,7 +248,8 @@ check("tactical turns preserve poison death and stun rules", () => {
 
 check("grid store consumes the player turn, blocks repeated input, and keeps ATB/cooldowns", () => {
   const store = useBattleStore.getState;
-  store().start(build, build);
+  // Seeded dice: unseeded, a lucky crit now and then ends the fight before the hero's next turn.
+  store().start(build, build, { seed: 1 });
   store().stepAll();
   const mine = store().state!.units.find((u) => u.id === "A")!;
   assert.equal(store().state!.activeId, "A", "ties go to the player");

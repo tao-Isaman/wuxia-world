@@ -10,6 +10,12 @@ import { giftable, giftWorth } from "../lib/world/gifts";
 import { ARTISAN_PROFESSIONS, ARTISANS, FIELD_RECIPES, RECIPES, craftsAnywhere, getItem, getNpc, getRecipe, recipesOfferedBy } from "../lib/world/data";
 import { SECT_MEMBERSHIPS } from "../lib/world/data/sect-memberships";
 import { hasStation, stationFare, stationIds, stationTrips } from "../lib/world/stations";
+import { FERRYMAN, FERRY_FARE, FERRY_PORTS, ferryFare, ferryStops, ferryTrips, hasFerry } from "../lib/world/ferries";
+import { FERRY_LANDINGS } from "../lib/world/data/auto-map-exits";
+import { WORLD_COORDS } from "../lib/world/data/world-coords";
+import { getScene } from "../lib/world/data/scenes";
+import { getLocationMap } from "../lib/world/data/location-maps";
+import { WAYPOINT_FLAG, guideMarkerId, navigationGuide } from "../lib/world";
 import {
   BOUT_GOLD, PLACE_BY_ROUND, PLAYER, TOURNAMENT, TOURNAMENT_NAME, boutOdds, sendTournamentInvitation, tournamentHost, currentTournament, dayOfYear, drawEntrants, playerOpponent,
   prizeOptions, registerBlock, resolveRound, roundPairs, settleTournaments, startBlock, tournamentDay, tournamentPhase, yearOf,
@@ -207,6 +213,56 @@ check("stations: riding pays the fare and arrives at once", () => {
   assert.ok(store().day * 12 + store().time < day * 12 + time + 0.5, "no time of its own: the world clock runs on");
   useWorldStore.setState({ gold: 0 });
   assert.equal(store().stationTravel("city_capital").reason, "gold");
+});
+
+// ─── Ferries ─────────────────────────────────────────────────────────
+check("ferries: the islands are sailed to, never walked; the boatman waits at the ports and on every island", () => {
+  const stops = ferryStops();
+  const isles = Object.keys(WORLD_COORDS).filter((id) => id.startsWith("isle_"));
+  assert.equal(isles.length, 10);
+  for (const id of [...FERRY_PORTS, ...isles]) assert.ok(stops.includes(id) && hasFerry(id), id);
+  assert.ok(!hasFerry("city_capital") && !hasFerry("cave_bingcan"));
+  for (const id of isles) {
+    const scene = getScene(id);
+    assert.ok(scene?.kind === "location" && scene.routes.length === 0, `${id}: no road leads off it`);
+    assert.ok(FERRY_LANDINGS[id] || getLocationMap(id), `${id}: a map for the boatman to stand on`);
+  }
+  const near = ferryFare("city_suzhou", "isle_taohua"), far = ferryFare("city_suzhou", "isle_boni");
+  assert.ok(far.gold > near.gold && near.gold >= FERRY_FARE.baseGold);
+  assert.deepEqual(ferryTrips("city_capital"), [], "no boat from inland");
+  assert.equal(ferryTrips("isle_taohua").length, stops.length - 1, "any other pier, visited or not");
+});
+
+check("ferries: the boat ride pays the fare and lands at once; too poor stays ashore", () => {
+  newGame();
+  useWorldStore.setState({ currentSceneId: "city_suzhou", gold: 1000 });
+  const fare = ferryFare("city_suzhou", "isle_taohua");
+  assert.ok(store().ferryTravel("isle_taohua").ok);
+  assert.equal(store().currentSceneId, "isle_taohua");
+  assert.equal(store().gold, 1000 - fare.gold);
+  assert.ok(store().visitedLocationIds.includes("isle_taohua"));
+  assert.equal(store().ferryTravel("city_capital").reason, "unknown", "the boat only calls at piers");
+  useWorldStore.setState({ gold: 0 });
+  assert.equal(store().ferryTravel("city_suzhou").reason, "gold");
+  useWorldStore.setState({ currentSceneId: "city_capital", gold: 1000 });
+  assert.equal(store().ferryTravel("isle_taohua").reason, "no-ferry");
+});
+
+check("ferries: the guide walks to a port and points at the boatman for the crossing", () => {
+  newGame();
+  useWorldStore.setState({ currentSceneId: "city_suzhou", lastLocationId: "city_suzhou", flags: { ...store().flags, [WAYPOINT_FLAG]: "isle_boni" } });
+  const guide = navigationGuide(store())!;
+  assert.equal(guide.locationId, "isle_boni");
+  assert.deepEqual(guide.path, ["city_suzhou", "isle_boni"]);
+  assert.equal(guideMarkerId(store(), guide), FERRYMAN.markerId);
+  // From inland the walk heads for a port first.
+  useWorldStore.setState({ currentSceneId: "city_capital", lastLocationId: "city_capital" });
+  const inland = navigationGuide(store())!;
+  assert.ok(FERRY_PORTS.includes(inland.path[inland.path.length - 2] as never), inland.path.join(" → "));
+  // Reaching the waypoint ends it.
+  useWorldStore.setState({ currentSceneId: "city_suzhou", gold: 1000 });
+  store().ferryTravel("isle_boni");
+  assert.equal(store().flags[WAYPOINT_FLAG], undefined);
 });
 
 // ─── Tournament ──────────────────────────────────────────────────────

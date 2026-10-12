@@ -1,6 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { currentOutfit } from "@/lib/world/appearance";
+import { getOutfit } from "@/lib/world/data/outfits";
+
+const heroOutfitOf = (id: string) => {
+  const outfit = getOutfit(id);
+  return outfit?.tint ? { id: outfit.id, tint: outfit.tint } : undefined;
+};
 import { keyTick } from "@/lib/audio/engine";
 import { createPortal } from "react-dom";
 import type { CutsceneLine, CutsceneRuntime } from "@/lib/stage/cutscene-runtime";
@@ -23,6 +30,8 @@ export function CutscenePlayer({ cutsceneId, onDone }: { cutsceneId: string; onD
   const finished = useRef(false);
   const heroName = useWorldStore((s) => s.playerBuild?.name ?? "จอมยุทธ์");
   const heroBody = useWorldStore((s) => s.playerBodyId);
+  // The hero films in their outfit.
+  const heroOutfitId = useWorldStore((s) => currentOutfit(s));
   const [line, setLine] = useState<CutsceneLine | null>(null);
   const [shown, setShown] = useState(0);
   const [card, setCard] = useState<{ text: string; sub?: string } | null>(null);
@@ -47,7 +56,7 @@ export function CutscenePlayer({ cutsceneId, onDone }: { cutsceneId: string; onD
     // Phaser is browser-only: load the runtime on the client.
     void import("@/lib/stage/cutscene-runtime").then(({ createCutsceneRuntime }) => {
       if (cancelled) return;
-      created = createCutsceneRuntime(node, def, { heroBody, heroName, reducedMotion: reduced }, {
+      created = createCutsceneRuntime(node, def, { heroBody, heroName, reducedMotion: reduced, heroOutfit: heroOutfitOf(heroOutfitId) }, {
         ready: () => setReady(true),
         line: (next) => { setLine(next); setShown(0); },
         title: setCard,

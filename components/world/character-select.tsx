@@ -52,7 +52,7 @@ export function CharacterSelect({ onNew }: { onNew: () => void }) {
   return (
     <section className="hero-creation pixel-panel character-select" data-testid="character-select" aria-busy={busy || entering}>
       <FlowSteps step={2} />
-      <div className="creation-heading"><span>เลือกตัวละคร</span><span className="text-[#d7bd82]">俠</span></div>
+      <div className="creation-heading"><span>เลือกตัวละคร</span><span className="text-[#d7bd82]">❖</span></div>
       <p className="account-line" data-testid="account-line">บัญชี <b data-testid="online-username">{account}</b>
         <button type="button" onClick={() => void signOut()} disabled={entering}>ออกจากระบบ</button></p>
       {entering && current && <p className="character-entering" role="status">กำลังโหลด {current.name}…</p>}

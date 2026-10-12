@@ -84,10 +84,10 @@ export function questCompletionReceipt(def: QuestDef, before: ReceiptState, afte
   for (const reward of def.rewards ?? []) {
     switch (reward.t) {
       case "gold": amount("gold", "gold", "ทอง", reward.amount, after.gold - before.gold); break;
-      case "wExp": amount("wExp", "experience", "W-EXP", reward.amount, after.wExp - before.wExp); break;
+      case "wExp": amount("wExp", "experience", "ประสบการณ์ยุทธ", reward.amount, after.wExp - before.wExp); break;
       case "item": amount(`item:${reward.itemId}`, "item", getItem(reward.itemId)?.name ?? reward.itemId,
         Math.max(1, reward.count ?? 1), (after.inventory[reward.itemId] ?? 0) - (before.inventory[reward.itemId] ?? 0)); break;
-      case "skillExp": amount(`skill:${reward.skillId}`, "experience", `${getSkill(reward.skillId)?.n ?? "วิชา"} · XP`,
+      case "skillExp": amount(`skill:${reward.skillId}`, "experience", `${getSkill(reward.skillId)?.n ?? "วิชา"} · ประสบการณ์`,
         reward.amount, (after.skillExp[reward.skillId] ?? 0) - (before.skillExp[reward.skillId] ?? 0)); break;
       case "trait": amount(`trait:${reward.trait}`, "other", TRAIT_LABEL[reward.trait], reward.amount,
         (after.traits[reward.trait] ?? 0) - (before.traits[reward.trait] ?? 0)); break;

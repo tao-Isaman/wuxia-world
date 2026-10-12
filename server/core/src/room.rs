@@ -35,13 +35,16 @@ pub const MAX_SAY_CHARS: usize = 120;
 pub const SAY_BURST: usize = 5;
 /// …within this window (ms).
 pub const SAY_WINDOW_MS: f64 = 10_000.0;
+/// At most one look change per this many ms.
+pub const LOOK_INTERVAL_MS: f64 = 500.0;
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum Command {
-    Join { id: String, name: String, body: String, x: f32, y: f32, dir: Dir8 },
+    Join { id: String, name: String, body: String, x: f32, y: f32, dir: Dir8, outfit: String, weapon: Option<String> },
     Move { id: String, x: f32, y: f32, dir: Dir8, moving: bool },
     Leave { id: String, reason: LeaveReason },
     Say { id: String, text: String },
+    Look { id: String, outfit: String, weapon: Option<String> },
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -62,12 +65,14 @@ pub struct Room {
     /// When each player last spoke (ms, the last [`SAY_BURST`]), for the chat
     /// rate limit. Not part of the snapshot: a restarted room forgets it.
     said: BTreeMap<String, Vec<f64>>,
+    /// When each player last changed their look (ms), for its rate limit.
+    looked: BTreeMap<String, f64>,
 }
 
 impl Room {
     /// A room rebuilt from what each connection remembers (after the server slept).
     pub fn from_players(players: impl IntoIterator<Item = Presence>) -> Self {
-        Room { players: players.into_iter().map(|p| (p.id.clone(), p)).collect(), said: BTreeMap::new() }
+        Room { players: players.into_iter().map(|p| (p.id.clone(), p)).collect(), said: BTreeMap::new(), looked: BTreeMap::new() }
     }
 
     pub fn player(&self, id: &str) -> Option<&Presence> {
@@ -90,8 +95,9 @@ impl Room {
     /// What a command causes, at server time `now` (ms). Pure.
     pub fn decide(&self, command: &Command, now: f64) -> Result<Vec<RoomEvent>, Rejection> {
         match command {
-            Command::Join { id, name, body, x, y, dir } => {
+            Command::Join { id, name, body, x, y, dir, outfit, weapon } => {
                 let name = clean_name(name)?;
+                check_look(outfit, weapon)?;
                 if !BODIES.contains(&body.as_str()) {
                     return Err(Rejection::new(ErrorCode::BadProfile, format!("unknown body `{body}`")));
                 }
@@ -104,7 +110,18 @@ impl Room {
                 }
                 let (x, y) = clamp_to_map(*x, *y);
                 events.push(RoomEvent::Joined {
-                    player: Presence { id: id.clone(), name, body: body.clone(), x, y, dir: *dir, moving: false, at: now },
+                    player: Presence {
+                        id: id.clone(),
+                        name,
+                        body: body.clone(),
+                        x,
+                        y,
+                        dir: *dir,
+                        moving: false,
+                        at: now,
+                        outfit: outfit.clone(),
+                        weapon: weapon.clone(),
+                    },
                 });
                 Ok(events)
             }
@@ -143,6 +160,19 @@ impl Room {
                 }
                 Ok(vec![RoomEvent::Said { id: id.clone(), name: player.name.clone(), text, at: now }])
             }
+            Command::Look { id, outfit, weapon } => {
+                let Some(player) = self.players.get(id) else {
+                    return Err(Rejection::new(ErrorCode::NotJoined, "say hello first"));
+                };
+                check_look(outfit, weapon)?;
+                if player.outfit == *outfit && player.weapon == *weapon {
+                    return Ok(Vec::new());
+                }
+                if self.looked.get(id).is_some_and(|last| now - last < LOOK_INTERVAL_MS) {
+                    return Err(Rejection::new(ErrorCode::TooFast, "one look change every half second"));
+                }
+                Ok(vec![RoomEvent::Looked { id: id.clone(), outfit: outfit.clone(), weapon: weapon.clone(), at: now }])
+            }
         }
     }
 
@@ -164,6 +194,14 @@ impl Room {
             RoomEvent::Left { id, .. } => {
                 self.players.remove(id);
                 self.said.remove(id);
+                self.looked.remove(id);
+            }
+            RoomEvent::Looked { id, outfit, weapon, at } => {
+                if let Some(player) = self.players.get_mut(id) {
+                    player.outfit = outfit.clone();
+                    player.weapon = weapon.clone();
+                }
+                self.looked.insert(id.clone(), *at);
             }
             RoomEvent::Said { id, at, .. } => {
                 let times = self.said.entry(id.clone()).or_default();
@@ -199,6 +237,19 @@ fn clean_text(text: &str) -> Result<String, Rejection> {
     Ok(text.to_string())
 }
 
+/// A look's shape: an outfit id of 1–32 of `a–z 0–9 _`, a weapon id of 1–48 of `A–Z a–z 0–9 _` (or none).
+fn check_look(outfit: &str, weapon: &Option<String>) -> Result<(), Rejection> {
+    let id_ok = |text: &str, max: usize, upper: bool| {
+        !text.is_empty()
+            && text.len() <= max
+            && text.chars().all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '_' || (upper && c.is_ascii_uppercase()))
+    };
+    if !id_ok(outfit, 32, false) || weapon.as_deref().is_some_and(|w| !id_ok(w, 48, true)) {
+        return Err(Rejection::new(ErrorCode::BadProfile, "a look is an outfit id and an optional weapon id"));
+    }
+    Ok(())
+}
+
 fn clamp_to_map(x: f32, y: f32) -> (f32, f32) {
     let round = |v: f32| (v * 10.0).round() / 10.0;
     let x = if x.is_finite() { x } else { MAP_WIDTH / 2.0 };
@@ -211,7 +262,7 @@ mod tests {
     use super::*;
 
     fn join(id: &str, x: f32, y: f32) -> Command {
-        Command::Join { id: id.into(), name: format!("hero {id}"), body: "m1".into(), x, y, dir: Dir8::S }
+        Command::Join { id: id.into(), name: format!("hero {id}"), body: "m1".into(), x, y, dir: Dir8::S, outfit: "default".into(), weapon: None }
     }
     fn mv(id: &str, x: f32, y: f32) -> Command {
         Command::Move { id: id.into(), x, y, dir: Dir8::E, moving: true }
@@ -290,11 +341,11 @@ mod tests {
     #[test]
     fn profiles_are_checked() {
         let room = Room::default();
-        let bad_body = Command::Join { id: "a".into(), name: "ok".into(), body: "dragon".into(), x: 0.0, y: 0.0, dir: Dir8::S };
+        let bad_body = Command::Join { id: "a".into(), name: "ok".into(), body: "dragon".into(), x: 0.0, y: 0.0, dir: Dir8::S, outfit: "default".into(), weapon: None };
         assert_eq!(room.decide(&bad_body, 0.0).unwrap_err().code, ErrorCode::BadProfile);
-        let long = Command::Join { id: "a".into(), name: "ก".repeat(25), body: "f1".into(), x: 0.0, y: 0.0, dir: Dir8::S };
+        let long = Command::Join { id: "a".into(), name: "ก".repeat(25), body: "f1".into(), x: 0.0, y: 0.0, dir: Dir8::S, outfit: "default".into(), weapon: None };
         assert_eq!(room.decide(&long, 0.0).unwrap_err().code, ErrorCode::BadProfile);
-        let thai = Command::Join { id: "a".into(), name: "  หลี่มู่ไป๋  ".into(), body: "f1".into(), x: 0.0, y: 0.0, dir: Dir8::S };
+        let thai = Command::Join { id: "a".into(), name: "  หลี่มู่ไป๋  ".into(), body: "f1".into(), x: 0.0, y: 0.0, dir: Dir8::S, outfit: "default".into(), weapon: None };
         assert!(matches!(&room.decide(&thai, 0.0).unwrap()[0], RoomEvent::Joined { player } if player.name == "หลี่มู่ไป๋"));
     }
 
@@ -359,5 +410,27 @@ mod tests {
         assert!(room.decide(&Command::Say { id: "a".into(), text: "again".into() }, 10.0 + SAY_WINDOW_MS + 1.0).is_ok());
         // The chat leaves no trace in the snapshot.
         assert_eq!(room.snapshot().len(), 1);
+    }
+
+    #[test]
+    fn looks_are_checked_changed_once_and_rate_limited() {
+        let mut room = Room::default();
+        let dressed = Command::Join {
+            id: "a".into(), name: "ลี่".into(), body: "f1".into(), x: 0.0, y: 0.0, dir: Dir8::S,
+            outfit: "sect_emei".into(), weapon: Some("eq_t1_w_long".into()),
+        };
+        run(&mut room, dressed, 0.0).unwrap();
+        assert_eq!(room.player("a").unwrap().outfit, "sect_emei");
+        let bad = Command::Join { id: "b".into(), name: "x".into(), body: "m1".into(), x: 0.0, y: 0.0, dir: Dir8::S, outfit: "<b>".into(), weapon: None };
+        assert_eq!(room.decide(&bad, 0.0).unwrap_err().code, ErrorCode::BadProfile);
+        let look = |outfit: &str, weapon: Option<&str>| Command::Look { id: "a".into(), outfit: outfit.into(), weapon: weapon.map(Into::into) };
+        assert!(room.decide(&look("sect_emei", Some("eq_t1_w_long")), 10.0).unwrap().is_empty(), "no change, no event");
+        let changed = run(&mut room, look("tailor_ink", None), 10.0).unwrap();
+        assert_eq!(changed, vec![RoomEvent::Looked { id: "a".into(), outfit: "tailor_ink".into(), weapon: None, at: 10.0 }]);
+        assert_eq!(room.player("a").unwrap().weapon, None);
+        assert_eq!(room.decide(&look("default", None), 100.0).unwrap_err().code, ErrorCode::TooFast);
+        assert!(room.decide(&look("default", None), 10.0 + LOOK_INTERVAL_MS).is_ok());
+        assert_eq!(room.decide(&look("default", Some("bad weapon!")), 10_000.0).unwrap_err().code, ErrorCode::BadProfile);
+        assert_eq!(room.decide(&Command::Look { id: "z".into(), outfit: "default".into(), weapon: None }, 0.0).unwrap_err().code, ErrorCode::NotJoined);
     }
 }

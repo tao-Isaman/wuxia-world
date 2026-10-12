@@ -37,7 +37,7 @@ export function resolveCombatAction(state: BattleState, ctx: BattleContext, acti
     // A burn tick can reduce MP after the initial availability check. The turn
     // is still spent, matching skills that lose their action to a status tick.
     if (state.mpA < GUARD_MP_COST) {
-      logLine(state, "lA", `[${state.turn}] ปราณไม่พอตั้งรับ — ต้องใช้ ${GUARD_MP_COST} MP`);
+      logLine(state, "lA", `[${state.turn}] ปราณไม่พอตั้งรับ — ต้องใช้ปราณ ${GUARD_MP_COST}`);
       return true;
     }
     state.mpA -= GUARD_MP_COST;
@@ -49,13 +49,13 @@ export function resolveCombatAction(state: BattleState, ctx: BattleContext, acti
     const amount = Math.max(0, Math.min(GUARD_REDUCTION, 95 - reduction));
     state.st.A.buffs.push({ t: "buff_reduce", n: "ตั้งรับ", v: amount, u: 2 });
     state.st.A.buffs.push({ t: "buff_riposte", n: "สวนกลับ", v: RIPOSTE_BONUS, u: 1 });
-    logLine(state, "lA", `[${state.turn}] ตั้งรับ → MP -${GUARD_MP_COST} · ลดรับ ${amount}% จังหวะถัดไป · โจมตีกายครั้งถัดไป +${RIPOSTE_BONUS}% (ใช้สิทธิ์แม้พลาด)`);
+    logLine(state, "lA", `[${state.turn}] ตั้งรับ → ปราณ −${GUARD_MP_COST} · ลดรับ ${amount}% จังหวะถัดไป · โจมตีกายครั้งถัดไป +${RIPOSTE_BONUS}% (ใช้สิทธิ์แม้พลาด)`);
   } else {
     const amount = Math.min(state.dA.MP - state.mpA, recoveryAmount(state.dA.MP));
     state.mpA += amount;
     state.st.A.debuffs = state.st.A.debuffs.filter((debuff) => debuff.n !== "รวบรวมปราณ");
     state.st.A.debuffs.push({ t: "debuff_eva", n: "รวบรวมปราณ", v: -RECOVER_EVASION_COST, u: 2 });
-    logLine(state, "lA", `[${state.turn}] รวบรวมปราณ → MP +${amount} · หลบหลีก -${RECOVER_EVASION_COST} ในจังหวะถัดไป · ใช้ 1 ตา`);
+    logLine(state, "lA", `[${state.turn}] รวบรวมปราณ → ปราณ +${amount} · หลบหลีก -${RECOVER_EVASION_COST} ในจังหวะถัดไป · ใช้ 1 ตา`);
   }
   // Skills use positive sequence IDs. Tactical turns use a disjoint negative
   // sequence, so switching between them always starts a fresh animation.

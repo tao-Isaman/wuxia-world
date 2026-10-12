@@ -323,7 +323,7 @@ button.item-tile:hover { transform: translateY(-2px); box-shadow: inset 0 0 0 2p
 
 /* Empty states: a faint seal glyph plus a next step, not a lone italic line. */
 .menu-empty { position: relative; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 42px 20px 36px; text-align: center; overflow: hidden; }
-.menu-empty::before { content: attr(data-glyph); position: absolute; top: 50%; left: 50%; transform: translate(-50%, -52%); font: 700 150px/1 serif; color: #c9a55c14; pointer-events: none; }
+.menu-empty::before { content: attr(data-glyph); position: absolute; top: 50%; left: 50%; transform: translate(-50%, -52%); font: 700 84px/1 var(--font-display), serif; color: #c9a55c14; white-space: nowrap; pointer-events: none; }
 .menu-empty strong { position: relative; font-size: 17px; color: #e6d7ae; }
 .menu-empty span { position: relative; max-width: 460px; font-size: 14px; line-height: 1.7; color: #aeb59c; }
 .menu-empty-mark { display: inline-block; padding: 0 6px; color: #2a1a05; background: #ffd24a; font-weight: 900; }

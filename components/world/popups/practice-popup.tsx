@@ -107,12 +107,12 @@ export function PracticePopup({ open, scene, onClose }: Props) {
         </div>
         {hasBonus ? (
           <div className="text-[10px] text-emerald-700">
-            ฝึกได้ {PRACTICE_XP.matched.flat} xp + {PRACTICE_XP.matched.pct}% ของขั้นถัดไป (ปกติ {PRACTICE_XP.normal.flat} + {PRACTICE_XP.normal.pct}%) สำหรับวิชาประเภท:{" "}
+            ฝึกได้ {PRACTICE_XP.matched.flat} ประสบการณ์ + {PRACTICE_XP.matched.pct}% ของขั้นถัดไป (ปกติ {PRACTICE_XP.normal.flat} + {PRACTICE_XP.normal.pct}%) สำหรับวิชาประเภท:{" "}
             {matchedTypes.map((t) => SKILL_TYPE_LABEL[t]).join(" / ")}
           </div>
         ) : (
           <div className="text-[10px] text-muted-foreground">
-            ฝึกได้ {PRACTICE_XP.normal.flat} xp + {PRACTICE_XP.normal.pct}% ของขั้นถัดไปต่อครั้ง
+            ฝึกได้ {PRACTICE_XP.normal.flat} ประสบการณ์ + {PRACTICE_XP.normal.pct}% ของขั้นถัดไปต่อครั้ง
           </div>
         )}
         <div className="text-[10px] text-muted-foreground">
@@ -174,7 +174,7 @@ export function PracticePopup({ open, scene, onClose }: Props) {
                       </Badge>
                       {!maxed && (
                         <Badge variant="outline" className={`text-[9px] ${matched ? "border-emerald-400 text-emerald-700" : ""}`}>
-                          +{gain} xp{matched ? " · เหมาะ" : ""}
+                          +{gain} ประสบการณ์{matched ? " · เหมาะ" : ""}
                         </Badge>
                       )}
                     </div>
@@ -247,7 +247,7 @@ export function PracticePopup({ open, scene, onClose }: Props) {
                       </Badge>
                       {!maxed && (
                         <Badge variant="outline" className={`text-[9px] ${matched ? "border-emerald-400 text-emerald-700" : ""}`}>
-                          +{gain} xp{matched ? " · เหมาะ" : ""}
+                          +{gain} ประสบการณ์{matched ? " · เหมาะ" : ""}
                         </Badge>
                       )}
                     </div>
@@ -298,11 +298,11 @@ function practiceToast(r: PracticeResult): ToastTuple {
     const lvLabel = r.kind === "skill" ? `ระดับ ${r.newLevel}` : `ขั้น ${r.newLevel}`;
     return [
       "success",
-      `ฝึก ${kindLabel} ${name} · +${r.xpGained} xp${bonusPart} · ขึ้น ${lvLabel}!`,
+      `ฝึก ${kindLabel} ${name} · +${r.xpGained} ประสบการณ์${bonusPart} · ขึ้น ${lvLabel}!`,
     ];
   }
   return [
     "success",
-    `ฝึก ${kindLabel} ${name} · +${r.xpGained} xp${bonusPart}`,
+    `ฝึก ${kindLabel} ${name} · +${r.xpGained} ประสบการณ์${bonusPart}`,
   ];
 }

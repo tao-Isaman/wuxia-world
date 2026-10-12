@@ -2,7 +2,7 @@
 
 # Locations
 
-101 locations, 273 route scenes and 129 hand-authored connections (`lib/world/data/location-routes.ts`). The game starts at `home_player`. Map column: *painted (hand-placed markers)* = an entry in `LOCATION_MAPS` (`lib/world/data/location-maps.ts`); *painted (auto layout)* = listed in `AUTO_MAP_IDS` and laid out by `lib/world/data/auto-maps.ts`; *cards only* = no painting, the classic card view.
+101 locations, 249 route scenes and 129 hand-authored connections (`lib/world/data/location-routes.ts`). The game starts at `home_player`. Map column: *painted (hand-placed markers)* = an entry in `LOCATION_MAPS` (`lib/world/data/location-maps.ts`); *painted (auto layout)* = listed in `AUTO_MAP_IDS` and laid out by `lib/world/data/auto-maps.ts`; *cards only* = no painting, the classic card view.
 
 Services: 🏪 shop · 🏯 martial hall · 🔨 artisans (professions) · 🧘 practice allowed · ⛏ gathering / hunting nodes.
 
@@ -28,7 +28,7 @@ Services: 🏪 shop · 🏯 martial hall · 🔨 artisans (professions) · 🧘 
 | `city_xixia` | ซีเซี่ย | west | painted (auto layout) | 1 | 🏪 · 🏯 · 🔨 forge, alchemy, tailoring, chef, jewelry, accessory · ⛏ ขุดแร่เหล็ก, ตัดไม้เนื้ออ่อน, เล่นหมากรุกกับชาวบ้าน, ขอเงินคนผ่านไปมา, ขอเงินในตลาด | ทะเลทรายร้าง, ภูเขาอูฐขาว, ชนเผ่าหุยซู, บ้านนักรบชายแดน, บ้านไป๋เฝยหยาง, บ้านเยวี่ย |
 | `city_dali` | ต้าหลี่ | west | painted (auto layout) | 3 | 🏪 · 🏯 · 🔨 forge, alchemy, tailoring, chef, jewelry, accessory · ⛏ ขุดแร่เหล็ก, ตัดไม้เนื้ออ่อน, เล่นหมากรุกกับชาวบ้าน, ขอเงินคนผ่านไปมา, ขอเงินในตลาด | พรรคเบญจพิษ, ง้อไบ๊, บ้านอู๋เฉิน, ตลาดชาวเมี่ยว, ภูเขาวุ่นเหลียน, สระมังกรดำ, สำนักสกุลถัง, วัดต้าหลุน, หมู่บ้านดอกเหมย |
 | `city_yangzhou` | หยางโจว | east | painted (auto layout) | 3 | 🏪 · 🏯 · 🔨 forge, alchemy, tailoring, chef, jewelry, accessory · ⛏ ขุดแร่เหล็ก, ตัดไม้เนื้ออ่อน, เล่นหมากรุกกับชาวบ้าน, เล่นหมากรุกกับเซียนตัวจริง, ขอเงินคนผ่านไปมา, ขอเงินในตลาด | นครหลวง, ซูโจว, โรงเตี๊ยมเกาเซิ่ง, จินหลิง, สำนักคุ้มภัยเจิ้นหยวน, ดงดอกท้อ, หมู่บ้านอวู่เซี่ย |
-| `city_suzhou` | ซูโจว | east | painted (auto layout) | 2 | 🏪 · 🏯 · 🔨 forge, alchemy, tailoring, chef, jewelry, accessory · ⛏ ขุดแร่เหล็ก, ตัดไม้เนื้ออ่อน, เล่นหมากรุกกับชาวบ้าน, เล่นหมากรุกกับเซียนตัวจริง, ขอเงินคนผ่านไปมา, ขอเงินในตลาด | หยางโจว, จินหลิง, เกาะดอกท้อ, คุ้มนกนางแอ่น, โรงเตี๊ยมมีหว่าง, หมู่บ้านอวู่เซี่ย |
+| `city_suzhou` | ซูโจว | east | painted (auto layout) | 2 | 🏪 · 🏯 · 🔨 forge, alchemy, tailoring, chef, jewelry, accessory · ⛏ ขุดแร่เหล็ก, ตัดไม้เนื้ออ่อน, เล่นหมากรุกกับชาวบ้าน, เล่นหมากรุกกับเซียนตัวจริง, ขอเงินคนผ่านไปมา, ขอเงินในตลาด | หยางโจว, จินหลิง, คุ้มนกนางแอ่น, หมู่บ้านอวู่เซี่ย, โรงเตี๊ยมมีหว่าง |
 | `city_jinling` | จินหลิง | east | painted (auto layout) | 1 | 🏪 · 🏯 · 🔨 forge, alchemy, tailoring, chef, jewelry, accessory · ⛏ ขุดแร่เหล็ก, ตัดไม้เนื้ออ่อน, เล่นหมากรุกกับชาวบ้าน, ขอเงินคนผ่านไปมา, ขอเงินในตลาด | ซูโจว, โรงเตี๊ยมเฮ่อลั่ว, หยางโจว, ดงดอกท้อ |
 | `city_changan` | ฉางอัน | west | painted (auto layout) | 2 | 🏪 · 🏯 · 🔨 forge, alchemy, tailoring, chef, jewelry, accessory · ⛏ ขุดแร่เหล็ก, ตัดไม้เนื้ออ่อน, เล่นหมากรุกกับชาวบ้าน, ขอเงินคนผ่านไปมา, ขอเงินในตลาด | ฉวนเจิน / ชวนจิน, นครหลวง, กู่มู่ / โบราณสุสาน, พระราชวังจงหยาง, ผาสำนึกผิด, ป้อมหลำกู่, หัวซาน, หมู่บ้านหัวซาน |
 | `city_lingxiao` | เมืองลิ้งเซียว | west | painted (auto layout) | 5 | ⛏ เก็บสมุนไพรทั่วไป, ค้นหาสมุนไพรหายาก | ภูเขาอูฐขาว |
@@ -66,7 +66,7 @@ Services: 🏪 shop · 🏯 martial hall · 🔨 artisans (professions) · 🧘 
 | `sect_lingjiu` | วังอินทรีหิมะ | west | painted (auto layout) | 1 | 🧘 · ⛏ ตัดไม้เนื้อแข็ง, ล่าสัตว์ในป่า | เขาคุนหลุน, ภูเขาอูฐขาว |
 | `sect_beggars` | พรรคยาจก | heartland | painted (auto layout) | 11 | 🧘 · ⛏ ตัดไม้เนื้อแข็ง, ล่าสัตว์ในป่า | บ้านฉีเหลียง, บ้านเผิงเหล่าจิ่ว, โรงเตี๊ยมเกาเซิ่ง |
 | `sect_ming` | พรรคตะวันจันทรา | east | painted (auto layout) | 10 | 🧘 · ⛏ ตัดไม้เนื้อแข็ง, ล่าสัตว์ในป่า | ยอดเพลิงอุดร, ไม้ดำหน้าผา, บ้านซือถูคุน |
-| `sect_xiaoyao` | พรรคสราญรมย์ (เซียวหยาว) | north | painted (auto layout) | 8 | 🧘 · ⛏ ตัดไม้ศักดิ์สิทธิ์ | ป้อมหลำกู่, ถ้ำฝึกวิทยายุทธ์, คุ้มนกนางแอ่น, อู่ตัง / บู๊ตึ๊ง, หุบเขาร้อยดอกไม้ |
+| `sect_xiaoyao` | พรรคสราญรมย์ (เซียวหยาว) | north | painted (auto layout) | 8 | 🧘 · ⛏ ตัดไม้ศักดิ์สิทธิ์ | ป้อมหลำกู่, ถ้ำฝึกวิทยายุทธ์, หุบเขาร้อยดอกไม้, อู่ตัง / บู๊ตึ๊ง, คุ้มนกนางแอ่น |
 | `sect_xingxiu` | สำนักดาวดึงส์ (เห็งซัว) | west | painted (auto layout) | 1 | 🧘 · ⛏ ตัดไม้เนื้อแข็ง, ล่าสัตว์ในป่า | เขาดาวฤกษ์ทะเล, เขาคุนหลุน |
 | `sect_xuedao` | พรรคอสูรโลหิต | west | painted (auto layout) | 1 | 🧘 · ⛏ ตัดไม้เนื้อแข็ง, ล่าสัตว์ในป่า | สำนักดาบโลหิต, ทะเลทรายร้าง |
 | `sect_wudu` | พรรคเบญจพิษ | west | painted (auto layout) | 2 | 🔨 alchemy · 🧘 · ⛏ ตัดไม้เนื้อแข็ง, ล่าสัตว์ในป่า, เก็บพิษงู, เก็บพิษแมงป่อง | ตลาดชาวเมี่ยว, ต้าหลี่, สระมังกรดำ, ภูเขาวุ่นเหลียน |
@@ -155,16 +155,16 @@ Services: 🏪 shop · 🏯 martial hall · 🔨 artisans (professions) · 🧘 
 
 | Id | Name | Region | Map | People | Services | Connects to |
 | --- | --- | --- | --- | --- | --- | --- |
-| `isle_taohua` | เกาะดอกท้อ | east | painted (auto layout) | 1 | 🧘 · ⛏ ตกปลาในทะเล, ตัดไม้เนื้ออ่อน | เกาะหมอกทอง, เกาะยกซาน (นกกระยาง), ซูโจว |
-| `isle_xiake` | เกาะหมอกทอง | east | painted (auto layout) | 0 | ⛏ ตกปลาในทะเล, ตัดไม้เนื้ออ่อน | เกาะไร้ชื่อ, เกาะดอกท้อ, เกาะทะเลเพลิงน้ำแข็งเหนือ |
-| `isle_binghuo` | เกาะทะเลเพลิงน้ำแข็งเหนือ | east | painted (auto layout) | 0 | ⛏ ตกปลาในทะเล, ตัดไม้เนื้ออ่อน | เกาะมังกรเทพ, เกาะหมอกทอง |
-| `isle_yuanyang` | เกาะยกซาน (นกกระยาง) | east | painted (auto layout) | 0 | ⛏ ตกปลาในทะเล, ตัดไม้เนื้ออ่อน | เกาะดอกท้อ, เกาะฟ้าผ่า |
-| `isle_wane` | เกาะจระเข้หมื่นตัว | east | painted (auto layout) | 0 | ⛏ ตกปลาในทะเล, ตัดไม้เนื้ออ่อน | เกาะงูเงิน, เกาะโรตี |
-| `isle_pili` | เกาะฟ้าผ่า | east | painted (auto layout) | 0 | ⛏ ตกปลาในทะเล, ตัดไม้เนื้ออ่อน | เกาะยกซาน (นกกระยาง), เกาะงูเงิน |
-| `isle_lingshe` | เกาะงูเงิน | east | painted (auto layout) | 0 | 🧘 · ⛏ ตกปลาในทะเล, ตัดไม้เนื้ออ่อน | เกาะฟ้าผ่า, เกาะจระเข้หมื่นตัว |
-| `isle_boni` | เกาะโรตี | east | painted (auto layout) | 0 | ⛏ ตกปลาในทะเล, ตัดไม้เนื้ออ่อน | เกาะจระเข้หมื่นตัว, เกาะไร้ชื่อ |
-| `isle_shenlong` | เกาะมังกรเทพ | east | painted (auto layout) | 1 | 🧘 · ⛏ ตามรอยปลามังกร | เกาะทะเลเพลิงน้ำแข็งเหนือ, เกาะไร้ชื่อ |
-| `isle_wuming` | เกาะไร้ชื่อ | east | painted (auto layout) | 0 | ⛏ ตกปลาในทะเล, ตัดไม้เนื้ออ่อน | เกาะโรตี, เกาะหมอกทอง, เกาะมังกรเทพ |
+| `isle_taohua` | เกาะดอกท้อ | east | painted (auto layout) | 1 | 🧘 · ⛏ ตกปลาในทะเล, ตัดไม้เนื้ออ่อน |  |
+| `isle_xiake` | เกาะหมอกทอง | east | painted (auto layout) | 0 | ⛏ ตกปลาในทะเล, ตัดไม้เนื้ออ่อน |  |
+| `isle_binghuo` | เกาะทะเลเพลิงน้ำแข็งเหนือ | east | painted (auto layout) | 0 | ⛏ ตกปลาในทะเล, ตัดไม้เนื้ออ่อน |  |
+| `isle_yuanyang` | เกาะยกซาน (นกกระยาง) | east | painted (auto layout) | 0 | ⛏ ตกปลาในทะเล, ตัดไม้เนื้ออ่อน |  |
+| `isle_wane` | เกาะจระเข้หมื่นตัว | east | painted (auto layout) | 0 | ⛏ ตกปลาในทะเล, ตัดไม้เนื้ออ่อน |  |
+| `isle_pili` | เกาะฟ้าผ่า | east | painted (auto layout) | 0 | ⛏ ตกปลาในทะเล, ตัดไม้เนื้ออ่อน |  |
+| `isle_lingshe` | เกาะงูเงิน | east | painted (auto layout) | 0 | 🧘 · ⛏ ตกปลาในทะเล, ตัดไม้เนื้ออ่อน |  |
+| `isle_boni` | เกาะโรตี | east | painted (auto layout) | 0 | ⛏ ตกปลาในทะเล, ตัดไม้เนื้ออ่อน |  |
+| `isle_shenlong` | เกาะมังกรเทพ | east | painted (auto layout) | 1 | 🧘 · ⛏ ตามรอยปลามังกร |  |
+| `isle_wuming` | เกาะไร้ชื่อ | east | painted (auto layout) | 0 | ⛏ ตกปลาในทะเล, ตัดไม้เนื้ออ่อน |  |
 | `sea_xingxiu` | เขาดาวฤกษ์ทะเล | west | painted (auto layout) | 0 | 🧘 · ⛏ ขุดแร่เหล็ก, ล่าเสือบนภูเขา, ขุดแร่เงิน | สำนักดาวดึงส์ (เห็งซัว) |
 | `pool_heilong` | สระมังกรดำ | west | painted (auto layout) | 1 | 🧘 · ⛏ ล่าสัตว์ในป่า | พรรคเบญจพิษ, ต้าหลี่ |
 

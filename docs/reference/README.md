@@ -19,9 +19,9 @@ Generated lists of everything in the game, taken straight from the data tables. 
 | Content | Count |
 | --- | --- |
 | Locations | 101 |
-| Route scenes | 273 |
+| Route scenes | 249 |
 | Dialog scenes | 3609 |
-| All scenes | 3983 |
+| All scenes | 3959 |
 | Location connections (`LOCATION_ROUTES`) | 129 |
 | Painted maps (hand-placed / auto layout) | 3 / 97 |
 | Sect locations / memberships | 20 / 15 |

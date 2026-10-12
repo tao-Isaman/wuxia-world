@@ -495,7 +495,7 @@ const SKILL_BATCH: Record<string, IconRenderer> = {
       <polygon points="48,18 60,6 56,18 58,8" fill={accent} stroke={ink} strokeWidth={2} strokeLinejoin="round" />
       {/* dragon seal stamp on shaft */}
       <rect x={20} y={32} width={16} height={16} fill={accent} stroke={ink} strokeWidth={2} transform="rotate(-45 28 40)" />
-      <text x={28} y={44} textAnchor="middle" fontSize={10} fontWeight="bold" fill={ink} transform="rotate(-45 28 40)">龍</text>
+      <text x={28} y={44} textAnchor="middle" fontSize={10} fontWeight="bold" fill={ink} transform="rotate(-45 28 40)">✦</text>
       {/* tassel */}
       <line x1={46} y1={20} x2={40} y2={22} stroke={ink} strokeWidth={2} strokeLinecap="round" />
       <line x1={46} y1={20} x2={42} y2={28} stroke={ink} strokeWidth={2} strokeLinecap="round" />
@@ -920,7 +920,7 @@ const ART_BATCH: Record<string, IconRenderer> = {
       <circle cx={54} cy={54} r={3.5} fill={accent} stroke={ink} strokeWidth={2} />
       {/* center dharma seal */}
       <circle cx={32} cy={32} r={6} fill={accent} stroke={ink} strokeWidth={2} />
-      <text x={32} y={36} textAnchor="middle" fontSize={9} fontWeight="bold" fill={ink}>卍</text>
+      <text x={32} y={36} textAnchor="middle" fontSize={9} fontWeight="bold" fill={ink}>☸</text>
     </g>
   ),
 
@@ -1143,7 +1143,7 @@ const ART_BATCH: Record<string, IconRenderer> = {
       <path d="M 12 50 Q 18 46 14 40" fill="none" stroke={ink} strokeWidth={2} strokeLinecap="round" />
       <path d="M 52 50 Q 46 46 50 40" fill="none" stroke={ink} strokeWidth={2} strokeLinecap="round" />
       {/* N marker */}
-      <text x={32} y={16} textAnchor="middle" fontSize={6} fontWeight="bold" fill={ink}>北</text>
+      <text x={32} y={16} textAnchor="middle" fontSize={6} fontWeight="bold" fill={ink}>น</text>
     </g>
   ),
 
@@ -1214,7 +1214,7 @@ const ART_BATCH: Record<string, IconRenderer> = {
     <g>
       {/* central body silhouette */}
       <circle cx={32} cy={32} r={10} fill={accent} stroke={ink} strokeWidth={2} />
-      <text x={32} y={36} textAnchor="middle" fontSize={11} fontWeight="bold" fill={ink}>毒</text>
+      <text x={32} y={36} textAnchor="middle" fontSize={11} fontWeight="bold" fill={ink}>☠</text>
       {/* 5 poisonous creatures around */}
       {/* snake top */}
       <path d="M 28 10 Q 32 6 36 10 Q 36 14 32 14 Q 28 14 28 10 Z" fill={accent} stroke={ink} strokeWidth={1.5} strokeLinejoin="round" />
@@ -1275,7 +1275,7 @@ const ART_BATCH: Record<string, IconRenderer> = {
       {/* banner pole right */}
       <line x1={56} y1={4} x2={56} y2={60} stroke={ink} strokeWidth={2} />
       <polygon points="56,8 56,28 48,18" fill={accent} stroke={ink} strokeWidth={2} strokeLinejoin="round" />
-      <text x={50} y={22} textAnchor="middle" fontSize={6} fontWeight="bold" fill={ink}>軍</text>
+      <text x={50} y={22} textAnchor="middle" fontSize={6} fontWeight="bold" fill={ink}>★</text>
       {/* shield insignia */}
       <circle cx={32} cy={50} r={6} fill={accent} stroke={ink} strokeWidth={2} />
       <line x1={32} y1={46} x2={32} y2={54} stroke={ink} strokeWidth={1.5} />
@@ -1488,8 +1488,8 @@ const ART_BATCH: Record<string, IconRenderer> = {
       <circle cx={28} cy={24} r={2} fill={accent} />
       <circle cx={36} cy={32} r={1.5} fill={accent} />
       <circle cx={26} cy={34} r={1.5} fill={accent} />
-      {/* "九" character on moon */}
-      <text x={32} y={34} textAnchor="middle" fontSize={14} fontWeight="bold" fill={accent}>九</text>
+      {/* the Thai numeral nine on the moon */}
+      <text x={32} y={34} textAnchor="middle" fontSize={14} fontWeight="bold" fill={accent}>๙</text>
       {/* crossed bones below */}
       <g stroke={ink} strokeWidth={2.5} strokeLinecap="round">
         <line x1={14} y1={48} x2={50} y2={58} stroke={accent} strokeWidth={6} />
@@ -1574,11 +1574,11 @@ const ART_BATCH: Record<string, IconRenderer> = {
       {/* void center */}
       <circle cx={32} cy={32} r={4} fill={accent} />
       <circle cx={32} cy={32} r={1.5} fill={ink} />
-      {/* mystery glyphs around */}
-      <text x={32} y={14} textAnchor="middle" fontSize={6} fontWeight="bold" fill={accent}>玄</text>
-      <text x={14} y={36} textAnchor="middle" fontSize={6} fontWeight="bold" fill={accent}>洞</text>
-      <text x={50} y={36} textAnchor="middle" fontSize={6} fontWeight="bold" fill={accent}>神</text>
-      <text x={32} y={56} textAnchor="middle" fontSize={6} fontWeight="bold" fill={accent}>功</text>
+      {/* mystery stars around */}
+      <text x={32} y={14} textAnchor="middle" fontSize={6} fontWeight="bold" fill={accent}>✦</text>
+      <text x={14} y={36} textAnchor="middle" fontSize={6} fontWeight="bold" fill={accent}>✦</text>
+      <text x={50} y={36} textAnchor="middle" fontSize={6} fontWeight="bold" fill={accent}>✦</text>
+      <text x={32} y={56} textAnchor="middle" fontSize={6} fontWeight="bold" fill={accent}>✦</text>
     </g>
   ),
 

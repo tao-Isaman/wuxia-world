@@ -560,7 +560,7 @@ export function resolveSkill(
       if (state.winner) break;
       const res = calcSkillDamage(state, side, skill, ctx);
       const perHitDmg = Math.max(0, Math.round(res.dmg / hitCount));
-      const probe = `<span class="lp">[hit${res.hpPct}% crit${res.critPct}%]</span>`;
+      const probe = `<span class="lp">[โดน ${res.hpPct}% คริ ${res.critPct}%]</span>`;
       if (h === 0) firstProbe = probe;
 
       if (!res.hit) {
@@ -594,7 +594,7 @@ export function resolveSkill(
       // Life drain (per-hit)
       if (skill.dr && skill.dr > 0) {
         const heal = healHp(state, side, Math.round(perHitDmg * skill.dr / 100));
-        logLine(state, "lS", `&nbsp;→ ดูด ${heal} HP`);
+        logLine(state, "lS", `&nbsp;→ ดูดพลังชีวิต ${heal}`);
       }
 
       // Reflect on the caster: each landed hit reflects its share; the
@@ -729,12 +729,12 @@ export function resolveArtActive(
     const onCd =
       typeof slotIdx === "number" ? state.cd[side][slotIdx] : state.iaCD[side];
     if (onCd > 0) {
-      logLine(state, "lS", `[IA] ${escapeBattleText(ctx.names[side])}: กำลังภายใน CD ${onCd}`);
+      logLine(state, "lS", `[ท่าออกพลัง] ${escapeBattleText(ctx.names[side])}: ยังพักอีก ${onCd} ตา`);
       return false;
     }
     const mp = side === "A" ? state.mpA : state.mpB;
     if (mp < act.c) {
-      logLine(state, "lS", `[IA] ${escapeBattleText(ctx.names[side])}: MP ไม่พอ`);
+      logLine(state, "lS", `[ท่าออกพลัง] ${escapeBattleText(ctx.names[side])}: ปราณไม่พอ`);
       return false;
     }
 
@@ -791,7 +791,7 @@ export function resolveArtActive(
   let castCrit = false;
   let castMiss = false;
 
-  const probe = (hp: number, cp: number) => `<span class="lp">[hit${hp}% crit${cp}%]</span>`;
+  const probe = (hp: number, cp: number) => `<span class="lp">[โดน ${hp}% คริ ${cp}%]</span>`;
 
   const computeMissProbe = () => {
     let ea = ad.Acc * (1 + accPctOf(state.st[side]) / 100);
@@ -833,7 +833,7 @@ export function resolveArtActive(
       const want = Math.round(cap * (act.h ?? 0) / 100);
       const blocked = isScorched(state.st[side]);
       healHp(state, side, want);
-      logLine(state, cls, `[${state.turn}] ${nm} ⚡<b>${act.n}</b> → ฟื้น <b>${blocked ? 0 : want}</b> HP${blocked ? " (ถูกแผดเผา ฟื้นไม่ได้)" : ""}`);
+      logLine(state, cls, `[${state.turn}] ${nm} ⚡<b>${act.n}</b> → ฟื้น <b>${blocked ? 0 : want}</b> พลังชีวิต${blocked ? " (ถูกแผดเผา ฟื้นไม่ได้)" : ""}`);
       break;
     }
     case "heal_cleanse": {
@@ -843,7 +843,7 @@ export function resolveArtActive(
       const want = Math.round(cap * (act.h ?? 0) / 100);
       const blocked = isScorched(state.st[side]);
       healHp(state, side, want);
-      logLine(state, cls, `[${state.turn}] ${nm} ⚡<b>${act.n}</b> → ฟื้น <b>${blocked ? 0 : want}</b> HP${blocked ? " (ถูกแผดเผา ฟื้นไม่ได้)" : ""}${removed ? ` +ลบ[${removed.n}]` : ""}`);
+      logLine(state, cls, `[${state.turn}] ${nm} ⚡<b>${act.n}</b> → ฟื้น <b>${blocked ? 0 : want}</b> พลังชีวิต${blocked ? " (ถูกแผดเผา ฟื้นไม่ได้)" : ""}${removed ? ` +ลบ[${removed.n}]` : ""}`);
       break;
     }
     case "heal_full_cleanse": {
@@ -857,7 +857,7 @@ export function resolveArtActive(
       healHp(state, side, hpHeal);
       if (side === "A") state.mpA = Math.min(mpCap, state.mpA + mpHeal);
       else state.mpB = Math.min(mpCap, state.mpB + mpHeal);
-      logLine(state, cls, `[${state.turn}] ${nm} ⚡<b>${act.n}</b> → ฟื้น <b>${hpHeal}</b> HP / <b>${mpHeal}</b> MP +ลบดีบัฟ ${removedCount} ระดับ`);
+      logLine(state, cls, `[${state.turn}] ${nm} ⚡<b>${act.n}</b> → ฟื้นพลังชีวิต <b>${hpHeal}</b> / ปราณ <b>${mpHeal}</b> + ล้างสถานะผิดปกติ ${removedCount} อย่าง`);
       break;
     }
     case "atk_phy_pen": {
@@ -895,12 +895,12 @@ export function resolveArtActive(
     }
     case "buff_reduce": {
       addReduceBuff(state, side, act.v ?? 0, act.u ?? 1);
-      logLine(state, cls, `[${state.turn}] ${nm} ⚡<b>${act.n}</b> → ลดdmg${act.v}%(${act.u}ตา)`);
+      logLine(state, cls, `[${state.turn}] ${nm} ⚡<b>${act.n}</b> → ลดความเสียหาย ${act.v}% (${act.u} ตา)`);
       break;
     }
     case "buff_spd": {
       addBuff(state, side, { t: "buff_spd", n: act.n, v: act.v ?? 0, u: act.u ?? 1 });
-      logLine(state, cls, `[${state.turn}] ${nm} ⚡<b>${act.n}</b> → SPD+${act.v}(${act.u}ตา)`);
+      logLine(state, cls, `[${state.turn}] ${nm} ⚡<b>${act.n}</b> → ความเร็ว +${act.v} (${act.u} ตา)`);
       break;
     }
     case "drain": {
@@ -938,7 +938,7 @@ export function resolveArtActive(
       const hc = computeMissProbe();
       if (Math.random() * 100 >= hc.hp) {
         castMiss = true;
-        logLine(state, cls, `[${state.turn}] ${nm} ⚡<b>${act.n}</b> → Acc${act.adv} + <span style="color:#AAA">พลาด!</span> ${probe(hc.hp, hc.cp)}`);
+        logLine(state, cls, `[${state.turn}] ${nm} ⚡<b>${act.n}</b> → แม่นยำ ${act.adv} + <span style="color:#AAA">พลาด!</span> ${probe(hc.hp, hc.cp)}`);
       } else {
         const raw = rawDamage();
         const r = doAtkHit(raw, hc);
@@ -955,26 +955,26 @@ export function resolveArtActive(
       const hc = computeMissProbe();
       if (Math.random() * 100 >= hc.hp) {
         castMiss = true;
-        logLine(state, cls, `[${state.turn}] ${nm} ⚡<b>${act.n}</b> → Acc${act.ad} + <span style="color:#AAA">พลาด!</span> ${probe(hc.hp, hc.cp)}`);
+        logLine(state, cls, `[${state.turn}] ${nm} ⚡<b>${act.n}</b> → แม่นยำ ${act.ad} + <span style="color:#AAA">พลาด!</span> ${probe(hc.hp, hc.cp)}`);
       } else {
         const raw = rawDamage();
         const r = doAtkHit(raw, hc);
         const dt = r.crit ? `<span class="lC">★CRIT! ${r.dmg}</span>` : `<b>${r.dmg}</b>`;
-        logLine(state, cls, `[${state.turn}] ${nm} ⚡<b>${act.n}</b> → Acc${act.ad} + ${dt} ${probe(hc.hp, hc.cp)}`);
+        logLine(state, cls, `[${state.turn}] ${nm} ⚡<b>${act.n}</b> → แม่นยำ ${act.ad} + ${dt} ${probe(hc.hp, hc.cp)}`);
         checkWin(state, ctx.names);
       }
       break;
     }
     case "debuff_poison": {
       addDebuff(state, ds, { t: "debuff_poison", n: "พิษ", pp: act.pp ?? 0, u: act.u ?? 2 });
-      addDebuff(state, ds, { t: "debuff_eva", n: "พิษEva", v: act.ev ?? 0, u: act.u ?? 2 });
-      logLine(state, cls, `[${state.turn}] ${nm} ⚡<b>${act.n}</b> → พิษ${act.pp}%/ตา Eva${act.ev}`);
+      addDebuff(state, ds, { t: "debuff_eva", n: "พิษ (หลบหลีก)", v: act.ev ?? 0, u: act.u ?? 2 });
+      logLine(state, cls, `[${state.turn}] ${nm} ⚡<b>${act.n}</b> → พิษ ${act.pp}%/ตา หลบหลีก ${act.ev}`);
       break;
     }
     case "buff_eva_debuff_eva": {
       addEvaBuff(state, side, act.selfV ?? 0, act.u ?? 2);
       addDebuff(state, ds, { t: "debuff_eva", n: "ทราย", v: act.eneV ?? 0, u: act.u ?? 2 });
-      logLine(state, cls, `[${state.turn}] ${nm} ⚡<b>${act.n}</b> → Eva+${act.selfV} / ศัตรู Eva${act.eneV}(${act.u}ตา)`);
+      logLine(state, cls, `[${state.turn}] ${nm} ⚡<b>${act.n}</b> → หลบหลีก +${act.selfV} / ศัตรูหลบหลีก ${act.eneV} (${act.u} ตา)`);
       break;
     }
 

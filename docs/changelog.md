@@ -6,6 +6,29 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-12
 
+### A painted world map, and boats to the islands
+
+- **แผนที่โลก** — a new menu section (the last icon, hotkey **M**): the whole jianghu as one ink-and-watercolour painting with its walled cities, mountain temples, villages, caves, roads and island boat lanes drawn in, painted over a layout sketch made from the world coordinates so every place sits where it is in the game. Over it: every place by kind (visited or not, 🐎 stations, ⛵ piers), the roads by type, the five regions (tabs frame one, darken the rest and list its places with an explored count), where you are, the tracked quest 📌, and a planner — tap a place for its roads out and the way there step by step (road names, directions, boat fares) drawn as a marching red line; **🧭 นำทางไปที่นี่** sends the guide arrow there (a gold card in the HUD, ✕ to drop it, gone on arrival). Drag, pinch or wheel to zoom; names and markers keep their size; works on phones.
+- **The islands are reached by boat only.** The ten islands lost their walking roads: ลุงจาง คนแจวเรือ waits at ซูโจว, หยางโจว and on every island and sails to any other pier for 40 gold + 0.5 per world-map unit, at once. The quest guide walks you to a port and points at him. He can't be fought or killed, so nobody is stranded.
+- A map menu icon painted to match the others. New checks in `test:routes` (the atlas) and `test:systems` (ferries), and `world-map.spec.ts` (the map on desktop and phone, planning a route to an island, following the guide to the boatman and sailing).
+
+### Everything the player reads is Thai
+
+- **Stats in words.** The vitals read ชีวิต / ปราณ / พลัง instead of HP / MP; the profile drops the English keys beside each stat (STR, ATK, PD…); equipment, shop badges and the bag read พลังโจมตี +12 · ป้องกันกาย +4 · ลดความเสียหายที่ได้รับ 5 % (one helper, `lib/game/stat-text.ts`: `DERIVED_LABEL`, `equipStatParts`, `equipBonusParts`).
+- **Rewards and messages.** w-exp is ประสบการณ์ยุทธ, xp is ประสบการณ์, Lv. is ขั้น, sect points are แต้มสำนัก, CD is พัก N ตา, tiers show their names (ขั้นสูง, ลับ…) instead of T2 / T3.
+- **The battle.** The log, status tooltips and buttons are Thai (โดน % คริ %, หลบหลีก −10, ปราณไม่พอ, เริ่มใหม่); status chips no longer carry English names (หลบหลีก↓, พิษ (แม่นยำ)), and a heal-and-guard move names its guard instead of its internal id.
+- **Loanwords with a Thai word in the game** are replaced: บัฟ → พลังเสริม, ดีบัฟ → สถานะผิดปกติ, มาสเตอร์รี่ → ความชำนาญ, ไอเทม → ของ, NPC → ยอดยุทธ / คู่ต่อสู้. Raw move shorthand that still reached the screen (the sect hall, the spoils panel, the /debug library) now goes through `plainThai`.
+- **No Chinese on screen either.** Place descriptions lose their Chinese names (33 places that had only a Chinese name got a Thai line); the sundial's ring reads ๑–๑๒ and its face the hour's Thai name (เหม่า, เฉิน…); the purse shows N ยุทธ instead of 悟; item tiles without a painted icon show an emoji for their kind (🌿 🧪 🗡…) instead of a character; the menus' watermarks, the title seal and the headings' ornaments are Thai or a ❖; a critical hit floats คริติคอล! instead of 暴擊; move descriptions name the legends' moves in Thai (เก้ากระบี่เดียวดาย, คัมภีร์ทานตะวัน…); the few characters inside skill icons became symbols.
+- Key names stay as printed on the keyboard (Enter, Esc, WASD, E), and คริติคอล, สตัน and บอส stay as the game's own terms. The editor (`/game/engine`) and the frozen `/progress` journal are developer pages and keep their English.
+
+### Outfits and the weapon on the body
+
+- **A wardrobe (ชุด)** in โปรไฟล์: ชุดเดิม, the uniform of the hero's own sect (only while a disciple; other sects' uniforms are not listed; Shaolin's for men and Emei's for women only), six tailor's outfits bought in any city (300–3,000 ตำลึง, kept for good) and the tournament champion's gold. Each card shows the hero in it, carrying their weapon. An outfit is only a look: no stats.
+- **The hero is drawn in it everywhere** — on the map, in battle and in films — because an outfit is a recolour of the hero's own PixelLab sheet (the robe and the light cloth under it; skin, hair and head untouched), not new art (PixelLab has 276 generations left).
+- **The weapon on the body:** the equipped weapon is drawn on the hero on the map from its own icon — spears, staves, sabres and instruments slung across the back, fans at the waist — behind the body facing the viewer or in profile, in front of it facing away; **ซ่อนอาวุธ** hides it.
+- **Online:** others see the outfit and the weapon on the back, and a change at once (protocol 3: `look` / `looked`, the look in `hello`; the server checks only its shape and pace).
+- Save v29 (`appearance`, `wardrobe`). New suite `test:appearance`; `test:server`, `test:net`, `test:online`, `appearance.spec.ts` and `online.spec.ts` cover the rest. Design and research: [design/appearance.md](design/appearance.md).
+
 ### Players meet: friends, a party, chat and mail; NPC gifts wait for รับของ
 
 - **Friends (สหาย).** A new HUD tab (10th, hotkey 0) when playing online: add a friend by username or by tapping them on the map, accept or decline requests, see who is online, as which hero and where; remove or block. A request to someone who already asked you makes you friends at once.

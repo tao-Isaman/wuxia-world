@@ -36,6 +36,7 @@ import { SectHallPopup } from "./popups/sect-hall-popup";
 import { ArtisanPopup } from "./popups/artisan-popup";
 import { PracticePopup } from "./popups/practice-popup";
 import { StationPopup } from "./popups/station-popup";
+import { FerryPopup } from "./popups/ferry-popup";
 import { TournamentPopup } from "./popups/tournament-popup";
 import { RumorBanner } from "./rumor-banner";
 import { RumorListenButton } from "./rumor-listen-button";
@@ -77,6 +78,7 @@ export function LocationView({ scene, readOnly = false, dialogueSpeakerId }: Pro
   const [hallOpen, setHallOpen] = useState(false);
   const [practiceOpen, setPracticeOpen] = useState(false);
   const [stationOpen, setStationOpen] = useState(false);
+  const [ferryOpen, setFerryOpen] = useState(false);
   const [tournamentOpen, setTournamentOpen] = useState(false);
   const [activeArtisan, setActiveArtisan] = useState<ArtisanDef | null>(null);
   // Map-spot popups: rest + rumor objects on the painted map.
@@ -474,7 +476,7 @@ export function LocationView({ scene, readOnly = false, dialogueSpeakerId }: Pro
                       </span>
                       <span className="text-[10px] text-muted-foreground">
                         ⚡ {res.staminaCost}
-                        <span className="ml-2">มาสเตอร์รี่ของเจ้าระดับ {lvl}</span>
+                        <span className="ml-2">ความชำนาญของเจ้าระดับ {lvl}</span>
                         {tooLow && <span className="text-rose-600 ml-2">พลังไม่พอ</span>}
                         {res.opponentIds && (
                           <span className="text-amber-600 ml-2">⚔ จะเกิดการต่อสู้</span>
@@ -507,6 +509,7 @@ export function LocationView({ scene, readOnly = false, dialogueSpeakerId }: Pro
         onClose={() => setActiveArtisan(null)}
       />
       <StationPopup open={stationOpen} onClose={() => setStationOpen(false)} />
+      <FerryPopup open={ferryOpen} onClose={() => setFerryOpen(false)} />
       <TournamentPopup open={tournamentOpen} onClose={() => setTournamentOpen(false)} />
       <PracticePopup
         open={practiceOpen}
@@ -547,6 +550,7 @@ export function LocationView({ scene, readOnly = false, dialogueSpeakerId }: Pro
             onActivity: (id) => void runActivity(id),
             onObjective: runObjective,
             onStation: () => setStationOpen(true),
+            onFerry: () => setFerryOpen(true),
             onTournament: () => setTournamentOpen(true),
           }}
         />
@@ -621,14 +625,14 @@ function gatherToast(r: GatherResult): ToastTuple {
   if (r.type === "battle") return ["info", "พบเจอสัตว์ป่า — เตรียมต่อสู้!"];
   if (r.dropCheck === "failed") {
     const pct = Math.round(r.successChance * 100);
-    return ["warn", `ลองมือไม่สำเร็จ — มาสเตอร์รี่ยังไม่พอ (โอกาส ${pct}%) · +${r.xpGained} xp`];
+    return ["warn", `ลองมือไม่สำเร็จ — ความชำนาญยังไม่พอ (โอกาส ${pct}%) · +${r.xpGained} ประสบการณ์`];
   }
-  if (r.items.length === 0) return ["info", `เก็บได้แต่ไม่มีของชิ้นใด · +${r.xpGained} xp`];
+  if (r.items.length === 0) return ["info", `เก็บได้แต่ไม่มีของชิ้นใด · +${r.xpGained} ประสบการณ์`];
   const parts = r.items.map((it) => {
     const def = getItem(it.itemId);
     return `${def?.name ?? it.itemId}×${it.count}`;
   });
-  return ["success", `${parts.join(", ")} · +${r.xpGained} xp`];
+  return ["success", `${parts.join(", ")} · +${r.xpGained} ประสบการณ์`];
 }
 
 // Wraps the RumorListenButton in a header card. Renders nothing when

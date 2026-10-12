@@ -36,7 +36,7 @@ export function StartScreen() {
       <div className="title-shade" />
       <div className="title-content">
         <div className="title-intro">
-          <span className="title-seal" aria-hidden="true">武</span>
+          <span className="title-seal" aria-hidden="true">ยุทธ</span>
           <p className="title-kicker">กำลังภายใน</p>
           <h1>โลกยุทธภพ</h1>
           <p className="title-description">หนึ่งชีวิต หนึ่งเส้นทางยุทธ์<br />เรื่องราวของเจ้าเริ่มต้นที่นี่</p>
@@ -76,7 +76,7 @@ function HeroForm({ online, onCancel }: { online: boolean; onCancel?: () => void
       }
     }}>
       {online && <FlowSteps step={2} />}
-      <div className="creation-heading"><span>สร้างตัวละคร</span><span className="text-[#d7bd82]">初</span></div>
+      <div className="creation-heading"><span>สร้างตัวละคร</span><span className="text-[#d7bd82]">❖</span></div>
       <label className="creation-label" htmlFor="hero-name">ชื่อตัวละคร</label>
       <input id="hero-name" name="heroName" autoComplete="off" value={name} onChange={(e) => setName(e.target.value)}
         maxLength={24} placeholder="ชื่อของเจ้า" className="creation-input" required />

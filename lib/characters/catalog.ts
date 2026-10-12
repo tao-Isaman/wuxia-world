@@ -119,6 +119,7 @@ export function npcCharacterId(id: string): CharacterId {
   if (id === "city_capital_physician_lin") return "m3";
   if (id === "city_capital_magistrate_wu") return "m4";
   if (id === "training_capital_apprentice") return "m2";
+  if (id === "ferry_boatman") return "elder";
   if (id === "spy_capital_feng" || id === "spar_spy_feng") return "feng";
   if (id === "merchant_wang") return "wang";
   if (id === "city_capital_clerk_qing") return "qing";

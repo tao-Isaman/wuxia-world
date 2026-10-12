@@ -22,7 +22,16 @@ export interface LocationRoute {
   // Optional supporting hint — shown in small print under each label.
   hintA?: string;
   hintB?: string;
+  /**
+   * A sea lane to or between the islands: kept here so the world map lays the
+   * islands out where their sea lanes pull them (scripts/build-world-coords.ts),
+   * but nobody walks it — the hero takes a boat (lib/world/ferries.ts).
+   */
+  sea?: true;
 }
+
+/** The roads people walk: every entry but the sea lanes. */
+export const isWalkable = (route: LocationRoute) => !route.sea;
 
 export const LOCATION_ROUTES: readonly LocationRoute[] = [
   // ─── Capital region (central — Henan / Shanxi axis) ──────────────
@@ -96,7 +105,7 @@ export const LOCATION_ROUTES: readonly LocationRoute[] = [
   { a: "city_suzhou", b: "city_jinling",      fromA: "ลำคลองริมเขา",   fromB: "ลำคลองริมเขา" },
   { a: "city_suzhou", b: "villa_yanzi",       fromA: "ทะเลสาบนกแอ่น", fromB: "ทะเลสาบนกแอ่น" },
   { a: "city_suzhou", b: "village_wuxia",     fromA: "ปากลำธาร",       fromB: "ปากลำธาร" },
-  { a: "city_suzhou", b: "isle_taohua",       fromA: "ท่าเรือดอกท้อ",  fromB: "ท่าเรือดอกท้อ", hintA: "ขึ้นเรือออกสู่ทะเลตะวันออก" },
+  { a: "city_suzhou", b: "isle_taohua",       fromA: "ท่าเรือดอกท้อ",  fromB: "ท่าเรือดอกท้อ", hintA: "ขึ้นเรือออกสู่ทะเลตะวันออก", sea: true },
   { a: "city_suzhou", b: "inn_youjian",       fromA: "ตรอกริมทะเลสาบ", fromB: "ตรอกริมทะเลสาบ" },
   { a: "city_jinling", b: "villa_meizhuang",  fromA: "ดงดอกท้อใต้",   fromB: "ดงดอกท้อใต้" },
   { a: "city_jinling", b: "inn_heluo",        fromA: "ตรอกราชธานี",    fromB: "ตรอกราชธานี" },
@@ -146,17 +155,17 @@ export const LOCATION_ROUTES: readonly LocationRoute[] = [
   { a: "mt_kunlun", b: "mt_baituo",           fromA: "เนินหิมะตะวันตก", fromB: "เนินหิมะตะวันออก" },
 
   // ─── Islands (Donghai chain) ────────────────────────────────────
-  { a: "isle_taohua", b: "isle_xiake",        fromA: "ทะเลตะวันออก",   fromB: "ทะเลตะวันตก" },
-  { a: "isle_taohua", b: "isle_yuanyang",     fromA: "ทะเลใต้",        fromB: "ทะเลเหนือ" },
-  { a: "isle_xiake", b: "isle_wuming",        fromA: "ทะเลกลาง",       fromB: "ทะเลกลาง" },
-  { a: "isle_xiake", b: "isle_binghuo",       fromA: "ทะเลเหนือ",       fromB: "ทะเลใต้" },
-  { a: "isle_binghuo", b: "isle_shenlong",    fromA: "ทะเลน้ำแข็ง",    fromB: "ทะเลน้ำแข็ง" },
-  { a: "isle_yuanyang", b: "isle_pili",       fromA: "ทะเลฟ้าผ่า",      fromB: "ทะเลฟ้าผ่า" },
-  { a: "isle_wane", b: "isle_lingshe",        fromA: "ทะเลงู",          fromB: "ทะเลงู" },
-  { a: "isle_wane", b: "isle_boni",           fromA: "ทะเลใต้ฝั่ง",     fromB: "ทะเลใต้ฝั่ง" },
-  { a: "isle_pili", b: "isle_lingshe",        fromA: "ทะเลกลางมหาสมุทร", fromB: "ทะเลกลางมหาสมุทร" },
-  { a: "isle_boni", b: "isle_wuming",         fromA: "ทะเลปลายฟ้า",    fromB: "ทะเลปลายฟ้า" },
-  { a: "isle_shenlong", b: "isle_wuming",     fromA: "ทะเลมังกร",       fromB: "ทะเลมังกร" },
+  { a: "isle_taohua", b: "isle_xiake",        fromA: "ทะเลตะวันออก",   fromB: "ทะเลตะวันตก", sea: true },
+  { a: "isle_taohua", b: "isle_yuanyang",     fromA: "ทะเลใต้",        fromB: "ทะเลเหนือ", sea: true },
+  { a: "isle_xiake", b: "isle_wuming",        fromA: "ทะเลกลาง",       fromB: "ทะเลกลาง", sea: true },
+  { a: "isle_xiake", b: "isle_binghuo",       fromA: "ทะเลเหนือ",       fromB: "ทะเลใต้", sea: true },
+  { a: "isle_binghuo", b: "isle_shenlong",    fromA: "ทะเลน้ำแข็ง",    fromB: "ทะเลน้ำแข็ง", sea: true },
+  { a: "isle_yuanyang", b: "isle_pili",       fromA: "ทะเลฟ้าผ่า",      fromB: "ทะเลฟ้าผ่า", sea: true },
+  { a: "isle_wane", b: "isle_lingshe",        fromA: "ทะเลงู",          fromB: "ทะเลงู", sea: true },
+  { a: "isle_wane", b: "isle_boni",           fromA: "ทะเลใต้ฝั่ง",     fromB: "ทะเลใต้ฝั่ง", sea: true },
+  { a: "isle_pili", b: "isle_lingshe",        fromA: "ทะเลกลางมหาสมุทร", fromB: "ทะเลกลางมหาสมุทร", sea: true },
+  { a: "isle_boni", b: "isle_wuming",         fromA: "ทะเลปลายฟ้า",    fromB: "ทะเลปลายฟ้า", sea: true },
+  { a: "isle_shenlong", b: "isle_wuming",     fromA: "ทะเลมังกร",       fromB: "ทะเลมังกร", sea: true },
 
   // ─── Caves / valleys ────────────────────────────────────────────
   { a: "valley_jueqing", b: "valley_jueqing_bottom", fromA: "ทางลงสู่ใต้", fromB: "ทางขึ้นจากใต้" },

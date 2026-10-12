@@ -148,7 +148,7 @@ export function settleTournamentBout(state: WorldStateData, won: boolean): void 
   const outcome = resolveRound(state, won);
   const heroName = state.playerBuild?.name;
   appendActionLog(state, "tournament", won
-    ? `ชุมนุมวิจารณ์กระบี่เขาหัวซาน · ชนะ${ROUND_LABEL[round] ?? ""} · +${outcome.gold} ตำลึง · +${outcome.wExp} w-exp`
+    ? `ชุมนุมวิจารณ์กระบี่เขาหัวซาน · ชนะ${ROUND_LABEL[round] ?? ""} · +${outcome.gold} ตำลึง · ประสบการณ์ยุทธ +${outcome.wExp}`
     : `ชุมนุมวิจารณ์กระบี่เขาหัวซาน · ตกรอบ${ROUND_LABEL[round] ?? ""}`);
   const after = currentTournament(state);
   if (after?.playerOut && after.status === "running") finishTournament(state);

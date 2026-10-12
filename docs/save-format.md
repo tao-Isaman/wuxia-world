@@ -21,7 +21,7 @@ Without a game server the game keeps everything in the browser's `localStorage`:
 
 | Key | Holds | Version |
 | --- | --- | --- |
-| `localStorage["wusia-world-v1"]` | the player's game (`store/world-store.ts`) — **only without a game server**; with one, each character's save lives on the server ([online.md](online.md#characters-and-saves)) in this same format | **28** |
+| `localStorage["wusia-world-v1"]` | the player's game (`store/world-store.ts`) — **only without a game server**; with one, each character's save lives on the server ([online.md](online.md#characters-and-saves)) in this same format | **29** |
 | `localStorage["wusia-shared-v1"]` | the shared world, `{ version, world }` (`store/world/shared-local.ts`) — only without a game server; with one there is one world on the server for everyone ([online.md](online.md#the-shared-world)) | **1** |
 | `localStorage["wuxia-imported-v1"]` | the local hero already imported to the server (the offer is not shown again) | — |
 | `localStorage["wusia-character-v1"]` | the two /debug builds (`store/character-store.ts`) | **3** |
@@ -55,6 +55,7 @@ A reload during a battle restarts that battle from the start with the hero's sav
 | Where | `currentSceneId`, `lastLocationId`, `visitedLocationIds` |
 | Time | `day`, `time` (0 to below 12 ชั่วยาม): the world clock's, set on every action (`syncClock`) — saved so a reload shows where the hero was; `startDay` (v28): the world day the hero entered the jianghu (`startNewGame`) — progress that grows with the hero's own days (foe power, `playerPowerIndex`; the game-over day count) reads `daysInJianghu` = `day − startDay` (`lib/world/clock.ts`), never the world's `day` |
 | Money and bag | `gold`, `inventory` (item id → count), `inventoryEquipment` (gear id → count) |
+| Looks (v29) | `appearance`: `{ outfit, hideWeapon }` (the outfit worn, ซ่อนอาวุธ); `wardrobe`: the outfits bought from tailors (the others unlock from the save itself: sects, the tournament) — [design/appearance.md](design/appearance.md) |
 | Progress | `wExp`, `skillLevel`, `skillExp`, `artExp`, `meridianPoints`, `statExp`, `lifeSkillXp` (19 keys), `learnedRecipeIds` |
 | Story | `flags`, `quests` (id → `{ id, status, stage, acceptedDefeatedAt?, acceptedHasItemAt? }`), `traits`, `npcStates` |
 | Ledgers | `defeatedCounts`, `stoleFromCounts` |
@@ -92,7 +93,7 @@ They live on the store's state like any other field (every engine reads `state.n
 This is Zustand 5 `persist` over synchronous `localStorage`, so it all happens while the store is created:
 
 1. Read `{ state, version }` from `wusia-world-v1`.
-2. If `version !== 28` (`SAVE_VERSION`, `store/world/save-version.ts`), run `migrate(state, version)`.
+2. If `version !== 29` (`SAVE_VERSION`, `store/world/save-version.ts`), run `migrate(state, version)`.
 3. Run `merge(persisted, current)`: `{ ...current, ...persisted }` (noting which shared fields the save carried), then `seedLoreRumors` and `seedLiveness` if a game exists, and back-fill `playerBuild.baseHp` (`HERO_BASE_HP`, also added to `currentHp`) for saves made before the hero's flat base HP.
 
    This step runs for current-version saves too; it is how new lore reaches old saves.
@@ -170,6 +171,7 @@ What each version added. v1–v13 and v17→v18 are described in the comment abo
 | v25 → v26 | `bossDefeatedDay` (boss id → the day each legendary beast last fell, `lib/world/data/bosses.ts`; default `{}`) |
 | v26 → v27 | the world clock: day stamps rebased (`rebaseDays`); `worldSeed`, `worldEventLog`; the shared-world fields move out of the save into `wusia-shared-v1` |
 | v27 → v28 | the hero's own deeds come back from the shared world (`PLAYER_FROM_WORLD_KEYS`: `assassinatedNpcIds`, `kidnappedNpcIds`, `kidnappedUntil`, `bossDefeatedDay`, `tournament`, `tournamentHistory`): in a world shared by many players these are each player's own; and `startDay` (the hero's first world day: 1 rebased for a pre-v27 save, else the save's `day`). `joinSharedWorld` hands an older local world's values to a save that has none |
+| v28 → v29 | `appearance` (`{ outfit: "default", hideWeapon: false }`) and `wardrobe` (`[]`): outfits and the weapon on the body ([design/appearance.md](design/appearance.md)). Repair keeps only tailors' outfits in `wardrobe` (once each) and puts an outfit no longer held (unknown, a sect the hero is no longer an active disciple of, the other gender's) back to `default` |
 
 ## Repair on load
 
@@ -281,7 +283,7 @@ Content-only changes (a new quest, item or scene) need no version bump: missing 
 
 ## Tests
 
-- **Browser.** `tests/browser/game.spec.ts` loads a hand-written version-18 save and checks that it is upgraded to version 28 and plays.
+- **Browser.** `tests/browser/game.spec.ts` loads a hand-written version-18 save and checks that it is upgraded to version 29 and plays.
 - **Clock and shared world.** `scripts/test-clock.ts` (`bun run test:clock`) checks the save / shared-world split, `attachSharedWorld`, the carried fields, the v28 hand-over of the hero's deeds, `rebaseDays` and the v26 → v27 `migrate`.
 - **Meridians.** `scripts/test-meridians.ts` (`bun run test:meridians`) checks `partialize`, the `migrate` default and the repair of `meridians` / `meridianPoints`.
 - **Rumors.** `scripts/test-lore-rumors.ts` (in `bun run test:rumors`) rehydrates v18 / v19 saves and checks the version, lore seeding and repair.

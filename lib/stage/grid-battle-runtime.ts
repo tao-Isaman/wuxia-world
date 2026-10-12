@@ -523,7 +523,7 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
 
   // ── Units ───────────────────────────────────────────────────────────
   const lookKey = (look: UnitLook) => look.kind === "creature" ? "creature" : look.kind === "anim" ? `anim:${look.sheet}`
-    : look.still ? `still:${look.still}` : `char:${characterId(look.characterId)}`;
+    : look.still ? `still:${look.still}` : `char:${characterId(look.characterId)}${look.outfit ? `:${look.outfit.id}` : ""}`;
 
   interface LookTexture { key: string; kind: ActorKind; feet: number[]; directional: boolean; walk8?: boolean; w: number; h: number;
     actions?: { key: string; scale: number }; anim?: { sheet: AnimSheet; columns: number }; animTop?: number;
@@ -570,7 +570,8 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
         }
       }
       const id = characterId(look.characterId);
-      const [atlas, combat] = await Promise.all([loadCharacterAtlas(id),
+      const outfit = look.outfit ? { id: look.outfit.id, tint: { primary: look.outfit.primary, secondary: look.outfit.secondary } } : undefined;
+      const [atlas, combat] = await Promise.all([loadCharacterAtlas(id, true, outfit),
         // A missing combat sheet only costs the painted poses, never the character. A PixelLab
         // hero plays its own attack clip, so the painted poses (another style) stay out.
         hasHeroActions(id) && !getPlSheet(id) ? loadImage(heroCombatSheet(id)).catch(() => null) : Promise.resolve(null)]);
@@ -1090,7 +1091,7 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
       const jitter = ((index % 3) - 1) * 12 * uiScale;
       floatText(text, color, missed ? 16 : crit ? 28 : 22, target.x + jitter,
         target.y - target.head * target.s - (18 + (index % 2) * 14) * uiScale, 900, crit ? 0.12 : 0);
-      if (crit && !missed && damage > 0) floatText("暴擊", "#ffe9a8", 13, target.x + jitter, target.y - target.head * target.s - 44 * uiScale, 900);
+      if (crit && !missed && damage > 0) floatText("คริติคอล!", "#ffe9a8", 13, target.x + jitter, target.y - target.head * target.s - 44 * uiScale, 900);
       if (missed) {
         anyMiss = true;
         if (!reduced && vfx) vfx.whiff(play.vfx, at, dir, index, elapsed);

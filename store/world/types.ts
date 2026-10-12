@@ -241,6 +241,12 @@ export interface WorldStore extends WorldStateData {
   // What a won fight pays (rolled once, the first time it is asked for, and
   // used by acknowledgeBattleResult); null while there is no won world battle.
   victorySpoils: () => VictorySpoils | null;
+  /** Wear an outfit the wardrobe holds (lib/world/appearance.ts); false when it is locked. */
+  wearOutfit: (id: string) => boolean;
+  /** Buy a tailor's outfit (in a city) and wear it. */
+  buyOutfit: (id: string) => { ok: boolean; reason?: import("@/lib/world/appearance").BuyOutfitRefusal };
+  /** Hide or show the weapon carried on the body (ซ่อนอาวุธ). */
+  setHideWeapon: (hide: boolean) => void;
   /** Open a letter: mark it read (its gift waits for claimLetterGift). */
   readLetter: (letterId: string) => { ok: boolean };
   /** Take a letter's gift into the bag (รับของ). */
@@ -251,6 +257,8 @@ export interface WorldStore extends WorldStateData {
   deleteLetters: (letterIds: string[]) => { ok: boolean; deleted: number; discarded: number };
   /** Ride from this place's horse station to a visited station place. */
   stationTravel: (to: string) => { ok: boolean; reason?: "no-station" | "unknown" | "gold" };
+  /** Sail with the boatman from a pier to another (lib/world/ferries.ts). */
+  ferryTravel: (to: string) => { ok: boolean; reason?: "no-ferry" | "unknown" | "gold" };
   /** Pay the fee and register for this year's sword tournament. */
   registerTournament: () => boolean;
   /** Start the tournament (on its day) or the hero's next bout: queues the battle. */

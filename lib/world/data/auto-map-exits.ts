@@ -33,12 +33,6 @@ export const AUTO_MAP_EXIT_POINTS: Readonly<Record<string, Readonly<Record<strin
   inn_gaosheng: { city_yangzhou: { x: 96.7, y: 46.9 }, sect_beggars: { x: 21.4, y: 94.5 } },
   inn_heluo: { city_jinling: { x: 61.7, y: 93.8 }, sect_quanzhen: { x: 4.0, y: 38.8 } },
   inn_yuelai: { city_capital: { x: 40.8, y: 6.2 }, palace_royal: { x: 79.2, y: 93.8 } },
-  isle_binghuo: { isle_shenlong: { x: 87.5, y: 93.8 }, isle_xiake: { x: 51.0, y: 93.4 } },
-  isle_boni: { isle_wane: { x: 26.0, y: 93.8 }, isle_wuming: { x: 49.8, y: 6.2 } },
-  isle_lingshe: { isle_pili: { x: 50.5, y: 6.2 }, isle_wane: { x: 74.5, y: 94.5 } },
-  isle_shenlong: { isle_binghuo: { x: 17.1, y: 5.9 }, isle_wuming: { x: 50.2, y: 94.1 } },
-  isle_taohua: { city_suzhou: { x: 3.6, y: 53.9 }, isle_xiake: { x: 96.4, y: 52.0 }, isle_yuanyang: { x: 50.0, y: 94.2 } },
-  isle_wane: { isle_boni: { x: 95.0, y: 5.9 }, isle_lingshe: { x: 4.7, y: 7.0 } },
   market_miao: { city_dali: { x: 96.4, y: 39.8 }, sect_wudu: { x: 92.7, y: 6.2 } },
   mt_baituo: { city_lingxiao: { x: 49.2, y: 5.9 }, city_xixia: { x: 4.0, y: 41.9 }, mt_kunlun: { x: 96.0, y: 41.9 }, sect_lingjiu: { x: 93.8, y: 7.0 }, tribe_huizu: { x: 9.9, y: 93.8 } },
   mt_kunlun: { mt_baituo: { x: 4.0, y: 47.2 }, mt_kunlun_immortal: { x: 9.8, y: 93.8 }, peak_guangming: { x: 96.0, y: 52.0 }, sect_lingjiu: { x: 46.4, y: 6.2 }, sect_xingxiu: { x: 5.2, y: 7.5 }, temple_dalun: { x: 49.2, y: 93.8 } },
@@ -82,4 +76,18 @@ export const AUTO_MAP_EXIT_POINTS: Readonly<Record<string, Readonly<Record<strin
   village_qigu: { city_capital: { x: 91.7, y: 5.9 }, home_yanji: { x: 96.4, y: 51.6 }, village_noname: { x: 3.6, y: 48.1 } },
   village_taishan: { sect_songshan: { x: 49.0, y: 93.8 }, sect_taishan: { x: 94.3, y: 6.2 } },
   village_wuxia: { city_suzhou: { x: 50.8, y: 6.2 }, city_yangzhou: { x: 4.0, y: 44.1 } },
+};
+
+/**
+ * Where a boat lands on each island's painting: the shore its old sea path
+ * reached (the islands are sailed to, not walked — lib/world/ferries.ts). The
+ * boatman stands a little inland from it.
+ */
+export const FERRY_LANDINGS: Readonly<Record<string, MapPoint>> = {
+  isle_binghuo: { x: 87.5, y: 93.8 }, // toward isle_shenlong
+  isle_boni: { x: 26.0, y: 93.8 }, // toward isle_wane
+  isle_lingshe: { x: 50.5, y: 6.2 }, // toward isle_pili
+  isle_shenlong: { x: 17.1, y: 5.9 }, // toward isle_binghuo
+  isle_taohua: { x: 3.6, y: 53.9 }, // toward city_suzhou
+  isle_wane: { x: 95.0, y: 5.9 }, // toward isle_boni
 };

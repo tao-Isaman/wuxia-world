@@ -61,7 +61,7 @@ export function TournamentPopup({ open, onClose }: Props) {
     <Modal open={open} onClose={onClose} title="⚔ ชุมนุมประลองกระบี่หัวซาน">
       <div className="space-y-3 text-sm" data-testid="tournament-popup">
         <p className="text-xs text-muted-foreground">
-          จัดขึ้นปีละครั้งบนยอดเขาหัวซาน (สำนักหัวซานเป็นเจ้าภาพ ส่งจดหมายเชิญเมื่อเปิดรับลงชื่อ) · ยอดฝีมือ 32 คนประลองแบบแพ้คัดออก · ชนะแต่ละรอบได้เงินและ w-exp
+          จัดขึ้นปีละครั้งบนยอดเขาหัวซาน (สำนักหัวซานเป็นเจ้าภาพ ส่งจดหมายเชิญเมื่อเปิดรับลงชื่อ) · ยอดฝีมือ 32 คนประลองแบบแพ้คัดออก · ชนะแต่ละรอบได้เงินและประสบการณ์ยุทธ
           ผู้ชนะเลิศเลือกเรียนวิชาหนึ่งอย่างจากผู้เข้าแข่งขันทั้งหมด
         </p>
         <div className="rounded bg-muted/30 px-2 py-1.5">
@@ -97,7 +97,7 @@ export function TournamentPopup({ open, onClose }: Props) {
         {t && (t.gold > 0 || t.wExp > 0 || t.playerPlace) && (
           <div className="text-xs" data-testid="tournament-result">
             {t.playerPlace ? <>ผลของท่าน: <strong>{PLACE_LABEL[t.playerPlace]}</strong> · </> : null}
-            ได้รับ {t.gold} ตำลึง · {t.wExp} w-exp
+            ได้รับ {t.gold} ตำลึง · ประสบการณ์ยุทธ {t.wExp}
           </div>
         )}
 

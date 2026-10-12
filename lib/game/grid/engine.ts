@@ -89,7 +89,7 @@ function reviveFallen(state: GridBattleState): void {
     if (!u.alive || u.hp > 0 || !u.revive) continue;
     u.hp = Math.max(1, Math.round(u.derived.HP * u.revive / 100));
     u.revive = undefined;
-    pushLog(state, { cls: "lS", txt: `&nbsp;✺ ${nm(u)} ${REVIVE_LABEL}! (HP ${u.hp})` });
+    pushLog(state, { cls: "lS", txt: `&nbsp;✺ ${nm(u)} ${REVIVE_LABEL}! (พลังชีวิต ${u.hp})` });
     pushEvent(state, { t: "proc", unitId: u.id, kind: "revive", label: REVIVE_LABEL });
   }
 }
@@ -393,7 +393,7 @@ function doItem(state: GridBattleState, u: GridUnit, itemId: string, name: strin
     const mp = Math.min(u.derived.MP - u.mp, Math.round((effect.mp ?? 0) + u.derived.MP * (effect.mpPct ?? 0) / 100));
     u.hp += Math.max(0, hp); u.mp += Math.max(0, mp);
     results.push({ unitId: u.id, damages: [], crits: [], misses: [], healed: Math.max(0, hp), killed: false });
-    pushLog(state, { cls: cls(u), txt: `[${turn}] ${nm(u)} ใช้ ${escapeBattleText(name)}${hp > 0 ? ` · HP +${hp}` : ""}${mp > 0 ? ` · MP +${mp}` : ""}` });
+    pushLog(state, { cls: cls(u), txt: `[${turn}] ${nm(u)} ใช้ ${escapeBattleText(name)}${hp > 0 ? ` · พลังชีวิต +${hp}` : ""}${mp > 0 ? ` · ปราณ +${mp}` : ""}` });
   } else {
     const t = state.units.find((o) => o.alive && sameCell(o.pos, aimed) && o.team !== u.team);
     if (!t) return false;

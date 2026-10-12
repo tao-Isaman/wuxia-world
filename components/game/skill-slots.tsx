@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import {
   ARTS,
   SKILLS,
+  STAT_LABEL,
   TIERS,
   WEAPON_FAMILY_LABEL,
   bpMultiplier,
@@ -38,14 +39,14 @@ export function SkillSlots({ side }: Props) {
     const skillOpts = SKILLS.map<ComboOption>((sk) => ({
       value: sk.id,
       label: sk.n,
-      group: `กระบวนท่า T${sk.ti} (CD${TIERS[sk.ti].cd})`,
+      group: `กระบวนท่า${TIERS[sk.ti].n} (พัก ${TIERS[sk.ti].cd} ตา)`,
       hint: WEAPON_FAMILY_LABEL[sk.w],
     }));
     const artOpts = ARTS.filter((a) => a.id !== "none").map<ComboOption>((a) => ({
       value: encodeArtSlot(a.id),
       label: `⚛ ${a.n}`,
-      group: `กำลังภายใน T${a.ti}`,
-      hint: a.act ? `IA CD${a.act.cd}` : "passive",
+      group: `กำลังภายใน${TIERS[a.ti].n}`,
+      hint: a.act ? `ท่าออกพลัง พัก ${a.act.cd} ตา` : "ติดตัว",
     }));
     return [...skillOpts, ...artOpts];
   }, []);
@@ -93,9 +94,9 @@ export function SkillSlots({ side }: Props) {
                 (build.artId === ar.id ? build.artLevel : 1)
               : 1;
           const tag = sk
-            ? `${SKILL_KIND_ICON(sk)} ${WEAPON_FAMILY_LABEL[sk.w]} CD${TIERS[sk.ti].cd}`
+            ? `${SKILL_KIND_ICON(sk)} ${WEAPON_FAMILY_LABEL[sk.w]} พัก ${TIERS[sk.ti].cd} ตา`
             : ar
-              ? `⚛ T${ar.ti} ${ar.act ? `CD${ar.act.cd}` : "ผ่าน"}`
+              ? `⚛ ${TIERS[ar.ti].n} ${ar.act ? `พัก ${ar.act.cd} ตา` : "ติดตัว"}`
               : "—";
           return (
             <div key={i} className="space-y-1">
@@ -155,7 +156,7 @@ export function SkillSlots({ side }: Props) {
         โบนัสจากวิชา:{" "}
         {Object.entries(skillStatBonus).length > 0
           ? Object.entries(skillStatBonus)
-              .map(([k, v]) => `${k}+${v}`)
+              .map(([k, v]) => `${STAT_LABEL[k as keyof typeof STAT_LABEL] ?? k} +${v}`)
               .join(" ")
           : "—"}
       </div>

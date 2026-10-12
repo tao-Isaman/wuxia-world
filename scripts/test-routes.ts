@@ -7,13 +7,16 @@ import { SCENES } from "../lib/world/data";
 import { getLocationMap } from "../lib/world/data/location-maps";
 import { getRouteMap, routeDirection, routeGeometry } from "../lib/world/data/route-maps";
 import { WORLD_COORDS } from "../lib/world/data/world-coords";
-import { LOCATION_ROUTES } from "../lib/world/data/location-routes";
+import { LOCATION_ROUTES, isWalkable } from "../lib/world/data/location-routes";
+import { ferryStops } from "../lib/world/ferries";
+import { getScene } from "../lib/world/data/scenes";
 import { AUTO_MAP_EXIT_POINTS } from "../lib/world/data/auto-map-exits";
 import { DIR8, angleGap, dir8Of, dirVector, mapPointAngle, mapPointDir, oppositeDir, worldBearing } from "../lib/world/compass";
 import { setArrivalFrom, peekArrivalFrom, clearArrivalFrom, clearMapPositions } from "../lib/stage/types";
 import { initialWorldPlacement } from "../lib/stage/world-placement";
 import { ROUTE_GRADES, gradePixels } from "../lib/stage/route-grade";
 import { CENTRAL_RADIUS, regionAt, regionOf } from "../lib/world/data/regions";
+import { ATLAS_IMAGE, ATLAS_REGIONS, ATLAS_SIZE, atlasNeighbours, atlasPlaces, atlasPosition, atlasRoads, atlasRoute, regionLabelPoint, regionPolygon, routingOrigin } from "../lib/world/world-atlas";
 
 let passed = 0;
 function check(name: string, fn: () => void) {
@@ -136,9 +139,16 @@ check("arriving: a hint puts the hero just inside the exit back, facing into the
   assert.ok(facing / paired > 0.85);
 });
 
-check("every place on the world map can be reached by road from the hero's home", () => {
+check("every place on the world map can be reached from the hero's home: on foot, the islands by boat", () => {
   const adj: Record<string, string[]> = {};
-  for (const r of LOCATION_ROUTES) { (adj[r.a] ??= []).push(r.b); (adj[r.b] ??= []).push(r.a); }
+  for (const r of LOCATION_ROUTES.filter(isWalkable)) { (adj[r.a] ??= []).push(r.b); (adj[r.b] ??= []).push(r.a); }
+  for (const a of ferryStops()) for (const b of ferryStops()) if (a !== b) (adj[a] ??= []).push(b);
+  // Nobody walks to an island: every sea lane touches one, and no island has a road.
+  for (const r of LOCATION_ROUTES) if ([r.a, r.b].some((id) => id.startsWith("isle_"))) assert.ok(r.sea, `${r.a} ↔ ${r.b} is a sea lane`);
+  for (const id of ferryStops().filter((s) => s.startsWith("isle_"))) {
+    const scene = getScene(id);
+    assert.ok(scene?.kind === "location" && scene.routes.length === 0, `${id} has no road out`);
+  }
   const seen = new Set(["home_player"]), queue = ["home_player"];
   while (queue.length) for (const next of adj[queue.pop()!] ?? []) if (!seen.has(next)) { seen.add(next); queue.push(next); }
   const cut = Object.keys(WORLD_COORDS).filter((id) => !seen.has(id));
@@ -165,6 +175,54 @@ check("regions follow the map: the heartland around the capital, the compass qua
   assert.equal(regionOf("city_capital"), "heartland");
   assert.equal(regionOf("village"), "heartland", "unplaced places count as the heartland");
   for (const region of ["heartland", "north", "south", "east", "west"]) assert.ok((counts[region] ?? 0) >= 5, `${region} has places (${counts[region] ?? 0})`);
+});
+
+// ─── The world atlas (แผนที่โลก) ──────────────────────────────────────
+check("world atlas: every placed location, the walked roads plus the sea lanes, the painted map's size", () => {
+  const places = atlasPlaces();
+  const located = Object.keys(WORLD_COORDS).filter((id) => getScene(id)?.kind === "location");
+  assert.deepEqual(places.map((p) => p.id).sort(), located.sort());
+  for (const p of places) assert.equal(p.region, regionOf(p.id), p.id);
+  const roads = atlasRoads();
+  const sea = roads.filter((r) => r.sea);
+  assert.equal(sea.length, LOCATION_ROUTES.filter((r) => r.sea).length);
+  assert.equal(roads.length - sea.length, LOCATION_ROUTES.filter(isWalkable).length);
+  for (const road of roads) assert.ok(road.sea || (road.labelA && road.labelB), `${road.a}–${road.b} is named from both ends`);
+  assert.ok(existsSync(`public${ATLAS_IMAGE}`), "the painted map");
+  assert.equal(ATLAS_SIZE.width / ATLAS_SIZE.height, 1.5);
+});
+
+check("world atlas: region outlines match regionAt, names sit clear of the places", () => {
+  for (const region of ["north", "south", "east", "west"] as const) {
+    const poly = regionPolygon(region);
+    assert.ok(poly.length >= 3, region);
+    // The polygon's middle lies in the region.
+    const middle = { x: poly.reduce((s, p) => s + p.x, 0) / poly.length, y: poly.reduce((s, p) => s + p.y, 0) / poly.length };
+    assert.equal(regionAt(middle), region);
+  }
+  for (const region of ATLAS_REGIONS) {
+    const at = regionLabelPoint(region);
+    assert.equal(regionAt(at), region, `${region}'s name inside it`);
+    const covered = atlasPlaces().filter((p) => Math.abs(p.x - at.x) < 80 && Math.abs(p.y - at.y) < 22);
+    assert.deepEqual(covered.map((p) => p.id), [], `${region}'s name covers no place`);
+  }
+});
+
+check("world atlas: the hero's spot (a place, a road's middle) and the way to an island ends in a boat ride", () => {
+  assert.deepEqual(atlasPosition({ currentSceneId: "city_capital", lastLocationId: "city_capital" }), { kind: "place", id: "city_capital" });
+  const onRoad = atlasPosition({ currentSceneId: "route_city_capital__to__city_changan", lastLocationId: "city_capital" });
+  assert.deepEqual(onRoad, { kind: "road", from: "city_capital", to: "city_changan" });
+  assert.equal(routingOrigin(onRoad), "city_changan");
+  const way = atlasRoute("city_capital", "isle_boni")!;
+  assert.ok(way.length >= 2);
+  const last = way[way.length - 1];
+  assert.equal(last.to, "isle_boni");
+  assert.ok(last.ferry && last.ferry.gold > 0, "the last leg is the boat");
+  assert.ok(way.slice(0, -1).every((step) => !step.ferry), "walked to the port");
+  assert.ok(way.every((step) => step.road && step.direction), "every step named, with its direction");
+  assert.deepEqual(atlasRoute("city_capital", "city_capital"), []);
+  // An island lists its sea lanes; nobody walks off it.
+  assert.ok(atlasNeighbours("isle_boni").every((n) => n.road.sea));
 });
 
 console.log(`${passed} route checks passed`);

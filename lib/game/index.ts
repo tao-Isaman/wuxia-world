@@ -140,3 +140,4 @@ export {
   POWER_TIERS, powerBreakdown, powerScore, powerTier, powerTierOf, powerOutlook,
   type PowerTier, type PowerBreakdown, type PowerOutlook,
 } from "./power-tier";
+export { DERIVED_LABEL, equipStatParts, equipBonusParts } from "./stat-text";

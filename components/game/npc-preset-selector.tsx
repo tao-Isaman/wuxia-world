@@ -40,7 +40,7 @@ export function NpcPresetSelector({ side }: Props) {
   return (
     <div className="flex items-center gap-2 text-xs">
       <label htmlFor={`npc-preset-${side}`} className="text-muted-foreground shrink-0">
-        โหลด NPC:
+        โหลดคู่ต่อสู้:
       </label>
       <select
         id={`npc-preset-${side}`}
@@ -48,7 +48,7 @@ export function NpcPresetSelector({ side }: Props) {
         onChange={(e) => onSelect(e.target.value)}
         className="flex-1 border border-border bg-background px-2 py-1 text-xs focus:outline-none focus:border-primary"
       >
-        <option value="">— เลือก NPC —</option>
+        <option value="">— เลือกคู่ต่อสู้ —</option>
         {grouped.map(({ tierLabel, opponents }) => (
           <optgroup key={tierLabel} label={tierLabel}>
             {opponents.map((opp) => (

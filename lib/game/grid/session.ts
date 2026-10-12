@@ -14,7 +14,9 @@
 // Only commands that changed the battle are logged, so a replay must accept
 // every one of them.
 
-import type { CharacterBuild } from "../types";
+import type { CharacterBuild, WeaponFamily } from "../types";
+import { WEAPON_FAMILY_LABEL } from "../data/weapons";
+import { escapeBattleText } from "../effects";
 import { getArt } from "../data/arts";
 import { getMasteryMap } from "../derive";
 import { seededRng, withRandom } from "../rng";
@@ -133,14 +135,15 @@ export function startSession(a: CharacterBuild, b: CharacterBuild, opts: BattleS
     const leader = battle.units[0];
     const log = (txt: string) => battle.log.push({ cls: "lS", txt });
     log("━━ เริ่มการต่อสู้ ━━");
-    if (typeof opts.hpA === "number" && leader.hp < leader.derived.HP) log(`A เริ่มต้นด้วย HP ${leader.hp}/${leader.derived.HP}`);
-    if (typeof opts.mpA === "number" && leader.mp < leader.derived.MP) log(`A เริ่มต้นด้วย MP ${leader.mp}/${leader.derived.MP}`);
+    const nameA = escapeBattleText(leader.name), nameB = escapeBattleText(battle.units[1]?.name ?? "");
+    if (typeof opts.hpA === "number" && leader.hp < leader.derived.HP) log(`${nameA} เริ่มต้นด้วยพลังชีวิต ${leader.hp}/${leader.derived.HP}`);
+    if (typeof opts.mpA === "number" && leader.mp < leader.derived.MP) log(`${nameA} เริ่มต้นด้วยปราณ ${leader.mp}/${leader.derived.MP}`);
     for (const [w, v] of Object.entries(getMasteryMap(a.skillIds, a.skillLevels))) {
-      log(`A: ${w} ×${(1 + (v / 200) * 0.5).toFixed(2)}`);
+      log(`${nameA}: ชำนาญ${WEAPON_FAMILY_LABEL[w as WeaponFamily] ?? w} ×${(1 + (v / 200) * 0.5).toFixed(2)}`);
     }
     const aA = getArt(a.artId), aB = getArt(b.artId);
-    if (aA.id !== "none") log(`A IA: ${aA.n} ขั้น${a.artLevel} HP+${aA.hL * a.artLevel} MP+${aA.mL * a.artLevel}`);
-    if (aB.id !== "none") log(`B IA: ${aB.n} ขั้น${b.artLevel} HP+${aB.hL * b.artLevel} MP+${aB.mL * b.artLevel}`);
+    if (aA.id !== "none") log(`${nameA} ลมปราณ: ${aA.n} ขั้น ${a.artLevel} · พลังชีวิต +${aA.hL * a.artLevel} · ปราณ +${aA.mL * a.artLevel}`);
+    if (aB.id !== "none") log(`${nameB} ลมปราณ: ${aB.n} ขั้น ${b.artLevel} · พลังชีวิต +${aB.hL * b.artLevel} · ปราณ +${aB.mL * b.artLevel}`);
     const extra = battle.units.length - 2;
     if (extra > 0) log(`ฝ่ายศัตรูมีพวกอีก ${extra} คน`);
     return battle;

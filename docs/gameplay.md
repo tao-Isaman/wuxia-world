@@ -86,7 +86,7 @@ A typical first session in the capital:
 
 - **Landscape only.** The game is played on its side: a phone held upright shows it turned 90°, and the menus are laid out in columns and tabs so nothing scrolls.
 - **Top left:** a slim card with HP, MP and พลัง (stamina) gauges, and under it the icon bar — 1 โปรไฟล์, 2 ย่าม (bag), 3 วิชา (skills), 4 อาชีพ (life skills and crafts), 5 ภารกิจ (quests), 6 สำนัก (sect), 7 บันทึก (action log), ♪ sound, and the install button.
-- **Top right:** gold (ตำลึง), w-exp (悟), the sundial, the day, and the tracked quest (📌).
+- **Top right:** gold (ตำลึง), ประสบการณ์ยุทธ (shown as N ยุทธ), the sundial, the day, and the tracked quest (📌).
 - **Top centre:** wanted marks and the jail sentence, when you have any.
 - **Bottom right:** พัก (rest), and above it the action button (คุยกับ / ไปที่ / ใช้ + the target's name).
 - **Arrival:** entering a location shows its name as a banner. Saving is automatic and continuous.
@@ -118,7 +118,7 @@ Everything happens at once; the price is stamina (an action that used to take *h
 
 **Regeneration.** Out of battle, stamina refills on its own in 6 ชั่วยาม (30 real minutes) and HP / MP in 12 (one real hour), whether or not the game is open. Back after a day or more away, a toast and the log say how many days passed (ระหว่างที่ท่านไม่อยู่ ผ่านไป N วัน).
 
-Night is the five watches, 戌 to 寅 (ชั่วยาม 7–11; `isNight` in `lib/world/clock.ts`). It only changes the lighting, the sundial, the HUD's ยามค่ำ and the music (the synthesized `night` song where a place has no region song).
+Night is the five watches, ยามซวี to ยามอิ๋น (ชั่วยาม 7–11; `isNight` in `lib/world/clock.ts`). It only changes the lighting, the sundial, the HUD's ยามค่ำ and the music (the synthesized `night` song where a place has no region song).
 
 ### Resting
 
@@ -157,6 +157,31 @@ Every city, village and the grounds of the 15 joinable sects have a horse statio
 - Roaming foes on the map you leave are gone when you arrive.
 
 Code: `lib/world/stations.ts`; the store's `stationTravel`.
+
+### Boats to the islands (ลุงจาง คนแจวเรือ)
+
+Nobody walks to the ten islands of the eastern sea. **ลุงจาง คนแจวเรือ** stands at the ports (ซูโจว and หยางโจว) and on every island, where the old sea path met the shore; talking to him opens the boat list:
+
+- **Where:** from any pier to any other pier — a port or an island — visited or not.
+- **Fare:** 40 gold + 0.5 gold per world-map unit (ซูโจว → เกาะดอกท้อ about 100, to the far islands about 200).
+- **Time:** none, like a horse; foes left behind on the map are gone.
+- He is not a registry NPC: he can't be fought, robbed or killed, so nobody is ever stranded on an island.
+- The quest guide and the world map's way-finding walk to a port, then point at him for the crossing.
+
+Code: `lib/world/ferries.ts`; the store's `ferryTravel`; `components/world/popups/ferry-popup.tsx`.
+
+### The world map (แผนที่โลก)
+
+The แผนที่ section (the last menu icon, hotkey **M**) shows the jianghu as one painted ink-and-watercolour map with its cities, temples, villages and roads drawn in (`public/maps/world-atlas.webp`, painted to the world coordinates), and over it:
+
+- **Every place** as a marker by kind (city, sect, village, home, inn, temple and palace, manor, cave and valley, island, peak, lake, desert, tribe and market), 🐎 on horse stations, ⛵ on piers; places never visited are paler, with a dashed ring. Cities' and sects' names always show, the rest once the map is zoomed in.
+- **The roads** in the style of their kind (ทางหลวง, ทางชนบท, ทางป่า, ทางขึ้นเขา, ทางหุบผา, ทางตรอก) and the dotted sea lanes; a road whose both ends you have visited is drawn in full ink.
+- **The five regions**: ภาคกลาง is the circle round the capital, the others the compass quarters beyond it — the same rule rumors, music and road colours use. A region tab frames the region, darkens the rest and lists its places with how many you have explored.
+- **Where you are** (a red pin; on a road, half way along it), the tracked quest's place 📌 and the waypoint 🧭.
+- **The way there:** tap a place to read it, see its roads out, and the walk from where you are, step by step — each road's name and direction, and any boat with its fare — drawn on the map as a marching red line. **🧭 นำทางไปที่นี่** makes it the guide arrow's destination (a gold card above the quest tracker, ✕ to drop it); arriving ends it.
+- Drag to move, pinch or the wheel to zoom, ◎ to come back to yourself.
+
+Code: `lib/world/world-atlas.ts` (places, roads, regions, position, routes), `components/world/popups/world-map-popup.tsx`, `app/world-map.css`; the waypoint is `flags.mapWaypoint` (`waypointGuide` / `navigationGuide`, `lib/world/quest-guide.ts`).
 
 ## Random encounters
 
@@ -432,6 +457,11 @@ Mastery levels 1–5 need 0 / 100 / 300 / 700 / 1500 xp.
 
 **Gear (76 pieces).** Ten slots: weapon, armour, head, boots, two bracers, two rings, two charms. Gear from the bag is equipped in ย่าม, and a replaced piece goes back to the bag. Stats and effects are in [combat.md](combat.md).
 
+**Outfits and the weapon on the body** ([design/appearance.md](design/appearance.md)). The โปรไฟล์ window's **ชุด** tab is the wardrobe: each outfit shows the hero in it, carrying their weapon. An outfit changes only the look (never stats) and is a recolour of the hero's own drawing, so it shows on the map, in battle and in films, and other players see it online.
+
+- **Which:** ชุดเดิม; the uniform of the hero's own sect while they are its disciple (other sects' uniforms are not listed; leaving the sect puts it away); six tailor's outfits, bought in any city (ชุดคราม 300, ชุดขาวไว้ทุกข์ 300, ชุดหมึกดำ 500, ชุดผ้าไหมแดง 600, ชุดเขียวหยก 800, ชุดขุนนางทอง 3,000 ตำลึง) and kept for good; ชุดยอดฝีมือ for a tournament champion.
+- **The weapon on the body:** the equipped weapon is drawn on the hero on the map — long weapons, sabres and instruments across the back, fans at the waist (fists, hidden weapons and the jian the hero already wears at the hip are not drawn). Behind the body facing the viewer or in profile, in front of it facing away. **ซ่อนอาวุธ** hides it.
+
 ## Progression
 
 ### Skills and inner arts
@@ -470,7 +500,7 @@ Practice:
 
   A skill with no yin / yang / balance tag counts as balance, so it gets the mountain bonus.
 
-**W-exp (悟, ประสบการณ์ยุทธ)** is a shared pool. **เลื่อนระดับ (ใช้ประสบการณ์ยุทธ N)** in the วิชา menu buys the rest of the current level with it.
+**W-exp (ประสบการณ์ยุทธ)** is a shared pool. **เลื่อนระดับ (ใช้ประสบการณ์ยุทธ N)** in the วิชา menu buys the rest of the current level with it.
 
 | W-exp source | Amount |
 | --- | --- |

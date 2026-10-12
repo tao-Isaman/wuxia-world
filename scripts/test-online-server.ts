@@ -71,12 +71,12 @@ const isWelcome = (m: ServerMsg): m is Extract<ServerMsg, { t: "welcome" }> => m
 const isEvent = <K extends string>(kind: K) => (m: ServerMsg): m is Extract<ServerMsg, { t: "event" }> => m.t === "event" && m.ev.t === kind;
 const isError = (code: string) => (m: ServerMsg): m is Extract<ServerMsg, { t: "error" }> => m.t === "error" && m.code === code;
 
-function open(token: string, name: string, x: number): Promise<{ conn: RoomConnection; inbox: ServerMsg[] }> {
+function open(token: string, name: string, x: number, look?: { outfit: string; weapon: string | null }): Promise<{ conn: RoomConnection; inbox: ServerMsg[] }> {
   const inbox: ServerMsg[] = [];
   return new Promise((resolve) => {
     const conn = connectRoom({
       server, token, room,
-      hello: { name, body: name.startsWith("ก") ? "f1" : "m1", x, y: 300, dir: "S" },
+      hello: { name, body: name.startsWith("ก") ? "f1" : "m1", x, y: 300, dir: "S", ...look },
       onMessage: (message) => inbox.push(message),
       onOpen: () => resolve({ conn, inbox }),
     });
@@ -91,7 +91,7 @@ let bobToken = "";
 await check("health answers with the protocol version", async () => {
   const health = await (await fetch(`${server}/health`)).json() as { ok: boolean; protocol: number };
   assert.equal(health.ok, true);
-  assert.equal(health.protocol, 2);
+  assert.equal(health.protocol, 3);
   assert.equal((health as { auth?: string }).auth, "ready", "the server can reach its signing key (KeyObject)");
 });
 
@@ -172,6 +172,26 @@ await check("map chat: a line reaches everyone on the map with the speaker's nam
   await next(a.inbox, isError("bad_text"));
   for (let i = 0; i < 5; i++) a.conn.say(`บรรทัด ${i}`);
   await next(a.inbox, isError("too_fast"));
+  a.conn.close();
+  b.conn.close();
+});
+
+await check("looks: an outfit and a carried weapon arrive with the player; a change is heard by all; bad or hurried looks are refused", async () => {
+  const a = await open(annToken, "อาจารย์หลิว", 200, { outfit: "sect_emei", weapon: "eq_t1_w_long" });
+  await next(a.inbox, isWelcome);
+  const b = await open(bobToken, "กาเหว่า", 600);
+  const welcome = await next(b.inbox, isWelcome);
+  const annThere = welcome.players.find((p) => p.id === ann)!;
+  assert.deepEqual([annThere.outfit, annThere.weapon], ["sect_emei", "eq_t1_w_long"]);
+  assert.equal(welcome.players.find((p) => p.id === bob)!.outfit, "default", "no look given: the default");
+  a.conn.look({ outfit: "tailor_ink", weapon: null });
+  const looked = await next(b.inbox, isEvent("looked"));
+  assert.ok(looked.ev.t === "looked" && looked.ev.id === ann && looked.ev.outfit === "tailor_ink" && looked.ev.weapon === null);
+  a.conn.look({ outfit: "tailor_jade", weapon: null });
+  await next(a.inbox, isError("too_fast"));
+  await new Promise((r) => setTimeout(r, 600));
+  a.conn.look({ outfit: "<script>", weapon: null });
+  await next(a.inbox, isError("bad_profile"));
   a.conn.close();
   b.conn.close();
 });

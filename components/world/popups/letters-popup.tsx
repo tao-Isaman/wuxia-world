@@ -30,7 +30,7 @@ interface Props {
 /** The letter's gift as a bag-style tile: the item's icon (glyph fallback), or gold ingots. */
 function GiftIcon({ letter, size }: { letter: Letter; size?: "sm" }) {
   const item = letter.itemId ? getItem(letter.itemId) : null;
-  const glyph = letter.gold ? "金" : CATEGORY_GLYPH[item?.category ?? "misc"];
+  const glyph = letter.gold ? "💰" : CATEGORY_GLYPH[item?.category ?? "misc"];
   return (
     <span className={`letter-gift${size === "sm" ? " letter-gift--sm" : ""}${letter.claimed ? " letter-gift--taken" : ""}`}>
       <ItemTile glyph={glyph} icon={letter.gold ? GOLD_ICON_URL : itemIconUrl(letter.itemId)} rarity={letter.rarity} count={letter.count} label={letterGiftLabel(letter)} />

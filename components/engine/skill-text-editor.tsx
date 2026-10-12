@@ -187,8 +187,8 @@ function TextRowEditor({ row, draft, setDraft, issues, quests }: {
       <div className="eng-card-preview" data-testid="skill-preview">{preview}</div>
       <h3>ตัวเลข (อ่านอย่างเดียว)</h3>
       <p className="eng-numbers">{row.skill ? skillNumbers(row.skill) : row.art ? artNumbers(row.art) : ""}</p>
-      <h3>เควสที่เอ่ยชื่อนี้</h3>
-      {quests.length === 0 ? <p className="eng-muted">กำลังโหลดเควส…</p>
+      <h3>ภารกิจที่เอ่ยชื่อนี้</h3>
+      {quests.length === 0 ? <p className="eng-muted">กำลังโหลดภารกิจ…</p>
         : mentions.length === 0 ? <p className="eng-muted">ไม่มี</p>
         : <ul className="eng-mentions">{mentions.slice(0, 12).map((q) => <li key={q.id}><code>{q.id}</code> {q.name}</li>)}{mentions.length > 12 && <li>…อีก {mentions.length - 12}</li>}</ul>}
     </div>

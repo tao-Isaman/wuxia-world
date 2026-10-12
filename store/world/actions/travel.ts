@@ -1,12 +1,13 @@
 // Dialog choices and moving between scenes (roads, horse stations).
 import { hasStation, stationTrips } from "@/lib/world/stations";
+import { FERRYMAN, ferryTrips, hasFerry } from "@/lib/world/ferries";
 import { applyEffects, getScene } from "@/lib/world";
 import { evaluateCondition } from "@/lib/world/conditions";
 import { canAffordTravelTo, chargeTravelIfNeeded, followAutoAdvance, jailBlocks, takeChoice } from "../navigation";
 import { appendActionLog, draftFrom } from "../state";
 import type { WorldGet, WorldSet, WorldStore } from "../types";
 
-export const travelActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "makeChoice" | "travelRoute" | "gotoScene" | "exitToLocation" | "canTravelTo" | "stationTravel"> => ({
+export const travelActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "makeChoice" | "travelRoute" | "gotoScene" | "exitToLocation" | "canTravelTo" | "stationTravel" | "ferryTravel"> => ({
   makeChoice: (idx) => {
     const s = get();
     if (!s.hasGame || s.pendingBattle) return;
@@ -77,6 +78,23 @@ export const travelActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "m
     const draft = draftFrom(s);
     draft.gold -= trip.gold;
     appendActionLog(draft, "travel", `ขี่ม้าจากสถานีพักม้าไป${(getScene(to) as { name?: string } | null)?.name ?? to} · ${trip.gold} ตำลึง`);
+    draft.currentSceneId = to;
+    const sc = getScene(to);
+    if (sc?.onEnter) applyEffects(draft, sc.onEnter);
+    followAutoAdvance(draft);
+    set({ ...draft, roamingFoes: [] });
+    return { ok: true };
+  },
+
+  ferryTravel: (to) => {
+    const s = get();
+    if (!hasFerry(s.currentSceneId)) return { ok: false, reason: "no-ferry" };
+    const trip = ferryTrips(s.currentSceneId).find((t) => t.to === to);
+    if (!trip) return { ok: false, reason: "unknown" };
+    if (s.gold < trip.gold) return { ok: false, reason: "gold" };
+    const draft = draftFrom(s);
+    draft.gold -= trip.gold;
+    appendActionLog(draft, "travel", `นั่งเรือ${FERRYMAN.name}ไป${(getScene(to) as { name?: string } | null)?.name ?? to} · ${trip.gold} ตำลึง`);
     draft.currentSceneId = to;
     const sc = getScene(to);
     if (sc?.onEnter) applyEffects(draft, sc.onEnter);

@@ -1,9 +1,10 @@
 "use client";
 import { useLoadingStore } from "@/store/loading-store";
+import { characterLook, heroLook } from "@/lib/world/appearance";
 import { heroHasPose, heroPoseStrip } from "@/lib/characters/hero-actions";
 import { useEffect, useRef, useState } from "react";
 import type { ArtisanDef, LocationMapDef, LocationScene, MapSpot, NpcDef } from "@/lib/world";
-import { npcPresent, activeGuide, evaluateCondition, guideMarkerId, objectiveMarkerId, objectiveSpotsAt, objectiveSpotsForNpc, getArtisan, isQuestOfferable, isQuestTurnInForNpc, getResource, getScene, getSectHallAt, getShopAt, npcBodySprite, npcPixelSprite, playerBodySprite } from "@/lib/world";
+import { npcPresent, navigationGuide, evaluateCondition, guideMarkerId, objectiveMarkerId, objectiveSpotsAt, objectiveSpotsForNpc, getArtisan, isQuestOfferable, isQuestTurnInForNpc, getResource, getScene, getSectHallAt, getShopAt, npcBodySprite, npcPixelSprite, playerBodySprite } from "@/lib/world";
 import { heldQuests, npcsAt, predecessorsOf } from "@/lib/world/npc-life";
 import { useWorldStore, TRAVEL_STAMINA_COST } from "@/store/world-store";
 import { getActivity } from "@/lib/world/data/activities";
@@ -14,6 +15,8 @@ import { capitalVignette } from "@/lib/stage/world-vignettes";
 import { bossFoesAt, roamingFoesOn } from "./roaming-foes";
 import { resolveRumorChannel } from "./rumor-listen-button";
 import { hasStation } from "@/lib/world/stations";
+import { FERRYMAN, hasFerry } from "@/lib/world/ferries";
+import { FERRY_LANDINGS } from "@/lib/world/data/auto-map-exits";
 import { TOURNAMENT } from "@/lib/world/tournament";
 import { arrivalSpawn, freeSpot } from "@/lib/stage/map-anchors";
 import { useMapPlacements } from "./use-map-placements";
@@ -33,6 +36,7 @@ export interface MapSpotHandlers {
   onActivity: (activityId: string) => void;
   onObjective: (questId: string, spotIndex: number) => void;
   onStation: () => void;
+  onFerry: () => void;
   onTournament: () => void;
 }
 
@@ -134,6 +138,14 @@ export function LocationMap({ scene, map, handlers, readOnly = false, dialogueSp
     markers.push({ id: "station", ...point, kind: "service", label: "สถานีพักม้า", badge: "station", category: "place",
       onActivate: handlers.onStation });
   }
+  // The boatman: the only way to and between the islands. He waits at the
+  // landing where the old sea path met the shore (islands), else beside the arrival.
+  if (hasFerry(scene.id)) {
+    const landing = FERRY_LANDINGS[scene.id];
+    const point = landing ? { x: landing.x + (50 - landing.x) * 0.12, y: landing.y + (50 - landing.y) * 0.12 } : freeSpot(map.spawn, markers);
+    markers.push({ id: FERRYMAN.markerId, ...point, kind: "npc", label: FERRYMAN.name, category: "place",
+      onActivate: handlers.onFerry });
+  }
   // The sword tournament's ring at the capital.
   if (scene.id === TOURNAMENT.locationId) {
     const point = freeSpot(map.spawn, markers);
@@ -163,7 +175,7 @@ export function LocationMap({ scene, map, handlers, readOnly = false, dialogueSp
         current.gotoScene(routeId);
       } });
   }
-  const guide = activeGuide(state);
+  const guide = navigationGuide(state);
   const guideId = guide ? guideMarkerId(state, guide) : null;
   const guidedMarkers = guideId ? markers.map((marker) => marker.id === guideId ? { ...marker, guide: true } : marker) : markers;
   const arrival = arrivalSpawn(map, arrivedFrom);
@@ -174,7 +186,10 @@ export function LocationMap({ scene, map, handlers, readOnly = false, dialogueSp
   const heroAction = workPose && heroHasPose(state.playerBodyId, workPose) ? heroPoseStrip(state.playerBodyId, workPose) : null;
   // A map whose painting the engine replaced draws its tiled ground instead.
   const ground = placements ? peekMapGround(scene.id) : null;
+  // The hero's outfit and the weapon they carry (docs/design/appearance.md).
+  const look = heroLook(state);
   const presentation: WorldPresentation = { key: scene.id, name: scene.name, image: ground ? groundImageKey(ground.tile) : map.image, heroAction,
+    heroLook: characterLook(look.outfit, look.weapon),
     ground: ground ? { image: ground.image, size: ground.size } : null,
     time: state.time, spawn: arrival?.spawn ?? map.spawn, spawnFacing: arrival?.facing, playerImage: playerBodySprite(state.playerBodyId), markers: guidedMarkers, foes, placements,
     ...capitalVignette(scene.id, state.quests.qc_capital_clinic_supplies?.status === "done",

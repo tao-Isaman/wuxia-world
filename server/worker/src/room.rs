@@ -94,7 +94,7 @@ impl RoomObject {
                         let _ = origin.serialize_attachment(&conn);
                     }
                 }
-                RoomEvent::Moved { .. } => {
+                RoomEvent::Moved { .. } | RoomEvent::Looked { .. } => {
                     if let Some(mut conn) = conn_of(origin) {
                         let id = conn.user.clone();
                         conn.joined = self.with_room(|live| live.room.as_ref().and_then(|r| r.player(&id).cloned()));
@@ -196,7 +196,7 @@ impl DurableObject for RoomObject {
             }
         };
         match message {
-            ClientMsg::Hello { v, name, body, x, y, dir } => {
+            ClientMsg::Hello { v, name, body, x, y, dir, outfit, weapon } => {
                 if v != PROTOCOL_VERSION {
                     reject(&ws, Rejection { code: ErrorCode::BadVersion, message: format!("server speaks protocol {PROTOCOL_VERSION}") });
                     let _ = ws.close(Some(4002), Some("bad version"));
@@ -206,7 +206,7 @@ impl DurableObject for RoomObject {
                     reject(&ws, Rejection { code: ErrorCode::AlreadyJoined, message: "already in this room".into() });
                     return Ok(());
                 }
-                match self.run(Command::Join { id: conn.user.clone(), name, body, x, y, dir }, &ws) {
+                match self.run(Command::Join { id: conn.user.clone(), name, body, x, y, dir, outfit, weapon }, &ws) {
                     Ok(_) => self.welcome(&ws, &conn),
                     Err(rejection) => reject(&ws, rejection),
                 }
@@ -226,6 +226,15 @@ impl DurableObject for RoomObject {
                     return Ok(());
                 }
                 if let Err(rejection) = self.run(Command::Say { id: conn.user.clone(), text }, &ws) {
+                    reject(&ws, rejection);
+                }
+            }
+            ClientMsg::Look { outfit, weapon } => {
+                if conn.joined.is_none() {
+                    reject(&ws, Rejection { code: ErrorCode::NotJoined, message: "say hello first".into() });
+                    return Ok(());
+                }
+                if let Err(rejection) = self.run(Command::Look { id: conn.user.clone(), outfit, weapon }, &ws) {
                     reject(&ws, rejection);
                 }
             }

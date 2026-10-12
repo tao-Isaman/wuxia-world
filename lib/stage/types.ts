@@ -1,7 +1,22 @@
 import type { HeroPoseStrip } from "@/lib/characters/hero-actions";
 import type { PlacementGeometry } from "@/lib/assets/placement-geometry";
 import type { Dir8 } from "@/lib/characters/walk8";
+import type { RecolorTint } from "@/lib/characters/outfit-recolor";
 export interface Point { x: number; y: number }
+
+/** A weapon carried on the body (docs/design/appearance.md): its icon, where, and its length as a share of the figure. */
+export interface CarriedWeapon {
+  id: string;
+  icon: string;
+  carry: "back" | "waist";
+  length: number;
+}
+/** How a hero looks: the outfit (its id and recolour) and the weapon carried, if shown. */
+export interface CharacterLook {
+  outfit: string;
+  tint: RecolorTint | null;
+  weapon: CarriedWeapon | null;
+}
 
 /** Another player on this map (lib/net, docs/online.md), in map units. */
 export interface RemotePlayer extends Point {
@@ -11,6 +26,8 @@ export interface RemotePlayer extends Point {
   body: string;
   dir: Dir8;
   moving: boolean;
+  /** Their outfit and carried weapon (absent: as drawn). */
+  look?: CharacterLook | null;
 }
 /** Where the hero stands and faces, reported every frame to the online session. */
 export interface HeroMotion extends Point {
@@ -98,6 +115,8 @@ export interface WorldPresentation {
    * played in place of the walking sprite while set; read every frame.
    */
   heroAction?: HeroPoseStrip | null;
+  /** The hero's outfit and carried weapon (docs/design/appearance.md); absent: as drawn. */
+  heroLook?: CharacterLook | null;
   /**
    * Objects placed on this map by the engine's map editor
    * (lib/assets/placement-geometry.ts): drawn by layer and depth, their

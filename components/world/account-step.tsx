@@ -49,7 +49,7 @@ export function AccountStep() {
     <form className="hero-creation pixel-panel account-step" data-testid="account-form" data-mode={mode}
       onSubmit={(event) => { event.preventDefault(); void submit(); }}>
       <FlowSteps step={1} />
-      <div className="creation-heading"><span>{mode === "register" ? "สมัครบัญชี" : "เข้าสู่ระบบ"}</span><span className="text-[#d7bd82]">門</span></div>
+      <div className="creation-heading"><span>{mode === "register" ? "สมัครบัญชี" : "เข้าสู่ระบบ"}</span><span className="text-[#d7bd82]">❖</span></div>
       <div className="account-tabs" role="tablist" aria-label="บัญชี">
         {(["register", "login"] as const).map((value) => (
           <button key={value} type="button" role="tab" aria-selected={mode === value}

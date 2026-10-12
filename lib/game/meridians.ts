@@ -30,7 +30,7 @@ export const MERIDIAN_KIND_LABEL: Readonly<Record<MeridianKind, string>> = {
   base: "ค่าสถานะพื้นฐาน",
   combat: "ค่าสถานะการต่อสู้",
   ability: "ความสามารถ",
-  buff: "บัฟพิเศษ",
+  buff: "พลังเสริมพิเศษ",
 };
 
 const CHARTS_BY_ID = new Map<string, MeridianChart>(MERIDIAN_CHARTS.map((c) => [c.id, c]));

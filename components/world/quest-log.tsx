@@ -84,7 +84,7 @@ export function QuestLog({ variant = "card" }: QuestLogProps = {}) {
     <div className="space-y-3">
       <TabBar tab={tab} counts={counts} onSelect={onSwitchTab} />
       {list.length === 0 ? (
-        <div className="menu-empty" data-glyph="令">
+        <div className="menu-empty" data-glyph="ภารกิจ">
           <strong>{tab === "active"
             ? "ยังไม่มีภารกิจที่กำลังทำ"
             : tab === "done"
@@ -476,10 +476,10 @@ function summarizeRewards(rewards: readonly QuestReward[]): string {
         break;
       }
       case "wExp":
-        parts.push(`+${r.amount} w-exp`);
+        parts.push(`ประสบการณ์ยุทธ +${r.amount}`);
         break;
       case "skillExp":
-        parts.push(`+${r.amount} xp`);
+        parts.push(`+${r.amount} ประสบการณ์`);
         break;
       case "trait":
         parts.push(`${r.trait} +${r.amount}`);

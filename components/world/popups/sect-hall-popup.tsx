@@ -13,6 +13,7 @@ import type { SectHallDef } from "@/lib/world";
 import { useWorldStore } from "@/store/world-store";
 import { toast } from "@/store/toast-store";
 import { ArtTooltip, SkillTooltip } from "../skill-tooltip";
+import { plainThai } from "@/lib/game/skill-text";
 import { capitalTrainingStatus } from "@/lib/world/capital-training";
 import { describeSentence } from "@/lib/world/law";
 import { CAPITAL_TRAINING_NAME, CAPITAL_TRAINING_SCENE_ID } from "@/lib/world/data/capital-training";
@@ -52,10 +53,10 @@ export function SectHallPopup({ open, hall, onClose }: Props) {
             <p>{CAPITAL_TRAINING_NAME} · คู่ฝึกระดับเริ่มต้น</p>
             {!training.completed && <>
               <p className="leading-relaxed">ใช้ หมัดตรง ออกกระบวนท่าเมื่อถึงตา · ถ้าเพลี่ยงพล้ำ กด ถอยหนี เพื่อออกจากการต่อสู้</p>
-              <p className="text-muted-foreground leading-relaxed">ไม่มีค่าฝึก · แพ้ไม่เสียชีวิต · ชนะรับ W-EXP และประสบการณ์วิชาที่ใช้ · จบแล้วกลับนครหลวง</p>
+              <p className="text-muted-foreground leading-relaxed">ไม่มีค่าฝึก · แพ้ไม่เสียชีวิต · ชนะรับประสบการณ์ยุทธและประสบการณ์วิชาที่ใช้ · จบแล้วกลับนครหลวง</p>
               <p className="text-muted-foreground">ใช้ 5 แรงทั้งแพ้และชนะ · ผ่านได้หนึ่งครั้ง</p>
             </>}
-            {training.needsRest && <p className="leading-relaxed">HP {training.hp}/{training.maxHp} · MP {training.mp} · พักฟื้นก่อนฝึกได้ฟรี</p>}
+            {training.needsRest && <p className="leading-relaxed">พลังชีวิต {training.hp}/{training.maxHp} · ปราณ {training.mp} · พักฟื้นก่อนฝึกได้ฟรี</p>}
             <div className="flex flex-wrap gap-2">
               {!training.completed && <Button size="sm" disabled={!training.canStart} onClick={() => {
                 if (!capitalTrainingStatus(useWorldStore.getState())?.canStart) return;
@@ -64,11 +65,11 @@ export function SectHallPopup({ open, hall, onClose }: Props) {
               }}>ฝึกประลองฟรี</Button>}
               {training.needsRest && <Button size="sm" variant="outline" onClick={() => {
                 const result = state.rest("route");
-                if (result.ok) toast("success", "พักริมทางแล้ว · ฟื้น HP, MP และแรง ¼");
+                if (result.ok) toast("success", "พักริมทางแล้ว · ฟื้นพลังชีวิต ปราณ และแรง ¼");
                 else if (result.reason === "cooldown") toast("warn", `เพิ่งพักไป · พักได้อีกใน ${describeSentence(result.readyIn)}`);
               }}>พักริมทาง · ฟรี</Button>}
             </div>
-            {training.needsRest && <p className="text-[10px] text-muted-foreground">พักแล้วฟื้นทันที HP, MP และแรง ¼ · พักซ้ำได้ทุก 10 นาที (หรือรอให้ฟื้นเองตามเวลา)</p>}
+            {training.needsRest && <p className="text-[10px] text-muted-foreground">พักแล้วฟื้นพลังชีวิต ปราณ และแรง ¼ ทันที · พักซ้ำได้ทุก 10 นาที (หรือรอให้ฟื้นเองตามเวลา)</p>}
           </section>
         )}
 
@@ -120,7 +121,7 @@ export function SectHallPopup({ open, hall, onClose }: Props) {
                   </div>
                   {(sk?.d ?? art?.d ?? art?.tp) && (
                     <div className="text-[10px] text-muted-foreground">
-                      {sk?.d ?? art?.d ?? art?.tp}
+                      {plainThai(sk?.d ?? art?.d ?? art?.tp)}
                     </div>
                   )}
                 </div>

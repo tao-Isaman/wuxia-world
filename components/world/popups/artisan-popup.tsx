@@ -20,7 +20,7 @@ import {
   type ItemCategory,
   type RecipeDef,
 } from "@/lib/world";
-import { SLOT_LABELS, getEquip } from "@/lib/game";
+import { SLOT_LABELS, equipStatParts, getEquip } from "@/lib/game";
 import { useWorldStore } from "@/store/world-store";
 import { flashLoading } from "@/store/loading-store";
 import { lifeSkillPose } from "@/lib/characters/hero-actions";
@@ -228,7 +228,7 @@ function CraftTab({ artisan }: { artisan: ArtisanDef }) {
                 res.reason === "missing-input"
                   ? "วัตถุดิบไม่ครบ"
                   : res.reason === "missing-mastery"
-                    ? "มาสเตอร์รี่ยังไม่ถึงระดับที่กำหนด"
+                    ? "ความชำนาญยังไม่ถึงระดับที่กำหนด"
                     : res.reason === "not-learned"
                       ? "ยังไม่ได้เรียนสูตรนี้"
                       : res.reason === "no-artisan"
@@ -241,13 +241,13 @@ function CraftTab({ artisan }: { artisan: ArtisanDef }) {
             if (res.dropCheck === "failed") {
               toast(
                 "warn",
-                `พลาดในขั้นตอนสุดท้าย — เสียวัตถุดิบ · +${res.xpGained} xp`,
+                `พลาดในขั้นตอนสุดท้าย — เสียวัตถุดิบ · +${res.xpGained} ประสบการณ์`,
               );
               return;
             }
             toast(
               "success",
-              `สร้าง ${out?.name ?? res.outputItemId}×${res.outputCount} · +${res.xpGained} xp`,
+              `สร้าง ${out?.name ?? res.outputItemId}×${res.outputCount} · +${res.xpGained} ประสบการณ์`,
             );
           }}
         />
@@ -425,39 +425,12 @@ function TradeTab({ artisan }: { artisan: ArtisanDef }) {
                           <Badge variant="outline" className="text-[9px]">
                             {SLOT_LABELS[e.ty]}
                           </Badge>
-                          {e.atkb > 0 && (
-                            <Badge variant="outline" className="text-[9px]">
-                              ATK +{e.atkb}
+                          {equipStatParts(e).map((part) => (
+                            <Badge key={part} variant="outline" className="text-[9px]">
+                              {part}
                             </Badge>
-                          )}
-                          {e.pdb > 0 && (
-                            <Badge variant="outline" className="text-[9px]">
-                              PD +{e.pdb}
-                            </Badge>
-                          )}
-                          {e.idb > 0 && (
-                            <Badge variant="outline" className="text-[9px]">
-                              ID +{e.idb}
-                            </Badge>
-                          )}
-                          {e.hpb > 0 && (
-                            <Badge variant="outline" className="text-[9px]">
-                              HP +{e.hpb}
-                            </Badge>
-                          )}
-                          {e.mpb > 0 && (
-                            <Badge variant="outline" className="text-[9px]">
-                              MP +{e.mpb}
-                            </Badge>
-                          )}
+                          ))}
                         </div>
-                        {Object.keys(e.st).length > 0 && (
-                          <p className="text-[10px] text-emerald-700 mt-0.5">
-                            {Object.entries(e.st)
-                              .map(([k, v]) => `${k}+${v}`)
-                              .join(" ")}
-                          </p>
-                        )}
                       </div>
                       <Button
                         size="sm"

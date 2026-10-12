@@ -905,6 +905,14 @@ export interface TournamentState {
   wExp: number;
 }
 
+/** How the hero looks (lib/world/appearance.ts). */
+export interface HeroAppearance {
+  /** The outfit worn (an `OUTFITS` id, lib/world/data/outfits.ts). */
+  outfit: string;
+  /** Hide the weapon carried on the body (ซ่อนอาวุธ). */
+  hideWeapon: boolean;
+}
+
 export interface TournamentRecord {
   year: number;
   champion: string;
@@ -1291,6 +1299,12 @@ export interface WorldStateData {
   // Selected body sprite id (see lib/world/data/player-bodies.ts).
   // Chosen at character creation; drives the map token sprite.
   playerBodyId: string;
+
+  // v29: how the hero looks (lib/world/appearance.ts, docs/design/appearance.md):
+  // the outfit worn and whether the weapon on the body is hidden; and the
+  // outfits bought from tailors (the others unlock from the save itself).
+  appearance: HeroAppearance;
+  wardrobe: string[];
 
   // Sect membership state, keyed by SectId. Empty when the player isn't a
   // disciple anywhere yet. Joining a sect adds an entry seeded with the

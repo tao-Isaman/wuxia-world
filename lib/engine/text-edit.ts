@@ -159,7 +159,7 @@ export function validateTextRows(rows: readonly TextRow[], draft: TextOverrides,
     if (row.kind === "skill" && !d.trim()) add(row, { level: "warning", field: "d", message: "ไม่มีคำบรรยาย" });
     if (name) {
       const naming = quests.filter((q) => (row.kind === "skill" ? q.skills : q.arts).includes(row.id) && q.texts.some((text) => text.includes(name)));
-      if (naming.length) add(row, { level: "warning", field: "n", message: `เควสที่ให้วิชานี้เอ่ยชื่อ "${name}": ${naming.map((q) => q.id).join(", ")} — เควสต้องไม่บอกชื่อวิชาที่ให้ (test:story จะไม่ผ่าน)` });
+      if (naming.length) add(row, { level: "warning", field: "n", message: `ภารกิจที่ให้วิชานี้เอ่ยชื่อ "${name}": ${naming.map((q) => q.id).join(", ")} — ภารกิจต้องไม่บอกชื่อวิชาที่ให้ (test:story จะไม่ผ่าน)` });
     }
   }
   return issues;
@@ -202,10 +202,10 @@ export function skillNumbers(skill: Skill): string {
 export function artNumbers(art: Art): string {
   const parts = [`ขั้น${TIERS[art.ti]?.n ?? art.ti}`];
   if (art.tp) parts.push(art.tp);
-  parts.push(`HP +${art.hL}/ขั้น`, `MP +${art.mL}/ขั้น`);
+  parts.push(`พลังชีวิต +${art.hL}/ขั้น`, `ปราณ +${art.mL}/ขั้น`);
   const st = stats(art.stats);
   if (st) parts.push(`พลัง ${st} (×ขั้น/10)`);
-  if (art.act) parts.push(`ออกพลัง ${art.act.n} (MP ${art.act.c} · CD ${art.act.cd})`);
+  if (art.act) parts.push(`ออกพลัง ${art.act.n} (ปราณ ${art.act.c} · พัก ${art.act.cd} ตา)`);
   if (art.pas) parts.push(`ติดตัว ${art.pas.ch}%`);
   return parts.join(" · ");
 }

@@ -141,7 +141,7 @@ Both runtimes are loaded with a dynamic `import()` in the browser only. The host
 - **Guide arrow.** A jade arrow bobs over the marker flagged `guide` (the tracked quest's target). When that marker is off screen, a pulsing edge pointer turns toward it. Published as `data-guide-marker`.
   - **Never under the HUD.** HUD boxes over the map carry `data-hud-occluder` (the vitals + menu stack, purse and sundial, quest tracker, law chips, rest button, action button, places control, the extras button); the runtime measures them once a frame while the guide needs them (`hudOccluders`; boxes come and go — the action button appears beside a marker). An arrow they would cover turns into the edge pointer, and the pointer slides in along its ray toward the screen centre — still pointing the same way — until it clears every box. Its host-pixel spot is published as `data-guide-edge` (`x,y`). Give any new HUD box over the map `data-hud-occluder`.
 - **Occluders.** Foreground cut-outs from the painting, sorted against feet (`world-occlusion.ts`). Only `home_player` and `city_capital` have them.
-- **Lighting.** A flat veil over the scene (`world-lighting.ts`). Its darkness is `nightLevel(time)` (`lib/world/clock.ts`): night is the five watches 戌–寅 (ชั่วยาม 7–11), deepening through 戌, full from 亥 and paling through 寅 — the same night the sundial, the HUD's ยามค่ำ and the music use. Lantern pools exist only on `home_player` and `city_capital`; they flicker at about 10 fps, except under reduced motion.
+- **Lighting.** A flat veil over the scene (`world-lighting.ts`). Its darkness is `nightLevel(time)` (`lib/world/clock.ts`): night is the five watches ยามซวี–ยามอิ๋น (ชั่วยาม 7–11), deepening through ยามซวี, full from ยามไฮ่ and paling through ยามอิ๋น — the same night the sundial, the HUD's ยามค่ำ and the music use. Lantern pools exist only on `home_player` and `city_capital`; they flicker at about 10 fps, except under reduced motion.
 - **Vignettes.** `capitalVignette` (`world-vignettes.ts`) adds story props on `city_capital` only:
   - clinic supplies and a waiting elder once the clinic errand is done;
   - the archive chest, closed or open by `capital_ledger_recovered`.
@@ -362,9 +362,10 @@ On a map (`MapHud` in `components/world/map-hud.tsx` + `MenuBar hud`):
   - Then ♪ and the install icon.
   - Layout: two rows on desktop and landscape; on phones, rows of four.
 - **Top right:** the purse and the day.
-  - Gold "ตำลึง" and w-exp "悟", each with a floating +N / −N for 1.6 s.
-  - The sundial: 12 shichen from 卯; the ring turns, and 戌–寅 are styled as night (`isNight`, `lib/world/clock.ts`).
+  - Gold "ตำลึง" and w-exp "ยุทธ", each with a floating +N / −N for 1.6 s.
+  - The sundial: 12 shichen from ยามเหม่า, Thai numerals ๑–๑๒ on the ring and the hour's name on the face; the ring turns, and ยามซวี–ยามอิ๋น are styled as night (`isNight`, `lib/world/clock.ts`).
   - The "วันที่ N" pill, and the hour line (hidden on phones).
+- **Waypoint card** (`.qt-waypoint`, `[data-waypoint]`): when a place is picked on the world map, a gold-edged card above the quest tracker — 🧭 the place and the roads left, ✕ to drop it.
 - **Quest tracker** under the purse (`quest-tracker.tsx`): 📌 stage n/N, the quest name, 🎯 action and counter, 📍 place and roads left. Tapping it opens the quest log. It heads `.hud-right-stack` (`app/mobile-hud.css`, a flex column at the top right); the map's `extras` (the drawer button) sit right-aligned below it, so a tall tracker pushes the button down instead of covering it.
 - **Top centre:** law chips — "⛓ หมายจับ ●●○○○", "⛓ เหลือโทษ …", "🔓 พ้นโทษแล้ว · ไปที่ประตูคุก".
 - **Arrival banner.**
@@ -415,6 +416,8 @@ A menu section opens as a full-screen **menu shell** (`components/ui/modal.tsx` 
 | `sect-hall-popup.tsx` | the city hall's offers; the capital's free training duel |
 | `artisan-popup.tsx` | ซื้อสูตร · ประดิษฐ์ · ซื้อ-ขาย |
 | `practice-popup.tsx` | skills and arts to practise, the place bonus, the cost |
+| `world-map-popup.tsx` | แผนที่โลก (`fill`, `app/world-map.css`): the painted atlas as an SVG — the image, region tints (`regionPolygon` minus `HEARTLAND_CIRCLE`), roads and sea lanes, place markers, the hero's pin, the planned route — with region tabs, drag / pinch / wheel zoom, ＋ － ◎; markers and names keep one screen size (`k` = map units per pixel) and minor names appear above 0.95 px per unit. The side column: a place (kind, region, tags, roads out, the way there step by step, 🧭 นำทาง), a region (its places by kind, explored count) or the overview and legend |
+| `ferry-popup.tsx` | ลุงจาง คนแจวเรือ: every other pier with its fare and ลงเรือ |
 | `rumor-popup.tsx` | the rumor list and "ฟังต่อ" (see [liveness.md](liveness.md#where-the-hero-hears-rumors)) |
 
 ## Overlays
@@ -517,7 +520,7 @@ More styling details:
 
 - **Primitives.**
   - `components/ui/`: Badge (with a `seal` variant), Button (`pixel`), Card, Combobox, Command, Input, Modal (menu-shell aware), Popover, Progress (`variant` hp / qi / exp / stamina, `pixel`), Slider, Table, Tabs.
-  - `components/ui/wuxia/`: `Panel` (default / quiet / flat), `WuxiaButton`, `InfoPopover`, `ItemTile` (rarity frame + the item's library icon (`icon`, `lib/world/data/item-icons.ts`), else a category glyph 材 草 毒 藥 食 書 譜 工 寶 令 雜 or slot glyph 兵 衣 冠 靴 腕 戒 飾), `OrnamentDivider` (unused).
+  - `components/ui/wuxia/`: `Panel` (default / quiet / flat), `WuxiaButton`, `InfoPopover`, `ItemTile` (rarity frame + the item's library icon (`icon`, `lib/world/data/item-icons.ts`), else a category emoji 🪨 🌿 ☠ 🧪 🍚 📖 📜 🔨 💎 📯 📦 or slot emoji 🗡 👘 🪖 👟 💪 💍 🎖), `OrnamentDivider` (unused).
 - **Rarity** (`lib/ui/rarity.ts`): grey, green, blue, purple, orange, red-gold.
   - Items by price: 40 / 120 / 300 / 800 / 2000.
   - Gear by stat budget: 8 / 20 / 38 / 60 / 90.

@@ -509,7 +509,7 @@ export function heldQuests(state: Partial<LifeState>, npcId: string): QuestDef[]
 const NEIGHBOURS: ReadonlyMap<string, readonly string[]> = (() => {
   const map = new Map<string, string[]>();
   const link = (a: string, b: string) => { if (!map.has(a)) map.set(a, []); map.get(a)!.push(b); };
-  for (const r of LOCATION_ROUTES) { link(r.a, r.b); link(r.b, r.a); }
+  for (const r of LOCATION_ROUTES) if (!r.sea) { link(r.a, r.b); link(r.b, r.a); }
   return map;
 })();
 

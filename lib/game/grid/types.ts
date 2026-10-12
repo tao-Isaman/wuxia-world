@@ -69,7 +69,9 @@ export type AreaShape =
  * wolf, a hulking boss) on top of a shared sheet or creature frame.
  */
 export type UnitLook =
-  | { kind: "character"; characterId: string; still?: string; tint?: number; size?: number }   // atlas (+ optional unique still sprite)
+  | { kind: "character"; characterId: string; still?: string; tint?: number; size?: number;   // atlas (+ optional unique still sprite)
+      /** A hero's outfit (docs/design/appearance.md): its id and the recolour of the sheet's cloth. */
+      outfit?: { id: string; primary: readonly [number, number, number]; secondary?: readonly [number, number, number] } }
   | { kind: "creature"; frame: number; tint?: number; size?: number }                         // /art/creature-atlas.png frame
   | { kind: "anim"; sheet: string; tint?: number; size?: number };                           // lib/characters/anim-sheets.ts (bosses, T5)
 

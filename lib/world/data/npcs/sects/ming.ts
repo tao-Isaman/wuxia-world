@@ -45,7 +45,7 @@ export const NPCS_MING: readonly NpcDef[] = [
   {
     id: "sect_sunmoon_sun_elder_zuolengchan",
     name: "ผู้อาวุโสตะวันซางเหยียนเลี่ย",
-    description: "ผู้อาวุโสฝ่ายตะวัน (yang) ของพรรค · เชี่ยวชาญพลังกายสุริยันและเพลิงตะวัน · พูดกระชับและเด็ดขาด",
+    description: "ผู้อาวุโสฝ่ายตะวัน (หยาง) ของพรรค · เชี่ยวชาญพลังกายสุริยันและเพลิงตะวัน · พูดกระชับและเด็ดขาด",
     locationIds: ["sect_ming"],
     dialogSceneId: "npc_sect_sunmoon_sun_elder_zuolengchan_talk",
     sparOpponentId: "spar_sunmoon_zuolengchan",
@@ -61,7 +61,7 @@ export const NPCS_MING: readonly NpcDef[] = [
   {
     id: "sect_sunmoon_moon_elder_xianggwentian",
     name: "ผู้อาวุโสจันทราฉินเยว่หลิง",
-    description: "ผู้อาวุโสฝ่ายจันทรา (yin) ของพรรค · เชี่ยวชาญพลังกายจันทราและร้อยจันทรา · เงียบขรึมและลึกซึ้ง",
+    description: "ผู้อาวุโสฝ่ายจันทรา (หยิน) ของพรรค · เชี่ยวชาญพลังกายจันทราและร้อยจันทรา · เงียบขรึมและลึกซึ้ง",
     locationIds: ["sect_ming"],
     sparOpponentId: "spar_sunmoon_xianggwentian",
     sparFameReward: 12,

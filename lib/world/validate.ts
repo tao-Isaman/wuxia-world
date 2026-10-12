@@ -1,4 +1,6 @@
 import type { LifeSkill, TraitKey, WorldStateData } from "./types";
+import { DEFAULT_OUTFIT, getOutfit } from "./data/outfits";
+import { currentOutfit } from "./appearance";
 import { LIFE_SKILL_KEYS, TRAIT_KEYS } from "./types";
 import { SCENES_BY_ID, START_SCENE_ID } from "./data/scenes";
 import { ITEMS_BY_ID } from "./data/items";
@@ -63,6 +65,11 @@ export function validateAndRepair(state: WorldStateData): void {
   // Only m1 (male) and f1 (female) are hero bodies now; an older save's
   // m2–m4 / f2–f4 hero takes the one of their gender.
   state.playerBodyId = heroBodyFor(state.playerBodyId, state.gender);
+
+  // Looks: bought outfits must exist; one worn but not (or no longer) held is ชุดเดิม.
+  state.wardrobe = [...new Set((state.wardrobe ?? []).filter((id) => getOutfit(id)?.unlock.t === "tailor"))];
+  state.appearance ??= { outfit: DEFAULT_OUTFIT, hideWeapon: false };
+  state.appearance = { ...state.appearance, outfit: currentOutfit(state), hideWeapon: state.appearance.hideWeapon === true };
 
   // Transient engine flags must never survive a reload. `_skipEventRoll` is
   // still written by walk events and hunting (rollWalkEvent), though nothing

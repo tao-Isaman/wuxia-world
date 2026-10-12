@@ -4,6 +4,8 @@ import { useMemo } from "react";
 import {
   EQUIPMENT,
   SLOT_LABELS,
+  equipBonusParts,
+  equipStatParts,
   getEquip,
   getEquipBonus,
   getEquipStatBonus,
@@ -35,28 +37,8 @@ const SLOTS: SlotDef[] = [
 ];
 
 function describeItem(id: string | null): string {
-  if (!id) return "";
-  const e = getEquip(id);
-  if (!e) return "";
-  const parts: string[] = [];
-  if (e.atkb) parts.push(`Atk+${e.atkb}`);
-  if (e.pdb) parts.push(`PD+${e.pdb}`);
-  if (e.idb) parts.push(`ID+${e.idb}`);
-  if (e.hpb) parts.push(`HP+${e.hpb}`);
-  if (e.mpb) parts.push(`MP+${e.mpb}`);
-  const sb = Object.entries(e.st)
-    .map(([k, v]) => `${k}+${v}`)
-    .join(" ");
-  if (sb) parts.push(sb);
-  if (e.eff) {
-    if (e.eff.t === "pct_atk") parts.push(`+${e.eff.v}%ATK`);
-    else if (e.eff.t === "flat_cri") parts.push(`Cri+${e.eff.v}`);
-    else if (e.eff.t === "flat_eva") parts.push(`Eva+${e.eff.v}`);
-    else if (e.eff.t === "pct_reduce") parts.push(`ลดDmg${e.eff.v}%`);
-    else if (e.eff.t === "hp_regen") parts.push(`ฟื้น${e.eff.v}%/ตา`);
-    else if (e.eff.t === "on_hit") parts.push(`OnHit:${e.eff.db.t.replace("debuff_", "")}${e.eff.db.v}`);
-  }
-  return parts.join(" ");
+  const e = id ? getEquip(id) : undefined;
+  return e ? equipStatParts(e).join(" · ") : "";
 }
 
 export function EquipmentSlots({ side }: Props) {
@@ -75,18 +57,7 @@ export function EquipmentSlots({ side }: Props) {
   const eb = getEquipBonus(build.equipment);
   const sb = getEquipStatBonus(build.equipment);
 
-  const summary: string[] = [];
-  if (eb.atk) summary.push(`Atk+${eb.atk}`);
-  if (eb.pd) summary.push(`PD+${eb.pd}`);
-  if (eb.id_) summary.push(`ID+${eb.id_}`);
-  if (eb.hp) summary.push(`HP+${eb.hp}`);
-  if (eb.mp) summary.push(`MP+${eb.mp}`);
-  if (eb.cri) summary.push(`Cri+${eb.cri}`);
-  if (eb.eva) summary.push(`Eva+${eb.eva}`);
-  if (eb.pct_atk) summary.push(`ATK+${eb.pct_atk}%`);
-  if (eb.pct_red) summary.push(`ลดDmg${eb.pct_red}%`);
-  if (eb.hp_regen) summary.push(`ฟื้น${eb.hp_regen}%/ตา`);
-  for (const [k, v] of Object.entries(sb)) summary.push(`${k}+${v}`);
+  const summary = equipBonusParts(eb, sb);
 
   return (
     <section className="border-t pt-3 mt-3">

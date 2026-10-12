@@ -21,7 +21,7 @@ import { sectLineageQuests } from "@/lib/world/story/registry";
 import { REJOIN_COOLDOWN_DAYS, isRedemptionQuest, membershipStatus, rejoinWaitDays, redemptionQuestId } from "@/lib/world/sects";
 import { questHolder } from "@/lib/world/npc-life";
 import type { SectId, QuestDef } from "@/lib/world";
-import { getSkill, getArt } from "@/lib/game";
+import { TIERS, getSkill, getArt } from "@/lib/game";
 
 interface Props {
   open: boolean;
@@ -77,7 +77,7 @@ export function SectMembershipPopup({ open, onClose }: Props) {
   if (joinedIds.length === 0 || !current) {
     return (
       <Modal open={open} onClose={onClose} title="🪷 สำนัก" maxWidth="max-w-md">
-        <div className="menu-empty" data-glyph="門">
+        <div className="menu-empty" data-glyph="สำนัก">
           <strong>ยังไม่ได้เข้าสำนักใด</strong>
           <span>เดินทางไปยังสำนักที่สนใจ แล้วคุยกับเจ้าอาวาสหรืออาจารย์ใหญ่เพื่อขอเข้าเป็นศิษย์ บางสำนักรับเฉพาะเพศหรือต้องมีคุณสมบัติก่อน</span>
         </div>
@@ -317,7 +317,7 @@ function LeaveSectConfirm({
         >
           <div className="font-semibold">ทรยศสำนัก</div>
           <div className="text-xs text-muted-foreground mt-1">
-            หนีโดยไม่บอกใคร — วิชาจากสำนักยังเลื่อนขั้นได้ตามปกติ · แต่นักล่าจากสำนักจะตามล่าเจ้าในที่ต่าง ๆ (เช็กหนีด้วย AGI + LUK) · ความชั่ว +5 · ล้างได้ด้วยภารกิจไถ่บาปกับเจ้าสำนัก แล้วจึงกลับเข้าสำนักได้
+            หนีโดยไม่บอกใคร — วิชาจากสำนักยังเลื่อนขั้นได้ตามปกติ · แต่นักล่าจากสำนักจะตามล่าเจ้าในที่ต่าง ๆ (โอกาสหนีพ้นขึ้นกับความเร็วและโชค) · ความชั่ว +5 · ล้างได้ด้วยภารกิจไถ่บาปกับเจ้าสำนัก แล้วจึงกลับเข้าสำนักได้
           </div>
         </button>
         <button
@@ -403,7 +403,7 @@ function RewardsTab({ def, rank, atTop, nextRank, nextCost, canRankUp, worldStat
               <span className="min-w-0 truncate">
                 {item ? item.n : MYSTERY_MOVE_LABEL}{" "}
                 <span className="text-muted-foreground text-[10px]">
-                  {item ? `T${item.ti} · ` : ""}{e.kind === "skill" ? "กระบวนท่า" : "ลมปราณ"}
+                  {item ? `${TIERS[item.ti]?.n ?? ""} · ` : ""}{e.kind === "skill" ? "กระบวนท่า" : "ลมปราณ"}
                   {!item && options.length > 1 ? ` · เลือก 1 จาก ${options.length}` : ""}
                 </span>
               </span>

@@ -17,6 +17,8 @@ function freshState(): WorldStateData {
     hasGame: true,
     playerBuild: null,
     playerBodyId: "m1",
+    appearance: { outfit: "default", hideWeapon: false },
+    wardrobe: [],
     currentSceneId: "city_capital",
     lastLocationId: "city_capital",
     flags: {},
