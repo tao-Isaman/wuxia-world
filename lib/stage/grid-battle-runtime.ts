@@ -1091,7 +1091,7 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
       const jitter = ((index % 3) - 1) * 12 * uiScale;
       floatText(text, color, missed ? 16 : crit ? 28 : 22, target.x + jitter,
         target.y - target.head * target.s - (18 + (index % 2) * 14) * uiScale, 900, crit ? 0.12 : 0);
-      if (crit && !missed && damage > 0) floatText("暴擊", "#ffe9a8", 13, target.x + jitter, target.y - target.head * target.s - 44 * uiScale, 900);
+      if (crit && !missed && damage > 0) floatText("คริติคอล!", "#ffe9a8", 13, target.x + jitter, target.y - target.head * target.s - 44 * uiScale, 900);
       if (missed) {
         anyMiss = true;
         if (!reduced && vfx) vfx.whiff(play.vfx, at, dir, index, elapsed);

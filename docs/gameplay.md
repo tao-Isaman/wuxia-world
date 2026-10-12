@@ -86,7 +86,7 @@ A typical first session in the capital:
 
 - **Landscape only.** The game is played on its side: a phone held upright shows it turned 90°, and the menus are laid out in columns and tabs so nothing scrolls.
 - **Top left:** a slim card with HP, MP and พลัง (stamina) gauges, and under it the icon bar — 1 โปรไฟล์, 2 ย่าม (bag), 3 วิชา (skills), 4 อาชีพ (life skills and crafts), 5 ภารกิจ (quests), 6 สำนัก (sect), 7 บันทึก (action log), ♪ sound, and the install button.
-- **Top right:** gold (ตำลึง), w-exp (悟), the sundial, the day, and the tracked quest (📌).
+- **Top right:** gold (ตำลึง), ประสบการณ์ยุทธ (shown as N ยุทธ), the sundial, the day, and the tracked quest (📌).
 - **Top centre:** wanted marks and the jail sentence, when you have any.
 - **Bottom right:** พัก (rest), and above it the action button (คุยกับ / ไปที่ / ใช้ + the target's name).
 - **Arrival:** entering a location shows its name as a banner. Saving is automatic and continuous.
@@ -118,7 +118,7 @@ Everything happens at once; the price is stamina (an action that used to take *h
 
 **Regeneration.** Out of battle, stamina refills on its own in 6 ชั่วยาม (30 real minutes) and HP / MP in 12 (one real hour), whether or not the game is open. Back after a day or more away, a toast and the log say how many days passed (ระหว่างที่ท่านไม่อยู่ ผ่านไป N วัน).
 
-Night is the five watches, 戌 to 寅 (ชั่วยาม 7–11; `isNight` in `lib/world/clock.ts`). It only changes the lighting, the sundial, the HUD's ยามค่ำ and the music (the synthesized `night` song where a place has no region song).
+Night is the five watches, ยามซวี to ยามอิ๋น (ชั่วยาม 7–11; `isNight` in `lib/world/clock.ts`). It only changes the lighting, the sundial, the HUD's ยามค่ำ and the music (the synthesized `night` song where a place has no region song).
 
 ### Resting
 
@@ -475,7 +475,7 @@ Practice:
 
   A skill with no yin / yang / balance tag counts as balance, so it gets the mountain bonus.
 
-**W-exp (悟, ประสบการณ์ยุทธ)** is a shared pool. **เลื่อนระดับ (ใช้ประสบการณ์ยุทธ N)** in the วิชา menu buys the rest of the current level with it.
+**W-exp (ประสบการณ์ยุทธ)** is a shared pool. **เลื่อนระดับ (ใช้ประสบการณ์ยุทธ N)** in the วิชา menu buys the rest of the current level with it.
 
 | W-exp source | Amount |
 | --- | --- |

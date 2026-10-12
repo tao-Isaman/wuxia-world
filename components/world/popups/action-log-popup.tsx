@@ -52,7 +52,7 @@ export function ActionLogPopup({ open, onClose }: Props) {
         แสดงรายการล่าสุด (ไม่เกิน 100 รายการ)
       </div>
       {reversed.length === 0 ? (
-        <div className="menu-empty" data-glyph="錄">
+        <div className="menu-empty" data-glyph="บันทึก">
           <strong>ยังไม่มีบันทึกการกระทำ</strong>
           <span>การเดินทาง การต่อสู้ และภารกิจของเจ้าจะถูกจดไว้ที่นี่</span>
         </div>

@@ -37,12 +37,12 @@ export function VictorySpoils() {
     <div className="gb-spoils" data-testid="victory-spoils" aria-label="ของที่ได้รับ">
       <div className="gb-spoils-row" role="list">
         {spoils.gold > 0 && <span role="listitem" className="gb-spoil">
-          <ItemTile glyph="金" icon={GOLD_ICON_URL} rarity={2} label={`${spoils.gold} ตำลึง`} selected={picked?.kind === "gold"}
+          <ItemTile glyph="💰" icon={GOLD_ICON_URL} rarity={2} label={`${spoils.gold} ตำลึง`} selected={picked?.kind === "gold"}
             onClick={() => setPicked({ kind: "gold", amount: spoils.gold })} />
           <em>+{spoils.gold}</em>
         </span>}
         <span role="listitem" className="gb-spoil">
-          <ItemTile glyph="悟" rarity={3} label={`ประสบการณ์ยุทธ ${spoils.wExp}`} selected={picked?.kind === "wexp"}
+          <ItemTile glyph="☯" rarity={3} label={`ประสบการณ์ยุทธ ${spoils.wExp}`} selected={picked?.kind === "wexp"}
             onClick={() => setPicked({ kind: "wexp", amount: spoils.wExp })} />
           <em>+{spoils.wExp}</em>
         </span>
@@ -59,7 +59,7 @@ export function VictorySpoils() {
         {(spoils.gear ?? []).map((id) => {
           const gear = EQUIPMENT_BY_ID.get(id);
           return <span role="listitem" className="gb-spoil" key={`gear:${id}`}>
-            <ItemTile glyph="甲" icon={equipmentIconUrl(id)} rarity={5} label={gear?.n ?? id}
+            <ItemTile glyph="🛡" icon={equipmentIconUrl(id)} rarity={5} label={gear?.n ?? id}
               selected={picked?.kind === "gear" && picked.id === id} onClick={() => setPicked({ kind: "gear", id })} />
             <em>×1</em>
           </span>;

@@ -84,7 +84,7 @@ export function QuestLog({ variant = "card" }: QuestLogProps = {}) {
     <div className="space-y-3">
       <TabBar tab={tab} counts={counts} onSelect={onSwitchTab} />
       {list.length === 0 ? (
-        <div className="menu-empty" data-glyph="令">
+        <div className="menu-empty" data-glyph="ภารกิจ">
           <strong>{tab === "active"
             ? "ยังไม่มีภารกิจที่กำลังทำ"
             : tab === "done"

@@ -77,7 +77,7 @@ export function SectMembershipPopup({ open, onClose }: Props) {
   if (joinedIds.length === 0 || !current) {
     return (
       <Modal open={open} onClose={onClose} title="🪷 สำนัก" maxWidth="max-w-md">
-        <div className="menu-empty" data-glyph="門">
+        <div className="menu-empty" data-glyph="สำนัก">
           <strong>ยังไม่ได้เข้าสำนักใด</strong>
           <span>เดินทางไปยังสำนักที่สนใจ แล้วคุยกับเจ้าอาวาสหรืออาจารย์ใหญ่เพื่อขอเข้าเป็นศิษย์ บางสำนักรับเฉพาะเพศหรือต้องมีคุณสมบัติก่อน</span>
         </div>

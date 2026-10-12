@@ -20,7 +20,7 @@
 .title-shade { position: fixed; inset: 0; background: linear-gradient(90deg, #0c201c99, #10211d1a 60%, #0b1b2459); }
 .title-content { position: relative; min-height: calc(100 * var(--dvh)); max-width: 1320px; margin: auto; padding: 48px 60px; display: grid; grid-template-columns: 1fr 390px; align-items: center; gap: 60px; }
 .title-intro { color: #f6ebc9; text-shadow: 3px 3px 0 #192d28; padding-bottom: 36px; }
-.title-seal { display: inline-grid; place-items: center; background: #9f3d31; border: 2px solid #dca17b; width: 52px; height: 64px; font: 36px serif; margin-bottom: 28px; box-shadow: 3px 3px 0 #172823; }
+.title-seal { display: inline-grid; place-items: center; background: #9f3d31; border: 2px solid #dca17b; width: 52px; height: 64px; font: 700 17px var(--font-body), sans-serif; margin-bottom: 28px; box-shadow: 3px 3px 0 #172823; }
 .title-kicker { font-family: var(--font-display); font-size: 25px; margin-bottom: 8px; }
 .title-intro h1 { font-family: var(--font-display); color: #fff0ca; font-size: clamp(46px, calc(5.5 * var(--vw)), 82px); line-height: 1.4; }
 .title-description { color: #f2ecd6; font-size: 18px; line-height: 1.9; margin-top: 20px; }

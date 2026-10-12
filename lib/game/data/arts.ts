@@ -216,7 +216,7 @@ export const ARTS: readonly Art[] = withTextOverrides<Art>("arts", [
     pas: { tr: "hit_recv", ch: 25, d: "ถูกโจมตี 25% → DEF+8 (5ตา)", e: { t: "buff_def", n: "ม้าถอย", v: 8, u: 5 } } },
   { id: "qzzq", n: "ลมปราณชวนจินก่า", sc: "ฉวนเจิน", tp: "หยาง·ภายใน", types: ["yang", "internal"], ti: 2,
     stats: { POW: 12, INT: 10, DEF: 8 }, hL: 25, mL: 25,
-    act: { n: "หยางบริสุทธิ์", c: 25, cd: 3, t: "buff_reduce", v: 25, u: 5, d: "ลด dmg 25% (3ตา) — 全真真气 หยางบริสุทธิ์ CD3" },
+    act: { n: "หยางบริสุทธิ์", c: 25, cd: 3, t: "buff_reduce", v: 25, u: 5, d: "ลด dmg 25% (3ตา) — ลมปราณฉวนเจิน หยางบริสุทธิ์ CD3" },
     pas: { tr: "use_int", ch: 100, d: "Int skill → IAtk+12%", e: { t: "mult_iatk", v: 12 } } },
   { id: "t3_qz_sun", n: "หนึ่งพลังสุริยันต์", sc: "ฉวนเจิน", tp: "หยาง·ภายใน", types: ["yang", "internal"], ti: 3,
     stats: { POW: 14, INT: 12, STR: 10 }, hL: 30, mL: 30,
@@ -230,7 +230,7 @@ export const ARTS: readonly Art[] = withTextOverrides<Art>("arts", [
   // ─── กู่มู่ ───
   { id: "ynxj", n: "คัมภีร์หยกเหมันต์", sc: "กู่มู่", tp: "หยิน·ภายใน", types: ["yin", "internal"], ti: 3,
     stats: { POW: 14, INT: 14, DEX: 12 }, hL: 25, mL: 35,
-    act: { n: "หทัยบริสุทธิ์", c: 30, cd: 3, t: "heal_cleanse", h: 22, d: "ฟื้น 22%HP + ลบ debuff CD3 — 寒玉心经" },
+    act: { n: "หทัยบริสุทธิ์", c: 30, cd: 3, t: "heal_cleanse", h: 22, d: "ฟื้น 22%HP + ลบ debuff CD3 — คัมภีร์ใจหยกเย็น" },
     pas: { tr: "hit_recv", ch: 25, d: "ถูกโจมตี 25% → ฟื้น 7% HP", e: { t: "heal_pct", v: 7 } } },
   { id: "t4_gm_iceweave", n: "วิชาไหมน้ำแข็ง", sc: "กู่มู่", tp: "หยิน·ภายใน", types: ["yin", "internal"], ti: 4,
     stats: { POW: 18, INT: 16, DEX: 14, AGI: 8 }, hL: 35, mL: 35,
@@ -306,7 +306,7 @@ export const ARTS: readonly Art[] = withTextOverrides<Art>("arts", [
     pas: { tr: "use_int", ch: 100, d: "Int skill → IAtk+15%", e: { t: "mult_iatk", v: 15 } } },
   { id: "yxhd", n: "ดาวเคลื่อนดาราคล้อย", sc: "พรรคตะวันจันทรา", tp: "สมดุล·อ่อน", types: ["soft"], ti: 4,
     stats: { AGI: 22, DEX: 16, LUK: 12 }, hL: 35, mL: 35,
-    act: { n: "เบี่ยงดาว", c: 35, cd: 3, t: "buff_reflect", v: 70, u: 5, d: "สะท้อน 70% (5ตา) — 移星换斗 CD3" },
+    act: { n: "เบี่ยงดาว", c: 35, cd: 3, t: "buff_reflect", v: 70, u: 5, d: "สะท้อน 70% (5ตา) — เคลื่อนดาวย้ายดารา CD3" },
     pas: { tr: "hit_recv", ch: 30, d: "ถูกโจมตี 30% → Eva+20 (2ตา)", e: { t: "buff_eva", n: "ดาราคล้อย", v: 20, u: 5 } } },
 
   // ─── พรรคสราญรมย์ ───
@@ -332,17 +332,17 @@ export const ARTS: readonly Art[] = withTextOverrides<Art>("arts", [
     pas: { tr: "use_int", ch: 100, d: "Int → IAtk+12%", e: { t: "mult_iatk", v: 12 } } },
   { id: "bmzq", n: "ลมปราณทะเลลึก", sc: "พรรคสราญรมย์", tp: "หยิน·ภายใน", types: ["yin", "internal"], ti: 3,
     stats: { POW: 14, INT: 14, AGI: 12 }, hL: 25, mL: 35,
-    act: { n: "ทะเลลึก", c: 30, cd: 3, t: "buff_reflect", v: 50, u: 5, d: "สะท้อน 50% (2ตา) — 深海真气 CD3" },
+    act: { n: "ทะเลลึก", c: 30, cd: 3, t: "buff_reflect", v: 50, u: 5, d: "สะท้อน 50% (2ตา) — ลมปราณทะเลลึก CD3" },
     pas: { tr: "use_int", ch: 100, d: "Int → IAtk+15%", e: { t: "mult_iatk", v: 15 } } },
   { id: "bmsg", n: "วิชากลืนลมปราณ", sc: "พรรคสราญรมย์", tp: "หยิน·ภายใน", types: ["yin", "internal"], ti: 4,
     stats: { POW: 20, INT: 18, AGI: 12 }, hL: 25, mL: 45,
-    act: { n: "กลืนลมปราณ", c: 40, cd: 4, t: "drain", m: 1.4, h: 50, d: "Int×1.4 + ดูด 50%HP — 深海神功 CD4" },
+    act: { n: "กลืนลมปราณ", c: 40, cd: 4, t: "drain", m: 1.4, h: 50, d: "Int×1.4 + ดูด 50%HP — เคล็ดวิชาทะเลลึก CD4" },
     pas: { tr: "use_int", ch: 100, d: "Int → IAtk+15%", e: { t: "mult_iatk", v: 15 } } },
 
   // ─── สำนักดาวดึงส์ ───
   { id: "hgdf", n: "วิชาสลายพลัง", sc: "สำนักดาวดึงส์", tp: "หยิน·ภายใน", types: ["yin", "internal"], ti: 3,
     stats: { POW: 14, INT: 12, DEX: 14 }, hL: 30, mL: 30,
-    act: { n: "สลายพลัง", c: 30, cd: 3, t: "debuff_acc_dmg", ad: -20, u: 5, dm: 0.6, d: "Acc-20 + Int×0.6 (3ตา) — 化功大法 CD3" },
+    act: { n: "สลายพลัง", c: 30, cd: 3, t: "debuff_acc_dmg", ad: -20, u: 5, dm: 0.6, d: "Acc-20 + Int×0.6 (3ตา) — เคล็ดสลายปราณ CD3" },
     pas: { tr: "use_int", ch: 50, d: "Int 50% → ศัตรู PDef-12 (2ตา)", e: { t: "debuff_def", n: "สลาย", v: -12, u: 5 } } },
 
   // ─── พรรคเบญจพิษ ───
@@ -492,7 +492,7 @@ export const ARTS: readonly Art[] = withTextOverrides<Art>("arts", [
     pas: { tr: "use_int", ch: 50, d: "Int skill 50% → ศัตรู PDef-12 (2ตา)", e: { t: "debuff_def", n: "ไฟไหม้", v: -12, u: 5 } } },
   { id: "khbt", n: "คัมภีร์ทานตะวัน", sc: "ยุทธจักร", tp: "สมดุล·อ่อน", types: ["balance", "soft"], ti: 5,
     stats: { AGI: 50, STR: 10, POW: 10, LUK: 10 }, hL: 30, mL: 50,
-    act: { n: "ทานตะวันพลิกฟ้า", c: 60, cd: 6, t: "buff_spd", v: 100, u: 5, d: "SPD+100 (5ตา) — 葵花宝典 CD6" },
+    act: { n: "ทานตะวันพลิกฟ้า", c: 60, cd: 6, t: "buff_spd", v: 100, u: 5, d: "SPD+100 (5ตา) — คัมภีร์ทานตะวัน CD6" },
     pas: { tr: "on_crit", ch: 100, d: "Crit → SPD+50 / Cri+15 (5ตา) — ทานตะวันสะสมความเร็ว", e: { t: "buff_spd_cri", n: "ทานตะวัน", sv: 50, cv: 15, u: 5 } } },
   { id: "kuyt", n: "ลมปราณตะวันเก้าชั้น", sc: "ยุทธจักร", tp: "สมดุล·ภายใน", types: ["balance", "internal"], ti: 5,
     stats: { STR: 20, POW: 20, AGI: 20, VIT: 20 }, hL: 40, mL: 40,
@@ -502,7 +502,7 @@ export const ARTS: readonly Art[] = withTextOverrides<Art>("arts", [
   { id: "kgim", n: "คัมภีร์จันทราเก้าชั้น", sc: "ยุทธจักร", tp: "หยิน·ภายใน", types: ["yin", "internal"], ti: 5,
     stats: { INT: 30, POW: 30, DEX: 20 }, hL: 20, mL: 60,
     mpRegenPct: 5,
-    act: { n: "กรงเล็บกระดูกขาวจันทราเก้าชั้น", c: 55, cd: 5, t: "atk_int_pen", m: 1.8, pen: 50, d: "Int×1.8 ทะลุ IDef 50% — 九重月华经 CD5" },
+    act: { n: "กรงเล็บกระดูกขาวจันทราเก้าชั้น", c: 55, cd: 5, t: "atk_int_pen", m: 1.8, pen: 50, d: "Int×1.8 ทะลุ IDef 50% — คัมภีร์แสงจันทร์เก้าชั้น CD5" },
     pas: { tr: "use_int", ch: 100, d: "Int skill → ศัตรู PDef-15 (2ตา) — เย็นยะเยือกถึงกระดูก", e: { t: "debuff_def", n: "กระดูกจันทราเก้าชั้น", v: -15, u: 5 } } },
 
   // ─── สัตว์ร้าย ───

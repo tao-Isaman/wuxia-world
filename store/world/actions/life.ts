@@ -439,7 +439,7 @@ export const lifeActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "gat
         const won = Math.round(r.gold[0] + Math.random() * (r.gold[1] - r.gold[0]));
         draft.gold += won; if (won) gains.push(`${won} ตำลึง`);
       }
-      if (r.wExp) { draft.wExp += r.wExp; gains.push(`${r.wExp} 悟`); }
+      if (r.wExp) { draft.wExp += r.wExp; gains.push(`${r.wExp} ประสบการณ์ยุทธ`); }
       if (r.statXp) grantStatXp(draft, r.statXp, STAT_XP_PER_ACTION);
       if (r.trait) applyEffect(draft, { t: "addTrait", trait: r.trait.trait, amount: r.trait.amount });
       if (r.item && Math.random() < (r.item.chance ?? 1)) {
