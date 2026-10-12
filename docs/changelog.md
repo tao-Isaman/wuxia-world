@@ -9,6 +9,7 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 ### Free travel, and the world's day starts over
 
 - **Travel costs no stamina**: exits, roads and arriving are free, and a spent hero can still walk home; stamina goes only on fights and activities. Each road hop still trains AGI and rolls LUK.
+- **The map waypoint card's ✕** is a small corner button again: the quest card's full-width button style had stretched it over the card's title.
 - **The world clock starts over**: day 1 is now 2026-10-13 00:00 Bangkok time (it was 2026-10-08, so the HUD read day 120). Saves, the stored world and the server's world from the old clock are rewound to today on load, keeping every cooldown's time left (`rewindSaveToClock`, `rewindWorldToClock`, the server's `advanceWorld`).
 
 ### Gear options (ออฟชั่นเสริม)

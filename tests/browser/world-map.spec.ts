@@ -62,6 +62,11 @@ test("world map: where the hero is, the regions, a planned way to an island, and
 
   // The HUD shows the waypoint, and the guide arrow points at the boatman.
   await expect(page.locator("[data-waypoint]")).toHaveAttribute("data-waypoint", "isle_boni");
+  // Its ✕ is a small corner button, clear of the card's title (not the quest card's full-width button).
+  const cancel = await page.locator("[data-waypoint] .qt-cancel").boundingBox();
+  const kicker = await page.locator("[data-waypoint] .qt-kicker").boundingBox();
+  expect(cancel!.width).toBeLessThan(30);
+  expect(cancel!.x).toBeGreaterThanOrEqual(kicker!.x + kicker!.width - 1);
   await expect(canvas).toHaveAttribute("data-guide-marker", "npc-ferry_boatman", { timeout: 20_000 });
 
   // The boatman sails the hero over for a fare; arriving ends the waypoint.

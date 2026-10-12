@@ -208,11 +208,11 @@
   width: min(260px, calc(42 * var(--vw))); display: flex; flex-direction: column; align-items: flex-end; gap: 6px; pointer-events: none; }
 .hud-right-stack > * { pointer-events: auto; }
 .quest-tracker { width: 100%; }
-.quest-tracker button { display: flex; flex-direction: column; gap: 2px; width: 100%; padding: 7px 11px 8px; text-align: left; color: #f3e6c8;
+.quest-tracker > button { display: flex; flex-direction: column; gap: 2px; width: 100%; padding: 7px 11px 8px; text-align: left; color: #f3e6c8;
   border: 1px solid #9a7442; border-left: 3px solid #5fb89c; border-radius: 6px; background: #2a1611e0; box-shadow: 2px 3px 0 #0a0503aa;
   font: 500 12px/1.35 var(--font-body); text-shadow: 1px 1px 0 #140a07; cursor: pointer; }
-.quest-tracker button:hover { background: #3a2016ee; }
-.quest-tracker button:focus-visible { outline: 2px solid #f6dc8a; outline-offset: 2px; }
+.quest-tracker > button:hover { background: #3a2016ee; }
+.quest-tracker > button:focus-visible { outline: 2px solid #f6dc8a; outline-offset: 2px; }
 .qt-kicker { font-size: 10px; letter-spacing: .5px; color: #93dccb; }
 .qt-name { font: 700 14px/1.3 var(--font-body); color: #f6dc8a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .qt-action { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
@@ -223,16 +223,16 @@
   border: 1px solid #9a7442; border-left: 3px solid #e2b14f; border-radius: 6px; background: #2a1611e0; box-shadow: 2px 3px 0 #0a0503aa;
   font: 500 12px/1.35 var(--font-body); text-shadow: 1px 1px 0 #140a07; }
 .qt-waypoint .qt-kicker { color: #f0cf7e; }
-.qt-cancel { position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; border-radius: 5px; color: #f3e6c8; font-weight: 700; background: #ffffff14; }
+.qt-cancel { position: absolute; top: 4px; right: 4px; display: grid; place-items: center; width: 22px; height: 22px; padding: 0; border: 0; border-radius: 5px; color: #f3e6c8; font: 700 12px/1 var(--font-body); background: #ffffff14; cursor: pointer; }
 .qt-cancel:hover { background: #a8392a; }
 @media (orientation: landscape) and (max-width: 640px), (orientation: portrait) and (max-height: 640px) {
   .hud-right-stack { top: calc(max(6px, var(--safe-top)) + 112px); right: max(6px, var(--safe-right)); width: min(210px, calc(56 * var(--vw))); gap: 4px; }
-  .quest-tracker button { padding: 5px 8px 6px; font-size: 11px; }
+  .quest-tracker > button { padding: 5px 8px 6px; font-size: 11px; }
   .qt-name { font-size: 12px; }
 }
 @media (orientation: landscape) and (max-height: 560px) and (min-width: 641px), (orientation: portrait) and (max-width: 560px) and (min-height: 641px) {
   .hud-right-stack { top: calc(max(4px, var(--safe-top)) + 92px); right: max(8px, var(--safe-right)); width: 230px; gap: 4px; }
-  .quest-tracker button { padding: 4px 9px 5px; }
+  .quest-tracker > button { padding: 4px 9px 5px; }
   .qt-where { display: none; }
 }
 
