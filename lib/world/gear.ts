@@ -4,6 +4,7 @@
 // level 3; the materials drop from tier-3-and-up foes; and the ประสบการณ์ยุทธ
 // option raises what fights and quests pay.
 import {
+  ENHANCE_MAX,
   affixCountRange,
   getBuildBonus,
   getEquip,
@@ -104,7 +105,7 @@ export function reforgeablePieces(
 /** The same piece with a fresh set of options. */
 export function rerollGear(key: string, rand: () => number = Math.random): string {
   const g = parseGear(key);
-  return g ? gearKey(g.def.id, rollGearAffixes(g.def.ti, rand)) : key;
+  return g ? gearKey(g.def.id, rollGearAffixes(g.def.ti, rand), g.enhance) : key;
 }
 
 /** Put one gained piece in the bag, its options rolled (returns its key). */
@@ -137,6 +138,97 @@ export function rollSpiritMaterials(opp: { ti?: number; boss?: boolean } | null 
     if (Math.random() < drop.chance) out.push({ itemId, count: between(drop.count) });
   }
   return out;
+}
+
+// ─── Enhancement (เสริมพลัง +1…+10) ───────────────────────────────────
+// At a city craft shop of the piece's line, with that craft at level 3+, for
+// ศิลาเสริมพลัง. Success odds fall with the level aimed at; a failure aiming at
+// +1–5 costs only the stones, at +6–8 drops the piece one level, at +9–10
+// breaks it (it is gone).
+
+/** ศิลาเสริมพลัง: spent on every enhancement attempt. */
+export const ENHANCE_STONE = "enhance_stone";
+/** The hero's own level in the piece's craft needed to enhance it. */
+export const ENHANCE_MIN_LEVEL = 3;
+/** Success odds by the level aimed at (index 1…10). */
+export const ENHANCE_CHANCE: readonly number[] = [0, 1, 0.95, 0.9, 0.85, 0.8, 0.65, 0.55, 0.45, 0.3, 0.2];
+
+/** Stones one attempt at `target` costs: 1 for +1–5, 2 for +6–8, 3 for +9–10. */
+export function enhanceStones(target: number): number {
+  return target <= 5 ? 1 : target <= 8 ? 2 : 3;
+}
+
+/** What a failed attempt at `target` does: nothing, one level down, or the piece breaks. */
+export function enhanceFailure(target: number): "none" | "down" | "break" {
+  return target <= 5 ? "none" : target <= 8 ? "down" : "break";
+}
+
+/** Enhancement happens only in a city (`city_…`). */
+export const isEnhanceTown = (locationId: string) => locationId.startsWith("city_");
+
+export type EnhanceRefusal = "unknown" | "wrong-shop" | "not-city" | "low-skill" | "max" | "no-stone";
+
+export interface EnhanceCheck {
+  ok: boolean;
+  reason?: EnhanceRefusal;
+  /** The level the attempt aims at, its odds, stones and what a failure does. */
+  target?: number;
+  chance?: number;
+  stones?: number;
+  failure?: "none" | "down" | "break";
+  level?: number;
+}
+
+/** Can this shop enhance the piece now (city, craft line, level, stones)? */
+export function enhanceCheck(
+  s: Pick<WorldStateData, "lifeSkillXp" | "inventory">,
+  artisanProfession: string,
+  locationId: string,
+  key: string,
+): EnhanceCheck {
+  const g = parseGear(key);
+  if (!g) return { ok: false, reason: "unknown" };
+  const target = g.enhance + 1;
+  const level = masteryLevel(s.lifeSkillXp?.[gearProfession(g.def)] ?? 0);
+  const base = { target, chance: ENHANCE_CHANCE[Math.min(ENHANCE_MAX, target)] ?? 0, stones: enhanceStones(target), failure: enhanceFailure(target), level };
+  if (g.enhance >= ENHANCE_MAX) return { ok: false, reason: "max", ...base };
+  if (artisanProfession !== gearProfession(g.def)) return { ok: false, reason: "wrong-shop", ...base };
+  if (!isEnhanceTown(locationId)) return { ok: false, reason: "not-city", ...base };
+  if (level < ENHANCE_MIN_LEVEL) return { ok: false, reason: "low-skill", ...base };
+  if ((s.inventory[ENHANCE_STONE] ?? 0) < base.stones) return { ok: false, reason: "no-stone", ...base };
+  return { ok: true, ...base };
+}
+
+/**
+ * One enhancement attempt's outcome: the new key (null when it broke).
+ * `success` raises it one level; a failure follows `enhanceFailure`.
+ */
+export function rollEnhance(key: string, rand: () => number = Math.random): { outcome: "success" | "kept" | "down" | "broken"; key: string | null } {
+  const g = parseGear(key);
+  if (!g || g.enhance >= ENHANCE_MAX) return { outcome: "kept", key };
+  const target = g.enhance + 1;
+  if (rand() < (ENHANCE_CHANCE[target] ?? 0)) return { outcome: "success", key: gearKey(g.def.id, g.affixes, target) };
+  const failure = enhanceFailure(target);
+  if (failure === "break") return { outcome: "broken", key: null };
+  if (failure === "down") return { outcome: "down", key: gearKey(g.def.id, g.affixes, Math.max(0, g.enhance - 1)) };
+  return { outcome: "kept", key };
+}
+
+/** Enhancement stones a beaten foe leaves: tier 1 and up, more from the strong; a legendary beast 2–4. */
+export const ENHANCE_STONE_DROP: Readonly<Record<number, { chance: number; count: readonly [number, number] }>> = {
+  1: { chance: 0.1, count: [1, 1] },
+  2: { chance: 0.15, count: [1, 1] },
+  3: { chance: 0.2, count: [1, 2] },
+  4: { chance: 0.25, count: [1, 2] },
+  5: { chance: 0.3, count: [1, 3] },
+};
+
+export function rollEnhanceStones(opp: { ti?: number; boss?: boolean } | null | undefined): number {
+  if (!opp) return 0;
+  const between = ([lo, hi]: readonly [number, number]) => lo + Math.floor(Math.random() * (hi - lo + 1));
+  if (opp.boss) return between([2, 4]);
+  const drop = ENHANCE_STONE_DROP[Math.min(5, opp.ti ?? 0)];
+  return drop && Math.random() < drop.chance ? between(drop.count) : 0;
 }
 
 // ─── Recipes for craft-only gear ─────────────────────────────────────
@@ -203,7 +295,7 @@ export function repairGearKey(key: string, salt: number): string | null {
   const g = parseGear(key);
   if (!g) return null;
   if (g.affixes.length >= affixCountRange(g.def.ti)[0]) return g.key;
-  return gearKey(g.def.id, rollGearAffixes(g.def.ti, seededRng(hashKey(g.key), salt)));
+  return gearKey(g.def.id, rollGearAffixes(g.def.ti, seededRng(hashKey(g.key), salt)), g.enhance);
 }
 
 /** Repair the bag and the loadout's keys (unknown pieces dropped). */

@@ -16,7 +16,7 @@ import {
 } from "./skill-conflict";
 import type { Equipment } from "./types";
 import { meridianBuildBonus } from "./meridians";
-import { loadoutAffixes } from "./gear";
+import { enhanceBonus, loadoutAffixes, loadoutKeys, parseGear } from "./gear";
 
 // Pure: base stats → derived combat stats.
 //
@@ -116,6 +116,8 @@ export interface EquipBonus {
   eva_pct: number;
   crit_dmg: number;
   wexp: number;
+  // Enhancement (เสริมพลัง, gear.ts): % more on every hit dealt (weapon +6 up).
+  final_dmg: number;
 }
 
 // Aggregate special effects + flat additions from equipment and its options.
@@ -124,7 +126,7 @@ export function getEquipBonus(loadout: EquipLoadout): EquipBonus {
     atk: 0, pd: 0, id_: 0, hp: 0, mp: 0,
     pa: 0, ia: 0, spd: 0, acc: 0, res: 0,
     cri: 0, eva: 0, pct_atk: 0, pct_red: 0, hp_regen: 0,
-    pd_pct: 0, id_pct: 0, pa_pct: 0, ia_pct: 0, acc_pct: 0, eva_pct: 0, crit_dmg: 0, wexp: 0,
+    pd_pct: 0, id_pct: 0, pa_pct: 0, ia_pct: 0, acc_pct: 0, eva_pct: 0, crit_dmg: 0, wexp: 0, final_dmg: 0,
   };
   for (const e of getEquippedItems(loadout)) {
     b.atk += e.atkb;
@@ -167,6 +169,14 @@ export function getEquipBonus(loadout: EquipLoadout): EquipBonus {
       case "wexp": b.wexp += a.v; break;
       // stat → getEquipStatBonus; fam_dmg / fam_red → gearFamilyMods (battle context)
     }
+  }
+  // Enhancement levels (+1…+10) by the kind of piece.
+  for (const key of loadoutKeys(loadout)) {
+    const g = parseGear(key);
+    if (!g?.enhance) continue;
+    const e = enhanceBonus(g.def.ty, g.enhance);
+    b.atk += e.atk; b.pd += e.pd; b.id_ += e.id; b.hp += e.hp; b.mp += e.mp;
+    b.pa += e.pa; b.ia += e.ia; b.final_dmg += e.final_dmg;
   }
   return b;
 }

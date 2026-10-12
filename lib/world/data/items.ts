@@ -205,6 +205,8 @@ export const ITEMS: readonly ItemDef[] = ([
   // ─── Magic materials: re-roll gear options at a craft shop (lib/world/gear.ts)
   { id: "spirit_stone",  name: "หินศิลาวิเศษ",     category: "material", price: 400,
     description: "ผลึกหินเรืองแสงที่ยอดฝีมือและสัตว์ร้ายระดับสูงพกติดตัว ช่างที่ชำนาญขั้น 3 ขึ้นไปใช้หลอมออฟชั่นเสริมของอาวุธ แหวน และเครื่องประดับใหม่" },
+  { id: "enhance_stone", name: "ศิลาเสริมพลัง",    category: "material", price: 150,
+    description: "ศิลาผลึกใสที่ศัตรูฝีมือดีพกติดตัว ช่างในเมืองที่ชำนาญขั้น 3 ขึ้นไปใช้เสริมพลังอุปกรณ์ +1 ถึง +10 · ยิ่งสูงยิ่งเสี่ยง +6 ขึ้นไปพลาดแล้วลดขั้น +9 ขึ้นไปพลาดแล้วแตกสลาย" },
   { id: "spirit_thread", name: "ด้ายศิลาวิเศษ",    category: "material", price: 400,
     description: "ด้ายที่ฟั่นด้วยผงศิลาวิเศษ ช่างที่ชำนาญขั้น 3 ขึ้นไปใช้สุ่มออฟชั่นเสริมของเสื้อ หมวก รองเท้า และปลอกแขนใหม่" },
 

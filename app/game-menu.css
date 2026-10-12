@@ -374,4 +374,5 @@ body:has(.hud-menu, .game-modal) [data-radix-popper-content-wrapper] > * {
 /* An option's colour is how good its roll is (affixQuality 0–5, the rarity colours). */
 .affix-q0 { color: #d8d3c2; } .affix-q1 { color: #7fd48f; } .affix-q2 { color: #6fb8f2; }
 .affix-q3 { color: #c48ff0; } .affix-q4 { color: #f0a456; } .affix-q5 { color: #f06a55; font-weight: 700; }
+.gear-enhance { font-size: 13px; font-weight: 700; color: #ffd27a; }
 .gear-affixes-none { font-size: 13px; color: #9b8fb0; font-style: italic; }

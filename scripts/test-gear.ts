@@ -14,6 +14,10 @@ import {
   GEAR_FAMILY_REDUCE_CAP,
   affixParts,
   affixQuality,
+  ENHANCE_MAX,
+  enhanceBonus,
+  enhanceParts,
+  gearName,
   combinedStats,
   deriveAll,
   equipStatParts,
@@ -27,7 +31,7 @@ import {
   type CharacterBuild,
   type GearAffix,
 } from "../lib/game";
-import { calcSkillDamage, critMultiplier, makeContext, makeInitialState } from "../lib/game/battle";
+import { calcSkillDamage, critMultiplier, finalDamageMod, makeContext, makeInitialState } from "../lib/game/battle";
 import { SKILLS, isBeastMove, isBossMove } from "../lib/game/data";
 import { seededRng, withRandom } from "../lib/game/rng";
 import {
@@ -38,6 +42,13 @@ import {
   reforgeCheck,
   reforgeMaterial,
   recipeOutputName,
+  rerollGear,
+  ENHANCE_CHANCE,
+  ENHANCE_STONE,
+  enhanceFailure,
+  enhanceStones,
+  rollEnhance,
+  rollEnhanceStones,
   rollRecipeDrop,
   repairGear,
   rollSpiritMaterials,
@@ -406,6 +417,97 @@ check("reading a สูตร teaches it once; crafting at the line's shop forge
   // Not at a forge: no craft.
   useWorldStore.setState({ currentSceneId: "home_player", inventory: { ...inventory } });
   assert.deepEqual(store().craftRecipe(recipe.id), { ok: false, reason: "no-artisan" });
+});
+
+check("enhancement: the table by kind and band, levels add up; keys carry it, clamp it, keep it through a re-roll", () => {
+  assert.equal(ENHANCE_MAX, 10);
+  assert.deepEqual(enhanceBonus("W", 5), { atk: 50, pd: 0, id: 0, hp: 0, mp: 0, pa: 0, ia: 0, final_dmg: 0 });
+  assert.deepEqual(enhanceBonus("W", 7), { atk: 80, pd: 0, id: 0, hp: 0, mp: 0, pa: 0, ia: 0, final_dmg: 2 });
+  assert.deepEqual(enhanceBonus("W", 10), { atk: 135, pd: 0, id: 0, hp: 0, mp: 0, pa: 0, ia: 0, final_dmg: 11 });
+  for (const ty of ["A", "H", "B", "BR"] as const) {
+    assert.deepEqual(enhanceBonus(ty, 10), { atk: 0, pd: 135, id: 135, hp: 850, mp: 0, pa: 0, ia: 0, final_dmg: 0 }, ty);
+  }
+  assert.deepEqual(enhanceBonus("A", 6), { atk: 0, pd: 65, id: 65, hp: 350, mp: 0, pa: 0, ia: 0, final_dmg: 0 });
+  assert.deepEqual(enhanceBonus("C", 10), { atk: 0, pd: 0, id: 0, hp: 850, mp: 850, pa: 0, ia: 0, final_dmg: 0 });
+  assert.deepEqual(enhanceBonus("R", 10), { atk: 0, pd: 0, id: 0, hp: 0, mp: 0, pa: 85, ia: 85, final_dmg: 0 });
+  assert.deepEqual(enhanceBonus("R", 8), { atk: 0, pd: 0, id: 0, hp: 0, mp: 0, pa: 55, ia: 55, final_dmg: 0 });
+  const key = gearKey("eq_t1_w_sword", [{ k: "pa", v: 6 }], 7);
+  assert.equal(key, "eq_t1_w_sword~en:7,pa:6");
+  assert.equal(parseGear(key)!.enhance, 7);
+  assert.equal(parseGear("eq_t1_w_sword~en:99,pa:6")!.key, "eq_t1_w_sword~en:10,pa:6", "clamped to +10");
+  assert.equal(parseGear("eq_t0_w_fist~en:3")!.affixes.length, 0, "the level is no option");
+  assert.equal(gearName(key), "+7 กระบี่เหล็ก");
+  assert.equal(gearName("eq_t1_w_sword"), "กระบี่เหล็ก");
+  assert.equal(parseGear(withRandom(seededRng(1, 1), () => rerollGear(key)))!.enhance, 7, "a re-roll keeps the level");
+  assert.ok(enhanceParts("W", 7).includes("ความเสียหายสุดท้าย +2%"));
+  // Worn, it lands in the derived stats and the final damage.
+  newGame();
+  const b = build();
+  assert.equal(deriveAll(withGear(b, "eq_t0_w_fist~en:5")).Atk, deriveAll(withGear(b, "eq_t0_w_fist")).Atk + 50);
+  const armored = { ...b, equipment: { ...b.equipment, A: "eq_t0_a_cloth~en:6", C: ["eq_t0_c_cloth~en:5", null] as [string, null], R: ["eq_t0_r_copper~en:9", null] as [string, null] } };
+  const plain = { ...b, equipment: { ...b.equipment, A: "eq_t0_a_cloth", C: ["eq_t0_c_cloth", null] as [string, null], R: ["eq_t0_r_copper", null] as [string, null] } };
+  const [da, dp] = [deriveAll(armored), deriveAll(plain)];
+  assert.equal(da.PD - dp.PD, 65);
+  assert.equal(da.ID - dp.ID, 65);
+  assert.equal(da.HP - dp.HP, 350 + 250);
+  assert.equal(da.MP - dp.MP, 250);
+  assert.equal(da.PA - dp.PA, 25 + 30 + 15);
+  assert.equal(getBuildBonus(withGear(b, "W5~en:10")).final_dmg, 11);
+  assert.equal(finalDamageMod(getBuildBonus(withGear(b, "W5~en:10"))), 1.11);
+});
+
+check("enhancement odds and failures: +1–5 nothing lost, +6–8 one level down, +9–10 the piece breaks", () => {
+  assert.deepEqual([1, 5, 6, 8, 9, 10].map(enhanceStones), [1, 1, 2, 2, 3, 3]);
+  assert.deepEqual([3, 6, 9].map(enhanceFailure), ["none", "down", "break"]);
+  assert.equal(ENHANCE_CHANCE[1], 1);
+  for (let l = 2; l <= 10; l++) assert.ok(ENHANCE_CHANCE[l]! < ENHANCE_CHANCE[l - 1]!, `odds fall at +${l}`);
+  const win = () => 0, lose = () => 0.999;
+  assert.deepEqual(rollEnhance("eq_t1_w_sword~en:2", win), { outcome: "success", key: "eq_t1_w_sword~en:3" });
+  assert.deepEqual(rollEnhance("eq_t1_w_sword~en:2", lose), { outcome: "kept", key: "eq_t1_w_sword~en:2" });
+  assert.deepEqual(rollEnhance("eq_t1_w_sword~en:6,pa:6", lose), { outcome: "down", key: "eq_t1_w_sword~en:5,pa:6" });
+  assert.deepEqual(rollEnhance("eq_t1_w_sword~en:8", lose), { outcome: "broken", key: null });
+  assert.deepEqual(rollEnhance("eq_t1_w_sword~en:10", win), { outcome: "kept", key: "eq_t1_w_sword~en:10" }, "+10 is the top");
+  // Stones: tier 1 and up, a beast always.
+  assert.equal(withRandom(seededRng(2, 2), () => Array.from({ length: 500 }, () => rollEnhanceStones({ ti: 0 })).reduce((a, n) => a + n, 0)), 0);
+  const t3 = withRandom(seededRng(3, 3), () => Array.from({ length: 2000 }, () => rollEnhanceStones({ ti: 3 }) > 0 ? 1 : 0).reduce((a, n) => a + n, 0 as number));
+  assert.ok(t3 > 300 && t3 < 500, `tier 3 ≈ 20 %: ${t3}`);
+  for (let i = 0; i < 50; i++) { const n = rollEnhanceStones({ ti: 5, boss: true }); assert.ok(n >= 2 && n <= 4); }
+  assert.equal(getItem(ENHANCE_STONE)?.category, "material");
+  assert.ok(itemIconId(ENHANCE_STONE));
+});
+
+check("enhancing at a shop: a city craft shop of the line, craft level 3, stones; success, a fall and a break", () => {
+  newGame();
+  useWorldStore.setState({ gold: 10_000, currentSceneId: "city_capital" });
+  const bought = store().buyEquipment("eq_t1_w_blade", 300);
+  assert.ok(bought.ok);
+  let key = bought.equipId;
+  assert.deepEqual(store().enhanceGear(key), { ok: false, reason: "low-skill" });
+  useWorldStore.setState({ lifeSkillXp: { ...store().lifeSkillXp, forge: 300 } });
+  assert.deepEqual(store().enhanceGear(key), { ok: false, reason: "no-stone" });
+  useWorldStore.setState({ inventory: { ...store().inventory, [ENHANCE_STONE]: 20 } });
+  // A village forge won't.
+  useWorldStore.setState({ currentSceneId: "village_huashan" });
+  assert.deepEqual(store().enhanceGear(key), { ok: false, reason: "not-city" });
+  useWorldStore.setState({ currentSceneId: "city_capital" });
+  const r = store().enhanceGear(key);
+  assert.ok(r.ok && r.outcome === "success" && r.level === 1, "+1 never fails");
+  key = r.key!;
+  assert.equal(store().inventoryEquipment[key], 1);
+  assert.equal(store().inventory[ENHANCE_STONE], 19);
+  // Worn at +8: a failure aiming at +9 breaks it out of the slot.
+  const high = gearKey("eq_t1_w_blade", parseGear(key)!.affixes, 8);
+  useWorldStore.setState({ inventoryEquipment: {}, playerBuild: { ...store().playerBuild!, equipment: { ...store().playerBuild!.equipment, W: high } } });
+  const broke = withRandom(() => 0.999, () => store().enhanceGear(high, { ty: "W", idx: 0 }));
+  assert.ok(broke.ok && broke.outcome === "broken" && broke.key === null && broke.stones === 3);
+  assert.equal(store().playerBuild!.equipment.W, null);
+  assert.equal(store().inventory[ENHANCE_STONE], 16);
+  // At +6 from the bag: a failure drops it to +5.
+  const mid = gearKey("eq_t1_w_blade", [], 6);
+  useWorldStore.setState({ inventoryEquipment: { [mid]: 1 } });
+  const fell = withRandom(() => 0.999, () => store().enhanceGear(mid));
+  assert.ok(fell.ok && fell.outcome === "down" && fell.level === 5);
+  assert.deepEqual(store().inventoryEquipment, { [gearKey("eq_t1_w_blade", [], 5)]: 1 });
 });
 
 check("repair: pieces from before options get their share, alike every time; bad keys and slots go", () => {

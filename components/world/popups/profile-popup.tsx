@@ -17,6 +17,7 @@ import {
   deriveAll,
   getEquip,
   gearFamilyMods,
+  gearName,
   equipBonusParts,
   equipStatParts,
   getEquipBonus,
@@ -254,7 +255,7 @@ export function ProfilePopup({ open, onClose }: Props) {
                   return (
                     <li key={`${row.type}-${row.index ?? "x"}`}>
                       <span className="profile-gear-slot">{row.label}</span>
-                      <span className="profile-gear-name">{e ? e.n : <i>— ว่าง —</i>}</span>
+                      <span className="profile-gear-name">{e ? gearName(id) : <i>— ว่าง —</i>}</span>
                       {e && <small>{describeEquip(id)}</small>}
                       {e && <GearAffixLine gearKey={id} />}
                     </li>

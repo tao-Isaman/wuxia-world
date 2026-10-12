@@ -404,6 +404,11 @@ export interface DamageResult {
   reflectDmg: number;
 }
 
+/** The attacker's final-damage multiplier: enhanced weapons (+6 up) add % to every hit. */
+export function finalDamageMod(equip: Pick<EquipBonus, "final_dmg"> | undefined): number {
+  return 1 + (equip?.final_dmg ?? 0) / 100;
+}
+
 /** A crit's damage multiplier: ×1.5, plus the attacker's crit-damage gear options. */
 export function critMultiplier(equip: Pick<EquipBonus, "crit_dmg"> | undefined): number {
   return CRIT_MULTIPLIER + (equip?.crit_dmg ?? 0) / 100;
@@ -476,7 +481,7 @@ export function calcSkillDamage(
   const ed = Math.max(0, (sk.at === "phy" ? dd.PD : dd.ID) * defMul * pierce + fD - dR);
   // Gear options: more damage with this weapon family's moves, less taken from them.
   const fm = familyDamageMod(ctx.gearFamily?.[side], ctx.gearFamily?.[ds], sk.w);
-  const raw = Math.max(1, (ad.Atk * sm * ab + ta + se) * sk.dm * mm - ed) * (1 - pR / 100) * fm;
+  const raw = Math.max(1, (ad.Atk * sm * ab + ta + se) * sk.dm * mm - ed) * (1 - pR / 100) * fm * finalDamageMod(ctx.equipBonus[side]);
 
   const hp = hitPct(ea, ee);
   if (Math.random() * 100 >= hp) {
@@ -820,7 +825,7 @@ export function resolveArtActive(
   // doAtkHit applies damage, optional reflect; returns final dmg + crit flag.
   const doAtkHit = (rawDmg: number, hc: { cp: number }) => {
     const crit = Math.random() * 100 < hc.cp;
-    const dealt = Math.round(rawDmg * riposte * (crit ? critMultiplier(ctx.equipBonus[side]) : 1));
+    const dealt = Math.round(rawDmg * finalDamageMod(ctx.equipBonus[side]) * riposte * (crit ? critMultiplier(ctx.equipBonus[side]) : 1));
     state.hitsReceived[ds]++;
     // A meridian shield soaks first; then the defender's rages roll.
     const dmg = landDamage(state, ds, dealt);

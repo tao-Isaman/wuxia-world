@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Modal } from "@/components/ui/modal";
-import { SLOT_LABELS, STAT_LABEL, affixParts, equipStatParts, gearTierLabel, getEquip } from "@/lib/game";
+import { SLOT_LABELS, STAT_LABEL, affixParts, equipStatParts, gearName, gearTierLabel, getEquip } from "@/lib/game";
 import { GearAffixList } from "@/components/game/gear-affixes";
 import type { EquipSlotType, Equipment } from "@/lib/game";
 import { ITEM_CATEGORIES, ITEM_CATEGORY_LABEL, LIFE_SKILL_LABEL, getItem, type ItemCategory } from "@/lib/world";
@@ -143,13 +143,14 @@ export function InventoryPopup({ open, onClose }: Props) {
             <div className="bag-doll-figure" aria-hidden="true"><CharacterPreview id={bodyId} animate /></div>
             {SLOT_ROWS.map((row) => {
               const eq = equipped(row);
+              const name = gearName(equippedKey(row));
               const key = `${row.type}-${row.index ?? "x"}`;
               return <div key={key} className="bag-doll-slot" style={{ gridArea: DOLL_AREA[key] }} data-slot={key}>
                 <ItemTile glyph={CATEGORY_GLYPH[row.type]} icon={equipmentIconUrl(eq?.id)} rarity={eq ? equipRarity(eq) : 0} dim={!eq}
-                  label={eq ? `${row.label}: ${eq.n}` : `${row.label}: ว่าง`}
+                  label={eq ? `${row.label}: ${name}` : `${row.label}: ว่าง`}
                   selected={isSelected({ kind: "slot", row })}
                   onClick={() => setSelection({ kind: "slot", row })} />
-                <span className="bag-gear-label">{eq ? eq.n : row.label}</span>
+                <span className="bag-gear-label">{eq ? name : row.label}</span>
               </div>;
             })}
           </div>
@@ -177,9 +178,9 @@ export function InventoryPopup({ open, onClose }: Props) {
                 const opts = affixParts(c.id);
                 return <div className="bag-cell" data-gear-key={c.id}>
                   <ItemTile glyph={CATEGORY_GLYPH[eq.ty]} icon={equipmentIconUrl(eq.id)} rarity={rarity} count={c.n}
-                    label={`${eq.n} ×${c.n}${opts.length ? ` · ${opts.join(" · ")}` : ""}`} selected={isSelected({ kind: "bagEquip", id: c.id })}
+                    label={`${gearName(c.id)} ×${c.n}${opts.length ? ` · ${opts.join(" · ")}` : ""}`} selected={isSelected({ kind: "bagEquip", id: c.id })}
                     onClick={() => setSelection({ kind: "bagEquip", id: c.id })} />
-                  <span style={{ color: rarityColor(rarity) }} aria-hidden="true">{eq.n}</span>
+                  <span style={{ color: rarityColor(rarity) }} aria-hidden="true">{gearName(c.id)}</span>
                 </div>;
               }
               const def = getItem(c.id);
@@ -250,7 +251,7 @@ function BagDetail({ selection, inventory, inventoryEquipment, equipped, equippe
     const eq = getEquip(selection.id);
     if (!eq || n <= 0) return <p className="bag-detail-hint">ไม่มีอุปกรณ์นี้ในย่ามแล้ว</p>;
     return <>
-      <h3 className="bag-detail-name" style={{ color: rarityColor(equipRarity(eq)) }}>{eq.n}</h3>
+      <h3 className="bag-detail-name" style={{ color: rarityColor(equipRarity(eq)) }}>{gearName(selection.id)}</h3>
       <p className="bag-detail-meta">{SLOT_LABELS[eq.ty]} · ชั้น{gearTierLabel(eq.ti)} · มี {n} ชิ้น</p>
       <ul className="bag-detail-stats">{equipStats(eq).map((stat) => <li key={stat}>{stat}</li>)}</ul>
       <GearAffixList gearKey={selection.id} />
@@ -263,7 +264,7 @@ function BagDetail({ selection, inventory, inventoryEquipment, equipped, equippe
     <p className="bag-detail-hint">ช่องว่าง — เลือกอุปกรณ์ในย่ามแล้วกดติดตั้ง</p>
   </>;
   return <>
-    <h3 className="bag-detail-name" style={{ color: rarityColor(equipRarity(eq)) }}>{eq.n}</h3>
+    <h3 className="bag-detail-name" style={{ color: rarityColor(equipRarity(eq)) }}>{gearName(equippedKey(selection.row))}</h3>
     <p className="bag-detail-meta">สวมอยู่ · {selection.row.label} · ชั้น{gearTierLabel(eq.ti)}</p>
     <ul className="bag-detail-stats">{equipStats(eq).map((stat) => <li key={stat}>{stat}</li>)}</ul>
     <GearAffixList gearKey={equippedKey(selection.row)} />

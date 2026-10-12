@@ -58,6 +58,7 @@ export const ITEM_ICONS: Readonly<Record<string, string>> = {
   // ── magic materials (gear options)
   spirit_stone: "ico_material_ore_05",
   spirit_thread: "ico_material_cloth_03",
+  enhance_stone: "ico_material_ore_03",
   // ── legendary beast trophies
   trophy_golden_serpent: "ico_material_animal_part_07",
   trophy_blood_tiger: "ico_material_animal_part_06",

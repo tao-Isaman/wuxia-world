@@ -100,11 +100,22 @@ export interface OwnedGear {
   key: string;
   def: Equipment;
   affixes: GearAffix[];
+  /** Enhancement (เสริมพลัง) level, 0–ENHANCE_MAX. */
+  enhance: number;
 }
 
-/** The key for a piece and its options (a bare id when it has none). */
-export function gearKey(baseId: string, affixes: readonly GearAffix[]): string {
-  return affixes.length ? `${baseId}~${affixes.map(encodeAffix).join(",")}` : baseId;
+/** The highest enhancement (เสริมพลัง) a piece can reach. */
+export const ENHANCE_MAX = 10;
+
+const clampEnhance = (v: number) => Math.max(0, Math.min(ENHANCE_MAX, Math.floor(Number.isFinite(v) ? v : 0)));
+
+/**
+ * The key for a piece, its enhancement and its options (a bare id when it has
+ * neither): `eq_t1_w_sword~en:7,pa:6,cri:9`.
+ */
+export function gearKey(baseId: string, affixes: readonly GearAffix[], enhance = 0): string {
+  const tokens = [...(clampEnhance(enhance) > 0 ? [`en:${clampEnhance(enhance)}`] : []), ...affixes.map(encodeAffix)];
+  return tokens.length ? `${baseId}~${tokens.join(",")}` : baseId;
 }
 
 /**
@@ -118,17 +129,70 @@ export function parseGear(key: string | null | undefined): OwnedGear | null {
   if (!def) return null;
   const cut = key.indexOf("~");
   const affixes: GearAffix[] = [];
+  let enhance = 0;
   if (cut >= 0) {
     const max = affixCountRange(def.ti)[1];
     const seen = new Set<GearAffixKind>();
     for (const token of key.slice(cut + 1).split(",")) {
+      if (token.startsWith("en:")) {
+        enhance = clampEnhance(Number(token.slice(3)));
+        continue;
+      }
       const a = decodeAffix(token);
       if (!a || seen.has(a.k) || affixes.length >= max) continue;
       seen.add(a.k);
       affixes.push(a);
     }
   }
-  return { key: gearKey(baseId, affixes), def, affixes };
+  return { key: gearKey(baseId, affixes, enhance), def, affixes, enhance };
+}
+
+/** A piece's enhancement level (0 for a bare id or an unknown key). */
+export function gearEnhance(key: string | null | undefined): number {
+  return parseGear(key)?.enhance ?? 0;
+}
+
+// ─── Enhancement (เสริมพลัง) ──────────────────────────────────────────
+// What each level adds, by the kind of piece; levels add up (+7 on a weapon
+// = five × 10 + two × 15 Atk). Bands: +1–5, +6–8, +9–10.
+
+export type EnhanceKind = "weapon" | "armor" | "charm" | "ring";
+
+export function enhanceKind(ty: Equipment["ty"]): EnhanceKind {
+  return ty === "W" ? "weapon" : ty === "C" ? "charm" : ty === "R" ? "ring" : "armor";
+}
+
+/** The band a level falls in: 0 for +1–5, 1 for +6–8, 2 for +9–10. */
+export function enhanceBand(level: number): 0 | 1 | 2 {
+  return level <= 5 ? 0 : level <= 8 ? 1 : 2;
+}
+
+/** What one level in each band adds. */
+export const ENHANCE_STEP: Readonly<Record<EnhanceKind, readonly Readonly<Partial<Record<"atk" | "def" | "hp" | "mp" | "pa_ia" | "final_dmg", number>>>[]>> = {
+  weapon: [{ atk: 10 }, { atk: 15, final_dmg: 1 }, { atk: 20, final_dmg: 4 }],
+  armor: [{ def: 10, hp: 50 }, { def: 15, hp: 100 }, { def: 20, hp: 150 }],
+  charm: [{ hp: 50, mp: 50 }, { hp: 100, mp: 100 }, { hp: 150, mp: 150 }],
+  ring: [{ pa_ia: 5 }, { pa_ia: 10 }, { pa_ia: 15 }],
+};
+
+export interface EnhanceBonus { atk: number; pd: number; id: number; hp: number; mp: number; pa: number; ia: number; final_dmg: number }
+
+/** Everything a piece of this slot at this enhancement adds, summed over its levels. */
+export function enhanceBonus(ty: Equipment["ty"], level: number): EnhanceBonus {
+  const out: EnhanceBonus = { atk: 0, pd: 0, id: 0, hp: 0, mp: 0, pa: 0, ia: 0, final_dmg: 0 };
+  const steps = ENHANCE_STEP[enhanceKind(ty)];
+  for (let l = 1; l <= clampEnhance(level); l++) {
+    const s = steps[enhanceBand(l)]!;
+    out.atk += s.atk ?? 0;
+    out.pd += s.def ?? 0;
+    out.id += s.def ?? 0;
+    out.hp += s.hp ?? 0;
+    out.mp += s.mp ?? 0;
+    out.pa += s.pa_ia ?? 0;
+    out.ia += s.pa_ia ?? 0;
+    out.final_dmg += s.final_dmg ?? 0;
+  }
+  return out;
 }
 
 /** A piece's options (none for a bare id or an unknown key). */

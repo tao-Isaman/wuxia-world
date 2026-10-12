@@ -487,6 +487,17 @@ A base-stat option counts in battle and everywhere stats are shown, but not for 
 
 **Craft-only gear (`lib/world/data/gear-recipes.ts`).** Twenty-eight pieces are sold by no one and dropped by no foe: the old ×1–×3 sets (ดาบเหล็กสามัญ, ดาบทองคำ, ดาบเพลิง; เสื้อผ้าธรรมดา, เกราะหนัง, เกราะเหล็ก; the cloth, leather and iron hats, boots and bracers; แหวนทองเปล่า, แหวนพลัง, แหวนชีวิต; เหรียญโชคลาภ, ประดับเลือดมังกร, ประดับปัญญาสวรรค์) and every tier-3 piece. Each is made from its recipe at the craft shop of its line, with that craft at level 1 / 2 / 3 / 4 for tier 0 / 1 / 2 / 3, from common materials (iron ingots, leather, thread, ores, jade…) — a tier-3 piece also takes a legendary beast's trophy; a crafted piece rolls its options like any other. The recipe is what drops: a foe leaves a **สูตร…** item 5 % of wins (a legendary beast 25 %; not spars, the law or bouts) — tier-0 foes tier-0 recipes, tier 1 tiers 0–1, tier 2 tiers 1–2, tier 3 tiers 2–3, tier 4 and up (beasts too) tier 3 — preferring one the hero neither knows nor carries. Reading it (ย่าม → ใช้) adds it to the shop's ประดิษฐ์ tab; a known recipe is kept.
 
+**Enhancement (⚒ เสริมพลัง, +1 to +10).** At a **city** craft shop of the piece's line, with the hero's own craft at level 3+, for **ศิลาเสริมพลัง** (1 stone aiming at +1–5, 2 at +6–8, 3 at +9–10). Each level adds by the kind of piece, and the levels add up:
+
+| Piece | +1–5, each | +6–8, each | +9–10, each | at +10 |
+| --- | --- | --- | --- | --- |
+| weapon | พลังโจมตี +10 | พลังโจมตี +15, ความเสียหายสุดท้าย +1 % | พลังโจมตี +20, ความเสียหายสุดท้าย +4 % | +135, +11 % |
+| robe, hat, boots, bracers | ป้องกันกาย / ใน +10, HP +50 | +15, HP +100 | +20, HP +150 | +135 each, HP +850 |
+| charm | HP and MP +50 | +100 | +150 | +850 each |
+| ring | โจมตีกาย / ใน +5 | +10 | +15 | +85 each |
+
+Success odds by the level aimed at: +1 100 %, +2 95, +3 90, +4 85, +5 80, +6 65, +7 55, +8 45, +9 30, +10 20 %. A failure aiming at +1–5 costs only the stones; at +6–8 the piece drops a level; at +9–10 it breaks and is gone (the shop asks first). ความเสียหายสุดท้าย multiplies every hit the wearer lands, moves and art actives alike. The stones drop from tier-1-and-up foes (10 / 15 / 20 / 25 / 30 % for T1–T5, 1–3 of them) and always 2–4 from a legendary beast. An enhanced piece shows as "+7 ดาบ…"; a re-roll of its options keeps the level.
+
 **Re-rolling options (✦ สุ่มออฟชั่น).** The craft shop of the piece's own line re-rolls the whole set, on a worn piece or one in the bag: the forge (weapons, iron armour and every beast-won armour), the tailor (cloth, leather and silk), the jeweller (rings) and the accessory maker (charms). It needs the hero's own skill in that craft at **level 3** or more, and one magic material per roll: **หินศิลาวิเศษ** for weapons, rings and charms, **ด้ายศิลาวิเศษ** for robes, hats, boots and bracers. Both drop only from tier-3-and-up foes: tier 3 each 20 % (1), tier 4 30 % (1–2), tier 5 40 % (1–2), a legendary beast always 2–3 of each. Spars, the law and tournament bouts leave none.
 
 **Outfits and the weapon on the body** ([design/appearance.md](design/appearance.md)). The โปรไฟล์ window's **ชุด** tab is the wardrobe: each outfit shows the hero in it, carrying their weapon. An outfit changes only the look (never stats) and is a recolour of the hero's own drawing, so it shows on the map, in battle and in films, and other players see it online.

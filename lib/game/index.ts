@@ -142,4 +142,4 @@ export {
   POWER_TIERS, powerBreakdown, powerScore, powerTier, powerTierOf, powerOutlook,
   type PowerTier, type PowerBreakdown, type PowerOutlook,
 } from "./power-tier";
-export { AFFIX_LABEL, DERIVED_LABEL, GEAR_TIER_LABEL, affixParts, affixText, equipStatParts, equipBonusParts, gearTierLabel } from "./stat-text";
+export { AFFIX_LABEL, DERIVED_LABEL, GEAR_TIER_LABEL, affixParts, affixText, enhanceParts, equipStatParts, equipBonusParts, gearName, gearTierLabel } from "./stat-text";

@@ -27,7 +27,7 @@
 // touching state. Ties break on lower x, then y, then slot (deterministic).
 // The AI never flees — retreat is the player's decision.
 
-import { artActiveRaw, artDamageMults, atkStackMod, critMultiplier, iatkBuffMod, masteryMod, PCT_REDUCE_CAP } from "../battle";
+import { artActiveRaw, artDamageMults, atkStackMod, critMultiplier, finalDamageMod, iatkBuffMod, masteryMod, PCT_REDUCE_CAP } from "../battle";
 import { familyDamageMod } from "../gear";
 import { frenzyPct, isScorched } from "../effects";
 import { accPctOf, criRateOf, defPctOf } from "../meridian-battle";
@@ -125,7 +125,7 @@ function estimateSkill(u: GridUnit, foe: GridUnit, sk: Skill): Estimate {
   const pierce = 1 - Math.max(0, Math.min(100, sk.pen ?? 0)) / 100;
   const ed = Math.max(0, (sk.at === "phy" ? dd.PD : dd.ID) * (1 + defPctOf(foe.status) / 100) * pierce + fD - dR);
   const fm = familyDamageMod(ctx.gearFamily?.A, ctx.gearFamily?.B, sk.w);
-  const raw = Math.max(1, (d.Atk * sm * ab + ta + se) * sk.dm * mm - ed) * (1 - pR / 100) * fm;
+  const raw = Math.max(1, (d.Atk * sm * ab + ta + se) * sk.dm * mm - ed) * (1 - pR / 100) * fm * finalDamageMod(ctx.equipBonus.A);
   const hit = hitPct(accuracy(u), evasion(foe)) / 100;
   const crit = critOf(u, foe);
   return { expected: raw * hit * (1 + crit * (critMultiplier(ctx.equipBonus.A) - 1)), onHit: raw, hit, crit };

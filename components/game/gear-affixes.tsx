@@ -1,6 +1,6 @@
 "use client";
 
-import { affixCountRange, affixQuality, affixText, gearTierLabel, parseGear } from "@/lib/game";
+import { affixCountRange, affixQuality, affixText, enhanceParts, gearTierLabel, parseGear } from "@/lib/game";
 
 // A piece's random options (ออฟชั่นเสริม, lib/game/gear.ts): its tier, how many
 // it can roll, and each option in words. Used by the bag, the profile and the
@@ -15,6 +15,9 @@ export function GearAffixList({ gearKey, className }: { gearKey: string | null |
       <p className="gear-affixes-head">
         ออฟชั่นเสริม <span>ชั้น{gearTierLabel(g.def.ti)} · สุ่มได้ {lo === hi ? lo : `${lo}–${hi}`} อย่าง</span>
       </p>
+      {g.enhance > 0 && (
+        <p className="gear-enhance" data-enhance={g.enhance}>⚒ เสริมพลัง +{g.enhance}: {enhanceParts(g.def.ty, g.enhance).join(" · ")}</p>
+      )}
       {g.affixes.length ? (
         <ul>
           {g.affixes.map((a) => {

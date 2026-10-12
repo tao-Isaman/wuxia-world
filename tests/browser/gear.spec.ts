@@ -31,7 +31,7 @@ test("gear options: bought with coloured options, shown in the bag, re-rolled at
   await expect(page.getByTestId("world-canvas")).toHaveAttribute("data-ready", "true", { timeout: 60_000 });
   await patch(page, `state.gold = 5000; state.currentSceneId = "city_capital"; state.lastLocationId = "city_capital";
     state.visitedLocationIds = [...new Set([...state.visitedLocationIds, "city_capital"])];
-    state.inventory = { ...state.inventory, spirit_stone: 2 };`);
+    state.inventory = { ...state.inventory, spirit_stone: 2, enhance_stone: 3 };`);
 
   // Buy a tier-1 sword: 1–2 options, each coloured by its roll.
   await openForge(page);
@@ -74,4 +74,18 @@ test("gear options: bought with coloured options, shown in the bag, re-rolled at
   for (const c of colors) expect(c).not.toBe("rgb(230, 210, 255)"); // a quality colour, not the box's plain text
   await page.waitForTimeout(300);
   await page.screenshot({ path: "test-results/screenshots/gear-bag.png" });
+  await page.keyboard.press("Escape");
+  await page.keyboard.press("Escape");
+
+  // ⚒ เสริมพลัง: +1 never fails; the piece is "+1 กระบี่เหล็ก" after.
+  await openForge(page);
+  await page.getByTestId("artisan-tab-enhance").click();
+  const enhance = page.locator(`[data-enhance-key="${newKey}"]`).getByTestId("enhance-button");
+  await expect(enhance).toBeEnabled();
+  await enhance.click();
+  await expect.poll(async () => Object.keys((await save(page)).inventoryEquipment)[0]).toMatch(/^eq_t1_w_sword~en:1/);
+  expect((await save(page)).inventory.enhance_stone).toBe(2);
+  await expect(page.getByTestId("artisan-enhance")).toContainText("+1 กระบี่เหล็ก");
+  await page.waitForTimeout(300);
+  await page.screenshot({ path: "test-results/screenshots/gear-enhance.png" });
 });

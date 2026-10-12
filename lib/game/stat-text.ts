@@ -6,7 +6,8 @@ import type { Equipment, StatKey } from "./types";
 import type { EquipBonus } from "./derive";
 import { STAT_LABEL } from "./data/stats";
 import { WEAPON_FAMILY_LABEL } from "./data/weapons";
-import { gearAffixes, type GearAffix, type GearAffixKind } from "./gear";
+import { enhanceBonus, gearAffixes, parseGear, type GearAffix, type GearAffixKind } from "./gear";
+import type { EquipSlotType } from "./types";
 
 /** The derived stats (`deriveAll`'s keys) in Thai. */
 export const DERIVED_LABEL = {
@@ -71,6 +72,7 @@ export function equipBonusParts(eb: EquipBonus, stats: Partial<Record<StatKey, n
   if (eb.eva_pct) out.push(`${DERIVED_LABEL.Eva} +${eb.eva_pct}%`);
   if (eb.crit_dmg) out.push(`ความเสียหายคริติคอล +${eb.crit_dmg}%`);
   if (eb.wexp) out.push(`ประสบการณ์ยุทธที่ได้รับ +${eb.wexp}%`);
+  if (eb.final_dmg) out.push(`ความเสียหายสุดท้าย +${eb.final_dmg}%`);
   if (eb.pct_red) out.push(`ลดความเสียหายที่ได้รับ ${eb.pct_red}%`);
   if (eb.hp_regen) out.push(`ฟื้นพลังชีวิต ${eb.hp_regen}% ทุกตา`);
   for (const [k, v] of Object.entries(stats)) if (v) add(STAT_LABEL[k as StatKey] ?? k, v);
@@ -126,4 +128,26 @@ export function affixParts(keyOrAffixes: string | null | undefined | readonly Ge
 export const GEAR_TIER_LABEL = ["ธรรมดา", "ดี", "ชั้นเลิศ", "หายาก", "ในตำนาน"] as const;
 export function gearTierLabel(ti: number): string {
   return GEAR_TIER_LABEL[Math.max(0, Math.min(4, Math.floor(ti)))]!;
+}
+
+/** What an enhancement level adds to a piece of this slot, in words. */
+export function enhanceParts(ty: EquipSlotType, level: number): string[] {
+  const e = enhanceBonus(ty, level);
+  const out: string[] = [];
+  if (e.atk) out.push(`${DERIVED_LABEL.Atk} +${e.atk}`);
+  if (e.pd) out.push(`${DERIVED_LABEL.PD} +${e.pd}`);
+  if (e.id) out.push(`${DERIVED_LABEL.ID} +${e.id}`);
+  if (e.pa) out.push(`${DERIVED_LABEL.PA} +${e.pa}`);
+  if (e.ia) out.push(`${DERIVED_LABEL.IA} +${e.ia}`);
+  if (e.hp) out.push(`${DERIVED_LABEL.HP}สูงสุด +${e.hp}`);
+  if (e.mp) out.push(`${DERIVED_LABEL.MP}สูงสุด +${e.mp}`);
+  if (e.final_dmg) out.push(`ความเสียหายสุดท้าย +${e.final_dmg}%`);
+  return out;
+}
+
+/** A piece's name with its enhancement: "+7 กระบี่เหล็ก" (plain name at +0). */
+export function gearName(key: string | null | undefined): string {
+  const g = parseGear(key);
+  if (!g) return key ?? "";
+  return g.enhance > 0 ? `+${g.enhance} ${g.def.n}` : g.def.n;
 }
