@@ -8,6 +8,8 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ### Gear options (ออฟชั่นเสริม)
 
+- **Menus open alone**: an open menu no longer shows the strip of every other section above it; the ✕ sits in the panel's top corner, the HUD icons open another section (keys 1–0 and M still switch).
+
 - **Every piece of gear counts at half** its old numbers (stats and effects); random options make up the rest. A piece rolls them when gained, by its tier: ธรรมดา 0–1, ดี 1–2, ชั้นเลิศ (city specialties) 1–3, หายาก (beast gear) 2–3, ในตำนาน 3–4.
 - **17 kinds of option**, each equally likely: a base stat +1–10; ป้องกันกาย / ป้องกันใน / โจมตีกาย / โจมตีใน +5–15 or +1–10 %; แม่นยำ / หลบหลีก +1–15 %; คริติคอล / ต้านทานคริติคอล +5–15; ความเสียหายคริติคอล +1–10 %; ประสบการณ์ยุทธที่ได้รับ +5–15 %; a weapon family's moves +5–25 % harder, or −5–25 % on the wearer (capped at 60 %).
 - **Coloured by how good the roll is**: grey at the bottom of an option's range, then green, blue, purple, orange, red-gold at the very top — in the bag, the profile, the craft shop and the spoils panel.

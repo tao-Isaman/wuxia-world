@@ -97,9 +97,12 @@ test("mobile HUD: top icons, left-thumb joystick and a context action button", a
   await page.screenshot({ path: "test-results/screenshots/mobile-profile.png" });
   await profileTabs.getByRole("tab", { name: "อุปกรณ์" }).click();
   await expect(page.getByRole("tabpanel", { name: "อุปกรณ์" })).toContainText("อาวุธ");
+  // No strip of the other sections above an open menu.
+  await expect(page.getByRole("dialog").getByRole("tablist", { name: "หมวดเมนู" })).toHaveCount(0);
   // Every menu section fits: no column scrolls.
   for (const section of ["โปรไฟล์", "ย่าม", "วิชา", "อาชีพ", "จดหมาย"]) {
-    await page.getByRole("dialog").getByRole("tab", { name: section, exact: true }).click();
+    await page.getByRole("button", { name: "ปิด", exact: true }).click();
+    await page.getByRole("navigation", { name: "เมนูเกม" }).getByRole("button", { name: section, exact: true }).click();
     await expect(page.locator(".hud-menu-panel--fill")).toBeVisible();
     const overflow = await page.locator(".menu-col:not(.menu-col--scroll), .hud-menu-panel--fill .hud-menu-body").evaluateAll((nodes) =>
       nodes.filter((node) => node.scrollHeight > node.clientHeight + 2).map((node) => node.className));

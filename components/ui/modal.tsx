@@ -25,7 +25,8 @@ const typing = (target: EventTarget | null) =>
 
 // Lightweight modal — backdrop click + Escape close, scrolls inside the card
 // if the content overflows the viewport. Opened from the HUD menu bar it
-// becomes the full-screen tabbed menu shell (see game-menu-context.tsx).
+// becomes the full-screen menu shell (see game-menu-context.tsx): the section
+// alone, no strip of the other sections above it (number keys still switch).
 export function Modal({ open, onClose, title, children, maxWidth = "max-w-2xl", fill = false }: Props) {
   const menu = useGameMenu();
   const nested = useInsideMenuShell();
@@ -49,24 +50,10 @@ export function Modal({ open, onClose, title, children, maxWidth = "max-w-2xl", 
   const activeTab = menu?.tabs.find((tab) => tab.id === menu.active);
   if (shell && menu) {
     return (
-      <div className="hud-menu" role="dialog" aria-modal="true" aria-label={cleanTitle(title)}>
-        <header className="hud-menu-bar">
-          <nav className="hud-menu-tabs" role="tablist" aria-label="หมวดเมนู">
-            {menu.tabs.map((tab) => (
-              <button key={tab.id} type="button" role="tab" aria-selected={tab.id === menu.active}
-                className="hud-menu-tab" onClick={() => menu.select(tab.id)}
-                title={tab.hotkey ? `${tab.label} (${tab.hotkey})` : tab.label}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={tab.icon} alt="" className="pixel" draggable={false} />
-                <span>{tab.label}</span>
-                {typeof tab.badge === "number" && <b className="hud-menu-badge">{tab.badge}</b>}
-              </button>
-            ))}
-          </nav>
-          <button type="button" className="hud-menu-close" onClick={onClose} aria-label="ปิด">✕</button>
-        </header>
+      <div className="hud-menu" role="dialog" aria-modal="true" aria-label={cleanTitle(title)} data-menu-section={menu.active ?? undefined}>
         <div className="hud-menu-stage" onClick={onClose}>
           <section className={`hud-menu-panel game-modal-card${fill ? " hud-menu-panel--fill" : ""}`} onClick={(e) => e.stopPropagation()}>
+            <button type="button" className="hud-menu-close" onClick={onClose} aria-label="ปิด">✕</button>
             {title && <h2 className="hud-menu-title">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               {activeTab && <img src={activeTab.icon} alt="" className="pixel" draggable={false} />}

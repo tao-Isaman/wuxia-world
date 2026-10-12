@@ -83,8 +83,10 @@
 .hud-menu-close:focus-visible { outline: 2px solid #f2d790; }
 .hud-menu-stage {
   flex: 1; min-height: 0; display: flex; justify-content: center; align-items: flex-start;
-  padding: 18px max(20px, var(--safe-right)) max(18px, var(--safe-bottom)) max(20px, var(--safe-left));
+  padding: max(18px, var(--safe-top)) max(20px, var(--safe-right)) max(18px, var(--safe-bottom)) max(20px, var(--safe-left));
 }
+/* No strip of sections above the menu: the close button sits in the panel's top corner. */
+.hud-menu-panel > .hud-menu-close { position: absolute; z-index: 2; top: 2px; right: 6px; width: 44px; height: 44px; margin: 0; font-size: 30px; }
 .hud-menu-panel {
   position: relative; width: min(1120px, 100%); display: flex; flex-direction: column; min-height: min(360px, 100%); max-height: 100%;
   padding: 0;
@@ -109,7 +111,7 @@
   .hud-menu-tab { flex-direction: column; gap: 1px; min-height: 54px; padding: 5px 8px 6px; font-size: 11px; }
   .hud-menu-tab img { width: 24px; height: 24px; }
   .hud-menu-close { width: 44px; height: 48px; font-size: 30px; }
-  .hud-menu-stage { padding: 8px 6px max(8px, var(--safe-bottom)); }
+  .hud-menu-stage { padding: max(8px, var(--safe-top)) max(6px, var(--safe-right)) max(8px, var(--safe-bottom)) max(6px, var(--safe-left)); }
   .hud-menu-panel::before, .hud-menu-panel::after { display: none; }
   .hud-menu-title { font-size: 18px; padding: 8px 12px; }
   .hud-menu-body { padding: 12px 12px 18px; }
@@ -119,7 +121,8 @@
   .hud-menu-tab { min-height: 40px; padding: 3px 9px 4px; font-size: 12px; }
   .hud-menu-tab img { width: 20px; height: 20px; }
   .hud-menu-close { height: 40px; font-size: 28px; }
-  .hud-menu-stage { padding-top: 6px; padding-bottom: 6px; }
+  .hud-menu-stage { padding-top: max(6px, var(--safe-top)); padding-bottom: max(6px, var(--safe-bottom)); }
+  .hud-menu-panel > .hud-menu-close { width: 38px; height: 38px; font-size: 26px; top: 0; right: 4px; }
   .hud-menu-title { padding: 5px 14px; font-size: 17px; }
 }
 @media (prefers-reduced-motion: reduce) { .hud-menu { animation: none; } }
