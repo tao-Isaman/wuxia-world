@@ -497,7 +497,7 @@ export const ARTS: readonly Art[] = withTextOverrides<Art>("arts", [
   { id: "kuyt", n: "ลมปราณตะวันเก้าชั้น", sc: "ยุทธจักร", tp: "สมดุล·ภายใน", types: ["balance", "internal"], ti: 5,
     stats: { STR: 20, POW: 20, AGI: 20, VIT: 20 }, hL: 40, mL: 40,
     hpRegenPct: 5, mpRegenPct: 5,
-    act: { n: "ฟื้นพลังตะวันเก้าชั้น", c: 50, cd: 6, t: "heal_full_cleanse", h: 50, mh: 50, d: "ฟื้น 50% HP/MP + ลบดีบัฟทุกระดับ CD6" },
+    act: { n: "ฟื้นพลังตะวันเก้าชั้น", c: 50, cd: 6, t: "heal_full_cleanse", h: 50, mh: 50, d: "ฟื้น 50% HP/MP + ลบสถานะผิดปกติทุกระดับ CD6" },
     pas: { tr: "hit_recv", ch: 100, d: "ถูกโจมตี 100% → สะท้อน 20% (5ตา) — ลมปราณตะวันเก้าชั้นสะท้อนกลับ", e: { t: "buff_reflect", n: "ลมปราณตะวันเก้าชั้น", v: 20, u: 5 } } },
   { id: "kgim", n: "คัมภีร์จันทราเก้าชั้น", sc: "ยุทธจักร", tp: "หยิน·ภายใน", types: ["yin", "internal"], ti: 5,
     stats: { INT: 30, POW: 30, DEX: 20 }, hL: 20, mL: 60,

@@ -588,7 +588,7 @@ function summarizeRewards(rewards: readonly QuestReward[]): string {
         break;
       }
       case "wExp":
-        parts.push(`+${r.amount} w-exp`);
+        parts.push(`ประสบการณ์ยุทธ +${r.amount}`);
         break;
       case "skillExp":
         parts.push(`+${r.amount} ประสบการณ์ · ${getSkill(r.skillId)?.n ?? "วิชา"}`);

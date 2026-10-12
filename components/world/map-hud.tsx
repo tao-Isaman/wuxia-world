@@ -69,7 +69,7 @@ export function MapHud() {
       <div className="hud-purse">
         <PurseDelta value={gold} />
         <span title="เงิน"><b>{gold.toLocaleString()}</b> <i>ตำลึง</i></span>
-        <span title="W-EXP" className="hud-purse-wexp"><b>{wExp.toLocaleString()}</b> <i>悟</i></span>
+        <span title="ประสบการณ์ยุทธ" className="hud-purse-wexp"><b>{wExp.toLocaleString()}</b> <i>悟</i></span>
       </div>
       <div className="hud-clock">
         <Sundial time={time} />

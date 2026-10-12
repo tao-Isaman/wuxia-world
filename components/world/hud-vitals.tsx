@@ -14,8 +14,8 @@ export function HudVitals() {
   if (!player) return null;
   const d = deriveAll(player);
   const gauges = [
-    { key: "hp", label: "HP", name: "พลังชีวิต", cur: Math.min(d.HP, currentHp), max: d.HP },
-    { key: "mp", label: "MP", name: "ปราณ", cur: Math.min(d.MP, currentMp), max: d.MP },
+    { key: "hp", label: "ชีวิต", name: "พลังชีวิต", cur: Math.min(d.HP, currentHp), max: d.HP },
+    { key: "mp", label: "ปราณ", name: "ปราณ", cur: Math.min(d.MP, currentMp), max: d.MP },
     { key: "st", label: "พลัง", name: "กำลังกาย", cur: stamina, max: staminaMax },
   ];
   return (

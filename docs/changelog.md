@@ -6,6 +6,14 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-12
 
+### Everything the player reads is Thai
+
+- **Stats in words.** The vitals read ชีวิต / ปราณ / พลัง instead of HP / MP; the profile drops the English keys beside each stat (STR, ATK, PD…); equipment, shop badges and the bag read พลังโจมตี +12 · ป้องกันกาย +4 · ลดความเสียหายที่ได้รับ 5 % (one helper, `lib/game/stat-text.ts`: `DERIVED_LABEL`, `equipStatParts`, `equipBonusParts`).
+- **Rewards and messages.** w-exp is ประสบการณ์ยุทธ, xp is ประสบการณ์, Lv. is ขั้น, sect points are แต้มสำนัก, CD is พัก N ตา, tiers show their names (ขั้นสูง, ลับ…) instead of T2 / T3.
+- **The battle.** The log, status tooltips and buttons are Thai (โดน % คริ %, หลบหลีก −10, ปราณไม่พอ, เริ่มใหม่); status chips no longer carry English names (หลบหลีก↓, พิษ (แม่นยำ)), and a heal-and-guard move names its guard instead of its internal id.
+- **Loanwords with a Thai word in the game** are replaced: บัฟ → พลังเสริม, ดีบัฟ → สถานะผิดปกติ, มาสเตอร์รี่ → ความชำนาญ, ไอเทม → ของ, NPC → ยอดยุทธ / คู่ต่อสู้. Raw move shorthand that still reached the screen (the sect hall, the spoils panel, the /debug library) now goes through `plainThai`.
+- Key names stay as printed on the keyboard (Enter, Esc, WASD, E), and คริติคอล, สตัน and บอส stay as the game's own terms. The editor (`/game/engine`) and the frozen `/progress` journal are developer pages and keep their English.
+
 ### Outfits and the weapon on the body
 
 - **A wardrobe (ชุด)** in โปรไฟล์: ชุดเดิม, the uniform of the hero's own sect (only while a disciple; other sects' uniforms are not listed; Shaolin's for men and Emei's for women only), six tailor's outfits bought in any city (300–3,000 ตำลึง, kept for good) and the tournament champion's gold. Each card shows the hero in it, carrying their weapon. An outfit is only a look: no stats.

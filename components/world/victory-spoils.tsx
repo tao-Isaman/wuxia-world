@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { getArt, getSkill } from "@/lib/game";
+import { plainThai } from "@/lib/game/skill-text";
 import { ITEM_CATEGORY_LABEL, getItem } from "@/lib/world";
 import { GOLD_ICON_URL, equipmentIconUrl, itemIconUrl } from "@/lib/world/data/item-icons";
 import { EQUIPMENT_BY_ID } from "@/lib/game/data/equipment";
@@ -41,7 +42,7 @@ export function VictorySpoils() {
           <em>+{spoils.gold}</em>
         </span>}
         <span role="listitem" className="gb-spoil">
-          <ItemTile glyph="悟" rarity={3} label={`w-exp ${spoils.wExp}`} selected={picked?.kind === "wexp"}
+          <ItemTile glyph="悟" rarity={3} label={`ประสบการณ์ยุทธ ${spoils.wExp}`} selected={picked?.kind === "wexp"}
             onClick={() => setPicked({ kind: "wexp", amount: spoils.wExp })} />
           <em>+{spoils.wExp}</em>
         </span>
@@ -68,7 +69,7 @@ export function VictorySpoils() {
           const art = m.kind === "art" ? getArt(m.id) : undefined;
           const name = skill?.n ?? art?.n ?? m.id;
           return <span role="listitem" className="gb-spoil" key={`${m.kind}:${m.id}`}>
-            <button type="button" className="gb-spoil-move" aria-label={`${name} +${m.xp} xp`} title={`${name} +${m.xp} xp`}
+            <button type="button" className="gb-spoil-move" aria-label={`${name} +${m.xp} ประสบการณ์`} title={`${name} +${m.xp} ประสบการณ์`}
               aria-pressed={picked?.kind === "move" && picked.id === m.id}
               onClick={() => setPicked({ kind: "move", id: m.id, move: m.kind, xp: m.xp })}>
               {skill ? <SkillIcon skill={skill} size={34} /> : art ? <ArtIcon art={art} size={34} /> : null}
@@ -87,8 +88,8 @@ function SpoilDetail({ picked, onClose }: { picked: Picked; onClose: () => void 
   if (picked.kind === "gold") {
     title = `${picked.amount} ตำลึง`; meta = "เงิน"; body = <p>เงินที่ติดตัวศัตรูมา เก็บเข้ากระเป๋าแล้ว</p>;
   } else if (picked.kind === "wexp") {
-    title = `w-exp +${picked.amount}`; meta = "ประสบการณ์ยุทธ์";
-    body = <p>ใช้เร่งเลเวลวิชาและกำลังภายในได้ในหน้า วิชา</p>;
+    title = `ประสบการณ์ยุทธ +${picked.amount}`; meta = "ใช้เลื่อนระดับวิชาได้ทันที";
+    body = <p>ใช้เร่งระดับวิชาและกำลังภายในได้ในหน้า วิชา</p>;
   } else if (picked.kind === "item") {
     const def = getItem(picked.itemId);
     color = rarityColor(itemRarity(def?.price));
@@ -101,9 +102,9 @@ function SpoilDetail({ picked, onClose }: { picked: Picked; onClose: () => void 
   } else {
     const skill = picked.move === "skill" ? getSkill(picked.id) : undefined;
     const art = picked.move === "art" ? getArt(picked.id) : undefined;
-    title = `${skill?.n ?? art?.n ?? picked.id} +${picked.xp} xp`;
+    title = `${skill?.n ?? art?.n ?? picked.id} +${picked.xp} ประสบการณ์`;
     meta = picked.move === "skill" ? "กระบวนท่า" : "กำลังภายใน";
-    body = <p>{skill?.d ?? art?.d ?? ""}</p>;
+    body = <p>{plainThai(skill?.d ?? art?.d)}</p>;
   }
   return (
     <div className="gb-spoil-detail" role="dialog" aria-label="รายละเอียดรางวัล" data-testid="victory-spoil-detail">

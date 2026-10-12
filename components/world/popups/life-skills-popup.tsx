@@ -36,7 +36,7 @@ type Tab = "skills" | "practice" | "craft" | "recipes";
 
 // Combined popup for the menu's "🌾 อาชีพ" button: four tabs, each a paged
 // grid of tiles (no scrolling, landscape):
-//   • มาสเตอร์รี่    — one tile per life skill: icon, level, progress
+//   • ความชำนาญ    — one tile per life skill: icon, level, progress
 //   • ฝึกฝน          — the music practice + every training item in the bag
 //   • ประดิษฐ์        — the hero's own trades' recipes (mining, hunting, fishing,
 //                      herbalism, venom, woodcutting, drawing, writing), crafted
@@ -62,7 +62,7 @@ export function LifeSkillsPopup({ open, onClose }: Props) {
 }
 
 const TABS: { id: Tab; label: string }[] = [
-  { id: "skills", label: "มาสเตอร์รี่" },
+  { id: "skills", label: "ความชำนาญ" },
   { id: "practice", label: "ฝึกฝน" },
   { id: "craft", label: "ประดิษฐ์" },
   { id: "recipes", label: "สูตรที่เรียน" },
@@ -74,7 +74,7 @@ function SkillsTab() {
   const short = useShortScreen();
   return (
     <PagedGrid items={LIFE_SKILL_KEYS} itemKey={(k) => k} cellWidth={short ? 118 : 150} cellHeight={short ? 70 : 92} gap={6}
-      label="มาสเตอร์รี่" render={(k) => <SkillTile skill={k} xp={xpMap[k] ?? 0} />} />
+      label="ความชำนาญ" render={(k) => <SkillTile skill={k} xp={xpMap[k] ?? 0} />} />
   );
 }
 
@@ -118,7 +118,7 @@ function PracticeTab() {
 
   return (
     <PagedGrid items={cells} itemKey={(c) => (c.kind === "music" ? "music" : c.id)} cellWidth={short ? 150 : 180} cellHeight={short ? 84 : 104} gap={6}
-      label="ไอเทมฝึกฝน" render={(c) => {
+      label="ของฝึกฝน" render={(c) => {
         if (c.kind === "music") return (
           <div className="life-tile">
             <div className="life-tile-head"><span className="life-tile-icon" aria-hidden="true">🎵</span><strong>เล่นเพลงในใจ</strong></div>
@@ -127,7 +127,7 @@ function PracticeTab() {
               onClick={() => {
                 const r = practiceMusic();
                 if (!r.ok) { toast("error", r.reason === "no-instrument" ? "ต้องสวมเครื่องดนตรีในช่องอาวุธก่อน" : "เล่นเพลงไม่ได้ตอนนี้"); return; }
-                toast("success", `บรรเลงเพลงสั้น ๆ · +${r.xpGained} xp ดนตรี`);
+                toast("success", `บรรเลงเพลงสั้น ๆ · +${r.xpGained} ประสบการณ์ดนตรี`);
               }}>เล่นเพลง</Button>
           </div>
         );
@@ -137,12 +137,12 @@ function PracticeTab() {
         return (
           <div className="life-tile" title={it.description}>
             <div className="life-tile-head"><span className="life-tile-icon" aria-hidden="true">{LIFE_SKILL_ICON[eff.skill]}</span><strong>{it.name}</strong></div>
-            <small>{LIFE_SKILL_LABEL[eff.skill]} · +{eff.xp} xp · ×{inventory[it.id] ?? 0}</small>
+            <small>{LIFE_SKILL_LABEL[eff.skill]} · +{eff.xp} ประสบการณ์ · ×{inventory[it.id] ?? 0}</small>
             <Button size="sm" variant="outline" className="h-7 text-[12px] mt-auto"
               onClick={() => {
                 const r = consumeItem(it.id);
                 if (!r.ok) { toast("error", "ใช้ไม่สำเร็จ"); return; }
-                if (r.kind === "trainSkill") toast("success", `ฝึก ${LIFE_SKILL_LABEL[r.skill]} · +${r.xpGained} xp`);
+                if (r.kind === "trainSkill") toast("success", `ฝึก ${LIFE_SKILL_LABEL[r.skill]} · +${r.xpGained} ประสบการณ์`);
               }}>ใช้</Button>
           </div>
         );
@@ -165,15 +165,15 @@ function CraftTab() {
     const res = craftRecipe(recipe.id);
     if (!res.ok) {
       toast("error", res.reason === "missing-input" ? "วัตถุดิบไม่ครบ"
-        : res.reason === "missing-mastery" ? "มาสเตอร์รี่ยังไม่ถึงระดับที่กำหนด"
+        : res.reason === "missing-mastery" ? "ความชำนาญยังไม่ถึงระดับที่กำหนด"
           : "ไม่สามารถประดิษฐ์ได้");
       return;
     }
     if (res.dropCheck === "failed") {
-      toast("warn", `พลาดในขั้นตอนสุดท้าย — เสียวัตถุดิบ · +${res.xpGained} xp`);
+      toast("warn", `พลาดในขั้นตอนสุดท้าย — เสียวัตถุดิบ · +${res.xpGained} ประสบการณ์`);
       return;
     }
-    toast("success", `สร้าง ${getItem(res.outputItemId)?.name ?? res.outputItemId}×${res.outputCount} · +${res.xpGained} xp`);
+    toast("success", `สร้าง ${getItem(res.outputItemId)?.name ?? res.outputItemId}×${res.outputCount} · +${res.xpGained} ประสบการณ์`);
   };
 
   return (
@@ -283,7 +283,7 @@ function RecipeRow({
       {onCraft && (
         <Button size="sm" variant="outline" className="h-7 text-[12px] mt-auto" data-craft-recipe={recipe.id}
           disabled={!masteryOk || !inputsOk}
-          title={!masteryOk ? `ต้องมาสเตอร์รี่ระดับ ${required}` : !inputsOk ? "วัตถุดิบไม่ครบ" : undefined}
+          title={!masteryOk ? `ต้องมีความชำนาญระดับ ${required}` : !inputsOk ? "วัตถุดิบไม่ครบ" : undefined}
           onClick={onCraft}>ประดิษฐ์</Button>
       )}
     </div>

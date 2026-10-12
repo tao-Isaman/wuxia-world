@@ -57,7 +57,7 @@ export const trainingActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, 
     appendActionLog(
       draft,
       "learn",
-      `เร่งกระบวนท่า ${sk.n} → Lv.${lv + 1} (-${remaining} w-exp)`,
+      `เร่งกระบวนท่า ${sk.n} → ขั้น ${lv + 1} (ใช้ประสบการณ์ยุทธ ${remaining})`,
     );
     grantMeridianPoints(draft, 1);
     set({ ...draft });
@@ -90,7 +90,7 @@ export const trainingActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, 
     appendActionLog(
       draft,
       "learn",
-      `เร่งลมปราณ ${art.n} → ขั้น ${lv + 1} (-${remaining} w-exp)`,
+      `เร่งลมปราณ ${art.n} → ขั้น ${lv + 1} (ใช้ประสบการณ์ยุทธ ${remaining})`,
     );
     grantMeridianPoints(draft, 1);
     set({ ...draft });
@@ -207,8 +207,8 @@ export const trainingActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, 
       appendActionLog(
         draft,
         "learn",
-        `ฝึก ${sk.n} · +${xpGained} xp${matched ? " (สถานที่เหมาะ)" : ""}` +
-          (leveledUp ? ` · ขึ้น Lv.${afterLv}` : ""),
+        `ฝึก ${sk.n} · +${xpGained} ประสบการณ์${matched ? " (สถานที่เหมาะ)" : ""}` +
+          (leveledUp ? ` · ขึ้นขั้น ${afterLv}` : ""),
       );
       set({ ...draft });
       return {
@@ -244,7 +244,7 @@ export const trainingActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, 
     appendActionLog(
       draft,
       "learn",
-      `ฝึก ${art.n} · +${xpGained} xp${matched ? " (สถานที่เหมาะ)" : ""}` +
+      `ฝึก ${art.n} · +${xpGained} ประสบการณ์${matched ? " (สถานที่เหมาะ)" : ""}` +
         (leveledUp ? ` · ขึ้นขั้น ${afterLv}` : ""),
     );
     set({ ...draft });

@@ -40,7 +40,7 @@ export const sectsActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "jo
     const target = m.rank - 1;
     const cost = def.rankUpCost(target);
     if (m.points < cost) {
-      return { ok: false, reason: `ต้องการ ${cost} sect points (มี ${m.points})` };
+      return { ok: false, reason: `ต้องการแต้มสำนัก ${cost} (มี ${m.points})` };
     }
     const draft = draftFrom(s);
     const dm = draft.sectMembership[sectId];
@@ -57,7 +57,7 @@ export const sectsActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "jo
     appendActionLog(
       draft,
       "sect",
-      `เลื่อนขั้น${def.name} → ขั้นที่ ${target} (จ่าย ${cost} sect points${gold ? ` · ได้รับ ${gold} ตำลึง` : ""})`,
+      `เลื่อนขั้น${def.name} → ขั้นที่ ${target} (จ่ายแต้มสำนัก ${cost}${gold ? ` · ได้รับ ${gold} ตำลึง` : ""})`,
     );
     // Liveness Layer: rank-up is a public milestone — player-echo
     // rumor lands in the pool for inn-goers to repeat.

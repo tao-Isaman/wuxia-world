@@ -90,7 +90,7 @@ function UnitCard({ unit, onClose }: { unit: GridUnit; onClose: () => void }) {
       <span className="gb-unit-face"><UnitPortrait look={unit.look} /></span>
       <div>
         <strong>{unit.name}</strong>
-        <small>{unit.team === "ally" ? "ฝ่ายเรา" : "ฝ่ายศัตรู"}{unit.alive ? ` · เดิน ${unit.move} ช่อง · SPD ${unit.derived.Spd}` : " · ล้มลงแล้ว"}</small>
+        <small>{unit.team === "ally" ? "ฝ่ายเรา" : "ฝ่ายศัตรู"}{unit.alive ? ` · เดิน ${unit.move} ช่อง · ความเร็ว ${unit.derived.Spd}` : " · ล้มลงแล้ว"}</small>
       </div>
       <button type="button" onClick={onClose} aria-label="ปิดข้อมูล"><X size={16} aria-hidden="true" /></button>
     </header>
@@ -118,7 +118,7 @@ function UnitCard({ unit, onClose }: { unit: GridUnit; onClose: () => void }) {
             <div className="text-muted-foreground">{desc.detail}</div></div>
         </InfoPopover>;
       })}
-      {stk > 0 && <span className="gb-chip" data-kind="stack" style={{ "--st": hexColor(statusStyle({ t: "stack_atk" }, "buff").color) } as React.CSSProperties}>ATK+{stk * stkV}%</span>}
+      {stk > 0 && <span className="gb-chip" data-kind="stack" style={{ "--st": hexColor(statusStyle({ t: "stack_atk" }, "buff").color) } as React.CSSProperties}>โจมตี +{stk * stkV}%</span>}
     </div>}
   </section>;
 }
@@ -381,13 +381,13 @@ export function BattleArena({ mode = "free", onContinue, winExtra, pendingNote }
             {pendingNote ?? (!state.escaped && state.winnerTeam === "ally" && winExtra)}
             {mode === "world" ? <Button disabled={!!pendingNote} onClick={() => onContinue?.()}>ดำเนินเรื่อง →</Button> :
               <div className="flex gap-2"><Button onClick={() => start(setupA, setupB)}>เริ่มใหม่</Button>
-                <Button variant="outline" onClick={reset}>Reset</Button></div>}
+                <Button variant="outline" onClick={reset}>เริ่มใหม่</Button></div>}
           </div>
         ) : <>
           <div className="gb-skills" role="group" aria-label={`กระบวนท่าของ ${controlled?.name ?? ""}`}>
             {slots.map((v, index) => {
               const pressed = selection.slot === v.slot && myTurn;
-              const meta = v.cd > 0 ? `รอ ${v.cd} ตา` : v.mpShort ? `MP ไม่พอ (${v.mp})` : v.mp ? `${v.mp} MP` : v.inReach ? "พร้อม" : "นอกระยะ";
+              const meta = v.cd > 0 ? `รอ ${v.cd} ตา` : v.mpShort ? `ปราณไม่พอ (${v.mp})` : v.mp ? `ปราณ ${v.mp}` : v.inReach ? "พร้อม" : "นอกระยะ";
               return <button key={v.slot} type="button" className="gb-skill combat-action" aria-label={v.name}
                 aria-pressed={pressed} aria-keyshortcuts={index < 9 ? String(index + 1) : undefined}
                 disabled={!myTurn || !v.ready} onClick={() => selectSlot(v.slot)}
@@ -426,11 +426,11 @@ export function BattleArena({ mode = "free", onContinue, winExtra, pendingNote }
               </button>}
             </>}
             <button type="button" className="gb-control" data-kind="auto" aria-pressed={auto} onClick={toggleAuto} aria-keyshortcuts="A"
-              title="ให้ AI เล่นฝ่ายเรา">
+              title="ให้ระบบเล่นแทนฝ่ายเรา">
               <Bot size={18} aria-hidden="true" /><span>อัตโนมัติ</span>
             </button>
             {mode === "free" && <button type="button" className="gb-control" data-kind="reset" onClick={reset}>
-              <span>Reset</span>
+              <span>เริ่มใหม่</span>
             </button>}
           </div>
         </>}

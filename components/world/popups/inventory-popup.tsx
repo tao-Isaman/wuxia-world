@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Modal } from "@/components/ui/modal";
-import { SLOT_LABELS, getEquip } from "@/lib/game";
+import { SLOT_LABELS, STAT_LABEL, equipStatParts, getEquip } from "@/lib/game";
 import type { EquipSlotType, Equipment } from "@/lib/game";
 import { ITEM_CATEGORIES, ITEM_CATEGORY_LABEL, LIFE_SKILL_LABEL, getItem, type ItemCategory } from "@/lib/world";
 import { useWorldStore } from "@/store/world-store";
@@ -44,14 +44,7 @@ const SLOT_ROWS: readonly SlotRow[] = [
 type Filter = "all" | "gear" | ItemCategory;
 type Selection = { kind: "item"; id: string } | { kind: "bagEquip"; id: string } | { kind: "slot"; row: SlotRow };
 
-function equipStats(eq: Equipment): string[] {
-  const out: string[] = [];
-  const add = (label: string, value: number | undefined) => { if (value) out.push(`${label} +${value}`); };
-  add("ATK", eq.atkb); add("PA", eq.pab); add("IA", eq.iab); add("PD", eq.pdb); add("ID", eq.idb);
-  add("HP", eq.hpb); add("MP", eq.mpb); add("SPD", eq.spdb); add("Eva", eq.evab); add("Acc", eq.accb);
-  add("Cri", eq.crib); add("Res", eq.resb);
-  return out;
-}
+const equipStats = (eq: Equipment): string[] => equipStatParts(eq);
 
 // The bag, in two landscape columns: worn equipment laid out around the hero
 // (a paper doll) on the left, and the bag's items on the right — category
@@ -90,19 +83,19 @@ export function InventoryPopup({ open, onClose }: Props) {
   const use = (id: string) => {
     const r = consumeItem(id);
     if (!r.ok) {
-      if (r.reason === "full") setLastUsed("HP / MP เต็มแล้ว ไม่ต้องใช้");
-      else if (r.reason === "stat-too-low") setLastUsed(`ฝีมือยังไม่ถึงขั้น · ต้องการ ${r.stat} ${r.needed} (ปัจจุบัน ${r.current})`);
+      if (r.reason === "full") setLastUsed("พลังชีวิตและปราณเต็มแล้ว ไม่ต้องใช้");
+      else if (r.reason === "stat-too-low") setLastUsed(`ฝีมือยังไม่ถึงขั้น · ต้องการ${STAT_LABEL[r.stat as keyof typeof STAT_LABEL] ?? r.stat} ${r.needed} (ปัจจุบัน ${r.current})`);
       else if (r.reason === "already-learned") setLastUsed("เรียนวิชานี้แล้ว ไม่ต้องอ่านอีก");
       else if (r.reason === "meridian-locked") setLastUsed(r.message);
       else setLastUsed("ใช้ไม่ได้");
       return;
     }
     let message = "";
-    if (r.kind === "trainSkill") message = `ฝึก ${LIFE_SKILL_LABEL[r.skill]} · +${r.xpGained} xp`;
+    if (r.kind === "trainSkill") message = `ฝึก ${LIFE_SKILL_LABEL[r.skill]} · +${r.xpGained} ประสบการณ์`;
     else if (r.kind === "heal") {
       const parts: string[] = [];
-      if (r.hpHealed > 0) parts.push(`HP +${r.hpHealed}`);
-      if (r.mpHealed > 0) parts.push(`MP +${r.mpHealed}`);
+      if (r.hpHealed > 0) parts.push(`พลังชีวิต +${r.hpHealed}`);
+      if (r.mpHealed > 0) parts.push(`ปราณ +${r.mpHealed}`);
       message = parts.length > 0 ? `ฟื้นพลัง: ${parts.join(" · ")}` : "ไม่มีพลังให้ฟื้น";
     } else if (r.kind === "manualLearnSkill") message = "เรียนกระบวนท่าสำเร็จ · พร้อมใช้ทันที";
     else if (r.kind === "manualLearnArt") message = `เรียนลมปราณสำเร็จ · เริ่มที่ระดับ ${r.level}`;

@@ -84,7 +84,7 @@ export function applySkillLevelUps(state: WorldStateData, skillId: string): void
     appendActionLog(
       state,
       "learn",
-      `กระบวนท่า ${sk.n} เลื่อนขั้นเป็น Lv.${state.skillLevel[skillId]}`,
+      `กระบวนท่า ${sk.n} เลื่อนเป็นขั้น ${state.skillLevel[skillId]}`,
     );
     grantMeridianPoints(state, levelsGained);
   }

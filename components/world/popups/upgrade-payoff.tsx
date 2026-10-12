@@ -66,7 +66,7 @@ export function UpgradePayoff({ receipt, onDismiss }: {
         <p className={styles.detail}>{receipt.detail}</p>
       </div>
       <div className={styles.footer}>
-        <p>ใช้ <b>{number(receipt.cost)}</b> W-EXP <span>· เหลือ {number(receipt.remaining)}</span></p>
+        <p>ใช้ <b>{number(receipt.cost)}</b> ประสบการณ์ยุทธ <span>· เหลือ {number(receipt.remaining)}</span></p>
         <button type="button" onClick={onDismiss}>รับทราบ</button>
       </div>
     </section>

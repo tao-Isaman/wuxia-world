@@ -109,9 +109,9 @@ const VILLAGES: LocationScene[] = [
 
 // ─── Sects (18) ───────────────────────────────────────────────────────
 const SECTS: LocationScene[] = [
-  leaf("sect_shaolin", "วัดเส้าหลิน", "少林派 · เขาซงซาน · Tank หลัก · ชายล้วน"),
+  leaf("sect_shaolin", "วัดเส้าหลิน", "少林派 · เขาซงซาน · เน้นรับหนัก · ชายล้วน"),
   leaf("sect_wudang", "อู่ตัง / บู๊ตึ๊ง", "武当派 · เขาอู่ตัง · กระบี่ · แลกปราณเป็นเลือด"),
-  leaf("sect_emei", "ง้อไบ๊", "峨嵋派 · เขาง้อไบ๊ · หญิงล้วน · Heal ได้"),
+  leaf("sect_emei", "ง้อไบ๊", "峨嵋派 · เขาง้อไบ๊ · หญิงล้วน · ถนัดรักษา"),
   leaf("sect_huashan", "หัวซาน", "华山派 · เขาหัวซาน · ดาบ · ตีเหล็กไฟ"),
   leaf("sect_hengshan_south", "เฮิงซาน", "衡山派 · เขาเฮิงซาน (5 ยอด)"),
   leaf("sect_hengshan_north", "เหิงซาน", "恒山派 · เขาเหิงซาน · นักพรตหญิง · ดาบซ่อนในเครื่องดนตรี"),
@@ -180,7 +180,7 @@ const CAVES: LocationScene[] = [
   leaf("cave_treasure", "คลังสมบัติลับ", "藏宝洞"),
   leaf("cave_chuangwang", "สมบัติราชาโจร", "闯王宝藏"),
   leaf("valley_baihua", "หุบเขาร้อยดอกไม้", "百花谷"),
-  leaf("cave_zixiu", "ถ้ำฝึกวิทยายุทธ์", "自修山洞 · เฉพาะ JY Online"),
+  leaf("cave_zixiu", "ถ้ำฝึกวิทยายุทธ์", "自修山洞 · ถ้ำฝึกตนลับ"),
 ];
 
 // ─── Temples / palaces / fortresses (5) ──────────────────────────────
@@ -227,7 +227,7 @@ const HOMES: LocationScene[] = [
 const MISC: LocationScene[] = [
   leaf("desert_ruins", "ทะเลทรายร้าง", "沙漠废墟"),
   leaf("tribe_huizu", "ชนเผ่าหุยซู", "回族部落"),
-  leaf("market_miao", "ตลาดชาวเมี่ยว", "苗族集市 · เฉพาะ JY Online"),
+  leaf("market_miao", "ตลาดชาวเมี่ยว", "苗族集市 · ตลาดชนเผ่าแดนใต้"),
   leaf("pool_heilong", "สระมังกรดำ", "黑龙潭"),
   leaf("peak_guangming", "ยอดเพลิงอุดร", "北焰峰 · มิ่งเจี้ยว"),
   leaf("home_player", "คฤหาสน์ตนเอง", "自宅 · บ้านของผู้เล่น"),
@@ -649,7 +649,7 @@ const WORLD_HUB: LocationScene = {
     { routeSceneId: "cat_temples", label: "🏛 วัด · วัง · ป้อม (5)", hint: "ศาสนสถานและที่หลวง" },
     { routeSceneId: "cat_mansions", label: "🏠 คุ้มและคฤหาสน์ (4)", hint: "ตระกูลขุนนางในบู๊ลิ้ม" },
     { routeSceneId: "cat_inns", label: "🍵 โรงเตี๊ยม (4)", hint: "จุดพักการเดินทาง" },
-    { routeSceneId: "cat_homes", label: "👤 บ้าน NPC (11)", hint: "บ้านของยอดยุทธในตำนาน" },
+    { routeSceneId: "cat_homes", label: "👤 บ้านยอดยุทธ (11)", hint: "บ้านของยอดยุทธในตำนาน" },
     { routeSceneId: "cat_misc", label: "🌍 อื่น ๆ (7)", hint: "สถานที่หลากหลาย" },
   ],
   onEnter: [{ t: "gotoRandom", sceneIds: ALL_LEAVES.map((l) => l.id) }],
@@ -666,7 +666,7 @@ const CATEGORY_ROUTES: RouteScene[] = [
   categoryRoute("cat_temples", "ทางสู่วัดและวัง", "เส้นทางสู่ศาสนสถานและที่ของหลวง", TEMPLES),
   categoryRoute("cat_mansions", "ทางสู่คุ้มและคฤหาสน์", "เส้นทางสู่ตระกูลขุนนางในบู๊ลิ้ม", MANSIONS),
   categoryRoute("cat_inns", "ทางสู่โรงเตี๊ยม", "เส้นทางสู่จุดพักการเดินทาง", INNS),
-  categoryRoute("cat_homes", "ทางสู่บ้าน NPC", "เส้นทางสู่บ้านของยอดยุทธในตำนาน", HOMES),
+  categoryRoute("cat_homes", "ทางสู่บ้านยอดยุทธ", "เส้นทางสู่บ้านของยอดยุทธในตำนาน", HOMES),
   categoryRoute("cat_misc", "ทางสู่ดินแดนอื่น ๆ", "เส้นทางสู่สถานที่อื่นในแผ่นดิน", MISC),
 ];
 

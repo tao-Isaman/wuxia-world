@@ -22,9 +22,9 @@ export function clinicPreparation(state: PreparationState) {
       label: "วิชาจากการประลอง",
       title: `ยกระดับ${upgrade.skill.n}`,
       nextStep: `วิชา → ${upgrade.skill.n} → เลื่อนระดับด้วยประสบการณ์ยุทธ`,
-      description: `ขั้น ${upgrade.level} → ${upgrade.level + 1} · ใช้อีก ${upgrade.cost} W-EXP · มี ${state.wExp} W-EXP`,
+      description: `ขั้น ${upgrade.level} → ${upgrade.level + 1} · ใช้ประสบการณ์ยุทธอีก ${upgrade.cost} · มี ${state.wExp}`,
       action: `เมนู วิชา → ${upgrade.skill.n} → เลื่อนระดับ (ใช้ประสบการณ์ยุทธ ${upgrade.cost})`,
-      note: "ประสบการณ์จากการใช้วิชาลดค่าอัปขั้นแล้ว · เลือกเก็บ W-EXP ไว้ก่อนได้",
+      note: "ประสบการณ์จากการใช้วิชาลดค่าเลื่อนขั้นแล้ว · เลือกเก็บประสบการณ์ยุทธไว้ก่อนได้",
     } : null;
   }
   const hasHealingSupply = Object.entries(state.inventory).some(([id, count]) => {
@@ -39,8 +39,8 @@ export function clinicPreparation(state: PreparationState) {
     title: training.needsRest ? "พักฟื้นก่อนลองฝีมือ" : `ฝึกกับ${CAPITAL_TRAINING_NAME}`,
     nextStep: training.needsRest ? "จุดหมาย → สำนักยุทธิ์ → พักริมทาง" : "จุดหมาย → สำนักยุทธิ์ → ฝึกประลองฟรี",
     description: training.needsRest
-      ? `HP ${training.hp}/${training.maxHp} · MP ${training.mp} · สำนักมีทางเลือกพักฟรีก่อนประลอง`
-      : "คู่ฝึกระดับเริ่มต้น · ไม่มีค่าฝึก · แพ้ไม่เสียชีวิต · ชนะรับ 50 W-EXP",
+      ? `พลังชีวิต ${training.hp}/${training.maxHp} · ปราณ ${training.mp} · สำนักมีทางเลือกพักฟรีก่อนประลอง`
+      : "คู่ฝึกระดับเริ่มต้น · ไม่มีค่าฝึก · แพ้ไม่เสียชีวิต · ชนะรับประสบการณ์ยุทธ 50",
     action: training.needsRest
       ? "จุดหมาย → สำนักยุทธิ์ → พักริมทาง · แล้วเลือก ฝึกประลองฟรี เมื่อพร้อม"
       : "จุดหมาย → สำนักยุทธิ์ → ฝึกประลองฟรี · ใช้ หมัดตรง ต่อสู้ · ถอยหนีได้เมื่อจำเป็น",
@@ -56,10 +56,10 @@ export function clinicPreparation(state: PreparationState) {
     label: "เตรียมเดินทางครั้งต่อไป",
     title: `สำรอง${potion.name}ไว้สักขวด`,
     nextStep: `จุดหมาย → ${shopName}`,
-    description: `${potion.name}ราคา ${price} ทอง · มี ${state.gold} ทอง · ฟื้น HP ${potion.use.hp ?? 0}${potion.use.hpPct ? ` + ${potion.use.hpPct}% ของ HP สูงสุด` : ""} · ดื่มจากย่ามหรือกลางการต่อสู้`,
+    description: `${potion.name}ราคา ${price} ทอง · มี ${state.gold} ทอง · ฟื้นพลังชีวิต ${potion.use.hp ?? 0}${potion.use.hpPct ? ` + ${potion.use.hpPct}% ของสูงสุด` : ""} · ดื่มจากย่ามหรือกลางการต่อสู้`,
     action: `จุดหมาย → ${shopName} → ซื้อ ${potion.name} · เก็บไว้ใช้เมื่อบาดเจ็บ`,
     note: skill && upgradeCost !== null
-      ? `${skill.n}: อัปขั้นใช้ ${upgradeCost} W-EXP · มี ${state.wExp} W-EXP · เลือกเก็บเงินไว้ก่อนได้`
+      ? `${skill.n}: เลื่อนขั้นใช้ประสบการณ์ยุทธ ${upgradeCost} · มี ${state.wExp} · เลือกเก็บเงินไว้ก่อนได้`
       : "เลือกเตรียมเสบียงหรือออกสำรวจต่อได้ตามใจ",
   };
 }

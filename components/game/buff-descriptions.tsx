@@ -71,22 +71,22 @@ export function describeBuff(b: BuffRecord): BuffDescription {
     case "buff_def":
       return {
         title: "แข็งแกร่ง",
-        detail: `เพิ่ม PDef ${sign(b.v)} — ลด damage ทางกายที่รับเข้า. สะสมจาก buff อื่นประเภทเดียวกันได้`,
+        detail: `ป้องกันกาย ${sign(b.v)} — รับความเสียหายทางกายน้อยลง · ซ้อนกับพลังเสริมประเภทเดียวกันได้`,
       };
     case "buff_eva":
       return {
         title: "พริ้วไหว",
-        detail: `เพิ่ม Eva ${sign(b.v)} — โอกาสหลบโจมตีของศัตรูสูงขึ้น`,
+        detail: `หลบหลีก ${sign(b.v)} — หลบการโจมตีของศัตรูได้ง่ายขึ้น`,
       };
     case "buff_reduce":
       return {
         title: "ทรงพลัง",
-        detail: `ลด damage ที่ได้รับ ${b.v}% — กระทบทุกประเภท damage`,
+        detail: `ลดความเสียหายที่ได้รับ ${b.v}% — ทั้งทางกายและทางใน`,
       };
     case "buff_reflect":
       return {
         title: "สะท้อนพลังร้าย",
-        detail: `สะท้อน ${b.v}% ของ damage ที่ได้รับ กลับไปยังผู้โจมตี · ใช้ครั้งเดียวแล้วหายไป`,
+        detail: `สะท้อนความเสียหายที่ได้รับ ${b.v}% กลับไปยังผู้โจมตี · ใช้ครั้งเดียวแล้วหายไป`,
       };
     case "buff_riposte":
       return {
@@ -96,65 +96,65 @@ export function describeBuff(b: BuffRecord): BuffDescription {
     case "buff_spd":
       return {
         title: "ว่องไว",
-        detail: `SPD ${sign(b.v)} — เกจ ATB ไหลเร็วขึ้น (ตาเร็วกว่าศัตรู)`,
+        detail: `ความเร็ว ${sign(b.v)} — ถึงตาเร็วขึ้น ได้ตาก่อนศัตรู`,
       };
     case "buff_cri":
       return {
         title: "วงคริต",
-        detail: `Cri ${sign(b.v)} — โอกาสคริติคอลต่อเทิร์นสูงขึ้น`,
+        detail: `คริติคอล ${sign(b.v)} — โอกาสติดคริติคอลสูงขึ้น`,
       };
     case "heal_pct":
       return {
         title: "ฟื้นพลังดีเด่น",
-        detail: `ฟื้น HP ${b.v}% ของพลังชีวิตสูงสุด · effect ทันที`,
+        detail: `ฟื้นพลังชีวิต ${b.v}% ของสูงสุด · ได้ผลทันที`,
       };
     case "heal_buff":
       return {
         title: "ฟื้นพลังต่อเนื่อง",
-        detail: `ฟื้น HP + เพิ่ม buff defensively`,
+        detail: `ฟื้นพลังชีวิตและเพิ่มพลังป้องกันตัว`,
       };
     case "stack_atk":
       return {
         title: "สะสมพลังโจมตีภายใน",
-        detail: `ATK ${sign(b.v)} × จำนวนชั้น (สูงสุดตาม mx) · ค้างจนสุดเกม (ลบโดย dispel)`,
+        detail: `พลังโจมตี ${sign(b.v)}% ต่อชั้น (ซ้อนได้ตามที่ท่ากำหนด) · อยู่จนจบการต่อสู้ เว้นถูกล้างพลังเสริม`,
       };
     case "buff_iatk":
       return {
         title: "สะสมพลังโจมตีภายใน",
-        detail: `IAtk ${sign(b.v)}% — เพิ่มพลังโจมตีภายใน (Int)`,
+        detail: `พลังโจมตีภายใน ${sign(b.v)}%`,
       };
     case "buff_iatk_reduce":
       return {
         title: "กร้างแกร่ง",
-        detail: `IAtk + ลด damage รับเข้าพร้อมกัน (combo)`,
+        detail: `เพิ่มพลังโจมตีภายใน และลดความเสียหายที่ได้รับไปพร้อมกัน`,
       };
     case "buff_reflect_eva":
       return {
         title: "ยืมหอกสนองคืน",
-        detail: `สะท้อน ${b.v}% + เพิ่ม Eva (combo)`,
+        detail: `สะท้อนความเสียหาย ${b.v}% และเพิ่มหลบหลีก`,
       };
     case "buff_atk_pct":
       return { title: b.n ?? "พลังโจมตี↑", detail: `พลังโจมตี +${b.v}% (ชีพจร)` };
     case "buff_regen":
-      return { title: b.n ?? "ฟื้นชีพจร", detail: `ฟื้น HP ${b.v}% ของสูงสุด ทุกต้นตาของตน (ชีพจร)` };
+      return { title: b.n ?? "ฟื้นชีพจร", detail: `ฟื้นพลังชีวิต ${b.v}% ของสูงสุด ทุกต้นตาของตน (ชีพจร)` };
     case "buff_spd_pct":
-      return { title: b.n ?? "ความเร็ว↑", detail: `เกจเติมเร็วขึ้น ${b.v}% (ชีพจร)` };
+      return { title: b.n ?? "ความเร็ว↑", detail: `ถึงตาเร็วขึ้น ${b.v}% (ชีพจร)` };
     case "buff_def_pct":
-      return { title: b.n ?? "พลังป้องกัน↑", detail: `PDef / IDef +${b.v}% (ชีพจร)` };
+      return { title: b.n ?? "พลังป้องกัน↑", detail: `ป้องกันกายและป้องกันใน +${b.v}% (ชีพจร)` };
     case "buff_cri_rate":
       return { title: b.n ?? "คริติคอล↑", detail: `โอกาสคริติคอล +${b.v} (ชีพจร)` };
     case "buff_acc_pct":
-      return { title: b.n ?? "แม่นยำ↑", detail: `Acc +${b.v}% (ชีพจร)` };
+      return { title: b.n ?? "แม่นยำ↑", detail: `แม่นยำ +${b.v}% (ชีพจร)` };
     case "shield":
-      return { title: b.n === "กระดองตะวัน" ? "กระดองตะวัน" : "โล่ชีพจร", detail: `ดูดซับความเสียหายได้อีก ${b.v} ก่อนถึง HP` };
+      return { title: b.n === "กระดองตะวัน" ? "กระดองตะวัน" : "โล่ชีพจร", detail: `ดูดซับความเสียหายได้อีก ${b.v} ก่อนถึงพลังชีวิต` };
     case "ward":
-      return { title: "ผนึกชีพจร", detail: `กันดีบัฟได้อีก ${b.v} ครั้ง` };
+      return { title: "ผนึกชีพจร", detail: `กันสถานะผิดปกติได้อีก ${b.v} ครั้ง` };
     case "frenzy":
       return { title: "โลหิตคลั่ง", detail: `พลังโจมตี +${b.v}% — ยิ่งเลือดน้อยยิ่งคลั่งแรง` };
     case "molt":
-      return { title: "ลอกคราบ", detail: "ล้างดีบัฟทั้งหมด ฟื้น HP และสะท้อนความเสียหาย" };
+      return { title: "ลอกคราบ", detail: "ล้างสถานะผิดปกติทั้งหมด ฟื้นพลังชีวิต และสะท้อนความเสียหาย" };
     case "sun_shell":
-      return { title: "กระดองตะวัน", detail: "โล่ดูดซับตาม % HP สูงสุด และสะท้อนความเสียหาย" };
+      return { title: "กระดองตะวัน", detail: "โล่ดูดซับความเสียหายตามสัดส่วนพลังชีวิตสูงสุด และสะท้อนความเสียหาย" };
   }
 }
 
@@ -162,46 +162,46 @@ export function describeDebuff(d: DebuffRecord): BuffDescription {
   switch (d.t) {
     case "debuff_acc":
       return {
-        title: "ตาพร่า (Acc ลด)",
-        detail: `Acc ${sign(d.v ?? 0)} — โอกาสโจมตีพลาดสูงขึ้น · สะสมจาก hit ซ้ำได้`,
+        title: "ตาพร่า (แม่นยำลด)",
+        detail: `แม่นยำ ${sign(d.v ?? 0)} — โจมตีพลาดง่ายขึ้น · ซ้อนได้เมื่อโดนซ้ำ`,
       };
     case "debuff_eva":
       return {
-        title: "ติดขัด (Eva ลด)",
-        detail: `Eva ${sign(d.v ?? 0)} — หลบยากขึ้น · สะสมจาก hit ซ้ำได้`,
+        title: "ติดขัด (หลบหลีกลด)",
+        detail: `หลบหลีก ${sign(d.v ?? 0)} — หลบยากขึ้น · ซ้อนได้เมื่อโดนซ้ำ`,
       };
     case "debuff_def":
       return {
-        title: "เกราะแตก (PDef ลด)",
-        detail: `PDef ${sign(d.v ?? 0)} — รับ damage ทางกายมากขึ้น · สะสมจาก hit ซ้ำได้`,
+        title: "เกราะแตก (ป้องกันกายลด)",
+        detail: `ป้องกันกาย ${sign(d.v ?? 0)} — รับความเสียหายทางกายมากขึ้น · ซ้อนได้เมื่อโดนซ้ำ`,
       };
     case "debuff_atk":
       return {
-        title: "อ่อนแรง (ATK ลด)",
-        detail: `ATK ${sign(d.v ?? 0)}% — damage โจมตีออกลดลง · สะสมจาก hit ซ้ำได้`,
+        title: "อ่อนแรง (พลังโจมตีลด)",
+        detail: `พลังโจมตี ${sign(d.v ?? 0)}% — โจมตีเบาลง · ซ้อนได้เมื่อโดนซ้ำ`,
       };
     case "debuff_poison":
       return {
         title: "พิษ",
-        detail: `รับ damage ${d.pp ?? 0}% HP ต่อเทิร์น (DoT) · ตายจากพิษได้`,
+        detail: `เสียพลังชีวิต ${d.pp ?? 0}% ทุกตา · ตายจากพิษได้`,
       };
     case "burn_hp_mp":
       return {
         title: "เผาไหม้",
-        detail: `ลด HP ${d.pp ?? 0}% + MP ${d.mpp ?? 0}% ต่อเทิร์น · DoT คู่`,
+        detail: `เสียพลังชีวิต ${d.pp ?? 0}% และปราณ ${d.mpp ?? 0}% ทุกตา`,
       };
     case "stun":
       return {
         title: "สตัน",
-        detail: `ข้ามตา (skip turn) — ไม่สามารถโจมตี/ใช้สกิลได้`,
+        detail: `ข้ามตา — โจมตีหรือใช้กระบวนท่าไม่ได้`,
       };
     case "debuff_spd":
-      return { title: "เชื่องช้า (ความเร็วลด)", detail: `เกจเติมช้าลง ${Math.abs(d.v ?? 0)}% (ถูกสกัดชีพจร)` };
+      return { title: "เชื่องช้า (ความเร็วลด)", detail: `ถึงตาช้าลง ${Math.abs(d.v ?? 0)}% (ถูกสกัดชีพจร)` };
     case "bleed":
-      return { title: "เลือดไหล", detail: `เสีย HP ${d.pp ?? 0}% ทุกตา และแผลเปิดกว้างขึ้น +${d.inc ?? 0}% ทุกตา` };
+      return { title: "เลือดไหล", detail: `เสียพลังชีวิต ${d.pp ?? 0}% ทุกตา และแผลเปิดกว้างขึ้น +${d.inc ?? 0}% ทุกตา` };
     case "blind":
       return { title: "ตาบอด", detail: `ท่าถัดไปมีโอกาส ${d.ch ?? 0}% พลาดเป้าทั้งท่า (ใช้แล้วหายไป)` };
     case "scorch":
-      return { title: "แผดเผา", detail: `เสีย HP ${d.pp ?? 0}% ทุกตา · ฟื้นพลังชีวิตไม่ได้ทุกทาง` };
+      return { title: "แผดเผา", detail: `เสียพลังชีวิต ${d.pp ?? 0}% ทุกตา · ฟื้นพลังชีวิตไม่ได้ทุกทาง` };
   }
 }

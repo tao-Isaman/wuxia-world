@@ -50,14 +50,14 @@ export function StatusBar() {
         </strong>
 
         <StatGauge
-          label="HP"
+          label="ชีวิต"
           variant="hp"
           cur={hpCur}
           max={d.HP}
           pct={hpPct}
         />
         <StatGauge
-          label="MP"
+          label="ปราณ"
           variant="qi"
           cur={mpCur}
           max={d.MP}
@@ -80,7 +80,7 @@ export function StatusBar() {
         </div>
 
         <div className="flex items-center gap-1.5 text-xs shrink-0">
-          <span className="text-muted-foreground">w-exp</span>
+          <span className="text-muted-foreground">ประสบการณ์ยุทธ</span>
           <Badge
             variant="outline"
             className="font-mono text-[11px] px-2 py-0.5 border-2 border-jade text-jade"

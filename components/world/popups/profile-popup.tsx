@@ -16,6 +16,8 @@ import {
   derive,
   deriveAll,
   getEquip,
+  equipBonusParts,
+  equipStatParts,
   getEquipBonus,
   getEquipStatBonus,
   getMasteryMap,
@@ -74,26 +76,8 @@ const EQUIP_ROWS: readonly EquipSlotRow[] = [
 ];
 
 function describeEquip(id: string | null): string {
-  if (!id) return "";
-  const e = getEquip(id);
-  if (!e) return "";
-  const parts: string[] = [];
-  if (e.atkb) parts.push(`Atk+${e.atkb}`);
-  if (e.pdb)  parts.push(`PD+${e.pdb}`);
-  if (e.idb)  parts.push(`ID+${e.idb}`);
-  if (e.hpb)  parts.push(`HP+${e.hpb}`);
-  if (e.mpb)  parts.push(`MP+${e.mpb}`);
-  const sb = Object.entries(e.st).map(([k, v]) => `${k}+${v}`).join(" ");
-  if (sb) parts.push(sb);
-  if (e.eff) {
-    if (e.eff.t === "pct_atk")    parts.push(`+${e.eff.v}%ATK`);
-    else if (e.eff.t === "flat_cri")    parts.push(`Cri+${e.eff.v}`);
-    else if (e.eff.t === "flat_eva")    parts.push(`Eva+${e.eff.v}`);
-    else if (e.eff.t === "pct_reduce")  parts.push(`ลดDmg${e.eff.v}%`);
-    else if (e.eff.t === "hp_regen")    parts.push(`ฟื้น${e.eff.v}%/ตา`);
-    else if (e.eff.t === "on_hit")      parts.push(`OnHit:${e.eff.db.t.replace("debuff_", "")}${e.eff.db.v}`);
-  }
-  return parts.join(" ");
+  const e = id ? getEquip(id) : undefined;
+  return e ? equipStatParts(e).join(" · ") : "";
 }
 
 // Profile — a read-only character sheet in three landscape columns:
@@ -150,18 +134,7 @@ export function ProfilePopup({ open, onClose }: Props) {
   // Equipment bonus summary (mirrors EquipmentSlots).
   const eb = getEquipBonus(player.equipment);
   const sb = getEquipStatBonus(player.equipment);
-  const equipSummary: string[] = [];
-  if (eb.atk)      equipSummary.push(`Atk+${eb.atk}`);
-  if (eb.pd)       equipSummary.push(`PD+${eb.pd}`);
-  if (eb.id_)      equipSummary.push(`ID+${eb.id_}`);
-  if (eb.hp)       equipSummary.push(`HP+${eb.hp}`);
-  if (eb.mp)       equipSummary.push(`MP+${eb.mp}`);
-  if (eb.cri)      equipSummary.push(`Cri+${eb.cri}`);
-  if (eb.eva)      equipSummary.push(`Eva+${eb.eva}`);
-  if (eb.pct_atk)  equipSummary.push(`ATK+${eb.pct_atk}%`);
-  if (eb.pct_red)  equipSummary.push(`ลดDmg${eb.pct_red}%`);
-  if (eb.hp_regen) equipSummary.push(`ฟื้น${eb.hp_regen}%/ตา`);
-  for (const [k, v] of Object.entries(sb)) equipSummary.push(`${k}+${v}`);
+  const equipSummary = equipBonusParts(eb, sb);
 
   const staminaPct = staminaMax > 0 ? Math.min(100, (stamina / staminaMax) * 100) : 0;
   const hpNow = Math.min(currentHp, derivedAll.HP), mpNow = Math.min(currentMp, derivedAll.MP);
@@ -182,8 +155,8 @@ export function ProfilePopup({ open, onClose }: Props) {
             </div>
           </div>
           <div className="profile-bars">
-            <VitalBar label="HP" tone="hp" value={hpNow} max={derivedAll.HP} />
-            <VitalBar label="MP" tone="mp" value={mpNow} max={derivedAll.MP} />
+            <VitalBar label="ชีวิต" tone="hp" value={hpNow} max={derivedAll.HP} />
+            <VitalBar label="ปราณ" tone="mp" value={mpNow} max={derivedAll.MP} />
             <VitalBar label="พลัง" tone="st" value={stamina} max={staminaMax} pct={staminaPct} />
           </div>
           <dl className="profile-facts">
@@ -228,7 +201,7 @@ export function ProfilePopup({ open, onClose }: Props) {
                 const xpPct = cost > 0 ? Math.min(100, Math.round((xp / cost) * 100)) : 0;
                 const cellTrigger = (
                   <div className="profile-stat">
-                    <span className="profile-stat-name">{STAT_LABEL[k]}<small>{k}</small></span>
+                    <span className="profile-stat-name">{STAT_LABEL[k]}</span>
                     <b className="profile-stat-value">{c}{d > 0 && <em>+{d}</em>}</b>
                     <span className="profile-stat-train" aria-label={`ฝึก ${xp} จาก ${cost}`}>
                       <i><span style={{ width: `${xpPct}%` }} /></i>
@@ -240,7 +213,7 @@ export function ProfilePopup({ open, onClose }: Props) {
                   <InfoPopover key={k} trigger={cellTrigger} contentClassName="w-64">
                     <div className="space-y-1.5 text-sm">
                       <div className="flex items-baseline justify-between">
-                        <strong className="font-display">{STAT_LABEL[k]} · {k}</strong>
+                        <strong className="font-display">{STAT_LABEL[k]}</strong>
                         <span className="text-base font-semibold">{c}</span>
                       </div>
                       <ul className="space-y-0.5 text-[13px]">
@@ -295,7 +268,7 @@ export function ProfilePopup({ open, onClose }: Props) {
               const diff = cv - bv;
               return (
                 <div key={label}>
-                  <dt>{thai}<small>{label}</small></dt>
+                  <dt>{thai}</dt>
                   <dd>{cv}{diff > 0 && <em>+{diff}</em>}</dd>
                 </div>
               );
@@ -309,7 +282,7 @@ export function ProfilePopup({ open, onClose }: Props) {
               </span>
             ))}
           </div>
-          <p className="profile-bonus">โบนัสจากวิชา: {Object.entries(skillStatBonus).length > 0 ? Object.entries(skillStatBonus).map(([k, v]) => `${k}+${v}`).join(" ") : "—"}</p>
+          <p className="profile-bonus">โบนัสจากวิชา: {Object.entries(skillStatBonus).length > 0 ? Object.entries(skillStatBonus).map(([k, v]) => `${STAT_LABEL[k as keyof typeof STAT_LABEL] ?? k} +${v}`).join(" · ") : "—"}</p>
         </section>
       </div>
     </Modal>

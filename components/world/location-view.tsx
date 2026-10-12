@@ -474,7 +474,7 @@ export function LocationView({ scene, readOnly = false, dialogueSpeakerId }: Pro
                       </span>
                       <span className="text-[10px] text-muted-foreground">
                         ⚡ {res.staminaCost}
-                        <span className="ml-2">มาสเตอร์รี่ของเจ้าระดับ {lvl}</span>
+                        <span className="ml-2">ความชำนาญของเจ้าระดับ {lvl}</span>
                         {tooLow && <span className="text-rose-600 ml-2">พลังไม่พอ</span>}
                         {res.opponentIds && (
                           <span className="text-amber-600 ml-2">⚔ จะเกิดการต่อสู้</span>
@@ -621,14 +621,14 @@ function gatherToast(r: GatherResult): ToastTuple {
   if (r.type === "battle") return ["info", "พบเจอสัตว์ป่า — เตรียมต่อสู้!"];
   if (r.dropCheck === "failed") {
     const pct = Math.round(r.successChance * 100);
-    return ["warn", `ลองมือไม่สำเร็จ — มาสเตอร์รี่ยังไม่พอ (โอกาส ${pct}%) · +${r.xpGained} xp`];
+    return ["warn", `ลองมือไม่สำเร็จ — ความชำนาญยังไม่พอ (โอกาส ${pct}%) · +${r.xpGained} ประสบการณ์`];
   }
-  if (r.items.length === 0) return ["info", `เก็บได้แต่ไม่มีของชิ้นใด · +${r.xpGained} xp`];
+  if (r.items.length === 0) return ["info", `เก็บได้แต่ไม่มีของชิ้นใด · +${r.xpGained} ประสบการณ์`];
   const parts = r.items.map((it) => {
     const def = getItem(it.itemId);
     return `${def?.name ?? it.itemId}×${it.count}`;
   });
-  return ["success", `${parts.join(", ")} · +${r.xpGained} xp`];
+  return ["success", `${parts.join(", ")} · +${r.xpGained} ประสบการณ์`];
 }
 
 // Wraps the RumorListenButton in a header card. Renders nothing when

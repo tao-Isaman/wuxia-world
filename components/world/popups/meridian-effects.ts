@@ -5,7 +5,7 @@ import { RAGE_STYLES, STATUS_STYLES, hexColor } from "@/lib/ui/status-catalog";
 
 const RAGE_GAIN: Record<string, (v: number) => string> = {
   fire: (v) => `พลังโจมตี +${v}%`,
-  water: (v) => `ฟื้น HP ${v}% ทุกต้นตา`,
+  water: (v) => `ฟื้นพลังชีวิต ${v}% ทุกต้นตา`,
   wind: (v) => `ความเร็ว +${v}%`,
   earth: (v) => `พลังป้องกัน +${v}%`,
   thunder: (v) => `โอกาสคริติคอล +${v}`,
@@ -32,14 +32,14 @@ export function meridianEffectView(e: MeridianEffect): EffectView {
       return { name: "เปิดศึก", color: color(OPENING_STATUS[e.stat] ?? "buff_atk_pct"),
         text: `เข้าศึก: ${MERIDIAN_STAT_LABEL[e.stat]} +${e.v}% ${e.turns} ตาแรก` };
     case "revive":
-      return { name: "คืนชีพ", color: "#ffd36a", text: `ล้มลงครั้งแรกลุกขึ้นใหม่ด้วย HP ${e.hpPct}% (ครั้งเดียวต่อศึก)` };
+      return { name: "คืนชีพ", color: "#ffd36a", text: `ล้มลงครั้งแรกลุกขึ้นใหม่ด้วยพลังชีวิต ${e.hpPct}% (ครั้งเดียวต่อศึก)` };
     case "rage":
       return { name: MERIDIAN_ELEMENT_LABEL[e.element], color: hexColor(RAGE_STYLES[e.element].color),
         text: `ถูกโจมตี: โอกาส ${e.chance}% ได้${RAGE_GAIN[e.element](e.v)} ${e.turns} ตา · ซ้อนได้ ${e.maxStacks} ชั้น` };
     case "shield":
-      return { name: "โล่ชีพจร", color: color("shield"), text: `เข้าศึก: โล่ปราณ ${e.pct}% ของ HP สูงสุด ดูดซับความเสียหายก่อน` };
+      return { name: "โล่ชีพจร", color: color("shield"), text: `เข้าศึก: โล่ปราณ ${e.pct}% ของพลังชีวิตสูงสุด ดูดซับความเสียหายก่อน` };
     case "ward":
-      return { name: "ผนึกชีพจร", color: color("ward"), text: `เข้าศึก: กันดีบัฟได้ ${e.count} ครั้ง` };
+      return { name: "ผนึกชีพจร", color: color("ward"), text: `เข้าศึก: กันสถานะผิดปกติได้ ${e.count} ครั้ง` };
     case "sap":
       return { name: "สกัดชีพจร", color: color(SAP_STATUS[e.stat] ?? "debuff_atk"),
         text: `โจมตีโดน: โอกาส ${e.chance}% ลด${MERIDIAN_STAT_LABEL[e.stat]}เป้าหมาย ${e.v}% ${e.turns} ตา` };

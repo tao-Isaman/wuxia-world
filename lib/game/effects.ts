@@ -44,6 +44,10 @@ const PCT_BUFF: ReadonlySet<BuffRecord["t"]> = new Set([
 ]);
 const STAT_CAP = 200;
 const PCT_CAP = 100;
+/** The buff a heal_buff move adds, as its status chip and log name it. */
+const HEAL_BUFF_LABEL: Record<"buff_def" | "buff_eva" | "buff_reduce", string> = {
+  buff_def: "ป้องกัน", buff_eva: "หลบหลีก", buff_reduce: "ลดความเสียหาย",
+};
 function clampBuffValue(t: BuffRecord["t"], v: number): number {
   const cap = PCT_BUFF.has(t) ? PCT_CAP : STAT_CAP;
   return Math.max(-cap, Math.min(cap, v));
@@ -79,8 +83,8 @@ export function addDebuff(state: BattleState, side: Side, d: DebuffRecord): void
   if (ward) {
     ward.v -= 1;
     if (ward.v <= 0) state.st[side].buffs = state.st[side].buffs.filter((b) => b !== ward);
-    pushProc(state, side, "ward", ward.v > 0 ? `ผนึกกันดีบัฟ (เหลือ ${ward.v})` : "ผนึกกันดีบัฟ (หมด)");
-    logLine(state, "lS", `&nbsp;🛡 ผนึกชีพจรกัน${d.n ?? "ดีบัฟ"}${ward.v > 0 ? ` (เหลือ ${ward.v})` : ""}`);
+    pushProc(state, side, "ward", ward.v > 0 ? `ผนึกกันสถานะผิดปกติ (เหลือ ${ward.v})` : "ผนึกกันสถานะผิดปกติ (หมด)");
+    logLine(state, "lS", `&nbsp;🛡 ผนึกชีพจรกัน${d.n ?? "สถานะผิดปกติ"}${ward.v > 0 ? ` (เหลือ ${ward.v})` : ""}`);
     return;
   }
   const list = state.st[side].debuffs;
@@ -194,37 +198,37 @@ export function applySelfEffect(
       return;
     case "buff_eva":
       addBuff(state, side, { t: "buff_eva", n: "ว่องไว", v: eff.v, u: eff.u });
-      logLine(state, "lS", `&nbsp;⟳ ${nm}: Eva+${eff.v}(${eff.u}ตา)`);
+      logLine(state, "lS", `&nbsp;⟳ ${nm}: หลบหลีก +${eff.v}(${eff.u}ตา)`);
       return;
     case "buff_reduce":
       addBuff(state, side, { t: "buff_reduce", n: "เกราะ", v: eff.v, u: eff.u });
-      logLine(state, "lS", `&nbsp;⟳ ${nm}: ลดdmg${eff.v}%(${eff.u}ตา)`);
+      logLine(state, "lS", `&nbsp;⟳ ${nm}: ลดความเสียหาย ${eff.v}%(${eff.u}ตา)`);
       return;
     case "buff_def":
-      addBuff(state, side, { t: "buff_def", n: "DEF↑", v: eff.v, u: eff.u });
-      logLine(state, "lS", `&nbsp;⟳ ${nm}: DEF+${eff.v}(${eff.u}ตา)`);
+      addBuff(state, side, { t: "buff_def", n: "ป้องกัน↑", v: eff.v, u: eff.u });
+      logLine(state, "lS", `&nbsp;⟳ ${nm}: ป้องกัน +${eff.v}(${eff.u}ตา)`);
       return;
     case "buff_spd":
       addBuff(state, side, { t: "buff_spd", n: "เร็ว", v: eff.v, u: eff.u });
-      logLine(state, "lS", `&nbsp;⟳ ${nm}: SPD+${eff.v}(${eff.u}ตา)`);
+      logLine(state, "lS", `&nbsp;⟳ ${nm}: ความเร็ว +${eff.v}(${eff.u}ตา)`);
       return;
     case "buff_cri":
       addBuff(state, side, { t: "buff_cri", n: "วงคริต", v: eff.v, u: eff.u });
-      logLine(state, "lS", `&nbsp;⟳ ${nm}: Cri+${eff.v}(${eff.u}ตา)`);
+      logLine(state, "lS", `&nbsp;⟳ ${nm}: คริติคอล +${eff.v}(${eff.u}ตา)`);
       return;
     case "heal_pct": {
       const cap = side === "A" ? state.dA.HP : state.dB.HP;
       const want = Math.round(cap * eff.v / 100);
       const heal = healHp(state, side, want);
-      logLine(state, "lS", `&nbsp;⟳ ${nm}: ฟื้น${heal}HP${blockedNote(state, side, want, heal)}`);
+      logLine(state, "lS", `&nbsp;⟳ ${nm}: ฟื้นพลังชีวิต ${heal}${blockedNote(state, side, want, heal)}`);
       return;
     }
     case "heal_buff": {
       const cap = side === "A" ? state.dA.HP : state.dB.HP;
       const want = Math.round(cap * eff.hp / 100);
       const heal = healHp(state, side, want);
-      addBuff(state, side, { t: eff.bt, n: "บัฟ", v: eff.bv, u: eff.bu });
-      logLine(state, "lS", `&nbsp;⟳ ${nm}: ฟื้น${heal}HP${blockedNote(state, side, want, heal)}+${eff.bt}+${eff.bv}(${eff.bu}ตา)`);
+      addBuff(state, side, { t: eff.bt, n: HEAL_BUFF_LABEL[eff.bt], v: eff.bv, u: eff.bu });
+      logLine(state, "lS", `&nbsp;⟳ ${nm}: ฟื้นพลังชีวิต ${heal}${blockedNote(state, side, want, heal)} + ${HEAL_BUFF_LABEL[eff.bt]} +${eff.bv}${eff.bt === "buff_reduce" ? "%" : ""} (${eff.bu}ตา)`);
       return;
     }
     case "stack_atk": {
@@ -235,19 +239,19 @@ export function applySelfEffect(
       state.st[side].stkV = eff.v;
       if (cur < eff.mx) {
         state.st[side].stk++;
-        logLine(state, "lS", `&nbsp;⟳ ${nm}: ATK+${state.st[side].stk * eff.v}%`);
+        logLine(state, "lS", `&nbsp;⟳ ${nm}: พลังโจมตี +${state.st[side].stk * eff.v}%`);
       }
       return;
     }
     case "buff_iatk_reduce":
       addBuff(state, side, { t: "buff_iatk", n: "ลมปราณอุดร", v: eff.iv, u: eff.u });
       addBuff(state, side, { t: "buff_reduce", n: "ลดรับ", v: eff.rv, u: eff.u });
-      logLine(state, "lS", `&nbsp;⟳ ${nm}: IAtk+${eff.iv}% + ลดรับ${eff.rv}%(${eff.u}ตา)`);
+      logLine(state, "lS", `&nbsp;⟳ ${nm}: โจมตีใน +${eff.iv}% + ลดรับ${eff.rv}%(${eff.u}ตา)`);
       return;
     case "buff_reflect_eva":
       addBuff(state, side, { t: "buff_reflect", n: "ดาวคล้อย", v: eff.rv, u: eff.u });
       addBuff(state, side, { t: "buff_eva", n: "ดาวคล้อย", v: eff.ev, u: eff.u });
-      logLine(state, "lS", `&nbsp;⟳ ${nm}: สะท้อน${eff.rv}% + Eva+${eff.ev}(${eff.u}ตา)`);
+      logLine(state, "lS", `&nbsp;⟳ ${nm}: สะท้อน${eff.rv}% + หลบหลีก +${eff.ev}(${eff.u}ตา)`);
       return;
     case "molt": {
       // Shed the old skin first, so a scorch it carried no longer blocks the heal.
@@ -256,12 +260,12 @@ export function applySelfEffect(
       const cap = side === "A" ? state.dA.HP : state.dB.HP;
       const heal = healHp(state, side, Math.round(cap * eff.hp / 100));
       addBuff(state, side, { t: "buff_reflect", n: "เกล็ดใหม่", v: eff.rv, u: eff.u });
-      logLine(state, "lS", `&nbsp;⟳ ${nm}: ลอกคราบ ล้างดีบัฟ ${cleared} · ฟื้น${heal}HP · สะท้อน${eff.rv}%(${eff.u}ตา)`);
+      logLine(state, "lS", `&nbsp;⟳ ${nm}: ลอกคราบ ล้างสถานะผิดปกติ ${cleared} · ฟื้นพลังชีวิต ${heal} · สะท้อน${eff.rv}%(${eff.u}ตา)`);
       return;
     }
     case "frenzy": {
       const pct = applyFrenzy(state, side, "โลหิตคลั่ง", eff.v, eff.mx, eff.u);
-      logLine(state, "lS", `&nbsp;⟳ ${nm}: คลั่ง ATK+${pct}%(${eff.u}ตา)`);
+      logLine(state, "lS", `&nbsp;⟳ ${nm}: คลั่ง พลังโจมตี +${pct}%(${eff.u}ตา)`);
       return;
     }
     case "sun_shell": {
@@ -295,24 +299,24 @@ export function applyEnemyEffect(
   const dnm = nameOf(ds, names);
   switch (eff.t) {
     case "debuff_eva":
-      addDebuff(state, ds, { t: "debuff_eva", n: "Eva↓", v: eff.v, u: eff.u });
-      logLine(state, "lS", `&nbsp;✗ ${dnm}: Eva${eff.v}(${eff.u}ตา)`);
+      addDebuff(state, ds, { t: "debuff_eva", n: "หลบหลีก↓", v: eff.v, u: eff.u });
+      logLine(state, "lS", `&nbsp;✗ ${dnm}: หลบหลีก ${eff.v}(${eff.u}ตา)`);
       return;
     case "debuff_acc":
-      addDebuff(state, ds, { t: "debuff_acc", n: "Acc↓", v: eff.v, u: eff.u });
-      logLine(state, "lS", `&nbsp;✗ ${dnm}: Acc${eff.v}(${eff.u}ตา)`);
+      addDebuff(state, ds, { t: "debuff_acc", n: "แม่นยำ↓", v: eff.v, u: eff.u });
+      logLine(state, "lS", `&nbsp;✗ ${dnm}: แม่นยำ ${eff.v}(${eff.u}ตา)`);
       return;
     case "debuff_def":
-      addDebuff(state, ds, { t: "debuff_def", n: "DEF↓", v: eff.v, u: eff.u });
-      logLine(state, "lS", `&nbsp;✗ ${dnm}: PDef${eff.v}(${eff.u}ตา)`);
+      addDebuff(state, ds, { t: "debuff_def", n: "ป้องกัน↓", v: eff.v, u: eff.u });
+      logLine(state, "lS", `&nbsp;✗ ${dnm}: ป้องกันกาย ${eff.v}(${eff.u}ตา)`);
       return;
     case "debuff_atk":
-      addDebuff(state, ds, { t: "debuff_atk", n: "ATK↓", v: eff.v, u: eff.u });
-      logLine(state, "lS", `&nbsp;✗ ${dnm}: ATK${eff.v}%(${eff.u}ตา)`);
+      addDebuff(state, ds, { t: "debuff_atk", n: "โจมตี↓", v: eff.v, u: eff.u });
+      logLine(state, "lS", `&nbsp;✗ ${dnm}: พลังโจมตี ${eff.v}%(${eff.u}ตา)`);
       return;
     case "burn_hp_mp":
       addDebuff(state, ds, { t: "burn_hp_mp", n: "เผาไหม้", pp: eff.dmg, mpp: eff.mp, u: eff.u });
-      logLine(state, "lS", `&nbsp;✗ ${dnm}: เผาไหม้ HP${eff.dmg}% MP${eff.mp}%/ตา (${eff.u}ตา)`);
+      logLine(state, "lS", `&nbsp;✗ ${dnm}: เผาไหม้ พลังชีวิต ${eff.dmg}% ปราณ ${eff.mp}%/ตา (${eff.u}ตา)`);
       return;
     case "poison_dmg":
       // Pure HP DoT — reuses the existing `debuff_poison` debuff stat
@@ -320,7 +324,7 @@ export function applyEnemyEffect(
       // `debuff_poison` enemy effect adds. Higher pp values than burn
       // since poison gives up MP damage + secondary debuffs in trade.
       addDebuff(state, ds, { t: "debuff_poison", n: "พิษ", pp: eff.pp, u: eff.u });
-      logLine(state, "lS", `&nbsp;✗ ${dnm}: พิษ${eff.pp}%HP/ตา (${eff.u}ตา)`);
+      logLine(state, "lS", `&nbsp;✗ ${dnm}: พิษ${eff.pp}%/ตา (${eff.u}ตา)`);
       return;
     case "stun":
       if (Math.random() * 100 < eff.ch) {
@@ -332,24 +336,24 @@ export function applyEnemyEffect(
       return;
     case "debuff_poison":
       addDebuff(state, ds, { t: "debuff_poison", n: "พิษ", pp: eff.pp, u: eff.u });
-      addDebuff(state, ds, { t: "debuff_eva", n: "พิษEva", v: eff.ev, u: eff.u });
-      logLine(state, "lS", `&nbsp;✗ ${dnm}: พิษ${eff.pp}%/ตา Eva${eff.ev}(${eff.u}ตา)`);
+      addDebuff(state, ds, { t: "debuff_eva", n: "พิษ (หลบหลีก)", v: eff.ev, u: eff.u });
+      logLine(state, "lS", `&nbsp;✗ ${dnm}: พิษ${eff.pp}%/ตา หลบหลีก ${eff.ev}(${eff.u}ตา)`);
       return;
     case "multi_debuff":
-      addDebuff(state, ds, { t: "debuff_acc", n: "Acc↓", v: eff.av, u: eff.u });
-      addDebuff(state, ds, { t: "debuff_eva", n: "Eva↓", v: eff.ev, u: eff.u });
-      logLine(state, "lS", `&nbsp;✗ ${dnm}: Acc${eff.av} Eva${eff.ev}(${eff.u}ตา)`);
+      addDebuff(state, ds, { t: "debuff_acc", n: "แม่นยำ↓", v: eff.av, u: eff.u });
+      addDebuff(state, ds, { t: "debuff_eva", n: "หลบหลีก↓", v: eff.ev, u: eff.u });
+      logLine(state, "lS", `&nbsp;✗ ${dnm}: แม่นยำ ${eff.av} หลบหลีก ${eff.ev}(${eff.u}ตา)`);
       return;
     case "debuff_def_eva":
-      addDebuff(state, ds, { t: "debuff_def", n: "DEF↓", v: eff.dv, u: eff.u });
-      addDebuff(state, ds, { t: "debuff_eva", n: "Eva↓", v: eff.ev, u: eff.u });
-      logLine(state, "lS", `&nbsp;✗ ${dnm}: PDef${eff.dv} Eva${eff.ev}(${eff.u}ตา)`);
+      addDebuff(state, ds, { t: "debuff_def", n: "ป้องกัน↓", v: eff.dv, u: eff.u });
+      addDebuff(state, ds, { t: "debuff_eva", n: "หลบหลีก↓", v: eff.ev, u: eff.u });
+      logLine(state, "lS", `&nbsp;✗ ${dnm}: ป้องกันกาย ${eff.dv} หลบหลีก ${eff.ev}(${eff.u}ตา)`);
       return;
     case "heavy_poison":
       addDebuff(state, ds, { t: "debuff_poison", n: "พิษร้าย", pp: eff.pp, u: eff.u });
-      addDebuff(state, ds, { t: "debuff_acc", n: "พิษAcc", v: eff.av, u: eff.u });
-      addDebuff(state, ds, { t: "debuff_eva", n: "พิษEva", v: eff.ev, u: eff.u });
-      logLine(state, "lS", `&nbsp;✗ ${dnm}: พิษ${eff.pp}%/ตา Acc${eff.av} Eva${eff.ev}(${eff.u}ตา)`);
+      addDebuff(state, ds, { t: "debuff_acc", n: "พิษ (แม่นยำ)", v: eff.av, u: eff.u });
+      addDebuff(state, ds, { t: "debuff_eva", n: "พิษ (หลบหลีก)", v: eff.ev, u: eff.u });
+      logLine(state, "lS", `&nbsp;✗ ${dnm}: พิษ${eff.pp}%/ตา แม่นยำ ${eff.av} หลบหลีก ${eff.ev}(${eff.u}ตา)`);
       return;
     case "drain_mp": {
       const dCap = ds === "A" ? state.dA.MP : state.dB.MP;
@@ -361,37 +365,37 @@ export function applyEnemyEffect(
       const cCap = caster === "A" ? state.dA.MP : state.dB.MP;
       if (caster === "A") state.mpA = Math.min(cCap, state.mpA + gained);
       else state.mpB = Math.min(cCap, state.mpB + gained);
-      logLine(state, "lS", `&nbsp;✗ ${dnm}: ดูด MP ${gained}`);
+      logLine(state, "lS", `&nbsp;✗ ${dnm}: ดูดปราณ ${gained}`);
       return;
     }
     case "dispel": {
       const removed = state.st[ds].buffs.shift();
       addDebuff(state, ds, { t: "debuff_acc", n: "สลายพลัง", v: eff.acc, u: eff.u });
-      logLine(state, "lS", `&nbsp;✗ ${dnm}: ${removed ? `สลาย[${removed.n ?? "บัฟ"}]` : ""} Acc${eff.acc}(${eff.u}ตา)`);
+      logLine(state, "lS", `&nbsp;✗ ${dnm}: ${removed ? `สลาย[${removed.n ?? "พลังเสริม"}]` : ""} แม่นยำ ${eff.acc}(${eff.u}ตา)`);
       return;
     }
     case "bind": {
       addDebuff(state, ds, { t: "debuff_def", n: "ถูกรัด", v: eff.dv, u: eff.du });
       if (Math.random() * 100 < eff.ch) {
         addDebuff(state, ds, { t: "stun", n: "ถูกรัด", u: eff.u });
-        logLine(state, "lS", `&nbsp;✗ ${dnm}: ถูกรัดแน่น สตัน (${eff.u}ตา) + PDef${eff.dv}(${eff.du}ตา)`);
+        logLine(state, "lS", `&nbsp;✗ ${dnm}: ถูกรัดแน่น สตัน (${eff.u}ตา) + ป้องกันกาย ${eff.dv}(${eff.du}ตา)`);
       } else {
-        logLine(state, "lS", `&nbsp;✗ ${dnm}: ดิ้นหลุด + PDef${eff.dv}(${eff.du}ตา)`);
+        logLine(state, "lS", `&nbsp;✗ ${dnm}: ดิ้นหลุด + ป้องกันกาย ${eff.dv}(${eff.du}ตา)`);
       }
       return;
     }
     case "bleed":
       addDebuff(state, ds, { t: "bleed", n: "เลือดไหล", pp: eff.pp, inc: eff.inc, u: eff.u });
-      logLine(state, "lS", `&nbsp;✗ ${dnm}: เลือดไหล ${eff.pp}%HP/ตา +${eff.inc}/ตา (${eff.u}ตา)`);
+      logLine(state, "lS", `&nbsp;✗ ${dnm}: เลือดไหล ${eff.pp}%/ตา +${eff.inc}/ตา (${eff.u}ตา)`);
       return;
     case "blind":
       addDebuff(state, ds, { t: "debuff_acc", n: "ตาพร่า", v: eff.v, u: eff.u });
       addDebuff(state, ds, { t: "blind", n: "ตาบอด", ch: eff.ch, u: eff.u });
-      logLine(state, "lS", `&nbsp;✗ ${dnm}: ตาพร่า Acc${eff.v} · ท่าถัดไปพลาด ${eff.ch}% (${eff.u}ตา)`);
+      logLine(state, "lS", `&nbsp;✗ ${dnm}: ตาพร่า แม่นยำ ${eff.v} · ท่าถัดไปพลาด ${eff.ch}% (${eff.u}ตา)`);
       return;
     case "scorch":
       addDebuff(state, ds, { t: "scorch", n: "แผดเผา", pp: eff.pp, u: eff.u });
-      logLine(state, "lS", `&nbsp;✗ ${dnm}: แผดเผา ${eff.pp}%HP/ตา ฟื้นพลังไม่ได้ (${eff.u}ตา)`);
+      logLine(state, "lS", `&nbsp;✗ ${dnm}: แผดเผา ${eff.pp}%/ตา ฟื้นพลังไม่ได้ (${eff.u}ตา)`);
       return;
     case "sunder": {
       // Strip first: a ward is broken too, so the armour break always lands.
@@ -399,7 +403,7 @@ export function applyEnemyEffect(
       state.st[ds].buffs = [];
       state.st[ds].stk = 0;
       addDebuff(state, ds, { t: "debuff_def", n: "เกราะแหลก", v: eff.dv, u: eff.u });
-      logLine(state, "lS", `&nbsp;✗ ${dnm}: ทลายเกราะ${stripped ? ` สลายบัฟ ${stripped}` : ""} + PDef${eff.dv}(${eff.u}ตา)`);
+      logLine(state, "lS", `&nbsp;✗ ${dnm}: ทลายเกราะ${stripped ? ` สลายพลังเสริม ${stripped}` : ""} + ป้องกันกาย ${eff.dv}(${eff.u}ตา)`);
       return;
     }
 
@@ -437,11 +441,11 @@ function applyPassiveEffect(
   switch (e.t) {
     case "buff_def":
       addBuff(state, side, { t: "buff_def", n: e.n ?? "DEF↑", v: e.v, u: e.u });
-      logLine(state, "lS", `&nbsp;◆ ${nm}: DEF+${e.v}(${e.u}ตา)`);
+      logLine(state, "lS", `&nbsp;◆ ${nm}: ป้องกัน +${e.v}(${e.u}ตา)`);
       return;
     case "buff_eva":
       addBuff(state, side, { t: "buff_eva", n: e.n ?? "Eva↑", v: e.v, u: e.u });
-      logLine(state, "lS", `&nbsp;◆ ${nm}: Eva+${e.v}(${e.u}ตา)`);
+      logLine(state, "lS", `&nbsp;◆ ${nm}: หลบหลีก +${e.v}(${e.u}ตา)`);
       return;
     case "buff_reflect":
       addBuff(state, side, { t: "buff_reflect", n: e.n ?? "สะท้อน", v: e.v, u: e.u });
@@ -450,38 +454,38 @@ function applyPassiveEffect(
     case "buff_spd_cri":
       addBuff(state, side, { t: "buff_spd", n: e.n ?? "เร็ว", v: e.sv, u: e.u });
       addBuff(state, side, { t: "buff_cri", n: e.n ?? "วงคริต", v: e.cv, u: e.u });
-      logLine(state, "lS", `&nbsp;◆ ${nm}: SPD+${e.sv} / Cri+${e.cv}(${e.u}ตา)`);
+      logLine(state, "lS", `&nbsp;◆ ${nm}: ความเร็ว +${e.sv} / คริติคอล +${e.cv}(${e.u}ตา)`);
       return;
     case "heal_pct": {
       const cap = side === "A" ? state.dA.HP : state.dB.HP;
       const want = Math.round(cap * e.v / 100);
       const heal = healHp(state, side, want);
-      logLine(state, "lS", `&nbsp;◆ ${nm} ฟื้น ${heal} HP${blockedNote(state, side, want, heal)}`);
+      logLine(state, "lS", `&nbsp;◆ ${nm} ฟื้นพลังชีวิต ${heal}${blockedNote(state, side, want, heal)}`);
       return;
     }
     case "frenzy": {
       const pct = applyFrenzy(state, side, e.n ?? "โลหิตคลั่ง", e.v, e.mx, e.u);
-      logLine(state, "lS", `&nbsp;◆ ${nm}: คลั่ง ATK+${pct}%(${e.u}ตา)`);
+      logLine(state, "lS", `&nbsp;◆ ${nm}: คลั่ง พลังโจมตี +${pct}%(${e.u}ตา)`);
       return;
     }
     case "debuff_acc":
       addDebuff(state, ds, { t: "debuff_acc", n: e.n ?? "Acc↓", v: e.v, u: e.u });
-      logLine(state, "lS", `&nbsp;◆ ${dnm}: Acc${e.v}(${e.u}ตา)`);
+      logLine(state, "lS", `&nbsp;◆ ${dnm}: แม่นยำ ${e.v}(${e.u}ตา)`);
       return;
     case "debuff_eva":
       addDebuff(state, ds, { t: "debuff_eva", n: e.n ?? "Eva↓", v: e.v, u: e.u });
-      logLine(state, "lS", `&nbsp;◆ ${dnm}: Eva${e.v}(${e.u}ตา)`);
+      logLine(state, "lS", `&nbsp;◆ ${dnm}: หลบหลีก ${e.v}(${e.u}ตา)`);
       return;
     case "debuff_def":
       addDebuff(state, ds, { t: "debuff_def", n: e.n ?? "DEF↓", v: e.v, u: e.u });
-      logLine(state, "lS", `&nbsp;◆ ${dnm}: PDef${e.v}(${e.u}ตา)`);
+      logLine(state, "lS", `&nbsp;◆ ${dnm}: ป้องกันกาย ${e.v}(${e.u}ตา)`);
       return;
     case "stack_atk": {
       const cur = state.st[side].stk;
       state.st[side].stkV = e.v;
       if (cur < e.mx) {
         state.st[side].stk++;
-        logLine(state, "lS", `&nbsp;◆ ${nm}: ATK+${state.st[side].stk * e.v}%`);
+        logLine(state, "lS", `&nbsp;◆ ${nm}: พลังโจมตี +${state.st[side].stk * e.v}%`);
       }
       return;
     }
@@ -570,7 +574,7 @@ function tickDots(state: BattleState, side: Side, names: Record<Side, string>): 
       state.mpB = Math.max(0, state.mpB - mpDmg);
     }
     if (hpDmg > 0 || mpDmg > 0)
-      logLine(state, "lS", `&nbsp;🔥 ${nameOf(side, names)} เผาไหม้ HP-${hpDmg} MP-${mpDmg}`);
+      logLine(state, "lS", `&nbsp;🔥 ${nameOf(side, names)} เผาไหม้ พลังชีวิต −${hpDmg} ปราณ −${mpDmg}`);
   }
 
   // Bleed: the wound opens wider every tick (pp grows by inc, ≤ BLEED_CAP %).
@@ -630,13 +634,13 @@ function tickRegen(
     const mpCap = side === "A" ? state.dA.MP : state.dB.MP;
     if (art.hpRegenPct && art.hpRegenPct > 0) {
       const heal = healHp(state, side, Math.round(hpCap * art.hpRegenPct / 100));
-      if (heal > 0) logLine(state, "lS", `&nbsp;🌱 ${nameOf(side, names)} ฟื้น ${heal} HP (${art.n})`);
+      if (heal > 0) logLine(state, "lS", `&nbsp;🌱 ${nameOf(side, names)} ฟื้นพลังชีวิต ${heal} (${art.n})`);
     }
     if (art.mpRegenPct && art.mpRegenPct > 0) {
       const mpHeal = Math.round(mpCap * art.mpRegenPct / 100);
       if (side === "A") state.mpA = Math.min(mpCap, state.mpA + mpHeal);
       else state.mpB = Math.min(mpCap, state.mpB + mpHeal);
-      if (mpHeal > 0) logLine(state, "lS", `&nbsp;🌱 ${nameOf(side, names)} ฟื้น ${mpHeal} MP (${art.n})`);
+      if (mpHeal > 0) logLine(state, "lS", `&nbsp;🌱 ${nameOf(side, names)} ฟื้นปราณ ${mpHeal} (${art.n})`);
     }
   }
 }

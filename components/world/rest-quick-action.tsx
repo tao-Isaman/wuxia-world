@@ -103,7 +103,7 @@ export function RestQuickAction() {
       {open && (
         <div className="rest-bubble" role="group" aria-label="เลือกวิธีพักผ่อน">
           <p className="rest-bubble-title">พักผ่อน <small>· ฟื้นทันที</small></p>
-          {atFull && <p className="rest-bubble-note">HP, MP และพลังเต็มแล้ว</p>}
+          {atFull && <p className="rest-bubble-note">พลังชีวิต ปราณ และแรงเต็มแล้ว</p>}
           {choices.map((choice) => (
             <button key={choice.kind} type="button" disabled={atFull || choice.short || choice.waiting} onClick={() => choose(choice.kind)}
               aria-label={`${choice.title} ${choice.detail}`}>

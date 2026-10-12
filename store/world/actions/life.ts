@@ -85,9 +85,9 @@ export const lifeActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "gat
             return `${def?.name ?? it.itemId}×${it.count}`;
           }).join(", ")
         : "ไม่ได้ของ";
-      appendActionLog(draft, "gather", `เก็บ ${res.name}: ${itemPart} · +${xpGained} xp`);
+      appendActionLog(draft, "gather", `เก็บ ${res.name}: ${itemPart} · +${xpGained} ประสบการณ์`);
     } else {
-      appendActionLog(draft, "gather", `เก็บ ${res.name}: ลองมือไม่สำเร็จ · +${xpGained} xp`);
+      appendActionLog(draft, "gather", `เก็บ ${res.name}: ลองมือไม่สำเร็จ · +${xpGained} ประสบการณ์`);
     }
     set({ ...draft });
     return {
@@ -182,12 +182,12 @@ export const lifeActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "gat
     rollLukXp(draft);
     const outDef = getItem(r.output.itemId);
     if (dropCheck === "failed") {
-      appendActionLog(draft, "craft", `ประดิษฐ์ ${r.name}: พลาด · +${xpGained} xp`);
+      appendActionLog(draft, "craft", `ประดิษฐ์ ${r.name}: พลาด · +${xpGained} ประสบการณ์`);
     } else {
       appendActionLog(
         draft,
         "craft",
-        `ประดิษฐ์ ${outDef?.name ?? r.output.itemId}×${r.output.count} · +${xpGained} xp`,
+        `ประดิษฐ์ ${outDef?.name ?? r.output.itemId}×${r.output.count} · +${xpGained} ประสบการณ์`,
       );
     }
     set({ ...draft });
@@ -286,7 +286,7 @@ export const lifeActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "gat
       const itemStat = statFromLifeSkill(eff.skill);
       if (itemStat) grantStatXp(draft, itemStat, STAT_XP_PER_ACTION);
       rollLukXp(draft);
-      appendActionLog(draft, "use", `ใช้ ${def.name} · +${eff.xp} xp`);
+      appendActionLog(draft, "use", `ใช้ ${def.name} · +${eff.xp} ประสบการณ์`);
       set({ ...draft });
       return { ok: true, kind: "trainSkill", itemId, skill: eff.skill, xpGained: eff.xp };
     }
@@ -304,8 +304,8 @@ export const lifeActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "gat
       draft.stamina = Math.min(draft.staminaMax, draft.stamina + staminaHealed);
       rollLukXp(draft);
       const parts: string[] = [];
-      if (hpHealed > 0) parts.push(`HP +${hpHealed}`);
-      if (mpHealed > 0) parts.push(`MP +${mpHealed}`);
+      if (hpHealed > 0) parts.push(`พลังชีวิต +${hpHealed}`);
+      if (mpHealed > 0) parts.push(`ปราณ +${mpHealed}`);
       if (staminaHealed > 0) parts.push(`พลัง +${staminaHealed}`);
       appendActionLog(draft, "use", `ใช้ ${def.name} · ${parts.join(" / ") || "ไม่มีพลังให้ฟื้น"}`);
       set({ ...draft });
@@ -512,7 +512,7 @@ export const lifeActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "gat
         draft.stamina = Math.min(draft.staminaMax, draft.stamina + 15);
         // Nothing to do but sit with one's arts: insight comes (w-exp).
         draft.wExp += JAIL_MEDITATE_WEXP;
-        message = `จิตสงบท่ามกลางซี่กรง · ปราณเต็มเปี่ยม · w-exp +${JAIL_MEDITATE_WEXP}`;
+        message = `จิตสงบท่ามกลางซี่กรง · ปราณเต็มเปี่ยม · ประสบการณ์ยุทธ +${JAIL_MEDITATE_WEXP}`;
         break;
       }
       case "jail_escape": {
