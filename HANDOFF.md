@@ -49,6 +49,8 @@ Deploys are implied to be on Vercel (`VERCEL_GIT_COMMIT_SHA` sets the service-wo
 
 ## Verified state
 
+**2026-10-12** (friends, party, chat, player mail; NPC letter gifts behind รับของ): typecheck clean; lint 0 errors (17 warnings); `cargo test` 25; every `test:*` unit suite passes (`test:play-server` 18, `test:net` 8); `test:online` 18 against `wrangler dev`; `audit-content` OK; build OK; `test:e2e` 69 passed with the local game server running (the online specs included).
+
 **2026-10-11** (the server-run world, checked battles, data generation 2, and the bug-fix wave, PR #114): typecheck clean; lint 0 errors (17 warnings, all in untouched story data and old files); `cargo test` 23; every `test:*` unit suite passes, including the new `test:play-server` (11) and `test:rumors` / `test:grid-store`, which failed on `main` before; `test:online` 12 against `wrangler dev`; `audit-content` OK (1,075 quests); the server bundles from a clean checkout (1.78 MB gzipped); the browser suite as recorded in the PR. The table below is the older baseline.
 
 Checked on 2026-10-05 for the hero's flat base HP (a new hero starts at 136 HP), line-by-line conversations with coloured key words, the map editor's moved markers (NPCs, exits, spawn, service spots), the 1401 timeline and lore (sagas re-timed, the court's seized scriptures, the 15-chapter main story), the story timeline (NPC renames), the road fixes (the way back after a fight, the guide arrow turning back), item icons (every item, scroll and equipment piece shows a library icon), the PixelLab asset library (3,194 assets + 464 kit pieces: roads, city walls, house walls, fences that join on a grid), the engine at `/game/engine` (asset library, map editor, skill / art text overrides) and objects placed on maps:
