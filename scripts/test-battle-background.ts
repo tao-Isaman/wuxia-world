@@ -2,6 +2,10 @@ import assert from "node:assert/strict";
 import { BATTLE_BACKGROUNDS, resolveBattleBackground } from "../lib/stage/battle-background";
 import { CAPITAL_TRAINING_OPPONENT_ID, CAPITAL_TRAINING_SCENE_ID } from "../lib/world/data/capital-training";
 import type { PendingBattle } from "../lib/world/types";
+import { existsSync } from "node:fs";
+import { getLocationMap } from "../lib/world/data/location-maps";
+import { getRouteMap } from "../lib/world/data/route-maps";
+import { SCENES } from "../lib/world/data/scenes";
 
 const memory = new Map<string, string>();
 Object.defineProperty(globalThis, "localStorage", { configurable: true, value: {
@@ -21,27 +25,36 @@ assert.equal(resolveBattleBackground({ ...training, mode: "free" }).id, "courtya
 assert.equal(resolveBattleBackground({ ...capital, mode: "free" }).id, "courtyard");
 assert.equal(resolveBattleBackground({ ...capital, pendingBattle: null }).id, "courtyard");
 assert.equal(resolveBattleBackground({ ...capital, pendingBattle: { ...capitalBattle, opponentId: "training_other_apprentice" } }).id, "capital-street", "no broad training-name heuristic");
-for (const override of [
-  { currentSceneId: "city_changan" },
-  { lastLocationId: "home_player" },
-  { lastLocationId: null },
-  { currentSceneId: "npc_city_capital_magistrate_wu_talk" },
-  { pendingBattle: { ...capitalBattle, onWin: "other_return" } },
-  { pendingBattle: { ...capitalBattle, onLose: "other_return" } },
-]) {
-  assert.equal(resolveBattleBackground({ ...capital, ...override }).id, "courtyard", "ambiguous or conflicting origin keeps the existing fallback");
-}
+// Every other place fights over its own painting; a dialog's fight, over the place the talk is held.
+const changan = resolveBattleBackground({ ...capital, currentSceneId: "city_changan", lastLocationId: "city_changan" });
+assert.equal(changan.id, "place:city_changan");
+assert.equal(changan.image, getLocationMap("city_changan")!.image);
+assert.equal(resolveBattleBackground({ ...capital, currentSceneId: "npc_city_capital_magistrate_wu_talk" }).id, "capital-street", "a talk in the capital fights in the capital");
+assert.equal(resolveBattleBackground({ ...capital, currentSceneId: "npc_some_talk", lastLocationId: "village_taishan" }).id, "place:village_taishan");
+assert.equal(resolveBattleBackground({ ...capital, currentSceneId: "no_such_scene", lastLocationId: null }).id, "courtyard", "an unknown place keeps the courtyard");
+assert.strictEqual(resolveBattleBackground({ ...capital, currentSceneId: "city_changan" }), changan, "one object per place: the canvas is not rebuilt");
+// Roads: the road's own painting, graded for its region.
 for (const route of ["route_home_player__to__city_capital", "route_city_capital__to__home_player"]) {
-  assert.equal(resolveBattleBackground({ ...capital, currentSceneId: route,
-    pendingBattle: { ...capitalBattle, onWin: route, onLose: route } }).id, "courtyard", "a road must not display capital street scenery");
+  const road = resolveBattleBackground({ ...capital, currentSceneId: route, pendingBattle: { ...capitalBattle, onWin: route, onLose: route } });
+  assert.equal(road.id, `road:${route}`, "a road fights over the road, not the capital street");
+  assert.equal(road.image, getRouteMap(route)!.image);
 }
+let painted = 0;
+for (const scene of SCENES) {
+  if (scene.kind !== "location" || !getLocationMap(scene.id)) continue;
+  const bg = resolveBattleBackground({ ...capital, currentSceneId: scene.id, lastLocationId: scene.id });
+  assert.ok(bg.id === "capital-street" || bg.id === `place:${scene.id}`, scene.id);
+  assert.ok(existsSync(`public${bg.image}`), `${scene.id}: ${bg.image}`);
+  painted++;
+}
+assert.ok(painted >= 90, `${painted} painted places`);
 const untouched = JSON.stringify(capital);
 assert.strictEqual(resolveBattleBackground(capital), BATTLE_BACKGROUNDS["capital-street"], "stable metadata avoids restarting the canvas per render");
 assert.equal(JSON.stringify(capital), untouched, "resolver is read-only");
 assert.equal(BATTLE_BACKGROUNDS.courtyard.image, "/art/jade-courtyard.png");
 assert.equal(BATTLE_BACKGROUNDS["capital-training"].image, "/art/battle-capital-training.png");
 assert.equal(BATTLE_BACKGROUNDS["capital-street"].image, "/art/battle-capital-street.png");
-console.log("PASS pure background routing: exact training ID, exact capital anchors/returns, debug and ambiguous/road origins keep courtyard; immutable stable metadata");
+console.log("PASS pure background routing: the training yard, the capital street, every painted place and road its own painting, debug and unknown places the courtyard; stable metadata");
 
 const random = Math.random;
 try {

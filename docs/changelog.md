@@ -6,6 +6,10 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-13
 
+### A fight is drawn over the place it happens in
+
+- **Battle backgrounds** (`resolveBattleBackground`, `lib/stage/battle-background.ts`): every fight outside the capital stood on the same jade courtyard. Now the board sits on the painting of where the fight begins: a place's own map, or on a road the road's painting graded to its region (`gradePixels` in the battle runtime); a fight from a dialog uses the place the hero was in. The capital street, the training yard and the courtyard (/debug, unpainted places) stay. `test:battle-background` checks every painted place's image exists; `battle-setting.spec.ts` fights in a village and on a road.
+
 ### The face in a conversation is whoever is speaking
 
 - **Per-line voice** (`beatVoice`, `lib/world/speaker.ts`): the dialog stage showed the face and name of the person the talk began with for every line, so another speaker's words sat under the wrong portrait (1181 dialogs have more than one speaker). Now each beat shows its own speaker: a known person's portrait, the hero's own figure for the hero's lines, a walk-on's name with no face; narration keeps the last voice. `test:quests` checks every line of every dialog; `hero-name.spec.ts` walks the beats.

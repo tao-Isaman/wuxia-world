@@ -32,3 +32,32 @@ test("capital encounter keeps its street setting through reload and phone rotati
   }
   expect(errors).toEqual([]);
 });
+
+for (const where of [
+  { label: "a village", scene: "village_taishan", id: "place:village_taishan" },
+  { label: "a road", scene: "route_home_player__to__city_capital", id: "road:route_home_player__to__city_capital", image: /^\/maps\/routes\// },
+]) {
+  test(`a fight in ${where.label} is drawn over that place's own painting`, async ({ page }) => {
+    const errors: string[] = [];
+    page.on("pageerror", error => errors.push(error.message));
+    await page.goto("/");
+    await page.locator("#hero-name").fill("ผู้ตรวจฉาก");
+    await page.getByRole("button", { name: "เริ่มเกมใหม่" }).click();
+    await expect(page.getByTestId("world-canvas")).toHaveAttribute("data-ready", "true");
+    await page.evaluate((scene) => {
+      const save = JSON.parse(localStorage.getItem("wusia-world-v1")!);
+      save.state.currentSceneId = scene;
+      save.state.lastLocationId = scene.startsWith("route_") ? "home_player" : scene;
+      save.state.pendingBattle = { opponentId: "petty_thief", onWin: scene, onLose: scene, nonFatal: true };
+      localStorage.setItem("wusia-world-v1", JSON.stringify(save));
+    }, where.scene);
+    await page.reload();
+    await page.getByRole("button", { name: /เข้าต่อสู้/ }).click();
+    const battle = page.getByTestId("battle-canvas");
+    await expect(battle).toHaveAttribute("data-ready", "true");
+    await expect(battle).toHaveAttribute("data-battle-background", where.id);
+    if (where.image) await expect(battle).toHaveAttribute("data-background-image", where.image);
+    await page.screenshot({ path: `test-results/screenshots/battle-${where.id.replace(/[:]/g, "-")}.png` });
+    expect(errors).toEqual([]);
+  });
+}

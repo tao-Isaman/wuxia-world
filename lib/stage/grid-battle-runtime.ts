@@ -24,6 +24,7 @@ import { HERO_ACTION_CELL, HERO_COMBAT_COLUMNS, HERO_COMBAT_ROWS, hasHeroActions
   heroCombatPoseFrame, heroCombatSheet, type HeroCombatRow } from "@/lib/characters/hero-actions";
 import { getSkill } from "@/lib/game";
 import { BATTLE_BACKGROUNDS, type BattleBackground } from "./battle-background";
+import { gradePixels } from "./route-grade";
 import { addGridFrames, canvasTexture, createStage, type Stage } from "./phaser-stage";
 import { castVfx, type CastVfx } from "./cast-vfx";
 import { createBattleVfx, type BattleVfx, type Point } from "./battle-vfx";
@@ -1330,7 +1331,19 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
     const backgroundImage = await loadImage(backdrop.image);
     if (destroyed || failed || !scene) return;
     parent.dataset.backgroundImage = backdrop.image;
-    scene.textures.addImage("gb:backdrop", backgroundImage);
+    if (backdrop.grade) {
+      // A road keeps the look of the land it crosses, as on the road map.
+      const canvas = document.createElement("canvas");
+      canvas.width = backgroundImage.naturalWidth; canvas.height = backgroundImage.naturalHeight;
+      const context = canvas.getContext("2d", { willReadFrequently: true });
+      if (context) {
+        context.drawImage(backgroundImage, 0, 0);
+        const pixels = context.getImageData(0, 0, canvas.width, canvas.height);
+        gradePixels(pixels.data, backdrop.grade);
+        context.putImageData(pixels, 0, 0);
+        scene.textures.addCanvas("gb:backdrop", canvas);
+      } else scene.textures.addImage("gb:backdrop", backgroundImage);
+    } else scene.textures.addImage("gb:backdrop", backgroundImage);
     background = scene.add.image(0, 0, "gb:backdrop").setDepth(0);
     veil = scene.add.rectangle(0, 0, 10, 10, 0x1c0f0a, 0.18).setDepth(0.5);
     boardGfx = scene.add.graphics().setDepth(1);

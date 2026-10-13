@@ -531,7 +531,7 @@ More styling details:
 | Path | Holds |
 | --- | --- |
 | `public/maps/` | 98 `.webp` + 3 `.png` location paintings (1536 × 1024); `routes/` 56 road paintings (7 types × 8 directions; regions graded at load) |
-| `public/art/` | `jade-courtyard.png` (title and default battle), `battle-capital-training.png`, `battle-capital-street.png`, `creature-atlas.png`; `characters/` sheets; `props/` story props. Provenance: [public/art/README.md](../public/art/README.md) |
+| `public/art/` | `jade-courtyard.png` (title and fallback battle; other fights stand on the place's or road's own painting), `battle-capital-training.png`, `battle-capital-street.png`, `creature-atlas.png`; `characters/` sheets; `props/` story props. Provenance: [public/art/README.md](../public/art/README.md) |
 | `public/npcs/` | 159 portraits; `body/` 159 paintings (build input); `pixel/` and `pixel-battle/` 159 sprites each |
 | `public/player/` | 8 hero stills (build input for the PWA icons) |
 | `public/icons/` | `skills/` 178, `arts/` 122, `ui/` 8 menu icons |

@@ -328,7 +328,7 @@ Details of the rewards: [gameplay.md](gameplay.md#progression).
 
 ### Backgrounds
 
-`resolveBattleBackground` in `lib/stage/battle-background.ts`: the beginner practice bout (`training_capital_apprentice`) uses the capital training yard; a battle that starts and ends in the capital (current scene, last location, `onWin` and `onLose` all `city_capital`) uses the capital street; everything else, including /debug, uses the jade courtyard.
+`resolveBattleBackground` in `lib/stage/battle-background.ts` draws a fight over the place it begins in: on a road (`currentSceneId` a `route_…`) the road's own painting (`getRouteMap`), graded to its region like the road map (`grade`, applied by the runtime with `gradePixels` on a canvas texture); in a place, that place's painting (`getLocationMap(id).image`), and for a fight that starts from a dialog the painting of `lastLocationId`. The capital keeps its street art (`battle-capital-street.png`), the beginner practice bout (`training_capital_apprentice`) the capital training yard; /debug and a place with no painting use the jade courtyard. Each place's background is one object (`place:<id>`, `road:<routeId>`), so the canvas key stays stable; the host shows `data-battle-background` and `data-background-image`.
 
 ## Battle UI
 
