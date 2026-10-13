@@ -25,6 +25,8 @@ import { generatePlayerEcho, noteLeadHeard, playerEchoContext } from "./rumor-en
 import { sendPlayerEcho, worldRunsOnServer } from "./shared/world";
 import { questHolder } from "./npc-life";
 import { appendActionLog } from "./action-log";
+import { placeName, questRefText, sectName } from "./quest-text";
+import { LIFE_SKILL_LABEL, masteryLevel } from "./data/life-skills";
 import {
   REJOIN_COOLDOWN_DAYS, bestSectRank, isRedemptionQuest, isSkillFrozen, membershipStatus, redemptionQuestId, sectJoinCheck,
 } from "./sects";
@@ -1041,7 +1043,7 @@ export function describeQuestCondition(
       const need = c.count ?? 1;
       const def = getItem(c.itemId);
       return [{
-        label: def?.name ?? c.itemId,
+        label: def?.name ?? "ของที่ต้องใช้",
         current: have,
         required: need,
         done: have >= need,
@@ -1053,7 +1055,7 @@ export function describeQuestCondition(
       const need = c.count ?? 1;
       const def = getOpponent(c.opponentId);
       return [{
-        label: `ปราบ ${def?.name ?? c.opponentId}`,
+        label: `ปราบ ${def?.name ?? "ศัตรู"}`,
         current: have,
         required: need,
         done: have >= need,
@@ -1064,7 +1066,7 @@ export function describeQuestCondition(
       const need = c.count ?? 1;
       const def = getNpc(c.npcId);
       return [{
-        label: `ขโมยจาก ${def?.name ?? c.npcId}`,
+        label: `ขโมยจาก ${def?.name ?? "เป้าหมาย"}`,
         current: have,
         required: need,
         done: have >= need,
@@ -1095,7 +1097,7 @@ export function describeQuestCondition(
     case "npcRelationship": {
       const v = state.npcStates[c.npcId]?.relationship ?? 0;
       const def = getNpc(c.npcId);
-      const name = def?.name ?? c.npcId;
+      const name = def?.name ?? "คนผู้นั้น";
       if (c.min !== undefined) {
         return [{
           label: `สัมพันธ์ ${name} ≥ ${c.min}`,
@@ -1116,7 +1118,7 @@ export function describeQuestCondition(
     }
     case "visitedLocation":
       return [{
-        label: `ไปยัง ${c.locationId}`,
+        label: `ไปเยือน${placeName(c.locationId)}`,
         current: state.visitedLocationIds.includes(c.locationId) ? 1 : 0,
         required: 1,
         done: state.visitedLocationIds.includes(c.locationId),
@@ -1124,7 +1126,7 @@ export function describeQuestCondition(
     case "questStatus": {
       const cur = state.quests[c.questId]?.status ?? "none";
       return [{
-        label: `${c.questId} = ${c.status}`,
+        label: questRefText(c.questId, c.status),
         current: cur === c.status ? 1 : 0,
         required: 1,
         done: cur === c.status,
@@ -1135,7 +1137,7 @@ export function describeQuestCondition(
       const target = c.equals;
       const ok = target === undefined ? Boolean(v) : v === target;
       return [{
-        label: `flag ${c.flag}${target !== undefined ? ` = ${target}` : ""}`,
+        label: "ผ่านเหตุการณ์ก่อนหน้าในเรื่องนี้",
         current: ok ? 1 : 0,
         required: 1,
         done: ok,
@@ -1148,7 +1150,7 @@ export function describeQuestCondition(
     case "learnedSkill":
     case "learnedArt": {
       const done = evaluateCondition(state, c);
-      const name = c.t === "learnedSkill" ? getSkill(c.skillId)?.n ?? c.skillId : getArt(c.artId).n;
+      const name = c.t === "learnedSkill" ? getSkill(c.skillId)?.n ?? "วิชา" : getArt(c.artId).n;
       return [{ label: `เรียน ${name}`, current: done ? 1 : 0, required: 1, done }];
     }
     case "assassinatedNpc":
@@ -1157,11 +1159,51 @@ export function describeQuestCondition(
       const def = getNpc(c.npcId);
       const verb = c.t === "assassinatedNpc" ? "ลอบสังหาร" : "ลักพาตัว";
       return [{
-        label: `${verb} ${def?.name ?? c.npcId}`,
+        label: `${verb} ${def?.name ?? "เป้าหมาย"}`,
         current: list.includes(c.npcId) ? 1 : 0,
         required: 1,
         done: list.includes(c.npcId),
       }];
+    }
+    case "gender": {
+      const done = evaluateCondition(state, c);
+      return [{ label: c.equals === "male" ? "เฉพาะบุรุษ" : "เฉพาะสตรี", current: done ? 1 : 0, required: 1, done }];
+    }
+    case "sectMember":
+    case "sectStatus":
+    case "sectRankAtLeast": {
+      const done = evaluateCondition(state, c);
+      const sect = sectName(c.sectId);
+      const label = c.t === "sectMember" ? `เป็นศิษย์${sect}`
+        : c.t === "sectRankAtLeast" ? `ขั้น ${c.maxRank} ขึ้นไปใน${sect}`
+        : c.status === "active" ? `เป็นศิษย์${sect}` : c.status === "resigned" ? `ลาออกจาก${sect}แล้ว` : `ทรยศ${sect}`;
+      return [{ label, current: done ? 1 : 0, required: 1, done }];
+    }
+    case "anySectMember": {
+      const done = evaluateCondition(state, c);
+      return [{ label: "เป็นศิษย์สำนักใดสำนักหนึ่ง", current: done ? 1 : 0, required: 1, done }];
+    }
+    case "goldAtLeast":
+      return [{ label: `มีเงิน ${c.amount} ตำลึง`, current: state.gold, required: c.amount, done: state.gold >= c.amount }];
+    case "lifeSkillLevel": {
+      const lv = masteryLevel(state.lifeSkillXp[c.skill] ?? 0);
+      return [{ label: `${LIFE_SKILL_LABEL[c.skill] ?? "วิชาชีพ"} ขั้น ${c.min}`, current: lv, required: c.min, done: lv >= c.min }];
+    }
+    case "heardRumor":
+    case "heardRumorAbout": {
+      const done = evaluateCondition(state, c);
+      const about = c.t === "heardRumorAbout" ? getNpc(c.target)?.name : undefined;
+      return [{ label: about ? `ได้ยินข่าวลือเรื่อง${about}` : "ได้ยินข่าวลือที่เกี่ยวข้อง", current: done ? 1 : 0, required: 1, done }];
+    }
+    case "npcStatus": {
+      const done = evaluateCondition(state, c);
+      const who = getNpc(c.npcId)?.name ?? "คนผู้นั้น";
+      const how = { alive: "ยังมีชีวิตอยู่", dead: "สิ้นชีพแล้ว", missing: "หายตัวไป", secluded: "เก็บตัวอยู่" }[c.status];
+      return [{ label: `${who}${how}`, current: done ? 1 : 0, required: 1, done }];
+    }
+    case "canBribeJail": {
+      const done = evaluateCondition(state, c);
+      return [{ label: "มีเงินพอติดสินบน", current: done ? 1 : 0, required: 1, done }];
     }
     case "and":
       return c.all.flatMap((sub) => describeQuestCondition(state, sub, depth + 1, quest));

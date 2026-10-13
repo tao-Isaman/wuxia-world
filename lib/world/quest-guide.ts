@@ -343,8 +343,8 @@ export function guideForQuest(state: WorldStateData, questId: string): QuestGuid
       const counter = { current: Math.min(line.current, line.required), required: line.required };
       const sources = leaf.t === "hasItem" ? itemSources(leaf.itemId) : opponentSources(leaf.opponentId);
       const pick = nearest(sources, here, previous);
-      const itemName = leaf.t === "hasItem" ? getItem(leaf.itemId)?.name ?? leaf.itemId : "";
-      const foeName = leaf.t === "defeatedOpponent" ? getOpponent(leaf.opponentId)?.name ?? leaf.opponentId : "";
+      const itemName = leaf.t === "hasItem" ? getItem(leaf.itemId)?.name ?? "ของที่ต้องใช้" : "";
+      const foeName = leaf.t === "defeatedOpponent" ? getOpponent(leaf.opponentId)?.name ?? "ศัตรู" : "";
       if (pick) {
         const verb = leaf.t === "defeatedOpponent"
           ? pick.source.kind === "hunt" ? `ล่า${foeName}` : `ปราบ${foeName} · เดินสำรวจเพื่อพบเจอ`

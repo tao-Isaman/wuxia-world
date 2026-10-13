@@ -1,5 +1,6 @@
 "use client";
 
+import { questRewardText } from "@/lib/world/quest-text";
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -10,10 +11,7 @@ import {
   objectiveSpotsFor,
   trackedQuestId,
   guideForQuest,
-  getItem,
-  MYSTERY_MOVE_LABEL,
   getQuest,
-  type QuestReward,
 } from "@/lib/world";
 import { useWorldStore } from "@/store/world-store";
 import { toast } from "@/store/toast-store";
@@ -463,35 +461,4 @@ function stepStatusFor(
   return "pending";
 }
 
-function summarizeRewards(rewards: readonly QuestReward[]): string {
-  const parts: string[] = [];
-  for (const r of rewards) {
-    switch (r.t) {
-      case "gold":
-        parts.push(`+${r.amount}🟡`);
-        break;
-      case "item": {
-        const def = getItem(r.itemId);
-        parts.push(`${def?.name ?? r.itemId}×${r.count ?? 1}`);
-        break;
-      }
-      case "wExp":
-        parts.push(`ประสบการณ์ยุทธ +${r.amount}`);
-        break;
-      case "skillExp":
-        parts.push(`+${r.amount} ประสบการณ์`);
-        break;
-      case "trait":
-        parts.push(`${r.trait} +${r.amount}`);
-        break;
-      case "npcRelationship":
-        parts.push(`สัมพันธ์ ${r.amount > 0 ? "+" : ""}${r.amount}`);
-        break;
-      case "learnSkill":
-      case "learnArt":
-        parts.push(MYSTERY_MOVE_LABEL);
-        break;
-    }
-  }
-  return parts.join(" · ");
-}
+const summarizeRewards = questRewardText;

@@ -3,6 +3,8 @@
 // ฉางอัน at its "observe" stage. Run: bun scripts/test-quest-guide.ts
 import assert from "node:assert/strict";
 import { QUESTS } from "../lib/world/data/quests";
+import * as effects from "../lib/world/effects";
+import { questRewardText } from "../lib/world/quest-text";
 import { itemSources } from "../lib/world/quest-guide";
 import { SCENES } from "../lib/world/data/scenes";
 import { RECIPES } from "../lib/world/data/recipes";
@@ -149,6 +151,24 @@ check("every active stage of every quest has something to show, most with a plac
   console.log(`  ${stages - withoutPlace.length}/${stages} stages point somewhere`);
   if (process.env.GUIDE_DEBUG) console.log(withoutPlace.join("\n"));
   assert.ok(withoutPlace.length / stages < 0.1, `too many stages without a place: ${withoutPlace.slice(0, 20).join(", ")}`);
+});
+
+check("the player never reads an id: every quest's gates, stage needs, rewards and text are Thai", () => {
+  const { describeQuestCondition } = effects;
+  const s = useWorldStore.getState();
+  const RAW = /[A-Za-z]{2,}_[A-Za-z0-9_]+|\b(done|active|failed|flag|undefined|null|NaN|humility|arrogance|evil|good|fame)\b/;
+  const bad: string[] = [];
+  const scan = (where: string, text: string | undefined) => { const m = text?.match(RAW); if (m) bad.push(`${where}: "${m[0]}" in ${text!.slice(0, 80)}`); };
+  for (const q of QUESTS) {
+    for (const l of describeQuestCondition(s, q.prereqs ?? { t: "and", all: [] })) scan(`${q.id} gate`, l.label);
+    for (const st of q.stages) {
+      if (st.autoAdvance) for (const l of describeQuestCondition(s, st.autoAdvance)) scan(`${q.id} stage`, l.label);
+      scan(`${q.id} stage text`, st.description);
+    }
+    scan(`${q.id} rewards`, questRewardText(q.rewards ?? []));
+    scan(`${q.id} name`, q.name); scan(`${q.id} description`, q.description); scan(`${q.id} brief`, q.briefSummary);
+  }
+  assert.deepEqual(bad.slice(0, 20), []);
 });
 
 console.log(`quest guide: ${checks} checks passed`);

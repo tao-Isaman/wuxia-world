@@ -1,5 +1,6 @@
 "use client";
 
+import { questRewardText } from "@/lib/world/quest-text";
 import { Modal } from "@/components/ui/modal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,9 +8,7 @@ import {
   evaluateCondition,
   getItem,
   getNpc,
-  TRAIT_LABEL,
   getQuest,
-  MYSTERY_MOVE_LABEL,
   getScene,
   isQuestOfferable,
   isQuestTurnInForNpc,
@@ -18,7 +17,6 @@ import {
   type NpcDef,
   type NpcStateEntry,
   type QuestDef,
-  type QuestReward,
   type Scene,
 } from "@/lib/world";
 import {
@@ -32,7 +30,6 @@ import { toast } from "@/store/toast-store";
 import { confirmDialog } from "@/store/confirm-store";
 import { flashLoading } from "@/store/loading-store";
 import { NpcStatusBadge } from "../npc-status-badge";
-import { getSkill } from "@/lib/game";
 import { CharacterPreview } from "@/components/game/character-preview";
 import { npcCharacterId } from "@/lib/characters/catalog";
 import { GiftPicker } from "./gift-picker";
@@ -337,7 +334,7 @@ export function NpcInteractionPopup({ open, npc, onClose }: Props) {
                 if (r.outcome === "passed") {
                   const loot = r.items?.length
                     ? r.items
-                        .map((it) => `${getItem(it.itemId)?.name ?? it.itemId}×${it.count}`)
+                        .map((it) => `${getItem(it.itemId)?.name ?? "ของ"}×${it.count}`)
                         .join(", ")
                     : "ไม่ได้ของ";
                   toast("success", `ขโมยสำเร็จ! ${loot}`);
@@ -575,38 +572,7 @@ export function NpcInteractionPopup({ open, npc, onClose }: Props) {
 }
 
 // Helper for readable reward summaries inside the offer button.
-function summarizeRewards(rewards: readonly QuestReward[]): string {
-  const parts: string[] = [];
-  for (const r of rewards) {
-    switch (r.t) {
-      case "gold":
-        parts.push(`+${r.amount}🟡`);
-        break;
-      case "item": {
-        const def = getItem(r.itemId);
-        parts.push(`${def?.name ?? r.itemId}×${r.count ?? 1}`);
-        break;
-      }
-      case "wExp":
-        parts.push(`ประสบการณ์ยุทธ +${r.amount}`);
-        break;
-      case "skillExp":
-        parts.push(`+${r.amount} ประสบการณ์ · ${getSkill(r.skillId)?.n ?? "วิชา"}`);
-        break;
-      case "trait":
-        parts.push(`${TRAIT_LABEL[r.trait]} +${r.amount}`);
-        break;
-      case "npcRelationship":
-        parts.push(`สัมพันธ์ ${getNpc(r.npcId)?.name ?? "สหาย"} ${r.amount > 0 ? "+" : ""}${r.amount}`);
-        break;
-      case "learnSkill":
-      case "learnArt":
-        parts.push(MYSTERY_MOVE_LABEL);
-        break;
-    }
-  }
-  return parts.join(" · ");
-}
+const summarizeRewards = questRewardText;
 
 // ─── The sect's door ─────────────────────────────────────────────────
 // On the card of a sect's master (or whoever now holds their charges): a
