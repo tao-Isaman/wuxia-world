@@ -169,6 +169,11 @@ const CITY_EQUIPMENT_SPECIALTIES: readonly {
   { city: "city_suzhou",   prof: "accessory", equipId: "W_pipa",            price: 900 },
 ];
 
+/** What an artisan asks for a piece (its base id), or null for one no artisan sells (crafted, dropped). */
+export function equipmentListPrice(equipId: string): number | null {
+  return CITY_EQUIPMENT_SPECIALTIES.find((s) => s.equipId === equipId)?.price ?? EQUIPMENT_PRICE[equipId] ?? null;
+}
+
 function specialtyEquipFor(
   city: string,
   prof: CraftProfession,

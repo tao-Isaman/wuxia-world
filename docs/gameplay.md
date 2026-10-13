@@ -402,13 +402,15 @@ Full sect data: [reference/sects.md](reference/sects.md).
 
 | Where | What | Sell-back |
 | --- | --- | --- |
-| general store, 7 cities | 23 items (ซูโจว adds silk) | 50 % |
+| general store (ตลาด), 7 cities | 23 items (ซูโจว adds silk); buys anything, gear from the bag included | 50 % |
 | inn shop, 4 inns | 5 food and herb items; buys food, herbs, materials | 40 % |
 | village shop, 8 villages | 4 items; buys food, herbs, materials | 35 % |
 | sect hall (🏯), 7 cities | tier 0–1 jianghu skills (200 / 800 gold) and inner arts (500 / 2000 gold) | — |
 | artisans, 49 in all | recipes, crafting and gear; every city has the six crafts | 40 % (35 % in villages and sects) |
 
 Sect styles are never sold in city halls; you learn them by rank inside the sect.
+
+**Selling gear.** A city market (ตลาด) buys any piece in the bag (what is worn stays on) at half its value (`gearValue`, `lib/world/gear.ts`): the artisan's price, or by tier for a piece no artisan sells (80 / 260 / 700 / 1,800 / 4,500), +10 % per option and +10 % per enhancement level.
 
 **Crafting** happens at an artisan and has three tabs: 📜 ซื้อสูตร (buy a recipe), 🔧 ประดิษฐ์ (craft) and 🏪 ซื้อ-ขาย (trade, including gear).
 

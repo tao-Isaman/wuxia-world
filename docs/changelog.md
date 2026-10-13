@@ -6,6 +6,10 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-13
 
+### Gear sells at the market
+
+- **A city market (ตลาด) buys gear**: its ขาย tab lists every piece in the bag beside the items, at half the piece's value (its artisan price, else 80 / 260 / 700 / 1,800 / 4,500 by tier, +10 % per option and per enhancement level). Gear could not be sold anywhere before (store `sellGear`, `gearValue`).
+
 ### A cleaner phone HUD ([design/mobile-hud.md](design/mobile-hud.md))
 
 - **เมนู folds the icons**: on a phone the eleven section icons sit behind one เมนู button (their badges summed on it) and fold again after a section opens, so the map is the map; larger screens still show them all. Number keys and M work either way.

@@ -5,8 +5,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { affixParts, gearName, getEquip } from "@/lib/game";
 import {
   ITEM_CATEGORY_LABEL,
+  gearSellPrice,
   getItem,
   type ItemCategory,
   type ShopDef,
@@ -15,8 +17,8 @@ import { useWorldStore } from "@/store/world-store";
 import { toast } from "@/store/toast-store";
 import { ItemEffects } from "@/components/world/item-effects";
 import { CATEGORY_GLYPH, ItemTile } from "@/components/ui/wuxia/item-tile";
-import { itemIconUrl } from "@/lib/world/data/item-icons";
-import { itemRarity, rarityColor } from "@/lib/ui/rarity";
+import { equipmentIconUrl, itemIconUrl } from "@/lib/world/data/item-icons";
+import { equipRarity, itemRarity, rarityColor } from "@/lib/ui/rarity";
 
 interface Props {
   open: boolean;
@@ -33,6 +35,8 @@ export function ShopPopup({ open, shop, onClose }: Props) {
   const inventory = useWorldStore((s) => s.inventory);
   const buyItem = useWorldStore((s) => s.buyItem);
   const sellItem = useWorldStore((s) => s.sellItem);
+  const inventoryEquipment = useWorldStore((s) => s.inventoryEquipment);
+  const sellGear = useWorldStore((s) => s.sellGear);
   const [tab, setTab] = useState<"buy" | "sell">("buy");
   // The item whose details are open (tap a row or its tile), on either tab.
   const [detailId, setDetailId] = useState<string | null>(null);
@@ -57,6 +61,11 @@ export function ShopPopup({ open, shop, onClose }: Props) {
     return canSell(def.category);
   });
 
+  // The markets that take anything also buy gear from the bag (what is worn stays on).
+  const sellableGear = acceptsAll
+    ? Object.entries(inventoryEquipment).filter(([key, n]) => n > 0 && getEquip(key) && gearSellPrice(key, shop.sellMultiplier) > 0)
+    : [];
+
   const buy = (id: string, name: string) => {
     const r = buyItem(id, 1);
     if (!r.ok) {
@@ -72,6 +81,14 @@ export function ShopPopup({ open, shop, onClose }: Props) {
       return;
     }
     toast("success", `ขาย ${name} · +${r.gained}🟡`);
+  };
+  const sellPiece = (key: string) => {
+    const r = sellGear(key, shop.sellMultiplier);
+    if (!r.ok) {
+      toast("error", "ขายไม่ได้");
+      return;
+    }
+    toast("success", `ขาย ${gearName(key)} · +${r.gained}🟡`);
   };
   const detail = detailId ? getItem(detailId) : null;
   const detailOwned = detailId ? inventory[detailId] ?? 0 : 0;
@@ -154,7 +171,7 @@ export function ShopPopup({ open, shop, onClose }: Props) {
               );
             })}
           </ul>
-        ) : sellable.length === 0 ? (
+        ) : sellable.length + sellableGear.length === 0 ? (
           <p className="text-xs text-muted-foreground italic py-2 text-center">
             ไม่มีของที่ขายให้ร้านนี้ได้ (
             {acceptsAll
@@ -195,6 +212,35 @@ export function ShopPopup({ open, shop, onClose }: Props) {
                       variant="outline"
                       className="min-h-11 min-w-11 px-2 text-[11px]"
                       onClick={(e) => { e.stopPropagation(); sell(id, def.name); }}
+                    >
+                      ขาย
+                    </Button>
+                  </div>
+                </li>
+              );
+            })}
+            {sellableGear.map(([key, n]) => {
+              const eq = getEquip(key)!;
+              const rarity = equipRarity(eq);
+              const opts = affixParts(key);
+              return (
+                <li key={key} className="shop-row" data-shop-gear={key}>
+                  <ItemTile glyph={CATEGORY_GLYPH[eq.ty]} icon={equipmentIconUrl(eq.id)} rarity={rarity} count={n} label={gearName(key)} />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <strong className="shop-name" style={{ color: rarityColor(rarity) }}>{gearName(key)}</strong>
+                      <Badge variant="outline" className="text-[10px]">×{n}</Badge>
+                      <Badge variant="outline" className="text-[9px]">อุปกรณ์</Badge>
+                    </div>
+                    {opts.length > 0 && <div className="text-[10px] text-muted-foreground">{opts.join(" · ")}</div>}
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <span className="shop-price"><i className="hud-coin" aria-hidden="true" />{gearSellPrice(key, shop.sellMultiplier)}</span>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="min-h-11 min-w-11 px-2 text-[11px]"
+                      onClick={() => sellPiece(key)}
                     >
                       ขาย
                     </Button>

@@ -322,6 +322,8 @@ export interface WorldStore extends WorldStateData {
   // popups can show the right toast on success / failure.
   buyItem: (itemId: string, count: number) => BuyResult;
   sellItem: (itemId: string, count: number, sellMultiplier: number) => SellResult;
+  // Sell one piece of gear from the bag (its key, options and all) at a market.
+  sellGear: (key: string, sellMultiplier: number) => SellResult;
   buyMoveSkill: (skillId: string, price: number) => BuyOfferResult;
   buyInnerSkill: (artId: string, price: number) => BuyOfferResult;
   // Buy a recipe at an artisan — adds the id to learnedRecipeIds. The

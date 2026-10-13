@@ -29,7 +29,7 @@ test("a shop row opens the item's details, to buy or sell from", async ({ page }
   await page.getByRole("button", { name: "เริ่มเกมใหม่" }).click();
   await expect(page.getByTestId("world-canvas")).toHaveAttribute("data-ready", "true", { timeout: 60_000 });
   await expect.poll(() => page.evaluate(() => !!localStorage.getItem("wusia-world-v1"))).toBe(true);
-  await page.evaluate(() => { const raw = JSON.parse(localStorage.getItem("wusia-world-v1")!); Object.assign(raw.state, { currentSceneId: "city_capital", lastLocationId: "city_capital", gold: 500 }); raw.state.inventory.herb_common = 2; localStorage.setItem("wusia-world-v1", JSON.stringify(raw)); });
+  await page.evaluate(() => { const raw = JSON.parse(localStorage.getItem("wusia-world-v1")!); Object.assign(raw.state, { currentSceneId: "city_capital", lastLocationId: "city_capital", gold: 500 }); raw.state.inventory.herb_common = 2; raw.state.inventoryEquipment = { ...raw.state.inventoryEquipment, "eq_t1_w_sword~pa:6": 1 }; localStorage.setItem("wusia-world-v1", JSON.stringify(raw)); });
   await page.reload();
   await expect(page.getByTestId("world-canvas")).toHaveAttribute("data-ready", "true", { timeout: 60_000 });
   const m = page.locator('[data-marker-id^="service-"]').filter({ hasText: "ตลาด" }).first();
@@ -49,4 +49,12 @@ test("a shop row opens the item's details, to buy or sell from", async ({ page }
   await expect(detail).toBeVisible();
   await expect(detail.getByRole("button", { name: /ขาย 1 ชิ้น/ })).toBeEnabled();
   await page.screenshot({ path: "test-results/screenshots/shop-item-detail.png" });
+  // The market buys gear from the bag too.
+  await detail.getByRole("button", { name: "กลับไปที่ร้าน" }).tap();
+  const gear = page.locator('[data-shop-gear="eq_t1_w_sword~pa:6"]');
+  await expect(gear).toBeVisible();
+  const before = await page.evaluate(() => JSON.parse(localStorage.getItem("wusia-world-v1")!).state.gold);
+  await gear.getByRole("button", { name: "ขาย" }).tap();
+  await expect(gear).toHaveCount(0);
+  await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem("wusia-world-v1")!).state.gold)).toBeGreaterThan(before);
 });

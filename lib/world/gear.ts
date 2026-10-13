@@ -20,7 +20,7 @@ import {
 import { seededRng } from "../game/rng";
 import type { RecipeDef, WorldStateData } from "./types";
 import { getItem } from "./data/items";
-import { equipmentProfession, getArtisansAt, type CraftProfession } from "./data/artisans";
+import { equipmentListPrice, equipmentProfession, getArtisansAt, type CraftProfession } from "./data/artisans";
 import { masteryLevel } from "./data/life-skills";
 import { GEAR_RECIPES, recipeItemId } from "./data/gear-recipes";
 
@@ -114,6 +114,25 @@ export function gainGear(s: Pick<WorldStateData, "inventoryEquipment">, equipId:
   s.inventoryEquipment = { ...s.inventoryEquipment, [key]: (s.inventoryEquipment[key] ?? 0) + 1 };
   return key;
 }
+
+// ─── Selling gear ────────────────────────────────────────────────────
+
+/** What a piece no artisan sells is worth, by tier (crafted and dropped pieces). */
+export const GEAR_TIER_VALUE: readonly number[] = [80, 260, 700, 1800, 4500];
+
+/**
+ * What a piece is worth to a market: its artisan price (else its tier's value),
+ * +10 % per option and +10 % per enhancement level.
+ */
+export function gearValue(key: string): number {
+  const g = parseGear(key);
+  if (!g) return 0;
+  const base = equipmentListPrice(g.def.id) ?? GEAR_TIER_VALUE[Math.max(0, Math.min(GEAR_TIER_VALUE.length - 1, g.def.ti))]!;
+  return Math.round(base * (1 + 0.1 * g.affixes.length + 0.1 * g.enhance));
+}
+
+/** What a market pays for a piece at its sell-back rate. */
+export const gearSellPrice = (key: string, sellMultiplier: number) => Math.floor(gearValue(key) * sellMultiplier);
 
 // ─── Materials from the strong ───────────────────────────────────────
 

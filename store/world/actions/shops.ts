@@ -1,6 +1,6 @@
 // Shops, sect halls and artisans: buying and selling, recipes, equipment in and out of the bag.
 import { getArt, getEquip, getSkill } from "@/lib/game";
-import { ENHANCE_STONE, enhanceCheck, gainGear, gearProfession, getArtisansAt, getItem, getRecipe, reforgeCheck, rerollGear, rollEnhance } from "@/lib/world";
+import { ENHANCE_STONE, enhanceCheck, gainGear, gearProfession, getArtisansAt, getItem, getRecipe, gearSellPrice, reforgeCheck, rerollGear, rollEnhance } from "@/lib/world";
 import { affixParts, gearEnhance, gearName } from "@/lib/game";
 import { staminaForHours } from "../lifecycle";
 import { ACTION_HOURS } from "../rules";
@@ -8,7 +8,7 @@ import { rollLukXp } from "../progression";
 import { appendActionLog, draftFrom } from "../state";
 import type { WorldGet, WorldSet, WorldStore } from "../types";
 
-export const shopsActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "buyItem" | "sellItem" | "buyMoveSkill" | "buyInnerSkill" | "buyRecipe" | "buyEquipment" | "equipFromBag" | "unequipFromSlot" | "reforgeGear" | "enhanceGear"> => ({
+export const shopsActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "buyItem" | "sellItem" | "sellGear" | "buyMoveSkill" | "buyInnerSkill" | "buyRecipe" | "buyEquipment" | "equipFromBag" | "unequipFromSlot" | "reforgeGear" | "enhanceGear"> => ({
   buyItem: (itemId, count) => {
     if (count <= 0) return { ok: false, reason: "unknown" };
     const s = get();
@@ -46,6 +46,24 @@ export const shopsActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "bu
     appendActionLog(draft, "sell", `ขาย ${def.name}×${count} · +${gained}🟡`);
     set({ ...draft });
     return { ok: true, itemId, count, gained };
+  },
+
+  sellGear: (key, sellMultiplier) => {
+    const s = get();
+    if (!getEquip(key)) return { ok: false, reason: "unknown" };
+    if ((s.inventoryEquipment[key] ?? 0) <= 0) return { ok: false, reason: "missing" };
+    const gained = gearSellPrice(key, sellMultiplier);
+    if (gained <= 0) return { ok: false, reason: "unsellable" };
+    const draft = draftFrom(s);
+    const bag = { ...draft.inventoryEquipment };
+    if (bag[key]! <= 1) delete bag[key];
+    else bag[key] = bag[key]! - 1;
+    draft.inventoryEquipment = bag;
+    draft.gold = Math.max(0, draft.gold + gained);
+    rollLukXp(draft);
+    appendActionLog(draft, "sell", `ขาย ${gearName(key)} · +${gained}🟡`);
+    set({ ...draft });
+    return { ok: true, itemId: key, count: 1, gained };
   },
 
   buyMoveSkill: (skillId, price) => {

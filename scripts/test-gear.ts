@@ -53,6 +53,9 @@ import {
   repairGear,
   rollSpiritMaterials,
   wExpWithGear,
+  GEAR_TIER_VALUE,
+  gearSellPrice,
+  gearValue,
 } from "../lib/world/gear";
 import { getItem } from "../lib/world/data/items";
 import { itemIconId } from "../lib/world/data/item-icons";
@@ -293,6 +296,29 @@ check("buying rolls the piece's options into its key", () => {
   const key = [...keys][0]!;
   assert.ok(store().equipFromBag(key).ok);
   assert.equal(store().playerBuild!.equipment.W, key);
+});
+
+check("selling: a market buys any piece from the bag at its value × the sell rate; options and enhancement raise it", () => {
+  newGame();
+  for (const eq of EQUIPMENT) assert.ok(gearValue(eq.id) > 0, `${eq.id} has a value`);
+  assert.equal(gearValue("eq_t1_w_sword"), 260, "an artisan's price");
+  assert.equal(gearValue("eq_xixia_w_blade"), 720, "a city specialty's price");
+  const crafted = EQUIPMENT.find((e) => e.ti === 3)!;
+  assert.equal(gearValue(crafted.id), GEAR_TIER_VALUE[3], "an unsold piece goes by its tier");
+  assert.equal(gearValue("eq_t1_w_sword~en:2,pa:6"), Math.round(260 * 1.3), "+10 % per option and per level");
+  const key = "eq_t1_w_sword~pa:6";
+  useWorldStore.setState({ gold: 0, inventoryEquipment: { [key]: 2 } });
+  const r = store().sellGear(key, 0.5);
+  assert.ok(r.ok && r.gained === gearSellPrice(key, 0.5) && r.gained === Math.floor(286 * 0.5), JSON.stringify(r));
+  assert.equal(store().gold, r.ok ? r.gained : -1);
+  assert.equal(store().inventoryEquipment[key], 1);
+  assert.ok(store().sellGear(key, 0.5).ok);
+  assert.equal(store().inventoryEquipment[key], undefined, "the last one leaves the bag");
+  assert.equal(store().sellGear(key, 0.5).ok, false, "none left");
+  // A worn piece is not in the bag, so it can't be sold.
+  useWorldStore.setState({ inventoryEquipment: { eq_t0_w_fist: 1 } });
+  assert.ok(store().equipFromBag("eq_t0_w_fist").ok);
+  assert.equal(store().sellGear("eq_t0_w_fist", 0.5).ok, false);
 });
 
 check("re-rolling: the line's own shop, craft level 3, one material; bag and worn pieces", () => {
