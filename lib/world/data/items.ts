@@ -2,6 +2,8 @@ import { scaleMoveStat } from "./move-gates";
 import { ARTS, SKILLS, TIERS, MERIDIAN_CHARTS, MERIDIAN_KIND_LABEL, meridianChartItemId, getSkill, getArt, isBeastMove, isBossArt } from "@/lib/game";
 import type { ItemDef } from "../types";
 import { GEAR_RECIPES, GEAR_RECIPE_PRICE, recipeItemId } from "./gear-recipes";
+import { OUTFIT_RECIPES, OUTFIT_SOURCES, outfitItemId, outfitRecipeItemId } from "./outfit-sources";
+import { getOutfit } from "./outfits";
 import { getEquip as getEquipDef, SLOT_LABELS } from "@/lib/game";
 
 // คัมภีร์ — what a quest that teaches a move or art hands over instead. The
@@ -397,6 +399,7 @@ export const ITEMS: readonly ItemDef[] = ([
   // ─── แผนภาพชีพจร — one per meridian chart (generated) ───────────────
   ...meridianChartItems(),
   ...gearRecipeItems(),
+  ...outfitItems(),
 ] satisfies readonly ItemDef[]).map(scaleManualGate);
 
 /** Manuals ask half their authored stat (MOVE_STAT_GATE_SCALE). */
@@ -446,6 +449,23 @@ function gearRecipeItems(): ItemDef[] {
       description: `สูตรสร้าง${def?.n ?? ""} (${def ? SLOT_LABELS[def.ty] : "อุปกรณ์"}) — อ่านแล้วจำสูตรได้ ไปสร้างที่ร้าน${LINE[r.skill ?? ""] ?? "ช่าง"} ต้องฝีมือขั้น ${r.requiredMastery ?? 1} ขึ้นไป ของชิ้นนี้ไม่มีร้านใดขาย`,
       use: { t: "learnRecipe", recipeId: r.id },
     };
+  });
+}
+
+/** ชุด… (a bundled outfit) and สูตรตัด… (its tailoring recipe) — data/outfit-sources.ts; no shop sells either. */
+function outfitItems(): ItemDef[] {
+  return Object.entries(OUTFIT_SOURCES).flatMap(([outfitId, src]): ItemDef[] => {
+    const outfit = getOutfit(outfitId);
+    if (!outfit) return [];
+    const recipe = OUTFIT_RECIPES.find((r) => r.output.itemId === outfitItemId(outfitId));
+    return [
+      { id: outfitItemId(outfitId), name: outfit.name, category: "craft", price: src.value,
+        description: `${outfit.description} — สวมแล้วเก็บไว้ในตู้ชุด (โปรไฟล์ › ชุด) ใส่ได้ตลอดไป`,
+        use: { t: "learnOutfit", outfitId } },
+      ...(recipe ? [{ id: outfitRecipeItemId(outfitId), name: `สูตรตัด${outfit.name}`, category: "manual" as const, price: Math.round(src.value / 2),
+        description: `สูตรตัด${outfit.name} — อ่านแล้วจำสูตรได้ ไปตัดที่ร้านช่างตัดเย็บ ต้องฝีมือขั้น ${recipe.requiredMastery ?? 1} ขึ้นไป ชุดนี้ไม่มีร้านใดขาย`,
+        use: { t: "learnRecipe" as const, recipeId: recipe.id } }] : []),
+    ];
   });
 }
 

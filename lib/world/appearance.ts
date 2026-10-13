@@ -6,6 +6,9 @@ import type { WeaponFamily } from "@/lib/game/types";
 import { DEFAULT_OUTFIT, OUTFITS, getOutfit, type OutfitDef } from "./data/outfits";
 import { equipmentIconId, equipmentIconUrl } from "./data/item-icons";
 import { SECT_MEMBERSHIPS } from "./data/sect-memberships";
+import { OUTFIT_SOURCES } from "./data/outfit-sources";
+import { getQuest } from "./data/quests";
+import { getOpponent } from "./data/opponents";
 import type { Condition, Gender, HeroAppearance, SectId, WorldStateData } from "./types";
 
 /** The hero's id in the tournament's records (lib/world/tournament.ts PLAYER). */
@@ -58,10 +61,10 @@ export function outfitStatus(state: AppearanceState, outfit: OutfitDef): { unloc
       const name = SECT_MEMBERSHIPS[unlock.sectId]?.name ?? unlock.sectId;
       return inOwnSect(state, unlock.sectId) ? { unlocked: true, hint: "" } : { unlocked: false, hint: `ศิษย์${name}เท่านั้น` };
     }
-    case "tailor":
+    case "item":
       return state.wardrobe.includes(outfit.id)
         ? { unlocked: true, hint: "" }
-        : { unlocked: false, hint: `ซื้อจากร้านตัดเสื้อในเมือง ${unlock.price.toLocaleString()} ตำลึง` };
+        : { unlocked: false, hint: outfitSourceHint(outfit.id) };
     case "champion":
       return state.tournamentHistory.some((record) => record.champion === PLAYER)
         ? { unlocked: true, hint: "" }
@@ -85,20 +88,17 @@ export function currentOutfit(state: AppearanceState): string {
   return outfitUnlocked(state, id) ? id : DEFAULT_OUTFIT;
 }
 
-/** A tailor sells here: any city. */
-export const hasTailor = (sceneId: string | null | undefined) => !!sceneId?.startsWith("city_");
-
-export type BuyOutfitRefusal = "unknown" | "owned" | "not_for_sale" | "no_tailor" | "gold";
-
-/** Why an outfit cannot be bought now, or null. */
-export function buyOutfitRefusal(state: AppearanceState & Pick<WorldStateData, "gold" | "currentSceneId">, id: string): BuyOutfitRefusal | null {
-  const outfit = getOutfit(id);
-  if (!outfit) return "unknown";
-  if (outfit.unlock.t !== "tailor") return "not_for_sale";
-  if (state.wardrobe.includes(id)) return "owned";
-  if (!hasTailor(state.currentSceneId)) return "no_tailor";
-  if (state.gold < outfit.unlock.price) return "gold";
-  return null;
+/** Where a found outfit comes from, in words: its quests, the foes that drop it, and its tailoring recipe. */
+export function outfitSourceHint(outfitId: string): string {
+  const src = OUTFIT_SOURCES[outfitId];
+  if (!src) return "ไม่มีร้านใดขาย";
+  const parts: string[] = [];
+  const quests = (src.questRewards ?? []).map((id) => getQuest(id)?.name).filter(Boolean);
+  if (quests.length) parts.push(`ภารกิจ ${quests.join(", ")}`);
+  const foes = (src.loot ?? []).map((l) => getOpponent(l.opponentId)?.name).filter(Boolean);
+  if (foes.length) parts.push(`ดรอปจาก ${foes.join(", ")}`);
+  if (src.craft) parts.push(`ตัดเองได้ (ช่างตัดเย็บขั้น ${src.craft.mastery}, สูตรจากศัตรู)`);
+  return `ไม่มีร้านใดขาย · ${parts.join(" · ")}`;
 }
 
 // ─── The weapon on the body ───────────────────────────────────────────

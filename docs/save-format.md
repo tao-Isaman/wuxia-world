@@ -55,7 +55,7 @@ A reload during a battle restarts that battle from the start with the hero's sav
 | Where | `currentSceneId`, `lastLocationId`, `visitedLocationIds` |
 | Time | `day`, `time` (0 to below 12 ชั่วยาม): the world clock's, set on every action (`syncClock`) — saved so a reload shows where the hero was; `startDay` (v28): the world day the hero entered the jianghu (`startNewGame`) — progress that grows with the hero's own days (foe power, `playerPowerIndex`; the game-over day count) reads `daysInJianghu` = `day − startDay` (`lib/world/clock.ts`), never the world's `day` |
 | Money and bag | `gold`, `inventory` (item id → count), `inventoryEquipment` (gear key → count; a key is the equipment id plus its enhancement and options, `eq_t1_w_sword~en:7,pa:6,cri:9`, [combat.md](combat.md#gear-options-libgamegearts)) |
-| Looks (v29) | `appearance`: `{ outfit, hideWeapon }` (the outfit worn, ซ่อนอาวุธ); `wardrobe`: the outfits bought from tailors (the others unlock from the save itself: sects, the tournament) — [design/appearance.md](design/appearance.md) |
+| Looks (v29) | `appearance`: `{ outfit, hideWeapon }` (the outfit worn, ซ่อนอาวุธ); `wardrobe`: the found outfits (read from their items) (the others unlock from the save itself: sects, the tournament) — [design/appearance.md](design/appearance.md) |
 | Progress | `wExp`, `skillLevel`, `skillExp`, `artExp`, `meridianPoints`, `statExp`, `lifeSkillXp` (19 keys), `learnedRecipeIds` |
 | Story | `flags`, `quests` (id → `{ id, status, stage, acceptedDefeatedAt?, acceptedHasItemAt? }`), `traits`, `npcStates` |
 | Ledgers | `defeatedCounts`, `stoleFromCounts` |
@@ -172,7 +172,7 @@ What each version added. v1–v13 and v17→v18 are described in the comment abo
 | v25 → v26 | `bossDefeatedDay` (boss id → the day each legendary beast last fell, `lib/world/data/bosses.ts`; default `{}`) |
 | v26 → v27 | the world clock: day stamps rebased (`rebaseDays`); `worldSeed`, `worldEventLog`; the shared-world fields move out of the save into `wusia-shared-v1` |
 | v27 → v28 | the hero's own deeds come back from the shared world (`PLAYER_FROM_WORLD_KEYS`: `assassinatedNpcIds`, `kidnappedNpcIds`, `kidnappedUntil`, `bossDefeatedDay`, `tournament`, `tournamentHistory`): in a world shared by many players these are each player's own; and `startDay` (the hero's first world day: 1 rebased for a pre-v27 save, else the save's `day`). `joinSharedWorld` hands an older local world's values to a save that has none |
-| v28 → v29 | `appearance` (`{ outfit: "default", hideWeapon: false }`) and `wardrobe` (`[]`): outfits and the weapon on the body ([design/appearance.md](design/appearance.md)). Repair keeps only tailors' outfits in `wardrobe` (once each) and puts an outfit no longer held (unknown, a sect the hero is no longer an active disciple of, the other gender's) back to `default` |
+| v28 → v29 | `appearance` (`{ outfit: "default", hideWeapon: false }`) and `wardrobe` (`[]`): outfits and the weapon on the body ([design/appearance.md](design/appearance.md)). Repair keeps only found outfits in `wardrobe` (once each) and puts an outfit no longer held (unknown, a sect the hero is no longer an active disciple of, the other gender's) back to `default` |
 
 ## Repair on load
 

@@ -1,4 +1,5 @@
 // Life skills and the bag: gathering, crafting, using items, music, rest and place activities.
+import { getOutfit } from "@/lib/world/data/outfits";
 import { affixParts, combinedStats, deriveAll, getArt, getEquip, getSkill, getMeridianChart } from "@/lib/game";
 import { statFromLifeSkill, STAT_XP_PER_ACTION } from "@/lib/world/stat-progression";
 import { applyEffects, gainGear, gatherSuccessChance, getArtisansAt, getItem, getRecipe, getResource, masteryLevel } from "@/lib/world";
@@ -277,6 +278,11 @@ export const lifeActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "gat
       if (block) return { ok: false, reason: "meridian-locked", itemId, message: block };
     }
 
+    // ชุด…: already in the wardrobe → kept.
+    if (def.use.t === "learnOutfit") {
+      if (!getOutfit(def.use.outfitId)) return { ok: false, reason: "unknown" };
+      if (s.wardrobe.includes(def.use.outfitId)) return { ok: false, reason: "already-learned", itemId };
+    }
     // สูตร…: known already → kept.
     if (def.use.t === "learnRecipe") {
       if (!getRecipe(def.use.recipeId)) return { ok: false, reason: "unknown" };
@@ -353,6 +359,13 @@ export const lifeActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "gat
       appendActionLog(draft, "meridian", `อ่าน ${def.name} · เรียนรู้ชีพจร${chart.name} (${chart.nodes.length} จุด)`);
       set({ ...draft });
       return { ok: true, kind: "learnMeridian", itemId, chartId: chart.id };
+    }
+    if (eff.t === "learnOutfit") {
+      const outfit = getOutfit(eff.outfitId)!;
+      draft.wardrobe = [...draft.wardrobe, outfit.id];
+      appendActionLog(draft, "learn", `ได้${outfit.name} · เก็บไว้ในตู้ชุดแล้ว (โปรไฟล์ › ชุด)`);
+      set({ ...draft });
+      return { ok: true, kind: "learnOutfit", itemId, outfitId: outfit.id };
     }
     if (eff.t === "learnRecipe") {
       const recipe = getRecipe(eff.recipeId)!;

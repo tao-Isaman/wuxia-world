@@ -58,6 +58,13 @@ export const ITEM_ICONS: Readonly<Record<string, string>> = {
   // ── magic materials (gear options)
   spirit_stone: "ico_material_ore_05",
   spirit_thread: "ico_material_cloth_03",
+  // Found outfits (data/outfit-sources.ts): a folded robe each.
+  outfit_tailor_indigo: "ico_armor_robe_armor_03",
+  outfit_tailor_mourning: "ico_armor_robe_armor_04",
+  outfit_tailor_ink: "ico_armor_robe_armor_06",
+  outfit_tailor_silk_red: "ico_armor_robe_armor_07",
+  outfit_tailor_jade: "ico_armor_robe_armor_08",
+  outfit_tailor_noble_gold: "ico_armor_robe_armor_09",
   enhance_stone: "ico_material_ore_03",
   // ── legendary beast trophies
   trophy_golden_serpent: "ico_material_animal_part_07",

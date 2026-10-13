@@ -108,7 +108,8 @@ export type UseItemResult =
   | { ok: true; kind: "manualLearnSkill"; itemId: string; skillId: string }
   | { ok: true; kind: "manualLearnArt"; itemId: string; artId: string; level: number }
   | { ok: true; kind: "learnMeridian"; itemId: string; chartId: string }
-  | { ok: true; kind: "learnRecipe"; itemId: string; recipeId: string };
+  | { ok: true; kind: "learnRecipe"; itemId: string; recipeId: string }
+  | { ok: true; kind: "learnOutfit"; itemId: string; outfitId: string };
 
 // Result of opening / upgrading a meridian point (openMeridianNode).
 export type OpenMeridianNodeResult = { ok: true; rank: number } | { ok: false; reason: string };
@@ -262,7 +263,6 @@ export interface WorldStore extends WorldStateData {
   /** Wear an outfit the wardrobe holds (lib/world/appearance.ts); false when it is locked. */
   wearOutfit: (id: string) => boolean;
   /** Buy a tailor's outfit (in a city) and wear it. */
-  buyOutfit: (id: string) => { ok: boolean; reason?: import("@/lib/world/appearance").BuyOutfitRefusal };
   /** Hide or show the weapon carried on the body (ซ่อนอาวุธ). */
   setHideWeapon: (hide: boolean) => void;
   /** Open a letter: mark it read (its gift waits for claimLetterGift). */

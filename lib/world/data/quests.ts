@@ -10,6 +10,7 @@ import { PLACE_QUESTS } from "./places";
 import { LINEAGE_PROLOGUES, SAGA_PROLOGUES } from "./story";
 import { scaleMoveStat } from "./move-gates";
 import { meridianChartItemsForQuest } from "../meridians";
+import { outfitItemsForQuest } from "./outfit-sources";
 
 // ─── Quest registry ────────────────────────────────────────────────────
 // Aggregator. Authors add new quests to one of the regional files under
@@ -93,7 +94,8 @@ export const QUESTS: readonly QuestDef[] = [
 
 /** Meridian charts whose source table names this quest join its rewards. */
 function withMeridianCharts(q: QuestDef): QuestDef {
-  const items = meridianChartItemsForQuest(q.id)
+  // …and so do the outfits it hands over (data/outfit-sources.ts).
+  const items = [...meridianChartItemsForQuest(q.id), ...outfitItemsForQuest(q.id)]
     .filter((itemId) => !(q.rewards ?? []).some((r) => r.t === "item" && r.itemId === itemId));
   if (items.length === 0) return q;
   return { ...q, rewards: [...(q.rewards ?? []), ...items.map((itemId) => ({ t: "item" as const, itemId }))] };

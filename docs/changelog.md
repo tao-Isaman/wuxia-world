@@ -7,6 +7,8 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 ## 2026-10-13
 
 - **โจมตีภายนอก / โจมตีภายใน** everywhere a stat is named (profile, gear options, enhancement, meridians, buffs, the battle log): no more โจมตีกาย(ภาพ) / โจมตีใน, matching how moves already read.
+- **Outfits are never sold**: the six cloth outfits (ชุดคราม, ชุดขาวไว้ทุกข์, ชุดหมึกดำ, ชุดผ้าไหมแดง, ชุดเขียวหยก, ชุดขุนนางทอง) left the tailors. Each now comes as an item (read it from the bag and it stays in the wardrobe) from quests, foes' drops and tailoring recipes that foes drop (สูตรตัด…); a locked one in the ชุด tab says where it comes from.
+- **The outfit stays on the road**: entering a road no longer draws the hero in ชุดเดิม (the road map now gets the hero's look); `appearance.spec.ts` walks onto a road in an outfit.
 - **Chat at the bottom centre**: no more สนทนา button in the HUD; online, a chat bar always sits at the bottom centre of the screen (channel, unread count; new lines float above it) and opens in place into the box. The overheard-rumor banner rises above it.
 - **A menu's ✕ covers nothing**: the last column's head, the bag's purse and the ชีพจร empty screen's title leave the panel corner to the ✕ (it lay over คะแนนพลัง and ทอง on phones); `menu-close.spec.ts` checks every section at six screen sizes.
 - **ป้องกันภายนอก / ป้องกันภายใน** likewise replace ป้องกันกาย / ป้องกันใน (profile, gear options, enhancement, meridians, buffs, the battle log).

@@ -30,6 +30,8 @@ export function ItemEffects({ effect, battle }: { effect?: ItemUseEffect; battle
     const piece = recipe?.output.equipId !== undefined ? getEquip(recipe?.output.equipId) : null;
     labels.push(`จำสูตร${piece ? `สร้าง${piece.n}` : recipe?.name ?? ""}`);
     if (recipe?.skill) labels.push(`${LIFE_SKILL_LABEL[recipe.skill]} ขั้น ${recipe.requiredMastery ?? 1}+`);
+  } else if (effect.t === "learnOutfit") {
+    labels.push("เพิ่มเข้าตู้ชุด (โปรไฟล์ › ชุด)");
   }
   if (battle) {
     if (battle.t === "heal") labels.push("⚔ ใช้กลางการต่อสู้ได้");

@@ -94,8 +94,8 @@ check("crafting: the hero's own trades' recipes (not artisan ones) craft anywher
   // An artisan recipe still needs the artisan.
   assert.equal(store().craftRecipe("forge_iron_sword").ok, false);
   // ...and every artisan recipe is sold by some artisan of its profession
-  // (gear recipes are not: foes drop them as สูตร items — test:gear).
-  for (const r of RECIPES.filter((x) => !craftsAnywhere(x) && x.output.equipId === undefined)) {
+  // (gear and outfit recipes are not: foes drop them as สูตร items — test:gear, test:appearance).
+  for (const r of RECIPES.filter((x) => !craftsAnywhere(x) && x.output.equipId === undefined && !x.output.itemId?.startsWith("outfit_"))) {
     const sellers = ARTISANS.filter((a) => a.profession === r.skill && recipesOfferedBy(a).some((o) => o.recipeId === r.id));
     assert.ok(sellers.length > 0, `${r.id} is sold nowhere`);
   }

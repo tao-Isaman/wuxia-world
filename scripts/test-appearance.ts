@@ -1,5 +1,5 @@
 // Outfits and weapons on the body (docs/design/appearance.md): the outfit
-// catalogue, what unlocks each, wearing and buying, the save, the weapon's
+// catalogue, what unlocks each, wearing, where found outfits come from (never sold), the save, the weapon's
 // family and carry, the recolour of a hero's sheet, and the battle look.
 //   bun run test:appearance
 import assert from "node:assert/strict";
@@ -8,13 +8,20 @@ import { EQUIPMENT } from "../lib/game/data/equipment";
 import { DEFAULT_OUTFIT, OUTFITS, getOutfit } from "../lib/world/data/outfits";
 import { SECT_MEMBERSHIPS } from "../lib/world/data/sect-memberships";
 import {
-  buyOutfitRefusal, characterLook, wardrobeOutfits, currentOutfit, heroLook, outfitStatus, outfitUnlocked, unlockedOutfits, weaponFamilyOf, weaponLookOf,
+  characterLook, outfitSourceHint, wardrobeOutfits, currentOutfit, heroLook, outfitStatus, outfitUnlocked, unlockedOutfits, weaponFamilyOf, weaponLookOf,
 } from "../lib/world/appearance";
 import { HEAD_SHARE, HERO_CLOTH, frameBoxes, recolorColor, recolorSheet, rgbToHsl, hslToRgb } from "../lib/characters/outfit-recolor";
 import { PL_SHEETS } from "../lib/characters/pl-sheets";
 import { playerLook } from "../lib/world/battle-looks";
 import { worldBattleStart } from "../lib/world/battle-setup";
 import { validateAndRepair } from "../lib/world/validate";
+import { OUTFIT_SOURCES, outfitItemId, outfitRecipeItemId, outfitRecipeId, rollOutfitLoot } from "../lib/world/data/outfit-sources";
+import { getItem } from "../lib/world/data/items";
+import { getQuest } from "../lib/world/data/quests";
+import { getOpponent } from "../lib/world/data/opponents";
+import { getRecipe } from "../lib/world/data/recipes";
+import { SHOPS } from "../lib/world/data/shops";
+import { ARTISANS, recipesOfferedBy } from "../lib/world/data/artisans";
 import { migrateSave, partializeSave } from "../store/world/persist";
 import { SAVE_VERSION } from "../store/world/save-version";
 import { useWorldStore } from "../store/world-store";
@@ -60,12 +67,12 @@ check("outfits: unique ids, a uniform for every joinable sect, tints in range, T
       const [h, s, l] = hsl!;
       assert.ok(h >= 0 && h < 360 && s >= 0 && s <= 1 && l >= 0 && l <= 1, `${outfit.id} tint`);
     }
-    if (outfit.unlock.t === "tailor") assert.ok(outfit.unlock.price > 0);
+    if (outfit.unlock.t === "item") assert.ok(OUTFIT_SOURCES[outfit.id], `${outfit.id} has sources`);
   }
   assert.ok(OUTFITS.some((o) => o.unlock.t === "champion"));
 });
 
-check("unlocks: the default always; the hero's own sect's uniform only (while a disciple); tailor once bought; champion once won", () => {
+check("unlocks: the default always; the hero's own sect's uniform only (while a disciple); a found outfit once its item is used; champion once won", () => {
   newGame();
   const s = store();
   assert.deepEqual(unlockedOutfits(s).map((o) => o.id), [DEFAULT_OUTFIT]);
@@ -104,25 +111,51 @@ check("gender: Shaolin's robe is only for men, Emei's only for women — left ou
   assert.equal(store().wearOutfit("sect_emei"), false);
 });
 
-check("wearing and buying: only what the wardrobe holds; a tailor in a city, for gold; bought outfits are kept and worn", () => {
+check("found outfits: no shop or tailor sells one; each comes from quests, drops or a recipe, with a repeatable source", () => {
+  const found = OUTFITS.filter((o) => o.unlock.t === "item");
+  assert.equal(found.length, 6);
+  for (const outfit of found) {
+    const src = OUTFIT_SOURCES[outfit.id]!;
+    const item = getItem(outfitItemId(outfit.id));
+    assert.ok(item?.use?.t === "learnOutfit" && item.use.outfitId === outfit.id, `${outfit.id}: its item adds it`);
+    for (const q of src.questRewards ?? []) {
+      assert.ok(getQuest(q)?.rewards?.some((r) => r.t === "item" && r.itemId === outfitItemId(outfit.id)), `${q} hands over ${outfit.id}`);
+    }
+    for (const l of [...(src.loot ?? []), ...(src.craft?.recipeLoot ?? [])]) assert.ok(getOpponent(l.opponentId), `${l.opponentId} exists`);
+    if (src.craft) {
+      const recipe = getRecipe(outfitRecipeId(outfit.id));
+      assert.equal(recipe?.skill, "tailoring");
+      assert.equal(recipe?.output.itemId, outfitItemId(outfit.id));
+      for (const input of recipe!.inputs) assert.ok(getItem(input.itemId), input.itemId);
+      assert.equal(getItem(outfitRecipeItemId(outfit.id))?.use?.t, "learnRecipe");
+    }
+    // Repeatable: a foe's drop or a recipe to craft it again and again.
+    assert.ok((src.loot?.length ?? 0) > 0 || !!src.craft, `${outfit.id} has a repeatable source`);
+    assert.ok(!outfitSourceHint(outfit.id).includes("undefined"));
+    // Never sold.
+    for (const shop of SHOPS) assert.ok(!shop.inventory.some((e) => (typeof e === "string" ? e : (e as { itemId: string }).itemId) === outfitItemId(outfit.id)), `${shop.id} sells ${outfit.id}`);
+    for (const artisan of ARTISANS) assert.ok(!recipesOfferedBy(artisan).some((o) => o.recipeId === outfitRecipeId(outfit.id)), `${artisan.id} sells its recipe`);
+  }
+  // A foe's drop rolls.
+  assert.deepEqual(rollOutfitLoot("night_blade", () => 0), [outfitItemId("tailor_ink")]);
+  assert.deepEqual(rollOutfitLoot("night_blade", () => 0.99), []);
+});
+
+check("wearing: only what the wardrobe holds; an outfit's item puts it there for good", () => {
   newGame();
   assert.equal(store().wearOutfit("tailor_jade"), false, "locked");
+  assert.match(outfitStatus(store(), getOutfit("tailor_jade")!).hint, /ไม่มีร้านใดขาย/);
   assert.equal(store().appearance.outfit, DEFAULT_OUTFIT);
-  useWorldStore.setState({ gold: 2000, currentSceneId: "home_player" });
-  assert.equal(buyOutfitRefusal(store(), "tailor_jade"), "no_tailor");
-  assert.equal(store().buyOutfit("tailor_jade").reason, "no_tailor");
-  useWorldStore.setState({ currentSceneId: "city_capital" });
-  assert.equal(buyOutfitRefusal(store(), "sect_wudang"), "not_for_sale");
-  assert.equal(buyOutfitRefusal(store(), "tailor_noble_gold"), "gold");
-  assert.equal(buyOutfitRefusal(store(), "nope"), "unknown");
-  assert.ok(store().buyOutfit("tailor_jade").ok);
-  assert.equal(store().gold, 2000 - 800);
+  useWorldStore.setState({ inventory: { [outfitItemId("tailor_jade")]: 2 } });
+  const used = store().useItem(outfitItemId("tailor_jade"));
+  assert.ok(used.ok && used.kind === "learnOutfit");
   assert.deepEqual(store().wardrobe, ["tailor_jade"]);
-  assert.equal(store().appearance.outfit, "tailor_jade", "worn at once");
-  assert.equal(store().buyOutfit("tailor_jade").reason, "owned");
+  assert.equal(store().inventory[outfitItemId("tailor_jade")], 1, "one used");
+  assert.equal(store().useItem(outfitItemId("tailor_jade")).ok, false, "already in the wardrobe: kept");
+  assert.equal(store().inventory[outfitItemId("tailor_jade")], 1);
   assert.ok(store().actionLog.at(-1)?.message.includes("ชุดเขียวหยก"));
-  assert.ok(store().wearOutfit(DEFAULT_OUTFIT));
   assert.ok(store().wearOutfit("tailor_jade"));
+  assert.ok(store().wearOutfit(DEFAULT_OUTFIT));
   store().setHideWeapon(true);
   assert.equal(store().appearance.hideWeapon, true);
 });
@@ -137,7 +170,7 @@ check("a worn outfit no longer held falls back to the default (current look, and
   const state = JSON.parse(JSON.stringify(store())) as WorldStateData;
   state.wardrobe = ["tailor_ink", "tailor_ink", "sect_emei", "made_up"];
   validateAndRepair(state);
-  assert.deepEqual(state.wardrobe, ["tailor_ink"], "only tailors' outfits, once each");
+  assert.deepEqual(state.wardrobe, ["tailor_ink"], "only found outfits, once each");
   assert.equal(state.appearance.outfit, DEFAULT_OUTFIT);
 });
 

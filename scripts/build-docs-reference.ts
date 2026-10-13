@@ -362,6 +362,7 @@ const pages: Record<string, string> = {};
       case "manualLearnArt": return `learn ${esc(artName(u.artId))} (${u.reqStat} ≥ ${u.reqValue})`;
       case "learnMeridian": return `learn meridian chart ${code(u.chartId)}`;
       case "learnRecipe": return `learn recipe ${code(u.recipeId)}`;
+      case "learnOutfit": return `add outfit ${code(u.outfitId)} to the wardrobe`;
     }
   };
   for (const cat of ITEM_CATEGORIES) {

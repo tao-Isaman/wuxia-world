@@ -87,7 +87,7 @@ export function InventoryPopup({ open, onClose }: Props) {
     if (!r.ok) {
       if (r.reason === "full") setLastUsed("พลังชีวิตและปราณเต็มแล้ว ไม่ต้องใช้");
       else if (r.reason === "stat-too-low") setLastUsed(`ฝีมือยังไม่ถึงขั้น · ต้องการ${STAT_LABEL[r.stat as keyof typeof STAT_LABEL] ?? r.stat} ${r.needed} (ปัจจุบัน ${r.current})`);
-      else if (r.reason === "already-learned") setLastUsed("เรียนวิชานี้แล้ว ไม่ต้องอ่านอีก");
+      else if (r.reason === "already-learned") setLastUsed(getItem(id)?.use?.t === "learnOutfit" ? "มีชุดนี้ในตู้ชุดแล้ว" : "เรียนวิชานี้แล้ว ไม่ต้องอ่านอีก");
       else if (r.reason === "meridian-locked") setLastUsed(r.message);
       else setLastUsed("ใช้ไม่ได้");
       return;
@@ -103,6 +103,7 @@ export function InventoryPopup({ open, onClose }: Props) {
     else if (r.kind === "manualLearnArt") message = `เรียนลมปราณสำเร็จ · เริ่มที่ระดับ ${r.level}`;
     else if (r.kind === "learnMeridian") message = "เรียนรู้แผนภาพชีพจรสำเร็จ · เปิดจุดชีพจรได้ที่เมนูชีพจร";
     else if (r.kind === "learnRecipe") message = "จำสูตรได้แล้ว · ไปสร้างได้ที่ร้านช่างแท็บ ประดิษฐ์";
+    else if (r.kind === "learnOutfit") message = "เก็บชุดไว้ในตู้ชุดแล้ว · สวมได้ที่ โปรไฟล์ › ชุด";
     // The last one used: back to the bag, the result as a toast.
     if ((useWorldStore.getState().inventory[id] ?? 0) <= 0) {
       if (message) toast("success", message);

@@ -67,7 +67,7 @@ export function validateAndRepair(state: WorldStateData): void {
   state.playerBodyId = heroBodyFor(state.playerBodyId, state.gender);
 
   // Looks: bought outfits must exist; one worn but not (or no longer) held is ชุดเดิม.
-  state.wardrobe = [...new Set((state.wardrobe ?? []).filter((id) => getOutfit(id)?.unlock.t === "tailor"))];
+  state.wardrobe = [...new Set((state.wardrobe ?? []).filter((id) => getOutfit(id)?.unlock.t === "item"))];
   state.appearance ??= { outfit: DEFAULT_OUTFIT, hideWeapon: false };
   state.appearance = { ...state.appearance, outfit: currentOutfit(state), hideWeapon: state.appearance.hideWeapon === true };
 

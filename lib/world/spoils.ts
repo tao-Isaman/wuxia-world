@@ -10,6 +10,7 @@ import { gatherSuccessChance, masteryLevel } from "./data/life-skills";
 import { pickWeighted } from "./data/random-events";
 import { isLawOpponent } from "./law";
 import { rollMeridianLoot } from "./meridians";
+import { rollOutfitLoot } from "./data/outfit-sources";
 import { getBoss } from "./data/bosses";
 import { dropsGold, moveXpMultiplier, victoryWExp } from "./victory";
 import { ENHANCE_STONE, rollEnhanceStones, rollRecipeDrop, rollSpiritMaterials, wExpWithGear } from "./gear";
@@ -77,6 +78,8 @@ export function rollVictorySpoilsFrom(
       // A craft-only piece's recipe (data/gear-recipes.ts).
       const recipe = rollRecipeDrop(opp, s);
       if (recipe) items[recipe] = (items[recipe] ?? 0) + 1;
+      // An outfit, or a tailor's recipe for one (data/outfit-sources.ts).
+      for (const itemId of rollOutfitLoot(pb.opponentId)) items[itemId] = (items[itemId] ?? 0) + 1;
     }
     if (!s.pendingSpar && !pb.nonFatal && !isLawOpponent(pb.opponentId) && dropsGold(opp)) {
       const [min, max] = FOE_GOLD[Math.max(0, Math.min(5, opp?.ti ?? 0))];

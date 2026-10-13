@@ -593,7 +593,9 @@ export type ItemUseEffect =
   | { t: "learnMeridian"; chartId: string }
   // สูตร… — teaches a crafting recipe (learnedRecipeIds). Refuses (item
   // kept) when the recipe is already known. Gear recipes drop from foes.
-  | { t: "learnRecipe"; recipeId: string };
+  | { t: "learnRecipe"; recipeId: string }
+  /** A bundled outfit (data/outfit-sources.ts): adds it to the wardrobe. */
+  | { t: "learnOutfit"; outfitId: string };
 
 // Stat threshold per skill / art tier when learning from a manual. T0
 // items have no stat gate; higher tiers escalate. Authors set the stat

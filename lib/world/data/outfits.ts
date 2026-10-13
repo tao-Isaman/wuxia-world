@@ -15,8 +15,9 @@ export type OutfitUnlock =
   | { t: "default" }
   /** Joining the sect (active or resigned; a betrayer loses it). */
   | { t: "sect"; sectId: SectId }
-  /** Bought from a tailor in a city; kept for good. */
-  | { t: "tailor"; price: number }
+  /** Found, never sold: its bundled item (a quest reward, a foe's drop or a
+   *  tailor's craft — data/outfit-sources.ts) puts it in the wardrobe for good. */
+  | { t: "item" }
   /** Winning the sword tournament once. */
   | { t: "champion" };
 
@@ -33,8 +34,9 @@ export const DEFAULT_OUTFIT = "default";
 
 const sect = (id: string, sectId: SectId, name: string, description: string, primary: Hsl, secondary: Hsl): OutfitDef =>
   ({ id, name, description, tint: { primary, secondary }, unlock: { t: "sect", sectId } });
-const tailor = (id: string, name: string, description: string, price: number, primary: Hsl, secondary: Hsl): OutfitDef =>
-  ({ id, name, description, tint: { primary, secondary }, unlock: { t: "tailor", price } });
+// The ids keep their old tailor_ prefix: saves hold them in `wardrobe`.
+const found = (id: string, name: string, description: string, primary: Hsl, secondary: Hsl): OutfitDef =>
+  ({ id, name, description, tint: { primary, secondary }, unlock: { t: "item" } });
 
 export const OUTFITS: readonly OutfitDef[] = [
   { id: DEFAULT_OUTFIT, name: "ชุดเดิม", description: "ชุดเดินทางที่สวมมาตั้งแต่ออกจากบ้าน", tint: null, unlock: { t: "default" } },
@@ -53,12 +55,12 @@ export const OUTFITS: readonly OutfitDef[] = [
   sect("sect_sunmoon", "sunmoon", "ชุดดำตะวันจันทรา", "ชุดดำขลิบแดงของพรรคตะวันจันทรา", [0, 0, 0.18], [0, 0.75, 0.45]),
   sect("sect_tang", "tang", "ชุดสกุลถัง", "ชุดสีเขียวเข้มของสำนักสกุลถัง", [150, 0.45, 0.28], [150, 0.1, 0.75]),
   sect("sect_xiaoyao", "xiaoyao", "ชุดสราญรมย์", "ชุดสีฟ้าเมฆของพรรคสราญรมย์", [195, 0.45, 0.65], [55, 0.35, 0.86]),
-  tailor("tailor_indigo", "ชุดคราม", "ผ้าย้อมครามเนื้อหนา ทนทานสำหรับเดินทาง", 300, [232, 0.55, 0.32], [230, 0.1, 0.82]),
-  tailor("tailor_mourning", "ชุดขาวไว้ทุกข์", "ชุดผ้าขาวเรียบ ไร้ลวดลาย", 300, [40, 0.04, 0.86], [40, 0.02, 0.94]),
-  tailor("tailor_ink", "ชุดหมึกดำ", "ชุดดำสนิทดุจหมึก เหมาะแก่การเดินยามราตรี", 500, [220, 0.05, 0.16], [220, 0.04, 0.6]),
-  tailor("tailor_silk_red", "ชุดผ้าไหมแดง", "ผ้าไหมแดงสดจากร้านตัดเสื้อในเมือง", 600, [358, 0.62, 0.45], [10, 0.25, 0.85]),
-  tailor("tailor_jade", "ชุดเขียวหยก", "ผ้าไหมสีหยกขลิบขาว", 800, [160, 0.4, 0.45], [150, 0.1, 0.86]),
-  tailor("tailor_noble_gold", "ชุดขุนนางทอง", "ผ้าไหมปักทองแบบที่ขุนนางในเมืองหลวงสวม", 3000, [44, 0.7, 0.48], [355, 0.55, 0.45]),
+  found("tailor_indigo", "ชุดคราม", "ผ้าย้อมครามเนื้อหนา ทนทานสำหรับเดินทาง", [232, 0.55, 0.32], [230, 0.1, 0.82]),
+  found("tailor_mourning", "ชุดขาวไว้ทุกข์", "ชุดผ้าขาวเรียบ ไร้ลวดลาย", [40, 0.04, 0.86], [40, 0.02, 0.94]),
+  found("tailor_ink", "ชุดหมึกดำ", "ชุดดำสนิทดุจหมึก เหมาะแก่การเดินยามราตรี", [220, 0.05, 0.16], [220, 0.04, 0.6]),
+  found("tailor_silk_red", "ชุดผ้าไหมแดง", "ผ้าไหมแดงสดเนื้อดี", [358, 0.62, 0.45], [10, 0.25, 0.85]),
+  found("tailor_jade", "ชุดเขียวหยก", "ผ้าไหมสีหยกขลิบขาว", [160, 0.4, 0.45], [150, 0.1, 0.86]),
+  found("tailor_noble_gold", "ชุดขุนนางทอง", "ผ้าไหมปักทองแบบที่ขุนนางในเมืองหลวงสวม", [44, 0.7, 0.48], [355, 0.55, 0.45]),
   { id: "champion_gold", name: "ชุดยอดฝีมือ", description: "ชุดขาวทองของผู้ชนะชุมนุมประลองกระบี่หัวซาน", tint: { primary: [48, 0.8, 0.55], secondary: [45, 0.2, 0.92] }, unlock: { t: "champion" } },
 ];
 

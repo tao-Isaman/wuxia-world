@@ -40,10 +40,10 @@ An outfit gives a target `[hue, saturation, lightness]` per class. A pixel keeps
 | --- | --- |
 | ชุดเดิม (the hero's own) | always |
 | the uniform of the hero's own sect (one per joinable sect: saffron Shaolin, grey-white Wudang, rose Emei, …) | being its disciple now (active): the wardrobe lists only the own sect's uniform, never another sect's, and a former disciple (resigned or betrayed) no longer wears it. Shaolin takes men and Emei women only (their join rules' `gender`), so an edited save cannot dress the other gender in them |
-| six tailor's outfits (ชุดผ้าไหมแดง, ชุดหมึกดำ, ชุดคราม, ชุดเขียวหยก, ชุดขาวไว้ทุกข์, ชุดขุนนางทอง) | bought from a tailor in any city (`city_…`), 300–3,000 ตำลึง; kept for good |
+| six tailor's outfits (ชุดผ้าไหมแดง, ชุดหมึกดำ, ชุดคราม, ชุดเขียวหยก, ชุดขาวไว้ทุกข์, ชุดขุนนางทอง) | never sold: an item `outfit_<id>` from a quest, a foe's drop or a tailoring recipe foes drop (`lib/world/data/outfit-sources.ts`); reading it keeps the outfit for good |
 | ชุดยอดฝีมือ (champion's gold) | winning the sword tournament once |
 
-The wardrobe lists ชุดเดิม, the own sect's uniform, the tailors' outfits (to buy or held) and the champion's; what was bought is saved (`wardrobe`), the rest follows from the save (the sect membership, the tournament history).
+The wardrobe lists ชุดเดิม, the own sect's uniform, the found outfits (held, or locked with where they come from) and the champion's; what was found is saved (`wardrobe`), the rest follows from the save (the sect membership, the tournament history).
 
 ## The weapon on the body
 

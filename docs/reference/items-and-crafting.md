@@ -2,7 +2,7 @@
 
 # Items, shops, crafting and gathering
 
-516 items (`lib/world/data/items.ts`), 19 shops, 7 martial halls, 49 artisans, 64 recipes and 25 gathering / hunting nodes.
+527 items (`lib/world/data/items.ts`), 19 shops, 7 martial halls, 49 artisans, 69 recipes and 25 gathering / hunting nodes.
 
 ## Contents
 
@@ -104,7 +104,7 @@
 | `alpha_inter` | อักษรงดงาม | 300 | train writing +80 xp |
 | `alpha_master` | อักษรเทพนิยม | 800 | train writing +180 xp |
 
-### ตำราวิชา (`manual`, 420)
+### ตำราวิชา (`manual`, 425)
 
 | Id | Name | Price | Use |
 | --- | --- | --- | --- |
@@ -528,8 +528,13 @@
 | `recipe_gear_br4` | สูตรปลอกแขนมังกร | 2000 | learn recipe `gear_br4` |
 | `recipe_gear_r4` | สูตรแหวนปัญญา | 2000 | learn recipe `gear_r4` |
 | `recipe_gear_c4` | สูตรประดับชีวิตนิรันดร์ | 2000 | learn recipe `gear_c4` |
+| `recipe_outfit_tailor_indigo` | สูตรตัดชุดคราม | 150 | learn recipe `outfit_tailor_indigo` |
+| `recipe_outfit_tailor_mourning` | สูตรตัดชุดขาวไว้ทุกข์ | 150 | learn recipe `outfit_tailor_mourning` |
+| `recipe_outfit_tailor_silk_red` | สูตรตัดชุดผ้าไหมแดง | 300 | learn recipe `outfit_tailor_silk_red` |
+| `recipe_outfit_tailor_jade` | สูตรตัดชุดเขียวหยก | 400 | learn recipe `outfit_tailor_jade` |
+| `recipe_outfit_tailor_noble_gold` | สูตรตัดชุดขุนนางทอง | 1500 | learn recipe `outfit_tailor_noble_gold` |
 
-### ของช่างฝีมือ (`craft`, 16)
+### ของช่างฝีมือ (`craft`, 22)
 
 | Id | Name | Price | Use |
 | --- | --- | --- | --- |
@@ -549,6 +554,12 @@
 | `warrior_belt` | เข็มขัดนักรบ | 320 | — |
 | `jade_pendant` | จี้หยก | 480 | — |
 | `fortune_charm` | เครื่องรางเสริมโชค | 280 | — |
+| `outfit_tailor_indigo` | ชุดคราม | 300 | add outfit `tailor_indigo` to the wardrobe |
+| `outfit_tailor_mourning` | ชุดขาวไว้ทุกข์ | 300 | add outfit `tailor_mourning` to the wardrobe |
+| `outfit_tailor_ink` | ชุดหมึกดำ | 500 | add outfit `tailor_ink` to the wardrobe |
+| `outfit_tailor_silk_red` | ชุดผ้าไหมแดง | 600 | add outfit `tailor_silk_red` to the wardrobe |
+| `outfit_tailor_jade` | ชุดเขียวหยก | 800 | add outfit `tailor_jade` to the wardrobe |
+| `outfit_tailor_noble_gold` | ชุดขุนนางทอง | 3000 | add outfit `tailor_noble_gold` to the wardrobe |
 
 ### ของมีค่า (`valuable`, 8)
 
@@ -749,7 +760,7 @@ Every city hosts all six craft professions; villages and some sects host one. Re
 | `gear_b4` | สร้างรองเท้าลม | 3× หนังฟอก + 2× เหล็กแท่ง + 1× ขนปีกกระบี่อินทรียักษ์ → 1× รองเท้าลม (gear) | 4 |  | nowhere (sold by no artisan) |
 | `gear_br4` | สร้างปลอกแขนมังกร | 5× เหล็กแท่ง + 2× แร่ทองคำ + 1× เขี้ยวพยัคฆ์โลหิต → 1× ปลอกแขนมังกร (gear) | 4 |  | nowhere (sold by no artisan) |
 
-### ตัดเย็บ (`tailoring`, 11)
+### ตัดเย็บ (`tailoring`, 16)
 
 | Id | Name | Inputs → output | Mastery | Basic | Taught at |
 | --- | --- | --- | --- | --- | --- |
@@ -764,6 +775,11 @@ Every city hosts all six craft professions; villages and some sects host one. Re
 | `gear_h2` | สร้างหมวกหนัง | 2× หนังฟอก + 1× เส้นด้าย → 1× หมวกหนัง (gear) | 2 |  | nowhere (sold by no artisan) |
 | `gear_b2` | สร้างรองเท้าหนัง | 2× หนังฟอก + 1× เส้นด้าย → 1× รองเท้าหนัง (gear) | 2 |  | nowhere (sold by no artisan) |
 | `gear_br2` | สร้างปลอกแขนหนังสัตว์ | 2× หนังฟอก + 1× หนังสัตว์ → 1× ปลอกแขนหนังสัตว์ (gear) | 2 |  | nowhere (sold by no artisan) |
+| `outfit_tailor_indigo` | ตัดชุดคราม | 4× เส้นด้าย + 1× ผ้าไหม → 1× ชุดคราม | 2 |  | nowhere (sold by no artisan) |
+| `outfit_tailor_mourning` | ตัดชุดขาวไว้ทุกข์ | 3× เส้นด้าย + 1× ผ้าไหม → 1× ชุดขาวไว้ทุกข์ | 2 |  | nowhere (sold by no artisan) |
+| `outfit_tailor_silk_red` | ตัดชุดผ้าไหมแดง | 3× ผ้าไหม + 2× เส้นด้าย → 1× ชุดผ้าไหมแดง | 3 |  | nowhere (sold by no artisan) |
+| `outfit_tailor_jade` | ตัดชุดเขียวหยก | 4× ผ้าไหม + 1× หยกล้ำค่า → 1× ชุดเขียวหยก | 4 |  | nowhere (sold by no artisan) |
+| `outfit_tailor_noble_gold` | ตัดชุดขุนนางทอง | 5× ผ้าไหม + 2× แร่ทองคำ + 1× หยกล้ำค่า → 1× ชุดขุนนางทอง | 4 |  | nowhere (sold by no artisan) |
 
 ### ช่างเครื่องประดับ (`jewelry`, 7)
 
@@ -862,7 +878,7 @@ Mastery levels 1–5 at xp thresholds 0 / 100 / 300 / 700 / 1500 (`lib/world/dat
 | `begging` | ขอทาน | 🥣 | 2 | 0 |
 | `steal` | ขโมย | 🥷 | 0 | 0 |
 | `forge` | ตีอาวุธ | 🔨 | 0 | 15 |
-| `tailoring` | ตัดเย็บ | 🧵 | 0 | 11 |
+| `tailoring` | ตัดเย็บ | 🧵 | 0 | 16 |
 | `jewelry` | ช่างเครื่องประดับ | 💍 | 0 | 7 |
 | `alchemy` | เภสัช | 🧪 | 0 | 8 |
 | `chef` | ทำอาหาร | 🍳 | 0 | 3 |

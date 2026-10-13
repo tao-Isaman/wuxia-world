@@ -8,6 +8,7 @@ import { toast } from "@/store/toast-store";
 import { MapHud } from "./map-hud";
 import { MenuBar } from "./menu-bar";
 import { roamingFoesOn } from "./roaming-foes";
+import { characterLook, heroLook } from "@/lib/world/appearance";
 
 const facingOf = (dir: RouteMapDef["direction"]) =>
   dir.includes("E") ? "east" as const : dir.includes("W") ? "west" as const : dir === "N" ? "north" as const : "south" as const;
@@ -39,10 +40,12 @@ export function RouteMapView({ scene, map }: { scene: RouteScene; map: RouteMapD
   const guide = navigationGuide(state);
   const guideId = guide ? guideMarkerId(state, guide) : null;
   for (const marker of markers) if (marker.id === guideId) marker.guide = true;
+  // The hero keeps their outfit and carried weapon on the road (docs/design/appearance.md).
+  const look = heroLook(state);
   return <div className="fixed inset-0 z-40 !mt-0 bg-[#172723]" data-route-direction={map.direction}>
     <WorldCanvas presentation={{ key: scene.id, name: scene.label, image: map.image, imageGrade: map.grade, mirrorImage: map.mirror,
       time: state.time, playerImage: playerBodySprite(state.playerBodyId), spawn: map.spawn, spawnFacing: facingOf(map.direction), markers,
-      foes: roamingFoesOn(state.roamingFoes, scene.id) }} />
+      foes: roamingFoesOn(state.roamingFoes, scene.id), heroLook: characterLook(look.outfit, look.weapon) }} />
     <MapHud /><MenuBar hud />
   </div>;
 }

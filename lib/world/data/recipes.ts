@@ -1,5 +1,6 @@
 import type { LifeSkill, RecipeDef } from "../types";
 import { GEAR_RECIPES } from "./gear-recipes";
+import { OUTFIT_RECIPES } from "./outfit-sources";
 
 // Crafting recipes. Inputs are consumed in order; output is added to the
 // player's inventory. The store's `craftRecipe` action enforces input
@@ -464,6 +465,7 @@ export const RECIPES: readonly RecipeDef[] = [
   },
   // Craft-only gear: the recipes foes drop as สูตร… items (gear-recipes.ts).
   ...GEAR_RECIPES,
+  ...OUTFIT_RECIPES,
 ];
 
 export const RECIPES_BY_ID = new Map<string, RecipeDef>(
