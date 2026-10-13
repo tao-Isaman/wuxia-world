@@ -6,6 +6,10 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-13
 
+### Each sect quest on its own two-hour turn
+
+- **Every sect quest again after two hours**: each repeatable quest in the sect window is taken again two real hours after it was last taken, each on its own turn, so several can be done at once (was: one quest every two hours across every sect). Each waiting quest says how long is left (`sectQuestWait(state, def)`, the membership's `lastQuestDay` stamped on taking; the save field `sectQuestTaken` is gone, no version bump). Dropping a quest gives its turn back.
+
 ### World bosses are the world's, fought by a party
 
 - **One of each beast for everyone**: online each legendary beast is kept by the server (a `RaidObject` per beast); every world reply says when each fell and who is fighting it, and a lair's map shows it only while it waits. It is back **three real hours** after it falls (offline too: `BOSS_RESPAWN_DAYS` = 3, was 90).
@@ -15,7 +19,7 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ### The player's schedules run on real time (save v30)
 
-- **Sect quests every two hours**: the sect window gives one repeatable sect quest every two real hours, across every sect, and a missed turn is not saved up (was: each quest again 30 hours after it was done). Dropping the quest just taken gives the turn back. The window says when the next one opens (`SECT_QUEST_GAP_DAYS`, `sectQuestWait`, save `sectQuestTaken`).
+- **Sect quests every two hours** **(replaced** by each quest on its own turn, above**)**: the sect window gives one repeatable sect quest every two real hours, across every sect, and a missed turn is not saved up (was: each quest again 30 hours after it was done). Dropping the quest just taken gives the turn back. The window says when the next one opens (`SECT_QUEST_GAP_DAYS`, `sectQuestWait`, save `sectQuestTaken`).
 - **Letters every three hours**: a friend may write at 00:00, 03:00, 06:00 … Thai time, one letter a slot and one per person a real day; coming back brings the letters of the last real day (`isLetterSlot`).
 - **The tournament every two weeks**: registration opens on Monday at 00:00 Thai time (the invitation comes once a round, also to a hero who starts mid-round), bouts run from the second Saturday at 20:00 until Sunday at 23:00 (was three real hours), and the champion picks a move every time. The window shows the real dates; a round that ended while the hero was away is settled on their return; the inns talk of it from three days before ("คืนวันเสาร์นี้ยามสองทุ่ม…").
 - **The server's clock**: every `GET /world` reply carries the server's `now` and the game keeps to it, and the server refuses a save dated more than an hour ahead of its clock, so moving the device clock on no longer moves the schedules (`lib/world/calendar.ts` names real times in Thai).

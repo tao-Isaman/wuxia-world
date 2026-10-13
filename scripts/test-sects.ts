@@ -270,7 +270,7 @@ check("store sect actions need an active membership", () => {
   assert.ok(store().acceptSectQuest("wudang", sectQuest.id).ok);
 });
 
-check("sect quests: one every two real hours across every sect, not saved up; dropping it gives the turn back; art quests are apart", () => {
+check("sect quests: each one again two real hours after it was taken, the others still open; dropping one gives its turn back", () => {
   setTestWorldTime(500, 0);
   try {
     newGame();
@@ -278,29 +278,32 @@ check("sect quests: one every two real hours across every sect, not saved up; dr
     const repeatable = QUESTS.filter((q) => q.sectId === "wudang" && !q.isArtQuest && q.id !== redemptionQuestId("wudang") && isSectQuestOfferable(store(), q).offerable);
     assert.ok(repeatable.length >= 2, "two quests to try");
     const [a, b] = repeatable;
-    assert.ok(isSectQuestOfferable(store(), a!).offerable);
     assert.ok(store().acceptSectQuest("wudang", a!.id).ok);
-    const blocked = isSectQuestOfferable(store(), b!);
-    assert.equal(blocked.offerable, false, "the next waits");
+    // Another quest is not held up by the first.
+    assert.ok(isSectQuestOfferable(store(), b!).offerable, "every quest on its own turn");
+    assert.ok(store().acceptSectQuest("wudang", b!.id).ok);
+    // The first, done at once, waits its own two hours.
+    assert.ok(store().finishQuestNow(a!.id).ok);
+    const blocked = isSectQuestOfferable(store(), a!);
+    assert.equal(blocked.offerable, false, "the same quest waits");
     assert.ok(Math.abs(blocked.cooldownLeft - SECT_QUEST_GAP_DAYS) < 1e-6, "two real hours (world days)");
-    assert.equal(store().acceptSectQuest("wudang", b!.id).ok, false);
+    assert.equal(store().acceptSectQuest("wudang", a!.id).ok, false);
     // An hour and a half later: still waiting; two hours: open again.
     setTestWorldTime(501, 6);
-    assert.equal(store().acceptSectQuest("wudang", b!.id).ok, false);
+    assert.equal(store().acceptSectQuest("wudang", a!.id).ok, false);
     setTestWorldTime(502, 0);
-    assert.ok(store().acceptSectQuest("wudang", b!.id).ok, "two hours on");
-    // Dropping the quest just taken gives the turn back.
-    assert.ok(store().abandonQuest(b!.id).ok);
-    assert.equal(store().sectQuestTaken, null);
-    assert.ok(isSectQuestOfferable(store(), b!).offerable);
-    // A long absence does not stack turns: one quest, then two hours again.
+    assert.ok(store().acceptSectQuest("wudang", a!.id).ok, "two hours on");
+    // Dropping a quest gives its turn back.
+    assert.ok(store().abandonQuest(a!.id).ok);
+    assert.ok(isSectQuestOfferable(store(), a!).offerable);
+    // A long absence does not stack turns: taken once, then two hours again.
     setTestWorldTime(530, 0);
-    assert.ok(store().acceptSectQuest("wudang", b!.id).ok);
-    const other = repeatable.find((q) => q.id !== b!.id && store().quests[q.id]?.status !== "active")!;
-    assert.equal(store().acceptSectQuest("wudang", other.id).ok, false, "no saved-up turns");
+    assert.ok(store().acceptSectQuest("wudang", a!.id).ok);
+    assert.ok(store().finishQuestNow(a!.id).ok);
+    assert.equal(store().acceptSectQuest("wudang", a!.id).ok, false, "no saved-up turns");
     // The one-shot art trials keep their own gate.
     const art = QUESTS.find((q) => q.sectId === "wudang" && q.isArtQuest)!;
-    assert.notEqual(isSectQuestOfferable(store(), art).reason, "รับภารกิจสำนักได้ทุก 2 ชั่วโมง");
+    assert.notEqual(isSectQuestOfferable(store(), art).reason, "ภารกิจนี้รับซ้ำได้ทุก 2 ชั่วโมง");
   } finally { setTestClock(null); }
 });
 

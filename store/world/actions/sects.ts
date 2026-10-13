@@ -73,9 +73,9 @@ export const sectsActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "jo
     const def = getQuest(questId);
     if (!def) return { ok: false, reason: "ไม่พบภารกิจ" };
     if (def.sectId !== sectId) return { ok: false, reason: "ไม่ใช่ภารกิจของสำนักนี้" };
-    // Brought to the clock first: the two-hour turn is checked on the time now.
+    // Brought to the clock first: the quest's two-hour turn is checked on the time now.
     const draft = draftFrom(s);
-    // isSectQuestOfferable also requires an active membership and keeps the two-hour turn.
+    // isSectQuestOfferable also requires an active membership and keeps the quest's two-hour turn.
     const check = isSectQuestOfferable(draft, def);
     if (!check.offerable) {
       const at = msAtWorld(draft.day, draft.time);
@@ -86,10 +86,13 @@ export const sectsActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "jo
     }
     // Reset prior done/failed status so the quest can be re-accepted.
     // Active status is blocked by the offer helper above. A repeatable quest
-    // starts the two-hour turn (sectQuestTaken); dropping it gives the turn back.
+    // starts its own two-hour turn (lastQuestDay); dropping it gives the turn back.
     delete draft.quests[questId];
     applyEffect(draft, { t: "startQuest", questId });
-    if (!def.isArtQuest) draft.sectQuestTaken = { at: draft.day + draft.time / HOURS_PER_DAY, questId };
+    const m = draft.sectMembership[sectId];
+    if (!def.isArtQuest && m) {
+      draft.sectMembership = { ...draft.sectMembership, [sectId]: { ...m, lastQuestDay: { ...m.lastQuestDay, [questId]: draft.day + draft.time / HOURS_PER_DAY } } };
+    }
     appendActionLog(draft, "sect", `รับภารกิจสำนัก: ${def.name}`);
     set({ ...draft });
     return { ok: true };

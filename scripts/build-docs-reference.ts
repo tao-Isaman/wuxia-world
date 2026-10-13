@@ -219,7 +219,7 @@ const pages: Record<string, string> = {};
     md += `## ${esc(def.name)} (${code(def.id)})\n\n`;
     md += `- Hall: ${esc(locName(def.hallLocationId))} (${code(def.hallLocationId)}) · registrar: ${esc(npcName(def.registrarNpcId))} (${code(def.registrarNpcId)})\n`;
     md += `- Join requirements: ${conditionText(def.joinRequirements)}\n`;
-    md += `- Ranks: start ${def.startRank}, top ${def.topRank} · a sect quest every ${SECT_QUEST_GAP_DAYS} real hours\n`;
+    md += `- Ranks: start ${def.startRank}, top ${def.topRank} · each sect quest again ${SECT_QUEST_GAP_DAYS} real hours after it is taken\n`;
     const costs: string[] = [];
     for (let r = def.startRank - 1; r >= def.topRank; r--) costs.push(`→${r}: ${def.rankUpCost(r)}`);
     md += `- Rank-up cost (sect points): ${costs.join(" · ") || "—"}\n`;

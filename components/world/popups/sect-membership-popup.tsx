@@ -9,7 +9,6 @@ import {
   SECT_MEMBERSHIPS,
   getQuestsForSect,
   isSectQuestOfferable,
-  sectQuestWait,
   isQuestOfferable,
   isSecretSectQuest,
   MYSTERY_MOVE_LABEL,
@@ -428,17 +427,12 @@ function QuestsTab({ quests, worldState, onAccept }: QuestsTabProps) {
   if (quests.length === 0) {
     return <div className="text-xs text-muted-foreground">ยังไม่มีภารกิจประจำสำนัก</div>;
   }
-  const wait = sectQuestWait(worldState);
+  const at = msAtWorld(worldState.day, worldState.time);
   return (
     <div className="space-y-2">
       <div className="text-xs text-muted-foreground">
-        ภารกิจประจำ — รับได้ครั้งละหนึ่งภารกิจทุก 2 ชั่วโมง (นับจากที่รับ ไม่สะสม)
+        ภารกิจประจำ — แต่ละภารกิจรับซ้ำได้ทุก 2 ชั่วโมง (นับจากที่รับ ไม่สะสม)
       </div>
-      {wait > 0 && (
-        <div className="text-xs text-vermilion" data-testid="sect-quest-wait">
-          รับภารกิจสำนักครั้งต่อไปได้{realWait(msAtWorld(worldState.day, worldState.time) + wait * MS_PER_DAY, msAtWorld(worldState.day, worldState.time))}
-        </div>
-      )}
       {quests.map((q) => {
         const status = isSectQuestOfferable(worldState, q);
         const active = worldState.quests[q.id]?.status === "active";
@@ -467,7 +461,7 @@ function QuestsTab({ quests, worldState, onAccept }: QuestsTabProps) {
                 ) : status.offerable ? (
                   <span className="text-jade">พร้อมรับ</span>
                 ) : status.cooldownLeft > 0 ? (
-                  <span className="text-muted-foreground">รอรอบถัดไป</span>
+                  <span className="text-muted-foreground" data-testid="sect-quest-wait">รับซ้ำได้{realWait(at + status.cooldownLeft * MS_PER_DAY, at)}</span>
                 ) : (
                   <span className="text-muted-foreground">{status.reason ?? "—"}</span>
                 )}

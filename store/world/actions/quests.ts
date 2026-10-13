@@ -50,8 +50,13 @@ export const questsActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "a
     const before = flags[droppedQuestFlag(questId)];
     flags[droppedQuestFlag(questId)] = Math.max(typeof before === "number" ? before : 0, reached);
     draft.flags = flags;
-    // Dropping the sect quest just taken gives its two-hour turn back.
-    if (draft.sectQuestTaken?.questId === questId) draft.sectQuestTaken = null;
+    // Dropping a repeatable sect quest gives its two-hour turn back.
+    const m = def.sectId && !def.isArtQuest ? draft.sectMembership[def.sectId] : undefined;
+    if (m && def.sectId && m.lastQuestDay?.[questId] != null) {
+      const lastQuestDay = { ...m.lastQuestDay };
+      delete lastQuestDay[questId];
+      draft.sectMembership = { ...draft.sectMembership, [def.sectId]: { ...m, lastQuestDay } };
+    }
     appendActionLog(draft, "quest", `ละทิ้งภารกิจ: ${def.name} (รับใหม่ได้ภายหลัง)`);
     set({ ...draft });
     return { ok: true, questId };

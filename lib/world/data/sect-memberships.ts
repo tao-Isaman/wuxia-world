@@ -34,8 +34,8 @@ export interface SectMembershipDef {
   topRank: number;
   // Cost (sect points) to upgrade INTO this rank from the rank just below.
   rankUpCost: (targetRank: number) => number;
-  // Sect quests are taken one every two real hours, across every sect
-  // (SECT_QUEST_GAP_DAYS, lib/world/effects.ts).
+  // Each repeatable sect quest is taken again two real hours after it was
+  // last taken (SECT_QUEST_GAP_DAYS, lib/world/effects.ts).
 }
 
 // Shaolin disciple ranks. Climbing from rank 9 (entry, novice) to rank 1

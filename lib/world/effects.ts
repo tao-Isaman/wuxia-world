@@ -806,9 +806,10 @@ function recordSectQuestCompletion(state: WorldStateData, def: QuestDef): void {
   if (!def.sectId) return;
   const m = state.sectMembership[def.sectId];
   if (!m) return;
-  m.lastQuestDay = { ...m.lastQuestDay, [def.id]: state.day };
-  if (def.isArtQuest && !m.artQuestsDone.includes(def.id)) {
-    m.artQuestsDone = [...m.artQuestsDone, def.id];
+  // A repeatable quest's turn was stamped when it was taken (acceptSectQuest).
+  if (def.isArtQuest) {
+    m.lastQuestDay = { ...m.lastQuestDay, [def.id]: state.day };
+    if (!m.artQuestsDone.includes(def.id)) m.artQuestsDone = [...m.artQuestsDone, def.id];
   }
 }
 
@@ -874,23 +875,28 @@ export function isSecretSectQuest(questId: string): boolean {
 }
 
 /**
- * World days (= real hours) between two repeatable sect quests taken from the
- * sect window: one every two real hours, across every sect, and a missed turn
- * is not saved up.
+ * World days (= real hours) before a repeatable sect quest can be taken again
+ * from the sect window: each quest on its own, two real hours after it was
+ * last taken.
  */
 export const SECT_QUEST_GAP_DAYS = 2;
 
-/** World days (fractional; one is a real hour) until the next sect quest can be taken, 0 when it can. */
-export function sectQuestWait(state: Pick<WorldStateData, "sectQuestTaken" | "day" | "time">): number {
-  const taken = state.sectQuestTaken;
-  if (!taken) return 0;
-  return Math.max(0, taken.at + SECT_QUEST_GAP_DAYS - (state.day + (state.time ?? 0) / HOURS_PER_DAY));
+/**
+ * World days (fractional; one is a real hour) until this repeatable sect quest
+ * can be taken again, 0 when it can. Its turn is the stamp `acceptSectQuest`
+ * leaves in `lastQuestDay` (day + ชั่วยาม / 12).
+ */
+export function sectQuestWait(state: Pick<WorldStateData, "sectMembership" | "day" | "time">, def: QuestDef): number {
+  if (!def.sectId || def.isArtQuest) return 0;
+  const last = state.sectMembership[def.sectId]?.lastQuestDay?.[def.id];
+  if (typeof last !== "number") return 0;
+  return Math.max(0, last + SECT_QUEST_GAP_DAYS - (state.day + (state.time ?? 0) / HOURS_PER_DAY));
 }
 
 // Sect-quest offerable check — used by SectMembershipPopup. Honors:
 //   - membership prereq
 //   - rank gate (def.minSectRank)
-//   - the two-hour turn for repeatable quests (sectQuestWait)
+//   - each repeatable quest's two-hour turn (sectQuestWait)
 //   - one-shot art quests (skipped if id is in artQuestsDone)
 //   - in-progress active quests (player can't double-accept)
 export function isSectQuestOfferable(
@@ -918,12 +924,10 @@ export function isSectQuestOfferable(
   if (existing && existing.status === "active") {
     return { offerable: false, cooldownLeft: 0, reason: "กำลังทำอยู่" };
   }
-  // The two-hour turn only matters for repeatable sect quests, not one-shot
-  // art quests (gated by artQuestsDone above).
-  if (!def.isArtQuest) {
-    const wait = sectQuestWait(state);
-    if (wait > 0) return { offerable: false, cooldownLeft: wait, reason: "รับภารกิจสำนักได้ทุก 2 ชั่วโมง" };
-  }
+  // Each repeatable quest is taken again two hours after it was last taken
+  // (one-shot art quests are gated by artQuestsDone above).
+  const wait = sectQuestWait(state, def);
+  if (wait > 0) return { offerable: false, cooldownLeft: wait, reason: "ภารกิจนี้รับซ้ำได้ทุก 2 ชั่วโมง" };
   if (def.prereqs && !evaluateCondition(state, def.prereqs)) {
     return { offerable: false, cooldownLeft: 0, reason: "ยังไม่ผ่านเงื่อนไข" };
   }

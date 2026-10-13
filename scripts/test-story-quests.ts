@@ -486,12 +486,13 @@ check("secret trials: the T4 saga trials are off the sect window and offered by 
     if (!isQuestOfferable(member(rank, "active"), open)) err(`trial ${qid}: giver does not offer it at rank ${rank}`);
     if (isQuestOfferable(member(rank + 1, "active"), open)) err(`trial ${qid}: offered below rank ${rank}`);
     if (isQuestOfferable(member(rank, "resigned"), open)) err(`trial ${qid}: offered to a former member`);
-    // The สำนัก badge: with the window's two-hour turn just taken and every art quest done, the
+    // The สำนัก badge: with every repeatable quest just taken and every art quest done, the
     // secret trial (offered by its giver, hidden in the window) must not count.
     const others = getQuestsForSect(def.sectId).filter((q) => !isSecretSectQuest(q.id));
     const busy = { ...member(rank, "active") } as WorldStateData;
     const m = busy.sectMembership[def.sectId as keyof typeof busy.sectMembership]!;
-    busy.sectQuestTaken = { at: busy.day + (busy.time ?? 0) / 12, questId: "x" }; // the two-hour turn just taken
+    const takenAt = busy.day + (busy.time ?? 0) / 12;
+    m.lastQuestDay = Object.fromEntries(others.filter((q) => !q.isArtQuest).map((q) => [q.id, takenAt])); // each one's turn just taken
     m.artQuestsDone = others.filter((q) => q.isArtQuest).map((q) => q.id);
     if (sectActionCount(busy) !== 0) err(`trial ${qid}: the sect badge counts something the window doesn't offer`);
   }
