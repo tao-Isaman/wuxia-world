@@ -91,7 +91,7 @@ export function describeBuff(b: BuffRecord): BuffDescription {
     case "buff_riposte":
       return {
         title: "พร้อมสวนกลับ",
-        detail: `โจมตีกายครั้งถัดไปแรงขึ้น ${b.v}% · ใช้ได้ 1 ครั้ง แม้โจมตีพลาดก็เสียสิทธิ์ · ไม่หมดระหว่างตาศัตรู`,
+        detail: `โจมตีภายนอกครั้งถัดไปแรงขึ้น ${b.v}% · ใช้ได้ 1 ครั้ง แม้โจมตีพลาดก็เสียสิทธิ์ · ไม่หมดระหว่างตาศัตรู`,
       };
     case "buff_spd":
       return {

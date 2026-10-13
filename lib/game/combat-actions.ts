@@ -49,7 +49,7 @@ export function resolveCombatAction(state: BattleState, ctx: BattleContext, acti
     const amount = Math.max(0, Math.min(GUARD_REDUCTION, 95 - reduction));
     state.st.A.buffs.push({ t: "buff_reduce", n: "ตั้งรับ", v: amount, u: 2 });
     state.st.A.buffs.push({ t: "buff_riposte", n: "สวนกลับ", v: RIPOSTE_BONUS, u: 1 });
-    logLine(state, "lA", `[${state.turn}] ตั้งรับ → ปราณ −${GUARD_MP_COST} · ลดรับ ${amount}% จังหวะถัดไป · โจมตีกายครั้งถัดไป +${RIPOSTE_BONUS}% (ใช้สิทธิ์แม้พลาด)`);
+    logLine(state, "lA", `[${state.turn}] ตั้งรับ → ปราณ −${GUARD_MP_COST} · ลดรับ ${amount}% จังหวะถัดไป · โจมตีภายนอกครั้งถัดไป +${RIPOSTE_BONUS}% (ใช้สิทธิ์แม้พลาด)`);
   } else {
     const amount = Math.min(state.dA.MP - state.mpA, recoveryAmount(state.dA.MP));
     state.mpA += amount;

@@ -246,7 +246,7 @@ export function applySelfEffect(
     case "buff_iatk_reduce":
       addBuff(state, side, { t: "buff_iatk", n: "ลมปราณอุดร", v: eff.iv, u: eff.u });
       addBuff(state, side, { t: "buff_reduce", n: "ลดรับ", v: eff.rv, u: eff.u });
-      logLine(state, "lS", `&nbsp;⟳ ${nm}: โจมตีใน +${eff.iv}% + ลดรับ${eff.rv}%(${eff.u}ตา)`);
+      logLine(state, "lS", `&nbsp;⟳ ${nm}: โจมตีภายใน +${eff.iv}% + ลดรับ${eff.rv}%(${eff.u}ตา)`);
       return;
     case "buff_reflect_eva":
       addBuff(state, side, { t: "buff_reflect", n: "ดาวคล้อย", v: eff.rv, u: eff.u });

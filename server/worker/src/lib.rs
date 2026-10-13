@@ -38,7 +38,7 @@ use keys::signing_key;
 /// TypeScript half uses the same, `server/worker/ts/env.ts`). Raising it starts
 /// the server over — no accounts, characters, saves or world, and a new
 /// signing key. Generation 2 began 2026-10-11.
-pub(crate) const DATA_EPOCH: &str = "3";
+pub(crate) const DATA_EPOCH: &str = "4";
 
 /// The name of a Durable Object in this data generation.
 pub(crate) fn object_name(name: &str) -> String {

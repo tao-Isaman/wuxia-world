@@ -17,7 +17,7 @@ export interface Env {
  * starts the server over with no accounts, characters, saves or world, and a
  * new signing key (old sessions sign out). Generation 2 began 2026-10-11.
  */
-export const DATA_EPOCH = "3";
+export const DATA_EPOCH = "4";
 
 export const accountObjectName = (username: string) => `${DATA_EPOCH}:${username}`;
 export const battleObjectName = (username: string, characterId: string) => `${DATA_EPOCH}:${username}:${characterId}`;

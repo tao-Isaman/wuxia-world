@@ -473,8 +473,8 @@ Each of the 17 kinds is equally likely, and a piece never rolls one kind twice:
 | Option | Range |
 | --- | --- |
 | a base stat (กำลัง … ฉลาด, random) | +1–10 |
-| ป้องกันกาย / ป้องกันใน / โจมตีกาย / โจมตีใน | +5–15 each |
-| ป้องกันกาย / ป้องกันใน / โจมตีกาย / โจมตีใน % (on the whole stat) | +1–10 % each |
+| ป้องกันกาย / ป้องกันใน / โจมตีภายนอก / โจมตีภายใน | +5–15 each |
+| ป้องกันกาย / ป้องกันใน / โจมตีภายนอก / โจมตีภายใน % (on the whole stat) | +1–10 % each |
 | แม่นยำ % / หลบหลีก % | +1–15 % each |
 | คริติคอล / ต้านทานคริติคอล | +5–15 each |
 | ความเสียหายคริติคอล (the ×1.5 crit becomes ×1.5 + v/100) | +1–10 % |
@@ -493,7 +493,7 @@ A base-stat option counts in battle and everywhere stats are shown, but not for 
 | weapon | พลังโจมตี +10 | พลังโจมตี +15, ความเสียหายสุดท้าย +1 % | พลังโจมตี +20, ความเสียหายสุดท้าย +4 % | +135, +11 % |
 | robe, hat, boots, bracers | ป้องกันกาย / ใน +10, HP +50 | +15, HP +100 | +20, HP +150 | +135 each, HP +850 |
 | charm | HP and MP +50 | +100 | +150 | +850 each |
-| ring | โจมตีกาย / ใน +5 | +10 | +15 | +85 each |
+| ring | โจมตีภายนอก / ภายใน +5 | +10 | +15 | +85 each |
 
 Success odds by the level aimed at: +1 100 %, +2 95, +3 90, +4 85, +5 80, +6 65, +7 55, +8 45, +9 30, +10 20 %. A failure aiming at +1–5 costs only the stones; at +6–8 the piece drops a level; at +9–10 it breaks and is gone (the shop asks first). ความเสียหายสุดท้าย multiplies every hit the wearer lands, moves and art actives alike. The stones drop from tier-1-and-up foes (10 / 15 / 20 / 25 / 30 % for T1–T5, 1–3 of them) and always 2–4 from a legendary beast. An enhanced piece shows as "+7 ดาบ…"; a re-roll of its options keeps the level.
 
