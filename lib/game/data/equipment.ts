@@ -15,7 +15,7 @@ const AUTHORED_EQUIPMENT: readonly Equipment[] = [
   { id: "W2", n: "ดาบทองคำ", ty: "W", fam: "blade", ti: 1, atkb: 71, pdb: 0, idb: 0, hpb: 24, mpb: 0, pab: 23, iab: 7, accb: 14, crib: 8, st: {}, eff: null },
   { id: "W3", n: "ดาบเพลิง", ty: "W", fam: "blade", ti: 2, atkb: 75, pdb: 10, idb: 10, hpb: 30, mpb: 120, pab: 20, iab: 20, crib: 10, st: {}, eff: { t: "pct_atk", v: 10 } },
   { id: "W4", n: "ดาบพิษ", ty: "W", fam: "blade", ti: 3, atkb: 55, pdb: 0, idb: 0, hpb: 0, mpb: 0, pab: 18, iab: 18, accb: 20, crib: 8, resb: 8, st: {}, eff: { t: "on_hit", db: { t: "debuff_eva", v: -10, u: 2 } } },
-  { id: "W5", n: "ดาบมังกรเทพ", ty: "W", fam: "blade", ti: 4, atkb: 110, pdb: 0, idb: 0, hpb: 30, mpb: 0, pab: 24, iab: 4, spdb: 12, evab: 12, accb: 8, crib: 10, st: {}, eff: { t: "flat_cri", v: 20 } },
+  { id: "W5", n: "ดาบมังกรเทพ", ty: "W", fam: "sword", ti: 4, atkb: 110, pdb: 0, idb: 0, hpb: 30, mpb: 0, pab: 24, iab: 4, spdb: 12, evab: 12, accb: 8, crib: 10, st: {}, eff: { t: "flat_cri", v: 20 } },
   // Music instruments — fight as weak weapons but tag the W slot for the
   // music life-skill so practiceMusic() works.
   { id: "W_flute", n: "ขลุ่ยไผ่", ty: "W", fam: "music", ti: 1, atkb: 22, pdb: 12, idb: 12, hpb: 0, mpb: 94, iab: 8, st: {}, eff: null, instrument: true },
