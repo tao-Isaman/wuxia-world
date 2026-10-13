@@ -7,6 +7,7 @@ import { useWorldStore } from "@/store/world-store";
 import { CharacterPreview } from "@/components/game/character-preview";
 import { npcCharacterId } from "@/lib/characters/catalog";
 import { DialogDisplay, useHeroNamer } from "./dialog-display";
+import { beatVoice } from "@/lib/world/speaker";
 import { visibleLength } from "./rich-text";
 import { keyTick } from "@/lib/audio/engine";
 import { ChoicePanel } from "./choice-panel";
@@ -74,7 +75,12 @@ export function DialogStage({ scene, speaker, title, locationName }: {
   const skip = () => { setAt(beats - 1); setShown(Number.MAX_SAFE_INTEGER); };
   const heading = useRef<HTMLHeadingElement>(null);
   const content = useRef<HTMLDivElement>(null);
-  const portrait = speaker ? npcPortrait(speaker.id) : undefined;
+  // The face and name tag follow whoever speaks the beat on screen (narration
+  // keeps the last voice); before any line, the person the talk is with.
+  const voice = instant ? null : beatVoice(state, scene.id, lines, at);
+  const facing: DialogSpeaker | undefined = voice ? (voice.kind === "npc" ? voice.npc : undefined) : speaker;
+  const portrait = facing ? npcPortrait(facing.id) : undefined;
+  const heroFace = voice?.kind === "hero";
   const visibleChoices = (scene.choices ?? []).map((choice, index) => ({ choice, index }))
     .filter(({ choice }) => !choice.visibleIf || evaluateCondition(state, choice.visibleIf));
   const leave = visibleChoices.find(({ choice }) => choice.next === state.lastLocationId && !choice.effects?.length);
@@ -139,7 +145,9 @@ export function DialogStage({ scene, speaker, title, locationName }: {
     advance();
   };
   // A heading taken from a line's speaker may be "{hero}": the player's name.
-  const name = named(speaker?.name ?? title ?? "บทสนทนา");
+  const name = voice
+    ? voice.kind === "hero" ? named("{hero}") : named(voice.name)
+    : named(speaker?.name ?? title ?? "บทสนทนา");
 
   // Film layout (the cutscene standard): letterbox bars, the speaker standing
   // at the left, the line as a subtitle at the bottom, choices beside it.
@@ -148,7 +156,7 @@ export function DialogStage({ scene, speaker, title, locationName }: {
       data-typing={typing || undefined}
       style={{ "--dialog-scale": scale } as React.CSSProperties}>
       <section
-        className={`${styles.panel} ${portrait || speaker ? styles.withBust : ""}`}
+        className={`${styles.panel} ${portrait || facing || heroFace ? styles.withBust : ""}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby={headingId}
@@ -195,12 +203,14 @@ export function DialogStage({ scene, speaker, title, locationName }: {
             </button>}
           </div>
         </div>
-        {(portrait || speaker) && <div className={styles.bust} aria-hidden="true">
-          {portrait ? (
+        {(portrait || facing || heroFace) && <div className={styles.bust} aria-hidden="true" data-voice={heroFace ? "hero" : facing?.id}>
+          {heroFace ? <div className={styles.portrait}>
+            <CharacterPreview key="hero" id={state.playerBodyId} animate framing="bust" />
+          </div> : portrait ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img className={styles.portrait} src={portrait} alt="" draggable={false} />
-          ) : speaker && <div className={styles.portrait}>
-            <CharacterPreview id={npcCharacterId(speaker.id)} animate framing="bust" />
+          ) : facing && <div className={styles.portrait}>
+            <CharacterPreview key={facing.id} id={npcCharacterId(facing.id)} animate framing="bust" />
           </div>}
         </div>}
         <div ref={content} className={`${styles.content} ${showChoices ? styles.hasChoices : ""}`} tabIndex={0} role="region" aria-label="บทสนทนาและตัวเลือก">

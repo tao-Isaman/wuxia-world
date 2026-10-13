@@ -12,7 +12,7 @@
 import assert from "node:assert/strict";
 import { NPCS, QUESTS, SCENES, SCENES_BY_ID, START_SCENE_ID, evaluateCondition, getNpc, getQuest, getScene, type Condition, type DialogScene, type Scene, type SceneEffect } from "../lib/world";
 
-import { dialogSpeaker, npcForSpeaker, questIdOfScene, sceneCast } from "../lib/world/speaker";
+import { beatVoice, dialogSpeaker, npcForSpeaker, questIdOfScene, sceneCast } from "../lib/world/speaker";
 import { npcCharacterId } from "../lib/characters/catalog";
 
 const memory = new Map<string, string>();
@@ -310,6 +310,29 @@ check("the pirate cache is dug up, fought for and carried home", () => {
   choose(/แบกกล่อง/);
   assert.equal(store().quests.qv_wuxia_pirate_cache.status, "active", "the box still has to reach Deng");
   assert.equal(stageId("qv_wuxia_pirate_cache"), "return_cache");
+});
+
+check("the dialog face and name tag follow whoever speaks each line, not whoever began the talk", () => {
+  // หุบเขาตัดใจ (Gumu saga): the hero speaks, then ผู้เฒ่าหลิน, a walk-on with no face.
+  const scene = getScene("st_st_gumu_sixteen_years_03_s2") as DialogScene;
+  const at = (i: number) => beatVoice({}, scene.id, scene.lines, i);
+  assert.equal(at(0), null, "narration before any line: the stage keeps who the talk is with");
+  assert.deepEqual(at(1), { kind: "hero" });
+  assert.deepEqual(at(2), { kind: "walkon", name: "ผู้เฒ่าหลิน" });
+  // Every line of every dialog: a known speaker's beat shows that speaker, the hero's the hero.
+  let known = 0;
+  for (const sc of SCENES) {
+    if (sc.kind !== "dialog") continue;
+    sc.lines.forEach((line, i) => {
+      if (line.t !== "dialogue") return;
+      const voice = beatVoice({}, sc.id, sc.lines, i)!;
+      if (line.speaker.includes("{hero}")) return assert.equal(voice.kind, "hero", `${sc.id} #${i}`);
+      const npc = npcForSpeaker(line.speaker, sceneCast(sc.id));
+      if (npc) { known++; assert.equal(voice.kind === "npc" && voice.npc.id, npc.id, `${sc.id} #${i}: ${line.speaker}`); }
+      else assert.equal(voice.kind, "walkon", `${sc.id} #${i}: ${line.speaker}`);
+    });
+  }
+  assert.ok(known > 1000, `${known} lines by known people`);
 });
 
 console.log(`${checks} quest dialog checks passed`);

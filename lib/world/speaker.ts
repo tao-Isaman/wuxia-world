@@ -128,3 +128,35 @@ export function voiceLabel(state: Partial<Pick<WorldStateData, "npcExt" | "assas
   const voice = livingVoice(state, npc);
   return voice ? npcBaseName(voice.name) : label;
 }
+
+/** Who speaks one line: the hero, a known person (with their face), or a walk-on (a name, no face). */
+export type LineVoice =
+  | { kind: "hero" }
+  | { kind: "npc"; npc: Named; name: string }
+  | { kind: "walkon"; name: string };
+
+export function lineVoice(state: Partial<Pick<WorldStateData, "npcExt" | "assassinatedNpcIds">>, sceneId: string, label: string): LineVoice {
+  if (label.includes("{hero}")) return { kind: "hero" };
+  const npc = livingVoice(state, npcForSpeaker(label, sceneCast(sceneId)));
+  const name = voiceLabel(state, sceneId, label);
+  return npc ? { kind: "npc", npc, name } : { kind: "walkon", name };
+}
+
+/**
+ * Who the dialog stage shows for the beat on screen: the speaker of the last
+ * spoken line up to it (narration keeps the last voice), or null before any —
+ * then the stage keeps the person the conversation is with. So the face and
+ * name tag always belong to whoever is talking, not to whoever started it.
+ */
+export function beatVoice(
+  state: Partial<Pick<WorldStateData, "npcExt" | "assassinatedNpcIds">>,
+  sceneId: string,
+  lines: readonly DialogScene["lines"][number][],
+  at: number,
+): LineVoice | null {
+  for (let i = Math.min(at, lines.length - 1); i >= 0; i--) {
+    const line = lines[i]!;
+    if (line.t === "dialogue") return lineVoice(state, sceneId, line.speaker);
+  }
+  return null;
+}

@@ -6,6 +6,10 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-13
 
+### The face in a conversation is whoever is speaking
+
+- **Per-line voice** (`beatVoice`, `lib/world/speaker.ts`): the dialog stage showed the face and name of the person the talk began with for every line, so another speaker's words sat under the wrong portrait (1181 dialogs have more than one speaker). Now each beat shows its own speaker: a known person's portrait, the hero's own figure for the hero's lines, a walk-on's name with no face; narration keeps the last voice. `test:quests` checks every line of every dialog; `hero-name.spec.ts` walks the beats.
+
 ### {hero} is the hero's name everywhere in a conversation
 
 - **The speaker heading** over the conversation box took its name from the first line's speaker, and 180 story dialogs open on the hero, so it read `{hero}`. The heading and the choices now go through the same namer as the lines (`useHeroNamer`); an e2e (`hero-name.spec.ts`) opens one and checks no `{hero}` is on screen.
