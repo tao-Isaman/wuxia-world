@@ -55,6 +55,7 @@ A reload during a battle restarts that battle from the start with the hero's sav
 | Where | `currentSceneId`, `lastLocationId`, `visitedLocationIds` |
 | Time | `day`, `time` (0 to below 12 ชั่วยาม): the world clock's, set on every action (`syncClock`) — saved so a reload shows where the hero was; `startDay` (v28): the world day the hero entered the jianghu (`startNewGame`) — progress that grows with the hero's own days (foe power, `playerPowerIndex`; the game-over day count) reads `daysInJianghu` = `day − startDay` (`lib/world/clock.ts`), never the world's `day` |
 | Money and bag | `gold`, `inventory` (item id → count), `inventoryEquipment` (gear key → count; a key is the equipment id plus its enhancement and options, `eq_t1_w_sword~en:7,pa:6,cri:9`, [combat.md](combat.md#gear-options-libgamegearts)) |
+| A party fight | `pendingBattle.raid`: `{ bossId, fight, unit }` — a world boss fought by a party on the server ([online.md](online.md#world-bosses)); no version change |
 | Sect quest turn (v30) | `sectQuestTaken`: `{ at, questId }` or `null` — the last repeatable sect quest taken (a world stamp, day + ชั่วยาม / 12); the next waits two real hours |
 | Looks (v29) | `appearance`: `{ outfit, hideWeapon }` (the outfit worn, ซ่อนอาวุธ); `wardrobe`: the found outfits (read from their items) (the others unlock from the save itself: sects, the tournament) — [design/appearance.md](design/appearance.md) |
 | Progress | `wExp`, `skillLevel`, `skillExp`, `artExp`, `meridianPoints`, `statExp`, `lifeSkillXp` (19 keys), `learnedRecipeIds` |

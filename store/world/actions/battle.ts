@@ -3,6 +3,7 @@ import { getArt, getEquip, getSkill } from "@/lib/game";
 import { STAT_XP_PER_ACTION } from "@/lib/world/stat-progression";
 import { useBattleStore } from "@/store/battle-store";
 import { cloudBattle, useCloudBattle } from "@/store/cloud-battle";
+import { cloudRaid } from "@/store/cloud-raid";
 import { packOpponentIdOf } from "@/lib/world/battle-looks";
 import { getItem, getNpc, getOpponent, getResource, getScene, masteryLevel } from "@/lib/world";
 import { applyEffect, tickQuestProgress } from "@/lib/world/effects";
@@ -37,16 +38,32 @@ export const battleActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "c
     // A battle the game server checks ends on the server's verdict and pays
     // the spoils it rolled (store/cloud-battle.ts). A battle it refused counts
     // as left: no rewards, no harm.
-    const checked = cloudBattle.checking();
-    if (checked && useCloudBattle.getState().status !== "done") return;
+    // A world boss fought by a party (store/cloud-raid.ts) ends on the server's
+    // verdict too; a fight called off (or gone) counts as left.
+    const raid = !!s.pendingBattle.raid;
+    const raidFight = raid ? cloudRaid.fight() : null;
+    if (raid && raidFight && raidFight.phase !== "over") return;
+    const checked = raid || cloudBattle.checking();
+    if (!raid && checked && useCloudBattle.getState().status !== "done") return;
     const local = useBattleStore.getState().state;
-    const verdict = checked ? cloudBattle.verdict() : null;
-    const battleState = !checked || !local ? local
+    const verdict = raid ? cloudRaid.verdict() : checked ? cloudBattle.verdict() : null;
+    // A party fight that is gone (called off, forgotten) with nothing on screen: it simply ends.
+    if (raid && !verdict && !local) {
+      cloudRaid.stop();
+      set({ pendingBattle: null });
+      return;
+    }
+    // A party fight whose screen was lost (a reload): the verdict alone carries it.
+    const shown = local ?? (raid && verdict
+      ? ({ units: [], log: [], events: [], skillUses: { A: {}, B: {} }, artUses: { A: {}, B: {} }, hitsReceived: {} } as unknown as NonNullable<typeof local>)
+      : null);
+    const battleState = !checked || !shown ? shown
       : verdict
-        ? { ...local, winner: verdict.winner, escaped: verdict.escaped, hA: verdict.hA, mpA: verdict.mpA, itemsUsed: verdict.itemsUsed }
-        : { ...local, winner: null, escaped: true, hA: s.currentHp, mpA: s.currentMp, itemsUsed: {} };
+        ? { ...shown, winner: verdict.winner, escaped: verdict.escaped, hA: verdict.hA, mpA: verdict.mpA, itemsUsed: verdict.itemsUsed }
+        : { ...shown, winner: null, escaped: true, hA: s.currentHp, mpA: s.currentMp, itemsUsed: {} };
     const serverSpoils = checked ? verdict?.spoils ?? { gold: 0, wExp: 0, items: [], moves: [], hunt: null, gear: [] } : null;
-    if (checked) cloudBattle.stop();
+    if (raid) cloudRaid.stop();
+    else if (checked) cloudBattle.stop();
     const winner = battleState?.winner;
     if (battleState?.escaped) {
       // Retreat: the fight simply ends. No rewards, no defeat; the player
@@ -303,12 +320,13 @@ export const battleActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "c
         (lootSummary.length > 0 ? ` · ${lootSummary.join(", ")}` : ""),
     );
 
-    // A legendary beast fell: it is gone for 90 days and the jianghu hears of it.
-    // The beast belongs to the shared world: its fall is a world event.
+    // A legendary beast fell: it is gone for three real hours and the jianghu
+    // hears of it. Online the beast is the server's (RaidObject keeps its fall);
+    // without a server the fall is a world event here.
     if (oppDef?.boss) {
-      emitWorldEvent(draft, { t: "boss_slain", bossId: oppDef.id, byPlayer: heroTag(draft), day: draft.day });
+      if (!pb.raid) emitWorldEvent(draft, { t: "boss_slain", bossId: oppDef.id, byPlayer: heroTag(draft), day: draft.day });
       const boss = getBoss(oppDef.id);
-      if (boss) appendActionLog(draft, "boss", `ปราบ${boss.name}สำเร็จ! ข่าวนี้จะลือไปทั่วยุทธภพ — มันจะกลับมาอีกใน ${boss.respawnDays} วัน`);
+      if (boss) appendActionLog(draft, "boss", `ปราบ${boss.name}สำเร็จ${pb.raid ? "พร้อมคณะ" : ""}! ข่าวนี้จะลือไปทั่วยุทธภพ — มันจะกลับมาอีกใน 3 ชั่วโมง`);
     }
 
     // Now that loot, kill counts, and skill xp have all been written,

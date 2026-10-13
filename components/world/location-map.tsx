@@ -13,6 +13,7 @@ import { WorldCanvas } from "@/components/game/world-canvas";
 import { clearArrivalFrom, forgetMapPosition, peekArrivalFrom, type WorldMarker, type WorldPresentation } from "@/lib/stage/types";
 import { capitalVignette } from "@/lib/stage/world-vignettes";
 import { bossFoesAt, roamingFoesOn } from "./roaming-foes";
+import { useRaid } from "@/store/cloud-raid";
 import { resolveRumorChannel } from "./rumor-listen-button";
 import { hasStation } from "@/lib/world/stations";
 import { FERRYMAN, hasFerry } from "@/lib/world/ferries";
@@ -44,6 +45,8 @@ export function LocationMap({ scene, map, handlers, readOnly = false, dialogueSp
   scene: LocationScene; map: LocationMapDef; handlers: MapSpotHandlers; readOnly?: boolean; dialogueSpeakerId?: string;
 }) {
   const state = useWorldStore();
+  // The world bosses' states (online): a beast that fell or returned redraws its lair.
+  useRaid((s) => s.bosses);
   const workPose = useLoadingStore((s) => s.active ? s.pose : null);
   const lastInteractivePresentation = useRef<WorldPresentation | null>(null);
   // Objects placed by the engine's map editor (null while they load).

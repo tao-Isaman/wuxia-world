@@ -11,8 +11,10 @@ export type WorldReply = (
   | { rev: number; same: true }
   | { rev: number; same?: false; day: number; time: number; world: SharedWorld }
 ) & {
-  /** The server's clock (ms) when it answered: the browser keeps to it (lib/world/clock.ts setClockOffset). */
+  /** The server's clock (ms) when it answered: the browser keeps to it (lib/world/clock.ts syncClockToServer). */
   now?: number;
+  /** The world bosses (docs/online.md "World bosses"): when each fell, who is fighting it. */
+  bosses?: Record<string, import("./raid-protocol").BossStatus>;
 };
 
 /** What the hero did, as the jianghu will tell it (`POST /world/echo`); the server writes the rumor. */

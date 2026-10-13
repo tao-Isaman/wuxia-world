@@ -30,7 +30,8 @@ export interface BossDef {
   lore: string;
 }
 
-export const BOSS_RESPAWN_DAYS = 90;
+/** World days (one is a real hour) a felled beast stays away: three real hours (online, RaidObject keeps the same). */
+export const BOSS_RESPAWN_DAYS = 3;
 
 export const BOSSES: readonly BossDef[] = [
   { id: "boss_golden_serpent", name: "งูยักษ์เกล็ดทองคำ", lair: "cave_jinshe", spot: { x: 82, y: 32 },

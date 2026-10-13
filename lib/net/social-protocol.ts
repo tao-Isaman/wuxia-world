@@ -92,6 +92,8 @@ export type SocialPush =
   | { t: "party"; party: PartyView | null }
   | { t: "party_invite"; invite: PartyInvite }
   | { t: "party_chat"; from: PlayerRef; text: string; at: number }
+  /** The party's leader opened a fight with a world boss (lib/net/raid-protocol.ts): join at its lair. */
+  | { t: "raid_invite"; invite: { bossId: string; raid: string; from: string; until: number | null } }
   | { t: "refresh" };
 
 /** What the browser tells its hub over the socket (browser → server). */

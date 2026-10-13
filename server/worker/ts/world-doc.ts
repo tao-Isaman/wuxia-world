@@ -16,6 +16,8 @@ import { rebaseDays } from "@/lib/world/shared/rebase";
 import { sharedSlice, type SharedWorld } from "@/lib/world/shared/world";
 import type { WorldStateData } from "@/lib/world/types";
 import { bossSlain } from "@/lib/world/victory";
+import { getBoss } from "@/lib/world/data/bosses";
+import type { BossStatus } from "@/lib/net/raid-protocol";
 import { scheduleTournamentWarning } from "@/lib/world/tournament";
 import { emptyData } from "@/store/world/state";
 
@@ -30,6 +32,8 @@ export interface WorldDoc {
   pins: Record<string, { ids: string[]; until: number }>;
   /** Per player: when their recent echoes came (ms), for the rate limit. */
   echoes: Record<string, number[]>;
+  /** The world bosses as their RaidObjects last told (docs/online.md "World bosses"). */
+  bosses?: Record<string, BossStatus>;
 }
 
 /** A player's pins last this long without being sent again (two game days). */
@@ -173,10 +177,21 @@ export function killInWorld(doc: WorldDoc, npcId: string, player: string, locati
   return true;
 }
 
-/** A legendary beast fell to a player (checked): the jianghu hears of it. */
-export function bossFellInWorld(doc: WorldDoc, bossId: string, player: string): boolean {
+/** A world boss's state, as its RaidObject tells it; a fall is news. Returns whether anything changed. */
+export function setBossStatus(doc: WorldDoc, bossId: string, status: BossStatus, fell: boolean): boolean {
+  if (!getBoss(bossId)) return false;
+  const before = JSON.stringify(doc.bosses?.[bossId] ?? null);
+  doc.bosses = { ...(doc.bosses ?? {}), [bossId]: status };
+  if (fell) bossFellInWorld(doc, bossId, "", status.fellBy ?? []);
+  const changed = fell || JSON.stringify(status) !== before;
+  if (changed && !fell) doc.rev++;
+  return changed;
+}
+
+/** A legendary beast fell to a player (checked) or a party: the jianghu hears of it. */
+export function bossFellInWorld(doc: WorldDoc, bossId: string, player: string, party: string[] = []): boolean {
   const state = shell(doc);
-  const boss = bossSlain(state, bossId, state.day);
+  const boss = bossSlain(state, bossId, state.day, party);
   if (!boss) return false;
   const rumor = state.rumorPool.find((r) => r.id === `rumor_boss_${boss.id}_${state.day}`);
   if (rumor) recordWorldEvent(state, { t: "rumor", rumor });

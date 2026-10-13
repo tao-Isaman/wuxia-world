@@ -6,6 +6,13 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-13
 
+### World bosses are the world's, fought by a party
+
+- **One of each beast for everyone**: online each legendary beast is kept by the server (a `RaidObject` per beast); every world reply says when each fell and who is fighting it, and a lair's map shows it only while it waits. It is back **three real hours** after it falls (offline too: `BOSS_RESPAWN_DAYS` = 3, was 90).
+- **A party fight**: the party's leader (2–4 people) walks into the beast at its lair; the others get an invitation card (เข้าร่วม at the lair, 🧭 นำทาง otherwise) and a gathering card shows who has come (เริ่มสู้เลย with two or more). While a party fights a beast nobody else can.
+- **One board for everyone**: the server plays the fight; each screen replays it, and a player acts for their own hero when its turn comes (30 s, then the AI plays it; อัตโนมัติ hands it to the AI). The beast is sturdier for each extra person. No items or retreat in a party fight.
+- **Full spoils for each**: a win gives every member their own verdict and spoils and fells the beast for everyone (the inns say which party did it); a beast is never a solo checked fight any more (`boss_party`).
+
 ### The player's schedules run on real time (save v30)
 
 - **Sect quests every two hours**: the sect window gives one repeatable sect quest every two real hours, across every sect, and a missed turn is not saved up (was: each quest again 30 hours after it was done). Dropping the quest just taken gives the turn back. The window says when the next one opens (`SECT_QUEST_GAP_DAYS`, `sectQuestWait`, save `sectQuestTaken`).

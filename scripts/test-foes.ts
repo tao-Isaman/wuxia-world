@@ -280,15 +280,15 @@ check("legendary beasts: six bosses, power 1100–1600, minions, lairs on a reac
   assert.equal(regions.size, 6, "one lair each");
 });
 
-check("bosses: alive until beaten, back after 90 days; bossesAt; save v26 migrate and repair", () => {
+check("bosses: alive until beaten, back after three real hours (3 world days); bossesAt; save v26 migrate and repair", () => {
   const state = { day: 100, bossDefeatedDay: {} as Record<string, number> };
   assert.deepEqual(bossesAt(state, "cave_jinshe").map((b) => b.id), ["boss_golden_serpent"]);
   assert.deepEqual(bossesAt(state, "city_capital"), []);
   state.bossDefeatedDay.boss_golden_serpent = 100;
   assert.equal(bossAlive(state, "boss_golden_serpent"), false);
   assert.deepEqual(bossesAt(state, "cave_jinshe"), []);
-  state.day = 189; assert.equal(bossAlive(state, "boss_golden_serpent"), false);
-  state.day = 190; assert.equal(bossAlive(state, "boss_golden_serpent"), true, "back after 90 days");
+  state.day = 102; assert.equal(bossAlive(state, "boss_golden_serpent"), false);
+  state.day = 103; assert.equal(bossAlive(state, "boss_golden_serpent"), true, "back after three real hours");
   assert.equal(bossAlive(state, "nobody"), false);
   // bossSlain stamps the day and spreads big news.
   const world = freshState();

@@ -455,7 +455,7 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
     const g = overlayGfx!;
     g.clear();
     let mode = "none";
-    const playerTurn = idle && isPlayerTurn(state, auto);
+    const playerTurn = idle && useBattleStore.getState().queued === 0 && isPlayerTurn(state, auto, useBattleStore.getState().control);
     const active = state.activeId ? state.units.find((o) => o.id === state.activeId) : undefined;
     if (playerTurn && active) {
       if (ui.slot === null) {
@@ -1215,8 +1215,9 @@ export function createGridBattleRuntime(parent: HTMLElement, options: GridBattle
           setPlaying(false);
         }
       }
-      // Pace the AI: one visible beat after the last animation settles.
-      if (!current && !playing && state.phase !== "over" && !isPlayerTurn(state, store.auto)) {
+      // Pace the AI: one visible beat after the last animation settles. A party
+      // fight plays the server's commands as they come, whoever's turn it is here.
+      if (!current && !playing && state.phase !== "over" && (store.queued > 0 || !isPlayerTurn(state, store.auto, store.control))) {
         const pace = (reduced ? 200 : STEP_PACE) * (state.phase === "moved" ? 0.6 : 1);
         if (elapsed - idleSince >= pace && elapsed - lastStepAt >= pace) {
           lastStepAt = elapsed;

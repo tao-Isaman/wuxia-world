@@ -28,7 +28,7 @@ console.warn = (...args: unknown[]) => { if (!String(args[0]).includes("zustand 
 
 const {
   ApiFailure, checkToken, claimMail, connectRoom, createCharacter, deleteCharacter, finishBattle, listCharacters, loadSave, loadSocial,
-  loadWorld, logBattle, login, partyAction, postEcho, register, sendMail, socialAction, socialUrl, startBattle, storeSave,
+  loadRaid, loadWorld, logBattle, login, partyAction, postEcho, postRaid, register, sendMail, socialAction, socialUrl, startBattle, storeSave,
 } = await import("../lib/net/client");
 type SocialPush = import("../lib/net/social-protocol").SocialPush;
 type RoomConnection = import("../lib/net/client").RoomConnection;
@@ -37,7 +37,7 @@ type BattleStartReply = import("../lib/net/play-protocol").BattleStartReply;
 const { useWorldStore } = await import("../store/world-store");
 const { partializeSave } = await import("../store/world/persist");
 const { SAVE_VERSION } = await import("../store/world/save-version");
-const { setSessionAuto, startSession, stepSession } = await import("../lib/game/grid/session");
+const { applyCommand, setSessionAuto, startSession, stepSession } = await import("../lib/game/grid/session");
 const { OPPONENTS } = await import("../lib/world/data/opponents");
 const { BOSSES } = await import("../lib/world/data/bosses");
 const { npcFoeFor } = await import("../lib/world/npc-life");
@@ -290,7 +290,7 @@ await check("the shared world: one for every account; a deed becomes a rumor the
   assert.ok(Object.keys(forAnn.world.npcExt).length >= 30, "its people live on the server");
   const same = await loadWorld(server, annToken, forAnn.rev);
   assert.equal(typeof same.now, "number", "every answer carries the server's clock");
-  assert.deepEqual({ ...same, now: undefined }, { rev: forAnn.rev, same: true, now: undefined });
+  assert.deepEqual({ rev: same.rev, same: same.same }, { rev: forAnn.rev, same: true });
   const before = forAnn.world.rumorPool.length;
   const { rev } = await postEcho(server, annToken, {
     actionId: "sect_join", context: { archetype: "นักท่องยุทธ์", sceneId: "city_capital", sectId: "shaolin" },
@@ -363,12 +363,10 @@ await check("battles: a log that does not fit the fight is refused, and no fight
   assert.equal(await refusal(startBattle(server, annToken, heroId)), "no_character", "only the owner's characters");
 });
 
-await check("battles: a felled beast rests for this hero; a killing of a simulated person reaches the world", async () => {
+await check("battles: a beast is never a solo fight; a killing of a simulated person reaches the world", async () => {
   const boss = BOSSES[0]!;
   await standBefore({ opponentId: boss.id, onWin: boss.lair, onLose: "home_player" }, 100_000);
-  const { verdict } = await fight(await startBattle(server, bobToken, heroId));
-  assert.equal(verdict.winner, "A");
-  assert.equal(await refusal(startBattle(server, bobToken, heroId)), "boss_resting");
+  assert.equal(await refusal(startBattle(server, bobToken, heroId)), "boss_party", "the world's beasts are fought by a party");
   const world = await loadWorld(server, bobToken);
   assert.ok(!world.same);
   if (world.same) return;
@@ -524,6 +522,76 @@ await check("party: invite, accept, party chat; a companion on the map lifts a c
   await partyAction(server, annToken, "leave", {});
   await pushed(bobSocial.inbox, "party", 5000, (m) => m.party === null);
   assert.equal((await loadSocial(server, bobToken)).party, null);
+});
+
+// ─── World bosses (docs/online.md "World bosses") ─────────────────────
+
+/** A strong hero of `token`'s character standing at `place`, saved on the server. */
+async function saveHeroAt(token: string, characterId: string, name: string, place: string): Promise<void> {
+  useWorldStore.getState().startNewGame({ name, gender: "female", newWorld: true });
+  const s = useWorldStore.getState();
+  const stats = Object.fromEntries(Object.keys(s.playerBuild!.stats).map((k) => [k, 2_000]));
+  useWorldStore.setState({ playerBuild: { ...s.playerBuild!, name, stats: stats as never }, currentHp: 99_999, currentMp: 99_999,
+    currentSceneId: place, lastLocationId: place, pendingBattle: null, day: TODAY });
+  const { rev } = await loadSave(server, token, characterId);
+  await sleep(1100);
+  const saved = await storeSave(server, token, characterId, rev, { version: SAVE_VERSION, state: partializeSave(useWorldStore.getState()) as never });
+  if (token === bobToken) heroRev = saved.rev;
+}
+
+await check("world boss: a party opens it at the lair, fights it on the server together; it falls for everyone and rests three hours", async () => {
+  // A beast nobody is fighting and that is not resting (the server may have run this before).
+  const states = (await loadWorld(server, annToken)).bosses ?? {};
+  const boss = BOSSES.find((b) => { const st = states[b.id]; return !st || (!st.fighting && (st.fellAt === null || Date.now() - st.fellAt > 3 * 3_600_000)); })!;
+  assert.ok(boss, "a beast waits somewhere");
+  const mei = (await listCharacters(server, annToken)).find((c) => c.name === "เหมยหลิง")!;
+  const bobName = (await listCharacters(server, bobToken)).find((c) => c.id === heroId)!.name;
+  // Alone: no fight.
+  await saveHeroAt(annToken, mei.id, "เหมยหลิง", boss.lair);
+  assert.equal(await refusal(postRaid(server, annToken, boss.id, "open", { characterId: mei.id })), "party_small");
+  // A party of two, both at the lair.
+  const { partyId } = await partyAction<{ partyId: string }>(server, annToken, "invite", { to: bob });
+  await pushed(bobSocial.inbox, "party_invite");
+  await partyAction(server, bobToken, "accept", { partyId });
+  await pushed(annSocial.inbox, "party", 5000, (m) => (m.party?.members.length ?? 0) === 2);
+  await saveHeroAt(bobToken, heroId, bobName, boss.lair);
+  assert.equal(await refusal(postRaid(server, bobToken, boss.id, "open", { characterId: heroId })), "not_leader");
+  const opened = await postRaid(server, annToken, boss.id, "open", { characterId: mei.id });
+  assert.equal(opened.fight?.phase, "gather");
+  assert.equal(opened.fight?.me, "A");
+  const invite = await pushed(bobSocial.inbox, "raid_invite");
+  assert.equal(invite.invite.bossId, boss.id);
+  // While it gathers, the beast is taken: the world says who fights it.
+  const during = await loadWorld(server, bobToken);
+  assert.equal(during.bosses?.[boss.id]?.fighting, "เหมยหลิง");
+  // Bob joins: everyone is in, the fight begins on the server.
+  const joined = await postRaid(server, bobToken, boss.id, "join", { raid: invite.invite.raid, characterId: heroId });
+  assert.equal(joined.fight?.phase, "battle");
+  assert.equal(joined.fight?.me, "P2");
+  assert.ok(joined.fight?.start, "the staging comes with the first look");
+  // Both let the AI play their heroes: the server plays the fight to its end.
+  await postRaid(server, annToken, boss.id, "act", { raid: invite.invite.raid, intent: { t: "auto", on: true } });
+  await postRaid(server, bobToken, boss.id, "act", { raid: invite.invite.raid, intent: { t: "auto", on: true } });
+  const over = await loadRaid(server, bobToken, boss.id, 0);
+  assert.equal(over.fight?.phase, "over");
+  const verdict = over.fight!.verdict!;
+  // A screen replaying the server's commands sees the same end.
+  const start = over.fight!.start!;
+  const replay = startSession(start.a, start.b, { ...start.opts, seed: start.seed });
+  for (const command of over.fight!.commands) applyCommand(replay, command, () => null);
+  assert.equal(replay.state.phase, "over");
+  assert.equal(replay.state.winnerTeam === "ally" ? "A" : "B", verdict.winner);
+  assert.equal(verdict.winner, "A", "two strong heroes fell the beast");
+  assert.ok(verdict.spoils && verdict.spoils.items.some((i) => i.itemId === boss.trophyItemId), "each winner's own trophy");
+  const annVerdict = (await loadRaid(server, annToken, boss.id, over.fight!.total)).fight!.verdict!;
+  assert.equal(annVerdict.winner, "A");
+  // It fell for everyone: the world shows it resting, and nobody can take it on for three hours.
+  const after = await loadWorld(server, annToken);
+  assert.ok(typeof after.bosses?.[boss.id]?.fellAt === "number");
+  assert.equal(after.bosses?.[boss.id]?.fighting, null);
+  assert.equal(await refusal(postRaid(server, annToken, boss.id, "open", { characterId: mei.id })), "resting");
+  await partyAction(server, annToken, "leave", {});
+  await pushed(bobSocial.inbox, "party", 5000, (m) => m.party === null);
 });
 
 await check("block: the blocked player is unfriended and their whispers, requests and mail are refused", async () => {

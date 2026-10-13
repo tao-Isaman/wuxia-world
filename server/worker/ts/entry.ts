@@ -10,9 +10,13 @@
 //   POST /characters/<id>/battle/start|log|finish   a checked battle (BattleObject)
 //   GET  /social · /social/ws                  the player's friends, mail, party (PlayerHub)
 //   POST /social/<action> · /party/<action>    friends, whispers, mail, the party
+//   GET  /raid/<bossId>[?from=N]               a world boss and the player's fight for it (RaidObject)
+//   POST /raid/<bossId>/open|join|start|act    open a party fight, join it, begin it, play a turn
 import { WorkerEntrypoint } from "cloudflare:workers";
 import RustWorker, { AccountObject, KeyObject, RoomObject } from "wuxia-rust";
-import { accountObjectName, battleObjectName, hubObjectName, WORLD_OBJECT_NAME, type Env } from "./env";
+import { accountObjectName, battleObjectName, hubObjectName, raidObjectName, WORLD_OBJECT_NAME, type Env } from "./env";
+import { getBoss } from "@/lib/world/data/bosses";
+import type { PartyView } from "@/lib/net/social-protocol";
 import { callObject, json, readJson, withCors } from "./http";
 
 export { AccountObject, KeyObject, RoomObject };
@@ -20,6 +24,7 @@ export { WorldObject } from "./world-object";
 export { BattleObject } from "./battle-object";
 export { PlayerHub } from "./hub-object";
 export { PartyObject } from "./party-object";
+export { RaidObject } from "./raid-object";
 
 /** What a player may ask their hub for (its `/internal/*` routes are for other objects only). */
 const SOCIAL_ACTIONS = new Set([
@@ -57,13 +62,16 @@ export default class GameServer extends WorkerEntrypoint<Env> {
     const isBattle = parts[0] === "characters" && parts.length === 4 && parts[2] === "battle" && request.method === "POST"
       && ["start", "log", "finish"].includes(parts[3]!);
     const social = this.socialPath(request, parts);
-    if (!isWorld && !isBattle && !social) return this.rust().fetch(request);
+    const isRaid = parts[0] === "raid" && !!getBoss(parts[1]) && (parts.length === 2 ? request.method === "GET"
+      : parts.length === 3 && request.method === "POST" && ["open", "join", "start", "act"].includes(parts[2]!));
+    if (!isWorld && !isBattle && !social && !isRaid) return this.rust().fetch(request);
     const player = await this.player(request, url);
     if (!player) return withCors(json({ error: "bad_token" }, 401));
     try {
       // A socket upgrade goes back as it is (CORS headers do not apply).
       if (social === "/ws") return await this.hub(request, player, social);
       if (social) return withCors(await this.hub(request, player, social));
+      if (isRaid) return withCors(await this.raid(request, url, player, parts[1]!, parts[2] ?? null));
       return withCors(isWorld ? await this.world(request, url, player) : await this.battle(request, player, decodeURIComponent(parts[1]!), parts[3]!));
     } catch (error) {
       console.error("[server]", error);
@@ -114,6 +122,47 @@ export default class GameServer extends WorkerEntrypoint<Env> {
     const echo = await readJson<unknown>(request, 10_000);
     if (!echo) return json({ error: "bad_request" }, 400);
     return callObject(this.worldStub(), "/echo", { player, echo });
+  }
+
+  /** A character's last accepted save (the account's Durable Object answers only for its own characters). */
+  private async savedState(player: string, characterId: string): Promise<unknown | Response> {
+    const account = this.env.ACCOUNTS.get(this.env.ACCOUNTS.idFromName(accountObjectName(player)));
+    const reply = await account.fetch(`https://account/characters/${encodeURIComponent(characterId)}/save`);
+    if (!reply.ok) return new Response(reply.body, { status: reply.status, headers: { "content-type": "application/json" } });
+    const { save } = await reply.json() as { save: { state?: unknown } | null };
+    return save?.state ?? null;
+  }
+
+  /** A world boss: the router loads what the fight needs (saves, the party) and hands it on. */
+  private async raid(request: Request, url: URL, player: string, bossId: string, action: string | null): Promise<Response> {
+    const stub = this.env.RAIDS.get(this.env.RAIDS.idFromName(raidObjectName(bossId)));
+    const headers = { "content-type": "application/json", "x-boss-id": bossId };
+    if (!action) {
+      const query = new URLSearchParams({ player, from: url.searchParams.get("from") ?? "0" });
+      return stub.fetch(`https://raid/view?${query}`, { headers });
+    }
+    const body = await readJson<Record<string, unknown>>(request, 20_000);
+    if (!body) return json({ error: "bad_request" }, 400);
+    const forward: Record<string, unknown> = { ...body, player };
+    if (action === "open" || action === "join") {
+      const characterId = typeof body.characterId === "string" ? body.characterId : "";
+      if (!characterId) return json({ error: "bad_request" }, 400);
+      const save = await this.savedState(player, characterId);
+      if (save instanceof Response) return save;
+      if (!save) return json({ error: "no_hero" }, 422);
+      forward.save = save;
+    }
+    if (action === "open") {
+      // The party as it stands: the leader opens, everyone in it is asked.
+      const hub = this.env.HUBS.get(this.env.HUBS.idFromName(hubObjectName(player)));
+      const reply = await hub.fetch("https://hub/internal/party", { headers: { "x-hub-user": player } });
+      const { party } = (reply.ok ? await reply.json() : { party: null }) as { party: PartyView | null };
+      if (!party) return json({ error: "party_small" }, 422);
+      if (party.leader !== player) return json({ error: "not_leader" }, 403);
+      const members = [...party.members].sort((a, b) => (a.username === player ? -1 : b.username === player ? 1 : 0));
+      forward.party = members.map((m) => ({ player: m.username, name: m.name || m.username }));
+    }
+    return stub.fetch(`https://raid/${action}`, { method: "POST", headers, body: JSON.stringify(forward) });
   }
 
   private async battle(request: Request, player: string, characterId: string, action: string): Promise<Response> {

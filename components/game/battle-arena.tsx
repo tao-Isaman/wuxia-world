@@ -175,7 +175,10 @@ interface Selection { key: string; slot: number | null; aimed: Cell | null }
 
 export function BattleArena({ mode = "free", onContinue, winExtra, pendingNote }: BattleArenaProps) {
   const state = useBattleStore((s) => s.state);
-  const auto = useBattleStore((s) => s.auto);
+  const storeAuto = useBattleStore((s) => s.auto);
+  // A party fight (a world boss): this player plays one unit of the ally side.
+  const control = useBattleStore((s) => s.control);
+  const auto = control ? control.autoUnits.includes(control.me) : storeAuto;
   const start = useBattleStore((s) => s.start);
   const reset = useBattleStore((s) => s.reset);
   const setupA = useCharacterStore((s) => s.builds.A);
@@ -199,10 +202,13 @@ export function BattleArena({ mode = "free", onContinue, winExtra, pendingNote }
   const selection = rawSelection.key === turnKey ? rawSelection : { key: turnKey, slot: null, aimed: null };
   const lastSeq = state?.events.length ? state.events[state.events.length - 1].seq : 0;
   const caughtUp = playedSeq >= lastSeq && !animating;
-  const myTurn = !!state && caughtUp && isPlayerTurn(state, auto);
+  // A party fight: while the server's commands wait to be played, the turn on screen is not the player's yet.
+  const queued = useBattleStore((s) => s.queued);
+  const myTurn = !!state && caughtUp && queued === 0 && isPlayerTurn(state, storeAuto, control);
   const active = state ? activeUnit(state) : null;
   const leader = state?.units.find((u) => u.leader) ?? state?.units.find((u) => u.team === "ally");
-  const controlled = active && active.team === "ally" ? active : leader;
+  const mine = control ? state?.units.find((u) => u.id === control.me) ?? leader : leader;
+  const controlled = active && active.team === "ally" && (!control || active.id === control.me) ? active : mine;
 
   const refs = useRef({ state, myTurn, selection, inspect });
   refs.current = { state, myTurn, selection, inspect };
@@ -215,10 +221,10 @@ export function BattleArena({ mode = "free", onContinue, winExtra, pendingNote }
 
   // If the stage can't run, keep the battle moving without animation.
   useEffect(() => {
-    if (!rendererDown || !state || state.phase === "over" || isPlayerTurn(state, auto)) return;
+    if (!rendererDown || !state || state.phase === "over" || (queued === 0 && isPlayerTurn(state, storeAuto, control))) return;
     const timer = setTimeout(() => useBattleStore.getState().step(), 350);
     return () => clearTimeout(timer);
-  }, [rendererDown, state, auto]);
+  }, [rendererDown, state, storeAuto, control, queued]);
 
   const clearSelection = useCallback(() => setSelection({ key: turnKey, slot: null, aimed: null }), [turnKey]);
 
@@ -279,7 +285,8 @@ export function BattleArena({ mode = "free", onContinue, winExtra, pendingNote }
   const doFlee = useCallback(() => { if (refs.current.myTurn) useBattleStore.getState().flee(); }, []);
   const toggleAuto = useCallback(() => {
     const store = useBattleStore.getState();
-    store.setAuto(!store.auto);
+    const on = store.control ? store.control.autoUnits.includes(store.control.me) : store.auto;
+    store.setAuto(!on);
     setSelection({ key: "", slot: null, aimed: null });
   }, []);
 
@@ -413,14 +420,14 @@ export function BattleArena({ mode = "free", onContinue, winExtra, pendingNote }
                 <Check size={18} aria-hidden="true" /><span>ยืนยัน</span>
               </button>
             </> : <>
-              {mode === "world" && state.bag && <button type="button" className="gb-control" data-kind="item" aria-expanded={showItems}
+              {mode === "world" && state.bag && !control && <button type="button" className="gb-control" data-kind="item" aria-expanded={showItems}
                 onClick={() => setShowItems((v) => !v)} disabled={!myTurn || !active?.leader} title="ใช้ยา พิษ หรืออาวุธลับ (จบตา)">
                 <FlaskConical size={18} aria-hidden="true" /><span>ใช้ของ</span>
               </button>}
               <button type="button" className="gb-control" onClick={doWait} disabled={!myTurn} aria-keyshortcuts="W" title="จบตานี้โดยไม่ออกกระบวนท่า">
                 <Hourglass size={18} aria-hidden="true" /><span>รอ</span>
               </button>
-              {mode === "world" && <button type="button" className="gb-control" data-kind="flee" onClick={doFlee}
+              {mode === "world" && !control && <button type="button" className="gb-control" data-kind="flee" onClick={doFlee}
                 disabled={!myTurn || !active?.leader} title={`โอกาสหนีรอด ${fleeOdds}% · พลาดจะเสียตานี้`}>
                 <Footprints size={18} aria-hidden="true" /><span>ถอยหนี</span>
               </button>}

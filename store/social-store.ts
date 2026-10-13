@@ -6,6 +6,7 @@
 // the map room (lib/net/session.ts). Actions call the game server; nothing
 // here is saved (the server keeps it all). Only used with a game server.
 import { create } from "zustand";
+import { cloudRaid } from "./cloud-raid";
 import {
   ApiFailure, claimMail as claimMailCall, loadSocial, partyAction, sendMail as sendMailCall, socialAction,
 } from "@/lib/net/client";
@@ -221,6 +222,10 @@ export const useSocialStore = create<SocialState>()((set, get) => {
         break;
       case "party_chat":
         addLines([{ id: `p:${message.at}:${message.from.username}`, channel: "party", from: message.from, text: message.text, at: message.at, mine: message.from.username === state.me.username }]);
+        break;
+      case "raid_invite":
+        cloudRaid.invited(message.invite);
+        toast("info", `${message.invite.from} เปิดศึกกับสัตว์ร้าย — ไปที่ถ้ำของมันแล้วกดเข้าร่วม`);
         break;
       case "refresh":
         void get().refresh();

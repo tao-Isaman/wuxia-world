@@ -82,12 +82,129 @@ await check("stageBattle: the saved fight, or why not (no hero, no battle, a bea
   assert.deepEqual(stageBattle({ ...heroBefore(thief), playerBuild: null } as never, ids, {}, 0), { error: "no_hero" });
   assert.deepEqual(stageBattle(heroBefore(null), ids, {}, 0), { error: "no_battle" });
   assert.deepEqual(stageBattle(heroBefore({ ...thief, opponentId: "nobody" }), ids, {}, 0), { error: "no_battle" });
+  // A legendary beast is the world's, fought by a party (raid-doc.ts), never in a solo checked battle.
   const boss = BOSSES[0]!;
-  setTestClock(msAtWorld(300));
   const atLair = heroBefore({ opponentId: boss.id, onWin: boss.lair, onLose: "home_player" });
-  assert.deepEqual(stageBattle(atLair, ids, { [boss.id]: 299 }, 0), { error: "boss_resting" });
-  const staged = stageBattle(atLair, ids, { [boss.id]: 300 - boss.respawnDays }, 0);
-  assert.ok(!("error" in staged) && staged.start.b.name);
+  assert.deepEqual(stageBattle(atLair, ids, {}, 0), { error: "boss_party" });
+});
+
+// ─── World bosses: party fights on the server ────────────────────────
+const raid = await import("../server/worker/ts/raid-doc");
+const { RAID_RULES } = await import("../lib/net/raid-protocol");
+const { humanToAct } = await import("../lib/game/grid/session");
+
+/** A strong hero standing in `lair` (a save as the server would load it). */
+function heroAt(name: string, lair: string): WorldStateData {
+  useWorldStore.getState().startNewGame({ name, newWorld: true });
+  const s = useWorldStore.getState();
+  const stats = Object.fromEntries(Object.keys(s.playerBuild!.stats).map((k) => [k, 2_000])) as never;
+  useWorldStore.setState({ playerBuild: { ...s.playerBuild!, stats }, currentHp: 99_999, currentMp: 99_999, currentSceneId: lair, lastLocationId: lair });
+  return clone(useWorldStore.getState()) as WorldStateData;
+}
+
+await check("world boss: the leader opens at the lair, the party joins, the fight begins; one party at a time", () => {
+  const boss = BOSSES[0]!;
+  const doc = raid.newRaidDoc(boss.id);
+  const t0 = 1_000_000;
+  const ann = heroAt("แอน", boss.lair), ben = heroAt("เบน", boss.lair), far = heroAt("ไกล", "city_capital");
+  const party = [{ player: "ann", name: "แอน" }, { player: "ben", name: "เบน" }];
+  assert.equal(raid.openRaid(doc, { player: "ann", characterId: "c1", save: ann }, party.slice(0, 1), { id: "f1", seed: 3 }, t0), "party_small");
+  assert.equal(raid.openRaid(doc, { player: "ann", characterId: "c1", save: far }, party, { id: "f1", seed: 3 }, t0), "not_here");
+  assert.equal(raid.openRaid(doc, { player: "ben", characterId: "c2", save: ben }, party, { id: "f1", seed: 3 }, t0), "not_leader");
+  assert.equal(raid.openRaid(doc, { player: "ann", characterId: "c1", save: ann }, party, { id: "f1", seed: 3 }, t0), null);
+  assert.equal(raid.bossStatus(doc).fighting, "แอน");
+  assert.equal(raid.openRaid(doc, { player: "cat", characterId: "c3", save: ann }, [{ player: "cat", name: "แคท" }, ...party], { id: "f2", seed: 3 }, t0), "taken", "one party at a time");
+  assert.equal(raid.joinRaid(doc, "f1", { player: "ben", characterId: "c2", save: far }, t0), "not_here");
+  assert.equal(raid.joinRaid(doc, "f1", { player: "eve", characterId: "c9", save: ben }, t0), "not_member");
+  assert.equal(raid.joinRaid(doc, "f1", { player: "ben", characterId: "c2", save: ben }, t0), null);
+  const session = raid.beginRaid(doc, t0 + 1_000);
+  assert.ok(typeof session !== "string");
+  if (typeof session === "string") return;
+  const fight = doc.fight!;
+  assert.equal(fight.phase, "battle");
+  assert.deepEqual(fight.members.map((m) => m.unit), ["A", "P2"]);
+  // Both heroes stand on the board; the beast has HP for two.
+  assert.deepEqual(session.state.units.filter((u) => u.team === "ally").map((u) => u.id), ["A", "P2"]);
+  const plain = { ...fight.start!.b, baseHp: 0 };
+  assert.ok((raid.partyScaled(plain, 2).baseHp ?? 0) > 0 && raid.partyScaled(plain, 1) === plain, "a party adds to the beast's HP; one alone adds nothing");
+  assert.ok((fight.start!.b.baseHp ?? 0) > 0, "this beast is sturdier for the party of two");
+  // Each sees the same fight from the start; a stranger sees none.
+  const view = raid.raidView(doc, "ben", 0, t0 + 1_000);
+  assert.equal(view.fight?.me, "P2");
+  assert.ok(view.fight?.start && view.fight.total === fight.commands.length);
+  assert.equal(raid.raidView(doc, "eve", 0, t0).fight, null);
+});
+
+await check("world boss: only the unit's own player acts on its turn; a turn that runs out is the AI's; the party wins together", () => {
+  const boss = BOSSES[0]!;
+  const doc = raid.newRaidDoc(boss.id);
+  let now = 2_000_000;
+  const ann = heroAt("แอน", boss.lair), ben = heroAt("เบน", boss.lair);
+  raid.openRaid(doc, { player: "ann", characterId: "c1", save: ann }, [{ player: "ann", name: "แอน" }, { player: "ben", name: "เบน" }], { id: "f1", seed: 11 }, now);
+  raid.joinRaid(doc, "f1", { player: "ben", characterId: "c2", save: ben }, now);
+  let session = raid.beginRaid(doc, now) as Exclude<ReturnType<typeof raid.beginRaid>, string>;
+  const fight = doc.fight!;
+  const whose = (unit: string | null) => fight.members.find((m) => m.unit === unit)?.player;
+  // Whoever's unit holds the turn: the other player is refused, its own player may wait.
+  const turn = humanToAct(session);
+  if (turn) {
+    const other = whose(turn) === "ann" ? "ben" : "ann";
+    assert.equal(raid.actRaid(doc, session, other, { t: "wait" }, now), "not_your_turn");
+    assert.equal(raid.actRaid(doc, session, whose(turn)!, { t: "wait" }, now), null);
+  }
+  // A client replaying the server's commands reaches the same board.
+  const client = raid.sessionOf(fight);
+  assert.equal(JSON.stringify(client.state.units.map((u) => [u.id, u.hp, u.pos])), JSON.stringify(session.state.units.map((u) => [u.id, u.hp, u.pos])));
+  // From here nobody acts: every turn runs out and the AI plays it, until the fight ends.
+  for (let i = 0; i < 4000 && doc.fight!.phase === "battle" && session.state.phase !== "over"; i++) {
+    now += RAID_RULES.turnMs + 1;
+    for (const m of fight.members) m.seen = now; // they are there, only slow
+    session = raid.tickRaid(doc, session, now) as typeof session;
+  }
+  assert.equal(session.state.phase, "over", "the fight ends");
+  assert.ok(fight.commands.some((c) => c[0] === "x"), "timed-out turns were played by the AI");
+  const won = raid.judgeRaid(doc, session, now);
+  assert.equal(typeof won, "boolean");
+  const verdicts = doc.fight!.verdicts!;
+  assert.deepEqual(Object.keys(verdicts).sort(), ["ann", "ben"]);
+  if (won) {
+    assert.ok(verdicts.ann!.spoils && verdicts.ben!.spoils, "each winner's own spoils");
+    assert.ok(verdicts.ann!.hA >= 1 && verdicts.ben!.hA >= 1, "a fallen member still walks away");
+    assert.equal(doc.fellAt, now);
+    assert.deepEqual(doc.fellBy, ["แอน", "เบน"]);
+    assert.equal(raid.bossUp(doc, now + RAID_RULES.respawnMs - 1), false, "gone for three hours");
+    assert.equal(raid.bossUp(doc, now + RAID_RULES.respawnMs), true, "back after three hours");
+    assert.equal(raid.openRaid(doc, { player: "ann", characterId: "c1", save: ann }, [{ player: "ann", name: "แอน" }, { player: "ben", name: "เบน" }], { id: "f2", seed: 1 }, now + 1), "resting");
+  } else {
+    assert.equal(doc.fellAt, null, "lost: the beast is free again");
+  }
+  assert.equal(raid.bossStatus(doc).fighting, null);
+});
+
+await check("world boss: the quiet are played by the AI; a gathering that runs out begins with who came, or ends", () => {
+  const boss = BOSSES[1]!;
+  let doc = raid.newRaidDoc(boss.id);
+  const now = 3_000_000;
+  const ann = heroAt("แอน", boss.lair), ben = heroAt("เบน", boss.lair);
+  const party = [{ player: "ann", name: "แอน" }, { player: "ben", name: "เบน" }, { player: "cat", name: "แคท" }];
+  raid.openRaid(doc, { player: "ann", characterId: "c1", save: ann }, party, { id: "f1", seed: 5 }, now);
+  raid.joinRaid(doc, "f1", { player: "ben", characterId: "c2", save: ben }, now);
+  // Cat never came: the gathering runs out and the fight begins with two.
+  const session = raid.tickRaid(doc, null, now + RAID_RULES.gatherMs);
+  assert.ok(session);
+  assert.equal(doc.fight!.phase, "battle");
+  assert.deepEqual(doc.fight!.members.map((m) => m.player), ["ann", "ben"]);
+  // Ben goes quiet: the AI plays his unit.
+  doc.fight!.members.find((m) => m.player === "ben")!.seen = now - RAID_RULES.idleMs - 1;
+  doc.fight!.members.find((m) => m.player === "ann")!.seen = now + RAID_RULES.gatherMs;
+  raid.tickRaid(doc, session, now + RAID_RULES.gatherMs + 1);
+  assert.ok(session!.autoUnits.includes("P2"));
+  // Alone, nobody else came: no fight.
+  doc = raid.newRaidDoc(boss.id);
+  raid.openRaid(doc, { player: "ann", characterId: "c1", save: ann }, party.slice(0, 2), { id: "f2", seed: 5 }, now);
+  assert.equal(raid.tickRaid(doc, null, now + RAID_RULES.gatherMs), null);
+  assert.equal(doc.fight!.phase, "over");
+  assert.equal(raid.bossStatus(doc).fighting, null);
 });
 
 await check("playCommands + judge: the log replays in parts (a repeated part skipped), a gap or a bad command refused; a win pays", () => {

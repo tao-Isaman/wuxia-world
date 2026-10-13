@@ -6,7 +6,6 @@
 // The browser plays it and sends its command log; the server replays every
 // command on its own session (lib/game/grid/session.ts) and so knows the true
 // outcome, whatever the browser claims. A won fight's spoils are rolled here.
-import { worldNow } from "@/lib/world/clock";
 import { getOpponent } from "@/lib/world/data/opponents";
 import { getBoss } from "@/lib/world/data/bosses";
 import { battleItemOf, worldBattleStart, type WorldBattleStart } from "@/lib/world/battle-setup";
@@ -55,11 +54,9 @@ export function stageBattle(
   const pending = save.pendingBattle;
   const opponent = pending ? getOpponent(pending.opponentId) : null;
   if (!pending || !opponent) return { error: "no_battle" };
-  if (opponent.boss) {
-    const boss = getBoss(opponent.id);
-    const fell = bosses[opponent.id];
-    if (boss && typeof fell === "number" && fell <= worldNow().day && worldNow().day - fell < boss.respawnDays) return { error: "boss_resting" };
-  }
+  // A legendary beast is the world's, fought by a party (RaidObject), never alone.
+  if (opponent.boss && getBoss(opponent.id)) return { error: "boss_party" };
+  void bosses;
   // The state as the browser's would be: every field present (an old save may lack some).
   const state = { ...emptyData(), ...save } as WorldStateData;
   const start = worldBattleStart(state);

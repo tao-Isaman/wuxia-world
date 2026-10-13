@@ -12,7 +12,7 @@
 //   POST /party/invite|accept|decline|leave|kick|lead|chat
 // Internal, from other hubs and parties only (entry.ts never forwards them):
 //   POST /internal/request|accepted|forget|whisper|mail|party-invite|party-left|push
-//   GET  /internal/status · /internal/can-mail?from= · /internal/party-bonus?location=
+//   GET  /internal/status · /internal/can-mail?from= · /internal/party-bonus?location= · /internal/party
 import { DurableObject } from "cloudflare:workers";
 import {
   SOCIAL_LIMITS as L, cleanText, normalUsername,
@@ -187,6 +187,12 @@ export class PlayerHub extends DurableObject<Env> {
           // Asked before a sender pays: would this box take a letter from them?
           const from = url.searchParams.get("from") ?? "";
           return json({ result: doc.blocked[from] ? "blocked" : doc.mail.length >= L.mailbox ? "full" : "ok" });
+        }
+        case "/internal/party": {
+          // The player's party as it stands (a world boss fight asks): its leader and members.
+          if (!doc.partyId) return json({ party: null });
+          const answer = await this.callParty<PartyView | null>(doc.partyId, "/view");
+          return json({ party: answer.ok ? answer.body : null });
         }
         case "/internal/party-bonus": {
           if (!doc.partyId) return json({ bonus: false });

@@ -12,6 +12,7 @@
 import { getQuest } from "@/lib/world";
 import { seedLiveness } from "@/lib/world/npc-life";
 import { loadWorld, postEcho } from "@/lib/net/client";
+import { cloudRaid } from "./cloud-raid";
 import type { WorldReply } from "@/lib/net/play-protocol";
 import { SHARED_WORLD_KEYS, setServerRunsWorld, type PlayerEcho, type SharedWorld } from "@/lib/world/shared/world";
 import type { WorldStateData } from "@/lib/world/types";
@@ -61,6 +62,8 @@ export function applyServerWorld(state: WorldStateData, world: SharedWorld): voi
 function take(reply: WorldReply): void {
   if (!link) return;
   link.rev = reply.rev;
+  // The world bosses ride on every answer (docs/online.md "World bosses").
+  cloudRaid.setBosses(reply.bosses);
   if (reply.same) return;
   const draft = { ...useWorldStore.getState() } as WorldStateData;
   applyServerWorld(draft, reply.world);
@@ -94,6 +97,7 @@ function sendEcho(echo: PlayerEcho): void {
  */
 export async function fetchServerWorld(server: string, token: string): Promise<{ rev: number; world: SharedWorld | null }> {
   const reply = await loadWorld(server, token);
+  cloudRaid.setBosses(reply.bosses);
   return reply.same ? { rev: reply.rev, world: null } : { rev: reply.rev, world: reply.world };
 }
 

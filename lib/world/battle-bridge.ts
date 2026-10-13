@@ -23,6 +23,7 @@ import { useWorldStore } from "@/store/world-store";
 import { battleSetupFor, worldBattleStart, type BattleSetup } from "./battle-setup";
 import { powerOutlook, powerScore, powerTierOf, type CharacterBuild, type PowerOutlook, type PowerTier } from "../game";
 import { cloudBattle } from "@/store/cloud-battle";
+import { cloudRaid } from "@/store/cloud-raid";
 
 export { battleBag } from "./battle-setup";
 
@@ -84,6 +85,12 @@ export function ensureBattleStarted(): void {
 
   const bs = useBattleStore.getState();
   if (bs.state) return; // already running
+
+  // A world boss fought by a party is played on the server: take it up again from there.
+  if (ws.pendingBattle.raid) {
+    cloudRaid.resume(ws.pendingBattle.raid.bossId);
+    return;
+  }
 
   if (!ws.playerBuild) {
     console.warn("[bridge] pendingBattle without playerBuild — clearing");

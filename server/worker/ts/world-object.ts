@@ -9,10 +9,12 @@
 //   POST /echo  { player, echo }           → { rev }
 //   POST /kill  { player, npcId, locationId } → { applied }
 //   POST /boss  { player, bossId }         → { applied }
+//   POST /boss-state { bossId, status, fell } → { applied } (from RaidObject: a world boss's state)
 import { DurableObject } from "cloudflare:workers";
 import { MS_PER_DAY } from "@/lib/world/clock";
 import type { WorldReply } from "@/lib/net/play-protocol";
-import { acceptEcho, advanceWorld, bossFellInWorld, createWorld, killInWorld, setPins, type WorldDoc } from "./world-doc";
+import { acceptEcho, advanceWorld, bossFellInWorld, createWorld, killInWorld, setBossStatus, setPins, type WorldDoc } from "./world-doc";
+import type { BossStatus } from "@/lib/net/raid-protocol";
 import { json, readJson } from "./http";
 import type { Env } from "./env";
 
@@ -70,9 +72,9 @@ export class WorldObject extends DurableObject<Env> {
   private reply(doc: WorldDoc, rev: number | null): Response {
     // Every answer carries the server's clock, which the browsers keep to.
     const now = Date.now();
-    if (rev === doc.rev) return json({ rev: doc.rev, same: true, now } satisfies WorldReply);
+    if (rev === doc.rev) return json({ rev: doc.rev, same: true, now, bosses: doc.bosses ?? {} } satisfies WorldReply);
     if (this.cached?.rev !== doc.rev) {
-      this.cached = { rev: doc.rev, body: JSON.stringify({ rev: doc.rev, day: doc.day, time: doc.time, world: doc.world } satisfies WorldReply) };
+      this.cached = { rev: doc.rev, body: JSON.stringify({ rev: doc.rev, day: doc.day, time: doc.time, world: doc.world, bosses: doc.bosses ?? {} } satisfies WorldReply) };
     }
     return new Response(`{"now":${now},${this.cached.body.slice(1)}`, { headers: { "content-type": "application/json" } });
   }
@@ -104,6 +106,12 @@ export class WorldObject extends DurableObject<Env> {
       case "/kill": {
         const applied = typeof body.npcId === "string" && killInWorld(doc, body.npcId, player, String(body.locationId ?? ""));
         if (applied) await this.store(doc, true);
+        return json({ applied });
+      }
+      case "/boss-state": {
+        const status = body.status as BossStatus | undefined;
+        const applied = typeof body.bossId === "string" && !!status && setBossStatus(doc, body.bossId, status, body.fell === true);
+        if (applied) await this.store(doc, body.fell === true);
         return json({ applied });
       }
       case "/boss": {

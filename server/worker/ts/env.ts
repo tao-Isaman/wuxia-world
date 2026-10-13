@@ -8,6 +8,7 @@ export interface Env {
   BATTLES: DurableObjectNamespace;
   HUBS: DurableObjectNamespace;
   PARTIES: DurableObjectNamespace;
+  RAIDS: DurableObjectNamespace;
   PBKDF2_ITERATIONS?: string;
 }
 
@@ -24,3 +25,4 @@ export const battleObjectName = (username: string, characterId: string) => `${DA
 export const WORLD_OBJECT_NAME = `${DATA_EPOCH}:world`;
 export const hubObjectName = (username: string) => `${DATA_EPOCH}:hub:${username}`;
 export const partyObjectName = (partyId: string) => `${DATA_EPOCH}:party:${partyId}`;
+export const raidObjectName = (bossId: string) => `${DATA_EPOCH}:raid:${bossId}`;

@@ -249,7 +249,9 @@ Six great animals wait each in its own lair, large on the map with a name plate.
 | ปูวิเศษจ้าวแห่งดาบ | สระมังกรดำ (west) | two iron crabs |
 | กระทิงยักษ์เขาเพลิง | ยอดเพลิงอุดร (heartland) | two blood boars |
 
-The wilds talk about each one (a lore rumor names its lair). A win pays 3,000–4,000 w-exp, double move xp, its trophy (a costly crafting material), four rolls of rare materials, big potions and meridian charts, and a 15 % chance of a piece of top gear. The jianghu hears of it at once, and the beast is back **90 days** later.
+The wilds talk about each one (a lore rumor names its lair). A win pays 3,000–4,000 w-exp, double move xp, its trophy (a costly crafting material), four rolls of rare materials, big potions and meridian charts, and a 15 % chance of a piece of top gear. The jianghu hears of it at once, and the beast is back **three real hours** later.
+
+Online each beast is **one for everyone** and needs a **party** (2–4 people, [online.md](online.md#world-bosses)): the party's leader walks into it at its lair and the others are asked to join (they must stand there too); while a party fights it, nobody else can. Each player plays their own hero on the same board when its turn comes (30 seconds, then the AI plays it); a win gives every member the full spoils, and the beast is gone for three hours for everyone.
 
 ### Life and death
 

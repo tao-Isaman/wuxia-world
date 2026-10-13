@@ -1,6 +1,9 @@
 // Walk ticks, foes on the map and the fight-or-flee screen; the last death's report.
 import { getNpc, getOpponent, getScene, type WorldStateData } from "@/lib/world";
 import { bossAlive, getBoss } from "@/lib/world/data/bosses";
+import { bossIsUp, cloudRaid, useRaid } from "@/store/cloud-raid";
+import { raidErrorText } from "@/lib/world/raid-text";
+import { toast } from "@/store/toast-store";
 import { rollFoeSpawn, rollWalkEvent } from "@/lib/world/effects";
 import { isLawOpponent } from "@/lib/world/law";
 import { feudActive, feudVictim, hunterSect, sectTitle } from "@/lib/world/feuds";
@@ -29,7 +32,7 @@ export function walkEventsDisabled(): boolean {
   try { return typeof localStorage !== "undefined" && localStorage.getItem("wuxia-random-events") === "off"; } catch { return false; }
 }
 
-export const encountersActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "acceptEncounter" | "walkTick" | "roamingFoes" | "engageFoe" | "engageBoss" | "fleeEncounter" | "lastDeath" | "dismissDeath"> => ({
+export const encountersActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "acceptEncounter" | "walkTick" | "roamingFoes" | "engageFoe" | "engageBoss" | "enterRaidBattle" | "fleeEncounter" | "lastDeath" | "dismissDeath"> => ({
   acceptEncounter: () => {
     const s = get();
     if (!s.pendingEncounter || s.pendingBattle) return;
@@ -102,9 +105,28 @@ export const encountersActions = (set: WorldSet, get: WorldGet): Pick<WorldStore
   engageBoss: (bossId) => {
     const s = get();
     const boss = getBoss(bossId);
-    if (!boss || s.pendingBattle || s.pendingEncounter || boss.lair !== s.currentSceneId || !bossAlive(s, bossId)) return;
+    if (!boss || s.pendingBattle || s.pendingEncounter || boss.lair !== s.currentSceneId) return;
+    // Online, the beast is the world's: the party's leader opens a fight for the party (store/cloud-raid.ts).
+    if (cloudRaid.enabled()) {
+      const status = useRaid.getState().bosses[bossId];
+      if (status?.fighting) { toast("warn", `คณะของ${status.fighting}กำลังต่อสู้กับ${boss.name}อยู่`); return; }
+      if (!bossIsUp(status)) { toast("warn", `${boss.name}ยังไม่กลับมา`); return; }
+      if (cloudRaid.fight()) return;
+      void cloudRaid.open(bossId).then((view) => {
+        if (!view?.fight) toast("warn", raidErrorText(useRaid.getState().error, boss.name));
+      });
+      return;
+    }
+    if (!bossAlive(s, bossId)) return;
     // Its minions always come with it (encounterBattle sets withPack).
     set({ pendingEncounter: { opponentId: boss.id, returnSceneId: s.currentSceneId } });
+  },
+
+  enterRaidBattle: (raid) => {
+    const s = get();
+    const boss = getBoss(raid.bossId);
+    if (!boss || s.pendingBattle?.raid?.fight === raid.fight) return;
+    set({ pendingEncounter: null, pendingBattle: { opponentId: boss.id, onWin: boss.lair, onLose: boss.lair, withPack: true, raid } });
   },
 
   fleeEncounter: () => {

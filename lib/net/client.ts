@@ -6,6 +6,7 @@ import { PROTOCOL_VERSION, type ClientMsg, type HeroBody, type Look, type Motion
 import type { Dir8 } from "@/lib/characters/walk8";
 import type { BattleLogRequest, BattleStartReply, BattleVerdict, EchoRequest, WorldReply } from "./play-protocol";
 import type { Parcel, SendMailRequest, SocialSnapshot } from "./social-protocol";
+import type { RaidView } from "./raid-protocol";
 import { syncClockToServer } from "@/lib/world/clock";
 
 /** An auth call the server refused: `code` is its error (`taken`, `wrong_login`, …). */
@@ -103,6 +104,12 @@ export const loadWorld = async (server: string, token: string, rev?: number, pin
   if (typeof reply.now === "number") syncClockToServer(reply.now, sentAt);
   return reply;
 };
+/** A world boss and this player's fight for it (`from`: the first command wanted). */
+export const loadRaid = (server: string, token: string, bossId: string, from = 0) =>
+  call<RaidView>(server, token, "GET", `/raid/${encodeURIComponent(bossId)}?from=${from}`);
+/** Open (the leader), join, begin (the leader) or play a turn in a world boss fight. */
+export const postRaid = (server: string, token: string, bossId: string, action: "open" | "join" | "start" | "act", body: Record<string, unknown>) =>
+  call<RaidView>(server, token, "POST", `/raid/${encodeURIComponent(bossId)}/${action}`, body);
 /** Tell the jianghu what the hero did; the server writes the rumor. */
 export const postEcho = (server: string, token: string, echo: EchoRequest) =>
   call<{ rev: number }>(server, token, "POST", "/world/echo", echo);

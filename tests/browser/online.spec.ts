@@ -388,3 +388,77 @@ test("looks online: another player sees the outfit and the weapon on the back, a
   await ann.context().close();
   await bob.context().close();
 });
+
+/** Call the game server as this page's player (its token from the online store). */
+async function asPlayer<T>(page: Page, method: string, path: string, body?: unknown): Promise<T> {
+  return page.evaluate(async ([server, method, path, body]) => {
+    const online = JSON.parse(localStorage.getItem("wuxia-online-v1")!).state as { token: string };
+    const reply = await fetch(`${server}${path}`, { method, headers: { authorization: `Bearer ${online.token}`, "content-type": "application/json" },
+      body: body === undefined ? undefined : JSON.stringify(body) });
+    return reply.json();
+  }, [SERVER, method, path, body] as const) as Promise<T>;
+}
+
+test("world boss: a party's leader walks into the beast, the member joins from the invitation, both fight it on one board", async ({ browser }) => {
+  test.skip(!(await serverUp()), `no game server at ${SERVER} (bun run server:dev)`);
+  test.setTimeout(300_000);
+  const annId = `wa_${run}`.slice(0, 20);
+  const bobId = `wb_${run}`.slice(0, 20);
+  const ann = await player(browser, "หลินเยว่", "หญิง", annId);
+  const bob = await player(browser, "จางเฟิง", "ชาย", bobId);
+  // A beast nobody is fighting (the server may have seen this run before).
+  const world = await asPlayer<{ bosses?: Record<string, { fellAt: number | null; fighting: string | null }> }>(ann, "GET", "/world");
+  const lairs: Record<string, string> = { boss_golden_serpent: "cave_jinshe", boss_blood_tiger: "valley_hudie", boss_sword_eagle: "cliff_motian", boss_blade_crab: "pool_heilong", boss_flame_bull: "peak_guangming" };
+  const bossId = Object.keys(lairs).find((id) => { const st = world.bosses?.[id]; return !st || (!st.fighting && (st.fellAt === null || Date.now() - st.fellAt > 3 * 3_600_000)); })!;
+  const lair = lairs[bossId]!;
+  // A party of two (through the server, as the สหาย window would).
+  const { partyId } = await asPlayer<{ partyId: string }>(ann, "POST", "/party/invite", { to: bobId });
+  await expect.poll(() => asPlayer<{ ok?: boolean; error?: string }>(bob, "POST", "/party/accept", { partyId }).then((r) => r.error ?? "ok"), { timeout: 10_000 }).toBe("ok");
+  await expect(ann.getByTestId("party-frame")).toContainText("จางเฟิง", { timeout: 15_000 });
+  // Both stand in the lair, strong.
+  const strong = `state.currentSceneId = "${lair}"; state.lastLocationId = "${lair}"; state.currentHp = 99999; state.currentMp = 99999;
+    state.playerBuild.stats = Object.fromEntries(Object.keys(state.playerBuild.stats).map((k) => [k, 2000]));`;
+  await editSave(ann, strong);
+  await editSave(bob, strong);
+  // Ann walks into the beast: the fight gathers.
+  const canvas = ann.getByTestId("world-canvas");
+  await expect.poll(async () => (await canvas.getAttribute("data-boss-foes")) ?? "", { timeout: 20_000 }).not.toBe("");
+  const gather = ann.getByTestId("raid-gather");
+  const box = (await canvas.boundingBox())!;
+  for (let i = 0; i < 10 && !(await gather.isVisible()); i++) {
+    const foes = JSON.parse((await canvas.getAttribute("data-foes-at")) ?? "[]") as [number, number][];
+    const [fx, fy] = foes[0]!;
+    const point = await canvas.evaluate((host: HTMLElement & { worldScreenPoint?: (x: number, y: number) => { x: number; y: number } }, at) => host.worldScreenPoint!(at[0], at[1]), [fx, fy] as [number, number]);
+    const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
+    await ann.mouse.click(clamp(point.x, box.x + 60, box.x + box.width - 60), clamp(point.y, box.y + 60, box.y + box.height - 60));
+    await ann.waitForTimeout(1500);
+  }
+  await expect(gather).toBeVisible({ timeout: 20_000 });
+  await expect(gather).toContainText("จางเฟิง");
+  await ann.screenshot({ path: "test-results/screenshots/raid-gather.png" });
+  // Bob is invited; he joins from where he stands.
+  const invite = bob.getByTestId("raid-invite");
+  await expect(invite).toBeVisible({ timeout: 20_000 });
+  await bob.screenshot({ path: "test-results/screenshots/raid-invite.png" });
+  await invite.getByTestId("raid-join").click();
+  // The fight begins for both: one board, two heroes, the beast.
+  for (const page of [ann, bob]) {
+    await expect(page.getByTestId("grid-battle")).toBeVisible({ timeout: 30_000 });
+    await expect.poll(async () => {
+      const units = JSON.parse((await page.getByTestId("battle-canvas").getAttribute("data-units")) ?? "[]") as { id: string; team: string }[];
+      return units.filter((u) => u.team === "ally").map((u) => u.id).sort().join(",");
+    }, { timeout: 30_000 }).toBe("A,P2");
+  }
+  await ann.screenshot({ path: "test-results/screenshots/raid-battle.png" });
+  // Both hand their heroes to the AI: the fight runs to its end and each takes the verdict.
+  for (const page of [ann, bob]) await page.getByRole("button", { name: "อัตโนมัติ" }).click();
+  for (const page of [ann, bob]) {
+    const result = page.getByTestId("combat-result");
+    await expect(result).toBeVisible({ timeout: 180_000 });
+    await expect(result.getByRole("button", { name: /ดำเนินเรื่อง/ })).toBeEnabled({ timeout: 20_000 });
+    await result.getByRole("button", { name: /ดำเนินเรื่อง/ }).click();
+    await expect(page.getByTestId("world-canvas")).toHaveAttribute("data-ready", "true", { timeout: 60_000 });
+  }
+  await ann.context().close();
+  await bob.context().close();
+});

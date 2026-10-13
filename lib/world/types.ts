@@ -873,6 +873,9 @@ export interface PendingBattle {
   // An upright NPC waylaying a wanted hero for the law (lib/world/effects.ts
   // rollWalkEvent): a law battle — losing is arrest.
   ambushNpcId?: string;
+  // A world boss fought by a party, played on the server (store/cloud-raid.ts):
+  // the fight's id and this hero's unit in it.
+  raid?: { bossId: string; fight: string; unit: string };
 }
 
 // ─── Letters (lib/world/letters.ts) ──────────────────────────────────

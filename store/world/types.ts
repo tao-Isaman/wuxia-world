@@ -410,6 +410,8 @@ export interface WorldStore extends WorldStateData {
   engageFoe: (foeId: string) => void;
   /** Walk into a legendary beast in its lair (data/bosses.ts): the fight-or-flee screen. */
   engageBoss: (bossId: string) => void;
+  /** A world boss fight this hero is in has begun on the server (store/cloud-raid.ts): the battle screen takes over. */
+  enterRaidBattle: (raid: { bossId: string; fight: string; unit: string }) => void;
   // The last death's price (lib/world/death.ts), shown once on waking at home;
   // not saved (the action log keeps it).
   lastDeath: { lines: string[] } | null;

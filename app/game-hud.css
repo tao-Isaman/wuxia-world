@@ -183,3 +183,28 @@
 .text-mark-move { color: #e7b3ff; }
 .text-mark-foe { color: #ff8f8f; }
 .text-mark-number { color: #ffe9a0; }
+
+/* ─── World boss fights (components/world/raid-bridge.tsx) ─────────────
+   The invitation and the gathering: a card at the top centre, under the law
+   chips. Not a dialog: the map keeps going, so a member can walk to the lair. */
+.raid-card {
+  position: fixed;
+  top: calc(var(--safe-top) + 56px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 60;
+  width: min(360px, calc(100% - 32px));
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(24, 12, 8, 0.92);
+  border: 1px solid rgba(214, 170, 90, 0.7);
+  color: #f6e7c8;
+  font-size: 13px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+}
+.raid-card h3 { margin: 0 0 6px; font-size: 15px; color: #f2c66d; }
+.raid-card ul { margin: 0 0 6px; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 4px 12px; }
+.raid-card li[data-joined="false"] { opacity: 0.6; }
+.raid-card .raid-note { margin: 0 0 6px; font-size: 12px; opacity: 0.85; }
+.raid-card .raid-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.raid-card .pixel-action { min-height: 40px; }

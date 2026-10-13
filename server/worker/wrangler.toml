@@ -47,6 +47,10 @@ class_name = "PlayerHub"
 name = "PARTIES"
 class_name = "PartyObject"
 
+[[durable_objects.bindings]]
+name = "RAIDS"
+class_name = "RaidObject"
+
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["AccountObject", "RoomObject"]
@@ -62,6 +66,10 @@ new_sqlite_classes = ["WorldObject", "BattleObject"]
 [[migrations]]
 tag = "v4"
 new_sqlite_classes = ["PlayerHub", "PartyObject"]
+
+[[migrations]]
+tag = "v5"
+new_sqlite_classes = ["RaidObject"]
 
 [vars]
 # PBKDF2 rounds for new passwords (Workers bill CPU time; raise on a paid plan).

@@ -243,8 +243,9 @@ applyAction(state, unitId, action, rng = Math.random): boolean   // false (state
 | `stepAll()` | repeat `step()` until the player's turn or the end (tests) |
 | `reset()` | clear the battle and turn auto off |
 | `commands()` | the command log of a seeded battle so far |
+| `startParty(a, b, opts, me, send)`, `receive(from, commands)`, `control`, `queued` | a **party fight** played on the server (a world boss, [online.md](online.md#world-bosses)): staged as the server staged it (`opts.allies`, `opts.humans`), this player's unit `me`; the player's moves go to `send` as intents and play when the server's commands come back through `receive`; `step()` plays the next one. `control` (`{ me, humans, autoUnits }`) tells the UI and renderer whose turn is this player's |
 
-Helpers: `isPlayerTurn(state, auto)`, `aiControls(unit, auto)`, `cloneBattle`, `PLAYER_UNIT = "A"`, `PRIMARY_ENEMY_UNIT = "B"`. Every change publishes fresh `state`, `units`, `events` and `log` references. The store never runs a timer.
+Helpers: `isPlayerTurn(state, auto, control?)`, `aiControls(unit, auto, control?)`, `cloneBattle`, `PLAYER_UNIT = "A"`, `PRIMARY_ENEMY_UNIT = "B"`. A session for a party fight also takes `allies` (more units on the hero's side) and `humans` (the units people play; the AI plays the rest), keeps `autoUnits` (people's units the AI plays for now), and logs two more commands: `["x"]` (the AI plays one beat for the person holding the turn — their time ran out) and `["u", unit, 0 | 1]` (that person's อัตโนมัติ); `stepUntilHuman` / `humanToAct` are the server's. Every change publishes fresh `state`, `units`, `events` and `log` references. The store never runs a timer.
 
 ## World ↔ battle
 

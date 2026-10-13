@@ -340,7 +340,7 @@ Then run `bun run test:navigation`: every painted map must keep its spawn open a
 ## A legendary beast (boss)
 
 1. **The opponent** in the legendary-beast block of `opponents.ts`: `ti: 5`, `category: "beast"`, `boss: true`, `look: { anim: "<sheet>" }`, `drops: BOSS_DROPS`, a `pack` of minions (always brought), its own inner art `art_boss_<x>` and three moves of its own (`bss_*`, combat engine, [combat.md](combat.md)). Power 1100–1600 at stat scale 1.
-2. **The lair** in `BOSSES` (`lib/world/data/bosses.ts`): `lair` (a wild location with a painted map), `spot` (map %: open ground reachable from the spawn and ≥ 12 % from every marker — `test:foes` probes it), `respawnDays` (90), `wExp` (3,000–4,000), `trophyItemId`, `gear` + `gearChance`, and the `lore` line the wilds repeat (it becomes a lore rumor pointing at the lair).
+2. **The lair** in `BOSSES` (`lib/world/data/bosses.ts`): `lair` (a wild location with a painted map), `spot` (map %: open ground reachable from the spawn and ≥ 12 % from every marker — `test:foes` probes it), `respawnDays` (`BOSS_RESPAWN_DAYS`, 3: three real hours), `wExp` (3,000–4,000), `trophyItemId`, `gear` + `gearChance`, and the `lore` line the wilds repeat (it becomes a lore rumor pointing at the lair).
 3. **The trophy** `trophy_<x>` in `items.ts` (category `material`, a high price) with an icon in `item-icons.ts`.
 4. **The art** sheet at `/art/anims/<id>.png` ([assets.md](assets.md)).
 - **Other ways to meet it:**

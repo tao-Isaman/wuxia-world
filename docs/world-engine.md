@@ -244,7 +244,7 @@ Nothing rolls on arrival. While the hero walks on a location or route map, the w
 
 There are no treasure or meeting events (removed with their scenes).
 
-**Legendary beasts** (`lib/world/data/bosses.ts`) are not rolled: an alive boss (`bossAlive`: never beaten, or beaten ≥ `respawnDays` (90) ago, `bossDefeatedDay` saved since v26) always waits at its lair's `spot` (`bossesAt(state, locationId)`). The location map adds it to `presentation.foes` as a `WorldFoe` with `boss: true` and `look: { kind: "anim", sheet }` (`bossFoesAt` in `components/world/roaming-foes.ts`); walking into it calls `engageBoss(id)` → the same encounter screen, and ⚔ ต่อสู้ brings its pack (`withPack`). A win calls `bossSlain` (`lib/world/victory.ts`): `bossDefeatedDay[id] = day`, a loud rumor (weight 12, heard everywhere within 10 days, 40-day life) and a `boss` action-log line.
+**Legendary beasts** (`lib/world/data/bosses.ts`) are not rolled: an alive boss (`bossAlive`: never beaten, or beaten ≥ `respawnDays` (3 world days, three real hours) ago, `bossDefeatedDay` saved since v26; online the server's `BossStatus` decides instead, and the beast is fought by a party — [online.md](online.md#world-bosses)) always waits at its lair's `spot` (`bossesAt(state, locationId)`). The location map adds it to `presentation.foes` as a `WorldFoe` with `boss: true` and `look: { kind: "anim", sheet }` (`bossFoesAt` in `components/world/roaming-foes.ts`); walking into it calls `engageBoss(id)` → the same encounter screen, and ⚔ ต่อสู้ brings its pack (`withPack`). A win calls `bossSlain` (`lib/world/victory.ts`): `bossDefeatedDay[id] = day`, a loud rumor (weight 12, heard everywhere within 10 days, 40-day life) and a `boss` action-log line.
 
 ### Who turns up
 

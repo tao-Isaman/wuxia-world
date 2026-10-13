@@ -1,6 +1,7 @@
 import type { WorldFoe } from "@/lib/stage/types";
 import { getOpponent } from "@/lib/world/data/opponents";
-import { bossesAt } from "@/lib/world/data/bosses";
+import { BOSSES, bossesAt } from "@/lib/world/data/bosses";
+import { bossIsUp, cloudRaid, useRaid } from "@/store/cloud-raid";
 import { foeLook } from "@/lib/world/battle-looks";
 import { npcPresent } from "@/lib/world/npc-presence";
 import type { WorldStateData } from "@/lib/world";
@@ -32,8 +33,13 @@ export function roamingFoesOn(foes: readonly RoamingFoe[], sceneId: string): Wor
  * and the battle brings its minions.
  */
 export function bossFoesAt(state: Pick<WorldStateData, "bossDefeatedDay" | "day">, sceneId: string): WorldFoe[] {
-  return bossesAt(state, sceneId).map((boss) => ({
-    id: `boss:${boss.id}`, x: boss.spot.x, y: boss.spot.y, name: boss.name, boss: true,
+  // Online the beasts are the world's (store/cloud-raid.ts): drawn while the server says they wait.
+  const online = cloudRaid.enabled();
+  const statuses = useRaid.getState().bosses;
+  const here = online ? BOSSES.filter((b) => b.lair === sceneId && bossIsUp(statuses[b.id])) : bossesAt(state, sceneId);
+  return here.map((boss) => ({
+    id: `boss:${boss.id}`, x: boss.spot.x, y: boss.spot.y, boss: true,
+    name: online && statuses[boss.id]?.fighting ? `${boss.name} (กำลังสู้กับคณะของ${statuses[boss.id]!.fighting})` : boss.name,
     look: mapLook(boss.id),
     onEngage: () => useWorldStore.getState().engageBoss(boss.id),
   }));

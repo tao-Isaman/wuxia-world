@@ -11,8 +11,16 @@
 //   ["w"] · ["f"]         wait · flee
 //   ["i", itemId, x, y]   a battle item (its effect comes from the item table)
 //   ["auto", 0 | 1]       อัตโนมัติ off / on
+//   ["x"]                 one AI beat for the person whose unit holds the turn (their time ran out)
+//   ["u", unitId, 0 | 1]  the AI plays that person's unit from now on, or stops (a party fight)
 // Only commands that changed the battle are logged, so a replay must accept
 // every one of them.
+//
+// A party fight (a world boss, server/worker/ts/raid-*.ts) has more than one
+// person on the ally side: `allies` adds their units, `humans` names the units
+// people play (the rest of the side is the AI's), and `autoUnits` the people's
+// units the AI plays for now. Commands still act for whichever unit holds the
+// turn; who may send them is the server's business.
 
 import type { CharacterBuild, WeaponFamily } from "../types";
 import { WEAPON_FAMILY_LABEL } from "../data/weapons";
@@ -42,6 +50,10 @@ export interface BattleStartOpts {
   bag?: Record<string, number>;
   /** Roll every die from this seed and keep the command log (a battle the server checks). */
   seed?: number;
+  /** A party fight: more units on the leader's side (after the leader), in order. */
+  allies?: UnitSpec[];
+  /** The units people play (default: the whole ally side); the AI plays the others. */
+  humans?: string[];
 }
 
 export type BattleCommand =
@@ -51,7 +63,9 @@ export type BattleCommand =
   | ["w"]
   | ["f"]
   | ["i", string, number, number]
-  | ["auto", 0 | 1];
+  | ["auto", 0 | 1]
+  | ["x"]
+  | ["u", string, 0 | 1];
 
 /** What a battle item does in a fight (the item table's `battle` entry), for `["i", …]` replays. */
 export type BattleItemLookup = (itemId: string) => { name: string; effect: BattleItemEffect } | null;
@@ -66,6 +80,18 @@ export interface BattleSession {
   rng: (() => number) | null;
   /** The commands so far (only for a seeded battle). */
   commands: BattleCommand[] | null;
+  /** The units people play (null: the whole ally side, a solo fight). */
+  humans: string[] | null;
+  /** People's units the AI plays for now (a party fight: time ran out, or they asked). */
+  autoUnits: string[];
+}
+
+/** Who plays which unit: the session's settings, as the UI sees them (null fields: a solo fight). */
+export interface BattleControl {
+  /** The unit this screen's player plays. */
+  me: string;
+  humans: readonly string[] | null;
+  autoUnits: readonly string[];
 }
 
 export const PLAYER_UNIT = "A";
@@ -77,16 +103,33 @@ const DEFAULT_LOOKS: { A: UnitLook; B: UnitLook } = {
 /** Safety bound for stepAll (each step makes progress, so this is never hit in practice). */
 const STEP_ALL_LIMIT = 5000;
 
-/** Whether the AI plays this unit right now (enemies always; allies when auto is on). */
-export function aiControls(unit: GridUnit, auto: boolean): boolean {
-  return unit.team === "enemy" || auto;
+/**
+ * Whether the AI plays this unit right now: enemies always; an ally nobody
+ * plays (a party fight's `humans`); a person's unit set to the AI
+ * (`autoUnits`); and every ally when auto is on.
+ */
+export function aiControls(unit: GridUnit, auto: boolean, control?: Pick<BattleControl, "humans" | "autoUnits"> | null): boolean {
+  if (unit.team === "enemy" || auto) return true;
+  if (control?.humans && !control.humans.includes(unit.id)) return true;
+  return !!control?.autoUnits.includes(unit.id);
 }
 
-/** True when the battle is waiting for the player's input (their unit holds the turn, auto off). */
-export function isPlayerTurn(state: GridBattleState | null, auto: boolean): boolean {
+/**
+ * True when the battle waits for a person's input (their unit holds the turn,
+ * the AI not playing it). With a `control`'s `me`, only for that player's own unit.
+ */
+export function isPlayerTurn(state: GridBattleState | null, auto: boolean, control?: BattleControl | null): boolean {
   if (!state || state.phase === "over") return false;
   const u = activeUnit(state);
-  return !!u && !aiControls(u, auto);
+  if (!u || aiControls(u, auto, control)) return false;
+  return !control || u.id === control.me;
+}
+
+/** Whether a person (any of them) must act now: the session waits for a command it cannot make itself. */
+function humanTurn(session: BattleSession): boolean {
+  if (session.state.phase === "over") return false;
+  const u = activeUnit(session.state);
+  return !!u && !aiControls(u, session.auto, session);
 }
 
 // ─── Copy-on-write ─────────────────────────────────────────────────────
@@ -126,6 +169,7 @@ export function startSession(a: CharacterBuild, b: CharacterBuild, opts: BattleS
     const looks = opts.looks ?? DEFAULT_LOOKS;
     const specs: UnitSpec[] = [
       { id: PLAYER_UNIT, team: "ally", build: a, look: looks.A, hp: opts.hpA, mp: opts.mpA, leader: true },
+      ...(opts.allies ?? []).map((u) => ({ ...u, team: "ally" as const, leader: false })),
       { id: PRIMARY_ENEMY_UNIT, team: "enemy", build: b, look: looks.B },
       ...(opts.enemies ?? []).map((e) => ({ ...e, team: "enemy" as const, leader: false })),
     ];
@@ -144,11 +188,13 @@ export function startSession(a: CharacterBuild, b: CharacterBuild, opts: BattleS
     const aA = getArt(a.artId), aB = getArt(b.artId);
     if (aA.id !== "none") log(`${nameA} ลมปราณ: ${aA.n} ขั้น ${a.artLevel} · พลังชีวิต +${aA.hL * a.artLevel} · ปราณ +${aA.mL * a.artLevel}`);
     if (aB.id !== "none") log(`${nameB} ลมปราณ: ${aB.n} ขั้น ${b.artLevel} · พลังชีวิต +${aB.hL * b.artLevel} · ปราณ +${aB.mL * b.artLevel}`);
-    const extra = battle.units.length - 2;
+    const allies = opts.allies?.length ?? 0;
+    if (allies > 0) log(`ฝ่ายเรามีสหายร่วมคณะอีก ${allies} คน`);
+    const extra = battle.units.length - 2 - allies;
     if (extra > 0) log(`ฝ่ายศัตรูมีพวกอีก ${extra} คน`);
     return battle;
   });
-  return { state: cloneBattle(state), auto: false, planned: null, rng, commands: rng ? [] : null };
+  return { state: cloneBattle(state), auto: false, planned: null, rng, commands: rng ? [] : null, humans: opts.humans ? [...opts.humans] : null, autoUnits: [] };
 }
 
 function record(session: BattleSession, command: BattleCommand): void {
@@ -167,8 +213,8 @@ function commandOf(action: GridAction): BattleCommand {
 
 /** The player's active unit acts, if it is the player's turn. Returns whether anything happened. */
 export function playerAction(session: BattleSession, action: GridAction): boolean {
-  const { state, auto } = session;
-  if (!isPlayerTurn(state, auto)) return false;
+  const { state } = session;
+  if (!humanTurn(session)) return false;
   const next = cloneBattle(state);
   const u = activeUnit(next)!;
   if (!withRandom(session.rng, () => applyAction(next, u.id, action))) return false;
@@ -178,19 +224,24 @@ export function playerAction(session: BattleSession, action: GridAction): boolea
   return true;
 }
 
-/** One visible beat of non-player play: start the next turn and / or one AI move or action. */
-export function stepSession(session: BattleSession): boolean {
-  const { state, auto } = session;
+/**
+ * One visible beat of non-player play: start the next turn and / or one AI
+ * move or action. `force` plays a person's unit too (their time ran out: `["x"]`).
+ */
+export function stepSession(session: BattleSession, force = false): boolean {
+  const { state } = session;
   if (state.phase === "over") return false;
   const next = cloneBattle(state);
+  const ai = (u: GridUnit) => force || aiControls(u, session.auto, session);
   const changed = withRandom(session.rng, () => {
     let u = activeUnit(next);
     if (!u) {
+      if (force) return false; // nobody's turn to play for
       u = beginNextTurn(next);
       session.planned = null;
       // Player's turn (or battle over): publish the new turn and wait.
-      if (!u || !aiControls(u, auto)) return true;
-    } else if (!aiControls(u, auto)) {
+      if (!u || !aiControls(u, session.auto, session)) return true;
+    } else if (!ai(u)) {
       return false; // waiting for the player
     }
     // One AI beat: the move, or (after moving / when not moving) the action.
@@ -213,14 +264,34 @@ export function stepSession(session: BattleSession): boolean {
   });
   if (!changed) return false;
   session.state = next;
-  record(session, ["s"]);
+  record(session, force ? ["x"] : ["s"]);
   return true;
+}
+
+/** A party fight: the AI plays a person's unit from now on (`on`), or stops. Only for `humans`. */
+export function setUnitAuto(session: BattleSession, unitId: string, on: boolean): boolean {
+  if (!session.humans?.includes(unitId) || session.autoUnits.includes(unitId) === on) return false;
+  session.autoUnits = on ? [...session.autoUnits, unitId] : session.autoUnits.filter((id) => id !== unitId);
+  record(session, ["u", unitId, on ? 1 : 0]);
+  return true;
+}
+
+/** Steps until a person must act or the battle ends (the server's side of a party fight). Returns the beats made. */
+export function stepUntilHuman(session: BattleSession, limit = STEP_ALL_LIMIT): number {
+  let beats = 0;
+  while (beats < limit && session.state.phase !== "over" && !humanTurn(session) && stepSession(session)) beats++;
+  return beats;
+}
+
+/** The unit holding the turn when a person must act now, else null. */
+export function humanToAct(session: BattleSession): string | null {
+  return humanTurn(session) ? activeUnit(session.state)?.id ?? null : null;
 }
 
 /** Step until the player must act or the battle ends (tests, debug). */
 export function stepSessionAll(session: BattleSession): void {
   for (let i = 0; i < STEP_ALL_LIMIT; i++) {
-    if (session.state.phase === "over" || isPlayerTurn(session.state, session.auto)) return;
+    if (session.state.phase === "over" || humanTurn(session)) return;
     if (!stepSession(session)) return;
   }
 }
@@ -255,6 +326,8 @@ export function applyCommand(session: BattleSession, command: unknown, items: Ba
       if (a !== 0 && a !== 1) return false;
       setSessionAuto(session, a === 1);
       return true;
+    case "x": return humanTurn(session) && stepSession(session, true);
+    case "u": return typeof a === "string" && (b === 0 || b === 1) && setUnitAuto(session, a, b === 1);
     default:
       return false;
   }

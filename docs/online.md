@@ -242,10 +242,10 @@ Storage keeps the save and the roster that numbers it in one write.
 
 Every fight of a character played on the server is **staged, replayed and paid by the server**:
 
-1. **Staging.** Going in (`ensureBattleStarted` → `cloudBattle.begin`), the browser saves (`cloudSave.settle`) and asks `POST /characters/<id>/battle/start`. The server reads the character's last accepted save, stages its `pendingBattle` with the same pure code the browser uses (`worldBattleStart`, `lib/world/battle-setup.ts`: the scaled foe and pack, the hero's build, HP / MP and bag) and picks a random **seed**. A legendary beast this character felled less than its rest ago is refused (`boss_resting`); so is a save with no battle (`no_battle`), and more than 12 starts a minute.
+1. **Staging.** Going in (`ensureBattleStarted` → `cloudBattle.begin`), the browser saves (`cloudSave.settle`) and asks `POST /characters/<id>/battle/start`. The server reads the character's last accepted save, stages its `pendingBattle` with the same pure code the browser uses (`worldBattleStart`, `lib/world/battle-setup.ts`: the scaled foe and pack, the hero's build, HP / MP and bag) and picks a random **seed**. A legendary beast is never a solo fight here (`boss_party`: it is the world's, fought by a party — [World bosses](#world-bosses)); a save with no battle is refused (`no_battle`), and so are more than 12 starts a minute.
 2. **Playing.** The browser starts the battle with exactly the server's fight and seed. A battle is a list of commands (`lib/game/grid/session.ts`: a step, a move, a skill on a cell, wait, flee, an item, อัตโนมัติ on / off); with a seed every die is rolled from it (`withRandom`), and the commands are logged. The log streams to the server every 2.5 s; the server replays each command on its own session as it comes (`playCommands`). A command that cannot happen in that battle voids it (`bad_log`).
 3. **The verdict.** When the battle ends the browser sends the rest and asks for the verdict (`finish`). The server's replay says who won, the HP / MP left and the items used, and on a win it rolls the spoils itself (`rollVictorySpoilsFrom`, `lib/world/spoils.ts`). The result panel waits for it ("กำลังตรวจผลการต่อสู้กับเซิร์ฟเวอร์…"; ลองอีกครั้ง when the server cannot be reached), then shows the server's spoils; `acknowledgeBattleResult` applies the verdict, not the browser's own outcome. A battle the server refused counts as left: no rewards, no harm.
-4. **Consequences on the server.** A win's gold is granted to the character (`/grant` on its `AccountObject`), so the next save may show it beyond the allowance; a felled beast rests for this character; a won ⚔ สังหาร against one of the simulated people kills them in the shared world.
+4. **Consequences on the server.** A win's gold is granted to the character (`/grant` on its `AccountObject`), so the next save may show it beyond the allowance; a won ⚔ สังหาร against one of the simulated people kills them in the shared world.
 
 The browser and the server roll the same numbers because the engines are the same code and every engine call runs under the seed; the browser's battle store and the server's replay share `lib/game/grid/session.ts`. (Tested across engines: the browser's V8 or JavaScriptCore against the server's V8.)
 
@@ -256,6 +256,26 @@ The browser and the server roll the same numbers because the engines are the sam
 | `POST /characters/<id>/battle/finish` `{ battleId, from, commands }` | `{ battleId, winner, escaped, hA, mpA, itemsUsed, spoils }` (asking again gives the same) |
 
 Without a server (dev, tests, `/debug`) battles are unseeded and roll in the browser as before.
+
+## World bosses
+
+The six legendary beasts (`lib/world/data/bosses.ts`) are **one each for everyone**, kept by the server, and fought by a **party** (2–4 people): `server/worker/ts/raid-object.ts` (a `RaidObject` per beast, `4:raid:<bossId>`) with the rules in `raid-doc.ts` (pure, `test:play-server`); the browser side is `store/cloud-raid.ts` and `components/world/raid-bridge.tsx`; the messages are `lib/net/raid-protocol.ts` (`RAID_RULES`).
+
+1. **Where they stand.** Every `GET /world` reply carries `bosses` (`BossStatus`: when each last fell, who felled it, who is fighting it now), which the RaidObjects tell the `WorldObject` (`/boss-state`). A lair's map draws its beast while it waits (`bossFoesAt`, `bossIsUp`), named with the party fighting it.
+2. **Opening.** The party's leader, standing at the lair (their last accepted save says so), walks into the beast: `POST /raid/<bossId>/open`. The router reads the leader's save and the party (their hub's `/internal/party`); refusals: `party_small` (alone), `not_leader`, `not_here`, `taken` (another party is fighting it), `resting` (it fell less than three real hours ago). The fight **gathers** for 90 s: the beast is taken, and every other member gets a `raid_invite` on their social socket (a card: เข้าร่วม at the lair, else 🧭 นำทาง there).
+3. **Joining and beginning.** A member at the lair `join`s (their save read the same way). The fight begins when all have joined, when the leader presses เริ่มสู้เลย (`start`, two or more), or when the gathering runs out with two or more (else it ends). The beast and its pack are staged once for the party: scaled by the strongest member's power, each foe's HP +60 % of its own per person after the first (`partyScaled`, a `baseHp`).
+4. **Playing.** The server plays the fight (`lib/game/grid/session.ts` with `allies` and `humans`: unit `A` is the leader, `P2`–`P4` the others). Each screen stages the same fight from the reply (`startParty`) and replays the server's commands one beat at a time (`receive`, polled every 0.9 s). When a player's own unit holds the turn they send what it does (`act`: move, skill, wait, or อัตโนมัติ for their unit — `["u", unit, 0 | 1]`); the AI plays the foes at once, a turn left for 30 s (`["x"]`), and anyone not heard from for 20 s. No items or retreat in a party fight; it is called off after 30 minutes.
+5. **The end.** The server judges it: on a win every member gets their own verdict and spoils (`rollVictorySpoilsFrom` on their unit's moves and their own save; a member who fell walks away with 1 HP), gold to each one's allowance; the beast is gone for **three real hours** (`RAID_RULES.respawnMs`), and the jianghu hears that the party felled it. Lost or called off, the beast is free again at full strength. `acknowledgeBattleResult` applies the verdict (`pendingBattle.raid`), as for a checked battle; a reload mid-fight takes it up again from the server's log (`cloudRaid.resume`).
+
+| Call | Answer |
+| --- | --- |
+| `GET /raid/<bossId>[?from=N]` | `RaidView`: the beast's `BossStatus`, and the fight this player is in — its phase, members, their unit (`me`), the deadline, the staging (from 0), the commands from `N`, and their verdict once over |
+| `POST /raid/<bossId>/open { characterId }` | the leader opens (as above) |
+| `POST /raid/<bossId>/join { raid, characterId }` | a member joins |
+| `POST /raid/<bossId>/start { raid }` | the leader begins with who has joined |
+| `POST /raid/<bossId>/act { raid, intent }` | `not_your_turn` unless this player's unit holds the turn (`auto` any time) |
+
+Without a server (dev, tests) a beast is fought alone as before and is back three hours (three world days) after it falls.
 
 ## Friends, party, chat and mail
 
