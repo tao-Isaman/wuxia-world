@@ -308,7 +308,7 @@ export function applyEnemyEffect(
       return;
     case "debuff_def":
       addDebuff(state, ds, { t: "debuff_def", n: "ป้องกัน↓", v: eff.v, u: eff.u });
-      logLine(state, "lS", `&nbsp;✗ ${dnm}: ป้องกันกาย ${eff.v}(${eff.u}ตา)`);
+      logLine(state, "lS", `&nbsp;✗ ${dnm}: ป้องกันภายนอก ${eff.v}(${eff.u}ตา)`);
       return;
     case "debuff_atk":
       addDebuff(state, ds, { t: "debuff_atk", n: "โจมตี↓", v: eff.v, u: eff.u });
@@ -347,7 +347,7 @@ export function applyEnemyEffect(
     case "debuff_def_eva":
       addDebuff(state, ds, { t: "debuff_def", n: "ป้องกัน↓", v: eff.dv, u: eff.u });
       addDebuff(state, ds, { t: "debuff_eva", n: "หลบหลีก↓", v: eff.ev, u: eff.u });
-      logLine(state, "lS", `&nbsp;✗ ${dnm}: ป้องกันกาย ${eff.dv} หลบหลีก ${eff.ev}(${eff.u}ตา)`);
+      logLine(state, "lS", `&nbsp;✗ ${dnm}: ป้องกันภายนอก ${eff.dv} หลบหลีก ${eff.ev}(${eff.u}ตา)`);
       return;
     case "heavy_poison":
       addDebuff(state, ds, { t: "debuff_poison", n: "พิษร้าย", pp: eff.pp, u: eff.u });
@@ -378,9 +378,9 @@ export function applyEnemyEffect(
       addDebuff(state, ds, { t: "debuff_def", n: "ถูกรัด", v: eff.dv, u: eff.du });
       if (Math.random() * 100 < eff.ch) {
         addDebuff(state, ds, { t: "stun", n: "ถูกรัด", u: eff.u });
-        logLine(state, "lS", `&nbsp;✗ ${dnm}: ถูกรัดแน่น สตัน (${eff.u}ตา) + ป้องกันกาย ${eff.dv}(${eff.du}ตา)`);
+        logLine(state, "lS", `&nbsp;✗ ${dnm}: ถูกรัดแน่น สตัน (${eff.u}ตา) + ป้องกันภายนอก ${eff.dv}(${eff.du}ตา)`);
       } else {
-        logLine(state, "lS", `&nbsp;✗ ${dnm}: ดิ้นหลุด + ป้องกันกาย ${eff.dv}(${eff.du}ตา)`);
+        logLine(state, "lS", `&nbsp;✗ ${dnm}: ดิ้นหลุด + ป้องกันภายนอก ${eff.dv}(${eff.du}ตา)`);
       }
       return;
     }
@@ -403,7 +403,7 @@ export function applyEnemyEffect(
       state.st[ds].buffs = [];
       state.st[ds].stk = 0;
       addDebuff(state, ds, { t: "debuff_def", n: "เกราะแหลก", v: eff.dv, u: eff.u });
-      logLine(state, "lS", `&nbsp;✗ ${dnm}: ทลายเกราะ${stripped ? ` สลายพลังเสริม ${stripped}` : ""} + ป้องกันกาย ${eff.dv}(${eff.u}ตา)`);
+      logLine(state, "lS", `&nbsp;✗ ${dnm}: ทลายเกราะ${stripped ? ` สลายพลังเสริม ${stripped}` : ""} + ป้องกันภายนอก ${eff.dv}(${eff.u}ตา)`);
       return;
     }
 
@@ -478,7 +478,7 @@ function applyPassiveEffect(
       return;
     case "debuff_def":
       addDebuff(state, ds, { t: "debuff_def", n: e.n ?? "DEF↓", v: e.v, u: e.u });
-      logLine(state, "lS", `&nbsp;◆ ${dnm}: ป้องกันกาย ${e.v}(${e.u}ตา)`);
+      logLine(state, "lS", `&nbsp;◆ ${dnm}: ป้องกันภายนอก ${e.v}(${e.u}ตา)`);
       return;
     case "stack_atk": {
       const cur = state.st[side].stk;

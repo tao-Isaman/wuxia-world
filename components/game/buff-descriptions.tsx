@@ -71,7 +71,7 @@ export function describeBuff(b: BuffRecord): BuffDescription {
     case "buff_def":
       return {
         title: "แข็งแกร่ง",
-        detail: `ป้องกันกาย ${sign(b.v)} — รับความเสียหายทางกายน้อยลง · ซ้อนกับพลังเสริมประเภทเดียวกันได้`,
+        detail: `ป้องกันภายนอก ${sign(b.v)} — รับความเสียหายทางกายน้อยลง · ซ้อนกับพลังเสริมประเภทเดียวกันได้`,
       };
     case "buff_eva":
       return {
@@ -140,7 +140,7 @@ export function describeBuff(b: BuffRecord): BuffDescription {
     case "buff_spd_pct":
       return { title: b.n ?? "ความเร็ว↑", detail: `ถึงตาเร็วขึ้น ${b.v}% (ชีพจร)` };
     case "buff_def_pct":
-      return { title: b.n ?? "พลังป้องกัน↑", detail: `ป้องกันกายและป้องกันใน +${b.v}% (ชีพจร)` };
+      return { title: b.n ?? "พลังป้องกัน↑", detail: `ป้องกันภายนอกและป้องกันภายใน +${b.v}% (ชีพจร)` };
     case "buff_cri_rate":
       return { title: b.n ?? "คริติคอล↑", detail: `โอกาสคริติคอล +${b.v} (ชีพจร)` };
     case "buff_acc_pct":
@@ -172,8 +172,8 @@ export function describeDebuff(d: DebuffRecord): BuffDescription {
       };
     case "debuff_def":
       return {
-        title: "เกราะแตก (ป้องกันกายลด)",
-        detail: `ป้องกันกาย ${sign(d.v ?? 0)} — รับความเสียหายทางกายมากขึ้น · ซ้อนได้เมื่อโดนซ้ำ`,
+        title: "เกราะแตก (ป้องกันภายนอกลด)",
+        detail: `ป้องกันภายนอก ${sign(d.v ?? 0)} — รับความเสียหายทางกายมากขึ้น · ซ้อนได้เมื่อโดนซ้ำ`,
       };
     case "debuff_atk":
       return {

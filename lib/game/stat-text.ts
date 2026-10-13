@@ -16,8 +16,8 @@ export const DERIVED_LABEL = {
   Atk: "พลังโจมตี",
   PA: "โจมตีภายนอก",
   IA: "โจมตีภายใน",
-  PD: "ป้องกันกาย",
-  ID: "ป้องกันใน",
+  PD: "ป้องกันภายนอก",
+  ID: "ป้องกันภายใน",
   Spd: "ความเร็ว",
   Eva: "หลบหลีก",
   Acc: "แม่นยำ",
@@ -33,7 +33,7 @@ const ON_HIT_LABEL: Record<string, string> = {
 
 const signed = (v: number) => (v >= 0 ? `+${v}` : `−${Math.abs(v)}`);
 
-/** One equipment piece's bonuses: "พลังโจมตี +12 · ป้องกันกาย +4 · ทุกครั้งที่ตีโดน หลบหลีกศัตรู −5 (1 ตา)". */
+/** One equipment piece's bonuses: "พลังโจมตี +12 · ป้องกันภายนอก +4 · ทุกครั้งที่ตีโดน หลบหลีกศัตรู −5 (1 ตา)". */
 export function equipStatParts(e: Equipment): string[] {
   const out: string[] = [];
   const add = (label: string, value: number | undefined) => { if (value) out.push(`${label} ${signed(value)}`); };
@@ -100,7 +100,7 @@ export const AFFIX_LABEL: Record<GearAffixKind, string> = {
   fam_red: "ลดความเสียหายจากกระบวนท่า",
 };
 
-/** One option in words: "ป้องกันกาย +12", "แม่นยำ +6%", "กระบวนท่าสายกระบี่ แรงขึ้น 15%". */
+/** One option in words: "ป้องกันภายนอก +12", "แม่นยำ +6%", "กระบวนท่าสายกระบี่ แรงขึ้น 15%". */
 export function affixText(a: GearAffix): string {
   switch (a.k) {
     case "stat": return `${a.stat ? STAT_LABEL[a.stat] : "ค่าสถานะ"} +${a.v}`;

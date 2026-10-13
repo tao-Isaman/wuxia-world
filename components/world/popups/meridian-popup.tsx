@@ -49,7 +49,7 @@ export const MERIDIAN_KIND_COLOR: Record<MeridianKind, string> = {
 const TIER_COLOR = ["#cfc6ac", "#7fd48f", "#6fb8f2", "#c48ff0", "#f0a456", "#f06a55"];
 
 const COMBAT_LABEL: Record<keyof MeridianCombat, string> = {
-  atk: "พลังโจมตี", pd: "ป้องกันกาย", id_: "ป้องกันใน", hp: "พลังชีวิต", mp: "พลังปราณ",
+  atk: "พลังโจมตี", pd: "ป้องกันภายนอก", id_: "ป้องกันภายใน", hp: "พลังชีวิต", mp: "พลังปราณ",
   pa: "โจมตีภายนอก", ia: "โจมตีภายใน", spd: "ความเร็ว", acc: "แม่นยำ", res: "ต้านทาน",
   cri: "คริติคอล", eva: "หลบหลีก", pct_atk: "พลังโจมตี", pct_red: "ลดความเสียหาย", hp_regen: "ฟื้นพลังชีวิต",
 };

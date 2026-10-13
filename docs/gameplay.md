@@ -473,8 +473,8 @@ Each of the 17 kinds is equally likely, and a piece never rolls one kind twice:
 | Option | Range |
 | --- | --- |
 | a base stat (กำลัง … ฉลาด, random) | +1–10 |
-| ป้องกันกาย / ป้องกันใน / โจมตีภายนอก / โจมตีภายใน | +5–15 each |
-| ป้องกันกาย / ป้องกันใน / โจมตีภายนอก / โจมตีภายใน % (on the whole stat) | +1–10 % each |
+| ป้องกันภายนอก / ป้องกันภายใน / โจมตีภายนอก / โจมตีภายใน | +5–15 each |
+| ป้องกันภายนอก / ป้องกันภายใน / โจมตีภายนอก / โจมตีภายใน % (on the whole stat) | +1–10 % each |
 | แม่นยำ % / หลบหลีก % | +1–15 % each |
 | คริติคอล / ต้านทานคริติคอล | +5–15 each |
 | ความเสียหายคริติคอล (the ×1.5 crit becomes ×1.5 + v/100) | +1–10 % |
@@ -491,7 +491,7 @@ A base-stat option counts in battle and everywhere stats are shown, but not for 
 | Piece | +1–5, each | +6–8, each | +9–10, each | at +10 |
 | --- | --- | --- | --- | --- |
 | weapon | พลังโจมตี +10 | พลังโจมตี +15, ความเสียหายสุดท้าย +1 % | พลังโจมตี +20, ความเสียหายสุดท้าย +4 % | +135, +11 % |
-| robe, hat, boots, bracers | ป้องกันกาย / ใน +10, HP +50 | +15, HP +100 | +20, HP +150 | +135 each, HP +850 |
+| robe, hat, boots, bracers | ป้องกันภายนอก / ภายใน +10, HP +50 | +15, HP +100 | +20, HP +150 | +135 each, HP +850 |
 | charm | HP and MP +50 | +100 | +150 | +850 each |
 | ring | โจมตีภายนอก / ภายใน +5 | +10 | +15 | +85 each |
 

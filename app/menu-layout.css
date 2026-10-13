@@ -22,6 +22,11 @@
 /* Last resort only: a column whose content truly cannot fit scrolls itself. */
 .menu-col--scroll { overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
 .menu-col-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex: 0 0 auto; }
+/* The panel's ✕ sits in its top-right corner: the last column's head leaves it room. */
+.hud-menu-panel .menu-col:last-child > :is(.menu-col-head, .bag-toolbar, .meridian-title:first-child) { padding-right: 40px; }
+@media (orientation: landscape) and (max-height: 500px), (orientation: portrait) and (max-width: 500px) {
+  .hud-menu-panel .menu-col:last-child > :is(.menu-col-head, .bag-toolbar, .meridian-title:first-child) { padding-right: 34px; }
+}
 .menu-col-title { font-size: 15px; font-weight: 700; color: var(--ribbon-deep); }
 .menu-tabs { display: flex; gap: 4px; flex: 0 0 auto; padding: 3px; background: #3a261618; border-radius: 8px; }
 .menu-tabs button { flex: 1; min-height: 34px; padding: 0 10px; font-size: 14px; font-weight: 600; color: var(--scroll-ink-soft); border-radius: 6px; white-space: nowrap; }
