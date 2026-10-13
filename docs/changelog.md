@@ -6,6 +6,10 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-13
 
+### {hero} is the hero's name everywhere in a conversation
+
+- **The speaker heading** over the conversation box took its name from the first line's speaker, and 180 story dialogs open on the hero, so it read `{hero}`. The heading and the choices now go through the same namer as the lines (`useHeroNamer`); an e2e (`hero-name.spec.ts`) opens one and checks no `{hero}` is on screen.
+
 ### Quest text is all Thai
 
 - **No ids on screen**: a quest's "ยังต้องการ" lines read ทำภารกิจ «name» ของ<giver> ให้สำเร็จก่อน instead of `qst_… = done`, places by name, sect gates, ranks, gender, gold, life-skill levels, rumors and a person's fate in words; a flag reads ผ่านเหตุการณ์ก่อนหน้าในเรื่องนี้. Rewards on the quest card and in the log share one Thai text (`questRewardText`, `lib/world/quest-text.ts`: traits by name, sect points, joining or leaving a sect) — no more `humility +5`. `test:quests` scans every quest's gates, stage needs, rewards and text for ids.

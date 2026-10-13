@@ -138,7 +138,8 @@ export function DialogStage({ scene, speaker, title, locationName }: {
     if (instant || (event.target as Element).closest("button, a")) return;
     advance();
   };
-  const name = speaker?.name ?? title ?? "บทสนทนา";
+  // A heading taken from a line's speaker may be "{hero}": the player's name.
+  const name = named(speaker?.name ?? title ?? "บทสนทนา");
 
   // Film layout (the cutscene standard): letterbox bars, the speaker standing
   // at the left, the line as a subtitle at the bottom, choices beside it.
@@ -206,7 +207,7 @@ export function DialogStage({ scene, speaker, title, locationName }: {
           <div className={styles.talk}>
             <h2 ref={heading} id={headingId} tabIndex={-1} className={styles.speaker}>{name}</h2>
             <div className={`${styles.subtitle} ${instant ? "" : styles.beat}`} data-testid="dialog-lines">
-              {(instant || lines.length > 0) && <DialogDisplay key={instant ? "all" : at} scene={scene} speakerName={speaker?.name ?? title}
+              {(instant || lines.length > 0) && <DialogDisplay key={instant ? "all" : at} scene={scene} speakerName={name}
                 lines={instant ? lines : current ? [current] : []} shown={typing ? shown : undefined} />}
               {!instant && !typing && !lastBeat && <span className={styles.nextMark} aria-hidden="true">▼</span>}
             </div>

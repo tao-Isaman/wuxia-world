@@ -5,6 +5,7 @@ import type { DialogScene } from "@/lib/world";
 import { evaluateCondition } from "@/lib/world";
 import { useWorldStore } from "@/store/world-store";
 import { RichText } from "./rich-text";
+import { useHeroNamer } from "./dialog-display";
 
 interface Props {
   scene: DialogScene;
@@ -12,6 +13,7 @@ interface Props {
 
 export function ChoicePanel({ scene }: Props) {
   const state = useWorldStore();
+  const named = useHeroNamer();
   const makeChoice = useWorldStore((s) => s.makeChoice);
   const gotoScene = useWorldStore((s) => s.gotoScene);
   const exitToLocation = useWorldStore((s) => s.exitToLocation);
@@ -91,7 +93,7 @@ export function ChoicePanel({ scene }: Props) {
           onClick={() => makeChoice(idx)}
         >
           <span className="text-paper/50 mr-2">{displayIndex + 1}.</span>
-          <span><RichText text={choice.text} /></span>
+          <span><RichText text={named(choice.text, true)} /></span>
         </Button>
       ))}
     </div>
