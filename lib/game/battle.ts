@@ -9,6 +9,7 @@ import type {
   SideBattleState,
   Skill,
   StatBlock,
+  WeaponFamily,
 } from "./types";
 import {
   combinedStats,
@@ -29,6 +30,7 @@ import {
 import { firstArtSlotIndex, parseSlotId } from "./slots";
 import { meridianActiveEffects } from "./meridians";
 import { familyDamageMod, gearFamilyMods, type GearFamilyMods } from "./gear";
+import { heldWeaponFamily, weaponMatchMod } from "./weapon-match";
 import type { MeridianEffect } from "./meridian-types";
 import { accPctOf, atkPctOf, criRateOf, defPctOf, landDamage, rollRage, rollSaps, spdPctOf, spdWithPct } from "./meridian-battle";
 
@@ -61,6 +63,8 @@ export interface BattleContext {
   names: Record<Side, string>;
   artIds: Record<Side, string>;
   weaponEquipIds: Record<Side, string | null>;
+  /** The weapon family in hand for the weapon-match rule (null: neutral; lib/game/weapon-match.ts). */
+  heldFamily?: Record<Side, WeaponFamily | null>;
   equipBonus: Record<Side, EquipBonus>;
   // Gear options that change a move's damage by its weapon family (gear.ts).
   gearFamily: Record<Side, GearFamilyMods>;
@@ -102,6 +106,7 @@ export function makeContext(buildA: CharacterBuild, buildB: CharacterBuild): Bat
     names: { A: buildA.name, B: buildB.name },
     artIds: { A: primaryArtId(buildA), B: primaryArtId(buildB) },
     weaponEquipIds: { A: buildA.equipment.W, B: buildB.equipment.W },
+    heldFamily: { A: heldWeaponFamily(buildA), B: heldWeaponFamily(buildB) },
     // Equipment + meridian (ชีพจร) pct_atk / pct_red / hp_regen and flats.
     equipBonus: { A: getBuildBonus(buildA), B: getBuildBonus(buildB) },
     gearFamily: { A: gearFamilyMods(buildA.equipment), B: gearFamilyMods(buildB.equipment) },
@@ -481,7 +486,9 @@ export function calcSkillDamage(
   const ed = Math.max(0, (sk.at === "phy" ? dd.PD : dd.ID) * defMul * pierce + fD - dR);
   // Gear options: more damage with this weapon family's moves, less taken from them.
   const fm = familyDamageMod(ctx.gearFamily?.[side], ctx.gearFamily?.[ds], sk.w);
-  const raw = Math.max(1, (ad.Atk * sm * ab + ta + se) * sk.dm * mm - ed) * (1 - pR / 100) * fm * finalDamageMod(ctx.equipBonus[side]);
+  // Weapon match: +10 % with the family in hand, −10 % with another.
+  const wm = weaponMatchMod(ctx.heldFamily?.[side] ?? null, sk);
+  const raw = Math.max(1, (ad.Atk * sm * ab + ta + se) * sk.dm * mm - ed) * (1 - pR / 100) * fm * wm * finalDamageMod(ctx.equipBonus[side]);
 
   const hp = hitPct(ea, ee);
   if (Math.random() * 100 >= hp) {

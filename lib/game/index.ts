@@ -43,6 +43,7 @@ export {
   type StatBreakdown,
 } from "./derive";
 export * from "./gear";
+export * from "./weapon-match";
 export { gearBaseId, EQUIP_STAT_SCALE, EQUIPMENT_BY_ID } from "./data";
 export * from "./meridian-types";
 export {

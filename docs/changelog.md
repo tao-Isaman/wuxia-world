@@ -6,6 +6,10 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-13
 
+### The weapon in hand matters
+
+- **Weapon match**: a move hits 10 % harder with a weapon of its family in hand and 10 % softer with another (bare hands are fist for the hero; foes without a weapon, arts and beast moves are neutral). Every weapon now carries its family (`Equipment.fam`; หมัดเหล็ก is fist, it read as a hidden weapon from its icon), and the skills window says how a move stands with the weapon held (`lib/game/weapon-match.ts`).
+
 ### The wardrobe shows only outfits the hero has
 
 - **No locked outfits in the ชุด tab**: an outfit not yet had (a found one still to find, another sect's uniform) is no longer listed; the wardrobe shows only what can be worn now (`components/world/wardrobe.tsx`).

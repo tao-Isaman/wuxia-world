@@ -137,7 +137,7 @@ Consequences worth knowing:
 `calcSkillDamage(state, side, skill, ctx)` in `lib/game/battle.ts` runs once per hit for skills with an attack type (`at` = `"phy"` or `"int"`):
 
 ```
-raw = max(1, (Atk × sm × ab + ta + se) × dm × mm − ed) × (1 − pR/100)
+raw = max(1, (Atk × sm × ab + ta + se) × dm × mm − ed) × (1 − pR/100) × fm × wm × final
 dmg = round(raw × riposte × (crit ? 1.5 : 1))
 ```
 
@@ -152,6 +152,9 @@ dmg = round(raw × riposte × (crit ? 1.5 : 1))
 | `mm` | mastery: `1 + (mastery[family]/200) × 0.5` (max ×1.5) |
 | `ed` | effective defence: `max(0, (PD for phy / ID for int) × (1 − pen/100) + Σ buff_def − Σ |debuff_def|)`; `pen` is the skill's pierce (ทะลวง, 0 for all but three boss moves) |
 | `pR` | percent reduction: `Σ defender buff_reduce + defender equipment pct_reduce`, capped at `PCT_REDUCE_CAP` (90) |
+| `fm` | gear options for the move's family: the attacker's `fam_dmg`, the defender's `fam_red` (`familyDamageMod`) |
+| `wm` | weapon match: ×1.1 when the weapon in hand is of the move's family, ×0.9 when it is not (`weaponMatchMod`, below) |
+| `final` | enhancement's `final_dmg` (`finalDamageMod`) |
 | `riposte` | legacy guard bonus (1 + v/100) — unreachable in the game today |
 
 `buff_def` / `debuff_def` change whichever defence the attack targets (PD or ID). `stack_atk` and `pct_atk` scale only the Atk term, not PA / IA / the skill term.
@@ -225,6 +228,10 @@ Arts scale their `stats` by `level/10` and add `hL` / `mL` HP / MP per level. Wh
 ### Weapon mastery
 
 `getMasteryMap(skillIds, skillLevels, conflict)`: every **slotted** skill adds `effectiveMg(skill, level) × conflict` to its weapon family (`fist`, `long`, `sword`, `blade`, `short`, `hidden`, `music`), capped at 200 per family. In damage, one multiplier per family: `1 + mastery/200 × 0.5`, so at most ×1.5 for every skill of that family.
+
+### Weapon match
+
+`lib/game/weapon-match.ts`: every weapon carries its family (`Equipment.fam`). A move hits `× (1 + WEAPON_MATCH_BONUS)` = ×1.1 when the weapon in hand (`heldWeaponFamily`) is of the move's family `w`, and `× (1 − WEAPON_MISMATCH_MALUS)` = ×0.9 when it is not. Bare hands are `fist` for the hero (a build with `baseHp`); a foe with no weapon on its build (the opponents table carries none) is neutral, and so are arts, beast and boss moves. The skills window shows the match on a move's numbers (`data-testid="weapon-match"`). Mastery (above) is separate: it comes from the slotted moves, not the weapon.
 
 ### Type conflict
 

@@ -195,7 +195,8 @@ Two deliberate exceptions reach into stores:
 
   - Hit `clamp(80 + (Acc − Eva)/4, 5, 95)`.
   - Crit `clamp(3 + (Cri − Res)/3, 0, 75)`, ×1.5.
-  - Mastery `1 + (mastery/200) × 0.5` per matching weapon family (cap 200).
+  - Mastery `1 + (mastery/200) × 0.5` per matching weapon family (cap 200), from the slotted moves.
+  - Weapon match (`weapon-match.ts`, `Equipment.fam` on every weapon): a move ×1.1 with a weapon of its family in hand, ×0.9 with another; the hero bare-handed is `fist`, a foe without a weapon, arts and beast / boss moves are neutral.
 - **Levels 1–10** (`leveling.ts`).
   - `effectiveBp` goes from 50 % at lv 1 to 100 % at lv 10; a skill's `st` bonus scales the same way. Art stats scale by `level/10`.
   - Xp to the next level: skill `50 × lv × (tier+1)`; art `100 × lv × (tier+1)`.

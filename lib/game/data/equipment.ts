@@ -11,15 +11,15 @@ import type { Equipment, EquipSlotType } from "../types";
 // scaled by EQUIP_STAT_SCALE (the options make up the rest).
 const AUTHORED_EQUIPMENT: readonly Equipment[] = [
   // อาวุธ W — base: ATK
-  { id: "W1", n: "ดาบเหล็กสามัญ", ty: "W", ti: 0, atkb: 20, pdb: 0, idb: 0, hpb: 0, mpb: 0, st: {}, eff: null },
-  { id: "W2", n: "ดาบทองคำ", ty: "W", ti: 1, atkb: 71, pdb: 0, idb: 0, hpb: 24, mpb: 0, pab: 23, iab: 7, accb: 14, crib: 8, st: {}, eff: null },
-  { id: "W3", n: "ดาบเพลิง", ty: "W", ti: 2, atkb: 75, pdb: 10, idb: 10, hpb: 30, mpb: 120, pab: 20, iab: 20, crib: 10, st: {}, eff: { t: "pct_atk", v: 10 } },
-  { id: "W4", n: "ดาบพิษ", ty: "W", ti: 3, atkb: 55, pdb: 0, idb: 0, hpb: 0, mpb: 0, pab: 18, iab: 18, accb: 20, crib: 8, resb: 8, st: {}, eff: { t: "on_hit", db: { t: "debuff_eva", v: -10, u: 2 } } },
-  { id: "W5", n: "ดาบมังกรเทพ", ty: "W", ti: 4, atkb: 110, pdb: 0, idb: 0, hpb: 30, mpb: 0, pab: 24, iab: 4, spdb: 12, evab: 12, accb: 8, crib: 10, st: {}, eff: { t: "flat_cri", v: 20 } },
+  { id: "W1", n: "ดาบเหล็กสามัญ", ty: "W", fam: "blade", ti: 0, atkb: 20, pdb: 0, idb: 0, hpb: 0, mpb: 0, st: {}, eff: null },
+  { id: "W2", n: "ดาบทองคำ", ty: "W", fam: "blade", ti: 1, atkb: 71, pdb: 0, idb: 0, hpb: 24, mpb: 0, pab: 23, iab: 7, accb: 14, crib: 8, st: {}, eff: null },
+  { id: "W3", n: "ดาบเพลิง", ty: "W", fam: "blade", ti: 2, atkb: 75, pdb: 10, idb: 10, hpb: 30, mpb: 120, pab: 20, iab: 20, crib: 10, st: {}, eff: { t: "pct_atk", v: 10 } },
+  { id: "W4", n: "ดาบพิษ", ty: "W", fam: "blade", ti: 3, atkb: 55, pdb: 0, idb: 0, hpb: 0, mpb: 0, pab: 18, iab: 18, accb: 20, crib: 8, resb: 8, st: {}, eff: { t: "on_hit", db: { t: "debuff_eva", v: -10, u: 2 } } },
+  { id: "W5", n: "ดาบมังกรเทพ", ty: "W", fam: "blade", ti: 4, atkb: 110, pdb: 0, idb: 0, hpb: 30, mpb: 0, pab: 24, iab: 4, spdb: 12, evab: 12, accb: 8, crib: 10, st: {}, eff: { t: "flat_cri", v: 20 } },
   // Music instruments — fight as weak weapons but tag the W slot for the
   // music life-skill so practiceMusic() works.
-  { id: "W_flute", n: "ขลุ่ยไผ่", ty: "W", ti: 1, atkb: 22, pdb: 12, idb: 12, hpb: 0, mpb: 94, iab: 8, st: {}, eff: null, instrument: true },
-  { id: "W_pipa",  n: "พิณยี่ห้อง", ty: "W", ti: 2, atkb: 27, pdb: 15, idb: 15, hpb: 0, mpb: 120, iab: 10, st: {}, eff: null, instrument: true },
+  { id: "W_flute", n: "ขลุ่ยไผ่", ty: "W", fam: "music", ti: 1, atkb: 22, pdb: 12, idb: 12, hpb: 0, mpb: 94, iab: 8, st: {}, eff: null, instrument: true },
+  { id: "W_pipa",  n: "พิณยี่ห้อง", ty: "W", fam: "music", ti: 2, atkb: 27, pdb: 15, idb: 15, hpb: 0, mpb: 120, iab: 10, st: {}, eff: null, instrument: true },
 
   // เสื้อ A — base: PD+ID (สูง)
   { id: "A1", n: "เสื้อผ้าธรรมดา", ty: "A", ti: 0, atkb: 0, pdb: 30, idb: 20, hpb: 0, mpb: 0, st: {}, eff: null },
@@ -72,12 +72,12 @@ const AUTHORED_EQUIPMENT: readonly Equipment[] = [
   // gear, not late-game pieces.
 
   // ── tier 0 weapons (forge) — 6 weapon families
-  { id: "eq_t0_w_fist",   n: "นวมไม้ฝึกหมัด",      ty: "W", ti: 0, atkb: 14, pdb: 0, idb: 0, hpb: 6, mpb: 0, pab: 4, crib: 2, st: {}, eff: null },
-  { id: "eq_t0_w_long",   n: "ทวนไม้ฝึก",          ty: "W", ti: 0, atkb: 16, pdb: 1, idb: 1, hpb: 26, mpb: 0, pab: 4, crib: 2, st: {}, eff: null },
-  { id: "eq_t0_w_sword",  n: "กระบี่ไม้ฝึก",        ty: "W", ti: 0, atkb: 12, pdb: 2, idb: 2, hpb: 0, mpb: 24, iab: 4, spdb: 2, evab: 2, st: {}, eff: null },
-  { id: "eq_t0_w_blade",  n: "ดาบไม้ฝึก",          ty: "W", ti: 0, atkb: 20, pdb: 0, idb: 0, hpb: 9, mpb: 0, pab: 6, crib: 3, st: {}, eff: null },
-  { id: "eq_t0_w_short",  n: "พัดฝึกฝีมือ",         ty: "W", ti: 0, atkb: 11, pdb: 4, idb: 4, hpb: 0, mpb: 38, iab: 4, st: {}, eff: null },
-  { id: "eq_t0_w_hidden", n: "เข็มฝึกซ้อม",         ty: "W", ti: 0, atkb: 9, pdb: 0, idb: 0, hpb: 0, mpb: 0, pab: 3, iab: 3, accb: 6, st: {}, eff: null },
+  { id: "eq_t0_w_fist",   n: "นวมไม้ฝึกหมัด",      ty: "W", fam: "fist", ti: 0, atkb: 14, pdb: 0, idb: 0, hpb: 6, mpb: 0, pab: 4, crib: 2, st: {}, eff: null },
+  { id: "eq_t0_w_long",   n: "ทวนไม้ฝึก",          ty: "W", fam: "long", ti: 0, atkb: 16, pdb: 1, idb: 1, hpb: 26, mpb: 0, pab: 4, crib: 2, st: {}, eff: null },
+  { id: "eq_t0_w_sword",  n: "กระบี่ไม้ฝึก",        ty: "W", fam: "sword", ti: 0, atkb: 12, pdb: 2, idb: 2, hpb: 0, mpb: 24, iab: 4, spdb: 2, evab: 2, st: {}, eff: null },
+  { id: "eq_t0_w_blade",  n: "ดาบไม้ฝึก",          ty: "W", fam: "blade", ti: 0, atkb: 20, pdb: 0, idb: 0, hpb: 9, mpb: 0, pab: 6, crib: 3, st: {}, eff: null },
+  { id: "eq_t0_w_short",  n: "พัดฝึกฝีมือ",         ty: "W", fam: "short", ti: 0, atkb: 11, pdb: 4, idb: 4, hpb: 0, mpb: 38, iab: 4, st: {}, eff: null },
+  { id: "eq_t0_w_hidden", n: "เข็มฝึกซ้อม",         ty: "W", fam: "hidden", ti: 0, atkb: 9, pdb: 0, idb: 0, hpb: 0, mpb: 0, pab: 3, iab: 3, accb: 6, st: {}, eff: null },
 
   // ── tier 0 armor (forge metal: iron / tailoring cloth)
   { id: "eq_t0_a_cloth",  n: "เสื้อผ้าฝ้ายเรียบ",    ty: "A", ti: 0, atkb: 0, pdb: 18,  idb: 12, hpb: 0, mpb: 0, st: {},                  eff: null },
@@ -94,12 +94,12 @@ const AUTHORED_EQUIPMENT: readonly Equipment[] = [
   { id: "eq_t0_c_cloth",  n: "เครื่องรางผ้าแดง",   ty: "C", ti: 0, atkb: 0, pdb: 0, idb: 0, hpb: 100, mpb: 0, pab: 2, iab: 2, crib: 2, resb: 2, st: {}, eff: null },
 
   // ── tier 1 weapons (forge)
-  { id: "eq_t1_w_fist",   n: "หมัดเหล็ก",          ty: "W", ti: 1, atkb: 33, pdb: 2, idb: 2, hpb: 55, mpb: 0, pab: 10, crib: 5, st: {}, eff: null },
-  { id: "eq_t1_w_long",   n: "ทวนเหล็ก",          ty: "W", ti: 1, atkb: 40, pdb: 0, idb: 0, hpb: 15, mpb: 0, pab: 10, spdb: 6, evab: 6, crib: 5, st: {}, eff: null },
-  { id: "eq_t1_w_sword",  n: "กระบี่เหล็ก",        ty: "W", ti: 1, atkb: 28, pdb: 4, idb: 4, hpb: 0, mpb: 48, pab: 4, iab: 12, accb: 8, st: {}, eff: null },
-  { id: "eq_t1_w_blade",  n: "ดาบเหล็กกล้า",      ty: "W", ti: 1, atkb: 42, pdb: 0, idb: 0, hpb: 18, mpb: 0, pab: 12, crib: 6, st: {}, eff: null },
-  { id: "eq_t1_w_short",  n: "พัดเหล็กบาง",        ty: "W", ti: 1, atkb: 28, pdb: 12, idb: 12, hpb: 0, mpb: 84, iab: 8, st: {}, eff: null },
-  { id: "eq_t1_w_hidden", n: "เข็มเหล็กพิษอ่อน",  ty: "W", ti: 1, atkb: 20, pdb: 0, idb: 0, hpb: 0, mpb: 0, pab: 9, iab: 9, accb: 12, crib: 3, resb: 3, st: {}, eff: { t: "on_hit", db: { t: "debuff_eva", v: -5, u: 1 } } },
+  { id: "eq_t1_w_fist",   n: "หมัดเหล็ก",          ty: "W", fam: "fist", ti: 1, atkb: 33, pdb: 2, idb: 2, hpb: 55, mpb: 0, pab: 10, crib: 5, st: {}, eff: null },
+  { id: "eq_t1_w_long",   n: "ทวนเหล็ก",          ty: "W", fam: "long", ti: 1, atkb: 40, pdb: 0, idb: 0, hpb: 15, mpb: 0, pab: 10, spdb: 6, evab: 6, crib: 5, st: {}, eff: null },
+  { id: "eq_t1_w_sword",  n: "กระบี่เหล็ก",        ty: "W", fam: "sword", ti: 1, atkb: 28, pdb: 4, idb: 4, hpb: 0, mpb: 48, pab: 4, iab: 12, accb: 8, st: {}, eff: null },
+  { id: "eq_t1_w_blade",  n: "ดาบเหล็กกล้า",      ty: "W", fam: "blade", ti: 1, atkb: 42, pdb: 0, idb: 0, hpb: 18, mpb: 0, pab: 12, crib: 6, st: {}, eff: null },
+  { id: "eq_t1_w_short",  n: "พัดเหล็กบาง",        ty: "W", fam: "short", ti: 1, atkb: 28, pdb: 12, idb: 12, hpb: 0, mpb: 84, iab: 8, st: {}, eff: null },
+  { id: "eq_t1_w_hidden", n: "เข็มเหล็กพิษอ่อน",  ty: "W", fam: "hidden", ti: 1, atkb: 20, pdb: 0, idb: 0, hpb: 0, mpb: 0, pab: 9, iab: 9, accb: 12, crib: 3, resb: 3, st: {}, eff: { t: "on_hit", db: { t: "debuff_eva", v: -5, u: 1 } } },
 
   // ── tier 1 armor — leather/iron
   { id: "eq_t1_a_leather",  n: "เสื้อหนัง",          ty: "A", ti: 1, atkb: 0, pdb: 48, idb: 35, hpb: 140, mpb: 0, resb: 2, st: {}, eff: null },
@@ -117,8 +117,8 @@ const AUTHORED_EQUIPMENT: readonly Equipment[] = [
 
   // ── city specialties — limited to specific city artisans (see
   // CITY_EQUIPMENT_SPECIALTIES in lib/world/data/artisans.ts)
-  { id: "eq_xixia_w_blade",   n: "ดาบเหล็กชายแดน",    ty: "W", ti: 2, atkb: 51, pdb: 3, idb: 3, hpb: 81, mpb: 0, pab: 14, crib: 7, st: {}, eff: null },
-  { id: "eq_yangzhou_w_blade",n: "ดาบโค้งแม่น้ำ",      ty: "W", ti: 2, atkb: 36, pdb: 0, idb: 0, hpb: 0, mpb: 0, pab: 4, iab: 4, spdb: 12, evab: 12, accb: 8, st: {}, eff: { t: "flat_eva", v: 8 } },
+  { id: "eq_xixia_w_blade",   n: "ดาบเหล็กชายแดน",    ty: "W", fam: "blade", ti: 2, atkb: 51, pdb: 3, idb: 3, hpb: 81, mpb: 0, pab: 14, crib: 7, st: {}, eff: null },
+  { id: "eq_yangzhou_w_blade",n: "ดาบโค้งแม่น้ำ",      ty: "W", fam: "blade", ti: 2, atkb: 36, pdb: 0, idb: 0, hpb: 0, mpb: 0, pab: 4, iab: 4, spdb: 12, evab: 12, accb: 8, st: {}, eff: { t: "flat_eva", v: 8 } },
   { id: "eq_suzhou_a_silk",   n: "เสื้อผ้าไหมซูโจว",   ty: "A", ti: 2, atkb: 15, pdb: 43, idb: 53, hpb: 0, mpb: 110, iab: 10, st: {}, eff: null },
   { id: "eq_jinling_r_jade",  n: "แหวนหยกจินหลิง",    ty: "R", ti: 2, atkb: 13, pdb: 13, idb: 13, hpb: 140, mpb: 156, iab: 6, st: {}, eff: null },
   { id: "eq_dali_c_herb",     n: "เครื่องรางสมุนไพรต้าหลี่", ty: "C", ti: 2, atkb: 0, pdb: 4, idb: 4, hpb: 300, mpb: 0, st: {}, eff: { t: "hp_regen", v: 2 } },

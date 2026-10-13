@@ -34,6 +34,7 @@ import {
 import { calcSkillDamage, critMultiplier, finalDamageMod, makeContext, makeInitialState } from "../lib/game/battle";
 import { SKILLS, isBeastMove, isBossMove } from "../lib/game/data";
 import { seededRng, withRandom } from "../lib/game/rng";
+import { heldWeaponFamily, weaponMatchMod } from "../lib/game/weapon-match";
 import {
   REFORGE_MIN_LEVEL,
   SPIRIT_STONE,
@@ -206,6 +207,38 @@ check("options join the derived stats: flats, % on the whole stat, base stats (n
   assert.equal(crit.wexp, 12);
   assert.equal(critMultiplier(crit), 1.58);
   assert.equal(deriveAll(withGear(b, "W5~res:9")).Res, deriveAll(withGear(b, "W5")).Res + 9);
+});
+
+check("weapon match: every weapon has a family; its moves +10 %, another family's −10 %, bare-handed hero is fist, a foe without a weapon and beast moves neutral", () => {
+  for (const e of EQUIPMENT) if (e.ty === "W") assert.ok(e.fam, `${e.id}: no family`);
+  assert.equal(getEquip("eq_t1_w_fist")?.fam, "fist");
+  const skill = SKILLS.find((x) => x.at === "phy" && x.dm > 0 && !x.hits && x.w === "sword" && !isBeastMove(x.id))!;
+  const roll = (atk: CharacterBuild, def: CharacterBuild, sk = skill) => {
+    const ctx = makeContext(atk, def);
+    const state = makeInitialState(atk, def);
+    return withRandom(seededRng(7, 1), () => {
+      state.dA.Acc = 9999; state.dB.Eva = 0; state.dA.Cri = 0; state.dB.Res = 9999;
+      return calcSkillDamage(state, "A", sk, ctx).dmg;
+    });
+  };
+  const d = build();
+  // A foe build (no baseHp) with no weapon: neutral; the hero (baseHp) bare-handed: fist.
+  const foe = (): CharacterBuild => ({ ...withGear(build(), null), baseHp: undefined });
+  const neutral = roll(foe(), d);
+  const hero = withGear(build(), null);
+  assert.ok(Math.abs(roll(hero, d) - Math.round(neutral * 0.9)) <= 1, "bare-handed hero: a sword move is off-weapon");
+  assert.equal(weaponMatchMod(heldWeaponFamily(hero), skill), 0.9);
+  assert.equal(weaponMatchMod(heldWeaponFamily(withGear(foe(), "eq_t0_w_sword")), skill), 1.1);
+  assert.equal(weaponMatchMod(heldWeaponFamily(withGear(foe(), "eq_t0_w_blade")), skill), 0.9);
+  assert.equal(weaponMatchMod(heldWeaponFamily(foe()), skill), 1, "no weapon, not the hero: neutral");
+  const fist = SKILLS.find((x) => x.w === "fist" && !isBeastMove(x.id))!;
+  assert.equal(weaponMatchMod(heldWeaponFamily(hero), fist), 1.1, "bare hands are fist");
+  const beast = SKILLS.find((x) => isBeastMove(x.id))!;
+  assert.equal(weaponMatchMod("sword", beast), 1, "beast moves untouched");
+  // In battle: the sword in hand against the same piece's family-free twin.
+  const sword = roll(withGear(build(), "eq_t0_w_sword"), d);
+  const blade = roll(withGear(build(), "eq_t0_w_blade"), d);
+  assert.ok(sword > blade, `${sword} > ${blade}`);
 });
 
 check("battle: a family's moves hit harder with its option, softer against its guard (capped)", () => {

@@ -350,6 +350,8 @@ export interface Equipment {
   id: string;
   n: string;
   ty: EquipSlotType;
+  /** A weapon's family (W only): its moves hit +10 %, other families' −10 % (lib/game/weapon-match.ts). */
+  fam?: WeaponFamily;
   /** Tier 0–4: how many random options the piece rolls (lib/game/gear.ts). */
   ti: number;
   // Direct combat-stat boosts. Equipment now contributes ONLY through

@@ -30,6 +30,7 @@ import {
 import type { WeaponFamily } from "@/lib/game";
 import { ATTACK_KIND_LABEL, movePower, passiveLine, plainThai, skillFlavour, skillSummaryLines, statLine } from "@/lib/game/skill-text";
 import { useWorldStore } from "@/store/world-store";
+import { WEAPON_MATCH_BONUS, WEAPON_MISMATCH_MALUS, heldWeaponFamily, weaponMatchMod } from "@/lib/game/weapon-match";
 import { confirmDialog } from "@/store/confirm-store";
 import { toast } from "@/store/toast-store";
 import { FROZEN_MOVE_TEXT } from "@/lib/world/sects";
@@ -441,6 +442,9 @@ function ArtNumbers({ art, lv }: { art: ReturnType<typeof getArt>; lv: number })
 
 function SkillNumbers({ skill: sk, lv }: { skill: NonNullable<ReturnType<typeof getSkill>>; lv: number }) {
   const flavour = skillFlavour(sk);
+  // Weapon match (lib/game/weapon-match.ts): the family in hand against this move's.
+  const held = useWorldStore((s) => (s.playerBuild ? heldWeaponFamily(s.playerBuild) : null));
+  const match = held ? weaponMatchMod(held, sk) : 1;
   const bpMax = Math.round(effectiveBp(sk, SKILL_LEVEL_MAX));
   const mgMax = Math.round(effectiveMg(sk, SKILL_LEVEL_MAX));
   const atMax = lv >= SKILL_LEVEL_MAX;
@@ -459,6 +463,12 @@ function SkillNumbers({ skill: sk, lv }: { skill: NonNullable<ReturnType<typeof 
       <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] text-muted-foreground">
         <span title="บวกเข้ากับพลังโจมตีของเจ้าทุกครั้งที่ใช้ท่านี้">พลังของท่า <b className="text-foreground">{movePower(effectiveBp(sk, lv), sk)}</b>{!atMax && <span className="opacity-60"> (ระดับ 10: {movePower(bpMax, sk)})</span>}</span>
         <span>ความชำนาญ{WEAPON_FAMILY_LABEL[sk.w]} <b className="text-foreground">+{Math.round(effectiveMg(sk, lv))}</b>{!atMax && <span className="opacity-60"> (ระดับ 10: +{mgMax})</span>}</span>
+        {match !== 1 && held && (
+          <span data-testid="weapon-match" className={match > 1 ? "text-emerald-700" : "text-vermilion"}
+            title={`ใช้กับอาวุธสาย${WEAPON_FAMILY_LABEL[sk.w]} แรงขึ้น ${Math.round(WEAPON_MATCH_BONUS * 100)}% · อาวุธสายอื่นเบาลง ${Math.round(WEAPON_MISMATCH_MALUS * 100)}%`}>
+            {match > 1 ? `อาวุธตรงสาย แรงขึ้น ${Math.round((match - 1) * 100)}%` : `ถือ${WEAPON_FAMILY_LABEL[held]} ไม่ตรงสาย เบาลง ${Math.round((1 - match) * 100)}%`}
+          </span>
+        )}
       </div>
     </>
   );

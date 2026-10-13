@@ -125,10 +125,11 @@ const CARRY: Record<WeaponFamily, { carry: WeaponCarry | null; length: number }>
   hidden: { carry: null, length: 0 },
 };
 
-/** A weapon's family, read from its icon (the equipment table carries none). */
+/** A weapon's family: the table's `fam`, else read from its icon. */
 export function weaponFamilyOf(equipmentId: string | null | undefined): WeaponFamily | null {
   const equip = getEquip(equipmentId);
   if (!equip || equip.ty !== "W") return null;
+  if (equip.fam) return equip.fam;
   if (equip.instrument) return "music";
   const icon = equipmentIconId(equip.id) ?? "";
   if (icon.includes("jian_sword")) return "sword";
