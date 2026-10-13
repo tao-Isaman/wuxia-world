@@ -1,10 +1,12 @@
 "use client";
 
-// สนทนา — the chat (docs/design/social.md): a box at the bottom left with
-// three channels, แผนที่ (everyone on this map), คณะ (the party) and กระซิบ (one
-// player). It is not a dialog, so the map keeps running; while its input has
-// focus the hero stands still (worldInputBlocked). Enter on the map opens it,
-// Escape closes it. Closed, the last lines float for a few seconds.
+// สนทนา — the chat (docs/design/social.md): a bar always at the bottom centre
+// of the screen while online (no menu button), which opens in place into a box
+// with three channels, แผนที่ (everyone on this map), คณะ (the party) and
+// กระซิบ (one player). It is not a dialog, so the map keeps running; while its
+// input has focus the hero stands still (worldInputBlocked). Tapping the bar or
+// Enter on the map opens it, Escape or ▾ folds it back. Folded, the last lines
+// float above the bar for a few seconds.
 import { useEffect, useRef, useState } from "react";
 import { useSocialStore, socialErrorText, type ChatChannel, type ChatLine } from "@/store/social-store";
 import { SOCIAL_LIMITS } from "@/lib/net/social-protocol";
@@ -39,6 +41,7 @@ export function ChatBox() {
   const whisperTo = useSocialStore((s) => s.whisperTo);
   const party = useSocialStore((s) => s.party);
   const friends = useSocialStore((s) => s.friends);
+  const unread = useSocialStore((s) => s.unread);
   const { setChatOpen, setChatTab, setWhisperTo, say, showCard } = useSocialStore.getState();
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
@@ -86,14 +89,24 @@ export function ChatBox() {
 
   if (!open) {
     const feed = lines.filter((l) => now - l.at < FEED_MS && !l.mine).slice(-3);
-    if (!feed.length) return null;
+    const tabLabel = TABS.find((t) => t.id === tab)?.label ?? "แผนที่";
     return (
-      <div className="chat-feed" aria-live="polite" data-testid="chat-feed">
-        {feed.map((line) => (
-          <p key={line.id} className={`chat-line chat-line--${line.channel}`}>
-            <b className="chat-who">{who(line)}</b><span className="chat-text">{line.text}</span>
-          </p>
-        ))}
+      <div className="chat-dock" data-testid="chat-dock">
+        {feed.length > 0 && (
+          <div className="chat-feed" aria-live="polite" data-testid="chat-feed">
+            {feed.map((line) => (
+              <p key={line.id} className={`chat-line chat-line--${line.channel}`}>
+                <b className="chat-who">{who(line)}</b><span className="chat-text">{line.text}</span>
+              </p>
+            ))}
+          </div>
+        )}
+        <button type="button" className="chat-bar" data-hud-occluder data-testid="chat-bar" aria-label="สนทนา" title="สนทนา (Enter)"
+          onClick={() => setChatOpen(true)}>
+          <span className="chat-bar-channel">{tabLabel}</span>
+          <span className="chat-bar-hint">แตะเพื่อพิมพ์ข้อความ</span>
+          {unread > 0 && <b className="chat-bar-badge" aria-label={`${unread} ข้อความใหม่`}>{unread}</b>}
+        </button>
       </div>
     );
   }
@@ -108,7 +121,7 @@ export function ChatBox() {
               data-testid={`chat-tab-${t.id}`} onClick={() => setChatTab(t.id)}>{t.label}</button>
           ))}
         </nav>
-        <button type="button" className="chat-close" aria-label="ปิดแชท" onClick={() => setChatOpen(false)}>✕</button>
+        <button type="button" className="chat-close" aria-label="ย่อแชท" title="ย่อแชท (Esc)" onClick={() => setChatOpen(false)}>▾</button>
       </header>
       {tab === "whisper" && (
         <label className="chat-to">
@@ -138,22 +151,5 @@ export function ChatBox() {
         <button type="submit" disabled={disabled || busy || !text.trim()}>ส่ง</button>
       </form>
     </section>
-  );
-}
-
-/** The HUD's สนทนา button: opens the chat, with the unread count. */
-export function ChatButton() {
-  const status = useSocialStore((s) => s.status);
-  const unread = useSocialStore((s) => s.unread);
-  const open = useSocialStore((s) => s.chatOpen);
-  if (status === "off") return null;
-  return (
-    <button type="button" className="hud-icon" aria-label="สนทนา" title="สนทนา (Enter)" data-testid="chat-button"
-      aria-pressed={open} onClick={() => useSocialStore.getState().setChatOpen(!open)}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/icons/ui/chat.png" alt="" className="pixel" draggable={false} />
-      <span className="hud-icon-label" aria-hidden="true">สนทนา</span>
-      {unread > 0 && !open && <b className="hud-icon-badge" aria-hidden="true">{unread}</b>}
-    </button>
   );
 }

@@ -264,6 +264,12 @@ test("between players: map chat with bubbles, a tap opens the card, friends, a p
   await expect.poll(() => remoteAt(ann, bobId), { timeout: 20_000 }).not.toBeNull();
   await expect.poll(() => remoteAt(bob, annId), { timeout: 20_000 }).not.toBeNull();
 
+  // The chat is a bar at the bottom centre of the screen, not a HUD menu button.
+  await expect(ann.locator(".hud-iconbar").getByRole("button", { name: "สนทนา", exact: true })).toHaveCount(0);
+  const bar = (await ann.getByTestId("chat-bar").boundingBox())!;
+  const view = ann.viewportSize()!;
+  expect(Math.abs(bar.x + bar.width / 2 - view.width / 2)).toBeLessThan(4);
+  expect(view.height - (bar.y + bar.height)).toBeLessThan(40);
   // Map chat: Enter opens the box; the line reaches Bob's feed and floats over Ann's head on his map.
   await ann.getByTestId("world-canvas").focus();
   await ann.keyboard.press("Enter");
@@ -317,7 +323,7 @@ test("between players: map chat with bubbles, a tap opens the card, friends, a p
   await expect(ann.getByTestId("world-canvas")).toHaveAttribute("data-party-tags", bobId, { timeout: 10_000 });
 
   // Party chat.
-  await bob.getByTestId("chat-button").click();
+  await bob.getByTestId("chat-bar").click();
   await bob.getByTestId("chat-tab-party").click();
   await bob.getByTestId("chat-input").fill("ออกเดินทางกันเถิด");
   await bob.getByTestId("chat-input").press("Enter");

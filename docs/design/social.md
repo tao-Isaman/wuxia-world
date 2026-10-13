@@ -90,7 +90,7 @@ Opening a letter (`readLetter`) only marks it read. Its gift waits behind **ร�
 | `store/social-store.ts` | friends, requests, blocked, party, mail, chat lines (per channel), connection state |
 | HUD **สหาย** tab | friends (online first: hero name, place, actions), requests, blocked; the party (members, places, invite, leave, kick, lead) |
 | **จดหมาย** tab | two lists — จากผู้คน (NPC letters) and จากสหาย (player mail) — and เขียนจดหมาย (to, text, parcel) |
-| chat box | bottom left, collapsible: แผนที่ / คณะ / กระซิบ tabs, Enter to talk; typing never moves the hero |
+| chat box | a bar always at the bottom centre (no HUD button) that opens in place: แผนที่ / คณะ / กระซิบ tabs, Enter to talk; typing never moves the hero |
 | player card | tap another player on the map: กระซิบ, เพิ่มสหาย, ชวนเข้าคณะ, ส่งจดหมาย, บล็อก |
 | party frame | under the vitals: each member's hero name, place, online dot |
 | map | chat bubbles over speakers; party members' name tags in another colour |

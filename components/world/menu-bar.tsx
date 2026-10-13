@@ -26,7 +26,7 @@ import { sectActionCount } from "@/lib/world";
 import { mailWaiting, useSocialStore } from "@/store/social-store";
 import { FriendsPopup } from "./social/friends-popup";
 import { WorldMapPopup } from "./popups/world-map-popup";
-import { ChatBox, ChatButton } from "./social/chat-box";
+import { ChatBox } from "./social/chat-box";
 import { PlayerCard } from "./social/player-card";
 import { PartyFrame } from "./social/party-frame";
 
@@ -182,7 +182,6 @@ export function MenuBar({ hud, extras }: { hud?: boolean; extras?: ReactNode } =
               {typeof t.badge === "number" && <b className="hud-icon-badge" aria-hidden="true">{t.badge}</b>}
             </button>
           ))}
-          <ChatButton />
           <SoundButton />
           <OnlineButton />
           <InstallGameButton variant="icon" />

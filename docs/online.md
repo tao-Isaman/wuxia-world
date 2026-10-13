@@ -284,7 +284,7 @@ The design, with what other games do, is in [design/social.md](design/social.md)
 | `POST /social/mail/read\|claim\|delete` | `{ ok }` / `{ parcel }`; `claimed`, `no_parcel`, `no_character` |
 | `POST /party/invite\|accept\|decline\|leave\|kick\|lead\|chat` | `{ ok }`; `not_leader`, `full`, `member`, `in_party`, `no_invite`, `no_party`, `too_fast` |
 
-**In the game.** A สหาย tab (10th, hotkey 0) lists friends (online first, where they are; กระซิบ, ชวนเข้าคณะ, จดหมาย, ลบ), requests and invites, the party (leader's tools) and the blocked. A สนทนา button opens the chat box at the bottom left (แผนที่ / คณะ / กระซิบ; Enter on the map opens it, Esc closes it; typing never moves the hero); closed, new lines float there for a few seconds. The จดหมาย window gains จากสหาย and เขียนจดหมาย tabs. The party frame under the vitals shows each companion, ★ when they share the map. Tapping another player opens their card: กระซิบ, เพิ่มสหาย, ชวนเข้าคณะ, เขียนจดหมาย, บล็อก.
+**In the game.** A สหาย tab (10th, hotkey 0) lists friends (online first, where they are; กระซิบ, ชวนเข้าคณะ, จดหมาย, ลบ), requests and invites, the party (leader's tools) and the blocked. The chat is a bar always at the bottom centre of the screen (no HUD button): tapping it or Enter on the map opens it in place into the box (แผนที่ / คณะ / กระซิบ; Esc or ▾ folds it; typing never moves the hero); folded, new lines float above the bar for a few seconds and the bar counts the unread. The จดหมาย window gains จากสหาย and เขียนจดหมาย tabs. The party frame under the vitals shows each companion, ★ when they share the map. Tapping another player opens their card: กระซิบ, เพิ่มสหาย, ชวนเข้าคณะ, เขียนจดหมาย, บล็อก.
 
 ## Data generations (resetting the server)
 
