@@ -18,7 +18,7 @@ import {
   getQuest,
   rankUpGold,
 } from "@/lib/world";
-import { sectLineageQuests } from "@/lib/world/story/registry";
+import { sectLineageQuests, trialOpens } from "@/lib/world/story/registry";
 import { REJOIN_COOLDOWN_DAYS, isRedemptionQuest, membershipStatus, rejoinWaitDays, redemptionQuestId } from "@/lib/world/sects";
 import { questHolder } from "@/lib/world/npc-life";
 import { MS_PER_DAY, msAtWorld } from "@/lib/world/clock";
@@ -496,6 +496,22 @@ interface ArtQuestsTabProps {
   onAccept: (questId: string) => { ok: boolean; reason?: string };
 }
 
+/**
+ * What a passed trial opened: its lineage quest, who gives it and how it
+ * stands — a trial teaches nothing itself, so the window says where to go.
+ */
+function trialNext(worldState: import("@/lib/world").WorldStateData, trialId: string): string {
+  const quest = getQuest(trialOpens(trialId) ?? "");
+  if (!quest) return "ผ่านบททดสอบแล้ว";
+  const giver = quest.giverNpcId ? getNpc(questHolder(worldState, quest.giverNpcId) ?? quest.giverNpcId)?.name : undefined;
+  const status = worldState.quests[quest.id]?.status;
+  if (status === "done") return `ผ่านแล้ว · ${quest.name} สำเร็จแล้ว`;
+  if (status === "active") return `ผ่านแล้ว · กำลังทำ ${quest.name}`;
+  if (isQuestOfferable(worldState, quest)) return `ผ่านแล้ว · ไปรับ ${quest.name} จาก ${giver ?? "—"}`;
+  const unmet = describeQuestCondition(worldState, quest.prereqs ?? { t: "and", all: [] }).filter((l) => !l.done && !l.negated);
+  return `ผ่านแล้ว · ${quest.name} (${giver ?? "—"}) ${unmet.length ? `ต้องการ ${unmet.map((l) => l.label).join(", ")}` : "ยังไม่ครบเงื่อนไข"}`;
+}
+
 function ArtQuestsTab({
   quests,
   artQuestsDone,
@@ -523,7 +539,7 @@ function ArtQuestsTab({
               <div className="flex-1">
                 <div className="text-sm font-bold">
                   {q.name}{" "}
-                  {done && <span className="text-jade text-xs">✓ เรียนแล้ว</span>}
+                  {done && <span className="text-jade text-xs">✓ ผ่านแล้ว</span>}
                 </div>
                 <div className="text-xs text-muted-foreground">
                   {q.briefSummary ?? q.description}
@@ -538,7 +554,7 @@ function ArtQuestsTab({
             <div className="flex items-center justify-between">
               <div className="text-xs">
                 {done ? (
-                  <span className="text-jade">รับวิชาแล้ว</span>
+                  <span className="text-jade" data-testid="trial-next">{trialNext(worldState, q.id)}</span>
                 ) : active ? (
                   <span className="text-vermilion">📜 กำลังทำอยู่</span>
                 ) : status.offerable ? (

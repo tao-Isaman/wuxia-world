@@ -11,6 +11,7 @@ import { getItem } from "../data/items";
 import { OPPONENTS_BY_ID } from "../data/opponents";
 import { SECT_MEMBERSHIPS } from "../data/sect-memberships";
 import { LINEAGE_PROLOGUES, LINEAGE_SPECS, MAIN_ARC, SAGA_PROLOGUES, STORY_ARC_SPECS } from "../data/story";
+import { QUESTS_SECTS_TEMPLES } from "../data/quests/sects-temples";
 import { compileArc, compileLineage, type StoryResolvers } from "./compile";
 import type { CutsceneDef, LineageSpec, StoryArcInfo } from "./types";
 
@@ -54,6 +55,16 @@ const lessonsBy = new Map<string, number>();
 // One lineage quest per sect, tier and kind: its moves are a choice made once at
 // the hand-in (สายมีดสั้น or สายอาวุธลับ…). The first spec of the group gives the
 // teacher, the trial and the lines; the rest only add their move to the choice.
+// The trials' own rank gates (minSectRank), read from the hand-written sect quests.
+const PROLOGUE_IDS = new Set(Object.values(LINEAGE_PROLOGUES));
+const QUEST_RANK: ReadonlyMap<string, number> = new Map(
+  QUESTS_SECTS_TEMPLES.filter((q) => PROLOGUE_IDS.has(q.id) && q.minSectRank != null).map((q) => [q.id, q.minSectRank!] as const),
+);
+/** A gate's sect rank, loosened to `rank` (a larger number is a lower rank). */
+const atRank = (c: Condition, rank: number): Condition =>
+  c.t === "sectRankAtLeast" ? { ...c, maxRank: Math.max(c.maxRank, rank) }
+  : c.t === "and" ? { ...c, all: c.all.map((k) => atRank(k, rank)) }
+  : c;
 const lineageGroups = new Map<string, LineageSpec[]>();
 for (const raw of LINEAGE_SPECS) {
   const info = STORY_RESOLVERS.martial(raw.kind, raw.id);
@@ -70,7 +81,11 @@ for (const group of lineageGroups.values()) {
   const seq = (lessonsBy.get(raw.giver) ?? 0) + 1;
   lessonsBy.set(raw.giver, seq);
   const c = compileLineage(spec, STORY_RESOLVERS, seq, group.map((g) => g.id));
-  quests.push(...c.quests); scenes.push(...c.scenes); cutscenes.push(...c.cutscenes);
+  // A passed trial is the step up: the lesson opens at the trial's own rank
+  // (it used to wait one rank more, so the trial seemed to give nothing).
+  const trialRank = Math.max(0, ...trials.map((id) => QUEST_RANK.get(id) ?? 0));
+  quests.push(...(trialRank ? c.quests.map((q) => ({ ...q, prereqs: q.prereqs && atRank(q.prereqs, trialRank) })) : c.quests));
+  scenes.push(...c.scenes); cutscenes.push(...c.cutscenes);
 }
 // The main story first: its chapters chain from a new game.
 if (MAIN_ARC.chapters.length) {
@@ -150,6 +165,12 @@ for (const a of arcs) {
 /** The lineage quest that offers a move (alone, or as one of its tier's choices). */
 export function lineageQuestOf(kind: "skill" | "art", id: string): string | null {
   return quests.find((q) => q.lineage?.kind === kind && (q.lineage.options ?? [q.lineage.id]).includes(id))?.id ?? null;
+}
+
+/** The lineage quest a sect trial (LINEAGE_PROLOGUES) opens once it is passed. */
+export function trialOpens(trialId: string): string | null {
+  const art = Object.keys(LINEAGE_PROLOGUES).find((id) => LINEAGE_PROLOGUES[id] === trialId);
+  return art ? lineageQuestOf("art", art) : null;
 }
 
 /** Every lineage quest and saga of a sect (by its Thai label), in tier order. */

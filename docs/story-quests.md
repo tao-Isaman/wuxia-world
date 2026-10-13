@@ -28,7 +28,7 @@ This page covers the engine. How to *write* the content is in [story-writing.md]
 | Quest id | `ql_<skill\|art>_<id>` | `st_<arcId>_<nn>` |
 | `QuestDef.type` | `"side"`, with `lineage: { kind, id, options? }` | `"story"`, with `story: { arcId, chapter }` |
 | Offered by | a sect NPC's card | the chapter's giver (often the master) |
-| Gate | not learned, scroll not held; tier-based rank, stat, outsider trait; eight T3 arts also need their old art quest done (`LINEAGE_PROLOGUES`) | chapter 1: the saga's `require` + not learned + scroll not held; then the previous chapter done (+ the chapter's own `require`) |
+| Gate | not learned, scroll not held; tier-based rank, stat, outsider trait; eight T3 arts also need their old art quest done (`LINEAGE_PROLOGUES`), and passing it opens the lesson at the trial's own rank (its `minSectRank`; `trialOpens(trialId)` names the lesson, which the sect window's ลมปราณ tab shows next to the passed trial) | chapter 1: the saga's `require` + not learned + scroll not held; then the previous chapter done (+ the chapter's own `require`) |
 | Ends with | `learnSkill` / `learnArt` (handed over as the move's scroll) + w-exp + relationship + sect points | small rewards; the last chapter also hands over the T4's scroll (arts read at level 3) |
 | Scenes | `qs_<id>_offer`, `qs_<id>_complete` | the same, plus a scene per visit / talk / duel step (`st_<id>_s<n>`, `…_win`, asides `…_a<k>`) |
 

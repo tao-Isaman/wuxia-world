@@ -10,10 +10,10 @@ import { SKILLS } from "../lib/game/data/skills";
 import { ARTS } from "../lib/game/data/arts";
 import { BEAST_SECT, isBeastMove } from "../lib/game/data/sects";
 import { CHARACTER_IDS, CREATURE_FRAME_COUNT } from "../lib/characters/catalog";
-import { LINEAGE_SPECS, MAIN_ARC, SAGA_PROLOGUES, STORY_ARC_SPECS } from "../lib/world/data/story";
+import { LINEAGE_PROLOGUES, LINEAGE_SPECS, MAIN_ARC, SAGA_PROLOGUES, STORY_ARC_SPECS } from "../lib/world/data/story";
 import { isQuestOfferable, isSecretSectQuest, sectActionCount } from "../lib/world/effects";
 import { getQuestsForSect } from "../lib/world/data/quests";
-import { CUTSCENES, SAGA_RANK, STORY_ARCS, STORY_QUESTS, STORY_RESOLVERS, lineageQuestOf } from "../lib/world/story/registry";
+import { CUTSCENES, SAGA_RANK, STORY_ARCS, STORY_QUESTS, STORY_RESOLVERS, lineageQuestOf, trialOpens } from "../lib/world/story/registry";
 import { chainNext } from "../lib/world/quest-chain";
 import { DECLINE_TEXT, storyQuestId, LINEAGE_TIERS } from "../lib/world/story/compile";
 import type { CutsceneSpec, StoryBeat, StoryLine, StoryStep } from "../lib/world/story/types";
@@ -510,6 +510,22 @@ check("a sect's sagas open over ranks 3, 2 and 1, not all at one rank", () => {
     const arc = STORY_ARC_SPECS.find((a) => a.reward.id === reward);
     const trial = getQuest(qid);
     if (arc && trial && trial.minSectRank !== SAGA_RANK.get(arc.id)) err(`${qid}: trial rank ${trial.minSectRank} ≠ its saga's ${SAGA_RANK.get(arc.id)}`);
+  }
+});
+
+check("a passed lineage trial opens its lesson at the trial's own rank (the trial gives something)", () => {
+  const rankOf = (c: Condition | undefined): number | null => {
+    if (!c) return null;
+    if (c.t === "sectRankAtLeast") return c.maxRank;
+    if (c.t === "and") for (const k of c.all) { const r = rankOf(k); if (r != null) return r; }
+    return null;
+  };
+  for (const [art, qid] of Object.entries(LINEAGE_PROLOGUES)) {
+    const trial = getQuest(qid);
+    const lesson = getQuest(trialOpens(qid) ?? "");
+    if (!trial || !lesson) { err(`${qid}: trial or its lesson (${art}) missing`); continue; }
+    const rank = rankOf(lesson.prereqs);
+    if (rank !== trial.minSectRank) err(`${qid}: lesson ${lesson.id} opens at rank ${rank}, the trial at ${trial.minSectRank}`);
   }
 });
 
