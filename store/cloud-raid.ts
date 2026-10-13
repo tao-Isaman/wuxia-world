@@ -161,7 +161,8 @@ class CloudRaid {
   /** Take a view: stage the battle when it begins, hand on its commands, stop asking once it is over. */
   private take(view: RaidView): void {
     const fight = view.fight;
-    useRaid.setState({ view });
+    // The beast's own state comes with every answer: its lair redraws at once.
+    useRaid.setState((s) => ({ view, bosses: { ...s.bosses, [view.bossId]: view.boss } }));
     if (!fight) { this.stopPolling(); return; }
     if (fight.phase !== "gather" && fight.start && this.staged !== fight.id && fight.me) {
       this.staged = fight.id;
