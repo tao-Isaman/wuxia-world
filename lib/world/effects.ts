@@ -935,22 +935,33 @@ export function isSectQuestOfferable(
 }
 
 /**
- * Things to do in the สำนัก window, for its menu badge: an affordable
- * rank-up and the quests that window offers, in active memberships only.
- * Secret T4 saga trials are left out — the window hides them (their giver
- * offers them in person), so counting them showed a badge with nothing to take.
+ * Things to do in one sect's สำนัก window, by its tab: an affordable rank-up
+ * (ขั้นและวิชา), the repeatable quests it offers now (ภารกิจประจำ) and the art
+ * trials (ลมปราณ). An inactive membership has none. Secret T4 saga trials and
+ * the redemption quest are left out — the window never lists them.
  */
+export function sectActionsFor(state: WorldStateData, sectId: string): { rankUp: number; quests: number; art: number } {
+  const none = { rankUp: 0, quests: 0, art: 0 };
+  const m = state.sectMembership[sectId as keyof typeof state.sectMembership];
+  if (!m || (m.status ?? "active") !== "active") return none;
+  const def = SECT_MEMBERSHIPS[sectId as keyof typeof SECT_MEMBERSHIPS];
+  if (!def) return none;
+  const out = { ...none, rankUp: m.rank > def.topRank && m.points >= def.rankUpCost(m.rank - 1) ? 1 : 0 };
+  for (const quest of getQuestsForSect(sectId)) {
+    if (isSecretSectQuest(quest.id) || isRedemptionQuest(quest)) continue;
+    if (!isSectQuestOfferable(state, quest).offerable) continue;
+    if (quest.isArtQuest) out.art++;
+    else out.quests++;
+  }
+  return out;
+}
+
+/** The สำนัก menu badge: every tab's count (sectActionsFor) over the active memberships. */
 export function sectActionCount(state: WorldStateData): number {
   let count = 0;
-  for (const [sectId, m] of Object.entries(state.sectMembership)) {
-    if (!m || (m.status ?? "active") !== "active") continue;
-    const def = SECT_MEMBERSHIPS[sectId as keyof typeof SECT_MEMBERSHIPS];
-    if (!def) continue;
-    if (m.rank > def.topRank && m.points >= def.rankUpCost(m.rank - 1)) count++;
-    for (const quest of getQuestsForSect(sectId)) {
-      if (isSecretSectQuest(quest.id) || isRedemptionQuest(quest)) continue;
-      if (isSectQuestOfferable(state, quest).offerable) count++;
-    }
+  for (const sectId of Object.keys(state.sectMembership)) {
+    const a = sectActionsFor(state, sectId);
+    count += a.rankUp + a.quests + a.art;
   }
   return count;
 }

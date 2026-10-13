@@ -106,6 +106,7 @@ export {
   sectQuestWait,
   SECT_QUEST_GAP_DAYS,
   sectActionCount,
+  sectActionsFor,
   tickQuestProgress,
   type QuestProgressLine,
 } from "./effects";

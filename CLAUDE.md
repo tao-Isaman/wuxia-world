@@ -360,7 +360,7 @@ Two deliberate exceptions reach into stores:
 
 - **Root.** `components/world/world-screen.tsx` picks a view: start → game over → battle → encounter → mapped location (+ dialog over the same canvas) → dialog over a painting → road map → the classic card layout (only `world_journey` and 13 unpainted roads).
 - **HUD** (mobile first):
-  - top left, stacked: the vitals card (HP / MP / พลัง gauges, no portrait; `hud-vitals.tsx`), online the party frame, then the icon grid behind a **เมนู** toggle (phones start folded and fold again after a section; badges summed on it; icons ≥ 44 px; `localStorage["wuxia-hud-menu"]="open"` keeps it out — the e2e suite seeds it): 1 โปรไฟล์ 2 ย่าม 3 วิชา 4 อาชีพ 5 ภารกิจ 6 สำนัก 7 บันทึก 8 จดหมาย (unread badge) 9 ชีพจร (badge: unspent points that can open something), online 0 สหาย, M แผนที่, then ♪, 🌐 and install;
+  - top left, stacked: the vitals card (HP / MP / พลัง gauges, no portrait; `hud-vitals.tsx`), online the party frame, then the icon grid behind a **เมนู** toggle (phones start folded and fold again after a section; badges summed on it; icons ≥ 44 px; `localStorage["wuxia-hud-menu"]="open"` keeps it out — the e2e suite seeds it): 1 โปรไฟล์ 2 ย่าม 3 วิชา 4 อาชีพ 5 ภารกิจ 6 สำนัก (badge: rank-up + ready quests + art trials, `sectActionsFor`; each window tab shows its share) 7 บันทึก 8 จดหมาย (unread badge) 9 ชีพจร (badge: unspent points that can open something), online 0 สหาย, M แผนที่, then ♪, 🌐 and install;
   - purse, sundial and day at the top right, with the quest tracker below;
   - law chips at the top centre;
   - พัก and the action button at the bottom right;

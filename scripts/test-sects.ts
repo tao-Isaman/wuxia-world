@@ -21,11 +21,12 @@ console.warn = (...args: unknown[]) => {
 };
 
 const { useWorldStore } = await import("../store/world-store");
-const { SECT_QUEST_GAP_DAYS, applyEffect, applyEffects, droppedQuestFlag, isQuestOfferable, isSectQuestOfferable, repeatsQuestGifts } = await import("../lib/world/effects");
+const { SECT_QUEST_GAP_DAYS, sectActionCount, sectActionsFor, applyEffect, applyEffects, droppedQuestFlag, isQuestOfferable, isSectQuestOfferable, repeatsQuestGifts } = await import("../lib/world/effects");
 const { setTestClock, setTestWorldTime } = await import("../lib/world/clock");
 const { QUESTS, getQuest } = await import("../lib/world/data/quests");
 const { getNpc } = await import("../lib/world/data/npcs");
 const { SECT_MEMBERSHIPS } = await import("../lib/world/data/sect-memberships");
+const { getQuestsForSect } = await import("../lib/world");
 const { REJOIN_COOLDOWN_DAYS, isSkillFrozen, redemptionQuestId, sectIntroQuest, sectJoinCheck } = await import("../lib/world/sects");
 const { applySkillLevelUps } = await import("../store/world/progression");
 const { getSkill } = await import("../lib/game");
@@ -305,6 +306,19 @@ check("sect quests: each one again two real hours after it was taken, the others
     const art = QUESTS.find((q) => q.sectId === "wudang" && q.isArtQuest)!;
     assert.notEqual(isSectQuestOfferable(store(), art).reason, "ภารกิจนี้รับซ้ำได้ทุก 2 ชั่วโมง");
   } finally { setTestClock(null); }
+});
+
+check("the สำนัก badge is the sum of the window's tab counts (rank-up, quests, art trials)", () => {
+  newGame();
+  const def = SECT_MEMBERSHIPS.wudang;
+  useWorldStore.setState({ sectMembership: { wudang: member("wudang", { rank: def.startRank, points: def.rankUpCost(def.startRank - 1) }) } as never });
+  const a = sectActionsFor(store(), "wudang");
+  assert.equal(a.rankUp, 1, "an affordable rank-up counts on its own tab");
+  assert.ok(a.quests > 0, "repeatable quests counted");
+  assert.equal(sectActionCount(store()), a.rankUp + a.quests + a.art);
+  // What the ภารกิจประจำ tab lists as ready is its count.
+  const ready = getQuestsForSect("wudang").filter((q) => !q.isArtQuest && q.id !== redemptionQuestId("wudang") && isSectQuestOfferable(store(), q).offerable);
+  assert.equal(a.quests, ready.length);
 });
 
 console.warn = originalWarn;

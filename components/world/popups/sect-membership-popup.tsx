@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { WuxiaButton } from "@/components/ui/wuxia/button";
 import { useWorldStore } from "@/store/world-store";
 import {
+  sectActionsFor,
   SECT_MEMBERSHIPS,
   getQuestsForSect,
   isSectQuestOfferable,
@@ -99,6 +100,9 @@ export function SectMembershipPopup({ open, onClose }: Props) {
   const repeatable = sectQuests.filter((q) => !q.isArtQuest && !isRedemptionQuest(q));
   // The T4 saga trials stay secret: their giver offers them in person.
   const artQuests = sectQuests.filter((q) => q.isArtQuest && !isSecretSectQuest(q.id));
+  // Each tab's count, the same that adds up to the menu's สำนัก badge.
+  const actions = sectActionsFor(worldState, current);
+  const tabCount: Record<Tab, number> = { rewards: actions.rankUp, quests: actions.quests, art: actions.art };
 
   return (
     <Modal open={open} onClose={onClose} title={`🪷 ศิษย์${def.name}`} maxWidth="max-w-2xl">
@@ -161,6 +165,7 @@ export function SectMembershipPopup({ open, onClose }: Props) {
             }`}
           >
             {TAB_LABEL[t]}
+            {tabCount[t] > 0 && <span className="ml-1 text-vermilion font-bold" data-testid={`sect-tab-count-${t}`}>({tabCount[t]})</span>}
           </button>
         ))}
       </div>

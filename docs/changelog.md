@@ -6,6 +6,10 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-13
 
+### The สำนัก badge matches the window
+
+- **Each sect tab shows its count**: the สำนัก badge adds an affordable rank-up, the ready ภารกิจประจำ and the ready ลมปราณ trials, so it could read 4 while the quests tab listed 3. Each tab of the window now shows its own share in brackets, from the same count as the badge (`sectActionsFor`).
+
 ### Each sect quest on its own two-hour turn
 
 - **Every sect quest again after two hours**: each repeatable quest in the sect window is taken again two real hours after it was last taken, each on its own turn, so several can be done at once (was: one quest every two hours across every sect). Each waiting quest says how long is left (`sectQuestWait(state, def)`, the membership's `lastQuestDay` stamped on taking; the save field `sectQuestTaken` is gone, no version bump). Dropping a quest gives its turn back.
