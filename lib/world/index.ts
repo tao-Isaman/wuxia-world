@@ -103,6 +103,8 @@ export {
   isSecretSectQuest,
   isQuestTurnInForNpc,
   isSectQuestOfferable,
+  sectQuestWait,
+  SECT_QUEST_GAP_DAYS,
   sectActionCount,
   tickQuestProgress,
   type QuestProgressLine,

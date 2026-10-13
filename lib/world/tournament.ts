@@ -1,20 +1,21 @@
-// ชุมนุมประลองกระบี่หัวซาน — the yearly sword tournament on Mount Hua
-// (the Huashan sect's grounds). Each year, the day registration opens, the
-// holder of Huashan's seat sends the hero an invitation letter with the fee
-// for the road (`sendTournamentInvitation`).
-//
-// Registration opens TOURNAMENT.registerFrom days into each year (a year is
-// TOURNAMENT.yearDays days) and the tournament is fought on day
-// TOURNAMENT.startDay, or on any of the next `graceDays` days, on Mount Hua.
+// ชุมนุมประลองกระบี่หัวซาน — the sword tournament on Mount Hua (the Huashan
+// sect's grounds), held every two real weeks on the Thai calendar
+// (calendar.ts). Each round (still called a "year" in the code and the save,
+// `TournamentState.year`) begins on a Monday at 00:00: the holder of
+// Huashan's seat sends the hero an invitation letter with the fee for the
+// road (`sendTournamentInvitation`), and registration is open until the
+// second Saturday at 20:00, when the bouts begin; they can be fought until
+// that Sunday at 23:00. One world day is one real hour, so the round is
+// TOURNAMENT.yearDays = 14 × 24 world days, counted from TOURNAMENT.anchorDay.
 // 32 entrants: the hero (if registered) and the liveness NPCs (the named
 // roster), topped up with other fighters who spar. Single elimination over
 // five rounds. The hero's bouts are real non-fatal battles; every other bout
 // is simulated from the two fighters' power scores. Each bout the hero wins
 // pays gold and w-exp; their final place pays w-exp and ชื่อเสียง. The
-// champion picks one move or art from everything the 32 entrants know —
-// an NPC champion picks too (and grows a little stronger). The prize is the
-// one documented exception to "sect moves come only from lineage quests".
-// If the day passes without the hero, the year is fought without them.
+// champion picks one move or art from everything the 32 entrants know, every
+// time — an NPC champion picks too (and grows a little stronger). The prize
+// is the one documented exception to "sect moves come only from lineage
+// quests". If the days pass without the hero, the round is fought without them.
 
 import { getArt, parseSlotId, powerBreakdown, type CharacterBuild } from "@/lib/game";
 import { getNamedDefault, namedNpcIds } from "./data/named-npcs";
@@ -24,16 +25,20 @@ import { getOpponent, npcFoeId } from "./data/opponents";
 import { npcPresent } from "./npc-presence";
 import { generateWarning } from "./rumor-engine";
 import { sectChief } from "./npc-life";
+import { thaiDateOfDay } from "./calendar";
 import type { TournamentRecord, TournamentState, WorldStateData } from "./types";
 
 export const TOURNAMENT = {
   locationId: "sect_huashan",
-  yearDays: 360,
-  /** Day of the year registration opens, and the tournament day. */
-  registerFrom: 60,
-  startDay: 90,
-  /** Days after the tournament day it can still be started. */
-  graceDays: 2,
+  /** A round is two real weeks: 14 × 24 world days (one world day is one real hour). */
+  yearDays: 336,
+  /** The world day a round began on: Monday 2026-10-05, 00:00 Thai time (world day 1 is Tuesday 2026-10-13). */
+  anchorDay: -191,
+  /** Day of the round registration opens (Monday of week one, 00:00), and the tournament day (Saturday of week two, 20:00). */
+  registerFrom: 1,
+  startDay: 309,
+  /** Days after the tournament day it can still be started: until Sunday 23:00. */
+  graceDays: 26,
   fee: 100,
   size: 32,
   historyMax: 20,
@@ -59,10 +64,16 @@ type Rng = () => number;
 type TState = Pick<WorldStateData, "day" | "tournament" | "tournamentHistory" | "npcExt" | "assassinatedNpcIds" | "kidnappedUntil"
   | "playerBuild" | "gold" | "wExp" | "traits" | "currentSceneId">;
 
-export const yearOf = (day: number) => Math.floor((day - 1) / TOURNAMENT.yearDays) + 1;
-export const dayOfYear = (day: number) => ((day - 1) % TOURNAMENT.yearDays) + 1;
-/** The absolute day of a year's tournament. */
-export const tournamentDay = (year: number) => (year - 1) * TOURNAMENT.yearDays + TOURNAMENT.startDay;
+/** The tournament round (1, 2, …) a world day falls in. */
+export const yearOf = (day: number) => Math.floor((day - TOURNAMENT.anchorDay) / TOURNAMENT.yearDays) + 1;
+/** The day of its round, 1–yearDays (each is one real hour). */
+export const dayOfYear = (day: number) => (((day - TOURNAMENT.anchorDay) % TOURNAMENT.yearDays) + TOURNAMENT.yearDays) % TOURNAMENT.yearDays + 1;
+/** The absolute world day a round begins on. */
+export const roundStartDay = (year: number) => TOURNAMENT.anchorDay + (year - 1) * TOURNAMENT.yearDays;
+/** The absolute day of a round's tournament (its first bout hour). */
+export const tournamentDay = (year: number) => roundStartDay(year) + TOURNAMENT.startDay - 1;
+/** The absolute day after a round's last bout hour (the tournament is over). */
+export const tournamentEndDay = (year: number) => tournamentDay(year) + TOURNAMENT.graceDays + 1;
 
 export type TournamentPhase = "closed" | "registration" | "day";
 /** Where the calendar is: registration window, tournament days, or closed. */
@@ -72,20 +83,20 @@ export function tournamentPhase(day: number): TournamentPhase {
   if (d >= TOURNAMENT.registerFrom && d < TOURNAMENT.startDay) return "registration";
   return "closed";
 }
-/** Days until this year's (or next year's) registration opens, 0 while it is open. */
+/** Days (real hours) until this round's (or the next round's) registration opens, 0 while it is open. */
 export function daysUntilRegistration(day: number): number {
   const d = dayOfYear(day);
   if (d >= TOURNAMENT.registerFrom && d <= TOURNAMENT.startDay + TOURNAMENT.graceDays) return 0;
   return d < TOURNAMENT.registerFrom ? TOURNAMENT.registerFrom - d : TOURNAMENT.yearDays - d + TOURNAMENT.registerFrom;
 }
 
-/** This year's tournament state, if any (an older one is history). */
+/** This round's tournament state, if any (an older one is history). */
 export function currentTournament(state: Pick<WorldStateData, "tournament" | "day">): TournamentState | null {
   const t = state.tournament;
   return t && t.year === yearOf(state.day) ? t : null;
 }
 export const registered = (state: Pick<WorldStateData, "tournament" | "day">) => !!currentTournament(state);
-/** The record of this year's tournament, once fought. */
+/** The record of a round's tournament, once fought. */
 export function yearRecord(state: Pick<WorldStateData, "tournamentHistory">, year: number): TournamentRecord | undefined {
   return state.tournamentHistory?.find((r) => r.year === year);
 }
@@ -101,7 +112,7 @@ export function registerBlock(state: TState): RegisterBlock | null {
   return null;
 }
 
-/** Pay the fee and enter this year's tournament. */
+/** Pay the fee and enter this round's tournament. */
 export function registerForTournament(state: TState): boolean {
   if (registerBlock(state)) return false;
   state.gold -= TOURNAMENT.fee;
@@ -199,7 +210,12 @@ export interface RoundOutcome { playerWon?: boolean; gold: number; wExp: number;
  * when they go out, and finishes the tournament after the final.
  */
 export function resolveRound(state: TState, playerWon: boolean | null, rng: Rng = Math.random): RoundOutcome {
-  const t = currentTournament(state);
+  return currentTournament(state) ? resolveRoundOf(state, playerWon, rng) : { gold: 0, wExp: 0, fame: 0, finished: false };
+}
+
+/** resolveRound on the hero's tournament state, whatever round it belongs to. */
+function resolveRoundOf(state: TState, playerWon: boolean | null, rng: Rng): RoundOutcome {
+  const t = state.tournament;
   const outcome: RoundOutcome = { gold: 0, wExp: 0, fame: 0, finished: false };
   if (!t || t.status !== "running") return outcome;
   const round = t.round;
@@ -292,12 +308,31 @@ function recordYear(state: TState, t: TournamentState): void {
 }
 
 /**
- * After a tournament's last day: a year fought without the hero is simulated
- * (an unstarted registration is forfeit), and a bracket the hero left
- * running is finished. Called as time passes.
+ * After a tournament's last hour: a round fought without the hero is
+ * simulated (an unstarted registration is forfeit), and a bracket the hero
+ * left running is finished. A round that ended while the hero was away is
+ * settled when they come back (the one just before this one at least).
+ * Called as time passes.
  */
 export function settleTournaments(state: TState, rng: Rng = Math.random): void {
   const year = yearOf(state.day);
+  const simulate = (round: number) => {
+    const seeds = drawEntrants(state, TOURNAMENT.size, rng);
+    if (seeds.length < 2) return;
+    // A registration never started is forfeit (the fee is gone).
+    state.tournament = { year: round, status: "running", rounds: [seeds], round: 0, playerOut: true, gold: 0, wExp: 0 };
+    finishRound(state, rng);
+  };
+  // A round of the hero's from before (they were away when it ended).
+  const old = state.tournament;
+  if (old && old.year < year && !yearRecord(state, old.year)) {
+    if (old.status === "running") {
+      if (!old.playerOut) state.tournament = { ...old, playerOut: true, playerPlace: PLACE_BY_ROUND[old.round] };
+      finishRound(state, rng);
+    } else if (old.status === "registered") simulate(old.year);
+  }
+  // The round before this one, if nobody settled it (the hero never came).
+  if (year > 1 && !yearRecord(state, year - 1) && (state.tournament?.year ?? 0) < year) simulate(year - 1);
   const past = dayOfYear(state.day) > TOURNAMENT.startDay + TOURNAMENT.graceDays;
   const t = currentTournament(state);
   if (t?.status === "running" && (past || t.playerOut)) {
@@ -308,12 +343,13 @@ export function settleTournaments(state: TState, rng: Rng = Math.random): void {
     finishTournament(state, rng);
   }
   if (!past || yearRecord(state, year)) return;
-  // Nobody fought this year with the hero: run it among the NPCs.
-  const seeds = drawEntrants(state, TOURNAMENT.size, rng);
-  if (seeds.length < 2) return;
-  // A registration never started is forfeit (the fee is gone).
-  state.tournament = { year, status: "running", rounds: [seeds], round: 0, playerOut: true, gold: 0, wExp: 0 };
-  finishTournament(state, rng);
+  // Nobody fought this round with the hero: run it among the NPCs.
+  simulate(year);
+}
+
+/** Simulate every remaining bout of the hero's tournament state, whatever round it belongs to. */
+function finishRound(state: TState, rng: Rng): void {
+  for (let guard = 0; guard < 6 && state.tournament?.status === "running"; guard++) resolveRoundOf(state, null, rng);
 }
 
 /** Display name of an entrant. */
@@ -337,24 +373,25 @@ export function tournamentHost(state: Pick<WorldStateData, "npcExt" | "assassina
 }
 
 /**
- * The day registration opens (any day in (fromDay, state.day]), Huashan's
- * chief writes to the hero: when, where, the fee — and the fee itself for
- * the road. One letter a year; returns it when sent.
+ * While registration is open (checked on each new world day — a real hour —
+ * after `fromDay`), Huashan's chief writes to the hero once a round: when,
+ * where, the fee — and the fee itself for the road. Returns it when sent.
  */
 export function sendTournamentInvitation(state: WorldStateData, fromDay: number): import("./types").Letter | null {
-  for (let day = fromDay + 1; day <= state.day; day++) {
-    if (dayOfYear(day) !== TOURNAMENT.registerFrom) continue;
+  if (state.day <= fromDay || tournamentPhase(state.day) !== "registration") return null;
+  {
+    const day = state.day;
     const year = yearOf(day);
     const id = `letter_invite_${year}`;
-    if ((state.letters ?? []).some((l) => l.id === id)) continue;
+    if ((state.letters ?? []).some((l) => l.id === id)) return null;
     const host = tournamentHost(state);
-    if (!host) continue;
+    if (!host) return null;
     const name = getNpc(host)?.name ?? "เจ้าสำนักหัวซาน";
     const letter = {
       id, day, npcId: host, rarity: 2, gold: TOURNAMENT.fee, read: false, claimed: false,
-      text: `ถึงจอมยุทธ์ผู้มีฝีมือ — สำนักหัวซานขอเชิญท่านร่วม${TOURNAMENT_NAME}ปีที่ ${year} `
-        + `เปิดรับลงชื่อที่ลานบนยอดเขาหัวซานตั้งแต่บัดนี้ถึงวันที่ ${TOURNAMENT.startDay - 1} ของปี ค่าลงชื่อ ${TOURNAMENT.fee} ตำลึง `
-        + `ประลองจริงวันที่ ${TOURNAMENT.startDay}–${TOURNAMENT.startDay + TOURNAMENT.graceDays} ยอดฝีมือสามสิบสองคนจะได้วัดกันว่าใครคือกระบี่อันดับหนึ่งแห่งยุคนี้ `
+      text: `ถึงจอมยุทธ์ผู้มีฝีมือ — สำนักหัวซานขอเชิญท่านร่วม${TOURNAMENT_NAME}ครั้งที่ ${year} `
+        + `เปิดรับลงชื่อที่ลานบนยอดเขาหัวซานตั้งแต่บัดนี้จนก่อน${thaiDateOfDay(tournamentDay(year))} ค่าลงชื่อ ${TOURNAMENT.fee} ตำลึง `
+        + `ประลองจริงตั้งแต่${thaiDateOfDay(tournamentDay(year))} ถึง${thaiDateOfDay(tournamentEndDay(year))} ยอดฝีมือสามสิบสองคนจะได้วัดกันว่าใครคือกระบี่อันดับหนึ่งแห่งยุคนี้ `
         + `ข้าแนบค่าเดินทางมาให้ด้วย หวังว่าจะได้พบท่านบนยอดเขา — ${name}`,
     };
     state.letters = [...(state.letters ?? []), letter];
@@ -363,14 +400,14 @@ export function sendTournamentInvitation(state: WorldStateData, fromDay: number)
   return null;
 }
 
-/** Days before the tournament the inns start talking about it (a warning rumor). */
-export const TOURNAMENT_WARNING_DAYS = 45;
+/** Days before the tournament the inns start talking about it (a warning rumor): three real days. */
+export const TOURNAMENT_WARNING_DAYS = 72;
 
 /**
  * The tournament's warning rumor (rumor-engine `generateWarning`, kind
  * `tournament`): from TOURNAMENT_WARNING_DAYS before the tournament day until
  * the day before it, every inn hears "อีก N วันจะมีชุมนุมประลองกระบี่หัวซาน…".
- * One rumor a year (id `rumor_warn_tournament_y<year>`), its day count kept
+ * One rumor a round (id `rumor_warn_tournament_y<year>`), its day count kept
  * current on every sync. Returns its id, or null outside the window.
  */
 export function scheduleTournamentWarning(state: WorldStateData): string | null {

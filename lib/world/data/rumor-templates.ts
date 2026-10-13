@@ -246,7 +246,8 @@ export const WARNING_TEMPLATES: Record<string, readonly RumorTemplate[]> = {
   // สงครามยุทธจักร / sect-gathering tournament
   tournament: [
     {
-      text: "อีก {days} วันจะมี{event}ที่{location} ยอดยุทธ์จากทั่วยุทธจักรจะมาประลองกัน",
+      // Warned from three real days before: the bouts start on Saturday at 20:00 (lib/world/tournament.ts).
+      text: "คืนวันเสาร์นี้ยามสองทุ่มจะมี{event}ที่{location} ยอดยุทธ์จากทั่วยุทธจักรจะมาประลองกัน",
       weight: 9,
       lifespan: 30,
       channel: "inn",

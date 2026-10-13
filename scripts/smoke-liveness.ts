@@ -18,6 +18,7 @@ function freshState(): WorldStateData {
     playerBuild: null,
     playerBodyId: "m1",
     appearance: { outfit: "default", hideWeapon: false },
+    sectQuestTaken: null,
     wardrobe: [],
     currentSceneId: "city_capital",
     lastLocationId: "city_capital",

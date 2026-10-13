@@ -135,8 +135,9 @@ check("syncClock: back after a day or more away, the log says how long", () => {
   syncClock(s, msAtWorld(10, 11));
   assert.ok(!s.actionLog.some((e) => e.kind === "time"), "not for a few ชั่วยาม");
   syncClock(s, msAtWorld(14, 0));
-  const line = s.actionLog.at(-1)!;
-  assert.equal(line.kind, "time");
+  // (A friend's letter may land in the same sync, after it.)
+  const line = s.actionLog.findLast((e) => e.kind === "time")!;
+  assert.ok(line, "a time line");
   assert.ok(line.message.includes("ผ่านไป 3 วัน"), line.message);
   // Through the store, the count comes back for the toast.
   newGame(10, 0);
@@ -364,6 +365,19 @@ check("a save and a world from before the clock moved back rewind to today with 
   assert.equal(w.lastNpcTickDay, 3);
   assert.deepEqual(w.kidnappedUntil, { npc: 84 });
   assert.equal(rewindWorldToClock(w, 3), false);
+});
+
+check("online: the game keeps to the server's clock (a device clock moved on does not move the world)", () => {
+  setTestClock(null);
+  try {
+    // The server is two hours behind this device: the world follows the server.
+    const sent = Date.now();
+    clock.syncClockToServer(sent - 2 * 3_600_000 + 50, sent, sent + 100);
+    const lag = Date.now() - clock.now();
+    assert.ok(Math.abs(lag - 2 * 3_600_000) < 1_000, `about two hours behind the device (${lag} ms)`);
+    clock.resetClockOffset();
+    assert.ok(Math.abs(Date.now() - clock.now()) < 50);
+  } finally { clock.resetClockOffset(); }
 });
 
 console.warn = originalWarn;

@@ -39,6 +39,16 @@ pub const MAX_STACK: f64 = 9_999.0;
 pub const MAX_ITEM_KINDS: usize = 5_000;
 pub const MAX_POINTS: f64 = 1_000_000.0;
 pub const MAX_WEXP: f64 = 1_000_000_000_000.0;
+/// World day 1 (lib/world/clock.ts `WORLD_EPOCH_MS`): one world day is one real hour.
+pub const WORLD_EPOCH_MS: f64 = 1_791_824_400_000.0;
+pub const MS_PER_WORLD_DAY: f64 = 3_600_000.0;
+/// How far (world days = real hours) a save's day may run ahead of the server's clock.
+pub const DAY_SLACK: f64 = 1.0;
+
+/// The world day at a real time (as the browser's clock counts it).
+pub fn world_day(now: f64) -> f64 {
+    ((now - WORLD_EPOCH_MS) / MS_PER_WORLD_DAY).floor() + 1.0
+}
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum SaveError {
@@ -293,6 +303,11 @@ pub fn check_save(character: &Character, upload: &SaveUpload, bytes: usize, now:
     number(state, "meridianPoints", 0.0, MAX_POINTS)?;
     number(state, "wExp", 0.0, MAX_WEXP)?;
     let day = number(state, "day", -1_000_000.0, 1_000_000_000.0)?;
+    // A save from the future (the device's clock moved on) is refused: the
+    // real-time schedules (sect quests, letters, the tournament) run on it.
+    if day > world_day(now) + DAY_SLACK {
+        return Err(SaveError::BadSave("day"));
+    }
 
     // Gold may rise by what the server paid (checked battles) plus an
     // allowance that refills over time (everything the browser still pays).
@@ -388,7 +403,8 @@ mod tests {
     use super::*;
     use serde_json::json;
 
-    const T0: f64 = 1_000_000.0;
+    /// World day 201 (the test saves are on day 90).
+    const T0: f64 = WORLD_EPOCH_MS + 200.0 * MS_PER_WORLD_DAY;
 
     fn roster_with_hero() -> Roster {
         let mut roster = Roster::default();
@@ -445,6 +461,17 @@ mod tests {
         assert_eq!((hero.rev, hero.version), (1, 27));
         // The next one builds on rev 1.
         assert!(check_save(hero, &upload(1, 60.0), 2_000, T0 + 7_000.0).is_ok());
+    }
+
+    #[test]
+    fn a_save_dated_ahead_of_the_server_clock_is_refused() {
+        let mut roster = roster_with_hero();
+        let hero = roster.get_mut("c1").unwrap();
+        // Day 90 is in the past at T0 (day 201); at day 89.5 it is half an hour ahead (within the slack), at day 88 two hours.
+        assert!(check_save(hero, &upload(0, 0.0), 10, WORLD_EPOCH_MS + 88.5 * MS_PER_WORLD_DAY).is_ok());
+        assert_eq!(check_save(hero, &upload(0, 0.0), 10, WORLD_EPOCH_MS + 87.0 * MS_PER_WORLD_DAY), Err(SaveError::BadSave("day")));
+        assert_eq!(world_day(WORLD_EPOCH_MS), 1.0);
+        assert_eq!(world_day(WORLD_EPOCH_MS + MS_PER_WORLD_DAY - 1.0), 1.0);
     }
 
     #[test]

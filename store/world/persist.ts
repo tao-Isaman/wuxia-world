@@ -100,6 +100,8 @@ export const partializeSave = (s: WorldStore): PlayerSave => ({
   // v29: the outfit worn, the weapon shown, the outfits bought.
   appearance: s.appearance,
   wardrobe: s.wardrobe,
+  // v30: the last sect quest taken (the two-hour wait).
+  sectQuestTaken: s.sectQuestTaken,
   pendingBattle: s.pendingBattle,
   pendingEncounter: s.pendingEncounter,
   pendingHuntYield: s.pendingHuntYield,
@@ -191,6 +193,7 @@ export const partializeSave = (s: WorldStore): PlayerSave => ({
 //            treated as starting now (its current day).
 //   v28 → v29 added appearance (the outfit worn, ซ่อนอาวุธ) and wardrobe
 //            (outfits bought from tailors).
+//   v29 → v30 added sectQuestTaken (sect quests every two real hours).
 // Despite the list, `migrate` is one idempotent normalizer: it ignores
 // fromVersion and fills every missing field. See docs/save-format.md.
 function migratedStartDay(p: Partial<WorldStateData>): number {
@@ -331,6 +334,9 @@ export function migrateSave(persisted: unknown, fromVersion: number): WorldState
       hideWeapon: p.appearance?.hideWeapon === true,
     },
     wardrobe: Array.isArray(p.wardrobe) ? p.wardrobe.filter((id): id is string => typeof id === "string") : [],
+    // v30: the last sect quest taken.
+    sectQuestTaken: p.sectQuestTaken && typeof p.sectQuestTaken.at === "number" && Number.isFinite(p.sectQuestTaken.at)
+      && typeof p.sectQuestTaken.questId === "string" ? { at: p.sectQuestTaken.at, questId: p.sectQuestTaken.questId } : null,
     sectMembership:
       p.sectMembership && typeof p.sectMembership === "object"
         ? { ...p.sectMembership }

@@ -6,6 +6,7 @@ import { PROTOCOL_VERSION, type ClientMsg, type HeroBody, type Look, type Motion
 import type { Dir8 } from "@/lib/characters/walk8";
 import type { BattleLogRequest, BattleStartReply, BattleVerdict, EchoRequest, WorldReply } from "./play-protocol";
 import type { Parcel, SendMailRequest, SocialSnapshot } from "./social-protocol";
+import { syncClockToServer } from "@/lib/world/clock";
 
 /** An auth call the server refused: `code` is its error (`taken`, `wrong_login`, …). */
 export class AuthFailure extends Error {
@@ -94,10 +95,13 @@ export const storeSave = (server: string, token: string, id: string, rev: number
   call<{ rev: number; summary: CharacterInfo["summary"] }>(server, token, "PUT", `/characters/${encodeURIComponent(id)}/save`,
     { rev, version: save.version, state: save.state }, keepalive);
 
-/** The one shared world (`same` when `rev` is still current). */
-export const loadWorld = (server: string, token: string, rev?: number, pins: readonly string[] = []) => {
+/** The one shared world (`same` when `rev` is still current); the game keeps to the clock it brings. */
+export const loadWorld = async (server: string, token: string, rev?: number, pins: readonly string[] = []) => {
   const query = [rev === undefined ? "" : `rev=${rev}`, pins.length ? `pins=${pins.map(encodeURIComponent).join(",")}` : ""].filter(Boolean).join("&");
-  return call<WorldReply>(server, token, "GET", query ? `/world?${query}` : "/world");
+  const sentAt = Date.now();
+  const reply = await call<WorldReply>(server, token, "GET", query ? `/world?${query}` : "/world");
+  if (typeof reply.now === "number") syncClockToServer(reply.now, sentAt);
+  return reply;
 };
 /** Tell the jianghu what the hero did; the server writes the rumor. */
 export const postEcho = (server: string, token: string, echo: EchoRequest) =>

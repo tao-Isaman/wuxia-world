@@ -68,11 +68,13 @@ export class WorldObject extends DurableObject<Env> {
   }
 
   private reply(doc: WorldDoc, rev: number | null): Response {
-    if (rev === doc.rev) return json({ rev: doc.rev, same: true } satisfies WorldReply);
+    // Every answer carries the server's clock, which the browsers keep to.
+    const now = Date.now();
+    if (rev === doc.rev) return json({ rev: doc.rev, same: true, now } satisfies WorldReply);
     if (this.cached?.rev !== doc.rev) {
       this.cached = { rev: doc.rev, body: JSON.stringify({ rev: doc.rev, day: doc.day, time: doc.time, world: doc.world } satisfies WorldReply) };
     }
-    return new Response(this.cached.body, { headers: { "content-type": "application/json" } });
+    return new Response(`{"now":${now},${this.cached.body.slice(1)}`, { headers: { "content-type": "application/json" } });
   }
 
   async fetch(request: Request): Promise<Response> {

@@ -31,7 +31,7 @@
 
 - Hall: วัดเส้าหลิน (`sect_shaolin`) · registrar: เจ้าอาวาสฮุยหยวน (`sect_shaolin_abbot_huiyuan`)
 - Join requirements: male hero **and** ความเลว ≤ 10
-- Ranks: start 9, top 1 · quest cooldown 30 days
+- Ranks: start 9, top 1 · a sect quest every 2 real hours
 - Rank-up cost (sect points): →8: 100 · →7: 200 · →6: 350 · →5: 500 · →4: 700 · →3: 1000 · →2: 1400 · →1: 2000
 - Sect quests: 8 (2 art quests) · redemption quest `qst_shaolin_redemption` · betrayal hunter `hunter_shaolin`
 
@@ -66,7 +66,7 @@ Martial line — every skill and art is taught only by its lineage quest or saga
 
 - Hall: อู่ตัง / บู๊ตึ๊ง (`sect_wudang`) · registrar: อาจารย์ชิงซวี่ (`sect_wudang_master_qingxu`)
 - Join requirements: ความเลว ≤ 10
-- Ranks: start 9, top 1 · quest cooldown 30 days
+- Ranks: start 9, top 1 · a sect quest every 2 real hours
 - Rank-up cost (sect points): →8: 100 · →7: 200 · →6: 350 · →5: 500 · →4: 700 · →3: 1000 · →2: 1400 · →1: 2000
 - Sect quests: 8 (1 art quests) · redemption quest `qst_wudang_redemption` · betrayal hunter `hunter_wudang`
 
@@ -97,7 +97,7 @@ Martial line — every skill and art is taught only by its lineage quest or saga
 
 - Hall: หัวซาน (`sect_huashan`) · registrar: อาจารย์ใหญ่อี้ชิง (`sect_huashan_master_yiqing`)
 - Join requirements: ความเลว ≤ 10
-- Ranks: start 5, top 1 · quest cooldown 30 days
+- Ranks: start 5, top 1 · a sect quest every 2 real hours
 - Rank-up cost (sect points): →4: 100 · →3: 250 · →2: 500 · →1: 1000
 - Sect quests: 5 (1 art quests) · redemption quest `qst_huashan_redemption` · betrayal hunter `hunter_huashan`
 
@@ -120,7 +120,7 @@ Martial line — every skill and art is taught only by its lineage quest or saga
 
 - Hall: ซงซาน (`sect_songshan`) · registrar: อาจารย์ใหญ่เกาซงเหยียน (`sect_songshan_master_zuolengchan`)
 - Join requirements: ความเลว ≤ 10
-- Ranks: start 5, top 1 · quest cooldown 30 days
+- Ranks: start 5, top 1 · a sect quest every 2 real hours
 - Rank-up cost (sect points): →4: 100 · →3: 250 · →2: 500 · →1: 1000
 - Sect quests: 5 (1 art quests) · redemption quest `qst_songshan_redemption` · betrayal hunter `hunter_songshan`
 
@@ -143,7 +143,7 @@ Martial line — every skill and art is taught only by its lineage quest or saga
 
 - Hall: ไท่ซาน (`sect_taishan`) · registrar: เจ้าสำนักชิงสือเต้าเหริน (`sect_taishan_master_tianmen`)
 - Join requirements: ความเลว ≤ 10
-- Ranks: start 5, top 1 · quest cooldown 30 days
+- Ranks: start 5, top 1 · a sect quest every 2 real hours
 - Rank-up cost (sect points): →4: 100 · →3: 250 · →2: 500 · →1: 1000
 - Sect quests: 5 (1 art quests) · redemption quest `qst_taishan_redemption` · betrayal hunter `hunter_taishan`
 
@@ -166,7 +166,7 @@ Martial line — every skill and art is taught only by its lineage quest or saga
 
 - Hall: เฮิงซาน (`sect_hengshan_south`) · registrar: อาจารย์ใหญ่เซี่ยอวิ๋น (`sect_hengshan_south_master_modaxiansheng`)
 - Join requirements: ความเลว ≤ 10
-- Ranks: start 5, top 1 · quest cooldown 30 days
+- Ranks: start 5, top 1 · a sect quest every 2 real hours
 - Rank-up cost (sect points): →4: 100 · →3: 250 · →2: 500 · →1: 1000
 - Sect quests: 5 (1 art quests) · redemption quest `qst_hengshan_south_redemption` · betrayal hunter `hunter_hengshan_south`
 
@@ -189,7 +189,7 @@ Martial line — every skill and art is taught only by its lineage quest or saga
 
 - Hall: เหิงซาน (`sect_hengshan_north`) · registrar: ภิกษุณีเสวียนเยว่ (`sect_hengshan_north_abbess_dingyi`)
 - Join requirements: ความเลว ≤ 10
-- Ranks: start 5, top 1 · quest cooldown 30 days
+- Ranks: start 5, top 1 · a sect quest every 2 real hours
 - Rank-up cost (sect points): →4: 100 · →3: 250 · →2: 500 · →1: 1000
 - Sect quests: 5 (1 art quests) · redemption quest `qst_hengshan_north_redemption` · betrayal hunter `hunter_hengshan_north`
 
@@ -212,7 +212,7 @@ Martial line — every skill and art is taught only by its lineage quest or saga
 
 - Hall: ฉวนเจิน / ชวนจิน (`sect_quanzhen`) · registrar: อาจารย์ใหญ่หลิงเจิน (`sect_quanzhen_master_chongyang`)
 - Join requirements: ความเลว ≤ 10
-- Ranks: start 5, top 1 · quest cooldown 30 days
+- Ranks: start 5, top 1 · a sect quest every 2 real hours
 - Rank-up cost (sect points): →4: 100 · →3: 250 · →2: 500 · →1: 1000
 - Sect quests: 5 (1 art quests) · redemption quest `qst_quanzhen_redemption` · betrayal hunter `hunter_quanzhen`
 
@@ -238,7 +238,7 @@ Martial line — every skill and art is taught only by its lineage quest or saga
 
 - Hall: ง้อไบ๊ (`sect_emei`) · registrar: ซือไท้จิงฉาน (`sect_emei_abbess_jingchan`)
 - Join requirements: female hero **and** ความเลว ≤ 10
-- Ranks: start 9, top 1 · quest cooldown 30 days
+- Ranks: start 9, top 1 · a sect quest every 2 real hours
 - Rank-up cost (sect points): →8: 100 · →7: 200 · →6: 350 · →5: 500 · →4: 700 · →3: 1000 · →2: 1400 · →1: 2000
 - Sect quests: 8 (1 art quests) · redemption quest `qst_emei_redemption` · betrayal hunter `hunter_emei`
 
@@ -270,7 +270,7 @@ Martial line — every skill and art is taught only by its lineage quest or saga
 
 - Hall: กู่มู่ / โบราณสุสาน (`sect_gumu`) · registrar: หญิงปริศนาในสุสาน (`sect_gumu_mystery_woman`)
 - Join requirements: ความเลว ≤ 10
-- Ranks: start 3, top 1 · quest cooldown 30 days
+- Ranks: start 3, top 1 · a sect quest every 2 real hours
 - Rank-up cost (sect points): →2: 400 · →1: 1200
 - Sect quests: 4 (0 art quests) · redemption quest `qst_gumu_redemption` · betrayal hunter `hunter_gumu`
 
@@ -291,7 +291,7 @@ Martial line — every skill and art is taught only by its lineage quest or saga
 
 - Hall: พรรคยาจก (`sect_beggars`) · registrar: หัวหน้าหงเทียน (`sect_beggars_chief_hongtian`)
 - Join requirements: ความเลว ≤ 10 **and** ขอทาน (begging) mastery ≥ 2
-- Ranks: start 9, top 1 · quest cooldown 30 days
+- Ranks: start 9, top 1 · a sect quest every 2 real hours
 - Rank-up cost (sect points): →8: 100 · →7: 200 · →6: 350 · →5: 500 · →4: 700 · →3: 1000 · →2: 1400 · →1: 2000
 - Sect quests: 8 (1 art quests) · redemption quest `qst_beggars_redemption` · betrayal hunter `hunter_beggars`
 
@@ -322,7 +322,7 @@ Martial line — every skill and art is taught only by its lineage quest or saga
 
 - Hall: องครักษ์เสื้อแพร (`sect_jinyiwei`) · registrar: ผู้บัญชาการจ้าวฝู่ (`sect_jinyiwei_leader_zhao`)
 - Join requirements: ความเลว ≤ 30
-- Ranks: start 9, top 1 · quest cooldown 30 days
+- Ranks: start 9, top 1 · a sect quest every 2 real hours
 - Rank-up cost (sect points): →8: 100 · →7: 200 · →6: 350 · →5: 500 · →4: 700 · →3: 1000 · →2: 1400 · →1: 2000
 - Sect quests: 8 (1 art quests) · redemption quest `qst_jinyiwei_redemption` · betrayal hunter `hunter_jinyiwei`
 
@@ -354,7 +354,7 @@ Martial line — every skill and art is taught only by its lineage quest or saga
 
 - Hall: พรรคตะวันจันทรา (`sect_ming`) · registrar: อาจารย์ใหญ่หยินอวี้ (`sect_sunmoon_chief_dongfang`)
 - Join requirements: ความเลว ≤ 30
-- Ranks: start 9, top 1 · quest cooldown 30 days
+- Ranks: start 9, top 1 · a sect quest every 2 real hours
 - Rank-up cost (sect points): →8: 100 · →7: 200 · →6: 350 · →5: 500 · →4: 700 · →3: 1000 · →2: 1400 · →1: 2000
 - Sect quests: 8 (1 art quests) · redemption quest `qst_sunmoon_redemption` · betrayal hunter `hunter_sunmoon`
 
@@ -380,7 +380,7 @@ Martial line — every skill and art is taught only by its lineage quest or saga
 
 - Hall: สำนักสกุลถัง (`sect_tang`) · registrar: เจ้าสำนักถังเหมิน (`sect_tang_chief_tangmen`)
 - Join requirements: ความเลว ≤ 30
-- Ranks: start 9, top 1 · quest cooldown 30 days
+- Ranks: start 9, top 1 · a sect quest every 2 real hours
 - Rank-up cost (sect points): →8: 100 · →7: 200 · →6: 350 · →5: 500 · →4: 700 · →3: 1000 · →2: 1400 · →1: 2000
 - Sect quests: 8 (1 art quests) · redemption quest `qst_tang_redemption` · betrayal hunter `hunter_tang`
 
@@ -410,7 +410,7 @@ Martial line — every skill and art is taught only by its lineage quest or saga
 
 - Hall: พรรคสราญรมย์ (เซียวหยาว) (`sect_xiaoyao`) · registrar: ปรมาจารย์ยุนเซียว (`sect_xiaoyao_master_yunxiao`)
 - Join requirements: ความเลว ≤ 15
-- Ranks: start 9, top 1 · quest cooldown 30 days
+- Ranks: start 9, top 1 · a sect quest every 2 real hours
 - Rank-up cost (sect points): →8: 100 · →7: 200 · →6: 350 · →5: 500 · →4: 700 · →3: 1000 · →2: 1400 · →1: 2000
 - Sect quests: 8 (1 art quests) · redemption quest `qst_xiaoyao_redemption` · betrayal hunter `hunter_xiaoyao`
 

@@ -9,6 +9,7 @@ import {
   SECT_MEMBERSHIPS,
   getQuestsForSect,
   isSectQuestOfferable,
+  sectQuestWait,
   isQuestOfferable,
   isSecretSectQuest,
   MYSTERY_MOVE_LABEL,
@@ -20,6 +21,8 @@ import {
 import { sectLineageQuests } from "@/lib/world/story/registry";
 import { REJOIN_COOLDOWN_DAYS, isRedemptionQuest, membershipStatus, rejoinWaitDays, redemptionQuestId } from "@/lib/world/sects";
 import { questHolder } from "@/lib/world/npc-life";
+import { MS_PER_DAY, msAtWorld } from "@/lib/world/clock";
+import { realWait } from "@/lib/world/calendar";
 import type { SectId, QuestDef } from "@/lib/world";
 import { TIERS, getSkill, getArt } from "@/lib/game";
 
@@ -182,8 +185,6 @@ export function SectMembershipPopup({ open, onClose }: Props) {
           <QuestsTab
             quests={repeatable}
             sectId={current}
-            cooldownDays={def.questCooldownDays}
-            day={day}
             worldState={worldState}
             onAccept={(qid) => acceptSectQuest(current, qid)}
           />
@@ -193,7 +194,6 @@ export function SectMembershipPopup({ open, onClose }: Props) {
           <ArtQuestsTab
             quests={artQuests}
             sectId={current}
-            cooldownDays={def.questCooldownDays}
             artQuestsDone={m.artQuestsDone}
             worldState={worldState}
             onAccept={(qid) => acceptSectQuest(current, qid)}
@@ -420,23 +420,27 @@ function RewardsTab({ def, rank, atTop, nextRank, nextCost, canRankUp, worldStat
 interface QuestsTabProps {
   quests: QuestDef[];
   sectId: SectId;
-  cooldownDays: number;
-  day: number;
   worldState: import("@/lib/world").WorldStateData;
   onAccept: (questId: string) => { ok: boolean; reason?: string };
 }
 
-function QuestsTab({ quests, cooldownDays, day, worldState, onAccept }: QuestsTabProps) {
+function QuestsTab({ quests, worldState, onAccept }: QuestsTabProps) {
   if (quests.length === 0) {
     return <div className="text-xs text-muted-foreground">ยังไม่มีภารกิจประจำสำนัก</div>;
   }
+  const wait = sectQuestWait(worldState);
   return (
     <div className="space-y-2">
       <div className="text-xs text-muted-foreground">
-        ภารกิจประจำ — รับซ้ำได้ทุก {cooldownDays} วันหลังจากทำสำเร็จ
+        ภารกิจประจำ — รับได้ครั้งละหนึ่งภารกิจทุก 2 ชั่วโมง (นับจากที่รับ ไม่สะสม)
       </div>
+      {wait > 0 && (
+        <div className="text-xs text-vermilion" data-testid="sect-quest-wait">
+          รับภารกิจสำนักครั้งต่อไปได้{realWait(msAtWorld(worldState.day, worldState.time) + wait * MS_PER_DAY, msAtWorld(worldState.day, worldState.time))}
+        </div>
+      )}
       {quests.map((q) => {
-        const status = isSectQuestOfferable(worldState, q, cooldownDays);
+        const status = isSectQuestOfferable(worldState, q);
         const active = worldState.quests[q.id]?.status === "active";
         return (
           <div
@@ -463,9 +467,7 @@ function QuestsTab({ quests, cooldownDays, day, worldState, onAccept }: QuestsTa
                 ) : status.offerable ? (
                   <span className="text-jade">พร้อมรับ</span>
                 ) : status.cooldownLeft > 0 ? (
-                  <span className="text-muted-foreground">
-                    คูลดาวน์อีก {status.cooldownLeft} วัน
-                  </span>
+                  <span className="text-muted-foreground">รอรอบถัดไป</span>
                 ) : (
                   <span className="text-muted-foreground">{status.reason ?? "—"}</span>
                 )}
@@ -482,9 +484,6 @@ function QuestsTab({ quests, cooldownDays, day, worldState, onAccept }: QuestsTa
           </div>
         );
       })}
-      <div className="text-[10px] text-muted-foreground pt-1">
-        วันนี้วันที่ {day} · ทำสำเร็จแล้วจะเริ่มนับคูลดาวน์
-      </div>
     </div>
   );
 }
@@ -493,7 +492,6 @@ function QuestsTab({ quests, cooldownDays, day, worldState, onAccept }: QuestsTa
 interface ArtQuestsTabProps {
   quests: QuestDef[];
   sectId: SectId;
-  cooldownDays: number;
   artQuestsDone: readonly string[];
   worldState: import("@/lib/world").WorldStateData;
   onAccept: (questId: string) => { ok: boolean; reason?: string };
@@ -501,7 +499,6 @@ interface ArtQuestsTabProps {
 
 function ArtQuestsTab({
   quests,
-  cooldownDays,
   artQuestsDone,
   worldState,
   onAccept,
@@ -515,7 +512,7 @@ function ArtQuestsTab({
         ภารกิจหายาก — ทำได้ครั้งเดียว เพื่อรับลมปราณระดับสูง
       </div>
       {quests.map((q) => {
-        const status = isSectQuestOfferable(worldState, q, cooldownDays);
+        const status = isSectQuestOfferable(worldState, q);
         const done = artQuestsDone.includes(q.id);
         const active = worldState.quests[q.id]?.status === "active";
         return (

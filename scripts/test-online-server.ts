@@ -11,6 +11,10 @@
 // Map chat, friends, whispers, mail with parcels and the party
 // (docs/design/social.md).
 import assert from "node:assert/strict";
+import { worldNow } from "../lib/world/clock";
+
+/** Today's world day: a save may not be dated ahead of the server's clock. */
+const TODAY = worldNow().day;
 
 // The world store runs here to build real saves (it needs a localStorage).
 const memory = new Map<string, string>();
@@ -228,7 +232,7 @@ async function refusal(promise: Promise<unknown>): Promise<string> {
 }
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 function heroState(name: string, gold: number) {
-  return { hasGame: true, day: 90, gold, wExp: 0, meridianPoints: 0, lastLocationId: "city_capital", inventory: { herb_common: 2 },
+  return { hasGame: true, day: TODAY, gold, wExp: 0, meridianPoints: 0, lastLocationId: "city_capital", inventory: { herb_common: 2 },
     inventoryEquipment: {}, sectMembership: {}, playerBuild: { name, artLevel: 1, stats: { STR: 5 }, skillLevels: { basic_punch: 1 } } };
 }
 
@@ -274,7 +278,7 @@ await check("saves: the server checks rev, pace, the hero, its numbers and the g
   assert.equal(loaded.save?.version, 27);
   assert.equal((loaded.save?.state as { gold: number }).gold, 80);
   const listed = (await listCharacters(server, annToken)).find((c) => c.id === mei.id)!;
-  assert.deepEqual([listed.rev, listed.summary?.day, listed.summary?.location], [2, 90, "city_capital"]);
+  assert.deepEqual([listed.rev, listed.summary?.day, listed.summary?.location], [2, TODAY, "city_capital"]);
 });
 
 await check("the shared world: one for every account; a deed becomes a rumor the server writes", async () => {
@@ -284,7 +288,9 @@ await check("the shared world: one for every account; a deed becomes a rumor the
   if (forAnn.same || forBob.same) return;
   assert.equal(forAnn.world.worldSeed, forBob.world.worldSeed, "the same world");
   assert.ok(Object.keys(forAnn.world.npcExt).length >= 30, "its people live on the server");
-  assert.deepEqual(await loadWorld(server, annToken, forAnn.rev), { rev: forAnn.rev, same: true });
+  const same = await loadWorld(server, annToken, forAnn.rev);
+  assert.equal(typeof same.now, "number", "every answer carries the server's clock");
+  assert.deepEqual({ ...same, now: undefined }, { rev: forAnn.rev, same: true, now: undefined });
   const before = forAnn.world.rumorPool.length;
   const { rev } = await postEcho(server, annToken, {
     actionId: "sect_join", context: { archetype: "นักท่องยุทธ์", sceneId: "city_capital", sectId: "shaolin" },

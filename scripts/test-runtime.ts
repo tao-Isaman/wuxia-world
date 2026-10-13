@@ -219,7 +219,7 @@ check("hidden and unknown route destinations have no effects", () => {
 });
 check("Phaser runtime objects never enter the version 29 save", () => {
   const options = useWorldStore.persist.getOptions();
-  assert.equal(options.version, 29);
+  assert.equal(options.version, 30);
   const saved = options.partialize!(useWorldStore.getState());
   assert.equal(JSON.stringify(saved).includes("enemyElapsedMs"), false);
   assert.equal("travelRoute" in saved, false);

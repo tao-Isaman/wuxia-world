@@ -34,9 +34,8 @@ export interface SectMembershipDef {
   topRank: number;
   // Cost (sect points) to upgrade INTO this rank from the rank just below.
   rankUpCost: (targetRank: number) => number;
-  // Days between sect-quest re-offers. Used by sect-quest gating in the NPC
-  // popup (offer hidden when day - lastQuestDay[questId] < cooldownDays).
-  questCooldownDays: number;
+  // Sect quests are taken one every two real hours, across every sect
+  // (SECT_QUEST_GAP_DAYS, lib/world/effects.ts).
 }
 
 // Shaolin disciple ranks. Climbing from rank 9 (entry, novice) to rank 1
@@ -71,7 +70,6 @@ const SHAOLIN: SectMembershipDef = {
     };
     return table[targetRank] ?? Infinity;
   },
-  questCooldownDays: 30,
 };
 
 // Wudang disciple ranks. Same 9→1 climb as Shaolin, but no gender gate
@@ -101,7 +99,6 @@ const WUDANG: SectMembershipDef = {
     };
     return table[targetRank] ?? Infinity;
   },
-  questCooldownDays: 30,
 };
 
 // Huashan disciple ranks. T3 sect — smaller, sword-only school whose
@@ -126,7 +123,6 @@ const HUASHAN: SectMembershipDef = {
     };
     return table[targetRank] ?? Infinity;
   },
-  questCooldownDays: 30,
 };
 
 // Songshan disciple ranks. T3 sect — central peak iron-sword. Compressed
@@ -145,7 +141,6 @@ const SONGSHAN: SectMembershipDef = {
     };
     return table[targetRank] ?? Infinity;
   },
-  questCooldownDays: 30,
 };
 
 // Taishan disciple ranks. T3 sect — eastern peak Daoist, yang/external
@@ -164,7 +159,6 @@ const TAISHAN: SectMembershipDef = {
     };
     return table[targetRank] ?? Infinity;
   },
-  questCooldownDays: 30,
 };
 
 // Hengshan South disciple ranks (เฮิงซาน — five-peaks sword sect). T3 sect
@@ -183,7 +177,6 @@ const HENGSHAN_SOUTH: SectMembershipDef = {
     };
     return table[targetRank] ?? Infinity;
   },
-  questCooldownDays: 30,
 };
 
 // Hengshan North disciple ranks (เหิงซาน — Buddhist nun's order). T3 sect
@@ -202,7 +195,6 @@ const HENGSHAN_NORTH: SectMembershipDef = {
     };
     return table[targetRank] ?? Infinity;
   },
-  questCooldownDays: 30,
 };
 
 // Quanzhen disciple ranks. Like Huashan, leadership caps at T3 — strong
@@ -227,7 +219,6 @@ const QUANZHEN: SectMembershipDef = {
     };
     return table[targetRank] ?? Infinity;
   },
-  questCooldownDays: 30,
 };
 
 // Emei disciple ranks. Big Buddhist nun sect — leadership tier matches
@@ -264,7 +255,6 @@ const EMEI: SectMembershipDef = {
     };
     return table[targetRank] ?? Infinity;
   },
-  questCooldownDays: 30,
 };
 
 // Ancient Tomb sect (สุสานโบราณ / 古墓派). The secret sixth sect — only
@@ -295,7 +285,6 @@ const GUMU: SectMembershipDef = {
     };
     return table[targetRank] ?? Infinity;
   },
-  questCooldownDays: 30,
 };
 
 // Beggars sect (พรรคยาจก / 丐帮). Big sect — leadership tier matches
@@ -333,7 +322,6 @@ const BEGGARS: SectMembershipDef = {
     };
     return table[targetRank] ?? Infinity;
   },
-  questCooldownDays: 30,
 };
 
 // Jinyiwei sect (องครักษ์เสื้อแพร / 锦衣卫). Imperial guard sect — backed
@@ -368,7 +356,6 @@ const JINYIWEI: SectMembershipDef = {
     };
     return table[targetRank] ?? Infinity;
   },
-  questCooldownDays: 30,
 };
 
 // พรรคตะวันจันทรา (Sun-Moon sect / 日月神教). Big art-focused sect — the
@@ -402,7 +389,6 @@ const SUNMOON: SectMembershipDef = {
     };
     return table[targetRank] ?? Infinity;
   },
-  questCooldownDays: 30,
 };
 
 // Tang sect (สำนักสกุลถัง / 唐门). Big Sichuan family — known throughout
@@ -435,7 +421,6 @@ const TANG: SectMembershipDef = {
     };
     return table[targetRank] ?? Infinity;
   },
-  questCooldownDays: 30,
 };
 
 // Xiaoyao sect (พรรคสราญรมย์ / 逍遥派). Big sect — yin / internal art-
@@ -463,7 +448,6 @@ const XIAOYAO: SectMembershipDef = {
     };
     return table[targetRank] ?? Infinity;
   },
-  questCooldownDays: 30,
 };
 
 export const SECT_MEMBERSHIPS: Record<SectId, SectMembershipDef> = {

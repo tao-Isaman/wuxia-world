@@ -21,7 +21,8 @@ console.warn = (...args: unknown[]) => {
 };
 
 const { useWorldStore } = await import("../store/world-store");
-const { applyEffect, applyEffects, droppedQuestFlag, isQuestOfferable, isSectQuestOfferable, repeatsQuestGifts } = await import("../lib/world/effects");
+const { SECT_QUEST_GAP_DAYS, applyEffect, applyEffects, droppedQuestFlag, isQuestOfferable, isSectQuestOfferable, repeatsQuestGifts } = await import("../lib/world/effects");
+const { setTestClock, setTestWorldTime } = await import("../lib/world/clock");
 const { QUESTS, getQuest } = await import("../lib/world/data/quests");
 const { getNpc } = await import("../lib/world/data/npcs");
 const { SECT_MEMBERSHIPS } = await import("../lib/world/data/sect-memberships");
@@ -192,7 +193,7 @@ check("redemption: every joinable sect has one, at its grounds; a betrayer is of
   assert.equal(store().traits.evil, evil + 5);
   const redemption = getQuest("qst_xiaoyao_redemption")!;
   assert.ok(isQuestOfferable(store(), redemption), "the master offers forgiveness");
-  assert.equal(isSectQuestOfferable(store(), redemption, 30).offerable, false, "not from the sect window");
+  assert.equal(isSectQuestOfferable(store(), redemption).offerable, false, "not from the sect window");
   assert.equal(store().joinSect("xiaoyao").ok, false, "a betrayer cannot walk back in");
   assert.ok(store().acceptQuest(redemption.id).ok);
   assert.ok(store().finishQuestNow(redemption.id).ok);
@@ -267,6 +268,40 @@ check("store sect actions need an active membership", () => {
   useWorldStore.setState({ sectMembership: { wudang: member("wudang", { points: 10_000 }) } as never });
   assert.ok(store().upgradeSectRank("wudang").ok);
   assert.ok(store().acceptSectQuest("wudang", sectQuest.id).ok);
+});
+
+check("sect quests: one every two real hours across every sect, not saved up; dropping it gives the turn back; art quests are apart", () => {
+  setTestWorldTime(500, 0);
+  try {
+    newGame();
+    useWorldStore.setState({ sectMembership: { wudang: member("wudang", { rank: 1 }) } as never });
+    const repeatable = QUESTS.filter((q) => q.sectId === "wudang" && !q.isArtQuest && q.id !== redemptionQuestId("wudang") && isSectQuestOfferable(store(), q).offerable);
+    assert.ok(repeatable.length >= 2, "two quests to try");
+    const [a, b] = repeatable;
+    assert.ok(isSectQuestOfferable(store(), a!).offerable);
+    assert.ok(store().acceptSectQuest("wudang", a!.id).ok);
+    const blocked = isSectQuestOfferable(store(), b!);
+    assert.equal(blocked.offerable, false, "the next waits");
+    assert.ok(Math.abs(blocked.cooldownLeft - SECT_QUEST_GAP_DAYS) < 1e-6, "two real hours (world days)");
+    assert.equal(store().acceptSectQuest("wudang", b!.id).ok, false);
+    // An hour and a half later: still waiting; two hours: open again.
+    setTestWorldTime(501, 6);
+    assert.equal(store().acceptSectQuest("wudang", b!.id).ok, false);
+    setTestWorldTime(502, 0);
+    assert.ok(store().acceptSectQuest("wudang", b!.id).ok, "two hours on");
+    // Dropping the quest just taken gives the turn back.
+    assert.ok(store().abandonQuest(b!.id).ok);
+    assert.equal(store().sectQuestTaken, null);
+    assert.ok(isSectQuestOfferable(store(), b!).offerable);
+    // A long absence does not stack turns: one quest, then two hours again.
+    setTestWorldTime(530, 0);
+    assert.ok(store().acceptSectQuest("wudang", b!.id).ok);
+    const other = repeatable.find((q) => q.id !== b!.id && store().quests[q.id]?.status !== "active")!;
+    assert.equal(store().acceptSectQuest("wudang", other.id).ok, false, "no saved-up turns");
+    // The one-shot art trials keep their own gate.
+    const art = QUESTS.find((q) => q.sectId === "wudang" && q.isArtQuest)!;
+    assert.notEqual(isSectQuestOfferable(store(), art).reason, "รับภารกิจสำนักได้ทุก 2 ชั่วโมง");
+  } finally { setTestClock(null); }
 });
 
 console.warn = originalWarn;

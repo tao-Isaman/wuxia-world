@@ -107,7 +107,7 @@ export function syncClock(state: WorldStateData, at: number = now()): void {
     settleTournaments(state);
     const record = state.tournamentHistory[state.tournamentHistory.length - 1];
     if (state.tournamentHistory.length > before && record) {
-      appendActionLog(state, "tournament", `ชุมนุมวิจารณ์กระบี่เขาหัวซานปีที่ ${record.year} จบลง · ผู้ชนะเลิศ ${entrantName(record.champion, state.playerBuild?.name)}`);
+      appendActionLog(state, "tournament", `${TOURNAMENT_NAME}ครั้งที่ ${record.year} จบลง · ผู้ชนะเลิศ ${entrantName(record.champion, state.playerBuild?.name)}`);
     }
   }
 }

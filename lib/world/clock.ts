@@ -48,10 +48,27 @@ export function nightLevel(time: number): number {
 }
 
 let testNow: number | null = null;
+/** How far the game server's clock is from this device's (online play keeps to the server's). */
+let clockOffset = 0;
 
-/** The real time the world is at: `Date.now()`, or the test clock when one is set. */
+/** The real time the world is at: `Date.now()` (kept to the game server's clock), or the test clock when one is set. */
 export function now(): number {
-  return testNow ?? Date.now();
+  return testNow ?? Date.now() + clockOffset;
+}
+
+/**
+ * Keep to the game server's clock: `serverNow` is its time when it answered a
+ * request sent at `sentAt` and answered by `receivedAt` (device times). A
+ * device whose clock was moved on (or back) then sees the server's day.
+ */
+export function syncClockToServer(serverNow: number, sentAt: number, receivedAt: number = Date.now()): void {
+  if (!Number.isFinite(serverNow)) return;
+  clockOffset = serverNow + (receivedAt - sentAt) / 2 - receivedAt;
+}
+
+/** Forget the server's clock (signed out, or tests). */
+export function resetClockOffset(): void {
+  clockOffset = 0;
 }
 
 /** Tests only: pin the clock (ms since 1970), or `null` to follow real time again. */

@@ -175,7 +175,7 @@ check("a worn outfit no longer held falls back to the default (current look, and
 });
 
 check("save v29: appearance and wardrobe are saved; an older save gets the default look", () => {
-  assert.equal(SAVE_VERSION, 29);
+  assert.equal(SAVE_VERSION, 30);
   newGame();
   useWorldStore.setState({ wardrobe: ["tailor_ink"], appearance: { outfit: "tailor_ink", hideWeapon: true } });
   const saved = partializeSave(store()) as unknown as WorldStateData;

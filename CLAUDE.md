@@ -79,7 +79,7 @@ bun run test:routes         # compass exits, 8-way road paintings and arrival si
 bun run test:places         # place NPCs / quests / activities; every ยุทธจักร T0–T3 move is a quest reward; gifts; presence
 bun run test:systems        # practice xp, letters, horse stations, the sword tournament; sect join / rejoin / redemption, dropped quests
 bun run test:gear           # gear options: halved stats, tiers, rolls, keys that clamp, options in stats and battle, magic materials, buy / re-roll, repair
-bun run test:appearance     # outfits (unlocks, gender, found outfits and their sources, wardrobe save v29), weapon families and carry, the recolour on the real sheets, the battle look
+bun run test:appearance     # outfits (unlocks, gender, found outfits and their sources, wardrobe save), weapon families and carry, the recolour on the real sheets, the battle look
 bun run test:quests         # campaign audit + dead ends + every item/kill/objective quest + guidance + bad-action stages
 bun run test:meridians      # meridian charts: engine, combat bonus, chart items / sources, points, store, repair, content counts
 bun run test:engine         # text overrides over SKILLS / ARTS, the engine's filters / edits / validation, the save route whitelist
@@ -142,7 +142,7 @@ bun scripts/assets/build-kits.ts plan && python3 scripts/assets/generate.py run 
 ```
 app/, components/         React: screens, HUD, menus, popups, battle UI
    ↓
-store/                    Zustand: world (saved, v29, + the shared world), battle, character (/debug, v3), loading, toast, confirm
+store/                    Zustand: world (saved, v30, + the shared world), battle, character (/debug, v3), loading, toast, confirm
    ↓
 lib/world/  ──────►  lib/game/          pure engines — no React, no DOM, no I/O
    └ battle-bridge.ts: the one place the world and battle stores meet
@@ -249,7 +249,7 @@ Two deliberate exceptions reach into stores:
 - **Sects** (`data/sect-memberships.ts`, 15 joinable).
   - Ladders: 9 → 1 (eight sects), 5 → 1 (six) or 3 → 1 (Gumu).
   - Ranks grant no martial arts: a rank-up pays gold (`rankUpGold`, half its point cost) and opens lineage quests and sagas, the **only** way to any sect skill or art (`test:story` enforces it; no rank pool, manual, hall, dialog or other quest may teach one). The one exception is the sword tournament champion's prize pick (below).
-  - Sect quests are repeatable after a 30-day cooldown.
+  - Sect quests (the sect window's repeatable ones) are taken one every two real hours across every sect, not saved up (`SECT_QUEST_GAP_DAYS`, `sectQuestWait`, save `sectQuestTaken`; dropping that quest gives the turn back); the art trials are one-shot.
   - Membership status is `active | resigned | betrayed`. Only `active` counts for `sectMember` / `anySectMember`, and the store's sect actions (rank-up, sect quests, leaving) need it.
   - Joins go through each intro quest's `joinSect` **reward**, which checks `sectJoinCheck` (`lib/world/sects.ts`: `joinRequirements`, one sect at a time, no betrayer); a hero refused there asks later on the master's card (store `joinSect`). `test:systems` checks every intro's `prereqs` carry the `joinRequirements`.
   - Leaving (resign / betray, by the menu, a quest reward or a scene) logs, echoes and (betrayal) adds evil +5 inside the effect. A resigned sect's moves get no xp from any source; it takes the hero back `REJOIN_COOLDOWN_DAYS` (30) after `leftDay`, from the first rank (`bestRank` stops rank-up gold paying twice).
@@ -275,9 +275,9 @@ Two deliberate exceptions reach into stores:
   - **Place activities** are `ActivityDef`s with `place` (locations, cooldown in days, cost, rewards), run by `doActivity`; auto maps place their spots (`ACTIVITY_SLOTS`), hand maps need `place.spot`.
   - **NPC looks:** all 68 place NPCs have their own painted portrait and body (`import-npc-art.ts`). Strollers (`look.wander`) are rigged (`ANIMATED_NPC_IDS`); the rest stand as a unique pixel sprite. `look.body` (`registerNpcBodies`) is only the fallback sheet for art-less NPCs.
 - **Letters, stations, tournament.**
-  - **Letters** (`letters.ts`): each new day an NPC with relationship ≥ 20 may write (one letter a day, 15 days per NPC; odds from relationship, fame, LUK; gift rarity from LUK). Inbox `state.letters`; `readLetter` only marks read, `claimLetterGift` / `claimAllLetterGifts` take gifts (รับของ / รับทั้งหมด); `deleteLetters` throws letters away with any untaken gift (the window asks first).
+  - **Letters** (`letters.ts`): every three real hours (00:00, 03:00 … Thai time, `isLetterSlot`; missed slots of the last real day are rolled on coming back) an NPC with relationship ≥ 20 may write (one letter a slot, one per NPC a real day; odds from relationship, fame, LUK; gift rarity from LUK). Inbox `state.letters`; `readLetter` only marks read, `claimLetterGift` / `claimAllLetterGifts` take gifts (รับของ / รับทั้งหมด); `deleteLetters` throws letters away with any untaken gift (the window asks first).
   - **Horse stations** (`stations.ts`): cities, villages and joinable sects' grounds; ride to a visited station place for gold by world-map distance, arriving at once (`stationTravel`).
-  - **Sword tournament** (`tournament.ts`): a 360-day year; held on Mount Hua (`sect_huashan`, `TOURNAMENT_NAME` ชุมนุมประลองกระบี่หัวซาน); on day 60 Huashan's chief sends an invitation letter with the 100-gold fee (`sendTournamentInvitation`); register there (days 60–89, 100 gold), fight on day 90–92. 32 entrants (hero + the liveness roster + sparring fighters); the hero's bouts are real non-fatal battles (`pendingBattle.tournament`), the rest simulated by power. Bout and place rewards; the champion (hero or NPC) picks one entrant's move or art.
+  - **Sword tournament** (`tournament.ts`): every two real weeks on the Thai calendar (a "year" in the code is one round of 336 world days from `TOURNAMENT.anchorDay`, a Monday 00:00); held on Mount Hua (`sect_huashan`, `TOURNAMENT_NAME` ชุมนุมประลองกระบี่หัวซาน); while registration is open Huashan's chief sends an invitation letter with the 100-gold fee, once a round (`sendTournamentInvitation`); register there (Monday 00:00 until the second Saturday 20:00, 100 gold), fight from that Saturday 20:00 until Sunday 23:00; a round that ended while the hero was away is settled on their return. 32 entrants (hero + the liveness roster + sparring fighters); the hero's bouts are real non-fatal battles (`pendingBattle.tournament`), the rest simulated by power. Bout and place rewards; the champion (hero or NPC) picks one entrant's move or art, every time.
   - **Practice xp** is 30 + 5 % of the xp to the next level, 50 + 6 % at a fitting place (`practiceXpGain`).
 - **Ferries and the world map.**
   - **Islands by boat only** (`lib/world/ferries.ts`): island entries in `location-routes.ts` are `sea: true` (layout and the map's boat lanes only; `isWalkable` filters them, so no route scene, NPC road or habitat). ลุงจาง คนแจวเรือ (`FERRYMAN`, marker `npc-ferry_boatman`, not an `NpcDef`: unkillable) waits at ซูโจว, หยางโจว and every island and sails to any other pier for 40 + 0.5 gold per world-map unit (store `ferryTravel`, instant). The quest guide links every pier to every other and points at him for a crossing.
@@ -289,11 +289,12 @@ Two deliberate exceptions reach into stores:
   - Every skill / art level gained gives +1 `meridianPoints` (saved). A chart is learned by reading its item `chart_<id>` (แผนภาพชีพจร-…) once its `requires` skills / arts are learned → `playerBuild.meridians[id]` = a rank 0–3 per point.
   - `openMeridianNode` raises a point one rank for `(ti + 1) × rank` points, in order. Base stats join `combinedStats` (`fromMeridians`); combat fields join `deriveAll` and the battle context via `getBuildBonus`.
   - Filled (rank 3) points' `effects` (opening / shield / ward / revive / rage / sap) run in battle via `lib/game/meridian-battle.ts` (statuses `buff_*_pct`, `buff_regen`, `buff_cri_rate`, `shield`, `ward`, `debuff_spd`; grid `proc` events).
+- **Real time** (`lib/world/calendar.ts`). The player's schedules run on the real Thai calendar (UTC+7): `thaiDateTime`, `realWait`. One world day is one real hour, so they are kept in world days. Online, the browser keeps to the game server's clock (`syncClockToServer` from every `GET /world` reply's `now`) and the server refuses a save whose `day` runs ahead of its clock (`save.rs`, `BadSave("day")`).
 - **Repair** (`validate.ts`). `validateAndRepair` runs on every load and drops dangling ids.
 
 ## Stores (`store/`)
 
-- **`world-store.ts`** is saved as `wusia-world-v1`, **version 29** (`SAVE_VERSION`, `store/world/save-version.ts`; the player only); the shared world is saved apart (`wusia-shared-v1`, below).
+- **`world-store.ts`** is saved as `wusia-world-v1`, **version 30** (`SAVE_VERSION`, `store/world/save-version.ts`; the player only); the shared world is saved apart (`wusia-shared-v1`, below).
   - Actions draft a copy (`draftFrom`, **one level deep** — nested quest, sect and NPC entries are shared), call engine functions, then `set`.
   - **Time is the world clock** (`lib/world/clock.ts`): 1 game day = 1 real hour (12 ชั่วยาม of 5 real minutes), from `WORLD_EPOCH_MS` (day 1). No action moves time: `draftFrom` brings every draft to the clock (`syncClock`, `store/world/lifecycle.ts`: day / time, stamina back in 6 ชั่วยาม and HP / MP in 12, wanted decay, the NPC tick, rumors, and on a new day letters and the tournament), and `WorldClock` (`components/world/world-clock.tsx`) syncs every 10 s (a toast after a day or more away). Actions that used to take time are instant and cost stamina (`staminaForHours`); free rests have a 2-ชั่วยาม cooldown, jail is served in real time. Tests pin it: `setTestClock` / `setTestWorldTime` / `advanceTestClock`.
   - The player-visible log uses `appendActionLog` (newest 100).
@@ -411,7 +412,7 @@ Content changes need **no save version bump**. Removed ids are dropped on load.
 
 ## Saves
 
-- **Keys.** The player's save is `localStorage["wusia-world-v1"]`, **version 29**; the shared world `localStorage["wusia-shared-v1"]` (`{ version: 1, world }`). The "wusia" spelling is historical — never rename either.
+- **Keys.** The player's save is `localStorage["wusia-world-v1"]`, **version 30**; the shared world `localStorage["wusia-shared-v1"]` (`{ version: 1, world }`). The "wusia" spelling is historical — never rename either.
 - **Migration.** `migrate` is one idempotent normalizer; its one `fromVersion` step is v27's: a save from before is shifted onto the world clock (`rebaseDays`, `lib/world/shared/rebase.ts`: every day stamp moves by `worldNow().day − save.day`; jail cut to ≤ 12 ชั่วยาม; a running tournament dropped). The persist `merge` also back-fills lore rumors and people on every load, and `onRehydrateStorage` runs `validateAndRepair`.
 - **Adding a persisted field:**
   1. `WorldStateData` + `emptyData()`;

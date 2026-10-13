@@ -8,6 +8,8 @@ import { getQuest } from "@/lib/world";
 import { applyEffect, isSectQuestOfferable } from "@/lib/world/effects";
 import { SECT_MEMBERSHIPS, rankUpGold } from "@/lib/world/data/sect-memberships";
 import { membershipStatus, sectJoinCheck } from "@/lib/world/sects";
+import { HOURS_PER_DAY, MS_PER_DAY, msAtWorld } from "@/lib/world/clock";
+import { realWait } from "@/lib/world/calendar";
 import { appendActionLog, draftFrom } from "../state";
 import type { WorldGet, WorldSet, WorldStore } from "../types";
 
@@ -71,23 +73,23 @@ export const sectsActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "jo
     const def = getQuest(questId);
     if (!def) return { ok: false, reason: "ไม่พบภารกิจ" };
     if (def.sectId !== sectId) return { ok: false, reason: "ไม่ใช่ภารกิจของสำนักนี้" };
-    const sectDef = SECT_MEMBERSHIPS[sectId];
-    // isSectQuestOfferable also requires an active membership.
-    const check = isSectQuestOfferable(s, def, sectDef.questCooldownDays);
+    // Brought to the clock first: the two-hour turn is checked on the time now.
+    const draft = draftFrom(s);
+    // isSectQuestOfferable also requires an active membership and keeps the two-hour turn.
+    const check = isSectQuestOfferable(draft, def);
     if (!check.offerable) {
+      const at = msAtWorld(draft.day, draft.time);
       return {
         ok: false,
-        reason: check.reason ?? `รอเหลืออีก ${check.cooldownLeft} วัน`,
+        reason: check.cooldownLeft > 0 ? `${check.reason} · ${realWait(at + check.cooldownLeft * MS_PER_DAY, at)}` : check.reason ?? "รับไม่ได้",
       };
     }
-    const draft = draftFrom(s);
-    // Reset prior done/failed status so the quest can be re-accepted on
-    // its next cooldown cycle. Active status is blocked by the offer
-    // helper above. lastQuestDay is recorded at completion (see
-    // recordSectQuestCompletion in effects.ts), not at accept — so
-    // abandoning + re-accepting doesn't game the cooldown.
+    // Reset prior done/failed status so the quest can be re-accepted.
+    // Active status is blocked by the offer helper above. A repeatable quest
+    // starts the two-hour turn (sectQuestTaken); dropping it gives the turn back.
     delete draft.quests[questId];
     applyEffect(draft, { t: "startQuest", questId });
+    if (!def.isArtQuest) draft.sectQuestTaken = { at: draft.day + draft.time / HOURS_PER_DAY, questId };
     appendActionLog(draft, "sect", `รับภารกิจสำนัก: ${def.name}`);
     set({ ...draft });
     return { ok: true };

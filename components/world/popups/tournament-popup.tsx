@@ -5,9 +5,11 @@ import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { powerTierOf } from "@/lib/game";
 import {
-  BOUT_GOLD, PLACE_LABEL, PLAYER, ROUND_LABEL, TOURNAMENT, currentTournament, dayOfYear, daysUntilRegistration,
-  entrantName, entrantPower, playerOpponent, prizeName, registerBlock, roundPairs, startBlock, tournamentPhase, yearOf,
+  BOUT_GOLD, PLACE_LABEL, PLAYER, ROUND_LABEL, TOURNAMENT, currentTournament, daysUntilRegistration,
+  entrantName, entrantPower, playerOpponent, prizeName, registerBlock, roundPairs, startBlock, tournamentDay, tournamentEndDay, tournamentPhase, yearOf,
 } from "@/lib/world/tournament";
+import { msAtWorld, now } from "@/lib/world/clock";
+import { realWait, thaiDateOfDay } from "@/lib/world/calendar";
 import { useWorldStore } from "@/store/world-store";
 import { toast } from "@/store/toast-store";
 import { PowerTierBadge } from "../power-tier-badge";
@@ -22,10 +24,10 @@ const REGISTER_BLOCK: Record<string, string> = {
   elsewhere: "ต้องลงชื่อที่สำนักหัวซาน (ยอดเขาหัวซาน)",
   registered: "ลงชื่อแล้ว",
   gold: `ต้องมีค่าสมัคร ${TOURNAMENT.fee} ตำลึง`,
-  done: "ปีนี้จัดการแข่งขันไปแล้ว",
+  done: "รอบนี้จัดการแข่งขันไปแล้ว",
 };
 
-// ชุมนุมประลองกระบี่หัวซาน — the yearly 32-entrant tournament on Mount Hua:
+// ชุมนุมประลองกระบี่หัวซาน — the 32-entrant tournament on Mount Hua, every two weeks:
 // register, fight each round, watch the bracket, and (as champion) pick a
 // move or art from the entrants.
 export function TournamentPopup({ open, onClose }: Props) {
@@ -52,20 +54,23 @@ export function TournamentPopup({ open, onClose }: Props) {
     if (state.pickTournamentPrize(slotId)) toast("success", `ได้เรียน ${prizeName(slotId)}`);
   };
 
+  // The round's real dates (Thai time): bouts from Saturday 20:00 to Sunday 23:00 of its second week.
+  const fightFrom = tournamentDay(year);
+  const fightTo = tournamentEndDay(year);
   let calendar: string;
-  if (phase === "day") calendar = "วันนี้คือวันชุมนุมประลองกระบี่หัวซาน!";
-  else if (phase === "registration") calendar = `เปิดรับสมัคร · อีก ${TOURNAMENT.startDay - dayOfYear(state.day)} วันถึงวันแข่งขัน`;
-  else calendar = `จะเปิดรับสมัครในอีก ${daysUntilRegistration(state.day)} วัน`;
+  if (phase === "day") calendar = `ชุมนุมประลองกำลังดำเนินอยู่! ขึ้นเวทีได้ถึง${thaiDateOfDay(fightTo)} (${realWait(msAtWorld(fightTo), now())})`;
+  else if (phase === "registration") calendar = `เปิดรับสมัคร · ประลอง${thaiDateOfDay(fightFrom)} (${realWait(msAtWorld(fightFrom), now())})`;
+  else calendar = `รอบหน้าจะเปิดรับสมัคร${realWait(msAtWorld(state.day + daysUntilRegistration(state.day)), now())}`;
 
   return (
     <Modal open={open} onClose={onClose} title="⚔ ชุมนุมประลองกระบี่หัวซาน">
       <div className="space-y-3 text-sm" data-testid="tournament-popup">
         <p className="text-xs text-muted-foreground">
-          จัดขึ้นปีละครั้งบนยอดเขาหัวซาน (สำนักหัวซานเป็นเจ้าภาพ ส่งจดหมายเชิญเมื่อเปิดรับลงชื่อ) · ยอดฝีมือ 32 คนประลองแบบแพ้คัดออก · ชนะแต่ละรอบได้เงินและประสบการณ์ยุทธ
+          จัดขึ้นทุกสองสัปดาห์บนยอดเขาหัวซาน (สำนักหัวซานเป็นเจ้าภาพ ส่งจดหมายเชิญทุกวันจันทร์ที่เปิดรับลงชื่อ · ประลองคืนวันเสาร์ 20:00 น. ถึงวันอาทิตย์ 23:00 น.) · ยอดฝีมือ 32 คนประลองแบบแพ้คัดออก · ชนะแต่ละรอบได้เงินและประสบการณ์ยุทธ
           ผู้ชนะเลิศเลือกเรียนวิชาหนึ่งอย่างจากผู้เข้าแข่งขันทั้งหมด
         </p>
         <div className="rounded bg-muted/30 px-2 py-1.5">
-          <div className="font-semibold">ปีที่ {year} · วันที่ {dayOfYear(state.day)} ของปี</div>
+          <div className="font-semibold">ครั้งที่ {year}</div>
           <div className="text-xs" data-testid="tournament-calendar">{calendar}</div>
         </div>
 
@@ -78,7 +83,7 @@ export function TournamentPopup({ open, onClose }: Props) {
 
         {t?.status === "registered" && (
           <div className="flex items-center justify-between gap-2">
-            <span className="text-xs">{canStart ? "พร้อมแล้ว — จับสลากและขึ้นเวที" : `ลงชื่อแล้ว · รอวันที่ ${TOURNAMENT.startDay} ของปี`}</span>
+            <span className="text-xs">{canStart ? "พร้อมแล้ว — จับสลากและขึ้นเวที" : `ลงชื่อแล้ว · รอ${thaiDateOfDay(fightFrom)}`}</span>
             <Button size="sm" disabled={!canStart} onClick={fight} data-testid="tournament-start">เข้าสู่ลานประลอง</Button>
           </div>
         )}
@@ -155,7 +160,7 @@ export function TournamentPopup({ open, onClose }: Props) {
             <div className="text-xs font-semibold">ทำเนียบผู้ชนะเลิศ</div>
             <ul className="text-[11px]" data-testid="tournament-history">
               {history.map((r) => (
-                <li key={r.year}>ปีที่ {r.year}: {name(r.champion)}{r.playerPlace ? ` · ท่าน${PLACE_LABEL[r.playerPlace]}` : ""}</li>
+                <li key={r.year}>ครั้งที่ {r.year}: {name(r.champion)}{r.playerPlace ? ` · ท่าน${PLACE_LABEL[r.playerPlace]}` : ""}</li>
               ))}
             </ul>
           </div>

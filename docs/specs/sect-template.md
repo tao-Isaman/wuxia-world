@@ -121,7 +121,7 @@ Skip this section for a lore-only sect (visitable grounds, no membership — lik
 | Reward pools per rank | skills and arts unlocked at each rank. One id = granted automatically; several = the player picks one |
 | Join gate (intro quest `prereqs`) | always `not anySectMember`; plus any of: gender, `trait evil ≤ N` (10 for orthodox, 15-30 for unorthodox), a life-skill level, a learned art, another sect's membership |
 | Intro task (stages) | _e.g._ bring 10 herbs / 10 ginseng / 10 lotus seeds; pay 500 gold + 3 materials; kidnap or assassinate a named NPC |
-| Sect quests | 3-6 repeatable quests (`sectId`, 30-day cooldown after completion), 1 art quest (`isArtQuest`), optional rank-gated ones (`minSectRank`) |
+| Sect quests | 3-6 repeatable quests (`sectId`; the sect window gives one every two real hours across every sect), 1 art quest (`isArtQuest`), optional rank-gated ones (`minSectRank`) |
 | Sect points per quest | 20-200, typically 50-70 (`sectPoints` reward); the intro quest also grants some |
 | Redemption quest | `qst_<sectId>_redemption`, offered only to a betrayer (`sectStatus: "betrayed"`); rewards wExp 300, humility +8, `resignSect`, relationship +10 |
 | Hunter | `hunter_<sectId>`, tier 4, ambushes a betrayer on 30 % of walk ticks |

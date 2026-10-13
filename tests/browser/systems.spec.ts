@@ -68,7 +68,8 @@ test("horse station: ride from the capital to a visited city for gold, arriving 
 test("sword tournament: register in the window, then the tournament day queues a bout", async ({ page }) => {
   test.setTimeout(120_000);
   // The world clock decides the day (one game day is one real hour from the
-  // epoch): put the page on world day 70, inside the registration window.
+  // epoch): put the page on world day 70 (Thursday 2026-10-15), inside round
+  // 1's registration; its bouts begin on day 117 (Saturday 20:00, Thai time).
   const WORLD_EPOCH_MS = Date.UTC(2026, 9, 12, 17, 0, 0);
   const worldDay = (day: number) => WORLD_EPOCH_MS + (day - 1) * 3_600_000 + 60_000;
   await page.clock.install({ time: worldDay(70) });
@@ -84,7 +85,7 @@ test("sword tournament: register in the window, then the tournament day queues a
   await page.keyboard.press("Escape");
 
   // Tournament day.
-  await page.clock.setSystemTime(worldDay(90));
+  await page.clock.setSystemTime(worldDay(120));
   await page.reload();
   await expect(page.getByTestId("world-canvas")).toHaveAttribute("data-ready", "true", { timeout: 60_000 });
   await visit(page, "tournament");

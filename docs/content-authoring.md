@@ -401,7 +401,6 @@ This touches many files. In order:
 3. **Membership.** Add a `SectMembershipDef` to `SECT_MEMBERSHIPS` in `lib/world/data/sect-memberships.ts`:
    - `name`, `hallLocationId`, `registrarNpcId`;
    - `startRank` / `topRank` (9 → 1, 5 → 1 or 3 → 1) and `rankUpCost(rank)`;
-   - `questCooldownDays` (30 elsewhere);
    - `joinRequirements`. The quest reward does **not** check it; put the real gate in the intro quest's `prereqs`.
 4. **Files.** Create the three mirror files and add one import + one spread line to each barrel:
    - `lib/world/data/npcs/sects/<file>.ts` (barrel: `npcs/sects-temples.ts`);

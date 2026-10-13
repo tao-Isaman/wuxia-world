@@ -17,7 +17,7 @@ Decisions (from the brief):
 
 | Question | Decision |
 | --- | --- |
-| Clock speed | 1 game day = 1 real hour (1 ชั่วยาม = 5 real minutes; a 360-day year ≈ 15 real days) |
+| Clock speed | 1 game day = 1 real hour (1 ชั่วยาม = 5 real minutes; a 365-day NPC year ≈ 15 real days); the player's schedules (sect quests, letters, the tournament) run on the real Thai calendar (`lib/world/calendar.ts`) |
 | Actions that used to take hours | happen at once and cost stamina or gold instead; waiting is real time |
 | NPC fate | fully shared: a death, a killing, a kidnapping or a fallen boss is the same for everyone |
 

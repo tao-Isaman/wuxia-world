@@ -3,9 +3,10 @@
 import assert from "node:assert/strict";
 import { getSkill } from "../lib/game";
 import { advanceTestClock, msAtWorld, setTestClock, setTestWorldTime } from "../lib/world/clock";
+import { thaiParts } from "../lib/world/calendar";
 import { xpToNextLevel } from "../lib/game/leveling";
 import { PRACTICE_XP, canPracticeAt, inferCategoriesFromId, isForestPlace, practiceMatches, practiceXpGain } from "../lib/world/location-categories";
-import { LETTER_RULES, giftRarity, letterChance, letterWriters, pickLetterGift, rollLetters } from "../lib/world/letters";
+import { LETTER_RULES, giftRarity, isLetterSlot, letterChance, letterWriters, pickLetterGift, rollLetters } from "../lib/world/letters";
 import { giftable, giftWorth } from "../lib/world/gifts";
 import { ARTISAN_PROFESSIONS, ARTISANS, FIELD_RECIPES, RECIPES, craftsAnywhere, getItem, getNpc, getRecipe, recipesOfferedBy } from "../lib/world/data";
 import { SECT_MEMBERSHIPS } from "../lib/world/data/sect-memberships";
@@ -18,7 +19,7 @@ import { getLocationMap } from "../lib/world/data/location-maps";
 import { WAYPOINT_FLAG, guideFerryLeg, guideForQuest, guideMarkerId, navigationGuide } from "../lib/world";
 import {
   BOUT_GOLD, PLACE_BY_ROUND, PLAYER, TOURNAMENT, TOURNAMENT_NAME, boutOdds, sendTournamentInvitation, tournamentHost, currentTournament, dayOfYear, drawEntrants, playerOpponent,
-  prizeOptions, registerBlock, resolveRound, roundPairs, settleTournaments, startBlock, tournamentDay, tournamentPhase, yearOf,
+  prizeOptions, registerBlock, resolveRound, roundPairs, settleTournaments, startBlock, tournamentDay, tournamentEndDay, tournamentPhase, yearOf,
 } from "../lib/world/tournament";
 import { namedNpcIds } from "../lib/world/data/named-npcs";
 import { COMBO_EPITHETS, NEWCOMER_EPITHET, heroEpithet } from "../lib/world/epithet";
@@ -132,7 +133,7 @@ check("letters: gifts are giftable items of the rolled rarity (or gold), never m
   }
 });
 
-check("letters: a friend's letter lands in the inbox at most once a day, then the NPC waits", () => {
+check("letters: every three real hours a friend may write, each at most once a real day; a real day of slots is rolled on coming back", () => {
   newGame();
   const npcId = "sect_shaolin_abbot_huiyuan";
   const s = JSON.parse(JSON.stringify(useWorldStore.getState())) as ReturnType<typeof store>;
@@ -142,8 +143,11 @@ check("letters: a friend's letter lands in the inbox at most once a day, then th
   assert.deepEqual(letterWriters(s).map((n) => n.id), [npcId]);
   s.day = 40;
   const sent = rollLetters(s, 10, seeded(3));
-  assert.ok(sent.length >= 1 && sent.length <= 3, `${sent.length} letters over 7 days with a 15-day cooldown`);
-  assert.equal(new Set(sent.map((l) => l.day)).size, sent.length, "one letter a day");
+  assert.ok(sent.length >= 1 && sent.length <= 2, `${sent.length} letters over the last 24 hours with a day's wait each`);
+  for (const l of sent) assert.ok(isLetterSlot(l.day) && l.day > 40 - 24, `day ${l.day} is a slot of the last real day`);
+  assert.equal(new Set(sent.map((l) => l.day)).size, sent.length, "one letter a slot");
+  assert.deepEqual([1, 4, 7, 40].map(isLetterSlot), [true, true, true, true]);
+  assert.deepEqual([2, 3, 41].map(isLetterSlot), [false, false, false]);
   assert.equal(s.letters.length, sent.length);
   assert.equal(s.letterDays[npcId], sent[sent.length - 1].day);
   assert.deepEqual(letterWriters(s), [], "on cooldown");
@@ -286,14 +290,21 @@ check("ferries: a quarry that also lives on land a few roads away is hunted ther
 });
 
 // ─── Tournament ──────────────────────────────────────────────────────
-check("tournament: a 360-day year; registration from day 60, the tournament on day 90 (+2 days' grace)", () => {
-  assert.equal(yearOf(1), 1); assert.equal(yearOf(361), 2); assert.equal(dayOfYear(361), 1);
-  assert.equal(tournamentDay(2), 360 + 90);
-  assert.equal(tournamentPhase(59), "closed");
-  assert.equal(tournamentPhase(60), "registration");
-  assert.equal(tournamentPhase(90), "day");
-  assert.equal(tournamentPhase(92), "day");
-  assert.equal(tournamentPhase(93), "closed");
+check("tournament: every two real weeks on Thai time; register from Monday 00:00, bouts Saturday 20:00 to Sunday 23:00", () => {
+  // One world day is one real hour; round 1 began on Monday 2026-10-05 (world day -191).
+  assert.equal(yearOf(1), 1); assert.equal(yearOf(145), 2); assert.equal(dayOfYear(145), 1);
+  assert.equal(tournamentDay(1), 117);
+  assert.equal(tournamentDay(2), 117 + 336);
+  assert.equal(tournamentEndDay(1), 144);
+  const at = (day: number) => thaiParts(msAtWorld(day));
+  assert.deepEqual([at(145).weekday, at(145).hour, at(145).minute], [1, 0, 0], "a round opens on Monday 00:00");
+  assert.deepEqual([at(117).weekday, at(117).hour], [6, 20], "bouts from Saturday 20:00");
+  assert.deepEqual([at(144).weekday, at(144).hour], [0, 23], "until Sunday 23:00");
+  assert.equal(tournamentPhase(116), "registration");
+  assert.equal(tournamentPhase(117), "day");
+  assert.equal(tournamentPhase(143), "day");
+  assert.equal(tournamentPhase(144), "closed");
+  assert.equal(tournamentPhase(145), "registration");
 });
 
 check("tournament: 31 NPC entrants led by the living liveness roster, all distinct fighters", () => {
@@ -324,8 +335,8 @@ check("tournament: register on Mount Hua in the window, fight round by round, ge
     assert.equal(store().gold, 400);
     assert.equal(registerBlock(store()), "registered");
     assert.equal(startBlock(store()), "closed", "not before the day");
-    setTestWorldTime(90, 1);
-    useWorldStore.setState({ day: 90 });
+    setTestWorldTime(120, 1);
+    useWorldStore.setState({ day: 120 });
     assert.ok(store().fightTournamentBout(), "starts the bracket and queues the first bout");
     const t = currentTournament(store())!;
     assert.equal(t.status, "running");
@@ -357,10 +368,10 @@ check("tournament: register on Mount Hua in the window, fight round by round, ge
 });
 
 check("tournament: the champion picks one move or art from the entrants and learns it", () => {
-  setTestWorldTime(90, 1);
+  setTestWorldTime(120, 1);
   try {
     newGame();
-    useWorldStore.setState({ day: 90, gold: 500, currentSceneId: "sect_huashan" });
+    useWorldStore.setState({ day: 120, gold: 500, currentSceneId: "sect_huashan" });
     store().registerTournament();
     store().fightTournamentBout();
     const rng = seeded(4);
@@ -382,12 +393,12 @@ check("tournament: the champion picks one move or art from the entrants and lear
   } finally { setTestClock(null); }
 });
 
-check("tournament: a year without the hero is fought among the NPCs; a skipped registration is forfeit", () => {
+check("tournament: a round without the hero is fought among the NPCs; a skipped registration is forfeit", () => {
   newGame();
   const s = JSON.parse(JSON.stringify(useWorldStore.getState())) as ReturnType<typeof store>;
   s.day = 75; s.gold = 500; s.currentSceneId = "city_capital";
   s.tournament = { year: 1, status: "registered", rounds: [], round: 0, playerOut: false, gold: 0, wExp: 0 };
-  s.day = 95;
+  s.day = 144;
   settleTournaments(s, seeded(2));
   const record = s.tournamentHistory.find((r) => r.year === 1)!;
   assert.ok(record && record.champion !== PLAYER);
@@ -398,6 +409,26 @@ check("tournament: a year without the hero is fought among the NPCs; a skipped r
   assert.equal(s.tournamentHistory.filter((r) => r.year === 1).length, 1, "settled once");
   assert.equal(playerOpponent(s.tournament), null);
   assert.equal(roundPairs(s.tournament!, 0).length, 16);
+});
+
+check("tournament: a round that ended while the hero was away is settled when they come back", () => {
+  newGame();
+  const s = JSON.parse(JSON.stringify(useWorldStore.getState())) as ReturnType<typeof store>;
+  s.tournamentHistory = [];
+  // Left in the last 16 of round 1, back in round 2: the bracket is finished, a forfeit.
+  s.tournament = { year: 1, status: "running", rounds: [drawEntrants(s, 32, seeded(5))], round: 0, playerOut: false, gold: 0, wExp: 0 };
+  s.tournament.rounds[0][0] = PLAYER;
+  s.day = 200;
+  settleTournaments(s, seeded(5));
+  const one = s.tournamentHistory.find((r) => r.year === 1)!;
+  assert.ok(one && one.champion !== PLAYER, "round 1 has a champion");
+  assert.equal(one.playerPlace, PLACE_BY_ROUND[0]);
+  // A round nobody settled (the hero never came) is fought among the NPCs.
+  s.tournament = null;
+  s.tournamentHistory = [];
+  settleTournaments(s, seeded(6));
+  assert.ok(s.tournamentHistory.some((r) => r.year === 1), "the round before is settled");
+  assert.ok(!s.tournamentHistory.some((r) => r.year === 2), "this round is still to come");
 });
 
 check("letters: deleting one with a gift not yet taken throws the gift away (the window asks first); read ones go in one sweep", () => {

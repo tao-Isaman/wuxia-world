@@ -1,6 +1,10 @@
-// Letters (จดหมาย): friends write to the hero. Each new day, every NPC whose
-// relationship with the hero is high enough may send a letter with a gift —
-// at most one letter a day, and one per NPC every LETTER_RULES.cooldownDays.
+// Letters (จดหมาย): friends write to the hero. Every three real hours (on
+// Thai time: 00:00, 03:00, 06:00 …; one world day is one real hour, so a
+// slot begins on every third world day), every NPC whose relationship with
+// the hero is high enough may send a letter with a gift — at most one letter
+// a slot, and one per NPC a real day (LETTER_RULES.cooldownDays). Slots pass
+// whether or not the game is open: coming back rolls the missed ones, a real
+// day of them at most.
 // The odds rise with the relationship, the hero's ชื่อเสียง (fame) and LUK;
 // LUK (and a little fame) also lifts the gift's rarity. Letters wait in the
 // inbox (state.letters) until the hero opens them and takes the gift.
@@ -14,12 +18,14 @@ import type { ItemDef, Letter, NpcDef, WorldStateData } from "./types";
 export const LETTER_RULES = {
   /** Relationship an NPC needs before they write. */
   minRelationship: 20,
-  /** Days between two letters from the same NPC. */
-  cooldownDays: 15,
+  /** World days (real hours) between two letters from the same NPC: a real day. */
+  cooldownDays: 24,
+  /** World days (real hours) between two letter slots. */
+  slotDays: 3,
   /** Letters kept in the inbox (the oldest read ones go first). */
   inboxMax: 40,
-  /** Most new days rolled in one advanceTime call (a long rest doesn't flood the inbox). */
-  maxDaysPerTick: 7,
+  /** The span (world days = real hours) of missed slots rolled on coming back: a real day, eight slots. */
+  maxDaysPerTick: 24,
 } as const;
 
 /** Gift rarity: 1 ทั่วไป · 2 ดี · 3 หายาก · 4 ล้ำค่า (by the item's price, `giftWorth`). */
@@ -103,10 +109,13 @@ export function letterText(npc: Pick<NpcDef, "name">, rng: Rng): string {
   return `${open} ${close}\n\n— ${npc.name}`;
 }
 
+/** True when a letter slot begins on this world day (every LETTER_RULES.slotDays, from the epoch's 00:00). */
+export const isLetterSlot = (day: number) => ((day - 1) % LETTER_RULES.slotDays + LETTER_RULES.slotDays) % LETTER_RULES.slotDays === 0;
+
 /**
- * Roll the letters for the days from `fromDay` (exclusive) to `state.day`
- * (inclusive), at most LETTER_RULES.maxDaysPerTick of them. Mutates `state`
- * (letters, letterDays) and returns the new letters.
+ * Roll the letters for the slots that began after `fromDay` up to `state.day`
+ * (inclusive), within the last LETTER_RULES.maxDaysPerTick days. Mutates
+ * `state` (letters, letterDays) and returns the new letters.
  */
 export function rollLetters(state: LetterState, fromDay: number, rng: Rng = Math.random): Letter[] {
   const sent: Letter[] = [];
@@ -114,6 +123,7 @@ export function rollLetters(state: LetterState, fromDay: number, rng: Rng = Math
   state.letters ??= [];
   state.letterDays ??= {};
   for (let day = first; day <= state.day; day++) {
+    if (!isLetterSlot(day)) continue;
     const writers = letterWriters({ ...state, day });
     // Shuffle so no NPC is always asked first; the first success writes today's letter.
     for (let i = writers.length - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [writers[i], writers[j]] = [writers[j], writers[i]]; }

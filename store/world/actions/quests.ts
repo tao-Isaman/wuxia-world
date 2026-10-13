@@ -50,6 +50,8 @@ export const questsActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "a
     const before = flags[droppedQuestFlag(questId)];
     flags[droppedQuestFlag(questId)] = Math.max(typeof before === "number" ? before : 0, reached);
     draft.flags = flags;
+    // Dropping the sect quest just taken gives its two-hour turn back.
+    if (draft.sectQuestTaken?.questId === questId) draft.sectQuestTaken = null;
     appendActionLog(draft, "quest", `ละทิ้งภารกิจ: ${def.name} (รับใหม่ได้ภายหลัง)`);
     set({ ...draft });
     return { ok: true, questId };

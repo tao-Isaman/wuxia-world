@@ -376,7 +376,7 @@ try {
     assert.deepEqual(feuds.activeFeuds(useWorldStore.getState()), []);
   });
 
-  await check("warnings fire: the inns talk about the tournament before it comes, with the days counting down", () => {
+  await check("warnings fire: the inns talk about the tournament in the three days before it comes", () => {
     const state = fresh();
     const year = 1;
     const day = tournamentDay(year);
@@ -388,22 +388,21 @@ try {
     const warning = () => state.rumorPool.find((r) => r.id === id)!;
     assert.equal(warning().source, "warning");
     assert.equal(warning().region, "global");
-    assert.ok(warning().text.includes("อีก 30 วัน") && warning().text.includes("ชุมนุมประลองกระบี่หัวซาน"), warning().text);
+    assert.ok(warning().text.includes("คืนวันเสาร์นี้") && warning().text.includes("ชุมนุมประลองกระบี่หัวซาน"), warning().text);
     assert.equal(warning().expiresDay, day - 1);
     state.day = day - 3;
-    assert.equal(scheduleTournamentWarning(state), id, "one rumor a year");
-    assert.ok(warning().text.includes("อีก 3 วัน"), "its days count down");
+    assert.equal(scheduleTournamentWarning(state), id, "one rumor a round");
     assert.equal(state.rumorPool.filter((r) => r.source === "warning").length, 1);
     state.day = day;
     assert.equal(scheduleTournamentWarning(state), null, "the day itself needs no warning");
-    assert.equal(TOURNAMENT.startDay, 90);
+    assert.equal(TOURNAMENT.startDay, 309);
     // syncClock schedules it: a store action in the window leaves the warning in the pool.
     setTestWorldTime(day - 10, 0);
     useWorldStore.setState({ ...fresh(), day: day - 11 });
     setTestWorldTime(day - 10, 0);
     useWorldStore.getState().recordRumorHeard("nothing");
     useWorldStore.getState().gotoScene(useWorldStore.getState().currentSceneId);
-    assert.ok(useWorldStore.getState().rumorPool.some((r) => r.id === `rumor_warn_tournament_y${year}` && r.text.includes("อีก 10 วัน")));
+    assert.ok(useWorldStore.getState().rumorPool.some((r) => r.id === `rumor_warn_tournament_y${year}` && r.text.includes("คืนวันเสาร์นี้")));
     setTestWorldTime(1, 0);
   });
 

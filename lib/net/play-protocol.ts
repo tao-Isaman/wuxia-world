@@ -7,9 +7,13 @@ import type { SharedWorld } from "@/lib/world/shared/world";
 import type { VictorySpoils } from "@/lib/world/spoils";
 
 /** `GET /world[?rev=N]`: the one world everyone plays in (or `same` when `rev` is current). */
-export type WorldReply =
+export type WorldReply = (
   | { rev: number; same: true }
-  | { rev: number; same?: false; day: number; time: number; world: SharedWorld };
+  | { rev: number; same?: false; day: number; time: number; world: SharedWorld }
+) & {
+  /** The server's clock (ms) when it answered: the browser keeps to it (lib/world/clock.ts setClockOffset). */
+  now?: number;
+};
 
 /** What the hero did, as the jianghu will tell it (`POST /world/echo`); the server writes the rumor. */
 export interface EchoRequest {

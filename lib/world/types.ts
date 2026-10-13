@@ -1317,6 +1317,12 @@ export interface WorldStateData {
   appearance: HeroAppearance;
   wardrobe: string[];
 
+  // v30: the last repeatable sect quest taken from the sect window (a world
+  // stamp, day + ชั่วยาม / 12, and its id): the next one waits two real hours
+  // (SECT_QUEST_GAP_DAYS, lib/world/effects.ts); dropping that quest gives the
+  // turn back.
+  sectQuestTaken: { at: number; questId: string } | null;
+
   // Sect membership state, keyed by SectId. Empty when the player isn't a
   // disciple anywhere yet. Joining a sect adds an entry seeded with the
   // sect's starting rank (e.g. Shaolin = 9).

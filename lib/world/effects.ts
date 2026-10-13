@@ -15,6 +15,7 @@ import { getQuest, getQuestsForSect } from "./data/quests";
 import { SECT_MEMBERSHIPS } from "./data/sect-memberships";
 import { SAGA_PROLOGUES } from "./data/story";
 import { evaluateCondition, gearlessStat } from "./conditions";
+import { HOURS_PER_DAY } from "./clock";
 import { absoluteHours, arrestPenalty, bribeCost, describeSentence, jailCityFor, sentenceLeft } from "./law";
 import { deathLosableItems } from "./death";
 import { JAIL_SCENE_ID } from "./data/activities";
@@ -792,8 +793,7 @@ export function tickQuestProgress(state: WorldStateData): void {
 }
 
 // Helper called by every "quest just turned done" path. For sect quests,
-// record `lastQuestDay` (drives the sect's questCooldownDays, 30 for every
-// sect today) and add to
+// record `lastQuestDay` (when each was last done) and add to
 // `artQuestsDone` if the quest is one-shot art-tagged.
 function recordSectQuestCompletion(state: WorldStateData, def: QuestDef): void {
   // Done at last: a dropped attempt no longer matters (a repeatable sect
@@ -873,16 +873,29 @@ export function isSecretSectQuest(questId: string): boolean {
   return SECRET_SECT_QUESTS.has(questId);
 }
 
+/**
+ * World days (= real hours) between two repeatable sect quests taken from the
+ * sect window: one every two real hours, across every sect, and a missed turn
+ * is not saved up.
+ */
+export const SECT_QUEST_GAP_DAYS = 2;
+
+/** World days (fractional; one is a real hour) until the next sect quest can be taken, 0 when it can. */
+export function sectQuestWait(state: Pick<WorldStateData, "sectQuestTaken" | "day" | "time">): number {
+  const taken = state.sectQuestTaken;
+  if (!taken) return 0;
+  return Math.max(0, taken.at + SECT_QUEST_GAP_DAYS - (state.day + (state.time ?? 0) / HOURS_PER_DAY));
+}
+
 // Sect-quest offerable check — used by SectMembershipPopup. Honors:
 //   - membership prereq
 //   - rank gate (def.minSectRank)
-//   - cooldown (lastQuestDay + sect.questCooldownDays)
+//   - the two-hour turn for repeatable quests (sectQuestWait)
 //   - one-shot art quests (skipped if id is in artQuestsDone)
 //   - in-progress active quests (player can't double-accept)
 export function isSectQuestOfferable(
   state: WorldStateData,
   def: QuestDef,
-  cooldownDays: number,
 ): { offerable: boolean; cooldownLeft: number; reason?: string } {
   if (!def.sectId) return { offerable: false, cooldownLeft: 0, reason: "ไม่ใช่ภารกิจสำนัก" };
   const m = state.sectMembership[def.sectId];
@@ -905,21 +918,11 @@ export function isSectQuestOfferable(
   if (existing && existing.status === "active") {
     return { offerable: false, cooldownLeft: 0, reason: "กำลังทำอยู่" };
   }
-  // Cooldown only matters for repeatable sect quests, not one-shot art
-  // quests. Art quests are gated by artQuestsDone above, so once done they
-  // won't re-offer; before that, no cooldown.
+  // The two-hour turn only matters for repeatable sect quests, not one-shot
+  // art quests (gated by artQuestsDone above).
   if (!def.isArtQuest) {
-    const last = m.lastQuestDay[def.id];
-    if (typeof last === "number") {
-      const since = state.day - last;
-      if (since < cooldownDays) {
-        return {
-          offerable: false,
-          cooldownLeft: Math.max(0, cooldownDays - since),
-          reason: "อยู่ระหว่างคูลดาวน์",
-        };
-      }
-    }
+    const wait = sectQuestWait(state);
+    if (wait > 0) return { offerable: false, cooldownLeft: wait, reason: "รับภารกิจสำนักได้ทุก 2 ชั่วโมง" };
   }
   if (def.prereqs && !evaluateCondition(state, def.prereqs)) {
     return { offerable: false, cooldownLeft: 0, reason: "ยังไม่ผ่านเงื่อนไข" };
@@ -942,7 +945,7 @@ export function sectActionCount(state: WorldStateData): number {
     if (m.rank > def.topRank && m.points >= def.rankUpCost(m.rank - 1)) count++;
     for (const quest of getQuestsForSect(sectId)) {
       if (isSecretSectQuest(quest.id) || isRedemptionQuest(quest)) continue;
-      if (isSectQuestOfferable(state, quest, def.questCooldownDays).offerable) count++;
+      if (isSectQuestOfferable(state, quest).offerable) count++;
     }
   }
   return count;

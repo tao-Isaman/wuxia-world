@@ -26,6 +26,7 @@ import {
   craftsAnywhere, getSectHallAt, getShopAt, recipesOfferedBy,
   type Condition, type LocationScene, type QuestDef, type QuestStage, type Scene, type SceneEffect,
 } from "@/lib/world";
+import { SECT_QUEST_GAP_DAYS } from "@/lib/world/effects";
 import { AUTO_MAP_IDS } from "@/lib/world/data/auto-map-ids";
 import { LOCATION_ROUTES } from "@/lib/world/data/location-routes";
 import { regionOf } from "@/lib/world/data/regions";
@@ -218,7 +219,7 @@ const pages: Record<string, string> = {};
     md += `## ${esc(def.name)} (${code(def.id)})\n\n`;
     md += `- Hall: ${esc(locName(def.hallLocationId))} (${code(def.hallLocationId)}) · registrar: ${esc(npcName(def.registrarNpcId))} (${code(def.registrarNpcId)})\n`;
     md += `- Join requirements: ${conditionText(def.joinRequirements)}\n`;
-    md += `- Ranks: start ${def.startRank}, top ${def.topRank} · quest cooldown ${def.questCooldownDays} days\n`;
+    md += `- Ranks: start ${def.startRank}, top ${def.topRank} · a sect quest every ${SECT_QUEST_GAP_DAYS} real hours\n`;
     const costs: string[] = [];
     for (let r = def.startRank - 1; r >= def.topRank; r--) costs.push(`→${r}: ${def.rankUpCost(r)}`);
     md += `- Rank-up cost (sect points): ${costs.join(" · ") || "—"}\n`;

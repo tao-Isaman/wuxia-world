@@ -203,7 +203,7 @@ Usernames are 3–20 of `a–z 0–9 _`, case-insensitive. Passwords are 6–72 
 | `too_large` (413) | over 1 MB |
 | `bad_version` (400) | a save version below 27, or below the character's last |
 | `name_mismatch` (422) | the hero's name is not the character's |
-| `bad_save` (422, `detail`: the field) | not a hero (`hasGame`), stats outside 0–9,999, a skill / art level outside 1–10, stacks outside 0–9,999, gold outside 0–99,999,999, broken numbers |
+| `bad_save` (422, `detail`: the field) | not a hero (`hasGame`), stats outside 0–9,999, a skill / art level outside 1–10, stacks outside 0–9,999, gold outside 0–99,999,999, broken numbers, a `day` more than one world day (a real hour) ahead of the server's clock (`detail: "day"`: the device clock was moved on) |
 | `gold_too_fast` (422) | gold rose by more than the server's grants (a checked win's purse, `grant_gold`) plus the allowance: 100,000 at once, refilled at 3,000 a minute — far above what play earns, far below an edited save |
 
 Storage keeps the save and the roster that numbers it in one write.
@@ -231,7 +231,7 @@ Storage keeps the save and the roster that numbers it in one write.
 
 | Call | Answer |
 | --- | --- |
-| `GET /world[?rev=N&pins=a,b]` | `{ rev, day, time, world }`, or `{ rev, same: true }` when `rev` is current |
+| `GET /world[?rev=N&pins=a,b]` | `{ now, rev, day, time, world }`, or `{ now, rev, same: true }` when `rev` is current; `now` is the server's clock, which the browser keeps to (`syncClockToServer`, `lib/world/clock.ts`), so the real-time schedules (sect quests, letters, the tournament) follow the server, not the device |
 | `POST /world/echo` `{ actionId, targetNpcId?, context: { archetype, sceneId, sectId } }` | `{ rev }`; `bad_action`, `bad_target`, `bad_context` (422), `too_many` (429) |
 
 **The browser** (`store/cloud-world.ts`): while a character is played, `setServerRunsWorld(true)` stops the browser's own simulation and rumor upkeep (`syncClock` only trims what the hero heard), the world is asked for every minute (and after each echo), and a newer one is laid over the state (`applyServerWorld`): the shared fields replaced, generated people registered, and the hero's quests of anyone newly dead passed on or ended, with a line in the log.
