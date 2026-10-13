@@ -65,6 +65,8 @@
 .sg-flow > i { font: 700 18px ui-monospace, monospace; font-style: normal; color: var(--ribbon-deep); }
 
 @media (orientation: landscape) and (max-height: 500px), (orientation: portrait) and (max-width: 500px) {
+  .skills-guide-button { padding: 3px 8px; font-size: 12px; white-space: nowrap; }
+  .skills-guide-button small { display: none; }
   .skill-guide { gap: 6px; }
   .sg-card { padding: 6px 8px; gap: 5px; }
   .sg-title { font-size: 16px; }

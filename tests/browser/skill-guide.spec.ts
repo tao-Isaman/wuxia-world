@@ -28,6 +28,8 @@ for (const size of [{ name: "desktop", width: 1280, height: 720 }, { name: "phon
       b.learnedArtIds = ["t2_dharma"];
       b.equipment.W = "eq_t0_w_fist";`);
     await page.locator(".hud-iconbar").getByRole("button", { name: "วิชา", exact: true }).click();
+    await page.screenshot({ path: `test-results/skills-window-${size.name}.png` });
+    await expect(page.getByTestId("skill-guide-open")).toBeInViewport();
     await page.getByTestId("skill-guide-open").click();
     const guide = page.getByTestId("skill-guide");
     await expect(guide).toBeVisible();
