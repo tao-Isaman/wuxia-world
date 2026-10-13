@@ -6,6 +6,12 @@ Pull requests are on [github.com/tao-Isaman/wuxia-world](https://github.com/tao-
 
 ## 2026-10-13
 
+### Epithets are harder; repeatable quests
+
+- **Opposite traits**: a quest that raises ความดี lowers ความเลว by half as much (+10 → −5), and back; ถ่อมตน and หยิ่งยโส the same (`gainTrait`). Steals, killings and other deeds outside quests are unchanged.
+- **Repeatable quests** (`QuestDef.repeatEveryDays`): their giver offers them again two real hours after they were taken. Six of them: คัดพระสูตรสำนึกผิด (ความเลว −10) and ผ่าฟืนลดอัตตา (หยิ่งยโส −10) with เจ้าอาวาสฮุ่ยหยวน at Shaolin, ปิดนามซ่อนตน (ชื่อเสียง −10) with โปผู้เล่าเรื่อง at โรงเตี๊ยมเฮ่อลั่ว, ยาสำหรับคนยากไร้ (ความดี +6, 60 gold) with หมอหลิน, กวาดล้างโจรป่า (150 gold, ชื่อเสียง +3) with นายอำเภอหวู่, ส่งแร่ให้เถ้าแก่ (170 gold) with เถ้าแก่หวาง.
+- **Owner tools**: with `localStorage["wuxia-dev"] = "on"` the browser console has `wuxiaDev.setTrait(trait, value)` (`store/dev-tools.ts`).
+
 ### คู่มือวิชา in the skills window
 
 - **A guide button**: the skills window's 📖 คู่มือวิชา opens an infographic in two tabs — วิชาขัดแย้ง (the three opposing pairs with the hero's own tallies against the 60 % line, whether the rule is on, what shrinks and what does not) and อาวุธ · ความชำนาญ · ความเสียหาย (the weapon in hand ±10 %, mastery per family, how a hit multiplies). `conflictTally` (`lib/game/skill-conflict.ts`) is the tally `computeConflictFactors` now reads. The conflict note's tooltip no longer says only slotted moves count.

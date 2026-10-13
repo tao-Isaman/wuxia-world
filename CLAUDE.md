@@ -14,7 +14,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **What the player does:**
 
 - Explores 101 places (100 painted maps) joined by 117 roads and, for the ten islands, 12 sea lanes sailed with the boatman; the แผนที่ (M) section shows it all on one painted world map.
-- Meets 235 NPCs (30 of them, plus the disciples, heirs and newcomers they bring, live their own lives) and takes 1,075 quests: a 15-chapter main story (เนื้อเรื่องหลัก), 374 hand-written, 113 sect lineage quests (154 moves; 30 of them a choice) and 48 story sagas (573 chapters: 38 sect sagas and 10 long jianghu sagas for the unsect T4 / T5 moves); 511 cutscenes.
+- Meets 235 NPCs (30 of them, plus the disciples, heirs and newcomers they bring, live their own lives) and takes 1,081 quests: a 15-chapter main story (เนื้อเรื่องหลัก), 380 hand-written (six of them repeatable), 113 sect lineage quests (154 moves; 30 of them a choice) and 48 story sagas (573 chapters: 38 sect sagas and 10 long jianghu sagas for the unsect T4 / T5 moves); 511 cutscenes.
 - Lives in the 3rd year of Jianwen (1401), about 40 years after the legend of the last age (our own story, not a novel's sequel): the court's seized scriptures have just scattered back into the jianghu ([docs/story-writing.md](docs/story-writing.md#timeline-and-the-legends-people)).
 - Joins one of 15 sects and learns 173 move skills and 111 inner arts (plus 18 boss moves and 6 boss arts no one can learn).
 - Hunts foes where they live (habitats), from tier 0 to tier 5, and six legendary beasts (บอส) in their lairs.
@@ -227,6 +227,8 @@ Two deliberate exceptions reach into stores:
   - A store subscription re-ticks progress whenever `inventory` or `defeatedCounts` changes.
   - The last stage is the "return to the giver" beat; the NPC card offers hand-in there.
   - `qs_<questId>_offer` / `qs_<questId>_complete` are the optional briefing and hand-in dialogs.
+  - **Repeatable quests** (`repeatEveryDays`, `data/quests/repeatable.ts`, six every 2 real hours: lower evil / arrogance / fame, raise good, a bounty, a delivery): offered again once not active and the turn has come (`repeatQuestWait`, flag `qrepeat:<id>`; dropping clears it).
+  - **Traits from quests** (rewards and scene `addTrait`) go through `gainTrait`: a gain lowers the opposite by half (good ⇄ evil, arrogance ⇄ humility; fame has none).
 - **Objectives** (`quest-objectives.ts`). `QuestStage.objective.spots[]` are 🔍 map spots, NPC-card actions or dialogs for stages nothing else can drive.
   - Each flag is `qobj:<quest>:<stageId>:<i>`.
   - A spot needs the hero at its `locationId` and costs the stamina of its `hours` (default 1; `staminaForHours`).

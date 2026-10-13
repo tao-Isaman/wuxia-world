@@ -5,6 +5,7 @@ import type {
   SceneEffect,
   SectId,
   SectMembership,
+  TraitKey,
   WorldStateData,
 } from "./types";
 import { wExpWithGear } from "./gear";
@@ -64,8 +65,15 @@ export function applyEffect(state: WorldStateData, eff: SceneEffect): void {
     case "startQuest": {
       const def = getQuest(eff.questId);
       if (!def) return;
-      // Idempotent: don't reset an already-active or completed quest.
-      if (state.quests[eff.questId]) return;
+      // Idempotent: don't reset an already-active or completed quest — except
+      // a repeatable one (repeatEveryDays) whose turn has come round again.
+      if (state.quests[eff.questId]) {
+        if (!def.repeatEveryDays || state.quests[eff.questId]!.status === "active" || repeatQuestWait(state, def) > 0) return;
+        const quests = { ...state.quests };
+        delete quests[eff.questId];
+        state.quests = quests;
+      }
+      if (def.repeatEveryDays) state.flags = { ...state.flags, [repeatQuestFlag(def.id)]: state.day + (state.time ?? 0) / HOURS_PER_DAY };
       // Snapshot cumulative counters so repeatable sect quests don't
       // auto-complete on prior kills / inventory. Walk all stages'
       // autoAdvance conditions to find the opponentIds + itemIds the
@@ -155,8 +163,7 @@ export function applyEffect(state: WorldStateData, eff: SceneEffect): void {
     }
 
     case "addTrait": {
-      const cur = state.traits[eff.trait] ?? 0;
-      state.traits[eff.trait] = Math.max(0, cur + eff.amount);
+      gainTrait(state, eff.trait, eff.amount);
       return;
     }
 
@@ -622,8 +629,7 @@ function applyQuestRewards(state: WorldStateData, rewards: readonly QuestReward[
         break;
       }
       case "trait": {
-        const cur = state.traits[r.trait] ?? 0;
-        state.traits[r.trait] = Math.max(0, cur + r.amount);
+        gainTrait(state, r.trait, r.amount);
         break;
       }
       case "npcRelationship": {
@@ -839,6 +845,34 @@ function recordMajorQuestCompletion(state: WorldStateData, def: QuestDef): void 
   });
 }
 
+// ─── Traits from quests ────────────────────────────────────────────────
+// Opposites: a quest (reward or scene) that raises one of a pair lowers the
+// other by half as much — ความดี +10 is ความเลว −5, ถ่อมตน +4 is ทะนง −2 — so
+// an epithet that wants both sides high is earned the hard way.
+export const TRAIT_OPPOSITE: Partial<Record<TraitKey, TraitKey>> = { good: "evil", evil: "good", arrogance: "humility", humility: "arrogance" };
+
+/** A quest's trait change: never below 0; a gain lowers the opposite trait by half (rounded). */
+export function gainTrait(state: Pick<WorldStateData, "traits">, trait: TraitKey, amount: number): void {
+  state.traits[trait] = Math.max(0, (state.traits[trait] ?? 0) + amount);
+  const opposite = TRAIT_OPPOSITE[trait];
+  if (amount > 0 && opposite) state.traits[opposite] = Math.max(0, (state.traits[opposite] ?? 0) - Math.round(amount / 2));
+}
+
+// ─── Repeatable quests ─────────────────────────────────────────────────
+// A quest with `repeatEveryDays` can be taken again that many world days
+// (= real hours) after it was last taken, once it is not active. The stamp
+// (day + ชั่วยาม / 12) lives in the flag `qrepeat:<id>`; dropping the quest
+// clears it, so it can be taken again at once.
+export const repeatQuestFlag = (questId: string): string => `qrepeat:${questId}`;
+
+/** World days (fractional; one is a real hour) until a repeatable quest can be taken again, 0 when it can. */
+export function repeatQuestWait(state: Pick<WorldStateData, "flags" | "day" | "time">, def: QuestDef): number {
+  if (!def.repeatEveryDays) return 0;
+  const last = state.flags[repeatQuestFlag(def.id)];
+  if (typeof last !== "number") return 0;
+  return Math.max(0, last + def.repeatEveryDays - (state.day + (state.time ?? 0) / HOURS_PER_DAY));
+}
+
 // ─── Quest availability helper (used by NPC popup) ─────────────────────
 // Returns true when the player can be offered this quest right now:
 //   - never started (no entry in state.quests)
@@ -862,7 +896,11 @@ export function isQuestOfferable(state: WorldStateData, def: QuestDef): boolean 
       if (def.minSectRank != null && m.rank > def.minSectRank) return false;
     }
   }
-  if (state.quests[def.id]) return false;
+  const existing = state.quests[def.id];
+  if (existing) {
+    // A repeatable quest comes back when it is not active and its turn has come.
+    if (!def.repeatEveryDays || existing.status === "active" || repeatQuestWait(state, def) > 0) return false;
+  }
   if (def.prereqs && !evaluateCondition(state, def.prereqs)) return false;
   return true;
 }

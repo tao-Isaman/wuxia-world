@@ -2,7 +2,7 @@
 
 # Quests
 
-1075 quests: 16 main, 388 side, 98 sect quests (15 of them art quests). 0 are marked `isMajor` (completing one spreads a rumor about the hero). 2923 stages in total: 1016 advance on their own (`autoAdvance`), 830 are hands-on objectives (`objective`), the rest are dialog beats or the final hand-in. 968 quests have an offer scene (`qs_<id>_offer`) and 967 a completion scene (`qs_<id>_complete`).
+1081 quests: 16 main, 394 side, 98 sect quests (15 of them art quests). 0 are marked `isMajor` (completing one spreads a rumor about the hero). 2935 stages in total: 1022 advance on their own (`autoAdvance`), 830 are hands-on objectives (`objective`), the rest are dialog beats or the final hand-in. 968 quests have an offer scene (`qs_<id>_offer`) and 967 a completion scene (`qs_<id>_complete`).
 
 Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assassinate** / **trait** / **flag** = `autoAdvance` condition types · **objective** = map spot, person or scene the hero uses in person (`stage.objective`, ×n = several spots) · **dialog** = advanced by an `advanceQuest` choice in a scene · **turn-in** = last stage, closed at the turn-in person or by the completion scene.
 
@@ -482,6 +482,9 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qst_spy_capital_seal_ledger` | บัญชีตราพระราชา | เฟิงเจ้าของร้านบะหมี่ | visit → kill → turn-in |  |
 | `qst_spy_capital_court_traitor` | คนทรยศในราชสำนัก | เฟิงเจ้าของร้านบะหมี่ | visit → kill → turn-in | prereqs |
 | `qe_spy_capital_frame_merchant` | ปลูกหลักฐานใส่พ่อค้า | เฟิงเจ้าของร้านบะหมี่ | steal → turn-in |  |
+| `qr_heal_the_poor` | ยาสำหรับคนยากไร้ | หมอหลิน | item → turn-in |  |
+| `qr_bandit_sweep` | กวาดล้างโจรป่า | นายอำเภอหวู่ | kill → turn-in |  |
+| `qr_ore_supply` | ส่งแร่ให้เถ้าแก่ | เถ้าแก่หวาง | item → turn-in |  |
 | `qc_capital_clerk_night_sword` | กระบี่ของเสมียนยามดึก | เสมียนนายฉิง | kill → turn-in | prereqs |
 | `qc_capital_soaked_ledgers` | ทะเบียนเปียกฝน | เสมียนนายฉิง | item → objective (person) → turn-in |  |
 
@@ -708,6 +711,7 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | --- | --- | --- | --- | --- |
 | `qv_inn_legend_verify` | ตำนานถ้ำโบราณ | โปผู้เล่าเรื่อง | objective (scene) → turn-in |  |
 | `qv_inn_missing_traveler` | ผู้เดินทางที่หายไป | โปผู้เล่าเรื่อง | objective (scene) → turn-in |  |
+| `qr_quiet_name` | ปิดนามซ่อนตน | โปผู้เล่าเรื่อง | item → turn-in | prereqs |
 | `qc_heluo_envoy_palm` | นิทานเรื่องยมฑูต | โปผู้เล่าเรื่อง | objective (scene) → kill → item → turn-in | prereqs |
 
 ### วัดต้าหลุน (`temple_dalun`)
@@ -729,6 +733,8 @@ Stage kinds: **item** / **kill** / **visit** / **steal** / **kidnap** / **assass
 | `qst_shaolin_proof_of_heart` | บทพิสูจน์แห่งจิตใจ | เจ้าอาวาสฮุยหยวน | dialog → turn-in | prereqs |
 | `qst_shaolin_iron_training` | วัตถุดิบฝึกเหล็ก | อาจารย์ฝาหมิง | item → turn-in |  |
 | `qst_shaolin_wudang_joint` | ความลับใต้ผืนดิน | เจ้าอาวาสฮุยหยวน | objective (scene) → objective (scene) → objective (scene) → turn-in | prereqs |
+| `qr_atonement_sutra` | คัดพระสูตรสำนึกผิด | เจ้าอาวาสฮุยหยวน | item → turn-in | prereqs |
+| `qr_temple_chores` | ผ่าฟืนลดอัตตา | เจ้าอาวาสฮุยหยวน | item → turn-in | prereqs |
 | `ql_skill_sf` | สืบทอดวิชาลึกลับของศิษย์เซวียนจี้ | ศิษย์เซวียนจี้ | kill → turn-in | prereqs |
 | `ql_art_t0_lohan` | สืบทอดวิชาลึกลับของศิษย์เซวียนจี้ · ม้วนที่ 2 | ศิษย์เซวียนจี้ | kill → turn-in | prereqs |
 | `ql_skill_nd5` | สืบทอดวิชาลึกลับของหัวหน้าศิษย์หยวนเฉวียน | หัวหน้าศิษย์หยวนเฉวียน | kill → item → turn-in | prereqs |

@@ -303,7 +303,7 @@ Walk up to a person and talk. The NPC card offers what that person supports:
 
 ## Quests and tracking
 
-There are 1,075 quests: the 15-chapter main story (เนื้อเรื่องหลัก, [story-writing.md](story-writing.md#the-main-story)), one older main quest, 486 side quests (98 sect quests, 113 lineage quests and 97 place quests) and 573 story chapters in 48 sagas (38 sect sagas, 10 [jianghu sagas](story-quests.md#jianghu-sagas)) — see [Lineage quests and sagas](#lineage-quests-and-sagas).
+There are 1,081 quests: the 15-chapter main story (เนื้อเรื่องหลัก, [story-writing.md](story-writing.md#the-main-story)), one older main quest, 492 side quests (98 sect quests, 113 lineage quests and 97 place quests) and 573 story chapters in 48 sagas (38 sect sagas, 10 [jianghu sagas](story-quests.md#jianghu-sagas)) — see [Lineage quests and sagas](#lineage-quests-and-sagas).
 
 - **Accepting.** Most quests are offered by a person (the **!** mark). Sect quests are taken in the สำนัก menu.
 - **Stages.** A quest has 1–4 stages. The quest log (ภารกิจ) shows each one with ✓ done, ▸ current and ○ still ahead.
@@ -617,6 +617,8 @@ Hunting and begging give no stat xp.
 ## Traits and reputation
 
 Five traits start at 0 and never drop below 0: good, evil, arrogance, humility, fame. Sect intros check evil, and some quests check traits.
+
+Opposites pull against each other: when a quest raises ความดี, ความเลว drops by half as much (+10 → −5), and the other way round; ถ่อมตน and หยิ่งยโส work the same. Fame has no opposite. Deeds outside quests (steals, killings) are not halved this way. Six **repeatable quests** come back to their giver two real hours after they were taken: คัดพระสูตรสำนึกผิด (ความเลว −10) and ผ่าฟืนลดอัตตา (หยิ่งยโส −10) with เจ้าอาวาสฮุ่ยหยวน at Shaolin, ปิดนามซ่อนตน (ชื่อเสียง −10) with โปผู้เล่าเรื่อง at โรงเตี๊ยมเฮ่อลั่ว, ยาสำหรับคนยากไร้ (ความดี +6) with หมอหลิน in the capital, กวาดล้างโจรป่า (gold, ชื่อเสียง +3) with นายอำเภอหวู่ and ส่งแร่ให้เถ้าแก่ (gold) with เถ้าแก่หวาง.
 
 | Change | From |
 | --- | --- |

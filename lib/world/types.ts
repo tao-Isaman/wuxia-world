@@ -494,6 +494,10 @@ export interface QuestDef {
   // the player must have achieved in `sectId` before the quest is offerable.
   // Ignored when the quest isn't sect-tagged.
   minSectRank?: number;
+  // Repeatable: taken again this many world days (= real hours) after it was
+  // last taken, once not active (lib/world/effects.ts repeatQuestWait). The
+  // NPC card offers it again then.
+  repeatEveryDays?: number;
   // Marks a milestone quest. Completing one fires a player-echo rumor with
   // archetype-flavored phrasing in the player's current region (Liveness
   // Layer §3.2.2). Default false.

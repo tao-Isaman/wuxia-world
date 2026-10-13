@@ -5,6 +5,7 @@ import { WorldScreen } from "@/components/world/world-screen";
 import { QuestCompletionReceipt } from "@/components/world/quest-completion-receipt";
 import { MobileLandscape } from "@/components/mobile-landscape";
 import { initBattleBridge } from "@/lib/world/battle-bridge";
+import { installDevTools } from "@/store/dev-tools";
 import { SoundDirector } from "@/components/sound-director";
 import { EngineGoto } from "@/components/world/engine-goto";
 import { WorldClock } from "@/components/world/world-clock";
@@ -21,6 +22,7 @@ export default function HomePage() {
   // once in a useEffect so SSR / hot-reload don't double-subscribe.
   useEffect(() => {
     initBattleBridge();
+    installDevTools();
   }, []);
 
   return (

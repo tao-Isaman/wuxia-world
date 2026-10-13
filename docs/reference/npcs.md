@@ -10,10 +10,10 @@
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `merchant_wang` | เถ้าแก่หวาง | 💬 🤏 | — |
+| `merchant_wang` | เถ้าแก่หวาง | 💬 🤏 | 1 |
 | `city_capital_clerk_qing` | เสมียนนายฉิง | 💬 | 5 |
-| `city_capital_magistrate_wu` | นายอำเภอหวู่ | 💬 🤏 | 7 |
-| `city_capital_physician_lin` | หมอหลิน | 💬 🤏 | 6 |
+| `city_capital_magistrate_wu` | นายอำเภอหวู่ | 💬 🤏 | 8 |
+| `city_capital_physician_lin` | หมอหลิน | 💬 🤏 | 7 |
 | `city_capital_merchant_wang` | พ่อค้าหวัง | 💬 🤏 | — |
 | `evil_capital_blackmarket_zhou` | เถ้าแก่โจวตลาดมืด | 💬 🤏 | 11 |
 | `spy_capital_feng` | เฟิงเจ้าของร้านบะหมี่ | 💬 ⚔ 🤏 | 11 |
@@ -144,7 +144,7 @@
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `sect_shaolin_abbot_huiyuan` | เจ้าอาวาสฮุยหยวน | 💬 ⚔ 🤏 | 26 |
+| `sect_shaolin_abbot_huiyuan` | เจ้าอาวาสฮุยหยวน | 💬 ⚔ 🤏 | 28 |
 | `sect_shaolin_elder_faming` | อาจารย์ฝาหมิง | 💬 ⚔ | 6 |
 | `sect_shaolin_disciple_xuanji` | ศิษย์เซวียนจี้ | ⚔ | 4 |
 | `sect_shaolin_head_disciple_yuanquan` | หัวหน้าศิษย์หยวนเฉวียน | ⚔ 🤏 | 4 |
@@ -428,7 +428,7 @@
 
 | Id | Name | Can | Quests |
 | --- | --- | --- | --- |
-| `inn_heluo_storyteller_po` | โปผู้เล่าเรื่อง | 💬 | 17 |
+| `inn_heluo_storyteller_po` | โปผู้เล่าเรื่อง | 💬 | 18 |
 
 ## Homes
 

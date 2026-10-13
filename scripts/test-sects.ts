@@ -21,7 +21,7 @@ console.warn = (...args: unknown[]) => {
 };
 
 const { useWorldStore } = await import("../store/world-store");
-const { SECT_QUEST_GAP_DAYS, sectActionCount, sectActionsFor, applyEffect, applyEffects, droppedQuestFlag, isQuestOfferable, isSectQuestOfferable, repeatsQuestGifts } = await import("../lib/world/effects");
+const { SECT_QUEST_GAP_DAYS, gainTrait, sectActionCount, sectActionsFor, applyEffect, applyEffects, droppedQuestFlag, isQuestOfferable, isSectQuestOfferable, repeatsQuestGifts } = await import("../lib/world/effects");
 const { setTestClock, setTestWorldTime } = await import("../lib/world/clock");
 const { QUESTS, getQuest } = await import("../lib/world/data/quests");
 const { getNpc } = await import("../lib/world/data/npcs");
@@ -319,6 +319,63 @@ check("the สำนัก badge is the sum of the window's tab counts (rank-up,
   // What the ภารกิจประจำ tab lists as ready is its count.
   const ready = getQuestsForSect("wudang").filter((q) => !q.isArtQuest && q.id !== redemptionQuestId("wudang") && isSectQuestOfferable(store(), q).offerable);
   assert.equal(a.quests, ready.length);
+});
+
+check("traits from quests: a gain lowers the opposite by half (good ⇄ evil, arrogance ⇄ humility); fame has none; losses touch only themselves", () => {
+  const t = { good: 0, evil: 20, arrogance: 9, humility: 0, fame: 5 };
+  const s = { traits: { ...t } } as never as WorldStateData;
+  gainTrait(s, "good", 10);
+  assert.deepEqual(s.traits, { ...t, good: 10, evil: 15 });
+  gainTrait(s, "humility", 4);
+  assert.equal(s.traits.arrogance, 7);
+  gainTrait(s, "evil", 3);
+  assert.equal(s.traits.good, 8, "evil +3 → good −2 (rounded)");
+  gainTrait(s, "fame", 6);
+  assert.equal(s.traits.fame, 11);
+  gainTrait(s, "evil", -50);
+  assert.equal(s.traits.evil, 0, "never below 0");
+  assert.equal(s.traits.good, 8, "a loss does not raise the opposite");
+  // Through a quest's rewards.
+  newGame();
+  useWorldStore.setState({ traits: { ...store().traits, evil: 12 } });
+  const q = getQuest("qr_heal_the_poor")!;
+  assert.ok(store().acceptQuest(q.id).ok);
+  assert.ok(store().finishQuestNow(q.id).ok);
+  assert.equal(store().traits.evil, 9, "good +6 → evil −3");
+});
+
+check("repeatable quests: offered again two real hours after taken; not while active; dropping gives the turn back", () => {
+  setTestWorldTime(800, 0);
+  try {
+    newGame();
+    useWorldStore.setState({ traits: { ...store().traits, evil: 30 } });
+    const q = getQuest("qr_atonement_sutra")!;
+    assert.equal(q.repeatEveryDays, 2);
+    assert.ok(isQuestOfferable(store(), q));
+    assert.ok(store().acceptQuest(q.id).ok);
+    assert.equal(isQuestOfferable(store(), q), false, "not while active");
+    assert.ok(store().finishQuestNow(q.id).ok);
+    assert.equal(store().traits.evil, 20, "evil −10");
+    assert.equal(isQuestOfferable(store(), q), false, "waits after it was taken");
+    assert.equal(store().acceptQuest(q.id).ok, false);
+    setTestWorldTime(801, 6);
+    store().syncClock();
+    assert.equal(isQuestOfferable(store(), q), false, "an hour and a half on: still waiting");
+    setTestWorldTime(802, 0);
+    store().syncClock();
+    assert.ok(isQuestOfferable(store(), q), "two hours on");
+    assert.ok(store().acceptQuest(q.id).ok);
+    assert.equal(store().quests[q.id]?.status, "active", "a fresh round");
+    assert.ok(store().abandonQuest(q.id).ok);
+    assert.ok(isQuestOfferable(store(), q), "dropped: offered again at once");
+    // The trait gates: no evil, no atonement.
+    useWorldStore.setState({ traits: { ...store().traits, evil: 0 } });
+    assert.equal(isQuestOfferable(store(), q), false);
+    // A one-shot quest still never comes back.
+    const once = QUESTS.find((x) => !x.sectId && !x.repeatEveryDays && x.type === "side" && !x.prereqs)!;
+    useWorldStore.setState({ quests: { ...store().quests, [once.id]: { id: once.id, status: "done", stage: 0 } } });
+    assert.equal(isQuestOfferable(store(), once), false);
+  } finally { setTestClock(null); }
 });
 
 console.warn = originalWarn;

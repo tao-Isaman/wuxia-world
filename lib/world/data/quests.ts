@@ -5,6 +5,7 @@ import { QUESTS_SECTS_TEMPLES } from "./quests/sects-temples";
 import { QUESTS_WILDERNESS } from "./quests/wilderness";
 import { QUESTS_EVIL } from "./quests/evil";
 import { QUESTS_SPIES } from "./quests/spies";
+import { QUESTS_REPEATABLE } from "./quests/repeatable";
 import { STORY_QUESTS } from "../story/registry";
 import { PLACE_QUESTS } from "./places";
 import { LINEAGE_PROLOGUES, SAGA_PROLOGUES } from "./story";
@@ -87,6 +88,7 @@ export const QUESTS: readonly QuestDef[] = [
   ...QUESTS_WILDERNESS,
   ...QUESTS_EVIL,
   ...QUESTS_SPIES,
+  ...QUESTS_REPEATABLE,
   // Sect lineage quests and story saga chapters (lib/world/data/story).
   ...STORY_QUESTS,
   ...PLACE_QUESTS,

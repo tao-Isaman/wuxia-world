@@ -1,7 +1,7 @@
 // Accepting, dropping (forgetting) and handing in quests; hands-on objective spots.
 import { applyEffects, getQuest } from "@/lib/world";
 import { completeObjectiveSpot } from "@/lib/world/quest-objectives";
-import { consumeQuestAutoItems, droppedQuestFlag } from "@/lib/world/effects";
+import { consumeQuestAutoItems, droppedQuestFlag, repeatQuestFlag, repeatQuestWait } from "@/lib/world/effects";
 import { staminaForHours } from "../lifecycle";
 import { appendActionLog, draftFrom } from "../state";
 import type { WorldGet, WorldSet, WorldStore } from "../types";
@@ -13,10 +13,11 @@ export const questsActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "a
     if (!def) return { ok: false, reason: "unknown" };
     const cur = s.quests[questId];
     if (cur && cur.status === "active") return { ok: false, reason: "already-active" };
-    if (cur && (cur.status === "done" || cur.status === "failed")) {
+    const draft = draftFrom(s);
+    // A repeatable quest comes back on its own turn (checked on the clock now).
+    if (cur && (cur.status === "done" || cur.status === "failed") && (!def.repeatEveryDays || repeatQuestWait(draft, def) > 0)) {
       return { ok: false, reason: "already-done" };
     }
-    const draft = draftFrom(s);
     // applyEffects runs the existing startQuest dispatcher and the
     // quest progress ticker — so a quest whose stage 0 has an
     // autoAdvance that's already true can resolve a step or two on
@@ -50,6 +51,8 @@ export const questsActions = (set: WorldSet, get: WorldGet): Pick<WorldStore, "a
     const before = flags[droppedQuestFlag(questId)];
     flags[droppedQuestFlag(questId)] = Math.max(typeof before === "number" ? before : 0, reached);
     draft.flags = flags;
+    // Dropping a repeatable quest gives its turn back.
+    delete flags[repeatQuestFlag(questId)];
     // Dropping a repeatable sect quest gives its two-hour turn back.
     const m = def.sectId && !def.isArtQuest ? draft.sectMembership[def.sectId] : undefined;
     if (m && def.sectId && m.lastQuestDay?.[questId] != null) {
